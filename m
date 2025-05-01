@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-187337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EFCBAA676E
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 01:30:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EFD07AA676F
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 01:30:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D354B175C0E
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 23:30:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAA3B16FD56
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 23:30:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7047626AA83;
-	Thu,  1 May 2025 23:30:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FB1921B90B;
+	Thu,  1 May 2025 23:30:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dsixik8R"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WpUOvMDC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD0A8269CED
-	for <netdev@vger.kernel.org>; Thu,  1 May 2025 23:30:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C945265607
+	for <netdev@vger.kernel.org>; Thu,  1 May 2025 23:30:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746142207; cv=none; b=JXcSJN9LiK1NFAWQIVxA//R8Sdl94DJHKs78KrblzDTnAOC9wr08FF1/mPvya4x9fX27n1JOZLM8Po0VqOlOtHoSOjTTOInp6d7RI3Y/pjABnt69eEa+tf8qnUR+It89PopBL2N2KEldhOZVUcla0VNj1mVYkCIenm1XeACcdx0=
+	t=1746142214; cv=none; b=VdARLe1CwH71Tm0EYVUUMKyCYKH3odBltXY0J42obQtpvYSZXSUhkNnKbFoCpkhVJjCcqJcTX1hkXcOxzTc7wbtAFhru92bcfmLDzIDcJDXg5AbOroKegStaSsgkfMc+SHGZjFI84LNErhbXkYI3sn3XLUu1hSe/8tbiXQj8PhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746142207; c=relaxed/simple;
-	bh=R4/af6cJwJdQBeDpOZaGe6Uj14/Fg/JatIj+tJx8yjY=;
+	s=arc-20240116; t=1746142214; c=relaxed/simple;
+	bh=Ic8i3AUMwybu3Em3oudzBG+B8K2B9bXU9vc1+3WFLo4=;
 	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qRr94Lk3bkEdnK0oBm1o6kdVM/fhSE5zRnEQZcpY2IsRaG/X2QP1Btc1HWpam+9z1bWExzoshK8FjHvPMqKFPm4Rkljm9aUlbWII5UCSJxpICZkPKuJ10CFgWcnVHKPr+eySfLu8B60rNSMMVdNdeGE19zlS8e9V1NdMs9EwrPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dsixik8R; arc=none smtp.client-ip=209.85.210.171
+	 MIME-Version:Content-Type; b=rXRP2CyQLNU5Nd1xfICL6ucux5EjDR/HGMKq8bt5IgdVosyzsidqjtbRs/TRtIkhYwVIpcwr/ucUpWvhmNAd9ShPHKiej9DK1VQWYJiwLvi15KVYclzPqmGEr3b0MwOqzvvRz+/TxUlZntrGjyUtETdNWsvtVH4crQqbrR8sCFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WpUOvMDC; arc=none smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-73bb647eb23so1460921b3a.0
-        for <netdev@vger.kernel.org>; Thu, 01 May 2025 16:30:05 -0700 (PDT)
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-739b3fe7ce8so1506601b3a.0
+        for <netdev@vger.kernel.org>; Thu, 01 May 2025 16:30:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746142205; x=1746747005; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1746142211; x=1746747011; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=9lBZNIZFe2O+eHpsTGsQ1WDmkrJ/xuACWlcVt0AaO9Q=;
-        b=dsixik8RatchTNlsGuAZjfokWQ4aTYmRFQvAPiF3QUZaLKL+uGaYVtZahRwH5YCmRV
-         QG2UzIX0wrv8VaCgSs96JU42nIXe4eYBctFyM/9znO7ZuLRfZPudQJpklCjKOuiXtRhD
-         rY0/wohwIudwawclW6guEFfXFBjzPJy7RT+E07QdyUlPpiOf+R7q20Rwi7K2RpYP/58z
-         JAMYrm+U/GDrxDrfSTDL+DStGvW1UDhQ4X7D4RI0xSRF6j85w9AAsG9fDxe/SC3TWipx
-         XVvpKYYd35afQB7pCQGkwWld3tR0Buwt32uWZpSlzPpYZF+FtMRnMYk/qQvteTCa+OyB
-         574Q==
+        bh=RGU7yQMF+pHr09kvn6YF7wW8+U7H739V89wQF6f92G0=;
+        b=WpUOvMDCRBWwIzhpwEodCTLXzS9vCQSur11npsSzfsML4QoY6UOESahtTf78kc6u8X
+         EQWh3E3PJYAM9SpRTb9O8hTRupBdGSfwdN5pYKu5DqoDR8rMJ424tavZKedkKDVOaT/1
+         jfXTfcdsxkZSZJLZyFdAPGUGXf8VHW4cmRyfpdqgFGrcfl8EZHIK6p5v3FW9VAYmj+A2
+         GD+IONg4M1g+V4e7z7DyHlcJXAibUGG3tvl9gVoNW5+sBVcK7l4QqNiITyRXAWXxU4R/
+         DidO1XHMcf9Q6lYTS+oO3bwCDpjWPcIvlmR9HjrZb0huLbGqbfH4SAYPsvz/l1yg8D74
+         ddGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746142205; x=1746747005;
+        d=1e100.net; s=20230601; t=1746142211; x=1746747011;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=9lBZNIZFe2O+eHpsTGsQ1WDmkrJ/xuACWlcVt0AaO9Q=;
-        b=pQVYRIE8r1dcrrMw6HWdEgBN/MRIj0EviuIiuhMk01A/mbuq1zLAQMSARzh5h83GNJ
-         7cgzGbGqNsW7LfLai/367WlaqjuLNnx+9mgfOWpVlaukpNMJnzwPn4KL5qbCyHeWTSyN
-         Bu90VOP1431efkBxMLbwko9j70jKKA5VlqqKld5/Ll/4s02BqZrgQpGXvswKOOvoHoVW
-         caeqBUoMMpFcPf63Tc2RSdUcRas9egGlf8hnexMHbjxEabNg1xqpKXFDcHJBH2cy1B4D
-         M1ChHaFYadMfwWwLCC+dnnlQyDE1Q4F1WvI/1RdNLfekbkOe9F0xay7ap0LK9O5+T8L1
-         dKqQ==
-X-Gm-Message-State: AOJu0YwzKHXbEZhusWywdJNDLKXjAvjc603RV+kBDlpG+GDjo9Sc8X0a
-	ZywcvP+4dS33VSTuoEAW59FGxeRpfS/KJ8hb00sNA3WuzNNH+bUoBkZCAA==
-X-Gm-Gg: ASbGnctx3X9ORJIl7YAvMYcbb+/mFg1N6YpTgYlR94b+alOd38+7M05m7emk6B2xoAf
-	2MwmWHqwU3kqzDiOupgPyHqCsD16IroXm7RtWj53a00KYX3Xfh8q2V7TrPp+r2pdMDoa+52wJQH
-	tGJbS2Jzwpj4eP+wcx5eE5ZphBPqaHjCcf3dBi2XCPNQfSmY4dEVP0PR6zo0opBqKSrd6+CZEoJ
-	/yjaMDd13LPrRIB1LiSvyUxscoSVnfA1RMjYFv+XSbg5uhf/1I2PxrccWeEQs/bNmUtC/PY4veY
-	2PiEsCqhGn571ViccVYvyRQec80l2puh/k4mz0mxsBXlhlRVTdLMsFX32Iizk3ZkFJQcyiKInxU
+        bh=RGU7yQMF+pHr09kvn6YF7wW8+U7H739V89wQF6f92G0=;
+        b=b09xJvdZglhws3BFeS0lRw7ECE9hgkkhsra6KLvIMGUK+hzP72jvvq7lsL1qf7ltUl
+         7hUepbZS2Qn2+CwRnYXeVKu4U4bkgVcCYnpZD7zfOMRVhJX+13eZaHZoeSfPrMdCl5Pw
+         3GEkK+dW+0u8LSpMZOGXYrtm0B/1SmeEpvF1hdZxIcL+wbhGtFhZOZusAl4sjPGYC6F9
+         7yna1oIb/SsZzeWGh8cqbKYIpBsPOJd7IhqC03rAuFv1zgijxLjkMxnkQs5fOG0j5j6B
+         JnL8Uu54+asAbT4IXjZMYj6HOFrVTyJJlYwUx5ZeBj1pWJx4zi40fxqRwzYjIdSdzD15
+         LRUQ==
+X-Gm-Message-State: AOJu0YwkvLz04vwvfWz9Ir2ZaNvyWpcMezm6TpLcpX6iJ4taT/zdbJu5
+	eDpDeRLHWiqNHFVCyshmLy6c1UGwTv/+Lj8zS3K9oUd6EFWJ6BSU
+X-Gm-Gg: ASbGncu+bpZIoJPUSrHYWJThT22quRqrj+HmeUq1xxvJBh5JyvVe+NjlkcJTcBXfj95
+	y4i+krC3Nzk9vO8bx2qwGocdHOe9P77ghbD+MNfadJnzgoqBntwb/IeDyRDhLvxe3cW5pAPZY1t
+	xNtfbSSo1Vy/645yIv9SYchBWwtyCg6N1/cpH/Jh/cl+QNCeDB/W3xGMQC+V/xrld19z9UVSaDJ
+	GsnOrQaEGeDXbtzpXg9gAhJDFMxamD2lt70mYONctHU5EU5J9tnYQ3jxk/goXoz0LQcsNIElpe/
+	dxWGYebwX5QW3nulDK6bL10lsw/Ajb90bCdQ4PVWEBt2md8uhspiiMx943qEjhNEp5teqimUWPk
 	=
-X-Google-Smtp-Source: AGHT+IFKobAJTtxJIGJaAx17ryx1yg45L997d3JlZLBWrJ1g0d1qNJnrlZ3CdwZNzr52yVPnAqaCzQ==
-X-Received: by 2002:a05:6a20:918e:b0:1f5:619a:8f73 with SMTP id adf61e73a8af0-20cdfdf47b8mr823523637.26.1746142204887;
-        Thu, 01 May 2025 16:30:04 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IErqYNdfaIjC1L27KfHHEErHYFAO4O3V4aRfsM0h497dZs6kKNSN4PStnGBmnGdWYOXSbaJBQ==
+X-Received: by 2002:a05:6a20:7d9e:b0:1f5:56fe:b437 with SMTP id adf61e73a8af0-20cdfcfc81amr1122386637.32.1746142211290;
+        Thu, 01 May 2025 16:30:11 -0700 (PDT)
 Received: from ahduyck-xeon-server.home.arpa ([2605:59c8:829:4c00:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b1fa82b568asm164889a12.41.2025.05.01.16.30.04
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b1fa82b68c1sm164640a12.37.2025.05.01.16.30.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 May 2025 16:30:04 -0700 (PDT)
-Subject: [net PATCH 2/6] fbnic: Gate AXI read/write enabling on FW mailbox
+        Thu, 01 May 2025 16:30:10 -0700 (PDT)
+Subject: [net PATCH 3/6] fbnic: Add additional handling of IRQs
 From: Alexander Duyck <alexander.duyck@gmail.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
-Date: Thu, 01 May 2025 16:30:03 -0700
+Date: Thu, 01 May 2025 16:30:10 -0700
 Message-ID: 
- <174614220363.126317.10550539950263575976.stgit@ahduyck-xeon-server.home.arpa>
+ <174614221004.126317.3819743775871203479.stgit@ahduyck-xeon-server.home.arpa>
 In-Reply-To: 
  <174614212557.126317.3577874780629807228.stgit@ahduyck-xeon-server.home.arpa>
 References: 
@@ -95,173 +95,385 @@ Content-Transfer-Encoding: 7bit
 
 From: Alexander Duyck <alexanderduyck@fb.com>
 
-In order to prevent the device from throwing spurious writes and/or reads
-at us we need to gate the AXI fabric interface to the PCIe until such time
-as we know the FW is in a known good state.
+We have two issues that need to be addressed in our IRQ handling.
 
-To accomplish this we use the mailbox as a mechanism for us to recognize
-that the FW has acknowledged our presence and is no longer sending any
-stale message data to us.
+One is the fact that we can end up double-freeing IRQs in the event of an
+exception handling error such as a PCIe reset/recovery that fails. To
+prevent that from becoming an issue we can use the msix_vector values to
+indicate that we have successfully requested/freed the IRQ by only setting
+or clearing them when we have completed the tiven action.
 
-We start in fbnic_mbx_init by calling fbnic_mbx_reset_desc_ring function,
-disabling the DMA in both directions, and then invalidating all the
-descriptors in each ring.
+The other issue is that we have several potential races in our IRQ path due
+to us manipulating the mask before the vector has been truly disabled. In
+order to handle that in the case of the FW mailbox we need to not
+auto-enable the IRQ and instead will be enabling/disabling it separately.
+In the case of the PCS vector we can mitigate this by unmapping it and
+synchronizing the IRQ before we clear the mask.
 
-We then poll the mailbox in fbnic_mbx_poll_tx_ready and when the interrupt
-is set by the FW we pick it up and mark the mailboxes as ready, while also
-enabling the DMA.
+The general order of operations after this change is now to request the
+interrupt, poll the FW mailbox to ready, and then enable the interrupt. For
+the shutdown we do the reverse where we disable the interrupt, flush any
+pending Tx, and then free the IRQ. I am renaming the enable/disable to
+request/free to be equivilent with the IRQ calls being used. We may see
+additions in the future to enable/disable the IRQs versus request/free them
+for certain use cases.
 
-Once we have completed all the transactions and need to shut down we call
-into fbnic_mbx_clean which will in turn call fbnic_mbx_reset_desc_ring for
-each ring and shut down the DMA and once again invalidate the descriptors.
-
-Fixes: 3646153161f1 ("eth: fbnic: Add register init to set PCIe/Ethernet device config")
 Fixes: da3cde08209e ("eth: fbnic: Add FW communication mechanism")
-
+Fixes: 69684376eed5 ("eth: fbnic: Add link detection")
 Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
 ---
- drivers/net/ethernet/meta/fbnic/fbnic_csr.h |    2 +
- drivers/net/ethernet/meta/fbnic/fbnic_fw.c  |   38 ++++++++++++++++++++++-----
- drivers/net/ethernet/meta/fbnic/fbnic_mac.c |    6 ----
- 3 files changed, 33 insertions(+), 13 deletions(-)
+ drivers/net/ethernet/meta/fbnic/fbnic.h        |    8 +
+ drivers/net/ethernet/meta/fbnic/fbnic_irq.c    |  142 ++++++++++++++++--------
+ drivers/net/ethernet/meta/fbnic/fbnic_netdev.c |    5 +
+ drivers/net/ethernet/meta/fbnic/fbnic_pci.c    |   14 +-
+ 4 files changed, 110 insertions(+), 59 deletions(-)
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-index 3b12a0ab5906..51bee8072420 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-@@ -796,8 +796,10 @@ enum {
- /* PUL User Registers */
- #define FBNIC_CSR_START_PUL_USER	0x31000	/* CSR section delimiter */
- #define FBNIC_PUL_OB_TLP_HDR_AW_CFG	0x3103d		/* 0xc40f4 */
-+#define FBNIC_PUL_OB_TLP_HDR_AW_CFG_FLUSH	CSR_BIT(19)
- #define FBNIC_PUL_OB_TLP_HDR_AW_CFG_BME		CSR_BIT(18)
- #define FBNIC_PUL_OB_TLP_HDR_AR_CFG	0x3103e		/* 0xc40f8 */
-+#define FBNIC_PUL_OB_TLP_HDR_AR_CFG_FLUSH	CSR_BIT(19)
- #define FBNIC_PUL_OB_TLP_HDR_AR_CFG_BME		CSR_BIT(18)
- #define FBNIC_PUL_USER_OB_RD_TLP_CNT_31_0 \
- 					0x3106e		/* 0xc41b8 */
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
-index c4956f0a741e..f4749bfd840c 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
-@@ -51,10 +51,26 @@ static u64 __fbnic_mbx_rd_desc(struct fbnic_dev *fbd, int mbx_idx, int desc_idx)
- 	return desc;
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic.h b/drivers/net/ethernet/meta/fbnic/fbnic.h
+index 4ca7b99ef131..de6b1a340f55 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic.h
+@@ -154,14 +154,14 @@ struct fbnic_dev *fbnic_devlink_alloc(struct pci_dev *pdev);
+ void fbnic_devlink_register(struct fbnic_dev *fbd);
+ void fbnic_devlink_unregister(struct fbnic_dev *fbd);
+ 
+-int fbnic_fw_enable_mbx(struct fbnic_dev *fbd);
+-void fbnic_fw_disable_mbx(struct fbnic_dev *fbd);
++int fbnic_fw_request_mbx(struct fbnic_dev *fbd);
++void fbnic_fw_free_mbx(struct fbnic_dev *fbd);
+ 
+ void fbnic_hwmon_register(struct fbnic_dev *fbd);
+ void fbnic_hwmon_unregister(struct fbnic_dev *fbd);
+ 
+-int fbnic_pcs_irq_enable(struct fbnic_dev *fbd);
+-void fbnic_pcs_irq_disable(struct fbnic_dev *fbd);
++int fbnic_pcs_request_irq(struct fbnic_dev *fbd);
++void fbnic_pcs_free_irq(struct fbnic_dev *fbd);
+ 
+ void fbnic_napi_name_irqs(struct fbnic_dev *fbd);
+ int fbnic_napi_request_irq(struct fbnic_dev *fbd,
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_irq.c b/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
+index 1bbc0e56f3a0..1c88a2bf3a7a 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
+@@ -19,69 +19,105 @@ static irqreturn_t fbnic_fw_msix_intr(int __always_unused irq, void *data)
+ 	return IRQ_HANDLED;
  }
  
--static void fbnic_mbx_init_desc_ring(struct fbnic_dev *fbd, int mbx_idx)
-+static void fbnic_mbx_reset_desc_ring(struct fbnic_dev *fbd, int mbx_idx)
- {
- 	int desc_idx;
- 
-+	/* Disable DMA transactions from the device,
-+	 * and flush any transactions triggered during cleaning
-+	 */
-+	switch (mbx_idx) {
-+	case FBNIC_IPC_MBX_RX_IDX:
-+		wr32(fbd, FBNIC_PUL_OB_TLP_HDR_AW_CFG,
-+		     FBNIC_PUL_OB_TLP_HDR_AW_CFG_FLUSH);
-+		break;
-+	case FBNIC_IPC_MBX_TX_IDX:
-+		wr32(fbd, FBNIC_PUL_OB_TLP_HDR_AR_CFG,
-+		     FBNIC_PUL_OB_TLP_HDR_AR_CFG_FLUSH);
-+		break;
++static int __fbnic_fw_enable_mbx(struct fbnic_dev *fbd, int vector)
++{
++	int err;
++
++	/* Initialize mailbox and attempt to poll it into ready state */
++	fbnic_mbx_init(fbd);
++	err = fbnic_mbx_poll_tx_ready(fbd);
++	if (err) {
++		dev_warn(fbd->dev, "FW mailbox did not enter ready state\n");
++		return err;
 +	}
 +
-+	wrfl(fbd);
++	/* Enable interrupt and unmask the vector */
++	enable_irq(vector);
++	fbnic_wr32(fbd, FBNIC_INTR_MASK_CLEAR(0), 1u << FBNIC_FW_MSIX_ENTRY);
 +
- 	/* Initialize first descriptor to all 0s. Doing this gives us a
- 	 * solid stop for the firmware to hit when it is done looping
- 	 * through the ring.
-@@ -90,7 +106,7 @@ void fbnic_mbx_init(struct fbnic_dev *fbd)
- 	wr32(fbd, FBNIC_INTR_CLEAR(0), 1u << FBNIC_FW_MSIX_ENTRY);
- 
- 	for (i = 0; i < FBNIC_IPC_MBX_INDICES; i++)
--		fbnic_mbx_init_desc_ring(fbd, i);
-+		fbnic_mbx_reset_desc_ring(fbd, i);
- }
- 
- static int fbnic_mbx_map_msg(struct fbnic_dev *fbd, int mbx_idx,
-@@ -155,7 +171,7 @@ static void fbnic_mbx_clean_desc_ring(struct fbnic_dev *fbd, int mbx_idx)
- {
- 	int i;
- 
--	fbnic_mbx_init_desc_ring(fbd, mbx_idx);
-+	fbnic_mbx_reset_desc_ring(fbd, mbx_idx);
- 
- 	for (i = FBNIC_IPC_MBX_DESC_LEN; i--;)
- 		fbnic_mbx_unmap_and_free_msg(fbd, mbx_idx, i);
-@@ -354,7 +370,7 @@ static int fbnic_fw_xmit_cap_msg(struct fbnic_dev *fbd)
- 	return (err == -EOPNOTSUPP) ? 0 : err;
- }
- 
--static void fbnic_mbx_postinit_desc_ring(struct fbnic_dev *fbd, int mbx_idx)
-+static void fbnic_mbx_init_desc_ring(struct fbnic_dev *fbd, int mbx_idx)
- {
- 	struct fbnic_fw_mbx *mbx = &fbd->mbx[mbx_idx];
- 
-@@ -366,10 +382,18 @@ static void fbnic_mbx_postinit_desc_ring(struct fbnic_dev *fbd, int mbx_idx)
- 
- 	switch (mbx_idx) {
- 	case FBNIC_IPC_MBX_RX_IDX:
-+		/* Enable DMA writes from the device */
-+		wr32(fbd, FBNIC_PUL_OB_TLP_HDR_AW_CFG,
-+		     FBNIC_PUL_OB_TLP_HDR_AW_CFG_BME);
++	return 0;
++}
 +
- 		/* Make sure we have a page for the FW to write to */
- 		fbnic_mbx_alloc_rx_msgs(fbd);
- 		break;
- 	case FBNIC_IPC_MBX_TX_IDX:
-+		/* Enable DMA reads from the device */
-+		wr32(fbd, FBNIC_PUL_OB_TLP_HDR_AR_CFG,
-+		     FBNIC_PUL_OB_TLP_HDR_AR_CFG_BME);
-+
- 		/* Force version to 1 if we successfully requested an update
- 		 * from the firmware. This should be overwritten once we get
- 		 * the actual version from the firmware in the capabilities
-@@ -386,7 +410,7 @@ static void fbnic_mbx_postinit(struct fbnic_dev *fbd)
+ /**
+- * fbnic_fw_enable_mbx - Configure and initialize Firmware Mailbox
++ * fbnic_fw_request_mbx - Configure and initialize Firmware Mailbox
+  * @fbd: Pointer to device to initialize
+  *
+- * This function will initialize the firmware mailbox rings, enable the IRQ
+- * and initialize the communication between the Firmware and the host. The
+- * firmware is expected to respond to the initialization by sending an
+- * interrupt essentially notifying the host that it has seen the
+- * initialization and is now synced up.
++ * This function will allocate the IRQ and then reinitialize the mailbox
++ * starting communication between the host and firmware.
+  *
+  * Return: non-zero on failure.
+  **/
+-int fbnic_fw_enable_mbx(struct fbnic_dev *fbd)
++int fbnic_fw_request_mbx(struct fbnic_dev *fbd)
  {
- 	int i;
+-	u32 vector = fbd->fw_msix_vector;
+-	int err;
++	struct pci_dev *pdev = to_pci_dev(fbd->dev);
++	int vector, err;
++
++	WARN_ON(fbd->fw_msix_vector);
++
++	vector = pci_irq_vector(pdev, FBNIC_FW_MSIX_ENTRY);
++	if (vector < 0)
++		return vector;
  
--	/* We only need to do this on the first interrupt following init.
-+	/* We only need to do this on the first interrupt following reset.
- 	 * this primes the mailbox so that we will have cleared all the
- 	 * skip descriptors.
- 	 */
-@@ -396,7 +420,7 @@ static void fbnic_mbx_postinit(struct fbnic_dev *fbd)
- 	wr32(fbd, FBNIC_INTR_CLEAR(0), 1u << FBNIC_FW_MSIX_ENTRY);
+ 	/* Request the IRQ for FW Mailbox vector. */
+ 	err = request_threaded_irq(vector, NULL, &fbnic_fw_msix_intr,
+-				   IRQF_ONESHOT, dev_name(fbd->dev), fbd);
++				   IRQF_ONESHOT | IRQF_NO_AUTOEN,
++				   dev_name(fbd->dev), fbd);
+ 	if (err)
+ 		return err;
  
- 	for (i = 0; i < FBNIC_IPC_MBX_INDICES; i++)
--		fbnic_mbx_postinit_desc_ring(fbd, i);
-+		fbnic_mbx_init_desc_ring(fbd, i);
+ 	/* Initialize mailbox and attempt to poll it into ready state */
+-	fbnic_mbx_init(fbd);
+-	err = fbnic_mbx_poll_tx_ready(fbd);
+-	if (err) {
+-		dev_warn(fbd->dev, "FW mailbox did not enter ready state\n");
++	err = __fbnic_fw_enable_mbx(fbd, vector);
++	if (err)
+ 		free_irq(vector, fbd);
+-		return err;
+-	}
+ 
+-	/* Enable interrupts */
+-	fbnic_wr32(fbd, FBNIC_INTR_MASK_CLEAR(0), 1u << FBNIC_FW_MSIX_ENTRY);
++	fbd->fw_msix_vector = vector;
+ 
+-	return 0;
++	return err;
  }
  
  /**
-@@ -894,7 +918,7 @@ int fbnic_mbx_poll_tx_ready(struct fbnic_dev *fbd)
- 		 * avoid the mailbox getting stuck closed if the interrupt
- 		 * is reset.
- 		 */
--		fbnic_mbx_init_desc_ring(fbd, FBNIC_IPC_MBX_TX_IDX);
-+		fbnic_mbx_reset_desc_ring(fbd, FBNIC_IPC_MBX_TX_IDX);
+- * fbnic_fw_disable_mbx - Disable mailbox and place it in standby state
+- * @fbd: Pointer to device to disable
++ * fbnic_fw_disable_mbx - Temporarily place mailbox in standby state
++ * @fbd: Pointer to device
+  *
+- * This function will disable the mailbox interrupt, free any messages still
+- * in the mailbox and place it into a standby state. The firmware is
+- * expected to see the update and assume that the host is in the reset state.
++ * Shutdown the mailbox by notifying the firmware to stop sending us logs, mask
++ * and synchronize the IRQ, and then clean up the rings.
+  **/
+-void fbnic_fw_disable_mbx(struct fbnic_dev *fbd)
++static void fbnic_fw_disable_mbx(struct fbnic_dev *fbd)
+ {
+-	/* Disable interrupt and free vector */
+-	fbnic_wr32(fbd, FBNIC_INTR_MASK_SET(0), 1u << FBNIC_FW_MSIX_ENTRY);
++	/* Disable interrupt and synchronize the IRQ */
++	disable_irq(fbd->fw_msix_vector);
  
- 		msleep(200);
+-	/* Free the vector */
+-	free_irq(fbd->fw_msix_vector, fbd);
++	/* Mask the vector */
++	fbnic_wr32(fbd, FBNIC_INTR_MASK_SET(0), 1u << FBNIC_FW_MSIX_ENTRY);
  
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-index 14291401f463..dde4a37116e2 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-@@ -79,12 +79,6 @@ static void fbnic_mac_init_axi(struct fbnic_dev *fbd)
- 	fbnic_init_readrq(fbd, FBNIC_QM_RNI_RBP_CTL, cls, readrq);
- 	fbnic_init_mps(fbd, FBNIC_QM_RNI_RDE_CTL, cls, mps);
- 	fbnic_init_mps(fbd, FBNIC_QM_RNI_RCM_CTL, cls, mps);
+ 	/* Make sure disabling logs message is sent, must be done here to
+ 	 * avoid risk of completing without a running interrupt.
+ 	 */
+ 	fbnic_mbx_flush_tx(fbd);
 -
--	/* Enable XALI AR/AW outbound */
--	wr32(fbd, FBNIC_PUL_OB_TLP_HDR_AW_CFG,
--	     FBNIC_PUL_OB_TLP_HDR_AW_CFG_BME);
--	wr32(fbd, FBNIC_PUL_OB_TLP_HDR_AR_CFG,
--	     FBNIC_PUL_OB_TLP_HDR_AR_CFG_BME);
+-	/* Reset the mailboxes to the initialized state */
+ 	fbnic_mbx_clean(fbd);
  }
  
- static void fbnic_mac_init_qm(struct fbnic_dev *fbd)
++/**
++ * fbnic_fw_free_mbx - Disable mailbox and place it in standby state
++ * @fbd: Pointer to device to disable
++ *
++ * This function will disable the mailbox interrupt, free any messages still
++ * in the mailbox and place it into a disabled state. The firmware is
++ * expected to see the update and assume that the host is in the reset state.
++ **/
++void fbnic_fw_free_mbx(struct fbnic_dev *fbd)
++{
++	/* Vector has already been freed */
++	if (!fbd->fw_msix_vector)
++		return;
++
++	fbnic_fw_disable_mbx(fbd);
++
++	/* Free the vector */
++	free_irq(fbd->fw_msix_vector, fbd);
++	fbd->fw_msix_vector = 0;
++}
++
+ static irqreturn_t fbnic_pcs_msix_intr(int __always_unused irq, void *data)
+ {
+ 	struct fbnic_dev *fbd = data;
+@@ -101,7 +137,7 @@ static irqreturn_t fbnic_pcs_msix_intr(int __always_unused irq, void *data)
+ }
+ 
+ /**
+- * fbnic_pcs_irq_enable - Configure the MAC to enable it to advertise link
++ * fbnic_pcs_request_irq - Configure the PCS to enable it to advertise link
+  * @fbd: Pointer to device to initialize
+  *
+  * This function provides basic bringup for the MAC/PCS IRQ. For now the IRQ
+@@ -109,41 +145,61 @@ static irqreturn_t fbnic_pcs_msix_intr(int __always_unused irq, void *data)
+  *
+  * Return: non-zero on failure.
+  **/
+-int fbnic_pcs_irq_enable(struct fbnic_dev *fbd)
++int fbnic_pcs_request_irq(struct fbnic_dev *fbd)
+ {
+-	u32 vector = fbd->pcs_msix_vector;
+-	int err;
++	struct pci_dev *pdev = to_pci_dev(fbd->dev);
++	int vector, err;
+ 
+-	/* Request the IRQ for MAC link vector.
+-	 * Map MAC cause to it, and unmask it
++	WARN_ON(fbd->pcs_msix_vector);
++
++	vector = pci_irq_vector(pdev, FBNIC_PCS_MSIX_ENTRY);
++	if (vector < 0)
++		return vector;
++
++	/* Request the IRQ for PCS link vector.
++	 * Map PCS cause to it, and unmask it
+ 	 */
+ 	err = request_irq(vector, &fbnic_pcs_msix_intr, 0,
+ 			  fbd->netdev->name, fbd);
+ 	if (err)
+ 		return err;
+ 
++	/* Map and enable interrupt, unmask vector after link is configured */
+ 	fbnic_wr32(fbd, FBNIC_INTR_MSIX_CTRL(FBNIC_INTR_MSIX_CTRL_PCS_IDX),
+ 		   FBNIC_PCS_MSIX_ENTRY | FBNIC_INTR_MSIX_CTRL_ENABLE);
+ 
++	fbd->pcs_msix_vector = vector;
++
+ 	return 0;
+ }
+ 
+ /**
+- * fbnic_pcs_irq_disable - Teardown the MAC IRQ to prepare for stopping
++ * fbnic_pcs_free_irq - Teardown the PCS IRQ to prepare for stopping
+  * @fbd: Pointer to device that is stopping
+  *
+- * This function undoes the work done in fbnic_pcs_irq_enable and prepares
++ * This function undoes the work done in fbnic_pcs_request_irq and prepares
+  * the device to no longer receive traffic on the host interface.
+  **/
+-void fbnic_pcs_irq_disable(struct fbnic_dev *fbd)
++void fbnic_pcs_free_irq(struct fbnic_dev *fbd)
+ {
++	/* Vector has already been freed */
++	if (!fbd->pcs_msix_vector)
++		return;
++
+ 	/* Disable interrupt */
+ 	fbnic_wr32(fbd, FBNIC_INTR_MSIX_CTRL(FBNIC_INTR_MSIX_CTRL_PCS_IDX),
+ 		   FBNIC_PCS_MSIX_ENTRY);
++	fbnic_wrfl(fbd);
++
++	/* Synchronize IRQ to prevent race that would unmask vector */
++	synchronize_irq(fbd->pcs_msix_vector);
++
++	/* Mask the vector */
+ 	fbnic_wr32(fbd, FBNIC_INTR_MASK_SET(0), 1u << FBNIC_PCS_MSIX_ENTRY);
+ 
+ 	/* Free the vector */
+ 	free_irq(fbd->pcs_msix_vector, fbd);
++	fbd->pcs_msix_vector = 0;
+ }
+ 
+ void fbnic_synchronize_irq(struct fbnic_dev *fbd, int nr)
+@@ -226,9 +282,6 @@ void fbnic_free_irqs(struct fbnic_dev *fbd)
+ {
+ 	struct pci_dev *pdev = to_pci_dev(fbd->dev);
+ 
+-	fbd->pcs_msix_vector = 0;
+-	fbd->fw_msix_vector = 0;
+-
+ 	fbd->num_irqs = 0;
+ 
+ 	pci_free_irq_vectors(pdev);
+@@ -254,8 +307,5 @@ int fbnic_alloc_irqs(struct fbnic_dev *fbd)
+ 
+ 	fbd->num_irqs = num_irqs;
+ 
+-	fbd->pcs_msix_vector = pci_irq_vector(pdev, FBNIC_PCS_MSIX_ENTRY);
+-	fbd->fw_msix_vector = pci_irq_vector(pdev, FBNIC_FW_MSIX_ENTRY);
+-
+ 	return 0;
+ }
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+index 79a01fdd1dd1..2524d9b88d59 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+@@ -44,9 +44,10 @@ int __fbnic_open(struct fbnic_net *fbn)
+ 	if (err)
+ 		goto time_stop;
+ 
+-	err = fbnic_pcs_irq_enable(fbd);
++	err = fbnic_pcs_request_irq(fbd);
+ 	if (err)
+ 		goto time_stop;
++
+ 	/* Pull the BMC config and initialize the RPC */
+ 	fbnic_bmc_rpc_init(fbd);
+ 	fbnic_rss_reinit(fbd, fbn);
+@@ -82,7 +83,7 @@ static int fbnic_stop(struct net_device *netdev)
+ 	struct fbnic_net *fbn = netdev_priv(netdev);
+ 
+ 	fbnic_down(fbn);
+-	fbnic_pcs_irq_disable(fbn->fbd);
++	fbnic_pcs_free_irq(fbn->fbd);
+ 
+ 	fbnic_time_stop(fbn);
+ 	fbnic_fw_xmit_ownership_msg(fbn->fbd, false);
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
+index 6cbbc2ee3e1f..4e8595239c0f 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
+@@ -283,7 +283,7 @@ static int fbnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		goto free_irqs;
+ 	}
+ 
+-	err = fbnic_fw_enable_mbx(fbd);
++	err = fbnic_fw_request_mbx(fbd);
+ 	if (err) {
+ 		dev_err(&pdev->dev,
+ 			"Firmware mailbox initialization failure\n");
+@@ -363,7 +363,7 @@ static void fbnic_remove(struct pci_dev *pdev)
+ 	fbnic_hwmon_unregister(fbd);
+ 	fbnic_dbg_fbd_exit(fbd);
+ 	fbnic_devlink_unregister(fbd);
+-	fbnic_fw_disable_mbx(fbd);
++	fbnic_fw_free_mbx(fbd);
+ 	fbnic_free_irqs(fbd);
+ 
+ 	fbnic_devlink_free(fbd);
+@@ -387,7 +387,7 @@ static int fbnic_pm_suspend(struct device *dev)
+ 	rtnl_unlock();
+ 
+ null_uc_addr:
+-	fbnic_fw_disable_mbx(fbd);
++	fbnic_fw_free_mbx(fbd);
+ 
+ 	/* Free the IRQs so they aren't trying to occupy sleeping CPUs */
+ 	fbnic_free_irqs(fbd);
+@@ -420,7 +420,7 @@ static int __fbnic_pm_resume(struct device *dev)
+ 	fbd->mac->init_regs(fbd);
+ 
+ 	/* Re-enable mailbox */
+-	err = fbnic_fw_enable_mbx(fbd);
++	err = fbnic_fw_request_mbx(fbd);
+ 	if (err)
+ 		goto err_free_irqs;
+ 
+@@ -438,15 +438,15 @@ static int __fbnic_pm_resume(struct device *dev)
+ 	if (netif_running(netdev)) {
+ 		err = __fbnic_open(fbn);
+ 		if (err)
+-			goto err_disable_mbx;
++			goto err_free_mbx;
+ 	}
+ 
+ 	rtnl_unlock();
+ 
+ 	return 0;
+-err_disable_mbx:
++err_free_mbx:
+ 	rtnl_unlock();
+-	fbnic_fw_disable_mbx(fbd);
++	fbnic_fw_free_mbx(fbd);
+ err_free_irqs:
+ 	fbnic_free_irqs(fbd);
+ err_invalidate_uc_addr:
 
 
 
