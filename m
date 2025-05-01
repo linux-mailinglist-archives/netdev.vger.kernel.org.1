@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-187332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8B77AA668D
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 00:56:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F5AAAA6688
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 00:55:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CC239A8854
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 22:55:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EE41172F69
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 22:55:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5924F26B2B3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80B712741B2;
 	Thu,  1 May 2025 22:54:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XFeiVfWS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f+wTXH4a"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A834926E17A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4A5426F463
 	for <netdev@vger.kernel.org>; Thu,  1 May 2025 22:54:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746140084; cv=none; b=HI5Th/rTNHbVK4KShsSQuAi7ibPrGSdGWIvVYO0X+egXySHID8g1kNQth8aqqOdCoXFo9gtcAE/UhUwZ/6jgSUgUrBm4Gd3GGTRkpZD8/gVfJbNIDdCU5/1ZeAKqLJ8DmMfK7voN0T+1l69rUkeSKI65UvmaPAHfQIB49Swp7F4=
+	t=1746140084; cv=none; b=R38KWHJt95XZgbGoNfyCleby5gkZT/4qrEt5WsZa674qtktbXUZ7WF6L0IY+asowjGZEyKpQbKi6i9A74NPeS8F/ePMpfxtD2jm5UV8linyAvrDOQX4A8brVfu1ozb24Jt2PLX8RGVdeFZA3jNHPfpE0tGiH513/zXiZDg8niv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1746140084; c=relaxed/simple;
-	bh=09z7P/iSewgSewd6YPYLw8RK4FGwxounHiayMufZKwU=;
+	bh=tSu33t7AVifIwGn39pcyFKvKLahj6dGlHDegt9DYEHg=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ENRHAoc4VvmMhDnglrQQFH5suwlAM1X64jWWE496ALYKCJEBOrU+ADOCSnPQzcdXd+asbpKcFeo3e5BylhSWA6huba7eoHvAr7MW/RmBCeWwkL6CUaBpVMVzt6IbsWj1aPP2lMw59srg5JE8n0ZlEjnYEK9m5efjSISICEsMsxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XFeiVfWS; arc=none smtp.client-ip=198.175.65.13
+	 In-Reply-To:To:Cc; b=UQJUvFsUfVrH6iGhQeRf+BSBTv3m5zF0mDCJ2j2DXx64jX2ezrKgq4fw1pbBadXfhUMFhIDNLDUYYdNK1gEb32MAi3Alj+TQ80PvRXyAJE/4TG1fi5bkwJFb1uWINPnE66NvyXP+pSQycidLOGUg+mWJa+LT/YLThF//tITWVgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f+wTXH4a; arc=none smtp.client-ip=198.175.65.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,31 +36,32 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1746140083; x=1777676083;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=09z7P/iSewgSewd6YPYLw8RK4FGwxounHiayMufZKwU=;
-  b=XFeiVfWSBnpKddnyAVsawyjvNxGi2nl2Peeu6KuqS8fmn/V9vz7xQYVB
-   vLsHwYDKR1dUuEbbkvOyemCps8cWDHdDaLPRNLSpVDrD3/lEadba5g7cL
-   mD3tdf0pcfdYz4eS1PwqAtFiDNydacpNA9lj8fCV+e9o3Qh2Gdy9M+nMz
-   D7d6+OZh7Da1f8ryy0Fof1Lu6Gof8PsZFOZJCUks2bsJWdBDqJmV1kGI3
-   uh1eMGZt7gX9xxBb9OwUwrEyVKezrajNJW8uc4KWvjSjH3d7B/TtJr84n
-   k9AuXi2HTCMqarIANdJLzaQoVfQCZRVeSZHFkLY01LUoCSlHR01PWlJVH
+  bh=tSu33t7AVifIwGn39pcyFKvKLahj6dGlHDegt9DYEHg=;
+  b=f+wTXH4avb26OriQcxoa7MNy9/xFw0gINjSyeZ3jAEzHIgzkGwPdoNu4
+   8OVuAs9mEhu55nY6tBDBYESyFsT8e3DKwQYcDwgWisgoTX/2yQOuo5tC1
+   hjBmgcPM4rW0bjp2t4ccSjG8FQqBcl77L+1WfIQtv6BAeymzGjqWczWuF
+   QVz5WEgzd7wN0m3GWM+hvrl3qHZh9NRVgVmCVvPIO09wTWJaH7/Pwi33q
+   11pEuOjuN4nafWnH9VUs1sKmrWG3iviQkFk9S3/shGma6r5Yky2rHkQvz
+   z7+Oymoe756LZs82hly4ZMh4HsT+Kfqehrp89BURzp9P2yr3ATyLlZj1/
    A==;
-X-CSE-ConnectionGUID: XcILTzCkTBqFeH9FRKZ6tg==
-X-CSE-MsgGUID: EVdQagYsR6OFmwvqeH+KVQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11420"; a="58811755"
+X-CSE-ConnectionGUID: i9kmkE4eQkqYZusUIlqRDA==
+X-CSE-MsgGUID: e29OlmDbT0yIQ0ZZ1iw/3A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11420"; a="58811758"
 X-IronPort-AV: E=Sophos;i="6.15,254,1739865600"; 
-   d="scan'208";a="58811755"
+   d="scan'208";a="58811758"
 Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2025 15:54:38 -0700
-X-CSE-ConnectionGUID: JvVTZTtiRTGVVfXFyRmJfQ==
-X-CSE-MsgGUID: XfNLI6HhRaees9pxSeQsmA==
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2025 15:54:39 -0700
+X-CSE-ConnectionGUID: cBYpQQXmTSGot7qpTG7+ag==
+X-CSE-MsgGUID: Bdr2BZkqS1yV+LRB5tFusA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,254,1739865600"; 
-   d="scan'208";a="138514320"
+   d="scan'208";a="138514325"
 Received: from jekeller-desk.jf.intel.com ([10.166.241.15])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2025 15:54:37 -0700
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2025 15:54:38 -0700
 From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Thu, 01 May 2025 15:54:25 -0700
-Subject: [PATCH v4 14/15] ice: move TSPLL init calls to ice_ptp.c
+Date: Thu, 01 May 2025 15:54:26 -0700
+Subject: [PATCH v4 15/15] ice: default to TIME_REF instead of TXCO on
+ E825-C
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,7 +70,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250501-kk-tspll-improvements-alignment-v4-14-24c83d0ce7a8@intel.com>
+Message-Id: <20250501-kk-tspll-improvements-alignment-v4-15-24c83d0ce7a8@intel.com>
 References: <20250501-kk-tspll-improvements-alignment-v4-0-24c83d0ce7a8@intel.com>
 In-Reply-To: <20250501-kk-tspll-improvements-alignment-v4-0-24c83d0ce7a8@intel.com>
 To: Intel Wired LAN <intel-wired-lan@lists.osuosl.org>, 
@@ -83,119 +84,50 @@ Cc: Jacob Keller <jacob.e.keller@intel.com>,
  Milena Olech <milena.olech@intel.com>, Paul Menzel <pmenzel@molgen.mpg.de>
 X-Mailer: b4 0.14.2
 
-From: Karol Kolacinski <karol.kolacinski@intel.com>
+The driver currently defaults to the internal oscillator as the clock
+source for E825-C hardware. While this clock source is labeled TCXO,
+indicating a temperature compensated oscillator, this is only true for some
+board designs. Many board designs have a less capable oscillator. The
+E825-C hardware may also have its clock source set to the TIME_REF pin.
+This pin is connected to the DPLL and is often a more stable clock source.
+The choice of the internal oscillator is not suitable for all systems,
+especially those which want to enable SyncE support.
 
-Initialize TSPLL after initializing PHC in ice_ptp.c instead of calling
-for each product in PHC init in ice_ptp_hw.c.
+There is currently no interface available for users to configure the clock
+source. Other variants of the E82x board have the clock source configured
+in the NVM, but E825-C lacks this capability, so different board designs
+cannot select a different default clock via firmware.
 
-Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
-Reviewed-by: Milena Olech <milena.olech@intel.com>
-Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+In most setups, the TIME_REF is a suitable default clock source.
+Additionally, we now fall back to the internal oscillator automatically if
+the TIME_REF clock source cannot be locked.
+
+Change the default clock source for E825-C to TIME_REF. Note that the
+driver logs a dev_dbg message upon configuring the TSPLL which includes the
+clock source and frequency. This can be enabled to confirm which clock
+source is in use.
+
+Longterm a proper interface to dynamically introspect and change the clock
+source will be designed (perhaps some extension of the DPLL subsystem?)
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_ptp.c    | 11 +++++++++++
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 22 +---------------------
- drivers/net/ethernet/intel/ice/ice_tspll.c  |  5 +++++
- 3 files changed, 17 insertions(+), 21 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 083f50f827441792d3b7a838c3359e05d2bbdf7c..3278b96d8f01cdf783db495db167e44c13e8c8da 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -2891,6 +2891,10 @@ static int ice_ptp_rebuild_owner(struct ice_pf *pf)
- 	if (err)
- 		return err;
- 
-+	err = ice_tspll_init(hw);
-+	if (err)
-+		return err;
-+
- 	/* Acquire the global hardware lock */
- 	if (!ice_ptp_lock(hw)) {
- 		err = -EBUSY;
-@@ -3058,6 +3062,13 @@ static int ice_ptp_init_owner(struct ice_pf *pf)
- 		return err;
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index 7d731d1be862311358943c6922354504ba4721ba..742ffbfba73ca3279cec311ae359ebc6a4e6a584 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -2344,7 +2344,7 @@ ice_parse_1588_func_caps(struct ice_hw *hw, struct ice_hw_func_caps *func_p,
+ 		info->clk_src = ((number & ICE_TS_CLK_SRC_M) != 0);
+ 	} else {
+ 		info->clk_freq = ICE_TSPLL_FREQ_156_250;
+-		info->clk_src = ICE_CLK_SRC_TCXO;
++		info->clk_src = ICE_CLK_SRC_TIME_REF;
  	}
  
-+	err = ice_tspll_init(hw);
-+	if (err) {
-+		dev_err(ice_pf_to_dev(pf), "Failed to initialize CGU, status %d\n",
-+			err);
-+		return err;
-+	}
-+
- 	/* Acquire the global hardware lock */
- 	if (!ice_ptp_lock(hw)) {
- 		err = -EBUSY;
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 6da82025934cb709d06f12cc26f9b494c6f4d772..523f95271f353e72b72ac5ea0123869f2d387e98 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -2115,20 +2115,6 @@ int ice_start_phy_timer_eth56g(struct ice_hw *hw, u8 port)
- 	return 0;
- }
- 
--/**
-- * ice_ptp_init_phc_e825 - Perform E825 specific PHC initialization
-- * @hw: pointer to HW struct
-- *
-- * Perform E825-specific PTP hardware clock initialization steps.
-- *
-- * Return: 0 on success, negative error code otherwise.
-- */
--static int ice_ptp_init_phc_e825(struct ice_hw *hw)
--{
--	/* Initialize the Clock Generation Unit */
--	return ice_tspll_init(hw);
--}
--
- /**
-  * ice_ptp_read_tx_hwtstamp_status_eth56g - Get TX timestamp status
-  * @hw: pointer to the HW struct
-@@ -2788,7 +2774,6 @@ static int ice_ptp_set_vernier_wl(struct ice_hw *hw)
-  */
- static int ice_ptp_init_phc_e82x(struct ice_hw *hw)
- {
--	int err;
- 	u32 val;
- 
- 	/* Enable reading switch and PHY registers over the sideband queue */
-@@ -2798,11 +2783,6 @@ static int ice_ptp_init_phc_e82x(struct ice_hw *hw)
- 	val |= (PF_SB_REM_DEV_CTL_SWITCH_READ | PF_SB_REM_DEV_CTL_PHY0);
- 	wr32(hw, PF_SB_REM_DEV_CTL, val);
- 
--	/* Initialize the Clock Generation Unit */
--	err = ice_tspll_init(hw);
--	if (err)
--		return err;
--
- 	/* Set window length for all the ports */
- 	return ice_ptp_set_vernier_wl(hw);
- }
-@@ -5584,7 +5564,7 @@ int ice_ptp_init_phc(struct ice_hw *hw)
- 	case ICE_MAC_GENERIC:
- 		return ice_ptp_init_phc_e82x(hw);
- 	case ICE_MAC_GENERIC_3K_E825:
--		return ice_ptp_init_phc_e825(hw);
-+		return 0;
- 	default:
- 		return -EOPNOTSUPP;
- 	}
-diff --git a/drivers/net/ethernet/intel/ice/ice_tspll.c b/drivers/net/ethernet/intel/ice/ice_tspll.c
-index 7b61e1afe8b43a24c77edf0a0590562fbfa0ce3e..8f125ea5a80f5d145a412eee55a148b3ae3f830d 100644
---- a/drivers/net/ethernet/intel/ice/ice_tspll.c
-+++ b/drivers/net/ethernet/intel/ice/ice_tspll.c
-@@ -484,6 +484,11 @@ int ice_tspll_init(struct ice_hw *hw)
- 	enum ice_clk_src clk_src;
- 	int err;
- 
-+	/* Only E822, E823 and E825 products support TSPLL */
-+	if (hw->mac_type != ICE_MAC_GENERIC &&
-+	    hw->mac_type != ICE_MAC_GENERIC_3K_E825)
-+		return 0;
-+
- 	tspll_freq = (enum ice_tspll_freq)ts_info->time_ref;
- 	clk_src = (enum ice_clk_src)ts_info->clk_src;
- 	if (!ice_tspll_check_params(hw, tspll_freq, clk_src))
+ 	if (info->clk_freq < NUM_ICE_TSPLL_FREQ) {
 
 -- 
 2.48.1.397.gec9d649cc640
