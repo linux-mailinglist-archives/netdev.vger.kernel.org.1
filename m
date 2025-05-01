@@ -1,159 +1,143 @@
-Return-Path: <netdev+bounces-187252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B66FCAA5F82
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 15:51:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FF2FAA5F88
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 15:52:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8ED129C2951
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 13:50:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5A261BA3D38
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 13:52:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D56E51ACECE;
-	Thu,  1 May 2025 13:51:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5068A1D5CD7;
+	Thu,  1 May 2025 13:52:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f7e00Q/Q"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WMRdBJsz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0EF519D06B
-	for <netdev@vger.kernel.org>; Thu,  1 May 2025 13:51:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96CF719D06B
+	for <netdev@vger.kernel.org>; Thu,  1 May 2025 13:52:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746107465; cv=none; b=Z4De3bEbdvKdVSk+cQFPfxqe0Lq19pVxno6SGwjqQdwRG/hiAxg/eoQxtY56g0p30O6tjPdE7MJtnez7UKKML+g5fRgP8xF+rdF05ZFAumQ+I3a2HW2Qinc3WxnR8fU1yaJANqVuWd9+zD4fsTgZvaxnRF2+vlEw6ZEQ+BnkPJk=
+	t=1746107530; cv=none; b=h+kjlPxDO9wxPPTtvhkao+hrYyIps6BrzFIEGvHuVHKDDEm/TAJL1+9O14tDlaQBfHjHPsI+eJftZTuMpobkE69VomMZf7MYVCxIpnKJkQBcFdqnxrsMhEFuTbNRHYzmaMcuKRl6Wa4AWv3YjblcRKzgjpFjuc4SNTl0NnUGRiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746107465; c=relaxed/simple;
-	bh=oXB04uqyKlgN7tbJfyRt02/1FDKJI/QaOt5ciFDSSiA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wd4qoDNgtZxHglQZEDu0oJ96T73kYfwKOA6ihGXSuWxnIVjSgX0aw7bfXVMfJZtHS76j8/+eXGNHNLFBGKIJ6sPDB1ckLlreAXWtJOQ+rlAqLWF+HSyLyr7m+obHaaDL5I//LCKIThn8Vr+F9xCLUjp7QJp/Vyc5IHEjmhgkj+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f7e00Q/Q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D76CEC4CEE3;
-	Thu,  1 May 2025 13:51:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746107465;
-	bh=oXB04uqyKlgN7tbJfyRt02/1FDKJI/QaOt5ciFDSSiA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=f7e00Q/Qsh0Pk/KpONhQU+viGjvpq6iEV08gxw5YQEVj1DAOG4xPxUx7RhyXUKpw8
-	 8+syULZgXwL0Yl+vV9TDizd3uubXsVlyxqluRlBbFvavQSReYIA5mw6dUq2B/dy6Ve
-	 HtM22IzQhIXnav1eFAIH+dfYbgqjV/O90WIVGANmvr9QXGR5PYz4pOs8sgTpESKzOV
-	 awMdWdnvPFIENgYnQ89Zjyitw/kRGBB+32lGu0wNDU8Gx4PB9i6z1CPKjm5MwIRLgY
-	 74gjfXxinjdYbp7Ny0tydJymW0lR4AX5Ex1Ab28g8D+cZCUQT7CyQol9wYVsbx2CMs
-	 h6loUxjPaJV4g==
-Date: Thu, 1 May 2025 14:51:01 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: netdev <netdev@vger.kernel.org>,
-	Anthony Nguyen <anthony.l.nguyen@intel.com>,
-	Intel Wired LAN <intel-wired-lan@lists.osuosl.org>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH iwl-next 2/2] net: intel: move RSS packet classifier
- types to libie
-Message-ID: <20250501135101.GY3339421@horms.kernel.org>
-References: <20250430-jk-hash-ena-refactor-v1-0-8310a4785472@intel.com>
- <20250430-jk-hash-ena-refactor-v1-2-8310a4785472@intel.com>
+	s=arc-20240116; t=1746107530; c=relaxed/simple;
+	bh=TBF9cHqvsBBjMo+hOAdT/xXFYkhNbU6400lnc2ENgSA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lnxLgcewNwp6ixgt5qg/Llv2eOAtNsPWpAayiv2kqY16Q9OynU8VBPCk9ArlUHwieeJmkaNyy0nYscLZWtIZTBWqBguoqeAaPRPdEvmo5ZsOhrzrQMfLRfNo3Tzska69fEB/BVIA9qni+ubq2ouZBfTSM2ADA7r4ZNvv7NQNN2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WMRdBJsz; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746107527;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=D7Og0tNFd6K52qkvPJcrj4sxsIAm+zhBLcJjT2wd0Ho=;
+	b=WMRdBJszvjYxn3XG0iMjtn025v21Tye9+grZrisATFnkujRpJNro//qb1icsI9gs2gKpEU
+	2G3DUfjxuuGfmMb9BJPxEs8/N9rfApwquFJPyLdbh4T0krJbOVCiaPV5le8vlBluXxSYiG
+	a4QaYHqTGguq0pbXG2m2qAhYwd/Srtk=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-687-nJJNEWtTOJa3lZu8ag0sgA-1; Thu,
+ 01 May 2025 09:52:04 -0400
+X-MC-Unique: nJJNEWtTOJa3lZu8ag0sgA-1
+X-Mimecast-MFC-AGG-ID: nJJNEWtTOJa3lZu8ag0sgA_1746107522
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4CC541800990;
+	Thu,  1 May 2025 13:52:02 +0000 (UTC)
+Received: from [10.44.32.102] (unknown [10.44.32.102])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7DF311956094;
+	Thu,  1 May 2025 13:51:55 +0000 (UTC)
+Message-ID: <5eefb009-f920-4954-9ef9-4a00791e3129@redhat.com>
+Date: Thu, 1 May 2025 15:51:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250430-jk-hash-ena-refactor-v1-2-8310a4785472@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 8/8] mfd: zl3073x: Register DPLL sub-device
+ during init
+To: Lee Jones <lee@kernel.org>
+Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Andy Shevchenko <andy@kernel.org>, Michal Schmidt <mschmidt@redhat.com>,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org
+References: <20250430101126.83708-1-ivecera@redhat.com>
+ <20250430101126.83708-9-ivecera@redhat.com>
+ <20250501132201.GP1567507@google.com>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <20250501132201.GP1567507@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On Wed, Apr 30, 2025 at 10:11:53AM -0700, Jacob Keller wrote:
-> The Intel i40e, iavf, and ice drivers all include a definition of the
-> packet classifier filter types used to program RSS hash enable bits. For
-> i40e, these bits are used for both the PF and VF to configure the PFQF_HENA
-> and VFQF_HENA registers.
+
+On 01. 05. 25 3:22 odp., Lee Jones wrote:
+> On Wed, 30 Apr 2025, Ivan Vecera wrote:
 > 
-> For ice and iAVF, these bits are used to communicate the desired hash
-> enable filter over virtchnl via its struct virtchnl_rss_hashena. The
-> virtchnl.h header makes no mention of where the bit definitions reside.
+>> Register DPLL sub-devices to expose the functionality provided
+>> by ZL3073x chip family. Each sub-device represents one of
+>> the available DPLL channels.
+>>
+>> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+>> ---
+>> v4->v6:
+>> * no change
+>> v3->v4:
+>> * use static mfd cells
+>> ---
+>>   drivers/mfd/zl3073x-core.c | 19 +++++++++++++++++++
+>>   1 file changed, 19 insertions(+)
+>>
+>> diff --git a/drivers/mfd/zl3073x-core.c b/drivers/mfd/zl3073x-core.c
+>> index 050dc57c90c3..3e665cdf228f 100644
+>> --- a/drivers/mfd/zl3073x-core.c
+>> +++ b/drivers/mfd/zl3073x-core.c
+>> @@ -7,6 +7,7 @@
+>>   #include <linux/device.h>
+>>   #include <linux/export.h>
+>>   #include <linux/math64.h>
+>> +#include <linux/mfd/core.h>
+>>   #include <linux/mfd/zl3073x.h>
+>>   #include <linux/module.h>
+>>   #include <linux/netlink.h>
+>> @@ -755,6 +756,14 @@ static void zl3073x_devlink_unregister(void *ptr)
+>>   	devlink_unregister(ptr);
+>>   }
+>>   
+>> +static const struct mfd_cell zl3073x_dpll_cells[] = {
+>> +	MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 0),
+>> +	MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 1),
+>> +	MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 2),
+>> +	MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 3),
+>> +	MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 4),
+>> +};
 > 
-> Maintaining a separate copy of these bits across three drivers is
-> cumbersome. Move the definition to libie as a new pctype.h header file.
-> Each driver can include this, and drop its own definition.
+> What other devices / subsystems will be involved when this is finished?
 > 
-> The ice implementation also defined a ICE_AVF_FLOW_FIELD_INVALID, intending
-> to use this to indicate when there were no hash enable bits set. This is
-> confusing, since the enumeration is using bit positions. A value of 0
-> *should* indicate the first bit. Instead, rewrite the code that uses
-> ICE_AVF_FLOW_FIELD_INVALID to just check if the avf_hash is zero. From
-> context this should be clear that we're checking if none of the bits are
-> set.
-> 
-> The values are kept as bit positions instead of encoding the BIT_ULL
-> directly into their value. While most users will simply use BIT_ULL
-> immediately, i40e uses the macros both with BIT_ULL and test_bit/set_bit
-> calls.
-> 
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+PHC/PTP driver and in future GPIO controller.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+I'm adding here only DPLL for now as it is finished and ready
+(part2)... PTP driver is now in progress and GPIO is in planning phase.
 
-Please see comment below.
+Ivan
 
-...
-
-> diff --git a/include/linux/net/intel/libie/pctype.h b/include/linux/net/intel/libie/pctype.h
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..78723c8a33a084fb1120743427273af4b982c835
-> --- /dev/null
-> +++ b/include/linux/net/intel/libie/pctype.h
-> @@ -0,0 +1,44 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/* Copyright (C) 2025 Intel Corporation */
-> +
-> +#ifndef __LIBIE_PCTYPE_H
-> +#define __LIBIE_PCTYPE_H
-> +
-> +/**
-> + * enum libie_filter_pctype - Packet Classifier Types for filters
-> + *
-> + * Packet Classifier Type indexes, used to set the xxQF_HENA registers. Also
-> + * communicated over the virtchnl API as part of struct virtchnl_rss_hashena.
-> + */
-
-As there is a Kernel doc for this enum,
-./tools/kernel-doc -none would like each value documented too.
-
-> +enum libie_filter_pctype {
-> +	/* Note: Values 0-28 are reserved for future use.
-> +	 * Value 29, 30, 32 are not supported on XL710 and X710.
-> +	 */
-> +	LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP	= 29,
-> +	LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP	= 30,
-> +	LIBIE_FILTER_PCTYPE_NONF_IPV4_UDP		= 31,
-> +	LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK	= 32,
-> +	LIBIE_FILTER_PCTYPE_NONF_IPV4_TCP		= 33,
-> +	LIBIE_FILTER_PCTYPE_NONF_IPV4_SCTP		= 34,
-> +	LIBIE_FILTER_PCTYPE_NONF_IPV4_OTHER		= 35,
-> +	LIBIE_FILTER_PCTYPE_FRAG_IPV4			= 36,
-> +	/* Note: Values 37-38 are reserved for future use.
-> +	 * Value 39, 40, 42 are not supported on XL710 and X710.
-> +	 */
-> +	LIBIE_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP	= 39,
-> +	LIBIE_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP	= 40,
-> +	LIBIE_FILTER_PCTYPE_NONF_IPV6_UDP		= 41,
-> +	LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP_SYN_NO_ACK	= 42,
-> +	LIBIE_FILTER_PCTYPE_NONF_IPV6_TCP		= 43,
-> +	LIBIE_FILTER_PCTYPE_NONF_IPV6_SCTP		= 44,
-> +	LIBIE_FILTER_PCTYPE_NONF_IPV6_OTHER		= 45,
-> +	LIBIE_FILTER_PCTYPE_FRAG_IPV6			= 46,
-> +	/* Note: Value 47 is reserved for future use */
-> +	LIBIE_FILTER_PCTYPE_FCOE_OX			= 48,
-> +	LIBIE_FILTER_PCTYPE_FCOE_RX			= 49,
-> +	LIBIE_FILTER_PCTYPE_FCOE_OTHER			= 50,
-> +	/* Note: Values 51-62 are reserved for future use */
-> +	LIBIE_FILTER_PCTYPE_L2_PAYLOAD			= 63
-> +};
-> +
-> +#endif /* __LIBIE_PCTYPE_H */
-
-...
 
