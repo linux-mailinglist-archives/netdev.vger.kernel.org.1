@@ -1,74 +1,94 @@
-Return-Path: <netdev+bounces-187260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA550AA5FB6
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 16:15:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A186AA5FC7
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 16:20:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 203304A0734
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 14:15:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D20427B3BAB
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 14:18:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15EF71A0731;
-	Thu,  1 May 2025 14:15:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FFA41F1932;
+	Thu,  1 May 2025 14:19:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V/ssFVqd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SR8rwqV9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E38CA29CE6
-	for <netdev@vger.kernel.org>; Thu,  1 May 2025 14:15:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7140F1F1513;
+	Thu,  1 May 2025 14:19:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746108920; cv=none; b=KTFCI/VJ+pshOvBjFlUqz7cvSK+tnC13y0lpWYxHicxnPBO8DVoVnnyqcg83VeqpneGFAaSYQ4KsoOURxJZNZbcqpwKuhMx6joGQ9oRyWVBknTDW+Mo00DX9YolG8jSQLZ1zYZVI3VlwhIDbLEEg2ZfiPOGfKOdAUFOWUV0rhK8=
+	t=1746109193; cv=none; b=Q1foWc7G5mmR+Ke+kgJ6CcLdUro62nMpKlQvoslEJclCfZCKzQ5/iqiD8tnN/9FVYOsh7Ikb+P0sseJkJ2H9DlMDquzHfW+RVda2Kw/Km2e/WFfKJ8lqIk16L8k5DaJY5435SFtAPt7+Rna/6i7IbTwKkmz0niWx/zg6OQjDxX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746108920; c=relaxed/simple;
-	bh=9RB23hZVWmfW7dEWLdxiwSUVQ97nDs6C+WmIGSBZy4Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UaCIbEblT2Ev5LlpNyRDkVT+viFPNq6sEylge+smzMeyFg+utS53lpDYKoMeU/PmGGiLKJ3LGPYIwB9QPVSsG8DvRIJz6uia/86Qs84sLYrcIOwdZDqI7U5d+jKvJV4isfS0JEqad5R4kkNFBhiBlpOpbOVOZ2gVYYcsZX1Bpb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V/ssFVqd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AD36C4CEED;
-	Thu,  1 May 2025 14:15:19 +0000 (UTC)
+	s=arc-20240116; t=1746109193; c=relaxed/simple;
+	bh=pO2NnunOSN24JmQF/ksUCdUUhbN9haI8sI7qfylU7EI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=pRwEmdIKRwOapggnDjUdKXUXtWWjVaHJhBdOdcglhxqRo1EkJ8Ba1uQ3zegrUyPVC/9HagKgu05DLlAnJZNBSUUyPee2rMdy5yoBHEPsORsV3j9bO40dDPuVUesiHVUHzhkIMArm/4bqC/P5oDIU+c2gwDmfq+Q9xhdD1SqOAIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SR8rwqV9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0DCEC4CEE3;
+	Thu,  1 May 2025 14:19:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746108919;
-	bh=9RB23hZVWmfW7dEWLdxiwSUVQ97nDs6C+WmIGSBZy4Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=V/ssFVqdk49GRBYhcetFY4I6sWyAdoddxjRPmVg0ojYMJWkzsBnDeFDtcYmW5Ko/s
-	 YTWWfno5dVEnnUY/dJFSWxmGDGbSDF92Ep1olgts5v4enUpN7O+Rts1OqjOERLSi/8
-	 4U9KGguVNdbcxZI0iyrNndvAUoNo/DVkyK+vkA6oJNrVFOvWV54qu/l85KQ+IGx/In
-	 B8IaDy/A+Fv+ZPB0gxfss9pOeufaG2ZW75g+YEIuLzp/d+hSeNZgAFawPmiQgL+LWV
-	 TImnJD39L/speGNK6ZSq4Fzud02QQP1gJm/Zjk8vXEXOjFu9U9E2lkXbaNNYH/t8Uz
-	 N7qKusmJETVbg==
-Date: Thu, 1 May 2025 07:15:18 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, Simon Horman
- <horms@kernel.org>, Jacob Keller <jacob.e.keller@intel.com>
-Subject: Re: [PATCH net v4] net: airoha: Add missing filed to ppe_mbox_data
- struct
-Message-ID: <20250501071518.50c92e8c@kernel.org>
-In-Reply-To: <20250429-airoha-en7581-fix-ppe_mbox_data-v4-1-d2a8b901dad0@kernel.org>
-References: <20250429-airoha-en7581-fix-ppe_mbox_data-v4-1-d2a8b901dad0@kernel.org>
+	s=k20201202; t=1746109192;
+	bh=pO2NnunOSN24JmQF/ksUCdUUhbN9haI8sI7qfylU7EI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=SR8rwqV90xEGm+J2b5ZD0xjJ6RIDE4pBO/oqrRODgwLI0MHgAw0WDUPo1eEcuYa/2
+	 NRf5l1fKSRiT7NAZwLruwJIJKphSBavHsgDooTwHWzxukz5+i92moR2GbL8NSAY5y9
+	 s5j8mcAbXCVfrs0NjoX9B/2MKjNMa5Uc34UeQZ8mtfz6Eta8rsYcRWXGbdmRr9THQP
+	 g2KaAgixnlUVoQDK1iR6wK8Ka4skWpzTcB6uqwPZc1U42/BuwiycvSIPixgZqYDljx
+	 HqOHcOlRqB459VEh5KsT+bfLQMlF09IK+rMd6wyyRcNjrQdwabOm4K4yI2foGnKTaG
+	 t05Jy3fk8WuVg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D7A3822D59;
+	Thu,  1 May 2025 14:20:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v1] net: fec: ERR007885 Workaround for conventional TX
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174610923200.2992896.532106335830602410.git-patchwork-notify@kernel.org>
+Date: Thu, 01 May 2025 14:20:32 +0000
+References: <20250429090826.3101258-1-mattiasbarthel@gmail.com>
+In-Reply-To: <20250429090826.3101258-1-mattiasbarthel@gmail.com>
+To: None <mattiasbarthel@gmail.com>
+Cc: wei.fang@nxp.com, shenwei.wang@nxp.com, xiaoning.wang@nxp.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, troy.kisky@boundarydevices.com,
+ imx@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ mattias.barthel@atlascopco.com
 
-On Tue, 29 Apr 2025 16:17:41 +0200 Lorenzo Bianconi wrote:
-> Moreover, add __packed attribute to ppe_mbox_data struct definition and
-> make the fw layout padding explicit in init_info struct.
+Hello:
 
-Why? everything looks naturally packed now :(
-__packed also forces the compiler to assume the data is unaligned AFAIU.
-The recommended way to ensure the compiler doesn't insert padding is
-to do a compile time assert.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 29 Apr 2025 11:08:26 +0200 you wrote:
+> From: Mattias Barthel <mattias.barthel@atlascopco.com>
+> 
+> Activate TX hang workaround also in
+> fec_enet_txq_submit_skb() when TSO is not enabled.
+> 
+> Errata: ERR007885
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v1] net: fec: ERR007885 Workaround for conventional TX
+    https://git.kernel.org/netdev/net/c/a179aad12bad
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
