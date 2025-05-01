@@ -1,89 +1,65 @@
-Return-Path: <netdev+bounces-187279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A4F1AA6089
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 17:12:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FB81AA6095
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 17:16:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 727241888B04
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 15:12:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A7FC3AF528
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 15:16:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 837CA202F7C;
-	Thu,  1 May 2025 15:12:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0701E1EB9E8;
+	Thu,  1 May 2025 15:16:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="IKF9y59q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LhV8uj6m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2CF31AAE17
-	for <netdev@vger.kernel.org>; Thu,  1 May 2025 15:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE8551D6DBF;
+	Thu,  1 May 2025 15:16:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746112350; cv=none; b=JRQEgRjFAtlRKnh0azlSs39ysCPQorlRedURkOva8R2/8Q5vtCwUwxdzCBZxi1HXbxbh2DW+5c1sYQgA8CeqniNe1m3yfgAQQIU9dBRn/2BpE5q6B5YQRNKL23K78DLkAIC8tbGvmh6OAFFooQw4WLveOo1MBqsqG/F7NasoDJE=
+	t=1746112582; cv=none; b=nf8CHse9LUhH1BLVEIMqI+UAyJ/mye/nlhn+5X6NG6lcB9Dm+r/1NWMbQB7X32XNvGXMHRkxSjuHo8tJxFjAwAkJ4+To01MxPlFckguMDUMcnCejlHR8VBExcCYZ8LeZpgoNk6QCrQlCHWZTviGrjU5hcWeBjoSL7oHWZ6G961o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746112350; c=relaxed/simple;
-	bh=dWnGMRLuuiig00/q1qNO4cfo1u8O7FAVX0O/ycoMXU8=;
+	s=arc-20240116; t=1746112582; c=relaxed/simple;
+	bh=DeYBnZVHnZYEBZhQbxUl90si40aAkCAJWkQr9vzu+tQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OfOwTRs6KAmfxovF3ZXSR0jSi9cLVErbrC9Yy7l4bPN7yPKSUMDqXbsfsqD5ZKUToJqjs3lO+/nBUZxxcClJcyVPskcRLZkI5C4ywJQIHOhe7Znc8w+pZYLKdv3T/HXpswoBzjs9E2clpt6lA90i2EcOpyhGdXgkB4EdKA3dgAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=IKF9y59q; arc=none smtp.client-ip=209.85.166.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-3d812103686so3831865ab.0
-        for <netdev@vger.kernel.org>; Thu, 01 May 2025 08:12:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1746112347; x=1746717147; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fiSgvlc+jgTt+SalF/TBVD1MvIkMlCI4kO67DxSibGs=;
-        b=IKF9y59qzvtHHAEtcYSWSg+wHaw6Q4necx02i9DDF5ilKba40s04+SmaY1KSC/x+zJ
-         2fy+50aY1VKWcXFm5BWT10OtE28D2bgxMiWwlcfmzwp3gVmM/vEXSbwti5yowLP8Ppk7
-         Tf13+GahJ9g+C2gH7wrhPE1p/e/m5YmZ0m7ZsUEXA2/+li7EeGHFcDJHgnGI7Ppy8AKt
-         AMf9MX0DuTkBq5mBu/KPui1L0ACFp0PPM8nqwEDTkptiSO7ohPbpXzRIrXVhmx9qyUSr
-         OeA/X5yf5KTRQCOy0Np2VcnroS4+mPiOwlsrJIbRoDsFbga/UkpyCLyvZT4AYRyYG+HU
-         C5VA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746112347; x=1746717147;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fiSgvlc+jgTt+SalF/TBVD1MvIkMlCI4kO67DxSibGs=;
-        b=xQntNdmqc2FG3TpHyZvWSrunbh2j3R1c1d0i13YEsW005j+wy9ERSeDUlgrNS3+f6c
-         lFsTIn3Q1WMFFOnOJukxFNXO4jL4FhNWAszNgzXTzXTKBDdK8sWc8m4Up/ADxcgtF5WD
-         hKXkITH1oFiPzr4hh3fhq7Tz1TYpRSjSADf8pPg5o8fbGab96MYD26rmYpi6DK9i8aGx
-         sY3Mc5JdcHXMZ1dyR04DS/xxjU9Fm7mGRF8t8qtIKOk6Qz/OWu7BJGPRU99L+MXirftK
-         bSqsKqVTeq/ODb+Bu4BlpHCxEv2o9QIo0jAnqlqJvaDP/f74pzP76Uy/KwjHQTx0M7ko
-         azBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWAsXq5pOs0NJKzLm6fNtTLELzYy/PNBug6RutkomHYZlT3MglYGnheh88wLz0O4pfw2fr2pgg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YytqKXdgK5BZztRxP3fosW5Z6CGAYQPqmnz3+hE9b6OPKNUSnIs
-	E3UN71doW1QcdVpHzKUzGDDmdrKI7KEI+C0tOITy/3baR/E3wIleYeeA0CuH/CY=
-X-Gm-Gg: ASbGncvZH984/3Go1eN3XQwKF3J5KO+P2JaqS/9DWWK1ObRO8wCOHL0+7mYSIdHRjxO
-	7fHxSh5mDKcjtXoLmijAmJF/Jnm31xNVMamT+PAJYGi8EvzqPb8TV5mCj0zFrg8gJ+5WRXHZGuV
-	/Zz2KtygqUIoCAcr21ZhI6cO6+uansDgNO2kjgWYtZDauGvLgfYH3PDxrQFeDQpR/hZdEI39BXN
-	3iR7fgQO2swdITahf3kn2c4Jw7UhcsG/I0IHoiGfDYbyJrRXXPqYf4moB9Uclx5MbnNIeDqCyUi
-	TU4oRQmxS0ex7FLVUTr4azk=
-X-Google-Smtp-Source: AGHT+IEIOmyJqg0IDfnq12HF/KNZxN2C+QMTntsNo+GE5770dKW40hle7cceFLWUyRubp7ZQk3Lr0w==
-X-Received: by 2002:a05:6e02:5c2:b0:3d3:d08d:d526 with SMTP id e9e14a558f8ab-3d970bab314mr23866965ab.11.1746112346920;
-        Thu, 01 May 2025 08:12:26 -0700 (PDT)
-Received: from CMGLRV3 ([2a09:bac5:9478:1b37::2b6:2f])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f882ead968sm224915173.12.2025.05.01.08.12.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 May 2025 08:12:26 -0700 (PDT)
-Date: Thu, 1 May 2025 10:12:24 -0500
-From: Frederick Lawler <fred@cloudflare.com>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, Keith Busch <kbusch@meta.com>,
-	seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-	leiyang@redhat.com, virtualization@lists.linux.dev, x86@kernel.org,
-	netdev@vger.kernel.org, kernel-team@cloudfalre.com
-Subject: Re: [PATCHv3 2/2] kvm: retry nx_huge_page_recovery_thread creation
-Message-ID: <aBOPWGPTCgnUgtw-@CMGLRV3>
-References: <20250227230631.303431-1-kbusch@meta.com>
- <20250227230631.303431-3-kbusch@meta.com>
- <20250304155922.GG3666230@kernel.org>
- <Z8clO24vFqlDdge4@kbusch-mbp.dhcp.thefacebook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=u01x0AdKCtsU86iNDNC+cSwvEJOESCaL4rM4KN7boR95Z74XVtcRtPGtblkqluExAgmJ2YGKKbF5dmMfnuupUSgrmFMne4FVyu/SVVQfQcDrJopvpkmZXQUewul82UaSV4fMYUbUgfh4WJBD6q/N3hDiqx3+Nv0CFLK4TeNl5o0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LhV8uj6m; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BA65C4CEED;
+	Thu,  1 May 2025 15:16:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746112582;
+	bh=DeYBnZVHnZYEBZhQbxUl90si40aAkCAJWkQr9vzu+tQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LhV8uj6mRlmldjAzOQWpKP4k92NlF/xe+O2L/AzByiLRYby8Q0FpKTAWSctizCsa4
+	 H4t9XBEPXfl0LWGUG4DWoHJtYzjSVE5+05tPTDYQbZp782KnSMZ55MVucclwfbG6Z4
+	 h0U49b79IAwW/RcZlXaqrVQbxQYZUqaj9KCvwHeE/M7mtP6KEdp2a/QPm5bTuVRQ34
+	 XPFQ6B2A5PrjoFjPB/3QPKt7Qy/TwhFoWYAVW5xrAj0A/jHKNqhpl3Io5OcvR0Lrjb
+	 M7sHAjyHBcnHRrsKl9R5XhTwGdYU0VL3i51ode36mwAfFHChrBY1Kmz3b0Xh3SNhU8
+	 xXG5KHUwZwcGw==
+Date: Thu, 1 May 2025 16:16:16 +0100
+From: Simon Horman <horms@kernel.org>
+To: Brian Vazquez <brianvv@google.com>
+Cc: Brian Vazquez <brianvv.kernel@gmail.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org,
+	David Decotigny <decot@google.com>,
+	Anjali Singhai <anjali.singhai@intel.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	emil.s.tantilov@intel.com, Josh Hay <joshua.a.hay@intel.com>,
+	Luigi Rizzo <lrizzo@google.com>
+Subject: Re: [iwl-net PATCH v2] idpf: fix a race in txq wakeup
+Message-ID: <20250501151616.GA3339421@horms.kernel.org>
+References: <20250428195532.1590892-1-brianvv@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,32 +68,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z8clO24vFqlDdge4@kbusch-mbp.dhcp.thefacebook.com>
+In-Reply-To: <20250428195532.1590892-1-brianvv@google.com>
 
-Hi Keith,
-
-On Tue, Mar 04, 2025 at 09:07:23AM -0700, Keith Busch wrote:
-> On Tue, Mar 04, 2025 at 03:59:22PM +0000, Simon Horman wrote:
-> > A minor nit from my side:
-> > 
-> > As you are changing this line, and it seems like there will be another
-> > revision of this series anyway, please consider updating the indentation to
-> > use tabs.
+On Mon, Apr 28, 2025 at 07:55:32PM +0000, Brian Vazquez wrote:
+> Add a helper function to correctly handle the lockless
+> synchronization when the sender needs to block. The paradigm is
 > 
-> The patch is already applied to upstream and stable, and I think Paolo
-> must have taken care of the formatting because it looks good in the
-> commit now:
+>         if (no_resources()) {
+>                 stop_queue();
+>                 barrier();
+>                 if (!no_resources())
+>                         restart_queue();
+>         }
 > 
->   https://web.git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=916b7f42b3b3b539a71c204a9b49fdc4ca92cd82a
+> netif_subqueue_maybe_stop already handles the paradigm correctly, but
+> the code split the check for resources in three parts, the first one
+> (descriptors) followed the protocol, but the other two (completions and
+> tx_buf) were only doing the first part and so race prone.
+> 
+> Luckily netif_subqueue_maybe_stop macro already allows you to use a
+> function to evaluate the start/stop conditions so the fix only requires
+> the right helper function to evaluate all the conditions at once.
+> 
+> The patch removes idpf_tx_maybe_stop_common since it's no longer needed
+> and instead adjusts separately the conditions for singleq and splitq.
+> 
+> Note that idpf_rx_buf_hw_update doesn't need to check for resources
+> since that will be covered in idpf_tx_splitq_frame.
 
-I backported this patch cleanly on top of 6.12.24 and ran it on some of
-our production nodes. I compared 6.12.24 to the patched 6.12.24 over the
-last three days, and we saw a drop in ENOMEM reports from firecracker.
-It also appears our VM's to be consistently spinning up again.
+Should the above read idpf_tx_buf_hw_update() rather than
+idpf_rx_buf_hw_update()?
 
-When you said stable here, I checked the stable queue and lists, but I
-didn't see this patch in 6.12. (only in the 6.14/15 stable) Can we get
-this backported to 6.12 as well?
+If so, I see that this is true when idpf_tx_buf_hw_update() is called from
+idpf_tx_singleq_frame(). But is a check required in the case where
+idpf_rx_buf_hw_update() is called by idpf_tx_singleq_map()?
 
-Fred
+> 
+> To reproduce:
+> 
+> Reduce the threshold for pending completions to increase the chances of
+> hitting this pause by changing your kernel:
+> 
+> drivers/net/ethernet/intel/idpf/idpf_txrx.h
+> 
+> -#define IDPF_TX_COMPLQ_OVERFLOW_THRESH(txcq)   ((txcq)->desc_count >> 1)
+> +#define IDPF_TX_COMPLQ_OVERFLOW_THRESH(txcq)   ((txcq)->desc_count >> 4)
+> 
+> Use pktgen to force the host to push small pkts very aggressively:
+> 
+> ./pktgen_sample02_multiqueue.sh -i eth1 -s 100 -6 -d $IP -m $MAC \
+>   -p 10000-10000 -t 16 -n 0 -v -x -c 64
+> 
+> Fixes: 6818c4d5b3c2 ("idpf: add splitq start_xmit")
+> Signed-off-by: Josh Hay <joshua.a.hay@intel.com>
+> Signed-off-by: Brian Vazquez <brianvv@google.com>
+> Signed-off-by: Luigi Rizzo <lrizzo@google.com>
+
+...
 
