@@ -1,50 +1,87 @@
-Return-Path: <netdev+bounces-187310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6C46AA6500
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 23:00:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00F13AA6632
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 00:30:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17FA84A65E0
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 21:00:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B05E91BA6124
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 22:30:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F8FD257441;
-	Thu,  1 May 2025 20:59:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1529225A22;
+	Thu,  1 May 2025 22:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d9rTzouJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JIfWmsci"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 754C1256C6F;
-	Thu,  1 May 2025 20:59:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 322E61D6DBF;
+	Thu,  1 May 2025 22:30:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746133194; cv=none; b=qKeSozWiEF+5ivO7TONq7CaE1QTp1Z1VUb6nkAqwAyPB1mQVTpMmGjKK1LVMBJGUFzCOhaquskuade2bnDHViI7C87MqKBVTX0OnBgzEKiya3c8kwjxBq244Y5uGLLdNBADeInU6tVBu7zGh1DiOLLBwyhtA/IAj0UCv0+QpGZA=
+	t=1746138628; cv=none; b=Td95UENczt2qoyWAgFlQ2+LuxX0XhWBeyl0LlvMEwJpfWOLuHgq0OcygeZMaYhh2eyfIq9KRcc9KHUUopfkLG0JTLt2+rCvSoEhMcvhPjikFpXqb+8jA7sFSe+CGeLIkNY0Nb5YO4uIQN1gIcxST5B4MtIQ5VbGLicIb8OkpkwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746133194; c=relaxed/simple;
-	bh=Bcl0zyNkmd9dJy6p2JPm2imjsK6MR8ZGcLLQjr0KMv4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=VJ3U9xPN9oin8/OcGgIYvA3U7ZonrCnDTogdIRRbnzbadq0uAS/n9aXevFyWPbnLf9U/GKF3s+Vxk2GDdw44lKsMz160/abUhSYbDio3FZAMSVOqV4DnFHAv/dUHkVQx83q5XtmkvGGudWUtn33MkEVlh2tr0Zyk6OSlEMrt0Ps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d9rTzouJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDF02C4CEE4;
-	Thu,  1 May 2025 20:59:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746133193;
-	bh=Bcl0zyNkmd9dJy6p2JPm2imjsK6MR8ZGcLLQjr0KMv4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=d9rTzouJxYkLcvZDZBaAbNL/gYn+jjnBf3Im4bMHCxyy3RtZdp5PoV+wY5g83H1io
-	 UvOU1UTwY2bgEBoqurWYsCPEY3iUVfgZGM0utNBaVG8pMXcMGVoqvTXaNMNxyEDRFo
-	 8l4slfENW2Ssdxv48YvAKdG5+ScrSHEWVct7ztAXNHWpvbtVvxbAyVDuQPPpOWaGGV
-	 9+0592cQvTnmkErye0nnP6RniKKYtLC490ISiWzqir8ud/rSNVhcSaNaV1DWyrI6Kk
-	 8OseZ52JOUCKOxLxJUsT6ugbwAGlcAqZJOziDtbBFA/OM/QcQnzJRHu91KiEbRsglO
-	 tQEFHg00nPSxA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33F143822D59;
-	Thu,  1 May 2025 21:00:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1746138628; c=relaxed/simple;
+	bh=J2xlN2MKg+jZFLM4cidgDunn23asrqY5ojuLidh+RJ4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RIXyqHI2+WiambfuAnFZ/jrwm2iAqkfCRk8GCKmzc+i3lWxWv0TAa8n8JQEIEza3tWaswSNR2Kpt/vNss1ABePdnoHdH08xUtg7YgAS02ECtTDq5VpR5VJ7WFqG1vQI+QVTMK0Xkcb7a2YdqKxJwZr7rgiiJpqPD1Gc4n4gOiys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JIfWmsci; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2ff64550991so1179787a91.0;
+        Thu, 01 May 2025 15:30:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746138626; x=1746743426; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vGJYNqx3x4F1f1Flq8KMEpewuVHohO9K6jvScQ08hq0=;
+        b=JIfWmscivJpBSLRvVhpLP2FujYPnbqKmzoJgra0q+3W/g8Qp6wExYHU7vNh6iVCOmS
+         pcJshcOfP/osHW0+eWg5P0W4AUAZsiua7Wt9GVLWiGYWuXOn+ufNyruh4mE1nXNmzF0p
+         xjpCstXtUiHmpYOF8TzRF/w56e/VOTLNCsRv0l3nSW9KU2BxWyCJRdFvS+uakZ7wwu7m
+         6CxAuzvd1ibn/FLcJpjKjGmdjVf1BUikeuTbaNWAOLA6QaIX8ToPh/tdQZc8BQdmeMz1
+         5Pxl4aaXqDEysnGhSHZWTPo7hEMvN8q1cyh71pK9AIVm0nK19vkawJvtLFD2jnYImh8r
+         zxPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746138626; x=1746743426;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vGJYNqx3x4F1f1Flq8KMEpewuVHohO9K6jvScQ08hq0=;
+        b=kt2PxGtqtLb7fKirlG9iqI95sZrkNek+qUF36hKP74E9EcY9MdfybNLRqqRdljUBj8
+         z2pllPE7ymhHkc+EJEL5/pxTeo0hqVsJoAPRGgdpNwPUGDiwm+mwWrgI4yo8HrKM+g/T
+         L5kgmhjR0IM/p/FvlqUnmkszFo9/kxa9gTt/RWdPvhD8TaNitu2iWjxISFnUNwLPd59s
+         xfCUHK9tZgv/OiwwPRBXdg/QG9CFrryW0n4t5kY86yqVo2Sj1FXA5RpRex5XSqZLSeFF
+         KuNPlF1WgLwGWrzc8ZLRtpcD+Zuk/Bf9iIiuNN48YvczS6ayrbe/AVf1YXS2gh7Pk1D7
+         S7JA==
+X-Gm-Message-State: AOJu0Yy/BjzPXVzmOgjJbw8CW+8o3c57MR7RUEu+u1dQt2AyNn8DHBJ/
+	qtWI9IB59ljrpkS4teQ8SI6mcm31ulEL2ntlAPZ1pMX/tnKaFEDdhYnlOQ==
+X-Gm-Gg: ASbGncvABXeayCBnqiqqrnEyuNkc4EkkZg+1VR5f+Pk1tBn9r0AYSHIYe7c7gFFB0XP
+	xFhXaospt/LsOTD5iNOw9YqmDT0rpAyQz5rtwceoHiscP57gKBbUjnZ6xMqOd6pvJZQ7ynISVfG
+	/CtW9wIMVeyHeFu1sgOtIrT8sxZ3akMOoLQABZYY5vVvwil1zGjoW4BizJelf3OeZPGV8RR3WmF
+	ylxanbkJiipDzgaflkcSNO4Cz1kIR5Jtsq+KwX/gBbxLaWv7fXqMdJkA3q8BRqmOg9IsRD5etUP
+	ff46jhL80ZgWfseVwiH6/iVm2ii2vEU=
+X-Google-Smtp-Source: AGHT+IFoq+QTJSbfNwfFYD/N4bfU29bvNeqEEhS1rCRtIh8hEWh+U+HudWqCQWfCJ0/JFAkFWOOPqw==
+X-Received: by 2002:a17:90b:51c5:b0:2fe:a0ac:5fcc with SMTP id 98e67ed59e1d1-30a4e6b5c59mr849156a91.34.1746138626041;
+        Thu, 01 May 2025 15:30:26 -0700 (PDT)
+Received: from localhost ([2a03:2880:ff:2::])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30a474768eesm1472074a91.16.2025.05.01.15.30.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 May 2025 15:30:25 -0700 (PDT)
+From: Amery Hung <ameryhung@gmail.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	alexei.starovoitov@gmail.com,
+	andrii@kernel.org,
+	daniel@iogearbox.net,
+	martin.lau@kernel.org,
+	xiyou.wangcong@gmail.com,
+	kernel-team@meta.com
+Subject: [PATCH bpf-next/net v1 0/5] Fix bpf qdisc bugs and cleanup
+Date: Thu,  1 May 2025 15:30:20 -0700
+Message-ID: <20250501223025.569020-1-ameryhung@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,47 +89,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next v3 0/2] bpf: Allow XDP_REDIRECT for XDP dev-bound
- programs
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174613323300.3076028.3914757479953100366.git-patchwork-notify@kernel.org>
-Date: Thu, 01 May 2025 21:00:33 +0000
-References: <20250428-xdp-prog-bound-fix-v3-0-c9e9ba3300c7@kernel.org>
-In-Reply-To: <20250428-xdp-prog-bound-fix-v3-0-c9e9ba3300c7@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: ast@kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com,
- andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, davem@davemloft.net, kuba@kernel.org,
- hawk@kernel.org, mykolal@fb.com, shuah@kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
 
-Hello:
+This patchset fixes the following bugs in bpf qdisc and cleanup the
+selftest.
 
-This series was applied to bpf/bpf-next.git (master)
-by Martin KaFai Lau <martin.lau@kernel.org>:
+- A null-pointer dereference can happen in qdisc_watchdog_cancel() if the
+  timer is not initialized when 1) .init is not defined by user so
+  init prologue is not generated. 2) .init fails and qdisc_create()
+  calls .destroy
 
-On Mon, 28 Apr 2025 17:44:01 +0200 you wrote:
-> In the current implementation if the program is dev-bound to a specific
-> device, it will not be possible to perform XDP_REDIRECT into a DEVMAP or
-> CPUMAP even if the program is running in the driver NAPI context.
-> Fix the issue introducing __bpf_prog_map_compatible utility routine in
-> order to avoid bpf_prog_is_dev_bound() during the XDP program load.
-> Continue forbidding to attach a dev-bound program to XDP maps.
-> 
-> [...]
+- bpf qdisc fails to attach to mq/mqprio when being set as the default
+  qdisc due to failed qdisc_lookup() in init prologue
 
-Here is the summary with links:
-  - [bpf-next,v3,1/2] bpf: Allow XDP dev-bound programs to perform XDP_REDIRECT into maps
-    https://git.kernel.org/bpf/bpf-next/c/714070c4cb7a
-  - [bpf-next,v3,2/2] selftests/bpf: xdp_metadata: check XDP_REDIRCT support for dev-bound progs
-    https://git.kernel.org/bpf/bpf-next/c/3678331ca781
+Amery Hung (5):
+  bpf: net_sched: Fix bpf qdisc init prologue when set as default qdisc
+  selftests/bpf: Test setting and creating bpf qdisc as default qdisc
+  bpf: net_sched: Make some Qdisc_ops ops mandatory
+  selftests/bpf: selftests/bpf: Test attaching a bpf qdisc with
+    incomplete operators
+  selftests/bpf: Cleanup bpf qdisc selftests
 
-You are awesome, thank you!
+ net/sched/bpf_qdisc.c                         | 24 ++++-
+ .../selftests/bpf/prog_tests/bpf_qdisc.c      | 95 ++++++++++++++++++-
+ .../selftests/bpf/progs/bpf_qdisc_common.h    |  6 --
+ .../bpf/progs/bpf_qdisc_fail__incompl_ops.c   | 41 ++++++++
+ .../selftests/bpf/progs/bpf_qdisc_fifo.c      |  6 ++
+ .../selftests/bpf/progs/bpf_qdisc_fq.c        |  6 ++
+ 6 files changed, 164 insertions(+), 14 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/progs/bpf_qdisc_fail__incompl_ops.c
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.47.1
 
 
