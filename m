@@ -1,77 +1,57 @@
-Return-Path: <netdev+bounces-187187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CA6FAA590C
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 02:31:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5E61AA5914
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 02:32:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B22FB4640EB
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 00:31:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A7921BA6236
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 00:32:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 756DB1A3148;
-	Thu,  1 May 2025 00:31:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1393B19DF5F;
+	Thu,  1 May 2025 00:31:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="o0aguuBk"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="gFqDjBOQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B43CE19F421;
-	Thu,  1 May 2025 00:31:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17DD935893;
+	Thu,  1 May 2025 00:31:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746059465; cv=none; b=qQMr2z4ww06CptxGAXDZxWQpH/g0uaJ11g5+mvVrNQoHhc9DzyWhOa5X8EC7JxA3AC30jhb8mV+R1T5DDtl598tnfglHcMiyFxX5yEVTYdYlaCqeNmjzzP1ryl+jfPfwb1hesQvVhPeqf3tnpDQiReB8EKFDgBABJRpcNx8dPxc=
+	t=1746059517; cv=none; b=beioNcYDMxydkDcR6ALbLsjGrAzjTSssrf1Sq4IN4JR2e7xGz4J8FbrEOaSL8ZLewK1Y6GdU5buRaEzCVGw5UpCmXG4keFM+zVKX0RCDJ/x1dRjN7aZ3eyLiNNcpxWBqvWJBCIJiMKiYZ19dhwjtGBYjhmQz6KhL+3xZy7lRM24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746059465; c=relaxed/simple;
-	bh=Ci0DwSkdku8GewOdySf7cTEu3of/g50Vqk+aMKizZGk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QE0NxB8BdtXS7WbJOwPwNvt8/H1hgRl5gN2h5ZIg38KAWvJ+bCASbJL9Y3Kh6TpHzuhxbYWE0rXR8pM4xDTXPAjZnyoFXyPYczDZLLzc/SVjQmpPEPzhqgHsK6DVxshHjmkKBA5EzZg64emitLfwbKpFUssYfoJrj7L/YpQ/fOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=o0aguuBk; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1746059463; x=1777595463;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=9S7Rq8JOZsTFJ9lLP4FliEFT/hASyEX4dw+STGpWrg4=;
-  b=o0aguuBkifPhu0e+YKdkVC23huP9c2CT+g5XqR2uW4azrUcP9cx58+W3
-   ng8gquh3tgJOac24dT/6j15pyrh2OqfEHz7Ei+myBvnVQQL9kHArQ2tc4
-   wfi3Zj7c3hHe0Dm75bFau/VxCW6vuKbkz1cqg9Cbuf4Cyeg4s9jfbK1rP
-   g=;
-X-IronPort-AV: E=Sophos;i="6.15,253,1739836800"; 
-   d="scan'208";a="196066862"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2025 00:31:01 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:64656]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.114:2525] with esmtp (Farcaster)
- id 0c9374d3-d797-4853-a843-2daf2ecffefa; Thu, 1 May 2025 00:31:01 +0000 (UTC)
-X-Farcaster-Flow-ID: 0c9374d3-d797-4853-a843-2daf2ecffefa
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 1 May 2025 00:31:01 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.187.171.60) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 1 May 2025 00:30:56 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <brauner@kernel.org>
-CC: <bluca@debian.org>, <daan.j.demeyer@gmail.com>, <davem@davemloft.net>,
-	<david@readahead.eu>, <edumazet@google.com>, <horms@kernel.org>,
-	<jack@suse.cz>, <kuba@kernel.org>, <kuniyu@amazon.com>,
-	<lennart@poettering.net>, <linux-fsdevel@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <me@yhndnzj.com>, <netdev@vger.kernel.org>,
-	<oleg@redhat.com>, <pabeni@redhat.com>, <viro@zeniv.linux.org.uk>,
-	<zbyszek@in.waw.pl>
-Subject: Re: [PATCH RFC 3/3] coredump: support AF_UNIX sockets
-Date: Wed, 30 Apr 2025 17:25:19 -0700
-Message-ID: <20250501003048.49502-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1746059517; c=relaxed/simple;
+	bh=2lveSxjfFkBq6zfkWnzSsFQ1wGsQtjRTg3Iba7lZMhQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r+JswkUOW912YBj3r4cXOALkYV8gj/9Mkk1UQDlviUy/v/QykDl+F/IRjJgt/e48I85h38zuRZu7kjBsHgggrllpakftR9d6nq6C48NK4DXk+MUqQrh8kFKtcdJxtBH2OHAQlGABJIYtVbN6AcGqWYcwcuHglBcUIJM1qppF8AU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=gFqDjBOQ; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
+	:Subject; bh=8UPzLciHp4xNWmOLyriQyNsSYRyqmykzSDKFvr9TTJ8=; b=gFqDjBOQvaE1VdoK
+	2OmPz8yIXenxtzHX6LQ3JLtpqcvMKITw7W6NGBG6UKmRZ0QgPpsSBZUECgJQLOywHexJKRonobXUi
+	x3UALqe6bAVfebU/HD9u+bW+WCIXhAnoaQwoKGMEhfDpoNs0l7DA+Y/MDDA17b5tMC+GshYB9Pdhb
+	HiqRXaba9D1xXU7WmMXA/pVYhfLgSFrVrt62OnLtwzwcBCb20tnmcQ56vGI1YIeXpRBXT/s5JK75o
+	3OztjZ6ZklnY/lwcvv7UIpqdjy9s4498AM9R7KAOP9zSkQytmtquv4BMKEtambv++2Gt/Mmq74NGo
+	ApoZQTnxv1ByQ36S7A==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+	by mx.treblig.org with esmtp (Exim 4.96)
+	(envelope-from <linux@treblig.org>)
+	id 1uAHqC-000od7-2E;
+	Thu, 01 May 2025 00:31:52 +0000
+From: linux@treblig.org
+To: kuba@kernel.org,
+	netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	"Dr. David Alan Gilbert" <linux@treblig.org>
+Subject: [RFC net-next] strparser: Remove unused strp_process
+Date: Thu,  1 May 2025 01:31:50 +0100
+Message-ID: <20250501003150.309583-1-linux@treblig.org>
 X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250430-work-coredump-socket-v1-3-2faf027dbb47@kernel.org>
-References: <20250430-work-coredump-socket-v1-3-2faf027dbb47@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,51 +59,93 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWB003.ant.amazon.com (10.13.139.157) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Christian Brauner <brauner@kernel.org>
-Date: Wed, 30 Apr 2025 13:05:03 +0200
-> @@ -801,6 +837,49 @@ void do_coredump(const kernel_siginfo_t *siginfo)
->  		}
->  		break;
->  	}
-> +	case COREDUMP_SOCK: {
-> +		struct file *file __free(fput) = NULL;
-> +		struct sockaddr_un unix_addr = {
-> +			.sun_family = AF_UNIX,
-> +		};
-> +		struct sockaddr_storage *addr;
-> +
-> +		retval = strscpy(unix_addr.sun_path, cn.corename, sizeof(unix_addr.sun_path));
-> +		if (retval < 0)
-> +			goto close_fail;
-> +
-> +		file = __sys_socket_file(AF_UNIX, SOCK_STREAM, 0);
-> +		if (IS_ERR(file))
-> +			goto close_fail;
-> +
-> +		/*
-> +		 * It is possible that the userspace process which is
-> +		 * supposed to handle the coredump and is listening on
-> +		 * the AF_UNIX socket coredumps. This should be fine
-> +		 * though. If this was the only process which was
-> +		 * listen()ing on the AF_UNIX socket for coredumps it
-> +		 * obviously won't be listen()ing anymore by the time it
-> +		 * gets here. So the __sys_connect_file() call will
-> +		 * often fail with ECONNREFUSED and the coredump.
-> +		 *
-> +		 * In general though, userspace should just mark itself
-> +		 * non dumpable and not do any of this nonsense. We
-> +		 * shouldn't work around this.
-> +		 */
-> +		addr = (struct sockaddr_storage *)(&unix_addr);
-> +		retval = __sys_connect_file(file, addr, sizeof(unix_addr), O_CLOEXEC);
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-The 3rd argument should be offsetof(struct sockaddr_un, sun_path)
-+ retval of strscpy() above ?
+strp_process() was addded in 2017 in
+commit bbb03029a899 ("strparser: Generalize strparser")
 
-I guess you could see an unexpected error when
-CONFIG_INIT_STACK_NONE=y and cn.corename has garbage at tail.
+but never used.
+
+Remove it.
+
+....but, hmm I'm not sure how much other cleanup needs doing,
+there's still a comment in strp_init() referencing strp_process
+and it makes me think there might be other code handling the
+'general mode' which strp_process seems to have been added for.
+
+Suggestions?
+
+Dave
+
+Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+---
+ Documentation/networking/strparser.rst | 12 ------------
+ include/net/strparser.h                |  3 ---
+ net/strparser/strparser.c              | 13 -------------
+ 3 files changed, 28 deletions(-)
+
+diff --git a/Documentation/networking/strparser.rst b/Documentation/networking/strparser.rst
+index 8dc6bb04c710..e7729915d7a1 100644
+--- a/Documentation/networking/strparser.rst
++++ b/Documentation/networking/strparser.rst
+@@ -81,18 +81,6 @@ Functions
+ 
+      ::
+ 
+-	int strp_process(struct strparser *strp, struct sk_buff *orig_skb,
+-			 unsigned int orig_offset, size_t orig_len,
+-			 size_t max_msg_size, long timeo)
+-
+-    strp_process is called in general mode for a stream parser to
+-    parse an sk_buff. The number of bytes processed or a negative
+-    error number is returned. Note that strp_process does not
+-    consume the sk_buff. max_msg_size is maximum size the stream
+-    parser will parse. timeo is timeout for completing a message.
+-
+-    ::
+-
+ 	void strp_data_ready(struct strparser *strp);
+ 
+     The upper layer calls strp_tcp_data_ready when data is ready on
+diff --git a/include/net/strparser.h b/include/net/strparser.h
+index 0ed73e364faa..cc64e9d8c9e9 100644
+--- a/include/net/strparser.h
++++ b/include/net/strparser.h
+@@ -163,8 +163,5 @@ void strp_check_rcv(struct strparser *strp);
+ int strp_init(struct strparser *strp, struct sock *sk,
+ 	      const struct strp_callbacks *cb);
+ void strp_data_ready(struct strparser *strp);
+-int strp_process(struct strparser *strp, struct sk_buff *orig_skb,
+-		 unsigned int orig_offset, size_t orig_len,
+-		 size_t max_msg_size, long timeo);
+ 
+ #endif /* __NET_STRPARSER_H_ */
+diff --git a/net/strparser/strparser.c b/net/strparser/strparser.c
+index d946bfb424c7..2cd9c39910a5 100644
+--- a/net/strparser/strparser.c
++++ b/net/strparser/strparser.c
+@@ -314,19 +314,6 @@ static int __strp_recv(read_descriptor_t *desc, struct sk_buff *orig_skb,
+ 	return eaten;
+ }
+ 
+-int strp_process(struct strparser *strp, struct sk_buff *orig_skb,
+-		 unsigned int orig_offset, size_t orig_len,
+-		 size_t max_msg_size, long timeo)
+-{
+-	read_descriptor_t desc; /* Dummy arg to strp_recv */
+-
+-	desc.arg.data = strp;
+-
+-	return __strp_recv(&desc, orig_skb, orig_offset, orig_len,
+-			   max_msg_size, timeo);
+-}
+-EXPORT_SYMBOL_GPL(strp_process);
+-
+ static int strp_recv(read_descriptor_t *desc, struct sk_buff *orig_skb,
+ 		     unsigned int orig_offset, size_t orig_len)
+ {
+-- 
+2.49.0
+
 
