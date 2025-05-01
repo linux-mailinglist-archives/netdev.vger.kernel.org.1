@@ -1,147 +1,103 @@
-Return-Path: <netdev+bounces-187267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6E7FAA5FF6
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 16:28:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B00EAA6006
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 16:30:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 378981788FC
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 14:28:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B80153A4906
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 14:29:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 666831F1512;
-	Thu,  1 May 2025 14:28:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DB721F1527;
+	Thu,  1 May 2025 14:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kUwXcTvk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="am6DO0h4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36AAF19CC1C;
-	Thu,  1 May 2025 14:28:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E93E01D95B3;
+	Thu,  1 May 2025 14:29:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746109704; cv=none; b=SYTdo7Kvno+cBieCyYCWaWqztyzLELzP4AOUbvd27eCXZwh4fdLHrgOu5NQSEBM++THM4Y8qZHGJo0vHre5Y5qc04Pk//vbWknv3BRUbYlR3Uif6aR5UlFYFkG+TMQK/u2dMA7oJBNEYxyQ/lyze2IckdTaDPebhRJ1AQCvk85c=
+	t=1746109800; cv=none; b=DTCIybeJrMAYPZH8GEheVEgheMx7r6kCvJWaZK3kScb1BSkpWOzq0DOYOzb5bK5Bc0d52xjLi1r2DLAGb845mW2sdqkHGP2aLg2Uq/pM0GBsAVBMTzsge5pdcBN7WMas+SA/c2ooFadcmtYPtnpUfo0JBesYNYnHKxVzCaYNYBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746109704; c=relaxed/simple;
-	bh=dG/vmRyKkftV3UXTBolH+6yd6BgJNwN/cvqHh6HRxRA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PjDeTU4OS+sjZ+1RpQhMkn5/uxxWlJ6oICa7Zw2YRDbAuUg//42CtRTv0DdBRnolvUYA/GxoRd1ytLByMy3WaD5X/t4Xq0a24E6MVqs5CDsjPh/ih5popuEmPgYaehm0/tNY1fjbme5YF6bOX/C/24HKIkl8mirAYaSLFsfeNJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kUwXcTvk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DB17C4CEE3;
-	Thu,  1 May 2025 14:28:20 +0000 (UTC)
+	s=arc-20240116; t=1746109800; c=relaxed/simple;
+	bh=iWZntxMdLUW17/ltDYdvyArEEN8eRI/Cwkn4D0OJZfQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=DkS7b1+RtrWu0IDjQhpqv0KHHU8hTKsL7PQwbDdBgZvQjHRlRS8o7epBsNJkPaQbYj6lr8jToV5jBX2Kg/52YPX+HD6uqlT2UaeW87lR45qtEljKvn4WFdoR3gZeE+fjSxVvFOIL1s/G7QuxJ/arOy2q68KsnIZBHyloVR0VE8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=am6DO0h4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAE9DC4CEE3;
+	Thu,  1 May 2025 14:29:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746109703;
-	bh=dG/vmRyKkftV3UXTBolH+6yd6BgJNwN/cvqHh6HRxRA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kUwXcTvkkneJCvpsXOtBl99R3OlqklWXCU0ADMe603mh9WyN626b6zE18VejnTqyn
-	 3AFdV0WJ/gyMGYjtJrvfXX3oRa7QfhUjUamPOqzbINRo1EDuxX3Qj0T709Xp2cVv78
-	 DrVNx6bekqF4AUvubwfgc/r6x7SKb1/rtA77OzhJQzXCPRZLyzDkS0dC+F+G0mfowM
-	 cox+Vl4WGQlCyZ+6IA/htz5dq1hMKJPugim/3AZLyQ8eiGFHdEItPgDPSRK/+r7ZWu
-	 Yi54GnwJ5POgKb2iZqoQiAkUvNQzCI0VfpnH9WeGXSLSMsR1EOI4DfiRc+MKD02QBx
-	 GLAKIFsjzh1lw==
-Date: Thu, 1 May 2025 15:28:18 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Chaoyi Chen <chaoyi.chen@rock-chips.com>,
-	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] dt-bindings: net: ethernet-controller: Add
- informative text about RGMII delays
-Message-ID: <20250501-extrude-jot-aa8512a299ec@spud>
-References: <20250430-v6-15-rc3-net-rgmii-delays-v2-1-099ae651d5e5@lunn.ch>
+	s=k20201202; t=1746109799;
+	bh=iWZntxMdLUW17/ltDYdvyArEEN8eRI/Cwkn4D0OJZfQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=am6DO0h4Q4LNRx4pJohZVj9tKYjIi0mZLkCfKDSPflcIFyHqRHklvWipIMkkjggbC
+	 rjzb8gY+EjliEiSO1UGdDf0kvr3Gaw4bolMiRSZH0BwWMCfOyw0JYHzLxqlOreoSop
+	 AX6SPAQX50jL/L9bCkDL3OOFJ7d26C0MiBJyQHQ6EW7fUFbCSyxMO7gcTErlz9RYky
+	 6vl3+uCh4PsRaQ1cEWGOM212PSHZpcqN1oKe8gYdUMVZIBOxQCiP0lH6ZnCXYfLCKM
+	 yYQelOlG1SmxFNP1D1HYIpZ+Pu5a9ercBHR4fo85u3ZE68IPaYSUZiNhFK0dRyBHn1
+	 QZZGANII1oOBA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE9F3822D59;
+	Thu,  1 May 2025 14:30:39 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="I870tTDMsq2gvFPl"
-Content-Disposition: inline
-In-Reply-To: <20250430-v6-15-rc3-net-rgmii-delays-v2-1-099ae651d5e5@lunn.ch>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/4] There are some bugfix for the HNS3 ethernet driver
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174610983875.2996110.11381498032317925334.git-patchwork-notify@kernel.org>
+Date: Thu, 01 May 2025 14:30:38 +0000
+References: <20250430093052.2400464-1-shaojijie@huawei.com>
+In-Reply-To: <20250430093052.2400464-1-shaojijie@huawei.com>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ shenjian15@huawei.com, wangpeiyang1@huawei.com, liuyonglong@huawei.com,
+ chenhao418@huawei.com, jonathan.cameron@huawei.com,
+ shameerali.kolothum.thodi@huawei.com, salil.mehta@huawei.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+
+Hello:
+
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 30 Apr 2025 17:30:48 +0800 you wrote:
+> There is a pathset that contains three patches, but two of them
+> need to be removed:
+>  https://lore.kernel.org/all/20250402121001.663431-1-shaojijie@huawei.com/
+> The last patch and other patches form this patchset:
+>  net: hns3: store rx VLAN tag offload state for VF
+> 
+> Hao Lan (1):
+>   net: hns3: fixed debugfs tm_qset size
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,1/4] net: hns3: store rx VLAN tag offload state for VF
+    https://git.kernel.org/netdev/net/c/ef2383d078ed
+  - [net,2/4] net: hns3: fix an interrupt residual problem
+    https://git.kernel.org/netdev/net/c/8e6b9c6ea5a5
+  - [net,3/4] net: hns3: fixed debugfs tm_qset size
+    https://git.kernel.org/netdev/net/c/e317aebeefcb
+  - [net,4/4] net: hns3: defer calling ptp_clock_register()
+    https://git.kernel.org/netdev/net/c/4971394d9d62
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---I870tTDMsq2gvFPl
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Apr 30, 2025 at 11:21:35AM -0500, Andrew Lunn wrote:
-> Device Tree and Ethernet MAC driver writers often misunderstand RGMII
-> delays. Rewrite the Normative section in terms of the PCB, is the PCB
-> adding the 2ns delay. This meaning was previous implied by the
-> definition, but often wrongly interpreted due to the ambiguous wording
-> and looking at the definition from the wrong perspective. The new
-> definition concentrates clearly on the hardware, and should be less
-> ambiguous.
->=20
-> Add an Informative section to the end of the binding describing in
-> detail what the four RGMII delays mean. This expands on just the PCB
-> meaning, adding in the implications for the MAC and PHY.
->=20
-> Additionally, when the MAC or PHY needs to add a delay, which is
-> software configuration, describe how Linux does this, in the hope of
-> reducing errors. Make it clear other users of device tree binding may
-> implement the software configuration in other ways while still
-> conforming to the binding.
->=20
-> Fixes: 9d3de3c58347 ("dt-bindings: net: Add YAML schemas for the generic =
-Ethernet options")
-> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
-> ---
-> Changes in v2:
-> Reword Normative section
-> manor->manner
-> add when using phylib/phylink
-> request details in the commit message and .dts comments
-> clarify PHY -internal-delay-ps values being depending on rgmii-X mode.
-> Link to v1: https://lore.kernel.org/r/20250429-v6-15-rc3-net-rgmii-delays=
--v1-1-f52664945741@lunn.ch
-> ---
->  .../bindings/net/ethernet-controller.yaml          | 97 ++++++++++++++++=
-++++--
->  1 file changed, 90 insertions(+), 7 deletions(-)
->=20
-> diff --git a/Documentation/devicetree/bindings/net/ethernet-controller.ya=
-ml b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-> index 45819b2358002bc75e876eddb4b2ca18017c04bd..a2d4c626f659a57fc7dcd3930=
-1f322c28afed69d 100644
-> --- a/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-> +++ b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-> @@ -74,19 +74,17 @@ properties:
->        - rev-rmii
->        - moca
-> =20
-> -      # RX and TX delays are added by the MAC when required
-> +      # RX and TX delays are provided by the PCB. See below
-
-I'm not sure that "provided" is the correct word to describe what's
-meant here (implemented might be better), but it's perfectly
-understandable as-is and I don't think worth respinning or splitting
-hairs over...
-
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
-
---I870tTDMsq2gvFPl
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaBOFAgAKCRB4tDGHoIJi
-0jplAP9zRFU8cq0CrAIupeDxoyotkJxhG0NaXz1GE2mesULpvgD7BF2kqIywMMqL
-jF2DMurlLRkxpRkBUqu61t3g8/rkCwY=
-=FiiL
------END PGP SIGNATURE-----
-
---I870tTDMsq2gvFPl--
 
