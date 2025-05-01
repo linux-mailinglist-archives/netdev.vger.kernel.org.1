@@ -1,381 +1,354 @@
-Return-Path: <netdev+bounces-187246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DC04AA5E47
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 14:19:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 383B0AA5E52
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 14:22:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD7D1189ABA1
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 12:17:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE5DB1BC2C2D
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 12:22:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A20D265CC4;
-	Thu,  1 May 2025 12:16:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C629227EBB;
+	Thu,  1 May 2025 12:22:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BRG4YBJ1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rY85XMTI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06DB4263C7F;
-	Thu,  1 May 2025 12:16:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 422431EFFA3;
+	Thu,  1 May 2025 12:22:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746101805; cv=none; b=PTri4c68kOJe9oUvVfPUoGLYNEgD46HkKtC6UaDg8msJTsh5gyXOh7bO6pRTbvM9Y4mK9TovDus2KGoJb/7pytSY3ZkCkCtfCQCty6MaZ6zflOHdA59r73whiWyH7KZM/J90aEPWgXR5vQtj9VGZsTCzVf5YcClc0hwvaYDBIdI=
+	t=1746102143; cv=none; b=OYoh0dO452P2walPgNqVe/NuCUDvTlNz/2piGlNRDR31iv0A7WTy2isW5JqLrxDlOfhB5jB4vHXKvWP8r8YxIyjmHTza74AmepbbBPIUh/yPGWrrIJZ/Ijvkndp2toj5Gcm+AXXiAE+MhF7huxSbEURSIKeTjQa//NSOYIr6TzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746101805; c=relaxed/simple;
-	bh=IMuQP9SARGKuoqRLjhSofbdNbpWEhFDN/P0r3CMZVYM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=X0vInSSBp87Dze1PRvv6/J8DT3xVLG/cwxklRwwYiTJR4ItgDUzEjKQc+O0C2mN/AuLG077ngy4EjnJ76CNifgctY4kRXbX2IBkpcs9taAOBeqslBrlwMcDlWaUsVNtUxbQn0yHp+Xn7pAdnaTxHjomE1cVeDAj4weyHfDfPykY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BRG4YBJ1; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5efe8d9ebdfso1471244a12.3;
-        Thu, 01 May 2025 05:16:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746101802; x=1746706602; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=94Toc8wVdcQDUyoW3VJJlGoj+1RHyLQ4S7pxVKpk3Go=;
-        b=BRG4YBJ17rR8NEhHhyEDrYP96KJ9weGpRDeRpxrGd88Um6pUggYeLLEBVG8uuFMFIM
-         rjHbEdNIBKGHXXY1hCRMSWHsGzelFUMcXjap88zRLuRSmBggnsxEsdtgXRz+r21GGtbo
-         b5hgHiZTeK0Y1Bjspi13bBNO9U/0D9SmQSum7Tnml1enHoEI533PQx0WH1XsFU06ucqP
-         Akfn+CSHNeTvBnPK4HaxKYTcg5hS0PfMJF4UKNS8kuSa3LW5gb8qPbkRmMuI+flu6me8
-         ysWKUaMnR31qmZ8Pa89OeUoybmpK91YObbBTU12DRnDyexat8ZDYPDlClshkOrAYAs+l
-         IlTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746101802; x=1746706602;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=94Toc8wVdcQDUyoW3VJJlGoj+1RHyLQ4S7pxVKpk3Go=;
-        b=PP1MptBJ0B1IbEgWbqH4qHNSTefXQ0eJhIt0weTNsmhvrEFw19dfgfZqHuMYVDvj/o
-         rnlHgvBNspQpAiJwpJV6xTbGjc8VEx7MJJWOKbhpHDI+xmFSVLF7h7nNFGhRI0HNWvbJ
-         8hbiit/IW05mLaTy072oXmruOEu5eMTBhrazGp2HnamGV8hQudBTBnGFIcLLUaVE+ShB
-         /4i2+dG4eAoFdHjz1AZg0uVQa8YTVMS09J4miSJQqS6oALqsoPRtXcSBmkbnfirc9umA
-         qj8mOPevKQpBERufYOXLA1Vd68I5XZurGMojE7P1frnyyUiguXR2BGycXjfjz9tLthKk
-         sYzA==
-X-Forwarded-Encrypted: i=1; AJvYcCUBHVHtF5pwL8IQ3Lk1mkaSb/3vk08TUbpWGvD3mmdv1f02p6ApX2PHQxtTJ/q9Kpr34y6AYwY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmYT0Au7zxb7iS6TzGKINYoihs/basS0F/tEzw0MjPywvvfSDH
-	7Uf7nsxaKdQvQmsYOtGkpnA/oXkp7YJ8P9VSqz710f1IhOPvBQH1aJIHXA==
-X-Gm-Gg: ASbGncspdLde5s2QAp7mBb8iqhvpsMdFuOTA2l9ews66eJ5vYwmWVXXQiJ5c3k1KDtA
-	PLH8j8m6c87rDjVDKg9L1pb9ElsQms6uTRV+xCLVZ4r2UWKt8/5rTOc3xZ/2DEEOexN1zBvVZft
-	TAtjt52CcP1/nXRDHbrgQw06bnMeE+k4vC8esRMRTwNr8ev/WfgX89qNlIdMXaqGmn9COGBZ7Tb
-	tIM5gN2/FyB3VWhzvodGuJJl7OOHhddAEm5l9aQJ8lT3MOZebmQWqi1LzH6PbfNac87XFbybYMi
-	gj9EERJuQbKi5xJ5tLWjPOkE
-X-Google-Smtp-Source: AGHT+IEFCUdfaMZEoOgPPnwDwqCi+ycSb97DyRjDzND1euFUCXQ0+HlzXYjSqQXFfQpVMs9My71BKQ==
-X-Received: by 2002:a05:6402:847:b0:5f8:6096:778a with SMTP id 4fb4d7f45d1cf-5f9124ed38fmr2221231a12.10.1746101801782;
-        Thu, 01 May 2025 05:16:41 -0700 (PDT)
-Received: from 127.com ([2620:10d:c092:600::1:9c32])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5f930010655sm346146a12.73.2025.05.01.05.16.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 May 2025 05:16:40 -0700 (PDT)
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: io-uring@vger.kernel.org
-Cc: asml.silence@gmail.com,
-	David Wei <dw@davidwei.uk>,
-	netdev@vger.kernel.org,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Pedro Tammela <pctammela@mojatatu.com>,
-	Victor Nogueira <victor@mojatatu.com>
-Subject: [PATCH io_uring 5/5] io_uring/zcrx: dmabuf backed zerocopy receive
-Date: Thu,  1 May 2025 13:17:18 +0100
-Message-ID: <20bb1890e60a82ec945ab36370d1fd54be414ab6.1746097431.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <cover.1746097431.git.asml.silence@gmail.com>
-References: <cover.1746097431.git.asml.silence@gmail.com>
+	s=arc-20240116; t=1746102143; c=relaxed/simple;
+	bh=CHMvBUGmp7PP9u6wrn26Zh6LkyOXYpzbY4BnHG5wesw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Iy2bZb8sRxCe51O7NhMu4thGDJybrwelFTONY6uIGvfwe8z5s6MWTyQJufoULXBwYPkIVIqiY1fy4m5gvWPtuhRLQ75EgDadldoKE73noq7t2dXeXBWMz/VimO0xfbV7T3Sv4tlqa1AdQVGRU0ys7EXPvouO8wRRGhkUathfGu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rY85XMTI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F08B2C4CEE4;
+	Thu,  1 May 2025 12:22:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746102141;
+	bh=CHMvBUGmp7PP9u6wrn26Zh6LkyOXYpzbY4BnHG5wesw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rY85XMTI6MbZ+LCxioQwyydm/BV/5bdRBS5900pseyqPBzx+6y4nLbIoa7MQm89A1
+	 6TkhN7Rz+4vt7mI2OI2ZOqzUORIx0Z/XcQL8MdkV1yRx48WFwxcNd8YLmx4r48kB6k
+	 nGVDECPtZ/7D6azN4C5QSV0TfeD8S0g0jqg/hpU5RV930nI5cRGiYkjcwjPY/6GF93
+	 urghkRfWvrQgnaT8s7i6G4MamvW/e6amZ7uyv2gVwHei6qzdhdNI56uXVOg5H2hjfM
+	 MacFCtzT671ZxJ5yWD3YvmKFQAADo6/LlI32B0wTICXoHkBcvmMJy9lT0DlowYlotE
+	 Zv1gGRP5mlJ7g==
+Date: Thu, 1 May 2025 13:22:14 +0100
+From: Lee Jones <lee@kernel.org>
+To: a0282524688@gmail.com
+Cc: linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org,
+	mkl@pengutronix.de, mailhol.vincent@wanadoo.fr,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org,
+	linux@roeck-us.net, jdelvare@suse.com,
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org,
+	linux-can@vger.kernel.org, netdev@vger.kernel.org,
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org,
+	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org,
+	Ming Yu <tmyu0@nuvoton.com>
+Subject: Re: [PATCH v10 1/7] mfd: Add core driver for Nuvoton NCT6694
+Message-ID: <20250501122214.GK1567507@google.com>
+References: <20250423094058.1656204-1-tmyu0@nuvoton.com>
+ <20250423094058.1656204-2-tmyu0@nuvoton.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250423094058.1656204-2-tmyu0@nuvoton.com>
 
-Add support for dmabuf backed zcrx areas. To use it, the user should
-pass IORING_ZCRX_AREA_DMABUF in the struct io_uring_zcrx_area_reg flags
-field and pass a dmabuf fd in the dmabuf_fd field.
+On Wed, 23 Apr 2025, a0282524688@gmail.com wrote:
 
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
- include/uapi/linux/io_uring.h |   6 +-
- io_uring/zcrx.c               | 155 ++++++++++++++++++++++++++++++----
- io_uring/zcrx.h               |   7 ++
- 3 files changed, 151 insertions(+), 17 deletions(-)
+> From: Ming Yu <tmyu0@nuvoton.com>
+> 
+> The Nuvoton NCT6694 provides an USB interface to the host to
+> access its features.
+> 
+> Sub-devices can use the USB functions nct6694_read_msg() and
+> nct6694_write_msg() to issue a command. They can also request
+> interrupt that will be called when the USB device receives its
+> interrupt pipe.
+> 
+> Signed-off-by: Ming Yu <tmyu0@nuvoton.com>
+> ---
 
-diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-index 130f3bc71a69..5ce096090b0c 100644
---- a/include/uapi/linux/io_uring.h
-+++ b/include/uapi/linux/io_uring.h
-@@ -990,12 +990,16 @@ struct io_uring_zcrx_offsets {
- 	__u64	__resv[2];
- };
- 
-+enum io_uring_zcrx_area_flags {
-+	IORING_ZCRX_AREA_DMABUF		= 1,
-+};
-+
- struct io_uring_zcrx_area_reg {
- 	__u64	addr;
- 	__u64	len;
- 	__u64	rq_area_token;
- 	__u32	flags;
--	__u32	__resv1;
-+	__u32	dmabuf_fd;
- 	__u64	__resv2[2];
- };
- 
-diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
-index 34b09beba992..fac293bcba72 100644
---- a/io_uring/zcrx.c
-+++ b/io_uring/zcrx.c
-@@ -47,30 +47,110 @@ static inline struct page *io_zcrx_iov_page(const struct net_iov *niov)
- 	return area->mem.pages[net_iov_idx(niov)];
- }
- 
--static void io_release_area_mem(struct io_zcrx_mem *mem)
-+static void io_release_dmabuf(struct io_zcrx_mem *mem)
- {
--	if (mem->pages) {
--		unpin_user_pages(mem->pages, mem->nr_folios);
--		kvfree(mem->pages);
-+	if (mem->sgt)
-+		dma_buf_unmap_attachment_unlocked(mem->attach, mem->sgt,
-+						  DMA_FROM_DEVICE);
-+	if (mem->attach)
-+		dma_buf_detach(mem->dmabuf, mem->attach);
-+	if (mem->dmabuf)
-+		dma_buf_put(mem->dmabuf);
-+
-+	mem->sgt = NULL;
-+	mem->attach = NULL;
-+	mem->dmabuf = NULL;
-+}
-+
-+static int io_import_dmabuf(struct io_zcrx_ifq *ifq,
-+			    struct io_zcrx_mem *mem,
-+			    struct io_uring_zcrx_area_reg *area_reg)
-+{
-+	unsigned long off = (unsigned long)area_reg->addr;
-+	unsigned long len = (unsigned long)area_reg->len;
-+	unsigned long total_size = 0;
-+	struct scatterlist *sg;
-+	int dmabuf_fd = area_reg->dmabuf_fd;
-+	int i, ret;
-+
-+	if (WARN_ON_ONCE(!ifq->dev))
-+		return -EFAULT;
-+
-+	mem->is_dmabuf = true;
-+	mem->dmabuf = dma_buf_get(dmabuf_fd);
-+	if (IS_ERR(mem->dmabuf)) {
-+		ret = PTR_ERR(mem->dmabuf);
-+		mem->dmabuf = NULL;
-+		goto err;
-+	}
-+
-+	mem->attach = dma_buf_attach(mem->dmabuf, ifq->dev);
-+	if (IS_ERR(mem->attach)) {
-+		ret = PTR_ERR(mem->attach);
-+		mem->attach = NULL;
-+		goto err;
-+	}
-+
-+	mem->sgt = dma_buf_map_attachment_unlocked(mem->attach, DMA_FROM_DEVICE);
-+	if (IS_ERR(mem->sgt)) {
-+		ret = PTR_ERR(mem->sgt);
-+		mem->sgt = NULL;
-+		goto err;
- 	}
-+
-+	for_each_sgtable_dma_sg(mem->sgt, sg, i)
-+		total_size += sg_dma_len(sg);
-+
-+	if (total_size < off + len)
-+		return -EINVAL;
-+
-+	mem->dmabuf_offset = off;
-+	mem->size = len;
-+	return 0;
-+err:
-+	io_release_dmabuf(mem);
-+	return ret;
- }
- 
--static int io_import_area(struct io_zcrx_ifq *ifq,
-+static int io_zcrx_map_area_dmabuf(struct io_zcrx_ifq *ifq, struct io_zcrx_area *area)
-+{
-+	unsigned long off = area->mem.dmabuf_offset;
-+	struct scatterlist *sg;
-+	unsigned i, niov_idx = 0;
-+
-+	for_each_sgtable_dma_sg(area->mem.sgt, sg, i) {
-+		dma_addr_t dma = sg_dma_address(sg);
-+		unsigned long sg_len = sg_dma_len(sg);
-+		unsigned long sg_off = min(sg_len, off);
-+
-+		off -= sg_off;
-+		sg_len -= sg_off;
-+		dma += sg_off;
-+
-+		while (sg_len && niov_idx < area->nia.num_niovs) {
-+			struct net_iov *niov = &area->nia.niovs[niov_idx];
-+
-+			if (net_mp_niov_set_dma_addr(niov, dma))
-+				return 0;
-+			sg_len -= PAGE_SIZE;
-+			dma += PAGE_SIZE;
-+			niov_idx++;
-+		}
-+	}
-+	return niov_idx;
-+}
-+
-+static int io_import_umem(struct io_zcrx_ifq *ifq,
- 			  struct io_zcrx_mem *mem,
- 			  struct io_uring_zcrx_area_reg *area_reg)
- {
- 	struct page **pages;
- 	int nr_pages;
--	int ret;
- 
--	ret = io_validate_user_buf_range(area_reg->addr, area_reg->len);
--	if (ret)
--		return ret;
-+	if (area_reg->dmabuf_fd)
-+		return -EINVAL;
- 	if (!area_reg->addr)
- 		return -EFAULT;
--	if (area_reg->addr & ~PAGE_MASK || area_reg->len & ~PAGE_MASK)
--		return -EINVAL;
--
- 	pages = io_pin_pages((unsigned long)area_reg->addr, area_reg->len,
- 				   &nr_pages);
- 	if (IS_ERR(pages))
-@@ -82,6 +162,35 @@ static int io_import_area(struct io_zcrx_ifq *ifq,
- 	return 0;
- }
- 
-+static void io_release_area_mem(struct io_zcrx_mem *mem)
-+{
-+	if (mem->is_dmabuf) {
-+		io_release_dmabuf(mem);
-+		return;
-+	}
-+	if (mem->pages) {
-+		unpin_user_pages(mem->pages, mem->nr_folios);
-+		kvfree(mem->pages);
-+	}
-+}
-+
-+static int io_import_area(struct io_zcrx_ifq *ifq,
-+			  struct io_zcrx_mem *mem,
-+			  struct io_uring_zcrx_area_reg *area_reg)
-+{
-+	int ret;
-+
-+	ret = io_validate_user_buf_range(area_reg->addr, area_reg->len);
-+	if (ret)
-+		return ret;
-+	if (area_reg->addr & ~PAGE_MASK || area_reg->len & ~PAGE_MASK)
-+		return -EINVAL;
-+
-+	if (area_reg->flags & IORING_ZCRX_AREA_DMABUF)
-+		return io_import_dmabuf(ifq, mem, area_reg);
-+	return io_import_umem(ifq, mem, area_reg);
-+}
-+
- static void io_zcrx_unmap_umem(struct io_zcrx_ifq *ifq,
- 				struct io_zcrx_area *area, int nr_mapped)
- {
-@@ -101,7 +210,10 @@ static void __io_zcrx_unmap_area(struct io_zcrx_ifq *ifq,
- {
- 	int i;
- 
--	io_zcrx_unmap_umem(ifq, area, nr_mapped);
-+	if (area->mem.is_dmabuf)
-+		io_release_dmabuf(&area->mem);
-+	else
-+		io_zcrx_unmap_umem(ifq, area, nr_mapped);
- 
- 	for (i = 0; i < area->nia.num_niovs; i++)
- 		net_mp_niov_set_dma_addr(&area->nia.niovs[i], 0);
-@@ -145,7 +257,11 @@ static int io_zcrx_map_area(struct io_zcrx_ifq *ifq, struct io_zcrx_area *area)
- 	if (area->is_mapped)
- 		return 0;
- 
--	nr = io_zcrx_map_area_umem(ifq, area);
-+	if (area->mem.is_dmabuf)
-+		nr = io_zcrx_map_area_dmabuf(ifq, area);
-+	else
-+		nr = io_zcrx_map_area_umem(ifq, area);
-+
- 	if (nr != area->nia.num_niovs) {
- 		__io_zcrx_unmap_area(ifq, area, nr);
- 		return -EINVAL;
-@@ -251,6 +367,8 @@ static void io_zcrx_free_area(struct io_zcrx_area *area)
- 	kfree(area);
- }
- 
-+#define IO_ZCRX_AREA_SUPPORTED_FLAGS	(IORING_ZCRX_AREA_DMABUF)
-+
- static int io_zcrx_create_area(struct io_zcrx_ifq *ifq,
- 			       struct io_zcrx_area **res,
- 			       struct io_uring_zcrx_area_reg *area_reg)
-@@ -259,9 +377,11 @@ static int io_zcrx_create_area(struct io_zcrx_ifq *ifq,
- 	unsigned nr_iovs;
- 	int i, ret;
- 
--	if (area_reg->flags || area_reg->rq_area_token)
-+	if (area_reg->flags & ~IO_ZCRX_AREA_SUPPORTED_FLAGS)
-+		return -EINVAL;
-+	if (area_reg->rq_area_token)
- 		return -EINVAL;
--	if (area_reg->__resv1 || area_reg->__resv2[0] || area_reg->__resv2[1])
-+	if (area_reg->__resv2[0] || area_reg->__resv2[1])
- 		return -EINVAL;
- 
- 	ret = -ENOMEM;
-@@ -819,6 +939,9 @@ static ssize_t io_zcrx_copy_chunk(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
- 	size_t copied = 0;
- 	int ret = 0;
- 
-+	if (area->mem.is_dmabuf)
-+		return -EFAULT;
-+
- 	while (len) {
- 		size_t copy_size = min_t(size_t, PAGE_SIZE, len);
- 		const int dst_off = 0;
-diff --git a/io_uring/zcrx.h b/io_uring/zcrx.h
-index 9c22807af807..2f5e26389f22 100644
---- a/io_uring/zcrx.h
-+++ b/io_uring/zcrx.h
-@@ -3,15 +3,22 @@
- #define IOU_ZC_RX_H
- 
- #include <linux/io_uring_types.h>
-+#include <linux/dma-buf.h>
- #include <linux/socket.h>
- #include <net/page_pool/types.h>
- #include <net/net_trackers.h>
- 
- struct io_zcrx_mem {
- 	unsigned long			size;
-+	bool				is_dmabuf;
- 
- 	struct page			**pages;
- 	unsigned long			nr_folios;
-+
-+	struct dma_buf_attachment	*attach;
-+	struct dma_buf			*dmabuf;
-+	struct sg_table			*sgt;
-+	unsigned long			dmabuf_offset;
- };
- 
- struct io_zcrx_area {
+v10 and no change log?  Please add a change log.
+
+>  MAINTAINERS                 |   6 +
+>  drivers/mfd/Kconfig         |  15 ++
+>  drivers/mfd/Makefile        |   2 +
+>  drivers/mfd/nct6694.c       | 387 ++++++++++++++++++++++++++++++++++++
+>  include/linux/mfd/nct6694.h | 101 ++++++++++
+>  5 files changed, 511 insertions(+)
+>  create mode 100644 drivers/mfd/nct6694.c
+>  create mode 100644 include/linux/mfd/nct6694.h
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index fa1e04e87d1d..b2dfcc063f88 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -17358,6 +17358,12 @@ F:	drivers/nubus/
+>  F:	include/linux/nubus.h
+>  F:	include/uapi/linux/nubus.h
+>  
+> +NUVOTON NCT6694 MFD DRIVER
+> +M:	Ming Yu <tmyu0@nuvoton.com>
+> +S:	Supported
+> +F:	drivers/mfd/nct6694.c
+> +F:	include/linux/mfd/nct6694.h
+> +
+>  NVIDIA (rivafb and nvidiafb) FRAMEBUFFER DRIVER
+>  M:	Antonino Daplas <adaplas@gmail.com>
+>  L:	linux-fbdev@vger.kernel.org
+> diff --git a/drivers/mfd/Kconfig b/drivers/mfd/Kconfig
+> index 22b936310039..cd4d826a7fcb 100644
+> --- a/drivers/mfd/Kconfig
+> +++ b/drivers/mfd/Kconfig
+> @@ -1058,6 +1058,21 @@ config MFD_MENF21BMC
+>  	  This driver can also be built as a module. If so the module
+>  	  will be called menf21bmc.
+>  
+> +config MFD_NCT6694
+> +	tristate "Nuvoton NCT6694 support"
+> +	select MFD_CORE
+> +	depends on USB
+> +	help
+> +	  This enables support for the Nuvoton USB device NCT6694, which shares
+> +	  peripherals.
+> +	  The Nuvoton NCT6694 is a peripheral expander with 16 GPIO chips,
+> +	  6 I2C controllers, 2 CANfd controllers, 2 Watchdog timers, ADC,
+> +	  PWM, and RTC.
+> +	  This driver provides core APIs to access the NCT6694 hardware
+> +	  monitoring and control features.
+> +	  Additional drivers must be enabled to utilize the specific
+> +	  functionalities of the device.
+> +
+>  config MFD_OCELOT
+>  	tristate "Microsemi Ocelot External Control Support"
+>  	depends on SPI_MASTER
+> diff --git a/drivers/mfd/Makefile b/drivers/mfd/Makefile
+> index 948cbdf42a18..471dc1f183b8 100644
+> --- a/drivers/mfd/Makefile
+> +++ b/drivers/mfd/Makefile
+> @@ -120,6 +120,8 @@ obj-$(CONFIG_MFD_MC13XXX)	+= mc13xxx-core.o
+>  obj-$(CONFIG_MFD_MC13XXX_SPI)	+= mc13xxx-spi.o
+>  obj-$(CONFIG_MFD_MC13XXX_I2C)	+= mc13xxx-i2c.o
+>  
+> +obj-$(CONFIG_MFD_NCT6694)	+= nct6694.o
+> +
+>  obj-$(CONFIG_MFD_CORE)		+= mfd-core.o
+>  
+>  ocelot-soc-objs			:= ocelot-core.o ocelot-spi.o
+> diff --git a/drivers/mfd/nct6694.c b/drivers/mfd/nct6694.c
+> new file mode 100644
+> index 000000000000..2480ca56f350
+> --- /dev/null
+> +++ b/drivers/mfd/nct6694.c
+> @@ -0,0 +1,387 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (C) 2024 Nuvoton Technology Corp.
+> + *
+> + * Nuvoton NCT6694 core driver using USB interface to provide
+> + * access to the NCT6694 hardware monitoring and control features.
+> + *
+> + * The NCT6694 is an integrated controller that provides GPIO, I2C,
+> + * CAN, WDT, HWMON and RTC management.
+> + *
+
+Superfluous blank line.
+
+> + */
+> +
+> +#include <linux/bits.h>
+> +#include <linux/interrupt.h>
+> +#include <linux/irq.h>
+> +#include <linux/irqdomain.h>
+> +#include <linux/kernel.h>
+> +#include <linux/mfd/core.h>
+> +#include <linux/mfd/nct6694.h>
+> +#include <linux/module.h>
+> +#include <linux/slab.h>
+> +#include <linux/usb.h>
+> +
+> +static const struct mfd_cell nct6694_devs[] = {
+> +	MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 0),
+> +	MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 1),
+> +	MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 2),
+> +	MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 3),
+> +	MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 4),
+> +	MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 5),
+> +	MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 6),
+> +	MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 7),
+> +	MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 8),
+> +	MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 9),
+> +	MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 10),
+> +	MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 11),
+> +	MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 12),
+> +	MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 13),
+> +	MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 14),
+> +	MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 15),
+
+These are all identical.
+
+I thought you were going to use PLATFORM_DEVID_AUTO?  In fact, you are
+already using PLATFORM_DEVID_AUTO since you are calling
+mfd_add_hotplug_devices().  So you don't need this IDs.
+
+MFD_CELL_NAME() should do.
+
+> +	MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 0),
+> +	MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 1),
+> +	MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 2),
+> +	MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 3),
+> +	MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 4),
+> +	MFD_CELL_BASIC("nct6694-i2c", NULL, NULL, 0, 5),
+> +
+> +	MFD_CELL_BASIC("nct6694-canfd", NULL, NULL, 0, 0),
+> +	MFD_CELL_BASIC("nct6694-canfd", NULL, NULL, 0, 1),
+> +
+> +	MFD_CELL_BASIC("nct6694-wdt", NULL, NULL, 0, 0),
+> +	MFD_CELL_BASIC("nct6694-wdt", NULL, NULL, 0, 1),
+> +
+> +	MFD_CELL_NAME("nct6694-hwmon"),
+> +	MFD_CELL_NAME("nct6694-rtc"),
+> +};
+
+[...]
+
+> diff --git a/include/linux/mfd/nct6694.h b/include/linux/mfd/nct6694.h
+> new file mode 100644
+> index 000000000000..7a02e5b14bbb
+> --- /dev/null
+> +++ b/include/linux/mfd/nct6694.h
+> @@ -0,0 +1,101 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (C) 2024 Nuvoton Technology Corp.
+> + *
+> + * Nuvoton NCT6694 USB transaction and data structure.
+> + *
+
+Remove this line please.
+
+> + */
+> +
+> +#ifndef __MFD_NCT6694_H
+> +#define __MFD_NCT6694_H
+> +
+> +#define NCT6694_VENDOR_ID	0x0416
+> +#define NCT6694_PRODUCT_ID	0x200B
+> +#define NCT6694_INT_IN_EP	0x81
+> +#define NCT6694_BULK_IN_EP	0x02
+> +#define NCT6694_BULK_OUT_EP	0x03
+> +
+> +#define NCT6694_HCTRL_SET	0x40
+> +#define NCT6694_HCTRL_GET	0x80
+> +
+> +#define NCT6694_URB_TIMEOUT	1000
+> +
+> +enum nct6694_irq_id {
+> +	NCT6694_IRQ_GPIO0 = 0,
+> +	NCT6694_IRQ_GPIO1,
+> +	NCT6694_IRQ_GPIO2,
+> +	NCT6694_IRQ_GPIO3,
+> +	NCT6694_IRQ_GPIO4,
+> +	NCT6694_IRQ_GPIO5,
+> +	NCT6694_IRQ_GPIO6,
+> +	NCT6694_IRQ_GPIO7,
+> +	NCT6694_IRQ_GPIO8,
+> +	NCT6694_IRQ_GPIO9,
+> +	NCT6694_IRQ_GPIOA,
+> +	NCT6694_IRQ_GPIOB,
+> +	NCT6694_IRQ_GPIOC,
+> +	NCT6694_IRQ_GPIOD,
+> +	NCT6694_IRQ_GPIOE,
+> +	NCT6694_IRQ_GPIOF,
+> +	NCT6694_IRQ_CAN0,
+> +	NCT6694_IRQ_CAN1,
+> +	NCT6694_IRQ_RTC,
+> +	NCT6694_NR_IRQS,
+> +};
+> +
+> +enum nct6694_response_err_status {
+> +	NCT6694_NO_ERROR = 0,
+> +	NCT6694_FORMAT_ERROR,
+> +	NCT6694_RESERVED1,
+> +	NCT6694_RESERVED2,
+> +	NCT6694_NOT_SUPPORT_ERROR,
+> +	NCT6694_NO_RESPONSE_ERROR,
+> +	NCT6694_TIMEOUT_ERROR,
+> +	NCT6694_PENDING,
+> +};
+> +
+> +struct __packed nct6694_cmd_header {
+> +	u8 rsv1;
+> +	u8 mod;
+> +	union __packed {
+> +		__le16 offset;
+> +		struct __packed {
+> +			u8 cmd;
+> +			u8 sel;
+> +		};
+> +	};
+> +	u8 hctrl;
+> +	u8 rsv2;
+> +	__le16 len;
+> +};
+> +
+> +struct __packed nct6694_response_header {
+> +	u8 sequence_id;
+> +	u8 sts;
+> +	u8 reserved[4];
+> +	__le16 len;
+> +};
+> +
+> +union __packed nct6694_usb_msg {
+> +	struct nct6694_cmd_header cmd_header;
+> +	struct nct6694_response_header response_header;
+> +};
+> +
+> +struct nct6694 {
+> +	struct device *dev;
+> +	struct irq_domain *domain;
+> +	/* Mutex to protect access to the device */
+
+Place these single line comments on the end of the line you're commenting.
+
+Actually, considering the nomenclature here, they're probably not
+required at all.
+
+> +	struct mutex access_lock;
+> +	/* Mutex to protect access to the IRQ */
+> +	struct mutex irq_lock;
+> +	struct urb *int_in_urb;
+> +	struct usb_device *udev;
+> +	union nct6694_usb_msg *usb_msg;
+> +	unsigned char *int_buffer;
+> +	unsigned int irq_enable;
+> +};
+> +
+> +int nct6694_read_msg(struct nct6694 *nct6694, const struct nct6694_cmd_header *cmd_hd, void *buf);
+> +int nct6694_write_msg(struct nct6694 *nct6694, const struct nct6694_cmd_header *cmd_hd, void *buf);
+> +
+> +#endif
+> -- 
+> 2.34.1
+> 
+
 -- 
-2.48.1
-
+Lee Jones [李琼斯]
 
