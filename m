@@ -1,57 +1,74 @@
-Return-Path: <netdev+bounces-187188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5E61AA5914
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 02:32:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EA16AA5926
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 02:49:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A7921BA6236
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 00:32:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88B9F1782E3
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 00:49:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1393B19DF5F;
-	Thu,  1 May 2025 00:31:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 232851E3DF2;
+	Thu,  1 May 2025 00:48:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="gFqDjBOQ"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="P8XVsvcC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17DD935893;
-	Thu,  1 May 2025 00:31:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 569C31E2848
+	for <netdev@vger.kernel.org>; Thu,  1 May 2025 00:48:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746059517; cv=none; b=beioNcYDMxydkDcR6ALbLsjGrAzjTSssrf1Sq4IN4JR2e7xGz4J8FbrEOaSL8ZLewK1Y6GdU5buRaEzCVGw5UpCmXG4keFM+zVKX0RCDJ/x1dRjN7aZ3eyLiNNcpxWBqvWJBCIJiMKiYZ19dhwjtGBYjhmQz6KhL+3xZy7lRM24=
+	t=1746060537; cv=none; b=gb+4UMPjZ9IA5RG/aflSXGeCJfDS0uvv6N51iLmLk73gkFr3uA2vNzkLjOaUFcXYRxhXOpNkUPJHlHaw6WyMT/ggBPgdeiPRoAjQUwnk+J7wgVAd0O0W1DxYCuYXUjq6OqfJXTZEBrSu2UwgMTkc1HmbrIUzTAGnJspZNCp0yKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746059517; c=relaxed/simple;
-	bh=2lveSxjfFkBq6zfkWnzSsFQ1wGsQtjRTg3Iba7lZMhQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r+JswkUOW912YBj3r4cXOALkYV8gj/9Mkk1UQDlviUy/v/QykDl+F/IRjJgt/e48I85h38zuRZu7kjBsHgggrllpakftR9d6nq6C48NK4DXk+MUqQrh8kFKtcdJxtBH2OHAQlGABJIYtVbN6AcGqWYcwcuHglBcUIJM1qppF8AU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=gFqDjBOQ; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=8UPzLciHp4xNWmOLyriQyNsSYRyqmykzSDKFvr9TTJ8=; b=gFqDjBOQvaE1VdoK
-	2OmPz8yIXenxtzHX6LQ3JLtpqcvMKITw7W6NGBG6UKmRZ0QgPpsSBZUECgJQLOywHexJKRonobXUi
-	x3UALqe6bAVfebU/HD9u+bW+WCIXhAnoaQwoKGMEhfDpoNs0l7DA+Y/MDDA17b5tMC+GshYB9Pdhb
-	HiqRXaba9D1xXU7WmMXA/pVYhfLgSFrVrt62OnLtwzwcBCb20tnmcQ56vGI1YIeXpRBXT/s5JK75o
-	3OztjZ6ZklnY/lwcvv7UIpqdjy9s4498AM9R7KAOP9zSkQytmtquv4BMKEtambv++2Gt/Mmq74NGo
-	ApoZQTnxv1ByQ36S7A==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1uAHqC-000od7-2E;
-	Thu, 01 May 2025 00:31:52 +0000
-From: linux@treblig.org
-To: kuba@kernel.org,
-	netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [RFC net-next] strparser: Remove unused strp_process
-Date: Thu,  1 May 2025 01:31:50 +0100
-Message-ID: <20250501003150.309583-1-linux@treblig.org>
+	s=arc-20240116; t=1746060537; c=relaxed/simple;
+	bh=Ds8TmMBuw7jjFlzTjltkIfGXe08pcnBpGA6l+fgZPNg=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=a+8UnhULpIdMXSVEWXbynobHlVNupaRYlaMqDNU4UN4iNf6o4J3+79ntWV6kP/5sLqhcdABwaSRJRwlcrUt5mCVp1zRnI7NsG4FotxbigAxZpjWX1gI9K0jTPeAWzrV0V2LSNRHF5+BXilKHZ/fe2qYidWatQGiPiBjU3mZuBUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=P8XVsvcC; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1746060536; x=1777596536;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=dpuYtmvW5LY27MeIh1sbMXg9diZApPjrsPUVVk04ReM=;
+  b=P8XVsvcC5VmqGrzliiB07vy/QypMvqFt5tvAX2hSHE7vJQW7HDqdToR0
+   5BK/6jEnLnkR+ZrRg/C0cRDnZ+tLLVSSdS1Ld/34aZvfydO9ziYFPvAUv
+   dAMBI/ONSP+cuBkfIefGvtRjjj8HUqibs9wN302Nd7gdAfQBkQow49o2U
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.15,253,1739836800"; 
+   d="scan'208";a="88687929"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2025 00:48:52 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:12093]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.30.21:2525] with esmtp (Farcaster)
+ id e48674e6-9409-4594-9909-00e6b9f42e3a; Thu, 1 May 2025 00:48:51 +0000 (UTC)
+X-Farcaster-Flow-ID: e48674e6-9409-4594-9909-00e6b9f42e3a
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 1 May 2025 00:48:51 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.187.171.60) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 1 May 2025 00:48:48 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <dsahern@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
+	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <syzkaller@googlegroups.com>,
+	<yi1.lai@linux.intel.com>
+Subject: Re: [PATCH v1 net-next] ipv6: Restore fib6_config validation for SIOCADDRT.
+Date: Wed, 30 Apr 2025 17:48:37 -0700
+Message-ID: <20250501004841.52728-1-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <86cf6035-c6d9-462c-9a9c-42a6d0368069@kernel.org>
+References: <86cf6035-c6d9-462c-9a9c-42a6d0368069@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,93 +76,60 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D044UWB001.ant.amazon.com (10.13.139.171) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
+From: David Ahern <dsahern@kernel.org>
+Date: Tue, 29 Apr 2025 09:31:33 -0600
+> On 4/28/25 6:46 PM, Kuniyuki Iwashima wrote:
+> > diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+> > index d0351e95d916..4c1e86e968f8 100644
+> > --- a/net/ipv6/route.c
+> > +++ b/net/ipv6/route.c
+> > @@ -4496,6 +4496,53 @@ void rt6_purge_dflt_routers(struct net *net)
+> >  	rcu_read_unlock();
+> >  }
+> >  
+> > +static int fib6_config_validate(struct fib6_config *cfg,
+> > +				struct netlink_ext_ack *extack)
+> > +{
+> > +	/* RTF_PCPU is an internal flag; can not be set by userspace */
+> > +	if (cfg->fc_flags & RTF_PCPU) {
+> > +		NL_SET_ERR_MSG(extack, "Userspace can not set RTF_PCPU");
+> > +		goto errout;
+> > +	}
+> > +
+> > +	/* RTF_CACHE is an internal flag; can not be set by userspace */
+> > +	if (cfg->fc_flags & RTF_CACHE) {
+> > +		NL_SET_ERR_MSG(extack, "Userspace can not set RTF_CACHE");
+> > +		goto errout;
+> > +	}
+> > +
+> > +	if (cfg->fc_type > RTN_MAX) {
+> > +		NL_SET_ERR_MSG(extack, "Invalid route type");
+> > +		goto errout;
+> > +	}
+> > +
+> > +	if (cfg->fc_dst_len > 128) {
+> > +		NL_SET_ERR_MSG(extack, "Invalid prefix length");
+> > +		goto errout;
+> > +	}
+> > +
+> > +#ifdef CONFIG_IPV6_SUBTREES
+> > +	if (cfg->fc_src_len > 128) {
+> > +		NL_SET_ERR_MSG(extack, "Invalid source address length");
+> > +		goto errout;
+> > +	}
+> > +
+> > +	if (cfg->fc_nh_id &&  cfg->fc_src_len) {
+> 
+> extra space after '&&'
 
-strp_process() was addded in 2017 in
-commit bbb03029a899 ("strparser: Generalize strparser")
+I didn't notice I added it in fa76c1674f2e.
 
-but never used.
+Will remove it in v2 and add the missing last-minute change
+that caused build failure..
 
-Remove it.
-
-....but, hmm I'm not sure how much other cleanup needs doing,
-there's still a comment in strp_init() referencing strp_process
-and it makes me think there might be other code handling the
-'general mode' which strp_process seems to have been added for.
-
-Suggestions?
-
-Dave
-
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
----
- Documentation/networking/strparser.rst | 12 ------------
- include/net/strparser.h                |  3 ---
- net/strparser/strparser.c              | 13 -------------
- 3 files changed, 28 deletions(-)
-
-diff --git a/Documentation/networking/strparser.rst b/Documentation/networking/strparser.rst
-index 8dc6bb04c710..e7729915d7a1 100644
---- a/Documentation/networking/strparser.rst
-+++ b/Documentation/networking/strparser.rst
-@@ -81,18 +81,6 @@ Functions
- 
-      ::
- 
--	int strp_process(struct strparser *strp, struct sk_buff *orig_skb,
--			 unsigned int orig_offset, size_t orig_len,
--			 size_t max_msg_size, long timeo)
--
--    strp_process is called in general mode for a stream parser to
--    parse an sk_buff. The number of bytes processed or a negative
--    error number is returned. Note that strp_process does not
--    consume the sk_buff. max_msg_size is maximum size the stream
--    parser will parse. timeo is timeout for completing a message.
--
--    ::
--
- 	void strp_data_ready(struct strparser *strp);
- 
-     The upper layer calls strp_tcp_data_ready when data is ready on
-diff --git a/include/net/strparser.h b/include/net/strparser.h
-index 0ed73e364faa..cc64e9d8c9e9 100644
---- a/include/net/strparser.h
-+++ b/include/net/strparser.h
-@@ -163,8 +163,5 @@ void strp_check_rcv(struct strparser *strp);
- int strp_init(struct strparser *strp, struct sock *sk,
- 	      const struct strp_callbacks *cb);
- void strp_data_ready(struct strparser *strp);
--int strp_process(struct strparser *strp, struct sk_buff *orig_skb,
--		 unsigned int orig_offset, size_t orig_len,
--		 size_t max_msg_size, long timeo);
- 
- #endif /* __NET_STRPARSER_H_ */
-diff --git a/net/strparser/strparser.c b/net/strparser/strparser.c
-index d946bfb424c7..2cd9c39910a5 100644
---- a/net/strparser/strparser.c
-+++ b/net/strparser/strparser.c
-@@ -314,19 +314,6 @@ static int __strp_recv(read_descriptor_t *desc, struct sk_buff *orig_skb,
- 	return eaten;
- }
- 
--int strp_process(struct strparser *strp, struct sk_buff *orig_skb,
--		 unsigned int orig_offset, size_t orig_len,
--		 size_t max_msg_size, long timeo)
--{
--	read_descriptor_t desc; /* Dummy arg to strp_recv */
--
--	desc.arg.data = strp;
--
--	return __strp_recv(&desc, orig_skb, orig_offset, orig_len,
--			   max_msg_size, timeo);
--}
--EXPORT_SYMBOL_GPL(strp_process);
--
- static int strp_recv(read_descriptor_t *desc, struct sk_buff *orig_skb,
- 		     unsigned int orig_offset, size_t orig_len)
- {
--- 
-2.49.0
-
+Thanks!
 
