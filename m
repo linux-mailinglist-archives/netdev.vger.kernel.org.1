@@ -1,99 +1,87 @@
-Return-Path: <netdev+bounces-187274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9955AA6028
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 16:40:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EA9BAA6042
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 16:54:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 712BE9A4C8D
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 14:39:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C309A16A0CE
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 14:54:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A7D71F237E;
-	Thu,  1 May 2025 14:39:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61EEC1F8BDD;
+	Thu,  1 May 2025 14:54:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lr8gdcXr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l6vwC7LJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 220252E401;
-	Thu,  1 May 2025 14:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB881D619D;
+	Thu,  1 May 2025 14:53:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746110396; cv=none; b=aYo+TL4yfgV+neuQz0NZEH6TolLeo/M+CLWW4j7eNYYTUbtR5iolTf6BkpT+AzfK/f2pgEq5PO5afJponXZBqXPgit8CShrjT+EOoCEqEaO2QAcSaxZ2gwDUhpX8728G4+BHOcXDVXs166xLdNen+737jNHNBW08bkEBsVeHPs4=
+	t=1746111240; cv=none; b=Hy8nblRvzYpK+B2k2UwqKKZyt0ecPiH9S+ZzK7fd2IFQM29kl13jRztngLtdlmNXZp3YfLcH2WvO+Xa8bQZWMqAWnFk6jgtZfjBgsKC/iB/BzDKPakuEH53TgYbzZpECRtgFpvxqS/XgD6852TH4cvD2NNTDTeCpuBQXk0HCp70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746110396; c=relaxed/simple;
-	bh=ebq6ZQKy0bz52JluprLeqgvaVWccGrWculDohvzKkpc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LAJvZphguSwFBjoqyLgFBqHyp94EMpSRrTXiJqd9WbaQLAzDJdvrTmA2UyhjzSMkozfByeUUTIIhmBZ8quJxc0Em+AzPgTXcijbFzpN5AvHDNwiDFA+D4gcO57zOaoCp85O784t41waI8ZA1jDWBpZOhErGniHnoQeORAGZgjrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lr8gdcXr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E77DC4CEE3;
-	Thu,  1 May 2025 14:39:55 +0000 (UTC)
+	s=arc-20240116; t=1746111240; c=relaxed/simple;
+	bh=xXdZzehmKpZnbsgOKXp7I1LKRUhGMB11Fu7G/0fw8sM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jRI7B/3EEgEhvuraBPxjLEArzilsy6lVH2Fb6vuTGfEud2uGmCvbrOi0CE5mcYlj2DBqyTixZTmZPPXHfHjZ00zKXo7l4c/uO8kzqfLJw7MabphtyxEOmNZsXoRnJI60yZxPIuEwIBCokECScu5X5gUuMAJRbqOqrr4osy96u44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l6vwC7LJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B347CC4CEE3;
+	Thu,  1 May 2025 14:53:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746110395;
-	bh=ebq6ZQKy0bz52JluprLeqgvaVWccGrWculDohvzKkpc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Lr8gdcXrPoek+R87kCKiwBX5fT+vBi5ug9yygm2pCurK/yef9aNVJq/rKmflqN+G2
-	 5KI5TkENt4SZCau/OnVBQFOSXlkCQzrOGRDEjBFdThIVQLHTYCSPDxS9yqnS1ucvKQ
-	 IKrmwZ9mWRPoPWk1N27FUZlyG08WmyjDhhDgU3EmY+lbeDgiJt3QYY7f4vcYyn0iqV
-	 vhJobYCdRJayT6PlnzvJi81WCEBWuJvjTOwqaKDAyS8QsP9ZAGQVS826GUHvzub/Zy
-	 2DWdv/t5n3oekD6QUTHGQ0dkVlpq/8tkAGKzIZku0c2wpimvBJxXjBkepCtc3QIyve
-	 KeYCeQFsM2Hkw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB6FA3822D59;
-	Thu,  1 May 2025 14:40:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1746111239;
+	bh=xXdZzehmKpZnbsgOKXp7I1LKRUhGMB11Fu7G/0fw8sM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=l6vwC7LJ/nVPMGGyFou6rLrkgDYrlUMFVtJy+41fHkxY+TBVNKs8bP5CzLPcCrofQ
+	 aSMfrxinRbO9SBF3NsyEyBWxPEMIp34femxxDtb43yYLSIa1fIK8U+AtdNAV6LXYSu
+	 HZlm9FWtOA8nXVd0i/nivLRH9hpDNky2RYh1JBl0gNqtTrYLINk92Z9TFpacI/Ah06
+	 5at7Z1ZvxaQbdETxwlK7IR7OIvq1Pvr/mdXrQkZut+Zj1yleBO60VU6p4hL7KY4lru
+	 rrqxxJiOmmHkmmkLnqCwmsdot5TWQWxbtD28lRwGGQZSpu15FWkzk01GGwStneRnr/
+	 HgaYaQuCvBvAA==
+Date: Thu, 1 May 2025 07:53:57 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Meghana Malladi <m-malladi@ti.com>
+Cc: <dan.carpenter@linaro.org>, <john.fastabend@gmail.com>,
+ <hawk@kernel.org>, <daniel@iogearbox.net>, <ast@kernel.org>,
+ <pabeni@redhat.com>, <edumazet@google.com>, <davem@davemloft.net>,
+ <andrew+netdev@lunn.ch>, <bpf@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>, Vignesh Raghavendra
+ <vigneshr@ti.com>, Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
+Subject: Re: [PATCH net 2/4] net: ti: icssg-prueth: Report BQL before
+ sending XDP packets
+Message-ID: <20250501075357.37f2dc4f@kernel.org>
+In-Reply-To: <20250428120459.244525-3-m-malladi@ti.com>
+References: <20250428120459.244525-1-m-malladi@ti.com>
+	<20250428120459.244525-3-m-malladi@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net V2 0/4] net: vertexcom: mse102x: Fix RX handling
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174611043465.2998093.14745156096722266784.git-patchwork-notify@kernel.org>
-Date: Thu, 01 May 2025 14:40:34 +0000
-References: <20250430133043.7722-1-wahrenst@gmx.net>
-In-Reply-To: <20250430133043.7722-1-wahrenst@gmx.net>
-To: Stefan Wahren <wahrenst@gmx.net>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Mon, 28 Apr 2025 17:34:57 +0530 Meghana Malladi wrote:
+> When sending out any kind of traffic, it is essential that the driver
+> keeps reporting BQL of the number of bytes that have been sent so that
+> BQL can track the amount of data in the queue and prevents it from
+> overflowing. If BQL is not reported, the driver may continue sending
+> packets even when the queue is full, leading to packet loss, congestion
+> and decreased network performance. Currently this is missing in
+> emac_xmit_xdp_frame() and this patch fixes it.
 
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+The ordering of patches in the series is a bit off.
+The order should be something like:
 
-On Wed, 30 Apr 2025 15:30:39 +0200 you wrote:
-> This series is the first part of two series for the Vertexcom driver.
-> It contains substantial fixes for the RX handling of the Vertexcom MSE102x.
-> 
-> Changes in V2:
-> - clarify cover letter
-> - add footnote to Patch 1
-> - postpone DT binding changes to second series as suggested by Jakub K.
-> 
-> [...]
+  net: ti: icssg-prueth: Set XDP feature flags for ndev
+  net: ti: icssg-prueth: Fix kernel panic during concurrent Tx queue ...
+  net: ti: icssg-prueth: Fix race condition for traffic from different ...
+  net: ti: icssg-prueth: Report BQL before sending XDP packets
 
-Here is the summary with links:
-  - [net,V2,1/4] net: vertexcom: mse102x: Fix possible stuck of SPI interrupt
-    https://git.kernel.org/netdev/net/c/55f362885951
-  - [net,V2,2/4] net: vertexcom: mse102x: Fix LEN_MASK
-    https://git.kernel.org/netdev/net/c/74987089ec67
-  - [net,V2,3/4] net: vertexcom: mse102x: Add range check for CMD_RTS
-    https://git.kernel.org/netdev/net/c/d4dda902dac1
-  - [net,V2,4/4] net: vertexcom: mse102x: Fix RX error handling
-    https://git.kernel.org/netdev/net/c/ee512922ddd7
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+This patch is not correct without the extra locking in place.
 
