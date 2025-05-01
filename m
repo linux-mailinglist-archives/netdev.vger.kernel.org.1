@@ -1,192 +1,165 @@
-Return-Path: <netdev+bounces-187343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C4CAAA6799
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 01:58:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D23EAA67B7
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 02:17:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AA9A9881D0
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 23:58:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A2E21BC7925
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 00:17:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C2D92609EC;
-	Thu,  1 May 2025 23:58:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8403B539A;
+	Fri,  2 May 2025 00:17:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="v4XTPbg6"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="b/GkN4LF"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF57833987
-	for <netdev@vger.kernel.org>; Thu,  1 May 2025 23:58:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D7D2801;
+	Fri,  2 May 2025 00:17:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746143909; cv=none; b=U82UjutpynUNm5AYotgJT2+hnGa/K5HmF3+K+Yndb+UYhuq4KY5ZI2LFXkJOJi8UL5zPdDry00aM/HR3NjbIsQLATDH/dNCYNg9dtL8YoDZA6TYDEvflN278aN7Zv9eXNAdkjg/sCe0o06rpOTx909sMjfOWdtSo/rCFKoSPkGs=
+	t=1746145058; cv=none; b=a5uvLcGzZidQsoZnVQiHInYGSNeaGpAfxU1kTLEU+JLPmR8k1tdkLYroU/Gq9rq5dCF/H+WzvXhuKPG/kl4j+/1EyIX2V6N7ajb2ltlfDt6ZNaVT+rIlQthV/8zacI9Nv8k551c/S5kOgDv0CAw2YUi9WuvEa/jTDvBoX0mOwdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746143909; c=relaxed/simple;
-	bh=I5u9d8HWSZ/ZH/v+9KgdHorfTXAGHqr6+YiS97kzkxs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VebgMA7MQW6S0MmrHUKtMx3lvXt63GvVpOjVyescZdFufYExIZNXNWiK3C6U0kGH0CJDFqfl3Rmohr6sN8JLJHTQhRWjbs6Vk0Q0O/2H4WriFAzlZgWvzYmElRl9lJNxu5N2hxeoKiqwlkyQ1btNeVwSVIoZmw6lWqCib7IhLX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=v4XTPbg6; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <83c8f387-c4a9-4293-9996-fec285d34c94@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1746143895;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tncfEf9FYDlLvfP3M87721xQwzJy/xmBPxmLH4uisu4=;
-	b=v4XTPbg6220J33yOMAVDdpprkK87l1JXWgxAgOApGYxk0I/YoR08sx2fqAnPMDmTzM6YLc
-	1PkQzC5n4zZqRe1WDqyAlVEvZ3IeEkx72YaD4BTjWdL1RDdztSd4/e6qWuhjPvhlB2zOoT
-	B6dgECqCriWZJd1UEHSy9ApluSWVrQA=
-Date: Thu, 1 May 2025 16:58:09 -0700
+	s=arc-20240116; t=1746145058; c=relaxed/simple;
+	bh=5i8bFsSgpcufvSYsYIHQhogwNQunbUypD6CAxiA3sVw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ga2hYc7BbD2X3DtZuNwyfyPHUuhWuZzWW2rpxgPRLng5tQG1ag3YAP5YhXK2oaNYuaOOU1Bd5cup5xqkNMyeUv8Aq7mLmjf3+s9d987S8a99V01dqHgFQeeheSlM8ydeQ6KHjvMFjif9hHIHOIRI6iobD7OnmP4L9A2Gdb3IgWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=b/GkN4LF; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
+	:Subject; bh=95JfMuuwwwlYjV2zqmhexIQdacuaBYC+NdT7w2fT52Q=; b=b/GkN4LFfJPns1b8
+	gYuHMMcWTgo60iqVAS5m2gmE2RnqYwrpJBKjyScBAcECfIqtEfsme8QZ1xw1W6Xk3Xc1P6eqwkRUK
+	g/+5XUkFwjBpH2CWGNru7C3GC5BBzmmpR2Azw1xyMkL71qQWxxlYbXZr12qvqKKNC9QQZvOmxIBEE
+	p5ZcyIudvFvipfIi4w2FzoJihyW2OynGwKHlAEVs6vFvw7hI5X6Scii1UXjWtoZo4j6NNAnoBoJL+
+	sTh3NtGdt4jG/6s113Uq9kFaOP1xftnU2v/b5qkPb9kX7jxoYeFx3TdWVuiBEcwFyGwKMTUCVWlxb
+	M2modQL7Z8V5CG81ug==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+	by mx.treblig.org with esmtp (Exim 4.96)
+	(envelope-from <linux@treblig.org>)
+	id 1uAdTs-000xxT-1s;
+	Thu, 01 May 2025 23:38:16 +0000
+From: linux@treblig.org
+To: marcelo.leitner@gmail.com,
+	lucien.xin@gmail.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-sctp@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dr. David Alan Gilbert" <linux@treblig.org>
+Subject: [PATCH net-next] sctp: Remove unused sctp_assoc_del_peer and sctp_chunk_iif
+Date: Fri,  2 May 2025 00:38:15 +0100
+Message-ID: <20250501233815.99832-1-linux@treblig.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next/net v1 2/5] selftests/bpf: Test setting and
- creating bpf qdisc as default qdisc
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
- alexei.starovoitov@gmail.com, andrii@kernel.org, daniel@iogearbox.net,
- martin.lau@kernel.org, xiyou.wangcong@gmail.com, kernel-team@meta.com
-References: <20250501223025.569020-1-ameryhung@gmail.com>
- <20250501223025.569020-3-ameryhung@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20250501223025.569020-3-ameryhung@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On 5/1/25 3:30 PM, Amery Hung wrote:
-> First, test that bpf qdisc can be set as default qdisc. Then, attach
-> an mq qdisc to see if bpf qdisc can be successfully created and grafted.
-> 
-> The test is a sequential test as net.core.default_qdisc is global.
-> 
-> Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> ---
->   .../selftests/bpf/prog_tests/bpf_qdisc.c      | 78 +++++++++++++++++++
->   1 file changed, 78 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c b/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
-> index c9a54177c84e..c954cc2ae64f 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
-> @@ -159,6 +159,79 @@ static void test_qdisc_attach_to_non_root(void)
->   	bpf_qdisc_fifo__destroy(fifo_skel);
->   }
->   
-> +static int get_default_qdisc(char *qdisc_name)
-> +{
-> +	FILE *f;
-> +	int num;
-> +
-> +	f = fopen("/proc/sys/net/core/default_qdisc", "r");
-> +	if (!f)
-> +		return -errno;
-> +
-> +	num = fscanf(f, "%s", qdisc_name);
-> +	fclose(f);
-> +
-> +	return num == 1 ? 0 : -EFAULT;
-> +}
-> +
-> +static void test_default_qdisc_attach_to_mq(void)
-> +{
-> +	struct bpf_qdisc_fifo *fifo_skel;
-> +	char default_qdisc[IFNAMSIZ];
-> +	struct netns_obj *netns;
-> +	char tc_qdisc_show[64];
-> +	struct bpf_link *link;
-> +	char *str_ret;
-> +	FILE *tc;
-> +	int err;
-> +
-> +	fifo_skel = bpf_qdisc_fifo__open_and_load();
-> +	if (!ASSERT_OK_PTR(fifo_skel, "bpf_qdisc_fifo__open_and_load"))
-> +		return;
-> +
-> +	link = bpf_map__attach_struct_ops(fifo_skel->maps.fifo);
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-	fifo_skel->links.fifo = bpf_map__attach_struct_ops(....);
+sctp_assoc_del_peer() last use was removed in 2015 by
+commit 73e6742027f5 ("sctp: Do not try to search for the transport twice")
+which now uses rm_peer instead of del_peer.
 
-Then no need to bpf_link__destroy(link). bpf_qdisc_fifo__destroy() should do.
+sctp_chunk_iif() last use was removed in 2016 by
+commit 1f45f78f8e51 ("sctp: allow GSO frags to access the chunk too")
 
-> +	if (!ASSERT_OK_PTR(link, "bpf_map__attach_struct_ops")) {
-> +		bpf_qdisc_fifo__destroy(fifo_skel);
-> +		return;
-> +	}
-> +
-> +	err = get_default_qdisc(default_qdisc);
-> +	if (!ASSERT_OK(err, "read sysctl net.core.default_qdisc"))
-> +		goto out;
-> +
-> +	err = write_sysctl("/proc/sys/net/core/default_qdisc", "bpf_fifo");
-> +	if (!ASSERT_OK(err, "write sysctl net.core.default_qdisc"))
-> +		goto out;
-> +
-> +	netns = netns_new("bpf_qdisc_ns", true);
-> +	if (!ASSERT_OK_PTR(netns, "netns_new"))
-> +		goto out;
+Remove them.
 
-This should be 'goto out_restore_dflt_qdisc'.
+Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+---
+ include/net/sctp/sm.h      |  1 -
+ include/net/sctp/structs.h |  2 --
+ net/sctp/associola.c       | 18 ------------------
+ net/sctp/sm_make_chunk.c   |  8 --------
+ 4 files changed, 29 deletions(-)
 
-I would stay with minimum number of cleanup labels if possible. Initialize the 
-variables that need to be cleaned up instead. There is no need to optimize each 
-cleanup case for a test,
-
-e.g. "struct netns_obj netns = NULL; char default_qdisc[IFNAMSIZ] = {};..."
-
-> +
-> +	SYS(out_restore_dflt_qdisc, "ip link add veth0 type veth peer veth1");
-> +	SYS(out_delete_netns, "tc qdisc add dev veth0 root handle 1: mq");
-> +
-> +	tc = popen("tc qdisc show dev veth0 parent 1:1", "r");
-> +	if (!ASSERT_OK_PTR(tc, "tc qdisc show dev veth0 parent 1:1"))
-> +		goto out_delete_netns;
-> +
-> +	str_ret = fgets(tc_qdisc_show, sizeof(tc_qdisc_show), tc);
-> +	if (!ASSERT_OK_PTR(str_ret, "tc qdisc show dev veth0 parent 1:1"))
-> +		goto out_delete_netns;
-> +
-> +	str_ret = strstr(tc_qdisc_show, "qdisc bpf_fifo");
-> +	if (!ASSERT_OK_PTR(str_ret, "check if bpf_fifo is created"))
-> +		goto out_delete_netns;
-
-Instead of pipe and grep, how about having the bpf_fifo_init bpf prog to set a 
-global variable when called and then check the "fifo_skel->bss->init_called == 
-true" here?
-
-> +
-> +	SYS(out_delete_netns, "tc qdisc delete dev veth0 root mq");
-> +out_delete_netns:
-> +	netns_free(netns);
-> +out_restore_dflt_qdisc:
-> +	write_sysctl("/proc/sys/net/core/default_qdisc", default_qdisc);
-> +out:
-> +	bpf_link__destroy(link);
-> +	bpf_qdisc_fifo__destroy(fifo_skel);
-> +}
-> +
->   void test_bpf_qdisc(void)
->   {
->   	struct netns_obj *netns;
-> @@ -178,3 +251,8 @@ void test_bpf_qdisc(void)
->   
->   	netns_free(netns);
->   }
-> +
-> +void serial_test_bpf_qdisc_default(void)
-> +{
-> +	test_default_qdisc_attach_to_mq();
-> +}
+diff --git a/include/net/sctp/sm.h b/include/net/sctp/sm.h
+index 64c42bd56bb2..3bfd261a53cc 100644
+--- a/include/net/sctp/sm.h
++++ b/include/net/sctp/sm.h
+@@ -161,7 +161,6 @@ const struct sctp_sm_table_entry *sctp_sm_lookup_event(
+ 					enum sctp_event_type event_type,
+ 					enum sctp_state state,
+ 					union sctp_subtype event_subtype);
+-int sctp_chunk_iif(const struct sctp_chunk *);
+ struct sctp_association *sctp_make_temp_asoc(const struct sctp_endpoint *,
+ 					     struct sctp_chunk *,
+ 					     gfp_t gfp);
+diff --git a/include/net/sctp/structs.h b/include/net/sctp/structs.h
+index dcd288fa1bb6..1ad7ce71d0a7 100644
+--- a/include/net/sctp/structs.h
++++ b/include/net/sctp/structs.h
+@@ -2152,8 +2152,6 @@ struct sctp_transport *sctp_assoc_add_peer(struct sctp_association *,
+ 				     const union sctp_addr *address,
+ 				     const gfp_t gfp,
+ 				     const int peer_state);
+-void sctp_assoc_del_peer(struct sctp_association *asoc,
+-			 const union sctp_addr *addr);
+ void sctp_assoc_rm_peer(struct sctp_association *asoc,
+ 			 struct sctp_transport *peer);
+ void sctp_assoc_control_transport(struct sctp_association *asoc,
+diff --git a/net/sctp/associola.c b/net/sctp/associola.c
+index 760152e751c7..5793d71852b8 100644
+--- a/net/sctp/associola.c
++++ b/net/sctp/associola.c
+@@ -736,24 +736,6 @@ struct sctp_transport *sctp_assoc_add_peer(struct sctp_association *asoc,
+ 	return peer;
+ }
+ 
+-/* Delete a transport address from an association.  */
+-void sctp_assoc_del_peer(struct sctp_association *asoc,
+-			 const union sctp_addr *addr)
+-{
+-	struct list_head	*pos;
+-	struct list_head	*temp;
+-	struct sctp_transport	*transport;
+-
+-	list_for_each_safe(pos, temp, &asoc->peer.transport_addr_list) {
+-		transport = list_entry(pos, struct sctp_transport, transports);
+-		if (sctp_cmp_addr_exact(addr, &transport->ipaddr)) {
+-			/* Do book keeping for removing the peer and free it. */
+-			sctp_assoc_rm_peer(asoc, transport);
+-			break;
+-		}
+-	}
+-}
+-
+ /* Lookup a transport by address. */
+ struct sctp_transport *sctp_assoc_lookup_paddr(
+ 					const struct sctp_association *asoc,
+diff --git a/net/sctp/sm_make_chunk.c b/net/sctp/sm_make_chunk.c
+index f80208edd6a5..3ead591c72fd 100644
+--- a/net/sctp/sm_make_chunk.c
++++ b/net/sctp/sm_make_chunk.c
+@@ -115,14 +115,6 @@ static void sctp_control_set_owner_w(struct sctp_chunk *chunk)
+ 	skb->destructor = sctp_control_release_owner;
+ }
+ 
+-/* What was the inbound interface for this chunk? */
+-int sctp_chunk_iif(const struct sctp_chunk *chunk)
+-{
+-	struct sk_buff *skb = chunk->skb;
+-
+-	return SCTP_INPUT_CB(skb)->af->skb_iif(skb);
+-}
+-
+ /* RFC 2960 3.3.2 Initiation (INIT) (1)
+  *
+  * Note 2: The ECN capable field is reserved for future use of
+-- 
+2.49.0
 
 
