@@ -1,266 +1,210 @@
-Return-Path: <netdev+bounces-187290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F8E8AA6215
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 19:06:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 311A8AA62A9
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 20:12:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D2E11886439
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 17:06:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E4574A7D1F
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 18:12:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A7B92144CF;
-	Thu,  1 May 2025 17:06:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F150321FF40;
+	Thu,  1 May 2025 18:12:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WZmhNm0q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bQjNP5T1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA6511185
-	for <netdev@vger.kernel.org>; Thu,  1 May 2025 17:06:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D6B721D3FD;
+	Thu,  1 May 2025 18:12:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746119203; cv=none; b=fGsgLT/KAZCA/bV5cdvzF2FCBy3iUuY8lRnkAMu+WxjIBuwzW5ncCYKZZ1yOKbBgky+CsZq4zGYy2Dj+BzSpC9o0Lx/4ngQTp61Q4XUpMcOPnwKdsbv2QNyuNUk2E/CowVA39wwtxnHoVOiD+ymHiqMcDwL2UisLUfNahOKAWpM=
+	t=1746123126; cv=none; b=WaqbjNH62iePGwHX6PVOBsPqArZgET0WHD6soA1WzZacVxspaJlvnC6CkY/yhGMZWrMNIzYFcf6tgExYqxfGAYvWaN+ayJCWtq2MmxPr2/s4Y9LUkbiFHDvQEc6JwV+DPmVZKwlBxYkgxJNO1SaHZxcwkrAMZ3UR3z6k3QZsi88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746119203; c=relaxed/simple;
-	bh=vpwoHZgEK+eBpkOnV4IVJceo45W3/GlUw9ugRDiiG1E=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=q8AVvrmDpBM0Dw0pURNpQuMWkme8MmconP3aeelBuGt3QvwjCxtie5n3Ggw6ZGuyRf7QC1o/k0CY5380f34BOJ+Ja88rcGM8ckBZJOR1yi6KKgg0MLIrmmW8+PiwLOZH3Cf57SXzCl9ZcTOmj8iNui5MIPdIbYSNK94OgRgbQNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--brianvv.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WZmhNm0q; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--brianvv.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-736c0306242so1668379b3a.1
-        for <netdev@vger.kernel.org>; Thu, 01 May 2025 10:06:41 -0700 (PDT)
+	s=arc-20240116; t=1746123126; c=relaxed/simple;
+	bh=4XvbgcAfvaKHgkvrKyrrbxsc9Zo4i8P85+j5/TVPMVw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HsWzfhLBbbrp45U+ZkmRwjp4k6pygxESEYxP82SDg5tBRVzVAR+VEPDRenegij7nPq01XqEvvQwzqVPyg672y/6XrnLzLx3/tFQm2AujdZdDJysiZYvlZ13k52x4RkG+HZj7sYiEJEJKVHiOweKJtoYzxfvrMmr5VbBMzuKUd+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bQjNP5T1; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7390d21bb1cso1458736b3a.2;
+        Thu, 01 May 2025 11:12:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746119201; x=1746724001; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=CYoyI2HUtH9/wqxtGZ6AIAXvjb4DxACBRi1cFZcTEuM=;
-        b=WZmhNm0qVM6aG4SLxyKD7Jo+3/t1tTa7ARSDNylV/xYg3asgUvGdJ8geqdLaBlj3y2
-         /ElfnKBwQ6HP9ryfMT8900P1diUVOYvCFZ51VXo7YFxYWyfSEf6UXzlWJYSZTYN0opxB
-         4lEOmkLcSOtfVd4+cPNKAemSri1Y1tiTOEt0I0JJFEBN6/SVZ7JBGlSNXQ/XMfWn48n0
-         1uGebGJKOV9VbAWIyENJiqYMxbNU36mkl7yV8XElkELwxI7EnJFs7hx43/+FAZLF9OMp
-         i7l2vzCsRor2fpcXfcUR2N8/a0NiWwRJVusXQ+aWFrJN2NpKBDfosr08T3OFVyoXRDKg
-         vGNw==
+        d=gmail.com; s=20230601; t=1746123125; x=1746727925; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=x2KG2as49bpWoOoSGAasYC9XopQyjIivrGhuc6j4Ja8=;
+        b=bQjNP5T1I7Js8J7w5NTxt04RcBavgH+0ZgdXlX/CQAhESJ8chMnfpYW96hNKs5tndS
+         L2Ppy5TAdqUxCFwTNRkkyl0X6Sg2NjmBo2A7CS7oa/RN6IM56TVkI4DSQqGNTk/T239O
+         XTXSk5RRiOATs3Qqfdps63LrDNQgX/dkBPFNRl7TvFXrwL/mtG0kti8nI19X86T3QSNp
+         AWNdXoNK2U+8IJSStptewId52keQlcGj4Vex/b0EzEAj6CgfICeVNVP7lEDe9nn9zQcM
+         SJINQw4FUqO9rd5x/ZaH8pej9mx0Q585N8h9jpDYSnXkN5JdFu83YT+yFF+Qd7K15VNk
+         g6Pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746119201; x=1746724001;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CYoyI2HUtH9/wqxtGZ6AIAXvjb4DxACBRi1cFZcTEuM=;
-        b=sAkd+r6yZkOeZ3OrQ0XDs7sVLisigkK91e7V/b1JlN0wBWKJR3n9z9WvPIL9GOsYh5
-         8kCmV3+Qp21Yhnwhu43/7qbUOV8KkVkNRbt4hs4LhRWlvcjNvEIJ2VXqfCzOgfkQ+B7A
-         hwdAU06wJXxbCvt0C5u8s+z9VzpiqIAXbtHgmZkbkw14XqwPdetwP2/VxRAppDKlt3MO
-         ewJ4OzFizzxHDOJQ+1jRvM/hqSIIcYnAMrTWMZkbR1G973phNCBk+VmwoG0jtCYKbLsb
-         wGJSW+tHpoUFSCqqSYCFtKp/TgHM5cft9MriJCkIGGyyc4P7ID7MoJpzzHtAABiaImmP
-         pmqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVSCl1du/EJlNm6c7BbZy8lEY/SULxhU2OJKpxXVneuX3H7/T+0KccWXz8SimbKaAFmcwRwoHY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzoNt9w7qMW488hyMwUnuThMWHomuYLpTp3hq+MO7O5/vM5H7cK
-	CU5HqkuKWyQVQ8UX0B2dzP1u9NS/awmGZXQzyDbl3oxEOg98QoADnTOhougQqkq5x9zPjbQG4Xw
-	tHhQ1UA==
-X-Google-Smtp-Source: AGHT+IE+CNt/JL+aCgGxR0exee8kV9DzgY4OHDalS4DF1luZNEgwobOsGpCnxsW+nq8AuUV79LdPhRXrXa/D
-X-Received: from pfny12.prod.google.com ([2002:aa7:854c:0:b0:740:41eb:584c])
- (user=brianvv job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2e29:b0:736:a973:748
- with SMTP id d2e1a72fcca58-7403a82e80dmr9803580b3a.22.1746119200622; Thu, 01
- May 2025 10:06:40 -0700 (PDT)
-Date: Thu,  1 May 2025 17:06:17 +0000
+        d=1e100.net; s=20230601; t=1746123125; x=1746727925;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=x2KG2as49bpWoOoSGAasYC9XopQyjIivrGhuc6j4Ja8=;
+        b=Dp9gqM7Wv59+xLmCK79mttaH5y+Gy5NDJFx7K7kKqZeLRMK78yMXrhJBF85J/gPvie
+         +fYb4dHdwzHc+6MaHy+kOApKKgwYlduR7QEIeOQYvAsgw05/jIVU1NOTOuvvJkmWEFjW
+         cmhIj7Mtnm7Q3/+ZZZuVhbam25Lk16Be798/uDwXz2S8fjijsTzFmCCFJ2yA1kAaLF7p
+         Fdy5BYGQHLvpiF8XAzJYI8o8LKcBsb0cuzJ72nYpeOZRWhpuoleDL0TMPHgi+LbPzoDu
+         PRX9BJejpAFUkfD7t5dsjOUoHKnyWLjTtF1PP3fSCvv/qAs+OQLOMne6wSD3O4khzAGp
+         nrkg==
+X-Forwarded-Encrypted: i=1; AJvYcCUSDJ5D9MKTIY4/g6/NnybioQ9Nn76h74yzWBXxS5VVNTIfnRtlcBw7uLf/kM5HcDi6oCQESvOv@vger.kernel.org, AJvYcCVAGifGUFYxgtyPjr+KA4zoaNzz5kRjVF27oavz0z7x6ZUfRXaB2nKldWBi1+T9t1/z5lOPlfueXclDxU3nONuT37/F@vger.kernel.org, AJvYcCWuizKf0JozSE4xFLdEFS5QZeKk7AvCbZPVo8OhFftokKsxnQ0S47BN4vPfBJp3bBf1iqg=@vger.kernel.org, AJvYcCXl/ti90M6CuFQZ9HYimjtUpRHAkIQfK8zmcRfPrA3ClAjwLKBUPHUImlnA7Jir4i6gQ4zbSfHck3DpqJ0b@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWu8okbSP+C5vSTyZOarMLQ/WOROfVR63lXpuMmAfkSrLkN0mP
+	Uud9hpGEwmHlfquPdX8Tj6XXaw9h7rAFIDaop7tYrV6dtFfFA0t1j4JvDwd+MrVkTwJ2u74frcJ
+	Z/wwncA+13N8RvaVhiu71y9MdZDU=
+X-Gm-Gg: ASbGncsrPcVU2A9K1Mgxi/NvTtPep1xemTrL6+ZTJcjgbAx7Qfa9G8JnvCg1UaGVSle
+	bELGBbNpQo2SwiFXerpfipkBNhJxhaH0rpIcqq40ZU/X/RE8n9UgwB/DQqCAwiwqYBOBQrZU+e/
+	3qCwir0qdmPVpKFMHTg4OoNVurpxf3K0godmlvtg==
+X-Google-Smtp-Source: AGHT+IGqDlC2E7jiIsFNvlbYgxIKsWbas6w3+iAUOFuauDSOc2+ar8JgNhN475KkLIkoWKqF5a+y+XbTQjTmFoi/4BY=
+X-Received: by 2002:a05:6a21:338c:b0:1f3:41d5:6608 with SMTP id
+ adf61e73a8af0-20bd8247791mr3810125637.26.1746123124663; Thu, 01 May 2025
+ 11:12:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.49.0.967.g6a0df3ecc3-goog
-Message-ID: <20250501170617.1121247-1-brianvv@google.com>
-Subject: [iwl-net PATCH v3] idpf: fix a race in txq wakeup
-From: Brian Vazquez <brianvv@google.com>
-To: Brian Vazquez <brianvv.kernel@gmail.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	intel-wired-lan@lists.osuosl.org
-Cc: David Decotigny <decot@google.com>, Anjali Singhai <anjali.singhai@intel.com>, 
-	Sridhar Samudrala <sridhar.samudrala@intel.com>, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, emil.s.tantilov@intel.com, 
-	Brian Vazquez <brianvv@google.com>, Jacob Keller <jacob.e.keller@intel.com>, 
-	Madhu Chittim <madhu.chittim@intel.com>, Josh Hay <joshua.a.hay@intel.com>, 
-	Luigi Rizzo <lrizzo@google.com>
+MIME-Version: 1.0
+References: <20250427063821.207263-1-yangfeng59949@163.com>
+In-Reply-To: <20250427063821.207263-1-yangfeng59949@163.com>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Thu, 1 May 2025 11:11:52 -0700
+X-Gm-Features: ATxdqUEFaJVWHzuMIuxkj8n2TpEySzKQv1HstKSN00XuW5rRGuMvrjMLfJDz_ZI
+Message-ID: <CAEf4BzbJ0eaiiaCukaJV0JmrzF6fsbwOxszQUV3pL+MAJT25rw@mail.gmail.com>
+Subject: Re: [PATCH v2 bpf-next] bpf: Allow some trace helpers for all prog types
+To: Feng Yang <yangfeng59949@163.com>
+Cc: martin.lau@linux.dev, ast@kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, eddyz87@gmail.com, song@kernel.org, 
+	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, 
+	mattbobrowski@google.com, rostedt@goodmis.org, mhiramat@kernel.org, 
+	mathieu.desnoyers@efficios.com, davem@davemloft.net, bpf@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, htejun@fb.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add a helper function to correctly handle the lockless
-synchronization when the sender needs to block. The paradigm is
+On Sat, Apr 26, 2025 at 11:39=E2=80=AFPM Feng Yang <yangfeng59949@163.com> =
+wrote:
+>
+> From: Feng Yang <yangfeng@kylinos.cn>
+>
+> if it works under NMI and doesn't use any context-dependent things,
+> should be fine for any program type. The detailed discussion is in [1].
+>
+> [1] https://lore.kernel.org/all/CAEf4Bza6gK3dsrTosk6k3oZgtHesNDSrDd8sdeQ-=
+GiS6oJixQg@mail.gmail.com/
+>
+> Suggested-by: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+> Signed-off-by: Feng Yang <yangfeng@kylinos.cn>
+> ---
+> Changes in v2:
+> - not expose compat probe read APIs to more program types.
+> - Remove the prog->sleepable check added for copy_from_user,
+> - or the summarization_freplace/might_sleep_with_might_sleep test will fa=
+il with the error "program of this type cannot use helper bpf_copy_from_use=
+r"
+> - Link to v1: https://lore.kernel.org/all/20250425080032.327477-1-yangfen=
+g59949@163.com/
+> ---
+>  kernel/bpf/cgroup.c      |  6 ------
+>  kernel/bpf/helpers.c     | 38 +++++++++++++++++++++++++++++++++++++
+>  kernel/trace/bpf_trace.c | 41 ++++------------------------------------
+>  net/core/filter.c        |  2 --
+>  4 files changed, 42 insertions(+), 45 deletions(-)
+>
+> diff --git a/kernel/bpf/cgroup.c b/kernel/bpf/cgroup.c
+> index 84f58f3d028a..dbdad5f42761 100644
+> --- a/kernel/bpf/cgroup.c
+> +++ b/kernel/bpf/cgroup.c
+> @@ -2607,16 +2607,10 @@ const struct bpf_func_proto *
+>  cgroup_current_func_proto(enum bpf_func_id func_id, const struct bpf_pro=
+g *prog)
+>  {
+>         switch (func_id) {
+> -       case BPF_FUNC_get_current_uid_gid:
+> -               return &bpf_get_current_uid_gid_proto;
+> -       case BPF_FUNC_get_current_comm:
+> -               return &bpf_get_current_comm_proto;
+>  #ifdef CONFIG_CGROUP_NET_CLASSID
+>         case BPF_FUNC_get_cgroup_classid:
+>                 return &bpf_get_cgroup_classid_curr_proto;
+>  #endif
 
-        if (no_resources()) {
-                stop_queue();
-                barrier();
-                if (!no_resources())
-                        restart_queue();
-        }
+this is the only one left, and again, it's just current-dependent, so
+I'd just move this into base set and got rid of
+cgroup_current_func_proto altogether (there are 5 callers, let's clean
+them up)
 
-netif_subqueue_maybe_stop already handles the paradigm correctly, but
-the code split the check for resources in three parts, the first one
-(descriptors) followed the protocol, but the other two (completions and
-tx_buf) were only doing the first part and so race prone.
+> -       case BPF_FUNC_current_task_under_cgroup:
+> -               return &bpf_current_task_under_cgroup_proto;
+>         default:
+>                 return NULL;
+>         }
+> diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
+> index e3a2662f4e33..a01a2e55e17d 100644
+> --- a/kernel/bpf/helpers.c
+> +++ b/kernel/bpf/helpers.c
+> @@ -23,6 +23,7 @@
+>  #include <linux/btf_ids.h>
+>  #include <linux/bpf_mem_alloc.h>
+>  #include <linux/kasan.h>
+> +#include <linux/bpf_verifier.h>
 
-Luckily netif_subqueue_maybe_stop macro already allows you to use a
-function to evaluate the start/stop conditions so the fix only requires
-the right helper function to evaluate all the conditions at once.
+why do we need this include?
 
-The patch removes idpf_tx_maybe_stop_common since it's no longer needed
-and instead adjusts separately the conditions for singleq and splitq.
+[...]
 
-Note that idpf_tx_buf_hw_update doesn't need to check for resources
-since that will be covered in idpf_tx_splitq_frame.
+> @@ -2057,6 +2074,27 @@ bpf_base_func_proto(enum bpf_func_id func_id, cons=
+t struct bpf_prog *prog)
+>                 return bpf_get_trace_vprintk_proto();
+>         case BPF_FUNC_perf_event_read_value:
+>                 return bpf_get_perf_event_read_value_proto();
+> +       case BPF_FUNC_perf_event_read:
+> +               return &bpf_perf_event_read_proto;
+> +       case BPF_FUNC_send_signal:
+> +               return &bpf_send_signal_proto;
+> +       case BPF_FUNC_send_signal_thread:
+> +               return &bpf_send_signal_thread_proto;
+> +       case BPF_FUNC_get_task_stack:
+> +               return prog->sleepable ? &bpf_get_task_stack_sleepable_pr=
+oto
+> +                                      : &bpf_get_task_stack_proto;
+> +       case BPF_FUNC_task_storage_get:
+> +               if (bpf_prog_check_recur(prog))
+> +                       return &bpf_task_storage_get_recur_proto;
+> +               return &bpf_task_storage_get_proto;
+> +       case BPF_FUNC_task_storage_delete:
+> +               if (bpf_prog_check_recur(prog))
+> +                       return &bpf_task_storage_delete_recur_proto;
+> +               return &bpf_task_storage_delete_proto;
 
-To reproduce:
+task_storage_{get,delete} probably should be guarded just by CAP_BPF,
+no need for CAP_PERFMON, IMO. Can you please move them up a bit?
 
-Reduce the threshold for pending completions to increase the chances of
-hitting this pause by changing your kernel:
+Also, we should probably get rid of bpf_scx_get_func_proto() in
+kernel/sched/ext.c, given it only adds these two on top of the base
+set? But that's probably a separate patch against sched_ext tree?
+cc'ing Tejun
 
-drivers/net/ethernet/intel/idpf/idpf_txrx.h
+pw-bot: cr
 
--#define IDPF_TX_COMPLQ_OVERFLOW_THRESH(txcq)   ((txcq)->desc_count >> 1)
-+#define IDPF_TX_COMPLQ_OVERFLOW_THRESH(txcq)   ((txcq)->desc_count >> 4)
+> +       case BPF_FUNC_get_branch_snapshot:
+> +               return &bpf_get_branch_snapshot_proto;
+> +       case BPF_FUNC_find_vma:
+> +               return &bpf_find_vma_proto;
+>         default:
+>                 return NULL;
+>         }
 
-Use pktgen to force the host to push small pkts very aggressively:
-
-./pktgen_sample02_multiqueue.sh -i eth1 -s 100 -6 -d $IP -m $MAC \
-  -p 10000-10000 -t 16 -n 0 -v -x -c 64
-
-Fixes: 6818c4d5b3c2 ("idpf: add splitq start_xmit")
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
-Signed-off-by: Josh Hay <joshua.a.hay@intel.com>
-Signed-off-by: Brian Vazquez <brianvv@google.com>
-Signed-off-by: Luigi Rizzo <lrizzo@google.com>
----
-v3:
-- Fix typo in commit message
-v2:
-- Fix typos
-- Fix RCT in singleq function
-- No inline in c files
-- Submit to iwl-net and add Fixes tag
- .../ethernet/intel/idpf/idpf_singleq_txrx.c   |  9 ++--
- drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 45 +++++++------------
- drivers/net/ethernet/intel/idpf/idpf_txrx.h   |  8 ----
- 3 files changed, 22 insertions(+), 40 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-index eae1b6f474e6..6ade54e21325 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-@@ -362,17 +362,18 @@ netdev_tx_t idpf_tx_singleq_frame(struct sk_buff *skb,
- {
- 	struct idpf_tx_offload_params offload = { };
- 	struct idpf_tx_buf *first;
-+	int csum, tso, needed;
- 	unsigned int count;
- 	__be16 protocol;
--	int csum, tso;
- 
- 	count = idpf_tx_desc_count_required(tx_q, skb);
- 	if (unlikely(!count))
- 		return idpf_tx_drop_skb(tx_q, skb);
- 
--	if (idpf_tx_maybe_stop_common(tx_q,
--				      count + IDPF_TX_DESCS_PER_CACHE_LINE +
--				      IDPF_TX_DESCS_FOR_CTX)) {
-+	needed = count + IDPF_TX_DESCS_PER_CACHE_LINE + IDPF_TX_DESCS_FOR_CTX;
-+	if (!netif_subqueue_maybe_stop(tx_q->netdev, tx_q->idx,
-+				       IDPF_DESC_UNUSED(tx_q),
-+				       needed, needed)) {
- 		idpf_tx_buf_hw_update(tx_q, tx_q->next_to_use, false);
- 
- 		u64_stats_update_begin(&tx_q->stats_sync);
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index bdf52cef3891..a6ca2f55b5d5 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -2132,6 +2132,19 @@ void idpf_tx_splitq_build_flow_desc(union idpf_tx_flex_desc *desc,
- 	desc->flow.qw1.compl_tag = cpu_to_le16(params->compl_tag);
- }
- 
-+/* Global conditions to tell whether the txq (and related resources)
-+ * has room to allow the use of "size" descriptors.
-+ */
-+static int idpf_txq_has_room(struct idpf_tx_queue *tx_q, u32 size)
-+{
-+	if (IDPF_DESC_UNUSED(tx_q) < size ||
-+	    IDPF_TX_COMPLQ_PENDING(tx_q->txq_grp) >
-+		IDPF_TX_COMPLQ_OVERFLOW_THRESH(tx_q->txq_grp->complq) ||
-+	    IDPF_TX_BUF_RSV_LOW(tx_q))
-+		return 0;
-+	return 1;
-+}
-+
- /**
-  * idpf_tx_maybe_stop_splitq - 1st level check for Tx splitq stop conditions
-  * @tx_q: the queue to be checked
-@@ -2142,29 +2155,11 @@ void idpf_tx_splitq_build_flow_desc(union idpf_tx_flex_desc *desc,
- static int idpf_tx_maybe_stop_splitq(struct idpf_tx_queue *tx_q,
- 				     unsigned int descs_needed)
- {
--	if (idpf_tx_maybe_stop_common(tx_q, descs_needed))
--		goto out;
--
--	/* If there are too many outstanding completions expected on the
--	 * completion queue, stop the TX queue to give the device some time to
--	 * catch up
--	 */
--	if (unlikely(IDPF_TX_COMPLQ_PENDING(tx_q->txq_grp) >
--		     IDPF_TX_COMPLQ_OVERFLOW_THRESH(tx_q->txq_grp->complq)))
--		goto splitq_stop;
--
--	/* Also check for available book keeping buffers; if we are low, stop
--	 * the queue to wait for more completions
--	 */
--	if (unlikely(IDPF_TX_BUF_RSV_LOW(tx_q)))
--		goto splitq_stop;
--
--	return 0;
--
--splitq_stop:
--	netif_stop_subqueue(tx_q->netdev, tx_q->idx);
-+	if (netif_subqueue_maybe_stop(tx_q->netdev, tx_q->idx,
-+				      idpf_txq_has_room(tx_q, descs_needed),
-+				      1, 1))
-+		return 0;
- 
--out:
- 	u64_stats_update_begin(&tx_q->stats_sync);
- 	u64_stats_inc(&tx_q->q_stats.q_busy);
- 	u64_stats_update_end(&tx_q->stats_sync);
-@@ -2190,12 +2185,6 @@ void idpf_tx_buf_hw_update(struct idpf_tx_queue *tx_q, u32 val,
- 	nq = netdev_get_tx_queue(tx_q->netdev, tx_q->idx);
- 	tx_q->next_to_use = val;
- 
--	if (idpf_tx_maybe_stop_common(tx_q, IDPF_TX_DESC_NEEDED)) {
--		u64_stats_update_begin(&tx_q->stats_sync);
--		u64_stats_inc(&tx_q->q_stats.q_busy);
--		u64_stats_update_end(&tx_q->stats_sync);
--	}
--
- 	/* Force memory writes to complete before letting h/w
- 	 * know there are new descriptors to fetch.  (Only
- 	 * applicable for weak-ordered memory model archs,
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-index b029f566e57c..c192a6c547dd 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-@@ -1037,12 +1037,4 @@ bool idpf_rx_singleq_buf_hw_alloc_all(struct idpf_rx_queue *rxq,
- 				      u16 cleaned_count);
- int idpf_tso(struct sk_buff *skb, struct idpf_tx_offload_params *off);
- 
--static inline bool idpf_tx_maybe_stop_common(struct idpf_tx_queue *tx_q,
--					     u32 needed)
--{
--	return !netif_subqueue_maybe_stop(tx_q->netdev, tx_q->idx,
--					  IDPF_DESC_UNUSED(tx_q),
--					  needed, needed);
--}
--
- #endif /* !_IDPF_TXRX_H_ */
--- 
-2.49.0.967.g6a0df3ecc3-goog
-
+[...]
 
