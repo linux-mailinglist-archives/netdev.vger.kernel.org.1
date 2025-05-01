@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-187216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4559AA5BD7
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 10:06:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D030AA5BDA
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 10:06:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F4EA1B67DD7
-	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 08:06:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E298173EB6
+	for <lists+netdev@lfdr.de>; Thu,  1 May 2025 08:06:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EC52265CC4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8A2126C38C;
 	Thu,  1 May 2025 08:05:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="RbZPxq11"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="G751hQCu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C1025B1CE;
-	Thu,  1 May 2025 08:05:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6BBC1EB1BC;
+	Thu,  1 May 2025 08:05:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746086754; cv=none; b=topK097sonl+jpEmEONVxbuA1DqNyDGOGb8NI4VAdpqX1dwGITlpVUkyqpjnL70dYfMZN8SupnALIQwACJTLZUPhN/z/3/E/OHEAMKwO0sPa8iL68xvlGu78h5rJokZkvPO2oW1tevlkAhplVY8s9y3j5Qjo5e1leuOx5Yxw6Ng=
+	t=1746086754; cv=none; b=oZq+Wx3W7QZYSfuf++4QiVtn5PITRQk5wMAVMc3+oXqPpczEJmELDlVtxZl+AvLe724Mf6gr9Zc8XTJ04E1mH8LC1/HLvdy2E66uhOM0WXw7w0ydf0m2aq4yLjWp7lfsDfkmBRxhDov3k8nzISvkXhnXSfvlUlCbVPh5Ll+PyDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1746086754; c=relaxed/simple;
-	bh=Mu6prwauj7B3bCqGpqGc0KCidlcsB8GchOCM8+2XE5s=;
+	bh=sG2QEyQbrobbnyUhVWEtJMUwJvJ74lxMh2X+TVU/j8Y=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=uOT/U+zBKKB40kWneCErWTyXS26eH9dLQVQbe5OLgxuhZ5h1TonUwpDKGMYhzbIIr5gPkGyLT5ps3BGf0IiOn3ULZqqntid1lvUGvIUCqS53q/WAQkt6Q3vhaTY40qy4RA66JElfldJabf75x0Wc/uHuY/kZFWJFPw6IiQbCFko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=RbZPxq11; arc=none smtp.client-ip=185.226.149.38
+	 In-Reply-To:To:Cc; b=cTOPhIDxylehN341umQNjXZbv6q34N5UiBtCKlhw6LrzzxvRSL2lCgIJR6NhBrk/QpeNkqZj8vfRH64VuSgcrckgET8/oPKKVsx4R5+8/GT154GKpgVK869cjoaTd+6w73ippuXK9LluJisHI/ol1jlEKzcF1z8q8VOrNf8M2Tc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=G751hQCu; arc=none smtp.client-ip=185.226.149.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <mhal@rbox.co>)
-	id 1uAOvR-00BnGm-N6; Thu, 01 May 2025 10:05:45 +0200
+	id 1uAOvU-009GJK-I6; Thu, 01 May 2025 10:05:48 +0200
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
 	s=selector1; h=Cc:To:In-Reply-To:References:Message-Id:
 	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From;
-	bh=ryPcbNb/7eJcu1W3+cY8RMwSBA+GuC6dYVOgjIg/Z2w=; b=RbZPxq11clJsd+Hu6q6D9NWLN4
-	awvLEpO2WJUUZTNQRLYsFwxQuPeY24AIQHeDMm/NVuKxufBIZ10sGoGBDBoI1gxhKFq3MuGcK6NCk
-	YVWXlhDYlrHZ9gIUh+qabyZf6ztjZ4DbDINDpbhQ928Wv7/5u5Gk/itzOGUftBsjgew1+chJt1ijN
-	3Tc/mdJtsfCRtDUOm04j5BgRPH7vigAlV0a1ylPldY8QYhVbhKqeAxcPxP4nuQEfNnnDvVqX6yhQx
-	NSqoRsSnlMprYCkRiP4CKA4NcYgURw0hFfSxVQMQqhRNRb3+UecIV1LaD3gOYwedS9BiYs7JySQP3
-	ld+yE2RA==;
+	bh=2+Pq8Xix56XtZggy9D9QenLSKFUy39lDf1vpQzvRUiU=; b=G751hQCu0JZMaPkaorZdkE1h9o
+	i9d0NdWrxcOy8IhaePt6pvZN+zX5OWaDJ1qz709RzRp7uXe9FEwlE2Z1kAQ8VsOiQ1W0v73eupzx2
+	vn4KbyUfOZ4u+kSqBdAa6zXHj1aEdNMEYcia0haFA+44wex6TCyjMLXsSA7UyrO8h/YJMPFcfk77V
+	3qaWTUMVixpxefpue4SnBiFxfhHs/jUCKuFjLo1pXqzffCsGuZ49hW4I6s+dECB4obvVZV/S3sFMc
+	Z/0UTI8c5ogXFsohW7Hiz/iSDgc4Dv5ijVO2AZpJLiTznNLc+/KZfgpN40sANqEuJQXTDxUk5Ybxh
+	7Py8fQig==;
 Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <mhal@rbox.co>)
-	id 1uAOvQ-0007we-Cv; Thu, 01 May 2025 10:05:44 +0200
+	id 1uAOvU-0001EA-8b; Thu, 01 May 2025 10:05:48 +0200
 Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.93)
-	id 1uAOvI-005lsv-QR; Thu, 01 May 2025 10:05:36 +0200
+	id 1uAOvJ-005lsv-Oq; Thu, 01 May 2025 10:05:37 +0200
 From: Michal Luczaj <mhal@rbox.co>
-Date: Thu, 01 May 2025 10:05:22 +0200
-Subject: [PATCH net-next v4 1/3] vsock/virtio: Linger on unsent data
+Date: Thu, 01 May 2025 10:05:23 +0200
+Subject: [PATCH net-next v4 2/3] vsock: Move lingering logic to af_vsock
+ core
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,7 +64,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250501-vsock-linger-v4-1-beabbd8a0847@rbox.co>
+Message-Id: <20250501-vsock-linger-v4-2-beabbd8a0847@rbox.co>
 References: <20250501-vsock-linger-v4-0-beabbd8a0847@rbox.co>
 In-Reply-To: <20250501-vsock-linger-v4-0-beabbd8a0847@rbox.co>
 To: Stefano Garzarella <sgarzare@redhat.com>, 
@@ -78,50 +79,119 @@ Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org,
  Michal Luczaj <mhal@rbox.co>
 X-Mailer: b4 0.14.2
 
-Currently vsock's lingering effectively boils down to waiting (or timing
-out) until packets are consumed or dropped by the peer; be it by receiving
-the data, closing or shutting down the connection.
+Lingering should be transport-independent in the long run. In preparation
+for supporting other transports, as well the linger on shutdown(), move
+code to core.
 
-To align with the semantics described in the SO_LINGER section of man
-socket(7) and to mimic AF_INET's behaviour more closely, change the logic
-of a lingering close(): instead of waiting for all data to be handled,
-block until data is considered sent from the vsock's transport point of
-view. That is until worker picks the packets for processing and decrements
-virtio_vsock_sock::bytes_unsent down to 0.
+Generalize by querying vsock_transport::unsent_bytes(), guard against the
+callback being unimplemented. Do not pass sk_lingertime explicitly. Pull
+SOCK_LINGER check into vsock_linger().
 
-Note that (some interpretation of) lingering was always limited to
-transports that called virtio_transport_wait_close() on transport release.
-This does not change, i.e. under Hyper-V and VMCI no lingering would be
-observed.
+Flatten the function. Remove the nested block by inverting the condition:
+return early on !timeout.
 
-The implementation does not adhere strictly to man page's interpretation of
-SO_LINGER: shutdown() will not trigger the lingering. This follows AF_INET.
-
+Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Michal Luczaj <mhal@rbox.co>
 ---
- net/vmw_vsock/virtio_transport_common.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ include/net/af_vsock.h                  |  1 +
+ net/vmw_vsock/af_vsock.c                | 30 ++++++++++++++++++++++++++++++
+ net/vmw_vsock/virtio_transport_common.c | 23 ++---------------------
+ 3 files changed, 33 insertions(+), 21 deletions(-)
 
+diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+index 9e85424c834353d016a527070dd62e15ff3bfce1..d56e6e135158939087d060dfcf65d3fdaea53bf3 100644
+--- a/include/net/af_vsock.h
++++ b/include/net/af_vsock.h
+@@ -221,6 +221,7 @@ void vsock_for_each_connected_socket(struct vsock_transport *transport,
+ 				     void (*fn)(struct sock *sk));
+ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk);
+ bool vsock_find_cid(unsigned int cid);
++void vsock_linger(struct sock *sk);
+ 
+ /**** TAP ****/
+ 
+diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+index fc6afbc8d6806a4d98c66abc3af4bd139c583b08..a31ad6b141cd38d1806df4b5d417924bb8607e32 100644
+--- a/net/vmw_vsock/af_vsock.c
++++ b/net/vmw_vsock/af_vsock.c
+@@ -1013,6 +1013,36 @@ static int vsock_getname(struct socket *sock,
+ 	return err;
+ }
+ 
++void vsock_linger(struct sock *sk)
++{
++	DEFINE_WAIT_FUNC(wait, woken_wake_function);
++	ssize_t (*unsent)(struct vsock_sock *vsk);
++	struct vsock_sock *vsk = vsock_sk(sk);
++	long timeout;
++
++	if (!sock_flag(sk, SOCK_LINGER))
++		return;
++
++	timeout = sk->sk_lingertime;
++	if (!timeout)
++		return;
++
++	/* unsent_bytes() may be unimplemented. */
++	unsent = vsk->transport->unsent_bytes;
++	if (!unsent)
++		return;
++
++	add_wait_queue(sk_sleep(sk), &wait);
++
++	do {
++		if (sk_wait_event(sk, &timeout, unsent(vsk) == 0, &wait))
++			break;
++	} while (!signal_pending(current) && timeout);
++
++	remove_wait_queue(sk_sleep(sk), &wait);
++}
++EXPORT_SYMBOL_GPL(vsock_linger);
++
+ static int vsock_shutdown(struct socket *sock, int mode)
+ {
+ 	int err;
 diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index 7f7de6d8809655fe522749fbbc9025df71f071bd..045ac53f69735e1979162aea8c9ab5961407640c 100644
+index 045ac53f69735e1979162aea8c9ab5961407640c..aa308f285bf1bcf4c689407033de854c6f85a639 100644
 --- a/net/vmw_vsock/virtio_transport_common.c
 +++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -1196,12 +1196,14 @@ static void virtio_transport_wait_close(struct sock *sk, long timeout)
+@@ -1192,25 +1192,6 @@ static void virtio_transport_remove_sock(struct vsock_sock *vsk)
+ 	vsock_remove_sock(vsk);
+ }
+ 
+-static void virtio_transport_wait_close(struct sock *sk, long timeout)
+-{
+-	if (timeout) {
+-		DEFINE_WAIT_FUNC(wait, woken_wake_function);
+-		struct vsock_sock *vsk = vsock_sk(sk);
+-
+-		add_wait_queue(sk_sleep(sk), &wait);
+-
+-		do {
+-			if (sk_wait_event(sk, &timeout,
+-					  virtio_transport_unsent_bytes(vsk) == 0,
+-					  &wait))
+-				break;
+-		} while (!signal_pending(current) && timeout);
+-
+-		remove_wait_queue(sk_sleep(sk), &wait);
+-	}
+-}
+-
+ static void virtio_transport_cancel_close_work(struct vsock_sock *vsk,
+ 					       bool cancel_timeout)
  {
- 	if (timeout) {
- 		DEFINE_WAIT_FUNC(wait, woken_wake_function);
-+		struct vsock_sock *vsk = vsock_sk(sk);
+@@ -1280,8 +1261,8 @@ static bool virtio_transport_close(struct vsock_sock *vsk)
+ 	if ((sk->sk_shutdown & SHUTDOWN_MASK) != SHUTDOWN_MASK)
+ 		(void)virtio_transport_shutdown(vsk, SHUTDOWN_MASK);
  
- 		add_wait_queue(sk_sleep(sk), &wait);
+-	if (sock_flag(sk, SOCK_LINGER) && !(current->flags & PF_EXITING))
+-		virtio_transport_wait_close(sk, sk->sk_lingertime);
++	if (!(current->flags & PF_EXITING))
++		vsock_linger(sk);
  
- 		do {
- 			if (sk_wait_event(sk, &timeout,
--					  sock_flag(sk, SOCK_DONE), &wait))
-+					  virtio_transport_unsent_bytes(vsk) == 0,
-+					  &wait))
- 				break;
- 		} while (!signal_pending(current) && timeout);
- 
+ 	if (sock_flag(sk, SOCK_DONE)) {
+ 		return true;
 
 -- 
 2.49.0
