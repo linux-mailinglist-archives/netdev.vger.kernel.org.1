@@ -1,176 +1,99 @@
-Return-Path: <netdev+bounces-187517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9967EAA7A2E
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 21:25:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF654AA7A35
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 21:27:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45AA51B61361
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 19:25:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55FD53A45BD
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 19:27:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F8E7146A68;
-	Fri,  2 May 2025 19:25:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E73AD1EEA4B;
+	Fri,  2 May 2025 19:27:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ro3aLQGX"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="as9CrXay"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 250091EE00B
-	for <netdev@vger.kernel.org>; Fri,  2 May 2025 19:25:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4DF1185B73
+	for <netdev@vger.kernel.org>; Fri,  2 May 2025 19:27:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746213940; cv=none; b=EMTvkjct0UXMSDRhW1Xmuf9UCtXM3limaT9CYFP8y3Kk3ikOS36nNlbV+4kXIsb9Vy8kv6einWhk8b4/j9Zcf09yPc/fjp0swu0dNB+AoJ2laeGno6Yqer8mIm3b4bQmCME+r1em6MA1WBPmjdfFL7C8HgGS+A3cnTOKKBZT/Dc=
+	t=1746214059; cv=none; b=VIMn6BWOwnNnJf1EMRE74M57HyR0YMNRnSddHGwasB18ud+L1ECaoxJelfYJ6btqCP7pmn/0boi8zsLHsVPQf5/+irA55Bxp83CEGPKjVhKAm5IktS2Cx0jmEPStSTB1MwZ8mDLf/fHll1kyycumDMGS8/eDHzsKLMWeZ15PEqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746213940; c=relaxed/simple;
-	bh=ZOraj867pk/cuv9sGYnTnO1GOcFc4HnKNvgp4QcVTF8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TpI4RFwXAotCefme1TU8o+2NjlMnSIsOyLqeRBUnxyn4blQ+1EysPp6WNcoVNpLUWD85dieyFd2M6nqo4W3NeZqwjf2Z2tPzReQ3cjiNkPosxpqKcB99L/rE3I366I7KAWyoAOVsKqeTZ9O0rA1zJP2Ft1Gix+hYGnwMq4ttUNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ro3aLQGX; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2264c9d0295so31725ad.0
-        for <netdev@vger.kernel.org>; Fri, 02 May 2025 12:25:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746213937; x=1746818737; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZOraj867pk/cuv9sGYnTnO1GOcFc4HnKNvgp4QcVTF8=;
-        b=Ro3aLQGXP8CNe9vRdK6XeulHVcTX2VBrUyrixmFqJdUgryLQtuH8O9cayvD79Dqomd
-         hHQSiFSkuPc95X4JNas9F2/1xwcaILkXQgzpKCY86CeiOFD+5Sy0rkj8IdkC9tG64AFB
-         +sLGwf0iJDKBNf46VNhOVRoslDOQ196S0dd0WmPb+3GIOS0GZsBtYyrBQgSFUD+hgnDw
-         lPFeizJfOAIUiji8A8rGz1sEsM/yvDyh8s1u+zu5Oml7qMF86VPdPkxZzBC9Ue5D6ta5
-         ogZi4kL6PgyFcScnHTl1aC7EYD3oJFVe7/pDKpJuFv0se1smNPI6iRl9/1tRg8oY0tuB
-         Q0rg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746213937; x=1746818737;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZOraj867pk/cuv9sGYnTnO1GOcFc4HnKNvgp4QcVTF8=;
-        b=d8xgJlp2/i+uddLaU0Vc3BWY/8jLd+7zUiCWi7MOFHAS3Ut9gsqKkZ4m7R0YVRo/ph
-         9SSIpubZKyUhQsStHzISDVXjyoHmwI+BXHetgP9wcDk51q+1BYGZ+sfIL4eXSYMGfhlr
-         gZQjqm8iPRzDPdTBQYFGcEyoUsX9n7zq4CpPvSilk5eFzQjGE+zKrOinigMDmQG9aCf8
-         WebjlWZVevMtOgLGha6r3PynH9kXeNIQkO1TK8M7GHuPkVJAmWGtcr4h9aXwGi/6ZKUg
-         9WRzhbQTcUuLqCCeAQzYsxcXiUnb+GYDC9eRcTD05+kahUnQIW45sx+kAWwr2spa88s8
-         m6UQ==
-X-Gm-Message-State: AOJu0YxFM2GvqMqkKCPB6ZOCCJUt9qN4vEhsEMHMTlsuGZxRHyRtv+AE
-	Fv9bzrjYt5+N3K9fIaX0lVVEGf2YiTZpfcsog4+GPgAC2NLVRydtInvQ9Jqx3P1FwxzMjQMDRnl
-	ipvUEpWBZakP3n0Tj1bEUfvkfDaVGOpk0cPjALUPFCrJjLxCkbGyH
-X-Gm-Gg: ASbGncv9ebJjU/X3ZN6XGBKHWvHR22+SBbZVbkubTj+uhXC1BodYijUpMypqw+Mboq4
-	1SlBsCn0kcY4AdiWEYEqu1q/kuKEmyQtVga2c8BhbpBRzbF30sJC42Yn32xbHNUJPQG7UuFwxT8
-	8peHgdwLpebVAhOh9HObC8HB98yNvdGVUqGg==
-X-Google-Smtp-Source: AGHT+IHUOjgBbVOP8EhCotYEtz1xj8om994DHh63iGGlYgne8/oHskra7BjgsemS01jDY9TsbdDObHSsJ810l2GltBI=
-X-Received: by 2002:a17:902:ce07:b0:21f:4986:c7d5 with SMTP id
- d9443c01a7336-22e18a3edccmr455755ad.8.1746213937102; Fri, 02 May 2025
- 12:25:37 -0700 (PDT)
+	s=arc-20240116; t=1746214059; c=relaxed/simple;
+	bh=m5FsUSrgqJnJFyAJzio3wLwFf348gmKj5VWnE5R+NNE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EuJTclmix9KT9VM3crsskTjicdoGyKEycmtY4okZzTHLqF26+qYhY6hEB1t+NN6BpevdUjiInTCl6XLrQ/eU8EMjuglXrSkeZzEaNhfGGV/J84ZYoWR7wk5pPv2ZvCykFDd2lPBnLZkM9Mn9awdL5ZfqxFQO5UuUOtfm8X3ufPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=as9CrXay; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <ec91dcac-d2d0-4705-aca1-8cdc1954aa11@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1746214045;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eU9YI+kwmmrvaRkJDXEgoYcoQAkayKzj4/4m5F6kUMI=;
+	b=as9CrXayscBUB5dUnza31hDRWYt6QiLEeCKvmo16By9vRl+wWh4E4XV2WH+8TXPXCtwosT
+	Cx931JbpQ40nIgU4TUq9sZ5MIcYCHPPVMMb9PePGz0knBC3gdyG3bZBNDqmEUhHecTGucA
+	xUB0G4SwxlotLJvrzcNF5o0+zSbqTQo=
+Date: Fri, 2 May 2025 12:27:20 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250429032645.363766-1-almasrymina@google.com>
- <20250429032645.363766-5-almasrymina@google.com> <53433089-7beb-46cf-ae8a-6c58cd909e31@redhat.com>
- <fd7f21d9-3f45-4f68-85cb-dd160a0a95ca@redhat.com>
-In-Reply-To: <fd7f21d9-3f45-4f68-85cb-dd160a0a95ca@redhat.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 2 May 2025 12:25:23 -0700
-X-Gm-Features: ATxdqUFE7sBpQ0aEoZkfu-r1bro_WuWZDP8nLd_pOK-7HB7CvYHcAcfjkOn9v8E
-Message-ID: <CAHS8izPr_yt+PtG5Q++Ub=D4J=H7nP0S_7rOP9G7W=i2Zeau3g@mail.gmail.com>
-Subject: Re: [PATCH net-next v13 4/9] net: devmem: Implement TX path
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, io-uring@vger.kernel.org, 
-	virtualization@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Jeroen de Borst <jeroendb@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Willem de Bruijn <willemb@google.com>, Jens Axboe <axboe@kernel.dk>, 
-	Pavel Begunkov <asml.silence@gmail.com>, David Ahern <dsahern@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	sdf@fomichev.me, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
-	Samiullah Khawaja <skhawaja@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH bpf-next/net v1 2/5] selftests/bpf: Test setting and
+ creating bpf qdisc as default qdisc
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ alexei.starovoitov@gmail.com, andrii@kernel.org, daniel@iogearbox.net,
+ martin.lau@kernel.org, xiyou.wangcong@gmail.com, kernel-team@meta.com
+References: <20250501223025.569020-1-ameryhung@gmail.com>
+ <20250501223025.569020-3-ameryhung@gmail.com>
+ <83c8f387-c4a9-4293-9996-fec285d34c94@linux.dev>
+ <CAMB2axO2Jkc4Ec051+BYhju2Vr_GwzZL6yhHGuohMdg2q6WLRQ@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <CAMB2axO2Jkc4Ec051+BYhju2Vr_GwzZL6yhHGuohMdg2q6WLRQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, May 2, 2025 at 4:51=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
->
-> On 5/2/25 1:47 PM, Paolo Abeni wrote:
-> > On 4/29/25 5:26 AM, Mina Almasry wrote:
-> >> Augment dmabuf binding to be able to handle TX. Additional to all the =
-RX
-> >> binding, we also create tx_vec needed for the TX path.
-> >>
-> >> Provide API for sendmsg to be able to send dmabufs bound to this devic=
-e:
-> >>
-> >> - Provide a new dmabuf_tx_cmsg which includes the dmabuf to send from.
-> >> - MSG_ZEROCOPY with SCM_DEVMEM_DMABUF cmsg indicates send from dma-buf=
-.
-> >>
-> >> Devmem is uncopyable, so piggyback off the existing MSG_ZEROCOPY
-> >> implementation, while disabling instances where MSG_ZEROCOPY falls bac=
-k
-> >> to copying.
-> >>
-> >> We additionally pipe the binding down to the new
-> >> zerocopy_fill_skb_from_devmem which fills a TX skb with net_iov netmem=
-s
-> >> instead of the traditional page netmems.
-> >>
-> >> We also special case skb_frag_dma_map to return the dma-address of the=
-se
-> >> dmabuf net_iovs instead of attempting to map pages.
-> >>
-> >> The TX path may release the dmabuf in a context where we cannot wait.
-> >> This happens when the user unbinds a TX dmabuf while there are still
-> >> references to its netmems in the TX path. In that case, the netmems wi=
-ll
-> >> be put_netmem'd from a context where we can't unmap the dmabuf, Resolv=
-e
-> >> this by making __net_devmem_dmabuf_binding_free schedule_work'd.
-> >>
-> >> Based on work by Stanislav Fomichev <sdf@fomichev.me>. A lot of the me=
-at
-> >> of the implementation came from devmem TCP RFC v1[1], which included t=
-he
-> >> TX path, but Stan did all the rebasing on top of netmem/net_iov.
-> >>
-> >> Cc: Stanislav Fomichev <sdf@fomichev.me>
-> >> Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
-> >> Signed-off-by: Mina Almasry <almasrymina@google.com>
-> >> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-> >
-> > I'm sorry for the late feedback. A bunch of things I did not notice
-> > before...
->
-> The rest LGTM,
+On 5/2/25 10:52 AM, Amery Hung wrote:
+>>> +static void test_default_qdisc_attach_to_mq(void)
+>>> +{
+>>> +     struct bpf_qdisc_fifo *fifo_skel;
+>>> +     char default_qdisc[IFNAMSIZ];
+>>> +     struct netns_obj *netns;
+>>> +     char tc_qdisc_show[64];
+>>> +     struct bpf_link *link;
+>>> +     char *str_ret;
+>>> +     FILE *tc;
+>>> +     int err;
+>>> +
+>>> +     fifo_skel = bpf_qdisc_fifo__open_and_load();
+>>> +     if (!ASSERT_OK_PTR(fifo_skel, "bpf_qdisc_fifo__open_and_load"))
+>>> +             return;
+>>> +
+>>> +     link = bpf_map__attach_struct_ops(fifo_skel->maps.fifo);
+>>
+>>          fifo_skel->links.fifo = bpf_map__attach_struct_ops(....);
+>>
+>> Then no need to bpf_link__destroy(link). bpf_qdisc_fifo__destroy() should do.
+>>
+> 
+> I see. I assume it will also be okay to set autoattach and call
+> bpf_qdisc_fifo__attach()?
 
-Does this imply I should attach your Reviewed-by or Acked-by on follow
-up submissions if any? I'm happy either way, just checking.
+Good point. bpf_qdisc_fifo__attach() will be even simpler. I thought the 
+autoattach is true by default. Please check.
 
-> and my feedback here ranges from nit to corner-cases, so
-> we are probably better off with a follow-up than with a repost, other
-> opinions welcome!
->
-
-Agreed a follow-up is better, but up to you and other maintainers.
-There is some mounting urgency on my side (we're in the process of
-optimistical backports and migrating the devmem TCP userspace that we
-previously open sourced to the upstream UAPI), but we'll oblige either
-way.
-
---=20
-Thanks,
-Mina
 
