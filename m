@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-187546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187547-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CA2AAA7D5E
-	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 01:40:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD894AA7D60
+	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 01:41:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED79A189D7BE
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 23:40:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B5494600C6
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 23:40:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D1A922D79D;
-	Fri,  2 May 2025 23:38:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5875D22F759;
+	Fri,  2 May 2025 23:38:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="dyciaWhV"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="XECSigwe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB7BE22CBE2
-	for <netdev@vger.kernel.org>; Fri,  2 May 2025 23:38:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39B8B22D4F3
+	for <netdev@vger.kernel.org>; Fri,  2 May 2025 23:38:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746229094; cv=none; b=WsRsBziJ20YdhsEBi7AoYZqArJdAldKwRCNqJgcqfGJHhg5tLBHDghNoickUg3p/qimdLHKrVQJ2SsLsuQPfeYZuII9K8pTwRgVoCdjGL16W+Gcwc/mae3nVnoWssO74OTWb5ThGYReVUPkaZ6ygOHFEEyNGPZhrl9YkmT1Xgbw=
+	t=1746229096; cv=none; b=BBwt0hN99qBQpCr/Aj+fJ+Atq/WAvTy8wqOJM3afMm6/nfGiK5kFV5CraKlZGX+gHLAk3MxyiwxwBwRLv5so+ugkv27/CqIbtXN8iNsx+WXb+GOc2txSkApJcqLdc7olKLgoW0oelxbebKD5OW1XJa4/f3UczMIY8OCET8rq+wY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746229094; c=relaxed/simple;
-	bh=MvuNMuAlMG23UAquDIbnqH5UcCOXvYKxgxVsfe8oB9k=;
+	s=arc-20240116; t=1746229096; c=relaxed/simple;
+	bh=f7/9BPWA2a7OV1V+4HLNz+nFow5pP1l0xuo5zudLe9k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=c7rTknl1Vxd25jva4L4bVRlXpxyoOv1V7kD315Fw+iURhEIOYZH6M3Cmnm9uErMYJfVStiz1zLHRcT4Y31Bja3p4NVSMsZn/RejFWkNJ4RPKF0zLaWRcc10PKVF7PJtPiTAYxcqtg8p7D9X++hOJqfoj2pWRdD57A6lnfPSPwjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=dyciaWhV; arc=none smtp.client-ip=171.64.64.25
+	 MIME-Version; b=Tx8tTc3HOpVq3dTmrEpmtTKR1c8egILoQ8TkfFZICQ214PQcswMc++2IyVQcXZhDUeqmNHLj59iKt/SMJ0hBfEGEGsb8nXfaFvETa3aPOzG/53djX0mAA6RcUn8W9l5yA2X5ZmPk/GL+m56zxq1hJTeelJUd1zFmXc2T231t9lc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=XECSigwe; arc=none smtp.client-ip=171.64.64.25
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,17 +37,17 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=6r/TW6gsYpRQYwFuMh0tHkVLMYUNlKJ1ucQirQ+FrA0=; t=1746229092; x=1747093092; 
-	b=dyciaWhVSLBlW06F6c4Cc27xm+s4SY0SveBsdNrfeGyQ3tl23HMSU5AQWIZjpHc1mej5ABhYtAd
-	zNCVRFSDl+4npIVxRQPR1zWB99JvhIPUdOmFBRpd6xKEtDAySxXvI7DpOM83cspyqXCGMs3xEtXBX
-	M2b5+hZX1ikMmwBmiVno5ULEsb355F89ZSVpudwRVjANQBvaAdgVrIhTclfsLlTOt+4CYit+XrFQE
-	BFY+drFyArcdhgnlvUORpmgh3do6JsjKp/jlSWWF44IrUQuAucBloC/YvtMtYQgtBgA6v8BGMuahE
-	QJGfe8QVRy/KBrTEVBZlMPr+Vk2GvSAnJ6Xg==;
+	bh=HJi/yac4MR/eD3azK1bzpjcpo2FrRpS0zbE+4ZnJ8Mk=; t=1746229094; x=1747093094; 
+	b=XECSigweCBBLmeHuRuE9HHpG7vT9gB8YVh9Hx3RIXDvX49TFAMyQwwWEs1l/Iu4hbFJpEcpEAfO
+	Wvb3IqiMs5ATmLs52+aLJTgXbtppP4/GixYltzmNVHCQmJgXT2EaRfTz3ozR5xWEU5sr1sW+aszOz
+	8EDRxoTDxek8T1LhgLXeGs+mbHrUl3R3OGhP81dl6PgLr8ZHuiONCPBsqFP1iKfOxlmJKVNvnVPLR
+	QyyVdSdk7xXnbNKhjgCuzyZmDfut3G/fTj1kYsvOaZGBMiokvcDcg4EeWtfhAvdOQ3fnsAF+4hObF
+	IzaFxGXHi5gHRkO0OZdIBUOlnlj5jXxMnRgQ==;
 Received: from ouster448.stanford.edu ([172.24.72.71]:64199 helo=localhost.localdomain)
 	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ouster@cs.stanford.edu>)
-	id 1uAzxL-0007if-CQ; Fri, 02 May 2025 16:38:12 -0700
+	id 1uAzxM-0007if-8f; Fri, 02 May 2025 16:38:13 -0700
 From: John Ousterhout <ouster@cs.stanford.edu>
 To: netdev@vger.kernel.org
 Cc: pabeni@redhat.com,
@@ -55,9 +55,9 @@ Cc: pabeni@redhat.com,
 	horms@kernel.org,
 	kuba@kernel.org,
 	John Ousterhout <ouster@cs.stanford.edu>
-Subject: [PATCH net-next v8 07/15] net: homa: create homa_interest.h and homa_interest.
-Date: Fri,  2 May 2025 16:37:20 -0700
-Message-ID: <20250502233729.64220-8-ouster@cs.stanford.edu>
+Subject: [PATCH net-next v8 08/15] net: homa: create homa_pacer.h and homa_pacer.c
+Date: Fri,  2 May 2025 16:37:21 -0700
+Message-ID: <20250502233729.64220-9-ouster@cs.stanford.edu>
 X-Mailer: git-send-email 2.45.1
 In-Reply-To: <20250502233729.64220-1-ouster@cs.stanford.edu>
 References: <20250502233729.64220-1-ouster@cs.stanford.edu>
@@ -69,253 +69,531 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Score: -101.0
-X-Scan-Signature: 1085a1c2809627baa475b583c0169231
+X-Scan-Signature: 2a5f42e6cfb9ca8ef2476805c0a6b700
 
-These files implement the homa_interest struct, which is used to
-wait for incoming messages.
+These files provide facilities to pace packet output in order to prevent
+queue buildup in the NIC. This functionality is needed to implement SRPT
+on output, so short messages don't get stuck in long NIC queues.
 
 Signed-off-by: John Ousterhout <ouster@cs.stanford.edu>
----
- net/homa/homa_interest.c | 122 +++++++++++++++++++++++++++++++++++++++
- net/homa/homa_interest.h | 100 ++++++++++++++++++++++++++++++++
- 2 files changed, 222 insertions(+)
- create mode 100644 net/homa/homa_interest.c
- create mode 100644 net/homa/homa_interest.h
 
-diff --git a/net/homa/homa_interest.c b/net/homa/homa_interest.c
+---
+Changes for v8:
+* This file is new in v8 (functionality extracted from other files)
+---
+ net/homa/homa_pacer.c | 310 ++++++++++++++++++++++++++++++++++++++++++
+ net/homa/homa_pacer.h | 185 +++++++++++++++++++++++++
+ 2 files changed, 495 insertions(+)
+ create mode 100644 net/homa/homa_pacer.c
+ create mode 100644 net/homa/homa_pacer.h
+
+diff --git a/net/homa/homa_pacer.c b/net/homa/homa_pacer.c
 new file mode 100644
-index 000000000000..71bf70d7073b
+index 000000000000..12715a6aed10
 --- /dev/null
-+++ b/net/homa/homa_interest.c
-@@ -0,0 +1,122 @@
++++ b/net/homa/homa_pacer.c
+@@ -0,0 +1,310 @@
 +// SPDX-License-Identifier: BSD-2-Clause
 +
-+/* This file contains functions for managing homa_interest structs. */
++/* This file implements the Homa pacer, which implements SRPT for packet
++ * output. In order to do that, it throttles packet transmission to prevent
++ * the buildup of large queues in the NIC.
++ */
 +
-+#include "homa_impl.h"
-+#include "homa_interest.h"
++#include "homa_pacer.h"
 +#include "homa_rpc.h"
-+#include "homa_sock.h"
 +
 +/**
-+ * homa_interest_init_shared() - Initialize an interest and queue it up on a socket.
-+ * @interest:  Interest to initialize
-+ * @hsk:       Socket on which the interests should be queued. Must be locked
-+ *             by caller.
++ * homa_pacer_new() - Allocate and initialize a new pacer object, which
++ * will hold pacer-related information for @homa.
++ * @homa:   Homa transport that the pacer will be associated with.
++ * @net:    Network namespace that @homa is associated with.
++ * Return:  A pointer to the new struct pacer, or a negative errno.
 + */
-+void homa_interest_init_shared(struct homa_interest *interest,
-+			       struct homa_sock *hsk)
-+	__must_hold(&hsk->lock)
++struct homa_pacer *homa_pacer_new(struct homa *homa, struct net *net)
 +{
-+	interest->rpc = NULL;
-+	atomic_set(&interest->ready, 0);
-+	interest->core = raw_smp_processor_id();
-+	interest->blocked = 0;
-+	init_waitqueue_head(&interest->wait_queue);
-+	interest->hsk = hsk;
-+	list_add(&interest->links, &hsk->interests);
++	struct homa_pacer *pacer;
++	int err;
++
++	pacer = kmalloc(sizeof(*pacer), GFP_KERNEL | __GFP_ZERO);
++	if (!pacer)
++		return ERR_PTR(-ENOMEM);
++	pacer->homa = homa;
++	spin_lock_init(&pacer->mutex);
++	pacer->fifo_count = 1000;
++	spin_lock_init(&pacer->throttle_lock);
++	INIT_LIST_HEAD_RCU(&pacer->throttled_rpcs);
++	pacer->fifo_fraction = 50;
++	pacer->max_nic_queue_ns = 5000;
++	pacer->link_mbps = 25000;
++	pacer->throttle_min_bytes = 1000;
++	pacer->exit = false;
++	init_waitqueue_head(&pacer->wait_queue);
++	pacer->kthread = kthread_run(homa_pacer_main, pacer, "homa_pacer");
++	if (IS_ERR(pacer->kthread)) {
++		err = PTR_ERR(pacer->kthread);
++		pr_err("Homa couldn't create pacer thread: error %d\n", err);
++		goto error;
++	}
++	init_completion(&pacer->kthread_done);
++	atomic64_set(&pacer->link_idle_time, sched_clock());
++
++	homa_pacer_update_sysctl_deps(pacer);
++	return pacer;
++
++error:
++	homa_pacer_destroy(pacer);
++	return ERR_PTR(err);
 +}
 +
 +/**
-+ * homa_interest_init_private() - Initialize an interest that will wait
-+ * on a particular (private) RPC, and link it to that RPC.
-+ * @interest:   Interest to initialize.
-+ * @rpc:        RPC to associate with the interest. Must be private, and
-+ *              caller must have locked it.
-+ *
-+ * Return:      0 for success, otherwise a negative errno.
++ * homa_pacer_destroy() - Cleanup and destroy the pacer object for a Homa
++ * transport.
++ * @pacer:    Object to destroy; caller must not reference the object
++ *            again once this function returns.
 + */
-+int homa_interest_init_private(struct homa_interest *interest,
-+			       struct homa_rpc *rpc)
-+	__must_hold(&rpc->bucket->lock)
++void homa_pacer_destroy(struct homa_pacer *pacer)
 +{
-+	if (rpc->private_interest)
-+		return -EINVAL;
++	pacer->exit = true;
++	if (pacer->kthread) {
++		wake_up(&pacer->wait_queue);
++		kthread_stop(pacer->kthread);
++		wait_for_completion(&pacer->kthread_done);
++		pacer->kthread = NULL;
++	}
++	kfree(pacer);
++}
 +
-+	interest->rpc = rpc;
-+	atomic_set(&interest->ready, 0);
-+	interest->core = raw_smp_processor_id();
-+	interest->blocked = 0;
-+	init_waitqueue_head(&interest->wait_queue);
-+	interest->hsk = rpc->hsk;
-+	rpc->private_interest = interest;
++/**
++ * homa_pacer_check_nic_q() - This function is invoked before passing a
++ * packet to the NIC for transmission. It serves two purposes. First, it
++ * maintains an estimate of the NIC queue length. Second, it indicates to
++ * the caller whether the NIC queue is so full that no new packets should be
++ * queued (Homa's SRPT depends on keeping the NIC queue short).
++ * @pacer:    Pacer information for a Homa transport.
++ * @skb:      Packet that is about to be transmitted.
++ * @force:    True means this packet is going to be transmitted
++ *            regardless of the queue length.
++ * Return:    Nonzero is returned if either the NIC queue length is
++ *            acceptably short or @force was specified. 0 means that the
++ *            NIC queue is at capacity or beyond, so the caller should delay
++ *            the transmission of @skb. If nonzero is returned, then the
++ *            queue estimate is updated to reflect the transmission of @skb.
++ */
++int homa_pacer_check_nic_q(struct homa_pacer *pacer, struct sk_buff *skb,
++			   bool force)
++{
++	u64 idle, new_idle, clock, ns_for_packet;
++	int bytes;
++
++	bytes = homa_get_skb_info(skb)->wire_bytes;
++	ns_for_packet = pacer->ns_per_mbyte;
++	ns_for_packet *= bytes;
++	do_div(ns_for_packet, 1000000);
++	while (1) {
++		clock = sched_clock();
++		idle = atomic64_read(&pacer->link_idle_time);
++		if ((clock + pacer->max_nic_queue_ns) < idle && !force &&
++		    !(pacer->homa->flags & HOMA_FLAG_DONT_THROTTLE))
++			return 0;
++		if (idle < clock)
++			new_idle = clock + ns_for_packet;
++		else
++			new_idle = idle + ns_for_packet;
++
++		/* This method must be thread-safe. */
++		if (atomic64_cmpxchg_relaxed(&pacer->link_idle_time, idle,
++					     new_idle) == idle)
++			break;
++	}
++	return 1;
++}
++
++/**
++ * homa_pacer_main() - Top-level function for the pacer thread.
++ * @arg:  Pointer to pacer struct.
++ *
++ * Return:         Always 0.
++ */
++int homa_pacer_main(void *arg)
++{
++	struct homa_pacer *pacer = arg;
++
++	while (1) {
++		if (pacer->exit)
++			break;
++		pacer->wake_time = sched_clock();
++		homa_pacer_xmit(pacer);
++		pacer->wake_time = 0;
++		if (!list_empty(&pacer->throttled_rpcs)) {
++			/* NIC queue is full; before calling pacer again,
++			 * give other threads a chance to run (otherwise
++			 * low-level packet processing such as softirq could
++			 * get locked out).
++			 */
++			schedule();
++			continue;
++		}
++
++		wait_event(pacer->wait_queue, pacer->exit ||
++			   !list_empty(&pacer->throttled_rpcs));
++	}
++	kthread_complete_and_exit(&pacer->kthread_done, 0);
 +	return 0;
 +}
 +
 +/**
-+ * homa_interest_wait() - Wait for an interest to have an actionable RPC,
-+ * or for an error to occur.
-+ * @interest:     Interest to wait for; must previously have been initialized
-+ *                and linked to a socket or RPC. On return, the interest
-+ *                will have been unlinked if its ready flag is set; otherwise
-+ *                it may still be linked.
-+ * @nonblocking:  Nonzero means return without blocking if the interest
-+ *                doesn't become ready immediately.
-+ *
-+ * Return: 0 for success (there is an actionable RPC in the interest), or
-+ * a negative errno.
++ * homa_pacer_xmit() - Transmit packets from  the throttled list until
++ * either (a) the throttled list is empty or (b) the NIC queue has
++ * reached maximum allowable length. Note: this function may be invoked
++ * from either process context or softirq (BH) level. This function is
++ * invoked from multiple places, not just in the pacer thread. The reason
++ * for this is that (as of 10/2019) Linux's scheduling of the pacer thread
++ * is unpredictable: the thread may block for long periods of time (e.g.,
++ * because it is assigned to the same CPU as a busy interrupt handler).
++ * This can result in poor utilization of the network link. So, this method
++ * gets invoked from other places as well, to increase the likelihood that we
++ * keep the link busy. Those other invocations are not guaranteed to happen,
++ * so the pacer thread provides a backstop.
++ * @pacer:    Pacer information for a Homa transport.
 + */
-+int homa_interest_wait(struct homa_interest *interest, int nonblocking)
++void homa_pacer_xmit(struct homa_pacer *pacer)
 +{
-+	struct homa_sock *hsk = interest->hsk;
-+	int result = 0;
-+	int iteration;
-+	int wait_err;
++	struct homa_rpc *rpc;
++	s64 queue_ns;
 +
-+	interest->blocked = 0;
++	/* Make sure only one instance of this function executes at a time. */
++	if (!spin_trylock_bh(&pacer->mutex))
++		return;
 +
-+	/* This loop iterates in order to poll and/or reap dead RPCS. */
-+	for (iteration = 0; ; iteration++) {
-+		if (iteration != 0)
-+			/* Give NAPI/SoftIRQ tasks a chance to run. */
-+			schedule();
++	while (1) {
++		queue_ns = atomic64_read(&pacer->link_idle_time) - sched_clock();
++		if (queue_ns >= pacer->max_nic_queue_ns)
++			break;
++		if (list_empty(&pacer->throttled_rpcs))
++			break;
 +
-+		if (atomic_read_acquire(&interest->ready) != 0)
-+			goto done;
++		/* Lock the first throttled RPC. This may not be possible
++		 * because we have to hold throttle_lock while locking
++		 * the RPC; that means we can't wait for the RPC lock because
++		 * of lock ordering constraints (see sync.txt). Thus, if
++		 * the RPC lock isn't available, do nothing. Holding the
++		 * throttle lock while locking the RPC is important because
++		 * it keeps the RPC from being deleted before it can be locked.
++		 */
++		homa_pacer_throttle_lock(pacer);
++		pacer->fifo_count -= pacer->fifo_fraction;
++		if (pacer->fifo_count <= 0) {
++			struct homa_rpc *cur;
++			u64 oldest = ~0;
 +
-+		/* See if we can cleanup dead RPCs while waiting. */
-+		if (homa_rpc_reap(hsk, false) != 0)
-+			continue;
++			pacer->fifo_count += 1000;
++			rpc = NULL;
++			list_for_each_entry(cur, &pacer->throttled_rpcs,
++						throttled_links) {
++				if (cur->msgout.init_ns < oldest) {
++					rpc = cur;
++					oldest = cur->msgout.init_ns;
++				}
++			}
++		} else {
++			rpc = list_first_entry_or_null(&pacer->throttled_rpcs,
++						       struct homa_rpc,
++						       throttled_links);
++		}
++		if (!rpc) {
++			homa_pacer_throttle_unlock(pacer);
++			break;
++		}
++		if (!homa_rpc_try_lock(rpc)) {
++			homa_pacer_throttle_unlock(pacer);
++			break;
++		}
++		homa_pacer_throttle_unlock(pacer);
 +
-+		if (nonblocking) {
-+			result = -EAGAIN;
++		homa_xmit_data(rpc, true);
++
++		/* Note: rpc->state could be RPC_DEAD here, but the code
++		 * below should work anyway.
++		 */
++		if (!*rpc->msgout.next_xmit)
++			/* No more data can be transmitted from this message
++			 * (right now), so remove it from the throttled list.
++			 */
++			homa_pacer_unmanage_rpc(rpc);
++		homa_rpc_unlock(rpc);
++	}
++	spin_unlock_bh(&pacer->mutex);
++}
++
++/**
++ * homa_pacer_manage_rpc() - Arrange for the pacer to transmit packets
++ * from this RPC (make sure that an RPC is on the throttled list and wake up
++ * the pacer thread if necessary).
++ * @rpc:     RPC with outbound packets that have been granted but can't be
++ *           sent because of NIC queue restrictions. Must be locked by caller.
++ */
++void homa_pacer_manage_rpc(struct homa_rpc *rpc)
++	__must_hold(rpc_bucket_lock)
++{
++	struct homa_pacer *pacer = rpc->hsk->homa->pacer;
++	struct homa_rpc *candidate;
++	int bytes_left;
++	int checks = 0;
++
++	if (!list_empty(&rpc->throttled_links))
++		return;
++	bytes_left = rpc->msgout.length - rpc->msgout.next_xmit_offset;
++	homa_pacer_throttle_lock(pacer);
++	list_for_each_entry(candidate, &pacer->throttled_rpcs,
++				throttled_links) {
++		int bytes_left_cand;
++
++		checks++;
++
++		/* Watch out: the pacer might have just transmitted the last
++		 * packet from candidate.
++		 */
++		bytes_left_cand = candidate->msgout.length -
++				candidate->msgout.next_xmit_offset;
++		if (bytes_left_cand > bytes_left) {
++			list_add_tail(&rpc->throttled_links,
++					  &candidate->throttled_links);
 +			goto done;
 +		}
-+
-+		break;
 +	}
-+
-+	interest->blocked = 1;
-+	wait_err = wait_event_interruptible_exclusive(interest->wait_queue,
-+			atomic_read_acquire(&interest->ready) != 0);
-+	if (wait_err == -ERESTARTSYS)
-+		result = -EINTR;
-+
++	list_add_tail(&rpc->throttled_links, &pacer->throttled_rpcs);
 +done:
-+	return result;
++	homa_pacer_throttle_unlock(pacer);
++	wake_up(&pacer->wait_queue);
 +}
 +
 +/**
-+ * homa_interest_notify_private() - If a thread is waiting on the private
-+ * interest for an RPC, wake it up.
-+ * @rpc:      RPC that may (potentially) have a private interest. Must be
-+ *            locked by the caller.
++ * homa_pacer_unmanage_rpc() - Make sure that an RPC is no longer managed
++ * by the pacer.
++ * @rpc:     RPC of interest.
 + */
-+void homa_interest_notify_private(struct homa_rpc *rpc)
-+	__must_hold(&rpc->bucket->lock)
++void homa_pacer_unmanage_rpc(struct homa_rpc *rpc)
++	__must_hold(rpc_bucket_lock)
 +{
-+	if (rpc->private_interest) {
-+		atomic_set_release(&rpc->private_interest->ready, 1);
-+		wake_up(&rpc->private_interest->wait_queue);
++	struct homa_pacer *pacer = rpc->hsk->homa->pacer;
++
++	if (unlikely(!list_empty(&rpc->throttled_links))) {
++		homa_pacer_throttle_lock(pacer);
++		list_del_init(&rpc->throttled_links);
++		homa_pacer_throttle_unlock(pacer);
 +	}
 +}
 +
-diff --git a/net/homa/homa_interest.h b/net/homa/homa_interest.h
++/**
++ * homa_pacer_update_sysctl_deps() - Update any pacer fields that depend
++ * on values set by sysctl. This function is invoked anytime a pacer sysctl
++ * value is updated.
++ * @pacer:   Pacer to update.
++ */
++void homa_pacer_update_sysctl_deps(struct homa_pacer *pacer)
++{
++	u64 tmp;
++
++	tmp = 8 * 1000ULL * 1000ULL * 1000ULL;
++
++	/* Underestimate link bandwidth (overestimate time) by 1%. */
++	tmp = tmp * 101 / 100;
++	do_div(tmp, pacer->link_mbps);
++	pacer->ns_per_mbyte = tmp;
++}
++
+diff --git a/net/homa/homa_pacer.h b/net/homa/homa_pacer.h
 new file mode 100644
-index 000000000000..78111bf68b6c
+index 000000000000..c6318dfe8878
 --- /dev/null
-+++ b/net/homa/homa_interest.h
-@@ -0,0 +1,100 @@
++++ b/net/homa/homa_pacer.h
+@@ -0,0 +1,185 @@
 +/* SPDX-License-Identifier: BSD-2-Clause */
 +
-+/* This file defines struct homa_interest and related functions.  */
++/* This file defines structs and functions related to the Homa pacer,
++ * which implements SRPT for packet output. In order to do that, it
++ * throttles packet transmission to prevent the buildup of
++ * large queues in the NIC.
++ */
 +
-+#ifndef _HOMA_INTEREST_H
-+#define _HOMA_INTEREST_H
++#ifndef _HOMA_PACER_H
++#define _HOMA_PACER_H
 +
-+#include "homa_rpc.h"
-+#include "homa_sock.h"
++#include "homa_impl.h"
 +
 +/**
-+ * struct homa_interest - Used by homa_wait_private and homa_wait_shared to
-+ * wait for incoming message data to arrive for an RPC. An interest can
-+ * be either private (if referenced by an rpc->private_interest) or shared
-+ * (if present on hsk->interests).
++ * struct homa_pacer - Contains information that the pacer users to
++ * manage packet output. There is one instance of this object stored
++ * in each struct homa.
 + */
-+struct homa_interest {
-+	/**
-+	 * @rpc: If ready is set, then this holds an RPC that needs
-+	 * attention, or NULL if this is a shared interest and hsk has
-+	 * been shutdown. If ready is not set, this will be NULL if the
-+	 * interest is shared; if it's private, it holds the RPC the
-+	 * interest is associated with. If non-NULL, a reference has been
-+	 * taken on the RPC.
-+	 */
-+	struct homa_rpc *rpc;
++struct homa_pacer {
++	/** @homa: Transport that this pacer is associated with. */
++	struct homa *homa;
 +
 +	/**
-+	 * @ready: Nonzero means the interest is ready for attention: either
-+	 * there is an RPC that needs attention or @hsk has been shutdown.
++	 * @mutex: Ensures that only one instance of homa_pacer_xmit
++	 * runs at a time. Only used in "try" mode: never block on this.
 +	 */
-+	atomic_t ready;
++	spinlock_t mutex;
 +
 +	/**
-+	 * @core: Core on which homa_wait_*was invoked.  This is a hint
-+	 * used for load balancing (see balance.txt).
++	 * @fifo_count: When this becomes <= zero, it's time for the
++	 * pacer to allow the oldest RPC to transmit.
 +	 */
-+	int core;
++	int fifo_count;
 +
 +	/**
-+	 * @blocked: Zero means a handoff was received without the thread
-+	 * needing to block; nonzero means the thread blocked.
++	 * @wake_time: time (in sched_clock units) when the pacer last
++	 * woke up (if the pacer is running) or 0 if the pacer is sleeping.
 +	 */
-+	int blocked;
++	u64 wake_time;
 +
 +	/**
-+	 * @wait_queue: Used to block the thread while waiting (will never
-+	 * have more than one queued thread).
++	 * @throttle_lock: Used to synchronize access to @throttled_rpcs. Must
++	 * hold when inserting or removing an RPC from throttled_rpcs.
++	 */
++	spinlock_t throttle_lock;
++
++	/**
++	 * @throttled_rpcs: Contains all homa_rpcs that have bytes ready
++	 * for transmission, but which couldn't be sent without exceeding
++	 * the NIC queue limit.
++	 */
++	struct list_head throttled_rpcs;
++
++	/**
++	 * @fifo_fraction: Out of every 1000 packets transmitted by the
++	 * pacer, this number will be transmitted from the oldest message
++	 * rather than the highest-priority message. Set externally via
++	 * sysctl.
++	 */
++	int fifo_fraction;
++
++	/**
++	 * @max_nic_queue_ns: Limits the NIC queue length: we won't queue
++	 * up a packet for transmission if link_idle_time is this many
++	 * nanoseconds in the future (or more). Set externally via sysctl.
++	 */
++	int max_nic_queue_ns;
++
++	/**
++	 * @link_mbps: The raw bandwidth of the network uplink, in
++	 * units of 1e06 bits per second.  Set externally via sysctl.
++	 */
++	int link_mbps;
++
++	/**
++	 * @ns_per_mbyte: the number of ns that it takes to transmit
++	 * 10**6 bytes on our uplink. This is actually a slight overestimate
++	 * of the value, to ensure that we don't underestimate NIC queue
++	 * length and queue too many packets.
++	 */
++	u32 ns_per_mbyte;
++
++	/**
++	 * @throttle_min_bytes: If a packet has fewer bytes than this, then it
++	 * bypasses the throttle mechanism and is transmitted immediately.
++	 * We have this limit because for very small packets CPU overheads
++	 * make it impossible to keep up with the NIC so (a) the NIC queue
++	 * can't grow and (b) using the pacer would serialize all of these
++	 * packets through a single core, which makes things even worse.
++	 * Set externally via sysctl.
++	 */
++	int throttle_min_bytes;
++
++	/**
++	 * @exit: true means that the pacer thread should exit as
++	 * soon as possible.
++	 */
++	bool exit;
++
++	/**
++	 * @wait_queue: Used to block the pacer thread when there
++	 * are no throttled RPCs.
 +	 */
 +	struct wait_queue_head wait_queue;
 +
-+	/** @hsk: Socket that the interest is associated with. */
-+	struct homa_sock *hsk;
++	/**
++	 * @kthread: Kernel thread that transmits packets from
++	 * throttled_rpcs in a way that limits queue buildup in the
++	 * NIC.
++	 */
++	struct task_struct *kthread;
 +
 +	/**
-+	 * @links: If the interest is shared, used to link this object into
-+	 * @hsk->interests.
++	 * @kthread_done: Used to wait for @kthread to exit.
 +	 */
-+	struct list_head links;
++	struct completion kthread_done;
++
++	/**
++	 * @link_idle_time: The time, measured by sched_clock, at which we
++	 * estimate that all of the packets we have passed to the NIC for
++	 * transmission will have been transmitted. May be in the past.
++	 * This estimate assumes that only Homa is transmitting data, so
++	 * it could be a severe underestimate if there is competing traffic
++	 * from, say, TCP. Access only with atomic ops.
++	 */
++	atomic64_t link_idle_time ____cacheline_aligned_in_smp;
 +};
 +
++int      homa_pacer_check_nic_q(struct homa_pacer *pacer,
++				struct sk_buff *skb, bool force);
++int      homa_pacer_dointvec(const struct ctl_table *table, int write,
++			     void *buffer, size_t *lenp, loff_t *ppos);
++void     homa_pacer_destroy(struct homa_pacer *pacer);
++void     homa_pacer_unmanage_rpc(struct homa_rpc *rpc);
++void     homa_pacer_log_throttled(struct homa_pacer *pacer);
++int      homa_pacer_main(void *transport);
++void     homa_pacer_manage_rpc(struct homa_rpc *rpc);
++struct homa_pacer *homa_pacer_new(struct homa *homa, struct net *net);
++void     homa_pacer_throttle_lock_slow(struct homa_pacer *pacer);
++void     homa_pacer_update_sysctl_deps(struct homa_pacer *pacer);
++void     homa_pacer_xmit(struct homa_pacer *pacer);
++
 +/**
-+ * homa_interest_unlink_shared() - Remove an interest from the list for a
-+ * socket. Note: this can race with homa_rpc_handoff, so on return it's
-+ * possible that the interest is ready.
-+ * @interest:    Interest to remove. Must have been initialized with
-+ *               homa_interest_init_shared.
++ * homa_pacer_check() - This method is invoked at various places in Homa to
++ * see if the pacer needs to transmit more packets and, if so, transmit
++ * them. It's needed because the pacer thread may get descheduled by
++ * Linux, result in output stalls.
++ * @pacer:    Pacer information for a Homa transport.
 + */
-+static inline void homa_interest_unlink_shared(struct homa_interest *interest)
++static inline void homa_pacer_check(struct homa_pacer *pacer)
 +{
-+	if (!list_empty(&interest->links)) {
-+		homa_sock_lock(interest->hsk);
-+		list_del_init(&interest->links);
-+		homa_sock_unlock(interest->hsk);
-+	}
++	if (list_empty(&pacer->throttled_rpcs))
++		return;
++
++	/* The ">> 1" in the line below gives homa_pacer_main the first chance
++	 * to queue new packets; if the NIC queue becomes more than half
++	 * empty, then we will help out here.
++	 */
++	if ((sched_clock() + (pacer->max_nic_queue_ns >> 1)) <
++			atomic64_read(&pacer->link_idle_time))
++		return;
++	homa_pacer_xmit(pacer);
 +}
 +
 +/**
-+ * homa_interest_unlink_private() - Detach a private interest from its
-+ * RPC. Note: this can race with homa_rpc_handoff, so on return it's
-+ * possible that the interest is ready.
-+ * @interest:    Interest to remove. Must have been initialized with
-+ *               homa_interest_init_private. Its RPC must be locked by
-+ *               the caller.
++ * homa_pacer_throttle_lock() - Acquire the throttle lock.
++ * @pacer:    Pacer information for a Homa transport.
 + */
-+static inline void homa_interest_unlink_private(struct homa_interest *interest)
-+	__must_hold(&interest->rpc->bucket->lock)
++static inline void homa_pacer_throttle_lock(struct homa_pacer *pacer)
++	__acquires(&pacer->throttle_lock)
 +{
-+	if (interest == interest->rpc->private_interest)
-+		interest->rpc->private_interest = NULL;
++	spin_lock_bh(&pacer->throttle_lock);
 +}
 +
-+void     homa_interest_init_shared(struct homa_interest *interest,
-+	struct homa_sock *hsk);
-+int      homa_interest_init_private(struct homa_interest *interest,
-+				    struct homa_rpc *rpc);
-+void     homa_interest_notify_private(struct homa_rpc *rpc);
-+int      homa_interest_wait(struct homa_interest *interest, int nonblocking);
++/**
++ * homa_pacer_throttle_unlock() - Release the throttle lock.
++ * @pacer:    Pacer information for a Homa transport.
++ */
++static inline void homa_pacer_throttle_unlock(struct homa_pacer *pacer)
++	__releases(&pacer->throttle_lock)
++{
++	spin_unlock_bh(&pacer->throttle_lock);
++}
 +
-+#endif /* _HOMA_INTEREST_H */
++#endif /* _HOMA_PACER_H */
 -- 
 2.43.0
 
