@@ -1,97 +1,115 @@
-Return-Path: <netdev+bounces-187374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAB2CAA6B6C
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 09:16:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FAA1AA6B84
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 09:25:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BF131BA3B12
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 07:16:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 411F61BA5F59
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 07:25:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CD651DC9B5;
-	Fri,  2 May 2025 07:16:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B173321A94F;
+	Fri,  2 May 2025 07:24:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nqFVcs+m"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FAkB8YHC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 602B319DF41;
-	Fri,  2 May 2025 07:16:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D5CD1A0BC9
+	for <netdev@vger.kernel.org>; Fri,  2 May 2025 07:24:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746170175; cv=none; b=hacfcBlJt9CfjG2uEPyujxg1rB6St7L4mVOzS9TwKHApxQQf4omUq9kq6jW3tei+qY0qCmlMwGfaQEC5DCVw/XMfUByFlI8ZllobvUtevejFoRYPDz0vAK1M6itiM4bDHx63JEBYcEWznfx2a6vEolCuEehw2Ie1Xbx950gmFnA=
+	t=1746170693; cv=none; b=AOMOiDIW8P2pCYVaIaZnAN1m+7mlvZOz0wLMQnp+RoeNuTW4giBCZrxEX/CDqU0CYCOWnKCwolNPbYmuYQZii9JXT3LvtWvZ5YfWw5bc8h5U0PA5+0q3nOfacBURbpbRhi7yHIvPrP4Bq2ObBvvyZqCNiAFVUFv5cTnVJZl6cl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746170175; c=relaxed/simple;
-	bh=2ogR7mfOhi8SAd6iUoSl0ROEi0IAYvwqSFk3KRePUPY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ALZPpsqlNHxanuawmmQMedSXeskaOCSFf2k7KP4MNBUkvz0COPgqQq3FIiY9fBL1diD4fCSbdGyliBMzcy3JmMpYL6SeGMdVRsM5XUFy8fk7vyXyqedn6RneCsyOfzcTQqpKne42XQeHqvZgW1Uw5nkPEvL5b4z0P1Gii587TjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nqFVcs+m; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA457C4CEE4;
-	Fri,  2 May 2025 07:16:09 +0000 (UTC)
+	s=arc-20240116; t=1746170693; c=relaxed/simple;
+	bh=xBVcTSqslDhrYoHxQhgGftWrfyvr7UPOdVSdqhSYldQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bwo4QGCzEAFHh7rAZQ9hyfiGTIgk4TmbJNfMv2SK/CCK2W6OIx4Qy5IOyEYw+/gjDJryHnl5R/aKPk8IcUzmtAG8Z+eGDbNDyPF0yGTHLpSkcGiApCyRsQTdxtQb1blGpTJFj48eORtV0NVwA8UZOyI0DkavVDlddyBJObwAtt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FAkB8YHC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1EE4C4CEE4;
+	Fri,  2 May 2025 07:24:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746170174;
-	bh=2ogR7mfOhi8SAd6iUoSl0ROEi0IAYvwqSFk3KRePUPY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=nqFVcs+m7CD22XXjLVFYTwWYYNfjvquVL6Xm+Qe5tdQ8rKzT+HRRM1HJEJUTVkzl8
-	 YtzzrLxmj+D+KKSNCinTu+utxmemTZej0K2+MDFm0BDGsWZ/qkqWX9d3TMsal2k7Gx
-	 YPs5Er8oQ3EbhPLmtdVVzNQgFewOqoSIvrJBoRVOqbT7zlvdfp64oOY0rcyAvU2UTO
-	 NcB7wDURJ+Wgg79KooIqI6zfzzIvmkeZpZS8bjXuIvqMhvoqgAKKhRswVMOeZ2Ft26
-	 f2GufgW8o+Ts0IFQByjedILDPEVwrmBJG+YN1BVkQPwcRunKeiObJnoGG8oZNisLlw
-	 c6v2FQeoL3SJA==
-Message-ID: <0608a65d-f657-4ef3-aeea-7b2664aa7625@kernel.org>
-Date: Fri, 2 May 2025 09:16:08 +0200
+	s=k20201202; t=1746170692;
+	bh=xBVcTSqslDhrYoHxQhgGftWrfyvr7UPOdVSdqhSYldQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FAkB8YHCAzyCDzXwJKoSUPr5WZ6fEnearravg1Of1dPwt3uTGeTIOom6RrQPiD0CY
+	 4Yf0xHar9Z84goeBj0zNLvwgK3Rjy4d9RbXBGylAlhap3YIwo5PkR0SeF0W3d8KaV1
+	 2Id6Xisig1TJQMEwnYWo0ilFsvbRyXE8MavWucAjtntnlEDIzGRsD8vLNEzfl4LW9X
+	 +GCbyZudlxvGHkep/kcrPIdE9S/gbYv4OEzWD5aGLjWFV1NRNTKekgs6yVc4CWWQgX
+	 cRw+Zg4oWvAd8ge6kbNaRk5m1hjwEstQ9vNg8iC6X4oWruAFmtXBscXaI7PDGtWZQk
+	 TOBWDQvhRCvOQ==
+Date: Fri, 2 May 2025 09:24:49 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	Simon Horman <horms@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>
+Subject: Re: [PATCH net v4] net: airoha: Add missing filed to ppe_mbox_data
+ struct
+Message-ID: <aBRzQaonAK0IyAsu@lore-desk>
+References: <20250429-airoha-en7581-fix-ppe_mbox_data-v4-1-d2a8b901dad0@kernel.org>
+ <20250501071518.50c92e8c@kernel.org>
+ <aBPdyn580lxUMJKz@lore-desk>
+ <20250501174140.6dc31b36@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 0/4] Bug fixes from XDP patch series
-To: Meghana Malladi <m-malladi@ti.com>, dan.carpenter@linaro.org,
- john.fastabend@gmail.com, daniel@iogearbox.net, ast@kernel.org,
- pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
- davem@davemloft.net, andrew+netdev@lunn.ch
-Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, srk@ti.com,
- Vignesh Raghavendra <vigneshr@ti.com>, Roger Quadros <rogerq@kernel.org>,
- danishanwar@ti.com
-References: <20250428120459.244525-1-m-malladi@ti.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20250428120459.244525-1-m-malladi@ti.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="8z+Krzeqpybywa3l"
+Content-Disposition: inline
+In-Reply-To: <20250501174140.6dc31b36@kernel.org>
 
 
+--8z+Krzeqpybywa3l
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 28/04/2025 14.04, Meghana Malladi wrote:
-> This patch series fixes the bugs introduced while adding
-> xdp support in the icssg driver, and were reproduced while
-> running xdp-trafficgen to generate xdp traffic on icssg interfaces.
-> 
+> On Thu, 1 May 2025 22:47:06 +0200 Lorenzo Bianconi wrote:
+> > On May 01, Jakub Kicinski wrote:
+> > > On Tue, 29 Apr 2025 16:17:41 +0200 Lorenzo Bianconi wrote: =20
+> > > > Moreover, add __packed attribute to ppe_mbox_data struct definition=
+ and
+> > > > make the fw layout padding explicit in init_info struct. =20
+> > >=20
+> > > Why? everything looks naturally packed now :( =20
+> >=20
+> > What I mean here is the padding in the ppe_mbox_data struct used by the=
+ fw running
+> > on the NPU, not in the version used by the airoha_eth driver, got my po=
+int?
+> > Sorry, re-reading it, it was not so clear, I agree.
+>=20
+> You mean adding the "u8 rsv[3];" ? that is fine.
+> I don't get why we also need to add the 3 __packed
 
-This patchset clearly hurts performance by introducing a lot of locking.
+I agree the __packed attributes are not mandatory at the moment, we just ag=
+reed
+with Jacob that is fine to add them. Do you prefer to get rid of them?
 
-Can you please report what the performance regressions this is introducing?
+Regards,
+Lorenzo
 
+--8z+Krzeqpybywa3l
+Content-Type: application/pgp-signature; name=signature.asc
 
-> Meghana Malladi (4):
->    net: ti: icssg-prueth: Set XDP feature flags for ndev
->    net: ti: icssg-prueth: Report BQL before sending XDP packets
->    net: ti: icssg-prueth: Fix race condition for traffic from different
->      network sockets
->    net: ti: icssg-prueth: Fix kernel panic during concurrent Tx queue
->      access
-> 
->   drivers/net/ethernet/ti/icssg/icssg_common.c | 22 ++++++++++++++++++--
->   drivers/net/ethernet/ti/icssg/icssg_prueth.c | 16 ++++++++------
->   drivers/net/ethernet/ti/icssg/icssg_prueth.h |  1 +
->   3 files changed, 31 insertions(+), 8 deletions(-)
-> 
-> 
-> base-commit: cc17b4b9c332cc654b248619c1d8ca40d80d1155
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaBRzQQAKCRA6cBh0uS2t
+rEj4AQDe3T0L3mBOJoJrm2ODy4pvV1izGwKl5Xcprsl1zcOb5AD/TU2XoaKwtEM+
+Kj3qInfF17qy9bHaZFyNa6OmGmWI8AQ=
+=7uwp
+-----END PGP SIGNATURE-----
+
+--8z+Krzeqpybywa3l--
 
