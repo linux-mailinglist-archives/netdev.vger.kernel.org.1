@@ -1,162 +1,199 @@
-Return-Path: <netdev+bounces-187395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C43CAA6DA6
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 11:08:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FAA5AA6DC0
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 11:11:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F108B7A9F4C
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 09:07:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B017D17D6BF
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 09:10:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88FAA26A082;
-	Fri,  2 May 2025 09:04:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43FC023A995;
+	Fri,  2 May 2025 09:08:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EHP2L7o9"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="yHhrXQDF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75927267B77;
-	Fri,  2 May 2025 09:04:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0A1A23184A;
+	Fri,  2 May 2025 09:08:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746176674; cv=none; b=Ddc/Mcm/Lfh1Q+MlpODEFDtiTUDgv6W5oRWrPn5VCpazY8yUqdQPg6OFJbVbjQCkDzrBy9VBNpybglMJwnvbYjwNt+7E6wKlcg05dC5Jt5oSoPxKn6lS/Ji/Ybh0m/pxytHEQKFSBIEnSG5kEnsOVuP7a+aan5vcNHteALuaWk4=
+	t=1746176905; cv=none; b=jFsP4CUp8pSeRtWI94H2vxOBHaYO0UTvCvWgHHU3kYxm9p6tlzVk0s83HhmMUsGR0wkmgXCKWOZMEvb4zRqcoE85xOM7cx6xG/c7AW2reVRgxQ6oY8YCmG6UQerc3i/yqqTDuFUBO7bDF2JobhoEx77X4QZ9ETC4/BlWn/4z2zk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746176674; c=relaxed/simple;
-	bh=I7kWDbCb9YT/O0Cj2R2bStAeSRvHrutnIYH0yo5EYFA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=t76UFxCbQCkp90228Q+7CN0MXWONgRek/Ozbh/GiS3ODFNXN0CRDzJukUpPWUkDcDhJNmWFIxNseXL/Nb8HkpBaqo80pCPs5fGzGdQ3AvJIP3XvOx/N0fE7E6exkQPFrgcYauz3/LfHKEiCd/lgDa4ohyF1tpHsgaKMY0Tye5M8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EHP2L7o9; arc=none smtp.client-ip=209.85.128.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-6fead317874so15771147b3.0;
-        Fri, 02 May 2025 02:04:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746176671; x=1746781471; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ax6rAQxnmMYtNEHshOX9p41p7YxJfMs7tSxdQeWwIh8=;
-        b=EHP2L7o9uzzb5K7rVvAG0U3ueCu+nA8hXzCKmoFEP8bUPmOrIiKhzoLQpcToBjeccW
-         /WdJhbC/iX3kT/Oj8s+P0KXkJNZHc3A9e4x4SdaTi65sK+M3nU5qrL/RctvnN9bFbrqB
-         JqTIdBdsNUGVsjfVRMlImVFWTexnyaofAjPoYVXzi6386tRevDilERE09LNYbOhtRV/7
-         J/7wBR8IDOJjyP09ERpq4IF2hVFK+faLABwK4tTiiwTCUyXAGq3pysvAg/5PGbHtcYh3
-         ccTqkmSkso923v5xrBjF3z53bLrLJrU+S5RymYyz4VZh/HVvU85fr1uFlkPF1yh8m8q7
-         Dfkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746176671; x=1746781471;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ax6rAQxnmMYtNEHshOX9p41p7YxJfMs7tSxdQeWwIh8=;
-        b=rcgd2HdToi3VGbJ72uzz4XjBtK2rpUItG9aPt6jmxyclGriSuaGlSRJbzv96UJA3V2
-         FrzhDiipfiShb+T/BfkV+mcmgu/pIJ1O3DwYWgA/br0hdpfhw96MmbHDqP++mrvIU4Pe
-         jEA6oaalPxg6ztE6Own1IbjUeZtkNo1ROqjwIMmtUhQBIx1+lqZmTCVBGo0o1OcCYB10
-         MOa+vM0VWaCdI9hcNO09flDOCugmi1lnRoe/v2RokBt5QnVvWttxjSmFIDqz0yGq9bpc
-         iSSbtP9sKUtSV6/n7bfac43UYAIBmXFeZGkCDLKRUdvgtOzoN4BYghB58YeVEIq6P8np
-         FFAw==
-X-Forwarded-Encrypted: i=1; AJvYcCUcT8i1YTvWGEfiRdrcmGKs92qHcl5uPwlXtCDgqJBFYXeuuusXF13pk8F9N4oqpkopiyjpeno6yfzh5IX2ir4=@vger.kernel.org, AJvYcCUuhidYu0piXblS3dtZpppuxfC90DKv4GpVpa8ZytfC+44qmzg0dZ7Y5c/wFCWV4BxCurwZ010q1PxJjg==@vger.kernel.org, AJvYcCV5VjhM2yySPliwv4JiWLBrfChCl4Vfn5mxGpZifDC3teyjlevx+vM9fla/lY0akzYiO9JfnRCaaoGA@vger.kernel.org, AJvYcCVSrI377ArsAHzNhz03ZUkP2PSdH3Bw+2oDU8LkvdHXF0xPbS443OaMG7ZqiGdRRKjcNTRLEweXCaz3@vger.kernel.org, AJvYcCWAtmF56APy6D45Le4Cusho02EcH/3p78tGY0qQQLBcHyRQW1lQCpmXCSbU1TmEnYjNRFnyK5XvalMnmepO@vger.kernel.org, AJvYcCWabstch6zBM8uGmmGHd6qp6dR66IUr0A4SqEz7CeYkw410wB9LQFkxPGFrvrlbrDaGcYWUqSWa6WbT@vger.kernel.org, AJvYcCWsp0xdoL1q4Z/ywX6zqKVLJRtI/ziyetGe9sR9ppIapMBov+C3ln5nmfe+gm3MBJ5PtGvOwowMKhJCwHk=@vger.kernel.org, AJvYcCXBxT4p3DYAz3uASiHh7mPhOG7WDtccg5E1bKMuD20973jlQr8ip4QgNrWboEvJncqtyjuaeSUioN4=@vger.kernel.org, AJvYcCXv0N2Eb4L6F/H7zFaA3Srkk8CX0rTzVrxYK+yU9LJz7AcYD3+9QsvNRIBPBR9QPRCu4uoc6RKM@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWPElaiTtdND9WHemUoS/sPU6GlZ3c+YzwOfrvNj8g6bJKi/Vt
-	7xX1+08jg6oTeYZL9JbUJG9WjLUV57fpfKr4RRnaCPuBtAmHHoaIRcu6XA2/9e+Jch3wV5QjqJf
-	vqRLhIDDXqpZ3t98+zOyjahEC60Y=
-X-Gm-Gg: ASbGncuqgu2NCJdWa2ZzKmyI3FtN1MDFFhUr4HMlrldJJaBbQSKapl+ZN6ik+S4iBh4
-	9KdLhNulu42Gnygr9F7EaV9z/MMfxZq7PH4KKo8aDlvuFwckPTh0pGEC82588DIUG4AduaYYkWL
-	WaO0HfFQgZmq8JAUEXy9j9mDWxJK6zqFoX6aYGsIG5quYVsPgapnXdYQ==
-X-Google-Smtp-Source: AGHT+IFeIif58xXASLlUQ5gUuhwQWQfmgZ6uEgeqnbXUDfU31RgSE83NowbSJaAJgLlbclQ9hMc30P2+IT7ECEc6eyc=
-X-Received: by 2002:a05:690c:7307:b0:703:ac44:d367 with SMTP id
- 00721157ae682-708ced214admr35881097b3.6.1746176671162; Fri, 02 May 2025
- 02:04:31 -0700 (PDT)
+	s=arc-20240116; t=1746176905; c=relaxed/simple;
+	bh=eNLevQHHQAD4rAIc55GjBUxARGFUE3AIHvX1ZNgcr9w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=UO8vRJJ6k7BLSJPeRz2AlZeK1D6smXBZvJBJJAjcynNHrGEJv1Q/8qx0SQXVsoZdkNGbVXNcgnUJB05GGKrFfqHYPpAziQqzb0qYQHs+DXhpTAf/pCP8zWj7vA9AZ7BVZhzIJP9rtPPR9omp6MYDS7vn/7eMOsUORBZ3d4N1yhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=yHhrXQDF; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 54297thx3827106
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 2 May 2025 04:07:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1746176875;
+	bh=MCXA41Ish/7Jei7o/eseHM2xmg9pFZPuBLzeUlIR67s=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=yHhrXQDFMyCoPhhHLWtaWNqza8g8gbzocqHe3jZNQr4zIl5LCrvxpjVAUbxomKH9w
+	 C58fcII/WAi7JUFCBV0zhEBEQyKRvw4bqTkhgQQkjgzdhRFW2JMi43DfREvQU0U+WO
+	 rqMLMfS6RdmTrGDUTpphESBUVEulV/0e0vPbl1sA=
+Received: from DLEE103.ent.ti.com (dlee103.ent.ti.com [157.170.170.33])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 54297t4N021278
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Fri, 2 May 2025 04:07:55 -0500
+Received: from DLEE109.ent.ti.com (157.170.170.41) by DLEE103.ent.ti.com
+ (157.170.170.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 2
+ May 2025 04:07:55 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE109.ent.ti.com
+ (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 2 May 2025 04:07:54 -0500
+Received: from [172.24.30.16] (lt9560gk3.dhcp.ti.com [172.24.30.16])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 54297nmp052556;
+	Fri, 2 May 2025 04:07:50 -0500
+Message-ID: <f6434e4a-c37c-41dc-91b4-0cc2d33730ba@ti.com>
+Date: Fri, 2 May 2025 14:37:49 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250423094058.1656204-1-tmyu0@nuvoton.com> <20250423094058.1656204-2-tmyu0@nuvoton.com>
- <20250501122214.GK1567507@google.com> <CAOoeyxVL2MV83CJaYCXMiw0b5YUzk728H4B9GY1q9h_P8D43fg@mail.gmail.com>
- <20250502080754.GD3865826@google.com>
-In-Reply-To: <20250502080754.GD3865826@google.com>
-From: Ming Yu <a0282524688@gmail.com>
-Date: Fri, 2 May 2025 17:04:19 +0800
-X-Gm-Features: ATxdqUELjUMd__-XSmruQ7aiBehkcn0fiRFxm_J9Q8eFjgTFGBlNo-dtZFMfegY
-Message-ID: <CAOoeyxWpYmcg1_FBXYqDfMi28R5ZXp2Sk2PhUo=cL10Nn3iVEw@mail.gmail.com>
-Subject: Re: [PATCH v10 1/7] mfd: Add core driver for Nuvoton NCT6694
-To: Lee Jones <lee@kernel.org>
-Cc: linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org, 
-	mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org, 
-	Ming Yu <tmyu0@nuvoton.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 4/4] net: ti: icssg-prueth: Fix kernel panic during
+ concurrent Tx queue access
+To: Jesper Dangaard Brouer <hawk@kernel.org>, <dan.carpenter@linaro.org>,
+        <john.fastabend@gmail.com>, <daniel@iogearbox.net>, <ast@kernel.org>,
+        <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
+        <davem@davemloft.net>, <andrew+netdev@lunn.ch>
+CC: <bpf@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+        Roger Quadros
+	<rogerq@kernel.org>, <danishanwar@ti.com>
+References: <20250428120459.244525-1-m-malladi@ti.com>
+ <20250428120459.244525-5-m-malladi@ti.com>
+ <074a9a19-9050-44dd-a0bf-536ae8318da2@kernel.org>
+Content-Language: en-US
+From: "Malladi, Meghana" <m-malladi@ti.com>
+In-Reply-To: <074a9a19-9050-44dd-a0bf-536ae8318da2@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Lee Jones <lee@kernel.org> =E6=96=BC 2025=E5=B9=B45=E6=9C=882=E6=97=A5 =E9=
-=80=B1=E4=BA=94 =E4=B8=8B=E5=8D=884:08=E5=AF=AB=E9=81=93=EF=BC=9A
->
-...
-> > > > +static const struct mfd_cell nct6694_devs[] =3D {
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 0),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 1),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 2),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 3),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 4),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 5),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 6),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 7),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 8),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 9),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 10),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 11),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 12),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 13),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 14),
-> > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 15),
-> > >
-> > > These are all identical.
-> > >
-> > > I thought you were going to use PLATFORM_DEVID_AUTO?  In fact, you ar=
-e
-> > > already using PLATFORM_DEVID_AUTO since you are calling
-> > > mfd_add_hotplug_devices().  So you don't need this IDs.
-> > >
-> > > MFD_CELL_NAME() should do.
-> > >
-> >
-> > Yes, it uses PLATFORM_DEVID_AUTO, but in my implementation, the
-> > sub-devices use cell->id instead of platform_device->id, so it doesn't
-> > affect the current behavior.
-> > However, if you think there's a better approach or that this should be
-> > changed for consistency or correctness, I'm happy to update it, please
-> > let me know your recommendation.
-> >
-> > When using MFD_CELL_NAME(), the platform_device->id for the GPIO
-> > devices is assigned values from 1 to 16, and for the I2C devices from
-> > 1 to 6, but I need the ID offset to start from 0 instead.
->
-> Oh no, don't do that.  mfd_cell isn't supposed to be used outside of MFD.
->
-> Just use the platform_device id-- if you really need to start from 0.
->
-> As an aside, I'm surprised numbering starts from 1.
->
+Hi Jesper,
 
-OK, I will use platform_device->id instead. However, I'm still unsure
-why the ID starts from1.
+On 5/2/2025 12:44 PM, Jesper Dangaard Brouer wrote:
+> 
+> 
+> On 28/04/2025 14.04, Meghana Malladi wrote:
+>> Add __netif_tx_lock() to ensure that only one packet is being
+>> transmitted at a time to avoid race conditions in the netif_txq
+>> struct and prevent packet data corruption. Failing to do so causes
+>> kernel panic with the following error:
+>>
+>> [ 2184.746764] ------------[ cut here ]------------
+>> [ 2184.751412] kernel BUG at lib/dynamic_queue_limits.c:99!
+>> [ 2184.756728] Internal error: Oops - BUG: 00000000f2000800 [#1] 
+>> PREEMPT SMP
+>>
+>> logs: https://gist.github.com/ 
+>> MeghanaMalladiTI/9c7aa5fc3b7fb03f87c74aad487956e9
+>>
+>> The lock is acquired before calling emac_xmit_xdp_frame() and released 
+>> after the
+>> call returns. This ensures that the TX queue is protected from 
+>> concurrent access
+>> during the transmission of XDP frames.
+>>
+>> Fixes: 62aa3246f462 ("net: ti: icssg-prueth: Add XDP support")
+>> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
+>> ---
+>>   drivers/net/ethernet/ti/icssg/icssg_common.c | 7 ++++++-
+>>   drivers/net/ethernet/ti/icssg/icssg_prueth.c | 7 ++++++-
+>>   2 files changed, 12 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/ 
+>> net/ethernet/ti/icssg/icssg_common.c
+>> index a120ff6fec8f..e509b6ff81e7 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_common.c
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
+>> @@ -660,6 +660,8 @@ static u32 emac_run_xdp(struct prueth_emac *emac, 
+>> struct xdp_buff *xdp,
+>>               struct page *page, u32 *len)
+>>   {
+>>       struct net_device *ndev = emac->ndev;
+>> +    struct netdev_queue *netif_txq;
+>> +    int cpu = smp_processor_id();
+>>       struct bpf_prog *xdp_prog;
+>>       struct xdp_frame *xdpf;
+>>       u32 pkt_len = *len;
+>> @@ -679,8 +681,11 @@ static u32 emac_run_xdp(struct prueth_emac *emac, 
+>> struct xdp_buff *xdp,
+>>               goto drop;
+>>           }
+>> -        q_idx = smp_processor_id() % emac->tx_ch_num;
+>> +        q_idx = cpu % emac->tx_ch_num;
+>> +        netif_txq = netdev_get_tx_queue(ndev, q_idx);
+>> +        __netif_tx_lock(netif_txq, cpu);
+>>           result = emac_xmit_xdp_frame(emac, xdpf, page, q_idx);
+>> +        __netif_tx_unlock(netif_txq);
+>>           if (result == ICSSG_XDP_CONSUMED) {
+>>               ndev->stats.tx_dropped++;
+>>               goto drop;
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/ 
+>> net/ethernet/ti/icssg/icssg_prueth.c
+>> index ee35fecf61e7..b31060e7f698 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+>> @@ -1075,20 +1075,25 @@ static int emac_xdp_xmit(struct net_device 
+>> *dev, int n, struct xdp_frame **frame
+>>   {
+>>       struct prueth_emac *emac = netdev_priv(dev);
+>>       struct net_device *ndev = emac->ndev;
+>> +    struct netdev_queue *netif_txq;
+>> +    int cpu = smp_processor_id();
+>>       struct xdp_frame *xdpf;
+>>       unsigned int q_idx;
+>>       int nxmit = 0;
+>>       u32 err;
+>>       int i;
+>> -    q_idx = smp_processor_id() % emac->tx_ch_num;
+>> +    q_idx = cpu % emac->tx_ch_num;
+>> +    netif_txq = netdev_get_tx_queue(ndev, q_idx);
+>>       if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
+>>           return -EINVAL;
+>>       for (i = 0; i < n; i++) {
+>>           xdpf = frames[i];
+>> +        __netif_tx_lock(netif_txq, cpu);
+>>           err = emac_xmit_xdp_frame(emac, xdpf, NULL, q_idx);
+>> +        __netif_tx_unlock(netif_txq);
+> 
+> Why are you taking and releasing this lock in a loop?
+> 
+> XDP gain performance by sending a batch of 'n' packets.
+> This approach looks like a performance killer.
+> 
 
-Additionally, I noticed that when calling mfd_add_devices()
-separately, the IDs are also assigned consecutively (e.g., GPIO: 1~16,
-I2C: 17~22, ...).
+Yes, I agree with you. This wasn't the intended change. Thank you for 
+pointing this out. The lock and unlock should happen outside the loop. 
+Will fix this in v2.
 
-Do you have any recommendations on how I should implement this?
+> 
+>>           if (err != ICSSG_XDP_TX) {
+>>               ndev->stats.tx_dropped++;
+>>               break;
+> 
+> 
 
-
+-- 
 Thanks,
-Ming
+Meghana Malladi
+
 
