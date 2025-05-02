@@ -1,86 +1,86 @@
-Return-Path: <netdev+bounces-187404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1EB0AA6E91
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 11:59:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A0F1AA6F78
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 12:23:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34184461FA3
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 09:59:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04DE2188B881
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 10:23:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2606422CBD9;
-	Fri,  2 May 2025 09:59:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C32423C4EF;
+	Fri,  2 May 2025 10:22:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bw3yJzdt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cVD1cSQl"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74872205AB9
-	for <netdev@vger.kernel.org>; Fri,  2 May 2025 09:59:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD5D322D78B
+	for <netdev@vger.kernel.org>; Fri,  2 May 2025 10:22:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746179969; cv=none; b=bPKEJzI3ko+2hY2t3tI/Xf8wCFLkvYTC49plz/sstz556VHExH+tWvzLhd9g1nTNrd/k9y0olhLrtpYxjH+lkfqAQ74q4PhWhDpiO1m83m1QA/+7nvVKduCoFTeL6RJtH0pMS/jhynUfsMVLuRn3DNwqhCCNoTjqof3UlDMPzcI=
+	t=1746181375; cv=none; b=TzMbnyA9i8vZCNDMjbYfAY/QdZ/Bxo18W4ket3TvFXQdEt8m6D8xb+tg8jISbyOksC9+uYFg/hjpDTeDMUrsuci4MbQmUQhnheaqeWwJxX12t2fGn5cPoBHV03XJYDp3UI4za/XXp+Kivokje5OoWETXAvb+57Zb/cBFA6TWI3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746179969; c=relaxed/simple;
-	bh=LvQyjB3fpls2Rt70+aAx4jeREntiaIW4mWRWlZPfdrM=;
+	s=arc-20240116; t=1746181375; c=relaxed/simple;
+	bh=i0/o7pVkw7duSUK3m7urAHcNVUQGmAMppqUpi02REMs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BAWNY+DmNp1mkB4D0aI1dez5grAFxpTAax+9AuCKeo6S+FesGJtLpjVWcQiIL+c8hjtb7FRXaE5OQWdrQYjqBeKuq32lzv4Mjg1XwP6XEIkThT628i2Rf/mg9mPQCMKecndqP+dlVLvpIH9OYyu2B3KPZZKMOhFec4neXo9hHxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bw3yJzdt; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=EFr6M+7jj9ZdUGwDOFur9WXwjRby1CdRCu/dOaERr06+EmQUYX6JgMqSEy5YuY82lMKa+RMCEibQu1TGdLVwbF5WDus16QlbWKClmyWC5PJXyBtHg1F1rfFhYM74ZTE15x+AEFqLyQ1hp9lDdagiAZmdCRjXV9U0BByFpFs6r6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cVD1cSQl; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746179966;
+	s=mimecast20190719; t=1746181371;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=tXOh559gmhCR9OxgfPi+DVVVLlUWdAIWl82Cvhx7pCU=;
-	b=bw3yJzdtefVZ8NKUP7TWkm+CLWh5h1M0QwihCAlBwLhvN304bTso+UgT788o2ioLwb//ck
-	Z/fZV8IV2VU5SbEPacPfP+vnKSZOWa1P23V03VF1CFWQ23Y+1WdXAC+H+zBZGLLz3HbA9h
-	C5yLEbw5kqrj2MKQBm3aTgLRSWKR6DA=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=oPxLSU1XqT/NXlV7eFy5ZcbBJizdwKiKGPSIW+m2/2o=;
+	b=cVD1cSQl9NEJtDyuky8TRWttSz1VuqYPXK2hVDDbFHlY78BBbB7QvyMQD/PR904q/nkygV
+	44AZOOd5/Ab0jHJ1E+elu144tMW9GjnFaWJHcXkQczW363GVc9yXzmyQNtr4e3OMD0o1Y6
+	mjomuqMIuOwOfj4z/viFqjXqs4dFPnA=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-490-3gRzzNxyNFenuwuQeA4z5w-1; Fri, 02 May 2025 05:59:25 -0400
-X-MC-Unique: 3gRzzNxyNFenuwuQeA4z5w-1
-X-Mimecast-MFC-AGG-ID: 3gRzzNxyNFenuwuQeA4z5w_1746179964
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-44059976a1fso8374145e9.1
-        for <netdev@vger.kernel.org>; Fri, 02 May 2025 02:59:24 -0700 (PDT)
+ us-mta-99-UOt95rOhNgSS3qY_HtlJEw-1; Fri, 02 May 2025 06:22:50 -0400
+X-MC-Unique: UOt95rOhNgSS3qY_HtlJEw-1
+X-Mimecast-MFC-AGG-ID: UOt95rOhNgSS3qY_HtlJEw_1746181370
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-39c184b20a2so631191f8f.1
+        for <netdev@vger.kernel.org>; Fri, 02 May 2025 03:22:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746179964; x=1746784764;
+        d=1e100.net; s=20230601; t=1746181369; x=1746786169;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tXOh559gmhCR9OxgfPi+DVVVLlUWdAIWl82Cvhx7pCU=;
-        b=KVBrWZUUgDWyU7e2tBIhqm5lJB1o/K/9LK57lnvrMg2IhG3FJFBIZZEHz2U/KUCduS
-         XQQ4DJri1NMuVIDrxtQiO/Htx5NpXKqT8IwAFn4tqjZfogkxY++6zRLhpKbrE91LbeOx
-         m54B6Jm8xZxnjYl+COKHaQmdUw6qY9Lbql5bh+ND8mqU/+EiX/YUP/5xpzslRazN/q/h
-         xUdKPkmKbQWidZ8odz9+LlWsqm7KFxKV6Coo53ab7OEAu4khGRfZu93F1Adz/rA6zW8U
-         4BwM460JK0xCqwcXOePRmR4S3UGBc0D53o69hIdFhHixYdLz3lL30HVhCCoUX3aGEj+j
-         yzww==
-X-Forwarded-Encrypted: i=1; AJvYcCWlAm7DIRGbfMcNKKp5WCd4VZJS3Gv95nE5vlmn4S+6AHicoRxh0iGM9+6CBSZo1z2bGYn8cBU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMLuXsLoOb6laqQc+BZtqJgQ9U2Z8sY9DpCvKlLeO20W37NAu7
-	/iQuYYsV6apz0F0+bdM21D6LffaTM+mGm+TX9j+IyHYNYNHUcReetubIUHP5fNywGQ3YxmhzHs5
-	mlJRp0TwE7XCXp22OxLwWMtfzXuShgidsTcv8QGgaWREsoBnGVtouww==
-X-Gm-Gg: ASbGnctgGMW5LYcBW4QmfE/fLBJXa6xJ3lhuGoTJF48LaLaVtIZSgfhY9piVCm/oysx
-	2cddzW1mfWY10hP53iCoFjCt8wInNgGt0tvD8IRPYrSaYFcCazPp4xj9GgoxMGqu33jxPQd6cQ6
-	8G4SZ/TZWHT2bqo/DB0XXX24baU5mpAfOZa+7ojaLZNqPmiOlWm0kgDZs+/kvRnv42iqvZTJDbE
-	kT9z28neF1sbDc3Ig+DxKvkR9H1Blcz6p0pBJv+i7fdAtnmVikeus3Th2OdJ6WQFlhEqavTkL0Q
-	4Yhd0sCBRNjlHU6Zad4=
-X-Received: by 2002:a05:600c:1c91:b0:43c:fe90:1282 with SMTP id 5b1f17b1804b1-441bbea0cdamr13440605e9.7.1746179963956;
-        Fri, 02 May 2025 02:59:23 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHhhV2PfRCQUij4kfrb24Pgo9Ok5qcyqC/aHwvJcH6nqXz26wo+x83AXcU3EcuFU1TxFKSjng==
-X-Received: by 2002:a05:600c:1c91:b0:43c:fe90:1282 with SMTP id 5b1f17b1804b1-441bbea0cdamr13440445e9.7.1746179963616;
-        Fri, 02 May 2025 02:59:23 -0700 (PDT)
+        bh=oPxLSU1XqT/NXlV7eFy5ZcbBJizdwKiKGPSIW+m2/2o=;
+        b=lSVQI81uoS6IShakypu8Q5e8dxwlZIryfmYB9X11nFG3NC1uvyWuXXVLbO5Q8dwN/K
+         +av/kNuBHEjiNApW04Oo3t6HsNVmI0XVdDTMNdPgsU8Nos3eNrNcOicPeVORVfcI3ycQ
+         8P3CvB/otK4T8//L7m3wXM+ykPYlMZgqUG+2BV90QK/gxw/WGlIFwSdcvf/qx0Oev79E
+         e3W+ING13nGsmJR3Ix4kqbnz2M4564ovYbl8Ciz/fErnQoQAjrTG4cJhpR+0PTuaskkJ
+         y1SKq1zfxF/yUwKkybTRFzAnDOr/CmW7UB9Xs7ea+4H3iQNQ9mNmYBaunwMvXYsMX8mo
+         iwcA==
+X-Forwarded-Encrypted: i=1; AJvYcCVL8cHM68GkUnQWdkGqQqMSpUX+uHuEH5Gz8Sk3wgQcyJGsgMnL3rOl4noHfAl3ZXgbgc7PJ9Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzW9EVJntGXToy+Q4x6IT9W2DO/ymiawDK9n55UPBdC5mdVPwsX
+	yshtBQP+hbmGtJyfHQEcUEM9O5VF8O080H4BZHVNO77onq8Wql/ju4Fdq5PhxmlRKziBmL7pEwz
+	oty90YsvOA5j1NVTEkGNohhrv7IwQ4AyvAuTVOiaNmWtSyeAzp4q2/w==
+X-Gm-Gg: ASbGnctSy5HL86UymMMku0lCBXa9D4ywedea7tnsE0CuhME9hmg6ounw8U7DUlku/FX
+	zCcA8Npsi114Sn6A6AJq9BjwAMib5o/tg8IC2dTyfRtLK4h3TGW3p5nGMfZVLqdHbnewYEJCFqu
+	zzcSqr0LRbh5vgNkKu5wf680K8KiQZsALMPkSXLlyiOfpKo1GuLtzDofQn1J7mqWCJt3gfIZyTg
+	o6O4WifYQ+JIZoCRSUBNcWozKoYd22efg15OBJTgC+8AtxPqNgoQUHv17Ls9gQlXdF4PHl5OO+T
+	nX/gWB/DMk5ImAObU6k=
+X-Received: by 2002:a05:6000:4387:b0:391:4674:b10f with SMTP id ffacd0b85a97d-3a099ae9774mr1913560f8f.36.1746181369501;
+        Fri, 02 May 2025 03:22:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFzkS1lKR2T7hyh9gkaUuVs/7+Dq04YWJdFuTxAo1hUYcodL6jGaO9eOC3AbB7PExj+iPODSw==
+X-Received: by 2002:a05:6000:4387:b0:391:4674:b10f with SMTP id ffacd0b85a97d-3a099ae9774mr1913529f8f.36.1746181369141;
+        Fri, 02 May 2025 03:22:49 -0700 (PDT)
 Received: from ?IPV6:2a0d:3344:246d:aa10::f39? ([2a0d:3344:246d:aa10::f39])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-441b2af2a9dsm85925535e9.19.2025.05.02.02.59.22
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a099ae0c25sm1762567f8f.17.2025.05.02.03.22.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 May 2025 02:59:23 -0700 (PDT)
-Message-ID: <74017437-48d2-4518-9888-e74c14e01a5d@redhat.com>
-Date: Fri, 2 May 2025 11:59:21 +0200
+        Fri, 02 May 2025 03:22:48 -0700 (PDT)
+Message-ID: <3e3eea6b-10a6-4a32-aa12-ef6fdf2eeeb8@redhat.com>
+Date: Fri, 2 May 2025 12:22:46 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,65 +88,195 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [Patch net 1/2] sch_htb: make htb_deactivate() idempotent
-To: Victor Nogueira <victor@mojatatu.com>,
- Cong Wang <xiyou.wangcong@gmail.com>, netdev@vger.kernel.org
-Cc: jhs@mojatatu.com, jiri@resnulli.us, alan@wylie.me.uk
-References: <20250428232955.1740419-1-xiyou.wangcong@gmail.com>
- <20250428232955.1740419-2-xiyou.wangcong@gmail.com>
- <eecd9a29-14f9-432d-a3cf-5215313df9f0@mojatatu.com>
+Subject: Re: [PATCH net-next v3] selftests/vsock: add initial vmtest.sh for
+ vsock
+To: Bobby Eshleman <bobbyeshleman@gmail.com>,
+ Stefano Garzarella <sgarzare@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Shuah Khan <shuah@kernel.org>
+Cc: kvm@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20250428-vsock-vmtest-v3-1-181af6163f3e@gmail.com>
 Content-Language: en-US
 From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <eecd9a29-14f9-432d-a3cf-5215313df9f0@mojatatu.com>
+In-Reply-To: <20250428-vsock-vmtest-v3-1-181af6163f3e@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 4/30/25 5:19 PM, Victor Nogueira wrote:
-> If that's so, couldn't we instead of doing:
+On 4/29/25 1:48 AM, Bobby Eshleman wrote:
+> This commit introduces a new vmtest.sh runner for vsock.
 > 
->> @@ -348,7 +348,8 @@ static void htb_add_to_wait_tree(struct htb_sched *q,
->>    */
->>   static inline void htb_next_rb_node(struct rb_node **n)
->>   {
->> -	*n = rb_next(*n);
->> +	if (*n)
->> +		*n = rb_next(*n);
->>   }
+> It uses virtme-ng/qemu to run tests in a VM. The tests validate G2H,
+> H2G, and loopback. The testing tools from tools/testing/vsock/ are
+> reused. Currently, only vsock_test is used.
 > 
-> do something like:
+> VMCI and hyperv support is automatically built, though not used.
 > 
-> @@ -921,7 +921,9 @@ static struct sk_buff *htb_dequeue_tree(struct 
-> htb_sched *q, const int prio,
->                  cl->leaf.deficit[level] -= qdisc_pkt_len(skb);
->                  if (cl->leaf.deficit[level] < 0) {
->                          cl->leaf.deficit[level] += cl->quantum;
-> -                       htb_next_rb_node(level ? 
-> &cl->parent->inner.clprio[prio].ptr :
-> +                       /* Account for (fq_)codel child deactivating 
-> after dequeue */
-> +                       if (likely(cl->prio_activity))
-> +                               htb_next_rb_node(level ? 
-> &cl->parent->inner.clprio[prio].ptr :
->   
-> &q->hlevel[0].hprio[prio].ptr);
->                  }
->                  /* this used to be after charge_class but this constelation
+> Only tested on x86.
 > 
-> That way it's clear that the issue is a corner case where the
-> child qdisc deactivates the parent. Otherwise it seems like
-> we need to check for (*n) being NULL for every call to
-> htb_next_rb_node.
+> To run:
+> 
+>   $ tools/testing/selftests/vsock/vmtest.sh
+> 
+> or
+> 
+>   $ make -C tools/testing/selftests TARGETS=vsock run_tests
+> 
+> Results:
+> 	# linux/tools/testing/selftests/vsock/vmtest.log
+> 	setup:  Building kernel and tests
+> 	setup:  Booting up VM
+> 	setup:  VM booted up
+> 	test:vm_server_host_client:guest:       Control socket listening on 0.0.0.0:51000
+> 	test:vm_server_host_client:guest:       Control socket connection accepted...
+> 	[...]
+> 	test:vm_loopback:guest: 30 - SOCK_STREAM retry failed connect()...ok
+> 	test:vm_loopback:guest: 31 - SOCK_STREAM SO_LINGER null-ptr-deref...ok
+> 	test:vm_loopback:guest: 31 - SOCK_STREAM SO_LINGER null-ptr-deref...ok
+> 
+> Future work can include vsock_diag_test.
+> 
+> vmtest.sh is loosely based off of tools/testing/selftests/net/pmtu.sh,
+> which was picked out of the bag of tests I knew to work with NIPA.
+> 
+> Because vsock requires a VM to test anything other than loopback, this
+> patch adds vmtest.sh as a kselftest itself. This is different than other
+> systems that have a "vmtest.sh", where it is used as a utility script to
+> spin up a VM to run the selftests as a guest (but isn't hooked into
+> kselftest). This aspect is worth review, as I'm not aware of all of the
+> enviroments where this would run.
 
-@Victor, I think that the Cong's suggested patch is simpler to very/tie
-to code change to the actually addressed issue. I started at your
-suggest code for a bit, and out of sheer htb ignorance I'm less
-confident about it fixing the thing.
+I think this approach is interesting, but I think it will need some
+additional more work, see below...
 
-Do you have strong feeling vs Cong's suggested approach?
+[...]
 
-Thanks,
+> diff --git a/tools/testing/selftests/vsock/settings b/tools/testing/selftests/vsock/settings
+> new file mode 100644
+> index 0000000000000000000000000000000000000000..e7b9417537fbc4626153b72e8f295ab4594c844b
+> --- /dev/null
+> +++ b/tools/testing/selftests/vsock/settings
+> @@ -0,0 +1 @@
+> +timeout=0
+
+We need a reasonable, bounded runtime for nipa integration.
+
+> diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
+> new file mode 100755
+> index 0000000000000000000000000000000000000000..d70b9446e531d6d20beb24ddeda2cf0a9f7e9a39
+> --- /dev/null
+> +++ b/tools/testing/selftests/vsock/vmtest.sh
+> @@ -0,0 +1,354 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0
+> +#
+> +# Copyright (c) 2025 Meta Platforms, Inc. and affiliates
+> +#
+> +# Dependencies:
+> +#		* virtme-ng
+> +#		* busybox-static (used by virtme-ng)
+> +#		* qemu	(used by virtme-ng)
+
+You should probably check for such tools presence and bail out with skip
+otherwise.
+
+> +
+> +SCRIPT_DIR="$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+> +KERNEL_CHECKOUT=$(realpath ${SCRIPT_DIR}/../../../..)
+
+This is not going to work if/when the self-tests are installed in their
+own directory via `make install` in the tools/testing/selftests/
+directory, and that use case is supposed to work.
+
+At very least you should check for the expected layout and skip otherwise.
+
+> +QEMU=$(command -v qemu-system-$(uname -m))
+> +VERBOSE=0
+> +SKIP_BUILD=0
+> +VSOCK_TEST=${KERNEL_CHECKOUT}/tools/testing/vsock/vsock_test
+> +
+> +TEST_GUEST_PORT=51000
+> +TEST_HOST_PORT=50000
+> +TEST_HOST_PORT_LISTENER=50001
+> +SSH_GUEST_PORT=22
+> +SSH_HOST_PORT=2222
+> +VSOCK_CID=1234
+> +WAIT_PERIOD=3
+> +WAIT_PERIOD_MAX=20
+> +
+> +QEMU_PIDFILE=/tmp/qemu.pid
+> +
+> +# virtme-ng offers a netdev for ssh when using "--ssh", but we also need a
+> +# control port forwarded for vsock_test.  Because virtme-ng doesn't support
+> +# adding an additional port to forward to the device created from "--ssh" and
+> +# virtme-init mistakenly sets identical IPs to the ssh device and additional
+> +# devices, we instead opt out of using --ssh, add the device manually, and also
+> +# add the kernel cmdline options that virtme-init uses to setup the interface.
+> +QEMU_OPTS=""
+> +QEMU_OPTS="${QEMU_OPTS} -netdev user,id=n0,hostfwd=tcp::${TEST_HOST_PORT}-:${TEST_GUEST_PORT}"
+> +QEMU_OPTS="${QEMU_OPTS},hostfwd=tcp::${SSH_HOST_PORT}-:${SSH_GUEST_PORT}"
+> +QEMU_OPTS="${QEMU_OPTS} -device virtio-net-pci,netdev=n0"
+> +QEMU_OPTS="${QEMU_OPTS} -device vhost-vsock-pci,guest-cid=${VSOCK_CID}"
+> +QEMU_OPTS="${QEMU_OPTS} --pidfile ${QEMU_PIDFILE}"
+> +KERNEL_CMDLINE="virtme.dhcp net.ifnames=0 biosdevname=0 virtme.ssh virtme_ssh_user=$USER"
+> +
+> +LOG=${SCRIPT_DIR}/vmtest.log
+> +
+> +#		Name				Description
+> +avail_tests="
+> +	vm_server_host_client	Run vsock_test in server mode on the VM and in client mode on the host.	
+> +	vm_client_host_server	Run vsock_test in client mode on the VM and in server mode on the host.	
+> +	vm_loopback		Run vsock_test using the loopback transport in the VM.	
+> +"
+> +
+> +usage() {
+> +	echo
+> +	echo "$0 [OPTIONS] [TEST]..."
+> +	echo "If no TEST argument is given, all tests will be run."
+> +	echo
+> +	echo "Options"
+> +	echo "  -v: verbose output"
+> +	echo "  -s: skip build"
+> +	echo
+> +	echo "Available tests${avail_tests}"
+> +	exit 1
+> +}
+> +
+> +die() {
+> +	echo "$*" >&2
+> +	exit 1
+> +}
+> +
+> +vm_ssh() {
+> +	ssh -q -o UserKnownHostsFile=/dev/null -p 2222 localhost $*
+> +	return $?
+> +}
+> +
+> +cleanup() {
+> +	if [[ -f "${QEMU_PIDFILE}" ]]; then
+> +		pkill -SIGTERM -F ${QEMU_PIDFILE} 2>&1 >/dev/null
+> +	fi
+> +}
+> +
+> +build() {
+> +	log_setup "Building kernel and tests"
+> +
+> +	pushd ${KERNEL_CHECKOUT} >/dev/null
+> +	vng \
+> +		--kconfig \
+> +		--config ${KERNEL_CHECKOUT}/tools/testing/selftests/vsock/config.vsock
+> +	make -j$(nproc)
+> +	make -C ${KERNEL_CHECKOUT}/tools/testing/vsock
+> +	popd >/dev/null
+
+I think it would be better to avoid the kernel rebuild. A possible
+alternative could be including in 'config' the needed knobs for vng's
+sake and re-use the running kernel.
+
+Cheers,
 
 Paolo
-
 
 
