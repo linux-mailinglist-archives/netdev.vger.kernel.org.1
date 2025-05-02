@@ -1,265 +1,246 @@
-Return-Path: <netdev+bounces-187529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A68E2AA7AC1
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 22:17:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89787AA7AD2
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 22:24:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 810BA9A41EC
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 20:16:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28DFF1C0225D
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 20:24:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E807120C484;
-	Fri,  2 May 2025 20:16:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C9B41F7554;
+	Fri,  2 May 2025 20:24:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CrdP2DL6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qijDsJ4u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 445EA1FAC48;
-	Fri,  2 May 2025 20:16:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 611EE1F17EB
+	for <netdev@vger.kernel.org>; Fri,  2 May 2025 20:24:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746216992; cv=none; b=S1YwlFkWC4Njk/ag1oIjil9g6ScWnU2ontbX6yqp/A0yxoZdwdEZwnvGtK8QdIOeMC4PnzGodcqY5LXtqILL+4awKCjA9sUQYnPlsGazPsgMIKtKiQNxJFx0jdmrui1TsqM/Ut+kOFGU2aoxGKcn75aV3/ZqOXJqrBX0rzWQxHU=
+	t=1746217464; cv=none; b=PeUsFQDDKbaNNkHT4CaLiF/rxO7on80T9FpnwJ939Kdpd75eSuxFmVME0/KM5l/eaVeRbHrJeGPEeHKDD4+/ZUMolh1PAN+zpL2j1XDPeBQOWDmQuSwBgn96zSc25QW9LrcNLzAT+4uX+90ZNDIHwfsMwm1aWGjav0HM8vPPi9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746216992; c=relaxed/simple;
-	bh=h7914hPzIB1s4VYY437uzzwjiwHqmYSy67zGZfIQcZc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=j6hVG4iJmFH234zHvnlCNHhG/37BMsD5Sd5vu18MZavUOFVhh29E9IWAqWDVhpRI07mFJtOBs/xkNRfz/0cyY1G3+1A8pXRwTDBrHIYkNTaTSBuspnTTDfzIOM42/u2u1bXD12XeqRN9hYuGR3Ux3vMxwctY3eEUJnLDDsRY16I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CrdP2DL6; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-22c33677183so30100615ad.2;
-        Fri, 02 May 2025 13:16:31 -0700 (PDT)
+	s=arc-20240116; t=1746217464; c=relaxed/simple;
+	bh=dZuVMFmp0Inh0pJRa9kV5vxGYfgwhCDsb1znOpLRUuw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gGfjEFEQIBfpPgvBJWJlfLuoV1xU5YrBicvJI0SQ2+kDKi8NZpn2Moo+qRdDXdLJR783uAmxkbfey4PqLjvgSZVgv9mU6Bm/Q1aVbT3fhx7oTfme+CabMZs6ws7iw87knut55eWX31sfuD3ZzekThUnpCDLrfH+rssFL4tRKLeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qijDsJ4u; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5f88f236167so2190a12.0
+        for <netdev@vger.kernel.org>; Fri, 02 May 2025 13:24:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746216990; x=1746821790; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1746217461; x=1746822261; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rqaNgKeGThUQ6f+Ev4JAqaFPHXVZyijKyvVLH0FvmPI=;
-        b=CrdP2DL6ysFeJeaYxZqJAC64/+eLUmZZWUEuS14HTop7rRrE6gnAh4IoISN/JYJt5p
-         0GDlzPcOyqT8aioHUuaFlcBB6c8VCW43/6AAbh5uAt6W081M7hSKrGeY3eCL4PhYOrG/
-         e94SxrT57M4rxW/+hl3aQypA/mw/Xs17h26+XRbs3KVd68wCewc9FS2E5ApLkrr+XS10
-         81cbDlVa2cecwh2lDtJl3nszkYIOQ0TlF4UerrHgdDppdUKm6922/QK5x8f8HHiTMIP/
-         iarMlnmGEl3ZAEo1Fe+UdgkLG/BG/WwwXtC+vTjXg4Vba9Gl7n+3gACC6mQNT9LlYwN+
-         hD0A==
+        bh=gL/oGMV1bkBsob4mtK0KVB/s8CsmE7l1Y9u7qBwJ374=;
+        b=qijDsJ4uM7RQU03hpObBC5RwJQ+UnXe2v95/sNQ62K6Tu6XGDyV6exQZqCLu7iq4uU
+         /+PUvbo4fdwiVt7eVlzt8NAAWLpnotqbHz9czdmQt7WTJAubIrwCdJ6UhEoLWgDxlgZM
+         VVr7YAN+27ItumPgbt1WR8B6hQBMKNeZ0f5E4c+yjtNizgRE/FYJMAh+hVxQ/gXV1JBV
+         /I1RNcImiNfF5smL2yVgwuVFBiT6p2aPU0gjrt0oGEMkPsfrFK8OfwJfOQyW3GA2FoXL
+         0nxbmkXs9sfzPQ0y6nUiaoh9sfMt9VM0p+HX8nRfrFCXc6n+GTL8Q52FCymiMw6Y5noZ
+         K7cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746216990; x=1746821790;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1746217461; x=1746822261;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rqaNgKeGThUQ6f+Ev4JAqaFPHXVZyijKyvVLH0FvmPI=;
-        b=eeLiVUDpS+2j36L/8F6oNiBIeYucvNbRhd2mQV9zVKfV0H7lg2Cw7J7UyPu5OGqogt
-         69lHuXnHIUz2RSn+o2+7n0pHUA+QksYlnTkbF4lUj3jbJAgR/+1wbCVt02QwdaP+XJ0K
-         AcAJ9GUP8poeCLCFYeeWL61F8TRphtVGU5KE1okJ61xCnCnCX5tq2VOumwRAydi4wX9h
-         r1p3D3xK9IGGodN+uPZ1pKhGBqTCMjrt70uGtqpjQYFgQwwc27zjaOQdqoDQslJ0mYhQ
-         mFLdLk6OD08lh/bs2nWLW4pqqUZBlpb+8+Ilteb2xPf58hgZq0qYtSwDnQVSSNZMOGkH
-         k85g==
-X-Gm-Message-State: AOJu0YysuTISCTPb3cggxgVOJRaHun6wS3ZppCzgKEX1PpySN182BywE
-	efHAvYUj022TrQwdY57lMAwviLMeHWll1DknW+XiXvIsSPVqyUdljDaRZw==
-X-Gm-Gg: ASbGncsohaoZK3Jaeu8aRlA2PtQim0d/E0w8aRjnHC8k1eF/WgyXdRpIQoI+bZhwb1+
-	oeocZmOGuSnKNHpLSTTLI4sJ+HU45b0BOCnCLfosuv1vhzZWpVaTT8JK+KD0JpggA9jyOLyL+xe
-	O5dh5WyFwa1aaCrS7UeCW9Cyg3VTdy40k2NCbpEu1bFzmeI62faN7Wz05yfWCpKkEbu8c3LjuCt
-	GV8iw/fU/Bk/LCEkwyu0xSlxyhNSvcZ5O5JX3okTz+X50yDNQNNBelVkhpp0fn95Hw1IGXs1MFD
-	1a17TB44WLhAOarw5+RxL0TIa6FFm2f90woKi9lLxA==
-X-Google-Smtp-Source: AGHT+IG1Qge8qujO/SIeuASY2frHmtONpqTpgb0ud035QGQ1CV4S5UrvDgfRKBUx+Hbiu60n8Jh+CA==
-X-Received: by 2002:a17:903:22cb:b0:223:54e5:bf4b with SMTP id d9443c01a7336-22e1036c14bmr66489735ad.25.1746216990309;
-        Fri, 02 May 2025 13:16:30 -0700 (PDT)
-Received: from localhost ([2a03:2880:ff:e::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e1522fa58sm11850895ad.242.2025.05.02.13.16.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 May 2025 13:16:30 -0700 (PDT)
-From: Amery Hung <ameryhung@gmail.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	alexei.starovoitov@gmail.com,
-	andrii@kernel.org,
-	daniel@iogearbox.net,
-	martin.lau@kernel.org,
-	xiyou.wangcong@gmail.com,
-	kernel-team@meta.com
-Subject: [PATCH bpf-next/net v2 5/5] selftests/bpf: Cleanup bpf qdisc selftests
-Date: Fri,  2 May 2025 13:16:24 -0700
-Message-ID: <20250502201624.3663079-6-ameryhung@gmail.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250502201624.3663079-1-ameryhung@gmail.com>
-References: <20250502201624.3663079-1-ameryhung@gmail.com>
+        bh=gL/oGMV1bkBsob4mtK0KVB/s8CsmE7l1Y9u7qBwJ374=;
+        b=MFOOcETMJNvG13ic3j+ZTY+/pd38TLooKoz7JnqRjtuFPrruWrZowhY+uk4Xdg/vtM
+         DrtXrSXy8fHKnABaGFLJmjVWp+HpgKLXjA+4nUmmb+Mj//3zkYLjO7CUcv4mPuXHw2lH
+         4F4nxjAIg5DEQNGTxvPXgRK9n0XSNtSpJlZ0r+9HVUiKYo/ACIovBshPqTGri5MDqbM/
+         bUWwAAv6TPWIJHqy35frMG9SIacFnUH0Civ6q0OpostdtPxfc78FfZBWagvUfZaeSLld
+         KrjC1F97G/i0rD55G7pTLoIv1X9QkNXAwobaXOjk+OWUZOVoZkKZSk2mdYFMmX7XLyoz
+         dt5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVVLAXlYLAxH711JHJnNpijXr1XPN52NR73mS25EKnyV8Wu3u4EDqq5vJ9U08VsxZBjxdbIqA0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjYrkT1qseoyX3beLPfi/3hLrkv/aFauaXXOLgZ9v8MLJgE/Zf
+	KZF2BnFyfycO/ZkyE4zVKMSgq/VSqlXyyutQgxkC6pjgEK/qCC+Cn7IVGiALPLa/ATGIQyLKXpG
+	r87M5Lr2fsKV6ZQCzI1d65eDS79OsQu1G3WCX
+X-Gm-Gg: ASbGnct+LFSbYgU8iS9CiZghOrzr+kJrDWNGoIbadAxx0+Nkbsk0UTOtHTJAUsDMDsJ
+	f2WB9QFChwAs6IeemVg0F/+CGapiMIte1Z5GKf4NTGvoFyfe5D0DOXQ7CzfxNM4aYINHruz7aHI
+	z4Td+dwhkWfb5SD0C5watUXDKQeU22snuWk3F/c9rSsGgHvBx+Vw==
+X-Google-Smtp-Source: AGHT+IFBU11EVpVVrPBWAa64nkvdz6L6ofQR3kObgZnTcGWuajyGenWOEyDvBPb9FIURCMHMiUL8h1vtr1nfhcj1alo=
+X-Received: by 2002:a05:6402:3199:b0:5fa:82a1:b99c with SMTP id
+ 4fb4d7f45d1cf-5faa69618bamr24415a12.0.1746217460265; Fri, 02 May 2025
+ 13:24:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250502-work-coredump-socket-v2-0-43259042ffc7@kernel.org>
+ <20250502-work-coredump-socket-v2-3-43259042ffc7@kernel.org>
+ <CAG48ez1w+25tbSPPU6=z1rWRm3ZXuGq0ypq4jffhzUva9Bwazw@mail.gmail.com> <20250502-fanden-unbeschadet-89973225255f@brauner>
+In-Reply-To: <20250502-fanden-unbeschadet-89973225255f@brauner>
+From: Jann Horn <jannh@google.com>
+Date: Fri, 2 May 2025 22:23:44 +0200
+X-Gm-Features: ATxdqUHXcPgw7KB5LjgFO4gcINlAup0zI_DygTIVLbII3rAu_F1SAY-m1syr1Ko
+Message-ID: <CAG48ez3xYzzazbxcHKEFzj9DDMOrnVf1cfjNpwE_FAY-YhtHmw@mail.gmail.com>
+Subject: Re: [PATCH RFC v2 3/6] coredump: support AF_UNIX sockets
+To: Christian Brauner <brauner@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	Oleg Nesterov <oleg@redhat.com>, linux-fsdevel@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Daan De Meyer <daan.j.demeyer@gmail.com>, David Rheinsberg <david@readahead.eu>, 
+	Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>, 
+	Lennart Poettering <lennart@poettering.net>, Luca Boccassi <bluca@debian.org>, Mike Yuan <me@yhndnzj.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	=?UTF-8?Q?Zbigniew_J=C4=99drzejewski=2DSzmek?= <zbyszek@in.waw.pl>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Some cleanups:
-- Remove unnecessary kfuncs declaration
-- Use _ns in the test name to run tests in a separate net namespace
-- Call skeleton __attach() instead of bpf_map__attach_struct_ops() to
-  simplify tests.
+On Fri, May 2, 2025 at 10:11=E2=80=AFPM Christian Brauner <brauner@kernel.o=
+rg> wrote:
+> On Fri, May 02, 2025 at 04:04:32PM +0200, Jann Horn wrote:
+> > On Fri, May 2, 2025 at 2:42=E2=80=AFPM Christian Brauner <brauner@kerne=
+l.org> wrote:
+> > > diff --git a/fs/coredump.c b/fs/coredump.c
+> > [...]
+> > > @@ -801,6 +841,73 @@ void do_coredump(const kernel_siginfo_t *siginfo=
+)
+> > >                 }
+> > >                 break;
+> > >         }
+> > > +       case COREDUMP_SOCK: {
+> > > +               struct file *file __free(fput) =3D NULL;
+> > > +#ifdef CONFIG_UNIX
+> > > +               ssize_t addr_size;
+> > > +               struct sockaddr_un unix_addr =3D {
+> > > +                       .sun_family =3D AF_UNIX,
+> > > +               };
+> > > +               struct sockaddr_storage *addr;
+> > > +
+> > > +               /*
+> > > +                * TODO: We need to really support core_pipe_limit to
+> > > +                * prevent the task from being reaped before userspac=
+e
+> > > +                * had a chance to look at /proc/<pid>.
+> > > +                *
+> > > +                * I need help from the networking people (or maybe O=
+leg
+> > > +                * also knows?) how to do this.
+> > > +                *
+> > > +                * IOW, we need to wait for the other side to shutdow=
+n
+> > > +                * the socket/terminate the connection.
+> > > +                *
+> > > +                * We could just read but then userspace could sent u=
+s
+> > > +                * SCM_RIGHTS and we just shouldn't need to deal with
+> > > +                * any of that.
+> > > +                */
+> >
+> > I don't think userspace can send you SCM_RIGHTS if you don't do a
+> > recvmsg() with a control data buffer?
+>
+> Oh hm, then maybe just a regular read at the end would work. As soon as
+> userspace send us anything or we get a close event we just disconnect.
+>
+> But btw, I think we really need a recvmsg() flag that allows a receiver
+> to refuse SCM_RIGHTS/file descriptors from being sent to it. IIRC, right
+> now this is a real issue that systemd works around by always calling its
+> cmsg_close_all() helper after each recvmsg() to ensure that no one sent
+> it file descriptors it didn't want. The problem there is that someone
+> could have sent it an fd to a hanging NFS server or something and then
+> it would hang in close() even though it never even wanted any file
+> descriptors in the first place.
 
-Signed-off-by: Amery Hung <ameryhung@gmail.com>
----
- .../selftests/bpf/prog_tests/bpf_qdisc.c      | 50 ++++---------------
- .../selftests/bpf/progs/bpf_qdisc_common.h    |  6 ---
- 2 files changed, 11 insertions(+), 45 deletions(-)
+Would a recvmsg() flag really solve that aspect of NFS hangs? By the
+time you read from the socket, the file is already attached to an SKB
+queued up on the socket, and cleaning up the file is your task's
+responsibility either way (which will either be done by the kernel for
+you if you don't read it into a control message, or by userspace if it
+was handed off through a control message). The process that sent the
+file to you might already be gone, it can't be on the hook for
+cleaning up the file anymore.
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c b/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
-index 53154544b28c..c4d797f95da9 100644
---- a/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
-+++ b/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
-@@ -50,42 +50,32 @@ static void do_test(char *qdisc)
- static void test_fifo(void)
- {
- 	struct bpf_qdisc_fifo *fifo_skel;
--	struct bpf_link *link;
- 
- 	fifo_skel = bpf_qdisc_fifo__open_and_load();
- 	if (!ASSERT_OK_PTR(fifo_skel, "bpf_qdisc_fifo__open_and_load"))
- 		return;
- 
--	link = bpf_map__attach_struct_ops(fifo_skel->maps.fifo);
--	if (!ASSERT_OK_PTR(link, "bpf_map__attach_struct_ops")) {
--		bpf_qdisc_fifo__destroy(fifo_skel);
--		return;
--	}
-+	if (!ASSERT_OK(bpf_qdisc_fifo__attach(fifo_skel), "bpf_qdisc_fifo__attach"))
-+		goto out;
- 
- 	do_test("bpf_fifo");
--
--	bpf_link__destroy(link);
-+out:
- 	bpf_qdisc_fifo__destroy(fifo_skel);
- }
- 
- static void test_fq(void)
- {
- 	struct bpf_qdisc_fq *fq_skel;
--	struct bpf_link *link;
- 
- 	fq_skel = bpf_qdisc_fq__open_and_load();
- 	if (!ASSERT_OK_PTR(fq_skel, "bpf_qdisc_fq__open_and_load"))
- 		return;
- 
--	link = bpf_map__attach_struct_ops(fq_skel->maps.fq);
--	if (!ASSERT_OK_PTR(link, "bpf_map__attach_struct_ops")) {
--		bpf_qdisc_fq__destroy(fq_skel);
--		return;
--	}
-+	if (!ASSERT_OK(bpf_qdisc_fq__attach(fq_skel), "bpf_qdisc_fq__attach"))
-+		goto out;
- 
- 	do_test("bpf_fq");
--
--	bpf_link__destroy(link);
-+out:
- 	bpf_qdisc_fq__destroy(fq_skel);
- }
- 
-@@ -97,18 +87,14 @@ static void test_qdisc_attach_to_mq(void)
- 			    .handle = 0x11 << 16,
- 			    .qdisc = "bpf_fifo");
- 	struct bpf_qdisc_fifo *fifo_skel;
--	struct bpf_link *link;
- 	int err;
- 
- 	fifo_skel = bpf_qdisc_fifo__open_and_load();
- 	if (!ASSERT_OK_PTR(fifo_skel, "bpf_qdisc_fifo__open_and_load"))
- 		return;
- 
--	link = bpf_map__attach_struct_ops(fifo_skel->maps.fifo);
--	if (!ASSERT_OK_PTR(link, "bpf_map__attach_struct_ops")) {
--		bpf_qdisc_fifo__destroy(fifo_skel);
--		return;
--	}
-+	if (!ASSERT_OK(bpf_qdisc_fifo__attach(fifo_skel), "bpf_qdisc_fifo__attach"))
-+		goto out;
- 
- 	SYS(out, "ip link add veth0 type veth peer veth1");
- 	hook.ifindex = if_nametoindex("veth0");
-@@ -121,7 +107,6 @@ static void test_qdisc_attach_to_mq(void)
- 
- 	SYS(out, "tc qdisc delete dev veth0 root mq");
- out:
--	bpf_link__destroy(link);
- 	bpf_qdisc_fifo__destroy(fifo_skel);
- }
- 
-@@ -133,18 +118,14 @@ static void test_qdisc_attach_to_non_root(void)
- 			    .handle = 0x11 << 16,
- 			    .qdisc = "bpf_fifo");
- 	struct bpf_qdisc_fifo *fifo_skel;
--	struct bpf_link *link;
- 	int err;
- 
- 	fifo_skel = bpf_qdisc_fifo__open_and_load();
- 	if (!ASSERT_OK_PTR(fifo_skel, "bpf_qdisc_fifo__open_and_load"))
- 		return;
- 
--	link = bpf_map__attach_struct_ops(fifo_skel->maps.fifo);
--	if (!ASSERT_OK_PTR(link, "bpf_map__attach_struct_ops")) {
--		bpf_qdisc_fifo__destroy(fifo_skel);
--		return;
--	}
-+	if (!ASSERT_OK(bpf_qdisc_fifo__attach(fifo_skel), "bpf_qdisc_fifo__attach"))
-+		goto out;
- 
- 	SYS(out, "tc qdisc add dev lo root handle 1: htb");
- 	SYS(out_del_htb, "tc class add dev lo parent 1: classid 1:1 htb rate 75Kbit");
-@@ -156,7 +137,6 @@ static void test_qdisc_attach_to_non_root(void)
- out_del_htb:
- 	SYS(out, "tc qdisc delete dev lo root htb");
- out:
--	bpf_link__destroy(link);
- 	bpf_qdisc_fifo__destroy(fifo_skel);
- }
- 
-@@ -232,14 +212,8 @@ static void test_default_qdisc_attach_to_mq(void)
- 	bpf_qdisc_fifo__destroy(fifo_skel);
- }
- 
--void test_bpf_qdisc(void)
-+void test_ns_bpf_qdisc(void)
- {
--	struct netns_obj *netns;
--
--	netns = netns_new("bpf_qdisc_ns", true);
--	if (!ASSERT_OK_PTR(netns, "netns_new"))
--		return;
--
- 	if (test__start_subtest("fifo"))
- 		test_fifo();
- 	if (test__start_subtest("fq"))
-@@ -250,8 +224,6 @@ void test_bpf_qdisc(void)
- 		test_qdisc_attach_to_non_root();
- 	if (test__start_subtest("incompl_ops"))
- 		test_incompl_ops();
--
--	netns_free(netns);
- }
- 
- void serial_test_bpf_qdisc_default(void)
-diff --git a/tools/testing/selftests/bpf/progs/bpf_qdisc_common.h b/tools/testing/selftests/bpf/progs/bpf_qdisc_common.h
-index 7e7f2fe04f22..3754f581b328 100644
---- a/tools/testing/selftests/bpf/progs/bpf_qdisc_common.h
-+++ b/tools/testing/selftests/bpf/progs/bpf_qdisc_common.h
-@@ -14,12 +14,6 @@
- 
- struct bpf_sk_buff_ptr;
- 
--u32 bpf_skb_get_hash(struct sk_buff *p) __ksym;
--void bpf_kfree_skb(struct sk_buff *p) __ksym;
--void bpf_qdisc_skb_drop(struct sk_buff *p, struct bpf_sk_buff_ptr *to_free) __ksym;
--void bpf_qdisc_watchdog_schedule(struct Qdisc *sch, u64 expire, u64 delta_ns) __ksym;
--void bpf_qdisc_bstats_update(struct Qdisc *sch, const struct sk_buff *skb) __ksym;
--
- static struct qdisc_skb_cb *qdisc_skb_cb(const struct sk_buff *skb)
- {
- 	return (struct qdisc_skb_cb *)skb->cb;
--- 
-2.47.1
+I think the thorough fix would probably be to introduce a socket
+option (controlled via setsockopt()) that already blocks the peer's
+sendmsg().
 
+> > > +                * In general though, userspace should just mark itse=
+lf
+> > > +                * non dumpable and not do any of this nonsense. We
+> > > +                * shouldn't work around this.
+> > > +                */
+> > > +               addr =3D (struct sockaddr_storage *)(&unix_addr);
+> > > +               retval =3D __sys_connect_file(file, addr, addr_size, =
+O_CLOEXEC);
+> >
+> > Have you made an intentional decision on whether you want to connect
+> > to a unix domain socket with a path relative to current->fs->root (so
+> > that containers can do their own core dump handling) or relative to
+> > the root namespace root (so that core dumps always reach the init
+> > namespace's core dumping even if a process sandboxes itself with
+> > namespaces or such)? Also, I think this connection attempt will be
+>
+> Fsck no. :) I just jotted this down as an RFC. Details below.
+>
+> > subject to restrictions imposed by (for example) Landlock or AppArmor,
+> > I'm not sure if that is desired here (since this is not actually a
+> > connection that the process in whose context the call happens decided
+> > to make, it's something the system administrator decided to do, and
+> > especially with Landlock, policies are controlled by individual
+> > applications that may not know how core dumps work on the system).
+> >
+> > I guess if we keep the current behavior where the socket path is
+> > namespaced, then we also need to keep the security checks, since an
+> > unprivileged user could probably set up a namespace and chroot() to a
+> > place where the socket path (indirectly, through a symlink) refers to
+> > an arbitrary socket...
+> >
+> > An alternative design might be to directly register the server socket
+> > on the userns/mountns/netns or such in some magic way, and then have
+> > the core dumping walk up the namespace hierarchy until it finds a
+> > namespace that has opted in to using its own core dumping socket, and
+> > connect to that socket bypassing security checks. (A bit like how
+> > namespaced binfmt_misc works.) Like, maybe userspace with namespaced
+>
+> Yeah, I namespaced that thing. :)
+
+Oh, hah, sorry, I forgot that was you.
+
+> > CAP_SYS_ADMIN could bind() to some magic UNIX socket address, or use
+> > some new setsockopt() on the socket or such, to become the handler of
+> > core dumps? This would also have the advantage that malicious
+> > userspace wouldn't be able to send fake bogus core dumps to the
+> > server, and the server would provide clear consent to being connected
+> > to without security checks at connection time.
+>
+> I think that's policy that I absolute don't want the kernel to get
+> involved in unless absolutely necessary. A few days ago I just discussed
+> this at length with Lennart and the issue is that systemd would want to
+> see all coredumps on the system independent of the namespace they're
+> created in. To have a per-namespace (userns/mountns/netns) coredump
+> socket would invalidate that one way or the other and end up hiding
+> coredumps from the administrator unless there's some elaborate scheme
+> where it doesn't.
+>
+> systemd-coredump (and Apport fwiw) has infrastructure to forward
+> coredumps to individual services and containers and it's already based
+> on AF_UNIX afaict. And I really like that it's the job of userspace to
+> deal with this instead of the kernel having to get involved in that
+> mess.
+>
+> So all of this should be relative to the initial namespace. I want a
+
+Ah, sounds good.
+
+> separate security hook though so an LSMs can be used to prevent
+> processes from connecting to the coredump socket.
+>
+> My idea has been that systemd-coredump could use a bpf lsm program that
+> would allow to abort a coredump before the crashing process connects to
+> the socket and again make this a userspace policy issue.
+
+I don't understand this part. Why would you need an LSM to prevent a
+crashing process from connecting, can't the coredumping server process
+apply whatever filtering it wants in userspace?
 
