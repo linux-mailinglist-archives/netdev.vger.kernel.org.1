@@ -1,234 +1,197 @@
-Return-Path: <netdev+bounces-187465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEB9CAA7414
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 15:44:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B597AA73D8
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 15:36:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 287584C015D
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 13:44:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D347816B7C9
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 13:36:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CC91255E55;
-	Fri,  2 May 2025 13:44:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E8D825525E;
+	Fri,  2 May 2025 13:36:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="aCjcfw/4";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="tX7g9Z2q"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="PvKh08Tv"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2851A255E2F
-	for <netdev@vger.kernel.org>; Fri,  2 May 2025 13:44:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F71014286;
+	Fri,  2 May 2025 13:36:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746193494; cv=none; b=n7uc2IY+8R877ha085aagPAC7xlKcEFtdJRRiT6Ej6F4HA0cBjJLVtKGiFWa6t2kvreVfa7hlSUeAJxtcDgNTSR4CVD66hBLhEXd1JAfWk/CHNW31elWhztzcqnnZVoQbLbPEv7mI7NBOurhzd9Q1CMvC3ixjRKRT96WXmpd0Bs=
+	t=1746192976; cv=none; b=gDHIbnrTaP2aGlW9rybBv5HwIyI5BrTMCWjAKV8rTxDE01iaMBl1+r/OXLQwqoD6JAJg1A1sF0F3qWd2I7ZRxqvVMRxmRqzFkXBV4i2PVdEi8umX32xEAm1VrDAd/mFykpFqhqmlIujKNoA7LHAt3lwDIZRJWRL/8JBktnUuBUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746193494; c=relaxed/simple;
-	bh=bXWtEgK9TzRiij/Dk4f7B88nhogoZIxK/QBLZY6dhAY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lorwj83vQLiPjcGF8biZrb+b8YbGE+2QI8B9puity3stXRy2c5AOZhaukebLqEQ88p3RmuNhHjwk1ZP2HfCBfsYMdUtAfCC1XN4G1Nt3W2trw6z9mrRHaLE8tV6m7nylgThCjT2IQaXeus1PowHqb7Kog02viQPAvxwfeuHj1EI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=aCjcfw/4; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=tX7g9Z2q; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Fri, 2 May 2025 15:32:31 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1746192753;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JIFY1lnbeFhsEKUNrmrLTutQgu030503n74UHDdUDsU=;
-	b=aCjcfw/4LNyI3jsIeYsWb56w8nsXB94Pj1O6TJokHpaMBFo3v8GSaTaxKgbcXmj3aUEA/y
-	ZyY/nIAfTQuW2LUdv35Qt8U+s+kvdLU70MFt+xRQn8SlOaJ8DNu+W8Cv0aHemfeJBuRcKs
-	8Kdv9lvNP2mdoBB+lCRqJS6WId7gzbZnmkeXoZ7NP1fCb2wdoPFXOj0dr+8UusNe6Z0b20
-	moNh5nruodUSgWQW7b0AciKErIO370xpM/onIaqANe/0JvQxnO9/WWwCV0FCTBhD0c7TdX
-	IInmKD+9bXLeOKs29pBRW7QbcgwLswwjhcRLNZYnssXiEuQAWoEp+yjBqgtReg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1746192753;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JIFY1lnbeFhsEKUNrmrLTutQgu030503n74UHDdUDsU=;
-	b=tX7g9Z2qGZwo4rmtwq9FU/TETMOoF5zlSQHEp118YsLQfmaV+G+hMKrdJOPPpiBp9qd9Qt
-	FPM7tdRgmbsAtOAw==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-Cc: netdev@vger.kernel.org, linux-rt-devel@lists.linux.dev,
+	s=arc-20240116; t=1746192976; c=relaxed/simple;
+	bh=itYuNuJj572zzzMX8A1KgMiEzW0C+pb2+fnN7fRpI3E=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=rCDm4VfSkbRkUN1l0ipxq5H8WI+vGtl5/4bdYYqHKMDOxE9eNLBPlrZ4EPdo3kpLeB/L2e+gzJD2+QNC1t0nY8nQAt/4bHTb/DfbAucBWCpuWX1isPV9y9ws6iF49VwJTxPR8BJasxjVZsnDGrncuJd2ZLk2dHYjOhEpg3FABVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=PvKh08Tv; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=O9ohtHnmOIl7u93HcZyBYwH6Cqu/+kupWqZ4QCzt0ZI=; b=PvKh08TvSkmZOeHKvC5o+PCP2t
+	vvyWSy67sqf3Ohw1yKQ//2g4/OC1xbqRyKYZMAFlv2OUcAmcKy1S3N6ezWl75mnQL1v6caf5ahTlC
+	KoUaB9s3m+IMrnaXVoIwPh9Ieo/eW8yz8465JxXwVjxapXHrxRKEqeoRdAHyRPLhMdpRHn6hSEvi/
+	Ey1O655njlSi9Py68eklClN1zqEGeyuESk3EXkUvTIRygNUIveeHjDywiB4qSvjXnMlwI+UzwEj+a
+	N5mfR7mGVUWVYCahPku4mf3jD9GVCdwcOhOZ7So09bSX6VXqqdV1yWddqUX5RHJ+0KvX1hR5R4HiN
+	9KS79M6w==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:44032 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1uAqYk-0001OV-02;
+	Fri, 02 May 2025 14:36:10 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1uAqY7-002D3e-R3; Fri, 02 May 2025 14:35:31 +0100
+In-Reply-To: <aBTKOBKnhoz3rrlQ@shell.armlinux.org.uk>
+References: <aBTKOBKnhoz3rrlQ@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	bpf@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>
-Subject: Re: [PATCH net-next v3 05/18] xdp: Use nested-BH locking for
- system_page_pool
-Message-ID: <20250502133231.lS281-FN@linutronix.de>
-References: <20250430124758.1159480-1-bigeasy@linutronix.de>
- <20250430124758.1159480-6-bigeasy@linutronix.de>
- <878qng7i63.fsf@toke.dk>
+	John Fastabend <john.fastabend@gmail.com>,
+	Jon Hunter <jonathanh@nvidia.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Thierry Reding <treding@nvidia.com>
+Subject: [PATCH net-next v2 1/4] net: phylink: add ability to block carrier up
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <878qng7i63.fsf@toke.dk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1uAqY7-002D3e-R3@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Fri, 02 May 2025 14:35:31 +0100
 
-On 2025-05-01 12:13:24 [+0200], Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> > --- a/net/core/dev.c
-> > +++ b/net/core/dev.c
-> > @@ -462,7 +462,9 @@ EXPORT_PER_CPU_SYMBOL(softnet_data);
-> >   * PP consumers must pay attention to run APIs in the appropriate cont=
-ext
-> >   * (e.g. NAPI context).
-> >   */
-> > -DEFINE_PER_CPU(struct page_pool *, system_page_pool);
-> > +DEFINE_PER_CPU(struct page_pool_bh, system_page_pool) =3D {
-> > +	.bh_lock =3D INIT_LOCAL_LOCK(bh_lock),
-> > +};
->=20
-> I'm a little fuzzy on how DEFINE_PER_CPU() works, but does this
-> initialisation automatically do the right thing with the multiple
-> per-CPU instances?
+Network drivers such as stmmac need to quiesce the network device prior
+to changing the DMA configuration. Currently, they do this by calling
+netif_carrier_off() to stop the network stack pushing packets, but this
+is incompatible with phylink.
 
-It sets the "first" per-CPU data which is then copied to all
-"possible-CPUs" during early boot when the per-CPU data is made
-available. You can initialize almost everything like that. Pointer based
-structures (such as LIST_HEAD_INIT()) is something that obviously won't
-work.
+Provide a pair of functions to allow the software link state to be
+blocked and brought down if necessary, and restored afterwards.
 
-> >  #ifdef CONFIG_LOCKDEP
-> >  /*
-> > --- a/net/core/xdp.c
-> > +++ b/net/core/xdp.c
-> > @@ -737,10 +737,10 @@ static noinline bool xdp_copy_frags_from_zc(struc=
-t sk_buff *skb,
-> >   */
-> >  struct sk_buff *xdp_build_skb_from_zc(struct xdp_buff *xdp)
-> >  {
-> > -	struct page_pool *pp =3D this_cpu_read(system_page_pool);
-> >  	const struct xdp_rxq_info *rxq =3D xdp->rxq;
-> >  	u32 len =3D xdp->data_end - xdp->data_meta;
-> >  	u32 truesize =3D xdp->frame_sz;
-> > +	struct page_pool *pp;
-> >  	struct sk_buff *skb;
-> >  	int metalen;
-> >  	void *data;
-> > @@ -748,13 +748,18 @@ struct sk_buff *xdp_build_skb_from_zc(struct xdp_=
-buff *xdp)
-> >  	if (!IS_ENABLED(CONFIG_PAGE_POOL))
-> >  		return NULL;
-> > =20
-> > +	local_lock_nested_bh(&system_page_pool.bh_lock);
-> > +	pp =3D this_cpu_read(system_page_pool.pool);
-> >  	data =3D page_pool_dev_alloc_va(pp, &truesize);
-> > -	if (unlikely(!data))
-> > +	if (unlikely(!data)) {
-> > +		local_unlock_nested_bh(&system_page_pool.bh_lock);
-> >  		return NULL;
-> > +	}
-> > =20
-> >  	skb =3D napi_build_skb(data, truesize);
-> >  	if (unlikely(!skb)) {
-> >  		page_pool_free_va(pp, data, true);
-> > +		local_unlock_nested_bh(&system_page_pool.bh_lock);
-> >  		return NULL;
-> >  	}
-> > =20
-> > @@ -773,9 +778,11 @@ struct sk_buff *xdp_build_skb_from_zc(struct xdp_b=
-uff *xdp)
-> > =20
-> >  	if (unlikely(xdp_buff_has_frags(xdp)) &&
-> >  	    unlikely(!xdp_copy_frags_from_zc(skb, xdp, pp))) {
-> > +		local_unlock_nested_bh(&system_page_pool.bh_lock);
-> >  		napi_consume_skb(skb, true);
-> >  		return NULL;
-> >  	}
-> > +	local_unlock_nested_bh(&system_page_pool.bh_lock);
->=20
-> Hmm, instead of having four separate unlock calls in this function, how
-> about initialising skb =3D NULL, and having the unlock call just above
-> 'return skb' with an out: label?
->=20
-> Then the three topmost 'return NULL' can just straight-forwardly be
-> replaced with 'goto out', while the last one becomes 'skb =3D NULL; goto
-> out;'. I think that would be more readable than this repetition.
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/phy/phylink.c | 50 +++++++++++++++++++++++++++++++++++++++
+ include/linux/phylink.h   |  3 +++
+ 2 files changed, 53 insertions(+)
 
-Something like the following maybe? We would keep the lock during
-napi_consume_skb() which should work.
-
-diff --git a/net/core/xdp.c b/net/core/xdp.c
-index b2a5c934fe7b7..1ff0bc328305d 100644
---- a/net/core/xdp.c
-+++ b/net/core/xdp.c
-@@ -740,8 +740,8 @@ struct sk_buff *xdp_build_skb_from_zc(struct xdp_buff *=
-xdp)
- 	const struct xdp_rxq_info *rxq =3D xdp->rxq;
- 	u32 len =3D xdp->data_end - xdp->data_meta;
- 	u32 truesize =3D xdp->frame_sz;
-+	struct sk_buff *skb =3D NULL;
- 	struct page_pool *pp;
--	struct sk_buff *skb;
- 	int metalen;
- 	void *data;
-=20
-@@ -751,16 +751,13 @@ struct sk_buff *xdp_build_skb_from_zc(struct xdp_buff=
- *xdp)
- 	local_lock_nested_bh(&system_page_pool.bh_lock);
- 	pp =3D this_cpu_read(system_page_pool.pool);
- 	data =3D page_pool_dev_alloc_va(pp, &truesize);
--	if (unlikely(!data)) {
--		local_unlock_nested_bh(&system_page_pool.bh_lock);
--		return NULL;
--	}
-+	if (unlikely(!data))
-+		goto out;
-=20
- 	skb =3D napi_build_skb(data, truesize);
- 	if (unlikely(!skb)) {
- 		page_pool_free_va(pp, data, true);
--		local_unlock_nested_bh(&system_page_pool.bh_lock);
--		return NULL;
-+		goto out;
- 	}
-=20
- 	skb_mark_for_recycle(skb);
-@@ -778,15 +775,16 @@ struct sk_buff *xdp_build_skb_from_zc(struct xdp_buff=
- *xdp)
-=20
- 	if (unlikely(xdp_buff_has_frags(xdp)) &&
- 	    unlikely(!xdp_copy_frags_from_zc(skb, xdp, pp))) {
--		local_unlock_nested_bh(&system_page_pool.bh_lock);
- 		napi_consume_skb(skb, true);
--		return NULL;
-+		skb =3D NULL;
- 	}
-+
-+out:
- 	local_unlock_nested_bh(&system_page_pool.bh_lock);
--
--	xsk_buff_free(xdp);
--
--	skb->protocol =3D eth_type_trans(skb, rxq->dev);
-+	if (skb) {
-+		xsk_buff_free(xdp);
-+		skb->protocol =3D eth_type_trans(skb, rxq->dev);
-+	}
-=20
- 	return skb;
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 0faa3d97e06b..d522e12f89e8 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -26,6 +26,7 @@
+ 
+ enum {
+ 	PHYLINK_DISABLE_STOPPED,
++	PHYLINK_DISABLE_CARRIER,
+ 	PHYLINK_DISABLE_LINK,
+ 	PHYLINK_DISABLE_MAC_WOL,
+ 
+@@ -83,6 +84,7 @@ struct phylink {
+ 	bool mac_tx_clk_stop;
+ 	u32 mac_tx_lpi_timer;
+ 	u8 mac_rx_clk_stop_blocked;
++	u8 mac_carrier_blocked;
+ 
+ 	struct sfp_bus *sfp_bus;
+ 	bool sfp_may_have_phy;
+@@ -2456,6 +2458,54 @@ void phylink_stop(struct phylink *pl)
  }
+ EXPORT_SYMBOL_GPL(phylink_stop);
+ 
++/**
++ * phylink_carrier_block() - unblock carrier state
++ * @pl: a pointer to a &struct phylink returned from phylink_create()
++ *
++ * Disable the software link, which will call mac_link_down(). This is to
++ * allow network drivers to safely adjust e.g. DMA settings with the
++ * device idle. All calls to phylink_carrier_block() must be balanced by
++ * the appropriate number of calls to phylink_carrier_unblock().
++ */
++void phylink_carrier_block(struct phylink *pl)
++{
++	ASSERT_RTNL();
++
++	if (pl->mac_carrier_blocked == U8_MAX) {
++		phylink_warn(pl, "%s called too many times - ignoring\n",
++			     __func__);
++		dump_stack();
++		return;
++	}
++
++	if (pl->mac_carrier_blocked++ == 0)
++		phylink_run_resolve_and_disable(pl, PHYLINK_DISABLE_CARRIER);
++}
++EXPORT_SYMBOL_GPL(phylink_carrier_block);
++
++/**
++ * phylink_carrier_unblock() - unblock carrier state
++ * @pl: a pointer to a &struct phylink returned from phylink_create()
++ *
++ * All calls to phylink_carrier_block() must be balanced with a corresponding
++ * call to phylink_carrier_unblock() to restore the carrier state.
++ */
++void phylink_carrier_unblock(struct phylink *pl)
++{
++	ASSERT_RTNL();
++
++	if (pl->mac_carrier_blocked == 0) {
++		phylink_warn(pl, "%s called too many times - ignoring\n",
++			     __func__);
++		dump_stack();
++		return;
++	}
++
++	if (--pl->mac_carrier_blocked == 0)
++		phylink_enable_and_run_resolve(pl, PHYLINK_DISABLE_CARRIER);
++}
++EXPORT_SYMBOL_GPL(phylink_carrier_unblock);
++
+ /**
+  * phylink_rx_clk_stop_block() - block PHY ability to stop receive clock in LPI
+  * @pl: a pointer to a &struct phylink returned from phylink_create()
+diff --git a/include/linux/phylink.h b/include/linux/phylink.h
+index 30659b615fca..a48032561183 100644
+--- a/include/linux/phylink.h
++++ b/include/linux/phylink.h
+@@ -715,6 +715,9 @@ int phylink_pcs_pre_init(struct phylink *pl, struct phylink_pcs *pcs);
+ void phylink_start(struct phylink *);
+ void phylink_stop(struct phylink *);
+ 
++void phylink_carrier_block(struct phylink *);
++void phylink_carrier_unblock(struct phylink *);
++
+ void phylink_rx_clk_stop_block(struct phylink *);
+ void phylink_rx_clk_stop_unblock(struct phylink *);
+ 
+-- 
+2.30.2
 
-> -Toke
-
-Sebastian
 
