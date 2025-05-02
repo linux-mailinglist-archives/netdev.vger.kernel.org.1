@@ -1,190 +1,131 @@
-Return-Path: <netdev+bounces-187371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AF3EAA6A89
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 08:09:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69A7BAA6AAF
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 08:19:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C17123BF050
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 06:09:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85E3D988258
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 06:19:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A2AE1F3BA4;
-	Fri,  2 May 2025 06:08:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77C6021FF4F;
+	Fri,  2 May 2025 06:19:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="AiVEFlUu"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="oPDN5om4"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 279C31E51E3;
-	Fri,  2 May 2025 06:08:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39EA221FF20;
+	Fri,  2 May 2025 06:19:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746166092; cv=none; b=Mu7S7ernV6ip37iU5KZ5t9o1kEg/0bGLMOydjeVZLqEjtXKdVQ0V7medHtGYEzV1hxuXvX2nOdXlNKTCZLLklXK2JQdZ/bJcNCyn2w4kooG5JwnGEEwMaBIdl80VLN6dR9kDpdy/u54CJD1eTZqxIpECYCO7dtCZMFjDbPd8gVI=
+	t=1746166767; cv=none; b=VN6bkV0Fh4LvE8NtDhSk4abKPnmcTYqOwLfeN11ReLG7jrN1iHpBD9DwMJcz/2WaUG3+RhbVtje64rskNq3b0FXOjFkrMsP9k6dffcGJhTZVlCka+LoQJisvQwWG2SZ+6uG6bssQNX7pT00u3wwz6OavJhQITL1csGjcOr/LYbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746166092; c=relaxed/simple;
-	bh=Vx2THve1rmsHzjpjDKRkcdp0KoxQt1d23ap0dGDJAX0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X5V2fI9jIUoDSI1cSx/LCAaFDbH26DF5lmja4l7HfM9WrfRX+aEx8VaiEEMFghxqzvkglnCiH+lXPeNvbLSQY9JUDe3cYlHvlmL2nayTBMY7GvNhkBPm6UxtRitexvTddlt83kuljimMueOhjVz0szZwTMECGIulaTjkWPsOsuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=AiVEFlUu; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id 789102020964; Thu,  1 May 2025 23:08:09 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 789102020964
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1746166089;
-	bh=9+r69ZddY1UZkHR3/FwhIdCjqmNBZaadDjUSZVoYSAo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AiVEFlUu8IfyCCGNVGXAeB65x7LTHiBsP3cyaB05BdyktmMQdrW7BvdxLv00u1I+K
-	 r1g0rPMQqAsJ3B7qyaA52zhAQgAZXeGda+rIgFQ4eUeNd7kZJ40alPQW5JDCrpituU
-	 tCG1qe5CmLcW70KOfqLSp6O8Dh//y+Ae1fadP70w=
-Date: Thu, 1 May 2025 23:08:09 -0700
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: Michael Kelley <mhklinux@outlook.com>
-Cc: "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Nipun Gupta <nipun.gupta@amd.com>,
-	Yury Norov <yury.norov@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Jonathan Cameron <Jonathan.Cameron@huwei.com>,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>,
-	Kevin Tian <kevin.tian@intel.com>, Long Li <longli@microsoft.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Bjorn Helgaas <bhelgaas@google.com>, Rob Herring <robh@kernel.org>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Krzysztof Wilczy?ski <kw@linux.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Simon Horman <horms@kernel.org>, Leon Romanovsky <leon@kernel.org>,
-	Maxim Levitsky <mlevitsk@redhat.com>,
-	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	Paul Rosswurm <paulros@microsoft.com>,
-	Shradha Gupta <shradhagupta@microsoft.com>
-Subject: Re: [PATCH v2 3/3] net: mana: Allocate MSI-X vectors dynamically as
- required
-Message-ID: <20250502060809.GA10704@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1745578407-14689-1-git-send-email-shradhagupta@linux.microsoft.com>
- <1745578478-15195-1-git-send-email-shradhagupta@linux.microsoft.com>
- <SN6PR02MB4157FF2CA8E37298FC634491D4822@SN6PR02MB4157.namprd02.prod.outlook.com>
- <20250501142354.GA6208@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <SN6PR02MB4157EAC71A53E152EE684A4DD4822@SN6PR02MB4157.namprd02.prod.outlook.com>
+	s=arc-20240116; t=1746166767; c=relaxed/simple;
+	bh=Nznyg0LG5io9vLtmVMBR4II8Mn63VTmHrHvN2HbmD/o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=sHRJGOkqnAtYsnqXnSrMD0FUlTWSpAXhUyvipR9EpizHrCg0Yv2gUQUoQYUJAEOQiTktxO8Ziv0PrzglNkvj15C/+LXi7Bn49BYlgwLi+zACKP1YI6TB4Mmatb7SAN9s1l9kd7PxBMwOhhiWM2sscbH876hK/pJmHQgz+iQT3is=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=oPDN5om4; arc=none smtp.client-ip=198.47.23.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 5426IsIj346797
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 2 May 2025 01:18:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1746166734;
+	bh=K0RNhMfK3sIBzFbukwC318fh71Ziu5vXXAkpvIWDZxI=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=oPDN5om4VdiNS9FHLM0mQHoXcY1TMVEPLCYYtP4ccAerBHC7wM0LQ3pbfQCwJvMpj
+	 1+/FoT5lVgrky8w2nFwSuTeougZmyvZXCLlMgtsoLneMQ66CpZtqHk0rIh/DnP62Of
+	 Utwy567detCy+Xg2uBg5MFrj9tBqiUd4CYxcQ4fA=
+Received: from DLEE103.ent.ti.com (dlee103.ent.ti.com [157.170.170.33])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 5426IsJO022218
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Fri, 2 May 2025 01:18:54 -0500
+Received: from DLEE108.ent.ti.com (157.170.170.38) by DLEE103.ent.ti.com
+ (157.170.170.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 2
+ May 2025 01:18:53 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE108.ent.ti.com
+ (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 2 May 2025 01:18:53 -0500
+Received: from [172.24.30.16] (lt9560gk3.dhcp.ti.com [172.24.30.16])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 5426IlMR072250;
+	Fri, 2 May 2025 01:18:48 -0500
+Message-ID: <64396b06-5ea7-4da9-b854-b3d42f2b9bde@ti.com>
+Date: Fri, 2 May 2025 11:48:47 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SN6PR02MB4157EAC71A53E152EE684A4DD4822@SN6PR02MB4157.namprd02.prod.outlook.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 2/4] net: ti: icssg-prueth: Report BQL before sending
+ XDP packets
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <dan.carpenter@linaro.org>, <john.fastabend@gmail.com>, <hawk@kernel.org>,
+        <daniel@iogearbox.net>, <ast@kernel.org>, <pabeni@redhat.com>,
+        <edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
+        <bpf@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+        Roger Quadros
+	<rogerq@kernel.org>, <danishanwar@ti.com>
+References: <20250428120459.244525-1-m-malladi@ti.com>
+ <20250428120459.244525-3-m-malladi@ti.com>
+ <20250501075357.37f2dc4f@kernel.org>
+Content-Language: en-US
+From: "Malladi, Meghana" <m-malladi@ti.com>
+In-Reply-To: <20250501075357.37f2dc4f@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On Thu, May 01, 2025 at 03:56:48PM +0000, Michael Kelley wrote:
-> From: Shradha Gupta <shradhagupta@linux.microsoft.com> Sent: Thursday, May 1, 2025 7:24 AM
-> > 
-> > On Thu, May 01, 2025 at 05:27:49AM +0000, Michael Kelley wrote:
-> > > From: Shradha Gupta <shradhagupta@linux.microsoft.com> Sent: Friday, April 25,
-> > 2025 3:55 AM
-> > > >
-> > > > Currently, the MANA driver allocates MSI-X vectors statically based on
-> > > > MANA_MAX_NUM_QUEUES and num_online_cpus() values and in some cases ends
-> > > > up allocating more vectors than it needs. This is because, by this time
-> > > > we do not have a HW channel and do not know how many IRQs should be
-> > > > allocated.
-> > > >
-> > > > To avoid this, we allocate 1 MSI-X vector during the creation of HWC and
-> > > > after getting the value supported by hardware, dynamically add the
-> > > > remaining MSI-X vectors.
-> > >
-> > > I have a top-level thought about the data structures used to manage a
-> > > dynamic number of MSI-X vectors. The current code allocates a fixed size
-> > > array of struct gdma_irq_context, with one entry in the array for each
-> > > MSI-X vector. To find the entry for a particular msi_index, the code can
-> > > just index into the array, which is nice and simple.
-> > >
-> > > The new code uses a linked list of struct gdma_irq_context entries, with
-> > > one entry in the list for each MSI-X vector.  In the dynamic case, you can
-> > > start with one entry in the list, and then add to the list however many
-> > > additional entries the hardware will support.
-> > >
-> > > But this additional linked list adds significant complexity to the code
-> > > because it must be linearly searched to find the entry for a particular
-> > > msi_index, and there's the messiness of putting entries onto the list
-> > > and taking them off.  A spin lock is required.  Etc., etc.
-> > >
-> > > Here's an intermediate approach that would be simpler. Allocate a fixed
-> > > size array of pointers to struct gdma_irq_context. The fixed size is the
-> > > maximum number of possible MSI-X vectors for the device, which I
-> > > think is MANA_MAX_NUM_QUEUES, or 64 (correct me if I'm wrong
-> > > about that). Allocate a new struct gdma_irq_context when needed,
-> > > but store the address in the array rather than adding it onto a list.
-> > > Code can then directly index into the array to access the entry.
-> > >
-> > > Some entries in the array will be unused (and "wasted") if the device
-> > > uses fewer MSI-X vector, but each unused entry is only 8 bytes. The
-> > > max space unused is fewer than 512 bytes (assuming 64 entries in
-> > > the array), which is neglible in the grand scheme of things. With the
-> > > simpler code, and not having the additional list entry embedded in
-> > > each struct gmda_irq_context, you'll get some of that space back
-> > > anyway.
-> > >
-> > > Maybe there's a reason for the list that I missed in my initial
-> > > review of the code. But if not, it sure seems like the code could
-> > > be simpler, and having some unused 8 bytes entries in the array
-> > > is worth the tradeoff for the simplicity.
-> > >
-> > > Michael
-> > 
-> > Hey  Michael,
-> > 
-> > Thanks for your inputs. We did think of this approach and in fact that
-> > was how this patch was implemented(fixed size array) in the v1 of our
-> > internal reviews.
-> > 
-> > However, it came up in those reviews that we want to move away
-> > from the 64(MANA_MAX_NUM_QUEUES) as a hard limit for some new
-> > requirements, atleast for the dynamic IRQ allocation path. And now the
-> > new limit for all hardening purposes would be num_online_cpus().
-> > 
-> > Using this limit and the fixed array size approach creates problems,
-> > especially in machines with high number of vCPUs. It would lead to
-> > quite a bit of memory/resource wastage.
-> > 
-> > Hence, we decided to go ahead with this design.
-> > 
-> > Regards,
-> > Shradha.
-> 
-> One other thought:  Did you look at using an xarray? See
-> https://www.kernel.org/doc/html/latest/core-api/xarray.html.
-> It has most of or all the properties you need to deal with
-> a variable number of entries, while handling all the locking
-> automatically. Entries can be accessed with just a simple
-> index value.
-> 
-> I don't have first-hand experience writing code using xarrays,
-> so I can't be sure that it would simplify things for MANA IRQ
-> allocation, but it seems to be a very appropriate abstraction
-> for this use case.
-> 
-> Michael
->
-Thanks Michael,
+Hi Jakub,
 
-This does look promising for our usecase. I will try it with this patch,
-update the thread and then send out the next version as required.
+On 5/1/2025 8:23 PM, Jakub Kicinski wrote:
+> On Mon, 28 Apr 2025 17:34:57 +0530 Meghana Malladi wrote:
+>> When sending out any kind of traffic, it is essential that the driver
+>> keeps reporting BQL of the number of bytes that have been sent so that
+>> BQL can track the amount of data in the queue and prevents it from
+>> overflowing. If BQL is not reported, the driver may continue sending
+>> packets even when the queue is full, leading to packet loss, congestion
+>> and decreased network performance. Currently this is missing in
+>> emac_xmit_xdp_frame() and this patch fixes it.
+> 
+> The ordering of patches in the series is a bit off.
+> The order should be something like:
+> 
+>    net: ti: icssg-prueth: Set XDP feature flags for ndev
+>    net: ti: icssg-prueth: Fix kernel panic during concurrent Tx queue ...
+>    net: ti: icssg-prueth: Fix race condition for traffic from different ...
+>    net: ti: icssg-prueth: Report BQL before sending XDP packets
+> 
+> This patch is not correct without the extra locking in place.
 
-Regards,
-Shradha.
+Actually the order of bug fixes which I posted, is the order in which I 
+fixed the bugs, while running xdp-trafficgen:
+1. ndo_xdp_xmit() wasn't getting called because of missing XDP feature 
+flags check.
+2. kernel crash: kernel BUG at lib/dynamic_queue_limits.c:99! and was 
+fixed by reporting BQL for packet transmission.My bad, I forgot  to add 
+this in the commit message.
+3. kernel crash: kernel BUG at lib/genalloc.c:508! due to memory 
+corruption in DMA descriptors and fixed it with spinlock
+4. kernel crash: kernel BUG at lib/dynamic_queue_limits.c:99! due to 
+race condition in netif_txq and fixed it with __netif_tx_lock()
+
+But yeah I think the order you suggested makes more sense. Let me try 
+that and post v2.
+
+-- 
+Thanks,
+Meghana Malladi
+
 
