@@ -1,66 +1,50 @@
-Return-Path: <netdev+bounces-187553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9620FAA7D64
-	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 01:41:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AB8A2AA7D75
+	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 01:50:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87ABD1C04F6B
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 23:41:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7ACF11BC7B5C
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 23:50:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A1B9254AF0;
-	Fri,  2 May 2025 23:38:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFBD822A7E6;
+	Fri,  2 May 2025 23:49:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="dZeLnKU1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U/leqgbZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E89324C061
-	for <netdev@vger.kernel.org>; Fri,  2 May 2025 23:38:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D0120E703;
+	Fri,  2 May 2025 23:49:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746229106; cv=none; b=KcmiK+YRyIylO8lH8mBalLxDTT1BbHm41iaYUVXe2FA2FW7FvsVYFvWoAMwiCNJNvVFGQBNVvtnKm1gP0JTdk8iXNdT+aB4fJD9NxM3V0XC0smtOWf1FALlAgGUnifhgjVtKlpLo3u35ueBf++fJSU+C2jEfDIVpbApAiaT4HIU=
+	t=1746229798; cv=none; b=n2u65c+yUR+QrdSybfKASiFI/0xyCwy6VsJCBl47BnfyzZlZbIKY7dbdC6Fy57vOAnO64WQFWkOKCa0m7lmdfIJaELPsGiY+mN5GQ/F803aMf6Z79a/jRpH4G2kFVmyYBmqz5cMLXSrcdFuStyyqTS/12/9zQdMYiqnu/yh9GMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746229106; c=relaxed/simple;
-	bh=M1ixOlJ2L4Z4CgWFDLijLLB0IiPhfAHWva39O+qwyO8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JOPpMtMkV/ioCq+Orghm0rCiC0+saHQiPzPYAVeBeWOOTx6rjdeqovzgmbROL1ZjAb4KRDgjs+tnaiRKXNga1wB65NanuNIbZ1pmFNrdnQ7+PpL3JYKmBYlhebB/E2XbLf3H79Qslp4Dgq7yqSyNGHeAtJI6yuinNHadBKwuqo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=dZeLnKU1; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=zkt+bGwsIpVd+FthqxG3reCZb8L9GsEHpQz9GTXXQh4=; t=1746229104; x=1747093104; 
-	b=dZeLnKU1lALBpwzd9mHlgI5FednsXGh3RVjU6J3tApLuCVc8u8o4/CE2ok7IkYXe21Mh9PqbPwR
-	mQYvtQAd1CkxVq39NnnEKTjQYXsixxcLgpjxRsSqVji4RP+MLsF11WThqzuCNZZAd5OlmoKyo0n0E
-	FsRw2aiAIAHtm9gNxwP3wTdB9Y0c/XW+fnzeub0nFaiPpCnJYuRyHBUd4KizL3tAhYqA+UDT1CDNY
-	nHOX+eKsA/OJwnO5agthFxFvsFZbHBXHk2zCzkyQ2vYxFUgltEtSKINr7KOro/FSE7s2t/75ci6O9
-	0wcmUnEDOQ6AThMh+yw5UOkb8kcGjZY8VGWQ==;
-Received: from ouster448.stanford.edu ([172.24.72.71]:64199 helo=localhost.localdomain)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1uAzxX-0007if-If; Fri, 02 May 2025 16:38:24 -0700
-From: John Ousterhout <ouster@cs.stanford.edu>
-To: netdev@vger.kernel.org
-Cc: pabeni@redhat.com,
-	edumazet@google.com,
-	horms@kernel.org,
-	kuba@kernel.org,
-	John Ousterhout <ouster@cs.stanford.edu>
-Subject: [PATCH net-next v8 15/15] net: homa: create Makefile and Kconfig
-Date: Fri,  2 May 2025 16:37:28 -0700
-Message-ID: <20250502233729.64220-16-ouster@cs.stanford.edu>
-X-Mailer: git-send-email 2.45.1
-In-Reply-To: <20250502233729.64220-1-ouster@cs.stanford.edu>
-References: <20250502233729.64220-1-ouster@cs.stanford.edu>
+	s=arc-20240116; t=1746229798; c=relaxed/simple;
+	bh=yG9LcAGUkC+cOxnXcJ4G8nVqrUCz6qNazF2vIUeNWJs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=UCzUhU30R0812gt8bId1JzFMJVqTAB+m6lhxl0lNWGEWMGwi3hLLjAu+UINGJ/udHmCch6Oput0YJh8OguX919BEK/MGEpLTi9pkd5BBWH3uWg+SlgL6/VQ3nY+OuiIzsHQhuBLA5ejkvLV3LE6XIC3bmhmeCtI2LZmzupIi2HE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U/leqgbZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12E91C4CEE4;
+	Fri,  2 May 2025 23:49:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746229798;
+	bh=yG9LcAGUkC+cOxnXcJ4G8nVqrUCz6qNazF2vIUeNWJs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=U/leqgbZympbLDIuK8XjBV2AX07E0JcObJ/DtD04hmm5LRcbUox1Lw6u4c4DRIIOP
+	 gQjZEQm9Ag6blWkWUM1xdL9fYM77jdoK4Q6uJv83eUCBTLyilJA1GJdRe9rfxogtOK
+	 iW3sVDRb08p9YWV/bSsj/R1l/QWne4Q0n1pBvdISJFEyC7466S0qfclfFl0OEbEnV1
+	 PAp/RcLkKU08LK/tihRIrRs+2Q9hPml3FIM6IQBR+pTkAtbuoou3kY1XxZGR0ubSCS
+	 +VpxSgskpcyeyW5trruyvWet6NBOlOQMUM3XKGDVIvU8/XANTUFyzm6XVktxwanceE
+	 CR+xsM0ilM1oA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D16380DBE9;
+	Fri,  2 May 2025 23:50:38 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,99 +52,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Score: -101.0
-X-Scan-Signature: 50c535147b6e7155177bcd7d65214eb3
+Subject: Re: [PATCH bpf-next/net v2 0/5] Fix bpf qdisc bugs and clean up
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174622983725.3760707.369591195110683703.git-patchwork-notify@kernel.org>
+Date: Fri, 02 May 2025 23:50:37 +0000
+References: <20250502201624.3663079-1-ameryhung@gmail.com>
+In-Reply-To: <20250502201624.3663079-1-ameryhung@gmail.com>
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com,
+ andrii@kernel.org, daniel@iogearbox.net, martin.lau@kernel.org,
+ xiyou.wangcong@gmail.com, kernel-team@meta.com
 
-Before this commit the Homa code is "inert": it won't be compiled
-in kernel builds. This commit adds Homa's Makefile and Kconfig, and
-also links Homa into net/Makefile and net/Kconfig, so that Homa
-will be built during kernel builds if enabled (it is disabled by
-default).
+Hello:
 
-Signed-off-by: John Ousterhout <ouster@cs.stanford.edu>
----
- net/Kconfig       |  1 +
- net/Makefile      |  1 +
- net/homa/Kconfig  | 21 +++++++++++++++++++++
- net/homa/Makefile | 16 ++++++++++++++++
- 4 files changed, 39 insertions(+)
- create mode 100644 net/homa/Kconfig
- create mode 100644 net/homa/Makefile
+This series was applied to bpf/bpf-next.git (net)
+by Martin KaFai Lau <martin.lau@kernel.org>:
 
-diff --git a/net/Kconfig b/net/Kconfig
-index c3fca69a7c83..d6df0595d1d5 100644
---- a/net/Kconfig
-+++ b/net/Kconfig
-@@ -247,6 +247,7 @@ endif
- 
- source "net/dccp/Kconfig"
- source "net/sctp/Kconfig"
-+source "net/homa/Kconfig"
- source "net/rds/Kconfig"
- source "net/tipc/Kconfig"
- source "net/atm/Kconfig"
-diff --git a/net/Makefile b/net/Makefile
-index 60ed5190eda8..516b17d0bc6f 100644
---- a/net/Makefile
-+++ b/net/Makefile
-@@ -44,6 +44,7 @@ obj-y				+= 8021q/
- endif
- obj-$(CONFIG_IP_DCCP)		+= dccp/
- obj-$(CONFIG_IP_SCTP)		+= sctp/
-+obj-$(CONFIG_HOMA)		+= homa/
- obj-$(CONFIG_RDS)		+= rds/
- obj-$(CONFIG_WIRELESS)		+= wireless/
- obj-$(CONFIG_MAC80211)		+= mac80211/
-diff --git a/net/homa/Kconfig b/net/homa/Kconfig
-new file mode 100644
-index 000000000000..8ce5fbf08258
---- /dev/null
-+++ b/net/homa/Kconfig
-@@ -0,0 +1,21 @@
-+# SPDX-License-Identifier: BSD-2-Clause
-+#
-+# Homa transport protocol
-+#
-+
-+menuconfig HOMA
-+	tristate "The Homa transport protocol"
-+	depends on INET
-+	depends on IPV6
-+
-+	help
-+	  Homa is a network transport protocol for communication within
-+	  a datacenter. It provides significantly lower latency than TCP,
-+	  particularly for workloads containing a mixture of large and small
-+	  messages operating at high network utilization. At present, Homa
-+	  has been only partially upstreamed; this version provides bare-bones
-+	  functionality but is not performant. For more information see the
-+	  homa(7) man page or checkout the Homa Wiki at
-+	  https://homa-transport.atlassian.net/wiki/spaces/HOMA/overview.
-+
-+	  If unsure, say N.
-diff --git a/net/homa/Makefile b/net/homa/Makefile
-new file mode 100644
-index 000000000000..ed894ebab176
---- /dev/null
-+++ b/net/homa/Makefile
-@@ -0,0 +1,16 @@
-+# SPDX-License-Identifier: BSD-2-Clause
-+#
-+# Makefile for the Linux implementation of the Homa transport protocol.
-+
-+obj-$(CONFIG_HOMA) := homa.o
-+homa-y:=        homa_incoming.o \
-+		homa_interest.o \
-+		homa_outgoing.o \
-+		homa_pacer.o \
-+		homa_peer.o \
-+		homa_plumbing.o \
-+		homa_pool.o \
-+		homa_rpc.o \
-+		homa_sock.o \
-+		homa_timer.o \
-+		homa_utils.o
+On Fri,  2 May 2025 13:16:19 -0700 you wrote:
+> This patchset fixes the following bugs in bpf qdisc and clean up the
+> selftest.
+> 
+> - A null-pointer dereference can happen in qdisc_watchdog_cancel() if
+>   the timer is not initialized when 1) .init is not defined by user so
+>   init prologue is not generated. 2) .init fails and qdisc_create()
+>   calls .destroy
+> 
+> [...]
+
+Here is the summary with links:
+  - [bpf-next/net,v2,1/5] bpf: net_sched: Fix bpf qdisc init prologue when set as default qdisc
+    https://git.kernel.org/bpf/bpf-next/c/659b3b2c4885
+  - [bpf-next/net,v2,2/5] selftests/bpf: Test setting and creating bpf qdisc as default qdisc
+    (no matching commit)
+  - [bpf-next/net,v2,3/5] bpf: net_sched: Make some Qdisc_ops ops mandatory
+    https://git.kernel.org/bpf/bpf-next/c/64d6e3b9df1b
+  - [bpf-next/net,v2,4/5] selftests/bpf: Test attaching a bpf qdisc with incomplete operators
+    (no matching commit)
+  - [bpf-next/net,v2,5/5] selftests/bpf: Cleanup bpf qdisc selftests
+    https://git.kernel.org/bpf/bpf-next/c/2f9838e25790
+
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
