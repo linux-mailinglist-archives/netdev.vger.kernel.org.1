@@ -1,108 +1,141 @@
-Return-Path: <netdev+bounces-187468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF8D6AA746A
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 16:05:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACEE3AA746B
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 16:05:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5648A9E0D7C
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 14:04:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFCB61C0234A
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 14:05:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 303532566E1;
-	Fri,  2 May 2025 14:03:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28C2D255F5C;
+	Fri,  2 May 2025 14:05:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="haydd9qO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K40oS+KD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B59715A848;
-	Fri,  2 May 2025 14:03:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4994B255F36
+	for <netdev@vger.kernel.org>; Fri,  2 May 2025 14:05:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746194610; cv=none; b=GE9w25spzNfNLPyvvBAvVbiTn0ugZUAySBlP2t0ORrOzbMYQxYsA0jyEc0FI2QWau6rllugklS2QgPGKCnU/EzDnjDDDOD2K2KUEi+BX+6gPCejjQ9fABU9zOC+m7iLB1yAhd8JObaNHlAdGdS1vME87cA5MnMe/iOGLFX/MD+o=
+	t=1746194708; cv=none; b=W4R5qnVj4ryEIKw+6V53ZVKJPbK23q7/maV6X79ta3Yj7Ik58kv+3q+9uBLgeYc2GKTtbbooXC4oeyvKm8zhXyErYSp/53XI74pn4e18c7h9y9G002XC7XtA6u2QkaXQxOrf2Va3WknQzaLnyfBHKwXaHWh0ZRpnG0U8oauI3tk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746194610; c=relaxed/simple;
-	bh=J+7geM7OZeKeiKu7DrbSaOOB1gEHpjlKe0G+M+0X+9s=;
+	s=arc-20240116; t=1746194708; c=relaxed/simple;
+	bh=D9FrQH4n+PdihizMnAjXGJ0f+TPN3pD0AbB60hJwMCs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BpvafBNesNCbIpZcufoVtn2s7DUXZMAS7gZwgfyFC/k/K5bzvledjhggHqeowPLhVntqjDRYSkV+EHwL8JC5ZnoKjNgoSst71+fUmNK8BDBtBCmK67CK/Mrh4gp5jeYonoMO9XZsv775j5my0DPlUD1JTKaFfBlfuR9xAMfPtEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=haydd9qO; arc=none smtp.client-ip=209.85.166.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-86142446f3fso56569039f.2;
-        Fri, 02 May 2025 07:03:28 -0700 (PDT)
+	 To:Cc:Content-Type; b=BrfvV+U7uQesDXtTmTKvlsht4QRrD/AmXGYKNnWDszPKJXCTm6swKq67zF+EOiafYdlNzUI8mlgdtxzhosLId/L9ouxuRbOd+YTNsA8Bt+rVxl9IykwaMWmWPSmk30y6uVCjonVdZ0ZSCD32HD/qlypQWhw/u10WH693/+K2460=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K40oS+KD; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5dbfc122b82so10914a12.0
+        for <netdev@vger.kernel.org>; Fri, 02 May 2025 07:05:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746194607; x=1746799407; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1746194704; x=1746799504; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=J+7geM7OZeKeiKu7DrbSaOOB1gEHpjlKe0G+M+0X+9s=;
-        b=haydd9qOjcy+TCAGJ07cUB9hO1pRfwYkFAohAuyfoidir7QPVcBdXphPMVILACpzhp
-         TfiKyst2EVRTxDX8KN0cGvso86vDHgk6TLg8G5XSQotxtWf/46tBe5YRXi/inbqW919P
-         HBEhWcHUKgqPmtRzOhSDZNdKid1CdPJdnm/1y7pb85hyb791yukBf2mJmwpoGOvzWHuQ
-         TS2EV6Au7twA0DRQmpPzKTVeOfCyLNHiVsbbm2cK1QxV+RIfFZXznDtw1P8akl1QlgXW
-         di/s/jE5g3crfAtTURwuOjZanNeoarxNtbcnN4jLTqbiZQvq+lLx+ENUaJU8pInAch43
-         N8/g==
+        bh=nDe9RtA7TLLrd+vDa4DrWUwMAtXgbf0yt5j9UCuWdJ4=;
+        b=K40oS+KDoYyve/QhEdChMv2ixxs+PRSsEVpBWtf5lquTpS+iffSsqIo1ZE3+8dW4WC
+         i+9lOwDOj1LMex/qm07kMWuNW+MUrU1/x9Xu+6rH7rziI2zGKXKyToTTwRBpAY8jUZhR
+         E4I7duhtszys1nK3zmDJV+W1zCZ/ae7dBGkmN6WZlG4HHqggAfY55nOAWN/+CVyVGkpO
+         zCT38ugw6i2s9+xz913lPsGXi5fj10KLd+ncHDWOY++98okpxlAlHXY6w/kOVvCJy9Fn
+         GItNs7Fjd0ztVHPc2S0+ikwjlGf9t8zxsft6IPhXgnvZ68bCoSQ65C6ApoWpz9yAqlIG
+         ID5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746194607; x=1746799407;
+        d=1e100.net; s=20230601; t=1746194704; x=1746799504;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=J+7geM7OZeKeiKu7DrbSaOOB1gEHpjlKe0G+M+0X+9s=;
-        b=kDXsvetfsRk77gzTpR78feg3cpAt1xIYjpO+nexwaMnRQFsanGQdOs+k1Q9FJARsdR
-         hZIvuiTcGVA4T6Q57xR3Q548I85XlB+GvyKJ/t/f/a2GogXI+0yxaCK4JhqpxV+DBq91
-         eAYE+EMwZ21g0r6YnQme8A3uMDob3hK6/kljrks5dazdBRxQh9qmlOj8TDK/FyCh6Uol
-         JfH9TKuaIeKuVOjvsoS7HIbNJetzdySrJi2LoxXyB3oKuyYY9IR8QDEsw3HArAR1B+Su
-         RNtJN8bacGm1Gf7q2X6KanFDE9piM+UI3LIDNycsl+cjFlvndjAuZ+9r+ebsSkLIypqi
-         HU/w==
-X-Forwarded-Encrypted: i=1; AJvYcCU+tmWb7JkngdTjB5SYvXBLE2wWr8EVJjCpssBCr+7UemKgvrVXwnUqwpVF/XpoMNWA6Dn9mApazCGUPg==@vger.kernel.org, AJvYcCVDdrHAr5Veae2U/wuRQWniV/IfZpSPJHQeYFHrWapVnVpHGr4sN0F5K9HqW5WIdhfORYU/pACZ@vger.kernel.org, AJvYcCX1ej01WwTBz9ZQj+UHdTQtOCU/4n+8uAcZCixmXVYdOBXUw5bthdXc2PJCmrsPYg6NihpyH6qD0evSRhM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfMv9Yp3orcdzWZi27Q3lMC6/U9GImpWH7z+/LAu9vRbmeVO0r
-	mSr1SF43eVfRmqeUO4rC3K6Ii80Te6T9LUM8KoRKpk2l/OvvJVXz6LCJl6q3DobeLaYVx7Au2n5
-	4BcW/pN6LUVsaffYZNBsecxvWxto=
-X-Gm-Gg: ASbGncsoYVQ2AAVipULXdMrYg1JJir0JV/iD98WYppfdNWpl/acT2GaO2WnM2n7kNSn
-	YmOwwlPi7ybI703fsxcKu2MKM8zr/2Ap3cJMNY/VLPMzZkC4tCW7t6pn9DBRSBoxA3TDCdbZKTb
-	6nWqL9mHUoUYBo9x0v2Hr9qDVS
-X-Google-Smtp-Source: AGHT+IFVMPHJnDUUhpcX6XdaH3vpAJdu4LZJ3R/lCZPqoGS/As/H35451bCbpG2KagVgYq59AX3bEM91sCVs9m/uN8c=
-X-Received: by 2002:a05:6e02:1a85:b0:3d5:81aa:4d0a with SMTP id
- e9e14a558f8ab-3d97c1705e6mr27499175ab.6.1746194607586; Fri, 02 May 2025
- 07:03:27 -0700 (PDT)
+        bh=nDe9RtA7TLLrd+vDa4DrWUwMAtXgbf0yt5j9UCuWdJ4=;
+        b=TJiarReY4zprh4xt6C3+reQsgBcC2aj7d1tdnfLZsf/sPSo+78QLqT+Y4iMooBmrNh
+         tOVhQ8wfpBzinOTcf7Gtkbjmp/MXEsiWub1kya/fkZ42y8gagdzM3spUybfh69kAo1rb
+         UNZVlbdI2WukujJnJJKZ0zVd1C29IpRQGB4ELuRlpzqRXrgiK3fAfjghv1ORVSA/H1ju
+         wGNuAtGw3KeonjfPGeRF+URl8HsUbKKjGyQwUxr0XTRSWxa4sjO5eQgr3fXHjvCfTNxI
+         YC9pKji2kFAS5KfN9zgeWw0PnqSusts2+aUVqz4jD0hks5ra6NP6D5xkEwlRscWk1D9k
+         kanA==
+X-Forwarded-Encrypted: i=1; AJvYcCU5EgrS/X6AmxWhDLodJCcXPLH3tmpKQ3/2vr6glSDrhkkhjPKm6A26Gx3kM4bxX0/1ODS3LR0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YweNdJx5MyaFTR0DHAyHjb6/7mpC24kNLjMztQAP0y+YAGxWDvb
+	uxHOFBsaHRNzrEL9C0cizuR1ZoJr9UwHxLDMe2TL4k07cShegJKobWs91tsZmWyszHTN4M5npgg
+	Vwu/JF60oNJpiVZLdGXZjw4/vm28UkpGMvQq/
+X-Gm-Gg: ASbGnctQQJHFJNnTcefrjgkfywVy4Cy+eLKeqOm1Kc0iWcpaBeXlMk+euwoECVk5d8H
+	No18WpJXlyQbTfuyxqjgnnniagcSUPc9JAJ7vVohIoIU0YmiqIakwXU2JeoyC2nS/oTkyc14UcP
+	UWWOZTACDeIdv0umyY0ouDeIBJkNvrOnRupcgmQhb8ae/f+8MrFw==
+X-Google-Smtp-Source: AGHT+IGQyG7jBeuHSLNmsAImzv0cQUgCHSzQUeks+9StY/yQAdwPY81V2I46PF4Wav7Pheny/ljSV/t3KJ1MePw5oro=
+X-Received: by 2002:a05:6402:1d38:b0:5e4:afad:9a83 with SMTP id
+ 4fb4d7f45d1cf-5f9130fae93mr209007a12.2.1746194704052; Fri, 02 May 2025
+ 07:05:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250501233815.99832-1-linux@treblig.org>
-In-Reply-To: <20250501233815.99832-1-linux@treblig.org>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Fri, 2 May 2025 10:03:16 -0400
-X-Gm-Features: ATxdqUEFoCwjFw_FYE4QvhoWvdBIQ-fsPbqAykyXkm7nY1SDSa33tNg5JiOzku4
-Message-ID: <CADvbK_cJpug6TfH8=2uEM1Mwr9hhL5vJ5merYEjuDyA-Y1fRPQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] sctp: Remove unused sctp_assoc_del_peer and sctp_chunk_iif
-To: linux@treblig.org
-Cc: marcelo.leitner@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	linux-sctp@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+References: <20250502-work-coredump-socket-v2-0-43259042ffc7@kernel.org>
+In-Reply-To: <20250502-work-coredump-socket-v2-0-43259042ffc7@kernel.org>
+From: Jann Horn <jannh@google.com>
+Date: Fri, 2 May 2025 16:04:28 +0200
+X-Gm-Features: ATxdqUEap07yOkwLkXFTwqsri6Zk9OGzrg6-_-HwiNt-HyE-SosQ2SulcKFl1qc
+Message-ID: <CAG48ez3oefetsGTOxLf50d+PGcthj3oJCiMbxtNvkDkRZ-jwEg@mail.gmail.com>
+Subject: Re: [PATCH RFC v2 0/6] coredump: support AF_UNIX sockets
+To: Christian Brauner <brauner@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	Oleg Nesterov <oleg@redhat.com>, linux-fsdevel@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Daan De Meyer <daan.j.demeyer@gmail.com>, David Rheinsberg <david@readahead.eu>, 
+	Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>, 
+	Lennart Poettering <lennart@poettering.net>, Luca Boccassi <bluca@debian.org>, Mike Yuan <me@yhndnzj.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	=?UTF-8?Q?Zbigniew_J=C4=99drzejewski=2DSzmek?= <zbyszek@in.waw.pl>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 1, 2025 at 7:38=E2=80=AFPM <linux@treblig.org> wrote:
+On Fri, May 2, 2025 at 2:42=E2=80=AFPM Christian Brauner <brauner@kernel.or=
+g> wrote:
+> I need some help with the following questions:
 >
-> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+> (i) The core_pipe_limit setting is of vital importance to userspace
+>     because it allows it to a) limit the number of concurrent coredumps
+>     and b) causes the kernel to wait until userspace closes the pipe and
+>     thus prevents the process from being reaped, allowing userspace to
+>     parse information out of /proc/<pid>/.
 >
-> sctp_assoc_del_peer() last use was removed in 2015 by
-> commit 73e6742027f5 ("sctp: Do not try to search for the transport twice"=
-)
-> which now uses rm_peer instead of del_peer.
+>     Pipes already support this. I need to know from the networking
+>     people (or Oleg :)) how to wait for the userspace side to shutdown
+>     the socket/terminate the connection.
 >
-> sctp_chunk_iif() last use was removed in 2016 by
-> commit 1f45f78f8e51 ("sctp: allow GSO frags to access the chunk too")
+>     I don't want to just read() because then userspace can send us
+>     SCM_RIGHTS messages and it's really ugly anyway.
 >
-> Remove them.
+> (ii) The dumpability setting is of importance for userspace in order to
+>      know how a given binary is dumped: as regular user or as root user.
+>      This helps guard against exploits abusing set*id binaries. The
+>      setting needs to be the same as used at the time of the coredump.
 >
-> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
-Acked-by: Xin Long <lucien.xin@gmail.com>
+>      I'm exposing this as part of PIDFD_GET_INFO. I would like some
+>      input whether it's fine to simply expose the dumpability this way.
+>      I'm pretty sure it is. But it'd be good to have @Jann give his
+>      thoughts here.
+
+My only concern here is that if we expect the userspace daemon to look
+at the dumpability field and treat nondumpable tasks as "this may
+contain secret data and resources owned by various UIDs mixed
+together, only root should see the dump", we should have at least very
+clear documentation around this.
+
+[...]
+> Userspace can get a stable handle on the task generating the coredump by
+> using the SO_PEERPIDFD socket option. SO_PEERPIDFD uses the thread-group
+> leader pid stashed during connect(). Even if the task generating the
+
+Unrelated to this series: Huh, I think I haven't seen SO_PEERPIDFD
+before. I guess one interesting consequence of that feature is that if
+you get a unix domain socket whose peer is in another PID namespace,
+you can call pidfd_getfd() on that peer, which wouldn't normally be
+possible? Though of course it'll still be subject to the normal ptrace
+checks.
 
