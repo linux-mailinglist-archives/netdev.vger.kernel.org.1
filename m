@@ -1,261 +1,388 @@
-Return-Path: <netdev+bounces-187477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96BF0AA7504
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 16:33:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 766BBAA7509
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 16:34:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC39C7A38D3
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 14:32:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1590598474F
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 14:33:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50FA514A09C;
-	Fri,  2 May 2025 14:33:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 517612550B2;
+	Fri,  2 May 2025 14:33:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LQFyrPZH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ulU8ezpv"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44F323398B
-	for <netdev@vger.kernel.org>; Fri,  2 May 2025 14:33:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D20D151991;
+	Fri,  2 May 2025 14:33:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746196401; cv=none; b=oY3f4h1HeiirhJfqLcdJ/e/SCs25TJbLEhKkgTq/Hh301oGR296DJ5Qr2x0eDaHMP1RBYXMW/NXXO5OXETH8M5eUARbYOK9IlHTQas2rx0+/tEmX9MtAhFjNOvTHkTeyI45WyjATdWqsZ/VozMTJL+hYwsiKc72xJlsC3ANrBlU=
+	t=1746196439; cv=none; b=dLuSFqz+nrrqRmUG8fYc8VTovaVGgUfFG7iAp5D4UXbRD+D7QOta4/ledEaqtVtAnPrb/V/nnunUNdTrV/rjPqrPKhdmsrBoxXGNkJd6vqx/4x7htfyxxwheWP0Qr7qc6ov4i9wBeUMS04DTjth9IiaUzefckPzkqUhmgUOxQxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746196401; c=relaxed/simple;
-	bh=TvWlx5W+GGzj7SDWOR6MsmWMEYm7BfLlsYVqm6fsW+A=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=SpGli4TjLXzEHV2YDjxtSyhW/zR8ijvnHQWQs0qXFYSHtceaGnrJm3w+8kgltYFFDyfseUZIClUOGuPttXGYx/qYbVVRcWQPpnAApLXofXkyzXom6Qvuf6OvrDFFFnwCKCA+Mz5ydO4V46XCRbp6fx+5XtOCkHn7A/jmubMDEz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LQFyrPZH; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746196398;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Iidq5caE2qrMnaUyfRtrVUdIHj/SGDnk/ds3ljYLCTU=;
-	b=LQFyrPZHkNMWH1Ak3A0djTrAvc9QMLyQ2cfHww3GK8VbQL8z9bcCtZnjWOLzXiJzfVyzQs
-	/QTCJL3Lxe4IHIhWIKWoyZd5j40JqWJ3kCyRJ9kQnf+h2YGn2MbQRRW4YJHbxu+/i6KVNL
-	zir+6kdETPYjSeMyjuMOsofp+hSkxHU=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-323-xQo8amZsN2254lySuSjgEA-1; Fri, 02 May 2025 10:33:15 -0400
-X-MC-Unique: xQo8amZsN2254lySuSjgEA-1
-X-Mimecast-MFC-AGG-ID: xQo8amZsN2254lySuSjgEA_1746196393
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-3108149df63so10008381fa.2
-        for <netdev@vger.kernel.org>; Fri, 02 May 2025 07:33:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746196393; x=1746801193;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Iidq5caE2qrMnaUyfRtrVUdIHj/SGDnk/ds3ljYLCTU=;
-        b=D2dcmbVeeRH2T7jPWyblxOb7oy9FYpikXkCkMoUkO0pMFuTf8x9l2e2SCAkIfCHq1v
-         XgCOGj4NH91J9rMCXzg8wGg7CEZ6tjGuTzrtI6qkm9YNQTchVKJ7mLfdkI8/hlitdCeO
-         kKaBk2LuyUIIZA9ViE7OCiDsnm9GfYXwWaPiot7mXJ7DSkDMynEeTsiDYWCTDfd6lsrs
-         1lt8zTIs8Sae/qKhh4v46TF6GSPJse4vuonEVoKFdN+L/ONT0gRZiTkv8iED2y3p44Jz
-         qtMCaYnOlKZ1SX7ZiBgwtkRWOMTz3kGk8UHGmkLb4Fc+w90lyoqXVqfFbmXgHoPSV3q7
-         1+yg==
-X-Gm-Message-State: AOJu0Yytdnx0fIQ0ocaDvDDhejBLVyo73FH+mWCvUmtJuvk1w9UOvHp4
-	rLTvTHgcM79JW1z/3gKifyW4f0V0y3dzmLKBGJvsygtHnhAysUbPUAnRdIy7stVR4uY+2hrE5c0
-	ARSbDICY6Pbth7KfxboFV92QMFSOWQwk97T6NkShbY8SbuJn86Plb7A==
-X-Gm-Gg: ASbGncvVK5aXsf3H04qXxjwTR6AzcmGD2JKJhmnHN7UdSHePZLIYDrek6ClGx/Hbtvv
-	FPo+pz6h1GJFhAYGo9TEBWak5BwuLJGFe+ZMKxR5c+bQMJ5j98sUdYeMRr4isjSupeaJea++r6F
-	HCENUtw3yCXfNMQOAISpbWewYYqaUrgHjGcKCPotw/S8CdhjjN7Q8SD01ny8caW9hppyCugSt7Q
-	1FCS9APxT2MiL16mEJXa0R8WJ8VN7PC5BObXxkCkC+7F/GHHz0wEU7K2h2/tC/BykzqoQ4DFtFa
-	NpNsfRFe3C64+2Axo25Eee9rRJlnzZw1VW6K
-X-Received: by 2002:a05:6512:b22:b0:54a:cc11:b558 with SMTP id 2adb3069b0e04-54eac20ce44mr844942e87.33.1746196393304;
-        Fri, 02 May 2025 07:33:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHxZP3x8CctExY8BKU1Krhhw8vg7FGAq7GpbD015fqIistJw782m5FQTvV2H/OW0LrIz3wBow==
-X-Received: by 2002:a05:6512:b22:b0:54a:cc11:b558 with SMTP id 2adb3069b0e04-54eac20ce44mr844927e87.33.1746196392826;
-        Fri, 02 May 2025 07:33:12 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54ea94b17d6sm364278e87.6.2025.05.02.07.33.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 May 2025 07:33:12 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id DDB061A0851B; Fri, 02 May 2025 16:33:10 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, linux-rt-devel@lists.linux.dev, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>
-Subject: Re: [PATCH net-next v3 05/18] xdp: Use nested-BH locking for
- system_page_pool
-In-Reply-To: <20250502133231.lS281-FN@linutronix.de>
-References: <20250430124758.1159480-1-bigeasy@linutronix.de>
- <20250430124758.1159480-6-bigeasy@linutronix.de> <878qng7i63.fsf@toke.dk>
- <20250502133231.lS281-FN@linutronix.de>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Fri, 02 May 2025 16:33:10 +0200
-Message-ID: <87ikmj5bh5.fsf@toke.dk>
+	s=arc-20240116; t=1746196439; c=relaxed/simple;
+	bh=3OB+vCsY1Nf1uqDEFMD9tdzEcnzhPdE9qneBGjxivtM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mfUnwutZhlWGQVCtk1rao8GK2cm3jeHUfS2RqulSxmHjFThs13iWOvEvyoBLKfxr3wfGS3Pibl7QyljVUXNcHd9Vo+/fmp26N0y48Zl4SxztUP3Gq7yc6eJpkEtZUlVaXvA2fmQZjPN6szYlNqYrEfWuUBnj0IsYCYIwAch3OTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ulU8ezpv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1E36C4CEE4;
+	Fri,  2 May 2025 14:33:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746196437;
+	bh=3OB+vCsY1Nf1uqDEFMD9tdzEcnzhPdE9qneBGjxivtM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ulU8ezpvMpMndR+a4tvGp+KoP+p+oCpffievS/+dJkj6xqVkxn0sCRAu2U8JnB4VV
+	 +zwWoXgxuLrV9cv0EDt0xNHIkG+KXRHMR5WAZ/4dBJnhIoDM85xoV8iBgO8DJ7uxCj
+	 2oC7Z/IcA1u7OWaKJfgCChQ3P/LDZOvQcJZy5qwVPnNmwxp7zJSgJljjqM0dmjw1lp
+	 k2acbxAw9vFUGDiW6zdz5DXGWudMhbnIQgIT9tPUPY6JmoM1KdQ+Vl3BQvZpSE1mYk
+	 HC6sYnOwpgT3nrsL/Kwv6o3Zgod6nYd0E/lL0GQ4fnV55cNu2aRjYZhIskcLbVV0Qp
+	 TvhLflrSQkDbA==
+Message-ID: <a01df80b-c1ee-4c36-b400-e3044a0156e2@kernel.org>
+Date: Fri, 2 May 2025 16:33:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next v10 4/7] net: mtip: The L2 switch driver for imx287
+To: Lukasz Majewski <lukma@denx.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>
+Cc: Sascha Hauer <s.hauer@pengutronix.de>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ Stefan Wahren <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>
+References: <20250502074447.2153837-1-lukma@denx.de>
+ <20250502074447.2153837-5-lukma@denx.de>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20250502074447.2153837-5-lukma@denx.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Sebastian Andrzej Siewior <bigeasy@linutronix.de> writes:
-
-> On 2025-05-01 12:13:24 [+0200], Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->> > --- a/net/core/dev.c
->> > +++ b/net/core/dev.c
->> > @@ -462,7 +462,9 @@ EXPORT_PER_CPU_SYMBOL(softnet_data);
->> >   * PP consumers must pay attention to run APIs in the appropriate con=
-text
->> >   * (e.g. NAPI context).
->> >   */
->> > -DEFINE_PER_CPU(struct page_pool *, system_page_pool);
->> > +DEFINE_PER_CPU(struct page_pool_bh, system_page_pool) =3D {
->> > +	.bh_lock =3D INIT_LOCAL_LOCK(bh_lock),
->> > +};
->>=20
->> I'm a little fuzzy on how DEFINE_PER_CPU() works, but does this
->> initialisation automatically do the right thing with the multiple
->> per-CPU instances?
->
-> It sets the "first" per-CPU data which is then copied to all
-> "possible-CPUs" during early boot when the per-CPU data is made
-> available. You can initialize almost everything like that. Pointer based
-> structures (such as LIST_HEAD_INIT()) is something that obviously won't
-> work.
-
-Right, I see. Cool, thanks for explaining :)
-
->> >  #ifdef CONFIG_LOCKDEP
->> >  /*
->> > --- a/net/core/xdp.c
->> > +++ b/net/core/xdp.c
->> > @@ -737,10 +737,10 @@ static noinline bool xdp_copy_frags_from_zc(stru=
-ct sk_buff *skb,
->> >   */
->> >  struct sk_buff *xdp_build_skb_from_zc(struct xdp_buff *xdp)
->> >  {
->> > -	struct page_pool *pp =3D this_cpu_read(system_page_pool);
->> >  	const struct xdp_rxq_info *rxq =3D xdp->rxq;
->> >  	u32 len =3D xdp->data_end - xdp->data_meta;
->> >  	u32 truesize =3D xdp->frame_sz;
->> > +	struct page_pool *pp;
->> >  	struct sk_buff *skb;
->> >  	int metalen;
->> >  	void *data;
->> > @@ -748,13 +748,18 @@ struct sk_buff *xdp_build_skb_from_zc(struct xdp=
-_buff *xdp)
->> >  	if (!IS_ENABLED(CONFIG_PAGE_POOL))
->> >  		return NULL;
->> >=20=20
->> > +	local_lock_nested_bh(&system_page_pool.bh_lock);
->> > +	pp =3D this_cpu_read(system_page_pool.pool);
->> >  	data =3D page_pool_dev_alloc_va(pp, &truesize);
->> > -	if (unlikely(!data))
->> > +	if (unlikely(!data)) {
->> > +		local_unlock_nested_bh(&system_page_pool.bh_lock);
->> >  		return NULL;
->> > +	}
->> >=20=20
->> >  	skb =3D napi_build_skb(data, truesize);
->> >  	if (unlikely(!skb)) {
->> >  		page_pool_free_va(pp, data, true);
->> > +		local_unlock_nested_bh(&system_page_pool.bh_lock);
->> >  		return NULL;
->> >  	}
->> >=20=20
->> > @@ -773,9 +778,11 @@ struct sk_buff *xdp_build_skb_from_zc(struct xdp_=
-buff *xdp)
->> >=20=20
->> >  	if (unlikely(xdp_buff_has_frags(xdp)) &&
->> >  	    unlikely(!xdp_copy_frags_from_zc(skb, xdp, pp))) {
->> > +		local_unlock_nested_bh(&system_page_pool.bh_lock);
->> >  		napi_consume_skb(skb, true);
->> >  		return NULL;
->> >  	}
->> > +	local_unlock_nested_bh(&system_page_pool.bh_lock);
->>=20
->> Hmm, instead of having four separate unlock calls in this function, how
->> about initialising skb =3D NULL, and having the unlock call just above
->> 'return skb' with an out: label?
->>=20
->> Then the three topmost 'return NULL' can just straight-forwardly be
->> replaced with 'goto out', while the last one becomes 'skb =3D NULL; goto
->> out;'. I think that would be more readable than this repetition.
->
-> Something like the following maybe? We would keep the lock during
-> napi_consume_skb() which should work.
->
-> diff --git a/net/core/xdp.c b/net/core/xdp.c
-> index b2a5c934fe7b7..1ff0bc328305d 100644
-> --- a/net/core/xdp.c
-> +++ b/net/core/xdp.c
-> @@ -740,8 +740,8 @@ struct sk_buff *xdp_build_skb_from_zc(struct xdp_buff=
- *xdp)
->  	const struct xdp_rxq_info *rxq =3D xdp->rxq;
->  	u32 len =3D xdp->data_end - xdp->data_meta;
->  	u32 truesize =3D xdp->frame_sz;
-> +	struct sk_buff *skb =3D NULL;
->  	struct page_pool *pp;
-> -	struct sk_buff *skb;
->  	int metalen;
->  	void *data;
->=20=20
-> @@ -751,16 +751,13 @@ struct sk_buff *xdp_build_skb_from_zc(struct xdp_bu=
-ff *xdp)
->  	local_lock_nested_bh(&system_page_pool.bh_lock);
->  	pp =3D this_cpu_read(system_page_pool.pool);
->  	data =3D page_pool_dev_alloc_va(pp, &truesize);
-> -	if (unlikely(!data)) {
-> -		local_unlock_nested_bh(&system_page_pool.bh_lock);
-> -		return NULL;
-> -	}
-> +	if (unlikely(!data))
-> +		goto out;
->=20=20
->  	skb =3D napi_build_skb(data, truesize);
->  	if (unlikely(!skb)) {
->  		page_pool_free_va(pp, data, true);
-> -		local_unlock_nested_bh(&system_page_pool.bh_lock);
-> -		return NULL;
-> +		goto out;
->  	}
->=20=20
->  	skb_mark_for_recycle(skb);
-> @@ -778,15 +775,16 @@ struct sk_buff *xdp_build_skb_from_zc(struct xdp_bu=
-ff *xdp)
->=20=20
->  	if (unlikely(xdp_buff_has_frags(xdp)) &&
->  	    unlikely(!xdp_copy_frags_from_zc(skb, xdp, pp))) {
-> -		local_unlock_nested_bh(&system_page_pool.bh_lock);
->  		napi_consume_skb(skb, true);
-> -		return NULL;
-> +		skb =3D NULL;
->  	}
+On 02/05/2025 09:44, Lukasz Majewski wrote:
 > +
-> +out:
->  	local_unlock_nested_bh(&system_page_pool.bh_lock);
-> -
-> -	xsk_buff_free(xdp);
-> -
-> -	skb->protocol =3D eth_type_trans(skb, rxq->dev);
-> +	if (skb) {
-> +		xsk_buff_free(xdp);
-> +		skb->protocol =3D eth_type_trans(skb, rxq->dev);
+> +static int mtip_parse_of(struct switch_enet_private *fep,
+> +			 struct device_node *np)
+> +{
+> +	struct device_node *p;
+> +	unsigned int port_num;
+> +	int ret = 0;
+> +
+> +	p = of_find_node_by_name(np, "ethernet-ports");
+
+This should be looking for children, not any nodes. Otherwise you will
+take the ethernet ports from a next device as well.
+
+> +
+> +	for_each_available_child_of_node_scoped(p, port) {
+> +		if (of_property_read_u32(port, "reg", &port_num))
+> +			continue;
+> +
+> +		if (port_num > SWITCH_EPORT_NUMBER) {
+> +			dev_err(&fep->pdev->dev,
+> +				"%s: The switch supports up to %d ports!\n",
+> +				__func__, SWITCH_EPORT_NUMBER);
+> +			goto of_get_err;
+> +		}
+> +
+> +		fep->n_ports = port_num;
+> +		ret = of_get_mac_address(port, &fep->mac[port_num - 1][0]);
+> +		if (ret)
+> +			dev_dbg(&fep->pdev->dev,
+> +				"of_get_mac_address(%pOF) failed (%d)!\n",
+> +				port, ret);
+> +
+> +		ret = of_property_read_string(port, "label",
+> +					      &fep->ndev_name[port_num - 1]);
+> +		if (ret < 0) {
+> +			dev_err(&fep->pdev->dev,
+> +				"%s: Cannot get ethernet port name (%d)!\n",
+> +				__func__, ret);
+> +			goto of_get_err;
+> +		}
+> +
+> +		ret = of_get_phy_mode(port, &fep->phy_interface[port_num - 1]);
+> +		if (ret < 0) {
+> +			dev_err(&fep->pdev->dev,
+> +				"%s: Cannot get PHY mode (%d)!\n", __func__,
+> +				ret);
+> +			goto of_get_err;
+> +		}
+> +
+> +		fep->phy_np[port_num - 1] = of_parse_phandle(port,
+> +							     "phy-handle", 0);
 > +	}
+> +
+> + of_get_err:
+> +	of_node_put(p);
+> +
+> +	return ret;
+> +}
+> +
+> +static int mtip_sw_learning(void *arg)
+> +{
+> +	struct switch_enet_private *fep = arg;
+> +
+> +	while (!kthread_should_stop()) {
+> +		set_current_state(TASK_INTERRUPTIBLE);
+> +		/* check learning record valid */
+> +		mtip_atable_dynamicms_learn_migration(fep, fep->curr_time,
+> +						      NULL, NULL);
+> +		schedule_timeout(HZ / 100);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static void mtip_mii_unregister(struct switch_enet_private *fep)
+> +{
+> +	mdiobus_unregister(fep->mii_bus);
+> +	mdiobus_free(fep->mii_bus);
+> +}
+> +
+> +static const struct mtip_devinfo mtip_imx28_l2switch_info = {
+> +	.quirks = FEC_QUIRK_BUG_CAPTURE | FEC_QUIRK_SINGLE_MDIO |
+> +		  FEC_QUIRK_SWAP_FRAME,
+> +};
+> +
+> +static const struct of_device_id mtipl2_of_match[] = {
+> +	{ .compatible = "nxp,imx28-mtip-switch",
+> +	  .data = &mtip_imx28_l2switch_info},
+> +	{ /* sentinel */ }
+> +};
+> +MODULE_DEVICE_TABLE(of, mtipl2_of_match);
+> +
+> +static int mtip_sw_probe(struct platform_device *pdev)
+> +{
+> +	struct device_node *np = pdev->dev.of_node;
+> +	const struct of_device_id *of_id;
+> +	struct switch_enet_private *fep;
+> +	struct mtip_devinfo *dev_info;
+> +	int ret;
+> +
+> +	fep = devm_kzalloc(&pdev->dev, sizeof(*fep), GFP_KERNEL);
+> +	if (!fep)
+> +		return -ENOMEM;
+> +
+> +	of_id = of_match_node(mtipl2_of_match, pdev->dev.of_node);
+> +	if (of_id) {
+> +		dev_info = (struct mtip_devinfo *)of_id->data;
 
-I had in mind moving the out: label (and the unlock) below the
-skb->protocol assignment, which would save the if(skb) check; any reason
-we can't call xsk_buff_free() while holding the lock?
+Do not open-code of_device_get_match_data().
 
--Toke
+> +		if (dev_info)
+> +			fep->quirks = dev_info->quirks;
+> +	}
+> +
+> +	fep->pdev = pdev;
+> +	platform_set_drvdata(pdev, fep);
+> +
+> +	fep->enet_addr = devm_platform_ioremap_resource(pdev, 0);
+> +	if (IS_ERR(fep->enet_addr))
+> +		return PTR_ERR(fep->enet_addr);
+> +
+> +	fep->irq = platform_get_irq_byname(pdev, "enet_switch");
+> +	if (fep->irq < 0)
+> +		return fep->irq;
+> +
+> +	ret = mtip_parse_of(fep, np);
+> +	if (ret < 0) {
+> +		dev_err(&pdev->dev, "%s: OF parse error (%d)!\n", __func__,
+> +			ret);
 
+Syntax is:
+return dev_err_probe
+just like you have in other places
+
+> +		return ret;
+> +	}
+> +
+> +	/* Create an Ethernet device instance.
+> +	 * The switch lookup address memory starts at 0x800FC000
+> +	 */
+> +	fep->hwp_enet = fep->enet_addr;
+> +	fep->hwp = fep->enet_addr + ENET_SWI_PHYS_ADDR_OFFSET;
+> +	fep->hwentry = (struct mtip_addr_table __iomem *)
+> +		(fep->hwp + MCF_ESW_LOOKUP_MEM_OFFSET);
+> +
+> +	ret = devm_regulator_get_enable_optional(&pdev->dev, "phy");
+> +	if (ret)
+> +		return dev_err_probe(&pdev->dev, ret,
+> +				     "Unable to get and enable 'phy'\n");
+> +
+> +	fep->clk_ipg = devm_clk_get_enabled(&pdev->dev, "ipg");
+> +	if (IS_ERR(fep->clk_ipg))
+> +		return dev_err_probe(&pdev->dev, PTR_ERR(fep->clk_ipg),
+> +				     "Unable to acquire 'ipg' clock\n");
+> +
+> +	fep->clk_ahb = devm_clk_get_enabled(&pdev->dev, "ahb");
+> +	if (IS_ERR(fep->clk_ahb))
+> +		return dev_err_probe(&pdev->dev, PTR_ERR(fep->clk_ahb),
+> +				     "Unable to acquire 'ahb' clock\n");
+> +
+> +	fep->clk_enet_out = devm_clk_get_optional_enabled(&pdev->dev,
+> +							  "enet_out");
+> +	if (IS_ERR(fep->clk_enet_out))
+> +		return dev_err_probe(&pdev->dev, PTR_ERR(fep->clk_enet_out),
+> +				     "Unable to acquire 'enet_out' clock\n");
+> +
+> +	/* setup MII interface for external switch ports */
+> +	mtip_enet_init(fep, 1);
+> +	mtip_enet_init(fep, 2);
+> +
+> +	spin_lock_init(&fep->learn_lock);
+> +	spin_lock_init(&fep->hw_lock);
+> +	spin_lock_init(&fep->mii_lock);
+> +
+> +	ret = devm_request_irq(&pdev->dev, fep->irq, mtip_interrupt, 0,
+> +			       dev_name(&pdev->dev), fep);
+> +	if (ret)
+> +		return dev_err_probe(&pdev->dev, fep->irq,
+> +				     "Could not alloc IRQ\n");
+> +
+> +	ret = mtip_register_notifiers(fep);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = mtip_ndev_init(fep, pdev);
+> +	if (ret) {
+> +		dev_err(&pdev->dev, "%s: Failed to create virtual ndev (%d)\n",
+> +			__func__, ret);
+> +		goto ndev_init_err;
+> +	}
+> +
+> +	ret = mtip_switch_dma_init(fep);
+> +	if (ret) {
+> +		dev_err(&pdev->dev, "%s: ethernet switch init fail (%d)!\n",
+> +			__func__, ret);
+> +		goto dma_init_err;
+> +	}
+> +
+> +	ret = mtip_mii_init(fep, pdev);
+> +	if (ret) {
+> +		dev_err(&pdev->dev, "%s: Cannot init phy bus (%d)!\n", __func__,
+> +			ret);
+> +		goto mii_init_err;
+> +	}
+> +	/* setup timer for learning aging function */
+> +	timer_setup(&fep->timer_aging, mtip_aging_timer, 0);
+> +	mod_timer(&fep->timer_aging,
+> +		  jiffies + msecs_to_jiffies(LEARNING_AGING_INTERVAL));
+> +
+> +	fep->task = kthread_run(mtip_sw_learning, fep, "mtip_l2sw_learning");
+> +	if (IS_ERR(fep->task)) {
+> +		ret = PTR_ERR(fep->task);
+> +		dev_err(&pdev->dev, "%s: learning kthread_run error (%d)!\n",
+> +			__func__, ret);
+
+ret = dev_err_probe
+
+> +		goto task_learning_err;
+> +	}
+> +
+> +	return 0;
+> +
+> + task_learning_err:
+> +	timer_delete_sync(&fep->timer_aging);
+> +	mtip_mii_unregister(fep);
+> + mii_init_err:
+> + dma_init_err:
+> +	mtip_ndev_cleanup(fep);
+> + ndev_init_err:
+> +	mtip_unregister_notifiers(fep);
+> +
+> +	return ret;
+> +}
+> +
+> +static void mtip_sw_remove(struct platform_device *pdev)
+> +{
+> +	struct switch_enet_private *fep = platform_get_drvdata(pdev);
+> +
+> +	mtip_unregister_notifiers(fep);
+> +	mtip_ndev_cleanup(fep);
+> +
+> +	mtip_mii_remove(fep);
+> +
+> +	kthread_stop(fep->task);
+> +	timer_delete_sync(&fep->timer_aging);
+> +	platform_set_drvdata(pdev, NULL);
+> +
+> +	kfree(fep);
+
+Jakub already pointed out that tools would find this bug but also
+testing. This was not ever tested. If it was, you would see nice clear
+double free.
+
+All last three versions had trivial issues which are pointed out by
+tooling, compilers, static analyzers. Before you post next version.
+please run standard kernel tools for static analysis, like coccinelle,
+smatch and sparse, and fix reported warnings. Also please check for
+warnings when building with W=1 with clang. Most of these commands
+(checks or W=1 build) can build specific targets, like some directory,
+to narrow the scope to only your code. The code here looks like it needs
+a fix. Feel free to get in touch if the warning is not clear.
+
+You do not nede the the top-level, one of the most busy maintainers to
+point out the issues which compilers find as well. Using reviewers
+instead of automated tools is the easiest way to get grumpy responses.
+
+
+Best regards,
+Krzysztof
 
