@@ -1,148 +1,186 @@
-Return-Path: <netdev+bounces-187537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01307AA7C0F
-	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 00:13:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0E74AA7C15
+	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 00:16:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D05D466ED5
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 22:13:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B88C4A5A63
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 22:16:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE252214229;
-	Fri,  2 May 2025 22:13:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 600B71EC014;
+	Fri,  2 May 2025 22:16:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="jdk2iU7O"
+	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="emae7WEZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD265158DA3
-	for <netdev@vger.kernel.org>; Fri,  2 May 2025 22:13:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F4093320F;
+	Fri,  2 May 2025 22:16:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746224009; cv=none; b=P0OnfJipbv9yL8/PUFdjty9My2SiDKxL9XvEHG556ewlOphnw4OONgQDSQzrFFmBD0sPCFXMAIH/MgkAlnIourcy82NJm6CkLCWplHEUhpGAK29D0zoaBLzQTz5kgzs+L9BQE9Ci4ePVK6wXiwneMOlApBrivhTnag305ytIKnc=
+	t=1746224174; cv=none; b=deOXzUcsRk3SsNlV/KZOkD28gESqhNILEVexQKKpkzs+vZxyrPyH5QKWorwdTy2CEJ7ntBtJt6CfhKJ1rnrbxlFSnTZli1XVvZV3mEVBuZaliC/5AdEfHgbyCkiVrabH1KosoTsiXiXGxkNxQ7me9IEZ8HBiLTnwJOiK5mdphAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746224009; c=relaxed/simple;
-	bh=jaym/16v8FFucxKSSDLsQMllUbISdbiFaG7eDkG/sTI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RbZYnbvZmumX8AUR2ThX5C9wbT41HmS8C/9kCviOFegvMWvyJw4kmd2ClVq/+DOAvqz9ZDDEnB0FDhjrRr4GbXAl7jQ+Z2igvL1Q1CLXffuGBzV/ynVthG6xJEBwwUPXhlnioLf2I/vH/LR1sRqavZxuJQ1bRVqJMX/feOmcKYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=jdk2iU7O; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-224341bbc1dso34460955ad.3
-        for <netdev@vger.kernel.org>; Fri, 02 May 2025 15:13:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1746224007; x=1746828807; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tFotOqo0DgEAbTYeUd+xbULGxUTbjXpH3LeNYn7z6lo=;
-        b=jdk2iU7O0Ay0RXXCtcUDyLyQCqm7Nt9xUFOVckozuoI7zfHA3qLAZTK5kykRgzfQBS
-         cKpdIvrooZFvtlrlsVRjPToPOV1PR3HEYDxvMQt5qBr//gTOhcZUCbOO3WwbA0667t5d
-         XvYBn0oS76t6Ei3XVyKTM+cy/5lforE6WMEuf62jZck77qWby3t1l7701FlTZagQCBQO
-         VoKL6UFpRt+U3iXGcgG1YdDztdyEaDjosunR0hqNogtZisRZin2qymxyHGQMHUqpMIeg
-         Z+PJ+4NbEu8agOhAT5jG6NWdA2yhnbeAthb/x3hPjh8zudf86AQ5DetoOx/xiQRAI2bs
-         +x2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746224007; x=1746828807;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tFotOqo0DgEAbTYeUd+xbULGxUTbjXpH3LeNYn7z6lo=;
-        b=eJkZM+qE7WrqPvCGscdwF3Eclf4woKWnva3njaqxUK0d4oNInUy1bI3C6JZ7M3Nsav
-         X9l+aUxoP4yo/iWzWInVfN6ydmb07y5OqjsrADQGY+bgixUakADnNAdf4DpetxcnMnYa
-         hSrUic9/0st0LUOhJ+UoRxhlwHhaWsAcWDrXJMIwkaw//R0uKIgB6LjVnjRqvOAul0WM
-         RCKr8VU7v+2Te9EjXR9h1Wigyofk+5UEL1Zrwt678KgExzPsmsL1qlLcG/Ob1Q/4sL8b
-         kO9xSn2c0DKOosRmJJ83GxK5nF/mojO22pxUjELOKxyUOwr51NFtPjQlKLqjLTlPZMmp
-         5jhw==
-X-Forwarded-Encrypted: i=1; AJvYcCUUQenTzIgOvjqG9pTTmUARVwEGAqs4DosRBgjcJmSebAbR8PvAh/M13nztp9mFsY+RLj3xLKw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxK27v4SP4BVjrGpjO9WeEumGgkr+3EirRGOy+jghNKu3sUQ3oN
-	YsjdZ9jNX4dfGi2e7Oizutdr26qUuiKSrXVuN2a7/7kJHoAAS4j9Tr16lYLhNQ==
-X-Gm-Gg: ASbGnctysNztY+YvrPldLGPJxI9MdKZXkqwJvBJL5zEQePM/4Wos6ro7Bm9XJyP7Ij8
-	OooMz8U0CnP68KPtDDRoT4H8v5dWfuDS8iDZvsnlCmz2FV6q/pyswsCfFew3mb6x0eBU5UkgaVN
-	jFMCIDfbS8LojDNdVkbAUy/DGJDeLC7OT3ribxkFPJRo/zziAUQVElVVUIfBvLkZLRKnVQZLw87
-	a8pxVxRasx9+tAitpwTpippDb68gg+Po0v91IRERK6AX4OQW7TQ2FEiTZqzwA7pr/0jxslf1gNO
-	tZZYW5/JvC9URt8qVuwp1i1Ux+LOoHW3rh9D4UQe95QfQwE0LKx8m1WGsbpv91/+h1QJw9KE1b4
-	BaQ5+3nzxbuQ=
-X-Google-Smtp-Source: AGHT+IHnh6Aopfv20YDtmSdz175QDlyZYCM9OEPqA8Zl7GC0o++Dw4E9MtEXkQYSNGjPMsOuTQc+7Q==
-X-Received: by 2002:a17:903:2350:b0:220:c813:dfce with SMTP id d9443c01a7336-22e18c39127mr8813745ad.39.1746224006807;
-        Fri, 02 May 2025 15:13:26 -0700 (PDT)
-Received: from ?IPV6:2804:7f1:e2c0:32dc:1373:7adc:1124:6935? ([2804:7f1:e2c0:32dc:1373:7adc:1124:6935])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e173b584csm7338805ad.16.2025.05.02.15.13.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 May 2025 15:13:26 -0700 (PDT)
-Message-ID: <d56902b7-1e1a-402e-b0b8-9080e9115add@mojatatu.com>
-Date: Fri, 2 May 2025 19:13:23 -0300
+	s=arc-20240116; t=1746224174; c=relaxed/simple;
+	bh=YbIgEoWZ+RDbdv/qNR2kvQ/QsB+i63R4L9kxQgvqDSI=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=DE915aOylP9eC97bBwVSdB52JPqcUgpLKvHPwb/6sVHhgbKPAew1Ep4rW1DPDXrgEXwAYtLqbodNToXDma0hzUp4TchCDZEoNW3zM6iKYPSPmHc/GdgdSJh7Pnea5Cc5cjTPJk+VUGbWKYwzd/VLRqhpm3YOs/lm8V3Jy+tbe+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=emae7WEZ; arc=none smtp.client-ip=193.238.174.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
+Received: from mx.ssi.bg (localhost [127.0.0.1])
+	by mx.ssi.bg (Potsfix) with ESMTP id E1DB520196;
+	Sat,  3 May 2025 01:16:05 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
+	:content-type:content-type:date:from:from:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
+	 bh=GV5jrpCeKAbrT1H1amlypy3VO6Qao+dT06uekrv1lr4=; b=emae7WEZg8jY
+	mX2N3BEU26n9sa4PtsCMXAhoUO0syALZlDBibW4Ownage8AkLcA1t2iY/52bR9eX
+	6Bzs08CwTYT6P89xZ0yoBQCl+5IKtIt/vF0uvmF+y+EKQ7Hd+GSYy4mPHfqxpx+3
+	Da3XIUMdp6/Vefu5lQTwWMWw0/5k+rrLTuXz0M/7LH74SUot/+r8Xq6Pw9lx+MOH
+	LVn4hBys+yNfnDw6dmuMRpIwWHe83W8WkqdqK0Ww4ppD1zgF4+sTjatc4DZxxJSX
+	rzJ23L5trl1j7shaqZyXcUNNCJuyof2SZM8RrNP5QnWjSdEWIBewSVFfVZimoXVb
+	8p83XEgAmz+8OJk5Zp6Hv9goUE036ApOxHYMm5OQM73fKYS8fN5DYcfDr+TjpbrX
+	DVxF4a22QYIuIQY9eCJcsrJsJsRvginLheo+LCsf/iHlxZ3itaauN+A0OBxZceym
+	i3YWx5EMXnuCPzKRtE3zCdtvkbfazAerRlHqItbMKNy9lEQA8IMxS3W8/vTguosw
+	qDNgg6he5+O4toKPRAbI/WCpkr4iYxAYkWa/tmKr6YVyl6g28RkFT2A6GhaLOds1
+	kpLn13qHjJsfylMMwJsr7xTvBuibXs0TxetmmTJfLRCCigVOuxr2aywQYLMzVEN0
+	fW8dQ6YxF79qV/mr+rI6PPpYoAb76Zg=
+Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
+	by mx.ssi.bg (Potsfix) with ESMTPS;
+	Sat,  3 May 2025 01:16:04 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by box.ssi.bg (Potsfix) with ESMTPSA id 3600961BC1;
+	Sat,  3 May 2025 01:16:03 +0300 (EEST)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.18.1/8.17.1) with ESMTP id 542MFvKL069117;
+	Sat, 3 May 2025 01:15:58 +0300
+Date: Sat, 3 May 2025 01:15:57 +0300 (EEST)
+From: Julian Anastasov <ja@ssi.bg>
+To: syzbot <syzbot+04b9a82855c8aed20860@syzkaller.appspotmail.com>
+cc: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com,
+        horms@verge.net.au, kadlec@netfilter.org, kuba@kernel.org,
+        linux-kernel@vger.kernel.org, lvs-devel@vger.kernel.org,
+        netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        pabeni@redhat.com, pablo@netfilter.org,
+        syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [lvs?] KMSAN: uninit-value in do_output_route4
+In-Reply-To: <68138dfa.050a0220.14dd7d.0017.GAE@google.com>
+Message-ID: <70eb95f5-6fe9-1905-70b7-709eacd48b19@ssi.bg>
+References: <68138dfa.050a0220.14dd7d.0017.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Patch net 1/2] sch_htb: make htb_deactivate() idempotent
-To: Paolo Abeni <pabeni@redhat.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- netdev@vger.kernel.org
-Cc: jhs@mojatatu.com, jiri@resnulli.us, alan@wylie.me.uk
-References: <20250428232955.1740419-1-xiyou.wangcong@gmail.com>
- <20250428232955.1740419-2-xiyou.wangcong@gmail.com>
- <eecd9a29-14f9-432d-a3cf-5215313df9f0@mojatatu.com>
- <74017437-48d2-4518-9888-e74c14e01a5d@redhat.com>
-Content-Language: en-US
-From: Victor Nogueira <victor@mojatatu.com>
-In-Reply-To: <74017437-48d2-4518-9888-e74c14e01a5d@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
 
-On 5/2/25 06:59, Paolo Abeni wrote:
-> On 4/30/25 5:19 PM, Victor Nogueira wrote:
->> If that's so, couldn't we instead of doing:
->>
->>> @@ -348,7 +348,8 @@ static void htb_add_to_wait_tree(struct htb_sched *q,
->>>     */
->>>    static inline void htb_next_rb_node(struct rb_node **n)
->>>    {
->>> -	*n = rb_next(*n);
->>> +	if (*n)
->>> +		*n = rb_next(*n);
->>>    }
->>
->> do something like:
->>
->> @@ -921,7 +921,9 @@ static struct sk_buff *htb_dequeue_tree(struct
->> htb_sched *q, const int prio,
->>                   cl->leaf.deficit[level] -= qdisc_pkt_len(skb);
->>                   if (cl->leaf.deficit[level] < 0) {
->>                           cl->leaf.deficit[level] += cl->quantum;
->> -                       htb_next_rb_node(level ?
->> &cl->parent->inner.clprio[prio].ptr :
->> +                       /* Account for (fq_)codel child deactivating
->> after dequeue */
->> +                       if (likely(cl->prio_activity))
->> +                               htb_next_rb_node(level ?
->> &cl->parent->inner.clprio[prio].ptr :
->>    
->> &q->hlevel[0].hprio[prio].ptr);
->>                   }
->>                   /* this used to be after charge_class but this constelation
->>
->> That way it's clear that the issue is a corner case where the
->> child qdisc deactivates the parent. Otherwise it seems like
->> we need to check for (*n) being NULL for every call to
->> htb_next_rb_node.
+
+	Hello,
+
+On Thu, 1 May 2025, syzbot wrote:
+
+> Hello,
 > 
-> @Victor, I think that the Cong's suggested patch is simpler to very/tie
-> to code change to the actually addressed issue. I started at your
-> suggest code for a bit, and out of sheer htb ignorance I'm less
-> confident about it fixing the thing.
+> syzbot found the following issue on:
 > 
-> Do you have strong feeling vs Cong's suggested approach?
+> HEAD commit:    bc3372351d0c Merge tag 'for-6.15-rc3-tag' of git://git.ker..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=12d64574580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=fca45111586bf9a6
+> dashboard link: https://syzkaller.appspot.com/bug?extid=04b9a82855c8aed20860
+> compiler:       Debian clang version 15.0.6, Debian LLD 15.0.6
+> userspace arch: i386
+> 
+> Unfortunately, I don't have any reproducer for this issue yet.
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/01b8968610a1/disk-bc337235.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/528a97652269/vmlinux-bc337235.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/768ed51bbb66/bzImage-bc337235.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+04b9a82855c8aed20860@syzkaller.appspotmail.com
+> 
+> =====================================================
+> BUG: KMSAN: uninit-value in do_output_route4+0x42c/0x4d0 net/netfilter/ipvs/ip_vs_xmit.c:147
+>  do_output_route4+0x42c/0x4d0 net/netfilter/ipvs/ip_vs_xmit.c:147
+>  __ip_vs_get_out_rt+0x403/0x21d0 net/netfilter/ipvs/ip_vs_xmit.c:330
+>  ip_vs_tunnel_xmit+0x205/0x2380 net/netfilter/ipvs/ip_vs_xmit.c:1136
+>  ip_vs_in_hook+0x1aa5/0x35b0 net/netfilter/ipvs/ip_vs_core.c:2063
+>  nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
+>  nf_hook_slow+0xf7/0x400 net/netfilter/core.c:626
+>  nf_hook include/linux/netfilter.h:269 [inline]
+>  __ip_local_out+0x758/0x7e0 net/ipv4/ip_output.c:118
+>  ip_local_out net/ipv4/ip_output.c:127 [inline]
+>  ip_send_skb+0x6a/0x3c0 net/ipv4/ip_output.c:1501
+>  udp_send_skb+0xfda/0x1b70 net/ipv4/udp.c:1195
+>  udp_sendmsg+0x2fe3/0x33c0 net/ipv4/udp.c:1483
+>  inet_sendmsg+0x1fc/0x280 net/ipv4/af_inet.c:851
+>  sock_sendmsg_nosec net/socket.c:712 [inline]
+>  __sock_sendmsg+0x267/0x380 net/socket.c:727
+>  ____sys_sendmsg+0x91b/0xda0 net/socket.c:2566
+>  ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2620
+>  __sys_sendmmsg+0x41d/0x880 net/socket.c:2702
+>  __compat_sys_sendmmsg net/compat.c:360 [inline]
+>  __do_compat_sys_sendmmsg net/compat.c:367 [inline]
+>  __se_compat_sys_sendmmsg net/compat.c:364 [inline]
+>  __ia32_compat_sys_sendmmsg+0xc8/0x140 net/compat.c:364
+>  ia32_sys_call+0x3ffa/0x41f0 arch/x86/include/generated/asm/syscalls_32.h:346
+>  do_syscall_32_irqs_on arch/x86/entry/syscall_32.c:83 [inline]
+>  __do_fast_syscall_32+0xb0/0x110 arch/x86/entry/syscall_32.c:306
+>  do_fast_syscall_32+0x38/0x80 arch/x86/entry/syscall_32.c:331
+>  do_SYSENTER_32+0x1f/0x30 arch/x86/entry/syscall_32.c:369
+>  entry_SYSENTER_compat_after_hwframe+0x84/0x8e
+> 
+> Uninit was created at:
+>  slab_post_alloc_hook mm/slub.c:4167 [inline]
+>  slab_alloc_node mm/slub.c:4210 [inline]
+>  __kmalloc_cache_noprof+0x8fa/0xe00 mm/slub.c:4367
+>  kmalloc_noprof include/linux/slab.h:905 [inline]
+>  ip_vs_dest_dst_alloc net/netfilter/ipvs/ip_vs_xmit.c:61 [inline]
+>  __ip_vs_get_out_rt+0x35d/0x21d0 net/netfilter/ipvs/ip_vs_xmit.c:323
+>  ip_vs_tunnel_xmit+0x205/0x2380 net/netfilter/ipvs/ip_vs_xmit.c:1136
+>  ip_vs_in_hook+0x1aa5/0x35b0 net/netfilter/ipvs/ip_vs_core.c:2063
+>  nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
+>  nf_hook_slow+0xf7/0x400 net/netfilter/core.c:626
+>  nf_hook include/linux/netfilter.h:269 [inline]
+>  __ip_local_out+0x758/0x7e0 net/ipv4/ip_output.c:118
+>  ip_local_out net/ipv4/ip_output.c:127 [inline]
+>  ip_send_skb+0x6a/0x3c0 net/ipv4/ip_output.c:1501
+>  udp_send_skb+0xfda/0x1b70 net/ipv4/udp.c:1195
+>  udp_sendmsg+0x2fe3/0x33c0 net/ipv4/udp.c:1483
+>  inet_sendmsg+0x1fc/0x280 net/ipv4/af_inet.c:851
+>  sock_sendmsg_nosec net/socket.c:712 [inline]
+>  __sock_sendmsg+0x267/0x380 net/socket.c:727
+>  ____sys_sendmsg+0x91b/0xda0 net/socket.c:2566
+>  ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2620
+>  __sys_sendmmsg+0x41d/0x880 net/socket.c:2702
+>  __compat_sys_sendmmsg net/compat.c:360 [inline]
+>  __do_compat_sys_sendmmsg net/compat.c:367 [inline]
+>  __se_compat_sys_sendmmsg net/compat.c:364 [inline]
+>  __ia32_compat_sys_sendmmsg+0xc8/0x140 net/compat.c:364
+>  ia32_sys_call+0x3ffa/0x41f0 arch/x86/include/generated/asm/syscalls_32.h:346
+>  do_syscall_32_irqs_on arch/x86/entry/syscall_32.c:83 [inline]
+>  __do_fast_syscall_32+0xb0/0x110 arch/x86/entry/syscall_32.c:306
+>  do_fast_syscall_32+0x38/0x80 arch/x86/entry/syscall_32.c:331
+>  do_SYSENTER_32+0x1f/0x30 arch/x86/entry/syscall_32.c:369
+>  entry_SYSENTER_compat_after_hwframe+0x84/0x8e
+> 
+> CPU: 0 UID: 0 PID: 22408 Comm: syz.4.5165 Not tainted 6.15.0-rc3-syzkaller-00019-gbc3372351d0c #0 PREEMPT(undef) 
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
+> =====================================================
 
-I have no strong feelings, I'm ok with merging the patch
-as is.
+	I hopefully addressed this report with patch titled
+"ipvs: fix uninit-value for saddr in do_output_route4".
 
-cheers,
-Victor
+Regards
+
+--
+Julian Anastasov <ja@ssi.bg>
+
 
