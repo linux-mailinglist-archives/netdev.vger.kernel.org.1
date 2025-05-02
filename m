@@ -1,116 +1,132 @@
-Return-Path: <netdev+bounces-187410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4804AAA700C
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 12:50:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CEA1AA700E
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 12:51:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3FDD7A9D0E
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 10:48:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 354343BF405
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 10:51:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 896B923BCE3;
-	Fri,  2 May 2025 10:50:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WpdjQKv0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1A5B23C50A;
+	Fri,  2 May 2025 10:51:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62F6C79D2
-	for <netdev@vger.kernel.org>; Fri,  2 May 2025 10:50:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11F2F1EA7F1
+	for <netdev@vger.kernel.org>; Fri,  2 May 2025 10:51:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746183004; cv=none; b=AMh7P8dgsIbdCwXRygEbaY6cGUNzoA5z31VcaUce440s+u6Qgy82CGA8ahzGTyho9/sz5PbA77rJYi1grC73iPm+btoBCs7amn/sd5WMAXjukgQHcXw/ToRH9z4Sp8aUeiQrzufHD9nOPlJeK5jDyzkyyxyCIwKqzoeYYV8z6Wk=
+	t=1746183114; cv=none; b=ZVt4RD3jWdliWBRHwLzZuUEqafcac54V4w+Oo01MZZ4+Hyeep6BJ5LxFNPW7H8h1O9Emc8z/gEuV3ljUThudC3aMwVY4n5jGGGnTq3b+uGax47yu6xp3c5ukW4b1ZVe0KKf78/K3xWFNjVIx1T1HAy/U4qHnXSUhPtCh0MOACfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746183004; c=relaxed/simple;
-	bh=XqxvwkczJLwMWdzTgjLSJtIt5i54UJ8RB8+j78ynTSk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=CK1oOmihRfYk3gZ5dJouk0ozFKzUH0UrwRLjO6vDMX95zY9o4ki7MxtOUT1cuwkrWgcsdlMceDg2l3Yxe9wLs/Qi6GbVzr11ZNUNlbMliLaIJd2XUL0NW2ZkwY2+thm4X2hKnApW6kyktf5uTvfB6CiYLBzu8vgLpR1pFMJbWsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WpdjQKv0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6650C4CEE4;
-	Fri,  2 May 2025 10:50:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746183003;
-	bh=XqxvwkczJLwMWdzTgjLSJtIt5i54UJ8RB8+j78ynTSk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WpdjQKv0RB5Je8cWwh1RDdz2VQB+oFoIlHwMD7FWpTq12qyk5t8RZB7CdrA28v0qP
-	 XI4jQEHp8aFBIT7F4scJwDZsnTKdJqJX1dJLUhKVENlri/5B1H6QENcWMxGTUh5NGZ
-	 3ry0+yn+t3aBX4WideWVaNzI85NwpFwfWiiFht2z6GdloZGit1+aQt5kJw7ufjWpcP
-	 3j2pGJTf68Uv173lvVhWWRkBolK7q3DusjZKoQJBi1S9/k0iqaie+J5p/Hd/lSGCyh
-	 tmKSIgFIwVNH6lXQZ8ryTumQ+dqVUHkgYGWKGeKXpkLYsvbXHjl7tJpziBogTZKovz
-	 jeU6MByZlqx4g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33BC63822D61;
-	Fri,  2 May 2025 10:50:44 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1746183114; c=relaxed/simple;
+	bh=/Bg1W3vx5VqNBb4X9ISt+wzbx9RV1XwLd37krZ0v+/I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uZOqTVC5XYaxnkzgQkxonmo4z+7gzkaAlBfezp+5iZiDZrHw8R/J0yWjx/zHd0nseIcyMQcOWrwmJX5yJ3ibs0dH3ziXUtOlA5vJD2E7+p+qQxnpmwgBWCxruU8QtaNJrjfy8XAm+ZvIWjg7lmcJamnfEya91iZ0Ic8RUen9CfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-453-NpDObbQYM_eFGHiT3Wb_ZQ-1; Fri, 02 May 2025 06:51:50 -0400
+X-MC-Unique: NpDObbQYM_eFGHiT3Wb_ZQ-1
+X-Mimecast-MFC-AGG-ID: NpDObbQYM_eFGHiT3Wb_ZQ_1746183109
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43ceeaf1524so7810225e9.1
+        for <netdev@vger.kernel.org>; Fri, 02 May 2025 03:51:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746183109; x=1746787909;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7pHoDrN/cn5NUfRY8+fhnaI8XRygteksiSbMuei/zJ8=;
+        b=KEfov7nFun5LgcsIC/LvgaI152jWByN2u4SJI3365/KRAkhQS6hZC4S4Qkok9cwdUq
+         I8k1ThAFmcsdLKDFdCUis/p1KPEkTQBrx8Htw2ZsFbPyjFhOL2wLW/D0O3dKvPANE2Gi
+         71ql4LSRMiCDnvNOHjeCPZze/uswz6u0e9j/bx5OIx09U2QYvARgGZ3YFQ6Go8IMqMFo
+         f2RrMo+VDzFXnobMMgcovk02rH9dYt1o7avy+dWOZ7ewdBkuCbJ/rWZNDdyU8M4DsNQD
+         hvSUV4tE8nI0mPxYJucNzdjPi4srmnCFCkamO6sINR+tMPpusHz/8cvSv3NUC8jVTznl
+         Mozg==
+X-Forwarded-Encrypted: i=1; AJvYcCWxFdd31YGSLHjykf2ACmIh8OXL6BZjt38yac2haAWDWKfyRIhwZ6E4+fUovoF51mMp7gUxX/Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzeO/yPkMHyX1FIJIB+J8Ej8WckEXrgAtzvmckOt9mBthYfzLTX
+	9BbfL/Pkt0BUIvfkB+eEH5894zvaEE7TdILYHLDeJZ8non1un4JgVKxNLrpguznyPIyPmyyo478
+	GqI5Oy2eI4vwamrmuCCbqJ8dUdNLQ5NDQHUJjFH4BqdIqv7w0C1okuw==
+X-Gm-Gg: ASbGnctKwX1h4PtfUSTvkziPgw81FmS9RbMocQx3dO2uPswdSQjy1KcBPWt5699IpuS
+	PyhA5wGEV7urZGRXMnczZhycXc/Lm1OZ9D4WFFyWCs9AjZdYK+Sb/Iae2wxA4HPm3ka8CGC5RjM
+	KiWKooIuFMp+/ya7HUj3KY581zAQofQFEtPL+4hn2tymXZQQh3oNHUgKAjPNnDl9/1hHlrc8Erl
+	WIg4N0XWmidwh1/Dgt3Ctq4zCYUr/E24citrSOvp9UO83uZJH4XbtTTblFE9UxKjXDQU5PHNJ7h
+	ddpKStM76g7uFhNBV5g=
+X-Received: by 2002:a05:600c:3acd:b0:435:edb0:5d27 with SMTP id 5b1f17b1804b1-441b72c0a66mr49043815e9.9.1746183109574;
+        Fri, 02 May 2025 03:51:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF0ji9b4/ZVgNefxRUhb/GlgmAOtjpg49JM7ialo/DRbM3k1g2bgLpI6NcCCmHH8X+ehawG3A==
+X-Received: by 2002:a05:600c:3acd:b0:435:edb0:5d27 with SMTP id 5b1f17b1804b1-441b72c0a66mr49043615e9.9.1746183109261;
+        Fri, 02 May 2025 03:51:49 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:246d:aa10::f39? ([2a0d:3344:246d:aa10::f39])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-441b2af4546sm87615685e9.22.2025.05.02.03.51.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 02 May 2025 03:51:48 -0700 (PDT)
+Message-ID: <4e68ca40-85b8-4766-9040-edf677afd0f7@redhat.com>
+Date: Fri, 2 May 2025 12:51:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3] net: phy: marvell-88q2xxx: Enable temperature
+ measurement in probe again
+To: =?UTF-8?Q?Niklas_S=C3=B6derlund?=
+ <niklas.soderlund+renesas@ragnatech.se>,
+ Dimitri Fedrau <dima.fedrau@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Gregor Herburger <gregor.herburger@ew.tq-group.com>,
+ Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Kory Maincent <kory.maincent@bootlin.com>
+References: <20250429-marvell-88q2xxx-hwmon-enable-at-probe-v3-1-0351ccd9127e@gmail.com>
+ <20250429200306.GE1969140@ragnatech.se>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250429200306.GE1969140@ragnatech.se>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 00/12] tools: ynl-gen: additional C types and
- classic netlink handling
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174618304300.3576625.13148490893846898306.git-patchwork-notify@kernel.org>
-Date: Fri, 02 May 2025 10:50:43 +0000
-References: <20250429154704.2613851-1-kuba@kernel.org>
-In-Reply-To: <20250429154704.2613851-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- donald.hunter@gmail.com, jacob.e.keller@intel.com, sdf@fomichev.me,
- jdamato@fastly.com, nicolas.dichtel@6wind.com
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Tue, 29 Apr 2025 08:46:52 -0700 you wrote:
-> This series is a bit of a random grab bag adding things we need
-> to generate code for rt-link.
+On 4/29/25 10:03 PM, Niklas Söderlund wrote:
+>> @@ -765,6 +768,13 @@ static int mv88q2xxx_hwmon_probe(struct phy_device *phydev)
+>>  	struct mv88q2xxx_priv *priv = phydev->priv;
+>>  	struct device *dev = &phydev->mdio.dev;
+>>  	struct device *hwmon;
+>> +	int ret;
+>> +
+>> +	/* Enable temperature sense */
+>> +	ret = phy_modify_mmd(phydev, MDIO_MMD_PCS, MDIO_MMD_PCS_MV_TEMP_SENSOR2,
+>> +			     MDIO_MMD_PCS_MV_TEMP_SENSOR2_DIS_MASK, 0);
+>> +	if (ret < 0)
+>> +		return ret;
 > 
-> First two patches are pretty random code cleanups.
+> nit: I wonder if it make sens to create a helper function to enable the 
+> sensor? My worry being this procedure growing in the future and only 
+> being fixed in one location and not the other. It would also reduce code 
+> duplication and could be stubbed to be compiled out with the existing 
+> IS_ENABLED(CONFIG_HWMON) guard for other hwmon functions.
 > 
-> Patch 3 adds default values if the spec is missing them.
+> That being said I tested this with mv88q211x and the temp sensor and PHY 
+> keeps working as expected.
 > 
-> [...]
+> Tested-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
 
-Here is the summary with links:
-  - [net-next,v3,01/12] tools: ynl-gen: fix comment about nested struct dict
-    https://git.kernel.org/netdev/net-next/c/a6471da7745a
-  - [net-next,v3,02/12] tools: ynl-gen: factor out free_needs_iter for a struct
-    https://git.kernel.org/netdev/net-next/c/2286905f1b33
-  - [net-next,v3,03/12] tools: ynl-gen: fill in missing empty attr lists
-    https://git.kernel.org/netdev/net-next/c/d12a7be02524
-  - [net-next,v3,04/12] tools: ynl: let classic netlink requests specify extra nlflags
-    https://git.kernel.org/netdev/net-next/c/fe7d57e040f7
-  - [net-next,v3,05/12] tools: ynl-gen: support using dump types for ntf
-    https://git.kernel.org/netdev/net-next/c/bbfb3c557c66
-  - [net-next,v3,06/12] tools: ynl-gen: support CRUD-like notifications for classic Netlink
-    https://git.kernel.org/netdev/net-next/c/49398830a4aa
-  - [net-next,v3,07/12] tools: ynl-gen: multi-attr: type gen for string
-    https://git.kernel.org/netdev/net-next/c/0ea8cf56cc20
-  - [net-next,v3,08/12] tools: ynl-gen: mutli-attr: support binary types with struct
-    https://git.kernel.org/netdev/net-next/c/3456084d6361
-  - [net-next,v3,09/12] tools: ynl-gen: array-nest: support put for scalar
-    https://git.kernel.org/netdev/net-next/c/18b1886447d6
-  - [net-next,v3,10/12] tools: ynl-gen: array-nest: support binary array with exact-len
-    https://git.kernel.org/netdev/net-next/c/5f7804dd8326
-  - [net-next,v3,11/12] tools: ynl-gen: don't init enum checks for classic netlink
-    https://git.kernel.org/netdev/net-next/c/18d574c8dd3e
-  - [net-next,v3,12/12] tools: ynl: allow fixed-header to be specified per op
-    (no matching commit)
+Since this is net-next material +1 for the helper.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Also AFAICS this is fixing a net-next regression, so it needs a fixes
+tag, too.
 
+Thanks,
+
+Paolo
 
 
