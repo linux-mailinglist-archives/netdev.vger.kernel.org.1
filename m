@@ -1,250 +1,287 @@
-Return-Path: <netdev+bounces-187521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA1E4AA7A98
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 22:11:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 90D01AA7A94
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 22:11:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDCA93B3EDA
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 20:10:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A3ED3A3D69
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 20:10:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF7931F5859;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 350E91F4198;
 	Fri,  2 May 2025 20:11:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="cXYW4I+f";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="VMbabmyU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sv864FeB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 157F917A2FC;
-	Fri,  2 May 2025 20:11:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746216665; cv=fail; b=s0GOF1i1RHSBugHA709XcnfIt2axVNip6u1w9Z2c0+tjH21SGtSNj8xKwaL2FMeC3C6mMeyumhucoKE0cIt2ezXts3X5PRZz04EmiQpVQOmRWpFy7yA2Ny9+yf2web+4TazcjuAJf2208yx3u+U2RClB2X9wO0wmkxbBbaJzwbo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 023701F30DD;
+	Fri,  2 May 2025 20:11:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746216665; cv=none; b=syiHbkXRBRCKwXIfrm8i8QeVKSuwNYJPLw60uaEovVlrsiuPEhK/yK6hnJ6lgvZlt4pnLwRTSm7jOHM3s2xr7sDrPdkAOqRmlfcX3Z05qDWMTfQstFQWepwm8s8XS4DVffbELeiMqrTPWFp9MTFzevonOHCvA4kugQwW5RgvFsc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1746216665; c=relaxed/simple;
-	bh=NlJITODSCV2CTtFymG6wxKnZBj2Dj9fUZris2Eu5GWI=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=oa8yH2dWB/3Tk8+Vuj5ptd23WqM9ldB0PT19Yi2NElJ2SSfbH9Ps9JsblHZHPZn0XSCDkcYhPbRswZVOzJP+ne2wuWsG+vLevv0TdCZSXIqQ6RZHNR6cK8zMUVJZ7XpQCLvYULR4dPTLtkWcraxP4a/ECxryNvf3aYdwIDqI6Zw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=cXYW4I+f; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=VMbabmyU; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 542JiJVG002702;
-	Fri, 2 May 2025 20:08:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2025-04-25; bh=SKra8xWrCKknsSrn5ZkNCtPetL7FDOZl4TsqKvFFe6I=; b=
-	cXYW4I+fYKU7anAXi7E+Nrc0J9BBl/9rRPs39AinJ6bV8CXPy6s2edJ6BF0Horr1
-	RX9n3Py7Isf5hyK3tnuk1Msv1iFfe4Gl1CARr65iJdSQayiWA1j9ZLUTppIoKs9h
-	PgjsC4VSIbqnHJU5NBnZu4a5+53AB+GEdCP43jJIHYRBivN53t03F/tMcQSAItHK
-	vR2bYV1ptr4kMPtv/oV9AE9u8sw4HLSX/wJ9o+FCvcV3xR8bu9TOUiu6NfHkyYPG
-	jk4+j6XK4tLKxdguUgMRNVPte7AAemYy65n9/QhCRJZ1y+15XNRm4ZXvD4lxoc16
-	lT59EVo07Xdt1IUeolP8mw==
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 46b6ukp1m4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 02 May 2025 20:08:30 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 542IY2Bh013901;
-	Fri, 2 May 2025 20:08:29 GMT
-Received: from cy4pr05cu001.outbound.protection.outlook.com (mail-westcentralusazlp17010001.outbound.protection.outlook.com [40.93.6.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 468nxe6c5a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 02 May 2025 20:08:29 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=RgCipfuvd7l0HcY3lycmBS2onHttlxXlXgGK65I0LTl3U05JZuTJ1/tq+NzvJtraeNBaMjAOTOVbkeO/YMH0wzBGPoJh0aSeSb+8YmpsvknSjhYBBE4g40zSZ7m+VvelcDp0+mYCd/o9IkP0LzjzmW998ktm+YjCq05fN6r4Vyj84vCJtxJxVEIKhNW5IFAsE1WJc216XmjdAX1spgv+DHyJ7D7VVxnz8ts0FIFl5Pn3rcyOz/Yxv0uhDz5DMfbKX8b6JC2ZQA83/WCtevPY4QEAKjfozm3dUBdFiHdWreEbNUSSd7BmPkhV6olWADIS53qi8FCki7GHvjiMLIGQMA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SKra8xWrCKknsSrn5ZkNCtPetL7FDOZl4TsqKvFFe6I=;
- b=ehh0eRHRPzniSHIJ/9dT22p2P5J3q1D8863QSuf34w/xP8ES7dY7sTtXLgbxfuVCYA5aad8/PJh4WFUVUQ64czAhCkpMmvqwcIgqCbgmlGShPM8M+xSUCAjZlq98kfxRvzc8ct+su+ibuyG/7hUwgewEYW37Ls9meenteMxYOG8XlNbDUJzlH6Ka0zdPV5Hgn+QeqDPFpTbUSoUiYcioNWo3/Jp9yZZxzZKT/Icz6hYyMN72h2xJhQ0LAnU3+ozZBwa1q0MXuEQnw4VCWR84Catq3BAwYKWdPp8OCHY/k/ZbY6pA2xTMe41DWHri1SYRGb2UkrBLeFrW1IOZu1hKqQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SKra8xWrCKknsSrn5ZkNCtPetL7FDOZl4TsqKvFFe6I=;
- b=VMbabmyUFD8IldN/AzM1sOgE5Vd9+6h7heE0eqbmlOCA9Y+huSBADwqq5x7BfY1S5nY1C3JzenhRDj9m+LqmtBZOT2wpUwELQZZ5vl4GRpQq2J0nkOLUDv+LWZPg4USWF91ZWsablcXmd/y1k8ySqD+ByCF/GF+7cbgbc3o1Yn0=
-Received: from DS7PR10MB5328.namprd10.prod.outlook.com (2603:10b6:5:3a6::12)
- by BL3PR10MB6067.namprd10.prod.outlook.com (2603:10b6:208:3b6::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.23; Fri, 2 May
- 2025 20:08:23 +0000
-Received: from DS7PR10MB5328.namprd10.prod.outlook.com
- ([fe80::ea13:c6c1:9956:b29c]) by DS7PR10MB5328.namprd10.prod.outlook.com
- ([fe80::ea13:c6c1:9956:b29c%2]) with mapi id 15.20.8699.022; Fri, 2 May 2025
- 20:08:23 +0000
-Message-ID: <d6473f85-4d2f-4979-804a-0ef5c4f3cb69@oracle.com>
-Date: Sat, 3 May 2025 01:38:03 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 01/11] dt-bindings: net: ti: Adds DUAL-EMAC
- mode support on PRU-ICSS2 for AM57xx, AM43xx and AM33xx SOCs
-To: Parvathi Pudi <parvathi@couthit.com>, danishanwar@ti.com,
-        rogerq@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, nm@ti.com,
-        ssantosh@kernel.org, tony@atomide.com, richardcochran@gmail.com,
-        glaroque@baylibre.com, schnelle@linux.ibm.com, m-karicheri2@ti.com,
-        s.hauer@pengutronix.de, rdunlap@infradead.org, diogo.ivo@siemens.com,
-        basharath@couthit.com, horms@kernel.org, jacob.e.keller@intel.com,
-        m-malladi@ti.com, javier.carrasco.cruz@gmail.com, afd@ti.com,
-        s-anna@ti.com
-Cc: linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pratheesh@ti.com, prajith@ti.com, vigneshr@ti.com, praneeth@ti.com,
-        srk@ti.com, rogerq@ti.com, krishna@couthit.com, pmohan@couthit.com,
-        mohan@couthit.com
-References: <20250423060707.145166-1-parvathi@couthit.com>
- <20250423060707.145166-2-parvathi@couthit.com>
-Content-Language: en-US
-From: ALOK TIWARI <alok.a.tiwari@oracle.com>
-In-Reply-To: <20250423060707.145166-2-parvathi@couthit.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MAXP287CA0010.INDP287.PROD.OUTLOOK.COM
- (2603:1096:a00:49::21) To DS7PR10MB5328.namprd10.prod.outlook.com
- (2603:10b6:5:3a6::12)
+	bh=iTuW9YI+dyuT02HLYxJyyxkPKnlk5po8c12xAAkhwpw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Btc08IcTIyLS9U84eH3vCOneQY6L9JG0mkqXvQ0xYWKLOTjlLIkJPVj4MHj4KQxVxuagrjCHFrzct9JjulRHUz4UHaERCntiMELbL5/+sUZ/yjVKJxYkq89WfJJvAbsC9vsuMguzMaDmx4jKcE4l4W3QxQjVRRTxd2IN3lJ69Uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sv864FeB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1ADB5C4CEE4;
+	Fri,  2 May 2025 20:10:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746216664;
+	bh=iTuW9YI+dyuT02HLYxJyyxkPKnlk5po8c12xAAkhwpw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Sv864FeBd9KxTRdvKgOZ+axY1H8VJH6iQ6cUVIomlzaF8Tt9DU1hTss3RaV0GZGw0
+	 RKet8XeU2WIeWeupCA3Z9iHmv84YHtpKjuDx2zS50DsC7PFGE3b0m1BzZhn6cqY0iw
+	 ZiOVbf4T5FM1pJ38MSl5brA85uW6PChKkKaCJiMldiQgECJympibLARyoEuarBSxjo
+	 Jp9rOnCwV3RTUZJmrxWtRmwna1eihF+o7ly+2lZSOrU06Jk4AfecpZXmte8Y09CbPd
+	 6lzKD8lSPHAJyJbSj9PDcRHDM5i4A1KjJtHmmESVkhFiw/Tp+pLNeiEVbXUFW6hF8c
+	 G56Lo/9mbOmqw==
+Date: Fri, 2 May 2025 22:10:57 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Jann Horn <jannh@google.com>
+Cc: Eric Dumazet <edumazet@google.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Oleg Nesterov <oleg@redhat.com>, linux-fsdevel@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Daan De Meyer <daan.j.demeyer@gmail.com>, David Rheinsberg <david@readahead.eu>, 
+	Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>, 
+	Lennart Poettering <lennart@poettering.net>, Luca Boccassi <bluca@debian.org>, Mike Yuan <me@yhndnzj.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH RFC v2 3/6] coredump: support AF_UNIX sockets
+Message-ID: <20250502-fanden-unbeschadet-89973225255f@brauner>
+References: <20250502-work-coredump-socket-v2-0-43259042ffc7@kernel.org>
+ <20250502-work-coredump-socket-v2-3-43259042ffc7@kernel.org>
+ <CAG48ez1w+25tbSPPU6=z1rWRm3ZXuGq0ypq4jffhzUva9Bwazw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR10MB5328:EE_|BL3PR10MB6067:EE_
-X-MS-Office365-Filtering-Correlation-Id: 793215d0-71c7-4ce7-a84d-08dd89b5172f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|1800799024|7416014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Q3RMd1hGMVk2YTQyQWRvVDJqWWtqVXppNHM2QW5FQlhzc0pkVFJMVGswY00y?=
- =?utf-8?B?NktBd0lWSlM5b1RIS0s5Q09JWU5BMVlGZXFjR2lQR2JDV0lYQ1hUWGx1SFg0?=
- =?utf-8?B?Tmwvck5yeU9xRW1PM3dadFdEb0tTcS9sa09JL0tUVWE0UWo5aVJ0UTdGV29m?=
- =?utf-8?B?ZjUxMHpUUW5QMGZQRjhqYXJCQmVTcFhjdVFmUVhaYVZwbHd2bXV1Q2U4V0Np?=
- =?utf-8?B?TXZsZlExYmJubTRPdUhIYy9qcVJlb3dBWkpsQTAxN1VTL2JRQ2lCU3ZxbDBT?=
- =?utf-8?B?ZldtV3hOOEVpenJ3RlRPNDdrSXl4NkJuWnVYdWM2cDh2SWp3QzdSQlNJbldQ?=
- =?utf-8?B?SjJoRjJ4Z1pybS9sZHBQRisxcWl2NGkvRVNsRmsrSWdRVjhhNzVjSTFZQlRw?=
- =?utf-8?B?RjN0YzFHNE4xUnJUYlR2VjRXdXh5d1NpZ0F6amxVbGRnRnpXTmRnR0thZDdJ?=
- =?utf-8?B?OTNZRmJTb0g5dmtBT21TYitxejFBNEpXZU9YVk1ES2tRemxOWUxBUTZyWHhG?=
- =?utf-8?B?bS9NYUZOZXNRaUtZQXoveklZZGRnaERwYThNYUIyRStrbDhBQWxSZmtxaWhX?=
- =?utf-8?B?Qlo1RTd5Wi9DbDFEdnJ4NkdvZGRtTmZZcktWL2psNlpQNVNNaGhIZmVBV1Q4?=
- =?utf-8?B?S0I4ZlVNeG9zY3Z4OGtta053WWNtazJSTm5JMWF3aE8vVFN0NmxJck1rUG5E?=
- =?utf-8?B?QVF3QXJGTEtyU3FaWm5BZ3RWRlpkTDhWbXNUK1dzRDlKZHdsejEzYnR4Z0JF?=
- =?utf-8?B?b2RWUzE0WnVSVlRNYmZQbWJoQ1FEcXpSV2ZUWXZjYm9DWk04WlREN0o4b0F6?=
- =?utf-8?B?SlZjRzMxYk9EeGcxTXVaTHFIMlpTbllnNy9pelV6TmpWQU1vOUJObnYxaFQ3?=
- =?utf-8?B?R1lKZkNLRHBsTEpzckg1THg5VDBBemFac0pKQ2JmMWlzQkVEZkliQm1kWEFQ?=
- =?utf-8?B?c1ZHZWJlV2p2ellRYlJlbUJCa2NnVmZQQWttbWlZK1FxZXgvVlc4c0RUcGlY?=
- =?utf-8?B?NXhpTDh0SWw2Qzh5T2dCckE1VVpaSzB0UkwxS25ENW5TYjBpVVU2aXJwWE9H?=
- =?utf-8?B?V1E1UUhpd3J4OGNTbjFxbG1VRnpjV2JnVUttbm52ZE5xaVpEL0JtK3U4RnRr?=
- =?utf-8?B?SE8vYVBIUmdScDVwSWpTTkNrRUlCM3NmQ2lLT1lKOGtsYzM1MSsvK0lQRXBD?=
- =?utf-8?B?QUsySnc4Z21hd0syOUpuNDR2YTZvU0lYSTBycnlqMVkzRGlOdndhTlNjaWQr?=
- =?utf-8?B?TWZVQ0psR3JEdGc1Y1AxcUxTSzRld3EzYnVodEVuenN6RVR6aGRRS0xWYTg2?=
- =?utf-8?B?WU9GeWJ4ZC9PeWt2T082d2RXNS9hVnhvbWpRbDJVVGxXMld0QmlsREVtT2Nt?=
- =?utf-8?B?N2ZJZngrRXhXYVNzMVVYSlRLNEhtQXU3K2FEeGlISmFUeG1HUmhvRkk2Y0J5?=
- =?utf-8?B?MEtvbEp1OHpzdVJDWFBXM1d2Q2k5eTdsNW9NajVUWFAvenRmVDFsc2h0Mkp5?=
- =?utf-8?B?cXRsRHhSNlBXd3pCVUxOdnBoNFZwTHZJU1ZHV09LYTZmTGprNmxPZHE5NDc5?=
- =?utf-8?B?U3djbmpOSXkzc204WHNJVmgwdkk5UmFCaStLQ29YNWdBTkZBS0F3UmNMMVdZ?=
- =?utf-8?B?NUV5M1lkZzBSbFRmeFVJWHF1MFJYZTlsZUdGWFFHYzA4Nmh4WlJueDlrRjRP?=
- =?utf-8?B?TUtsK0RpZWplWGpSck9MNEx4akR0ajFreU5ybndTZU9JN1E1Qk5XeUJ4SnNR?=
- =?utf-8?B?MTk0RFR3SG1TQVh5ekUvS0VVVVNkQnJEQjhyN014aHNrVlV2YjlRYXREK0Vy?=
- =?utf-8?B?MkhKN25Na21tdElyVGVmc1k4UEY2Q1IzV2NYWUtVbnpWcDE1cldKWnFraEVk?=
- =?utf-8?B?NzJZcENMYWdJcmlJajRRU2htSGovR0hGZlVVdGJzQU03azlab1RMbWlyWW9J?=
- =?utf-8?B?RXJNMndnemRLR0gwYXdjRTRpMnc1U0NYUlNoTFM3azlDaDFSMWxhcldRWUxB?=
- =?utf-8?B?YjlwVXhtdlNBPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR10MB5328.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7416014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?MUNRcG1MWEl3TERGSnE4SHU3QXozajdETlViUkdOTGw5TVJTNXUrUEVpOGVT?=
- =?utf-8?B?ck04U0craGlkRnlIUVBUQ2E1N1JzUHZhbVJIN0FTQTYzd2pxNEEwd2pLaUhu?=
- =?utf-8?B?Z0NDQno2cVdLUitxczM3VS9TN2V5WG9yWEFHdnBGWitCdTF4dlpNamhRMHNu?=
- =?utf-8?B?Z1Nta1YrczlqMisrYzkvczMxYW1pY3B6YTdHRXlmSzkvYVpFWkpKMFJpUmZy?=
- =?utf-8?B?YmRiQnZSczA0ZHFORmJCL01iUHArUXpRNFB1M0d5VHF4bURoTXBnUUl6d0lX?=
- =?utf-8?B?TUJRa3ZvajZJUFNyanRIRmRBeUtPV0xSZWtCTjJIYy82VmdmamxhZ2tuUWcx?=
- =?utf-8?B?V2JmMGlwb2RldmdRM1I4WlJQT3FENTZzSXB2YjlUSTFkNElQSmRpbDNqQkdH?=
- =?utf-8?B?M2tQcGJzOTVwbGJMSnNnQmV2LzJDMkJhUzFVbU1XbnVnajJHdGRSaUowanU2?=
- =?utf-8?B?Z0lOR2dxYVhaL3NlaXdON3dJbEo4c0Fzc0U3OGs0RXFOd2JnUk1sNkVPd1U3?=
- =?utf-8?B?N0xoOEUxVXdta09weVJhdlExenQ1RCtuck5obktyZnJoTFJscjZ5WjVsWE1T?=
- =?utf-8?B?S2RLSExmR3kyb3lPem04V0JMZkEvREcvcFNVNU9RczVuaUlqNHFiVWxQSG5K?=
- =?utf-8?B?cjFRVmVORnh3WUJHemlwYXAyVk81bUFoOVU1VXNBOS9vSDZhL1lhcmJLSmtN?=
- =?utf-8?B?NFFjUWNvRnVNcUVSZS9DTHMvR3EyWTZ4UFd5TGZVNElOTVhkUjVJQktOMjhU?=
- =?utf-8?B?am1GYWJBNDd1M3lSVWFNLzdKNEFYZmoxa0xkcjJDNld2VDRra21qeTQvRmFQ?=
- =?utf-8?B?RjRVUGFOTVpBVzhYRU9la2ZML2hzc050dGhENWhqT2U5TmlrWGJsUGsxaFF5?=
- =?utf-8?B?UVJ5ZDhkeXdJVjhIMGxPS3ErNm9KUml4dEtUaXgyOWE5ZDYwU045akMzY3RP?=
- =?utf-8?B?ZFZIVlhOcElNOTFLMVZZMUJseUREdW0zUjdQRVQvOXdyV3hWbFVlYTFoMjAr?=
- =?utf-8?B?eUY2cUt4WkQvYkJvMjQ1ODlIcEtrSENqYzJsM2dKQ2YzY1JjOTJ3MkxGbkxY?=
- =?utf-8?B?ckthTHZxL095MjJUQytJMlVmL0F1N01ta3c3aFRiL1BIM3VQQkZXL0J0V0Qz?=
- =?utf-8?B?dlJjeTlCd2xHMTRYZ1pHM1hCVHgvRnZWQkRya3J5M0FsZWFGTmdveCtnVER3?=
- =?utf-8?B?TkpvT1dJcW5VU0J6b3VNUkdkZzBRbk5kNUdvODY3bjV0Tk10ZTFCc2VIcXBs?=
- =?utf-8?B?NllxMnRDOGExTW1TRmM3SjVJaHlIQ1kwL0t1eHFSR0YxSSs3RXdHSFlTRE42?=
- =?utf-8?B?SWdmbjd2NlRFbCtlVVV1ZUhGWGhJai8zQkIyUE4wa2d6QzRlN3UrN013Ym9S?=
- =?utf-8?B?czlMei9LQko1OStCZkxadGFyaU9aUFJvYklkTUs1QnJNTFoyeTZXQ1lwUG05?=
- =?utf-8?B?b2w5WEJvZVczVnFXNTVJM2NSV3B4Y3lXSTZ4ZTkrQ29HeTZvalRRb0VxSTVV?=
- =?utf-8?B?UWxmdy9HaTk0bVVPUEJ3aW5oQWVpUFFZZDUzZlR5aHhOVTRXejl4Qml0NDlz?=
- =?utf-8?B?M0UvZUxtaVB4MWdkQ1JqWHZyZEZKT2dlaTBLbGtibjJqVkVXYzdxYjVSL1BH?=
- =?utf-8?B?SzJBUGp5ZG93VGVhQVJDSWtsQ2Z6SGpoL2taaWVoMkFiK1Y1cC9yUExsSmhu?=
- =?utf-8?B?L2FRVzVYUlZiWmg4UC9ySU9pME8vYTZPWm1RU0FCZ2cwWTl4VnpQK2lHbGJN?=
- =?utf-8?B?ck9POVhpTU9hQ3hlRk83TWZZWDJDVlk3STN3OTgzRG5TOFluWFRNRU11eW5n?=
- =?utf-8?B?dmFBSlR3OHd2RU4zK214N0RQemZPdTE1WmFjbHZpaEUzcjVwZWVpcHFGSXFS?=
- =?utf-8?B?bWVXSC9BTVJCdmZCK3RuQncyandpK3lFV2lndUwwQkp0M3JvZjM5MWNEUkJO?=
- =?utf-8?B?bzJ3bmlPenl5MlE4OFdBcWE4bEZuNTVVUlZEYk5BYVE0Z3VESW1xSG1CRVBk?=
- =?utf-8?B?dEZxVi8wb0FVeHpRazBBSUdOaUo0WHJFRGFYdUdDY2ZJTXZYNVBQUUZ3Mm4y?=
- =?utf-8?B?VmhDVVFBcUdVZUUrazZEM2ZHZGRYT2xBVjNrU1Brc3hUazdac3FZUlk0dkdw?=
- =?utf-8?Q?iPcGVm8KgVpU79oY5c8mIc7ms?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	Z1Aq6EPaJkG/bxSDCg3vJ9qc1KsriR9bb6RjXFox6D/NXwezTZ+sbgQVKN4a2jAjobTisp1nH54p7oJXlAFgA4V2Xcp3wN5QcLq0qIFc4f/q3kiTu1bKF/PMd8vq0pYnyNTNXqnroMGYZmaPLaTNpDbngygmw5tCYXinhAvT+hscIOeRaeLitw8DRgdWnIGLb4YVQXICY+j7ZHpnM9K6B0Qv4lWRSyYCA4BP6R3EmvpK0RTyKl/tSpASgpi1EHu163AtUIODoUwpwrt+tIbA01JC+weIFfAvfH9mKHT3JS8tJvo+Uvp3sh8kx5p5s9BL65Oz7S3IzeEafCtSRGbUEgY3PXwIEJPrYQ19uhYDIDh+aBg0hSda+8v/0sAptC2HM9O6g86sxkUiGeTKrg5kAF9jTlRaNkowoZWtYQUx6z5iyXNchkq95ti/IjCLOpMEMU0yk5GjpLEv+BQTflfF8+1sLgD+hyRV4/qJiCev3SDPkON+GNLjlhbL/0QPFZakwgmoU8VDmdgQ4Rsm7vmD/+LH1yy/H7XaiLWONChA5HeNGPWgE5tQUnJBMzYb1DHhHnwBkiBb4qE/ywMWuqLxbQsW2JTOVTrh1Kajn4QJ6kM=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 793215d0-71c7-4ce7-a84d-08dd89b5172f
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR10MB5328.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 May 2025 20:08:23.1862
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: TkStcm5j0XYps5Z5/GutzKZdogWEn6GxXbeMn2CY967ZMVMZaF+bcxf3twJDfVLU7mlB4eHcFNW6Ut3TSgLaztQ9l6+eLWfHXZZ7gbtFO6c=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR10MB6067
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-02_04,2025-04-30_01,2025-02-21_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 adultscore=0 phishscore=0
- bulkscore=0 mlxlogscore=999 suspectscore=0 mlxscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2504070000
- definitions=main-2505020162
-X-Authority-Analysis: v=2.4 cv=MIZgmNZl c=1 sm=1 tr=0 ts=6815263e b=1 cx=c_pps a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19
- a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=GoEa3M9JfhUA:10 a=jxZJpUkXbe-8BzyzFWQA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: okglN0PQQsDBUanMmycJMPC1BbrIh7Eh
-X-Proofpoint-ORIG-GUID: okglN0PQQsDBUanMmycJMPC1BbrIh7Eh
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTAyMDE2MiBTYWx0ZWRfX/M6CavN69iaf gUR4S43Xf7xdD16VVn/9xB0x8sypTwIIo5sAV7euI5Z3SZzknsZaA62J91M/oJENItJdDG8ZHq0 lj73JNli/ypujg2OE9S4ylKcykBvNGy/Y7JJZA+h987DcdoDyKYj0RM31U7TJN4ci0e954d6+L+
- C6LQegmRcP1wR7MnAUr/h08htLNOlSodjavtFrhM3yaZYqAst6k2oTTbu+DNsDvVtcoT37lF95D ImCDGYWyCVi02cqb1RzzpRtacX7KxmARuOjJ9cSCA/tYpW5dWeBXqnQ93KJfaYYXLadZzm+sG/P bYtj6u2Qend2Dvt4TDYIumUqUrOK0rgQ/xFaHWu3eb6KYJn1F8/TVwG1WWpTMYSUn8grUsqSRDM
- r5pv7VGTrYo5ejiNHfAdpyhVXnHAYBwF8YFqkMS3sHbq3iN7PqsWQjVLEF/ULhqyeO6HdtqP
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAG48ez1w+25tbSPPU6=z1rWRm3ZXuGq0ypq4jffhzUva9Bwazw@mail.gmail.com>
 
+On Fri, May 02, 2025 at 04:04:32PM +0200, Jann Horn wrote:
+> On Fri, May 2, 2025 at 2:42 PM Christian Brauner <brauner@kernel.org> wrote:
+> > diff --git a/fs/coredump.c b/fs/coredump.c
+> [...]
+> > @@ -801,6 +841,73 @@ void do_coredump(const kernel_siginfo_t *siginfo)
+> >                 }
+> >                 break;
+> >         }
+> > +       case COREDUMP_SOCK: {
+> > +               struct file *file __free(fput) = NULL;
+> > +#ifdef CONFIG_UNIX
+> > +               ssize_t addr_size;
+> > +               struct sockaddr_un unix_addr = {
+> > +                       .sun_family = AF_UNIX,
+> > +               };
+> > +               struct sockaddr_storage *addr;
+> > +
+> > +               /*
+> > +                * TODO: We need to really support core_pipe_limit to
+> > +                * prevent the task from being reaped before userspace
+> > +                * had a chance to look at /proc/<pid>.
+> > +                *
+> > +                * I need help from the networking people (or maybe Oleg
+> > +                * also knows?) how to do this.
+> > +                *
+> > +                * IOW, we need to wait for the other side to shutdown
+> > +                * the socket/terminate the connection.
+> > +                *
+> > +                * We could just read but then userspace could sent us
+> > +                * SCM_RIGHTS and we just shouldn't need to deal with
+> > +                * any of that.
+> > +                */
+> 
+> I don't think userspace can send you SCM_RIGHTS if you don't do a
+> recvmsg() with a control data buffer?
 
+Oh hm, then maybe just a regular read at the end would work. As soon as
+userspace send us anything or we get a close event we just disconnect.
 
-On 23-04-2025 11:36, Parvathi Pudi wrote:
-> +    description:
-> +      PRU-ICSS has a Enhanced Capture (eCAP) event module which can generate
-> +      and capture periodic timer based events which will be used for features
-> +      like RX Pacing to rise interrupt when the timer event has occurred.
-> +      Each PRU-ICSS instance has one eCAP modeule irrespective of SOCs.
+But btw, I think we really need a recvmsg() flag that allows a receiver
+to refuse SCM_RIGHTS/file descriptors from being sent to it. IIRC, right
+now this is a real issue that systemd works around by always calling its
+cmsg_close_all() helper after each recvmsg() to ensure that no one sent
+it file descriptors it didn't want. The problem there is that someone
+could have sent it an fd to a hanging NFS server or something and then
+it would hang in close() even though it never even wanted any file
+descriptors in the first place.
 
-typo modeule -> module
+> 
+> > +               if (WARN_ON_ONCE(core_pipe_limit)) {
+> > +                       retval = -EINVAL;
+> > +                       goto close_fail;
+> > +               }
+> > +
+> > +               retval = strscpy(unix_addr.sun_path, cn.corename, sizeof(unix_addr.sun_path));
+> > +               if (retval < 0)
+> > +                       goto close_fail;
+> > +               addr_size = offsetof(struct sockaddr_un, sun_path) + retval + 1,
+> > +
+> > +               file = __sys_socket_file(AF_UNIX, SOCK_STREAM, 0);
+> > +               if (IS_ERR(file))
+> > +                       goto close_fail;
+> > +
+> > +               /*
+> > +                * It is possible that the userspace process which is
+> > +                * supposed to handle the coredump and is listening on
+> > +                * the AF_UNIX socket coredumps. This should be fine
+> > +                * though. If this was the only process which was
+> > +                * listen()ing on the AF_UNIX socket for coredumps it
+> > +                * obviously won't be listen()ing anymore by the time it
+> > +                * gets here. So the __sys_connect_file() call will
+> > +                * often fail with ECONNREFUSED and the coredump.
+> 
+> Why will the server not be listening anymore? Have the task's file
+> descriptors already been closed by the time we get here?
 
-> +
-> +    type: object
-> +
->     mii-rt@[a-f0-9]+$:
->       description: |
->         Real-Time Ethernet to support multiple industrial communication protocols.
+No, the file descriptors are still open.
 
-Thanks,
-Alok
+> 
+> (Maybe just get rid of this comment, I agree with the following
+> comment saying we should let userspace deal with this.)
+
+Good idea.
+
+> 
+> > +                * In general though, userspace should just mark itself
+> > +                * non dumpable and not do any of this nonsense. We
+> > +                * shouldn't work around this.
+> > +                */
+> > +               addr = (struct sockaddr_storage *)(&unix_addr);
+> > +               retval = __sys_connect_file(file, addr, addr_size, O_CLOEXEC);
+> 
+> Have you made an intentional decision on whether you want to connect
+> to a unix domain socket with a path relative to current->fs->root (so
+> that containers can do their own core dump handling) or relative to
+> the root namespace root (so that core dumps always reach the init
+> namespace's core dumping even if a process sandboxes itself with
+> namespaces or such)? Also, I think this connection attempt will be
+
+Fsck no. :) I just jotted this down as an RFC. Details below.
+
+> subject to restrictions imposed by (for example) Landlock or AppArmor,
+> I'm not sure if that is desired here (since this is not actually a
+> connection that the process in whose context the call happens decided
+> to make, it's something the system administrator decided to do, and
+> especially with Landlock, policies are controlled by individual
+> applications that may not know how core dumps work on the system).
+> 
+> I guess if we keep the current behavior where the socket path is
+> namespaced, then we also need to keep the security checks, since an
+> unprivileged user could probably set up a namespace and chroot() to a
+> place where the socket path (indirectly, through a symlink) refers to
+> an arbitrary socket...
+> 
+> An alternative design might be to directly register the server socket
+> on the userns/mountns/netns or such in some magic way, and then have
+> the core dumping walk up the namespace hierarchy until it finds a
+> namespace that has opted in to using its own core dumping socket, and
+> connect to that socket bypassing security checks. (A bit like how
+> namespaced binfmt_misc works.) Like, maybe userspace with namespaced
+
+Yeah, I namespaced that thing. :)
+
+> CAP_SYS_ADMIN could bind() to some magic UNIX socket address, or use
+> some new setsockopt() on the socket or such, to become the handler of
+> core dumps? This would also have the advantage that malicious
+> userspace wouldn't be able to send fake bogus core dumps to the
+> server, and the server would provide clear consent to being connected
+> to without security checks at connection time.
+
+I think that's policy that I absolute don't want the kernel to get
+involved in unless absolutely necessary. A few days ago I just discussed
+this at length with Lennart and the issue is that systemd would want to
+see all coredumps on the system independent of the namespace they're
+created in. To have a per-namespace (userns/mountns/netns) coredump
+socket would invalidate that one way or the other and end up hiding
+coredumps from the administrator unless there's some elaborate scheme
+where it doesn't.
+
+systemd-coredump (and Apport fwiw) has infrastructure to forward
+coredumps to individual services and containers and it's already based
+on AF_UNIX afaict. And I really like that it's the job of userspace to
+deal with this instead of the kernel having to get involved in that
+mess.
+
+So all of this should be relative to the initial namespace. I want a
+separate security hook though so an LSMs can be used to prevent
+processes from connecting to the coredump socket.
+
+My idea has been that systemd-coredump could use a bpf lsm program that
+would allow to abort a coredump before the crashing process connects to
+the socket and again make this a userspace policy issue.
+
+> 
+> > +               if (retval)
+> > +                       goto close_fail;
+> > +
+> > +               /* The peer isn't supposed to write and we for sure won't read. */
+> > +               retval =  __sys_shutdown_sock(sock_from_file(file), SHUT_RD);
+> > +               if (retval)
+> > +                       goto close_fail;
+> > +
+> > +               cprm.limit = RLIM_INFINITY;
+> > +#endif
+> > +               cprm.file = no_free_ptr(file);
+> > +               break;
+> > +       }
+> >         default:
+> >                 WARN_ON_ONCE(true);
+> >                 retval = -EINVAL;
+> > @@ -818,7 +925,10 @@ void do_coredump(const kernel_siginfo_t *siginfo)
+> >                  * have this set to NULL.
+> >                  */
+> >                 if (!cprm.file) {
+> > -                       coredump_report_failure("Core dump to |%s disabled", cn.corename);
+> > +                       if (cn.core_type == COREDUMP_PIPE)
+> > +                               coredump_report_failure("Core dump to |%s disabled", cn.corename);
+> > +                       else
+> > +                               coredump_report_failure("Core dump to :%s disabled", cn.corename);
+> >                         goto close_fail;
+> >                 }
+> >                 if (!dump_vma_snapshot(&cprm))
+> > @@ -839,8 +949,25 @@ void do_coredump(const kernel_siginfo_t *siginfo)
+> >                 file_end_write(cprm.file);
+> >                 free_vma_snapshot(&cprm);
+> >         }
+> > -       if ((cn.core_type == COREDUMP_PIPE) && core_pipe_limit)
+> > -               wait_for_dump_helpers(cprm.file);
+> > +
+> > +       if (core_pipe_limit) {
+> > +               switch (cn.core_type) {
+> > +               case COREDUMP_PIPE:
+> > +                       wait_for_dump_helpers(cprm.file);
+> > +                       break;
+> > +               case COREDUMP_SOCK: {
+> > +                       /*
+> > +                        * TODO: Wait for the coredump handler to shut
+> > +                        * down the socket so we prevent the task from
+> > +                        * being reaped.
+> > +                        */
+> 
+> Hmm, I'm no expert but maybe you could poll for the POLLRDHUP event...
+> though that might require writing your own helper with a loop that
+> does vfs_poll() and waits for a poll wakeup, since I don't think there
+> is a kernel helper analogous to a synchronous poll() syscall yet.
+> 
+> > +                       break;
+> > +               }
+> > +               default:
+> > +                       break;
+> > +               }
+> > +       }
+> > +
+> >  close_fail:
+> >         if (cprm.file)
+> >                 filp_close(cprm.file, NULL);
 
