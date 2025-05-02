@@ -1,86 +1,86 @@
-Return-Path: <netdev+bounces-187471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63AFAAA7478
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 16:08:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F2BDAA748B
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 16:11:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAE003AC9C6
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 14:07:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 531D63BFFE5
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 14:11:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1934255F48;
-	Fri,  2 May 2025 14:08:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AA372566DE;
+	Fri,  2 May 2025 14:11:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zN4+LBjn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YaG2OyDd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D741C255F43
-	for <netdev@vger.kernel.org>; Fri,  2 May 2025 14:08:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B952A2561D7
+	for <netdev@vger.kernel.org>; Fri,  2 May 2025 14:11:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746194883; cv=none; b=nm2hhE5JFVmPwD2PB1wXFJwm4MyroEnilGnVN0frn57JevsTAInL2pSqmKxfhmKSnlBIpo6SRl4SNmUFP2AQRatXDKv4Pui1+effTidGnrUHrbFiRcMYKFsoGfpT5IwfIsTNnGY+DD2ZJO42F8e/BeYu+8WUXnD+0tbgeBL6GMM=
+	t=1746195088; cv=none; b=ByoW8JA7qJff9duDlsaNGP25zM6ggEskHqRKxLCe/O1D5xdQS1PnBLf6KMVzUxggmBeonbNBa3Z7b0goH5v4UocMpBnTEJ624qOYMv4bRD/nsAm/m0NC/4gEnutYpAJOPWY5XbP79FW8d4t1/SGEZMWY+cLez0fODNGeC5V+sKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746194883; c=relaxed/simple;
-	bh=UVrY8f5Cyv14chduVrQZ3t/d79hUTi9W+07ivdjtsbI=;
+	s=arc-20240116; t=1746195088; c=relaxed/simple;
+	bh=Vt2jUIItSucYOFtSbIcXHATgjkrt7oAf8nrQ6pmlrbo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=utlPM0QaLhrBVMj7ho4hTL5w4T464jMYikGl0tw2CJk2m5C9sbFm01ipSN0o0Y/luBC4MHCv6JJZm2+FCZtElgvihZTVzGgqjlioWyJ94tZXVMUed7KTjG3i5ulFNd/I9qEZbULTVfynq7LDZyelrcvAImx21LysZRsYRin15b0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zN4+LBjn; arc=none smtp.client-ip=209.85.208.46
+	 To:Cc:Content-Type; b=EKxiGXnQyeQXLEYe0UDdi9wCG4weIjBbz1UQ8O3HxID8Y6iM+YJOzRhC5s6W21Um2pRRNn0pqHUxV3aWxhKVkFfDpFgi6z7MTfJBQreFYXdWcbwon76hdDCOFLJ7DKT7dCo/nsSOfgN110SwnRpoi46F+HPnbJWHWB+ZJYvU1Ok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YaG2OyDd; arc=none smtp.client-ip=209.85.208.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5f632bada3bso8116a12.1
-        for <netdev@vger.kernel.org>; Fri, 02 May 2025 07:08:01 -0700 (PDT)
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5dbfc122b82so11037a12.0
+        for <netdev@vger.kernel.org>; Fri, 02 May 2025 07:11:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746194880; x=1746799680; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1746195085; x=1746799885; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=E+ralkWtDGcfXchRBqjEDJJfkQsdJ9smPBhVueEpLX8=;
-        b=zN4+LBjnP4Cu7vLw76toWXqWKIVwN76veFVgq2/O91Cc3Up/kIE8EbvE8D6qttK2sY
-         7wpAGEDAki6Pzr1XJgZztl7CKZZO2e4kjWgYWiDKxnEbbBGTguC8JYRF5ef0xQhQXD6u
-         E1G4ccXN7SeYRQ8to5IOS4JvnSIO8h7griPAk/wfz3GiAb/HObZ6d3wY9vo5FGufm8yf
-         cip1xI2qJRpZiSGOekImzugKayye8fi+47mdCfN1EuzS0ZKNdMVzMXqB9FqQ3A4BBo+C
-         J4YR+1GJKqy//CiZvzSNRnpT7qYTNkwxfPmvMzpTed/yRV6aNWxxt4h+snIkyranUw0/
-         SqQg==
+        bh=Vt2jUIItSucYOFtSbIcXHATgjkrt7oAf8nrQ6pmlrbo=;
+        b=YaG2OyDdfxp6rWAfJEcX0jTBAp1bikRAEsb3RZ0sVY1Ci1V2Wssrwo01mcXZJQC6WU
+         54g+QpeGj9ixHjP+K6GwtpMMFjA37mHJgEs/VhGrIO8v2DfLTnxnucVgZxd9EXz2DyCZ
+         4aDbpLFVt6+opDL94J3CWeoXmHbWNYSOJ8lKhV0QPTCkp+v7vVUs11B+/vRqooR1IQl2
+         PXHvLWRRElKm2AdKtUCg+P8gF/4x3gLwpKX5q77oSKh4QlC5gEGvnnlm+pjV5lMET0te
+         b00baFbNlCj/haUM82JciErz1tJH3MeOH7qc1W27MnoBk8flsKSv+9un59puG8+t14J+
+         CI/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746194880; x=1746799680;
+        d=1e100.net; s=20230601; t=1746195085; x=1746799885;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=E+ralkWtDGcfXchRBqjEDJJfkQsdJ9smPBhVueEpLX8=;
-        b=OCYZuUljdbkbSGP/IVgiW59hPIk+GQ8R20mFWuPPFzj2wl92CsJQmzV1t98040NiGi
-         NwiFA9v93iuOXAp1n+f0RBS8fAHXhMYQ6xe86jUyM6nM+gg6mrYgi/agOo6XKKx8ib/5
-         rN5AXV8+nFuHZPrB2XNNF+RKJdqH55EKVS9tG23FJcpM6k1opSDu41SA2eBQ7/NqEqT4
-         +YTME2Az3gMlAwjhbuET7ZGPXkCuASWXNw9P3A0wO1ElO0wWHYBnmkpMFmape6pqHFRY
-         LWFZah8TREdgbpmRncuWOp4g6lFuQ/tDRm89kJxT6gJXuNBVzNmk4k7WfF68yhgjlgJd
-         eAsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVX7b7I9hlIwBC704L1+HTg/F3zvozMwV/ZMPNciY6HFj7y3tqrYBTVSyPKeaopy1mpa9mfrYE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJnqVUxmWS9iIFQh89D3ooD8Jg3EBvRAgiGCTu+/iUq2ImhXuw
-	Hi1bLefPQQ2uVZQcoAd/5FoTwlQOkMAfKHp6NuDFLdsN4nKBKDvxj8TI3KwZJ1P3RNiEuLj5ESR
-	op929UDMfPW666nYAhfQEitDEONq4v7NHjjE4
-X-Gm-Gg: ASbGncsCnqWP1qbiuefMmoV0jBrXcwbZoS1qwTzg6GphRkq5ko09fI+KLqtYDhdduTq
-	UUYJrUqiZOCb/jhas5qOfOWLT0y4Oq/EjHkydsa11dbf7HjqaTMpZpOkd6KL5OcK+2zLWl504SJ
-	lU2bSqghmQ1hQNnWQZI2lGhnVdNeyaeQ3aYv5rpo1IWPU9MGWJGw==
-X-Google-Smtp-Source: AGHT+IH2MgYtnCt0qoRxeEEy4wBAGB4W8/4VBrSSGQAsYhZAqwznZ2l8EUQhrSMm9GTN06zMa/L9rySKK9MxDQ8WHV0=
-X-Received: by 2002:aa7:cc12:0:b0:5e4:9ee2:afe1 with SMTP id
- 4fb4d7f45d1cf-5f9132eb267mr197482a12.2.1746194879730; Fri, 02 May 2025
- 07:07:59 -0700 (PDT)
+        bh=Vt2jUIItSucYOFtSbIcXHATgjkrt7oAf8nrQ6pmlrbo=;
+        b=aZvECWl/UwTj92R/yE+sFSrdiT13i4R++1zwKFkNko4mvRQ7/jG1R/O6geiIfTrG6y
+         7JMqf/RIEBhdAs9Sg3fPoExonZPI4pM6in9P0yAMJBvZ0ekjaWGEJlmKZKHwbh+Tv7bD
+         XEM5L0+JA476v6H3TVOSUGHLHXu0cedlojuzagOEaL/UT5r9cwMTYiS1RxNjCH/jlLyY
+         fdG7/kQ4jw1Vt0ZhVAcgSIt5pZQfKAquTOXohctcceIjB8VO4i0F8C51BtQ1kXg0YOpI
+         T/kM+X/1pnZeCf2xM1VMsdA/L/XRLL+Cusc7zphRksxCeZsz1yjyROoK/uv1OoAX7hXp
+         IH5w==
+X-Forwarded-Encrypted: i=1; AJvYcCX1hMj1siPimgo18w7bldLmuu+W/EyRCwgg++VNIbwjsTk/3e1sDsMVfS6CHJUGmA2NIkCd6fU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxg4gsS9BMzQTayKGjMfmj0U4MBjRZAcUQuz4ns72EzhmBA4IkL
+	zPEQD6ce0q3laV7Dy/xQoJMNQKrZxo0GxjMVqBha9F+C2lF73y+3SPyB/nkNj4ZD0lg47RuXvzl
+	aiW/jVhvpBLUe2Y6NDI4r/WDOVzkZ2IWHIXu9
+X-Gm-Gg: ASbGncvqhbo/H0STRhRc7APB5jZBorCVEeHzL0jV9Jwu5OllwugTXTncv7yVob1M04L
+	E4dps/kCLsTZ9HA5wv7Yj7l0qyNWmLmIsAohT1cJ/t7YmiNXnBdNbmYW+w7H8SNfIvCKH2QXoPn
+	G7U0omJqyVvEfBW88P5huwAIBIJIgaD3zRUYqJtF/nLmTGiyuNWw==
+X-Google-Smtp-Source: AGHT+IEq4zZYwSq4JbP1XWIN3z7LZZH/ze1XMZW0I7CaF9AqWXRX3zQiHPa0jJanCkxNdcG6ojLB9VYf79HdE5YqMJ0=
+X-Received: by 2002:a50:c018:0:b0:5f7:f888:4cb5 with SMTP id
+ 4fb4d7f45d1cf-5f918c08662mr174781a12.1.1746195084602; Fri, 02 May 2025
+ 07:11:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250502-work-coredump-socket-v2-0-43259042ffc7@kernel.org> <20250502-work-coredump-socket-v2-4-43259042ffc7@kernel.org>
-In-Reply-To: <20250502-work-coredump-socket-v2-4-43259042ffc7@kernel.org>
+References: <20250502-work-coredump-socket-v2-0-43259042ffc7@kernel.org> <20250502-work-coredump-socket-v2-5-43259042ffc7@kernel.org>
+In-Reply-To: <20250502-work-coredump-socket-v2-5-43259042ffc7@kernel.org>
 From: Jann Horn <jannh@google.com>
-Date: Fri, 2 May 2025 16:07:23 +0200
-X-Gm-Features: ATxdqUFEoXQsC4OEC4hdmE0Par_5oTsZKTXGKHrZCv9IPMoKZDb_IIBUvPJNHJc
-Message-ID: <CAG48ez1YjoHnH9Tsh8aO2SNkJUW=7VUPXAdvxqt7d0B4A8evEw@mail.gmail.com>
-Subject: Re: [PATCH RFC v2 4/6] coredump: show supported coredump modes
+Date: Fri, 2 May 2025 16:10:48 +0200
+X-Gm-Features: ATxdqUENxkugyPW7ElgtsxNZpy_Nh_FmjQSxMwJIlzlcl6CVeGfFkE7y7zUJP5s
+Message-ID: <CAG48ez1x09k3neRXqZYtPwgcxN+8a9=HZCtUkok54bRwAk6BSA@mail.gmail.com>
+Subject: Re: [PATCH RFC v2 5/6] pidfs, coredump: add PIDFD_INFO_COREDUMP
 To: Christian Brauner <brauner@kernel.org>
 Cc: Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
 	Oleg Nesterov <oleg@redhat.com>, linux-fsdevel@vger.kernel.org, 
@@ -96,38 +96,15 @@ Content-Transfer-Encoding: quoted-printable
 
 On Fri, May 2, 2025 at 2:43=E2=80=AFPM Christian Brauner <brauner@kernel.or=
 g> wrote:
-> Allow userspace to discover what coredump modes are supported.
+> Let userspace know that the task coredumped and whether it was dumped as
+> root or as regular user. The latter is needed so that access permissions
+> to the executable are correctly handled.
 >
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
-> ---
->  fs/coredump.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
->
-> diff --git a/fs/coredump.c b/fs/coredump.c
-> index 9a6cba233db9..1c7428c23878 100644
-> --- a/fs/coredump.c
-> +++ b/fs/coredump.c
-> @@ -1217,6 +1217,13 @@ static int proc_dostring_coredump(const struct ctl=
-_table *table, int write,
->
->  static const unsigned int core_file_note_size_min =3D CORE_FILE_NOTE_SIZ=
-E_DEFAULT;
->  static const unsigned int core_file_note_size_max =3D CORE_FILE_NOTE_SIZ=
-E_MAX;
-> +static char core_modes[] =3D {
-> +#ifdef CONFIG_UNIX
-> +       "file\npipe\nunix"
-> +#else
-> +       "file\npipe"
-> +#endif
-> +};
+> I don't think this requires any additional privileges checks. The
+> missing exposure of the dumpability attribute of a given task is an
+> issue we should fix given that we already expose whether a task is
+> coredumping or not.
 
-Nit: You could do something like
-
-static char core_modes[] =3D
-#ifdef CONFIG_UNIX
-  "unix\n"
-#endif
-  "file\npipe"
-;
+Yeah, it certainly isn't more sensitive than things like the exit code and =
+UIDs.
 
