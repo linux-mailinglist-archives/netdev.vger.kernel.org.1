@@ -1,109 +1,122 @@
-Return-Path: <netdev+bounces-187367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEE21AA69B6
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 06:14:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5822FAA69BE
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 06:24:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F4DF3ADC97
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 04:14:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 118021BC4763
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 04:24:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BDF019B5B4;
-	Fri,  2 May 2025 04:14:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09C3019E83E;
+	Fri,  2 May 2025 04:24:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=deepl.com header.i=@deepl.com header.b="BtKI8nvu"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="WEn3xYjG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC46728F1
-	for <netdev@vger.kernel.org>; Fri,  2 May 2025 04:14:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DA4A2F2F;
+	Fri,  2 May 2025 04:24:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746159282; cv=none; b=KTC5dyPYSLGCq6j5y+ajes0CMAgMUGhdD6YtEm7nGKn/6M8+2+qjkK+LwQjbKQvipi0wJ6CLo+RG8VZ0jZ3bWoZVr/ZSX8508Gx3I+6nskY+kqLuY78L7FDDhpuycXOK65jiCPiUKP08+yVk5dl7F5FXPdFcaRUrO1TMBbzBjkM=
+	t=1746159848; cv=none; b=ehgYOXTcznpI4h+kYaUoINtGH4Dg6RDyyEdLmf65jSb/s68LV7WeIraEtlAfEIgVU8YSAP/iNogYIUpHAXmN4Fc3W1wiNpJq9Sv4fIO38yyJw6mxQp+oZZ/dsczNtOt4WsFY/98iZ8aCm9C9PF4dYW7x7MYO+et8I9o2BQrtZM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746159282; c=relaxed/simple;
-	bh=bkO+hsiCkKkIYKZyxNYWFLOIO+ikfLHbYanlhTIbkEA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FJNzAHlS6u07m/pUtdUQmAbUkeT/4JMmK1q0GcddKrX103d1eSTECdpltfYSzS/Pq/vidsEFZBBQXPbFsBoVKopGO5U5d4RUF4WMbt0yj0Jv/bdTH14cPwAygxAxb1WnAfqLRWVkVw39qeGmzTTrx5CwYPksfFMsY4nBHn8UseY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=deepl.com; spf=pass smtp.mailfrom=deepl.com; dkim=pass (2048-bit key) header.d=deepl.com header.i=@deepl.com header.b=BtKI8nvu; arc=none smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=deepl.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deepl.com
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-30bef9b04adso14610221fa.1
-        for <netdev@vger.kernel.org>; Thu, 01 May 2025 21:14:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=deepl.com; s=google; t=1746159279; x=1746764079; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=x9dxMHxHGQFSFuCFJR/tpGkJfuZvFN0FE0shIf7v3xQ=;
-        b=BtKI8nvuKaO+sZrpLMVJAoLC28CHrwVe7j8gIwRyu4f8iUrLxU2o8/5kID4BymtTSV
-         wqQiEIPilPH3F+htGBMW5JYg7aL3ETtLRqYkN+GiKNqT2YLEEZKUR660VAhxByuDrPSb
-         RDhrk/kSccDhokSxI8JhyYbWQQYgKg/Cvnh2LbqSNimrEZ2L43uA42/AII+3yjoi6XQy
-         V0CoipRY8yXTYFW1LTIRtRF5mrTZjVhd3ikdIKizV/wJWgKDcSDOUTC/FWfsDoiGikvx
-         7emIlQ2dqzYf4L1s5LPAGoOpAHpuxEaR7MBWRed3VTSUvC4f5285FEkp5RRIdyg0/5M3
-         J+nQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746159279; x=1746764079;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=x9dxMHxHGQFSFuCFJR/tpGkJfuZvFN0FE0shIf7v3xQ=;
-        b=d7kuNVQYo7y0A1/gXY7S43PqIkPmrefp2QB5QFoX1TjXlQFeuevjq9QyiVaTHTJgxy
-         GZKZcLmylo50du8OzsRWp1NAPhsKxYR/49JUoRDiVuIiZQEnptpomrnH4Z275nQkm6LR
-         8hMo1l+Xin1bBxHBFKO13nN9nUKjsFGDubNSxReWAleqACR791q1/MxstEz9ddk5/6Uh
-         1ErlQnFeqAE75nEEzZwCekAb2GxB6EnTILNAd6zkx6f4Wg8LoHQc5iJXFb2IgN6cWLnV
-         UcaZb2KDJR8gd2YAQobxKhaQfFSdyiyiAAR79SzYsHByef0L+Y0O4EzspL+g1EGxPWXN
-         wTXg==
-X-Gm-Message-State: AOJu0Yyr1Cyk8zuoxO7q7q/9DYJahs1TmTzp7pm5HLGDbQi3L+/cPXgx
-	YGOYUVFkiJAZ55MpdVhm4exLEDFnh18npNpcv8peq8HyKpt7y76jjemnYuFDe/M9q/zzO9IOkZA
-	ZCY8=
-X-Gm-Gg: ASbGncvE4OOu1G5dZbhZphf6/IoObDUGbSoN9UYLG0yyG2kBzL+HSCgrkXubkcHW2Lp
-	jU67rMGLQO4wcTv19jV7AQSelcX8Q78r554h8x/G+QgPw0Fh78kJo/doPWrnIHDnftD6zSxotVg
-	3i6arTDhnnVTg2WIcIJBqYF+Vup+Xoefl/fP0WMJvCZ0zoE+Ajp+PYNy1KExXSCd/8VMiyMevHu
-	rynSu8t3vxQLv06sk2VHuyEHaY1TEIBgp+0kbmmBoqGoygT3r473hXukpYa+8NTJ0bj11337eiB
-	+RbIqvsi81cmuN53OUai2x2DocXSTUvoEv7tWGwiJwcnrhMpnNkAxYTYTpEzPAK4sd7ze/EBjBS
-	VQBq346AL3TXeWFXUuDAKv9BU3SH6fg==
-X-Google-Smtp-Source: AGHT+IEoVyVMyOYtFJM/chy1gUkFhWkmn9T7eTV+hnbrn97tjQnk33BPCJARqicfVVsCjkgIeYlKbg==
-X-Received: by 2002:a05:651c:19ab:b0:30b:d543:5a71 with SMTP id 38308e7fff4ca-320c3af139fmr2888981fa.1.1746159278745;
-        Thu, 01 May 2025 21:14:38 -0700 (PDT)
-Received: from ?IPV6:2a00:6020:ad81:dc00:46ab:9962:9b00:76f8? ([2a00:6020:ad81:dc00:46ab:9962:9b00:76f8])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-3202a89f450sm2509611fa.80.2025.05.01.21.14.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 May 2025 21:14:38 -0700 (PDT)
-Message-ID: <93e175a2-485e-437e-8957-403fad70e902@deepl.com>
-Date: Fri, 2 May 2025 06:14:37 +0200
+	s=arc-20240116; t=1746159848; c=relaxed/simple;
+	bh=xNxMPd9/iT31oaa3P1K08pqMS9oTm3FccWzUvjaDt5k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=arD7CHSuZ8CnHwIHYLwL0O2lL7FXMnBkxzlvXJaqlN7s+MrCbud28aFF6rydVxPcJ25Tz5NUut1kdvcsbbZjUe4AVw9Ev7nNX3I3zOoXLEP8LkMJMIbsSYSp6eqKhjrYxVs/8hNqb3rt/xV64tQ5tp8L68tfHmTaU2Nzn04D/HY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=WEn3xYjG; arc=none smtp.client-ip=117.135.210.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-ID:MIME-Version:
+	Content-Type; bh=8InkDp27DC5WPYBCqXZbfAX4HPlXb/a3Sn044Zn5gN0=;
+	b=WEn3xYjG4XXTkMCCsLeVm8jVPt80e1PuhxQByP3eIKFdIcTIcy0CcBOQDTaCui
+	fCcQ9nGO5h8FNKLsUt064EOCVyFjDr9QS64KSLy5Yrol4MtWvhgKoeG97Axz/Fgk
+	ITEXT5jhiBPKoqMnnvbUQRMhZnn6EOdlHPaaqJJbC8Kso=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-2 (Coremail) with SMTP id _____wDn74m1SBRoWmWQDw--.37075S2;
+	Fri, 02 May 2025 12:23:18 +0800 (CST)
+From: Haiyue Wang <haiyuewa@163.com>
+To: netdev@vger.kernel.org
+Cc: Haiyue Wang <haiyuewa@163.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	David Wei <dw@davidwei.uk>,
+	linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net v1] selftests: iou-zcrx: Clean up build warnings for error format
+Date: Fri,  2 May 2025 12:22:20 +0800
+Message-ID: <20250502042240.17371-1-haiyuewa@163.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [EXT] Re: Possible Memory tracking bug with Intel ICE driver and
- jumbo frames
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: netdev@vger.kernel.org,
- "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-References: <06415c07-5f29-4e1d-99c3-29e76cc2f1ae@deepl.com>
- <f5f8a9a0-a590-467e-81ad-81e1feea3b79@deepl.com>
- <445d48a8-8e4e-4605-bad8-4a80707a1452@intel.com>
-Content-Language: en-US
-From: Christoph Petrausch <christoph.petrausch@deepl.com>
-In-Reply-To: <445d48a8-8e4e-4605-bad8-4a80707a1452@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wDn74m1SBRoWmWQDw--.37075S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7tw4DKFWDtF13KF47GrWfZrb_yoW8XFy5pa
+	s5tw1qkrWrJF17JayDJrWIgFW5Xrs7A3yIkF1UAa4fXrW3AFZ2qF4fKFy0kF9rWrWS93WY
+	y3yIkF48AF1UZ37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zMWlkUUUUUU=
+X-CM-SenderInfo: 5kdl53xhzdqiywtou0bp/1tbiYBBBa2gUQV-PVAAAsj
 
+Clean up two build warnings:
 
-> The faulty state perpetuates then forever? (say, at least few minutes)
-Yes, the faulty state perpetuates then forever. The first time we have 
-discovered this issue, it was there for hours.
-I have another sad news, while bisecting this, I questioned my initial 
-assumption that v5.15 is a good release. I managed to reproduce the 
-issue on the v5.15 kernel release as well.
+[1]:
+iou-zcrx.c: In function ‘process_recvzc’:
+iou-zcrx.c:263:37: warning: too many arguments for
+  format [-Wformat-extra-args]
+  263 |               error(1, 0, "payload mismatch at ", i);
+      |                           ^~~~~~~~~~~~~~~~~~~~~~
 
-Best Regards,
-Christoph Petrausch
+[2]:
+iou-zcrx.c: In function ‘run_client’:
+iou-zcrx.c:357:47: warning: format ‘%d’ expects argument of
+  type ‘int’, but argument 4 has
+  type ‘ssize_t’ {aka ‘long int’} [-Wformat=]
+  357 |               error(1, 0, "send(): %d", sent);
+      |                                    ~^   ~~~~
+      |                                     |   |
+      |                                     int ssize_t {aka long int}
+      |                                    %ld
+
+Signed-off-by: Haiyue Wang <haiyuewa@163.com>
+---
+ tools/testing/selftests/drivers/net/hw/iou-zcrx.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/drivers/net/hw/iou-zcrx.c b/tools/testing/selftests/drivers/net/hw/iou-zcrx.c
+index c26b4180eddd..19e1ff45deb4 100644
+--- a/tools/testing/selftests/drivers/net/hw/iou-zcrx.c
++++ b/tools/testing/selftests/drivers/net/hw/iou-zcrx.c
+@@ -260,7 +260,7 @@ static void process_recvzc(struct io_uring *ring, struct io_uring_cqe *cqe)
+ 
+ 	for (i = 0; i < n; i++) {
+ 		if (*(data + i) != payload[(received + i)])
+-			error(1, 0, "payload mismatch at ", i);
++			error(1, 0, "payload mismatch at %d", i);
+ 	}
+ 	received += n;
+ 
+@@ -354,7 +354,7 @@ static void run_client(void)
+ 		chunk = min_t(ssize_t, cfg_payload_len, to_send);
+ 		res = send(fd, src, chunk, 0);
+ 		if (res < 0)
+-			error(1, 0, "send(): %d", sent);
++			error(1, 0, "send(): %ld", sent);
+ 		sent += res;
+ 		to_send -= res;
+ 	}
+-- 
+2.49.0
+
 
