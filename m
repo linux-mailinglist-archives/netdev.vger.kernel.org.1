@@ -1,99 +1,94 @@
-Return-Path: <netdev+bounces-187535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B96EDAA7B60
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 23:31:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0C4AAA7B62
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 23:31:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 422F87AFF9B
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 21:30:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 390B04C4600
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 21:31:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 310C61F7569;
-	Fri,  2 May 2025 21:31:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C2EA20296A;
+	Fri,  2 May 2025 21:31:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="AZhRR/Ev"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iJW33cCQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95D0D2AF0E
-	for <netdev@vger.kernel.org>; Fri,  2 May 2025 21:31:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA971B5EB5
+	for <netdev@vger.kernel.org>; Fri,  2 May 2025 21:31:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746221484; cv=none; b=F1p8DhquSNwxqVyg8TUNZNAOhzFgjHW6AopxBLgrYdTMOXU7WgdGY/aO4MtZKJXRYjz8l+CeLsurLv49NhB5PyAXr05txPyeSJ567XnG5FE6q2zlaMjA2yCHo+1mam0mEpBSjzwT3lQg/2sMfGLgPLxb97DMEDbTuPPu3AYbX/w=
+	t=1746221496; cv=none; b=QnYp7nmn8VDgTJyqYbo1zM7RFhSDV+X6cOiWMKfl9d5FmhaEhhTJo8RvLBD4wT05idu2EFFpoInvIOFCPJ2AC5qwLlhffiQ0L03ppPVM2O3jiWYLQ2gwIeeqJOLFoAjV1/Kf4V5LRGT6CYaYWjt2Wk7VtU95e7aWd/kgre7I3Oc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746221484; c=relaxed/simple;
-	bh=RGXQNtLTkh+xIhPnSkMALdI+GFl4K4fNKdAJQESg89U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cqgrqS5GMU/FLXiLdw/0IfF580HKpqGYTq7vX7/k5VN3/B18/XJ/V/3vKEC/Ih1j5j+q1LyTkzfaJMSvdCNzHWGChANWf+P4u5tzRv5U7nqVu1RTE6ZVnPb8IWYNZZmW8hMIi3GkhenvB0QpNDnZSjxbvl7/wemTAkJ6UpYVDc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=AZhRR/Ev; arc=none smtp.client-ip=209.85.219.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6f521e77e4dso317196d6.3
-        for <netdev@vger.kernel.org>; Fri, 02 May 2025 14:31:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1746221481; x=1746826281; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=RGXQNtLTkh+xIhPnSkMALdI+GFl4K4fNKdAJQESg89U=;
-        b=AZhRR/EvdELWEyiIf1WuDbs1PudlLz5g2zTy2AsEo9tsQIyeCR8ktX+2ojLbTpR0v2
-         TLgq8pNZF4v5uzHGB7dbgXHTfzgSRFtKRfPioDAVwYJtJ54S8z4Skvsxsii+Sq+jh3dP
-         IvTow1kg9KTG12+f4fIx2f+I0kngY6pTdOfPCQ3m3LRlhLJhN4RTi3HvfHqr9Kn/LDAd
-         bh5Ry0Uc+wnVTHmTt4vnn7RprxMy9POgcwLnOlsAuuTXkzo52xpIlUgqhfQDhhcQTPlM
-         hS9ov2tuRNbt6sWwloZvWwBsyBHNDeh6ybf7Onc2l1NRlJkLD9ewkgm157F8DLxVQt1Y
-         /21w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746221481; x=1746826281;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RGXQNtLTkh+xIhPnSkMALdI+GFl4K4fNKdAJQESg89U=;
-        b=WAJcJolf+1wt4lYh+TbiTFTHMrry++IRB6Gbsz4osBpKrgDkEq3Un7CZvtX8CgfiX5
-         Qw2CzOAkYuVKVwmhAAgxoQ5uQjZu9WatkWqeku6+8GHhReL1oajEfFh5LobXO8hh5V4e
-         jSBnZEo6xIhzXZC2R7EGjBpfcMNZs/0WbkqnlHwt3Hv0gmmgVppD5muuk7X4/avMuUWk
-         G9WHeOT7wqS+5iemHe17Q5c27a0dXv2tDi7neOdzjNSglnMppRZ/AvWjcCfRHwH++7b3
-         yKh9NqPxCzEqYmOLQhk62aRu3qLsy+i1NFjnzwhcALxFfcW7DcFQWM7LqWYFVsqhnejG
-         XHHg==
-X-Forwarded-Encrypted: i=1; AJvYcCXwo40QvbzPzcHnRAEMEauAUgAJhl06xL9dacXqxbwZ1R4klhBlR2VKkHA9PzQYn4H7lYz2WSY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNiBHNVWqSZHXNBzSJkJk5AKS/EFz90hEz1k8svq5MS5ZWnn5E
-	AaLmJ9Vr2hyI+96CDBxySCoeXHHjKzd8RNA+olQ6Mjh8Z/YoXijeJMhBfopBjU6lBi6lxS/dA/+
-	iIgp8PvXjQyr7b+lw7CssZ9o/cfCQ2SYi4Td2lg==
-X-Gm-Gg: ASbGncv5VW3/NWAWvmDsEU4uauIElCkmOqylBLRGpctzG+axmywXwdaLvyzVC9LgTHg
-	XFZ72GVCrkp/0zYAmVlQ+inF95dzmY3cOYoxG0g3mh21SGFFEtCWl00Q3Jx/jzTdwFRwxNgrkHG
-	W1HNLJjxys52mhxPl1G1pkVpEmKsqstnsePruZFONQ7gvDziQ0w1jSOR4=
-X-Google-Smtp-Source: AGHT+IERfHMRWcJQMEva4rkmtn5ehpt9XaNEm3Fv/nxtB2z2K6G25t/gHReTY9xAMlW7M2olUtASjCG9tZusu4eWnO4=
-X-Received: by 2002:ad4:5c81:0:b0:6e8:fa58:85fc with SMTP id
- 6a1803df08f44-6f5153770c5mr29352856d6.3.1746221481458; Fri, 02 May 2025
- 14:31:21 -0700 (PDT)
+	s=arc-20240116; t=1746221496; c=relaxed/simple;
+	bh=fO83jngm4I+8NcFnovYW3J2Nl2BVgEK5gRt7cR1a8m4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=G3R5P6o29m+s4wxviVthXA13xDx+vadfHkbUHKPTNfjFJcLuO5yW5hSHy5BF7D97klbyZkcSG34wMPRjMdcW5YR3ItsBrZIPZw5TbuNop0rCSFZ+2EogjcWPsqpBdtiREbBJ8XaliNpfO+GtX1xUP9A99Q6CZKYLXEtph8q4zmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iJW33cCQ; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <35aee73f-171c-4c64-9144-ff97afd8801c@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1746221492;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vm2HtaUa4lsM1mZOYVFFrWZAlxQrKgy52YQ3FmHDcHI=;
+	b=iJW33cCQkusBm/ILZY3pDjmkY8h0yGTNs8GvLGa4bw7alleMj+jz8jxB/61w5W22nN0ZPV
+	iM72Ni6NC7bADzX/iwtmehOrmv9CIFvWErlzn+SS0lEbYa8Kcs4DHKK6tWVL0x299Be7Xs
+	7val0UqNNEc7qGAulJNSr+q/P/v5ovM=
+Date: Fri, 2 May 2025 14:31:28 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250502161528.264630-1-jordan@jrife.io> <20250502161528.264630-5-jordan@jrife.io>
- <77957459-cd64-4d7e-a503-829a1cf892c9@linux.dev>
-In-Reply-To: <77957459-cd64-4d7e-a503-829a1cf892c9@linux.dev>
-From: Jordan Rife <jordan@jrife.io>
-Date: Fri, 2 May 2025 14:31:10 -0700
-X-Gm-Features: ATxdqUHL5mMsQfKQeV7aDz9_4D8WLgTmIP7TBLfiWweLEbVP5Zbljy49Y0_yJKo
-Message-ID: <CABi4-ojQc-QwOpe_OdMCF4NhAQ5K32HfJt2QVGn8do_vSsudnA@mail.gmail.com>
-Subject: Re: [PATCH v7 bpf-next 4/7] bpf: udp: Use bpf_udp_iter_batch_item for
- bpf_udp_iter_state batch items
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Aditi Ghag <aditi.ghag@isovalent.com>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Alexei Starovoitov <alexei.starovoitov@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v7 bpf-next 1/7] bpf: udp: Make mem flags configurable
+ through bpf_iter_udp_realloc_batch
+To: Jordan Rife <jordan@jrife.io>
+Cc: Aditi Ghag <aditi.ghag@isovalent.com>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>,
+ Alexei Starovoitov <alexei.starovoitov@gmail.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <20250502161528.264630-1-jordan@jrife.io>
+ <20250502161528.264630-2-jordan@jrife.io>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20250502161528.264630-2-jordan@jrife.io>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-> I fixed this to "while (cur_sk < iter->end_sk)". Not that matters since the next
-patch 5 fixed itself but it is better to keep this patch clean.
+On 5/2/25 9:15 AM, Jordan Rife wrote:
+> Prepare for the next patch which needs to be able to choose either
+> GFP_USER or GFP_NOWAIT for calls to bpf_iter_udp_realloc_batch.
+> 
+> Signed-off-by: Jordan Rife <jordan@jrife.io>
+> Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
+>   net/ipv4/udp.c | 11 ++++++-----
+>   1 file changed, 6 insertions(+), 5 deletions(-)
+> 
+> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> index 2742cc7602bb..6a3c351aa06e 100644
+> --- a/net/ipv4/udp.c
+> +++ b/net/ipv4/udp.c
+> @@ -3401,7 +3401,7 @@ struct bpf_udp_iter_state {
+>   };
+>   
+>   static int bpf_iter_udp_realloc_batch(struct bpf_udp_iter_state *iter,
+> -				      unsigned int new_batch_sz);
+> +				      unsigned int new_batch_sz, int flags);
 
-Agh, missed this while shifting things around.
+I also made a minor change from "int flags" to "gfp_t flags".
 
-Thanks for patching it up!
-
-Jordan
 
