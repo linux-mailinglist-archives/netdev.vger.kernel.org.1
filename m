@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-187432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43522AA71E2
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 14:31:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BB7FAA7259
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 14:42:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 66C731BC6980
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 12:31:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 929104C3CD8
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 12:42:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF49C2566DE;
-	Fri,  2 May 2025 12:29:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 289E32522A5;
+	Fri,  2 May 2025 12:42:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A5Aq20Um"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kx1uL2En"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC37D2566D4;
-	Fri,  2 May 2025 12:29:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF9AF248F46;
+	Fri,  2 May 2025 12:42:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746188996; cv=none; b=l/HY/LNeAVoNnYuUdXD3tio0+7m3fO9rA1qPrgMcrymPJfRsFslm1oKqfMp/R3btnE+2MGTGpPgbin5dErECcK5IILhXJBiFtiRYq9MqQI7GbJrZfa3lp7TmwjvC0UnqIce3icpX1Bf5Vs3CcIqBfHFN7ORO1J5RxFwV9tlkZwE=
+	t=1746189765; cv=none; b=lRCj4I0SMEUMFhKY8vm7RvkVkqqNycChZgK26gFm3xiAQBguhc428yGcbaqCEX7VNK12ZycINQpuGF8hTlylV3DJolng5WuooFrUfjQv0bCLHSwCHl/KmhPA3allaiIvcIf0BF0n6NNCFvtXvrHFupsXqs4oJGZqXmEopdFQ+IY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746188996; c=relaxed/simple;
-	bh=DGcYu+3DqZNwUOU60M33ZGmzLjkivOhGbY2ClBN8f/4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=jphPvsfU8ZX9qR/bvHcCwtb4BLo+AsAyh4nUyaetN2AMuOOOGNManzlQ6KU54SDOXAWnlcahHrKNiTHLq+CIoqTHmsnxJlnI31yuZfZ3Zoz/+3uFxToOa9hVcA8BhArzubnYzTiUFuEDsGVJpXUguHYkaTyIDmXbs4SgtTImgjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A5Aq20Um; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5614C4CEEF;
-	Fri,  2 May 2025 12:29:53 +0000 (UTC)
+	s=arc-20240116; t=1746189765; c=relaxed/simple;
+	bh=MgdmhzLKR4Mx/HocbGM9V7rUCi4u9dxVVe407WZLWVU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ISwcnGkaaLA0dNSez9F5YLGVXCrTGNC7pgS9lZzYFVlXvYfjBamd0LRL916lzRyWj/tbZZQBqMPbThu4LorMIQdZyAi/29v/M9+AqEKe73AXjOqXIqvjKbxjM3+2/8DdD/b3hK3GnaCreN5Cinw8mPH/rfAVBxtdNAormPVjDTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kx1uL2En; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79334C4CEF0;
+	Fri,  2 May 2025 12:42:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746188996;
-	bh=DGcYu+3DqZNwUOU60M33ZGmzLjkivOhGbY2ClBN8f/4=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=A5Aq20UmZw/n8JuSJthdNPcL2VufHRnX86P9N5/lDJDQ1Nl3rYcA59uYY/tHf7Eqy
-	 20yeBrxIabqqt93vElvDVvAyQqY2N8wWbX79hyCq3b9e4N4zjzMy3/byNpHlAL5yAh
-	 DQpMs3dacjTe84NqvpFxzc8NxHhycI5HaqJVDtMWKS1N/sy1JScmUWxCCZuxrBRpps
-	 DlT2947AWIfX/T6O1edUogJ4erzQ2TyPagA/1ITxwpg/XR/CsmxdK26jGoi/IozjK0
-	 1CpV15GX7WDp3Yu8vk9AHPsAH7cRgry4JOTIw+o07lj+rQeZY4PE+9Dyh9jSJuMae0
-	 3mYLlaeqq09VA==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Fri, 02 May 2025 14:29:27 +0200
-Subject: [PATCH net-next 7/7] selftests: mptcp: add chk_sublfow in diag.sh
+	s=k20201202; t=1746189764;
+	bh=MgdmhzLKR4Mx/HocbGM9V7rUCi4u9dxVVe407WZLWVU=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Kx1uL2En8cPqdXcGN07sWTwitFsA6Se/FFMq9Hj7LErEXDxKiFozEbNgJcMWdsyM4
+	 RtDHW/edlof9Y6o2p9NgAeMvBP0+XWLPw2xsO8YdgDLfkQkLIEbwK5y5yaOAjhjE+Y
+	 4pwLxOLW9mkJt+7/i43rfGqrB2MgZsQ/SE4JHXYQGpHB8QKh1H49QQ9MFR24OD8j0E
+	 RJI1opLpOx6gFRdFDLHJV6iUnb4vuqvUg35keWW62XpHok0reR2wgIMKnZOlyN4e9+
+	 UE8Yh0uOVGOjkCRlda3FIp5lHE3Od3a2DX0wxBk06v7WaQhI1nonPELAGO+EoG1Yb1
+	 4Yj8MsIyIWKRw==
+From: Christian Brauner <brauner@kernel.org>
+Subject: [PATCH RFC v2 0/6] coredump: support AF_UNIX sockets
+Date: Fri, 02 May 2025 14:42:31 +0200
+Message-Id: <20250502-work-coredump-socket-v2-0-43259042ffc7@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,95 +52,176 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250502-net-next-mptcp-sft-inc-cover-v1-7-68eec95898fb@kernel.org>
-References: <20250502-net-next-mptcp-sft-inc-cover-v1-0-68eec95898fb@kernel.org>
-In-Reply-To: <20250502-net-next-mptcp-sft-inc-cover-v1-0-68eec95898fb@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+X-B4-Tracking: v=1; b=H4sIALe9FGgC/22OwQ6CMBBEf8Xs2SWlIhVPJiZ+gFfDoZQtNCglW
+ 0QN4d8FvHqcSd6bGSEQOwpw3IzANLjgfDsHud2AqXVbEbpyziCF3ItEZvjy3KDxTOXz0WHwpqE
+ eD8oYYWOlZGZgRjsm696r9gbXyxnyuSx0ICxYt6ZejIMNmEZxGnWutGGhahd6z5/1yxCv7G92J
+ /7PDjEKlFZbIVVZFIk6NcQt3SPPFeTTNH0B4w1pJ98AAAA=
+X-Change-ID: 20250429-work-coredump-socket-87cc0f17729c
+To: Eric Dumazet <edumazet@google.com>, 
+ Kuniyuki Iwashima <kuniyu@amazon.com>, Oleg Nesterov <oleg@redhat.com>, 
+ linux-fsdevel@vger.kernel.org, Jann Horn <jannh@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, 
+ Daan De Meyer <daan.j.demeyer@gmail.com>, 
+ David Rheinsberg <david@readahead.eu>, Jakub Kicinski <kuba@kernel.org>, 
+ Jan Kara <jack@suse.cz>, Lennart Poettering <lennart@poettering.net>, 
+ Luca Boccassi <bluca@debian.org>, Mike Yuan <me@yhndnzj.com>, 
  Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- Gang Yan <yangang@kylinos.cn>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1984; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=JQOWlruNPp9QEkq2WeaRRQQFmYLUfEbcF8gyDviCmTk=;
- b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDJEdq2Naprr8HbH2oIpBw1DDmc9O66+ZMbL2eW/Sxarx
- gi4XdFO7ChlYRDjYpAVU2SRbovMn/m8irfEy88CZg4rE8gQBi5OAZjIknqGv2KBIuqsYbM0713X
- SJbXXm3n7VzL17fv+tTJn/mv3Yk9fYSR4X4Qg6TNhiwRyXtMXcYbb8xYXnR256/ZaZP4e3mEjWZ
- t4wEA
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+ =?utf-8?q?Zbigniew_J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ Christian Brauner <brauner@kernel.org>
+X-Mailer: b4 0.15-dev-c25d1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5895; i=brauner@kernel.org;
+ h=from:subject:message-id; bh=MgdmhzLKR4Mx/HocbGM9V7rUCi4u9dxVVe407WZLWVU=;
+ b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWSI7N0f0u8lcKYgpaAguPM8y0zplSys13cweD6WF2bs3
+ ny//pxJRykLgxgXg6yYIotDu0m43HKeis1GmRowc1iZQIYwcHEKwEQYzjP8lb4nFODWNf3w+hdx
+ Jx8tjlRmynf+qCV4nk/Vb7uzauZCQYb/LtPEF/JveFhQ+3qFz2IN6+7PAuKnElteZxx/6m17NcS
+ RHwA=
+X-Developer-Key: i=brauner@kernel.org; a=openpgp;
+ fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 
-From: Gang Yan <yangang@kylinos.cn>
+I need some help with the following questions:
 
-This patch aims to add chk_dump_subflow in diag.sh. The subflow's
-info can be obtained through "ss -tin", then use the 'mptcp_diag'
-to verify the token in subflow_info.
+(i) The core_pipe_limit setting is of vital importance to userspace
+    because it allows it to a) limit the number of concurrent coredumps
+    and b) causes the kernel to wait until userspace closes the pipe and
+    thus prevents the process from being reaped, allowing userspace to
+    parse information out of /proc/<pid>/.
 
-Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/524
-Co-developed-by: Geliang Tang <geliang@kernel.org>
-Signed-off-by: Geliang Tang <geliang@kernel.org>
-Signed-off-by: Gang Yan <yangang@kylinos.cn>
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+    Pipes already support this. I need to know from the networking
+    people (or Oleg :)) how to wait for the userspace side to shutdown
+    the socket/terminate the connection.
+
+    I don't want to just read() because then userspace can send us
+    SCM_RIGHTS messages and it's really ugly anyway.
+
+(ii) The dumpability setting is of importance for userspace in order to
+     know how a given binary is dumped: as regular user or as root user.
+     This helps guard against exploits abusing set*id binaries. The
+     setting needs to be the same as used at the time of the coredump.
+
+     I'm exposing this as part of PIDFD_GET_INFO. I would like some
+     input whether it's fine to simply expose the dumpability this way.
+     I'm pretty sure it is. But it'd be good to have @Jann give his
+     thoughts here.
+
+Now the actual blurb:
+
+Coredumping currently supports two modes:
+
+(1) Dumping directly into a file somewhere on the filesystem.
+(2) Dumping into a pipe connected to a usermode helper process
+    spawned as a child of the system_unbound_wq or kthreadd.
+
+For simplicity I'm mostly ignoring (1). There's probably still some
+users of (1) out there but processing coredumps in this way can be
+considered adventurous especially in the face of set*id binaries.
+
+The most common option should be (2) by now. It works by allowing
+userspace to put a string into /proc/sys/kernel/core_pattern like:
+
+        |/usr/lib/systemd/systemd-coredump %P %u %g %s %t %c %h
+
+The "|" at the beginning indicates to the kernel that a pipe must be
+used. The path following the pipe indicator is a path to a binary that
+will be spawned as a usermode helper process. Any additional parameters
+pass information about the task that is generating the coredump to the
+binary that processes the coredump.
+
+In this case systemd-coredump is spawned as a usermode helper. There's
+various conceptual consequences of this (non-exhaustive list):
+
+- systemd-coredump is spawned with file descriptor number 0 (stdin)
+  to the read-end of the pipe. All other file descriptors are closed.
+  That specifically includes 1 (stdout) and 2 (stderr). This has already
+  caused bugs because userspace assumed that this cannot happen (Whether
+  or not this is a sane assumption is irrelevant.).
+
+- systemd-coredump will be spawned as a child of system_unbound_wq. So
+  it is not a child of any userspace process and specifically not a
+  child of PID 1 so it cannot be waited upon and is in general a weird
+  hybrid upcall.
+
+- systemd-coredump is spawned highly privileged as it is spawned with
+  full kernel credentials requiring all kinds of weird privilege
+  dropping excercises in userspaces.
+
+This adds another mode:
+
+(3) Dumping into a AF_UNIX socket.
+
+Userspace can set /proc/sys/kernel/core_pattern to:
+
+        :/run/coredump.socket
+
+The ":" at the beginning indicates to the kernel that an AF_UNIX socket
+is used to process coredumps. The task generating the coredump simply
+connects to the socket and writes the coredump into the socket.
+
+Userspace can get a stable handle on the task generating the coredump by
+using the SO_PEERPIDFD socket option. SO_PEERPIDFD uses the thread-group
+leader pid stashed during connect(). Even if the task generating the
+coredump is a subthread in the thread-group the pidfd of the
+thread-group leader is a reliable stable handle. Userspace that's
+interested in the credentials of the specific thread that crashed can
+use SCM_PIDFD to retrieve them.
+
+The pidfd can be used to safely open and parse /proc/<pid> of the task
+and it can also be used to retrieve additional meta information via the
+PIDFD_GET_INFO ioctl().
+
+This will allow userspace to not have to rely on usermode helpers for
+processing coredumps and thus to stop having to handle super privileged
+coredumping helpers.
+
+This is easy to test:
+
+(a) coredump processing (we're using socat):
+
+    > cat coredump_socket.sh
+    #!/bin/bash
+
+    set -x
+
+    sudo bash -c "echo ':/tmp/stream.sock' > /proc/sys/kernel/core_pattern"
+    socat --statistics unix-listen:/tmp/stream.sock,fork FILE:core_file,create,append,truncate
+
+(b) trigger a coredump:
+
+    user1@localhost:~/data/scripts$ cat crash.c
+    #include <stdio.h>
+    #include <unistd.h>
+
+    int main(int argc, char *argv[])
+    {
+            fprintf(stderr, "%u\n", (1 / 0));
+            _exit(0);
+    }
+
+Signed-off-by: Christian Brauner <brauner@kernel.org>
 ---
- tools/testing/selftests/net/mptcp/diag.sh | 32 +++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+Changes in v2:
+- Expose dumpability via PIDFD_GET_INFO.
+- Place COREDUMP_SOCK handling under CONFIG_UNIX.
+- Link to v1: https://lore.kernel.org/20250430-work-coredump-socket-v1-0-2faf027dbb47@kernel.org
 
-diff --git a/tools/testing/selftests/net/mptcp/diag.sh b/tools/testing/selftests/net/mptcp/diag.sh
-index e7a75341f0f32304ff4e58c9b2500d405124dc74..7a3cb4c09e450f0ae570015c4724ec268c6dc19f 100755
---- a/tools/testing/selftests/net/mptcp/diag.sh
-+++ b/tools/testing/selftests/net/mptcp/diag.sh
-@@ -225,6 +225,37 @@ chk_dump_one()
- 	fi
- }
- 
-+chk_dump_subflow()
-+{
-+	local inet_diag_token
-+	local subflow_line
-+	local ss_output
-+	local ss_token
-+	local msg
-+
-+	ss_output=$(ss -tniN $ns)
-+
-+	subflow_line=$(echo "$ss_output" | \
-+		       grep -m1 -Eo '[0-9.]+:[0-9].+ +[0-9.]+:[0-9.]+')
-+
-+	ss_token=$(echo "$ss_output" | grep -m1 -Eo 'token:[^ ]+')
-+
-+	inet_diag_token=$(ip netns exec $ns ./mptcp_diag -s "$subflow_line" | \
-+			  grep -Eo 'token:[^ ]+')
-+
-+	msg="....chk dump_subflow"
-+
-+	mptcp_lib_print_title "$msg"
-+	if [ -n "$ss_token" ] && [ "$ss_token" = "$inet_diag_token" ]; then
-+		mptcp_lib_pr_ok
-+		mptcp_lib_result_pass "${msg}"
-+	else
-+		mptcp_lib_pr_fail "expected $ss_token found $inet_diag_token"
-+		mptcp_lib_result_fail "${msg}"
-+		ret=${KSFT_FAIL}
-+	fi
-+}
-+
- msk_info_get_value()
- {
- 	local port="${1}"
-@@ -316,6 +347,7 @@ chk_msk_fallback_nr 0 "....chk no fallback"
- chk_msk_inuse 2
- chk_msk_cestab 2
- chk_dump_one
-+chk_dump_subflow
- flush_pids
- 
- chk_msk_inuse 0 "2->0"
+---
+Christian Brauner (6):
+      coredump: massage format_corname()
+      coredump: massage do_coredump()
+      coredump: support AF_UNIX sockets
+      coredump: show supported coredump modes
+      pidfs, coredump: add PIDFD_INFO_COREDUMP
+      selftests/coredump: add tests for AF_UNIX coredumps
 
--- 
-2.48.1
+ fs/coredump.c                                     | 312 ++++++++++++++++------
+ fs/pidfs.c                                        |  58 ++++
+ include/linux/pidfs.h                             |   3 +
+ include/uapi/linux/pidfd.h                        |  11 +
+ tools/testing/selftests/coredump/stackdump_test.c |  50 ++++
+ 5 files changed, 359 insertions(+), 75 deletions(-)
+---
+base-commit: 4dd6566b5a8ca1e8c9ff2652c2249715d6c64217
+change-id: 20250429-work-coredump-socket-87cc0f17729c
 
 
