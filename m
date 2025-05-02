@@ -1,87 +1,118 @@
-Return-Path: <netdev+bounces-187350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187352-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 838A0AA680F
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 02:57:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D59C4AA6813
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 03:00:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD99C46648B
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 00:57:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 928991BC0F64
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 01:00:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49B2735950;
-	Fri,  2 May 2025 00:57:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1245273FD;
+	Fri,  2 May 2025 01:00:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KoKfvxiY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WJV1+yP4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EEFB2576;
-	Fri,  2 May 2025 00:57:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CF711D554
+	for <netdev@vger.kernel.org>; Fri,  2 May 2025 01:00:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746147438; cv=none; b=Pjn4rxjIsELNyol0BlvrqMy0OwxmZrEhdo79lMiFg2z/b58An0dBSY04u38wuDQ9RYwuJsIfFL8e5kgsXu/tF5ipvMLS5wrRSy3k7AgJCUCtUOQi7lKH1piEapDoaf8coRIjmsOURS5efD6+I926/L4da+50ITtHuPqfPRdpgGY=
+	t=1746147611; cv=none; b=evQvTJgbWxjgnaM/G/2HYwtsT/C+xYjbULwJJgeYpFVRDp84tYgBsqPPjD7n6HNlL5dxVqPFEC+jIZQhPKjV1a7kaNmSOeZR9J3UfroOxMRmWpBSligqNr7Xdpmx2QvnerpJJpBuSz4Ne9GvKP4aAGPvBtJ+qzDuFs0ITBC2kZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746147438; c=relaxed/simple;
-	bh=MoqpqiYmYsjQ16yN73Y7SVxbPLWAuOZzKEnuNo+e/Lw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=V3bZ/KwxwGJStkWV76f9SK+RIKyUbogFMfhaPzG5AHjEFRd7tIslEFQ8huv2oNIrOaqYfH/FkhqikuiyDV/i6ZDJygZJGfWMcMxgUSqkCq6uagr6glYKLZ8tJYB/bszy1hJux6axJPcghOdy2IPOvCbx7jPMVRoN1Sw4ICx1HAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KoKfvxiY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79C32C4CEE3;
-	Fri,  2 May 2025 00:57:14 +0000 (UTC)
+	s=arc-20240116; t=1746147611; c=relaxed/simple;
+	bh=oETiaGMw3peCTlYjqcrh/u3VNVOp4CruXRpVbAqgExQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=u2kOwDK5nYrY6zzNOddp39qh8ScWlyZGQm/upXVQFZ6PTVATbYTlAiF5Dhq7ckysSCEAnXnBbl37MQjj+/M3lFcn83xQEFx/O1mvYCEGazgokXLgOrHXBdA2wsn0aSfRO/XgY2cQxqZSIuJCx7mPs5qmZKzbofDg7/tNs5tgC4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WJV1+yP4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8E79C4CEE3;
+	Fri,  2 May 2025 01:00:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746147435;
-	bh=MoqpqiYmYsjQ16yN73Y7SVxbPLWAuOZzKEnuNo+e/Lw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KoKfvxiYkOFnahr34ekNz23PL+yeDdfBJIyL5MdW8IwgD0IxzGRGB6VjzXjXmh1aJ
-	 at5E4VYqg8hLg0DsqD41btJu+cgTTmJNJbd1+qVpO+4kMU5UKr72cev98KbpnZMQ5b
-	 +1LI5ukrFFsaiVwKcG+5V/1/p4aEGnSpzQiiuv4JlZfMLolyRq6Vg5Zka5FBjltgpQ
-	 MUgpUz5K9yhFMDyypTBEHbytEUITAt/a375ixRBuBqq3IkwcYzPju4XV6fNUb3uy0e
-	 hnJIGJYYxS+gPLYSfTCKwsOvOelO/wDOLQLT2QnTuJgcG3zgydww5cKZqmskvfJC2E
-	 2INRE/s0errdA==
-Date: Thu, 1 May 2025 17:57:13 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
- <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, Richard Cochran
- <richardcochran@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
- <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>, Andrew Lunn
- <andrew@lunn.ch>
-Subject: Re: [net-next v9 4/7] net: mtip: The L2 switch driver for imx287
-Message-ID: <20250501175713.54aa656e@kernel.org>
-In-Reply-To: <20250430051756.574067-5-lukma@denx.de>
-References: <20250430051756.574067-1-lukma@denx.de>
-	<20250430051756.574067-5-lukma@denx.de>
+	s=k20201202; t=1746147609;
+	bh=oETiaGMw3peCTlYjqcrh/u3VNVOp4CruXRpVbAqgExQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=WJV1+yP4wd2FR945SdRnMwaifQy0EcboDIgcPBXayfa4IjDhIvWIwP2rZs7a8KGvD
+	 8AMnxxUzACURlCh/mCozl5akRHqVlq9W6FsZL77rR8jb1+ol7EPdKu7xVhrpBttnKE
+	 580b0tV/aOEc03bVmzH59NOON7xD3gU2WqQ6ES9PHxtjLV0n3oSZ7WJ9urYWMFc3ny
+	 OBGDohnrSQhZ7/pBvj3frHPLg9Web1jpoQMz3W4+4NKJmCUcMUB/2lCqrX5xt5EJfo
+	 Blxasx64IRyO0/Z0UQ/9aryyUywQglKiUDp8d/24Up4GIMdcyz+0LFcAEIzpGHviC7
+	 vvuPbBPOCsYXg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D123822D59;
+	Fri,  2 May 2025 01:00:50 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 00/13][pull request] Intel Wired LAN Driver Updates
+ 2025-04-29 (igb, igc, ixgbe, idpf)
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174614764900.3121766.588855584070943085.git-patchwork-notify@kernel.org>
+Date: Fri, 02 May 2025 01:00:49 +0000
+References: <20250429234651.3982025-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20250429234651.3982025-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org
 
-On Wed, 30 Apr 2025 07:17:53 +0200 Lukasz Majewski wrote:
-> +static int __init mtip_switch_dma_init(struct switch_enet_private *fep)
-> +{
-...
-> +}
+Hello:
 
-> +static int mtip_sw_probe(struct platform_device *pdev)
+This series was applied to netdev/net-next.git (main)
+by Tony Nguyen <anthony.l.nguyen@intel.com>:
 
-One more warning:
+On Tue, 29 Apr 2025 16:46:35 -0700 you wrote:
+> For igb:
+> Kurt Kanzenbach adds linking of IRQs and queues to NAPI instances and
+> adds persistent NAPI config. Lastly, he removes undesired IRQs that
+> occur while busy polling.
+> 
+> For igc:
+> Kurt Kanzenbach switches the Tx mode for MQPRIO offload to harmonize the
+> current implementation with TAPRIO.
+> 
+> [...]
 
-WARNING: modpost: drivers/net/ethernet/freescale/mtipsw/nxp-mtipl2sw: section mismatch in reference: mtip_sw_probe+0xa50 (section: .text) -> mtip_switch_dma_init (section: .init.text)
+Here is the summary with links:
+  - [net-next,01/13] igb: Link IRQs to NAPI instances
+    https://git.kernel.org/netdev/net-next/c/6fc54c408dc9
+  - [net-next,02/13] igb: Link queues to NAPI instances
+    https://git.kernel.org/netdev/net-next/c/b75a1dea500f
+  - [net-next,03/13] igb: Add support for persistent NAPI config
+    https://git.kernel.org/netdev/net-next/c/fc0fb1f116e9
+  - [net-next,04/13] igb: Get rid of spurious interrupts
+    https://git.kernel.org/netdev/net-next/c/a22ed15c99a0
+  - [net-next,05/13] igc: Limit netdev_tc calls to MQPRIO
+    https://git.kernel.org/netdev/net-next/c/68f37f26b0ff
+  - [net-next,06/13] igc: Change Tx mode for MQPRIO offloading
+    https://git.kernel.org/netdev/net-next/c/876863c3fc75
+  - [net-next,07/13] ixgbe: create E610 specific ethtool_ops structure
+    https://git.kernel.org/netdev/net-next/c/462cc09ac37d
+  - [net-next,08/13] ixgbe: add support for ACPI WOL for E610
+    https://git.kernel.org/netdev/net-next/c/451c6bc923e2
+  - [net-next,09/13] ixgbe: apply different rules for setting FC on E610
+    https://git.kernel.org/netdev/net-next/c/7f58648dbc53
+  - [net-next,10/13] ixgbe: add E610 .set_phys_id() callback implementation
+    https://git.kernel.org/netdev/net-next/c/4bf2d11902ef
+  - [net-next,11/13] ixgbe: devlink: add devlink region support for E610
+    https://git.kernel.org/netdev/net-next/c/fe259a1bb26e
+  - [net-next,12/13] idpf: assign extracted ptype to struct libeth_rqe_info field
+    https://git.kernel.org/netdev/net-next/c/508d374b8dc0
+  - [net-next,13/13] idpf: remove unreachable code from setting mailbox
+    https://git.kernel.org/netdev/net-next/c/c058c5f8b6e4
 
-We only see it with clang, not sure why. The warning looks legit.
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
