@@ -1,127 +1,217 @@
-Return-Path: <netdev+bounces-187503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C75C6AA78C2
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 19:42:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D685FAA78D0
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 19:51:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 402A64E1A70
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 17:42:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C3B31BA62FE
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 17:51:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDC83264FB1;
-	Fri,  2 May 2025 17:41:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB1642609EC;
+	Fri,  2 May 2025 17:51:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MdQ2XScY"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="f2DvQ9MW"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B415C264FA5
-	for <netdev@vger.kernel.org>; Fri,  2 May 2025 17:41:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4590B42A87;
+	Fri,  2 May 2025 17:51:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746207714; cv=none; b=oSQC3j3bYbIg3RO87+BA5OrwYKyeZUpMIXEvfP/TQ5+dOBpX4BBjFVV2Zrg5f9r68dLLCc8nIEeFWS8E89gVGoMMEKTRz9DEWKDsojpKKKpWpcUmjZorLJ2z11nt4hc5+QEJZF/PiWmh1BvESxL0IKGgLE7tI1Z+iJCaWHKx2Ww=
+	t=1746208264; cv=none; b=ii7v7Y/7ZXI+ekUFGY93kSUnH3EtMwHK0BQOYkoG7UMWOuOoPIOCcvrZpsL/AZl5NacXPTpmaRtil87xDT0+2mJrnPm8mv4XZxYEwRlnojwAHJLcyHwCP9vkWhCwi5Xq4ogBYkWq5Ph7yAqCJpGJo/7tt+P35nrWjXVU2SyaI4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746207714; c=relaxed/simple;
-	bh=eLz7obv35w/u/cKxEql/UTAbQvGopYBPWu2O23zJfFE=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=PxWUobkeHFq71SCUR1xGpKL7rp54LdtpMDhxyNaZ6B6qRybJD7ROppyIFqmuGbdrfN4NT7DPtHDhdIL+1+5CAeAGgo+pefhXWA7ThWyoqcjKRhzkCPxmyPyXyKGljcg8hbJhHSf6KCYIWfxHLl2yIMcXuwjuSKev6hPJhQ+GDFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MdQ2XScY; arc=none smtp.client-ip=91.218.175.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <7590d7af-e8c3-48cd-aba2-10af4d9d909d@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1746207700;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Xff4owWgDUIlVTdiJE9nAsinQN/NlojnRKLTslMQN8U=;
-	b=MdQ2XScY0YuJgRON9Ye4a2dZ6lrHOCp7JQsLUQSjuXZectNoGme+AUXVBqAz/bLAUi84rn
-	tYk3cMji0ERwL3QX6FL0n8Dtm2D4cGvlptE8Tm+HJDb0EKSUXLT3/UAE5lO/SrfbPWesYm
-	LxlvBaN08D7jjeD+fd2fPTrHOxfw2sQ=
-Date: Fri, 2 May 2025 13:41:32 -0400
+	s=arc-20240116; t=1746208264; c=relaxed/simple;
+	bh=drM8O3toaDkU9WbF5hourjHUHTWTN+EOTGXaXdM7ew0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fTtbVi0q9SuXtCOTWC2oCnNpK2ShXOle7UTawFpb9+m/g2Qn5bORJ8MFeFBJ01Yd+hU5jmYjGBNDDgMZC5I1sHDLSIf3jG6u2ELwMvx9YQFYT/CNJThU+L+TgoQSDmv92oyFQqvuIIAnhl3y0D3C9JtvOMNlfDVqu2DKnRzFXX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=f2DvQ9MW; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [192.168.7.202] ([71.202.166.45])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 542Ho3nX2101973
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Fri, 2 May 2025 10:50:03 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 542Ho3nX2101973
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025042001; t=1746208207;
+	bh=LzR4L+NzvxhTrQ0qnGzytLxrMo2x9HNW2SUoBs+4hnk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=f2DvQ9MW8Z0JHknIhUmlaIPnE6PHfIIPe0rpr7QJUvAXpKBCT+qAa2LT23C9nwyHn
+	 /1a1mWwt981CwHC7LEhukO1K0m1bgC3vouAUx32YzUdMpcsCtQbd/jw/0r9+oZFhHH
+	 zWNmyzJlWsf15/gfOAQCHW/PstZJwBaw5PzyA2AIZsvRshoRiosxrgxL3BGNy8GnvI
+	 j1N92z82OgALfPhLkgXq737LFNKZtz9B4b6V3qkfZIO+IB2Ra6RgpyueZDDglkuTjG
+	 iaLXdZxYtCOMzwCegp0RoTN30GI8VbyzguvhXK2x0MgYmhv6FrtA1j3wSshxLcp5ca
+	 a3YLWxbyYWbZw==
+Message-ID: <a2bdcbaf-2a00-4b12-84e9-14c40610d599@zytor.com>
+Date: Fri, 2 May 2025 10:50:02 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [net-next PATCH v3 00/11] Add PCS core support
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, upstream@airoha.com,
- Christian Marangi <ansuelsmth@gmail.com>, linux-kernel@vger.kernel.org,
- Kory Maincent <kory.maincent@bootlin.com>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Clark Wang <xiaoning.wang@nxp.com>,
- Claudiu Beznea <claudiu.beznea@microchip.com>,
- Claudiu Manoil <claudiu.manoil@nxp.com>, Conor Dooley <conor+dt@kernel.org>,
- Ioana Ciornei <ioana.ciornei@nxp.com>, Jonathan Corbet <corbet@lwn.net>,
- Joyce Ooi <joyce.ooi@intel.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Madalin Bucur <madalin.bucur@nxp.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Michal Simek <michal.simek@amd.com>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
- Rob Herring <robh+dt@kernel.org>, Rob Herring <robh@kernel.org>,
- Robert Hancock <robert.hancock@calian.com>,
- Saravana Kannan <saravanak@google.com>, UNGLinuxDriver@microchip.com,
- Vladimir Oltean <vladimir.oltean@nxp.com>, Wei Fang <wei.fang@nxp.com>,
- devicetree@vger.kernel.org, imx@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com
-References: <20250415193323.2794214-1-sean.anderson@linux.dev>
- <aADzVrN1yb6UOcLh@shell.armlinux.org.uk>
- <13357f38-f27f-45b5-8c6a-9a7aca41156f@linux.dev>
- <aAEdQVd5Wn7EaxXp@shell.armlinux.org.uk>
- <8d6c8f72-a8bd-43a8-b1e6-a20cafddf804@linux.dev>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4A 01/15] x86/msr: Add missing includes of <asm/msr.h>
+To: =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+        mingo@redhat.com
+Cc: LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        virtualization@lists.linux.dev, linux-pm@vger.kernel.org,
+        linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org,
+        linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org,
+        Netdev <netdev@vger.kernel.org>, platform-driver-x86@vger.kernel.org,
+        tglx@linutronix.de, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, acme@kernel.org, jgross@suse.com,
+        andrew.cooper3@citrix.com, peterz@infradead.org, namhyung@kernel.org,
+        mark.rutland@arm.com, alexander.shishkin@linux.intel.com,
+        jolsa@kernel.org, irogers@google.com, adrian.hunter@intel.com,
+        kan.liang@linux.intel.com, wei.liu@kernel.org, ajay.kaher@broadcom.com,
+        bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com,
+        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
+        luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com,
+        haiyangz@microsoft.com, decui@microsoft.com,
+        dapeng1.mi@linux.intel.com
+References: <a1917b37-e41e-d303-749b-4007cda01605@linux.intel.com>
+ <20250501054241.1245648-1-xin@zytor.com>
+ <a34d7955-aa31-7bef-52cf-65dc4bb7a5c1@linux.intel.com>
 Content-Language: en-US
-In-Reply-To: <8d6c8f72-a8bd-43a8-b1e6-a20cafddf804@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+From: Xin Li <xin@zytor.com>
+Autocrypt: addr=xin@zytor.com; keydata=
+ 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
+ l75w1xInsg==
+In-Reply-To: <a34d7955-aa31-7bef-52cf-65dc4bb7a5c1@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Russell,
-
-On 4/17/25 11:29, Sean Anderson wrote:
-> On 4/17/25 11:24, Russell King (Oracle) wrote:
->> On Thu, Apr 17, 2025 at 10:22:09AM -0400, Sean Anderson wrote:
->>> Hi Russell,
->>> 
->>> On 4/17/25 08:25, Russell King (Oracle) wrote:
->>> > On Tue, Apr 15, 2025 at 03:33:12PM -0400, Sean Anderson wrote:
->>> >> This series adds support for creating PCSs as devices on a bus with a
->>> >> driver (patch 3). As initial users,
->>> > 
->>> > As per previous, unless I respond (this response not included) then I
->>> > haven't had time to look at it - and today is total ratshit so, not
->>> > today.
->>> 
->>> Sorry if I resent this too soon. I had another look at the request for
->>> #pcs-cells [1], and determined that a simpler approach would be
->>> possible. So I wanted to resend with that change since it would let me
->>> drop the fwnode_property_get_reference_optional_args patches.
->> 
->> Please can you send them as RFC so I don't feel the pressure to say
->> something before they get merged (remember, non-RFC patches to netdev
->> get queued up in patchwork for merging.)
+On 5/2/2025 6:13 AM, Ilpo Järvinen wrote:
+>> diff --git a/arch/x86/kernel/trace_clock.c b/arch/x86/kernel/trace_clock.c
+>> index b8e7abe00b06..708d61743d15 100644
+>> --- a/arch/x86/kernel/trace_clock.c
+>> +++ b/arch/x86/kernel/trace_clock.c
+>> @@ -4,7 +4,7 @@
+>>    */
+>>   #include <asm/trace_clock.h>
+>>   #include <asm/barrier.h>
+>> -#include <asm/msr.h>
+>> +#include <asm/tsc.h>
+> Does this change belong to this patch?
 > 
-> This series is marked "changes requested" in patchwork, so I don't think
-> it should get merged automatically. I won't send a v4 until you've had a
-> chance to review it.
+> It might even cause a build failure until the second patch which moves
+> the tsc related things to the other file (unless there's indirect include
+> path to asm/msr.h).
 
-Any chance you could review this series in the next week or so? I would
-like to send v4 in time to be reviewed before net-next closes later this
-month.
+Ah, you're right as I have separated the relocation of rdtsc_ordered()
+into a following patch.
 
---Sean
+> 
+>> diff --git a/arch/x86/lib/kaslr.c b/arch/x86/lib/kaslr.c
+>> index a58f451a7dd3..b5893928d55c 100644
+>> --- a/arch/x86/lib/kaslr.c
+>> +++ b/arch/x86/lib/kaslr.c
+>> @@ -8,7 +8,7 @@
+>>    */
+>>   #include <asm/asm.h>
+>>   #include <asm/kaslr.h>
+>> -#include <asm/msr.h>
+>> +#include <asm/tsc.h>
+> Same thing here.
+> 
+>>   #include <asm/archrandom.h>
+>>   #include <asm/e820/api.h>
+>>   #include <asm/shared/io.h>
+>> diff --git a/drivers/accel/habanalabs/common/habanalabs_ioctl.c b/drivers/accel/habanalabs/common/habanalabs_ioctl.c
+>> index 8729a0c57d78..dc80ca921d90 100644
+>> --- a/drivers/accel/habanalabs/common/habanalabs_ioctl.c
+>> +++ b/drivers/accel/habanalabs/common/habanalabs_ioctl.c
+>> @@ -17,8 +17,6 @@
+>>   #include <linux/uaccess.h>
+>>   #include <linux/vmalloc.h>
+>>   
+>> -#include <asm/msr.h>
+>> -
+> I suggested making a separate patch out of these removals. Currently you
+> do them without any clear warning in the changelog which only talks about
+> adding asm/msr.h.
+>
+
+I didn't want to add an extra patch to the v4 series, but I really
+should have mentioned the removal at least.
+
+
+>> diff --git a/drivers/acpi/processor_throttling.c b/drivers/acpi/processor_throttling.c
+>> index 00d045e5f524..ecd7fe256153 100644
+>> --- a/drivers/acpi/processor_throttling.c
+>> +++ b/drivers/acpi/processor_throttling.c
+>> @@ -18,9 +18,13 @@
+>>   #include <linux/sched.h>
+>>   #include <linux/cpufreq.h>
+>>   #include <linux/acpi.h>
+>> +#include <linux/uaccess.h>
+>>   #include <acpi/processor.h>
+>>   #include <asm/io.h>
+>> -#include <linux/uaccess.h>
+>> +#include <asm/asm.h>
+> ???
+
+Damn me!
+
+Not to find an excuse but I guess I got somewhat tired when doing it.
+
+> 
+>> +#ifdef CONFIG_X86
+>> +#include <asm/msr.h>
+>> +#endif
+> 
+> I really appreciate you took the effort to do this change the correct
+> way! 🙂
+
+Same here for pushing it the right direction!
+
+
+Hi Ingo,
+
+Since you *wisely* didn't remove msr.h from tsc.h, maybe you could just
+zap this patch and I will send an afterwards patch set to replace this
+patch?
+
+Apology for the noise.
+
+Thanks!
+     Xin
 
