@@ -1,177 +1,106 @@
-Return-Path: <netdev+bounces-187485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 708CBAA768E
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 17:59:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 478A7AA76BB
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 18:08:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A516460B0C
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 15:59:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 44ED41C05D8C
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 16:09:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A82125B1CE;
-	Fri,  2 May 2025 15:59:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F8A125DAFA;
+	Fri,  2 May 2025 16:08:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F19b31gk"
+	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="piUpZvaz"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0B4725B1ED
-	for <netdev@vger.kernel.org>; Fri,  2 May 2025 15:59:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7497125D544
+	for <netdev@vger.kernel.org>; Fri,  2 May 2025 16:08:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746201578; cv=none; b=tLg/o0W8Z9RsuSbFh4FvOo+yKOb4hlDFVl3zN/ACLFSXlsRqc0ys03cFNZ1ByAE2I9gj6NofAvG+7eickUhaTdnvC6m04KFpgdla5q+m/FFaBG3Q4pQuWSDktv0eQmS9ED1GdKiRaumWVBASAo03tAf73pq/XQJqahIMrkLeKRo=
+	t=1746202119; cv=none; b=uNzBJNRDw1mmjRdJmnXw0y0PQ2bHEqtvAGCnx3TW/5UWi4aPnZAFZA58zUixOB3NtGhf8SMAcMtTGo1K1ZSTg3QQTW5lM7PjuEeaDxZhC10PcLWKnkHdFVvXMU1RpVxec08njyInwdKHQ216oMKEDF5Veg3MWdN3q88VgUXUvwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746201578; c=relaxed/simple;
-	bh=byOrUSsEOpSIyajuw0Q2H0DNNQZ13wezcUb1dsGRvt4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=MLp25v/Tfd3xhq6vm9t7D0kNB4OVrWiu0BgryRljElAU3ScMF1cd+WnG1w5M3dsnXs6ch1ypiAI58fssNlLBkWaeB9lSV0GH26d/RKJ8AVzoYRIVXEww97UZaYwv5/rd2E6oeBJzS0vPoIW0ZBy3lHEW/Y9cSt/W0De1Dqij69c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F19b31gk; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746201575;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dCdtyBucBLgyJrIWE2a1E5opSPjkTpqCOuhdn8D/y7k=;
-	b=F19b31gk2ZL+Ki8dyGv4gZlCvuSkNIC6vSLE/Z+NkgcxjIuxxJT69HuPEtfz0cEBM3nkHA
-	duyTy30iXNYiIaZHcnqdub1xx9O10/SWxuAMWNJLSTqwdZAkr3n818LR+h4j9J8eZaKFZR
-	FR4AbXssl+FtmHkp3WOBFKkOwlsasE4=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-145-OhhTSyC_MrCtn129hA3vNQ-1; Fri, 02 May 2025 11:59:34 -0400
-X-MC-Unique: OhhTSyC_MrCtn129hA3vNQ-1
-X-Mimecast-MFC-AGG-ID: OhhTSyC_MrCtn129hA3vNQ_1746201573
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-5498963ebc3so1366398e87.0
-        for <netdev@vger.kernel.org>; Fri, 02 May 2025 08:59:33 -0700 (PDT)
+	s=arc-20240116; t=1746202119; c=relaxed/simple;
+	bh=qFW90J9T8RJ+7GYrvlnNFaoJarkTqvcieznVTo0kQ7w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HUNPuFcOfa27twrJBkMGNVcBA2edgSqzopPF33ubh3EfFJ5Kr6FrJgqZdGWUeK+zug4ZL89tO+LORznjJlPGVngf7VZcOMmiacyabXq66kh/dkTVrhu23780KqV8WriilYa/+Ktfq/UvTZzFuXV9EDQSQfV5VSmnwqAp+GdqYdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=piUpZvaz; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-224104a9230so3660485ad.1
+        for <netdev@vger.kernel.org>; Fri, 02 May 2025 09:08:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1746202116; x=1746806916; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Gj3NocPP0YximFiD8TQzgbDDNI2dofYflmIdPP6lA+Q=;
+        b=piUpZvazM6bIO/u4AQnv+Oir0bi7zRpTo4vbWpksRqYNKyuDw9llfKA1DoWtTtR/wd
+         Cp/8+JJpPSMd+L+IJ2ip7fvgjZVJG2s24jHjw+Dgh52kKPyDN6IUdbvD5fxMMyxWDYzK
+         XsvInhh2bkDWdAFdGB7HwUSg6bbbmx7RLATPrc20yU79W8rilQ2Dp85C1dMu90nEiKHZ
+         uVSh8SS1Kn9Ol9s9s7VzeDVajzvPIuP5GLbamX6cggzi/3koGsnnMICdu5QKxSaPsWIa
+         +iky5jafM+m+aYTv8Q78ZqZjwAwzvPpDTI64wLNzrRe/MsbIQRO4a39+QLQzfPQMtlBA
+         gbyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746201572; x=1746806372;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dCdtyBucBLgyJrIWE2a1E5opSPjkTpqCOuhdn8D/y7k=;
-        b=mOJvuREZ0cGVYw+B+zv6YVRdZHOQ7H7FpXGvBrQOUtm2GpCGKP+kjRF8INku3/dqUJ
-         wn91RSVPHcJotHkTD/c+XzyGMVvaTP4SlKBXsNxNYsu7J2i/XWM4JoCAa8PSFjrvBopx
-         l/Imi9hmBZlIP8kjk17R5TsNtBNxjD57X9feKhj5RZT2W3Qcz1jnwZT4WdYH08PIMIQ6
-         nznKXY+lRUcJy+K6WrKvpq6nMmZ6RO/jywz6erlVQElIDkwo2mQ+y7enQVkT1ANz56LY
-         QXKNGuUQWZlWIxhKjff78U7DMFowf4JRkUU8eshViAgr8SOwgmPS87lwUwE4raLefJZ8
-         HPiA==
-X-Gm-Message-State: AOJu0YzmBvV0s8CP3DJepvf2MwoCzTykzb8UD597jO5nQtkAsyDaB+O7
-	zqTUjU+yfdp5ZfrRiqNd/yUrtuNOcQnWySMDvwqcrkFLCLKzJD5hiJEFoFUgcIkzPmqZkHIu5qZ
-	p9q8rATokST08jOnk5EtHoXuLZGKQs9cpECxadRdKV0Mc/Bfal/vNOg==
-X-Gm-Gg: ASbGncsdNEsxgVuGghXh/1PBxcIb1GdRcjRZIs4rnTuAsuwBUUXpbSTTjWVFRbzgEBR
-	HUArEC1pXobmcuYrDj4oisQPIA4MAggnQHyVJD08iQPNUJE5ey9TP9cjuN4hSchI9gn4bPcIXex
-	Gi4UwARqXltJip8sxYNfu+ix02mIy5wawKxV4WzTk9mFsQvKxmo5pEGcbg1YfgygqNW5xeS/NBz
-	snkvbITBOtTLSVDxv65xcNKAYwyOlUbYa/UkuW3tdYr5KR8+RYRXKgaayvPRm1hTnf4Iqe3zMsH
-	seB2AV/m
-X-Received: by 2002:a05:6512:2c89:b0:549:2ae5:99db with SMTP id 2adb3069b0e04-54eac2347b5mr1180035e87.45.1746201572623;
-        Fri, 02 May 2025 08:59:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHbbWQ37DcyLp6u4Y7JWsAcBdhHWVsBBDog3Y4p3ar8KI2Q/GPFrZQ6gXIgWIBs257ALgTY0Q==
-X-Received: by 2002:a05:6512:2c89:b0:549:2ae5:99db with SMTP id 2adb3069b0e04-54eac2347b5mr1180023e87.45.1746201572225;
-        Fri, 02 May 2025 08:59:32 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54ea94f2160sm377797e87.190.2025.05.02.08.59.31
+        d=1e100.net; s=20230601; t=1746202116; x=1746806916;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Gj3NocPP0YximFiD8TQzgbDDNI2dofYflmIdPP6lA+Q=;
+        b=GLLsHF/rbh9mK4Z3BhnJHz2V8lqFcj7cAz7qG0SvA/U+pROI/aoiz9UWguuH1ynZcH
+         FzFclzU1oDssupoy8AlamCH0zuDIdpzO9bJeJeI1OAcgmiiRNSzun+Nl1gy8GwtdGYgs
+         FKaJa3CqwzBLe7SM4NFd8khnBMSAkpYOR6Q2PZlNERXPKY9lnHysXd3qX3qIsgXa0JfM
+         tbfiaNsaZHRYugP0JmvxqEUNSlcnu6n8g8P8fDHckWh8CuyBf8KIMr885QW5ACUOFkeu
+         VVhK2S+JEAMnLopT69rWKaJ/YJrbBHQyp9tkvHyt0ET92ED31cjyb+w3w1YIlOK7oCf1
+         wJpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVqzjrEd4s4DtWR7L8e3RH/FrD8cc114YrmzC/RlxSuwmez7ruaSiY3Vs9fyNYczArW9AMBZt8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzpUiOB7kR2yQv2NlIYJgPsBG2ZOISxa6U8zifSZsTKEdXKC3ri
+	DIspNhvZbmAFpdw7PUml1Rp+7iTstOhBllquEki1Y4lZeNQG57PthT98O9obY80=
+X-Gm-Gg: ASbGncsPj61M/NRN2Zafitpq1huRjjjS2cSMm4/O4VKlTqFq1u1xJSiNVEmDDtJsHtD
+	Qe8FmgpvIgT0dccXz7ucGFrNpno1Nd+G0bbWOopaqQKll4b37ELovkcQzTVBKKIHGXdJaGJ4YcS
+	q/QMDKFpK2HkWt9KTCR5Dfzm8Aa/rinjpuAI+UGzEYBImHhYkOSJu8ni5N2KsG1mituO7VFWHRb
+	a2CTvCca/5b0I1bLufFkes8XvIgCVUOri8M6AOG2WBeNvAi1aFtlTJphJ9zASvSZL9cFfelSgAQ
+	9CAmCbV1smtOVTA2woaaF3kWIKI=
+X-Google-Smtp-Source: AGHT+IEx2hIRACQD4vGbjeB7Sd8QKVmVcIAMoL1DlBjtzG/ltHk7Rttj9zTdUNlhvywKnKU5ZyPKYQ==
+X-Received: by 2002:a17:903:2343:b0:224:10b0:4ee5 with SMTP id d9443c01a7336-22e10236f31mr21466155ad.0.1746202116504;
+        Fri, 02 May 2025 09:08:36 -0700 (PDT)
+Received: from t14 ([2001:5a8:4528:b100:7676:294c:90a5:2828])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e151e98desm9439475ad.55.2025.05.02.09.08.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 May 2025 08:59:31 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 9AB7E1A0852F; Fri, 02 May 2025 17:59:00 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, linux-rt-devel@lists.linux.dev, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>
-Subject: Re: [PATCH net-next v3 05/18] xdp: Use nested-BH locking for
- system_page_pool
-In-Reply-To: <20250502150705.1sewZ77B@linutronix.de>
-References: <20250430124758.1159480-1-bigeasy@linutronix.de>
- <20250430124758.1159480-6-bigeasy@linutronix.de> <878qng7i63.fsf@toke.dk>
- <20250502133231.lS281-FN@linutronix.de> <87ikmj5bh5.fsf@toke.dk>
- <20250502150705.1sewZ77B@linutronix.de>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Fri, 02 May 2025 17:59:00 +0200
-Message-ID: <87frhn57i3.fsf@toke.dk>
+        Fri, 02 May 2025 09:08:36 -0700 (PDT)
+Date: Fri, 2 May 2025 09:08:32 -0700
+From: Jordan Rife <jordan@jrife.io>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Aditi Ghag <aditi.ghag@isovalent.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
+	netdev@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH v6 bpf-next 4/7] bpf: udp: Use bpf_udp_iter_batch_item
+ for bpf_udp_iter_state batch items
+Message-ID: <a4iluxons4k536rz3ynmlpuaqkjpyi2gt2acm4o7bcns43q64j@f5qmwmg3x5bf>
+References: <20250428180036.369192-1-jordan@jrife.io>
+ <20250428180036.369192-5-jordan@jrife.io>
+ <2ccb3470-0218-4bca-af17-4f9bd1e758a3@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2ccb3470-0218-4bca-af17-4f9bd1e758a3@linux.dev>
 
-Sebastian Andrzej Siewior <bigeasy@linutronix.de> writes:
+> A nit. just noticed this.
+> 
+> Since it needs a respin, rename the pointer from "sock" to "sk". It should
+> be more consistent with most other places on the "struct socket *sock" /
+> "struct sock *sk" naming.
 
-> On 2025-05-02 16:33:10 [+0200], Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->>=20
->> > @@ -751,16 +751,13 @@ struct sk_buff *xdp_build_skb_from_zc(struct xdp=
-_buff *xdp)
->> >  	local_lock_nested_bh(&system_page_pool.bh_lock);
->> >  	pp =3D this_cpu_read(system_page_pool.pool);
->> >  	data =3D page_pool_dev_alloc_va(pp, &truesize);
->> > -	if (unlikely(!data)) {
->> > -		local_unlock_nested_bh(&system_page_pool.bh_lock);
->> > -		return NULL;
->> > -	}
->> > +	if (unlikely(!data))
->> > +		goto out;
->> >=20=20
->> >  	skb =3D napi_build_skb(data, truesize);
->> >  	if (unlikely(!skb)) {
->> >  		page_pool_free_va(pp, data, true);
->> > -		local_unlock_nested_bh(&system_page_pool.bh_lock);
->> > -		return NULL;
->> > +		goto out;
->> >  	}
->> >=20=20
->> >  	skb_mark_for_recycle(skb);
->> > @@ -778,15 +775,16 @@ struct sk_buff *xdp_build_skb_from_zc(struct xdp=
-_buff *xdp)
->> >=20=20
->> >  	if (unlikely(xdp_buff_has_frags(xdp)) &&
->> >  	    unlikely(!xdp_copy_frags_from_zc(skb, xdp, pp))) {
->> > -		local_unlock_nested_bh(&system_page_pool.bh_lock);
->> >  		napi_consume_skb(skb, true);
->> > -		return NULL;
->> > +		skb =3D NULL;
->> >  	}
->> > +
->> > +out:
->> >  	local_unlock_nested_bh(&system_page_pool.bh_lock);
->> > -
->> > -	xsk_buff_free(xdp);
->> > -
->> > -	skb->protocol =3D eth_type_trans(skb, rxq->dev);
->> > +	if (skb) {
->> > +		xsk_buff_free(xdp);
->> > +		skb->protocol =3D eth_type_trans(skb, rxq->dev);
->> > +	}
->>=20
->> I had in mind moving the out: label (and the unlock) below the
->> skb->protocol assignment, which would save the if(skb) check; any reason
->> we can't call xsk_buff_free() while holding the lock?
->
-> We could do that, I wasn't entirely sure about xsk_buff_free(). It is
-> just larger scope but nothing else so far.
->
-> I've been staring at xsk_buff_free() and the counterparts such as
-> xsk_buff_alloc_batch() and I didn't really figure out what is protecting
-> the list. Do we rely on the fact that this is used once per-NAPI
-> instance within RX-NAPI and never somewhere else?
+Sure, will do.
 
-Yeah, I believe so. The commit adding the API[0] mentions this being
-"single core (single producer/consumer)".
-
--Toke
-
-[0] 2b43470add8c ("xsk: Introduce AF_XDP buffer allocation API")
-
+Jordan
 
