@@ -1,110 +1,98 @@
-Return-Path: <netdev+bounces-187472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F2BDAA748B
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 16:11:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F30EAA74A0
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 16:14:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 531D63BFFE5
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 14:11:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8DA351896E8E
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 14:13:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AA372566DE;
-	Fri,  2 May 2025 14:11:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54BC62566E1;
+	Fri,  2 May 2025 14:13:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YaG2OyDd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HEJCUjNA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B952A2561D7
-	for <netdev@vger.kernel.org>; Fri,  2 May 2025 14:11:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22B1A255F50;
+	Fri,  2 May 2025 14:13:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746195088; cv=none; b=ByoW8JA7qJff9duDlsaNGP25zM6ggEskHqRKxLCe/O1D5xdQS1PnBLf6KMVzUxggmBeonbNBa3Z7b0goH5v4UocMpBnTEJ624qOYMv4bRD/nsAm/m0NC/4gEnutYpAJOPWY5XbP79FW8d4t1/SGEZMWY+cLez0fODNGeC5V+sKI=
+	t=1746195210; cv=none; b=QKOI8N2dpZry/l//ico5lLbM2ln/DMz0t+6Kiecq+a90XMtNtdrVO5qsxueVxoRzYj3THgx3R4jK3x4s6B5Pw0U7fVd0d5OduqIGnNxGnhqM5SUDq/DZAc4q6xYBtV/D+uZJoLvLTzNVaWbSQKd/fk/XeiIL8qP3KK73obGnwNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746195088; c=relaxed/simple;
-	bh=Vt2jUIItSucYOFtSbIcXHATgjkrt7oAf8nrQ6pmlrbo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EKxiGXnQyeQXLEYe0UDdi9wCG4weIjBbz1UQ8O3HxID8Y6iM+YJOzRhC5s6W21Um2pRRNn0pqHUxV3aWxhKVkFfDpFgi6z7MTfJBQreFYXdWcbwon76hdDCOFLJ7DKT7dCo/nsSOfgN110SwnRpoi46F+HPnbJWHWB+ZJYvU1Ok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YaG2OyDd; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5dbfc122b82so11037a12.0
-        for <netdev@vger.kernel.org>; Fri, 02 May 2025 07:11:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746195085; x=1746799885; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Vt2jUIItSucYOFtSbIcXHATgjkrt7oAf8nrQ6pmlrbo=;
-        b=YaG2OyDdfxp6rWAfJEcX0jTBAp1bikRAEsb3RZ0sVY1Ci1V2Wssrwo01mcXZJQC6WU
-         54g+QpeGj9ixHjP+K6GwtpMMFjA37mHJgEs/VhGrIO8v2DfLTnxnucVgZxd9EXz2DyCZ
-         4aDbpLFVt6+opDL94J3CWeoXmHbWNYSOJ8lKhV0QPTCkp+v7vVUs11B+/vRqooR1IQl2
-         PXHvLWRRElKm2AdKtUCg+P8gF/4x3gLwpKX5q77oSKh4QlC5gEGvnnlm+pjV5lMET0te
-         b00baFbNlCj/haUM82JciErz1tJH3MeOH7qc1W27MnoBk8flsKSv+9un59puG8+t14J+
-         CI/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746195085; x=1746799885;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Vt2jUIItSucYOFtSbIcXHATgjkrt7oAf8nrQ6pmlrbo=;
-        b=aZvECWl/UwTj92R/yE+sFSrdiT13i4R++1zwKFkNko4mvRQ7/jG1R/O6geiIfTrG6y
-         7JMqf/RIEBhdAs9Sg3fPoExonZPI4pM6in9P0yAMJBvZ0ekjaWGEJlmKZKHwbh+Tv7bD
-         XEM5L0+JA476v6H3TVOSUGHLHXu0cedlojuzagOEaL/UT5r9cwMTYiS1RxNjCH/jlLyY
-         fdG7/kQ4jw1Vt0ZhVAcgSIt5pZQfKAquTOXohctcceIjB8VO4i0F8C51BtQ1kXg0YOpI
-         T/kM+X/1pnZeCf2xM1VMsdA/L/XRLL+Cusc7zphRksxCeZsz1yjyROoK/uv1OoAX7hXp
-         IH5w==
-X-Forwarded-Encrypted: i=1; AJvYcCX1hMj1siPimgo18w7bldLmuu+W/EyRCwgg++VNIbwjsTk/3e1sDsMVfS6CHJUGmA2NIkCd6fU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxg4gsS9BMzQTayKGjMfmj0U4MBjRZAcUQuz4ns72EzhmBA4IkL
-	zPEQD6ce0q3laV7Dy/xQoJMNQKrZxo0GxjMVqBha9F+C2lF73y+3SPyB/nkNj4ZD0lg47RuXvzl
-	aiW/jVhvpBLUe2Y6NDI4r/WDOVzkZ2IWHIXu9
-X-Gm-Gg: ASbGncvqhbo/H0STRhRc7APB5jZBorCVEeHzL0jV9Jwu5OllwugTXTncv7yVob1M04L
-	E4dps/kCLsTZ9HA5wv7Yj7l0qyNWmLmIsAohT1cJ/t7YmiNXnBdNbmYW+w7H8SNfIvCKH2QXoPn
-	G7U0omJqyVvEfBW88P5huwAIBIJIgaD3zRUYqJtF/nLmTGiyuNWw==
-X-Google-Smtp-Source: AGHT+IEq4zZYwSq4JbP1XWIN3z7LZZH/ze1XMZW0I7CaF9AqWXRX3zQiHPa0jJanCkxNdcG6ojLB9VYf79HdE5YqMJ0=
-X-Received: by 2002:a50:c018:0:b0:5f7:f888:4cb5 with SMTP id
- 4fb4d7f45d1cf-5f918c08662mr174781a12.1.1746195084602; Fri, 02 May 2025
- 07:11:24 -0700 (PDT)
+	s=arc-20240116; t=1746195210; c=relaxed/simple;
+	bh=yx8MFH01X2N39XwTWzq6+ATHZglg/J+RztBenNzgst4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZxGLTplq7Goyczap+QBaT/RBSlM4xNSINPm+87JjpEtqsOnkkjs3pYDQYdzbGIiDyaGuc3vgl10g/FkBDm7yePxy5ev2q3K0iAiCVldy7vMDfWVu2BKGFoDsZiiEAGXZQbQigtWopW+Rt8SiWTaMg4GdiZ5zZK/tYqJBoYj8n0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HEJCUjNA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D86FFC4CEE4;
+	Fri,  2 May 2025 14:13:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746195209;
+	bh=yx8MFH01X2N39XwTWzq6+ATHZglg/J+RztBenNzgst4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HEJCUjNAg/oXF9wvqym9vnorYBbBg6HAk8rKG4heSNpO90IPRIhdrchKRHxuV5Yia
+	 FDObzWatACdFKKIjNTGgziRG8XDnlbX3tTHP5pumonsFOuTe5HXLxvUDbpg8QKr1eU
+	 u1S3Qb29+tkYAE5kDYb7itLzsZNPRnFmJGqErxsK2DkTO6Eeg/pafXwJG1eV2fwAUO
+	 p4jQdZPZrqfAIhQLrsD3cQvilI+D/ngIya0x+i95Ynr2jv646qdUHjywWLzec/8oPk
+	 7znjw5WTNKwzxZBjNxCbspkFRExq+NZ7bz5DVg39YkN7nV/01JHWgffaeRdIuI1Cii
+	 QDzMKHL1LUpDQ==
+Date: Fri, 2 May 2025 07:13:28 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
+ <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>, Richard Cochran
+ <richardcochran@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
+ <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>, Andrew Lunn
+ <andrew@lunn.ch>
+Subject: Re: [net-next v10 4/7] net: mtip: The L2 switch driver for imx287
+Message-ID: <20250502071328.069d0933@kernel.org>
+In-Reply-To: <20250502074447.2153837-5-lukma@denx.de>
+References: <20250502074447.2153837-1-lukma@denx.de>
+	<20250502074447.2153837-5-lukma@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250502-work-coredump-socket-v2-0-43259042ffc7@kernel.org> <20250502-work-coredump-socket-v2-5-43259042ffc7@kernel.org>
-In-Reply-To: <20250502-work-coredump-socket-v2-5-43259042ffc7@kernel.org>
-From: Jann Horn <jannh@google.com>
-Date: Fri, 2 May 2025 16:10:48 +0200
-X-Gm-Features: ATxdqUENxkugyPW7ElgtsxNZpy_Nh_FmjQSxMwJIlzlcl6CVeGfFkE7y7zUJP5s
-Message-ID: <CAG48ez1x09k3neRXqZYtPwgcxN+8a9=HZCtUkok54bRwAk6BSA@mail.gmail.com>
-Subject: Re: [PATCH RFC v2 5/6] pidfs, coredump: add PIDFD_INFO_COREDUMP
-To: Christian Brauner <brauner@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Oleg Nesterov <oleg@redhat.com>, linux-fsdevel@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, David Rheinsberg <david@readahead.eu>, 
-	Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>, 
-	Lennart Poettering <lennart@poettering.net>, Luca Boccassi <bluca@debian.org>, Mike Yuan <me@yhndnzj.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	=?UTF-8?Q?Zbigniew_J=C4=99drzejewski=2DSzmek?= <zbyszek@in.waw.pl>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, May 2, 2025 at 2:43=E2=80=AFPM Christian Brauner <brauner@kernel.or=
-g> wrote:
-> Let userspace know that the task coredumped and whether it was dumped as
-> root or as regular user. The latter is needed so that access permissions
-> to the executable are correctly handled.
->
-> I don't think this requires any additional privileges checks. The
-> missing exposure of the dumpability attribute of a given task is an
-> issue we should fix given that we already expose whether a task is
-> coredumping or not.
+On Fri,  2 May 2025 09:44:44 +0200 Lukasz Majewski wrote:
+> This patch series provides support for More Than IP L2 switch embedded
+> in the imx287 SoC.
+> 
+> This is a two port switch (placed between uDMA[01] and MAC-NET[01]),
+> which can be used for offloading the network traffic.
+> 
+> It can be used interchangeably with current FEC driver - to be more
+> specific: one can use either of it, depending on the requirements.
+> 
+> The biggest difference is the usage of DMA - when FEC is used, separate
+> DMAs are available for each ENET-MAC block.
+> However, with switch enabled - only the DMA0 is used to send/receive data
+> to/form switch (and then switch sends them to respecitive ports).
+> 
+> Signed-off-by: Lukasz Majewski <lukma@denx.de>
+> Reviewed-by: Stefan Wahren <wahrenst@gmx.net>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Yeah, it certainly isn't more sensitive than things like the exit code and =
-UIDs.
+Now that basic build is green the series has advanced to full testing,
+where coccicheck says:
+
+drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c:1961:1-6: WARNING: invalid free of devm_ allocated data
+drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c:1237:16-19: ERROR: bus is NULL but dereferenced.
+-- 
+pw-bot: cr
 
