@@ -1,127 +1,160 @@
-Return-Path: <netdev+bounces-187483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187484-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF03DAA75F8
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 17:27:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E822BAA7605
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 17:29:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C3F847BAC18
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 15:25:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20757462C18
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 15:29:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8825025A640;
-	Fri,  2 May 2025 15:25:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A295E257435;
+	Fri,  2 May 2025 15:29:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="BhD3f6Fv"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="p6NGLdFP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15DA1257AD8
-	for <netdev@vger.kernel.org>; Fri,  2 May 2025 15:25:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A2617A2ED;
+	Fri,  2 May 2025 15:29:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746199536; cv=none; b=HWyKSd2VEKEsJkvntasN6njmGaJJwodV2XqcdIFh709MkJGYl0TmgtL8Uf0Fmhac7vXj20Gx9SHeY+u+BNGuYtbn7TTJZ/vCBOXwpkWF0eJZNkuUAOt2LLeIj7oc9TD50e1x6r7HYnyFA2U2/b5t51wi5EDxT8MbQMyjdqRBjXA=
+	t=1746199779; cv=none; b=WSoTOZhA5nSU2VlY9VYTiqMuEL63y//hKirm0IaL1vL0K+cBQpRjozAr3rqSSzHfMlkqpj+aZM5ao5TLw3i0o3rg+CkEdPQfW5V8llbuK0EkCpQW5MusN1xrszo/y/ad/H4goyEmLlBRegU4Uingvde1gNgA0gHoy2hvNcSorwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746199536; c=relaxed/simple;
-	bh=4vHb/e0Kpp9FikZJirZ0eO3cVqqiZE9ibnExEMgiK+I=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=hRSVUomkxw23D8o/5lMM6lNobDkO+yleSZwCd0jedBwnEvftZToFWQUQ+EPkxtQGH+99KfP2DaJaj4XHS6MjJ2zX+Sm+4zLt/F4EUJq0NC1aAal+xPzcqOs66Uey98VC9vY/S505IZ8l92MK8KjACgoiIDdbNuk53FML9pKbX2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=BhD3f6Fv; arc=none smtp.client-ip=209.85.166.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-85b3f92c8f8so254979639f.1
-        for <netdev@vger.kernel.org>; Fri, 02 May 2025 08:25:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1746199534; x=1746804334; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=swe/trEBPnb/cRsPYQHbOe82io1cAUpgTTADUGLC8hA=;
-        b=BhD3f6FvUFJ3KwquWL40SHIbEOlHR7pCxqQg13q/jTJpAOz5HHuVywqzyHhfeXclGT
-         kLQ/n61+La1t/nLzLXsfb+HN60NpSfaPyITkdbmN0Gxxv2s4r79lVpwlU51Ng7aE/Nen
-         LACX504q419CRtJKzBV3dOOi7siiu/nibQrmbToJICiUpWUdX4KHla3sPiAWmW6bFhkv
-         a7Z8SqE4p8+JgnqoPsywSRdbhgLqWNYCo7ysxH/AOvWeAnrooSkX6Yd0/4Er9TXrzcSv
-         wq/b9hrZ4lUQTtaX0kl9oN+rZM7+t9xscQgnzwGNYcGP1wFKxpOKIjhOFy7u/bM5bWNO
-         tVDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746199534; x=1746804334;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=swe/trEBPnb/cRsPYQHbOe82io1cAUpgTTADUGLC8hA=;
-        b=HmS3tX/sLS5J2V6eSjtl7IKukiOoa26mI/2R/zRnxVoWnkYE/J2iILDQfjP0LubOya
-         eknk1fyhpTRcB15Rg/Kw3NAccge/WlLdTROd707qTLi2mEgxjg5aELbMC+sZLlSORhPq
-         aTKv0ZgqzOBVpoD/BfP8I1v8O2149WMTPKRXxphInE21dto/RhOr1IyB2/dcVoYBy+3j
-         qhY0jn0e2B1w9sp2dafVKSfoWkFrCX2zLrspU18Qx+6Xc6QnOTM+X2UE6Ei7q+akQq4w
-         NbCmp6K6lbt7pZbM5aEAL8wLD/dfyIVZmm0jKPtVz5a0GxIzQh4frklL8JeuFWztLWtb
-         URog==
-X-Forwarded-Encrypted: i=1; AJvYcCWwCSbvZ6gY5Wxmbl9Jsh4bPHHbyHKQ1e/Mhtl7lNZeGChx855SJHZ1+wSolOZ6mS9LZFWO7Lg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxoWT2oeiL0rq2YjD11EoQcqWaqDMaWRAWP0wIruvMASZLjF0Cd
-	4VFIaSgK+d/pM/sK/y7veR/iH45Gck3QtvmQcUddRDP3LA6kNpzBJgefwemqhkumbcN8VoFT7Y+
-	R
-X-Gm-Gg: ASbGncsDRqn0fzdE094HxXuBztI3DvHfoeVssgO3Pc3psRrUXfJojdTHNE/j81RVW/Z
-	pvpSmMgsohkhPcqBpwqs0B0aKglU5oER/d2wCtU010AjJdxn/WR3AEIlUpwUbsTJvDnBsUQrOJT
-	3/qHT2M4scqZibRMiV1YHRjGrPDIoeefNjvOtfJeCnYXRm+tbRoCXyqFCbLN2S9YEcv9Tds2jpd
-	D3KMvh12WUkX3k4i0xD6qusDOOd9IcJP1rhv+NzY1P4HYr0uPkWGBC30htn3cgZB39NMV/5iT8i
-	IpXZCUIp9KSOna/GPNsVIg2oAVDnufaqMAU7mq1IKg==
-X-Google-Smtp-Source: AGHT+IHny6qzFoF4mOzb7RBx7VS6edPHk1SLaBvgePlKlF87WCO8sxdJxrc2DFrFA1MQ2Kk3f5ESWQ==
-X-Received: by 2002:a05:6602:3687:b0:864:a3d0:ddef with SMTP id ca18e2360f4ac-866b343cd04mr445111439f.6.1746199534158;
-        Fri, 02 May 2025 08:25:34 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f88aa8e1f7sm429300173.121.2025.05.02.08.25.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 May 2025 08:25:33 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: io-uring@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>
-Cc: David Wei <dw@davidwei.uk>, netdev@vger.kernel.org, 
- Jamal Hadi Salim <jhs@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
- Victor Nogueira <victor@mojatatu.com>
-In-Reply-To: <cover.1746097431.git.asml.silence@gmail.com>
-References: <cover.1746097431.git.asml.silence@gmail.com>
-Subject: Re: [PATCH io_uring 0/5] Add dmabuf support for io_uring zcrx
-Message-Id: <174619953298.748556.14620839074775551188.b4-ty@kernel.dk>
-Date: Fri, 02 May 2025 09:25:32 -0600
+	s=arc-20240116; t=1746199779; c=relaxed/simple;
+	bh=+k/prdyt7XpxkLmp3ByAG2eKIeUdBVBeyW2YyID4bTQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F9JBBzSMxPtAHXxiRHTv3PaWyFULhJzJgQtlOL3RCKoJPRCjVUats73QKWxw7AdxwJYq+2OSiMqkSDPELiJjbs4OJUfVnxeUnvjW7TD40J4gsX1v3Lyh1NHVkfgnPh13EcI/jWisC9DZthHjDUqLWRZmvchq670Ba1OkIxCocjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=p6NGLdFP; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=UfHSthQhcUGUYPAqAokpW8M9XQiGqY8eZUIZb5WDYjI=; b=p6NGLdFPU5vD+ggKs/3gbgFczg
+	ARE+G6P1/RTbibIEYqrFuAo2kpWtO3AAaAJNjJ5B5RdEDv0EwyDiu4Lgtl7i/XKAYdMl0kmdedgNo
+	kIYuOx7CSgcrd0+WnS59vnplpO2Pg+zBkuc+wxx64SDmqpe4HvgRoxcqEBZZ8ZVwozG0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uAsKH-00BQnu-1r; Fri, 02 May 2025 17:29:21 +0200
+Date: Fri, 2 May 2025 17:29:21 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, bpf@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jon Hunter <jonathanh@nvidia.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Thierry Reding <treding@nvidia.com>
+Subject: Re: [PATCH net-next v2 2/4] net: stmmac: call phylink_carrier_*() in
+ XDP functions
+Message-ID: <ed54d4e5-ecc3-4327-8739-3d41ca41211e@lunn.ch>
+References: <aBTKOBKnhoz3rrlQ@shell.armlinux.org.uk>
+ <E1uAqYC-002D3p-UO@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3-dev-7b9b9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1uAqYC-002D3p-UO@rmk-PC.armlinux.org.uk>
 
-
-On Thu, 01 May 2025 13:17:13 +0100, Pavel Begunkov wrote:
-> Currently, io_uring zcrx uses regular user pages to populate the
-> area for page pools, this series allows the user to pass a dmabuf
-> instead.
+On Fri, May 02, 2025 at 02:35:36PM +0100, Russell King (Oracle) wrote:
+> Phylink does not permit drivers to mess with the netif carrier, as
+> this will de-synchronise phylink with the MAC driver. Moreover,
+> setting and clearing the TE and RE bits via stmmac_mac_set() in this
+> path is also wrong as the link may not be up.
 > 
-> Patches 1-4 are preparatory and do code shuffling. All dmabuf
-> touching changes are in the last patch. A basic example can be
-> found at:
+> Replace the netif_carrier_on(), netif_carrier_off() and
+> stmmac_mac_set() calls with the appropriate phylink_carrier_block() and
+> phylink_carrier_unblock() calls, thereby allowing phylink to manage the
+> netif carrier and TE/RE bits through the .mac_link_up() and
+> .mac_link_down() methods.
 > 
-> [...]
+> This change will have the side effect of printing link messages to
+> the kernel log, even though the physical link hasn't changed state.
+> This matches the carrier state that userspace sees, which has always
+> "bounced".
+> 
+> Note that RE should only be set after the DMA is ready to avoid the
+> receive FIFO between the MAC and DMA blocks overflowing, so
+> phylink_start() needs to be placed after DMA has been started.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 20 +++++++++++--------
+>  1 file changed, 12 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index f59a2363f150..ac27ea679b23 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -6922,6 +6922,11 @@ void stmmac_xdp_release(struct net_device *dev)
+>  	/* Ensure tx function is not running */
+>  	netif_tx_disable(dev);
+>  
+> +	/* Take down the software link. stmmac_xdp_open() must be called after
+> +	 * this function to release this block.
+> +	 */
+> +	phylink_carrier_block(priv->phylink);
+> +
+>  	/* Disable NAPI process */
+>  	stmmac_disable_all_queues(priv);
+>  
+> @@ -6937,14 +6942,10 @@ void stmmac_xdp_release(struct net_device *dev)
+>  	/* Release and free the Rx/Tx resources */
+>  	free_dma_desc_resources(priv, &priv->dma_conf);
+>  
+> -	/* Disable the MAC Rx/Tx */
+> -	stmmac_mac_set(priv, priv->ioaddr, false);
+> -
+>  	/* set trans_start so we don't get spurious
+>  	 * watchdogs during reset
+>  	 */
+>  	netif_trans_update(dev);
+> -	netif_carrier_off(dev);
+>  }
+>  
 
-Applied, thanks!
+>  int stmmac_xdp_open(struct net_device *dev)
+> @@ -7026,25 +7027,28 @@ int stmmac_xdp_open(struct net_device *dev)
+>  		hrtimer_setup(&tx_q->txtimer, stmmac_tx_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
+>  	}
+>  
+> -	/* Enable the MAC Rx/Tx */
+> -	stmmac_mac_set(priv, priv->ioaddr, true);
+> -
+>  	/* Start Rx & Tx DMA Channels */
+>  	stmmac_start_all_dma(priv);
+>  
+> +	/* Allow phylink to bring the software link back up.
+> +	 * stmmac_xdp_release() must have been called prior to this.
+> +	 */
 
-[1/5] io_uring/zcrx: improve area validation
-      commit: d760d3f59f0d8d0df2895db30d36cf23106d6b05
-[2/5] io_uring/zcrx: resolve netdev before area creation
-      commit: 6c9589aa08471f8984cdb5e743d2a2c048dc2403
-[3/5] io_uring/zcrx: split out memory holders from area
-      commit: 782dfa329ac9d1b5ca7b6df56a7696bac58cb829
-[4/5] io_uring/zcrx: split common area map/unmap parts
-      commit: 8a62804248fff77749048a0f5511649b2569bba9
-[5/5] io_uring/zcrx: dmabuf backed zerocopy receive
-      commit: a42c735833315bbe7a54243ef5453b9a7fa0c248
+This is counter intuitive. Why is release called before open?
 
-Best regards,
--- 
-Jens Axboe
+Looking into stmmac_xdp_set_prog() i think i get it. Even if there is
+not a running XDP prog, stmmac_xdp_release() is called, and then
+stmmac_xdp_open().
 
+Maybe these two functions need better names? prepare and commit?
 
-
+      Andrew
 
