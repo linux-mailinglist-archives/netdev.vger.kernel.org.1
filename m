@@ -1,341 +1,202 @@
-Return-Path: <netdev+bounces-187442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 919B0AA7313
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 15:14:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BFAEAA735D
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 15:23:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B5A057ACAA7
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 13:12:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFE501C0014A
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 13:22:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24F802550C4;
-	Fri,  2 May 2025 13:13:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE45125522E;
+	Fri,  2 May 2025 13:21:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PUfTHgWM"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="jwOsbvMa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A61F1252905;
-	Fri,  2 May 2025 13:13:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 129AB242D82;
+	Fri,  2 May 2025 13:21:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746191606; cv=none; b=Pj8IBZ2ACDsCyH256PsyfsEm22wb/6kKnEDLyZK1iroRNu9B00FPwTS0ZqtvR+IHfiDwyXSX/7T340iNMJ7kpZ+wL1caLe3ATZefoNzoD/wYPrzed64j7yBSkZcunFxMbIiaintv7uKmcF+zPyutqmONhaiSmAciy+t1btcsgxY=
+	t=1746192095; cv=none; b=uPm+dnnbXX2pJnBJQAoW2p9SmvoU9U4QYWs0OYQvojrJwQjLxpE6pog8xFN6VnUEx0l6idIu88tOSqGpQ1ez46SD9rE6QO59AqRJia6N0XqMiqCYKLV7JbdjByQfgY3o19Zot6pVgiyOD2eyjmQgrskqWCrzEODUQX4/sY4m7OE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746191606; c=relaxed/simple;
-	bh=8rjzfX3W2W2Ua3bnqMyXei5mk/ntSXdZx8V9rkAjM0A=;
-	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=YXP6+qcX6mFz3b1EMJv4q2HdX0WzcXZTovEFDhoCxDelcAPGqaf/GFwSOi2VIePBcVTnTn2myUTTl8MF5DYmb+s1kE8suMI9mQtN7pGGtl5ZgorZVcYi9WEUF/cHIIGORagOjqm9Fd1eHTj2BlVItPzIcDY7CMs94hg+Kek57Cg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PUfTHgWM; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746191604; x=1777727604;
-  h=from:date:to:cc:subject:in-reply-to:message-id:
-   references:mime-version:content-id;
-  bh=8rjzfX3W2W2Ua3bnqMyXei5mk/ntSXdZx8V9rkAjM0A=;
-  b=PUfTHgWMvFJxTxND5TgwBvNsgJId94eVBVfY440xMak13A4AWz2tAXMD
-   Tao5LLz6glxthe48jZDAji454nEQ7pCS0yaWIRtt58SJAPgIb8CALdIzn
-   XjXoRZMkps0dcuyhpJu5ErZ/E3FMm724c1VeqkvyhLDVla9PiJNPNQ+hb
-   UI2miYeVyfl8xb9sD5fQDWVHBUH7OlS2t6VwkIU4+iQP76IHZjN0OWL7D
-   k2GhxH/HW2A29ksO0xD7OsaxXM/E0fegq45MRQzdcYeFZs+un+N0qk1rp
-   Yr6I/ELrKocmRKRB/psq9q++qBO2KKjoqZHjZWXykBb5aSUxgu2PFj0aa
-   w==;
-X-CSE-ConnectionGUID: 3nKXHhdgS9Wu9QsbB212VA==
-X-CSE-MsgGUID: 8DsjZxQjR+S24+L33e3JJA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11421"; a="59233288"
-X-IronPort-AV: E=Sophos;i="6.15,256,1739865600"; 
-   d="scan'208";a="59233288"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 May 2025 06:13:23 -0700
-X-CSE-ConnectionGUID: uqJeJQZ9QjyJ9pDg+lbEpA==
-X-CSE-MsgGUID: eaKgRDz1TzO6Du8usPzXEw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,256,1739865600"; 
-   d="scan'208";a="135599266"
-Received: from ijarvine-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.244.135])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 May 2025 06:13:07 -0700
-From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Date: Fri, 2 May 2025 16:13:03 +0300 (EEST)
-To: "Xin Li (Intel)" <xin@zytor.com>, mingo@redhat.com
-cc: LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org, 
-    linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-    virtualization@lists.linux.dev, linux-pm@vger.kernel.org, 
-    linux-edac@vger.kernel.org, xen-devel@lists.xenproject.org, 
-    linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-    Netdev <netdev@vger.kernel.org>, platform-driver-x86@vger.kernel.org, 
-    tglx@linutronix.de, bp@alien8.de, dave.hansen@linux.intel.com, 
-    x86@kernel.org, hpa@zytor.com, acme@kernel.org, jgross@suse.com, 
-    andrew.cooper3@citrix.com, peterz@infradead.org, namhyung@kernel.org, 
-    mark.rutland@arm.com, alexander.shishkin@linux.intel.com, jolsa@kernel.org, 
-    irogers@google.com, adrian.hunter@intel.com, kan.liang@linux.intel.com, 
-    wei.liu@kernel.org, ajay.kaher@broadcom.com, 
-    bcm-kernel-feedback-list@broadcom.com, tony.luck@intel.com, 
-    pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com, 
-    luto@kernel.org, boris.ostrovsky@oracle.com, kys@microsoft.com, 
-    haiyangz@microsoft.com, decui@microsoft.com, dapeng1.mi@linux.intel.com
-Subject: Re: [PATCH v4A 01/15] x86/msr: Add missing includes of <asm/msr.h>
-In-Reply-To: <20250501054241.1245648-1-xin@zytor.com>
-Message-ID: <a34d7955-aa31-7bef-52cf-65dc4bb7a5c1@linux.intel.com>
-References: <a1917b37-e41e-d303-749b-4007cda01605@linux.intel.com> <20250501054241.1245648-1-xin@zytor.com>
+	s=arc-20240116; t=1746192095; c=relaxed/simple;
+	bh=rIAlmlwMtQaUgow1iGT0jE1zo6pYUXceWlqRKjuOQxc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ltm75U9OENk77X5+RiRQiPS5TYKA2XxtgMoH6rw0CIZX84qmVQvY3Of4tTbnVDUhZ0MV345a1UnsYSpza/39/q7dwL7lYpb3IV7IbjM9eplZjlK8USW7OOMwAbSFfvz6UlI9Jt0hZhe5pwSF/z8Lp0hc2jbiwFvMnOgmMP4I2mE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=jwOsbvMa; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5428rEtc026238;
+	Fri, 2 May 2025 06:20:51 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=2+wqQXMClAVhXAV0is5Y088
+	yZ6Z5k3S6DIxIe4xuZyg=; b=jwOsbvMa+ohV7liVQjtFOIkxlLgBGgq5VD6fOJB
+	58EAri/83tLKCYdDsWANmYXWmyjraw8h0difekZhpVF/fwod+B4ApPqikJpUQqej
+	YQ+6Vq+aSCFapg9WcCu2fUfGVt7GlTjOQlOu/2zHL1ewcsZxyYR1FARiseMx8iqi
+	d1midvaGa4eA0CcTAVhS9ipHeyiV+OQZZAKSlRk3doXKkZb6VPLlW2/M3C2gpRUI
+	hnxfcnMv5hzwuCcEcrqaxaGQPdtpnJtOxtw7+lOaCcPsUfvS8mALsdHxDSQaamcP
+	IHHekPYrLTbmj6+Z5XN/4BNrT2TWMfftr60f64CF/6GPK9g==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 46cjpb97tu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 02 May 2025 06:20:51 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Fri, 2 May 2025 06:20:50 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Fri, 2 May 2025 06:20:50 -0700
+Received: from optiplex.marvell.com (unknown [10.28.34.253])
+	by maili.marvell.com (Postfix) with ESMTP id 908765B6921;
+	Fri,  2 May 2025 06:20:38 -0700 (PDT)
+From: Tanmay Jagdale <tanmay@marvell.com>
+To: <bbrezillon@kernel.org>, <arno@natisbad.org>, <schalla@marvell.com>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <sgoutham@marvell.com>, <lcherian@marvell.com>, <gakula@marvell.com>,
+        <jerinj@marvell.com>, <hkelam@marvell.com>, <sbhatta@marvell.com>,
+        <andrew+netdev@lunn.ch>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <bbhushan2@marvell.com>, <bhelgaas@google.com>,
+        <pstanner@redhat.com>, <gregkh@linuxfoundation.org>,
+        <peterz@infradead.org>, <linux@treblig.org>,
+        <krzysztof.kozlowski@linaro.org>, <giovanni.cabiddu@intel.com>
+CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <rkannoth@marvell.com>, <sumang@marvell.com>,
+        <gcherian@marvell.com>, Tanmay Jagdale <tanmay@marvell.com>
+Subject: [net-next PATCH v1 00/15] Enable Inbound IPsec offload on Marvell CN10K SoC
+Date: Fri, 2 May 2025 18:49:41 +0530
+Message-ID: <20250502132005.611698-1-tanmay@marvell.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; BOUNDARY="8323328-2124274657-1746191047=:958"
-Content-ID: <69d4ead6-fa09-8594-add2-0d027d3e7e6c@linux.intel.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: gnSXQwkE1vHbwsI35uWgU8hgqyEOk8wn
+X-Proofpoint-ORIG-GUID: gnSXQwkE1vHbwsI35uWgU8hgqyEOk8wn
+X-Authority-Analysis: v=2.4 cv=Tu/mhCXh c=1 sm=1 tr=0 ts=6814c6b3 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=dt9VzEwgFbYA:10 a=JobPnVYPRzK78MvRnRwA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTAyMDEwNiBTYWx0ZWRfX6bprN3aCERIj 54lRHMrkhAyALYu5vKvQrSiwwmbNd0ySOL46nTi910ZJv6WiDwjMFb0h0D2YP8h56zYMZnrL2vp fgDacnhk23P3/H9S20TdkuqkW3Non9g2+XRh++coKmaLlzXpsmnoH7cJNV1Ztfr9ssclbCFCkS4
+ bOoKpW2PtOrdNGrIc2WHJEvZLKp7m+z1scFTs9zGsgerPl9jr99/FVWptdn0VWmbTJD77ZUH1Rr futKXOqFBNfhw2IICkxoKjmBvDK9bGPsIhMtNX5SitG1eohv7WCK5VrexrjsfELATi1dPhTHJfv QyFGiEqntwozLd/ItLLg4aKCfi07FiWXd9O60DaI8TrCA5zlzxWWxY8ZSJEKHOQYrdstMkEnPJu
+ aIg9NgHquDA6larr6j3zfdrXx+OowAr/NRCnFmzgGhnvTXaSOAsLVzuNxy3lFH1miz9R7v9N
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-02_01,2025-04-30_01,2025-02-21_01
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+This patch series adds support for inbound inline IPsec flows for the
+Marvell CN10K SoC.
 
---8323328-2124274657-1746191047=:958
-Content-Type: text/plain; CHARSET=ISO-8859-15
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Content-ID: <914dd26d-9889-125a-917d-3b9acfbc7938@linux.intel.com>
+The packet flow
+---------------
+An encrypted IPSec packet goes through two passes in the RVU hardware
+before reaching the CPU.
+First Pass:
+  The first pass involves identifying the packet as IPSec, assigning an RQ,
+  allocating a buffer from the Aura pool and then send it to CPT for decryption.
 
-On Wed, 30 Apr 2025, Xin Li (Intel) wrote:
+Second Pass:
+  After CPT decrypts the packet, it sends a metapacket to NIXRX via the X2P
+  bus. The metapacket contains CPT_PARSE_HDR_S structure and some initial
+  bytes of the decrypted packet which would help NIXRX in classification.
+  CPT also sets BIT(11) of channel number to further help in identifcation.
+  NIXRX allocates a new buffer for this packet and submits it to the CPU.
 
-> For some reason, there are some TSC-related functions in the MSR
-> header even though there is a tsc.h header.
->=20
-> To facilitate the relocation of rdtsc{,_ordered}() from <asm/msr.h>
-> to <asm/tsc.h> and to eventually eliminate the inclusion of
-> <asm/msr.h> in <asm/tsc.h>, add <asm/msr.h> to the source files that
-> reference definitions from <asm/msr.h>.
->=20
-> Signed-off-by: Xin Li (Intel) <xin@zytor.com>
-> Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
-> Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-> Acked-by: Ilpo J=E4rvinen <ilpo.jarvinen@linux.intel.com>
-> ---
->=20
-> Change in v4A:
-> *) Use "git grep -l -e $PATTERN | grep -v -f <(git grep -l -e 'asm/msr\.h=
-')"
->    to ensure ALL required *direct* inclusion of <asm/msr.h> (Ilpo J=E4rvi=
-nen).
->=20
-> Change in v4:
-> *) Add missing includes in a different patch (Ilpo J=E4rvinen).
-> *) Add all necessary direct inclusions for msr.h (Ilpo J=E4rvinen).
->=20
-> Change in v3:
-> * Add a problem statement to the changelog (Dave Hansen).
-> ---
->  arch/x86/coco/sev/core.c                                    | 1 +
->  arch/x86/events/amd/core.c                                  | 1 +
->  arch/x86/events/amd/ibs.c                                   | 1 +
->  arch/x86/events/amd/iommu.c                                 | 2 ++
->  arch/x86/events/amd/lbr.c                                   | 1 +
->  arch/x86/events/amd/power.c                                 | 1 +
->  arch/x86/events/core.c                                      | 1 +
->  arch/x86/events/intel/bts.c                                 | 1 +
->  arch/x86/events/intel/core.c                                | 1 +
->  arch/x86/events/intel/cstate.c                              | 1 +
->  arch/x86/events/intel/ds.c                                  | 1 +
->  arch/x86/events/intel/knc.c                                 | 1 +
->  arch/x86/events/intel/p4.c                                  | 1 +
->  arch/x86/events/intel/p6.c                                  | 1 +
->  arch/x86/events/intel/pt.c                                  | 1 +
->  arch/x86/events/intel/uncore.c                              | 1 +
->  arch/x86/events/intel/uncore_discovery.c                    | 1 +
->  arch/x86/events/intel/uncore_nhmex.c                        | 1 +
->  arch/x86/events/intel/uncore_snb.c                          | 1 +
->  arch/x86/events/intel/uncore_snbep.c                        | 1 +
->  arch/x86/events/msr.c                                       | 2 ++
->  arch/x86/events/perf_event.h                                | 1 +
->  arch/x86/events/probe.c                                     | 2 ++
->  arch/x86/events/rapl.c                                      | 1 +
->  arch/x86/events/utils.c                                     | 1 +
->  arch/x86/events/zhaoxin/core.c                              | 1 +
->  arch/x86/hyperv/hv_apic.c                                   | 1 +
->  arch/x86/hyperv/hv_init.c                                   | 1 +
->  arch/x86/hyperv/hv_spinlock.c                               | 1 +
->  arch/x86/hyperv/hv_vtl.c                                    | 1 +
->  arch/x86/hyperv/ivm.c                                       | 1 +
->  arch/x86/include/asm/fred.h                                 | 1 +
->  arch/x86/include/asm/kvm_host.h                             | 1 +
->  arch/x86/include/asm/microcode.h                            | 2 ++
->  arch/x86/include/asm/mshyperv.h                             | 1 +
->  arch/x86/include/asm/msr.h                                  | 1 +
->  arch/x86/include/asm/resctrl.h                              | 2 ++
->  arch/x86/include/asm/suspend_32.h                           | 1 +
->  arch/x86/include/asm/suspend_64.h                           | 1 +
->  arch/x86/include/asm/switch_to.h                            | 2 ++
->  arch/x86/kernel/acpi/sleep.c                                | 1 +
->  arch/x86/kernel/amd_nb.c                                    | 1 +
->  arch/x86/kernel/apic/apic.c                                 | 1 +
->  arch/x86/kernel/apic/apic_numachip.c                        | 1 +
->  arch/x86/kernel/cet.c                                       | 1 +
->  arch/x86/kernel/cpu/amd.c                                   | 1 +
->  arch/x86/kernel/cpu/aperfmperf.c                            | 1 +
->  arch/x86/kernel/cpu/bus_lock.c                              | 1 +
->  arch/x86/kernel/cpu/feat_ctl.c                              | 1 +
->  arch/x86/kernel/cpu/hygon.c                                 | 1 +
->  arch/x86/kernel/cpu/mce/inject.c                            | 1 +
->  arch/x86/kernel/cpu/microcode/core.c                        | 1 +
->  arch/x86/kernel/cpu/mshyperv.c                              | 1 +
->  arch/x86/kernel/cpu/resctrl/core.c                          | 1 +
->  arch/x86/kernel/cpu/resctrl/monitor.c                       | 1 +
->  arch/x86/kernel/cpu/resctrl/pseudo_lock.c                   | 1 +
->  arch/x86/kernel/cpu/resctrl/rdtgroup.c                      | 1 +
->  arch/x86/kernel/cpu/sgx/main.c                              | 1 +
->  arch/x86/kernel/cpu/topology.c                              | 1 +
->  arch/x86/kernel/cpu/topology_amd.c                          | 1 +
->  arch/x86/kernel/cpu/tsx.c                                   | 1 +
->  arch/x86/kernel/cpu/zhaoxin.c                               | 1 +
->  arch/x86/kernel/fpu/core.c                                  | 1 +
->  arch/x86/kernel/fpu/xstate.c                                | 1 +
->  arch/x86/kernel/fpu/xstate.h                                | 1 +
->  arch/x86/kernel/fred.c                                      | 1 +
->  arch/x86/kernel/hpet.c                                      | 1 +
->  arch/x86/kernel/kvm.c                                       | 1 +
->  arch/x86/kernel/paravirt.c                                  | 1 +
->  arch/x86/kernel/process.c                                   | 1 +
->  arch/x86/kernel/process_64.c                                | 1 +
->  arch/x86/kernel/trace_clock.c                               | 2 +-
->  arch/x86/kernel/traps.c                                     | 1 +
->  arch/x86/kernel/tsc.c                                       | 1 +
->  arch/x86/kernel/tsc_sync.c                                  | 1 +
->  arch/x86/kvm/svm/avic.c                                     | 1 +
->  arch/x86/kvm/svm/sev.c                                      | 1 +
->  arch/x86/kvm/svm/svm.c                                      | 1 +
->  arch/x86/kvm/vmx/nested.c                                   | 1 +
->  arch/x86/kvm/vmx/pmu_intel.c                                | 1 +
->  arch/x86/kvm/vmx/sgx.c                                      | 1 +
->  arch/x86/kvm/vmx/vmx.c                                      | 1 +
->  arch/x86/lib/insn-eval.c                                    | 1 +
->  arch/x86/lib/kaslr.c                                        | 2 +-
->  arch/x86/mm/mem_encrypt_identity.c                          | 1 +
->  arch/x86/mm/tlb.c                                           | 1 +
->  arch/x86/pci/amd_bus.c                                      | 1 +
->  arch/x86/pci/mmconfig-shared.c                              | 3 ++-
->  arch/x86/power/cpu.c                                        | 1 +
->  arch/x86/realmode/init.c                                    | 1 +
->  arch/x86/virt/svm/sev.c                                     | 1 +
->  arch/x86/xen/enlighten_pv.c                                 | 1 +
->  arch/x86/xen/pmu.c                                          | 1 +
->  arch/x86/xen/suspend.c                                      | 1 +
->  drivers/accel/habanalabs/common/habanalabs_ioctl.c          | 2 --
->  drivers/acpi/acpi_extlog.c                                  | 1 +
->  drivers/acpi/processor_perflib.c                            | 1 +
->  drivers/acpi/processor_throttling.c                         | 6 +++++-
->  drivers/char/agp/nvidia-agp.c                               | 1 +
->  drivers/cpufreq/amd-pstate-ut.c                             | 2 ++
->  drivers/cpufreq/elanfreq.c                                  | 1 -
->  drivers/cpufreq/sc520_freq.c                                | 1 -
->  drivers/crypto/ccp/sev-dev.c                                | 1 +
->  drivers/edac/amd64_edac.c                                   | 1 +
->  drivers/edac/ie31200_edac.c                                 | 1 +
->  drivers/edac/mce_amd.c                                      | 1 +
->  drivers/hwmon/hwmon-vid.c                                   | 4 ++++
->  drivers/idle/intel_idle.c                                   | 1 +
->  drivers/misc/cs5535-mfgpt.c                                 | 1 +
->  drivers/net/vmxnet3/vmxnet3_drv.c                           | 4 ++++
->  drivers/platform/x86/intel/ifs/core.c                       | 1 +
->  drivers/platform/x86/intel/ifs/load.c                       | 1 +
->  drivers/platform/x86/intel/ifs/runtest.c                    | 1 +
->  drivers/platform/x86/intel/pmc/cnp.c                        | 1 +
->  drivers/platform/x86/intel/speed_select_if/isst_if_common.c | 1 +
->  .../platform/x86/intel/speed_select_if/isst_if_mbox_msr.c   | 1 +
->  drivers/platform/x86/intel/speed_select_if/isst_tpmi_core.c | 1 +
->  drivers/platform/x86/intel/turbo_max_3.c                    | 1 +
->  .../platform/x86/intel/uncore-frequency/uncore-frequency.c  | 1 +
->  drivers/powercap/intel_rapl_common.c                        | 1 +
->  drivers/powercap/intel_rapl_msr.c                           | 1 +
->  .../intel/int340x_thermal/processor_thermal_device.c        | 1 +
->  drivers/thermal/intel/intel_tcc_cooling.c                   | 1 +
->  drivers/thermal/intel/x86_pkg_temp_thermal.c                | 1 +
->  drivers/video/fbdev/geode/display_gx.c                      | 1 +
->  drivers/video/fbdev/geode/gxfb_core.c                       | 1 +
->  drivers/video/fbdev/geode/lxfb_ops.c                        | 1 +
->  127 files changed, 142 insertions(+), 8 deletions(-)
->=20
-
-> diff --git a/arch/x86/kernel/trace_clock.c b/arch/x86/kernel/trace_clock.=
-c
-> index b8e7abe00b06..708d61743d15 100644
-> --- a/arch/x86/kernel/trace_clock.c
-> +++ b/arch/x86/kernel/trace_clock.c
-> @@ -4,7 +4,7 @@
->   */
->  #include <asm/trace_clock.h>
->  #include <asm/barrier.h>
-> -#include <asm/msr.h>
-> +#include <asm/tsc.h>
-
-Does this change belong to this patch?
-
-It might even cause a build failure until the second patch which moves=20
-the tsc related things to the other file (unless there's indirect include=
-=20
-path to asm/msr.h).
-
-> diff --git a/arch/x86/lib/kaslr.c b/arch/x86/lib/kaslr.c
-> index a58f451a7dd3..b5893928d55c 100644
-> --- a/arch/x86/lib/kaslr.c
-> +++ b/arch/x86/lib/kaslr.c
-> @@ -8,7 +8,7 @@
->   */
->  #include <asm/asm.h>
->  #include <asm/kaslr.h>
-> -#include <asm/msr.h>
-> +#include <asm/tsc.h>
-
-Same thing here.
-
->  #include <asm/archrandom.h>
->  #include <asm/e820/api.h>
->  #include <asm/shared/io.h>
-
-> diff --git a/drivers/accel/habanalabs/common/habanalabs_ioctl.c b/drivers=
-/accel/habanalabs/common/habanalabs_ioctl.c
-> index 8729a0c57d78..dc80ca921d90 100644
-> --- a/drivers/accel/habanalabs/common/habanalabs_ioctl.c
-> +++ b/drivers/accel/habanalabs/common/habanalabs_ioctl.c
-> @@ -17,8 +17,6 @@
->  #include <linux/uaccess.h>
->  #include <linux/vmalloc.h>
-> =20
-> -#include <asm/msr.h>
-> -
-
-I suggested making a separate patch out of these removals. Currently you=20
-do them without any clear warning in the changelog which only talks about=
-=20
-adding asm/msr.h.
-
-> diff --git a/drivers/acpi/processor_throttling.c b/drivers/acpi/processor=
-_throttling.c
-> index 00d045e5f524..ecd7fe256153 100644
-> --- a/drivers/acpi/processor_throttling.c
-> +++ b/drivers/acpi/processor_throttling.c
-> @@ -18,9 +18,13 @@
->  #include <linux/sched.h>
->  #include <linux/cpufreq.h>
->  #include <linux/acpi.h>
-> +#include <linux/uaccess.h>
->  #include <acpi/processor.h>
->  #include <asm/io.h>
-> -#include <linux/uaccess.h>
-> +#include <asm/asm.h>
-
-???
-
-> +#ifdef CONFIG_X86
-> +#include <asm/msr.h>
-> +#endif
+Once the decrypted metapacket packet is delivered to the CPU, get the WQE
+pointer from CPT_PARSE_HDR_S in the packet buffer. This WQE points to the
+complete decrypted packet. We create an skb using this, set the relevant
+XFRM packet mode flags to indicate successful decryption, and submit it
+to the network stack.
 
 
-I really appreciate you took the effort to do this change the correct
-way! :-)
+Patches are grouped as follows:
+-------------------------------
+1) CPT LF movement from crypto driver to RVU AF
+    0001-crypto-octeontx2-Share-engine-group-info-with-AF-dri.patch
+    0002-octeontx2-af-Configure-crypto-hardware-for-inline-ip.patch
+    0003-octeontx2-af-Setup-Large-Memory-Transaction-for-cryp.patch
+    0004-octeontx2-af-Handle-inbound-inline-ipsec-config-in-A.patch
+    0005-crypto-octeontx2-Remove-inbound-inline-ipsec-config.patch
 
---
- i.
---8323328-2124274657-1746191047=:958--
+2) RVU AF Mailbox changes for CPT 2nd pass RQ mask, SPI-to-SA table,
+   NIX-CPT BPID configuration
+    0006-octeontx2-af-Add-support-for-CPT-second-pass.patch
+    0007-octeontx2-af-Add-support-for-SPI-to-SA-index-transla.patch
+    0008-octeontx2-af-Add-mbox-to-alloc-free-BPIDs.patch
+
+3) Inbound Inline IPsec support patches
+    0009-octeontx2-pf-ipsec-Allocate-Ingress-SA-table.patch
+    0010-octeontx2-pf-ipsec-Setup-NIX-HW-resources-for-inboun.patch
+    0011-octeontx2-pf-ipsec-Handle-NPA-threshhold-interrupt.patch
+    0012-octeontx2-pf-ipsec-Initialize-ingress-IPsec.patch
+    0013-octeontx2-pf-ipsec-Manage-NPC-rules-and-SPI-to-SA-ta.patch
+    0014-octeontx2-pf-ipsec-Process-CPT-metapackets.patch
+    0015-octeontx2-pf-ipsec-Add-XFRM-state-and-policy-hooks-f.patch
+
+
+Bharat Bhushan (5):
+  crypto: octeontx2: Share engine group info with AF driver
+  octeontx2-af: Configure crypto hardware for inline ipsec
+  octeontx2-af: Setup Large Memory Transaction for crypto
+  octeontx2-af: Handle inbound inline ipsec config in AF
+  crypto: octeontx2: Remove inbound inline ipsec config
+
+Geetha sowjanya (1):
+  octeontx2-af: Add mbox to alloc/free BPIDs
+
+Kiran Kumar K (1):
+  octeontx2-af: Add support for SPI to SA index translation
+
+Rakesh Kudurumalla (1):
+  octeontx2-af: Add support for CPT second pass
+
+Tanmay Jagdale (7):
+  octeontx2-pf: ipsec: Allocate Ingress SA table
+  octeontx2-pf: ipsec: Setup NIX HW resources for inbound flows
+  octeontx2-pf: ipsec: Handle NPA threshold interrupt
+  octeontx2-pf: ipsec: Initialize ingress IPsec
+  octeontx2-pf: ipsec: Manage NPC rules and SPI-to-SA table entries
+  octeontx2-pf: ipsec: Process CPT metapackets
+  octeontx2-pf: ipsec: Add XFRM state and policy hooks for inbound flows
+
+ .../marvell/octeontx2/otx2_cpt_common.h       |    8 -
+ drivers/crypto/marvell/octeontx2/otx2_cptpf.h |   10 -
+ .../marvell/octeontx2/otx2_cptpf_main.c       |   50 +-
+ .../marvell/octeontx2/otx2_cptpf_mbox.c       |  286 +---
+ .../marvell/octeontx2/otx2_cptpf_ucode.c      |  116 +-
+ .../marvell/octeontx2/otx2_cptpf_ucode.h      |    3 +-
+ .../ethernet/marvell/octeontx2/af/Makefile    |    2 +-
+ .../ethernet/marvell/octeontx2/af/common.h    |    1 +
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |  119 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu.c   |    9 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |   71 +
+ .../ethernet/marvell/octeontx2/af/rvu_cn10k.c |   11 +
+ .../ethernet/marvell/octeontx2/af/rvu_cpt.c   |  706 +++++++++-
+ .../ethernet/marvell/octeontx2/af/rvu_cpt.h   |   71 +
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  230 +++-
+ .../marvell/octeontx2/af/rvu_nix_spi.c        |  220 +++
+ .../ethernet/marvell/octeontx2/af/rvu_reg.h   |   16 +
+ .../marvell/octeontx2/af/rvu_struct.h         |    4 +-
+ .../marvell/octeontx2/nic/cn10k_ipsec.c       | 1191 ++++++++++++++++-
+ .../marvell/octeontx2/nic/cn10k_ipsec.h       |  152 +++
+ .../marvell/octeontx2/nic/otx2_common.c       |   23 +-
+ .../marvell/octeontx2/nic/otx2_common.h       |   16 +
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   17 +
+ .../marvell/octeontx2/nic/otx2_struct.h       |   16 +
+ .../marvell/octeontx2/nic/otx2_txrx.c         |   25 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |    4 +
+ 26 files changed, 2915 insertions(+), 462 deletions(-)
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_nix_spi.c
+
+-- 
+2.43.0
+
 
