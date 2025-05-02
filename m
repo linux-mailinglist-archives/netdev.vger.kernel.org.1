@@ -1,106 +1,129 @@
-Return-Path: <netdev+bounces-187523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3FCFAA7A9B
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 22:11:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55932AA7AB6
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 22:16:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F6E646601B
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 20:11:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D211F1C05E28
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 20:16:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 257281F5852;
-	Fri,  2 May 2025 20:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7F8A1F8AC8;
+	Fri,  2 May 2025 20:16:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HfGK8+5K"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WIQrkyd/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED5B21DE4E7;
-	Fri,  2 May 2025 20:11:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA0C1E5018;
+	Fri,  2 May 2025 20:16:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746216690; cv=none; b=M4p6XWkwf6uK8DrJINmgm5xu57QBkpgZrs7jORQ22iO1je9CKfp4EvIyhUGea3E4s8Tcbr4GiPY0HcobJyphJJDCL1kN1GUpJUQQnzgdyOHdhkh/4f5lqb7vguXlE4/tvJEUxeIuS4QSmwB6hQazMMKmssZ06xY6opDsU92AiUY=
+	t=1746216987; cv=none; b=hOE2VG9ryOxVQZiyOIZB10VivGBAGSlrJBTI42yLFBTpkHjB1gJklCv1D8c/iUsv5FGYQcBXmlvtet9h/5coA4j9uJKA1lawnvQSf446XfCxDPV+x2gX/Zz9ARSkfQsoPwWC2uXaF/nYDqWZL3GsyGexpbgGMnbE9Pb+GZGQW4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746216690; c=relaxed/simple;
-	bh=fNb/U1Naew7SwzCXUAnbIHev7jMNaHPPTiUJSpadZyw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s9tlqMrV43/EOFdpYmdUBo7p+7B3SgUdhJbGGzjnzHC70CuDVnrR477XGZP1Hh08dd3Gmu3cJZ6om3nTJmKLqnin7JdfYkEgc0c59hejcMpY0/T8JAMkhB4wYG5YsE08Bn4LmZGfOcJWrXUy2EzWrDgfpPVX3VGQ7izEHSve82A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HfGK8+5K; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EC21C4CEE4;
-	Fri,  2 May 2025 20:11:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746216689;
-	bh=fNb/U1Naew7SwzCXUAnbIHev7jMNaHPPTiUJSpadZyw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HfGK8+5KcuxZO1r/6Egtm1iaDIgfN1LWFqd+4i0JLZNdZC3GAvFLeW3bOcnfaAOL0
-	 EEPFHkY4oSuFeGEb6uVu64vsOno982nujxxEgwsZe3m+Byu5BPcge9SGSUwX9VGZYR
-	 IzRl0SYW9J6Ac9cYGZyqRwDViYJyWZkLDHT/iFkLWWz+rZrEiKQcFpIuNrLhmAkjH7
-	 C3XvCo73OsY7/UueGMX6G0opY1AQVOQrwfiacX1m75+64xwgYEjVziRqy2IR5EIY5N
-	 9Vba91YbI8iCk6ROGlBYsp7ckuGEbpP53hOXYxweraFCAKSjouGD2/6iYtJ8jOzEqy
-	 oCC5qfh2xd5fg==
-Date: Fri, 2 May 2025 22:11:22 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Jann Horn <jannh@google.com>
-Cc: Eric Dumazet <edumazet@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Oleg Nesterov <oleg@redhat.com>, linux-fsdevel@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, David Rheinsberg <david@readahead.eu>, 
-	Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>, 
-	Lennart Poettering <lennart@poettering.net>, Luca Boccassi <bluca@debian.org>, Mike Yuan <me@yhndnzj.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH RFC v2 4/6] coredump: show supported coredump modes
-Message-ID: <20250502-zugrunde-mehrheit-5fc9ef5d6ec8@brauner>
-References: <20250502-work-coredump-socket-v2-0-43259042ffc7@kernel.org>
- <20250502-work-coredump-socket-v2-4-43259042ffc7@kernel.org>
- <CAG48ez1YjoHnH9Tsh8aO2SNkJUW=7VUPXAdvxqt7d0B4A8evEw@mail.gmail.com>
+	s=arc-20240116; t=1746216987; c=relaxed/simple;
+	bh=By0nI/Uah9tzUoQmwxi/mBhuqe3pZYV+eYsD7oVllnA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XqJ9O878lKzkswfRbsh0map7rmz2US2wa8MCtru6KPtllmBKHpFAJez1UavdvR9q+GmAMbTsN3WUUOZOeWZ6w2MV30JyRODvCM7L/0i4UHbqWxpkYI4FDDlh0n0wmtw5Jy705Vb720uk+0CV/buvpvCPTTxjCG5ePOVu15vJ1fU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WIQrkyd/; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-227914acd20so30129685ad.1;
+        Fri, 02 May 2025 13:16:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746216985; x=1746821785; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LL5lYrGOsN1TXJBXHfkfn0mVSZaxvHWW419ORusS2B0=;
+        b=WIQrkyd/9DFlL3NSMs5QtJ8i4y4OtWaDwbPHLbMtrKRU4MHay70aUS9ge2M0VtxQAg
+         elL2EUsd+YA8FCNfz3W3TYEleRP56EAg7I42LBCiBgLFZHN97Bhp1tOb5Gmow6lWHwEe
+         KQqq1xzhvmKaEUVMUT249jVWA1ZqBubmulFJqIYmQEzNQhRiIAtkENedSzqxXyeipWWt
+         N6anydeZZ/WquqtbOFISo33Uz8ede2lJhb8Ceq2yaJprWJpOUMiOJJw6QuCWFnf1/5i5
+         sIO6vkK7RPAMVLMiKjFdgf7t/bTxTczi1uiZuSeIIkgcjxZZ5Z9sgUixBTx4cb5MDKXB
+         NYDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746216985; x=1746821785;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LL5lYrGOsN1TXJBXHfkfn0mVSZaxvHWW419ORusS2B0=;
+        b=jOpYMSgZcueOqk41eeXRRO195wnUthxE9NIC5lU3++bZnGvDb8zmvX3A8sBZZe/VFl
+         Qgqa6URGLJMT1vhdu67DbYCyhDTmRLezKKxIc+s58iOmZLPUf1QB/xl2ZfaVf0h0rS6t
+         v94UXxgxXf64aW8mOnx0st7EARgE23EiY3StRmTp6hENN4Idrq9pxUTRT9e778eD4mgb
+         waxOUnCWO+u93VlZ8nctmp+U0rHSNq+ik23ev4MRStKDVVgED1t/m0+2zkCe79KkTX5H
+         LxCNPdtCOavDAfUQNyCzoP2LeSdXOyZberqW8RO8aB6e2bl3vKhrECvRml6yJjRuvp5j
+         hGdw==
+X-Gm-Message-State: AOJu0YwRu1+uSSVztnXIhYzCeLQ5bHbri5+eNxUsTvScFas8JtSghh3u
+	qeg3AseOWC4uUsdVadhxzWQeNpN1U4EbEeA+c++m4rgGNIaLeNqRXfus2A==
+X-Gm-Gg: ASbGncvvHUjVNIBcdpEi8hccilxA0Q3qjvZyyp7qF+qplTKXR0f1uo9JvG3ncC32+dR
+	CAKlTbyDyo5CBKeb/2DgmaxkaiND7o5mGsR6EhIdEFZM6QI5zfnnQ6AsjpdwCX2jzDNjWe8u2Xd
+	5NVZmZVlPNWjnre2GwrfJghC3X70Ehe9l95Xj8hulo7jpJ58IQMfg74JGE4Tm4VItb3J1mOa53D
+	c4cwSpyTyB7e87OgaCLPCKmGN0FIRQ23NTUnLalHQ0imNpwaW1SuufFFORJRGXMxzCKdiEzqTJP
+	39e2+Z0RTHx5falSYUzznBG8TYaMspwn
+X-Google-Smtp-Source: AGHT+IFoHN90qk9yu6USUPG3BMDit02CbQz1zzIzbK91aT4z2GTJ0Y8cylM2G2fUBOCh07eWxNa71Q==
+X-Received: by 2002:a17:902:f745:b0:215:ba2b:cd55 with SMTP id d9443c01a7336-22e1001e466mr64113505ad.2.1746216985566;
+        Fri, 02 May 2025 13:16:25 -0700 (PDT)
+Received: from localhost ([2a03:2880:ff:73::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e173b584csm6415385ad.16.2025.05.02.13.16.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 May 2025 13:16:25 -0700 (PDT)
+From: Amery Hung <ameryhung@gmail.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	alexei.starovoitov@gmail.com,
+	andrii@kernel.org,
+	daniel@iogearbox.net,
+	martin.lau@kernel.org,
+	xiyou.wangcong@gmail.com,
+	kernel-team@meta.com
+Subject: [PATCH bpf-next/net v2 0/5] Fix bpf qdisc bugs and clean up
+Date: Fri,  2 May 2025 13:16:19 -0700
+Message-ID: <20250502201624.3663079-1-ameryhung@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAG48ez1YjoHnH9Tsh8aO2SNkJUW=7VUPXAdvxqt7d0B4A8evEw@mail.gmail.com>
 
-On Fri, May 02, 2025 at 04:07:23PM +0200, Jann Horn wrote:
-> On Fri, May 2, 2025 at 2:43 PM Christian Brauner <brauner@kernel.org> wrote:
-> > Allow userspace to discover what coredump modes are supported.
-> >
-> > Signed-off-by: Christian Brauner <brauner@kernel.org>
-> > ---
-> >  fs/coredump.c | 14 ++++++++++++++
-> >  1 file changed, 14 insertions(+)
-> >
-> > diff --git a/fs/coredump.c b/fs/coredump.c
-> > index 9a6cba233db9..1c7428c23878 100644
-> > --- a/fs/coredump.c
-> > +++ b/fs/coredump.c
-> > @@ -1217,6 +1217,13 @@ static int proc_dostring_coredump(const struct ctl_table *table, int write,
-> >
-> >  static const unsigned int core_file_note_size_min = CORE_FILE_NOTE_SIZE_DEFAULT;
-> >  static const unsigned int core_file_note_size_max = CORE_FILE_NOTE_SIZE_MAX;
-> > +static char core_modes[] = {
-> > +#ifdef CONFIG_UNIX
-> > +       "file\npipe\nunix"
-> > +#else
-> > +       "file\npipe"
-> > +#endif
-> > +};
-> 
-> Nit: You could do something like
-> 
-> static char core_modes[] =
-> #ifdef CONFIG_UNIX
->   "unix\n"
-> #endif
->   "file\npipe"
-> ;
+This patchset fixes the following bugs in bpf qdisc and clean up the
+selftest.
 
-Thanks!
+- A null-pointer dereference can happen in qdisc_watchdog_cancel() if
+  the timer is not initialized when 1) .init is not defined by user so
+  init prologue is not generated. 2) .init fails and qdisc_create()
+  calls .destroy
+
+- bpf qdisc fails to attach to mq/mqprio when being set as the default
+  qdisc due to failed qdisc_lookup() in init prologue
+
+v2
+- Rebase to bpf-next/net
+- Fix erroneous commit messages
+- Fix and simplify selftests cleanup
+  v1: https://lore.kernel.org/bpf/20250501223025.569020-1-ameryhung@gmail.com/
+
+Amery Hung (5):
+  bpf: net_sched: Fix bpf qdisc init prologue when set as default qdisc
+  selftests/bpf: Test setting and creating bpf qdisc as default qdisc
+  bpf: net_sched: Make some Qdisc_ops ops mandatory
+  selftests/bpf: Test attaching a bpf qdisc with incomplete operators
+  selftests/bpf: Cleanup bpf qdisc selftests
+
+ net/sched/bpf_qdisc.c                         |  24 +++-
+ .../selftests/bpf/prog_tests/bpf_qdisc.c      | 120 +++++++++++++-----
+ .../selftests/bpf/progs/bpf_qdisc_common.h    |   6 -
+ .../bpf/progs/bpf_qdisc_fail__incompl_ops.c   |  41 ++++++
+ .../selftests/bpf/progs/bpf_qdisc_fifo.c      |   9 ++
+ .../selftests/bpf/progs/bpf_qdisc_fq.c        |   6 +
+ 6 files changed, 161 insertions(+), 45 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/progs/bpf_qdisc_fail__incompl_ops.c
+
+-- 
+2.47.1
+
 
