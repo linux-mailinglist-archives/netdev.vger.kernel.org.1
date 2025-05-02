@@ -1,50 +1,75 @@
-Return-Path: <netdev+bounces-187360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9067AA6833
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 03:11:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 64E59AA684E
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 03:16:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EC594C075C
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 01:11:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C77E817FEC3
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 01:16:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5531319F464;
-	Fri,  2 May 2025 01:10:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B54611CD3F;
+	Fri,  2 May 2025 01:16:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G1B8yLAy"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="k46JRcTa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2925719E97C;
-	Fri,  2 May 2025 01:10:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5E871EEE6;
+	Fri,  2 May 2025 01:16:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746148204; cv=none; b=cjhE7FbB9LWtyWkFcEjEpkX4CBWWNHK99PZ4+RVTSDHfQiQ8kVs1edAXl3eKP9Nq0wvUq9lz+8AVHcQ9/5yuhaEat+KRyDzk5ZPQWxJbDrfrYlk0v7OBkBSFJO3pJd6tcc85l5eoC95t7yLbmGHujAXWrmSS+WMT0k8fzdaqMis=
+	t=1746148568; cv=none; b=lL08RwSeE13pXRNie92xo/1T4caOH5LoErqfFodQZTHuPoBZOKHVODXNn8CTAJHpnX7O4LVMj1EFRea7Qek3YCczGtr/WstSqUMpiL6t52zNQMUc4eWcLNlMOlYMhFfZO1W9zytqSApCf89GDvtxhCPfw/eW75blfLlJSeIo5eY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746148204; c=relaxed/simple;
-	bh=HeRz4Eqjgid11Yf2gHq/DK2dnmS/GnV7dhlmGANKrNY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NA9AN+4V8jwXB18zGW1a+Xmz4FXAEmU8LNWRTekZBObzfN5eGJQ6zcTN41BuU3xbOH1QxRkCdBAj4CItX1GK6QVxOnITtjjO+o23nNhagAtX2YBHCTpo94d6KI+ENQ/vvfSpHEInDST1DdJ+mVyL4Y4S7MMt96/P3t0s0yXLUv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G1B8yLAy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 970BEC4CEED;
-	Fri,  2 May 2025 01:10:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746148203;
-	bh=HeRz4Eqjgid11Yf2gHq/DK2dnmS/GnV7dhlmGANKrNY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=G1B8yLAyDtduRjGPdq7uUrpR6hEKFMURfo2UNDMhNEWKlUW6kPbnvPt282ioWWGBK
-	 qhqPTgMWdnkNJBSxO4wNKzdZM3lHrktJDK1Ftr7nbnML8ciWyEbZYLC+s7nUr5XWCh
-	 IyYxH2BdOUuevtYnJm6ciXi9k9YaezN1sdB1NqMNXVFrQJ1tMpCWGUtqqED1L55/3K
-	 jnitNdb2kNTeRvgv522iSip1N++Xpdnik+uodfPSKT/BT67fXDFkVcjM1j3bhzwgqX
-	 ZwfLLyXYVj007xBfeMzeSmeWQbcvwjby2kGaktM06iztrWdQVCtLGUq+fR27E1LpfH
-	 pbwWtmB+C1T9w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB0443822D59;
-	Fri,  2 May 2025 01:10:43 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1746148568; c=relaxed/simple;
+	bh=KKUucRsq7J/KTfh1cyQk5FctIMDkTamHhSf2mp3C8lQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QOXHSlctSasV1pgcb9bBDC5MTdLuQN6/Jvk+dBrpKAitdteoJA+Z0iG5lKTKN5y/X7ekW/8/3dPT477S/n771XzK2MhZAcTFI4g/tFxWq8rRJMqOJPFj2xP0i0xSFT3HKvwweitfsu3CfyEV+sO5x0q1B5VLTuDqHiEh0qSjDZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=k46JRcTa; arc=none smtp.client-ip=52.119.213.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1746148567; x=1777684567;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=W8qrr7k4O1a2fqkvBoS4P4GlOV9v1wWvQtczvCq40s8=;
+  b=k46JRcTa5YnjouKg40amKiINGZQgw2/qJ/8Jw/NAno+2SOdQtx2a+9CP
+   QxK4+kBAgwNmuuzAncbN78cuv3sirNzBgiwqBMyQrBfqeHIWYPo6/K6Sw
+   XUrToRw0xiIo/TMJNbCEKzGfWD5T/pPd9LrbOmx/y8SomxheqYhNEaJCK
+   8=;
+X-IronPort-AV: E=Sophos;i="6.15,255,1739836800"; 
+   d="scan'208";a="740689088"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 May 2025 01:16:02 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:34805]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.33.6:2525] with esmtp (Farcaster)
+ id 9238b5d2-9583-4e05-8620-1900c65421ad; Fri, 2 May 2025 01:16:01 +0000 (UTC)
+X-Farcaster-Flow-ID: 9238b5d2-9583-4e05-8620-1900c65421ad
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 2 May 2025 01:16:00 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.187.171.41) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 2 May 2025 01:15:57 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <dsahern@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <elver@google.com>,
+	<horms@kernel.org>, <justinstitt@google.com>, <kees@kernel.org>,
+	<kuba@kernel.org>, <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <syzbot+8f8024317adff163ec5a@syzkaller.appspotmail.com>,
+	<syzkaller-bugs@googlegroups.com>, <kuniyu@amazon.com>
+Subject: Re: [syzbot] [net?] UBSAN: array-index-out-of-bounds in ip6_rt_copy_init
+Date: Thu, 1 May 2025 18:15:28 -0700
+Message-ID: <20250502011550.66510-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <e1e1fa75-e9c2-4ae7-befb-f3910a349a9f@kernel.org>
+References: <e1e1fa75-e9c2-4ae7-befb-f3910a349a9f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,53 +77,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next] ipv6: sr: switch to GFP_ATOMIC flag to allocate memory
- during seg6local LWT setup
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174614824249.3123530.9494554975799967680.git-patchwork-notify@kernel.org>
-Date: Fri, 02 May 2025 01:10:42 +0000
-References: <20250429132453.31605-1-andrea.mayer@uniroma2.it>
-In-Reply-To: <20250429132453.31605-1-andrea.mayer@uniroma2.it>
-To: Andrea Mayer <andrea.mayer@uniroma2.it>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, horms@kernel.org, kuniyu@amazon.com,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
- stefano.salsano@uniroma2.it, paolo.lungaroni@uniroma2.it,
- ahabdels.dev@gmail.com
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D043UWA002.ant.amazon.com (10.13.139.53) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 29 Apr 2025 15:24:53 +0200 you wrote:
-> Recent updates to the locking mechanism that protects IPv6 routing tables
-> [1] have affected the SRv6 networking subsystem. Such changes cause
-> problems with some SRv6 Endpoints behaviors, like End.B6.Encaps and also
-> impact SRv6 counters.
+From: David Ahern <dsahern@kernel.org>
+Date: Thu, 1 May 2025 14:44:03 -0600
+> On 5/1/25 2:12 PM, Kees Cook wrote:
+> > static int ip6_rt_type_to_error(u8 fib6_type)
+> > {
+> >         return fib6_prop[fib6_type];
+> > }
+> > 
+> > Perhaps some kind of type confusion, as this is being generated through
+> > ip6_rt_init_dst_reject(). Is the fib6_type not "valid" on a reject?
 > 
-> Starting from commit 169fd62799e8 ("ipv6: Get rid of RTNL for SIOCADDRT and
-> RTM_NEWROUTE."), the inet6_rtm_newroute() function no longer needs to
-> acquire the RTNL lock for creating and configuring IPv6 routes and set up
-> lwtunnels.
-> The RTNL lock can be avoided because the ip6_route_add() function
-> finishes setting up a new route in a section protected by RCU.
-> This makes sure that no dev/nexthops can disappear during the operation.
-> Because of this, the steps for setting up lwtunnels - i.e., calling
-> lwtunnel_build_state() - are now done in a RCU lock section and not
-> under the RTNL lock anymore.
+> fib6_result is initialized to 0 in ip6_pol_route and no setting of
+> fib6_type should be > RTN_MAX.
 > 
-> [...]
+> > 
+> > The reproducer appears to be just absolutely spamming netlink with
+> > requests -- it's not at all obvious to me where the fib6_type is even
+> > coming from. I think this is already only reachable on the error path
+> > (i.e. it's during a "reject", it looks like), so the rt->dst.error is
+> > just being set weird.
+> > 
+> > This feels like it's papering over the actual problem:
+> 
+> yes, if fib6_type is > than RTN_MAX we need to understand where that is
+> happening.
 
-Here is the summary with links:
-  - [net-next] ipv6: sr: switch to GFP_ATOMIC flag to allocate memory during seg6local LWT setup
-    https://git.kernel.org/netdev/net-next/c/14a0087e7236
+Sorry, I think this was my mistake,
+https://lore.kernel.org/netdev/20250502002616.60759-1-kuniyu@amazon.com/T/#t
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+and this will fix it.
+https://lore.kernel.org/netdev/20250501005335.53683-1-kuniyu@amazon.com/
+
+Thanks!
 
 
+#syz dup: [syzbot] [net?] WARNING in ipv6_addr_prefix
 
