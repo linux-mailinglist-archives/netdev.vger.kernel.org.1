@@ -1,101 +1,127 @@
-Return-Path: <netdev+bounces-187555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB8A2AA7D75
-	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 01:50:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75C88AA7D77
+	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 01:51:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7ACF11BC7B5C
-	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 23:50:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCE5E16E587
+	for <lists+netdev@lfdr.de>; Fri,  2 May 2025 23:51:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFBD822A7E6;
-	Fri,  2 May 2025 23:49:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD70C26FD86;
+	Fri,  2 May 2025 23:51:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U/leqgbZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mvl9Vk9E"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D0120E703;
-	Fri,  2 May 2025 23:49:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20F2926FA46;
+	Fri,  2 May 2025 23:51:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746229798; cv=none; b=n2u65c+yUR+QrdSybfKASiFI/0xyCwy6VsJCBl47BnfyzZlZbIKY7dbdC6Fy57vOAnO64WQFWkOKCa0m7lmdfIJaELPsGiY+mN5GQ/F803aMf6Z79a/jRpH4G2kFVmyYBmqz5cMLXSrcdFuStyyqTS/12/9zQdMYiqnu/yh9GMY=
+	t=1746229863; cv=none; b=QoNhKy2G78I+MyljrL5KVhr2F7WZqaY8zHOpBPTtl5oxbZjWF6k2CDjTGozO67tcIjdYrYpSwCYdfmtEeepQnaBgHUGAVNU7O1jVVgg/f9ai4hsMVs+UuRZFa41JSWKfyWvdCP5rG+ZxzbEoUGh1YFUTgIhXBEM6XmeYfeHUxCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746229798; c=relaxed/simple;
-	bh=yG9LcAGUkC+cOxnXcJ4G8nVqrUCz6qNazF2vIUeNWJs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=UCzUhU30R0812gt8bId1JzFMJVqTAB+m6lhxl0lNWGEWMGwi3hLLjAu+UINGJ/udHmCch6Oput0YJh8OguX919BEK/MGEpLTi9pkd5BBWH3uWg+SlgL6/VQ3nY+OuiIzsHQhuBLA5ejkvLV3LE6XIC3bmhmeCtI2LZmzupIi2HE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U/leqgbZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12E91C4CEE4;
-	Fri,  2 May 2025 23:49:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746229798;
-	bh=yG9LcAGUkC+cOxnXcJ4G8nVqrUCz6qNazF2vIUeNWJs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=U/leqgbZympbLDIuK8XjBV2AX07E0JcObJ/DtD04hmm5LRcbUox1Lw6u4c4DRIIOP
-	 gQjZEQm9Ag6blWkWUM1xdL9fYM77jdoK4Q6uJv83eUCBTLyilJA1GJdRe9rfxogtOK
-	 iW3sVDRb08p9YWV/bSsj/R1l/QWne4Q0n1pBvdISJFEyC7466S0qfclfFl0OEbEnV1
-	 PAp/RcLkKU08LK/tihRIrRs+2Q9hPml3FIM6IQBR+pTkAtbuoou3kY1XxZGR0ubSCS
-	 +VpxSgskpcyeyW5trruyvWet6NBOlOQMUM3XKGDVIvU8/XANTUFyzm6XVktxwanceE
-	 CR+xsM0ilM1oA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D16380DBE9;
-	Fri,  2 May 2025 23:50:38 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1746229863; c=relaxed/simple;
+	bh=aKrWXBVCrG+e3+Ml462cXe5Y1NZSgwzHBhsRjL5mNO8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oe2Q8h76QSknBlfPVld6RWL0IO4IMpk2cZIxGPZtNau+6p9IaE2mE2TOsTDSKDZqUIsouSxpBqG2qf/EzQ3NJiebbvbjfwc0FQphFXwVQakTNeoRaoyLO+qDdp0adj7/Y83frkyH07TdOIoVem+mbmDfF396Mu+ZzoBlb2+B3RA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mvl9Vk9E; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6f0c30a1ca3so29113116d6.1;
+        Fri, 02 May 2025 16:51:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746229861; x=1746834661; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gwhAOszonc/zk1grsNfE4+Jc6827zk/H0LKdtiazqhU=;
+        b=mvl9Vk9EWcjp/NgivLq+Keu4aWgIyyrZOqlfT7pzbtZFq6bSCW7YHy75/MKoIINZob
+         ul7uHhfZxz3p+/aRFrQ8/HGP3u/Z3HoL/C43djVnjimnfMXPubhCUqcg10+bm/bkzrhQ
+         VwHV9ow4t9zHJWZiIUTpu8QWzqYhh1hF36oPzdt+Uu693m3vueCVRWvyL5O4eLw3aTrO
+         JOomrJyhpUgRD6b6M5eX+Jtl1hThvIg5W3gymiOsPxTOX92tPy+UHBV7ex+rRzgenDgV
+         fqdVV+6MdxrhXK/0bzqKZ3zbQo2bVoFvhoxjvlZ0AN88Tiq73rZ4T0yJNJy40crrShEo
+         CsRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746229861; x=1746834661;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gwhAOszonc/zk1grsNfE4+Jc6827zk/H0LKdtiazqhU=;
+        b=HIxtmtKexk0nkgW2WMUsXECQ8oGeF9d8VcECpVeFlCMcBnzvhZanM9GgT7z05FSDTq
+         1ENYpk7CNknmu7Z6OoRo+WVwJLDAYl3phxVPqsV6VZ3sQbzCyMsV6K8fL4lyHcRm6DjM
+         72m8hd/ADvW7h41WQcFLTr6we0IWmleFmdMzCkaqX66m3lyw4/kqaOd2q0B6p+KolBeu
+         xtXXopO9CQKeggylieSsWIGyDoBA1u5+f+o5WyOkA7PcGKCWRnu24ZF4VUcWlRZ4NKVW
+         C5VGHoMwjCH3A2fh3OiNyToNaYijfqnedwE/XTBNm/ZS8EyzYjYsTXDD+TrfB3jlSbOX
+         wnmw==
+X-Forwarded-Encrypted: i=1; AJvYcCU5bZir63gQlPJJDRzU1qZG+owleBfyo0OlNPGiKY6WcNjK7GW1mEAdDkEVHsl6nna/EezPLCUe@vger.kernel.org, AJvYcCVVfn/L1sUo7FwiX7+4nuVCqitbdUxAzdidnU/JqKQ+/Vg+bdMW9E7J3knHGTF8PZewc1zFAPTBhdSZAoM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnBbcDyGGYmcrV1enqjlXeiNN7aoI6yYCRKo+JM/wewAy2NYR2
+	fhJJgCM68i5rX7J1mrW8UvhESoNVLBf857sX+5Ldk9SLJ7rLD2S28IhEoYgbae06bmxgtrz6VnQ
+	g9RZVd2NGTYRgeafEESfDUYr7ZQ4=
+X-Gm-Gg: ASbGncutd6A5qtWRAAdsE8A/XTI3cQPpjYbLlV2dIHO6yCTZB71/ofcpK9SeMzwQ+YX
+	ymBWajVqC9rl9hfu2dJsXt8oXuvZMXjVY/OkvqaWub/PcjZq41El7V4tio6kjkh3gtsxR/EYHLy
+	ZKxqEoi+do3TD6L1Q3MfIX9Q==
+X-Google-Smtp-Source: AGHT+IHB8oiJWrbY009G2fsW3lPulWnSCJAW1zOAkTIk9NWb+srZNZo+N7KbfA5KVFqROvkAUEZp7A5rU+3bIhbXK10=
+X-Received: by 2002:ad4:5b86:0:b0:6eb:2f30:55cd with SMTP id
+ 6a1803df08f44-6f51580dbf9mr63733176d6.45.1746229860892; Fri, 02 May 2025
+ 16:51:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next/net v2 0/5] Fix bpf qdisc bugs and clean up
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174622983725.3760707.369591195110683703.git-patchwork-notify@kernel.org>
-Date: Fri, 02 May 2025 23:50:37 +0000
-References: <20250502201624.3663079-1-ameryhung@gmail.com>
-In-Reply-To: <20250502201624.3663079-1-ameryhung@gmail.com>
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com,
- andrii@kernel.org, daniel@iogearbox.net, martin.lau@kernel.org,
- xiyou.wangcong@gmail.com, kernel-team@meta.com
+References: <20250425231352.102535-2-yyyynoom@gmail.com> <20250429143503.5a44a94f@kernel.org>
+In-Reply-To: <20250429143503.5a44a94f@kernel.org>
+From: Moon Yeounsu <yyyynoom@gmail.com>
+Date: Sat, 3 May 2025 08:50:49 +0900
+X-Gm-Features: ATxdqUGqfEX6ZdoD5W8pkMUTv_VYN1eHfMA_5mzpjWaEp3c5tPyDIMsFKrybwjU
+Message-ID: <CAAjsZQwymBUvn67+jWJ1WRG2iJHyQFLwWEh8+3O_ryfX31mesw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] net: dlink: add synchronization for stats update
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+Thank you for reviewing my patch!
 
-This series was applied to bpf/bpf-next.git (net)
-by Martin KaFai Lau <martin.lau@kernel.org>:
+On Wed, Apr 30, 2025 at 6:35=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+> I could be wrong but since this code runs in IRQ context I believe
+> you need to use spin_lock_irqsave() here. Or just spin_lock() but
+> not sure, and spin_lock_irqsave() always works..
 
-On Fri,  2 May 2025 13:16:19 -0700 you wrote:
-> This patchset fixes the following bugs in bpf qdisc and clean up the
-> selftest.
-> 
-> - A null-pointer dereference can happen in qdisc_watchdog_cancel() if
->   the timer is not initialized when 1) .init is not defined by user so
->   init prologue is not generated. 2) .init fails and qdisc_create()
->   calls .destroy
-> 
-> [...]
+If my understanding is correct, then it seems I was mistaken and you were r=
+ight.
 
-Here is the summary with links:
-  - [bpf-next/net,v2,1/5] bpf: net_sched: Fix bpf qdisc init prologue when set as default qdisc
-    https://git.kernel.org/bpf/bpf-next/c/659b3b2c4885
-  - [bpf-next/net,v2,2/5] selftests/bpf: Test setting and creating bpf qdisc as default qdisc
-    (no matching commit)
-  - [bpf-next/net,v2,3/5] bpf: net_sched: Make some Qdisc_ops ops mandatory
-    https://git.kernel.org/bpf/bpf-next/c/64d6e3b9df1b
-  - [bpf-next/net,v2,4/5] selftests/bpf: Test attaching a bpf qdisc with incomplete operators
-    (no matching commit)
-  - [bpf-next/net,v2,5/5] selftests/bpf: Cleanup bpf qdisc selftests
-    https://git.kernel.org/bpf/bpf-next/c/2f9838e25790
+I misunderstood that the same form of locking function should always
+be used for a given lock. However, as you pointed out,
+`spin_[un]lock()` seems to be the correct choice in this case.
+This is because the `tx_error()` function is only called from
+`rio_interrupt()`, which runs in IRQ context. (There are no other call
+paths.) In this context, there's no need to enable or disable IRQs at
+all.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Also, I believe that `spin_lock_irq()` in `get_stats()` should be
+changed to `spin_lock_irqsave()` since `get_stats()` can be called
+from IRQ context (via `rio_interrupt()` -> `rio_error()` ->
+`get_stats()`).  In my view, calling `spin_unlock_irq()` in this
+context could be risky, as it would re-enable local IRQs via
+local_irq_enable().
 
+There are two ways to lock the `get_stats()` function: either add a
+new parameter to check whether it's in IRQ context, or simply use
+`spin_lock_irqsave()`. I found that `rio_free_tx()` behaves like the
+first case. I'd appreciate your opinion on which approach would be
+preferable here.
 
+Thanks again for your feedback.
+
+Best regards,
+Moon Yeounsu
 
