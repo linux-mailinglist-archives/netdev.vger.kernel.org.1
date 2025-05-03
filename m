@@ -1,151 +1,100 @@
-Return-Path: <netdev+bounces-187618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4C7EAA81C5
-	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 19:14:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 467A2AA8295
+	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 22:07:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FB605A474E
-	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 17:14:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7A5A3B3D1D
+	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 20:07:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48B542798E3;
-	Sat,  3 May 2025 17:14:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2049D266EEC;
+	Sat,  3 May 2025 20:07:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NVNRyeU/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qFe7t5/k"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CEF5130E58;
-	Sat,  3 May 2025 17:14:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAFB518DB18;
+	Sat,  3 May 2025 20:07:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746292478; cv=none; b=ixGeLoZrh6HeS2bDzMdFN07euG1iaRBIOrZ3TW3dBNh0PDTS6VSXOTdGAegYP9FNEakaVPRpmDGbwG8OpRF6hTvd3b8EFyW5yI7v4yKjNYy9qzC20hObE6yuLjM06qDhg5Tk36ODepF9LK0PLbdj/fqwub1r1A7E87gTmsIxWOc=
+	t=1746302863; cv=none; b=UDF9Zu3hGM8aKm+eeQ9wAgrD1QqEJCokdfbElZCgjjMNBDQNZ1x9AWM+uMTAG78VHfnjoYiDjKY79wX68Q3NCGtvCyf6gcV1jch8NqtnBaqN0H2fs+ruCLjKdipPsDMFm+No+UeKg9Fxd5FE4IRzCMRRwA1aSodhI5aMcpVZzSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746292478; c=relaxed/simple;
-	bh=TO0GFJ0GhL304hsOhpjSdH3o1D4SYQYquYsY9RZQ6fs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ldR33cae+92MYwpVZTaEkSMmS4lCo0rgpu9gxM6CTy+Mi0NCcGzB3Xo3BMz6kWXc56UfQII8kdgUeBflu0rlirwlYV/tLv7kYZNoGOIxLBSmULdWVVtOC4B8LXxp9bciut9AZhU1J700Imnn7Zgueco5FcUA3HmVfWticwj/x00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NVNRyeU/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24DAEC4CEE3;
-	Sat,  3 May 2025 17:14:36 +0000 (UTC)
+	s=arc-20240116; t=1746302863; c=relaxed/simple;
+	bh=5qfdHU4QKRdeBHcuAAzl/0hDZRG+8CSgRLabUYVr9KY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LRBdSqkc6QJRX16RqvlehQM1AtPUMIH97X6XyBdkO6xZuOwkgSJ4vQ/+gXQNuFFEnuEW6c3+tbWhvbkCbVu5msJLRRukOq00X1LzRK5W5Y2Pxfm9Sb/qt+ZZRI9XxRDKlmj/MTL6jTSetaeBH/5TVkUOdNAlXzRdU+9A/2SExkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qFe7t5/k; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1E1AC4CEE3;
+	Sat,  3 May 2025 20:07:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746292477;
-	bh=TO0GFJ0GhL304hsOhpjSdH3o1D4SYQYquYsY9RZQ6fs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NVNRyeU/8qZCUHMRmqHsxd5g3wj3Um9s0fPqjmF5GJy0xnk6UdVnLE3sQFHlaeyhH
-	 zLZ2LMG7iSw1jV21YXZZIntyIOzxPIVxMPUBSeP6M4B3rWXGiRp2/RzgsSZ6GalLQ7
-	 Fy2CysyqQe2BR4bVNvFHxoL5QdtV9qWiXhaX8xaBdAI9IQDCffFWTb2HqsGh2ifmSN
-	 YG9NdFDUC93Y3SiJs32tmhMhEF826K6+hsMzufCcNKwJCfnPIUeSQFi22IGCQ90we1
-	 /jNiPrzHvFDLIANuISVIYQpEolSAIm3ZIV2cQ6pJDa0Wf06n1YYmOEUlgrK9Qg9E8A
-	 4jEBTpDVdslKA==
-Date: Sat, 3 May 2025 19:14:34 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Elad Yifee <eladwf@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net 1/2] net: ethernet: mtk_eth_soc: reset all TX queues
- on DMA free
-Message-ID: <aBZO-nmFoKLx5E5w@lore-desk>
-References: <27713d0004ead6e57d070f9e19c0d13709ba2512.1746285649.git.daniel@makrotopia.org>
+	s=k20201202; t=1746302860;
+	bh=5qfdHU4QKRdeBHcuAAzl/0hDZRG+8CSgRLabUYVr9KY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qFe7t5/knsU5HoiTDbnj3TIv9oCE7+eo+3Or8ojjzEobwgHHPokLh7P3iRaSDK5Sa
+	 ZIcoDlYNe4LhJW4MXC0arJ3DDSggHoBqnYUOdFlAbUNm/GHo+Xl//SCJ1Zt10eryTU
+	 q4Dv/CBedHLp5A9EFeXYRAGkHBIIBUV3qV2UYduTlqUyLpkrv/qPmNZmBKgpcGN7AC
+	 I5Nz7QYIbGT2U7WGUSEJNgWxMxFkd0ASJHsVc0YmCBB8hTQOhrE8XiFjB4wrKydD4d
+	 WhZsqpAp66GpEqlOrAKl4W8lnMOWtvQFG6+iMSSUcQhR+OSaJuu6+J4ztlU4fGiyYX
+	 M/p7ym859yLyQ==
+Date: Sat, 3 May 2025 13:07:39 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ linux-wireless@vger.kernel.org, donald.hunter@redhat.com
+Subject: Re: [PATCH net-next v5 10/10] netlink: specs: wireless: add a spec
+ for nl80211
+Message-ID: <20250503130739.1c94d433@kernel.org>
+In-Reply-To: <20250211120127.84858-11-donald.hunter@gmail.com>
+References: <20250211120127.84858-1-donald.hunter@gmail.com>
+	<20250211120127.84858-11-donald.hunter@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="Rv+qQaaENS0fon55"
-Content-Disposition: inline
-In-Reply-To: <27713d0004ead6e57d070f9e19c0d13709ba2512.1746285649.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Tue, 11 Feb 2025 12:01:27 +0000 Donald Hunter wrote:
+> +    name: ieee80211-mcs-info
+> +    type: struct
+> +    members:
+> +      -
+> +        name: rx-mask
+> +        type: binary
+> +        len: 10
+> +      -
+> +        name: rx-highest
+> +        type: u16
+> +        byte-order: little-endian
+> +      -
+> +        name: tx-params
+> +        type: u8
+> +      -
+> +        name: reserved
+> +        type: binary
+> +        len: 3
 
---Rv+qQaaENS0fon55
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Looks like we have 3 structs in the Netlink spec:
+ - ieee80211-ht-cap
+ - ieee80211-mcs-info
+ - ieee80211-vht-mcs-info
+which are defined in include/linux/ieee80211.h rather than the uAPI,
+but we do use them in Netlink attrs. I'm guessing these come from 
+the IEEE spec so there is no ambiguity?
 
-> The purpose of resetting the TX queue is to reset the
-> byte and packet count as well as to clear the software
-> flow control XOFF bit.
->=20
-> MediaTek developers pointed out that netdev_reset_queue would only
-> resets queue 0 of the network device.
->=20
-> Queues that are not reset may cause unexpected issues.
->=20
-> Packets may stop being sent after reset and "transmit timeout" log may
-> be displayed.
->=20
-> Import fix from MediaTek's SDK to resolve this issue.
->=20
-> Link: https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwr=
-t-feeds/+/319c0d9905579a46dc448579f892f364f1f84818
-> Fixes: f63959c7eec31 ("net: ethernet: mtk_eth_soc: implement multi-queue =
-support for per-port queues")
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
->  drivers/net/ethernet/mediatek/mtk_eth_soc.c | 16 ++++++++++++----
->  1 file changed, 12 insertions(+), 4 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/et=
-hernet/mediatek/mtk_eth_soc.c
-> index 217355d79bbb7..d6d4c2daebab0 100644
-> --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> @@ -3274,11 +3274,19 @@ static int mtk_dma_init(struct mtk_eth *eth)
->  static void mtk_dma_free(struct mtk_eth *eth)
->  {
->  	const struct mtk_soc_data *soc =3D eth->soc;
-> -	int i;
-> +	int i, j, txqs =3D 1;
-> +
-> +	if (MTK_HAS_CAPS(eth->soc->caps, MTK_QDMA))
-> +		txqs =3D MTK_QDMA_NUM_QUEUES;
-> +
-> +	for (i =3D 0; i < MTK_MAX_DEVS; i++) {
-> +		if (!eth->netdev[i])
-> +			continue;
-> +
-> +		for (j =3D 0; j < txqs; j++)
-> +			netdev_tx_reset_queue(netdev_get_tx_queue(eth->netdev[i], j));
-
-nit: you can use netdev_tx_reset_subqueue() here.
-
-Regards,
-Lorenzo
-
-> +	}
-> =20
-> -	for (i =3D 0; i < MTK_MAX_DEVS; i++)
-> -		if (eth->netdev[i])
-> -			netdev_reset_queue(eth->netdev[i]);
->  	if (!MTK_HAS_CAPS(soc->caps, MTK_SRAM) && eth->scratch_ring) {
->  		dma_free_coherent(eth->dma_dev,
->  				  MTK_QDMA_RING_SIZE * soc->tx.desc_size,
-> --=20
-> 2.49.0
-
---Rv+qQaaENS0fon55
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaBZO+gAKCRA6cBh0uS2t
-rE0aAQDxoKadhJgML6RMtuWFIuS6nXVqip1kMkzOx8SOecG8mAEAu48++YTfL3y+
-spXzcEGZDYYHs2oCuQXYweAp4NW2YAI=
-=Q4YT
------END PGP SIGNATURE-----
-
---Rv+qQaaENS0fon55--
+I'm trying to figure out what to do with them in the C codegen
+for YNL. Normally we assume all structs used by the spec are defined
+in the headers. We can add an annotation to render the definition
+in user space code, but I wonder if this omission is really intentional?
+Wouldn't it be generally useful to user space to expose the types 
+in uAPI?
 
