@@ -1,85 +1,95 @@
-Return-Path: <netdev+bounces-187572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5296CAA7DEF
-	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 03:37:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10781AA7DF0
+	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 03:39:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A0C0A467054
-	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 01:37:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9847B5A4C36
+	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 01:39:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2650941C7F;
-	Sat,  3 May 2025 01:37:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC31D60DCF;
+	Sat,  3 May 2025 01:39:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jTzzJxBJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pohUkJEt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0223A134AC
-	for <netdev@vger.kernel.org>; Sat,  3 May 2025 01:37:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB35A8479;
+	Sat,  3 May 2025 01:39:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746236242; cv=none; b=qvPCY+r9+DdKTYb0QtV2y3RweQ+aF+rW/pA9Tk81j7/1z1GMbWBf+27s3FdGVBTursaLvvzkrxLIe8teGmSUDRBSLBE3zs9vsSn8m2XGVtB0Fti+T4WjKQWkLhc/lzdbWlG4SbZ60clKIUqY/FzxNCkY4JQnUaOBFBiEPbgWLQU=
+	t=1746236389; cv=none; b=hJcJrLBE3kPg4Oj8rRDDakfRecwJiLSlRtMHp/BCNt1AuAWl9dR9kypE3TttpyLKEWRxNCiFk6jTV1zym8AtI7W1SCSLPxUcdc/s6bCpWdlzHTWRJwhPXkSlJwVJ8xZpvX/4lRt+NQqEx5b780Y1hbDIpQEEgCz2pT1GQcpR+cw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746236242; c=relaxed/simple;
-	bh=csJ5rCdsmxOhF/KJF162wkmTFqyOHIAFeKcVQNtXjkk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NvuBfHH/VCviYVIdDa0rGla0zyDL8zEbICBBrPI1GC4zif86szaiGDhyHBfdC8H83E39v0PzoW2T3be0aV5F+7kQhyKvviJhJDBX2WUiU+kxKWqZkJM7gi3LZbFaLlFqRNxIGW9pyR5l9pXfGFQ/caiaZqhfnJ7pxMJq78SPyj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jTzzJxBJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27512C4CEE4;
-	Sat,  3 May 2025 01:37:21 +0000 (UTC)
+	s=arc-20240116; t=1746236389; c=relaxed/simple;
+	bh=kUE9dfyTbL7WgDurwx5nxsrda/CGqMTgTvgU00qO40A=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=VpdilceLPIT/fvpQidG/eh32r+ZvURupZHZshk9hfTFJY4IQVtp+/+6rDXqB+fe6oN4WeYXDH/hQtExlNsnNc38y0mN9QujlDRKZBH5uClGAm7h/iqFTW+akmm7nlUwaSYZYuLuijs177cyKGBJ21HktU/OQIy4dY3KFACIH/78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pohUkJEt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CC65C4CEE4;
+	Sat,  3 May 2025 01:39:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746236241;
-	bh=csJ5rCdsmxOhF/KJF162wkmTFqyOHIAFeKcVQNtXjkk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jTzzJxBJpkm9z1eb2Z/h8MoFaHF6k2csGpFB+LzUR00FEAu2mFq60FE+ZlsXq5Js8
-	 x9gs9+J9ZfsPxv4dvaOUENM0d/se4kC2HCrgJ8Giax44u0novdUTH2jrsgge4I1Ggl
-	 Y+hti6WxHzwoD5rr0UZb9LcfhI4R9gEgE9e6vT0BICAUCOgeJtUZ/6x6tA0zl+eJtB
-	 tPiqoZSAGw0gyIkb9c6ciODehL03i/iy9kSDIyw6hrQRwIEnCRDjSUFcgVycDj63FC
-	 W5mFflqUwbURMNX/qQIeBXUzPXnBC4VYdeJVc1mwUWpuD5jHpn3C0MDdmjsNiYJwp0
-	 JCuOwb6J/9ToQ==
-Date: Fri, 2 May 2025 18:37:20 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, saeedm@nvidia.com, horms@kernel.org,
- donald.hunter@gmail.com
-Subject: Re: [PATCH net-next 1/5] tools: ynl-gen: extend block_start/end by
- noind arg
-Message-ID: <20250502183720.15a82e29@kernel.org>
-In-Reply-To: <20250502113821.889-2-jiri@resnulli.us>
-References: <20250502113821.889-1-jiri@resnulli.us>
-	<20250502113821.889-2-jiri@resnulli.us>
+	s=k20201202; t=1746236389;
+	bh=kUE9dfyTbL7WgDurwx5nxsrda/CGqMTgTvgU00qO40A=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=pohUkJEtKq4oaxjLkVvbromWc6Qsxg0mgVs05CFqC4AeqTIQTIQXi4iFp1sy70SOH
+	 ZueQIBVoqmYYAKFuNLvaOi88zj4hHydv8HJrNKI7eFPmdT2KjEZ2i4VFO6ubysJBn0
+	 1XYhKspZA7+VIBYjF67QflkvyOlGcK8svRC5w84+C4XaVvrBMAaf3zNoZkUj135sVv
+	 XHNXTeM3syJqDyv1l51fCNhWIORnGS15numXK+QWRd2jBtD36PPX130ueZ4nSWXObX
+	 UZqUr/AMRdHN25cgZ0ma/3Xt0Oq/GHERX3F0Bq42BVv4tNmGu4GIjcF2o99OHXOG6N
+	 9rfYc1+TK0k6w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CEC380DBE9;
+	Sat,  3 May 2025 01:40:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] mptcp: Align mptcp_inet6_sk with other protocols
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174623642826.3774742.12489840490454605534.git-patchwork-notify@kernel.org>
+Date: Sat, 03 May 2025 01:40:28 +0000
+References: <20250430154541.1038561-1-pfalcato@suse.de>
+In-Reply-To: <20250430154541.1038561-1-pfalcato@suse.de>
+To: Pedro Falcato <pfalcato@suse.de>
+Cc: matttbe@kernel.org, martineau@kernel.org, geliang@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, netdev@vger.kernel.org, mptcp@lists.linux.dev,
+ linux-kernel@vger.kernel.org
 
-On Fri,  2 May 2025 13:38:17 +0200 Jiri Pirko wrote:
-> -    def block_start(self, line=''):
-> +    def block_start(self, line='', noind=False):
->          if line:
->              line = line + ' '
->          self.p(line + '{')
-> -        self._ind += 1
-> +        if not noind:
-> +            self._ind += 1
->  
-> -    def block_end(self, line=''):
-> +    def block_end(self, line='', noind=False):
->          if line and line[0] not in {';', ','}:
->              line = ' ' + line
-> -        self._ind -= 1
-> +        if not noind:
-> +            self._ind -= 1
+Hello:
 
-Should not be necessary, CodeWriter already automatically "unindents"
-lines which end with : as all switch cases should.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 30 Apr 2025 16:45:41 +0100 you wrote:
+> Ever since commit f5f80e32de12 ("ipv6: remove hard coded limitation on
+> ipv6_pinfo") that protocols stopped using the old "obj_size -
+> sizeof(struct ipv6_pinfo)" way of grabbing ipv6_pinfo, that severely
+> restricted struct layout and caused fun, hard to see issues.
+> 
+> However, mptcp_inet6_sk wasn't fixed (unlike tcp_inet6_sk). Do so.
+> The non-cloned sockets already do the right thing using
+> ipv6_pinfo_offset + the generic IPv6 code.
+> 
+> [...]
+
+Here is the summary with links:
+  - mptcp: Align mptcp_inet6_sk with other protocols
+    https://git.kernel.org/netdev/net-next/c/a2f6476ed18a
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
