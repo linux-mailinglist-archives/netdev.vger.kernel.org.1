@@ -1,120 +1,105 @@
-Return-Path: <netdev+bounces-187586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59BBFAA7E6B
-	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 06:30:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B36BDAA7E6C
+	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 06:31:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B79544A47F5
-	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 04:30:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4106B987104
+	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 04:31:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30FD915573A;
-	Sat,  3 May 2025 04:30:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2178144C77;
+	Sat,  3 May 2025 04:31:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="N8xwrW5j"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="aI2apliD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF56246B8
-	for <netdev@vger.kernel.org>; Sat,  3 May 2025 04:30:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C005F46B8
+	for <netdev@vger.kernel.org>; Sat,  3 May 2025 04:31:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746246656; cv=none; b=tffZe9V/JzOkg/F1YA8vD8fyIIZA3s0AXTbubq1AeaAbDGo0XpqOdAOJ6BArn/cWP0WrOj2dw8kt3Fs5DyuVkByKWWPUSkv9oG4r1Z1+OLvN4qYoQe9umW0/6pPuLSqEYvWMT+P+Ui7m7ZNoPBEdji+z+vbbtwOfTo4sxusTry8=
+	t=1746246708; cv=none; b=pifiOEk7K4OQKTH8RLO4wR2ZnEECP9Td9VANDzPTZ+Fp+gGdHNDvX4RMeiV/E32w+W8Hi7ftvBq5R/y4N+kN1H9tYNzbscrnih7wWvWKEnYwCZXF9E0RpkmMr6OAT9QxOjBe6Ey3JNTcqGVTNFDIlHanFNyDONZM1akZbArILCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746246656; c=relaxed/simple;
-	bh=tK6sqp5IX8UPrZJnAqXViMwDwhL2/8sqXAdWXsC1kos=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=szhiXEPCmDFMKrTQf93hMWCcXP7nTA8EprnaXPGyksrSCc+7YalTuX3HLnCt8f8/mBSLMugRLIdr5b9+EOASp073cBCKEV3Tt/DmQoIQ8BJpxtowINWo2VGLihurhR0y3h1bHFxO4MGtesqNoHJ8ycsQcegDEOurB2WIifqT4Bk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=N8xwrW5j; arc=none smtp.client-ip=209.85.215.169
+	s=arc-20240116; t=1746246708; c=relaxed/simple;
+	bh=vgeOEO4mmRTbNiau2oWiHylBSaTFuLm1/wNsRgxbXB4=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=ompk4F+rKAlFWwzCOMjNShsodpxwNtVuN4Pau5NkyliPm9tJEEg3XYEYa2GlB+uILmsQEEZCkEWl60sjkEO93qlke8lrrcZsWchvvmEtXs4/4J6KrxrNgprBxaVxR/9afBy+EPbCbNAgPO8kzKmD4Qzy5nSJ2LBggqCoqS+oYac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=aI2apliD; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-af51596da56so2192939a12.0
-        for <netdev@vger.kernel.org>; Fri, 02 May 2025 21:30:54 -0700 (PDT)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2255003f4c6so30384295ad.0
+        for <netdev@vger.kernel.org>; Fri, 02 May 2025 21:31:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1746246654; x=1746851454; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=p+f18GgeWP3bF+TlxBMdab8Cp7U+xxHJNURE3i6Ge1U=;
-        b=N8xwrW5jvuFSV5uFExM15Lw+DGSJREXhTsxPpV4uzEy27bd3krRKy3+ENaDbO30aXU
-         lumoe9uT/SblOYtG+ar363A2ltL3MAIhFF6emZu4RMhnkhxMlxFQOe7i7fBA0jylgqej
-         +ZmSHPcFcjWEECMzc5oVg0nvVvmfqVc1JkZoqsmZDUJvwzdnxEppffLIap/XEw0ZHoIB
-         X4eda5cyr33tLqUsvHHjgegiydgG779AiNezW1+9EX2UmiuxxDURthORzKAjtA+LsGO9
-         yhU5MdA5kfuJUXKUgfqoRbvVWtH/cfljCzWGmXCueEu1+z2fgEGQdxeXF0hKh+/KrQqX
-         Hijw==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1746246706; x=1746851506; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=CpUkI6245kHsPqlCkZyvAf3355FDSMSSB7t0mD6h4Yc=;
+        b=aI2apliDRHCb7UgUKXoEdZ2L4tjtCD0weQ1hmfwWnKm9q+NPVOXlbVA/j2h8tVagu3
+         ZrmpSbflLtz4c2eUN8TD7z6x/nYsqCorLUeKIRVHLX10kiMCEyFeYuqPQelw7xkqD1EW
+         TiA6fZLLlmRQmr1xwV0zD8ytovUl8ufv5bo7elOPhCLlcoGmpkURjyGC/eE8FBRxP1hG
+         6U8UMeks8M16pNph+8Xu5BygYDTO9DfHgcyYKvsvqPb8W996ftCEWhRr17oSt2bCgsQk
+         Jn/WFpxFyx4T22fI9yi3BYXvXtS9obq/6ks4TvG++DFbYzXbJXeeoh2x8apwz4GP/s36
+         b9Vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746246654; x=1746851454;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=p+f18GgeWP3bF+TlxBMdab8Cp7U+xxHJNURE3i6Ge1U=;
-        b=nTR2kgjN3NWJGZCQVNsWsRSlBLRZRc7B21msPpaPNxEd3sndHDWUJUFFHN39c8bRr5
-         z6FIlb0yemu6qiJvC6VbpL+yjq9sBcqvFZ4dhZ9Ep1lXuZh/lkmoC6zBdI1xTkF29ptx
-         u50GlO+e5cdlU4p9hs7bx14PC2QFzsHcJLWVcswlqV5aYmqe+Mu3KchO1Qe8pCNJW7tW
-         ZmQZ2+BAWEE8txbENUZiPSjVul1FjlpqGbP8oSZvQ/j5Are66VgMrq1w/hK8XIGnHydk
-         sBq6RWsFuvtvL5zBbFMs8TCxzGl51SDjcJXHWl/OjagpxddFfIerXLqX/Kf5gkuhWGdE
-         6vfA==
-X-Gm-Message-State: AOJu0YyZ8m15HZjmbMlL6QEqy14oCy2crVLUY1TMM60eC4Bxesr+Zh2k
-	v71Ls0ArV0EvHbF6v7nCi2SYTmQybeuPscZVlUZH9U5LQxOsrZpoKQmZxIx+zTlB1NTTY1DilyX
-	7
-X-Gm-Gg: ASbGncvLoDX7hvBLgiB2crGOQ0byrT+NEzLyg8YF00RPcJqwKVRfhhBtdZmhLFlmXf9
-	x7WuVTVhNN8Rr0zo/thc7sB5PlXQCS4y1HtoXvvu6NiVRODExCvy2uJbMNYlf/H1CcF3Z6e1RJ8
-	EY14pYmYFw/rd6mrVXUcRDRnOVV7PPgHi+X6smUquw8Lu5mnHn9TihokiSmsdDH8aEJGf/jPUpV
-	9jL3C21PW+Ml47H1NUiaBFDcwenMLjKfOikN6WLYQFK2nvZHJTFyoJUTFufXMAGkXMgC+nYiJ71
-	6JoVHAu2h+cFuMZgZTp9QyqC0zF+CbzgCSM/hA==
-X-Google-Smtp-Source: AGHT+IElr87daY0HGdRNz2eiGqMz9KFGg8WbnGbFLM826DvJ7NsaHvHa/xN+JW26reCwoxMxDddCjA==
-X-Received: by 2002:a17:90b:2709:b0:2ee:e317:69ab with SMTP id 98e67ed59e1d1-30a4e43f1e6mr9718059a91.0.1746246654041;
-        Fri, 02 May 2025 21:30:54 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:71::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e1522a3desm16103055ad.198.2025.05.02.21.30.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 May 2025 21:30:53 -0700 (PDT)
-From: David Wei <dw@davidwei.uk>
-To: netdev@vger.kernel.org
-Cc: Donald Hunter <donald.hunter@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH net-next v1] tools: ynl-gen: validate 0 len strings from kernel
-Date: Fri,  2 May 2025 21:30:50 -0700
-Message-ID: <20250503043050.861238-1-dw@davidwei.uk>
-X-Mailer: git-send-email 2.47.1
+        d=1e100.net; s=20230601; t=1746246706; x=1746851506;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CpUkI6245kHsPqlCkZyvAf3355FDSMSSB7t0mD6h4Yc=;
+        b=lDIQC3yB0Q0jpdbPx7g4/wQ2qc0FGM0ZubeKq36zwx0/JyvSpUqSvJ0kUihnUzsbdJ
+         ibGYjy8BMblCdcvmzSMAFcovX0VbzqaNNfleuIi/nwte+nUg7QjaQtNR031ofH86Nk5u
+         QWocexojqxwMW44383+JqPdMYrkPYFrilzy/pMgrDw8FEp34cssl1p2w4rw46BzHeBog
+         dwefryU6oZIKQxUqpQOjxEkJ5EgJXN0fCTrguS+B4ACPuj1rp+3pmHw0cTMlJlvaHX33
+         Ix2wrZo7iKuzbdkSGK3tfXT356XVMggu51xmIQa5EI7dz0lKfHSNEvaedmIK/A/m7Zfi
+         81Fw==
+X-Gm-Message-State: AOJu0Ywf3f3N6o/7iUOrjid2+btkTPIFsVblW09QQBJeDz/tjaVW4GVt
+	Jvw4tzukxhrWN3B/cUwL0TAkYz2+IT+EnxsjY351XX+5cQgTb9KO8/tepEnR+lDeyeXzr/uZ8HU
+	vOCE=
+X-Gm-Gg: ASbGncvN7hzSBC6262nd0Mve5ZKXJkY8xtFwT1lGcwOklfM0qHEYmdQOy47jUtv6594
+	V4r+kwDfiQv9hYzyj6HSkZps83uxXjO6h1E4xjHVVanhR1ojs3Si4HvN/jVG8ZR3NNxdyzkK3qD
+	JuTUcTdPcTarNMWUzmjTdWT3BhLskLrK2aKy96oxxaNgxIEAcdVao6Nv0Z+TkG1LsRXYUo59i3u
+	+7huDemNBog70Twmf3r9jWCVsZVYKSc/Nu3ES1Cv048uzYZGrJlmVYwWtLleQdqSMvw1X5KjDi5
+	YEseKqk2d8To+3CjpfTO+tHKDzD+sfsiah8owW7X1CcThvZeuAz/vzUK+g==
+X-Google-Smtp-Source: AGHT+IHUPt79olq/5A1vmuGFPYY1phtnAD/VnJ14B7q0tr8yh9vS00b3kmMRGrJXnmqI5+jYEe0Z5A==
+X-Received: by 2002:a17:903:234e:b0:224:26fd:82e5 with SMTP id d9443c01a7336-22e1038ea74mr83401265ad.48.1746246705967;
+        Fri, 02 May 2025 21:31:45 -0700 (PDT)
+Received: from [192.168.1.21] ([97.126.136.10])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e1521faf1sm16164895ad.129.2025.05.02.21.31.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 02 May 2025 21:31:45 -0700 (PDT)
+Message-ID: <cc7417ae-113c-495f-9487-b2e42a4ade95@davidwei.uk>
+Date: Fri, 2 May 2025 21:31:45 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v1] io_uring/zcrx: selftests: fix setting ntuple
+ rule into rss
+From: David Wei <dw@davidwei.uk>
+To: netdev@vger.kernel.org
+Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski
+ <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Jacob Keller <jacob.e.keller@intel.com>
+References: <20250503043007.857215-1-dw@davidwei.uk>
+Content-Language: en-US
+In-Reply-To: <20250503043007.857215-1-dw@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Strings from the kernel are guaranteed to be null terminated and
-ynl_attr_validate() checks for this. But it doesn't check if the string
-has a len of 0, which would cause problems when trying to access
-data[len - 1]. Fix this by checking that len is positive.
+On 5/2/25 21:30, David Wei wrote:
+> Fix ethtool syntax for setting ntuple rule into rss. It should be
+> `context' instead of `action'.
+> 
+> Signed-off-by: David Wei <dw@davidwei.uk>
 
-Signed-off-by: David Wei <dw@davidwei.uk>
----
- tools/net/ynl/lib/ynl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tools/net/ynl/lib/ynl.c b/tools/net/ynl/lib/ynl.c
-index d263f6f40ad5..a0b54ad4c073 100644
---- a/tools/net/ynl/lib/ynl.c
-+++ b/tools/net/ynl/lib/ynl.c
-@@ -364,7 +364,7 @@ int ynl_attr_validate(struct ynl_parse_arg *yarg, const struct nlattr *attr)
- 		     "Invalid attribute (binary %s)", policy->name);
- 		return -1;
- 	case YNL_PT_NUL_STR:
--		if ((!policy->len || len <= policy->len) && !data[len - 1])
-+		if (len && (!policy->len || len <= policy->len) && !data[len - 1])
- 			break;
- 		yerr(yarg->ys, YNL_ERROR_ATTR_INVALID,
- 		     "Invalid attribute (string %s)", policy->name);
--- 
-2.47.1
-
+Sorry I accidentally sent the wrong patch. :(
 
