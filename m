@@ -1,89 +1,90 @@
-Return-Path: <netdev+bounces-187597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07D89AA7FA4
-	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 11:29:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52245AA7FA8
+	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 11:32:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC6D61BA1A2B
-	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 09:29:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE2F29A0BF0
+	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 09:32:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F16001D7E54;
-	Sat,  3 May 2025 09:29:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7B841CEE90;
+	Sat,  3 May 2025 09:32:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="arkvE+4v";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="LV9s7gEG"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Ad5zhHfL";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="n4oboeGO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC63D42A8F;
-	Sat,  3 May 2025 09:29:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4C8E2940D;
+	Sat,  3 May 2025 09:32:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746264562; cv=fail; b=nVPav90vBiuLTYL1g2qRhZqHbSoITHN4+iptrlSmDqqWmxU4g3dj7LSSB2jf8bomnJ5oQr6iLKNTP9BQEWcBOSrRIp5rKSCvJi9bfe0UnaWN26+yPaeNrb8ye9hmQmn/t0lsstsQF1eySQcDRQlnY+HW6HbX1ip+khvSzLiGywo=
+	t=1746264743; cv=fail; b=uGZhfwmioczer5eb0LlcTQjMcdXAz3oe01oUtXBz6xDtdTXLbBTLz+nrkYQ6oNJ/ym3a0DtGBMjw7H7c1yz9C6d+co0c3HfgUkYKwkXZ0eLs6JhXHIvsge0c/qFItkj0wkfzvcK+dTfc2s+TIgLuexXRFb7awWinoVw6cCgdZ5c=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746264562; c=relaxed/simple;
-	bh=UNoYckbqD1ZK6+TmM/zd3BkMCozEBA2zcDL9/iiGFjc=;
+	s=arc-20240116; t=1746264743; c=relaxed/simple;
+	bh=PfoENLh9fOQF27Md6UPPbYDLp5Dlmohtlq05UdWGob8=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=kaV7JsB6kOJRtg9h//MblwsV5S8JJN2Se04xgFnFYmJjEiixi6R4Z95rhLq8Y5yslj1/FII3nfg5b9nFp8m+nATh+D+jnaRVheWc4YMK7cIncI0pypcDJArF9ryja2pj8AL0xx4UdRt9V5ib/h9bK+WbhSGzm5VN3SqV+bJzd3k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=arkvE+4v; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=LV9s7gEG; arc=fail smtp.client-ip=205.220.165.32
+	 Content-Type:MIME-Version; b=TotGE0GJGl2S9txBEd1LRnFTlvOitdejlwX4fRkoiOSTx2ggm15KMmxuUREXGXRJ81LO/rm8Na8adn5H66bTVobSa2tJ/WO2UFWGstTCZBukRJMG9kCFTFnCSor9s392K5TC1nmRGOtpm9GxjuJGUYhWHrR1MY8LfaZlTylrZkg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Ad5zhHfL; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=n4oboeGO; arc=fail smtp.client-ip=205.220.177.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54392Qth029848;
-	Sat, 3 May 2025 09:26:42 GMT
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5437Y30G010456;
+	Sat, 3 May 2025 09:29:50 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=
-	corp-2025-04-25; bh=SVHrHPuHV+ds93MwJJkeCUdtd1QKa1tgGwkEv49jhkY=; b=
-	arkvE+4vxUsxk64u0TCDX7G37jgN8J7S05eRvELEb3czK51SVTyNEuR7vl99rD4C
-	Xpmr6fRY8oePCrUJamVkKmZL+qb54Mnw3gWM3ziFJ75utYJnnT53trzGGaxBEjP/
-	+325d8vgikQAV52DIjnZp7VfzvPM6Ayfn3bLJ5exQPbF5VWX3m1IhL3kKEzL9gtI
-	HfY6hn49T2N93OuiUjgIv/e84dOWW3CiuZfhTSgFHzyKqenSBpAcLnuvAG1Evv/Y
-	vPk2JgeBzjSSIFjDRYksINMjb+vB7SR1qh6Xq89oHI/POjiu/clfGZ/sv+r4LSu8
-	ouY4yx1lq7aXrIbz6DhpWA==
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 46dg5g00h3-1
+	corp-2025-04-25; bh=I5zyNe+MSjVjYFDF1660WyPY4hTEAuJ3aa8cRmLE9dc=; b=
+	Ad5zhHfLLu11N5j272xXvy8DxtzKKWNX1huqm0P0oZf99YOp3jPMN83OgZZp58li
+	WjFCD4D1o2yK4CsVPgBg/g2qGKRGKoUnE//lM8Yc3rWOgXGD33AnGtzmT9SGbNnA
+	wRxJP/yNfzKQhkdf4lv0oE33V0H8uJ3lt82uDQ3j+tbfQCST8sQXeAhVb7uu/BIz
+	155XH7y0qRsiTbmLLuFDC07SaYaTikagm2WmSIsDtduK0Em+2DAq5KOGngPxGFBi
+	IvuvQyb5KWOO+R9CkxvnZe/WIBMkiZCs6MwGOFcnZ7rrn2gB7M8gpXv3VRML0IZs
+	njvlTz+1+KNJ8U1eAS3CBw==
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 46deu6g3d7-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sat, 03 May 2025 09:26:42 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 543710av035355;
-	Sat, 3 May 2025 09:26:40 GMT
-Received: from nam04-bn8-obe.outbound.protection.outlook.com (mail-bn8nam04lp2040.outbound.protection.outlook.com [104.47.74.40])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 46d9kceb38-1
+	Sat, 03 May 2025 09:29:50 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 54374m1v035323;
+	Sat, 3 May 2025 09:29:49 GMT
+Received: from ch1pr05cu001.outbound.protection.outlook.com (mail-northcentralusazlp17010004.outbound.protection.outlook.com [40.93.20.4])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 46d9k66exw-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sat, 03 May 2025 09:26:40 +0000
+	Sat, 03 May 2025 09:29:49 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=VWz7GoAhkz49pEsQ5qU35zpd71FKeFAZem8DQn0OHBN13IiqwY1OYD17I7ttO8fktevYu4wdUHvTqTOMRzqyf26MgLT6LzyOcaJ4lsX1g63XlcC4kKDvWtUHUGBDzvxT43qiagQ8UJhX6RGfJQMcYGhr8aeFJKl7YcGB8mj8v+RBhnnGj/Sz37KLCZd3cRG3A4mjOv6H8cSzgnINPoxBu7+jggWFwekosgg7A4/MkWmxfobEbmYq1ttvcozeDp5Wljk2KwL7NRr8Dv0ug+E3cKCAOzPong8gzLvwaqd76uSHcgHSGlx6CJkpFmLDXWCQIs+3KmpkfNyxfEN00untBg==
+ b=SrMkDqPYOsc2UVm9kLTZ4WJd9aBirgbnZ9GEHvNa63g68zVVO9TkH9YjjTwen6FY+fSpStE3CsII5MKHZFpGpcrdgK40pQt5GECp7xysimljZgdb8IzUh2QlfXF1JD+I6VtW/+/2DYrxOEdJAX99Ze3NXs8z3qtP8tUlGjrT0jryBxzVNy0nunjC2ZQggKtpE06gkGhtIJFuV71y7Hl4iprSGIqkvZ/KktvjxuYiAIAy/rx+7Kw9uczvNX9S7Ew8wDJIvAoHA1JSV3f8Alu8dCpthsHZwOBdPPA9/4Qo9u7F2qFEEuVQeIgbLnqmW2beuEosMa0Yf29Rn1bGDZHjfg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SVHrHPuHV+ds93MwJJkeCUdtd1QKa1tgGwkEv49jhkY=;
- b=F2Ak/fzw7WPfYaswVgwvEt5CYU6WYqqWc3UowuEg4uIlYosIS5IzdC/Xm/adeXyJeyJMUmt7KJ5TN7nrt8gCfJAJWQHsgg86c14FLnsQwDGMjyCHX/uXoeIFoB/Z0SD20mpVIXtuuIC0c5WOGADhxi5CAj0SW85bbhpxGaCeJSuNm6MTtlkSR3Lj/2BB+xNmtnOj5lYw8+lto3M1KRN9BV7ZDj6Y9JyDEFF+WS8w3gMVyNtNTPF0Rxber0L6Vf2UGkherBrwW+fuwmEJZauOZTq0MLwabY8ups4uIhaRhXQewPl+Nl+HBbylKYrvntXNaW1nbom71lpnDWTa0cUcFA==
+ bh=I5zyNe+MSjVjYFDF1660WyPY4hTEAuJ3aa8cRmLE9dc=;
+ b=povNsXNN+u9CJ9ahV5l6vv30bgFxOfsRRXcnpHA/c1P3TpLvlmDN93fgE6o6j5SfHaAddEbEIsIWvrN2C8kBSPaBFXfDaqn/uAMAifYAwMxjhQ31TWI2FXjMmH4TG9DG4upi/9A9FKdutr5Fp/9aH0u9JFPonBjOOBc2c9BMZagPBpBTlFEKVZtbWfsFCXom2GeuNkJN6gnGCD4xBcLfQ3muGDsU2qNHNdAwfKH4RiomgzYPyIoHRbQHYwuRpK8/h4swpPFj5cYtI95Tf4aounx8Osbk5EgosT5l6UDTu7TOzZq3W5pA2YqcvQUq1X6sTS9PMaGfn/ZjM/BcAm5VgA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SVHrHPuHV+ds93MwJJkeCUdtd1QKa1tgGwkEv49jhkY=;
- b=LV9s7gEGlmEXvfBrUxCV5WQYXvC4tTxMJ0IDYZ3JTBrLDNN0FMwdys4w3Sgx3TDFPLhxbZ7XwcC7OX+w6tECRE9eMZOdysv7Krglcdmk0lrhFeRblxFgPTqoqtOfcGpVLn4Vj7cKDUAtuvAkuRpStFH69IgV/APMnAHcCE79nDw=
+ bh=I5zyNe+MSjVjYFDF1660WyPY4hTEAuJ3aa8cRmLE9dc=;
+ b=n4oboeGOMolYFESBy9NuRrqKCT9ME19ynVC6PynsDpN2jsZ52q8IN4e7cKvLgFWGiZbbXYsQ3pLIGXSGwVAuvooYCJc31LyN8PmeQ0alKJZgwitPD4G3qEa0rr7oShDw29+kxguEDTNamyzFTE+9Z28puNmbfa+cOppCm5GM7rQ=
 Received: from DS7PR10MB5328.namprd10.prod.outlook.com (2603:10b6:5:3a6::12)
- by DM4PR10MB6062.namprd10.prod.outlook.com (2603:10b6:8:b7::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8699.25; Sat, 3 May 2025 09:26:37 +0000
+ by MN6PR10MB8191.namprd10.prod.outlook.com (2603:10b6:208:4f9::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.25; Sat, 3 May
+ 2025 09:29:46 +0000
 Received: from DS7PR10MB5328.namprd10.prod.outlook.com
  ([fe80::ea13:c6c1:9956:b29c]) by DS7PR10MB5328.namprd10.prod.outlook.com
  ([fe80::ea13:c6c1:9956:b29c%2]) with mapi id 15.20.8699.022; Sat, 3 May 2025
- 09:26:37 +0000
-Message-ID: <90a12a85-cf44-499d-bc1b-9413eea00954@oracle.com>
-Date: Sat, 3 May 2025 14:56:22 +0530
+ 09:29:46 +0000
+Message-ID: <868c8163-d776-4ff4-b516-3046c5db0fc0@oracle.com>
+Date: Sat, 3 May 2025 14:59:31 +0530
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 07/11] net: ti: prueth: Adds support for
- network filters for traffic control supported by PRU-ICSS
+Subject: Re: [PATCH net-next v6 05/11] net: ti: prueth: Adds ethtool support
+ for ICSSM PRUETH Driver
 To: Parvathi Pudi <parvathi@couthit.com>, danishanwar@ti.com,
         rogerq@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
         edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
@@ -100,14 +101,14 @@ Cc: linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
         srk@ti.com, rogerq@ti.com, krishna@couthit.com, pmohan@couthit.com,
         mohan@couthit.com
 References: <20250423060707.145166-1-parvathi@couthit.com>
- <20250423072356.146726-8-parvathi@couthit.com>
+ <20250423072356.146726-6-parvathi@couthit.com>
 Content-Language: en-US
 From: ALOK TIWARI <alok.a.tiwari@oracle.com>
-In-Reply-To: <20250423072356.146726-8-parvathi@couthit.com>
+In-Reply-To: <20250423072356.146726-6-parvathi@couthit.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SI1PR02CA0015.apcprd02.prod.outlook.com
- (2603:1096:4:1f7::18) To DS7PR10MB5328.namprd10.prod.outlook.com
+X-ClientProxiedBy: SG2PR03CA0102.apcprd03.prod.outlook.com
+ (2603:1096:4:7c::30) To DS7PR10MB5328.namprd10.prod.outlook.com
  (2603:10b6:5:3a6::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -116,428 +117,316 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR10MB5328:EE_|DM4PR10MB6062:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0038d11a-c08d-4f8e-3a16-08dd8a249a61
+X-MS-TrafficTypeDiagnostic: DS7PR10MB5328:EE_|MN6PR10MB8191:EE_
+X-MS-Office365-Filtering-Correlation-Id: ab4d33fc-02c6-4f77-b9df-08dd8a250af6
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|366016|1800799024|921020;
+	BCL:0;ARA:13230040|1800799024|366016|376014|7416014|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?SnhZK0xham9VNGVYdXNaa09kMkR6aVNDcmNqK2M3WWp3alZabmo0ZWV1ajhl?=
- =?utf-8?B?OXhYaUZ5UnpZWmZCQXVsaDdwWEJjY0dEMFEvNHJhWWdkdHkzYkl6bHdtNFAr?=
- =?utf-8?B?M0gvYjY4bUtJamt1STQwbDFaMEdPbGViR0N4R2QrVnhUMFJMV0JPNVEwbjZn?=
- =?utf-8?B?ZXNuSDhoTldWTnN2YW8ybGRRZDNQR0VWK0tPWkQ0dlpCV3RVVHB3V01HNExH?=
- =?utf-8?B?Y29DYTQ0SlV0RGtITllzc0hLQmxzQXhER2JaYm9Lc09tRkZ4MU5BUHdJQWth?=
- =?utf-8?B?ZzJBTjRrRk5mMEJiT3lCL3FycGFicitUd0VIRUhrSzR4cWJQK0xLQ1g2YTVV?=
- =?utf-8?B?Vm1DV3ZjYXBGT3l4aVVseUJPdEFNOHphdjBxT3FTUzhxRWlDNGprVjVKZHpC?=
- =?utf-8?B?WFlUUVB5cmM2N0VhMW92YzlESTg2aGRDQXBsdUpYUFdkZUZ0QS9wQlJQb2o5?=
- =?utf-8?B?S2plb21xN0J6REYxWEtPWFhVbHM2blNOOWd3VmVZZXlrSjlaNXIrdWhIbHUw?=
- =?utf-8?B?cEJOa0RwdUcxV1BqK1FIRlI2clJvcXdXYkRzMFBXSk1HZmVJYVZLd0loWXpK?=
- =?utf-8?B?U1RVUXl5S1ZyZTQ1VGJiMWxqdzdFTHl4VnM2MFo2QmNRTWxEVk9ZZDJ0aTgw?=
- =?utf-8?B?U2xHa21admNaSHZkTkpHWVFGN0VuUzUyNU5RUC90QVVqZmYvQUdlN2V3SE12?=
- =?utf-8?B?aCtRdTh1WE80WHdaR0lxSEJOYllaQ09vcEw3VTlOQTh6THNJdXRnRTErQjFW?=
- =?utf-8?B?a1IrQnVUMVI4bFpySEJ4eGhPNDhQUGVvaUhRWFgrSnVHeEV3VnFKaG5EbGsw?=
- =?utf-8?B?YUlUMWMzT0xsbFY1L09uOEVxeVNtMW5FbWxQV3NGQ3dVK1Q2ZXRjZVd2QUZt?=
- =?utf-8?B?eDEyUER0a0ptNzlXdlJVWDlpUHNpTFNZNUpOazB2c25CaEY2UmtEUnRlM2VZ?=
- =?utf-8?B?K0ZnSmNtMkJYenQ2UEd5U2hIeXBhdDZyck5BQ293T3VBN2RkYmdkeTdFcGtS?=
- =?utf-8?B?TnZZVFhyTEZWVVp4SVVieVJaWEoxaVBkamRVZkdOWDQwbEpFVUxDc2hFUnVH?=
- =?utf-8?B?bEg1YVZnV1lTQlNyZ2RLWmM5Q1h1d1I5YWcxdlVuOVZ1TmtCMCs2QUhLakU3?=
- =?utf-8?B?RUxVM2YyTkVUaDU2Zy95ZGF6V2kycnl2KzJTOVVtcHJuUUpVNnlWcm9pc3ZR?=
- =?utf-8?B?WU1YYmQ0RkZMZ3p0NW5nNzNlcjVPcVcyVE5TTWlybHliYjRpWHJXU29lZi90?=
- =?utf-8?B?SHRJV0ZsRVFuajJWSytBL0p5M0h6WXE5YkljNXU5OStBOWltR2srSVVHWlVY?=
- =?utf-8?B?SEQ3MGpTTTMrd1dJYk9ETXNTL0xyVHhTL0tka3FONnlBbG05dWJyZDd0Slhp?=
- =?utf-8?B?RXhIUlNLMEwxZ0ZXdFdabXl1T3Y1RE9tWmExOXd5MTFSdEk5K0Y3RzY0ZUFj?=
- =?utf-8?B?S1liTEF0YXRydDRZTUY2LytxV2ZtclFsczBNSXdNUEQ0MGd4VGRMWDVkcHFP?=
- =?utf-8?B?WHF1MGFPeEQ5cEpiMUFqYjF1UDNmVytRaVRtdzhnTk1tUlNoeWNhR0NnSDRh?=
- =?utf-8?B?VWFsaHFBQjV4SjhlM1Y2WkFPSmZkUk1KRkhnVlJLU0xkQXNCOHlNUXBqekNI?=
- =?utf-8?B?UGJLYktZNzhDQ0E2VUNZbjhNbTdrY2toRXhWaUg3alBEdU9nL0RnRVNNOGZ2?=
- =?utf-8?B?NWJoWWtzMVY4OXpBcXNRTlY0WFhCQlRGSUZ6NEJhaEJCVW9HYlVrN0dyYVFS?=
- =?utf-8?B?ZnI2STRKMGNSdloydWF6SHQ4cFZWNnFZREhYL3A4aEhib0R1Y3p0TUxYbm52?=
- =?utf-8?B?N1ZmaUtMNXRVQ3hhV3VkZ3lXbk9QWmFuOUYxcFNDZzJWVjgxQ3NVSGFaQjhB?=
- =?utf-8?B?UDNpWE9POHh2eDg5K01KcVRYNWxMMkgzL3Mza0Zhbm9WdWc9PQ==?=
+	=?utf-8?B?S2pXNUhPSEU4Ukp2eFoxUDFFa1R6RXhxL1QwK3dicktBNUlnT2tqc2xCUkZI?=
+ =?utf-8?B?a2xnUGl2TUEwNXdzSTJHcXBiL0Q3VXpZYXFnK0x1bjExWDRYZ29ETWRZT01q?=
+ =?utf-8?B?L3VLQ2tnZDhJbmJzakNiV2lTSGhqMmhmMnFWaVVaUnpUWUp6dWl6U0tGdk9r?=
+ =?utf-8?B?UE1rbU9GOVRjcTJ3SWhwbzNtYlgya0tjRkxmUkFYRGE4NFQxT0JaWDBvUHk4?=
+ =?utf-8?B?VlEvTzBFN01YODIxSFBHV2Q2dXM4R1I0T1BxalJmMHVtMFE1ZVlwRDVuMW03?=
+ =?utf-8?B?aDRjMWJiMkpFeDVmc013cWd1QzFjV2NYc1crNWV4ekJoWjBlY3haQ0VFVjRR?=
+ =?utf-8?B?NWY2c0hGL3FGUlluaW5xbjdhNk0xYmNvVGNjRnhvbjhtdmxRM1NaNmxveTRO?=
+ =?utf-8?B?N0E3bXN3T0UzZFk4RU9xZG1jRVJpNnFUNWtMNnE1VmVWS1RIdHVnclpSUkQz?=
+ =?utf-8?B?NWVLeWZ4Y3hlVlN6SHptNTdldlpIWXdha0JJZThSNmZoK3ZlZ0FLWnNCQ2F6?=
+ =?utf-8?B?aGk2VHd3amh1THF2dDRGdXBLcE1SWlZuVHp5d0t3b0VXVkhCeGF6NGRCNHlZ?=
+ =?utf-8?B?OXQxMk9Wbmt0U0g1MmIveGVZeklZVHFiVnh6cXcwSTNuYWYvL1M0WTNMaVBv?=
+ =?utf-8?B?SzdmU3pqOFRwWkdjR1lhTWlIallqR1NCUGV5dExNMzdNOE5sMVlwRFVnalJo?=
+ =?utf-8?B?Z2ZkblhOc0Zxa01TQzJNY1hIUzVCaGcwWmhyOE8vRTdmeDJpbytWa2Eyb0xz?=
+ =?utf-8?B?bFMrbmxlbTVvSEExcjhjR1luaU55U0lhbGsyNlBjYWtSVWlWdit1UHdUZTBi?=
+ =?utf-8?B?Uk9Rd0NvRWZabkhaY2tIdjYxbjc0WXVHNVV3c0JWSEtPVjdJYlR5S2djMHJN?=
+ =?utf-8?B?NGRoWWlDZEI4K2V0RUJ3SHQ0ZHBCaGQvVlVTalAyNjRsTEQ0MjVBV2orMWpy?=
+ =?utf-8?B?V1RIZ3NKdFpJa2ZJbUhWMUNjMTc0MzAzdVFFTHpZbDJuOU9xUUhlL2puOFJx?=
+ =?utf-8?B?eVdNYzdhWEY2dEhkV2VOSjZNOWpaNit2NFhiNTJwN1huUzBzNTBNK21WTUxj?=
+ =?utf-8?B?bVVaZFdzVnRmd3JzeGN0RncvNUlHMWlUbFVXU0JhdCs4U21MRTRVdmNYU0Vr?=
+ =?utf-8?B?N0g0NG55YjdrbVM4ZHJMbWlTbHdwVU1NVU92MG04aHpKMW9aMEhDSEtzam9D?=
+ =?utf-8?B?V0xFa0ozRnI0SnAvS3g0WlhZQVQrdUprcWEzb3d0dWEyQUgxZGlFZC9LWGdo?=
+ =?utf-8?B?Y0RicGdSekh5U1c3Nm9ydnVDNnl3YktYa1BGcFhUNVloUHkzZDZ5ZkpXdTZK?=
+ =?utf-8?B?NHFROTJRUmdZcnovWEhmUmtmNnZ0b0RocGZxNEEwS2ZzaHg4ZUFHblJKTTBt?=
+ =?utf-8?B?N2tTa1hMQzFxYzlhZVlIeVdYbzR5ejJKNFJQMXplaW9wS3JXL1BlQjBuaTJs?=
+ =?utf-8?B?T0pFNnRyWUtWUG9Tc0Z2b21mc01HMmVOK1hMOG9RL1BGYmFXRHFkWFlieUxk?=
+ =?utf-8?B?czFUbEtOZEJUWTdCOGpvZ0FHaUNhK3N1QTVMS2NYNW4wYkFUMnlOWUtkeFRv?=
+ =?utf-8?B?LzRFaFN5WDhSUDRFMUc3QUtwOVltWU5KYjN3dkZYam5kVjVGOXFpeU1rVFZO?=
+ =?utf-8?B?WWk5UGxEYmkwbjZZSVgzNGJVeFhTV0FnRkd2ZjVZdk9CbCtCeHFMbGp3ZmtF?=
+ =?utf-8?B?VXNqc1diTm82b2hTWExiYThSTGIvWFBEd1phOWRWNzMrb1RibkFPdzRoSHNo?=
+ =?utf-8?B?WVlGNG1UbXFpREl5d2VPY0ZhRURwWjR4UmEvTGdSdW1iOFlIeXdVZEZ5UHNz?=
+ =?utf-8?B?NGFiRUlOa2lnY1VXOU9PRTRHQWF3eW1TbzJJTFBINkV2Qm5TcWZWRktvRmhC?=
+ =?utf-8?B?NzdYa2xKSE94REc2NWdRN0RrMTk1RzExQnhTYlZ5aGpTZEg4OFNBSmtkbVJm?=
+ =?utf-8?B?WkhYZnJhenY4TUZORFExNlUrZFlRYmJzcUZNcnl5QlVuR2VzalpkVjVhRHBQ?=
+ =?utf-8?B?SXVzZkNEU3hnPT0=?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR10MB5328.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(921020);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR10MB5328.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(921020);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?S3JTL0w4RDZPaDBGNHhrNDNVeHJ6VUJZZUZiMGJrV2lpZ2cwcFZsRkpYcnZN?=
- =?utf-8?B?RWVmZVpDYkVpaVBqejZkWWR0ZzVCQi9mck1nY3oyZUpHWFliVVV6WXl1MUhn?=
- =?utf-8?B?aUgvM3VZUEJIeHV1WmNnMGt2VXYrd3V4anl4QlpqWXF6V0ZWSXJPWGcvSXVt?=
- =?utf-8?B?eDNxOFBnekNDVTY0aUxYU3drc2NLVUpFOHdkQzBwZFRIbUNrcXVPT0x3QnpU?=
- =?utf-8?B?Z1hjTlE4bXhjWlp5Z1VMdU1FeWs3eVB4Z0xOTGJKZ0craVI2YWFBWmVuR3Zm?=
- =?utf-8?B?cmN0Y0I1VXVVVm1sTkdaZEIxWHg0YnQ3REVVL0RObU03OHRlMTlITWhrNExu?=
- =?utf-8?B?TmpTdGtXSzI1a0F5MWV4V3hUMVBqM3hnN2g4R0NCSVdTUE1WOWFvcHZkN1BY?=
- =?utf-8?B?cm1DbnZmOThQaXA4YmE5MlM5aWFrZVF4bHNNWnBVaFZTMUZZTmVaU1pVcXNG?=
- =?utf-8?B?aWlaZERaS1Jpa1MwWnlwMHNKWnFDamJGUzdwSXlSWlozaUo3U3FmcTgwb2k4?=
- =?utf-8?B?NEtOWFI2WE9IVzJ6MVF1K3V1eDNWT29LVlZXSlowdk5VSnFYbkZwaTVGNksw?=
- =?utf-8?B?STB0R042UElrUThYT2NMeW1BbGlpbzhTeHJ0Q2pEL010TFFHaDhDVGZwUDBh?=
- =?utf-8?B?RDhEcEc5SldEM2U1MzhLcGc5YUM1OTlzZDFIbEpMZFpmOHpmbnc3VDNiWE5L?=
- =?utf-8?B?WFFwc0NpZTVQeUI4Y3YyaWdOQmxPU3UzZHRNMS93TkRITWE3SmJrVTlMSGIw?=
- =?utf-8?B?NXZ6RjFjRDZHcnE2dUk3dUYwcjFtczZvNHhwR3BoYVczOHYwOGRYQ2xhWGI5?=
- =?utf-8?B?RjV3T0tKb0JGTHh4Sy9Xb0gwMnBEYmdUdWZ3eUVqY3pUVURvOVYySE1XM1l4?=
- =?utf-8?B?eGdPZ1ptNFc0bldyaTZDOXo1N0NXNGtoMXpSaWtLRFkvbXJneFBkZDdjeG03?=
- =?utf-8?B?cE90WEwzQjRtb0FxbG5udXlLa3hqNkNWcTMyUVE2ZnBHTnYvdmxHakNwN0tv?=
- =?utf-8?B?eGsySFlDYzhHRWxQSEhEWXZQUzlha0dEOElCbGtiTHEyNWhVN1QyR2lrR1Ix?=
- =?utf-8?B?cjhieWwwV1hLLzFVYkc1MWdkNVpYS1JqbGdzWnZTb2I5RlE0ZFltc0EyZkJC?=
- =?utf-8?B?WVh1T0ZNU0huZHA3eE45WGFwL0J4aDBrQTNERXFqWUY0bWRFV2cvOFdsYmlU?=
- =?utf-8?B?R01peHFhZzRoSWJyTGF5bEh4TUhnU1BRQnpMMFVxV0paQkpMRHRBWHVjR000?=
- =?utf-8?B?V280MVNzR25xYmFaeVZwTDBkbFJYY0dLUTg5V1J3YUluYko4dCtWcElmNGJP?=
- =?utf-8?B?ME14MHFGcVZ4bk4yV1hsZnVoMjJmUHZaeFdvdDF0YVdCQUhEaFJ5MEdtbm04?=
- =?utf-8?B?eVJtSm1TRGx3ZlVOL2dvbUJTNVdkbG9OaTMxK0xianFXbXlvRkZKNHIvNXdP?=
- =?utf-8?B?anpzeXExbUdmM3k1aElNZlArZG9JNzVoZ1Z1K0tzUm51TWFlUEZLMHRETVA2?=
- =?utf-8?B?RXBxRkRQZ200Q1RVVjB3MUZJY1VkR21udUhkQXBXR1FycTJjdDZXVkQybHZI?=
- =?utf-8?B?UndNY1hXNm04akJPQVBFblY4VWM3KzdYblpIWFZsU1VMSnNURjFLK1BGdkJt?=
- =?utf-8?B?ZkhGbDJTdWxLL2pmOHo4cWJqeUpRTUlzcTVhMXpRa0hjblBjd0ZEdUFveWE3?=
- =?utf-8?B?ak1iSDJlRWZBUG05SVFIU2NrVXJkT2NRUEJiNkR5MVlRWi9BbkNNYVI1dHZm?=
- =?utf-8?B?TGtVYi9FeFhEOElDcUFHazNHYlZ1aDRTQTdXeVFJRzVwZ2dTZWYrdURMTzNH?=
- =?utf-8?B?bmRHSFlDQ2pQU1lYblp6Z2k1UkZlOVE5dzhrbkRFcnpMSzZHT3A0UVU0STdP?=
- =?utf-8?B?bmVpSDhZSWozMHRYc0xNWlBldTFiaVhNM3dYeGNvSTBQbWR6Y2h2UWpiRXdD?=
- =?utf-8?B?MU1RcEZDUHB1R3hhSm1jZTNnSmJQcnFCSE00QUlqbFRYYXVOYnpTN1NXVTg3?=
- =?utf-8?B?NTJ3WDgxMjY1UHArdHlCaHFvcHhQUWxvUzY2UG1oWEdoZEROVTNESWhkSzQ2?=
- =?utf-8?B?Zmw0Zi9uVVhHSlZPV21iRSswSHduakFyT0RIcGJOanl1a29aSFpYcUxWeGdO?=
- =?utf-8?B?VlFETlFDM1pha2Z5bmlQUnRXNEZGb2VHeS9jamMrK2d6aGY3bm1GREN3UG5y?=
- =?utf-8?B?THc9PQ==?=
+	=?utf-8?B?VjMybC93QXdISWZsTVJEUW8vbVFGTWM5YWJraVNpYktFVGtldVJESWc2TXRT?=
+ =?utf-8?B?K0pwdFFTZzlrY3pkUW9vMHp1VmVHdU90MmFNazFONUZteWVKaHhKa1JxbHJN?=
+ =?utf-8?B?enlpemZZQ0NiMWM0eDh0MzFMVnlyVC9reEE2U1d2S0R3L1Q0NkdNdXpvUU5S?=
+ =?utf-8?B?L3dJdGRkOG52MGxWdGJxZzdHalJkdHFkQnpzQzFsWUtia3FuRmtERTlhaVIz?=
+ =?utf-8?B?TCtKNTRhS3YxR210VXduS2VtTm1uWnZ5TkZDK3gyR1k1ZXVxQmxrbDViT2VR?=
+ =?utf-8?B?c0ptZ3JiS3VlM2JGbnQyZG52eWM5OU1LVnFSb0ZwL3p6QkdLWXBOZnkvRHVY?=
+ =?utf-8?B?WFV3czdIOW5UaXN1Wmc4ZmQrd2dsTkdNV2RkMEVEaExiTGFqdDhzUC9wMHAz?=
+ =?utf-8?B?M1hINkVSTzNNWW9mQ0lvWS85dmZSMWlCa1pYQnhDRGdIdGhXNTZ0YkRwbnhj?=
+ =?utf-8?B?UUhQaEhnUXA3SGZyc1J3Z1BvMzhGVEVSd1ZpUlFrb3lVRXBFMFR4SWhSODBz?=
+ =?utf-8?B?OU85YWh1TEtWR202UnkyVHJ3RW8vZENkY0JXS3U1ZEc5aFA3Unh2bmVQcFlE?=
+ =?utf-8?B?YTZvOElJeUZZSi9oQnpsTnNKb3E1VkJyWEowT0cydnJSUUl1NWUvY2tPemd1?=
+ =?utf-8?B?ZXVCeGpRblNScEhFNUM2MVVicnRZOSs2NkZkUVFzc2RaVWppWFlLY3ppVEdN?=
+ =?utf-8?B?Q2pxYWhEcmgyWEdseFppZDNyNVNrQjFranl1ZTUwYzNpOXJXdnhXcXRqak1N?=
+ =?utf-8?B?Q2RQT1hENXdEODQwNm50Q3RMNkkwZk85OXpGSGNBV0piQW9WeVhGZ2xGRkU5?=
+ =?utf-8?B?TGtNRDFmaDVUeU12WmNoMWJHMHRpZE9LYm5PTG9OSGNaOWx2M0I3TFlIM2lE?=
+ =?utf-8?B?ZEZvejZFOGpZZlpNbWd5N3IwSklockNnY1dtNkZ2UVl3eXlXWEI5c3I1T1pw?=
+ =?utf-8?B?Z0p1SVNWMDJoK3h0MHpyOUdWWVd5UXpHUzBRdVVyUlVBLzY4cWZ6NjRIM2JM?=
+ =?utf-8?B?RjZDUGo4SUhkR3pJbDFpQUt2dVROckNkM2xBQ1RPRi9QaEtQMVBoR0svc2NM?=
+ =?utf-8?B?MlpCbnZMc0V4UWlNTXVRRnp5alJFRXBWWmxDdWNMcy9xb2ZHZ2RRYUpvUTZo?=
+ =?utf-8?B?NFMxb1dHdUo5Q2JMbmxiNUQ4M3lGaUJmazRxeG8vN2ZsaE9taVY3UWxSUEl3?=
+ =?utf-8?B?bmV3OGFzL2x2dC9MOHcybEw2SFovSW1JbDZuUDhiSjFod2F5TFRDVStPQmRQ?=
+ =?utf-8?B?T2JtQzkyQi82TTY3cUdlelNsWU1pVk5reG1uUUlOOHU1T0lvVlpkUTJ2OXdu?=
+ =?utf-8?B?RzN1TUM0YlpyZ3NvVGtINGZkRjhKTUJiRzkvdzVpbXp3RUJJYmd4MURNZ09p?=
+ =?utf-8?B?MG5xQWJ6L0hRaEVUOVlHVHNRVmdsRFp3VStLcDZFZHZ1Ukx3RXREYnZ3ZXEr?=
+ =?utf-8?B?U2lRM1BWMDdKR3NsUjhxa1VPRUxpa2pZblRNZlRuY3M5Tm1UcmhidXRCb2hk?=
+ =?utf-8?B?QWxEZzRER2Z2T0dtZTNydThqVDR0MEgxWTJna1JuRWhWWC9rM1VNT29IV2N5?=
+ =?utf-8?B?R05RU09lS1QwVjlZNzdFeTBsVjA2aFVMZnlOWHEwQzhyOU5nWDZHYzZQTDFR?=
+ =?utf-8?B?RGNoczdQSTJpaG9ESzRhanRISU1XTk9YMGpHOXNnbk1tWklRZ2JnMXE1RzJj?=
+ =?utf-8?B?eUtGaWZyREU5UW5UR2pBWUhTTnpwZFRvSWtpWVBsaEZFNkNXeXFNa09jMjRu?=
+ =?utf-8?B?VC9XL0xxdWlCRXBwckkvRGJlL1FlaStmZjNUclFjWDlKYTZ1TER3SE5BZlpl?=
+ =?utf-8?B?aTVTMjlYK3AxNXZJWXRYY09FUWhHcU5sTXdSMUlSdGIvemdBaWQxSEphUmh0?=
+ =?utf-8?B?VDQ2SzVwdW5VK1V3eTVaQ25maDNWZUhUWisxaWNVcXdNN0pKL3JzL3RxOVVl?=
+ =?utf-8?B?YSthS0pxdmdxTXphb0gvekZiSUxReHh6YWhZQXRHZXpRNlJTbXFsNzhiTlhQ?=
+ =?utf-8?B?c3VzSnZvUXdIYkloMkVSLzNuZ3hlZWxFZmd0a2dadUFUNzVnT1o1ckp1MFB6?=
+ =?utf-8?B?MUFxK2EvSkZuRVFHVml6QTl2dFprRGhsOHdOWi8rdmt4cWZMZ2EzeGxEeENL?=
+ =?utf-8?B?S21ZSUREK0xWWk9PcmZpVUNDQ2k4MVhhTnBDdHhoWEV0dm5lQTRqdFNOZ2xv?=
+ =?utf-8?B?WWc9PQ==?=
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	3saluEVZszVQx61C3CxI12oxub5uXTMhbP+2xYgAIMWvNz4Zrv0mkHqMlE+S+6GeApATSOvkQAFKaZQFF6y14czrSY5C1RaMsL9fJ8iQS8CAuAG87E/WygJAiEABeCRZwTEkmZT7QTIvhuzexxPwilY90RkMkuvuHqHJ2snRi2eqx5xs2hEUv8eUl28/yQZLiduc4mKoPYa4/kyZ/jbsmVyteUN5luEc0N9NRGavEI9sAT6AnIDc7n5wVRQLu+Hu6KN9UJVPA9+9NhcWe1a/+CLjmyO9P2pErGkqWoETAzS++zDuH3NCzThsxMv6cVXK6k+qCKB/dQ1oCWbJdtO8AvAECczypuOAiSr190gkFTo9ztiBZO+wsod3kYsV9cAB/nP2fjO5QYrIKghgfZMOOS6uTJDfN4xRvrgoJ4Q/A+Q2ZFlzJgUgm0AM8/1uvkOuzmVh4hBaqX7WHKGOvR+srBVS7YOpkGRgpnFZcAx+enjYMzvuoww4pNckKT5sGPgaKcGmEConF7VupcxhIQXsclSZBIQNmvp9RiOwh3Vbt3wKQPjzyJUvZxZBT8y8OybKGty/mOcqhN8awUItxOwLMjbA3PXyFp98ytkjo/lxykU=
+	cQFECSl+i/URZ4Dk1tH/ThdFB1Iqz2a7Kakvo2EzmwyXWfFtApZEc+I69Cb7sZVpH9PMUov/espX2g5ahYvRo8HfRXKqhsE+a/zv19kkxsgwWqDnb9NYogiIYcRlK4ftCeDW9cqVCxWPgofjaJpYevBGHbAv7sTOPcAU/aNzojh0OEylT/9Lg+luvoXdfqXt707h9TT3LRGxjXkoTP3S+TR3PRmQOQ/2u/6cWta1coFehPvh2Klc50tOKsnjglUhMfi9vfAJgXcZJZGYwzynkNk2dmD8Afqn4/ewihHDsMVcl4+kUKAuZcKU24eGTYwEeD2yIakyVWcYsrIFEZITN+jo+TrWPeBEaKnD5wKXYGJThf8e9RjVwKv0BvV/C5h+ljmMjCL9GvD6qRSFdtuh/S/9/NkAeK0jpJlvi1iE5KZlaseB51xUpHKwLlgEtrpjVvergXJLEpLx4Io4SYZjlahQVYyfVH3HT+WjVxne4HArnlnhxWudSbF/OyoIYa4TFmKfMuYRbVr66QKcOd/6hBaTBDeASjB7W/IIUob1Jd064P+sgd4yX9T5OeLeGNyuuHNhz+WbGeqeVhuhJDFe6ieqm+aNPmNIBblRJC56NHA=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0038d11a-c08d-4f8e-3a16-08dd8a249a61
+X-MS-Exchange-CrossTenant-Network-Message-Id: ab4d33fc-02c6-4f77-b9df-08dd8a250af6
 X-MS-Exchange-CrossTenant-AuthSource: DS7PR10MB5328.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 May 2025 09:26:37.1860
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 May 2025 09:29:46.2408
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9s2yZfMz0rNK+i9Q0xcnoocgS95oc+rMrb00Ps+yzw9Tjx1187oHvoftVFq8QuE3aRLBy+vKiu9TgvB2ipClcXyrMDIm/BP1T4PpDXHl19E=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR10MB6062
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9s6/r/yZYNa/QNotdJxjEraLza1CJDn4sgHN4F/C4Svl0ONndyVeEqSRQU/Yi0IF2IK1RM0w5qlYOesR+jHSitmGEg5E2TYMu+BhPRWcvJQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR10MB8191
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
  definitions=2025-05-03_04,2025-04-30_01,2025-02-21_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 suspectscore=0
- malwarescore=0 mlxscore=0 spamscore=0 mlxlogscore=999 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2504070000
- definitions=main-2505030082
-X-Authority-Analysis: v=2.4 cv=GLEIEvNK c=1 sm=1 tr=0 ts=6815e152 b=1 cx=c_pps a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19
- a=MC2SG-5JKGE4uHR-:21 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=GoEa3M9JfhUA:10 a=sozttTNsAAAA:8 a=phHMdyB2EjiPLhRZp2EA:9 a=QEXdDO2ut3YA:10 cc=ntf awl=host:13130
-X-Proofpoint-GUID: wC5xz4WSU55mqhtY91V-cfogIynNHAXd
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTAzMDA4MyBTYWx0ZWRfX1a4DPy8m5HM4 RgsJIXS5ngfrA+Xpa8SiChOJG+hnxffKGVm66JsQv7DPhn725Rqa1HwD/D3NxeHE06UGKbL0YMf cstKEakmSY3wyvKbgnOt9Eeq9zYWR5AWHgxYWQjnGSmJFkpHFA2EdOY9CLWoMZKrHiVF+QwY6tu
- LAL5BS757F7fi16n74SmDDhlhPRmYzpL5Hq/iwKY8owSIiny3GV5Gr4leyIXkxcTYFrLG27r4Kw clX7dajrwCPD37Ddrr3jOMZD+st1npPZBiwy6j1UMKSc6//b/H9xDUMsWXtnkr8OmmUjN8/THNN /p21BhrF3TMwZnrCABn5Cll9s9fzkPMMyrBF6jERPVDRZTJ+KtktSVY1KzQddj5Xhw3G+fyMkpO
- eC5KW0GmlD3PJqw5rJIo0B5uMToUps07IobqkTlGcj9kPwoeL1RPp9QBGMcQsP5nTLt8koUv
-X-Proofpoint-ORIG-GUID: wC5xz4WSU55mqhtY91V-cfogIynNHAXd
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0
+ malwarescore=0 spamscore=0 mlxlogscore=999 bulkscore=0 mlxscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2504070000 definitions=main-2505030083
+X-Proofpoint-GUID: OuZSFyYCoD6TJyKhoboZyVJrHY07BVmn
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTAzMDA4MiBTYWx0ZWRfX8vrOR6uIxLIc 5yUsAV7f2e8NcgBah7Fq+nRyP8dy7jcjgryo6JK+QSHOx4kzMqf1kcVuBHZUBtGkN6IQD1CmueW LeyhwFmAOx9+xvuveNkfqLBVgxIic0JHrzLdjxNYZOl5ETe24AZdt1r/Hg+tspaN9OwVazDiESv
+ tvEKZmfH3gMrnu0/9Kk3QSiBRZqeU6scm53pmAvzzDwbexOxsoIGqRlFfCqjg8HzhrcuLzWbpwp msDdT40Ae5nVaze02iqF3SKJ+szwQ0TQgMSlSVttH/clzI4JOg6yxWBdgrU+2Q5aK7IGpnffLjo nZSbfvraAsLk7+6Yugha3G7wPEy6XDyjJjmH4we5uII/kzhUBJYYva7U8UxRTA1qfERpJAzo+zT
+ KMgNWMFf3ZI8lYEHAJKDjKGvjn2MyLRoPRJyxNz4FZqCsEMI8LR79e8o+EAG5/2appxQHKtB
+X-Proofpoint-ORIG-GUID: OuZSFyYCoD6TJyKhoboZyVJrHY07BVmn
+X-Authority-Analysis: v=2.4 cv=CIcqXQrD c=1 sm=1 tr=0 ts=6815e20e b=1 cx=c_pps a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19
+ a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=GoEa3M9JfhUA:10 a=sozttTNsAAAA:8 a=EcxQipIutFa8zc1G2lcA:9 a=QEXdDO2ut3YA:10
 
 
-> +	/* for LRE, it is a shared table. So lock the access */
-> +	spin_lock_irqsave(&emac->addr_lock, flags);
-> +
-> +	/* VLAN filter table is 512 bytes (4096 bit) bitmap.
-> +	 * Each bit controls enabling or disabling corresponding
-> +	 * VID. Therefore byte index that controls a given VID is
-> +	 * can calculated as vid / 8 and the bit within that byte
-> +	 * that controls VID is given by vid % 8. Allow untagged
-> +	 * frames to host by default.
-> +	 */
-> +	byte_index = vid / BITS_PER_BYTE;
-> +	bit_index = vid % BITS_PER_BYTE;
-> +	val = readb(ram + vlan_filter_tbl + byte_index);
-> +	if (add)
-> +		val |= BIT(bit_index);
-> +	else
-> +		val &= ~BIT(bit_index);
-> +	writeb(val, ram + vlan_filter_tbl + byte_index);
-> +
-> +	spin_unlock_irqrestore(&emac->addr_lock, flags);
-> +
-> +	netdev_dbg(emac->ndev, "%s VID bit at index %d and bit %d\n",
-> +		   add ? "Setting" : "Clearing", byte_index, bit_index);
 
-VID bit at byte index
+On 23-04-2025 12:53, Parvathi Pudi wrote:
+> From: Roger Quadros <rogerq@ti.com>
+> 
+> Changes for enabling ethtool support for the newly added PRU Ethernet
+> interfaces. Extends the support for statistics collection from PRU internal
+> memory and displays it in the user space. Along with statistics,
+> enable/disable of features, configuring link speed etc.are now supported.
 
-> +
-> +	return 0;
+etc.are -> etc. are
+
+> 
+> The firmware running on PRU maintains statistics in internal data memory.
+> When requested ethtool collects all the statistics for the specified
+> interface and displays it in the user space.
+> 
+
+> --- a/drivers/net/ethernet/ti/Makefile
+> +++ b/drivers/net/ethernet/ti/Makefile
+> @@ -4,7 +4,7 @@
+>   #
+>   
+[clip]
 > +}
 > +
-> +static int icssm_emac_ndo_vlan_rx_add_vid(struct net_device *dev,
-> +					  __be16 proto, u16 vid)
-> +{
-> +	struct prueth_emac *emac = netdev_priv(dev);
-> +
-> +	return icssm_emac_add_del_vid(emac, true, proto, vid);
-> +}
-> +
-> +static int icssm_emac_ndo_vlan_rx_kill_vid(struct net_device *dev,
-> +					   __be16 proto, u16 vid)
-> +{
-> +	struct prueth_emac *emac = netdev_priv(dev);
-> +
-> +	return icssm_emac_add_del_vid(emac, false, proto, vid);
-> +}
-> +
-> +static int icssm_emac_get_port_parent_id(struct net_device *dev,
-> +					 struct netdev_phys_item_id *ppid)
-> +{
-> +	struct prueth_emac *emac = netdev_priv(dev);
-> +	struct prueth *prueth = emac->prueth;
-> +
-> +	ppid->id_len = sizeof(prueth->base_mac);
-> +	memcpy(&ppid->id, &prueth->base_mac, ppid->id_len);
-> +
-> +	return 0;
-> +}
-> +
-> +static int icssm_emac_ndo_get_phys_port_name(struct net_device *ndev,
-> +					     char *name, size_t len)
+> +static void icssm_emac_get_regs(struct net_device *ndev,
+> +				struct ethtool_regs *regs, void *p)
 > +{
 > +	struct prueth_emac *emac = netdev_priv(ndev);
-> +	int err;
+> +	struct prueth *prueth = emac->prueth;
 > +
-> +	err = snprintf(name, len, "p%d", emac->port_id);
+> +	regs->version = PRUETH_REG_DUMP_GET_VER(prueth);
+> +}
 > +
-> +	if (err >= len)
-> +		return -EINVAL;
+> +static const struct ethtool_rmon_hist_range icssm_emac_rmon_ranges[] = {
+> +	{    0,   64},
+> +	{   65,  127},
+> +	{  128,  255},
+> +	{  256,  511},
+> +	{  512,  1023},
+> +	{ 1024,  EMAC_MAX_PKTLEN},
+> +	{}
+> +};
 > +
-> +	return 0;
+> +static void
+> +icssm_emac_get_rmon_stats(struct net_device *ndev,
+> +			  struct ethtool_rmon_stats *rmon_stats,
+> +			  const struct ethtool_rmon_hist_range **ranges)
+> +{
+> +	struct prueth_emac *emac = netdev_priv(ndev);
+> +	struct port_statistics pstats;
+> +
+> +	*ranges = icssm_emac_rmon_ranges;
+> +	icssm_emac_get_stats(emac, &pstats);
+> +
+> +	rmon_stats->undersize_pkts = pstats.rx_undersized_frames;
+> +	rmon_stats->oversize_pkts  = pstats.rx_oversized_frames;
+
+remove extra ' ' before =
+
+> +
+> +	rmon_stats->hist[0] = pstats.tx64byte;
+> +	rmon_stats->hist[1] = pstats.tx65_127byte;
+> +	rmon_stats->hist[2] = pstats.tx128_255byte;
+> +	rmon_stats->hist[3] = pstats.tx256_511byte;
+> +	rmon_stats->hist[4] = pstats.tx512_1023byte;
+> +
+> +	rmon_stats->hist_tx[0] = pstats.rx64byte;
+> +	rmon_stats->hist_tx[1] = pstats.rx65_127byte;
+> +	rmon_stats->hist_tx[2] = pstats.rx128_255byte;
+> +	rmon_stats->hist_tx[3] = pstats.rx256_511byte;
+> +	rmon_stats->hist_tx[4] = pstats.rx1024byte;
+> +}
+> +
+> +static void
+> +icssm_emac_get_eth_mac_stats(struct net_device *ndev,
+> +			     struct ethtool_eth_mac_stats *mac_stats)
+> +{
+> +	struct prueth_emac *emac = netdev_priv(ndev);
+> +	struct port_statistics pstats;
+> +
+> +	icssm_emac_get_stats(emac, &pstats);
+> +
+> +	mac_stats->LateCollisions = pstats.late_coll;
+> +	mac_stats->SingleCollisionFrames = pstats.single_coll;
+> +	mac_stats->MultipleCollisionFrames = pstats.multi_coll;
+> +}
+> +
+> +/* Ethtool support for EMAC adapter */
+> +const struct ethtool_ops emac_ethtool_ops = {
+> +	.get_drvinfo = icssm_emac_get_drvinfo,
+> +	.get_link_ksettings = phy_ethtool_get_link_ksettings,
+> +	.set_link_ksettings = phy_ethtool_set_link_ksettings,
+> +	.get_link = ethtool_op_get_link,
+> +	.get_sset_count = icssm_emac_get_sset_count,
+> +	.get_strings = icssm_emac_get_strings,
+> +	.get_ethtool_stats = icssm_emac_get_ethtool_stats,
+> +	.get_regs = icssm_emac_get_regs,
+> +	.get_rmon_stats = icssm_emac_get_rmon_stats,
+> +	.get_eth_mac_stats = icssm_emac_get_eth_mac_stats,
+> +};
+> +EXPORT_SYMBOL_GPL(emac_ethtool_ops);
+> diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth.c b/drivers/net/ethernet/ti/icssm/icssm_prueth.c
+> index 7aae12383ad3..b37991b04dd1 100644
+> --- a/drivers/net/ethernet/ti/icssm/icssm_prueth.c
+> +++ b/drivers/net/ethernet/ti/icssm/icssm_prueth.c
+> @@ -901,6 +901,8 @@ static int icssm_emac_ndo_open(struct net_device *ndev)
+>   
+>   	icssm_prueth_emac_config(emac);
+>   
+> +	icssm_emac_set_stats(emac, &emac->stats);
+> +
+>   	ret = icssm_emac_set_boot_pru(emac, ndev);
+>   	if (ret)
+>   		return ret;
+> @@ -952,6 +954,8 @@ static int icssm_emac_ndo_stop(struct net_device *ndev)
+>   	/* stop the PRU */
+>   	rproc_shutdown(emac->pru);
+>   
+> +	icssm_emac_get_stats(emac, &emac->stats);
+> +
+>   	/* free rx interrupts */
+>   	free_irq(emac->rx_irq, ndev);
+>   
+> @@ -1045,10 +1049,39 @@ static enum netdev_tx icssm_emac_ndo_start_xmit(struct sk_buff *skb,
+>   	return ret;
+>   }
+>   
+> +/**
+> + * icssm_emac_ndo_get_stats64 - EMAC get statistics function
+> + * @ndev: The EMAC network adapter
+> + * @stats: rtnl_link_stats structure
+> + *
+> + * Called when system wants to get statistics from the device.
+> + *
+> + */
+> +static void icssm_emac_ndo_get_stats64(struct net_device *ndev,
+> +				       struct rtnl_link_stats64 *stats)
+> +{
+> +	struct prueth_emac *emac = netdev_priv(ndev);
+> +	struct port_statistics pstats;
+> +
+> +	icssm_emac_get_stats(emac, &pstats);
+> +
+> +	stats->rx_packets = ndev->stats.rx_packets;
+> +	stats->rx_bytes   = ndev->stats.rx_bytes;
+> +	stats->tx_packets = ndev->stats.tx_packets;
+> +	stats->tx_bytes   = ndev->stats.tx_bytes;
+> +	stats->tx_errors  = ndev->stats.tx_errors;
+> +	stats->tx_dropped = ndev->stats.tx_dropped;
+> +	stats->multicast  = pstats.rx_mcast;
+> +
+> +	stats->rx_over_errors   = ndev->stats.rx_over_errors;
+> +	stats->rx_length_errors = ndev->stats.rx_length_errors;
+
+remove extra ' ' before =
+
 > +}
 > +
 >   static const struct net_device_ops emac_netdev_ops = {
 >   	.ndo_open = icssm_emac_ndo_open,
 >   	.ndo_stop = icssm_emac_ndo_stop,
 >   	.ndo_start_xmit = icssm_emac_ndo_start_xmit,
-> +	.ndo_set_mac_address = eth_mac_addr,
-> +	.ndo_validate_addr = eth_validate_addr,
->   	.ndo_tx_timeout = icssm_emac_ndo_tx_timeout,
->   	.ndo_get_stats64 = icssm_emac_ndo_get_stats64,
-> +	.ndo_set_rx_mode = icssm_emac_ndo_set_rx_mode,
->   	.ndo_eth_ioctl = icssm_emac_ndo_ioctl,
-> +	.ndo_vlan_rx_add_vid = icssm_emac_ndo_vlan_rx_add_vid,
-> +	.ndo_vlan_rx_kill_vid = icssm_emac_ndo_vlan_rx_kill_vid,
-> +	.ndo_setup_tc = icssm_emac_ndo_setup_tc,
-> +	.ndo_get_port_parent_id = icssm_emac_get_port_parent_id,
-> +	.ndo_get_phys_port_name = icssm_emac_ndo_get_phys_port_name,
+> +	.ndo_get_stats64 = icssm_emac_ndo_get_stats64,
 >   };
 >   
 >   /* get emac_port corresponding to eth_node name */
-> @@ -1567,6 +1865,7 @@ static int icssm_prueth_netdev_init(struct prueth *prueth,
->   	emac->prueth = prueth;
->   	emac->ndev = ndev;
->   	emac->port_id = port;
-> +	memset(&emac->mc_filter_mask[0], 0xff, ETH_ALEN); /* default mask */
->   
->   	/* by default eth_type is EMAC */
->   	switch (port) {
-> @@ -1608,7 +1907,9 @@ static int icssm_prueth_netdev_init(struct prueth *prueth,
->   		dev_err(prueth->dev, "could not get ptp tx irq. Skipping PTP support\n");
->   	}
->   
-> +	spin_lock_init(&emac->lock);
->   	spin_lock_init(&emac->ptp_skb_lock);
-> +	spin_lock_init(&emac->addr_lock);
->   
->   	/* get mac address from DT and set private and netdev addr */
->   	ret = of_get_ethdev_address(eth_node, ndev);
-> @@ -1637,6 +1938,10 @@ static int icssm_prueth_netdev_init(struct prueth *prueth,
->   	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_Pause_BIT);
+> @@ -1177,6 +1210,7 @@ static int icssm_prueth_netdev_init(struct prueth *prueth,
 >   	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_Asym_Pause_BIT);
 >   
-> +	ndev->features |= NETIF_F_HW_VLAN_CTAG_FILTER | NETIF_F_HW_TC;
-> +
-> +	ndev->hw_features |= NETIF_F_HW_VLAN_CTAG_FILTER;
-> +
 >   	ndev->netdev_ops = &emac_netdev_ops;
->   	ndev->ethtool_ops = &emac_ethtool_ops;
+> +	ndev->ethtool_ops = &emac_ethtool_ops;
 >   
-> @@ -1689,6 +1994,7 @@ static int icssm_prueth_probe(struct platform_device *pdev)
->   	platform_set_drvdata(pdev, prueth);
->   	prueth->dev = dev;
->   	prueth->fw_data = device_get_match_data(dev);
-> +	prueth->fw_offsets = &fw_offsets_v2_1;
->   
->   	eth_ports_node = of_get_child_by_name(np, "ethernet-ports");
->   	if (!eth_ports_node)
-> @@ -1875,6 +2181,8 @@ static int icssm_prueth_probe(struct platform_device *pdev)
->   			prueth->emac[PRUETH_MAC1]->ndev;
->   	}
->   
-> +	eth_random_addr(prueth->base_mac);
-> +
->   	dev_info(dev, "TI PRU ethernet driver initialized: %s EMAC mode\n",
->   		 (!eth0_node || !eth1_node) ? "single" : "dual");
->   
+>   	return 0;
+>   free:
 > diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth.h b/drivers/net/ethernet/ti/icssm/icssm_prueth.h
-> index 1709b3b6c2be..8a5f1647466a 100644
+> index 3c70dc9c4be0..39ceed0e2d15 100644
 > --- a/drivers/net/ethernet/ti/icssm/icssm_prueth.h
 > +++ b/drivers/net/ethernet/ti/icssm/icssm_prueth.h
-> @@ -28,6 +28,9 @@
+> @@ -27,6 +27,12 @@
 >   #define EMAC_MAX_FRM_SUPPORT (ETH_HLEN + VLAN_HLEN + ETH_DATA_LEN + \
 >   			      ICSSM_LRE_TAG_SIZE)
 >   
-> +/* default timer for NSP and HSR/PRP */
-> +#define PRUETH_NSP_TIMER_MS	(100) /* Refresh NSP counters every 100ms */
+> +#define PRUETH_REG_DUMP_VER		1
 > +
->   #define PRUETH_REG_DUMP_VER		1
->   
->   /* Encoding: 32-16: Reserved, 16-8: Reg dump version, 8-0: Ethertype  */
+> +/* Encoding: 32-16: Reserved, 16-8: Reg dump version, 8-0: Ethertype  */
 
 remove extra ' ' after Ethertype
 
-> @@ -293,6 +296,29 @@ enum prueth_mem {
->   	PRUETH_MEM_MAX,
+> +#define PRUETH_REG_DUMP_GET_VER(x)	((PRUETH_REG_DUMP_VER << 8) | \
+> +					 ((x)->eth_type))
+> +
+>   /* PRU Ethernet Type - Ethernet functionality (protocol
+>    * implemented) provided by the PRU firmware being loaded.
+>    */
+> @@ -108,6 +114,119 @@ struct prueth_packet_info {
+>   	bool timestamp;
 >   };
->   
-> +/* Firmware offsets/size information */
-> +struct prueth_fw_offsets {
-> +	u32 index_array_offset;
-> +	u32 bin_array_offset;
-> +	u32 nt_array_offset;
-> +	u32 index_array_loc;
-> +	u32 bin_array_loc;
-> +	u32 nt_array_loc;
-> +	u32 index_array_max_entries;
-> +	u32 bin_array_max_entries;
-> +	u32 nt_array_max_entries;
-> +	u32 vlan_ctrl_byte;
-> +	u32 vlan_filter_tbl;
-> +	u32 mc_ctrl_byte;
-> +	u32 mc_filter_mask;
-> +	u32 mc_filter_tbl;
-> +	/* IEP wrap is used in the rx packet ordering logic and
-> +	 * is different for ICSSM v1.0 vs 2.1
-> +	 */
-> +	u32 iep_wrap;
-> +	u16 hash_mask;
-> +};
-> +
-[clip]
-> @@ -0,0 +1,120 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +
-> +/* Copyright (C) 2015-2021 Texas Instruments Incorporated - https://urldefense.com/v3/__https://www.ti.com__;!!ACWV5N9M2RV99hQ!Pnt8LQPwsRI73TtUPzBpwVw_Cn90DbuNXinXJ5m2isPHfFxjNTp4JBlr6UedPapFerELKSzV4SFNoiUfE1xa8g$
-> + *
-> + * This file contains VLAN/Multicast filtering feature memory map
-> + *
-> + */
-> +
-> +#ifndef ICSS_VLAN_MULTICAST_FILTER_MM_H
-> +#define ICSS_VLAN_MULTICAST_FILTER_MM_H
-> +
-> +/*  VLAN/Multicast filter defines & offsets,
-> + *  present on both PRU0 and PRU1 DRAM
-
-remove extra ' '
-
-> + */
-> +
-> +/* Feature enable/disable values for multicast filtering */
-> +#define ICSS_EMAC_FW_MULTICAST_FILTER_CTRL_DISABLED		0x00
-> +#define ICSS_EMAC_FW_MULTICAST_FILTER_CTRL_ENABLED		0x01
-> +
-> +/* Feature enable/disable values  for VLAN filtering */
-
-remove extra ' ' after values
-
-> +#define ICSS_EMAC_FW_VLAN_FILTER_CTRL_DISABLED			0x00
-> +#define ICSS_EMAC_FW_VLAN_FILTER_CTRL_ENABLED			0x01
-> +
-> +/* Add/remove multicast mac id for filtering bin */
-> +#define ICSS_EMAC_FW_MULTICAST_FILTER_HOST_RCV_ALLOWED		0x01
-> +#define ICSS_EMAC_FW_MULTICAST_FILTER_HOST_RCV_NOT_ALLOWED	0x00
-> +
-> +/* Default HASH value for the multicast filtering Mask */
-> +#define ICSS_EMAC_FW_MULTICAST_FILTER_INIT_VAL			0xFF
-> +
-> +/* Size requirements for Multicast filtering feature */
-> +#define ICSS_EMAC_FW_MULTICAST_TABLE_SIZE_BYTES			       256
-> +#define ICSS_EMAC_FW_MULTICAST_FILTER_MASK_SIZE_BYTES			 6
-> +#define ICSS_EMAC_FW_MULTICAST_FILTER_CTRL_SIZE_BYTES			 1
-> +#define ICSS_EMAC_FW_MULTICAST_FILTER_MASK_OVERRIDE_STATUS_SIZE_BYTES	 1
-> +#define ICSS_EMAC_FW_MULTICAST_FILTER_DROP_CNT_SIZE_BYTES		 4
-> +
-> +/* Size requirements for VLAN filtering feature : 4096 bits = 512 bytes */
-> +#define ICSS_EMAC_FW_VLAN_FILTER_TABLE_SIZE_BYTES		       512
-> +#define ICSS_EMAC_FW_VLAN_FILTER_CTRL_SIZE_BYTES			 1
-> +#define ICSS_EMAC_FW_VLAN_FILTER_DROP_CNT_SIZE_BYTES			 4
-> +
-> +/* Mask override set status */
-> +#define ICSS_EMAC_FW_MULTICAST_FILTER_MASK_OVERRIDE_SET			 1
-> +/* Mask override not set status */
-> +#define ICSS_EMAC_FW_MULTICAST_FILTER_MASK_OVERRIDE_NOT_SET		 0
-> +/* 6 bytes HASH Mask for the MAC */
-> +#define ICSS_EMAC_FW_MULTICAST_FILTER_MASK_OFFSET	  0xF4
-> +/* 0 -> multicast filtering disabled | 1 -> multicast filtering enabled */
-> +#define ICSS_EMAC_FW_MULTICAST_FILTER_CTRL_OFFSET	\
-> +	(ICSS_EMAC_FW_MULTICAST_FILTER_MASK_OFFSET +	\
-> +	 ICSS_EMAC_FW_MULTICAST_FILTER_MASK_SIZE_BYTES)
-> +/* Status indicating if the HASH override is done or not: 0: no, 1: yes */
-> +#define ICSS_EMAC_FW_MULTICAST_FILTER_OVERRIDE_STATUS	\
-> +	(ICSS_EMAC_FW_MULTICAST_FILTER_CTRL_OFFSET +	\
-> +	 ICSS_EMAC_FW_MULTICAST_FILTER_CTRL_SIZE_BYTES)
-> +/* Multicast drop statistics */
-> +#define ICSS_EMAC_FW_MULTICAST_FILTER_DROP_CNT_OFFSET	\
-> +	(ICSS_EMAC_FW_MULTICAST_FILTER_OVERRIDE_STATUS +\
-> +	 ICSS_EMAC_FW_MULTICAST_FILTER_MASK_OVERRIDE_STATUS_SIZE_BYTES)
-> +/* Multicast table */
-> +#define ICSS_EMAC_FW_MULTICAST_FILTER_TABLE		\
-> +	(ICSS_EMAC_FW_MULTICAST_FILTER_DROP_CNT_OFFSET +\
-> +	 ICSS_EMAC_FW_MULTICAST_FILTER_DROP_CNT_SIZE_BYTES)
-> +
-> +/* Multicast filter defines & offsets for LRE
-> + */
-> +#define ICSS_LRE_FW_MULTICAST_TABLE_SEARCH_OP_CONTROL_BIT	0xE0
-> +/* one byte field :
-> + * 0 -> multicast filtering disabled
-> + * 1 -> multicast filtering enabled
-> + */
-> +#define ICSS_LRE_FW_MULTICAST_FILTER_MASK			 0xE4
-> +#define ICSS_LRE_FW_MULTICAST_FILTER_TABLE			 0x100
-> +
-> +/* VLAN table Offsets */
-> +#define ICSS_EMAC_FW_VLAN_FLTR_TBL_BASE_ADDR		 0x200
-> +#define ICSS_EMAC_FW_VLAN_FILTER_CTRL_BITMAP_OFFSET	 0xEF
-> +#define ICSS_EMAC_FW_VLAN_FILTER_DROP_CNT_OFFSET	\
-> +	(ICSS_EMAC_FW_VLAN_FILTER_CTRL_BITMAP_OFFSET +	\
-> +	 ICSS_EMAC_FW_VLAN_FILTER_CTRL_SIZE_BYTES)
-> +
-> +/* VLAN filter Control Bit maps */
-> +/* one bit field, bit 0: | 0 : VLAN filter disabled (default),
-> + * 1: VLAN filter enabled
-> + */
-> +#define ICSS_EMAC_FW_VLAN_FILTER_CTRL_ENABLE_BIT		       0
-> +/* one bit field, bit 1: | 0 : untagged host rcv allowed (default),
-> + * 1: untagged host rcv not allowed
-> + */
-> +#define ICSS_EMAC_FW_VLAN_FILTER_UNTAG_HOST_RCV_ALLOW_CTRL_BIT	       1
-> +/* one bit field, bit 1: | 0 : priotag host rcv allowed (default),
-> + * 1: priotag host rcv not allowed
-> + */
-> +#define ICSS_EMAC_FW_VLAN_FILTER_PRIOTAG_HOST_RCV_ALLOW_CTRL_BIT       2
-> +/* one bit field, bit 1: | 0 : skip sv vlan flow
-> + * :1 : take sv vlan flow  (not applicable for dual emac )
-> + */
-> +#define ICSS_EMAC_FW_VLAN_FILTER_SV_VLAN_FLOW_HOST_RCV_ALLOW_CTRL_BIT  3
-> +
-> +/* VLAN IDs */
-> +#define ICSS_EMAC_FW_VLAN_FILTER_PRIOTAG_VID			       0
-> +#define ICSS_EMAC_FW_VLAN_FILTER_VID_MIN			       0x0000
-> +#define ICSS_EMAC_FW_VLAN_FILTER_VID_MAX			       0x0FFF
-> +
-> +/* VLAN Filtering Commands */
-> +#define ICSS_EMAC_FW_VLAN_FILTER_ADD_VLAN_VID_CMD		       0x00
-> +#define ICSS_EMAC_FW_VLAN_FILTER_REMOVE_VLAN_VID_CMD		       0x01
-> +
-> +/* Switch defines for VLAN/MC filtering */
-> +/* SRAM
-> + * VLAN filter defines & offsets
-> + */
-> +#define ICSS_LRE_FW_VLAN_FLTR_CTRL_BYTE				 0x1FE
-
-lowercase hex please, all place.
-
-> +/* one bit field | 0 : VLAN filter disabled
-> + *		 | 1 : VLAN filter enabled
-> + */
-> +#define ICSS_LRE_FW_VLAN_FLTR_TBL_BASE_ADDR			 0x200
-> +
-> +#endif /* ICSS_MULTICAST_FILTER_MM_H */
-
 
 Thanks,
 Alok
