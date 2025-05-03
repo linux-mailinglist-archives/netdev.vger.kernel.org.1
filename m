@@ -1,50 +1,93 @@
-Return-Path: <netdev+bounces-187567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0BC9AA7DE5
-	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 03:30:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A204AA7DE8
+	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 03:35:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50D285A3047
-	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 01:29:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C195E5A3883
+	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 01:35:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA4403C465;
-	Sat,  3 May 2025 01:29:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 361DD2629D;
+	Sat,  3 May 2025 01:35:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dYBU9/NC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lvcaWxu8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B49192581
-	for <netdev@vger.kernel.org>; Sat,  3 May 2025 01:29:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7855826AFB;
+	Sat,  3 May 2025 01:35:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746235797; cv=none; b=J1Hc3Fd7RJvwC3IARsLLLCe+wU1gD/YCZb05ITT6jWfkM7c10x5X6yZi+s5d9HSaSD9gF0Tf+N3XlHyV3bM/lJK4TRdlEHYTrYhqkMz3ubpq4wsmTBDuA9b4bH2fsbryDvp6oB80K4GDKOitvWCCkxHspjIaGCbeDNVXfFSsrtQ=
+	t=1746236128; cv=none; b=a2QD7wklWgy81A1ZowCKIIk7SF8qMIHoUanXUu1UiXVduLaFfmg4xpOuHgBjYxG/9mb7eqkfy9p4w1HJxh36yGT2rsurcsmJWFM1Ruu9qaS3Cnw0QWHa1Oq9p5Q2W7cktGjAeADS/sCC/P+e4OhHjMjPK+SrpkWRZesVN9C/JYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746235797; c=relaxed/simple;
-	bh=ckSRd/Z1qnGR5wOXMVaoNwn10WAMsGKB1bQB2+988VI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Dyno4T5J4K4eydZ1W2YxP8bNacnCC1F+4KvEBQCGBnuxTpmq45134F4tCjbaiuKuSMC3pOlRpoDfX01uchmF4XYyqYw3OoZ+caioGbFlf9ZsIClgKSi9+A7DqoIttoxgBC5YzbviK5zOjSKs8HHpT9MgNSrmgHz0GQEHwqHkpms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dYBU9/NC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E6C7C4CEE4;
-	Sat,  3 May 2025 01:29:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746235797;
-	bh=ckSRd/Z1qnGR5wOXMVaoNwn10WAMsGKB1bQB2+988VI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dYBU9/NCWhZT9cEjrZ/wwIvulZvVimgDEDPtNxu5T/H7Gzd8/Z64POfrz+Bvgbs6f
-	 MB72dWx4d/9CklUKdQ0/rjWzddt9bhkzZMTrAYouMti9W0vwq+chHA8hilvNpJzTPG
-	 0ApbmwCIEr0wIoHxP3W+WZmoFN3lWJubLBpSdz5UXOvB7olLl4REF3b3UlIKlO993s
-	 j6Tn6Z58KboK8DCCdnVmKsIqGfhLihnTtvfGDL1R23dsZf4DijJSBlumm6M3R86z8E
-	 0vfPmCv1lHOaZoX5p0i9E0RcInCPYY5YzuaCsyBKWhI7njUoY6EPykgVxR5O9mHt2H
-	 Q4oDSB9UI4/cw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C66380DBE9;
-	Sat,  3 May 2025 01:30:37 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1746236128; c=relaxed/simple;
+	bh=tMl8hZVUQG5HQG6FwMbiZOTecaN2qL0bC3Qr9pnE8jM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=D7zKVI73LghTp+ismdSL+FF9UjhCRviqMJ0f08jRt7XvKvkWIatpR8zeeoMcEZjJ2y68X0DSoJfrZaL+W+/UniuWkhs7Ho34suvjkmTS0L3U5spfQmYB+0NfArdKE7PppV7gUa8QBUFbR6y23J7BNHsGMQzozjxKEkpQtyvmWYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lvcaWxu8; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-43cf06eabdaso20007415e9.2;
+        Fri, 02 May 2025 18:35:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746236124; x=1746840924; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xar3mqUDwUSQmq/Fr0wdfqpIsI5GH3WpXBsnieneFNg=;
+        b=lvcaWxu8tKHHkqVFy+8OuQuEc7C00xEqIZcB3/fUlLWh47IT8Prnv1F41i1Su+jAio
+         +TenW/6BRqnDWt2s/dFCL9W0gBoSFE2m7aebRoF0sHXnbwmgRQXsCd9a9n+xz78Uwf7g
+         xts2QEzeMYufcmKNIlvD7Xw6LqJLtdfRsOcoypsORRg4hyUcrxC3BJUzYyRF8GQU7nVQ
+         SzOIp82nyNZf7Sv5SmKK8lCQcQGuJeG+vkc3cJD3AruDnlsPfnN8MVhM2UR3Hk8OZzxb
+         ekjs01ggLpWiEd2c1C7hWqE6PogAJ03wCnPjM79XDKkNsdAueBe2ypvX/VGdeAxf/tk+
+         7e/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746236124; x=1746840924;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xar3mqUDwUSQmq/Fr0wdfqpIsI5GH3WpXBsnieneFNg=;
+        b=RxqbZSHVKZky8rMfEzHk9D0poRwM9sILOlxApzGqQqwbrSf8ksQeZ9CH/RT0NdDMms
+         j04TDrOpUqRGBguejmoxJAtIG/FgwwWfOgOdCRi17Nr0FyCEnyYcLpvcoZ+fVo/a8xdC
+         VcuhH0/dbjSDm5P0hU/5sCxqvXblovFkO8Wx7HTxHwQ1qIQNEMRjlSJ6O38HlHtmsMhe
+         pwAbVjjypqsOBOGJYsq7x+0MrOr4q4sek6Q4mJuPJrJRVO3rxY4M8rnf+O1+8YoPX4+y
+         8JpoZa+476datz7vdMOfA5bg+FT3/tMkse54ksoP6oKBXX+W7V5HtZq4XkQHeTS8l7dv
+         9GAg==
+X-Forwarded-Encrypted: i=1; AJvYcCXQXHdcZlzF4y9q3sGZ0mA3nME17Ihun8PBRHsBAKJ8n/7zSNMgcvQ4HZdzp/KHoTZVqDu4z//HR8MpieZiPk0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YynayVbIYRyQjYWeAUkFjoWj4mam8G3Jct3IlXlcjuKxS2wY8y9
+	lGK+s7bbCm+ibrobapU66BbdO1uWgt/Fobr0IQzcrE79230UDWHvgARpCe8C
+X-Gm-Gg: ASbGncuxFK/j1lm3opMUeWQVXNHC6hshSCNUIAnoT5HszjSmZGq9ZH1ASxPXYDcMV1n
+	2z5gZWvY5IlQqhHmspfZD/4FppczKrkQPX8e6ohKDHKqwuLgq3ofNrvxc/IqqzVbG0QJymc2+xy
+	DFvEbBpk/zd968d/G7+v8ZJBHo7fpZ32HEBDB3j+7zLnNN3KCddyaG9tIDF0qwNcMzuHDvHWOgI
+	yXKp9p53u15PgyU8XtJR1YgxTKLvLqAUjr1HgMM1CIHFyFFK4xgOyTnowXXUQyKJj4jANxs0DLp
+	b1FmgZk+tAvTcmlDZFJRCr4R9Ddo7ViPlViJ0QQ=
+X-Google-Smtp-Source: AGHT+IEqd1XB6kNK6F/Karw2QKCnNoTNQlAdVLXCmN2M7WpvAkzcmSXaTEtXvIAyITItPdU+cX72Yg==
+X-Received: by 2002:a05:600c:4688:b0:43d:300f:fa4a with SMTP id 5b1f17b1804b1-441bbeb479emr47951635e9.12.1746236124152;
+        Fri, 02 May 2025 18:35:24 -0700 (PDT)
+Received: from localhost ([2a03:2880:31ff:70::])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-441b89d1636sm59452155e9.13.2025.05.02.18.35.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 May 2025 18:35:23 -0700 (PDT)
+From: Mohsin Bashir <mohsin.bashr@gmail.com>
+To: netdev@vger.kernel.org
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	ap420073@gmail.com,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net 0/3 v4] selftests: drv: net: fix `ping.py` test failure
+Date: Fri,  2 May 2025 18:35:15 -0700
+Message-ID: <20250503013518.1722913-1-mohsin.bashr@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,55 +95,20 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/6] net: stmmac: replace speed_mode_2500() method
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174623583625.3773265.4045311227752993763.git-patchwork-notify@kernel.org>
-Date: Sat, 03 May 2025 01:30:36 +0000
-References: <aBNe0Vt81vmqVCma@shell.armlinux.org.uk>
-In-Reply-To: <aBNe0Vt81vmqVCma@shell.armlinux.org.uk>
-To: Russell King (Oracle) <linux@armlinux.org.uk>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com,
- netdev@vger.kernel.org, pabeni@redhat.com
 
-Hello:
+Fix `ping.py` test failure on an ipv6 system, and appropriately handle the
+cases where either one of the two address families (ipv4, ipv6) is not
+present.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Mohsin Bashir (3):
+  selftests: drv: net: fix test failure on ipv6 sys
+  selftests: drv: net: avoid skipping tests
+  selftests: drv: net: add version indicator
 
-On Thu, 1 May 2025 12:45:21 +0100 you wrote:
-> Hi,
-> 
-> This series replaces the speed_mode_2500() method with a new method
-> that is more flexible, allowing the platform glue driver to populate
-> phylink's supported_interfaces and set the PHY-side interface mode.
-> 
-> The only user of this method is currently dwmac-intel, which we
-> update to use this new method.
-> 
-> [...]
+ tools/testing/selftests/drivers/net/ping.py | 45 ++++++++++++---------
+ 1 file changed, 27 insertions(+), 18 deletions(-)
 
-Here is the summary with links:
-  - [net-next,1/6] net: stmmac: use a local variable for priv->phylink_config
-    https://git.kernel.org/netdev/net-next/c/5ad39ceaea00
-  - [net-next,2/6] net: stmmac: use priv->plat->phy_interface directly
-    https://git.kernel.org/netdev/net-next/c/1966be55da5b
-  - [net-next,3/6] net: stmmac: add get_interfaces() platform method
-    https://git.kernel.org/netdev/net-next/c/ca732e990fc8
-  - [net-next,4/6] net: stmmac: intel: move phy_interface init to tgl_common_data()
-    https://git.kernel.org/netdev/net-next/c/0f455d2d1bbe
-  - [net-next,5/6] net: stmmac: intel: convert speed_mode_2500() to get_interfaces()
-    https://git.kernel.org/netdev/net-next/c/d3836052fe09
-  - [net-next,6/6] net: stmmac: remove speed_mode_2500() method
-    https://git.kernel.org/netdev/net-next/c/9d165dc58055
-
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.47.1
 
 
