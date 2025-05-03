@@ -1,169 +1,85 @@
-Return-Path: <netdev+bounces-187571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CC27AA7DEE
-	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 03:35:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5296CAA7DEF
+	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 03:37:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 472791B65BD4
-	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 01:36:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A0C0A467054
+	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 01:37:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C5C27346F;
-	Sat,  3 May 2025 01:35:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2650941C7F;
+	Sat,  3 May 2025 01:37:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l0heVtPP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jTzzJxBJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69C48134AC;
-	Sat,  3 May 2025 01:35:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0223A134AC
+	for <netdev@vger.kernel.org>; Sat,  3 May 2025 01:37:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746236139; cv=none; b=sQ74qzl/jYck/0DL3QH2+LJKs+xwhNN/euER8MLpgMhPT4m3ib8grlr51Qs/3XMut7UJtJdfZaOyFSobpHWeAWejDJ4abGyT4MZ6xKoPocdYgQ5Lzlk3TJN+U5eVlRBny3yqM3PwfUkIVVboe4hS4p0/rMPtlhHa8UMA687KKIE=
+	t=1746236242; cv=none; b=qvPCY+r9+DdKTYb0QtV2y3RweQ+aF+rW/pA9Tk81j7/1z1GMbWBf+27s3FdGVBTursaLvvzkrxLIe8teGmSUDRBSLBE3zs9vsSn8m2XGVtB0Fti+T4WjKQWkLhc/lzdbWlG4SbZ60clKIUqY/FzxNCkY4JQnUaOBFBiEPbgWLQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746236139; c=relaxed/simple;
-	bh=K167g7fRemdb/WjUQxfGyL4vXoA+rt1mXfrmOgKxWGw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kxWeWoYs3hcUbFupJYWhud5tkSyAdcU0cpKysedbpom9t3a/eeb+onPKleR8uXOM3KbV8rr28Hgqk8HtwrY7ekY7ohZFfFdn9AtZBvdzTTFZrmod8wQjrMUFnYRNyY0/mIO5ZPxUA4KgZfDdfJTUK1CkUhszKc4anBvP7GW9ZSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l0heVtPP; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-39bf44be22fso1794439f8f.0;
-        Fri, 02 May 2025 18:35:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746236135; x=1746840935; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kj7Tv0PMAv5wN2mQctk8ok8E4ZG10HhCwkVt+fUKixg=;
-        b=l0heVtPPgQV+yxrQgCR6M8GYHW52pknDXz07m+XbkyV4OiK7UXLgKUbo57pUpHcuDJ
-         QIxJrp614+t5Hl/DaJsebaN65lA2Nyv3aZMZnqBT+jdy7dvX+08BoEzfVW2/+zMNJ1BJ
-         9qzHPrQn0jUL5MKUnA2aHpXe2mhhSRFb8kYtZIYIveb/A5/7niG/ryNYyS4tRM/4B7Zg
-         SK4tFG1Z1nzHcds+qQ5AqOxlvICpGLaQFBJ2WSbA0KskUKbAsZ/EQoUW+whGew5lguQ8
-         yA9jJdcfhZ+xPGhNNHki7cky9mf9tOEhqYNk8lYcQyFO7oxziAmeEMRdyLZ3x+jstw9H
-         YgXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746236135; x=1746840935;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kj7Tv0PMAv5wN2mQctk8ok8E4ZG10HhCwkVt+fUKixg=;
-        b=Z8KtlzFeNdnLr63vRik9Y5N5xECHmzTY9J2afLhMH40SWig6XmxO8H7aoQqeontUpr
-         az3VOBXisM3xs5FIuaIe4vsy8swRzhYrdrINMkr4gl1tPpKSG6M7rrOnLEpQSEAuRNwl
-         kqhUwfCNg64skovxmO4P1GHPLhDKhP0/vOFuIFh0+jqrA5G7sJBoxVHxZRETfyvJdOEr
-         pAz2RHu6RoJ+qo5DbP4boN8ZAa1JwGZ8Jhhn8V+4BQqFZZnvvaR7K1V7Q0ZOab+3JsnU
-         BOpYRlrR6teo8hIfcMJR8mamfJF0d29sgROv+XPBcT6UaQOFLH455E5A9bLcUHbazpPe
-         yDgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW8Ps5TBqXBR1Y24GwrrG3ghPnJ1LmG59bOSXd3mfmMweUETua+5RffDVPQ38+xR5Gj8xkOOrXQHbKS2rcwyx0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMFw0Yn86CV7f8YKtBsprxzPFJeKaXkw3penbU6YPGuL60HmrI
-	0NBJtoI0f/oWFMsUoMIX02JUP91Y9QhJfHPQlnSN3QnKri/NgJtqwQakPoAY
-X-Gm-Gg: ASbGnct+7vmwm5dJ9VWVyXfwmZszkiAUVS8c4Y9OxZdtvEPMYqk39ZrS5+bolC/kdTK
-	76m3BK6ZQyG6D6uZIhTOM76A4h/DyS3OVbot2Wsh/lTcL6r2S9TOT3EbCLE5b7N6OCpnigztkdV
-	ijkIhjWhKWbDEndkFzGSg1FMrITaOEoIGDJ4o6ngWmBIiU4sItSO6O4t8fN2vO/ltdqhSp1gKTB
-	8r/x2+gI+7EtJuu6D043JhChnXYU2S9V3M0S2XVLi3kmEsmKLZmdX7d6BWeEp3z28CluNS4aCtb
-	wlY9dcylbfk/TNlzq0dw6QeIPp6vDGIki9ypw6AL05DIHo4g
-X-Google-Smtp-Source: AGHT+IH4gwCCZ6L77cFPD83z/oLaEFSZBiISpUZp1xuE+vCdGzJee8S0L9fpNB6GCgxypDTBHc7xzA==
-X-Received: by 2002:a05:6000:1cca:b0:3a0:7d82:d454 with SMTP id ffacd0b85a97d-3a09ceb0099mr697383f8f.20.1746236135348;
-        Fri, 02 May 2025 18:35:35 -0700 (PDT)
-Received: from localhost ([2a03:2880:31ff:8::])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a099b2449dsm3441410f8f.101.2025.05.02.18.35.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 May 2025 18:35:33 -0700 (PDT)
-From: Mohsin Bashir <mohsin.bashr@gmail.com>
-To: netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	ap420073@gmail.com,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net 3/3] selftests: drv: net: add version indicator
-Date: Fri,  2 May 2025 18:35:18 -0700
-Message-ID: <20250503013518.1722913-4-mohsin.bashr@gmail.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250503013518.1722913-1-mohsin.bashr@gmail.com>
-References: <20250503013518.1722913-1-mohsin.bashr@gmail.com>
+	s=arc-20240116; t=1746236242; c=relaxed/simple;
+	bh=csJ5rCdsmxOhF/KJF162wkmTFqyOHIAFeKcVQNtXjkk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NvuBfHH/VCviYVIdDa0rGla0zyDL8zEbICBBrPI1GC4zif86szaiGDhyHBfdC8H83E39v0PzoW2T3be0aV5F+7kQhyKvviJhJDBX2WUiU+kxKWqZkJM7gi3LZbFaLlFqRNxIGW9pyR5l9pXfGFQ/caiaZqhfnJ7pxMJq78SPyj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jTzzJxBJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27512C4CEE4;
+	Sat,  3 May 2025 01:37:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746236241;
+	bh=csJ5rCdsmxOhF/KJF162wkmTFqyOHIAFeKcVQNtXjkk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jTzzJxBJpkm9z1eb2Z/h8MoFaHF6k2csGpFB+LzUR00FEAu2mFq60FE+ZlsXq5Js8
+	 x9gs9+J9ZfsPxv4dvaOUENM0d/se4kC2HCrgJ8Giax44u0novdUTH2jrsgge4I1Ggl
+	 Y+hti6WxHzwoD5rr0UZb9LcfhI4R9gEgE9e6vT0BICAUCOgeJtUZ/6x6tA0zl+eJtB
+	 tPiqoZSAGw0gyIkb9c6ciODehL03i/iy9kSDIyw6hrQRwIEnCRDjSUFcgVycDj63FC
+	 W5mFflqUwbURMNX/qQIeBXUzPXnBC4VYdeJVc1mwUWpuD5jHpn3C0MDdmjsNiYJwp0
+	 JCuOwb6J/9ToQ==
+Date: Fri, 2 May 2025 18:37:20 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, saeedm@nvidia.com, horms@kernel.org,
+ donald.hunter@gmail.com
+Subject: Re: [PATCH net-next 1/5] tools: ynl-gen: extend block_start/end by
+ noind arg
+Message-ID: <20250502183720.15a82e29@kernel.org>
+In-Reply-To: <20250502113821.889-2-jiri@resnulli.us>
+References: <20250502113821.889-1-jiri@resnulli.us>
+	<20250502113821.889-2-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Currently, the test result does not differentiate between the cases when
-either one of the address families are configured or if both the address
-families are configured. Ideally, the result should report if a
-particular case was skipped.
+On Fri,  2 May 2025 13:38:17 +0200 Jiri Pirko wrote:
+> -    def block_start(self, line=''):
+> +    def block_start(self, line='', noind=False):
+>          if line:
+>              line = line + ' '
+>          self.p(line + '{')
+> -        self._ind += 1
+> +        if not noind:
+> +            self._ind += 1
+>  
+> -    def block_end(self, line=''):
+> +    def block_end(self, line='', noind=False):
+>          if line and line[0] not in {';', ','}:
+>              line = ' ' + line
+> -        self._ind -= 1
+> +        if not noind:
+> +            self._ind -= 1
 
-./drivers/net/ping.py
-TAP version 13
-1..7
-ok 1 ping.test_default_v4 # SKIP Test requires IPv4 connectivity
-ok 2 ping.test_default_v6
-ok 3 ping.test_xdp_generic_sb
-ok 4 ping.test_xdp_generic_mb
-ok 5 ping.test_xdp_native_sb
-ok 6 ping.test_xdp_native_mb
-ok 7 ping.test_xdp_offload # SKIP device does not support offloaded XDP
-Totals: pass:5 fail:0 xfail:0 xpass:0 skip:2 error:0
-
-Fixes: 75cc19c8ff89 ("selftests: drv-net: add xdp cases for ping.py")
-Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
----
- tools/testing/selftests/drivers/net/ping.py | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
-
-diff --git a/tools/testing/selftests/drivers/net/ping.py b/tools/testing/selftests/drivers/net/ping.py
-index 16b7d3ab0fc8..af8df2313a3b 100755
---- a/tools/testing/selftests/drivers/net/ping.py
-+++ b/tools/testing/selftests/drivers/net/ping.py
-@@ -136,13 +136,23 @@ def set_interface_init(cfg) -> None:
-     cmd(f"ip link set dev {cfg.ifname} xdpoffload off", shell=True)
-     cmd(f"ip link set dev {cfg.remote_ifname} mtu 1500", shell=True, host=cfg.remote)
- 
--def test_default(cfg, netnl) -> None:
-+def test_default_v4(cfg, netnl) -> None:
-+    cfg.require_ipver("4")
-+
-     _set_offload_checksum(cfg, netnl, "off")
-     _test_v4(cfg)
--    _test_v6(cfg)
-     _test_tcp(cfg)
-     _set_offload_checksum(cfg, netnl, "on")
-     _test_v4(cfg)
-+    _test_tcp(cfg)
-+
-+def test_default_v6(cfg, netnl) -> None:
-+    cfg.require_ipver("6")
-+
-+    _set_offload_checksum(cfg, netnl, "off")
-+    _test_v6(cfg)
-+    _test_tcp(cfg)
-+    _set_offload_checksum(cfg, netnl, "on")
-     _test_v6(cfg)
-     _test_tcp(cfg)
- 
-@@ -200,7 +210,8 @@ def main() -> None:
-     with NetDrvEpEnv(__file__) as cfg:
-         get_interface_info(cfg)
-         set_interface_init(cfg)
--        ksft_run([test_default,
-+        ksft_run([test_default_v4,
-+                  test_default_v6,
-                   test_xdp_generic_sb,
-                   test_xdp_generic_mb,
-                   test_xdp_native_sb,
--- 
-2.47.1
-
+Should not be necessary, CodeWriter already automatically "unindents"
+lines which end with : as all switch cases should.
 
