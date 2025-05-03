@@ -1,62 +1,50 @@
-Return-Path: <netdev+bounces-187566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 407D2AA7DDD
-	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 03:19:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0BC9AA7DE5
+	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 03:30:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A3731BC47EA
-	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 01:19:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50D285A3047
+	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 01:29:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24A5B18E25;
-	Sat,  3 May 2025 01:19:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA4403C465;
+	Sat,  3 May 2025 01:29:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eJA42N4c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dYBU9/NC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB4971798F;
-	Sat,  3 May 2025 01:18:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B49192581
+	for <netdev@vger.kernel.org>; Sat,  3 May 2025 01:29:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746235140; cv=none; b=KPHvfTCPZKfPRZZAYCve5NPcJoEPGHvwqskCJWvKAQZXxf0nMjuQcRoi5S/JQx6UecTAebR0FkiZe4ZERK4A3n1t+K+A9+cCsbicP/HfQXfpyrK01SJPo29+ciwTUfp7WmTtivO4CFPkmKxgqEn2JyPQEuHJff6lNSGYJ50BgxQ=
+	t=1746235797; cv=none; b=J1Hc3Fd7RJvwC3IARsLLLCe+wU1gD/YCZb05ITT6jWfkM7c10x5X6yZi+s5d9HSaSD9gF0Tf+N3XlHyV3bM/lJK4TRdlEHYTrYhqkMz3ubpq4wsmTBDuA9b4bH2fsbryDvp6oB80K4GDKOitvWCCkxHspjIaGCbeDNVXfFSsrtQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746235140; c=relaxed/simple;
-	bh=TJMIDQCtPoRrpvB6gLnZu60p+q5widiXgewefPHF1Z4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pwqy3E2AdqEcjivQ1mvex022FgvBd2uTjIigCVqUQztghqoC8E+xOh0AimlJeSXOYveH64Lqpy9qOWBSwWub9VmYWtcTRRP1ibO42wXdo20PhN+7/5QjOr5AMC+XzyhmKl6fAOrJdZoEoQ3X8VdsJF9yPpJEf/Ie6PZH5e3zEyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eJA42N4c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC3FBC4CEE4;
-	Sat,  3 May 2025 01:18:58 +0000 (UTC)
+	s=arc-20240116; t=1746235797; c=relaxed/simple;
+	bh=ckSRd/Z1qnGR5wOXMVaoNwn10WAMsGKB1bQB2+988VI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Dyno4T5J4K4eydZ1W2YxP8bNacnCC1F+4KvEBQCGBnuxTpmq45134F4tCjbaiuKuSMC3pOlRpoDfX01uchmF4XYyqYw3OoZ+caioGbFlf9ZsIClgKSi9+A7DqoIttoxgBC5YzbviK5zOjSKs8HHpT9MgNSrmgHz0GQEHwqHkpms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dYBU9/NC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E6C7C4CEE4;
+	Sat,  3 May 2025 01:29:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746235139;
-	bh=TJMIDQCtPoRrpvB6gLnZu60p+q5widiXgewefPHF1Z4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=eJA42N4c07HbNUBrBa86p5bCJNyBAGF9vXm6TENsflBxD4O7jo0xa4Re+DabOdLxj
-	 UDtsP7tf18xu0wM8Rx83NA8Wgfkse0o68qFAjdoDPgubczU7HYczEe1Wmx4mqTcaxu
-	 3duF7nyNDBlMxxk+YkS4/PhXCzLZ8rTGTUL90RI7hZwHKqd1+ravsfCUegfBZhpTZC
-	 qst+plcAMbpKAcOFcjzsWtbwOQPHkIssQQMIhD1cqMif09zNcFmkWGxZuRkE1SsiH2
-	 yAfp5SXCbSV2OY1suLkM1I0F2GX6bzxSBpXc2l5uIyojMZyH2SJPgVIg7oBWgwJphC
-	 pCsUQYtOYUYjw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	ecree.xilinx@gmail.com,
-	petrm@nvidia.com,
-	willemb@google.com,
-	sdf@fomichev.me,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next v3] selftests: net: exit cleanly on SIGTERM / timeout
-Date: Fri,  2 May 2025 18:18:56 -0700
-Message-ID: <20250503011856.46308-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.49.0
+	s=k20201202; t=1746235797;
+	bh=ckSRd/Z1qnGR5wOXMVaoNwn10WAMsGKB1bQB2+988VI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=dYBU9/NCWhZT9cEjrZ/wwIvulZvVimgDEDPtNxu5T/H7Gzd8/Z64POfrz+Bvgbs6f
+	 MB72dWx4d/9CklUKdQ0/rjWzddt9bhkzZMTrAYouMti9W0vwq+chHA8hilvNpJzTPG
+	 0ApbmwCIEr0wIoHxP3W+WZmoFN3lWJubLBpSdz5UXOvB7olLl4REF3b3UlIKlO993s
+	 j6Tn6Z58KboK8DCCdnVmKsIqGfhLihnTtvfGDL1R23dsZf4DijJSBlumm6M3R86z8E
+	 0vfPmCv1lHOaZoX5p0i9E0RcInCPYY5YzuaCsyBKWhI7njUoY6EPykgVxR5O9mHt2H
+	 Q4oDSB9UI4/cw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C66380DBE9;
+	Sat,  3 May 2025 01:30:37 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,109 +52,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/6] net: stmmac: replace speed_mode_2500() method
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174623583625.3773265.4045311227752993763.git-patchwork-notify@kernel.org>
+Date: Sat, 03 May 2025 01:30:36 +0000
+References: <aBNe0Vt81vmqVCma@shell.armlinux.org.uk>
+In-Reply-To: <aBNe0Vt81vmqVCma@shell.armlinux.org.uk>
+To: Russell King (Oracle) <linux@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com,
+ netdev@vger.kernel.org, pabeni@redhat.com
 
-ksft runner sends 2 SIGTERMs in a row if a test runs out of time.
-Handle this in a similar way we handle SIGINT - cleanup and stop
-running further tests.
+Hello:
 
-Because we get 2 signals we need a bit of logic to ignore
-the subsequent one, they come immediately one after the other
-(due to commit 9616cb34b08e ("kselftest/runner.sh: Propagate SIGTERM
-to runner child")).
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-This change makes sure we run cleanup (scheduled defer()s)
-and also print a stack trace on SIGTERM, which doesn't happen
-by default. Tests occasionally hang in NIPA and it's impossible
-to tell what they are waiting from or doing.
+On Thu, 1 May 2025 12:45:21 +0100 you wrote:
+> Hi,
+> 
+> This series replaces the speed_mode_2500() method with a new method
+> that is more flexible, allowing the platform glue driver to populate
+> phylink's supported_interfaces and set the PHY-side interface mode.
+> 
+> The only user of this method is currently dwmac-intel, which we
+> update to use this new method.
+> 
+> [...]
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-v3:
- - remove unnecessary isinstance()
-v2: https://lore.kernel.org/20250429170804.2649622-1-kuba@kernel.org
- - remove declaration at the global scope
-v1: https://lore.kernel.org/20250425151757.1652517-1-kuba@kernel.org
+Here is the summary with links:
+  - [net-next,1/6] net: stmmac: use a local variable for priv->phylink_config
+    https://git.kernel.org/netdev/net-next/c/5ad39ceaea00
+  - [net-next,2/6] net: stmmac: use priv->plat->phy_interface directly
+    https://git.kernel.org/netdev/net-next/c/1966be55da5b
+  - [net-next,3/6] net: stmmac: add get_interfaces() platform method
+    https://git.kernel.org/netdev/net-next/c/ca732e990fc8
+  - [net-next,4/6] net: stmmac: intel: move phy_interface init to tgl_common_data()
+    https://git.kernel.org/netdev/net-next/c/0f455d2d1bbe
+  - [net-next,5/6] net: stmmac: intel: convert speed_mode_2500() to get_interfaces()
+    https://git.kernel.org/netdev/net-next/c/d3836052fe09
+  - [net-next,6/6] net: stmmac: remove speed_mode_2500() method
+    https://git.kernel.org/netdev/net-next/c/9d165dc58055
 
-CC: ecree.xilinx@gmail.com
-CC: petrm@nvidia.com
-CC: willemb@google.com
-CC: sdf@fomichev.me
-CC: linux-kselftest@vger.kernel.org
----
- tools/testing/selftests/net/lib/py/ksft.py | 24 +++++++++++++++++++++-
- 1 file changed, 23 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/net/lib/py/ksft.py b/tools/testing/selftests/net/lib/py/ksft.py
-index 3cfad0fd4570..61287c203b6e 100644
---- a/tools/testing/selftests/net/lib/py/ksft.py
-+++ b/tools/testing/selftests/net/lib/py/ksft.py
-@@ -3,6 +3,7 @@
- import builtins
- import functools
- import inspect
-+import signal
- import sys
- import time
- import traceback
-@@ -26,6 +27,10 @@ KSFT_DISRUPTIVE = True
-     pass
- 
- 
-+class KsftTerminate(KeyboardInterrupt):
-+    pass
-+
-+
- def ksft_pr(*objs, **kwargs):
-     print("#", *objs, **kwargs)
- 
-@@ -193,6 +198,17 @@ KSFT_DISRUPTIVE = True
-     return env
- 
- 
-+def _ksft_intr(signum, frame):
-+    # ksft runner.sh sends 2 SIGTERMs in a row on a timeout
-+    # if we don't ignore the second one it will stop us from handling cleanup
-+    global term_cnt
-+    term_cnt += 1
-+    if term_cnt == 1:
-+        raise KsftTerminate()
-+    else:
-+        ksft_pr(f"Ignoring SIGTERM (cnt: {term_cnt}), already exiting...")
-+
-+
- def ksft_run(cases=None, globs=None, case_pfx=None, args=()):
-     cases = cases or []
- 
-@@ -205,6 +221,10 @@ KSFT_DISRUPTIVE = True
-                     cases.append(value)
-                     break
- 
-+    global term_cnt
-+    term_cnt = 0
-+    prev_sigterm = signal.signal(signal.SIGTERM, _ksft_intr)
-+
-     totals = {"pass": 0, "fail": 0, "skip": 0, "xfail": 0}
- 
-     print("TAP version 13")
-@@ -233,7 +253,7 @@ KSFT_DISRUPTIVE = True
-             for line in tb.strip().split('\n'):
-                 ksft_pr("Exception|", line)
-             if stop:
--                ksft_pr("Stopping tests due to KeyboardInterrupt.")
-+                ksft_pr(f"Stopping tests due to {type(e).__name__}.")
-             KSFT_RESULT = False
-             cnt_key = 'fail'
- 
-@@ -248,6 +268,8 @@ KSFT_DISRUPTIVE = True
-         if stop:
-             break
- 
-+    signal.signal(signal.SIGTERM, prev_sigterm)
-+
-     print(
-         f"# Totals: pass:{totals['pass']} fail:{totals['fail']} xfail:{totals['xfail']} xpass:0 skip:{totals['skip']} error:0"
-     )
+You are awesome, thank you!
 -- 
-2.49.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
