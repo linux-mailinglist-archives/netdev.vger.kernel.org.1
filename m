@@ -1,86 +1,85 @@
-Return-Path: <netdev+bounces-187653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21C82AA88F2
-	for <lists+netdev@lfdr.de>; Sun,  4 May 2025 20:25:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE656AA88F3
+	for <lists+netdev@lfdr.de>; Sun,  4 May 2025 20:25:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 764E53AA2DF
-	for <lists+netdev@lfdr.de>; Sun,  4 May 2025 18:25:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 377513AB142
+	for <lists+netdev@lfdr.de>; Sun,  4 May 2025 18:25:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82B4B1E3DF4;
-	Sun,  4 May 2025 18:25:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2388A2288F9;
+	Sun,  4 May 2025 18:25:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="fmbgsLyY"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="KkhuVBMZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14DBC1AAE13
-	for <netdev@vger.kernel.org>; Sun,  4 May 2025 18:25:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B0E01F2BAE
+	for <netdev@vger.kernel.org>; Sun,  4 May 2025 18:25:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746383118; cv=none; b=K3lFGYZkkINduV0d85z9ZBnuNATGxcP4lI+itYcpvcBlNBHCbkTT3ra2/80fZXP4PXlghmn4YY9WnCPGZ1AxqcgXIgne3PHG76i5+YvpztkB3pxG24q1lUBva9eGX4HhrI7+uRFNCcfdgd2TbuVT7zj1OEcRWWgxupRyaKXo7Ug=
+	t=1746383144; cv=none; b=RA0S5lX+6EKLP5rcXjee1IMCTR1gLPVxYgzsreGbeKihyYwJa6oGoQBqpMAtA1mHGctZx7M86Lu43fMbrm4n897T3P8E3rFfIs6pQt7tSet0mBvftIxmOuNM2zEvEeU20yTe3sgVP2tylKbWox8RfvFUtmsHTJ8IR/X5idFPzX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746383118; c=relaxed/simple;
-	bh=AHQD6c6qWKDIwojiYyNtwfz8sxAgfunXZCbhRB+/28A=;
+	s=arc-20240116; t=1746383144; c=relaxed/simple;
+	bh=rIPDVCgBD98yP8XgkjMd3N9XfKvEAGpKWQd4JOQ4PSU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uegHIZpCDRbFYCUbBM7QKubwd2O2AZFRDLSvlnz7eu9uAvXFqjD3wwhL7OBJJnfB2w35XkqGrqoaObmNMDxNdYor2wTqWqmdXZgcz2p2Lu02bh75XQ4QApfIHF+lalrOePfYioOWMxmUedz0Ie6FJStSk92uVSNAONKbM6ZG4Vg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=fmbgsLyY; arc=none smtp.client-ip=209.85.221.43
+	 Content-Type:Content-Disposition:In-Reply-To; b=Bq29UESitv/u6bw2pAFA3Q5WXlvHg+ENy/R/lAj+16S2nTSBDcvjL1wJMhpuna2W+QXgFHPQ7LNsE36jws1c+xJ1AKkT08WGWZlIYWyK0TfDXK1CZUkSDGveRNfhVToske1mxclQRYs12eQsEoFX36M8927979u3kD6E8avur90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=KkhuVBMZ; arc=none smtp.client-ip=209.85.221.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-39c31e4c3e5so2139971f8f.0
-        for <netdev@vger.kernel.org>; Sun, 04 May 2025 11:25:15 -0700 (PDT)
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3a07a7b517dso2248693f8f.3
+        for <netdev@vger.kernel.org>; Sun, 04 May 2025 11:25:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1746383114; x=1746987914; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1746383140; x=1746987940; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mDT3JHgVKGlkfgIsNZyWq1jDYJKNmdu5OHg7pB9h6zw=;
-        b=fmbgsLyYPL6lP1B8u9dv1Czc5GIBdOvHCrTAS7pNw9cbCy3xtqSpZudc4PDDBhqOre
-         eivwZEO/an6t9US9YtbVBg5bB3ahsjqumqdismM/KcD4FaW+KUdQSIJMgBJokEO+u26b
-         eAbaas4VAqS6zObY9luQFXCPLU01SwO+ZEz2q2QwiUZTSLTVh5x1S2Dultj41GY26JQ6
-         v8T7q0aYBwb9WD557ijSxFWbz/TMVBM51FFE9Ox4uE6/2OVPTCm0caSTW+YlgEow8kX9
-         JgtrNqO3OtLdBtgQhNolN4Bav+CrbzV3VDEucI9H08BrlIVsjU1rjxSdHwZ5OGC9r036
-         UqRA==
+        bh=GhDUXZBRLoiL50gX1up2oatHRhRRbdNcpfDcMqnMr/k=;
+        b=KkhuVBMZBocTuDfgWv67De3GpoXtrEfbx1JB9towr/ojwUdnHMIKgEEP8XKC9NVaCe
+         VB6gEI3MZ9YrKlQhqjhrpvumWBgmGVwvbVQsYmY3LKfKZdyM0+PpPWnyHqGuG0z/tAtw
+         tUsfFP1iIVGjD5u2BcPSoQ/47bZXSVNX5H2p7bHRRoYisY2Iu8OjfFO9wVVOx2o1y5Bd
+         C6iA3+qOoT7j+p0lpdqyccyt6jufBbk6E0tjOVQh+SVf1QUL/lqsP6EBOyrt46jnACnx
+         q0TS5vGT6KH7Ano5sZEpynhqe8iQZ2Ja7MDoxHvsT0ulSe0YDHow7KN9V71oPuuvNY44
+         z33A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746383114; x=1746987914;
+        d=1e100.net; s=20230601; t=1746383140; x=1746987940;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mDT3JHgVKGlkfgIsNZyWq1jDYJKNmdu5OHg7pB9h6zw=;
-        b=ZA/lxkWcXBKw7Kw5wXUFZIbmiM3pj1EF/z/wPaWjVwJn3FKFlZn+uKP7tGKsFqQxnX
-         cw1i+xD0KYEiOIOZVI0apY71uACoC0seBPE6s7Jjkpk2cRewQ+OJFKx62bI2u/E6mniH
-         x+3G9POMIVAwMujtVdBu9mf1JD9QwqhUNnvm+KT4rQVjWXgGoDThW1OwNSiLXEH4IhUE
-         m3CVvLU2yfXJ0NfeNu0p5SSgm8deTCDWFBVsqgyMjXN4eKUlacNrL9bL/tN9T+Q7aXpL
-         PpRIiryitKEDqYpFIFTGPftTmfgIxVVyA3edr1n7H+7CyxDtgjo1wrGVP929+Liymjxw
-         2pUg==
-X-Gm-Message-State: AOJu0YwGcwfjfdgT8VgxQ2HZ1+QFYsUGcSxJvY3Ul/Qob47zdB3K62DB
-	9VzoTQ5/oCfPih388JUvt1I4efft2HiuC/a9/H4PQ0Jq1PCR248mQoqHXgGhiBQ=
-X-Gm-Gg: ASbGncusOo9rnMRekSbByyazufYsoWNKLe74I3U0Qbk5Jl1Y8BavqMMFU45xMnb1C4o
-	bbH6tyKRwasLuCOeKTDRBXfk/olmWXWLSE8h+vAASCPZdYipHOp5xK+L9kJ+CXdVxOPzlfc1wTL
-	czUBHLRWbmz6NbIUZOnCc06Y3Qj3pGprWYXyeUD1cio+Ji9prW5Pb+YrduyeeDg5WxnKBZ5a8s5
-	SvEIyiv1LpNKl1vqAZIQ/YPf96l6iKR+OjLYtluePXSuACBxhHqUm/oeXflBN0pKkl6xu1pAx7S
-	bbDdyCLt8oom8oJMBrmD2j76YzWack7Hz/fjCCRcDfNKsxBoJX56fIaeCNBYapQ/niUz
-X-Google-Smtp-Source: AGHT+IEXJ/x08F22pIpmTz2A8suQX53A4j/B2p9cIZFVe09lH6U+bTIC5/fcB/HKQVhz8C5Whru1Pw==
-X-Received: by 2002:a05:6000:1888:b0:391:43cb:43fa with SMTP id ffacd0b85a97d-3a09fde5b65mr3105749f8f.51.1746383113747;
-        Sun, 04 May 2025 11:25:13 -0700 (PDT)
+        bh=GhDUXZBRLoiL50gX1up2oatHRhRRbdNcpfDcMqnMr/k=;
+        b=wkXwZH3UTFK3jjzH45T6D9n4osITPbfgaf6E1aTarJjIydorfaFOCdB+769o14lgon
+         1/OxRqGg3o6Jo5yO3da2eqh3nJC8aYfEbQuPOz7xYWdBwohZWja8b2eNLpYy2yLqjrAQ
+         68qQQiZ8GD+itSp4/6sHPFG+wJYYZZrufXOx9wjfKwon+LvmhqcI+KmSiPOoUpvBHE+k
+         Hnfbkrqrx0W+fIIi0Vrkz3OexofgGl3YOp/V5pSSzsZQtBNNu2ZHeBRpbu3ccB0tifbq
+         5x4xkQjs257tOuaCEOyyLNjaSBIytXm5xPhGCruZaGdnGaB0yXeBKi9r+c5bBT54wzxc
+         0SLg==
+X-Gm-Message-State: AOJu0YzlSy406S3rLv6l2hn1pXv0sKY0834Dko6gXPrSnVqSOp/+Qw0I
+	0wWDsZ4NCA//RMh1AivMGdH3QjS9BIo+0/RhBCcqvizP88gbefZWgHb2Xvkwe48=
+X-Gm-Gg: ASbGnctzLEPCjfY/sW1L9ZALkhbrJM7tgjmpfo3L0QZ+6Qzpn5VsQkUc3Z0WNMHA4+v
+	gG7/MCwU1xgkAizwwqwz48pAWYh6dgsnmxrLAk1fw+7Jf7CyNI3UCet9oJXWHlNDyoKTDyc7X3V
+	NiJybcbvTg6Mf/LUSpDPggab4U9Sy12y3zB5+WAOivuJqVfm2j5jn79GK4u5fsBfW0sS03xLWIm
+	CR4rwaF7F2MGsa7iRpE/klyWZEfI2/FcGMb2Hr6wnc35YFKETuLbrLbqMO8vVQKQhYf2xh9EA5y
+	ESwTWTe8ZiDn7oWCJTcm006mbBvYsdU856k5zXe2Y0KtFgp7cXpjU/5+YMvvSJPKSjoT
+X-Google-Smtp-Source: AGHT+IHBGNRIoR1xwTNw6TYss91GhpHVe0F2QdbxZP4SRvqX6ds09zu6rCGraFNbua8nzaqW1pkkng==
+X-Received: by 2002:a05:6000:1863:b0:39c:2c38:4599 with SMTP id ffacd0b85a97d-3a09cf4d6f6mr4417139f8f.48.1746383140300;
+        Sun, 04 May 2025 11:25:40 -0700 (PDT)
 Received: from jiri-mlt.client.nvidia.com ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a099ae7caasm8169687f8f.54.2025.05.04.11.25.10
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a099ae0b9fsm7868271f8f.4.2025.05.04.11.25.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 May 2025 11:25:12 -0700 (PDT)
-Date: Sun, 4 May 2025 20:25:08 +0200
+        Sun, 04 May 2025 11:25:39 -0700 (PDT)
+Date: Sun, 4 May 2025 20:25:37 +0200
 From: Jiri Pirko <jiri@resnulli.us>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
 	pabeni@redhat.com, saeedm@nvidia.com, horms@kernel.org, donald.hunter@gmail.com
-Subject: Re: [PATCH net-next 3/5] devlink: define enum for attr types of
- dynamic attributes
-Message-ID: <fozccqzcqh4ihgtnvio3y3m73vwxorcszunwqlphexxjq6lqnf@4nphkotznath>
+Subject: Re: [PATCH net-next 2/5] tools: ynl-gen: allow noncontiguous enums
+Message-ID: <rgyzpltlodolcgr4pthrq3r2w7s5lj2mutenvszcirpwttmvjq@4dowixxyqxiw>
 References: <20250502113821.889-1-jiri@resnulli.us>
- <20250502113821.889-4-jiri@resnulli.us>
- <20250502184604.1758c65e@kernel.org>
+ <20250502113821.889-3-jiri@resnulli.us>
+ <20250502184347.68488470@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,38 +88,111 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250502184604.1758c65e@kernel.org>
+In-Reply-To: <20250502184347.68488470@kernel.org>
 
-Sat, May 03, 2025 at 03:46:04AM +0200, kuba@kernel.org wrote:
->On Fri,  2 May 2025 13:38:19 +0200 Jiri Pirko wrote:
->> +/**
->> + * enum devlink_var_attr_type - Variable attribute type.
->> + */
+Sat, May 03, 2025 at 03:43:47AM +0200, kuba@kernel.org wrote:
+>On Fri,  2 May 2025 13:38:18 +0200 Jiri Pirko wrote:
+>> From: Jiri Pirko <jiri@nvidia.com>
+>> 
+>> In case the enum has holes, instead of hard stop, generate a validation
+>> callback to check valid enum values.
+>> 
+>> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+>> ---
+>> Saeed's v3->v1:
+>> - add validation callback generation
+>> ---
+>>  tools/net/ynl/pyynl/ynl_gen_c.py | 45 +++++++++++++++++++++++++++++---
+>>  1 file changed, 42 insertions(+), 3 deletions(-)
+>> 
+>> diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
+>> index b4889974f645..c37551473923 100755
+>> --- a/tools/net/ynl/pyynl/ynl_gen_c.py
+>> +++ b/tools/net/ynl/pyynl/ynl_gen_c.py
+>> @@ -358,11 +358,13 @@ class TypeScalar(Type):
+>>          if 'enum' in self.attr:
+>>              enum = self.family.consts[self.attr['enum']]
+>>              low, high = enum.value_range()
+>> -            if 'min' not in self.checks:
+>> +            if low and 'min' not in self.checks:
+>>                  if low != 0 or self.type[0] == 's':
+>>                      self.checks['min'] = low
+>> -            if 'max' not in self.checks:
+>> +            if high and 'max' not in self.checks:
+>>                  self.checks['max'] = high
+>> +            if not low and not high:
+>> +                self.checks['sparse'] = True
 >
->If we want this to be a kdoc it needs to document all values.
->Same as a struct kdoc needs to document all values.
->Not sure if there's much to say here for each value, so a non-kdoc
->comment is probably better?
+>you should probably explicitly check for None, 0 is a valid low / high
 
 Okay.
 
->
->I think I already mentioned this generates a build warning..
 
-Did not see. Any. Will check.
+>  
+>>          if 'min' in self.checks and 'max' in self.checks:
+>>              if self.get_limit('min') > self.get_limit('max'):
+>
+>> +def print_kernel_policy_sparse_enum_validates(family, cw):
+>> +    first = True
+>> +    for _, attr_set in family.attr_sets.items():
+>> +        if attr_set.subset_of:
+>> +            continue
+>> +
+>> +        for _, attr in attr_set.items():
+>> +            if not attr.request:
+>> +                continue
+>> +            if not attr.enum_name:
+>> +                continue
+>> +            if 'sparse' not in attr.checks:
+>> +                continue
+>> +
+>> +            if first:
+>> +                cw.p('/* Sparse enums validation callbacks */')
+>> +                first = False
+>> +
+>> +            sign = '' if attr.type[0] == 'u' else '_signed'
+>> +            suffix = 'ULL' if attr.type[0] == 'u' else 'LL'
+>> +            cw.write_func_prot('static int', f'{c_lower(attr.enum_name)}_validate',
+>> +                               ['const struct nlattr *attr', 'struct netlink_ext_ack *extack'])
+>> +            cw.block_start()
+>> +            cw.block_start(line=f'switch (nla_get_{attr["type"]}(attr))', noind=True)
+>> +            enum = family.consts[attr['enum']]
+>> +            for entry in enum.entries.values():
+>> +                cw.p(f'case {entry.c_name}: return 0;')
+>
+>All the cases end in "return 0;"
+>remove this, and add the return 0; before the block end.
+>The code should look something like:
+>
+>	switch (nla_get_...) {
+>	case VAL1:
+>	case VAL2:
+>	case VAL3:
+>		return 0;
+>	}
+
+Sure.
+
+Thanks!
 
 >
->> +enum devlink_var_attr_type {
->> +	/* Following values relate to the internal NLA_* values */
->> +	DEVLINK_VAR_ATTR_TYPE_U8 = 1,
->> +	DEVLINK_VAR_ATTR_TYPE_U16,
->> +	DEVLINK_VAR_ATTR_TYPE_U32,
->> +	DEVLINK_VAR_ATTR_TYPE_U64,
->> +	DEVLINK_VAR_ATTR_TYPE_STRING,
->> +	DEVLINK_VAR_ATTR_TYPE_FLAG,
->> +	DEVLINK_VAR_ATTR_TYPE_NUL_STRING = 10,
->> +	DEVLINK_VAR_ATTR_TYPE_BINARY,
->> +	__DEVLINK_VAR_ATTR_TYPE_CUSTOM_BASE = 0x80,
->> +	/* Any possible custom types, unrelated to NLA_* values go below */
->> +};
+>> +            cw.block_end(noind=True)
+>> +            cw.p('NL_SET_ERR_MSG_ATTR(extack, attr, "invalid enum value");')
+>> +            cw.p('return -EINVAL;')
+>> +            cw.block_end()
+>> +            cw.nl()
+>> +
+>> +
+>>  def print_kernel_op_table_fwd(family, cw, terminate):
+>>      exported = not kernel_can_gen_family_struct(family)
+>>  
+>> @@ -2965,6 +3003,7 @@ def main():
+>>              print_kernel_family_struct_hdr(parsed, cw)
+>>          else:
+>>              print_kernel_policy_ranges(parsed, cw)
+>> +            print_kernel_policy_sparse_enum_validates(parsed, cw)
+>>  
+>>              for _, struct in sorted(parsed.pure_nested_structs.items()):
+>>                  if struct.request:
+>
 
