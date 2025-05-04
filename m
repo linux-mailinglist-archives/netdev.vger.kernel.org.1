@@ -1,96 +1,143 @@
-Return-Path: <netdev+bounces-187620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44F0BAA82D0
-	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 22:59:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 752F6AA8450
+	for <lists+netdev@lfdr.de>; Sun,  4 May 2025 08:28:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 734343BE288
-	for <lists+netdev@lfdr.de>; Sat,  3 May 2025 20:59:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5AC451899819
+	for <lists+netdev@lfdr.de>; Sun,  4 May 2025 06:28:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCB0A2797BB;
-	Sat,  3 May 2025 20:59:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2C6F1624E5;
+	Sun,  4 May 2025 06:28:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EQKA8JBS"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="MgE7mYBf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.denx.de (mx.denx.de [89.58.32.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 987E6149E17
-	for <netdev@vger.kernel.org>; Sat,  3 May 2025 20:59:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B380817BD3;
+	Sun,  4 May 2025 06:28:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746305988; cv=none; b=iTX1ByS+aVS2AfcfpiDSGQ0OXE3NHofrXirYcKnnLs48XMNmgqOnBHY9odtNkytyP5HBeUpoaGY+T9hhLW9NZoLQbeHT3oyK8ilRh4/t8MpIXGiVTMXgO2SWs+g70iRMsG55OYXu4vq1Eb58OngoGrNnwVqGdN3DeyrmH3RF8Z0=
+	t=1746340111; cv=none; b=dgsrniK0Jyh/3CfhL7y8d01PUMomett8w34Lowy5sxejmFpqoCHO8zMvyFMIW25ggqtZEvykjp/k6/lkIG+MNY8GXlulyRAvMEuCg3f5Z7uZSBgM5xwh5nqgwwe9bTJYZkHskLA1azVtTYSJcGGQupKJPpQmTprnQt9aC2QpJls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746305988; c=relaxed/simple;
-	bh=lNOSa+BiNy68IDrkses3VidGbbTA1YC+SXAKXj7x9Jw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=TnfTtbuNd+T6X4prOS+XvVtwoOPDx5qDK06kCAHmrZ2DTR47rXBWPRCblZ+vvVyJST3wM3Jo12asdPhn/l3egOvGVpa/OrluwLXlA1RcflS/en2Vc5l5dB8KbFR/j7T6b58R2PRWXeaEJS/tPgNsc1t6LANtndm27Q0ZCXLQBm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EQKA8JBS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07EB7C4CEE3;
-	Sat,  3 May 2025 20:59:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746305988;
-	bh=lNOSa+BiNy68IDrkses3VidGbbTA1YC+SXAKXj7x9Jw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=EQKA8JBSlYdjpqZdXJSSzLQhj+nqawV6P1dj7p2LFO5VX0ZJWtPJEVHgu2IOOB0Cn
-	 Fp56fnTXXyqp9/GcrGVmGeAyLxN8BVwu45vVpZmKHxyH7n4YofaCARogrijlGUYRDC
-	 SKhwM2zUtXDrXlEvQtWXfI+Kb6qgNQZ5XvX+zimMAHswPz6utt+2oJG7dNepl8bReO
-	 XEWRBBC3Fi8vxFdyPmhhFgvOMWrFKMp30nM+pvueN1izy9G55GIHURbPDF2qqdBcJ2
-	 y5mVcjX4kmmxJQYN8WU+WJJSzX0hI9ZiKHGQNBKRBK1xOOy3UEBLJgFYBzuKSB+sa6
-	 jBvfFEmQcM9kg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70BF7380DBE9;
-	Sat,  3 May 2025 21:00:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1746340111; c=relaxed/simple;
+	bh=JH7UWl0QPjoLu0FdEYSBj0ChSPIozh3YaMARZWs2Gyo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Q/rdCKo1sSpPN8jLU/DKL17HKi4+3fINXNcMz82kQQ19PAvwdkIKEiaOCgOS889sUCaVUtoFaT7+fvvTtNxM1uCg9084ZLExTN7duGbb4/CWEDWfrmJsLB0UV9nMehEeM5/P0ryk1y/GLFLxO8wu2t9Zm3W9XhBp4+qlDG6Bgqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=MgE7mYBf; arc=none smtp.client-ip=89.58.32.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9C58C102EBA58;
+	Sun,  4 May 2025 08:28:14 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
+	t=1746340100; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=rCgrVpFe4biw8hf/ZoueDjqGBEEPT9+1gxH8yMqDfrI=;
+	b=MgE7mYBfXN/HyW3DXX1gurVkn01PGNgPV3q7o0L+9PRlNWoioSE9c6kaq2ZrqXIAPjdDgI
+	ONrqX8sYjiREnJHNYF0XKTSgW48osfwDUHKGGigLh3ByV6gUlX3WDHhRaNL9/0t/uJFGc9
+	f4ahN/RJd72PKhp8T4/7o+dqVrm7S1+Inh96VoMAZ80yCs+r8KxQRhdoxyEPA2z1Qowo4U
+	z2ULxr3K0WOZB44kliZKG41EccEypr8FoznyhCm128qryxuGu+JwdH7mjWkgmX3vCEhyRk
+	eDWwJFj7edmMDpl+Z7ZlxTGe9cRJrRxesac92ErNRHW47zCX6GFC1O81tWmhBQ==
+Date: Sun, 4 May 2025 08:28:11 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
+ <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>, Richard Cochran
+ <richardcochran@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
+ <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>, Andrew Lunn
+ <andrew@lunn.ch>
+Subject: Re: [net-next v10 4/7] net: mtip: The L2 switch driver for imx287
+Message-ID: <20250504082811.4893afaa@wsk>
+In-Reply-To: <20250502071328.069d0933@kernel.org>
+References: <20250502074447.2153837-1-lukma@denx.de>
+	<20250502074447.2153837-5-lukma@denx.de>
+	<20250502071328.069d0933@kernel.org>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] ipv4: Honor "ignore_routes_with_linkdown" sysctl in
- nexthop selection
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174630602726.3923569.14228022387754510869.git-patchwork-notify@kernel.org>
-Date: Sat, 03 May 2025 21:00:27 +0000
-References: <20250430100240.484636-1-idosch@nvidia.com>
-In-Reply-To: <20250430100240.484636-1-idosch@nvidia.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org, horms@kernel.org,
- willemb@google.com
+Content-Type: multipart/signed; boundary="Sig_/6QmTqwgtdiqccoc742SZ04r";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Last-TLS-Session-Version: TLSv1.3
 
-Hello:
+--Sig_/6QmTqwgtdiqccoc742SZ04r
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+Hi Jakub,
 
-On Wed, 30 Apr 2025 13:02:40 +0300 you wrote:
-> Commit 32607a332cfe ("ipv4: prefer multipath nexthop that matches source
-> address") changed IPv4 nexthop selection to prefer a nexthop whose
-> nexthop device is assigned the specified source address for locally
-> generated traffic.
-> 
-> While the selection honors the "fib_multipath_use_neigh" sysctl and will
-> not choose a nexthop with an invalid neighbour, it does not honor the
-> "ignore_routes_with_linkdown" sysctl and can choose a nexthop without a
-> carrier:
-> 
-> [...]
+> On Fri,  2 May 2025 09:44:44 +0200 Lukasz Majewski wrote:
+> > This patch series provides support for More Than IP L2 switch
+> > embedded in the imx287 SoC.
+> >=20
+> > This is a two port switch (placed between uDMA[01] and MAC-NET[01]),
+> > which can be used for offloading the network traffic.
+> >=20
+> > It can be used interchangeably with current FEC driver - to be more
+> > specific: one can use either of it, depending on the requirements.
+> >=20
+> > The biggest difference is the usage of DMA - when FEC is used,
+> > separate DMAs are available for each ENET-MAC block.
+> > However, with switch enabled - only the DMA0 is used to
+> > send/receive data to/form switch (and then switch sends them to
+> > respecitive ports).
+> >=20
+> > Signed-off-by: Lukasz Majewski <lukma@denx.de>
+> > Reviewed-by: Stefan Wahren <wahrenst@gmx.net>
+> > Reviewed-by: Andrew Lunn <andrew@lunn.ch> =20
+>=20
+> Now that basic build is green the series has advanced to full testing,
+> where coccicheck says:
+>=20
+> drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c:1961:1-6: WARNING:
+> invalid free of devm_ allocated data
+> drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c:1237:16-19: ERROR:
+> bus is NULL but dereferenced.
 
-Here is the summary with links:
-  - [net-next] ipv4: Honor "ignore_routes_with_linkdown" sysctl in nexthop selection
-    https://git.kernel.org/netdev/net-next/c/836b313a14a3
+I'm sorry for not checking the code with coccinelle.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+I do have already used sparse and checkpatch.
 
+I will fix those errors.
 
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/6QmTqwgtdiqccoc742SZ04r
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmgXCPwACgkQAR8vZIA0
+zr03AwgAkMNG0YrgvTM3iFWNDJ6IgUY1d14CkUU8GCex+FMbAMEEJeXx/+nws0ZR
+9sxsteMOv8I8iImMD1EIgBHdT8YjQKy9afBmzf5t8E9XOeE92W/e4Dc8w5CziCyN
+TV4akdUhoaTkhv3s7whhUAEOBvrZ7aHn9uqYzw5AybFcSArlLmmNS4MqWaGK0ATz
+tkfp14hOhxRKzMY87sqfTZYw+1DKMwnIn8mStHL8rHFnidLrt6LlAqWYrPw4wocp
+Ne/ziIpwkNfLjGtJM29tAB97HI4l4aZ5th6kcZACU+pTgRgY24wLDtXtk8UhY2a5
++EqG6B5zHuTWSNnZiUalr89fo0JhzA==
+=HuJH
+-----END PGP SIGNATURE-----
+
+--Sig_/6QmTqwgtdiqccoc742SZ04r--
 
