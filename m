@@ -1,259 +1,140 @@
-Return-Path: <netdev+bounces-187644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2964AA886D
-	for <lists+netdev@lfdr.de>; Sun,  4 May 2025 19:22:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D296AA887A
+	for <lists+netdev@lfdr.de>; Sun,  4 May 2025 19:29:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D9F2175B8A
-	for <lists+netdev@lfdr.de>; Sun,  4 May 2025 17:22:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F30E3A92E2
+	for <lists+netdev@lfdr.de>; Sun,  4 May 2025 17:29:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 525911EBA08;
-	Sun,  4 May 2025 17:22:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADDA81E3761;
+	Sun,  4 May 2025 17:29:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Kvdv+AHA"
+	dkim=pass (2048-bit key) header.d=fossekall.de header.i=@fossekall.de header.b="ItZyaiLj";
+	dkim=permerror (0-bit key) header.d=fossekall.de header.i=@fossekall.de header.b="ckH91us0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 767A31E5B9A
-	for <netdev@vger.kernel.org>; Sun,  4 May 2025 17:22:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746379340; cv=none; b=fS+PSmjhWW34a0SnetoQxOWdpy7Jxgt0H7wMNPtcJlWBtMA6V9VPvBteFEpKjDLpcfDPQ+YMO1iB1hDCSeDeXZnHzUjZj/APozsYvb9tG33dQEDHCROHYJZVztLlaQg6vG1WodQFV0PUabTsnvTEGeho7MjhzXJCwcioDAgxEmY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746379340; c=relaxed/simple;
-	bh=w8xYAL4O7WSJDQlXqBUhYmX0qnXvCI/4YMOQDYuadHE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=n1ULUcj422t9OB9BQiergbbbnkozj2PtARZoWnbCi4BrWpVk/U8kSgcxdGQVtidVavJS4bg26xqTAVOjyRQ160BSLH8ZinrV2pU/yeUng6Kj+mC9bjdZMgFcZhtb01LJSOrZD5d4UqQjnqLeJPcDqMw0Ho1tH4OJvIWtgH46zXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Kvdv+AHA; arc=none smtp.client-ip=207.171.184.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1746379339; x=1777915339;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=dlx77w/sdFMhcuYO3w82ycYHNJPApN9IbwvnsyNFaTI=;
-  b=Kvdv+AHAYzVP7m/04a8AmOqtO+Dq0UuPA4QRObSHmPwQyfrOaiL60Vag
-   +FpI4QnJT5epyw4QV9A6ibKkI/LWU3oC62X43MerHfktM8ajKfnab6sV4
-   f83Ghfa0ve9XezCMjffEy5E4BuXMVrHCmWj76sZSmL35ENdQiA2NnW5la
-   U=;
-X-IronPort-AV: E=Sophos;i="6.15,262,1739836800"; 
-   d="scan'208";a="517302254"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2025 17:22:12 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:44358]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.38.92:2525] with esmtp (Farcaster)
- id 3a02330a-54ac-4480-8cea-a9a3c4683eb9; Sun, 4 May 2025 17:22:11 +0000 (UTC)
-X-Farcaster-Flow-ID: 3a02330a-54ac-4480-8cea-a9a3c4683eb9
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Sun, 4 May 2025 17:22:11 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.106.101.38) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Sun, 4 May 2025 17:22:08 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <edumazet@google.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <horms@kernel.org>,
-	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH v3 net-next 15/15] ipv6: Get rid of RTNL for SIOCADDRT and RTM_NEWROUTE.
-Date: Sun, 4 May 2025 10:20:48 -0700
-Message-ID: <20250504172159.7358-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <CANn89i+r1cGacVC_6n3-A-WSkAa_Nr+pmxJ7Gt+oP-P9by2aGw@mail.gmail.com>
-References: <CANn89i+r1cGacVC_6n3-A-WSkAa_Nr+pmxJ7Gt+oP-P9by2aGw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B1AD185B73;
+	Sun,  4 May 2025 17:29:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746379783; cv=pass; b=cQp/mb8cuEoB3UvQB4MF60Su3Vqfxxur3rPu1hHWbrUns+Sa4/ZfJBtRDZUNxQstuMxOumiNu8t6BdIrw6VvmJ/tMGYVlKuYznM9B5VWHSVNKwwuV349SuDR/OBang9cf04x+Tb4CBfkYyf0OYFfzxx5rDhvEzfZY7JZ32dHoTE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746379783; c=relaxed/simple;
+	bh=jJKDNzXtKBCS0HUyXjCv+SwHQOVAU8vhblrbianhQu4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Bxo54kfWcZK+VNW1HxfZq4WRq6XbX/2YekJlg49KxopGUdxW/MiwC3rrv4B7DbeGIeFbzvUWaXpCelVEMBH9sD6UZP5JA9Ogv7hH+K5hNNjLfXOiXd36PM0Eqcjg2cMTuEN7VReF5LppyXNTW/XKk3QcmO4DrgpH/iWysP3cAAU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fossekall.de; spf=pass smtp.mailfrom=a98shuttle.de; dkim=pass (2048-bit key) header.d=fossekall.de header.i=@fossekall.de header.b=ItZyaiLj; dkim=permerror (0-bit key) header.d=fossekall.de header.i=@fossekall.de header.b=ckH91us0; arc=pass smtp.client-ip=85.215.255.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fossekall.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=a98shuttle.de
+ARC-Seal: i=1; a=rsa-sha256; t=1746379771; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=DGmOqG/FY5zeZ7yo6/5dDagkBahmcdlEuSdeM7TERplkeeKbMBaG0kg8D8m5rZnSXr
+    gGou+hYs42q8ppqOE9x1wyWh0c+nNW3NI6l1XeK8lTThVs9d/wwKRCAGw8oLAftvVKMH
+    716SSFe91thou/Fs699cCi1ENOX2v/TybDHe/4NrQ8KxkBzRWYmKqBfsjBEHA0x4jyWb
+    0uHmkHZ3ufeVB9ttfcZcpZt54+19jyH7c0/amjN0mNSofZ9a4ZJ5AqfYfFJuXbMfHobl
+    IEhhKElTitf2a+mu8HtRtHAjeTvKQ9o87di1y3QNKwAwlr7jqtgWHhE6zjhku+zQxnpJ
+    Pa0A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1746379771;
+    s=strato-dkim-0002; d=strato.com;
+    h=Message-Id:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=W0SKc7oupxmOFLst8fPJxQqK9t+U/JRXtklMlKkdpRI=;
+    b=QCWW/eTlDA38ekFyp2Mf5WFLoLT65T+rwGgf7AAf17advbg10nW2D3Oq2H5xKGb4/i
+    GU+ooxXyYp4xt9z8Ara5dcz6gP0ZKli+UZnjUr8nwswFzih/gHccLkSkbuyXEabhFWvD
+    u3MKh5tk1L2BD/ZhT5s3QX9kNxo467Ebl3+MLqSTFcILJK6ibYCPvBiUjggevqCY3rKB
+    i3GB4ZWuag/wAcjH3oJwuc4lR/dt0XrDw5Yt+pnvdTAnC0m1w4Tht6spvBejGVA+7G93
+    0iJkFYqyz498r+mWFXoGaqzoYKDpYoiQg2pIJqIa6YOW6eMghAP6AQkKRkiKRaBDAkUk
+    80lQ==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1746379771;
+    s=strato-dkim-0002; d=fossekall.de;
+    h=Message-Id:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=W0SKc7oupxmOFLst8fPJxQqK9t+U/JRXtklMlKkdpRI=;
+    b=ItZyaiLjnxJYAmN/5O8NQ31V0zSHJZNC2SwBL9YRDJVcAHN6EDAXgvQbXfdzL+HGj8
+    1aWbIxJh8eiak4bnpIrpjzsEIv9EMBMgo/225AViXjGFumHJFbBKneK4DJsZ79nVrMWT
+    oBHrd3HAxCXbdlaHVoAkCbCgdKsZgxGVJ1+TPqNHjd2Kq11HQox9KKuoO7IRUuEsLt0W
+    Jz1Tkc/5iaIU2BzNT07DLshn2FYGH2rzrafx3BQzYETf+carzZi71A8qeg054lLnVufh
+    0SifgYgXQ8plXFNH0B7YaylowhySPZ/nhuh22AMm22i63glOAAYJmev2S7d75gN84RCD
+    RyMg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1746379771;
+    s=strato-dkim-0003; d=fossekall.de;
+    h=Message-Id:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=W0SKc7oupxmOFLst8fPJxQqK9t+U/JRXtklMlKkdpRI=;
+    b=ckH91us0GOj9uAFlVOkc3hMsdd6hh+0cweu9xn26nFfQdPTNPVMYNEGptI4e5ZCK/l
+    280HO0JG9qQg2MicqNBw==
+X-RZG-AUTH: ":O2kGeEG7b/pS1EzgE2y7nF0STYsSLflpbjNKxx7cGrBdao6FTL4AJcMdm+lap4JEHkzok9eyEg=="
+Received: from aerfugl
+    by smtp.strato.de (RZmta 51.3.0 AUTH)
+    with ESMTPSA id f28b35144HTUz9F
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Sun, 4 May 2025 19:29:30 +0200 (CEST)
+Received: from koltrast.home ([192.168.1.27] helo=a98shuttle.de)
+	by aerfugl with smtp (Exim 4.96)
+	(envelope-from <michael@a98shuttle.de>)
+	id 1uBd9d-0004NK-0a;
+	Sun, 04 May 2025 19:29:29 +0200
+Received: (nullmailer pid 243222 invoked by uid 502);
+	Sun, 04 May 2025 17:29:29 -0000
+From: Michael Klein <michael@fossekall.de>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Michael Klein <michael@fossekall.de>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [net-next v7 0/6] net: phy: realtek: Add support for PHY LEDs
+Date: Sun,  4 May 2025 19:29:10 +0200
+Message-Id: <20250504172916.243185-1-michael@fossekall.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D035UWA004.ant.amazon.com (10.13.139.109) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset="us-ascii"
 
-From: Eric Dumazet <edumazet@google.com>
-Date: Sun, 4 May 2025 02:16:13 -0700
-> On Thu, Apr 17, 2025 at 5:10 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
-> >
-> > Now we are ready to remove RTNL from SIOCADDRT and RTM_NEWROUTE.
-> >
-> > The remaining things to do are
-> >
-> >   1. pass false to lwtunnel_valid_encap_type_attr()
-> >   2. use rcu_dereference_rtnl() in fib6_check_nexthop()
-> >   3. place rcu_read_lock() before ip6_route_info_create_nh().
-> >
-> > Let's complete the RTNL-free conversion.
-> >
-> > When each CPU-X adds 100000 routes on table-X in a batch
-> > concurrently on c7a.metal-48xl EC2 instance with 192 CPUs,
-> >
-> > without this series:
-> >
-> >   $ sudo ./route_test.sh
-> >   ...
-> >   added 19200000 routes (100000 routes * 192 tables).
-> >   time elapsed: 191577 milliseconds.
-> >
-> > with this series:
-> >
-> >   $ sudo ./route_test.sh
-> >   ...
-> >   added 19200000 routes (100000 routes * 192 tables).
-> >   time elapsed: 62854 milliseconds.
-> >
-> > I changed the number of routes in each table (1000 ~ 100000)
-> > and consistently saw it finish 3x faster with this series.
-> >
-> > Note that now every caller of lwtunnel_valid_encap_type() passes
-> > false as the last argument, and this can be removed later.
-> >
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > ---
-> >  net/ipv4/nexthop.c |  4 ++--
-> >  net/ipv6/route.c   | 18 ++++++++++++------
-> >  2 files changed, 14 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
-> > index 6ba6cb1340c1..823e4a783d2b 100644
-> > --- a/net/ipv4/nexthop.c
-> > +++ b/net/ipv4/nexthop.c
-> > @@ -1556,12 +1556,12 @@ int fib6_check_nexthop(struct nexthop *nh, struct fib6_config *cfg,
-> >         if (nh->is_group) {
-> >                 struct nh_group *nhg;
-> >
-> > -               nhg = rtnl_dereference(nh->nh_grp);
-> > +               nhg = rcu_dereference_rtnl(nh->nh_grp);
-> 
-> Or add a condition about table lock being held ?
+Changes in V7:
+- Remove some unused macros (patch 1)
+- Add more register defines for RTL8211F (patch 3)
+- Revise macro definition order once more (patch 4)
 
-I think in this context the caller is more of an rcu reader
-than a ipv6 route writer.
+Changes in V6:
+- fix macro definition order (patch 1)
+- introduce two more register defines (patch 2)
 
+Changes in V5:
+- Split cleanup patch and improve code formatting
 
+Changes in V4:
+- Change (!ret) to (ret == 0)
+- Replace set_bit() by __set_bit()
 
-> 
-> >                 if (nhg->has_v4)
-> >                         goto no_v4_nh;
-> >                 is_fdb_nh = nhg->fdb_nh;
-> >         } else {
-> > -               nhi = rtnl_dereference(nh->nh_info);
-> > +               nhi = rcu_dereference_rtnl(nh->nh_info);
-> >                 if (nhi->family == AF_INET)
-> >                         goto no_v4_nh;
-> >                 is_fdb_nh = nhi->fdb_nh;
-> > diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-> > index c8c1c75268e3..bb46e724db73 100644
-> > --- a/net/ipv6/route.c
-> > +++ b/net/ipv6/route.c
-> > @@ -3902,12 +3902,16 @@ int ip6_route_add(struct fib6_config *cfg, gfp_t gfp_flags,
-> >         if (IS_ERR(rt))
-> >                 return PTR_ERR(rt);
-> >
-> > +       rcu_read_lock();
-> 
-> This looks bogus to me (and syzbot)
-> 
-> Holding rcu_read_lock() from writers is almost always wrong.
+Changes in V3:
+- move definition of rtl8211e_read_ext_page() to patch 2
+- Wrap overlong lines
 
-Yes, but I added it as a reader of netdev and nexthop to guarantee
-that they won't go away.
+Changes in V2:
+- Designate to net-next
+- Add ExtPage access cleanup patch as suggested by Andrew Lunn
 
+Michael Klein (6):
+  net: phy: realtek: remove unsed RTL821x_PHYSR* macros
+  net: phy: realtek: Clean up RTL821x ExtPage access
+  net: phy: realtek: add RTL8211F register defines
+  net: phy: realtek: Group RTL82* macro definitions
+  net: phy: realtek: use __set_bit() in rtl8211f_led_hw_control_get()
+  net: phy: realtek: Add support for PHY LEDs on RTL8211E
 
-> 
-> In this case, this prevents any GFP_KERNEL allocations to happen
-> (among other things)
+ drivers/net/phy/realtek/realtek_main.c | 269 ++++++++++++++++++-------
+ 1 file changed, 201 insertions(+), 68 deletions(-)
 
-Oh, I completely missed this path, thanks!
+-- 
+2.39.5
 
-Fortunately, it seems all ->build_state() except for
-ip_tun_build_state() use GFP_ATOMIC.
-
-So, simply changing GFP_KERNEL to GFP_ATOMIC is acceptable ?
-
-
-lwtunnel_state_alloc
-  - kzalloc(GFP_ATOMIC)
-
-ip_tun_build_state
-  - dst_cache_init(GFP_KERNEL)
-
-ip6_tun_build_state / mpls_build_state / xfrmi_build_state
--> no alloc other than lwtunnel_state_alloc()
-
-bpf_build_state
-  - bpf_parse_prog
-    - nla_memdup(GFP_ATOMIC)
-
-ila_build_state / ioam6_build_state / rpl_build_state / seg6_build_state
-  - dst_cache_init(GFP_ATOMIC)
-
-seg6_local_build_state
-  - seg6_end_dt4_build / seg6_end_dt6_build / seg6_end_dt46_build
-    -> no alloc other than lwtunnel_state_alloc()
-
-
-> 
-> [ BUG: Invalid wait context ]
-> 6.15.0-rc4-syzkaller-00746-g836b313a14a3 #0 Tainted: G W
-> -----------------------------
-> syz-executor234/5832 is trying to lock:
-> ffffffff8e021688 (pcpu_alloc_mutex){+.+.}-{4:4}, at:
-> pcpu_alloc_noprof+0x284/0x16b0 mm/percpu.c:1782
-> other info that might help us debug this:
-> context-{5:5}
-> 1 lock held by syz-executor234/5832:
-> #0: ffffffff8df3b860 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire
-> include/linux/rcupdate.h:331 [inline]
-> #0: ffffffff8df3b860 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock
-> include/linux/rcupdate.h:841 [inline]
-> #0: ffffffff8df3b860 (rcu_read_lock){....}-{1:3}, at:
-> ip6_route_add+0x4d/0x2f0 net/ipv6/route.c:3913
-> stack backtrace:
-> CPU: 0 UID: 0 PID: 5832 Comm: syz-executor234 Tainted: G W
-> 6.15.0-rc4-syzkaller-00746-g836b313a14a3 #0 PREEMPT(full)
-> Tainted: [W]=WARN
-> Hardware name: Google Google Compute Engine/Google Compute Engine,
-> BIOS Google 04/29/2025
-> Call Trace:
-> <TASK>
-> dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
-> print_lock_invalid_wait_context kernel/locking/lockdep.c:4831 [inline]
-> check_wait_context kernel/locking/lockdep.c:4903 [inline]
-> __lock_acquire+0xbcf/0xd20 kernel/locking/lockdep.c:5185
-> lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5866
-> __mutex_lock_common kernel/locking/mutex.c:601 [inline]
-> __mutex_lock+0x182/0xe80 kernel/locking/mutex.c:746
-> pcpu_alloc_noprof+0x284/0x16b0 mm/percpu.c:1782
-> dst_cache_init+0x37/0xc0 net/core/dst_cache.c:145
-> ip_tun_build_state+0x193/0x6b0 net/ipv4/ip_tunnel_core.c:687
-> lwtunnel_build_state+0x381/0x4c0 net/core/lwtunnel.c:137
-> fib_nh_common_init+0x129/0x460 net/ipv4/fib_semantics.c:635
-> fib6_nh_init+0x15e4/0x2030 net/ipv6/route.c:3669
-> ip6_route_info_create_nh+0x139/0x870 net/ipv6/route.c:3866
-> ip6_route_add+0xf6/0x2f0 net/ipv6/route.c:3915
-> inet6_rtm_newroute+0x284/0x1c50 net/ipv6/route.c:5732
-> rtnetlink_rcv_msg+0x7cc/0xb70 net/core/rtnetlink.c:6955
-> netlink_rcv_skb+0x219/0x490 net/netlink/af_netlink.c:2534
-> netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
-> netlink_unicast+0x758/0x8d0 net/netlink/af_netlink.c:1339
-> netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1883
-> sock_sendmsg_nosec net/socket.c:712 [inline]
-> __sock_sendmsg+0x219/0x270 net/socket.c:727
-> ____sys_sendmsg+0x505/0x830 net/socket.c:2566
-> ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
-> __sys_sendmsg net/socket.c:2652 [inline]
-> __do_sys_sendmsg net/socket.c:2657 [inline]
-> __se_sys_sendmsg net/socket.c:2655 [inline]
-> __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2655
-> do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-> do_syscall_64+0xf6/0x210 arch/x86/entry/syscall_64.c:94
 
