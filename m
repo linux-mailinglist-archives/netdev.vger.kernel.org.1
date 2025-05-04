@@ -1,207 +1,259 @@
-Return-Path: <netdev+bounces-187643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBDFFAA8816
-	for <lists+netdev@lfdr.de>; Sun,  4 May 2025 18:41:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2964AA886D
+	for <lists+netdev@lfdr.de>; Sun,  4 May 2025 19:22:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 913321895A10
-	for <lists+netdev@lfdr.de>; Sun,  4 May 2025 16:41:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D9F2175B8A
+	for <lists+netdev@lfdr.de>; Sun,  4 May 2025 17:22:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BB941DED49;
-	Sun,  4 May 2025 16:41:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 525911EBA08;
+	Sun,  4 May 2025 17:22:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Kvdv+AHA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C14C11DDA14
-	for <netdev@vger.kernel.org>; Sun,  4 May 2025 16:41:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 767A31E5B9A
+	for <netdev@vger.kernel.org>; Sun,  4 May 2025 17:22:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746376892; cv=none; b=CLI/BBnAzwFytI9djPvgpyl8A8UtSiMlEmoWzXGdK9YZUYABqMdQoXa7yYwra368NuXRU5Dr1qiB67mXRl8M2MFXUL0/6l8oKjYGG57Jj7FWgvC63pQieksmNF/UFZa/FDqPxemlIf/UjYsdJMfz9FNoILw1ylfTaiGSmw1j28A=
+	t=1746379340; cv=none; b=fS+PSmjhWW34a0SnetoQxOWdpy7Jxgt0H7wMNPtcJlWBtMA6V9VPvBteFEpKjDLpcfDPQ+YMO1iB1hDCSeDeXZnHzUjZj/APozsYvb9tG33dQEDHCROHYJZVztLlaQg6vG1WodQFV0PUabTsnvTEGeho7MjhzXJCwcioDAgxEmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746376892; c=relaxed/simple;
-	bh=zx+jKXcri6dR+IIa1Sk/SxxetBjN9UsFxeJlWEPlXdU=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=EDypBkJfLJGnBJGpTZ2SpMj0cNSr7a9bfOjuSOgLmpSlmIiIHctUr9H1L7VMgmc2MwTZ486Z/iIIOeb+GT8+kN0hLXM8fwIvzLPu89K/KokKQHtkZJTSpFAnSEzp35K57XrJ7GxNSq+RJy3lN1qD1Zg2ELlWup2aEUnHcpfCyNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3d443811f04so35863315ab.1
-        for <netdev@vger.kernel.org>; Sun, 04 May 2025 09:41:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746376889; x=1746981689;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Gfw45Ij98dx4ZUWmy0fErG1QSZAKfLu5YdTYGEu1vH0=;
-        b=JFxD4q/fFw9FWGvKlMhSFRjGt9zgtJMfIlD09PNqaNq01jMz8IzA5b98N5BSyPr7Vm
-         izDJOK5HUhH0z2V1AszMXu2S14z67BiWiv50qPwem2mYsWkZY0QvR6ujpjds0FvvNxDA
-         HCbgVbfQZ//S085vYKTVxHucp9/+yp1QD1bUqSVOgZ3MPjiAcNYmnk9vpQHrSh5nUxej
-         CM+b7aBHV+Pm4b4HmJCahJH/JTLQHcilMyJBgBK7gCkLFmPExVseDal5qQmvew+ACjKU
-         VAXfKVOSt4cEggfuIcXUxXD5BR2LoCkjDVAOOqrcIbXXBkC9h0+wRJjU80SBY5fkFsE7
-         7U2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVnGJ4GGpFIF2Jrol6XSgHTSuTN8k5ko/UOKAoit2vLz0HOlMlVjueHZwG3sdZKsta8qnZlSxs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFlJOWZlOwJ/cy4ipMtRzeHNkZsFYe4hL6HZOHQ8VyoUD/uwWn
-	SyMW+3+6SryLdTLg5bWTwqMVe+ExVYCMZhfgO88wFm3QDzHAkMoJkZazT5io+LtuagnC16mQfIT
-	XA3NKHdkdnz0wwR9cIZTeh6s+qAbcIHXggUXTvgJfEFeOzdp3WeNqupg=
-X-Google-Smtp-Source: AGHT+IEVyigHJO6JzmSf7gcFgqLz6Xr9b4/nKfyn2Gi1Si0GpO7frnmtmbzTAHwJIYllmmS90gnLV9quVD6Io84gRzFMfY/G4L3e
+	s=arc-20240116; t=1746379340; c=relaxed/simple;
+	bh=w8xYAL4O7WSJDQlXqBUhYmX0qnXvCI/4YMOQDYuadHE=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=n1ULUcj422t9OB9BQiergbbbnkozj2PtARZoWnbCi4BrWpVk/U8kSgcxdGQVtidVavJS4bg26xqTAVOjyRQ160BSLH8ZinrV2pU/yeUng6Kj+mC9bjdZMgFcZhtb01LJSOrZD5d4UqQjnqLeJPcDqMw0Ho1tH4OJvIWtgH46zXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Kvdv+AHA; arc=none smtp.client-ip=207.171.184.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1746379339; x=1777915339;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=dlx77w/sdFMhcuYO3w82ycYHNJPApN9IbwvnsyNFaTI=;
+  b=Kvdv+AHAYzVP7m/04a8AmOqtO+Dq0UuPA4QRObSHmPwQyfrOaiL60Vag
+   +FpI4QnJT5epyw4QV9A6ibKkI/LWU3oC62X43MerHfktM8ajKfnab6sV4
+   f83Ghfa0ve9XezCMjffEy5E4BuXMVrHCmWj76sZSmL35ENdQiA2NnW5la
+   U=;
+X-IronPort-AV: E=Sophos;i="6.15,262,1739836800"; 
+   d="scan'208";a="517302254"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2025 17:22:12 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:44358]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.38.92:2525] with esmtp (Farcaster)
+ id 3a02330a-54ac-4480-8cea-a9a3c4683eb9; Sun, 4 May 2025 17:22:11 +0000 (UTC)
+X-Farcaster-Flow-ID: 3a02330a-54ac-4480-8cea-a9a3c4683eb9
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Sun, 4 May 2025 17:22:11 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.106.101.38) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Sun, 4 May 2025 17:22:08 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <horms@kernel.org>,
+	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH v3 net-next 15/15] ipv6: Get rid of RTNL for SIOCADDRT and RTM_NEWROUTE.
+Date: Sun, 4 May 2025 10:20:48 -0700
+Message-ID: <20250504172159.7358-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <CANn89i+r1cGacVC_6n3-A-WSkAa_Nr+pmxJ7Gt+oP-P9by2aGw@mail.gmail.com>
+References: <CANn89i+r1cGacVC_6n3-A-WSkAa_Nr+pmxJ7Gt+oP-P9by2aGw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:32c2:b0:3d8:1a41:69a9 with SMTP id
- e9e14a558f8ab-3da5b2a02fbmr47154055ab.12.1746376889714; Sun, 04 May 2025
- 09:41:29 -0700 (PDT)
-Date: Sun, 04 May 2025 09:41:29 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <681798b9.050a0220.11da1b.0033.GAE@google.com>
-Subject: [syzbot] [net?] general protection fault in rt6_find_cached_rt
-From: syzbot <syzbot+c98f63d3185beafbc080@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D035UWA004.ant.amazon.com (10.13.139.109) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hello,
+From: Eric Dumazet <edumazet@google.com>
+Date: Sun, 4 May 2025 02:16:13 -0700
+> On Thu, Apr 17, 2025 at 5:10 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+> >
+> > Now we are ready to remove RTNL from SIOCADDRT and RTM_NEWROUTE.
+> >
+> > The remaining things to do are
+> >
+> >   1. pass false to lwtunnel_valid_encap_type_attr()
+> >   2. use rcu_dereference_rtnl() in fib6_check_nexthop()
+> >   3. place rcu_read_lock() before ip6_route_info_create_nh().
+> >
+> > Let's complete the RTNL-free conversion.
+> >
+> > When each CPU-X adds 100000 routes on table-X in a batch
+> > concurrently on c7a.metal-48xl EC2 instance with 192 CPUs,
+> >
+> > without this series:
+> >
+> >   $ sudo ./route_test.sh
+> >   ...
+> >   added 19200000 routes (100000 routes * 192 tables).
+> >   time elapsed: 191577 milliseconds.
+> >
+> > with this series:
+> >
+> >   $ sudo ./route_test.sh
+> >   ...
+> >   added 19200000 routes (100000 routes * 192 tables).
+> >   time elapsed: 62854 milliseconds.
+> >
+> > I changed the number of routes in each table (1000 ~ 100000)
+> > and consistently saw it finish 3x faster with this series.
+> >
+> > Note that now every caller of lwtunnel_valid_encap_type() passes
+> > false as the last argument, and this can be removed later.
+> >
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > ---
+> >  net/ipv4/nexthop.c |  4 ++--
+> >  net/ipv6/route.c   | 18 ++++++++++++------
+> >  2 files changed, 14 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
+> > index 6ba6cb1340c1..823e4a783d2b 100644
+> > --- a/net/ipv4/nexthop.c
+> > +++ b/net/ipv4/nexthop.c
+> > @@ -1556,12 +1556,12 @@ int fib6_check_nexthop(struct nexthop *nh, struct fib6_config *cfg,
+> >         if (nh->is_group) {
+> >                 struct nh_group *nhg;
+> >
+> > -               nhg = rtnl_dereference(nh->nh_grp);
+> > +               nhg = rcu_dereference_rtnl(nh->nh_grp);
+> 
+> Or add a condition about table lock being held ?
 
-syzbot found the following issue on:
-
-HEAD commit:    2bfcee565c3a Merge tag 'bcachefs-2025-05-01' of git://evil..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=14ecf774580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a9a25b7a36123454
-dashboard link: https://syzkaller.appspot.com/bug?extid=c98f63d3185beafbc080
-compiler:       Debian clang version 20.1.2 (++20250402124445+58df0ef89dd6-1~exp1~20250402004600.97), Debian LLD 20.1.2
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/75f61dd1e26c/disk-2bfcee56.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/b0255b732c7e/vmlinux-2bfcee56.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/bff4e7ba94d0/bzImage-2bfcee56.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c98f63d3185beafbc080@syzkaller.appspotmail.com
-
-Oops: general protection fault, probably for non-canonical address 0xdffffc000000000c: 0000 [#1] SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000060-0x0000000000000067]
-CPU: 1 UID: 0 PID: 5881 Comm: kworker/1:4 Not tainted 6.15.0-rc4-syzkaller-00189-g2bfcee565c3a #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/19/2025
-Workqueue: mld mld_ifc_work
-RIP: 0010:fib6_nh_get_excptn_bucket net/ipv6/route.c:1662 [inline]
-RIP: 0010:rt6_find_cached_rt+0xb9/0x270 net/ipv6/route.c:1858
-Code: 48 c1 e8 03 48 89 44 24 08 48 8b 44 24 08 80 3c 18 00 74 08 4c 89 f7 e8 65 8c 14 f8 49 8b 2e 48 83 c5 60 48 89 e8 48 c1 e8 03 <80> 3c 18 00 74 08 48 89 ef e8 49 8c 14 f8 4c 8b 6d 00 e8 70 c5 48
-RSP: 0018:ffffc90000a084e0 EFLAGS: 00010206
-RAX: 000000000000000c RBX: dffffc0000000000 RCX: 0000000000000100
-RDX: ffff88807f319e00 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000000060 R08: ffff88807ef99633 R09: 1ffff1100fdf32c6
-R10: dffffc0000000000 R11: ffffed100fdf32c7 R12: ffffc90000a085b8
-R13: 0000000000000000 R14: ffffc90000a085b0 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8881261cc000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fbb92ae56c0 CR3: 000000006a5c2000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000005325
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <IRQ>
- ip6_pol_route+0x28d/0x1180 net/ipv6/route.c:2273
- pol_lookup_func include/net/ip6_fib.h:616 [inline]
- fib6_rule_lookup+0x55e/0x6f0 net/ipv6/fib6_rules.c:125
- ip6_route_input_lookup net/ipv6/route.c:2335 [inline]
- ip6_route_input+0x6ce/0xa50 net/ipv6/route.c:2631
- ip6_rcv_finish+0x141/0x2d0 net/ipv6/ip6_input.c:77
- NF_HOOK+0x309/0x3a0 include/linux/netfilter.h:314
- __netif_receive_skb_one_core net/core/dev.c:5887 [inline]
- __netif_receive_skb+0xd3/0x380 net/core/dev.c:6000
- process_backlog+0x60e/0x14f0 net/core/dev.c:6352
- __napi_poll+0xc4/0x480 net/core/dev.c:7324
- napi_poll net/core/dev.c:7388 [inline]
- net_rx_action+0x6ea/0xdf0 net/core/dev.c:7510
- handle_softirqs+0x283/0x870 kernel/softirq.c:579
- do_softirq+0xec/0x180 kernel/softirq.c:480
- </IRQ>
- <TASK>
- __local_bh_enable_ip+0x17d/0x1c0 kernel/softirq.c:407
- local_bh_enable include/linux/bottom_half.h:33 [inline]
- rcu_read_unlock_bh include/linux/rcupdate.h:910 [inline]
- __dev_queue_xmit+0x1cd7/0x3a70 net/core/dev.c:4656
- neigh_output include/net/neighbour.h:539 [inline]
- ip6_finish_output2+0x11fb/0x16a0 net/ipv6/ip6_output.c:141
- __ip6_finish_output net/ipv6/ip6_output.c:-1 [inline]
- ip6_finish_output+0x234/0x7d0 net/ipv6/ip6_output.c:226
- NF_HOOK+0x9e/0x380 include/linux/netfilter.h:314
- mld_sendpack+0x800/0xd80 net/ipv6/mcast.c:1868
- mld_send_cr net/ipv6/mcast.c:2169 [inline]
- mld_ifc_work+0x835/0xde0 net/ipv6/mcast.c:2702
- process_one_work kernel/workqueue.c:3238 [inline]
- process_scheduled_works+0xadb/0x17a0 kernel/workqueue.c:3319
- worker_thread+0x8a0/0xda0 kernel/workqueue.c:3400
- kthread+0x70e/0x8a0 kernel/kthread.c:464
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:153
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:fib6_nh_get_excptn_bucket net/ipv6/route.c:1662 [inline]
-RIP: 0010:rt6_find_cached_rt+0xb9/0x270 net/ipv6/route.c:1858
-Code: 48 c1 e8 03 48 89 44 24 08 48 8b 44 24 08 80 3c 18 00 74 08 4c 89 f7 e8 65 8c 14 f8 49 8b 2e 48 83 c5 60 48 89 e8 48 c1 e8 03 <80> 3c 18 00 74 08 48 89 ef e8 49 8c 14 f8 4c 8b 6d 00 e8 70 c5 48
-RSP: 0018:ffffc90000a084e0 EFLAGS: 00010206
-
-RAX: 000000000000000c RBX: dffffc0000000000 RCX: 0000000000000100
-RDX: ffff88807f319e00 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000000060 R08: ffff88807ef99633 R09: 1ffff1100fdf32c6
-R10: dffffc0000000000 R11: ffffed100fdf32c7 R12: ffffc90000a085b8
-R13: 0000000000000000 R14: ffffc90000a085b0 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8881261cc000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fbb92ae56c0 CR3: 000000006a5c2000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000005325
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	48 c1 e8 03          	shr    $0x3,%rax
-   4:	48 89 44 24 08       	mov    %rax,0x8(%rsp)
-   9:	48 8b 44 24 08       	mov    0x8(%rsp),%rax
-   e:	80 3c 18 00          	cmpb   $0x0,(%rax,%rbx,1)
-  12:	74 08                	je     0x1c
-  14:	4c 89 f7             	mov    %r14,%rdi
-  17:	e8 65 8c 14 f8       	call   0xf8148c81
-  1c:	49 8b 2e             	mov    (%r14),%rbp
-  1f:	48 83 c5 60          	add    $0x60,%rbp
-  23:	48 89 e8             	mov    %rbp,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	80 3c 18 00          	cmpb   $0x0,(%rax,%rbx,1) <-- trapping instruction
-  2e:	74 08                	je     0x38
-  30:	48 89 ef             	mov    %rbp,%rdi
-  33:	e8 49 8c 14 f8       	call   0xf8148c81
-  38:	4c 8b 6d 00          	mov    0x0(%rbp),%r13
-  3c:	e8                   	.byte 0xe8
-  3d:	70 c5                	jo     0x4
-  3f:	48                   	rex.W
+I think in this context the caller is more of an rcu reader
+than a ipv6 route writer.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> 
+> >                 if (nhg->has_v4)
+> >                         goto no_v4_nh;
+> >                 is_fdb_nh = nhg->fdb_nh;
+> >         } else {
+> > -               nhi = rtnl_dereference(nh->nh_info);
+> > +               nhi = rcu_dereference_rtnl(nh->nh_info);
+> >                 if (nhi->family == AF_INET)
+> >                         goto no_v4_nh;
+> >                 is_fdb_nh = nhi->fdb_nh;
+> > diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+> > index c8c1c75268e3..bb46e724db73 100644
+> > --- a/net/ipv6/route.c
+> > +++ b/net/ipv6/route.c
+> > @@ -3902,12 +3902,16 @@ int ip6_route_add(struct fib6_config *cfg, gfp_t gfp_flags,
+> >         if (IS_ERR(rt))
+> >                 return PTR_ERR(rt);
+> >
+> > +       rcu_read_lock();
+> 
+> This looks bogus to me (and syzbot)
+> 
+> Holding rcu_read_lock() from writers is almost always wrong.
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Yes, but I added it as a reader of netdev and nexthop to guarantee
+that they won't go away.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+> 
+> In this case, this prevents any GFP_KERNEL allocations to happen
+> (among other things)
 
-If you want to undo deduplication, reply with:
-#syz undup
+Oh, I completely missed this path, thanks!
+
+Fortunately, it seems all ->build_state() except for
+ip_tun_build_state() use GFP_ATOMIC.
+
+So, simply changing GFP_KERNEL to GFP_ATOMIC is acceptable ?
+
+
+lwtunnel_state_alloc
+  - kzalloc(GFP_ATOMIC)
+
+ip_tun_build_state
+  - dst_cache_init(GFP_KERNEL)
+
+ip6_tun_build_state / mpls_build_state / xfrmi_build_state
+-> no alloc other than lwtunnel_state_alloc()
+
+bpf_build_state
+  - bpf_parse_prog
+    - nla_memdup(GFP_ATOMIC)
+
+ila_build_state / ioam6_build_state / rpl_build_state / seg6_build_state
+  - dst_cache_init(GFP_ATOMIC)
+
+seg6_local_build_state
+  - seg6_end_dt4_build / seg6_end_dt6_build / seg6_end_dt46_build
+    -> no alloc other than lwtunnel_state_alloc()
+
+
+> 
+> [ BUG: Invalid wait context ]
+> 6.15.0-rc4-syzkaller-00746-g836b313a14a3 #0 Tainted: G W
+> -----------------------------
+> syz-executor234/5832 is trying to lock:
+> ffffffff8e021688 (pcpu_alloc_mutex){+.+.}-{4:4}, at:
+> pcpu_alloc_noprof+0x284/0x16b0 mm/percpu.c:1782
+> other info that might help us debug this:
+> context-{5:5}
+> 1 lock held by syz-executor234/5832:
+> #0: ffffffff8df3b860 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire
+> include/linux/rcupdate.h:331 [inline]
+> #0: ffffffff8df3b860 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock
+> include/linux/rcupdate.h:841 [inline]
+> #0: ffffffff8df3b860 (rcu_read_lock){....}-{1:3}, at:
+> ip6_route_add+0x4d/0x2f0 net/ipv6/route.c:3913
+> stack backtrace:
+> CPU: 0 UID: 0 PID: 5832 Comm: syz-executor234 Tainted: G W
+> 6.15.0-rc4-syzkaller-00746-g836b313a14a3 #0 PREEMPT(full)
+> Tainted: [W]=WARN
+> Hardware name: Google Google Compute Engine/Google Compute Engine,
+> BIOS Google 04/29/2025
+> Call Trace:
+> <TASK>
+> dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+> print_lock_invalid_wait_context kernel/locking/lockdep.c:4831 [inline]
+> check_wait_context kernel/locking/lockdep.c:4903 [inline]
+> __lock_acquire+0xbcf/0xd20 kernel/locking/lockdep.c:5185
+> lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5866
+> __mutex_lock_common kernel/locking/mutex.c:601 [inline]
+> __mutex_lock+0x182/0xe80 kernel/locking/mutex.c:746
+> pcpu_alloc_noprof+0x284/0x16b0 mm/percpu.c:1782
+> dst_cache_init+0x37/0xc0 net/core/dst_cache.c:145
+> ip_tun_build_state+0x193/0x6b0 net/ipv4/ip_tunnel_core.c:687
+> lwtunnel_build_state+0x381/0x4c0 net/core/lwtunnel.c:137
+> fib_nh_common_init+0x129/0x460 net/ipv4/fib_semantics.c:635
+> fib6_nh_init+0x15e4/0x2030 net/ipv6/route.c:3669
+> ip6_route_info_create_nh+0x139/0x870 net/ipv6/route.c:3866
+> ip6_route_add+0xf6/0x2f0 net/ipv6/route.c:3915
+> inet6_rtm_newroute+0x284/0x1c50 net/ipv6/route.c:5732
+> rtnetlink_rcv_msg+0x7cc/0xb70 net/core/rtnetlink.c:6955
+> netlink_rcv_skb+0x219/0x490 net/netlink/af_netlink.c:2534
+> netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
+> netlink_unicast+0x758/0x8d0 net/netlink/af_netlink.c:1339
+> netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1883
+> sock_sendmsg_nosec net/socket.c:712 [inline]
+> __sock_sendmsg+0x219/0x270 net/socket.c:727
+> ____sys_sendmsg+0x505/0x830 net/socket.c:2566
+> ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
+> __sys_sendmsg net/socket.c:2652 [inline]
+> __do_sys_sendmsg net/socket.c:2657 [inline]
+> __se_sys_sendmsg net/socket.c:2655 [inline]
+> __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2655
+> do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+> do_syscall_64+0xf6/0x210 arch/x86/entry/syscall_64.c:94
 
