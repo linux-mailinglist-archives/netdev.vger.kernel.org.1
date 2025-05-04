@@ -1,238 +1,152 @@
-Return-Path: <netdev+bounces-187660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE6C1AA8934
-	for <lists+netdev@lfdr.de>; Sun,  4 May 2025 22:11:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 210A4AA8937
+	for <lists+netdev@lfdr.de>; Sun,  4 May 2025 22:18:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE9E63B3925
-	for <lists+netdev@lfdr.de>; Sun,  4 May 2025 20:11:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 287431893738
+	for <lists+netdev@lfdr.de>; Sun,  4 May 2025 20:18:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00AEB2472AB;
-	Sun,  4 May 2025 20:11:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22AB019D8BC;
+	Sun,  4 May 2025 20:18:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="jeKkhnxa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gFGroO52"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A45367
-	for <netdev@vger.kernel.org>; Sun,  4 May 2025 20:11:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F1658494
+	for <netdev@vger.kernel.org>; Sun,  4 May 2025 20:18:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746389496; cv=none; b=Nr/cm8setVoS8OxevC6behRJNjO0Jw8JT6YBRW6q3c1nNhKwil0taTWjIHCyz4FNgAffgNKis4uj3K4KNth849b7gA9tzqVPxVujNVejvcNokBi3ZmvswEQhZbRMNA+GBDF1b4sfp7hyzHm6PzqbJqQHVoQPwp6oSMYzsFOSyas=
+	t=1746389889; cv=none; b=YzmHoONXt3ATohHyC2QYMXvKUMgBe+baLhQHxx9auGG6KCE/vVN5GhxyO0tB8F+eh6jg4GMveIJBYNgfjvesLFSOgK0RHCRR9SCdGe28jvCP+A6121xgf5O/saZwVs9HBe4u1xa2BmcKnR4Ml39GKy1wa6C2TiF9U6RXE6RVtjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746389496; c=relaxed/simple;
-	bh=Xzdz5Ei202U2ElHDS/8En5JPiLnH8Bsxb9QUfNeon4Y=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kpIzttU1G5BEky1kFaIkA6HMba5wfk3VtOaUe/HYFm8bRSNFLkgGxcgSadv7/JivKKZJiRo7MkozGIWWXEyG7JC4nmNQEpi/LxNczsdnbpivACo2QEywlx/tqr18gRUHlljwlNWUFRYXrUhkbmbnxZtM0Nq5p0s2DdJY8lBZYok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=jeKkhnxa; arc=none smtp.client-ip=52.119.213.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1746389889; c=relaxed/simple;
+	bh=il2HSTg1WEyM9SDKF5gmqGQXSIHezegaxdU8pWyTrvs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q2CQCP67hBuYW3WaZLcYow/Sn0KUZTIBV7tWo9PV9/8LpNmbBkLhWP8h7grBOh5osakgU+kaNg7hLNEkzGY0a5Ogk1QDTQJh4c+noQc7bATNxTHkj1DK2RSWsp+w+WnsvadDYKV0N8ERdyFnHCCNmK2ro84EtN2xZCtq2kz05Is=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gFGroO52; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2241053582dso55880575ad.1
+        for <netdev@vger.kernel.org>; Sun, 04 May 2025 13:18:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1746389496; x=1777925496;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=oHD5YBruEGRXYmuqk4eJsB0nvuGTbAv0RuAFaCp9x6g=;
-  b=jeKkhnxaljOFFQUaL/Sd+4GvjlCF7VaBYJUTPvwpIxt/0wSg60T3EnAe
-   guBxX9xlT7sb+EbCT4gVqBYvQPt6lv7POawNd2uT4zGTNInwHLOWeeBmI
-   I4HXSxTfe/6KXcc5GTB+URoi04Jv1OQYaynzhG42RT/jdheCtbMO8a6nP
-   c=;
-X-IronPort-AV: E=Sophos;i="6.15,262,1739836800"; 
-   d="scan'208";a="89835744"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2025 20:11:31 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:27562]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.41.121:2525] with esmtp (Farcaster)
- id 95644d60-2c9b-4022-820b-ad5a8f34944c; Sun, 4 May 2025 20:11:30 +0000 (UTC)
-X-Farcaster-Flow-ID: 95644d60-2c9b-4022-820b-ad5a8f34944c
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Sun, 4 May 2025 20:11:28 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.106.101.38) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Sun, 4 May 2025 20:11:25 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <edumazet@google.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <horms@kernel.org>,
-	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH v3 net-next 15/15] ipv6: Get rid of RTNL for SIOCADDRT and RTM_NEWROUTE.
-Date: Sun, 4 May 2025 13:11:11 -0700
-Message-ID: <20250504201116.30743-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <CANn89i+fLC6fd-1ea7W3OhL+562qpjBEbKj7sgtCG7ogZj=dOQ@mail.gmail.com>
-References: <CANn89i+fLC6fd-1ea7W3OhL+562qpjBEbKj7sgtCG7ogZj=dOQ@mail.gmail.com>
+        d=gmail.com; s=20230601; t=1746389887; x=1746994687; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3CJ9OYEzL25KIEHSXVFSRpTW5a8w6nofrKrinB5k8wA=;
+        b=gFGroO52EpU+HIBFFUoy8zlOOTNMjmTCdXi7Dc1CgtQyvLfYP2v7DbC9RkE9N3gCBj
+         IFQUrwZps/AGYtSl5f6IO+ybkdCdIz60mdIC0keIpg0tYxr73hUxG5+gv1QGBEgTSyso
+         lLb8RlOCeT+cOaym/pKUR4iIz4ZXy5gLAsASdxIKahw2/nTZjycmUAqPTo6X7gehjodF
+         CsP/5dMwq293YgRnNnvwLbPupvp9Htr4U+TFO22YmIWs0o2SYWrwQSt78GbeRJ3aN6vB
+         LqlF6LBaq9P1Z21C2OkBx1KUZMdOuAKs7AsCdP5aF5k21bynVLu9VvpfspuHjqWLw4rl
+         rs2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746389887; x=1746994687;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3CJ9OYEzL25KIEHSXVFSRpTW5a8w6nofrKrinB5k8wA=;
+        b=C5pxByydcoeDjILh3TrCDYooOSDtFTCwnFZbKIPfENCe4sn50i+LGRsAqW3l9W0xwF
+         4uv2oy2MxJliUrMcCCGUyGJv+uph5iPEASIvxulAwgMTYJ/5Q/lQ/0wiAYUly4m1miqp
+         cQK5nicW/YIOGmsOvaxHAfUw2KsIlYoEWgT1pZqtpvc2N9nyl5IMkDKGQXKKdgoG+9Ol
+         /4zDMMNF7Y6zygOu89tP1/OfD/PBt0LmP8Ne6SMFOT7HQhv4/dAsGNOkgtFytjHupBXA
+         HVJ41SwzmlDm1TiMOalY+3XjFYNZ/lMYZ+luwQKB2c2qdHIWcz9a0OCGLLWWuEjO1HaH
+         BFeg==
+X-Gm-Message-State: AOJu0YxOxDQk5sPYMZvZOdG3UUVrPDIMtfOMOlCOknkbLt3S1OcE5bSc
+	JKaUky9JdAhsnDnBmZlBen+PkNL0gtrgUVG1zWM8JYPGFDf6wCaL
+X-Gm-Gg: ASbGncsgIxDST/g1IrN7UCGhSlfBKwvImTS60AEwHoihwNR2xuM6Uqv7Yzw7NjfPGwU
+	OEoScQBlEwfAiMW4VqR/oNbHJ/MjRzMN37mj9jYHHHPCKl7R72/3M4J43Y53MiTGXcKREW7k+Lq
+	Pnvf99hKu9WaNUF+dd6mFM8oTzcwtjih2gx9rmgiFi36EKSTo/JrhnSf+jNb94uU/5EVkP4Z9V8
+	Icf3VHToiJZXh5d4MpFVf/aKxzB3EpRphIOA8+tb07TcM1IMu1CytMNO8mJtoEy7wwrFTjwsnMy
+	+m/tIMjctiq++htegPjUSfbA7d6E7SJqYu0mmNazihg=
+X-Google-Smtp-Source: AGHT+IFzj10u17tG4uzXyiAblF/d/oVI7X+bT997Y9FX0EK0jqv0PHUpSj0taMzvpbXjqcT22s9ffw==
+X-Received: by 2002:a17:902:e5c7:b0:22c:36d1:7a49 with SMTP id d9443c01a7336-22e1eaeff29mr84053965ad.53.1746389886712;
+        Sun, 04 May 2025 13:18:06 -0700 (PDT)
+Received: from localhost ([66.205.136.11])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e188285f8sm31153595ad.46.2025.05.04.13.18.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 04 May 2025 13:18:05 -0700 (PDT)
+Date: Sun, 4 May 2025 13:18:04 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Victor Nogueira <victor@mojatatu.com>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
+	alan@wylie.me.uk
+Subject: Re: [Patch net 1/2] sch_htb: make htb_deactivate() idempotent
+Message-ID: <aBfEk6QUI//BIyZC@pop-os.localdomain>
+References: <20250428232955.1740419-1-xiyou.wangcong@gmail.com>
+ <20250428232955.1740419-2-xiyou.wangcong@gmail.com>
+ <eecd9a29-14f9-432d-a3cf-5215313df9f0@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D038UWC002.ant.amazon.com (10.13.139.238) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <eecd9a29-14f9-432d-a3cf-5215313df9f0@mojatatu.com>
 
-From: Eric Dumazet <edumazet@google.com>
-Date: Sun, 4 May 2025 12:34:49 -0700
-> On Sun, May 4, 2025 at 10:22 AM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
-> >
-> > From: Eric Dumazet <edumazet@google.com>
-> > Date: Sun, 4 May 2025 02:16:13 -0700
-> > > On Thu, Apr 17, 2025 at 5:10 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
-> > > >
-> > > > Now we are ready to remove RTNL from SIOCADDRT and RTM_NEWROUTE.
-> > > >
-> > > > The remaining things to do are
-> > > >
-> > > >   1. pass false to lwtunnel_valid_encap_type_attr()
-> > > >   2. use rcu_dereference_rtnl() in fib6_check_nexthop()
-> > > >   3. place rcu_read_lock() before ip6_route_info_create_nh().
-> > > >
-> > > > Let's complete the RTNL-free conversion.
-> > > >
-> > > > When each CPU-X adds 100000 routes on table-X in a batch
-> > > > concurrently on c7a.metal-48xl EC2 instance with 192 CPUs,
-> > > >
-> > > > without this series:
-> > > >
-> > > >   $ sudo ./route_test.sh
-> > > >   ...
-> > > >   added 19200000 routes (100000 routes * 192 tables).
-> > > >   time elapsed: 191577 milliseconds.
-> > > >
-> > > > with this series:
-> > > >
-> > > >   $ sudo ./route_test.sh
-> > > >   ...
-> > > >   added 19200000 routes (100000 routes * 192 tables).
-> > > >   time elapsed: 62854 milliseconds.
-> > > >
-> > > > I changed the number of routes in each table (1000 ~ 100000)
-> > > > and consistently saw it finish 3x faster with this series.
-> > > >
-> > > > Note that now every caller of lwtunnel_valid_encap_type() passes
-> > > > false as the last argument, and this can be removed later.
-> > > >
-> > > > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > > > ---
-> > > >  net/ipv4/nexthop.c |  4 ++--
-> > > >  net/ipv6/route.c   | 18 ++++++++++++------
-> > > >  2 files changed, 14 insertions(+), 8 deletions(-)
-> > > >
-> > > > diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
-> > > > index 6ba6cb1340c1..823e4a783d2b 100644
-> > > > --- a/net/ipv4/nexthop.c
-> > > > +++ b/net/ipv4/nexthop.c
-> > > > @@ -1556,12 +1556,12 @@ int fib6_check_nexthop(struct nexthop *nh, struct fib6_config *cfg,
-> > > >         if (nh->is_group) {
-> > > >                 struct nh_group *nhg;
-> > > >
-> > > > -               nhg = rtnl_dereference(nh->nh_grp);
-> > > > +               nhg = rcu_dereference_rtnl(nh->nh_grp);
-> > >
-> > > Or add a condition about table lock being held ?
-> >
-> > I think in this context the caller is more of an rcu reader
-> > than a ipv6 route writer.
-> >
-> >
-> >
-> > >
-> > > >                 if (nhg->has_v4)
-> > > >                         goto no_v4_nh;
-> > > >                 is_fdb_nh = nhg->fdb_nh;
-> > > >         } else {
-> > > > -               nhi = rtnl_dereference(nh->nh_info);
-> > > > +               nhi = rcu_dereference_rtnl(nh->nh_info);
-> > > >                 if (nhi->family == AF_INET)
-> > > >                         goto no_v4_nh;
-> > > >                 is_fdb_nh = nhi->fdb_nh;
-> > > > diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-> > > > index c8c1c75268e3..bb46e724db73 100644
-> > > > --- a/net/ipv6/route.c
-> > > > +++ b/net/ipv6/route.c
-> > > > @@ -3902,12 +3902,16 @@ int ip6_route_add(struct fib6_config *cfg, gfp_t gfp_flags,
-> > > >         if (IS_ERR(rt))
-> > > >                 return PTR_ERR(rt);
-> > > >
-> > > > +       rcu_read_lock();
-> > >
-> > > This looks bogus to me (and syzbot)
-> > >
-> > > Holding rcu_read_lock() from writers is almost always wrong.
-> >
-> > Yes, but I added it as a reader of netdev and nexthop to guarantee
-> > that they won't go away.
+On Wed, Apr 30, 2025 at 12:19:03PM -0300, Victor Nogueira wrote:
+> On 4/28/25 20:29, Cong Wang wrote:
+> > Alan reported a NULL pointer dereference in htb_next_rb_node()
+> > after we made htb_qlen_notify() idempotent.
+> > 
+> > It turns out in the following case it introduced some regression:
+> > 
+> > htb_dequeue_tree():
+> >    |-> fq_codel_dequeue()
+> >      |-> qdisc_tree_reduce_backlog()
+> >        |-> htb_qlen_notify()
+> >          |-> htb_deactivate()
+> >    |-> htb_next_rb_node()
+> >    |-> htb_deactivate()
+> > 
+> > For htb_next_rb_node(), after calling the 1st htb_deactivate(), the
+> > clprio[prio]->ptr could be already set to  NULL, which means
+> > htb_next_rb_node() is vulnerable here.
 > 
-> We have standard ways for preventing this, acquiring a refcount on the objects.
-> >
-> >
-> > >
-> > > In this case, this prevents any GFP_KERNEL allocations to happen
-> > > (among other things)
-> >
-> > Oh, I completely missed this path, thanks!
-> >
-> > Fortunately, it seems all ->build_state() except for
-> > ip_tun_build_state() use GFP_ATOMIC.
-> >
-> > So, simply changing GFP_KERNEL to GFP_ATOMIC is acceptable ?
+> If I'm not missing something, the issue seems to be that
+> fq_codel_dequeue or codel_qdisc_dequeue may call qdisc_tree_reduce_backlog
+> with sch->q.qlen == 0 after commit 342debc12183. This will cause
+> htb_qlen_notify to be called which will deactivate before we
+> call htb_next_rb_node further down in htb_dequeue_tree (as you
+> said above).
 > 
-> What protects against writers' mutual exclusion ?
+> If that's so, couldn't we instead of doing:
 > 
-> I dislike using GFP_ATOMIC in control paths. This is something that we
-> must avoid.
+> > @@ -348,7 +348,8 @@ static void htb_add_to_wait_tree(struct htb_sched *q,
+> >    */
+> >   static inline void htb_next_rb_node(struct rb_node **n)
+> >   {
+> > -	*n = rb_next(*n);
+> > +	if (*n)
+> > +		*n = rb_next(*n);
+> >   }
 > 
-> This will make admin operations unpredictable. Many scripts would
-> break under pressure.
+> do something like:
+> 
+> @@ -921,7 +921,9 @@ static struct sk_buff *htb_dequeue_tree(struct htb_sched
+> *q, const int prio,
+>                 cl->leaf.deficit[level] -= qdisc_pkt_len(skb);
+>                 if (cl->leaf.deficit[level] < 0) {
+>                         cl->leaf.deficit[level] += cl->quantum;
+> -                       htb_next_rb_node(level ?
+> &cl->parent->inner.clprio[prio].ptr :
+> +                       /* Account for (fq_)codel child deactivating after
+> dequeue */
+> +                       if (likely(cl->prio_activity))
+> +                               htb_next_rb_node(level ?
 
-I see.  I'll rework this and convert RCU to refcounting of
-netdev and nexthop.
+It reads odd to me to check cl->prio_activity before htb_next_rb_node(),
+and I don't see any existing pattern of using this.
 
-Then, I'll change the rcu_dereference_rtnl() above and friends to
-check the table lock as you suggested.
-
-
-> 
-> >
-> >
-> > lwtunnel_state_alloc
-> >   - kzalloc(GFP_ATOMIC)
-> >
-> > ip_tun_build_state
-> >   - dst_cache_init(GFP_KERNEL)
-> >
-> > ip6_tun_build_state / mpls_build_state / xfrmi_build_state
-> > -> no alloc other than lwtunnel_state_alloc()
-> >
-> > bpf_build_state
-> >   - bpf_parse_prog
-> >     - nla_memdup(GFP_ATOMIC)
-> >
-> > ila_build_state / ioam6_build_state / rpl_build_state / seg6_build_state
-> >   - dst_cache_init(GFP_ATOMIC)
-> >
-> > seg6_local_build_state
-> >   - seg6_end_dt4_build / seg6_end_dt6_build / seg6_end_dt46_build
-> >     -> no alloc other than lwtunnel_state_alloc()
-> >
-> 
-> You mean, following the wrong fix done in :
-> 
-> 14a0087e7236228d56bfa3fab7084c19fcb513fb ipv6: sr: switch to
-> GFP_ATOMIC flag to allocate memory during seg6local LWT setup
-
-Oh it's last week... somehow I missed this mail..
-maybe I filtered it with ipv6: sr.. :/
-
-In the rework, I'll include the revert of that.
+My patch pretty much follows all the existing patterns of checking
+either cl->prio_activity or cl->leaf.q->q.qlen. So, although it looks
+bigger from diffstat, it is safer from this point of view.
 
 Thanks!
 
