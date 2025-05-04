@@ -1,142 +1,235 @@
-Return-Path: <netdev+bounces-187625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C808AA84CF
-	for <lists+netdev@lfdr.de>; Sun,  4 May 2025 10:15:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67059AA855A
+	for <lists+netdev@lfdr.de>; Sun,  4 May 2025 11:15:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72F051797CC
-	for <lists+netdev@lfdr.de>; Sun,  4 May 2025 08:15:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BAA0F178D46
+	for <lists+netdev@lfdr.de>; Sun,  4 May 2025 09:15:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBD1219C546;
-	Sun,  4 May 2025 08:14:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 890D11991BF;
+	Sun,  4 May 2025 09:15:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MAHYFbGS"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34A03192D6B
-	for <netdev@vger.kernel.org>; Sun,  4 May 2025 08:14:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746346497; cv=none; b=mJ/o5DXKe7jgqS2XB2qSdgJj1bOAW1XCm9vxpFr1fUL6iYnt46Tlzp0KVDE5LbetPPliRwMOdULf4Y6s1bbY5uSBIBxPOHj5tbjoTO0GOZu/EuZLUau0+Iv2fHgD+uC2/Dz11eOCblh7Plj6nlKBUKsh874PAFufxxUPcH3OtbI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746346497; c=relaxed/simple;
-	bh=VGUYVw6QW+wGdP57zdeokyo5cVDXcXvy4Co08zbuMzM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=D7DGwpcfoQUpUgcoiB0KfmeOhWZPPNGViNLgpORtgpYBA8ZBE6cc+YLBxCTCDRu5DgpRBJXi7B6YW55uy1Z4BStrS3BmtoJRnj+XdMwrf4pJQMFD0q5/SfBiBBhR9njp/NIVSfeMSAhMfnB4DKrvTPc/JwOjYIPv2IUWfaM9has=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uBUUf-00062b-5x; Sun, 04 May 2025 10:14:37 +0200
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uBUUd-0012RO-0e;
-	Sun, 04 May 2025 10:14:35 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uBUUd-001mRI-0N;
-	Sun, 04 May 2025 10:14:35 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	stable@vger.kernel.org,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: [PATCH net v4 2/2] net: phy: micrel: remove KSZ9477 EEE quirks now handled by phylink
-Date: Sun,  4 May 2025 10:14:34 +0200
-Message-Id: <20250504081434.424489-3-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250504081434.424489-1-o.rempel@pengutronix.de>
-References: <20250504081434.424489-1-o.rempel@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A90E74C85;
+	Sun,  4 May 2025 09:15:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746350103; cv=fail; b=oQvZtsbYjWYTBjJN795baapwyvdKtnI1KaAxvUcF/Vgw3+XHvH170tpTx5J4L9pzZPFVsHhjDx0C7h9K0B8i0W5myqlVbGjc0OKjXS2++iUxdLVd28xsbucep3JzTpQwez3YyQj8P3zpXAHTILE5jm3nClD5A8318s/fxkwraoI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746350103; c=relaxed/simple;
+	bh=Pu0y0EtRUYeo6DsxwwtqsWhoByQDugYFiFDjRelMxPM=;
+	h=Subject:To:CC:References:From:Message-ID:Date:In-Reply-To:
+	 Content-Type:MIME-Version; b=iz0fOKKnxa+L+bMbZrd4iMqwEX92MINWpA9kjQn3Ja+X6RgnFXF5LJsKiUaObsPMLD+Cy7Mti6LuTy+5N6289xTBzh10oz2OKuYm2IaJ/kRB1RrXFrf8oZRcysruGPopLtXB6hBM/f4aC8/0WpncpzNBeCXu+Was2Lm2G6AdPBw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MAHYFbGS; arc=fail smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746350101; x=1777886101;
+  h=subject:to:cc:references:from:message-id:date:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Pu0y0EtRUYeo6DsxwwtqsWhoByQDugYFiFDjRelMxPM=;
+  b=MAHYFbGSIoe4/SEst3mE35qRH0BwLEVTxAmEuLolFjZw7WPQwgYMizvM
+   njJQCc+CskArCZezilY3VjFutILvbS2E85SAuFJTrgTkU7qf87TuAcjEN
+   BzH4lrkTfYxGpWwff35uWZbR8q0gFuP+voYQIw1q3yBHRKcCKgHGqcfjg
+   Iwx49xX/IZSCUJhbWMBQutJBsm5FQm3kZmfszzzdXTOlzosnZCe/a3lnm
+   qZL62uGySA60LmT4tZuS2lEMHzVN72H+bUt9fTgwCUCtj3jIlW4DWpzMF
+   tYGBWzTq8XYwXhgxgoVTPV5utdf2trUZPr8cfXEu2QoXqdKYdAEf6FypQ
+   w==;
+X-CSE-ConnectionGUID: ZcrZJwZdTcGhl5Zh+K0fJA==
+X-CSE-MsgGUID: W5bc2f4tRwq4K0AQF1aLGg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11422"; a="48065015"
+X-IronPort-AV: E=Sophos;i="6.15,261,1739865600"; 
+   d="scan'208";a="48065015"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2025 02:15:01 -0700
+X-CSE-ConnectionGUID: 4O4DJB0/TJeqWpa5+Bg+IQ==
+X-CSE-MsgGUID: q9AhgH5pQ+qGKAXj4VASQQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,261,1739865600"; 
+   d="scan'208";a="172233785"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2025 02:15:01 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Sun, 4 May 2025 02:15:00 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Sun, 4 May 2025 02:15:00 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.48) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Sun, 4 May 2025 02:14:36 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jc5lxQZWO4NDWWk50/HQ2qhw8NpdjhPkjBWMYbDmIplCfiyMUB9UztQyFd3C8R6cZBHnGE65oZRwNXBK6Y9n+HI51Ai5mtxA1EK46uLr635u2U1z1mMWOACDUsjw985kgybfbklWuKi/BpFx8g2KqLsaNIiJpR/FTf3KAhEAs6XpbxW1AJYpEXtOUDZDFd7bdjvtZaRzlX/uDjRnhqJ7xKYGmOaf9GoeKR42VUI6fNHwLd0vaQWybZfGOyglO4wV2RRsz9rr1U4rkLZtnTtY9mjGEa5kqcUvNkMQpG3mONAc1lCleJVcpF1hEZW55sUPq7RNrfY1hNzQjU+245gIFA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=07RoAupwKPBEI9jRDurlPiDcj8oysDC3xdrajoUlYKI=;
+ b=ReqUcYforTGDeMcYX7tJVzChadkb0Tk9R8vEPBF8K6q+ve113veVmEJQvTz743C7ny1HYOPGIbESAqnn3PyymtaS5cqLpAO/8XahcnZpXVtRRwJXAo+ASAHAU+3KlgvpWjPhrVuqPQK+3wUh5GufgHjVehzxVufhZV/7tBl02+ywJMNsxduvekM9RJ6B+E83OCyRcX469grbgT9Ch7+Z48YI/lEyG8xPpjF9V5D+T6yFg44aKbYef+gZRbLSaQNt5Q+7tOJmMNChfp07f5fBnMZ5wbii8cyesd5ZYFOBUEBu1vSgxrwNIltizYOONZlB+K62byhZHUKsjrQhSQXYNQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB5949.namprd11.prod.outlook.com (2603:10b6:510:144::6)
+ by CH3PR11MB8468.namprd11.prod.outlook.com (2603:10b6:610:1ba::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.20; Sun, 4 May
+ 2025 09:13:51 +0000
+Received: from PH0PR11MB5949.namprd11.prod.outlook.com
+ ([fe80::1c5d:e556:f779:e861]) by PH0PR11MB5949.namprd11.prod.outlook.com
+ ([fe80::1c5d:e556:f779:e861%6]) with mapi id 15.20.8699.019; Sun, 4 May 2025
+ 09:13:51 +0000
+Subject: Re: [Intel-wired-lan] [PATCH] e1000e: disregard NVM checksum on tgp
+ when valid checksum mask is not set
+To: Jacek Kowalski <jacek@jacekk.info>, Simon Horman <horms@kernel.org>
+CC: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <5555d3bd-44f6-45c1-9413-c29fe28e79eb@jacekk.info>
+ <20250424162444.GH3042781@horms.kernel.org>
+ <879abd6b-d44b-5a3d-0df6-9de8d0b472a3@intel.com>
+ <e6899d87-9ec4-42aa-9952-11653bc27092@jacekk.info>
+ <0530ea8e-eb81-74cd-5056-4ee6db8feb9e@intel.com>
+ <a0069d48-38b9-4bf0-979f-7051f8e906f4@jacekk.info>
+From: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
+Message-ID: <c890cd3b-a4c5-217d-3ad3-6d9389b98f7c@intel.com>
+Date: Sun, 4 May 2025 12:13:44 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
+In-Reply-To: <a0069d48-38b9-4bf0-979f-7051f8e906f4@jacekk.info>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-ClientProxiedBy: TLZP290CA0011.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:9::19) To PH0PR11MB5949.namprd11.prod.outlook.com
+ (2603:10b6:510:144::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB5949:EE_|CH3PR11MB8468:EE_
+X-MS-Office365-Filtering-Correlation-Id: d30c4352-9524-4d5d-525b-08dd8aebfc61
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?R1hBVzJtVUFLMzFOaHdLNDc2a2lEdlNTRGx1N3NCcGtnL2I0Nkw4TC91RENi?=
+ =?utf-8?B?SmF3UC9xSDRkTldLUmdGcmkydkg4STNZNUM1YVFETXMycTFmb0ZiOFhlNXB2?=
+ =?utf-8?B?clZnWXlLRHJLMGtCYmdwZVI1djZaQVRjNFUvLzZPZTMvSmJEajFjM21IalNU?=
+ =?utf-8?B?TFF1OGJEK091a3pXcXRqMmdFSmRUSVZCTG10U1dnUS8vRFJXU2wxOHlBRE4v?=
+ =?utf-8?B?dE9pbzE3MFVyQWZDbGZudFVNTndRQ1ZhQnVzbmtFT2kxakRoSUdLZlc2V3Z3?=
+ =?utf-8?B?VXFKZUo2S0JDZ3FtelRLeFlXV0dtVExOQk9TMWFQbVExLzF0U1NycFRBdjg3?=
+ =?utf-8?B?OFgzNGd0WUF2WTVMaEJPdlMwODJxN2hmNmwvVkhsR3p1aWd5eU1HMGtHU3Qw?=
+ =?utf-8?B?Lys1c04ya3NGdHRsYk16OWRNOG9naFJtYmFlekxIUnZ0Z2o4UXVrc2Y2YW4x?=
+ =?utf-8?B?c3dwRlZQdUNpdXRlYkRrb2ljVFZSempNcEpMR0lrT3ZZMU1HWEFxdHF0bTVP?=
+ =?utf-8?B?Mmo2S1ZHSE5MYzJ2WkI5VnkzQ1FDcHJRdDU4UEJjOU9RTWJybDBqN2JGTzhh?=
+ =?utf-8?B?RVFPZ2F2NGNmdldObTBna0s3RjgveEJRcVJ1bko0SnkwVG8wYndLKzN5d0J3?=
+ =?utf-8?B?Z3d1cFZOYXh3emVkc0hVeEY5dlFkcCswbmVUbnZxZGhsQ0luNXo2Zkd0aUtP?=
+ =?utf-8?B?OFNNTTRLazZKbTZQNEZzVnNpKzZoSmdiQzVjNjNHTXdDMFZIT1lUS3ZieWpo?=
+ =?utf-8?B?eXdBMHJURERTcjlPZUlpVUY0M01qVklTanBTcjVHTXkyaWhNZy8wcDV6aVh0?=
+ =?utf-8?B?d09UMGVvYWpmbCtScDFxTWt2ajd5VWRlVjc1T2FxS0JqOFFlaDlaY2VqTjhY?=
+ =?utf-8?B?aWUxK2FVNFlmTVVBSGJWWXdPL3lHYnBGWHg3Z1ljMkN1S3U1N3o0T2RxQ3NS?=
+ =?utf-8?B?Y0FyVUJ2dVQxSDU0dTE1N29FZXExUnl4emR5YUd2SlZhbUlWMGZ6MUd6R3lt?=
+ =?utf-8?B?YjVHaGQyTmdibjBVdCtRM3dBN2VKcE1iQWRtYTEzQU9nTlVTTjB4ajIzeisx?=
+ =?utf-8?B?YkMwOWlzcHJtZmJCWnQyMFpIWGczOWVpQVZuSzZsYVJaU3N0RjlzTXgxdnlQ?=
+ =?utf-8?B?SWpsb2FjU1hqMTZTTmZYRkVsMXRLaExNdDBVSTk3WER5Mit5ZE9MQTc4Rmdv?=
+ =?utf-8?B?TEdtTlI3dWYvSjI0Z2NXUUFhbXBvdzBkUHJ2MU5oMXFlcWU1TlB5V0VqdHhO?=
+ =?utf-8?B?ZXBwV3BZTzRGdkpEWHNLL2w0N3pqVEp4bEhwZFNWVW9SVUZ1Y2hIOWZGNUNv?=
+ =?utf-8?B?QXJaUFFPNWFKdHFaNFh5ZXcrOUdvaGNSYVB0cHZNN2xSZUN4UC9paFM1RElZ?=
+ =?utf-8?B?TTArZG8yUHZFRVVoYTZQUlZ1YXhMTTBPL3A4OEh4VHA2SlZJTnRRSlpRQmFi?=
+ =?utf-8?B?MFhRdzFhOUlXN3czdisxOW9NUE84bDRBNEZVMGxGcDJqcUh1WGs2MmN3L2sv?=
+ =?utf-8?B?VmdSMjNUb0Zjb1A5OEUvb1dZVG5weUxpeEtCQlhrV1l6eHhkRDRnV1k1ZnNR?=
+ =?utf-8?B?R1N4YXM5SnJsMEcySExUNWtnVkJjUzZMdUlaWU5xRHRUclV5NjNzZ01JTEM4?=
+ =?utf-8?B?WUxIS0U0RmxEMXNnZGJPMEJ3MWRHTU5raWVtaGxNRGRDazIwRmh0ZzVCR2N0?=
+ =?utf-8?B?YTd3UmczT1lLb2hkcGlnKy9Ga2FHV3RIMlFkTUJBdndFTHhSdVlwV255dm5W?=
+ =?utf-8?B?b2pnUWt2MnlzZXllVy96RG9oZzdZbFFnUDVpaXMrSDVlM2VyRHlEMTNDaWd2?=
+ =?utf-8?B?RTNSay94M0FaVzYvSGhpaEZnL29SZmVTTTd3ZS8xT2cxeVVhVXJtT0YwaHRX?=
+ =?utf-8?B?WkMvSkkvUlRuUHk4R1VWRHJteDNXMElXZW9JMWVGYVJacituazBoY2o1U3px?=
+ =?utf-8?Q?Nz/eNfpoVbM=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5949.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SFVLUEFVTFlpNUxuRCtuTTlKUjhlY2h0MHp5RHpvWjhoZXhYcTdZUm9xOW53?=
+ =?utf-8?B?UVo0V2Q0ajhDSjhZK0Q4VDRNZ3p0VVJaYzVWTHFpNHRBTkYvWlN3SHNBcG9Y?=
+ =?utf-8?B?RG1sZGplR01pWTllZExtbUQ3UE9LSlZqY0NRZHVDU05DSUNRdUlQU21lWEJr?=
+ =?utf-8?B?cXFmK1l5SUdVeU5kaU93a1hIS0lPVmFrUW5nMkFOeWRJSkY4Ny9jaCtrdkQv?=
+ =?utf-8?B?b05wMnJ2Y3pGZUU3MWN4Q1htQ1JGaXRJY2ZqMURiQUxsQkJpM2NuT0kzbDN3?=
+ =?utf-8?B?cU12RXd4U3VxZDNWV2FWaTVVWmRKMjJvQURPMEhjOXFSeE9CbFJSOW9VMnhO?=
+ =?utf-8?B?SFhERXBqOGVKUzA3d3NuL0tHWFd0SjFSeHRjUitZaHMxS0kzUUw1VTJ4aFcw?=
+ =?utf-8?B?N3phYlNKd05KL2ZUakJMTEZDZjgzalBCN1lIUm8xZzBxK2xuOW5LQ1pDY203?=
+ =?utf-8?B?SEN3d3NPYWgxYVFid2M2WG9NN01qSDNzb1hkbWd3UHZKV1NWanF0ak9mRWVn?=
+ =?utf-8?B?bmllLy94OHN6M0ptQlRnL3N6TFU4V3pTS3hkNXhLZkpBYVFyRGVaVmk1dVRE?=
+ =?utf-8?B?OVdtWEZmcFdwT3laQVJUcHdER0NHbVpKWkRPdW93RDJGL3dJSnVoYUk5Qzl3?=
+ =?utf-8?B?UjVSMnJhOGcrNmRDSUhNUWpCWHUxZTVjYWRZNlIxWFFpenRTQWZsV3gyb2w0?=
+ =?utf-8?B?cmxFcFNOWXo3b2pFbXNPYjFxRUZEUzZjcmprcGN5RkJ2a0ZsclZWK3dpTVFp?=
+ =?utf-8?B?OHRINjNwazhQQi9vNE5jck9nYWxQU3BqUVVIUWRybGNKN2kyZ1d0TEZkY29K?=
+ =?utf-8?B?cHpFK2NaVkZmcTVEb1ZBMyt5Q3VxUzJzYlYwbVdITE9MSzFZV0dPbDNjRC9r?=
+ =?utf-8?B?WjdJVmM5MmJCVGhLazNWeHhmSHdBelpqaEV1WTFLNXhzUW5OT0k3TGRxanAx?=
+ =?utf-8?B?Wk5GdTlQbTIwTXc2TjJnQmxGUnN3bTQzcmN2WTA4bmFCT2MyNnN6SmlSTk9O?=
+ =?utf-8?B?SHhsdE0xY25JbmFld3d2MXF0cERnMHNrOFY2dUNNYlVmb1grYk5mVCthTWYr?=
+ =?utf-8?B?V2cwRDdRcTZUeGFIYmo2YTlBK3R4cStiM211Z01sOWFwdXZSNTlUcVZVVWRy?=
+ =?utf-8?B?TWRYN3R0emtNSjFXU1NBOU1McHNNTnhGeXg0NDB1WUdWZGJ6bTI1dHBDUEds?=
+ =?utf-8?B?OENkVEVLWnV1bnlhT2VLbXNTdFlrS0srRXVicVJkSDR3dTMwTDgxNGo5alRy?=
+ =?utf-8?B?Ky9CSm8wR2ZNeVRyNnkvdFpPOXU5OXhlWkEwam1BaEpRZ0kzK2hmNGhNMUJO?=
+ =?utf-8?B?cGZtZktlazJ6dFFyV1ZrNmdxUDRSck9JSzZGU2dPMmJ3Szk3YU4xV1RCL1FZ?=
+ =?utf-8?B?N3F5bnMwWWdpY05UWFhaWFFlSHlrVlZaN1ZjZjB0eVp4Tk84Y29KdkJFQjVY?=
+ =?utf-8?B?NUY3VXBSVGhRSThVdXhrd1dqcDBRejVMRndOTjh3MUlqMktBZjJSY2cyVm9W?=
+ =?utf-8?B?SDBaeFVjS2NiVnl2a1VpT2tBSGFMQlZDSXVNWWV2c0E4Qk9qZ1NEZVVUS29x?=
+ =?utf-8?B?R3V1RW0vWFllalIvTU1KejI5USt3WmVUa1ZaMjZ3U2NVZmt5MEFPdUlhelJv?=
+ =?utf-8?B?c3hUS0NIWEpKdU5ZM0xNYW5rdUpTaWtWSngzRlNPdVlJUHFOMW8yMXphNmRP?=
+ =?utf-8?B?ek5UYTVqc1pOcUFUNUlOTGFDUlVvYnZINWxiY0RGOG5HdGtYTXcyK3ZzODhN?=
+ =?utf-8?B?TUoyRjl1aldhbXJDOTZ4YnMreERSRnBtc0lkcE1obUtvR09tb3JEeVNKRWkw?=
+ =?utf-8?B?NysrM3JPdU4yZWZ2dmQ2dkl3VGFrWU9Vd0t6QW5DaGU4amllbHl2ZTk4RUla?=
+ =?utf-8?B?RkVHWmxVOFFTeWtqOG04R09jaUNIdDlEUFNKNk5makZ2b3BWR3F1ZjRLRTZJ?=
+ =?utf-8?B?WGtvMHVkU28rZXNRWFd6alJnYlovSzJLSG44MWl0dm52ZEM0N2dJaUVucnBh?=
+ =?utf-8?B?c1RnRW9wR0dNdXNKc3JUbCtTTXZzbzdoY1pxT0x2cjd1Qks1dVhYNkJaV1Rt?=
+ =?utf-8?B?dlpLSko4a2t6VkpYNkhycFJoeVhaSXVnWElBNUR1MHJBWGhoSzViWkc5a1dQ?=
+ =?utf-8?B?ZjB6Z3YwS2IwamlHamtLcGZZT2V1M2s2U2lobHRnRHZBVTRETDh1RDdralpX?=
+ =?utf-8?B?dXc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: d30c4352-9524-4d5d-525b-08dd8aebfc61
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5949.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 May 2025 09:13:51.4018
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: N+RQe8LWAPb6pzXIm5BPOUkm5Inqz0sjUW1f6Zk2SKfqWmlaNcirOq+csMqBHoVB2jI7Nd/f9OQfsw31HKhXSV7kL93ZkD86ArR1EVvyJ9g=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8468
+X-OriginatorOrg: intel.com
 
-The KSZ9477 PHY driver contained workarounds for broken EEE capability
-advertisements by manually masking supported EEE modes and forcibly
-disabling EEE if MICREL_NO_EEE was set.
 
-With proper MAC-side EEE handling implemented via phylink, these quirks
-are no longer necessary. Remove MICREL_NO_EEE handling and the use of
-ksz9477_get_features().
+On 4/28/2025 7:43 PM, Jacek Kowalski wrote:
+>> Anyway, I think that the commit message should be precise.
+>> How about this?
+>>
+>> Starting from Tiger Lake, LAN NVM is locked for writes by SW, so the 
+>> driver cannot perform checksum validation and correction. This means 
+>> that all NVM images must leave the factory with correct checksum and 
+>> checksum valid bit set. Since Tiger Lake devices were the first to 
+>> have this lock, some systems in the field did not meet this 
+>> requirement. Therefore, for these transitional devices we skip 
+>> checksum update and verification, if the valid bit is not set.
+>
+> Should I prepare v2 with this description?
+>
 
-This simplifies the PHY driver and avoids duplicated EEE management logic.
-
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: stable@vger.kernel.org # v6.14+
----
-changes v3:
-- included missing CC
----
- drivers/net/phy/micrel.c   | 7 -------
- include/linux/micrel_phy.h | 1 -
- 2 files changed, 8 deletions(-)
-
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index 71fb4410c31b..c2e5be404f07 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -2027,12 +2027,6 @@ static int ksz9477_config_init(struct phy_device *phydev)
- 			return err;
- 	}
- 
--	/* According to KSZ9477 Errata DS80000754C (Module 4) all EEE modes
--	 * in this switch shall be regarded as broken.
--	 */
--	if (phydev->dev_flags & MICREL_NO_EEE)
--		phy_disable_eee(phydev);
--
- 	return kszphy_config_init(phydev);
- }
- 
-@@ -5698,7 +5692,6 @@ static struct phy_driver ksphy_driver[] = {
- 	.handle_interrupt = kszphy_handle_interrupt,
- 	.suspend	= genphy_suspend,
- 	.resume		= ksz9477_resume,
--	.get_features	= ksz9477_get_features,
- } };
- 
- module_phy_driver(ksphy_driver);
-diff --git a/include/linux/micrel_phy.h b/include/linux/micrel_phy.h
-index 591bf5b5e8dc..9af01bdd86d2 100644
---- a/include/linux/micrel_phy.h
-+++ b/include/linux/micrel_phy.h
-@@ -44,7 +44,6 @@
- #define MICREL_PHY_50MHZ_CLK	BIT(0)
- #define MICREL_PHY_FXEN		BIT(1)
- #define MICREL_KSZ8_P1_ERRATA	BIT(2)
--#define MICREL_NO_EEE		BIT(3)
- 
- #define MICREL_KSZ9021_EXTREG_CTRL	0xB
- #define MICREL_KSZ9021_EXTREG_DATA_WRITE	0xC
--- 
-2.39.5
+Yes, please.
 
 
