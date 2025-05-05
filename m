@@ -1,66 +1,65 @@
-Return-Path: <netdev+bounces-188154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0937AAB52F
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 07:24:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B14A8AAB542
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 07:25:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABF775022EB
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:20:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C37633A2BD1
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:20:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF10E3A7876;
-	Tue,  6 May 2025 00:45:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A2A5346EB4;
+	Tue,  6 May 2025 00:45:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uGJqqAGu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FY52MbnK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FB7C284692;
-	Mon,  5 May 2025 23:16:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39B52F5F86;
+	Mon,  5 May 2025 23:17:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746487014; cv=none; b=Ww2Akq6vlnk+kS+FJkmrpXWeIyIiOjHNKseasdLgMUj0u8XK1OOEdkdb6KUQ+jsqYDpsxPJD+2SHyX25k7Ev0lBG5Yn8OifOUGgVt9GLrGFf5Y+1HS1cVxuzdAQZ2AOU0d2AYcue06eMx62mxklpDIMht27uHakHYxsw1PwbFKw=
+	t=1746487045; cv=none; b=hTW3+uDjsLqA2P4Xun49i3Am5f354fbow+vj07queds2mny36L3HYlYs2Ecjh2K6eqlZWEI5nDlQqlMC5j87N56s+qSpgz+TRA5y1qDCk5AXMltfEF9rU8GfZSwAc1lxTlJFBS/Ho2owvka9Jm/28Rhc7Nugtp4lu2pTQ/Oj+fg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746487014; c=relaxed/simple;
-	bh=luk1d5dvK5s4+w24BiCGoAm4BeBTHfKMzopG+08qbQY=;
+	s=arc-20240116; t=1746487045; c=relaxed/simple;
+	bh=jxorT5kC7+ch9b4vT4OAtlzC+qRhXbPQIT2KwokeOtQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MiMvEfIxKSAQ61gvgtiTXAhwPYAIi/nq7LBJG68YgHGqR6Yx9Kl2IGOt4gKJfVp3DJh3AYzpkmKDyV18oCXstXnbChUHas82kexU2CDtpee1NxSXXqMPkqbw7JT9hWJT9sQQjvwDNktINXEsRpp/Jn8zZ2ELWDbLqejvY3Q33ws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uGJqqAGu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0E2AC4CEE4;
-	Mon,  5 May 2025 23:16:51 +0000 (UTC)
+	 MIME-Version; b=gAdD6vGWYglx5HB05ngXeeyM/U1Pfae0nSnbPVDo27UamNrktZJ4GhaBbVm/PsjEpN95G2fRPEktL9IM4THlZeN0a9mAGTW/mqLItA/JzJ7QsMzxsOtQhNGfW9+zjgQoS0m8XbGQvQCXZ6prNa1+TbpLad8PCbiL02Leu7ke4x8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FY52MbnK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52A73C4CEED;
+	Mon,  5 May 2025 23:17:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746487013;
-	bh=luk1d5dvK5s4+w24BiCGoAm4BeBTHfKMzopG+08qbQY=;
+	s=k20201202; t=1746487044;
+	bh=jxorT5kC7+ch9b4vT4OAtlzC+qRhXbPQIT2KwokeOtQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uGJqqAGud+f2IoXcaUOGCC7TM82ffcUKRZs5x8sqbJIb+VXebtI6Pta0mLa23Ms+d
-	 EvqN1UfD+NYl3a5ozvggOg22MS8pZjmFBGNsGntgEu+EuPX43Shr07ddrOTjQ1T8cd
-	 nl7dMmJCEqtei3YbwSuETEgoIqSr3T2P1nCJVO4nbMiR33fUEAOQnUDvVOcJwRgA0D
-	 vYyOcfBbsZ4ljUyYO53/pLgIUGXVqSt0AOjOVg3dxK7icnOjQRV5Voz06jqFlQCVNC
-	 h6JJzymGqxKTHzHRazhZPIltpgxVeRgYYJUjWauJXrh4wwKiDvygLLDyPPLPIDvPYe
-	 2471rkZpfu/Zw==
+	b=FY52MbnK8wSDBIAbSnVm754zyjCuvwF//uAKU54Fp/uOWfvyCqJH+g78BPwBCfuOd
+	 3o2S1blG8dSNOdgD9YwdwE2Fvxic5ki2nI8SUyPtxNofI463E6BUXw1xFt1YuCtUAO
+	 a/6YOwgAY+UZksbpLkh27CuLjmwwJHkWVa2dYnR4XeP3tB/r+6SryKUgP+pv0ztFG6
+	 w4mAcD9eW6JRgwFjxSMVfRsJg8s3fyrmwI1ZxuryEalsnTse4bOvZDRwFIBJHte0SR
+	 vA5lRbWhxpU0+1l/d7brYh4pv2rhqluYxZ/ijentmQc62BqujJYKz7RkJQeQ3gfefx
+	 4IxVpUrUapxqA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>,
+Cc: William Tu <witu@nvidia.com>,
+	Daniel Jurgens <danielj@nvidia.com>,
 	Tariq Toukan <tariqt@nvidia.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
+	saeedm@nvidia.com,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
 	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 107/153] eth: mlx4: don't try to complete XDP frames in netpoll
-Date: Mon,  5 May 2025 19:12:34 -0400
-Message-Id: <20250505231320.2695319-107-sashal@kernel.org>
+	linux-rdma@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.15 124/153] net/mlx5e: set the tx_queue_len for pfifo_fast
+Date: Mon,  5 May 2025 19:12:51 -0400
+Message-Id: <20250505231320.2695319-124-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505231320.2695319-1-sashal@kernel.org>
 References: <20250505231320.2695319-1-sashal@kernel.org>
@@ -75,37 +74,42 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.15.181
 Content-Transfer-Encoding: 8bit
 
-From: Jakub Kicinski <kuba@kernel.org>
+From: William Tu <witu@nvidia.com>
 
-[ Upstream commit 8fdeafd66edaf420ea0063a1f13442fe3470fe70 ]
+[ Upstream commit a38cc5706fb9f7dc4ee3a443f61de13ce1e410ed ]
 
-mlx4 doesn't support ndo_xdp_xmit / XDP_REDIRECT and wasn't
-using page pool until now, so it could run XDP completions
-in netpoll (NAPI budget == 0) just fine. Page pool has calling
-context requirements, make sure we don't try to call it from
-what is potentially HW IRQ context.
+By default, the mq netdev creates a pfifo_fast qdisc. On a
+system with 16 core, the pfifo_fast with 3 bands consumes
+16 * 3 * 8 (size of pointer) * 1024 (default tx queue len)
+= 393KB. The patch sets the tx qlen to representor default
+value, 128 (1<<MLX5E_REP_PARAMS_DEF_LOG_SQ_SIZE), which
+consumes 16 * 3 * 8 * 128 = 49KB, saving 344KB for each
+representor at ECPF.
 
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
-Link: https://patch.msgid.link/20250213010635.1354034-3-kuba@kernel.org
+Signed-off-by: William Tu <witu@nvidia.com>
+Reviewed-by: Daniel Jurgens <danielj@nvidia.com>
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Link: https://patch.msgid.link/20250209101716.112774-9-tariqt@nvidia.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/mellanox/mlx4/en_tx.c | 2 ++
+ drivers/net/ethernet/mellanox/mlx5/core/en_rep.c | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx4/en_tx.c b/drivers/net/ethernet/mellanox/mlx4/en_tx.c
-index c56b9dba4c718..ed695f7443a83 100644
---- a/drivers/net/ethernet/mellanox/mlx4/en_tx.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/en_tx.c
-@@ -445,6 +445,8 @@ int mlx4_en_process_tx_cq(struct net_device *dev,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
+index de168d8cf33f7..3c8bfedeafffd 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
+@@ -642,6 +642,8 @@ static void mlx5e_build_rep_netdev(struct net_device *netdev,
+ 	netdev->ethtool_ops = &mlx5e_rep_ethtool_ops;
  
- 	if (unlikely(!priv->port_up))
- 		return 0;
-+	if (unlikely(!napi_budget) && cq->type == TX_XDP)
-+		return 0;
+ 	netdev->watchdog_timeo    = 15 * HZ;
++	if (mlx5_core_is_ecpf(mdev))
++		netdev->tx_queue_len = 1 << MLX5E_REP_PARAMS_DEF_LOG_SQ_SIZE;
  
- 	netdev_txq_bql_complete_prefetchw(ring->tx_queue);
- 
+ #if IS_ENABLED(CONFIG_MLX5_CLS_ACT)
+ 	netdev->hw_features    |= NETIF_F_HW_TC;
 -- 
 2.39.5
 
