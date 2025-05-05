@@ -1,65 +1,63 @@
-Return-Path: <netdev+bounces-188146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD42CAAB4C7
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 07:15:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEEA1AAB4F1
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 07:18:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 185213AFA5A
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:08:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCE684A5F17
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:15:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75F5638DC3C;
-	Tue,  6 May 2025 00:43:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 321B934542F;
+	Tue,  6 May 2025 00:44:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tmdNe/Uy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kK2k9FLT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CA862F2C58;
-	Mon,  5 May 2025 23:13:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B98D32F3A8E;
+	Mon,  5 May 2025 23:14:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746486826; cv=none; b=nANvbjKTGVAwxHUOa6cC24GpBNnIIU1pbxkD9OidRdaZuSa2QX8VpUNEdfHi33Fd1hoWK3JCb0iiutcaKZo+6Wd+JJ/udkAi2xbhK2JWpB4MtYV9PEhr1mJrRfC4+QW2DJjj9DQfDTM+S4hxrCxhn5BfsBYIG52yDrEZHLBzfRI=
+	t=1746486893; cv=none; b=IbbWKS6qCjoklZflWKdcKPhuy5GSt1AmclodG1s//d2026vWISdkazQZgXspJJnAP7nXCRCnJ+IqD0rs9q+PEfHcm4jTN4YWlrWOTdX5FJakpJ/xh4P2l+T/dLCsifp75eJB2ddDELEz4L3INvpmFylyAqhUHoGCRMQH3YdtiEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746486826; c=relaxed/simple;
-	bh=5zCAUR5fKm9UzdL5/oPX1lm7XAncAkCAaeT6OXBH1Ak=;
+	s=arc-20240116; t=1746486893; c=relaxed/simple;
+	bh=k7U5ZkxStIoJ2OWerJ26c5Smu0n+lwx1QJs5hxu2pMw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Hh7jko7Ka5KLKnbVV8lEI0FRuFyIBZNo8woJvL/M1EqM23wt0MOeRUnH2r3VWi65px9gRrG3PdrvpgkX6M4NS4EthsU4faDFIJf1VNjyicMBXXbOCLSebjKFQrDhfIH5yXeW7siLhVScvFiGQd233LScRTSMKTiRo/FKbYy/qFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tmdNe/Uy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 749E7C4CEED;
-	Mon,  5 May 2025 23:13:44 +0000 (UTC)
+	 MIME-Version; b=P+Ipl2+LZXb6bH7V0sIYwkl8qBVqpmo5fTSGzuNq3cyzTOhnRZcm2oFPP1cA+VaRj8ckaHH3+OOj5+V7uwowHycdqH3G4XNj63B8Wdq7Ng3wXSZV9DP0P9DJsS44CwAqznj8tJuGnmIsVB6PTgJEsQnvcp5h+U8k5VPnH6g+kmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kK2k9FLT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C44A7C4CEE4;
+	Mon,  5 May 2025 23:14:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746486826;
-	bh=5zCAUR5fKm9UzdL5/oPX1lm7XAncAkCAaeT6OXBH1Ak=;
+	s=k20201202; t=1746486893;
+	bh=k7U5ZkxStIoJ2OWerJ26c5Smu0n+lwx1QJs5hxu2pMw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tmdNe/UyZQZP1nziO5XkoXFitc1fkwACYkXzyTZ/YFb/HFE4390mzuuG1GXOVRnec
-	 U8Fz611TATT/pJnFJ3B+rIBxbpzlpR6xhz7YWcIRVpJXW7BNbLxCHIm9h/2dzY+Ujt
-	 HMf5oRbtFbJG7nW9E/c+/Kw7V3pwq4XhliHpKEuS0LLWu6HycfUB9/joadUkHBue7+
-	 g/gR9h+F7GnytH91bvORtV8gAXrMFPn37dxU9oWWIrREWtXtAxbtZREoBmsl44NTC4
-	 EXcNaEnUb7Ql+Ys4m0cY9RkqgsA682HW1RjgUmsC2uz3BGUfQP1adeSVFABu3A31Dc
-	 hsOyeBpYAuSPA==
+	b=kK2k9FLTxsNu2Rrx6XwooisGfWpTcO3pXFZSfSe9Zj4CSxwUSnfYmX4MCDNyMf9no
+	 IDvjQUevSBVe1wDv+qwNJ2cY19EirBMCJxyO83XvqtTFRUol+12FatHPJ59XhqL3a3
+	 XNjRVvqPsTqDHwG99lTK0I/mNleohAHGoROUsNlcDWK4tKmfEWu2n/EBEEw9ShjJWd
+	 sNr0UYSGHfJxTqaPEnYXI6CFprUJlumeCkHrqEe0OVSqzO9TRJYYSIL81/hX7sM82X
+	 sFMlihL5yexdvmBeO1+IBHsoKeFxLKbPC5quHsxaU4m0Ic8kNmuZI6cG4Lvszh5LEV
+	 IvzqiGkO/p2Ew==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Benjamin Coddington <bcodding@redhat.com>,
+Cc: Nicolas Bouchinet <nicolas.bouchinet@ssi.gouv.fr>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
 	Sasha Levin <sashal@kernel.org>,
-	chuck.lever@oracle.com,
-	trondmy@kernel.org,
-	anna@kernel.org,
+	kadlec@netfilter.org,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	linux-nfs@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 010/153] SUNRPC: rpcbind should never reset the port to the value '0'
-Date: Mon,  5 May 2025 19:10:57 -0400
-Message-Id: <20250505231320.2695319-10-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 048/153] netfilter: conntrack: Bound nf_conntrack sysctl writes
+Date: Mon,  5 May 2025 19:11:35 -0400
+Message-Id: <20250505231320.2695319-48-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505231320.2695319-1-sashal@kernel.org>
 References: <20250505231320.2695319-1-sashal@kernel.org>
@@ -74,38 +72,83 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.15.181
 Content-Transfer-Encoding: 8bit
 
-From: Trond Myklebust <trond.myklebust@hammerspace.com>
+From: Nicolas Bouchinet <nicolas.bouchinet@ssi.gouv.fr>
 
-[ Upstream commit 214c13e380ad7636631279f426387f9c4e3c14d9 ]
+[ Upstream commit 8b6861390ffee6b8ed78b9395e3776c16fec6579 ]
 
-If we already had a valid port number for the RPC service, then we
-should not allow the rpcbind client to set it to the invalid value '0'.
+nf_conntrack_max and nf_conntrack_expect_max sysctls were authorized to
+be written any negative value, which would then be stored in the
+unsigned int variables nf_conntrack_max and nf_ct_expect_max variables.
 
-Reviewed-by: Jeff Layton <jlayton@kernel.org>
-Reviewed-by: Benjamin Coddington <bcodding@redhat.com>
-Signed-off-by: Trond Myklebust <trond.myklebust@hammerspace.com>
+While the do_proc_dointvec_conv function is supposed to limit writing
+handled by proc_dointvec proc_handler to INT_MAX. Such a negative value
+being written in an unsigned int leads to a very high value, exceeding
+this limit.
+
+Moreover, the nf_conntrack_expect_max sysctl documentation specifies the
+minimum value is 1.
+
+The proc_handlers have thus been updated to proc_dointvec_minmax in
+order to specify the following write bounds :
+
+* Bound nf_conntrack_max sysctl writings between SYSCTL_ZERO
+  and SYSCTL_INT_MAX.
+
+* Bound nf_conntrack_expect_max sysctl writings between SYSCTL_ONE
+  and SYSCTL_INT_MAX as defined in the sysctl documentation.
+
+With this patch applied, sysctl writes outside the defined in the bound
+will thus lead to a write error :
+
+```
+sysctl -w net.netfilter.nf_conntrack_expect_max=-1
+sysctl: setting key "net.netfilter.nf_conntrack_expect_max": Invalid argument
+```
+
+Signed-off-by: Nicolas Bouchinet <nicolas.bouchinet@ssi.gouv.fr>
+Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/sunrpc/rpcb_clnt.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ net/netfilter/nf_conntrack_standalone.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/net/sunrpc/rpcb_clnt.c b/net/sunrpc/rpcb_clnt.c
-index 638b14f28101e..c49f9295fce97 100644
---- a/net/sunrpc/rpcb_clnt.c
-+++ b/net/sunrpc/rpcb_clnt.c
-@@ -797,9 +797,10 @@ static void rpcb_getport_done(struct rpc_task *child, void *data)
- 	}
- 
- 	trace_rpcb_setport(child, map->r_status, map->r_port);
--	xprt->ops->set_port(xprt, map->r_port);
--	if (map->r_port)
-+	if (map->r_port) {
-+		xprt->ops->set_port(xprt, map->r_port);
- 		xprt_set_bound(xprt);
-+	}
- }
- 
- /*
+diff --git a/net/netfilter/nf_conntrack_standalone.c b/net/netfilter/nf_conntrack_standalone.c
+index 7515705583bcf..770590041c549 100644
+--- a/net/netfilter/nf_conntrack_standalone.c
++++ b/net/netfilter/nf_conntrack_standalone.c
+@@ -629,7 +629,9 @@ static struct ctl_table nf_ct_sysctl_table[] = {
+ 		.data		= &nf_conntrack_max,
+ 		.maxlen		= sizeof(int),
+ 		.mode		= 0644,
+-		.proc_handler	= proc_dointvec,
++		.proc_handler	= proc_dointvec_minmax,
++		.extra1		= SYSCTL_ZERO,
++		.extra2		= SYSCTL_INT_MAX,
+ 	},
+ 	[NF_SYSCTL_CT_COUNT] = {
+ 		.procname	= "nf_conntrack_count",
+@@ -665,7 +667,9 @@ static struct ctl_table nf_ct_sysctl_table[] = {
+ 		.data		= &nf_ct_expect_max,
+ 		.maxlen		= sizeof(int),
+ 		.mode		= 0644,
+-		.proc_handler	= proc_dointvec,
++		.proc_handler	= proc_dointvec_minmax,
++		.extra1		= SYSCTL_ONE,
++		.extra2		= SYSCTL_INT_MAX,
+ 	},
+ 	[NF_SYSCTL_CT_ACCT] = {
+ 		.procname	= "nf_conntrack_acct",
+@@ -976,7 +980,9 @@ static struct ctl_table nf_ct_netfilter_table[] = {
+ 		.data		= &nf_conntrack_max,
+ 		.maxlen		= sizeof(int),
+ 		.mode		= 0644,
+-		.proc_handler	= proc_dointvec,
++		.proc_handler	= proc_dointvec_minmax,
++		.extra1		= SYSCTL_ZERO,
++		.extra2		= SYSCTL_INT_MAX,
+ 	},
+ 	{ }
+ };
 -- 
 2.39.5
 
