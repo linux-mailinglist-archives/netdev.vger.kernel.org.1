@@ -1,162 +1,222 @@
-Return-Path: <netdev+bounces-188016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49283AAAC1D
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 04:09:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CC59AAAF8B
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:19:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEA3E1B6510D
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 02:06:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0E127B2101
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:17:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62EDD2FB2AE;
-	Mon,  5 May 2025 23:23:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA96F3C8745;
+	Mon,  5 May 2025 23:25:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GKnAnOnu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gGG0ZDTK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43EA63839BD;
-	Mon,  5 May 2025 23:09:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9CFC2F379D;
+	Mon,  5 May 2025 23:14:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746486595; cv=none; b=VaeEL2TlfEelpfTNaiV6XMP6iABzWLjyUnx+SUlo7WaZVJICbz/pWGcBj/SzCo21H90u8JGG1yUK7BiyT5Dns2M3gR4uDTaKAauKtwvbDipd+X1HnPONBCYKGyFz3ZimCg1CTXvgn3tI9pgPPnDH3tOO2KooIakd1bB/q4rpdE4=
+	t=1746486877; cv=none; b=lomkjSaYw8Hhtg+jOp/hHktEwd+dKSOxVFmIh3YEyAtxpLViJqBag07Rs73Hfx3EyBQoiV+ln3zNZs6or/AAOpF+okpjb/ODeywHL8+Cy1F58ZeBxBlcoxg7xRGlc2bUt6KaKIJSC35V7lvs0TXI1yogavNg/ug7K2RF5XOg+m0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746486595; c=relaxed/simple;
-	bh=QPwr0a3hI3hIBTqtzqqTs2xwxaxhRKIl4wXz72iYB9Q=;
-	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=hZhB/sJt5tQwL7t/keUL+9E0SuaF7UNEESdcxlpCpJacr21oftkNiwXCAJnjvQqZNZCqEpQmkIEXFNR/FrWpDs3Mnir3pUASD2Li0ssSUdb+uq/A+Zm++UDIOF5Y4RaKk/+66AzTvM9ze2mejqExOYQDAhJSWZeP8f1drXVCK8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GKnAnOnu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A634C4CEE4;
-	Mon,  5 May 2025 23:09:53 +0000 (UTC)
+	s=arc-20240116; t=1746486877; c=relaxed/simple;
+	bh=NNkPYG3d16F+ZFizuQsJctllpyeh8AGzTVNFYhCDOFY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OYBCc872ZFbBNZb/SDHp78ts/xLdF4li4h2z2GazkKJrxHb35F4j5gNXCeYBTiQo/ALZqIaQLN+V+FNL0vjHeg7XZam0qf96jHuCF9HemtACL4cMa8r3oXmUxC99JXWbP2JYaXI9BcflXZIsQDdwNLiSEo4GaAHotRGDNQaeWdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gGG0ZDTK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83F27C4CEED;
+	Mon,  5 May 2025 23:14:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746486594;
-	bh=QPwr0a3hI3hIBTqtzqqTs2xwxaxhRKIl4wXz72iYB9Q=;
-	h=From:Date:To:cc:Subject:In-Reply-To:References:From;
-	b=GKnAnOnucxWQgZQ5PShIrRAhiNOaQJ81ED86k2XW0QUQCL34viuFPDxoXsEnTNrLN
-	 NaIepN75L7XsBxepBVytaXxJEPdmlnm453u3CalZ3bNqaP9GOX6pg/1yddWDh+ihN+
-	 eUoSMioHWUBLxJMco5wWfPGlJBkOCgUvyz2rI512D2QGs+H54EZCuH/JbF5emS3mFT
-	 uNuBWEe58jaN/6bs32q/Ss4MD9G+POw4ykvWwgEb2+Waji0yaIbSZync2xEA0MiL7K
-	 yT8eb4lqi7L9x0ogAB69rHJacHUJH/T2gXETxPL3YfiHy221I1eeSoWNmEyj8+DNwQ
-	 A5C/EYMcUCB4A==
-From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ij@kernel.org>
-Date: Tue, 6 May 2025 02:09:49 +0300 (EEST)
-To: Paolo Abeni <pabeni@redhat.com>
-cc: chia-yu.chang@nokia-bell-labs.com, horms@kernel.org, dsahern@kernel.org, 
-    kuniyu@amazon.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-    dave.taht@gmail.com, jhs@mojatatu.com, kuba@kernel.org, 
-    stephen@networkplumber.org, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
-    davem@davemloft.net, edumazet@google.com, andrew+netdev@lunn.ch, 
-    donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com, 
-    shuah@kernel.org, linux-kselftest@vger.kernel.org, ncardwell@google.com, 
-    koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com, 
-    ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com, 
-    cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com, 
-    vidhi_goel@apple.com
-Subject: Re: [PATCH v5 net-next 07/15] tcp: allow embedding leftover into
- option padding
-In-Reply-To: <2067a9f7-eba4-476d-a095-3d6301e14830@redhat.com>
-Message-ID: <7e64bedf-2da2-2deb-2712-f338474720e7@kernel.org>
-References: <20250422153602.54787-1-chia-yu.chang@nokia-bell-labs.com> <20250422153602.54787-8-chia-yu.chang@nokia-bell-labs.com> <2067a9f7-eba4-476d-a095-3d6301e14830@redhat.com>
+	s=k20201202; t=1746486875;
+	bh=NNkPYG3d16F+ZFizuQsJctllpyeh8AGzTVNFYhCDOFY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=gGG0ZDTKQ4YUJkm6ji/AISGGk/yJtPnecwuwCNqeGPVv0wos5pFa1r4bYjY35G8kU
+	 aCtuuC9J9cANdB/CgvMUkP6ELeBUnJIlpQ75pR7toO6B+O/aYYhY+bbo0ctokTkfST
+	 l9jPgm68KvFKNms1fBM2AsoCEi94BSVMWLssQhHnDgQKnRwyeCO5dydehasmcih424
+	 x0PMUssGmuGQvWTfEfTkeOxgoEEOx9YyN2eKCLmq6t6dm4pooQ9ZFu6oAHGcFixost
+	 EcXJeTMjF9WtZyEjlvSrqppXmMxnSJ9ZpDD6HLfr/XXX7Zsyd/2EwsFkQh4ybRNgvI
+	 u7g03KBnNUqIA==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ij@kernel.org>,
+	Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Sasha Levin <sashal@kernel.org>,
+	edumazet@google.com,
+	ncardwell@google.com,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.15 037/153] tcp: reorganize tcp_in_ack_event() and tcp_count_delivered()
+Date: Mon,  5 May 2025 19:11:24 -0400
+Message-Id: <20250505231320.2695319-37-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250505231320.2695319-1-sashal@kernel.org>
+References: <20250505231320.2695319-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 5.15.181
+Content-Transfer-Encoding: 8bit
 
-On Tue, 29 Apr 2025, Paolo Abeni wrote:
+From: Ilpo Järvinen <ij@kernel.org>
 
-> On 4/22/25 5:35 PM, chia-yu.chang@nokia-bell-labs.com wrote:
-> > @@ -709,6 +709,8 @@ static __be32 *process_tcp_ao_options(struct tcp_sock *tp,
-> >  	return ptr;
-> >  }
-> >  
-> > +#define NOP_LEFTOVER	((TCPOPT_NOP << 8) | TCPOPT_NOP)
-> > +
-> >  /* Write previously computed TCP options to the packet.
-> >   *
-> >   * Beware: Something in the Internet is very sensitive to the ordering of
-> > @@ -727,8 +729,10 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
-> >  			      struct tcp_out_options *opts,
-> >  			      struct tcp_key *key)
-> >  {
-> > +	u16 leftover_bytes = NOP_LEFTOVER;      /* replace next NOPs if avail */
-> >  	__be32 *ptr = (__be32 *)(th + 1);
-> >  	u16 options = opts->options;	/* mungable copy */
-> > +	int leftover_size = 2;
-> >  
-> >  	if (tcp_key_is_md5(key)) {
-> >  		*ptr++ = htonl((TCPOPT_NOP << 24) | (TCPOPT_NOP << 16) |
-> > @@ -763,17 +767,22 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
-> >  	}
-> >  
-> >  	if (unlikely(OPTION_SACK_ADVERTISE & options)) {
-> > -		*ptr++ = htonl((TCPOPT_NOP << 24) |
-> > -			       (TCPOPT_NOP << 16) |
-> > +		*ptr++ = htonl((leftover_bytes << 16) |
-> >  			       (TCPOPT_SACK_PERM << 8) |
-> >  			       TCPOLEN_SACK_PERM);
-> > +		leftover_bytes = NOP_LEFTOVER;
-> 
-> Why? isn't leftover_bytes already == NOP_LEFTOVER?
-> 
-> >  	}
-> >  
-> >  	if (unlikely(OPTION_WSCALE & options)) {
-> > -		*ptr++ = htonl((TCPOPT_NOP << 24) |
-> > +		u8 highbyte = TCPOPT_NOP;
-> > +
-> > +		if (unlikely(leftover_size == 1))
-> 
-> How can the above conditional be true?
-> 
-> > +			highbyte = leftover_bytes >> 8;
-> > +		*ptr++ = htonl((highbyte << 24) |
-> >  			       (TCPOPT_WINDOW << 16) |
-> >  			       (TCPOLEN_WINDOW << 8) |
-> >  			       opts->ws);
-> > +		leftover_bytes = NOP_LEFTOVER;
-> 
-> Why? isn't leftover_bytes already == NOP_LEFTOVER?
-> 
-> >  	}
-> >  
-> >  	if (unlikely(opts->num_sack_blocks)) {
-> > @@ -781,8 +790,7 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
-> >  			tp->duplicate_sack : tp->selective_acks;
-> >  		int this_sack;
-> >  
-> > -		*ptr++ = htonl((TCPOPT_NOP  << 24) |
-> > -			       (TCPOPT_NOP  << 16) |
-> > +		*ptr++ = htonl((leftover_bytes << 16) |
-> >  			       (TCPOPT_SACK <<  8) |
-> >  			       (TCPOLEN_SACK_BASE + (opts->num_sack_blocks *
-> >  						     TCPOLEN_SACK_PERBLOCK)));
-> > @@ -794,6 +802,10 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
-> >  		}
-> >  
-> >  		tp->rx_opt.dsack = 0;
-> > +	} else if (unlikely(leftover_bytes != NOP_LEFTOVER)) {
-> 
-> I really feel like I'm missing some code chunk, but I don't see any
-> possible value for leftover_bytes other than NOP_LEFTOVER
+[ Upstream commit 149dfb31615e22271d2525f078c95ea49bc4db24 ]
 
-Hi,
-   
-I split it this way to keep the generic part of the leftover mechanism in
-own patch separate from AccECN option change itself (as you did later
-discover). This is among the most convoluted parts in the entire AccECN
-patch series so it seemed wise to split it as small as I could. Having
-those non-sensical looking assigns here were to avoid code churn in the
-latter patch. The changelog could have stated that clearly though (my
-fault from years back).
+- Move tcp_count_delivered() earlier and split tcp_count_delivered_ce()
+  out of it
+- Move tcp_in_ack_event() later
+- While at it, remove the inline from tcp_in_ack_event() and let
+  the compiler to decide
 
+Accurate ECN's heuristics does not know if there is going
+to be ACE field based CE counter increase or not until after
+rtx queue has been processed. Only then the number of ACKed
+bytes/pkts is available. As CE or not affects presence of
+FLAG_ECE, that information for tcp_in_ack_event is not yet
+available in the old location of the call to tcp_in_ack_event().
 
+Signed-off-by: Ilpo Järvinen <ij@kernel.org>
+Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/ipv4/tcp_input.c | 56 +++++++++++++++++++++++++-------------------
+ 1 file changed, 32 insertions(+), 24 deletions(-)
+
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 6bd28ac949b42..8859a38b45d5e 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -404,6 +404,20 @@ static bool tcp_ecn_rcv_ecn_echo(const struct tcp_sock *tp, const struct tcphdr
+ 	return false;
+ }
+ 
++static void tcp_count_delivered_ce(struct tcp_sock *tp, u32 ecn_count)
++{
++	tp->delivered_ce += ecn_count;
++}
++
++/* Updates the delivered and delivered_ce counts */
++static void tcp_count_delivered(struct tcp_sock *tp, u32 delivered,
++				bool ece_ack)
++{
++	tp->delivered += delivered;
++	if (ece_ack)
++		tcp_count_delivered_ce(tp, delivered);
++}
++
+ /* Buffer size and advertised window tuning.
+  *
+  * 1. Tuning sk->sk_sndbuf, when connection enters established state.
+@@ -1112,15 +1126,6 @@ void tcp_mark_skb_lost(struct sock *sk, struct sk_buff *skb)
+ 	}
+ }
+ 
+-/* Updates the delivered and delivered_ce counts */
+-static void tcp_count_delivered(struct tcp_sock *tp, u32 delivered,
+-				bool ece_ack)
+-{
+-	tp->delivered += delivered;
+-	if (ece_ack)
+-		tp->delivered_ce += delivered;
+-}
+-
+ /* This procedure tags the retransmission queue when SACKs arrive.
+  *
+  * We have three tag bits: SACKED(S), RETRANS(R) and LOST(L).
+@@ -3776,12 +3781,23 @@ static void tcp_process_tlp_ack(struct sock *sk, u32 ack, int flag)
+ 	}
+ }
+ 
+-static inline void tcp_in_ack_event(struct sock *sk, u32 flags)
++static void tcp_in_ack_event(struct sock *sk, int flag)
+ {
+ 	const struct inet_connection_sock *icsk = inet_csk(sk);
+ 
+-	if (icsk->icsk_ca_ops->in_ack_event)
+-		icsk->icsk_ca_ops->in_ack_event(sk, flags);
++	if (icsk->icsk_ca_ops->in_ack_event) {
++		u32 ack_ev_flags = 0;
++
++		if (flag & FLAG_WIN_UPDATE)
++			ack_ev_flags |= CA_ACK_WIN_UPDATE;
++		if (flag & FLAG_SLOWPATH) {
++			ack_ev_flags |= CA_ACK_SLOWPATH;
++			if (flag & FLAG_ECE)
++				ack_ev_flags |= CA_ACK_ECE;
++		}
++
++		icsk->icsk_ca_ops->in_ack_event(sk, ack_ev_flags);
++	}
+ }
+ 
+ /* Congestion control has updated the cwnd already. So if we're in
+@@ -3898,12 +3914,8 @@ static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
+ 		tcp_snd_una_update(tp, ack);
+ 		flag |= FLAG_WIN_UPDATE;
+ 
+-		tcp_in_ack_event(sk, CA_ACK_WIN_UPDATE);
+-
+ 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPHPACKS);
+ 	} else {
+-		u32 ack_ev_flags = CA_ACK_SLOWPATH;
+-
+ 		if (ack_seq != TCP_SKB_CB(skb)->end_seq)
+ 			flag |= FLAG_DATA;
+ 		else
+@@ -3915,19 +3927,12 @@ static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
+ 			flag |= tcp_sacktag_write_queue(sk, skb, prior_snd_una,
+ 							&sack_state);
+ 
+-		if (tcp_ecn_rcv_ecn_echo(tp, tcp_hdr(skb))) {
++		if (tcp_ecn_rcv_ecn_echo(tp, tcp_hdr(skb)))
+ 			flag |= FLAG_ECE;
+-			ack_ev_flags |= CA_ACK_ECE;
+-		}
+ 
+ 		if (sack_state.sack_delivered)
+ 			tcp_count_delivered(tp, sack_state.sack_delivered,
+ 					    flag & FLAG_ECE);
+-
+-		if (flag & FLAG_WIN_UPDATE)
+-			ack_ev_flags |= CA_ACK_WIN_UPDATE;
+-
+-		tcp_in_ack_event(sk, ack_ev_flags);
+ 	}
+ 
+ 	/* This is a deviation from RFC3168 since it states that:
+@@ -3954,6 +3959,8 @@ static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
+ 
+ 	tcp_rack_update_reo_wnd(sk, &rs);
+ 
++	tcp_in_ack_event(sk, flag);
++
+ 	if (tp->tlp_high_seq)
+ 		tcp_process_tlp_ack(sk, ack, flag);
+ 
+@@ -3985,6 +3992,7 @@ static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
+ 	return 1;
+ 
+ no_queue:
++	tcp_in_ack_event(sk, flag);
+ 	/* If data was DSACKed, see if we can undo a cwnd reduction. */
+ 	if (flag & FLAG_DSACKING_ACK) {
+ 		tcp_fastretrans_alert(sk, prior_snd_una, num_dupack, &flag,
 -- 
- i.
+2.39.5
 
 
