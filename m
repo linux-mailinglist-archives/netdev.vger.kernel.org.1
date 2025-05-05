@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-188067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76F60AAB0C7
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:47:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AE332AAB0DE
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:49:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 376CA3A7D99
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:42:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28E8A3A5060
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:44:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6A67326083;
-	Tue,  6 May 2025 00:24:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B4193278C2;
+	Tue,  6 May 2025 00:25:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aDyD300x"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gh7ha+9W"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C72252BE7BC;
-	Mon,  5 May 2025 22:47:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BFA237533D;
+	Mon,  5 May 2025 22:47:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746485256; cv=none; b=ARxBH5yPwCv1IWHc0gtm6ATuFmXNOF5K1KXYpwYSCfhvov+1+RLwykdENP66zDoY9cNXx03TlvH/Aj0g4FKV5VuDBa0S+6Y7DDlzDPMbGV3Up9lo5KWat4RwnXFqC5uAD9PS8Ghv5tgM07FIpUsuD+/ghX9qeu2IxemPhkhWwTw=
+	t=1746485271; cv=none; b=RVqc9/hYvLsHeQdjvQkyKxjqCwWWBBY72tmaGwLJP6w/uoJ6kGShecKKWBh0MeykRukAUqJZAUd0QwA0DDURq1udZx5jb6zFQ1S/0nQqSjcTEXDcemLO1N3NczrlryAxmcruWZh7pPmBjk6OKlYFOTOvVJPUhyT9e/SMBGkVOL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746485256; c=relaxed/simple;
-	bh=Z9n9wiIPdC41RfHmTwLHjKY+A1WrsoMrfXOJKYq3Qso=;
+	s=arc-20240116; t=1746485271; c=relaxed/simple;
+	bh=pb2oVT93ib72xdnlaAdoQ8z1PWQRPnFU+pEqI39w8SA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=WAt0c20UcRLrBOhkpyJSkukq/j7fmHw4Us1Oc9YaGN256TGDLXGe9xMUVEonSgj/kxu1qhQZU075BIdBOMtn6J4AuQUkzYLRgcgp4PgFtQTUumHHjxub4RlUOPRLWv7g8ycmdTFqzj9aVbrCzim52mjtdIdLCU6PyOrtUEe498g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aDyD300x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66005C4CEF2;
-	Mon,  5 May 2025 22:47:35 +0000 (UTC)
+	 MIME-Version; b=kkueUyM5+F2I4D+AZcefHtzWNFL44vDGXFTBD98v9ISGMXGhXc6X2Kb9lsYxKKu1Uad2bPKG5T0S6J/aEvubL0Y0yfhX708c+VsFh7mHJbMemviZs2jdfUbOssNLdi8F0FX9MzhwDDPFbHEa4O92y41tuYXBl0eBHhlv8xDqboo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gh7ha+9W; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7166C4CEF1;
+	Mon,  5 May 2025 22:47:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746485256;
-	bh=Z9n9wiIPdC41RfHmTwLHjKY+A1WrsoMrfXOJKYq3Qso=;
+	s=k20201202; t=1746485271;
+	bh=pb2oVT93ib72xdnlaAdoQ8z1PWQRPnFU+pEqI39w8SA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=aDyD300x/mOB4/lsXU4OZyGeOIHIeqSnl02RCN6FGVMEQGZsoontt6+hQZMOs/wTV
-	 qSkHyrczLndDfIetP2ogs4xgRUQim+IlF8rsNlC3fDhOnbq3291S2Pe3tFt+VC1n+K
-	 5gXq/SwVUd6fm1xTZgTsnXuZVeMUL5n0wV3FCk2Mb73JwgRvHlSOeldACRd2XRiaks
-	 Iv6Z7Z3SfbjG9qpwp32loDHhJzlijT8mQFlTQZlYb6tM628h1FBqNiGpAcBQNQCL9k
-	 JVazEfvUE2jFgNyyRbScVbl4qJjOYFuI58TyBSGtNluUt92JdOP191v7IgSyGJpw8N
-	 3DexpyVpF76ew==
+	b=Gh7ha+9WrBIxuYo/8MIbkpLMXXWvtUO3Kw+dpDlGyfa6rOuzhrrSk4LTZO4U9yxM9
+	 4VyzV2QGag+6ZereS7z0bUxv0lsvlcHW0QtWz2tkCwvw94HYCVrLIQ+7xoG9LCnKFV
+	 hf/gOHqbi6JI7MBtzPNV2ghh+2NZmjFF1wrMW2IhjDPCfGibHqaWbain65dPpC7Ecx
+	 5v4EhVcvlzihvtjPYJYuU25w1mU59anmm/Hbx7Pu+4j9C/QB19ipIOYxhR943054o/
+	 dvdh29SANV9MzcDsuZfocevvgDPgizRfiLzYzaopQ0OZ71OqLrDQdwXAljhn0edvjT
+	 DbNi3czDnM5Ww==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Kevin Krakauer <krakauer@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
+	iyappan@os.amperecomputing.com,
+	keyur@os.amperecomputing.com,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 239/486] selftests/net: have `gro.sh -t` return a correct exit code
-Date: Mon,  5 May 2025 18:35:15 -0400
-Message-Id: <20250505223922.2682012-239-sashal@kernel.org>
+	kuba@kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.12 245/486] net: xgene-v2: remove incorrect ACPI_PTR annotation
+Date: Mon,  5 May 2025 18:35:21 -0400
+Message-Id: <20250505223922.2682012-245-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505223922.2682012-1-sashal@kernel.org>
 References: <20250505223922.2682012-1-sashal@kernel.org>
@@ -71,35 +71,45 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.12.26
 Content-Transfer-Encoding: 8bit
 
-From: Kevin Krakauer <krakauer@google.com>
+From: Arnd Bergmann <arnd@arndb.de>
 
-[ Upstream commit 784e6abd99f24024a8998b5916795f0bec9d2fd9 ]
+[ Upstream commit 01358e8fe922f716c05d7864ac2213b2440026e7 ]
 
-Modify gro.sh to return a useful exit code when the -t flag is used. It
-formerly returned 0 no matter what.
+Building with W=1 shows a warning about xge_acpi_match being unused when
+CONFIG_ACPI is disabled:
 
-Tested: Ran `gro.sh -t large` and verified that test failures return 1.
-Signed-off-by: Kevin Krakauer <krakauer@google.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Link: https://patch.msgid.link/20250226192725.621969-2-krakauer@google.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+drivers/net/ethernet/apm/xgene-v2/main.c:723:36: error: unused variable 'xge_acpi_match' [-Werror,-Wunused-const-variable]
+
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Link: https://patch.msgid.link/20250225163341.4168238-2-arnd@kernel.org
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- tools/testing/selftests/net/gro.sh | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/apm/xgene-v2/main.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/tools/testing/selftests/net/gro.sh b/tools/testing/selftests/net/gro.sh
-index 02c21ff4ca81f..aabd6e5480b8e 100755
---- a/tools/testing/selftests/net/gro.sh
-+++ b/tools/testing/selftests/net/gro.sh
-@@ -100,5 +100,6 @@ trap cleanup EXIT
- if [[ "${test}" == "all" ]]; then
-   run_all_tests
- else
--  run_test "${proto}" "${test}"
-+  exit_code=$(run_test "${proto}" "${test}")
-+  exit $exit_code
- fi;
+diff --git a/drivers/net/ethernet/apm/xgene-v2/main.c b/drivers/net/ethernet/apm/xgene-v2/main.c
+index 9e90c23814910..68335935cea77 100644
+--- a/drivers/net/ethernet/apm/xgene-v2/main.c
++++ b/drivers/net/ethernet/apm/xgene-v2/main.c
+@@ -9,8 +9,6 @@
+ 
+ #include "main.h"
+ 
+-static const struct acpi_device_id xge_acpi_match[];
+-
+ static int xge_get_resources(struct xge_pdata *pdata)
+ {
+ 	struct platform_device *pdev;
+@@ -731,7 +729,7 @@ MODULE_DEVICE_TABLE(acpi, xge_acpi_match);
+ static struct platform_driver xge_driver = {
+ 	.driver = {
+ 		   .name = "xgene-enet-v2",
+-		   .acpi_match_table = ACPI_PTR(xge_acpi_match),
++		   .acpi_match_table = xge_acpi_match,
+ 	},
+ 	.probe = xge_probe,
+ 	.remove_new = xge_remove,
 -- 
 2.39.5
 
