@@ -1,109 +1,144 @@
-Return-Path: <netdev+bounces-187816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26876AA9C01
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 20:53:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A12CAA9C07
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 20:55:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A87F7A1019
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 18:52:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 77F5B17D248
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 18:55:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DC7F1C1F12;
-	Mon,  5 May 2025 18:53:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47ED6266B4B;
+	Mon,  5 May 2025 18:55:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BenqUuzK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kGJ//V5b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02B7286342
-	for <netdev@vger.kernel.org>; Mon,  5 May 2025 18:53:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA8926E158
+	for <netdev@vger.kernel.org>; Mon,  5 May 2025 18:55:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746471211; cv=none; b=r0BrVokDdAlMZgxJ05RJTj45ib5d5k6BZRVIhKqTNg2p2gjC2dz/plvTqii08urLKosRaD/m8HZHNojLtXfvS9Ri4abS+OSzPDiShu4v01k16UPDYM/MqWZqa2ApgrZCV3Vg8Eti+XKpjQWJ/C5A64Y7BTPD6YRFnrHgbEC4tN4=
+	t=1746471303; cv=none; b=nkGBkZMg5H8WRDDm86foWZfM7AvlRH3BMSercy94bO13h/waUufR8dcfl6ww/f0fTl2kFN+EokmjuUiMqgae6GWPgBydDRQVOA39Tj50lU+mzdXhgVsG1UdJR2FfCYn5DBT3xFLeQF7SLTr57ce7RBH1Srx+lwvDFbPobb/dpKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746471211; c=relaxed/simple;
-	bh=FuIgF3xpl57BQM5gb5B/cbVDBncuVooGE9Ug9ln/YFY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QUhMFtelFmz8VR2Roiix5kyIXiE3kCUNEHZhCJqzloi1m3gqN1L/+gTG3uZkQjE+DRDVrw1dvmH5pX3vqepzbcv4pOlok5vA3p4P+sK/4oV8Z2AyYJsye2Lm60wHsMesV37Ij9s5igBOMq4919nZR8yrdSuMfn11ZjNqnzPIYSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BenqUuzK; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4769aef457bso65942461cf.2
-        for <netdev@vger.kernel.org>; Mon, 05 May 2025 11:53:29 -0700 (PDT)
+	s=arc-20240116; t=1746471303; c=relaxed/simple;
+	bh=R5F9NqaxR5XbxfQ/diedPP8STe39zCzQseoAXXOQ+74=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tJyBvfciYa3Tb5F7+xvNv2RMpHg2IGsGYlXRCobT6DEfFqmb59bJFzyaCm0+5as6fVSqlZanZlREHWKzvLMvQkA6RWvAV1sFEmazsRTLd5cZZ4tx4+8VQYCOKkDEP7UVihFMwbxxjgSA/3nhxA+sxZxoOjVwpJpu15FeGd3UBUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kGJ//V5b; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-22e09f57ed4so44870405ad.0
+        for <netdev@vger.kernel.org>; Mon, 05 May 2025 11:55:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746471209; x=1747076009; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VE8E7uN6e92XnvlGgfyB3YrFpfW0Jvu0vZ/ENMS40h4=;
-        b=BenqUuzKezca7EqaIsKxozXkjSLDs20oh5msqg2wYm0IssM2pv5zYuFWGmgNn6La0P
-         WQ8ZW/fR/X8x2eJ0uacneYWJv57kqAqAOPDTf6AfeZ1zWUOqLXB2eiEKQ6jibkYYZWLT
-         hyS8AYaN4kuh0wPRUOlROPpd5XcX593VZOCuIC2QPEXfcXb/x8SkOqynb1bfFB4TYPxj
-         4H+P5cgcA57pc466bV5xvfGod2lgaZrlbfr8UeLmjraLB33qFVx/zpFIt+rE1PkTbAU1
-         0i2xPUmK0z5YOvTv9MXzaFJrqoAG8u+eUTYozFntOZc8FXPPrc2txvvI/ucyvwZBl6If
-         Oq5A==
+        d=gmail.com; s=20230601; t=1746471301; x=1747076101; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=txCrSyIQVZ2E4MFqA55/D/rx40+DY1GbdWm4aGzs95Y=;
+        b=kGJ//V5bKyuHFcjoGoS892oQh7UnjttfIYI9FlgTd5qQF9hnadroKt+CN9PlWjR+Fn
+         czMW3TorPDBbNzP8g7tyKOhAJoA7OPxlYx/z1eNK5vBS10VCScW6IHqys5CachrzvnFq
+         oOPky4CLQIeK6u4PxbBv/GuX65bzM8M/iGxaA9NF2ACtms6asQLU19tpupKWdfGAP8UT
+         TUSiiOGqElZloe9pj9HkT0G6OGOkOLR7XcM/8yfhWjdTr994NxgdGpEOr2eGi54KrlCY
+         Jco5mvPhYfNCQkTLZEjMGv1LfcQuElnLy3hvRiB2JUYdJZFIjnUJx56BF6U/IlUaNWQm
+         lJkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746471209; x=1747076009;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VE8E7uN6e92XnvlGgfyB3YrFpfW0Jvu0vZ/ENMS40h4=;
-        b=rQsYoYqGdsvMmmE/gFAz9C0uySMRxTB0uy0XHi0OGKGk4g1mbC4/qTs2yD/EtMmfdB
-         aKFHl4V3ykcGBCDh201tyxuoqCbNhjO5IKSQWRyiegb2vYQXC/snxLxFlomT7WCR7knS
-         T2lj9wHoJ1sX3tyFCGLfH9Cjq+egjc2IxBIFwRuR6+uo87oV6qPy1xSC6sG/MK3Gs3Nv
-         l/amvaVwKPxUWoirwHMR+MXTQQQHC5Y7QRmN/1/DjhFXAiTZrs4YuvxBYWUiifjAQTN5
-         rh+NYEeAQF8aKk9vxRxkFqP7r1tNF6Kzz04NwT5SluVY625+vIG30gxiy3sKFb37YfqX
-         /9Wg==
-X-Forwarded-Encrypted: i=1; AJvYcCXS/fMBLoX4uBiKS6YS2xLUpYq9lrMzLK8uYbFjL6/qLGg248E3WC/0+Jse4loVg6Mg14KX+KU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywql4i6Ih8IiG8RmsPZ8a+CqtqUaUvg05ux3RZR/row1N/ksq4O
-	i80RlGCRZDufPa09X4d0fZO3t931hHhAeXkMJ8ObUu0TVNC7YfO8mP+1k+rUAS8fYlBmramfxzN
-	vtO/A8eGF1wSC8bqZgO75u0ypyVvS+JyX/EsR
-X-Gm-Gg: ASbGncsuE/NTYhoGjw8N2cqjxuHHzKv3yRmJyXCjBwNc53ozUU0IZ0bPt8Hl44TGsBG
-	2IXWFQJ4gEMhVG4aO5jKBq+ayvPUB2ZpTUU9WQzb11biFpVUkf5EE5wjkijSQtJlWjmDb4tA56P
-	yeua3fRVQZeYu5DZa7dJ8=
-X-Google-Smtp-Source: AGHT+IEySOd8jG/a7RMEmZco3yglzRd4YyLNh+zFFYwlCG8pwIkJpEe0KkaJ3MejnrGXn4ZLZqti1s2EYZeSeG6Z6L4=
-X-Received: by 2002:a05:622a:1101:b0:477:e78:5a14 with SMTP id
- d75a77b69052e-48dff3e1b73mr121558691cf.3.1746471208555; Mon, 05 May 2025
- 11:53:28 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1746471301; x=1747076101;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=txCrSyIQVZ2E4MFqA55/D/rx40+DY1GbdWm4aGzs95Y=;
+        b=HG/tSaAbSVqXtFC3acdH2Zgjcd1L8Bwj6ykOMTtYmfUQ2ko92J12R7NOi622FiZJm/
+         zMZ3Nhm5K720LvrTJG1/vmIEkZOaOdBlwYtEUIOvVDMJu8sCG9LghNARzY1ln388/XVg
+         9VZruppcTSmKS8aMt1E8bx5IiiUwGEuN0byPbb6+d/ecjxz6jBOoYn8uHfNPfgQCng3E
+         87OB16e1iCd3Jc0nh5BOyyaeLeOkNSQE3WD8P6U8aDHFmEaZ0us3MfooB/HS0hI2xNxy
+         mcrIWrEohJWX6A9NOVA8ZvS9yo5Nvytk0i0xcpTKH5bmijpX7XJgzoxljmawG2V/r0yM
+         xEIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXz1qILbKBLZlJcNFnHspWHjArH44ujvlY9xFGO/TIjMBs+i9H+W/3itXg1NGK81ycGUAEOmOs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YypmpuHAGxxny49XgqHKVVTYJ9GeosZ3isaYkN6hqHtC36KNUTG
+	Sxu3XC1GEToZ0zFlORN0vOVi5T5chB+Z9ruw27smMD3S5thVSOSAHk06
+X-Gm-Gg: ASbGnctuF5RbZIUwrz5XR/8q2KwrEp5w2QSBWwukHceRslyA358ybHRGqVG++I/GFqw
+	Q63c9FExyy0nj0wXw8ACa/hhy1KKoB9g9IBCZQqRNsB29ejKewLrGI9fQXWbNiLF16WdKDDifCY
+	NTeX5m89qY5o4WAXCK6w30aYYWqXhiyNp3jAQNiQZ5sf+VNrn2KoUkJ6IYvvipPAdDxioofPFZi
+	9f8JS3Ydn1hyg6xBRc3DbYexjmYRFtWnQYvnc4EWjUyxlECIDBZ+7lyrPHrZbj8E8Vu7CyeA9dx
+	I9jqk6G7d3DMq/51ia4RUtF2FgjKR3dL9rYMBn0QyZXA4EZIMT9MuPtcZye2QOIgIPlubEfwBrc
+	=
+X-Google-Smtp-Source: AGHT+IF/O1MvffQJmKw7LEsAshPbUZNiQvZnfXgLTSK4oZPG6B1apypfjRav5PACBP0Srw9lI9Iuqg==
+X-Received: by 2002:a17:902:f60b:b0:223:5187:a886 with SMTP id d9443c01a7336-22e327eb5b9mr7466145ad.22.1746471300827;
+        Mon, 05 May 2025 11:55:00 -0700 (PDT)
+Received: from localhost (c-73-170-40-124.hsd1.ca.comcast.net. [73.170.40.124])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-22e1521fae5sm58736065ad.132.2025.05.05.11.55.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 May 2025 11:55:00 -0700 (PDT)
+Date: Mon, 5 May 2025 11:54:59 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Cosmin Ratiu <cratiu@nvidia.com>, "jhs@mojatatu.com" <jhs@mojatatu.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"saeed@kernel.org" <saeed@kernel.org>,
+	Dragos Tatulea <dtatulea@nvidia.com>,
+	"sdf@fomichev.me" <sdf@fomichev.me>,
+	"xiyou.wangcong@gmail.com" <xiyou.wangcong@gmail.com>,
+	"jiri@resnulli.us" <jiri@resnulli.us>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v10 04/14] net: hold netdev instance lock during
+ qdisc ndo_setup_tc
+Message-ID: <aBkJg0W-QhIJiMfp@mini-arch>
+References: <20250305163732.2766420-1-sdf@fomichev.me>
+ <20250305163732.2766420-5-sdf@fomichev.me>
+ <eba9def750047f1789b708b97e376f453f09bfa4.camel@nvidia.com>
+ <aBjUFyaiZ9UHpvze@mini-arch>
+ <a834c663507a78acaf1f0b3145cf38c74fe3de09.camel@nvidia.com>
+ <20250505113514.6f369217@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250321211639.3812992-1-michael.chan@broadcom.com>
- <20250321211639.3812992-3-michael.chan@broadcom.com> <CANn89i+ps_CozfOyRnKav0_LUmSekJ9ExB5JkDbTAVf_ss_98g@mail.gmail.com>
- <CACKFLikb0+uBshZvdNadKTbD0bRrH1XvrTchjuv5Kty0T4+Zsg@mail.gmail.com>
-In-Reply-To: <CACKFLikb0+uBshZvdNadKTbD0bRrH1XvrTchjuv5Kty0T4+Zsg@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 5 May 2025 11:53:17 -0700
-X-Gm-Features: ATxdqUGdkDnLPM1nN_B7RSwdRJB8oY5hLHPPhLd4Y_LJzTQ4mMWFh0xMN9VLXD8
-Message-ID: <CANn89iLFwUkLP+EO1YJe_ynTKEz69LJtGW43Uht9aM18K3e49w@mail.gmail.com>
-Subject: Re: [PATCH net 2/2] bnxt_en: Linearize TX SKB if the fragments exceed
- the max
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, pavan.chebbi@broadcom.com, 
-	andrew.gospodarek@broadcom.com, osk@google.com, 
-	Somnath Kotur <somnath.kotur@broadcom.com>, 
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250505113514.6f369217@kernel.org>
 
-On Mon, May 5, 2025 at 11:34=E2=80=AFAM Michael Chan <michael.chan@broadcom=
-.com> wrote:
+On 05/05, Jakub Kicinski wrote:
+> On Mon, 5 May 2025 15:12:39 +0000 Cosmin Ratiu wrote:
+> > On Mon, 2025-05-05 at 08:07 -0700, Stanislav Fomichev wrote:
+> > > On 05/05, Cosmin Ratiu wrote:  
+> > > > diff --git a/net/core/dev.c b/net/core/dev.c
+> > > > index d1a8cad0c99c..134ceddf7fa5 100644
+> > > > --- a/net/core/dev.c
+> > > > +++ b/net/core/dev.c
+> > > > @@ -12020,9 +12020,9 @@ void
+> > > > unregister_netdevice_many_notify(struct
+> > > > list_head *head,
+> > > >                 struct sk_buff *skb = NULL;
+> > > >  
+> > > >                 /* Shutdown queueing discipline. */
+> > > > +               netdev_lock_ops(dev);
+> > > >                 dev_shutdown(dev);
+> > > >                 dev_tcx_uninstall(dev);  
+> > > 
+> > > There is a synchronize_net hidden inside of dev_tcx_uninstall, so
+> > > let's ops-lock only dev_shutdown here? Other than that, don't see
+> > > anything wrong. Can you send this separately and target net tree?  
+> 
+> Avoiding synchronize_net() under the instance lock as an optimization? 
+> We're under rtnl_lock here, probably a premature optimization?
+> But no strong preference..
 
-> The patch works.  I forced a smaller TX_MAX_FRAGS to easily test it.
-> But we now skip the warn_once() above since we intercept it earlier.
->  Should we add a warn_once() here also?  Thanks.
->
+Good point, yes, let's not over complicate and just move the lock_ops
+up as Cosmin originally suggested.
 
-I do not think a warn_once() is needed here, GSO is pretty fast, in
-the unlikely case this would be hit.
+> BTW isn't the naming scheme now that dev_* takes the lock? So we should
+> probably add netif_ versions or rename these existing calls?
 
-You could add a per tx queue counter, that ethtool -S could fetch for
-curious minds.
+Can I follow up on these separately? I was thinking about sending
+a bulk rename once we are closer to shipping 6.15. We have a lot of
+cases where dev_ is inconsistent.
 
