@@ -1,62 +1,60 @@
-Return-Path: <netdev+bounces-188051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13514AAB05C
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:36:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55A09AAB06B
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:38:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5834D4C3D71
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:36:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBF541BA471D
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:38:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C24328ECC9;
-	Mon,  5 May 2025 23:43:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8AAF30EA8C;
+	Mon,  5 May 2025 23:44:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vJEBddhj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mbOJ7T2x"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 860272FAECC;
-	Mon,  5 May 2025 23:23:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87DE2FB45C;
+	Mon,  5 May 2025 23:23:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746487388; cv=none; b=meWAhdr8IAhZ486BPEtS4hI2GnQSXO3bVy0Nz5UXWaMCSmXBN0p9sj6ztIeNhRATshjQH2z/kk+28DDElMKHs1S8lLdl0D/Ygrkc5+zQRJDhvUcUbaEkDGvt0y+3prrFK9ozuweUYK3TDgDrDCSbW3RxXiy/+inkgmjKCW/rfFc=
+	t=1746487405; cv=none; b=PXnG+v1E101gdqicBSbKqNMDVsrqBuU+Ienmw2G9TQ/KAUWPwRwRMIQ5ir5caEUP2bVpP8QlZtvN7nbh/8TTsQDaDlkD91t/3ljMxW6EpLDeg4iRmVagkRf2Ti6v/6IphXcKLhyKymmcuzjjujg5C/4kvlVFpmwAhGKetYfhejM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746487388; c=relaxed/simple;
-	bh=r1tiKjuKfbd96zLtE+khOfPEPljsl9llIGk5isv3VwU=;
+	s=arc-20240116; t=1746487405; c=relaxed/simple;
+	bh=TLK/nw2rcYQzO6iVjYaqZj4A8EqjcfM5zZQ6+AxLI/4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=K8jzSF7SP9RduV+SL7shaD4mW5OcnNbRHGga7yCeWYdJqS60k90vat3E2HN7mvfSfsCwSdLSI4+rg9MKM5d6WKmfCA43LIBu70sPzs6cvdRz7B71eMZjt+eB5K8t0ssvdiJ0PcjGVtMfkBH4i5RaFWDj3tiAJI5cwd5TIexFaAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vJEBddhj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC276C4CEEE;
-	Mon,  5 May 2025 23:23:06 +0000 (UTC)
+	 MIME-Version; b=opGaJ7c4dT1M0l9LduPh+c3UT2oQg0IfuLGg21HmXPBkfyBd62lArPuZkhKXkz8cb/QM4NRxswvggSnk81XtKVOzYQBi0to2FHHqiM9dk8f0I7i0d+WiscRgcFSu7drMsxRDL8PLNM+K3w82Py6Ojr5bBXqkPlkUfJkbpeT6PLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mbOJ7T2x; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78A27C4CEE4;
+	Mon,  5 May 2025 23:23:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746487388;
-	bh=r1tiKjuKfbd96zLtE+khOfPEPljsl9llIGk5isv3VwU=;
+	s=k20201202; t=1746487404;
+	bh=TLK/nw2rcYQzO6iVjYaqZj4A8EqjcfM5zZQ6+AxLI/4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=vJEBddhj9LiXDIz3E//MW/xvde+KlG9JD4MpM0pemEKOb+0yWKIEV+JwwdHav6TxH
-	 CLeqR6Y/9LcwGxxhrqkXGfkC0iPHfZr7iRLtJ1f2Q+6Ix6oZYfYrDSeLC/4lry4cn+
-	 g11wOlNRx3NJQtF7+Je5P2MD+eWBfjLDiwswemhNlDXXH9INA8ECEgs9fliTesDeyf
-	 wuR6lZ1RvvOihpFJw9kw8pEH8roSl1yJWAxZQs/V4HjKz5r1EF0ZxOSYIUrkH1Npe3
-	 c5OJ9qn6n/cTo7pBAuXu/CXQx1lq3aaMeF/unIMzIzKYmtbOXiI9N0lMsZzccYWDgd
-	 oeQkGd1FOzMnw==
+	b=mbOJ7T2x03FT5Yn1xinxvVrTkFAlzupqeocTWv8hYJwgREJ2V1zy0xe59acJtlD0H
+	 y6yZwIj1/VAeFHr/u3cQCynnigdpU4kBLPyqDIFgbsuX01DPSiTG3WgYjfbQzkR3Z7
+	 vU2PFLxG1cRdHMOpPw7psgE8tObkR6sTGluJzz8BBDJzKNOyQ5Q6kxMTTlLJp8AIjz
+	 GZAjBkPgTDRopHNdv0tDvc1T+GXOVicXFpC/mJ2iLJo4CGWKfXk4SHYZyOx5X4m51m
+	 jNfTK2iAmelqyOfwkd0RaGuHx1pZt+u2I/ISstjh3otdTM48U5T1ciulElu0Xz/oWL
+	 iJGig+ORMJQzQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Paolo Abeni <pabeni@redhat.com>,
+Cc: Peter Seiderer <ps.report@gmx.net>,
+	Simon Horman <horms@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	iyappan@os.amperecomputing.com,
-	keyur@os.amperecomputing.com,
-	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
+	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 43/79] net: xgene-v2: remove incorrect ACPI_PTR annotation
-Date: Mon,  5 May 2025 19:21:15 -0400
-Message-Id: <20250505232151.2698893-43-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 51/79] net: pktgen: fix access outside of user given buffer in pktgen_thread_write()
+Date: Mon,  5 May 2025 19:21:23 -0400
+Message-Id: <20250505232151.2698893-51-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505232151.2698893-1-sashal@kernel.org>
 References: <20250505232151.2698893-1-sashal@kernel.org>
@@ -71,45 +69,47 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.4.293
 Content-Transfer-Encoding: 8bit
 
-From: Arnd Bergmann <arnd@arndb.de>
+From: Peter Seiderer <ps.report@gmx.net>
 
-[ Upstream commit 01358e8fe922f716c05d7864ac2213b2440026e7 ]
+[ Upstream commit 425e64440ad0a2f03bdaf04be0ae53dededbaa77 ]
 
-Building with W=1 shows a warning about xge_acpi_match being unused when
-CONFIG_ACPI is disabled:
+Honour the user given buffer size for the strn_len() calls (otherwise
+strn_len() will access memory outside of the user given buffer).
 
-drivers/net/ethernet/apm/xgene-v2/main.c:723:36: error: unused variable 'xge_acpi_match' [-Werror,-Wunused-const-variable]
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Link: https://patch.msgid.link/20250225163341.4168238-2-arnd@kernel.org
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Peter Seiderer <ps.report@gmx.net>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Link: https://patch.msgid.link/20250219084527.20488-8-ps.report@gmx.net
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/apm/xgene-v2/main.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ net/core/pktgen.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/apm/xgene-v2/main.c b/drivers/net/ethernet/apm/xgene-v2/main.c
-index 848be6bf2fd1f..514a121d96aeb 100644
---- a/drivers/net/ethernet/apm/xgene-v2/main.c
-+++ b/drivers/net/ethernet/apm/xgene-v2/main.c
-@@ -9,8 +9,6 @@
+diff --git a/net/core/pktgen.c b/net/core/pktgen.c
+index e7cde4f097908..4fd66e6466d29 100644
+--- a/net/core/pktgen.c
++++ b/net/core/pktgen.c
+@@ -1770,8 +1770,8 @@ static ssize_t pktgen_thread_write(struct file *file,
+ 	i = len;
  
- #include "main.h"
- 
--static const struct acpi_device_id xge_acpi_match[];
+ 	/* Read variable name */
 -
- static int xge_get_resources(struct xge_pdata *pdata)
- {
- 	struct platform_device *pdev;
-@@ -733,7 +731,7 @@ MODULE_DEVICE_TABLE(acpi, xge_acpi_match);
- static struct platform_driver xge_driver = {
- 	.driver = {
- 		   .name = "xgene-enet-v2",
--		   .acpi_match_table = ACPI_PTR(xge_acpi_match),
-+		   .acpi_match_table = xge_acpi_match,
- 	},
- 	.probe = xge_probe,
- 	.remove = xge_remove,
+-	len = strn_len(&user_buffer[i], sizeof(name) - 1);
++	max = min(sizeof(name) - 1, count - i);
++	len = strn_len(&user_buffer[i], max);
+ 	if (len < 0)
+ 		return len;
+ 
+@@ -1801,7 +1801,8 @@ static ssize_t pktgen_thread_write(struct file *file,
+ 	if (!strcmp(name, "add_device")) {
+ 		char f[32];
+ 		memset(f, 0, 32);
+-		len = strn_len(&user_buffer[i], sizeof(f) - 1);
++		max = min(sizeof(f) - 1, count - i);
++		len = strn_len(&user_buffer[i], max);
+ 		if (len < 0) {
+ 			ret = len;
+ 			goto out;
 -- 
 2.39.5
 
