@@ -1,152 +1,256 @@
-Return-Path: <netdev+bounces-187758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76CFEAA9893
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 18:18:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B36A2AA98A1
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 18:20:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 197D43B27AE
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 16:17:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B155617B829
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 16:20:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95E1B19D09C;
-	Mon,  5 May 2025 16:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95971269AFD;
+	Mon,  5 May 2025 16:19:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="ssPH/cjs"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G39OUPaI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B6D182
-	for <netdev@vger.kernel.org>; Mon,  5 May 2025 16:15:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A88CD6F30C
+	for <netdev@vger.kernel.org>; Mon,  5 May 2025 16:19:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746461744; cv=none; b=qiRuOT4u8u6Kw7vWbaYnaT0kTW85PYGORU366kMXj1Lya1KkOeE1f5f4EFvxtAxTD9pyA1uKhGtEYzj2f5tRABXTtiot/Js5gtWd9oZOMGMhpYrMVjgcF+m2EoarPbGbT9WZGu98nS6kh8HVqwj/qpITVIkz4Tku7Dbb0EyvLx0=
+	t=1746461990; cv=none; b=Su7Vvmn0xbe0aFd9OQSreAWXjQvpQEnW8UELQAxCe4avvq/FJpHWX8H9GS6Pid75FjteVfKXsyPkgmQ9cADb1kszz6DZMdXLIgnav+ZA1LhyO13x9WOkG16+EpBK62ZDIH2zW6vF3GQcjW1ND1cJyNfB53SYo4sg66TSwKnMZ38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746461744; c=relaxed/simple;
-	bh=RX0/dQkILWgtfe24wxeWKn8PuIXSomVisH7hoYyJatQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eXsvMAHucYh7Gp2WZ+ht20ux0Of8P8kzC1BFLOHJIuyrpAjyhDqdR0XTbUfjKQOsk8YuRCMVzGHVMztcqbrypGNRrXbJjuHZJZtalmj6UZjxSznbhVBlbFeBfDH8gWjVy8TnofbuwBvenBfwfbSsNva+trzpIlBNA6X2k6xKbGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=ssPH/cjs; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Tikh5jmWQ3/lk6fBQXDrEBdjIfUJM9dZn/TENNrBMcA=; t=1746461742; x=1747325742; 
-	b=ssPH/cjsKtKSL5wtIPMZfT3bddJX95QRcyrjB8EGmmUi0i569yViWzi1UUhHpt12/20AIYQOTYa
-	B5e6ouBRM3NKR5e+oaJWnwdJ2TTxK64CHxo6/zzUw6LskpCPJWuAOtGNlE6OzrjA2SGCTtXRVxKIG
-	6GH4ab+RkuSKhJpgLlsKAz6UC48ANvBQjPqcykyqgkEPzkBoS9Ee9kELHEB+VtC+Z467nPCcxvLmZ
-	Xy5z/DdAtOXBkhNurP7znW8DOLIgC1fwrZrOtm89uQdJfCrh8wamHmTUbWHiLVMUhmTR4GoFygVKz
-	l9gq6uwdo08bPWznZqQ1b9HZd+cNRDx+gKsA==;
-Received: from mail-oo1-f52.google.com ([209.85.161.52]:44435)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1uByTe-0001z1-PF
-	for netdev@vger.kernel.org; Mon, 05 May 2025 09:15:35 -0700
-Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-60402c94319so2945809eaf.1
-        for <netdev@vger.kernel.org>; Mon, 05 May 2025 09:15:34 -0700 (PDT)
-X-Gm-Message-State: AOJu0Yze43+2ksZZoNZ+wfluXOmeBCOajYd59Gzd+XWqNiCZYeJ8GqUA
-	2R/wm59UQct1hfaO69I8+PLIYZwve4mxAUC1dDQtzGUiZzjZR7mUdsMM+27MJq8oT4yjGoU6QWH
-	27Sl4jh6rQt77+5Au7pfrPM9eLS0=
-X-Google-Smtp-Source: AGHT+IHXvUuOJPKhd/Q9uaOU13rY/xsFskynHMn4BONKnIWsZAamAYOmZPUwpya3ej8Z0Hd6yerJjSuZn/BrtoVXzkM=
-X-Received: by 2002:a05:6820:188a:b0:607:e15c:be07 with SMTP id
- 006d021491bc7-607ee8702e6mr8656437eaf.7.1746461734178; Mon, 05 May 2025
- 09:15:34 -0700 (PDT)
+	s=arc-20240116; t=1746461990; c=relaxed/simple;
+	bh=TLGx2zXG4R5RwLk/UaHbeOUNlqg+YLAi7dg7YS5VLMw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=N1OWM/l6sMuR442siMA4ShG+sQqGMWJEOnmuG2CDWccDWHNsiJmiMqPKk8f04F49lWxmD8/5LwJV51Tc9USZiTEsMYkrNc8Qa7YGGmbl1ZEdS0++eArkWk5wt3JYcSa1Q24CXRx+o6MyrNdbVz/eDxKEY9vnUw6ZFRCqdXdzUmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G39OUPaI; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746461988; x=1777997988;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=TLGx2zXG4R5RwLk/UaHbeOUNlqg+YLAi7dg7YS5VLMw=;
+  b=G39OUPaIawA2CZa3BYsZXMXYXa3zHK7wnqixB8MZTdE3xZhEvVw89Qeu
+   X/5mq/4uKMy3iPw8RrB4SAa0LXgT7chJc7ck4feeEe+c2JJ9Qva9QV1mP
+   Sxp46I1enfdFRFopDcGOy2GvoB+Eq7O4oZ0a0mqOCIPhfa5Y/tdL5Yebk
+   /edSrb/HW55lq6MqAioPveaY4uSFiSzZVfTppSeCcm40aw58gJaPM7f51
+   BYIFruYpV37RzAEGoHZxYYZbkeYkF8tqgh2eBG/LWpe71zMiL1mmguiJK
+   BTe0U6PDnaXZ3VEUbO0xy/N8+3r9KE+TwpRY2g+IShfkBOOG8gjR23A79
+   g==;
+X-CSE-ConnectionGUID: OX9HGmAHQvG89NwdHt/kTw==
+X-CSE-MsgGUID: kZl5hVhVQ2KrGEyf/cIj9w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11424"; a="47187075"
+X-IronPort-AV: E=Sophos;i="6.15,264,1739865600"; 
+   d="scan'208";a="47187075"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2025 09:19:47 -0700
+X-CSE-ConnectionGUID: dxbsDDWORMSte9Wtdrqabg==
+X-CSE-MsgGUID: EdkXhvHzSOaGq0Dmjzgp1Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,264,1739865600"; 
+   d="scan'208";a="135811630"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa007.jf.intel.com with ESMTP; 05 May 2025 09:19:47 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	anthony.l.nguyen@intel.com,
+	karol.kolacinski@intel.com,
+	sergey.temerkhanov@intel.com,
+	michal.kubiak@intel.com,
+	aleksandr.loktionov@intel.com,
+	jacob.e.keller@intel.com,
+	mschmidt@redhat.com,
+	horms@kernel.org,
+	jiri@resnulli.us,
+	Rinitha S <sx.rinitha@intel.com>
+Subject: [PATCH net] ice: use DSN instead of PCI BDF for ice_adapter index
+Date: Mon,  5 May 2025 09:19:38 -0700
+Message-ID: <20250505161939.2083581-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250502233729.64220-1-ouster@cs.stanford.edu>
- <20250502233729.64220-2-ouster@cs.stanford.edu> <938931dc-2157-44c8-b192-f6737b69f317@redhat.com>
-In-Reply-To: <938931dc-2157-44c8-b192-f6737b69f317@redhat.com>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Mon, 5 May 2025 09:14:58 -0700
-X-Gmail-Original-Message-ID: <CAGXJAmzqj3V=gubPBAH=zpNmHnW7g2Wk8mQ8=4wGhcJ9AsYb_g@mail.gmail.com>
-X-Gm-Features: ATxdqUEEAyCYUvJTQR-DK58qiZTxI9cSMkM0yn5PhK9NVbO8Df5AJo85VkKFqzI
-Message-ID: <CAGXJAmzqj3V=gubPBAH=zpNmHnW7g2Wk8mQ8=4wGhcJ9AsYb_g@mail.gmail.com>
-Subject: Re: [PATCH net-next v8 01/15] net: homa: define user-visible API for Homa
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Spam-Level: 
-X-Scan-Signature: cb5916722246bf80bd9488153e8e2604
+Content-Transfer-Encoding: 8bit
 
-On Mon, May 5, 2025 at 12:55=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On 5/3/25 1:37 AM, John Ousterhout wrote:
-> > +/**
-> > + * define HOMA_MAX_BPAGES - The largest number of bpages that will be =
-required
-> > + * to store an incoming message.
-> > + */
-> > +#define HOMA_MAX_BPAGES ((HOMA_MAX_MESSAGE_LENGTH + HOMA_BPAGE_SIZE - =
-1) \
-> > +             >> HOMA_BPAGE_SHIFT)
->
-> Minor nit: the above indentation is somewhat uncommon, the preferred
-> style is:
->
-> #define HOMA_MAX_BPAGES ((HOMA_MAX_MESSAGE_LENGTH + HOMA_BPAGE_SIZE - 1)
-> >> \
->                          HOMA_BPAGE_SHIFT)
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 
-Fixed (I only recently learned of this convention and have been fixing
-noncompliant code as I find it)
+Use Device Serial Number instead of PCI bus/device/function for
+the index of struct ice_adapter.
 
-> > +
-> > +#if !defined(__cplusplus)
-> > +_Static_assert(sizeof(struct homa_sendmsg_args) >=3D 24,
-> > +            "homa_sendmsg_args shrunk");
-> > +_Static_assert(sizeof(struct homa_sendmsg_args) <=3D 24,
-> > +            "homa_sendmsg_args grew");
-> > +#endif
->
-> I think this assertions don't belong here, should be BUILD_BUG_ON() in c
-> files. Even better could be avoided with explicit alignment on the
-> message struct.
+Functions on the same physical device should point to the very same
+ice_adapter instance, but with two PFs, when at least one of them is
+PCI-e passed-through to a VM, it is no longer the case - PFs will get
+seemingly random PCI BDF values, and thus indices, what finally leds to
+each of them being on their own instance of ice_adapter. That causes them
+to don't attempt any synchronization of the PTP HW clock usage, or any
+other future resources.
 
-This is a user-facing header; is BUILD_BUG_ON OK there (ChatGPT
-doesn't seem to think so)? Also, what do you mean about "explicit
-alignment on the message struct"?
->
-> [...]
-> > +int     homa_send(int sockfd, const void *message_buf,
-> > +               size_t length, const struct sockaddr *dest_addr,
-> > +               __u32 addrlen,  __u64 *id, __u64 completion_cookie,
-> > +               int flags);
-> > +int     homa_sendv(int sockfd, const struct iovec *iov,
-> > +                int iovcnt, const struct sockaddr *dest_addr,
-> > +                __u32 addrlen,  __u64 *id, __u64 completion_cookie,
-> > +                int flags);
-> > +ssize_t homa_reply(int sockfd, const void *message_buf,
-> > +                size_t length, const struct sockaddr *dest_addr,
-> > +                __u32 addrlen,  __u64 id);
-> > +ssize_t homa_replyv(int sockfd, const struct iovec *iov,
-> > +                 int iovcnt, const struct sockaddr *dest_addr,
-> > +                 __u32 addrlen,  __u64 id);
->
-> I assume the above are user-space functions definition ??? If so, they
-> don't belong here.
+DSN works nicely in place of the index, as it is "immutable" in terms of
+virtualization.
 
-Yes, these are declarations for user-space functions that wrap the
-sendmsg and recvmsg kernel calls. If not here, where should they go?
-Are you suggesting a second header file (suggestions for what it
-should be called?)? These are very thin wrappers, which I expect
-people will almost always use instead of invoking raw sendmsg and
-recvmsg, so I thought it would be cleanest to put them here, next to
-other info related to the Homa kernel calls.
+Fixes: 0e2bddf9e5f9 ("ice: add ice_adapter for shared data across PFs on the same NIC")
+Suggested-by: Jacob Keller <jacob.e.keller@intel.com>
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Suggested-by: Jiri Pirko <jiri@resnulli.us>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+---
+IWL: https://lore.kernel.org/intel-wired-lan/20250414131241.122855-1-przemyslaw.kitszel@intel.com/
 
--John-
+ drivers/net/ethernet/intel/ice/ice_adapter.c | 47 ++++++++------------
+ drivers/net/ethernet/intel/ice/ice_adapter.h |  6 ++-
+ 2 files changed, 22 insertions(+), 31 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.c b/drivers/net/ethernet/intel/ice/ice_adapter.c
+index 01a08cfd0090..66e070095d1b 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adapter.c
++++ b/drivers/net/ethernet/intel/ice/ice_adapter.c
+@@ -1,7 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+ // SPDX-FileCopyrightText: Copyright Red Hat
+ 
+-#include <linux/bitfield.h>
+ #include <linux/cleanup.h>
+ #include <linux/mutex.h>
+ #include <linux/pci.h>
+@@ -14,32 +13,16 @@
+ static DEFINE_XARRAY(ice_adapters);
+ static DEFINE_MUTEX(ice_adapters_mutex);
+ 
+-/* PCI bus number is 8 bits. Slot is 5 bits. Domain can have the rest. */
+-#define INDEX_FIELD_DOMAIN GENMASK(BITS_PER_LONG - 1, 13)
+-#define INDEX_FIELD_DEV    GENMASK(31, 16)
+-#define INDEX_FIELD_BUS    GENMASK(12, 5)
+-#define INDEX_FIELD_SLOT   GENMASK(4, 0)
+-
+-static unsigned long ice_adapter_index(const struct pci_dev *pdev)
++static unsigned long ice_adapter_index(u64 dsn)
+ {
+-	unsigned int domain = pci_domain_nr(pdev->bus);
+-
+-	WARN_ON(domain > FIELD_MAX(INDEX_FIELD_DOMAIN));
+-
+-	switch (pdev->device) {
+-	case ICE_DEV_ID_E825C_BACKPLANE:
+-	case ICE_DEV_ID_E825C_QSFP:
+-	case ICE_DEV_ID_E825C_SFP:
+-	case ICE_DEV_ID_E825C_SGMII:
+-		return FIELD_PREP(INDEX_FIELD_DEV, pdev->device);
+-	default:
+-		return FIELD_PREP(INDEX_FIELD_DOMAIN, domain) |
+-		       FIELD_PREP(INDEX_FIELD_BUS,    pdev->bus->number) |
+-		       FIELD_PREP(INDEX_FIELD_SLOT,   PCI_SLOT(pdev->devfn));
+-	}
++#if BITS_PER_LONG == 64
++	return dsn;
++#else
++	return (u32)dsn ^ (u32)(dsn >> 32);
++#endif
+ }
+ 
+-static struct ice_adapter *ice_adapter_new(void)
++static struct ice_adapter *ice_adapter_new(u64 dsn)
+ {
+ 	struct ice_adapter *adapter;
+ 
+@@ -47,6 +30,7 @@ static struct ice_adapter *ice_adapter_new(void)
+ 	if (!adapter)
+ 		return NULL;
+ 
++	adapter->device_serial_number = dsn;
+ 	spin_lock_init(&adapter->ptp_gltsyn_time_lock);
+ 	refcount_set(&adapter->refcount, 1);
+ 
+@@ -77,23 +61,26 @@ static void ice_adapter_free(struct ice_adapter *adapter)
+  * Return:  Pointer to ice_adapter on success.
+  *          ERR_PTR() on error. -ENOMEM is the only possible error.
+  */
+-struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev)
++struct ice_adapter *ice_adapter_get(struct pci_dev *pdev)
+ {
+-	unsigned long index = ice_adapter_index(pdev);
++	u64 dsn = pci_get_dsn(pdev);
+ 	struct ice_adapter *adapter;
++	unsigned long index;
+ 	int err;
+ 
++	index = ice_adapter_index(dsn);
+ 	scoped_guard(mutex, &ice_adapters_mutex) {
+ 		err = xa_insert(&ice_adapters, index, NULL, GFP_KERNEL);
+ 		if (err == -EBUSY) {
+ 			adapter = xa_load(&ice_adapters, index);
+ 			refcount_inc(&adapter->refcount);
++			WARN_ON_ONCE(adapter->device_serial_number != dsn);
+ 			return adapter;
+ 		}
+ 		if (err)
+ 			return ERR_PTR(err);
+ 
+-		adapter = ice_adapter_new();
++		adapter = ice_adapter_new(dsn);
+ 		if (!adapter)
+ 			return ERR_PTR(-ENOMEM);
+ 		xa_store(&ice_adapters, index, adapter, GFP_KERNEL);
+@@ -110,11 +97,13 @@ struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev)
+  *
+  * Context: Process, may sleep.
+  */
+-void ice_adapter_put(const struct pci_dev *pdev)
++void ice_adapter_put(struct pci_dev *pdev)
+ {
+-	unsigned long index = ice_adapter_index(pdev);
++	u64 dsn = pci_get_dsn(pdev);
+ 	struct ice_adapter *adapter;
++	unsigned long index;
+ 
++	index = ice_adapter_index(dsn);
+ 	scoped_guard(mutex, &ice_adapters_mutex) {
+ 		adapter = xa_load(&ice_adapters, index);
+ 		if (WARN_ON(!adapter))
+diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.h b/drivers/net/ethernet/intel/ice/ice_adapter.h
+index e233225848b3..ac15c0d2bc1a 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adapter.h
++++ b/drivers/net/ethernet/intel/ice/ice_adapter.h
+@@ -32,6 +32,7 @@ struct ice_port_list {
+  * @refcount: Reference count. struct ice_pf objects hold the references.
+  * @ctrl_pf: Control PF of the adapter
+  * @ports: Ports list
++ * @device_serial_number: DSN cached for collision detection on 32bit systems
+  */
+ struct ice_adapter {
+ 	refcount_t refcount;
+@@ -40,9 +41,10 @@ struct ice_adapter {
+ 
+ 	struct ice_pf *ctrl_pf;
+ 	struct ice_port_list ports;
++	u64 device_serial_number;
+ };
+ 
+-struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev);
+-void ice_adapter_put(const struct pci_dev *pdev);
++struct ice_adapter *ice_adapter_get(struct pci_dev *pdev);
++void ice_adapter_put(struct pci_dev *pdev);
+ 
+ #endif /* _ICE_ADAPTER_H */
+-- 
+2.47.1
+
 
