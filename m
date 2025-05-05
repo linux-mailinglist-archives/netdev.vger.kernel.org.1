@@ -1,67 +1,63 @@
-Return-Path: <netdev+bounces-187963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E855AAA99E
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:18:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55F89AAA9A1
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:18:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E7545A3865
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 01:13:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98491188B8EF
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 01:16:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36BE13118C2;
-	Mon,  5 May 2025 22:45:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54F773679B4;
+	Mon,  5 May 2025 22:46:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K/4ShBh8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m6ZdxZ1N"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50FFF29A3E4;
-	Mon,  5 May 2025 22:43:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8087129A3E5;
+	Mon,  5 May 2025 22:43:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746485034; cv=none; b=YoQYqnBtjHbyo7NkQqZ/cD0Q3CF4y3JmiHzWbyRIOqWx/RMd8VA4c222+dOVCL5+gq7emPzea0tVwBqjKzhlxwHvQd4jlASikc1nb/rmCJwzLrCsZeyi7x9YCyDaghzLxrdB4FlaQ9IdinVR+AFwsOdS+Mx8RW8b3kHHX0htApQ=
+	t=1746485038; cv=none; b=hNcMAvyBfQZr7BcHclicSzHynP/2cPkwIyP5PVEsChJkpNqN4DNthoviHNFQVeI4MEdCPg9JbKVaALwfxSgxlrSmUytCg9u58XoKS7cuwv1kY+St/AjEV2kWFupH3C/Smm+KNShzYk/iXgJIOIY0ndYUOLvl0Mge+mUzRteXUQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746485034; c=relaxed/simple;
-	bh=LXifM12Dnri12CQI5SLjhrOVYgM9WK3dDj3xy1yF1yk=;
+	s=arc-20240116; t=1746485038; c=relaxed/simple;
+	bh=BjLeZRjT7RgjsCwKpIEeIybZ8EIpiwyBzGS14AWFqV4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rGWJyFDZGfS08Ib/yqQcOfb98xZ02sPyeC52by01t0RJWDIe95daeuDBW8cns6D3dQ9USeqjizeLCa4PvTVo2Yboy+XOshgu0mNW12/BdQ3fwKxK5c7ugaD3oes2cGPR682b/gbjOGR1970dZJ2YaenlMXse9WKeeyspEw3G1Fo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K/4ShBh8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7226BC4CEE4;
-	Mon,  5 May 2025 22:43:52 +0000 (UTC)
+	 MIME-Version; b=G6XLky2+kRWhSuZi144iCd3BjCNHUyVl8Bq2Q+COSTqxIuD8XqgDhIULUmRzgixdmnSJTTmFHRtUcqHOINXbr86rk58QhLYChqAGyI5VOKAPEuRk+8yjYjM7noR3/C//qwIh155LKzDwuRKukLfZMCvpi0TR4VD+Gjy9RAJm28E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m6ZdxZ1N; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0995FC4CEEF;
+	Mon,  5 May 2025 22:43:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746485034;
-	bh=LXifM12Dnri12CQI5SLjhrOVYgM9WK3dDj3xy1yF1yk=;
+	s=k20201202; t=1746485038;
+	bh=BjLeZRjT7RgjsCwKpIEeIybZ8EIpiwyBzGS14AWFqV4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=K/4ShBh8Hd8MPj2ALkumIv1qpS34GyKS7T2ks+4Ic6KbYShO7VKp5gioDvwkzVI35
-	 AthBOoI5ipfQ72DJhRrnTHUYdwROMxj4+ny0fh3AL8qEg9RVw2jI/oXJehAbG4wVNL
-	 wwRQyTQ39nI6vHuC/HY0Ar907XSVvY5qjx+AKszfQHKD7VGd0HXeqd5DQhXd/0hztO
-	 Mt0iU/VaKsOEfguWg3HOxv6hMX3K8qezsMHlDKw5l+Bb+lsy8rrgJ73dLvRkVV05K9
-	 mPxKh/A79YW9zHA52NtZWzHLuXMkSsvonuZroBZzaCY90O5GalMtC74Le1mvySyymw
-	 nmeHdfQDJvCmw==
+	b=m6ZdxZ1NfvVfb/rKkhzZJtwbjYtlPOEJZnbm5oy+AaVtVPF325LO/aib7YS44fjrg
+	 RDe4v680iOX1CrrU46Xf99hkXPEJDzsaVu701NUp7xHTjHBrRQh/yecWGsY7pYjuUp
+	 evKLWp8ueA/mRwH+1diPy+b00TJ9X8AuF3FFm3JCAuvHUX+fNeaszzAnwXcsMYWW3r
+	 ZV1dK4HyIZusupuBsShK47YV1ITZ5WWP8hiinEd12aOWg/SQlifGvblfrPWTMVW3iL
+	 f38Y0CXKCLbXl95kRDb3neT7UpnAzG9W/bmknNw+8VDc6gSoJ/w3WeKmuBR23xwW81
+	 KcZ5UHuuLcYxQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Jaakko Karrenpalo <jkarrenpalo@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+Cc: Nicolas Bouchinet <nicolas.bouchinet@ssi.gouv.fr>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
 	Sasha Levin <sashal@kernel.org>,
+	kadlec@netfilter.org,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	lukma@denx.de,
-	aleksander.lobakin@intel.com,
-	sdf@fomichev.me,
-	w-kwok2@ti.com,
-	m-karicheri2@ti.com,
-	danishanwar@ti.com,
-	wojciech.drewek@intel.com,
+	pabeni@redhat.com,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 132/486] net: hsr: Fix PRP duplicate detection
-Date: Mon,  5 May 2025 18:33:28 -0400
-Message-Id: <20250505223922.2682012-132-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.12 135/486] netfilter: conntrack: Bound nf_conntrack sysctl writes
+Date: Mon,  5 May 2025 18:33:31 -0400
+Message-Id: <20250505223922.2682012-135-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505223922.2682012-1-sashal@kernel.org>
 References: <20250505223922.2682012-1-sashal@kernel.org>
@@ -76,245 +72,83 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.12.26
 Content-Transfer-Encoding: 8bit
 
-From: Jaakko Karrenpalo <jkarrenpalo@gmail.com>
+From: Nicolas Bouchinet <nicolas.bouchinet@ssi.gouv.fr>
 
-[ Upstream commit 05fd00e5e7b1ac60d264f72423fba38cc382b447 ]
+[ Upstream commit 8b6861390ffee6b8ed78b9395e3776c16fec6579 ]
 
-Add PRP specific function for handling duplicate
-packets. This is needed because of potential
-L2 802.1p prioritization done by network switches.
+nf_conntrack_max and nf_conntrack_expect_max sysctls were authorized to
+be written any negative value, which would then be stored in the
+unsigned int variables nf_conntrack_max and nf_ct_expect_max variables.
 
-The L2 prioritization can re-order the PRP packets
-from a node causing the existing implementation to
-discard the frame(s) that have been received 'late'
-because the sequence number is before the previous
-received packet. This can happen if the node is
-sending multiple frames back-to-back with different
-priority.
+While the do_proc_dointvec_conv function is supposed to limit writing
+handled by proc_dointvec proc_handler to INT_MAX. Such a negative value
+being written in an unsigned int leads to a very high value, exceeding
+this limit.
 
-Signed-off-by: Jaakko Karrenpalo <jkarrenpalo@gmail.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Link: https://patch.msgid.link/20250307161700.1045-1-jkarrenpalo@gmail.com
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Moreover, the nf_conntrack_expect_max sysctl documentation specifies the
+minimum value is 1.
+
+The proc_handlers have thus been updated to proc_dointvec_minmax in
+order to specify the following write bounds :
+
+* Bound nf_conntrack_max sysctl writings between SYSCTL_ZERO
+  and SYSCTL_INT_MAX.
+
+* Bound nf_conntrack_expect_max sysctl writings between SYSCTL_ONE
+  and SYSCTL_INT_MAX as defined in the sysctl documentation.
+
+With this patch applied, sysctl writes outside the defined in the bound
+will thus lead to a write error :
+
+```
+sysctl -w net.netfilter.nf_conntrack_expect_max=-1
+sysctl: setting key "net.netfilter.nf_conntrack_expect_max": Invalid argument
+```
+
+Signed-off-by: Nicolas Bouchinet <nicolas.bouchinet@ssi.gouv.fr>
+Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/hsr/hsr_device.c   |  2 +
- net/hsr/hsr_forward.c  |  4 +-
- net/hsr/hsr_framereg.c | 95 ++++++++++++++++++++++++++++++++++++++++--
- net/hsr/hsr_framereg.h |  8 +++-
- net/hsr/hsr_main.h     |  2 +
- 5 files changed, 104 insertions(+), 7 deletions(-)
+ net/netfilter/nf_conntrack_standalone.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
-index 44048d7538ddc..9d0754b3642fd 100644
---- a/net/hsr/hsr_device.c
-+++ b/net/hsr/hsr_device.c
-@@ -543,6 +543,7 @@ static struct hsr_proto_ops hsr_ops = {
- 	.drop_frame = hsr_drop_frame,
- 	.fill_frame_info = hsr_fill_frame_info,
- 	.invalid_dan_ingress_frame = hsr_invalid_dan_ingress_frame,
-+	.register_frame_out = hsr_register_frame_out,
+diff --git a/net/netfilter/nf_conntrack_standalone.c b/net/netfilter/nf_conntrack_standalone.c
+index 7d4f0fa8b609d..3ea60ff7a6a49 100644
+--- a/net/netfilter/nf_conntrack_standalone.c
++++ b/net/netfilter/nf_conntrack_standalone.c
+@@ -619,7 +619,9 @@ static struct ctl_table nf_ct_sysctl_table[] = {
+ 		.data		= &nf_conntrack_max,
+ 		.maxlen		= sizeof(int),
+ 		.mode		= 0644,
+-		.proc_handler	= proc_dointvec,
++		.proc_handler	= proc_dointvec_minmax,
++		.extra1		= SYSCTL_ZERO,
++		.extra2		= SYSCTL_INT_MAX,
+ 	},
+ 	[NF_SYSCTL_CT_COUNT] = {
+ 		.procname	= "nf_conntrack_count",
+@@ -655,7 +657,9 @@ static struct ctl_table nf_ct_sysctl_table[] = {
+ 		.data		= &nf_ct_expect_max,
+ 		.maxlen		= sizeof(int),
+ 		.mode		= 0644,
+-		.proc_handler	= proc_dointvec,
++		.proc_handler	= proc_dointvec_minmax,
++		.extra1		= SYSCTL_ONE,
++		.extra2		= SYSCTL_INT_MAX,
+ 	},
+ 	[NF_SYSCTL_CT_ACCT] = {
+ 		.procname	= "nf_conntrack_acct",
+@@ -948,7 +952,9 @@ static struct ctl_table nf_ct_netfilter_table[] = {
+ 		.data		= &nf_conntrack_max,
+ 		.maxlen		= sizeof(int),
+ 		.mode		= 0644,
+-		.proc_handler	= proc_dointvec,
++		.proc_handler	= proc_dointvec_minmax,
++		.extra1		= SYSCTL_ZERO,
++		.extra2		= SYSCTL_INT_MAX,
+ 	},
  };
  
- static struct hsr_proto_ops prp_ops = {
-@@ -553,6 +554,7 @@ static struct hsr_proto_ops prp_ops = {
- 	.fill_frame_info = prp_fill_frame_info,
- 	.handle_san_frame = prp_handle_san_frame,
- 	.update_san_info = prp_update_san_info,
-+	.register_frame_out = prp_register_frame_out,
- };
- 
- void hsr_dev_setup(struct net_device *dev)
-diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
-index c0217476eb17f..ace4e355d1647 100644
---- a/net/hsr/hsr_forward.c
-+++ b/net/hsr/hsr_forward.c
-@@ -524,8 +524,8 @@ static void hsr_forward_do(struct hsr_frame_info *frame)
- 		 * Also for SAN, this shouldn't be done.
- 		 */
- 		if (!frame->is_from_san &&
--		    hsr_register_frame_out(port, frame->node_src,
--					   frame->sequence_nr))
-+		    hsr->proto_ops->register_frame_out &&
-+		    hsr->proto_ops->register_frame_out(port, frame))
- 			continue;
- 
- 		if (frame->is_supervision && port->type == HSR_PT_MASTER &&
-diff --git a/net/hsr/hsr_framereg.c b/net/hsr/hsr_framereg.c
-index 73bc6f659812f..85991fab7db58 100644
---- a/net/hsr/hsr_framereg.c
-+++ b/net/hsr/hsr_framereg.c
-@@ -35,6 +35,7 @@ static bool seq_nr_after(u16 a, u16 b)
- 
- #define seq_nr_before(a, b)		seq_nr_after((b), (a))
- #define seq_nr_before_or_eq(a, b)	(!seq_nr_after((a), (b)))
-+#define PRP_DROP_WINDOW_LEN 32768
- 
- bool hsr_addr_is_redbox(struct hsr_priv *hsr, unsigned char *addr)
- {
-@@ -176,8 +177,11 @@ static struct hsr_node *hsr_add_node(struct hsr_priv *hsr,
- 		new_node->time_in[i] = now;
- 		new_node->time_out[i] = now;
- 	}
--	for (i = 0; i < HSR_PT_PORTS; i++)
-+	for (i = 0; i < HSR_PT_PORTS; i++) {
- 		new_node->seq_out[i] = seq_out;
-+		new_node->seq_expected[i] = seq_out + 1;
-+		new_node->seq_start[i] = seq_out + 1;
-+	}
- 
- 	if (san && hsr->proto_ops->handle_san_frame)
- 		hsr->proto_ops->handle_san_frame(san, rx_port, new_node);
-@@ -482,9 +486,11 @@ void hsr_register_frame_in(struct hsr_node *node, struct hsr_port *port,
-  *	 0 otherwise, or
-  *	 negative error code on error
-  */
--int hsr_register_frame_out(struct hsr_port *port, struct hsr_node *node,
--			   u16 sequence_nr)
-+int hsr_register_frame_out(struct hsr_port *port, struct hsr_frame_info *frame)
- {
-+	struct hsr_node *node = frame->node_src;
-+	u16 sequence_nr = frame->sequence_nr;
-+
- 	spin_lock_bh(&node->seq_out_lock);
- 	if (seq_nr_before_or_eq(sequence_nr, node->seq_out[port->type]) &&
- 	    time_is_after_jiffies(node->time_out[port->type] +
-@@ -499,6 +505,89 @@ int hsr_register_frame_out(struct hsr_port *port, struct hsr_node *node,
- 	return 0;
- }
- 
-+/* Adaptation of the PRP duplicate discard algorithm described in wireshark
-+ * wiki (https://wiki.wireshark.org/PRP)
-+ *
-+ * A drop window is maintained for both LANs with start sequence set to the
-+ * first sequence accepted on the LAN that has not been seen on the other LAN,
-+ * and expected sequence set to the latest received sequence number plus one.
-+ *
-+ * When a frame is received on either LAN it is compared against the received
-+ * frames on the other LAN. If it is outside the drop window of the other LAN
-+ * the frame is accepted and the drop window is updated.
-+ * The drop window for the other LAN is reset.
-+ *
-+ * 'port' is the outgoing interface
-+ * 'frame' is the frame to be sent
-+ *
-+ * Return:
-+ *	 1 if frame can be shown to have been sent recently on this interface,
-+ *	 0 otherwise
-+ */
-+int prp_register_frame_out(struct hsr_port *port, struct hsr_frame_info *frame)
-+{
-+	enum hsr_port_type other_port;
-+	enum hsr_port_type rcv_port;
-+	struct hsr_node *node;
-+	u16 sequence_diff;
-+	u16 sequence_exp;
-+	u16 sequence_nr;
-+
-+	/* out-going frames are always in order
-+	 * and can be checked the same way as for HSR
-+	 */
-+	if (frame->port_rcv->type == HSR_PT_MASTER)
-+		return hsr_register_frame_out(port, frame);
-+
-+	/* for PRP we should only forward frames from the slave ports
-+	 * to the master port
-+	 */
-+	if (port->type != HSR_PT_MASTER)
-+		return 1;
-+
-+	node = frame->node_src;
-+	sequence_nr = frame->sequence_nr;
-+	sequence_exp = sequence_nr + 1;
-+	rcv_port = frame->port_rcv->type;
-+	other_port = rcv_port == HSR_PT_SLAVE_A ? HSR_PT_SLAVE_B :
-+				 HSR_PT_SLAVE_A;
-+
-+	spin_lock_bh(&node->seq_out_lock);
-+	if (time_is_before_jiffies(node->time_out[port->type] +
-+	    msecs_to_jiffies(HSR_ENTRY_FORGET_TIME)) ||
-+	    (node->seq_start[rcv_port] == node->seq_expected[rcv_port] &&
-+	     node->seq_start[other_port] == node->seq_expected[other_port])) {
-+		/* the node hasn't been sending for a while
-+		 * or both drop windows are empty, forward the frame
-+		 */
-+		node->seq_start[rcv_port] = sequence_nr;
-+	} else if (seq_nr_before(sequence_nr, node->seq_expected[other_port]) &&
-+		   seq_nr_before_or_eq(node->seq_start[other_port], sequence_nr)) {
-+		/* drop the frame, update the drop window for the other port
-+		 * and reset our drop window
-+		 */
-+		node->seq_start[other_port] = sequence_exp;
-+		node->seq_expected[rcv_port] = sequence_exp;
-+		node->seq_start[rcv_port] = node->seq_expected[rcv_port];
-+		spin_unlock_bh(&node->seq_out_lock);
-+		return 1;
-+	}
-+
-+	/* update the drop window for the port where this frame was received
-+	 * and clear the drop window for the other port
-+	 */
-+	node->seq_start[other_port] = node->seq_expected[other_port];
-+	node->seq_expected[rcv_port] = sequence_exp;
-+	sequence_diff = sequence_exp - node->seq_start[rcv_port];
-+	if (sequence_diff > PRP_DROP_WINDOW_LEN)
-+		node->seq_start[rcv_port] = sequence_exp - PRP_DROP_WINDOW_LEN;
-+
-+	node->time_out[port->type] = jiffies;
-+	node->seq_out[port->type] = sequence_nr;
-+	spin_unlock_bh(&node->seq_out_lock);
-+	return 0;
-+}
-+
- static struct hsr_port *get_late_port(struct hsr_priv *hsr,
- 				      struct hsr_node *node)
- {
-diff --git a/net/hsr/hsr_framereg.h b/net/hsr/hsr_framereg.h
-index 993fa950d8144..b04948659d84d 100644
---- a/net/hsr/hsr_framereg.h
-+++ b/net/hsr/hsr_framereg.h
-@@ -44,8 +44,7 @@ void hsr_addr_subst_dest(struct hsr_node *node_src, struct sk_buff *skb,
- 
- void hsr_register_frame_in(struct hsr_node *node, struct hsr_port *port,
- 			   u16 sequence_nr);
--int hsr_register_frame_out(struct hsr_port *port, struct hsr_node *node,
--			   u16 sequence_nr);
-+int hsr_register_frame_out(struct hsr_port *port, struct hsr_frame_info *frame);
- 
- void hsr_prune_nodes(struct timer_list *t);
- void hsr_prune_proxy_nodes(struct timer_list *t);
-@@ -73,6 +72,8 @@ void prp_update_san_info(struct hsr_node *node, bool is_sup);
- bool hsr_is_node_in_db(struct list_head *node_db,
- 		       const unsigned char addr[ETH_ALEN]);
- 
-+int prp_register_frame_out(struct hsr_port *port, struct hsr_frame_info *frame);
-+
- struct hsr_node {
- 	struct list_head	mac_list;
- 	/* Protect R/W access to seq_out */
-@@ -89,6 +90,9 @@ struct hsr_node {
- 	bool			san_b;
- 	u16			seq_out[HSR_PT_PORTS];
- 	bool			removed;
-+	/* PRP specific duplicate handling */
-+	u16			seq_expected[HSR_PT_PORTS];
-+	u16			seq_start[HSR_PT_PORTS];
- 	struct rcu_head		rcu_head;
- };
- 
-diff --git a/net/hsr/hsr_main.h b/net/hsr/hsr_main.h
-index fcfeb79bb0401..e26244456f639 100644
---- a/net/hsr/hsr_main.h
-+++ b/net/hsr/hsr_main.h
-@@ -183,6 +183,8 @@ struct hsr_proto_ops {
- 			       struct hsr_frame_info *frame);
- 	bool (*invalid_dan_ingress_frame)(__be16 protocol);
- 	void (*update_san_info)(struct hsr_node *node, bool is_sup);
-+	int (*register_frame_out)(struct hsr_port *port,
-+				  struct hsr_frame_info *frame);
- };
- 
- struct hsr_self_node {
 -- 
 2.39.5
 
