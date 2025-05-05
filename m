@@ -1,67 +1,66 @@
-Return-Path: <netdev+bounces-187933-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187934-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65637AAA706
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 02:24:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E36AAAA720
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 02:26:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA8B71B63717
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 00:23:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCE484A1F7F
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 00:25:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45B72332804;
-	Mon,  5 May 2025 22:35:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 976A829ACF5;
+	Mon,  5 May 2025 22:36:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XHtq7YJr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tj+RA3TL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A5E13327FE;
-	Mon,  5 May 2025 22:35:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8EC29ACC9;
+	Mon,  5 May 2025 22:36:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746484556; cv=none; b=akVoQAqyLIEUH0VapjKjpAyCLUpSizXthm3/G9AuJayxEfRbxy4wK4KxSu282L42xGhGWL6hd8dM9zrFSXuKCInBEtGmM4ib/PCe5ksE+ZFFOgL3nIPfHBXp4vc4BvMV2J7NwTyYjAUtybIFp4LsGf6330Gl8tfu82YQcfpSuMM=
+	t=1746484573; cv=none; b=Qatacw1OwI8JU/ZGgf9JjAsUpk2h4YO5Idly4VA1SKEKDul3Bwb3voId69roHK8nfjhX/njjkutYWTsLO9mGSRXJZVFHjn9rTlspcItP0wyfDCvd+3K3v+g48fYMEJGVFy8k+7Ltqkw/BSN2cZiNg1Z5PTh+wDOWH8wfEr0jvVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746484556; c=relaxed/simple;
-	bh=N50elTsvLV/m+xQAOHeAKX14EuZ7+WW4CerdYMMbhFI=;
+	s=arc-20240116; t=1746484573; c=relaxed/simple;
+	bh=qnlW6kW/MHKL3YI/EjqNJUQP7K40U59GY6a8zZf60PY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=WtnW5AM/KN35LZv17xEZfWiNLn1QifTyfH4XKHxBoNFd6JOIWp9ZY4YrkkuYd/T8TQxixCdtR55bwoaNBc6PN2ndl6CeGsmd3C0HSBwDTn6xOjUI6a6qV9GWrMPXTZr0PsGgGLJkhIuAfSPO5197hGhRdAC6goKCGGx8HBZ5NAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XHtq7YJr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CD3AC4CEE4;
-	Mon,  5 May 2025 22:35:54 +0000 (UTC)
+	 MIME-Version; b=CQqCC7UN+1bovQzWhI2STU8RbhXJGCY3gA5DiApx5L0iuInly9yGw7p42lWe/pnPvwHrJ732UZH1s9f70ELgKXBT89e00IDzAduYWKbPVT6MLz+RVwA5IPEHPwB1iIAZrsriRJsD5JYuqEzMFK5Bt5vpcsaHfzTA9E8FTFduD+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tj+RA3TL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C21DC4CEE4;
+	Mon,  5 May 2025 22:36:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746484556;
-	bh=N50elTsvLV/m+xQAOHeAKX14EuZ7+WW4CerdYMMbhFI=;
+	s=k20201202; t=1746484572;
+	bh=qnlW6kW/MHKL3YI/EjqNJUQP7K40U59GY6a8zZf60PY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XHtq7YJrgQU4euZaYr9NUkUnBusOgvwbCM8uIqKNQduS4Bg274nMq1kwcxpFqAH3U
-	 +PnpN/vjDm1/XbelL2pvhtF/THUl4fVKj9f9WOWscdlY89IstWH5wP6fVeHhA7qNXw
-	 o5R+4U/sSn/mMx9cNnuX+Do7hFigNSo+6WXM1Bcns/Mo6sNuSRylvQbgFFnfzDxelJ
-	 SKR0jGazhOimXTJPBmHSxa82MYwWykNl5KOLGs5siSo2BSJ87ylvmHXVkb3ZTYJkfw
-	 ijivj+ASHdE8kpMpvqrxvBn8+IT5ZENV0TQ4Uwx/RWos2pAL3y9brl8KGlU4M/xV1X
-	 zyFxUNS4uIrJw==
+	b=tj+RA3TLziGXewaqjyk1fTVhkSVzCp3ZB8OugexVRHHfDhAa4IGMT2bL1K4/VCuFX
+	 J4NcBdw/grh85E3IrAuCFIKUeBIjSzlPJxzxUPGImQEmF7ch5ckFpj5sOTNfljZPvx
+	 WgIBv8Wru3cRiyjpYBFtbcxDArf0eUZVPWJwa8rOzmtbcbObhntF0yviuLyELPy/zp
+	 Kqi2Z1HBIqUdxgGfcP2AY9azQq+4iCSP0qXPA+XOOfoPg6/UjEcHUEZpk+SgZuZ0tz
+	 vqpjxMc1E9mMTFs27Z2ZiRzK7AL+qVlFThlv2wjqcDGxmaKh2IrweN3cQHv+gcFvxB
+	 5VJGmEYT/Jsmg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Mina Almasry <almasrymina@google.com>,
+Cc: Alexander Duyck <alexanderduyck@meta.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
+	alexanderduyck@fb.com,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
-	pabeni@redhat.com,
-	hawk@kernel.org,
-	ilias.apalodimas@linaro.org,
 	jdamato@fastly.com,
+	mohsin.bashr@gmail.com,
+	vadim.fedorenko@linux.dev,
 	sdf@fomichev.me,
-	kuniyu@amazon.com,
-	kory.maincent@bootlin.com,
-	mkarsten@uwaterloo.ca,
-	bigeasy@linutronix.de,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.14 534/642] net: page_pool: avoid false positive warning if NAPI was never added
-Date: Mon,  5 May 2025 18:12:30 -0400
-Message-Id: <20250505221419.2672473-534-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.14 543/642] eth: fbnic: set IFF_UNICAST_FLT to avoid enabling promiscuous mode when adding unicast addrs
+Date: Mon,  5 May 2025 18:12:39 -0400
+Message-Id: <20250505221419.2672473-543-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505221419.2672473-1-sashal@kernel.org>
 References: <20250505221419.2672473-1-sashal@kernel.org>
@@ -76,70 +75,70 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.14.5
 Content-Transfer-Encoding: 8bit
 
-From: Jakub Kicinski <kuba@kernel.org>
+From: Alexander Duyck <alexanderduyck@meta.com>
 
-[ Upstream commit c1e00bc4be06cacee6307cedb9b55bbaddb5044d ]
+[ Upstream commit 09717c28b76c30b1dc8c261c855ffb2406abab2e ]
 
-We expect NAPI to be in disabled state when page pool is torn down.
-But it is also legal if the NAPI is completely uninitialized.
+I realized when we were adding unicast addresses we were enabling
+promiscuous mode. I did a bit of digging and realized we had overlooked
+setting the driver private flag to indicate we supported unicast filtering.
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
-Link: https://patch.msgid.link/20250206225638.1387810-4-kuba@kernel.org
+Example below shows the table with 00deadbeef01 as the main NIC address,
+and 5 additional addresses in the 00deadbeefX0 format.
+
+  # cat $dbgfs/mac_addr
+  Idx S TCAM Bitmap       Addr/Mask
+  ----------------------------------
+  00  0 00000000,00000000 000000000000
+                          000000000000
+  01  0 00000000,00000000 000000000000
+                          000000000000
+  02  0 00000000,00000000 000000000000
+                          000000000000
+  ...
+  24  0 00000000,00000000 000000000000
+                          000000000000
+  25  1 00100000,00000000 00deadbeef50
+                          000000000000
+  26  1 00100000,00000000 00deadbeef40
+                          000000000000
+  27  1 00100000,00000000 00deadbeef30
+                          000000000000
+  28  1 00100000,00000000 00deadbeef20
+                          000000000000
+  29  1 00100000,00000000 00deadbeef10
+                          000000000000
+  30  1 00100000,00000000 00deadbeef01
+                          000000000000
+  31  0 00000000,00000000 000000000000
+                          000000000000
+
+Before rule 31 would be active. With this change it correctly sticks
+to just the unicast filters.
+
+Signed-off-by: Alexander Duyck <alexanderduyck@meta.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Link: https://patch.msgid.link/20250204010038.1404268-2-kuba@kernel.org
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/core/dev.h       | 12 ++++++++++++
- net/core/page_pool.c |  7 ++-----
- 2 files changed, 14 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/meta/fbnic/fbnic_netdev.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/net/core/dev.h b/net/core/dev.h
-index a5b166bbd169a..caa13e431a6bc 100644
---- a/net/core/dev.h
-+++ b/net/core/dev.h
-@@ -299,6 +299,18 @@ void xdp_do_check_flushed(struct napi_struct *napi);
- static inline void xdp_do_check_flushed(struct napi_struct *napi) { }
- #endif
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+index 7a96b6ee773f3..1db57c42333ef 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+@@ -628,6 +628,8 @@ struct net_device *fbnic_netdev_alloc(struct fbnic_dev *fbd)
+ 	fbnic_rss_key_fill(fbn->rss_key);
+ 	fbnic_rss_init_en_mask(fbn);
  
-+/* Best effort check that NAPI is not idle (can't be scheduled to run) */
-+static inline void napi_assert_will_not_race(const struct napi_struct *napi)
-+{
-+	/* uninitialized instance, can't race */
-+	if (!napi->poll_list.next)
-+		return;
++	netdev->priv_flags |= IFF_UNICAST_FLT;
 +
-+	/* SCHED bit is set on disabled instances */
-+	WARN_ON(!test_bit(NAPI_STATE_SCHED, &napi->state));
-+	WARN_ON(READ_ONCE(napi->list_owner) != -1);
-+}
-+
- void kick_defer_list_purge(struct softnet_data *sd, unsigned int cpu);
- 
- #define XMIT_RECURSION_LIMIT	8
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index ede82c610936e..cca51aa2e876f 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -25,6 +25,7 @@
- 
- #include <trace/events/page_pool.h>
- 
-+#include "dev.h"
- #include "mp_dmabuf_devmem.h"
- #include "netmem_priv.h"
- #include "page_pool_priv.h"
-@@ -1146,11 +1147,7 @@ void page_pool_disable_direct_recycling(struct page_pool *pool)
- 	if (!pool->p.napi)
- 		return;
- 
--	/* To avoid races with recycling and additional barriers make sure
--	 * pool and NAPI are unlinked when NAPI is disabled.
--	 */
--	WARN_ON(!test_bit(NAPI_STATE_SCHED, &pool->p.napi->state));
--	WARN_ON(READ_ONCE(pool->p.napi->list_owner) != -1);
-+	napi_assert_will_not_race(pool->p.napi);
- 
- 	mutex_lock(&page_pools_lock);
- 	WRITE_ONCE(pool->p.napi, NULL);
+ 	netdev->features |=
+ 		NETIF_F_RXHASH |
+ 		NETIF_F_SG |
 -- 
 2.39.5
 
