@@ -1,63 +1,61 @@
-Return-Path: <netdev+bounces-188177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDF22AAB5FA
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 07:40:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D87ECAAB5FE
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 07:40:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 842644E4F56
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:35:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E62F7503045
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:36:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 071DE4B0014;
-	Tue,  6 May 2025 00:53:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EEE934E84E;
+	Tue,  6 May 2025 00:54:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j55qTF6Y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ct7kUO2G"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57EB63BEEC7;
-	Mon,  5 May 2025 23:23:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0D2385422;
+	Mon,  5 May 2025 23:23:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746487418; cv=none; b=GWpknKurrV9RCkFj1jLFS/9oJjCpbYfZHRUMpnpuaLJTfFQ3majxVkIMGMAj85+fqhOUvxIPd1nMo9eyoeCLGLwDgoWBzFigY5RygBETvfpwx6nptYJavZPcZc50O/qjEzXcPxt6zv2pihjDGMC8o6jz8qXxZriOKkJmSjANb1s=
+	t=1746487428; cv=none; b=AZGrsIEOAlY1lTiJgblzVpumb+oAk8cTV3gJ8x1uwFDK/qIgGZyHkrtuTmeOQong51vBeX4yOhN2/iCZrwOHdMzA1ShSBnwIpY/IV+Nqy04YHwFJAU2xVYA62HqGtJ1kkmIGiuafw7SzZW1MuzylrNCEWzS9Iu0Xwfl7iUEkyn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746487418; c=relaxed/simple;
-	bh=ymRGSnOUYCVaT5kFAkKEB47zA5IKBa3/u2yKaN1wEKk=;
+	s=arc-20240116; t=1746487428; c=relaxed/simple;
+	bh=qFWqH2m4VdVUeXk8WYPLlL0rQMwt65e+mgnXxmQ7TNY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JvDLfRVeVSztlKgXm9myeKpg2YdZIUHkOyXYA/eY0L9dHzg8CwomznQU2E1bdFBdm6dGPDVzzhhcVWeOmTbQi4Uy0NmM/VtcVngG5ZXOQ5lI5tgqzf3RUecirFivqxNOF5meJw/PBPTcAR5zv+DLRG/JZkqQLijNBiXkE2W0XQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j55qTF6Y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68AE7C4CEEE;
-	Mon,  5 May 2025 23:23:36 +0000 (UTC)
+	 MIME-Version; b=sspoTavHOLYhhnJ9MxBpqDvuT3N/FWz1FDQHw9b+Cxc2qT2W8owZ+PfVbDCXOAPlSPUfEMg6Z4Y6t/bLVNtVV4OsoEcgSa8+Ph9qZTFNEXSGKi60h0J6/7ZJbfxhCINnyG0S4KELLAq9GLgPrPq6uJIK3Mfa7ToSjKLHIhvkjZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ct7kUO2G; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 651DBC4CEE4;
+	Mon,  5 May 2025 23:23:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746487417;
-	bh=ymRGSnOUYCVaT5kFAkKEB47zA5IKBa3/u2yKaN1wEKk=;
+	s=k20201202; t=1746487426;
+	bh=qFWqH2m4VdVUeXk8WYPLlL0rQMwt65e+mgnXxmQ7TNY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=j55qTF6Y4HJZBDKg7HR+pjgqorfAl3PHK56g1m/R12JPQnBz9bmpfrGsO6Dhyqe7Z
-	 ApUyDSwf7tE+wXiwi9ujTeMHFSKFYwtOd5rah/QD67XhIc+XRlVMhGTz8sP9wEClvT
-	 DFCt47XSsWykex35BhOPbunJD/eG091Z5ED51yszrLeAH9w9dmbdZm/g52JGEu30YD
-	 aP3ZRfkgBzKLwkfStkfmjm7VGQ+4Pe2FnkKvHMTUKaixnPwixBMJXeNVzCncIQWjkE
-	 OorRuOFruKmn3BK9dHbTa+CVCkoOkLsD0wxni40e8Iz3TV6AhBjvOXO2gGezhV7FsC
-	 vWBXmf+O+FxYQ==
+	b=ct7kUO2Ge6xi8HCOA++9VVhG8cLZfSRbTLlX/Jzh3asI2nBFi/opkTzv7EEri+7u1
+	 /ISac8tUmVvdEGog2uW15NsnKaxDLj8fZhNXeAPWTbDHWwzwul8YYCXNfZuacf2CHq
+	 c8ovEk0QuW13SA26zk6+Sm9g7V+ICPfAqz4WCtQSxIwpTvigqYDbRyQZ8rx8wP11/b
+	 fxvgrQoV6KmJQPwOGAOkhO0L0iB0y2G7Eoq0F5Z0lhUozLAoIlWQXQLmGRdTIpqFPv
+	 cQojLnxvW1kIdTSIWGElV+hj5HFS2AIpZzE7NmRvKpGwh4mAFUBOjkaq0lBUGJ2Iv6
+	 B1fQmq7/TWf4A==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Kees Cook <kees@kernel.org>,
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Ido Schimmel <idosch@nvidia.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	tariqt@nvidia.com,
-	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
-	edumazet@google.com,
+	dsahern@kernel.org,
 	pabeni@redhat.com,
-	yishaih@nvidia.com,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 60/79] net/mlx4_core: Avoid impossible mlx4_db_alloc() order value
-Date: Mon,  5 May 2025 19:21:32 -0400
-Message-Id: <20250505232151.2698893-60-sashal@kernel.org>
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.4 65/79] ip: fib_rules: Fetch net from fib_rule in fib[46]_rule_configure().
+Date: Mon,  5 May 2025 19:21:37 -0400
+Message-Id: <20250505232151.2698893-65-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505232151.2698893-1-sashal@kernel.org>
 References: <20250505232151.2698893-1-sashal@kernel.org>
@@ -72,76 +70,59 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.4.293
 Content-Transfer-Encoding: 8bit
 
-From: Kees Cook <kees@kernel.org>
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-[ Upstream commit 4a6f18f28627e121bd1f74b5fcc9f945d6dbeb1e ]
+[ Upstream commit 5a1ccffd30a08f5a2428cd5fbb3ab03e8eb6c66d ]
 
-GCC can see that the value range for "order" is capped, but this leads
-it to consider that it might be negative, leading to a false positive
-warning (with GCC 15 with -Warray-bounds -fdiagnostics-details):
+The following patch will not set skb->sk from VRF path.
 
-../drivers/net/ethernet/mellanox/mlx4/alloc.c:691:47: error: array subscript -1 is below array bounds of 'long unsigned int *[2]' [-Werror=array-bounds=]
-  691 |                 i = find_first_bit(pgdir->bits[o], MLX4_DB_PER_PAGE >> o);
-      |                                    ~~~~~~~~~~~^~~
-  'mlx4_alloc_db_from_pgdir': events 1-2
-  691 |                 i = find_first_bit(pgdir->bits[o], MLX4_DB_PER_PAGE >> o);                        |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      |                     |                         |                                                   |                     |                         (2) out of array bounds here
-      |                     (1) when the condition is evaluated to true                             In file included from ../drivers/net/ethernet/mellanox/mlx4/mlx4.h:53,
-                 from ../drivers/net/ethernet/mellanox/mlx4/alloc.c:42:
-../include/linux/mlx4/device.h:664:33: note: while referencing 'bits'
-  664 |         unsigned long          *bits[2];
-      |                                 ^~~~
+Let's fetch net from fib_rule->fr_net instead of sock_net(skb->sk)
+in fib[46]_rule_configure().
 
-Switch the argument to unsigned int, which removes the compiler needing
-to consider negative values.
-
-Signed-off-by: Kees Cook <kees@kernel.org>
-Link: https://patch.msgid.link/20250210174504.work.075-kees@kernel.org
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Tested-by: Ido Schimmel <idosch@nvidia.com>
+Link: https://patch.msgid.link/20250207072502.87775-5-kuniyu@amazon.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/mellanox/mlx4/alloc.c | 6 +++---
- include/linux/mlx4/device.h                | 2 +-
+ net/ipv4/fib_rules.c  | 4 ++--
+ net/ipv6/fib6_rules.c | 4 ++--
  2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx4/alloc.c b/drivers/net/ethernet/mellanox/mlx4/alloc.c
-index b330020dc0d67..f2bded847e61d 100644
---- a/drivers/net/ethernet/mellanox/mlx4/alloc.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/alloc.c
-@@ -682,9 +682,9 @@ static struct mlx4_db_pgdir *mlx4_alloc_db_pgdir(struct device *dma_device)
- }
- 
- static int mlx4_alloc_db_from_pgdir(struct mlx4_db_pgdir *pgdir,
--				    struct mlx4_db *db, int order)
-+				    struct mlx4_db *db, unsigned int order)
+diff --git a/net/ipv4/fib_rules.c b/net/ipv4/fib_rules.c
+index e9a3cc9e98dfa..1617ea18fae3a 100644
+--- a/net/ipv4/fib_rules.c
++++ b/net/ipv4/fib_rules.c
+@@ -220,9 +220,9 @@ static int fib4_rule_configure(struct fib_rule *rule, struct sk_buff *skb,
+ 			       struct nlattr **tb,
+ 			       struct netlink_ext_ack *extack)
  {
--	int o;
-+	unsigned int o;
- 	int i;
+-	struct net *net = sock_net(skb->sk);
++	struct fib4_rule *rule4 = (struct fib4_rule *)rule;
++	struct net *net = rule->fr_net;
+ 	int err = -EINVAL;
+-	struct fib4_rule *rule4 = (struct fib4_rule *) rule;
  
- 	for (o = order; o <= 1; ++o) {
-@@ -712,7 +712,7 @@ static int mlx4_alloc_db_from_pgdir(struct mlx4_db_pgdir *pgdir,
- 	return 0;
- }
- 
--int mlx4_db_alloc(struct mlx4_dev *dev, struct mlx4_db *db, int order)
-+int mlx4_db_alloc(struct mlx4_dev *dev, struct mlx4_db *db, unsigned int order)
+ 	if (frh->tos & ~IPTOS_TOS_MASK) {
+ 		NL_SET_ERR_MSG(extack, "Invalid tos");
+diff --git a/net/ipv6/fib6_rules.c b/net/ipv6/fib6_rules.c
+index 3cf9dc2231036..acb8610c9a9df 100644
+--- a/net/ipv6/fib6_rules.c
++++ b/net/ipv6/fib6_rules.c
+@@ -344,9 +344,9 @@ static int fib6_rule_configure(struct fib_rule *rule, struct sk_buff *skb,
+ 			       struct nlattr **tb,
+ 			       struct netlink_ext_ack *extack)
  {
- 	struct mlx4_priv *priv = mlx4_priv(dev);
- 	struct mlx4_db_pgdir *pgdir;
-diff --git a/include/linux/mlx4/device.h b/include/linux/mlx4/device.h
-index 35b4e324e17f2..7c399831540d7 100644
---- a/include/linux/mlx4/device.h
-+++ b/include/linux/mlx4/device.h
-@@ -1128,7 +1128,7 @@ int mlx4_write_mtt(struct mlx4_dev *dev, struct mlx4_mtt *mtt,
- int mlx4_buf_write_mtt(struct mlx4_dev *dev, struct mlx4_mtt *mtt,
- 		       struct mlx4_buf *buf);
++	struct fib6_rule *rule6 = (struct fib6_rule *)rule;
++	struct net *net = rule->fr_net;
+ 	int err = -EINVAL;
+-	struct net *net = sock_net(skb->sk);
+-	struct fib6_rule *rule6 = (struct fib6_rule *) rule;
  
--int mlx4_db_alloc(struct mlx4_dev *dev, struct mlx4_db *db, int order);
-+int mlx4_db_alloc(struct mlx4_dev *dev, struct mlx4_db *db, unsigned int order);
- void mlx4_db_free(struct mlx4_dev *dev, struct mlx4_db *db);
- 
- int mlx4_alloc_hwq_res(struct mlx4_dev *dev, struct mlx4_hwq_resources *wqres,
+ 	if (rule->action == FR_ACT_TO_TBL && !rule->l3mdev) {
+ 		if (rule->table == RT6_TABLE_UNSPEC) {
 -- 
 2.39.5
 
