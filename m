@@ -1,127 +1,117 @@
-Return-Path: <netdev+bounces-187695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE5FBAA8F02
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 11:10:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 665E4AA8F00
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 11:10:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 836D11897803
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 09:11:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6EA83B009C
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 09:10:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 917061F4261;
-	Mon,  5 May 2025 09:10:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 846E51F4161;
+	Mon,  5 May 2025 09:10:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S6yuBXwh"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="CKRL1TwN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f193.google.com (mail-pl1-f193.google.com [209.85.214.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050151F3D20;
-	Mon,  5 May 2025 09:10:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD9011A5BAE;
+	Mon,  5 May 2025 09:10:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746436253; cv=none; b=LqJmdlDmK7fMKL9KiAFUSkALiFfu2wI6ppk5YUnFB//qfXg7VgfllCEAgx5Fgl5iVcG+5xHtCTtqjD3VTcTqXSDRWS8xGhj9vRUepDT46WkE6DO5EJUOfdUY+6pYQVJjWfjZf74pCvUFUs1wQRMwmixJXqYYPOWS73Er4SJ2RTg=
+	t=1746436234; cv=none; b=lHo+U/wAQM0bQP03c473Z9KQLISmXLiXlsc+46Z8pPh0Q1zZtEBwIo79iZON2Uh6FGTupTJZM4CSy4iJIF5L/EdYCcv3hA9UpW7nqBYq2jxJz+RhavInKPXk9xMGcy8G/4hqhuJIHQ0E6ZxKfN2mBAwmPcMqZtupkh/NB1XJF8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746436253; c=relaxed/simple;
-	bh=W1UhMgLjVd2n2XGiQWxnLIrYjuUTOOTZ7SjWfHY102Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HtnHVEC9ucf2v5gBNy4LERUHcx2rkiBit2LuQzxEh9DgcRwtpSlpAIRMJRHOW7o3fzVQ1jZdugGFAOBiccn6lGrDKfJ/S/Mz8+5QCp9K71UODIe3lqrjrBxQ6wGUZjSBMRtQNJD/kRNWPQeXmZQWxRVRKFe7N7GGOHTNV0uC6Ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S6yuBXwh; arc=none smtp.client-ip=209.85.214.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f193.google.com with SMTP id d9443c01a7336-22423adf751so47127495ad.2;
-        Mon, 05 May 2025 02:10:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746436251; x=1747041051; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=E/zvdg2/U/i/qCcOe+f7vAEo8dPot4Sa76Am+x0kALM=;
-        b=S6yuBXwht2gLJOl1zmis/Ukdeg/HniBoa0QTe9NFEvpq4ffa53yHWTc9IgEYSzfP8B
-         npSU4aRqzXop+D3OnxJR74GHOWXmEdwn3vGdf/MrGcXnuyXaZ6OJRArFUYUSJ1C/yMEP
-         nIqY43LMqqooyIr8pn2T126EUenJ5OitEnjXyiUpQvqYD32LNMUWARJCCrnupH/4u0aB
-         913LNb9g25pCxEyzqDkft9wx+GKXq2j06WO6luoxZ3iGuYqfPSQ5QSp+Q28UygeJgNks
-         JdyUpeOL2fMaVf2xGy5H91KBzew76wvq+U58eoEk8Y0TC75L9XwbHEGETSCGegwSOgm8
-         NKCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746436251; x=1747041051;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=E/zvdg2/U/i/qCcOe+f7vAEo8dPot4Sa76Am+x0kALM=;
-        b=slyTKTvBje3rLtDN8r5KytXUptCq/zck+Z+wz5T9apJuh/7EUm5h9Cwl5yU7u07lcL
-         rsTTmwO+z5d8qt9rlHBzJtVK83zKg2iIbZfK3qiiRSZfuUYQvIOv4hsLFz7xsf0f+2j0
-         /KOQwISlyyh+Zu+Ep9pRqAtif5PsW1AfPs+p3fm5+E5OnvRS/klmPDzius52kNb+FEsr
-         NMOuszFi0cKbB0L3CyLa+SWDkvU8HgnwQ3XGSBQTxotW66Mi/l3eJvjVIcC7llb2SN4g
-         5ghOYE2x/y8ptePZlOql2vISLhSKwogTKWm/CHBTE3hfsF3R+Elc33uht5mUoRHDw1BG
-         tF6w==
-X-Forwarded-Encrypted: i=1; AJvYcCViPR/iCklktso6QnCRr/qe1T7zc5Zp1XhmD8spX/m84aRPwO7xd0Sq8IlHq2gMbvCwSMSWBa1HFnYhusQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDPXgwzRHoAUiT0uQ3ifnTTo03wMz8g9d8CvCoc3RM0QWn+ocT
-	8NXC/pyoakUtkSzo5Ob4fxHkw9u2HItVH5nj6vHdFwtvJOuvw5Yy
-X-Gm-Gg: ASbGncuj7SoPcfmEUT1aKzAItPAY7X0HCdlU278IkjplCZVX/hJSjlf/x3sqHm+11Ac
-	S4gLhGVTbPow41fLlX+WIs0Bb+2NLOT8b0TJI1l8/PdVHAA1nMBa5roRAXGIw772uSXZhe7GabJ
-	iaaqs0ZCdjKizy5qyu2hpg6KA26AZ077yHfPpTXtogk1lbv0H0NuhXVcm69umaxvVycgwBnWpxu
-	HfEICsMxASqTIFqEsx+RjAkOsgRcpZcio0aMQ0WvAURs+1+UhCuz3jpDyJAtle6eEB57S3rIMDt
-	RPKiztyXnk3kuw4TqUPkAjzh8SdNQF65KSZrsxrkPzn5UQ2Qp87gn86q/ig=
-X-Google-Smtp-Source: AGHT+IHLbxeGLjT/TswtMt+x7j48HKYYWzeEqiEchK77MOzKnnrmbYjxUgmkxglRUnq2YBocQ1/WiA==
-X-Received: by 2002:a17:903:3c25:b0:22c:3609:97ed with SMTP id d9443c01a7336-22e1031f6femr176430255ad.30.1746436251199;
-        Mon, 05 May 2025 02:10:51 -0700 (PDT)
-Received: from sid-Inspiron-15-3525.. ([106.222.229.19])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74059020fe7sm6435377b3a.102.2025.05.05.02.10.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 May 2025 02:10:50 -0700 (PDT)
-From: Siddarth G <siddarthsgml@gmail.com>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org,
-	Siddarth G <siddarthsgml@gmail.com>
-Subject: [PATCH] fddi/skfp: fix null pointer dereference in smt.c
-Date: Mon,  5 May 2025 14:40:25 +0530
-Message-ID: <20250505091025.27368-1-siddarthsgml@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1746436234; c=relaxed/simple;
+	bh=BsoJw9Awkc2b9z0Ir3SPQ6bfTit5OupPAahv1L/C5n8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=KGFgJl+5DsA6iC0A7bvzW8s7Izin5QwIL+MfUAMP1lZ0tgfowr+0vAEsAI60qTezEXIM0yzDL6dZ8YSnA2AhsH8wF5zSPArKxAYn/8WlbAdkqS9TfXJWWx5E3oB2HaiW7sj1EPk/pJfUGaqzUbqo4M0Bqgsy2kfznmv5xrXhaQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=CKRL1TwN; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=DSB+wJ+TDPRmWBcqAGxu93uKfUHoTJ506dWsYvX2S+c=;
+	t=1746436232; x=1747645832; b=CKRL1TwNfwmtV7wPYtYvEuP5uoxa953jgbv8EqAlsnP8aWh
+	4AVFY/wtnzohLiCJRvQLXApMRICgDOjXgTNQ2ny34fq6PsgTNX9ZW5+k3b9Px2fIdO3cNwFgS4HSD
+	pt9frtt5oxIE5xv9mt1KW9+K/KMEfMWJOLifrh63uOBVmO73YUkpttr3ynOvUGam7VIdWM7o5qS1v
+	/YGC1p4L5ulTqLq5xFsyKOmQFWODr/C+UpoBHpWE3y5LqPPudb9+rmZfaEbYBNXAAuRipXdqO058j
+	pb7vdkj1FMOOQ3cW7Tp2r2xVNzcyE0m1HbOWTcaKBDWpwYcSnlVvaR6sJz6IqCbg==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.1)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1uBrqG-000000046Hp-2D0t;
+	Mon, 05 May 2025 11:10:28 +0200
+Message-ID: <004030652d592b379e730be2f0344bebc4a03475.camel@sipsolutions.net>
+Subject: Re: [PATCH net-next v5 10/10] netlink: specs: wireless: add a spec
+ for nl80211
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,
+ linux-wireless@vger.kernel.org, donald.hunter@redhat.com
+Date: Mon, 05 May 2025 11:10:27 +0200
+In-Reply-To: <20250503130739.1c94d433@kernel.org>
+References: <20250211120127.84858-1-donald.hunter@gmail.com>
+		<20250211120127.84858-11-donald.hunter@gmail.com>
+	 <20250503130739.1c94d433@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-malware-bazaar: not-scanned
 
-In smt_string_swap(), when a closing bracket ']' is encountered
-before any opening bracket '[' open_paren would be NULL,
-and assigning it to format would lead to a null pointer being
-dereferenced in the format++ statement.
+On Sat, 2025-05-03 at 13:07 -0700, Jakub Kicinski wrote:
+> Looks like we have 3 structs in the Netlink spec:
+>  - ieee80211-ht-cap
+>  - ieee80211-mcs-info
+>  - ieee80211-vht-mcs-info
+> which are defined in include/linux/ieee80211.h rather than the uAPI,
+> but we do use them in Netlink attrs. I'm guessing these come from=20
+> the IEEE spec so there is no ambiguity?
 
-Add a check to verify open_paren is non-NULL before assigning
-it to format
+Yes. In some of these cases userspace has different definitions that
+match the same bits, but might have e.g. __le32 vs. u8 for some fields
+and then just has a different number of fields. For HT it looks pretty
+similar though.
 
-Fixes: CID 100271 (Coverity Scan)
+Certainly there are many more in this area that could have a similar
+situation. There are also new ones where there's maybe not a good struct
+representation at all, unless you care only about special cases (which
+may well be appropriate for some tools, but not for the API.)
 
-Signed-off-by: Siddarth G <siddarthsgml@gmail.com>
----
- drivers/net/fddi/skfp/smt.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> I'm trying to figure out what to do with them in the C codegen
+> for YNL. Normally we assume all structs used by the spec are defined
+> in the headers. We can add an annotation to render the definition
+> in user space code, but I wonder if this omission is really intentional?
+> Wouldn't it be generally useful to user space to expose the types=20
+> in uAPI?
 
-diff --git a/drivers/net/fddi/skfp/smt.c b/drivers/net/fddi/skfp/smt.c
-index dd15af4e98c2..174f279b89ac 100644
---- a/drivers/net/fddi/skfp/smt.c
-+++ b/drivers/net/fddi/skfp/smt.c
-@@ -1857,7 +1857,8 @@ static void smt_string_swap(char *data, const char *format, int len)
- 			open_paren = format ;
- 			break ;
- 		case ']' :
--			format = open_paren ;
-+			if (open_paren)
-+				format = open_paren ;
- 			break ;
- 		case '1' :
- 		case '2' :
--- 
-2.43.0
+We never even conceptually exposed these in the original nl80211.h, that
+just literally said it's the HT capability element, without caring how
+you arrived at the bytes representing it. We did define the length for
+the policy check, but I guess in some way even that isn't needed.
 
+I'm not really sure it really is all that useful given that different
+tools care about different things and restrictions (endian, etc.).
+
+I also don't know if we'd really want the kernel to become the canonical
+definition of structures used for elements defined in the spec., but
+then is it restricted to those that need to be in the userspace API?
+That would also feel a bit odd?
+
+So not sure. I'd almost prefer to just remove the struct annotation from
+the spec here.
+
+johannes
 
