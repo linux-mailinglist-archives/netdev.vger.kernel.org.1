@@ -1,277 +1,203 @@
-Return-Path: <netdev+bounces-187682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FDBDAA8DD2
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 10:05:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C86CAA8E40
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 10:29:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6080C3A957A
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 08:05:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 312B4188D8D8
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 08:29:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 626E01A2393;
-	Mon,  5 May 2025 08:05:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5E571F3FC3;
+	Mon,  5 May 2025 08:28:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="icdt4AeV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G5C6l1JJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F66C1E48A;
-	Mon,  5 May 2025 08:05:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E5B1D63CF
+	for <netdev@vger.kernel.org>; Mon,  5 May 2025 08:28:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746432352; cv=none; b=R12zB/kST2EZ8vUWZK7QW7/xEzMCUenORFE9n8Sivqcc/Q5ISp3askF+HwoPlWjsCbjpMf121ZUUPWAOSBX1I0XMCi/YOnF0PEl5n/08iIiFfrT77odHZJ7Gt8KqoULoOmSOVfJH8NOgcV6dJuP5sCymUfStlq99UrI4jcZJFRc=
+	t=1746433735; cv=none; b=e6A9NKlnr6XU8bIVabj+Qz2clS4Pf5oKowcUL3Jz2I0LISS4zQUfF4JEPQYeybz5oxQw1ijiHp1xHCB2i5f5V/if+x1ndNtq2+GPPBHIgggfBGl99+PveMTkUgjWG9DHt9xzL0pQJ5B//PPGuAI70j0pQYnW7yjZlQAoN05zZ8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746432352; c=relaxed/simple;
-	bh=sEn0JbLJ+2KtLbxcEixQL7BULeNTdU1w4BNv+zrfAC8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=tigdb62GrS5JK6GegQ3piYNGZ1E7Cb3l3b47ieT7brQlGhbgIKQByt3M0S3FkNxKKZIpaRqfa2Ws4Do0rrVnb5VLlPui417c0JeBazkuwNsHlhb979ugQ+jaUDEyM3Y7eT9BubX8mgfmPjGSjfuNIQvn/wfVh9ex6T6sDh+3lpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=icdt4AeV; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746432347; x=1777968347;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=sEn0JbLJ+2KtLbxcEixQL7BULeNTdU1w4BNv+zrfAC8=;
-  b=icdt4AeVIYp9k2OmheG5IHiVmo0dFfPg1Z8N5/LQHT8Mj/1p4Vx6tIGU
-   8S7YhjaR2Xwv+EGlarchQwz5W6euzJ/j11THNp3J1olLg7ll6OBObMkg3
-   z09rWz9YGSuIm5o5JJ+zFI9rso+HkzlMFKtJv1mmFTFYYctMzJGlwwvgv
-   IV2TTAqDYHe59DbGrB40BMg1jt3SdP3FGRP6xmQ3WDm+5wn+uy6UkI0fM
-   K303whK/rfXTgxfkwHY4kYhI2dQi4DxFaCNBD72wybOuS+ik1G5eEoBcj
-   GTXne1AvRrSW351QvJn0hZ8m/532UHunyUUCvhdx/lgx9nmWkZCdqvJiH
-   w==;
-X-CSE-ConnectionGUID: kKeEGmyAR0OeMSNznpfonA==
-X-CSE-MsgGUID: uL8mDdTtRQu3/1bCpjrDow==
-X-IronPort-AV: E=McAfee;i="6700,10204,11423"; a="65433511"
-X-IronPort-AV: E=Sophos;i="6.15,262,1739865600"; 
-   d="scan'208";a="65433511"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2025 01:05:46 -0700
-X-CSE-ConnectionGUID: WVpB8LTlQ5Gp6D46hzAfvw==
-X-CSE-MsgGUID: ZyvzMFgARIqh2D8utixdPQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,262,1739865600"; 
-   d="scan'208";a="140172578"
-Received: from slindbla-desk.ger.corp.intel.com (HELO localhost) ([10.245.246.232])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2025 01:05:38 -0700
-From: Jani Nikula <jani.nikula@linux.intel.com>
-To: Jeff Layton <jlayton@kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Maarten
- Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard
- <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David
- Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Joonas
- Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi
- <rodrigo.vivi@intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Qasim Ijaz <qasdev00@gmail.com>,
- Nathan Chancellor <nathan@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, Jeff
- Layton <jlayton@kernel.org>
-Subject: Re: [PATCH v6 06/10] ref_tracker: automatically register a file in
- debugfs for a ref_tracker_dir
-In-Reply-To: <20250430-reftrack-dbgfs-v6-6-867c29aff03a@kernel.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-References: <20250430-reftrack-dbgfs-v6-0-867c29aff03a@kernel.org>
- <20250430-reftrack-dbgfs-v6-6-867c29aff03a@kernel.org>
-Date: Mon, 05 May 2025 11:05:35 +0300
-Message-ID: <87frhjwkhc.fsf@intel.com>
+	s=arc-20240116; t=1746433735; c=relaxed/simple;
+	bh=XX2GLy7M69SyjpKH6D50B0FbBqeW874P3U/byTPKH4c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GO6gl+J/1NjiGt2CSr009Rnqvau0wMcZ3rpPmBsz31z/0yiR/5QUY+lYcfABWtYxV3V9ctE6a38T5eEguSJxnAOHGK2AETUL/fRwwzFaZ5sUPSeRLvmNd75k8Cv1EPwiZuAguZ+XKTCf0kUd5UZ5/+3BX33VeSlPgwjgV5a9O5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G5C6l1JJ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746433732;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YcdgmM9hhmqmoQj3mRT3moQ2aAyMiniR8OXULWzEh0U=;
+	b=G5C6l1JJK8nnDhwFRSDxqJlU4DI+ZUO4IBFi8G31xigJe6TMZ6BGMJysXLtqwEkJF1tIhC
+	qSSBlab98wOJqZzURpiqwAm8d0iZp80qE0KOVWzCBrGaGVI23p+vsUhvhXiPebDQGvJi8W
+	d3aWoRiz4Zwx5Z27vd3Vn1Jlo7BdhT4=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-643-Uxouk0GhMlyAPv00Ej16lw-1; Mon, 05 May 2025 04:28:51 -0400
+X-MC-Unique: Uxouk0GhMlyAPv00Ej16lw-1
+X-Mimecast-MFC-AGG-ID: Uxouk0GhMlyAPv00Ej16lw_1746433730
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43cf5196c25so22143125e9.0
+        for <netdev@vger.kernel.org>; Mon, 05 May 2025 01:28:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746433730; x=1747038530;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YcdgmM9hhmqmoQj3mRT3moQ2aAyMiniR8OXULWzEh0U=;
+        b=NhnGaMOEfvxbG0p5rSKwuyo/uIyhL8O+PnWQruNDaAvdPe1UYE9LS1A2aZDW53b6aL
+         1LDV3ij85rYuL5Yh/y1rW5jOaiGYDICkzl4uSve1D1Bu2Vv2G4I52UD4nHUZj42qeyDo
+         Xf2L7KmI1Ilsqiyx0f1CPAQLjJUiyX3ju1rDl2uoh2jxOmi3t2pVKzYL4iD/+YrRu/Gi
+         rsT/c7aB/CgNHrrCJHL1zflRnUGT44/CryxL+90DnauXJtG5qhojcnoQwr1DGfgWBRRA
+         hQbGGZukeA4U49LovA4evXiWWzwOL6582RZZFC3iRhKJiWOnibSv0zs/qIGQ5IDJmuXT
+         Onmw==
+X-Forwarded-Encrypted: i=1; AJvYcCUpXv1og0fpA5We9Ku19beH5wPVGofXIqGgkcUJnGwTLypRG8GiKTN4Ej6QZUVp5wJ9+xRU99k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxm0KRbHlXLf0KL/Ug5O63mnZi+VtDVOubdbBn63klW67bpBO5i
+	wcUwHqM4Ld2mnf223LgYhLPnP1jYh56fnAykwvxVrkxFpSxcqK8RdVgDALEKUVAfOMxH0LbpszW
+	u5qbaeZo9NJuoKPfGGEj64MT9+dhfXOuZaTIOwRnDNSEjKyLmxSCkk1BmodEU545PPPM=
+X-Gm-Gg: ASbGncthsqeYBFEURMOJcsTX7zFxjvKIt8Dk80Oc/ZzWSHY+ya64yWb070s8MuBsVZK
+	ydZG1LLjveeyWyFJtCZP9E40Zv1+oozlZj8IIphh58oHyDHB7RThUo0+JE5MhbsmzeWX7ePU/ag
+	qGdcs9/SYxe2HjB6AemBRUGrKnx6J68RYg9ruASPSVr/DJhYN/8NQL/TnlUG8CvJ9GkuLThk17z
+	zrRkxZ91k4A93e1Gfz1NvwlfIlWMJX9cqR7xEOdw9UgMu+wOymKDWKbi0SuSgcJFP0NXhO0JzeG
+	SbQRjLANXFq/JEJ03w72j7g/8NreLJuxH9AMj83vYyaudwD+UCToOyZfqxk=
+X-Received: by 2002:a05:6000:1ac9:b0:3a0:7a8f:fc73 with SMTP id ffacd0b85a97d-3a09fd72e95mr4933793f8f.14.1746433729937;
+        Mon, 05 May 2025 01:28:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFEpnrS8LLunlYEmjzbbhBhPi8LfSfQDUYsRi9armU69qn7iXQkq+5O8/A0fV+sLFEgLylDeg==
+X-Received: by 2002:a05:6000:1ac9:b0:3a0:7a8f:fc73 with SMTP id ffacd0b85a97d-3a09fd72e95mr4933772f8f.14.1746433729475;
+        Mon, 05 May 2025 01:28:49 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2706:e010:b099:aac6:4e70:6198? ([2a0d:3344:2706:e010:b099:aac6:4e70:6198])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a099ae0cafsm9755381f8f.19.2025.05.05.01.28.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 May 2025 01:28:49 -0700 (PDT)
+Message-ID: <835b43b9-b9c4-4f09-9ce3-9157e1d9fea6@redhat.com>
+Date: Mon, 5 May 2025 10:28:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 02/15] net: homa: create homa_wire.h
+To: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org
+Cc: edumazet@google.com, horms@kernel.org, kuba@kernel.org
+References: <20250502233729.64220-1-ouster@cs.stanford.edu>
+ <20250502233729.64220-3-ouster@cs.stanford.edu>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250502233729.64220-3-ouster@cs.stanford.edu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, 30 Apr 2025, Jeff Layton <jlayton@kernel.org> wrote:
-> Currently, there is no convenient way to see the info that the
-> ref_tracking infrastructure collects. Attempt to create a file in
-> debugfs when called from ref_tracker_dir_init().
->
-> The file is given the name "class@%px", as having the unmodified address
-> is helpful for debugging. This should be safe since this directory is only
-> accessible by root
->
-> If debugfs file creation fails, a pr_warn will be isssued.
->
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> ---
->  include/linux/ref_tracker.h | 14 +++++++++
->  lib/ref_tracker.c           | 73 +++++++++++++++++++++++++++++++++++++++++++--
->  2 files changed, 85 insertions(+), 2 deletions(-)
->
-> diff --git a/include/linux/ref_tracker.h b/include/linux/ref_tracker.h
-> index 2adae128d4b5e45f156af4775a1d184bb596fa91..c6e65d7ef4d4fc74c60fcabd19166c131d4173e2 100644
-> --- a/include/linux/ref_tracker.h
-> +++ b/include/linux/ref_tracker.h
-> @@ -5,6 +5,7 @@
->  #include <linux/types.h>
->  #include <linux/spinlock.h>
->  #include <linux/stackdepot.h>
-> +#include <linux/seq_file.h>
+On 5/3/25 1:37 AM, John Ousterhout wrote:
+> diff --git a/net/homa/homa_wire.h b/net/homa/homa_wire.h
+> new file mode 100644
+> index 000000000000..47693244c3ec
+> --- /dev/null
+> +++ b/net/homa/homa_wire.h
 
-Nothing here requires seq_file.h as far as I can tell. Please avoid
-superfluous header dependencies.
+I'm wondering why you keep the wire-struct definition outside the uAPI -
+the opposite of what other protocols do.
 
-BR,
-Jani.
+> @@ -0,0 +1,362 @@
+> +/* SPDX-License-Identifier: BSD-2-Clause */
+> +
+> +/* This file defines the on-the-wire format of Homa packets. */
+> +
+> +#ifndef _HOMA_WIRE_H
+> +#define _HOMA_WIRE_H
+> +
+> +#include <linux/skbuff.h>
+> +
+> +/* Defines the possible types of Homa packets.
+> + *
+> + * See the xxx_header structs below for more information about each type.
+> + */
+> +enum homa_packet_type {
+> +	DATA               = 0x10,
+> +	RESEND             = 0x12,
+> +	RPC_UNKNOWN        = 0x13,
+> +	BUSY               = 0x14,
+> +	NEED_ACK           = 0x17,
+> +	ACK                = 0x18,
+> +	BOGUS              = 0x19,      /* Used only in unit tests. */
+> +	/* If you add a new type here, you must also do the following:
+> +	 * 1. Change BOGUS so it is the highest opcode
 
->  
->  struct ref_tracker;
->  
-> @@ -18,12 +19,17 @@ struct ref_tracker_dir {
->  	struct list_head	list; /* List of active trackers */
->  	struct list_head	quarantine; /* List of dead trackers */
->  	const char		*class; /* object classname */
-> +#ifdef CONFIG_DEBUG_FS
-> +	struct dentry		*dentry;
-> +#endif
->  	char			name[32];
->  #endif
->  };
->  
->  #ifdef CONFIG_REF_TRACKER
->  
-> +void ref_tracker_dir_debugfs(struct ref_tracker_dir *dir);
-> +
->  static inline void ref_tracker_dir_init(struct ref_tracker_dir *dir,
->  					unsigned int quarantine_count,
->  					const char *class,
-> @@ -37,7 +43,11 @@ static inline void ref_tracker_dir_init(struct ref_tracker_dir *dir,
->  	refcount_set(&dir->untracked, 1);
->  	refcount_set(&dir->no_tracker, 1);
->  	dir->class = class;
-> +#ifdef CONFIG_DEBUG_FS
-> +	dir->dentry = NULL;
-> +#endif
->  	strscpy(dir->name, name, sizeof(dir->name));
-> +	ref_tracker_dir_debugfs(dir);
->  	stack_depot_init();
->  }
->  
-> @@ -66,6 +76,10 @@ static inline void ref_tracker_dir_init(struct ref_tracker_dir *dir,
->  {
->  }
->  
-> +static inline void ref_tracker_dir_debugfs(struct ref_tracker_dir *dir)
-> +{
-> +}
-> +
->  static inline void ref_tracker_dir_exit(struct ref_tracker_dir *dir)
->  {
->  }
-> diff --git a/lib/ref_tracker.c b/lib/ref_tracker.c
-> index b69c11e83c18c19aaa2dc23f802291d4a7e82a66..3ee4fd0f33407881cfa140dcb7d8b40e3c2722de 100644
-> --- a/lib/ref_tracker.c
-> +++ b/lib/ref_tracker.c
-> @@ -31,6 +31,14 @@ struct ref_tracker_dir_stats {
->  	} stacks[];
->  };
->  
-> +#ifdef CONFIG_DEBUG_FS
-> +static void ref_tracker_debugfs_remove(struct ref_tracker_dir *dir);
-> +#else
-> +static inline void ref_tracker_debugfs_remove(struct ref_tracker_dir *dir)
-> +{
-> +}
-> +#endif
-> +
->  static struct ref_tracker_dir_stats *
->  ref_tracker_get_stats(struct ref_tracker_dir *dir, unsigned int limit)
->  {
-> @@ -197,6 +205,7 @@ void ref_tracker_dir_exit(struct ref_tracker_dir *dir)
->  	bool leak = false;
->  
->  	dir->dead = true;
-> +	ref_tracker_debugfs_remove(dir);
->  	spin_lock_irqsave(&dir->lock, flags);
->  	list_for_each_entry_safe(tracker, n, &dir->quarantine, head) {
->  		list_del(&tracker->head);
-> @@ -313,8 +322,7 @@ EXPORT_SYMBOL_GPL(ref_tracker_free);
->  #ifdef CONFIG_DEBUG_FS
->  #include <linux/debugfs.h>
->  
-> -static __maybe_unused int
-> -ref_tracker_dir_seq_print(struct ref_tracker_dir *dir, struct seq_file *seq)
-> +static int ref_tracker_dir_seq_print(struct ref_tracker_dir *dir, struct seq_file *seq)
->  {
->  	struct ostream os = { .func = pr_ostream_seq,
->  			      .prefix = "",
-> @@ -328,6 +336,67 @@ ref_tracker_dir_seq_print(struct ref_tracker_dir *dir, struct seq_file *seq)
->  	return os.used;
->  }
->  
-> +static int ref_tracker_debugfs_show(struct seq_file *f, void *v)
-> +{
-> +	struct ref_tracker_dir *dir = f->private;
-> +
-> +	return ref_tracker_dir_seq_print(dir, f);
-> +}
-> +
-> +static int ref_tracker_debugfs_open(struct inode *inode, struct file *filp)
-> +{
-> +	struct ref_tracker_dir *dir = inode->i_private;
-> +
-> +	return single_open(filp, ref_tracker_debugfs_show, dir);
-> +}
-> +
-> +static const struct file_operations ref_tracker_debugfs_fops = {
-> +	.owner		= THIS_MODULE,
-> +	.open		= ref_tracker_debugfs_open,
-> +	.read		= seq_read,
-> +	.llseek		= seq_lseek,
-> +	.release	= single_release,
+If you instead define 'MAX' value, the required update policy would be
+self-explained and you will not need to expose tests details.
+
+> +	 * 2. Add support for the new opcode in homa_print_packet,
+> +	 *    homa_print_packet_short, homa_symbol_for_type, and mock_skb_new.
+> +	 * 3. Add the header length to header_lengths in homa_plumbing.c.
+> +	 */
 > +};
 > +
-> +/**
-> + * ref_tracker_dir_debugfs - create debugfs file for ref_tracker_dir
-> + * @dir: ref_tracker_dir to be associated with debugfs file
-> + *
-> + * In most cases, a debugfs file will be created automatically for every
-> + * ref_tracker_dir. If the object was created before debugfs is brought up
-> + * then that may fail. In those cases, it is safe to call this at a later
-> + * time to create the file.
-> + */
-> +void ref_tracker_dir_debugfs(struct ref_tracker_dir *dir)
-> +{
-> +	char name[NAME_MAX + 1];
-> +	int ret;
+> +/** define HOMA_IPV6_HEADER_LENGTH - Size of IP header (V6). */
+> +#define HOMA_IPV6_HEADER_LENGTH 40
 > +
-> +	/* No-op if already created */
-> +	if (!IS_ERR_OR_NULL(dir->dentry))
-> +		return;
-> +
-> +	ret = snprintf(name, sizeof(name), "%s@%px", dir->class, dir);
-> +	name[sizeof(name) - 1] = '\0';
-> +
-> +	if (ret < sizeof(name))
-> +		dir->dentry = debugfs_create_file(name, S_IFREG | 0400,
-> +						  ref_tracker_debug_dir, dir,
-> +						  &ref_tracker_debugfs_fops);
-> +	else
-> +		dir->dentry = ERR_PTR(-ENAMETOOLONG);
-> +
-> +	if (IS_ERR(dir->dentry))
-> +		pr_warn("ref_tracker: unable to create debugfs file for %s: %pe\n",
-> +			name, dir->dentry);
-> +}
-> +EXPORT_SYMBOL(ref_tracker_dir_debugfs);
-> +
-> +static void ref_tracker_debugfs_remove(struct ref_tracker_dir *dir)
-> +{
-> +	debugfs_remove(dir->dentry);
-> +}
-> +
->  static int __init ref_tracker_debugfs_init(void)
->  {
->  	ref_tracker_debug_dir = debugfs_create_dir("ref_tracker", NULL);
+> +/** define HOMA_IPV4_HEADER_LENGTH - Size of IP header (V4). */
+> +#define HOMA_IPV4_HEADER_LENGTH 20
 
--- 
-Jani Nikula, Intel
+I suspect you will be better off using sizeof(<relevant struct>). Making
+protocol-specific definition for common/global constants is somewhat
+confusing and unexpected
+
+> +
+> +/**
+> + * define HOMA_SKB_EXTRA - How many bytes of additional space to allow at the
+> + * beginning of each sk_buff, before the IP header. This includes room for a
+> + * VLAN header and also includes some extra space, "just to be safe" (not
+> + * really sure if this is needed).
+> + */
+> +#define HOMA_SKB_EXTRA 40
+
+You could use:
+
+#define MAX_HOME_HEADER MAX_TCP_HEADER
+
+to leverage a consolidated value covering most use-cases and kernel configs.
+
+> +
+> +/**
+> + * define HOMA_ETH_OVERHEAD - Number of bytes per Ethernet packet for Ethernet
+> + * header, CRC, preamble, and inter-packet gap.
+> + */
+> +#define HOMA_ETH_OVERHEAD 42
+
+It's not clear why the protocol should be interested in MAC-specific
+details. What if the the MAC is not ethernet?
+
+[...]
+> +	/**
+> +	 * @type: Homa packet type (one of the values of the homa_packet_type
+> +	 * enum). Corresponds to the low-order byte of the ack in TCP.
+> +	 */
+> +	__u8 type;
+
+If you keep this outside uAPI you should use 'u8'
+
+[...]
+> +_Static_assert(sizeof(struct homa_data_hdr) <= HOMA_MAX_HEADER,
+> +	       "homa_data_hdr too large for HOMA_MAX_HEADER; must adjust HOMA_MAX_HEADER");
+> +_Static_assert(sizeof(struct homa_data_hdr) >= HOMA_MIN_PKT_LENGTH,
+> +	       "homa_data_hdr too small: Homa doesn't currently have code to pad data packets");
+> +_Static_assert(((sizeof(struct homa_data_hdr) - sizeof(struct homa_seg_hdr)) &
+> +		0x3) == 0,
+> +	       " homa_data_hdr length not a multiple of 4 bytes (required for TCP/TSO compatibility");
+
+Please use BUILD_BUG_ON() in a .c file instead. Many other cases below.
+
+/P
+
 
