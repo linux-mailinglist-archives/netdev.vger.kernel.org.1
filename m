@@ -1,145 +1,187 @@
-Return-Path: <netdev+bounces-188062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5EABAAB12F
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:55:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D16C9AAB5F5
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 07:39:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2EE427B5617
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:50:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B87457A1B76
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:37:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FCCA2FFBCF;
-	Tue,  6 May 2025 00:15:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98AF8322AAF;
+	Tue,  6 May 2025 00:23:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="YSzbt0dU";
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="b/kkMkyi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OIr6N989"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0668830C1FD;
-	Mon,  5 May 2025 23:42:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 816C736DD4A;
+	Mon,  5 May 2025 22:46:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746488534; cv=none; b=h7AHHU7DgqlJOgyVWdMXwnbZ2O9qesps9RW2WfnUtiFIo5xLLTRXhf5LVP+dJmZBcFfNNfoZaXlSmGlETPXQ4bnFEU61rklRLt/Eh9xqIPoR9WPk8Rwq+Rjv6R7loMkRlO5mqsjp+9olFgu2n3nWF5a1CehTu6k77pGIiDu8apM=
+	t=1746485201; cv=none; b=atQE+BRLNi6BsNUYUtJcK6XxFMVkapWqsSWqtpHnyXkl9M/ESrpQnXp0f1vTWqeCagjwJrAzKqAbpblnFsIt2RlwSZ0E4XFJO/fVpBFZiE9ljQnIa9q+KGFjyUGJSvXQOnkurxLQplQjawe75PQ0zeiH50YL3jRrdnPtxse3fuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746488534; c=relaxed/simple;
-	bh=YBKt0MNfFUPhTQ5pPrpKdZS2i7hIYYUL2Qo+eR0JkRI=;
+	s=arc-20240116; t=1746485201; c=relaxed/simple;
+	bh=yuXGiFMgftvcB/kFfE2afuFLtedFU/p8/E+RKzxHC2E=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ewV87jk96yi3B6ECroZV/53CDcp7R9wZ+BqSbXqlg7mXQFyggDv1T7MXsSVixdO/bTVYXUiS6FgR1F1eUeFvegn9h4flktgsel6q1lwAPetL2V6Y8mu4xSeODfXbXd9FcOeB9IaoBuhnsPHYjKq+IDvDkUNMzNofjupIdsBrxH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=YSzbt0dU; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=b/kkMkyi; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: by mail.netfilter.org (Postfix, from userid 109)
-	id 7276760654; Tue,  6 May 2025 01:42:10 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1746488530;
-	bh=s6cSq5pM3sPILW7lGQC/3IynDjBjciqctcy7gTDh4Cw=;
+	 MIME-Version; b=LUykHMS3UTKjEnyEXOC9tryB/xgNBpccw9za06STduk5kJAKuhQpwY8zWBzDEWfeMMcEvfueSQAsi8DCemgf81N2MxfFVPniw3CH2HmCaBRuth0rJQH5QaYWlX+x93VMMNZe8J/o2bTNQAnsI6G96LJOnwBOMhmvyW62W2PKaBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OIr6N989; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B8AFC4CEEF;
+	Mon,  5 May 2025 22:46:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746485201;
+	bh=yuXGiFMgftvcB/kFfE2afuFLtedFU/p8/E+RKzxHC2E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YSzbt0dUKvuyVTK0z8N7yvLYu/hLzlggnNInz+YmuWRTxmbJQn9bbO6KOyCNzqz9z
-	 +TDQMNWTxrfb2/PCl5UWGI/r+9yythKYI7OdOoZOu2W3Hb7F6tghiUKKMS/zQuP3QP
-	 P160WOkNSjSeTducBs2/BbxVEl8Uy0OpT0/1JZIgUq5ZkXwf2eYCebYTSEa09lPCX+
-	 wXUkjSnXGSwl71Rb4HcyhUCSUlSNA7+FPsJ3Z4ZTdG+xwE7uZHg2NiVJJMs8HnBtzk
-	 T9dm/YWX0WGoTzH/+tMTjXPc/EpX8Z93yPm6Ps6o1oUnp9KKvDthUGUA56I0gMaUpl
-	 k4Nn0kDbCpVbQ==
-X-Spam-Level: 
-Received: from localhost.localdomain (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id 2D3E660654;
-	Tue,  6 May 2025 01:42:01 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1746488521;
-	bh=s6cSq5pM3sPILW7lGQC/3IynDjBjciqctcy7gTDh4Cw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=b/kkMkyi51zZ+u57DP0wueNCwgR2RtSg9Jk9Senvtdk/7G/SBUa347h8fzcnSA6o8
-	 yP/7vdMqqgtDPm2YaieTjefFAklqZyNmj2RbhIiaiaMqrx+MrbCgNUmTLBIYSBVIrR
-	 lGqpS2spLXTMP5WSMwsZPjyp6IXK/2Xp27t4KTtHwgT3ONwukdD60m+pyev5Hoefns
-	 21jnjRJi2sBaqPcXi+lPDBbMBecUwNIkUSAaeX7mtd9SBm1MpH03ef2TAR8+nfg7ii
-	 XXQ2eD76XnbxYAm0WyBHhAdgtRInciUmNPxDX8C6WlqlAMinI3NW5zUw2ib2SUFK2Y
-	 2xv9x2mnt9t2Q==
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
+	b=OIr6N989MIzujB2dKup1LZBgszKzoi1mP+YtMYgY9GTHFUbHqEvnhAUKdpwtQL3ZC
+	 JZQCT8jzrKDvHTrdhICzZNUBdAxqRjabzaHFcQ+Rybo+zQX6OhwAg9C9F9Q0Uvr+rv
+	 p/aQYnVeFqcK7sSsttUD63RT3qF6sVymV8nuEYmXix/7F4bnxzYnrPvV4FJxHiyEEq
+	 HOX6yShL4my9BmhW4xA2QJ3/hxhAO5DMw94jPK/9TNDdMl987427lgZfzTwbtoBpwB
+	 L9fyE625ymhTfiTsS4XQVP01hslKQA+drCnxheyAx/chA7HM/ztGq4+JfbmY72UHPi
+	 tmGTVWSeUjXCw==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Andrei Botila <andrei.botila@oss.nxp.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	hkallweit1@gmail.com,
+	davem@davemloft.net,
 	edumazet@google.com,
-	fw@strlen.de,
-	horms@kernel.org
-Subject: [PATCH nf-next 7/7] selftests: netfilter: nft_fib.sh: check lo packets bypass fib lookup
-Date: Tue,  6 May 2025 01:41:51 +0200
-Message-Id: <20250505234151.228057-8-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20250505234151.228057-1-pablo@netfilter.org>
-References: <20250505234151.228057-1-pablo@netfilter.org>
+	pabeni@redhat.com,
+	sd@queasysnail.net,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.12 207/486] net: phy: nxp-c45-tja11xx: add match_phy_device to TJA1103/TJA1104
+Date: Mon,  5 May 2025 18:34:43 -0400
+Message-Id: <20250505223922.2682012-207-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250505223922.2682012-1-sashal@kernel.org>
+References: <20250505223922.2682012-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.12.26
 Content-Transfer-Encoding: 8bit
 
-From: Florian Westphal <fw@strlen.de>
+From: Andrei Botila <andrei.botila@oss.nxp.com>
 
-With reverted fix:
-PASS: fib expression did not cause unwanted packet drops
-[   37.285169] ns1-KK76Kt nft_rpfilter: IN=lo OUT= MAC=00:00:00:00:00:00:00:00:00:00:00:00:08:00 SRC=127.0.0.1 DST=127.0.0.1 LEN=84 TOS=0x00 PREC=0x00 TTL=64 ID=32287 DF PROTO=ICMP TYPE=8 CODE=0 ID=1818 SEQ=1
-FAIL: rpfilter did drop packets
-FAIL: ns1-KK76Kt cannot reach 127.0.0.1, ret 0
+[ Upstream commit a06a868a0cd96bc51401cdea897313a3f6ad01a0 ]
 
-Check for this.
+Add .match_phy_device for the existing TJAs to differentiate between
+TJA1103 and TJA1104.
+TJA1103 and TJA1104 share the same PHY_ID but TJA1104 has MACsec
+capabilities while TJA1103 doesn't.
 
-Link: https://lore.kernel.org/netfilter/20250422114352.GA2092@breakpoint.cc/
-Signed-off-by: Florian Westphal <fw@strlen.de>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+Signed-off-by: Andrei Botila <andrei.botila@oss.nxp.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Link: https://patch.msgid.link/20250228154320.2979000-2-andrei.botila@oss.nxp.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- .../selftests/net/netfilter/nft_fib.sh        | 23 +++++++++++++++++++
- 1 file changed, 23 insertions(+)
+ drivers/net/phy/nxp-c45-tja11xx.c | 54 +++++++++++++++++++++++++++++--
+ 1 file changed, 52 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/net/netfilter/nft_fib.sh b/tools/testing/selftests/net/netfilter/nft_fib.sh
-index ce1451c275fd..ea47dd246a08 100755
---- a/tools/testing/selftests/net/netfilter/nft_fib.sh
-+++ b/tools/testing/selftests/net/netfilter/nft_fib.sh
-@@ -45,6 +45,19 @@ table inet filter {
- EOF
+diff --git a/drivers/net/phy/nxp-c45-tja11xx.c b/drivers/net/phy/nxp-c45-tja11xx.c
+index 9788b820c6be7..99a5eee77bec1 100644
+--- a/drivers/net/phy/nxp-c45-tja11xx.c
++++ b/drivers/net/phy/nxp-c45-tja11xx.c
+@@ -1,6 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0
+ /* NXP C45 PHY driver
+- * Copyright 2021-2023 NXP
++ * Copyright 2021-2025 NXP
+  * Author: Radu Pirea <radu-nicolae.pirea@oss.nxp.com>
+  */
+ 
+@@ -18,6 +18,8 @@
+ 
+ #include "nxp-c45-tja11xx.h"
+ 
++#define PHY_ID_MASK			GENMASK(31, 4)
++/* Same id: TJA1103, TJA1104 */
+ #define PHY_ID_TJA_1103			0x001BB010
+ #define PHY_ID_TJA_1120			0x001BB031
+ 
+@@ -1930,6 +1932,30 @@ static void tja1120_nmi_handler(struct phy_device *phydev,
+ 	}
  }
  
-+load_input_ruleset() {
-+	local netns=$1
++static int nxp_c45_macsec_ability(struct phy_device *phydev)
++{
++	bool macsec_ability;
++	int phy_abilities;
 +
-+ip netns exec "$netns" nft -f /dev/stdin <<EOF
-+table inet filter {
-+	chain input {
-+		type filter hook input priority 0; policy accept;
-+	        fib saddr . iif oif missing counter log prefix "$netns nft_rpfilter: " drop
-+	}
++	phy_abilities = phy_read_mmd(phydev, MDIO_MMD_VEND1,
++				     VEND1_PORT_ABILITIES);
++	macsec_ability = !!(phy_abilities & MACSEC_ABILITY);
++
++	return macsec_ability;
 +}
-+EOF
++
++static int tja1103_match_phy_device(struct phy_device *phydev)
++{
++	return phy_id_compare(phydev->phy_id, PHY_ID_TJA_1103, PHY_ID_MASK) &&
++	       !nxp_c45_macsec_ability(phydev);
 +}
 +
- load_pbr_ruleset() {
- 	local netns=$1
- 
-@@ -165,6 +178,16 @@ check_drops || exit 1
- 
- echo "PASS: fib expression did not cause unwanted packet drops"
- 
-+load_input_ruleset "$ns1"
++static int tja1104_match_phy_device(struct phy_device *phydev)
++{
++	return phy_id_compare(phydev->phy_id, PHY_ID_TJA_1103, PHY_ID_MASK) &&
++	       nxp_c45_macsec_ability(phydev);
++}
 +
-+test_ping 127.0.0.1 ::1 || exit 1
-+check_drops || exit 1
-+
-+test_ping 10.0.1.99 dead:1::99 || exit 1
-+check_drops || exit 1
-+
-+echo "PASS: fib expression did not discard loopback packets"
-+
- ip netns exec "$nsrouter" nft flush table inet filter
+ static const struct nxp_c45_regmap tja1120_regmap = {
+ 	.vend1_ptp_clk_period	= 0x1020,
+ 	.vend1_event_msg_filt	= 0x9010,
+@@ -2000,7 +2026,6 @@ static const struct nxp_c45_phy_data tja1120_phy_data = {
  
- ip -net "$ns1" route del default
+ static struct phy_driver nxp_c45_driver[] = {
+ 	{
+-		PHY_ID_MATCH_MODEL(PHY_ID_TJA_1103),
+ 		.name			= "NXP C45 TJA1103",
+ 		.get_features		= nxp_c45_get_features,
+ 		.driver_data		= &tja1103_phy_data,
+@@ -2022,6 +2047,31 @@ static struct phy_driver nxp_c45_driver[] = {
+ 		.get_sqi		= nxp_c45_get_sqi,
+ 		.get_sqi_max		= nxp_c45_get_sqi_max,
+ 		.remove			= nxp_c45_remove,
++		.match_phy_device	= tja1103_match_phy_device,
++	},
++	{
++		.name			= "NXP C45 TJA1104",
++		.get_features		= nxp_c45_get_features,
++		.driver_data		= &tja1103_phy_data,
++		.probe			= nxp_c45_probe,
++		.soft_reset		= nxp_c45_soft_reset,
++		.config_aneg		= genphy_c45_config_aneg,
++		.config_init		= nxp_c45_config_init,
++		.config_intr		= tja1103_config_intr,
++		.handle_interrupt	= nxp_c45_handle_interrupt,
++		.read_status		= genphy_c45_read_status,
++		.suspend		= genphy_c45_pma_suspend,
++		.resume			= genphy_c45_pma_resume,
++		.get_sset_count		= nxp_c45_get_sset_count,
++		.get_strings		= nxp_c45_get_strings,
++		.get_stats		= nxp_c45_get_stats,
++		.cable_test_start	= nxp_c45_cable_test_start,
++		.cable_test_get_status	= nxp_c45_cable_test_get_status,
++		.set_loopback		= genphy_c45_loopback,
++		.get_sqi		= nxp_c45_get_sqi,
++		.get_sqi_max		= nxp_c45_get_sqi_max,
++		.remove			= nxp_c45_remove,
++		.match_phy_device	= tja1104_match_phy_device,
+ 	},
+ 	{
+ 		PHY_ID_MATCH_MODEL(PHY_ID_TJA_1120),
 -- 
-2.30.2
+2.39.5
 
 
