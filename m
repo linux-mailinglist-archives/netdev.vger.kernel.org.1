@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-187990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60903AAAEE2
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:06:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 52693AAAEE6
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:07:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7B2E3BCC96
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:01:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDC763BB0F0
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:01:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F37F12EE4A3;
-	Mon,  5 May 2025 23:09:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 149A027933E;
+	Mon,  5 May 2025 23:09:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HvvwB5tv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DDp6phfc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFD343867C5;
-	Mon,  5 May 2025 23:00:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39AB52D269E;
+	Mon,  5 May 2025 23:00:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746486041; cv=none; b=pSS1n0UcQUZ0ajOkTO4oOmTfKoj8rjP3VPv7++7p44STWItfviPgiunTWR4UQva03xCF5JHaCmdCkfxpAa+9W6Elfk2mjaCWljHPYEljha0ZRhCeM6oHgM2qZqw/hV7+fsEhxCzDm+zy2ARjI59occCuz5JJDD+f9gfMDxTq144=
+	t=1746486049; cv=none; b=sSNCd5qT1e3dqmi7nLWzDfqG3PrSSWLJiz6I+KnjM7lu/vU5zx+qKOe10hUWnLUx6sOD0AFZ0edd8/89Ew9/gDhIS0m4JWiHq151+KgDQWGzZ/QbAdtSDmE1G6pXrlZmZoKxYgTIUcCLv3I8RA+QE/nCiwhj3eCo1A0Ff6F4xs8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746486041; c=relaxed/simple;
-	bh=WcgOYCt13//Gm6w2smiHXIK2M2CVcg9ou1RV1ABdh/k=;
+	s=arc-20240116; t=1746486049; c=relaxed/simple;
+	bh=aiC4SBjgelIG567vwbV5hUes4Lo+EROcUkIHcu2EjXc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=p97pH4DhAm2jOz4a7uyLMdOAJX/5cZggya8eYNX0+xF0hLHIaFSIR1xa9/kqCUa3+j/vq2kmaaTjZjc4FTMjj9Akhkef7AS9QbCcqXwByuRYUxOZpMxhthK2ZWZQyHpAKVerI0HtkjrDusEy9wzyRPSZo5PvNqXFElw0sN4vZ/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HvvwB5tv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18DA6C4CEED;
-	Mon,  5 May 2025 23:00:40 +0000 (UTC)
+	 MIME-Version; b=D+r/zsIYDqHMtyMh2VHOb3fMP3PvOGGQefoRcvKLue8MJJhLd2TQi1GjrLJP3zjBQYb2njZCA7r3Gc00YXGvmr05/P4HoqaEblVZdZNKm0Or/mghP/NbZntUhX167b6WYgm4mjt9pq+kgSlaA3bVRNmyDtY8o/dACjdYzZCTVdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DDp6phfc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B1E3C4CEEE;
+	Mon,  5 May 2025 23:00:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746486041;
-	bh=WcgOYCt13//Gm6w2smiHXIK2M2CVcg9ou1RV1ABdh/k=;
+	s=k20201202; t=1746486048;
+	bh=aiC4SBjgelIG567vwbV5hUes4Lo+EROcUkIHcu2EjXc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=HvvwB5tveUgcUu6S+zNYAVlXtlK3WHbK2uqYpmDvEwICEnkU0Ihz7Qg3tl1+SaHoh
-	 9cCj8u1LvF7SM5yuVmNQOZZrI+s8s1uJQVHHmJ9CZSJBFYgOLGRIlsngqmjOkQvSf5
-	 cB72M28SF2EXOgA1/+NXknEZ4MJ3tBSFnZtoq2ZIVB/PLq7nVc5iyCuz5bqQ2W4G+i
-	 ikazhtro9wHaJ3yJYLtr5etCQZN3vx+32Bmvi4sJC2UQq8iHeuj7WF/qFFmqOzCXUA
-	 Old525+mJZT+2JSVALO4EYvzfaJ7rWtVV9EDUqooEt9AYIwBoAIQKW4VUhGxG0rT5Y
-	 rRnJBvIVwcmyA==
+	b=DDp6phfcXfRUzfGtzgZC/YvrP3c3lucfHrRsTn3BxVdxsA/Cr1ot7fhOx6pjE6Eqx
+	 4YaK7/76wCRzesPQHPewYYoUqCBPN6GubwR/19xLX2IGuCgaKIhhV3r2xluSJ28Dea
+	 r0taqPY6Jfeh+ORsJffwnaYKY8s54PC/gF0eBPraI30PO17Yf+xFvuePr7Ulp9xcch
+	 oszE8T+JdRrK7xIxJ4zuXcoRFD6KAMfAr11Ydv9W04116CQyaGs2cr1vh7C8RmiA50
+	 3n+L/IFTGL83PmjahMhXEG6BmXjb5Kg79iS083M7zc7JN7FYs8/N9vpRKsYRBvetcj
+	 Vbqe96vrzVRlQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Peter Seiderer <ps.report@gmx.net>,
-	Simon Horman <horms@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Eric Dumazet <edumazet@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
+	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 123/294] net: pktgen: fix mpls maximum labels list parsing
-Date: Mon,  5 May 2025 18:53:43 -0400
-Message-Id: <20250505225634.2688578-123-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 126/294] ipv4: fib: Move fib_valid_key_len() to rtm_to_fib_config().
+Date: Mon,  5 May 2025 18:53:46 -0400
+Message-Id: <20250505225634.2688578-126-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505225634.2688578-1-sashal@kernel.org>
 References: <20250505225634.2688578-1-sashal@kernel.org>
@@ -69,50 +69,126 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.89
 Content-Transfer-Encoding: 8bit
 
-From: Peter Seiderer <ps.report@gmx.net>
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-[ Upstream commit 2b15a0693f70d1e8119743ee89edbfb1271b3ea8 ]
+[ Upstream commit 254ba7e6032d3fc738050d500b0c1d8197af90ca ]
 
-Fix mpls maximum labels list parsing up to MAX_MPLS_LABELS entries (instead
-of up to MAX_MPLS_LABELS - 1).
+fib_valid_key_len() is called in the beginning of fib_table_insert()
+or fib_table_delete() to check if the prefix length is valid.
 
-Addresses the following:
+fib_table_insert() and fib_table_delete() are called from 3 paths
 
-	$ echo "mpls 00000f00,00000f01,00000f02,00000f03,00000f04,00000f05,00000f06,00000f07,00000f08,00000f09,00000f0a,00000f0b,00000f0c,00000f0d,00000f0e,00000f0f" > /proc/net/pktgen/lo\@0
-	-bash: echo: write error: Argument list too long
+  - ip_rt_ioctl()
+  - inet_rtm_newroute() / inet_rtm_delroute()
+  - fib_magic()
 
-Signed-off-by: Peter Seiderer <ps.report@gmx.net>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+In the first ioctl() path, rtentry_to_fib_config() checks the prefix
+length with bad_mask().  Also, fib_magic() always passes the correct
+prefix: 32 or ifa->ifa_prefixlen, which is already validated.
+
+Let's move fib_valid_key_len() to the rtnetlink path, rtm_to_fib_config().
+
+While at it, 2 direct returns in rtm_to_fib_config() are changed to
+goto to match other places in the same function
+
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: David Ahern <dsahern@kernel.org>
+Link: https://patch.msgid.link/20250228042328.96624-12-kuniyu@amazon.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/core/pktgen.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ net/ipv4/fib_frontend.c | 18 ++++++++++++++++--
+ net/ipv4/fib_trie.c     | 22 ----------------------
+ 2 files changed, 16 insertions(+), 24 deletions(-)
 
-diff --git a/net/core/pktgen.c b/net/core/pktgen.c
-index 359e24c3f22ca..1decd6300f34c 100644
---- a/net/core/pktgen.c
-+++ b/net/core/pktgen.c
-@@ -897,6 +897,10 @@ static ssize_t get_labels(const char __user *buffer, struct pktgen_dev *pkt_dev)
- 	pkt_dev->nr_labels = 0;
- 	do {
- 		__u32 tmp;
-+
-+		if (n >= MAX_MPLS_LABELS)
-+			return -E2BIG;
-+
- 		len = hex32_arg(&buffer[i], 8, &tmp);
- 		if (len <= 0)
- 			return len;
-@@ -908,8 +912,6 @@ static ssize_t get_labels(const char __user *buffer, struct pktgen_dev *pkt_dev)
- 			return -EFAULT;
- 		i++;
- 		n++;
--		if (n >= MAX_MPLS_LABELS)
--			return -E2BIG;
- 	} while (c == ',');
+diff --git a/net/ipv4/fib_frontend.c b/net/ipv4/fib_frontend.c
+index 90ce87ffed461..7993ff46de23c 100644
+--- a/net/ipv4/fib_frontend.c
++++ b/net/ipv4/fib_frontend.c
+@@ -829,19 +829,33 @@ static int rtm_to_fib_config(struct net *net, struct sk_buff *skb,
+ 		}
+ 	}
  
- 	pkt_dev->nr_labels = n;
++	if (cfg->fc_dst_len > 32) {
++		NL_SET_ERR_MSG(extack, "Invalid prefix length");
++		err = -EINVAL;
++		goto errout;
++	}
++
++	if (cfg->fc_dst_len < 32 && (ntohl(cfg->fc_dst) << cfg->fc_dst_len)) {
++		NL_SET_ERR_MSG(extack, "Invalid prefix for given prefix length");
++		err = -EINVAL;
++		goto errout;
++	}
++
+ 	if (cfg->fc_nh_id) {
+ 		if (cfg->fc_oif || cfg->fc_gw_family ||
+ 		    cfg->fc_encap || cfg->fc_mp) {
+ 			NL_SET_ERR_MSG(extack,
+ 				       "Nexthop specification and nexthop id are mutually exclusive");
+-			return -EINVAL;
++			err = -EINVAL;
++			goto errout;
+ 		}
+ 	}
+ 
+ 	if (has_gw && has_via) {
+ 		NL_SET_ERR_MSG(extack,
+ 			       "Nexthop configuration can not contain both GATEWAY and VIA");
+-		return -EINVAL;
++		err = -EINVAL;
++		goto errout;
+ 	}
+ 
+ 	if (!cfg->fc_table)
+diff --git a/net/ipv4/fib_trie.c b/net/ipv4/fib_trie.c
+index 77b97c48da5ea..fa54b36b241ac 100644
+--- a/net/ipv4/fib_trie.c
++++ b/net/ipv4/fib_trie.c
+@@ -1192,22 +1192,6 @@ static int fib_insert_alias(struct trie *t, struct key_vector *tp,
+ 	return 0;
+ }
+ 
+-static bool fib_valid_key_len(u32 key, u8 plen, struct netlink_ext_ack *extack)
+-{
+-	if (plen > KEYLENGTH) {
+-		NL_SET_ERR_MSG(extack, "Invalid prefix length");
+-		return false;
+-	}
+-
+-	if ((plen < KEYLENGTH) && (key << plen)) {
+-		NL_SET_ERR_MSG(extack,
+-			       "Invalid prefix for given prefix length");
+-		return false;
+-	}
+-
+-	return true;
+-}
+-
+ static void fib_remove_alias(struct trie *t, struct key_vector *tp,
+ 			     struct key_vector *l, struct fib_alias *old);
+ 
+@@ -1228,9 +1212,6 @@ int fib_table_insert(struct net *net, struct fib_table *tb,
+ 
+ 	key = ntohl(cfg->fc_dst);
+ 
+-	if (!fib_valid_key_len(key, plen, extack))
+-		return -EINVAL;
+-
+ 	pr_debug("Insert table=%u %08x/%d\n", tb->tb_id, key, plen);
+ 
+ 	fi = fib_create_info(cfg, extack);
+@@ -1723,9 +1704,6 @@ int fib_table_delete(struct net *net, struct fib_table *tb,
+ 
+ 	key = ntohl(cfg->fc_dst);
+ 
+-	if (!fib_valid_key_len(key, plen, extack))
+-		return -EINVAL;
+-
+ 	l = fib_find_node(t, &tp, key);
+ 	if (!l)
+ 		return -ESRCH;
 -- 
 2.39.5
 
