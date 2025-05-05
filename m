@@ -1,62 +1,66 @@
-Return-Path: <netdev+bounces-187871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2177CAA9FD3
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 00:28:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CD61AAA120
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 00:44:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FFD6165B29
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 22:28:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0894F1889F51
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 22:43:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B59328A1F6;
-	Mon,  5 May 2025 22:16:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D053727E1C5;
+	Mon,  5 May 2025 22:19:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UEYWQ2bH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JstQqrvw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF5228A1F2;
-	Mon,  5 May 2025 22:15:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4C5C270ED2;
+	Mon,  5 May 2025 22:19:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746483360; cv=none; b=WL1knAUlLkiOqBI3SYNHaGbEP2rgSVpWeKncj2fhuDEOWDUpceZ8K7W414PlIMfhqhlx9aBGmJeCLgo6WFd4j5JaCX6jeoS+GNAvhbo4BUS7JSKCusqK/jX7VQow87wGnZ8Zm98FhZM/iNQuSZ0rWSZKaiNr7ZMS3/ruVpGoprM=
+	t=1746483562; cv=none; b=CCMJygdX41X2R+tLxd8Of3r5tO8SYc7CMZjlI6+zVpv9VrvY3OnFAotY4WWlJxNOmIlYQVEydX/oi+TPNn0+1TQUJiM4qBKhr9ZbFx0M8S7hQpSMYBH+Qq54RSLnwvRkb81SncwmMsHX7EfnHQHqVSNNB6kjGxcSIp86ltqclMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746483360; c=relaxed/simple;
-	bh=fl21SqllGa3GmW7YFUTP0an3YYMZ++AKiz3F0pLgxhM=;
+	s=arc-20240116; t=1746483562; c=relaxed/simple;
+	bh=gJOWUeD1S/7jV0r5kWY4nHy8F7NqqrZHwZ4AE47cmc4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZwGviw/lPD+ygmwIYx3AWydp+rTO8pE6/2CkzXhbiIuXaySuD3XOeT4qUkCEku3irvuPvgZLx+3bofnRDjlO0IrADgf22gaeyXRHa1ty/x1mGXTCQn8u3dMMakoCZgBOhFw5MURhSnHS77YizXs/JiD1Zs761YCuTUhZMxTBDPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UEYWQ2bH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92C58C4CEF1;
-	Mon,  5 May 2025 22:15:58 +0000 (UTC)
+	 MIME-Version; b=Yt2h66MiNyAjH8LaYSAsyPcjSOXoZlDh1PrcQF9KKTujNJ50ZXb/MMQv6UiQMvhY6ElYumgkguAHHW6ruUk3qsCGnexMlMfchyWY7P5qzW52mcC2CiSyWdiue7J7WEkuZhlY9Ci8lJz7JVreOBo2X+G3wbAWUa3BHZTA58O0qB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JstQqrvw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BF76C4CEED;
+	Mon,  5 May 2025 22:19:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746483359;
-	bh=fl21SqllGa3GmW7YFUTP0an3YYMZ++AKiz3F0pLgxhM=;
+	s=k20201202; t=1746483561;
+	bh=gJOWUeD1S/7jV0r5kWY4nHy8F7NqqrZHwZ4AE47cmc4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UEYWQ2bHILFwsS6s/2mam7abcjB4rxiF50uz9r91GJN+mXN1Yu6RO4KU2jGheIluM
-	 k8a5bI3qx9XNz4DDiJMFzUCrREYkt0VfcBGm75UyYGPdya3xp1Bui1T4s7HN0HxJ66
-	 E8D7Gyn4CyJJEepc3dSWepkJ2WLEpJNrAGfzhJR/nymV2Meukh3tRfK//S8gQNlx0U
-	 RPDcCK16GC6ToBDX2e8S62ho0RFLbtSNNBXLgRRhfbRA+d1mxuZYCZQ6DSmyfFBngo
-	 XdGTkDMeYP04X0vCFKlmYJFoU0d/Bt+5+IbikSYFfPQfeNKIoIKO3TtL15GPKGUGp/
-	 ucar+5Qbip80w==
+	b=JstQqrvw44sh9hYCVA2glV+oU4HqMrLxsoXiFuyyfLB8fnrWRbW+0u2mtyvhexcOW
+	 SvAfPhy8ezMFrRMR3KYj/W++RdtXn+qOEgALvXzFlebOJAhMnHix4HX4a3z53dEeQn
+	 3wg7YdZZe/rF7lVmegMuR8pwB8dsOy1in+jALg5R3jR5u5eFwOK5BlatmCDl7rJ58+
+	 mj/k1U/Fu4UwS9uyJuVnyWFEkqkZ1lagFtQjhmdMGD3Hk0buQjGrKbCrrkfiWc/EUE
+	 Tfdfdqfg6a+7kppEyvEfD45hepQV2Vi5KspCm3WhanXsKwpQVppSB84NSS1RxfzEDE
+	 0gJbOvSUF9MvQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: ChunHao Lin <hau@realtek.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Carolina Jubran <cjubran@nvidia.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	nic_swsd@realtek.com,
+	saeedm@nvidia.com,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.14 053/642] r8169: disable RTL8126 ZRX-DC timeout
-Date: Mon,  5 May 2025 18:04:29 -0400
-Message-Id: <20250505221419.2672473-53-sashal@kernel.org>
+	kuba@kernel.org,
+	cratiu@nvidia.com,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.14 115/642] net/mlx5: Preserve rate settings when creating a rate node
+Date: Mon,  5 May 2025 18:05:31 -0400
+Message-Id: <20250505221419.2672473-115-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505221419.2672473-1-sashal@kernel.org>
 References: <20250505221419.2672473-1-sashal@kernel.org>
@@ -71,68 +75,73 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.14.5
 Content-Transfer-Encoding: 8bit
 
-From: ChunHao Lin <hau@realtek.com>
+From: Carolina Jubran <cjubran@nvidia.com>
 
-[ Upstream commit b48688ea3c9ac8d5d910c6e91fb7f80d846581f0 ]
+[ Upstream commit f88c349c75e3784a3f5463f5b403ff28dd823782 ]
 
-Disable it due to it dose not meet ZRX-DC specification. If it is enabled,
-device will exit L1 substate every 100ms. Disable it for saving more power
-in L1 substate.
+Modify `esw_qos_create_node_sched_elem()` to receive max_rate and
+bw_share values while maintaining the previous configuration.
 
-Signed-off-by: ChunHao Lin <hau@realtek.com>
-Reviewed-by: Heiner Kallweit <hkallweit1@gmail.com>
-Link: https://patch.msgid.link/20250318083721.4127-3-hau@realtek.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+This change is essential for the upcoming patch that will modify rate
+nodes and requires the existing settings to be preserved unless
+explicitly changed.
+
+Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
+Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+Link: https://patch.msgid.link/1741642016-44918-4-git-send-email-tariqt@nvidia.com
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/realtek/r8169_main.c | 27 +++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 5a5eba49c6515..4ead966727734 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -2850,6 +2850,32 @@ static u32 rtl_csi_read(struct rtl8169_private *tp, int addr)
- 		RTL_R32(tp, CSIDR) : ~0;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
+index 823c1ba456cd1..803bacf2a95e6 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
+@@ -305,8 +305,9 @@ static int esw_qos_set_node_min_rate(struct mlx5_esw_sched_node *node,
+ 	return 0;
  }
  
-+static void rtl_disable_zrxdc_timeout(struct rtl8169_private *tp)
-+{
-+	struct pci_dev *pdev = tp->pci_dev;
-+	u32 csi;
-+	int rc;
-+	u8 val;
-+
-+#define RTL_GEN3_RELATED_OFF	0x0890
-+#define RTL_GEN3_ZRXDC_NONCOMPL	0x1
-+	if (pdev->cfg_size > RTL_GEN3_RELATED_OFF) {
-+		rc = pci_read_config_byte(pdev, RTL_GEN3_RELATED_OFF, &val);
-+		if (rc == PCIBIOS_SUCCESSFUL) {
-+			val &= ~RTL_GEN3_ZRXDC_NONCOMPL;
-+			rc = pci_write_config_byte(pdev, RTL_GEN3_RELATED_OFF,
-+						   val);
-+			if (rc == PCIBIOS_SUCCESSFUL)
-+				return;
-+		}
-+	}
-+
-+	netdev_notice_once(tp->dev,
-+		"No native access to PCI extended config space, falling back to CSI\n");
-+	csi = rtl_csi_read(tp, RTL_GEN3_RELATED_OFF);
-+	rtl_csi_write(tp, RTL_GEN3_RELATED_OFF, csi & ~RTL_GEN3_ZRXDC_NONCOMPL);
-+}
-+
- static void rtl_set_aspm_entry_latency(struct rtl8169_private *tp, u8 val)
+-static int esw_qos_create_node_sched_elem(struct mlx5_core_dev *dev, u32 parent_element_id,
+-					  u32 *tsar_ix)
++static int
++esw_qos_create_node_sched_elem(struct mlx5_core_dev *dev, u32 parent_element_id,
++			       u32 max_rate, u32 bw_share, u32 *tsar_ix)
  {
- 	struct pci_dev *pdev = tp->pci_dev;
-@@ -3822,6 +3848,7 @@ static void rtl_hw_start_8125d(struct rtl8169_private *tp)
+ 	u32 tsar_ctx[MLX5_ST_SZ_DW(scheduling_context)] = {};
+ 	void *attr;
+@@ -323,6 +324,8 @@ static int esw_qos_create_node_sched_elem(struct mlx5_core_dev *dev, u32 parent_
+ 		 SCHEDULING_CONTEXT_ELEMENT_TYPE_TSAR);
+ 	MLX5_SET(scheduling_context, tsar_ctx, parent_element_id,
+ 		 parent_element_id);
++	MLX5_SET(scheduling_context, tsar_ctx, max_average_bw, max_rate);
++	MLX5_SET(scheduling_context, tsar_ctx, bw_share, bw_share);
+ 	attr = MLX5_ADDR_OF(scheduling_context, tsar_ctx, element_attributes);
+ 	MLX5_SET(tsar_element, attr, tsar_type, TSAR_ELEMENT_TSAR_TYPE_DWRR);
  
- static void rtl_hw_start_8126a(struct rtl8169_private *tp)
- {
-+	rtl_disable_zrxdc_timeout(tp);
- 	rtl_set_def_aspm_entry_latency(tp);
- 	rtl_hw_start_8125_common(tp);
- }
+@@ -396,7 +399,8 @@ __esw_qos_create_vports_sched_node(struct mlx5_eswitch *esw, struct mlx5_esw_sch
+ 	u32 tsar_ix;
+ 	int err;
+ 
+-	err = esw_qos_create_node_sched_elem(esw->dev, esw->qos.root_tsar_ix, &tsar_ix);
++	err = esw_qos_create_node_sched_elem(esw->dev, esw->qos.root_tsar_ix, 0,
++					     0, &tsar_ix);
+ 	if (err) {
+ 		NL_SET_ERR_MSG_MOD(extack, "E-Switch create TSAR for node failed");
+ 		return ERR_PTR(err);
+@@ -463,7 +467,8 @@ static int esw_qos_create(struct mlx5_eswitch *esw, struct netlink_ext_ack *exta
+ 	if (!MLX5_CAP_GEN(dev, qos) || !MLX5_CAP_QOS(dev, esw_scheduling))
+ 		return -EOPNOTSUPP;
+ 
+-	err = esw_qos_create_node_sched_elem(esw->dev, 0, &esw->qos.root_tsar_ix);
++	err = esw_qos_create_node_sched_elem(esw->dev, 0, 0, 0,
++					     &esw->qos.root_tsar_ix);
+ 	if (err) {
+ 		esw_warn(dev, "E-Switch create root TSAR failed (%d)\n", err);
+ 		return err;
 -- 
 2.39.5
 
