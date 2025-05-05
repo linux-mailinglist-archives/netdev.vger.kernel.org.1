@@ -1,65 +1,68 @@
-Return-Path: <netdev+bounces-188158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24D4CAAB53B
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 07:24:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F25EAAB52D
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 07:23:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 427CE4A3CDB
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:20:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3110D7B98B8
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:20:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A93B6496E85;
-	Tue,  6 May 2025 00:45:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 808702F5FA5;
+	Tue,  6 May 2025 00:46:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W21STe2U"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K7W0THAs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD092DFA23;
-	Mon,  5 May 2025 23:17:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37EE2284B50;
+	Mon,  5 May 2025 23:17:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746487047; cv=none; b=ebOd/BAEPtFk5hAeBvx7YFm0hoNWvC2e6A3VPl7nRSItNyM5zbtPvknHUQu+xro6FLmJ98xvyk8iHm5xXCZlRRRQeHPW/jQm5AcvvDogwNHcLF4tVYZf63rLhfb8qzVcrOTkrBl3bAhwHTOOM6btkugTgyhc5DfW6KYRsjNPZCk=
+	t=1746487057; cv=none; b=A1CiFsZx2dKkU6I5NV4vtJwrwxeY7HCy/W99EMl3cQjvkdSaoGFDk50qB5sP4gWSkhuTHMGuiKs/T/XNkfVZfyfHo0tVV42QY6QgMDUhW4aekQPFmYNCQe4jhu6WYlxOh6bAz3VxKInvnZOdbm4U8VKSJwU8EKaUJaBhqCxd0VI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746487047; c=relaxed/simple;
-	bh=UXdsgPW4q/gYnzy2QjsqjqUASLdk6p45bA7QgTcgMmI=;
+	s=arc-20240116; t=1746487057; c=relaxed/simple;
+	bh=+jOy/rUkDGwAENDvYuJBQ7AgNkyldxwU7QFdHWuSleA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=jYuSrUF06+Zy0rgFDsTdqSYsvNhoZcMWAn9UjinRqUjJZIIgCc2CBnU5jwyoPIggdlvJXLUVBVnPGE6o0xzyOwEx5J6JaA51JStRRf6UxpimM1gSYkWLbJ11yCoigYL7hP67zSr5YeMBpGL1H4XDHBi7IQyPzB7c8c1hzEelUlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W21STe2U; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 419C7C4CEE4;
-	Mon,  5 May 2025 23:17:25 +0000 (UTC)
+	 MIME-Version; b=QtgRzUn9WoQrKZNT8NW9yXo+AfoeKiCMpDI5MfXsjMK+q9DZnLfDXjNe16us3JRBI1nbVOfA6hbQBN0amNQWsjGP5sn7KcJgO945x//LPHfhIp5vArqeYZh/z6S7hS+fu46yoq4ydDob49MkM5Fh8fD/ypqs1kf8vnAoXaQWEXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K7W0THAs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51085C4CEE4;
+	Mon,  5 May 2025 23:17:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746487046;
-	bh=UXdsgPW4q/gYnzy2QjsqjqUASLdk6p45bA7QgTcgMmI=;
+	s=k20201202; t=1746487057;
+	bh=+jOy/rUkDGwAENDvYuJBQ7AgNkyldxwU7QFdHWuSleA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=W21STe2UXIWAjNGuGZ+MC5Ubhw4e34QibuqWuLbJ3zygoIncVkXd4zyPSQysvB5wl
-	 ncOJSUBbonis7cxcFRFpTWAnmZ7hLaFndioxkxBrswipD05OsY80eU8ftOIE8gwXbf
-	 21l+Qpago1mn5bB/S9ukpYueWoXmZPqi7L73c7G/GRGLeMORjMDBfEitqclKZRyyxj
-	 12wGZiiQl63fCN3sHd7EzKK5eCyte2MAzmJaDTBDkCZLu51x9YLvswSN0PYfj98YNL
-	 awC0VUKitNRt93TkgqEHyTm1ztDqev03iU92e50fkun4kcntNLUNUnhkafd4cp59qh
-	 9H3br/yGA9Teg==
+	b=K7W0THAsIKgx4vW0UqGc2UzkhoGY5hGXKycEPjJn0fdj8U9ppHipIW0COT3ktIGUN
+	 jxpkeNFDh9JzSWEwEXGcbH/j5Ssoy25KFe5Enw9vVCZpAs7s4sRT1SrMiSsbLfAow8
+	 kMzyY5q+W9etZadtkAe96B8+25YjSPcvdWY7MJT4rpc5NsvXhLOVCUv28NcWcocrn8
+	 jQGaJr4vil7rhJXmXyZXkPqs3zsdSswuVuwl68X8uKMB+1pu8BSAlZgtuGnHrQ5cRP
+	 3aVldpf7j6wthyAVqaW7M4KUsL3RpIIffBG2w+Hc0hmkfv9JiPhpEBsAKkOukPJUlc
+	 qCYFAJA5GvQdw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: William Tu <witu@nvidia.com>,
-	Bodong Wang <bodong@nvidia.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+Cc: Aleksander Jan Bajkowski <olek2@wp.pl>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 125/153] net/mlx5e: reduce rep rxq depth to 256 for ECPF
-Date: Mon,  5 May 2025 19:12:52 -0400
-Message-Id: <20250505231320.2695319-125-sashal@kernel.org>
+	gregkh@linuxfoundation.org,
+	hayeswang@realtek.com,
+	horms@kernel.org,
+	dianders@chromium.org,
+	gmazyland@gmail.com,
+	phahn-oss@avm.de,
+	ste3ls@gmail.com,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.15 130/153] r8152: add vendor/device ID pair for Dell Alienware AW1022z
+Date: Mon,  5 May 2025 19:12:57 -0400
+Message-Id: <20250505231320.2695319-130-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505231320.2695319-1-sashal@kernel.org>
 References: <20250505231320.2695319-1-sashal@kernel.org>
@@ -74,73 +77,48 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.15.181
 Content-Transfer-Encoding: 8bit
 
-From: William Tu <witu@nvidia.com>
+From: Aleksander Jan Bajkowski <olek2@wp.pl>
 
-[ Upstream commit b9cc8f9d700867aaa77aedddfea85e53d5e5d584 ]
+[ Upstream commit 848b09d53d923b4caee5491f57a5c5b22d81febc ]
 
-By experiments, a single queue representor netdev consumes kernel
-memory around 2.8MB, and 1.8MB out of the 2.8MB is due to page
-pool for the RXQ. Scaling to a thousand representors consumes 2.8GB,
-which becomes a memory pressure issue for embedded devices such as
-BlueField-2 16GB / BlueField-3 32GB memory.
+The Dell AW1022z is an RTL8156B based 2.5G Ethernet controller.
 
-Since representor netdevs mostly handles miss traffic, and ideally,
-most of the traffic will be offloaded, reduce the default non-uplink
-rep netdev's RXQ default depth from 1024 to 256 if mdev is ecpf eswitch
-manager. This saves around 1MB of memory per regular RQ,
-(1024 - 256) * 2KB, allocated from page pool.
+Add the vendor and product ID values to the driver. This makes Ethernet
+work with the adapter.
 
-With rxq depth of 256, the netlink page pool tool reports
-$./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-	 --dump page-pool-get
- {'id': 277,
-  'ifindex': 9,
-  'inflight': 128,
-  'inflight-mem': 786432,
-  'napi-id': 775}]
-
-This is due to mtu 1500 + headroom consumes half pages, so 256 rxq
-entries consumes around 128 pages (thus create a page pool with
-size 128), shown above at inflight.
-
-Note that each netdev has multiple types of RQs, including
-Regular RQ, XSK, PTP, Drop, Trap RQ. Since non-uplink representor
-only supports regular rq, this patch only changes the regular RQ's
-default depth.
-
-Signed-off-by: William Tu <witu@nvidia.com>
-Reviewed-by: Bodong Wang <bodong@nvidia.com>
-Reviewed-by: Saeed Mahameed <saeedm@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Link: https://patch.msgid.link/20250209101716.112774-8-tariqt@nvidia.com
+Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+Link: https://patch.msgid.link/20250206224033.980115-1-olek2@wp.pl
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en_rep.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/net/usb/r8152.c   | 1 +
+ include/linux/usb/r8152.h | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-index 3c8bfedeafffd..8e44fa0d3f371 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-@@ -58,6 +58,7 @@
- #define MLX5E_REP_PARAMS_DEF_LOG_SQ_SIZE \
- 	max(0x7, MLX5E_PARAMS_MINIMUM_LOG_SQ_SIZE)
- #define MLX5E_REP_PARAMS_DEF_NUM_CHANNELS 1
-+#define MLX5E_REP_PARAMS_DEF_LOG_RQ_SIZE 0x8
+diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
+index abf4a488075ef..6cde3d262d415 100644
+--- a/drivers/net/usb/r8152.c
++++ b/drivers/net/usb/r8152.c
+@@ -9853,6 +9853,7 @@ static const struct usb_device_id rtl8152_table[] = {
+ 	{ USB_DEVICE(VENDOR_ID_NVIDIA,  0x09ff) },
+ 	{ USB_DEVICE(VENDOR_ID_TPLINK,  0x0601) },
+ 	{ USB_DEVICE(VENDOR_ID_DLINK,   0xb301) },
++	{ USB_DEVICE(VENDOR_ID_DELL,    0xb097) },
+ 	{ USB_DEVICE(VENDOR_ID_ASUS,    0x1976) },
+ 	{}
+ };
+diff --git a/include/linux/usb/r8152.h b/include/linux/usb/r8152.h
+index 33a4c146dc19c..2ca60828f28bb 100644
+--- a/include/linux/usb/r8152.h
++++ b/include/linux/usb/r8152.h
+@@ -30,6 +30,7 @@
+ #define VENDOR_ID_NVIDIA		0x0955
+ #define VENDOR_ID_TPLINK		0x2357
+ #define VENDOR_ID_DLINK			0x2001
++#define VENDOR_ID_DELL			0x413c
+ #define VENDOR_ID_ASUS			0x0b05
  
- static const char mlx5e_rep_driver_name[] = "mlx5e_rep";
- 
-@@ -615,6 +616,8 @@ static void mlx5e_build_rep_params(struct net_device *netdev)
- 
- 	/* RQ */
- 	mlx5e_build_rq_params(mdev, params);
-+	if (!mlx5e_is_uplink_rep(priv) && mlx5_core_is_ecpf(mdev))
-+		params->log_rq_mtu_frames = MLX5E_REP_PARAMS_DEF_LOG_RQ_SIZE;
- 
- 	/* CQ moderation params */
- 	params->rx_dim_enabled = MLX5_CAP_GEN(mdev, cq_moderation);
+ #if IS_REACHABLE(CONFIG_USB_RTL8152)
 -- 
 2.39.5
 
