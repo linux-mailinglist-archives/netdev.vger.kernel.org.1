@@ -1,185 +1,154 @@
-Return-Path: <netdev+bounces-187825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F214EAA9C6D
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 21:22:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 45432AA9C9F
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 21:27:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 348423AD899
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 19:22:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FC623A3D7A
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 19:27:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A488F2701AD;
-	Mon,  5 May 2025 19:22:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 624DF25D539;
+	Mon,  5 May 2025 19:27:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PKjissC1"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="QgMNsUXP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D90126FDB2
-	for <netdev@vger.kernel.org>; Mon,  5 May 2025 19:22:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF9817333F;
+	Mon,  5 May 2025 19:27:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746472929; cv=none; b=NnZe7iUIRUx9Pj/g0dXU+4mf9DX+E6HL1jFwlPhGX8TIB6ETGxNVErqOvh5bQYwicrKoLDFyQIJ0i/WqinAzepCu6hUvIiat3vSHi+UWSDglTIreEVV7q+26PnfBUD16MylgyOQEzzMtAYWSIrU6Dad+W3fqsQeDAWKF/BTC0nc=
+	t=1746473252; cv=none; b=b4gyNJUhJduCbkF8lgeVTa+zZGVmLAOp+zoga3kibvxjBtZXVaI6f8GGqdRr2bIF5kTXbn3kbRAoRrE0rckiz7uSMBjQc6oNQO9JspK8D4M35lpCOOlwp5MKF2cKJ3pe1iyXgRffbp1LfBXNeP6X61smH4fzdY37xOBfcZuvti8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746472929; c=relaxed/simple;
-	bh=gYD/Kzs6oTsv+0ZH4aOAnzhos7PNt9I66XbHWq8bNHk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ex4gtU5Mm3Tbl1O/4ZHuzpu+AFngwoqsomJ5S1TediYec21+csRxkWr2V0NK3mkNuoVd4LVoZOlMpDOA6x1Be8Jo+aNHzkltIgyWS52YMGBkB9tpTTH4TjjB27Xz48NzoU6bEfUM2D4uFq4/3lNJnrU4PwU4qAJf2pOfNDxG7IE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PKjissC1; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-22e1eafa891so32875ad.0
-        for <netdev@vger.kernel.org>; Mon, 05 May 2025 12:22:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746472926; x=1747077726; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=13EmT6a1TZnyupdlDEzlBX0OfGBAsXa0Pw9qfUJ6O8k=;
-        b=PKjissC1ASZ4Z423+/lTq3pVNF8JcFpAnJlQ0ZDptuCniIEzDk8TArLduucGcz+GuK
-         /Zb/tgBXkoM1M/ObO6sGId7VJfDmofAV5qmM1PAzlXw/DdTDAiVOVOS8+XwZHq9yYyTa
-         rTeJP8p9m2jVaTtgf/VdM4ynI/JoqDQS8TgTwMk5vwIaKparng0bPH6OL8h+0wUqSICP
-         XnIXslcW9uwQ/9sprUMD/2Ws4elqLUMmqtP7+SLN55l1wUaLn5TNgBbmT42bmapyV7nj
-         R0x0WFLzLPs8NvjwkGC8e6Adg4/kOnAoo/paiz4QxZQ+gBmxhUcn5p0HcOGDfHe1HUV2
-         VSfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746472926; x=1747077726;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=13EmT6a1TZnyupdlDEzlBX0OfGBAsXa0Pw9qfUJ6O8k=;
-        b=fIsGpspQV+e68rWnGSJuq4TJ9ec/ExDFJFztV7iOVSUBvvmajoLLqLyv3EA91eMCgp
-         1AaAYlL4ZaEiNqPDFSuEr7hmjA9ptyqFacBEm/INukidXsNgf2LF5T2qvsX7wJx08LTT
-         coUF3MGGI9NvakgCyx3NpnUOiH6rskpq8WttBq1aPTPHixDDNNSHwfwlGsASJfonDkdj
-         O6jasgced4LmIif2ArT1a+t7sn7ugslSImsTansrkNnw01YNtMtRehkIHP3YzUc6+8Po
-         seR4L0A35snOOGg/WdD/3YNTtfBvjGig0jPyt3Giogou5omiT8lyrNmYPaTuzT4HjcIb
-         SMGA==
-X-Gm-Message-State: AOJu0Yx+x6vX8eJywIDz8k84hWclcc0PQqhyD8tgxZfDI+mAKnKdlxsU
-	osiBzrPsZha41/42mcuOi0PHzmuOCxXM6QSHKRUNEwgmTUGMXP4wt3OyWr2+jrx/+TiAUjaEyHS
-	5Mn5UXzsXDy0cci/RuXJ3xrCGxyxU6JJLgqLG
-X-Gm-Gg: ASbGncsr7tpmT2GT2VEUIxBytMHREyuaAeFQKCmqrg+BMdyvv0ROCoXqD7D4Zb+m6Mu
-	LINrwaT1XltsylQEhyGZUqucirPtvC9RQNvtg8wsNno7VFuSUeKrDcqOIPia+hLLqdBaJCw4Zpj
-	m8tSbEkRpPaXy3sMNesPd7b5wXDaHlJkXPeZx5Pnz+DStY8hs6DgAU
-X-Google-Smtp-Source: AGHT+IH+1FHQJvKJ+5gk0ObZr0RxyrgBMmy3GsQ5pvSVSaH+9ABf1o8pwmLf6DaYpLoD5CckC/+0XsPmpQDgIq/k6Hw=
-X-Received: by 2002:a17:903:46cd:b0:223:37ec:63be with SMTP id
- d9443c01a7336-22e34dee32bmr522795ad.4.1746472926072; Mon, 05 May 2025
- 12:22:06 -0700 (PDT)
+	s=arc-20240116; t=1746473252; c=relaxed/simple;
+	bh=yE4K00cim4sjv2RnRcLDj9EJ+VBCvkau+NXqtQGE4to=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=owc4533ZU0RKa77AH/5Pe0zgFaFix04P9Jb0qAUVXabTLBQboFEKa4apgVFh4AxWVc/ByjZB4H/At4oDFwjjzuOj6mgEBTVd338/7vLdYM7R/wWntk1W7I5Ym88ay7214a9dxrpy/pYFGMOQ4bYx1X997VRCiEdNhsvtqCkhSXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=QgMNsUXP; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=hKochlIwHnCpW8MnNP8D8YL+YspnWH14oOiGbaOJ6Vg=; b=Qg
+	MNsUXPFv2p51/f9Vsv8mA3try/6PvDu0rDiMnH0O8/DyN0x30z27QL+H3hhHpLQBgI30HMSNCThSz
+	SEdyZAN6xe/lods7BJgawT4gsFpmsDOn/zM16pkzdKCGj0H7q4Zrv7zNFu0mDVbZ5VMEodKc8tjLB
+	uEOim51zxWp9IbU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uC1TA-00BdB7-N5; Mon, 05 May 2025 21:27:16 +0200
+Date: Mon, 5 May 2025 21:27:16 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Stefan Wahren <wahrenst@gmx.net>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next 4/5] net: vertexcom: mse102x: Return code for
+ mse102x_rx_pkt_spi
+Message-ID: <51cdf94b-6f97-421d-916c-aca5e7c34879@lunn.ch>
+References: <20250505142427.9601-1-wahrenst@gmx.net>
+ <20250505142427.9601-5-wahrenst@gmx.net>
+ <3b9d36a7-c2fd-4d37-ba33-fc13121d92e6@lunn.ch>
+ <c1fc1341-4490-4e22-a2ee-64bb67529660@gmx.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250429032645.363766-1-almasrymina@google.com>
- <20250429032645.363766-5-almasrymina@google.com> <53433089-7beb-46cf-ae8a-6c58cd909e31@redhat.com>
- <CAHS8izMefrkHf9WXerrOY4Wo8U2KmxSVkgY+4JB+6iDuoCZ3WQ@mail.gmail.com> <8cdf120d-a0f0-4dcc-a8f9-cea967ce6e7b@redhat.com>
-In-Reply-To: <8cdf120d-a0f0-4dcc-a8f9-cea967ce6e7b@redhat.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 5 May 2025 12:21:51 -0700
-X-Gm-Features: ATxdqUF0TufrZ5sNnCdYBkqjbvffoKrpOyGeuWbNVRLX_hL4oSnD4IZmYehVOSg
-Message-ID: <CAHS8izOVV-NviR-Ty=hDdg29OCpJCQwW_K7B+mg1X=r3N7Lr7Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v13 4/9] net: devmem: Implement TX path
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, io-uring@vger.kernel.org, 
-	virtualization@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Jeroen de Borst <jeroendb@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Willem de Bruijn <willemb@google.com>, Jens Axboe <axboe@kernel.dk>, 
-	Pavel Begunkov <asml.silence@gmail.com>, David Ahern <dsahern@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	sdf@fomichev.me, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
-	Samiullah Khawaja <skhawaja@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <c1fc1341-4490-4e22-a2ee-64bb67529660@gmx.net>
 
-On Mon, May 5, 2025 at 12:42=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On 5/2/25 9:20 PM, Mina Almasry wrote:
-> > On Fri, May 2, 2025 at 4:47=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> =
-wrote:
-> >>> @@ -1078,7 +1092,8 @@ int tcp_sendmsg_locked(struct sock *sk, struct =
-msghdr *msg, size_t size)
-> >>>                               zc =3D MSG_ZEROCOPY;
-> >>>               } else if (sock_flag(sk, SOCK_ZEROCOPY)) {
-> >>>                       skb =3D tcp_write_queue_tail(sk);
-> >>> -                     uarg =3D msg_zerocopy_realloc(sk, size, skb_zco=
-py(skb));
-> >>> +                     uarg =3D msg_zerocopy_realloc(sk, size, skb_zco=
-py(skb),
-> >>> +                                                 sockc_valid && !!so=
-ckc.dmabuf_id);
-> >>
-> >> If sock_cmsg_send() failed and the user did not provide a dmabuf_id,
-> >> memory accounting will be incorrect.
-> >
-> > Forgive me but I don't see it. sockc_valid will be false, so
-> > msg_zerocopy_realloc will do the normal MSG_ZEROCOPY accounting. Then
-> > below whech check sockc_valid in place of where we did the
-> > sock_cmsg_send before, and goto err. I assume the goto err should undo
-> > the memory accounting in the new code as in the old code. Can you
-> > elaborate on the bug you see?
->
-> Uhm, I think I misread the condition used for msg_zerocopy_realloc()
-> last argument.
->
-> Re-reading it now it the problem I see is that if sock_cmsg_send() fails
-> after correctly setting 'dmabuf_id', msg_zerocopy_realloc() will account
-> the dmabuf memory, which looks unexpected.
->
+On Mon, May 05, 2025 at 07:16:51PM +0200, Stefan Wahren wrote:
+> Hi Andrew,
+> 
+> Am 05.05.25 um 18:43 schrieb Andrew Lunn:
+> > On Mon, May 05, 2025 at 04:24:26PM +0200, Stefan Wahren wrote:
+> > > The interrupt handler mse102x_irq always returns IRQ_HANDLED even
+> > > in case the SPI interrupt is not handled. In order to solve this,
+> > > let mse102x_rx_pkt_spi return the proper return code.
+> > > 
+> > > Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
+> > > ---
+> > >   drivers/net/ethernet/vertexcom/mse102x.c | 15 +++++++++------
+> > >   1 file changed, 9 insertions(+), 6 deletions(-)
+> > > 
+> > > diff --git a/drivers/net/ethernet/vertexcom/mse102x.c b/drivers/net/ethernet/vertexcom/mse102x.c
+> > > index 204ce8bdbaf8..aeef144d0051 100644
+> > > --- a/drivers/net/ethernet/vertexcom/mse102x.c
+> > > +++ b/drivers/net/ethernet/vertexcom/mse102x.c
+> > > @@ -303,7 +303,7 @@ static void mse102x_dump_packet(const char *msg, int len, const char *data)
+> > >   		       data, len, true);
+> > >   }
+> > > -static void mse102x_rx_pkt_spi(struct mse102x_net *mse)
+> > > +static irqreturn_t mse102x_rx_pkt_spi(struct mse102x_net *mse)
+> > >   {
+> > >   	struct sk_buff *skb;
+> > >   	unsigned int rxalign;
+> > > @@ -324,7 +324,7 @@ static void mse102x_rx_pkt_spi(struct mse102x_net *mse)
+> > >   		mse102x_tx_cmd_spi(mse, CMD_CTR);
+> > >   		ret = mse102x_rx_cmd_spi(mse, (u8 *)&rx);
+> > >   		if (ret)
+> > > -			return;
+> > > +			return IRQ_NONE;
+> > >   		cmd_resp = be16_to_cpu(rx);
+> > >   		if ((cmd_resp & CMD_MASK) != CMD_RTS) {
+> > > @@ -357,7 +357,7 @@ static void mse102x_rx_pkt_spi(struct mse102x_net *mse)
+> > >   	rxalign = ALIGN(rxlen + DET_SOF_LEN + DET_DFT_LEN, 4);
+> > >   	skb = netdev_alloc_skb_ip_align(mse->ndev, rxalign);
+> > >   	if (!skb)
+> > > -		return;
+> > > +		return IRQ_NONE;
+> > This is not my understanding of IRQ_NONE. To me, IRQ_NONE means the
+> > driver has read the interrupt status register and determined that this
+> > device did not generate the interrupt. It is probably some other
+> > device which is sharing the interrupt.
+> At first i wrote this patch for the not-shared interrupt use case in mind.
+> Unfortunately this device doesn't have a interrupt status register and in
+> the above cases the interrupt is not handled.
+> 
+> kernel-doc says:
+> 
+> @IRQ_NONE:        interrupt was not from this device or was not handled
+> @IRQ_HANDLED:    interrupt was handled by this device
 
-This is my intention with the code, let me know if you think it's
-actually wrong. In this scenario, sockc_valid will be false, so
-msg_zerocopy_realloc() will account the dma-buf memory, then later if
-!sockc_valid, we goto out_err which will net_zcopy_put and finally
-unaccount the dmabuf memory. It is a bit weird indeed to account and
-unaccount the dmabuf memory in this edge case but AFAICT it's
-harmless? It also matches the scenario where the user uses
-MSG_ZEROCOPY with an invalid cmsg. In that case the zerocopy memory
-will be accounted in msg_zerocopy_realloc and unaccounted in
-net_zcopy_put in the error path as well.
+A memory allocation failure in netdev_alloc_skb_ip_align() does not
+seem like a reason to return IRQ_NONE. I think the more normal case
+is, there was an interrupt, there was an attempt to handle it, but the
+handler failed. The driver should try to put the hardware into a state
+the next interrupt will actually happen, and be serviced.
 
-Improving this edge case is possible but maybe complicates the code.
-Either the dmabuf id needs to be split up into its own parsing like
-you suggested earlier, or we need to record that the user is
-attempting to set a dmabuf id, but since the whole sock_cmsg_send
-failed we may not know what the user intended to do at all.
+This is particularly important with level interrupts. If you fail to
+clear the interrupt, it is going to fire again immediately after
+exiting the interrupt handler and the interrupt is reenabled. You
+don't want to die in an interrupt storm. Preventing such interrupt
+storms is part of what the return value is used for. If the handler
+continually returns IRQ_NONE, after a while the core declares there is
+nobody actually interested in the interrupt, and it leaves it
+disabled.
 
-> Somewhat related, I don't see any change to the msg_zerocopy/ubuf
-> complete/cleanup path(s): what will happen to the devmem ubuf memory at
-> uarg->complete() time? It looks like it will go unexpectedly through
-> mm_unaccount_pinned_pages()???
->
+> So from my understanding IRQ_NONE fits better here (assuming a not-shared
+> interrupt).
+> 
+> I think driver should only use not-shared interrupts, because there is no
+> interrupt status register. Am I right?
 
-Right, this works without a change in the cleanup path needed. When
-the dmabuf id is provided, we skip calling mm_account_pinned_pages in
-msg_zerocopy_alloc and msg_zerocopy_realloc, so we skip setting
-uarg->mmp->user.
+I don't see why it cannot be shared. It is not very efficient, and
+there will probable be a bias towards the first device which requests
+the interrupt, but a shared interrupt should work.
 
-mm_unaccount_pinned_pages does nothing if uarg->mmp->user is not set:
-
-void mm_unaccount_pinned_pages(struct mmpin *mmp)
-{
-  if (mmp->user) {
-     atomic_long_sub(mmp->num_pg, &mmp->user->locked_vm);
-     free_uid(mmp->user);
-   }
-}
-
-Although maybe a comment would explain why it works to improve clarity.
-
-
---=20
-Thanks,
-Mina
+	Andrew
 
