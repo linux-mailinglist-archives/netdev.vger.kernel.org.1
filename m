@@ -1,191 +1,107 @@
-Return-Path: <netdev+bounces-187986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78AFFAAAEAE
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:01:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8394AAAE5B
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 04:55:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9324A1B606BC
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 02:58:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE3257AA4F7
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 02:54:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A07437AAAD;
-	Mon,  5 May 2025 23:04:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1B6338B4EE;
+	Mon,  5 May 2025 23:01:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z4TWE7sY"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="JE/2zT+H"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B56EF374589;
-	Mon,  5 May 2025 22:58:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 338FD2D47BB
+	for <netdev@vger.kernel.org>; Mon,  5 May 2025 22:53:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746485932; cv=none; b=kfln9k/XPngn9hLNjfzLDPTCnbxaSYtHlavtkYegcOaK9dTpz1sPBW6k49Ytmmi/2sELUJav73du+RbIfFZoHtjB7sqGMF3GBeWTjKeSP4azRGD6qOrVd+fbWfm4l/ZXPeYXQ2UfJNATT9Pj/k32h+wJV3B6OmkzqU+fj3gTmPU=
+	t=1746485625; cv=none; b=I8xqmtZzDWNenmUI+kdA/JotcJoJWDlnES1pE8qgYFZ0GF2sKSky/KEmWmY5wAjDC/DhKhNQs6jtMEwb16wtdePE3zp2WZyKlm6x7Jb1gGzYlRrM4S8VmIgpNcvn07EeQg/ZVimgg5Z+QLTMUlAHZ/VuFthXNYxXMPnmKIgDjl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746485932; c=relaxed/simple;
-	bh=GK31QfUDyBBGfYjJDHgtizcta3uBh9rj9nFl+F5ZUjc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=R63mUhldImhiLb+gJ3XGgRvGftfj9v5ZFxxKKYpZNR4KhGTxaZok6CSuH4ZIX6HjCePwITPn0KRSUzFT/9M5abf9RQQkeeTnsuAeXz0qV72BnRII5NEvxabxcyMKU2UR6dnFNTjwLaWMfpIy4Uj5SGrHKtEpoSQEKNuQGgMYqp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z4TWE7sY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AF9EC4CEEE;
-	Mon,  5 May 2025 22:58:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746485931;
-	bh=GK31QfUDyBBGfYjJDHgtizcta3uBh9rj9nFl+F5ZUjc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Z4TWE7sYa2akso7vMYJtNIh6ZkH1PFsde3FfzLwNyXM2SsTsJGRZve7YrBPsYiRSi
-	 FkSAfH4h8m0rjJfiO9j/rSkoz+fDT/Lu8KhnQ+RXP/y8IEGBnxPW8XYqfkFY+dZxcT
-	 lwyPpZQNhICEIw5YdtjEEBN3lW5JKRKLlOEZu0VixChS9zTDNjYs7LG5nk4R7PFZ+x
-	 x1sEOtFzgDw963c5J6H/6aGIGbt/qdfaBNUGwpH6y8cntBaO7UjTIWwEEvNo3x1P4O
-	 pUB6sM/qDzCPr57647ybU98ipPbUsKGIFFAa+ll+HWY+EYa3/5ruAHLrDmmR4zcL83
-	 3gB4LxCQRz1ug==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Guangguan Wang <guangguan.wang@linux.alibaba.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Sasha Levin <sashal@kernel.org>,
-	jaka@linux.ibm.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 072/294] net/smc: use the correct ndev to find pnetid by pnetid table
-Date: Mon,  5 May 2025 18:52:52 -0400
-Message-Id: <20250505225634.2688578-72-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250505225634.2688578-1-sashal@kernel.org>
-References: <20250505225634.2688578-1-sashal@kernel.org>
+	s=arc-20240116; t=1746485625; c=relaxed/simple;
+	bh=vtQJCct6hQsBhQdcgfNqlkz15EDdeFhIYhf9s6naFSg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=q/a0UOFwISi1OSkW1p7LmkncDSMT1W5iob8J38NDF6ruYpyeg2wQ7xTz+3AWm5ImQmoT2PwNCmlRr9wsqAN/z2NoL3iFkVY0q1upesawTjp9DLxHTBKWs0lAgKWeP7XXY/2MNIR+ToMnG9r7ELZj7DEdBprp+z2VcBtzQtY6vlo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=JE/2zT+H; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=BWIsDAIAABq4aX9t63Ep5DxcKnrpjYvMCl9JdFgagf0=; t=1746485624; x=1747349624; 
+	b=JE/2zT+HifDxkOcG0kHx2TaNbLYNMjFkfHTAXcrj2pv9HyfOeIq3lThJJaGgrSmo7+aoMwOEYxw
+	PdOYZbwlbZOSW11KNTof5zo2O8Azj0GFTzmeEwUzsb9bGnb2cXJSHfwAqhcedMYaITZ/spQUoBkTu
+	V8SUENgZi/elsp/b86KepKVusUYtSTWhi8b0hu9/JUtmCrMNkx2x7e2kfEkwt+h8QB2rWD/gpY+62
+	lIjJSk5+3sKxmuvMVFdod84Xf/OMZj4VZLQTEq5Fx5JdO/76+I+CfU3oUtV6X/qhfGijjkMKx7ZWj
+	xo3lTjo6Pe3c1ou7f6B4Ksk/jP9l2PF6emUQ==;
+Received: from mail-oo1-f53.google.com ([209.85.161.53]:43084)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1uC4gv-0001Fs-Em
+	for netdev@vger.kernel.org; Mon, 05 May 2025 15:53:42 -0700
+Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-601ad30bc0cso3716004eaf.0
+        for <netdev@vger.kernel.org>; Mon, 05 May 2025 15:53:41 -0700 (PDT)
+X-Gm-Message-State: AOJu0YxKaEpA0QBB2BpbmhGWLbc26irAewcBSLPJ79TbpGRr86snstZu
+	szkNm+ljQ4eqvZ4xsd/gDIBchNWybYCdCqcYfUQsFHfbJpvtwV5055iKHnuw2nPWX/WcmAy49Le
+	fuc2z09ozdgekcNeMvtUcDF5+NLc=
+X-Google-Smtp-Source: AGHT+IH5xheY/a1uLcWmnbUZD7CuOUGKjtX6dr2NTu0PPIfMYE2qeTRaAk8HqGFr5ji8tp78h0eekx1GRDzq2Ycu7t0=
+X-Received: by 2002:a05:6820:4086:b0:607:de46:fa94 with SMTP id
+ 006d021491bc7-6081da3a6b6mr957018eaf.4.1746485620916; Mon, 05 May 2025
+ 15:53:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.89
-Content-Transfer-Encoding: 8bit
+References: <20250502233729.64220-1-ouster@cs.stanford.edu>
+ <20250502233729.64220-2-ouster@cs.stanford.edu> <7addde54-1b77-4376-b976-655a2776a31e@redhat.com>
+In-Reply-To: <7addde54-1b77-4376-b976-655a2776a31e@redhat.com>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Mon, 5 May 2025 15:53:05 -0700
+X-Gmail-Original-Message-ID: <CAGXJAmx8xGAn8GWNFZ6bw7z_5nCnzCLRHAhjaWM6W_Z91pNvzg@mail.gmail.com>
+X-Gm-Features: ATxdqUEXtrBKNf-g_qLlfKo7ggKaP4AEromPPP-PksCQNByk5MZvbFTcbnE-KBU
+Message-ID: <CAGXJAmx8xGAn8GWNFZ6bw7z_5nCnzCLRHAhjaWM6W_Z91pNvzg@mail.gmail.com>
+Subject: Re: [PATCH net-next v8 01/15] net: homa: define user-visible API for Homa
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: -1.0
+X-Spam-Level: 
+X-Scan-Signature: 9dddbef7dbf47a29383c7a3c8e5dce6e
 
-From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+On Mon, May 5, 2025 at 1:03=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
+e:
+>
+> On 5/3/25 1:37 AM, John Ousterhout wrote:
+> > +/* Flag bits for homa_sendmsg_args.flags (see man page for documentati=
+on):
+> > + */
+> > +#define HOMA_SENDMSG_PRIVATE       0x01
+> > +#define HOMA_SENDMSG_NONBLOCKING   0x02
+>
+> It's unclear why you need to define a new mechanism instead of using
+> MSG_DONTWAIT. This is possibly not needed and deserves at least a good
+> motivation in the patch introducing it.
 
-[ Upstream commit bfc6c67ec2d64d0ca4e5cc3e1ac84298a10b8d62 ]
+I'm not sure why that flag still exists (or HOMA_RECVMSG_NONBLOCKING
+either), since Homa supports MSG_DONTWAIT and that seems to provide
+the same functionality. Maybe these are leftover from earlier Homa
+versions that weren't layered on sendmsg and recvmsg.
 
-When using smc_pnet in SMC, it will only search the pnetid in the
-base_ndev of the netdev hierarchy(both HW PNETID and User-defined
-sw pnetid). This may not work for some scenarios when using SMC in
-container on cloud environment.
-In container, there have choices of different container network,
-such as directly using host network, virtual network IPVLAN, veth,
-etc. Different choices of container network have different netdev
-hierarchy. Examples of netdev hierarchy show below. (eth0 and eth1
-in host below is the netdev directly related to the physical device).
-            _______________________________
-           |   _________________           |
-           |  |POD              |          |
-           |  |                 |          |
-           |  | eth0_________   |          |
-           |  |____|         |__|          |
-           |       |         |             |
-           |       |         |             |
-           |   eth1|base_ndev| eth0_______ |
-           |       |         |    | RDMA  ||
-           | host  |_________|    |_______||
-           ---------------------------------
-     netdev hierarchy if directly using host network
-           ________________________________
-           |   _________________           |
-           |  |POD  __________  |          |
-           |  |    |upper_ndev| |          |
-           |  |eth0|__________| |          |
-           |  |_______|_________|          |
-           |          |lower netdev        |
-           |        __|______              |
-           |   eth1|         | eth0_______ |
-           |       |base_ndev|    | RDMA  ||
-           | host  |_________|    |_______||
-           ---------------------------------
-            netdev hierarchy if using IPVLAN
-            _______________________________
-           |   _____________________       |
-           |  |POD        _________ |      |
-           |  |          |base_ndev||      |
-           |  |eth0(veth)|_________||      |
-           |  |____________|________|      |
-           |               |pairs          |
-           |        _______|_              |
-           |       |         | eth0_______ |
-           |   veth|base_ndev|    | RDMA  ||
-           |       |_________|    |_______||
-           |        _________              |
-           |   eth1|base_ndev|             |
-           | host  |_________|             |
-           ---------------------------------
-             netdev hierarchy if using veth
-Due to some reasons, the eth1 in host is not RDMA attached netdevice,
-pnetid is needed to map the eth1(in host) with RDMA device so that POD
-can do SMC-R. Because the eth1(in host) is managed by CNI plugin(such
-as Terway, network management plugin in container environment), and in
-cloud environment the eth(in host) can dynamically be inserted by CNI
-when POD create and dynamically be removed by CNI when POD destroy and
-no POD related to the eth(in host) anymore. It is hard to config the
-pnetid to the eth1(in host). But it is easy to config the pnetid to the
-netdevice which can be seen in POD. When do SMC-R, both the container
-directly using host network and the container using veth network can
-successfully match the RDMA device, because the configured pnetid netdev
-is a base_ndev. But the container using IPVLAN can not successfully
-match the RDMA device and 0x03030000 fallback happens, because the
-configured pnetid netdev is not a base_ndev. Additionally, if config
-pnetid to the eth1(in host) also can not work for matching RDMA device
-when using veth network and doing SMC-R in POD.
+I have removed both HOMA_SENDMSG_NONBLOCKING and HOMA_RECVMSG_NONBLOCKING.
 
-To resolve the problems list above, this patch extends to search user
--defined sw pnetid in the clc handshake ndev when no pnetid can be found
-in the base_ndev, and the base_ndev take precedence over ndev for backward
-compatibility. This patch also can unify the pnetid setup of different
-network choices list above in container(Config user-defined sw pnetid in
-the netdevice can be seen in POD).
-
-Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
-Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/smc/smc_pnet.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
-index dbcc72b43d0c0..d44d7f427fc94 100644
---- a/net/smc/smc_pnet.c
-+++ b/net/smc/smc_pnet.c
-@@ -1084,14 +1084,16 @@ static void smc_pnet_find_roce_by_pnetid(struct net_device *ndev,
- 					 struct smc_init_info *ini)
- {
- 	u8 ndev_pnetid[SMC_MAX_PNETID_LEN];
-+	struct net_device *base_ndev;
- 	struct net *net;
- 
--	ndev = pnet_find_base_ndev(ndev);
-+	base_ndev = pnet_find_base_ndev(ndev);
- 	net = dev_net(ndev);
--	if (smc_pnetid_by_dev_port(ndev->dev.parent, ndev->dev_port,
-+	if (smc_pnetid_by_dev_port(base_ndev->dev.parent, base_ndev->dev_port,
- 				   ndev_pnetid) &&
-+	    smc_pnet_find_ndev_pnetid_by_table(base_ndev, ndev_pnetid) &&
- 	    smc_pnet_find_ndev_pnetid_by_table(ndev, ndev_pnetid)) {
--		smc_pnet_find_rdma_dev(ndev, ini);
-+		smc_pnet_find_rdma_dev(base_ndev, ini);
- 		return; /* pnetid could not be determined */
- 	}
- 	_smc_pnet_find_roce_by_pnetid(ndev_pnetid, ini, NULL, net);
--- 
-2.39.5
-
+-John-
 
