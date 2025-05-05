@@ -1,204 +1,272 @@
-Return-Path: <netdev+bounces-187739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE0BBAA95AD
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 16:25:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E92D6AA96B2
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 16:59:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B8A816A84D
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 14:25:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7316316B87A
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 14:58:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 576A425C836;
-	Mon,  5 May 2025 14:24:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DFDF25D21A;
+	Mon,  5 May 2025 14:57:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="OG+fLVjr"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="hsQtmhd5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
+Received: from smtp-190d.mail.infomaniak.ch (smtp-190d.mail.infomaniak.ch [185.125.25.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 376BF25C713;
-	Mon,  5 May 2025 14:24:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B47F024DFFE;
+	Mon,  5 May 2025 14:57:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746455095; cv=none; b=eHefv4u72BLpgQ8IhHiUw7EqTqDP2dB73fAcZAvA291A8xlOe6wLf36qKpfVCJETcbSQ1wg/HgGFnbwZgpMbxLd9GPNW3a027yuGdkXBqNhF6eVC5xlRPF4LDFknjSZF83WemATsU3kL/DtE4LTCdKMr3nBp1P9Q5pRX2IfbzkQ=
+	t=1746457042; cv=none; b=ge4QB1uHaek3Cbzwi7mXiR73EANfjF1JDuj2/TnFMiGCXJhKsjE4m6ADa4p9TmzJwovynjLyQ9eXC+dQ99LTuE8FVMwMuQCTsdDLrnoYXGyQ3PA67tJbpsFvrn7xlWTx2OhvCwCDBZ3nrHRmfBN6dPkmfSNNHggHlJkSb0VZ+3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746455095; c=relaxed/simple;
-	bh=htqO1Run8pY7RltG3aOurOQe8uNjb32JudFR5O5BdX8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MtQGeYHKG/Lbn7rFnYDx4gF2SD4pCkxzimY1f28xwz6t3a9Uovhl9SO/fgHLyItZSvlt+/pfPul4zS0AWWrsfan9wqyf3Rw9z4BqzHss1sXaQcZBTgbYTdWDfLSlqZTNnk8rlxyX7s9Hu17IaFSsnY3TLckZyibLvHwfvaKVuHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=OG+fLVjr; arc=none smtp.client-ip=212.227.17.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1746455088; x=1747059888; i=wahrenst@gmx.net;
-	bh=FnJr2wI1hn/yDB2M9hi2HWCOyB2w21rn33+r9rXVn/8=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-Id:In-Reply-To:
-	 References:MIME-Version:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=OG+fLVjrf4ige8dk878CnykaecLzWyysnTIe9/ageSGV0p9wCV7uoYa0/0zsbMD+
-	 30vVzxHlh+8KWblupRzc/wa2dhk2PHyIBRqyUgP3F8WuB9M+2I1Z46Iu4mrPcvybc
-	 jKZMcrp7eTA6j/CytYJTM81W/i8hSwSDq60TX2sE5ugFk+73NO2mCF/Jji2mPsBwg
-	 bOARStFTnGE3ynN5nvORLEWDjI0B7ejovXglqmTdif8c0rUcghiC6FwCS66a6Oczv
-	 aHFUTPcP0GQvRrdRTiB5HSxMOMiPUI/gl5Zx1uH0TYcvooBvMVR+6/UUY41Zio/ci
-	 J26FKc+ub1zHBcDoTw==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from stefanw-SCHENKER ([91.41.216.208]) by mail.gmx.net (mrgmx105
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MjS9C-1usBFS1sSI-00Zoj6; Mon, 05
- May 2025 16:24:48 +0200
-From: Stefan Wahren <wahrenst@gmx.net>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>
-Cc: netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	Stefan Wahren <wahrenst@gmx.net>
-Subject: [PATCH net-next 5/5] net: vertexcom: mse102x: Simplify mse102x_rx_pkt_spi
-Date: Mon,  5 May 2025 16:24:27 +0200
-Message-Id: <20250505142427.9601-6-wahrenst@gmx.net>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250505142427.9601-1-wahrenst@gmx.net>
-References: <20250505142427.9601-1-wahrenst@gmx.net>
+	s=arc-20240116; t=1746457042; c=relaxed/simple;
+	bh=rmJVoxe6JpXdnJlgrFr2iRmGnfNfaPEWutrVFR9VjQI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rea0a8VNd/x6a0r1SCQin8Weja+bySMUhb0XN4NGHYepemI9kONINsM8w/NuuCTuimyeVrON9f41kkiErkys6qIID8TQKOwuvyEtNvgmdvplhC/Ek8TvNYakvRv3hzRBWXnPX9iY/YP+2YTYTqGW0vuykwYyBS+MsdJqEJcnGMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=hsQtmhd5; arc=none smtp.client-ip=185.125.25.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-4-0000.mail.infomaniak.ch (smtp-4-0000.mail.infomaniak.ch [10.7.10.107])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Zrkk25Hfqzbv8;
+	Mon,  5 May 2025 16:41:30 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1746456090;
+	bh=MC1nkmhENPqTiFdqcO3yyGjubPoyxSzyVFPPAgsdEiY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hsQtmhd5732QcbDRpO+NAQDAwbO+efKYwcz9xJqM9ociXjoaHMBkcOxs7vAtQLsBP
+	 10gOFTa4Djyajxsro7f+KKOXAQx+kJkiro+oLmimPpUyu6fgqmJZDYRWBOQeaChn9z
+	 9LDpOX6Lo0dnAIKeYrCkuvAXMEnHM8G83L/ChfL8=
+Received: from unknown by smtp-4-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4Zrkk12dJgz36S;
+	Mon,  5 May 2025 16:41:29 +0200 (CEST)
+Date: Mon, 5 May 2025 16:41:28 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Christian Brauner <brauner@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Oleg Nesterov <oleg@redhat.com>, linux-fsdevel@vger.kernel.org, 
+	Jann Horn <jannh@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Daan De Meyer <daan.j.demeyer@gmail.com>, 
+	David Rheinsberg <david@readahead.eu>, Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>, 
+	Lennart Poettering <lennart@poettering.net>, Luca Boccassi <bluca@debian.org>, Mike Yuan <me@yhndnzj.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	Alexander Mikhalitsyn <alexander@mihalicyn.com>, linux-security-module@vger.kernel.org
+Subject: Re: [PATCH RFC v3 00/10] coredump: add coredump socket
+Message-ID: <20250505.aFia3choo1aw@digikod.net>
+References: <20250505-work-coredump-socket-v3-0-e1832f0e1eae@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:zjyDOn2Fu1hIWG5ryUyFBSuUbfWDrD8H7XPAcqIjE5/e+QY/DH/
- R1jAh1V/WZf4On8cUkwvduhmgKCDOAoDLQmMr2clYJc9juDNYTLWo2Nq2o/gVcXC8+4pxZa
- zOcANEOctgUzAdxFVLVWhuJrfSVYl9I1oB+WeqlY+E+Js+XQM4QTDSUVfAftqo73bhbd/Gd
- 06qK12JzVW2THb6FoHXiA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:ZKSDHO9A30M=;2tO8DSvFHnJbzQ9YumRQ4d6NivD
- QitaRb80wWBHpLQmYJjT0THjax8tB0nZ51ujikRUHpXSV25MSwVzVtFHFfBiUNXSAIEsJ3nLT
- RmU1ZFTd+LPAgJThzb9M8SI2DP78+w+HOKWWkhyap/YTPVf84eqL/XxgMlJFY0r/7JS41tFy9
- dz9j4NQ8keoV2g6/bZ0dEmGmlePR++v/CGcH6k/VeGLTbLdCeKuoAARnl75iBfI/B0qr9oJ6z
- baXWha4dM9bZR0Ubo08GD1dHvXjtiTN7J0PphoR1PoYz5e9FG1rhTx41STTIjokqoNxz5/GX9
- GQ+9mlZBeL1DVVDUtZdBfjbCeYLxJXaq4rU2enMXoEQhNUpSq6og6zdh3DLyAhd0MFbt/ko5e
- 9LPQ3M9virJJ5os6qaVb6LTnfSeuojuhVFbfvOKkPjLMxSHAwLEJRW27joawkeAI5GUuKBPBf
- oVsGmUnqtRKYfrn/M8Z9UZa+xwtKE4PwyvltvnT6bI35s7Nv2RDzDmKq5L/SoSOJEp2xy7wTW
- caEZTL9GyDGZjA2wiP2C8PxdLlWOEY38+n7RIjquMbuA5Yhl3G9d/N/WAkaTbfZGS9gFFfJop
- WsOqcDWfSDZiCJV5D7Aj/HxW24vMsGzan+ugDvtYhjnSVWqzXAsiQ7z7HUfsAD4Gud9yVZg1I
- ApmKrNnyvqK7RE9lLIrj2kx0eF9MFzhA5nic9FpeM3pxDrdBrG8Er8T8+yRyCfHVTGMTCXozH
- m8KMe1F+/Za65HZXC2R+bbsDNm5a0laDW2j+hAnyGlhhClw0jY74xn1JCZlOujbmpug93/BSM
- yzs2/1c3aFlQPrkKVjKyxCEviVIU6T7hMpbyLnpUIvr79s5NEK6hwUv677OoYFc00SkPi+Y/J
- vgYClp+3o+De2BQOgHRTbTQflNY2yYKr0eNDSY1RF+dOX+LWeLAcrjKzwmPlZEAB8sN1GpDUB
- toEJm5kDLvE3hki9OANv6+iQ3odt1Hkb1OvhhdH+TnpaAbBjk7XxBRWiSoThZPQ3W66dpW09T
- B6DjEEgNVj5I+q8ONNaZSbgtZl76Rz6dOnP3cwJefe6gBdGYIT8pZOQoqsG0e66orKh9iidoC
- SOYk4gLNDxcdBtbMm+OXJIjGEJ2p2gUe677l09CiNTX6Auvmrwd3f2zfR/YlHt8cOuBnPewmT
- XxKmepa5i7TanCGRygN58dtijfIfSNK6rCTEwMmpVL76vkIEn6+BOsegpjAQ6cKUp/w50svwn
- lwYSjBoP4odI/U9NULBcts7oWCueHc35NMondpltHy662AazImzC3trfiVdn2jroQQlMTN096
- WTrOUSjvSio6mo676T0rV3H5H+zggR4VuiBMnRrucvKIdVLHEIEbX+qTRECqQL/AuM4lWfBQE
- XsmcPCxK9PcGP2nIBJtXY8tJD9CNwbBBHoCkq1Bz+cGKWF+Lbh6isUZg02JvpDbu3N/ktdEfc
- dMbqadkWB56avjAKDb+C55/nJeDjcXnjMuNGUZUaKjrt6/b9FR8kvuhvCmGMwigAAoxxuhWk/
- EcnqEHbHc77kNyjyeDWZp05fcThd7Wy8QOy3CN8/lzvDLZBBE34/8L8CYwXWUdStRRJ4u7dRh
- yPqBi0KXY+pP0wSo9+8ABLKhqDTjPz/EBqDXlGSnv1PShk9PiENhenoXV/YBH1yTxgdjnddnT
- kTEl0ly3nzfuccYjmC9TeGX5SKNRkrKaHLyLitLcwj7H3oD0UJopWuPtkQSQBrDoxMMdB1Wtq
- hg1WUcRMgA+iymAU+hZaalYo8tmxy9ZCKOPeQ6QFQfKxyvAywM6s8Jke+PHnF8d2Zjj+aHqaY
- 0iiY4KzUkFRUJ8HB0nx/kerGcckge3/dvF2ZV2qh+wHKRkh4vEczfTkU1qAvz0XOOCzD0BqAU
- DqpJsGn0zPfDq06NgH/iGvSa7XRjsBR38zD9uuPHidi/rEY+C0943LsyJEzqlE0xQMZKlfYsE
- 5U5jvDLwR0ryc6IOlGuM83hEjYA1cyLIM/MmlhP/q1I9QgoCZMphfGaOcaats9frI/PONcrwX
- AEd/WJU9vKstNgNiOrhRFTJjmJO0nJIvji+IRC8ldztc9P0ttNO9CpKLZCk3ZFHa0Wrvey/BC
- c9aPzBNomD1oSqr2/fdciY0l/dDITnUp8Yco/Q53bJupLIPG698GRFMTIdzxstBiLzZEzrg1R
- eTCSQ7WLCgOpIiHLiVl67uP/ZOzcItWs/nwZLbyyFjYtBOZjkqMmQ5pLWWNfU9nXLHXJda2fa
- FRyE6c7kbLJwjihpMtvCvl8ioyoHGg7NpsM3PctbFSpuLLTYIYlGO2QX+zTIOqowOZgTc0Q9h
- HkkBBkOWMcJFDMzk/BAam87Vw3RQE5ZgjuA0pSvhdD5gksxIT1Ss88KVbKe6+3DT7SQpxoTXg
- 35HlGD5rMNK//8gWsPK6ta8mlo5jeEYlF5KcLkUXHLzkNc9bOP115e2yNBjxO24PpSBPX/gSb
- 38V3sQMXy+vtdSd7IM8Vn3nA/VeEM+hmRuCB8gM1eTyJytAIpkvmKN43kFOvqOjo+IOd5ZWHV
- ersXt/Gz0cVzqKth3M131JtCWnTe7n7WOFVIHn5/qZCysJgjZiQJPzqmeicpXjP1duPKU3RVP
- 3iGpl5eOJRj91ySL6GpWQ+LBQw+EyYL9mOjNQ5J8yub7U71tM8AoyYPd8sk2CX2NFHW2kUIBD
- +hePDQ5di2NnSLi9Z66WAJ3V59ML++sC1rqgYmb5W+Jsq3RM9Dcu637PRtFXAZg9irAVxzX37
- U6OctA5eK7sgcymNIyBHmzCJaLCT7S95ESphHosI/tErtg4xJLMqayYsxx7WwzR4EsEEbdb0/
- MLqtgv2yMmUy4/gN+U/fHlcI8pro9TxXLT1Fvtzp8Vy5gv6pjvYmWPx3bEkuGYttBcjc3U5MZ
- hVStYbVyWYhzJoznnFbyNoOkPoTZXESD4KlBwnqrpxCQfu7JG4oaVKerf7LoNtJ7ec+ea9cMi
- ATWG2nSHwfhPnAxJYySLdYoXLqnsw2xPEYHhUfQ/4yx2wPp/gshU9jIs5tpfGF5+btSj9l9VY
- doVUdIHOoqJsbXj2AwCuh4wXl2ROHWb6osLS8EA8C6MKNIsm3ZONnCCLs+z7SWqW0SavsUtK6
- srH2gQ1eIkkDY=
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250505-work-coredump-socket-v3-0-e1832f0e1eae@kernel.org>
+X-Infomaniak-Routing: alpha
 
-The function mse102x_rx_pkt_spi is used in two cases:
-* initial polling to re-arm interrupt
-* level based interrupt handler
+On Mon, May 05, 2025 at 01:13:38PM +0200, Christian Brauner wrote:
+> Coredumping currently supports two modes:
+> 
+> (1) Dumping directly into a file somewhere on the filesystem.
+> (2) Dumping into a pipe connected to a usermode helper process
+>     spawned as a child of the system_unbound_wq or kthreadd.
+> 
+> For simplicity I'm mostly ignoring (1). There's probably still some
+> users of (1) out there but processing coredumps in this way can be
+> considered adventurous especially in the face of set*id binaries.
+> 
+> The most common option should be (2) by now. It works by allowing
+> userspace to put a string into /proc/sys/kernel/core_pattern like:
+> 
+>         |/usr/lib/systemd/systemd-coredump %P %u %g %s %t %c %h
+> 
+> The "|" at the beginning indicates to the kernel that a pipe must be
+> used. The path following the pipe indicator is a path to a binary that
+> will be spawned as a usermode helper process. Any additional parameters
+> pass information about the task that is generating the coredump to the
+> binary that processes the coredump.
+> 
+> In the example core_pattern shown above systemd-coredump is spawned as a
+> usermode helper. There's various conceptual consequences of this
+> (non-exhaustive list):
+> 
+> - systemd-coredump is spawned with file descriptor number 0 (stdin)
+>   connected to the read-end of the pipe. All other file descriptors are
+>   closed. That specifically includes 1 (stdout) and 2 (stderr). This has
+>   already caused bugs because userspace assumed that this cannot happen
+>   (Whether or not this is a sane assumption is irrelevant.).
+> 
+> - systemd-coredump will be spawned as a child of system_unbound_wq. So
+>   it is not a child of any userspace process and specifically not a
+>   child of PID 1. It cannot be waited upon and is in a weird hybrid
+>   upcall which are difficult for userspace to control correctly.
+> 
+> - systemd-coredump is spawned with full kernel privileges. This
+>   necessitates all kinds of weird privilege dropping excercises in
+>   userspace to make this safe.
+> 
+> - A new usermode helper has to be spawned for each crashing process.
+> 
+> This series adds a new mode:
+> 
+> (3) Dumping into an abstract AF_UNIX socket.
+> 
+> Userspace can set /proc/sys/kernel/core_pattern to:
+> 
+>         @linuxafsk/coredump_socket
+> 
+> The "@" at the beginning indicates to the kernel that the abstract
+> AF_UNIX coredump socket will be used to process coredumps.
+> 
+> The coredump socket uses the fixed address "linuxafsk/coredump.socket"
+> for now.
+> 
+> The coredump socket is located in the initial network namespace. To bind
+> the coredump socket userspace must hold CAP_SYS_ADMIN in the initial
+> user namespace. Listening and reading can happen from whatever
+> unprivileged context is necessary to safely process coredumps.
+> 
+> When a task coredumps it opens a client socket in the initial network
+> namespace and connects to the coredump socket. For now only tasks that
+> are acctually coredumping are allowed to connect to the initial coredump
+> socket.
 
-Both of them doesn't need an open-coded retry mechanism.
-In the first case the function can be called again, if the return code
-is IRQ_NONE. This keeps the error behavior during netdev open.
+I think we should avoid using abstract UNIX sockets, especially for new
+interfaces, because it is hard to properly control such access.  Can we
+create new dedicated AF_UNIX protocols instead?  One could be used by a
+privileged process in the initial namespace to create a socket to
+collect coredumps, and the other could be dedicatde to coredumped
+proccesses.  Such (coredump collector) file descriptor or new (proxy)
+socketpair ones could be passed to containers.
 
-In the second case the proper retry would be handled implicit by
-the SPI interrupt. So drop the retry code and simplify the receive path.
-
-Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
-=2D--
- drivers/net/ethernet/vertexcom/mse102x.c | 34 +++++++++---------------
- 1 file changed, 12 insertions(+), 22 deletions(-)
-
-diff --git a/drivers/net/ethernet/vertexcom/mse102x.c b/drivers/net/ethern=
-et/vertexcom/mse102x.c
-index aeef144d0051..a474ceb77ece 100644
-=2D-- a/drivers/net/ethernet/vertexcom/mse102x.c
-+++ b/drivers/net/ethernet/vertexcom/mse102x.c
-@@ -312,31 +312,20 @@ static irqreturn_t mse102x_rx_pkt_spi(struct mse102x=
-_net *mse)
- 	__be16 rx =3D 0;
- 	u16 cmd_resp;
- 	u8 *rxpkt;
--	int ret;
-=20
- 	mse102x_tx_cmd_spi(mse, CMD_CTR);
--	ret =3D mse102x_rx_cmd_spi(mse, (u8 *)&rx);
--	cmd_resp =3D be16_to_cpu(rx);
--
--	if (ret || ((cmd_resp & CMD_MASK) !=3D CMD_RTS)) {
-+	if (mse102x_rx_cmd_spi(mse, (u8 *)&rx)) {
- 		usleep_range(50, 100);
-+		return IRQ_NONE;
-+	}
-=20
--		mse102x_tx_cmd_spi(mse, CMD_CTR);
--		ret =3D mse102x_rx_cmd_spi(mse, (u8 *)&rx);
--		if (ret)
--			return IRQ_NONE;
--
--		cmd_resp =3D be16_to_cpu(rx);
--		if ((cmd_resp & CMD_MASK) !=3D CMD_RTS) {
--			net_dbg_ratelimited("%s: Unexpected response (0x%04x)\n",
--					    __func__, cmd_resp);
--			mse->stats.invalid_rts++;
--			drop =3D true;
--			goto drop;
--		}
--
--		net_dbg_ratelimited("%s: Unexpected response to first CMD\n",
--				    __func__);
-+	cmd_resp =3D be16_to_cpu(rx);
-+	if ((cmd_resp & CMD_MASK) !=3D CMD_RTS) {
-+		net_dbg_ratelimited("%s: Unexpected response (0x%04x)\n",
-+				    __func__, cmd_resp);
-+		mse->stats.invalid_rts++;
-+		drop =3D true;
-+		goto drop;
- 	}
-=20
- 	rxlen =3D cmd_resp & LEN_MASK;
-@@ -558,7 +547,8 @@ static int mse102x_net_open(struct net_device *ndev)
- 	 * So poll for possible packet(s) to re-arm the interrupt.
- 	 */
- 	mutex_lock(&mses->lock);
--	mse102x_rx_pkt_spi(mse);
-+	if (mse102x_rx_pkt_spi(mse) =3D=3D IRQ_NONE)
-+		mse102x_rx_pkt_spi(mse);
- 	mutex_unlock(&mses->lock);
-=20
- 	netif_dbg(mse, ifup, ndev, "network device up\n");
-=2D-=20
-2.34.1
-
+> 
+> - The coredump server should use SO_PEERPIDFD to get a stable handle on
+>   the connected crashing task. The retrieved pidfd will provide a stable
+>   reference even if the crashing task gets SIGKILLed while generating
+>   the coredump.
+> 
+> - By setting core_pipe_limit non-zero userspace can guarantee that the
+>   crashing task cannot be reaped behind it's back and thus process all
+>   necessary information in /proc/<pid>. The SO_PEERPIDFD can be used to
+>   detect whether /proc/<pid> still refers to the same process.
+> 
+>   The core_pipe_limit isn't used to rate-limit connections to the
+>   socket. This can simply be done via AF_UNIX socket directly.
+> 
+> - The pidfd for the crashing task will contain information how the task
+>   coredumps. The PIDFD_GET_INFO ioctl gained a new flag
+>   PIDFD_INFO_COREDUMP which can be used to retreive the coredump
+>   information.
+> 
+>   If the coredump gets a new coredump client connection the kernel
+>   guarantees that PIDFD_INFO_COREDUMP information is available.
+>   Currently the following information is provided in the new
+>   @coredump_mask extension to struct pidfd_info:
+> 
+>   * PIDFD_COREDUMPED is raised if the task did actually coredump.
+>   * PIDFD_COREDUMP_SKIP	is raised if the task skipped coredumping (e.g.,
+>     undumpable).
+>   * PIDFD_COREDUMP_USER	is raised if this is a regular coredump and
+>     doesn't need special care by the coredump server.
+>   * IDFD_COREDUMP_ROOT is raised if the generated coredump should be
+>     treated as sensitive and the coredump server should restrict to the
+>     generated coredump to sufficiently privileged users.
+> 
+> - Since unix_stream_connect() runs bpf programs during connect it's
+>   possible to even redirect or multiplex coredumps to other sockets.
+> 
+> - The coredump server should mark itself as non-dumpable.
+>   To capture coredumps for the coredump server itself a bpf program
+>   should be run at connect to redirect it to another socket in
+>   userspace. This can be useful for debugging crashing coredump servers.
+> 
+> - A container coredump server in a separate network namespace can simply
+>   bind to linuxafsk/coredump.socket and systemd-coredump fowards
+>   coredumps to the container.
+> 
+> - Fwiw, one idea is to handle coredumps via per-user/session coredump
+>   servers that run with that users privileges.
+> 
+>   The coredump server listens on the coredump socket and accepts a
+>   new coredump connection. It then retrieves SO_PEERPIDFD for the
+>   client, inspects uid/gid and hands the accepted client to the users
+>   own coredump handler which runs with the users privileges only.
+> 
+> The new coredump socket will allow userspace to not have to rely on
+> usermode helpers for processing coredumps and provides a safer way to
+> handle them instead of relying on super privileged coredumping helpers.
+> 
+> This will also be significantly more lightweight since no fork()+exec()
+> for the usermodehelper is required for each crashing process. The
+> coredump server in userspace can just keep a worker pool.
+> 
+> This is easy to test:
+> 
+> (a) coredump processing (we're using socat):
+> 
+>     > cat coredump_socket.sh
+>     #!/bin/bash
+> 
+>     set -x
+> 
+>     sudo bash -c "echo '@linuxafsk/coredump.socket' > /proc/sys/kernel/core_pattern"
+>     sudo socat --statistics abstract-listen:linuxafsk/coredump.socket,fork FILE:core_file,create,append,trunc
+> 
+> (b) trigger a coredump:
+> 
+>     user1@localhost:~/data/scripts$ cat crash.c
+>     #include <stdio.h>
+>     #include <unistd.h>
+> 
+>     int main(int argc, char *argv[])
+>     {
+>             fprintf(stderr, "%u\n", (1 / 0));
+>             _exit(0);
+>     }
+> 
+> Signed-off-by: Christian Brauner <brauner@kernel.org>
+> ---
+> Changes in v3:
+> - Use an abstract unix socket.
+> - Add documentation.
+> - Add selftests.
+> - Link to v2: https://lore.kernel.org/20250502-work-coredump-socket-v2-0-43259042ffc7@kernel.org
+> 
+> Changes in v2:
+> - Expose dumpability via PIDFD_GET_INFO.
+> - Place COREDUMP_SOCK handling under CONFIG_UNIX.
+> - Link to v1: https://lore.kernel.org/20250430-work-coredump-socket-v1-0-2faf027dbb47@kernel.org
+> 
+> ---
+> Christian Brauner (10):
+>       coredump: massage format_corname()
+>       coredump: massage do_coredump()
+>       net: reserve prefix
+>       coredump: add coredump socket
+>       coredump: validate socket name as it is written
+>       coredump: show supported coredump modes
+>       pidfs, coredump: add PIDFD_INFO_COREDUMP
+>       net, pidfs, coredump: only allow coredumping tasks to connect to coredump socket
+>       selftests/pidfd: add PIDFD_INFO_COREDUMP infrastructure
+>       selftests/coredump: add tests for AF_UNIX coredumps
+> 
+>  fs/coredump.c                                     | 358 +++++++++++++++++-----
+>  fs/pidfs.c                                        |  68 ++++
+>  include/linux/coredump.h                          |  12 +
+>  include/linux/pidfs.h                             |   4 +
+>  include/uapi/linux/pidfd.h                        |  16 +
+>  include/uapi/linux/un.h                           |   2 +
+>  net/unix/af_unix.c                                |  64 +++-
+>  tools/testing/selftests/coredump/stackdump_test.c |  71 ++++-
+>  tools/testing/selftests/pidfd/pidfd.h             |  22 ++
+>  9 files changed, 528 insertions(+), 89 deletions(-)
+> ---
+> base-commit: 4dd6566b5a8ca1e8c9ff2652c2249715d6c64217
+> change-id: 20250429-work-coredump-socket-87cc0f17729c
+> 
 
