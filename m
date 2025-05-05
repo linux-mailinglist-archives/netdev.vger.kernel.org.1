@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-187998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80A1CAAAF07
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:09:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE6DFAAAF0D
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:09:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1ECA316CB35
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:07:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B2E67B09D9
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:08:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36BD32F5FB3;
-	Mon,  5 May 2025 23:17:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C41373AE5D2;
+	Mon,  5 May 2025 23:19:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Eku9V9da"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vbkc9Ve2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8079E281359;
-	Mon,  5 May 2025 23:03:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B31439527F;
+	Mon,  5 May 2025 23:04:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746486195; cv=none; b=CD2ACHdsGpbX87qeXFo8eykXsXeJ9254nFKCyoaEZzy263fNDjJ2oJNIzAivpRASxP03/v2GwwJa+FVkQeB1low0yGkjjfEGj/tLiGiChJqYLxMRbnBSJGyAjZJj6Izon07JVQH7nGn6SO8SXHGB3VZEAjL3K7+rLFrdu63v1A4=
+	t=1746486271; cv=none; b=jDKFBOHcxXP5bDfHujTT+Momm1i9VwPML32/5V8mgKMISbSAqTlV7Nkyx6Ip2U3VPnPwa+DXq21aoRSOYsM4iy6HvnKAYD15XrekLR80UJy9TlbHfkOM1yMeYswFlc4bWWOeHInv3/vdHkdxAOj15Fs91+TAyW3yS+0hqXuhDfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746486195; c=relaxed/simple;
-	bh=cG9+6Z7Bog13sT6niqG2mYbzsvFckweOUilz1ChfGsY=;
+	s=arc-20240116; t=1746486271; c=relaxed/simple;
+	bh=rNRQtODZcnpVBIPGRz8IF6cUXjg8GEwei8Nmbe8MrKE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=t4U1+5dQ1Yj87a6V1ounBhh9MYU3EG3XtMQh1O0eLhYqtSSFEyP/+MrikGJse+6NjnHY1i1AMhwbVZqX5n32wA9Gnb97hm1uwF9DbJoNjWXavKAuo0UFituualsLhot8QGr5KVTKTOi33bx0tin5Gu3mTch6lK0dtGUAmMjGJfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Eku9V9da; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3F1AC4CEED;
-	Mon,  5 May 2025 23:03:12 +0000 (UTC)
+	 MIME-Version; b=GYd5m9wctK5U+tbc/phSdZtKe5l5nHmlSzjui6XvxqNMt8mWM1A8gP9ays3eUDgfHJPcURrVLHF99Lrbq+bpep/p8sefoJvJ0CVpD+KoQVIJVr72bJ7OVJ00pwUmN7SmOtnY4BvUMNrk5xfqAKJuAK1oN91LWwJQe313QjUDA0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vbkc9Ve2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29549C4CEE4;
+	Mon,  5 May 2025 23:04:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746486194;
-	bh=cG9+6Z7Bog13sT6niqG2mYbzsvFckweOUilz1ChfGsY=;
+	s=k20201202; t=1746486270;
+	bh=rNRQtODZcnpVBIPGRz8IF6cUXjg8GEwei8Nmbe8MrKE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Eku9V9dao6NMG5zyzaZGM7qBaIBi4MiGSQV2KzrJwbq6SF17AtLdZbuf+ksPXLDve
-	 zj2a3xu+kFFLNWVIhN6lia40qHM/Odxrg2EhwrWyitjlCcNeSadBasMToTUkXS3/Kn
-	 PVvOVQRrdMdHXfWoKrTrV5EW8cZ3urhDG5GqUZrkmUcsOvIszYTkA7sXaXrjLXeZpq
-	 d+/IAM1eWaVjMIKTGSpX09i/U0zUJXlZTQ8meMLLDmJWnO74hYNkO2VBV8CjTOixWl
-	 qcVtAIOp2rvAaqw5EfwIV/ssDyJ6C59ae+iImsCIA1rBm4tx8xxjurB53ZRjSkofBZ
-	 RLBmrL8JRr28w==
+	b=Vbkc9Ve2WFxcfg5sdFgkMjbOX5xyraOabkI6K/VGB6DGy7H3oSyZ5D+r8JnZyPjvl
+	 vt4hPyPdUPSH/+NgzAdbZHg+jbtBPl0fnjcdsg6+kM9QDUd3p4HlOSyYoMELXfAhJV
+	 C3Q6OGZqNlL0Eyc+RfmkplOqolmFsIqehLGG3zjQ/ryBs1F3IO/9tvMOGmxK2aW+o9
+	 sAM/6w5aDA+2mjs3jcLyR1a4G1AJFPv3mx3jhg9n7s6TF3M3/FM6Bk0WD2RPJNf8/O
+	 zkSj2mCkkFa/8B+eXMPCDXHWhqqzzrt1dt7+pM3Cc37q7g2UgEUQcri4HbqRxzy1A7
+	 0VhLX1lDwOhyw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Shahar Shitrit <shshitrit@nvidia.com>,
+Cc: Alexei Lazar <alazar@nvidia.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	saeedm@nvidia.com,
@@ -56,9 +56,9 @@ Cc: Shahar Shitrit <shshitrit@nvidia.com>,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org,
 	linux-rdma@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 197/294] net/mlx5: Apply rate-limiting to high temperature warning
-Date: Mon,  5 May 2025 18:54:57 -0400
-Message-Id: <20250505225634.2688578-197-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 232/294] net/mlx5: Extend Ethtool loopback selftest to support non-linear SKB
+Date: Mon,  5 May 2025 18:55:32 -0400
+Message-Id: <20250505225634.2688578-232-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505225634.2688578-1-sashal@kernel.org>
 References: <20250505225634.2688578-1-sashal@kernel.org>
@@ -73,43 +73,39 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.89
 Content-Transfer-Encoding: 8bit
 
-From: Shahar Shitrit <shshitrit@nvidia.com>
+From: Alexei Lazar <alazar@nvidia.com>
 
-[ Upstream commit 9dd3d5d258aceb37bdf09c8b91fa448f58ea81f0 ]
+[ Upstream commit 95b9606b15bb3ce1198d28d2393dd0e1f0a5f3e9 ]
 
-Wrap the high temperature warning in a temperature event with
-a call to net_ratelimit() to prevent flooding the kernel log
-with repeated warning messages when temperature exceeds the
-threshold multiple times within a short duration.
+Current loopback test validation ignores non-linear SKB case in
+the SKB access, which can lead to failures in scenarios such as
+when HW GRO is enabled.
+Linearize the SKB so both cases will be handled.
 
-Signed-off-by: Shahar Shitrit <shshitrit@nvidia.com>
+Signed-off-by: Alexei Lazar <alazar@nvidia.com>
+Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
 Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Link: https://patch.msgid.link/20250213094641.226501-2-tariqt@nvidia.com
+Link: https://patch.msgid.link/20250209101716.112774-15-tariqt@nvidia.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/events.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/en_selftest.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/events.c b/drivers/net/ethernet/mellanox/mlx5/core/events.c
-index 0f4763dab5d25..e7143d32b2211 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/events.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/events.c
-@@ -169,9 +169,10 @@ static int temp_warn(struct notifier_block *nb, unsigned long type, void *data)
- 	value_lsb &= 0x1;
- 	value_msb = be64_to_cpu(eqe->data.temp_warning.sensor_warning_msb);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_selftest.c b/drivers/net/ethernet/mellanox/mlx5/core/en_selftest.c
+index 08a75654f5f18..c170503b3aace 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_selftest.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_selftest.c
+@@ -165,6 +165,9 @@ mlx5e_test_loopback_validate(struct sk_buff *skb,
+ 	struct udphdr *udph;
+ 	struct iphdr *iph;
  
--	mlx5_core_warn(events->dev,
--		       "High temperature on sensors with bit set %llx %llx",
--		       value_msb, value_lsb);
-+	if (net_ratelimit())
-+		mlx5_core_warn(events->dev,
-+			       "High temperature on sensors with bit set %llx %llx",
-+			       value_msb, value_lsb);
- 
- 	return NOTIFY_OK;
- }
++	if (skb_linearize(skb))
++		goto out;
++
+ 	/* We are only going to peek, no need to clone the SKB */
+ 	if (MLX5E_TEST_PKT_SIZE - ETH_HLEN > skb_headlen(skb))
+ 		goto out;
 -- 
 2.39.5
 
