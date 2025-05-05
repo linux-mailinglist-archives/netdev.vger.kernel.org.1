@@ -1,78 +1,50 @@
-Return-Path: <netdev+bounces-188185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D691BAAB7E6
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:22:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7280AAB820
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:27:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5ADB55023FB
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:20:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C71E3AF344
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:20:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 719AB354E09;
-	Tue,  6 May 2025 01:13:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64B9628C5CF;
+	Tue,  6 May 2025 01:18:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="V6Tplmlg";
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="gXF7aWd0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TFbcGhKI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 219A730C1F7;
-	Mon,  5 May 2025 23:42:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDA25312819
+	for <netdev@vger.kernel.org>; Mon,  5 May 2025 23:50:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746488532; cv=none; b=gqTMr4tKR/XESmn0zXeN2W4vCoDLyOgQD7yWdTHHE0GvtbmE4L6yqiige+tP/Zk/4HtBi9J0QBN4oPYzcMfrMW9WrhsjIZknq+zoDJAbnLNc4+b9nWc+JkL0PnBJ6EjzIEQjWvXLg19/Eo0ojaNCGTNZ53sd4RAOISvxFl0RC6Y=
+	t=1746489044; cv=none; b=E5HRJMCLKhQ/oMRWYo5IKPq+N06qhW0NZUTJJ2rGjjBqEJyck33W9pk/o4FI4IjML7sd/YKI63aZYFaFKLq5h1A/KrrG1LGOSAJz9ij3CCYYYWqmBrQwYaSiPkN7H0TRmC6RGRfPrKTqKSJ5ldGsiK0klrmwYAGVZvTKGWm8NKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746488532; c=relaxed/simple;
-	bh=rHkIcYpd8IVf/yuDq1tl9uYYDKLeL1IrOA5/oplKYic=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nt70Po/lwejcqjWqXChqEnrTLEkgg0le3bvzAiqPRRczoc6kR84HmEGkf2ONWfpY7969Z6Kdbk9coZ90rwUIeTECli+mUm4/SAdLPbJbDhoTWJ9srQY2nCZ6nDKCLeJrrfWquHSmhrlst2O5FgA+Y4HyCJp9j0Coj3PAeCigQwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=V6Tplmlg; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=gXF7aWd0; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: by mail.netfilter.org (Postfix, from userid 109)
-	id 8033560655; Tue,  6 May 2025 01:42:09 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1746488529;
-	bh=r5HCCgoT0G3V8yuYwiKnaIC/5iF9MPectUiKQD7HoWw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=V6TplmlgxIrlpkAqNR49BmZCCbe5MtTDR1nYFJ/S3mkiEh4/3aLTEw01meXK1enWD
-	 g2U6Vep09BYO7ZhmevURLt2IuYBhcE2k5bgq7Erc8ONPGUDV50TZqfugONEIPfYeAd
-	 PbArxmobWUygSOl2ljDxXsn6XLc4xG4zUw5PzJDcSBtLfKogXjI3TWjtbwSgdiFqTZ
-	 Zs5MHTrZBFPBUR3ceMITtnmetVUZpS8e42F0ZjxnRv+VmEcjytEar5UX7mpqQRoTsR
-	 NGLyirrmTJIOSx4FIa2uiIZ9d/Rxx2m6yRvBCetfw1sBu2+eAICN7XQ6fh4ouBAp4A
-	 2+c9DQPZ0B7Og==
-X-Spam-Level: 
-Received: from localhost.localdomain (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id 78A0A60656;
-	Tue,  6 May 2025 01:42:00 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1746488520;
-	bh=r5HCCgoT0G3V8yuYwiKnaIC/5iF9MPectUiKQD7HoWw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gXF7aWd0jpXVvdCjpesX5BVdWMNyMChlCXr6TJe0XInurTz2pC1HOUDVT1XY3UD/I
-	 XI6llja51AuCNJ/UP5TqeJsnLlQSG0ybaGqJ7W8i2M2iF7wyPJWhKiLpi6dfy9eZ0e
-	 jMsVd2ziGpgOjSMuQLqEoqVyvqqRwV5Oy+f8CeZXSQJ3HkqJ8NV9FkMBA+LRrkr6/e
-	 gCbN92TN+J/UPTsRxtBNqNdzT/4hvShRRIExJ+k60EVjPaCDgiIyQj7UZ8fAIderub
-	 x1KGqtHhuZ1n3A8kdU8LLk08Z1qwA6JFggpj9l5GSza9X0/6kiHO/n8eB8s7o/5ZD4
-	 pvmgUtENfP89Q==
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de,
-	horms@kernel.org
-Subject: [PATCH nf-next 6/7] netfilter: nft_set_pipapo: clamp maximum map bucket size to INT_MAX
-Date: Tue,  6 May 2025 01:41:50 +0200
-Message-Id: <20250505234151.228057-7-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20250505234151.228057-1-pablo@netfilter.org>
-References: <20250505234151.228057-1-pablo@netfilter.org>
+	s=arc-20240116; t=1746489044; c=relaxed/simple;
+	bh=Imvs25kNyD3wbRL8FIIKi8JHDwJ1XTQgKqj9YAt0RsQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=XpkTfWf0MjObVuCTEgJfMeYcFCs2NukwF1EpBwS/pGlN20CGTtOxcL/Ie/6Y/VmJHk+JEwhib1mKGhwIg6SXOWKxluHrB09y4gS81DuWqLia8CEHlCliGqH2x68zTJMfBZdJGVnNLEmPQ7C9wn/RjX4Xs0zsJt7GrsKiG0MdndE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TFbcGhKI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7854EC4CEE4;
+	Mon,  5 May 2025 23:50:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746489042;
+	bh=Imvs25kNyD3wbRL8FIIKi8JHDwJ1XTQgKqj9YAt0RsQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=TFbcGhKIS1spVbUgOrTyJZORk1R5t7ss5dGQwpDCbYNIB7T0QhIYNt/3N8dNV1ya9
+	 1EAGvVI4EbJ0TJiHATf4ANrfLZQjnXjBKYDOrDMfbSMH/ibr/1KFLcXXiakyTRiUdE
+	 YeldDxxGBwgm9lTSIQE1kvtmireRM99RqV+Vx1Z05edwvAPejkWARUlf873Ywz8Sx9
+	 8hSvYZ/U64MNg9QuJCAmvu1v/FJ1J58U5Jrm/4BRoyUZH5wr+xrkpmaWuCKEVeoQPW
+	 pE5+KrgGcffBh9kJWPT5IxMXImAz0ozfbIkODbjHJ4Ral4YP1DLtVVKPWTqCUH/V3B
+	 rE44Es4keETlg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD23380CFD9;
+	Mon,  5 May 2025 23:51:22 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,45 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [Patch net 0/2] net_sched: fix a regression in sch_htb
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174648908149.967302.17523654895263433591.git-patchwork-notify@kernel.org>
+Date: Mon, 05 May 2025 23:51:21 +0000
+References: <20250428232955.1740419-1-xiyou.wangcong@gmail.com>
+In-Reply-To: <20250428232955.1740419-1-xiyou.wangcong@gmail.com>
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
+ alan@wylie.me.uk
 
-Otherwise, it is possible to hit WARN_ON_ONCE in __kvmalloc_node_noprof()
-when resizing hashtable because __GFP_NOWARN is unset.
+Hello:
 
-Similar to:
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-  b541ba7d1f5a ("netfilter: conntrack: clamp maximum hashtable size to INT_MAX")
+On Mon, 28 Apr 2025 16:29:53 -0700 you wrote:
+> This patchset contains a fix for the regression reported by Alan and a
+> selftest to cover that case. Please see each patch description for more
+> details.
+> 
+> ---
+> 
+> Cong Wang (2):
+>   sch_htb: make htb_deactivate() idempotent
+>   selftests/tc-testing: Add a test case to cover basic HTB+FQ_CODEL case
+> 
+> [...]
 
-Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- net/netfilter/nft_set_pipapo.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Here is the summary with links:
+  - [net,1/2] sch_htb: make htb_deactivate() idempotent
+    https://git.kernel.org/netdev/net/c/376947861013
+  - [net,2/2] selftests/tc-testing: Add a test case to cover basic HTB+FQ_CODEL case
+    https://git.kernel.org/netdev/net/c/63890286f557
 
-diff --git a/net/netfilter/nft_set_pipapo.c b/net/netfilter/nft_set_pipapo.c
-index 0529e4ef7520..c5855069bdab 100644
---- a/net/netfilter/nft_set_pipapo.c
-+++ b/net/netfilter/nft_set_pipapo.c
-@@ -663,6 +663,9 @@ static int pipapo_realloc_mt(struct nft_pipapo_field *f,
- 	    check_add_overflow(rules, extra, &rules_alloc))
- 		return -EOVERFLOW;
- 
-+	if (rules_alloc > (INT_MAX / sizeof(*new_mt)))
-+		return -ENOMEM;
-+
- 	new_mt = kvmalloc_array(rules_alloc, sizeof(*new_mt), GFP_KERNEL_ACCOUNT);
- 	if (!new_mt)
- 		return -ENOMEM;
-@@ -1499,6 +1502,9 @@ static struct nft_pipapo_match *pipapo_clone(struct nft_pipapo_match *old)
- 		       src->groups * NFT_PIPAPO_BUCKETS(src->bb));
- 
- 		if (src->rules > 0) {
-+			if (src->rules_alloc > (INT_MAX / sizeof(*src->mt)))
-+				goto out_mt;
-+
- 			dst->mt = kvmalloc_array(src->rules_alloc,
- 						 sizeof(*src->mt),
- 						 GFP_KERNEL_ACCOUNT);
+You are awesome, thank you!
 -- 
-2.30.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
