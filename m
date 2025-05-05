@@ -1,196 +1,187 @@
-Return-Path: <netdev+bounces-187790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E0DDAA9A80
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 19:29:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B15EBAA9A9F
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 19:33:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 445233BE195
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 17:29:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2BB63AAAAB
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 17:33:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3C0126C389;
-	Mon,  5 May 2025 17:28:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF0092690F2;
+	Mon,  5 May 2025 17:33:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="ctRys7Jw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YoeKViSM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E86C426B96B;
-	Mon,  5 May 2025 17:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D0E42A82;
+	Mon,  5 May 2025 17:33:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746466137; cv=none; b=pTPtBwqrj/ZeJaV1JLGclvrOTGC8O2eGrxsJcLs29Hcs2atlajBc5kAjzqMqYv7a7uzWvgQuUrX24AmmGr7X9r14apaSulbF9ZOiBVrG0sHC8JW2HNGSY35M1ragWNMOCUOWaO4Lkr4lIG//+sfA+WQgegr2QwKzBrOpkoElXbY=
+	t=1746466409; cv=none; b=pJuJYTH5lHeWX47NmZPiENfBRMK6qacicjIBkLJVKOlYnsMDK4qESf5ioE5fFMDM8qkbFUZujEUyiQ3a6ycGAtQhlfCzJk5o3h1ngyjyDkxbR8IV/7BlYtyutiixnEoJ3L54Nm8sd9KKghKJ2M/mOcOu50Fx+o+FG6dLLAjygZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746466137; c=relaxed/simple;
-	bh=Q9SUJDlxu7+oHqqERc9KWOzxSght9ksFz6MmLIcSFVQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iEjMtV5SCcNVqnewbCsLAWji1sGfEgvXULahkifUjJg1PV8pEZKQojWJfDrqRxfGXHGPOnZ4ZN/AxluMxGQrZ5rklgnO8na2tTA/LB5lqRKuP8qmOr4Yo6/dpg+nvznbVUamOpvbHlc9KcCFzgYK7MX1ojLpxgiaVGqYE0bYRUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=ctRys7Jw; arc=none smtp.client-ip=212.227.17.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1746466118; x=1747070918; i=wahrenst@gmx.net;
-	bh=TS+8AQqmHliHMq0qcLfbUxz1SOqHNnQuwRnW5p6kMog=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=ctRys7JwUqbmYB6bjCdds4rzccyadII+UAdqJ5H2kdwPg3r7d0XagiqcZxuoA5Zd
-	 Wr2bdlIHwwFxqKpdVO/mbwcEuD01xGwe9DjI9i2PJxK2nwypJfIK+rt6apTac0iWW
-	 k2A8RV2xptPVJu/XTq61B7pit80cHicmMFID0ICjm4Z7q4F/UpC/rJsadvvejD6xN
-	 0tkaJYMGAHuDgwvN9mrun1n/DyteBt2OCJ9Ow1WaN/tUIIHj3rYWE6kmZfRLBkYSn
-	 XqO8Rd9/zkcliFgq9Q4lIe7iu3ImWyOZwIOLBTEWv0VZGYJ6E+tZv/piLpqmoE//R
-	 fUB0SVarFSGtXtvZog==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [192.168.1.101] ([91.41.216.208]) by mail.gmx.net (mrgmx105
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1Mg6dy-1ug5qS2xqg-00oARP; Mon, 05
- May 2025 19:28:38 +0200
-Message-ID: <3b9bf068-fa84-454f-8cca-cb424a1556a4@gmx.net>
-Date: Mon, 5 May 2025 19:28:34 +0200
+	s=arc-20240116; t=1746466409; c=relaxed/simple;
+	bh=A9nqwk4EU2CFq+nYXobdwXRr84cWRlfVQ+QuUpCQ57U=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=DnXB2rqY845MEMioG88V0ASGtCaxBbu0Ioi585tDgfu8gl39k/tbpi3w7YWjPXnOCG1Wg/8GBW64aV0omVtUBNsw0A3A9hN/dtV3/JEuiCArtiPyrT9tYuGYvljW423e5e9eATL1iKw5Kes+P0zGobqWdTYSajJXXtidvZ8yBY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YoeKViSM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DE76C4CEE4;
+	Mon,  5 May 2025 17:33:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746466409;
+	bh=A9nqwk4EU2CFq+nYXobdwXRr84cWRlfVQ+QuUpCQ57U=;
+	h=From:Subject:Date:To:Cc:From;
+	b=YoeKViSMJjyBioYn99YJcg3fMmlpvnFk07JFGSXKQ7BMS6WLhry76wkKFwm+Te3zK
+	 Z71iIh9W3IXczAYGrLCvJ9+hCpUtVKEz8hkO8MlgmsHnRuFASy0wt+9tuTjfhmrHVi
+	 qf4YvlWWPcEUGT+y3uNYIvHNIfKoQhWaQYvTVM0IFXmLaEPAvbg5yOvPgkfWXsBZ8V
+	 64SKDanLsPeG0jLRRk6ur4Ytj48W4P+yskRDRLStUlqJUGNx4vaQyMzhgRrRPETi0C
+	 3gQc91Ay6UYK8zSJXx9m/efjZ4Wq9JNxTyPegfsTMysq9Hf6OT9VMkeJH8cRL56ma2
+	 qUiSANJIAPxzg==
+From: Jeff Layton <jlayton@kernel.org>
+Subject: [PATCH v7 00/10] ref_tracker: add ability to register a debugfs
+ file for a ref_tracker_dir
+Date: Mon, 05 May 2025 13:33:14 -0400
+Message-Id: <20250505-reftrack-dbgfs-v7-0-f78c5d97bcca@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/5] net: vertexcom: mse102x: Drop invalid cmd
- stats
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org
-References: <20250505142427.9601-1-wahrenst@gmx.net>
- <20250505142427.9601-4-wahrenst@gmx.net>
- <fdac2206-86ad-4d07-9aea-ef88820dfc88@lunn.ch>
-Content-Language: en-US
-From: Stefan Wahren <wahrenst@gmx.net>
-Autocrypt: addr=wahrenst@gmx.net; keydata=
- xjMEZ1dOJBYJKwYBBAHaRw8BAQdA7H2MMG3q8FV7kAPko5vOAeaa4UA1I0hMgga1j5iYTTvN
- IFN0ZWZhbiBXYWhyZW4gPHdhaHJlbnN0QGdteC5uZXQ+wo8EExYIADcWIQT3FXg+ApsOhPDN
- NNFuwvLLwiAwigUCZ1dOJAUJB4TOAAIbAwQLCQgHBRUICQoLBRYCAwEAAAoJEG7C8svCIDCK
- JQ4BAP4Y9uuHAxbAhHSQf6UZ+hl5BDznsZVBJvH8cZe2dSZ6AQCNgoc1Lxw1tvPscuC1Jd1C
- TZomrGfQI47OiiJ3vGktBc44BGdXTiQSCisGAQQBl1UBBQEBB0B5M0B2E2XxySUQhU6emMYx
- f5QR/BrEK0hs3bLT6Hb9WgMBCAfCfgQYFggAJhYhBPcVeD4Cmw6E8M000W7C8svCIDCKBQJn
- V04kBQkHhM4AAhsMAAoJEG7C8svCIDCKJxoA/i+kqD5bphZEucrJHw77ujnOQbiKY2rLb0pE
- aHMQoiECAQDVbj827W1Yai/0XEABIr8Ci6a+/qZ8Vz6MZzL5GJosAA==
-In-Reply-To: <fdac2206-86ad-4d07-9aea-ef88820dfc88@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:MEuqLFBDy73ap3gVhdMkTjQFy7LTG3+oKSvKM0vpIZmL8MvWi/7
- JzzxmRNupbKnu6Ix57G2Zo23B+vFR0uMf+KkN8544m4s/zyYlaO0H+MwyeBKSjC68y0/6z6
- iL5xISX1Uym0JIvCvuB+33j3Bvz3PKo4LIJJKWNkoOk9bsuOwtTTjBVS8y6WB0YF3VpYy0j
- rQDgmkez/VtCNvdw94SPw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:3OGx38FJPJw=;Sdx4+6ly0SSU7GWDYtj4lyNB02G
- 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
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAFr2GGgC/2XQzWoDIRSG4VsJrmvRc3R0uup9lC78nUjKTNEwt
+ IS5954ECrYuP+V5QW+spVpSYy+nG6tpL61sKw3zdGLh7NYl8RJpMxCghZLIa8rX6sKFR7/kxtF
+ MxqPABNkxQp90X74ewbd32ufSrlv9fvR3eT/9Tan/qV1ywbNAbbVFAIGvl1TX9PG81YXdWzv0X
+ g8eyHtpg3I+SoA8eOy9GTySDyj1rMAGm/3gVe/t4BV5HZwOxs6zVmrwuvMwek1eBu9jpsdbHwc
+ /dR7F4CfydjIBZpfpH90ffxzHD58iwrztAQAA
+X-Change-ID: 20250413-reftrack-dbgfs-3767b303e2fa
+To: Andrew Morton <akpm@linux-foundation.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+ Jani Nikula <jani.nikula@linux.intel.com>, 
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, 
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, 
+ Tvrtko Ursulin <tursulin@ursulin.net>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Qasim Ijaz <qasdev00@gmail.com>, 
+ Nathan Chancellor <nathan@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, 
+ Jeff Layton <jlayton@kernel.org>, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4332; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=A9nqwk4EU2CFq+nYXobdwXRr84cWRlfVQ+QuUpCQ57U=;
+ b=owEBbQKS/ZANAwAIAQAOaEEZVoIVAcsmYgBoGPZh/zwOU78oskuy2Fq8nW/14U1t/GlL8FSf6
+ h60UEe1S3yJAjMEAAEIAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaBj2YQAKCRAADmhBGVaC
+ FUaQEACzDsUMhzfWXRnGuD2PzW5co2ALVUNLJFKiiKpZ6s2KReXJbAezpqTZ+/JlLuzDA17wpYI
+ oC1gQEjE6XYOIIqK8xUjtWtRRHkCDwvBWRlufftwWeDsnozbJEE4ArrIXTxC7DMOUaneZEBj9so
+ IA/wSOgsoGbaGpKkbxC97e9VS3UyU5ZHJmcsSZg61lIgl3azV1QCn1oCPvX5e5YMV2F0FZTGFfh
+ 82ufKlOMz+t5MXA9AQXuwCQuiwdLI/CuAcWrq3zzez3RXWvKaemsPVZSQhZzVMRmgBEgv5Ns3Vh
+ LDcuAPHQFWushXiHjOcIo3jx7bqM6xVQP9lRwhcZ47fMqaQ7m0i1WwVnvsnD3fhB6OOqd1LlV9G
+ 4/oqQHL5r5ECqrDyucKIOdyYUk1h4YH2CVSYvyH9iozOO6AHo1TDshp1K1tQ6Jhr1AiP0/JTgB0
+ 9d7JjyoqBINB4kkpKu0b4DWsjUcQ/cCR2X0Iyv93b2qOFBCRhXSUatU1nAIZz+Lhi4yK05xsIl1
+ EqNgnGDUo06UfwkCp2OUfyE6w5BbJbQyk4PQ9H1r0+7wtggTxU5gPjd5bqnljXxK8Fw3kFvWIQq
+ tcK1HpwNh4XieC+gHV5PSIr4lWs4her4hq7MJZ0tfnaXTDfinwi5IlfRkOPAlc4Qff87IUYTHt6
+ wsjJl2rCqp4LvEg==
+X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
+ fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-Am 05.05.25 um 18:35 schrieb Andrew Lunn:
-> On Mon, May 05, 2025 at 04:24:25PM +0200, Stefan Wahren wrote:
->> The SPI implementation on the MSE102x MCU is in software, as a result
->> it cannot reply to SPI commands in busy state and increase the invalid
->> command counter. So drop the confusing statistics about "invalid" comma=
-nd
->> replies.
->>
->> Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
->> ---
->>   drivers/net/ethernet/vertexcom/mse102x.c | 3 ---
->>   1 file changed, 3 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/vertexcom/mse102x.c b/drivers/net/eth=
-ernet/vertexcom/mse102x.c
->> index 33371438aa17..204ce8bdbaf8 100644
->> --- a/drivers/net/ethernet/vertexcom/mse102x.c
->> +++ b/drivers/net/ethernet/vertexcom/mse102x.c
->> @@ -45,7 +45,6 @@
->>  =20
->>   struct mse102x_stats {
->>   	u64 xfer_err;
->> -	u64 invalid_cmd;
->>   	u64 invalid_ctr;
->>   	u64 invalid_dft;
->>   	u64 invalid_len;
->> @@ -56,7 +55,6 @@ struct mse102x_stats {
->>  =20
->>   static const char mse102x_gstrings_stats[][ETH_GSTRING_LEN] =3D {
->>   	"SPI transfer errors",
->> -	"Invalid command",
->>   	"Invalid CTR",
->>   	"Invalid DFT",
->>   	"Invalid frame length",
->> @@ -194,7 +192,6 @@ static int mse102x_rx_cmd_spi(struct mse102x_net *m=
-se, u8 *rxb)
->>   	} else if (*cmd !=3D cpu_to_be16(DET_CMD)) {
->>   		net_dbg_ratelimited("%s: Unexpected response (0x%04x)\n",
->>   				    __func__, *cmd);
->> -		mse->stats.invalid_cmd++;
-> If the net_dbg_ratelimited() is going to stay, maybe rename the
-> counter to unexpct_rsp, or similar?
-The problem here is that there are many reasons for the unexpected respons=
-e:
+This one is quite a bit of a change from the last set. I've gone back to
+auto-registering the debugfs files for every ref_tracker_dir. With this,
+the callers should pass in a static string as a classname instead of an
+individual name string that gets copied. The debugfs file is given a
+name "class@%px" The output format is switched to print "class@%p"
+instead of "name@%p".
 
-  * line interferences
-  * MSE102x has no firmware installed
-  * MSE102x busy
-  * no packet in MSE102x receive buffer
+To allow for human-readable names, I've added the ability to add a
+symlink in the debugfs dir that can be set to an arbitrary name. This is
+optional. I've only added them to the netns and i915 trackers in this
+series.
 
-So without further context like the actual response this counter isn't=20
-very helpful and more likely to scare users. But I would like keep the=20
-debug message for hardware / wiring issues.
+Finally, with the above changes, we can eliminate the "name" field in
+the ref_tracker_dir which shrinks it by 16 bytes on a 64 bit host.
 
-Regards
+The original plan was to merge this via the networking tree. That's
+probably still doable but there are some display port and i915 changes
+in here too. Note that those are untested, mostly because I don't have
+the necessary hardware handy.
 
->
-> 	Andrew
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
+---
+Changes in v7:
+- include net->net_cookie in netns symlink name
+- add __ostream_printf to ref_tracker_dir_symlink() stub function
+- remove unneeded #include of seq_file.h
+- Link to v6: https://lore.kernel.org/r/20250430-reftrack-dbgfs-v6-0-867c29aff03a@kernel.org
+
+Changes in v6:
+- clean up kerneldoc comment for ref_tracker_dir_debugfs()
+- add missing stub function for ref_tracker_dir_symlink()
+- temporary __maybe_unused on ref_tracker_dir_seq_print() to silence compiler warning
+- Link to v5: https://lore.kernel.org/r/20250428-reftrack-dbgfs-v5-0-1cbbdf2038bd@kernel.org
+
+Changes in v5:
+- add class string to each ref_tracker_dir
+- auto-register debugfs file for every tracker in ref_tracker_dir_init
+- add function to allow adding a symlink for each tracker
+- add patches to create symlinks for netns's and i915 entries
+- change output format to print class@%p instead of name@%p
+- eliminate the name field in ref_tracker_dir
+- fix off-by-one bug when NULL terminating name string
+- Link to v4: https://lore.kernel.org/r/20250418-reftrack-dbgfs-v4-0-5ca5c7899544@kernel.org
+
+Changes in v4:
+- Drop patch to widen ref_tracker_dir_.name, use NAME_MAX+1 (256) instead since this only affects dentry name
+- Link to v3: https://lore.kernel.org/r/20250417-reftrack-dbgfs-v3-0-c3159428c8fb@kernel.org
+
+Changes in v3:
+- don't overwrite dir->name in ref_tracker_dir_debugfs
+- define REF_TRACKER_NAMESZ and use it when setting name
+- Link to v2: https://lore.kernel.org/r/20250415-reftrack-dbgfs-v2-0-b18c4abd122f@kernel.org
+
+Changes in v2:
+- Add patch to do %pK -> %p conversion in ref_tracker.c
+- Pass in output function to pr_ostream() instead of if statement
+- Widen ref_tracker_dir.name to 64 bytes to accomodate unique names
+- Eliminate error handling with debugfs manipulation
+- Incorporate pointer value into netdev name
+- Link to v1: https://lore.kernel.org/r/20250414-reftrack-dbgfs-v1-0-f03585832203@kernel.org
+
+---
+Jeff Layton (10):
+      ref_tracker: don't use %pK in pr_ostream() output
+      ref_tracker: add a top level debugfs directory for ref_tracker
+      ref_tracker: have callers pass output function to pr_ostream()
+      ref_tracker: add a static classname string to each ref_tracker_dir
+      ref_tracker: allow pr_ostream() to print directly to a seq_file
+      ref_tracker: automatically register a file in debugfs for a ref_tracker_dir
+      ref_tracker: add a way to create a symlink to the ref_tracker_dir debugfs file
+      net: add symlinks to ref_tracker_dir for netns
+      i915: add ref_tracker_dir symlinks for each tracker
+      ref_tracker: eliminate the ref_tracker_dir name field
+
+ drivers/gpu/drm/display/drm_dp_tunnel.c |   2 +-
+ drivers/gpu/drm/i915/intel_runtime_pm.c |   4 +-
+ drivers/gpu/drm/i915/intel_wakeref.c    |   3 +-
+ include/linux/ref_tracker.h             |  46 +++++++-
+ lib/ref_tracker.c                       | 190 +++++++++++++++++++++++++++++---
+ net/core/dev.c                          |   2 +-
+ net/core/net_namespace.c                |  34 +++++-
+ 7 files changed, 255 insertions(+), 26 deletions(-)
+---
+base-commit: 5bc1018675ec28a8a60d83b378d8c3991faa5a27
+change-id: 20250413-reftrack-dbgfs-3767b303e2fa
+
+Best regards,
+-- 
+Jeff Layton <jlayton@kernel.org>
 
 
