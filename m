@@ -1,125 +1,191 @@
-Return-Path: <netdev+bounces-187807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEE83AA9B13
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 19:53:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11817AA9B10
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 19:52:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 583AD17E5C8
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 17:53:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20997189FD78
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 17:52:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B687326C3A4;
-	Mon,  5 May 2025 17:53:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BCD826C3A4;
+	Mon,  5 May 2025 17:52:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="Hg3jJaIL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GrFsSaO/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DAD0199931
-	for <netdev@vger.kernel.org>; Mon,  5 May 2025 17:53:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F08651A3056;
+	Mon,  5 May 2025 17:52:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746467591; cv=none; b=urLeAzkDGxwxvMugmvXmEQNsjKaGvmqF2YjQLnt+NDKdp2qvcJMlj7hZWkZELo27f5XqObt4mmTgN1juLfYx258IGjLCMARWdlU6epHoPWQT2PUaSifN7+DOEpLYPgJMs8+i0dn7bYZdp1lcfqu0CcSKqSLBuksD4jdopJevngY=
+	t=1746467557; cv=none; b=sY5v+zf6it7Dof8DUYAovO3GlmhPTxwdsxqop06kvdR/KqA2+U0IYPbFeYa/sPuZDeDcsmg3iUKKBnSZooKvlHWXiZWZMUjfo6cmYT7IE26GkqmMeDsssOQdEiVKa2VPhClU3jriUoJ8eddfx2bho0wz4OPi/pTconme5M2es/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746467591; c=relaxed/simple;
-	bh=efNZquut4+9lZQufvATWrejGTyXtxT8Ei34p0JEOSrs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ka9TPu8zI0ubt3/ZAvSpjp9bZrTjjHWHvodz2KP3S8i3JT4egpdNjxXKuycG+FJZoboqYE4Iuh2Buc6s2CDwjtrW2KC18i4AFzq2F3ykhQwksh1+aJAZU+K2ZpgAVEpZ9BIDfRtzThU2QQcQYFYbg6blwJIImp9ofdPs3pXxyCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=Hg3jJaIL; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=bYnPpxrMlH6TUUSukQ5Al2s5BnBkDvWVQ6bEwFo6Csk=; t=1746467590; x=1747331590; 
-	b=Hg3jJaIL0NjYKlFRg/+rzVd/MyOcNcOEw/cSHBJOaWAfgSHPrUb3gTKW+f6eM45j3yZ8QVXplAV
-	F+P4ym+u0suAR6Mj0XWy12oKYywHssR0NtQTaPVVUr6TywXqHesvU6e3O4bXeAILGDi3ltIwNHsaX
-	AoU6i3lZlQyaiXkPUHT5LG1UEyvduuQHMZ8AhL+3QSysBdBCF/bPXs4siGSstkPRbjr6u/5G/Y3ml
-	OelXfDvPeUuYuikMMJxTW+LjPeHNuYCT99a/d29Otb7gE6fKc9hLidNUmMwbo9gCN7CQOpW39F+wb
-	n4aQTjl3xpFxkgTXVYuV/iUGCDvSZjRBQm7w==;
-Received: from mail-oo1-f43.google.com ([209.85.161.43]:54625)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1uC004-0007Vo-RA
-	for netdev@vger.kernel.org; Mon, 05 May 2025 10:53:09 -0700
-Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-60634f82c77so1296380eaf.1
-        for <netdev@vger.kernel.org>; Mon, 05 May 2025 10:53:08 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUpbg0EBh1UZocmWeawpIfJ8M2lKaUF0kmMMfRyzBMv360XzWUg+QhgcLbbNdtrp4uIGTJQhf4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yws0BgFEXqUtXq/tTFqrt0IZNG2m6uAJLf1uxb9oTTMt9QYDZEL
-	6SOBS/2oCEG5y4VIskgKRyaC7K+RhCqwhqgXTcbyn38gh2Ku2MOXFYdvmW60zZJHlpl9v4wTTu9
-	BmHk0yF3B32Jrt394zUlXfSko524=
-X-Google-Smtp-Source: AGHT+IHERwajXBBpROgo8vZtiz1kufhrc3t2uzXB7yurCE15f17QMrLzfWUPuopRY/Y+r4VKc351ElhYj+WK+shWi5M=
-X-Received: by 2002:a05:6820:4c87:b0:603:f191:a93b with SMTP id
- 006d021491bc7-608002bc780mr6730847eaf.1.1746467588273; Mon, 05 May 2025
- 10:53:08 -0700 (PDT)
+	s=arc-20240116; t=1746467557; c=relaxed/simple;
+	bh=bRdbB5nwoXceqJLAgXR8XsFvGMcB++yq5xBurBYsHF8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mxILYlid0zvVeHiRz0EdvB/IYdVrW6pxHk6mBezFWnaPRmOyMMOnJDuIqa5ckCifCFl6pWtTKVgvNSQiztF2XPX4xuaRuHttLB0IcPfaQTrBbGhLd+elPW44rwlqlNr6uAjDf1xCsRsI12dwzS+CH1ZdNAvYjcmyp0hpAUyrN/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GrFsSaO/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5A49C4CEE4;
+	Mon,  5 May 2025 17:52:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746467556;
+	bh=bRdbB5nwoXceqJLAgXR8XsFvGMcB++yq5xBurBYsHF8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GrFsSaO/rc5NtMJpnqe/lDFOwhuNGiijkItvt4S7Dl6WQdwK53uxHqqI6jUNG+qlK
+	 Y3o0WbevDK7KU+DAXO4j2Ko/caQ1qSb1JQAZJC3L7wPgy0lz/kNCaMSQ1lZ4/5hTdx
+	 JSMpqE21g9ySrJ+Bv8hq7ZUhLTotzRxchKiIsJDjPvVNB4V43i9ajouo2lmF8BA4vb
+	 c4lGkGcmZUbbIrCXsBS4Oc/V6+M9MArYDDC920EnMDebr0u8hq9ye+R1itIWb20P/x
+	 YNQ+mFyBUP3wHNnCJsa5xuyaHHCJng795ZBLx9n/30ErfOdsbia+f3TVfDm+ddH3CT
+	 RtD2/5dWf9DTw==
+Date: Mon, 5 May 2025 20:52:32 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Tanmay Jagdale <tanmay@marvell.com>
+Cc: bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
+	jerinj@marvell.com, hkelam@marvell.com, sbhatta@marvell.com,
+	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, bbhushan2@marvell.com, bhelgaas@google.com,
+	pstanner@redhat.com, gregkh@linuxfoundation.org,
+	peterz@infradead.org, linux@treblig.org,
+	krzysztof.kozlowski@linaro.org, giovanni.cabiddu@intel.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, rkannoth@marvell.com, sumang@marvell.com,
+	gcherian@marvell.com
+Subject: Re: [net-next PATCH v1 00/15] Enable Inbound IPsec offload on
+ Marvell CN10K SoC
+Message-ID: <20250505175232.GN5848@unreal>
+References: <20250502132005.611698-1-tanmay@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250502233729.64220-1-ouster@cs.stanford.edu>
- <20250502233729.64220-2-ouster@cs.stanford.edu> <938931dc-2157-44c8-b192-f6737b69f317@redhat.com>
- <CAGXJAmzqj3V=gubPBAH=zpNmHnW7g2Wk8mQ8=4wGhcJ9AsYb_g@mail.gmail.com> <56dfa989-92b9-42c6-afbd-c5eefcca42cf@lunn.ch>
-In-Reply-To: <56dfa989-92b9-42c6-afbd-c5eefcca42cf@lunn.ch>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Mon, 5 May 2025 10:52:30 -0700
-X-Gmail-Original-Message-ID: <CAGXJAmxNsvfdJP9QYwR+8mQesSvNpKKpMW4H8J1ELmi0i9jn5A@mail.gmail.com>
-X-Gm-Features: ATxdqUGGHJFlqNZaUsOKWkKKCnP49PC_VgCCyqHietEpLgLfBHyS8mZZI-OOwQQ
-Message-ID: <CAGXJAmxNsvfdJP9QYwR+8mQesSvNpKKpMW4H8J1ELmi0i9jn5A@mail.gmail.com>
-Subject: Re: [PATCH net-next v8 01/15] net: homa: define user-visible API for Homa
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Spam-Level: 
-X-Scan-Signature: 078eb853d78558c6c655f7b6c94b391a
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250502132005.611698-1-tanmay@marvell.com>
 
-On Mon, May 5, 2025 at 9:48=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> > > > +int     homa_send(int sockfd, const void *message_buf,
-> > > > +               size_t length, const struct sockaddr *dest_addr,
-> > > > +               __u32 addrlen,  __u64 *id, __u64 completion_cookie,
-> > > > +               int flags);
-> > > > +int     homa_sendv(int sockfd, const struct iovec *iov,
-> > > > +                int iovcnt, const struct sockaddr *dest_addr,
-> > > > +                __u32 addrlen,  __u64 *id, __u64 completion_cookie=
-,
-> > > > +                int flags);
-> > > > +ssize_t homa_reply(int sockfd, const void *message_buf,
-> > > > +                size_t length, const struct sockaddr *dest_addr,
-> > > > +                __u32 addrlen,  __u64 id);
-> > > > +ssize_t homa_replyv(int sockfd, const struct iovec *iov,
-> > > > +                 int iovcnt, const struct sockaddr *dest_addr,
-> > > > +                 __u32 addrlen,  __u64 id);
-> > >
-> > > I assume the above are user-space functions definition ??? If so, the=
-y
-> > > don't belong here.
-> >
-> > Yes, these are declarations for user-space functions that wrap the
-> > sendmsg and recvmsg kernel calls. If not here, where should they go?
-> > Are you suggesting a second header file (suggestions for what it
-> > should be called?)? These are very thin wrappers, which I expect
-> > people will almost always use instead of invoking raw sendmsg and
-> > recvmsg, so I thought it would be cleanest to put them here, next to
-> > other info related to the Homa kernel calls.
->
-> Maybe put the whole library into tools/lib/homa.
+On Fri, May 02, 2025 at 06:49:41PM +0530, Tanmay Jagdale wrote:
+> This patch series adds support for inbound inline IPsec flows for the
+> Marvell CN10K SoC.
 
-After thinking about this some more, I think I'm going to just delete
-these functions. They don't add much value and they create some
-awkwardness (e.g. there would need to be a new user-level library with
-their code).
+It will be much easier if in commit messages and comments you
+will use kernel naming, e.g. "IPsec packet offload" and not "inline IPsec", e.t.c.
 
--John-
+Also, I'm wonder, do you have performance numbers for this code?
+
+Thanks
+
+> 
+> The packet flow
+> ---------------
+> An encrypted IPSec packet goes through two passes in the RVU hardware
+> before reaching the CPU.
+> First Pass:
+>   The first pass involves identifying the packet as IPSec, assigning an RQ,
+>   allocating a buffer from the Aura pool and then send it to CPT for decryption.
+> 
+> Second Pass:
+>   After CPT decrypts the packet, it sends a metapacket to NIXRX via the X2P
+>   bus. The metapacket contains CPT_PARSE_HDR_S structure and some initial
+>   bytes of the decrypted packet which would help NIXRX in classification.
+>   CPT also sets BIT(11) of channel number to further help in identifcation.
+>   NIXRX allocates a new buffer for this packet and submits it to the CPU.
+> 
+> Once the decrypted metapacket packet is delivered to the CPU, get the WQE
+> pointer from CPT_PARSE_HDR_S in the packet buffer. This WQE points to the
+> complete decrypted packet. We create an skb using this, set the relevant
+> XFRM packet mode flags to indicate successful decryption, and submit it
+> to the network stack.
+> 
+> 
+> Patches are grouped as follows:
+> -------------------------------
+> 1) CPT LF movement from crypto driver to RVU AF
+>     0001-crypto-octeontx2-Share-engine-group-info-with-AF-dri.patch
+>     0002-octeontx2-af-Configure-crypto-hardware-for-inline-ip.patch
+>     0003-octeontx2-af-Setup-Large-Memory-Transaction-for-cryp.patch
+>     0004-octeontx2-af-Handle-inbound-inline-ipsec-config-in-A.patch
+>     0005-crypto-octeontx2-Remove-inbound-inline-ipsec-config.patch
+> 
+> 2) RVU AF Mailbox changes for CPT 2nd pass RQ mask, SPI-to-SA table,
+>    NIX-CPT BPID configuration
+>     0006-octeontx2-af-Add-support-for-CPT-second-pass.patch
+>     0007-octeontx2-af-Add-support-for-SPI-to-SA-index-transla.patch
+>     0008-octeontx2-af-Add-mbox-to-alloc-free-BPIDs.patch
+> 
+> 3) Inbound Inline IPsec support patches
+>     0009-octeontx2-pf-ipsec-Allocate-Ingress-SA-table.patch
+>     0010-octeontx2-pf-ipsec-Setup-NIX-HW-resources-for-inboun.patch
+>     0011-octeontx2-pf-ipsec-Handle-NPA-threshhold-interrupt.patch
+>     0012-octeontx2-pf-ipsec-Initialize-ingress-IPsec.patch
+>     0013-octeontx2-pf-ipsec-Manage-NPC-rules-and-SPI-to-SA-ta.patch
+>     0014-octeontx2-pf-ipsec-Process-CPT-metapackets.patch
+>     0015-octeontx2-pf-ipsec-Add-XFRM-state-and-policy-hooks-f.patch
+> 
+> 
+> Bharat Bhushan (5):
+>   crypto: octeontx2: Share engine group info with AF driver
+>   octeontx2-af: Configure crypto hardware for inline ipsec
+>   octeontx2-af: Setup Large Memory Transaction for crypto
+>   octeontx2-af: Handle inbound inline ipsec config in AF
+>   crypto: octeontx2: Remove inbound inline ipsec config
+> 
+> Geetha sowjanya (1):
+>   octeontx2-af: Add mbox to alloc/free BPIDs
+> 
+> Kiran Kumar K (1):
+>   octeontx2-af: Add support for SPI to SA index translation
+> 
+> Rakesh Kudurumalla (1):
+>   octeontx2-af: Add support for CPT second pass
+> 
+> Tanmay Jagdale (7):
+>   octeontx2-pf: ipsec: Allocate Ingress SA table
+>   octeontx2-pf: ipsec: Setup NIX HW resources for inbound flows
+>   octeontx2-pf: ipsec: Handle NPA threshold interrupt
+>   octeontx2-pf: ipsec: Initialize ingress IPsec
+>   octeontx2-pf: ipsec: Manage NPC rules and SPI-to-SA table entries
+>   octeontx2-pf: ipsec: Process CPT metapackets
+>   octeontx2-pf: ipsec: Add XFRM state and policy hooks for inbound flows
+> 
+>  .../marvell/octeontx2/otx2_cpt_common.h       |    8 -
+>  drivers/crypto/marvell/octeontx2/otx2_cptpf.h |   10 -
+>  .../marvell/octeontx2/otx2_cptpf_main.c       |   50 +-
+>  .../marvell/octeontx2/otx2_cptpf_mbox.c       |  286 +---
+>  .../marvell/octeontx2/otx2_cptpf_ucode.c      |  116 +-
+>  .../marvell/octeontx2/otx2_cptpf_ucode.h      |    3 +-
+>  .../ethernet/marvell/octeontx2/af/Makefile    |    2 +-
+>  .../ethernet/marvell/octeontx2/af/common.h    |    1 +
+>  .../net/ethernet/marvell/octeontx2/af/mbox.h  |  119 +-
+>  .../net/ethernet/marvell/octeontx2/af/rvu.c   |    9 +-
+>  .../net/ethernet/marvell/octeontx2/af/rvu.h   |   71 +
+>  .../ethernet/marvell/octeontx2/af/rvu_cn10k.c |   11 +
+>  .../ethernet/marvell/octeontx2/af/rvu_cpt.c   |  706 +++++++++-
+>  .../ethernet/marvell/octeontx2/af/rvu_cpt.h   |   71 +
+>  .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  230 +++-
+>  .../marvell/octeontx2/af/rvu_nix_spi.c        |  220 +++
+>  .../ethernet/marvell/octeontx2/af/rvu_reg.h   |   16 +
+>  .../marvell/octeontx2/af/rvu_struct.h         |    4 +-
+>  .../marvell/octeontx2/nic/cn10k_ipsec.c       | 1191 ++++++++++++++++-
+>  .../marvell/octeontx2/nic/cn10k_ipsec.h       |  152 +++
+>  .../marvell/octeontx2/nic/otx2_common.c       |   23 +-
+>  .../marvell/octeontx2/nic/otx2_common.h       |   16 +
+>  .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   17 +
+>  .../marvell/octeontx2/nic/otx2_struct.h       |   16 +
+>  .../marvell/octeontx2/nic/otx2_txrx.c         |   25 +-
+>  .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |    4 +
+>  26 files changed, 2915 insertions(+), 462 deletions(-)
+>  create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.h
+>  create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_nix_spi.c
+> 
+> -- 
+> 2.43.0
+> 
+> 
 
