@@ -1,80 +1,174 @@
-Return-Path: <netdev+bounces-187997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 035CCAAAF02
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:09:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B577DAAAF61
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:16:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 450C116A90F
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:07:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 94A351A83352
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:13:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D411028A719;
-	Mon,  5 May 2025 23:17:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 319A43BA89B;
+	Mon,  5 May 2025 23:22:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UXAcwsgW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p7/NJEVF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BA402DA0EA;
-	Mon,  5 May 2025 23:02:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23ECA2EE181;
+	Mon,  5 May 2025 23:09:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746486177; cv=none; b=M+T+PaijYZ7VKOCXAZWeQiOp9O9apIXXC8ndrMNw0RhfJYe7lJ+fXVlzT6dcEh/wKQwBdXYAR0yLDYUtC7RwOhgSudHWkOCBm8LQkuUQTaUcd7QhgSpAVpjTfbApeQue54NH/P7HmWU/bnDrwm9MDWpX5AW+bba+W5NMPyY2kow=
+	t=1746486548; cv=none; b=MXPQnBl6uZYW4H9rx8bsJR1JEBIisljkUeqJMaiM9RQQuha2gA/Qo5kVN23LGvFGV95XkUChjjFSpGiTWSJsE/BFohngrD4mMzXhOIHwCetRJBiOH68xBb5MiaAquxwWbecYD+a4mYjRkDB8oNRVmkM52JYeof0bfINP7G3lrGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746486177; c=relaxed/simple;
-	bh=pEmDVUXvc0J46+4t6pQY34qv1kz8YJhrfowiq+L+feA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gIjnDopG3EB3FvNPh07p7ILpgM2cSJHYBy80fHFfTptBzMpgnRIrIDbmxOgvcNwnWFgu1XWgZWNxFn/eFNxvMDeub/AAmAg9ZG7nl3E2Y2jFIBWqy0ZhmnQvMi0WZ3cQ7o9eiC3+daObQgIMgVpRQgedRhWUF0maCwHGe+K1SXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UXAcwsgW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57D1CC4CEED;
-	Mon,  5 May 2025 23:02:54 +0000 (UTC)
+	s=arc-20240116; t=1746486548; c=relaxed/simple;
+	bh=lKUOyyEsgfGMETIfBIUl6hMf95sF/LDWANlYOJwQH8w=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=lg4yxFagn2GufaNyAuwl4y0vaK/mLyXEnOGghDP5XKihFIyMtosgUbvmEkRbqqkXtMGYhktXr2qqNo7mXDzmEL3Um1cJ2Dh9STfMrynjyZNyWO1xdVaK8ztXcd82nj+WC5i/j9A/7V2XNUITjXR2vgXo1aTbBSQGBczoBHbszVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p7/NJEVF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFBFBC4CEEF;
+	Mon,  5 May 2025 23:09:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746486175;
-	bh=pEmDVUXvc0J46+4t6pQY34qv1kz8YJhrfowiq+L+feA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UXAcwsgWa1shdmgMd4J6YmBSb37jGGNWNiDwN5W0hrXuQCM4ei3rTEvGxbYQmpuOB
-	 0KBVWAzhLvuusSaEiWughaw8K96UmAZLjNC/a4kn4GhytEsFD5U20nuy1iqQxESjk8
-	 Gi5DW2Rm7rhtS96ChJgaN45Ae0+18fi3KuwW5c0F/7RWAKoW4g2OuDJxWCnpIkBgbL
-	 upx9EJrnmRlVrUc7RtdRj5ffRPtgry4B/7W6R8zhPWnr91k206yMzaaXfd/pLmZ6K0
-	 bjF1J84dHygQUCWIPwmL0vrVaHF+vhB+Eup9PwF2xmqGrhqs/whyzKEoGTBShkWw7m
-	 /eyDguntyItSA==
-Date: Mon, 5 May 2025 16:02:53 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, linux-rt-devel@lists.linux.dev, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Thomas Gleixner
- <tglx@linutronix.de>
-Subject: Re: [PATCH net-next v3 00/18] net: Cover more per-CPU storage with
- local nested BH locking.
-Message-ID: <20250505160253.3d50ebab@kernel.org>
-In-Reply-To: <20250430124758.1159480-1-bigeasy@linutronix.de>
-References: <20250430124758.1159480-1-bigeasy@linutronix.de>
+	s=k20201202; t=1746486547;
+	bh=lKUOyyEsgfGMETIfBIUl6hMf95sF/LDWANlYOJwQH8w=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=p7/NJEVFZhQyVJgNkNfu1wnzLCAWiHgPHbm/NYYKTwySVgFKD7LAwzrMLhJrpbhzA
+	 HLmRlGpGs7XVvioKQCJSK0IdzSawxPGDycXOLerqZzyzFAJpvlelWH7DJlyBbzkPgN
+	 DE/0eGE7s0yuiuiF0KULaNWnOdBlbDi9Vx9ZLR+qkw8i5kjCvg0ERZkscm9UZi5pl4
+	 +ULDcloriRdqHG7FH+TCJK3BKABxrvEpjo5i2u7y5TNewY4kb9cZvZE7LJj4smtv0N
+	 jktHyAg7ZsYuAZ70Qub498APaMkm2E++vOs+rairI3bCJpL/A0PoXdSq4IHambl7xF
+	 OdEKEkLD+tu9g==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Eric Dumazet <edumazet@google.com>,
+	Jason Xing <kerneljasonxing@gmail.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	ncardwell@google.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.1 083/212] tcp: bring back NUMA dispersion in inet_ehash_locks_alloc()
+Date: Mon,  5 May 2025 19:04:15 -0400
+Message-Id: <20250505230624.2692522-83-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250505230624.2692522-1-sashal@kernel.org>
+References: <20250505230624.2692522-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.1.136
+Content-Transfer-Encoding: 8bit
 
-On Wed, 30 Apr 2025 14:47:40 +0200 Sebastian Andrzej Siewior wrote:
-> I was looking at the build-time defined per-CPU variables in net/ and
-> added the needed local-BH-locks in order to be able to remove the
-> current per-CPU lock in local_bh_disable() on PREMPT_RT.
-> 
-> The work is not yet complete, I just wanted to post what I have so far
-> instead of sitting on it.
+From: Eric Dumazet <edumazet@google.com>
 
-Looks fine overall but we're anticipating a respin for patch 5?
-When you repost could you split out the netfilter patches so they 
-can be applied by Pablo to the netfilter tree?
+[ Upstream commit f8ece40786c9342249aa0a1b55e148ee23b2a746 ]
 
-And there really doesn't seem to be a strong reason to make this
-series longer than 15 patches, so please don't add more:
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
+We have platforms with 6 NUMA nodes and 480 cpus.
+
+inet_ehash_locks_alloc() currently allocates a single 64KB page
+to hold all ehash spinlocks. This adds more pressure on a single node.
+
+Change inet_ehash_locks_alloc() to use vmalloc() to spread
+the spinlocks on all online nodes, driven by NUMA policies.
+
+At boot time, NUMA policy is interleave=all, meaning that
+tcp_hashinfo.ehash_locks gets hash dispersion on all nodes.
+
+Tested:
+
+lack5:~# grep inet_ehash_locks_alloc /proc/vmallocinfo
+0x00000000d9aec4d1-0x00000000a828b652   69632 inet_ehash_locks_alloc+0x90/0x100 pages=16 vmalloc N0=2 N1=3 N2=3 N3=3 N4=3 N5=2
+
+lack5:~# echo 8192 >/proc/sys/net/ipv4/tcp_child_ehash_entries
+lack5:~# numactl --interleave=all unshare -n bash -c "grep inet_ehash_locks_alloc /proc/vmallocinfo"
+0x000000004e99d30c-0x00000000763f3279   36864 inet_ehash_locks_alloc+0x90/0x100 pages=8 vmalloc N0=1 N1=2 N2=2 N3=1 N4=1 N5=1
+0x00000000d9aec4d1-0x00000000a828b652   69632 inet_ehash_locks_alloc+0x90/0x100 pages=16 vmalloc N0=2 N1=3 N2=3 N3=3 N4=3 N5=2
+
+lack5:~# numactl --interleave=0,5 unshare -n bash -c "grep inet_ehash_locks_alloc /proc/vmallocinfo"
+0x00000000fd73a33e-0x0000000004b9a177   36864 inet_ehash_locks_alloc+0x90/0x100 pages=8 vmalloc N0=4 N5=4
+0x00000000d9aec4d1-0x00000000a828b652   69632 inet_ehash_locks_alloc+0x90/0x100 pages=16 vmalloc N0=2 N1=3 N2=3 N3=3 N4=3 N5=2
+
+lack5:~# echo 1024 >/proc/sys/net/ipv4/tcp_child_ehash_entries
+lack5:~# numactl --interleave=all unshare -n bash -c "grep inet_ehash_locks_alloc /proc/vmallocinfo"
+0x00000000db07d7a2-0x00000000ad697d29    8192 inet_ehash_locks_alloc+0x90/0x100 pages=1 vmalloc N2=1
+0x00000000d9aec4d1-0x00000000a828b652   69632 inet_ehash_locks_alloc+0x90/0x100 pages=16 vmalloc N0=2 N1=3 N2=3 N3=3 N4=3 N5=2
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Tested-by: Jason Xing <kerneljasonxing@gmail.com>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Link: https://patch.msgid.link/20250305130550.1865988-1-edumazet@google.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/ipv4/inet_hashtables.c | 37 ++++++++++++++++++++++++++-----------
+ 1 file changed, 26 insertions(+), 11 deletions(-)
+
+diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
+index 321f509f23473..5e7cdcebd64f8 100644
+--- a/net/ipv4/inet_hashtables.c
++++ b/net/ipv4/inet_hashtables.c
+@@ -1218,22 +1218,37 @@ int inet_ehash_locks_alloc(struct inet_hashinfo *hashinfo)
+ {
+ 	unsigned int locksz = sizeof(spinlock_t);
+ 	unsigned int i, nblocks = 1;
++	spinlock_t *ptr = NULL;
+ 
+-	if (locksz != 0) {
+-		/* allocate 2 cache lines or at least one spinlock per cpu */
+-		nblocks = max(2U * L1_CACHE_BYTES / locksz, 1U);
+-		nblocks = roundup_pow_of_two(nblocks * num_possible_cpus());
++	if (locksz == 0)
++		goto set_mask;
+ 
+-		/* no more locks than number of hash buckets */
+-		nblocks = min(nblocks, hashinfo->ehash_mask + 1);
++	/* Allocate 2 cache lines or at least one spinlock per cpu. */
++	nblocks = max(2U * L1_CACHE_BYTES / locksz, 1U) * num_possible_cpus();
+ 
+-		hashinfo->ehash_locks = kvmalloc_array(nblocks, locksz, GFP_KERNEL);
+-		if (!hashinfo->ehash_locks)
+-			return -ENOMEM;
++	/* At least one page per NUMA node. */
++	nblocks = max(nblocks, num_online_nodes() * PAGE_SIZE / locksz);
++
++	nblocks = roundup_pow_of_two(nblocks);
++
++	/* No more locks than number of hash buckets. */
++	nblocks = min(nblocks, hashinfo->ehash_mask + 1);
+ 
+-		for (i = 0; i < nblocks; i++)
+-			spin_lock_init(&hashinfo->ehash_locks[i]);
++	if (num_online_nodes() > 1) {
++		/* Use vmalloc() to allow NUMA policy to spread pages
++		 * on all available nodes if desired.
++		 */
++		ptr = vmalloc_array(nblocks, locksz);
++	}
++	if (!ptr) {
++		ptr = kvmalloc_array(nblocks, locksz, GFP_KERNEL);
++		if (!ptr)
++			return -ENOMEM;
+ 	}
++	for (i = 0; i < nblocks; i++)
++		spin_lock_init(&ptr[i]);
++	hashinfo->ehash_locks = ptr;
++set_mask:
+ 	hashinfo->ehash_locks_mask = nblocks - 1;
+ 	return 0;
+ }
+-- 
+2.39.5
+
 
