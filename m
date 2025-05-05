@@ -1,73 +1,70 @@
-Return-Path: <netdev+bounces-187904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB056AAA4EB
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 01:38:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74EE2AAA501
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 01:40:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F2983B505A
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 23:35:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9945E1885827
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 23:38:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AD5130670C;
-	Mon,  5 May 2025 22:27:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3370A308158;
+	Mon,  5 May 2025 22:28:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cxcF/OnF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W6h9/zux"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7CC3066FB;
-	Mon,  5 May 2025 22:27:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 068D230814B;
+	Mon,  5 May 2025 22:28:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746484079; cv=none; b=sskTMGu72mGMvT0XU9mt2idokPAXSRrNfUJ3gEf+ovDhF9H5CYp8p3HGMFYzMQr7wac9PzwvDajkd9qkzyMjGiMXw7UynP5lIRDgis5NoA6khXz/11PUezibBwX90Y06YdEZHjr+sDcvCJZcRAniOkk+R79K91bMc/6QrlGWARY=
+	t=1746484096; cv=none; b=aslNPgLpPL1POx3PilNCZN9fVMPdQwgp2T9rzfQOT9vW39EFYFfuPQaHilCnpSD6UcEGYnGQFnlXDCRMUd1YXIvGMypXDYxk3Q9PKw5uFDwhG+UnkILkUto27PwbWhWdNAM/Hkom9ngWC2URMaaEVi8UBMzv62zf7bfavY1XNwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746484079; c=relaxed/simple;
-	bh=8QB1qWbQMWXdg2olIa2PcGR3GhKyBvi+KW+5UPu/fRg=;
+	s=arc-20240116; t=1746484096; c=relaxed/simple;
+	bh=dhoCfpOHS0OUTZp4TEo2mmOgeJLlhKm5KIG++G/GU4Y=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=uYHir79JWyqV8Vaxq/w4j6MmEVkE0pgv6BpQunr2B5vykcIC31TOysGwGCnR7u5dnvnNfxppPV0vpkS/7CbOT39enGjNPxyqEr+P9TKGOrsCnW/TqLBblDlRMywLNh/xn0hSlAtVWZihMpUSHjyPgVJd6X3Qyreb8LPe990VeGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cxcF/OnF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3BFAC4CEE4;
-	Mon,  5 May 2025 22:27:56 +0000 (UTC)
+	 MIME-Version; b=P6WFOWv2q+532GzBlBHwdN4lf29crQYFk2YdXTx30nXksWPUZn04yn+8kynYtiOq4EPdVYJV4xdZlJsL9MD3MNy7gLBOpfQ3EYVUZos4MehP4YV3JxwB5Dbv9nh1mRGSau3/EFIbHqru3CDbDiNiSROgPxVDspoHUpzPiXzFv+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W6h9/zux; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76431C4CEE4;
+	Mon,  5 May 2025 22:28:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746484079;
-	bh=8QB1qWbQMWXdg2olIa2PcGR3GhKyBvi+KW+5UPu/fRg=;
+	s=k20201202; t=1746484095;
+	bh=dhoCfpOHS0OUTZp4TEo2mmOgeJLlhKm5KIG++G/GU4Y=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cxcF/OnFa3vfZgfBQ0lloRErHHwL3YfnxVS5xKcB/uw7NGQVwJajtxrf1fwt4+Khf
-	 J19oiPYlzpOjlEXbB2ccgbyI0mw2UAkLO8Mq3XgCMJbZ+dVBtHz6A0VOy02TJn7ZfE
-	 CsCA0REDF0lZk29JxFqqMlj0FXOuufqFzxao6kXOL9RKwdBaE2cFcV+6dsXg9il+ZI
-	 q5xoBI6QCDSJtyjPIFbUfPfdo0V+47kDxI29DXsLmw/i7PpKNt0ghKrNGmYfm+rpd9
-	 rqVRVyWxZqC3U46UjO4tWbFF1ou5tMXl82ZvCg7h9gU+GvS+iXVMvwONQ2CEBDG7P7
-	 4dgsT0KsQS/Tw==
+	b=W6h9/zuxsGoLfHSbc3OLyN4La+FpfqDnsLU47E3SaJ2GARayxfUblgJORG8WOY/a5
+	 5SZM1VleOdDJyxpBFyGv+2HZIhqJ5TpoqNA15Hyu9nhQf2+h4rACCaihmXPfVF0svB
+	 ukj+QI8r5eU1AzhvlmE6neQfRqg86+QdNyY5RYut3OtfWWxPCkk4okk7RBz+j6N4ZN
+	 QSwgnTWvaPrkRTjX7kHuebTeUhFIkiKPYQ0JxC0W3L+XxRUlO8+roZmPZZgfFLcqaI
+	 lRPOj1H9HHwIqCSF7rSnEhwwH5BTOzTovtTjsVgyaNnOI4s2fu9Zff7/jmpC8rqd36
+	 bCpGkMJ356zsw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Patrisious Haddad <phaddad@nvidia.com>,
+	Maor Gottlieb <maorg@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
+	saeedm@nvidia.com,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
+	kuba@kernel.org,
 	pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com,
-	maxime.chevallier@bootlin.com,
-	fancer.lancer@gmail.com,
-	jan.petrous@oss.nxp.com,
-	si.yanteng@linux.dev,
-	0x1207@gmail.com,
-	olteanv@gmail.com,
-	xiaolei.wang@windriver.com,
+	cratiu@nvidia.com,
+	bpoirier@nvidia.com,
+	vulab@iscas.ac.cn,
+	horms@kernel.org,
 	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH AUTOSEL 6.14 338/642] net: stmmac: Correct usage of maximum queue number macros
-Date: Mon,  5 May 2025 18:09:14 -0400
-Message-Id: <20250505221419.2672473-338-sashal@kernel.org>
+	linux-rdma@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.14 347/642] net/mlx5: Change POOL_NEXT_SIZE define value and make it global
+Date: Mon,  5 May 2025 18:09:23 -0400
+Message-Id: <20250505221419.2672473-347-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505221419.2672473-1-sashal@kernel.org>
 References: <20250505221419.2672473-1-sashal@kernel.org>
@@ -82,76 +79,106 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.14.5
 Content-Transfer-Encoding: 8bit
 
-From: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
+From: Patrisious Haddad <phaddad@nvidia.com>
 
-[ Upstream commit 352bc4513ec3907db71cb5674fb93a76fc341ca9 ]
+[ Upstream commit 80df31f384b4146a62a01b3d4beb376cc7b9a89e ]
 
-The maximum numbers of each Rx and Tx queues are defined by
-MTL_MAX_RX_QUEUES and MTL_MAX_TX_QUEUES respectively.
+Change POOL_NEXT_SIZE define value from 0 to BIT(30), since this define
+is used to request the available maximum sized flow table, and zero doesn't
+make sense for it, whereas some places in the driver use zero explicitly
+expecting the smallest table size possible but instead due to this
+define they end up allocating the biggest table size unawarely.
 
-There are some places where Rx and Tx are used in reverse. There is no
-issue when the Tx and Rx macros have the same value, but should correct
-usage of macros for maximum queue number to keep consistency and prevent
-unexpected mistakes.
+In addition move the definition to "include/linux/mlx5/fs.h" to expose the
+define to IB driver as well, while appropriately renaming it.
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Reviewed-by: Huacai Chen <chenhuacai@kernel.org>
-Signed-off-by: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
-Link: https://patch.msgid.link/20250221051818.4163678-1-hayashi.kunihiko@socionext.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Patrisious Haddad <phaddad@nvidia.com>
+Reviewed-by: Maor Gottlieb <maorg@nvidia.com>
+Reviewed-by: Mark Bloch <mbloch@nvidia.com>
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+Link: https://patch.msgid.link/20250219085808.349923-3-tariqt@nvidia.com
+Signed-off-by: Leon Romanovsky <leon@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/stmicro/stmmac/common.h | 4 ++--
- drivers/net/ethernet/stmicro/stmmac/stmmac.h | 7 +++----
- 2 files changed, 5 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/esw/legacy.c    | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/fs_ft_pool.c    | 6 ++++--
+ drivers/net/ethernet/mellanox/mlx5/core/fs_ft_pool.h    | 2 --
+ drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c | 3 ++-
+ include/linux/mlx5/fs.h                                 | 2 ++
+ 5 files changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
-index e25db747a81a5..c660eb933f24b 100644
---- a/drivers/net/ethernet/stmicro/stmmac/common.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/common.h
-@@ -101,8 +101,8 @@ struct stmmac_rxq_stats {
- /* Updates on each CPU protected by not allowing nested irqs. */
- struct stmmac_pcpu_stats {
- 	struct u64_stats_sync syncp;
--	u64_stats_t rx_normal_irq_n[MTL_MAX_TX_QUEUES];
--	u64_stats_t tx_normal_irq_n[MTL_MAX_RX_QUEUES];
-+	u64_stats_t rx_normal_irq_n[MTL_MAX_RX_QUEUES];
-+	u64_stats_t tx_normal_irq_n[MTL_MAX_TX_QUEUES];
- };
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/legacy.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/legacy.c
+index 45183de424f3d..76382626ad41d 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/esw/legacy.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/legacy.c
+@@ -96,7 +96,7 @@ static int esw_create_legacy_fdb_table(struct mlx5_eswitch *esw)
+ 	if (!flow_group_in)
+ 		return -ENOMEM;
  
- /* Extra statistic and debug information exposed by ethtool */
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-index f05cae103d836..dae279ee2c280 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-@@ -257,7 +257,7 @@ struct stmmac_priv {
- 	/* Frequently used values are kept adjacent for cache effect */
- 	u32 tx_coal_frames[MTL_MAX_TX_QUEUES];
- 	u32 tx_coal_timer[MTL_MAX_TX_QUEUES];
--	u32 rx_coal_frames[MTL_MAX_TX_QUEUES];
-+	u32 rx_coal_frames[MTL_MAX_RX_QUEUES];
+-	ft_attr.max_fte = POOL_NEXT_SIZE;
++	ft_attr.max_fte = MLX5_FS_MAX_POOL_SIZE;
+ 	ft_attr.prio = LEGACY_FDB_PRIO;
+ 	fdb = mlx5_create_flow_table(root_ns, &ft_attr);
+ 	if (IS_ERR(fdb)) {
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_ft_pool.c b/drivers/net/ethernet/mellanox/mlx5/core/fs_ft_pool.c
+index c14590acc7726..f6abfd00d7e68 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/fs_ft_pool.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_ft_pool.c
+@@ -50,10 +50,12 @@ mlx5_ft_pool_get_avail_sz(struct mlx5_core_dev *dev, enum fs_flow_table_type tab
+ 	int i, found_i = -1;
  
- 	int hwts_tx_en;
- 	bool tx_path_in_lpi_mode;
-@@ -265,8 +265,7 @@ struct stmmac_priv {
- 	int sph;
- 	int sph_cap;
- 	u32 sarc_type;
+ 	for (i = ARRAY_SIZE(FT_POOLS) - 1; i >= 0; i--) {
+-		if (dev->priv.ft_pool->ft_left[i] && FT_POOLS[i] >= desired_size &&
++		if (dev->priv.ft_pool->ft_left[i] &&
++		    (FT_POOLS[i] >= desired_size ||
++		     desired_size == MLX5_FS_MAX_POOL_SIZE) &&
+ 		    FT_POOLS[i] <= max_ft_size) {
+ 			found_i = i;
+-			if (desired_size != POOL_NEXT_SIZE)
++			if (desired_size != MLX5_FS_MAX_POOL_SIZE)
+ 				break;
+ 		}
+ 	}
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_ft_pool.h b/drivers/net/ethernet/mellanox/mlx5/core/fs_ft_pool.h
+index 25f4274b372b5..173e312db7204 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/fs_ft_pool.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_ft_pool.h
+@@ -7,8 +7,6 @@
+ #include <linux/mlx5/driver.h>
+ #include "fs_core.h"
+ 
+-#define POOL_NEXT_SIZE 0
 -
--	u32 rx_riwt[MTL_MAX_TX_QUEUES];
-+	u32 rx_riwt[MTL_MAX_RX_QUEUES];
- 	int hwts_rx_en;
+ int mlx5_ft_pool_init(struct mlx5_core_dev *dev);
+ void mlx5_ft_pool_destroy(struct mlx5_core_dev *dev);
  
- 	void __iomem *ioaddr;
-@@ -343,7 +342,7 @@ struct stmmac_priv {
- 	char int_name_sfty[IFNAMSIZ + 10];
- 	char int_name_sfty_ce[IFNAMSIZ + 10];
- 	char int_name_sfty_ue[IFNAMSIZ + 10];
--	char int_name_rx_irq[MTL_MAX_TX_QUEUES][IFNAMSIZ + 14];
-+	char int_name_rx_irq[MTL_MAX_RX_QUEUES][IFNAMSIZ + 14];
- 	char int_name_tx_irq[MTL_MAX_TX_QUEUES][IFNAMSIZ + 18];
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
+index 711d14dea2485..d313cb7f0ed88 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
+@@ -161,7 +161,8 @@ mlx5_chains_create_table(struct mlx5_fs_chains *chains,
+ 		ft_attr.flags |= (MLX5_FLOW_TABLE_TUNNEL_EN_REFORMAT |
+ 				  MLX5_FLOW_TABLE_TUNNEL_EN_DECAP);
  
- #ifdef CONFIG_DEBUG_FS
+-	sz = (chain == mlx5_chains_get_nf_ft_chain(chains)) ? FT_TBL_SZ : POOL_NEXT_SIZE;
++	sz = (chain == mlx5_chains_get_nf_ft_chain(chains)) ?
++		FT_TBL_SZ : MLX5_FS_MAX_POOL_SIZE;
+ 	ft_attr.max_fte = sz;
+ 
+ 	/* We use chains_default_ft(chains) as the table's next_ft till
+diff --git a/include/linux/mlx5/fs.h b/include/linux/mlx5/fs.h
+index 2a69d9d71276d..01cb72d68c231 100644
+--- a/include/linux/mlx5/fs.h
++++ b/include/linux/mlx5/fs.h
+@@ -40,6 +40,8 @@
+ 
+ #define MLX5_SET_CFG(p, f, v) MLX5_SET(create_flow_group_in, p, f, v)
+ 
++#define MLX5_FS_MAX_POOL_SIZE BIT(30)
++
+ enum mlx5_flow_destination_type {
+ 	MLX5_FLOW_DESTINATION_TYPE_NONE,
+ 	MLX5_FLOW_DESTINATION_TYPE_VPORT,
 -- 
 2.39.5
 
