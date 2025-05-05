@@ -1,85 +1,85 @@
-Return-Path: <netdev+bounces-187677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07EB2AA8D3D
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 09:43:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BB7BAA8D22
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 09:37:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 441CD3B45BE
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 07:43:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D82918949D2
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 07:38:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 924DA1D5CD1;
-	Mon,  5 May 2025 07:43:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F2541DE8B5;
+	Mon,  5 May 2025 07:37:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aFvdcU6H"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RXS1gEJj"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1DD8176AC8
-	for <netdev@vger.kernel.org>; Mon,  5 May 2025 07:43:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF37D1DE3A5
+	for <netdev@vger.kernel.org>; Mon,  5 May 2025 07:37:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746431007; cv=none; b=BMQXJDuHvsH/68tzJc2zK282ojxgpkQzdas0b4p8Qjmyz4etPsNIMGRiOxlskK9RHDNAF2ytl4EyeFSukvPMU9hix+JNGpbDptCSSP+O/xa1g3J+kcIqVstos5Z3h/R/GH5NIVRrVpqZXuQNb5s+WXPlzv9viCYJijHQQIvjWjw=
+	t=1746430666; cv=none; b=d5c/AXKCDkSt2wrA+kFqDfgFax50J+OW9qJlqzH+nPFePNT5uLeoTIf/sJ10Vr2GFpos/n9aTzxmUfVpF2iehXAL/PwXkuq33c7BfNn8VbNK01Hw0p8Fa2a/1uJf+Ge6iAVFckboSIwb6jk09sISHgLGiUOBuF65RTE4xOpUJr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746431007; c=relaxed/simple;
-	bh=/1L4VXQZnM4TVg9Q0XEcQOC1Z7dwzdgPChSwdWfL7fE=;
+	s=arc-20240116; t=1746430666; c=relaxed/simple;
+	bh=wA86OvXvQW2Wk0ySWN1S8dAXgWbBM9cP3A1cI9Z6u5U=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XNMm3vS4ZShkXOEO4j400VttZBjAtvBq/TK7g9UqUQuFFe9vW1jG6pxiuA46ovS7C6/qig8OcimVmiO2R7NdiwmiiiZg3dYOAwlvpNJRakE/+mKej6ECx0iEVvRkGWHn3U0UZRQFLMVSy62MBCwBXpnggrE2Qf0QSERJWmmFdw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aFvdcU6H; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=m72coO+j73HYXg00lXh0yCszN8OC1pRV+2h5uVk6S40mPDsfpG8Ls9msOwzhb2KQBB+mw60D3uqGbRqzZDE8zaby3tarjz3FLN5obuwsdBbxXNBYB79MG39V1fnzRzQT6P0tqYlfe4bk4OOCFa+f3ic5/IP/AirYmL1txKYz9AM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RXS1gEJj; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746431004;
+	s=mimecast20190719; t=1746430663;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=NYutuEk9tS5pMcj+KQxarlK855jenHaF07JshpvJP/c=;
-	b=aFvdcU6HBJ5kwWqI80QeGa/nksKkq3du/L+rgPS8XllBA3KGzaJtIbs+16kvoTZHTRL6ly
-	0PSdRYohTI0qQgRMITeHNHHCSS0iLiFErwyXmTaMIFxUzpOLSEJAWXab6ifNkc1KeSGbC6
-	/jwLce1PS4uj83B+nsSCb8jaZYSovhw=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=EbQ8Ebd7T0AIaFrJMEa7u08GAGQmcdkDS4quExidCGE=;
+	b=RXS1gEJjdqJJjGzcdwYJC26o/62iUqfvjeNzD0P09hsGQ8xP1mAu1tHihp28JtdxUA7Wlq
+	AytQ41x0vbVX0KSMavJrspJ+P9wklVr7Ro4fRhKTl5Eees8KMC50r4Mklp5F1uo033RQTB
+	lH41B+4gTsbSMmd3cpGwRZUp27I86xk=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-144-cSuaWo_OPiuOB4pyGi5O1A-1; Mon, 05 May 2025 03:43:23 -0400
-X-MC-Unique: cSuaWo_OPiuOB4pyGi5O1A-1
-X-Mimecast-MFC-AGG-ID: cSuaWo_OPiuOB4pyGi5O1A_1746431002
-Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-30c4cbc324bso20505141fa.1
-        for <netdev@vger.kernel.org>; Mon, 05 May 2025 00:43:23 -0700 (PDT)
+ us-mta-618-gIcitWh-P2utN3DgN4VuJA-1; Mon, 05 May 2025 03:37:42 -0400
+X-MC-Unique: gIcitWh-P2utN3DgN4VuJA-1
+X-Mimecast-MFC-AGG-ID: gIcitWh-P2utN3DgN4VuJA_1746430661
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-39abdadb0f0so1062730f8f.0
+        for <netdev@vger.kernel.org>; Mon, 05 May 2025 00:37:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746431002; x=1747035802;
+        d=1e100.net; s=20230601; t=1746430661; x=1747035461;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NYutuEk9tS5pMcj+KQxarlK855jenHaF07JshpvJP/c=;
-        b=m2/LuUQ0r+xPWSTLcJv1b+ziPRbUVbfTgXJuoSudNAOkt94gUo3cDFNfHSM8+MPuS9
-         ZVp3oxJyHaOJwIegApc2MEMNOYRqOTCvzVYCUBrNOacAb7DUrLyJ20ehbIY/knJATFxY
-         UrxGfQZGR8a2C9qneY1wKOXK2LIUUb8iaFzwt8G6ate5MjwjH5TZGYEvRDHyOBoI1dpL
-         9YUI2k6piHKYbuFc6sE34BsJsFZdK/R+/N7GicJbt6DNDvE2ivXY1VOXc2z9jLSzEoPe
-         Ubjn6CN6DtiOy6CiusvPRO4RxWJ0agWrnbh/BN3leVdcAij/Av9Zrlv2pU8aghIYmjg4
-         SamQ==
-X-Gm-Message-State: AOJu0YyBCBFV7MzWCopoz7Uwl9dGjV87zRc0aOlY5s8MFKL74o2+CtIv
-	kKb7qtqv0TDwB2gkOPM/RA+wgemTB9v/tA41VCKhWCvDJQzI0/3+/Ofe04hFTsrlEUgJDz5ncyQ
-	hV6jcGrEEjvf+0FaQrC5GS6u5qvKpFbGb7g55JL033UtUHPg8XDj3a8gkHs1/YoA99Zc=
-X-Gm-Gg: ASbGncstB1WLmq20QfEwSOUWpOCf4GHdJEWUCdAStLIyJR1aLrSPiG3ofobaTkJV/YN
-	a5BpK3QamHXnMTPa7I5XLshQi3OKdksgnpPWW7sMN+mQqyF2dNMbE2cus9vEjxMaTlHFdyU/c2+
-	OHNY4QqfZCEPCNlpCruo9kl6WwPHhC/UZq2sYiV+lKm7RoYsNNLGJhXoGcM4S0RQe4at8a3GWxL
-	ENHJYWGPmSvzyHWkS1sxx3amKYOzWEpYNQkw/4JlX8dX5emNAQvLivk2GgKJbRHKiUbQ/AWXJ0k
-	x2/rZaFfSHWLWGKS6J2cSkIKU8rzBMNL5v8x+PEAKz4/7E7E+mcbouudq50=
-X-Received: by 2002:a05:6512:a87:b0:549:38d2:f630 with SMTP id 2adb3069b0e04-54f9efd2c99mr1456238e87.24.1746431001781;
-        Mon, 05 May 2025 00:43:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHsEsHgZOcmzKyEYKe53zgGMeSaMF3WinuQkv4wSGTWsyP+GpxlPUt85uINmh0HuIcOZYrSLQ==
-X-Received: by 2002:a05:600c:1e09:b0:43c:f895:cb4e with SMTP id 5b1f17b1804b1-441cb49494cmr15680615e9.17.1746430567130;
-        Mon, 05 May 2025 00:36:07 -0700 (PDT)
+        bh=EbQ8Ebd7T0AIaFrJMEa7u08GAGQmcdkDS4quExidCGE=;
+        b=wcsl4w6+b1cakEOlNqn/PaLperBW1SkYtFDnctfzsmsAtB0YPHs9yg4CvX13mnLdUa
+         c3fbibfAYhPeKPJOeJIRKp7JMxNs8w/alkkSRJNwLQEK2gsDQvKh3sqJemmUNXJub24h
+         QKlOzzuRG4NACd6pzcyRMrvfs/YSvWDjUVypWvhJxw/bzIyTugHQh6Mb9KXctOZ13245
+         aTt6yFJ1ZFDis+P95wyrneRyAESstHKXPuVsbjg7q7Y7g9zzpdnzyHYJjZnH5Xjmg9Dm
+         pZwDPhh3rKUv/f3+xJZumGWOKGopZpbJGrpvd2sX0VMG0RTwrTBoZreSbP+bUoeUy8px
+         Fs5A==
+X-Gm-Message-State: AOJu0Yx6XvUEs2+9gOqTtkGnAYa8e0kwYofKhWRp8xrzn8ClpiGeBAiD
+	fQbvo29ECq9Xz0CEozS4ZxRlSadSR5wVwyzYK6WeDEBkVwgAso2oV1gOJHAFzKIO7+ZiYfoe491
+	Wpa2D1v8EdnwvZX8Ru5xGd/2I8e4a2Gs3h7zmObnU9LgZCxGAL/0XuQ==
+X-Gm-Gg: ASbGncv7xUGBl7gk41gV6BTAVq+2aav876qYaB9EQFFZoum6kWckwU5RaeKYEVpaCCy
+	FdNh9G3UPFCkgP//zg7PSMwBCz03HwvpC7nH0kDNZv3eQq9cBUHKw80dCPmA5Mj+cEAOFfDAcD+
+	wAl5FNd19C/QHZOzcavU6S1w0WPCEUNJa2i4cAxQKEu2HVTlNhpRdJVN2Px0I0D2oZJDhwz2hMp
+	OTKxSnq1vHyqQYw8yfh6E5+OWRSljsJdmxHxxZGRj9Ykz9CDFCs9PwA161JwbG4XnvhA/dt4jSD
+	+vX2uzSgS9Z3OjoezR4D+YAdInBg2Gu/Mkd0jVGoQo+hzssvg8sVuO3lr7I=
+X-Received: by 2002:a5d:6711:0:b0:3a0:a0f5:1b02 with SMTP id ffacd0b85a97d-3a0a0f51bcdmr2980342f8f.25.1746430661017;
+        Mon, 05 May 2025 00:37:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHXPgUBS6oLYKFEGfiQb4hNjm4EqETq0WQb6mbrzb4uGVHXyVmTL98k94ybGGle6pM8Sc5r1w==
+X-Received: by 2002:a5d:6711:0:b0:3a0:a0f5:1b02 with SMTP id ffacd0b85a97d-3a0a0f51bcdmr2980306f8f.25.1746430660573;
+        Mon, 05 May 2025 00:37:40 -0700 (PDT)
 Received: from ?IPV6:2a0d:3344:2706:e010:b099:aac6:4e70:6198? ([2a0d:3344:2706:e010:b099:aac6:4e70:6198])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-441b391c42bsm162401715e9.39.2025.05.05.00.36.04
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a099b172a8sm9666263f8f.91.2025.05.05.00.37.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 May 2025 00:36:06 -0700 (PDT)
-Message-ID: <8cdf120d-a0f0-4dcc-a8f9-cea967ce6e7b@redhat.com>
-Date: Mon, 5 May 2025 09:36:03 +0200
+        Mon, 05 May 2025 00:37:40 -0700 (PDT)
+Message-ID: <1710b0e0-ec7a-4d79-89ad-ad9d0cf58f5c@redhat.com>
+Date: Mon, 5 May 2025 09:37:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -113,44 +113,63 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
 References: <20250429032645.363766-1-almasrymina@google.com>
  <20250429032645.363766-5-almasrymina@google.com>
  <53433089-7beb-46cf-ae8a-6c58cd909e31@redhat.com>
- <CAHS8izMefrkHf9WXerrOY4Wo8U2KmxSVkgY+4JB+6iDuoCZ3WQ@mail.gmail.com>
+ <fd7f21d9-3f45-4f68-85cb-dd160a0a95ca@redhat.com>
+ <CAHS8izPr_yt+PtG5Q++Ub=D4J=H7nP0S_7rOP9G7W=i2Zeau3g@mail.gmail.com>
 Content-Language: en-US
 From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CAHS8izMefrkHf9WXerrOY4Wo8U2KmxSVkgY+4JB+6iDuoCZ3WQ@mail.gmail.com>
+In-Reply-To: <CAHS8izPr_yt+PtG5Q++Ub=D4J=H7nP0S_7rOP9G7W=i2Zeau3g@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 5/2/25 9:20 PM, Mina Almasry wrote:
-> On Fri, May 2, 2025 at 4:47 AM Paolo Abeni <pabeni@redhat.com> wrote:
->>> @@ -1078,7 +1092,8 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
->>>                               zc = MSG_ZEROCOPY;
->>>               } else if (sock_flag(sk, SOCK_ZEROCOPY)) {
->>>                       skb = tcp_write_queue_tail(sk);
->>> -                     uarg = msg_zerocopy_realloc(sk, size, skb_zcopy(skb));
->>> +                     uarg = msg_zerocopy_realloc(sk, size, skb_zcopy(skb),
->>> +                                                 sockc_valid && !!sockc.dmabuf_id);
+On 5/2/25 9:25 PM, Mina Almasry wrote:
+> On Fri, May 2, 2025 at 4:51 AM Paolo Abeni <pabeni@redhat.com> wrote:
 >>
->> If sock_cmsg_send() failed and the user did not provide a dmabuf_id,
->> memory accounting will be incorrect.
+>> On 5/2/25 1:47 PM, Paolo Abeni wrote:
+>>> On 4/29/25 5:26 AM, Mina Almasry wrote:
+>>>> Augment dmabuf binding to be able to handle TX. Additional to all the RX
+>>>> binding, we also create tx_vec needed for the TX path.
+>>>>
+>>>> Provide API for sendmsg to be able to send dmabufs bound to this device:
+>>>>
+>>>> - Provide a new dmabuf_tx_cmsg which includes the dmabuf to send from.
+>>>> - MSG_ZEROCOPY with SCM_DEVMEM_DMABUF cmsg indicates send from dma-buf.
+>>>>
+>>>> Devmem is uncopyable, so piggyback off the existing MSG_ZEROCOPY
+>>>> implementation, while disabling instances where MSG_ZEROCOPY falls back
+>>>> to copying.
+>>>>
+>>>> We additionally pipe the binding down to the new
+>>>> zerocopy_fill_skb_from_devmem which fills a TX skb with net_iov netmems
+>>>> instead of the traditional page netmems.
+>>>>
+>>>> We also special case skb_frag_dma_map to return the dma-address of these
+>>>> dmabuf net_iovs instead of attempting to map pages.
+>>>>
+>>>> The TX path may release the dmabuf in a context where we cannot wait.
+>>>> This happens when the user unbinds a TX dmabuf while there are still
+>>>> references to its netmems in the TX path. In that case, the netmems will
+>>>> be put_netmem'd from a context where we can't unmap the dmabuf, Resolve
+>>>> this by making __net_devmem_dmabuf_binding_free schedule_work'd.
+>>>>
+>>>> Based on work by Stanislav Fomichev <sdf@fomichev.me>. A lot of the meat
+>>>> of the implementation came from devmem TCP RFC v1[1], which included the
+>>>> TX path, but Stan did all the rebasing on top of netmem/net_iov.
+>>>>
+>>>> Cc: Stanislav Fomichev <sdf@fomichev.me>
+>>>> Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
+>>>> Signed-off-by: Mina Almasry <almasrymina@google.com>
+>>>> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+>>>
+>>> I'm sorry for the late feedback. A bunch of things I did not notice
+>>> before...
+>>
+>> The rest LGTM,
 > 
-> Forgive me but I don't see it. sockc_valid will be false, so
-> msg_zerocopy_realloc will do the normal MSG_ZEROCOPY accounting. Then
-> below whech check sockc_valid in place of where we did the
-> sock_cmsg_send before, and goto err. I assume the goto err should undo
-> the memory accounting in the new code as in the old code. Can you
-> elaborate on the bug you see?
+> Does this imply I should attach your Reviewed-by or Acked-by on follow
+> up submissions if any? I'm happy either way, just checking.
 
-Uhm, I think I misread the condition used for msg_zerocopy_realloc()
-last argument.
-
-Re-reading it now it the problem I see is that if sock_cmsg_send() fails
-after correctly setting 'dmabuf_id', msg_zerocopy_realloc() will account
-the dmabuf memory, which looks unexpected.
-
-Somewhat related, I don't see any change to the msg_zerocopy/ubuf
-complete/cleanup path(s): what will happen to the devmem ubuf memory at
-uarg->complete() time? It looks like it will go unexpectedly through
-mm_unaccount_pinned_pages()???
+Should any other revision be required, please add my acked-by tag to all
+the patch except 4/9.
 
 Thanks,
 
