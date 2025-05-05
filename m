@@ -1,154 +1,161 @@
-Return-Path: <netdev+bounces-187826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45432AA9C9F
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 21:27:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4152CAA9CB5
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 21:38:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FC623A3D7A
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 19:27:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 342037A1F5B
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 19:37:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 624DF25D539;
-	Mon,  5 May 2025 19:27:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D7F1C6FF6;
+	Mon,  5 May 2025 19:38:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="QgMNsUXP"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="bqBxAAIx"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF9817333F;
-	Mon,  5 May 2025 19:27:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D3D19CC22;
+	Mon,  5 May 2025 19:38:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746473252; cv=none; b=b4gyNJUhJduCbkF8lgeVTa+zZGVmLAOp+zoga3kibvxjBtZXVaI6f8GGqdRr2bIF5kTXbn3kbRAoRrE0rckiz7uSMBjQc6oNQO9JspK8D4M35lpCOOlwp5MKF2cKJ3pe1iyXgRffbp1LfBXNeP6X61smH4fzdY37xOBfcZuvti8=
+	t=1746473929; cv=none; b=mcFeDPGIbiHxa2D8ZvN+GRfi2j6818Lu8TMPENQBVjYLldIabYbu0okB0rKkPh7JpCiEAA7gGBLUA59SRbchGVqhy1zuWrCqHTQFkYo8hlDi/gOli6t82YvVhxcu0JoSga5qVpo1uS3QvxmlngdplnoXhkiKJQerTd/A3EWRilg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746473252; c=relaxed/simple;
-	bh=yE4K00cim4sjv2RnRcLDj9EJ+VBCvkau+NXqtQGE4to=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=owc4533ZU0RKa77AH/5Pe0zgFaFix04P9Jb0qAUVXabTLBQboFEKa4apgVFh4AxWVc/ByjZB4H/At4oDFwjjzuOj6mgEBTVd338/7vLdYM7R/wWntk1W7I5Ym88ay7214a9dxrpy/pYFGMOQ4bYx1X997VRCiEdNhsvtqCkhSXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=QgMNsUXP; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=hKochlIwHnCpW8MnNP8D8YL+YspnWH14oOiGbaOJ6Vg=; b=Qg
-	MNsUXPFv2p51/f9Vsv8mA3try/6PvDu0rDiMnH0O8/DyN0x30z27QL+H3hhHpLQBgI30HMSNCThSz
-	SEdyZAN6xe/lods7BJgawT4gsFpmsDOn/zM16pkzdKCGj0H7q4Zrv7zNFu0mDVbZ5VMEodKc8tjLB
-	uEOim51zxWp9IbU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uC1TA-00BdB7-N5; Mon, 05 May 2025 21:27:16 +0200
-Date: Mon, 5 May 2025 21:27:16 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Stefan Wahren <wahrenst@gmx.net>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 4/5] net: vertexcom: mse102x: Return code for
- mse102x_rx_pkt_spi
-Message-ID: <51cdf94b-6f97-421d-916c-aca5e7c34879@lunn.ch>
-References: <20250505142427.9601-1-wahrenst@gmx.net>
- <20250505142427.9601-5-wahrenst@gmx.net>
- <3b9d36a7-c2fd-4d37-ba33-fc13121d92e6@lunn.ch>
- <c1fc1341-4490-4e22-a2ee-64bb67529660@gmx.net>
+	s=arc-20240116; t=1746473929; c=relaxed/simple;
+	bh=h5+ocRkThM3cFZuVHgdmPoWEi3V+/8Fni2J7OAHsn+A=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=e5/1f5T80uMjnPShdw0p92qB/vsmNMLIzNtV1Wzj0zaPHBKVprVLhvDp8i3WokHFbnyCxMQoG/Z3rREtGFqYfvrx4oUtw4fBga6C6hc9MJXsJhP1MhYxLpbxG8ibszIcmWy0MLsDjUTIoLu72KmgCx4oE662BTaieuUq42yvLPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=bqBxAAIx; arc=none smtp.client-ip=52.119.213.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1746473928; x=1778009928;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=EmyOzH4Yr6VUhqnbV3Hao5p1e1RvsY0yslF5wkCHRio=;
+  b=bqBxAAIx7mDq8+szBJAZ/RYnhnYDMHlGmlsnLmkUXHAojKly1bGkDHl8
+   NGI4y4ExCfI9KmMfKV+5wLtGCpXUiMxaaq14HaVk8wC4mmGfzJGFTM60v
+   vKkkFmzK8Qp5NkVvyYPMB33BhCZ03Rtt1u8ZZSEjkJLPhymR9rIundQot
+   8=;
+X-IronPort-AV: E=Sophos;i="6.15,264,1739836800"; 
+   d="scan'208";a="719938196"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2025 19:38:43 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:3458]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.10.32:2525] with esmtp (Farcaster)
+ id 8e51118b-b34a-40f3-8714-330443b79728; Mon, 5 May 2025 19:38:41 +0000 (UTC)
+X-Farcaster-Flow-ID: 8e51118b-b34a-40f3-8714-330443b79728
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 5 May 2025 19:38:40 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.187.170.18) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 5 May 2025 19:38:36 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <jannh@google.com>
+CC: <alexander@mihalicyn.com>, <bluca@debian.org>, <brauner@kernel.org>,
+	<daan.j.demeyer@gmail.com>, <davem@davemloft.net>, <david@readahead.eu>,
+	<edumazet@google.com>, <horms@kernel.org>, <jack@suse.cz>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <lennart@poettering.net>,
+	<linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<me@yhndnzj.com>, <netdev@vger.kernel.org>, <oleg@redhat.com>,
+	<pabeni@redhat.com>, <viro@zeniv.linux.org.uk>, <zbyszek@in.waw.pl>
+Subject: Re: [PATCH RFC v3 08/10] net, pidfs, coredump: only allow coredumping tasks to connect to coredump socket
+Date: Mon, 5 May 2025 12:35:50 -0700
+Message-ID: <20250505193828.21759-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <CAG48ez35FN6ka4QtrNQ6aKEycQBOpJKy=VyhQDzKTwey+4KOMg@mail.gmail.com>
+References: <CAG48ez35FN6ka4QtrNQ6aKEycQBOpJKy=VyhQDzKTwey+4KOMg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <c1fc1341-4490-4e22-a2ee-64bb67529660@gmx.net>
+X-ClientProxiedBy: EX19D040UWA001.ant.amazon.com (10.13.139.22) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Mon, May 05, 2025 at 07:16:51PM +0200, Stefan Wahren wrote:
-> Hi Andrew,
+From: Jann Horn <jannh@google.com>
+Date: Mon, 5 May 2025 21:10:28 +0200
+> On Mon, May 5, 2025 at 8:41â€¯PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+> > From: Christian Brauner <brauner@kernel.org>
+> > Date: Mon, 5 May 2025 16:06:40 +0200
+> > > On Mon, May 05, 2025 at 03:08:07PM +0200, Jann Horn wrote:
+> > > > On Mon, May 5, 2025 at 1:14â€¯PM Christian Brauner <brauner@kernel.org> wrote:
+> > > > > Make sure that only tasks that actually coredumped may connect to the
+> > > > > coredump socket. This restriction may be loosened later in case
+> > > > > userspace processes would like to use it to generate their own
+> > > > > coredumps. Though it'd be wiser if userspace just exposed a separate
+> > > > > socket for that.
+> > > >
+> > > > This implementation kinda feels a bit fragile to me... I wonder if we
+> > > > could instead have a flag inside the af_unix client socket that says
+> > > > "this is a special client socket for coredumping".
+> > >
+> > > Should be easily doable with a sock_flag().
+> >
+> > This restriction should be applied by BPF LSM.
 > 
-> Am 05.05.25 um 18:43 schrieb Andrew Lunn:
-> > On Mon, May 05, 2025 at 04:24:26PM +0200, Stefan Wahren wrote:
-> > > The interrupt handler mse102x_irq always returns IRQ_HANDLED even
-> > > in case the SPI interrupt is not handled. In order to solve this,
-> > > let mse102x_rx_pkt_spi return the proper return code.
-> > > 
-> > > Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
-> > > ---
-> > >   drivers/net/ethernet/vertexcom/mse102x.c | 15 +++++++++------
-> > >   1 file changed, 9 insertions(+), 6 deletions(-)
-> > > 
-> > > diff --git a/drivers/net/ethernet/vertexcom/mse102x.c b/drivers/net/ethernet/vertexcom/mse102x.c
-> > > index 204ce8bdbaf8..aeef144d0051 100644
-> > > --- a/drivers/net/ethernet/vertexcom/mse102x.c
-> > > +++ b/drivers/net/ethernet/vertexcom/mse102x.c
-> > > @@ -303,7 +303,7 @@ static void mse102x_dump_packet(const char *msg, int len, const char *data)
-> > >   		       data, len, true);
-> > >   }
-> > > -static void mse102x_rx_pkt_spi(struct mse102x_net *mse)
-> > > +static irqreturn_t mse102x_rx_pkt_spi(struct mse102x_net *mse)
-> > >   {
-> > >   	struct sk_buff *skb;
-> > >   	unsigned int rxalign;
-> > > @@ -324,7 +324,7 @@ static void mse102x_rx_pkt_spi(struct mse102x_net *mse)
-> > >   		mse102x_tx_cmd_spi(mse, CMD_CTR);
-> > >   		ret = mse102x_rx_cmd_spi(mse, (u8 *)&rx);
-> > >   		if (ret)
-> > > -			return;
-> > > +			return IRQ_NONE;
-> > >   		cmd_resp = be16_to_cpu(rx);
-> > >   		if ((cmd_resp & CMD_MASK) != CMD_RTS) {
-> > > @@ -357,7 +357,7 @@ static void mse102x_rx_pkt_spi(struct mse102x_net *mse)
-> > >   	rxalign = ALIGN(rxlen + DET_SOF_LEN + DET_DFT_LEN, 4);
-> > >   	skb = netdev_alloc_skb_ip_align(mse->ndev, rxalign);
-> > >   	if (!skb)
-> > > -		return;
-> > > +		return IRQ_NONE;
-> > This is not my understanding of IRQ_NONE. To me, IRQ_NONE means the
-> > driver has read the interrupt status register and determined that this
-> > device did not generate the interrupt. It is probably some other
-> > device which is sharing the interrupt.
-> At first i wrote this patch for the not-shared interrupt use case in mind.
-> Unfortunately this device doesn't have a interrupt status register and in
-> the above cases the interrupt is not handled.
+> I think we shouldn't allow random userspace processes to connect to
+> the core dump handling service and provide bogus inputs; that
+> unnecessarily increases the risk that a crafted coredump can be used
+> to exploit a bug in the service. So I think it makes sense to enforce
+> this restriction in the kernel.
+
+It's already restricted by /proc/sys/kernel/core_pattern.
+We don't need a duplicated logic.
+
+Even when the process holding the listener dies, you can
+still avoid such a leak.
+
+e.g.
+
+1. Set up a listener
+2. Put the socket into a bpf map
+3. Attach LSM at connect()
+
+Then, the LSM checks if the destination socket is
+
+  * listening on the name specified in /proc/sys/kernel/core_pattern
+  * exists in the associated BPF map
+
+So, if the socket is dies and a malicious user tries to hijack
+the core_pattern name, LSM still rejects such connect().
+
+Later, the admin can restart the program with different core_pattern.
+
+
 > 
-> kernel-doc says:
+> My understanding is that BPF LSM creates fairly tight coupling between
+> userspace and the kernel implementation, and it is kind of unwieldy
+> for userspace. (I imagine the "man 5 core" manpage would get a bit
+> longer and describe more kernel implementation detail if you tried to
+> show how to write a BPF LSM that is capable of detecting unix domain
+> socket connections to a specific address that are not initiated by
+> core dumping.) I would like to keep it possible to implement core
+> userspace functionality in a best-practice way without needing eBPF.
+
+I think the untrusted user scenario is paranoia in most cases,
+and the man page just says "if you really care, use BPF LSM".
+
+If someone can listen on a name AND set it to core_pattern, most
+likely something worse already happened.
+
+
 > 
-> @IRQ_NONE:        interrupt was not from this device or was not handled
-> @IRQ_HANDLED:    interrupt was handled by this device
-
-A memory allocation failure in netdev_alloc_skb_ip_align() does not
-seem like a reason to return IRQ_NONE. I think the more normal case
-is, there was an interrupt, there was an attempt to handle it, but the
-handler failed. The driver should try to put the hardware into a state
-the next interrupt will actually happen, and be serviced.
-
-This is particularly important with level interrupts. If you fail to
-clear the interrupt, it is going to fire again immediately after
-exiting the interrupt handler and the interrupt is reenabled. You
-don't want to die in an interrupt storm. Preventing such interrupt
-storms is part of what the return value is used for. If the handler
-continually returns IRQ_NONE, after a while the core declares there is
-nobody actually interested in the interrupt, and it leaves it
-disabled.
-
-> So from my understanding IRQ_NONE fits better here (assuming a not-shared
-> interrupt).
+> > It's hard to loosen such a default restriction as someone might
+> > argue that's unexpected and regression.
 > 
-> I think driver should only use not-shared interrupts, because there is no
-> interrupt status register. Am I right?
-
-I don't see why it cannot be shared. It is not very efficient, and
-there will probable be a bias towards the first device which requests
-the interrupt, but a shared interrupt should work.
-
-	Andrew
+> If userspace wants to allow other processes to connect to the core
+> dumping service, that's easy to implement - userspace can listen on a
+> separate address that is not subject to these restrictions.
+> 
 
