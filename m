@@ -1,65 +1,62 @@
-Return-Path: <netdev+bounces-187984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0594AAAA6E
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:37:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DADCAAAACE
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:45:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E646188CB52
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 01:35:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95AF53A59E1
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 01:39:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55F8E2E5DDF;
-	Mon,  5 May 2025 23:01:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C358B393E7F;
+	Mon,  5 May 2025 23:03:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SYQeFRIV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mxa84x9a"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 043453628D5;
-	Mon,  5 May 2025 22:57:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D34037267A;
+	Mon,  5 May 2025 22:58:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746485843; cv=none; b=WYcc2fzH9hn4603kaHyBRYLxCmECXku4gBasccUbw/tv+S6xqfaCRE1zJbmRHuSgh/V5xeycnZ2QpL3EI/q+z03NoTu13uUIHNi2DZNkeHqg4Dn6sOLTLScpeJRcWxb26rnYGxs7YKO0jnG52GBNJhwSJCbJyUrY/b3Jt5JyqgY=
+	t=1746485917; cv=none; b=lkxGBQr/9/nzPzwLXJNkHKHv2YrbdM3y7vO9wGXiscwk8vH6hwi9TiZkO4GcGv4wFX/CuxgvIXAgYCmvx+gf2jJEvkwyZ6hdbl7TLPDqpT9i8wvoFUDKmBy+IdZvwRmVB7UkcNbOhLN/5NlF0nJqQqBZN4NCaVTZ8IFHunW0jg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746485843; c=relaxed/simple;
-	bh=HeeP2xKYVYs1yu+7i+b43zQrFagrYyxzptijZfungNY=;
+	s=arc-20240116; t=1746485917; c=relaxed/simple;
+	bh=39hkzjDfkXnmr1qhqbpL0xEVZqj0Ysy9UdjsREhQAq8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nKjLnZBU0WnSCPzmTQkYQ+RwbHcrD54eaS5XkRLIfYi+6V7N0PfsxoKlYfZj7yguEsBpldR/MtuFqZ3baeZ2JjG5RXkBptUyrvMRP48g6auSQIcqc2Cjz0t0fHHF4iptv4/YWPg7EfZIGgklLyebZuHsdjkCpv8LAX6spVKHPh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SYQeFRIV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DD6BC4CEED;
-	Mon,  5 May 2025 22:57:20 +0000 (UTC)
+	 MIME-Version:Content-Type; b=bgNSSc7ZHAc6st9ClkGfAyE47MCmh4iWsd3vjeAa3ZD2IAfZ1+mSRh6+7HdtpxMKpQrDA12ecHSEbzdf91rAtK85lxit7QRPcmCZBNanv5DpBnRpnhocgQuvvxIA98OmKT7RudbpUIihFRAjwa/5W5ZVnwhnCcNlR84GpdEuX5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mxa84x9a; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE853C4CEEF;
+	Mon,  5 May 2025 22:58:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746485841;
-	bh=HeeP2xKYVYs1yu+7i+b43zQrFagrYyxzptijZfungNY=;
+	s=k20201202; t=1746485916;
+	bh=39hkzjDfkXnmr1qhqbpL0xEVZqj0Ysy9UdjsREhQAq8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SYQeFRIV1rcp6Go5LUDQB1Z6jjeWJSA0RsWEfGwBxx+pq9QStsBHd6iQgBalEOZS6
-	 7U6MqipFPAawm8gd5FWc49xuVrGteHckU3AcCm1LsLtGUWWRqlOApxk4wgLFZVZQ+k
-	 IXIlaxqLa0UganU94x/bqURLbqrD1KWiO8TI18haVNHFCqsvH1HOpLhcVf7qA4Z162
-	 eJPNUsjnX/PDyH6W5rGh6GLuSrN0cLrQc2cmbB/Wqp6lD8JAp3B51xfQ0Dc8sOzIsP
-	 Ys6PaMy0Bs4g8cee9SZwfF8+jzROIF/2ACHfWTA6th5Ay2CzbnMygVJ9BIRKhYq2Fp
-	 Ciw2dLiXNW5bA==
+	b=mxa84x9agdWMz69bxSZCYL10ocQxKx2kKb91QXnTfyAiyyeKKw36H+/oJhU8Cbl+7
+	 OTwugFX3oHlJp/QC4tOx9+GCtyuwdlhgK9bIzbTrCEm6GhhbO0hS0zkvUTbWa+RPa5
+	 b9wgGW/JKSJf+pqvQsT5DFwaWlZf9DAwno42aaPmAIBeq1ZtRQaL10ohqOJHKuiV3O
+	 SlXSEQDEJrW+guO9P/rt3ymfN1YES7TIqbM73SSL0eS8KJTLC+L18IiG1pnN0Rv/c9
+	 9sN2VWt2ZzlrBXwqrw+dyX416Xl/zyyCqKg8RKZHFhxgLQO91ZPf/VGYOCu9UAnkaO
+	 bJC8ix7z4c6Kw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Benjamin Coddington <bcodding@redhat.com>,
+Cc: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ij@kernel.org>,
+	Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	chuck.lever@oracle.com,
-	trondmy@kernel.org,
-	anna@kernel.org,
-	davem@davemloft.net,
 	edumazet@google.com,
+	ncardwell@google.com,
+	dsahern@kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	linux-nfs@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 023/294] SUNRPC: rpc_clnt_set_transport() must not change the autobind setting
-Date: Mon,  5 May 2025 18:52:03 -0400
-Message-Id: <20250505225634.2688578-23-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 063/294] tcp: reorganize tcp_in_ack_event() and tcp_count_delivered()
+Date: Mon,  5 May 2025 18:52:43 -0400
+Message-Id: <20250505225634.2688578-63-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505225634.2688578-1-sashal@kernel.org>
 References: <20250505225634.2688578-1-sashal@kernel.org>
@@ -69,41 +66,156 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.89
 Content-Transfer-Encoding: 8bit
 
-From: Trond Myklebust <trond.myklebust@hammerspace.com>
+From: Ilpo Järvinen <ij@kernel.org>
 
-[ Upstream commit bf9be373b830a3e48117da5d89bb6145a575f880 ]
+[ Upstream commit 149dfb31615e22271d2525f078c95ea49bc4db24 ]
 
-The autobind setting was supposed to be determined in rpc_create(),
-since commit c2866763b402 ("SUNRPC: use sockaddr + size when creating
-remote transport endpoints").
+- Move tcp_count_delivered() earlier and split tcp_count_delivered_ce()
+  out of it
+- Move tcp_in_ack_event() later
+- While at it, remove the inline from tcp_in_ack_event() and let
+  the compiler to decide
 
-Reviewed-by: Jeff Layton <jlayton@kernel.org>
-Reviewed-by: Benjamin Coddington <bcodding@redhat.com>
-Signed-off-by: Trond Myklebust <trond.myklebust@hammerspace.com>
+Accurate ECN's heuristics does not know if there is going
+to be ACE field based CE counter increase or not until after
+rtx queue has been processed. Only then the number of ACKed
+bytes/pkts is available. As CE or not affects presence of
+FLAG_ECE, that information for tcp_in_ack_event is not yet
+available in the old location of the call to tcp_in_ack_event().
+
+Signed-off-by: Ilpo Järvinen <ij@kernel.org>
+Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/sunrpc/clnt.c | 3 ---
- 1 file changed, 3 deletions(-)
+ net/ipv4/tcp_input.c | 56 +++++++++++++++++++++++++-------------------
+ 1 file changed, 32 insertions(+), 24 deletions(-)
 
-diff --git a/net/sunrpc/clnt.c b/net/sunrpc/clnt.c
-index 142ee6554848a..4ffb2bcaf3648 100644
---- a/net/sunrpc/clnt.c
-+++ b/net/sunrpc/clnt.c
-@@ -275,9 +275,6 @@ static struct rpc_xprt *rpc_clnt_set_transport(struct rpc_clnt *clnt,
- 	old = rcu_dereference_protected(clnt->cl_xprt,
- 			lockdep_is_held(&clnt->cl_lock));
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 10d38ec0ff5ac..a172248b66783 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -425,6 +425,20 @@ static bool tcp_ecn_rcv_ecn_echo(const struct tcp_sock *tp, const struct tcphdr
+ 	return false;
+ }
  
--	if (!xprt_bound(xprt))
--		clnt->cl_autobind = 1;
++static void tcp_count_delivered_ce(struct tcp_sock *tp, u32 ecn_count)
++{
++	tp->delivered_ce += ecn_count;
++}
++
++/* Updates the delivered and delivered_ce counts */
++static void tcp_count_delivered(struct tcp_sock *tp, u32 delivered,
++				bool ece_ack)
++{
++	tp->delivered += delivered;
++	if (ece_ack)
++		tcp_count_delivered_ce(tp, delivered);
++}
++
+ /* Buffer size and advertised window tuning.
+  *
+  * 1. Tuning sk->sk_sndbuf, when connection enters established state.
+@@ -1137,15 +1151,6 @@ void tcp_mark_skb_lost(struct sock *sk, struct sk_buff *skb)
+ 	}
+ }
+ 
+-/* Updates the delivered and delivered_ce counts */
+-static void tcp_count_delivered(struct tcp_sock *tp, u32 delivered,
+-				bool ece_ack)
+-{
+-	tp->delivered += delivered;
+-	if (ece_ack)
+-		tp->delivered_ce += delivered;
+-}
 -
- 	clnt->cl_timeout = timeout;
- 	rcu_assign_pointer(clnt->cl_xprt, xprt);
- 	spin_unlock(&clnt->cl_lock);
+ /* This procedure tags the retransmission queue when SACKs arrive.
+  *
+  * We have three tag bits: SACKED(S), RETRANS(R) and LOST(L).
+@@ -3816,12 +3821,23 @@ static void tcp_process_tlp_ack(struct sock *sk, u32 ack, int flag)
+ 	}
+ }
+ 
+-static inline void tcp_in_ack_event(struct sock *sk, u32 flags)
++static void tcp_in_ack_event(struct sock *sk, int flag)
+ {
+ 	const struct inet_connection_sock *icsk = inet_csk(sk);
+ 
+-	if (icsk->icsk_ca_ops->in_ack_event)
+-		icsk->icsk_ca_ops->in_ack_event(sk, flags);
++	if (icsk->icsk_ca_ops->in_ack_event) {
++		u32 ack_ev_flags = 0;
++
++		if (flag & FLAG_WIN_UPDATE)
++			ack_ev_flags |= CA_ACK_WIN_UPDATE;
++		if (flag & FLAG_SLOWPATH) {
++			ack_ev_flags |= CA_ACK_SLOWPATH;
++			if (flag & FLAG_ECE)
++				ack_ev_flags |= CA_ACK_ECE;
++		}
++
++		icsk->icsk_ca_ops->in_ack_event(sk, ack_ev_flags);
++	}
+ }
+ 
+ /* Congestion control has updated the cwnd already. So if we're in
+@@ -3938,12 +3954,8 @@ static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
+ 		tcp_snd_una_update(tp, ack);
+ 		flag |= FLAG_WIN_UPDATE;
+ 
+-		tcp_in_ack_event(sk, CA_ACK_WIN_UPDATE);
+-
+ 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPHPACKS);
+ 	} else {
+-		u32 ack_ev_flags = CA_ACK_SLOWPATH;
+-
+ 		if (ack_seq != TCP_SKB_CB(skb)->end_seq)
+ 			flag |= FLAG_DATA;
+ 		else
+@@ -3955,19 +3967,12 @@ static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
+ 			flag |= tcp_sacktag_write_queue(sk, skb, prior_snd_una,
+ 							&sack_state);
+ 
+-		if (tcp_ecn_rcv_ecn_echo(tp, tcp_hdr(skb))) {
++		if (tcp_ecn_rcv_ecn_echo(tp, tcp_hdr(skb)))
+ 			flag |= FLAG_ECE;
+-			ack_ev_flags |= CA_ACK_ECE;
+-		}
+ 
+ 		if (sack_state.sack_delivered)
+ 			tcp_count_delivered(tp, sack_state.sack_delivered,
+ 					    flag & FLAG_ECE);
+-
+-		if (flag & FLAG_WIN_UPDATE)
+-			ack_ev_flags |= CA_ACK_WIN_UPDATE;
+-
+-		tcp_in_ack_event(sk, ack_ev_flags);
+ 	}
+ 
+ 	/* This is a deviation from RFC3168 since it states that:
+@@ -3994,6 +3999,8 @@ static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
+ 
+ 	tcp_rack_update_reo_wnd(sk, &rs);
+ 
++	tcp_in_ack_event(sk, flag);
++
+ 	if (tp->tlp_high_seq)
+ 		tcp_process_tlp_ack(sk, ack, flag);
+ 
+@@ -4025,6 +4032,7 @@ static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
+ 	return 1;
+ 
+ no_queue:
++	tcp_in_ack_event(sk, flag);
+ 	/* If data was DSACKed, see if we can undo a cwnd reduction. */
+ 	if (flag & FLAG_DSACKING_ACK) {
+ 		tcp_fastretrans_alert(sk, prior_snd_una, num_dupack, &flag,
 -- 
 2.39.5
 
