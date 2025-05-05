@@ -1,65 +1,62 @@
-Return-Path: <netdev+bounces-188057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24E62AAADC9
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 04:42:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7D50AAB082
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:39:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 678A2171294
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 02:39:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F0FCC1BA5CB8
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:40:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD872401332;
-	Mon,  5 May 2025 23:45:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B47E9405E96;
+	Mon,  5 May 2025 23:46:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p4FW6KIF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D6LmhY75"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83E07385426;
-	Mon,  5 May 2025 23:23:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E392B3C088F;
+	Mon,  5 May 2025 23:23:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746487426; cv=none; b=eNfp9vcU5HUrKeMVwkTvL1s65tTQdFA1NtzFtKkINq7mz+H3gE73YAcXcFRiDiH1bZbD90b3knvP1vshnCm87w2xnahymzTAAYLVbUDn/4OkrOU1W9WMRF2eOelNAXRcpCquPdeDN3LbKVsjen1bnY5kfyXhnZtFm3822kmwln4=
+	t=1746487433; cv=none; b=UyzuYG8XUPAx6q/kJuJ3pUTaidfd+TPr45CRFwM/LXUrrIkRRMVBq31q3J07Gh1VBHUYaqOU9ZsxoQ8nDxR265oB+vTfDs83l7aSlqwgRz1J5HrTCj8t+3dtdx9wPJlWxF/Xzb7V1snzesGapMLDkbjPSbWqgLRgycd8TsMgBJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746487426; c=relaxed/simple;
-	bh=j7RuD0oweaGhyvg5Wfr347HLY1yzuaNKvhLk+beBfik=;
+	s=arc-20240116; t=1746487433; c=relaxed/simple;
+	bh=VqAjdqFowdMxBwvZn1FNxrrbYAYPH2ZoKKabX/YN78c=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=t7nh1KTvFCdzT88u4UcVDQWv7+UK/0fwEvuK+XGKtPY4aeYtglLmaS6Zd91e+RGm45NV2rB2kyHvsyXUECdksBb46v5FVs4y6Zy1/OU2S4398djj6pG147EQvhyLmAuK+1XhMMH6J5hl4NkPg81Ufyxte5DlpLkGKrM8NtWGMnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p4FW6KIF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 639FEC4CEEE;
-	Mon,  5 May 2025 23:23:43 +0000 (UTC)
+	 MIME-Version; b=p9wyGoqSCVM9xiRnFVvxXOHdflOoo/hXV9PczEPphtnBNTzyBSkM0x5qOdQzJ45jmM94gM4Dv5eZXQoiVLyETGrmK5QlpSkd1yhjpHHsRq16kVoEFHWnIhX0K1+IX5X+hVuBD9o8tU4gOfhQ3ELHJRGh0CpCRW6OCoOxbKZDmBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D6LmhY75; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81866C4CEEE;
+	Mon,  5 May 2025 23:23:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746487425;
-	bh=j7RuD0oweaGhyvg5Wfr347HLY1yzuaNKvhLk+beBfik=;
+	s=k20201202; t=1746487431;
+	bh=VqAjdqFowdMxBwvZn1FNxrrbYAYPH2ZoKKabX/YN78c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=p4FW6KIFZtTy8wV6axdMC1U3g9G7U5XJUtGXDEx//yCSNCB61Qhk3ZTSXllQriZzv
-	 TvoybLtQUTQf0UuGxAbbo76ToJpRPQ3CocjGXf9ke/9yEIjWyFUXyPl73lRxrqQgBd
-	 ATZf4a23zH+BfUhocyQNk7cyvvPn16p9M1cuC5kxm71G/Ywu6ME7iR1UmMV+xHGb4R
-	 8b22I+ZRzh43AQ08Ytjo+VwwTlNgyU9HQ7sDCwN2hkTYO7a0zUTuc95oTJQicjb50C
-	 6eDn7dACtI5iwIDasWWzA9Prk0PS0VI2MW0X+TnT7/kbl5XzfW2qgJOaLZfiL7WqTI
-	 sfQ0b/JjtvSRw==
+	b=D6LmhY75C9YditeDX/dEhKgDe1QNaLBnE/gCXqt5Q59itSHzCyL4fLRH5gaPvGwG7
+	 8MLPPdnn3bvmy+q1mdhHF8do+ARQ1tjRW5BzI1xhFpdM2Hbo+5yqoQzEP6rZQhpEik
+	 E1RkmX65OBH/qDchkEKIAM8jeXPrYjv2f3zNGRnjx3VgOG7HZyYMB9pN+5/CmxZ/uj
+	 8WuBXVcovu701ihhusD8QvLuAEd2sP/YKjxY37yLxJL1GzNFljWLlvv73hw03OaVta
+	 o1KkvhUdkhbpjffaypGroGnN7ARDNGedbdK3jvO3oTh2BQSM0WlnIIW9aOYNhuKrvO
+	 yGQGWIsRxSB9w==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: William Tu <witu@nvidia.com>,
-	Bodong Wang <bodong@nvidia.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+Cc: Ido Schimmel <idosch@nvidia.com>,
+	Petr Machata <petrm@nvidia.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
-	edumazet@google.com,
 	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 64/79] net/mlx5e: reduce rep rxq depth to 256 for ECPF
-Date: Mon,  5 May 2025 19:21:36 -0400
-Message-Id: <20250505232151.2698893-64-sashal@kernel.org>
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.4 68/79] vxlan: Annotate FDB data races
+Date: Mon,  5 May 2025 19:21:40 -0400
+Message-Id: <20250505232151.2698893-68-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505232151.2698893-1-sashal@kernel.org>
 References: <20250505232151.2698893-1-sashal@kernel.org>
@@ -74,73 +71,142 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.4.293
 Content-Transfer-Encoding: 8bit
 
-From: William Tu <witu@nvidia.com>
+From: Ido Schimmel <idosch@nvidia.com>
 
-[ Upstream commit b9cc8f9d700867aaa77aedddfea85e53d5e5d584 ]
+[ Upstream commit f6205f8215f12a96518ac9469ff76294ae7bd612 ]
 
-By experiments, a single queue representor netdev consumes kernel
-memory around 2.8MB, and 1.8MB out of the 2.8MB is due to page
-pool for the RXQ. Scaling to a thousand representors consumes 2.8GB,
-which becomes a memory pressure issue for embedded devices such as
-BlueField-2 16GB / BlueField-3 32GB memory.
+The 'used' and 'updated' fields in the FDB entry structure can be
+accessed concurrently by multiple threads, leading to reports such as
+[1]. Can be reproduced using [2].
 
-Since representor netdevs mostly handles miss traffic, and ideally,
-most of the traffic will be offloaded, reduce the default non-uplink
-rep netdev's RXQ default depth from 1024 to 256 if mdev is ecpf eswitch
-manager. This saves around 1MB of memory per regular RQ,
-(1024 - 256) * 2KB, allocated from page pool.
+Suppress these reports by annotating these accesses using
+READ_ONCE() / WRITE_ONCE().
 
-With rxq depth of 256, the netlink page pool tool reports
-$./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-	 --dump page-pool-get
- {'id': 277,
-  'ifindex': 9,
-  'inflight': 128,
-  'inflight-mem': 786432,
-  'napi-id': 775}]
+[1]
+BUG: KCSAN: data-race in vxlan_xmit / vxlan_xmit
 
-This is due to mtu 1500 + headroom consumes half pages, so 256 rxq
-entries consumes around 128 pages (thus create a page pool with
-size 128), shown above at inflight.
+write to 0xffff942604d263a8 of 8 bytes by task 286 on cpu 0:
+ vxlan_xmit+0xb29/0x2380
+ dev_hard_start_xmit+0x84/0x2f0
+ __dev_queue_xmit+0x45a/0x1650
+ packet_xmit+0x100/0x150
+ packet_sendmsg+0x2114/0x2ac0
+ __sys_sendto+0x318/0x330
+ __x64_sys_sendto+0x76/0x90
+ x64_sys_call+0x14e8/0x1c00
+ do_syscall_64+0x9e/0x1a0
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Note that each netdev has multiple types of RQs, including
-Regular RQ, XSK, PTP, Drop, Trap RQ. Since non-uplink representor
-only supports regular rq, this patch only changes the regular RQ's
-default depth.
+read to 0xffff942604d263a8 of 8 bytes by task 287 on cpu 2:
+ vxlan_xmit+0xadf/0x2380
+ dev_hard_start_xmit+0x84/0x2f0
+ __dev_queue_xmit+0x45a/0x1650
+ packet_xmit+0x100/0x150
+ packet_sendmsg+0x2114/0x2ac0
+ __sys_sendto+0x318/0x330
+ __x64_sys_sendto+0x76/0x90
+ x64_sys_call+0x14e8/0x1c00
+ do_syscall_64+0x9e/0x1a0
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Signed-off-by: William Tu <witu@nvidia.com>
-Reviewed-by: Bodong Wang <bodong@nvidia.com>
-Reviewed-by: Saeed Mahameed <saeedm@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Link: https://patch.msgid.link/20250209101716.112774-8-tariqt@nvidia.com
+value changed: 0x00000000fffbac6e -> 0x00000000fffbac6f
+
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 2 UID: 0 PID: 287 Comm: mausezahn Not tainted 6.13.0-rc7-01544-gb4b270f11a02 #5
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-3.fc41 04/01/2014
+
+[2]
+ #!/bin/bash
+
+ set +H
+ echo whitelist > /sys/kernel/debug/kcsan
+ echo !vxlan_xmit > /sys/kernel/debug/kcsan
+
+ ip link add name vx0 up type vxlan id 10010 dstport 4789 local 192.0.2.1
+ bridge fdb add 00:11:22:33:44:55 dev vx0 self static dst 198.51.100.1
+ taskset -c 0 mausezahn vx0 -a own -b 00:11:22:33:44:55 -c 0 -q &
+ taskset -c 2 mausezahn vx0 -a own -b 00:11:22:33:44:55 -c 0 -q &
+
+Reviewed-by: Petr Machata <petrm@nvidia.com>
+Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+Link: https://patch.msgid.link/20250204145549.1216254-2-idosch@nvidia.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en_rep.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/net/vxlan.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-index 26a9d38d1e2a7..479304afdada2 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-@@ -53,6 +53,7 @@
- #define MLX5E_REP_PARAMS_DEF_LOG_SQ_SIZE \
-         max(0x7, MLX5E_PARAMS_MINIMUM_LOG_SQ_SIZE)
- #define MLX5E_REP_PARAMS_DEF_NUM_CHANNELS 1
-+#define MLX5E_REP_PARAMS_DEF_LOG_RQ_SIZE 0x8
+diff --git a/drivers/net/vxlan.c b/drivers/net/vxlan.c
+index ce11fb2b05561..7105ac37f341e 100644
+--- a/drivers/net/vxlan.c
++++ b/drivers/net/vxlan.c
+@@ -302,9 +302,9 @@ static int vxlan_fdb_info(struct sk_buff *skb, struct vxlan_dev *vxlan,
+ 	    nla_put_u32(skb, NDA_IFINDEX, rdst->remote_ifindex))
+ 		goto nla_put_failure;
  
- static const char mlx5e_rep_driver_name[] = "mlx5e_rep";
+-	ci.ndm_used	 = jiffies_to_clock_t(now - fdb->used);
++	ci.ndm_used	 = jiffies_to_clock_t(now - READ_ONCE(fdb->used));
+ 	ci.ndm_confirmed = 0;
+-	ci.ndm_updated	 = jiffies_to_clock_t(now - fdb->updated);
++	ci.ndm_updated	 = jiffies_to_clock_t(now - READ_ONCE(fdb->updated));
+ 	ci.ndm_refcnt	 = 0;
  
-@@ -1430,6 +1431,8 @@ static void mlx5e_build_rep_params(struct net_device *netdev)
+ 	if (nla_put(skb, NDA_CACHEINFO, sizeof(ci), &ci))
+@@ -510,8 +510,8 @@ static struct vxlan_fdb *vxlan_find_mac(struct vxlan_dev *vxlan,
+ 	struct vxlan_fdb *f;
  
- 	/* RQ */
- 	mlx5e_build_rq_params(mdev, params);
-+	if (!mlx5e_is_uplink_rep(priv) && mlx5_core_is_ecpf(mdev))
-+		params->log_rq_mtu_frames = MLX5E_REP_PARAMS_DEF_LOG_RQ_SIZE;
+ 	f = __vxlan_find_mac(vxlan, mac, vni);
+-	if (f && f->used != jiffies)
+-		f->used = jiffies;
++	if (f && READ_ONCE(f->used) != jiffies)
++		WRITE_ONCE(f->used, jiffies);
  
- 	/* CQ moderation params */
- 	params->rx_dim_enabled = MLX5_CAP_GEN(mdev, cq_moderation);
+ 	return f;
+ }
+@@ -942,12 +942,12 @@ static int vxlan_fdb_update_existing(struct vxlan_dev *vxlan,
+ 	    !(f->flags & NTF_VXLAN_ADDED_BY_USER)) {
+ 		if (f->state != state) {
+ 			f->state = state;
+-			f->updated = jiffies;
++			WRITE_ONCE(f->updated, jiffies);
+ 			notify = 1;
+ 		}
+ 		if (f->flags != fdb_flags) {
+ 			f->flags = fdb_flags;
+-			f->updated = jiffies;
++			WRITE_ONCE(f->updated, jiffies);
+ 			notify = 1;
+ 		}
+ 	}
+@@ -974,7 +974,7 @@ static int vxlan_fdb_update_existing(struct vxlan_dev *vxlan,
+ 	}
+ 
+ 	if (ndm_flags & NTF_USE)
+-		f->used = jiffies;
++		WRITE_ONCE(f->used, jiffies);
+ 
+ 	if (notify) {
+ 		if (rd == NULL)
+@@ -1351,7 +1351,7 @@ static bool vxlan_snoop(struct net_device *dev,
+ 				    src_mac, &rdst->remote_ip.sa, &src_ip->sa);
+ 
+ 		rdst->remote_ip = *src_ip;
+-		f->updated = jiffies;
++		WRITE_ONCE(f->updated, jiffies);
+ 		vxlan_fdb_notify(vxlan, f, rdst, RTM_NEWNEIGH, true, NULL);
+ 	} else {
+ 		u32 hash_index = fdb_head_index(vxlan, src_mac, vni);
+@@ -2748,7 +2748,7 @@ static void vxlan_cleanup(struct timer_list *t)
+ 			if (f->flags & NTF_EXT_LEARNED)
+ 				continue;
+ 
+-			timeout = f->used + vxlan->cfg.age_interval * HZ;
++			timeout = READ_ONCE(f->used) + vxlan->cfg.age_interval * HZ;
+ 			if (time_before_eq(timeout, jiffies)) {
+ 				netdev_dbg(vxlan->dev,
+ 					   "garbage collect %pM\n",
 -- 
 2.39.5
 
