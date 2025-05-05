@@ -1,65 +1,63 @@
-Return-Path: <netdev+bounces-187866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0911AAA9F5E
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 00:23:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 735FCAA9F88
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 00:24:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C6433AB6F5
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 22:22:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0ACF1A825A9
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 22:24:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12DAF283683;
-	Mon,  5 May 2025 22:15:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6706F284671;
+	Mon,  5 May 2025 22:15:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RRMQnFns"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kr6oRBb4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D750B2820DE;
-	Mon,  5 May 2025 22:15:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D45B279358;
+	Mon,  5 May 2025 22:15:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746483326; cv=none; b=GtybR8HLUSLDzqt6M5CC63eFHWm2R8IZNbjoYDorki9RDdNBW887u54ZWD3R11coYZ3ilj41NP7gZLHmNTE6x4s+sHQCFU+lSdawIxsBP0RzajHLgq8ABCmOaMXeAlvSW6AlL4IDIwcQaH2d87gFQ6qBF7HKoafRT/D1n0uNnl0=
+	t=1746483332; cv=none; b=QP6HpJw8z4PRAxOs/EopfRi9GFeAesDO6K1HBImoTJDZ7K9NAzlOTIXnJSaw10tr/ygjM5fhMPONzF/R/5sxovm/nGe88q76jKUoPQGegpCJx1OUFcFsaGXeuIdeCqoc02OwIKFwlvrdzl/D4AIzk4kjRlBhfywpZuHIVMuGt4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746483326; c=relaxed/simple;
-	bh=BYmx1SoM6cZjl6yYUpyus6wm6SDYezgd/kLQ4Fl4VDg=;
+	s=arc-20240116; t=1746483332; c=relaxed/simple;
+	bh=VyHl2/k893g41M784F8ipECbATSeSfXZgCi/sJEuRbg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=fwWybv2rDiQ/hXiUkfm06xg07j1AFeOAj8pyDZuEM8ruJ9aa2Ba3wM6wuvjBs8MFpDgiSgTLeyYL+qba8q6bpE4BXqu9lnkVT7Btc/PnjIpohOzTYMLvsTti7QDUjUweWqKucSmvlLj3u8pvSvjtT5AuX2WpALKyhxcw5HDqAyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RRMQnFns; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38994C4CEF1;
-	Mon,  5 May 2025 22:15:24 +0000 (UTC)
+	 MIME-Version; b=nyCBbgT6y6CFNwTspPXHuLrKbNhG4L8nYR0DF/8bdCOHOnqKjiSxwCYj9+Okm0G8cXTVemEzXz4vDok6XI6uW3E6s6Hs+FtCfWQilokvG8tzLw0lOy+n/7d3sftOgNJaj2Vk/9SDhAFwsIGYhCKq404C3VkqkgygfET+rj+75OM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kr6oRBb4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4CE3C4CEE4;
+	Mon,  5 May 2025 22:15:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746483325;
-	bh=BYmx1SoM6cZjl6yYUpyus6wm6SDYezgd/kLQ4Fl4VDg=;
+	s=k20201202; t=1746483332;
+	bh=VyHl2/k893g41M784F8ipECbATSeSfXZgCi/sJEuRbg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RRMQnFnsqqEM5O4mSHDjdmSkYMFYiCQ0oWZTZv0XgV/iSiczI9nGZLgc4lOl9pase
-	 sk7vxAwULU2m+rnRv/SadqxauCAcCWzlCpHanPz/ylEH2J9U5nBLLiF4zM8zISitMw
-	 Yf94mNvOsJ1Hc/iMomN7Bj8k7yLsKEBwT6uSAGrv8wGjGm1AyzyrqXZSrE4XsBKQrb
-	 yFR+mHSv+7qfs1suS8nLU4eo8jCy4bWtObbftXus9nisyq9bFNR1nSQniXj4CzM5TL
-	 S/DH9gXBEyfyfo6kBkAd43E4gJgDIQcZDcMWabf3PpZ1V6t5CIShuxDYAbhzO8139N
-	 YeZ/pGMF5i1Pw==
+	b=kr6oRBb4fKPC4ukw1D8HH0RfEYYdgGhSCilAcQ9EZdMiVOrbrJDGSGlvPXajxoXqY
+	 6pGIPeAwQ3fdv/Sua90nHz4K2ZYPVqAX9XDET+gqtdWW8VeyRWE+YUUAHLtB8G6lc3
+	 ou9o+3BqjX8nXWQWVU5Y4BkFtVTpVaExy34zuhLc57V0CtqUPDi3vxab1z5AQHgBOX
+	 11r9eRc9Z+hpmz101QEIMX2I5tCBqtan2mJsmRjQBNt+iSoUdtL5SLOxVott9us+JS
+	 skpjZ+YYcmdBoiwUCtSB+wyUwtDo5wOZpM4vY5WnpFu+bm2a6+78lXRbjyWXdjIDXn
+	 gYI+YZkPqq29Q==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Benjamin Coddington <bcodding@redhat.com>,
+Cc: Daniel Hsu <d486250@gmail.com>,
+	Daniel Hsu <Daniel-Hsu@quantatw.com>,
+	Jeremy Kerr <jk@codeconstruct.com.au>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	chuck.lever@oracle.com,
-	trondmy@kernel.org,
-	anna@kernel.org,
-	davem@davemloft.net,
+	matt@codeconstruct.com.au,
+	andrew+netdev@lunn.ch,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	linux-nfs@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.14 034/642] SUNRPC: rpcbind should never reset the port to the value '0'
-Date: Mon,  5 May 2025 18:04:10 -0400
-Message-Id: <20250505221419.2672473-34-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.14 038/642] mctp: Fix incorrect tx flow invalidation condition in mctp-i2c
+Date: Mon,  5 May 2025 18:04:14 -0400
+Message-Id: <20250505221419.2672473-38-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505221419.2672473-1-sashal@kernel.org>
 References: <20250505221419.2672473-1-sashal@kernel.org>
@@ -74,38 +72,39 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.14.5
 Content-Transfer-Encoding: 8bit
 
-From: Trond Myklebust <trond.myklebust@hammerspace.com>
+From: Daniel Hsu <d486250@gmail.com>
 
-[ Upstream commit 214c13e380ad7636631279f426387f9c4e3c14d9 ]
+[ Upstream commit 70facbf978ac90c6da17a3de2a8dd111b06f1bac ]
 
-If we already had a valid port number for the RPC service, then we
-should not allow the rpcbind client to set it to the invalid value '0'.
+Previously, the condition for invalidating the tx flow in
+mctp_i2c_invalidate_tx_flow() checked if `rc` was nonzero.
+However, this could incorrectly trigger the invalidation
+even when `rc > 0` was returned as a success status.
 
-Reviewed-by: Jeff Layton <jlayton@kernel.org>
-Reviewed-by: Benjamin Coddington <bcodding@redhat.com>
-Signed-off-by: Trond Myklebust <trond.myklebust@hammerspace.com>
+This patch updates the condition to explicitly check for `rc < 0`,
+ensuring that only error cases trigger the invalidation.
+
+Signed-off-by: Daniel Hsu <Daniel-Hsu@quantatw.com>
+Reviewed-by: Jeremy Kerr <jk@codeconstruct.com.au>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/sunrpc/rpcb_clnt.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/net/mctp/mctp-i2c.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/sunrpc/rpcb_clnt.c b/net/sunrpc/rpcb_clnt.c
-index 102c3818bc54d..53bcca365fb1c 100644
---- a/net/sunrpc/rpcb_clnt.c
-+++ b/net/sunrpc/rpcb_clnt.c
-@@ -820,9 +820,10 @@ static void rpcb_getport_done(struct rpc_task *child, void *data)
- 	}
+diff --git a/drivers/net/mctp/mctp-i2c.c b/drivers/net/mctp/mctp-i2c.c
+index d74d47dd6e04d..f782d93f826ef 100644
+--- a/drivers/net/mctp/mctp-i2c.c
++++ b/drivers/net/mctp/mctp-i2c.c
+@@ -537,7 +537,7 @@ static void mctp_i2c_xmit(struct mctp_i2c_dev *midev, struct sk_buff *skb)
+ 		rc = __i2c_transfer(midev->adapter, &msg, 1);
  
- 	trace_rpcb_setport(child, map->r_status, map->r_port);
--	xprt->ops->set_port(xprt, map->r_port);
--	if (map->r_port)
-+	if (map->r_port) {
-+		xprt->ops->set_port(xprt, map->r_port);
- 		xprt_set_bound(xprt);
-+	}
- }
+ 		/* on tx errors, the flow can no longer be considered valid */
+-		if (rc)
++		if (rc < 0)
+ 			mctp_i2c_invalidate_tx_flow(midev, skb);
  
- /*
+ 		break;
 -- 
 2.39.5
 
