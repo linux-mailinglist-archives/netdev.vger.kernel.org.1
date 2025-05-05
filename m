@@ -1,63 +1,73 @@
-Return-Path: <netdev+bounces-187977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCD6CAAAE8C
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 04:59:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE869AAB183
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:01:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFBAD3BB3B0
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 02:54:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 071131BC30CF
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 04:01:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 852EC385363;
-	Mon,  5 May 2025 23:00:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 361D2364326;
+	Tue,  6 May 2025 00:27:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MVf91LAU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o8UHUuAV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF07B3635D4;
-	Mon,  5 May 2025 22:51:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CBF227F743;
+	Mon,  5 May 2025 22:52:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746485488; cv=none; b=ogEEOifDjCOy4SnNAOQmbx7JPWRRiePlko0SFRrsmf4xXnxndj2FL6g2OKrX3YmPHZJdk/mhJUqwSLt0BPAsOMaNiUFpeg8U7CuyVrZ9az9NTy9EcMVKKJz8mughhaw3YTAP9TjgRMlLY8AC354Tm2EBxo4kTEIUw6BvWnjllE8=
+	t=1746485523; cv=none; b=hHWHs0WatchZCi984WVGR5EsSUHxj7vJGZehYa2AXj0DZgv11iEvPoyvsc3wX7g6qfEnxioKBj6x4yDtYR8R0AUhqMbI3tkMq6Q1kATeugwhUFc2pIP7/VBaDDbkp44qfBmiKbvMeoq9kV/A370SkEQBpXUt36Ma+GhqeA0fzVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746485488; c=relaxed/simple;
-	bh=/poekQtgswXL0n9PrpAg6A9ekTrrgUkF7TlsYeW/k5A=;
+	s=arc-20240116; t=1746485523; c=relaxed/simple;
+	bh=mma8tzwZ/NqwWnsXqPq43wQ4tvCGsiw9PyvHomQ17l4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nD4pAK9hSw9VLZZsb7TicJXiEHsEQUH0BwdMmRcgjWugRYPFFJC9HeICfBZxcHw00bvOHs734zdJntpuVKne/mqu8jPncX5D97+IdcNOWYZRxJTisdTvIvvhnewnn2gZP5F/szA8mGw0kzmC33u38Z3V74lyXhCGx8L4fE5o3js=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MVf91LAU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AA25C4CEEE;
-	Mon,  5 May 2025 22:51:27 +0000 (UTC)
+	 MIME-Version; b=PLO4qii6IsMAEk6VHBQwz68lvuaRs378zfafXMjSG7a3JMYpVYr7g/btRG/BBIpbJzo1EG0FN9JCMHw+xur8d/wbV8Pt4CfqVSGz+A9HZhgx9NznxpVdo0CKPY3SL6ReaBFB1EYp9OoFmUcyjMtt/dmlmdBkSw/VF61TE2Tp5YI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o8UHUuAV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCD57C4CEEE;
+	Mon,  5 May 2025 22:52:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746485488;
-	bh=/poekQtgswXL0n9PrpAg6A9ekTrrgUkF7TlsYeW/k5A=;
+	s=k20201202; t=1746485523;
+	bh=mma8tzwZ/NqwWnsXqPq43wQ4tvCGsiw9PyvHomQ17l4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MVf91LAUVzVhi7d23aiIYr90/8tQ8znfC1FMjPZVYdgYatTCURSN7WTT8ctQx1rNy
-	 puTVBIovu1ODYhsrmSK8V2C40Rh79pBNi4GnrD2dmlr/GQRmmxLRwej+i0h+4nPjdu
-	 mTjLie4KMylRvXubtXipsVheN8yfK0mrqcZ2t2cMjzp7B5nWlUYtRbRUiyBkxXuzS6
-	 AmAVE8VNAtD+GtPSJZ0flMZ21VH21tKE9KyyW2fTW7MA/dOTeZpoF5C3FnuyZNrBaZ
-	 jNEOP2R4Ca1BuhXyjzwX7AN6Om8FMZJqm6RdgtAhjTcQonTHWlHFv4iNMZbyJrzTdK
-	 +fsxv7tiJJA+Q==
+	b=o8UHUuAV+pp8U4nzrTGRW3FafFipWgqRsYr3y82xYCrwmiQgenXntYpbxXN+jj3hl
+	 93lHACaMNuCKUiTjPgdNQz+XknKL5rixeL7R6xGgA4gbsdiqNfOtxkrOrxQVwqJBM3
+	 DpDw80m+k/+Iw7ZEM2Qt21XH+0sCtoTCdqJ9YEcdzzgUULtFJJusThbNm0HyGpiQqG
+	 rAKV7ex2tDHALtwOHoxgaDtlkSZIfRBoIcY2gfq0gAxvzqMvcPNnV9SvFemzkVTQae
+	 6u3oXBv3oOUB6CoUp2E47QnlEzqLhSfn+JOZGIcqs3YuUuCRwOPXzTJHBAgli7CVTQ
+	 pFNWS0X7egAKg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Kees Cook <kees@kernel.org>,
+Cc: Huacai Chen <chenhuacai@loongson.cn>,
+	Yanteng Si <si.yanteng@linux.dev>,
+	Simon Horman <horms@kernel.org>,
+	Chong Qiao <qiaochong@loongson.cn>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	tariqt@nvidia.com,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	yishaih@nvidia.com,
+	mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	chenhuacai@kernel.org,
+	fancer.lancer@gmail.com,
+	chenfeiyang@loongson.cn,
+	phasta@kernel.org,
+	zhaoqunqin@loongson.cn,
+	rmk+kernel@armlinux.org.uk,
 	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 342/486] net/mlx4_core: Avoid impossible mlx4_db_alloc() order value
-Date: Mon,  5 May 2025 18:36:58 -0400
-Message-Id: <20250505223922.2682012-342-sashal@kernel.org>
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH AUTOSEL 6.12 359/486] net: stmmac: dwmac-loongson: Set correct {tx,rx}_fifo_size
+Date: Mon,  5 May 2025 18:37:15 -0400
+Message-Id: <20250505223922.2682012-359-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505223922.2682012-1-sashal@kernel.org>
 References: <20250505223922.2682012-1-sashal@kernel.org>
@@ -72,76 +82,50 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.12.26
 Content-Transfer-Encoding: 8bit
 
-From: Kees Cook <kees@kernel.org>
+From: Huacai Chen <chenhuacai@loongson.cn>
 
-[ Upstream commit 4a6f18f28627e121bd1f74b5fcc9f945d6dbeb1e ]
+[ Upstream commit 8dbf0c7556454b52af91bae305ca71500c31495c ]
 
-GCC can see that the value range for "order" is capped, but this leads
-it to consider that it might be negative, leading to a false positive
-warning (with GCC 15 with -Warray-bounds -fdiagnostics-details):
+Now for dwmac-loongson {tx,rx}_fifo_size are uninitialised, which means
+zero. This means dwmac-loongson doesn't support changing MTU because in
+stmmac_change_mtu() it requires the fifo size be no less than MTU. Thus,
+set the correct tx_fifo_size and rx_fifo_size for it (16KB multiplied by
+queue counts).
 
-../drivers/net/ethernet/mellanox/mlx4/alloc.c:691:47: error: array subscript -1 is below array bounds of 'long unsigned int *[2]' [-Werror=array-bounds=]
-  691 |                 i = find_first_bit(pgdir->bits[o], MLX4_DB_PER_PAGE >> o);
-      |                                    ~~~~~~~~~~~^~~
-  'mlx4_alloc_db_from_pgdir': events 1-2
-  691 |                 i = find_first_bit(pgdir->bits[o], MLX4_DB_PER_PAGE >> o);                        |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      |                     |                         |                                                   |                     |                         (2) out of array bounds here
-      |                     (1) when the condition is evaluated to true                             In file included from ../drivers/net/ethernet/mellanox/mlx4/mlx4.h:53,
-                 from ../drivers/net/ethernet/mellanox/mlx4/alloc.c:42:
-../include/linux/mlx4/device.h:664:33: note: while referencing 'bits'
-  664 |         unsigned long          *bits[2];
-      |                                 ^~~~
+Here {tx,rx}_fifo_size is initialised with the initial value (also the
+maximum value) of {tx,rx}_queues_to_use. So it will keep as 16KB if we
+don't change the queue count, and will be larger than 16KB if we change
+(decrease) the queue count. However stmmac_change_mtu() still work well
+with current logic (MTU cannot be larger than 16KB for stmmac).
 
-Switch the argument to unsigned int, which removes the compiler needing
-to consider negative values.
+Note: the Fixes tag picked here is the oldest commit and key commit of
+the dwmac-loongson series "stmmac: Add Loongson platform support".
 
-Signed-off-by: Kees Cook <kees@kernel.org>
-Link: https://patch.msgid.link/20250210174504.work.075-kees@kernel.org
+Acked-by: Yanteng Si <si.yanteng@linux.dev>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Chong Qiao <qiaochong@loongson.cn>
+Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
+Link: https://patch.msgid.link/20250210134328.2755328-1-chenhuacai@loongson.cn
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/mellanox/mlx4/alloc.c | 6 +++---
- include/linux/mlx4/device.h                | 2 +-
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx4/alloc.c b/drivers/net/ethernet/mellanox/mlx4/alloc.c
-index b330020dc0d67..f2bded847e61d 100644
---- a/drivers/net/ethernet/mellanox/mlx4/alloc.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/alloc.c
-@@ -682,9 +682,9 @@ static struct mlx4_db_pgdir *mlx4_alloc_db_pgdir(struct device *dma_device)
- }
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+index ab7c2750c1042..702ea5a00b56d 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+@@ -590,6 +590,9 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+ 	if (ret)
+ 		goto err_disable_device;
  
- static int mlx4_alloc_db_from_pgdir(struct mlx4_db_pgdir *pgdir,
--				    struct mlx4_db *db, int order)
-+				    struct mlx4_db *db, unsigned int order)
- {
--	int o;
-+	unsigned int o;
- 	int i;
- 
- 	for (o = order; o <= 1; ++o) {
-@@ -712,7 +712,7 @@ static int mlx4_alloc_db_from_pgdir(struct mlx4_db_pgdir *pgdir,
- 	return 0;
- }
- 
--int mlx4_db_alloc(struct mlx4_dev *dev, struct mlx4_db *db, int order)
-+int mlx4_db_alloc(struct mlx4_dev *dev, struct mlx4_db *db, unsigned int order)
- {
- 	struct mlx4_priv *priv = mlx4_priv(dev);
- 	struct mlx4_db_pgdir *pgdir;
-diff --git a/include/linux/mlx4/device.h b/include/linux/mlx4/device.h
-index 27f42f713c891..86f0f2a25a3d6 100644
---- a/include/linux/mlx4/device.h
-+++ b/include/linux/mlx4/device.h
-@@ -1135,7 +1135,7 @@ int mlx4_write_mtt(struct mlx4_dev *dev, struct mlx4_mtt *mtt,
- int mlx4_buf_write_mtt(struct mlx4_dev *dev, struct mlx4_mtt *mtt,
- 		       struct mlx4_buf *buf);
- 
--int mlx4_db_alloc(struct mlx4_dev *dev, struct mlx4_db *db, int order);
-+int mlx4_db_alloc(struct mlx4_dev *dev, struct mlx4_db *db, unsigned int order);
- void mlx4_db_free(struct mlx4_dev *dev, struct mlx4_db *db);
- 
- int mlx4_alloc_hwq_res(struct mlx4_dev *dev, struct mlx4_hwq_resources *wqres,
++	plat->tx_fifo_size = SZ_16K * plat->tx_queues_to_use;
++	plat->rx_fifo_size = SZ_16K * plat->rx_queues_to_use;
++
+ 	if (dev_of_node(&pdev->dev))
+ 		ret = loongson_dwmac_dt_config(pdev, plat, &res);
+ 	else
 -- 
 2.39.5
 
