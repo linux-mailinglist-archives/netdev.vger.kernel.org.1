@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-188015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F5F7AAABF7
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 04:06:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3969AAAAF76
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:17:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5874E4C2B5C
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 02:05:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 760281892287
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:15:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0D242FB437;
-	Mon,  5 May 2025 23:23:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 027A838541A;
+	Mon,  5 May 2025 23:23:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qD8T+Bs9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QMzYvmj4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B766F2EEBEC;
-	Mon,  5 May 2025 23:10:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C02D538666D;
+	Mon,  5 May 2025 23:11:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746486608; cv=none; b=klDJo9YlKdSq2OseXB+tOYVkIsVdxKgLu3NakW0Lqe2nWV9Dl6eE5jdBoHwbGV3rZ3ev9PXF1xGj73n0YHn+sBgpZKpmYZdiI3OWTaCrjQu3B2QCGXKvYCz/UPX02NwZPDLKKeUzLYbxJmbYm5pDZMvz5Yt1a2HuToKAamBm3Dc=
+	t=1746486711; cv=none; b=iOfsggeKwkcjztg67P0lXO1bhx0DWuXe9RqUyqiYnC8nsfHkuimyarRUNsKXmxn8kSlDiN/+IBbYILZLsrVMX+SI4wW205qRvMmHJJ1wpHy5E7vMenPnqmB57n6vdZwueiIVNbT1D+lHiQl3BxkXpj6tfVnJlx0exB9px39do5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746486608; c=relaxed/simple;
-	bh=6nilLHw0VgDiTs0EsmbNUNsBYV4knhCYP34x5LqIndU=;
+	s=arc-20240116; t=1746486711; c=relaxed/simple;
+	bh=4wfJOZhBEhP2f/egkoNxpv8K2LBegtw1HcJEoXxGblw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ul4xQBL3toBfTam3irTrAeVJm3HhENcpBSeEJi3kspNG4YL1hI67Dscn9ZRAWJSFnP1TRzssP4E41qWV0FxCl7K4qB8XP24dldN5/VdHwNQcpax3Guxfgq58Tphde7r/euKw8JPfsS/CpkbW9qeb15wDovRVtPiDTwr5xbaAhlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qD8T+Bs9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CED5DC4CEEE;
-	Mon,  5 May 2025 23:10:05 +0000 (UTC)
+	 MIME-Version; b=EFLHb9bRNTv4cDsTNGvzBs6pk48p8RHTf0gQyPGU+UW4h+qviZISOW0cMCyplC5gTklaT/9eIZ+dtvx/dlF+l+t/OsPlsioFX5kIl0PNNjzgodH1XmO4NwyaefDOSZjRfwNK8mj/JnuAeNwLOiz8ilZ/Hhd8KW8/GPaq1cjhrBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QMzYvmj4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44D5EC4CEF1;
+	Mon,  5 May 2025 23:11:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746486607;
-	bh=6nilLHw0VgDiTs0EsmbNUNsBYV4knhCYP34x5LqIndU=;
+	s=k20201202; t=1746486710;
+	bh=4wfJOZhBEhP2f/egkoNxpv8K2LBegtw1HcJEoXxGblw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qD8T+Bs9MrzhlMi/Zp7AtwJjAbYo1HDSOvV6xO/Ibvad2DkeGdOgFYU4RvhvLHiUb
-	 02KsdtMi4Ilp0bXGUIoAXuM+ZE+mZZaFYlj6WyeWYzbUN3QZxwGfHnOuwEcaPE5qkv
-	 QNDDbxSEPxXBylVE1Ruft3kNTcO+EFzbtHBq8CKoqNq4QV3LJOdbUQtRE1oKftuKUJ
-	 3UrI4dOFHFmU26OKCMORrRskvSn6LrKCkNP1krM8xEZ+QRy/+VzlV3LmKVjf3uA+0Y
-	 /6w+drLPkoyPHx5feeiWqiICksIbTGYaQ83CFq4OZuTWd0T0cTgZBVC34T/CzplXRh
-	 ckS1yHH5chpow==
+	b=QMzYvmj4GtVxntf65o+zL0lBa5fbygIQJSUBIOJ6D+O/wgm6/UYbcE6HKYC0d9AqH
+	 KSo7jArHfYdQFlEfEqCX8znQxpv4l+I0qoxtIN1VM8H8rIFz7GqJfUD3EueQb73P2b
+	 PNuBODccAJ+1m16VMJ7jycT/47paKnt61c/I9tE4+UMDL/n91vmpTtG31xJJpwEeAo
+	 DqO0+jQMWA2We2ceUx7MYPq/Ppm6zsKX7LIGVrepX4w4eVNitBs/vQP65ARGuJYeLQ
+	 C7/deEr9M85ITanSGe6WlxO4blOI01NhlvqjURYv8ztAjX7MUMGufhnYLiTHHx9kHr
+	 shInfuVBjoEdQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Kevin Krakauer <krakauer@google.com>,
-	Willem de Bruijn <willemb@google.com>,
+Cc: Kees Cook <kees@kernel.org>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
+	tariqt@nvidia.com,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	shuah@kernel.org,
+	yishaih@nvidia.com,
 	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 115/212] selftests/net: have `gro.sh -t` return a correct exit code
-Date: Mon,  5 May 2025 19:04:47 -0400
-Message-Id: <20250505230624.2692522-115-sashal@kernel.org>
+	linux-rdma@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.1 166/212] net/mlx4_core: Avoid impossible mlx4_db_alloc() order value
+Date: Mon,  5 May 2025 19:05:38 -0400
+Message-Id: <20250505230624.2692522-166-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505230624.2692522-1-sashal@kernel.org>
 References: <20250505230624.2692522-1-sashal@kernel.org>
@@ -71,35 +72,76 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.1.136
 Content-Transfer-Encoding: 8bit
 
-From: Kevin Krakauer <krakauer@google.com>
+From: Kees Cook <kees@kernel.org>
 
-[ Upstream commit 784e6abd99f24024a8998b5916795f0bec9d2fd9 ]
+[ Upstream commit 4a6f18f28627e121bd1f74b5fcc9f945d6dbeb1e ]
 
-Modify gro.sh to return a useful exit code when the -t flag is used. It
-formerly returned 0 no matter what.
+GCC can see that the value range for "order" is capped, but this leads
+it to consider that it might be negative, leading to a false positive
+warning (with GCC 15 with -Warray-bounds -fdiagnostics-details):
 
-Tested: Ran `gro.sh -t large` and verified that test failures return 1.
-Signed-off-by: Kevin Krakauer <krakauer@google.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Link: https://patch.msgid.link/20250226192725.621969-2-krakauer@google.com
+../drivers/net/ethernet/mellanox/mlx4/alloc.c:691:47: error: array subscript -1 is below array bounds of 'long unsigned int *[2]' [-Werror=array-bounds=]
+  691 |                 i = find_first_bit(pgdir->bits[o], MLX4_DB_PER_PAGE >> o);
+      |                                    ~~~~~~~~~~~^~~
+  'mlx4_alloc_db_from_pgdir': events 1-2
+  691 |                 i = find_first_bit(pgdir->bits[o], MLX4_DB_PER_PAGE >> o);                        |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                     |                         |                                                   |                     |                         (2) out of array bounds here
+      |                     (1) when the condition is evaluated to true                             In file included from ../drivers/net/ethernet/mellanox/mlx4/mlx4.h:53,
+                 from ../drivers/net/ethernet/mellanox/mlx4/alloc.c:42:
+../include/linux/mlx4/device.h:664:33: note: while referencing 'bits'
+  664 |         unsigned long          *bits[2];
+      |                                 ^~~~
+
+Switch the argument to unsigned int, which removes the compiler needing
+to consider negative values.
+
+Signed-off-by: Kees Cook <kees@kernel.org>
+Link: https://patch.msgid.link/20250210174504.work.075-kees@kernel.org
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- tools/testing/selftests/net/gro.sh | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/mellanox/mlx4/alloc.c | 6 +++---
+ include/linux/mlx4/device.h                | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/tools/testing/selftests/net/gro.sh b/tools/testing/selftests/net/gro.sh
-index 342ad27f631b1..e771f5f7faa26 100755
---- a/tools/testing/selftests/net/gro.sh
-+++ b/tools/testing/selftests/net/gro.sh
-@@ -95,5 +95,6 @@ trap cleanup EXIT
- if [[ "${test}" == "all" ]]; then
-   run_all_tests
- else
--  run_test "${proto}" "${test}"
-+  exit_code=$(run_test "${proto}" "${test}")
-+  exit $exit_code
- fi;
+diff --git a/drivers/net/ethernet/mellanox/mlx4/alloc.c b/drivers/net/ethernet/mellanox/mlx4/alloc.c
+index b330020dc0d67..f2bded847e61d 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/alloc.c
++++ b/drivers/net/ethernet/mellanox/mlx4/alloc.c
+@@ -682,9 +682,9 @@ static struct mlx4_db_pgdir *mlx4_alloc_db_pgdir(struct device *dma_device)
+ }
+ 
+ static int mlx4_alloc_db_from_pgdir(struct mlx4_db_pgdir *pgdir,
+-				    struct mlx4_db *db, int order)
++				    struct mlx4_db *db, unsigned int order)
+ {
+-	int o;
++	unsigned int o;
+ 	int i;
+ 
+ 	for (o = order; o <= 1; ++o) {
+@@ -712,7 +712,7 @@ static int mlx4_alloc_db_from_pgdir(struct mlx4_db_pgdir *pgdir,
+ 	return 0;
+ }
+ 
+-int mlx4_db_alloc(struct mlx4_dev *dev, struct mlx4_db *db, int order)
++int mlx4_db_alloc(struct mlx4_dev *dev, struct mlx4_db *db, unsigned int order)
+ {
+ 	struct mlx4_priv *priv = mlx4_priv(dev);
+ 	struct mlx4_db_pgdir *pgdir;
+diff --git a/include/linux/mlx4/device.h b/include/linux/mlx4/device.h
+index 6646634a0b9d4..0cb296f0f8d1d 100644
+--- a/include/linux/mlx4/device.h
++++ b/include/linux/mlx4/device.h
+@@ -1115,7 +1115,7 @@ int mlx4_write_mtt(struct mlx4_dev *dev, struct mlx4_mtt *mtt,
+ int mlx4_buf_write_mtt(struct mlx4_dev *dev, struct mlx4_mtt *mtt,
+ 		       struct mlx4_buf *buf);
+ 
+-int mlx4_db_alloc(struct mlx4_dev *dev, struct mlx4_db *db, int order);
++int mlx4_db_alloc(struct mlx4_dev *dev, struct mlx4_db *db, unsigned int order);
+ void mlx4_db_free(struct mlx4_dev *dev, struct mlx4_db *db);
+ 
+ int mlx4_alloc_hwq_res(struct mlx4_dev *dev, struct mlx4_hwq_resources *wqres,
 -- 
 2.39.5
 
