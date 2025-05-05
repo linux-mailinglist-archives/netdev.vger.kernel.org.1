@@ -1,62 +1,64 @@
-Return-Path: <netdev+bounces-188175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4797AAB5FD
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 07:40:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B81FAAB612
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 07:42:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8421C3B53FD
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:34:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB8F73A065D
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:35:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93BD84AE9E8;
-	Tue,  6 May 2025 00:53:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10822973AC;
+	Tue,  6 May 2025 00:53:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K8of1/Qn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T1shxVit"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38B112857F2;
-	Mon,  5 May 2025 23:23:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC3052EC2B8;
+	Mon,  5 May 2025 23:23:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746487391; cv=none; b=M87lIkG41kpRDGaB7twZPIO5dt+1ipvfMbZBqbjqklNua6q8G8yWPSWt9scCMuPr/YnPZRRdmGqy/Tlx4IIL/Cr5cZfLE/+FFq6t53VBJEOg91iHpsFvWscWg73YZy4TtrqcxdydG7LD0dXjCEMkWDD+tbweYh+5jrlj5/akfyk=
+	t=1746487411; cv=none; b=SsD79tcPdTw4QlSTwq0Bu+j3LirSlFinrmuo0W+cLt6QtnwocQ66zk1j1ejsVs+3GIXJhs1tSe0VqumSfvao39qpUHVdL4brltPib5Dly0o43lNL1xiHiaS4y02SslHIe4vitm+0iLZ92L7vJacxh5rMCBNa9LtRew0RhGFXG5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746487391; c=relaxed/simple;
-	bh=ZTd19gbXMM2JQclcAhf5+lMh4BnjWdzATH/0xqyENVQ=;
+	s=arc-20240116; t=1746487411; c=relaxed/simple;
+	bh=KAi3PVFthWgF+EyVstfDrRkdy5yp485XR2TZzmWYyZU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mkUq2/GeEWhf9xwBH+k+TaooGgsRDgTSmhgHT8kZdAOjIaj7DNV2F61qirb2zCFdLto89rK/HArBABRQk4SLcTD7UrZg2mKrDH3NtLVnTSJdhBZ6/+Dq3LuTiqyImVeqSD0kFoxP5pI30vtFmDPIhgWYaC/JDchvo+ij+6CkbJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K8of1/Qn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9C4BC4CEED;
-	Mon,  5 May 2025 23:23:08 +0000 (UTC)
+	 MIME-Version; b=jGj220RIfk3ouovxYo2WHJtsebEEYmj/IFkqPTa/rpTjDtVxfQRmCU/eItTKwTRtgR6f2ns6MmZx1XGZettpZf9iXqcvTo5j6EoTE+0ANXPEaJb8PlVmy6ZdZDPNmlbqEDt0CPAOqHN7dgBWCwJTwpN28MM8IcWgS4yhpK5mXd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T1shxVit; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC385C4CEED;
+	Mon,  5 May 2025 23:23:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746487390;
-	bh=ZTd19gbXMM2JQclcAhf5+lMh4BnjWdzATH/0xqyENVQ=;
+	s=k20201202; t=1746487410;
+	bh=KAi3PVFthWgF+EyVstfDrRkdy5yp485XR2TZzmWYyZU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=K8of1/QnETwh2G6emZTS5Kjumpl9s4leY8+dd48Nkq+nui4hfog3uPsulojWPOEZQ
-	 BFdWHNiBXlq5vKPvd5tKA1lQZNqH4709wljvm9jfvHskjz0biZo7iTCfSOCkb7JuR/
-	 WGeYtiM0LSqMZEwUCwod3PeiEH44BNzyokXFJmxSXFp+R3au0gQsG5miJ4BqfIUOXX
-	 xLVergjah0ZLzBw6/wPjbzKe78jS2YTZTF/u+4wv9xpj5oyizmRE6hn9akvAA30fU8
-	 H000HzGcNjSS/zt28kcibNztlbtEQpKrH4ZwegRpoEN5Fi81VyFSPbe+1t2arT/969
-	 yONhCnaXl2riA==
+	b=T1shxVit5MRYVk1tya7tPr2sPaYj04j+SKx8HVCgTcOc043pzdMa1X4AsCy2fLWeG
+	 iqsL8wmW0YmTV4Qn95vq9cjuzS9+OTgV4VR+a2Bg+l0ZPmfxRr8b63gg8YgkZSepTt
+	 Bq9M4dEgjFL53rIyUpy7gS5Yko1Xs3/n2F0YifKsVRLZfirnLYD5RmrMTjLax1XMBU
+	 6IvAxJtYId1dyFJHt9yiHnYRelpzklMw2T4BLMpEKm0C/Mf5xbvwNhPFyZQWRuTlGi
+	 2K8lRC/ZRGhXSqZqbfknofRpAXF8cWHCLr8Txj/VxoHnciE+UCBfQ8TP8kcbalff/+
+	 M9HyzyHJSrjZQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Hangbin Liu <liuhangbin@gmail.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
+Cc: Shahar Shitrit <shshitrit@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	jv@jvosburgh.net,
+	saeedm@nvidia.com,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 44/79] bonding: report duplicate MAC address in all situations
-Date: Mon,  5 May 2025 19:21:16 -0400
-Message-Id: <20250505232151.2698893-44-sashal@kernel.org>
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.4 55/79] net/mlx5: Modify LSB bitmask in temperature event to include only the first bit
+Date: Mon,  5 May 2025 19:21:27 -0400
+Message-Id: <20250505232151.2698893-55-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505232151.2698893-1-sashal@kernel.org>
 References: <20250505232151.2698893-1-sashal@kernel.org>
@@ -66,48 +68,48 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.4.293
 Content-Transfer-Encoding: 8bit
 
-From: Hangbin Liu <liuhangbin@gmail.com>
+From: Shahar Shitrit <shshitrit@nvidia.com>
 
-[ Upstream commit 28d68d396a1cd21591e8c6d74afbde33a7ea107e ]
+[ Upstream commit 633f16d7e07c129a36b882c05379e01ce5bdb542 ]
 
-Normally, a bond uses the MAC address of the first added slave as the bond’s
-MAC address. And the bond will set active slave’s MAC address to bond’s
-address if fail_over_mac is set to none (0) or follow (2).
+In the sensor_count field of the MTEWE register, bits 1-62 are
+supported only for unmanaged switches, not for NICs, and bit 63
+is reserved for internal use.
 
-When the first slave is removed, the bond will still use the removed slave’s
-MAC address, which can lead to a duplicate MAC address and potentially cause
-issues with the switch. To avoid confusion, let's warn the user in all
-situations, including when fail_over_mac is set to 2 or not in active-backup
-mode.
+To prevent confusing output that may include set bits that are
+not relevant to NIC sensors, we update the bitmask to retain only
+the first bit, which corresponds to the sensor ASIC.
 
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
-Link: https://patch.msgid.link/20250225033914.18617-1-liuhangbin@gmail.com
+Signed-off-by: Shahar Shitrit <shshitrit@nvidia.com>
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Link: https://patch.msgid.link/20250213094641.226501-4-tariqt@nvidia.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/bonding/bond_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/mellanox/mlx5/core/events.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 89797b2575733..3b235a269c1b8 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -1954,7 +1954,7 @@ static int __bond_release_one(struct net_device *bond_dev,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/events.c b/drivers/net/ethernet/mellanox/mlx5/core/events.c
+index 3ce17c3d7a001..9d7b0a4cc48a9 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/events.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/events.c
+@@ -156,6 +156,10 @@ static int temp_warn(struct notifier_block *nb, unsigned long type, void *data)
+ 	u64 value_msb;
  
- 	RCU_INIT_POINTER(bond->current_arp_slave, NULL);
+ 	value_lsb = be64_to_cpu(eqe->data.temp_warning.sensor_warning_lsb);
++	/* bit 1-63 are not supported for NICs,
++	 * hence read only bit 0 (asic) from lsb.
++	 */
++	value_lsb &= 0x1;
+ 	value_msb = be64_to_cpu(eqe->data.temp_warning.sensor_warning_msb);
  
--	if (!all && (!bond->params.fail_over_mac ||
-+	if (!all && (bond->params.fail_over_mac != BOND_FOM_ACTIVE ||
- 		     BOND_MODE(bond) != BOND_MODE_ACTIVEBACKUP)) {
- 		if (ether_addr_equal_64bits(bond_dev->dev_addr, slave->perm_hwaddr) &&
- 		    bond_has_slaves(bond))
+ 	mlx5_core_warn(events->dev,
 -- 
 2.39.5
 
