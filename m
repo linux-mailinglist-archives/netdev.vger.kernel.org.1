@@ -1,60 +1,63 @@
-Return-Path: <netdev+bounces-187950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81433AAA804
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 02:45:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CDEEAAA837
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 02:50:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49B697AEECF
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 00:44:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A413A18986B2
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 00:48:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 337B8346EA3;
-	Mon,  5 May 2025 22:38:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B71A9349B7A;
+	Mon,  5 May 2025 22:39:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CCBInygN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mftCi3QO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09D722957C5;
-	Mon,  5 May 2025 22:38:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 816C7349B77;
+	Mon,  5 May 2025 22:39:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746484732; cv=none; b=cb+T3Ti+ecz4stwl8g8Xm4R8sY3oE3DMM06XkqnEBL9Gob1BauGrENzDf8Jltpa5ZOnFLdh1zCPGgCdnw9ZVH9V+xYZqgNBXZPSzHMEFHiCIK39mpv+sxVNw26Yngeg1B0yBmp8AW7Aq/VuqyG4YlYIFckh7YuYB9OpHJ3d8VfI=
+	t=1746484758; cv=none; b=DhII05acxfYsK0T8jJpQWaxay8CvHnT9Z7H0htLh4ZHsG3asx5DUxc+LQwonse6vX/DL3tQHfM5YGMLVL6zYW30masGU5/cZeiN6xR8C9h6Dmv8qYhlxNXLMcu2mZGeUfklTZVo7TPPiig1iw/zFNFrk14tk0NTaTPP2MomU9Qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746484732; c=relaxed/simple;
-	bh=z65+LRzHh/2gE62xUs/hX7uhqQuSK505LPQ3HD6jUQM=;
+	s=arc-20240116; t=1746484758; c=relaxed/simple;
+	bh=ywexBUzYrqkZI7OIwHPb5OJ1EGlVD5NLhiZhN4R+bxY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CQCInM52u7ZVGvV8DU4hmlorM1spkpB4QyAgFyx5GbdPPaIZTc7PaWDJ1hHxih/xLBQXNzwJtMyfQJdQkaSTX/awPu941EhqNyyGVPjQqOMPhXuV9ar9lLXyYrCZcbJcBLQiz6+8fn7qdpFEa7n+ypg8/UQjx54hXWexXd8Lts0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CCBInygN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 632DEC4CEF2;
-	Mon,  5 May 2025 22:38:50 +0000 (UTC)
+	 MIME-Version; b=p3iJqH7KtOfogOoKQuozSycoDZv5JEajFiHfkSn+clvfjVf/lcZLM+hgGqKHMBjif3bB3GuezCZC+fjyenUky6mMbOCH2fxLzZOgnW0Fp1/W1n3AoOltMwafC4TH4fvEvzMvAjPrWKDfS9yUeBLbwbiJTURiEtw+Q9nYd1DzaeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mftCi3QO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 002B4C4CEE4;
+	Mon,  5 May 2025 22:39:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746484731;
-	bh=z65+LRzHh/2gE62xUs/hX7uhqQuSK505LPQ3HD6jUQM=;
+	s=k20201202; t=1746484758;
+	bh=ywexBUzYrqkZI7OIwHPb5OJ1EGlVD5NLhiZhN4R+bxY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CCBInygNsrHowJpI6Kc/Y30kWJdawW0VLEZhrysFbzTh5l4LI66uiGj0hCnbZkon/
-	 zD3CaU25CbFVkoNa+UkDjExEo6RkZJ/yddZhSZ1olPfdPMFJ6ij5c2syb50C9bf/8/
-	 xeCMXcZ31Sy0TeA5UPIBvLxdcihHgeo57RboRl8/IbMC2N9I8+7IHffsfc1jlmzaCK
-	 5LibG6KkgM9eMgTZ3Auo2+0SeCR90xAMHAmFOe1Bu92ljwNBloRT12xFyWFB6YEUNQ
-	 ZuOX6m+CN53GBZg7BaGn26E1YRw6xzOitlHDpMeI/Dkh4ZvwEPz9KJJRLy+eCbV2MO
-	 jpJk3/zcHqzAA==
+	b=mftCi3QO2l70qsLHvUnjvh9WVQ6UNDfAfSvUVFK5cdIjFcajUFJwsyYxaaNjiv6zL
+	 1HFfkfdAxKisPzUNBQhRYXDAkT07fCahEPjEQjZx9ys4G6tOLpi+OOt/yWUKseW2G7
+	 IeqwpKjeNjNNnvovGNVG7jl+hl1uoCY1hLkhdoB/1B6AbeWVO6zTtqPRviWGr4R4pN
+	 xjMP6B2qsnQG6IQQxEnSNgeLcyLJvogaOE6n+T/hcimFYCS+qLlEM7v9TGegMbyMo9
+	 S6hNO5MCQTTCu4aVo9VNrqtd0vJ8vfGIJ1BcT+l/k68r2dq6ZYiJdSvgXFKqOvgmxj
+	 6oSAbOYFBDFZQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Willem de Bruijn <willemb@google.com>,
-	Eric Dumazet <edumazet@google.com>,
+Cc: Eric Dumazet <edumazet@google.com>,
+	Marco Leogrande <leogrande@google.com>,
+	Antoine Tenart <atenart@kernel.org>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	davem@davemloft.net,
-	dsahern@kernel.org,
 	pabeni@redhat.com,
+	sdf@fomichev.me,
+	jdamato@fastly.com,
+	aleksander.lobakin@intel.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.14 632/642] ipv6: remove leftover ip6 cookie initializer
-Date: Mon,  5 May 2025 18:14:08 -0400
-Message-Id: <20250505221419.2672473-632-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.14 642/642] net-sysfs: restore behavior for not running devices
+Date: Mon,  5 May 2025 18:14:18 -0400
+Message-Id: <20250505221419.2672473-642-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505221419.2672473-1-sashal@kernel.org>
 References: <20250505221419.2672473-1-sashal@kernel.org>
@@ -69,45 +72,71 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.14.5
 Content-Transfer-Encoding: 8bit
 
-From: Willem de Bruijn <willemb@google.com>
+From: Eric Dumazet <edumazet@google.com>
 
-[ Upstream commit 54580ccdd8a9c6821fd6f72171d435480867e4c3 ]
+[ Upstream commit 75bc3dab4e49b4daccb27ad6ce8ce2fcd253fc1b ]
 
-As of the blamed commit ipc6.dontfrag is always initialized at the
-start of udpv6_sendmsg, by ipcm6_init_sk, to either 0 or 1.
+modprobe dummy dumdummies=1
 
-Later checks against -1 are no longer needed and the branches are now
-dead code.
+Old behavior :
 
-The blamed commit had removed those branches. But I had overlooked
-this one case.
+$ cat /sys/class/net/dummy0/carrier
+cat: /sys/class/net/dummy0/carrier: Invalid argument
 
-UDP has both a lockless fast path and a slower path for corked
-requests. This branch remained in the fast path.
+After blamed commit, an empty string is reported.
 
-Fixes: 096208592b09 ("ipv6: replace ipcm6_init calls with ipcm6_init_sk")
-Signed-off-by: Willem de Bruijn <willemb@google.com>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Link: https://patch.msgid.link/20250307033620.411611-2-willemdebruijn.kernel@gmail.com
+$ cat /sys/class/net/dummy0/carrier
+$
+
+In this commit, I restore the old behavior for carrier,
+speed and duplex attributes.
+
+Fixes: 79c61899b5ee ("net-sysfs: remove rtnl_trylock from device attributes")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reported-by: Marco Leogrande <leogrande@google.com>
+Reviewed-by: Antoine Tenart <atenart@kernel.org>
+Link: https://patch.msgid.link/20250221051223.576726-1-edumazet@google.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/ipv6/ip6_output.c | 2 --
- 1 file changed, 2 deletions(-)
+ net/core/net-sysfs.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index eb636bec89796..581bc62890818 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -2055,8 +2055,6 @@ struct sk_buff *ip6_make_skb(struct sock *sk,
- 		ip6_cork_release(cork, &v6_cork);
- 		return ERR_PTR(err);
- 	}
--	if (ipc6->dontfrag < 0)
--		ipc6->dontfrag = inet6_test_bit(DONTFRAG, sk);
+diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+index cedbe7d9ae670..474824e88959f 100644
+--- a/net/core/net-sysfs.c
++++ b/net/core/net-sysfs.c
+@@ -313,12 +313,13 @@ static ssize_t carrier_show(struct device *dev,
+ 			    struct device_attribute *attr, char *buf)
+ {
+ 	struct net_device *netdev = to_net_dev(dev);
+-	int ret = -EINVAL;
++	int ret;
  
- 	err = __ip6_append_data(sk, &queue, cork, &v6_cork,
- 				&current->task_frag, getfrag, from,
+ 	ret = sysfs_rtnl_lock(&dev->kobj, &attr->attr, netdev);
+ 	if (ret)
+ 		return ret;
+ 
++	ret = -EINVAL;
+ 	if (netif_running(netdev)) {
+ 		/* Synchronize carrier state with link watch,
+ 		 * see also rtnl_getlink().
+@@ -349,6 +350,7 @@ static ssize_t speed_show(struct device *dev,
+ 	if (ret)
+ 		return ret;
+ 
++	ret = -EINVAL;
+ 	if (netif_running(netdev)) {
+ 		struct ethtool_link_ksettings cmd;
+ 
+@@ -376,6 +378,7 @@ static ssize_t duplex_show(struct device *dev,
+ 	if (ret)
+ 		return ret;
+ 
++	ret = -EINVAL;
+ 	if (netif_running(netdev)) {
+ 		struct ethtool_link_ksettings cmd;
+ 
 -- 
 2.39.5
 
