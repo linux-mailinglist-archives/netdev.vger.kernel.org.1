@@ -1,68 +1,60 @@
-Return-Path: <netdev+bounces-188078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59889AAB1C1
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:06:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D7DDAAB1DB
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:08:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6DAFA1BC4FB4
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 04:05:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5FB5188E3CB
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 04:07:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE1FE41A063;
-	Tue,  6 May 2025 00:28:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D126336769;
+	Tue,  6 May 2025 00:28:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="schoKTPh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O0cLZOhN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2C3B2D3F9E;
-	Mon,  5 May 2025 22:53:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA50B2D3FA5;
+	Mon,  5 May 2025 22:53:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746485608; cv=none; b=ss5g6XE89blOok0syi/VdocMEehWSaq6+y0+ZDpiP5Xbry71wJMGGZtkPsMhvKLJeqZUt/TqhkQ+CAKgsLcbhTGSgSrjYLJV4xDWHSJ7LHuElNXT0rjIgfduQ+hsJtnFoPPj62n5Sh5IB4RigC6TVWSiKA7Gu09qOA8pqwUD4ZU=
+	t=1746485612; cv=none; b=cmtOc6MSIbUSO8FZPBgTdc+nXpZ3o11AAfF0edFxEhfvRS2QKwkunfF5avfz+PjpTOceHhNDo2K2cCuLwaZbstt7OrSY1X3QtEHN3QGNQ670jyNRg7p6kttsg+FtMlxkKxYTc2ov5lcUDD4vV9w3kdIWV709j6XiL/giXWFtnL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746485608; c=relaxed/simple;
-	bh=yepw7QVUQHFmSgLSQIXX+iRrCnSdlF6rd2Op0jZkti4=;
+	s=arc-20240116; t=1746485612; c=relaxed/simple;
+	bh=aa86rpjTT/uoEWnxipn/ZsY0n6ZfIhYZnLnwkmQFKNU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ULAAlCHIC8+cRsv7LJKAVTLN+Agbs0mJsvi/zKhDmb1H1pfWlQe+MdH7q2ld7hoL+IGsy6O+d5TQ5WplQPRX1ryDaxp17LIZF/EWLBYKAIOeF/hOG+q8zCq+dYGO0NSBQP/80ZV7XDVEiGcq8hNKWK5x9h6yrU22X4LCV7p4Pt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=schoKTPh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC699C4CEE4;
-	Mon,  5 May 2025 22:53:25 +0000 (UTC)
+	 MIME-Version; b=YE5MrCFLZenC9s4/DZNwzOTzGFWWGCjnA+ZFjn8mh6Ub6pV6cB4xMb10nYYNQZCEHgivhVQAmAkA6K1j/A00xrRJB7P/JdkUr+XwV+TontCNevCYRj6qrfVwWFOiRK6xZ16IFp3D4EuKHvGLvoHFDs3I7aH8dPNX222FB5BkgvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O0cLZOhN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A45F2C4CEF2;
+	Mon,  5 May 2025 22:53:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746485607;
-	bh=yepw7QVUQHFmSgLSQIXX+iRrCnSdlF6rd2Op0jZkti4=;
+	s=k20201202; t=1746485610;
+	bh=aa86rpjTT/uoEWnxipn/ZsY0n6ZfIhYZnLnwkmQFKNU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=schoKTPhRUkZ66GAg2PtnFp032xf1BgVfrrYk4VNbKhfYHcUm5RQ2EpcMNXoPfNgJ
-	 G5dclm13AF6AO0KJteyyJVCKhNkKRfAGzDviOU7YcX9bgNED/6nCE/spq+OI5Vvhzr
-	 qpyUYK5rmPMUv7QN8A2wqhtMpY7Xo3C2FzUpuB6ywapbC/NDCAD27Q+8ays+lpilQu
-	 fz9h87NFnyRE4iNfkV+nii7Ro9rx97pQAqQrSU/lV760EoZeQCia04UVdnm9nLwnNd
-	 h7TE65DXgvOiqZ/pmYtqTy9TMUNrdV1FA9MnjNwlnopW5JDuBzQaY1a8kfG6z4tiED
-	 2tZTvoSC7YXig==
+	b=O0cLZOhN7LyRmY/eElFGKDds2Wmqhmby2I/CpaBCswcctZiZLzs0P+GsGEHnDEYU0
+	 cSruRhzhChiVn0h1PYmhnPtIZckyVAa6rPMlWHHzq6E7Tsli98P/6KuV33iEApHvii
+	 TjxEoEnkrKzabx1Nl2XJPOd26Bq1d2GlsPypUz0CJtLlXeO+QQpsfmq44eCqILzCls
+	 FY/U2BUlAREhJn2RZfb9x+6x61ZzQH+p+wyvO/qqjoxFhNY7Pu5jgObhX3iDUY4Zbv
+	 lP3vb3wveJ2zXR0JCd8ZUzkNPY512ebvwpguOzLByVq1jl5lYy3qutO+GG1CzBU7Qs
+	 14Aqce40fKy5g==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: William Tu <witu@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Leon Romanovsky <leonro@nvidia.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
 	Sasha Levin <sashal@kernel.org>,
-	saeedm@nvidia.com,
-	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
+	kuba@kernel.org,
 	pabeni@redhat.com,
-	dtatulea@nvidia.com,
-	alazar@nvidia.com,
-	yorayz@nvidia.com,
-	lkayal@nvidia.com,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 383/486] net/mlx5e: reduce the max log mpwrq sz for ECPF and reps
-Date: Mon,  5 May 2025 18:37:39 -0400
-Message-Id: <20250505223922.2682012-383-sashal@kernel.org>
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.12 385/486] xfrm: prevent high SEQ input in non-ESN mode
+Date: Mon,  5 May 2025 18:37:41 -0400
+Message-Id: <20250505223922.2682012-385-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505223922.2682012-1-sashal@kernel.org>
 References: <20250505223922.2682012-1-sashal@kernel.org>
@@ -77,90 +69,51 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.12.26
 Content-Transfer-Encoding: 8bit
 
-From: William Tu <witu@nvidia.com>
+From: Leon Romanovsky <leonro@nvidia.com>
 
-[ Upstream commit e1d68ea58c7e9ebacd9ad7a99b25a3578fa62182 ]
+[ Upstream commit e3aa43a50a6455831e3c32dabc7ece38d9cd9d05 ]
 
-For the ECPF and representors, reduce the max MPWRQ size from 256KB (18)
-to 128KB (17). This prepares the later patch for saving representor
-memory.
+In non-ESN mode, the SEQ numbers are limited to 32 bits and seq_hi/oseq_hi
+are not used. So make sure that user gets proper error message, in case
+such assignment occurred.
 
-With Striding RQ, there is a minimum of 4 MPWQEs. So with 128KB of max
-MPWRQ size, the minimal memory is 4 * 128KB = 512KB. When creating page
-pool, consider 1500 mtu, the minimal page pool size will be 512KB/4KB =
-128 pages = 256 rx ring entries (2 entries per page).
-
-Before this patch, setting RX ringsize (ethtool -G rx) to 256 causes
-driver to allocate page pool size more than it needs due to max MPWRQ
-is 256KB (18). Ex: 4 * 256KB = 1MB, 1MB/4KB = 256 pages, but actually
-128 pages is good enough. Reducing the max MPWRQ to 128KB fixes the
-limitation.
-
-Signed-off-by: William Tu <witu@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Link: https://patch.msgid.link/20250209101716.112774-7-tariqt@nvidia.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en.h      |  2 --
- .../net/ethernet/mellanox/mlx5/core/en/params.c   | 15 +++++++++++----
- 2 files changed, 11 insertions(+), 6 deletions(-)
+ net/xfrm/xfrm_user.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-index d6266f6a96d6e..e048a667e0758 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-@@ -94,8 +94,6 @@ struct page_pool;
- #define MLX5_MPWRQ_DEF_LOG_STRIDE_SZ(mdev) \
- 	MLX5_MPWRQ_LOG_STRIDE_SZ(mdev, order_base_2(MLX5E_RX_MAX_HEAD))
+diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+index 87013623773a2..da2a1c00ca8a6 100644
+--- a/net/xfrm/xfrm_user.c
++++ b/net/xfrm/xfrm_user.c
+@@ -178,6 +178,12 @@ static inline int verify_replay(struct xfrm_usersa_info *p,
+ 				       "Replay seq and seq_hi should be 0 for output SA");
+ 			return -EINVAL;
+ 		}
++		if (rs->oseq_hi && !(p->flags & XFRM_STATE_ESN)) {
++			NL_SET_ERR_MSG(
++				extack,
++				"Replay oseq_hi should be 0 in non-ESN mode for output SA");
++			return -EINVAL;
++		}
+ 		if (rs->bmp_len) {
+ 			NL_SET_ERR_MSG(extack, "Replay bmp_len should 0 for output SA");
+ 			return -EINVAL;
+@@ -190,6 +196,12 @@ static inline int verify_replay(struct xfrm_usersa_info *p,
+ 				       "Replay oseq and oseq_hi should be 0 for input SA");
+ 			return -EINVAL;
+ 		}
++		if (rs->seq_hi && !(p->flags & XFRM_STATE_ESN)) {
++			NL_SET_ERR_MSG(
++				extack,
++				"Replay seq_hi should be 0 in non-ESN mode for input SA");
++			return -EINVAL;
++		}
+ 	}
  
--#define MLX5_MPWRQ_MAX_LOG_WQE_SZ 18
--
- /* Keep in sync with mlx5e_mpwrq_log_wqe_sz.
-  * These are theoretical maximums, which can be further restricted by
-  * capabilities. These values are used for static resource allocations and
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/params.c b/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
-index 8c4d710e85675..58ec5e44aa7ad 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
-@@ -10,6 +10,9 @@
- #include <net/page_pool/types.h>
- #include <net/xdp_sock_drv.h>
- 
-+#define MLX5_MPWRQ_MAX_LOG_WQE_SZ 18
-+#define MLX5_REP_MPWRQ_MAX_LOG_WQE_SZ 17
-+
- static u8 mlx5e_mpwrq_min_page_shift(struct mlx5_core_dev *mdev)
- {
- 	u8 min_page_shift = MLX5_CAP_GEN_2(mdev, log_min_mkey_entity_size);
-@@ -103,18 +106,22 @@ u8 mlx5e_mpwrq_log_wqe_sz(struct mlx5_core_dev *mdev, u8 page_shift,
- 			  enum mlx5e_mpwrq_umr_mode umr_mode)
- {
- 	u8 umr_entry_size = mlx5e_mpwrq_umr_entry_size(umr_mode);
--	u8 max_pages_per_wqe, max_log_mpwqe_size;
-+	u8 max_pages_per_wqe, max_log_wqe_size_calc;
-+	u8 max_log_wqe_size_cap;
- 	u16 max_wqe_size;
- 
- 	/* Keep in sync with MLX5_MPWRQ_MAX_PAGES_PER_WQE. */
- 	max_wqe_size = mlx5e_get_max_sq_aligned_wqebbs(mdev) * MLX5_SEND_WQE_BB;
- 	max_pages_per_wqe = ALIGN_DOWN(max_wqe_size - sizeof(struct mlx5e_umr_wqe),
- 				       MLX5_UMR_FLEX_ALIGNMENT) / umr_entry_size;
--	max_log_mpwqe_size = ilog2(max_pages_per_wqe) + page_shift;
-+	max_log_wqe_size_calc = ilog2(max_pages_per_wqe) + page_shift;
-+
-+	WARN_ON_ONCE(max_log_wqe_size_calc < MLX5E_ORDER2_MAX_PACKET_MTU);
- 
--	WARN_ON_ONCE(max_log_mpwqe_size < MLX5E_ORDER2_MAX_PACKET_MTU);
-+	max_log_wqe_size_cap = mlx5_core_is_ecpf(mdev) ?
-+			   MLX5_REP_MPWRQ_MAX_LOG_WQE_SZ : MLX5_MPWRQ_MAX_LOG_WQE_SZ;
- 
--	return min_t(u8, max_log_mpwqe_size, MLX5_MPWRQ_MAX_LOG_WQE_SZ);
-+	return min_t(u8, max_log_wqe_size_calc, max_log_wqe_size_cap);
- }
- 
- u8 mlx5e_mpwrq_pages_per_wqe(struct mlx5_core_dev *mdev, u8 page_shift,
+ 	return 0;
 -- 
 2.39.5
 
