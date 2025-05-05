@@ -1,132 +1,188 @@
-Return-Path: <netdev+bounces-187678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A312AA8D5D
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 09:50:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98542AA8D9B
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 09:56:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7653F3B5F3D
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 07:50:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75DDB18954A8
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 07:56:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0364C1DDC1B;
-	Mon,  5 May 2025 07:50:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B69D21DF993;
+	Mon,  5 May 2025 07:55:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dWNbdEjZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3EAD1DE4E1
-	for <netdev@vger.kernel.org>; Mon,  5 May 2025 07:50:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF5F61E5B7D
+	for <netdev@vger.kernel.org>; Mon,  5 May 2025 07:55:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746431431; cv=none; b=HAjVQJjY7diiWsicGIslZtYC5p6LQlMwlisHMkHS2/88Wll02ytRx2zsAOB3XuSDGfGK5u3ty/ZtX6FTU4p5j7LBUyvYQPC9RZm5LhH+HpBs5H4yCmc/ZzWuvOUAiAv3rbFH7c2Ns3RnliTt/pkzPj6nisPzwBhiqT2YlHXt2Jw=
+	t=1746431706; cv=none; b=lh11ChV5lJyAcGBNNEfYlyNo7eqCDEH37q9YLW/WksD7x4AoqgCyZ/9KdL/MzxZcdKYDoNSyuhPkD3gUsOyVo39WyVcoagVjNNBYbpuDV2lBcwY0EMK9wKqBNr9WjSRAIrTq4UV9jmE5WyCkuFlwRg1bD9rJVlVQ5epzpDQUXr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746431431; c=relaxed/simple;
-	bh=s1tPNrFQVa+he+GL0iqA/bpIpDXE5fUgW0C4vmtsLuk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BNgDJ1cXv9wwpb9gnldVxWmVN27bajysuPm2KAFkwo0RDHNeTFcwH364RkN7FfwO/2BRQJZAACMoJ8nLUAe9e4bA67Ap93VE2BVV8yN6KXjj8gYc5ymALuZy3MW9E7r52zy6NC1hoZb738xfm8H4PpTv7WrKLSxknkCSBK94OC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uBqa2-0002c0-Mb; Mon, 05 May 2025 09:49:38 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uBqZy-001C1T-34;
-	Mon, 05 May 2025 09:49:34 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uBqZy-004X3I-2a;
-	Mon, 05 May 2025 09:49:34 +0200
-Date: Mon, 5 May 2025 09:49:34 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/1] Documentation: networking: expand and
- clarify EEE_GET/EEE_SET documentation
-Message-ID: <aBhtjnwIKkskuC6x@pengutronix.de>
-References: <20250427134035.2458430-1-o.rempel@pengutronix.de>
- <f82fe7ac-fc12-4d50-98d4-4149db2bffa0@redhat.com>
- <aBSnRZEGTnHxnMaI@shell.armlinux.org.uk>
+	s=arc-20240116; t=1746431706; c=relaxed/simple;
+	bh=29MHSk9j1fF0Pk/+yqzxVPNn3x/SQEJdwgmdSN3wYSE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=amNFuy03Kp5qAbWPOCxnCsEB1YvcF9S9s6TxJF3tN/EeLJHcYaahnmSBkJcqSCH5iShnaPQDBVBNDJ6S9OVAclPuKzb7QOSDL79l7lfBTqj2jrzwMJbGM6u9T8Ls5imtt5134+twr4bbNBQuFrDISuihaY2/m5RkWBxuS7EwFrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dWNbdEjZ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746431702;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AyPnMBIWgVsfptMubHyY1kpECsuir2FcGrasPWJztWc=;
+	b=dWNbdEjZdbl3ijMO995sgf6NNhAbJUUfePBeZy5c2Cb4XStkiY8wBtvAGwFj+SDoR2CTOP
+	lEadegvFYwMiYT2/Ysvh7qMoTmu3ofwdpaUXmnATMVZ7uPFyLwkkn2mFVKIX5dDASMHsu/
+	sqR/cYikmO3uTogyp+XI99P9TJCoAN0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-185-Nc6Xf8Y1MjSq8qGbF0viWw-1; Mon, 05 May 2025 03:55:00 -0400
+X-MC-Unique: Nc6Xf8Y1MjSq8qGbF0viWw-1
+X-Mimecast-MFC-AGG-ID: Nc6Xf8Y1MjSq8qGbF0viWw_1746431699
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43cec217977so24173245e9.0
+        for <netdev@vger.kernel.org>; Mon, 05 May 2025 00:55:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746431699; x=1747036499;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AyPnMBIWgVsfptMubHyY1kpECsuir2FcGrasPWJztWc=;
+        b=f4xsIRwYFy0Q8QCpxRTMRr9uuzuuoYAhYCIOOhoucJY9x5fXep3JaPtD8BpLBZTUY0
+         zKrOk31Wj8gSG9hIzi3MGmmweK5sxhtRfZQfsaJ64ywCITWiVyFKPd5cgi0cM7FdXT4L
+         waxGZ/ERor4uRhLTwBmAzRq2Z4VSW80nxua+huVJKWEHTQ6tJTd+y0lz+32Li/fnHThm
+         34v6WOnxo1N9hVBnYduQ81hYGjSyXJBnISiR25dDlvvtiO4Y3T1i2B4TnKRD4BDlnrH2
+         B3ma+LfNvkvRrDct7TP3UBVN00w9O+t/jZIXzz/Eq6WZjEQrP/0Ep2HNOfIqtPDCS0PL
+         JuDg==
+X-Forwarded-Encrypted: i=1; AJvYcCVK8hIPjfDjfCOgydknlENoEA4W2YxRlYl/pbgyTeRgQNF+M35HSau2nHVaHHXhs8eslERUpEg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9FTPWHoEYldcwc7nbSxCRQa5wSXLihiETd5TGLycZKytJV/uw
+	7+jnMhnYg1ebo0H3pBLFzz+2bFhMv7Wnv03y3Tb+OhtWBRt9gfUd11pWghTcsf3RJlvJCr/euJI
+	mOB+0GgY5ckYK2AEOy1owvlEmiupsZdkbc64qtw4+kQPa0Titglyugw==
+X-Gm-Gg: ASbGncun24XYEVMZgd9H/MWZABbjA8FKZHtmteATwANwbXnkZ6riAJ+r8EGzSBUE1Jq
+	o+xJIwgdLcQt53Ns4wKqr31/2Y8XbLViXqXpvDi1VHSFxz4Obc2s638YrnAEi3USmtpN8y5AN+X
+	g3N8uaJXaVYfvJDVu56pv20jDUa9s7/+vpz1N8zAzmMI+uhjXvSIBvCAqW1hR7rT3103LUch6HV
+	Ek7HkBrWGQ4Ztzj0r8vCkbAzdsDvQMlIRpmWlDwKWn1AHnpKHBbaOXGAxlxDgqPvsiuLEiXij3n
+	KLrEhc7/bvD9KNM/t/6E2e+f9Tcdv4OKG3NJwlUKby1l7kjrNS0S8kJMEdI=
+X-Received: by 2002:a05:600c:34c7:b0:43c:eeee:b70a with SMTP id 5b1f17b1804b1-441c491fcb6mr43207825e9.22.1746431699235;
+        Mon, 05 May 2025 00:54:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFNLaCwYHeYTkMx81M6FyXUvxVr3xyEW0QbrIaAS4GAXKQPyyDpTBLFaX32PbanmKErhnsgWQ==
+X-Received: by 2002:a05:600c:34c7:b0:43c:eeee:b70a with SMTP id 5b1f17b1804b1-441c491fcb6mr43207645e9.22.1746431698893;
+        Mon, 05 May 2025 00:54:58 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2706:e010:b099:aac6:4e70:6198? ([2a0d:3344:2706:e010:b099:aac6:4e70:6198])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-441b8a315fdsm123337385e9.34.2025.05.05.00.54.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 May 2025 00:54:58 -0700 (PDT)
+Message-ID: <938931dc-2157-44c8-b192-f6737b69f317@redhat.com>
+Date: Mon, 5 May 2025 09:54:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aBSnRZEGTnHxnMaI@shell.armlinux.org.uk>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 01/15] net: homa: define user-visible API for
+ Homa
+To: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org
+Cc: edumazet@google.com, horms@kernel.org, kuba@kernel.org
+References: <20250502233729.64220-1-ouster@cs.stanford.edu>
+ <20250502233729.64220-2-ouster@cs.stanford.edu>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250502233729.64220-2-ouster@cs.stanford.edu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, May 02, 2025 at 12:06:45PM +0100, Russell King (Oracle) wrote:
-> On Fri, May 02, 2025 at 10:46:02AM +0200, Paolo Abeni wrote:
-> > On 4/27/25 3:40 PM, Oleksij Rempel wrote:
-> > > Improve the documentation for ETHTOOL_MSG_EEE_GET and ETHTOOL_MSG_EEE_SET
-> > > to provide accurate descriptions of all netlink attributes involved.
-> > > 
-> > > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> > 
-> > This looks like an almost complete rewrite WRT v1, a changelog would
-> > have helped reviewing. I'm unsure if it captures all the feedback from
-> > Russell,
-> 
-> Indeed, because I'm still of the opinion that we shouldn't be trying to
-> document the same thing in two different places, but differently, which
-> will only add confusion, and over time the two descriptions will diverge
-> making the problem harder.
-> 
-> We need to document this in exactly one place, not two places.
-> 
-> So please, choose one of:
-> 
-> * Documentation/devicetree/bindings/net/ethernet-phy.yaml
-> * Documentation/networking/phy.rst
-> 
-> and reference one from the other, if necessary improving the
-> documentation.
-> 
-> Given that phylib is not a DT thing, I believe it should not be
-> documented in the DT bindings, but people directed to the phylib
-> documentation (the second) for the clarification of our implementation.
+On 5/3/25 1:37 AM, John Ousterhout wrote:
+> +/**
+> + * define HOMA_MAX_BPAGES - The largest number of bpages that will be required
+> + * to store an incoming message.
+> + */
+> +#define HOMA_MAX_BPAGES ((HOMA_MAX_MESSAGE_LENGTH + HOMA_BPAGE_SIZE - 1) \
+> +		>> HOMA_BPAGE_SHIFT)
 
-Ok, I see - I wrongly interpreted previous mail. phy.rst - is a good
-option. It should replace (extend) documentation in:
-Documentation/networking/ethtool-netlink.rst
-include/uapi/linux/ethtool.h
+Minor nit: the above indentation is somewhat uncommon, the preferred
+style is:
 
-Are there any other missing documentation artifacts which should be
-replaced?
+#define HOMA_MAX_BPAGES ((HOMA_MAX_MESSAGE_LENGTH + HOMA_BPAGE_SIZE - 1)
+>> \
+			 HOMA_BPAGE_SHIFT)
+> +
+> +/**
+> + * define HOMA_MIN_DEFAULT_PORT - The 16 bit port space is divided into
+> + * two nonoverlapping regions. Ports 1-32767 are reserved exclusively
+> + * for well-defined server ports. The remaining ports are used for client
+> + * ports; these are allocated automatically by Homa. Port 0 is reserved.
+> + */
+> +#define HOMA_MIN_DEFAULT_PORT 0x8000
+> +
+> +/**
+> + * struct homa_sendmsg_args - Provides information needed by Homa's
+> + * sendmsg; passed to sendmsg using the msg_control field.
+> + */
+> +struct homa_sendmsg_args {
+> +	/**
+> +	 * @id: (in/out) An initial value of 0 means a new request is
+> +	 * being sent; nonzero means the message is a reply to the given
+> +	 * id. If the message is a request, then the value is modified to
+> +	 * hold the id of the new RPC.
+> +	 */
+> +	__u64 id;
+> +
+> +	/**
+> +	 * @completion_cookie: (in) Used only for request messages; will be
+> +	 * returned by recvmsg when the RPC completes. Typically used to
+> +	 * locate app-specific info about the RPC.
+> +	 */
+> +	__u64 completion_cookie;
+> +
+> +	/**
+> +	 * @flags: (in) OR-ed combination of bits that control the operation.
+> +	 * See below for values.
+> +	 */
+> +	__u32 flags;
+> +
+> +	/** @reserved: Not currently used. */
+> +	__u32 reserved;
+> +};
+> +
+> +#if !defined(__cplusplus)
+> +_Static_assert(sizeof(struct homa_sendmsg_args) >= 24,
+> +	       "homa_sendmsg_args shrunk");
+> +_Static_assert(sizeof(struct homa_sendmsg_args) <= 24,
+> +	       "homa_sendmsg_args grew");
+> +#endif
 
-Best Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+I think this assertions don't belong here, should be BUILD_BUG_ON() in c
+files. Even better could be avoided with explicit alignment on the
+message struct.
+
+[...]
+> +int     homa_send(int sockfd, const void *message_buf,
+> +		  size_t length, const struct sockaddr *dest_addr,
+> +		  __u32 addrlen,  __u64 *id, __u64 completion_cookie,
+> +		  int flags);
+> +int     homa_sendv(int sockfd, const struct iovec *iov,
+> +		   int iovcnt, const struct sockaddr *dest_addr,
+> +		   __u32 addrlen,  __u64 *id, __u64 completion_cookie,
+> +		   int flags);
+> +ssize_t homa_reply(int sockfd, const void *message_buf,
+> +		   size_t length, const struct sockaddr *dest_addr,
+> +		   __u32 addrlen,  __u64 id);
+> +ssize_t homa_replyv(int sockfd, const struct iovec *iov,
+> +		    int iovcnt, const struct sockaddr *dest_addr,
+> +		    __u32 addrlen,  __u64 id);
+
+I assume the above are user-space functions definition ??? If so, they
+don't belong here.
+
+/P
+
 
