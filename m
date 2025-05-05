@@ -1,65 +1,64 @@
-Return-Path: <netdev+bounces-187983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C7E3AAAE8F
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 04:59:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78AFFAAAEAE
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:01:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92EA71B62804
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 02:56:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9324A1B606BC
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 02:58:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A33B2D5D09;
-	Mon,  5 May 2025 23:01:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A07437AAAD;
+	Mon,  5 May 2025 23:04:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EFV5ElRQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z4TWE7sY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B4136E084;
-	Mon,  5 May 2025 22:57:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B56EF374589;
+	Mon,  5 May 2025 22:58:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746485845; cv=none; b=YzRamGoTMEJeCsGPzTP8a7ueyGMwDEKmTIgtdWHvgBmroF/cfsZd5l1TF0/qkOYJEwfNL4RFnzfIze8r+FS8MZpps7WvGq2yMKY1J1ZRPWHxAn9y9p1uMQM8VXjBuUeCANiUiU5HLUgscCb+qIcil2+a/KEiA/XbuTKYd6s2MI0=
+	t=1746485932; cv=none; b=kfln9k/XPngn9hLNjfzLDPTCnbxaSYtHlavtkYegcOaK9dTpz1sPBW6k49Ytmmi/2sELUJav73du+RbIfFZoHtjB7sqGMF3GBeWTjKeSP4azRGD6qOrVd+fbWfm4l/ZXPeYXQ2UfJNATT9Pj/k32h+wJV3B6OmkzqU+fj3gTmPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746485845; c=relaxed/simple;
-	bh=BYmx1SoM6cZjl6yYUpyus6wm6SDYezgd/kLQ4Fl4VDg=;
+	s=arc-20240116; t=1746485932; c=relaxed/simple;
+	bh=GK31QfUDyBBGfYjJDHgtizcta3uBh9rj9nFl+F5ZUjc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Okqfcs4riMMCnf4CQfktVjj1zAWS/T+1nnJF5ytAxhcuK8vkma+jP7lof2nSbupnBuR026BMhIaY5QBuyt+tgsHPDDkr09NaL72ZUtKScyvFEzEOBFa4jT3Uwb71XMJmszPpQTnf1CTQiUZVa89vAwlemhge5Zku/49dK+nsPGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EFV5ElRQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4652AC4CEE4;
-	Mon,  5 May 2025 22:57:22 +0000 (UTC)
+	 MIME-Version; b=R63mUhldImhiLb+gJ3XGgRvGftfj9v5ZFxxKKYpZNR4KhGTxaZok6CSuH4ZIX6HjCePwITPn0KRSUzFT/9M5abf9RQQkeeTnsuAeXz0qV72BnRII5NEvxabxcyMKU2UR6dnFNTjwLaWMfpIy4Uj5SGrHKtEpoSQEKNuQGgMYqp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z4TWE7sY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AF9EC4CEEE;
+	Mon,  5 May 2025 22:58:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746485843;
-	bh=BYmx1SoM6cZjl6yYUpyus6wm6SDYezgd/kLQ4Fl4VDg=;
+	s=k20201202; t=1746485931;
+	bh=GK31QfUDyBBGfYjJDHgtizcta3uBh9rj9nFl+F5ZUjc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EFV5ElRQrki9YQMhBEsQx3PoIC6dy2baLUqIqTiyxmsfcJaQlDmfQ8SUB8PIPokYn
-	 ahNIxnYEDGokMpE0AhqkorrybpryrCbSa/IjP11RGZZkR9Y/QIjbqQu93oCz8WEnIr
-	 N2JEldHJaiXBJZStEu3xH0Yg/rYVDKo2HzW4AIN87/bQUklIf1KLkd+QzRdxA/WVnP
-	 0ewm1sx9KvYsoSQsNoTEMsz2yUPBjCzjMkf3dyZ2UTzgZM/62LViYs/14unXa+P9Vb
-	 wI9CTrZh2x7n1LeFWI2cFQPECBJnJgOw2I+YB4YcOpyof/b0IYWBjM1UkGgpNJofg1
-	 M++MS0XiweFjg==
+	b=Z4TWE7sYa2akso7vMYJtNIh6ZkH1PFsde3FfzLwNyXM2SsTsJGRZve7YrBPsYiRSi
+	 FkSAfH4h8m0rjJfiO9j/rSkoz+fDT/Lu8KhnQ+RXP/y8IEGBnxPW8XYqfkFY+dZxcT
+	 lwyPpZQNhICEIw5YdtjEEBN3lW5JKRKLlOEZu0VixChS9zTDNjYs7LG5nk4R7PFZ+x
+	 x1sEOtFzgDw963c5J6H/6aGIGbt/qdfaBNUGwpH6y8cntBaO7UjTIWwEEvNo3x1P4O
+	 pUB6sM/qDzCPr57647ybU98ipPbUsKGIFFAa+ll+HWY+EYa3/5ruAHLrDmmR4zcL83
+	 3gB4LxCQRz1ug==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Benjamin Coddington <bcodding@redhat.com>,
+Cc: Guangguan Wang <guangguan.wang@linux.alibaba.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	trondmy@kernel.org,
-	anna@kernel.org,
-	chuck.lever@oracle.com,
-	davem@davemloft.net,
+	jaka@linux.ibm.com,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	linux-nfs@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 024/294] SUNRPC: rpcbind should never reset the port to the value '0'
-Date: Mon,  5 May 2025 18:52:04 -0400
-Message-Id: <20250505225634.2688578-24-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 072/294] net/smc: use the correct ndev to find pnetid by pnetid table
+Date: Mon,  5 May 2025 18:52:52 -0400
+Message-Id: <20250505225634.2688578-72-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505225634.2688578-1-sashal@kernel.org>
 References: <20250505225634.2688578-1-sashal@kernel.org>
@@ -74,38 +73,118 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.89
 Content-Transfer-Encoding: 8bit
 
-From: Trond Myklebust <trond.myklebust@hammerspace.com>
+From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
 
-[ Upstream commit 214c13e380ad7636631279f426387f9c4e3c14d9 ]
+[ Upstream commit bfc6c67ec2d64d0ca4e5cc3e1ac84298a10b8d62 ]
 
-If we already had a valid port number for the RPC service, then we
-should not allow the rpcbind client to set it to the invalid value '0'.
+When using smc_pnet in SMC, it will only search the pnetid in the
+base_ndev of the netdev hierarchy(both HW PNETID and User-defined
+sw pnetid). This may not work for some scenarios when using SMC in
+container on cloud environment.
+In container, there have choices of different container network,
+such as directly using host network, virtual network IPVLAN, veth,
+etc. Different choices of container network have different netdev
+hierarchy. Examples of netdev hierarchy show below. (eth0 and eth1
+in host below is the netdev directly related to the physical device).
+            _______________________________
+           |   _________________           |
+           |  |POD              |          |
+           |  |                 |          |
+           |  | eth0_________   |          |
+           |  |____|         |__|          |
+           |       |         |             |
+           |       |         |             |
+           |   eth1|base_ndev| eth0_______ |
+           |       |         |    | RDMA  ||
+           | host  |_________|    |_______||
+           ---------------------------------
+     netdev hierarchy if directly using host network
+           ________________________________
+           |   _________________           |
+           |  |POD  __________  |          |
+           |  |    |upper_ndev| |          |
+           |  |eth0|__________| |          |
+           |  |_______|_________|          |
+           |          |lower netdev        |
+           |        __|______              |
+           |   eth1|         | eth0_______ |
+           |       |base_ndev|    | RDMA  ||
+           | host  |_________|    |_______||
+           ---------------------------------
+            netdev hierarchy if using IPVLAN
+            _______________________________
+           |   _____________________       |
+           |  |POD        _________ |      |
+           |  |          |base_ndev||      |
+           |  |eth0(veth)|_________||      |
+           |  |____________|________|      |
+           |               |pairs          |
+           |        _______|_              |
+           |       |         | eth0_______ |
+           |   veth|base_ndev|    | RDMA  ||
+           |       |_________|    |_______||
+           |        _________              |
+           |   eth1|base_ndev|             |
+           | host  |_________|             |
+           ---------------------------------
+             netdev hierarchy if using veth
+Due to some reasons, the eth1 in host is not RDMA attached netdevice,
+pnetid is needed to map the eth1(in host) with RDMA device so that POD
+can do SMC-R. Because the eth1(in host) is managed by CNI plugin(such
+as Terway, network management plugin in container environment), and in
+cloud environment the eth(in host) can dynamically be inserted by CNI
+when POD create and dynamically be removed by CNI when POD destroy and
+no POD related to the eth(in host) anymore. It is hard to config the
+pnetid to the eth1(in host). But it is easy to config the pnetid to the
+netdevice which can be seen in POD. When do SMC-R, both the container
+directly using host network and the container using veth network can
+successfully match the RDMA device, because the configured pnetid netdev
+is a base_ndev. But the container using IPVLAN can not successfully
+match the RDMA device and 0x03030000 fallback happens, because the
+configured pnetid netdev is not a base_ndev. Additionally, if config
+pnetid to the eth1(in host) also can not work for matching RDMA device
+when using veth network and doing SMC-R in POD.
 
-Reviewed-by: Jeff Layton <jlayton@kernel.org>
-Reviewed-by: Benjamin Coddington <bcodding@redhat.com>
-Signed-off-by: Trond Myklebust <trond.myklebust@hammerspace.com>
+To resolve the problems list above, this patch extends to search user
+-defined sw pnetid in the clc handshake ndev when no pnetid can be found
+in the base_ndev, and the base_ndev take precedence over ndev for backward
+compatibility. This patch also can unify the pnetid setup of different
+network choices list above in container(Config user-defined sw pnetid in
+the netdevice can be seen in POD).
+
+Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
+Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/sunrpc/rpcb_clnt.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ net/smc/smc_pnet.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/net/sunrpc/rpcb_clnt.c b/net/sunrpc/rpcb_clnt.c
-index 102c3818bc54d..53bcca365fb1c 100644
---- a/net/sunrpc/rpcb_clnt.c
-+++ b/net/sunrpc/rpcb_clnt.c
-@@ -820,9 +820,10 @@ static void rpcb_getport_done(struct rpc_task *child, void *data)
+diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
+index dbcc72b43d0c0..d44d7f427fc94 100644
+--- a/net/smc/smc_pnet.c
++++ b/net/smc/smc_pnet.c
+@@ -1084,14 +1084,16 @@ static void smc_pnet_find_roce_by_pnetid(struct net_device *ndev,
+ 					 struct smc_init_info *ini)
+ {
+ 	u8 ndev_pnetid[SMC_MAX_PNETID_LEN];
++	struct net_device *base_ndev;
+ 	struct net *net;
+ 
+-	ndev = pnet_find_base_ndev(ndev);
++	base_ndev = pnet_find_base_ndev(ndev);
+ 	net = dev_net(ndev);
+-	if (smc_pnetid_by_dev_port(ndev->dev.parent, ndev->dev_port,
++	if (smc_pnetid_by_dev_port(base_ndev->dev.parent, base_ndev->dev_port,
+ 				   ndev_pnetid) &&
++	    smc_pnet_find_ndev_pnetid_by_table(base_ndev, ndev_pnetid) &&
+ 	    smc_pnet_find_ndev_pnetid_by_table(ndev, ndev_pnetid)) {
+-		smc_pnet_find_rdma_dev(ndev, ini);
++		smc_pnet_find_rdma_dev(base_ndev, ini);
+ 		return; /* pnetid could not be determined */
  	}
- 
- 	trace_rpcb_setport(child, map->r_status, map->r_port);
--	xprt->ops->set_port(xprt, map->r_port);
--	if (map->r_port)
-+	if (map->r_port) {
-+		xprt->ops->set_port(xprt, map->r_port);
- 		xprt_set_bound(xprt);
-+	}
- }
- 
- /*
+ 	_smc_pnet_find_roce_by_pnetid(ndev_pnetid, ini, NULL, net);
 -- 
 2.39.5
 
