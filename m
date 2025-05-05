@@ -1,65 +1,62 @@
-Return-Path: <netdev+bounces-188174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0E3FAAB5CE
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 07:36:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4797AAB5FD
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 07:40:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E0904C143B
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:32:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8421C3B53FD
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:34:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0180834C98E;
-	Tue,  6 May 2025 00:51:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93BD84AE9E8;
+	Tue,  6 May 2025 00:53:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q/qIrMJc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K8of1/Qn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4D533B96F7;
-	Mon,  5 May 2025 23:22:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38B112857F2;
+	Mon,  5 May 2025 23:23:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746487325; cv=none; b=TaaAd7CerSYgHUX1aLXDcidp0xO4oLv7SRqdMcUKpqj6c6FXvqW4rh/d0EdNtbhyJdEINJRM46xW95sTiB9H5gyKVbffvBOzfYMvjZ1CL+VnOK17rYLuuYS47tC9S4D33TsHXmtD8+6dqe0YE5LCA4yelwf6JtbLRqoypHNg/Cw=
+	t=1746487391; cv=none; b=M87lIkG41kpRDGaB7twZPIO5dt+1ipvfMbZBqbjqklNua6q8G8yWPSWt9scCMuPr/YnPZRRdmGqy/Tlx4IIL/Cr5cZfLE/+FFq6t53VBJEOg91iHpsFvWscWg73YZy4TtrqcxdydG7LD0dXjCEMkWDD+tbweYh+5jrlj5/akfyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746487325; c=relaxed/simple;
-	bh=r2MZUQHt6DwOgzB2vWJnhnSAR1QWjHGXqGvtKXBEtog=;
+	s=arc-20240116; t=1746487391; c=relaxed/simple;
+	bh=ZTd19gbXMM2JQclcAhf5+lMh4BnjWdzATH/0xqyENVQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NAUkZe+upwL1bZkU4xHVjt/6ZAsS10NZbdMCCeFlIQ0eVMem0EEK5G7u61u1JngY9BJCpohv6CuCGeJf8qikRGUCr3AMYPpVxFd1L2lIMn+Ej1DV+7u3wAHk2+HBesSVDFivIzjhhtBuwpdXGBDXhkvis4oOrlEaIgKTwGo8y+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q/qIrMJc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89055C4CEEF;
-	Mon,  5 May 2025 23:22:02 +0000 (UTC)
+	 MIME-Version:Content-Type; b=mkUq2/GeEWhf9xwBH+k+TaooGgsRDgTSmhgHT8kZdAOjIaj7DNV2F61qirb2zCFdLto89rK/HArBABRQk4SLcTD7UrZg2mKrDH3NtLVnTSJdhBZ6/+Dq3LuTiqyImVeqSD0kFoxP5pI30vtFmDPIhgWYaC/JDchvo+ij+6CkbJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K8of1/Qn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9C4BC4CEED;
+	Mon,  5 May 2025 23:23:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746487324;
-	bh=r2MZUQHt6DwOgzB2vWJnhnSAR1QWjHGXqGvtKXBEtog=;
+	s=k20201202; t=1746487390;
+	bh=ZTd19gbXMM2JQclcAhf5+lMh4BnjWdzATH/0xqyENVQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Q/qIrMJcVh0pUQ7yQm4G3j/TKIlCRDYXUdiEaTZa3J2FquicV8JrDh+WrfsVHH5AZ
-	 EyDwlRDyaZfDHwYwNEZFWgL7EDR8YbiZTuyU98CeB+cOrOKQm2/4cdKX8cJtZJkYyJ
-	 ZABkXHCkMNzn+BdMgqQV7ecmDg8npCZnGLyZjSYs/cKlrtUCUYReXo8O7RCvH+V756
-	 7G1Ngvru+euMivhsRQMPg0rX1+FzRCfkHmoWw8d+1k1rSSV3dqqPEqK+klKDtMALKH
-	 wLWx9HJbAUf5dPlp9g/N110FDNd/lbx7W23Is8K0JbH4hfUjIHL84Z8n6Q3Nxenprp
-	 2bNZkOJwhiXZQ==
+	b=K8of1/QnETwh2G6emZTS5Kjumpl9s4leY8+dd48Nkq+nui4hfog3uPsulojWPOEZQ
+	 BFdWHNiBXlq5vKPvd5tKA1lQZNqH4709wljvm9jfvHskjz0biZo7iTCfSOCkb7JuR/
+	 WGeYtiM0LSqMZEwUCwod3PeiEH44BNzyokXFJmxSXFp+R3au0gQsG5miJ4BqfIUOXX
+	 xLVergjah0ZLzBw6/wPjbzKe78jS2YTZTF/u+4wv9xpj5oyizmRE6hn9akvAA30fU8
+	 H000HzGcNjSS/zt28kcibNztlbtEQpKrH4ZwegRpoEN5Fi81VyFSPbe+1t2arT/969
+	 yONhCnaXl2riA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Benjamin Coddington <bcodding@redhat.com>,
+Cc: Hangbin Liu <liuhangbin@gmail.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	trondmy@kernel.org,
-	anna@kernel.org,
-	chuck.lever@oracle.com,
+	jv@jvosburgh.net,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
 	pabeni@redhat.com,
-	linux-nfs@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 06/79] SUNRPC: rpc_clnt_set_transport() must not change the autobind setting
-Date: Mon,  5 May 2025 19:20:38 -0400
-Message-Id: <20250505232151.2698893-6-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 44/79] bonding: report duplicate MAC address in all situations
+Date: Mon,  5 May 2025 19:21:16 -0400
+Message-Id: <20250505232151.2698893-44-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505232151.2698893-1-sashal@kernel.org>
 References: <20250505232151.2698893-1-sashal@kernel.org>
@@ -69,41 +66,48 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.4.293
 Content-Transfer-Encoding: 8bit
 
-From: Trond Myklebust <trond.myklebust@hammerspace.com>
+From: Hangbin Liu <liuhangbin@gmail.com>
 
-[ Upstream commit bf9be373b830a3e48117da5d89bb6145a575f880 ]
+[ Upstream commit 28d68d396a1cd21591e8c6d74afbde33a7ea107e ]
 
-The autobind setting was supposed to be determined in rpc_create(),
-since commit c2866763b402 ("SUNRPC: use sockaddr + size when creating
-remote transport endpoints").
+Normally, a bond uses the MAC address of the first added slave as the bond’s
+MAC address. And the bond will set active slave’s MAC address to bond’s
+address if fail_over_mac is set to none (0) or follow (2).
 
-Reviewed-by: Jeff Layton <jlayton@kernel.org>
-Reviewed-by: Benjamin Coddington <bcodding@redhat.com>
-Signed-off-by: Trond Myklebust <trond.myklebust@hammerspace.com>
+When the first slave is removed, the bond will still use the removed slave’s
+MAC address, which can lead to a duplicate MAC address and potentially cause
+issues with the switch. To avoid confusion, let's warn the user in all
+situations, including when fail_over_mac is set to 2 or not in active-backup
+mode.
+
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+Link: https://patch.msgid.link/20250225033914.18617-1-liuhangbin@gmail.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/sunrpc/clnt.c | 3 ---
- 1 file changed, 3 deletions(-)
+ drivers/net/bonding/bond_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/sunrpc/clnt.c b/net/sunrpc/clnt.c
-index f689c7b0c304d..d67cb10a11db6 100644
---- a/net/sunrpc/clnt.c
-+++ b/net/sunrpc/clnt.c
-@@ -277,9 +277,6 @@ static struct rpc_xprt *rpc_clnt_set_transport(struct rpc_clnt *clnt,
- 	old = rcu_dereference_protected(clnt->cl_xprt,
- 			lockdep_is_held(&clnt->cl_lock));
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 89797b2575733..3b235a269c1b8 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -1954,7 +1954,7 @@ static int __bond_release_one(struct net_device *bond_dev,
  
--	if (!xprt_bound(xprt))
--		clnt->cl_autobind = 1;
--
- 	clnt->cl_timeout = timeout;
- 	rcu_assign_pointer(clnt->cl_xprt, xprt);
- 	spin_unlock(&clnt->cl_lock);
+ 	RCU_INIT_POINTER(bond->current_arp_slave, NULL);
+ 
+-	if (!all && (!bond->params.fail_over_mac ||
++	if (!all && (bond->params.fail_over_mac != BOND_FOM_ACTIVE ||
+ 		     BOND_MODE(bond) != BOND_MODE_ACTIVEBACKUP)) {
+ 		if (ether_addr_equal_64bits(bond_dev->dev_addr, slave->perm_hwaddr) &&
+ 		    bond_has_slaves(bond))
 -- 
 2.39.5
 
