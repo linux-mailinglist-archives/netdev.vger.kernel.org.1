@@ -1,241 +1,221 @@
-Return-Path: <netdev+bounces-187844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DA31AA9DD2
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 23:07:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 618EFAA9DED
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 23:21:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2AE0017F6EC
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 21:07:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DDD5189F228
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 21:21:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73812270548;
-	Mon,  5 May 2025 21:06:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC53126F452;
+	Mon,  5 May 2025 21:20:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="nfXRPFXL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gw8DHIM+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C904226F452
-	for <netdev@vger.kernel.org>; Mon,  5 May 2025 21:06:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74B7525A2AA;
+	Mon,  5 May 2025 21:20:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746479194; cv=none; b=emB4h3Z6Fup9qGSq6KPYRXo7UN0FU7g/kogGfmHMJfhZXqTkFULs81IArLx0N+xajLUf450pi43S5hDEDrT2IYdozwEAlLORjIny5/JOg4M5hKNeGE4a2pcj+Mkoh1GQoa5aEjNq+I0/H4SDm8i6iI95p8TVZ2d5KUVxAsMQJjI=
+	t=1746480057; cv=none; b=HYqr92CuMFaeRcQZNRJ39Bps3tsl98J+mDcDYj1TXyYA9xwtfyty1pLTDPO5NA6g7dtCMb5iI7bKtqW2CPT75ueLHSbEAIy5sVxPGE+qUuzurtK9IMrhgw5rVo4fx+mcERUxYD3ZYoYKQBsZDthK562YLwiOf37WzRxKUMWIISA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746479194; c=relaxed/simple;
-	bh=5D4UR6yrC02HsfYWF2fnDeI7m9ilUlRIe2YUeXg+vVY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hlP1dbxAuDW4BPfA2NJPLAj2S4MUVdJip4Dop68Du+6iVBhn5CsT5tW9FaxSFRSfA05uZRkJOJJ9XqztG5e5QqrS5SSQj9X2RP3UfdYGyR5hdMzbeS6pOc4jGDU70ikjv5/BsBP/K2BUJpMwi2klSVnQ71UcIRC/BTuzWnu48Ms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=nfXRPFXL; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-22c33ac23edso54266235ad.0
-        for <netdev@vger.kernel.org>; Mon, 05 May 2025 14:06:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1746479192; x=1747083992; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ziwd7DkzqCHv5BZRiJhdQnxG6MiqU3QIW7cbJEJQApk=;
-        b=nfXRPFXLdkdovcgyGrIqxmdfcYGM9UEd7hUjOa3Z2WmS16Lp9gHGclD/wLw0IFQ72N
-         hnSaubE3Z7z2AfWBx+qRlQSvvBc3Z1NHocn41l535kFUR2FYlaByWG56ln48Xv6KeXDy
-         dE/uTZZAv8+6kSg2hGEJS0N1DWk5TvEkc0qLvwNoOMyyY5rhBdw4pPRLXUt4w81KT4Pw
-         o1k0YBCAMb30H856WfYvZwHN45ayw8KivhXGCdulT2IvftCbUfqWq9QWywrl2FcVhyTd
-         tHG06CoQA4F8Ts9829BR4pzL0xH5KC3i9HFqLhHd+8jFn7Bs7vLM2NJhirIkOfcxfRnC
-         zqxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746479192; x=1747083992;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ziwd7DkzqCHv5BZRiJhdQnxG6MiqU3QIW7cbJEJQApk=;
-        b=eLCexqfPY+HboNev5kOwfJ3EoIMyUVoIRiTlHx330BObqeqvW7TM6iKHlpqAV5EH/w
-         aPA+kZXtDvonFMQleUh0lwMGKKyV5pjTuxnApwf4xLVy02rccH1quICYMlfMQ+wm/tkx
-         Gs5d+MvWr/YkoSxhxUexz//YPgPF4VeLFTcbzA8POt58N1h68NStW8XU/PwgzVE6WbfM
-         nJCmB/twltRst+lkc4XeZKYZBVED8Qbkj91chSq7mLz8hW5Pp1DOm7NathsrkyY1DwDi
-         4M4olnTgX0OfljdwR4POghXySGUrkSUEeQF4pOY60b5W4+QnlJ5IFdsnE672Oa2Lx9/Y
-         Qsew==
-X-Gm-Message-State: AOJu0YzczWSBa1giBc6RuWM3UmqakcZkM8HLK1lZSxlEqjatzykVGcVK
-	qZXEKLk8ZFWkmAFudHULJHBvLQb7c+2ohBUORmzzysl7yAdwC4Mc6RM5+GHOA1Y=
-X-Gm-Gg: ASbGncuW5kDL5UNvw0Yh7c66fBDUQ0fwKLh4BcdDelY8lLJNXGppxn9P2jXW84JUGVT
-	71JrUeTrhbj/nm0iMwUjqz4tZjUqr2LzY10febwnyI2IPrh1UBBpnOMahRgOtxyN9VsIcitNIPB
-	68Gdgz1IPIAKQ22QY/TOlLW8+sg2FB6KI2Yor9PEouUeRd7v9ovCDb0yscrXSIT/uboHZKUFDSb
-	FntUR9XyaRCIGm8oJLQJ7mMgVzyzKRUMHLg0Y5a+Wpy+02e14VYXcb32gUzukuJIUgmQgS02q/3
-	hz3NVBWkk5RsSXpJOPDpbU/0pmoNezxr8L/8dfk99NJCt8MYylvF77vaso9M+WV5gzdd0gOlMK2
-	kjlw=
-X-Google-Smtp-Source: AGHT+IEmWioKfN1n1Pjx9b+0eszvnCyEE1BsNZR7o5QaGQIiHkwCcTSHhVKUgxmQmsZ17x5bMFLYQg==
-X-Received: by 2002:a17:902:d4cf:b0:227:ac2a:1dd6 with SMTP id d9443c01a7336-22e1e910446mr168438095ad.24.1746479192001;
-        Mon, 05 May 2025 14:06:32 -0700 (PDT)
-Received: from ?IPV6:2a03:83e0:1156:1:1079:4a23:3f58:8abc? ([2620:10d:c090:500::4:906f])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e1521fd4fsm59634635ad.146.2025.05.05.14.06.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 May 2025 14:06:31 -0700 (PDT)
-Message-ID: <a6842c5f-032c-4003-9e7c-2705fecc2835@davidwei.uk>
-Date: Mon, 5 May 2025 14:06:29 -0700
+	s=arc-20240116; t=1746480057; c=relaxed/simple;
+	bh=wgAaW/NfV8YKTFUVADXC4wAnf8itqyWKdPvOxGbGlGg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KQd6YzWGpvdd72/t7R1GROgsoLTjKAyr3XLHO5Ibpkb44ithUbI4H5pKhhiBa+ri8I0pULz2nGaRRbesf3rSkbldzXh9QWJWqmTnX62EUfXzHZAH1VcltEuyxCXy4hDu//IFQ3EgATpSYKXrhQ3Whld3qPwMsa1Rm7KuR6Shj8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gw8DHIM+; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746480055; x=1778016055;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=wgAaW/NfV8YKTFUVADXC4wAnf8itqyWKdPvOxGbGlGg=;
+  b=gw8DHIM+tvrJah5zFH0FS11yvyJh5LOEPobuftP6pFkJx45EsehDG8Lp
+   5pLVUEKbm0gS3AlgEClefEQXkKJM+pq7WeoLO8rUILhSKIt5TAvA3jz7K
+   uRSPzOGzK7VigbwoR+e4hpWO1bnjXHhan2jtQqz/Bzy6SVhnvbN1ejMVf
+   CIXmw0egYPZ1z43YyuJuPy4cTrMAXE2/zVGlyhJv2bOVYcD0X+4SzY8X2
+   s7WmupCie9orLiI2PbHRfQZ9j3Re3A19ONgQLS5k6EHCqNtIEpGkVcwdf
+   0rEqhdLVSOkqyoDessVRSp/GOjPq2ApFXJcf0QOLFFJBR9iVH7vJ7JlXW
+   w==;
+X-CSE-ConnectionGUID: fvQA6iYZROmOwGIiIy34+A==
+X-CSE-MsgGUID: sruRpCWISkS5ePwV/HyhZA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11424"; a="51762212"
+X-IronPort-AV: E=Sophos;i="6.15,264,1739865600"; 
+   d="scan'208";a="51762212"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2025 14:20:54 -0700
+X-CSE-ConnectionGUID: 8TfuSweETb6fH4JG2v98aA==
+X-CSE-MsgGUID: Ky3HfmB3TWqxTwJX6r4ZPQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,264,1739865600"; 
+   d="scan'208";a="140352867"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa004.jf.intel.com with ESMTP; 05 May 2025 14:20:53 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	jgg@ziepe.ca,
+	leon@kernel.org,
+	linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	tatyana.e.nikolova@intel.com,
+	david.m.ertman@intel.com,
+	przemyslaw.kitszel@intel.com
+Subject: [PATCH net-next,rdma-next 0/5][pull request] Prepare for Intel IPU E2000 (GEN3)
+Date: Mon,  5 May 2025 14:20:29 -0700
+Message-ID: <20250505212037.2092288-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/3] tools: ynl-gen: split presence metadata
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, donald.hunter@gmail.com,
- jacob.e.keller@intel.com, sdf@fomichev.me
-References: <20250505165208.248049-1-kuba@kernel.org>
- <20250505165208.248049-3-kuba@kernel.org>
-Content-Language: en-US
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20250505165208.248049-3-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 5/5/25 09:52, Jakub Kicinski wrote:
-> Each YNL struct contains the data and a sub-struct indicating which
-> fields are valid. Something like:
-> 
->    struct family_op_req {
->        struct {
->              u32 a:1;
->              u32 b:1;
-> 	    u32 bin_len;
->        } _present;
-> 
->        u32 a;
->        u64 b;
->        const unsigned char *bin;
->    };
-> 
-> Note that the bin object 'bin' has a length stored, and that length
-> has a _len suffix added to the field name. This breaks if there
-> is a explicit field called bin_len, which is the case for some
-> TC actions. Move the length fields out of the _present struct,
-> create a new struct called _len:
-> 
->    struct family_op_req {
->        struct {
->              u32 a:1;
->              u32 b:1;
->        } _present;
->        struct {
-> 	    u32 bin;
->        } _len;
-> 
->        u32 a;
->        u64 b;
->        const unsigned char *bin;
->    };
-> 
-> This should prevent name collisions and help with the packing
-> of the struct.
-> 
-> Unfortunately this is a breaking change, but hopefully the migration
-> isn't too painful.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->   tools/net/ynl/samples/devlink.c  |  2 +-
->   tools/net/ynl/samples/rt-addr.c  |  4 +--
->   tools/net/ynl/samples/rt-route.c |  4 +--
->   tools/net/ynl/pyynl/ynl_gen_c.py | 46 ++++++++++++++++----------------
->   4 files changed, 28 insertions(+), 28 deletions(-)
-> 
-> diff --git a/tools/net/ynl/samples/devlink.c b/tools/net/ynl/samples/devlink.c
-> index d2611d7ebab4..3d32a6335044 100644
-> --- a/tools/net/ynl/samples/devlink.c
-> +++ b/tools/net/ynl/samples/devlink.c
-> @@ -34,7 +34,7 @@ int main(int argc, char **argv)
->   		if (!info_rsp)
->   			goto err_free_devs;
->   
-> -		if (info_rsp->_present.info_driver_name_len)
-> +		if (info_rsp->_len.info_driver_name)
->   			printf("    driver: %s\n", info_rsp->info_driver_name);
->   		if (info_rsp->n_info_version_running)
->   			printf("    running fw:\n");
-> diff --git a/tools/net/ynl/samples/rt-addr.c b/tools/net/ynl/samples/rt-addr.c
-> index 0f4851b4ec57..2edde5c36b18 100644
-> --- a/tools/net/ynl/samples/rt-addr.c
-> +++ b/tools/net/ynl/samples/rt-addr.c
-> @@ -20,7 +20,7 @@ static void rt_addr_print(struct rt_addr_getaddr_rsp *a)
->   	if (name)
->   		printf("%16s: ", name);
->   
-> -	switch (a->_present.address_len) {
-> +	switch (a->_len.address) {
->   	case 4:
->   		addr = inet_ntop(AF_INET, a->address,
->   				 addr_str, sizeof(addr_str));
-> @@ -36,7 +36,7 @@ static void rt_addr_print(struct rt_addr_getaddr_rsp *a)
->   	if (addr)
->   		printf("%s", addr);
->   	else
-> -		printf("[%d]", a->_present.address_len);
-> +		printf("[%d]", a->_len.address);
->   
->   	printf("\n");
->   }
-> diff --git a/tools/net/ynl/samples/rt-route.c b/tools/net/ynl/samples/rt-route.c
-> index 9d9c868f8873..7427104a96df 100644
-> --- a/tools/net/ynl/samples/rt-route.c
-> +++ b/tools/net/ynl/samples/rt-route.c
-> @@ -26,13 +26,13 @@ static void rt_route_print(struct rt_route_getroute_rsp *r)
->   			printf("oif: %-16s ", name);
->   	}
->   
-> -	if (r->_present.dst_len) {
-> +	if (r->_len.dst) {
->   		route = inet_ntop(r->_hdr.rtm_family, r->dst,
->   				  route_str, sizeof(route_str));
->   		printf("dst: %s/%d", route, r->_hdr.rtm_dst_len);
->   	}
->   
-> -	if (r->_present.gateway_len) {
-> +	if (r->_len.gateway) {
->   		route = inet_ntop(r->_hdr.rtm_family, r->gateway,
->   				  route_str, sizeof(route_str));
->   		printf("gateway: %s ", route);
-> diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
-> index f93e6e79312a..800710fe96c9 100755
-> --- a/tools/net/ynl/pyynl/ynl_gen_c.py
-> +++ b/tools/net/ynl/pyynl/ynl_gen_c.py
-> @@ -154,7 +154,7 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
->   
->           if self.presence_type() == 'len':
->               pfx = '__' if space == 'user' else ''
-> -            return f"{pfx}u32 {self.c_name}_len;"
-> +            return f"{pfx}u32 {self.c_name};"
->   
->       def _complex_member_type(self, ri):
->           return None
-> @@ -217,10 +217,9 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
->           cw.p(f'[{self.enum_name}] = {"{"} .name = "{self.name}", {typol}{"}"},')
->   
->       def _attr_put_line(self, ri, var, line):
-> -        if self.presence_type() == 'present':
-> -            ri.cw.p(f"if ({var}->_present.{self.c_name})")
-> -        elif self.presence_type() == 'len':
-> -            ri.cw.p(f"if ({var}->_present.{self.c_name}_len)")
-> +        presence = self.presence_type()
-> +        if presence in {'present', 'len'}:
-> +            ri.cw.p(f"if ({var}->_{presence}.{self.c_name})")
->           ri.cw.p(f"{line};")
->   
->       def _attr_put_simple(self, ri, var, put_type):
-> @@ -282,6 +281,7 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
->               # Every layer below last is a nest, so we know it uses bit presence
->               # last layer is "self" and may be a complex type
->               if i == len(ref) - 1 and self.presence_type() != 'present':
-> +                presence = f"{var}->{'.'.join(ref[:i] + [''])}_{self.presence_type()}.{ref[i]}"
+This is the first part in introducing RDMA support for idpf.
+This shared pull request targets both net-next and rdma-next branches
+and is based on tag v6.15-rc1.
 
-Can this go a few lines higher and replace:
+IWL reviews:
+[v5] https://lore.kernel.org/all/20250416021549.606-1-tatyana.e.nikolova@intel.com/
+[v4] https://lore.kernel.org/all/20250225050428.2166-1-tatyana.e.nikolova@intel.com/
+[v3] https://lore.kernel.org/all/20250207194931.1569-1-tatyana.e.nikolova@intel.com/
+[v2] https://lore.kernel.org/all/20240824031924.421-1-tatyana.e.nikolova@intel.com/
+[v1] https://lore.kernel.org/all/20240724233917.704-1-tatyana.e.nikolova@intel.com/
 
-             presence = f"{var}->{'.'.join(ref[:i] + [''])}_present.{ref[i]}"
+There are a few minor conflicts that exist with this series and the
+respective trees:
 
-Since self.presence_type() would always return the correct string,
-including "_present"?
+net-next:
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@@ -9341,9 -9310,8 +9341,10 @@@ ice_setup_tc(struct net_device *netdev
+             void *type_data)
+  {
+        struct ice_netdev_priv *np = netdev_priv(netdev);
+ +      enum flow_block_binder_type binder_type;
++       struct iidc_rdma_core_dev_info *cdev;
+        struct ice_pf *pf = np->vsi->back;
+ +      flow_setup_cb_t *flower_handler;
+        bool locked = false;
+        int err;
+
+RDMA for-rc series [1] (showing direct conflicts):
+--- a/drivers/infiniband/hw/irdma/main.c
++++ b/drivers/infiniband/hw/irdma/main.c
+@@@ -221,8 -221,8 +221,8 @@@ static int irdma_init_interrupts(struc
+                        break;
+
+        if (i < IRDMA_MIN_MSIX) {
+-               for (; i > 0; i--)
++               while (--i >= 0)
+ -                      ice_free_rdma_qvector(pf, &rf->msix_entries[i]);
+ +                      ice_free_rdma_qvector(cdev, &rf->msix_entries[i]);
+
+                kfree(rf->msix_entries);
+                return -ENOMEM;
+
+
+@@@ -245,40 -245,35 +245,42 @@@ static void irdma_deinit_interrupts(str
+
+  static void irdma_remove(struct auxiliary_device *aux_dev)
+  {
+
+...
+
++       kfree(iwdev->rf);
++
+ -      pr_debug("INIT: Gen2 PF[%d] device remove success\n", PCI_FUNC(pf->pdev->devfn));
+ +      pr_debug("INIT: Gen2 PF[%d] device remove success\n", PCI_FUNC(cdev_info->pdev->devfn));
+  }
+
+[1] https://lore.kernel.org/linux-rdma/174514658010.719262.13870226048967432907.b4-ty@kernel.org/
+
+The following changes since commit 0af2f6be1b4281385b618cb86ad946eded089ac8:
+
+  Linux 6.15-rc1 (2025-04-06 13:11:33 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/linux.git for-next
+
+for you to fetch changes up to 8d7be3651c9a6c2b5bc952356536cbd9f4a722b2:
+
+  iidc/ice/irdma: Update IDC to support multiple consumers (2025-04-30 13:22:27 -0700)
+
+----------------------------------------------------------------
+Tatyana Nikolova says:
+
+To align with review comments, the patch series introducing RDMA
+RoCEv2 support for the Intel Infrastructure Processing Unit (IPU)
+E2000 line of products is going to be submitted in three parts:
+
+1. Modify ice to use specific and common IIDC definitions and
+   pass a core device info to irdma.
+
+2. Add RDMA support to idpf and modify idpf to use specific and
+   common IIDC definitions and pass a core device info to irdma.
+
+3. Add RDMA RoCEv2 support for the E2000 products, referred to as
+   GEN3 to irdma.
+
+This first part is a 5 patch series based on the original
+"iidc/ice/irdma: Update IDC to support multiple consumers" patch
+to allow for multiple CORE PCI drivers, using the auxbus.
+
+Patches:
+1) Move header file to new name for clarity and replace ice
+   specific DSCP define with a kernel equivalent one in irdma
+2) Unify naming convention
+3) Separate header file into common and driver specific info
+4) Replace ice specific DSCP define with a kernel equivalent
+   one in ice
+5) Implement core device info struct and update drivers to use it
+
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+
+----------------------------------------------------------------
+Dave Ertman (4):
+      iidc/ice/irdma: Rename IDC header file
+      iidc/ice/irdma: Rename to iidc_* convention
+      iidc/ice/irdma: Break iidc.h into two headers
+      iidc/ice/irdma: Update IDC to support multiple consumers
+
+Tatyana Nikolova (1):
+      ice: Replace ice specific DSCP mapping num with a kernel define
+
+ MAINTAINERS                                      |   2 +-
+ drivers/infiniband/hw/irdma/main.c               | 125 +++++++-------
+ drivers/infiniband/hw/irdma/main.h               |   3 +-
+ drivers/infiniband/hw/irdma/osdep.h              |   2 +-
+ drivers/infiniband/hw/irdma/type.h               |   4 +-
+ drivers/net/ethernet/intel/ice/devlink/devlink.c |  45 +++--
+ drivers/net/ethernet/intel/ice/ice.h             |   6 +-
+ drivers/net/ethernet/intel/ice/ice_dcb.c         |   2 +-
+ drivers/net/ethernet/intel/ice/ice_dcb_lib.c     |  47 +++++-
+ drivers/net/ethernet/intel/ice/ice_dcb_lib.h     |   9 +
+ drivers/net/ethernet/intel/ice/ice_dcb_nl.c      |   4 +-
+ drivers/net/ethernet/intel/ice/ice_ethtool.c     |   8 +-
+ drivers/net/ethernet/intel/ice/ice_idc.c         | 204 ++++++++++++++---------
+ drivers/net/ethernet/intel/ice/ice_idc_int.h     |   5 +-
+ drivers/net/ethernet/intel/ice/ice_main.c        |  18 +-
+ drivers/net/ethernet/intel/ice/ice_type.h        |   6 +-
+ include/linux/net/intel/iidc.h                   | 109 ------------
+ include/linux/net/intel/iidc_rdma.h              |  68 ++++++++
+ include/linux/net/intel/iidc_rdma_ice.h          |  70 ++++++++
+ 19 files changed, 449 insertions(+), 288 deletions(-)
+ delete mode 100644 include/linux/net/intel/iidc.h
+ create mode 100644 include/linux/net/intel/iidc_rdma.h
+ create mode 100644 include/linux/net/intel/iidc_rdma_ice.h
 
