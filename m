@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-187803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D0A3AA9AF3
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 19:44:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68D9FAA9AFC
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 19:47:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9DE987A3306
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 17:43:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F30B3BBEE1
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 17:46:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D322926C390;
-	Mon,  5 May 2025 17:44:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BD3126B2CC;
+	Mon,  5 May 2025 17:47:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X9MZMqi4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SBNzI5cH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAAF225D8FB;
-	Mon,  5 May 2025 17:44:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72BD9C8F0;
+	Mon,  5 May 2025 17:47:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746467075; cv=none; b=pAPDs72jQX3N+3gt0XPMvGOSm+z8PG6UqXO80xeuFpyk+Fm61R+2QhADs5NnMMa1ZBEacuxmPmtAJ5UT40j4VyjLyLLICq2+m2ps4lbO0/s26Dm7pobzqiBUZYNTiwv/PcGf1izwh9pqaLpngWHV6dY7AdUU4AveTcdeJYyLJ2M=
+	t=1746467223; cv=none; b=iQgMbKQy8SjOzfmsEM86QIzfg4sdvRROlbdVJMK0jc7AVocmNQOAP2fcvMczD5kaBsGyDM/LhFWrfFW99rYoP4YM61Zpb9H4MspnWlO6vRv+lIWSpqU9LoazDAg9GIcth7D2ZRejBhF/lwe/0jUBBKeNZ5eQyTBHYdhE5CjuSAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746467075; c=relaxed/simple;
-	bh=uQtdKOv8+nklDkXLNTL9GcP88vqK29pPRV8J/XiFxhg=;
+	s=arc-20240116; t=1746467223; c=relaxed/simple;
+	bh=nsjBifR6yWR4MXUDca/cmqBb6NRin1gFwQZewX7TJHY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JL2pCvTJd8qt2OGOhfs9RjJY1O509HYfbWl4eeEX40OHnXmvSvkAcL5/UDo5qVuvElfn61ZlOfayVjXIf8CEIYoU5ADsxqh3vgiKrulXRP4gx2/zAiyeu9vOUA/PO9qX/BjbLOh13/MSs0C2ciwqBlj1nWuAGo+bAWm/daxkibg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X9MZMqi4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7EEEC4CEE4;
-	Mon,  5 May 2025 17:44:34 +0000 (UTC)
+	 MIME-Version:Content-Type; b=UaUhcGAYD4bYagYP/51X9eGxYAjZ0kQraqr1Siyyx9MCTqoxFJsJ5FhY4zHsEA8GPAVboBe+hTR4gNw108OOnHyNruVI+pdPu/DnCyXr5qNzLLsQMOWoYHgyOjN7B+W+1kxhZCwWXPEoyLpDRPZKjnyy/7aFwUqLmfZrae2wgvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SBNzI5cH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A0E8C4CEE4;
+	Mon,  5 May 2025 17:47:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746467075;
-	bh=uQtdKOv8+nklDkXLNTL9GcP88vqK29pPRV8J/XiFxhg=;
+	s=k20201202; t=1746467222;
+	bh=nsjBifR6yWR4MXUDca/cmqBb6NRin1gFwQZewX7TJHY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=X9MZMqi4Mj/wTOK7/vTn9XJFeq64v474403hadA5n4yh0tniENbLFrOnsYK/hSCjR
-	 DGEtjWFV2D3Vri7Y8MuEkFD9ctXSzdMR3NN0ggvMmb5oy2+EFQtVZ/IWZsHdfI6yuT
-	 X5VujU39m2Pr5S9p81r+qi+TMle3CxHi4C7yyddjMKFLNQSAFvZyVuXOl8QRnrNPch
-	 B8tE3NEF5j2HmCzcWwynPrZwuSrSOv7JpUyIv/vinZk3zPFsvfXRtZQopTFhLKL4CQ
-	 SORBk1FubGOVjl9Waxb4uD99cu9xwrCMemVuQImSMVoT07EUmZVByRqBXK1dR7iV3c
-	 jh4jXhgoRrUnQ==
-Date: Mon, 5 May 2025 10:44:33 -0700
+	b=SBNzI5cHjHND1dv/IRjKkZpMBO6SxmKp5vAcpdLcqNzBX1DBGjGMusbpKFeOr/o7h
+	 1p8Mx7i7t5Oy6p/38OW9giYO8IiEaIoEc2z1KQSAYV8AYWxP6WcKj5S5td6gWdfFmT
+	 7+YMaE2mG4Tk67m0H9qS90cpJSx0pLzAbYM1Pcq2WzOvGiokn/pDZzMXAOaZui6WQf
+	 6/V+0lNV0ew/IZIOqyuAGsGEdPP7j+Gz+BAFA4sTWBLIj9V7Tulm2bmzEgfhZ3TzCf
+	 M6/5S0SnPuu7Ib6HRFWTBw10GrZDmMynPIXUOQwXur2xltSVaa3uPKCp73Gz9NtRBi
+	 7nJdPgo4mye9w==
+Date: Mon, 5 May 2025 10:47:01 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: David Wei <dw@davidwei.uk>
 Cc: Mohsin Bashir <mohsin.bashr@gmail.com>, netdev@vger.kernel.org,
@@ -49,13 +49,12 @@ Cc: Mohsin Bashir <mohsin.bashr@gmail.com>, netdev@vger.kernel.org,
  pabeni@redhat.com, shuah@kernel.org, ast@kernel.org, daniel@iogearbox.net,
  hawk@kernel.org, john.fastabend@gmail.com, ap420073@gmail.com,
  linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net 1/3] selftests: drv: net: fix test failure on ipv6
- sys
-Message-ID: <20250505104433.0eb6173a@kernel.org>
-In-Reply-To: <9f944c15-5f61-403f-95cd-540fa9c0b783@davidwei.uk>
+Subject: Re: [PATCH net 2/3] selftests: drv: net: avoid skipping tests
+Message-ID: <20250505104701.10d3eb14@kernel.org>
+In-Reply-To: <0db1b7f0-028c-44e9-bf98-81468dee32f0@davidwei.uk>
 References: <20250503013518.1722913-1-mohsin.bashr@gmail.com>
-	<20250503013518.1722913-2-mohsin.bashr@gmail.com>
-	<9f944c15-5f61-403f-95cd-540fa9c0b783@davidwei.uk>
+	<20250503013518.1722913-3-mohsin.bashr@gmail.com>
+	<0db1b7f0-028c-44e9-bf98-81468dee32f0@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,11 +64,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 2 May 2025 21:49:46 -0700 David Wei wrote:
-> Unrelated to this patch, but there is an ip() helper already. Can it be
-> used instead of cmd() with shell=True?
+On Fri, 2 May 2025 21:54:11 -0700 David Wei wrote:
+> >   def _test_v4(cfg) -> None:
+> > -    cfg.require_ipver("4")
+> > +    if not cfg.addr_v["4"]:
+> > +        return  
+> 
+> What if cfg.remote_addr_v['4'] doesn't exist?
 
-The wrappers are mostly useful for JSON, parsing the JSON output
-is a few lines. For running a simple command we don't have strong
-guidance.
+Not sure if its super pythonic but it's set to None in the lib
+if user doesn't provide the config.
 
