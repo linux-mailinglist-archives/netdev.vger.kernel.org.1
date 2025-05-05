@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-187982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C6FBAAAA44
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:33:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0594AAAA6E
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:37:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73F65463188
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 01:33:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E646188CB52
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 01:35:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6797A2D8687;
-	Mon,  5 May 2025 23:01:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55F8E2E5DDF;
+	Mon,  5 May 2025 23:01:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OPs1twL5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SYQeFRIV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C997F35AED8;
-	Mon,  5 May 2025 22:55:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 043453628D5;
+	Mon,  5 May 2025 22:57:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746485712; cv=none; b=Wc2gZR9ubB8Ed8pF4hgHTDQx6gVqcnOUS8PP49A90xOfWQWFnyE1C6naQcxe/D6SgG8ok1238ywaJyZ4sfEPu9W+9Wm5ot4YC+gpWxcKa8uwuoIQhPIzoUSZhe9DO5V6i/sn/uG2XTNp79v8f7SwWyqquC92IzmGRr4OuNy4md0=
+	t=1746485843; cv=none; b=WYcc2fzH9hn4603kaHyBRYLxCmECXku4gBasccUbw/tv+S6xqfaCRE1zJbmRHuSgh/V5xeycnZ2QpL3EI/q+z03NoTu13uUIHNi2DZNkeHqg4Dn6sOLTLScpeJRcWxb26rnYGxs7YKO0jnG52GBNJhwSJCbJyUrY/b3Jt5JyqgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746485712; c=relaxed/simple;
-	bh=iqiwDHIIKO7VHXaGeOt334f35nJ0OWz57iOP+tsOaL8=;
+	s=arc-20240116; t=1746485843; c=relaxed/simple;
+	bh=HeeP2xKYVYs1yu+7i+b43zQrFagrYyxzptijZfungNY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JmW0tZMPlQ4zYzH0RoamqUBtIb9YPug0/oy2oMhQzEMoPhiEocZhrHH5dM4eoNUBOWVBGcwQ0mQCBQRX1GTUFmix25GnmNmWK5H5cV7HRZrU1tvJVj2ctERi3Dv/DSyZXb5QxiNW7TOgEwX+vcsf4xdvCtsLXiSewgDL3vDY0oQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OPs1twL5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93558C4CEEF;
-	Mon,  5 May 2025 22:55:10 +0000 (UTC)
+	 MIME-Version; b=nKjLnZBU0WnSCPzmTQkYQ+RwbHcrD54eaS5XkRLIfYi+6V7N0PfsxoKlYfZj7yguEsBpldR/MtuFqZ3baeZ2JjG5RXkBptUyrvMRP48g6auSQIcqc2Cjz0t0fHHF4iptv4/YWPg7EfZIGgklLyebZuHsdjkCpv8LAX6spVKHPh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SYQeFRIV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DD6BC4CEED;
+	Mon,  5 May 2025 22:57:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746485712;
-	bh=iqiwDHIIKO7VHXaGeOt334f35nJ0OWz57iOP+tsOaL8=;
+	s=k20201202; t=1746485841;
+	bh=HeeP2xKYVYs1yu+7i+b43zQrFagrYyxzptijZfungNY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OPs1twL5DDzcc27XKeLdpYwwUGxyYUd4zpfiduz+NJVxh3506l8cMWxBGWQhypBra
-	 4J06Lzr7ztRVHMiUZAOnWe1uwJsGCdddrkIrbFCBLPHP46kaVOl/TnxhVycFfp+wsD
-	 cXLjurg6hR3XC+wbKeCRaOfg4ASdEFzxzajSWzJu8SCSrmTSMc35ifxVwkCT3QLArU
-	 thx8UUXHSlPkPftoP+Zgkty5apGtu/IjIXVg6E+f4w0UOla1UAF69HShvwggqqY21Q
-	 xFdUd80VjvEL3cf2Ge/ZNNeYR32aA9IwD/aB4VUe+EU5qHd/tuMwQEc7bUvCB+gn5R
-	 VQqEY8YZetFGQ==
+	b=SYQeFRIV1rcp6Go5LUDQB1Z6jjeWJSA0RsWEfGwBxx+pq9QStsBHd6iQgBalEOZS6
+	 7U6MqipFPAawm8gd5FWc49xuVrGteHckU3AcCm1LsLtGUWWRqlOApxk4wgLFZVZQ+k
+	 IXIlaxqLa0UganU94x/bqURLbqrD1KWiO8TI18haVNHFCqsvH1HOpLhcVf7qA4Z162
+	 eJPNUsjnX/PDyH6W5rGh6GLuSrN0cLrQc2cmbB/Wqp6lD8JAp3B51xfQ0Dc8sOzIsP
+	 Ys6PaMy0Bs4g8cee9SZwfF8+jzROIF/2ACHfWTA6th5Ay2CzbnMygVJ9BIRKhYq2Fp
+	 Ciw2dLiXNW5bA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
+Cc: Trond Myklebust <trond.myklebust@hammerspace.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Benjamin Coddington <bcodding@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
+	chuck.lever@oracle.com,
+	trondmy@kernel.org,
+	anna@kernel.org,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org,
+	linux-nfs@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 438/486] ice: count combined queues using Rx/Tx count
-Date: Mon,  5 May 2025 18:38:34 -0400
-Message-Id: <20250505223922.2682012-438-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 023/294] SUNRPC: rpc_clnt_set_transport() must not change the autobind setting
+Date: Mon,  5 May 2025 18:52:03 -0400
+Message-Id: <20250505225634.2688578-23-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250505223922.2682012-1-sashal@kernel.org>
-References: <20250505223922.2682012-1-sashal@kernel.org>
+In-Reply-To: <20250505225634.2688578-1-sashal@kernel.org>
+References: <20250505225634.2688578-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,41 +71,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.12.26
+X-stable-base: Linux 6.6.89
 Content-Transfer-Encoding: 8bit
 
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+From: Trond Myklebust <trond.myklebust@hammerspace.com>
 
-[ Upstream commit c3a392bdd31adc474f1009ee85c13fdd01fe800d ]
+[ Upstream commit bf9be373b830a3e48117da5d89bb6145a575f880 ]
 
-Previous implementation assumes that there is 1:1 matching between
-vectors and queues. It isn't always true.
+The autobind setting was supposed to be determined in rpc_create(),
+since commit c2866763b402 ("SUNRPC: use sockaddr + size when creating
+remote transport endpoints").
 
-Get minimum value from Rx/Tx queues to determine combined queues number.
-
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Reviewed-by: Jeff Layton <jlayton@kernel.org>
+Reviewed-by: Benjamin Coddington <bcodding@redhat.com>
+Signed-off-by: Trond Myklebust <trond.myklebust@hammerspace.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/intel/ice/ice_ethtool.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ net/sunrpc/clnt.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index 7d1feeb317be3..2a2acbeb57221 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -3817,8 +3817,7 @@ static u32 ice_get_combined_cnt(struct ice_vsi *vsi)
- 	ice_for_each_q_vector(vsi, q_idx) {
- 		struct ice_q_vector *q_vector = vsi->q_vectors[q_idx];
+diff --git a/net/sunrpc/clnt.c b/net/sunrpc/clnt.c
+index 142ee6554848a..4ffb2bcaf3648 100644
+--- a/net/sunrpc/clnt.c
++++ b/net/sunrpc/clnt.c
+@@ -275,9 +275,6 @@ static struct rpc_xprt *rpc_clnt_set_transport(struct rpc_clnt *clnt,
+ 	old = rcu_dereference_protected(clnt->cl_xprt,
+ 			lockdep_is_held(&clnt->cl_lock));
  
--		if (q_vector->rx.rx_ring && q_vector->tx.tx_ring)
--			combined++;
-+		combined += min(q_vector->num_ring_tx, q_vector->num_ring_rx);
- 	}
- 
- 	return combined;
+-	if (!xprt_bound(xprt))
+-		clnt->cl_autobind = 1;
+-
+ 	clnt->cl_timeout = timeout;
+ 	rcu_assign_pointer(clnt->cl_xprt, xprt);
+ 	spin_unlock(&clnt->cl_lock);
 -- 
 2.39.5
 
