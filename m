@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-187915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1058AAA5D3
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 01:59:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26884AAA5D8
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 01:59:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FC061683BF
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 23:59:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9AC5F4680A6
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 23:59:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B95A31A0E6;
-	Mon,  5 May 2025 22:31:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D27AA31A9F8;
+	Mon,  5 May 2025 22:31:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d3gmHveA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fmf/pbAp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DEDC31A0DE;
-	Mon,  5 May 2025 22:31:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A627731A9F0;
+	Mon,  5 May 2025 22:31:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746484284; cv=none; b=sbNjhMcFyZURfqqn2byMHnPrihjz2Rah7cH30ed8Fu82KJyq+h6eHwFUjAN3IyZzhvdtaVojEaDCKQyByQK6u9xRZIMFHOwur7qei04s7h1iKr4qpLxNbfIiOWUdT+lw6PdnkK05D5Qw0giQAXODJFNTzuyhyqMJ53JL+eionSU=
+	t=1746484286; cv=none; b=YhCd18U+JdNOJAck+V0dydsgmuPxRCQ2y235pJjnOGaiywYaSYekg76S2qFwXdnyetphYd9uFyq6C1xuihDTHr0RlGwewQkea8T4PX689JSmZFKyDOpt9joHEiXqd35B9zUCXQ3eODy+BNa7MXKFaCIi+/O6dtEXUZwcbi1RWDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746484284; c=relaxed/simple;
-	bh=TZpFGMXpH5A7lLcfxRrM8HRa0+BE7zEJu72ns+dJXJQ=;
+	s=arc-20240116; t=1746484286; c=relaxed/simple;
+	bh=/poekQtgswXL0n9PrpAg6A9ekTrrgUkF7TlsYeW/k5A=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GnLNCR/kZncsME7kjV+eQ1hJYilNqlh4yns76iC4vxEjg/jlSpAPs+CP6pvtxBLF9Akb4/pGoTO4R4vPjCM1RSN7WYh3DV9ttxhBVw4xJm376s3SJCGCWLSWfBI1jK38KiTWlp3QSKPjjjJqW/fzdMeuuuCsFLjuGOgQXtJdIQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d3gmHveA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECB4EC4CEED;
-	Mon,  5 May 2025 22:31:22 +0000 (UTC)
+	 MIME-Version; b=UbNpKWCWWCWm9d6tl9gRwmUELIrFUkgZcnzIC7EhIEpUTrIayt2Hha+g7szLII9ugl3N60WwE1bHkXWw3FkT1HIhxrpmeDgPeeTlre2OLSCLtmZZjMCptCZgFAsvmdIFE5M8bwi3j8lR2kvsjbKrbhQc+SNkGdby8jEsr9cAB5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fmf/pbAp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAA9DC4CEE4;
+	Mon,  5 May 2025 22:31:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746484284;
-	bh=TZpFGMXpH5A7lLcfxRrM8HRa0+BE7zEJu72ns+dJXJQ=;
+	s=k20201202; t=1746484286;
+	bh=/poekQtgswXL0n9PrpAg6A9ekTrrgUkF7TlsYeW/k5A=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=d3gmHveApLOtgQC20jpqUzjOlEe7v5Pngux/1Q/zBZTRk9t4q3Foxu3S+DCnL9Yn8
-	 4O11jw6OX+Gj5JLL6mehOv2rOEXfTl7j5nXHv9udP9wbl4j+DCvhiY4WDK3omvLWyk
-	 KyvO5T0JLlKFBMf+qf3O6OJ0EhYLp8NXh2/r5q1zH48YxUvz+cMZdjhYDs4Wraww2Q
-	 q+aA71Z1uRhHuQkA/ZoUVP+rps3WwAt8kFfhbr8X7IYcZe0SHtnTfueEn1avv91Niy
-	 MiezSmv0ynJopWXMnId1+OjVdOloj4HLqehJr2A+2deGV73dUVuXk/TeIYuxazX4KK
-	 l1JLPVVouhHrQ==
+	b=fmf/pbApYTbi3tFGodyvle1GmCnhb/90jJEvxA2Zvg+y4ZDP738BBtFbtGNzo/ssS
+	 B30Ie4HHc2MbP4apGimkU1notpFr9jXrmOXw0tT7wR9+SDqw2beY0AIOKJegtNL6v/
+	 CtLCXmJHy1GXla5qivzwFZLvJ09OuUEXT/XuQce+rIVgvc6I347g/tcloVt3L77izo
+	 6SksJZTwOBqv/1k9VSrOzCu7QfFLTYvCiVLfLrHd3lgeXO0uoj620JMZo+osgMhX/p
+	 Ih6oSO6fxtc8Z+DzTmvoIXnkrVxfZhaIT3XiOpjd7wOsC4AtkSscAo8TR6351ZP81L
+	 Has6M+nfMVR3A==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Michael Chan <michael.chan@broadcom.com>,
-	Somnath Kotur <somnath.kotur@broadcom.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+Cc: Kees Cook <kees@kernel.org>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	pavan.chebbi@broadcom.com,
+	tariqt@nvidia.com,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.14 434/642] bnxt_en: Set NPAR 1.2 support when registering with firmware
-Date: Mon,  5 May 2025 18:10:50 -0400
-Message-Id: <20250505221419.2672473-434-sashal@kernel.org>
+	yishaih@nvidia.com,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.14 435/642] net/mlx4_core: Avoid impossible mlx4_db_alloc() order value
+Date: Mon,  5 May 2025 18:10:51 -0400
+Message-Id: <20250505221419.2672473-435-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505221419.2672473-1-sashal@kernel.org>
 References: <20250505221419.2672473-1-sashal@kernel.org>
@@ -72,75 +72,76 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.14.5
 Content-Transfer-Encoding: 8bit
 
-From: Michael Chan <michael.chan@broadcom.com>
+From: Kees Cook <kees@kernel.org>
 
-[ Upstream commit ebdf7fe488c512b18add66b6c26e11e4d3830213 ]
+[ Upstream commit 4a6f18f28627e121bd1f74b5fcc9f945d6dbeb1e ]
 
-NPAR (Network interface card partitioning)[1] 1.2 adds a transparent
-VLAN tag for all packets between the NIC and the switch.  Because of
-that, RX VLAN acceleration cannot be supported for any additional
-host configured VLANs.  The driver has to acknowledge that it can
-support no RX VLAN acceleration and set the NPAR 1.2 supported flag
-when registering with the FW.  Otherwise, the FW call will fail and
-the driver will abort on these NPAR 1.2 NICs with this error:
+GCC can see that the value range for "order" is capped, but this leads
+it to consider that it might be negative, leading to a false positive
+warning (with GCC 15 with -Warray-bounds -fdiagnostics-details):
 
-bnxt_en 0000:26:00.0 (unnamed net_device) (uninitialized): hwrm req_type 0x1d seq id 0xb error 0x2
+../drivers/net/ethernet/mellanox/mlx4/alloc.c:691:47: error: array subscript -1 is below array bounds of 'long unsigned int *[2]' [-Werror=array-bounds=]
+  691 |                 i = find_first_bit(pgdir->bits[o], MLX4_DB_PER_PAGE >> o);
+      |                                    ~~~~~~~~~~~^~~
+  'mlx4_alloc_db_from_pgdir': events 1-2
+  691 |                 i = find_first_bit(pgdir->bits[o], MLX4_DB_PER_PAGE >> o);                        |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                     |                         |                                                   |                     |                         (2) out of array bounds here
+      |                     (1) when the condition is evaluated to true                             In file included from ../drivers/net/ethernet/mellanox/mlx4/mlx4.h:53,
+                 from ../drivers/net/ethernet/mellanox/mlx4/alloc.c:42:
+../include/linux/mlx4/device.h:664:33: note: while referencing 'bits'
+  664 |         unsigned long          *bits[2];
+      |                                 ^~~~
 
-[1] https://techdocs.broadcom.com/us/en/storage-and-ethernet-connectivity/ethernet-nic-controllers/bcm957xxx/adapters/introduction/features/network-partitioning-npar.html
+Switch the argument to unsigned int, which removes the compiler needing
+to consider negative values.
 
-Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
-Link: https://patch.msgid.link/20250213011240.1640031-2-michael.chan@broadcom.com
+Signed-off-by: Kees Cook <kees@kernel.org>
+Link: https://patch.msgid.link/20250210174504.work.075-kees@kernel.org
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 5 +++++
- drivers/net/ethernet/broadcom/bnxt/bnxt.h | 1 +
- 2 files changed, 6 insertions(+)
+ drivers/net/ethernet/mellanox/mlx4/alloc.c | 6 +++---
+ include/linux/mlx4/device.h                | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 40af27c2ba799..719ae44aa7639 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -5585,6 +5585,8 @@ int bnxt_hwrm_func_drv_rgtr(struct bnxt *bp, unsigned long *bmap, int bmap_size,
- 	if (bp->fw_cap & BNXT_FW_CAP_ERROR_RECOVERY)
- 		flags |= FUNC_DRV_RGTR_REQ_FLAGS_ERROR_RECOVERY_SUPPORT |
- 			 FUNC_DRV_RGTR_REQ_FLAGS_MASTER_SUPPORT;
-+	if (bp->fw_cap & BNXT_FW_CAP_NPAR_1_2)
-+		flags |= FUNC_DRV_RGTR_REQ_FLAGS_NPAR_1_2_SUPPORT;
- 	req->flags = cpu_to_le32(flags);
- 	req->ver_maj_8b = DRV_VER_MAJ;
- 	req->ver_min_8b = DRV_VER_MIN;
-@@ -8385,6 +8387,7 @@ static int bnxt_hwrm_func_qcfg(struct bnxt *bp)
+diff --git a/drivers/net/ethernet/mellanox/mlx4/alloc.c b/drivers/net/ethernet/mellanox/mlx4/alloc.c
+index b330020dc0d67..f2bded847e61d 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/alloc.c
++++ b/drivers/net/ethernet/mellanox/mlx4/alloc.c
+@@ -682,9 +682,9 @@ static struct mlx4_db_pgdir *mlx4_alloc_db_pgdir(struct device *dma_device)
+ }
  
- 	switch (resp->port_partition_type) {
- 	case FUNC_QCFG_RESP_PORT_PARTITION_TYPE_NPAR1_0:
-+	case FUNC_QCFG_RESP_PORT_PARTITION_TYPE_NPAR1_2:
- 	case FUNC_QCFG_RESP_PORT_PARTITION_TYPE_NPAR1_5:
- 	case FUNC_QCFG_RESP_PORT_PARTITION_TYPE_NPAR2_0:
- 		bp->port_partition_type = resp->port_partition_type;
-@@ -9549,6 +9552,8 @@ static int __bnxt_hwrm_func_qcaps(struct bnxt *bp)
- 		bp->fw_cap |= BNXT_FW_CAP_HOT_RESET_IF;
- 	if (BNXT_PF(bp) && (flags_ext & FUNC_QCAPS_RESP_FLAGS_EXT_FW_LIVEPATCH_SUPPORTED))
- 		bp->fw_cap |= BNXT_FW_CAP_LIVEPATCH;
-+	if (flags_ext & FUNC_QCAPS_RESP_FLAGS_EXT_NPAR_1_2_SUPPORTED)
-+		bp->fw_cap |= BNXT_FW_CAP_NPAR_1_2;
- 	if (BNXT_PF(bp) && (flags_ext & FUNC_QCAPS_RESP_FLAGS_EXT_DFLT_VLAN_TPID_PCP_SUPPORTED))
- 		bp->fw_cap |= BNXT_FW_CAP_DFLT_VLAN_TPID_PCP;
- 	if (flags_ext & FUNC_QCAPS_RESP_FLAGS_EXT_BS_V2_SUPPORTED)
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index d621fb621f30c..f91d9d8eacb97 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -2498,6 +2498,7 @@ struct bnxt {
- 	#define BNXT_FW_CAP_CFA_RFS_RING_TBL_IDX_V3	BIT_ULL(39)
- 	#define BNXT_FW_CAP_VNIC_RE_FLUSH		BIT_ULL(40)
- 	#define BNXT_FW_CAP_SW_MAX_RESOURCE_LIMITS	BIT_ULL(41)
-+	#define BNXT_FW_CAP_NPAR_1_2			BIT_ULL(42)
+ static int mlx4_alloc_db_from_pgdir(struct mlx4_db_pgdir *pgdir,
+-				    struct mlx4_db *db, int order)
++				    struct mlx4_db *db, unsigned int order)
+ {
+-	int o;
++	unsigned int o;
+ 	int i;
  
- 	u32			fw_dbg_cap;
+ 	for (o = order; o <= 1; ++o) {
+@@ -712,7 +712,7 @@ static int mlx4_alloc_db_from_pgdir(struct mlx4_db_pgdir *pgdir,
+ 	return 0;
+ }
  
+-int mlx4_db_alloc(struct mlx4_dev *dev, struct mlx4_db *db, int order)
++int mlx4_db_alloc(struct mlx4_dev *dev, struct mlx4_db *db, unsigned int order)
+ {
+ 	struct mlx4_priv *priv = mlx4_priv(dev);
+ 	struct mlx4_db_pgdir *pgdir;
+diff --git a/include/linux/mlx4/device.h b/include/linux/mlx4/device.h
+index 27f42f713c891..86f0f2a25a3d6 100644
+--- a/include/linux/mlx4/device.h
++++ b/include/linux/mlx4/device.h
+@@ -1135,7 +1135,7 @@ int mlx4_write_mtt(struct mlx4_dev *dev, struct mlx4_mtt *mtt,
+ int mlx4_buf_write_mtt(struct mlx4_dev *dev, struct mlx4_mtt *mtt,
+ 		       struct mlx4_buf *buf);
+ 
+-int mlx4_db_alloc(struct mlx4_dev *dev, struct mlx4_db *db, int order);
++int mlx4_db_alloc(struct mlx4_dev *dev, struct mlx4_db *db, unsigned int order);
+ void mlx4_db_free(struct mlx4_dev *dev, struct mlx4_db *db);
+ 
+ int mlx4_alloc_hwq_res(struct mlx4_dev *dev, struct mlx4_hwq_resources *wqres,
 -- 
 2.39.5
 
