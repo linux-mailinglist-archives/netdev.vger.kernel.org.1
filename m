@@ -1,95 +1,91 @@
-Return-Path: <netdev+bounces-187728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5800AAA92B5
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 14:08:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D192AA92CA
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 14:15:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6E98F7A6AC1
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 12:06:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 68D4518990E0
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 12:15:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C59ED227EB1;
-	Mon,  5 May 2025 12:08:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 936D322B8D1;
+	Mon,  5 May 2025 12:15:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dq9gqMTM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486F722578C
-	for <netdev@vger.kernel.org>; Mon,  5 May 2025 12:08:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF7722AE7F;
+	Mon,  5 May 2025 12:15:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746446887; cv=none; b=qHxx+3ZnOGPq6gFUPTr2oRfxNQQqEfOMrGqyeCNGmB9+dgjwDqaT06lptEoqJEfvHfLJvurI9kyZlMd3LKaCk0bi+1nMZcc3rNpyxBEojukxbX5tl22r9lbMS7fQuKNJCbsDJJ82VmOrfpiVXC9my2Z5XmIByL6NdEp5xzLkaoA=
+	t=1746447323; cv=none; b=IsyDokTVT/IQQMVfnGznVm6F+7EcPDSsrJRDeDcyDDXplbxsCiCUJcTGOnk7sExlqtBy3xwTrefiA8eq/79Zg7Vaacia7kLR4huxNOVT4YV72nE70zqT6GatTcwrRhEYH88a0BRBomlov7Me02qmoYuCegpNnPZ1Ot5K1tMbi6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746446887; c=relaxed/simple;
-	bh=DHwp8aDOJDlgugg90sJmF2XyZAUiP69pwzhuX3CPzYM=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=E9bdPU0Q6YV+sRsbAuMT4P7u/PxCrL2v14VcZnKBYSKdI2nz50A8eOmBwcrBgnNl8BmMYSBgbKVWKENRySn0oqWjZQdWDsnD1ga0hJJvBdzaJsOdrV2IKnNfE/9zQct3SXFSTgTLe4r8xq/R9SlfEDPjXtaWt5giTyRq4V/m1Oo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-851a991cf8bso475464039f.0
-        for <netdev@vger.kernel.org>; Mon, 05 May 2025 05:08:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746446885; x=1747051685;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vOyl3MaiaAtE/UsGWO9Ub0FNoaYpMHqSsINHLLvPVuY=;
-        b=dbOBMIJJJfpzZv1PStBe/lZmx7QZ/YSjWdER+34HCX6M71vTWxrCmzb2FNVs1hQOdA
-         Cw7Uxbpjma3orqqHvsaL/UbQjqxwb566ThzTuefO6+S5wJaVqSZZS4HhvfAIxiT1bWGj
-         ob8PmZD1QC+hHCmJ8i4P0wVGWfnhLlDVq+VJa9gQVeV+PR6g37axBAzdlnR3xGDzGcLs
-         WxZjvejNSgoySl8UvLkdHDiyPtOnkQWf8XtkjKn1iC4E/zrn/lh1Ag0QKPms0lo7dw5n
-         EaqYrAM4Tmzl6AMhxAHvSY4Wi1YF3SVPgEo4pHbYu87jb2TpMl3I44b4g9I6+CFgC1ia
-         eYOA==
-X-Forwarded-Encrypted: i=1; AJvYcCUKDgSMVO7EzkCpZ0ia7h1tqkr270HjWgM5rd3hUB4qephEygIZrvfrMQO8OnPo1tYys13gfaY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyU7B3Ao9hty9lXkhx15HtFenUBZDMGat0Hc0hO9Pb/YLf5gAT+
-	3vkh2S/zUeqEJA/QOtT9H2OX3Wa9/WThjDLc2Wq3LL2bAalTLTXq69ao3hjNeefes5J+Bcxjg1e
-	mLfS2+QGlH39gmUb8j8WRYFsVUC1CrDAOvBQwxMw2gbouyFKlzQckwz8=
-X-Google-Smtp-Source: AGHT+IHAK8haRRYfwkU6RoGcf8J9F0Vip/rN+oMOWgFiAju7v68UvjjYKW45uWvGfQWIfTnuIyKVyDOwQ3f/Q4nUcONsd26bsijG
+	s=arc-20240116; t=1746447323; c=relaxed/simple;
+	bh=/ZxlZzMuIp9unqNcD0XajEpNxCAOmLzEQvkD+safKWw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C/XuxNGvSuyXFTqdi0B7sbBUCEiZocDStBsmRLehX2e0ys/R3FJHWvfu8tZ/mOZNYDlG1g5bDI2McVG1XownjOaKiRkX1uz5J4obFXSrF9eL6/OnxxA5A3Mqc2msbDQ6FgafPqVS/hKeyT74f7/VHt7vo/RNSuTWph1CFIHuDAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dq9gqMTM; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=NbulvA1d2ndRK+1/mUS5QJdpNLrzeNCoxVF106IVpuA=; b=dq9gqMTMjXBY5G9paS6dfm7P92
+	SVXbVDW8brc1RsEIoIejCyXOIQdSjKv+i+i+8iOM2aW37Ua+MTzv7krWhHgTsklDHVhFpjPdrxcxZ
+	rKn1bkML3TsYPLwe6xQkgNejQBuUnmJuLF08oDTNnSDemhFR3QG0XgWfPR5nLW8N7Pz8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uBuiw-00BajR-Pd; Mon, 05 May 2025 14:15:06 +0200
+Date: Mon, 5 May 2025 14:15:06 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Thangaraj Samynathan <thangaraj.s@microchip.com>
+Cc: netdev@vger.kernel.org, bryan.whitehead@microchip.com,
+	UNGLinuxDriver@microchip.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 net-next] net: lan743x: configure interrupt
+  moderation timers based on speed
+Message-ID: <e2d7079b-f2d3-443d-a0e5-cb4f7a85b1e6@lunn.ch>
+References: <20250505072943.123943-1-thangaraj.s@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:5a5:b0:3d2:af0b:6e2a with SMTP id
- e9e14a558f8ab-3d970ad6a68mr132698725ab.5.1746446885382; Mon, 05 May 2025
- 05:08:05 -0700 (PDT)
-Date: Mon, 05 May 2025 05:08:05 -0700
-In-Reply-To: <681732c5.050a0220.11da1b.002d.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6818aa25.a70a0220.254cdc.004f.GAE@google.com>
-Subject: Re: [syzbot] [net?] BUG: sleeping function called from invalid
- context in pcpu_alloc_noprof
-From: syzbot <syzbot+bcc12d6799364500fbec@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, kuniyu@amazon.com, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250505072943.123943-1-thangaraj.s@microchip.com>
 
-syzbot has bisected this issue to:
+On Mon, May 05, 2025 at 12:59:43PM +0530, Thangaraj Samynathan wrote:
+> Configures the interrupt moderation timer value to 64us for 2.5G,
+> 150us for 1G, 330us for 10/100M. Earlier this was 400us for all
+> speeds. This improvess UDP TX and Bidirectional performance to
+> 2.3Gbps from 1.4Gbps in 2.5G. These values are derived after
+> experimenting with different values.
 
-commit 169fd62799e8acabbfb4760799be11138ced949c
-Author: Kuniyuki Iwashima <kuniyu@amazon.com>
-Date:   Fri Apr 18 00:03:56 2025 +0000
+It would be good to also implement:
 
-    ipv6: Get rid of RTNL for SIOCADDRT and RTM_NEWROUTE.
+       ethtool -c|--show-coalesce devname
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=169578d4580000
-start commit:   836b313a14a3 ipv4: Honor "ignore_routes_with_linkdown" sys..
-git tree:       net-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=159578d4580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=119578d4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=734b5f968169d82b
-dashboard link: https://syzkaller.appspot.com/bug?extid=bcc12d6799364500fbec
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=147be0f4580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=127be0f4580000
+       ethtool -C|--coalesce devname [adaptive-rx on|off] [adaptive-tx on|off]
+              [rx-usecs N] [rx-frames N] [rx-usecs-irq N] [rx-frames-irq N]
+              [tx-usecs N] [tx-frames N] [tx-usecs-irq N] [tx-frames-irq N]
+              [stats-block-usecs N] [pkt-rate-low N] [rx-usecs-low N]
+              [rx-frames-low N] [tx-usecs-low N] [tx-frames-low N]
+              [pkt-rate-high N] [rx-usecs-high N] [rx-frames-high N]
+              [tx-usecs-high N] [tx-frames-high N] [sample-interval N]
+              [cqe-mode-rx on|off] [cqe-mode-tx on|off] [tx-aggr-max-bytes N]
+              [tx-aggr-max-frames N] [tx-aggr-time-usecs N]
 
-Reported-by: syzbot+bcc12d6799364500fbec@syzkaller.appspotmail.com
-Fixes: 169fd62799e8 ("ipv6: Get rid of RTNL for SIOCADDRT and RTM_NEWROUTE.")
+so the user can configure it. Sometimes lower power is more important
+than high speed.
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+	Andrew
 
