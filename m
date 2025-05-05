@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-187782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99AF2AA9A01
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 19:03:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 105BEAA9A03
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 19:04:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13BA517DF43
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 17:03:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 357C018946E7
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 17:03:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 468B726C3B7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6E8A26C3BF;
 	Mon,  5 May 2025 17:02:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uhsn3occ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F+trLWG7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2115926C3B1
-	for <netdev@vger.kernel.org>; Mon,  5 May 2025 17:02:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2A3D26D4C2
+	for <netdev@vger.kernel.org>; Mon,  5 May 2025 17:02:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746464548; cv=none; b=ERAXmUIKdc51n8JeXAqkYUtdlstUbuBkcKzL/uu86uBoEw+YMfpz3EZw3ky+D1h8nc3HGAEgcMU+4vEslpKUAG+b+gv7+MWYXIYbFPkCUEHhQ34PuMT6ViIywJG92vON0ZX5nCVFtGz5jvReHj+Ktp4g1MNfw6xEvOc9E1VXyxc=
+	t=1746464548; cv=none; b=Tz6/c0941chw+UYQ3zEWbQBbBBvn1SgIri21y88G8OjtVvjRwqeZX+d9adCFqDPBnPHgHkkkD367V/8G5D+J+/odm/GuVZYdb9JpGvpzagX7SiP55bI6qUFQTHHon/UgDUFvVsx9rk8od8BxpvSR9G+Gg+KXk2IzbeelGuxI36Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1746464548; c=relaxed/simple;
-	bh=h9UHv31E49kHV1zeF+jVvA6jTS0PubcXmWfDtyZIBRI=;
+	bh=HRxpEKYAl+YITMCgOc9M7gZaErAmaRkfrV+DGWONcdo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R7b39ectexYVPs/cQRFIJj0Ea8/NbI9olbLBOKMch2mnqmru43rIR6z/eUnMCLE0i/WM9q/DhGPXxLiyYJEymx3R00q8r9VajY6s2oI3GwIEPMZidyNatcv4vzefmZRr4YD0wPi9cJhQ0kYyi+ZwAFn6CmT/TIyqtHHZAGy5TFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uhsn3occ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C8AEC4CEF1;
+	 MIME-Version; b=n3MKJoeMBbsowQYlA8dYjyjEqGVk031Hlr9q+eRXnv53DHMCL3buiz8I0iYipAFdX00pZt7iEaEExLoNtkznPHQ1TF6u7D0BU+UHxQ31AlMBHOMAUAD3SKtUI+8l+BFBuguRO/r3O1EQju8CSgadQwiunsbxsgYAvjEj40zNhXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F+trLWG7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB788C4CEF2;
 	Mon,  5 May 2025 17:02:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746464547;
-	bh=h9UHv31E49kHV1zeF+jVvA6jTS0PubcXmWfDtyZIBRI=;
+	s=k20201202; t=1746464548;
+	bh=HRxpEKYAl+YITMCgOc9M7gZaErAmaRkfrV+DGWONcdo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uhsn3occS2SWtNXmd/hxl0LpNum9+Qc3VOLXz6m3iOTlBTEtrm3hyURXqhT1uO5Ck
-	 PyjcHP+OOUmSL4dJglMn9P3V7+XVsABgu5xNwSALssINjKuaWh5D9/akAL8DxbS3Co
-	 FPyX3jhFCtg+4tsKZoVjyyI44sNEqEhh5EW7hXwHL69z782oxUKkdz1MRoU4FYefJB
-	 Tl8EccIz4UAC7Vi1dwQfRNqDzAs1m4BMpYKoqBv9XPhKhmVjSrjBl227RsHjekV242
-	 JzitNICd1SjV5l40MBuY/zpIWuTgdIMfsOe0exl5xnEQ4qN4iNT135RzAlAssF5nOg
-	 iOSQFF1LtAdvA==
+	b=F+trLWG7/xREy7VgnN4BBiVC6V9t43WDwuPtjRNzvcQRzHQfxOxGj8AQE/MXiLc8e
+	 kzCFQT6CL+Msmzib50gF7KdOHWDxb6AYPf44nHss6XGDLxg/rVO/LkTN5mpWXcxwBx
+	 Yb6/PwPieB8maHiGMKVgShSy2TP4vuvhrDt4h83O3A3FwnSDvd9oRX50DA5N+FpG93
+	 ccv1YvEWjz8ydOqkQu3mpjeqLGX6g0lzqFBSVG/iObVHURgCFKS3FrHAqv7/dUNa1L
+	 XS6DpY6XjvzWkVX0AMo8tphzHyKlGnhEMoKQPVUEPUMntCee46/g87R3EF4gxyBHGC
+	 /M6nXi8kKaVyw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -52,9 +52,9 @@ Cc: netdev@vger.kernel.org,
 	johannes@sipsolutions.net,
 	razor@blackwall.org,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 1/4] netlink: specs: nl80211: drop structs which are not uAPI
-Date: Mon,  5 May 2025 10:02:12 -0700
-Message-ID: <20250505170215.253672-2-kuba@kernel.org>
+Subject: [PATCH net-next 2/4] netlink: specs: ovs: correct struct names
+Date: Mon,  5 May 2025 10:02:13 -0700
+Message-ID: <20250505170215.253672-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250505170215.253672-1-kuba@kernel.org>
 References: <20250505170215.253672-1-kuba@kernel.org>
@@ -66,120 +66,77 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-C codegen will soon use structs for binary types. A handful of structs
-in WiFi carry information elements from the wire, defined by the standard.
-The structs are not part of uAPI, so we can't use them in C directly.
-We could add them to the uAPI or add some annotation to tell the codegen
-to output a local version to the user header. The former seems arbitrary
-since we don't expose structs for most of the standard. The latter seems
-like a lot of work for a rare occurrence. Drop the struct info for now.
+C codegen will soon support using struct types for binary attrs.
+Correct the struct names in OvS specs.
 
-Link: https://lore.kernel.org/004030652d592b379e730be2f0344bebc4a03475.camel@sipsolutions.net
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- Documentation/netlink/specs/nl80211.yaml | 68 ------------------------
- 1 file changed, 68 deletions(-)
+ Documentation/netlink/specs/ovs_datapath.yaml | 10 ++++------
+ Documentation/netlink/specs/ovs_vport.yaml    |  5 ++---
+ 2 files changed, 6 insertions(+), 9 deletions(-)
 
-diff --git a/Documentation/netlink/specs/nl80211.yaml b/Documentation/netlink/specs/nl80211.yaml
-index 1ec49c3562cd..3611b11a7d8f 100644
---- a/Documentation/netlink/specs/nl80211.yaml
-+++ b/Documentation/netlink/specs/nl80211.yaml
-@@ -203,71 +203,6 @@ protocol: genetlink-legacy
-       - scan-random-mac-addr
-       - sched-scan-random-mac-addr
-       - no-random-mac-addr
--  -
--    name: ieee80211-mcs-info
--    type: struct
--    members:
--      -
--        name: rx-mask
--        type: binary
--        len: 10
--      -
--        name: rx-highest
--        type: u16
--        byte-order: little-endian
--      -
--        name: tx-params
--        type: u8
--      -
--        name: reserved
--        type: binary
--        len: 3
--  -
--    name: ieee80211-vht-mcs-info
--    type: struct
--    members:
--      -
--        name: rx-mcs-map
--        type: u16
--        byte-order: little-endian
--      -
--        name: rx-highest
--        type: u16
--        byte-order: little-endian
--      -
--        name: tx-mcs-map
--        type: u16
--        byte-order: little-endian
--      -
--        name: tx-highest
--        type: u16
--        byte-order: little-endian
--  -
--    name: ieee80211-ht-cap
--    type: struct
--    members:
--      -
--        name: cap-info
--        type: u16
--        byte-order: little-endian
--      -
--        name: ampdu-params-info
--        type: u8
--      -
--        name: mcs
--        type: binary
--        struct: ieee80211-mcs-info
--      -
--        name: extended-ht-cap-info
--        type: u16
--        byte-order: little-endian
--      -
--        name: tx-bf-cap-info
--        type: u32
--        byte-order: little-endian
--      -
--        name: antenna-selection-info
--        type: u8
+diff --git a/Documentation/netlink/specs/ovs_datapath.yaml b/Documentation/netlink/specs/ovs_datapath.yaml
+index edc8c95ca6f5..df6a8f94975e 100644
+--- a/Documentation/netlink/specs/ovs_datapath.yaml
++++ b/Documentation/netlink/specs/ovs_datapath.yaml
+@@ -35,8 +35,7 @@ uapi-header: linux/openvswitch.h
+         name: dispatch-upcall-per-cpu
+         doc: Allow per-cpu dispatch of upcalls
    -
-     name: channel-type
-     type: enum
-@@ -761,7 +696,6 @@ protocol: genetlink-legacy
+-    name: datapath-stats
+-    enum-name: ovs-dp-stats
++    name: ovs-dp-stats
+     type: struct
+     members:
        -
-         name: ht-capability-mask
+@@ -52,8 +51,7 @@ uapi-header: linux/openvswitch.h
+         name: n-flows
+         type: u64
+   -
+-    name: megaflow-stats
+-    enum-name: ovs-dp-megaflow-stats
++    name: ovs-dp-megaflow-stats
+     type: struct
+     members:
+       -
+@@ -88,11 +86,11 @@ uapi-header: linux/openvswitch.h
+       -
+         name: stats
          type: binary
--        struct: ieee80211-ht-cap
+-        struct: datapath-stats
++        struct: ovs-dp-stats
        -
-         name: noack-map
-         type: u16
-@@ -1382,7 +1316,6 @@ protocol: genetlink-legacy
-       -
-         name: ht-mcs-set
+         name: megaflow-stats
          type: binary
--        struct: ieee80211-mcs-info
+-        struct: megaflow-stats
++        struct: ovs-dp-megaflow-stats
        -
-         name: ht-capa
-         type: u16
-@@ -1395,7 +1328,6 @@ protocol: genetlink-legacy
-       -
-         name: vht-mcs-set
-         type: binary
--        struct: ieee80211-vht-mcs-info
-       -
-         name: vht-capa
+         name: user-features
          type: u32
+diff --git a/Documentation/netlink/specs/ovs_vport.yaml b/Documentation/netlink/specs/ovs_vport.yaml
+index b538bb99ee9b..306da6bb842d 100644
+--- a/Documentation/netlink/specs/ovs_vport.yaml
++++ b/Documentation/netlink/specs/ovs_vport.yaml
+@@ -23,9 +23,8 @@ uapi-header: linux/openvswitch.h
+     name-prefix: ovs-vport-type-
+     entries: [ unspec, netdev, internal, gre, vxlan, geneve ]
+   -
+-    name: vport-stats
++    name: ovs-vport-stats
+     type: struct
+-    enum-name: ovs-vport-stats
+     members:
+       -
+         name: rx-packets
+@@ -106,7 +105,7 @@ uapi-header: linux/openvswitch.h
+       -
+         name: stats
+         type: binary
+-        struct: vport-stats
++        struct: ovs-vport-stats
+       -
+         name: pad
+         type: unused
 -- 
 2.49.0
 
