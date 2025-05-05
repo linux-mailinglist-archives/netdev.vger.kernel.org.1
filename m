@@ -1,62 +1,68 @@
-Return-Path: <netdev+bounces-188169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F832AAB7A5
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:15:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C9BBAAB796
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:14:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 489134E74A8
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:13:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 694DB7A5D21
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:12:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D09512F73BC;
-	Tue,  6 May 2025 00:47:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36FEE272E51;
+	Tue,  6 May 2025 00:48:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rFx/OxTm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VrkPNUPO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 909102F7C31;
-	Mon,  5 May 2025 23:19:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 909E828AB0C;
+	Mon,  5 May 2025 23:19:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746487172; cv=none; b=kXpBfrEmN7/tyMHrUfoSVI4jsHMVPDO6BYajgR+YqnPccDjplzCcmLrWfbxUHC0mSV0CDiXzhJFO0XYH2pt2zPgf5TtuEHLh6qEkYMVCMehBZRMUHu9NwL41suRALAaJRKFpd88YyokyMpkZQAlLPzF8SIK2GXPLcoVDH5v3BXQ=
+	t=1746487191; cv=none; b=sodoKnWLa/qoG793oOT0MAnt9QFp7DDGF8Wsmyv4n0czrxJaO+7UzbuYUIjqRBC818R29rFHrmWWuIN3wi71RmjwpX6bjnEx5rvQ4tk73bKON63TEOSqNu5W/NA8c1sRIKNhXP89t82muSeuDYvZHoqLZUs/FWy9G9qOixJe/tc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746487172; c=relaxed/simple;
-	bh=81Th+zx9z9nFX6KUCm0gksr1wiLFd9LYLWv6qaS25ns=;
+	s=arc-20240116; t=1746487191; c=relaxed/simple;
+	bh=5z5mejJ4lJQ7xauFMS3AH3ERPz0KEqrovqj9Hs4PAZM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HeXiSiGaBNKZvOZ24Ctv6NE1esenDT335JpiVzDj7RVK1vhIfKm2nxKdIOLD4g/R3WmRLSR+pgFhRXzfbzoh6UoW7trBrJ0vumvr+9ciNzhLnzFS/dulBc6Z2swfMG0YomcFmS5Evznoho3PXOzGVbKHjZgt6E0b4BBvdfwpRY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rFx/OxTm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5E02C4CEEF;
-	Mon,  5 May 2025 23:19:29 +0000 (UTC)
+	 MIME-Version; b=PCSHrziEcnE6CyIZkmOZJ2q7sh73BdtKczJRicl64jJl702RDHRrLQRKqG05ZTlkbN+s4ZefEDCverSKOMfAf6o2FCGSY+4fuQcZdrLj3dJA7+2oeOtM/eKZjKCo1neG7528RwTfUXzbkANhroQQOsFUga8u++og7nmrDQRmjM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VrkPNUPO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C4EEC4CEED;
+	Mon,  5 May 2025 23:19:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746487171;
-	bh=81Th+zx9z9nFX6KUCm0gksr1wiLFd9LYLWv6qaS25ns=;
+	s=k20201202; t=1746487191;
+	bh=5z5mejJ4lJQ7xauFMS3AH3ERPz0KEqrovqj9Hs4PAZM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rFx/OxTmmBgI/lTyxwEk7PxkvGWktoSM2Z1mdjkHoA4YySXZslheo4ihWcDiErRSx
-	 ijFD5l2Aa6T+k9ggLFPrtRJqr48U5d74crbdB970s7aMmJd3awRByzB18GolskucCW
-	 z7zgsSf52JHPjD+DE9sQLk2jX7Tqk97yPafjdTKi1DeLB6bCUIiEZSbxwqaZt4vbd9
-	 Sf7cOnRMXjZFQGUBSa0RQfseLJzVuORfvREL9/mVy9AJzPUo3bwLB3eOHFPtj+hlEH
-	 dafP8XoUwWrDb2qysl3HCPYAjIfZj7d2cbDjmTOJukGsEBH8X5KcaKlpf7pc4KydmE
-	 sBp7byvWs8Jew==
+	b=VrkPNUPOCtZ6dCkl6z24q8eK1cIdNziaaeoRdo+iMkTwMGa0M6wMW5CbwBiDAXGtb
+	 SkZSKfNg3xjaxQFfSA4E2OuRUqjEU83HX4Sk6cSqNPFDH7+qVntrQ/qr4x5u8wp7bU
+	 Orsj3TV/7GWgTZg/TfxCxsfuztc761hqU2lWNHGK2iDjoW8Pj4djneXSU53xq7DbxQ
+	 uxUKwRyWbbkc4OAd2XI0XydKg8Vtp6NyhsJT2eCW+YY8c8Gujz8WJPa11jkyfFutZg
+	 /JVqhyl74tyQuSeipjvC057m2FYj/bF/bcTozEHSoAzi6XH/OTIl7xYttsfhj8JATc
+	 YdFzo9LU/kjlg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Eric Dumazet <edumazet@google.com>,
-	Jason Xing <kerneljasonxing@gmail.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
+Cc: Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Andrew Lunn <andrew@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	ncardwell@google.com,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
-	dsahern@kernel.org,
+	edumazet@google.com,
 	pabeni@redhat.com,
+	alexander.sverdlin@gmail.com,
+	hkallweit1@gmail.com,
+	lorenzo@kernel.org,
+	nicolas.dichtel@6wind.com,
+	aleksander.lobakin@intel.com,
+	linux-omap@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 039/114] tcp: bring back NUMA dispersion in inet_ehash_locks_alloc()
-Date: Mon,  5 May 2025 19:17:02 -0400
-Message-Id: <20250505231817.2697367-39-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 049/114] net: ethernet: ti: cpsw_new: populate netdev of_node
+Date: Mon,  5 May 2025 19:17:12 -0400
+Message-Id: <20250505231817.2697367-49-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505231817.2697367-1-sashal@kernel.org>
 References: <20250505231817.2697367-1-sashal@kernel.org>
@@ -71,103 +77,35 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.10.237
 Content-Transfer-Encoding: 8bit
 
-From: Eric Dumazet <edumazet@google.com>
+From: Alexander Sverdlin <alexander.sverdlin@siemens.com>
 
-[ Upstream commit f8ece40786c9342249aa0a1b55e148ee23b2a746 ]
+[ Upstream commit 7ff1c88fc89688c27f773ba956f65f0c11367269 ]
 
-We have platforms with 6 NUMA nodes and 480 cpus.
+So that of_find_net_device_by_node() can find CPSW ports and other DSA
+switches can be stacked downstream. Tested in conjunction with KSZ8873.
 
-inet_ehash_locks_alloc() currently allocates a single 64KB page
-to hold all ehash spinlocks. This adds more pressure on a single node.
-
-Change inet_ehash_locks_alloc() to use vmalloc() to spread
-the spinlocks on all online nodes, driven by NUMA policies.
-
-At boot time, NUMA policy is interleave=all, meaning that
-tcp_hashinfo.ehash_locks gets hash dispersion on all nodes.
-
-Tested:
-
-lack5:~# grep inet_ehash_locks_alloc /proc/vmallocinfo
-0x00000000d9aec4d1-0x00000000a828b652   69632 inet_ehash_locks_alloc+0x90/0x100 pages=16 vmalloc N0=2 N1=3 N2=3 N3=3 N4=3 N5=2
-
-lack5:~# echo 8192 >/proc/sys/net/ipv4/tcp_child_ehash_entries
-lack5:~# numactl --interleave=all unshare -n bash -c "grep inet_ehash_locks_alloc /proc/vmallocinfo"
-0x000000004e99d30c-0x00000000763f3279   36864 inet_ehash_locks_alloc+0x90/0x100 pages=8 vmalloc N0=1 N1=2 N2=2 N3=1 N4=1 N5=1
-0x00000000d9aec4d1-0x00000000a828b652   69632 inet_ehash_locks_alloc+0x90/0x100 pages=16 vmalloc N0=2 N1=3 N2=3 N3=3 N4=3 N5=2
-
-lack5:~# numactl --interleave=0,5 unshare -n bash -c "grep inet_ehash_locks_alloc /proc/vmallocinfo"
-0x00000000fd73a33e-0x0000000004b9a177   36864 inet_ehash_locks_alloc+0x90/0x100 pages=8 vmalloc N0=4 N5=4
-0x00000000d9aec4d1-0x00000000a828b652   69632 inet_ehash_locks_alloc+0x90/0x100 pages=16 vmalloc N0=2 N1=3 N2=3 N3=3 N4=3 N5=2
-
-lack5:~# echo 1024 >/proc/sys/net/ipv4/tcp_child_ehash_entries
-lack5:~# numactl --interleave=all unshare -n bash -c "grep inet_ehash_locks_alloc /proc/vmallocinfo"
-0x00000000db07d7a2-0x00000000ad697d29    8192 inet_ehash_locks_alloc+0x90/0x100 pages=1 vmalloc N2=1
-0x00000000d9aec4d1-0x00000000a828b652   69632 inet_ehash_locks_alloc+0x90/0x100 pages=16 vmalloc N0=2 N1=3 N2=3 N3=3 N4=3 N5=2
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Tested-by: Jason Xing <kerneljasonxing@gmail.com>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Link: https://patch.msgid.link/20250305130550.1865988-1-edumazet@google.com
+Reviewed-by: Siddharth Vadapalli <s-vadapalli@ti.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+Link: https://patch.msgid.link/20250303074703.1758297-1-alexander.sverdlin@siemens.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/ipv4/inet_hashtables.c | 37 ++++++++++++++++++++++++++-----------
- 1 file changed, 26 insertions(+), 11 deletions(-)
+ drivers/net/ethernet/ti/cpsw_new.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-index 0fb5d758264fe..fea74ab2a4bec 100644
---- a/net/ipv4/inet_hashtables.c
-+++ b/net/ipv4/inet_hashtables.c
-@@ -934,22 +934,37 @@ int inet_ehash_locks_alloc(struct inet_hashinfo *hashinfo)
- {
- 	unsigned int locksz = sizeof(spinlock_t);
- 	unsigned int i, nblocks = 1;
-+	spinlock_t *ptr = NULL;
+diff --git a/drivers/net/ethernet/ti/cpsw_new.c b/drivers/net/ethernet/ti/cpsw_new.c
+index a1ee205d6a889..d6f8d3e757a25 100644
+--- a/drivers/net/ethernet/ti/cpsw_new.c
++++ b/drivers/net/ethernet/ti/cpsw_new.c
+@@ -1427,6 +1427,7 @@ static int cpsw_create_ports(struct cpsw_common *cpsw)
+ 		ndev->netdev_ops = &cpsw_netdev_ops;
+ 		ndev->ethtool_ops = &cpsw_ethtool_ops;
+ 		SET_NETDEV_DEV(ndev, dev);
++		ndev->dev.of_node = slave_data->slave_node;
  
--	if (locksz != 0) {
--		/* allocate 2 cache lines or at least one spinlock per cpu */
--		nblocks = max(2U * L1_CACHE_BYTES / locksz, 1U);
--		nblocks = roundup_pow_of_two(nblocks * num_possible_cpus());
-+	if (locksz == 0)
-+		goto set_mask;
- 
--		/* no more locks than number of hash buckets */
--		nblocks = min(nblocks, hashinfo->ehash_mask + 1);
-+	/* Allocate 2 cache lines or at least one spinlock per cpu. */
-+	nblocks = max(2U * L1_CACHE_BYTES / locksz, 1U) * num_possible_cpus();
- 
--		hashinfo->ehash_locks = kvmalloc_array(nblocks, locksz, GFP_KERNEL);
--		if (!hashinfo->ehash_locks)
--			return -ENOMEM;
-+	/* At least one page per NUMA node. */
-+	nblocks = max(nblocks, num_online_nodes() * PAGE_SIZE / locksz);
-+
-+	nblocks = roundup_pow_of_two(nblocks);
-+
-+	/* No more locks than number of hash buckets. */
-+	nblocks = min(nblocks, hashinfo->ehash_mask + 1);
- 
--		for (i = 0; i < nblocks; i++)
--			spin_lock_init(&hashinfo->ehash_locks[i]);
-+	if (num_online_nodes() > 1) {
-+		/* Use vmalloc() to allow NUMA policy to spread pages
-+		 * on all available nodes if desired.
-+		 */
-+		ptr = vmalloc_array(nblocks, locksz);
-+	}
-+	if (!ptr) {
-+		ptr = kvmalloc_array(nblocks, locksz, GFP_KERNEL);
-+		if (!ptr)
-+			return -ENOMEM;
- 	}
-+	for (i = 0; i < nblocks; i++)
-+		spin_lock_init(&ptr[i]);
-+	hashinfo->ehash_locks = ptr;
-+set_mask:
- 	hashinfo->ehash_locks_mask = nblocks - 1;
- 	return 0;
- }
+ 		if (!napi_ndev) {
+ 			/* CPSW Host port CPDMA interface is shared between
 -- 
 2.39.5
 
