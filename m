@@ -1,444 +1,233 @@
-Return-Path: <netdev+bounces-187735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8273AAA9498
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 15:35:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A6A9AA94B7
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 15:41:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B886E3AC236
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 13:34:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4CD617678C
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 13:41:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDA1B1FF7D7;
-	Mon,  5 May 2025 13:35:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C1E32586EE;
+	Mon,  5 May 2025 13:41:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="reak0Vpm"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="pRjFmGIx"
 X-Original-To: netdev@vger.kernel.org
-Received: from server.wki.vra.mybluehostin.me (server.wki.vra.mybluehostin.me [162.240.238.73])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2079.outbound.protection.outlook.com [40.107.236.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8231C190678;
-	Mon,  5 May 2025 13:35:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.238.73
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746452104; cv=none; b=li1ODdDlQ8x/YEIGZpQpXkYQGRqiIbklpB9KWnwRcO3eJm1pgMvgPg7d2lNlKQL6Xhgqnsjq0rwXkNkrO3mjP741ReAT9teF55mw6gbQa+6F84Sh9z1NvR7Reo+L7mMC14tMkbsNcjlgdlurESFN1ROR/BpZErFdMIC/PrXY9nw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746452104; c=relaxed/simple;
-	bh=s8p3e5VIszstYk+q3tgIcOH1NUGgIICzoprifWFhoRE=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=nM0I5NouhzkwLgyIqaHYVy0nAu9XIDBDYdKDKQOOsRl3PJrLX1Loh/8v/ZY9ZpFRf6nl0/qEtdWiUKGMAcsIR5I/57Uj9rc4cKeejAPiV78eKNgRK9ETCy1gXT4JfTWsyAvJ1oTn41c7OIeh40mNROXURBEH5upziMIlshjsbgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=reak0Vpm; arc=none smtp.client-ip=162.240.238.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
-	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
-	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=lKakNgp+cMBljiW9bGBJgwi5m8R7UDNEA5lNfD/vC+E=; b=reak0VpmibtkEtPWw7a2b0Xnrd
-	j8P+PpUjy6BpPdk/IHzqwfcKQDBk83Da4NA3M1qq6ANdBvc2cfLY2dPZkcuOiw2+vGAe1cpByJhbd
-	739twC14lU37p+i+VGppTY7cHtncnTQnTaXPb5zrQPRavTCFqiJxioHPntdT2uMLtyf8xZ52w4nZs
-	Z9M47OgewB7voEY1M0zub/91+TUCQbOGnL55ACvzJ6Y5AmVQE7gLMovenP8Mp0Ap4pfCUsDYT6xx0
-	5UbF2afKB8+Vy4ChGFSBDPV1GPWUfWGf/uDrZEqCoLTnN5h5CVFkJaDYp93t/tHcn5ujW7QpzqtsZ
-	RvCDcc7Q==;
-Received: from [122.175.9.182] (port=5358 helo=zimbra.couthit.local)
-	by server.wki.vra.mybluehostin.me with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.1)
-	(envelope-from <parvathi@couthit.com>)
-	id 1uBvy2-000000003nv-3GhN;
-	Mon, 05 May 2025 19:04:47 +0530
-Received: from zimbra.couthit.local (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTPS id 17A5C1781C02;
-	Mon,  5 May 2025 19:04:39 +0530 (IST)
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTP id ECB431783FF8;
-	Mon,  5 May 2025 19:04:38 +0530 (IST)
-Received: from zimbra.couthit.local ([127.0.0.1])
-	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id ZROrIBlTU3UA; Mon,  5 May 2025 19:04:38 +0530 (IST)
-Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
-	by zimbra.couthit.local (Postfix) with ESMTP id 8FE7317821E7;
-	Mon,  5 May 2025 19:04:38 +0530 (IST)
-Date: Mon, 5 May 2025 19:04:38 +0530 (IST)
-From: Parvathi Pudi <parvathi@couthit.com>
-To: ALOK TIWARI <alok.a.tiwari@oracle.com>
-Cc: danishanwar <danishanwar@ti.com>, rogerq <rogerq@kernel.org>, 
-	andrew+netdev <andrew+netdev@lunn.ch>, davem <davem@davemloft.net>, 
-	edumazet <edumazet@google.com>, kuba <kuba@kernel.org>, 
-	parvathi <parvathi@couthit.com>, pabeni <pabeni@redhat.com>, 
-	robh <robh@kernel.org>, krzk+dt <krzk+dt@kernel.org>, 
-	conor+dt <conor+dt@kernel.org>, ssantosh <ssantosh@kernel.org>, 
-	tony <tony@atomide.com>, richardcochran <richardcochran@gmail.com>, 
-	glaroque <glaroque@baylibre.com>, schnelle <schnelle@linux.ibm.com>, 
-	m-karicheri2 <m-karicheri2@ti.com>, s hauer <s.hauer@pengutronix.de>, 
-	rdunlap <rdunlap@infradead.org>, diogo ivo <diogo.ivo@siemens.com>, 
-	basharath <basharath@couthit.com>, horms <horms@kernel.org>, 
-	jacob e keller <jacob.e.keller@intel.com>, 
-	m-malladi <m-malladi@ti.com>, 
-	javier carrasco cruz <javier.carrasco.cruz@gmail.com>, 
-	afd <afd@ti.com>, s-anna <s-anna@ti.com>, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
-	netdev <netdev@vger.kernel.org>, 
-	devicetree <devicetree@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	pratheesh <pratheesh@ti.com>, Prajith Jayarajan <prajith@ti.com>, 
-	Vignesh Raghavendra <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
-	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
-	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>, 
-	mohan <mohan@couthit.com>
-Message-ID: <596171543.1212368.1746452078442.JavaMail.zimbra@couthit.local>
-In-Reply-To: <90a12a85-cf44-499d-bc1b-9413eea00954@oracle.com>
-References: <20250423060707.145166-1-parvathi@couthit.com> <20250423072356.146726-8-parvathi@couthit.com> <90a12a85-cf44-499d-bc1b-9413eea00954@oracle.com>
-Subject: Re: [PATCH net-next v6 07/11] net: ti: prueth: Adds support for
- network filters for traffic control supported by PRU-ICSS
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF7331E32C6
+	for <netdev@vger.kernel.org>; Mon,  5 May 2025 13:41:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.79
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746452505; cv=fail; b=khl/jnzs3pWGseTPTeEGxl6MwjYAYlCWSS2tesl675UmU54GYZPVyl+AVkkq1Lc61zt09yfeZuXV4GNd5rnoVS8tz93dq99wjFbQUwTFS7YM633nll7ML3OMVT/dZAUKBGCR54onYl2QFuWu/Rvq6NMCIcZoTsPcl+inIkYVlbU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746452505; c=relaxed/simple;
+	bh=miS+DBc+/6iUnpuBzvEkaaFBTIFekWyhblyW+VFNHGk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=LC1YpiqdzV+az+29trD12rYRtBtamGWi8uRmfeTPL1+FHy2fKXDonfK2rUC9h5TW1XuX+fcFBTM50/FPVbnO13fxL5Xi1PiXpftgBFqIt9ecUvM2gZ5rowDyvl9S0m0wnqAzAhcdm4eCMiG8v8Y6knN7uiFGE2T0E9Lg5vfQJyE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=pRjFmGIx; arc=fail smtp.client-ip=40.107.236.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Q4N7e8TudVZvpMppuErt3O3SHP7LxIiMJmqMtIB/GeIpmR/Pi6e8QNKHJlhf1QDnKHZsX7pWkQZGgdt9TjoAIRqGNYkSjknF5qmLw/Bx/SRa5Yiz95vsA9IbOFbDbgqb6AZXBvfNyjiZb04ViigmoquhGvl8xOhtLjPb6LhJZ3C5x4MKYQNg+G3jOZ4FmADKMCDT+HiFfsYjuua65oNbEH3gcIzXUSQruyvxTbN1cJ3BFKFv0DQE9u7B5nuJ9pvwXIeA7QRcC+wDuUSx+d1+Q/xL1rtlrYvu5/hfM324f1UwpwGLSWgPyUbkrEwlyidZ5NBxmdSqW/mBJu6RYsvU0A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=miS+DBc+/6iUnpuBzvEkaaFBTIFekWyhblyW+VFNHGk=;
+ b=hgez7QY3vQGuT5kSon7eDJQ6/ejeMbD8Jwi74Q/pdsYjOaXPnpg7P7S2e1AGO9Ydr+BSHaM9ZBYUhQWrHM1f6b/R1Kbk6h/8j+lObFEDBq73zYH2lVELTprkPmxAtk9vlz4+NfjDzefIOzqJHSjQ1vUEdi07HJKErZhha9bBHX9KI5L21RN0Gsc7IKIpAUSwMaTDn4mxW6QiT0rQp/m2p5cWeuv9o7UA0TbQM3mvBC7RSMQ8Ktvn6Dlp2RC8m1tD0gwwFZA7tWhJHNP/gXa2pzt8ngre8+7Aaj7xYWLHmkUvfB8oPMiXzWJpQ3iT64NlF7V2aPe0Jp1JmJn9RoUP/A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=miS+DBc+/6iUnpuBzvEkaaFBTIFekWyhblyW+VFNHGk=;
+ b=pRjFmGIxFNthxCo4B3GtfpjgWaTD6v5iihXmqzb2veCtWSJfRNoju1CC6NewdUngbm8XcOxUPRJFEtFalNRPtPPnYdKh4yXavBJo8+1L2RLHpuSnZkRp2PkuJUoycRRphMhpQzVTa/55OcTV9zFFUYCcC4IXTLQ5ZZjvc5upA/BEypf9ewOmBRC12a+btaWXDE5xInuqgCOXCZ5sPLfF/1iyU/+ej2W9QMGWDZN1FJSxjrNs0g/qzSkzVU38t2W3H3Dm7bdoU56flbLTWdceTf+Olz7WzVzGeqSIaZ7nnDlJAAM3wlp2w3ar0BFcHksDJBsXYSndgiyy/+kFSpM4ug==
+Received: from DS0PR12MB6560.namprd12.prod.outlook.com (2603:10b6:8:d0::22) by
+ SA1PR12MB6749.namprd12.prod.outlook.com (2603:10b6:806:255::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.26; Mon, 5 May
+ 2025 13:41:39 +0000
+Received: from DS0PR12MB6560.namprd12.prod.outlook.com
+ ([fe80::4c05:4274:b769:b8af]) by DS0PR12MB6560.namprd12.prod.outlook.com
+ ([fe80::4c05:4274:b769:b8af%4]) with mapi id 15.20.8699.024; Mon, 5 May 2025
+ 13:41:39 +0000
+From: Cosmin Ratiu <cratiu@nvidia.com>
+To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "sdf@fomichev.me"
+	<sdf@fomichev.me>
+CC: "jhs@mojatatu.com" <jhs@mojatatu.com>, "davem@davemloft.net"
+	<davem@davemloft.net>, "saeed@kernel.org" <saeed@kernel.org>, Dragos Tatulea
+	<dtatulea@nvidia.com>, "xiyou.wangcong@gmail.com" <xiyou.wangcong@gmail.com>,
+	"jiri@resnulli.us" <jiri@resnulli.us>, "kuba@kernel.org" <kuba@kernel.org>,
+	"edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
+	<pabeni@redhat.com>
+Subject: Re: [PATCH net-next v10 04/14] net: hold netdev instance lock during
+ qdisc ndo_setup_tc
+Thread-Topic: [PATCH net-next v10 04/14] net: hold netdev instance lock during
+ qdisc ndo_setup_tc
+Thread-Index: AQHbje0DX5+rdJVuAUCwIzeB0fSvMrPEav8A
+Date: Mon, 5 May 2025 13:41:39 +0000
+Message-ID: <eba9def750047f1789b708b97e376f453f09bfa4.camel@nvidia.com>
+References: <20250305163732.2766420-1-sdf@fomichev.me>
+	 <20250305163732.2766420-5-sdf@fomichev.me>
+In-Reply-To: <20250305163732.2766420-5-sdf@fomichev.me>
+Reply-To: Cosmin Ratiu <cratiu@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS0PR12MB6560:EE_|SA1PR12MB6749:EE_
+x-ms-office365-filtering-correlation-id: fc0698a3-fd7d-4e4b-dd80-08dd8bda905b
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|7416014|376014|366016|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?SjErLy9PODZ0MDkzdEYvM0ExQVo1MVFnNjJXU1pBNTB0dnUxUkVEM204dFg5?=
+ =?utf-8?B?OWh5ZmNPb2tacGxWY2IyUGxtZG9HNG1jZ2xmWlYrcnlxNGVXSXpTSkxaTFds?=
+ =?utf-8?B?RncrNWZvYmxzSTBRRTBxdTNmQ200YXBSQWZMWjdqWWlDU2tIVHM2WkpCMk9z?=
+ =?utf-8?B?Um5mdEJPS3hjalRrcllaZis0RUJRdnJuS2Z0UmZreVRwVmVyWnhJdTNDT09Z?=
+ =?utf-8?B?K1F2T1NkdzV0SmxvaTZMWTBqQlh3dlR3OC9BdDhxQ2ZCdzhpRUo2d255eFdL?=
+ =?utf-8?B?ZzAvWnB5K0laemdJUjdGVUZFbmtSczNUaEQ4TGxCYk96SkozQ0ZZZlFIR0o5?=
+ =?utf-8?B?cTZYTFpPK2puQk91czVQWm5FdnZWeWhLTktEWlV2Y1BMMVk1TWRRVllrYjZ4?=
+ =?utf-8?B?UHdaakIrNG54aitIZm1rWU8vTmdLMjNsKzlnbU1NRlNYQWJzNFRiRlJvTERP?=
+ =?utf-8?B?RDl5Qk9zTzI1L20ybUZ0OXVIN2JkVllQMUNDek10U2Z2b2hOdjFXbVF3allE?=
+ =?utf-8?B?T2Jhb2VXWnFoNVB2N0JqazV4N25JNmFmUzMwcW5waUlCUktOVHdCQ1p6YTNL?=
+ =?utf-8?B?V1pQMzErUVVJa0JlUWczU00yaDNnT0RVYUw0NlJkL1lCd1JqTDNLQlErQjA3?=
+ =?utf-8?B?TUlhU3VWZDE1S3pNQkh1aUFZRUl1a2tZeHdVZ0toRngxcEluTGxmRjlCelFo?=
+ =?utf-8?B?WkZ2bXMzdTh0WDFRV2RSVVVCVVluTVZHQldEbHB2em9rN2tJTHd3enQ1UEk4?=
+ =?utf-8?B?bzQwTngwZ3NSeUdXWE5LN3MreGRWZSszcGpGRGRyWS82UGZ4SWJYY2xBUzBU?=
+ =?utf-8?B?VzQxbFVTSWo1TFdLOElwYVQ5T3NqMllZNzU3cS9aV1hyeTF2eVlzLzB1SExr?=
+ =?utf-8?B?QmhUS0ZpdVBIbmlFMVJlSTRtODZSZUU0c2Q2VFArTnZBZVlYTGlpSDBoRGNH?=
+ =?utf-8?B?cFdxR0lVR3hQYXVITHhyYXVSQkg3NTV0T1BYMjBLQjlsRkRzYS9wNU05bGlD?=
+ =?utf-8?B?dTNwTHFaVGVySTZSYWsyOVJCUnRVckdrOHpueWt4TXZ5a2lTOVdLQkwzV0Fx?=
+ =?utf-8?B?YWQweG9hK3NHUWQ0K20xdnhxdmNJbXZqL3NVN1A2aVBQM1M0aWlRRE5pekpa?=
+ =?utf-8?B?R1E0Yk9aM3pEYVE0RDNkcnhzQW9rQ003NVp5UmFIbVVQZjJtSUF0RTBLaDMr?=
+ =?utf-8?B?T0FSNW9kTmVGdnhLTEY0b2dSZUQzdExadGZrdWM2RC9URWM4MGsyZzkzcFg1?=
+ =?utf-8?B?VkpVeTVrK0hpRVIwOFZwcmJ3UmEwc3RKTEpDZjhmZ1dJaUx0VHhBNXQ2Z0Fx?=
+ =?utf-8?B?cWRRUzl5clArenduNms5ZjBFNGlTMnBnaFlwc01HNUZON1RMY3RtNGVzQ0M5?=
+ =?utf-8?B?ZSt4TzE0QzMxSG93UlRLcTV1ZS94YWJKaGFXaGJDRzFESlFJbFRtajN3WWRH?=
+ =?utf-8?B?cThZTGpObk05K0NMd29TTnk0SlFxbjYweHB4WnVWNHdaQWZaVS9jeDJ5SXhy?=
+ =?utf-8?B?cmxITWhIelV4elV6VkNHQ1NWTlFKd3loMkliOWVYdTI3M3BzSSsxMlZjSVds?=
+ =?utf-8?B?Wkk4STFJdklYblZvcURDS2RramNSQ3hCQ3U3N0dUbDRWY3V1TEZVd2JidCs4?=
+ =?utf-8?B?YnVYdXAzUlRtS0ZVUWZ0M3dEZmcrK1BRV2RWUnZ6djArTXpMOHAvYmFxSGhx?=
+ =?utf-8?B?dkxsQTV3SkN6WTFkLzFoaUlHd1BEQTJxUEt2YnVpMHNFVU11OC80WU05UHpn?=
+ =?utf-8?B?MERpNnZDSmdxcWExTjRyZXRhMUcxNVIzTmw2ODhHYTB4a1EyczJSL0ZqN1J3?=
+ =?utf-8?B?TkdJMGlHRUZVVFJPRTk4M3lCeTRsOUZibzNvZXlSTUlQYzQrUXdxYjArNS94?=
+ =?utf-8?B?RjJSd0o5dXo1ZWpxS0s4T3o1Y1NPd2kxL25Sa3JYWGt4cHBYdkgxbXNGazh2?=
+ =?utf-8?B?eWsxa1QxWDlUbllVK0kzblZ0RnZmRGtOalVpblQramFjK0NUdXAvekNwV2NV?=
+ =?utf-8?B?a1BTb1JUK0tRPT0=?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?N2NiVFIwTzl2M2Z0Ukp5bjI4Q2gwaW1PR1lBL2JxUXpLOUdKSlVnV2lxTEZz?=
+ =?utf-8?B?eDRwVkkyYnF0b1dpQ2tyOHdyNXRVN1RkNGJSNjFXbjFvTHR1UHA4dUZYMm1N?=
+ =?utf-8?B?NkM0Y1pSYVdoQjZ4MjlqV1phUUVxM2xwRG5Eb200Q01YSnpIWHFubXB6MEpy?=
+ =?utf-8?B?bGlhVXVZdkVWdWpFOUoxTUVHQXExQ1M0NU51RUtoSm5FKy92eWJnK1JsNVRB?=
+ =?utf-8?B?cnVRZVIxOG1nc3N5ZkI3a05PRFVkUEJ5ME5Mb2R6N0FxN3pEWThZUGhxb3h1?=
+ =?utf-8?B?Mlk0TklvR05kU2lkSmN3ell1bG9BWWRNRWdqWWpKek5NQUhOUG8yRFBaSldp?=
+ =?utf-8?B?ejAxRzlza1dKUXFGQ3c2aXh2eWJMSjNibzVSbDltcXNEQ1BvZ3U1UG9JY3Zx?=
+ =?utf-8?B?Z2I5WFIyMSthT1E1dTdvSjZWcnkzbWFNVlQzakdRbExTbzhod3RCa3d2ZUIx?=
+ =?utf-8?B?OCtiNys1QjNlZlkvUFNid1p3aHY0eG15d1pnUXZRVmxXcjQrZVhPOWRXK3Jn?=
+ =?utf-8?B?aXpoZzl1aGhXSkhkR3N6SzMwVzFyMWVEemt0N2RPOVo0TmVSeDJESmw1V1Nt?=
+ =?utf-8?B?TmhuV3MvTEJlMU1UejFCSGhTNmFIS0VJbHFZdUowcDI4ckhYQ3ByNzJ4Sm5r?=
+ =?utf-8?B?QUl0YWcwc05GMm5tQkRxaG0reXQ1UVpaVGQyRDFVem5Sa2g5eFg3MEZvdHMv?=
+ =?utf-8?B?eDdlL2dSQXJubk9RazhHdGtVb0FKR2U5NXlRc3BXUGhXL2w0a2xkdE9qRlJY?=
+ =?utf-8?B?ZGs4ZmxJUThsdWZ6bUJ4SUdGS2kycDlRV2pKZTlBT0QvZmEvQmNyNVViNEZy?=
+ =?utf-8?B?U2xodzFwVHU5K2RtNmlSVzUrYy9tT2FDNHBiaWphS1FSNkNuMnE5V0FRRE9E?=
+ =?utf-8?B?dHBoOWlKcGNXZCtLSXd3NkN1OEhwNnh2bThCanIvZCt0TlhZcnp0VGlNdFBv?=
+ =?utf-8?B?ZG5LbVdQdTlxUk05S2ZWSUlLS0I4N3VMb1F0K0ZidklBRVlDREF0cFh3VUlo?=
+ =?utf-8?B?N3VPa1R5WVBXYTg1UUxxY04vN3Q5bk5Sb3VNZW44M2VEZVFOKzQ4QXEwdm5k?=
+ =?utf-8?B?OFRmelVzYVRHZXNoWmNPSG5qUFJXdnVRcldEbktOZ1J1SlR1VFAvajYwbE1m?=
+ =?utf-8?B?cjQ2RHVSU09nUmZaSGo4QnNOaVljVmdsb2U3RHJXb0JDdll4anlHMGJZbHFC?=
+ =?utf-8?B?MjlieTJDMnNhR1NvVjBQT1E5WXcxY3o5QVNZWmllTzFDQ05COGhIdm1VNmVJ?=
+ =?utf-8?B?djl3K2dtcWYyNmpQblk0U0ZpV0hyR0FQTmF0SnRRTlJWSHN6NzBOTTVDNys4?=
+ =?utf-8?B?SnIvS2VrOHZFeGF3eDloN2NRZFplM2NOc0UzSWpFUStNb2E4MENYTGNCYmdD?=
+ =?utf-8?B?VVN4NEVSbFJGRHVYZHBnMmc1Q2QycFQzd3JxWWpWVmUra3ptbDRyTWlvcjRU?=
+ =?utf-8?B?bDlUZ0dqc3lKZU1Ha2xKbS85OWtBVDVhSEk2dUtXTlIxa1VRLzRwS1FteFU1?=
+ =?utf-8?B?K2VEMjFRNWRvZWlXckI1MWlOQ2N1NG02eHEvdWw4ZW80amptZCtEZFNSL011?=
+ =?utf-8?B?V2VKTDdMQVowWllGNEhmMzE1UExNNzNpbDBzTndYQWJuTkprcmVjczNKbFJO?=
+ =?utf-8?B?N0xicFkrNHl0eWhTdjZHcitpVnYxQ2VqZnNDc0xmZjNBbXN2VFYzOWU4R2FK?=
+ =?utf-8?B?dER4SmlRU2xkK3RFT1BJNndnL0VFdVZhVkR4MjBRRWNWdjIvMENNbiswV20z?=
+ =?utf-8?B?bGxIczZDNVRSSUlEYWNJdXlja3p4Um5ZelpVR3dyblc3aUZHaThoV3RadjBN?=
+ =?utf-8?B?M1hWWHRqWlg4ZmdpRDRqZGlrcy9La0NrcHN2eU9MM3Z5cFJLUGZ4QUNNL2N4?=
+ =?utf-8?B?dUpQemJCMExhWHIzWWN3dzBkTnVnZG5jWVJrV1llbFpoeGVxaERDOEQwdndT?=
+ =?utf-8?B?RFVuY1JFK0swZEVlQ3Z1SGYzWmNjVWY3aWZYT1pxcnh1VmJrb2d2QW9zWTQ3?=
+ =?utf-8?B?TjdFWHpnMERuS2IwZ2IwVU9ZUUU1eG8zSWRXOUh2NDVSY1FDdUtHWjhVc1Fj?=
+ =?utf-8?B?Z1NURm5ZVGVKaWxVY1lReXVEZVptbStYRmQzeGxrekI4RSs0ZnZDeE50aDdT?=
+ =?utf-8?Q?Vbf66TpTLvksUVeicQW8JRuR7?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <3B26F1C4E7A82A498F1B99038D96C133@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - FF113 (Linux)/8.8.15_GA_3968)
-Thread-Topic: prueth: Adds support for network filters for traffic control supported by PRU-ICSS
-Thread-Index: +fyddl2CzkXGoiVxpswuiFN5y+v5FA==
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server.wki.vra.mybluehostin.me
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - couthit.com
-X-Get-Message-Sender-Via: server.wki.vra.mybluehostin.me: authenticated_id: smtp@couthit.com
-X-Authenticated-Sender: server.wki.vra.mybluehostin.me: smtp@couthit.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6560.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fc0698a3-fd7d-4e4b-dd80-08dd8bda905b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 May 2025 13:41:39.7229
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vDU6PThlNogOzUyRyFFZgqUku+qzSM2VThyHIhb2JYdenNjaKMrSKikHn9cJdTtEN9GbpydO7mRYvF4XQp6l3A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6749
 
-Hi,
-
->> +	/* for LRE, it is a shared table. So lock the access */
->> +	spin_lock_irqsave(&emac->addr_lock, flags);
->> +
->> +	/* VLAN filter table is 512 bytes (4096 bit) bitmap.
->> +	 * Each bit controls enabling or disabling corresponding
->> +	 * VID. Therefore byte index that controls a given VID is
->> +	 * can calculated as vid / 8 and the bit within that byte
->> +	 * that controls VID is given by vid % 8. Allow untagged
->> +	 * frames to host by default.
->> +	 */
->> +	byte_index = vid / BITS_PER_BYTE;
->> +	bit_index = vid % BITS_PER_BYTE;
->> +	val = readb(ram + vlan_filter_tbl + byte_index);
->> +	if (add)
->> +		val |= BIT(bit_index);
->> +	else
->> +		val &= ~BIT(bit_index);
->> +	writeb(val, ram + vlan_filter_tbl + byte_index);
->> +
->> +	spin_unlock_irqrestore(&emac->addr_lock, flags);
->> +
->> +	netdev_dbg(emac->ndev, "%s VID bit at index %d and bit %d\n",
->> +		   add ? "Setting" : "Clearing", byte_index, bit_index);
-> 
-> VID bit at byte index
-> 
->> +
->> +	return 0;
->> +}
->> +
->> +static int icssm_emac_ndo_vlan_rx_add_vid(struct net_device *dev,
->> +					  __be16 proto, u16 vid)
->> +{
->> +	struct prueth_emac *emac = netdev_priv(dev);
->> +
->> +	return icssm_emac_add_del_vid(emac, true, proto, vid);
->> +}
->> +
->> +static int icssm_emac_ndo_vlan_rx_kill_vid(struct net_device *dev,
->> +					   __be16 proto, u16 vid)
->> +{
->> +	struct prueth_emac *emac = netdev_priv(dev);
->> +
->> +	return icssm_emac_add_del_vid(emac, false, proto, vid);
->> +}
->> +
->> +static int icssm_emac_get_port_parent_id(struct net_device *dev,
->> +					 struct netdev_phys_item_id *ppid)
->> +{
->> +	struct prueth_emac *emac = netdev_priv(dev);
->> +	struct prueth *prueth = emac->prueth;
->> +
->> +	ppid->id_len = sizeof(prueth->base_mac);
->> +	memcpy(&ppid->id, &prueth->base_mac, ppid->id_len);
->> +
->> +	return 0;
->> +}
->> +
->> +static int icssm_emac_ndo_get_phys_port_name(struct net_device *ndev,
->> +					     char *name, size_t len)
->> +{
->> +	struct prueth_emac *emac = netdev_priv(ndev);
->> +	int err;
->> +
->> +	err = snprintf(name, len, "p%d", emac->port_id);
->> +
->> +	if (err >= len)
->> +		return -EINVAL;
->> +
->> +	return 0;
->> +}
->> +
->>   static const struct net_device_ops emac_netdev_ops = {
->>   	.ndo_open = icssm_emac_ndo_open,
->>   	.ndo_stop = icssm_emac_ndo_stop,
->>   	.ndo_start_xmit = icssm_emac_ndo_start_xmit,
->> +	.ndo_set_mac_address = eth_mac_addr,
->> +	.ndo_validate_addr = eth_validate_addr,
->>   	.ndo_tx_timeout = icssm_emac_ndo_tx_timeout,
->>   	.ndo_get_stats64 = icssm_emac_ndo_get_stats64,
->> +	.ndo_set_rx_mode = icssm_emac_ndo_set_rx_mode,
->>   	.ndo_eth_ioctl = icssm_emac_ndo_ioctl,
->> +	.ndo_vlan_rx_add_vid = icssm_emac_ndo_vlan_rx_add_vid,
->> +	.ndo_vlan_rx_kill_vid = icssm_emac_ndo_vlan_rx_kill_vid,
->> +	.ndo_setup_tc = icssm_emac_ndo_setup_tc,
->> +	.ndo_get_port_parent_id = icssm_emac_get_port_parent_id,
->> +	.ndo_get_phys_port_name = icssm_emac_ndo_get_phys_port_name,
->>   };
->>   
->>   /* get emac_port corresponding to eth_node name */
->> @@ -1567,6 +1865,7 @@ static int icssm_prueth_netdev_init(struct prueth *prueth,
->>   	emac->prueth = prueth;
->>   	emac->ndev = ndev;
->>   	emac->port_id = port;
->> +	memset(&emac->mc_filter_mask[0], 0xff, ETH_ALEN); /* default mask */
->>   
->>   	/* by default eth_type is EMAC */
->>   	switch (port) {
->> @@ -1608,7 +1907,9 @@ static int icssm_prueth_netdev_init(struct prueth *prueth,
->>   		dev_err(prueth->dev, "could not get ptp tx irq. Skipping PTP support\n");
->>   	}
->>   
->> +	spin_lock_init(&emac->lock);
->>   	spin_lock_init(&emac->ptp_skb_lock);
->> +	spin_lock_init(&emac->addr_lock);
->>   
->>   	/* get mac address from DT and set private and netdev addr */
->>   	ret = of_get_ethdev_address(eth_node, ndev);
->> @@ -1637,6 +1938,10 @@ static int icssm_prueth_netdev_init(struct prueth
->> *prueth,
->>   	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_Pause_BIT);
->>   	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_Asym_Pause_BIT);
->>   
->> +	ndev->features |= NETIF_F_HW_VLAN_CTAG_FILTER | NETIF_F_HW_TC;
->> +
->> +	ndev->hw_features |= NETIF_F_HW_VLAN_CTAG_FILTER;
->> +
->>   	ndev->netdev_ops = &emac_netdev_ops;
->>   	ndev->ethtool_ops = &emac_ethtool_ops;
->>   
->> @@ -1689,6 +1994,7 @@ static int icssm_prueth_probe(struct platform_device
->> *pdev)
->>   	platform_set_drvdata(pdev, prueth);
->>   	prueth->dev = dev;
->>   	prueth->fw_data = device_get_match_data(dev);
->> +	prueth->fw_offsets = &fw_offsets_v2_1;
->>   
->>   	eth_ports_node = of_get_child_by_name(np, "ethernet-ports");
->>   	if (!eth_ports_node)
->> @@ -1875,6 +2181,8 @@ static int icssm_prueth_probe(struct platform_device
->> *pdev)
->>   			prueth->emac[PRUETH_MAC1]->ndev;
->>   	}
->>   
->> +	eth_random_addr(prueth->base_mac);
->> +
->>   	dev_info(dev, "TI PRU ethernet driver initialized: %s EMAC mode\n",
->>   		 (!eth0_node || !eth1_node) ? "single" : "dual");
->>   
->> diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth.h
->> b/drivers/net/ethernet/ti/icssm/icssm_prueth.h
->> index 1709b3b6c2be..8a5f1647466a 100644
->> --- a/drivers/net/ethernet/ti/icssm/icssm_prueth.h
->> +++ b/drivers/net/ethernet/ti/icssm/icssm_prueth.h
->> @@ -28,6 +28,9 @@
->>   #define EMAC_MAX_FRM_SUPPORT (ETH_HLEN + VLAN_HLEN + ETH_DATA_LEN + \
->>   			      ICSSM_LRE_TAG_SIZE)
->>   
->> +/* default timer for NSP and HSR/PRP */
->> +#define PRUETH_NSP_TIMER_MS	(100) /* Refresh NSP counters every 100ms */
->> +
->>   #define PRUETH_REG_DUMP_VER		1
->>   
->>   /* Encoding: 32-16: Reserved, 16-8: Reg dump version, 8-0: Ethertype  */
-> 
-> remove extra ' ' after Ethertype
-> 
->> @@ -293,6 +296,29 @@ enum prueth_mem {
->>   	PRUETH_MEM_MAX,
->>   };
->>   
->> +/* Firmware offsets/size information */
->> +struct prueth_fw_offsets {
->> +	u32 index_array_offset;
->> +	u32 bin_array_offset;
->> +	u32 nt_array_offset;
->> +	u32 index_array_loc;
->> +	u32 bin_array_loc;
->> +	u32 nt_array_loc;
->> +	u32 index_array_max_entries;
->> +	u32 bin_array_max_entries;
->> +	u32 nt_array_max_entries;
->> +	u32 vlan_ctrl_byte;
->> +	u32 vlan_filter_tbl;
->> +	u32 mc_ctrl_byte;
->> +	u32 mc_filter_mask;
->> +	u32 mc_filter_tbl;
->> +	/* IEP wrap is used in the rx packet ordering logic and
->> +	 * is different for ICSSM v1.0 vs 2.1
->> +	 */
->> +	u32 iep_wrap;
->> +	u16 hash_mask;
->> +};
->> +
-> [clip]
->> @@ -0,0 +1,120 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +
->> +/* Copyright (C) 2015-2021 Texas Instruments Incorporated -
->> https://urldefense.com/v3/__https://www.ti.com__;!!ACWV5N9M2RV99hQ!Pnt8LQPwsRI73TtUPzBpwVw_Cn90DbuNXinXJ5m2isPHfFxjNTp4JBlr6UedPapFerELKSzV4SFNoiUfE1xa8g$
->> + *
->> + * This file contains VLAN/Multicast filtering feature memory map
->> + *
->> + */
->> +
->> +#ifndef ICSS_VLAN_MULTICAST_FILTER_MM_H
->> +#define ICSS_VLAN_MULTICAST_FILTER_MM_H
->> +
->> +/*  VLAN/Multicast filter defines & offsets,
->> + *  present on both PRU0 and PRU1 DRAM
-> 
-> remove extra ' '
-> 
->> + */
->> +
->> +/* Feature enable/disable values for multicast filtering */
->> +#define ICSS_EMAC_FW_MULTICAST_FILTER_CTRL_DISABLED		0x00
->> +#define ICSS_EMAC_FW_MULTICAST_FILTER_CTRL_ENABLED		0x01
->> +
->> +/* Feature enable/disable values  for VLAN filtering */
-> 
-> remove extra ' ' after values
-> 
->> +#define ICSS_EMAC_FW_VLAN_FILTER_CTRL_DISABLED			0x00
->> +#define ICSS_EMAC_FW_VLAN_FILTER_CTRL_ENABLED			0x01
->> +
->> +/* Add/remove multicast mac id for filtering bin */
->> +#define ICSS_EMAC_FW_MULTICAST_FILTER_HOST_RCV_ALLOWED		0x01
->> +#define ICSS_EMAC_FW_MULTICAST_FILTER_HOST_RCV_NOT_ALLOWED	0x00
->> +
->> +/* Default HASH value for the multicast filtering Mask */
->> +#define ICSS_EMAC_FW_MULTICAST_FILTER_INIT_VAL			0xFF
->> +
->> +/* Size requirements for Multicast filtering feature */
->> +#define ICSS_EMAC_FW_MULTICAST_TABLE_SIZE_BYTES			       256
->> +#define ICSS_EMAC_FW_MULTICAST_FILTER_MASK_SIZE_BYTES			 6
->> +#define ICSS_EMAC_FW_MULTICAST_FILTER_CTRL_SIZE_BYTES			 1
->> +#define ICSS_EMAC_FW_MULTICAST_FILTER_MASK_OVERRIDE_STATUS_SIZE_BYTES	 1
->> +#define ICSS_EMAC_FW_MULTICAST_FILTER_DROP_CNT_SIZE_BYTES		 4
->> +
->> +/* Size requirements for VLAN filtering feature : 4096 bits = 512 bytes */
->> +#define ICSS_EMAC_FW_VLAN_FILTER_TABLE_SIZE_BYTES		       512
->> +#define ICSS_EMAC_FW_VLAN_FILTER_CTRL_SIZE_BYTES			 1
->> +#define ICSS_EMAC_FW_VLAN_FILTER_DROP_CNT_SIZE_BYTES			 4
->> +
->> +/* Mask override set status */
->> +#define ICSS_EMAC_FW_MULTICAST_FILTER_MASK_OVERRIDE_SET			 1
->> +/* Mask override not set status */
->> +#define ICSS_EMAC_FW_MULTICAST_FILTER_MASK_OVERRIDE_NOT_SET		 0
->> +/* 6 bytes HASH Mask for the MAC */
->> +#define ICSS_EMAC_FW_MULTICAST_FILTER_MASK_OFFSET	  0xF4
->> +/* 0 -> multicast filtering disabled | 1 -> multicast filtering enabled */
->> +#define ICSS_EMAC_FW_MULTICAST_FILTER_CTRL_OFFSET	\
->> +	(ICSS_EMAC_FW_MULTICAST_FILTER_MASK_OFFSET +	\
->> +	 ICSS_EMAC_FW_MULTICAST_FILTER_MASK_SIZE_BYTES)
->> +/* Status indicating if the HASH override is done or not: 0: no, 1: yes */
->> +#define ICSS_EMAC_FW_MULTICAST_FILTER_OVERRIDE_STATUS	\
->> +	(ICSS_EMAC_FW_MULTICAST_FILTER_CTRL_OFFSET +	\
->> +	 ICSS_EMAC_FW_MULTICAST_FILTER_CTRL_SIZE_BYTES)
->> +/* Multicast drop statistics */
->> +#define ICSS_EMAC_FW_MULTICAST_FILTER_DROP_CNT_OFFSET	\
->> +	(ICSS_EMAC_FW_MULTICAST_FILTER_OVERRIDE_STATUS +\
->> +	 ICSS_EMAC_FW_MULTICAST_FILTER_MASK_OVERRIDE_STATUS_SIZE_BYTES)
->> +/* Multicast table */
->> +#define ICSS_EMAC_FW_MULTICAST_FILTER_TABLE		\
->> +	(ICSS_EMAC_FW_MULTICAST_FILTER_DROP_CNT_OFFSET +\
->> +	 ICSS_EMAC_FW_MULTICAST_FILTER_DROP_CNT_SIZE_BYTES)
->> +
->> +/* Multicast filter defines & offsets for LRE
->> + */
->> +#define ICSS_LRE_FW_MULTICAST_TABLE_SEARCH_OP_CONTROL_BIT	0xE0
->> +/* one byte field :
->> + * 0 -> multicast filtering disabled
->> + * 1 -> multicast filtering enabled
->> + */
->> +#define ICSS_LRE_FW_MULTICAST_FILTER_MASK			 0xE4
->> +#define ICSS_LRE_FW_MULTICAST_FILTER_TABLE			 0x100
->> +
->> +/* VLAN table Offsets */
->> +#define ICSS_EMAC_FW_VLAN_FLTR_TBL_BASE_ADDR		 0x200
->> +#define ICSS_EMAC_FW_VLAN_FILTER_CTRL_BITMAP_OFFSET	 0xEF
->> +#define ICSS_EMAC_FW_VLAN_FILTER_DROP_CNT_OFFSET	\
->> +	(ICSS_EMAC_FW_VLAN_FILTER_CTRL_BITMAP_OFFSET +	\
->> +	 ICSS_EMAC_FW_VLAN_FILTER_CTRL_SIZE_BYTES)
->> +
->> +/* VLAN filter Control Bit maps */
->> +/* one bit field, bit 0: | 0 : VLAN filter disabled (default),
->> + * 1: VLAN filter enabled
->> + */
->> +#define ICSS_EMAC_FW_VLAN_FILTER_CTRL_ENABLE_BIT		       0
->> +/* one bit field, bit 1: | 0 : untagged host rcv allowed (default),
->> + * 1: untagged host rcv not allowed
->> + */
->> +#define ICSS_EMAC_FW_VLAN_FILTER_UNTAG_HOST_RCV_ALLOW_CTRL_BIT	       1
->> +/* one bit field, bit 1: | 0 : priotag host rcv allowed (default),
->> + * 1: priotag host rcv not allowed
->> + */
->> +#define ICSS_EMAC_FW_VLAN_FILTER_PRIOTAG_HOST_RCV_ALLOW_CTRL_BIT       2
->> +/* one bit field, bit 1: | 0 : skip sv vlan flow
->> + * :1 : take sv vlan flow  (not applicable for dual emac )
->> + */
->> +#define ICSS_EMAC_FW_VLAN_FILTER_SV_VLAN_FLOW_HOST_RCV_ALLOW_CTRL_BIT  3
->> +
->> +/* VLAN IDs */
->> +#define ICSS_EMAC_FW_VLAN_FILTER_PRIOTAG_VID			       0
->> +#define ICSS_EMAC_FW_VLAN_FILTER_VID_MIN			       0x0000
->> +#define ICSS_EMAC_FW_VLAN_FILTER_VID_MAX			       0x0FFF
->> +
->> +/* VLAN Filtering Commands */
->> +#define ICSS_EMAC_FW_VLAN_FILTER_ADD_VLAN_VID_CMD		       0x00
->> +#define ICSS_EMAC_FW_VLAN_FILTER_REMOVE_VLAN_VID_CMD		       0x01
->> +
->> +/* Switch defines for VLAN/MC filtering */
->> +/* SRAM
->> + * VLAN filter defines & offsets
->> + */
->> +#define ICSS_LRE_FW_VLAN_FLTR_CTRL_BYTE				 0x1FE
-> 
-> lowercase hex please, all place.
-> 
-
-Thank you for the feedback.
-
-We have addressed all the comments provided, except for the one regarding
-hexadecimal format, where we need some clarity.
-
-Is there any specific style guide or convention that mandates lowercase
-hexadecimal formatting? We've observed that other drivers in the code base
-consistently use uppercase hex values, and we've followed the same convention
-throughout in our implementation.
-
-
-Thanks and Regards,
-Parvathi.
+T24gV2VkLCAyMDI1LTAzLTA1IGF0IDA4OjM3IC0wODAwLCBTdGFuaXNsYXYgRm9taWNoZXYgd3Jv
+dGU6DQo+IFFkaXNjIG9wZXJhdGlvbnMgdGhhdCBjYW4gbGVhZCB0byBuZG9fc2V0dXBfdGMgbWln
+aHQgbmVlZA0KPiB0byBoYXZlIGFuIGluc3RhbmNlIGxvY2suIEFkZCBuZXRkZXZfbG9ja19vcHMv
+bmV0ZGV2X3VubG9ja19vcHMNCj4gaW52b2NhdGlvbnMgZm9yIGFsbCBwc2NoZWRfcnRubF9tc2df
+aGFuZGxlcnMgb3BlcmF0aW9ucy4NCg0KU29ycnkgZm9yIHJlc3VycmVjdGluZyB0aGlzIHRocmVh
+ZCwgYnV0IGl0IHNlZW1zIGxpa2UgYSBnb29kIHBsYWNlIHRvDQphc2sgYSByZWxhdGVkIHF1ZXN0
+aW9uLg0KDQpJZiBxZGlzYyBvcGVyYXRpb25zIHRoYXQgbGVhZCB0byAubmRvX3NldHVwX3RjKCkg
+bmVlZCB0byBob2xkIGFuDQppbnN0YW5jZSBsb2NrLCBzaG91bGRuJ3QgYWxsIHN1Y2ggY2FsbGVy
+cyBhY3F1aXJlIGl0Pw0KDQpJbiBteSB0ZXN0aW5nLCBJIGZvdW5kIG91dCB0aGF0IGUuZy4sIHdo
+ZW4gdW5sb2FkaW5nIGEgZGV2aWNlLCB0aGVyZSdzDQp0aGlzIGNhbGwgcGF0aCB3aGljaCBlbmRz
+IHVwIGNhbGxpbmcgLm5kb19zZXR1cF90YygpIHVubG9ja2VkOg0KDQpkZXZsaW5rX3JlbG9hZCAt
+Li4uLT4gZGV2aWNlX2RlbCAtLi4uLT4gdW5yZWdpc3Rlcl9uZXRkZXYgLS4uLi0+DQp1bnJlZ2lz
+dGVyX25ldGRldmljZV9tYW55X25vdGlmeSAtPiBkZXZfc2h1dGRvd24gLT4gcWRpc2NfcHV0IC0+
+DQpfX3FkaXNjX2Rlc3Ryb3kgLT4gbXFwcmlvX2Rpc2FibGVfb2ZmbG9hZCAtPiAubmRvX3NldHVw
+X3RjDQoNCk1hbnkgb3RoZXIgcWRpc2NzIChvdGhlciB0aGFuIG1xcHJpbykgY2FsbCAubmRvX3Nl
+dHVwX3RjKCkgYW5kIHdvdWxkIGJlDQppbiBhIHNpbWlsYXIgc2l0dWF0aW9uLg0KDQpEb2VzIGl0
+IG1ha2Ugc2Vuc2UgdG8gZXh0ZW5kIHRoZSBuZXRkZXYgbG9jayBmb3IgZGV2X3NodXRkb3duIGxp
+a2UgaW4NCnRoZSBwYXRjaCBiZWxvdz8gQWZ0ZXIgc29tZSBiYXNpYyB0ZXN0aW5nLCBpdCBzZWVt
+cyBzYWZlIGJ1dCBJIGhhdmVuJ3QNCmxvb2tlZCB0b28gZGVlcCBpbnRvIGFsbCBwb3NzaWJpbGl0
+aWVzLg0KDQpDb3NtaW4uDQoNCkZyb20gZThiNjEzZGZkMmIyNDFhNmMxOWJiODlhODI5ZDU5OGQ2
+NjQwYjZmOSBNb24gU2VwIDE3IDAwOjAwOjAwIDIwMDENCkZyb206IENvc21pbiBSYXRpdSA8Y3Jh
+dGl1QG52aWRpYS5jb20+DQpEYXRlOiBNb24sIDUgTWF5IDIwMjUgMTU6MzQ6NTMgKzAzMDANClN1
+YmplY3Q6IFtQQVRDSCAwMS8yMF0gbmV0L3NjaGVkOiBMb2NrIG5ldGRldmljZXMgZHVyaW5nIGRl
+dl9zaHV0ZG93bg0KDQpWYXJpb3VzIHFkaXNjcyBjYW4gZW5kIHVwIGNhbGxpbmcgaW50byAubmRv
+X3NldHVwX3RjKCkgYW5kIGFzIHN1Y2gsDQptaWdodCBuZWVkIHRoZSBuZXRkZXYgaW5zdGFuY2Ug
+bG9jay4NCg0KU2lnbmVkLW9mZi1ieTogQ29zbWluIFJhdGl1IDxjcmF0aXVAbnZpZGlhLmNvbT4N
+Ci0tLQ0KIG5ldC9jb3JlL2Rldi5jIHwgNCArKystDQogMSBmaWxlIGNoYW5nZWQsIDMgaW5zZXJ0
+aW9ucygrKSwgMSBkZWxldGlvbigtKQ0KDQpkaWZmIC0tZ2l0IGEvbmV0L2NvcmUvZGV2LmMgYi9u
+ZXQvY29yZS9kZXYuYw0KaW5kZXggZDFhOGNhZDBjOTljLi4xMzRjZWRkZjdmYTUgMTAwNjQ0DQot
+LS0gYS9uZXQvY29yZS9kZXYuYw0KKysrIGIvbmV0L2NvcmUvZGV2LmMNCkBAIC0xMjAyMCw5ICsx
+MjAyMCw5IEBAIHZvaWQgdW5yZWdpc3Rlcl9uZXRkZXZpY2VfbWFueV9ub3RpZnkoc3RydWN0DQps
+aXN0X2hlYWQgKmhlYWQsDQogICAgICAgICAgICAgICAgc3RydWN0IHNrX2J1ZmYgKnNrYiA9IE5V
+TEw7DQogDQogICAgICAgICAgICAgICAgLyogU2h1dGRvd24gcXVldWVpbmcgZGlzY2lwbGluZS4g
+Ki8NCisgICAgICAgICAgICAgICBuZXRkZXZfbG9ja19vcHMoZGV2KTsNCiAgICAgICAgICAgICAg
+ICBkZXZfc2h1dGRvd24oZGV2KTsNCiAgICAgICAgICAgICAgICBkZXZfdGN4X3VuaW5zdGFsbChk
+ZXYpOw0KLSAgICAgICAgICAgICAgIG5ldGRldl9sb2NrX29wcyhkZXYpOw0KICAgICAgICAgICAg
+ICAgIGRldl94ZHBfdW5pbnN0YWxsKGRldik7DQogICAgICAgICAgICAgICAgZGV2X21lbW9yeV9w
+cm92aWRlcl91bmluc3RhbGwoZGV2KTsNCiAgICAgICAgICAgICAgICBuZXRkZXZfdW5sb2NrX29w
+cyhkZXYpOw0KQEAgLTEyMjE4LDcgKzEyMjE4LDkgQEAgaW50IF9fZGV2X2NoYW5nZV9uZXRfbmFt
+ZXNwYWNlKHN0cnVjdA0KbmV0X2RldmljZSAqZGV2LCBzdHJ1Y3QgbmV0ICpuZXQsDQogICAgICAg
+IHN5bmNocm9uaXplX25ldCgpOw0KIA0KICAgICAgICAvKiBTaHV0ZG93biBxdWV1ZWluZyBkaXNj
+aXBsaW5lLiAqLw0KKyAgICAgICBuZXRkZXZfbG9ja19vcHMoZGV2KTsNCiAgICAgICAgZGV2X3No
+dXRkb3duKGRldik7DQorICAgICAgIG5ldGRldl91bmxvY2tfb3BzKGRldik7DQogDQogICAgICAg
+IC8qIE5vdGlmeSBwcm90b2NvbHMsIHRoYXQgd2UgYXJlIGFib3V0IHRvIGRlc3Ryb3kNCiAgICAg
+ICAgICogdGhpcyBkZXZpY2UuIFRoZXkgc2hvdWxkIGNsZWFuIGFsbCB0aGUgdGhpbmdzLg0KLS0g
+DQoyLjQ1LjANCg0K
 
