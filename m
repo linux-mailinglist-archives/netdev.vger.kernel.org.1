@@ -1,65 +1,60 @@
-Return-Path: <netdev+bounces-187988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD5EEAAAED5
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:05:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60903AAAEE2
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:06:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC69F3B7F1F
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:00:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7B2E3BCC96
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:01:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE05D2820D2;
-	Mon,  5 May 2025 23:08:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F37F12EE4A3;
+	Mon,  5 May 2025 23:09:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fZ0VWQgv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HvvwB5tv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6401438097A;
-	Mon,  5 May 2025 23:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFD343867C5;
+	Mon,  5 May 2025 23:00:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746486015; cv=none; b=i7It+gqt3e3a3iYwEBbPM6kq2aTiUyV/WeFxGS/cpVtOYpwb1nqMnENuvrY4/pb/NRvb8C75v6HWwj2csoPiZfp22ra8QrosYmqT8TiGpma3SFxXWHNFBcEn7P4lCciQqqVEBJZkR5Kc/XymCezDoiZP3vShZTuY6qoA/31JutU=
+	t=1746486041; cv=none; b=pSS1n0UcQUZ0ajOkTO4oOmTfKoj8rjP3VPv7++7p44STWItfviPgiunTWR4UQva03xCF5JHaCmdCkfxpAa+9W6Elfk2mjaCWljHPYEljha0ZRhCeM6oHgM2qZqw/hV7+fsEhxCzDm+zy2ARjI59occCuz5JJDD+f9gfMDxTq144=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746486015; c=relaxed/simple;
-	bh=o3KuwVmsFoNNM5uAAtIqemYd1E85pxI1xkOZlR7TRfE=;
+	s=arc-20240116; t=1746486041; c=relaxed/simple;
+	bh=WcgOYCt13//Gm6w2smiHXIK2M2CVcg9ou1RV1ABdh/k=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZW+/8Egd3pzgNpSCBExXvclBxsYPuXRXyMyodjqemYpqaa56XKIChhnb9aUm42SSRzuqfC0p1Af37qhvlnsHzju826gdgpNLwhaqk8EHbBqesv9ueQ+Lw/CFaKDKemyCL3B4WcLP2azEONFCK7DwXxwoFlU7WjDsjGUiqDu0NTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fZ0VWQgv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F566C4CEEF;
-	Mon,  5 May 2025 23:00:12 +0000 (UTC)
+	 MIME-Version; b=p97pH4DhAm2jOz4a7uyLMdOAJX/5cZggya8eYNX0+xF0hLHIaFSIR1xa9/kqCUa3+j/vq2kmaaTjZjc4FTMjj9Akhkef7AS9QbCcqXwByuRYUxOZpMxhthK2ZWZQyHpAKVerI0HtkjrDusEy9wzyRPSZo5PvNqXFElw0sN4vZ/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HvvwB5tv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18DA6C4CEED;
+	Mon,  5 May 2025 23:00:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746486013;
-	bh=o3KuwVmsFoNNM5uAAtIqemYd1E85pxI1xkOZlR7TRfE=;
+	s=k20201202; t=1746486041;
+	bh=WcgOYCt13//Gm6w2smiHXIK2M2CVcg9ou1RV1ABdh/k=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fZ0VWQgvDaIB8S6TruHcxXvwizvFBJruUQEzMlAP+X83C/s7ocNDEGSR+bIwRgiiK
-	 EHmd7sn7kfYqpVj0p1u1Nm7xin1/QA607/YSm6Eb46fvzM3KaMw6Vvry5acw72pnIQ
-	 pX4a1cepzCSTptKCuYMZ75nPq/c6GY90SdQlfLVsmVhRwCIev6DS4xvhR8OEYndMly
-	 qxWD8FJ9jvEt5LCioYKyMVW7QrbaX8wi8MHrkn9ZfT80KC/MHbIpFNsYEd4WHYHcEt
-	 W+Dt6VYpkWxibtCznV5Qis9HLLw5NmLA9yiBwNmlQttfQX5j0juhfJvdyj5kuTjoOS
-	 9iLNjh/xyqQew==
+	b=HvvwB5tveUgcUu6S+zNYAVlXtlK3WHbK2uqYpmDvEwICEnkU0Ihz7Qg3tl1+SaHoh
+	 9cCj8u1LvF7SM5yuVmNQOZZrI+s8s1uJQVHHmJ9CZSJBFYgOLGRIlsngqmjOkQvSf5
+	 cB72M28SF2EXOgA1/+NXknEZ4MJ3tBSFnZtoq2ZIVB/PLq7nVc5iyCuz5bqQ2W4G+i
+	 ikazhtro9wHaJ3yJYLtr5etCQZN3vx+32Bmvi4sJC2UQq8iHeuj7WF/qFFmqOzCXUA
+	 Old525+mJZT+2JSVALO4EYvzfaJ7rWtVV9EDUqooEt9AYIwBoAIQKW4VUhGxG0rT5Y
+	 rRnJBvIVwcmyA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
+Cc: Peter Seiderer <ps.report@gmx.net>,
+	Simon Horman <horms@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	alex.aring@gmail.com,
-	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wpan@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 110/294] ieee802154: ca8210: Use proper setters and getters for bitwise types
-Date: Mon,  5 May 2025 18:53:30 -0400
-Message-Id: <20250505225634.2688578-110-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 123/294] net: pktgen: fix mpls maximum labels list parsing
+Date: Mon,  5 May 2025 18:53:43 -0400
+Message-Id: <20250505225634.2688578-123-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505225634.2688578-1-sashal@kernel.org>
 References: <20250505225634.2688578-1-sashal@kernel.org>
@@ -74,75 +69,50 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.89
 Content-Transfer-Encoding: 8bit
 
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+From: Peter Seiderer <ps.report@gmx.net>
 
-[ Upstream commit 169b2262205836a5d1213ff44dca2962276bece1 ]
+[ Upstream commit 2b15a0693f70d1e8119743ee89edbfb1271b3ea8 ]
 
-Sparse complains that the driver doesn't respect the bitwise types:
+Fix mpls maximum labels list parsing up to MAX_MPLS_LABELS entries (instead
+of up to MAX_MPLS_LABELS - 1).
 
-drivers/net/ieee802154/ca8210.c:1796:27: warning: incorrect type in assignment (different base types)
-drivers/net/ieee802154/ca8210.c:1796:27:    expected restricted __le16 [addressable] [assigned] [usertype] pan_id
-drivers/net/ieee802154/ca8210.c:1796:27:    got unsigned short [usertype]
-drivers/net/ieee802154/ca8210.c:1801:25: warning: incorrect type in assignment (different base types)
-drivers/net/ieee802154/ca8210.c:1801:25:    expected restricted __le16 [addressable] [assigned] [usertype] pan_id
-drivers/net/ieee802154/ca8210.c:1801:25:    got unsigned short [usertype]
-drivers/net/ieee802154/ca8210.c:1928:28: warning: incorrect type in argument 3 (different base types)
-drivers/net/ieee802154/ca8210.c:1928:28:    expected unsigned short [usertype] dst_pan_id
-drivers/net/ieee802154/ca8210.c:1928:28:    got restricted __le16 [addressable] [usertype] pan_id
+Addresses the following:
 
-Use proper setters and getters for bitwise types.
+	$ echo "mpls 00000f00,00000f01,00000f02,00000f03,00000f04,00000f05,00000f06,00000f07,00000f08,00000f09,00000f0a,00000f0b,00000f0c,00000f0d,00000f0e,00000f0f" > /proc/net/pktgen/lo\@0
+	-bash: echo: write error: Argument list too long
 
-Note, in accordance with [1] the protocol is little endian.
-
-Link: https://www.cascoda.com/wp-content/uploads/2018/11/CA-8210_datasheet_0418.pdf [1]
-Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Link: https://lore.kernel.org/20250305105656.2133487-2-andriy.shevchenko@linux.intel.com
-Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
+Signed-off-by: Peter Seiderer <ps.report@gmx.net>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ieee802154/ca8210.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ net/core/pktgen.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-index 0a0ad3d77557f..587643a371de3 100644
---- a/drivers/net/ieee802154/ca8210.c
-+++ b/drivers/net/ieee802154/ca8210.c
-@@ -1446,8 +1446,7 @@ static u8 mcps_data_request(
- 	command.pdata.data_req.src_addr_mode = src_addr_mode;
- 	command.pdata.data_req.dst.mode = dst_address_mode;
- 	if (dst_address_mode != MAC_MODE_NO_ADDR) {
--		command.pdata.data_req.dst.pan_id[0] = LS_BYTE(dst_pan_id);
--		command.pdata.data_req.dst.pan_id[1] = MS_BYTE(dst_pan_id);
-+		put_unaligned_le16(dst_pan_id, command.pdata.data_req.dst.pan_id);
- 		if (dst_address_mode == MAC_MODE_SHORT_ADDR) {
- 			command.pdata.data_req.dst.address[0] = LS_BYTE(
- 				dst_addr->short_address
-@@ -1795,12 +1794,12 @@ static int ca8210_skb_rx(
- 	}
- 	hdr.source.mode = data_ind[0];
- 	dev_dbg(&priv->spi->dev, "srcAddrMode: %#03x\n", hdr.source.mode);
--	hdr.source.pan_id = *(u16 *)&data_ind[1];
-+	hdr.source.pan_id = cpu_to_le16(get_unaligned_le16(&data_ind[1]));
- 	dev_dbg(&priv->spi->dev, "srcPanId: %#06x\n", hdr.source.pan_id);
- 	memcpy(&hdr.source.extended_addr, &data_ind[3], 8);
- 	hdr.dest.mode = data_ind[11];
- 	dev_dbg(&priv->spi->dev, "dstAddrMode: %#03x\n", hdr.dest.mode);
--	hdr.dest.pan_id = *(u16 *)&data_ind[12];
-+	hdr.dest.pan_id = cpu_to_le16(get_unaligned_le16(&data_ind[12]));
- 	dev_dbg(&priv->spi->dev, "dstPanId: %#06x\n", hdr.dest.pan_id);
- 	memcpy(&hdr.dest.extended_addr, &data_ind[14], 8);
+diff --git a/net/core/pktgen.c b/net/core/pktgen.c
+index 359e24c3f22ca..1decd6300f34c 100644
+--- a/net/core/pktgen.c
++++ b/net/core/pktgen.c
+@@ -897,6 +897,10 @@ static ssize_t get_labels(const char __user *buffer, struct pktgen_dev *pkt_dev)
+ 	pkt_dev->nr_labels = 0;
+ 	do {
+ 		__u32 tmp;
++
++		if (n >= MAX_MPLS_LABELS)
++			return -E2BIG;
++
+ 		len = hex32_arg(&buffer[i], 8, &tmp);
+ 		if (len <= 0)
+ 			return len;
+@@ -908,8 +912,6 @@ static ssize_t get_labels(const char __user *buffer, struct pktgen_dev *pkt_dev)
+ 			return -EFAULT;
+ 		i++;
+ 		n++;
+-		if (n >= MAX_MPLS_LABELS)
+-			return -E2BIG;
+ 	} while (c == ',');
  
-@@ -1927,7 +1926,7 @@ static int ca8210_skb_tx(
- 	status =  mcps_data_request(
- 		header.source.mode,
- 		header.dest.mode,
--		header.dest.pan_id,
-+		le16_to_cpu(header.dest.pan_id),
- 		(union macaddr *)&header.dest.extended_addr,
- 		skb->len - mac_len,
- 		&skb->data[mac_len],
+ 	pkt_dev->nr_labels = n;
 -- 
 2.39.5
 
