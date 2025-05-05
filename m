@@ -1,90 +1,115 @@
-Return-Path: <netdev+bounces-187665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCA57AA89B5
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 00:16:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B6E5EAA8A8A
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 03:08:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36BE8173927
-	for <lists+netdev@lfdr.de>; Sun,  4 May 2025 22:16:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FA8E171DA4
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 01:08:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 913381D9A41;
-	Sun,  4 May 2025 22:16:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NUHxrHtB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B16C913A87C;
+	Mon,  5 May 2025 01:07:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56EEC4C62;
-	Sun,  4 May 2025 22:16:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F63101DE;
+	Mon,  5 May 2025 01:07:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746397002; cv=none; b=HaIdUBFppQpKfOJ22DpUFg3sI2jCdrKr5FsNBiPX4i9oUmPN3Qvw5IeUpJzSGg8/ufTxkKFOJKaWjxe8zSEFNP3S5FGU8Yt/AcqAdZA/9cknQTvT0rppzt/8HuvEiTVp2JZq4VW7nycwlZHSiuC49cNxDqmKOWCrSz332xnXZYk=
+	t=1746407276; cv=none; b=PAnGPtLOlBE3i6rojQo/wS9Waz6BR5EFYoQIr55XyuPt/wYF4WPwQ0F/Ua/VYl0WmzbnuxqPKourwIM18WgBafTYdpRkM35MeHXxKpdo9SHyU9its0T2jfIa2Z9DRTQGyhlHGi5vXczTgoXOzWJkE0iblSVO+A+2Abto85p9Mk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746397002; c=relaxed/simple;
-	bh=beKfR6HjFlnY/P8zdhmJ7Qq4Li2sesKeU7YVYmfZXH4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J6ZHyak+AxtCpFRHnbUHU4su1m/6jrvOWQfY1scEjB2eZrPh2FFaRizEUgDdPTN9Ltsdvu19j4cGxroB/YMZ1kng5NRsDtZtSDMz33Io1w0A9q3CYQrJNAULZYiQzUdFkq66y0F+TxWr9ANTMtiDe1/pZ4LcJMeDkVwAuoLGo4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NUHxrHtB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22F1EC4CEE7;
-	Sun,  4 May 2025 22:16:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746397001;
-	bh=beKfR6HjFlnY/P8zdhmJ7Qq4Li2sesKeU7YVYmfZXH4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=NUHxrHtB0+lM+Jk3BHUFgF+I7guI67DxCj2c83EtKDk7q+r81TQKX952AEguTEyqW
-	 oRLXC5vq65grR2aS3qVwBO/w2q3M1/hVFwXllPN9YtA2j1nVNxlUX3rA/9T1iTdd8W
-	 0a542tt4nvg8L+w0tMc34MkKVgxesdbC60MhUe1FkIryaEF/WO/u/neNlSlZZiLuCq
-	 JkUh2mfkNnMhM4bjLo/uHiH3B6pY0O4yXciya6flIjRyWpksNTKLswvZK07gOANevY
-	 ruu2i6yaNi7cQzg6p1baBU3tlE74w3IDnBe3H85fFrJzuE2gqKH0bfvWw6UPZb7vxi
-	 y/e7JE7XO6DuQ==
-Message-ID: <260b6cc3-db8b-4b4c-a360-7bdd858943a8@kernel.org>
-Date: Sun, 4 May 2025 17:16:39 -0500
+	s=arc-20240116; t=1746407276; c=relaxed/simple;
+	bh=sHK7lP3qPE4iWUk8Hu6kRNrQGDRD7chOKMPwsEvQo8o=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Bvm1wAjJ7MyEDQ/s0D3FCTECxqhRpPvB4OONqbmI5lJhi2V2ocuQDjbaZLSHDrYYZauXtI2AlvLtu9kljHM07Ggg8oVR9FueljPwrW+YOo0jK3b/km4v4ULQem9Df97AGHFvygMbP9qmDhFdLczAnY5BH/SYoQAGT+n0YCq1JzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1uBkDE-000000004ZL-12PW;
+	Mon, 05 May 2025 01:07:35 +0000
+Date: Mon, 5 May 2025 02:07:32 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Elad Yifee <eladwf@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH net v2 1/2] net: ethernet: mtk_eth_soc: reset all TX queues
+ on DMA free
+Message-ID: <c9ff9adceac4f152239a0f65c397f13547639175.1746406763.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 RESEND] clk: socfpga: agilex: add support for the Intel
- Agilex5
-To: "Gerlach, Matthew" <matthew.gerlach@altera.com>, mturquette@baylibre.com,
- sboyd@kernel.org, richardcochran@gmail.com, linux-clk@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>,
- Teh Wen Ping <wen.ping.teh@intel.com>
-References: <20250417145238.31657-1-matthew.gerlach@altera.com>
- <fd295c8b-c5fd-4fda-b5d4-3c261d8dbfeb@altera.com>
-Content-Language: en-US
-From: Dinh Nguyen <dinguyen@kernel.org>
-In-Reply-To: <fd295c8b-c5fd-4fda-b5d4-3c261d8dbfeb@altera.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 5/4/25 16:34, Gerlach, Matthew wrote:
-> 
-> 
-> On 4/17/2025 7:52 AM, Matthew Gerlach wrote:
->> From: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
->>
->> Add support for Intel's SoCFPGA Agilex5 platform. The clock manager
->> driver for the Agilex5 is very similar to the Agilex platform, so
->> it is reusing most of the Agilex clock driver code.
->>
->> Signed-off-by: Teh Wen Ping <wen.ping.teh@intel.com>
->> Reviewed-by: Dinh Nguyen <dinguyen@kernel.org>
->> Signed-off-by: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
->> Signed-off-by: Matthew Gerlach <matthew.gerlach@altera.com>
-> 
-> Is there any feedback on this patch?
-> 
+The purpose of resetting the TX queue is to reset the byte and packet
+count as well as to clear the software flow control XOFF bit.
 
-I've applied it and sent a PR for 6.16.
+MediaTek developers pointed out that netdev_reset_queue would only
+resets queue 0 of the network device.
 
-Dinh
+Queues that are not reset may cause unexpected issues.
 
+Packets may stop being sent after reset and "transmit timeout" log may
+be displayed.
+
+Import fix from MediaTek's SDK to resolve this issue.
+
+Link: https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwrt-feeds/+/319c0d9905579a46dc448579f892f364f1f84818
+Fixes: f63959c7eec31 ("net: ethernet: mtk_eth_soc: implement multi-queue support for per-port queues")
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+v2: Use netdev_tx_reset_subqueue()
+
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+index 8fda4ce80d811..53c39561b6d9a 100644
+--- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
++++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+@@ -3186,11 +3186,19 @@ static int mtk_dma_init(struct mtk_eth *eth)
+ static void mtk_dma_free(struct mtk_eth *eth)
+ {
+ 	const struct mtk_soc_data *soc = eth->soc;
+-	int i;
++	int i, j, txqs = 1;
++
++	if (MTK_HAS_CAPS(eth->soc->caps, MTK_QDMA))
++		txqs = MTK_QDMA_NUM_QUEUES;
++
++	for (i = 0; i < MTK_MAX_DEVS; i++) {
++		if (!eth->netdev[i])
++			continue;
++
++		for (j = 0; j < txqs; j++)
++			netdev_tx_reset_subqueue(eth->netdev[i], j);
++	}
+ 
+-	for (i = 0; i < MTK_MAX_DEVS; i++)
+-		if (eth->netdev[i])
+-			netdev_reset_queue(eth->netdev[i]);
+ 	if (!MTK_HAS_CAPS(soc->caps, MTK_SRAM) && eth->scratch_ring) {
+ 		dma_free_coherent(eth->dma_dev,
+ 				  MTK_QDMA_RING_SIZE * soc->tx.desc_size,
+-- 
+2.49.0
 
