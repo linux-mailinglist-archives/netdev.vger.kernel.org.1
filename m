@@ -1,67 +1,66 @@
-Return-Path: <netdev+bounces-188134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188135-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 592FDAAB47B
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 07:07:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A0FDAAB464
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 07:06:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E8A53A109E
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:01:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3274188C3E2
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:02:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CCA7226CF3;
-	Tue,  6 May 2025 00:41:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C54FA4793B5;
+	Tue,  6 May 2025 00:41:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CYMJn4W7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nRDQ+KR9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED722EFB8F;
-	Mon,  5 May 2025 23:11:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 506F0283C87;
+	Mon,  5 May 2025 23:11:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746486660; cv=none; b=l976VYO8W6HYZzO1153fB8/nTc2A9FOOxSqcKxAXyigjusixRChuS9ULvhJiEQiQuP/badJ6KakM1yblsc4gq7BREgDdMi3+wtHWZkjd213Slr3dmwK0NLOGKdrs4Fh0qdcVzXbeTE3oafp5qErJHUY9JTmdN5RvVyIlZC6g4B4=
+	t=1746486683; cv=none; b=lGURXuU2CosvtTkumPF1dWdxxhrMks84vRffrTMCqPVWzyiWHwgI+7RvVM2q/aShzVjLufSfZ2uiPKoyFE4+Df0D0nKo3ZedMFc/bfm77U8uMbz1Bn+F1YtuWr3U5v0l0jGpEfx2fCXCs1/8NQXfI45Q7Foxr7VLQ6LOt7Kjqn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746486660; c=relaxed/simple;
-	bh=sp0Bc0d0L61Rb4tMpOoh/ccLekA5iIagdLOTWh7AADM=;
+	s=arc-20240116; t=1746486683; c=relaxed/simple;
+	bh=03AKzvn2TQE81Zw15swWqMnLTPF7HbWUjCZB2G51KCQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=UoisCY/WLNJGjjawytxgpOOuV1NupqfCXVjJ8VR/Y8HalTOj3iJKR6L1jkjqTaeZbR3j/kkaR0+ycGUf/uC47i1t3/0cONqIxwCQPKLEqoEtfLDGaa8UMwfDIgAPjk/pNu402VsYV4k0deYmQ4cu8wvsDQMbg+xUw4ucRh08qDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CYMJn4W7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50A9BC4CEE4;
-	Mon,  5 May 2025 23:10:58 +0000 (UTC)
+	 MIME-Version; b=u6pI1OZrMlwVL3V85Wsgqh3htvNs2/eJ3WtpOPVF1TDllD25zoVbQ+LaNkfZWtm1ewqRJSkQDn81lmwdu65iP5bcy4jWUNreK/n7/JSN2CwJcakwBd0IRBHTVTqg+X6D8pgu5vhJ2FL0eokiZboC4jCJc41UghQ8zNVl4JaRFkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nRDQ+KR9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80542C4CEE4;
+	Mon,  5 May 2025 23:11:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746486660;
-	bh=sp0Bc0d0L61Rb4tMpOoh/ccLekA5iIagdLOTWh7AADM=;
+	s=k20201202; t=1746486682;
+	bh=03AKzvn2TQE81Zw15swWqMnLTPF7HbWUjCZB2G51KCQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CYMJn4W7A3Mbl5RXCFy+UlCuw+3n0ZVngZXHpgp6RZNnudUJp3SNHX+zrYpKhFXwC
-	 lJJ33KwP/ByauP7bQ7RUkQwddIHZqlpAMIfb4fnuBMDjV/C3/XdD+HeXsdAoOuVD+8
-	 juJpZg0Gx/ABn1i+ZyFmWX21neulIL3pzJTDPIXdIMLoQp9ByyNc2RrQQwsyPCXQgl
-	 OWxNfIZWZNtt15Oi2B8cWfUhRveaDP8T2HAZN8KpP/j1XkamPQ8J98d1c1oI7mSKJh
-	 EwGxxTbdKXpuDnYmc61w6ZCvfCBfBSAuVxVzxqjGbM51Q6FQm0OJmfK72ko5WE0wio
-	 kjPDpEVsT1/zw==
+	b=nRDQ+KR98s62FbYbO2BheQiQEqgdO9cQH1+JDxt8K2ZEqeIfeABUxPz5056ImGlzR
+	 mACjCG0/FXmnZnSpcIlp5Lz3ffpA+egmbxa2F9nyjz6Iq/zhQPt+IDMKZni7J1/V4J
+	 YJlUDhhFlJMOnS7M68lLhJHZRu91ateq80wCUrMCWFXeIH0Pf4wt+ODedU/4UXDome
+	 g6rdVwbg3rYiOha/rvnRlGsuVaI2qw5uAyHGKVsk1CTLFCvSHH3KbA6Qx5FuUSyaOu
+	 ut5mvkBx87SqUd+rYBEhz1svm0aTCLvfJkmUbrEIFln1DTcURQLm3lyFWKsVt1G8Hd
+	 aHq9pvPE8dzaw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Jason Xing <kerneljasonxing@gmail.com>,
-	Martin KaFai Lau <martin.lau@kernel.org>,
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
 	Sasha Levin <sashal@kernel.org>,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
 	ast@kernel.org,
 	daniel@iogearbox.net,
-	andrii@kernel.org,
-	edumazet@google.com,
-	ncardwell@google.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	martin.lau@linux.dev,
-	dsahern@kernel.org,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 142/212] bpf: Prevent unsafe access to the sock fields in the BPF timestamping callback
-Date: Mon,  5 May 2025 19:05:14 -0400
-Message-Id: <20250505230624.2692522-142-sashal@kernel.org>
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.1 148/212] eth: mlx4: don't try to complete XDP frames in netpoll
+Date: Mon,  5 May 2025 19:05:20 -0400
+Message-Id: <20250505230624.2692522-148-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505230624.2692522-1-sashal@kernel.org>
 References: <20250505230624.2692522-1-sashal@kernel.org>
@@ -76,146 +75,36 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.1.136
 Content-Transfer-Encoding: 8bit
 
-From: Jason Xing <kerneljasonxing@gmail.com>
+From: Jakub Kicinski <kuba@kernel.org>
 
-[ Upstream commit fd93eaffb3f977b23bc0a48d4c8616e654fcf133 ]
+[ Upstream commit 8fdeafd66edaf420ea0063a1f13442fe3470fe70 ]
 
-The subsequent patch will implement BPF TX timestamping. It will
-call the sockops BPF program without holding the sock lock.
+mlx4 doesn't support ndo_xdp_xmit / XDP_REDIRECT and wasn't
+using page pool until now, so it could run XDP completions
+in netpoll (NAPI budget == 0) just fine. Page pool has calling
+context requirements, make sure we don't try to call it from
+what is potentially HW IRQ context.
 
-This breaks the current assumption that all sock ops programs will
-hold the sock lock. The sock's fields of the uapi's bpf_sock_ops
-requires this assumption.
-
-To address this, a new "u8 is_locked_tcp_sock;" field is added. This
-patch sets it in the current sock_ops callbacks. The "is_fullsock"
-test is then replaced by the "is_locked_tcp_sock" test during
-sock_ops_convert_ctx_access().
-
-The new TX timestamping callbacks added in the subsequent patch will
-not have this set. This will prevent unsafe access from the new
-timestamping callbacks.
-
-Potentially, we could allow read-only access. However, this would
-require identifying which callback is read-safe-only and also requires
-additional BPF instruction rewrites in the covert_ctx. Since the BPF
-program can always read everything from a socket (e.g., by using
-bpf_core_cast), this patch keeps it simple and disables all read
-and write access to any socket fields through the bpf_sock_ops
-UAPI from the new TX timestamping callback.
-
-Moreover, note that some of the fields in bpf_sock_ops are specific
-to tcp_sock, and sock_ops currently only supports tcp_sock. In
-the future, UDP timestamping will be added, which will also break
-this assumption. The same idea used in this patch will be reused.
-Considering that the current sock_ops only supports tcp_sock, the
-variable is named is_locked_"tcp"_sock.
-
-Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
-Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
-Link: https://patch.msgid.link/20250220072940.99994-4-kerneljasonxing@gmail.com
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+Link: https://patch.msgid.link/20250213010635.1354034-3-kuba@kernel.org
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- include/linux/filter.h | 1 +
- include/net/tcp.h      | 1 +
- net/core/filter.c      | 8 ++++----
- net/ipv4/tcp_input.c   | 2 ++
- net/ipv4/tcp_output.c  | 2 ++
- 5 files changed, 10 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/mellanox/mlx4/en_tx.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/include/linux/filter.h b/include/linux/filter.h
-index f3ef1a8965bb2..09cc8fb735f02 100644
---- a/include/linux/filter.h
-+++ b/include/linux/filter.h
-@@ -1319,6 +1319,7 @@ struct bpf_sock_ops_kern {
- 	void	*skb_data_end;
- 	u8	op;
- 	u8	is_fullsock;
-+	u8	is_locked_tcp_sock;
- 	u8	remaining_opt_len;
- 	u64	temp;			/* temp and everything after is not
- 					 * initialized to 0 before calling
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 83e0362e3b721..63caa3181dfe6 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -2409,6 +2409,7 @@ static inline int tcp_call_bpf(struct sock *sk, int op, u32 nargs, u32 *args)
- 	memset(&sock_ops, 0, offsetof(struct bpf_sock_ops_kern, temp));
- 	if (sk_fullsock(sk)) {
- 		sock_ops.is_fullsock = 1;
-+		sock_ops.is_locked_tcp_sock = 1;
- 		sock_owned_by_me(sk);
- 	}
+diff --git a/drivers/net/ethernet/mellanox/mlx4/en_tx.c b/drivers/net/ethernet/mellanox/mlx4/en_tx.c
+index 7fccf1a79f09b..95eae224bbb4a 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/en_tx.c
++++ b/drivers/net/ethernet/mellanox/mlx4/en_tx.c
+@@ -446,6 +446,8 @@ int mlx4_en_process_tx_cq(struct net_device *dev,
  
-diff --git a/net/core/filter.c b/net/core/filter.c
-index d713696d0832a..abf489c2ed102 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -10239,10 +10239,10 @@ static u32 sock_ops_convert_ctx_access(enum bpf_access_type type,
- 		}							      \
- 		*insn++ = BPF_LDX_MEM(BPF_FIELD_SIZEOF(			      \
- 						struct bpf_sock_ops_kern,     \
--						is_fullsock),		      \
-+						is_locked_tcp_sock),	      \
- 				      fullsock_reg, si->src_reg,	      \
- 				      offsetof(struct bpf_sock_ops_kern,      \
--					       is_fullsock));		      \
-+					       is_locked_tcp_sock));	      \
- 		*insn++ = BPF_JMP_IMM(BPF_JEQ, fullsock_reg, 0, jmp);	      \
- 		if (si->dst_reg == si->src_reg)				      \
- 			*insn++ = BPF_LDX_MEM(BPF_DW, reg, si->src_reg,	      \
-@@ -10327,10 +10327,10 @@ static u32 sock_ops_convert_ctx_access(enum bpf_access_type type,
- 					       temp));			      \
- 		*insn++ = BPF_LDX_MEM(BPF_FIELD_SIZEOF(			      \
- 						struct bpf_sock_ops_kern,     \
--						is_fullsock),		      \
-+						is_locked_tcp_sock),	      \
- 				      reg, si->dst_reg,			      \
- 				      offsetof(struct bpf_sock_ops_kern,      \
--					       is_fullsock));		      \
-+					       is_locked_tcp_sock));	      \
- 		*insn++ = BPF_JMP_IMM(BPF_JEQ, reg, 0, 2);		      \
- 		*insn++ = BPF_LDX_MEM(BPF_FIELD_SIZEOF(			      \
- 						struct bpf_sock_ops_kern, sk),\
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index db1a99df29d55..16f4a41a068e4 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -168,6 +168,7 @@ static void bpf_skops_parse_hdr(struct sock *sk, struct sk_buff *skb)
- 	memset(&sock_ops, 0, offsetof(struct bpf_sock_ops_kern, temp));
- 	sock_ops.op = BPF_SOCK_OPS_PARSE_HDR_OPT_CB;
- 	sock_ops.is_fullsock = 1;
-+	sock_ops.is_locked_tcp_sock = 1;
- 	sock_ops.sk = sk;
- 	bpf_skops_init_skb(&sock_ops, skb, tcp_hdrlen(skb));
+ 	if (unlikely(!priv->port_up))
+ 		return 0;
++	if (unlikely(!napi_budget) && cq->type == TX_XDP)
++		return 0;
  
-@@ -184,6 +185,7 @@ static void bpf_skops_established(struct sock *sk, int bpf_op,
- 	memset(&sock_ops, 0, offsetof(struct bpf_sock_ops_kern, temp));
- 	sock_ops.op = bpf_op;
- 	sock_ops.is_fullsock = 1;
-+	sock_ops.is_locked_tcp_sock = 1;
- 	sock_ops.sk = sk;
- 	/* sk with TCP_REPAIR_ON does not have skb in tcp_finish_connect */
- 	if (skb)
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 40568365cdb3b..2f109f1968253 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -509,6 +509,7 @@ static void bpf_skops_hdr_opt_len(struct sock *sk, struct sk_buff *skb,
- 		sock_owned_by_me(sk);
- 
- 		sock_ops.is_fullsock = 1;
-+		sock_ops.is_locked_tcp_sock = 1;
- 		sock_ops.sk = sk;
- 	}
- 
-@@ -554,6 +555,7 @@ static void bpf_skops_write_hdr_opt(struct sock *sk, struct sk_buff *skb,
- 		sock_owned_by_me(sk);
- 
- 		sock_ops.is_fullsock = 1;
-+		sock_ops.is_locked_tcp_sock = 1;
- 		sock_ops.sk = sk;
- 	}
+ 	netdev_txq_bql_complete_prefetchw(ring->tx_queue);
  
 -- 
 2.39.5
