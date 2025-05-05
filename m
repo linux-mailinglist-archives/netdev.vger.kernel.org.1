@@ -1,62 +1,64 @@
-Return-Path: <netdev+bounces-187995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AACC1AAAEF6
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:08:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CE8CAAAF2D
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:12:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF67E1BA391F
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:04:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 916D31BA2C39
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:08:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CD2C2F1CFD;
-	Mon,  5 May 2025 23:12:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D2823AA170;
+	Mon,  5 May 2025 23:18:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U4zIygeo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oBUKLEM0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF15238C411;
-	Mon,  5 May 2025 23:01:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D7A392601;
+	Mon,  5 May 2025 23:03:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746486091; cv=none; b=JyajLG99dwSQgbBkDo8MHUvLa13hZ8Qh8dgPEPKcS8UYjWTOmhzClf9vCMIStFT0g4FSu4x8HRbMUOm+xGaZ0vTUqP/o3Vkr0+QCOUN08HkzZhEiphII3t67cfzZLlYw4ALypIGvBj95kyPmP0L0VT+LA7eXl1em0weTX82CHZ4=
+	t=1746486189; cv=none; b=MaGAnMAP39zEKixwsF5ooVaQRFtrP3EmXqm8VhLBGKOrQIpjbWiBJ2XqBs4Mhj4VkVhpjGtgLaKdF6XebVK3yXyVKYD3QX25T6OxSUN4qV7/E+x+tXzwKaIu0gscDL73Sw9fY0oa95lEwv4YwmwC/6OsqrZaTLVnuF6WO4Bb5RQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746486091; c=relaxed/simple;
-	bh=7vZJ/qgoHpmHGdqWagURVrg/UArHS/UJRLHVDnt/V3I=;
+	s=arc-20240116; t=1746486189; c=relaxed/simple;
+	bh=Q4X4RMQLPMf/g1HsGnmghAs5fbLu0Gn6jjGsgWRUALs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aEhGkaJV9YiwpO5kMS8fpQb1WZWRerCTVDfaY3Neb42AIAFeSCnCF1c/P3k1XpWAaHae0aaUCpu20VkH00qaYE8nYfJM71P0imkUjUQdbo06/ReKbIp01JP12Y9NusANIIaVQ4+CA180p8Jjy44FftelJ3gQUP8OOS+uVffQhks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U4zIygeo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AEBDC4CEF1;
-	Mon,  5 May 2025 23:01:28 +0000 (UTC)
+	 MIME-Version; b=UDCBR/T11JP8acp6dZsaDoaerYPnbzIPHQf6e9lQzKSiod6uKZIknpBImwqmmMA62K0MPwtS/6VAyEnCvszlRQgmP9JLUp9ZMYK6KnW3i4vRBWJzH4yp0Plp/tmEOD4RNPCUoto1Bvhu44kpEofxvrMdxQxLxUkF3ayDYluubYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oBUKLEM0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3DD2C4CEE4;
+	Mon,  5 May 2025 23:03:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746486090;
-	bh=7vZJ/qgoHpmHGdqWagURVrg/UArHS/UJRLHVDnt/V3I=;
+	s=k20201202; t=1746486189;
+	bh=Q4X4RMQLPMf/g1HsGnmghAs5fbLu0Gn6jjGsgWRUALs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=U4zIygeoytiXMsrrGgg5YnqMZg99sApFMjBd3jFAx+/d2Gl+2wmiVmsA6udz29fn9
-	 mNcxrhG/y+PvySSGtrvV33Dx6geLS+sUX0RbBFhT02jS+G7C2Wn/FT9MCJEEfI74KU
-	 3ekuED9nm8DKa+yMR5tKgcQ1jWtqN8YP2LbVTNv7m2gZv7SAy30dsR+rnAs/qnmC5K
-	 6HmtDY4+75w+/q4PWJlm21lWdz7IbckebY+2qrpvSZ2XkKsm5G8I88JmG7Lmajw+Wi
-	 s8LucJQiwgKRzRkXV+BOTrSlt+9fc4O/BOEPYVsa4yiemjeZpv84tbKs4ZSF7SIF3s
-	 ctAO1YGGJxjwA==
+	b=oBUKLEM09px+gg6olBWzjCC2xQ86FWo++Rj/AA/70wCeAk0xZaTuSKWgptjxmyjtb
+	 Wf7rTKzRT5NG6e8pd66Dd0jwdaQxZNoveZB03QIL30+iWbLB3nxDpHHQkKtLG/U9FQ
+	 xDZydQS1aU6YbqcJsTpjGB0AptvS8Wcvyg78yiVMQMci+4Tx7vYRw6WEnLKEzdHSdt
+	 xRurlycoN2Ixr5sau4cQCiSlzqwv32f0qwlpr7rp4qzHbaIvvR+WuKRGqXaZEK050H
+	 ah6DSM8nty1kSkQA+A0G7LscaN0LRS87PJYIptjqV3nPcC+l2n4GoPF9MGdgkWsONy
+	 ugGopFNcF5sUQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Hangbin Liu <liuhangbin@gmail.com>,
+Cc: Petr Machata <petrm@nvidia.com>,
+	Ido Schimmel <idosch@nvidia.com>,
 	Nikolay Aleksandrov <razor@blackwall.org>,
-	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	jv@jvosburgh.net,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
-	pabeni@redhat.com,
+	kuba@kernel.org,
+	menglong8.dong@gmail.com,
+	gnault@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 150/294] bonding: report duplicate MAC address in all situations
-Date: Mon,  5 May 2025 18:54:10 -0400
-Message-Id: <20250505225634.2688578-150-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 194/294] vxlan: Join / leave MC group after remote changes
+Date: Mon,  5 May 2025 18:54:54 -0400
+Message-Id: <20250505225634.2688578-194-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505225634.2688578-1-sashal@kernel.org>
 References: <20250505225634.2688578-1-sashal@kernel.org>
@@ -66,48 +68,116 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.89
 Content-Transfer-Encoding: 8bit
 
-From: Hangbin Liu <liuhangbin@gmail.com>
+From: Petr Machata <petrm@nvidia.com>
 
-[ Upstream commit 28d68d396a1cd21591e8c6d74afbde33a7ea107e ]
+[ Upstream commit d42d543368343c0449a4e433b5f02e063a86209c ]
 
-Normally, a bond uses the MAC address of the first added slave as the bond’s
-MAC address. And the bond will set active slave’s MAC address to bond’s
-address if fail_over_mac is set to none (0) or follow (2).
+When a vxlan netdevice is brought up, if its default remote is a multicast
+address, the device joins the indicated group.
 
-When the first slave is removed, the bond will still use the removed slave’s
-MAC address, which can lead to a duplicate MAC address and potentially cause
-issues with the switch. To avoid confusion, let's warn the user in all
-situations, including when fail_over_mac is set to 2 or not in active-backup
-mode.
+Therefore when the multicast remote address changes, the device should
+leave the current group and subscribe to the new one. Similarly when the
+interface used for endpoint communication is changed in a situation when
+multicast remote is configured. This is currently not done.
 
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+Both vxlan_igmp_join() and vxlan_igmp_leave() can however fail. So it is
+possible that with such fix, the netdevice will end up in an inconsistent
+situation where the old group is not joined anymore, but joining the new
+group fails. Should we join the new group first, and leave the old one
+second, we might end up in the opposite situation, where both groups are
+joined. Undoing any of this during rollback is going to be similarly
+problematic.
+
+One solution would be to just forbid the change when the netdevice is up.
+However in vnifilter mode, changing the group address is allowed, and these
+problems are simply ignored (see vxlan_vni_update_group()):
+
+ # ip link add name br up type bridge vlan_filtering 1
+ # ip link add vx1 up master br type vxlan external vnifilter local 192.0.2.1 dev lo dstport 4789
+ # bridge vni add dev vx1 vni 200 group 224.0.0.1
+ # tcpdump -i lo &
+ # bridge vni add dev vx1 vni 200 group 224.0.0.2
+ 18:55:46.523438 IP 0.0.0.0 > 224.0.0.22: igmp v3 report, 1 group record(s)
+ 18:55:46.943447 IP 0.0.0.0 > 224.0.0.22: igmp v3 report, 1 group record(s)
+ # bridge vni
+ dev               vni                group/remote
+ vx1               200                224.0.0.2
+
+Having two different modes of operation for conceptually the same interface
+is silly, so in this patch, just do what the vnifilter code does and deal
+with the errors by crossing fingers real hard.
+
+The vnifilter code leaves old before joining new, and in case of join /
+leave failures does not roll back the configuration changes that have
+already been applied, but bails out of joining if it could not leave. Do
+the same here: leave before join, apply changes unconditionally and do not
+attempt to join if we couldn't leave.
+
+Signed-off-by: Petr Machata <petrm@nvidia.com>
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
-Link: https://patch.msgid.link/20250225033914.18617-1-liuhangbin@gmail.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/bonding/bond_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/vxlan/vxlan_core.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 7eb62fe55947f..56c241246d1af 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -2469,7 +2469,7 @@ static int __bond_release_one(struct net_device *bond_dev,
+diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+index 64db3e98a1b66..822cf49d82676 100644
+--- a/drivers/net/vxlan/vxlan_core.c
++++ b/drivers/net/vxlan/vxlan_core.c
+@@ -4240,6 +4240,7 @@ static int vxlan_changelink(struct net_device *dev, struct nlattr *tb[],
+ 			    struct netlink_ext_ack *extack)
+ {
+ 	struct vxlan_dev *vxlan = netdev_priv(dev);
++	bool rem_ip_changed, change_igmp;
+ 	struct net_device *lowerdev;
+ 	struct vxlan_config conf;
+ 	struct vxlan_rdst *dst;
+@@ -4263,8 +4264,13 @@ static int vxlan_changelink(struct net_device *dev, struct nlattr *tb[],
+ 	if (err)
+ 		return err;
  
- 	RCU_INIT_POINTER(bond->current_arp_slave, NULL);
++	rem_ip_changed = !vxlan_addr_equal(&conf.remote_ip, &dst->remote_ip);
++	change_igmp = vxlan->dev->flags & IFF_UP &&
++		      (rem_ip_changed ||
++		       dst->remote_ifindex != conf.remote_ifindex);
++
+ 	/* handle default dst entry */
+-	if (!vxlan_addr_equal(&conf.remote_ip, &dst->remote_ip)) {
++	if (rem_ip_changed) {
+ 		u32 hash_index = fdb_head_index(vxlan, all_zeros_mac, conf.vni);
  
--	if (!all && (!bond->params.fail_over_mac ||
-+	if (!all && (bond->params.fail_over_mac != BOND_FOM_ACTIVE ||
- 		     BOND_MODE(bond) != BOND_MODE_ACTIVEBACKUP)) {
- 		if (ether_addr_equal_64bits(bond_dev->dev_addr, slave->perm_hwaddr) &&
- 		    bond_has_slaves(bond))
+ 		spin_lock_bh(&vxlan->hash_lock[hash_index]);
+@@ -4308,6 +4314,9 @@ static int vxlan_changelink(struct net_device *dev, struct nlattr *tb[],
+ 		}
+ 	}
+ 
++	if (change_igmp && vxlan_addr_multicast(&dst->remote_ip))
++		err = vxlan_multicast_leave(vxlan);
++
+ 	if (conf.age_interval != vxlan->cfg.age_interval)
+ 		mod_timer(&vxlan->age_timer, jiffies);
+ 
+@@ -4315,7 +4324,12 @@ static int vxlan_changelink(struct net_device *dev, struct nlattr *tb[],
+ 	if (lowerdev && lowerdev != dst->remote_dev)
+ 		dst->remote_dev = lowerdev;
+ 	vxlan_config_apply(dev, &conf, lowerdev, vxlan->net, true);
+-	return 0;
++
++	if (!err && change_igmp &&
++	    vxlan_addr_multicast(&dst->remote_ip))
++		err = vxlan_multicast_join(vxlan);
++
++	return err;
+ }
+ 
+ static void vxlan_dellink(struct net_device *dev, struct list_head *head)
 -- 
 2.39.5
 
