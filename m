@@ -1,51 +1,52 @@
-Return-Path: <netdev+bounces-187864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4126EAA9F03
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 00:17:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CE18AA9F5A
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 00:22:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1617A1A81D5A
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 22:18:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C26A03B7A78
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 22:22:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91E1827C841;
-	Mon,  5 May 2025 22:14:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94A6B2820B9;
+	Mon,  5 May 2025 22:15:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="exGn1nF2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ppOT3UVk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C0827C17C;
-	Mon,  5 May 2025 22:14:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 648532820B5;
+	Mon,  5 May 2025 22:15:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746483283; cv=none; b=e5vbjDn6Xop1l05xoMhzBnz8YWO6rswHU8D172T/hvzka0y+nbW7ZDT/rz1Ig16tAgjAQEz0OL/bdf/ZENVAccyJxYswCNPv/DUNqMC9g28bDS5Rki4qgYZdiBSxeHHfwlyRzUxVJniiFpxOJ2NN5V8jJVP9V+U9FOpRcjw7UGk=
+	t=1746483324; cv=none; b=PY0Bjns12rQdvZJtkpCWyk4jlGQr18MVuAhrMD7niPrTKWlQyS4Im+kWKt6vIJ7+uH4cMQZfoNwXx6UzAtaIu0l+slHq5HKD0nnkTMNSZXWEe1K1/kXzKoW1vmKaAoFGwaz2MGkiSzPWCPHMiIQAa32gZ8suPfShwyMs+IefnhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746483283; c=relaxed/simple;
-	bh=qHENiOabmT77UFCXK7h2Oxu5/iLS0ySjclWVOhKY/ws=;
+	s=arc-20240116; t=1746483324; c=relaxed/simple;
+	bh=jTQOrB6egtLeBV+5u8WXazKOAGwD6P3SZZKw7rNqx50=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=plXIpQ8Z+qvmNhw2smJlF7bk0JZnY1op6wNmRJycmElDwNEtgTgqo4hi0pEbxeJrW68lVyRvbZ2KB7j/n83g3tcEbGMPLr5w+N2fjMbNs293VQQBUYhRhB6+EGJN5iXAIij1o6Fw0kPD4jkQebUU7VG9n45iu4RG7j6t5r+HHMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=exGn1nF2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B71BAC4CEF1;
-	Mon,  5 May 2025 22:14:41 +0000 (UTC)
+	 MIME-Version; b=bJZi4u9oB7/a+y4sIPPfnLTeQdJTfKkogA2zFOpIlPG89HVYfWQyN/v94wBvoQEq8g1jeyPM7N70qf0mr69TN7G5ZMTfhHqsj1Hwqz9opsTXXuUi2WeCAcG2NMip2v0SUuz7+t5174QDW+9ZHC9Eyl2o+Mec1DRbdJHWgh+gGes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ppOT3UVk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 473FBC4CEF2;
+	Mon,  5 May 2025 22:15:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746483283;
-	bh=qHENiOabmT77UFCXK7h2Oxu5/iLS0ySjclWVOhKY/ws=;
+	s=k20201202; t=1746483323;
+	bh=jTQOrB6egtLeBV+5u8WXazKOAGwD6P3SZZKw7rNqx50=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=exGn1nF211ZU/LdpgClgOJDYWbadM9ACef62sLsYsKlQaKaBD9/U92KjM4xQk2VNg
-	 CHDNDd6eFg4RQTdxdFhx6kDQPRsl25DnGEOMtk9E0LfUziLaivwD9NeumKAqhaTDDZ
-	 7FsRSUvyK9uaLs70sNqDX+Ndvvm1+XcvxydOypB8CTVdH4UKjn07MPBkr7XWUlMyc3
-	 N6cO4igFVe/KftxBPZOUZEaG3jYyjrgjCCaVwNyr3NS9NVquaGperDaupUov/ScelR
-	 8ng+n7NrPBrEUuQuGkYkRWnrYNttTfdFW0y2idmSe8gnM0yR7Nb+/lW5OKq3W8T8Kv
-	 nvPL3EqRCNxmA==
+	b=ppOT3UVk/lHZ2zD7zKgzG2aRTJP4/IVLyHl2ms4nlKtKUdmYoS6a9z/PmUIeVgVp8
+	 6uENeOltlKTxVzs+aAHWF/Jzw0Fir3LZUpmIzOA+Bi998uzHvK86gZZeHx7GELKBKB
+	 wf5Dr7ldRllyHxG6BcSZ6aWHwkV7F2wDQ/Qtqbxm/8HYnTLA5VzbHw6IXqd2BNKdco
+	 Lu/6/LxYaIoPkG0SGQQ0Htm1cixWBL1UAtP1DCi3L7iUs6/Zwv82+hj5noO+zG+5T/
+	 zAL4fG3aF9SzdbPiD7DnQSerKJt8QyAhsm4YmJ1Ebsw8RMnPLh82H41FLquAb+tTqI
+	 FAPYqk5sk2QRA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
 Cc: Trond Myklebust <trond.myklebust@hammerspace.com>,
 	Jeff Layton <jlayton@kernel.org>,
+	Benjamin Coddington <bcodding@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
 	chuck.lever@oracle.com,
 	trondmy@kernel.org,
@@ -56,9 +57,9 @@ Cc: Trond Myklebust <trond.myklebust@hammerspace.com>,
 	pabeni@redhat.com,
 	linux-nfs@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.14 014/642] SUNRPC: Don't allow waiting for exiting tasks
-Date: Mon,  5 May 2025 18:03:50 -0400
-Message-Id: <20250505221419.2672473-14-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.14 033/642] SUNRPC: rpc_clnt_set_transport() must not change the autobind setting
+Date: Mon,  5 May 2025 18:04:09 -0400
+Message-Id: <20250505221419.2672473-33-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505221419.2672473-1-sashal@kernel.org>
 References: <20250505221419.2672473-1-sashal@kernel.org>
@@ -75,31 +76,34 @@ Content-Transfer-Encoding: 8bit
 
 From: Trond Myklebust <trond.myklebust@hammerspace.com>
 
-[ Upstream commit 14e41b16e8cb677bb440dca2edba8b041646c742 ]
+[ Upstream commit bf9be373b830a3e48117da5d89bb6145a575f880 ]
 
-Once a task calls exit_signals() it can no longer be signalled. So do
-not allow it to do killable waits.
+The autobind setting was supposed to be determined in rpc_create(),
+since commit c2866763b402 ("SUNRPC: use sockaddr + size when creating
+remote transport endpoints").
 
 Reviewed-by: Jeff Layton <jlayton@kernel.org>
+Reviewed-by: Benjamin Coddington <bcodding@redhat.com>
 Signed-off-by: Trond Myklebust <trond.myklebust@hammerspace.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/sunrpc/sched.c | 2 ++
- 1 file changed, 2 insertions(+)
+ net/sunrpc/clnt.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/net/sunrpc/sched.c b/net/sunrpc/sched.c
-index 9b45fbdc90cab..73bc39281ef5f 100644
---- a/net/sunrpc/sched.c
-+++ b/net/sunrpc/sched.c
-@@ -276,6 +276,8 @@ EXPORT_SYMBOL_GPL(rpc_destroy_wait_queue);
+diff --git a/net/sunrpc/clnt.c b/net/sunrpc/clnt.c
+index 2fe88ea79a70c..c9c5f0caef6bd 100644
+--- a/net/sunrpc/clnt.c
++++ b/net/sunrpc/clnt.c
+@@ -270,9 +270,6 @@ static struct rpc_xprt *rpc_clnt_set_transport(struct rpc_clnt *clnt,
+ 	old = rcu_dereference_protected(clnt->cl_xprt,
+ 			lockdep_is_held(&clnt->cl_lock));
  
- static int rpc_wait_bit_killable(struct wait_bit_key *key, int mode)
- {
-+	if (unlikely(current->flags & PF_EXITING))
-+		return -EINTR;
- 	schedule();
- 	if (signal_pending_state(mode, current))
- 		return -ERESTARTSYS;
+-	if (!xprt_bound(xprt))
+-		clnt->cl_autobind = 1;
+-
+ 	clnt->cl_timeout = timeout;
+ 	rcu_assign_pointer(clnt->cl_xprt, xprt);
+ 	spin_unlock(&clnt->cl_lock);
 -- 
 2.39.5
 
