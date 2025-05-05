@@ -1,121 +1,269 @@
-Return-Path: <netdev+bounces-187810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99F60AA9B80
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 20:26:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 24423AA9B95
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 20:33:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EAED17E869
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 18:26:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E0D9170FDD
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 18:33:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1DAC1F5849;
-	Mon,  5 May 2025 18:25:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B496126B097;
+	Mon,  5 May 2025 18:33:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="oXgKrURw"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="qs2smi/h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ADFD26F473
-	for <netdev@vger.kernel.org>; Mon,  5 May 2025 18:25:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA0434CF5;
+	Mon,  5 May 2025 18:33:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746469544; cv=none; b=I83ZFVAZsNzikdUXJ4Iem8nHyh3riXRGiGiurtwkN6yPLAhlRGZkyWWU6+7Yr+dDKoyoHN5nyW+f+V+aZB31iV/mZdF1xyM7ll62gN6OLk36mR7GBug3poT5L3H+LWhCq1NtSVweai3miZ0y4Wf8Xdgxfhix52T4MclsBoMA4xA=
+	t=1746470012; cv=none; b=s0x3MczJ/IYK79Y+St3BnvZJXklqWTc2EoQlBwiuKsYKVVc6sFAE40n05/jZDGd5zK9loc60IqWBCkvV3MRCwB6BUM4Cf+mwvWqQUmXMDY86ipNcuiAMQrhsrLhpp/FOx9G+kcZn7zBNaMVMYaz6x3EAGH8RV71ioPW5qDiBXbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746469544; c=relaxed/simple;
-	bh=PL3tk9SXF+UboYZB1OAYc7v5izuRyE7yzyGHDTvmbUs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=If8SI5wMqAeoeNoQHYzUoQltvKTzry75ccyWpJeYPv4TbW/CHWZ7jmp/4VLhPTubxLsTkbGfSVEQvoPi4YEsRHh2UoFKfDKqsQpPwnYM4Ssx1CqZHFfB4pJH/ei19tg14ItVDX+xZQw8PfqNyTRp1BzFdAq993JWHUGQb2PVp18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=oXgKrURw; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-736a7e126c7so4286101b3a.3
-        for <netdev@vger.kernel.org>; Mon, 05 May 2025 11:25:42 -0700 (PDT)
+	s=arc-20240116; t=1746470012; c=relaxed/simple;
+	bh=HXO5JcDo80JaOhk9cK0Fhw9BSR/xmOMPB4eD9xgN0xI=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IsnOLEr/a1ph0OC4HvFL7khpG7+Q2jOKXo7ynmhppUCs3aWXk8+uzcunhPJm/UrZH3gTUiYvTrD7iNSSJyxg8tiHGRElVOVd2JPmR5n2cjARFWgSlnwRRf2AtfjK6nPF4MjR43ka0MjmoknmEkdeCnQvnisKOpuxJ+sBfEmQUBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=qs2smi/h; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1746469542; x=1747074342; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=aY1QPXBAxiPqA6SnBidclDpjSSn+hCgvII34RjFoNsM=;
-        b=oXgKrURwI6OEwMyLmMWjpoDlPMC/uztkHBJxQxN8pCCpDDpPmpiejbnZTRpGQrmO8/
-         Et0Q6tv3ShbQEUNQgbJzTTvFHjGPx4qwQSBKjlo9Zf/6FWe2I6H/SRFQLmS9jM14u6JW
-         wHIyEHA7IDE8DPk0w3OBQcspXRzzr4LsDIMknxdceGUMuKN2HGC6pHAHVKyjje0vQz+M
-         9PIz4Ecdqk/JrTCSHcsm6tMfJFBilRwgs0Iqvg/xwgEQ1CvhmcgWdlAjHspD36QHUJzR
-         9BQxSKSYPD8Lt6Ebwa/8Qn+p0P2mfpSEGlhoBIX7+ryC/H0ZdQrUHihJBI6h7ckpp6MX
-         FghA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746469542; x=1747074342;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aY1QPXBAxiPqA6SnBidclDpjSSn+hCgvII34RjFoNsM=;
-        b=Ml7wcH4L9VYLlJ1+e+sYbEL8/Tkyc5UxqkNyqUlf/vDKzpp0hu2J58vixcZegp0CyL
-         CPr+nsWlbbHjr9G5MbjSSCyAQyQ/cZubKL30kPIZ70Orz6YDB+g7sGIyG8lyKl7TFd0T
-         Z9Z/w2Z//CjAA6WO9Uv/uFL3Z3m4LS4/u2aq4ibjQ1ILEIPqJG7IWCnd4TTPyxVgh659
-         tQCP+Tz4EaVvYPbF7po0NJJejlJO6sru4M3Axf7T/0m8/mJtRFMLeRFgZ2uqfKLZ4YMD
-         Wx65hTWvRH0BUKOSRnsGiywx52bjSDp7/4Qxu2MhVBG4zyqidn7fzrTotNkFx5jRUC4d
-         /1RA==
-X-Forwarded-Encrypted: i=1; AJvYcCWGPzL91bRrWT5HSRaOxAf8qShR5fZM21IkDOaNe6JmAM7s8cLs2Dr1U9T0aR8ZlaDQZIe8MYM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFNzSBXV3QwraOp0YaDA0b7cdpG0F94HZr/uLdkxD7Ux78Yzvh
-	E6fh+YVKbgpHh24s7hwgogG60hEBKAKMq4+C6tWSIFaU0jaRPrQj6wnu3THoyAY=
-X-Gm-Gg: ASbGncscD/bd3K5YONU5e0n1VrphTJ+3hCEEMgz+8gd7EK/0cYCgn4jWuuGv+1QH6O6
-	jiS7jvnPdsgEzFTuX93oifjjBFZ3yY/QOCDmAHC7UzyaHmAfu6ifsYDDhUxCJipZqZOAR4/NrLQ
-	YzoRVqI6puR8WuT4Xb+6yKcWZ5NCoj7zOpmCdPzPevZVWbMNqWtbemK57H/zpmSL6mCpr8+qzkE
-	BA0IRhZ1XLbc8PltaF3CtFP1XgIuk3BzBYm4ivrCL9UllanPO5A24hXSJHx7WZtSHyu93Hvdm/G
-	1PKjb2AwDVfvAvsTkH7vEBcqmz1GBnxHQx3zyPCirWY8DVz1wzmwUJ9OxTDSwwszBZRKrx71E+J
-	Zjb/t7gtjYMKHeg==
-X-Google-Smtp-Source: AGHT+IH3yTyd9CoIyRroGXYmPmIhboNx21rq/5kk83cwVyajvIvLqyoxpARKz16cpW7XwQ676c59XA==
-X-Received: by 2002:a05:6a00:f0b:b0:73c:b86:b47f with SMTP id d2e1a72fcca58-740919adee9mr296339b3a.4.1746469541836;
-        Mon, 05 May 2025 11:25:41 -0700 (PDT)
-Received: from ?IPV6:2a03:83e0:1156:1:1079:4a23:3f58:8abc? ([2620:10d:c090:500::4:906f])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74058dbbaa2sm7385228b3a.57.2025.05.05.11.25.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 May 2025 11:25:41 -0700 (PDT)
-Message-ID: <88dedab9-369b-48ab-9c3d-87af9c6a828f@davidwei.uk>
-Date: Mon, 5 May 2025 11:25:39 -0700
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1746470011; x=1778006011;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=KmnKyyPy8iUgcNbmIz3b3IApAhNbCnLedsjN4F9Uwb0=;
+  b=qs2smi/hdp+Hg2DcoQK/DkOIQt7IvquaZ1E0XAgmkEF2EtxTAw4maH0V
+   VBgZbQb+IlZCh2R1iVo/enHBieGfSSrOXTcLNjQ7A9C3tiQi3aP+9/z2d
+   6V3XVu/89brAqOCodWOVE8yhGGeHuiuVul80QUFLgdU5irTthjgcJgfF+
+   M=;
+X-IronPort-AV: E=Sophos;i="6.15,264,1739836800"; 
+   d="scan'208";a="90169577"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2025 18:33:23 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:46279]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.30.21:2525] with esmtp (Farcaster)
+ id bf9ed52f-b5c4-4af4-80e5-24084eff4961; Mon, 5 May 2025 18:33:16 +0000 (UTC)
+X-Farcaster-Flow-ID: bf9ed52f-b5c4-4af4-80e5-24084eff4961
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 5 May 2025 18:33:15 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.187.170.18) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 5 May 2025 18:33:11 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <brauner@kernel.org>
+CC: <alexander@mihalicyn.com>, <bluca@debian.org>, <daan.j.demeyer@gmail.com>,
+	<davem@davemloft.net>, <david@readahead.eu>, <edumazet@google.com>,
+	<horms@kernel.org>, <jack@suse.cz>, <jannh@google.com>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <lennart@poettering.net>,
+	<linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<me@yhndnzj.com>, <netdev@vger.kernel.org>, <oleg@redhat.com>,
+	<pabeni@redhat.com>, <viro@zeniv.linux.org.uk>, <zbyszek@in.waw.pl>
+Subject: Re: [PATCH RFC v3 00/10] coredump: add coredump socket
+Date: Mon, 5 May 2025 11:33:00 -0700
+Message-ID: <20250505183303.14126-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250505-work-coredump-socket-v3-0-e1832f0e1eae@kernel.org>
+References: <20250505-work-coredump-socket-v3-0-e1832f0e1eae@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 3/3] selftests: drv: net: add version indicator
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Mohsin Bashir <mohsin.bashr@gmail.com>, netdev@vger.kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, shuah@kernel.org, ast@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, john.fastabend@gmail.com, ap420073@gmail.com,
- linux-kselftest@vger.kernel.org
-References: <20250503013518.1722913-1-mohsin.bashr@gmail.com>
- <20250503013518.1722913-4-mohsin.bashr@gmail.com>
- <a8c17a58-67fe-4cba-ad4a-a1822554c459@davidwei.uk>
- <20250505104954.39cc63e1@kernel.org>
-Content-Language: en-US
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20250505104954.39cc63e1@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D044UWB002.ant.amazon.com (10.13.139.188) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 5/5/25 10:49, Jakub Kicinski wrote:
-> On Fri, 2 May 2025 22:02:43 -0700 David Wei wrote:
->>> -def test_default(cfg, netnl) -> None:
->>> +def test_default_v4(cfg, netnl) -> None:
->>> +    cfg.require_ipver("4")
->>
->> With this patch, is the previous patch and this hunk still needed? I
->> think you can drop patch 2/3 or both.
+From: Christian Brauner <brauner@kernel.org>
+Date: Mon, 05 May 2025 13:13:38 +0200
+> Coredumping currently supports two modes:
 > 
-> The previous patch makes the more "meaty" tests run when either ipver
-> is available. But we still want an indication if both versions are
-> supported by env but reporting *a* skip. Historically this is what
-> the ping test was for, TBH, pretty much a sanity check for the env.
-> But it ended up accumulating random XDP test cases :(
-> Perhaps something to address in net-next..
+> (1) Dumping directly into a file somewhere on the filesystem.
+> (2) Dumping into a pipe connected to a usermode helper process
+>     spawned as a child of the system_unbound_wq or kthreadd.
+> 
+> For simplicity I'm mostly ignoring (1). There's probably still some
+> users of (1) out there but processing coredumps in this way can be
+> considered adventurous especially in the face of set*id binaries.
+> 
+> The most common option should be (2) by now. It works by allowing
+> userspace to put a string into /proc/sys/kernel/core_pattern like:
+> 
+>         |/usr/lib/systemd/systemd-coredump %P %u %g %s %t %c %h
+> 
+> The "|" at the beginning indicates to the kernel that a pipe must be
+> used. The path following the pipe indicator is a path to a binary that
+> will be spawned as a usermode helper process. Any additional parameters
+> pass information about the task that is generating the coredump to the
+> binary that processes the coredump.
+> 
+> In the example core_pattern shown above systemd-coredump is spawned as a
+> usermode helper. There's various conceptual consequences of this
+> (non-exhaustive list):
+> 
+> - systemd-coredump is spawned with file descriptor number 0 (stdin)
+>   connected to the read-end of the pipe. All other file descriptors are
+>   closed. That specifically includes 1 (stdout) and 2 (stderr). This has
+>   already caused bugs because userspace assumed that this cannot happen
+>   (Whether or not this is a sane assumption is irrelevant.).
+> 
+> - systemd-coredump will be spawned as a child of system_unbound_wq. So
+>   it is not a child of any userspace process and specifically not a
+>   child of PID 1. It cannot be waited upon and is in a weird hybrid
+>   upcall which are difficult for userspace to control correctly.
+> 
+> - systemd-coredump is spawned with full kernel privileges. This
+>   necessitates all kinds of weird privilege dropping excercises in
+>   userspace to make this safe.
+> 
+> - A new usermode helper has to be spawned for each crashing process.
+> 
+> This series adds a new mode:
+> 
+> (3) Dumping into an abstract AF_UNIX socket.
+> 
+> Userspace can set /proc/sys/kernel/core_pattern to:
+> 
+>         @linuxafsk/coredump_socket
+> 
+> The "@" at the beginning indicates to the kernel that the abstract
+> AF_UNIX coredump socket will be used to process coredumps.
+> 
+> The coredump socket uses the fixed address "linuxafsk/coredump.socket"
+> for now.
 
-I see, makes sense.
+What's behind this dicision from v2 ?
 
-Reviewed-by: David Wei <dw@davidwei.uk>
+/proc/sys/kernel/core_pattern can only be set by Administrator
+and I don't see the point in having this limitation on the
+AF_UNIX side.
+
+
+
+> 
+> The coredump socket is located in the initial network namespace.
+
+I understand this is a reasonable decision to avoid complicated
+path management in the mount ns but keep connectivity from any
+namespace.
+
+
+> To bind
+> the coredump socket userspace must hold CAP_SYS_ADMIN in the initial
+> user namespace. Listening and reading can happen from whatever
+> unprivileged context is necessary to safely process coredumps.
+> 
+> When a task coredumps it opens a client socket in the initial network
+> namespace and connects to the coredump socket. For now only tasks that
+> are acctually coredumping are allowed to connect to the initial coredump
+> socket.
+
+This can be controlled by BPF (cgroup sockops or LSM) if a user
+really cares about spam clients.
+
+I think how to set up coredump is userspace responsibility.
+
+
+> 
+> - The coredump server should use SO_PEERPIDFD to get a stable handle on
+>   the connected crashing task. The retrieved pidfd will provide a stable
+>   reference even if the crashing task gets SIGKILLed while generating
+>   the coredump.
+> 
+> - By setting core_pipe_limit non-zero userspace can guarantee that the
+>   crashing task cannot be reaped behind it's back and thus process all
+>   necessary information in /proc/<pid>. The SO_PEERPIDFD can be used to
+>   detect whether /proc/<pid> still refers to the same process.
+> 
+>   The core_pipe_limit isn't used to rate-limit connections to the
+>   socket. This can simply be done via AF_UNIX socket directly.
+> 
+> - The pidfd for the crashing task will contain information how the task
+>   coredumps. The PIDFD_GET_INFO ioctl gained a new flag
+>   PIDFD_INFO_COREDUMP which can be used to retreive the coredump
+>   information.
+> 
+>   If the coredump gets a new coredump client connection the kernel
+>   guarantees that PIDFD_INFO_COREDUMP information is available.
+>   Currently the following information is provided in the new
+>   @coredump_mask extension to struct pidfd_info:
+> 
+>   * PIDFD_COREDUMPED is raised if the task did actually coredump.
+>   * PIDFD_COREDUMP_SKIP	is raised if the task skipped coredumping (e.g.,
+>     undumpable).
+>   * PIDFD_COREDUMP_USER	is raised if this is a regular coredump and
+>     doesn't need special care by the coredump server.
+>   * IDFD_COREDUMP_ROOT is raised if the generated coredump should be
+>     treated as sensitive and the coredump server should restrict to the
+>     generated coredump to sufficiently privileged users.
+> 
+> - Since unix_stream_connect() runs bpf programs during connect it's
+>   possible to even redirect or multiplex coredumps to other sockets.
+
+If the socket is in a cgroup, yes, and even if not, BPF LSM can
+reject some requests.
+
+
+> 
+> - The coredump server should mark itself as non-dumpable.
+>   To capture coredumps for the coredump server itself a bpf program
+>   should be run at connect to redirect it to another socket in
+>   userspace. This can be useful for debugging crashing coredump servers.
+> 
+> - A container coredump server in a separate network namespace can simply
+>   bind to linuxafsk/coredump.socket and systemd-coredump fowards
+>   coredumps to the container.
+
+I think the name should be also configurable in non-initial netns.
+
+
+> 
+> - Fwiw, one idea is to handle coredumps via per-user/session coredump
+>   servers that run with that users privileges.
+> 
+>   The coredump server listens on the coredump socket and accepts a
+>   new coredump connection. It then retrieves SO_PEERPIDFD for the
+>   client, inspects uid/gid and hands the accepted client to the users
+>   own coredump handler which runs with the users privileges only.
+> 
+> The new coredump socket will allow userspace to not have to rely on
+> usermode helpers for processing coredumps and provides a safer way to
+> handle them instead of relying on super privileged coredumping helpers.
+> 
+> This will also be significantly more lightweight since no fork()+exec()
+> for the usermodehelper is required for each crashing process. The
+> coredump server in userspace can just keep a worker pool.
+> 
+> This is easy to test:
+> 
+> (a) coredump processing (we're using socat):
+> 
+>     > cat coredump_socket.sh
+>     #!/bin/bash
+> 
+>     set -x
+> 
+>     sudo bash -c "echo '@linuxafsk/coredump.socket' > /proc/sys/kernel/core_pattern"
+>     sudo socat --statistics abstract-listen:linuxafsk/coredump.socket,fork FILE:core_file,create,append,trunc
+> 
+> (b) trigger a coredump:
+> 
+>     user1@localhost:~/data/scripts$ cat crash.c
+>     #include <stdio.h>
+>     #include <unistd.h>
+> 
+>     int main(int argc, char *argv[])
+>     {
+>             fprintf(stderr, "%u\n", (1 / 0));
+>             _exit(0);
+>     }
 
