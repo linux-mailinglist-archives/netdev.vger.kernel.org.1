@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-188171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C53AAAB5B0
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 07:34:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C9EFAAB5C0
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 07:35:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 430C64A4541
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:30:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 946F01BC0062
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:32:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C2C94A3C40;
-	Tue,  6 May 2025 00:48:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F6AE3B11E9;
+	Tue,  6 May 2025 00:49:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZV9zMkLD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DvgdihHf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DD2B2F818E;
-	Mon,  5 May 2025 23:19:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B33B12F8BAC;
+	Mon,  5 May 2025 23:20:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746487196; cv=none; b=gUnAwn/YetZ83tr0j4znpa1DjbdJeXB/FUJw6gz1RzwGyVOfR9tAR3fD/3J5Ms/RFRQPJppNt3HxZJCbsmWRE8Vz1lzKdfXjEbx9hHQQPEw3wGXgHN3DvudzESc1V35nYzSkCgFp+oeYtCTGOTeyzdR8MOaZqp8LiwQnk56wA5I=
+	t=1746487242; cv=none; b=q7luJt73eu7uGNhkt2Ju8ESxdnm0syIJjGmwtklF0tk+i7gfBxlhdoffYuW+cMMrJaJ1dOjTQ2iKzo9ZlhCuh5HDxnrqAozVC/2b9424ZAAhxLtlblVdMxvC2EilqsXe+xof7AvZEdWQ2w9IybMvuVZeEfjEoF6XwtN5RUI+5Cw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746487196; c=relaxed/simple;
-	bh=KT+uXDczhG9CVFcFO/QUvgBQUbGLWTZv1Qclq7yxCGw=;
+	s=arc-20240116; t=1746487242; c=relaxed/simple;
+	bh=YL/1WgjLI1B6LoS2/NIYGlwG7WEGAG37g1mVj7vL2kA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Z51/EZTzXr+/wdPPZHbEycw8oLooHKqFecE+KbOUXJ44kTErZrYKLYQlBOccJipwEmug/s7Munap1zxNQxpPlSsRWhXL0QBJBXhPJLRBoI3M6Vif1UYKmzXBQRCegmdw1Xg0gPggiowXfXgC6Rb1hewkHODZgk4s8A6olqLLbC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZV9zMkLD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B93FC4CEEF;
-	Mon,  5 May 2025 23:19:53 +0000 (UTC)
+	 MIME-Version; b=To/CMR6zK0SDNS5wCb3w2hAi+RzzPu9H/ElSh82KR4FVQjs0CPKstmYNlj2kdanaUxlAyYwrYic10zjBqGCf6VflGG7t5I40OO8l0rNBvC7ytPskAdmk4D2boyQG2HNlEWHXAHKtGWPq7FFRsX1yGFPg3hbc29BwnQ/4JMGllWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DvgdihHf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75121C4CEED;
+	Mon,  5 May 2025 23:20:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746487195;
-	bh=KT+uXDczhG9CVFcFO/QUvgBQUbGLWTZv1Qclq7yxCGw=;
+	s=k20201202; t=1746487241;
+	bh=YL/1WgjLI1B6LoS2/NIYGlwG7WEGAG37g1mVj7vL2kA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZV9zMkLD44MdQ3/UoflK/8azkTDfhiJ55trbDUbHDI+Nr6SiR2b6Ztq9e1O9nZNYa
-	 w4aYi+EiwoMfdr5QfEXyuiIYMKibnEtcJKEYlMwmqRXe/WsWYf77Riemq3OM2Jl7ws
-	 T6Q2UJWL505xHNa5A0Mc4abbu+tA6Yw9jjQyLRmzXwjHT5ZuC/dqTfOCvpqwQ3Vyty
-	 0lbGeF7I239WHZ8wL2BZOJDhGNWaWADMLTRgwbfhK8/TjIgaNCPdCQXKt5KKFjKR3k
-	 i2AAU37jMlGGrREctXQsWYxVEotj1O5Ozh6+ucCoHl4P7usb6YZroQJ52UpYBg2sWu
-	 ROTWJVwCP/A2A==
+	b=DvgdihHfuI5qUA0ZhbfyiWXXrwcFtQVcgn14rckyWU4wOFEq3zBo7+lWSABK90924
+	 jedGM19JkGl09MewPEE0JMn2a9ziT6f1MiuNI9+hbGkoD/VwSWF183I2q7I0KK2+fj
+	 ZR1vKGJJwsDtvP25JJt9vt8mfIo08X8oP1BxZluHulIZ6mrprSdr6tbqwBvmQKxmrc
+	 5bjNbG1bwIJbRztdLmDPW499SyLEJPQfJV9V+x01xDGoWfvtXBraIcXAmrZVLvBlja
+	 17DJ3wjFNtSXp0EIokoVXwMO4x1zC5BcyZvvEK2hcYQ8QzKvvDRFBRgr9awXeAraM8
+	 KsqatmM4dD6xw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Eric Dumazet <edumazet@google.com>,
-	David Ahern <dsahern@kernel.org>,
+Cc: Peter Seiderer <ps.report@gmx.net>,
+	Simon Horman <horms@kernel.org>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	davem@davemloft.net,
+	edumazet@google.com,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 051/114] ipv4: fib: Move fib_valid_key_len() to rtm_to_fib_config().
-Date: Mon,  5 May 2025 19:17:14 -0400
-Message-Id: <20250505231817.2697367-51-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 075/114] net: pktgen: fix access outside of user given buffer in pktgen_thread_write()
+Date: Mon,  5 May 2025 19:17:38 -0400
+Message-Id: <20250505231817.2697367-75-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505231817.2697367-1-sashal@kernel.org>
 References: <20250505231817.2697367-1-sashal@kernel.org>
@@ -69,126 +69,47 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.10.237
 Content-Transfer-Encoding: 8bit
 
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
+From: Peter Seiderer <ps.report@gmx.net>
 
-[ Upstream commit 254ba7e6032d3fc738050d500b0c1d8197af90ca ]
+[ Upstream commit 425e64440ad0a2f03bdaf04be0ae53dededbaa77 ]
 
-fib_valid_key_len() is called in the beginning of fib_table_insert()
-or fib_table_delete() to check if the prefix length is valid.
+Honour the user given buffer size for the strn_len() calls (otherwise
+strn_len() will access memory outside of the user given buffer).
 
-fib_table_insert() and fib_table_delete() are called from 3 paths
-
-  - ip_rt_ioctl()
-  - inet_rtm_newroute() / inet_rtm_delroute()
-  - fib_magic()
-
-In the first ioctl() path, rtentry_to_fib_config() checks the prefix
-length with bad_mask().  Also, fib_magic() always passes the correct
-prefix: 32 or ifa->ifa_prefixlen, which is already validated.
-
-Let's move fib_valid_key_len() to the rtnetlink path, rtm_to_fib_config().
-
-While at it, 2 direct returns in rtm_to_fib_config() are changed to
-goto to match other places in the same function
-
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: David Ahern <dsahern@kernel.org>
-Link: https://patch.msgid.link/20250228042328.96624-12-kuniyu@amazon.com
+Signed-off-by: Peter Seiderer <ps.report@gmx.net>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Link: https://patch.msgid.link/20250219084527.20488-8-ps.report@gmx.net
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/ipv4/fib_frontend.c | 18 ++++++++++++++++--
- net/ipv4/fib_trie.c     | 22 ----------------------
- 2 files changed, 16 insertions(+), 24 deletions(-)
+ net/core/pktgen.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/net/ipv4/fib_frontend.c b/net/ipv4/fib_frontend.c
-index 5e2a003cd83c7..f902cd8cb852b 100644
---- a/net/ipv4/fib_frontend.c
-+++ b/net/ipv4/fib_frontend.c
-@@ -817,19 +817,33 @@ static int rtm_to_fib_config(struct net *net, struct sk_buff *skb,
- 		}
- 	}
+diff --git a/net/core/pktgen.c b/net/core/pktgen.c
+index c2b3c454eddd9..57502e8628462 100644
+--- a/net/core/pktgen.c
++++ b/net/core/pktgen.c
+@@ -1770,8 +1770,8 @@ static ssize_t pktgen_thread_write(struct file *file,
+ 	i = len;
  
-+	if (cfg->fc_dst_len > 32) {
-+		NL_SET_ERR_MSG(extack, "Invalid prefix length");
-+		err = -EINVAL;
-+		goto errout;
-+	}
-+
-+	if (cfg->fc_dst_len < 32 && (ntohl(cfg->fc_dst) << cfg->fc_dst_len)) {
-+		NL_SET_ERR_MSG(extack, "Invalid prefix for given prefix length");
-+		err = -EINVAL;
-+		goto errout;
-+	}
-+
- 	if (cfg->fc_nh_id) {
- 		if (cfg->fc_oif || cfg->fc_gw_family ||
- 		    cfg->fc_encap || cfg->fc_mp) {
- 			NL_SET_ERR_MSG(extack,
- 				       "Nexthop specification and nexthop id are mutually exclusive");
--			return -EINVAL;
-+			err = -EINVAL;
-+			goto errout;
- 		}
- 	}
- 
- 	if (has_gw && has_via) {
- 		NL_SET_ERR_MSG(extack,
- 			       "Nexthop configuration can not contain both GATEWAY and VIA");
--		return -EINVAL;
-+		err = -EINVAL;
-+		goto errout;
- 	}
- 
- 	if (!cfg->fc_table)
-diff --git a/net/ipv4/fib_trie.c b/net/ipv4/fib_trie.c
-index 1bdcdc79d43f9..6c53381fa36f7 100644
---- a/net/ipv4/fib_trie.c
-+++ b/net/ipv4/fib_trie.c
-@@ -1145,22 +1145,6 @@ static int fib_insert_alias(struct trie *t, struct key_vector *tp,
- 	return 0;
- }
- 
--static bool fib_valid_key_len(u32 key, u8 plen, struct netlink_ext_ack *extack)
--{
--	if (plen > KEYLENGTH) {
--		NL_SET_ERR_MSG(extack, "Invalid prefix length");
--		return false;
--	}
+ 	/* Read variable name */
 -
--	if ((plen < KEYLENGTH) && (key << plen)) {
--		NL_SET_ERR_MSG(extack,
--			       "Invalid prefix for given prefix length");
--		return false;
--	}
--
--	return true;
--}
--
- static void fib_remove_alias(struct trie *t, struct key_vector *tp,
- 			     struct key_vector *l, struct fib_alias *old);
+-	len = strn_len(&user_buffer[i], sizeof(name) - 1);
++	max = min(sizeof(name) - 1, count - i);
++	len = strn_len(&user_buffer[i], max);
+ 	if (len < 0)
+ 		return len;
  
-@@ -1181,9 +1165,6 @@ int fib_table_insert(struct net *net, struct fib_table *tb,
- 
- 	key = ntohl(cfg->fc_dst);
- 
--	if (!fib_valid_key_len(key, plen, extack))
--		return -EINVAL;
--
- 	pr_debug("Insert table=%u %08x/%d\n", tb->tb_id, key, plen);
- 
- 	fi = fib_create_info(cfg, extack);
-@@ -1671,9 +1652,6 @@ int fib_table_delete(struct net *net, struct fib_table *tb,
- 
- 	key = ntohl(cfg->fc_dst);
- 
--	if (!fib_valid_key_len(key, plen, extack))
--		return -EINVAL;
--
- 	l = fib_find_node(t, &tp, key);
- 	if (!l)
- 		return -ESRCH;
+@@ -1801,7 +1801,8 @@ static ssize_t pktgen_thread_write(struct file *file,
+ 	if (!strcmp(name, "add_device")) {
+ 		char f[32];
+ 		memset(f, 0, 32);
+-		len = strn_len(&user_buffer[i], sizeof(f) - 1);
++		max = min(sizeof(f) - 1, count - i);
++		len = strn_len(&user_buffer[i], max);
+ 		if (len < 0) {
+ 			ret = len;
+ 			goto out;
 -- 
 2.39.5
 
