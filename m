@@ -1,67 +1,62 @@
-Return-Path: <netdev+bounces-188004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13578AAAB2E
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:53:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C54CAAAAB9C
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:59:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7DB137B05C8
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 01:52:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1044318899A3
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 01:56:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1A363AE5FC;
-	Mon,  5 May 2025 23:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC4143B11C0;
+	Mon,  5 May 2025 23:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QpqEQKmN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SNH7OAdB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24AB1220F4E;
-	Mon,  5 May 2025 23:04:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A39FB22D9FB;
+	Mon,  5 May 2025 23:05:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746486297; cv=none; b=bqljrt9MzIoKngk2tki+HDDZ10SPsBxd9TJX3itcKlPLCHfJCa3wOYg4QcuFMzS7d0yZS5a7VW6QRgXUBDfSWRhqb+PR7Eb35SvOg7etX7PrFh8WRCKoVekNr4tgheg1EsON1joyzpSSD4+q4Sa27lDTBor9BX/p4c2CWRh4vb0=
+	t=1746486321; cv=none; b=iolmVnChuH8hNlhSWfvHtak6p4YiIgJFx3Dkt41R3kBeLrMF97gFzf6IJyexlAzSARrwDqMauAn3CinN6nTlR8Dd8l4fQ9S8BJtcVhCund0gzCSdbLCr7FlE2GQZAkfoukNCHO++FrZpg3+r5O/ELQtgQsLNiU8NE2EXVWXLsZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746486297; c=relaxed/simple;
-	bh=pJS5gDJn4L7Ui65d9Ezyw0LskcjJRE1S20yZ1un/upo=;
+	s=arc-20240116; t=1746486321; c=relaxed/simple;
+	bh=J+K0fq+oSO6ukMR9+4dy0cKhnVJb8creVGAE7cYNVHU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=aBqeKtTsAHsLZEPGxPC1GLtVrgdFpDA3o4jpGx7W48wKA1ruROFSkQAhzgYYJtqRaekyrtJrFL+sraihvapaPH4CLcDU30ZreEm+8j2bqYoM90CdZoEgE0adw5T7WPFBL7LdHv5nDVN0krQyqLJpS4lQm2sXGn10xHPwmXHva0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QpqEQKmN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44AC6C4CEE4;
-	Mon,  5 May 2025 23:04:54 +0000 (UTC)
+	 MIME-Version; b=n5+pcDK+K55NJav20KCE8rc115s3pt/MwLVFux9b4ZTYkCb78JpSp34IvXDDnyHuglqs2bHLDno6khx0Jb3vJxY3AiQ1O81uij86qgaK0O2aqoN4zo9XMQKmesxw0dzGLsr9d0zP9MjV6Nl/yW5HvhRSeaEEwV0W/ZKYJv+R/dI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SNH7OAdB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 423A2C4CEEE;
+	Mon,  5 May 2025 23:05:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746486296;
-	bh=pJS5gDJn4L7Ui65d9Ezyw0LskcjJRE1S20yZ1un/upo=;
+	s=k20201202; t=1746486320;
+	bh=J+K0fq+oSO6ukMR9+4dy0cKhnVJb8creVGAE7cYNVHU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QpqEQKmNvJc3OA7XXHjax42ge4rRtm25gnSWqLQWT9uVmuYGR13wi92CUFlhjTXM5
-	 iWSEvQW6vIqzXdaY3YUACtZOiwnujtc17N2q1mtNM8unhE8J7I/sCGnz/xHOqcE5H3
-	 31LLT1iMH6mvEIK4nXY3gdfTQ3gL7ZAZAvwRNz5OHqcYSL3prDYx+ckJ3lJphbMHl/
-	 09ILYfBKY2T6kazZYK3E6OGjIepKyh/zbN1xPqYPx70wOAcSyUvpNAOQKoy8QRc2q2
-	 oMkvGrlbu8oXMICxk4QKBiw7KpoWj6cStIb+WSqW11JdU3XS9pcZEGPBAzXHZYK6/O
-	 5OR/ZDBuEmS8Q==
+	b=SNH7OAdB3vZqEGvMpk9wH5eACLTebuLHkvc48zTAr5GalwmN0ONmHaCjkRREfwMQn
+	 s04fnPB58zLuQMQ9NzBLFbWpu+1nPWia4XU2TWaJvzsCI2gyDQ8HxpM/V99yxgSgzG
+	 7065neYALtaJY4Ex34jRfpUfQhjt0czF9fNEPCZt8KQ85Y+yBCwsGf8XyU0qp4FUQT
+	 dPyxRSQrMPtDxl8v+xoZaFX1SWBKLhqx76aKM+w/N0PXu19wn77E3kxh4prPpjwU3Z
+	 3a2aN+904dCbq27I/14kuYdYSP5WJkiZZm7MjHV82D6+DxkDCLS3YdXNNADST6Hw0L
+	 NWZ59r/tig+Uw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Aleksander Jan Bajkowski <olek2@wp.pl>,
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
+	nic_swsd@realtek.com,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	gregkh@linuxfoundation.org,
-	hayeswang@realtek.com,
-	horms@kernel.org,
-	dianders@chromium.org,
-	ste3ls@gmail.com,
-	phahn-oss@avm.de,
-	linux-usb@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 243/294] r8152: add vendor/device ID pair for Dell Alienware AW1022z
-Date: Mon,  5 May 2025 18:55:43 -0400
-Message-Id: <20250505225634.2688578-243-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 258/294] r8169: don't scan PHY addresses > 0
+Date: Mon,  5 May 2025 18:55:58 -0400
+Message-Id: <20250505225634.2688578-258-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505225634.2688578-1-sashal@kernel.org>
 References: <20250505225634.2688578-1-sashal@kernel.org>
@@ -76,48 +71,34 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.89
 Content-Transfer-Encoding: 8bit
 
-From: Aleksander Jan Bajkowski <olek2@wp.pl>
+From: Heiner Kallweit <hkallweit1@gmail.com>
 
-[ Upstream commit 848b09d53d923b4caee5491f57a5c5b22d81febc ]
+[ Upstream commit faac69a4ae5abb49e62c79c66b51bb905c9aa5ec ]
 
-The Dell AW1022z is an RTL8156B based 2.5G Ethernet controller.
+The PHY address is a dummy, because r8169 PHY access registers
+don't support a PHY address. Therefore scan address 0 only.
 
-Add the vendor and product ID values to the driver. This makes Ethernet
-work with the adapter.
-
-Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
-Link: https://patch.msgid.link/20250206224033.980115-1-olek2@wp.pl
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Link: https://patch.msgid.link/830637dd-4016-4a68-92b3-618fcac6589d@gmail.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/usb/r8152.c   | 1 +
- include/linux/usb/r8152.h | 1 +
- 2 files changed, 2 insertions(+)
+ drivers/net/ethernet/realtek/r8169_main.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-index bbcefcc7ef8f0..1e85cfe524e87 100644
---- a/drivers/net/usb/r8152.c
-+++ b/drivers/net/usb/r8152.c
-@@ -10032,6 +10032,7 @@ static const struct usb_device_id rtl8152_table[] = {
- 	{ USB_DEVICE(VENDOR_ID_NVIDIA,  0x09ff) },
- 	{ USB_DEVICE(VENDOR_ID_TPLINK,  0x0601) },
- 	{ USB_DEVICE(VENDOR_ID_DLINK,   0xb301) },
-+	{ USB_DEVICE(VENDOR_ID_DELL,    0xb097) },
- 	{ USB_DEVICE(VENDOR_ID_ASUS,    0x1976) },
- 	{}
- };
-diff --git a/include/linux/usb/r8152.h b/include/linux/usb/r8152.h
-index 33a4c146dc19c..2ca60828f28bb 100644
---- a/include/linux/usb/r8152.h
-+++ b/include/linux/usb/r8152.h
-@@ -30,6 +30,7 @@
- #define VENDOR_ID_NVIDIA		0x0955
- #define VENDOR_ID_TPLINK		0x2357
- #define VENDOR_ID_DLINK			0x2001
-+#define VENDOR_ID_DELL			0x413c
- #define VENDOR_ID_ASUS			0x0b05
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 7e5258b2c4290..5af932a5e70c4 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -5125,6 +5125,7 @@ static int r8169_mdio_register(struct rtl8169_private *tp)
+ 	new_bus->priv = tp;
+ 	new_bus->parent = &pdev->dev;
+ 	new_bus->irq[0] = PHY_MAC_INTERRUPT;
++	new_bus->phy_mask = GENMASK(31, 1);
+ 	snprintf(new_bus->id, MII_BUS_ID_SIZE, "r8169-%x-%x",
+ 		 pci_domain_nr(pdev->bus), pci_dev_id(pdev));
  
- #if IS_REACHABLE(CONFIG_USB_RTL8152)
 -- 
 2.39.5
 
