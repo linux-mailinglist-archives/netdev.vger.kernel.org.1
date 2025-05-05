@@ -1,115 +1,221 @@
-Return-Path: <netdev+bounces-188164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85AB4AAB7C1
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:17:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0044AAB7CA
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:18:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD9DE1C27966
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:12:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A062C3AF569
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:12:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47DE1347955;
-	Tue,  6 May 2025 00:46:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DC0129A9D2;
+	Tue,  6 May 2025 00:47:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NqVgjClv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nAFtvY+a"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63E3B2F6B55;
-	Mon,  5 May 2025 23:17:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EFD23ACFC8;
+	Mon,  5 May 2025 23:19:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746487079; cv=none; b=WBPI6LYLxbfAy7IVCZI7EafOiGfe0p2T0xQn1H+oB0qkcyTZYh1Lhi+KeeDnSyffsbWArkLJr9CoXi4qikXK3yeyxP76W7I/mnx9fKCLpdpvYJk/rWxcU0mFBq9LjCh630pwCLn62x+cXD7Eb1AWPXVc0nTiVDR+B77Zx/xUlcw=
+	t=1746487152; cv=none; b=ZlZCrsFmDeU8FrU4s6ARw8oaeH5ufBP8s7dQGwmPJl4wys0snbQvqWKCGXScWKtWpjnt4b3XS94uuFbvYx9Mxk6HSbdJbbAskLi7ta616xg8aPKbOSzayF6soBy+lQVNsxUtqQsJS+DHN6HPV80vB+arHucIDzExCwaOm7ykRSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746487079; c=relaxed/simple;
-	bh=VkEDehoOkFDH575yzWrUFq76dyse+0I2ePUzowEbN3Q=;
+	s=arc-20240116; t=1746487152; c=relaxed/simple;
+	bh=W9jlmyaJpUsPS3IC76/I9kFZv9MWOqjHA6bbfEuOvQ8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kCl1o8xMXSIQfd3pbGMXv9eVa17LQJnoCZfBVpiOrh2PsHgxhqD0j5JkgRxLuCZK6KPDnmPNg6N+hNzKhz9Kt0u6IbFz4Vfc+o+zjxwyc2lHTZGj9gE4PEettFNsvLm7ad7lcBy/m1D46P6PkVkaS0yNRQ34Q45n1/ZWhUoibpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NqVgjClv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E25EC4CEE4;
-	Mon,  5 May 2025 23:17:56 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ghCO2x89cgZVfdw9+/RXGV/1TTFEQkO88Y4nIvDyBet9VuB42RK8GCBC0/7sGucC0UyBdW0NEGEPaYbDnic1UniQCqTpQUGTLgwVskxUXcPCxqB1S6FnceAil/oTY4wCC2FPqPRqpbM0NdtOHAXFqhLAgvTFOjYAPJlUv+5YuE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nAFtvY+a; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21418C4CEEE;
+	Mon,  5 May 2025 23:19:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746487078;
-	bh=VkEDehoOkFDH575yzWrUFq76dyse+0I2ePUzowEbN3Q=;
+	s=k20201202; t=1746487151;
+	bh=W9jlmyaJpUsPS3IC76/I9kFZv9MWOqjHA6bbfEuOvQ8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NqVgjClviuWJlmLwjaS6PNMwSSzyfukt0VhG1WOPhHw6cjvPixxxgTKBQjG/U41tw
-	 1ol3yypsqUm+9GIcN03M5xZnqTJO1CWT2b43Wt3fZo1hDyOzxNqQdqNwcArovKhHRQ
-	 knK8sKPi/JwKnGOW7c2QLjl/jN6MhYqMGhemKr+X0t/7WdH+9+IUeBarPe1XCHQpWz
-	 OzZgdd5Zyod0thv4RZS+c7kcgtsLlgfYbpThFfkAXBAuZ2PYJBCrOl5SiCvy2WCfTE
-	 uSYLU9WI+UQNWFqJAr7m/pB+cBMqFv1mClDBqLt4lHY35lRR3yHkQzUpvsc/3wSGO1
-	 0CoDb9FDy1YlA==
+	b=nAFtvY+aXpan2rAKeZ9nUfpv+268LpX7qM18vhUQ5rDk0+roAPchxb8vWTNUH2I3y
+	 UtjThjhylIXXf2OQt8j6W/5KhKWMgbWfbb+tHbB/RLeSIrqR52b4zdpE5lOQrEGYEf
+	 g5l4xwa1TMcT8WF22g/IwNr+ZLtb6aeiHt7et3ZRCt1a+Rr0P/GRWEBjcT9zBnQWoU
+	 /BW7sL6aY88RmU+QrqbCGBYbcmLz000qX1EoGLD/n3K9CwK7wM1l2nwUI3z+oQP+ch
+	 XJP3IMouCTNARWIaLSPOSgDA1Da+YIyXbxHFlYbTlBRTAEVosIiSNXWfPQBOM5hFuZ
+	 2Dw18fdsw0ABg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Konstantin Taranov <kotaranov@microsoft.com>,
-	Shiraz Saleem <shirazsaleem@microsoft.com>,
-	Long Li <longli@microsoft.com>,
-	Leon Romanovsky <leon@kernel.org>,
+Cc: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ij@kernel.org>,
+	Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
 	edumazet@google.com,
+	ncardwell@google.com,
+	dsahern@kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	shradhagupta@linux.microsoft.com,
-	mlevitsk@redhat.com,
-	ernis@linux.microsoft.com,
-	peterz@infradead.org,
-	linux-hyperv@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 141/153] net/mana: fix warning in the writer of client oob
-Date: Mon,  5 May 2025 19:13:08 -0400
-Message-Id: <20250505231320.2695319-141-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 027/114] tcp: reorganize tcp_in_ack_event() and tcp_count_delivered()
+Date: Mon,  5 May 2025 19:16:50 -0400
+Message-Id: <20250505231817.2697367-27-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250505231320.2695319-1-sashal@kernel.org>
-References: <20250505231320.2695319-1-sashal@kernel.org>
+In-Reply-To: <20250505231817.2697367-1-sashal@kernel.org>
+References: <20250505231817.2697367-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.15.181
+X-stable-base: Linux 5.10.237
 Content-Transfer-Encoding: 8bit
 
-From: Konstantin Taranov <kotaranov@microsoft.com>
+From: Ilpo Järvinen <ij@kernel.org>
 
-[ Upstream commit 5ec7e1c86c441c46a374577bccd9488abea30037 ]
+[ Upstream commit 149dfb31615e22271d2525f078c95ea49bc4db24 ]
 
-Do not warn on missing pad_data when oob is in sgl.
+- Move tcp_count_delivered() earlier and split tcp_count_delivered_ce()
+  out of it
+- Move tcp_in_ack_event() later
+- While at it, remove the inline from tcp_in_ack_event() and let
+  the compiler to decide
 
-Signed-off-by: Konstantin Taranov <kotaranov@microsoft.com>
-Link: https://patch.msgid.link/1737394039-28772-9-git-send-email-kotaranov@linux.microsoft.com
-Reviewed-by: Shiraz Saleem <shirazsaleem@microsoft.com>
-Reviewed-by: Long Li <longli@microsoft.com>
-Signed-off-by: Leon Romanovsky <leon@kernel.org>
+Accurate ECN's heuristics does not know if there is going
+to be ACE field based CE counter increase or not until after
+rtx queue has been processed. Only then the number of ACKed
+bytes/pkts is available. As CE or not affects presence of
+FLAG_ECE, that information for tcp_in_ack_event is not yet
+available in the old location of the call to tcp_in_ack_event().
+
+Signed-off-by: Ilpo Järvinen <ij@kernel.org>
+Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/microsoft/mana/gdma_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/ipv4/tcp_input.c | 56 +++++++++++++++++++++++++-------------------
+ 1 file changed, 32 insertions(+), 24 deletions(-)
 
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index 0fb42193643dc..7864611f55a77 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -957,7 +957,7 @@ static u32 mana_gd_write_client_oob(const struct gdma_wqe_request *wqe_req,
- 	header->inline_oob_size_div4 = client_oob_size / sizeof(u32);
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 6b926c71b6f31..7c2e714527f68 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -403,6 +403,20 @@ static bool tcp_ecn_rcv_ecn_echo(const struct tcp_sock *tp, const struct tcphdr
+ 	return false;
+ }
  
- 	if (oob_in_sgl) {
--		WARN_ON_ONCE(!pad_data || wqe_req->num_sge < 2);
-+		WARN_ON_ONCE(wqe_req->num_sge < 2);
++static void tcp_count_delivered_ce(struct tcp_sock *tp, u32 ecn_count)
++{
++	tp->delivered_ce += ecn_count;
++}
++
++/* Updates the delivered and delivered_ce counts */
++static void tcp_count_delivered(struct tcp_sock *tp, u32 delivered,
++				bool ece_ack)
++{
++	tp->delivered += delivered;
++	if (ece_ack)
++		tcp_count_delivered_ce(tp, delivered);
++}
++
+ /* Buffer size and advertised window tuning.
+  *
+  * 1. Tuning sk->sk_sndbuf, when connection enters established state.
+@@ -1102,15 +1116,6 @@ void tcp_mark_skb_lost(struct sock *sk, struct sk_buff *skb)
+ 	}
+ }
  
- 		header->client_oob_in_sgl = 1;
+-/* Updates the delivered and delivered_ce counts */
+-static void tcp_count_delivered(struct tcp_sock *tp, u32 delivered,
+-				bool ece_ack)
+-{
+-	tp->delivered += delivered;
+-	if (ece_ack)
+-		tp->delivered_ce += delivered;
+-}
+-
+ /* This procedure tags the retransmission queue when SACKs arrive.
+  *
+  * We have three tag bits: SACKED(S), RETRANS(R) and LOST(L).
+@@ -3735,12 +3740,23 @@ static void tcp_process_tlp_ack(struct sock *sk, u32 ack, int flag)
+ 	}
+ }
  
+-static inline void tcp_in_ack_event(struct sock *sk, u32 flags)
++static void tcp_in_ack_event(struct sock *sk, int flag)
+ {
+ 	const struct inet_connection_sock *icsk = inet_csk(sk);
+ 
+-	if (icsk->icsk_ca_ops->in_ack_event)
+-		icsk->icsk_ca_ops->in_ack_event(sk, flags);
++	if (icsk->icsk_ca_ops->in_ack_event) {
++		u32 ack_ev_flags = 0;
++
++		if (flag & FLAG_WIN_UPDATE)
++			ack_ev_flags |= CA_ACK_WIN_UPDATE;
++		if (flag & FLAG_SLOWPATH) {
++			ack_ev_flags |= CA_ACK_SLOWPATH;
++			if (flag & FLAG_ECE)
++				ack_ev_flags |= CA_ACK_ECE;
++		}
++
++		icsk->icsk_ca_ops->in_ack_event(sk, ack_ev_flags);
++	}
+ }
+ 
+ /* Congestion control has updated the cwnd already. So if we're in
+@@ -3857,12 +3873,8 @@ static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
+ 		tcp_snd_una_update(tp, ack);
+ 		flag |= FLAG_WIN_UPDATE;
+ 
+-		tcp_in_ack_event(sk, CA_ACK_WIN_UPDATE);
+-
+ 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPHPACKS);
+ 	} else {
+-		u32 ack_ev_flags = CA_ACK_SLOWPATH;
+-
+ 		if (ack_seq != TCP_SKB_CB(skb)->end_seq)
+ 			flag |= FLAG_DATA;
+ 		else
+@@ -3874,19 +3886,12 @@ static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
+ 			flag |= tcp_sacktag_write_queue(sk, skb, prior_snd_una,
+ 							&sack_state);
+ 
+-		if (tcp_ecn_rcv_ecn_echo(tp, tcp_hdr(skb))) {
++		if (tcp_ecn_rcv_ecn_echo(tp, tcp_hdr(skb)))
+ 			flag |= FLAG_ECE;
+-			ack_ev_flags |= CA_ACK_ECE;
+-		}
+ 
+ 		if (sack_state.sack_delivered)
+ 			tcp_count_delivered(tp, sack_state.sack_delivered,
+ 					    flag & FLAG_ECE);
+-
+-		if (flag & FLAG_WIN_UPDATE)
+-			ack_ev_flags |= CA_ACK_WIN_UPDATE;
+-
+-		tcp_in_ack_event(sk, ack_ev_flags);
+ 	}
+ 
+ 	/* This is a deviation from RFC3168 since it states that:
+@@ -3913,6 +3918,8 @@ static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
+ 
+ 	tcp_rack_update_reo_wnd(sk, &rs);
+ 
++	tcp_in_ack_event(sk, flag);
++
+ 	if (tp->tlp_high_seq)
+ 		tcp_process_tlp_ack(sk, ack, flag);
+ 
+@@ -3944,6 +3951,7 @@ static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
+ 	return 1;
+ 
+ no_queue:
++	tcp_in_ack_event(sk, flag);
+ 	/* If data was DSACKed, see if we can undo a cwnd reduction. */
+ 	if (flag & FLAG_DSACKING_ACK) {
+ 		tcp_fastretrans_alert(sk, prior_snd_una, num_dupack, &flag,
 -- 
 2.39.5
 
