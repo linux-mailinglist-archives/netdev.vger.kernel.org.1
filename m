@@ -1,67 +1,64 @@
-Return-Path: <netdev+bounces-188030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53B12AAAFBC
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:23:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C572FAAACAE
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 04:21:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C93807A4C21
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:21:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 759457AD615
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 02:20:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A1282FFBFB;
-	Mon,  5 May 2025 23:28:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34CAC2FFC72;
+	Mon,  5 May 2025 23:28:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BQrZYJEB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rkH16t5E"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B79B3A6F96;
-	Mon,  5 May 2025 23:16:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E4FC28A700;
+	Mon,  5 May 2025 23:16:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746487007; cv=none; b=o0qV59iyGxe403jrj7nwvluRVQor1WFgQzCPBdvI57PHHpFp0yNV4hU59MC4wlP6nEYj9axOmuyUsAPRMylp4M6LsIyKWXe1o+hYHw+w82z5H/x17/JnNQd/6f8eQcDZ49PRkqpCDwpyhH/eaGUi4B3hE857pe3vD9ECgfXkJDQ=
+	t=1746487019; cv=none; b=kVK2CdPF+R4uJGcTgm+4XBvKNcyXcgyu80wjogQeXDtTW+SyOk6y2UlPhCq/hvqRR7eNdCxP9OUtQppwg05XPKkN9MPm/jQ8ciXCevt5geGykt795zkXjikeBtALQnNQLDM1grHRfPjdoonlY0N+45WJqcNChiH7u6g+NsuQvOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746487007; c=relaxed/simple;
-	bh=qzo60eq99Q4KeFcPO165fQwMvAIqpbtTaxi/l/uJZ7g=;
+	s=arc-20240116; t=1746487019; c=relaxed/simple;
+	bh=JxjItHrrQgLMHSz/Gv5gajhZoDln5AohXYwfHcgnOyw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=VLWXNqifq8TqoKA7DWa9qqKOa6AD5p20wlZek+uAAptmW8xL9XshleGIhIsfjxTyBrzrYIdleQmveSXBPXiCTv4uis8JjkiF0ZbjzXvfZVMr7pc/1ndK/kqF8dxfe1W5G8E1aN2UeVEOTiCp2RxNzz99DDlpycI7CqadMzgFk3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BQrZYJEB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E870C4CEED;
-	Mon,  5 May 2025 23:16:44 +0000 (UTC)
+	 MIME-Version; b=dd+gOyqabtAe3Fm7+RZu4aLrDuPw9QmP6ck1Hz2LeD1xq8w9oZct15RCssL9pfhwzyxR9mg+xbg9SZPSNmNDi+arhvOirzdjGNj9nzMKWcbwo0zTaivgzd1I/Mz10pStnwlW06UcAlv5PsLlucKp2BIEMct84DQSo0S5POxuDuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rkH16t5E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53A5FC4CEED;
+	Mon,  5 May 2025 23:16:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746487006;
-	bh=qzo60eq99Q4KeFcPO165fQwMvAIqpbtTaxi/l/uJZ7g=;
+	s=k20201202; t=1746487017;
+	bh=JxjItHrrQgLMHSz/Gv5gajhZoDln5AohXYwfHcgnOyw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BQrZYJEBlFstL68ok+AREMoABLlY2j5s2NmNZJND91UdIsMJ05p6QeewvzEoiiSVy
-	 Zi02+QFnWuoiQiKBiDeQYmMZxhHATQgUbKh1PcaqfnCmj28anIoKUPWoQOfS+xTz6m
-	 CfCeao4pws2tUxoGjQSwDVYZNyY8Q5sXvpP6/+A0gDBKVhicSK7NpoAwU6qOz3w/76
-	 /B2N0Zi1WJio9tbY+poPI34FQwuD8PQBImdAmzvIutqaTgSiVdw9rNJtlnf4ZdDoRc
-	 pDzTGmQTFzkXFHD7a6hXnDUXqBRAQ2jGjVr69uboHrlXLEPzmcRlemZSIQ/DSylPKq
-	 g+WGHNwFoMHGA==
+	b=rkH16t5EibkbO9BEXyCS7JoIyOsIxBMmm8d/7VeeXIbqiuRf6fVrVqOvp8geLosh5
+	 d5XtcJl5HRM7q0ZNYLqTwFa9s+7UzoiBEajuIRNpM4Ku9ECWRSusIfa8cJ+qbl5j3s
+	 PqZamyMkhyQNyW6slXuIZBZtEJ9rb5o3BhlsSsCqCLMqH50sHJKctHZkYjb5iqu2qb
+	 obed4Uf6jL+cS29phXlQspHJQCaJ7LYTTsrqGMWNAcu7HMTeZI1pyELbCSs7LiUWY0
+	 fSutSsg+dzha66zyXPOxmpONreHq5o420Sw9hhRu2KRWotVvLVLZ+A/T/MednEVehJ
+	 gCPVxtV/qRuYQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Jason Xing <kerneljasonxing@gmail.com>,
-	Martin KaFai Lau <martin.lau@kernel.org>,
+Cc: Shahar Shitrit <shshitrit@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	edumazet@google.com,
-	ncardwell@google.com,
+	saeedm@nvidia.com,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
-	kuba@kernel.org,
+	edumazet@google.com,
 	pabeni@redhat.com,
-	martin.lau@linux.dev,
-	dsahern@kernel.org,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 104/153] bpf: Prevent unsafe access to the sock fields in the BPF timestamping callback
-Date: Mon,  5 May 2025 19:12:31 -0400
-Message-Id: <20250505231320.2695319-104-sashal@kernel.org>
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.15 110/153] net/mlx5: Modify LSB bitmask in temperature event to include only the first bit
+Date: Mon,  5 May 2025 19:12:37 -0400
+Message-Id: <20250505231320.2695319-110-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505231320.2695319-1-sashal@kernel.org>
 References: <20250505231320.2695319-1-sashal@kernel.org>
@@ -76,147 +73,43 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.15.181
 Content-Transfer-Encoding: 8bit
 
-From: Jason Xing <kerneljasonxing@gmail.com>
+From: Shahar Shitrit <shshitrit@nvidia.com>
 
-[ Upstream commit fd93eaffb3f977b23bc0a48d4c8616e654fcf133 ]
+[ Upstream commit 633f16d7e07c129a36b882c05379e01ce5bdb542 ]
 
-The subsequent patch will implement BPF TX timestamping. It will
-call the sockops BPF program without holding the sock lock.
+In the sensor_count field of the MTEWE register, bits 1-62 are
+supported only for unmanaged switches, not for NICs, and bit 63
+is reserved for internal use.
 
-This breaks the current assumption that all sock ops programs will
-hold the sock lock. The sock's fields of the uapi's bpf_sock_ops
-requires this assumption.
+To prevent confusing output that may include set bits that are
+not relevant to NIC sensors, we update the bitmask to retain only
+the first bit, which corresponds to the sensor ASIC.
 
-To address this, a new "u8 is_locked_tcp_sock;" field is added. This
-patch sets it in the current sock_ops callbacks. The "is_fullsock"
-test is then replaced by the "is_locked_tcp_sock" test during
-sock_ops_convert_ctx_access().
-
-The new TX timestamping callbacks added in the subsequent patch will
-not have this set. This will prevent unsafe access from the new
-timestamping callbacks.
-
-Potentially, we could allow read-only access. However, this would
-require identifying which callback is read-safe-only and also requires
-additional BPF instruction rewrites in the covert_ctx. Since the BPF
-program can always read everything from a socket (e.g., by using
-bpf_core_cast), this patch keeps it simple and disables all read
-and write access to any socket fields through the bpf_sock_ops
-UAPI from the new TX timestamping callback.
-
-Moreover, note that some of the fields in bpf_sock_ops are specific
-to tcp_sock, and sock_ops currently only supports tcp_sock. In
-the future, UDP timestamping will be added, which will also break
-this assumption. The same idea used in this patch will be reused.
-Considering that the current sock_ops only supports tcp_sock, the
-variable is named is_locked_"tcp"_sock.
-
-Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
-Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
-Link: https://patch.msgid.link/20250220072940.99994-4-kerneljasonxing@gmail.com
+Signed-off-by: Shahar Shitrit <shshitrit@nvidia.com>
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Link: https://patch.msgid.link/20250213094641.226501-4-tariqt@nvidia.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- include/linux/filter.h | 1 +
- include/net/tcp.h      | 1 +
- net/core/filter.c      | 8 ++++----
- net/ipv4/tcp_input.c   | 2 ++
- net/ipv4/tcp_output.c  | 2 ++
- 5 files changed, 10 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/events.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/include/linux/filter.h b/include/linux/filter.h
-index 7d8294d0d7173..e723b930bac14 100644
---- a/include/linux/filter.h
-+++ b/include/linux/filter.h
-@@ -1327,6 +1327,7 @@ struct bpf_sock_ops_kern {
- 	void	*skb_data_end;
- 	u8	op;
- 	u8	is_fullsock;
-+	u8	is_locked_tcp_sock;
- 	u8	remaining_opt_len;
- 	u64	temp;			/* temp and everything after is not
- 					 * initialized to 0 before calling
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index be91d81d66ab3..577e60ec41b8c 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -2322,6 +2322,7 @@ static inline int tcp_call_bpf(struct sock *sk, int op, u32 nargs, u32 *args)
- 	memset(&sock_ops, 0, offsetof(struct bpf_sock_ops_kern, temp));
- 	if (sk_fullsock(sk)) {
- 		sock_ops.is_fullsock = 1;
-+		sock_ops.is_locked_tcp_sock = 1;
- 		sock_owned_by_me(sk);
- 	}
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/events.c b/drivers/net/ethernet/mellanox/mlx5/core/events.c
+index a1ac3a654962e..080aee3e3f9bb 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/events.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/events.c
+@@ -160,6 +160,10 @@ static int temp_warn(struct notifier_block *nb, unsigned long type, void *data)
+ 	u64 value_msb;
  
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 9d358fb865e28..983aca1bf833f 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -9640,10 +9640,10 @@ static u32 sock_ops_convert_ctx_access(enum bpf_access_type type,
- 		}							      \
- 		*insn++ = BPF_LDX_MEM(BPF_FIELD_SIZEOF(			      \
- 						struct bpf_sock_ops_kern,     \
--						is_fullsock),		      \
-+						is_locked_tcp_sock),	      \
- 				      fullsock_reg, si->src_reg,	      \
- 				      offsetof(struct bpf_sock_ops_kern,      \
--					       is_fullsock));		      \
-+					       is_locked_tcp_sock));	      \
- 		*insn++ = BPF_JMP_IMM(BPF_JEQ, fullsock_reg, 0, jmp);	      \
- 		if (si->dst_reg == si->src_reg)				      \
- 			*insn++ = BPF_LDX_MEM(BPF_DW, reg, si->src_reg,	      \
-@@ -9728,10 +9728,10 @@ static u32 sock_ops_convert_ctx_access(enum bpf_access_type type,
- 					       temp));			      \
- 		*insn++ = BPF_LDX_MEM(BPF_FIELD_SIZEOF(			      \
- 						struct bpf_sock_ops_kern,     \
--						is_fullsock),		      \
-+						is_locked_tcp_sock),	      \
- 				      reg, si->dst_reg,			      \
- 				      offsetof(struct bpf_sock_ops_kern,      \
--					       is_fullsock));		      \
-+					       is_locked_tcp_sock));	      \
- 		*insn++ = BPF_JMP_IMM(BPF_JEQ, reg, 0, 2);		      \
- 		*insn++ = BPF_LDX_MEM(BPF_FIELD_SIZEOF(			      \
- 						struct bpf_sock_ops_kern, sk),\
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 8859a38b45d5e..0caf1474b9807 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -168,6 +168,7 @@ static void bpf_skops_parse_hdr(struct sock *sk, struct sk_buff *skb)
- 	memset(&sock_ops, 0, offsetof(struct bpf_sock_ops_kern, temp));
- 	sock_ops.op = BPF_SOCK_OPS_PARSE_HDR_OPT_CB;
- 	sock_ops.is_fullsock = 1;
-+	sock_ops.is_locked_tcp_sock = 1;
- 	sock_ops.sk = sk;
- 	bpf_skops_init_skb(&sock_ops, skb, tcp_hdrlen(skb));
+ 	value_lsb = be64_to_cpu(eqe->data.temp_warning.sensor_warning_lsb);
++	/* bit 1-63 are not supported for NICs,
++	 * hence read only bit 0 (asic) from lsb.
++	 */
++	value_lsb &= 0x1;
+ 	value_msb = be64_to_cpu(eqe->data.temp_warning.sensor_warning_msb);
  
-@@ -184,6 +185,7 @@ static void bpf_skops_established(struct sock *sk, int bpf_op,
- 	memset(&sock_ops, 0, offsetof(struct bpf_sock_ops_kern, temp));
- 	sock_ops.op = bpf_op;
- 	sock_ops.is_fullsock = 1;
-+	sock_ops.is_locked_tcp_sock = 1;
- 	sock_ops.sk = sk;
- 	/* sk with TCP_REPAIR_ON does not have skb in tcp_finish_connect */
- 	if (skb)
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 3a66d0c7d015c..3a819413d3968 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -507,6 +507,7 @@ static void bpf_skops_hdr_opt_len(struct sock *sk, struct sk_buff *skb,
- 		sock_owned_by_me(sk);
- 
- 		sock_ops.is_fullsock = 1;
-+		sock_ops.is_locked_tcp_sock = 1;
- 		sock_ops.sk = sk;
- 	}
- 
-@@ -552,6 +553,7 @@ static void bpf_skops_write_hdr_opt(struct sock *sk, struct sk_buff *skb,
- 		sock_owned_by_me(sk);
- 
- 		sock_ops.is_fullsock = 1;
-+		sock_ops.is_locked_tcp_sock = 1;
- 		sock_ops.sk = sk;
- 	}
- 
+ 	mlx5_core_warn(events->dev,
 -- 
 2.39.5
 
