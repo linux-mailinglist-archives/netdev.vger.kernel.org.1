@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-187912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD93FAAA59C
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 01:53:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E282AAA5BA
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 01:56:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73C7D1A830A6
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 23:50:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8CE13B19F0
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 23:52:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0FAC312808;
-	Mon,  5 May 2025 22:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 252203154C9;
+	Mon,  5 May 2025 22:30:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fX7t5f5U"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ltg6Jzsq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73BE13146D1;
-	Mon,  5 May 2025 22:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA7F93154C0;
+	Mon,  5 May 2025 22:30:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746484229; cv=none; b=N2w7jzu9kvSLH3KfblkTqIdy352gLWYfrQ21QkQgOSJAzd5m71SPRTAHa5tlA/Y7P1oBB4JDee0PcVquDiTO/GhoILr6stoRYnielTOIS4DQ4Q9/ini9Qm+icCEvRIanq0R4ntDkobn9+W+THBhf0kOAP1FqzEq+j3s4Y02bBqw=
+	t=1746484244; cv=none; b=mfM1s58x2I0RIJtthtt9rC5m/fbaJNK0O+9218s/5/UbVoLJsuskUYNnDLIFCngtLOeaIkjE0gEYZII3YhdvTE7teWsr8pTEn4vxEmOy8+vz2eRYerBIyJ2F9Yph0gdk1/kfg7O9JEpKPa6V4/DGths9gQSzY0JqiVfy1A7Aj6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746484229; c=relaxed/simple;
-	bh=3cThNiVHF135CctaPExQFYahuervVIqr7vOKgbtKPJU=;
+	s=arc-20240116; t=1746484244; c=relaxed/simple;
+	bh=lBWU+9wpWhMPBNO5GCvKFPDkpojiMGc2rdryTUP+QnM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NzxID52+xh14qY5kREVuRCuH6LZC14pMX9eiaO2eCpEO09yLxHILa4jI/wT8qeal7Np/XCOafEiqzFXMdwh14RZfbYjDVU+2kSyTVqyO7ZTsxG4Po0YONdYV6nXjWqLQa8fet7RhpXFsG/UFBQ/AfIsHkHouFeA8cG1yYZjay0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fX7t5f5U; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D9C9C4CEE4;
-	Mon,  5 May 2025 22:30:27 +0000 (UTC)
+	 MIME-Version; b=rGiUBC43igQYryMwMjrsu2VEba2o16kgOGywMagFEzI+Bo6P4cIOi7CXECMhFJnp77rbN+R6JEHvx3hkLDgpJizKEcxm9ekB92/WxaED2UjSe2H75Gx/XOnc9b9AvcSo5HmRyG+wBAfKpmahAneAiN8evEgV8gkgNZQpogN6rdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ltg6Jzsq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CA40C4CEE4;
+	Mon,  5 May 2025 22:30:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746484229;
-	bh=3cThNiVHF135CctaPExQFYahuervVIqr7vOKgbtKPJU=;
+	s=k20201202; t=1746484243;
+	bh=lBWU+9wpWhMPBNO5GCvKFPDkpojiMGc2rdryTUP+QnM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fX7t5f5Ui5xHziSZUubq8YaC8bcV5pt5z78337rsNSNEz0jwExXkxi7CBN7cLi67/
-	 xLavGgX1Sxzq2TMeAfJyKZI+YoLnft52DE49+8qThQLXZA3fNGapBPf7VD5pO7mQvI
-	 YywYp5R4Ohi/IWlwjkhZQ2KGROdP4y0JyG4I0Y4QztDGYk7inbaol+gzPISfs98PBI
-	 frb2Z1t9tCZRRJkE32xlnyXjI1aADdMsN2h9VSX7f7hCqu1PqmPH7R/4bl/niT5/yb
-	 4VoRysQwAdpcgJn2N3e5aKJUoIaWbBkiNg/Uk/B3rqGKbVqf7Ox5qYscbdxNr05iXy
-	 p9DC5vac/upzQ==
+	b=Ltg6Jzsq5vlEonrLEDMpyMHawcnQy9i3rXAVynprmel7EMcSdTOcG27nT4mzZKy4o
+	 QRGi5uxJaxD0SC0xzs+UoV3s6PSFZX+fvImqbWnvgD7XeS8xHEfaKDvE4ySVOkyq1M
+	 itU21biqC6vNHuoNUthmIwWb1okHEvVEG6Z3rTyiWaqsBVR5dgFySqeXxiCPEJ7IgQ
+	 jHHEcLD6jcHJDW27z2/0dYPsC+CjlvGBi8y+ziemgpJX75m7oYjmCi90TRpD5kzdlp
+	 6s07OzF6CfAiHRb7lwMR3C/3Hgj8I70hKaaR66Vuu3kddjbGUCwOKwpVgRjwnXdVMh
+	 F4+5hC7DhyCHg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Petr Machata <petrm@nvidia.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+Cc: Shahar Shitrit <shshitrit@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
+	saeedm@nvidia.com,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
-	menglong8.dong@gmail.com,
-	gnault@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.14 399/642] vxlan: Join / leave MC group after remote changes
-Date: Mon,  5 May 2025 18:10:15 -0400
-Message-Id: <20250505221419.2672473-399-sashal@kernel.org>
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.14 407/642] net/mlx5: Modify LSB bitmask in temperature event to include only the first bit
+Date: Mon,  5 May 2025 18:10:23 -0400
+Message-Id: <20250505221419.2672473-407-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505221419.2672473-1-sashal@kernel.org>
 References: <20250505221419.2672473-1-sashal@kernel.org>
@@ -73,111 +73,43 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.14.5
 Content-Transfer-Encoding: 8bit
 
-From: Petr Machata <petrm@nvidia.com>
+From: Shahar Shitrit <shshitrit@nvidia.com>
 
-[ Upstream commit d42d543368343c0449a4e433b5f02e063a86209c ]
+[ Upstream commit 633f16d7e07c129a36b882c05379e01ce5bdb542 ]
 
-When a vxlan netdevice is brought up, if its default remote is a multicast
-address, the device joins the indicated group.
+In the sensor_count field of the MTEWE register, bits 1-62 are
+supported only for unmanaged switches, not for NICs, and bit 63
+is reserved for internal use.
 
-Therefore when the multicast remote address changes, the device should
-leave the current group and subscribe to the new one. Similarly when the
-interface used for endpoint communication is changed in a situation when
-multicast remote is configured. This is currently not done.
+To prevent confusing output that may include set bits that are
+not relevant to NIC sensors, we update the bitmask to retain only
+the first bit, which corresponds to the sensor ASIC.
 
-Both vxlan_igmp_join() and vxlan_igmp_leave() can however fail. So it is
-possible that with such fix, the netdevice will end up in an inconsistent
-situation where the old group is not joined anymore, but joining the new
-group fails. Should we join the new group first, and leave the old one
-second, we might end up in the opposite situation, where both groups are
-joined. Undoing any of this during rollback is going to be similarly
-problematic.
-
-One solution would be to just forbid the change when the netdevice is up.
-However in vnifilter mode, changing the group address is allowed, and these
-problems are simply ignored (see vxlan_vni_update_group()):
-
- # ip link add name br up type bridge vlan_filtering 1
- # ip link add vx1 up master br type vxlan external vnifilter local 192.0.2.1 dev lo dstport 4789
- # bridge vni add dev vx1 vni 200 group 224.0.0.1
- # tcpdump -i lo &
- # bridge vni add dev vx1 vni 200 group 224.0.0.2
- 18:55:46.523438 IP 0.0.0.0 > 224.0.0.22: igmp v3 report, 1 group record(s)
- 18:55:46.943447 IP 0.0.0.0 > 224.0.0.22: igmp v3 report, 1 group record(s)
- # bridge vni
- dev               vni                group/remote
- vx1               200                224.0.0.2
-
-Having two different modes of operation for conceptually the same interface
-is silly, so in this patch, just do what the vnifilter code does and deal
-with the errors by crossing fingers real hard.
-
-The vnifilter code leaves old before joining new, and in case of join /
-leave failures does not roll back the configuration changes that have
-already been applied, but bails out of joining if it could not leave. Do
-the same here: leave before join, apply changes unconditionally and do not
-attempt to join if we couldn't leave.
-
-Signed-off-by: Petr Machata <petrm@nvidia.com>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Shahar Shitrit <shshitrit@nvidia.com>
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Link: https://patch.msgid.link/20250213094641.226501-4-tariqt@nvidia.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/vxlan/vxlan_core.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/events.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index 92516189e792f..ae0e2edfde1aa 100644
---- a/drivers/net/vxlan/vxlan_core.c
-+++ b/drivers/net/vxlan/vxlan_core.c
-@@ -4415,6 +4415,7 @@ static int vxlan_changelink(struct net_device *dev, struct nlattr *tb[],
- 			    struct netlink_ext_ack *extack)
- {
- 	struct vxlan_dev *vxlan = netdev_priv(dev);
-+	bool rem_ip_changed, change_igmp;
- 	struct net_device *lowerdev;
- 	struct vxlan_config conf;
- 	struct vxlan_rdst *dst;
-@@ -4438,8 +4439,13 @@ static int vxlan_changelink(struct net_device *dev, struct nlattr *tb[],
- 	if (err)
- 		return err;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/events.c b/drivers/net/ethernet/mellanox/mlx5/core/events.c
+index d91ea53eb394d..cd8d107f7d9e3 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/events.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/events.c
+@@ -163,6 +163,10 @@ static int temp_warn(struct notifier_block *nb, unsigned long type, void *data)
+ 	u64 value_msb;
  
-+	rem_ip_changed = !vxlan_addr_equal(&conf.remote_ip, &dst->remote_ip);
-+	change_igmp = vxlan->dev->flags & IFF_UP &&
-+		      (rem_ip_changed ||
-+		       dst->remote_ifindex != conf.remote_ifindex);
-+
- 	/* handle default dst entry */
--	if (!vxlan_addr_equal(&conf.remote_ip, &dst->remote_ip)) {
-+	if (rem_ip_changed) {
- 		u32 hash_index = fdb_head_index(vxlan, all_zeros_mac, conf.vni);
+ 	value_lsb = be64_to_cpu(eqe->data.temp_warning.sensor_warning_lsb);
++	/* bit 1-63 are not supported for NICs,
++	 * hence read only bit 0 (asic) from lsb.
++	 */
++	value_lsb &= 0x1;
+ 	value_msb = be64_to_cpu(eqe->data.temp_warning.sensor_warning_msb);
  
- 		spin_lock_bh(&vxlan->hash_lock[hash_index]);
-@@ -4483,6 +4489,9 @@ static int vxlan_changelink(struct net_device *dev, struct nlattr *tb[],
- 		}
- 	}
- 
-+	if (change_igmp && vxlan_addr_multicast(&dst->remote_ip))
-+		err = vxlan_multicast_leave(vxlan);
-+
- 	if (conf.age_interval != vxlan->cfg.age_interval)
- 		mod_timer(&vxlan->age_timer, jiffies);
- 
-@@ -4490,7 +4499,12 @@ static int vxlan_changelink(struct net_device *dev, struct nlattr *tb[],
- 	if (lowerdev && lowerdev != dst->remote_dev)
- 		dst->remote_dev = lowerdev;
- 	vxlan_config_apply(dev, &conf, lowerdev, vxlan->net, true);
--	return 0;
-+
-+	if (!err && change_igmp &&
-+	    vxlan_addr_multicast(&dst->remote_ip))
-+		err = vxlan_multicast_join(vxlan);
-+
-+	return err;
- }
- 
- static void vxlan_dellink(struct net_device *dev, struct list_head *head)
+ 	mlx5_core_warn(events->dev,
 -- 
 2.39.5
 
