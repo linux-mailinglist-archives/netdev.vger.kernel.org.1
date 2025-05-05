@@ -1,167 +1,198 @@
-Return-Path: <netdev+bounces-187829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 543BBAA9CBC
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 21:45:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D809CAA9CBB
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 21:44:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B486517A71F
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 19:45:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 389E0179D6D
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 19:44:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 381C425EF97;
-	Mon,  5 May 2025 19:45:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9EF71DED5E;
+	Mon,  5 May 2025 19:44:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="mg74TtMj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SVQbv4AU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BBA525A2AD;
-	Mon,  5 May 2025 19:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CCFF1684A4
+	for <netdev@vger.kernel.org>; Mon,  5 May 2025 19:44:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746474308; cv=none; b=tUTYFWxlJjUg6GBUtJwY407x1sFiHynIZ8/1WzQjSKs1OziEPtIH0Cx4CgjrnMM3IcgeGYTZT9Z+izvGQvZ1j3Ux67a9ywtypK4+BKLJjhoVEZgVDlREfGNT9D41B0CdFhRQ6QHQgn7j+IQxTk51fxtzGpPfw9e5F2u7Z6hEg4I=
+	t=1746474277; cv=none; b=h0EuCyUIhalzrSGyHew71LUlPKcnPZeBHvqSygRh7FPB6w+pyrAlq7qNJY+qeVV/BnQYjLCCe9QUkOgSXNfZx7jFmARTN69i1tX4jY+zeaHWkdnOU/9FJ0iownCvgYT+gMYnGxSpuoPPvdl4MT6avQ4W+43Ncxs3IcplSjXe0Ig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746474308; c=relaxed/simple;
-	bh=E5D00Fn3Ews3NrcKKo40oyb0gzJDlFcBX1biTaaaB/M=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NHyRcxsFHfKcU7+aoWOlhZLFpnJaXTTufXHpHW4FWjMa6DOirTwLWwU+vTkApk89Ef9siptKh0pMa4JUG9+L4f9QsORcANd2PKKGNFPife0mufLOCvY6Ii1VIWp87urA1fo6pShXmbD7Gtt0fuPq3Fr4H50+GT9wtKNb1j42Vq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=mg74TtMj; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1746474277; c=relaxed/simple;
+	bh=FIU3C15HMdDoIyO04SIlCSqXtCWA8PbBT/0ridkCzsQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hkSasGlyGostCgr/DLT0l59Z/oAgcBHowv7KDvHzATHS6j9QeoJMeRfYs1w0vEgKOqZoeDYtlS6B2a/kUVQAUYKh2by7sheCZ933Y3wzvbSI5NEIOYfKnRkj8+2AMfXTg7kaEP1ybaR7D9GajHdUcPpq12qPKt6avhqk8lZ/XIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SVQbv4AU; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-af548cb1f83so4652102a12.3
+        for <netdev@vger.kernel.org>; Mon, 05 May 2025 12:44:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1746474306; x=1778010306;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=in13V4Hpf+rM5riCqQp8PkhP40WaDgpbmkmr0PaeIdU=;
-  b=mg74TtMjtX5BsB7/ecNyyiha/yPhviJqK8hNBpLaygWG4iRQB+IPxXS3
-   m++796nkesS725aK6nKi1ZtYB1Qj01sSsdk90v192n0JXULNgA7bMoitK
-   Yyxu73OQ3a/KOBCyP6YttORTdG6GcipFSicy5rSyXe5dBWPu49w7ylTuX
-   g=;
-X-IronPort-AV: E=Sophos;i="6.15,264,1739836800"; 
-   d="scan'208";a="193851574"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2025 19:45:04 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:50948]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.10.32:2525] with esmtp (Farcaster)
- id a2fb1d49-05fb-4bfc-b186-5b0439853504; Mon, 5 May 2025 19:45:04 +0000 (UTC)
-X-Farcaster-Flow-ID: a2fb1d49-05fb-4bfc-b186-5b0439853504
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 5 May 2025 19:45:03 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.187.170.18) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 5 May 2025 19:44:59 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuniyu@amazon.com>
-CC: <alexander@mihalicyn.com>, <bluca@debian.org>, <brauner@kernel.org>,
-	<daan.j.demeyer@gmail.com>, <davem@davemloft.net>, <david@readahead.eu>,
-	<edumazet@google.com>, <horms@kernel.org>, <jack@suse.cz>,
-	<jannh@google.com>, <kuba@kernel.org>, <lennart@poettering.net>,
-	<linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<me@yhndnzj.com>, <netdev@vger.kernel.org>, <oleg@redhat.com>,
-	<pabeni@redhat.com>, <viro@zeniv.linux.org.uk>, <zbyszek@in.waw.pl>
-Subject: Re: [PATCH RFC v3 08/10] net, pidfs, coredump: only allow coredumping tasks to connect to coredump socket
-Date: Mon, 5 May 2025 12:44:30 -0700
-Message-ID: <20250505194451.22723-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250505193828.21759-1-kuniyu@amazon.com>
-References: <20250505193828.21759-1-kuniyu@amazon.com>
+        d=gmail.com; s=20230601; t=1746474275; x=1747079075; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=A8b2RS58kS+UBOT9kP3uDOYyvhTTboqGcQTIlcuEiNY=;
+        b=SVQbv4AUvg/GvVK10vq+QpJhOSf+l8g23YzyceRfj8V06frIvfhvsV+g3mI9jxRn/g
+         A8aDS1HUStYQUF0/VWDiz3YboyzO+bs70UBHmEphTxk3aO9FwD9/z+qA5JjF2V6yhjMg
+         kYcmKfQ6ddAKbRjqzvIV9hXoeCVHZHH+vKli3uAtLEdg8EwdhxXD4EljHcdB2H2pCL5Z
+         DxNuXOdtePYxuExGTFiEoy/RSNUTyoCwzw/ApogQI5I0kukuJCzHdWr05y1v4GoTAv+O
+         9QqTWlrj69tAwxryuFo5yEGKfm017q5pRpMle3TFbw9foxaEygAXeWepJv5GKKPXYyTt
+         4S0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746474275; x=1747079075;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A8b2RS58kS+UBOT9kP3uDOYyvhTTboqGcQTIlcuEiNY=;
+        b=gTq0wbUIBFOc35UyskCYpEvS8un2LlAMvJDWAQ1zDLZec59JYuWIOV//xk5THxpKpD
+         ei7QWqbNa8Zah/cYithjA2Pj4otDU1CALHwLtERRu7VmQhjhh/PYIdyu1qwrwIoUoejU
+         0+muA4vI2xT4XCoVj5Yhon4l7F3zjuC6CljhuZ8GbMLfo8/0axtb5sC0gQdUb/SXFVV+
+         SRugknC9RiT31c2PGa6vouq2GABcW+J9s6eHstooX5AKcpWiYkOov2JhRB4mGGB6M89H
+         gk/cNHza/1gj8tlawB5CzIMfSwSGGEEMOm/SXtOBzN3EzvnZ/nK98zWw2uwx6zenYo60
+         +COA==
+X-Forwarded-Encrypted: i=1; AJvYcCVswAqJIOWNuJbDe9D7TOisDmw9IAnbvPYAOmlVZPNSYwNA+HKakT8G33r9F9FSeQlzCzP6LyA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEOAe3C0sjifyAZgc1HSeJVxfPVGshpa1nzVXVY8xxH6b9qMll
+	QTtayu/HK4J4fZNnJnay+YAXFy6rkLB7DcPGCie4BZfbCQdlmd/P
+X-Gm-Gg: ASbGncudXJUvs6WD+Ne+XXcFM0l9dc5n8zppMk4gPn/7z8zy7ifDRzxaRbf8FrSsmwC
+	O+XhHOqCHEzxvwJSCtc6f3hR5jZa/Ayvj7r+mLw1FiY0wvls2+ghrkeA7D7mv6k2m2UD5Ysk9Wd
+	CErhVZ6ZxXmdDq4HGBF8oA0emqfhACyKOXy/88cKo9q/S9wYCmhA5sZFOP2KiaG9rqMF2PBnY89
+	w2H9j+oXfPisTljFtDqUW14H9dTRCr9wefmAOZnkrj2Zj4YyaZsPgrBmP/0rGInc5wUaHP8WkCp
+	51vSY6tzpd2EVafyGu69wYeTGrLrT2Ac1OFtAUpNg9yb
+X-Google-Smtp-Source: AGHT+IFh3h/cLhKscWBMuZI6rfCG02KLjLiFWUzh4I7s4mk1wE91lg4v57jg0tlbLLOHvDmKBFIq4g==
+X-Received: by 2002:a17:90a:c884:b0:2ff:72f8:3708 with SMTP id 98e67ed59e1d1-30a7c09e74cmr1159194a91.17.1746474274916;
+        Mon, 05 May 2025 12:44:34 -0700 (PDT)
+Received: from localhost ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30a4747681fsm9436696a91.12.2025.05.05.12.44.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 May 2025 12:44:34 -0700 (PDT)
+Date: Mon, 5 May 2025 12:44:33 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Savy <savy@syst3mfailure.io>
+Cc: Will <willsroot@protonmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, jhs@mojatatu.com,
+	jiri@resnulli.us
+Subject: Re: [BUG] net/sched: Race Condition and Null Dereference in
+ codel_change, pie_change, fq_pie_change, fq_codel_change, hhf_change
+Message-ID: <aBkVIY4GZBnrolrq@pop-os.localdomain>
+References: <UTd8zf-_MMCqMv9R15RSDZybxtCeV9czSvpeaslK7984UCPTX8pbSFVyWhzqiaA6HYFZtHIldd7guvr7_8xVfkk9xSUHnY3e8dSWi7pdVsE=@protonmail.com>
+ <aA1kmZ/Hs0a33l5j@pop-os.localdomain>
+ <B2ZSzsBR9rUWlLkrgrMrCzqOGeSFxXIkYImvul6994v5tDSqykWo1UaWKRV-SNkNKJurgVzRcnPN07ZAVYykRaYhADyIwTxQ18OQfKDpILQ=@protonmail.com>
+ <aA/czQYEtPmMim0G@pop-os.localdomain>
+ <EBHeQZeq5AJteszZoHrsiJv6EGOnuByQ-XNejgA9WiqQ8g2jIXowzoGjuJowDcV6xi9xBgyMTwNlS8wN0zUOlRl4Bl2Mv-x883IKCvdySyU=@syst3mfailure.io>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D043UWA004.ant.amazon.com (10.13.139.41) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <EBHeQZeq5AJteszZoHrsiJv6EGOnuByQ-XNejgA9WiqQ8g2jIXowzoGjuJowDcV6xi9xBgyMTwNlS8wN0zUOlRl4Bl2Mv-x883IKCvdySyU=@syst3mfailure.io>
 
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-Date: Mon, 5 May 2025 12:35:50 -0700
-> From: Jann Horn <jannh@google.com>
-> Date: Mon, 5 May 2025 21:10:28 +0200
-> > On Mon, May 5, 2025 at 8:41 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
-> > > From: Christian Brauner <brauner@kernel.org>
-> > > Date: Mon, 5 May 2025 16:06:40 +0200
-> > > > On Mon, May 05, 2025 at 03:08:07PM +0200, Jann Horn wrote:
-> > > > > On Mon, May 5, 2025 at 1:14 PM Christian Brauner <brauner@kernel.org> wrote:
-> > > > > > Make sure that only tasks that actually coredumped may connect to the
-> > > > > > coredump socket. This restriction may be loosened later in case
-> > > > > > userspace processes would like to use it to generate their own
-> > > > > > coredumps. Though it'd be wiser if userspace just exposed a separate
-> > > > > > socket for that.
-> > > > >
-> > > > > This implementation kinda feels a bit fragile to me... I wonder if we
-> > > > > could instead have a flag inside the af_unix client socket that says
-> > > > > "this is a special client socket for coredumping".
-> > > >
-> > > > Should be easily doable with a sock_flag().
-> > >
-> > > This restriction should be applied by BPF LSM.
+On Tue, Apr 29, 2025 at 01:41:19PM +0000, Savy wrote:
+> 
+> On Monday, April 28th, 2025 at 7:53 PM, Cong Wang <xiyou.wangcong@gmail.com> wrote:
+> 
 > > 
-> > I think we shouldn't allow random userspace processes to connect to
-> > the core dump handling service and provide bogus inputs; that
-> > unnecessarily increases the risk that a crafted coredump can be used
-> > to exploit a bug in the service. So I think it makes sense to enforce
-> > this restriction in the kernel.
+> > 
+> > Excellent analysis!
+> > 
+> > Do you mind testing the following patch?
+> > 
+> > Note:
+> > 
+> > 1) We can't just test NULL, because otherwise we would leak the skb's
+> > in gso_skb list.
+> > 
+> > 2) I am totally aware that maybe there are some other cases need the
+> > same fix, but I want to be conservative here since this will be
+> > targeting for -stable. It is why I intentionally keep my patch minimum.
+> > 
+> > Thanks!
+> > 
+> > --------------->
+> > 
 > 
-> It's already restricted by /proc/sys/kernel/core_pattern.
-> We don't need a duplicated logic.
+> Hi Cong,
 > 
-> Even when the process holding the listener dies, you can
-> still avoid such a leak.
+> Thank you for the reply. We have tested your patch and can confirm that it resolves the issue.
+> However, regarding point [1], we conducted some tests to verify if there is a skb leak in the gso_skb list, 
+> but the packet remains in the list only for a limited amount of time.
 > 
-> e.g.
+> In our POC we set a very low TBF rate, so when the Qdisc runs out of tokens, 
+> it reschedules itself via qdisc watchdog after approximately 45 seconds.
 > 
-> 1. Set up a listener
-> 2. Put the socket into a bpf map
-> 3. Attach LSM at connect()
+> Returning to the example above, here is what happens when the watchdog timer fires:
 > 
-> Then, the LSM checks if the destination socket is
+> [ ... ]
 > 
->   * listening on the name specified in /proc/sys/kernel/core_pattern
->   * exists in the associated BPF map
+> Packet 2 is sent:
+> 
+>     [ ... ]
+> 
+>     tbf_dequeue()
+>         qdisc_peek_dequeued()
+>             skb_peek(&sch->gso_skb) // sch->gso_skb is empty
+>             codel_qdisc_dequeue() // Codel qlen is 1
+>                 qdisc_dequeue_head()
+>                 // Packet 2 is removed from the queue
+>                 // Codel qlen = 0
+>             __skb_queue_head(&sch->gso_skb, skb); // Packet 2 is added to gso_skb list
+>             sch->q.qlen++ // Codel qlen = 1
+> 
+>         // TBF runs out of tokens and reschedules itself for later
+>         qdisc_watchdog_schedule_ns() 
+> 
+>     codel_change() // Patched, (!skb) break;, does not crash
+> 
+>     // ... ~45 seconds later the qdisc watchdog timer fires
+> 
+>     tbf_dequeue()
+>         qdisc_peek_dequeued()
+>             skb_peek(&sch->gso_skb) // sch->gso_skb is _not_ empty (contains Packet 2)
+>         // TBF now has enough tokens
+>         qdisc_dequeue_peeked()
+>             skb = __skb_dequeue(&sch->gso_skb) // Packet 2 is removed from the gso_skb list
+>             sch->q.qlen-- // Codel qlen = 0
+> 
+> Notice how the gso_skb list is correctly cleaned up when the watchdog timer fires.
+> We also examined some edge cases, such as when the watchdog is canceled 
+> and there are still packets left in the gso_skb list, and it is always cleaned up:
+> 
+> Qdisc destruction case:
+> 
+>     tbf_destroy()
+>         qdisc_put()
+>             __qdisc_destroy()
+>                qdisc_reset()
+>                    __skb_queue_purge(&qdisc->gso_skb);
+> 
+> Qdisc reset case:
+> 
+>     tbf_reset()
+>         qdisc_reset()
+>             __skb_queue_purge(&qdisc->gso_skb);
+> 
+> Perhaps the skb leak you mentioned occurs in another edge case that we overlooked? 
 
-and LSM can check if the source socket is a kernel socket too.
 
+You are right, it is inaccurate to say it is a leak, probably just a
+matter of ordering, because ->gso_list is logically the "head" of a
+Qdisc.
 
+> In any case, we believe your patch is technically more correct,
+> as it makes sense to clean up packets in the gso_skb list first when the limit changes.
 > 
-> So, if the socket is dies and a malicious user tries to hijack
-> the core_pattern name, LSM still rejects such connect().
-> 
-> Later, the admin can restart the program with different core_pattern.
-> 
-> 
-> > 
-> > My understanding is that BPF LSM creates fairly tight coupling between
-> > userspace and the kernel implementation, and it is kind of unwieldy
-> > for userspace. (I imagine the "man 5 core" manpage would get a bit
-> > longer and describe more kernel implementation detail if you tried to
-> > show how to write a BPF LSM that is capable of detecting unix domain
-> > socket connections to a specific address that are not initiated by
-> > core dumping.) I would like to keep it possible to implement core
-> > userspace functionality in a best-practice way without needing eBPF.
-> 
-> I think the untrusted user scenario is paranoia in most cases,
-> and the man page just says "if you really care, use BPF LSM".
-> 
-> If someone can listen on a name AND set it to core_pattern, most
-> likely something worse already happened.
-> 
-> 
-> > 
-> > > It's hard to loosen such a default restriction as someone might
-> > > argue that's unexpected and regression.
-> > 
-> > If userspace wants to allow other processes to connect to the core
-> > dumping service, that's easy to implement - userspace can listen on a
-> > separate address that is not subject to these restrictions.
-> > 
+
+Thank you for testing! I will add your Reported-and-Tested-by and send
+out the patch.
+
+Regards,
+Cong
 
