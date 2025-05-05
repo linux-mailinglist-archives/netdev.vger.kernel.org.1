@@ -1,114 +1,151 @@
-Return-Path: <netdev+bounces-188172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECF9BAAB7AF
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:16:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EC0C9AAB7DF
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:21:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF5AD5023FA
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:14:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70FD54A26B5
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:19:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42A0C4A4E64;
-	Tue,  6 May 2025 00:48:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 496E83537CF;
+	Tue,  6 May 2025 01:12:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ewfl4VnR"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="nVAkFbts";
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="OpX7j1iA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5877C3AF413;
-	Mon,  5 May 2025 23:20:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D80630C1C6;
+	Mon,  5 May 2025 23:41:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746487211; cv=none; b=JZj3C/9ZoeQJmUXz7JJcVWbsHa2L0ABFjhi4FilWqVUF2IzoCahvVvoi9CDv+HD2o8BzGFOin6ZFpb+vye/VLR+Bl43EukDp3gLFCElwqXyks6I1WWmYoUCcriMmmeVYiUMhEpGVd5j5aOA76PRdVekXMCW0A2k8XpLqFtjcZpc=
+	t=1746488523; cv=none; b=jxehqS4BSTj8lJKBNiBkfx0LpvvuLtDA4YJwAdcUOvn1ng4SzemFw+Bo5Pg/Xk0fqCr0xXVUVaGsJkI6rZWVcnmmi3/Q4ONs4i8yASGeEf0gqhLkY3PXW69ox0gYm42tczAJvpo1w+xJlBG/2mXaFThu5qst03JgBUH3i5nZ+RE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746487211; c=relaxed/simple;
-	bh=2yE7zy2FWQ3AXCJ6jui9QnR9f1PfghpII4uGE+xFPO4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KzE+4LDGvtEi9LQkJA8V5brPcTkZ0C3ts6czcAneZkJHb1JsMS/PMF4GBVP9ySelN4c7QkvPEpMfXK/MOCDbw48iwsbFsQIMSZ67rqKxIeosFy1R2K6HB9M/UdTvDtqHZUOvE0bUHZ6T5BdiesSlILTrkLWKiu7cIjsh0Ic7K7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ewfl4VnR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98425C4CEED;
-	Mon,  5 May 2025 23:20:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746487211;
-	bh=2yE7zy2FWQ3AXCJ6jui9QnR9f1PfghpII4uGE+xFPO4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ewfl4VnRIeAARoPMNjwvb62j8zOQ6ARTZjFtG0ysAaEDdmxv0oXZU1AMWfuTUi4fh
-	 62JrYa3iLJRNjVbLlyYaWBa2HGGwlDfPWdU636NtNVP+XnyvsWjnrfRfOdS+UBBlFT
-	 CG+xiSYghbas3pUmYdvkEXA4T+M4vkm/AQd13d/GvjU/PQYYDECADj2TQ+/NrpP+il
-	 3TV8eLYG52EVPxOQyQbgpwj+0X7BHNCazODKZCuXqrmoi1rh7npaBvPK5YQdB9WElY
-	 WFIm8CB6RmDYaNkHiOVqnG6u+b2Jo3XFaMqLmuEUCfumZeAZ/98NjPgMpgYECNzSlD
-	 FVKU/ZsOW0fVw==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Moshe Shemesh <moshe@nvidia.com>,
-	Shahar Shitrit <shshitrit@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Sasha Levin <sashal@kernel.org>,
-	saeedm@nvidia.com,
-	andrew+netdev@lunn.ch,
-	edumazet@google.com,
+	s=arc-20240116; t=1746488523; c=relaxed/simple;
+	bh=MaMkf53SEIRP4bQtihcD1yyrGguY6LuXqAfw+XKt1/U=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oVOuWLOc1L4CdMrZT5UrRbBX9ISOncLCfe0TAlNBtRXEcwqOSTgx6/IMUS6EZDbUU/CJr6LwLMAz6NSiOGIy9xpKPx5pXOw3NSm6DrPrDvvzNsqx04+X+l5eXLhlPFAKNLeppUqkqAiGPR//qObT3SCMAA53W30+xac096ydbPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=nVAkFbts; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=OpX7j1iA; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: by mail.netfilter.org (Postfix, from userid 109)
+	id 11EF56065D; Tue,  6 May 2025 01:41:58 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1746488518;
+	bh=LfiaJP+Uo+z2Z0JoRS0aywKhfv0uxsPSHVVFel78Bko=;
+	h=From:To:Cc:Subject:Date:From;
+	b=nVAkFbtsaPUFj3hkjJaV2O3uyeK2Gl1ksr415cZn84XZSwBj6I4r98GgT5pzxaCRe
+	 mxOI1Sb1wsjAWnZGOKbXj8N5xwPql2uUfxvfr002G0L0rLUS97XXlRxnONcBOI/m+A
+	 0112M96R9Bc32HWTM3n5UmpuklqvVhcXg6VNPUaPKY9oGjMGnI3YLVNe7knwm+bTku
+	 A7Yryn4B8vu5nMWM3Ac7E3horgwbq5PO0jKP5ArFyTls8r1RueeQSCkrO6AFMxH1Nr
+	 U+sUCtyIKQ/Ntapgj/wWQNOmT2uTlIr+c8S7WXUU1uJuONXsw0Ym3MpfBuH80NQKdb
+	 ZrCl5QyVZeJIg==
+X-Spam-Level: 
+Received: from localhost.localdomain (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id 684DA60654;
+	Tue,  6 May 2025 01:41:55 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1746488515;
+	bh=LfiaJP+Uo+z2Z0JoRS0aywKhfv0uxsPSHVVFel78Bko=;
+	h=From:To:Cc:Subject:Date:From;
+	b=OpX7j1iAzQvnfpDsHF28r7LeG2KouyiRK/jJTgy1Y3cFsXyHzp5SkSfteMGSBbtr+
+	 qgE+7VSITVSuPbqlM020XefnXGVy/n0t5e8M2o2+FG3M+UbkKfCW0BExM1wKRUQpxh
+	 v2M04BoYw/kPZE9LYwTfnnJ3Wd8PiHXzQhGmYs0S/eeLsyuvDroZDuyeIANCRoJkmO
+	 LWuvN24T1KSRQObUaGeINDJ3IqBIVE26UJSNi7RBbLqaafzKK3kC70+jBhlzl6kkfC
+	 d80LzY0ayKp1C8RUbqO34/hX0tNIZOOygDjnFI8rL3sXlqOh1zEH7XzshGyLuicWJy
+	 Oa1k+M+wJ0Llg==
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 059/114] net/mlx5: Avoid report two health errors on same syndrome
-Date: Mon,  5 May 2025 19:17:22 -0400
-Message-Id: <20250505231817.2697367-59-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250505231817.2697367-1-sashal@kernel.org>
-References: <20250505231817.2697367-1-sashal@kernel.org>
+	edumazet@google.com,
+	fw@strlen.de,
+	horms@kernel.org
+Subject: [PATCH nf-next 0/7] Netfilter updates for net-next
+Date: Tue,  6 May 2025 01:41:44 +0200
+Message-Id: <20250505234151.228057-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.10.237
 Content-Transfer-Encoding: 8bit
 
-From: Moshe Shemesh <moshe@nvidia.com>
+Hi,
 
-[ Upstream commit b5d7b2f04ebcff740f44ef4d295b3401aeb029f4 ]
+The following patchset contains Netfilter updates for net-next:
 
-In case health counter has not increased for few polling intervals, miss
-counter will reach max misses threshold and health report will be
-triggered for FW health reporter. In case syndrome found on same health
-poll another health report will be triggered.
+1) Apparently, nf_conntrack_bridge changes the way in which fragments
+   are handled, dealing to packet drop. From Huajian Yang.
 
-Avoid two health reports on same syndrome by marking this syndrome as
-already known.
+2) Add a selftest to stress the conntrack subsystem, from Florian Westphal.
 
-Signed-off-by: Moshe Shemesh <moshe@nvidia.com>
-Reviewed-by: Shahar Shitrit <shshitrit@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/net/ethernet/mellanox/mlx5/core/health.c | 1 +
- 1 file changed, 1 insertion(+)
+3) nft_quota depletion is off-by-one byte, Zhongqiu Duan.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/health.c b/drivers/net/ethernet/mellanox/mlx5/core/health.c
-index f42e118f32901..d48912d7afe54 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/health.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/health.c
-@@ -733,6 +733,7 @@ static void poll_health(struct timer_list *t)
- 	health->prev = count;
- 	if (health->miss_counter == MAX_MISSES) {
- 		mlx5_core_err(dev, "device's health compromised - reached miss count\n");
-+		health->synd = ioread8(&h->synd);
- 		print_health_info(dev);
- 		queue_work(health->wq, &health->report_work);
- 	}
--- 
-2.39.5
+4) Rewrites the procfs to read the conntrack table to speed it up,
+   from Florian Westphal.
 
+5) Two patches to prevent overflow in nft_pipapo lookup table and to
+   clamp the maximum bucket size.
+
+6) Update nft_fib selftest to check for loopback packet bypass.
+   From Florian Westphal.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git nf-next-25-05-06
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit 836b313a14a316290886dcc2ce7e78bf5ecc8658:
+
+  ipv4: Honor "ignore_routes_with_linkdown" sysctl in nexthop selection (2025-05-03 21:52:38 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git tags/nf-next-25-05-06
+
+for you to fetch changes up to fc91d5e6d948733773af35ef3b95504d8e588e4f:
+
+  selftests: netfilter: nft_fib.sh: check lo packets bypass fib lookup (2025-05-05 13:17:32 +0200)
+
+----------------------------------------------------------------
+netfilter pull request 25-05-06
+
+----------------------------------------------------------------
+Florian Westphal (3):
+      selftests: netfilter: add conntrack stress test
+      netfilter: nf_conntrack: speed up reads from nf_conntrack proc file
+      selftests: netfilter: nft_fib.sh: check lo packets bypass fib lookup
+
+Huajian Yang (1):
+      netfilter: bridge: Move specific fragmented packet to slow_path instead of dropping it
+
+Pablo Neira Ayuso (2):
+      netfilter: nft_set_pipapo: prevent overflow in lookup table allocation
+      netfilter: nft_set_pipapo: clamp maximum map bucket size to INT_MAX
+
+Zhongqiu Duan (1):
+      netfilter: nft_quota: match correctly when the quota just depleted
+
+ net/bridge/netfilter/nf_conntrack_bridge.c         |  12 +-
+ net/ipv6/netfilter.c                               |  12 +-
+ net/netfilter/nf_conntrack_standalone.c            |  88 +++--
+ net/netfilter/nft_quota.c                          |  20 +-
+ net/netfilter/nft_set_pipapo.c                     |  64 +++-
+ tools/testing/selftests/net/netfilter/Makefile     |   1 +
+ tools/testing/selftests/net/netfilter/config       |   1 +
+ .../selftests/net/netfilter/conntrack_resize.sh    | 406 +++++++++++++++++++++
+ tools/testing/selftests/net/netfilter/nft_fib.sh   |  23 ++
+ 9 files changed, 559 insertions(+), 68 deletions(-)
+ create mode 100755 tools/testing/selftests/net/netfilter/conntrack_resize.sh
 
