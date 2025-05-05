@@ -1,63 +1,70 @@
-Return-Path: <netdev+bounces-187886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83543AAA368
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 01:13:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B001AAA3AB
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 01:18:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F11304642A6
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 23:13:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FBA8188FA56
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 23:18:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 521D3283FC9;
-	Mon,  5 May 2025 22:23:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B1FB284B5B;
+	Mon,  5 May 2025 22:25:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lGBTSN+u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pq/IE7Np"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 293231D8E10;
-	Mon,  5 May 2025 22:23:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A27C2F6648;
+	Mon,  5 May 2025 22:25:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746483834; cv=none; b=gA7E/tWu09q87sQk8hHnwKyHa0xAkHrVhGt/72qE1cXFYtstiox3CKbeMiQUk8nnW6KPNGhjX7ayyZler8rOFLxj7ZtiSIAu8/8KhoJ6CB5GeHxV+m7Bc0ZyOl1NSZz5aZqki7iC1BHNU/seP65Mpv4yZdVScng9h66iYUCClqc=
+	t=1746483902; cv=none; b=GwJjsyc2D6GzSr1FkcWGlBbGeN2QwCNl8frY+Ld39zKJVefJVdGnrobXV9JMb/AMlIu675RvDWeGQ7/ikluUBFe/rBKjATdm//x+Y9XVjtOWJSIGrvKXZrVhMyDJWR3CS/w609FLOxk+/A2TO/kGQ0UO/FjHGN44X/bKPviKb48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746483834; c=relaxed/simple;
-	bh=L12TfLyhSgJ8CCXsimdHeqgPD24pWLgJegt2ic6cTG0=;
+	s=arc-20240116; t=1746483902; c=relaxed/simple;
+	bh=hPGDMPxI4Jtk67vaUVuzunpBf/jA19y2TKrx0ghs468=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=aOFC+NRTBrQ/rh6avUCO4utenkeL1mlwddkq8LU65YVANuSFVpIxJQ5NAxA9sU71nzfN2ATLxFrxd+07umLaUoQvgqCb9n2JV7M7BE5/O70Q4BAYyMV5A8pBEQzqMaCDz0Vwo/d/pvy3tAhGEzIHXb780rGoLIX3eZasvANJ3TY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lGBTSN+u; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F896C4CEF1;
-	Mon,  5 May 2025 22:23:52 +0000 (UTC)
+	 MIME-Version; b=gQyaGwmOkQ0AjAt/u0SDAzw4tvRsfWxS9I12vvJGB3Th5XIvnGVRZe4cimziQxFKFQ3Zx5B+KgRs8VRS60ZSACPK4o7dpKZ97qQZ0OhhMfpnCBCaL12ifUAvmuo5/Z0h+Puw6OjhBCW7BrDyn0X+Q9VzyY40PeHZZelyMBpy7GM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pq/IE7Np; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C3E8C4CEE4;
+	Mon,  5 May 2025 22:24:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746483834;
-	bh=L12TfLyhSgJ8CCXsimdHeqgPD24pWLgJegt2ic6cTG0=;
+	s=k20201202; t=1746483901;
+	bh=hPGDMPxI4Jtk67vaUVuzunpBf/jA19y2TKrx0ghs468=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lGBTSN+uTNueJVtlVIuEx4ZQmwsLmN4zPAodloG6EpyzM4AipA/oBVpl57ZHGFwrx
-	 gC1BKAmCMs5pRJ9HOCnST4c9g32pvYHOD6+4Qx7q3Zus8ce6vOfIriXCShwL5MP11p
-	 CJr93iWTpSkGbM7Zw4OKQwG2VCMrJ4C9JQOvfBfei4Vag7jMkKNAfxY3vlhXy6plLx
-	 5JHkocJO0+4SOi4YN3yQ+r/bTUCv7nUpjMEJBlt3YHrsFuoiiPyTYjBqESWkb2hinH
-	 urFnOOIK8q9HF1UzMQGDMhzPbshkQTw5Dv9TIw6/oUSOagOB3grSgEOxl+ti288Hrv
-	 1Xh9uxbPkrQaw==
+	b=Pq/IE7Np334Ee6zTRsZKi5jjXy6S5Qgl0BWuZ1hzQ48vL8KIlixDH4KrJfMK8GZJc
+	 ByCCUtjU24vcs6H7+ZmR9083bxV2JnZDkIQMlTSz7eTbiz+tbbsUiS4cCK8/6XKz6J
+	 3b4SoaXGKj9G6gD/YVVIzodTLUGHfxX6aFa5TVK0lr+t0e6yi6WzhykmcsR3nk9HtN
+	 8Yu7b2F4ovqXwM6DVJGf3QJTAgXf5mdcHfvObw1PLeR0DxecxH6gbCBFCrsGPNnVim
+	 NYjqqm/YvtKUM33uddjcUj8sMA5Z07fKyjvF1WzuT5rfNW7nelnnSCWiDxteAW8Zyv
+	 g77zKObhQ/1kg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Choong Yong Liang <yong.liang.choong@linux.intel.com>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
+Cc: Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Andrew Lunn <andrew@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	linux@armlinux.org.uk,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
+	alexander.sverdlin@gmail.com,
+	michal.kubiak@intel.com,
+	nicolas.dichtel@6wind.com,
+	lorenzo@kernel.org,
+	u.kleine-koenig@baylibre.com,
+	aleksander.lobakin@intel.com,
+	hkallweit1@gmail.com,
+	linux-omap@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.14 242/642] net: phylink: use pl->link_interface in phylink_expects_phy()
-Date: Mon,  5 May 2025 18:07:38 -0400
-Message-Id: <20250505221419.2672473-242-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.14 261/642] net: ethernet: ti: cpsw_new: populate netdev of_node
+Date: Mon,  5 May 2025 18:07:57 -0400
+Message-Id: <20250505221419.2672473-261-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505221419.2672473-1-sashal@kernel.org>
 References: <20250505221419.2672473-1-sashal@kernel.org>
@@ -72,57 +79,35 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.14.5
 Content-Transfer-Encoding: 8bit
 
-From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+From: Alexander Sverdlin <alexander.sverdlin@siemens.com>
 
-[ Upstream commit b63263555eaafbf9ab1a82f2020bbee872d83759 ]
+[ Upstream commit 7ff1c88fc89688c27f773ba956f65f0c11367269 ]
 
-The phylink_expects_phy() function allows MAC drivers to check if they are
-expecting a PHY to attach. The checking condition in phylink_expects_phy()
-aims to achieve the same result as the checking condition in
-phylink_attach_phy().
+So that of_find_net_device_by_node() can find CPSW ports and other DSA
+switches can be stacked downstream. Tested in conjunction with KSZ8873.
 
-However, the checking condition in phylink_expects_phy() uses
-pl->link_config.interface, while phylink_attach_phy() uses
-pl->link_interface.
-
-Initially, both pl->link_interface and pl->link_config.interface are set
-to SGMII, and pl->cfg_link_an_mode is set to MLO_AN_INBAND.
-
-When the interface switches from SGMII to 2500BASE-X,
-pl->link_config.interface is updated by phylink_major_config().
-At this point, pl->cfg_link_an_mode remains MLO_AN_INBAND, and
-pl->link_config.interface is set to 2500BASE-X.
-Subsequently, when the STMMAC interface is taken down
-administratively and brought back up, it is blocked by
-phylink_expects_phy().
-
-Since phylink_expects_phy() and phylink_attach_phy() aim to achieve the
-same result, phylink_expects_phy() should check pl->link_interface,
-which never changes, instead of pl->link_config.interface, which is
-updated by phylink_major_config().
-
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-Link: https://patch.msgid.link/20250227121522.1802832-2-yong.liang.choong@linux.intel.com
+Reviewed-by: Siddharth Vadapalli <s-vadapalli@ti.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+Link: https://patch.msgid.link/20250303074703.1758297-1-alexander.sverdlin@siemens.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/phy/phylink.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/ti/cpsw_new.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 5be48eb810abb..8c4dfe9dc7650 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -2074,7 +2074,7 @@ bool phylink_expects_phy(struct phylink *pl)
- {
- 	if (pl->cfg_link_an_mode == MLO_AN_FIXED ||
- 	    (pl->cfg_link_an_mode == MLO_AN_INBAND &&
--	     phy_interface_mode_is_8023z(pl->link_config.interface)))
-+	     phy_interface_mode_is_8023z(pl->link_interface)))
- 		return false;
- 	return true;
- }
+diff --git a/drivers/net/ethernet/ti/cpsw_new.c b/drivers/net/ethernet/ti/cpsw_new.c
+index cec0a90659d94..66713bc931741 100644
+--- a/drivers/net/ethernet/ti/cpsw_new.c
++++ b/drivers/net/ethernet/ti/cpsw_new.c
+@@ -1418,6 +1418,7 @@ static int cpsw_create_ports(struct cpsw_common *cpsw)
+ 		ndev->netdev_ops = &cpsw_netdev_ops;
+ 		ndev->ethtool_ops = &cpsw_ethtool_ops;
+ 		SET_NETDEV_DEV(ndev, dev);
++		ndev->dev.of_node = slave_data->slave_node;
+ 
+ 		if (!napi_ndev) {
+ 			/* CPSW Host port CPDMA interface is shared between
 -- 
 2.39.5
 
