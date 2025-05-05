@@ -1,62 +1,64 @@
-Return-Path: <netdev+bounces-187877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE2A4AAA17B
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 00:48:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F673AAA1BA
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 00:51:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41B273B5CD6
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 22:46:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7A0D1881604
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 22:50:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E45632BE0E3;
-	Mon,  5 May 2025 22:19:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 690712D0AAB;
+	Mon,  5 May 2025 22:20:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r35HF/GS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="abezoa9M"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B48772BD93C;
-	Mon,  5 May 2025 22:19:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC952D0AA0;
+	Mon,  5 May 2025 22:20:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746483590; cv=none; b=a0tFJ686IACWnmufdPc13u6Wl5zayDLQtr5QgPsDEttlurr0J4Pnh1H2zEwdUcQc7FwB5K+QEQDkT5u3mem9FzGufMPAOE8Xmr2bqnkB16TqGB0KaAAY0m8gaL9h0KrsmNzZN2JwmiAPuyd9Lm/FgzVtr5dx4u3GM5wtetv6VBo=
+	t=1746483617; cv=none; b=CD6MydcilNfTppQXmxtHOwRe5sRUhM1x8udLkWtBCs1CxZbEboIagsHPx1ZBdY7sFCZPnzliSuXq6t/ycZsXZV/8PPXirW3q6iJ1AtO+XtAFsmBH1sUEgW22B31UkWna/mYujK+RhUcXNW4tcUSRXvlxlQm1ajyBmkB96sKPIh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746483590; c=relaxed/simple;
-	bh=UVFtPHDPtwNgmEepjvGjTz6OV6U6mih+Ib5ofDPkj3c=;
+	s=arc-20240116; t=1746483617; c=relaxed/simple;
+	bh=YODJSnivOEZDxjFwX5FgO6CI5awOhrnlo4GZiVdtxTQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ai34DXzZPoyiq+w5PI6ojRW9Lo8YHHT3DRhFol4T79+7dll4hQowNsPt29FInZ3cLqX/7/i9DdBz8SSuaOwaHjZ8hDRQ4vko3CGBCdkPiERHEzoIq16rJPkoSE6aPx72NGoIpfd7YpxDVmmukPhTAi//mKAuHQZhv1nzAnRJccI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r35HF/GS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A831C4CEE4;
-	Mon,  5 May 2025 22:19:49 +0000 (UTC)
+	 MIME-Version; b=s0+TT4eimHh0hPm7KTVKUV1roLnP88NQ7daiWTcOreVK9kLAWTqgfcUnx8qSXWKMMLUYioRfg3y1VM8UeSsJ6FHEG2sisOas4YlvxXe0IDzvC5qHL0Ym+vDKd4OrdsN3p/RLYOVKnMmJilgngLdVE8g5rT9+qWcs5Gl7vI942r4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=abezoa9M; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1097C4CEED;
+	Mon,  5 May 2025 22:20:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746483590;
-	bh=UVFtPHDPtwNgmEepjvGjTz6OV6U6mih+Ib5ofDPkj3c=;
+	s=k20201202; t=1746483616;
+	bh=YODJSnivOEZDxjFwX5FgO6CI5awOhrnlo4GZiVdtxTQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=r35HF/GSwLjgRouORTnWbIpjfBvbZPehHH/mD7DN22qHl+g6YQ4Qa5LS8tPnX+E9Y
-	 BTwM7eZdOlZ0TqxXJQNMDaBo46CmRG31M57S/s5jYX8sQE/+zJqKuVtsLoDoamebFY
-	 H8ngJ1BrvxQ+oXxFGMYXVKxSS2TmMOq2tPGW8KF+47zgLNQ+yFBNqihko/leucuNGo
-	 lf1guA76Egs3JJ4Yj2rqKUIF27Ns7c1Uc6i0KPlTdwdxKoxK+qIp81kkuOSV6M/SV9
-	 aZtJCqcLxG1/prR22grgJY+wYBB2w86O5TF+d1TV+FQNBqdioOcOh26Xn3wrfWmjKm
-	 cmwFhAahAhGzA==
+	b=abezoa9MdPxA2+po4EI8/gMPkmkVdcocj6mrq9jxBFKz1xmn0uHKRceIyat9FqnKa
+	 SY/gZKcgBdK2IQJ4ow0J6PDrJSKsPd5DT9eScnBACWLaaNTP8aQjXI+WvN4QFkeVKZ
+	 SEWQ6/kmzLVCW4GAWFiDRSEznMWz6F/HMOsORJGUGhH5icPRxA/dchxCwRMH2NnE9R
+	 MHFqIojKulxQeHYi4mTQnVUbImbMl7hSzjUE/EVfebBF3P8oXi9Wxco5TNpCpq9iXz
+	 llJ64WIAODCu1nDucJtekVQpnoAWjVuju+Uy22mX+cHKYIIb8nWiOpshHKWIEawhW8
+	 LnD/ko+q6FNiA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ij@kernel.org>,
-	Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>,
+Cc: Guangguan Wang <guangguan.wang@linux.alibaba.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
 	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
+	jaka@linux.ibm.com,
 	edumazet@google.com,
-	ncardwell@google.com,
-	dsahern@kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com,
+	linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.14 130/642] tcp: reorganize tcp_in_ack_event() and tcp_count_delivered()
-Date: Mon,  5 May 2025 18:05:46 -0400
-Message-Id: <20250505221419.2672473-130-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.14 145/642] net/smc: use the correct ndev to find pnetid by pnetid table
+Date: Mon,  5 May 2025 18:06:01 -0400
+Message-Id: <20250505221419.2672473-145-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505221419.2672473-1-sashal@kernel.org>
 References: <20250505221419.2672473-1-sashal@kernel.org>
@@ -66,156 +68,123 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.14.5
 Content-Transfer-Encoding: 8bit
 
-From: Ilpo Järvinen <ij@kernel.org>
+From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
 
-[ Upstream commit 149dfb31615e22271d2525f078c95ea49bc4db24 ]
+[ Upstream commit bfc6c67ec2d64d0ca4e5cc3e1ac84298a10b8d62 ]
 
-- Move tcp_count_delivered() earlier and split tcp_count_delivered_ce()
-  out of it
-- Move tcp_in_ack_event() later
-- While at it, remove the inline from tcp_in_ack_event() and let
-  the compiler to decide
+When using smc_pnet in SMC, it will only search the pnetid in the
+base_ndev of the netdev hierarchy(both HW PNETID and User-defined
+sw pnetid). This may not work for some scenarios when using SMC in
+container on cloud environment.
+In container, there have choices of different container network,
+such as directly using host network, virtual network IPVLAN, veth,
+etc. Different choices of container network have different netdev
+hierarchy. Examples of netdev hierarchy show below. (eth0 and eth1
+in host below is the netdev directly related to the physical device).
+            _______________________________
+           |   _________________           |
+           |  |POD              |          |
+           |  |                 |          |
+           |  | eth0_________   |          |
+           |  |____|         |__|          |
+           |       |         |             |
+           |       |         |             |
+           |   eth1|base_ndev| eth0_______ |
+           |       |         |    | RDMA  ||
+           | host  |_________|    |_______||
+           ---------------------------------
+     netdev hierarchy if directly using host network
+           ________________________________
+           |   _________________           |
+           |  |POD  __________  |          |
+           |  |    |upper_ndev| |          |
+           |  |eth0|__________| |          |
+           |  |_______|_________|          |
+           |          |lower netdev        |
+           |        __|______              |
+           |   eth1|         | eth0_______ |
+           |       |base_ndev|    | RDMA  ||
+           | host  |_________|    |_______||
+           ---------------------------------
+            netdev hierarchy if using IPVLAN
+            _______________________________
+           |   _____________________       |
+           |  |POD        _________ |      |
+           |  |          |base_ndev||      |
+           |  |eth0(veth)|_________||      |
+           |  |____________|________|      |
+           |               |pairs          |
+           |        _______|_              |
+           |       |         | eth0_______ |
+           |   veth|base_ndev|    | RDMA  ||
+           |       |_________|    |_______||
+           |        _________              |
+           |   eth1|base_ndev|             |
+           | host  |_________|             |
+           ---------------------------------
+             netdev hierarchy if using veth
+Due to some reasons, the eth1 in host is not RDMA attached netdevice,
+pnetid is needed to map the eth1(in host) with RDMA device so that POD
+can do SMC-R. Because the eth1(in host) is managed by CNI plugin(such
+as Terway, network management plugin in container environment), and in
+cloud environment the eth(in host) can dynamically be inserted by CNI
+when POD create and dynamically be removed by CNI when POD destroy and
+no POD related to the eth(in host) anymore. It is hard to config the
+pnetid to the eth1(in host). But it is easy to config the pnetid to the
+netdevice which can be seen in POD. When do SMC-R, both the container
+directly using host network and the container using veth network can
+successfully match the RDMA device, because the configured pnetid netdev
+is a base_ndev. But the container using IPVLAN can not successfully
+match the RDMA device and 0x03030000 fallback happens, because the
+configured pnetid netdev is not a base_ndev. Additionally, if config
+pnetid to the eth1(in host) also can not work for matching RDMA device
+when using veth network and doing SMC-R in POD.
 
-Accurate ECN's heuristics does not know if there is going
-to be ACE field based CE counter increase or not until after
-rtx queue has been processed. Only then the number of ACKed
-bytes/pkts is available. As CE or not affects presence of
-FLAG_ECE, that information for tcp_in_ack_event is not yet
-available in the old location of the call to tcp_in_ack_event().
+To resolve the problems list above, this patch extends to search user
+-defined sw pnetid in the clc handshake ndev when no pnetid can be found
+in the base_ndev, and the base_ndev take precedence over ndev for backward
+compatibility. This patch also can unify the pnetid setup of different
+network choices list above in container(Config user-defined sw pnetid in
+the netdevice can be seen in POD).
 
-Signed-off-by: Ilpo Järvinen <ij@kernel.org>
-Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
+Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
 Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/ipv4/tcp_input.c | 56 +++++++++++++++++++++++++-------------------
- 1 file changed, 32 insertions(+), 24 deletions(-)
+ net/smc/smc_pnet.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 0cbf81bf3d451..23cf8f4a37214 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -419,6 +419,20 @@ static bool tcp_ecn_rcv_ecn_echo(const struct tcp_sock *tp, const struct tcphdr
- 	return false;
- }
- 
-+static void tcp_count_delivered_ce(struct tcp_sock *tp, u32 ecn_count)
-+{
-+	tp->delivered_ce += ecn_count;
-+}
-+
-+/* Updates the delivered and delivered_ce counts */
-+static void tcp_count_delivered(struct tcp_sock *tp, u32 delivered,
-+				bool ece_ack)
-+{
-+	tp->delivered += delivered;
-+	if (ece_ack)
-+		tcp_count_delivered_ce(tp, delivered);
-+}
-+
- /* Buffer size and advertised window tuning.
-  *
-  * 1. Tuning sk->sk_sndbuf, when connection enters established state.
-@@ -1154,15 +1168,6 @@ void tcp_mark_skb_lost(struct sock *sk, struct sk_buff *skb)
- 	}
- }
- 
--/* Updates the delivered and delivered_ce counts */
--static void tcp_count_delivered(struct tcp_sock *tp, u32 delivered,
--				bool ece_ack)
--{
--	tp->delivered += delivered;
--	if (ece_ack)
--		tp->delivered_ce += delivered;
--}
--
- /* This procedure tags the retransmission queue when SACKs arrive.
-  *
-  * We have three tag bits: SACKED(S), RETRANS(R) and LOST(L).
-@@ -3862,12 +3867,23 @@ static void tcp_process_tlp_ack(struct sock *sk, u32 ack, int flag)
- 	}
- }
- 
--static inline void tcp_in_ack_event(struct sock *sk, u32 flags)
-+static void tcp_in_ack_event(struct sock *sk, int flag)
+diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
+index 716808f374a8d..b391c2ef463f2 100644
+--- a/net/smc/smc_pnet.c
++++ b/net/smc/smc_pnet.c
+@@ -1079,14 +1079,16 @@ static void smc_pnet_find_roce_by_pnetid(struct net_device *ndev,
+ 					 struct smc_init_info *ini)
  {
- 	const struct inet_connection_sock *icsk = inet_csk(sk);
+ 	u8 ndev_pnetid[SMC_MAX_PNETID_LEN];
++	struct net_device *base_ndev;
+ 	struct net *net;
  
--	if (icsk->icsk_ca_ops->in_ack_event)
--		icsk->icsk_ca_ops->in_ack_event(sk, flags);
-+	if (icsk->icsk_ca_ops->in_ack_event) {
-+		u32 ack_ev_flags = 0;
-+
-+		if (flag & FLAG_WIN_UPDATE)
-+			ack_ev_flags |= CA_ACK_WIN_UPDATE;
-+		if (flag & FLAG_SLOWPATH) {
-+			ack_ev_flags |= CA_ACK_SLOWPATH;
-+			if (flag & FLAG_ECE)
-+				ack_ev_flags |= CA_ACK_ECE;
-+		}
-+
-+		icsk->icsk_ca_ops->in_ack_event(sk, ack_ev_flags);
-+	}
- }
- 
- /* Congestion control has updated the cwnd already. So if we're in
-@@ -3984,12 +4000,8 @@ static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
- 		tcp_snd_una_update(tp, ack);
- 		flag |= FLAG_WIN_UPDATE;
- 
--		tcp_in_ack_event(sk, CA_ACK_WIN_UPDATE);
--
- 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPHPACKS);
- 	} else {
--		u32 ack_ev_flags = CA_ACK_SLOWPATH;
--
- 		if (ack_seq != TCP_SKB_CB(skb)->end_seq)
- 			flag |= FLAG_DATA;
- 		else
-@@ -4001,19 +4013,12 @@ static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
- 			flag |= tcp_sacktag_write_queue(sk, skb, prior_snd_una,
- 							&sack_state);
- 
--		if (tcp_ecn_rcv_ecn_echo(tp, tcp_hdr(skb))) {
-+		if (tcp_ecn_rcv_ecn_echo(tp, tcp_hdr(skb)))
- 			flag |= FLAG_ECE;
--			ack_ev_flags |= CA_ACK_ECE;
--		}
- 
- 		if (sack_state.sack_delivered)
- 			tcp_count_delivered(tp, sack_state.sack_delivered,
- 					    flag & FLAG_ECE);
--
--		if (flag & FLAG_WIN_UPDATE)
--			ack_ev_flags |= CA_ACK_WIN_UPDATE;
--
--		tcp_in_ack_event(sk, ack_ev_flags);
+-	ndev = pnet_find_base_ndev(ndev);
++	base_ndev = pnet_find_base_ndev(ndev);
+ 	net = dev_net(ndev);
+-	if (smc_pnetid_by_dev_port(ndev->dev.parent, ndev->dev_port,
++	if (smc_pnetid_by_dev_port(base_ndev->dev.parent, base_ndev->dev_port,
+ 				   ndev_pnetid) &&
++	    smc_pnet_find_ndev_pnetid_by_table(base_ndev, ndev_pnetid) &&
+ 	    smc_pnet_find_ndev_pnetid_by_table(ndev, ndev_pnetid)) {
+-		smc_pnet_find_rdma_dev(ndev, ini);
++		smc_pnet_find_rdma_dev(base_ndev, ini);
+ 		return; /* pnetid could not be determined */
  	}
- 
- 	/* This is a deviation from RFC3168 since it states that:
-@@ -4040,6 +4045,8 @@ static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
- 
- 	tcp_rack_update_reo_wnd(sk, &rs);
- 
-+	tcp_in_ack_event(sk, flag);
-+
- 	if (tp->tlp_high_seq)
- 		tcp_process_tlp_ack(sk, ack, flag);
- 
-@@ -4071,6 +4078,7 @@ static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
- 	return 1;
- 
- no_queue:
-+	tcp_in_ack_event(sk, flag);
- 	/* If data was DSACKed, see if we can undo a cwnd reduction. */
- 	if (flag & FLAG_DSACKING_ACK) {
- 		tcp_fastretrans_alert(sk, prior_snd_una, num_dupack, &flag,
+ 	_smc_pnet_find_roce_by_pnetid(ndev_pnetid, ini, NULL, net);
 -- 
 2.39.5
 
