@@ -1,62 +1,65 @@
-Return-Path: <netdev+bounces-188142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6B90AAB76B
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:11:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 171E0AAB74D
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:09:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B4B31C254D8
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:06:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E13F4C31E9
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:06:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6422F47ED6A;
-	Tue,  6 May 2025 00:42:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3644047ED94;
+	Tue,  6 May 2025 00:42:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JwwZf7P9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g5JhGqDo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D0D12F0BB5;
-	Mon,  5 May 2025 23:12:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80E222F1CC2;
+	Mon,  5 May 2025 23:12:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746486759; cv=none; b=FNy8oWkQbIfMXJFzgSaNbxtyMVj+rA8Xojh46iFCwqSWUi/3jJX7bnGOZxgpVbO/9XfP0gptUsJo2Yj3GEEuz4R0k45GiyMqhjc2Tb0eRKvZamt0gBJm0OXTfRlTCBeTXg/9108rMGUSnv3I2K1PgKvTX8kGaTRpiy7CpnLQItM=
+	t=1746486770; cv=none; b=KYSAS7Q+LotgGa0DucDmAcB5yhYqMgErZWawyFzlPvyfIIwGkpD2yFBvTpNOWw8I4eVb0wFekw1GZbsWXSsWXXoOmqpaZxlszVZbl7B11IugnD0z0UytjEZO/zu8nxh31/WUTQsuJy3eiMWSssXwxlukVEiHa8ZButEE0vWEaTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746486759; c=relaxed/simple;
-	bh=2MhPMJolL3bzf0hpny7AO0Glle1RNAMi1eEnNaXcDZs=;
+	s=arc-20240116; t=1746486770; c=relaxed/simple;
+	bh=KUORKRFxLRLeo2nK01Rulv/sfPY/dQT8RgV35mjwmBI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=c8mpPRiy1SyLxd/gWEGivK21BkzAQsJD8Q87GcsfZ1nQba1eEWLQgymlK8MAqHqcIiAZbRiqRRoVKWt6Av1dgg8a9IBZSzp7aJrC/e1wJZ4aBBwpdSC1d/yojbXPjenBA1+FOYpkPmywDXUg60WCwndyivmZ6Kei+sA02pH3Hw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JwwZf7P9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F84CC4CEEE;
-	Mon,  5 May 2025 23:12:38 +0000 (UTC)
+	 MIME-Version; b=S/I794mYD+gP6vwLFA8C9Gsf3jKfIwfvno1Od7Qnw8Gv80mTo4sx8jkM46z33LdPZ5VGDY74ASgJUcIyjpYbIVEDJaM5pbrktttksMm7IK4+Zpjt+m3lJlXwsuWKw2laG3Cthm9ClI5HKzqpcOxDco4IL/xlfk96AQjARjpRV+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g5JhGqDo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8E3DC4CEED;
+	Mon,  5 May 2025 23:12:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746486759;
-	bh=2MhPMJolL3bzf0hpny7AO0Glle1RNAMi1eEnNaXcDZs=;
+	s=k20201202; t=1746486770;
+	bh=KUORKRFxLRLeo2nK01Rulv/sfPY/dQT8RgV35mjwmBI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JwwZf7P9smrhSyYQxigbdDOObpT/rDs4oTcKaU6yI/8OnE6WlD5CZxs/GgEmcC5M2
-	 Uyc0iSRV1bMlsfY251IUilzaaqI8otmgZMqyeZNMQEAEFVBzfCxpbzyg4cIPp2x1yO
-	 8vyhxzWoG+lBggIhMwc8A/jVNxqaEywl4IWLWkHXYijyrnZnDhsiBRgaoS8D9Zppv8
-	 V+35DrbEuAC91O8O4jak8TmMng0NBziIXjfJgU9f1uaXSaKrD4EjVALZJeV0+GTRff
-	 elY2+6I9kVhsu/MA4r6w3eKWDf9Pv/ak4juke4bvWDefOewltqQP7DlpHFjeS64de+
-	 phQfxev2wpi7Q==
+	b=g5JhGqDoRPeTJegD0ycJJ0ttvWLbiVbwUszPZMZ6PKpOwGmDTZoHCV/Lar7mpPKgS
+	 l16CEkzP17/vlIsGxWhI4DG0DRga+IOXwHm6HJxMd4fOOSZBxM2surGGmqhVLOaTeW
+	 I+nuxfF4amEIGrbx1A8xznSOTo0TuxUydkuhWeShwoaUzk7ij8qZxu1h3a4WMhLx0P
+	 tETnNiZndOsjADcRPC7Q2Ff3lfZqV3G3a6y/283iB0o77FHrF2azjeZ78bWT02aVl8
+	 vQiKN8hAs+C42adBzVWHpgiFBsU0EqP+q6AQqJ+uPtvqbf7tGLB5cGAKYItYtqyRA9
+	 BI/fzM1D29RKA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
-	nic_swsd@realtek.com,
+	przemyslaw.kitszel@intel.com,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
+	kuba@kernel.org,
 	pabeni@redhat.com,
+	intel-wired-lan@lists.osuosl.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 188/212] r8169: don't scan PHY addresses > 0
-Date: Mon,  5 May 2025 19:06:00 -0400
-Message-Id: <20250505230624.2692522-188-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 194/212] ice: count combined queues using Rx/Tx count
+Date: Mon,  5 May 2025 19:06:06 -0400
+Message-Id: <20250505230624.2692522-194-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505230624.2692522-1-sashal@kernel.org>
 References: <20250505230624.2692522-1-sashal@kernel.org>
@@ -71,34 +74,38 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.1.136
 Content-Transfer-Encoding: 8bit
 
-From: Heiner Kallweit <hkallweit1@gmail.com>
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-[ Upstream commit faac69a4ae5abb49e62c79c66b51bb905c9aa5ec ]
+[ Upstream commit c3a392bdd31adc474f1009ee85c13fdd01fe800d ]
 
-The PHY address is a dummy, because r8169 PHY access registers
-don't support a PHY address. Therefore scan address 0 only.
+Previous implementation assumes that there is 1:1 matching between
+vectors and queues. It isn't always true.
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Link: https://patch.msgid.link/830637dd-4016-4a68-92b3-618fcac6589d@gmail.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Get minimum value from Rx/Tx queues to determine combined queues number.
+
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/realtek/r8169_main.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/ethernet/intel/ice/ice_ethtool.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 4b461e93ffe9d..6346821d480bd 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -5156,6 +5156,7 @@ static int r8169_mdio_register(struct rtl8169_private *tp)
- 	new_bus->priv = tp;
- 	new_bus->parent = &pdev->dev;
- 	new_bus->irq[0] = PHY_MAC_INTERRUPT;
-+	new_bus->phy_mask = GENMASK(31, 1);
- 	snprintf(new_bus->id, MII_BUS_ID_SIZE, "r8169-%x-%x",
- 		 pci_domain_nr(pdev->bus), pci_dev_id(pdev));
+diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+index a163e7717a534..1f62d11831567 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
++++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+@@ -3373,8 +3373,7 @@ static u32 ice_get_combined_cnt(struct ice_vsi *vsi)
+ 	ice_for_each_q_vector(vsi, q_idx) {
+ 		struct ice_q_vector *q_vector = vsi->q_vectors[q_idx];
  
+-		if (q_vector->rx.rx_ring && q_vector->tx.tx_ring)
+-			combined++;
++		combined += min(q_vector->num_ring_tx, q_vector->num_ring_rx);
+ 	}
+ 
+ 	return combined;
 -- 
 2.39.5
 
