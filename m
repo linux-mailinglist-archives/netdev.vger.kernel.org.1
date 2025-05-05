@@ -1,66 +1,69 @@
-Return-Path: <netdev+bounces-187818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29435AA9C0A
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 20:55:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54A3EAA9C0D
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 20:57:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39F473B2FC9
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 18:54:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD16917D37A
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 18:57:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58212266584;
-	Mon,  5 May 2025 18:55:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CCAF26F45F;
+	Mon,  5 May 2025 18:56:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kU+Ejm9e"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cbelu7s7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32E6C269AFD
-	for <netdev@vger.kernel.org>; Mon,  5 May 2025 18:55:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77DA026F453
+	for <netdev@vger.kernel.org>; Mon,  5 May 2025 18:56:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746471314; cv=none; b=C+8aIRY05HD/tviTgONbqaO8pDTJxWLI5nFD8cHkEC303USYV69B/BZZJIUyQq8EcddpaXlm+meAP8IMwQB3l5oAOsTLYYAQ9m6cuoj7jQEu/f6GV8KS3s6I2ogqaDc00Kxlw1aZvK2RgVGd0GGLbqRit4vites+7d4cSXqy5gQ=
+	t=1746471412; cv=none; b=Po5s/c5NF2bNqet+QmC2stPdPPNKRN+uGk3nX9SsQ0b944dD833rAhv7RIym3aA1hNZczEE6asqvSx2FSnIs+l1OFvzUitHNFUV/i7vGKLp9L9tFNiDDgYRTjqnX3N2zgX5pyyr/RZE4HGkRyTKXdef1djLsZ/RVWnp6KJw/hZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746471314; c=relaxed/simple;
-	bh=I4HzKEyD1rlq0HzCyLVHIDrrEYqhGPaM/olU2DuiDfU=;
+	s=arc-20240116; t=1746471412; c=relaxed/simple;
+	bh=CdjfHlYHRFSCunXCx79NBqlRvedR7t5yxArgE9saR3Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uApxf4SiGtgl00gfRi9rKAcmnE2k7hbb2qJy05MrTsfbk+0ZMAmFZ5kcdg91SCyR6mrocTpiCQO8uUBjC8yuIPcIa0abUlccgt9X2nW0zU/Hfcz0OJf1UfkX3JMV53tjSMXcbpDW5544ofQFSx/W1WLXI4P76HDxD7UwTn7xX6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kU+Ejm9e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41953C4CEE4;
-	Mon,  5 May 2025 18:55:13 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ZyqN9Hknk9CfZ1hZSkyfA5wVDXVrZCyYJqfiRW7RoDdoJyeq9MfqTvPuHuTKoi4fbvV4+JXGfI8LSEVT2+/tv0iyA4iRCvJ3cze2uXn8isfZI2g/dSMWCjuw6BexAdjS3UcRIuy8pLPGkYTwYP4MYoMFTLR6TFV8IFaHtkazr5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cbelu7s7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E72EC4CEE4;
+	Mon,  5 May 2025 18:56:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746471313;
-	bh=I4HzKEyD1rlq0HzCyLVHIDrrEYqhGPaM/olU2DuiDfU=;
+	s=k20201202; t=1746471411;
+	bh=CdjfHlYHRFSCunXCx79NBqlRvedR7t5yxArgE9saR3Q=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kU+Ejm9eLL2aYuf1dg44hIaPsJlvbnqpt/+bAUYXuAV8jdZ6H2eN208GxWOkufvbY
-	 R4g/Ds/qps+WvAz3y51EIZGbJEBYZJLc3w9n4nrvrGalI9LHFfSLK82PEYc4Ydc5N4
-	 JZ9EiI8fQAbl9iKZ3/hrbG6R1iU8y5SYueUeT3XzOD+Yb34KmN8ZkaqSMV0ODvRFt6
-	 LivfCUY4zoXDpUmGY8QbiKXlx+3wvep0L5ACzlcIW3PQANnaoxzgUQ3iUxQwDCn7m8
-	 VHwGbw9PZKFU1OJNgn21Y9vPR59HIu/ZML0D9goqFWINrAsQr95BjP60SEhikcOcim
-	 Ria0mIotZtp7A==
-Date: Mon, 5 May 2025 11:55:12 -0700
+	b=cbelu7s7ol+4bWTJ/8gBaq5l3NbSN7A4R5eUatkEOCR/DRHEpW0CZNiamx9+OyAsH
+	 VuGFu2Rk+kGl+n60bHoMTm/TBGpKBtHajtaZKA+PkyhQZphawIeCrmDwttw8EOFhzi
+	 UO+PyKyMqagDLVXAg4ji0BEubwc/HmmNiH6nYNZ6oPmUvhB2vB3lZId6xeTulmMLei
+	 2tlwBD0jrJn3IZ0EcaeqPGDRHAp0/XtwECPZ1WApNn+cnCca9CY0Ed8q0QOYob5HMF
+	 db0Bi2bzlXA46UUacbJrwv2fXE3B42eXFAPLiO8LuHEEZBSNKA/6IDRysQLVPUdvQr
+	 YI8He7PO2A/DA==
+Date: Mon, 5 May 2025 11:56:50 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Mark Bloch <mbloch@nvidia.com>
-Cc: Moshe Shemesh <moshe@nvidia.com>, netdev@vger.kernel.org, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Donald Hunter
- <donald.hunter@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Jonathan Corbet
- <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, Tariq Toukan
- <tariqt@nvidia.com>
-Subject: Re: [RFC net-next 0/5] devlink: Add unique identifier to devlink
- port function
-Message-ID: <20250505115512.0fa2e186@kernel.org>
-In-Reply-To: <d5241829-bd20-4c41-9dec-d805ce5b9bcc@nvidia.com>
-References: <1745416242-1162653-1-git-send-email-moshe@nvidia.com>
-	<20250424162425.1c0b46d1@kernel.org>
-	<95888476-26e8-425b-b6ae-c2576125f484@nvidia.com>
-	<20250428111909.16dd7488@kernel.org>
-	<507c9e1f-f31a-489c-8161-3e61ae425615@nvidia.com>
-	<20250501173922.6d797778@kernel.org>
-	<d5241829-bd20-4c41-9dec-d805ce5b9bcc@nvidia.com>
+To: Joe Damato <jdamato@fastly.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Samiullah Khawaja
+ <skhawaja@google.com>, "David S . Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ almasrymina@google.com, willemb@google.com, mkarsten@uwaterloo.ca,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v5] Add support to set napi threaded for
+ individual napi
+Message-ID: <20250505115650.300a3422@kernel.org>
+In-Reply-To: <aBWHv6TAwLnbPhMd@LQ3V64L9R2>
+References: <20250423201413.1564527-1-skhawaja@google.com>
+	<20250425174251.59d7a45d@kernel.org>
+	<aAxFmKo2cmLUmqAJ@LQ3V64L9R2>
+	<680cf086aec78_193a062946c@willemb.c.googlers.com.notmuch>
+	<aA_FErzTzz9BfDTc@LQ3V64L9R2>
+	<20250428113845.543ca2b8@kernel.org>
+	<aA_zH52V-5qYku3M@LQ3V64L9R2>
+	<20250428153207.03c01f64@kernel.org>
+	<aBFrwyxWzLle6B03@LQ3V64L9R2>
+	<20250502191011.68ccfdfe@kernel.org>
+	<aBWHv6TAwLnbPhMd@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,37 +73,25 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 4 May 2025 20:46:51 +0300 Mark Bloch wrote:
-> On the DPU (ARM), we see representors for each BDF. For simplicity,
-> assume each BDF corresponds to a single devlink port. So the ARM would
-> expose:
+On Fri, 2 May 2025 20:04:31 -0700 Joe Damato wrote:
+> > The thing I did add (in the rx-buf-len series) was a hook to the queue
+> > count changing code which wipes the configuration for queues which are
+> > explicitly disabled.
+> > So if you do some random reconfig (eg attach XDP) and driver recreates
+> > all NAPIs - the config should stay around. Same if you do ifdown ifup.
+> > But if you set NAPI count from 8 to 4 - the NAPIs 4..7 should get wiped.  
 > 
-> PF0_HOST0_REP
-> UPLINK0_REP
-> PF0_HOST1_REP
-> UPLINK1_REP
+> Yea I see. I will go back and re-read that series because I think
+> missed that part.
 > 
-> In devlink terms, we're referring to the c argument in phys_port_name,
-> which represents the controller, effectively indicating which host
-> the BDF belongs to.
+> IIRC, if you:
+>   1. set defer-hard-irqs on NAPIs 2 and 3
+>   2. resize down to 2 queues
+>   3. resize then back up to 4, the setting for NAPIs 2 and 3 should
+>      be restored.
 > 
-> The problem we're addressing is matching the PF seen on a host to its
-> corresponding representor on the DPU. From the ARM side, we know that
-> this rep X belongs to pf0 on host y, but we don't which host is which.
-> From within each host, you can't tell which host you are, because all
-> see their PF as PF0.
-> 
-> With the proposed feature (along with Jiri's changes), this becomes
-> trivial, you just match the function UID and you're done.
+> I now wonder if I should change that to be more like what you
+> describe for rx-buf-len so we converge?
 
-Thanks for explaining the setup. Could you please explain the user
-scenario now? Perhaps thinking of it as a sequence diagram would
-be helpful, but whatever is easiest, just make it concrete.
-
-> As a side note, I believe this feature has merit even beyond this
-> specific use case. 
-
-I also had that belief when I implemented something similar for the NFP
-long time ago. Jiri didn't like the solution / understand the problem 
-at the time. But it turned out not to matter in practice.
+IMHO yes, but others may disagree.
 
