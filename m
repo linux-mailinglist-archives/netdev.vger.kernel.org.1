@@ -1,66 +1,67 @@
-Return-Path: <netdev+bounces-187951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CDEEAAA837
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 02:50:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 734CCAAA854
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 02:52:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A413A18986B2
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 00:48:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 908F216797F
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 00:51:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B71A9349B7A;
-	Mon,  5 May 2025 22:39:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD5CF296FB5;
+	Mon,  5 May 2025 22:39:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mftCi3QO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R6xryH2c"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 816C7349B77;
-	Mon,  5 May 2025 22:39:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9050734C0FF;
+	Mon,  5 May 2025 22:39:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746484758; cv=none; b=DhII05acxfYsK0T8jJpQWaxay8CvHnT9Z7H0htLh4ZHsG3asx5DUxc+LQwonse6vX/DL3tQHfM5YGMLVL6zYW30masGU5/cZeiN6xR8C9h6Dmv8qYhlxNXLMcu2mZGeUfklTZVo7TPPiig1iw/zFNFrk14tk0NTaTPP2MomU9Qo=
+	t=1746484785; cv=none; b=TXj70cTmOc/bilAAJHlN6eLYd+q9fvJsKdFbvmdAFtgOaBNRHg3/XFRKv4rmZmcc7e70juJSEa6sHiGRQ918iTI22rpsunrNaT9nqDoaL0BaQnz67Jlq5YgFpA7Q7gAJeQEwuSiTfvXpLLV1fzxxFHJ1kQXxuZHABEdyVARfhuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746484758; c=relaxed/simple;
-	bh=ywexBUzYrqkZI7OIwHPb5OJ1EGlVD5NLhiZhN4R+bxY=;
+	s=arc-20240116; t=1746484785; c=relaxed/simple;
+	bh=qHENiOabmT77UFCXK7h2Oxu5/iLS0ySjclWVOhKY/ws=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=p3iJqH7KtOfogOoKQuozSycoDZv5JEajFiHfkSn+clvfjVf/lcZLM+hgGqKHMBjif3bB3GuezCZC+fjyenUky6mMbOCH2fxLzZOgnW0Fp1/W1n3AoOltMwafC4TH4fvEvzMvAjPrWKDfS9yUeBLbwbiJTURiEtw+Q9nYd1DzaeA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mftCi3QO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 002B4C4CEE4;
-	Mon,  5 May 2025 22:39:16 +0000 (UTC)
+	 MIME-Version; b=Bg9fxQvxxzw7sv+PRDmoUvwgrh3XqyVQ+8jAeZVcvKfDQYiiDiYBcI3ZgCikwAy6JmTJgO2nHG2sdAvZCp/+/2aXpoiATtS1iQPjRNW1LN57ylrvTY9ocjl4m46NccdiPqVKqUWI1xfaRYAbNF1yM45r7KDEGvdXwNIEcDYq1dk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R6xryH2c; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5275BC4CEED;
+	Mon,  5 May 2025 22:39:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746484758;
-	bh=ywexBUzYrqkZI7OIwHPb5OJ1EGlVD5NLhiZhN4R+bxY=;
+	s=k20201202; t=1746484785;
+	bh=qHENiOabmT77UFCXK7h2Oxu5/iLS0ySjclWVOhKY/ws=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mftCi3QO2l70qsLHvUnjvh9WVQ6UNDfAfSvUVFK5cdIjFcajUFJwsyYxaaNjiv6zL
-	 1HFfkfdAxKisPzUNBQhRYXDAkT07fCahEPjEQjZx9ys4G6tOLpi+OOt/yWUKseW2G7
-	 IeqwpKjeNjNNnvovGNVG7jl+hl1uoCY1hLkhdoB/1B6AbeWVO6zTtqPRviWGr4R4pN
-	 xjMP6B2qsnQG6IQQxEnSNgeLcyLJvogaOE6n+T/hcimFYCS+qLlEM7v9TGegMbyMo9
-	 S6hNO5MCQTTCu4aVo9VNrqtd0vJ8vfGIJ1BcT+l/k68r2dq6ZYiJdSvgXFKqOvgmxj
-	 6oSAbOYFBDFZQ==
+	b=R6xryH2coRRB70Os0zVbb591Yj7uNoN797O68HFXCY3cFduWExitfeViSiZjGq0C+
+	 FJrPEK4ev0wK+Rehz/sfuwZVTEKiwCtt7HanwUwmblBOAMSTZ/WBEYAITtdmmYiU/W
+	 0Tw8UQrU1TvOz42lGNjirD7UzMJ5uFUvadlzt8CIY6WRrf9vRTIyI+cfkkiqS1HUKW
+	 ZxPLjjkA0Ao9Bo2MhL8dTuHJW2NIJjdNeayY9Y86bTtAbamw3Sw8i+E3eV7SuSYc2w
+	 RZdcIqWTn0TZZKLobmD8KpNsiNgSu5J5zsZexglO7Vvmi28Bt/Ym2YJYO7lmHufh3z
+	 Uz1zzm/nnyWDw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Eric Dumazet <edumazet@google.com>,
-	Marco Leogrande <leogrande@google.com>,
-	Antoine Tenart <atenart@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Trond Myklebust <trond.myklebust@hammerspace.com>,
+	Jeff Layton <jlayton@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
+	chuck.lever@oracle.com,
+	trondmy@kernel.org,
+	anna@kernel.org,
 	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
 	pabeni@redhat.com,
-	sdf@fomichev.me,
-	jdamato@fastly.com,
-	aleksander.lobakin@intel.com,
+	linux-nfs@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.14 642/642] net-sysfs: restore behavior for not running devices
-Date: Mon,  5 May 2025 18:14:18 -0400
-Message-Id: <20250505221419.2672473-642-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.12 013/486] SUNRPC: Don't allow waiting for exiting tasks
+Date: Mon,  5 May 2025 18:31:29 -0400
+Message-Id: <20250505223922.2682012-13-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250505221419.2672473-1-sashal@kernel.org>
-References: <20250505221419.2672473-1-sashal@kernel.org>
+In-Reply-To: <20250505223922.2682012-1-sashal@kernel.org>
+References: <20250505223922.2682012-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,74 +70,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.14.5
+X-stable-base: Linux 6.12.26
 Content-Transfer-Encoding: 8bit
 
-From: Eric Dumazet <edumazet@google.com>
+From: Trond Myklebust <trond.myklebust@hammerspace.com>
 
-[ Upstream commit 75bc3dab4e49b4daccb27ad6ce8ce2fcd253fc1b ]
+[ Upstream commit 14e41b16e8cb677bb440dca2edba8b041646c742 ]
 
-modprobe dummy dumdummies=1
+Once a task calls exit_signals() it can no longer be signalled. So do
+not allow it to do killable waits.
 
-Old behavior :
-
-$ cat /sys/class/net/dummy0/carrier
-cat: /sys/class/net/dummy0/carrier: Invalid argument
-
-After blamed commit, an empty string is reported.
-
-$ cat /sys/class/net/dummy0/carrier
-$
-
-In this commit, I restore the old behavior for carrier,
-speed and duplex attributes.
-
-Fixes: 79c61899b5ee ("net-sysfs: remove rtnl_trylock from device attributes")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Reported-by: Marco Leogrande <leogrande@google.com>
-Reviewed-by: Antoine Tenart <atenart@kernel.org>
-Link: https://patch.msgid.link/20250221051223.576726-1-edumazet@google.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Reviewed-by: Jeff Layton <jlayton@kernel.org>
+Signed-off-by: Trond Myklebust <trond.myklebust@hammerspace.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/core/net-sysfs.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ net/sunrpc/sched.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-index cedbe7d9ae670..474824e88959f 100644
---- a/net/core/net-sysfs.c
-+++ b/net/core/net-sysfs.c
-@@ -313,12 +313,13 @@ static ssize_t carrier_show(struct device *dev,
- 			    struct device_attribute *attr, char *buf)
+diff --git a/net/sunrpc/sched.c b/net/sunrpc/sched.c
+index 9b45fbdc90cab..73bc39281ef5f 100644
+--- a/net/sunrpc/sched.c
++++ b/net/sunrpc/sched.c
+@@ -276,6 +276,8 @@ EXPORT_SYMBOL_GPL(rpc_destroy_wait_queue);
+ 
+ static int rpc_wait_bit_killable(struct wait_bit_key *key, int mode)
  {
- 	struct net_device *netdev = to_net_dev(dev);
--	int ret = -EINVAL;
-+	int ret;
- 
- 	ret = sysfs_rtnl_lock(&dev->kobj, &attr->attr, netdev);
- 	if (ret)
- 		return ret;
- 
-+	ret = -EINVAL;
- 	if (netif_running(netdev)) {
- 		/* Synchronize carrier state with link watch,
- 		 * see also rtnl_getlink().
-@@ -349,6 +350,7 @@ static ssize_t speed_show(struct device *dev,
- 	if (ret)
- 		return ret;
- 
-+	ret = -EINVAL;
- 	if (netif_running(netdev)) {
- 		struct ethtool_link_ksettings cmd;
- 
-@@ -376,6 +378,7 @@ static ssize_t duplex_show(struct device *dev,
- 	if (ret)
- 		return ret;
- 
-+	ret = -EINVAL;
- 	if (netif_running(netdev)) {
- 		struct ethtool_link_ksettings cmd;
- 
++	if (unlikely(current->flags & PF_EXITING))
++		return -EINTR;
+ 	schedule();
+ 	if (signal_pending_state(mode, current))
+ 		return -ERESTARTSYS;
 -- 
 2.39.5
 
