@@ -1,67 +1,66 @@
-Return-Path: <netdev+bounces-188089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01BABAAB203
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:11:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81DCBAAB66A
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 07:50:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BFFB4616B3
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 04:11:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3834A7BA310
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:47:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55E741F518;
-	Tue,  6 May 2025 00:28:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D95AC421B5D;
+	Tue,  6 May 2025 00:29:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CDRtQETv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nde6B3e6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2434E2D4B49;
-	Mon,  5 May 2025 22:54:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 049AB2D5D0F;
+	Mon,  5 May 2025 22:54:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746485660; cv=none; b=p1AeYbp+bdbzU4Dv/Za+G7zs2AG0nB1/mrQuiEZCOBL7Whi9W64hQcktzLS7/AT1egzs4toPcwL7K9vJVFKOlNusGPCmAdSm2srJvWwtDJznOvq94V56HmbeDhvg7YtQex895I+AbuNbmH+2a/Y/ojXYYs9PALLQcgAJXZYZvv8=
+	t=1746485679; cv=none; b=EJnZEN1Yzn7XE0OoA+Y02S1M0TL/DSV4iRjNjFqJCKfDf9cEeeriChbbBTx2jvE2bn6qpK8Jl5EmcEOV5Cva6Fuu/LsTsjIeponQusW60PEovDvZRGDM9Ki33dfCvQPP61kinRyCjlAuBwVzRj2vNvK4OXlZS4bgN4FgamSY2bI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746485660; c=relaxed/simple;
-	bh=bpkrz8KBNf3ONWBnGX36j1LvOm1wwo0jVhbLIIk0ZOo=;
+	s=arc-20240116; t=1746485679; c=relaxed/simple;
+	bh=l7jAxZOds+YpMtYaq2uWqkMKqPeBNVC/HpOgeEy1IPc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=jxbzES4OI6Ui8NX09xfR7vBbS33HKWmroo+CYrWye/Ect4kcgaN43SbAbG+zec69rUcCSekJ0VbhZ4x932W22cLR0NkIbvZ+n2IBu96TOcJ/DgStJdrqTVyVuhy0LyLqCcAs3IlFOlz729lUT5U5yorXabqaH/GqBSEfdVgBq2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CDRtQETv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44702C4CEE4;
-	Mon,  5 May 2025 22:54:17 +0000 (UTC)
+	 MIME-Version; b=HEDsK4u7tkj4lLw4UlbaLfzzfrHYm3jGc4TokFp4DImXbKlFsK6zOVHV8Fv6Knzipx9I16ZyC0G9aVcQhEb26MHBQfvM6+kfrqOvhRyOXr8ko99J8eWQGT//oqS9u3MSMBeN3NF9Wep2IhbDf5MKQF+uwN5ISudHKRZo7JDNgeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nde6B3e6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E0FFC4CEED;
+	Mon,  5 May 2025 22:54:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746485659;
-	bh=bpkrz8KBNf3ONWBnGX36j1LvOm1wwo0jVhbLIIk0ZOo=;
+	s=k20201202; t=1746485678;
+	bh=l7jAxZOds+YpMtYaq2uWqkMKqPeBNVC/HpOgeEy1IPc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CDRtQETvnqghjafQBDajbDdkbVtdJvCMegOb0BqNO8MaOWUPNOd35XCz1pd04nmQ+
-	 6TG0VnW0/X4F2hfHtgSsVfluhdxZDdF0pQGnOaZ2HsK9so3QsrzsXblENhTZZ0QMdE
-	 2rXrVgztQCLuyrRbRf8zMmmU6EGTIdmwcBFUk03KlLio51lemHLo+gFPzU23NHxDEG
-	 2muKeAzhx1SfXmhO5czhQt9JiTXKSwBleS1uHxs4muL+1xybSJuC0x8+Mt5v4eAzHb
-	 z0Un/a0YYR9I/TsoQYOAip7SxY2Y4e2OzIBrlVYSaPVBh/aCr0/lzUv/M0e1c5a+3n
-	 6LkpccVBiW3BA==
+	b=Nde6B3e6jruh96jvrtCtNyWi4oJ2qbf5/7INFNVqs/83jI4OqZdbNzykiCLYtRBhE
+	 yyhHe9/EF1OGLspWYbbgYETwWzjRxrLxQZlGBdyAs0sZ+pQ0SB0BTcnV40KjxYFnFi
+	 9xUyQdOobscA4QzOiH7WO/7n6hJb6S/0DkN+ULMZqx5jgmwqcGowdpiy4ytD58FyWo
+	 gydkosQzkmm7hI0aYWZjGi1/N8UjSaYk+5MheiklzoFPMJK9Pevoxm+oIT4339LU7o
+	 bNc3A55xz7wMsJczdb1m5+WQBx2nxpsdwPbMiDUKDb9ABEQ6i5xbs04PB4r6+MK0iB
+	 q3IQ/vocE7fNg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Mina Almasry <almasrymina@google.com>,
+Cc: Carolina Jubran <cjubran@nvidia.com>,
+	Yael Chemla <ychemla@nvidia.com>,
+	Cosmin Ratiu <cratiu@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
+	saeedm@nvidia.com,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
-	pabeni@redhat.com,
-	hawk@kernel.org,
-	ilias.apalodimas@linaro.org,
-	jdamato@fastly.com,
-	sdf@fomichev.me,
-	kuniyu@amazon.com,
-	kory.maincent@bootlin.com,
-	mkarsten@uwaterloo.ca,
-	bigeasy@linutronix.de,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 412/486] net: page_pool: avoid false positive warning if NAPI was never added
-Date: Mon,  5 May 2025 18:38:08 -0400
-Message-Id: <20250505223922.2682012-412-sashal@kernel.org>
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.12 422/486] net/mlx5e: Avoid WARN_ON when configuring MQPRIO with HTB offload enabled
+Date: Mon,  5 May 2025 18:38:18 -0400
+Message-Id: <20250505223922.2682012-422-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505223922.2682012-1-sashal@kernel.org>
 References: <20250505223922.2682012-1-sashal@kernel.org>
@@ -76,70 +75,46 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.12.26
 Content-Transfer-Encoding: 8bit
 
-From: Jakub Kicinski <kuba@kernel.org>
+From: Carolina Jubran <cjubran@nvidia.com>
 
-[ Upstream commit c1e00bc4be06cacee6307cedb9b55bbaddb5044d ]
+[ Upstream commit 689805dcc474c2accb5cffbbcea1c06ee4a54570 ]
 
-We expect NAPI to be in disabled state when page pool is torn down.
-But it is also legal if the NAPI is completely uninitialized.
+When attempting to enable MQPRIO while HTB offload is already
+configured, the driver currently returns `-EINVAL` and triggers a
+`WARN_ON`, leading to an unnecessary call trace.
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
-Link: https://patch.msgid.link/20250206225638.1387810-4-kuba@kernel.org
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Update the code to handle this case more gracefully by returning
+`-EOPNOTSUPP` instead, while also providing a helpful user message.
+
+Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
+Reviewed-by: Yael Chemla <ychemla@nvidia.com>
+Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/core/dev.h       | 12 ++++++++++++
- net/core/page_pool.c |  7 ++-----
- 2 files changed, 14 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/net/core/dev.h b/net/core/dev.h
-index 2e3bb7669984a..764e0097ccf22 100644
---- a/net/core/dev.h
-+++ b/net/core/dev.h
-@@ -148,6 +148,18 @@ void xdp_do_check_flushed(struct napi_struct *napi);
- static inline void xdp_do_check_flushed(struct napi_struct *napi) { }
- #endif
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index 15ec9750d4be0..36a2c935267b0 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -3759,8 +3759,11 @@ static int mlx5e_setup_tc_mqprio(struct mlx5e_priv *priv,
+ 	/* MQPRIO is another toplevel qdisc that can't be attached
+ 	 * simultaneously with the offloaded HTB.
+ 	 */
+-	if (WARN_ON(mlx5e_selq_is_htb_enabled(&priv->selq)))
+-		return -EINVAL;
++	if (mlx5e_selq_is_htb_enabled(&priv->selq)) {
++		NL_SET_ERR_MSG_MOD(mqprio->extack,
++				   "MQPRIO cannot be configured when HTB offload is enabled.");
++		return -EOPNOTSUPP;
++	}
  
-+/* Best effort check that NAPI is not idle (can't be scheduled to run) */
-+static inline void napi_assert_will_not_race(const struct napi_struct *napi)
-+{
-+	/* uninitialized instance, can't race */
-+	if (!napi->poll_list.next)
-+		return;
-+
-+	/* SCHED bit is set on disabled instances */
-+	WARN_ON(!test_bit(NAPI_STATE_SCHED, &napi->state));
-+	WARN_ON(READ_ONCE(napi->list_owner) != -1);
-+}
-+
- void kick_defer_list_purge(struct softnet_data *sd, unsigned int cpu);
- 
- #define XMIT_RECURSION_LIMIT	8
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 7b20f6fcb82c0..c8ce069605c42 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -25,6 +25,7 @@
- 
- #include <trace/events/page_pool.h>
- 
-+#include "dev.h"
- #include "mp_dmabuf_devmem.h"
- #include "netmem_priv.h"
- #include "page_pool_priv.h"
-@@ -1108,11 +1109,7 @@ void page_pool_disable_direct_recycling(struct page_pool *pool)
- 	if (!pool->p.napi)
- 		return;
- 
--	/* To avoid races with recycling and additional barriers make sure
--	 * pool and NAPI are unlinked when NAPI is disabled.
--	 */
--	WARN_ON(!test_bit(NAPI_STATE_SCHED, &pool->p.napi->state));
--	WARN_ON(READ_ONCE(pool->p.napi->list_owner) != -1);
-+	napi_assert_will_not_race(pool->p.napi);
- 
- 	WRITE_ONCE(pool->p.napi, NULL);
- }
+ 	switch (mqprio->mode) {
+ 	case TC_MQPRIO_MODE_DCB:
 -- 
 2.39.5
 
