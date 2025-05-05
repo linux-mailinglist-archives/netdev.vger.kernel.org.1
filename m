@@ -1,331 +1,275 @@
-Return-Path: <netdev+bounces-187711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87813AA9184
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 13:06:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C494AA91B2
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 13:14:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 70D7E18841D9
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 11:07:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FE6E188E0F5
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 11:14:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC3581FF1AD;
-	Mon,  5 May 2025 11:06:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A480203710;
+	Mon,  5 May 2025 11:13:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UldacciB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jcZW8TbH"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85EE31F4CA9
-	for <netdev@vger.kernel.org>; Mon,  5 May 2025 11:06:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CA02282EE;
+	Mon,  5 May 2025 11:13:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746443209; cv=none; b=UFJKSk+aXHHJP8fIXj48TuBrQ7mYPxprf54iNRWSojNbmtT39oqnvRBQzC3XSGv1Acql6g5ixJxl/LG+7AIAAwYT/bLrj6Hmxf9oOntAVA39PkWkF1O7LiH5kGv4Fkn2C1wPWo0NsGhKif1rfHIJdrYYwPPLOWLxn8LqQ/DDnOo=
+	t=1746443635; cv=none; b=sAtB9Q2ce/YBiVyHu9L6bZ4wsMqgFLgrglZq8kMRUASiQzQpsqjIQyrURCbJwJZkgKVR/9d/LVe1e18iDGA+cqGjXhzgo2I4Bq69Yoc/NP+Spcbn8zoTAlNx34MFlc/bAesE9VJz/oa7jQA1civ40j6TpwNgryda4pba8RRI858=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746443209; c=relaxed/simple;
-	bh=iv/eRYBIHwjOOaQhymv23NM4jlHCU1g6GSEHi6JOnLY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OzHw8sXIiJ4vcRxa4a6apd5s1EsGrKmjxN1FvAbrvm7NZckUQTTUB6GUiMKwXCdv96CUMZatgkLoOcc4/do4OROeT5KvQXSjMoePN62F324BVfim63D1KqRCgi5ZSzMsNfmnaTq9R88d6gpXWA0MsHpoVzUmgofizSewNDPZAlg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UldacciB; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746443206;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Mkgq91PgYNkfx7kaYEEWx+n1fYXclhNChD1pmbxuc7k=;
-	b=UldacciBuoHp9mASEZbMtUrxwwQPB4IZs2aW7Yi3dQ/yCm2ofk0H1JftMrmLtCV0DzG9eP
-	epX0O0nCmR4H3xxaQfDtzCJ54QvwDo41WMB9y26RyEnkNLsmDctA1W7fbp8AuRh0jXVfe7
-	h4KuAAQS8CJ8yF5HKhSiW6cypG5s8G8=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-42-wLL3t_s-OhyR0BiFAi3kDA-1; Mon, 05 May 2025 07:06:45 -0400
-X-MC-Unique: wLL3t_s-OhyR0BiFAi3kDA-1
-X-Mimecast-MFC-AGG-ID: wLL3t_s-OhyR0BiFAi3kDA_1746443204
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43d4d15058dso30483345e9.0
-        for <netdev@vger.kernel.org>; Mon, 05 May 2025 04:06:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746443204; x=1747048004;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mkgq91PgYNkfx7kaYEEWx+n1fYXclhNChD1pmbxuc7k=;
-        b=KVwX8nxsrluY97vC5F4a87TfxcX1RxgL+qErgyzzW6zx9RoENfnNm+2DcbeEUmPhhH
-         MCdiXRpn3JL21kNLSfyvinak9HhANHgvlA6LHkoBbtBRn3geFWGQ/1cT93j3MkIh3TB4
-         m2BTUHlnaYP8w0zdmmz/d7RDa42OXm0lf56gvklTqhRzusolMbRq7ffacJLYU3Wj7AAM
-         2ssabMn56uwwcXB/6Fm3f72VdOmilY/6qB2PTZGzOcROJluBjHVniYAktMrKqChJgs5G
-         yVamd9oilV04MaTYt40eNHi1/J7Cjk5LzU0XvZoMH5/DZ//A+zHVuWRQp0efQcTQMh10
-         tnUg==
-X-Forwarded-Encrypted: i=1; AJvYcCWyjcyn1cjVKcW3Fv1ShKEyPzGvFbxqrLzC33GhHZ7xefDHYfcwlFfOPnzYsMcPPxj0jvir1Nc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9N6EExGRRgSZvvrYgQbWgDZI/Ty4kuou6eECBr5Gumr0QY+/g
-	Yo2izg9AVOAyLGcyZUJ2rQVNmfszi9w7wnPPj//Y2EXxuilBEAJJFmF7QcCh3aqIU/ihDMdHdEK
-	55BJoZt4dpRMHltAwXlKDgBqwePvOkmZ2ws/kpK/1r1KVkHdJyVARVQ==
-X-Gm-Gg: ASbGnctbTf0FDaFaXiwfNUnl9KJQ/J2uebtO3PjLOv6sUbZFyCQ1TippxmVsWO+l4ME
-	hSE9QfMTyQLOjSqH3MXuuclnOqZv2Y2NStPAPmg9KC7WojRslKGWEmUJkla0xcmWVurpKoykWrq
-	dWnbbi4SRfRNibEOtCiXUHTy0yGjq5nW+xVdD02IX5yQR0L/FMRoxLsQb4CHiNEYu9yYfKIkdEm
-	MGqaKhU6ALwSZdAhTFfsAVr8ges7jl7riNJxyq8+8J3kKrd0l+mkWOgx/BBLF/929P3ARnZn/WO
-	i7iX50g47HW2povmuJe1EQW37nXh7EXjPVXgDC/x19MALHv+HD1KvvH5DAg=
-X-Received: by 2002:a05:6000:18a5:b0:399:737f:4e02 with SMTP id ffacd0b85a97d-3a09fdbe68emr5322935f8f.39.1746443203968;
-        Mon, 05 May 2025 04:06:43 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH+qYro0AVUqEXciacQp2awrtTh3oBuQW9n10CMa03sF1boAjnxNruymZFCZGd7fCUzq98zHw==
-X-Received: by 2002:a05:6000:18a5:b0:399:737f:4e02 with SMTP id ffacd0b85a97d-3a09fdbe68emr5322915f8f.39.1746443203526;
-        Mon, 05 May 2025 04:06:43 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2706:e010:b099:aac6:4e70:6198? ([2a0d:3344:2706:e010:b099:aac6:4e70:6198])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a099b0ffd5sm10101291f8f.70.2025.05.05.04.06.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 May 2025 04:06:43 -0700 (PDT)
-Message-ID: <4350bd09-9aad-491c-a38d-08249f082b6d@redhat.com>
-Date: Mon, 5 May 2025 13:06:41 +0200
+	s=arc-20240116; t=1746443635; c=relaxed/simple;
+	bh=2kAcBtas/AQjLAblI34TL2k5SEbCYozEXdmK/YGiGRw=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=F0zZ72FyRqR7omNypnhG+nkvRN/Wb5jBpv/hmdV6WLE4wXJ/z05RInxVcQpQfOxayRjc1D23dSB/I5L8gyFBGtM7njnbXBGQXsMfoXc9Bs746YZlHzQl1lqtd0/MoqtRBS2Xr7iC23GKZ4coRedFjCC58N1eSDiSFxoqJtNDtag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jcZW8TbH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC244C4CEE4;
+	Mon,  5 May 2025 11:13:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746443634;
+	bh=2kAcBtas/AQjLAblI34TL2k5SEbCYozEXdmK/YGiGRw=;
+	h=From:Subject:Date:To:Cc:From;
+	b=jcZW8TbHC9xMR303np7qvoqC5qR4RKdkImHM7avmzoiuWHN0KsUFuUn6P7hlHezqK
+	 /V9AJpx0rUlUl/B59cSz5moJpEYbwil+lH8q1BPm4LsH/U/Uh3A4FiuirENnry/Upo
+	 JsEjPOvOWDaPbo4Jde1jntc+FqIm3y+UH12+ZZRpcjigkWPKVXlOeAEUx5eqftk5Ku
+	 j2c3k3+0IcQ93jznZvTicXlQGHA1zLtpSdt+SvREEKfoDnwiNHEJQUvjsE8FtPrNUw
+	 KLEVJsX/JOoEK/h+S/MKPRtPDOJGQpcvQy6ayYz8fhYqvy9B+QsJAcUeax+BqoLBJM
+	 fAF45kR2ALeBA==
+From: Christian Brauner <brauner@kernel.org>
+Subject: [PATCH RFC v3 00/10] coredump: add coredump socket
+Date: Mon, 05 May 2025 13:13:38 +0200
+Message-Id: <20250505-work-coredump-socket-v3-0-e1832f0e1eae@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 05/15] net: homa: create homa_peer.h and
- homa_peer.c
-To: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org
-Cc: edumazet@google.com, horms@kernel.org, kuba@kernel.org
-References: <20250502233729.64220-1-ouster@cs.stanford.edu>
- <20250502233729.64220-6-ouster@cs.stanford.edu>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250502233729.64220-6-ouster@cs.stanford.edu>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAGKdGGgC/3WPzUrFMBCFX+WStVPS6U+sK0G4D+BWXDTppA29N
+ mXSG5XSdzetCxHuXZ4D5/tmVhGIHQXxdFoFU3TB+SmF4uEkzNBOPYHrUhYosZIlNvDpeQTjmbr
+ rxwzBm5EWeFTGSJsrhY0RaTozWfd1YN/E6/lFvKdSt4FAczuZYSdGG6DO8jqbXWfDvhpcWDx/H
+ 7fE/Nj+agt5WxtzkIC2tRJVp3WpnkfiiS6Z5/5QRvyjVBLvUDBRygKrJj1orflP2bbtBzRwZsw
+ lAQAA
+X-Change-ID: 20250429-work-coredump-socket-87cc0f17729c
+To: Eric Dumazet <edumazet@google.com>, 
+ Kuniyuki Iwashima <kuniyu@amazon.com>, Oleg Nesterov <oleg@redhat.com>, 
+ linux-fsdevel@vger.kernel.org, Jann Horn <jannh@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, 
+ Daan De Meyer <daan.j.demeyer@gmail.com>, 
+ David Rheinsberg <david@readahead.eu>, Jakub Kicinski <kuba@kernel.org>, 
+ Jan Kara <jack@suse.cz>, Lennart Poettering <lennart@poettering.net>, 
+ Luca Boccassi <bluca@debian.org>, Mike Yuan <me@yhndnzj.com>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ =?utf-8?q?Zbigniew_J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ Christian Brauner <brauner@kernel.org>, 
+ Alexander Mikhalitsyn <alexander@mihalicyn.com>
+X-Mailer: b4 0.15-dev-c25d1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=8212; i=brauner@kernel.org;
+ h=from:subject:message-id; bh=2kAcBtas/AQjLAblI34TL2k5SEbCYozEXdmK/YGiGRw=;
+ b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWRIzM0t3xF6amKBl4nu9FtnHzkW7YnbfXvJTdln9TcKr
+ 545Gst9pqOUhUGMi0FWTJHFod0kXG45T8Vmo0wNmDmsTCBDGLg4BWAiy4sY/qm37F00pehAwro/
+ 8wKFFtRd2TYx73uY0LuPxp67l37nu3iEkWG5gPuBFbpfrX6ET/0XyXZFMejE9bIY4cNqU6/0bHU
+ sfMwEAA==
+X-Developer-Key: i=brauner@kernel.org; a=openpgp;
+ fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 
-On 5/3/25 1:37 AM, John Ousterhout wrote:
-[...]
-> +{
-> +	/* Note: when we return, the object must be initialized so it's
-> +	 * safe to call homa_peertab_destroy, even if this function returns
-> +	 * an error.
-> +	 */
-> +	int i;
-> +
-> +	spin_lock_init(&peertab->write_lock);
-> +	INIT_LIST_HEAD(&peertab->dead_dsts);
-> +	peertab->buckets = vmalloc(HOMA_PEERTAB_BUCKETS *
-> +				   sizeof(*peertab->buckets));
+Coredumping currently supports two modes:
 
-This struct looks way too big to be allocated on per netns basis. You
-should use a global table and include the netns in the lookup key.
+(1) Dumping directly into a file somewhere on the filesystem.
+(2) Dumping into a pipe connected to a usermode helper process
+    spawned as a child of the system_unbound_wq or kthreadd.
 
-> +	if (!peertab->buckets)
-> +		return -ENOMEM;
-> +	for (i = 0; i < HOMA_PEERTAB_BUCKETS; i++)
-> +		INIT_HLIST_HEAD(&peertab->buckets[i]);
-> +	return 0;
-> +}
-> +
-> +/**
-> + * homa_peertab_destroy() - Destructor for homa_peertabs. After this
-> + * function returns, it is unsafe to use any results from previous calls
-> + * to homa_peer_find, since all existing homa_peer objects will have been
-> + * destroyed.
-> + * @peertab:  The table to destroy.
-> + */
-> +void homa_peertab_destroy(struct homa_peertab *peertab)
-> +{
-> +	struct hlist_node *next;
-> +	struct homa_peer *peer;
-> +	int i;
-> +
-> +	if (!peertab->buckets)
-> +		return;
-> +
-> +	spin_lock_bh(&peertab->write_lock);
-> +	for (i = 0; i < HOMA_PEERTAB_BUCKETS; i++) {
-> +		hlist_for_each_entry_safe(peer, next, &peertab->buckets[i],
-> +					  peertab_links) {
-> +			dst_release(peer->dst);
-> +			kfree(peer);
-> +		}
-> +	}
-> +	vfree(peertab->buckets);
-> +	homa_peertab_gc_dsts(peertab, ~0);
-> +	spin_unlock_bh(&peertab->write_lock);
-> +}
-> +
-> +/**
-> + * homa_peertab_gc_dsts() - Invoked to free unused dst_entries, if it is
-> + * safe to do so.
-> + * @peertab:       The table in which to free entries.
-> + * @now:           Current time, in sched_clock() units; entries with expiration
-> + *                 dates no later than this will be freed. Specify ~0 to
-> + *                 free all entries.
-> + */
-> +void homa_peertab_gc_dsts(struct homa_peertab *peertab, u64 now)
-> +	__must_hold(&peer_tab->write_lock)
-> +{
-> +	while (!list_empty(&peertab->dead_dsts)) {
-> +		struct homa_dead_dst *dead =
-> +			list_first_entry(&peertab->dead_dsts,
-> +					 struct homa_dead_dst, dst_links);
-> +		if (dead->gc_time > now)
-> +			break;
-> +		dst_release(dead->dst);
-> +		list_del(&dead->dst_links);
-> +		kfree(dead);
-> +	}
-> +}
-> +
-> +/**
-> + * homa_peer_find() - Returns the peer associated with a given host; creates
-> + * a new homa_peer if one doesn't already exist.
-> + * @peertab:    Peer table in which to perform lookup.
-> + * @addr:       Address of the desired host: IPv4 addresses are represented
-> + *              as IPv4-mapped IPv6 addresses.
-> + * @inet:       Socket that will be used for sending packets.
-> + *
-> + * Return:      The peer associated with @addr, or a negative errno if an
-> + *              error occurred. The caller can retain this pointer
-> + *              indefinitely: peer entries are never deleted except in
-> + *              homa_peertab_destroy.
-> + */
-> +struct homa_peer *homa_peer_find(struct homa_peertab *peertab,
-> +				 const struct in6_addr *addr,
-> +				 struct inet_sock *inet)
-> +{
-> +	struct homa_peer *peer;
-> +	struct dst_entry *dst;
-> +
-> +	u32 bucket = hash_32((__force u32)addr->in6_u.u6_addr32[0],
-> +			       HOMA_PEERTAB_BUCKET_BITS);
-> +
-> +	bucket ^= hash_32((__force u32)addr->in6_u.u6_addr32[1],
-> +			  HOMA_PEERTAB_BUCKET_BITS);
-> +	bucket ^= hash_32((__force u32)addr->in6_u.u6_addr32[2],
-> +			  HOMA_PEERTAB_BUCKET_BITS);
-> +	bucket ^= hash_32((__force u32)addr->in6_u.u6_addr32[3],
-> +			  HOMA_PEERTAB_BUCKET_BITS);
-> +
-> +	/* Use RCU operators to ensure safety even if a concurrent call is
-> +	 * adding a new entry. The calls to rcu_read_lock and rcu_read_unlock
-> +	 * shouldn't actually be needed, since we don't need to protect
-> +	 * against concurrent deletion.
-> +	 */
-> +	rcu_read_lock();
-> +	hlist_for_each_entry_rcu(peer, &peertab->buckets[bucket],
-> +				 peertab_links) {
-> +		if (ipv6_addr_equal(&peer->addr, addr)) {
-> +			rcu_read_unlock();
-> +			return peer;
-> +		}
-> +	}
-> +	rcu_read_unlock();
-> +
-> +	/* No existing entry; create a new one.
-> +	 *
-> +	 * Note: after we acquire the lock, we have to check again to
-> +	 * make sure the entry still doesn't exist (it might have been
-> +	 * created by a concurrent invocation of this function).
-> +	 */
-> +	spin_lock_bh(&peertab->write_lock);
-> +	hlist_for_each_entry(peer, &peertab->buckets[bucket],
-> +			     peertab_links) {
-> +		if (ipv6_addr_equal(&peer->addr, addr))
-> +			goto done;
-> +	}
-> +	peer = kmalloc(sizeof(*peer), GFP_ATOMIC | __GFP_ZERO);
+For simplicity I'm mostly ignoring (1). There's probably still some
+users of (1) out there but processing coredumps in this way can be
+considered adventurous especially in the face of set*id binaries.
 
-Please, move the allocation outside the atomic scope and use GFP_KERNEL.
+The most common option should be (2) by now. It works by allowing
+userspace to put a string into /proc/sys/kernel/core_pattern like:
 
-> +	if (!peer) {
-> +		peer = (struct homa_peer *)ERR_PTR(-ENOMEM);
-> +		goto done;
-> +	}
-> +	peer->addr = *addr;
-> +	dst = homa_peer_get_dst(peer, inet);
-> +	if (IS_ERR(dst)) {
-> +		kfree(peer);
-> +		peer = (struct homa_peer *)PTR_ERR(dst);
-> +		goto done;
-> +	}
-> +	peer->dst = dst;
-> +	hlist_add_head_rcu(&peer->peertab_links, &peertab->buckets[bucket]);
+        |/usr/lib/systemd/systemd-coredump %P %u %g %s %t %c %h
 
-At this point another CPU can lookup 'peer'. Since there are no memory
-barriers it could observe a NULL peer->dst.
+The "|" at the beginning indicates to the kernel that a pipe must be
+used. The path following the pipe indicator is a path to a binary that
+will be spawned as a usermode helper process. Any additional parameters
+pass information about the task that is generating the coredump to the
+binary that processes the coredump.
 
-Also AFAICS new peers are always added when lookup for a different
-address fail and deleted only at netns shutdown time (never for the initns).
+In the example core_pattern shown above systemd-coredump is spawned as a
+usermode helper. There's various conceptual consequences of this
+(non-exhaustive list):
 
-You need to:
-- account the memory used for peer
-- enforce an upper bound for the total number of peers (per netns),
-eventually freeing existing old ones.
+- systemd-coredump is spawned with file descriptor number 0 (stdin)
+  connected to the read-end of the pipe. All other file descriptors are
+  closed. That specifically includes 1 (stdout) and 2 (stderr). This has
+  already caused bugs because userspace assumed that this cannot happen
+  (Whether or not this is a sane assumption is irrelevant.).
 
-Note that freeing the peer at 'runtime' will require additional changes:
-i.e. likely refcounting will be beeded or the at lookup time, after the
-rcu unlock the code could hit HaF while accessing the looked-up peer.
+- systemd-coredump will be spawned as a child of system_unbound_wq. So
+  it is not a child of any userspace process and specifically not a
+  child of PID 1. It cannot be waited upon and is in a weird hybrid
+  upcall which are difficult for userspace to control correctly.
 
+- systemd-coredump is spawned with full kernel privileges. This
+  necessitates all kinds of weird privilege dropping excercises in
+  userspace to make this safe.
 
-> +	peer->current_ticks = -1;
-> +	spin_lock_init(&peer->ack_lock);
-> +
-> +done:
-> +	spin_unlock_bh(&peertab->write_lock);
-> +	return peer;
-> +}
-> +
-> +/**
-> + * homa_dst_refresh() - This method is called when the dst for a peer is
-> + * obsolete; it releases that dst and creates a new one.
-> + * @peertab:  Table containing the peer.
-> + * @peer:     Peer whose dst is obsolete.
-> + * @hsk:      Socket that will be used to transmit data to the peer.
-> + */
-> +void homa_dst_refresh(struct homa_peertab *peertab, struct homa_peer *peer,
-> +		      struct homa_sock *hsk)
-> +{
-> +	struct homa_dead_dst *save_dead;
-> +	struct dst_entry *dst;
-> +	u64 now;
-> +
-> +	/* Need to keep around the current entry for a while in case
-> +	 * someone is using it. If we can't do that, then don't update
-> +	 * the entry.
-> +	 */
-> +	save_dead = kmalloc(sizeof(*save_dead), GFP_ATOMIC);
-> +	if (unlikely(!save_dead))
-> +		return;
-> +
-> +	dst = homa_peer_get_dst(peer, &hsk->inet);
-> +	if (IS_ERR(dst)) {
-> +		kfree(save_dead);
-/> +		return;
-> +	}
-> +
-> +	spin_lock_bh(&peertab->write_lock);
-> +	now = sched_clock();
+- A new usermode helper has to be spawned for each crashing process.
 
-Use jiffies instead.
+This series adds a new mode:
 
-> +	save_dead->dst = peer->dst;
-> +	save_dead->gc_time = now + 100000000;   /* 100 ms */
-> +	list_add_tail(&save_dead->dst_links, &peertab->dead_dsts);
-> +	homa_peertab_gc_dsts(peertab, now);
-> +	peer->dst = dst;
-> +	spin_unlock_bh(&peertab->write_lock);
+(3) Dumping into an abstract AF_UNIX socket.
 
-It's unclear to me why you need this additional GC layer on top's of the
-core one.
+Userspace can set /proc/sys/kernel/core_pattern to:
 
-[...]
-> +static inline struct dst_entry *homa_get_dst(struct homa_peer *peer,
-> +					     struct homa_sock *hsk)
-> +{
-> +	if (unlikely(peer->dst->obsolete > 0))
+        @linuxafsk/coredump_socket
 
-you need to additionally call dst->ops->check
+The "@" at the beginning indicates to the kernel that the abstract
+AF_UNIX coredump socket will be used to process coredumps.
 
-/P
+The coredump socket uses the fixed address "linuxafsk/coredump.socket"
+for now.
+
+The coredump socket is located in the initial network namespace. To bind
+the coredump socket userspace must hold CAP_SYS_ADMIN in the initial
+user namespace. Listening and reading can happen from whatever
+unprivileged context is necessary to safely process coredumps.
+
+When a task coredumps it opens a client socket in the initial network
+namespace and connects to the coredump socket. For now only tasks that
+are acctually coredumping are allowed to connect to the initial coredump
+socket.
+
+- The coredump server should use SO_PEERPIDFD to get a stable handle on
+  the connected crashing task. The retrieved pidfd will provide a stable
+  reference even if the crashing task gets SIGKILLed while generating
+  the coredump.
+
+- By setting core_pipe_limit non-zero userspace can guarantee that the
+  crashing task cannot be reaped behind it's back and thus process all
+  necessary information in /proc/<pid>. The SO_PEERPIDFD can be used to
+  detect whether /proc/<pid> still refers to the same process.
+
+  The core_pipe_limit isn't used to rate-limit connections to the
+  socket. This can simply be done via AF_UNIX socket directly.
+
+- The pidfd for the crashing task will contain information how the task
+  coredumps. The PIDFD_GET_INFO ioctl gained a new flag
+  PIDFD_INFO_COREDUMP which can be used to retreive the coredump
+  information.
+
+  If the coredump gets a new coredump client connection the kernel
+  guarantees that PIDFD_INFO_COREDUMP information is available.
+  Currently the following information is provided in the new
+  @coredump_mask extension to struct pidfd_info:
+
+  * PIDFD_COREDUMPED is raised if the task did actually coredump.
+  * PIDFD_COREDUMP_SKIP	is raised if the task skipped coredumping (e.g.,
+    undumpable).
+  * PIDFD_COREDUMP_USER	is raised if this is a regular coredump and
+    doesn't need special care by the coredump server.
+  * IDFD_COREDUMP_ROOT is raised if the generated coredump should be
+    treated as sensitive and the coredump server should restrict to the
+    generated coredump to sufficiently privileged users.
+
+- Since unix_stream_connect() runs bpf programs during connect it's
+  possible to even redirect or multiplex coredumps to other sockets.
+
+- The coredump server should mark itself as non-dumpable.
+  To capture coredumps for the coredump server itself a bpf program
+  should be run at connect to redirect it to another socket in
+  userspace. This can be useful for debugging crashing coredump servers.
+
+- A container coredump server in a separate network namespace can simply
+  bind to linuxafsk/coredump.socket and systemd-coredump fowards
+  coredumps to the container.
+
+- Fwiw, one idea is to handle coredumps via per-user/session coredump
+  servers that run with that users privileges.
+
+  The coredump server listens on the coredump socket and accepts a
+  new coredump connection. It then retrieves SO_PEERPIDFD for the
+  client, inspects uid/gid and hands the accepted client to the users
+  own coredump handler which runs with the users privileges only.
+
+The new coredump socket will allow userspace to not have to rely on
+usermode helpers for processing coredumps and provides a safer way to
+handle them instead of relying on super privileged coredumping helpers.
+
+This will also be significantly more lightweight since no fork()+exec()
+for the usermodehelper is required for each crashing process. The
+coredump server in userspace can just keep a worker pool.
+
+This is easy to test:
+
+(a) coredump processing (we're using socat):
+
+    > cat coredump_socket.sh
+    #!/bin/bash
+
+    set -x
+
+    sudo bash -c "echo '@linuxafsk/coredump.socket' > /proc/sys/kernel/core_pattern"
+    sudo socat --statistics abstract-listen:linuxafsk/coredump.socket,fork FILE:core_file,create,append,trunc
+
+(b) trigger a coredump:
+
+    user1@localhost:~/data/scripts$ cat crash.c
+    #include <stdio.h>
+    #include <unistd.h>
+
+    int main(int argc, char *argv[])
+    {
+            fprintf(stderr, "%u\n", (1 / 0));
+            _exit(0);
+    }
+
+Signed-off-by: Christian Brauner <brauner@kernel.org>
+---
+Changes in v3:
+- Use an abstract unix socket.
+- Add documentation.
+- Add selftests.
+- Link to v2: https://lore.kernel.org/20250502-work-coredump-socket-v2-0-43259042ffc7@kernel.org
+
+Changes in v2:
+- Expose dumpability via PIDFD_GET_INFO.
+- Place COREDUMP_SOCK handling under CONFIG_UNIX.
+- Link to v1: https://lore.kernel.org/20250430-work-coredump-socket-v1-0-2faf027dbb47@kernel.org
+
+---
+Christian Brauner (10):
+      coredump: massage format_corname()
+      coredump: massage do_coredump()
+      net: reserve prefix
+      coredump: add coredump socket
+      coredump: validate socket name as it is written
+      coredump: show supported coredump modes
+      pidfs, coredump: add PIDFD_INFO_COREDUMP
+      net, pidfs, coredump: only allow coredumping tasks to connect to coredump socket
+      selftests/pidfd: add PIDFD_INFO_COREDUMP infrastructure
+      selftests/coredump: add tests for AF_UNIX coredumps
+
+ fs/coredump.c                                     | 358 +++++++++++++++++-----
+ fs/pidfs.c                                        |  68 ++++
+ include/linux/coredump.h                          |  12 +
+ include/linux/pidfs.h                             |   4 +
+ include/uapi/linux/pidfd.h                        |  16 +
+ include/uapi/linux/un.h                           |   2 +
+ net/unix/af_unix.c                                |  64 +++-
+ tools/testing/selftests/coredump/stackdump_test.c |  71 ++++-
+ tools/testing/selftests/pidfd/pidfd.h             |  22 ++
+ 9 files changed, 528 insertions(+), 89 deletions(-)
+---
+base-commit: 4dd6566b5a8ca1e8c9ff2652c2249715d6c64217
+change-id: 20250429-work-coredump-socket-87cc0f17729c
 
 
