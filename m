@@ -1,191 +1,124 @@
-Return-Path: <netdev+bounces-187806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11817AA9B10
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 19:52:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 176D3AA9B47
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 20:13:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20997189FD78
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 17:52:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0075218935F1
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 18:13:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BCD826C3A4;
-	Mon,  5 May 2025 17:52:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D997026F451;
+	Mon,  5 May 2025 18:12:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GrFsSaO/"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="Q0pgeGa0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F08651A3056;
-	Mon,  5 May 2025 17:52:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6709E26E173
+	for <netdev@vger.kernel.org>; Mon,  5 May 2025 18:12:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746467557; cv=none; b=sY5v+zf6it7Dof8DUYAovO3GlmhPTxwdsxqop06kvdR/KqA2+U0IYPbFeYa/sPuZDeDcsmg3iUKKBnSZooKvlHWXiZWZMUjfo6cmYT7IE26GkqmMeDsssOQdEiVKa2VPhClU3jriUoJ8eddfx2bho0wz4OPi/pTconme5M2es/8=
+	t=1746468777; cv=none; b=dWRDr3MOMbpyRc5Joh0UmGo9FdJJCKk3ZObKPrO3wWgFhfRdCwj2xTE6iCtC0QEgiGDIuM7zShB29jDBjtTbQ+3a1VWfNz18xGLmoF0rJbyIeF9C3tUCTjek30wDqtFisSPnqXaxsiZJs3m+8hYUkypX7Ky7J92CmsPm4MhcL50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746467557; c=relaxed/simple;
-	bh=bRdbB5nwoXceqJLAgXR8XsFvGMcB++yq5xBurBYsHF8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mxILYlid0zvVeHiRz0EdvB/IYdVrW6pxHk6mBezFWnaPRmOyMMOnJDuIqa5ckCifCFl6pWtTKVgvNSQiztF2XPX4xuaRuHttLB0IcPfaQTrBbGhLd+elPW44rwlqlNr6uAjDf1xCsRsI12dwzS+CH1ZdNAvYjcmyp0hpAUyrN/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GrFsSaO/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5A49C4CEE4;
-	Mon,  5 May 2025 17:52:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746467556;
-	bh=bRdbB5nwoXceqJLAgXR8XsFvGMcB++yq5xBurBYsHF8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GrFsSaO/rc5NtMJpnqe/lDFOwhuNGiijkItvt4S7Dl6WQdwK53uxHqqI6jUNG+qlK
-	 Y3o0WbevDK7KU+DAXO4j2Ko/caQ1qSb1JQAZJC3L7wPgy0lz/kNCaMSQ1lZ4/5hTdx
-	 JSMpqE21g9ySrJ+Bv8hq7ZUhLTotzRxchKiIsJDjPvVNB4V43i9ajouo2lmF8BA4vb
-	 c4lGkGcmZUbbIrCXsBS4Oc/V6+M9MArYDDC920EnMDebr0u8hq9ye+R1itIWb20P/x
-	 YNQ+mFyBUP3wHNnCJsa5xuyaHHCJng795ZBLx9n/30ErfOdsbia+f3TVfDm+ddH3CT
-	 RtD2/5dWf9DTw==
-Date: Mon, 5 May 2025 20:52:32 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Tanmay Jagdale <tanmay@marvell.com>
-Cc: bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
-	jerinj@marvell.com, hkelam@marvell.com, sbhatta@marvell.com,
-	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, bbhushan2@marvell.com, bhelgaas@google.com,
-	pstanner@redhat.com, gregkh@linuxfoundation.org,
-	peterz@infradead.org, linux@treblig.org,
-	krzysztof.kozlowski@linaro.org, giovanni.cabiddu@intel.com,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, rkannoth@marvell.com, sumang@marvell.com,
-	gcherian@marvell.com
-Subject: Re: [net-next PATCH v1 00/15] Enable Inbound IPsec offload on
- Marvell CN10K SoC
-Message-ID: <20250505175232.GN5848@unreal>
-References: <20250502132005.611698-1-tanmay@marvell.com>
+	s=arc-20240116; t=1746468777; c=relaxed/simple;
+	bh=r6zL691xyXDc/NYPMzcgtrOHkUdYXfPK6zMjb7J4m50=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aHWAv825ZRg05YdlFIkzMwH4042VUMIeNjFItY4CVttkgcvBMELMVytxfgcX9U8HCDQGk0r1fOCfsAwKKZxl6jlI51xaCRtaWP5DX5l56vomaAExCcFL3XAk+bk/G/8jYfYdj4YI9LPloN+02vpGiudSFzZWtqqZB7aT345BWME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=Q0pgeGa0; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-22e09f57ed4so44411785ad.0
+        for <netdev@vger.kernel.org>; Mon, 05 May 2025 11:12:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1746468774; x=1747073574; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kn/zibkomLWdf7PKFOzDAAA5I89jlaYGeX44MmTKrlM=;
+        b=Q0pgeGa0T5kG2YxFOEwmRQyN+ikX5zbkAf1Pw7dFZs4ad2sG5TXbekhrrOl1Mr/bMm
+         vkAd3B3SuFl08jJfcmRUwfObgGLDMSS6H8KekWNievh98rg98CBmtxRVTTe/CHaiMeOc
+         cvxp/556Qvc/kpMMBxMYD9cgqQw6TT6nkYJHLpiLKycWUYh3Ol+w2ODq3kjqVHiOP0AT
+         Kop+T4i0nImzsrgJ2xX241Red7YdXN3CyXTJ9IwuqBuEaA9FbLohCkkpf7evYUpiw2z3
+         BuytWeZEYDmJCkSYHPt3Ta/OKdsXEkV7AQN42PrhVC8s7sc/+TNBlqlX5v6d+1zrIPv8
+         eaAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746468774; x=1747073574;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kn/zibkomLWdf7PKFOzDAAA5I89jlaYGeX44MmTKrlM=;
+        b=eeTuQF0aWmnzM3ELNWx4bg7Solm1JaMtONg+CQqPlPIwP0AVpE7+icuWRwBpxSEDHX
+         B7okNEUT1fApt34+9chPO/KepJ5zmV79my5mPvHTUBfP9UMv/uM9ljC/kJaduouNtnKy
+         4QB++WJ84ghlQGEPTGfGr4N2vXLIE618yeMiHekYJ2FrkG82yk2bbHe3QRGE2F/z0rHq
+         qvyH+pTe7oVZ6gZDsP3UprnazS/SD1NHa2tmh+lL7zya+nIcxFACU4p3YhYBHas/Wch9
+         WaiDNxOVB9UdLnnf0uzgLn+4WY4I1fNdRm7/ishpJ4nqoDPwUr9KlIXX9oQGaI8/C3uT
+         z5RA==
+X-Forwarded-Encrypted: i=1; AJvYcCUL6PZkQE/OMgVB6tar/FnokLpbScw0E7Ti2dnMq4Q4h+7KlmI2opkq46+AzrV4b6/7wFjBGgw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxcbrrqwivm7O0uyQFqR7u5II2p2B+ZaYEnEVaqSqNpUtBnEnHI
+	xgRGb18ik7qfrjlgDkBvAeg2aDzIWPtOKVAusAvMmbJAgxHCfTDbW8eDNWz6NaU=
+X-Gm-Gg: ASbGncsAnBPLZKdLr2a6iKVYzeOMQB0QocUUQxDbwPmdv0SvLGv1evUC7Sm4PNUF6Nr
+	W8t0kZ8Jdnrl9QxKOOj34K5y31ubOmLMdXxiC0t37hqc5eo5K2+L/XWhlQxj/ue+xYZoOSRPtq4
+	Tv3vw/deu2Viw/jpNJCqYtpgmmkrR4s6Q7EgYoaPuFPyN0gL9f8A2tOReU3tSmS8/BTx9oVqgrQ
+	2PQXC3T3mzLKUncJxIjiqvGkEbVCXaDqPxg0K7BjfqUZVGMa9wFmgc7rtGmayfwwjKWSXJf/CTM
+	5KfeER8zCbIkzqIfD3DOGjNWfkgd+VUDBRpd4zbC8wyqP2XMFsSYBNEImeZtx5HKui967Fl0TUZ
+	RtemKhiFc
+X-Google-Smtp-Source: AGHT+IFcDMpZFbSC2cA6HXuHWJG/1gn3lj+yUO7wc1CEnrvnUO+JYcSjzB8buk5n0CphdfJMlqY/jQ==
+X-Received: by 2002:a17:903:19cf:b0:215:6c5f:d142 with SMTP id d9443c01a7336-22e327e57b2mr5750795ad.20.1746468774651;
+        Mon, 05 May 2025 11:12:54 -0700 (PDT)
+Received: from ?IPV6:2a03:83e0:1156:1:1079:4a23:3f58:8abc? ([2620:10d:c090:500::4:906f])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e1522054esm58324445ad.118.2025.05.05.11.12.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 May 2025 11:12:54 -0700 (PDT)
+Message-ID: <39a3d71e-2463-494d-9530-80fcaad0b208@davidwei.uk>
+Date: Mon, 5 May 2025 11:12:52 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250502132005.611698-1-tanmay@marvell.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 2/3] selftests: drv: net: avoid skipping tests
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Mohsin Bashir <mohsin.bashr@gmail.com>, netdev@vger.kernel.org,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, shuah@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ hawk@kernel.org, john.fastabend@gmail.com, ap420073@gmail.com,
+ linux-kselftest@vger.kernel.org
+References: <20250503013518.1722913-1-mohsin.bashr@gmail.com>
+ <20250503013518.1722913-3-mohsin.bashr@gmail.com>
+ <0db1b7f0-028c-44e9-bf98-81468dee32f0@davidwei.uk>
+ <20250505104701.10d3eb14@kernel.org>
+Content-Language: en-US
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <20250505104701.10d3eb14@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, May 02, 2025 at 06:49:41PM +0530, Tanmay Jagdale wrote:
-> This patch series adds support for inbound inline IPsec flows for the
-> Marvell CN10K SoC.
+On 5/5/25 10:47, Jakub Kicinski wrote:
+> On Fri, 2 May 2025 21:54:11 -0700 David Wei wrote:
+>>>    def _test_v4(cfg) -> None:
+>>> -    cfg.require_ipver("4")
+>>> +    if not cfg.addr_v["4"]:
+>>> +        return
+>>
+>> What if cfg.remote_addr_v['4'] doesn't exist?
+> 
+> Not sure if its super pythonic but it's set to None in the lib
+> if user doesn't provide the config.
 
-It will be much easier if in commit messages and comments you
-will use kernel naming, e.g. "IPsec packet offload" and not "inline IPsec", e.t.c.
+Ah okay. I'm concerned about the next line:
 
-Also, I'm wonder, do you have performance numbers for this code?
+>         cmd("ping -c 1 -W0.5 " + cfg.remote_addr_v["4"]) 
 
-Thanks
+If cfg.remote_addr_v["4"] is None by default then Python will complain:
 
-> 
-> The packet flow
-> ---------------
-> An encrypted IPSec packet goes through two passes in the RVU hardware
-> before reaching the CPU.
-> First Pass:
->   The first pass involves identifying the packet as IPSec, assigning an RQ,
->   allocating a buffer from the Aura pool and then send it to CPT for decryption.
-> 
-> Second Pass:
->   After CPT decrypts the packet, it sends a metapacket to NIXRX via the X2P
->   bus. The metapacket contains CPT_PARSE_HDR_S structure and some initial
->   bytes of the decrypted packet which would help NIXRX in classification.
->   CPT also sets BIT(11) of channel number to further help in identifcation.
->   NIXRX allocates a new buffer for this packet and submits it to the CPU.
-> 
-> Once the decrypted metapacket packet is delivered to the CPU, get the WQE
-> pointer from CPT_PARSE_HDR_S in the packet buffer. This WQE points to the
-> complete decrypted packet. We create an skb using this, set the relevant
-> XFRM packet mode flags to indicate successful decryption, and submit it
-> to the network stack.
-> 
-> 
-> Patches are grouped as follows:
-> -------------------------------
-> 1) CPT LF movement from crypto driver to RVU AF
->     0001-crypto-octeontx2-Share-engine-group-info-with-AF-dri.patch
->     0002-octeontx2-af-Configure-crypto-hardware-for-inline-ip.patch
->     0003-octeontx2-af-Setup-Large-Memory-Transaction-for-cryp.patch
->     0004-octeontx2-af-Handle-inbound-inline-ipsec-config-in-A.patch
->     0005-crypto-octeontx2-Remove-inbound-inline-ipsec-config.patch
-> 
-> 2) RVU AF Mailbox changes for CPT 2nd pass RQ mask, SPI-to-SA table,
->    NIX-CPT BPID configuration
->     0006-octeontx2-af-Add-support-for-CPT-second-pass.patch
->     0007-octeontx2-af-Add-support-for-SPI-to-SA-index-transla.patch
->     0008-octeontx2-af-Add-mbox-to-alloc-free-BPIDs.patch
-> 
-> 3) Inbound Inline IPsec support patches
->     0009-octeontx2-pf-ipsec-Allocate-Ingress-SA-table.patch
->     0010-octeontx2-pf-ipsec-Setup-NIX-HW-resources-for-inboun.patch
->     0011-octeontx2-pf-ipsec-Handle-NPA-threshhold-interrupt.patch
->     0012-octeontx2-pf-ipsec-Initialize-ingress-IPsec.patch
->     0013-octeontx2-pf-ipsec-Manage-NPC-rules-and-SPI-to-SA-ta.patch
->     0014-octeontx2-pf-ipsec-Process-CPT-metapackets.patch
->     0015-octeontx2-pf-ipsec-Add-XFRM-state-and-policy-hooks-f.patch
-> 
-> 
-> Bharat Bhushan (5):
->   crypto: octeontx2: Share engine group info with AF driver
->   octeontx2-af: Configure crypto hardware for inline ipsec
->   octeontx2-af: Setup Large Memory Transaction for crypto
->   octeontx2-af: Handle inbound inline ipsec config in AF
->   crypto: octeontx2: Remove inbound inline ipsec config
-> 
-> Geetha sowjanya (1):
->   octeontx2-af: Add mbox to alloc/free BPIDs
-> 
-> Kiran Kumar K (1):
->   octeontx2-af: Add support for SPI to SA index translation
-> 
-> Rakesh Kudurumalla (1):
->   octeontx2-af: Add support for CPT second pass
-> 
-> Tanmay Jagdale (7):
->   octeontx2-pf: ipsec: Allocate Ingress SA table
->   octeontx2-pf: ipsec: Setup NIX HW resources for inbound flows
->   octeontx2-pf: ipsec: Handle NPA threshold interrupt
->   octeontx2-pf: ipsec: Initialize ingress IPsec
->   octeontx2-pf: ipsec: Manage NPC rules and SPI-to-SA table entries
->   octeontx2-pf: ipsec: Process CPT metapackets
->   octeontx2-pf: ipsec: Add XFRM state and policy hooks for inbound flows
-> 
->  .../marvell/octeontx2/otx2_cpt_common.h       |    8 -
->  drivers/crypto/marvell/octeontx2/otx2_cptpf.h |   10 -
->  .../marvell/octeontx2/otx2_cptpf_main.c       |   50 +-
->  .../marvell/octeontx2/otx2_cptpf_mbox.c       |  286 +---
->  .../marvell/octeontx2/otx2_cptpf_ucode.c      |  116 +-
->  .../marvell/octeontx2/otx2_cptpf_ucode.h      |    3 +-
->  .../ethernet/marvell/octeontx2/af/Makefile    |    2 +-
->  .../ethernet/marvell/octeontx2/af/common.h    |    1 +
->  .../net/ethernet/marvell/octeontx2/af/mbox.h  |  119 +-
->  .../net/ethernet/marvell/octeontx2/af/rvu.c   |    9 +-
->  .../net/ethernet/marvell/octeontx2/af/rvu.h   |   71 +
->  .../ethernet/marvell/octeontx2/af/rvu_cn10k.c |   11 +
->  .../ethernet/marvell/octeontx2/af/rvu_cpt.c   |  706 +++++++++-
->  .../ethernet/marvell/octeontx2/af/rvu_cpt.h   |   71 +
->  .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  230 +++-
->  .../marvell/octeontx2/af/rvu_nix_spi.c        |  220 +++
->  .../ethernet/marvell/octeontx2/af/rvu_reg.h   |   16 +
->  .../marvell/octeontx2/af/rvu_struct.h         |    4 +-
->  .../marvell/octeontx2/nic/cn10k_ipsec.c       | 1191 ++++++++++++++++-
->  .../marvell/octeontx2/nic/cn10k_ipsec.h       |  152 +++
->  .../marvell/octeontx2/nic/otx2_common.c       |   23 +-
->  .../marvell/octeontx2/nic/otx2_common.h       |   16 +
->  .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   17 +
->  .../marvell/octeontx2/nic/otx2_struct.h       |   16 +
->  .../marvell/octeontx2/nic/otx2_txrx.c         |   25 +-
->  .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |    4 +
->  26 files changed, 2915 insertions(+), 462 deletions(-)
->  create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.h
->  create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_nix_spi.c
-> 
-> -- 
-> 2.43.0
-> 
-> 
+   >>> a = "foo test bar" + None
+   Traceback (most recent call last):
+     File "<stdin>", line 1, in <module>
+   TypeError: can only concatenate str (not "NoneType") to str
 
