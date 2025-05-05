@@ -1,62 +1,66 @@
-Return-Path: <netdev+bounces-188152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 968BBAAB516
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 07:22:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0937AAB52F
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 07:24:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91F134A19A5
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:18:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABF775022EB
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:20:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 352C634603A;
-	Tue,  6 May 2025 00:44:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF10E3A7876;
+	Tue,  6 May 2025 00:45:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BSVGe7BG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uGJqqAGu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E6392E61CD;
-	Mon,  5 May 2025 23:16:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FB7C284692;
+	Mon,  5 May 2025 23:16:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746486970; cv=none; b=DUtD/9Lo42LMmdyraz42yEI56ZWSA94VuX6lWS4IVVGTZB0bF31CHap0T0tywBaloSrab+4J2FdKsXiU0qcnDTi6t19elAbtxJW+e9c8SrWxoICG5C6PMp5g8+lBvkpxau5eoGLh8DybKLmF8MoZus06nVHRevbq761VovpssqM=
+	t=1746487014; cv=none; b=Ww2Akq6vlnk+kS+FJkmrpXWeIyIiOjHNKseasdLgMUj0u8XK1OOEdkdb6KUQ+jsqYDpsxPJD+2SHyX25k7Ev0lBG5Yn8OifOUGgVt9GLrGFf5Y+1HS1cVxuzdAQZ2AOU0d2AYcue06eMx62mxklpDIMht27uHakHYxsw1PwbFKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746486970; c=relaxed/simple;
-	bh=lD9jUtI1KHMpBHJeJ+oEJotljTUv3A4dNQi5VxznjOA=;
+	s=arc-20240116; t=1746487014; c=relaxed/simple;
+	bh=luk1d5dvK5s4+w24BiCGoAm4BeBTHfKMzopG+08qbQY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MBhyvXgPf6Fhgx0ntxRR4o4IkXLDby8n5fcUJ0WMLRWrZUn+SbJYwv+u+OTVzzzDiEF9PwiSaIO+cODs7Lyo1jLK8uCi8B3LXOpQdWeghHCAo2gJGgX1vOlTrzRBQ/Uv7GYY/wXn98+VSsX6/gUtr4HSpxkiyl8RyvLCTVLfFsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BSVGe7BG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDBC0C4CEEF;
-	Mon,  5 May 2025 23:16:08 +0000 (UTC)
+	 MIME-Version; b=MiMvEfIxKSAQ61gvgtiTXAhwPYAIi/nq7LBJG68YgHGqR6Yx9Kl2IGOt4gKJfVp3DJh3AYzpkmKDyV18oCXstXnbChUHas82kexU2CDtpee1NxSXXqMPkqbw7JT9hWJT9sQQjvwDNktINXEsRpp/Jn8zZ2ELWDbLqejvY3Q33ws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uGJqqAGu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0E2AC4CEE4;
+	Mon,  5 May 2025 23:16:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746486970;
-	bh=lD9jUtI1KHMpBHJeJ+oEJotljTUv3A4dNQi5VxznjOA=;
+	s=k20201202; t=1746487013;
+	bh=luk1d5dvK5s4+w24BiCGoAm4BeBTHfKMzopG+08qbQY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BSVGe7BGA7gq74CQjVTKMCqiSut5icBdJI6H1bmZytyj2CbpnlHN57OaFOW504zdt
-	 NcuF18xuF/XcTyPB5/tJfCJ0AV8NHzYv77M/AcXYz5raPQfC/oQABFd8pSIQYkVsui
-	 2MTIMX5Tgjp1fs6Gp/QOCvnvMJ8mP17TD4e7zgTvAeKO7Dx5lNNiVt3pjs8T8yF5MC
-	 FMoXKbiQ9oWPzItwxBdzvuAxLsnu58uc3DWU6nnEKjdPfOrmo+OTMbeLPM5RaCL5pC
-	 S3+GQnvtyHhBraQC34cvxg73Jwx4/Pu31faMK60a75E72yncdjbKMW5/YFrqyYLiUn
-	 eH4XHnZaed5vA==
+	b=uGJqqAGud+f2IoXcaUOGCC7TM82ffcUKRZs5x8sqbJIb+VXebtI6Pta0mLa23Ms+d
+	 EvqN1UfD+NYl3a5ozvggOg22MS8pZjmFBGNsGntgEu+EuPX43Shr07ddrOTjQ1T8cd
+	 nl7dMmJCEqtei3YbwSuETEgoIqSr3T2P1nCJVO4nbMiR33fUEAOQnUDvVOcJwRgA0D
+	 vYyOcfBbsZ4ljUyYO53/pLgIUGXVqSt0AOjOVg3dxK7icnOjQRV5Voz06jqFlQCVNC
+	 h6JJzymGqxKTHzHRazhZPIltpgxVeRgYYJUjWauJXrh4wwKiDvygLLDyPPLPIDvPYe
+	 2471rkZpfu/Zw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Hangbin Liu <liuhangbin@gmail.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
 	Sasha Levin <sashal@kernel.org>,
-	jv@jvosburgh.net,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 086/153] bonding: report duplicate MAC address in all situations
-Date: Mon,  5 May 2025 19:12:13 -0400
-Message-Id: <20250505231320.2695319-86-sashal@kernel.org>
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.15 107/153] eth: mlx4: don't try to complete XDP frames in netpoll
+Date: Mon,  5 May 2025 19:12:34 -0400
+Message-Id: <20250505231320.2695319-107-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505231320.2695319-1-sashal@kernel.org>
 References: <20250505231320.2695319-1-sashal@kernel.org>
@@ -66,48 +70,42 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.15.181
 Content-Transfer-Encoding: 8bit
 
-From: Hangbin Liu <liuhangbin@gmail.com>
+From: Jakub Kicinski <kuba@kernel.org>
 
-[ Upstream commit 28d68d396a1cd21591e8c6d74afbde33a7ea107e ]
+[ Upstream commit 8fdeafd66edaf420ea0063a1f13442fe3470fe70 ]
 
-Normally, a bond uses the MAC address of the first added slave as the bond’s
-MAC address. And the bond will set active slave’s MAC address to bond’s
-address if fail_over_mac is set to none (0) or follow (2).
+mlx4 doesn't support ndo_xdp_xmit / XDP_REDIRECT and wasn't
+using page pool until now, so it could run XDP completions
+in netpoll (NAPI budget == 0) just fine. Page pool has calling
+context requirements, make sure we don't try to call it from
+what is potentially HW IRQ context.
 
-When the first slave is removed, the bond will still use the removed slave’s
-MAC address, which can lead to a duplicate MAC address and potentially cause
-issues with the switch. To avoid confusion, let's warn the user in all
-situations, including when fail_over_mac is set to 2 or not in active-backup
-mode.
-
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
-Link: https://patch.msgid.link/20250225033914.18617-1-liuhangbin@gmail.com
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+Link: https://patch.msgid.link/20250213010635.1354034-3-kuba@kernel.org
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/bonding/bond_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/mellanox/mlx4/en_tx.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 75499e2967e8f..6bdc29d04a580 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -2355,7 +2355,7 @@ static int __bond_release_one(struct net_device *bond_dev,
+diff --git a/drivers/net/ethernet/mellanox/mlx4/en_tx.c b/drivers/net/ethernet/mellanox/mlx4/en_tx.c
+index c56b9dba4c718..ed695f7443a83 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/en_tx.c
++++ b/drivers/net/ethernet/mellanox/mlx4/en_tx.c
+@@ -445,6 +445,8 @@ int mlx4_en_process_tx_cq(struct net_device *dev,
  
- 	RCU_INIT_POINTER(bond->current_arp_slave, NULL);
+ 	if (unlikely(!priv->port_up))
+ 		return 0;
++	if (unlikely(!napi_budget) && cq->type == TX_XDP)
++		return 0;
  
--	if (!all && (!bond->params.fail_over_mac ||
-+	if (!all && (bond->params.fail_over_mac != BOND_FOM_ACTIVE ||
- 		     BOND_MODE(bond) != BOND_MODE_ACTIVEBACKUP)) {
- 		if (ether_addr_equal_64bits(bond_dev->dev_addr, slave->perm_hwaddr) &&
- 		    bond_has_slaves(bond))
+ 	netdev_txq_bql_complete_prefetchw(ring->tx_queue);
+ 
 -- 
 2.39.5
 
