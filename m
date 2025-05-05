@@ -1,65 +1,68 @@
-Return-Path: <netdev+bounces-188008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C54CAAAAB9C
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:59:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 785A3AAAB7F
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:57:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1044318899A3
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 01:56:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9717C164475
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 01:56:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC4143B11C0;
-	Mon,  5 May 2025 23:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C166F2F8BCB;
+	Mon,  5 May 2025 23:20:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SNH7OAdB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DETAdiiF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A39FB22D9FB;
-	Mon,  5 May 2025 23:05:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61727397A7A;
+	Mon,  5 May 2025 23:07:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746486321; cv=none; b=iolmVnChuH8hNlhSWfvHtak6p4YiIgJFx3Dkt41R3kBeLrMF97gFzf6IJyexlAzSARrwDqMauAn3CinN6nTlR8Dd8l4fQ9S8BJtcVhCund0gzCSdbLCr7FlE2GQZAkfoukNCHO++FrZpg3+r5O/ELQtgQsLNiU8NE2EXVWXLsZc=
+	t=1746486425; cv=none; b=oOVTy2sdG4gL5VPIAqhjN0CBsTwCqdJ+Ilw4poahl076REgMdpRlA2pYA5i6aBJOI/KXcv/TtUCiyvI30JHdq0DslhN46hFNSconvpIcLvnUmJoebApsRHEcFHsMXpJeHcIgocvv8ljxa3DkVU+FrlOEq3KmlltOq34qjGOxUgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746486321; c=relaxed/simple;
-	bh=J+K0fq+oSO6ukMR9+4dy0cKhnVJb8creVGAE7cYNVHU=;
+	s=arc-20240116; t=1746486425; c=relaxed/simple;
+	bh=iWcob6meNTskfImD0NHWwk6pQ0/76ij2r6zAjbghmU8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=n5+pcDK+K55NJav20KCE8rc115s3pt/MwLVFux9b4ZTYkCb78JpSp34IvXDDnyHuglqs2bHLDno6khx0Jb3vJxY3AiQ1O81uij86qgaK0O2aqoN4zo9XMQKmesxw0dzGLsr9d0zP9MjV6Nl/yW5HvhRSeaEEwV0W/ZKYJv+R/dI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SNH7OAdB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 423A2C4CEEE;
-	Mon,  5 May 2025 23:05:19 +0000 (UTC)
+	 MIME-Version; b=OpQiDORsRoPQA4SRwJEDDoPxuvg+pDCKG4CksVrYYv+DaWG3KZR5JqwpTB63R762pr3GX2ZQqne6YLzpzF1AYkr1V9UViZlFOAHSghyUskzdwyOeEkpcut3xMxKfjMxu8g5xJK7uuDfdN4xmfmlMfpR4rH8dn5ADveIX/7lZ9RI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DETAdiiF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BF65C4CEE4;
+	Mon,  5 May 2025 23:07:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746486320;
-	bh=J+K0fq+oSO6ukMR9+4dy0cKhnVJb8creVGAE7cYNVHU=;
+	s=k20201202; t=1746486424;
+	bh=iWcob6meNTskfImD0NHWwk6pQ0/76ij2r6zAjbghmU8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SNH7OAdB3vZqEGvMpk9wH5eACLTebuLHkvc48zTAr5GalwmN0ONmHaCjkRREfwMQn
-	 s04fnPB58zLuQMQ9NzBLFbWpu+1nPWia4XU2TWaJvzsCI2gyDQ8HxpM/V99yxgSgzG
-	 7065neYALtaJY4Ex34jRfpUfQhjt0czF9fNEPCZt8KQ85Y+yBCwsGf8XyU0qp4FUQT
-	 dPyxRSQrMPtDxl8v+xoZaFX1SWBKLhqx76aKM+w/N0PXu19wn77E3kxh4prPpjwU3Z
-	 3a2aN+904dCbq27I/14kuYdYSP5WJkiZZm7MjHV82D6+DxkDCLS3YdXNNADST6Hw0L
-	 NWZ59r/tig+Uw==
+	b=DETAdiiFUaITwpd4ZA0PNrBcT+atU7Dg14dRckFe+KFKqI1Rs4pFR/ZHVQoZlmXDU
+	 cQk/2N3Eeg1EA4K91u8Y/WppwDF7VgicZMK6mo1n5mDJwUz5nJ04wXIHyewij0ZE1l
+	 3U8DmfGRpp3lC98aTTf2jFAFxd/n+rMaxNnDbiKFhGP0ne/o4KMDiAF3HbxFn+IkH1
+	 yxv47B2Ab5v0rBpRofbgL1JsYSQLnhHqoEBm58oQZglnszg4s6pw+vPQ8cKxnYxt4S
+	 e/je2rxhLhQGHT0bjV8e/h/rR2CLc1bcZC4G0vomSsGZBOjGgNN3v757nI317c0Ykp
+	 N9424aTv9AlhQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Trond Myklebust <trond.myklebust@hammerspace.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Benjamin Coddington <bcodding@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	nic_swsd@realtek.com,
-	andrew+netdev@lunn.ch,
+	chuck.lever@oracle.com,
+	trondmy@kernel.org,
+	anna@kernel.org,
 	davem@davemloft.net,
 	edumazet@google.com,
+	kuba@kernel.org,
 	pabeni@redhat.com,
+	linux-nfs@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 258/294] r8169: don't scan PHY addresses > 0
-Date: Mon,  5 May 2025 18:55:58 -0400
-Message-Id: <20250505225634.2688578-258-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 019/212] SUNRPC: rpcbind should never reset the port to the value '0'
+Date: Mon,  5 May 2025 19:03:11 -0400
+Message-Id: <20250505230624.2692522-19-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250505225634.2688578-1-sashal@kernel.org>
-References: <20250505225634.2688578-1-sashal@kernel.org>
+In-Reply-To: <20250505230624.2692522-1-sashal@kernel.org>
+References: <20250505230624.2692522-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,37 +71,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.89
+X-stable-base: Linux 6.1.136
 Content-Transfer-Encoding: 8bit
 
-From: Heiner Kallweit <hkallweit1@gmail.com>
+From: Trond Myklebust <trond.myklebust@hammerspace.com>
 
-[ Upstream commit faac69a4ae5abb49e62c79c66b51bb905c9aa5ec ]
+[ Upstream commit 214c13e380ad7636631279f426387f9c4e3c14d9 ]
 
-The PHY address is a dummy, because r8169 PHY access registers
-don't support a PHY address. Therefore scan address 0 only.
+If we already had a valid port number for the RPC service, then we
+should not allow the rpcbind client to set it to the invalid value '0'.
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Link: https://patch.msgid.link/830637dd-4016-4a68-92b3-618fcac6589d@gmail.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Reviewed-by: Jeff Layton <jlayton@kernel.org>
+Reviewed-by: Benjamin Coddington <bcodding@redhat.com>
+Signed-off-by: Trond Myklebust <trond.myklebust@hammerspace.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/realtek/r8169_main.c | 1 +
- 1 file changed, 1 insertion(+)
+ net/sunrpc/rpcb_clnt.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 7e5258b2c4290..5af932a5e70c4 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -5125,6 +5125,7 @@ static int r8169_mdio_register(struct rtl8169_private *tp)
- 	new_bus->priv = tp;
- 	new_bus->parent = &pdev->dev;
- 	new_bus->irq[0] = PHY_MAC_INTERRUPT;
-+	new_bus->phy_mask = GENMASK(31, 1);
- 	snprintf(new_bus->id, MII_BUS_ID_SIZE, "r8169-%x-%x",
- 		 pci_domain_nr(pdev->bus), pci_dev_id(pdev));
+diff --git a/net/sunrpc/rpcb_clnt.c b/net/sunrpc/rpcb_clnt.c
+index 82afb56695f8d..1ec20163a0b7d 100644
+--- a/net/sunrpc/rpcb_clnt.c
++++ b/net/sunrpc/rpcb_clnt.c
+@@ -797,9 +797,10 @@ static void rpcb_getport_done(struct rpc_task *child, void *data)
+ 	}
  
+ 	trace_rpcb_setport(child, map->r_status, map->r_port);
+-	xprt->ops->set_port(xprt, map->r_port);
+-	if (map->r_port)
++	if (map->r_port) {
++		xprt->ops->set_port(xprt, map->r_port);
+ 		xprt_set_bound(xprt);
++	}
+ }
+ 
+ /*
 -- 
 2.39.5
 
