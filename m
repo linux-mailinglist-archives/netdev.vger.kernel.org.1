@@ -1,65 +1,60 @@
-Return-Path: <netdev+bounces-188033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A1EAAAAFF5
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:29:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7ECB9AAB011
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:31:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52E5A3AD626
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:24:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87DF53AC907
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:26:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 845E9302223;
-	Mon,  5 May 2025 23:30:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B4DA30396F;
+	Mon,  5 May 2025 23:32:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ors/B6xE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bCWr69KP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6A9C28AB0F;
-	Mon,  5 May 2025 23:18:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D07393E8D;
+	Mon,  5 May 2025 23:19:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746487122; cv=none; b=cPcLZxrWvaz3oMJJmBrPzr9E+/A7E2k3oex9rWYbKJzhyx5BkfEHmGhflcONLg+0yGPzX2TwlwpKYmh2pSU5Z0nZ/iby6fKDmwD40LRG/ZNMBtU+jcIiA8cmerKLbH/coWFaL5qn5hsGSU13qJOmqFSNTY2dEG72V1sv4xmb3dk=
+	t=1746487194; cv=none; b=WrIGO4l1SsnANQpu+qsc4E8UsJomt/dWPLErjGBeaHyPu12WX3/NInE+PVU0vuEbWFNYX/yzYpfewd2kTmKXad5qbw8arhyNOHNJFyaYQMaDeMsvjcRpf2BFGlnJiu2jY/dkZXpEwpvNAfSK+cxs+/gcEoH+bwrObNaYc5NuBeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746487122; c=relaxed/simple;
-	bh=5tlNQsO/DZGUsjYC+3qaziA6u0GM2G5/h4k4py1pbUo=;
+	s=arc-20240116; t=1746487194; c=relaxed/simple;
+	bh=ndMWoE6q7fLIy7AS4H7lryARQIYRXZJWzFV6c0gNmC0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=odTMNPJj3LEwxix1imy1abrTM9ddPKVWYEh0cMcaREIwp329lUnVaMhFQ7wvIT1NDVIRyrk0o722wJKcLzU7R7xYl8BRY/E/9o8O/B1WGL16aGsKPQk0X/l2+A9EfGjLgZV4FnP5TffMpYzC8UivH5hjDj4nCeZblN70eBRT0R8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ors/B6xE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 287DFC4CEF1;
-	Mon,  5 May 2025 23:18:40 +0000 (UTC)
+	 MIME-Version; b=KabhTJhjhl9iv6TcCAxnGHITOGmbnEZQRWIYqfnca001Ao9ER8Kbg34ORh8Z74SxX8V2rJNEjL2MSgjBUX/C7+3aFIMhpmNXix9+Bnjfbcuba9qOWmXgOcEvdXZhtzzBoukakChAN9TtlBW6Xz2wKsUl4rYdxylOdAOSQB765cw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bCWr69KP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78CECC4CEE4;
+	Mon,  5 May 2025 23:19:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746487121;
-	bh=5tlNQsO/DZGUsjYC+3qaziA6u0GM2G5/h4k4py1pbUo=;
+	s=k20201202; t=1746487193;
+	bh=ndMWoE6q7fLIy7AS4H7lryARQIYRXZJWzFV6c0gNmC0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ors/B6xEFlb0368UXTlH6meioL9PTfpt+Vs3OBLdY85A+w9EoP0G60Jk7FNWY11iU
-	 OTp4oe8slD/FclWYC72l9EvpTn9NoMgPoZBDrpJ3sO06HHbs1VBjUOvRQ54kDMp1T9
-	 /rlEHX0SEDyZvjhjHprATlDUAlfUVic+I2qkKmXieu8wBzqE9o6lPPVQpgLJpIhfnh
-	 SIj9ddAPT0MCyRSvBi1MJNLf7RxJ9p5Pt3dKpaUeMSpxSzGGWqQzny6dPJdaEPfLHB
-	 YMknf7agb3c47Q54BUsiT6LDVaD3vscJjsl6ZqqluZwiN8Tr92ZvFIKX5HbTyLyzm0
-	 kDZwP0A8uAT9g==
+	b=bCWr69KP+zanXGfXYIq4MyM6yWDVuDuhRu8gyMwN0Bh+HbdzL6rxmpuUMIyPao2L8
+	 vADCfF31zzg7MkXdrgkX99d2xyLIU7M9P90qyAF9y0dPF8oihqDKPYCofnjZRxDYPD
+	 Gbv5NET/Q3VksCwUMOvXNqR/ho+h/X3BgcihrwIcWalyggShALl3cMoFdWgmhWimq/
+	 +5uGVPNfiG6hdi7KmSSYHaadWkqatfhHl1u/ir2gK2xTu6PoXDcJpT4kerTqyLlxiS
+	 ArPMU/1VHCXxeopzgvqu6Pl4vGGf8NY60v3zC+oXJJ6pcD62vWRlVIAXgc9P1k2fHH
+	 gnfE8nJ1o81PA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Benjamin Coddington <bcodding@redhat.com>,
+Cc: Peter Seiderer <ps.report@gmx.net>,
+	Simon Horman <horms@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	trondmy@kernel.org,
-	anna@kernel.org,
-	chuck.lever@oracle.com,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-nfs@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 009/114] SUNRPC: rpcbind should never reset the port to the value '0'
-Date: Mon,  5 May 2025 19:16:32 -0400
-Message-Id: <20250505231817.2697367-9-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 050/114] net: pktgen: fix mpls maximum labels list parsing
+Date: Mon,  5 May 2025 19:17:13 -0400
+Message-Id: <20250505231817.2697367-50-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505231817.2697367-1-sashal@kernel.org>
 References: <20250505231817.2697367-1-sashal@kernel.org>
@@ -74,38 +69,50 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.10.237
 Content-Transfer-Encoding: 8bit
 
-From: Trond Myklebust <trond.myklebust@hammerspace.com>
+From: Peter Seiderer <ps.report@gmx.net>
 
-[ Upstream commit 214c13e380ad7636631279f426387f9c4e3c14d9 ]
+[ Upstream commit 2b15a0693f70d1e8119743ee89edbfb1271b3ea8 ]
 
-If we already had a valid port number for the RPC service, then we
-should not allow the rpcbind client to set it to the invalid value '0'.
+Fix mpls maximum labels list parsing up to MAX_MPLS_LABELS entries (instead
+of up to MAX_MPLS_LABELS - 1).
 
-Reviewed-by: Jeff Layton <jlayton@kernel.org>
-Reviewed-by: Benjamin Coddington <bcodding@redhat.com>
-Signed-off-by: Trond Myklebust <trond.myklebust@hammerspace.com>
+Addresses the following:
+
+	$ echo "mpls 00000f00,00000f01,00000f02,00000f03,00000f04,00000f05,00000f06,00000f07,00000f08,00000f09,00000f0a,00000f0b,00000f0c,00000f0d,00000f0e,00000f0f" > /proc/net/pktgen/lo\@0
+	-bash: echo: write error: Argument list too long
+
+Signed-off-by: Peter Seiderer <ps.report@gmx.net>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/sunrpc/rpcb_clnt.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ net/core/pktgen.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/net/sunrpc/rpcb_clnt.c b/net/sunrpc/rpcb_clnt.c
-index 8fad45320e1b9..f1bb4fd2a2707 100644
---- a/net/sunrpc/rpcb_clnt.c
-+++ b/net/sunrpc/rpcb_clnt.c
-@@ -794,9 +794,10 @@ static void rpcb_getport_done(struct rpc_task *child, void *data)
- 	}
+diff --git a/net/core/pktgen.c b/net/core/pktgen.c
+index c1e3d3bea1286..c2b3c454eddd9 100644
+--- a/net/core/pktgen.c
++++ b/net/core/pktgen.c
+@@ -805,6 +805,10 @@ static ssize_t get_labels(const char __user *buffer, struct pktgen_dev *pkt_dev)
+ 	pkt_dev->nr_labels = 0;
+ 	do {
+ 		__u32 tmp;
++
++		if (n >= MAX_MPLS_LABELS)
++			return -E2BIG;
++
+ 		len = hex32_arg(&buffer[i], 8, &tmp);
+ 		if (len <= 0)
+ 			return len;
+@@ -816,8 +820,6 @@ static ssize_t get_labels(const char __user *buffer, struct pktgen_dev *pkt_dev)
+ 			return -EFAULT;
+ 		i++;
+ 		n++;
+-		if (n >= MAX_MPLS_LABELS)
+-			return -E2BIG;
+ 	} while (c == ',');
  
- 	trace_rpcb_setport(child, map->r_status, map->r_port);
--	xprt->ops->set_port(xprt, map->r_port);
--	if (map->r_port)
-+	if (map->r_port) {
-+		xprt->ops->set_port(xprt, map->r_port);
- 		xprt_set_bound(xprt);
-+	}
- }
- 
- /*
+ 	pkt_dev->nr_labels = n;
 -- 
 2.39.5
 
