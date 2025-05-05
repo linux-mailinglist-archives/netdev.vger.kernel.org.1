@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-188165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0044AAB7CA
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:18:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75ED4AAB7C6
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:18:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A062C3AF569
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:12:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6AC1B1C26A2F
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:13:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DC0129A9D2;
-	Tue,  6 May 2025 00:47:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5547D34950F;
+	Tue,  6 May 2025 00:47:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nAFtvY+a"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pRGy9K5u"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EFD23ACFC8;
-	Mon,  5 May 2025 23:19:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A4A93ACFEE;
+	Mon,  5 May 2025 23:19:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746487152; cv=none; b=ZlZCrsFmDeU8FrU4s6ARw8oaeH5ufBP8s7dQGwmPJl4wys0snbQvqWKCGXScWKtWpjnt4b3XS94uuFbvYx9Mxk6HSbdJbbAskLi7ta616xg8aPKbOSzayF6soBy+lQVNsxUtqQsJS+DHN6HPV80vB+arHucIDzExCwaOm7ykRSw=
+	t=1746487159; cv=none; b=g7kqKoOfy4i26TGMkcbMoXlvArGfby8qsOb7+97PqTvLpQLL+fwAJLgdwUcRohayHKA1VmazCSw5f8if1c6GqmhJ7ZTavTbilRy/kr5e2lOzMkJs+tsDG8mp2wvgDOVME0FWOKgGqU4xe8vKOpSsMCs14/TFMgJlxiOwZMY7Bwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746487152; c=relaxed/simple;
-	bh=W9jlmyaJpUsPS3IC76/I9kFZv9MWOqjHA6bbfEuOvQ8=;
+	s=arc-20240116; t=1746487159; c=relaxed/simple;
+	bh=sMwPyvXBpK7TDRml1p1f82FV+kXU0/d7luIOBrkuOvo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ghCO2x89cgZVfdw9+/RXGV/1TTFEQkO88Y4nIvDyBet9VuB42RK8GCBC0/7sGucC0UyBdW0NEGEPaYbDnic1UniQCqTpQUGTLgwVskxUXcPCxqB1S6FnceAil/oTY4wCC2FPqPRqpbM0NdtOHAXFqhLAgvTFOjYAPJlUv+5YuE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nAFtvY+a; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21418C4CEEE;
-	Mon,  5 May 2025 23:19:10 +0000 (UTC)
+	 MIME-Version; b=ZxcgBYVK1nl1swXqcRCN7cNzbZr6ZyHM3g9Ql+X1xy9eaixaci+oGpDOPrjUixtzS0LR1rb+ZNMXBFSqNVDJc05J1rjRwat806V5q6dOhazy0nPbNWCSiwDXUtqkvE56xJR6gJii5rMhspREScLFV0rD8Q2ArWZAZj00Ga8i0Ao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pRGy9K5u; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03607C4CEED;
+	Mon,  5 May 2025 23:19:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746487151;
-	bh=W9jlmyaJpUsPS3IC76/I9kFZv9MWOqjHA6bbfEuOvQ8=;
+	s=k20201202; t=1746487159;
+	bh=sMwPyvXBpK7TDRml1p1f82FV+kXU0/d7luIOBrkuOvo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nAFtvY+aXpan2rAKeZ9nUfpv+268LpX7qM18vhUQ5rDk0+roAPchxb8vWTNUH2I3y
-	 UtjThjhylIXXf2OQt8j6W/5KhKWMgbWfbb+tHbB/RLeSIrqR52b4zdpE5lOQrEGYEf
-	 g5l4xwa1TMcT8WF22g/IwNr+ZLtb6aeiHt7et3ZRCt1a+Rr0P/GRWEBjcT9zBnQWoU
-	 /BW7sL6aY88RmU+QrqbCGBYbcmLz000qX1EoGLD/n3K9CwK7wM1l2nwUI3z+oQP+ch
-	 XJP3IMouCTNARWIaLSPOSgDA1Da+YIyXbxHFlYbTlBRTAEVosIiSNXWfPQBOM5hFuZ
-	 2Dw18fdsw0ABg==
+	b=pRGy9K5u6ds7DKD+JKsESg4l2M33LrhOps55WZ9POcP19NkjDudN1u3zVtToPsfXK
+	 ObCChZexZmCGUH28SMrfU7GiyPaQvW0VHJI0kSR0FEASLP5/HmaUY5nuQ/FYdFa8P7
+	 n8RCmlesww6F6xkz2pq7G/NfW9avVpnc0gaHRkY9yiMYsKKbP/V1WSi4dq40g1VMfq
+	 7s+K8wFvDJbLvPOXrP23ic2kvinbQ7R7lpMLbHGWV8pyXVnLWL/utUEbjLvte8Srag
+	 oegfl3nhnm1lKe+H28hiQ5ayyXVaTXsTPfMM276YhpoLNBOOeJ0ImjWO2BhGFfZoGW
+	 DNRt2onu3FZFg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ij@kernel.org>,
-	Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>,
-	"David S . Miller" <davem@davemloft.net>,
+Cc: Nicolas Bouchinet <nicolas.bouchinet@ssi.gouv.fr>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
 	Sasha Levin <sashal@kernel.org>,
+	kadlec@netfilter.org,
+	davem@davemloft.net,
 	edumazet@google.com,
-	ncardwell@google.com,
-	dsahern@kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 027/114] tcp: reorganize tcp_in_ack_event() and tcp_count_delivered()
-Date: Mon,  5 May 2025 19:16:50 -0400
-Message-Id: <20250505231817.2697367-27-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 033/114] netfilter: conntrack: Bound nf_conntrack sysctl writes
+Date: Mon,  5 May 2025 19:16:56 -0400
+Message-Id: <20250505231817.2697367-33-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505231817.2697367-1-sashal@kernel.org>
 References: <20250505231817.2697367-1-sashal@kernel.org>
@@ -66,156 +67,88 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.10.237
 Content-Transfer-Encoding: 8bit
 
-From: Ilpo Järvinen <ij@kernel.org>
+From: Nicolas Bouchinet <nicolas.bouchinet@ssi.gouv.fr>
 
-[ Upstream commit 149dfb31615e22271d2525f078c95ea49bc4db24 ]
+[ Upstream commit 8b6861390ffee6b8ed78b9395e3776c16fec6579 ]
 
-- Move tcp_count_delivered() earlier and split tcp_count_delivered_ce()
-  out of it
-- Move tcp_in_ack_event() later
-- While at it, remove the inline from tcp_in_ack_event() and let
-  the compiler to decide
+nf_conntrack_max and nf_conntrack_expect_max sysctls were authorized to
+be written any negative value, which would then be stored in the
+unsigned int variables nf_conntrack_max and nf_ct_expect_max variables.
 
-Accurate ECN's heuristics does not know if there is going
-to be ACE field based CE counter increase or not until after
-rtx queue has been processed. Only then the number of ACKed
-bytes/pkts is available. As CE or not affects presence of
-FLAG_ECE, that information for tcp_in_ack_event is not yet
-available in the old location of the call to tcp_in_ack_event().
+While the do_proc_dointvec_conv function is supposed to limit writing
+handled by proc_dointvec proc_handler to INT_MAX. Such a negative value
+being written in an unsigned int leads to a very high value, exceeding
+this limit.
 
-Signed-off-by: Ilpo Järvinen <ij@kernel.org>
-Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+Moreover, the nf_conntrack_expect_max sysctl documentation specifies the
+minimum value is 1.
+
+The proc_handlers have thus been updated to proc_dointvec_minmax in
+order to specify the following write bounds :
+
+* Bound nf_conntrack_max sysctl writings between SYSCTL_ZERO
+  and SYSCTL_INT_MAX.
+
+* Bound nf_conntrack_expect_max sysctl writings between SYSCTL_ONE
+  and SYSCTL_INT_MAX as defined in the sysctl documentation.
+
+With this patch applied, sysctl writes outside the defined in the bound
+will thus lead to a write error :
+
+```
+sysctl -w net.netfilter.nf_conntrack_expect_max=-1
+sysctl: setting key "net.netfilter.nf_conntrack_expect_max": Invalid argument
+```
+
+Signed-off-by: Nicolas Bouchinet <nicolas.bouchinet@ssi.gouv.fr>
+Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/ipv4/tcp_input.c | 56 +++++++++++++++++++++++++-------------------
- 1 file changed, 32 insertions(+), 24 deletions(-)
+ net/netfilter/nf_conntrack_standalone.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 6b926c71b6f31..7c2e714527f68 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -403,6 +403,20 @@ static bool tcp_ecn_rcv_ecn_echo(const struct tcp_sock *tp, const struct tcphdr
- 	return false;
- }
- 
-+static void tcp_count_delivered_ce(struct tcp_sock *tp, u32 ecn_count)
-+{
-+	tp->delivered_ce += ecn_count;
-+}
-+
-+/* Updates the delivered and delivered_ce counts */
-+static void tcp_count_delivered(struct tcp_sock *tp, u32 delivered,
-+				bool ece_ack)
-+{
-+	tp->delivered += delivered;
-+	if (ece_ack)
-+		tcp_count_delivered_ce(tp, delivered);
-+}
-+
- /* Buffer size and advertised window tuning.
-  *
-  * 1. Tuning sk->sk_sndbuf, when connection enters established state.
-@@ -1102,15 +1116,6 @@ void tcp_mark_skb_lost(struct sock *sk, struct sk_buff *skb)
- 	}
- }
- 
--/* Updates the delivered and delivered_ce counts */
--static void tcp_count_delivered(struct tcp_sock *tp, u32 delivered,
--				bool ece_ack)
--{
--	tp->delivered += delivered;
--	if (ece_ack)
--		tp->delivered_ce += delivered;
--}
--
- /* This procedure tags the retransmission queue when SACKs arrive.
-  *
-  * We have three tag bits: SACKED(S), RETRANS(R) and LOST(L).
-@@ -3735,12 +3740,23 @@ static void tcp_process_tlp_ack(struct sock *sk, u32 ack, int flag)
- 	}
- }
- 
--static inline void tcp_in_ack_event(struct sock *sk, u32 flags)
-+static void tcp_in_ack_event(struct sock *sk, int flag)
- {
- 	const struct inet_connection_sock *icsk = inet_csk(sk);
- 
--	if (icsk->icsk_ca_ops->in_ack_event)
--		icsk->icsk_ca_ops->in_ack_event(sk, flags);
-+	if (icsk->icsk_ca_ops->in_ack_event) {
-+		u32 ack_ev_flags = 0;
-+
-+		if (flag & FLAG_WIN_UPDATE)
-+			ack_ev_flags |= CA_ACK_WIN_UPDATE;
-+		if (flag & FLAG_SLOWPATH) {
-+			ack_ev_flags |= CA_ACK_SLOWPATH;
-+			if (flag & FLAG_ECE)
-+				ack_ev_flags |= CA_ACK_ECE;
-+		}
-+
-+		icsk->icsk_ca_ops->in_ack_event(sk, ack_ev_flags);
-+	}
- }
- 
- /* Congestion control has updated the cwnd already. So if we're in
-@@ -3857,12 +3873,8 @@ static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
- 		tcp_snd_una_update(tp, ack);
- 		flag |= FLAG_WIN_UPDATE;
- 
--		tcp_in_ack_event(sk, CA_ACK_WIN_UPDATE);
--
- 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPHPACKS);
- 	} else {
--		u32 ack_ev_flags = CA_ACK_SLOWPATH;
--
- 		if (ack_seq != TCP_SKB_CB(skb)->end_seq)
- 			flag |= FLAG_DATA;
- 		else
-@@ -3874,19 +3886,12 @@ static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
- 			flag |= tcp_sacktag_write_queue(sk, skb, prior_snd_una,
- 							&sack_state);
- 
--		if (tcp_ecn_rcv_ecn_echo(tp, tcp_hdr(skb))) {
-+		if (tcp_ecn_rcv_ecn_echo(tp, tcp_hdr(skb)))
- 			flag |= FLAG_ECE;
--			ack_ev_flags |= CA_ACK_ECE;
--		}
- 
- 		if (sack_state.sack_delivered)
- 			tcp_count_delivered(tp, sack_state.sack_delivered,
- 					    flag & FLAG_ECE);
--
--		if (flag & FLAG_WIN_UPDATE)
--			ack_ev_flags |= CA_ACK_WIN_UPDATE;
--
--		tcp_in_ack_event(sk, ack_ev_flags);
- 	}
- 
- 	/* This is a deviation from RFC3168 since it states that:
-@@ -3913,6 +3918,8 @@ static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
- 
- 	tcp_rack_update_reo_wnd(sk, &rs);
- 
-+	tcp_in_ack_event(sk, flag);
-+
- 	if (tp->tlp_high_seq)
- 		tcp_process_tlp_ack(sk, ack, flag);
- 
-@@ -3944,6 +3951,7 @@ static int tcp_ack(struct sock *sk, const struct sk_buff *skb, int flag)
- 	return 1;
- 
- no_queue:
-+	tcp_in_ack_event(sk, flag);
- 	/* If data was DSACKed, see if we can undo a cwnd reduction. */
- 	if (flag & FLAG_DSACKING_ACK) {
- 		tcp_fastretrans_alert(sk, prior_snd_una, num_dupack, &flag,
+diff --git a/net/netfilter/nf_conntrack_standalone.c b/net/netfilter/nf_conntrack_standalone.c
+index 8498bf27a3531..abf558868db11 100644
+--- a/net/netfilter/nf_conntrack_standalone.c
++++ b/net/netfilter/nf_conntrack_standalone.c
+@@ -613,7 +613,9 @@ static struct ctl_table nf_ct_sysctl_table[] = {
+ 		.data		= &nf_conntrack_max,
+ 		.maxlen		= sizeof(int),
+ 		.mode		= 0644,
+-		.proc_handler	= proc_dointvec,
++		.proc_handler	= proc_dointvec_minmax,
++		.extra1		= SYSCTL_ZERO,
++		.extra2		= SYSCTL_INT_MAX,
+ 	},
+ 	[NF_SYSCTL_CT_COUNT] = {
+ 		.procname	= "nf_conntrack_count",
+@@ -652,7 +654,9 @@ static struct ctl_table nf_ct_sysctl_table[] = {
+ 		.data		= &nf_ct_expect_max,
+ 		.maxlen		= sizeof(int),
+ 		.mode		= 0644,
+-		.proc_handler	= proc_dointvec,
++		.proc_handler	= proc_dointvec_minmax,
++		.extra1		= SYSCTL_ONE,
++		.extra2		= SYSCTL_INT_MAX,
+ 	},
+ 	[NF_SYSCTL_CT_ACCT] = {
+ 		.procname	= "nf_conntrack_acct",
+@@ -931,7 +935,9 @@ static struct ctl_table nf_ct_netfilter_table[] = {
+ 		.data		= &nf_conntrack_max,
+ 		.maxlen		= sizeof(int),
+ 		.mode		= 0644,
+-		.proc_handler	= proc_dointvec,
++		.proc_handler	= proc_dointvec_minmax,
++		.extra1		= SYSCTL_ZERO,
++		.extra2		= SYSCTL_INT_MAX,
+ 	},
+ 	{ }
+ };
 -- 
 2.39.5
 
