@@ -1,60 +1,63 @@
-Return-Path: <netdev+bounces-187923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECFFAAAA674
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 02:13:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DB62AAA68E
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 02:14:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D09D5188630C
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 00:12:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 216417A6FD2
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 00:13:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEBDD3272B6;
-	Mon,  5 May 2025 22:34:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E4D93247AD;
+	Mon,  5 May 2025 22:34:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lEIy25wv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i312R2lx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A398D3272AF;
-	Mon,  5 May 2025 22:34:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51FD62918C4;
+	Mon,  5 May 2025 22:34:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746484482; cv=none; b=c1+mlZlySe60aM2g4HVr7FpiVx8yieChoYpHNyV7xu+JKgpg8i4983ArieO6uexKd2CROCCB2ADNeZVOyTwJP6BB82e2U7xEZCXbW0MJMGtUk3qXkQ5mIFVscROn7jRRb1g6misYoh+V5xBbUx//BJ295fjQKZwJ+YIThVg0ofs=
+	t=1746484493; cv=none; b=lVjhjUx/enmr7l8gwQ3xoV7s/NQJTivo0/6uLpMOIT+c30gmlabr8oyzEHHuujcO/NIYk8wZ0Q6u/Qt4/HrdVapcGN461Bql/a6YVtQHTRXLGd1+DqnfEn1bl9N7SrFc/47aFrtp+zqpnYZJglSTcYWlMmSJA3eXAlWwSSJPAPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746484482; c=relaxed/simple;
-	bh=DYs97fnCcKXqsXxMsXf3adT5nR9m4ohxW0ZVfVou3XI=;
+	s=arc-20240116; t=1746484493; c=relaxed/simple;
+	bh=pycTl0WXJpjeJiLYbQCYWyh+olDVkiJRC+srfOeyQKg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=h+SXz1jkUzoRD8jaoJwJXxct5fBb0BnBS+qrVW5+41eloF2FYCyJ4Y8AxYbDbWSsiqrpJPkHqfmDAiGqMevZnunvaJLOnA+7z/oxxQOqQ/xHnEFq8iZ6eUdmTXXabOqupUdMIa+0rAgtYSRg8VfN9Q9a9Xo/yOA1CjZRecvJbL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lEIy25wv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B509C4CEF1;
-	Mon,  5 May 2025 22:34:41 +0000 (UTC)
+	 MIME-Version; b=e2Ynj2Th5kdANDv0jEBbW43ONBPFaxW3gWIk2sLyWplLcke44I/mBWfxuigdPdxV6pg7DzPtJeKhVZ0Alfj/YXHhLShm8Rf9OmRwdsoqFWInQw+DOKQyPz7NqD6EzNjDFCkqdE9H0pEMntcAsi/0bvWUzAIxy9xcqGi3+ZExxPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i312R2lx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DEC5C4CEF1;
+	Mon,  5 May 2025 22:34:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746484482;
-	bh=DYs97fnCcKXqsXxMsXf3adT5nR9m4ohxW0ZVfVou3XI=;
+	s=k20201202; t=1746484491;
+	bh=pycTl0WXJpjeJiLYbQCYWyh+olDVkiJRC+srfOeyQKg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lEIy25wvn8Qm6lJ6S85Qfa1sj9y+R3YNhbceGymgku944wRODqQgbcBFHBrZ/mV4+
-	 CTw/2HbGxrCGopIOHJfuytNG5R1p6Z3BM91m3ntzFQpacf9qkvSp8au4Xe5CB7KivT
-	 sqBk6n9rqBSGWn75DK0k4g6TycAyMEvj8cKGeoXj8sEfu6ZGys1d2ZV2RQBbVi25cz
-	 8PPfwNDt4mWmfprzYh6ndkTMfn22AkZFBmleQkZRMX+WHaFVpoTRXmdq4DmNgQwea2
-	 c4dXUqHRJojh+DVFHTazHaSgeHySachB16o/aTEgUB6WOT2UG92C7C4zs4dkWILaL7
-	 6NWIxLqRfmIqA==
+	b=i312R2lxW5RAQscI3Wgw1weTmTt+t34LNOtzPnhpg/gGEZfGYM+0RgWkYanLZ/S82
+	 nRBIwtDCxavnZyLDAONA0jFy+D8nQ+56FeTYYscX9ulQp9zcD2NFHmPG2b4bCuhJ6i
+	 VRlsh5lbwUANIikubUMveYBIImfTXPrIDB3e473DRr0H1B+Bis/5BsmQdqP5J+bL53
+	 IVTYFiakWyIUo3X40j80R14yd4Z/2plVxGm/YBHliGwv2iji/A/amPBxkSXvIUcDDE
+	 sgw4niIXD/zh+RvvVxM3UXpfvvNpZENpLPK0ExLddcDqS8vhBviTv/5z6vahcdmJ6U
+	 UVugOXDkTc8MQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Leon Romanovsky <leonro@nvidia.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
+Cc: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
+	Geliang Tang <geliang@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
+	martineau@kernel.org,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.14 492/642] xfrm: prevent high SEQ input in non-ESN mode
-Date: Mon,  5 May 2025 18:11:48 -0400
-Message-Id: <20250505221419.2672473-492-sashal@kernel.org>
+	netdev@vger.kernel.org,
+	mptcp@lists.linux.dev
+Subject: [PATCH AUTOSEL 6.14 498/642] mptcp: pm: userspace: flags: clearer msg if no remote addr
+Date: Mon,  5 May 2025 18:11:54 -0400
+Message-Id: <20250505221419.2672473-498-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505221419.2672473-1-sashal@kernel.org>
 References: <20250505221419.2672473-1-sashal@kernel.org>
@@ -69,51 +72,53 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.14.5
 Content-Transfer-Encoding: 8bit
 
-From: Leon Romanovsky <leonro@nvidia.com>
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
 
-[ Upstream commit e3aa43a50a6455831e3c32dabc7ece38d9cd9d05 ]
+[ Upstream commit 58b21309f97b08b6b9814d1ee1419249eba9ef08 ]
 
-In non-ESN mode, the SEQ numbers are limited to 32 bits and seq_hi/oseq_hi
-are not used. So make sure that user gets proper error message, in case
-such assignment occurred.
+Since its introduction in commit 892f396c8e68 ("mptcp: netlink: issue
+MP_PRIO signals from userspace PMs"), it was mandatory to specify the
+remote address, because of the 'if (rem->addr.family == AF_UNSPEC)'
+check done later one.
 
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+In theory, this attribute can be optional, but it sounds better to be
+precise to avoid sending the MP_PRIO on the wrong subflow, e.g. if there
+are multiple subflows attached to the same local ID. This can be relaxed
+later on if there is a need to act on multiple subflows with one
+command.
+
+For the moment, the check to see if attr_rem is NULL can be removed,
+because mptcp_pm_parse_entry() will do this check as well, no need to do
+that differently here.
+
+Reviewed-by: Geliang Tang <geliang@kernel.org>
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/xfrm/xfrm_user.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ net/mptcp/pm_userspace.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index 82a768500999b..b5266e0848e82 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -178,6 +178,12 @@ static inline int verify_replay(struct xfrm_usersa_info *p,
- 				       "Replay seq and seq_hi should be 0 for output SA");
- 			return -EINVAL;
- 		}
-+		if (rs->oseq_hi && !(p->flags & XFRM_STATE_ESN)) {
-+			NL_SET_ERR_MSG(
-+				extack,
-+				"Replay oseq_hi should be 0 in non-ESN mode for output SA");
-+			return -EINVAL;
-+		}
- 		if (rs->bmp_len) {
- 			NL_SET_ERR_MSG(extack, "Replay bmp_len should 0 for output SA");
- 			return -EINVAL;
-@@ -190,6 +196,12 @@ static inline int verify_replay(struct xfrm_usersa_info *p,
- 				       "Replay oseq and oseq_hi should be 0 for input SA");
- 			return -EINVAL;
- 		}
-+		if (rs->seq_hi && !(p->flags & XFRM_STATE_ESN)) {
-+			NL_SET_ERR_MSG(
-+				extack,
-+				"Replay seq_hi should be 0 in non-ESN mode for input SA");
-+			return -EINVAL;
-+		}
- 	}
+diff --git a/net/mptcp/pm_userspace.c b/net/mptcp/pm_userspace.c
+index 940ca94c88634..cd220742d2493 100644
+--- a/net/mptcp/pm_userspace.c
++++ b/net/mptcp/pm_userspace.c
+@@ -583,11 +583,9 @@ int mptcp_userspace_pm_set_flags(struct sk_buff *skb, struct genl_info *info)
+ 	if (ret < 0)
+ 		goto set_flags_err;
  
- 	return 0;
+-	if (attr_rem) {
+-		ret = mptcp_pm_parse_entry(attr_rem, info, false, &rem);
+-		if (ret < 0)
+-			goto set_flags_err;
+-	}
++	ret = mptcp_pm_parse_entry(attr_rem, info, false, &rem);
++	if (ret < 0)
++		goto set_flags_err;
+ 
+ 	if (loc.addr.family == AF_UNSPEC ||
+ 	    rem.addr.family == AF_UNSPEC) {
 -- 
 2.39.5
 
