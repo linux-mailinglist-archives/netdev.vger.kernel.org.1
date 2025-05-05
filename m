@@ -1,207 +1,385 @@
-Return-Path: <netdev+bounces-187709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D7E6AA90C3
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 12:18:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5620AA90C9
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 12:20:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD5613B7E1D
-	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 10:17:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFBE418972E3
+	for <lists+netdev@lfdr.de>; Mon,  5 May 2025 10:20:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0F721FE477;
-	Mon,  5 May 2025 10:18:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E84F91FC104;
+	Mon,  5 May 2025 10:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="bb5TEMNX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZghBQM+h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A770A1F8750
-	for <netdev@vger.kernel.org>; Mon,  5 May 2025 10:18:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E444815A8
+	for <netdev@vger.kernel.org>; Mon,  5 May 2025 10:20:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746440287; cv=none; b=X2d1rO2nRFVSmaOyYHuD1jyrMeRUqi9wjtzA6wA3rXIpEIX3mVlT58jVTDLTdjVikdg6rwk6JmxRwLZT3oI6PMs5FdMCfWw8x4mebEKb0wgqZ1uZ7XvxWhuCxJJ0cZ3yxi/UEA3/kPt5TMY1SKBNlRHAhm2gFGRlpZ3LwUk48/U=
+	t=1746440425; cv=none; b=tm1ULLluZ4LW3d0EqCFAM8srrgIQ6Y44un3uP9fT6N67BLeueCn+CWhKDbcYmY7FWBhlugWrOWAdk9ju6Jq18GIbhQUCCXil/+X6p8j97zWVxndbkirxj5o6T1b2Kx5HuU236G2H+AFDSNOLE96vvAq4NJ+P4THb063kNZUSJCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746440287; c=relaxed/simple;
-	bh=u6UJvftXl/qVaj3cvtTQnsXX+lktC8Txo7KTLoqlWQI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=kkmYQpcR6TElZKLacBEBjlwM03mJH/HeTAy5dbi71kKzwnfAoqB1KqRE/BWuqqmqUuoVWYsd60mu/IokkTh9xhVZcrpReasSc17ESNetmexlj/qqD1D0jOzEJRTA7wPxYd/taPihI+JDm+elb4/IEKfxzKfZZ+XgehCWG9I4aeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=bb5TEMNX; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-acacb8743a7so750766766b.1
-        for <netdev@vger.kernel.org>; Mon, 05 May 2025 03:18:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1746440284; x=1747045084; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wMbhdiZlrz9sQo5PTc3FJMOwGE5ASsIiJRGUlISPKrM=;
-        b=bb5TEMNXsEDDBiCxioB7iqQZFAqa1FDpClXNx1rn+KGTZjHiq29Mk0bAEYKL2K5swV
-         MhIhZTmU8SSdL7i6aUhm6Zo/qHCabou3xjnCMLGnLMub+m220/g0kZ187YbouWJG/jiW
-         v2BRvVSoFYxQUlUQY0xSiHTEdLHjna9vuPvTcXFmgM78k2P9DAeh/jF3JOIFY771mV95
-         oRpl/jxA3rL1a30HBJqvlER1rVwEK0ucCKMhXJN6gWXiPj26dkZGygVuP0e58hMcrGpm
-         tY2ZzYwAHnBF0l0bgHwDkqL/bA5Hn4KKoAEIuUGfZhSjcGzgGUG1V3UcNCPTDPjIFqiR
-         MJYQ==
+	s=arc-20240116; t=1746440425; c=relaxed/simple;
+	bh=1q0KiD5Gt1yqXw7Y+iFSU8MDzySUGWLWfFaUy7qyoFU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Y1CLfJa0fcQh0EkV4dTnRbLtfAqxTImdzo4fVTudtlqHURgDBxtFbCsaE4c1eVjoMpHJ4SP6HiATcZUWZpYlHaCxP46beEH6Wf4FLzZ7DsyG2RT3UEpdYa5LOuw35l8YN1FtiBqvfyPMuH5JVeAhycQqkcx9zC5jTr1HDQY4hdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZghBQM+h; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746440422;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xX5C1VaDkHWpoNEn9scG3WNylDkDETe0OqY0LqL1+Ps=;
+	b=ZghBQM+himkS9MFhmGbQqEzOeXwawlpHS90MHzcGsrw0593JjLA9XRI7uzWjURUqWRJ0pP
+	DJGSb8jAc4c9WNavOzAJS95kEmxXQOhlPR44CDFYkB1deluQ79dXIOJIFRataGa00QgEPN
+	m7CGXos5aYEEmENyk90OWYrvLN31hIY=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-133-2AZb2uWzPrSNflH4w_XY6Q-1; Mon, 05 May 2025 06:20:21 -0400
+X-MC-Unique: 2AZb2uWzPrSNflH4w_XY6Q-1
+X-Mimecast-MFC-AGG-ID: 2AZb2uWzPrSNflH4w_XY6Q_1746440420
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43e9a3d2977so30399985e9.1
+        for <netdev@vger.kernel.org>; Mon, 05 May 2025 03:20:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746440284; x=1747045084;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wMbhdiZlrz9sQo5PTc3FJMOwGE5ASsIiJRGUlISPKrM=;
-        b=MIYIWT0VRQ2x9/5gLzYdDVnsMQkLhCqLs1hf79omucLJaEUw6LfHtzrBZz54QH3qiZ
-         5PeZboao823gOeOvS0dWhzjJMU+/C4wOKIagjBFf5ufmqCtMv1AZiyjmYUrLTKKwb4+m
-         RT3dlLH3M1OKPPU0qgDR8o0jeoXfRL+mIhMQPtXe3EVOmxk41pY/9Z/kq0rt6Ymr7M9U
-         GlmK8VSSDMj1qThZG7oMIeeCYWMRWrTiTZfaVg8hvuoUiSAob3VtANaHcq1EvMIZkrwI
-         OOy5bwZNmVXSx+W/NIyNWZbT3A2AGULAAY4PEXOJf5KbHm+rP5sN3bDcUrZwgYFGzlfz
-         KfJA==
-X-Forwarded-Encrypted: i=1; AJvYcCW/wnhfwGSFUUAU8KwgOyT8dU4sBse1HVrUN0rRbAEiywMjUNWHweccE2DxlVGRBK6wdWpMUxQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNSCC0b9bO3KKmOKyMnTkVY+wzQ7rQQJc/xzx/zSQscscDPwwW
-	5rh74u93ZS48lEvyATpLkteBMCfuc35nLXysPsjMwa9sYROAGQ94qsIQ7lQkLPQ=
-X-Gm-Gg: ASbGncvh7e1wK+JqHDSrlXt09cYwciVJIxXzNqB7/eEXOtUsQo8aKX3Fltp/h6sJgoL
-	WdrqtbU7paYP3KNZSa7+7PD9iGwKGs63pOEFo5pwZTd1TeZnSWqE6iI+wK2lFXS8PwtasZzfJZj
-	aCac3Zv1D80luyqKGkAPovsNtklfpQDnVV8YeorJxtxyvOU63Qp4MvhpKUm8w9qJ2Lnev5gHL87
-	x/re+3+yYSqG6PkxfuhwpLJsoxl+k1sctfG9Eb+3tF0W6usP6M8gvqAapRXEhUuCcVYQj/Oq20k
-	9JPoqrwucm68cbnJDxytOZcSXeKrDoXxNHgmBfqqzGgd
-X-Google-Smtp-Source: AGHT+IE2wY2PK0C5jJCoFtzx86MRmfe79fZW3T8K2lfOOBs1qMJjYT2VLZfOgfwkob8g9n8DTGTI/w==
-X-Received: by 2002:a17:907:d041:b0:acb:b9ab:6d75 with SMTP id a640c23a62f3a-ad17af32546mr1000075466b.23.1746440283820;
-        Mon, 05 May 2025 03:18:03 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:506b:2432::39b:f9])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad1895400fesm463031466b.167.2025.05.05.03.18.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 May 2025 03:18:03 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,  Arthur Fabre
- <arthur@arthurfabre.com>,  Network Development <netdev@vger.kernel.org>,
-  bpf <bpf@vger.kernel.org>,  Jesper Dangaard Brouer <hawk@kernel.org>,
-  Yan Zhai <yan@cloudflare.com>,  jbrandeburg@cloudflare.com,
-  lbiancon@redhat.com,  Alexei Starovoitov <ast@kernel.org>,  Jakub
- Kicinski <kuba@kernel.org>,  Eric Dumazet <edumazet@google.com>,
-  kernel-team@cloudflare.com
-Subject: Re: [PATCH RFC bpf-next v2 01/17] trait: limited KV store for
- packet metadata
-In-Reply-To: <875xik7gsk.fsf@toke.dk> ("Toke =?utf-8?Q?H=C3=B8iland-J?=
- =?utf-8?Q?=C3=B8rgensen=22's?= message of
-	"Thu, 01 May 2025 12:43:07 +0200")
-References: <20250422-afabre-traits-010-rfc2-v2-0-92bcc6b146c9@arthurfabre.com>
-	<20250422-afabre-traits-010-rfc2-v2-1-92bcc6b146c9@arthurfabre.com>
-	<CAADnVQJeCC5j4_ss2+G2zjMbAcn=G3JLeAJCBZRC8uzfsVAjMA@mail.gmail.com>
-	<D9FYTORERFI7.36F4WG8G3NHGX@arthurfabre.com>
-	<CAADnVQKe3Jfd+pVt868P32-m2a-moP4H7ms_kdZnrYALCxx53Q@mail.gmail.com>
-	<87frhqnh0e.fsf@toke.dk> <87ikmle9t4.fsf@cloudflare.com>
-	<875xik7gsk.fsf@toke.dk>
-Date: Mon, 05 May 2025 12:18:01 +0200
-Message-ID: <87a57r4azq.fsf@cloudflare.com>
+        d=1e100.net; s=20230601; t=1746440420; x=1747045220;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xX5C1VaDkHWpoNEn9scG3WNylDkDETe0OqY0LqL1+Ps=;
+        b=sdzM3KFyvCcUF/Uefb4Of623xFEBeauNgiwB4YN+I+yU3ZBzobJid9CiMnvAjD0Awy
+         bSNSle/qca/XXvSwAK4P2cTzVGwWoHHv0/SDicOXY6ZdXIQzEMPIlgIyevfiDkfdSNXA
+         oZeWmLjY/3qaWOl2wMEgtT6eLAhI6D0anQTPUCouMUnrhwoH9UOwZZC9TNvoWzi4nsuc
+         B7NHkbcY9O2Cz9dOkKvSLif9RNctw4TrTJFwsjxfPRMTRayNqYE47xxN956s/k7gELxo
+         uPXubHR4Qz9RGmrYsLqn2cIu46236b4G/ndVagl04bPk99LhdleRjYBYXDPRVV64/V1o
+         9S8A==
+X-Forwarded-Encrypted: i=1; AJvYcCVg71kfuBugN8BjSqP9V+ywO0yH8DvWVkti6n94JmC0yK4OqQohfrg8x9Q/xIt+U1uu9JcTbos=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywqw4j6Gkl+us3aJiDJzFvwZI2bHK16WuvBZ04Glv0RKiScXdg+
+	yp9lQwWWQW/1vqh2O7WCb41gd2bZWY/wRcFdDsPRMMcmUMJ9A7VlTXDxgNRPutwkiZ9slqyIFLr
+	+WuFh4BNL6KbOoD2cFcYb+YL3xccetogClALI7ORIyUgz1lsp7LyONw==
+X-Gm-Gg: ASbGnctrGy6QhKLTTKFLCR9bEb5iUjtJwiQUGgYuo4g+pyfW7bBiqdvpMwibguh8aJp
+	5OALf0CmMoODvLfz12FH7aDyLSeh/bdP/DIo73hgz0c0M8vmdKbfvUQfIsDwiSBGRJoDthx86IW
+	if/v3lnG3R5bvVpRLj0DPJIBKZ8RH6tB93WnK62gZQcVRvACqGGM0mjhSV25KRAsgSgIdCvbgHt
+	9mPqMKkM3UPVrZseFnrHadddK20JSwCECkWWOe4wjZrn8zYB4pdPJ22uaVbfEu5WC4EvCTDTaNx
+	kTdmg89PdJTAoPu1kIREa/GlQ09KESVE3t6R759VWymCHTfVlXLz6Bi8e+s=
+X-Received: by 2002:a05:600c:8283:b0:43c:fe5e:f03b with SMTP id 5b1f17b1804b1-441c49483f8mr61593655e9.30.1746440420341;
+        Mon, 05 May 2025 03:20:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFJDdLb7cXPWDuOl+rtd+nJraEc73/KALgFwi1UqjkD1DwyXJd5fQQN6JL3USuftUBeiuqZAw==
+X-Received: by 2002:a05:600c:8283:b0:43c:fe5e:f03b with SMTP id 5b1f17b1804b1-441c49483f8mr61593385e9.30.1746440419953;
+        Mon, 05 May 2025 03:20:19 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2706:e010:b099:aac6:4e70:6198? ([2a0d:3344:2706:e010:b099:aac6:4e70:6198])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-441b2ad781csm174083325e9.8.2025.05.05.03.20.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 May 2025 03:20:19 -0700 (PDT)
+Message-ID: <521265b1-1a32-4d5e-9348-77559a5a0af4@redhat.com>
+Date: Mon, 5 May 2025 12:20:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 03/15] net: homa: create shared Homa header
+ files
+To: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org
+Cc: edumazet@google.com, horms@kernel.org, kuba@kernel.org
+References: <20250502233729.64220-1-ouster@cs.stanford.edu>
+ <20250502233729.64220-4-ouster@cs.stanford.edu>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250502233729.64220-4-ouster@cs.stanford.edu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 01, 2025 at 12:43 PM +02, Toke H=C3=B8iland-J=C3=B8rgensen wrot=
-e:
-> Jakub Sitnicki <jakub@cloudflare.com> writes:
->
->> On Wed, Apr 30, 2025 at 11:19 AM +02, Toke H=C3=B8iland-J=C3=B8rgensen w=
-rote:
->>> Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
->>>
->>>> On Fri, Apr 25, 2025 at 12:27=E2=80=AFPM Arthur Fabre <arthur@arthurfa=
-bre.com> wrote:
->>>>>
->>>>> On Thu Apr 24, 2025 at 6:22 PM CEST, Alexei Starovoitov wrote:
->>>>> > On Tue, Apr 22, 2025 at 6:23=E2=80=AFAM Arthur Fabre <arthur@arthur=
-fabre.com> wrote:
->>
->> [...]
->>
->>>>> * Hardware metadata: metadata exposed from NICs (like the receive
->>>>>   timestamp, 4 tuple hash...) is currently only exposed to XDP progra=
-ms
->>>>>   (via kfuncs).
->>>>>   But that doesn't expose them to the rest of the stack.
->>>>>   Storing them in traits would allow XDP, other BPF programs, and the
->>>>>   kernel to access and modify them (for example to into account
->>>>>   decapsulating a packet).
->>>>
->>>> Sure. If traits =3D=3D existing metadata bpf prog in xdp can communica=
-te
->>>> with bpf prog in skb layer via that "trait" format.
->>>> xdp can take tuple hash and store it as key=3D=3D0 in the trait.
->>>> The kernel doesn't need to know how to parse that format.
->>>
->>> Yes it does, to propagate it to the skb later. I.e.,
->>>
->>> XDP prog on NIC: get HW hash, store in traits, redirect to CPUMAP
->>> CPUMAP: build skb, read hash from traits, populate skb hash
->>>
->>> Same thing for (at least) timestamps and checksums.
->>>
->>> Longer term, with traits available we could move more skb fields into
->>> traits to make struct sk_buff smaller (by moving optional fields to
->>> traits that don't take up any space if they're not set).
->>
->> Perhaps we can have the cake and eat it too.
->>
->> We could leave the traits encoding/decoding out of the kernel and, at
->> the same time, *expose it* to the network stack through BPF struct_ops
->> programs. At a high level, for example ->get_rx_hash(), not the
->> individual K/V access. The traits_ops vtable could grow as needed to
->> support new use cases.
->>
->> If you think about it, it's not so different from BPF-powered congestion
->> algorithms and scheduler extensions. They also expose some state, kept in
->> maps, that only the loaded BPF code knows how to operate on.
->
-> Right, the difference being that the kernel works perfectly well without
-> an eBPF congestion control algorithm loaded because it has its own
-> internal implementation that is used by default.
+On 5/3/25 1:37 AM, John Ousterhout wrote:
+[...]
+> +/* Forward declarations. */
+> +struct homa;
+> +struct homa_peer;
+> +struct homa_rpc;
+> +struct homa_sock;
+> +
+> +#define sizeof32(type) ((int)(sizeof(type)))
 
-It seems to me that any code path on the network stack still needs to
-work *even if* traits K/V is not available. There has to be a fallback -
-like, RX hash not present in traits K/V? must recompute it. There is no
-guarantee that there will be space available in the traits K/V store for
-whatever value the network stack would like to cache there.
+(u32) instead of (int). I think you should try to avoid using this
+define, which is not very nice by itself.
 
-So if we can agree that traits K/V is a cache, with limited capacity,
-and any code path accessing it must be prepared to deal with a cache
-miss, then I think with struct_ops approach you could have a built-in
-default implementation for exclusive use by the network stack.
+> +
+> +#ifdef __CHECKER__
+> +#define __context__(x, y, z) __attribute__((context(x, y, z)))
+> +#else
+> +#define __context__(...)
+> +#endif /* __CHECKER__ */
 
-This default implementation of the storage access just wouldn't be
-exposed to the BPF or user-space. If you want access from BPF/userland,
-then you'd need to provide a BPF-backed struct_ops for accessing traits
-K/V.
+Why do you need to fiddle with the sparse annotation? Very likely this
+should be dropped.
 
-> Having a hard dependency on BPF for in-kernel functionality is a
-> different matter, and limits the cases it can be used for.
+[...]
+> +/**
+> + * homa_get_skb_info() - Return the address of Homa's private information
+> + * for an sk_buff.
+> + * @skb:     Socket buffer whose info is needed.
+> + * Return: address of Homa's private information for @skb.
+> + */
+> +static inline struct homa_skb_info *homa_get_skb_info(struct sk_buff *skb)
+> +{
+> +	return (struct homa_skb_info *)(skb_end_pointer(skb)) - 1;
 
-Notice that we already rely on XDP program being attached or the storage
-for traits K/V is not available.
+This looks fragile. Why can't you use the skb control buffer here?
 
-> Besides, I don't really see the point of leaving the encoding out of the
-> kernel? We keep the encoding kernel-internal anyway, and just expose a
-> get/set API, so there's no constraint on changing it later (that's kinda
-> the whole point of doing that). And with bulk get/set there's not an
-> efficiency argument either. So what's the point, other than doing things
-> in BPF for its own sake?
+> +}
+> +
+> +/**
+> + * homa_set_doff() - Fills in the doff TCP header field for a Homa packet.
+> + * @h:     Packet header whose doff field is to be set.
+> + * @size:  Size of the "header", bytes (must be a multiple of 4). This
+> + *         information is used only for TSO; it's the number of bytes
+> + *         that should be replicated in each segment. The bytes after
+> + *         this will be distributed among segments.
+> + */
+> +static inline void homa_set_doff(struct homa_data_hdr *h, int size)
+> +{
+> +	/* Drop the 2 low-order bits from size and set the 4 high-order
+> +	 * bits of doff from what's left.
+> +	 */
+> +	h->common.doff = size << 2;
+> +}
+> +
+> +/** skb_is_ipv6() - Return true if the packet is encapsulated with IPv6,
+> + *  false otherwise (presumably it's IPv4).
+> + */
+> +static inline bool skb_is_ipv6(const struct sk_buff *skb)
+> +{
+> +	return ipv6_hdr(skb)->version == 6;
+> +}
+> +
+> +/**
+> + * ipv6_to_ipv4() - Given an IPv6 address produced by ipv4_to_ipv6, return
+> + * the original IPv4 address (in network byte order).
+> + * @ip6:  IPv6 address; assumed to be a mapped IPv4 address.
+> + * Return: IPv4 address stored in @ip6.
+> + */
+> +static inline __be32 ipv6_to_ipv4(const struct in6_addr ip6)
+> +{
+> +	return ip6.in6_u.u6_addr32[3];
+> +}
+> +
+> +/**
+> + * canonical_ipv6_addr() - Convert a socket address to the "standard"
+> + * form used in Homa, which is always an IPv6 address; if the original address
+> + * was IPv4, convert it to an IPv4-mapped IPv6 address.
+> + * @addr:   Address to canonicalize (if NULL, "any" is returned).
+> + * Return: IPv6 address corresponding to @addr.
+> + */
+> +static inline struct in6_addr canonical_ipv6_addr(const union sockaddr_in_union
+> +						  *addr)
+> +{
+> +	struct in6_addr mapped;
+> +
+> +	if (addr) {
+> +		if (addr->sa.sa_family == AF_INET6)
+> +			return addr->in6.sin6_addr;
+> +		ipv6_addr_set_v4mapped(addr->in4.sin_addr.s_addr, &mapped);
+> +		return mapped;
+> +	}
+> +	return in6addr_any;
+> +}
+> +
+> +/**
+> + * skb_canonical_ipv6_saddr() - Given a packet buffer, return its source
+> + * address in the "standard" form used in Homa, which is always an IPv6
+> + * address; if the original address was IPv4, convert it to an IPv4-mapped
+> + * IPv6 address.
+> + * @skb:   The source address will be extracted from this packet buffer.
+> + * Return: IPv6 address for @skb's source machine.
+> + */
+> +static inline struct in6_addr skb_canonical_ipv6_saddr(struct sk_buff *skb)
+> +{
+> +	struct in6_addr mapped;
+> +
+> +	if (skb_is_ipv6(skb))
+> +		return ipv6_hdr(skb)->saddr;
+> +	ipv6_addr_set_v4mapped(ip_hdr(skb)->saddr, &mapped);
+> +	return mapped;
+> +}
+> +
+> +static inline bool is_homa_pkt(struct sk_buff *skb)
+> +{
+> +	struct iphdr *iph = ip_hdr(skb);
+> +
+> +	return (iph->protocol == IPPROTO_HOMA);
 
-There's the additional complexity in the socket glue layer, but I've
-already mentioned that.
+What if this is an ipv6 packet? Also I don't see any use of this
+function later on.
 
-What I think makes it even more appealing is that with the high-level
-struct_ops approach, we abstract away the individual K/V pair access and
-leave the problem of "key registration" (e.g., RX hash is key 42) to the
-user-provided implementation.
+> +}
+> +
+> +/**
+> + * homa_make_header_avl() - Invokes pskb_may_pull to make sure that all the
+> + * Homa header information for a packet is in the linear part of the skb
+> + * where it can be addressed using skb_transport_header.
+> + * @skb:     Packet for which header is needed.
+> + * Return:   The result of pskb_may_pull (true for success)
+> + */
+> +static inline bool homa_make_header_avl(struct sk_buff *skb)
+> +{
+> +	int pull_length;
+> +
+> +	pull_length = skb_transport_header(skb) - skb->data + HOMA_MAX_HEADER;
+> +	if (pull_length > skb->len)
+> +		pull_length = skb->len;
+> +	return pskb_may_pull(skb, pull_length);
+> +}
+> +
+> +#define UNIT_LOG(...)
+> +#define UNIT_HOOK(...)
 
-You, as the user, decide for your particular system how you want to lay
-out the values and for which values you actually want to reserve
-space. IOW, we leave any trade off decisions to the user in the spirit
-of providing a mechanism, not policy.
+It looks like the above 2 define are unused later on.
+
+
+> +extern unsigned int homa_net_id;
+> +
+> +void     homa_abort_rpcs(struct homa *homa, const struct in6_addr *addr,
+> +			 int port, int error);
+> +void     homa_abort_sock_rpcs(struct homa_sock *hsk, int error);
+> +void     homa_ack_pkt(struct sk_buff *skb, struct homa_sock *hsk,
+> +		      struct homa_rpc *rpc);
+> +void     homa_add_packet(struct homa_rpc *rpc, struct sk_buff *skb);
+> +int      homa_backlog_rcv(struct sock *sk, struct sk_buff *skb);
+> +int      homa_bind(struct socket *sk, struct sockaddr *addr,
+> +		   int addr_len);
+> +void     homa_close(struct sock *sock, long timeout);
+> +int      homa_copy_to_user(struct homa_rpc *rpc);
+> +void     homa_data_pkt(struct sk_buff *skb, struct homa_rpc *rpc);
+> +void     homa_destroy(struct homa *homa);
+> +int      homa_disconnect(struct sock *sk, int flags);
+> +void     homa_dispatch_pkts(struct sk_buff *skb, struct homa *homa);
+> +int      homa_err_handler_v4(struct sk_buff *skb, u32 info);
+> +int      homa_err_handler_v6(struct sk_buff *skb,
+> +			     struct inet6_skb_parm *opt, u8 type,  u8 code,
+> +			     int offset, __be32 info);
+> +int      homa_fill_data_interleaved(struct homa_rpc *rpc,
+> +				    struct sk_buff *skb, struct iov_iter *iter);
+> +struct homa_gap *homa_gap_new(struct list_head *next, int start, int end);
+> +void     homa_gap_retry(struct homa_rpc *rpc);
+> +int      homa_get_port(struct sock *sk, unsigned short snum);
+> +int      homa_getsockopt(struct sock *sk, int level, int optname,
+> +			 char __user *optval, int __user *optlen);
+> +int      homa_hash(struct sock *sk);
+> +enum hrtimer_restart homa_hrtimer(struct hrtimer *timer);
+> +int      homa_init(struct homa *homa, struct net *net);
+> +int      homa_ioctl(struct sock *sk, int cmd, int *karg);
+> +int      homa_load(void);
+> +int      homa_message_out_fill(struct homa_rpc *rpc,
+> +			       struct iov_iter *iter, int xmit);
+> +void     homa_message_out_init(struct homa_rpc *rpc, int length);
+> +void     homa_need_ack_pkt(struct sk_buff *skb, struct homa_sock *hsk,
+> +			   struct homa_rpc *rpc);
+> +struct sk_buff *homa_new_data_packet(struct homa_rpc *rpc,
+> +				     struct iov_iter *iter, int offset,
+> +				     int length, int max_seg_data);
+> +int      homa_net_init(struct net *net);
+> +void     homa_net_exit(struct net *net);
+> +__poll_t homa_poll(struct file *file, struct socket *sock,
+> +		   struct poll_table_struct *wait);
+> +int      homa_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+> +		      int flags, int *addr_len);
+> +void     homa_resend_pkt(struct sk_buff *skb, struct homa_rpc *rpc,
+> +			 struct homa_sock *hsk);
+> +void     homa_rpc_abort(struct homa_rpc *crpc, int error);
+> +void     homa_rpc_acked(struct homa_sock *hsk,
+> +			const struct in6_addr *saddr, struct homa_ack *ack);
+> +void     homa_rpc_end(struct homa_rpc *rpc);
+> +void     homa_rpc_handoff(struct homa_rpc *rpc);
+> +int      homa_sendmsg(struct sock *sk, struct msghdr *msg, size_t len);
+> +int      homa_setsockopt(struct sock *sk, int level, int optname,
+> +			 sockptr_t optval, unsigned int optlen);
+> +int      homa_shutdown(struct socket *sock, int how);
+> +int      homa_softirq(struct sk_buff *skb);
+> +void     homa_spin(int ns);
+> +void     homa_timer(struct homa *homa);
+> +int      homa_timer_main(void *transport);
+> +void     homa_unhash(struct sock *sk);
+> +void     homa_rpc_unknown_pkt(struct sk_buff *skb, struct homa_rpc *rpc);
+> +void     homa_unload(void);
+> +int      homa_wait_private(struct homa_rpc *rpc, int nonblocking);
+> +struct homa_rpc
+> +	*homa_wait_shared(struct homa_sock *hsk, int nonblocking);
+> +int      homa_xmit_control(enum homa_packet_type type, void *contents,
+> +			   size_t length, struct homa_rpc *rpc);
+> +int      __homa_xmit_control(void *contents, size_t length,
+> +			     struct homa_peer *peer, struct homa_sock *hsk);
+> +void     homa_xmit_data(struct homa_rpc *rpc, bool force);
+> +void     homa_xmit_unknown(struct sk_buff *skb, struct homa_sock *hsk);
+> +
+> +int      homa_message_in_init(struct homa_rpc *rpc, int unsched);
+> +void     homa_resend_data(struct homa_rpc *rpc, int start, int end);
+> +void     __homa_xmit_data(struct sk_buff *skb, struct homa_rpc *rpc);
+
+You should introduce the declaration of a given function in the same
+patch introducing the implementation. That means the patches should be
+sorted from the lowest level helper towards the upper layer.
+
+[...]
+> +static inline int homa_skb_append_to_frag(struct homa *homa,
+> +					  struct sk_buff *skb, void *buf,
+> +					  int length)
+> +{
+> +	char *dst = skb_put(skb, length);
+> +
+> +	memcpy(dst, buf, length);
+> +	return 0;
+
+The name is misleading as it does not append to an skb frag but to the
+skb linear part
+
+> +}
+> +
+> +static inline int  homa_skb_append_from_skb(struct homa *homa,
+> +					    struct sk_buff *dst_skb,
+> +					    struct sk_buff *src_skb,
+> +					    int offset, int length)
+> +{
+> +	return homa_skb_append_to_frag(homa, dst_skb,
+> +			skb_transport_header(src_skb) + offset, length);
+> +}
+> +
+> +static inline void homa_skb_free_tx(struct homa *homa, struct sk_buff *skb)
+> +{
+> +	kfree_skb(skb);
+> +}
+> +
+> +static inline void homa_skb_free_many_tx(struct homa *homa,
+> +					 struct sk_buff **skbs, int count)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < count; i++)
+> +		kfree_skb(skbs[i]);
+
+'home' is unused here.
+
+> +}
+> +
+> +static inline void homa_skb_get(struct sk_buff *skb, void *dest, int offset,
+> +				int length)
+> +{
+> +	memcpy(dest, skb_transport_header(skb) + offset, length);
+> +}
+> +
+> +static inline struct sk_buff *homa_skb_new_tx(int length)
+
+please use 'alloc' for allocator.
+
+/P
+
 
