@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-188149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A23BAAB772
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:12:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE031AAB75E
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:10:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF6F74E286C
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:09:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B8FF87AE2CF
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:09:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB3C234568C;
-	Tue,  6 May 2025 00:44:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24EBC3464B0;
+	Tue,  6 May 2025 00:45:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XSfbiVJr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JGVfpWvy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B342F3676;
-	Mon,  5 May 2025 23:15:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2275E390E3F;
+	Mon,  5 May 2025 23:16:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746486942; cv=none; b=pK5SVtutyd9pErXt9GnaR0gJ5weWGIjauRLKQM2zTmFjs6tzzSYfABmSxtrjvLFdOJYXmwcUfEw+hM3q5e6QL/tHk/OM0aAs8deNe1Eo6pIV2FWMNMm3oqYh4t4aadtixtG/W+2ta6yN5pU9SBwDzN1baYrWKvHDKWc2nU1XApo=
+	t=1746487004; cv=none; b=cZd0GAA9H9l3jluPn0qQLPersxx2nfpdx2yvlvzDYsQuXrZ98msS3p0dghjEx0CVhnrVDrn9Z8rTM7PW1Xbu9hugA8AcMY2WVQhyUsKpFXW0p5c0l1ocvkgVjAP+H0RwA6l442h984STkQG2RkfrJ0rY77ySPERL5GTEWs1v6Gw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746486942; c=relaxed/simple;
-	bh=naximBUSjgAyJt61O8PSusdEFY9hAobTJ9zOocSMYUw=;
+	s=arc-20240116; t=1746487004; c=relaxed/simple;
+	bh=Tw1OAR1vKnRom5Z/mLgyXztrEWHUgnnKnbtvpFmrB0I=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bA77VHpgeJBKzyoU1ZxJup5HYnEvZUWzmLhSmRlq1HbcrLeMmDZcxaWpABCvpL2Db5z8Z176UvIs+BoU6gMDV6hbWZIeM6R8mZDfyRr14ss+xZBkF6G7nLRPzBWJkISw4E47Y92VReAvAKZd/CchN/1wEiFVRhN5mqdUJkda98U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XSfbiVJr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCC94C4CEE4;
-	Mon,  5 May 2025 23:15:40 +0000 (UTC)
+	 MIME-Version; b=hgmTCWJhLbbYfdFzZI8yZViTax18O+xl2qRChP+vqd7o6SZBTFOLzc82UmeKMOK8SogFC69P6u3sL3nof2LzRy9PzvKJywGbocSqRxR3OytNEY9IHkRlmmDq4bMfNCDFvzGyoyC/m/awaAn9YGzZauCloLHx5FrR3cDXzGaLUSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JGVfpWvy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87A59C4CEEE;
+	Mon,  5 May 2025 23:16:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746486942;
-	bh=naximBUSjgAyJt61O8PSusdEFY9hAobTJ9zOocSMYUw=;
+	s=k20201202; t=1746487002;
+	bh=Tw1OAR1vKnRom5Z/mLgyXztrEWHUgnnKnbtvpFmrB0I=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XSfbiVJrD+8WJ0UD/gmYgcqqULsJTpVrmXnxAx5F6acHO6Bf4GSMWVpzThoGS5cNB
-	 0e5DnHgBWdvRGX2XiOo/SqoyzfiVu8KZrn4Nqa6wTIsRk6+dx521Jw+nF+ixKWD4zn
-	 ilNhYnGOoznkhDrdbe6226LeFAnfaDWm0NnoWoS9VxxnbzBSdjEDQicA5JDVMfViE4
-	 TSViYUmil+2YGtfG7YhshZL8pXYeL4vn8ytGkNyZ3S8Pcquw0OnUIjSlXwSslFxQcF
-	 nybcc3HEVNa7VA5FlgYco4hciBHkDg0dUkV1aytBo1eqF1YMORw3avtcgLcE7TFDg2
-	 iclxQQ61Xik1Q==
+	b=JGVfpWvywFBZvS89uKhKohHR3TfNM/W8TTD2WLAscnVXJNqLCVayMDBalDoaEd6r2
+	 pxEWrLKVECfmwNOMhOYMgi4IqKXccl61uhN/eny5ooQBezZ7/OM19d0K3VTNgJeWOx
+	 Htj+svcniotkRYTuou6ylXsCKdGhP7f4aTT4eXhrj7f+vnaKsFLkkdemp7lc0HH2ZQ
+	 iyJUGlPyK7a4qg+/oueDB3PdHQm1afD6uCAo9xJIbaRxW8mvxrseboFmPrGmycWS8e
+	 FgP/1UUvI7dLZh06g3Yl6X4lldylWc8u9/iT8GCoH7qC47KeCF9qkCOGwPRoY1rbPa
+	 TK21bduEilQEw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
 Cc: Peter Seiderer <ps.report@gmx.net>,
 	Simon Horman <horms@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
+	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 070/153] net: pktgen: fix mpls maximum labels list parsing
-Date: Mon,  5 May 2025 19:11:57 -0400
-Message-Id: <20250505231320.2695319-70-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 102/153] net: pktgen: fix access outside of user given buffer in pktgen_thread_write()
+Date: Mon,  5 May 2025 19:12:29 -0400
+Message-Id: <20250505231320.2695319-102-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505231320.2695319-1-sashal@kernel.org>
 References: <20250505231320.2695319-1-sashal@kernel.org>
@@ -71,48 +71,45 @@ Content-Transfer-Encoding: 8bit
 
 From: Peter Seiderer <ps.report@gmx.net>
 
-[ Upstream commit 2b15a0693f70d1e8119743ee89edbfb1271b3ea8 ]
+[ Upstream commit 425e64440ad0a2f03bdaf04be0ae53dededbaa77 ]
 
-Fix mpls maximum labels list parsing up to MAX_MPLS_LABELS entries (instead
-of up to MAX_MPLS_LABELS - 1).
-
-Addresses the following:
-
-	$ echo "mpls 00000f00,00000f01,00000f02,00000f03,00000f04,00000f05,00000f06,00000f07,00000f08,00000f09,00000f0a,00000f0b,00000f0c,00000f0d,00000f0e,00000f0f" > /proc/net/pktgen/lo\@0
-	-bash: echo: write error: Argument list too long
+Honour the user given buffer size for the strn_len() calls (otherwise
+strn_len() will access memory outside of the user given buffer).
 
 Signed-off-by: Peter Seiderer <ps.report@gmx.net>
 Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Link: https://patch.msgid.link/20250219084527.20488-8-ps.report@gmx.net
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/core/pktgen.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ net/core/pktgen.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/net/core/pktgen.c b/net/core/pktgen.c
-index 5d5f03471eb0c..28417fe2a7a2a 100644
+index 28417fe2a7a2a..2b7b1de70cf47 100644
 --- a/net/core/pktgen.c
 +++ b/net/core/pktgen.c
-@@ -896,6 +896,10 @@ static ssize_t get_labels(const char __user *buffer, struct pktgen_dev *pkt_dev)
- 	pkt_dev->nr_labels = 0;
- 	do {
- 		__u32 tmp;
-+
-+		if (n >= MAX_MPLS_LABELS)
-+			return -E2BIG;
-+
- 		len = hex32_arg(&buffer[i], 8, &tmp);
- 		if (len <= 0)
- 			return len;
-@@ -907,8 +911,6 @@ static ssize_t get_labels(const char __user *buffer, struct pktgen_dev *pkt_dev)
- 			return -EFAULT;
- 		i++;
- 		n++;
--		if (n >= MAX_MPLS_LABELS)
--			return -E2BIG;
- 	} while (c == ',');
+@@ -1876,8 +1876,8 @@ static ssize_t pktgen_thread_write(struct file *file,
+ 	i = len;
  
- 	pkt_dev->nr_labels = n;
+ 	/* Read variable name */
+-
+-	len = strn_len(&user_buffer[i], sizeof(name) - 1);
++	max = min(sizeof(name) - 1, count - i);
++	len = strn_len(&user_buffer[i], max);
+ 	if (len < 0)
+ 		return len;
+ 
+@@ -1907,7 +1907,8 @@ static ssize_t pktgen_thread_write(struct file *file,
+ 	if (!strcmp(name, "add_device")) {
+ 		char f[32];
+ 		memset(f, 0, 32);
+-		len = strn_len(&user_buffer[i], sizeof(f) - 1);
++		max = min(sizeof(f) - 1, count - i);
++		len = strn_len(&user_buffer[i], max);
+ 		if (len < 0) {
+ 			ret = len;
+ 			goto out;
 -- 
 2.39.5
 
