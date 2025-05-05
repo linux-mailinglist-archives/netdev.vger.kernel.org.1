@@ -1,62 +1,64 @@
-Return-Path: <netdev+bounces-187958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BB34AAA8B0
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 02:59:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 33923AAA92D
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:09:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D6AE17EF2E
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 00:59:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C0501649B9
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 01:09:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DFC5352B45;
-	Mon,  5 May 2025 22:40:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F8BD3110EA;
+	Mon,  5 May 2025 22:45:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lO5IEr/i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XAlCFZoK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41DF9352B42;
-	Mon,  5 May 2025 22:40:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5DAF359644;
+	Mon,  5 May 2025 22:42:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746484849; cv=none; b=cR55tvRh80wrXCySrw6g0NUgWgJut2fmfwAgs22j7HenMvJjg6TSgjH+gWoVA/nuc2mpFEu+1NqvmByse6j1ocRmpoVqWkmnmNIZvDs01yVR5DZIAECwyFoOWCjdiO1eIY4NQ4a8U1ouu+Z5m9RB7Imtf3czSeDudQWkuJxmhG4=
+	t=1746484952; cv=none; b=l3HDls2+TuElIykp1AZhpuKIK1YDucBt/XKz1ps6pA7nfCcCdkYzOkIP1hXumPt7K3hBqKxGNBZItKHfNTJhIAxDkBQ79sPdRI3XPtiGNmmx2fCQkIActXngq7BnYvgVxUdNpEc24cWIshMwV19/+DS5h1J6zvIa0de61E1sqAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746484849; c=relaxed/simple;
-	bh=aJdXPv18U8OTg0wYWxuaSKfkCuM+TeU+Mu1IdEujK9E=;
+	s=arc-20240116; t=1746484952; c=relaxed/simple;
+	bh=fs/jH77eWpvtN/vaewmV7hxsfkW8lvX7xmdN+lFKZ9c=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lxDHPtbgEQ/88rttnLDASae4giSRuILn7fT8Tf11jaPhzs/aHCE9/80em6r6ygcdSRXWtmwcALIeOOf59NkZjXwDz/r9EpZwajdDXXQd5fBYHmn/2luULOjHfK2AVl6bgCRI/WuP9UQcNzrmNg3MHEvq5L0fr9Ct/rKAdZc68fQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lO5IEr/i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDFEFC4CEE4;
-	Mon,  5 May 2025 22:40:47 +0000 (UTC)
+	 MIME-Version; b=XYt+hnfukesFk7lyYpLNJ2jnRnyIPftmhNqfIkwGtXyQAiwnbwpbMtyo3aPNLch14vv+sfn+QiDlDO1EjThp5LtjJXay5+ErrhseY8CB1s+rI1J09e1Y5GEMXywmImisPPV5NU6JAWy2pyRdZtgGkepgo3sH0FzyiA6XsrzLVZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XAlCFZoK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B920C4CEEF;
+	Mon,  5 May 2025 22:42:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746484849;
-	bh=aJdXPv18U8OTg0wYWxuaSKfkCuM+TeU+Mu1IdEujK9E=;
+	s=k20201202; t=1746484952;
+	bh=fs/jH77eWpvtN/vaewmV7hxsfkW8lvX7xmdN+lFKZ9c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lO5IEr/ixcL8WORS/p4E5X/hQN/IFqtsB7wo1JQh5ok8JnjQwrV0AnObb349Ehd2a
-	 T6YFbxb6IAw0Q30zuA4ROh0dcU2QR+hOI7AwMKJUj3T4EQhYsQ5M2nUJPOFlarBTVK
-	 UppyMGwdQntMr6Ic6Com3aOnx7GBOiMrNRYkfw5Fqr4LXEN4JhqvRbA7ekxyfOJ1k1
-	 Qv6I+mCyvDKOZDHdPQER5fzHx84TXR8CNsJlIacz8Eqg5mwM+3MAhcJo7hlTmx9Inp
-	 Jd1E/wvFXvpGTswWKFcmEVwr9t1pSMHohUeVXvpk2tHlsMF5WKikT4v5RyJEPEEPPU
-	 PLgLzrjE2uSnA==
+	b=XAlCFZoK+qmMUrbgp0rMu8WD4hFUlWjNDaYP3mbExUKVOKW3S9H5361fqQB0RQE2X
+	 GR1fQW8l8twItiyrVCDzAuSj5XEQOM1gfoxodqgxgDrVdEpE/C6iq/T9FFKi4qGfZA
+	 D35JXWOVmSSE0EG1rhYqOLMkR+nOLP1YvKjmwZDx/JM/nkuK05Az0mEnql6cao9S1K
+	 aUI7a5F0XX0cytoK0JwMWIvBDs5x+gKEdbFsIi6Ijrbqsc81l3osLIFlpKMmwswc2m
+	 eykG9YMZiPi/yQqKO0HzDEBN6IT7SKmPWsVXjzJHz0rH4W6aBAqOF8AYn7RbFG43t1
+	 59CWQzgJvcqRQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: ChunHao Lin <hau@realtek.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: shantiprasad shettar <shantiprasad.shettar@broadcom.com>,
+	Somnath Kotur <somnath.kotur@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	nic_swsd@realtek.com,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
-	pabeni@redhat.com,
+	kuba@kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 046/486] r8169: disable RTL8126 ZRX-DC timeout
-Date: Mon,  5 May 2025 18:32:02 -0400
-Message-Id: <20250505223922.2682012-46-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.12 092/486] bnxt_en: Query FW parameters when the CAPS_CHANGE bit is set
+Date: Mon,  5 May 2025 18:32:48 -0400
+Message-Id: <20250505223922.2682012-92-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505223922.2682012-1-sashal@kernel.org>
 References: <20250505223922.2682012-1-sashal@kernel.org>
@@ -71,68 +73,55 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.12.26
 Content-Transfer-Encoding: 8bit
 
-From: ChunHao Lin <hau@realtek.com>
+From: shantiprasad shettar <shantiprasad.shettar@broadcom.com>
 
-[ Upstream commit b48688ea3c9ac8d5d910c6e91fb7f80d846581f0 ]
+[ Upstream commit a6c81e32aeacbfd530d576fa401edd506ec966ef ]
 
-Disable it due to it dose not meet ZRX-DC specification. If it is enabled,
-device will exit L1 substate every 100ms. Disable it for saving more power
-in L1 substate.
+Newer FW can set the CAPS_CHANGE flag during ifup if some capabilities
+or configurations have changed.  For example, the CoS queue
+configurations may have changed.  Support this new flag by treating it
+almost like FW reset.  The driver will essentially rediscover all
+features and capabilities, reconfigure all backing store context memory,
+reset everything to default, and reserve all resources.
 
-Signed-off-by: ChunHao Lin <hau@realtek.com>
-Reviewed-by: Heiner Kallweit <hkallweit1@gmail.com>
-Link: https://patch.msgid.link/20250318083721.4127-3-hau@realtek.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Signed-off-by: shantiprasad shettar <shantiprasad.shettar@broadcom.com>
+Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+Link: https://patch.msgid.link/20250310183129.3154117-5-michael.chan@broadcom.com
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/realtek/r8169_main.c | 27 +++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 5ed2818bac257..3420b6cf8189f 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -2850,6 +2850,32 @@ static u32 rtl_csi_read(struct rtl8169_private *tp, int addr)
- 		RTL_R32(tp, CSIDR) : ~0;
- }
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 016dcfec8d496..63b674cae892c 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -11776,6 +11776,7 @@ static int bnxt_hwrm_if_change(struct bnxt *bp, bool up)
+ 	struct hwrm_func_drv_if_change_input *req;
+ 	bool fw_reset = !bp->irq_tbl;
+ 	bool resc_reinit = false;
++	bool caps_change = false;
+ 	int rc, retry = 0;
+ 	u32 flags = 0;
  
-+static void rtl_disable_zrxdc_timeout(struct rtl8169_private *tp)
-+{
-+	struct pci_dev *pdev = tp->pci_dev;
-+	u32 csi;
-+	int rc;
-+	u8 val;
+@@ -11831,8 +11832,11 @@ static int bnxt_hwrm_if_change(struct bnxt *bp, bool up)
+ 		set_bit(BNXT_STATE_ABORT_ERR, &bp->state);
+ 		return -ENODEV;
+ 	}
+-	if (resc_reinit || fw_reset) {
+-		if (fw_reset) {
++	if (flags & FUNC_DRV_IF_CHANGE_RESP_FLAGS_CAPS_CHANGE)
++		caps_change = true;
 +
-+#define RTL_GEN3_RELATED_OFF	0x0890
-+#define RTL_GEN3_ZRXDC_NONCOMPL	0x1
-+	if (pdev->cfg_size > RTL_GEN3_RELATED_OFF) {
-+		rc = pci_read_config_byte(pdev, RTL_GEN3_RELATED_OFF, &val);
-+		if (rc == PCIBIOS_SUCCESSFUL) {
-+			val &= ~RTL_GEN3_ZRXDC_NONCOMPL;
-+			rc = pci_write_config_byte(pdev, RTL_GEN3_RELATED_OFF,
-+						   val);
-+			if (rc == PCIBIOS_SUCCESSFUL)
-+				return;
-+		}
-+	}
-+
-+	netdev_notice_once(tp->dev,
-+		"No native access to PCI extended config space, falling back to CSI\n");
-+	csi = rtl_csi_read(tp, RTL_GEN3_RELATED_OFF);
-+	rtl_csi_write(tp, RTL_GEN3_RELATED_OFF, csi & ~RTL_GEN3_ZRXDC_NONCOMPL);
-+}
-+
- static void rtl_set_aspm_entry_latency(struct rtl8169_private *tp, u8 val)
- {
- 	struct pci_dev *pdev = tp->pci_dev;
-@@ -3816,6 +3842,7 @@ static void rtl_hw_start_8125b(struct rtl8169_private *tp)
- 
- static void rtl_hw_start_8126a(struct rtl8169_private *tp)
- {
-+	rtl_disable_zrxdc_timeout(tp);
- 	rtl_set_def_aspm_entry_latency(tp);
- 	rtl_hw_start_8125_common(tp);
- }
++	if (resc_reinit || fw_reset || caps_change) {
++		if (fw_reset || caps_change) {
+ 			set_bit(BNXT_STATE_FW_RESET_DET, &bp->state);
+ 			if (!test_bit(BNXT_STATE_IN_FW_RESET, &bp->state))
+ 				bnxt_ulp_irq_stop(bp);
 -- 
 2.39.5
 
