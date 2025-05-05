@@ -1,67 +1,60 @@
-Return-Path: <netdev+bounces-188131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 155C2AAB74B
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:08:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BA9CAAB760
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:10:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 602AB1C2493B
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:03:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB85A3A1DF7
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:03:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A338474F3A;
-	Tue,  6 May 2025 00:41:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 556742EEBFF;
+	Tue,  6 May 2025 00:41:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ElR7jyKI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vMBNl+W+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44BA9388C2C;
-	Mon,  5 May 2025 23:10:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB242EFB80;
+	Mon,  5 May 2025 23:10:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746486613; cv=none; b=J+CgCetuXQOApP26rg0RXjVg/mKkvNOA5Nymu4c6g3WfYh2Z4qyD6EvXIBQFG3wXPuYhOfJ3rbql00pa0fe3/s7OKD5lrZer3dEP4GAZtxxE4Ldn7b0FlDNYSkGf/xsHeUgJsg3VhaZpDkzUc3fx2dDhk0p0Wb/djrf76B3wuBo=
+	t=1746486656; cv=none; b=RbmJhxBMK9PkiJea1SG4L2l0UbIWcN0Xf++d1/52MJRZDV2xdVoA3s0DES0OLebTmTtuY0v7oIdsKWp7TtVOgvBYOKiWGHWorO3X08GFG7Ub/OfGdTQvvroQLoJS4MD+AWTS4CU+fT+if0WSdkv8Js13fvLQLPSBCNXsY6+5F08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746486613; c=relaxed/simple;
-	bh=aWAaNwhV/x0DOI5AMVG//fIxQeAHIm2Mo3OcOCuYYfU=;
+	s=arc-20240116; t=1746486656; c=relaxed/simple;
+	bh=Pa7L28cijMi8iOzF4/ANZtkfnSuJCas+Gkv0hY5XP1Y=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=YOCnnrfdN0qC4XPSJFd2d81J6WKsh2vCi8ohyh5aVcokkQRNacKbMw3rY+OHomIlKc4WYKNsl0mEcNVsLeODVorJgZsgBGMRm4lJTbtkdK8uD9lIpMe2DNklnCDGBc32XYm9Dy0MFm4xooHoFovi1sggKur+0b5QcO7GQfMY10c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ElR7jyKI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62FA5C4CEF1;
-	Mon,  5 May 2025 23:10:11 +0000 (UTC)
+	 MIME-Version; b=PCZ88zA9jblEGGlOT128YG2UUnIM4kCJ9ehNrsCPD8qXXxiAd+8qN/SWWmgwp06zNtBetYOLI+BGqF7g8c1K0OMkZvjmZGh2kPULaoWf7qAeG6HEaH0SWAhpFEo/XQLKwlzUDoEcXoSvJouIPk21QzwUW/TlVJyInAlMV4Jh2iY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vMBNl+W+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 516F3C4CEED;
+	Mon,  5 May 2025 23:10:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746486613;
-	bh=aWAaNwhV/x0DOI5AMVG//fIxQeAHIm2Mo3OcOCuYYfU=;
+	s=k20201202; t=1746486656;
+	bh=Pa7L28cijMi8iOzF4/ANZtkfnSuJCas+Gkv0hY5XP1Y=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ElR7jyKIL8u/HSDGnAGKW6B5a6hK4dXCOU528IhH7XXokOfx8fLaI74ywOPouMt3C
-	 wL4BXAphZjl5lDnM3MY0d/ygStNZskyqWs9Z/mA9ES2QmNbZRc17JfYkTcVaGZAohS
-	 prnaBBajVcZpPJu6zN2EnU8Nhf7eXSeAFvUzr6OMjbwNV0AX4zmPvlIKQ3iXCcuiTS
-	 sCoJLPtNxih98xmucUY23l0y7XUSsBp7jKalsRY0uroUrNc+tWqGL/GkoZCYGu76oc
-	 dlzsLQJc4NytKqxmOsAiSLEBqTKp+ThdrAjSWRaCvdk/gqe8tlJ9fEfDQud7urmGp9
-	 15zg6ogMn1ACA==
+	b=vMBNl+W+fTyfYuhJw/vjqaIvcgE99M1m363kh8tSrzF9r9yVTvM3OoIAAxRarvRyI
+	 JEwaZ+kZnrIyAxM6MBF2WKAo6vSJ+9JWm4fx2Gd/9ZghMFQ+perTLNNkVPH6dUKfk/
+	 7lBJcQEd6vlIaxtlFWp/digAobw7WW9HfPV+7jtyt/t2o6OLufOakw8HntRhoXYzWS
+	 iu9MN5mcWyHtZOiDqqBfs7OHuhJ0OZSxdgqvc32tmqrUl+t73HCRsKuwQbdWMftP7c
+	 ofepVELn1pzKhjNdO6U2SGDpmewh/7b91bYYBY/OfKh1ybomFlwUTrE6GCHrqBvFdN
+	 HtkPhOTbbLO1Q==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Eric Woudstra <ericwouds@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>,
+Cc: Peter Seiderer <ps.report@gmx.net>,
+	Simon Horman <horms@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	nbd@nbd.name,
-	sean.wang@mediatek.com,
-	lorenzo@kernel.org,
-	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
-	matthias.bgg@gmail.com,
-	angelogioacchino.delregno@collabora.com,
-	netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH AUTOSEL 6.1 118/212] net: ethernet: mtk_ppe_offload: Allow QinQ, double ETH_P_8021Q only
-Date: Mon,  5 May 2025 19:04:50 -0400
-Message-Id: <20250505230624.2692522-118-sashal@kernel.org>
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.1 140/212] net: pktgen: fix access outside of user given buffer in pktgen_thread_write()
+Date: Mon,  5 May 2025 19:05:12 -0400
+Message-Id: <20250505230624.2692522-140-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505230624.2692522-1-sashal@kernel.org>
 References: <20250505230624.2692522-1-sashal@kernel.org>
@@ -76,86 +69,47 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.1.136
 Content-Transfer-Encoding: 8bit
 
-From: Eric Woudstra <ericwouds@gmail.com>
+From: Peter Seiderer <ps.report@gmx.net>
 
-[ Upstream commit 7fe0353606d77a32c4c7f2814833dd1c043ebdd2 ]
+[ Upstream commit 425e64440ad0a2f03bdaf04be0ae53dededbaa77 ]
 
-mtk_foe_entry_set_vlan() in mtk_ppe.c already supports double vlan
-tagging, but mtk_flow_offload_replace() in mtk_ppe_offload.c only allows
-for 1 vlan tag, optionally in combination with pppoe and dsa tags.
+Honour the user given buffer size for the strn_len() calls (otherwise
+strn_len() will access memory outside of the user given buffer).
 
-However, mtk_foe_entry_set_vlan() only allows for setting the vlan id.
-The protocol cannot be set, it is always ETH_P_8021Q, for inner and outer
-tag. This patch adds QinQ support to mtk_flow_offload_replace(), only in
-the case that both inner and outer tags are ETH_P_8021Q.
-
-Only PPPoE-in-Q (as before) and Q-in-Q are allowed. A combination
-of PPPoE and Q-in-Q is not allowed.
-
-Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
-Link: https://patch.msgid.link/20250225201509.20843-1-ericwouds@gmail.com
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Peter Seiderer <ps.report@gmx.net>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Link: https://patch.msgid.link/20250219084527.20488-8-ps.report@gmx.net
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- .../net/ethernet/mediatek/mtk_ppe_offload.c   | 22 +++++++++----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+ net/core/pktgen.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/mediatek/mtk_ppe_offload.c b/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
-index 6a72687d5b83f..8cb8d47227f51 100644
---- a/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
-+++ b/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
-@@ -34,8 +34,10 @@ struct mtk_flow_data {
- 	u16 vlan_in;
+diff --git a/net/core/pktgen.c b/net/core/pktgen.c
+index 5917820f92c3d..a2838c15aa9da 100644
+--- a/net/core/pktgen.c
++++ b/net/core/pktgen.c
+@@ -1877,8 +1877,8 @@ static ssize_t pktgen_thread_write(struct file *file,
+ 	i = len;
  
- 	struct {
--		u16 id;
--		__be16 proto;
-+		struct {
-+			u16 id;
-+			__be16 proto;
-+		} vlans[2];
- 		u8 num;
- 	} vlan;
- 	struct {
-@@ -321,18 +323,19 @@ mtk_flow_offload_replace(struct mtk_eth *eth, struct flow_cls_offload *f)
- 		case FLOW_ACTION_CSUM:
- 			break;
- 		case FLOW_ACTION_VLAN_PUSH:
--			if (data.vlan.num == 1 ||
-+			if (data.vlan.num + data.pppoe.num == 2 ||
- 			    act->vlan.proto != htons(ETH_P_8021Q))
- 				return -EOPNOTSUPP;
+ 	/* Read variable name */
+-
+-	len = strn_len(&user_buffer[i], sizeof(name) - 1);
++	max = min(sizeof(name) - 1, count - i);
++	len = strn_len(&user_buffer[i], max);
+ 	if (len < 0)
+ 		return len;
  
--			data.vlan.id = act->vlan.vid;
--			data.vlan.proto = act->vlan.proto;
-+			data.vlan.vlans[data.vlan.num].id = act->vlan.vid;
-+			data.vlan.vlans[data.vlan.num].proto = act->vlan.proto;
- 			data.vlan.num++;
- 			break;
- 		case FLOW_ACTION_VLAN_POP:
- 			break;
- 		case FLOW_ACTION_PPPOE_PUSH:
--			if (data.pppoe.num == 1)
-+			if (data.pppoe.num == 1 ||
-+			    data.vlan.num == 2)
- 				return -EOPNOTSUPP;
- 
- 			data.pppoe.sid = act->pppoe.sid;
-@@ -422,12 +425,9 @@ mtk_flow_offload_replace(struct mtk_eth *eth, struct flow_cls_offload *f)
- 	if (offload_type == MTK_PPE_PKT_TYPE_BRIDGE)
- 		foe.bridge.vlan = data.vlan_in;
- 
--	if (data.vlan.num == 1) {
--		if (data.vlan.proto != htons(ETH_P_8021Q))
--			return -EOPNOTSUPP;
-+	for (i = 0; i < data.vlan.num; i++)
-+		mtk_foe_entry_set_vlan(eth, &foe, data.vlan.vlans[i].id);
- 
--		mtk_foe_entry_set_vlan(eth, &foe, data.vlan.id);
--	}
- 	if (data.pppoe.num == 1)
- 		mtk_foe_entry_set_pppoe(eth, &foe, data.pppoe.sid);
- 
+@@ -1908,7 +1908,8 @@ static ssize_t pktgen_thread_write(struct file *file,
+ 	if (!strcmp(name, "add_device")) {
+ 		char f[32];
+ 		memset(f, 0, 32);
+-		len = strn_len(&user_buffer[i], sizeof(f) - 1);
++		max = min(sizeof(f) - 1, count - i);
++		len = strn_len(&user_buffer[i], max);
+ 		if (len < 0) {
+ 			ret = len;
+ 			goto out;
 -- 
 2.39.5
 
