@@ -1,60 +1,65 @@
-Return-Path: <netdev+bounces-188065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45188AAB627
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 07:43:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6BEBAAB61A
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 07:43:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90E52466369
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:39:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 47952189DE8E
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:40:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10BA27F188;
-	Tue,  6 May 2025 00:24:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA88729ACC7;
+	Tue,  6 May 2025 00:25:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="liaw8ixq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zfet+8yc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A0E2BD91F;
-	Mon,  5 May 2025 22:46:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F37A2BE7CC;
+	Mon,  5 May 2025 22:47:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746485217; cv=none; b=AR0QxwbvEsp5wrXK7NdUh9C5fycuXXO6zolI9sice3x1pg9dLiJ/BkT9Dc3I5PRzLDmZ10VhGZjC9enJB8CowxMNloTE4s1DC62L0Vf+SWfiQn8fHVGBnh86UfcAu1xNUTKgZmS1oRsvkzDCKTzSYo9VfGOk4hus3xHAHuG6RlI=
+	t=1746485279; cv=none; b=WNuicQ6EGFhq7oy0KojTR9uaJt5HFxnGrnSFVtxmV7iNbdeu1kE5DhUNLZpiHOqHFXsjNZnFG4EsSya4fYhZJwH7UALjmD3DK+3Uok1HoO16TOliCjA7F8H+RmnZbVvle9rqgyJNUn/p5eLGOqRFLZfoNFq+gm8vrmtlJafEB2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746485217; c=relaxed/simple;
-	bh=QabyW7IDfbdIpSIYKsp+1fCXpESt0TfXLUD4PM4j3rU=;
+	s=arc-20240116; t=1746485279; c=relaxed/simple;
+	bh=W/fmnVm28UABsUxm8BpRqAlkePFFxH/1wCASUfw3Z+k=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tMRq5BngW0Xw4QnQjfxNpaMiswpg5cTcoo+eZfyxWwItw14VZ3IWzy69lJonYsdINW4I7gxc/wfGIx4qzAynpIgxX8RVlQWEqgdkE2GR0LBQVFnGr/3tjgCyg94FV0CQHm4qxlm6Sisag+PUvYqZ6vt2sqhgVJxvtWZruy0Ds0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=liaw8ixq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2E93C4CEE4;
-	Mon,  5 May 2025 22:46:56 +0000 (UTC)
+	 MIME-Version; b=Be/vcQ9H5MiKqKjbZiCoEXUf0uScK6twXC9HhF30+Jt8w0gy8eh/7soHd1FTCqReUuqdTLgzQmQp/J4+8Jf8RS9RVQC+wCnv4oBBNDJbwOnYKCdi8LE33qIBcxWQjWXmiQ1tW9J8XlMdWZ3K1mQTWoorM4ybqodu1LvQho9T7Yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zfet+8yc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2031DC4CEE4;
+	Mon,  5 May 2025 22:47:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746485217;
-	bh=QabyW7IDfbdIpSIYKsp+1fCXpESt0TfXLUD4PM4j3rU=;
+	s=k20201202; t=1746485279;
+	bh=W/fmnVm28UABsUxm8BpRqAlkePFFxH/1wCASUfw3Z+k=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=liaw8ixqgGnBmshQgaaxKBo+wAqu04YeIyQHIaMw5F2nqehbx6d2X/SHwGlToeBsr
-	 MOH14NhsSJF5mxIA2WWU/4lhMc/fZqbolRsfb1ZPwiI1YHMMSaAC1ju8xnx4Vq5kqW
-	 cenlIZOgjjH3MrY5CvbzrImyrAXiBTUF+s+hlv/uFNfAfKvPr1IiXnihcLuZrYx1KD
-	 j7U25O9DPXqaTEagxXeN4YClqRS8otQ6q6zT3RUbASVqzXDpy738PlL+Y8gLry3LfK
-	 8W5zFnrO10mIicPhtsLtjgDAMxZVrqzQ1HL7onTGERcOebAogu8b1rKeITLgUIV4Me
-	 fTRZhz1NkKCmg==
+	b=Zfet+8yc7R62CN8UfwbqMUAterl85qBQpagXJaeO6l+pc3G4cqlCWVb+meMAlTO5p
+	 3G44aWjmfXCRGpVjvjrLPPOmSKFbW2ObQcsu84rVVMrDRSkanRZzXpivPBXgn0ukGX
+	 pI4y9K0a2DSPtTjPk5ZCCT3RbSdCxITcNaZcu/ZAeJUOzbohYahYK/ihhXChg/LsuT
+	 46g3vzAAAJ7Z3c8oB11YNuafKr6hVPXhdVozTvEvE5XAz03g49wMhWgyiZg+R+SCbX
+	 xfPcy8dWqInvEUm/qJP/pASjG0VlI/LDW+oTPC9VU77wJ1olsCAyqAFRRowO8Pt/ms
+	 6MKb0gq1ju5KQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Eric Dumazet <edumazet@google.com>,
-	David Ahern <dsahern@kernel.org>,
+Cc: Hariprasad Kelam <hkelam@marvell.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
+	sgoutham@marvell.com,
+	lcherian@marvell.com,
+	gakula@marvell.com,
+	jerinj@marvell.com,
+	sbhatta@marvell.com,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
+	edumazet@google.com,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 216/486] ipv4: fib: Move fib_valid_key_len() to rtm_to_fib_config().
-Date: Mon,  5 May 2025 18:34:52 -0400
-Message-Id: <20250505223922.2682012-216-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.12 250/486] Octeontx2-af: RPM: Register driver with PCI subsys IDs
+Date: Mon,  5 May 2025 18:35:26 -0400
+Message-Id: <20250505223922.2682012-250-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505223922.2682012-1-sashal@kernel.org>
 References: <20250505223922.2682012-1-sashal@kernel.org>
@@ -69,126 +74,65 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.12.26
 Content-Transfer-Encoding: 8bit
 
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
+From: Hariprasad Kelam <hkelam@marvell.com>
 
-[ Upstream commit 254ba7e6032d3fc738050d500b0c1d8197af90ca ]
+[ Upstream commit fc9167192f29485be5621e2e9c8208b717b65753 ]
 
-fib_valid_key_len() is called in the beginning of fib_table_insert()
-or fib_table_delete() to check if the prefix length is valid.
+Although the PCI device ID and Vendor ID for the RPM (MAC) block
+have remained the same across Octeon CN10K and the next-generation
+CN20K silicon, Hardware architecture has changed (NIX mapped RPMs
+and RFOE Mapped RPMs).
 
-fib_table_insert() and fib_table_delete() are called from 3 paths
+Add PCI Subsystem IDs to the device table to ensure that this driver
+can be probed from NIX mapped RPM devices only.
 
-  - ip_rt_ioctl()
-  - inet_rtm_newroute() / inet_rtm_delroute()
-  - fib_magic()
-
-In the first ioctl() path, rtentry_to_fib_config() checks the prefix
-length with bad_mask().  Also, fib_magic() always passes the correct
-prefix: 32 or ifa->ifa_prefixlen, which is already validated.
-
-Let's move fib_valid_key_len() to the rtnetlink path, rtm_to_fib_config().
-
-While at it, 2 direct returns in rtm_to_fib_config() are changed to
-goto to match other places in the same function
-
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: David Ahern <dsahern@kernel.org>
-Link: https://patch.msgid.link/20250228042328.96624-12-kuniyu@amazon.com
+Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
+Link: https://patch.msgid.link/20250224035603.1220913-1-hkelam@marvell.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/ipv4/fib_frontend.c | 18 ++++++++++++++++--
- net/ipv4/fib_trie.c     | 22 ----------------------
- 2 files changed, 16 insertions(+), 24 deletions(-)
+ drivers/net/ethernet/marvell/octeontx2/af/cgx.c | 14 ++++++++++++--
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.h |  2 ++
+ 2 files changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/net/ipv4/fib_frontend.c b/net/ipv4/fib_frontend.c
-index 793e6781399a4..5b7c41333d6fc 100644
---- a/net/ipv4/fib_frontend.c
-+++ b/net/ipv4/fib_frontend.c
-@@ -829,19 +829,33 @@ static int rtm_to_fib_config(struct net *net, struct sk_buff *skb,
- 		}
- 	}
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+index 8216f843a7cd5..0b27a695008bd 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+@@ -66,8 +66,18 @@ static int cgx_fwi_link_change(struct cgx *cgx, int lmac_id, bool en);
+ /* Supported devices */
+ static const struct pci_device_id cgx_id_table[] = {
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_CAVIUM, PCI_DEVID_OCTEONTX2_CGX) },
+-	{ PCI_DEVICE(PCI_VENDOR_ID_CAVIUM, PCI_DEVID_CN10K_RPM) },
+-	{ PCI_DEVICE(PCI_VENDOR_ID_CAVIUM, PCI_DEVID_CN10KB_RPM) },
++	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_CAVIUM, PCI_DEVID_CN10K_RPM,
++	  PCI_ANY_ID, PCI_SUBSYS_DEVID_CN10K_A) },
++	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_CAVIUM, PCI_DEVID_CN10K_RPM,
++	  PCI_ANY_ID, PCI_SUBSYS_DEVID_CNF10K_A) },
++	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_CAVIUM, PCI_DEVID_CN10K_RPM,
++	  PCI_ANY_ID, PCI_SUBSYS_DEVID_CNF10K_B) },
++	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_CAVIUM, PCI_DEVID_CN10KB_RPM,
++	  PCI_ANY_ID, PCI_SUBSYS_DEVID_CN10K_B) },
++	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_CAVIUM, PCI_DEVID_CN10KB_RPM,
++	  PCI_ANY_ID, PCI_SUBSYS_DEVID_CN20KA) },
++	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_CAVIUM, PCI_DEVID_CN10KB_RPM,
++	  PCI_ANY_ID, PCI_SUBSYS_DEVID_CNF20KA) },
+ 	{ 0, }  /* end of table */
+ };
  
-+	if (cfg->fc_dst_len > 32) {
-+		NL_SET_ERR_MSG(extack, "Invalid prefix length");
-+		err = -EINVAL;
-+		goto errout;
-+	}
-+
-+	if (cfg->fc_dst_len < 32 && (ntohl(cfg->fc_dst) << cfg->fc_dst_len)) {
-+		NL_SET_ERR_MSG(extack, "Invalid prefix for given prefix length");
-+		err = -EINVAL;
-+		goto errout;
-+	}
-+
- 	if (cfg->fc_nh_id) {
- 		if (cfg->fc_oif || cfg->fc_gw_family ||
- 		    cfg->fc_encap || cfg->fc_mp) {
- 			NL_SET_ERR_MSG(extack,
- 				       "Nexthop specification and nexthop id are mutually exclusive");
--			return -EINVAL;
-+			err = -EINVAL;
-+			goto errout;
- 		}
- 	}
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+index 8555edbb1c8f9..f94bf04788e98 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+@@ -30,6 +30,8 @@
+ #define PCI_SUBSYS_DEVID_CNF10K_A	       0xBA00
+ #define PCI_SUBSYS_DEVID_CNF10K_B              0xBC00
+ #define PCI_SUBSYS_DEVID_CN10K_B               0xBD00
++#define PCI_SUBSYS_DEVID_CN20KA                0xC220
++#define PCI_SUBSYS_DEVID_CNF20KA               0xC320
  
- 	if (has_gw && has_via) {
- 		NL_SET_ERR_MSG(extack,
- 			       "Nexthop configuration can not contain both GATEWAY and VIA");
--		return -EINVAL;
-+		err = -EINVAL;
-+		goto errout;
- 	}
- 
- 	if (!cfg->fc_table)
-diff --git a/net/ipv4/fib_trie.c b/net/ipv4/fib_trie.c
-index 09e31757e96c7..cc86031d2050f 100644
---- a/net/ipv4/fib_trie.c
-+++ b/net/ipv4/fib_trie.c
-@@ -1193,22 +1193,6 @@ static int fib_insert_alias(struct trie *t, struct key_vector *tp,
- 	return 0;
- }
- 
--static bool fib_valid_key_len(u32 key, u8 plen, struct netlink_ext_ack *extack)
--{
--	if (plen > KEYLENGTH) {
--		NL_SET_ERR_MSG(extack, "Invalid prefix length");
--		return false;
--	}
--
--	if ((plen < KEYLENGTH) && (key << plen)) {
--		NL_SET_ERR_MSG(extack,
--			       "Invalid prefix for given prefix length");
--		return false;
--	}
--
--	return true;
--}
--
- static void fib_remove_alias(struct trie *t, struct key_vector *tp,
- 			     struct key_vector *l, struct fib_alias *old);
- 
-@@ -1229,9 +1213,6 @@ int fib_table_insert(struct net *net, struct fib_table *tb,
- 
- 	key = ntohl(cfg->fc_dst);
- 
--	if (!fib_valid_key_len(key, plen, extack))
--		return -EINVAL;
--
- 	pr_debug("Insert table=%u %08x/%d\n", tb->tb_id, key, plen);
- 
- 	fi = fib_create_info(cfg, extack);
-@@ -1723,9 +1704,6 @@ int fib_table_delete(struct net *net, struct fib_table *tb,
- 
- 	key = ntohl(cfg->fc_dst);
- 
--	if (!fib_valid_key_len(key, plen, extack))
--		return -EINVAL;
--
- 	l = fib_find_node(t, &tp, key);
- 	if (!l)
- 		return -ESRCH;
+ /* PCI BAR nos */
+ #define	PCI_AF_REG_BAR_NUM			0
 -- 
 2.39.5
 
