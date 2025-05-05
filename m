@@ -1,63 +1,60 @@
-Return-Path: <netdev+bounces-187964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55F89AAA9A1
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:18:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7090CAAA9B7
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:20:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98491188B8EF
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 01:16:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBD30160D39
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 01:19:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54F773679B4;
-	Mon,  5 May 2025 22:46:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34C41370B19;
+	Mon,  5 May 2025 22:46:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m6ZdxZ1N"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gwV3ah0g"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8087129A3E5;
-	Mon,  5 May 2025 22:43:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5A029B22B;
+	Mon,  5 May 2025 22:44:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746485038; cv=none; b=hNcMAvyBfQZr7BcHclicSzHynP/2cPkwIyP5PVEsChJkpNqN4DNthoviHNFQVeI4MEdCPg9JbKVaALwfxSgxlrSmUytCg9u58XoKS7cuwv1kY+St/AjEV2kWFupH3C/Smm+KNShzYk/iXgJIOIY0ndYUOLvl0Mge+mUzRteXUQ0=
+	t=1746485078; cv=none; b=nLHJ9oFQ4NcvyFOq860xCOA26BCYYAMUdrATBFi4xjpXc0CEvJrdFt+dKVkaDXWpRHHibOrt/JjJP6lXm0Y36rhtOzhqxEIbh6ozZw1h8t4/XnCKikYKdmC5WQLZ8XpgWT68lCCgxPIpHrmcOQ7khjf7yjupdQiWQbUO+UZIg3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746485038; c=relaxed/simple;
-	bh=BjLeZRjT7RgjsCwKpIEeIybZ8EIpiwyBzGS14AWFqV4=;
+	s=arc-20240116; t=1746485078; c=relaxed/simple;
+	bh=pG9jfuldlO2800hDmNAh2x2uJRK3w7OEvUGwAG1O76k=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=G6XLky2+kRWhSuZi144iCd3BjCNHUyVl8Bq2Q+COSTqxIuD8XqgDhIULUmRzgixdmnSJTTmFHRtUcqHOINXbr86rk58QhLYChqAGyI5VOKAPEuRk+8yjYjM7noR3/C//qwIh155LKzDwuRKukLfZMCvpi0TR4VD+Gjy9RAJm28E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m6ZdxZ1N; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0995FC4CEEF;
-	Mon,  5 May 2025 22:43:56 +0000 (UTC)
+	 MIME-Version; b=pzoq715h5ejH5pwJnvmUab1uGV2yyOH0wCNjsd7CM7QuirBGimFkjC/+GWJNSW0/bboaCPuYwMI0rLqhnwQPSErYdAH8pioTPU+IE3C+Z1G0rDXKllmZ2oLZZLhjvz0OyesMRXaiTBrSK483NgdFmaEQduua5VIgBrvvpqG8yUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gwV3ah0g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99064C4CEED;
+	Mon,  5 May 2025 22:44:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746485038;
-	bh=BjLeZRjT7RgjsCwKpIEeIybZ8EIpiwyBzGS14AWFqV4=;
+	s=k20201202; t=1746485077;
+	bh=pG9jfuldlO2800hDmNAh2x2uJRK3w7OEvUGwAG1O76k=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=m6ZdxZ1NfvVfb/rKkhzZJtwbjYtlPOEJZnbm5oy+AaVtVPF325LO/aib7YS44fjrg
-	 RDe4v680iOX1CrrU46Xf99hkXPEJDzsaVu701NUp7xHTjHBrRQh/yecWGsY7pYjuUp
-	 evKLWp8ueA/mRwH+1diPy+b00TJ9X8AuF3FFm3JCAuvHUX+fNeaszzAnwXcsMYWW3r
-	 ZV1dK4HyIZusupuBsShK47YV1ITZ5WWP8hiinEd12aOWg/SQlifGvblfrPWTMVW3iL
-	 f38Y0CXKCLbXl95kRDb3neT7UpnAzG9W/bmknNw+8VDc6gSoJ/w3WeKmuBR23xwW81
-	 KcZ5UHuuLcYxQ==
+	b=gwV3ah0gm8yL4fRrYi9b8YjZALjLF4ec29m5ehs7ejuVGbJfiwZu/X8TZkcU+hIZs
+	 Rl7/GyZPs8M7kZ1vzUVTEBMijiERoRPVUcO81zwB4xxWPnZGW4iyoUzEkRHbHeUntT
+	 a1T1WEHjoM5t5i1caSqMCfUfvBTELgQOGPLKsYUxjBXDdrLglRqSJNsshwRrU/0yZL
+	 MRNb8SLAeJOQ0PQvCLHoaY5tF8SA0PXL96+xkCl1UKWO/2whLsQwgAwBEfRwZSwz7L
+	 R4vaKarxlzFw7MnmhrYF4STPWkZrR4FmjaLGWiuD7ialfhQk+fxOmdCpafrnFkeC/N
+	 zVKIRjN8CyXDA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Nicolas Bouchinet <nicolas.bouchinet@ssi.gouv.fr>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
+Cc: Willem de Bruijn <willemb@google.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	kadlec@netfilter.org,
 	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
+	dsahern@kernel.org,
 	pabeni@redhat.com,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 135/486] netfilter: conntrack: Bound nf_conntrack sysctl writes
-Date: Mon,  5 May 2025 18:33:31 -0400
-Message-Id: <20250505223922.2682012-135-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.12 155/486] ipv6: save dontfrag in cork
+Date: Mon,  5 May 2025 18:33:51 -0400
+Message-Id: <20250505223922.2682012-155-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505223922.2682012-1-sashal@kernel.org>
 References: <20250505223922.2682012-1-sashal@kernel.org>
@@ -72,83 +69,101 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.12.26
 Content-Transfer-Encoding: 8bit
 
-From: Nicolas Bouchinet <nicolas.bouchinet@ssi.gouv.fr>
+From: Willem de Bruijn <willemb@google.com>
 
-[ Upstream commit 8b6861390ffee6b8ed78b9395e3776c16fec6579 ]
+[ Upstream commit a18dfa9925b9ef6107ea3aa5814ca3c704d34a8a ]
 
-nf_conntrack_max and nf_conntrack_expect_max sysctls were authorized to
-be written any negative value, which would then be stored in the
-unsigned int variables nf_conntrack_max and nf_ct_expect_max variables.
+When spanning datagram construction over multiple send calls using
+MSG_MORE, per datagram settings are configured on the first send.
 
-While the do_proc_dointvec_conv function is supposed to limit writing
-handled by proc_dointvec proc_handler to INT_MAX. Such a negative value
-being written in an unsigned int leads to a very high value, exceeding
-this limit.
+That is when ip(6)_setup_cork stores these settings for subsequent use
+in __ip(6)_append_data and others.
 
-Moreover, the nf_conntrack_expect_max sysctl documentation specifies the
-minimum value is 1.
+The only flag that escaped this was dontfrag. As a result, a datagram
+could be constructed with df=0 on the first sendmsg, but df=1 on a
+next. Which is what cmsg_ip.sh does in an upcoming MSG_MORE test in
+the "diff" scenario.
 
-The proc_handlers have thus been updated to proc_dointvec_minmax in
-order to specify the following write bounds :
+Changing datagram conditions in the middle of constructing an skb
+makes this already complex code path even more convoluted. It is here
+unintentional. Bring this flag in line with expected sockopt/cmsg
+behavior.
 
-* Bound nf_conntrack_max sysctl writings between SYSCTL_ZERO
-  and SYSCTL_INT_MAX.
+And stop passing ipc6 to __ip6_append_data, to avoid such issues
+in the future. This is already the case for __ip_append_data.
 
-* Bound nf_conntrack_expect_max sysctl writings between SYSCTL_ONE
-  and SYSCTL_INT_MAX as defined in the sysctl documentation.
+inet6_cork had a 6 byte hole, so the 1B flag has no impact.
 
-With this patch applied, sysctl writes outside the defined in the bound
-will thus lead to a write error :
-
-```
-sysctl -w net.netfilter.nf_conntrack_expect_max=-1
-sysctl: setting key "net.netfilter.nf_conntrack_expect_max": Invalid argument
-```
-
-Signed-off-by: Nicolas Bouchinet <nicolas.bouchinet@ssi.gouv.fr>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+Signed-off-by: Willem de Bruijn <willemb@google.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Link: https://patch.msgid.link/20250307033620.411611-3-willemdebruijn.kernel@gmail.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/netfilter/nf_conntrack_standalone.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ include/linux/ipv6.h  | 1 +
+ net/ipv6/ip6_output.c | 9 +++++----
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/net/netfilter/nf_conntrack_standalone.c b/net/netfilter/nf_conntrack_standalone.c
-index 7d4f0fa8b609d..3ea60ff7a6a49 100644
---- a/net/netfilter/nf_conntrack_standalone.c
-+++ b/net/netfilter/nf_conntrack_standalone.c
-@@ -619,7 +619,9 @@ static struct ctl_table nf_ct_sysctl_table[] = {
- 		.data		= &nf_conntrack_max,
- 		.maxlen		= sizeof(int),
- 		.mode		= 0644,
--		.proc_handler	= proc_dointvec,
-+		.proc_handler	= proc_dointvec_minmax,
-+		.extra1		= SYSCTL_ZERO,
-+		.extra2		= SYSCTL_INT_MAX,
- 	},
- 	[NF_SYSCTL_CT_COUNT] = {
- 		.procname	= "nf_conntrack_count",
-@@ -655,7 +657,9 @@ static struct ctl_table nf_ct_sysctl_table[] = {
- 		.data		= &nf_ct_expect_max,
- 		.maxlen		= sizeof(int),
- 		.mode		= 0644,
--		.proc_handler	= proc_dointvec,
-+		.proc_handler	= proc_dointvec_minmax,
-+		.extra1		= SYSCTL_ONE,
-+		.extra2		= SYSCTL_INT_MAX,
- 	},
- 	[NF_SYSCTL_CT_ACCT] = {
- 		.procname	= "nf_conntrack_acct",
-@@ -948,7 +952,9 @@ static struct ctl_table nf_ct_netfilter_table[] = {
- 		.data		= &nf_conntrack_max,
- 		.maxlen		= sizeof(int),
- 		.mode		= 0644,
--		.proc_handler	= proc_dointvec,
-+		.proc_handler	= proc_dointvec_minmax,
-+		.extra1		= SYSCTL_ZERO,
-+		.extra2		= SYSCTL_INT_MAX,
- 	},
+diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
+index a6e2aadbb91bd..5aeeed22f35bf 100644
+--- a/include/linux/ipv6.h
++++ b/include/linux/ipv6.h
+@@ -207,6 +207,7 @@ struct inet6_cork {
+ 	struct ipv6_txoptions *opt;
+ 	u8 hop_limit;
+ 	u8 tclass;
++	u8 dontfrag:1;
  };
  
+ /* struct ipv6_pinfo - ipv6 private area */
+diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+index 434ddf263b88a..89a61e040e6a1 100644
+--- a/net/ipv6/ip6_output.c
++++ b/net/ipv6/ip6_output.c
+@@ -1386,6 +1386,7 @@ static int ip6_setup_cork(struct sock *sk, struct inet_cork_full *cork,
+ 	}
+ 	v6_cork->hop_limit = ipc6->hlimit;
+ 	v6_cork->tclass = ipc6->tclass;
++	v6_cork->dontfrag = ipc6->dontfrag;
+ 	if (rt->dst.flags & DST_XFRM_TUNNEL)
+ 		mtu = READ_ONCE(np->pmtudisc) >= IPV6_PMTUDISC_PROBE ?
+ 		      READ_ONCE(rt->dst.dev->mtu) : dst_mtu(&rt->dst);
+@@ -1417,7 +1418,7 @@ static int __ip6_append_data(struct sock *sk,
+ 			     int getfrag(void *from, char *to, int offset,
+ 					 int len, int odd, struct sk_buff *skb),
+ 			     void *from, size_t length, int transhdrlen,
+-			     unsigned int flags, struct ipcm6_cookie *ipc6)
++			     unsigned int flags)
+ {
+ 	struct sk_buff *skb, *skb_prev = NULL;
+ 	struct inet_cork *cork = &cork_full->base;
+@@ -1471,7 +1472,7 @@ static int __ip6_append_data(struct sock *sk,
+ 	if (headersize + transhdrlen > mtu)
+ 		goto emsgsize;
+ 
+-	if (cork->length + length > mtu - headersize && ipc6->dontfrag &&
++	if (cork->length + length > mtu - headersize && v6_cork->dontfrag &&
+ 	    (sk->sk_protocol == IPPROTO_UDP ||
+ 	     sk->sk_protocol == IPPROTO_ICMPV6 ||
+ 	     sk->sk_protocol == IPPROTO_RAW)) {
+@@ -1843,7 +1844,7 @@ int ip6_append_data(struct sock *sk,
+ 
+ 	return __ip6_append_data(sk, &sk->sk_write_queue, &inet->cork,
+ 				 &np->cork, sk_page_frag(sk), getfrag,
+-				 from, length, transhdrlen, flags, ipc6);
++				 from, length, transhdrlen, flags);
+ }
+ EXPORT_SYMBOL_GPL(ip6_append_data);
+ 
+@@ -2048,7 +2049,7 @@ struct sk_buff *ip6_make_skb(struct sock *sk,
+ 	err = __ip6_append_data(sk, &queue, cork, &v6_cork,
+ 				&current->task_frag, getfrag, from,
+ 				length + exthdrlen, transhdrlen + exthdrlen,
+-				flags, ipc6);
++				flags);
+ 	if (err) {
+ 		__ip6_flush_pending_frames(sk, &queue, cork, &v6_cork);
+ 		return ERR_PTR(err);
 -- 
 2.39.5
 
