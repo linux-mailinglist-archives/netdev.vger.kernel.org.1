@@ -1,62 +1,60 @@
-Return-Path: <netdev+bounces-188068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE332AAB0DE
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:49:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6454BAAB0F0
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 05:50:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28E8A3A5060
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:44:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 342693A21D3
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 03:46:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B4193278C2;
-	Tue,  6 May 2025 00:25:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45A1C328A85;
+	Tue,  6 May 2025 00:25:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gh7ha+9W"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nh4xGY9a"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BFA237533D;
-	Mon,  5 May 2025 22:47:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ABC62BEC52;
+	Mon,  5 May 2025 22:48:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746485271; cv=none; b=RVqc9/hYvLsHeQdjvQkyKxjqCwWWBBY72tmaGwLJP6w/uoJ6kGShecKKWBh0MeykRukAUqJZAUd0QwA0DDURq1udZx5jb6zFQ1S/0nQqSjcTEXDcemLO1N3NczrlryAxmcruWZh7pPmBjk6OKlYFOTOvVJPUhyT9e/SMBGkVOL8=
+	t=1746485304; cv=none; b=kxMe0AgegsmWlRUY5X+V0z10ROvs0nOsX5+Pklku1S6prW4MjGmNVGpRk7oZko1VLIiAN4LpkROoIMPwcPjwnkDmV8alPIlf5Jdof9Me6cv1Lw5k0OUFTzzH1tDiRPPpR8ne5A/HmE8F0Oz2MwY44FgIIljJCSSqSCA0B62Omnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746485271; c=relaxed/simple;
-	bh=pb2oVT93ib72xdnlaAdoQ8z1PWQRPnFU+pEqI39w8SA=;
+	s=arc-20240116; t=1746485304; c=relaxed/simple;
+	bh=Me0u92KtWJbVatZweqiucn310jO79Ids9W1Hom/IDw8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kkueUyM5+F2I4D+AZcefHtzWNFL44vDGXFTBD98v9ISGMXGhXc6X2Kb9lsYxKKu1Uad2bPKG5T0S6J/aEvubL0Y0yfhX708c+VsFh7mHJbMemviZs2jdfUbOssNLdi8F0FX9MzhwDDPFbHEa4O92y41tuYXBl0eBHhlv8xDqboo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gh7ha+9W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7166C4CEF1;
-	Mon,  5 May 2025 22:47:49 +0000 (UTC)
+	 MIME-Version; b=n1TtrqLEpQ90RzB0tBU0RAhqRkJuk62jS9SbEU3kmtMS5R0GAIsrdMGY++hSbZEa2aEuiJok74hEE8J0aqBhHR5ZzYGZBov7z6YwdfCGGFSIjYbBO6NpbxtxVKIQ/UzS5+i3H8+5KR7Q8AjwRj4Z1T2Kvz3gglle6Ag9JD5+HHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nh4xGY9a; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2687C4CEEE;
+	Mon,  5 May 2025 22:48:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746485271;
-	bh=pb2oVT93ib72xdnlaAdoQ8z1PWQRPnFU+pEqI39w8SA=;
+	s=k20201202; t=1746485304;
+	bh=Me0u92KtWJbVatZweqiucn310jO79Ids9W1Hom/IDw8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Gh7ha+9WrBIxuYo/8MIbkpLMXXWvtUO3Kw+dpDlGyfa6rOuzhrrSk4LTZO4U9yxM9
-	 4VyzV2QGag+6ZereS7z0bUxv0lsvlcHW0QtWz2tkCwvw94HYCVrLIQ+7xoG9LCnKFV
-	 hf/gOHqbi6JI7MBtzPNV2ghh+2NZmjFF1wrMW2IhjDPCfGibHqaWbain65dPpC7Ecx
-	 5v4EhVcvlzihvtjPYJYuU25w1mU59anmm/Hbx7Pu+4j9C/QB19ipIOYxhR943054o/
-	 dvdh29SANV9MzcDsuZfocevvgDPgizRfiLzYzaopQ0OZ71OqLrDQdwXAljhn0edvjT
-	 DbNi3czDnM5Ww==
+	b=Nh4xGY9aSPXBxAOmIAwg7HoD700taaHrLQuoIQTIiwwgWX84l19OSQX7LGR6Zv7Yz
+	 jpJcbeRBv6QQdwXS1F17KiS7Yi3BniJcQXMVaMthe/GM60Sa2A25DwGu6aR67fxGTm
+	 qfTdhM2HwV/YtW6inwkI/FtlGj1gLHysF15i1w4OUVk3u3a1qwLh7lfK/OTlJFioGn
+	 56aTRxfDlKDeXv4dpNfP5ObxhxBdFIKLiCSm3xYG5NfSCQrRgCUhSJ8oKZpL3rLaMg
+	 P9R2qMLigPgRQ/ZftMXAeRIzx8I//JA1YQhOKuLrEhb38bRzm5b9WPPf7iWIP6cpI0
+	 8D5dJGcx2Fgtw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Paolo Abeni <pabeni@redhat.com>,
+Cc: Mike Christie <michael.christie@oracle.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	iyappan@os.amperecomputing.com,
-	keyur@os.amperecomputing.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
+	jasowang@redhat.com,
+	virtualization@lists.linux.dev,
+	kvm@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 245/486] net: xgene-v2: remove incorrect ACPI_PTR annotation
-Date: Mon,  5 May 2025 18:35:21 -0400
-Message-Id: <20250505223922.2682012-245-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.12 258/486] vhost-scsi: Return queue full for page alloc failures during copy
+Date: Mon,  5 May 2025 18:35:34 -0400
+Message-Id: <20250505223922.2682012-258-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505223922.2682012-1-sashal@kernel.org>
 References: <20250505223922.2682012-1-sashal@kernel.org>
@@ -71,45 +69,77 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.12.26
 Content-Transfer-Encoding: 8bit
 
-From: Arnd Bergmann <arnd@arndb.de>
+From: Mike Christie <michael.christie@oracle.com>
 
-[ Upstream commit 01358e8fe922f716c05d7864ac2213b2440026e7 ]
+[ Upstream commit 891b99eab0f89dbe08d216f4ab71acbeaf7a3102 ]
 
-Building with W=1 shows a warning about xge_acpi_match being unused when
-CONFIG_ACPI is disabled:
+This has us return queue full if we can't allocate a page during the
+copy operation so the initiator can retry.
 
-drivers/net/ethernet/apm/xgene-v2/main.c:723:36: error: unused variable 'xge_acpi_match' [-Werror,-Wunused-const-variable]
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Link: https://patch.msgid.link/20250225163341.4168238-2-arnd@kernel.org
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Mike Christie <michael.christie@oracle.com>
+Message-Id: <20241203191705.19431-5-michael.christie@oracle.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/apm/xgene-v2/main.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ drivers/vhost/scsi.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/net/ethernet/apm/xgene-v2/main.c b/drivers/net/ethernet/apm/xgene-v2/main.c
-index 9e90c23814910..68335935cea77 100644
---- a/drivers/net/ethernet/apm/xgene-v2/main.c
-+++ b/drivers/net/ethernet/apm/xgene-v2/main.c
-@@ -9,8 +9,6 @@
+diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
+index 35a03306d1345..f9a106bbe8ee1 100644
+--- a/drivers/vhost/scsi.c
++++ b/drivers/vhost/scsi.c
+@@ -757,7 +757,7 @@ vhost_scsi_copy_iov_to_sgl(struct vhost_scsi_cmd *cmd, struct iov_iter *iter,
+ 	size_t len = iov_iter_count(iter);
+ 	unsigned int nbytes = 0;
+ 	struct page *page;
+-	int i;
++	int i, ret;
  
- #include "main.h"
+ 	if (cmd->tvc_data_direction == DMA_FROM_DEVICE) {
+ 		cmd->saved_iter_addr = dup_iter(&cmd->saved_iter, iter,
+@@ -770,6 +770,7 @@ vhost_scsi_copy_iov_to_sgl(struct vhost_scsi_cmd *cmd, struct iov_iter *iter,
+ 		page = alloc_page(GFP_KERNEL);
+ 		if (!page) {
+ 			i--;
++			ret = -ENOMEM;
+ 			goto err;
+ 		}
  
--static const struct acpi_device_id xge_acpi_match[];
--
- static int xge_get_resources(struct xge_pdata *pdata)
- {
- 	struct platform_device *pdev;
-@@ -731,7 +729,7 @@ MODULE_DEVICE_TABLE(acpi, xge_acpi_match);
- static struct platform_driver xge_driver = {
- 	.driver = {
- 		   .name = "xgene-enet-v2",
--		   .acpi_match_table = ACPI_PTR(xge_acpi_match),
-+		   .acpi_match_table = xge_acpi_match,
- 	},
- 	.probe = xge_probe,
- 	.remove_new = xge_remove,
+@@ -777,8 +778,10 @@ vhost_scsi_copy_iov_to_sgl(struct vhost_scsi_cmd *cmd, struct iov_iter *iter,
+ 		sg_set_page(&sg[i], page, nbytes, 0);
+ 
+ 		if (cmd->tvc_data_direction == DMA_TO_DEVICE &&
+-		    copy_page_from_iter(page, 0, nbytes, iter) != nbytes)
++		    copy_page_from_iter(page, 0, nbytes, iter) != nbytes) {
++			ret = -EFAULT;
+ 			goto err;
++		}
+ 
+ 		len -= nbytes;
+ 	}
+@@ -793,7 +796,7 @@ vhost_scsi_copy_iov_to_sgl(struct vhost_scsi_cmd *cmd, struct iov_iter *iter,
+ 	for (; i >= 0; i--)
+ 		__free_page(sg_page(&sg[i]));
+ 	kfree(cmd->saved_iter_addr);
+-	return -ENOMEM;
++	return ret;
+ }
+ 
+ static int
+@@ -1277,9 +1280,9 @@ vhost_scsi_handle_vq(struct vhost_scsi *vs, struct vhost_virtqueue *vq)
+ 			 " %d\n", cmd, exp_data_len, prot_bytes, data_direction);
+ 
+ 		if (data_direction != DMA_NONE) {
+-			if (unlikely(vhost_scsi_mapal(cmd, prot_bytes,
+-						      &prot_iter, exp_data_len,
+-						      &data_iter))) {
++			ret = vhost_scsi_mapal(cmd, prot_bytes, &prot_iter,
++					       exp_data_len, &data_iter);
++			if (unlikely(ret)) {
+ 				vq_err(vq, "Failed to map iov to sgl\n");
+ 				vhost_scsi_release_cmd_res(&cmd->tvc_se_cmd);
+ 				goto err;
 -- 
 2.39.5
 
