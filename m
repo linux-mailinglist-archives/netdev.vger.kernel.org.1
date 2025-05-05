@@ -1,65 +1,72 @@
-Return-Path: <netdev+bounces-187947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-187948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47065AAA77B
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 02:35:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A50FAAA764
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 02:32:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6A1D5A5F63
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 00:29:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E60D4A2BB5
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 00:30:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAEE63380A2;
-	Mon,  5 May 2025 22:36:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 899862D548D;
+	Mon,  5 May 2025 22:36:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fGcQl+g8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AIGfPcbl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1250293455;
-	Mon,  5 May 2025 22:36:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 508BC2D5489;
+	Mon,  5 May 2025 22:36:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746484611; cv=none; b=QBRepbvbeAUtPHnfFNzwMmwJbdTQRtVZSvI2uVqfYesztS+cwbBXOX8ZSGcptvkEzOx9jis0v5WwVL0jakWJfPCOTIWuASy3BZbASc4przRHHKdi3Ux2udxeolCZlheqyQWEPAyhNaBg2Q4yYvQ8Pp8YvmUzaYOputQuGOL2cwA=
+	t=1746484617; cv=none; b=mY4grY4eKNCIcRSFWRFQM4JFRGjmYe/ETmgcQI8mdltuShjIdpSXdB0nDnqCXzSkR8WrPQqYZWRrNrWbvgZzZjeb/4oHeSrz0cyMFk+r6GLSfZdmQa0Ta+efn/20k03OXG+vk7+h9fBYc+2LlPYJKzOVzKIsI2iL3o2XPX3wBdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746484611; c=relaxed/simple;
-	bh=DZcrPpJm0WGlKa/b3sE1W3dZ54GcaR0gvKshv7RVs7o=;
+	s=arc-20240116; t=1746484617; c=relaxed/simple;
+	bh=4z5bQ9xiMoopi0CZXN8uUN7kEuCig4/cpWfz7ZNYzzs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gNzJQWPzgX9tBVD0y79yX9YAzxjKNJm/vBO6/QdOau1o9wD5znl0q5T+1Kfo9JV4I4Gytgms2A1nqO9MR59v6cNXuVn0FpDDQqQqywTK4W/Sctwq6FwYxZDElxKu7pBuKfg9ANBs477kZIZE4A055pYvzyXuXSDNbf0c58Y2uaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fGcQl+g8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C672C4CEF1;
-	Mon,  5 May 2025 22:36:49 +0000 (UTC)
+	 MIME-Version; b=qauRDpFZrbvccXktYKDN26SGS42LzenlTMASj3rS3BadFV3Uwj7zbYNbomCFkcZ8vCOhydoZJ4288jFztjSo8d7ptlE3SxQatWQIR8CxreDW6aFNqQHxpMVqKG2ofvL+Wcq086BpMHSbOuOP2mS+9qDjZAAf2zOiJn+5ND1J2kU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AIGfPcbl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EACCC4CEE4;
+	Mon,  5 May 2025 22:36:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746484611;
-	bh=DZcrPpJm0WGlKa/b3sE1W3dZ54GcaR0gvKshv7RVs7o=;
+	s=k20201202; t=1746484616;
+	bh=4z5bQ9xiMoopi0CZXN8uUN7kEuCig4/cpWfz7ZNYzzs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fGcQl+g8gMs5NqsIj8LHqag+t18Nm5y5J/fyi7I4dvYkdfus/BP+TMk9pqn77ajd+
-	 3FtQ4U77p4q1TavMxmaV5TM1FwcdCv3vLLj7LrTu9WRAIdblUVgKSDYmBPCPtzj1H6
-	 RH7z/U09SY21TDBtJvhouZ/l/EarxYCalOxdhrnLKyS2ZZdOyGhZdmUWy2L3Em6EGp
-	 HW6i/O1axXQbMljmLnLpbW8j4bp5aJY+ZCuEhJalVPZU5jUaYM4vnuMMVlxqNXIf7c
-	 RTqU8aw/CeaTSo+a68ei2QhEShNDJ9rwPOmEoY3wZW4mPdd4Muvsf+n0d9oA3BXhPW
-	 Gorx4/Ak2bUmw==
+	b=AIGfPcbltl0MtJVA/ACrAng2p9XTN0GwvX3RoxUC6f+mCMJdYWV/NVMMpGRVPIoP9
+	 3N7PLhMyYzZMcS2qXLPqpveihD1hLl8FH30KMi551sp/VIZlDgPWwYJWXXhxvZUURr
+	 8goclU0+D8hzPTG17koJDwiUzx8sCrZ/8bHJ3gN04/r+btQ3pSC+D63x7OO/MShc8p
+	 DSz+vg+8rJdlGeRTdhE11iSuM8oV998ENTvhPsri0ljhhTKsAr5NG6B1g/YboHEdO6
+	 LsM1C4tFyQaUHuEmZ7iPSGZirnPw8F0qXsqAKi7n3Sm2LYBqOgdcKZ01s3EBDrhMQl
+	 q9+OrzA269IOQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
+Cc: Konstantin Taranov <kotaranov@microsoft.com>,
+	Shiraz Saleem <shirazsaleem@microsoft.com>,
+	Long Li <longli@microsoft.com>,
+	Leon Romanovsky <leon@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	przemyslaw.kitszel@intel.com,
+	kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org,
+	shradhagupta@linux.microsoft.com,
+	mlevitsk@redhat.com,
+	peterz@infradead.org,
+	ernis@linux.microsoft.com,
+	linux-hyperv@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.14 561/642] ice: count combined queues using Rx/Tx count
-Date: Mon,  5 May 2025 18:12:57 -0400
-Message-Id: <20250505221419.2672473-561-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.14 563/642] net/mana: fix warning in the writer of client oob
+Date: Mon,  5 May 2025 18:12:59 -0400
+Message-Id: <20250505221419.2672473-563-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250505221419.2672473-1-sashal@kernel.org>
 References: <20250505221419.2672473-1-sashal@kernel.org>
@@ -74,38 +81,35 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.14.5
 Content-Transfer-Encoding: 8bit
 
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+From: Konstantin Taranov <kotaranov@microsoft.com>
 
-[ Upstream commit c3a392bdd31adc474f1009ee85c13fdd01fe800d ]
+[ Upstream commit 5ec7e1c86c441c46a374577bccd9488abea30037 ]
 
-Previous implementation assumes that there is 1:1 matching between
-vectors and queues. It isn't always true.
+Do not warn on missing pad_data when oob is in sgl.
 
-Get minimum value from Rx/Tx queues to determine combined queues number.
-
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Konstantin Taranov <kotaranov@microsoft.com>
+Link: https://patch.msgid.link/1737394039-28772-9-git-send-email-kotaranov@linux.microsoft.com
+Reviewed-by: Shiraz Saleem <shirazsaleem@microsoft.com>
+Reviewed-by: Long Li <longli@microsoft.com>
+Signed-off-by: Leon Romanovsky <leon@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/intel/ice/ice_ethtool.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/net/ethernet/microsoft/mana/gdma_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index f241493a6ac88..6bbb304ad9ab7 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -3817,8 +3817,7 @@ static u32 ice_get_combined_cnt(struct ice_vsi *vsi)
- 	ice_for_each_q_vector(vsi, q_idx) {
- 		struct ice_q_vector *q_vector = vsi->q_vectors[q_idx];
+diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+index 638ef64d639f3..f412e17b0d505 100644
+--- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
++++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+@@ -1047,7 +1047,7 @@ static u32 mana_gd_write_client_oob(const struct gdma_wqe_request *wqe_req,
+ 	header->inline_oob_size_div4 = client_oob_size / sizeof(u32);
  
--		if (q_vector->rx.rx_ring && q_vector->tx.tx_ring)
--			combined++;
-+		combined += min(q_vector->num_ring_tx, q_vector->num_ring_rx);
- 	}
+ 	if (oob_in_sgl) {
+-		WARN_ON_ONCE(!pad_data || wqe_req->num_sge < 2);
++		WARN_ON_ONCE(wqe_req->num_sge < 2);
  
- 	return combined;
+ 		header->client_oob_in_sgl = 1;
+ 
 -- 
 2.39.5
 
