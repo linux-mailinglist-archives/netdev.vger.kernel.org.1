@@ -1,135 +1,162 @@
-Return-Path: <netdev+bounces-188379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EE2BAAC945
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 17:20:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BCD4AAC96E
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 17:26:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A2A13BDC26
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 15:20:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5ED9500568
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 15:26:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CFAE2836A3;
-	Tue,  6 May 2025 15:20:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dsj8nT5i"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4697283FD5;
+	Tue,  6 May 2025 15:25:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f65.google.com (mail-ed1-f65.google.com [209.85.208.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3716925DB1E
-	for <netdev@vger.kernel.org>; Tue,  6 May 2025 15:20:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2092277817
+	for <netdev@vger.kernel.org>; Tue,  6 May 2025 15:24:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746544834; cv=none; b=skel1yTqBprfKy405Rm1JDuGTuF4qG5l+NkWH98h5QEp3Yh5tMLUOTKhE/KkYYBBv6lEpjrmszD/KytSA4gBMInq5lMlf9754B3ckEl3GXQ09wIRbTdb6U45PeBv0TULkfvoFalYYIylyNfhOQxbHvsbecFl9Ki8N3IOigC8krc=
+	t=1746545102; cv=none; b=HxiBUH4qGGLKqguAw8394UJtXf7UJLoy9qrTshx8BhYe3SE95puyugDLYT3WGyavXUc/6Z1/PHLbQewZBpQ3omZYxmABx4SKA/IJuTSRGKT68Lnut66fHqKKEyLZnkzdDoCo25FUznzAOwN5EwS5MeA2cVymUKm4+Y994k2wCJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746544834; c=relaxed/simple;
-	bh=fX4WzNeGvq6RHXfZG30zx0OSVaRJPNn7KAovJwRvo50=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZHEt9ReEnx5sv/ptik4QEpCe9O/U9NbTpLh6K99USsQYcWNtNYWLTKNW0b7QGEbJ3fcrj33tODE90aMkYJug4/I63obXIrBMVdLiH6t2LB1EwOw2kJxfc/FitrpboxGyCjYnLLF97/td53Fdmc3bwPIdvJyqrAsyoQDWnvFSJEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dsj8nT5i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29114C4CEE4;
-	Tue,  6 May 2025 15:20:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746544833;
-	bh=fX4WzNeGvq6RHXfZG30zx0OSVaRJPNn7KAovJwRvo50=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Dsj8nT5irN7IsWunFwZNcmpvghji+6qC4mECYHkeQ1TTPbuXGuPWo1r7Ha7rh1Top
-	 BpioeBqx7JXNxgLI0RmaN/WxML8ITNnO38ATEMej5+VoRLed5Cw7xq7TVS8CK0Y3DK
-	 PLiTJYSNjl6+NDgpfg+J+5U5Cz31jizQXMkGWtCheMXDI0bjjnnIh5Lp+X9AW74WRR
-	 0EUhqxjIKoqa6apZnVzAURTnPTedzyXUH7to7N0pBNZo51ty4kEefuEr0oPIraNHFM
-	 6rUVRMvIyUqgZ1Lq7hSHR7euXI8Z2yTJXCAGtmA6zSNRRe0lO3BJKldgDJnFdH8X4O
-	 AIj3MSwEUoTQQ==
-Date: Tue, 6 May 2025 08:20:32 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mark Bloch <mbloch@nvidia.com>
-Cc: Moshe Shemesh <moshe@nvidia.com>, netdev@vger.kernel.org, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Donald Hunter
- <donald.hunter@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Jonathan Corbet
- <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, Tariq Toukan
- <tariqt@nvidia.com>
-Subject: Re: [RFC net-next 0/5] devlink: Add unique identifier to devlink
- port function
-Message-ID: <20250506082032.1ab8f397@kernel.org>
-In-Reply-To: <c19e7dec-7aae-449d-b454-4078c8fbd926@nvidia.com>
-References: <1745416242-1162653-1-git-send-email-moshe@nvidia.com>
-	<20250424162425.1c0b46d1@kernel.org>
-	<95888476-26e8-425b-b6ae-c2576125f484@nvidia.com>
-	<20250428111909.16dd7488@kernel.org>
-	<507c9e1f-f31a-489c-8161-3e61ae425615@nvidia.com>
-	<20250501173922.6d797778@kernel.org>
-	<d5241829-bd20-4c41-9dec-d805ce5b9bcc@nvidia.com>
-	<20250505115512.0fa2e186@kernel.org>
-	<c19e7dec-7aae-449d-b454-4078c8fbd926@nvidia.com>
+	s=arc-20240116; t=1746545102; c=relaxed/simple;
+	bh=kHOo0TTG2E+azcnTaKa/TitUURRYG+FrLu72jmWYiDA=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=EKWh57IryeeR6MSQUlPBBr9zMp3mlXCQhsF4J3ueyMK+vaH9rPRLnXTGVjRKBnNto6+FNbX6kMhNEjBEEgmOEvigP63z/GtYyJDfN2d29fC121U3JG2NrgBWtcoJvmR9d6t3i8IMXr2ztaOVKVC+sQUH7kW/x+njlZ5PzdFPX1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f65.google.com with SMTP id 4fb4d7f45d1cf-5f4d28d9fd8so7891945a12.3
+        for <netdev@vger.kernel.org>; Tue, 06 May 2025 08:24:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746545098; x=1747149898;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:cc:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YJkx5T7QZ6OeB7JTYuDlAPnoixrZ1aXXPBauH0AFboc=;
+        b=OsDY2c8VYLJboMyAbBWz+XDNx07gBtbn7BPPb6+jjzgw6UMzT3Dr28xEENgO6TZGnB
+         CEruHMHIbB81ih0E/5F7La5saixH9fq3tvRB+SM3fDHidCwa//oC5gI1nZj19GpKtMeJ
+         3ggTpS7i+8gGKOuoRU7xHRJfJuvzHOlJtPzkz349s32M8Bz6rKYPO7Y/PpXd04yNCXcc
+         iKVxZFaXJdkD0XrAuurGwnvIZHzw199/1P0x9fVdtN1vbNR9hJbgnjZb539o8dK29EHF
+         L3LAIS1n6vcH4H9BIJZmviKYlrb3zqBkGFrUHyN29Fvj3ZCijN2jpgeYafzrBrHndY9s
+         UbnA==
+X-Forwarded-Encrypted: i=1; AJvYcCV5xHEkbm+3kDp8/M6vqX+FELNWvKT+/qw/b5ZIMHiS+U8Ngyo1s9b4kkd/fu3hndyDpceSGBg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOHXm7rr22zhrrZ7dD9iq9JVE/goW8vx0ysmdJPmvbYM+wQBxu
+	WVaDLkEP5YAjBGQERdLutV1uEjwZv+jfVyd8Vm8TChqkbzWeasbF
+X-Gm-Gg: ASbGnctjaWPiH8B0+yKu6zBAm4V6E35xuDCb0ojr48wSLpSJrVC52ayLlPNz8tAGqmT
+	kec4RBXDz0wOyhPso5BDo7MhdEnre1H+QYQxZeTIL93zdGXqV13ABi7NzvOmOxVK0vvpDMz5t8N
+	K6UkD7zzYfYaF9fV0Ywh7Sz50X0Bqfc0AQh9zXQx81WwcugtL/p0INxbyaTScEE2izDPhd/Ma1y
+	W+bchiKURJyIYeF2W9BAQG/bCeueWcSVSi5axUY8A4jg+HrDz0ryjzU+KfRjAopGlmudV/vzjK+
+	8BrgQm5ah39LusEVFAlw15zKeZOAvO3tm3m/e5vWwaG911ylcHj2zW5YVbpjC5P8kwqheXlVG1A
+	w2g==
+X-Google-Smtp-Source: AGHT+IHSOsqRr4daz5p9hC5Vsf+JYJ2MOE/hismBEzTp5lCHRPmrczFhHyfnEXYJglSoM+41Ot0Ehw==
+X-Received: by 2002:a05:6402:4403:b0:5ec:cbf8:ab28 with SMTP id 4fb4d7f45d1cf-5fb70c56ce8mr3013502a12.22.1746545097805;
+        Tue, 06 May 2025 08:24:57 -0700 (PDT)
+Received: from [192.168.88.252] (78-80-121-182.customers.tmcz.cz. [78.80.121.182])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5fa77818f02sm7679200a12.37.2025.05.06.08.24.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 May 2025 08:24:57 -0700 (PDT)
+Message-ID: <50b641a0-50d3-448c-a6f3-b4e143e87c08@ovn.org>
+Date: Tue, 6 May 2025 17:24:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: i.maximets@ovn.org, dev@openvswitch.org, aconole@redhat.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org
+Subject: Re: [PATCH net] openvswitch: Fix unsafe attribute parsing in
+ output_userspace()
+To: Eelco Chaudron <echaudro@redhat.com>, netdev@vger.kernel.org
+References: <0bd65949df61591d9171c0dc13e42cea8941da10.1746541734.git.echaudro@redhat.com>
+Content-Language: en-US
+From: Ilya Maximets <i.maximets@ovn.org>
+Autocrypt: addr=i.maximets@ovn.org; keydata=
+ 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
+In-Reply-To: <0bd65949df61591d9171c0dc13e42cea8941da10.1746541734.git.echaudro@redhat.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
-On Tue, 6 May 2025 14:25:10 +0300 Mark Bloch wrote:
-> > Thanks for explaining the setup. Could you please explain the user
-> > scenario now? Perhaps thinking of it as a sequence diagram would
-> > be helpful, but whatever is easiest, just make it concrete.
-> >  =20
->=20
-> It's a rough flow, but I believe it clearly illustrates the use case
-> we're targeting:
-> =20
-> Some system configuration info:
-> =20
-> - A static mapping file exists that defines the relationship between
->   a host and the corresponding ARM/DPU host that manages it.
-> =20
-> - OVN, OVS and Kubernetes are used to manage network connectivity and
->   resource allocation.
-> =20
-> Flow:
-> 1. A user requests a container with networking connectivity.
-> 2. Kubernetes allocates a VF on host X. An agent on the host handles VF
->    configuration and sends the PF number and VF index to the central
->    management software.
+On 5/6/25 4:28 PM, Eelco Chaudron wrote:
+> This patch replaces the manual Netlink attribute iteration in
+> output_userspace() with nla_for_each_nested(), which ensures that only
+> well-formed attributes are processed.
+> 
+> Fixes: ccb1352e76cf ("net: Add Open vSwitch kernel components.")
+> Signed-off-by: Eelco Chaudron <echaudro@redhat.com>
+> ---
+>  net/openvswitch/actions.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 
-What is "central management software" here? Deployment specific or
-some part of k8s?
+Should probably add a Reported-by tag referencing the report id
+and mention the reporter in the commit message.
 
-> 3. An agent on the DPU side detects the changes made on host X. Using
->    the PF number and VF index, it identifies the corresponding
->    representor, attaches it to an OVS bridge, and allows OVN to program
->    the relevant steering rules.
+Otherwise, LGTM.  Thanks!
 
-What does it mean that DPU "detects it", what's the source and=20
-mechanism of the notification?
-Is it communicating with the central SW during  the process?=20
+Acked-by: Ilya Maximets <i.maximets@ovn.org>
 
-> This setup works well when the mapping file defines a one-to-one
-> relationship between a host and a single ARM/DPU host.
-> It's already supported in upstream today [1]
-> =20
-> However, in a slightly more generic scenario like:
-> =20
-> Control Host A: External host X
->                 External host Y
-> =20
-> A single ARM/DPU host manages multiple external hosts. In this case, step
-> 2=E2=80=94where only the PF number and VF index are sent is insufficient.=
- During
-> step 3, the agent on the DPU reads the data but cannot determine which
-> external host created the VF. As a result, it cannot correctly associate
-> the representor with the appropriate OVS bridge.
-> =20
-> To resolve this, we plan to modify step 2 to include the VUID along with
-> the PF number and VF index. The DPU-side agent will use the VUID to match
-> it with the FUID, identify the correct PF representor, and then use
-> standard devlink mechanisms to locate the corresponding VF representor.
->=20
-> 1: https://github.com/ovn-kubernetes/ovn-kubernetes
-> You can look at: go-controller/pkg/util/dpu_annotations.go for more info.
+> 
+> diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
+> index 61fea7baae5d..2f22ca59586f 100644
+> --- a/net/openvswitch/actions.c
+> +++ b/net/openvswitch/actions.c
+> @@ -975,8 +975,7 @@ static int output_userspace(struct datapath *dp, struct sk_buff *skb,
+>  	upcall.cmd = OVS_PACKET_CMD_ACTION;
+>  	upcall.mru = OVS_CB(skb)->mru;
+>  
+> -	for (a = nla_data(attr), rem = nla_len(attr); rem > 0;
+> -	     a = nla_next(a, &rem)) {
+> +	nla_for_each_nested(a, attr, rem) {
+>  		switch (nla_type(a)) {
+>  		case OVS_USERSPACE_ATTR_USERDATA:
+>  			upcall.userdata = a;
 
-A link to the actual file / relevant code would be more helpful :(
 
