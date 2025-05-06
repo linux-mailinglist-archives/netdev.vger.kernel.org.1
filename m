@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-188223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4717AAB971
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:57:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4338AAB95B
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:56:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B54DC3BB2D0
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:45:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF7E63A1B4B
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:46:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C6F128AB15;
-	Tue,  6 May 2025 04:01:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BFCB28E5FB;
+	Tue,  6 May 2025 04:01:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PT90DV6U"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mZjVU8Vf"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0BBC2F8DFC
-	for <netdev@vger.kernel.org>; Tue,  6 May 2025 01:59:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 086462ECFDA
+	for <netdev@vger.kernel.org>; Tue,  6 May 2025 01:59:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746496766; cv=none; b=V+UH2cUkvFDuATZJSFHTVzYDUqtZCiofUDS4HP3hd0jiYGGUBpMRS0EaSOzuz1LfmhyxGyyeEI7EyTCCUoxzZqxaIjFipCzHJOgcY8/GV5KUUFh06pk9fIRXGQBo6w63FldK4dXldrfowhZzh4emvAtyfvLCguUsJGQ1+McXMkM=
+	t=1746496768; cv=none; b=Hhtq+WoYxr9jlw51k9k+zmCzKLMBxw/+eynRbbhBi0gnL8Bj013h5j0LssdF24pAkkSt5mQuPWh9L0VO+pdjYHxJvBloWPiapwejeRjkwtpS7MZ/70aq2od9OamNScropI5r7IynJ5k6cDHA+Y3enbpIGNercu7axk6k8j+U4F4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746496766; c=relaxed/simple;
-	bh=IC2DFeGDnaJV0AsGdsc00/VL8Jg2PXjB4wsUnDx79yI=;
+	s=arc-20240116; t=1746496768; c=relaxed/simple;
+	bh=sGXEJ9UzTKTJ6orUxxf20O42nPHtvGlhnGXRezZo6OY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=H9DiTVng3V51tDtmCqi5xye+8IvGjyX6iEpFMNjMfEUECQX8u1mcpqb909uNBl2y/uvj+KAL9rrjT/ejutdaaJitJa44mRpxXvX6eGvYR3W2xNKrLuZQk1ZI7uvkiu4dGzPdMvdzKKyAoZlWItU3Lm4YUPF7nyqCQkdzmZIR+mE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PT90DV6U; arc=none smtp.client-ip=91.218.175.189
+	 MIME-Version; b=FWfrowaCNu8+y9DQL0iMEGTZNi++1s6c59Rbyj6ZtRZnAyvCrqVr7F4I6146gNvOdUVoGWhDJaAkiyBR1zYoT8GslOcz1JS1jOZUdjG3LS1/jZyn/tJExPkJo+TjDoZgVCwDDBcWjvk3IFbCTuxjqk7StG2ihYL3z/Z3nlEc2c8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mZjVU8Vf; arc=none smtp.client-ip=91.218.175.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1746496763;
+	t=1746496765;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=MrSRj6u5dDFn+U6UhyI/q+bYbViTrcuI6lxB/1P47+A=;
-	b=PT90DV6UiUAOrPSb/vjzkz0EBuEM1jfCSJ8oAhe7qLu8k4zUYTx8A1clOdFqquBxLl56OE
-	oj1S/7Lmzwl9AT2md+EvuJOquRUFzGgnvNpvtq6lqgZ4/3fir9X0Lwk5lzAUklCOxtbei/
-	Ej30oyCPMz6VCYn9YZqXdb/t1iIzfsc=
+	bh=rKYIeM0rTydpOKf0DepkQmkMK1bRwSRWPs+8CNcvjiE=;
+	b=mZjVU8VfpLD0DMw0NQOXY3R3xtev2q7dX2YpkrgCAONrABzRUKOcjxPcJ4bmcGYY62Lsp1
+	iSg1QvAft4+GxqBYSMsWXOllhZqsWgln7HbRfz2RvIe6mxTygK3XpOQu697pkIArpMOx+Z
+	TNC8cakKxAnkWyKgmd2yYqnqN6gW6c4=
 From: Martin KaFai Lau <martin.lau@linux.dev>
 To: bpf@vger.kernel.org
 Cc: 'Alexei Starovoitov ' <ast@kernel.org>,
@@ -51,9 +51,9 @@ Cc: 'Alexei Starovoitov ' <ast@kernel.org>,
 	'Amery Hung ' <ameryhung@gmail.com>,
 	netdev@vger.kernel.org,
 	kernel-team@meta.com
-Subject: [PATCH v2 bpf-next 7/8] bpf: Add bpf_list_{front,back} kfunc
-Date: Mon,  5 May 2025 18:58:54 -0700
-Message-ID: <20250506015857.817950-8-martin.lau@linux.dev>
+Subject: [PATCH v2 bpf-next 8/8] selftests/bpf: Add test for bpf_list_{front,back}
+Date: Mon,  5 May 2025 18:58:55 -0700
+Message-ID: <20250506015857.817950-9-martin.lau@linux.dev>
 In-Reply-To: <20250506015857.817950-1-martin.lau@linux.dev>
 References: <20250506015857.817950-1-martin.lau@linux.dev>
 Precedence: bulk
@@ -67,115 +67,160 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Martin KaFai Lau <martin.lau@kernel.org>
 
-In the kernel fq qdisc implementation, it only needs to look at
-the fields of the first node in a list but does not always
-need to remove it from the list. It is more convenient to have
-a peek kfunc for the list. It works similar to the bpf_rbtree_first().
+This patch adds the "list_peek" test to use the new
+bpf_list_{front,back} kfunc.
 
-This patch adds bpf_list_{front,back} kfunc. The verifier is changed
-such that the kfunc returning "struct bpf_list_node *" will be
-marked as non-owning. The exception is the KF_ACQUIRE kfunc. The
-net effect is only the new bpf_list_{front,back} kfuncs will
-have its return pointer marked as non-owning.
+The test_{front,back}* tests ensure that the return value
+is a non_own_ref node pointer and requires the spinlock to be held.
 
-Acked-by: Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Suggested-by: Kumar Kartikeya Dwivedi <memxor@gmail.com> # check non_own_ref marking
 Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
 ---
- kernel/bpf/helpers.c  | 22 ++++++++++++++++++++++
- kernel/bpf/verifier.c | 12 ++++++++++--
- 2 files changed, 32 insertions(+), 2 deletions(-)
+ .../selftests/bpf/prog_tests/linked_list.c    |   6 +
+ .../selftests/bpf/progs/linked_list_peek.c    | 113 ++++++++++++++++++
+ 2 files changed, 119 insertions(+)
+ create mode 100644 tools/testing/selftests/bpf/progs/linked_list_peek.c
 
-diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
-index 36150d340c16..78cefb41266a 100644
---- a/kernel/bpf/helpers.c
-+++ b/kernel/bpf/helpers.c
-@@ -2293,6 +2293,26 @@ __bpf_kfunc struct bpf_list_node *bpf_list_pop_back(struct bpf_list_head *head)
- 	return __bpf_list_del(head, true);
- }
+diff --git a/tools/testing/selftests/bpf/prog_tests/linked_list.c b/tools/testing/selftests/bpf/prog_tests/linked_list.c
+index 77d07e0a4a55..5266c7022863 100644
+--- a/tools/testing/selftests/bpf/prog_tests/linked_list.c
++++ b/tools/testing/selftests/bpf/prog_tests/linked_list.c
+@@ -7,6 +7,7 @@
  
-+__bpf_kfunc struct bpf_list_node *bpf_list_front(struct bpf_list_head *head)
+ #include "linked_list.skel.h"
+ #include "linked_list_fail.skel.h"
++#include "linked_list_peek.skel.h"
+ 
+ static char log_buf[1024 * 1024];
+ 
+@@ -805,3 +806,8 @@ void test_linked_list(void)
+ 	test_linked_list_success(LIST_IN_LIST, true);
+ 	test_linked_list_success(TEST_ALL, false);
+ }
++
++void test_linked_list_peek(void)
 +{
-+	struct list_head *h = (struct list_head *)head;
++	RUN_TESTS(linked_list_peek);
++}
+diff --git a/tools/testing/selftests/bpf/progs/linked_list_peek.c b/tools/testing/selftests/bpf/progs/linked_list_peek.c
+new file mode 100644
+index 000000000000..264e81bfb287
+--- /dev/null
++++ b/tools/testing/selftests/bpf/progs/linked_list_peek.c
+@@ -0,0 +1,113 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (c) 2025 Meta Platforms, Inc. and affiliates. */
 +
-+	if (list_empty(h) || unlikely(!h->next))
-+		return NULL;
++#include <vmlinux.h>
++#include <bpf/bpf_helpers.h>
++#include "bpf_misc.h"
++#include "bpf_experimental.h"
 +
-+	return (struct bpf_list_node *)h->next;
++struct node_data {
++	struct bpf_list_node l;
++	int key;
++};
++
++#define private(name) SEC(".data." #name) __hidden __attribute__((aligned(8)))
++private(A) struct bpf_spin_lock glock;
++private(A) struct bpf_list_head ghead __contains(node_data, l);
++
++#define list_entry(ptr, type, member) container_of(ptr, type, member)
++#define NR_NODES 16
++
++int zero = 0;
++
++SEC("syscall")
++__retval(0)
++long list_peek(void *ctx)
++{
++	struct bpf_list_node *l_n;
++	struct node_data *n;
++	int i, err = 0;
++
++	bpf_spin_lock(&glock);
++	l_n = bpf_list_front(&ghead);
++	bpf_spin_unlock(&glock);
++	if (l_n)
++		return __LINE__;
++
++	bpf_spin_lock(&glock);
++	l_n = bpf_list_back(&ghead);
++	bpf_spin_unlock(&glock);
++	if (l_n)
++		return __LINE__;
++
++	for (i = zero; i < NR_NODES && can_loop; i++) {
++		n = bpf_obj_new(typeof(*n));
++		if (!n)
++			return __LINE__;
++		n->key = i;
++		bpf_spin_lock(&glock);
++		bpf_list_push_back(&ghead, &n->l);
++		bpf_spin_unlock(&glock);
++	}
++
++	bpf_spin_lock(&glock);
++
++	l_n = bpf_list_front(&ghead);
++	if (!l_n) {
++		err = __LINE__;
++		goto done;
++	}
++
++	n = list_entry(l_n, struct node_data, l);
++	if (n->key != 0) {
++		err = __LINE__;
++		goto done;
++	}
++
++	l_n = bpf_list_back(&ghead);
++	if (!l_n) {
++		err = __LINE__;
++		goto done;
++	}
++
++	n = list_entry(l_n, struct node_data, l);
++	if (n->key != NR_NODES - 1) {
++		err = __LINE__;
++		goto done;
++	}
++
++done:
++	bpf_spin_unlock(&glock);
++	return err;
 +}
 +
-+__bpf_kfunc struct bpf_list_node *bpf_list_back(struct bpf_list_head *head)
-+{
-+	struct list_head *h = (struct list_head *)head;
-+
-+	if (list_empty(h) || unlikely(!h->next))
-+		return NULL;
-+
-+	return (struct bpf_list_node *)h->prev;
++#define TEST_FB(op, dolock)					\
++SEC("syscall")							\
++__failure __msg(MSG)						\
++long test_##op##_spinlock_##dolock(void *ctx)			\
++{								\
++	struct bpf_list_node *l_n;				\
++	__u64 jiffies = 0;					\
++								\
++	if (dolock)						\
++		bpf_spin_lock(&glock);				\
++	l_n = bpf_list_##op(&ghead);				\
++	if (l_n)						\
++		jiffies = bpf_jiffies64();			\
++	if (dolock)						\
++		bpf_spin_unlock(&glock);			\
++								\
++	return !!jiffies;					\
 +}
 +
- __bpf_kfunc struct bpf_rb_node *bpf_rbtree_remove(struct bpf_rb_root *root,
- 						  struct bpf_rb_node *node)
- {
-@@ -3236,6 +3256,8 @@ BTF_ID_FLAGS(func, bpf_list_push_front_impl)
- BTF_ID_FLAGS(func, bpf_list_push_back_impl)
- BTF_ID_FLAGS(func, bpf_list_pop_front, KF_ACQUIRE | KF_RET_NULL)
- BTF_ID_FLAGS(func, bpf_list_pop_back, KF_ACQUIRE | KF_RET_NULL)
-+BTF_ID_FLAGS(func, bpf_list_front, KF_RET_NULL)
-+BTF_ID_FLAGS(func, bpf_list_back, KF_RET_NULL)
- BTF_ID_FLAGS(func, bpf_task_acquire, KF_ACQUIRE | KF_RCU | KF_RET_NULL)
- BTF_ID_FLAGS(func, bpf_task_release, KF_RELEASE)
- BTF_ID_FLAGS(func, bpf_rbtree_remove, KF_ACQUIRE | KF_RET_NULL)
-diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-index acb2f44316cc..99aa2c890e7b 100644
---- a/kernel/bpf/verifier.c
-+++ b/kernel/bpf/verifier.c
-@@ -12079,6 +12079,8 @@ enum special_kfunc_type {
- 	KF_bpf_list_push_back_impl,
- 	KF_bpf_list_pop_front,
- 	KF_bpf_list_pop_back,
-+	KF_bpf_list_front,
-+	KF_bpf_list_back,
- 	KF_bpf_cast_to_kern_ctx,
- 	KF_bpf_rdonly_cast,
- 	KF_bpf_rcu_read_lock,
-@@ -12124,6 +12126,8 @@ BTF_ID(func, bpf_list_push_front_impl)
- BTF_ID(func, bpf_list_push_back_impl)
- BTF_ID(func, bpf_list_pop_front)
- BTF_ID(func, bpf_list_pop_back)
-+BTF_ID(func, bpf_list_front)
-+BTF_ID(func, bpf_list_back)
- BTF_ID(func, bpf_cast_to_kern_ctx)
- BTF_ID(func, bpf_rdonly_cast)
- BTF_ID(func, bpf_rbtree_remove)
-@@ -12160,6 +12164,8 @@ BTF_ID(func, bpf_list_push_front_impl)
- BTF_ID(func, bpf_list_push_back_impl)
- BTF_ID(func, bpf_list_pop_front)
- BTF_ID(func, bpf_list_pop_back)
-+BTF_ID(func, bpf_list_front)
-+BTF_ID(func, bpf_list_back)
- BTF_ID(func, bpf_cast_to_kern_ctx)
- BTF_ID(func, bpf_rdonly_cast)
- BTF_ID(func, bpf_rcu_read_lock)
-@@ -12598,7 +12604,9 @@ static bool is_bpf_list_api_kfunc(u32 btf_id)
- 	return btf_id == special_kfunc_list[KF_bpf_list_push_front_impl] ||
- 	       btf_id == special_kfunc_list[KF_bpf_list_push_back_impl] ||
- 	       btf_id == special_kfunc_list[KF_bpf_list_pop_front] ||
--	       btf_id == special_kfunc_list[KF_bpf_list_pop_back];
-+	       btf_id == special_kfunc_list[KF_bpf_list_pop_back] ||
-+	       btf_id == special_kfunc_list[KF_bpf_list_front] ||
-+	       btf_id == special_kfunc_list[KF_bpf_list_back];
- }
- 
- static bool is_bpf_rbtree_api_kfunc(u32 btf_id)
-@@ -13903,7 +13911,7 @@ static int check_kfunc_call(struct bpf_verifier_env *env, struct bpf_insn *insn,
- 			if (is_kfunc_ret_null(&meta))
- 				regs[BPF_REG_0].id = id;
- 			regs[BPF_REG_0].ref_obj_id = id;
--		} else if (is_rbtree_node_type(ptr_type)) {
-+		} else if (is_rbtree_node_type(ptr_type) || is_list_node_type(ptr_type)) {
- 			ref_set_non_owning(env, &regs[BPF_REG_0]);
- 		}
- 
++#define MSG "call bpf_list_{{(front|back).+}}; R0{{(_w)?}}=ptr_or_null_node_data(id={{[0-9]+}},non_own_ref"
++TEST_FB(front, true)
++TEST_FB(back, true)
++#undef MSG
++
++#define MSG "bpf_spin_lock at off=0 must be held for bpf_list_head"
++TEST_FB(front, false)
++TEST_FB(back, false)
++#undef MSG
++
++char _license[] SEC("license") = "GPL";
 -- 
 2.47.1
 
