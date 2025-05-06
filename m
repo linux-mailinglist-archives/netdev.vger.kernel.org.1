@@ -1,235 +1,467 @@
-Return-Path: <netdev+bounces-188267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1792FAABD42
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 10:31:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F747AABCEB
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 10:19:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7675E7B097E
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:30:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77AF23A905D
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:12:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF86A2594B4;
-	Tue,  6 May 2025 08:27:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D377322D4FE;
+	Tue,  6 May 2025 08:12:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="H0UEMypJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eqXrgYeB"
 X-Original-To: netdev@vger.kernel.org
-Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11011052.outbound.protection.outlook.com [52.101.65.52])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0175A258CE8;
-	Tue,  6 May 2025 08:27:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746520079; cv=fail; b=dXhHiOxDMIko3MLth8dwRk1XGxNSJJbV/OrKGnjB9EnAGay1A5Y+G0iulCiBwe9ToTfPB8xLQPv3p0tH0aoUgWOBKQmx9tYS0IlVoDvvnHxZDc6Rtv1o7oenYrcCJuboKwt7ySxnXAycJI4RZvHKfeR2UQ842lz+tsDPhO5gJWU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746520079; c=relaxed/simple;
-	bh=XjNav7jKPyDWGqgwARsUwsFtRcPa9e1Eoxkn7KM6KYw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=caav80V5Z4yP+QvGO8b0ykGWJFcb46JACCwpIAQo/qlTOFO1YsiXWqxZawd0zR/SZULZb9DIBRIq4BmtwL/eQet+DT3yDO4S/ynYkqxqBBgMOycrVlv+A2jLDtcDe35boMwjnj14GPIyPQoCuvmE55D1Vxd/dihGPt1oToQd9jY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=H0UEMypJ; arc=fail smtp.client-ip=52.101.65.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=C5ul9SjZZo/J3ZyPkFaUu5yJSJO+ieVoaFjV2DE53y78NXGyRN5Uwk0F/sryOn837CSoHvPnhyzPNhkTnzwKKsbSHz26vDnLcV6lmVk34b9+RzWDdzcw0NXhxzoYLXT5tVwjun8jNKQl1nibqQrU6URdS2wdW0uDyjUbnQqkVwUdet8fyr4Tqnpcl1C9QimRy2Gb6mmKR34kF8zecOEtxd9l129XiM8g4rMX5/nDrkezT1FvRpXk5Xcx667J3iId1H+3TP2Hp5rpjk4JD1gdo45XnnG5bLzF1j8aC/4rWSRkBuxdNjBcueH1wDWJDxOHESMIsgmBOGxDY8z3oWcORQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1wf2ZPHzooNqEyfUwWyL/hekmw6AY1g3HgCMe46dxtE=;
- b=wQ9k6exmZYSOWKchk9GoCRSa6FQOK94GhxY8ScJ5IW6LBFE+fxvh/EqUIxgxqKdpI5XAj4cY+yWYEwW/9l/rrgRN9nOdWbi3tjQPaWe+hWwqCa4Nwq1uKIC0B9gkpSo1WCnuJyEiJ3PzjpYZKRbr/YhApkDo1mbrc3wQ+ZZza6yL+n39PmvZ15siMuPbVK/NpUAvg1/HZVKzcVLUD0LLQ6aGw1tvFFPR8nyF2QaRQB6fsrpztGymX8xb4TLjmyF/4x6aMFZVF4c+L0V2B3EqDpt2u8i7ifbhOnw5Erf51ePe2xHQfwi/Ja9vn4jzrfLVdsrvtSmUg7M3ZyB1K6DTLw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1wf2ZPHzooNqEyfUwWyL/hekmw6AY1g3HgCMe46dxtE=;
- b=H0UEMypJb16QUHEMMinCJ3v+lFs8HpXJxtYd6g1VjnujXRxEDdcGmDCkXI+IWwHsXBQ4+Ur7wHhQ78RIlAMtZBJ6BSaJNrC/7WEk7v3p5MFE06WJCpbx5omFocZ+HbsOB5/QOElgw4wtvKOUbPOrM6av3JZj5STStVkgSG+sYyuGM6lf6xvBukkP8HMTWvgwNiQI3vcjPgIbTMNjMmMV993qt8tVBPC/W77qeGcpMEL/r38G37gpsAA7ICnrTXidrIWkECMn5KqSj5Prl95hGTfl6hwReiqiyOw8Yezug9YG0oMJ7DYfWmpNb8Yq5c7KvJ+tfVotkVzO2z2RzcW/4Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by PA4PR04MB7744.eurprd04.prod.outlook.com (2603:10a6:102:c9::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.26; Tue, 6 May
- 2025 08:27:55 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%4]) with mapi id 15.20.8699.022; Tue, 6 May 2025
- 08:27:55 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com,
-	xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: christophe.leroy@csgroup.eu,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-arm-kernel@lists.infradead.org,
-	timur@kernel.org
-Subject: [PATCH v7 net-next 14/14] net: enetc: add loopback support for i.MX95 ENETC PF
-Date: Tue,  6 May 2025 16:07:35 +0800
-Message-Id: <20250506080735.3444381-15-wei.fang@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250506080735.3444381-1-wei.fang@nxp.com>
-References: <20250506080735.3444381-1-wei.fang@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SG2PR06CA0249.apcprd06.prod.outlook.com
- (2603:1096:4:ac::33) To PAXPR04MB8510.eurprd04.prod.outlook.com
- (2603:10a6:102:211::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A523920B813;
+	Tue,  6 May 2025 08:12:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746519165; cv=none; b=EAt0qqXCAAKzlB4SFo1ij4D9FKzy+SKoqnX11/kg3tFsS8OeDoCSe5Y0WMqc3KCY8zy45T3CCEr7CQ4Njt2t3lKJOCyb/5oSZSX3ECLMj49S16+2ZbYKHdeSdGjlva6ptcVtVh6n8/0cybykNouumjB19GCfMFCGN7v4uRsfAHg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746519165; c=relaxed/simple;
+	bh=Dwa3QWbDLaa1znidOxpzcDmlFBh6Y0Lv5/zlS8U7y5A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eoen4GoFGKR3cBMQb10WclbpT9gOTjmgEcbYyT7JCNva64RXgVV90igpMSaK8PHt+lAvG3JjQxpbv6Fo2XoYiVxDp/B6EpSqbqmZmdFjnCqQvKkQfqUH/IOGoRvHZ9RYr4Kw68REVC2M7ssCJIxfaNbT2zXi+OzwRIpS4L+8l8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eqXrgYeB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C806C4CEE4;
+	Tue,  6 May 2025 08:12:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746519164;
+	bh=Dwa3QWbDLaa1znidOxpzcDmlFBh6Y0Lv5/zlS8U7y5A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eqXrgYeBWApfF9s2tt7aYo6K1a9Ko2WC/i5aOj4CaV3KOoDe3nqTq2HPDi6GU4HIX
+	 W3LXJG3YT8SrcU3FN+lYs0gItOyvBDbERqgrT6nwyqgho7F8kRSR18dLqvjB7m7dsU
+	 iig0FRpfIjJQik9ICUTt8qr5mTac3d+V3mqcVbsphOXehrs957EOZxaECZ+QCbdtCf
+	 ZJEzH7gxTtG5dXLbdWRVjahJmUqaImA/3ZhRz8qoxqoCTAvIanR3GFArWYnutQhbdl
+	 LrVmkiypcHhtGFCcPW3EUYnufPnzQZp1tJpZxmGfGtKGgHgoataLyI4qHEH3sM9grH
+	 qME1BVA8om5og==
+Date: Tue, 6 May 2025 10:12:40 +0200
+From: Antoine Tenart <atenart@kernel.org>
+To: Sasha Levin <sashal@kernel.org>
+Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+	Antoine Tenart <atenart@kernel.org>, Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, sdf@fomichev.me, jdamato@fastly.com, 
+	aleksander.lobakin@intel.com, kuniyu@amazon.com, shaw.leon@gmail.com, netdev@vger.kernel.org
+Subject: Re: [PATCH AUTOSEL 6.14 554/642] net-sysfs: remove rtnl_trylock from
+ device attributes
+Message-ID: <jj7nizvkfuas57zcfkkbdaqnxzjdlgwtgzlkgzpazbrdnzhlc3@6ohz5cfz3tds>
+References: <20250505221419.2672473-1-sashal@kernel.org>
+ <20250505221419.2672473-554-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|PA4PR04MB7744:EE_
-X-MS-Office365-Filtering-Correlation-Id: f576df2f-315b-4461-7363-08dd8c77e69e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|52116014|366016|1800799024|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?8P30YHyQgJJKymYIRfzqg6MSwFRKGWkcS9o5s41+vNcRksr8e7OYu6CX7yPL?=
- =?us-ascii?Q?KHKk0HIYrxzl7EBo97TIxR+F81Q8qJkCV8SuRVKFP8jX2GbfmzvhhKaAIjkV?=
- =?us-ascii?Q?F/eWSaHkl/9IGXDs1PUEV7oazFE6ieEP4H9ylocqq0svCHljpWVI9iUMVuJb?=
- =?us-ascii?Q?4jJAoUbXiDULOnIXvp5TNGWEzHvM2XjvPuNIeQVC7yFcffWJ5VpqALk5f9CC?=
- =?us-ascii?Q?RV3RK20PD+3PekGfeAQVt3RDPVdj8ooNgavu28vk47nG/DdP1jCekZKYjuAK?=
- =?us-ascii?Q?UDN9UDf5MnpZcGmen/9ApvT6koNuw4CMbGgyqpzX2F8Xsp3U73EPTB6tXgkP?=
- =?us-ascii?Q?2NofKwqiqvLWePavVnoBKgjxLqEpQ0EsU0AANuU7X8j1L9Igv/5fq6yZNyXv?=
- =?us-ascii?Q?lcuerXuS+vCA4u1X2SVAGPTVX1jEGC0oH4hL7PN360Pda46CTXfZn4/tFEOd?=
- =?us-ascii?Q?dcinOg+Eufr7if5gYUaN6HDfr6TXl3NO5XT85PeBgtNdaer+6RTI5leAWWvw?=
- =?us-ascii?Q?//tzKSx7K765NlQm6PHUWPMu9GlnRVwaly7B49ti5LrBIHSCER7nFbi1rIHf?=
- =?us-ascii?Q?WsqCYJkA09rMXDYhCj/vOPc1PFSxOqozvLDh8gnAdyo/WwgXT8NtDFMVf1VW?=
- =?us-ascii?Q?ElKF5lxcTYiwtvmYIGLBj2v6f39xMK6ZUJadEO3zxCdy8mEqMrGLPudW5JM2?=
- =?us-ascii?Q?Dfy3NvHF307Q+eavurnpH7iwHCTqlMcX14ZcJDGHi0XsBznI1Q+RdjcFbiEL?=
- =?us-ascii?Q?iu//BmHQJ9m8dsRrBOrBq9bz1CS3Q1fBrCz5V5gh+uJURvm8J0WIwA1VmAYe?=
- =?us-ascii?Q?o+3qUZUgl0zv/qB7vDNU0zO6bh70+62gohPhXErEhF+PIzM8P3Vg3RbPhteZ?=
- =?us-ascii?Q?bCZqiAXh5fvx6zhQYZItD0fDPU6a8tg2CX2sMI9CvyCd2fhQ+wB3nmVaHRZU?=
- =?us-ascii?Q?ZYI9vRSROez994LycWE0dpPMFw0+wKIsKfK5fDY80BtnoGtAcc2fkQmwu9Cg?=
- =?us-ascii?Q?EkYKbQn4Da9+zLQ0KiIeMkLzxaW1WKYO+g7V4e06xCzrXyW8CjTcyM7fn77h?=
- =?us-ascii?Q?UR3J9Eq0obNF0RR055mTt5LqmBh38CM4RJMs47scklQsNdHFLSqh9Kza2gM8?=
- =?us-ascii?Q?w+AvIONarFFjojG8vZJcoNi8nW6uakw0NJYm9xR4sAemN/UMt10LGQAG4k75?=
- =?us-ascii?Q?TIB2V0kxKOJCOw7QNY74PVj18APrK3ACGe4G6uUeXkefISKB1luJer4/zWJm?=
- =?us-ascii?Q?EYyyG73lE6TJRYlLvsy1+zB5XzkUrhn0ABDdZi4zsNBjYr6J6WEPrH35rVlE?=
- =?us-ascii?Q?67WZmSc6BhUipmb8YmyL/LKdFVS9OV/jE8cgYnzxptIPb1I53EGeItf8xMgN?=
- =?us-ascii?Q?5P1s4BiHtI4Ze/0yjvgJtrGlC6nOrFQMr0hn04DWWlxagAVAru8mwauLw6cn?=
- =?us-ascii?Q?1P4eNyrUhrP4Jrn6aHCwWAZJ48iIOsvT1tjWD7Ny7dI/TwowaYCvfQ=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(52116014)(366016)(1800799024)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?LjDt6nyTjDI89RRDnMVRb+SGd5QFULlUYQLFf//c16A99a43ZrX1BIz02p+e?=
- =?us-ascii?Q?4ZfWWLqOdlR8ChzdoixnCp/ZMFjXeBQw6Y8WJSwQX8wu/xhfzBycV06PGXgo?=
- =?us-ascii?Q?yaEmvVgCsRij1C72XbCie/cvlG1ygKp2d6qzGYet05h2HRf4tsSfr9gTHCN1?=
- =?us-ascii?Q?Z0y9i0sMgMpkW7tA/39Wgn+UJDvpRp4tiQb7U+kI10IAFMWvExHqsYpjGCtJ?=
- =?us-ascii?Q?JU8qdgC5NnAD+c0YRXcPn6IuIDXGQ6pEaiAg7aCo2PHYRnAX3WxJZEuTZBG/?=
- =?us-ascii?Q?tlFWSCMXZ+4F7B17Xw6M7zGzsK+00UmB2qNl9UZPxmAIk6yFyTax5sR2fCeN?=
- =?us-ascii?Q?umj9OhGXjf4b6Kv+VFLDM0SNpNJAATIVbQyJKILhL6AS87P9A5tNYg+omhy+?=
- =?us-ascii?Q?cx4uCOZUWpxYq3GDTTnzCXyrfm5r0T28H9haSgTWYduw4TePLrHLtCsNfyhh?=
- =?us-ascii?Q?DCT2hXC+AQTd8VAAX0sHS9f4h1L0M8hKLp6wBZynft/rqqSKWZhP6kQna6IP?=
- =?us-ascii?Q?pNGYifH7TJgyxUc9fm5LmdZEDPKA8BQYqUOS4Bb43DBzRJrIYWa1PHD7Nu8r?=
- =?us-ascii?Q?EumbZDX8gRtY4z+Cd2Gb9x9SXuoqDBalgGqYR79nTxm8wfJ7NDzF+C6TQuz7?=
- =?us-ascii?Q?st6bmDJqbSVeERnDVhbjhE1zNV3mAbxYQSJcdPnISuUaa/JUH4GUHG2/uBfN?=
- =?us-ascii?Q?IgIkzSuDvrYIZ2VjCF1mgFsUkqefkRKY+MUKFHDiPcJLVdMpD0S2clZH2Pif?=
- =?us-ascii?Q?z2DXCkxmvqPWo2q+nBQQCwhs9uGO8ewcTrUN2NPSq1NJYCTaohIZFtwYd/cT?=
- =?us-ascii?Q?XZ3Qp+7Yx4BdHPFlutc3XAx0b7eL6OMuuznmpRyrfchPweS3I7vh+L4dNyMM?=
- =?us-ascii?Q?5ccuK4cTWp0gkr2y+q8u1wY1Eu1ZaefXcIfl0dhu3Kzlrmja8Kg8sonDy3aY?=
- =?us-ascii?Q?qYyLY0saFucRysP8yCiC/FOy7dU1vXzyq2lv/mRs7iVOSiquagnrsiDHE79J?=
- =?us-ascii?Q?SLru0ZfI8lkN6AprOc4Vong/80oEGafTaDwM6HaA4S3W9c0y9lkGXhoW2o0a?=
- =?us-ascii?Q?XQPM6vQZWjMM9yIE7Q+mq1VTrZTa9H1OZ8ZNOBQ7eefadTMQ2tjHuRRnto2r?=
- =?us-ascii?Q?5nf5DZ6G6S1rA6mDFUuH1ljg0RpnNfVV/ldLLVTD64Hy3BBzYtqkcAhoxp1r?=
- =?us-ascii?Q?Jx15P/Zv4eNB9MkSbUl1kwa5tK9C1NmyUtIt2OW0o+zQkYwlO9YOtZW0AKlQ?=
- =?us-ascii?Q?FyadstVjwQN/hKPNwqfvAW2rNw4ptWeHTVBB3M6L8F6iSpPxl9EOF5e1GUAp?=
- =?us-ascii?Q?FRFm9ZivHs+8V2BlaAkYFbpWJJb9qrGmRJCjS9J4KV9T75NQe6BgDl+kGhi0?=
- =?us-ascii?Q?pHm+FZOZAgQP7/PbpRHQbke9qYhPBkLGbcpfG5XATn9ZByclfGU/tn+kA6Lw?=
- =?us-ascii?Q?uXanMVpOcbliFA2t+PZHAf1cStQhPykW1HEd32u7Gruhp9xjUU2HiGBZVb82?=
- =?us-ascii?Q?rDDzzTjaPiORqYS0DRnF5OtuwfZ7QSdcTOJ1diP10E319M8yJsPmpnRgfc4q?=
- =?us-ascii?Q?YURsh2DNb/cteCOuL5vShslm6t1VrBOp6vUaomUJ?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f576df2f-315b-4461-7363-08dd8c77e69e
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2025 08:27:55.6805
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5K7V8oes9kHCmmKqJHaKa1HsqP98HgDmznShiDZolGSF4nBZZ1biHomuRbaskWyCALJ89apCUG08PS98h5hX2A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB7744
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250505221419.2672473-554-sashal@kernel.org>
 
-Add internal loopback support for i.MX95 ENETC PF, the default loopback
-mode is MAC level loopback, the MAC Tx data is looped back onto the Rx.
-The MAC interface runs at a fixed 1:8 ratio of NETC clock in MAC-level
-loopback mode, with no dependency on Tx clock.
+Hello,
 
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
----
- .../net/ethernet/freescale/enetc/enetc4_pf.c   | 18 ++++++++++++++++++
- .../ethernet/freescale/enetc/enetc_pf_common.c |  4 +---
- 2 files changed, 19 insertions(+), 3 deletions(-)
+On Mon, May 05, 2025 at 06:12:50PM -0400, Sasha Levin wrote:
+> From: Antoine Tenart <atenart@kernel.org>
+> 
+> [ Upstream commit 79c61899b5eee317907efd1b0d06a1ada0cc00d8 ]
+> 
+> There is an ABBA deadlock between net device unregistration and sysfs
+> files being accessed[1][2]. To prevent this from happening all paths
+> taking the rtnl lock after the sysfs one (actually kn->active refcount)
+> use rtnl_trylock and return early (using restart_syscall)[3], which can
+> make syscalls to spin for a long time when there is contention on the
+> rtnl lock[4].
+> 
+> There are not many possibilities to improve the above:
+> - Rework the entire net/ locking logic.
+> - Invert two locks in one of the paths — not possible.
+> 
+> But here it's actually possible to drop one of the locks safely: the
+> kernfs_node refcount. More details in the code itself, which comes with
+> lots of comments.
+> 
+> Note that we check the device is alive in the added sysfs_rtnl_lock
+> helper to disallow sysfs operations to run after device dismantle has
+> started. This also help keeping the same behavior as before. Because of
+> this calls to dev_isalive in sysfs ops were removed.
+> 
+> [1] https://lore.kernel.org/netdev/49A4D5D5.5090602@trash.net/
+> [2] https://lore.kernel.org/netdev/m14oyhis31.fsf@fess.ebiederm.org/
+> [3] https://lore.kernel.org/netdev/20090226084924.16cb3e08@nehalam/
+> [4] https://lore.kernel.org/all/20210928125500.167943-1-atenart@kernel.org/T/
+> 
+> Signed-off-by: Antoine Tenart <atenart@kernel.org>
+> Link: https://patch.msgid.link/20250204170314.146022-2-atenart@kernel.org
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc4_pf.c b/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-index 1f6500f12bbb..c16378eb50bc 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc4_pf.c
-@@ -101,6 +101,21 @@ static void enetc4_pf_set_si_mc_hash_filter(struct enetc_hw *hw, int si,
- 	enetc_port_wr(hw, ENETC4_PSIMMHFR1(si), upper_32_bits(hash));
- }
- 
-+static void enetc4_pf_set_loopback(struct net_device *ndev, bool en)
-+{
-+	struct enetc_ndev_priv *priv = netdev_priv(ndev);
-+	struct enetc_si *si = priv->si;
-+	u32 val;
-+
-+	val = enetc_port_mac_rd(si, ENETC4_PM_CMD_CFG(0));
-+	val = u32_replace_bits(val, en ? 1 : 0, PM_CMD_CFG_LOOP_EN);
-+	/* Default to select MAC level loopback mode if loopback is enabled. */
-+	val = u32_replace_bits(val, en ? LPBCK_MODE_MAC_LEVEL : 0,
-+			       PM_CMD_CFG_LPBK_MODE);
-+
-+	enetc_port_mac_wr(si, ENETC4_PM_CMD_CFG(0), val);
-+}
-+
- static void enetc4_pf_clear_maft_entries(struct enetc_pf *pf)
- {
- 	int i;
-@@ -536,6 +551,9 @@ static int enetc4_pf_set_features(struct net_device *ndev,
- 		enetc4_pf_set_si_vlan_promisc(hw, 0, promisc_en);
- 	}
- 
-+	if (changed & NETIF_F_LOOPBACK)
-+		enetc4_pf_set_loopback(ndev, !!(features & NETIF_F_LOOPBACK));
-+
- 	enetc_set_features(ndev, features);
- 
- 	return 0;
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-index 8c563e552021..edf14a95cab7 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-@@ -134,10 +134,8 @@ void enetc_pf_netdev_setup(struct enetc_si *si, struct net_device *ndev,
- 	}
- 
- 	/* TODO: currently, i.MX95 ENETC driver does not support advanced features */
--	if (!is_enetc_rev1(si)) {
--		ndev->hw_features &= ~NETIF_F_LOOPBACK;
-+	if (!is_enetc_rev1(si))
- 		goto end;
--	}
- 
- 	ndev->xdp_features = NETDEV_XDP_ACT_BASIC | NETDEV_XDP_ACT_REDIRECT |
- 			     NETDEV_XDP_ACT_NDO_XMIT | NETDEV_XDP_ACT_RX_SG |
--- 
-2.34.1
+I'm not sure why commits from this series were flagged for stable trees,
+but I would not advise to take them. They are not fixing a bug, only
+improving performances by reducing lock contention.
 
+The commits are:
+
+79c61899b5ee  net-sysfs: remove rtnl_trylock from device attributes
+b7ecc1de51ca  net-sysfs: move queue attribute groups outside the default groups
+[It seems this one was missed?]
+7e54f85c6082  net-sysfs: prevent uncleared queues from being re-added
+[My guess is this looks like a real fix, but it's only preventing an
+issue after the changes made in the series]
+b0b6fcfa6ad8  net-sysfs: remove rtnl_trylock from queue attributes
+
+Same applies for the other stable backport requests.
+
+Thanks,
+Antoine
+
+> ---
+>  include/linux/rtnetlink.h |   1 +
+>  net/core/net-sysfs.c      | 186 +++++++++++++++++++++++++++-----------
+>  net/core/rtnetlink.c      |   5 +
+>  3 files changed, 139 insertions(+), 53 deletions(-)
+> 
+> diff --git a/include/linux/rtnetlink.h b/include/linux/rtnetlink.h
+> index 4bc2ee0b10b05..ccaaf4c7d5f6a 100644
+> --- a/include/linux/rtnetlink.h
+> +++ b/include/linux/rtnetlink.h
+> @@ -43,6 +43,7 @@ extern void rtnl_lock(void);
+>  extern void rtnl_unlock(void);
+>  extern int rtnl_trylock(void);
+>  extern int rtnl_is_locked(void);
+> +extern int rtnl_lock_interruptible(void);
+>  extern int rtnl_lock_killable(void);
+>  extern bool refcount_dec_and_rtnl_lock(refcount_t *r);
+>  
+> diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+> index 87b2456aef08a..cedbe7d9ae670 100644
+> --- a/net/core/net-sysfs.c
+> +++ b/net/core/net-sysfs.c
+> @@ -42,6 +42,87 @@ static inline int dev_isalive(const struct net_device *dev)
+>  	return READ_ONCE(dev->reg_state) <= NETREG_REGISTERED;
+>  }
+>  
+> +/* There is a possible ABBA deadlock between rtnl_lock and kernfs_node->active,
+> + * when unregistering a net device and accessing associated sysfs files. The
+> + * potential deadlock is as follow:
+> + *
+> + *         CPU 0                                         CPU 1
+> + *
+> + *    rtnl_lock                                   vfs_read
+> + *    unregister_netdevice_many                   kernfs_seq_start
+> + *    device_del / kobject_put                      kernfs_get_active (kn->active++)
+> + *    kernfs_drain                                sysfs_kf_seq_show
+> + *    wait_event(                                 rtnl_lock
+> + *       kn->active == KN_DEACTIVATED_BIAS)       -> waits on CPU 0 to release
+> + *    -> waits on CPU 1 to decrease kn->active       the rtnl lock.
+> + *
+> + * The historical fix was to use rtnl_trylock with restart_syscall to bail out
+> + * of sysfs operations when the lock couldn't be taken. This fixed the above
+> + * issue as it allowed CPU 1 to bail out of the ABBA situation.
+> + *
+> + * But it came with performances issues, as syscalls are being restarted in
+> + * loops when there was contention on the rtnl lock, with huge slow downs in
+> + * specific scenarios (e.g. lots of virtual interfaces created and userspace
+> + * daemons querying their attributes).
+> + *
+> + * The idea below is to bail out of the active kernfs_node protection
+> + * (kn->active) while trying to take the rtnl lock.
+> + *
+> + * This replaces rtnl_lock() and still has to be used with rtnl_unlock(). The
+> + * net device is guaranteed to be alive if this returns successfully.
+> + */
+> +static int sysfs_rtnl_lock(struct kobject *kobj, struct attribute *attr,
+> +			   struct net_device *ndev)
+> +{
+> +	struct kernfs_node *kn;
+> +	int ret = 0;
+> +
+> +	/* First, we hold a reference to the net device as the unregistration
+> +	 * path might run in parallel. This will ensure the net device and the
+> +	 * associated sysfs objects won't be freed while we try to take the rtnl
+> +	 * lock.
+> +	 */
+> +	dev_hold(ndev);
+> +	/* sysfs_break_active_protection was introduced to allow self-removal of
+> +	 * devices and their associated sysfs files by bailing out of the
+> +	 * sysfs/kernfs protection. We do this here to allow the unregistration
+> +	 * path to complete in parallel. The following takes a reference on the
+> +	 * kobject and the kernfs_node being accessed.
+> +	 *
+> +	 * This works because we hold a reference onto the net device and the
+> +	 * unregistration path will wait for us eventually in netdev_run_todo
+> +	 * (outside an rtnl lock section).
+> +	 */
+> +	kn = sysfs_break_active_protection(kobj, attr);
+> +	/* We can now try to take the rtnl lock. This can't deadlock us as the
+> +	 * unregistration path is able to drain sysfs files (kernfs_node) thanks
+> +	 * to the above dance.
+> +	 */
+> +	if (rtnl_lock_interruptible()) {
+> +		ret = -ERESTARTSYS;
+> +		goto unbreak;
+> +	}
+> +	/* Check dismantle on the device hasn't started, otherwise deny the
+> +	 * operation.
+> +	 */
+> +	if (!dev_isalive(ndev)) {
+> +		rtnl_unlock();
+> +		ret = -ENODEV;
+> +		goto unbreak;
+> +	}
+> +	/* We are now sure the device dismantle hasn't started nor that it can
+> +	 * start before we exit the locking section as we hold the rtnl lock.
+> +	 * There's no need to keep unbreaking the sysfs protection nor to hold
+> +	 * a net device reference from that point; that was only needed to take
+> +	 * the rtnl lock.
+> +	 */
+> +unbreak:
+> +	sysfs_unbreak_active_protection(kn);
+> +	dev_put(ndev);
+> +
+> +	return ret;
+> +}
+> +
+>  /* use same locking rules as GIF* ioctl's */
+>  static ssize_t netdev_show(const struct device *dev,
+>  			   struct device_attribute *attr, char *buf,
+> @@ -95,14 +176,14 @@ static ssize_t netdev_store(struct device *dev, struct device_attribute *attr,
+>  	if (ret)
+>  		goto err;
+>  
+> -	if (!rtnl_trylock())
+> -		return restart_syscall();
+> +	ret = sysfs_rtnl_lock(&dev->kobj, &attr->attr, netdev);
+> +	if (ret)
+> +		goto err;
+> +
+> +	ret = (*set)(netdev, new);
+> +	if (ret == 0)
+> +		ret = len;
+>  
+> -	if (dev_isalive(netdev)) {
+> -		ret = (*set)(netdev, new);
+> -		if (ret == 0)
+> -			ret = len;
+> -	}
+>  	rtnl_unlock();
+>   err:
+>  	return ret;
+> @@ -220,7 +301,7 @@ static ssize_t carrier_store(struct device *dev, struct device_attribute *attr,
+>  	struct net_device *netdev = to_net_dev(dev);
+>  
+>  	/* The check is also done in change_carrier; this helps returning early
+> -	 * without hitting the trylock/restart in netdev_store.
+> +	 * without hitting the locking section in netdev_store.
+>  	 */
+>  	if (!netdev->netdev_ops->ndo_change_carrier)
+>  		return -EOPNOTSUPP;
+> @@ -234,8 +315,9 @@ static ssize_t carrier_show(struct device *dev,
+>  	struct net_device *netdev = to_net_dev(dev);
+>  	int ret = -EINVAL;
+>  
+> -	if (!rtnl_trylock())
+> -		return restart_syscall();
+> +	ret = sysfs_rtnl_lock(&dev->kobj, &attr->attr, netdev);
+> +	if (ret)
+> +		return ret;
+>  
+>  	if (netif_running(netdev)) {
+>  		/* Synchronize carrier state with link watch,
+> @@ -245,8 +327,8 @@ static ssize_t carrier_show(struct device *dev,
+>  
+>  		ret = sysfs_emit(buf, fmt_dec, !!netif_carrier_ok(netdev));
+>  	}
+> -	rtnl_unlock();
+>  
+> +	rtnl_unlock();
+>  	return ret;
+>  }
+>  static DEVICE_ATTR_RW(carrier);
+> @@ -258,13 +340,14 @@ static ssize_t speed_show(struct device *dev,
+>  	int ret = -EINVAL;
+>  
+>  	/* The check is also done in __ethtool_get_link_ksettings; this helps
+> -	 * returning early without hitting the trylock/restart below.
+> +	 * returning early without hitting the locking section below.
+>  	 */
+>  	if (!netdev->ethtool_ops->get_link_ksettings)
+>  		return ret;
+>  
+> -	if (!rtnl_trylock())
+> -		return restart_syscall();
+> +	ret = sysfs_rtnl_lock(&dev->kobj, &attr->attr, netdev);
+> +	if (ret)
+> +		return ret;
+>  
+>  	if (netif_running(netdev)) {
+>  		struct ethtool_link_ksettings cmd;
+> @@ -284,13 +367,14 @@ static ssize_t duplex_show(struct device *dev,
+>  	int ret = -EINVAL;
+>  
+>  	/* The check is also done in __ethtool_get_link_ksettings; this helps
+> -	 * returning early without hitting the trylock/restart below.
+> +	 * returning early without hitting the locking section below.
+>  	 */
+>  	if (!netdev->ethtool_ops->get_link_ksettings)
+>  		return ret;
+>  
+> -	if (!rtnl_trylock())
+> -		return restart_syscall();
+> +	ret = sysfs_rtnl_lock(&dev->kobj, &attr->attr, netdev);
+> +	if (ret)
+> +		return ret;
+>  
+>  	if (netif_running(netdev)) {
+>  		struct ethtool_link_ksettings cmd;
+> @@ -490,16 +574,15 @@ static ssize_t ifalias_store(struct device *dev, struct device_attribute *attr,
+>  	if (len >  0 && buf[len - 1] == '\n')
+>  		--count;
+>  
+> -	if (!rtnl_trylock())
+> -		return restart_syscall();
+> +	ret = sysfs_rtnl_lock(&dev->kobj, &attr->attr, netdev);
+> +	if (ret)
+> +		return ret;
+>  
+> -	if (dev_isalive(netdev)) {
+> -		ret = dev_set_alias(netdev, buf, count);
+> -		if (ret < 0)
+> -			goto err;
+> -		ret = len;
+> -		netdev_state_change(netdev);
+> -	}
+> +	ret = dev_set_alias(netdev, buf, count);
+> +	if (ret < 0)
+> +		goto err;
+> +	ret = len;
+> +	netdev_state_change(netdev);
+>  err:
+>  	rtnl_unlock();
+>  
+> @@ -551,24 +634,23 @@ static ssize_t phys_port_id_show(struct device *dev,
+>  				 struct device_attribute *attr, char *buf)
+>  {
+>  	struct net_device *netdev = to_net_dev(dev);
+> +	struct netdev_phys_item_id ppid;
+>  	ssize_t ret = -EINVAL;
+>  
+>  	/* The check is also done in dev_get_phys_port_id; this helps returning
+> -	 * early without hitting the trylock/restart below.
+> +	 * early without hitting the locking section below.
+>  	 */
+>  	if (!netdev->netdev_ops->ndo_get_phys_port_id)
+>  		return -EOPNOTSUPP;
+>  
+> -	if (!rtnl_trylock())
+> -		return restart_syscall();
+> +	ret = sysfs_rtnl_lock(&dev->kobj, &attr->attr, netdev);
+> +	if (ret)
+> +		return ret;
+>  
+> -	if (dev_isalive(netdev)) {
+> -		struct netdev_phys_item_id ppid;
+> +	ret = dev_get_phys_port_id(netdev, &ppid);
+> +	if (!ret)
+> +		ret = sysfs_emit(buf, "%*phN\n", ppid.id_len, ppid.id);
+>  
+> -		ret = dev_get_phys_port_id(netdev, &ppid);
+> -		if (!ret)
+> -			ret = sysfs_emit(buf, "%*phN\n", ppid.id_len, ppid.id);
+> -	}
+>  	rtnl_unlock();
+>  
+>  	return ret;
+> @@ -580,24 +662,23 @@ static ssize_t phys_port_name_show(struct device *dev,
+>  {
+>  	struct net_device *netdev = to_net_dev(dev);
+>  	ssize_t ret = -EINVAL;
+> +	char name[IFNAMSIZ];
+>  
+>  	/* The checks are also done in dev_get_phys_port_name; this helps
+> -	 * returning early without hitting the trylock/restart below.
+> +	 * returning early without hitting the locking section below.
+>  	 */
+>  	if (!netdev->netdev_ops->ndo_get_phys_port_name &&
+>  	    !netdev->devlink_port)
+>  		return -EOPNOTSUPP;
+>  
+> -	if (!rtnl_trylock())
+> -		return restart_syscall();
+> +	ret = sysfs_rtnl_lock(&dev->kobj, &attr->attr, netdev);
+> +	if (ret)
+> +		return ret;
+>  
+> -	if (dev_isalive(netdev)) {
+> -		char name[IFNAMSIZ];
+> +	ret = dev_get_phys_port_name(netdev, name, sizeof(name));
+> +	if (!ret)
+> +		ret = sysfs_emit(buf, "%s\n", name);
+>  
+> -		ret = dev_get_phys_port_name(netdev, name, sizeof(name));
+> -		if (!ret)
+> -			ret = sysfs_emit(buf, "%s\n", name);
+> -	}
+>  	rtnl_unlock();
+>  
+>  	return ret;
+> @@ -608,26 +689,25 @@ static ssize_t phys_switch_id_show(struct device *dev,
+>  				   struct device_attribute *attr, char *buf)
+>  {
+>  	struct net_device *netdev = to_net_dev(dev);
+> +	struct netdev_phys_item_id ppid = { };
+>  	ssize_t ret = -EINVAL;
+>  
+>  	/* The checks are also done in dev_get_phys_port_name; this helps
+> -	 * returning early without hitting the trylock/restart below. This works
+> +	 * returning early without hitting the locking section below. This works
+>  	 * because recurse is false when calling dev_get_port_parent_id.
+>  	 */
+>  	if (!netdev->netdev_ops->ndo_get_port_parent_id &&
+>  	    !netdev->devlink_port)
+>  		return -EOPNOTSUPP;
+>  
+> -	if (!rtnl_trylock())
+> -		return restart_syscall();
+> +	ret = sysfs_rtnl_lock(&dev->kobj, &attr->attr, netdev);
+> +	if (ret)
+> +		return ret;
+>  
+> -	if (dev_isalive(netdev)) {
+> -		struct netdev_phys_item_id ppid = { };
+> +	ret = dev_get_port_parent_id(netdev, &ppid, false);
+> +	if (!ret)
+> +		ret = sysfs_emit(buf, "%*phN\n", ppid.id_len, ppid.id);
+>  
+> -		ret = dev_get_port_parent_id(netdev, &ppid, false);
+> -		if (!ret)
+> -			ret = sysfs_emit(buf, "%*phN\n", ppid.id_len, ppid.id);
+> -	}
+>  	rtnl_unlock();
+>  
+>  	return ret;
+> diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+> index ab7041150f295..e1f9af1d75a50 100644
+> --- a/net/core/rtnetlink.c
+> +++ b/net/core/rtnetlink.c
+> @@ -80,6 +80,11 @@ void rtnl_lock(void)
+>  }
+>  EXPORT_SYMBOL(rtnl_lock);
+>  
+> +int rtnl_lock_interruptible(void)
+> +{
+> +	return mutex_lock_interruptible(&rtnl_mutex);
+> +}
+> +
+>  int rtnl_lock_killable(void)
+>  {
+>  	return mutex_lock_killable(&rtnl_mutex);
+> -- 
+> 2.39.5
+> 
 
