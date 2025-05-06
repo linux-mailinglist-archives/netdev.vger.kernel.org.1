@@ -1,122 +1,119 @@
-Return-Path: <netdev+bounces-188358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B921AAC747
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 16:01:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BFFDAAC76B
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 16:06:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65EB57B5F71
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 13:59:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88D3D522081
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 14:05:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 832B828150D;
-	Tue,  6 May 2025 14:00:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBD3028135C;
+	Tue,  6 May 2025 14:05:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=syst3mfailure.io header.i=@syst3mfailure.io header.b="MhLnVgbX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vg0x5+8J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-24421.protonmail.ch (mail-24421.protonmail.ch [109.224.244.21])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8C9C17BA5
-	for <netdev@vger.kernel.org>; Tue,  6 May 2025 14:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25F85281374
+	for <netdev@vger.kernel.org>; Tue,  6 May 2025 14:05:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746540056; cv=none; b=QKdcu969sWh0hN8tg5BcbjUDRWZPsp4QmVqVDora1ZpG2jUPHW1iiLrcwVGwEcv6h64YxqBhFhHNj2PlXvVG9jjfg0g/Y6EnxgmUpTJBFedu4O7AMcjFz0Z5vzwZPwn/do3KiKobLvN/rJzaHE30xXsNJJZQ2biijA5Q8odlczc=
+	t=1746540342; cv=none; b=Wa2O39ZJOA1cmoTUPKpdTQPczsQNwOwxUpHgetWY3OA4ymf+5es/iZWuc/TxPCAprEVLhFmmINSBvfftogFRxaKzwWXo2QMRdB6A7qoq2leVEX4hc6Cq0FYwR1oIgpgpnGsE/pThncItdL2p42566aHDXo2mztbEWZ+plcPGUdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746540056; c=relaxed/simple;
-	bh=jfBhPfjLiM6iY0WmAgWEklMpTliZ0Rd+Xz1ClpC+TMk=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MX3q4CETJ+JBRQv82Z3/Bx/QlYo8P7nZYF4TAjfawR6CCEilFI7s3dumGr8fBQqpCzi8CS5xd1POi4nJMTMUYj3dw2gJxny32dzA85dOCvFn4i6kXKtbonNB42Twmei9zNvqzydmyRegK+C2I/bxV30gBwQ4XEG59hEYVQOPAOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=syst3mfailure.io; spf=pass smtp.mailfrom=syst3mfailure.io; dkim=pass (2048-bit key) header.d=syst3mfailure.io header.i=@syst3mfailure.io header.b=MhLnVgbX; arc=none smtp.client-ip=109.224.244.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=syst3mfailure.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=syst3mfailure.io
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=syst3mfailure.io;
-	s=protonmail2; t=1746540042; x=1746799242;
-	bh=KcroGX2/Sy8OMi7AdXYaSu4kr+3tToOUYqSxMG+6NTw=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
-	b=MhLnVgbXw/BW9b0u8AOrsiR6WTaqt8KDX/uYZG+HqTk9zuztLRhuc05arjQdUj36J
-	 m+hUZxR566DJrVJrn42Bu1w+zYgUSugbQYgsyo5M9qlXmcpatSnCKpD6JTE1tztzBq
-	 12Atic/KjhGDFfFTOMz0IgHt/kGvpvygSBIIpHpX9TnHzo1A7uOpac4YYRpbMtAJdE
-	 CcVmxCXORUIPkOV4qlAJxuRJmZ2lWYkuODwXs3zlq+mX1nfh+7dgtoYpodRxHEYI9/
-	 xe1hCzVL6arQcECrF8EZoal1J6RLL0YgtTvp7S07XoLQThTxMO1GjyEMp2YIKUo28i
-	 rvAviPfdMy67g==
-Date: Tue, 06 May 2025 14:00:36 +0000
-To: Cong Wang <xiyou.wangcong@gmail.com>
-From: Savy <savy@syst3mfailure.io>
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, jhs@mojatatu.com, willsroot@protonmail.com
-Subject: Re: [Patch net 1/2] net_sched: Flush gso_skb list too during ->change()
-Message-ID: <krDuBwNbhtDxUlG2tgiXBwSA9KUwph1GfKqwvjBxYDSJv6nVQ98S_inVmQxaRBsndKdgg-rh_vN0xouX4zraF6V3UyQHpWNJUv-rvd-Cwfg=@syst3mfailure.io>
-In-Reply-To: <20250506001549.65391-2-xiyou.wangcong@gmail.com>
-References: <20250506001549.65391-1-xiyou.wangcong@gmail.com> <20250506001549.65391-2-xiyou.wangcong@gmail.com>
-Feedback-ID: 69690694:user:proton
-X-Pm-Message-ID: a7b825dec6914280c8d9002f1c056b864630cb69
+	s=arc-20240116; t=1746540342; c=relaxed/simple;
+	bh=m8P3EWoP+kX/U0WepN2nEPt3XqQjeb7/cDgQjDBrta4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Xpj7oconiF2ZYX+VBTshr9jJ5tPudEpQJ/lHKMVK6JTmqvnVU6d2aqqz5KWo+bKQIqjOmhAPN7lQiV7xnp35I3RVMFNA2RPnmkuOKGziK3eDvqtb3D5+zstOI/c4QQikWqEOtNsSe2LuDnjOZxnWI85ua3AYl5Z/pK4qJb/2Omk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vg0x5+8J; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746540340;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LmkgEe/zoJIW9iTJvHF7KhR3zOP9cgU3gMh4xjoUmmI=;
+	b=Vg0x5+8JxGRt3jO5BgfsmmoIwOoaMB6upixQfWK4e/x9r92pwAx1tqVxShte4ZKgJVCAsL
+	SfU4QD6b1yob7DDQ8YddfWf4g+Sxq1NCcjujDvUDV8oMsoFLScIJMbXo3x5Q56USy9zpMm
+	Y/WFb1v9AhvpeHCeXXJtrXlqgQGoj1M=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-27-CtN-fxR9NR29vZNL5xAtsA-1; Tue, 06 May 2025 10:05:38 -0400
+X-MC-Unique: CtN-fxR9NR29vZNL5xAtsA-1
+X-Mimecast-MFC-AGG-ID: CtN-fxR9NR29vZNL5xAtsA_1746540338
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43eea5a5d80so31036355e9.1
+        for <netdev@vger.kernel.org>; Tue, 06 May 2025 07:05:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746540337; x=1747145137;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LmkgEe/zoJIW9iTJvHF7KhR3zOP9cgU3gMh4xjoUmmI=;
+        b=VilSFY8at1ylqDxQrtFRaPi/vdbtaZaZ2HRHlbVZjBrM1TD6aB4/tjhoINvaMrz89e
+         tkmCPfQ8uQCt1719h06d+BbTCtBhrTOsu9g3EWWkjFqDiKiwZ+2ZvWGW1tQmRuyeurAR
+         ncVpgY2KmYSho/1sSYewU9dpZtpneu7vlfDw+AhbZ5W1SXk6u6MQ1F4kF2/Z/1b0pL9V
+         xc26QKezPr/g023MHdT6rhnjBsqJ7YuS/133uq4soIq0wAkPoOzy/aLOEDJqUNyax2+b
+         9PjZzFXIEGirP15mY/rv92rC4CBrW4kFP2Z6tReyhNvFRufzpAAsbXLm/MhvI9ynjBJA
+         70Yw==
+X-Forwarded-Encrypted: i=1; AJvYcCV13NcGEOPQs2fQOtRUVncrjTCiZQzdEQ/mOUFnkJgiiMFcoVP/ZV2fCYRDwYsuG9oPcMQQiXA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgLGyNDik7qtboX0RnJaIOC3ncmb6iMQDLmBiXRFcvCbBCmrxH
+	jITDHJIKhzMO0SZfDNGUAtxifSgsffnfnBkPObmgOuBZPMro0aM6M3Ufal4rBUD2UYrsgTLEI+I
+	rxCAOeA8s1ElMnRUqXpNhq97/ZA7VGU72uHiTAQ1z0kDDP7hNZk+44g==
+X-Gm-Gg: ASbGncuxrpxJbJISpZXHnCy+oPmhj6AhLYydndyegc2WCKHtgFQQtxaK0dwJzO/WCTe
+	d5Pvsy34ahOQswi2IATQyPy5tVEHN+tMhjWIOBm9EhitVvGZ7eiZhIVxxZf9oH5ltB1DSeTWcrS
+	9a+gVRs3vJxvRnrVWIoI4WDkuBRue4OkpWh/BPcBCtUrcqHLKp41Hy+YeiBx1QavQXrDL+tR+qN
+	mDC8APosvayMHDdrTQfUUWnG6lrmHlyomvrvGSOykQJLeEq8cnnMs33pv24UY9JUMMNknYPQUva
+	ZZlic6+nRdyPn8kPzho=
+X-Received: by 2002:a05:600c:1e88:b0:43c:f513:958a with SMTP id 5b1f17b1804b1-441c48bdf64mr92711165e9.13.1746540337498;
+        Tue, 06 May 2025 07:05:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGepUjD22eYZierzyRzl6XCS1oXxMDWQze4ovAhd3moHpY1dHJBLieoYu1kCE54P4rlPKFjgw==
+X-Received: by 2002:a05:600c:1e88:b0:43c:f513:958a with SMTP id 5b1f17b1804b1-441c48bdf64mr92710485e9.13.1746540336892;
+        Tue, 06 May 2025 07:05:36 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2706:e010::f39? ([2a0d:3344:2706:e010::f39])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-441b89cc469sm173068965e9.6.2025.05.06.07.05.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 May 2025 07:05:36 -0700 (PDT)
+Message-ID: <a6b82986-52df-4d51-b854-a2eb5842a574@redhat.com>
+Date: Tue, 6 May 2025 16:05:30 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 08/15] net: homa: create homa_pacer.h and
+ homa_pacer.c
+To: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org
+Cc: edumazet@google.com, horms@kernel.org, kuba@kernel.org
+References: <20250502233729.64220-1-ouster@cs.stanford.edu>
+ <20250502233729.64220-9-ouster@cs.stanford.edu>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250502233729.64220-9-ouster@cs.stanford.edu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tuesday, May 6th, 2025 at 12:15 AM, Cong Wang <xiyou.wangcong@gmail.com>=
- wrote:
+On 5/3/25 1:37 AM, John Ousterhout wrote:
+> +	/**
+> +	 * @link_mbps: The raw bandwidth of the network uplink, in
+> +	 * units of 1e06 bits per second.  Set externally via sysctl.
+> +	 */
+> +	int link_mbps;
 
->=20
-> the main skb queue was trimmed, potentially leaving packets in the gso_sk=
-b
-> list. This could result in NULL pointer dereference when we only check
-> sch->q.qlen against sch->limit.
->=20
->=20
+This is will be extremely problematic. In practice nobody will set this
+correctly and in some cases the info is not even available (VM) or will
+change dynamically due to policing/shaping.
 
-Hi Cong,
+I think you need to build your own estimator of the available B/W. I'm
+unsure/I don't think you can re-use bql info here.
 
-With this version of the patch, the null-ptr-deref can still be triggered.
-We also need to decrement sch->q.qlen if __skb_dequeue() returns a valid sk=
-b.
+/P
 
-We will take Codel as an example.
-
-        while (sch->q.qlen > sch->limit) {
-                struct sk_buff *skb =3D qdisc_dequeue_internal(sch, true);
-                ...
-        }
-
-If sch->q.qlen is 1 and there is a single packet in the gso_skb list,
-if sch->limit is dropped to 0 in codel_change, then qdisc_dequeue_internal(=
-) -> __skb_dequeue()
-will remove the skb from the gso_skb list, leaving sch->q.qlen unaltered.
-At this point, the while loop continues, as sch->q.qlen is still 1, but now=
- both the main queue and gso_skb are empty,
-so when qdisc_dequeue_internal() is called again, it returns NULL, and the =
-null-ptr-deref occurs.
-
-Something like this can fix the issue (tested with Codel):
-
-static inline struct sk_buff *qdisc_dequeue_internal(struct Qdisc *sch, boo=
-l direct)
-{
-        struct sk_buff *skb;
-
-        skb =3D __skb_dequeue(&sch->gso_skb);
-        if (skb) {
-                sch->q.qlen--;
-                return skb;
-        }
-
-        if (direct) {
-                skb =3D __qdisc_dequeue_head(&sch->q);
-        } else {
-                skb =3D sch->dequeue(sch);
-        }
-        return skb;
-}
-
-Regards,
-Savy
-Will
 
