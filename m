@@ -1,135 +1,95 @@
-Return-Path: <netdev+bounces-188276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70773AABDFB
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 10:56:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83C82AABED4
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 11:16:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 94AA77AC9FB
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:55:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 299991C282DE
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 09:15:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93481256C7D;
-	Tue,  6 May 2025 08:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE83627AC4B;
+	Tue,  6 May 2025 09:09:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XgSh9qd7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U/P3/SzQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6149F216399;
-	Tue,  6 May 2025 08:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 988CF27AC39;
+	Tue,  6 May 2025 09:09:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746521792; cv=none; b=UFh7H8BMPjcjdWbret/ZpW1C6nnA/dzDW2S24Hf/6NRLZzfEOpawKzutT9SlCPCDnXHMzoS/NSPZZ71WpAWKdoitTaF5U4qm54eKhqpwJPggrVyD8E9yO75eT7f33sw5paDcU+0w4eH6ExfLR7Q99SE4zskUumqH2cD5jEQYPws=
+	t=1746522589; cv=none; b=jGdjGRHYwdQcN9m2o0D1CrUVbMM9GsbwecSryD7Is7EN5gzFfYh/G3Bl0V3Zj7ow6N+9ceDsLbeZJAD2TX25nYapOLaouT53cGb7GIlxSvc9We54jiiK+0KppCwA10oKUfOKAYBnFP6pRCRGLZKXc5vMme4HKQkMwEsi45zVpr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746521792; c=relaxed/simple;
-	bh=qVZHyp88JCrxll1HUvVH3F1uXrcyk8ebeewT3tzyUyA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qzsUOMEf0+NQmpBBy1FdwExzaYMaBrIUtQrma1ph9g6EBqvXDDrFGQMOr6kuITWbY6vht5B+/LRTufSXL8rFHLHKQ2immyR73JCX9U+4WPfVUEYchCUg0PQLVLBvN/aBt/pi+UR7RlMfl9S2Q6ak6AvG2UShJsmnPH9KbomU5n4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XgSh9qd7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 942C1C4CEE4;
-	Tue,  6 May 2025 08:56:26 +0000 (UTC)
+	s=arc-20240116; t=1746522589; c=relaxed/simple;
+	bh=IBLkt51Dqj+Vf4R1YuGGgimLITou/R1H7/TssLq0RZQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=PqM4F2V+nrA6BhzDuSHyWAm4Y7Kw0Hars6i/fh4/s4nn3zE9Pl0otKapSDfdgIuqtEJiIPRY4PGRLoHDxV96rDX5x5b10+VDyH1C0fpRjoTc/IG6NZtmo7H1u7i7+1Ny6dxs29bsm8obA9uLHlR7mBCd/tFo/kY8XBN2KuE4SnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U/P3/SzQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D1A5C4CEE4;
+	Tue,  6 May 2025 09:09:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746521792;
-	bh=qVZHyp88JCrxll1HUvVH3F1uXrcyk8ebeewT3tzyUyA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XgSh9qd7o2kNDeo3OZ+KzR2Pj1P3AWvczzbjaZsNdGHLLQEY7U0W7rlgoxK1ZB3cl
-	 maLmSuhUMRUwgN4Qxu4xYtL4lj3YOPUREkn9rWTYOA0zPoChgB+pWtVT2Rxnqgf1rD
-	 5+P31LzmokYMJaeO5REpDL5haNaV2ElYHtFBsU2JJn4A7S37KDnyrijUBnWJx/s8Rf
-	 xMYF1INca9XnqdgE5lRtrWXCGogfSnS3D3DDVMQXZXYiqoxVymjVAHIaQdI/oDibKt
-	 hojwZ6N+t0bqNv2Am+ZI0xYhw3VmScrEO0jI6L51qlcNZH/kO94OzqY6lQc8SxXc5y
-	 O2/MxKpKkKw3A==
-Date: Tue, 6 May 2025 10:56:23 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Casey Schaufler <casey@schaufler-ca.com>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Eduard <eddyz87@gmail.com>, =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, 
-	Hao Luo <haoluo@google.com>, James Morris <jmorris@namei.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Jiri Olsa <jolsa@kernel.org>, KP Singh <kpsingh@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, LSM List <linux-security-module@vger.kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>, 
-	Network Development <netdev@vger.kernel.org>, Ondrej Mosnacek <omosnace@redhat.com>, 
-	Paul Moore <paul@paul-moore.com>, Stanislav Fomichev <sdf@fomichev.me>, selinux@vger.kernel.org, 
-	"Serge E . Hallyn" <serge@hallyn.com>, Song Liu <song@kernel.org>, 
-	Stephen Smalley <stephen.smalley.work@gmail.com>, Yonghong Song <yonghong.song@linux.dev>
-Subject: Re: [PATCH v1 bpf-next 4/5] bpf: Add kfunc to scrub SCM_RIGHTS at
- security_unix_may_send().
-Message-ID: <20250506-gehirn-festplatten-6ee995a756b7@brauner>
-References: <CAADnVQK1t3ZqERODdHJM_HaZDMm+JH4OFvwTsLNqZG0=4SQQcA@mail.gmail.com.txt>
- <20250506004550.67917-1-kuniyu@amazon.com>
- <CAADnVQ+bk8Qt=Zo4S2MZxB+O4G4q_EXB4P0BtJ3LjgbJuY_9_w@mail.gmail.com>
+	s=k20201202; t=1746522589;
+	bh=IBLkt51Dqj+Vf4R1YuGGgimLITou/R1H7/TssLq0RZQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=U/P3/SzQ9WFqJg7GUSCU1ZVtqUaQJQvYlPprT5WD9Iy/ID6bhk9wYk8gcY794F32/
+	 //ZcxEzsIb95ZB2+YzPPx+qtP9zhxTJTSEjfsehOHSqmJ//U+GgXh72iK6pIsb5MPb
+	 ZXfyErnkW0APWhnZP26f6MHf3HVrUMfW3aeonCO9uLfX07ZEcVr4aZn2/1fKZLkCGn
+	 7uXVrDVW88OU8M89fMPOGtUtu1GshQ1HL/Lu6WQbL5RTRsp00qwO8eZj57nn4T0c8Y
+	 1x4NJdDCa1niL7Qo9u1tSHzI6rEldE4X8jOmZYD5MFDpt3NTCHhh/QQuuHmEJI3YU1
+	 XZSkKwbMte+9g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70AF13822D64;
+	Tue,  6 May 2025 09:10:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAADnVQ+bk8Qt=Zo4S2MZxB+O4G4q_EXB4P0BtJ3LjgbJuY_9_w@mail.gmail.com>
+Subject: Re: [PATCH net-next v3] selftests: net: exit cleanly on SIGTERM / timeout
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174652262825.1103429.14575554229344854706.git-patchwork-notify@kernel.org>
+Date: Tue, 06 May 2025 09:10:28 +0000
+References: <20250503011856.46308-1-kuba@kernel.org>
+In-Reply-To: <20250503011856.46308-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ ecree.xilinx@gmail.com, petrm@nvidia.com, willemb@google.com,
+ sdf@fomichev.me, linux-kselftest@vger.kernel.org
 
-On Mon, May 05, 2025 at 05:56:49PM -0700, Alexei Starovoitov wrote:
-> On Mon, May 5, 2025 at 5:46 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
-> >
-> > From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-> > Date: Mon, 5 May 2025 17:13:32 -0700
-> > > On Mon, May 5, 2025 at 3:00 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
-> > > >
-> > > > As Christian Brauner said [0], systemd calls cmsg_close_all() [1] after
-> > > > each recvmsg() to close() unwanted file descriptors sent via SCM_RIGHTS.
-> > > >
-> > > > However, this cannot work around the issue that close() for unwanted file
-> > > > descriptors could block longer because the last fput() could occur on
-> > > > the receiver side once sendmsg() with SCM_RIGHTS succeeds.
-> > > >
-> > > > Also, even filtering by LSM at recvmsg() does not work for the same reason.
-> > > >
-> > > > Thus, we need a better way to filter SCM_RIGHTS on the sender side.
-> > > >
-> > > > Let's add a new kfunc to scrub all file descriptors from skb in
-> > > > sendmsg().
-> > > >
-> > > > This allows the receiver to keep recv()ing the bare data and disallows
-> > > > the sender to impose the potential slowness of the last fput().
-> > > >
-> > > > If necessary, we can add more granular filtering per file descriptor
-> > > > after refactoring GC code and adding some fd-to-file helpers for BPF.
-> > > >
-> > > > Sample:
-> > > >
-> > > > SEC("lsm/unix_may_send")
-> > > > int BPF_PROG(unix_scrub_scm_rights,
-> > > >              struct socket *sock, struct socket *other, struct sk_buff *skb)
-> > > > {
-> > > >         struct unix_skb_parms *cb;
-> > > >
-> > > >         if (skb && bpf_unix_scrub_fds(skb))
-> > > >                 return -EPERM;
-> > > >
-> > > >         return 0;
-> > > > }
-> > >
-> > > Any other programmability do you need there?
-> >
-> > This is kind of PoC, and as Kumar mentioned, per-fd scrubbing
-> > is ideal to cover the real use cases.
-> >
-> > https://lore.kernel.org/netdev/CAP01T77STmncrPt=BsFfEY6SX1+oYNXhPeZ1HC9J=S2jhOwQoQ@mail.gmail.com/
-> >
-> > for example:
-> > https://uapi-group.org/kernel-features/#filtering-on-received-file-descriptors
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Fri,  2 May 2025 18:18:56 -0700 you wrote:
+> ksft runner sends 2 SIGTERMs in a row if a test runs out of time.
+> Handle this in a similar way we handle SIGINT - cleanup and stop
+> running further tests.
 > 
-> Fair enough.
-> Would be great to have them as selftests to make sure that advanced
-> use cases are actually working.
+> Because we get 2 signals we need a bit of logic to ignore
+> the subsequent one, they come immediately one after the other
+> (due to commit 9616cb34b08e ("kselftest/runner.sh: Propagate SIGTERM
+> to runner child")).
+> 
+> [...]
 
-I think we should do both a socket option and the bpf fd filtering. They
-can compliment each other. We should not force the use of bpf for this.
-This is a very basic security guarantee we want that shouldn't require
-the involvement of any LSM whatsoever.
+Here is the summary with links:
+  - [net-next,v3] selftests: net: exit cleanly on SIGTERM / timeout
+    https://git.kernel.org/netdev/net-next/c/8f0ae19346ce
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
