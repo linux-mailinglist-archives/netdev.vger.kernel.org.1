@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-188211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7A46AAB967
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:57:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16D9EAAB8C9
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:42:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C79083A6862
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:41:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FB8C16F149
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:41:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E98DB290D9B;
-	Tue,  6 May 2025 03:57:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D8D9290DA2;
+	Tue,  6 May 2025 03:57:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XciCIkvg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fqazx+rA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B0F8290D9D
-	for <netdev@vger.kernel.org>; Tue,  6 May 2025 01:19:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A3B6290DA7;
+	Tue,  6 May 2025 01:19:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746494398; cv=none; b=Bqd9KIK5Uc8gUEe0XDa/f/MQ2MwueK8HuRqM0jPyBkJb5vpQ+onDH5PZXxgyTSsnQpHg/bRxon4fuH8X/KxG995c8eO5aJze2rtLPxqGBEm7xHGNInFbC/EeZNEl5G0z2HydKwXHwesPN4zhzxhTC5bACP96ppJShL5OjbQVwN0=
+	t=1746494400; cv=none; b=hkw8VlUglfmJKAhTH3NCTDNzC2G5VZV2j5y5bgFYgtTAx/Sbo0RV0qM1BjFWuW8kv/lSsEndAUpcZyx4NzdwfmPBqoWBuVAMH/pkUYLoeuqBEWB8itsbM9RoLu6uik3MTjtSfx7u/DfQSmyEeiICinMTjGupRUPv0pBLxNRPAkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746494398; c=relaxed/simple;
-	bh=xj4Os+WdiExkpD8Zgxlvke07JByqhTWf/PLeXJ2HIPo=;
+	s=arc-20240116; t=1746494400; c=relaxed/simple;
+	bh=HeZb4yEu/qemPLRKxvS0qir7D6RVJyn9J6jjk64llkY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FnYn3weTfO0EydakenAG10Zoclw4PAXjEKu4G5mZusGqERCIUih5p6+QFiwXzV3o2KMdUFem0ptD2zS6Etr8GTXsa8cGDomVksr3cseMtAcV/pfGSASphOZq1A+fstdR5VWdq1gBc3S/XXvrX/95P7nqi9cbdEFQtqF5xfAX7mM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XciCIkvg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1632C4CEE4;
-	Tue,  6 May 2025 01:19:57 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=gh4adq94wToceqwlclbKz2ZNziRJGQXQbVBM4hzAzJc3U19bLD1/2vtWYUJEeiTTdopz/gD+Rmg9FMoWLPvD4GMQKqHnUpwkJlQ1B9CXN1bp2mI8G5eJuCyXBEPrTYqcOFf0mjX6fMUuWl5/Xzq3VFLCrZ7abVuCSIxr7x03v8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fqazx+rA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B34AC4CEE4;
+	Tue,  6 May 2025 01:19:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746494398;
-	bh=xj4Os+WdiExkpD8Zgxlvke07JByqhTWf/PLeXJ2HIPo=;
+	s=k20201202; t=1746494399;
+	bh=HeZb4yEu/qemPLRKxvS0qir7D6RVJyn9J6jjk64llkY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XciCIkvg8te71lsOJtbBg8bGJuOslb39HIm3HLIqA1VKN8YRSymvd4hwuYTgS0bQo
-	 S7NatZOm2kN7016qTkVRv5C0Ingx1/gfzEnZQPCpSaQx/TyOu+Th5MazNFfNEy3mns
-	 ShbdiRxmw91gGRpioLnX6iopPQZC3BOQQRQhEnWlODTpNWVOUkjnURdNkyQH1r13dB
-	 bIlP1XoaqVM74TnGXI70jAmUP2Ct1FM0yACAr8uufW8PjyDA6CU3QYGwJmx6xyPw9d
-	 +9hB9YeZxZ6isRS3TP88zatQQawaDSMxkrlgjkiLfm4Vk430j0rbYJSdZGyrnc0A7N
-	 6wCsr8JF/fi4g==
+	b=Fqazx+rAsW6HzcDLt4vTAwwZ2zJ0TCi+PwCBGxFmfnzzS92jsuskx4/mcYuFD5Hw/
+	 LyBk1PRD9KgB/ASxpkPJMLIOL6MJ48POagziB673RrXQ5oyHisj7Km/Lgab6cLiEzB
+	 Brv3oDMngzLISkNHz8gtPyPlpjmALuckPedkTpE6DzrNGc+NH4KVITBYt5Mc2SvdHh
+	 C9iJ572n0+NUHWqI2QP8cTkTDhzkL5rOSaVQb5qSu/8Kfe8cIF9PopU71uXxV8usdH
+	 vPnbGfsE3u+Fu8oMPNHl32GwKGo8QHuUGckKxvBaRu/RjHQMIUeBpc1NAsA/u7whPQ
+	 ae9k6nlQPJL5g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C18380CFD9;
-	Tue,  6 May 2025 01:20:38 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD5F380CFD9;
+	Tue,  6 May 2025 01:20:39 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v1] tools: ynl-gen: validate 0 len strings from
- kernel
+Subject: Re: [PATCH net 0/3 v4] selftests: drv: net: fix `ping.py` test failure
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174649443724.1003512.5539017727353269660.git-patchwork-notify@kernel.org>
-Date: Tue, 06 May 2025 01:20:37 +0000
-References: <20250503043050.861238-1-dw@davidwei.uk>
-In-Reply-To: <20250503043050.861238-1-dw@davidwei.uk>
-To: David Wei <dw@davidwei.uk>
-Cc: netdev@vger.kernel.org, donald.hunter@gmail.com, kuba@kernel.org,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- horms@kernel.org, jacob.e.keller@intel.com
+ <174649443848.1003512.17960359288270090428.git-patchwork-notify@kernel.org>
+Date: Tue, 06 May 2025 01:20:38 +0000
+References: <20250503013518.1722913-1-mohsin.bashr@gmail.com>
+In-Reply-To: <20250503013518.1722913-1-mohsin.bashr@gmail.com>
+To: Mohsin Bashir <mohsin.bashr@gmail.com>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org,
+ ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+ john.fastabend@gmail.com, ap420073@gmail.com, linux-kselftest@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri,  2 May 2025 21:30:50 -0700 you wrote:
-> Strings from the kernel are guaranteed to be null terminated and
-> ynl_attr_validate() checks for this. But it doesn't check if the string
-> has a len of 0, which would cause problems when trying to access
-> data[len - 1]. Fix this by checking that len is positive.
+On Fri,  2 May 2025 18:35:15 -0700 you wrote:
+> Fix `ping.py` test failure on an ipv6 system, and appropriately handle the
+> cases where either one of the two address families (ipv4, ipv6) is not
+> present.
 > 
-> Signed-off-by: David Wei <dw@davidwei.uk>
+> Mohsin Bashir (3):
+>   selftests: drv: net: fix test failure on ipv6 sys
+>   selftests: drv: net: avoid skipping tests
+>   selftests: drv: net: add version indicator
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v1] tools: ynl-gen: validate 0 len strings from kernel
-    https://git.kernel.org/netdev/net/c/4720f9707c78
+  - [net,1/3] selftests: drv: net: fix test failure on ipv6 sys
+    https://git.kernel.org/netdev/net/c/b344a48cbe5f
+  - [net,2/3] selftests: drv: net: avoid skipping tests
+    https://git.kernel.org/netdev/net/c/8bb7d8e5cf7f
+  - [net,3/3] selftests: drv: net: add version indicator
+    https://git.kernel.org/netdev/net/c/4a9d494ca24b
 
 You are awesome, thank you!
 -- 
