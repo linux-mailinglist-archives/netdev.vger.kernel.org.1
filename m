@@ -1,147 +1,86 @@
-Return-Path: <netdev+bounces-188228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E59EAAB970
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:57:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97133AAB99A
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 09:00:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB85817375C
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:54:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9DE41C41CF2
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:55:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D244E3D3B8;
-	Tue,  6 May 2025 04:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FCE129B78E;
+	Tue,  6 May 2025 04:02:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="q7Y59Sv2"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="u+G4jXGP"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BAE32DA52E
-	for <netdev@vger.kernel.org>; Tue,  6 May 2025 02:52:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED1DF2874F5
+	for <netdev@vger.kernel.org>; Tue,  6 May 2025 02:58:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746499968; cv=none; b=fFC9Q7iW0xM2HqOIfLfe8nhwpzQLWoMGoLrfQ5l3ueV152JPt91n7SWRjhjcqgfzcWWTzRy94UMfS3JgMxsG4NXyiuc0Wk8N+ARwwHYZNTK67nMNYUy1XJMTD6z+Q8cxufw5VJ+mHlvazhafnQ2+MSX6J974N1oXfWOvVM5QYgA=
+	t=1746500287; cv=none; b=WUbz+QcPvw3mnv0FgrA5F7NXa0CMEy78vmhe77Lu8vrHypXcm7UAbSxw5lqxi9eOT3Vbjj8X5s+KMePAS4K6TyIv/4OIY+sJK/6eAVOSMEVYywFAon0SiNSJw1yAWDrHYHapnZ4HLjYvz444WxFpFMAXwp0M0kLMMY7B6tK7yEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746499968; c=relaxed/simple;
-	bh=I+Rv26GjS4KSNALIEBhVZMlFXm4GvJXZMsl//I41Rso=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cZmJgHl8L3WRY9YxnlxdRpa5q9kTXG2SkVbiWTgOdxlmsr1g3wh1uEbvNuGWLp1VtWoSsfifGAxU+adotdj2cpRmFgZQIVAOlvYXlBEoa96NHrY0YvC6QLUsVBHYh7hLpNQ5bNz9IPC2et7DixyAnLGRwUGVTTmA5wg2eFXfpK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=q7Y59Sv2; arc=none smtp.client-ip=95.215.58.180
+	s=arc-20240116; t=1746500287; c=relaxed/simple;
+	bh=LwbEy3wpNq3kSGayL5fDQ+4evJzz4QR3WrQDC86HT24=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:Cc:
+	 In-Reply-To:References; b=YWGnCxVX4bIdrVmHAUdO0ONCb6abS8MsmkHwtklGvQ+6MBkvJHCFPUSIs1uy8cqfOCCIlmbkUqnioLRaqRuNeiGCn9aSrY0125fDLihKv9K2E4B9VL02MxXq0VXrKKOs2A4fKyc6onL4myqbIwJB7WHGsn2tNUs8ULkMLa98eBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=u+G4jXGP; arc=none smtp.client-ip=95.215.58.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1746499961;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tw75EoSdg6zoL+Zi/I21b4aq2fuCyLyiBQ1sa4xiJrQ=;
-	b=q7Y59Sv2hCJ9PtPt3L/bAtdm+28a1Vyg1tmYkaJFCAucVOC1acZfu7hfD1C9byfn4gF4oL
-	8+/ontCfQLZ+07FB4aGARwF/oHKTVPASu+ACa55/77ki1HPiNEAUOkl/nVNIv7h12xscKE
-	zo9rXmvMKsaHOgRf/7iDKdAc8pEo6bg=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: vger.kernel.org@web.codeaurora.org
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org
-Subject: [RESEND PATCH bpf-next v4 2/2] bpf: Move the BPF net tracepoint definitions to net directory
-Date: Tue,  6 May 2025 10:51:25 +0800
-Message-ID: <20250506025131.136929-2-jiayuan.chen@linux.dev>
-In-Reply-To: <20250506025131.136929-1-jiayuan.chen@linux.dev>
-References: <20250506025131.136929-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1746500280;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LwbEy3wpNq3kSGayL5fDQ+4evJzz4QR3WrQDC86HT24=;
+	b=u+G4jXGPZQL5BsfNDyS+uaCXCL6j31zRZ1pCMqijsOaPOeq2hCIdAb8UsTKmWatQofotAK
+	dnli//rsDcLLqyTuAIilF5vfpmhsvtgn5qbAlJSaEBiQKm36HcPEGMBaPdGIgslMsFlGzm
+	AMXgIALDVBQ5+Qm2F5bN45duE5LEg18=
+Date: Tue, 06 May 2025 02:57:58 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
+Message-ID: <1c9aa8f91ef683dedbe71a59676ea159a64894d8@linux.dev>
+TLS-Required: No
+Subject: Re: [RESEND PATCH bpf-next v4 1/2] bpf, sockmap: Introduce tracing
+ capability for sockmap
+Cc: "Cong Wang" <xiyou.wangcong@gmail.com>, "Jakub Sitnicki"
+ <jakub@cloudflare.com>, "Steven Rostedt" <rostedt@goodmis.org>, "Alexei
+ Starovoitov" <ast@kernel.org>, "Daniel Borkmann" <daniel@iogearbox.net>,
+ "John Fastabend" <john.fastabend@gmail.com>, "Andrii Nakryiko"
+ <andrii@kernel.org>, "Martin KaFai Lau" <martin.lau@linux.dev>, "Eduard
+ Zingerman" <eddyz87@gmail.com>, "Song Liu" <song@kernel.org>, "Yonghong
+ Song" <yonghong.song@linux.dev>, "KP Singh" <kpsingh@kernel.org>,
+ "Stanislav Fomichev" <sdf@fomichev.me>, "Hao Luo" <haoluo@google.com>,
+ "Jiri Olsa" <jolsa@kernel.org>, "Masami Hiramatsu" <mhiramat@kernel.org>,
+ "Mathieu Desnoyers" <mathieu.desnoyers@efficios.com>, "David S. Miller"
+ <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Simon
+ Horman" <horms@kernel.org>, "Jesper Dangaard Brouer" <hawk@kernel.org>,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org
+In-Reply-To: <20250506025131.136929-1-jiayuan.chen@linux.dev>
+References: <20250506025131.136929-1-jiayuan.chen@linux.dev>
 X-Migadu-Flow: FLOW_OUT
 
-This commit relocates the BPF tracepoint definitions for XDP and sockmap
-from the kernel directory to net/bpf.
+I am resending this patch as I have discovered that the previous v3 patch=
+ which has already
+been reviewed was incorrectly marked as 'v2 superseded':
+https://github.com/kernel-patches/bpf/pull/8763
+(It seems that Patchwork closed it incorrectly?)
 
-This ensures that these tracepoints are controlled by the CONFIG_NET,
-avoiding unnecessary function definitions when the CONFIG_NET is disabled.
-Additionally, it prevents build failures caused by the use of net module
-functions when CONFIG_NET is not enabled.
-
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
----
- kernel/bpf/core.c       | 7 -------
- net/bpf/Makefile        | 1 +
- net/bpf/bpf_net_trace.c | 8 ++++++++
- 3 files changed, 9 insertions(+), 7 deletions(-)
- create mode 100644 net/bpf/bpf_net_trace.c
-
-diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
-index a3e571688421..18b6e157362b 100644
---- a/kernel/bpf/core.c
-+++ b/kernel/bpf/core.c
-@@ -3185,10 +3185,3 @@ late_initcall(bpf_global_ma_init);
- 
- DEFINE_STATIC_KEY_FALSE(bpf_stats_enabled_key);
- EXPORT_SYMBOL(bpf_stats_enabled_key);
--
--/* All definitions of tracepoints related to BPF. */
--#define CREATE_TRACE_POINTS
--#include <linux/bpf_trace.h>
--
--EXPORT_TRACEPOINT_SYMBOL_GPL(xdp_exception);
--EXPORT_TRACEPOINT_SYMBOL_GPL(xdp_bulk_tx);
-diff --git a/net/bpf/Makefile b/net/bpf/Makefile
-index 1ebe270bde23..e95453053159 100644
---- a/net/bpf/Makefile
-+++ b/net/bpf/Makefile
-@@ -1,5 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0-only
- obj-$(CONFIG_BPF_SYSCALL)	:= test_run.o
-+obj-$(CONFIG_BPF_SYSCALL)	+= bpf_net_trace.o
- ifeq ($(CONFIG_BPF_JIT),y)
- obj-$(CONFIG_BPF_SYSCALL)	+= bpf_dummy_struct_ops.o
- endif
-diff --git a/net/bpf/bpf_net_trace.c b/net/bpf/bpf_net_trace.c
-new file mode 100644
-index 000000000000..e7c0537dbffd
---- /dev/null
-+++ b/net/bpf/bpf_net_trace.c
-@@ -0,0 +1,8 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+/* All definitions of net tracepoints related to BPF. */
-+#define CREATE_TRACE_POINTS
-+#include <linux/bpf_trace.h>
-+
-+EXPORT_TRACEPOINT_SYMBOL_GPL(xdp_exception);
-+EXPORT_TRACEPOINT_SYMBOL_GPL(xdp_bulk_tx);
--- 
-2.47.1
-
+The original v3 thread can be found here:
+https://lore.kernel.org/all/20250414161153.14990-1-jiayuan.chen@linux.dev
 
