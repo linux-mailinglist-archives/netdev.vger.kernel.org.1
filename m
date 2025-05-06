@@ -1,61 +1,78 @@
-Return-Path: <netdev+bounces-188226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4338AAB95B
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:56:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1D69AAB983
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:58:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF7E63A1B4B
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:46:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22FB81C40A59
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:54:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BFCB28E5FB;
-	Tue,  6 May 2025 04:01:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2EF4280A3D;
+	Tue,  6 May 2025 04:01:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mZjVU8Vf"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wS5wZpD8"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 086462ECFDA
-	for <netdev@vger.kernel.org>; Tue,  6 May 2025 01:59:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECDE92DA53B
+	for <netdev@vger.kernel.org>; Tue,  6 May 2025 02:52:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746496768; cv=none; b=Hhtq+WoYxr9jlw51k9k+zmCzKLMBxw/+eynRbbhBi0gnL8Bj013h5j0LssdF24pAkkSt5mQuPWh9L0VO+pdjYHxJvBloWPiapwejeRjkwtpS7MZ/70aq2od9OamNScropI5r7IynJ5k6cDHA+Y3enbpIGNercu7axk6k8j+U4F4=
+	t=1746499966; cv=none; b=dBaQ2oiQtnmNeiFABMO4BzT8IMvhBUn03n3TmHvLA4/HBePElQ0RO8WTAMvSceFpBP1zBhbOTjnTXpCcYBbVQgJGGa7OXbsRQ5zN+02FYdtgt13i841AYzGobfPzaDTkx+GprAp/Ixzp8RvVtN5fJkTMfdD3Jxdt9KaDR4Lz+xM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746496768; c=relaxed/simple;
-	bh=sGXEJ9UzTKTJ6orUxxf20O42nPHtvGlhnGXRezZo6OY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FWfrowaCNu8+y9DQL0iMEGTZNi++1s6c59Rbyj6ZtRZnAyvCrqVr7F4I6146gNvOdUVoGWhDJaAkiyBR1zYoT8GslOcz1JS1jOZUdjG3LS1/jZyn/tJExPkJo+TjDoZgVCwDDBcWjvk3IFbCTuxjqk7StG2ihYL3z/Z3nlEc2c8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mZjVU8Vf; arc=none smtp.client-ip=91.218.175.177
+	s=arc-20240116; t=1746499966; c=relaxed/simple;
+	bh=N83Kro7Y2XtsKpOONGV1KN6BYEqm6Jl1PZg1n14gdU4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BCNzWYC5k8S0Az4zopGVJbBIVSq9sTmlMd9R0zVD3xZtu8Q3sO5auvHgmVgBg0ibaAG4iJ7ArNnubb+260zBTaKt1TMwLAEe6XXisCk6+WnJxFHV7uWmflMN5B5AFVU59aHeq+e7Y5UBM2PnrlOgLjNT7mtSVfCs75eorsNUGxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wS5wZpD8; arc=none smtp.client-ip=95.215.58.183
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1746496765;
+	t=1746499950;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rKYIeM0rTydpOKf0DepkQmkMK1bRwSRWPs+8CNcvjiE=;
-	b=mZjVU8VfpLD0DMw0NQOXY3R3xtev2q7dX2YpkrgCAONrABzRUKOcjxPcJ4bmcGYY62Lsp1
-	iSg1QvAft4+GxqBYSMsWXOllhZqsWgln7HbRfz2RvIe6mxTygK3XpOQu697pkIArpMOx+Z
-	TNC8cakKxAnkWyKgmd2yYqnqN6gW6c4=
-From: Martin KaFai Lau <martin.lau@linux.dev>
-To: bpf@vger.kernel.org
-Cc: 'Alexei Starovoitov ' <ast@kernel.org>,
-	'Andrii Nakryiko ' <andrii@kernel.org>,
-	'Daniel Borkmann ' <daniel@iogearbox.net>,
-	'Kumar Kartikeya Dwivedi ' <memxor@gmail.com>,
-	'Amery Hung ' <ameryhung@gmail.com>,
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Bo3lIpRR00+ll9v2+aoNEhfA1Cz5vfi98qdkLpEWVVs=;
+	b=wS5wZpD8EktTtX8dwjpiSexQ44rV0fO47MZHFmcFikQRgV/wboV7lp2MMqRoSy6myQzvRz
+	WaEXRceB8tFDP9HH+eYr8sl//Vtk7OFysjm0jQd/CKFRS7x5qxqTrgZxUvJ56QggE6o9kq
+	hj9Ziaog5NC8DL/Ztoq6XgwBlvtrfd8=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: vger.kernel.org@web.codeaurora.org
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
 	netdev@vger.kernel.org,
-	kernel-team@meta.com
-Subject: [PATCH v2 bpf-next 8/8] selftests/bpf: Add test for bpf_list_{front,back}
-Date: Mon,  5 May 2025 18:58:55 -0700
-Message-ID: <20250506015857.817950-9-martin.lau@linux.dev>
-In-Reply-To: <20250506015857.817950-1-martin.lau@linux.dev>
-References: <20250506015857.817950-1-martin.lau@linux.dev>
+	linux-trace-kernel@vger.kernel.org
+Subject: [RESEND PATCH bpf-next v4 1/2] bpf, sockmap: Introduce tracing capability for sockmap
+Date: Tue,  6 May 2025 10:51:24 +0800
+Message-ID: <20250506025131.136929-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,162 +82,302 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-From: Martin KaFai Lau <martin.lau@kernel.org>
+Sockmap has the same high-performance forwarding capability as XDP, but
+operates at Layer 7.
 
-This patch adds the "list_peek" test to use the new
-bpf_list_{front,back} kfunc.
+Introduce tracing capability for sockmap, to trace the execution results
+of BPF programs without modifying the programs themselves, similar to
+the existing trace_xdp_redirect{_map}.
 
-The test_{front,back}* tests ensure that the return value
-is a non_own_ref node pointer and requires the spinlock to be held.
+It is crucial for debugging sockmap programs, especially in production
+environments.
 
-Suggested-by: Kumar Kartikeya Dwivedi <memxor@gmail.com> # check non_own_ref marking
-Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
+Additionally, the new header file has to be added to bpf_trace.h to
+automatically generate tracepoints.
+
+Test results:
+$ echo "1" > /sys/kernel/tracing/events/sockmap/enable
+
+msg/skb:
+'''
+sockmap_redirect: sk=000000000ec02a93, netns=4026531840, inode=318, \
+family=2, protocol=6, prog_id=59, len=8192, type=msg, action=REDIRECT, \
+redirect_type=ingress
+
+sockmap_redirect: sk=00000000d5d9c931, netns=4026531840, inode=64731, \
+family=2, protocol=6, prog_id=91, len=8221, type=skb, action=REDIRECT, \
+redirect_type=egress
+
+sockmap_redirect: sk=00000000106fc281, netns=4026531840, inode=64729, \
+family=2, protocol=6, prog_id=94, len=8192, type=msg, action=PASS, \
+redirect_type=none
+'''
+
+strparser:
+'''
+sockmap_strparser: sk=00000000f15fc1c8, netns=4026531840, inode=52396, \
+family=2, protocol=6, prog_id=143, in_len=1000, full_len=10
+'''
+
+Reviewed-by: Cong Wang <xiyou.wangcong@gmail.com>
+Suggested-by: Jakub Sitnicki <jakub@cloudflare.com>
+Suggested-by: Cong Wang <xiyou.wangcong@gmail.com>
+Suggested-by: Steven Rostedt <rostedt@goodmis.org>
+Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+
 ---
- .../selftests/bpf/prog_tests/linked_list.c    |   6 +
- .../selftests/bpf/progs/linked_list_peek.c    | 113 ++++++++++++++++++
- 2 files changed, 119 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/progs/linked_list_peek.c
+v3 -> v4: Resending this patch as v3 was incorrectly closed by Patchwork.
+          Additionally, carrying the Reviewed-by tag.
+v3: https://lore.kernel.org/all/20250414161153.14990-1-jiayuan.chen@linux.dev
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/linked_list.c b/tools/testing/selftests/bpf/prog_tests/linked_list.c
-index 77d07e0a4a55..5266c7022863 100644
---- a/tools/testing/selftests/bpf/prog_tests/linked_list.c
-+++ b/tools/testing/selftests/bpf/prog_tests/linked_list.c
-@@ -7,6 +7,7 @@
+v1 -> v2: Print more valuable information as suggested by the maintainer.
+---
+ MAINTAINERS                    |   1 +
+ include/linux/bpf_trace.h      |   1 +
+ include/trace/events/sockmap.h | 158 +++++++++++++++++++++++++++++++++
+ net/core/skmsg.c               |   6 ++
+ 4 files changed, 166 insertions(+)
+ create mode 100644 include/trace/events/sockmap.h
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 3cbf9ac0d83f..76d742b7fbd6 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -4429,6 +4429,7 @@ L:	netdev@vger.kernel.org
+ L:	bpf@vger.kernel.org
+ S:	Maintained
+ F:	include/linux/skmsg.h
++F:	include/trace/events/sockmap.h
+ F:	net/core/skmsg.c
+ F:	net/core/sock_map.c
+ F:	net/ipv4/tcp_bpf.c
+diff --git a/include/linux/bpf_trace.h b/include/linux/bpf_trace.h
+index ddf896abcfb6..d559be0a79c5 100644
+--- a/include/linux/bpf_trace.h
++++ b/include/linux/bpf_trace.h
+@@ -3,5 +3,6 @@
+ #define __LINUX_BPF_TRACE_H__
  
- #include "linked_list.skel.h"
- #include "linked_list_fail.skel.h"
-+#include "linked_list_peek.skel.h"
+ #include <trace/events/xdp.h>
++#include <trace/events/sockmap.h>
  
- static char log_buf[1024 * 1024];
- 
-@@ -805,3 +806,8 @@ void test_linked_list(void)
- 	test_linked_list_success(LIST_IN_LIST, true);
- 	test_linked_list_success(TEST_ALL, false);
- }
-+
-+void test_linked_list_peek(void)
-+{
-+	RUN_TESTS(linked_list_peek);
-+}
-diff --git a/tools/testing/selftests/bpf/progs/linked_list_peek.c b/tools/testing/selftests/bpf/progs/linked_list_peek.c
+ #endif /* __LINUX_BPF_TRACE_H__ */
+diff --git a/include/trace/events/sockmap.h b/include/trace/events/sockmap.h
 new file mode 100644
-index 000000000000..264e81bfb287
+index 000000000000..79784e8d5866
 --- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/linked_list_peek.c
-@@ -0,0 +1,113 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2025 Meta Platforms, Inc. and affiliates. */
++++ b/include/trace/events/sockmap.h
+@@ -0,0 +1,158 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#undef TRACE_SYSTEM
++#define TRACE_SYSTEM sockmap
 +
-+#include <vmlinux.h>
-+#include <bpf/bpf_helpers.h>
-+#include "bpf_misc.h"
-+#include "bpf_experimental.h"
++#if !defined(_TRACE_SOCKMAP_H) || defined(TRACE_HEADER_MULTI_READ)
++#define _TRACE_SOCKMAP_H
 +
-+struct node_data {
-+	struct bpf_list_node l;
-+	int key;
++#include <linux/tracepoint.h>
++#include <linux/bpf.h>
++#include <linux/skmsg.h>
++
++#ifndef __TRACE_SOCKMAP_HELPER_ONCE_ONLY
++#define __TRACE_SOCKMAP_HELPER_ONCE_ONLY
++
++enum sockmap_direct_type {
++	SOCKMAP_REDIR_NONE	= 0,
++	SOCKMAP_REDIR_INGRESS,
++	SOCKMAP_REDIR_EGRESS,
 +};
 +
-+#define private(name) SEC(".data." #name) __hidden __attribute__((aligned(8)))
-+private(A) struct bpf_spin_lock glock;
-+private(A) struct bpf_list_head ghead __contains(node_data, l);
++enum sockmap_data_type {
++	SOCKMAP_MSG		= 0,
++	SOCKMAP_SKB,
++};
 +
-+#define list_entry(ptr, type, member) container_of(ptr, type, member)
-+#define NR_NODES 16
++#endif /* end __TRACE_SOCKMAP_HELPER_ONCE_ONLY */
 +
-+int zero = 0;
++TRACE_DEFINE_ENUM(SOCKMAP_MSG);
++TRACE_DEFINE_ENUM(SOCKMAP_SKB);
++TRACE_DEFINE_ENUM(SOCKMAP_REDIR_NONE);
++TRACE_DEFINE_ENUM(SOCKMAP_REDIR_INGRESS);
++TRACE_DEFINE_ENUM(SOCKMAP_REDIR_EGRESS);
 +
-+SEC("syscall")
-+__retval(0)
-+long list_peek(void *ctx)
-+{
-+	struct bpf_list_node *l_n;
-+	struct node_data *n;
-+	int i, err = 0;
++TRACE_DEFINE_ENUM(__SK_DROP);
++TRACE_DEFINE_ENUM(__SK_PASS);
++TRACE_DEFINE_ENUM(__SK_REDIRECT);
++TRACE_DEFINE_ENUM(__SK_NONE);
 +
-+	bpf_spin_lock(&glock);
-+	l_n = bpf_list_front(&ghead);
-+	bpf_spin_unlock(&glock);
-+	if (l_n)
-+		return __LINE__;
++#define show_redirect_type(x)					\
++	__print_symbolic(x,					\
++		{ SOCKMAP_REDIR_NONE,		"none" },	\
++		{ SOCKMAP_REDIR_INGRESS,	"ingress" },	\
++		{ SOCKMAP_REDIR_EGRESS,		"egress" })
 +
-+	bpf_spin_lock(&glock);
-+	l_n = bpf_list_back(&ghead);
-+	bpf_spin_unlock(&glock);
-+	if (l_n)
-+		return __LINE__;
++#define show_act(x)						\
++	__print_symbolic(x,					\
++		{ __SK_DROP,			"DROP" },	\
++		{ __SK_PASS,			"PASS" },	\
++		{ __SK_REDIRECT,		"REDIRECT" },	\
++		{ __SK_NONE,			"NONE" })
 +
-+	for (i = zero; i < NR_NODES && can_loop; i++) {
-+		n = bpf_obj_new(typeof(*n));
-+		if (!n)
-+			return __LINE__;
-+		n->key = i;
-+		bpf_spin_lock(&glock);
-+		bpf_list_push_back(&ghead, &n->l);
-+		bpf_spin_unlock(&glock);
-+	}
++#define show_data_type(x)					\
++	__print_symbolic(x,					\
++		{ SOCKMAP_MSG,			"msg" },	\
++		{ SOCKMAP_SKB,			"skb" })
 +
-+	bpf_spin_lock(&glock);
++#define trace_sockmap_skmsg_redirect(sk, prog, msg, act)	\
++	trace_sockmap_redirect((sk), SOCKMAP_MSG, (prog),	\
++			       (msg)->sg.size, (act),		\
++			       sk_msg_to_ingress(msg))
 +
-+	l_n = bpf_list_front(&ghead);
-+	if (!l_n) {
-+		err = __LINE__;
-+		goto done;
-+	}
++#define trace_sockmap_skb_redirect(sk, prog, skb, act)		\
++	trace_sockmap_redirect((sk), SOCKMAP_SKB, (prog),	\
++			       (skb)->len, (act),		\
++			       skb_bpf_ingress(skb))
 +
-+	n = list_entry(l_n, struct node_data, l);
-+	if (n->key != 0) {
-+		err = __LINE__;
-+		goto done;
-+	}
++#define trace_sockmap_skb_strp_parse(sk, prog, skb, ret)	\
++	trace_sockmap_strparser((sk), (prog), (skb)->len, (ret))
 +
-+	l_n = bpf_list_back(&ghead);
-+	if (!l_n) {
-+		err = __LINE__;
-+		goto done;
-+	}
++TRACE_EVENT(sockmap_redirect,
 +
-+	n = list_entry(l_n, struct node_data, l);
-+	if (n->key != NR_NODES - 1) {
-+		err = __LINE__;
-+		goto done;
-+	}
++	TP_PROTO(const struct sock *sk, enum sockmap_data_type type,
++		 const struct bpf_prog *prog, int len, int act,
++		 bool ingress),
 +
-+done:
-+	bpf_spin_unlock(&glock);
-+	return err;
-+}
++	TP_ARGS(sk, type, prog, len, act, ingress),
 +
-+#define TEST_FB(op, dolock)					\
-+SEC("syscall")							\
-+__failure __msg(MSG)						\
-+long test_##op##_spinlock_##dolock(void *ctx)			\
-+{								\
-+	struct bpf_list_node *l_n;				\
-+	__u64 jiffies = 0;					\
-+								\
-+	if (dolock)						\
-+		bpf_spin_lock(&glock);				\
-+	l_n = bpf_list_##op(&ghead);				\
-+	if (l_n)						\
-+		jiffies = bpf_jiffies64();			\
-+	if (dolock)						\
-+		bpf_spin_unlock(&glock);			\
-+								\
-+	return !!jiffies;					\
-+}
++	TP_STRUCT__entry(
++		__field(const void *, sk)
++		__field(unsigned long, ino)
++		__field(unsigned int, netns_ino)
++		__field(__u16, family)
++		__field(__u16, protocol)
++		__field(int, prog_id)
++		__field(int, len)
++		__field(int, act)
++		__field(enum sockmap_data_type, type)
++		__field(enum sockmap_direct_type, redir)
++	),
 +
-+#define MSG "call bpf_list_{{(front|back).+}}; R0{{(_w)?}}=ptr_or_null_node_data(id={{[0-9]+}},non_own_ref"
-+TEST_FB(front, true)
-+TEST_FB(back, true)
-+#undef MSG
++	TP_fast_assign(
++		/* 'redir' is undefined if action is not REDIRECT */
++		enum sockmap_direct_type redir = SOCKMAP_REDIR_NONE;
 +
-+#define MSG "bpf_spin_lock at off=0 must be held for bpf_list_head"
-+TEST_FB(front, false)
-+TEST_FB(back, false)
-+#undef MSG
++		if (act == __SK_REDIRECT) {
++			if (ingress)
++				redir = SOCKMAP_REDIR_INGRESS;
++			else
++				redir = SOCKMAP_REDIR_EGRESS;
++		}
++		__entry->sk		= sk;
++		__entry->ino		= sock_i_ino((struct sock *)sk);
++		__entry->netns_ino	= sock_net(sk)->ns.inum;
++		__entry->type		= type;
++		__entry->family		= sk->sk_family;
++		__entry->protocol	= sk->sk_protocol;
++		__entry->prog_id	= prog->aux->id;
++		__entry->len		= len;
++		__entry->act		= act;
++		__entry->redir		= redir;
++	),
 +
-+char _license[] SEC("license") = "GPL";
++	TP_printk("sk=%p, netns=%u, inode=%lu, family=%u, protocol=%u,"
++		  " prog_id=%d, len=%d, type=%s, action=%s, redirect_type=%s",
++		  __entry->sk, __entry->netns_ino, __entry->ino,
++		  __entry->family, __entry->protocol, __entry->prog_id,
++		  __entry->len, show_data_type(__entry->type),
++		  show_act(__entry->act), show_redirect_type(__entry->redir))
++);
++
++TRACE_EVENT(sockmap_strparser,
++
++	TP_PROTO(const struct sock *sk, const struct bpf_prog *prog,
++		 int in_len, int full_len),
++
++	TP_ARGS(sk, prog, in_len, full_len),
++
++	TP_STRUCT__entry(
++		__field(const void *, sk)
++		__field(unsigned long, ino)
++		__field(unsigned int, netns_ino)
++		__field(__u16, family)
++		__field(__u16, protocol)
++		__field(int, prog_id)
++		__field(int, in_len)
++		__field(int, full_len)
++	),
++
++	TP_fast_assign(
++		__entry->sk		= sk;
++		__entry->ino		= sock_i_ino((struct sock *)sk);
++		__entry->netns_ino	= sock_net(sk)->ns.inum;
++		__entry->family		= sk->sk_family;
++		__entry->protocol	= sk->sk_protocol;
++		__entry->prog_id	= prog->aux->id;
++		__entry->in_len		= in_len;
++		__entry->full_len	= full_len;
++	),
++
++	TP_printk("sk=%p, netns=%u, inode=%lu, family=%u, protocol=%u,"
++		  " prog_id=%d, in_len=%d, full_len=%d",
++		  __entry->sk, __entry->netns_ino, __entry->ino,
++		  __entry->family, __entry->protocol, __entry->prog_id,
++		  __entry->in_len, __entry->full_len)
++);
++#endif /* _TRACE_SOCKMAP_H */
++
++#include <trace/define_trace.h>
+diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+index 276934673066..517596efafa8 100644
+--- a/net/core/skmsg.c
++++ b/net/core/skmsg.c
+@@ -9,6 +9,7 @@
+ #include <net/tcp.h>
+ #include <net/tls.h>
+ #include <trace/events/sock.h>
++#include <trace/events/sockmap.h>
+ 
+ static bool sk_msg_try_coalesce_ok(struct sk_msg *msg, int elem_first_coalesce)
+ {
+@@ -910,6 +911,7 @@ int sk_psock_msg_verdict(struct sock *sk, struct sk_psock *psock,
+ 		sock_hold(psock->sk_redir);
+ 	}
+ out:
++	trace_sockmap_skmsg_redirect(sk, prog, msg, ret);
+ 	rcu_read_unlock();
+ 	return ret;
+ }
+@@ -981,6 +983,7 @@ int sk_psock_tls_strp_read(struct sk_psock *psock, struct sk_buff *skb)
+ 		ret = bpf_prog_run_pin_on_cpu(prog, skb);
+ 		ret = sk_psock_map_verd(ret, skb_bpf_redirect_fetch(skb));
+ 		skb->sk = NULL;
++		trace_sockmap_skb_redirect(psock->sk, prog, skb, ret);
+ 	}
+ 	sk_psock_tls_verdict_apply(skb, psock, ret);
+ 	rcu_read_unlock();
+@@ -1090,6 +1093,7 @@ static void sk_psock_strp_read(struct strparser *strp, struct sk_buff *skb)
+ 		skb_bpf_set_strparser(skb);
+ 		ret = sk_psock_map_verd(ret, skb_bpf_redirect_fetch(skb));
+ 		skb->sk = NULL;
++		trace_sockmap_skb_redirect(sk, prog, skb, ret);
+ 	}
+ 	sk_psock_verdict_apply(psock, skb, ret);
+ out:
+@@ -1113,6 +1117,7 @@ static int sk_psock_strp_parse(struct strparser *strp, struct sk_buff *skb)
+ 		skb->sk = psock->sk;
+ 		ret = bpf_prog_run_pin_on_cpu(prog, skb);
+ 		skb->sk = NULL;
++		trace_sockmap_skb_strp_parse(psock->sk, prog, skb, ret);
+ 	}
+ 	rcu_read_unlock();
+ 	return ret;
+@@ -1217,6 +1222,7 @@ static int sk_psock_verdict_recv(struct sock *sk, struct sk_buff *skb)
+ 		skb_bpf_redirect_clear(skb);
+ 		ret = bpf_prog_run_pin_on_cpu(prog, skb);
+ 		ret = sk_psock_map_verd(ret, skb_bpf_redirect_fetch(skb));
++		trace_sockmap_skb_redirect(psock->sk, prog, skb, ret);
+ 	}
+ 	ret = sk_psock_verdict_apply(psock, skb, ret);
+ 	if (ret < 0)
 -- 
 2.47.1
 
