@@ -1,45 +1,47 @@
-Return-Path: <netdev+bounces-188492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 150CCAAD133
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 00:56:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A269EAAD12E
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 00:56:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2474D984467
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 22:56:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B69B17FF32
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 22:56:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9B4F21CC58;
-	Tue,  6 May 2025 22:56:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D9AB21C9F5;
+	Tue,  6 May 2025 22:56:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="j0zT8S/k"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iSjtP7kZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C47721CC5F
-	for <netdev@vger.kernel.org>; Tue,  6 May 2025 22:56:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3EF821ABBC
+	for <netdev@vger.kernel.org>; Tue,  6 May 2025 22:55:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746572165; cv=none; b=CIu5FtrljAWagDY13MDlo021mglaHVo34kKKLPvj4KwpLog561MIP5RICXhRIhRgvw0e9cxm9doFcIc6YVkYw1RQ0rEeqj03W2rqsUJ9rV0Dbmx2kiAYyY2iS3WoLXDzgawbaoSfAsBNWkni2amnslEOWVoAyYUPLce4YB9h5/g=
+	t=1746572162; cv=none; b=kY+NvD5dKX6Sn7x8vEo925jjwVRSK28oBJLXfrmZOfZxSbYkw11kh7IWe/HQSMQEnlJJieQuXUa5UnLjafbFkuynyOescnksaw8V//Ystm/cuSyzcxkG2+uZouXIqp15Lu50vZl0x0Rbel76BbRKx4bejqWtd/Omzb7oGw0MORE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746572165; c=relaxed/simple;
-	bh=DFt+ebbbuAZjov8Pb/RuLLERhK4r3FUooBjd2K0GPYo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KWGQ1mOALLgn/oZwhom+3nfaYxeWWsXDPpKqmHrLphI9+Ra0ykJBQwBAuMmV8wvHq72LgUqDvfbrdEhpCmvVuWoruz7uXTxFsQnqOq3SpY/ayh7oJvD2hibmkcm49bOQCE/YEs7uvQSOe4ffwgs/Lztcizqfek9DH83vNZVW1KA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=j0zT8S/k; arc=none smtp.client-ip=91.218.175.170
+	s=arc-20240116; t=1746572162; c=relaxed/simple;
+	bh=hgDnOk091a2SDBWDtm9E/QTPNSNLsUmS0GA8gvXeYcA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Rs+vMmFT7y7SkaEPHhyZW8k6nvrwdM9pn+obgrMJVPTaPt/ReyKzswXsWbmF6gJ0Dyxs8jtX80XOtDCAEivt36yu/FCMuAzz8FY9qKwWA18gnfTDlsJp/MU++FjtHx11ZCxs0jiosJoe5fB3xzKtzJomV3AEGQHMxenyY6k0eaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iSjtP7kZ; arc=none smtp.client-ip=91.218.175.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1746572151;
+	t=1746572157;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=YWJSQngmYlXWZg+lyZsIjJarzLPqwEAzFpWOWt07a40=;
-	b=j0zT8S/kZxVs6fcz9mUMCkHREa6ceRcMgUr9SGpBWgyZqIXtyh5YzKJQe8wW55D8AvAlOE
-	4FpYhQnxM1dX8Raal5UOJGQ6318uCvhbtMC+6z6Zal94acKfnrp+jRlzFv6KONxTIwOvNK
-	jELyRxOz7CZFsZ+Hn9vtWpwy1rLVcSM=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=j+q7Zfy+PEXSZi9n40T4a1BJaXa9SzRLJNKzWtXA3xc=;
+	b=iSjtP7kZmALU52Zfo7EVlqEX0JO2Oj2pl4FpW9j/rJu6q6ZogQsaII5F4yOR+xPnStVBow
+	Do6Xap5yivv1BYV9ZPq5gQU1UcSsj9p3rNtvl9Ze+LY/iy4fYdceo216vtENZt0fHMHMri
+	UIDbkO9EGdVSYdZhnYFnvchYBg5RGg8=
 From: Shakeel Butt <shakeel.butt@linux.dev>
 To: Andrew Morton <akpm@linux-foundation.org>
 Cc: Johannes Weiner <hannes@cmpxchg.org>,
@@ -57,9 +59,11 @@ Cc: Johannes Weiner <hannes@cmpxchg.org>,
 	bpf@vger.kernel.org,
 	netdev@vger.kernel.org,
 	Meta kernel team <kernel-team@meta.com>
-Subject: [PATCH v3 0/4] memcg: decouple memcg and objcg stocks
-Date: Tue,  6 May 2025 15:55:29 -0700
-Message-ID: <20250506225533.2580386-1-shakeel.butt@linux.dev>
+Subject: [PATCH 1/4] memcg: simplify consume_stock
+Date: Tue,  6 May 2025 15:55:30 -0700
+Message-ID: <20250506225533.2580386-2-shakeel.butt@linux.dev>
+In-Reply-To: <20250506225533.2580386-1-shakeel.butt@linux.dev>
+References: <20250506225533.2580386-1-shakeel.butt@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,22 +73,26 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-The per-cpu memcg charge cache and objcg charge cache are coupled in a
-single struct memcg_stock_pcp and a single local lock is used to protect
-both of the caches. This makes memcg charging and objcg charging nmi
-safe challenging. Decoupling memcg and objcg stocks would allow us to
-make them nmi safe and even work without disabling irqs independently.
-This series completely decouples memcg and objcg stocks.
+The consume_stock() does not need to check gfp_mask for spinning and can
+simply trylock the local lock to decide to proceed or fail. No need to
+spin at all for local lock.
 
-To evaluate the impact of this series with and without PREEMPT_RT
-config, we ran varying number of netperf clients in different cgroups on
-a 72 CPU machine.
+One of the concern raised was that on PREEMPT_RT kernels, this trylock
+can fail more often due to tasks having lock_lock can be preempted. This
+can potentially cause the task which have preempted the task having the
+local_lock to take the slow path of memcg charging.
+
+However this behavior will only impact the performance if memcg charging
+slowpath is worse than two context switches and possibly scheduling
+delay behavior of current code. From the network intensive workload
+experiment it does not seem like the case.
+
+We ran varying number of netperf clients in different cgroups on a 72 CPU
+machine for PREEMPT_RT config.
 
  $ netserver -6
  $ netperf -6 -H ::1 -l 60 -t TCP_SENDFILE -- -m 10K
 
-PREEMPT_RT config:
-------------------
 number of clients | Without series | With series
   6               | 38559.1 Mbps   | 38652.6 Mbps
   12              | 37388.8 Mbps   | 37560.1 Mbps
@@ -93,35 +101,63 @@ number of clients | Without series | With series
   30              | 22347.7 Mbps   | 22326.5 Mbps
   36              | 20235.1 Mbps   | 20165.0 Mbps
 
-!PREEMPT_RT config:
--------------------
-number of clients | Without series | With series
-  6               | 50235.7 Mbps   | 51415.4 Mbps
-  12              | 49336.5 Mbps   | 49901.4 Mbps
-  18              | 46306.8 Mbps   | 46482.7 Mbps
-  24              | 38145.7 Mbps   | 38729.4 Mbps
-  30              | 30347.6 Mbps   | 31698.2 Mbps
-  36              | 26976.6 Mbps   | 27364.4 Mbps
+We don't see any significant performance difference for the network
+intensive workload with this series.
 
-No performance regression was observed.
+Signed-off-by: Shakeel Butt <shakeel.butt@linux.dev>
+---
+ mm/memcontrol.c | 20 +++++++-------------
+ 1 file changed, 7 insertions(+), 13 deletions(-)
 
-Changes since v2:
-- Ran and included network intensive benchmarking results
-- Brought back the simplify patch dropped in v2 after perf experiment.
-
-Changes since v1:
-- Drop first patch as requested by Alexei.
-- Remove preempt_disable() usage as suggested by Vlastimil.
-
-Shakeel Butt (4):
-  memcg: simplify consume_stock
-  memcg: separate local_trylock for memcg and obj
-  memcg: completely decouple memcg and obj stocks
-  memcg: no irq disable for memcg stock lock
-
- mm/memcontrol.c | 175 ++++++++++++++++++++++++++++--------------------
- 1 file changed, 102 insertions(+), 73 deletions(-)
-
+diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+index c44124ea3d08..7561e12ca0e0 100644
+--- a/mm/memcontrol.c
++++ b/mm/memcontrol.c
+@@ -1808,16 +1808,14 @@ static bool obj_stock_flush_required(struct memcg_stock_pcp *stock,
+  * consume_stock: Try to consume stocked charge on this cpu.
+  * @memcg: memcg to consume from.
+  * @nr_pages: how many pages to charge.
+- * @gfp_mask: allocation mask.
+  *
+- * The charges will only happen if @memcg matches the current cpu's memcg
+- * stock, and at least @nr_pages are available in that stock.  Failure to
+- * service an allocation will refill the stock.
++ * Consume the cached charge if enough nr_pages are present otherwise return
++ * failure. Also return failure for charge request larger than
++ * MEMCG_CHARGE_BATCH or if the local lock is already taken.
+  *
+  * returns true if successful, false otherwise.
+  */
+-static bool consume_stock(struct mem_cgroup *memcg, unsigned int nr_pages,
+-			  gfp_t gfp_mask)
++static bool consume_stock(struct mem_cgroup *memcg, unsigned int nr_pages)
+ {
+ 	struct memcg_stock_pcp *stock;
+ 	uint8_t stock_pages;
+@@ -1825,12 +1823,8 @@ static bool consume_stock(struct mem_cgroup *memcg, unsigned int nr_pages,
+ 	bool ret = false;
+ 	int i;
+ 
+-	if (nr_pages > MEMCG_CHARGE_BATCH)
+-		return ret;
+-
+-	if (gfpflags_allow_spinning(gfp_mask))
+-		local_lock_irqsave(&memcg_stock.stock_lock, flags);
+-	else if (!local_trylock_irqsave(&memcg_stock.stock_lock, flags))
++	if (nr_pages > MEMCG_CHARGE_BATCH ||
++	    !local_trylock_irqsave(&memcg_stock.stock_lock, flags))
+ 		return ret;
+ 
+ 	stock = this_cpu_ptr(&memcg_stock);
+@@ -2333,7 +2327,7 @@ static int try_charge_memcg(struct mem_cgroup *memcg, gfp_t gfp_mask,
+ 	unsigned long pflags;
+ 
+ retry:
+-	if (consume_stock(memcg, nr_pages, gfp_mask))
++	if (consume_stock(memcg, nr_pages))
+ 		return 0;
+ 
+ 	if (!gfpflags_allow_spinning(gfp_mask))
 -- 
 2.47.1
 
