@@ -1,222 +1,141 @@
-Return-Path: <netdev+bounces-188408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BE8BAACBB7
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 19:00:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B117AACBBE
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 19:01:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFD861BA7B36
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 16:58:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4613A1892E3A
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 16:59:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E264628151D;
-	Tue,  6 May 2025 16:54:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62AA4286D68;
+	Tue,  6 May 2025 16:57:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YL3YEaYr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vIwUl4sz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85A9280004;
-	Tue,  6 May 2025 16:54:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CF592857FA
+	for <netdev@vger.kernel.org>; Tue,  6 May 2025 16:57:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746550460; cv=none; b=JymSOGRL254W+5uDu+1TxULliu2ICJjUL9Su/S8lXmJ2AOB0ONal3Gjc6tDQRcjWtECdMwcigmOU7YLBQqwHWwiYfcsFShHk4bBK3AxkNvXESb6uVL13xKyxv3JKEdC9/vwKMofIAAak6D8Sk9qJXs1u3AJCghtVfEt3X8EygcY=
+	t=1746550626; cv=none; b=L13tDyIaBRMPuKd4nGnUPgq8Q8uiQvgRk4nWg7tRKmjvgRNVttA4JPPMZIsXuF0/NtLsYTeYlyJh7RR+TxbVy6tRV2n7LKgX7ltd8+qqZtvw0xGIPFdI+1C0DiFzUvHqzm8H3BoKZJqkzPlcyGBC+FP7TfMhzK4VqKH/pM/Ra14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746550460; c=relaxed/simple;
-	bh=Z823hMcPPZYof/30Mxd4GikB2LdielMOJnKPtKVaJJE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F+vlnIutEjYyeu3nKWwXOPYVXHsHRfMIUXpMzZyZaOsMhhToIXYw1ZguQ0BfsDQsTU+tpzm3yh3+D9vculft7shCTzTRrVEO0dnhoIRJ3iEj1qTKTy1+Al8lWdm1CtKNWqIOLUA7T+Xan3Zf4vwhWfIrmOM1ILxhmU669xt37s4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YL3YEaYr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47EBEC4CEE4;
-	Tue,  6 May 2025 16:54:15 +0000 (UTC)
+	s=arc-20240116; t=1746550626; c=relaxed/simple;
+	bh=ABOzDivVUxun6WUKZw1BVS9aK7ElmNBbTSdCr3O5K3k=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=O8nBfyWue2hwRXmi6ttTa9AQdhgXMBtsazNCmloBosi2Ng7I+QkaWMB3iW1Uh6IeqOvVUTb151mP3R5EgWTIPZ1wt8p056/h6kTXolis1XFwVKlmvxbLzQ7in9+wys3cGe8VALD68FJVo2M5PzcsG+urlrBJAQRwgW2Q2lvghqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vIwUl4sz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EC8FC4CEE4;
+	Tue,  6 May 2025 16:57:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746550460;
-	bh=Z823hMcPPZYof/30Mxd4GikB2LdielMOJnKPtKVaJJE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YL3YEaYr57UMngRzXMXrksbEZIqcZBsKrq7PXc0bWMKfXdbxTgJFw7DbOS+9qizqO
-	 19hovTHqCV5gLImcp92jsNdA19Y0ZGpk/kZhnZzHZNobwkkDkr/3DI07YB2O7Qefle
-	 m7fC3H7VKI/swGNBTK4l+DYuLjXADxCHzi2KXd8GbnGv5c8d5I+xWR1blxU0alF5hq
-	 4BRtLMASrD/UKkSUH8eMQmHgJm8fEg5upjCC9j9OeGTJ73kJOiL5P3SDo3zd0lWrWD
-	 tFYDwAtPA7CVJQ8IWQHP35Iv6AFnRN6AVj4cjxoX9rwbiRAEGCHTFND8EFWvYOg3VG
-	 fldAYzCX49bxg==
-Date: Tue, 6 May 2025 17:54:13 +0100
-From: Simon Horman <horms@kernel.org>
-To: chia-yu.chang@nokia-bell-labs.com
-Cc: donald.hunter@gmail.com, xandfury@gmail.com, netdev@vger.kernel.org,
-	dave.taht@gmail.com, pabeni@redhat.com, jhs@mojatatu.com,
-	kuba@kernel.org, stephen@networkplumber.org,
-	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
-	edumazet@google.com, andrew+netdev@lunn.ch, ast@fiberby.net,
-	liuhangbin@gmail.com, shuah@kernel.org,
-	linux-kselftest@vger.kernel.org, ij@kernel.org,
-	ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
-	g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
-	mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
-	Jason_Livingood@comcast.com, vidhi_goel@apple.com
-Subject: Re: [PATCH v14 net-next 1/5] sched: Struct definition and parsing of
- dualpi2 qdisc
-Message-ID: <20250506165413.GW3339421@horms.kernel.org>
-References: <20250505094837.7192-1-chia-yu.chang@nokia-bell-labs.com>
- <20250505094837.7192-2-chia-yu.chang@nokia-bell-labs.com>
+	s=k20201202; t=1746550625;
+	bh=ABOzDivVUxun6WUKZw1BVS9aK7ElmNBbTSdCr3O5K3k=;
+	h=From:Date:Subject:To:Cc:From;
+	b=vIwUl4szxr3mn6Ht3u4ZVPXR/v6wJMjbKlWscQEC/YHKl8rrGfxvpRBLGmzQU+mpS
+	 b+VeyEgmauFg4x3+41BUuqEY/Y22IlvN4CO7gj9MPt3hovP6Gxs/8cQIxbRqsrPtdn
+	 ziGBkUELy5D5jCyYlKizfzQL8Kd9fv9j204USMYHri5VsnfROEJZxb0PQNSEoSiz6U
+	 T4nBK7LaVnDyC82SxksY38gcPYZuhZTzzXQSQfKtqSzm17+25UvkTHOLSZu8h2KfLi
+	 0je2lxzb/80PrOiTVkb+gP8BdU+5lnCz4PBzxurBPdXePxJf604iDwjaH78B9PMGAh
+	 p1uRSGsPvwugg==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Tue, 06 May 2025 18:56:47 +0200
+Subject: [PATCH net v5] net: airoha: Add missing field to ppe_mbox_data
+ struct
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250505094837.7192-2-chia-yu.chang@nokia-bell-labs.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250506-airoha-en7581-fix-ppe_mbox_data-v5-1-29cabed6864d@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAE4/GmgC/43NTQ7CIBCG4as0rMUAhf648h7GNNSZtkSFBhpS0
+ /Tu0q50pct3Mnm+hQT0BgM5ZQvxGE0wzqZQh4zcBm17pAZSE8GEYlIIqo13g6ZoS1Vx2pmZjiM
+ 2z9bNDehJU1VAxwVI6EpBkjJ6TE/7wuWaejBhcv61D8Z8u/5vx5xyWpUAioGoVYHnO3qLj6PzP
+ dnwKD/B+jcoEwhCV23NOGhgX+C6rm/E/BQbIAEAAA==
+X-Change-ID: 20250422-airoha-en7581-fix-ppe_mbox_data-56df12d4df72
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
+ Simon Horman <horms@kernel.org>, Jacob Keller <jacob.e.keller@intel.com>
+X-Mailer: b4 0.14.2
 
-On Mon, May 05, 2025 at 11:48:33AM +0200, chia-yu.chang@nokia-bell-labs.com wrote:
-> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-> 
-> DualPI2 is the reference implementation of IETF RFC9332 DualQ Coupled
-> AQM (https://datatracker.ietf.org/doc/html/rfc9332) providing two
-> queues called low latency (L-queue) and classic (C-queue). By default,
-> it enqueues non-ECN and ECT(0) packets into the C-queue and ECT(1) and
-> CE packets into the low latency queue (L-queue), as per IETF RFC9332 spec.
-> 
-> This patch defines the dualpi2 Qdisc structure and parsing, and the
-> following two patches include dumping and enqueue/dequeue for the DualPI2.
-> 
-> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+The official Airoha EN7581 firmware requires adding max_packet field in
+ppe_mbox_data struct while the unofficial one used to develop the Airoha
+EN7581 flowtable support does not require this field.
+This patch does not introduce any real backwards compatible issue since
+EN7581 fw is not publicly available in linux-firmware or other
+repositories (e.g. OpenWrt) yet and the official fw version will use this
+new layout. For this reason this change needs to be backported.
+Moreover, make explicit the padding added by the compiler introducing
+the rsv array in init_info struct.
+At the same time use u32 instead of int for init_info and set_info
+struct definitions in ppe_mbox_data struct.
 
-...
+Fixes: 23290c7bc190d ("net: airoha: Introduce Airoha NPU support")
+Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+Changes in v5:
+- get rid of __packed attribute
+- fix typo in the commit subject
+- Link to v4: https://lore.kernel.org/r/20250429-airoha-en7581-fix-ppe_mbox_data-v4-1-d2a8b901dad0@kernel.org
 
-> diff --git a/net/sched/sch_dualpi2.c b/net/sched/sch_dualpi2.c
+Changes in v4:
+- use u32 instead of int in ppe_mbox_data struct
+- add __packed attribute to struct definitions and make the fw layout
+  padding explicit in init_info struct
+- Link to v3: https://lore.kernel.org/r/20250422-airoha-en7581-fix-ppe_mbox_data-v3-1-87dd50d2956e@kernel.org
 
-...
+Changes in v3:
+- resend targeting net tree
+- Link to v2: https://lore.kernel.org/r/20250417-airoha-en7581-fix-ppe_mbox_data-v2-1-43433cfbe874@kernel.org
 
-> +static int dualpi2_change(struct Qdisc *sch, struct nlattr *opt,
-> +			  struct netlink_ext_ack *extack)
-> +{
-> +	struct nlattr *tb[TCA_DUALPI2_MAX + 1];
-> +	struct dualpi2_sched_data *q;
-> +	int old_backlog;
-> +	int old_qlen;
-> +	int err;
-> +
-> +	if (!opt)
-> +		return -EINVAL;
-> +	err = nla_parse_nested(tb, TCA_DUALPI2_MAX, opt, dualpi2_policy,
-> +			       extack);
-> +	if (err < 0)
-> +		return err;
-> +
-> +	q = qdisc_priv(sch);
-> +	sch_tree_lock(sch);
-> +
-> +	if (tb[TCA_DUALPI2_LIMIT]) {
-> +		u32 limit = nla_get_u32(tb[TCA_DUALPI2_LIMIT]);
-> +
-> +		WRITE_ONCE(sch->limit, limit);
-> +		WRITE_ONCE(q->memory_limit, get_memory_limit(sch, limit));
-> +	}
-> +
-> +	if (tb[TCA_DUALPI2_MEMORY_LIMIT])
-> +		WRITE_ONCE(q->memory_limit,
-> +			   nla_get_u32(tb[TCA_DUALPI2_MEMORY_LIMIT]));
-> +
-> +	if (tb[TCA_DUALPI2_TARGET]) {
-> +		u64 target = nla_get_u32(tb[TCA_DUALPI2_TARGET]);
-> +
-> +		WRITE_ONCE(q->pi2_target, target * NSEC_PER_USEC);
-> +	}
-> +
-> +	if (tb[TCA_DUALPI2_TUPDATE]) {
-> +		u64 tupdate = nla_get_u32(tb[TCA_DUALPI2_TUPDATE]);
-> +
-> +		WRITE_ONCE(q->pi2_tupdate, tupdate * NSEC_PER_USEC);
-> +	}
-> +
-> +	if (tb[TCA_DUALPI2_ALPHA]) {
-> +		u32 alpha = nla_get_u32(tb[TCA_DUALPI2_ALPHA]);
-> +
-> +		WRITE_ONCE(q->pi2_alpha, dualpi2_scale_alpha_beta(alpha));
-> +	}
-> +
-> +	if (tb[TCA_DUALPI2_BETA]) {
-> +		u32 beta = nla_get_u32(tb[TCA_DUALPI2_BETA]);
-> +
-> +		WRITE_ONCE(q->pi2_beta, dualpi2_scale_alpha_beta(beta));
-> +	}
-> +
-> +	if (tb[TCA_DUALPI2_STEP_THRESH]) {
-> +		u32 step_th = nla_get_u32(tb[TCA_DUALPI2_STEP_THRESH]);
-> +		bool step_pkt = nla_get_flag(tb[TCA_DUALPI2_STEP_PACKETS]);
-> +
-> +		WRITE_ONCE(q->step_in_packets, step_pkt);
-> +		WRITE_ONCE(q->step_thresh,
-> +			   step_pkt ? step_th : (step_th * NSEC_PER_USEC));
-> +	}
-> +
-> +	if (tb[TCA_DUALPI2_MIN_QLEN_STEP])
-> +		WRITE_ONCE(q->min_qlen_step,
-> +			   nla_get_u32(tb[TCA_DUALPI2_MIN_QLEN_STEP]));
-> +
-> +	if (tb[TCA_DUALPI2_COUPLING]) {
-> +		u8 coupling = nla_get_u8(tb[TCA_DUALPI2_COUPLING]);
-> +
-> +		WRITE_ONCE(q->coupling_factor, coupling);
-> +	}
-> +
-> +	if (tb[TCA_DUALPI2_DROP_OVERLOAD]) {
-> +		u8 drop_overload = nla_get_u8(tb[TCA_DUALPI2_DROP_OVERLOAD]);
-> +
-> +		WRITE_ONCE(q->drop_overload, (bool)drop_overload);
-> +	}
-> +
-> +	if (tb[TCA_DUALPI2_DROP_EARLY]) {
-> +		u8 drop_early = nla_get_u8(tb[TCA_DUALPI2_DROP_EARLY]);
-> +
-> +		WRITE_ONCE(q->drop_early, (bool)drop_early);
-> +	}
-> +
-> +	if (tb[TCA_DUALPI2_C_PROTECTION]) {
-> +		u8 wc = nla_get_u8(tb[TCA_DUALPI2_C_PROTECTION]);
-> +
-> +		dualpi2_calculate_c_protection(sch, q, wc);
-> +	}
-> +
-> +	if (tb[TCA_DUALPI2_ECN_MASK]) {
-> +		u8 ecn_mask = nla_get_u8(tb[TCA_DUALPI2_ECN_MASK]);
-> +
-> +		if (ecn_mask != TCA_DUALPI2_ECN_MASK_L4S_ECT &&
-> +		    ecn_mask != TCA_DUALPI2_ECN_MASK_ANY_ECT)
-> +			return -EINVAL;
+Changes in v2:
+- Add more details to commit log
+- Link to v1: https://lore.kernel.org/r/20250415-airoha-en7581-fix-ppe_mbox_data-v1-1-4408c60ba964@kernel.org
+---
+ drivers/net/ethernet/airoha/airoha_npu.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-sch_tree_lock() is leaked here.
+diff --git a/drivers/net/ethernet/airoha/airoha_npu.c b/drivers/net/ethernet/airoha/airoha_npu.c
+index 7a5710f9ccf6a4a4f555ab63d67cb6b318de9b52..ead0625e781f57cd7c5883b6dd3d441db62292d3 100644
+--- a/drivers/net/ethernet/airoha/airoha_npu.c
++++ b/drivers/net/ethernet/airoha/airoha_npu.c
+@@ -104,12 +104,14 @@ struct ppe_mbox_data {
+ 			u8 xpon_hal_api;
+ 			u8 wan_xsi;
+ 			u8 ct_joyme4;
+-			int ppe_type;
+-			int wan_mode;
+-			int wan_sel;
++			u8 max_packet;
++			u8 rsv[3];
++			u32 ppe_type;
++			u32 wan_mode;
++			u32 wan_sel;
+ 		} init_info;
+ 		struct {
+-			int func_id;
++			u32 func_id;
+ 			u32 size;
+ 			u32 data;
+ 		} set_info;
 
-Flagged by Sparse and Smatch.
+---
+base-commit: e8716b5b0dff1b3d523b4a83fd5e94d57b887c5c
+change-id: 20250422-airoha-en7581-fix-ppe_mbox_data-56df12d4df72
 
-> +		WRITE_ONCE(q->ecn_mask, ecn_mask);
-> +	}
-> +
-> +	if (tb[TCA_DUALPI2_SPLIT_GSO]) {
-> +		u8 split_gso = nla_get_u8(tb[TCA_DUALPI2_SPLIT_GSO]);
-> +
-> +		WRITE_ONCE(q->split_gso, (bool)split_gso);
-> +	}
-> +
-> +	old_qlen = qdisc_qlen(sch);
-> +	old_backlog = sch->qstats.backlog;
-> +	while (qdisc_qlen(sch) > sch->limit ||
-> +	       q->memory_used > q->memory_limit) {
-> +		struct sk_buff *skb = __qdisc_dequeue_head(&sch->q);
-> +
-> +		q->memory_used -= skb->truesize;
-> +		qdisc_qstats_backlog_dec(sch, skb);
-> +		rtnl_qdisc_drop(skb, sch);
-> +	}
-> +	qdisc_tree_reduce_backlog(sch, old_qlen - qdisc_qlen(sch),
-> +				  old_backlog - sch->qstats.backlog);
-> +
-> +	sch_tree_unlock(sch);
-> +	return 0;
-> +}
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
 
-...
 
