@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-188197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24782AAB812
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:25:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56A6BAAB828
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:27:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A05C7A7FFA
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:24:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78E8F4A19AF
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 06:25:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C694B2253F2;
-	Tue,  6 May 2025 01:32:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07E6328E60F;
+	Tue,  6 May 2025 01:32:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VkL7MrdS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eRqHpihh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0286D2868A6
-	for <netdev@vger.kernel.org>; Tue,  6 May 2025 00:15:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A130430200A
+	for <netdev@vger.kernel.org>; Tue,  6 May 2025 00:15:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746490557; cv=none; b=RCDLJdfLV2tRtWNlc18cEH8glhPJgdC8WuNB+6yOTRoASbWuDyc2u2PTZ/cU7gtljpY00vPDhEGMeu3N8XzY95I3kHqRUNiQrbWD3pIU4+p6o6BLGKzpcZ3IO+7HVrcHlyxos6Io2aIotvic7jOxC+AFFzkVwwRO0Ytu0tft100=
+	t=1746490560; cv=none; b=tC8VWVNr8Z3rb0sCAIC5GU64L7js5S2cMVlTeH2hCD4gQ4NTE/sU7MjpXULajJo4zWamBx697MluVGQAfB+QrgLR7t/9sUf/Ud5Nipq+5VvboHmDYkL94AySdhSQOs7jjPsY+1jfv1Ba5O8MCag7vkSKLRvfLVQugFO2/V3B5XI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746490557; c=relaxed/simple;
-	bh=7Q6BCSI5bwQKkg/xKqLozazxhHHVK1coX+qZehwtg7o=;
+	s=arc-20240116; t=1746490560; c=relaxed/simple;
+	bh=SUQJwDyDelSjBYDisagH/CamsupKCyZTgx0Y0otYo1I=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=IS3daDC7sn+pK75GPt14jW+oj+2Vwa5ypF5BWeAkc/Qs77CYugREVx8Ald5xyQy6T5++9MzWnntkeoioYp3C/gT2bTWvGUIelDcAJwBifnAyDT4QOOD0uITmpGzfdHydxV7352THD/JFgxcpapR0pm0x/nrPbMPWen5301/ymTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VkL7MrdS; arc=none smtp.client-ip=209.85.210.172
+	 MIME-Version; b=u/Os2hNpajBiULPYY4QWwA9LhcrHqLyYxX/noGXu3wuSRqudV6wrv3mn5EpmYLyr4Y1OAx1JiPif/k3yyc988TFMNtpHZWF/bQLp6KgREDe++hTT8AKwnl5G5ZqUXRGRbUNSyddC+nGBMsyB/9J8MP9OkaA7HkCH+XBkFlX2gow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eRqHpihh; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7399838db7fso5231898b3a.0
-        for <netdev@vger.kernel.org>; Mon, 05 May 2025 17:15:55 -0700 (PDT)
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-72d3b48d2ffso5352053b3a.2
+        for <netdev@vger.kernel.org>; Mon, 05 May 2025 17:15:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746490555; x=1747095355; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1746490556; x=1747095356; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hwanQU3bj0aSmZBwthN3TYs6sRJ/qMdlHFJ0EZDKFeI=;
-        b=VkL7MrdSDq9TEYGvA+m1lUizUb7e5OaBSC3eMelW4y7htAHm5DpxFB4O1gQnE5qYDR
-         rzOmzTYgHcv0se7xkhRPOjIKY+vWCPY3Ukc/Vtgba2Mr3V4OWuhatQngWyIFKREGoXiZ
-         quB8aXXIwD9TxZK9sls6gUd0vbLfXjrSDg4639N9K5tVm5cecQk12IVcjOkqRa2BQrm7
-         hgLZCUmoA5TqpK59V8EbQbUZFhBchpZYlr4S3nBWycyu8UodMTxYvBFuzZnuW4gq8fo7
-         G4q2MTc4slAL32ep7Sbn+sgkHA/x8RrK3IjOsBkcSd3ECJ0W493fMNxhUfsfKIggiLjW
-         Saog==
+        bh=ZwudsHfxychSdk/ic8x+LNI6PSyH0BBqCifn8QiznO4=;
+        b=eRqHpihhU3jXgm830K3qAbSM7nAjRnLf79gonPfp8+e1z8dx7uco7c9qmxR6523akM
+         ZBm+W91gr+0fDFLMW9OBtztTAsuLfzlHv8AXW3Jy1LX8upfkC/G8y36NKLMrR+IkTrFL
+         5Qn1d8dwfoONDwDh29e4VEFjH4ABEmkn+acDLcKQdcxGSEN7Dn3N2VWjMRaU8uOx1TSS
+         AOPS5QRzRKmAD7Lr0O2Q3fBU0X71ptillX33U5IGqP9U6+VWk8ZWBqiflI5V7NQR0nQq
+         Bjoi/XzZrCCrzW//PBoQu2MiaRh1AJfZlOIMkea2g/n7VtMVWoznkXITXHF1nyZQtjoj
+         0vQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746490555; x=1747095355;
+        d=1e100.net; s=20230601; t=1746490556; x=1747095356;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hwanQU3bj0aSmZBwthN3TYs6sRJ/qMdlHFJ0EZDKFeI=;
-        b=TkcTpFcvnIfLN15j57zRnBbjDwE6rik86aUw7eDsc0hgndO4J5No07c1plEwcb4WPj
-         VTTB7f8ZT+W9A4c8I1hTqoq/9Wm5tt+wEgTMFhPD8R6OGdNTVWVPO/yscqherUKIkIIB
-         RVkIdEU2mlDVercwcfhFNWtCd4d8D8DkXx3K6RBId7Uu7yA+UILrpdTkmzzh7okRYkwf
-         8ylZG1w4GKpR9bksiZesY6mpTWl41U4CBC4wWENYFJ42NxhzTHJAiomdHJvPJz3NSztu
-         fw/yLyGzReuL1qVstZ4pr9Pfevjw5RQXRlfAIKL4C8oRFYVpK++5wqANaATZ6aX5BGqc
-         aW8A==
-X-Gm-Message-State: AOJu0YxQk1Wlub7cOBmRUy7Ami0y4pAjCTn10/eOByOoqaD4Zr/T+blD
-	w9Ll+TX+nPltHYzu0WPSXlcJkML+JKm/4rTNMVV5xoLQ6lpVLtNsA2N05WkN
-X-Gm-Gg: ASbGncucFghbgUwUkPxaJJ3wo75Ye4xJP/g6s/igeATpNXrK7Nmj1987mBO/aoHzWbb
-	LxsiK9HCzQCtr1TJXJRPdnN4hTos1HsWh3KQJBIg+zP51dg/4KYFmfpmlEfzPCYdfFseV36lhul
-	17xk5iQBRwHi4K7rqJbAen5SoUkTaM/6Ig2ESH/TEmgr+fODOjTC2XKNtuqkrXnrbYnGe4W4/9j
-	UIzI23iVijTLJXJTqnBNS/tAipDTQ9GeK6Q5nKzdf4SIW7USTeZsFoiPAsJPqWjHQgpN9AA64oN
-	WX2bgMjH3eqsSZGxNklzO61vD4vBx9dsnMOVK2dbfE31XepHxtw=
-X-Google-Smtp-Source: AGHT+IH/Gp09rrt6zJinlhCaGMWMeqVxx9sCg/yODl0g6+umyc3FnKbpcKZ7HHxM3GKMZRiO/mBjpg==
-X-Received: by 2002:aa7:8c0d:0:b0:736:4d05:2e35 with SMTP id d2e1a72fcca58-74090e0e6fbmr1789907b3a.3.1746490554706;
-        Mon, 05 May 2025 17:15:54 -0700 (PDT)
+        bh=ZwudsHfxychSdk/ic8x+LNI6PSyH0BBqCifn8QiznO4=;
+        b=US0sUns25O6RSEeFYdPqvybh+U3r7EtJi6cChyw0Rh4YN4l2N2MRrJbgWcI5LM8/4A
+         W6jf2SZTWd/HrzP0Wm7cJhwYbxS/MTcBIjwdRbz1KBdIGuUSX349jkmkeHw81fJ03CbY
+         8BxseTW/3ujMEglH6fUvu27p3zY7lEMh8SttsDc3o4/AVFKzKhAiW0K5e8occ28ICmF8
+         cgeQKDg9pL+hUZCH5ca+B8TK42oy7Oj0UIoJFV9sgfg5ZiIDJuXJkpVSDC/bZBZnSktz
+         5i/lR32gSKKkY0Is+8j97PM4TBTiFy3ws2LOiOO0r+nd1XCANR2/vcaiepwSXXP8nfw9
+         hKFA==
+X-Gm-Message-State: AOJu0YwTKzXgVScBPdsAnLPOAW9eNXitDBiCC8we+m4B8ti7WriRljb1
+	qx+YmCiakS0F8iq0uKgo0CNfJ74c4hvx7ehWGVbbHtoR588G9tKRE7DziLwX
+X-Gm-Gg: ASbGncsg6NOoC0K/OiZO5YmNF9g5deWUBooH67E2Bwxw//m/4X7hTXf0R9CUIEoFIPk
+	qgp2XfuQXYVjfF8eGPH5BzrucrYUGOn+xU+tUHvX5VrQptLnaQYtIwODqMzFvAM3HkWXU37kKfR
+	AoDZTz3KhNWEUDwl3wgDxrgt+LkJg4aiJshMOubr/cIWCFql2efY01QoHueWGTsd3xdPNDxAZQQ
+	GD2NUbh/sMCBK7yrd56l6pwZ/QJA/p9MBVtXoRmJGisimXxjU8n0eEiigtai1640Brt3Sd1GMmj
+	wHck74+NaHRumV4/DFDvCorm78mo5FdHg1KRTvqFoKgXnjjgYF0=
+X-Google-Smtp-Source: AGHT+IFzh51yIjRcfKiLxVVqyo1TXdk2pl3g/EZY6H3IHBVvvRRbHGLlWjCilxteIEbv69y4LSlfTg==
+X-Received: by 2002:a05:6a00:35ca:b0:736:34a2:8a20 with SMTP id d2e1a72fcca58-74091a915d8mr1430717b3a.21.1746490556330;
+        Mon, 05 May 2025 17:15:56 -0700 (PDT)
 Received: from pop-os.scu.edu ([129.210.115.104])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7405c2e7596sm7496824b3a.147.2025.05.05.17.15.53
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7405c2e7596sm7496824b3a.147.2025.05.05.17.15.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 May 2025 17:15:54 -0700 (PDT)
+        Mon, 05 May 2025 17:15:55 -0700 (PDT)
 From: Cong Wang <xiyou.wangcong@gmail.com>
 To: netdev@vger.kernel.org
 Cc: jiri@resnulli.us,
@@ -78,9 +78,9 @@ Cc: jiri@resnulli.us,
 	willsroot@protonmail.com,
 	savy@syst3mfailure.io,
 	Cong Wang <xiyou.wangcong@gmail.com>
-Subject: [Patch net 1/2] net_sched: Flush gso_skb list too during ->change()
-Date: Mon,  5 May 2025 17:15:48 -0700
-Message-Id: <20250506001549.65391-2-xiyou.wangcong@gmail.com>
+Subject: [Patch net 2/2] selftests/tc-testing: Add qdisc limit trimming tests
+Date: Mon,  5 May 2025 17:15:49 -0700
+Message-Id: <20250506001549.65391-3-xiyou.wangcong@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250506001549.65391-1-xiyou.wangcong@gmail.com>
 References: <20250506001549.65391-1-xiyou.wangcong@gmail.com>
@@ -92,138 +92,216 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Previously, when reducing a qdisc's limit via the ->change() operation, only
-the main skb queue was trimmed, potentially leaving packets in the gso_skb
-list. This could result in NULL pointer dereference when we only check
-sch->q.qlen against sch->limit.
+Added new test cases for FQ, FQ_CODEL, FQ_PIE, and HHF qdiscs to verify queue
+trimming behavior when the qdisc limit is dynamically reduced.
 
-This patch introduces a new helper, qdisc_dequeue_internal(), which ensures
-both the gso_skb list and the main queue are properly flushed when trimming
-excess packets. All relevant qdiscs (codel, fq, fq_codel, fq_pie, hhf, pie)
-are updated to use this helper in their ->change() routines.
+Each test injects packets, reduces the qdisc limit, and checks that the new
+limit is enforced. This is still best effort since timing qdisc backlog
+is not easy.
 
-Fixes: 76e3cc126bb2 ("codel: Controlled Delay AQM")
-Fixes: 4b549a2ef4be ("fq_codel: Fair Queue Codel AQM")
-Fixes: afe4fd062416 ("pkt_sched: fq: Fair Queue packet scheduler")
-Fixes: ec97ecf1ebe4 ("net: sched: add Flow Queue PIE packet scheduler")
-Fixes: 10239edf86f1 ("net-qdisc-hhf: Heavy-Hitter Filter (HHF) qdisc")
-Fixes: d4b36210c2e6 ("net: pkt_sched: PIE AQM scheme")
-Reported-by: Will <willsroot@protonmail.com>
-Reported-by: Savy <savy@syst3mfailure.io>
 Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
 ---
- include/net/sch_generic.h | 14 ++++++++++++++
- net/sched/sch_codel.c     |  2 +-
- net/sched/sch_fq.c        |  2 +-
- net/sched/sch_fq_codel.c  |  2 +-
- net/sched/sch_fq_pie.c    |  2 +-
- net/sched/sch_hhf.c       |  2 +-
- net/sched/sch_pie.c       |  2 +-
- 7 files changed, 20 insertions(+), 6 deletions(-)
+ .../tc-testing/tc-tests/qdiscs/codel.json     | 24 +++++++++++++++++++
+ .../tc-testing/tc-tests/qdiscs/fq.json        | 22 +++++++++++++++++
+ .../tc-testing/tc-tests/qdiscs/fq_codel.json  | 22 +++++++++++++++++
+ .../tc-testing/tc-tests/qdiscs/fq_pie.json    | 22 +++++++++++++++++
+ .../tc-testing/tc-tests/qdiscs/hhf.json       | 22 +++++++++++++++++
+ .../tc-testing/tc-tests/qdiscs/pie.json       | 24 +++++++++++++++++++
+ 6 files changed, 136 insertions(+)
+ create mode 100644 tools/testing/selftests/tc-testing/tc-tests/qdiscs/pie.json
 
-diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-index d48c657191cd..81523a4fb01b 100644
---- a/include/net/sch_generic.h
-+++ b/include/net/sch_generic.h
-@@ -1031,6 +1031,20 @@ static inline struct sk_buff *__qdisc_dequeue_head(struct qdisc_skb_head *qh)
- 	return skb;
- }
- 
-+static inline struct sk_buff *qdisc_dequeue_internal(struct Qdisc *sch, bool direct)
-+{
-+	struct sk_buff *skb;
-+
-+	skb = __skb_dequeue(&sch->gso_skb);
-+	if (!skb) {
-+		if (direct)
-+			skb = __qdisc_dequeue_head(&sch->q);
-+		else
-+			skb = sch->dequeue(sch);
-+	}
-+	return skb;
-+}
-+
- static inline struct sk_buff *qdisc_dequeue_head(struct Qdisc *sch)
- {
- 	struct sk_buff *skb = __qdisc_dequeue_head(&sch->q);
-diff --git a/net/sched/sch_codel.c b/net/sched/sch_codel.c
-index 12dd71139da3..c93761040c6e 100644
---- a/net/sched/sch_codel.c
-+++ b/net/sched/sch_codel.c
-@@ -144,7 +144,7 @@ static int codel_change(struct Qdisc *sch, struct nlattr *opt,
- 
- 	qlen = sch->q.qlen;
- 	while (sch->q.qlen > sch->limit) {
--		struct sk_buff *skb = __qdisc_dequeue_head(&sch->q);
-+		struct sk_buff *skb = qdisc_dequeue_internal(sch, true);
- 
- 		dropped += qdisc_pkt_len(skb);
- 		qdisc_qstats_backlog_dec(sch, skb);
-diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
-index 2ca5332cfcc5..902ff5470607 100644
---- a/net/sched/sch_fq.c
-+++ b/net/sched/sch_fq.c
-@@ -1136,7 +1136,7 @@ static int fq_change(struct Qdisc *sch, struct nlattr *opt,
- 		sch_tree_lock(sch);
- 	}
- 	while (sch->q.qlen > sch->limit) {
--		struct sk_buff *skb = fq_dequeue(sch);
-+		struct sk_buff *skb = qdisc_dequeue_internal(sch, false);
- 
- 		if (!skb)
- 			break;
-diff --git a/net/sched/sch_fq_codel.c b/net/sched/sch_fq_codel.c
-index 6c9029f71e88..2a0f3a513bfa 100644
---- a/net/sched/sch_fq_codel.c
-+++ b/net/sched/sch_fq_codel.c
-@@ -441,7 +441,7 @@ static int fq_codel_change(struct Qdisc *sch, struct nlattr *opt,
- 
- 	while (sch->q.qlen > sch->limit ||
- 	       q->memory_usage > q->memory_limit) {
--		struct sk_buff *skb = fq_codel_dequeue(sch);
-+		struct sk_buff *skb = qdisc_dequeue_internal(sch, false);
- 
- 		q->cstats.drop_len += qdisc_pkt_len(skb);
- 		rtnl_kfree_skbs(skb, skb);
-diff --git a/net/sched/sch_fq_pie.c b/net/sched/sch_fq_pie.c
-index f3b8203d3e85..a04554d01960 100644
---- a/net/sched/sch_fq_pie.c
-+++ b/net/sched/sch_fq_pie.c
-@@ -366,7 +366,7 @@ static int fq_pie_change(struct Qdisc *sch, struct nlattr *opt,
- 
- 	/* Drop excess packets if new limit is lower */
- 	while (sch->q.qlen > sch->limit) {
--		struct sk_buff *skb = fq_pie_qdisc_dequeue(sch);
-+		struct sk_buff *skb = qdisc_dequeue_internal(sch, true);
- 
- 		len_dropped += qdisc_pkt_len(skb);
- 		num_dropped += 1;
-diff --git a/net/sched/sch_hhf.c b/net/sched/sch_hhf.c
-index 44d9efe1a96a..f4c2bebd3780 100644
---- a/net/sched/sch_hhf.c
-+++ b/net/sched/sch_hhf.c
-@@ -564,7 +564,7 @@ static int hhf_change(struct Qdisc *sch, struct nlattr *opt,
- 	qlen = sch->q.qlen;
- 	prev_backlog = sch->qstats.backlog;
- 	while (sch->q.qlen > sch->limit) {
--		struct sk_buff *skb = hhf_dequeue(sch);
-+		struct sk_buff *skb = qdisc_dequeue_internal(sch, true);
- 
- 		rtnl_kfree_skbs(skb, skb);
- 	}
-diff --git a/net/sched/sch_pie.c b/net/sched/sch_pie.c
-index 3771d000b30d..ff49a6c97033 100644
---- a/net/sched/sch_pie.c
-+++ b/net/sched/sch_pie.c
-@@ -195,7 +195,7 @@ static int pie_change(struct Qdisc *sch, struct nlattr *opt,
- 	/* Drop excess packets if new limit is lower */
- 	qlen = sch->q.qlen;
- 	while (sch->q.qlen > sch->limit) {
--		struct sk_buff *skb = __qdisc_dequeue_head(&sch->q);
-+		struct sk_buff *skb = qdisc_dequeue_internal(sch, true);
- 
- 		dropped += qdisc_pkt_len(skb);
- 		qdisc_qstats_backlog_dec(sch, skb);
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/codel.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/codel.json
+index e9469ee71e6f..6d515d0e5ed6 100644
+--- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/codel.json
++++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/codel.json
+@@ -189,5 +189,29 @@
+         "teardown": [
+             "$TC qdisc del dev $DUMMY handle 1: root"
+         ]
++    },
++    {
++        "id": "deb1",
++        "name": "CODEL test qdisc limit trimming",
++        "category": ["qdisc", "codel"],
++        "plugins": {
++            "requires": ["nsPlugin", "scapyPlugin"]
++        },
++        "setup": [
++            "$TC qdisc add dev $DEV1 handle 1: root codel limit 10"
++        ],
++        "scapy": [
++            {
++                "iface": "$DEV0",
++                "count": 10,
++                "packet": "Ether(type=0x800)/IP(src='10.0.0.10',dst='10.0.0.20')/TCP(sport=5000,dport=10)"
++            }
++        ],
++        "cmdUnderTest": "$TC qdisc change dev $DEV1 handle 1: root codel limit 1",
++        "expExitCode": "0",
++        "verifyCmd": "$TC qdisc show dev $DEV1",
++        "matchPattern": "qdisc codel 1: root refcnt [0-9]+ limit 1p target 5ms interval 100ms",
++        "matchCount": "1",
++        "teardown": ["$TC qdisc del dev $DEV1 handle 1: root"]
+     }
+ ]
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fq.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fq.json
+index 3a537b2ec4c9..24faf4e12dfa 100644
+--- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fq.json
++++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fq.json
+@@ -377,5 +377,27 @@
+         "teardown": [
+             "$TC qdisc del dev $DUMMY handle 1: root"
+         ]
++    },
++    {
++        "id": "9479",
++        "name": "FQ test qdisc limit trimming",
++        "category": ["qdisc", "fq"],
++        "plugins": {"requires": ["nsPlugin", "scapyPlugin"]},
++        "setup": [
++            "$TC qdisc add dev $DEV1 handle 1: root fq limit 10"
++        ],
++        "scapy": [
++            {
++                "iface": "$DEV0",
++                "count": 10,
++                "packet": "Ether(type=0x800)/IP(src='10.0.0.10',dst='10.0.0.20')/TCP(sport=5000,dport=10)"
++            }
++        ],
++        "cmdUnderTest": "$TC qdisc change dev $DEV1 handle 1: root fq limit 1",
++        "expExitCode": "0",
++        "verifyCmd": "$TC qdisc show dev $DEV1",
++        "matchPattern": "qdisc fq 1: root refcnt [0-9]+ limit 1p",
++        "matchCount": "1",
++        "teardown": ["$TC qdisc del dev $DEV1 handle 1: root"]
+     }
+ ]
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fq_codel.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fq_codel.json
+index 9774b1e8801b..4ce62b857fd7 100644
+--- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fq_codel.json
++++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fq_codel.json
+@@ -294,5 +294,27 @@
+         "teardown": [
+             "$TC qdisc del dev $DUMMY handle 1: root"
+         ]
++    },
++    {
++        "id": "0436",
++        "name": "FQ_CODEL test qdisc limit trimming",
++        "category": ["qdisc", "fq_codel"],
++        "plugins": {"requires": ["nsPlugin", "scapyPlugin"]},
++        "setup": [
++            "$TC qdisc add dev $DEV1 handle 1: root fq_codel limit 10"
++        ],
++        "scapy": [
++            {
++                "iface": "$DEV0",
++                "count": 10,
++                "packet": "Ether(type=0x800)/IP(src='10.0.0.10',dst='10.0.0.20')/TCP(sport=5000,dport=10)"
++            }
++        ],
++        "cmdUnderTest": "$TC qdisc change dev $DEV1 handle 1: root fq_codel limit 1",
++        "expExitCode": "0",
++        "verifyCmd": "$TC qdisc show dev $DEV1",
++        "matchPattern": "qdisc fq_codel 1: root refcnt [0-9]+ limit 1p flows 1024 quantum.*target 5ms interval 100ms memory_limit 32Mb ecn drop_batch 64",
++        "matchCount": "1",
++        "teardown": ["$TC qdisc del dev $DEV1 handle 1: root"]
+     }
+ ]
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fq_pie.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fq_pie.json
+index d012d88d67fe..229fe1bf4a90 100644
+--- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fq_pie.json
++++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fq_pie.json
+@@ -18,5 +18,27 @@
+         "matchCount": "1",
+         "teardown": [
+         ]
++    },
++    {
++        "id": "83bf",
++        "name": "FQ_PIE test qdisc limit trimming",
++        "category": ["qdisc", "fq_pie"],
++        "plugins": {"requires": ["nsPlugin", "scapyPlugin"]},
++        "setup": [
++            "$TC qdisc add dev $DEV1 handle 1: root fq_pie limit 10"
++        ],
++        "scapy": [
++            {
++                "iface": "$DEV0",
++                "count": 10,
++                "packet": "Ether(type=0x800)/IP(src='10.0.0.10',dst='10.0.0.20')/TCP(sport=5000,dport=10)"
++            }
++        ],
++        "cmdUnderTest": "$TC qdisc change dev $DEV1 handle 1: root fq_pie limit 1",
++        "expExitCode": "0",
++        "verifyCmd": "$TC qdisc show dev $DEV1",
++        "matchPattern": "qdisc fq_pie 1: root refcnt [0-9]+ limit 1p",
++        "matchCount": "1",
++        "teardown": ["$TC qdisc del dev $DEV1 handle 1: root"]
+     }
+ ]
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/hhf.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/hhf.json
+index dbef5474b26b..0ca19fac54a5 100644
+--- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/hhf.json
++++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/hhf.json
+@@ -188,5 +188,27 @@
+         "teardown": [
+             "$TC qdisc del dev $DUMMY handle 1: root"
+         ]
++    },
++    {
++        "id": "385f",
++        "name": "HHF test qdisc limit trimming",
++        "category": ["qdisc", "hhf"],
++        "plugins": {"requires": ["nsPlugin", "scapyPlugin"]},
++        "setup": [
++            "$TC qdisc add dev $DEV1 handle 1: root hhf limit 10"
++        ],
++        "scapy": [
++            {
++                "iface": "$DEV0",
++                "count": 10,
++                "packet": "Ether(type=0x800)/IP(src='10.0.0.10',dst='10.0.0.20')/TCP(sport=5000,dport=10)"
++            }
++        ],
++        "cmdUnderTest": "$TC qdisc change dev $DEV1 handle 1: root hhf limit 1",
++        "expExitCode": "0",
++        "verifyCmd": "$TC qdisc show dev $DEV1",
++        "matchPattern": "qdisc hhf 1: root refcnt [0-9]+ limit 1p.*hh_limit 2048 reset_timeout 40ms admit_bytes 128Kb evict_timeout 1s non_hh_weight 2",
++        "matchCount": "1",
++        "teardown": ["$TC qdisc del dev $DEV1 handle 1: root"]
+     }
+ ]
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/pie.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/pie.json
+new file mode 100644
+index 000000000000..1a98b66e8030
+--- /dev/null
++++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/pie.json
+@@ -0,0 +1,24 @@
++[
++    {
++        "id": "6158",
++        "name": "PIE test qdisc limit trimming",
++        "category": ["qdisc", "pie"],
++        "plugins": {"requires": ["nsPlugin", "scapyPlugin"]},
++        "setup": [
++            "$TC qdisc add dev $DEV1 handle 1: root pie limit 10"
++        ],
++        "scapy": [
++            {
++                "iface": "$DEV0",
++                "count": 10,
++                "packet": "Ether(type=0x800)/IP(src='10.0.0.10',dst='10.0.0.20')/TCP(sport=5000,dport=10)"
++            }
++        ],
++        "cmdUnderTest": "$TC qdisc change dev $DEV1 handle 1: root pie limit 1",
++        "expExitCode": "0",
++        "verifyCmd": "$TC qdisc show dev $DEV1",
++        "matchPattern": "qdisc pie 1: root refcnt [0-9]+ limit 1p",
++        "matchCount": "1",
++        "teardown": ["$TC qdisc del dev $DEV1 handle 1: root"]
++    }
++]
 -- 
 2.34.1
 
