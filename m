@@ -1,126 +1,232 @@
-Return-Path: <netdev+bounces-188350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7F05AAC714
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 15:56:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80C97AAC738
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 16:00:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 736437AD41E
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 13:55:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 260F21BA555B
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 14:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FCC7280319;
-	Tue,  6 May 2025 13:56:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="d4+QEZ9G"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 282BB281343;
+	Tue,  6 May 2025 13:59:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE38280012
-	for <netdev@vger.kernel.org>; Tue,  6 May 2025 13:56:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED35281341
+	for <netdev@vger.kernel.org>; Tue,  6 May 2025 13:59:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746539782; cv=none; b=n6WvpV81TRnAzlcm+X+6RIqeB0Rn2B/2AVRpJilra2H6t/8dQpes01NucwaOTuonPSTl+J5bzDNkBgW7mTdYo5tzewiNmBaJxMjNDs19DbvQFDsBKVzZ+sZVlinA1JwzTy+lfd9uqENRlACAnDVhXLKQZ3SgsfgJB9lG609XnLo=
+	t=1746539989; cv=none; b=SGN3RzCpNZPg/jfHZisSu4SpJuaUTJ1xXUTyPuppinHGPwFFRqCkogQXjbzsVhbBdsGWlBv1tVMZsKepH13GfUohaTB89HozNBPuOIDfKL95LotnXZqOTZsjCpYw/N2OL3Agzd23rd/2fC7AKbJFp64lbqJjxMIHs4O0XSiqXq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746539782; c=relaxed/simple;
-	bh=lf6YtdrdwJ2QtsANp3wjNVE6niIZ90eHUTTGp1DiNGc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FZ4iLd4tW29o+Envyv7mTT8Zgdw4DEZIaBbpk15KzqEkl7rxpP4i4I/Hl9aO7mfLmg2m96zFidl2Xy09ErEBQ61LzqZIfx9FCoXaRw2Ry7l6YqKW1e6ZW4ycYzXIb68RQWLWXzh+q22I7mNLlJzuELeWZ3La65zwReLg/mpk5IY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=d4+QEZ9G; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=sDSa7bE8NOJXLelvEMpU/rC6sYcMXis7kEsdOk5BpI0=; b=d4+QEZ9GFyHLyMVwJ48TKE6Ihn
-	S1FaSH9ltOcNp8C2wL3927zufKs6vPAHstgRsiUbOBT/avqnIvnJLb7XBsytAf6hUbBRr4DgcLD5E
-	QxXqrbiDvqWJCSj2su4ZAgm5Q24jQsVEwnveMOLWQOD3Acy7oJfqgeOursDLY7diLPcQGrKbhQfz1
-	2MtbfQJI/M5z/exkUBLhgl5GT5inYAirRFLHgqvcAauiRhQlDigbzHxDM9FPDkScK6uy9NW0KpzHo
-	s+JcggW/WUYOWoHuOaWCNLI3mFZnAJNRXSqKNpYdStdAjwQHF0vy1LmTYJlZviuRWeeFgcQVT4zGa
-	YJ2py6yA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uCImP-0000000CDgT-3Equ;
-	Tue, 06 May 2025 13:56:17 +0000
-Date: Tue, 6 May 2025 06:56:17 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Hildenbrand <david@redhat.com>,
-	John Hubbard <jhubbard@nvidia.com>,
-	Christoph Hellwig <hch@infradead.org>, willy@infradead.org,
-	netdev@vger.kernel.org, linux-mm@kvack.org,
-	Willem de Bruijn <willemb@google.com>
-Subject: Re: Reorganising how the networking layer handles memory
-Message-ID: <aBoVAd-XX_44RKbC@infradead.org>
-References: <20250505131446.7448e9bf@kernel.org>
- <165f5d5b-34f2-40de-b0ec-8c1ca36babe8@lunn.ch>
- <0aa1b4a2-47b2-40a4-ae14-ce2dd457a1f7@lunn.ch>
- <1015189.1746187621@warthog.procyon.org.uk>
- <1021352.1746193306@warthog.procyon.org.uk>
- <1069540.1746202908@warthog.procyon.org.uk>
- <1216273.1746539449@warthog.procyon.org.uk>
+	s=arc-20240116; t=1746539989; c=relaxed/simple;
+	bh=EgwDTmoxAcWDrMGQj1WZkaNkSd2Dz3bwYxmKA5ICoC4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=uNLXPf8+tDLG+stsIO9UAqTidkZ6MJ5UzWFu4mJzlngki28aB9QjKz0BVSKCfgr0rr/DfExBk+5TA6d/VtR/dHu+6xHAB9aAK/i/UEuRGXuSHikRMoyqvWt/gX+8A/sVcUTaS4yHM1UlS9nc7+NildegGIaSmVTxRy6nvDbDEP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1uCIpk-0007pE-Fl
+	for netdev@vger.kernel.org; Tue, 06 May 2025 15:59:44 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1uCIpj-001P8T-2e
+	for netdev@vger.kernel.org;
+	Tue, 06 May 2025 15:59:43 +0200
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id 74DF7408F56
+	for <netdev@vger.kernel.org>; Tue, 06 May 2025 13:59:43 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id ECD7A408F35;
+	Tue, 06 May 2025 13:59:41 +0000 (UTC)
+Received: from blackshift.org (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 80c055d2;
+	Tue, 6 May 2025 13:59:41 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de,
+	Kelsey Maes <kelsey@vpprocess.com>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	Marc Kleine-Budde <mkl@pengutronix.de>
+Subject: [PATCH net 2/6] can: mcp251xfd: fix TDC setting for low data bit rates
+Date: Tue,  6 May 2025 15:56:18 +0200
+Message-ID: <20250506135939.652543-3-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.47.2
+In-Reply-To: <20250506135939.652543-1-mkl@pengutronix.de>
+References: <20250506135939.652543-1-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1216273.1746539449@warthog.procyon.org.uk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Tue, May 06, 2025 at 02:50:49PM +0100, David Howells wrote:
-> > > (2) sendmsg(MSG_ZEROCOPY) suffers from the O_DIRECT vs fork() bug because
-> > >      it doesn't use page pinning.  It needs to use the GUP routines.
-> > 
-> > We end up calling iov_iter_get_pages2(). Is it not setting
-> > FOLL_PIN is a conscious choice, or nobody cared until now?
-> 
-> iov_iter_get_pages*() predates GUP, I think.
+From: Kelsey Maes <kelsey@vpprocess.com>
 
-It predates pin_user_pages, but get_user_pages is much older.
+The TDC is currently hardcoded enabled. This means that even for lower
+CAN-FD data bitrates (with a DBRP (data bitrate prescaler) > 2) a TDC
+is configured. This leads to a bus-off condition.
 
-> There's now an
-> iov_iter_extract_pages() that does the pinning stuff, but you have to do a
-> different cleanup, which is why I created a new API call.
+ISO 11898-1 section 11.3.3 says "Transmitter delay compensation" (TDC)
+is only applicable if DBRP is 1 or 2.
 
-But yes, iov_iter_get_pages* needs to go away in favour of
-iov_iter_extract_pages, and I'm still annoyed that despite multiple
-pings no one has done any work on that outside of block / block based
-direct I/O and netfs.
+To fix the problem, switch the driver to use the TDC calculation
+provided by the CAN driver framework (which respects ISO 11898-1
+section 11.3.3). This has the positive side effect that userspace can
+control TDC as needed.
 
-> > >  (3) sendmsg(MSG_SPLICE_PAGES) isn't entirely satisfactory because it can't be
-> > >      used with certain memory types (e.g. slab).  It takes a ref on whatever
-> > >      it is given - which is wrong if it should pin this instead.
-> > 
-> > s/takes a ref/requires a ref/ ? I mean - the caller implicitly grants 
-> > a ref  to the stack, right? But yes, the networking stack will try to
-> > release it.
-> 
-> I mean 'takes' as in skb_append_pagefrags() calls get_page() - something that
-> needs to be changed.
-> 
-> Christoph Hellwig would like to make it such that the extractor gets
-> {phyaddr,len} rather than {page,off,len} - so all you, the network layer, see
-> is that you've got a span of memory to use as your buffer.  How that span of
-> memory is managed is the responsibility of whoever called sendmsg() - and they
-> need a callback to be able to handle that.
+Demonstration of the feature in action:
+| $ ip link set can0 up type can bitrate 125000 dbitrate 500000 fd on
+| $ ip -details link show can0
+| 3: can0: <NOARP,UP,LOWER_UP,ECHO> mtu 72 qdisc pfifo_fast state UP mode DEFAULT group default qlen 10
+|     link/can  promiscuity 0  allmulti 0 minmtu 0 maxmtu 0
+|     can <FD> state ERROR-ACTIVE (berr-counter tx 0 rx 0) restart-ms 0
+| 	  bitrate 125000 sample-point 0.875
+| 	  tq 50 prop-seg 69 phase-seg1 70 phase-seg2 20 sjw 10 brp 2
+| 	  mcp251xfd: tseg1 2..256 tseg2 1..128 sjw 1..128 brp 1..256 brp_inc 1
+| 	  dbitrate 500000 dsample-point 0.875
+| 	  dtq 125 dprop-seg 6 dphase-seg1 7 dphase-seg2 2 dsjw 1 dbrp 5
+| 	  mcp251xfd: dtseg1 1..32 dtseg2 1..16 dsjw 1..16 dbrp 1..256 dbrp_inc 1
+| 	  tdcv 0..63 tdco 0..63
+| 	  clock 40000000 numtxqueues 1 numrxqueues 1 gso_max_size 65536 gso_max_segs 65535 tso_max_size 65536 tso_max_segs 65535 gro_max_size 65536 parentbus spi parentdev spi0.0
+| $ ip link set can0 up type can bitrate 1000000 dbitrate 4000000 fd on
+| $ ip -details link show can0
+| 3: can0: <NOARP,UP,LOWER_UP,ECHO> mtu 72 qdisc pfifo_fast state UP mode DEFAULT group default qlen 10
+|     link/can  promiscuity 0  allmulti 0 minmtu 0 maxmtu 0
+|     can <FD,TDC-AUTO> state ERROR-ACTIVE (berr-counter tx 0 rx 0) restart-ms 0
+| 	  bitrate 1000000 sample-point 0.750
+| 	  tq 25 prop-seg 14 phase-seg1 15 phase-seg2 10 sjw 5 brp 1
+| 	  mcp251xfd: tseg1 2..256 tseg2 1..128 sjw 1..128 brp 1..256 brp_inc 1
+| 	  dbitrate 4000000 dsample-point 0.700
+| 	  dtq 25 dprop-seg 3 dphase-seg1 3 dphase-seg2 3 dsjw 1 dbrp 1
+| 	  tdco 7
+| 	  mcp251xfd: dtseg1 1..32 dtseg2 1..16 dsjw 1..16 dbrp 1..256 dbrp_inc 1
+| 	  tdcv 0..63 tdco 0..63
+| 	  clock 40000000 numtxqueues 1 numrxqueues 1 gso_max_size 65536 gso_max_segs 65535 tso_max_size 65536 tso_max_segs 65535 gro_max_size 65536 parentbus spi parentdev spi0.0
 
-Not sure what the extractor is, but we plan to change the bio_vec
-to be physical address instead of page+offset based.  Where we is
-a lot more people than just me.
+There has been some confusion about the MCP2518FD using a relative or
+absolute TDCO due to the datasheet specifying a range of [-64,63]. I
+have a custom board with a 40 MHz clock and an estimated loop delay of
+100 to 216 ns. During testing at a data bit rate of 4 Mbit/s I found
+that using can_get_relative_tdco() resulted in bus-off errors. The
+final TDCO value was 1 which corresponds to a 10% SSP in an absolute
+configuration. This behavior is expected if the TDCO value is really
+absolute and not relative. Using priv->can.tdc.tdco instead results in
+a final TDCO of 8, setting the SSP at exactly 80%. This configuration
+works.
 
-> Once advantage of delegating it to the caller, though, and having the caller
-> keep track of which bits in still needs to hold on to by transmission
-> completion position is that we don't need to manage refs/pins across sk_buff
-> duplication - let alone what we should do with stuff that's kmalloc'd.
+The automatic, manual, and off TDC modes were tested at speeds up to,
+and including, 8 Mbit/s on real hardware and behave as expected.
 
-And the callers already do that for all other kinds of I/O anyway.
+Fixes: 55e5b97f003e ("can: mcp25xxfd: add driver for Microchip MCP25xxFD SPI CAN")
+Reported-by: Kelsey Maes <kelsey@vpprocess.com>
+Closes: https://lore.kernel.org/all/C2121586-C87F-4B23-A933-845362C29CA1@vpprocess.com
+Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Signed-off-by: Kelsey Maes <kelsey@vpprocess.com>
+Link: https://patch.msgid.link/20250430161501.79370-1-kelsey@vpprocess.com
+[mkl: add comment]
+Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+---
+ .../net/can/spi/mcp251xfd/mcp251xfd-core.c    | 40 +++++++++++++++----
+ 1 file changed, 32 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c b/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
+index 3bc56517fe7a..064d81c724f4 100644
+--- a/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
++++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
+@@ -75,6 +75,24 @@ static const struct can_bittiming_const mcp251xfd_data_bittiming_const = {
+ 	.brp_inc = 1,
+ };
+ 
++/* The datasheet of the mcp2518fd (DS20006027B) specifies a range of
++ * [-64,63] for TDCO, indicating a relative TDCO.
++ *
++ * Manual tests have shown, that using a relative TDCO configuration
++ * results in bus off, while an absolute configuration works.
++ *
++ * For TDCO use the max value (63) from the data sheet, but 0 as the
++ * minimum.
++ */
++static const struct can_tdc_const mcp251xfd_tdc_const = {
++	.tdcv_min = 0,
++	.tdcv_max = 63,
++	.tdco_min = 0,
++	.tdco_max = 63,
++	.tdcf_min = 0,
++	.tdcf_max = 0,
++};
++
+ static const char *__mcp251xfd_get_model_str(enum mcp251xfd_model model)
+ {
+ 	switch (model) {
+@@ -510,8 +528,7 @@ static int mcp251xfd_set_bittiming(const struct mcp251xfd_priv *priv)
+ {
+ 	const struct can_bittiming *bt = &priv->can.bittiming;
+ 	const struct can_bittiming *dbt = &priv->can.data_bittiming;
+-	u32 val = 0;
+-	s8 tdco;
++	u32 tdcmod, val = 0;
+ 	int err;
+ 
+ 	/* CAN Control Register
+@@ -575,11 +592,16 @@ static int mcp251xfd_set_bittiming(const struct mcp251xfd_priv *priv)
+ 		return err;
+ 
+ 	/* Transmitter Delay Compensation */
+-	tdco = clamp_t(int, dbt->brp * (dbt->prop_seg + dbt->phase_seg1),
+-		       -64, 63);
+-	val = FIELD_PREP(MCP251XFD_REG_TDC_TDCMOD_MASK,
+-			 MCP251XFD_REG_TDC_TDCMOD_AUTO) |
+-		FIELD_PREP(MCP251XFD_REG_TDC_TDCO_MASK, tdco);
++	if (priv->can.ctrlmode & CAN_CTRLMODE_TDC_AUTO)
++		tdcmod = MCP251XFD_REG_TDC_TDCMOD_AUTO;
++	else if (priv->can.ctrlmode & CAN_CTRLMODE_TDC_MANUAL)
++		tdcmod = MCP251XFD_REG_TDC_TDCMOD_MANUAL;
++	else
++		tdcmod = MCP251XFD_REG_TDC_TDCMOD_DISABLED;
++
++	val = FIELD_PREP(MCP251XFD_REG_TDC_TDCMOD_MASK, tdcmod) |
++		FIELD_PREP(MCP251XFD_REG_TDC_TDCV_MASK, priv->can.tdc.tdcv) |
++		FIELD_PREP(MCP251XFD_REG_TDC_TDCO_MASK, priv->can.tdc.tdco);
+ 
+ 	return regmap_write(priv->map_reg, MCP251XFD_REG_TDC, val);
+ }
+@@ -2083,10 +2105,12 @@ static int mcp251xfd_probe(struct spi_device *spi)
+ 	priv->can.do_get_berr_counter = mcp251xfd_get_berr_counter;
+ 	priv->can.bittiming_const = &mcp251xfd_bittiming_const;
+ 	priv->can.data_bittiming_const = &mcp251xfd_data_bittiming_const;
++	priv->can.tdc_const = &mcp251xfd_tdc_const;
+ 	priv->can.ctrlmode_supported = CAN_CTRLMODE_LOOPBACK |
+ 		CAN_CTRLMODE_LISTENONLY | CAN_CTRLMODE_BERR_REPORTING |
+ 		CAN_CTRLMODE_FD | CAN_CTRLMODE_FD_NON_ISO |
+-		CAN_CTRLMODE_CC_LEN8_DLC;
++		CAN_CTRLMODE_CC_LEN8_DLC | CAN_CTRLMODE_TDC_AUTO |
++		CAN_CTRLMODE_TDC_MANUAL;
+ 	set_bit(MCP251XFD_FLAGS_DOWN, priv->flags);
+ 	priv->ndev = ndev;
+ 	priv->spi = spi;
+-- 
+2.47.2
+
 
 
