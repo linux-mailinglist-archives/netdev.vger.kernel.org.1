@@ -1,59 +1,61 @@
-Return-Path: <netdev+bounces-188241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0404AABC50
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 10:01:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89597AABC28
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 09:56:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD70BB2077E
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 07:54:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F137A505458
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 07:56:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 105131991B2;
-	Tue,  6 May 2025 07:34:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C72E221ADBA;
+	Tue,  6 May 2025 07:39:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S2bvm077"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TpEZgMWt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D48452033A;
-	Tue,  6 May 2025 07:34:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CF6B219A94;
+	Tue,  6 May 2025 07:39:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746516846; cv=none; b=BA4bzr1tma1k5AnQEaC3HGxy0MAkfkLIGdTy1ixFX7Yh6yC5/A9ptUWE6JlHr4mDcXfhj6Oz5m9JwSLCGEU7w2V7bV8wJvX0yV9cH7LG6+aHGhEAwpX9a0BROtseh7uQVfzxYRDNvFQF79w/fF7HT9hA+kCxWgNZbW2az7WNzIY=
+	t=1746517170; cv=none; b=eb+0Hvu6oHRWJvwRgeNXDTBGaQ5wiTiRoow6IE0i1+AJbhJPEVWPMzy752xVp3NjIft7wWEm3iOizsIoXaiLggSK0SVGXATiod1a+xtWll1AinV4bnbwIQ0fBi0ywRDxeb9UWRG16Ox9JnosL4N4x8BsKx1G1Q/YDWzOlewxHXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746516846; c=relaxed/simple;
-	bh=d9IiQ8Qjo0tqUnrKW/3eICy/RDOPsZnxBXE+q+64nqs=;
+	s=arc-20240116; t=1746517170; c=relaxed/simple;
+	bh=ldajszjlmAJBEpZ7WGRkd+NEPH8q2U32qIt+60788A8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j9is5gWBMWFHKkF1I4Nn4KAMwaW8cR8VnWYEWW7U1Us6TPqkgEUO3VQIqQfHqTr92CLzATitV6LwiJW5DKEgOMqrQlyc7bMbTEHrZown5XLpcNCBhmvFwmoGKxR1NGiKYjMd0w23b/I3NBG+sZwTyjBE0B7bioKYwWJNRdjbhKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S2bvm077; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BC0FC4CEE4;
-	Tue,  6 May 2025 07:34:00 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=jf8WJpMsbee+UHoLmUZUMOwpwrPErDputnsB1vJZZk20SP12EwWP9uoEccaYjEaYVxY29ilHeSL0H60fTdtQuEPt2uyo/TdbY52nYaxbJ4mcZUx/YEosFi835Ij0BZW4nVKqUM8/sRM4o6xNA+17gpg/9gwWX3k1fX5R1/01uds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TpEZgMWt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA4E3C4CEE4;
+	Tue,  6 May 2025 07:39:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746516845;
-	bh=d9IiQ8Qjo0tqUnrKW/3eICy/RDOPsZnxBXE+q+64nqs=;
+	s=k20201202; t=1746517169;
+	bh=ldajszjlmAJBEpZ7WGRkd+NEPH8q2U32qIt+60788A8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=S2bvm077AEBpwpjElh8A0pxs3b/rebZU0Otu3ammcbnYh1aGhsMpn8pXkv8cFEEY6
-	 BiCmEj0LFdj+u4xXX6bD6/PJVGnZkOe6xQj6iYbl5CGBbI1gLtKXGPhPuOoNj8Yqtw
-	 U5Qmd7k4R9mUduH+QjVRQ9mzq2Bafr/9pzFb69hKWX9J10CH1cspYq5KiJD+AcCAZ+
-	 drGJ3KKohO7iu+VHOgwv123iB1++jIWM37aqln9TD3dY48Vfgr+f3Qt9tQH9NLGhD5
-	 vIQoXGIuhqlCYI7jTaZi1bT58buoTH3Q7JRpkS/RLQYFMO/fRF7K/DkZYycp7Qg1XR
-	 blL+jv9RzpAbw==
-Date: Tue, 6 May 2025 09:33:58 +0200
+	b=TpEZgMWtRdVUAcq5WPuB3opmprM3oi218jk02ZJLh1AM5Fowc2zzm7ClsB6JQkLdg
+	 WcdcDUvSLsWm7OAxM/fjV4cB8aj96mm9Qzr2YxyKiYAPFtZGWWuhxBeJMO3cFxny57
+	 xStUmBf/jNAbGPAY054+tfLKAJoRYQxLvZElEDme4ZYktVXu7Jv7MuwF5Zc06R2Yvk
+	 XqgvK2LaYbg+ackwJr5GK7551Dv45RTP9xY3Eetc2tgovd0S+pEQQQV8XFZVmaGR1j
+	 6DEOmpx0LJHrIcy5N7qpfEplsuCDsjpd6BFsXaZuHSs+7w1vS/q2xwL1TCxY2JPuYR
+	 PqdQ0D4c6t05g==
+Date: Tue, 6 May 2025 09:39:22 +0200
 From: Christian Brauner <brauner@kernel.org>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: alexander@mihalicyn.com, bluca@debian.org, daan.j.demeyer@gmail.com, 
-	davem@davemloft.net, david@readahead.eu, edumazet@google.com, horms@kernel.org, 
-	jack@suse.cz, jannh@google.com, kuba@kernel.org, lennart@poettering.net, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, me@yhndnzj.com, 
-	netdev@vger.kernel.org, oleg@redhat.com, pabeni@redhat.com, viro@zeniv.linux.org.uk, 
-	zbyszek@in.waw.pl
-Subject: Re: [PATCH RFC v3 00/10] coredump: add coredump socket
-Message-ID: <20250506-umtriebe-rhabarber-161f1fcffe56@brauner>
-References: <20250505-work-coredump-socket-v3-0-e1832f0e1eae@kernel.org>
- <20250505183303.14126-1-kuniyu@amazon.com>
+To: Jann Horn <jannh@google.com>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, alexander@mihalicyn.com, 
+	bluca@debian.org, daan.j.demeyer@gmail.com, davem@davemloft.net, 
+	david@readahead.eu, edumazet@google.com, horms@kernel.org, jack@suse.cz, 
+	kuba@kernel.org, lennart@poettering.net, linux-fsdevel@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, me@yhndnzj.com, netdev@vger.kernel.org, oleg@redhat.com, 
+	pabeni@redhat.com, viro@zeniv.linux.org.uk, zbyszek@in.waw.pl
+Subject: Re: [PATCH RFC v3 08/10] net, pidfs, coredump: only allow
+ coredumping tasks to connect to coredump socket
+Message-ID: <20250506-zertifikat-teint-d866c715291a@brauner>
+References: <20250505193828.21759-1-kuniyu@amazon.com>
+ <20250505194451.22723-1-kuniyu@amazon.com>
+ <CAG48ez2YRJxDmAZEOSWVvCyz0fkHN2NaC=_mLzcLibVKVOWqHw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,57 +64,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250505183303.14126-1-kuniyu@amazon.com>
+In-Reply-To: <CAG48ez2YRJxDmAZEOSWVvCyz0fkHN2NaC=_mLzcLibVKVOWqHw@mail.gmail.com>
 
-> > The coredump socket is located in the initial network namespace.
-> 
-> I understand this is a reasonable decision to avoid complicated
-> path management in the mount ns but keep connectivity from any
-> namespace.
+> ("a kernel socket" is not necessarily the same as "a kernel socket
+> intended for core dumping")
 
-Yes, path lookup would not just be horrid it would also require playing
-around with credentials and current->fs. The beauty in this
-implementation is that its the crash dumping process itself which does
-everything.
-
-> > To bind
-> > the coredump socket userspace must hold CAP_SYS_ADMIN in the initial
-> > user namespace. Listening and reading can happen from whatever
-> > unprivileged context is necessary to safely process coredumps.
-> > 
-> > When a task coredumps it opens a client socket in the initial network
-> > namespace and connects to the coredump socket. For now only tasks that
-> > are acctually coredumping are allowed to connect to the initial coredump
-> > socket.
-> 
-> This can be controlled by BPF (cgroup sockops or LSM) if a user
-> really cares about spam clients.
-> 
-> I think how to set up coredump is userspace responsibility.
-
-I'll reply to that in the other thread so we don't have millions of
-branch points.
-
-> > - Since unix_stream_connect() runs bpf programs during connect it's
-> >   possible to even redirect or multiplex coredumps to other sockets.
-> 
-> If the socket is in a cgroup, yes, and even if not, BPF LSM can
-> reject some requests.
-
-Indeed. I've outlined that in an earlier version as well.
-
-> > - The coredump server should mark itself as non-dumpable.
-> >   To capture coredumps for the coredump server itself a bpf program
-> >   should be run at connect to redirect it to another socket in
-> >   userspace. This can be useful for debugging crashing coredump servers.
-> > 
-> > - A container coredump server in a separate network namespace can simply
-> >   bind to linuxafsk/coredump.socket and systemd-coredump fowards
-> >   coredumps to the container.
-> 
-> I think the name should be also configurable in non-initial netns.
-
-I don't see a good reason for this. We can always relax that later if we
-have to. The fixed address keeps the coredump setup very very dumb and
-simple.
+Indeed. The usermodehelper is a kernel protocol. Here it's the task with
+its own credentials that's connecting to a userspace socket. Which makes
+this very elegant because it's just userspace IPC. No one is running
+around with kernel credentials anywhere.
 
