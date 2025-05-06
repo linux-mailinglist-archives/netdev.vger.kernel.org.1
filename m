@@ -1,262 +1,148 @@
-Return-Path: <netdev+bounces-188397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 750C0AACA55
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 18:01:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF837AACA50
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 18:00:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 355A81C28A40
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 16:01:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B591C7B6632
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 15:59:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7E3328469D;
-	Tue,  6 May 2025 16:00:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D8AB283FEF;
+	Tue,  6 May 2025 16:00:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="au2bgeTl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UaT+K1WU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A094A2820D4
-	for <netdev@vger.kernel.org>; Tue,  6 May 2025 16:00:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC848284667
+	for <netdev@vger.kernel.org>; Tue,  6 May 2025 16:00:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746547223; cv=none; b=pi5XhgFCSrfEOEDL0sxeDlVJFuI+l6hl/krf6NqoE1O1GN3Luiy7PddFfDwcHdGsiXlT9LhfiDI97hDYjfmEJZhhusEnJXFL357gwbmm11CgF6a54h2TPN3+KcaKnLeCoHN1f/FM1jCKzuNa4eUFtYFpW9SMpqqUDouFxtM3Wcw=
+	t=1746547209; cv=none; b=XmoqelGyA8Algxj6whq15yfVhrgqvrtLnHMBnB5jdifbJ9EKvbA2/YC4ACw22dob/toaWeZyN3OmdqCZPqkX+tiIg5uxu4LpHJq9MwraHFDK9aMyG4+r153jwJPjRUOAApQJtMqUqf+6OiCBo0u0CdpLTZAgYLsrq7yS39DdTGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746547223; c=relaxed/simple;
-	bh=W59rsB0Jor4HkmikjlousX+UROJZeSQmBXSDZtAY10w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q1+a/aM1oKhpL/ryRvdjfx0blWUnSZgjblJJtSnRlWCJAro13Z/Nm2HudJHYiqRAOnUgBXLmFyShMFWZfAfUYHc3JnnzCoTw9EnN6jSoeypjtip1aSmilyXshpClsZhNan4UGMpPWEebFMVDUv8uWTBc3mzBYNN4fLogxiQXisM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=au2bgeTl; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 546FdaJ6006662;
-	Tue, 6 May 2025 16:00:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=wIPpIr4DJQxkLoiaoFhsmbSNEWgtEzeMf5+wpDoVx
-	Fo=; b=au2bgeTldBkCZFEmyt5gXXBzziHmc1ABjDFw7XlsjWbDaW8qo+HVpe1pa
-	3ZsSYd/JHcjOVU230k9QIhL6dmSYSSasdiBKfi8em8r2sK6riPwABt4cfcZkuwoF
-	1aFeu0COy6xLOlrHV4kQEMc5pWj9FEaocRMVSPyPHoDtas/o+DNJUqTpWGXjyLgA
-	NAUmLxiWrRiwlSNOzD0odXsFfwDkdA7zbZs5QE6zF6BIBQiDoR++//vPYXvIFnPg
-	oqd69+D2TBwdx3yePUQvKqpvyNqjy2vua5sbcnhVOrHIMjqUglzltgpCvKCa4miO
-	WxMlKusP8KUI9DDbm2t/6Em/UD+RQ==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 46fcgy2uc9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 06 May 2025 16:00:14 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 546DU7nN014097;
-	Tue, 6 May 2025 16:00:13 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 46dypkm1yr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 06 May 2025 16:00:13 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 546G0Cfg19530458
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 6 May 2025 16:00:12 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 61D4A5805A;
-	Tue,  6 May 2025 16:00:12 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 29EFC58054;
-	Tue,  6 May 2025 16:00:12 +0000 (GMT)
-Received: from d.austin.ibm.com (unknown [9.41.102.181])
-	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  6 May 2025 16:00:12 +0000 (GMT)
-From: Dave Marquardt <davemarq@linux.ibm.com>
+	s=arc-20240116; t=1746547209; c=relaxed/simple;
+	bh=484I+MLC5U50gnDw9oFx3RURKBj/52zdm9lq+O80ffs=;
+	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GqXHfwzdUUNFUtNuOEAwJ73KaRSTgmk7E0sbFoSwiii0BdTop8XutnbvKBZkafF5c1q+fsYRD25S6pOCfIaPbF4jA6SHUyh06RuLrZx1XUg5k8lLKJ2CT3Q5dC9iCMXL2OHj+o2qia1jP9/Rr0xaLgq+PYSHpj2r3hVEHz1AkXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UaT+K1WU; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2295d78b45cso76752885ad.0
+        for <netdev@vger.kernel.org>; Tue, 06 May 2025 09:00:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746547207; x=1747152007; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:message-id:date:cc:to:from:subject:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=DeEpmQRwXolX/nkIjxhbBLC2UHTxfqYqsZypSvjmKIA=;
+        b=UaT+K1WU1EtX1mIigMJuQMiKDb2OJCYvGnj2bth5YTReL8vhqY4ET0Gwb3/h+jiOyo
+         fHZ+JEXynvIeoiEPn4jgpMF1AaMMfYgWpS/5lu+CiP9DCwGuSXyVcIY0nXyNfr5v9pUv
+         0y/HCkiK7DtUOijsi3u/DBOAqv0mKp0Rrx7xAOKlhet4hyPtIqglqnUkPZQrofjYOtHI
+         E815mwUSGysLOEMBk4HsrEnBEUnR+dlC+yzT2YZcLquTtQCshpQ1fuDlQddeVmjJWwzU
+         9utHda+17noDxvCAvKHYhKYTpybMezLHF2fsqioLs/OhGLtjPTJHw6GjYEZEjPDUKwuv
+         ZowA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746547207; x=1747152007;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:message-id:date:cc:to:from:subject:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DeEpmQRwXolX/nkIjxhbBLC2UHTxfqYqsZypSvjmKIA=;
+        b=S/JS6S12p7sm62CKmbNBYd+0ddiW40iV9DbzkhaXT3qR/XAjXf+jylkMkUY9R4DsYv
+         Y0fl0eW4GsOcxTLQDYCq4oahLCQq02Xu+smnIOQpOn2jLIx8Qo8TKj8BPrnpSr5PWX7b
+         etT2fa+T45/jrQwFPvUKFT2Fsl/SaQTP8S0qW/LtA+LDL7uOEFKA/LU0cK4/r4OIGcb3
+         zDBIjwfLHKG/cVmvWyuasaOg3Je+ZWdes1USb2+uhka164jQ7/qSyagDuPc2LuAwECF9
+         BScNdrDPDB2JYYe5iRG+9W0tzWbZjp2hf635/wufteIB8cDaw9hdc8QQi3PdMvgQnA/O
+         kPdw==
+X-Gm-Message-State: AOJu0YxeoJRj/TcLLXbkv7B7irMtpbfpjJB0ngImlZfzasbsorz0VgDm
+	GfHem/iOzcFjvfe1ohRs++idIK0WzBa4dhGQTXAJqq7ZI/CxN/mU2tJkhg==
+X-Gm-Gg: ASbGncvUfMSQJIDK10LCCY8I4Q8apbH8727vdt0KI2qH6rwfDEQIqsr3yRH71N1ImI4
+	w+B1FDqAOOcTGdP7YJ9K6tc/x/bDJ3wpQT4YHbXuXoSS6okUH4HNnZh7JbxR0ro6gjf61KY5XKu
+	N6y49eDZvqrzrkeIxPwcAAp7YPjRHnEck+4lrNrCO36POrT9gWZXT34nJV7BxjVp6Dtj5mZFHRg
+	88zSmlZAhCtdGstQmUZ2Rs8VYiXk1x3Xt714LLuQzO5Kb8FHj1Rpheknvr6mYHHrRiAFeRr5PX/
+	GZdqtCO7FxFbwYpfo2YiSTl+h0BBg+6LMmX15ht692cKl6LFeuMWn4M1WLdot3KUcohOhoKsMle
+	dbEYkaX/O6A==
+X-Google-Smtp-Source: AGHT+IHiDYyjWidn3HZeUQbkCKXBGWncwuLVNn7dA7dbpwyTeyu8iSw7zdSfbIoeUY9OAhOO1e5DyA==
+X-Received: by 2002:a17:903:2284:b0:220:efc8:60b1 with SMTP id d9443c01a7336-22e32f031c2mr50752505ad.39.1746547207081;
+        Tue, 06 May 2025 09:00:07 -0700 (PDT)
+Received: from ahduyck-xeon-server.home.arpa ([2605:59c8:829:4c00:9e5c:8eff:fe4f:f2d0])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e150eb01dsm75676255ad.17.2025.05.06.09.00.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 May 2025 09:00:06 -0700 (PDT)
+Subject: [net PATCH v2 5/8] fbnic: Cleanup handling of completions
+From: Alexander Duyck <alexander.duyck@gmail.com>
 To: netdev@vger.kernel.org
-Cc: linuxppc-dev@lists.ozlabs.org, Dave Marquardt <davemarq@linux.ibm.com>
-Subject: [PATCH net-next] net: ibmveth: Refactored veth_pool_store for better maintainability
-Date: Tue,  6 May 2025 11:00:04 -0500
-Message-ID: <20250506160004.328347-1-davemarq@linux.ibm.com>
-X-Mailer: git-send-email 2.49.0
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
+Date: Tue, 06 May 2025 09:00:05 -0700
+Message-ID: 
+ <174654720578.499179.380252598204530873.stgit@ahduyck-xeon-server.home.arpa>
+In-Reply-To: 
+ <174654659243.499179.11194817277075480209.stgit@ahduyck-xeon-server.home.arpa>
+References: 
+ <174654659243.499179.11194817277075480209.stgit@ahduyck-xeon-server.home.arpa>
+User-Agent: StGit/1.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 33W9RJPXo1ANHBOSEAbktN31y_GhcYPs
-X-Authority-Analysis: v=2.4 cv=Pa7/hjhd c=1 sm=1 tr=0 ts=681a320e cx=c_pps a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17 a=dt9VzEwgFbYA:10 a=VnNF1IyMAAAA:8 a=-_ijbZd1G4CfSeCqscAA:9
-X-Proofpoint-ORIG-GUID: 33W9RJPXo1ANHBOSEAbktN31y_GhcYPs
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTA2MDE1MSBTYWx0ZWRfXyVLapHt5pvuI m6R29G5i+rnfQ4h/C3N3GVIZLLdp/nG6XGEZFG4mKDuzFO2qOfFxng9fBnpcLAlKkUmg3jdwQkV lZ4oIsQntPqy/zFv4VCJMW09s94c6u/zsz5K+jla+B90w/AKHZOA3FaYIleaRZI0I4HNSLFxA+T
- VQk0s2bzgnXE/vAXyr5U67WmwHOrRmsFO/tsjRuFPfR7sUNwrk5Ph01rS7/2du9f68g1mtmpwfm hBWDyjToRf4k0ETm8Wfp3zJOZalZPH3t+a1heLsucHUN3GeshVNZWzyvdTYURFnzxooKLYrHjOY EP6VK6uXyynuN01jlVUSZwzS9pPlHbVfS/TgohREpLK3bspFHbit8RlsQ9Upw8Kt7/fdN+wCwNA
- bbhPJFkmo0H5av8Vn1USv9/0dWj/YAdrYepo1RFOdLda3qsbQot2syCrhFyJXFkNrnoskEK7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-06_07,2025-05-05_01,2025-02-21_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 suspectscore=0 spamscore=0 bulkscore=0 mlxlogscore=999
- adultscore=0 impostorscore=0 lowpriorityscore=0 malwarescore=0 mlxscore=0
- phishscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.19.0-2504070000
- definitions=main-2505060151
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 
-Make veth_pool_store detect requested pool changes, close device if
-necessary, update pool, and reopen device.
+From: Alexander Duyck <alexanderduyck@fb.com>
 
-Signed-off-by: Dave Marquardt <davemarq@linux.ibm.com>
+There was an issue in that if we were to shutdown we could be left with
+a completion in flight as the mailbox went away. To address that I have
+added an fbnic_mbx_evict_all_cmpl function that is meant to essentially
+create a "broken pipe" type response so that all callers will receive an
+error indicating that the connection has been broken as a result of us
+shutting down the mailbox.
+
+Fixes: 378e5cc1c6c6 ("eth: fbnic: hwmon: Add completion infrastructure for firmware requests")
+Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
 ---
- drivers/net/ethernet/ibm/ibmveth.c | 111 +++++++++++++++++------------
- 1 file changed, 67 insertions(+), 44 deletions(-)
+ drivers/net/ethernet/meta/fbnic/fbnic_fw.c |   17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/drivers/net/ethernet/ibm/ibmveth.c b/drivers/net/ethernet/ibm/ibmveth.c
-index 45143467286e..24046fe16634 100644
---- a/drivers/net/ethernet/ibm/ibmveth.c
-+++ b/drivers/net/ethernet/ibm/ibmveth.c
-@@ -1871,6 +1871,26 @@ static ssize_t veth_pool_show(struct kobject *kobj,
- 	return 0;
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
+index d019191d6ae9..732875aae46c 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
+@@ -928,6 +928,20 @@ int fbnic_mbx_poll_tx_ready(struct fbnic_dev *fbd)
+ 	return attempts ? 0 : -ETIMEDOUT;
  }
  
-+/**
-+ * veth_pool_store - sysfs store handler for pool attributes
-+ * @kobj: kobject embedded in pool
-+ * @attr: attribute being changed
-+ * @buf: value being stored
-+ * @count: length of @buf in bytes
-+ *
-+ * Stores new value in pool attribute. Verifies the range of the new value for
-+ * size and buff_size. Verifies that at least one pool remains available to
-+ * receive MTU-sized packets.
-+ *
-+ * Context: Process context.
-+ *          Takes and releases rtnl_mutex to ensure correct ordering of close
-+ *	    and open calls.
-+ * Return:
-+ * * %-EPERM  - Not allowed to disabled all MTU-sized buffer pools
-+ * * %-EINVAL - New pool size or buffer size is out of range
-+ * * count    - Return count for success
-+ * * other    - Return value from a failed ibmveth_open call
-+ */
- static ssize_t veth_pool_store(struct kobject *kobj, struct attribute *attr,
- 			       const char *buf, size_t count)
- {
-@@ -1880,28 +1900,30 @@ static ssize_t veth_pool_store(struct kobject *kobj, struct attribute *attr,
- 	struct net_device *netdev = dev_get_drvdata(kobj_to_dev(kobj->parent));
- 	struct ibmveth_adapter *adapter = netdev_priv(netdev);
- 	long value = simple_strtol(buf, NULL, 10);
-+	bool change = false;
-+	u32 newbuff_size;
-+	u32 oldbuff_size;
-+	int newactive;
-+	int oldactive;
-+	u32 newsize;
-+	u32 oldsize;
- 	long rc;
- 
- 	rtnl_lock();
- 
-+	oldbuff_size = pool->buff_size;
-+	oldactive = pool->active;
-+	oldsize = pool->size;
++static void __fbnic_fw_evict_cmpl(struct fbnic_fw_completion *cmpl_data)
++{
++	cmpl_data->result = -EPIPE;
++	complete(&cmpl_data->done);
++}
 +
-+	newbuff_size = oldbuff_size;
-+	newactive = oldactive;
-+	newsize = oldsize;
-+
- 	if (attr == &veth_active_attr) {
--		if (value && !pool->active) {
--			if (netif_running(netdev)) {
--				if (ibmveth_alloc_buffer_pool(pool)) {
--					netdev_err(netdev,
--						   "unable to alloc pool\n");
--					rc = -ENOMEM;
--					goto unlock_err;
--				}
--				pool->active = 1;
--				ibmveth_close(netdev);
--				rc = ibmveth_open(netdev);
--				if (rc)
--					goto unlock_err;
--			} else {
--				pool->active = 1;
--			}
--		} else if (!value && pool->active) {
-+		if (value && !oldactive) {
-+			newactive = 1;
-+			change = true;
-+		} else if (!value && oldactive) {
- 			int mtu = netdev->mtu + IBMVETH_BUFF_OH;
- 			int i;
- 			/* Make sure there is a buffer pool with buffers that
-@@ -1921,43 +1943,44 @@ static ssize_t veth_pool_store(struct kobject *kobj, struct attribute *attr,
- 				goto unlock_err;
- 			}
- 
--			if (netif_running(netdev)) {
--				ibmveth_close(netdev);
--				pool->active = 0;
--				rc = ibmveth_open(netdev);
--				if (rc)
--					goto unlock_err;
--			}
--			pool->active = 0;
-+			newactive = 0;
-+			change = true;
- 		}
- 	} else if (attr == &veth_num_attr) {
- 		if (value <= 0 || value > IBMVETH_MAX_POOL_COUNT) {
- 			rc = -EINVAL;
- 			goto unlock_err;
--		} else {
--			if (netif_running(netdev)) {
--				ibmveth_close(netdev);
--				pool->size = value;
--				rc = ibmveth_open(netdev);
--				if (rc)
--					goto unlock_err;
--			} else {
--				pool->size = value;
--			}
-+		}
-+		if (value != oldsize) {
-+			newsize = value;
-+			change = true;
- 		}
- 	} else if (attr == &veth_size_attr) {
- 		if (value <= IBMVETH_BUFF_OH || value > IBMVETH_MAX_BUF_SIZE) {
- 			rc = -EINVAL;
- 			goto unlock_err;
--		} else {
--			if (netif_running(netdev)) {
--				ibmveth_close(netdev);
--				pool->buff_size = value;
--				rc = ibmveth_open(netdev);
--				if (rc)
--					goto unlock_err;
--			} else {
--				pool->buff_size = value;
-+		}
-+		if (value != oldbuff_size) {
-+			newbuff_size = value;
-+			change = true;
-+		}
++static void fbnic_mbx_evict_all_cmpl(struct fbnic_dev *fbd)
++{
++	if (fbd->cmpl_data) {
++		__fbnic_fw_evict_cmpl(fbd->cmpl_data);
++		fbd->cmpl_data = NULL;
 +	}
++}
 +
-+	if (change) {
-+		if (netif_running(netdev))
-+			ibmveth_close(netdev);
+ void fbnic_mbx_flush_tx(struct fbnic_dev *fbd)
+ {
+ 	unsigned long timeout = jiffies + 10 * HZ + 1;
+@@ -945,6 +959,9 @@ void fbnic_mbx_flush_tx(struct fbnic_dev *fbd)
+ 	/* Read tail to determine the last tail state for the ring */
+ 	tail = tx_mbx->tail;
+ 
++	/* Flush any completions as we are no longer processing Rx */
++	fbnic_mbx_evict_all_cmpl(fbd);
 +
-+		pool->active = newactive;
-+		pool->buff_size = newbuff_size;
-+		pool->size = newsize;
-+
-+		if (netif_running(netdev)) {
-+			rc = ibmveth_open(netdev);
-+			if (rc) {
-+				pool->active = oldactive;
-+				pool->buff_size = oldbuff_size;
-+				pool->size = oldsize;
-+				goto unlock_err;
- 			}
- 		}
- 	}
--- 
-2.49.0
+ 	spin_unlock_irq(&fbd->fw_tx_lock);
+ 
+ 	/* Give firmware time to process packet,
+
 
 
