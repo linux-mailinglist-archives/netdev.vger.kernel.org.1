@@ -1,57 +1,59 @@
-Return-Path: <netdev+bounces-188399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13630AACA70
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 18:07:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70A2FAACA72
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 18:08:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C8A51C41969
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 16:08:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 999F7525B9D
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 16:08:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BBDE283CB0;
-	Tue,  6 May 2025 16:07:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A609284673;
+	Tue,  6 May 2025 16:07:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5p/kv0rM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NggBylv4"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26F3E280A29;
-	Tue,  6 May 2025 16:07:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64877284663
+	for <netdev@vger.kernel.org>; Tue,  6 May 2025 16:07:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746547664; cv=none; b=OYNaOQKt1Ia7aEfcQxAmWis1CJDoIDapRbE8T9dcHqYpV7zToNzw7oMv7orh27qMGKBpCr2XLRYom4Sou+u6U2iFlSbjHGe50i0cZ/0FPzHEAh5m9rrOhTxfSX1jk9/jvl2KQu4FiqDHuqPsF0/e26Ok/taqIvSkXG+nsPsPGqM=
+	t=1746547678; cv=none; b=iZcGWBYxWCxOwO4jNMJcUCAcYqZHySATelVkVrx4vPK1QVABQukauKf75BeNfVm3UYNTibeLy6eaTqPhk6E4GBaAq+hErK7kV7EiXSZ0jkBcirUnGGGY+VwL7XY5W4b209JnKSLCNnWqzXfwnB+PWXTukjg+gecoaJfURcNP878=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746547664; c=relaxed/simple;
-	bh=R57uE80QHeIxF/beQ/FwZmTbYeEK5J1gOynGnagEdr8=;
+	s=arc-20240116; t=1746547678; c=relaxed/simple;
+	bh=fwhyVDiVmOPviMujIj3jD6wk57AXXjZMsLH5fjNqIb0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IUCwlrwVFFiQpgnkIzwVELucM83YUez3lSZDZIMlrvGfqMj1iTtHrui6OjZGiO1VxzmzuFFTvpqFZ+hEacqwV4Ad2eXl8ZQ0AjcTF4N6VsomaRt6U/3RyReSOwaWXXfmWsfJpNTNX7/gGbxOM98/axJebCKuM66nlmccxd2wIJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5p/kv0rM; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=o7khUtuXqkV12JSbjwJ8x1EVYWn6Fhstp775RFxlELY=; b=5p/kv0rMi9GpXe3Pn03TSlFekd
-	HhGxmjvOC9EnUnrbDizJhCGgBQePk+h0yjY6mSSqJEjOrYygCNsN/dAT1+mP1Rk44kDdhzFttRXTy
-	JO52Dn85kBMF/xtIfRY+mErY/izASMwAfHKg52XDgdNcnQFpfLCe7KL4CGXN5/6yB3gw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uCKpP-00BmaD-GB; Tue, 06 May 2025 18:07:31 +0200
-Date: Tue, 6 May 2025 18:07:31 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Alexander Shalimov <alex-shalimov@yandex-team.ru>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH] net/tun: expose queue utilization stats via ethtool
-Message-ID: <c02e519b-8b7d-414c-b602-5575c9382101@lunn.ch>
-References: <20250506154117.10651-1-alex-shalimov@yandex-team.ru>
+	 Content-Type:Content-Disposition:In-Reply-To; b=eHzAnp4WwgLh65IJgSOveBnJVXRkekUBk+mbANu2CWa7pU1Ajxxr7z1UsODmfkpgIRtU2V4ljXHlmE5HOSPx5ClTMbUU3gp3aCX3jtqJkJg3jUmCNnuKnWarMlsrthpEQEOUeOpLJbGlxAFxRlGZS4FFFJLeEHU7Qr92Wekt904=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NggBylv4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F16CBC4CEE4;
+	Tue,  6 May 2025 16:07:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746547677;
+	bh=fwhyVDiVmOPviMujIj3jD6wk57AXXjZMsLH5fjNqIb0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NggBylv4YQFtK9jIb/RLDZNDMWCf4v3QHL9Ht8S6lGta2h82b7WnOwmoRWRzivVt+
+	 1zUf5EywJIDFjAgPq9hPLet9CkUIjaycihq6Mr0QaVPtXfj9hl1+V/pM2DElci44yu
+	 rI9LBSw9CUut7is+bn0D9m9sk5Y0U/M/WbenWu0tG2Wyu0Cil0MejXKWQ9N9qcyqSS
+	 rDVUymTh/+7xCwm6LHuuEFUzoAdxUCCGWBTJzt+8o2gSPBSvWjaENWtsqqziSc1yso
+	 hEA2QvtnCs9COXy4wWnVcpe+A/IQU6OJzU9uli4jJHxfvjErNLSWbgCZk4/gFuue0h
+	 lEZaKYuY/ktkg==
+Date: Tue, 6 May 2025 17:07:53 +0100
+From: Simon Horman <horms@kernel.org>
+To: Matt Johnston <matt@codeconstruct.com.au>
+Cc: Jeremy Kerr <jk@codeconstruct.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	syzbot+e76d52dadc089b9d197f@syzkaller.appspotmail.com,
+	syzbot+1065a199625a388fce60@syzkaller.appspotmail.com
+Subject: Re: [PATCH net] net: mctp: Don't access ifa_index when missing
+Message-ID: <20250506160753.GU3339421@horms.kernel.org>
+References: <20250505-mctp-addr-dump-v1-1-a997013f99b8@codeconstruct.com.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,54 +62,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250506154117.10651-1-alex-shalimov@yandex-team.ru>
+In-Reply-To: <20250505-mctp-addr-dump-v1-1-a997013f99b8@codeconstruct.com.au>
 
-On Tue, May 06, 2025 at 06:41:17PM +0300, Alexander Shalimov wrote:
-> TUN/TAP devices are heavily used in network virtualization scenarios
-> such as QEMU/KVM with "-netdev tap" and are commonly paired with virtio-net
-> or vhost-net backends. Under high network load, queues of the tuntap device
-> may become saturated, resulting in TX drops.
+On Mon, May 05, 2025 at 05:05:12PM +0800, Matt Johnston wrote:
+> In mctp_dump_addrinfo, ifa_index can be used to filter interfaces, but
+> only when the struct ifaddrmsg is provided. Otherwise it will be
+> comparing to uninitialised memory - reproducible in the syzkaller case from
+> dhcpd, or busybox "ip addr show".
 > 
-> Existing aggregated drop counters alone are often insufficient during
-> complex debugging and performance tuning, especially in high-throughput
-> environments. Visibility of real-time queue utilization is critical for
-> understanding why guest VMs might be unable to dequeue packets in time.
+> The kernel MCTP implementation has always filtered by ifa_index, so
+> existing userspace programs expecting to dump MCTP addresses must
+> already be passing a valid ifa_index value (either 0 or a real index).
 > 
-> This patch exposes per-queue utilization statistics via ethtool -S,
-> allowing on-demand inspection of queue fill levels. Utilization metrics are
-> captured at the time of the ethtool invocation, providing a snapshot useful
-> for correlation with guest and host behavior.
+> BUG: KMSAN: uninit-value in mctp_dump_addrinfo+0x208/0xac0 net/mctp/device.c:128
+>  mctp_dump_addrinfo+0x208/0xac0 net/mctp/device.c:128
+>  rtnl_dump_all+0x3ec/0x5b0 net/core/rtnetlink.c:4380
+>  rtnl_dumpit+0xd5/0x2f0 net/core/rtnetlink.c:6824
+>  netlink_dump+0x97b/0x1690 net/netlink/af_netlink.c:2309
+> 
+> Fixes: 583be982d934 ("mctp: Add device handling and netlink interface")
+> Reported-by: syzbot+e76d52dadc089b9d197f@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/all/68135815.050a0220.3a872c.000e.GAE@google.com/
+> Reported-by: syzbot+1065a199625a388fce60@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/all/681357d6.050a0220.14dd7d.000d.GAE@google.com/
+> Signed-off-by: Matt Johnston <matt@codeconstruct.com.au>
 
-This does not fit the usual statistics pattern, which are simple
-incremental counters. Are there any other drivers doing anything like
-this?
+Thanks Matt,
 
-Maybe devlink resources would be a better API? That would also allow
-you to report the size of the ring.
+FWIIW, this looks good to me.
 
-> +static void tun_get_ethtool_stats(struct net_device *dev,
-> +				  struct ethtool_stats *stats, u64 *data)
-> +{
-> +	struct tun_struct *tun = netdev_priv(dev);
-> +	struct tun_file *tfile;
-> +	int i;
-> +	int producer, consumer, size, usage;
-> +
-> +	rcu_read_lock();
-> +	for (i = 0; i < dev->real_num_tx_queues; i++) {
-> +		tfile = rcu_dereference(tun->tfiles[i]);
-> +
-> +		producer = READ_ONCE(tfile->tx_ring.producer);
-> +		consumer = READ_ONCE(tfile->tx_ring.consumer_head);
-> +		size = READ_ONCE(tfile->tx_ring.size);
-> +
-> +		if (producer >= consumer)
-> +			usage = producer - consumer;
-> +		else
-> +			usage = size - (consumer - producer);
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-It seems like this belongs in ptr_ring.h along with all the other
-methods which deal with insides of the ring.
+> ---
+>  net/mctp/device.c | 14 ++++++++++----
+>  1 file changed, 10 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/mctp/device.c b/net/mctp/device.c
+> index 8e0724c56723de328592bfe5c6fc8085cd3102fe..7780acdb99dedca1cd6a17e4d6bf917c7f7f370f 100644
+> --- a/net/mctp/device.c
+> +++ b/net/mctp/device.c
+> @@ -117,11 +117,17 @@ static int mctp_dump_addrinfo(struct sk_buff *skb, struct netlink_callback *cb)
+>  	struct net_device *dev;
+>  	struct ifaddrmsg *hdr;
+>  	struct mctp_dev *mdev;
+> -	int ifindex, rc;
+> +	int ifindex = 0, rc;
+>  
+> -	hdr = nlmsg_data(cb->nlh);
+> -	// filter by ifindex if requested
+> -	ifindex = hdr->ifa_index;
+> +	/* Filter by ifindex if a header is provided */
+> +	if (cb->nlh->nlmsg_len >= nlmsg_msg_size(sizeof(*hdr))) {
+> +		hdr = nlmsg_data(cb->nlh);
 
-	Andrew
+FWIIW, I think the scope of the declaration of hdr can be reduced to this block.
+(Less positive ease, so to speak.)
+
+> +		/* Userspace programs providing AF_MCTP must be expecting ifa_index filter
+> +		 * behaviour, as will those setting strict_check.
+> +		 */
+> +		if (hdr->ifa_family == AF_MCTP || cb->strict_check)
+> +			ifindex = hdr->ifa_index;
+> +	}
+>  
+>  	rcu_read_lock();
+>  	for_each_netdev_dump(net, dev, mcb->ifindex) {
+> 
+> ---
+> base-commit: ebd297a2affadb6f6f4d2e5d975c1eda18ac762d
+> change-id: 20250505-mctp-addr-dump-673e0fdc7894
+> 
+> Best regards,
+> -- 
+> Matt Johnston <matt@codeconstruct.com.au>
+> 
 
