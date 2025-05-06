@@ -1,184 +1,145 @@
-Return-Path: <netdev+bounces-188281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87193AABF8B
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 11:32:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A82BAABFAE
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 11:35:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61DE03A7408
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 09:31:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A0633A86CC
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 09:34:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D83E3262FFE;
-	Tue,  6 May 2025 09:31:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ADC52750E2;
+	Tue,  6 May 2025 09:33:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CFura01T"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0D426A0B3
-	for <netdev@vger.kernel.org>; Tue,  6 May 2025 09:31:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA29926C3AA;
+	Tue,  6 May 2025 09:33:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746523901; cv=none; b=Lp/2TQAdq1IjPrjjZHx94to+Egp7yepMX5X5bVENqJEpIh47FOYU1T4yp1QjdlU4M513Aq6lP46Q6b7bnQfKMjl562W5ecP0s+kMP7/eFY/6h0yAvIEzSk8o/4PAU2wbt0np3Ma2NwLPAjCJtuLbFa/sWojmm3zLMCERj1emLuA=
+	t=1746524004; cv=none; b=YTa5wENBeQVsmBw+y/hwfE6dfgRVCMWg5uxdYEJBMrVdfaIHmrvLH1a7Xe8M/4E8eLT4cbIYbGhVeAt9jYo4uHVZ4dLgw59Kc1aQhBpb2LCQ78Nw6uelCJl4l/zOxbuhr8U7oq3zQU0l0wn3NVlGvG3Bw92eorHD3ncW4RTZyYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746523901; c=relaxed/simple;
-	bh=1UzmFVti+eJR5crKm6A18RZJGTC7kGHZxDksQrEJ8f4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=UWoQK1t7FRpj6qPFoIUNWAWrJmxVbq5jOHyQca25/svUyhBxv8aVucSS7tTrssKseTn12nauba2d8v0s//t4bFYikBP17kBoLK9aMulNGm9rxYZ0EoByMDBFriFjdH5MV/4PZ7hC/h4V9c/QKHeaP/ZvN+Sl7Sfb4yvD6RThwAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3d81820d5b3so104286975ab.3
-        for <netdev@vger.kernel.org>; Tue, 06 May 2025 02:31:39 -0700 (PDT)
+	s=arc-20240116; t=1746524004; c=relaxed/simple;
+	bh=pB4UnMehzDghVR5OwDqwfddSZnWmBw/uJ1d6JAmYPSo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LUk0k8gAbFl34jT6RLBd7BiC7gfzwEiMFz7aF07YUDgn1/6juzXYrmzGHZrGD3cuJkHwtsjInOpJUp1bKTAC6Bm2ttmx6v7L/iedoXOxmxbiguM5IHhwtWK/TCyhSXO3uD8uQLAOXWK1D0aYT3i4aGyI/6tMtP6GxulMySrQl78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CFura01T; arc=none smtp.client-ip=209.85.219.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6e8efefec89so54659046d6.3;
+        Tue, 06 May 2025 02:33:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746524001; x=1747128801; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=oX660r49SMPlsIsK7beVHLYMkPYM6F+6v7W4PhVK2ks=;
+        b=CFura01Ty+KdLjl8hZnhjkhdjM9gMkftb+9ITqPsjwNDDguGBzH9yYhNO2woMDBdIK
+         3N8QS+qrCR47JggR5BnfA9eaoXwsliPr2ezMGvWy2awqamFjR+XfjvOTbxo+HnOFF74+
+         zhVfCbomWkngGNy98wsNtmhndtlMgLUTN2BedlbYOjAAZ+pFK8i7BXelsgdpTllM40xX
+         g09K8E9Gzk+Z1IMwi9BMSz1y8oYNf4gHau9htaGu4WiZ0DlTnvbvjwewxrg8Jsjr4qNa
+         tBYkFKytu1aLdmDE1ri5JZ1YE7sWOnyXKW8lqHoDsPSlwlhXXsMAlGERlxRwjkTrfdT7
+         HKxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746523899; x=1747128699;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uGfQic62ZK/lL4Q3/70BBo2V5MwRcewQeROGIpqqmMc=;
-        b=YMR8jhZvnWqTAMaUVhJd1N/hyjbFQ5w0NwF0nZzHjTA3Z6WI+l7k3504je5W8NAtLb
-         toTsUEShebnG51dLtUkZyg2M6j4l7/KNdXvtxrUJBruiygHchuWA0w+89XEdSd3PEgNo
-         1Sm7439bvIUZwBncqIYYMOsWKJlGlyynMKblzyM1PBhPReUtqA15pFXKlif4enutmZtb
-         Cx9vK9gbbzUqMA0b0YGGVpPqhKEB0vUQK7bdm5X/lMBNbPePQomii1JLzWY3zxwD0Hmk
-         WMONfquv+j9DdTvXOY92h3/WH3qnZe3fZMsQ+u4duw69F4sdMUzBehP0HGFjZGqDxgQC
-         TXfw==
-X-Forwarded-Encrypted: i=1; AJvYcCXiCDUGwpZo4rV0OsXfbffXFkus7EUFIEwSTwMg5wce+ziJHYKTMdhzW+wMtsEHNWpGZPTQVV0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGQlIE9Ll9nWb2ROkQTenLSUclJjYcxAkDZeDYOk1GcBnPxXco
-	CFUZa9j16YykRMavta6ojLjJSXyV2nBJ5ssWHZFURvh7ZaNQs/bjIPt3DR1LRf8C+2a1EaNlqTu
-	IH2ZZ84qYYKwZWVrQ1DBBoeNGNVdQMYWSorY54w+o7RIOp4SzMcDouTI=
-X-Google-Smtp-Source: AGHT+IE4sHmY6IdyiB+TQmYI+gqvAUP8gWPaS8TNVHxhDrzQLAJkpqiLgJDP+42Ni5IffGUMwUEXI2KiGA4xqhmbW7romVkT0+BJ
+        d=1e100.net; s=20230601; t=1746524001; x=1747128801;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oX660r49SMPlsIsK7beVHLYMkPYM6F+6v7W4PhVK2ks=;
+        b=I+dPvj2tpCuClznj7b47YvdgUa46IPt3AvcOlV01cSguMtw4RLSVf05sQtB0a4VZpo
+         0KBiXH5YcjYfF6CmVQTbYhdGxiiWkVm/gvhJ+MrjWeckYh3LXpRcZp2HjuS3CA9N+gJA
+         UgjUn7MY3MxPW34WTaeZafk3p9ZCsZ/Q8oQmKRxwdkeF7XgQwKlYQ6yqNYRNKSx+EBjX
+         asgXV5fQvqsSGThy3S74zB3oKmJSAj9JDk2d5bsC79AVA6wFf+OYDLjDzf5tupK0jtML
+         BWk1GxjAw9FwtugTdtsPtXc01ckRKyIvOL+KId5aiDyIcSgU/AyYOcOEbVF3fnIfxu7d
+         PZDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUhgl4M5zqNOztCshoBIGmee3a1lrdWq4/GsW+FCJo3ENJp3mbLVrszsZG3m838UVhTHMOVRMuaiITPqqkA@vger.kernel.org, AJvYcCV5CaGk0pimjEneKvRyXT8zMj4JSCk6QRARtHwLbpSH8iigtmKnVSVqYuuckA1ebErm5Nk/bN0VMbi9@vger.kernel.org
+X-Gm-Message-State: AOJu0YxP4/nEI7Ymj0LT8JUrLVx5W2j6L78x1oecdZ9NRA63l5XlWW9f
+	cNUcp+r5MfPOglJu+nNbp8jR4x6FMcrvKKuRH+Qitqz8/kITeno6
+X-Gm-Gg: ASbGncvGpOZpLQwB4XsP8zQ4hJUJVkycODx89jnJlDLaqRJ9F+6RXxLiqXvj55YMpBx
+	S09wJdwcc4X5h5AvRUcwsriP6xkL+1IkkEf8aAswh1nz/k9065tJTu1Gh2MK0YZrid57cpsHnCi
+	c2I9eCV7wVeR3fRY4KMv3GbvG4Ga/9d0YhYcD76hgC874RGCLkRjPHx9SATF371SJbJZocbty3D
+	yEiJYfVhJrGz6jZqW9Lt6p2b2tJ68swascnm4Q47Tuu6bxAaY+VbSxz32f/LfI5BbXFgQfNOcPP
+	3uPbM67gmPx8qHAW
+X-Google-Smtp-Source: AGHT+IG0tpbViwqp9IJzfEAZpGJYiDuvgoMTMj0cgQ10I3tT7p2nWJKoF5IKgXDVmrvJ8d3QbJqUDQ==
+X-Received: by 2002:a05:6214:20a3:b0:6f4:c824:9d4a with SMTP id 6a1803df08f44-6f51574c329mr249376586d6.13.1746524001422;
+        Tue, 06 May 2025 02:33:21 -0700 (PDT)
+Received: from localhost ([2001:da8:7001:11::cb])
+        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-6f538316c12sm6219536d6.0.2025.05.06.02.33.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 May 2025 02:33:20 -0700 (PDT)
+From: Inochi Amaoto <inochiama@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chen Wang <unicorn_wang@outlook.com>,
+	Inochi Amaoto <inochiama@gmail.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Guo Ren <guoren@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>,
+	Lothar Rubusch <l.rubusch@gmail.com>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>
+Cc: netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	sophgo@lists.linux.dev,
+	linux-riscv@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	Yixun Lan <dlan@gentoo.org>,
+	Longbin Li <looong.bin@gmail.com>
+Subject: [PATCH net-next 0/4] riscv: sophgo: Add ethernet support for SG2042
+Date: Tue,  6 May 2025 17:32:50 +0800
+Message-ID: <20250506093256.1107770-1-inochiama@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1fcb:b0:3d4:70ab:f96f with SMTP id
- e9e14a558f8ab-3d97c199938mr185633105ab.8.1746523899193; Tue, 06 May 2025
- 02:31:39 -0700 (PDT)
-Date: Tue, 06 May 2025 02:31:39 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6819d6fb.050a0220.37980e.0390.GAE@google.com>
-Subject: [syzbot] [net?] general protection fault in __ip_mc_dec_group
-From: syzbot <syzbot+62d432efb04ee8ce0bb4@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+The ethernet controller of SG2042 is Synopsys DesignWare IP with
+tx clock. Add device id for it.
 
-syzbot found the following issue on:
+This patch can only be tested on a SG2042 x4 evb board, as pioneer
+does not expose this device.
 
-HEAD commit:    4397684a292a virtio-net: free xsk_buffs on error in virtne..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=17bab0f4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a9a25b7a36123454
-dashboard link: https://syzkaller.appspot.com/bug?extid=62d432efb04ee8ce0bb4
-compiler:       Debian clang version 20.1.2 (++20250402124445+58df0ef89dd6-1~exp1~20250402004600.97), Debian LLD 20.1.2
+Inochi Amaoto (4):
+  dt-bindings: net: sophgo,sg2044-dwmac: Add support for Sophgo SG2042
+    dwmac
+  net: stmmac: dwmac-sophgo: Add support for Sophgo SG2042 SoC
+  net: stmmac: platform: Add snps,dwmac-5.00a IP compatible string
+  riscv: dts: sophgo: add ethernet GMAC device for sg2042
 
-Unfortunately, I don't have any reproducer for this issue yet.
+ .../devicetree/bindings/net/snps,dwmac.yaml   |  4 ++
+ .../bindings/net/sophgo,sg2044-dwmac.yaml     | 11 +++-
+ arch/riscv/boot/dts/sophgo/sg2042.dtsi        | 62 +++++++++++++++++++
+ .../ethernet/stmicro/stmmac/dwmac-sophgo.c    |  1 +
+ .../ethernet/stmicro/stmmac/stmmac_platform.c |  1 +
+ 5 files changed, 76 insertions(+), 3 deletions(-)
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/f29ea34ba236/disk-4397684a.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/1a9b70451d16/vmlinux-4397684a.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/3c20ac38738f/bzImage-4397684a.xz
+--
+2.49.0
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+62d432efb04ee8ce0bb4@syzkaller.appspotmail.com
-
-bridge0: port 2(bridge_slave_1) entered disabled state
-bridge_slave_0: left allmulticast mode
-bridge_slave_0: left promiscuous mode
-bridge0: port 1(bridge_slave_0) entered disabled state
-Oops: general protection fault, probably for non-canonical address 0xdffffc001fffe1ac: 0000 [#1] SMP KASAN PTI
-KASAN: probably user-memory-access in range [0x00000000ffff0d60-0x00000000ffff0d67]
-CPU: 1 UID: 0 PID: 1106 Comm: kworker/u8:7 Not tainted 6.15.0-rc4-syzkaller-00152-g4397684a292a #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/29/2025
-Workqueue: netns cleanup_net
-RIP: 0010:ip_mc_hash_remove net/ipv4/igmp.c:1431 [inline]
-RIP: 0010:__ip_mc_dec_group+0x2fd/0x690 net/ipv4/igmp.c:1774
-Code: 39 e5 de f7 c6 05 80 e2 87 05 01 48 c7 c7 c0 88 7a 8c be 97 05 00 00 48 c7 c2 40 89 7a 8c e8 4a 5d bd f7 4c 89 e3 48 c1 eb 03 <42> 80 3c 2b 00 74 08 4c 89 e7 e8 04 da 40 f8 4d 8b 2c 24 4d 39 f5
-RSP: 0018:ffffc90003c0f5f8 EFLAGS: 00010206
-RAX: ffffffff89e0dade RBX: 000000001fffe1ac RCX: ffff8880268a8000
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: ffff888029438420 R08: ffffffff8f2f41e7 R09: 1ffffffff1e5e83c
-R10: dffffc0000000000 R11: fffffbfff1e5e83d R12: 00000000ffff0d60
-R13: dffffc0000000000 R14: ffff88806a165c00 R15: 1ffff11005287084
-FS:  0000000000000000(0000) GS:ffff8881261cc000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000110c2cae58 CR3: 000000007a838000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- inetdev_event+0x2a7/0x15b0 net/ipv4/devinet.c:1642
- notifier_call_chain+0x1b3/0x3e0 kernel/notifier.c:85
- call_netdevice_notifiers_extack net/core/dev.c:2214 [inline]
- call_netdevice_notifiers net/core/dev.c:2228 [inline]
- dev_close_many+0x29c/0x410 net/core/dev.c:1731
- unregister_netdevice_many_notify+0x834/0x2330 net/core/dev.c:11952
- cleanup_net+0x6a3/0xbd0 net/core/net_namespace.c:649
- process_one_work kernel/workqueue.c:3238 [inline]
- process_scheduled_works+0xadb/0x17a0 kernel/workqueue.c:3319
- worker_thread+0x8a0/0xda0 kernel/workqueue.c:3400
- kthread+0x70e/0x8a0 kernel/kthread.c:464
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:153
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:ip_mc_hash_remove net/ipv4/igmp.c:1431 [inline]
-RIP: 0010:__ip_mc_dec_group+0x2fd/0x690 net/ipv4/igmp.c:1774
-Code: 39 e5 de f7 c6 05 80 e2 87 05 01 48 c7 c7 c0 88 7a 8c be 97 05 00 00 48 c7 c2 40 89 7a 8c e8 4a 5d bd f7 4c 89 e3 48 c1 eb 03 <42> 80 3c 2b 00 74 08 4c 89 e7 e8 04 da 40 f8 4d 8b 2c 24 4d 39 f5
-RSP: 0018:ffffc90003c0f5f8 EFLAGS: 00010206
-RAX: ffffffff89e0dade RBX: 000000001fffe1ac RCX: ffff8880268a8000
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: ffff888029438420 R08: ffffffff8f2f41e7 R09: 1ffffffff1e5e83c
-R10: dffffc0000000000 R11: fffffbfff1e5e83d R12: 00000000ffff0d60
-R13: dffffc0000000000 R14: ffff88806a165c00 R15: 1ffff11005287084
-FS:  0000000000000000(0000) GS:ffff8881260cc000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f228f6e7d60 CR3: 000000000dd36000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	39 e5                	cmp    %esp,%ebp
-   2:	de f7                	fdivp  %st,%st(7)
-   4:	c6 05 80 e2 87 05 01 	movb   $0x1,0x587e280(%rip)        # 0x587e28b
-   b:	48 c7 c7 c0 88 7a 8c 	mov    $0xffffffff8c7a88c0,%rdi
-  12:	be 97 05 00 00       	mov    $0x597,%esi
-  17:	48 c7 c2 40 89 7a 8c 	mov    $0xffffffff8c7a8940,%rdx
-  1e:	e8 4a 5d bd f7       	call   0xf7bd5d6d
-  23:	4c 89 e3             	mov    %r12,%rbx
-  26:	48 c1 eb 03          	shr    $0x3,%rbx
-* 2a:	42 80 3c 2b 00       	cmpb   $0x0,(%rbx,%r13,1) <-- trapping instruction
-  2f:	74 08                	je     0x39
-  31:	4c 89 e7             	mov    %r12,%rdi
-  34:	e8 04 da 40 f8       	call   0xf840da3d
-  39:	4d 8b 2c 24          	mov    (%r12),%r13
-  3d:	4d 39 f5             	cmp    %r14,%r13
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
