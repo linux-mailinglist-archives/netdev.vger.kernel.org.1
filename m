@@ -1,158 +1,223 @@
-Return-Path: <netdev+bounces-188369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38ECAAAC813
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 16:34:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C50A6AAC83C
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 16:38:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E4F24E20FF
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 14:34:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5A8418904E4
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 14:38:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D3E0267712;
-	Tue,  6 May 2025 14:34:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1755A280A5F;
+	Tue,  6 May 2025 14:38:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PugnSh8e"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CRxKH3Pk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BEF31862;
-	Tue,  6 May 2025 14:34:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17FF918D656
+	for <netdev@vger.kernel.org>; Tue,  6 May 2025 14:38:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746542059; cv=none; b=EJcLZRKppjJmToqgReoIN4Kd5scNC4wyGUfJ6HzT5LV1hMYmH3Rbd1wjpkb2E87MWgyL+ps8o9yL6po4Cb08313Xvf80AzUpOlikW+Ryfr6d6i5HaxmINBs2QSLsSl6cApdjX9+TR6eSOq1bpWw30Yx/xncnftm5z3/WhyT81v8=
+	t=1746542311; cv=none; b=eqky5ytBMNmLzC3l8DC3Zu0O9izdA77uTw8bCk5QComuuBd4aNC1lFEcnMPM1LC0nDhljnzzhcqA3MxXWGJo4XEfL39ODqGqVa+kMUU7bbs/2Hd51ZNcb3BAYguS+ojDrmCcfkWa8Tiqa7smJsQAtWA++zqrlxTxlAvfhUuhGlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746542059; c=relaxed/simple;
-	bh=LHaPPpwPca6kcj5NTuDFy2qHBqEn3ONm9X4gAbWeSgM=;
+	s=arc-20240116; t=1746542311; c=relaxed/simple;
+	bh=Ma83b15qnnbFaueFtEvSpUdw/TKvSFOJHfOZe78Fr4A=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=N6JumF1oHcUughs3HLvPEr382vj21Dn2Bn45j0P1VMjkGnWqLtF3r6gxWRuhoWPm2FemGnhrqqMRMR0klgN5NzbJXAqV5uThdDrHBabjhDAEdAJOohRFjafFBbJq/vWuIpKryuHzQTslsScwXNREVf1Tv/Jvbzhb45oLVPcMPaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PugnSh8e; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-476a304a8edso70315741cf.3;
-        Tue, 06 May 2025 07:34:18 -0700 (PDT)
+	 To:Cc:Content-Type; b=uMB01eC0MLSJSrLasrfUWG95CTakEvDTnNkkif8WdIRYSRdQeMLiitfgkZnFzviVYdKc94QwAdFZOL1BLtRKrHW2a+sM4OIwYpDVaSV2RStA2TPJz/wT01YQQj+xIuNpQmkfBPZuqVpBz3ojwc+ymEdg7FeYkOxhjqITY9efl24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CRxKH3Pk; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5f632bada3bso9382a12.1
+        for <netdev@vger.kernel.org>; Tue, 06 May 2025 07:38:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746542057; x=1747146857; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1746542307; x=1747147107; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=StuB9y+BMojZ5vD2oKAZyZwlKbmEBqnfY2yebCn+Als=;
-        b=PugnSh8ewiQBcoksicYEIx9uEf7sHyJ1aXPvwE7SOEkKbuHJst5b1Mcrfpfv4dEr8n
-         KtnPsekr+i3IrX7ajlv+ngka6LCU88hsqDXXFLncQFIpJgbIVobj4quQFIqXDB9G8TYe
-         9uqIzxp2DluGmCJzKQkPXioL8bSRt7UKl4BnhVw80XWoYqAjKNQCdcIsD+dlDHhUv4fK
-         N6N5lDkBUCLlLa/2/JRdotQoMwizNtDa+s6xwQLnylyhtOjS+GLzmuHHCcncoU88S1EL
-         8AX2mynviU6FGZx9eWv/ftyxT3+wi4jJdtd8WrskzICNlLkzv7GWL+w7M+uZyM7X9tJy
-         x1hQ==
+        bh=WS0cqO7mEX8JBUGkY5ZSym9XPagAwEGfVvGLKmJF5sY=;
+        b=CRxKH3PkApshm30WZX8T9D4ebFVa2DK7zxt1/b5UuPL7Un040C1U04ni6pt6wn4EUz
+         5jx1dasvgSqPUAApV3udF1A/6C+nUlyypZIjBlpCM0dEuoRq7fICJSpaB2UhsFtOvRan
+         cgQZYs6G4UwwFepUYX64nBp1bhYcLI2CFkrti2s0X0fJmnym8e6wcNm1nbXBgHxxU4DO
+         73DjIY+ZRiUL8YZ58MzUU1ACZJE2e8eq3/y6W2agirsIrZFZiItiW8MF9e73oHUvzxHh
+         hKax1ddqHIzpONWeLztbYaFGdnyw3RTmNcKMUjTpBsKxrrazzPA+4XJ0EXcghTL4bPa9
+         UEJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746542057; x=1747146857;
+        d=1e100.net; s=20230601; t=1746542307; x=1747147107;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=StuB9y+BMojZ5vD2oKAZyZwlKbmEBqnfY2yebCn+Als=;
-        b=AbbE6+KHrh5tiFL9h8baEOMhAHnQ1KMoa3EK97QnRF1zv6d3hrsXHXCg0jUs2j0Pn4
-         FXqKSm/fTfOzISm0S960AGdr+vmunR9QRYoDg2qehu8LQ+VATLj/UaR3IPJu7vXFiGlg
-         PfW8wtW/3jr8ikd2NkFTcyhQtRtVGDhAmyeaW5HojIrPdsLnm2bDNqif71IFAXpdkL56
-         6qJM2GPL1y2X1QiUFyF/VIlmZQHxId1It5ceKsyQT0zFIrj7ciR9ayF3x6UoRA7d8npn
-         gWY9W8yBc+JDKXOrMpxyAqylSWE3259HqtUbVN5I/bEYdEA3ijY5Jx5KGF927ewLZo2t
-         Inmg==
-X-Forwarded-Encrypted: i=1; AJvYcCWapWOiFnnYdtR9Ypx/nZyLwsAt1mepz1rRm12QzpTQHuX8pH8pMjvsoSk8seD82x9vLvckFG8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzilHcSI/T2Wfahc7ngHA1TACmod+h8BzT+T/ZgHtCkAjBkL8ub
-	lJG7Jd9i0ebVwd/suWpGlw/eDOGlSFKPhU4d2vQaCUX20LzmKTWTIQWCqtvOnnL/INz4I/laSqR
-	OvRZWRBXPubTPCiyA6IkvNJ1nG6I=
-X-Gm-Gg: ASbGncu1EzESvODPJQZA1H/kARGwYj7doSmC5d+vtc3/31aBGHX1nBnVB7UV62gjPvH
-	GoDpjC+oAHOUDboXKWJC0p7bOoYaQblXXq5I0AVyGlY0/pw9bSIPsAxWva3r+JYkSUIuyEA5XF+
-	2xvNu0A7vOJ0oxMJlqhRS1hf0MHlea19A=
-X-Google-Smtp-Source: AGHT+IHtr6ibI5qatfCXKLwwmfLr6Qne/aSffQUrP0zvR9uPdOQ7tTGSzG9ulDYSVkUq8zzGWsDVbg0WFje76C/bDVM=
-X-Received: by 2002:a05:622a:580b:b0:476:b02d:2b4a with SMTP id
- d75a77b69052e-4910ca57e5fmr50336411cf.27.1746542056992; Tue, 06 May 2025
- 07:34:16 -0700 (PDT)
+        bh=WS0cqO7mEX8JBUGkY5ZSym9XPagAwEGfVvGLKmJF5sY=;
+        b=it/FADGQKqDCWN5Mo9E3EApnmmrRwTuajB6TkYsXdAf4ssDHyY2p9GwGPI3hxD3Ixe
+         CXlULA+KcSRLJSehR0E6PAIJs4QC/l075hYx9Bf8xDW0mfBgSnmR40OmZp8kLIiB+QyZ
+         CokWwSS0pPZRimSzG7GTWV5q5KEOzYMK+eFBq78Hx/7AF1sEUcq2FgQJUq08R3HUUoK1
+         OtP9oa2ftuzYTZsK3C6qA5qu1kSzCwxEQdL1e7T+UYhrcK8evyyMJXvDB5klMa0VF32w
+         rfIMMruyE+COuGHlRl8hCsCOVH0wtuXCD6PniMvhhTCKo8Ugmpwz+rmdyb8d5qjLz/U9
+         0dVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXcsb/mrnwr7h8vpBonwHJ+t/PVneI8SahGvqHtgUcEQKgKhvpsZzwiDxVi839HXO1kcxnBoeA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6FmcPz8UV6YVRC3TBSMEGJrUHOKZ+8fL7K183FihmvmitMlKI
+	C+tOf/H5CauM8QOrtsh+T6PKz7qVbELgj5xoJ5B5zLguMV7WWusBHL4SOWqyzbOPxCsMSdeZxck
+	D/iOkjm2bN/1QiaTf1uByxLFWy5ogKuDhwB8d
+X-Gm-Gg: ASbGncuvaHJqNBQuKzy6eSsERSeUrwpHO8CK1Pi7farBtmjreQWDO6lEaZhDJTyHJu/
+	msPOoPCP5lB5GiC83odwtIz0yOdE6wkRGXwqhPOka1subzHiofYMzSrY79iW9AKQ1s1mqPySalG
+	GeEhLdZaz53e283TwSkAzD8Jo+VN6frYBVakRbGwK4BylnAjoD7Q==
+X-Google-Smtp-Source: AGHT+IEKBtQbqHTSi7RTxOlTKbd2L3krdaRx+iHlrQhBUxrpFEHfioEBlUhMAatv2Ff4k8wWL2KQK5USpqhewEIPDcg=
+X-Received: by 2002:aa7:d1d9:0:b0:5f8:d6b1:71ba with SMTP id
+ 4fb4d7f45d1cf-5fbe76ccb80mr239a12.4.1746542307024; Tue, 06 May 2025 07:38:27
+ -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1746097431.git.asml.silence@gmail.com>
-In-Reply-To: <cover.1746097431.git.asml.silence@gmail.com>
-From: Alexey Charkov <alchark@gmail.com>
-Date: Tue, 6 May 2025 18:34:06 +0400
-X-Gm-Features: ATxdqUEPdSxTv8cThP_o2Pc53GH7dN6KGGj3rg-UQL_ryuYNnVzqSRrhJFCF1M0
-Message-ID: <CABjd4YzAJqvLiNid7RoVpLospTrAFzrBpTcFHuem2-JxfkzpmA@mail.gmail.com>
-Subject: Re: [PATCH io_uring 0/5] Add dmabuf support for io_uring zcrx
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: io-uring@vger.kernel.org, David Wei <dw@davidwei.uk>, netdev@vger.kernel.org, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
-	Victor Nogueira <victor@mojatatu.com>
+References: <20250505-dompteur-hinhalten-204b1e16bd02@brauner>
+ <20250505184136.14852-1-kuniyu@amazon.com> <CAG48ez35FN6ka4QtrNQ6aKEycQBOpJKy=VyhQDzKTwey+4KOMg@mail.gmail.com>
+ <20250506-zugabe-bezog-f688fbec72d3@brauner>
+In-Reply-To: <20250506-zugabe-bezog-f688fbec72d3@brauner>
+From: Jann Horn <jannh@google.com>
+Date: Tue, 6 May 2025 16:37:49 +0200
+X-Gm-Features: ATxdqUG1RLsm5I44mZFoXDEOhGLmKo0PIMKTKhu327qv26lJZYIhQ2B6edAN2po
+Message-ID: <CAG48ez0Pc+QzxgAnT25KqyvjC8n0=diL6DnxBe7CcdQ32u9GcA@mail.gmail.com>
+Subject: Re: [PATCH RFC v3 08/10] net, pidfs, coredump: only allow coredumping
+ tasks to connect to coredump socket
+To: Christian Brauner <brauner@kernel.org>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, alexander@mihalicyn.com, bluca@debian.org, 
+	daan.j.demeyer@gmail.com, davem@davemloft.net, david@readahead.eu, 
+	edumazet@google.com, horms@kernel.org, jack@suse.cz, kuba@kernel.org, 
+	lennart@poettering.net, linux-fsdevel@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, me@yhndnzj.com, netdev@vger.kernel.org, 
+	oleg@redhat.com, pabeni@redhat.com, viro@zeniv.linux.org.uk, 
+	zbyszek@in.waw.pl
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 6, 2025 at 6:29=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.c=
-om> wrote:
+On Tue, May 6, 2025 at 10:06=E2=80=AFAM Christian Brauner <brauner@kernel.o=
+rg> wrote:
+> On Mon, May 05, 2025 at 09:10:28PM +0200, Jann Horn wrote:
+> > On Mon, May 5, 2025 at 8:41=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon=
+.com> wrote:
+> > > From: Christian Brauner <brauner@kernel.org>
+> > > Date: Mon, 5 May 2025 16:06:40 +0200
+> > > > On Mon, May 05, 2025 at 03:08:07PM +0200, Jann Horn wrote:
+> > > > > On Mon, May 5, 2025 at 1:14=E2=80=AFPM Christian Brauner <brauner=
+@kernel.org> wrote:
+> > > > > > Make sure that only tasks that actually coredumped may connect =
+to the
+> > > > > > coredump socket. This restriction may be loosened later in case
+> > > > > > userspace processes would like to use it to generate their own
+> > > > > > coredumps. Though it'd be wiser if userspace just exposed a sep=
+arate
+> > > > > > socket for that.
+> > > > >
+> > > > > This implementation kinda feels a bit fragile to me... I wonder i=
+f we
+> > > > > could instead have a flag inside the af_unix client socket that s=
+ays
+> > > > > "this is a special client socket for coredumping".
+> > > >
+> > > > Should be easily doable with a sock_flag().
+> > >
+> > > This restriction should be applied by BPF LSM.
+> >
+> > I think we shouldn't allow random userspace processes to connect to
+> > the core dump handling service and provide bogus inputs; that
+> > unnecessarily increases the risk that a crafted coredump can be used
+> > to exploit a bug in the service. So I think it makes sense to enforce
+> > this restriction in the kernel.
+> >
+> > My understanding is that BPF LSM creates fairly tight coupling between
+> > userspace and the kernel implementation, and it is kind of unwieldy
+> > for userspace. (I imagine the "man 5 core" manpage would get a bit
+> > longer and describe more kernel implementation detail if you tried to
+> > show how to write a BPF LSM that is capable of detecting unix domain
+> > socket connections to a specific address that are not initiated by
+> > core dumping.) I would like to keep it possible to implement core
+> > userspace functionality in a best-practice way without needing eBPF.
+> >
+> > > It's hard to loosen such a default restriction as someone might
+> > > argue that's unexpected and regression.
+> >
+> > If userspace wants to allow other processes to connect to the core
+> > dumping service, that's easy to implement - userspace can listen on a
+> > separate address that is not subject to these restrictions.
 >
-> Currently, io_uring zcrx uses regular user pages to populate the
-> area for page pools, this series allows the user to pass a dmabuf
-> instead.
+> I think Kuniyuki's point is defensible. And I did discuss this with
+> Lennart when I wrote the patch and he didn't see a point in preventing
+> other processes from connecting to the core dump socket. He actually
+> would like this to be possible because there's some userspace programs
+> out there that generate their own coredumps (Python?) and he wanted them
+> to use the general coredump socket to send them to.
 >
-> Patches 1-4 are preparatory and do code shuffling. All dmabuf
-> touching changes are in the last patch. A basic example can be
-> found at:
+> I just found it more elegant to simply guarantee that only connections
+> are made to that socket come from coredumping tasks.
 >
-> https://github.com/isilence/liburing/tree/zcrx-dmabuf
-> https://github.com/isilence/liburing.git zcrx-dmabuf
+> But I should note there are two ways to cleanly handle this in
+> userspace. I had already mentioned the bpf LSM in the contect of
+> rate-limiting in an earlier posting:
 >
-> Pavel Begunkov (5):
->   io_uring/zcrx: improve area validation
->   io_uring/zcrx: resolve netdev before area creation
->   io_uring/zcrx: split out memory holders from area
->   io_uring/zcrx: split common area map/unmap parts
->   io_uring/zcrx: dmabuf backed zerocopy receive
+> (1) complex:
 >
->  include/uapi/linux/io_uring.h |   6 +-
->  io_uring/rsrc.c               |  27 ++--
->  io_uring/rsrc.h               |   2 +-
->  io_uring/zcrx.c               | 260 +++++++++++++++++++++++++++-------
->  io_uring/zcrx.h               |  18 ++-
->  5 files changed, 248 insertions(+), 65 deletions(-)
+>     Use a bpf LSM to intercept the connection request via
+>     security_unix_stream_connect() in unix_stream_connect().
+>
+>     The bpf program can simply check:
+>
+>     current->signal->core_state
+>
+>     and reject any connection if it isn't set to NULL.
 
-Hi Pavel,
+I think that would be racy, since zap_threads sets that pointer before
+ensuring that the other threads under the signal_struct are killed.
 
-Looks like another "depends" line might be needed in io_uring/Kconfig:
+>     The big downside is that bpf (and security) need to be enabled.
+>     Neither is guaranteed and there's quite a few users out there that
+>     don't enable bpf.
+>
+> (2) simple (and supported in this series):
+>
+>     Userspace accepts a connection. It has to get SO_PEERPIDFD anyway.
+>     It then needs to verify:
+>
+>     struct pidfd_info info =3D {
+>             info.mask =3D PIDFD_INFO_EXIT | PIDFD_INFO_COREDUMP,
+>     };
+>
+>     ioctl(pidfd, PIDFD_GET_INFO, &info);
+>     if (!(info.mask & PIDFD_INFO_COREDUMP)) {
+>             // Can't be from a coredumping task so we can close the
+>             // connection without reading.
+>             close(coredump_client_fd);
+>             return;
+>     }
+>
+>     /* This has to be set and is only settable by do_coredump(). */
+>     if (!(info.coredump_mask & PIDFD_COREDUMPED)) {
+>             // Can't be from a coredumping task so we can close the
+>             // connection without reading.
+>             close(coredump_client_fd);
+>             return;
+>     }
+>
+>     // Ok, this is a connection from a task that has coredumped, let's
+>     // handle it.
+>
+>     The crux is that the series guarantees that by the time the
+>     connection is made the info whether the task/thread-group did
+>     coredump is guaranteed to be available via the pidfd.
+>
+> I think if we document that most coredump servers have to do (2) then
+> this is fine. But I wouldn't mind a nod from Jann on this.
 
-diff --git a/io_uring/Kconfig b/io_uring/Kconfig
-index 4b949c42c0bf..9fa2cf502940 100644
---- a/io_uring/Kconfig
-+++ b/io_uring/Kconfig
-@@ -9,3 +9,4 @@ config IO_URING_ZCRX
-        depends on PAGE_POOL
-        depends on INET
-        depends on NET_RX_BUSY_POLL
-+       depends on DMA_SHARED_BUFFER
+I wouldn't recommend either of these as a way to verify that the data
+coming over the socket is a core dump generated by the kernel, since
+they both look racy in that regard.
 
-Otherwise I'm having trouble compiling the next-20250506 kernel for
-VT8500, which doesn't select DMA_BUF by default. The following linking
-error appears at the very end:
-
-armv7a-unknown-linux-gnueabihf-ld: io_uring/zcrx.o: in function
-`io_release_dmabuf':
-zcrx.c:(.text+0x1c): undefined reference to `dma_buf_unmap_attachment_unloc=
-ked'
-armv7a-unknown-linux-gnueabihf-ld: zcrx.c:(.text+0x30): undefined
-reference to `dma_buf_detach'
-armv7a-unknown-linux-gnueabihf-ld: zcrx.c:(.text+0x40): undefined
-reference to `dma_buf_put'
-armv7a-unknown-linux-gnueabihf-ld: io_uring/zcrx.o: in function
-`io_register_zcrx_ifq':
-zcrx.c:(.text+0x15cc): undefined reference to `dma_buf_get'
-armv7a-unknown-linux-gnueabihf-ld: zcrx.c:(.text+0x15e8): undefined
-reference to `dma_buf_attach'
-armv7a-unknown-linux-gnueabihf-ld: zcrx.c:(.text+0x1604): undefined
-reference to `dma_buf_map_attachment_unlocked'
-make[2]: *** [scripts/Makefile.vmlinux:91: vmlinux] Error 1
-make[1]: *** [/home/alchark/linux/Makefile:1242: vmlinux] Error 2
-make: *** [Makefile:248: __sub-make] Error 2
-
-Best regards,
-Alexey
+But given that you're saying the initial userspace user wouldn't
+actually want such a restriction, and that we could later provide a
+separate way for userspace to check what initiated the connection, I
+guess this is fine for now.
 
