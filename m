@@ -1,205 +1,127 @@
-Return-Path: <netdev+bounces-188347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53C34AAC6F3
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 15:51:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18A7CAAC704
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 15:54:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A7F97A24B5
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 13:49:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 858A4467D02
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 13:54:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 510001F5849;
-	Tue,  6 May 2025 13:51:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03C6728003B;
+	Tue,  6 May 2025 13:54:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gBiWj3uq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JUe3A7Um"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5073CB665
-	for <netdev@vger.kernel.org>; Tue,  6 May 2025 13:51:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F59A27585E
+	for <netdev@vger.kernel.org>; Tue,  6 May 2025 13:53:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746539463; cv=none; b=NA5x2Urvsuz85/KHTX7X0P3csroK0GzjLJUYRbYbntBiYUgc7pZsn7ih0T3AN7zogMa8k4dTJCUameN+3ZbIWnuREY84uWL1ubF96rSfYKg3xrAQGfMc5y9HyAF9hyvzLOpMH53TSypgi8P3zqO5enLgFRjerfjsBxe/Mf5xOwM=
+	t=1746539639; cv=none; b=YC3I2A37FsuwL2Dd/ZFhK23lROMMZlSMNDl++lOHq6IWOfQrbrEF3SRMuhqDMnVSdgwC7XXBzgu1mxtJpjk0hGufxf6vHlEGIzONjG6H+JBG1sAtd0MBrJ8fzjzDGSCmQ7eegbAsPGmeE6k6NJbfFQqazttbZgNnRqCbLuU+XSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746539463; c=relaxed/simple;
-	bh=xwDiM7vwR9941uDFI89avr47pUWGr0oXOZ6lkB8o9z4=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=gcxvZ4dDCFriJL/occvDwOQS8E6SyyvVwY7EtIoiZpiiU7aR7g/1fKmit/Lq/GTAdQM5mn3/YicdOg+pGpz2nJw/BWGWWbMa7C2MVUryR/Ki5ohCAJfDRFPJiWbqiVvyTeeBqMLywq26eXT8E8PwFZxRDBoGIeYVPltbFKnkFbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gBiWj3uq; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1746539639; c=relaxed/simple;
+	bh=jk8IPUOhFSl7xS+J+w5S6t5sEdN30Mlqwf72SBoEAhE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=k/NY90hMyqmTFQN1W93ZrT6nPSjJoJ/lA/FM2q9Iow7qXIFx1DcyI1r6Uyzft0RR3nPLU5g+bhtzOuhmtyIQpXDstt5sPxF9y0JujnlJ2qzoqqkrfyX0a+JyTx9h/3zn3LQtauskCW/0/Dfu3MZ0ouwoBkr6iLb9M0GiXQKmiq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JUe3A7Um; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746539460;
+	s=mimecast20190719; t=1746539637;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=anEY3ujvZHPM5gqKoxq1z9X5UR9pcG63oQwy5E9oFtQ=;
-	b=gBiWj3uqh/hh8OFf1E4KIwl5alkxCo1w4jCXWR1Sg5T+QFQlbtkQpg3hk6LMBuH8TU72rM
-	7LBWXJ7Ia86pOfNNo1MpNESR8P6swaf/StbMK0dN8ieY7Lq7Ci+flhF2XftrL2roPTDekz
-	OKGrDbdATweWp+qK1S0DYbMQi9HOaBc=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-39-NlxD3tefNnmHZj9SuIFDYg-1; Tue,
- 06 May 2025 09:50:56 -0400
-X-MC-Unique: NlxD3tefNnmHZj9SuIFDYg-1
-X-Mimecast-MFC-AGG-ID: NlxD3tefNnmHZj9SuIFDYg_1746539455
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 65DA71801A30;
-	Tue,  6 May 2025 13:50:54 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.188])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 07EC61800876;
-	Tue,  6 May 2025 13:50:50 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20250505131446.7448e9bf@kernel.org>
-References: <20250505131446.7448e9bf@kernel.org> <165f5d5b-34f2-40de-b0ec-8c1ca36babe8@lunn.ch> <0aa1b4a2-47b2-40a4-ae14-ce2dd457a1f7@lunn.ch> <1015189.1746187621@warthog.procyon.org.uk> <1021352.1746193306@warthog.procyon.org.uk> <1069540.1746202908@warthog.procyon.org.uk>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: dhowells@redhat.com, Andrew Lunn <andrew@lunn.ch>,
-    Eric Dumazet <edumazet@google.com>,
-    "David
- S. Miller" <davem@davemloft.net>,
-    David Hildenbrand <david@redhat.com>,
-    John Hubbard <jhubbard@nvidia.com>,
-    Christoph Hellwig <hch@infradead.org>, willy@infradead.org,
-    netdev@vger.kernel.org, linux-mm@kvack.org,
-    Willem de Bruijn <willemb@google.com>
-Subject: Re: Reorganising how the networking layer handles memory
+	bh=ZLfPkVVABPBRhYmPGTE54pe7g1W2AfEmrluw2R0EMC0=;
+	b=JUe3A7UmUxz5sYcYWlCcf99c0KVyfTIK5RRZjBJOlFCE6gfGZkbazRftcmD/+6tu6S5x7F
+	YBMqti+kciUH+QRyzs2nySOR0BwVErIyXjGoLKaAS+dY08rJkPpiM+Zg6Qrlk8f1Ua9784
+	FBseeMIuJvTz6kf/oMSLkdjzI1ffmq8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-401-Jq4NDXIFPbWuG4BJdGlKOQ-1; Tue, 06 May 2025 09:53:55 -0400
+X-MC-Unique: Jq4NDXIFPbWuG4BJdGlKOQ-1
+X-Mimecast-MFC-AGG-ID: Jq4NDXIFPbWuG4BJdGlKOQ_1746539635
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-39c1b1c0969so3413947f8f.1
+        for <netdev@vger.kernel.org>; Tue, 06 May 2025 06:53:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746539634; x=1747144434;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZLfPkVVABPBRhYmPGTE54pe7g1W2AfEmrluw2R0EMC0=;
+        b=aDHpD/GUt5ANRVE93vqKHzxNzNWBCjb7EY9EbqJXNOhllw7cag2Ii9WmrlqWQ+YvhK
+         jxVkuw3KPlusHrFjG41iTA2ZR/EGVxEn5EzZhXRaaeWHU7j8B/XcL8A27nhPxgmNMK0z
+         3n0iFkr5uXekBEIt6PtNVeF7oTSB+9b61T+hACLxD/ksYTY/G9H1A7mXEtKHlAcni7ld
+         ZaiGGWKqa1ebaNZG0ABVDL5cQOtIPzgXtCgELOT+vQ+qqEG6I4XHbnLmfXlYADPL9dc1
+         9VRmGpad9DWryq4u0PS47SiDLjL80U568ZSrlNgi4Vfuc7cB1M5N9U1+kZ+98OFsyW43
+         9bcg==
+X-Forwarded-Encrypted: i=1; AJvYcCVRZyb/DXQg3gn/QahpHGSZM++hkTVn5z8o0G/6zkjvuw+H8PT3gqsCkfdEgH3PQHIekHMDckA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywbrv6Q8UKcX3HlenrR+nObrORULTJinkfJRGVaJXfD9Kmtnjoy
+	ziXzc1Ol16jfEOr1A3dlk78aqhwyePzeD1MUovnxzHjDnLbNMxB0mmXrJ5qLYJPZxw0bIC1TNLn
+	7Rcz07FhzVdqYdvgxnDnv2LT8HBixJsW0Blt9b8eqPPMy4awmQB36YmyPWPHQw2kO
+X-Gm-Gg: ASbGnctojG0FIFcAHfyWyhV50ehuzAUAnE1xllge+FClLSMI+OJ1rMSoOqQWa/zW4lX
+	1pDlo2rX3vMBFG6zd8VKuImeS/d/1VrioSC5uk/w3Yq9WXp3g7vZKPfTYrk/JngGm+z+8R9Y/Xc
+	Sg8emvkcepo+iumva1CiaGiwGG4lUnp9cNHF0ItG9z9HACAuP7JvNxLqQEVHFd5j3dPrhB8mTyT
+	RuRkYzJa7Eq0oUvas3bMwJW6qkGgZ9cazbdHV+rj6CEwZ/8bqsx6aCbnNyVRHdN/R4MB1b9FA+K
+	fEFkdx279vM7pocU+Kk=
+X-Received: by 2002:a05:6000:2088:b0:391:158f:3d59 with SMTP id ffacd0b85a97d-3a0ac0d9677mr2845774f8f.15.1746539634484;
+        Tue, 06 May 2025 06:53:54 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IERNkkEZ1YZO8UUeB8eWmn9YMDglheLIo0HlsBm7ofvZQ1M5dC+wSsDFMe03Ll69zv/fiASgA==
+X-Received: by 2002:a05:6000:2088:b0:391:158f:3d59 with SMTP id ffacd0b85a97d-3a0ac0d9677mr2845747f8f.15.1746539634052;
+        Tue, 06 May 2025 06:53:54 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2706:e010::f39? ([2a0d:3344:2706:e010::f39])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a099b0ffb1sm13727733f8f.73.2025.05.06.06.53.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 May 2025 06:53:53 -0700 (PDT)
+Message-ID: <39fd697c-bff1-4d09-8979-c2a43a749c25@redhat.com>
+Date: Tue, 6 May 2025 15:53:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1216272.1746539449.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 06 May 2025 14:50:49 +0100
-Message-ID: <1216273.1746539449@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 07/15] net: homa: create homa_interest.h and
+ homa_interest.
+To: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org
+Cc: edumazet@google.com, horms@kernel.org, kuba@kernel.org
+References: <20250502233729.64220-1-ouster@cs.stanford.edu>
+ <20250502233729.64220-8-ouster@cs.stanford.edu>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250502233729.64220-8-ouster@cs.stanford.edu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Jakub Kicinski <kuba@kernel.org> wrote:
+On 5/3/25 1:37 AM, John Ousterhout wrote:
+> +/**
+> + * homa_interest_init_shared() - Initialize an interest and queue it up on a socket.
 
-> > (2) sendmsg(MSG_ZEROCOPY) suffers from the O_DIRECT vs fork() bug beca=
-use
-> >      it doesn't use page pinning.  It needs to use the GUP routines.
-> =
+What is an 'interest'? An event like input avail or unblocking output
+possible? If so, 'event' could be a possible/more idiomatic name.
 
-> We end up calling iov_iter_get_pages2(). Is it not setting
-> FOLL_PIN is a conscious choice, or nobody cared until now?
+> + * @interest:  Interest to initialize
+> + * @hsk:       Socket on which the interests should be queued. Must be locked
+> + *             by caller.
+> + */
+> +void homa_interest_init_shared(struct homa_interest *interest,
+> +			       struct homa_sock *hsk)
+> +	__must_hold(&hsk->lock)
+> +{
+> +	interest->rpc = NULL;
+> +	atomic_set(&interest->ready, 0);
+> +	interest->core = raw_smp_processor_id();
 
-iov_iter_get_pages*() predates GUP, I think.  There's now an
-iov_iter_extract_pages() that does the pinning stuff, but you have to do a
-different cleanup, which is why I created a new API call.
+I don't see this 'core' field used later on in this series. If so,
+please avoid introducing it until it's really used.
 
-iov_iter_extract_pages() also does no pinning at all on pages extracted fr=
-om a
-non-user iterator (e.g. ITER_BVEC).
-
-> =
-
-> >  (3) sendmsg(MSG_SPLICE_PAGES) isn't entirely satisfactory because it =
-can't be
-> >      used with certain memory types (e.g. slab).  It takes a ref on wh=
-atever
-> >      it is given - which is wrong if it should pin this instead.
-> =
-
-> s/takes a ref/requires a ref/ ? I mean - the caller implicitly grants =
-
-> a ref  to the stack, right? But yes, the networking stack will try to
-> release it.
-
-I mean 'takes' as in skb_append_pagefrags() calls get_page() - something t=
-hat
-needs to be changed.
-
-Christoph Hellwig would like to make it such that the extractor gets
-{phyaddr,len} rather than {page,off,len} - so all you, the network layer, =
-see
-is that you've got a span of memory to use as your buffer.  How that span =
-of
-memory is managed is the responsibility of whoever called sendmsg() - and =
-they
-need a callback to be able to handle that.
-
-> TAL at struct ubuf_info
-
-I've looked at it, yes, however, I'm wondering if we can make it more gene=
-ric
-and usable by regular file DIO and splice also.
-
-Further, we need a way to track pages we've pinned.  One way to do that is=
- to
-simply rely on the sk_buff fragment array and keep track of which particul=
-ar
-bits need putting/unpinning/freeing/kfreeing/etc - but really that should =
-be
-handled by the caller unless it costs too much performance (which it might=
-).
-
-Once advantage of delegating it to the caller, though, and having the call=
-er
-keep track of which bits in still needs to hold on to by transmission
-completion position is that we don't need to manage refs/pins across sk_bu=
-ff
-duplication - let alone what we should do with stuff that's kmalloc'd.
-
-> >  (3) We also pass an optional 'refill' function to sendmsg.  As data i=
-s
-> >      sent, the code that extracts the data will call this to pin more =
-user
-> >      bufs (we don't necessarily want to pin everything up front).  The
-> >      refill function is permitted to sleep to allow the amount of pinn=
-ed
-> >      memory to subside.
-> =
-
-> Why not feed the data as you get the notifications for completion?
-
-Because there are multiple factors that govern the size of the chunks in w=
-hich
-the refilling is done:
-
- (1) We want to get user pages in batches to reduce the cost of the
-     synchronisation MM has to do.  Further, the individual spans in the
-     batches will be of variable size (folios can be of different sizes, f=
-or
-     example).  The idea of the 'refill' is that we go and refill as each
-     batch is transcribed into skbuffs.
-
- (2) We don't want to run extraction too far ahead as that will delay the
-     onset of transmission.
-
- (3) We don't want to pin too much at any one time as that builds memory
-     pressure and in the worst case will cause OOM conditions.
-
-So we need to balance things - particularly (1) and (2) - and accept that =
-we
-may get multiple refils in order to fill the socket transmission buffer.
-
-> >  (5) The SO_EE_ORIGIN_ZEROCOPY completion notifications are then gener=
-ated by
-> >      the cleanup function.
-> =
-
-> Already the case? :)
-
-This is more a note-to-self, but in what I'm thinking of doing would have =
-the
-sendmsg() handler inserting SO_EE_ORIGIN_ZEROCOPY into the socket receive
-queue.
-
-David
+/P
 
 
