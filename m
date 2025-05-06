@@ -1,223 +1,232 @@
-Return-Path: <netdev+bounces-188372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C50A6AAC83C
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 16:38:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68ABEAAC8AB
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 16:51:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5A8418904E4
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 14:38:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3C3627A894D
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 14:50:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1755A280A5F;
-	Tue,  6 May 2025 14:38:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68982283C90;
+	Tue,  6 May 2025 14:51:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CRxKH3Pk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WrHNmjx8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17FF918D656
-	for <netdev@vger.kernel.org>; Tue,  6 May 2025 14:38:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746542311; cv=none; b=eqky5ytBMNmLzC3l8DC3Zu0O9izdA77uTw8bCk5QComuuBd4aNC1lFEcnMPM1LC0nDhljnzzhcqA3MxXWGJo4XEfL39ODqGqVa+kMUU7bbs/2Hd51ZNcb3BAYguS+ojDrmCcfkWa8Tiqa7smJsQAtWA++zqrlxTxlAvfhUuhGlc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746542311; c=relaxed/simple;
-	bh=Ma83b15qnnbFaueFtEvSpUdw/TKvSFOJHfOZe78Fr4A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uMB01eC0MLSJSrLasrfUWG95CTakEvDTnNkkif8WdIRYSRdQeMLiitfgkZnFzviVYdKc94QwAdFZOL1BLtRKrHW2a+sM4OIwYpDVaSV2RStA2TPJz/wT01YQQj+xIuNpQmkfBPZuqVpBz3ojwc+ymEdg7FeYkOxhjqITY9efl24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CRxKH3Pk; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5f632bada3bso9382a12.1
-        for <netdev@vger.kernel.org>; Tue, 06 May 2025 07:38:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746542307; x=1747147107; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WS0cqO7mEX8JBUGkY5ZSym9XPagAwEGfVvGLKmJF5sY=;
-        b=CRxKH3PkApshm30WZX8T9D4ebFVa2DK7zxt1/b5UuPL7Un040C1U04ni6pt6wn4EUz
-         5jx1dasvgSqPUAApV3udF1A/6C+nUlyypZIjBlpCM0dEuoRq7fICJSpaB2UhsFtOvRan
-         cgQZYs6G4UwwFepUYX64nBp1bhYcLI2CFkrti2s0X0fJmnym8e6wcNm1nbXBgHxxU4DO
-         73DjIY+ZRiUL8YZ58MzUU1ACZJE2e8eq3/y6W2agirsIrZFZiItiW8MF9e73oHUvzxHh
-         hKax1ddqHIzpONWeLztbYaFGdnyw3RTmNcKMUjTpBsKxrrazzPA+4XJ0EXcghTL4bPa9
-         UEJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746542307; x=1747147107;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WS0cqO7mEX8JBUGkY5ZSym9XPagAwEGfVvGLKmJF5sY=;
-        b=it/FADGQKqDCWN5Mo9E3EApnmmrRwTuajB6TkYsXdAf4ssDHyY2p9GwGPI3hxD3Ixe
-         CXlULA+KcSRLJSehR0E6PAIJs4QC/l075hYx9Bf8xDW0mfBgSnmR40OmZp8kLIiB+QyZ
-         CokWwSS0pPZRimSzG7GTWV5q5KEOzYMK+eFBq78Hx/7AF1sEUcq2FgQJUq08R3HUUoK1
-         OtP9oa2ftuzYTZsK3C6qA5qu1kSzCwxEQdL1e7T+UYhrcK8evyyMJXvDB5klMa0VF32w
-         rfIMMruyE+COuGHlRl8hCsCOVH0wtuXCD6PniMvhhTCKo8Ugmpwz+rmdyb8d5qjLz/U9
-         0dVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXcsb/mrnwr7h8vpBonwHJ+t/PVneI8SahGvqHtgUcEQKgKhvpsZzwiDxVi839HXO1kcxnBoeA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6FmcPz8UV6YVRC3TBSMEGJrUHOKZ+8fL7K183FihmvmitMlKI
-	C+tOf/H5CauM8QOrtsh+T6PKz7qVbELgj5xoJ5B5zLguMV7WWusBHL4SOWqyzbOPxCsMSdeZxck
-	D/iOkjm2bN/1QiaTf1uByxLFWy5ogKuDhwB8d
-X-Gm-Gg: ASbGncuvaHJqNBQuKzy6eSsERSeUrwpHO8CK1Pi7farBtmjreQWDO6lEaZhDJTyHJu/
-	msPOoPCP5lB5GiC83odwtIz0yOdE6wkRGXwqhPOka1subzHiofYMzSrY79iW9AKQ1s1mqPySalG
-	GeEhLdZaz53e283TwSkAzD8Jo+VN6frYBVakRbGwK4BylnAjoD7Q==
-X-Google-Smtp-Source: AGHT+IEKBtQbqHTSi7RTxOlTKbd2L3krdaRx+iHlrQhBUxrpFEHfioEBlUhMAatv2Ff4k8wWL2KQK5USpqhewEIPDcg=
-X-Received: by 2002:aa7:d1d9:0:b0:5f8:d6b1:71ba with SMTP id
- 4fb4d7f45d1cf-5fbe76ccb80mr239a12.4.1746542307024; Tue, 06 May 2025 07:38:27
- -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4263B28315A
+	for <netdev@vger.kernel.org>; Tue,  6 May 2025 14:51:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746543086; cv=fail; b=n23jttZowD7Oh8LdwoI+ij1o9IOd7I+tYZMt3mMR+lXh/6uBcduIdf/NerU8vA4ax7T31rI8kuNoJ7mjCkpq/awU5Zan1EEDGGeqEuRBtKZmwnGyl0DkmP6BrXSBA2MKNJEqPpigo4pD4OQZjthKhyEGl+PWUorc7RzfYYq0OmE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746543086; c=relaxed/simple;
+	bh=IAR625NTb4UHTxpCXn5UaJ51WAR5zobgKJGHdvduHSE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=a2fMcUDaHRBB4alELBbdUnMJH2ekfAtCnvKZdxVXtRTwHIABfkz5mh+gb7q+IAwJv20RqM21ZkFdH+68d1EbTmhY3UNJFdn2qsKC3x/dsVEefrJQqscUmVqEKaFb0XzAP6rTxiKQq0sqEvq4qoKHngsHFGqXqdW2NuEwCFcgFlE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WrHNmjx8; arc=fail smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746543084; x=1778079084;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=IAR625NTb4UHTxpCXn5UaJ51WAR5zobgKJGHdvduHSE=;
+  b=WrHNmjx8afHS96l4O7YzwnDM6/fvjat4Ipy+1yrldJQHkUt/f9m0GQ7V
+   SlxZVAEtIahoVwcuh+xkMem1WG2fVuHGtKBn/2Fv0T6N1Ve5h1Ylj2waQ
+   R6OQ4FQqMBQ+N5DjkA83enbt2RwPXjgArJSNicbpuG2aTeSC76PTWr9AV
+   miZMDeFlszZFUy/YdNKtXArpapiwNDWyizQtuYP8RcXJP808nKJ0MX4an
+   G2qLJQcueNDGmnDGCTTogOnJyyMsQIpMO9M0dsVsc7SwcbdHn358QPg9W
+   Y+9rgj0N/gvbXH1vheIGSdJvdJTWn/Az6OLt4eH8qXWYyJHlYffyQQTTO
+   g==;
+X-CSE-ConnectionGUID: RC63tnMBTmSdQJ+WjF4xAQ==
+X-CSE-MsgGUID: hCfZWAuhRWC4x6Pq4cuAUw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11425"; a="50865913"
+X-IronPort-AV: E=Sophos;i="6.15,266,1739865600"; 
+   d="scan'208";a="50865913"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2025 07:51:12 -0700
+X-CSE-ConnectionGUID: ll0nrZ3sT9uqZiz6gQKOxg==
+X-CSE-MsgGUID: 93wEurU4SvmdGsdmuCVeeg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,266,1739865600"; 
+   d="scan'208";a="166570855"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2025 07:51:12 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Tue, 6 May 2025 07:51:11 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Tue, 6 May 2025 07:51:11 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.174)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Tue, 6 May 2025 07:51:10 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=XbWqMbGx65ev6J99o0krmc9/G3Y2PtlsE2c/cTcHqajCGQ6lH/T6ygndhKXSU5JC6oK/rnSOn/7JUpazrZ7mTL+rOMYJfc7ly3TrJ5QsIihTBIjD9qa/JUPlx0g+lIcFZMEylHlNYFHnHA7M3trcAIZA+8gEyEjB9kfi2Dc/Hj5FGzDrHGvgb0ESl99pDDL6p9D2/d/5Tx0QbQCe3gZsA4QPa8OiPfin1bW7jNvKcvQd0tfhYhBFCjVZHkgQoJ7AHlbpXrqHGD/lSp9tPKEwISZMmCkS0vCNbfpIY2uRvjf3VAglqzA5NNsMn1K0lP4l9wxygNm+97cXwrywdILKaw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=IAR625NTb4UHTxpCXn5UaJ51WAR5zobgKJGHdvduHSE=;
+ b=BDuphW5C4RoMEbasI2rUBf4S8zvvCpK1OTaKGb4h4tRyVKjrwJzIll6HCQRTJSsAhB0NrTgp2/lG5DkxpEKaLLpyUqZ1lSxgtFeBby2YmVg7/+cvpJN32EyBgJnQv8hOvN3J9sE/2HjJvEYfJIldp4MNkurtO4jTNyuZwGubY6tgqIx/eABw/PvMqZ8uQVp2uNqALTwRV5bJDWPTdPB65uCqu5yjXcelLuKOEoUL2IuLILgQfKwQgpWBs0yMBGeh6HhGeRoREOL3k3MiTziUKZo8ugzZchO/rwlsi4it6r3IW+zyki/yQFptdwFKhMDXHNMKpyfHUnXOmvKX2X7xTQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH7PR11MB5885.namprd11.prod.outlook.com (2603:10b6:510:134::22)
+ by CYYPR11MB8432.namprd11.prod.outlook.com (2603:10b6:930:be::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.26; Tue, 6 May
+ 2025 14:50:37 +0000
+Received: from PH7PR11MB5885.namprd11.prod.outlook.com
+ ([fe80::b1f3:809e:5b8a:c46e]) by PH7PR11MB5885.namprd11.prod.outlook.com
+ ([fe80::b1f3:809e:5b8a:c46e%4]) with mapi id 15.20.8699.022; Tue, 6 May 2025
+ 14:50:37 +0000
+From: "Olech, Milena" <milena.olech@intel.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "davem@davemloft.net"
+	<davem@davemloft.net>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"edumazet@google.com" <edumazet@google.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "Keller, Jacob E"
+	<jacob.e.keller@intel.com>, "richardcochran@gmail.com"
+	<richardcochran@gmail.com>
+Subject: RE: [PATCH net-next v2 00/11][pull request] idpf: add initial PTP
+ support
+Thread-Topic: [PATCH net-next v2 00/11][pull request] idpf: add initial PTP
+ support
+Thread-Index: AQHbtixghtBT1IyYJEugZ4El30KEQbO50eAAgAFgtgCAAAMSgIAJHzlggAAfKoCAAUo1AA==
+Date: Tue, 6 May 2025 14:50:36 +0000
+Message-ID: <PH7PR11MB588530D6A52A68552C859C298E89A@PH7PR11MB5885.namprd11.prod.outlook.com>
+References: <20250425215227.3170837-1-anthony.l.nguyen@intel.com>
+	<20250428173906.37441022@kernel.org>
+	<17fe4f5a-d9ad-41bc-b43a-71cbdab53eea@intel.com>
+	<20250429145229.67ee90ea@kernel.org>
+	<MW4PR11MB588916A3C03165E0D21B73528E8E2@MW4PR11MB5889.namprd11.prod.outlook.com>
+ <20250505120207.704c945f@kernel.org>
+In-Reply-To: <20250505120207.704c945f@kernel.org>
+Accept-Language: en-US, pl-PL
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH7PR11MB5885:EE_|CYYPR11MB8432:EE_
+x-ms-office365-filtering-correlation-id: e2cdc29b-ac11-4fda-19d7-08dd8cad5cc3
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?xGSChhtq5rY6YtU+iJIhdgjUrfzMMLedNYW+oRcHXiaXq2gxrDMCigg2IvU/?=
+ =?us-ascii?Q?IEnFBdKBAtpKegb3NiM/OWrzzp2QhXFJCICrU695G+mh7AEt0mB4zTtyxaow?=
+ =?us-ascii?Q?pxSwtjsGGDy+LB2di3NAUtUybN7i9yL7t1Hgr3cyYhP0FnoTsTh703bcjNbg?=
+ =?us-ascii?Q?i8S6ieJSRUbOnA/Xe13A2zN/VBTc1ZY/FxzmYnUClSgB1g/cSKpsXc6o6euD?=
+ =?us-ascii?Q?kxGBjOZXNrmsMLYqezKuNPHAoqYNWXYUVaoh48/I/XuEXtDysbqyfvoBukYu?=
+ =?us-ascii?Q?K1jEBb3PZXcS+HGQslfzWUNFDeVEdl3w+tzLUfsYL6sWrX8sHFzyu5nh86/5?=
+ =?us-ascii?Q?58Bylp3XsQI70EJr1ANV5wHASknY3wSr6Lq1P50hgdXcXVv7xWUBM5jaJTy4?=
+ =?us-ascii?Q?5hiyl+UzvBZNpHzF02FxRP57CvT+UIiBMiuevFoKUrQ8TnVn93H6gxLkUFeM?=
+ =?us-ascii?Q?mnUvIDeZGHNbg0SYTjHyJd7pS8GAH7nb7NJ01lM9VxWwBi7wF/aC6PtyGLm0?=
+ =?us-ascii?Q?BXesALdheWXWBcENM1us5km8pf6gWl+kmZ7FjhOgR9hkVX0JL9Gw/1nlg7mM?=
+ =?us-ascii?Q?WwuRHcFHaFl5wU/1fTI0bwgq18SxqI78Zz9NH9InC6uoAKzS5AcKtFqc+CS3?=
+ =?us-ascii?Q?2NQcIoCaQMkFTqPCiQNOw5Sawm8f4ltdONUkf65lwx53e3UCmSpdPvP3lr+L?=
+ =?us-ascii?Q?sqFNu1RvhuFRQdxeucJWhAc9TPiNTANw5Pve9RU1ZzktfIFELvN/bNkFigQG?=
+ =?us-ascii?Q?dZIgRyR3vNiyVcdDg/L1IeOIPLh0WrQAtilfS6XYn6Yob9Cr50Eya39yFGbK?=
+ =?us-ascii?Q?S/X5SvgLjEulTCrmAq7/mwwGwRxDahVvbmzeD/QtpQHBBCz/IRFWPJ0rU3Zf?=
+ =?us-ascii?Q?w3xU+SW3udzBaL87B3amc2JddSI+cs5snu6W7J3ZZdqgux0N7rey2tPtDOvU?=
+ =?us-ascii?Q?C4ovEY0IHgxk1hBjE5f8GXBpyzRqjirXpUm8Xr7tUyfWkf/O3Yfcx7OiIGku?=
+ =?us-ascii?Q?Ng4eUsXR7FpRG+82lZzAUyL82iHQAHEeaLbjh1D8kIiBUz2NdaCy44EPnT9m?=
+ =?us-ascii?Q?xrxjUL5jyRDD9MhYzeeLzl0tywBqjHxHqJexZF5M+ziqtA7Y+TXyn6b2/ClE?=
+ =?us-ascii?Q?sJ9ImO0xHMaj/kA9G1k3CpWIj2MinyXVvQMr0ZITbtuZXsPjwQPxgLaiGUVO?=
+ =?us-ascii?Q?7x3DQyN0aOQbgkqnkTAcYPdmH441wJBhq96ssLZ8EoAymIgPz51izHPtVXtq?=
+ =?us-ascii?Q?KJ/IT7z0+wUCcYchvPVYYn8bBVlSPY4K+BI0LVlTwCjnw4Y/QTnzF4BTFiHq?=
+ =?us-ascii?Q?jGwfeVLNpPq6sieGDMMJ4s8tZbq86rKS9whpQyilkfpLjDfpyfbpR+VVCocx?=
+ =?us-ascii?Q?q2EO+lURZ4up/hN5kOuvIyph2nrmlDLEyEG5BjYTD+b1cIecHIaGoXDqSNOo?=
+ =?us-ascii?Q?MBQdfAjwjjIvHMmH0gemvbgnOE9LVZRnZ3FXjcFYC+sQJbD27H9uDP2Vl93k?=
+ =?us-ascii?Q?ig7YmkjyDpIM2sE=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR11MB5885.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?JZKzZTkr89MtqjwjHivO6KnymypzLX4ZsHTXe1off9XMIzkqCUPFH7O1QlXS?=
+ =?us-ascii?Q?aeB0IcyGb+R8b5rw5W5hIMmKzipEMcBU0IM/FP1Ez0WNr5FVOFFK18pF8sr3?=
+ =?us-ascii?Q?wYWiXZiUD6r8b5QyOJLEDt5QLT7SuL7gUDLDU5XA6p/vSG1XeQ8DknPBBUnR?=
+ =?us-ascii?Q?xdaFZ38WJsRhJoNqwmDoBBMjA5pKie/crC1xBoINS4nAlZB1fH83npIskbte?=
+ =?us-ascii?Q?ljsg+lOda88fbuSBuA+wsrA1Gx0g1Fpca7/6z+tl1DRZfK/lqlj0IO4Honwq?=
+ =?us-ascii?Q?D3mmwb21XtzRQfoODMTXEnpb0HRB8+oTI4zOwD4xRBZi48wshAsJgCCPxZjG?=
+ =?us-ascii?Q?2w3/ONxV8YJqkLBwJUHro0/tkqGIicZG3cnwxtQxsB+Q/IiVhuvqD2ICuEZD?=
+ =?us-ascii?Q?qZ00wklzgVvqY4HIjNicwpmqS8UNo4opkk7CmRrvgolp1eWflW6C0N4fLETW?=
+ =?us-ascii?Q?0tKV4U22xQ0sYcsvJ/7WN0IJiRAhWoGBztbhdHpZV/lpF5ICI5OQKoiK+9A7?=
+ =?us-ascii?Q?cWk3nN9lVenjphg+eWoQsmO25VDj7Ds/OU8zzbeWVdb5/14vjdeYscrSwzIx?=
+ =?us-ascii?Q?GNYYcoTXTKRh2HMW7o2Km09+u+cLgpM38AZ9QQ72oVTXYjlDPrcw8509vGlt?=
+ =?us-ascii?Q?G3W9cXP7YqsIHg01VTxNB7Lql+N4bVdWyYsbjuR/tAQ1dpOa7mgNlEuHkO/q?=
+ =?us-ascii?Q?zl3itscdp+wCW3P8+X5rfiVh4hRNA0w+S4ZxGT6eB0eed/0cSY+JGLR3+84f?=
+ =?us-ascii?Q?d+ryrfGPMjVmyLsPk6wXEl8NLDxq6kOb1tn2ckR3OJmOr6bSjSkQsaPpkfHh?=
+ =?us-ascii?Q?FS/oGIwhMYzwo6lEEjMal2KyVea+G2sZYksz8Fjqm+FoM77bP0GFKp3oZyW/?=
+ =?us-ascii?Q?H1khsoGHLEKjWjq5zX0J6UlR8o/JgXPfGTU3Po7AY5l8PSbC0W3pKnI2EYA+?=
+ =?us-ascii?Q?mHrCq+6aa/VXOhLqDEXihC41f50jVL9ggCSnrqP3SOIt8WIcj/7fKR/C9Ynv?=
+ =?us-ascii?Q?t/UJLWPu+l14FvR/TD2nKyqzIcqVStvyWSFngL30NTeSOo0YSN41YRLzP6nt?=
+ =?us-ascii?Q?usrTNEFNV5fX1MG8iNjPh1/nTb+o6YXPEemdxcsKCqpvnnPojC43AP6KoM3a?=
+ =?us-ascii?Q?WwDdRKLxDb1l8Mb2t0eDN/hykZqtjtRjehdLsRg9uJtO4MembAFMHAmeCH9f?=
+ =?us-ascii?Q?nn5nC9PjsKmNbw27YZRn8tb/zayy9N43IDB3XhUT/23EP2wGPyxxxTZEPGoS?=
+ =?us-ascii?Q?OQ6uPc82BG6djfwGRJmNazMAJnfNoYjp38yFy44WiAV9hfCgCk1v5g6eh9Nt?=
+ =?us-ascii?Q?2Grna6WG6zVN3WN34aR/fLM2lxW8voiMGhapeBBeRpvkKzGLE0jAptlviMyZ?=
+ =?us-ascii?Q?XG5WYypqsGjHtnlW97g84D34lVeIjnBaAccio4oaXOloce8lOKohOuxjmNVp?=
+ =?us-ascii?Q?4yo3EOEscxNidI4fZp/6YkO4WetPONzuUzCrGHAHacj0mnne/pDR0tAYrSI0?=
+ =?us-ascii?Q?d8tFYUuSzCyEFICvv0nTD+oUFM8JIebmExrsPVdQ1eUOZGj8KN4H3F9ScRnR?=
+ =?us-ascii?Q?XGqPqNvkL/5A5/LsclDwHvt6y60Yvchrm4ZEHgdx?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250505-dompteur-hinhalten-204b1e16bd02@brauner>
- <20250505184136.14852-1-kuniyu@amazon.com> <CAG48ez35FN6ka4QtrNQ6aKEycQBOpJKy=VyhQDzKTwey+4KOMg@mail.gmail.com>
- <20250506-zugabe-bezog-f688fbec72d3@brauner>
-In-Reply-To: <20250506-zugabe-bezog-f688fbec72d3@brauner>
-From: Jann Horn <jannh@google.com>
-Date: Tue, 6 May 2025 16:37:49 +0200
-X-Gm-Features: ATxdqUG1RLsm5I44mZFoXDEOhGLmKo0PIMKTKhu327qv26lJZYIhQ2B6edAN2po
-Message-ID: <CAG48ez0Pc+QzxgAnT25KqyvjC8n0=diL6DnxBe7CcdQ32u9GcA@mail.gmail.com>
-Subject: Re: [PATCH RFC v3 08/10] net, pidfs, coredump: only allow coredumping
- tasks to connect to coredump socket
-To: Christian Brauner <brauner@kernel.org>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, alexander@mihalicyn.com, bluca@debian.org, 
-	daan.j.demeyer@gmail.com, davem@davemloft.net, david@readahead.eu, 
-	edumazet@google.com, horms@kernel.org, jack@suse.cz, kuba@kernel.org, 
-	lennart@poettering.net, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, me@yhndnzj.com, netdev@vger.kernel.org, 
-	oleg@redhat.com, pabeni@redhat.com, viro@zeniv.linux.org.uk, 
-	zbyszek@in.waw.pl
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR11MB5885.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e2cdc29b-ac11-4fda-19d7-08dd8cad5cc3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 May 2025 14:50:36.9856
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: /t0xlTAINdUcEis13TZBdxotpG6BQaWq++IclxHJwICVInf390kLzGmwuKvhegpO58UnQV7XgjMcNCQVtALn3w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR11MB8432
+X-OriginatorOrg: intel.com
 
-On Tue, May 6, 2025 at 10:06=E2=80=AFAM Christian Brauner <brauner@kernel.o=
-rg> wrote:
-> On Mon, May 05, 2025 at 09:10:28PM +0200, Jann Horn wrote:
-> > On Mon, May 5, 2025 at 8:41=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon=
-.com> wrote:
-> > > From: Christian Brauner <brauner@kernel.org>
-> > > Date: Mon, 5 May 2025 16:06:40 +0200
-> > > > On Mon, May 05, 2025 at 03:08:07PM +0200, Jann Horn wrote:
-> > > > > On Mon, May 5, 2025 at 1:14=E2=80=AFPM Christian Brauner <brauner=
-@kernel.org> wrote:
-> > > > > > Make sure that only tasks that actually coredumped may connect =
-to the
-> > > > > > coredump socket. This restriction may be loosened later in case
-> > > > > > userspace processes would like to use it to generate their own
-> > > > > > coredumps. Though it'd be wiser if userspace just exposed a sep=
-arate
-> > > > > > socket for that.
-> > > > >
-> > > > > This implementation kinda feels a bit fragile to me... I wonder i=
-f we
-> > > > > could instead have a flag inside the af_unix client socket that s=
-ays
-> > > > > "this is a special client socket for coredumping".
-> > > >
-> > > > Should be easily doable with a sock_flag().
-> > >
-> > > This restriction should be applied by BPF LSM.
-> >
-> > I think we shouldn't allow random userspace processes to connect to
-> > the core dump handling service and provide bogus inputs; that
-> > unnecessarily increases the risk that a crafted coredump can be used
-> > to exploit a bug in the service. So I think it makes sense to enforce
-> > this restriction in the kernel.
-> >
-> > My understanding is that BPF LSM creates fairly tight coupling between
-> > userspace and the kernel implementation, and it is kind of unwieldy
-> > for userspace. (I imagine the "man 5 core" manpage would get a bit
-> > longer and describe more kernel implementation detail if you tried to
-> > show how to write a BPF LSM that is capable of detecting unix domain
-> > socket connections to a specific address that are not initiated by
-> > core dumping.) I would like to keep it possible to implement core
-> > userspace functionality in a best-practice way without needing eBPF.
-> >
-> > > It's hard to loosen such a default restriction as someone might
-> > > argue that's unexpected and regression.
-> >
-> > If userspace wants to allow other processes to connect to the core
-> > dumping service, that's easy to implement - userspace can listen on a
-> > separate address that is not subject to these restrictions.
->
-> I think Kuniyuki's point is defensible. And I did discuss this with
-> Lennart when I wrote the patch and he didn't see a point in preventing
-> other processes from connecting to the core dump socket. He actually
-> would like this to be possible because there's some userspace programs
-> out there that generate their own coredumps (Python?) and he wanted them
-> to use the general coredump socket to send them to.
->
-> I just found it more elegant to simply guarantee that only connections
-> are made to that socket come from coredumping tasks.
->
-> But I should note there are two ways to cleanly handle this in
-> userspace. I had already mentioned the bpf LSM in the contect of
-> rate-limiting in an earlier posting:
->
-> (1) complex:
->
->     Use a bpf LSM to intercept the connection request via
->     security_unix_stream_connect() in unix_stream_connect().
->
->     The bpf program can simply check:
->
->     current->signal->core_state
->
->     and reject any connection if it isn't set to NULL.
+On 05/05/2025 9:02 PM, Jakub Kicinski wrote:
 
-I think that would be racy, since zap_threads sets that pointer before
-ensuring that the other threads under the signal_struct are killed.
+>On Mon, 5 May 2025 17:20:11 +0000 Olech, Milena wrote:
+>> >Right, nothing too obvious, maybe cross timestmaping. But it takes me=20
+>> >30min to just read the code, before I start finding bugs I have to=20
+>> >switch to doing something else:(
+>> >
+>> >It's not a deal breaker, but I keep trickling in review comments 2 at=20
+>> >a time, please don't blame me, I'm doing my best :)
+>> > =20
+>>=20
+>> To have fully-functional PTP support we'd need clock configuration +=20
+>> Tx/Rx timestamping, so it will be challenging to remove something=20
+>> logically :<
+>>=20
+>> The only ideas that come to my mind are:
+>
+>No strong preference, but
+>
+>> - Remove tstamp statistics and create a separate patch for that
+>
+>yes
+>
+>> - Split PTP clock configuration (1) and Tx/Rx timestamping (2)
+>
+>no
+>
 
->     The big downside is that bpf (and security) need to be enabled.
->     Neither is guaranteed and there's quite a few users out there that
->     don't enable bpf.
->
-> (2) simple (and supported in this series):
->
->     Userspace accepts a connection. It has to get SO_PEERPIDFD anyway.
->     It then needs to verify:
->
->     struct pidfd_info info =3D {
->             info.mask =3D PIDFD_INFO_EXIT | PIDFD_INFO_COREDUMP,
->     };
->
->     ioctl(pidfd, PIDFD_GET_INFO, &info);
->     if (!(info.mask & PIDFD_INFO_COREDUMP)) {
->             // Can't be from a coredumping task so we can close the
->             // connection without reading.
->             close(coredump_client_fd);
->             return;
->     }
->
->     /* This has to be set and is only settable by do_coredump(). */
->     if (!(info.coredump_mask & PIDFD_COREDUMPED)) {
->             // Can't be from a coredumping task so we can close the
->             // connection without reading.
->             close(coredump_client_fd);
->             return;
->     }
->
->     // Ok, this is a connection from a task that has coredumped, let's
->     // handle it.
->
->     The crux is that the series guarantees that by the time the
->     connection is made the info whether the task/thread-group did
->     coredump is guaranteed to be available via the pidfd.
->
-> I think if we document that most coredump servers have to do (2) then
-> this is fine. But I wouldn't mind a nod from Jann on this.
-
-I wouldn't recommend either of these as a way to verify that the data
-coming over the socket is a core dump generated by the kernel, since
-they both look racy in that regard.
-
-But given that you're saying the initial userspace user wouldn't
-actually want such a restriction, and that we could later provide a
-separate way for userspace to check what initiated the connection, I
-guess this is fine for now.
+Is it ok if I remove tstamp stats from this series ~50-60 lines, and
+won't add more code (I mean get_ts_stats) ?
 
