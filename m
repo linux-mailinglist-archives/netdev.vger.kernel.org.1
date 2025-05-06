@@ -1,306 +1,209 @@
-Return-Path: <netdev+bounces-188416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F6FAAACC73
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 19:46:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD782AACC78
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 19:47:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 348C91C052A3
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 17:46:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 423545008AD
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 17:47:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A83C21CC62;
-	Tue,  6 May 2025 17:46:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E96C2857DD;
+	Tue,  6 May 2025 17:47:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="a/exqWQ4"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="mV1xolWr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2088.outbound.protection.outlook.com [40.107.220.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E7DC20B806
-	for <netdev@vger.kernel.org>; Tue,  6 May 2025 17:46:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746553589; cv=none; b=ndKvnCp2LQ171gZlUAKctcpkKv0aB4Mj1pF0t6J8nch7nlQXZzFD5zaLqGra33BK3SZ+sVi/ggVGMuqj5s/jl7uyuxerDDfwym3XJW+GAqnMU3/8vogUlLxNK/NojBsdw92R8PvP7rTNm1Paho57QDbid3EENtZWLzqQeutWh9s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746553589; c=relaxed/simple;
-	bh=JphBOVmCqX0wYmM3FvIOi8NKH7hyfPQQFD7PpU6fERc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tJQv//tiVlbEwOSxVnldKiSGJvyGu1DpbIxRxITjIBq/diREQjF82OzoOKG2Z27fNteixY7FkMYw5EatstkOgmzyeLaZrrhpTsA6ltHwVBBGvkbd2W1Ag9uA0RM4aCV3yox2iZWo1b4AozwrZrzy8OsjRqqhMv5VK44dpqTRYNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=a/exqWQ4; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=fUu5inMFOYZcgUIaWPTQvlVDgdfo/XkmY9anrk5A1QQ=; t=1746553587; x=1747417587; 
-	b=a/exqWQ4Nz7trc7PDi3pXd7Jaa3MnxLdQFierB0s9FYIjKC6yijDXfBhBebN2OJcdwWkHeNTXpQ
-	KlPXYwDejf9QWNX9vx4yHK0S7jMef7PhShcO3I8bwndzFStHLILGFlu23xmEAr2yJBuqF1KvPRaTm
-	3h8KQpFrFA+B09GfqG0orQ7IKk8ZB2wz1NUbVuvwhDytJ5Fg1xa1SFIWJ9uFMxY6q+fT9NLZQrdja
-	9Pd+sSXwsJTDZv9vEsxutWc206LloKVtHLOAKFiA+I+h8jXvRuoeqjpTvLCCoRSd/3chAcTron4Zk
-	HDnmvJIpQE+loLc8XZxQHEze3IGbYXN67jRw==;
-Received: from mail-oo1-f41.google.com ([209.85.161.41]:42216)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1uCMN2-0004wa-2g
-	for netdev@vger.kernel.org; Tue, 06 May 2025 10:46:21 -0700
-Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-606668f8d51so82890eaf.0
-        for <netdev@vger.kernel.org>; Tue, 06 May 2025 10:46:20 -0700 (PDT)
-X-Gm-Message-State: AOJu0Ywfx28A0pstK8FYyX5cSl4LfPUm75ATyDQ4Y3bULDaawcKlxrIL
-	nAj32uhR1kyT9s5NrirUfsEaqobYI2KeF74MhL/ep0oSV5ST6wOlSll8N56c+06lFC9DMD7URxM
-	G7BECH9FLv01nZ0CENIWhONpJV/s=
-X-Google-Smtp-Source: AGHT+IETJyzEY14boBRlid8F6DMIjDVwL6/eEPEd93ZqEAvx7MwagUWtzGPXgOixkCv34Ygm/s+TfnFkGLaq7an38IY=
-X-Received: by 2002:a4a:ca18:0:b0:607:de46:fa94 with SMTP id
- 006d021491bc7-60828322836mr468393eaf.4.1746553579484; Tue, 06 May 2025
- 10:46:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EBB421CC62;
+	Tue,  6 May 2025 17:47:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.88
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746553655; cv=fail; b=fK20Grwlx03lYGwLZJ8vlTn/2M+ydbUy+8an78zKBP7diLzw83Hwv87tWQF9KWj6Wtq7E8Apa9ge1ntz+4K1gwUFZ76J00EmhUjV/BeWXyle5Qev0Utbk9Ad5/q+0d7xa9etGqx32Om73cmoZm/WkAR3uEqtOYjTdBhbDakUCD0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746553655; c=relaxed/simple;
+	bh=ZmVJzv/v2X5/fYiErM6xaYbiso5JbEu1OKPUUUhMT5w=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=sBNKY6J3rzl4u7tSA1KgnppJEmm1JGY1SthbDTFUmQzKOs9f3y/KfWBqhULveNz2DzTePOzvrlQ94h+iywHxmow6+1ifYdESwo4MzfJYWu4GDIx1fmbkO8leeeyXzdexmLDsvdLuXiuhOUYDKAEQK5QR6e/sJv9BnZWm6C6grIE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=mV1xolWr; arc=fail smtp.client-ip=40.107.220.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=RhuY8cFw/WFkJTIa86JXSMPb/q/dq/hcv2V8UoFOrlNT4wvtGLnWTNGgy2u7kpRTfu9YrwQnvRogGcB4cLACCA5SjKc5il5mpF55CMaCuwyS9h+OHUxl/cQk2k6gynbNmaDks2s4FEMRttUqOEveyLeAD7FkI9vrjxNgSRz0TFGojyuwGUOsdH3vhETUvOqw/M9VepNjkU4XZo46e6RGY5O6tv2RpTvOZKEth4ei6T9UZFezNRjGOXnZykkLydfXYraRly6wqUtznSVAks1NGADhRsZjNQVn+CPK9LwKwvt7O2VGKbgv4BHWJ7+BAfSxrntq6euMX4x1F5OGIvsAfA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZmVJzv/v2X5/fYiErM6xaYbiso5JbEu1OKPUUUhMT5w=;
+ b=vNsb3KNocZ76ho4WdsyAF2us3Tfv0HYXn1qbgf39C3km56Nvvbdj+jWcVVHThWNJgj1eFeOSf3Z9j/qC7NlayTuaVqqApZodKbRb2H7or4pDUYzc+8DbMfYlXy6wr5oitfmhEu961xtEkZ2rP5ceQyd4KIhVYOm4QQ0vwDPVwWLkidlOBtnaX0Y4YGnOA/P/mYTv5ZF+8AKLUAYz0+ktUSXQxPyGeIANRERPlR2JbPLD8zEJ9T40lMjbm551K47yz3QiVezmWKvQCMGjjpzWEBDgAOwzDjn/44PzfzxjzHZPLDHu1udAMZ+eWo7t8mvmGK/9w9zLhaMoBEOKtFW/6Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZmVJzv/v2X5/fYiErM6xaYbiso5JbEu1OKPUUUhMT5w=;
+ b=mV1xolWrvLGW2jy/BfixyuNyu7+WD8Y+JktcaeD8Q8uzVopvqojUfLsiju2UxoRV/GJQb2mnbWCXeEZsCE1KpTuV0LWzXcz9mF4NuFXqvffp7+2traN+yr8HVgPcKmcc9rRihCXZiCMpwAwqsrSNLkzVGF5Nhn20C7Rc8ryXTgCP2kKrpZU/ZTcXHChTOpqhAttqf4+fms9HZl/YuqbZmuS9E1sPXMePspSM3rskSnqSp8aEHevwG/mEKfDQYEssTwNi51gmeBbD8Gd8W58fq6fyhjkzyLq591REHhTSNQvG1iQSt81HxeKkSAD8ErDfXIVc+ny/oOtpEhCT1UPOYA==
+Received: from DS0PR12MB6560.namprd12.prod.outlook.com (2603:10b6:8:d0::22) by
+ DS5PPFA33D606F8.namprd12.prod.outlook.com (2603:10b6:f:fc00::65b) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.27; Tue, 6 May
+ 2025 17:47:26 +0000
+Received: from DS0PR12MB6560.namprd12.prod.outlook.com
+ ([fe80::4c05:4274:b769:b8af]) by DS0PR12MB6560.namprd12.prod.outlook.com
+ ([fe80::4c05:4274:b769:b8af%4]) with mapi id 15.20.8699.024; Tue, 6 May 2025
+ 17:47:26 +0000
+From: Cosmin Ratiu <cratiu@nvidia.com>
+To: "stfomichev@gmail.com" <stfomichev@gmail.com>
+CC: "davem@davemloft.net" <davem@davemloft.net>, "kuba@kernel.org"
+	<kuba@kernel.org>, "linux-kselftest@vger.kernel.org"
+	<linux-kselftest@vger.kernel.org>, Dragos Tatulea <dtatulea@nvidia.com>,
+	"sdf@fomichev.me" <sdf@fomichev.me>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"jiri@resnulli.us" <jiri@resnulli.us>, "edumazet@google.com"
+	<edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net] net: Lock lower level devices when updating features
+Thread-Topic: [PATCH net] net: Lock lower level devices when updating features
+Thread-Index: AQHbvpI68/ihdVxTiEiw4lpvBpBbzLPF1uyAgAAJx4A=
+Date: Tue, 6 May 2025 17:47:26 +0000
+Message-ID: <8f700330f22b741ad72b398ff30a4468c2cb67e9.camel@nvidia.com>
+References: <20250506142117.1883598-1-cratiu@nvidia.com>
+	 <aBpC9_SgUaAA2P0f@mini-arch>
+In-Reply-To: <aBpC9_SgUaAA2P0f@mini-arch>
+Reply-To: Cosmin Ratiu <cratiu@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS0PR12MB6560:EE_|DS5PPFA33D606F8:EE_
+x-ms-office365-filtering-correlation-id: 0f41ddd8-8780-4a3b-55e0-08dd8cc61063
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?cW1BQ3pkdmhSL1hRb1M5bnFoM05adUtORVdpQXo4N1NxeHZaaEhBNWxWdDRY?=
+ =?utf-8?B?WkhxK2ZFdWhDeFU2cjRFUWhCckxRVkk3dkR2cWFOME00YndMMlJ4eEwxTUlu?=
+ =?utf-8?B?cHZKMmpRZlFPclZvVDUxVnI3TTVMbkxXc3hPSVlKNHp5YnNxMElDQ1Q2c21x?=
+ =?utf-8?B?REFSTDZRTEpIVWVqODRNQnhYbXNQYjNkeXFGUisvbmFnVGxJZHJBbHNhd0JE?=
+ =?utf-8?B?RzgydjRDTVgzN3VFSGlRcnRIQTRVQlpRczdKbDVhTW82SXJYSm1OWnpFTlpL?=
+ =?utf-8?B?c3dUbTB4UTJISTFGSVZqcEFHN0pFTjdXTnpibTIyZWNsVjdYSDVTN0xmYlFZ?=
+ =?utf-8?B?blpJOG1xODJ3MC9PRTNXaXZ1Q3UzTWZUZzZIR1FjMnNjelhwWHFBY1ZJSHNI?=
+ =?utf-8?B?MnNUUVAzRkhmQXRxNHlLaFp6YzlBWGJzNHBnOFdUTU9iUGVnTjlvVUh3S0dI?=
+ =?utf-8?B?K2Nsa0RkWXpIalNEYXc1YjV5dktZdWNCVU9FNTdOZXM5dnc4dkxwd0xsVCs3?=
+ =?utf-8?B?SnMvWUcwZ2hPazhYdk5ucVVtYndxOWRTQ1NneFQwcU9sdTZnemJpdGR6ekNQ?=
+ =?utf-8?B?RXBCekFHZXltR1g4M3k3WTZtMFhQUmhaZ05kaDJNMkhhTzBraCs5U1RZZXl6?=
+ =?utf-8?B?dE5zb0dpdFd2M3lybm14Qml6K0dydDZMVlNpaG9pcmxKRndXbmFlYzcrRkUy?=
+ =?utf-8?B?T2RZMU92dEJyZmcxUUZkRmNDNHowVXUvYjRvZlpYNWFISSs2bjBBMWxYOEFv?=
+ =?utf-8?B?RXFuUjMxSHFTZDI3RU0relBES2ZLYnpDL0pPNC9Qb3F2cU16bHRSRzJybVpE?=
+ =?utf-8?B?VDlUTzR0RFRZZmdFaUFncUQ0QTI1cnFHM0tZZVFPZFppMStPc2c3QTVIZjc5?=
+ =?utf-8?B?RmF3ZkdlWkNqNi9BRG4rWWtVazFUQXZCaC9abDNIbHFxVTFxYi95R1d4MzM4?=
+ =?utf-8?B?T3RWWFZoaWwrRElpVHowaFpRRmZHdThEYW9KV2hjQTZJZ2RjM2hjQ1FJb25X?=
+ =?utf-8?B?TlBLUUhXamNUNk01N2xLejhJUHQ1UEUxNkMwM3F4UTNyYmdXM1VqU1p3eHlX?=
+ =?utf-8?B?eWdFTUprSTh5VUl1VkRFSDdWdXd6VW1ONlZjWndKTzFLNnRNaUcxQ01GQnNK?=
+ =?utf-8?B?TjBZcld4WjZ2U1Z6L3BURm5TMk9MQWdueGJKc0VDRmdrMENYUnZPNEprS216?=
+ =?utf-8?B?S3JqTXZZRkZzNXN1blplVXVzMVB0Qmx3ZFlETkR5TTIrRFI5dXVmaEtZRU1i?=
+ =?utf-8?B?NGsrV2VVV1N0SEcvcVlob3NxclpaWER1U21ZNm9OZUJHZ3U5ckg5U0xTYkdk?=
+ =?utf-8?B?TVo4SUxNMzB3aVZ2SjNITVRQNEMxcWY3OXg5VTFRVTg2VlB6QU1XcUxYTHhI?=
+ =?utf-8?B?SGRwd25laWkwY0wxMFV0Ulp4THdJeUpWdmhwR2pKV2drUjBoZFFzQ0pCenZ3?=
+ =?utf-8?B?TXp5aEpQU3BkSDJCRytDa1kydG1GOUVFNnNKRWhEZ1RrV0hCbnBzNzh0Wkg4?=
+ =?utf-8?B?a21vNG5rQjU5M1ZqUlVITGRtZUpBRFBQMTNNK0JuMUljSDE3MzVsOGNNUGg4?=
+ =?utf-8?B?RlhqMy9UNU05OG45QlE4SmRiYllsYU9ZMmNtLzJ4cE1ZMWNpOHV5YTR4NEZI?=
+ =?utf-8?B?Q1dnRGJ0ZTJuUHk0NVp4N3NWVk02eGZJaW13ZUg2bVhoWEN5SkJpZHdSblBh?=
+ =?utf-8?B?TUNUbHV3SStsSkcyelIvY3BKL2plNmV2V3BZeWJhalFnSzl5eDBkWVczM0lC?=
+ =?utf-8?B?bm9RdWN6dTd1Q0hVbjFUTys4b2dleGQxUE1PeE5jd1BKWEFCWHMrUEY5TmZ2?=
+ =?utf-8?B?ckNZcTdrcW82dEJjOHhmUHdPdnE0Sy9hcUN2S0psWUhWYlFBSURsZzQxek95?=
+ =?utf-8?B?SWRnTUFaSGQ3VkthNzRFNEJLajlyNXI2RTU0VnNHOGZJclh3aGhSTmVMM2M0?=
+ =?utf-8?B?LzZBaXdNNW9RN0ZXV09yZE1yREV0VGdUR2RnR1oxSEs3dlViUDRFbWdqT3h2?=
+ =?utf-8?Q?jDPtRoLESzokjromPcs+dBF5Svphsg=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?VWZnSUlSOEFUanJWUWs1ZW9RQnlSQWtHTm9mZkp5cEZsSXlHMWhNYU5aWFUv?=
+ =?utf-8?B?bFFmREkyMlVJVHNuTEYxT3FGRWxQRitQSjBJMWZ6eFUzV1RoVEl3WEhvbktI?=
+ =?utf-8?B?Qkl6M1ZZOUt4QjNnRWV6U21pZ21kdnBpeDhKR3F0T1RhQUJRSklvRjVyVGhG?=
+ =?utf-8?B?bTFjUXpyWGlFSUV6dEIwTEZtTlNycXhSd3VYS3MvTDl3TXNBTjgxT3JVekZv?=
+ =?utf-8?B?TjFHQVV0NnovbjN4NzA3eVBEbW1TNWNJVUtWdlVPaEE4ZHMvSnoxRHgvRS80?=
+ =?utf-8?B?RDFxS1ovSUpna1ZFTEowOWdNRGZlK1hxWXU3T0VpTG55VUVlaEwzM0hvUURn?=
+ =?utf-8?B?cEQ3ZHVtVjg4bks1TE9QSjk2UG10SkYvck1rNGZYcElOb3E3OW5lWHNDTDZP?=
+ =?utf-8?B?blZZTHlUMExpRmtER0JNMGNSOHR4MG1hSHc3V3hDYVJEQnhEZEFSc3VMMXNB?=
+ =?utf-8?B?UURpSlZpUU1PbWF4N0hYaU5WWW9uZGhhOFVIUXZIY2hsbGRZN2xyR3RYanND?=
+ =?utf-8?B?d09jd0pLckNoWW9jalk1dXlHVGZHMmYxei9HMFo3dmtSaitzYkdPdFVXNFZI?=
+ =?utf-8?B?Rzl2S3Y3WjJPZ3RGRGRjRHRlbFVvVERvRXAvc29ZWVBoNWxTNGdaSS94NExx?=
+ =?utf-8?B?d3F1OTVVNHBXV0duOUFxcGJ5aDJjUDkveEVIbTVVbEJRZE5KTkxpSERlUnRl?=
+ =?utf-8?B?aTJBL25oai9OaUI5emFOa1dPeDJ4SG9PVktVZUQ0UEZVK1c4RnF2MmJnclRz?=
+ =?utf-8?B?TDJXbVJJc05lUG1DNE1BNVVZNnprRTJqKysraFdrb0dLR1ZtRW9XTzh6N0N1?=
+ =?utf-8?B?TXZUbHdIcGpBeURxYTE3d3VDYXB5TkMyMzd1RXFIVS9tSHVkMWg3dm50ckh3?=
+ =?utf-8?B?czIrZXh4M3ZXTER0T0U1dHVYRE83STR1TzJFMVFrTE0vVnRwNWxEaG0zelpM?=
+ =?utf-8?B?L201eFI2cTNaWWhlYzZ6U3YzRVVYQmpuOUhYdXlXUnVOSlJtbFRyR0pwY2dQ?=
+ =?utf-8?B?cHhDVU9JUmNnQzRkQ1FYcDNzb3JDd0Q4SnRtMVlDY3JzWjFjdTBqM3VTTGNL?=
+ =?utf-8?B?WDM0QTEwRkFVTjdoL0JtOUxveE40Qi8zUWxnMFhIbkkxd3hRVnk4Y2xoNkdl?=
+ =?utf-8?B?a3d6UGNxYWRxMU9SZlFUSmppOFVxRmJyQTgvK3dtM3YwcFZPVWZVKy9FZThr?=
+ =?utf-8?B?aEt5UTQ5N0dOUXBOc0tLTExpNUxsQ2ZSZFRpa2tDcnIwZ2NuRjlCQlRZSjd5?=
+ =?utf-8?B?K1JURFpUUjdvU3J3QVR3OUcxTGY5MktrTWlTR0FnUVFHbmFLL1BJS0FOQjJC?=
+ =?utf-8?B?RFArN3RZQ0ZJbjdSNVpIMW9lcUEzbE8vK1h2MGJIb3NXMmppSTc4TVdBMnFk?=
+ =?utf-8?B?MklYcnJIMDJUendyNko2emFyTDFpY3hUSGFuai80aU0zdjJUQXdvR0wvWmph?=
+ =?utf-8?B?MlpwS2k2Vnd3RDc4Z2g5NzkrTThPeDVWYit0Rm5ENGo5aXRuY3BzMGQyVGdS?=
+ =?utf-8?B?cTRnNHdINHBkUk5tNlFsaW9GMHp1MVB1UzFGdmo0RTN0ZFRsVkc5allkbWZQ?=
+ =?utf-8?B?a3NZRGxUNDJTY09hSGNGNjJraWxoOUJRSTNPcGxyODJTWHhjbi9vV2pVeTlP?=
+ =?utf-8?B?OEErd3llTEdYU0dGZjM1RUw5Zy9LZlI3NFV3RXNwUDlUTlBITDNmL2VWSzUz?=
+ =?utf-8?B?c2tTS2lzbW90Nnp5VzJEZnM5M055Vzlwb1dLampHUzd2S0xpRlhzNWRBb2xG?=
+ =?utf-8?B?UFl1TU1GZUN4V1BkMW53WUgwZUFmMGJnMTBNOXJSb01qK1NkT25ENlczTXpJ?=
+ =?utf-8?B?RHVFY0ZyRjYzVW9QVmFEb2tUZitZRmxkTHhoNnBnZ2dSSGpmVUVvemVYWGhN?=
+ =?utf-8?B?MnkrQ3ByVjNHMW9YSDlmZUNMbkg3UWorcmk4RzJUSDVTekd4LzM0ZSsybVRN?=
+ =?utf-8?B?UWxqb3BNWFBHZHR3OUkxOFdnbkVFUjV1eS84NDUvZlpndTFNalZDU0hLL1NK?=
+ =?utf-8?B?OGpSYmhlT1JIaSs4TkVUUkNVRFhNdVk3ZWNURUI5ejhOaGgxQ01JYVBES3Na?=
+ =?utf-8?B?QmxTdzZwR0w3VUNZRUpld1BHRUFrU2xxYnlwZDVCeksrVTNkOGYrdlJqeWpm?=
+ =?utf-8?Q?0Gdv9nszO3g3bneQULkyw6772?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <3256564414C6C340ACB5369179264C20@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250502233729.64220-1-ouster@cs.stanford.edu>
- <20250502233729.64220-4-ouster@cs.stanford.edu> <521265b1-1a32-4d5e-9348-77559a5a0af4@redhat.com>
-In-Reply-To: <521265b1-1a32-4d5e-9348-77559a5a0af4@redhat.com>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Tue, 6 May 2025 10:45:43 -0700
-X-Gmail-Original-Message-ID: <CAGXJAmyd-dgHh7bmA4g_ZAG=VTBHiNOJ2SCVOjmzF6w9AQLnng@mail.gmail.com>
-X-Gm-Features: ATxdqUGcReLpOZdMvfkJPRNx-P4OngSQAoCEFj9fFNz4szJ_WVMrtPKvygSMpb4
-Message-ID: <CAGXJAmyd-dgHh7bmA4g_ZAG=VTBHiNOJ2SCVOjmzF6w9AQLnng@mail.gmail.com>
-Subject: Re: [PATCH net-next v8 03/15] net: homa: create shared Homa header files
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Spam-Level: 
-X-Scan-Signature: 00ae0dc23c387355c0c9f5c46aa55045
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6560.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0f41ddd8-8780-4a3b-55e0-08dd8cc61063
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 May 2025 17:47:26.2550
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: DQ6bgbxkkUshDgPnATaMFYbNZ4Lfn+pJHge6qvV6brYCSH7ia2QnHJHlux1nCJM7KFmV7Fb9AGWVHaveWP9Uog==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS5PPFA33D606F8
 
-On Mon, May 5, 2025 at 3:20=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
-
-> > +
-> > +#define sizeof32(type) ((int)(sizeof(type)))
->
-> (u32) instead of (int). I think you should try to avoid using this
-> define, which is not very nice by itself.
-
-I have removed that #define and switched to sizeof everywhere.
-
-> > +#ifdef __CHECKER__
-> > +#define __context__(x, y, z) __attribute__((context(x, y, z)))
-> > +#else
-> > +#define __context__(...)
-> > +#endif /* __CHECKER__ */
->
-> Why do you need to fiddle with the sparse annotation? Very likely this
-> should be dropped.
-
-Without this I couldn't get the code to compile. Homa declares
-"__context__" for some spinlocks to handle cases where a lock is
-acquired for the return value of a function (so '__acquires' can't
-name the lock otherwise). For an example, search for 'rpc_bucket_lock'
-in homa_sock.h. I'm still pretty much a newbie with sparse, so maybe
-there's a better way to do this? In general I'm having a difficult
-time getting useful information out of sparse...
-
-> > +/**
-> > + * homa_get_skb_info() - Return the address of Homa's private informat=
-ion
-> > + * for an sk_buff.
-> > + * @skb:     Socket buffer whose info is needed.
-> > + * Return: address of Homa's private information for @skb.
-> > + */
-> > +static inline struct homa_skb_info *homa_get_skb_info(struct sk_buff *=
-skb)
-> > +{
-> > +     return (struct homa_skb_info *)(skb_end_pointer(skb)) - 1;
->
-> This looks fragile. Why can't you use the skb control buffer here?
-
-I was not aware of the skb control buffer.  After poking around and
-asking ChatGPT, it  appears that information in the control buffer is
-not guaranteed to survive across networking layers? Homa depends on
-the information being persistent.  For example, it's used to link
-together all of the skb's in a Homa message, which will be used if
-parts of a message need to be retransmitted. Why does this look
-fragile to you? It's pretty much equivalent to skb_shinfo, except with
-Homa information.
-
-> > +static inline bool is_homa_pkt(struct sk_buff *skb)
-> > +{
-> > +     struct iphdr *iph =3D ip_hdr(skb);
-> > +
-> > +     return (iph->protocol =3D=3D IPPROTO_HOMA);
->
-> What if this is an ipv6 packet? Also I don't see any use of this
-> function later on.
-
-This function isn't used anymore, so I have deleted it. It's probably
-leftover from before the addition of IPv6 support.
-
-> > +#define UNIT_LOG(...)
-> > +#define UNIT_HOOK(...)
->
-> It looks like the above 2 define are unused later on.
-
-Oops, that code was supposed to get stripped out of the upstream
-version of Homa. I've now fixed the stripper to keep this code out fo
-the upstream version of Homa.
-
-> > +extern unsigned int homa_net_id;
-> > +
-> > +void     homa_abort_rpcs(struct homa *homa, const struct in6_addr *add=
-r,
-> > +                      int port, int error);
-> > +void     homa_abort_sock_rpcs(struct homa_sock *hsk, int error);
-> > +void     homa_ack_pkt(struct sk_buff *skb, struct homa_sock *hsk,
-> > +                   struct homa_rpc *rpc);
-> > +void     homa_add_packet(struct homa_rpc *rpc, struct sk_buff *skb);
-> > +int      homa_backlog_rcv(struct sock *sk, struct sk_buff *skb);
-> > +int      homa_bind(struct socket *sk, struct sockaddr *addr,
-> > +                int addr_len);
-> > +void     homa_close(struct sock *sock, long timeout);
-> > +int      homa_copy_to_user(struct homa_rpc *rpc);
-> > +void     homa_data_pkt(struct sk_buff *skb, struct homa_rpc *rpc);
-> > +void     homa_destroy(struct homa *homa);
-> > +int      homa_disconnect(struct sock *sk, int flags);
-> > +void     homa_dispatch_pkts(struct sk_buff *skb, struct homa *homa);
-> > +int      homa_err_handler_v4(struct sk_buff *skb, u32 info);
-> > +int      homa_err_handler_v6(struct sk_buff *skb,
-> > +                          struct inet6_skb_parm *opt, u8 type,  u8 cod=
-e,
-> > +                          int offset, __be32 info);
-> > +int      homa_fill_data_interleaved(struct homa_rpc *rpc,
-> > +                                 struct sk_buff *skb, struct iov_iter =
-*iter);
-> > +struct homa_gap *homa_gap_new(struct list_head *next, int start, int e=
-nd);
-> > +void     homa_gap_retry(struct homa_rpc *rpc);
-> > +int      homa_get_port(struct sock *sk, unsigned short snum);
-> > +int      homa_getsockopt(struct sock *sk, int level, int optname,
-> > +                      char __user *optval, int __user *optlen);
-> > +int      homa_hash(struct sock *sk);
-> > +enum hrtimer_restart homa_hrtimer(struct hrtimer *timer);
-> > +int      homa_init(struct homa *homa, struct net *net);
-> > +int      homa_ioctl(struct sock *sk, int cmd, int *karg);
-> > +int      homa_load(void);
-> > +int      homa_message_out_fill(struct homa_rpc *rpc,
-> > +                            struct iov_iter *iter, int xmit);
-> > +void     homa_message_out_init(struct homa_rpc *rpc, int length);
-> > +void     homa_need_ack_pkt(struct sk_buff *skb, struct homa_sock *hsk,
-> > +                        struct homa_rpc *rpc);
-> > +struct sk_buff *homa_new_data_packet(struct homa_rpc *rpc,
-> > +                                  struct iov_iter *iter, int offset,
-> > +                                  int length, int max_seg_data);
-> > +int      homa_net_init(struct net *net);
-> > +void     homa_net_exit(struct net *net);
-> > +__poll_t homa_poll(struct file *file, struct socket *sock,
-> > +                struct poll_table_struct *wait);
-> > +int      homa_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
-> > +                   int flags, int *addr_len);
-> > +void     homa_resend_pkt(struct sk_buff *skb, struct homa_rpc *rpc,
-> > +                      struct homa_sock *hsk);
-> > +void     homa_rpc_abort(struct homa_rpc *crpc, int error);
-> > +void     homa_rpc_acked(struct homa_sock *hsk,
-> > +                     const struct in6_addr *saddr, struct homa_ack *ac=
-k);
-> > +void     homa_rpc_end(struct homa_rpc *rpc);
-> > +void     homa_rpc_handoff(struct homa_rpc *rpc);
-> > +int      homa_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)=
-;
-> > +int      homa_setsockopt(struct sock *sk, int level, int optname,
-> > +                      sockptr_t optval, unsigned int optlen);
-> > +int      homa_shutdown(struct socket *sock, int how);
-> > +int      homa_softirq(struct sk_buff *skb);
-> > +void     homa_spin(int ns);
-> > +void     homa_timer(struct homa *homa);
-> > +int      homa_timer_main(void *transport);
-> > +void     homa_unhash(struct sock *sk);
-> > +void     homa_rpc_unknown_pkt(struct sk_buff *skb, struct homa_rpc *rp=
-c);
-> > +void     homa_unload(void);
-> > +int      homa_wait_private(struct homa_rpc *rpc, int nonblocking);
-> > +struct homa_rpc
-> > +     *homa_wait_shared(struct homa_sock *hsk, int nonblocking);
-> > +int      homa_xmit_control(enum homa_packet_type type, void *contents,
-> > +                        size_t length, struct homa_rpc *rpc);
-> > +int      __homa_xmit_control(void *contents, size_t length,
-> > +                          struct homa_peer *peer, struct homa_sock *hs=
-k);
-> > +void     homa_xmit_data(struct homa_rpc *rpc, bool force);
-> > +void     homa_xmit_unknown(struct sk_buff *skb, struct homa_sock *hsk)=
-;
-> > +
-> > +int      homa_message_in_init(struct homa_rpc *rpc, int unsched);
-> > +void     homa_resend_data(struct homa_rpc *rpc, int start, int end);
-> > +void     __homa_xmit_data(struct sk_buff *skb, struct homa_rpc *rpc);
->
-> You should introduce the declaration of a given function in the same
-> patch introducing the implementation. That means the patches should be
-> sorted from the lowest level helper towards the upper layer.
-
-The patches are already sorted from lower layers to upper layers, and
-after your last round of comments I tested and reorganized so that the
-code compiles cumulatively after the addition of each new patch in the
-series (with one exception where there are mutual dependencies between
-files in successive patches). homa_impl.h is a grab-bag for things
-that don't fit logically elsewhere, so it has declarations for things
-in several patches. I will try to distribute the function declarations
-over the patches that contain the implementations.
-
-> [...]
-> > +static inline int homa_skb_append_to_frag(struct homa *homa,
-> > +                                       struct sk_buff *skb, void *buf,
-> > +                                       int length)
-> > +{
-> > +     char *dst =3D skb_put(skb, length);
-> > +
-> > +     memcpy(dst, buf, length);
-> > +     return 0;
->
-> The name is misleading as it does not append to an skb frag but to the
-> skb linear part
-
-This file (homa_stub.h) is a temporary file during the upstreaming
-process (see the comment at the beginning) in order to reduce the size
-of the initial patch series. In a later patch series the
-implementation will be replaced with a full-blown implementation of
-skb management that actually uses skb frags; this version just puts
-the entire skb in the linear part. So, the name reflects what will
-eventually happen (which is implemented in the GitHub repo). I'd
-prefer not to have to rewind the API back to what it was before "good"
-skb management was introduced into Homa. Would you rather I just pull
-the full skb management code into this first patch series?
-
-> > +static inline void homa_skb_free_many_tx(struct homa *homa,
-> > +                                      struct sk_buff **skbs, int count=
-)
-> > +{
-> > +     int i;
-> > +
-> > +     for (i =3D 0; i < count; i++)
-> > +             kfree_skb(skbs[i]);
->
-> 'homa' is unused here.
-
-Same issue as the previous comment: it will be used in the "full"
-version of skb management.
-
-> > +static inline struct sk_buff *homa_skb_new_tx(int length)
->
-> please use 'alloc' for allocator.
-
-Done.
-
--John-
-
-
--John-
+T24gVHVlLCAyMDI1LTA1LTA2IGF0IDEwOjEyIC0wNzAwLCBTdGFuaXNsYXYgRm9taWNoZXYgd3Jv
+dGU6DQo+IE9uIDA1LzA2LCBDb3NtaW4gUmF0aXUgd3JvdGU6DQo+ID4gX19uZXRkZXZfdXBkYXRl
+X2ZlYXR1cmVzKCkgZXhwZWN0cyB0aGUgbmV0ZGV2aWNlIHRvIGJlIG9wcy1sb2NrZWQsDQo+ID4g
+YnV0DQo+ID4gaXQgZ2V0cyBjYWxsZWQgcmVjdXJzaXZlbHkgb24gdGhlIGxvd2VyIGxldmVsIG5l
+dGRldmljZXMgdG8gc3luYw0KPiA+IHRoZWlyDQo+ID4gZmVhdHVyZXMsIGFuZCBub3RoaW5nIGxv
+Y2tzIHRob3NlLg0KPiA+IA0KPiA+IFRoaXMgY29tbWl0IGZpeGVzIHRoYXQsIHdpdGggdGhlIGFz
+c3VtcHRpb24gdGhhdCBpdCBzaG91bGRuJ3QgYmUNCj4gPiBwb3NzaWJsZQ0KPiA+IGZvciBib3Ro
+IGhpZ2hlci1sZXZlbCBhbmQgbG92ZXItbGV2ZWwgbmV0ZGV2aWNlcyB0byByZXF1aXJlIHRoZQ0K
+PiA+IGluc3RhbmNlDQo+ID4gbG9jaywgYmVjYXVzZSB0aGF0IHdvdWxkIGxlYWQgdG8gbG9jayBk
+ZXBlbmRlbmN5IHdhcm5pbmdzLg0KPiA+IA0KPiA+IFdpdGhvdXQgdGhpcywgcGxheWluZyB3aXRo
+IGhpZ2hlciBsZXZlbCAoZS5nLiB2eGxhbikgbmV0ZGV2aWNlcyBvbg0KPiA+IHRvcA0KPiA+IG9m
+IG5ldGRldmljZXMgd2l0aCBpbnN0YW5jZSBsb2NraW5nIGVuYWJsZWQgY2FuIHJ1biBpbnRvIGlz
+c3VlczoNCj4gDQo+IE1lbnRpb25pbmcgdnhsYW4gaXMgYSBiaXQgY29uZnVzaW5nIGhlcmU7IGl0
+IHNob3VsZG4ndCBsZXQgeW91IGZsaXANCj4gbHJvIChJDQo+IHRoaW5rKS4gV2hpY2ggdXBwZXIg
+YXJlIHlvdSB0ZXN0aW5nIGFnYWluc3Q/DQoNCkl0IGlzIHZ4bGFuLCBidXQgTFJPIGlzIGp1c3Qg
+YSByZWQgaGVycmluZyBpbiB0aGlzIGNhc2UsIA0KbWx4NWVfc2V0X2ZlYXR1cmVzIGNhbGxzIGV2
+ZXJ5IGZlYXR1cmUgaGFuZGxlciBpbiB0dXJuLCBhbmQgdGhpcyBpcw0KanVzdCB0aGUgZXhhbXBs
+ZSBJIHBpY2tlZCBmcm9tIHRoZSBzZWEgb2Ygc3RhY2sgdHJhY2VzLg0KDQo+IA0KPiBUcnlpbmcg
+dG8gdW5kZXJzdGFuZCBpZiB3ZSBjYW4gY292ZXIgdGhpcyBjYXNlIGluIHRoZSBzZWxmdGVzdHMu
+DQo+IG5ldGRldnNpbSBhbHNvIGRvZXNuJ3QgZXhwb3NlIEZfTFJPIGZlYXR1cmUuLi4gKHlldD8p
+DQoNCkkgc2VlIHlvdSBmb3VuZCBhIHdheSB3aXRoIHRlYW1pbmcsIGJ1dCBJIHRoaW5rIGluIGVz
+c2VuY2UgYSBzZXF1ZW5jZQ0Kb2YgY29tbWFuZHMgdGhhdCBtYWtlcyBfX25ldGRldl91cGRhdGVf
+ZmVhdHVyZXMgY2FsbCBpdHNlbGYgcmVjdXJzaXZlbHkNCm9uY2Ugb24gdGhlIGxvd2VyIGRldiB3
+aWxsIHRyaWdnZXIgdGhlIG5ldGRldl9vcHNfYXNzZXJ0X2xvY2tlZCBvbiB0aGUNCmxvd2VyIGRl
+di4NCg0KVGhhbmtzIGZvciB0aGUgcmV2aWV3IQ0KDQpDb3NtaW4uDQo=
 
