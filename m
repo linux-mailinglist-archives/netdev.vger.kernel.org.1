@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-188277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83C82AABED4
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 11:16:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F513AABED1
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 11:15:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 299991C282DE
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 09:15:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DEF7D7B55E9
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 09:14:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE83627AC4B;
-	Tue,  6 May 2025 09:09:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DC5827AC5F;
+	Tue,  6 May 2025 09:09:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U/P3/SzQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vPJBd/Em"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 988CF27AC39;
-	Tue,  6 May 2025 09:09:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D39DE27AC4C
+	for <netdev@vger.kernel.org>; Tue,  6 May 2025 09:09:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746522589; cv=none; b=jGdjGRHYwdQcN9m2o0D1CrUVbMM9GsbwecSryD7Is7EN5gzFfYh/G3Bl0V3Zj7ow6N+9ceDsLbeZJAD2TX25nYapOLaouT53cGb7GIlxSvc9We54jiiK+0KppCwA10oKUfOKAYBnFP6pRCRGLZKXc5vMme4HKQkMwEsi45zVpr0=
+	t=1746522590; cv=none; b=Sky3/NrU6ZVpD+YlyY1aX2Xoi+xFh3ZAAkJCxKRI9mtGPSS6hYRxDCXC4XdNka3UrDqcwvYDHdtf5b/zzPQ3Xj4dMIU7UHRHjAo0k2PR/KwDIVaYZNJFbG0gWdk3/xbuPp43M3pNEJ1OkDXR5K2nE4oCxpJ1AiGEgHMKK58mssc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746522589; c=relaxed/simple;
-	bh=IBLkt51Dqj+Vf4R1YuGGgimLITou/R1H7/TssLq0RZQ=;
+	s=arc-20240116; t=1746522590; c=relaxed/simple;
+	bh=+uZ3ebpQd0uf+Fpva73iBBmKy0Szo3bRoNQUjWxUk+Y=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PqM4F2V+nrA6BhzDuSHyWAm4Y7Kw0Hars6i/fh4/s4nn3zE9Pl0otKapSDfdgIuqtEJiIPRY4PGRLoHDxV96rDX5x5b10+VDyH1C0fpRjoTc/IG6NZtmo7H1u7i7+1Ny6dxs29bsm8obA9uLHlR7mBCd/tFo/kY8XBN2KuE4SnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U/P3/SzQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D1A5C4CEE4;
-	Tue,  6 May 2025 09:09:49 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=YN5Epal8k9CIvjKGnCBATX5x6cmMEov3MggHfxGOG9zM4NzGNv2PhstJlE1O1rCEt3hdus/JSqpOwZyNnOFLT4VBfcE6KgmHt3XTjPITU9OICYCMJTPBONHvA9jUQwNF1Mw9H7LHZzoBoqEzwrxvA0+EWzuHXTIm9AeGjVhrB/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vPJBd/Em; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48E8FC4CEE4;
+	Tue,  6 May 2025 09:09:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746522589;
-	bh=IBLkt51Dqj+Vf4R1YuGGgimLITou/R1H7/TssLq0RZQ=;
+	s=k20201202; t=1746522590;
+	bh=+uZ3ebpQd0uf+Fpva73iBBmKy0Szo3bRoNQUjWxUk+Y=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=U/P3/SzQ9WFqJg7GUSCU1ZVtqUaQJQvYlPprT5WD9Iy/ID6bhk9wYk8gcY794F32/
-	 //ZcxEzsIb95ZB2+YzPPx+qtP9zhxTJTSEjfsehOHSqmJ//U+GgXh72iK6pIsb5MPb
-	 ZXfyErnkW0APWhnZP26f6MHf3HVrUMfW3aeonCO9uLfX07ZEcVr4aZn2/1fKZLkCGn
-	 7uXVrDVW88OU8M89fMPOGtUtu1GshQ1HL/Lu6WQbL5RTRsp00qwO8eZj57nn4T0c8Y
-	 1x4NJdDCa1niL7Qo9u1tSHzI6rEldE4X8jOmZYD5MFDpt3NTCHhh/QQuuHmEJI3YU1
-	 XZSkKwbMte+9g==
+	b=vPJBd/Emsvr1Dj3RqHh3W5EP7l9mRgVeRdcFc7/rktCg6/X70lCFJw+ytlOvcmL+g
+	 eeKHodRag40GLlb9EZ1umR2RaS4plzmdH9SPleHEunANDwbK95U5rYEVgB6mylYRtu
+	 sPIyvAi6/LPpx77LT/hgOqyydCGoul0Sli1wN109+v26svyLnbMqKHx9mo9Xx2HNGW
+	 kic1iFEru41KC5U7ZV+VcaP39q0XCJTGAYyQAf771FwGBiCZmvsR6qxh9ZJE9E5S1Z
+	 XDRLIey6Z09VDH++WNhxKyEw4adY3F5XFB+cjwUyGzcQ4wT49kCzg/Fwe9+J+yAtSq
+	 XdYTrZyBiObnQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70AF13822D64;
-	Tue,  6 May 2025 09:10:29 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADBE33822D64;
+	Tue,  6 May 2025 09:10:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3] selftests: net: exit cleanly on SIGTERM / timeout
+Subject: Re: [PATCH net-next] eth: fbnic: fix `tx_dropped` counting
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174652262825.1103429.14575554229344854706.git-patchwork-notify@kernel.org>
-Date: Tue, 06 May 2025 09:10:28 +0000
-References: <20250503011856.46308-1-kuba@kernel.org>
-In-Reply-To: <20250503011856.46308-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- ecree.xilinx@gmail.com, petrm@nvidia.com, willemb@google.com,
- sdf@fomichev.me, linux-kselftest@vger.kernel.org
+ <174652262949.1103429.1253292957019592008.git-patchwork-notify@kernel.org>
+Date: Tue, 06 May 2025 09:10:29 +0000
+References: <20250503020145.1868252-1-mohsin.bashr@gmail.com>
+In-Reply-To: <20250503020145.1868252-1-mohsin.bashr@gmail.com>
+To: Mohsin Bashir <mohsin.bashr@gmail.com>
+Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kuba@kernel.org,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org, vadim.fedorenko@linux.dev,
+ sdf@fomichev.me
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Fri,  2 May 2025 18:18:56 -0700 you wrote:
-> ksft runner sends 2 SIGTERMs in a row if a test runs out of time.
-> Handle this in a similar way we handle SIGINT - cleanup and stop
-> running further tests.
+On Fri,  2 May 2025 19:01:45 -0700 you wrote:
+> Fix the tracking of rtnl_link_stats.tx_dropped. The counter
+> `tmi.drop.frames` is being double counted whereas, the counter
+> `tti.cm_drop.frames` is being skipped.
 > 
-> Because we get 2 signals we need a bit of logic to ignore
-> the subsequent one, they come immediately one after the other
-> (due to commit 9616cb34b08e ("kselftest/runner.sh: Propagate SIGTERM
-> to runner child")).
+> Fixes: f2957147ae7a ("eth: fbnic: add support for TTI HW stats")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v3] selftests: net: exit cleanly on SIGTERM / timeout
-    https://git.kernel.org/netdev/net-next/c/8f0ae19346ce
+  - [net-next] eth: fbnic: fix `tx_dropped` counting
+    https://git.kernel.org/netdev/net-next/c/fbaeb7b0f0ff
 
 You are awesome, thank you!
 -- 
