@@ -1,166 +1,244 @@
-Return-Path: <netdev+bounces-188269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EEBCAABD78
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 10:39:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A687AABD82
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 10:41:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9517A7ACC85
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:37:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E3453B19D5
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 08:39:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AC6E2472A1;
-	Tue,  6 May 2025 08:39:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 074B424A04A;
+	Tue,  6 May 2025 08:40:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="p+iHhScL"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="CdpldXB/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.20])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCCB11B4121;
-	Tue,  6 May 2025 08:39:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD70182B4;
+	Tue,  6 May 2025 08:40:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746520745; cv=none; b=eDfVldDlv4PLaF6/rN/YG+xJJ2IoTbobzZp4iz0bVakeq8vSxkkk2Ea3SoEHDehRAsX5Eb2IBf27yjKl0Uoy5mgqr2IL15nsAOhZQxacArNUZkeXnXmgBGe5tTyFFyiC2UJDFfimQTATVP2/3YOhXwGV4esJ31S+sjQH30PnIoQ=
+	t=1746520810; cv=none; b=IsjJhFu80BUOIPWsM1hBDq6Ijuwn8GoWDIqXO7LjaIEcXQsA7vo5XLOxIt9+YUxq9bXfPWYR6bP4nV0wI2z5SX08Rojf59JiZCRhaTi4ARm/acbqxYu3QUnkedc03ULVLYGOTxSrdAmlYDPadJ+CqM5EEDwCdriRdnhYQtRUyPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746520745; c=relaxed/simple;
-	bh=HHjsPZq8uzrPCe0zD/AzJMWNs04iV5XRcTof+9yIwpc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=naysQAu4AP7vk4T7wwlDce3tWF3ngYYVI/Mvb6oCFxaQpLDWJW1eBigeQ2+zTA5nK3FW526mccB8zThcivrVvZ6o8jOcJjOGnUxOdrGq/SagVCzRN2f/t3JubAkRW4ot09Y7oBmv4QSLV6pfgnHGq6byF4vIt3yGuNKNlhy/F6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=p+iHhScL; arc=none smtp.client-ip=212.227.17.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1746520734; x=1747125534; i=wahrenst@gmx.net;
-	bh=7LjBU1VRNS5UV3VYq3NfB+N0ZXJorinGcA/ME8xyElg=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=p+iHhScLZi8uzQhCHoeeOT5Eo3P43nXFU16ka0OkkYeMb796XJ2RVwhGBglVymqd
-	 1uN38zvA4y6lqLWy/Z+jSctM0tv1Zt+NaeB3eJticO9d4X1cJBdTxNtXgdfKs8Kpi
-	 fj4chye4jfxs0a6oItzf0JAc7ikFOU2w+yzipdo9yz1co+VJvKRyGMrILRM20VNbh
-	 nDjOhU084S+NC8mdbfcjysB7Crwdo9f8tK2BcHvYMrvLvN3zlSPW//3EBm2zYD87N
-	 B5rn0qH75HwehNon2IND/2rZmZgfw27+v5ApE2TddO6a5YY6XLaODJ7aD9s+RfmUg
-	 UfhwPSpAuKhN1SRdKA==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [192.168.1.101] ([91.41.216.208]) by mail.gmx.net (mrgmx105
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MBDnC-1uKV1s1P7W-001srh; Tue, 06
- May 2025 10:38:54 +0200
-Message-ID: <e75cebaf-6119-4502-ae63-a8758d0dd9f5@gmx.net>
-Date: Tue, 6 May 2025 10:38:53 +0200
+	s=arc-20240116; t=1746520810; c=relaxed/simple;
+	bh=V4iD4it7AtwDDWIlFWPxjAYr1MD/RRa8TIyOgKTxOOA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MIk/KGoH/Ceg0C25NN/PjW0t8CWXtMjhrkD83tJ8hwYm9aCh2Llt/81RsYiCMTB2ecMMgBdQmCZFsUi1Ew2Wc7DCgD/GMFoaynU4c6fhMgvxvwdezc9ZErHWY9ipTwf1yk9o75Te87rR7vl+Qyw/mO2lCFua0llYkzjPDl8mEzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=CdpldXB/; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=7erJ6D4MscaX/8GMAkhh6echRQy7e9Y89tGL2kE8J0M=; b=CdpldXB/2Q0l2OTVLNV2gpkRAG
+	XfccCdj2iux3quft5JVSSqw/idGG0Gm3/pQmtQp+6Hxod0KxkK+jVhfPGlNxUlMgmzKD+/mTvSCyh
+	3jFMecGeHePRWEUYRWLPW74q7X75hCp91jo2htDud9PBzTe6JBlhxP5dsw0py85278EQgpAMD75ls
+	cILdpReGXz2MKvgcOg9y93V1fbZsXZTVRau9wVlujcMsPvjfUXXwzkvoCQmwvc1KqNKIi4JzGK8U8
+	FRLpbI+nsHfh2Q9vEushCtnSQs8O0y+EpDjIkKDdDAIhCp87s70N3IfL4MlIFeFcYRQrYJdOXembm
+	H3GAXrdA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33184)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uCDqO-0005V2-1K;
+	Tue, 06 May 2025 09:40:04 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uCDqM-0004f5-0o;
+	Tue, 06 May 2025 09:40:02 +0100
+Date: Tue, 6 May 2025 09:40:02 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, bpf@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jon Hunter <jonathanh@nvidia.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Thierry Reding <treding@nvidia.com>
+Subject: Re: [PATCH net-next v2 2/4] net: stmmac: call phylink_carrier_*() in
+ XDP functions
+Message-ID: <aBnK4i52tEHs3jm_@shell.armlinux.org.uk>
+References: <aBTKOBKnhoz3rrlQ@shell.armlinux.org.uk>
+ <E1uAqYC-002D3p-UO@rmk-PC.armlinux.org.uk>
+ <ed54d4e5-ecc3-4327-8739-3d41ca41211e@lunn.ch>
+ <aBUG6Z_Crs31W45x@shell.armlinux.org.uk>
+ <aBnKKafHHjkL5iP-@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/5] net: vertexcom: mse102x: Add warning about
- IRQ trigger type
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org
-References: <20250505142427.9601-1-wahrenst@gmx.net>
- <20250505142427.9601-3-wahrenst@gmx.net>
- <14326654-2573-4bb6-b7c0-eb73681caabd@lunn.ch>
-Content-Language: en-US
-From: Stefan Wahren <wahrenst@gmx.net>
-Autocrypt: addr=wahrenst@gmx.net; keydata=
- xjMEZ1dOJBYJKwYBBAHaRw8BAQdA7H2MMG3q8FV7kAPko5vOAeaa4UA1I0hMgga1j5iYTTvN
- IFN0ZWZhbiBXYWhyZW4gPHdhaHJlbnN0QGdteC5uZXQ+wo8EExYIADcWIQT3FXg+ApsOhPDN
- NNFuwvLLwiAwigUCZ1dOJAUJB4TOAAIbAwQLCQgHBRUICQoLBRYCAwEAAAoJEG7C8svCIDCK
- JQ4BAP4Y9uuHAxbAhHSQf6UZ+hl5BDznsZVBJvH8cZe2dSZ6AQCNgoc1Lxw1tvPscuC1Jd1C
- TZomrGfQI47OiiJ3vGktBc44BGdXTiQSCisGAQQBl1UBBQEBB0B5M0B2E2XxySUQhU6emMYx
- f5QR/BrEK0hs3bLT6Hb9WgMBCAfCfgQYFggAJhYhBPcVeD4Cmw6E8M000W7C8svCIDCKBQJn
- V04kBQkHhM4AAhsMAAoJEG7C8svCIDCKJxoA/i+kqD5bphZEucrJHw77ujnOQbiKY2rLb0pE
- aHMQoiECAQDVbj827W1Yai/0XEABIr8Ci6a+/qZ8Vz6MZzL5GJosAA==
-In-Reply-To: <14326654-2573-4bb6-b7c0-eb73681caabd@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:nyYn9MGcsSn3H6u/52dswZlCjiPZgP00KwLLYk57Pyf1yCmTJYv
- 1302kaXrVQXkmgdolfMjd/lkDWtsv30kiy1dboMDVSMFAj1uH17mcrHIE2QnFcUih/rMDHF
- 28VHfaWRVH/U2997aVJUqdo58Fccf45As5BnABmItddzJnj9lq3Kp1Z+oMp7G601738A1D6
- L6bx/OKXXlNdzWrIygR2Q==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:7l6dMTvSR7k=;iSvewER8lGBR9mfNddXgeb4nBGD
- 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
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aBnKKafHHjkL5iP-@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hi Andrew,
+On Tue, May 06, 2025 at 09:36:57AM +0100, Russell King (Oracle) wrote:
+> On Fri, May 02, 2025 at 06:54:49PM +0100, Russell King (Oracle) wrote:
+> > On Fri, May 02, 2025 at 05:29:21PM +0200, Andrew Lunn wrote:
+> > > On Fri, May 02, 2025 at 02:35:36PM +0100, Russell King (Oracle) wrote:
+> > > > Phylink does not permit drivers to mess with the netif carrier, as
+> > > > this will de-synchronise phylink with the MAC driver. Moreover,
+> > > > setting and clearing the TE and RE bits via stmmac_mac_set() in this
+> > > > path is also wrong as the link may not be up.
+> > > > 
+> > > > Replace the netif_carrier_on(), netif_carrier_off() and
+> > > > stmmac_mac_set() calls with the appropriate phylink_carrier_block() and
+> > > > phylink_carrier_unblock() calls, thereby allowing phylink to manage the
+> > > > netif carrier and TE/RE bits through the .mac_link_up() and
+> > > > .mac_link_down() methods.
+> > > > 
+> > > > This change will have the side effect of printing link messages to
+> > > > the kernel log, even though the physical link hasn't changed state.
+> > > > This matches the carrier state that userspace sees, which has always
+> > > > "bounced".
+> > > > 
+> > > > Note that RE should only be set after the DMA is ready to avoid the
+> > > > receive FIFO between the MAC and DMA blocks overflowing, so
+> > > > phylink_start() needs to be placed after DMA has been started.
+> > > > 
+> > > > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > > > ---
+> > > >  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 20 +++++++++++--------
+> > > >  1 file changed, 12 insertions(+), 8 deletions(-)
+> > > > 
+> > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > > > index f59a2363f150..ac27ea679b23 100644
+> > > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > > > @@ -6922,6 +6922,11 @@ void stmmac_xdp_release(struct net_device *dev)
+> > > >  	/* Ensure tx function is not running */
+> > > >  	netif_tx_disable(dev);
+> > > >  
+> > > > +	/* Take down the software link. stmmac_xdp_open() must be called after
+> > > > +	 * this function to release this block.
+> > > > +	 */
+> > > > +	phylink_carrier_block(priv->phylink);
+> > > > +
+> > > >  	/* Disable NAPI process */
+> > > >  	stmmac_disable_all_queues(priv);
+> > > >  
+> > > > @@ -6937,14 +6942,10 @@ void stmmac_xdp_release(struct net_device *dev)
+> > > >  	/* Release and free the Rx/Tx resources */
+> > > >  	free_dma_desc_resources(priv, &priv->dma_conf);
+> > > >  
+> > > > -	/* Disable the MAC Rx/Tx */
+> > > > -	stmmac_mac_set(priv, priv->ioaddr, false);
+> > > > -
+> > > >  	/* set trans_start so we don't get spurious
+> > > >  	 * watchdogs during reset
+> > > >  	 */
+> > > >  	netif_trans_update(dev);
+> > > > -	netif_carrier_off(dev);
+> > > >  }
+> > > >  
+> > > 
+> > > >  int stmmac_xdp_open(struct net_device *dev)
+> > > > @@ -7026,25 +7027,28 @@ int stmmac_xdp_open(struct net_device *dev)
+> > > >  		hrtimer_setup(&tx_q->txtimer, stmmac_tx_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
+> > > >  	}
+> > > >  
+> > > > -	/* Enable the MAC Rx/Tx */
+> > > > -	stmmac_mac_set(priv, priv->ioaddr, true);
+> > > > -
+> > > >  	/* Start Rx & Tx DMA Channels */
+> > > >  	stmmac_start_all_dma(priv);
+> > > >  
+> > > > +	/* Allow phylink to bring the software link back up.
+> > > > +	 * stmmac_xdp_release() must have been called prior to this.
+> > > > +	 */
+> > > 
+> > > This is counter intuitive. Why is release called before open?
+> > 
+> > Indeed - and that should've been caught in the review where XDP was
+> > being added.
+> > 
+> > > Looking into stmmac_xdp_set_prog() i think i get it. Even if there is
+> > > not a running XDP prog, stmmac_xdp_release() is called, and then
+> > > stmmac_xdp_open().
+> > 
+> > If there is a change of "do we have an XDP prog" state, then
+> > stmmac_xdp_release() is called to free all the current contexts to
+> > do with queue/descriptor management, and then stmmac_xdp_open() is
+> > called thereafter. These are doing a subset of .ndo_open/.ndo_release
+> > and I think that's where they're getting their naming from.
+> > 
+> > The only possible sequence is:
+> > 
+> > 	stmmac_open()
+> > then, on each XDP prog addition or removal, but not replacement:
+> > 		stmmac_xdp_release()
+> > 		stmmac_xdp_open()
+> > finally,
+> > 	stmmac_release()
+> > 
+> > > Maybe these two functions need better names? prepare and commit?
+> > 
+> > Yes, it's all counter intuitive, and there are various things about the
+> > XDP code that make it hard to follow.
+> > 
+> > For example, stmmac_xdp_set_prog() leads you to think, because of the
+> > way the need_update variable is set, that looking for references to
+> > xdp_prog would show one where all the dependents are, but no, there's
+> > stmmac_xdp_is_enabled(), which is nice and readable, but could've
+> > been used in stmmac_xdp_set_prog() to make it more obvious what to
+> > grep for.
+> > 
+> > Incidentally, if stmmac_xdp_open() fails to re-grab the interrupts,
+> > then it calls phylink_stop(), stmmac_hw_teardown(), and
+> > free_dma_desc_resources().
+> > 
+> > If one then set the interface administratively down, stmmac_release()
+> > gets called, which again calls phylink_stop(), free_dma_desc_resources()
+> > and stmmac_release_ptp().
+> > 
+> > stmmac_release_ptp() disables/unprepares clk_ptp_ref, and unregisters
+> > the PTP stuff. stmmac_hw_teardown() also disables/unprepares
+> > clk_ptp_ref, so we probably unbalance the clk API in this case...
+> > and probably much other stuff.
+> > 
+> > Calling free_dma_desc_resources() twice calls functios such as 
+> > free_dma_tx_desc_resources() twice, and it looks like that's not going
+> > to be healthy, calling dma_free_coherent() with the same arguments,
+> > double-releasing memory. Same for kfree(). Probably same for the RX
+> > stuff.
+> > 
+> > Basically, if one messes with XDP in this driver, expect things to go
+> > bang and kill the kernel if something goes wrong with the whole
+> > xdp_release+xdp_open dance.
+> > 
+> > Honestly, this needs a rewrite, but I currently know nowt about XDP.
+> > 
+> > So, I'd suggest that the names of these functions is the least of the
+> > problems here.
+> 
+> Well, this series has been discarded from patchwork. Shrug. I won't be
+> posting another version, stmmac can remain broken. I don't have a
+> suggestion on better names for these functions.
 
-Am 05.05.25 um 18:32 schrieb Andrew Lunn:
->> +	if (!irq_data) {
->> +		netdev_err(ndev, "Invalid IRQ: %d\n", ndev->irq);
->> +		return -EINVAL;
->> +	}
->> +
->> +	switch (irqd_get_trigger_type(irq_data)) {
->> +	case IRQ_TYPE_LEVEL_HIGH:
->> +	case IRQ_TYPE_LEVEL_LOW:
->> +		break;
->> +	default:
->> +		netdev_warn_once(ndev, "Only IRQ type level recommended, please upda=
-te your firmware.\n");
-> I would probably put DT in there somewhere. firmware is rather
-> generic.
-I'm fine with changing it to DT. I slightly remember of a patch for a=20
-BCM2835 driver, which also had a warning to update the DT and a reviewer=
-=20
-requested it to change it to firmware. I don't remember the reason=20
-behind it, maybe it's the fact that not all user know what a DT /=20
-devicetree is. A quick grep shows both variants (DT vs firmware).
+... and in any case, Andrew's comment would be a *separate* change to
+the subject of this series, so is not appropriate to be part of this
+series.
 
-Regards
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
->
->      Andrew
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
