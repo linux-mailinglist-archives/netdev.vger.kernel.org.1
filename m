@@ -1,399 +1,87 @@
-Return-Path: <netdev+bounces-188464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA1AFAACE33
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 21:41:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6909FAACE50
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 21:45:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B81A4E61F9
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 19:41:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D64AF465F2C
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 19:45:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06BB6212B05;
-	Tue,  6 May 2025 19:41:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD376204F90;
+	Tue,  6 May 2025 19:45:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TbOfp7EK"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="BAGb74G8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52BD211299
-	for <netdev@vger.kernel.org>; Tue,  6 May 2025 19:41:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E23842AA9;
+	Tue,  6 May 2025 19:45:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746560482; cv=none; b=lqc7ksqCdr1vD7uELFsLOP+qXuMs6U4Es0EHFD+PtqSBvuAAx4abLLT+WfxYaDUan0GgH/xATCEFMyI+ce3gH6oeydfPzpH85xNR/RAwk6/+CaUGxnPqgFrjZFWmClVdrJjrL0v5obV6syWe2s4/wZYPbYPKvBXHuIC/ng/RBlw=
+	t=1746560724; cv=none; b=QqsitXOPZXEozVCvLMiCGE4VTmVL/kcshsfr5lOmCuaK33jDxlEPRQCAusy5XtXDlPuDdyd0Yjfn/hV3PaDbCCYqUIkylz2Z64wcwNXBrhTRyreaUlLI7ww8Yjlq8hWGiN01GAvOKVQrHyo00vkMj6Xe+ylRumIjhLEsFHVMLQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746560482; c=relaxed/simple;
-	bh=wi2bTZI67NueKhfvsgj8KHCUBa0ealH/JXkA/VmshgU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eKfLOOiDg2QDO9LeRGvH40k+0IPtYSNCP5DdqokflqscvVPtvW6EXZsYdnDWwV0gUyK8Ieu8IQo7V85cJyPbpiNIzSNsaU3kedgOy34Ce/L2k2AY0MAeoWbNqldI1vESZLUfwvWUGic6dmXeLVFqITFg3ngoYAyTptPA1M2MkzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TbOfp7EK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEF04C4CEF4;
-	Tue,  6 May 2025 19:41:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746560482;
-	bh=wi2bTZI67NueKhfvsgj8KHCUBa0ealH/JXkA/VmshgU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TbOfp7EK+z8ent9xpw1x7y5/Ke8ml00yk5EgIWz+frfjIk+HPViUcUioQrCcTfteQ
-	 ZUB5HUds+UMw8EUcBZ1ilUt+dUwUoGqeTlogGrNzsUPfnUhtJQ1e9Ok3WMYierhtl4
-	 sgqEwUgGQ92x/EcLKDMraIn+ceU8CubM+vQ8oT2EoTmBn/9Fd44bEFMbSN1kuvbTTD
-	 SN2MoBeMjwv4gOG6xFjf6ppg6IQaQI3yBLRNMGXUOitxM/W4dROs2/E5v9TUGW7tkE
-	 /Cd43gj9HF0I9Y2TbqUyFGPTdSO7fn/V81/ww9TNOH0c7PLemW1gAnbV/a41vpfHiF
-	 HDckJuEtD0VpA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	donald.hunter@gmail.com,
-	johannes@sipsolutions.net,
-	razor@blackwall.org,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 4/4] netlink: specs: rt-link: remove implicit structs from devconf
-Date: Tue,  6 May 2025 12:41:00 -0700
-Message-ID: <20250506194101.696272-5-kuba@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250506194101.696272-1-kuba@kernel.org>
-References: <20250506194101.696272-1-kuba@kernel.org>
+	s=arc-20240116; t=1746560724; c=relaxed/simple;
+	bh=kp1bMGzdGurJfc6hPYEwzm56tHB4KU9iWtWa4p+Esaw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=FusSkk2l0d5YU3coTmh331p97UijhHzcdglAuUVER68mleTiHuBl2DmxRp1295/p7A0mdwvbN6r6/tLRU9W/87tSd4JKQWhvvlMh5ecDSjmwnAJ68bFwSoZbZbvTSifmxnynqdbXq73fYMMWyBewd/ulFLjKl7AxhjuGQo6xmck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=BAGb74G8; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=kp1bMGzdGurJfc6hPYEwzm56tHB4KU9iWtWa4p+Esaw=;
+	t=1746560723; x=1747770323; b=BAGb74G81evAfO1kg585ed/Il+uMSYmsXyE3hlJFSqp7d8O
+	VP0CpE8L0nEMvImQamMoqp40/bsWRHcks0Zzd5CX5+3pUxEI6rGsFT4Pk9tEbigt6AhOnNoCJL7ao
+	hy+u04rTjGvgM4aPI+TI7bjk2TiC/vOzGqU2vLjvZKPNXGHtIwPrzn2mORezrj7+xGqfN49DOP80l
+	LSAVJPtATUjgKWCPWy/c1xFxTLkhLYhdLLXEQevDvBlE97rDS2tGeejPlPeL5nQKTZdfS+iEIzoJa
+	sUGf70jgvD7ZC0gezWG9PU6I99tsciIZByZJU892qW6bNBm1eAH2yjPorPV1Xl/g==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.1)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1uCOEC-00000006KUD-3JpU;
+	Tue, 06 May 2025 21:45:20 +0200
+Message-ID: <70308a97ff41d334e9a8f9c42705d83a33122349.camel@sipsolutions.net>
+Subject: Re: [GIT PULL] wireless-next-2025-05-06
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Date: Tue, 06 May 2025 21:45:20 +0200
+In-Reply-To: <b1991732077354adcaf3d318a008bee9258efe0e.camel@sipsolutions.net>
+References: <20250506174656.119970-3-johannes@sipsolutions.net>
+	 <b1991732077354adcaf3d318a008bee9258efe0e.camel@sipsolutions.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-malware-bazaar: not-scanned
 
-devconf is even odder than SNMP. On input it reports an array of u32s
-which seem to be indexed by the enum values - 1. On output kernel
-expects a nest where each attr has the enum type as the nla type.
+On Tue, 2025-05-06 at 21:37 +0200, Johannes Berg wrote:
+> On Tue, 2025-05-06 at 19:45 +0200, Johannes Berg wrote:
+> > Hi,
+> >=20
+> > Here's another set of patches for -next, but I know there's
+> > more coming, especially from iwlwifi.
+> >=20
+>=20
+> No, wait ... I'm withdrawing this, I need another change for iwlwifi
+> device IDs. Sorry.
 
-sub-type: u32 is probably best we can do right now.
+No... I should go sleep instead. Please do apply this.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- Documentation/netlink/specs/rt-link.yaml | 107 +++--------------------
- 1 file changed, 10 insertions(+), 97 deletions(-)
+That change will go to wireless, and cause a conflict, but we can just
+ignore the wireless change later for that since the changes going into
+iwlwifi-next will also fix the issue I need to fix in wireless.
 
-diff --git a/Documentation/netlink/specs/rt-link.yaml b/Documentation/netlink/specs/rt-link.yaml
-index fa5ff70f2f5f..7f91f474ff25 100644
---- a/Documentation/netlink/specs/rt-link.yaml
-+++ b/Documentation/netlink/specs/rt-link.yaml
-@@ -304,285 +304,196 @@ protonum: 0
-         type: u8
-   -
-     name: ipv4-devconf
--    type: struct
--    members:
-+    enum-name:
-+    type: enum
-+    entries:
-       -
-         name: forwarding
--        type: u32
-       -
-         name: mc-forwarding
--        type: u32
-       -
-         name: proxy-arp
--        type: u32
-       -
-         name: accept-redirects
--        type: u32
-       -
-         name: secure-redirects
--        type: u32
-       -
-         name: send-redirects
--        type: u32
-       -
-         name: shared-media
--        type: u32
-       -
-         name: rp-filter
--        type: u32
-       -
-         name: accept-source-route
--        type: u32
-       -
-         name: bootp-relay
--        type: u32
-       -
-         name: log-martians
--        type: u32
-       -
-         name: tag
--        type: u32
-       -
-         name: arpfilter
--        type: u32
-       -
-         name: medium-id
--        type: u32
-       -
-         name: noxfrm
--        type: u32
-       -
-         name: nopolicy
--        type: u32
-       -
-         name: force-igmp-version
--        type: u32
-       -
-         name: arp-announce
--        type: u32
-       -
-         name: arp-ignore
--        type: u32
-       -
-         name: promote-secondaries
--        type: u32
-       -
-         name: arp-accept
--        type: u32
-       -
-         name: arp-notify
--        type: u32
-       -
-         name: accept-local
--        type: u32
-       -
-         name: src-vmark
--        type: u32
-       -
-         name: proxy-arp-pvlan
--        type: u32
-       -
-         name: route-localnet
--        type: u32
-       -
-         name: igmpv2-unsolicited-report-interval
--        type: u32
-       -
-         name: igmpv3-unsolicited-report-interval
--        type: u32
-       -
-         name: ignore-routes-with-linkdown
--        type: u32
-       -
-         name: drop-unicast-in-l2-multicast
--        type: u32
-       -
-         name: drop-gratuitous-arp
--        type: u32
-       -
-         name: bc-forwarding
--        type: u32
-       -
-         name: arp-evict-nocarrier
--        type: u32
-   -
-     name: ipv6-devconf
--    type: struct
--    members:
-+    enum-name:
-+    type: enum
-+    entries:
-       -
-         name: forwarding
--        type: u32
-       -
-         name: hoplimit
--        type: u32
-       -
-         name: mtu6
--        type: u32
-       -
-         name: accept-ra
--        type: u32
-       -
-         name: accept-redirects
--        type: u32
-       -
-         name: autoconf
--        type: u32
-       -
-         name: dad-transmits
--        type: u32
-       -
-         name: rtr-solicits
--        type: u32
-       -
-         name: rtr-solicit-interval
--        type: u32
-       -
-         name: rtr-solicit-delay
--        type: u32
-       -
-         name: use-tempaddr
--        type: u32
-       -
-         name: temp-valid-lft
--        type: u32
-       -
-         name: temp-prefered-lft
--        type: u32
-       -
-         name: regen-max-retry
--        type: u32
-       -
-         name: max-desync-factor
--        type: u32
-       -
-         name: max-addresses
--        type: u32
-       -
-         name: force-mld-version
--        type: u32
-       -
-         name: accept-ra-defrtr
--        type: u32
-       -
-         name: accept-ra-pinfo
--        type: u32
-       -
-         name: accept-ra-rtr-pref
--        type: u32
-       -
-         name: rtr-probe-interval
--        type: u32
-       -
-         name: accept-ra-rt-info-max-plen
--        type: u32
-       -
-         name: proxy-ndp
--        type: u32
-       -
-         name: optimistic-dad
--        type: u32
-       -
-         name: accept-source-route
--        type: u32
-       -
-         name: mc-forwarding
--        type: u32
-       -
-         name: disable-ipv6
--        type: u32
-       -
-         name: accept-dad
--        type: u32
-       -
-         name: force-tllao
--        type: u32
-       -
-         name: ndisc-notify
--        type: u32
-       -
-         name: mldv1-unsolicited-report-interval
--        type: u32
-       -
-         name: mldv2-unsolicited-report-interval
--        type: u32
-       -
-         name: suppress-frag-ndisc
--        type: u32
-       -
-         name: accept-ra-from-local
--        type: u32
-       -
-         name: use-optimistic
--        type: u32
-       -
-         name: accept-ra-mtu
--        type: u32
-       -
-         name: stable-secret
--        type: u32
-       -
-         name: use-oif-addrs-only
--        type: u32
-       -
-         name: accept-ra-min-hop-limit
--        type: u32
-       -
-         name: ignore-routes-with-linkdown
--        type: u32
-       -
-         name: drop-unicast-in-l2-multicast
--        type: u32
-       -
-         name: drop-unsolicited-na
--        type: u32
-       -
-         name: keep-addr-on-down
--        type: u32
-       -
-         name: rtr-solicit-max-interval
--        type: u32
-       -
-         name: seg6-enabled
--        type: u32
-       -
-         name: seg6-require-hmac
--        type: u32
-       -
-         name: enhanced-dad
--        type: u32
-       -
-         name: addr-gen-mode
--        type: u8
-       -
-         name: disable-policy
--        type: u32
-       -
-         name: accept-ra-rt-info-min-plen
--        type: u32
-       -
-         name: ndisc-tclass
--        type: u32
-       -
-         name: rpl-seg-enabled
--        type: u32
-       -
-         name: ra-defrtr-metric
--        type: u32
-       -
-         name: ioam6-enabled
--        type: u32
-       -
-         name: ioam6-id
--        type: u32
-       -
-         name: ioam6-id-wide
--        type: u32
-       -
-         name: ndisc-evict-nocarrier
--        type: u32
-       -
-         name: accept-untracked-na
--        type: u32
-   -
-     name: ifla-icmp6-stats
-     enum-name:
-@@ -2144,7 +2055,8 @@ protonum: 0
-       -
-         name: conf
-         type: binary
--        struct: ipv4-devconf
-+        sub-type: u32
-+        doc: u32 indexed by ipv4-devconf - 1 on output, on input it's a nest
-   -
-     name: ifla6-attrs
-     name-prefix: ifla-inet6-
-@@ -2155,7 +2067,8 @@ protonum: 0
-       -
-         name: conf
-         type: binary
--        struct: ipv6-devconf
-+        sub-type: u32
-+        doc: u32 indexed by ipv6-devconf - 1 on output, on input it's a nest
-       -
-         name: stats
-         type: binary
--- 
-2.49.0
-
+johannes
 
