@@ -1,148 +1,126 @@
-Return-Path: <netdev+bounces-188355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B9AAAAC73B
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 16:00:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7F05AAC714
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 15:56:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10F303B94CD
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 13:59:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 736437AD41E
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 13:55:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 314362820C5;
-	Tue,  6 May 2025 13:59:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FCC7280319;
+	Tue,  6 May 2025 13:56:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="d4+QEZ9G"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD1A275842
-	for <netdev@vger.kernel.org>; Tue,  6 May 2025 13:59:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE38280012
+	for <netdev@vger.kernel.org>; Tue,  6 May 2025 13:56:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746539989; cv=none; b=ORbCe6JUNTzfEHRHY/lCdBaQOq9dNgnLgEKCPVbqhcCgXugzjgqAGRQ+lRtF8IbFNd6USIVALAaelZ5kGHxVXSmpb9Zx4z77g01XZGNQWyeG6jPP4I5lPiUZomoOReQQWzejIDk3H23RjEYcc3EztOcqYCeGRk6oCUZe8staRno=
+	t=1746539782; cv=none; b=n6WvpV81TRnAzlcm+X+6RIqeB0Rn2B/2AVRpJilra2H6t/8dQpes01NucwaOTuonPSTl+J5bzDNkBgW7mTdYo5tzewiNmBaJxMjNDs19DbvQFDsBKVzZ+sZVlinA1JwzTy+lfd9uqENRlACAnDVhXLKQZ3SgsfgJB9lG609XnLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746539989; c=relaxed/simple;
-	bh=ZcBkrScOOWoftsG0e6ti3c6tLR9Su//vowZDZIAZxZY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jdb6Z1OjWvL8xLg0Lp6nGck70IZ7fj7B159Cqxz8QgzIRJSALE0iYYGh9RX+dO+eOHKGrwP3Enr84jdVtbFQO4Tv9aMSy0l+gJBq4/p+RB8ySDh6FjVRjmYRs3PXEFJu0ojhk+mBiF77vraLpXTM2RCTJlU5UnyS4T3HNV5/Oh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1uCIpl-0007qk-4K
-	for netdev@vger.kernel.org; Tue, 06 May 2025 15:59:45 +0200
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1uCIpk-001P95-0p
-	for netdev@vger.kernel.org;
-	Tue, 06 May 2025 15:59:44 +0200
-Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id E69D9408F61
-	for <netdev@vger.kernel.org>; Tue, 06 May 2025 13:59:43 +0000 (UTC)
-Received: from hardanger.blackshift.org (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id D554A408F34;
-	Tue, 06 May 2025 13:59:41 +0000 (UTC)
-Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id f1b1daa5;
-	Tue, 6 May 2025 13:59:41 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	linux-can@vger.kernel.org,
-	kernel@pengutronix.de,
-	Antonios Salios <antonios@mwa.re>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	Markus Schneider-Pargmann <msp@baylibre.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net 1/6] can: m_can: m_can_class_allocate_dev(): initialize spin lock on device probe
-Date: Tue,  6 May 2025 15:56:17 +0200
-Message-ID: <20250506135939.652543-2-mkl@pengutronix.de>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20250506135939.652543-1-mkl@pengutronix.de>
-References: <20250506135939.652543-1-mkl@pengutronix.de>
+	s=arc-20240116; t=1746539782; c=relaxed/simple;
+	bh=lf6YtdrdwJ2QtsANp3wjNVE6niIZ90eHUTTGp1DiNGc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FZ4iLd4tW29o+Envyv7mTT8Zgdw4DEZIaBbpk15KzqEkl7rxpP4i4I/Hl9aO7mfLmg2m96zFidl2Xy09ErEBQ61LzqZIfx9FCoXaRw2Ry7l6YqKW1e6ZW4ycYzXIb68RQWLWXzh+q22I7mNLlJzuELeWZ3La65zwReLg/mpk5IY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=d4+QEZ9G; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=sDSa7bE8NOJXLelvEMpU/rC6sYcMXis7kEsdOk5BpI0=; b=d4+QEZ9GFyHLyMVwJ48TKE6Ihn
+	S1FaSH9ltOcNp8C2wL3927zufKs6vPAHstgRsiUbOBT/avqnIvnJLb7XBsytAf6hUbBRr4DgcLD5E
+	QxXqrbiDvqWJCSj2su4ZAgm5Q24jQsVEwnveMOLWQOD3Acy7oJfqgeOursDLY7diLPcQGrKbhQfz1
+	2MtbfQJI/M5z/exkUBLhgl5GT5inYAirRFLHgqvcAauiRhQlDigbzHxDM9FPDkScK6uy9NW0KpzHo
+	s+JcggW/WUYOWoHuOaWCNLI3mFZnAJNRXSqKNpYdStdAjwQHF0vy1LmTYJlZviuRWeeFgcQVT4zGa
+	YJ2py6yA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uCImP-0000000CDgT-3Equ;
+	Tue, 06 May 2025 13:56:17 +0000
+Date: Tue, 6 May 2025 06:56:17 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Hildenbrand <david@redhat.com>,
+	John Hubbard <jhubbard@nvidia.com>,
+	Christoph Hellwig <hch@infradead.org>, willy@infradead.org,
+	netdev@vger.kernel.org, linux-mm@kvack.org,
+	Willem de Bruijn <willemb@google.com>
+Subject: Re: Reorganising how the networking layer handles memory
+Message-ID: <aBoVAd-XX_44RKbC@infradead.org>
+References: <20250505131446.7448e9bf@kernel.org>
+ <165f5d5b-34f2-40de-b0ec-8c1ca36babe8@lunn.ch>
+ <0aa1b4a2-47b2-40a4-ae14-ce2dd457a1f7@lunn.ch>
+ <1015189.1746187621@warthog.procyon.org.uk>
+ <1021352.1746193306@warthog.procyon.org.uk>
+ <1069540.1746202908@warthog.procyon.org.uk>
+ <1216273.1746539449@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1216273.1746539449@warthog.procyon.org.uk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-From: Antonios Salios <antonios@mwa.re>
+On Tue, May 06, 2025 at 02:50:49PM +0100, David Howells wrote:
+> > > (2) sendmsg(MSG_ZEROCOPY) suffers from the O_DIRECT vs fork() bug because
+> > >      it doesn't use page pinning.  It needs to use the GUP routines.
+> > 
+> > We end up calling iov_iter_get_pages2(). Is it not setting
+> > FOLL_PIN is a conscious choice, or nobody cared until now?
+> 
+> iov_iter_get_pages*() predates GUP, I think.
 
-The spin lock tx_handling_spinlock in struct m_can_classdev is not
-being initialized. This leads the following spinlock bad magic
-complaint from the kernel, eg. when trying to send CAN frames with
-cansend from can-utils:
+It predates pin_user_pages, but get_user_pages is much older.
 
-| BUG: spinlock bad magic on CPU#0, cansend/95
-|  lock: 0xff60000002ec1010, .magic: 00000000, .owner: <none>/-1, .owner_cpu: 0
-| CPU: 0 UID: 0 PID: 95 Comm: cansend Not tainted 6.15.0-rc3-00032-ga79be02bba5c #5 NONE
-| Hardware name: MachineWare SIM-V (DT)
-| Call Trace:
-| [<ffffffff800133e0>] dump_backtrace+0x1c/0x24
-| [<ffffffff800022f2>] show_stack+0x28/0x34
-| [<ffffffff8000de3e>] dump_stack_lvl+0x4a/0x68
-| [<ffffffff8000de70>] dump_stack+0x14/0x1c
-| [<ffffffff80003134>] spin_dump+0x62/0x6e
-| [<ffffffff800883ba>] do_raw_spin_lock+0xd0/0x142
-| [<ffffffff807a6fcc>] _raw_spin_lock_irqsave+0x20/0x2c
-| [<ffffffff80536dba>] m_can_start_xmit+0x90/0x34a
-| [<ffffffff806148b0>] dev_hard_start_xmit+0xa6/0xee
-| [<ffffffff8065b730>] sch_direct_xmit+0x114/0x292
-| [<ffffffff80614e2a>] __dev_queue_xmit+0x3b0/0xaa8
-| [<ffffffff8073b8fa>] can_send+0xc6/0x242
-| [<ffffffff8073d1c0>] raw_sendmsg+0x1a8/0x36c
-| [<ffffffff805ebf06>] sock_write_iter+0x9a/0xee
-| [<ffffffff801d06ea>] vfs_write+0x184/0x3a6
-| [<ffffffff801d0a88>] ksys_write+0xa0/0xc0
-| [<ffffffff801d0abc>] __riscv_sys_write+0x14/0x1c
-| [<ffffffff8079ebf8>] do_trap_ecall_u+0x168/0x212
-| [<ffffffff807a830a>] handle_exception+0x146/0x152
+> There's now an
+> iov_iter_extract_pages() that does the pinning stuff, but you have to do a
+> different cleanup, which is why I created a new API call.
 
-Initializing the spin lock in m_can_class_allocate_dev solves that
-problem.
+But yes, iov_iter_get_pages* needs to go away in favour of
+iov_iter_extract_pages, and I'm still annoyed that despite multiple
+pings no one has done any work on that outside of block / block based
+direct I/O and netfs.
 
-Fixes: 1fa80e23c150 ("can: m_can: Introduce a tx_fifo_in_flight counter")
-Signed-off-by: Antonios Salios <antonios@mwa.re>
-Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Link: https://patch.msgid.link/20250425111744.37604-2-antonios@mwa.re
-Reviewed-by: Markus Schneider-Pargmann <msp@baylibre.com>
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- drivers/net/can/m_can/m_can.c | 1 +
- 1 file changed, 1 insertion(+)
+> > >  (3) sendmsg(MSG_SPLICE_PAGES) isn't entirely satisfactory because it can't be
+> > >      used with certain memory types (e.g. slab).  It takes a ref on whatever
+> > >      it is given - which is wrong if it should pin this instead.
+> > 
+> > s/takes a ref/requires a ref/ ? I mean - the caller implicitly grants 
+> > a ref  to the stack, right? But yes, the networking stack will try to
+> > release it.
+> 
+> I mean 'takes' as in skb_append_pagefrags() calls get_page() - something that
+> needs to be changed.
+> 
+> Christoph Hellwig would like to make it such that the extractor gets
+> {phyaddr,len} rather than {page,off,len} - so all you, the network layer, see
+> is that you've got a span of memory to use as your buffer.  How that span of
+> memory is managed is the responsibility of whoever called sendmsg() - and they
+> need a callback to be able to handle that.
 
-diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
-index 884a6352c42b..326ede9d400f 100644
---- a/drivers/net/can/m_can/m_can.c
-+++ b/drivers/net/can/m_can/m_can.c
-@@ -2379,6 +2379,7 @@ struct m_can_classdev *m_can_class_allocate_dev(struct device *dev,
- 	SET_NETDEV_DEV(net_dev, dev);
- 
- 	m_can_of_parse_mram(class_dev, mram_config_vals);
-+	spin_lock_init(&class_dev->tx_handling_spinlock);
- out:
- 	return class_dev;
- }
+Not sure what the extractor is, but we plan to change the bio_vec
+to be physical address instead of page+offset based.  Where we is
+a lot more people than just me.
 
-base-commit: ebd297a2affadb6f6f4d2e5d975c1eda18ac762d
--- 
-2.47.2
+> Once advantage of delegating it to the caller, though, and having the caller
+> keep track of which bits in still needs to hold on to by transmission
+> completion position is that we don't need to manage refs/pins across sk_buff
+> duplication - let alone what we should do with stuff that's kmalloc'd.
 
+And the callers already do that for all other kinds of I/O anyway.
 
 
