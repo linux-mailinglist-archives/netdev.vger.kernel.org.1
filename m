@@ -1,133 +1,132 @@
-Return-Path: <netdev+bounces-188500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B0C7AAD1B1
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 01:49:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 620FDAAD1BC
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 01:57:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D3D41BC59D8
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 23:49:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA00F983422
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 23:56:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48BC621D5BA;
-	Tue,  6 May 2025 23:49:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IiPHhhQZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59F1721D5B5;
+	Tue,  6 May 2025 23:57:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B25B0214815;
-	Tue,  6 May 2025 23:49:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28B78218ACA;
+	Tue,  6 May 2025 23:57:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746575367; cv=none; b=NxglABRp1oi25lR4ekPBJKoG5IUBPQsIgmHu8F6q5DFEXy579M/erEZFNWSIqOTFMLKzrNHZj8ueDH9pHD1B1x7jANpARszTr+MAgFaaoKlJHZesHM6GdhncT5VDFQ+y6ehN4dd3AZmHJ9g1tRyQ0JVRhaW1BWsyICEBc7IG8lQ=
+	t=1746575824; cv=none; b=ixehY+ZazJOBhqQy0alXW++xu0l/0CuK+kNJG1J/c+TX3B+jRDbsh4KC4ZDqVy8TqtbT5zJ3EG+/CsN9jmeyTxdU/cnz7EGhAgSmk2gBG5fFM4fShfl9zsCyIHAbKRAElp2/vF9q/ci4B8vAZ0EG0v2+k8WtTupjMDW5oQhomfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746575367; c=relaxed/simple;
-	bh=bN6Xre6GbjWnrrHg6esYssYxyunEvPUSznLL1o7vQYE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HfY1+JMiG5EQBqn+lxwYB10azz1WIErabxrtlhzd/MbvTSfT08aDYB9qObIpSShKmUZ9xfse1uL4NsB/OCE3qH9jWNet6qGyDWF33t5nLASmuAkkbAl4XrzGNVg1JmGYb/pYYbUR94xTv7nNE0OoPmhLLr0MESUUIc8mhXLpGFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IiPHhhQZ; arc=none smtp.client-ip=209.85.222.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7c56a3def84so639874585a.0;
-        Tue, 06 May 2025 16:49:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746575364; x=1747180164; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sLfEz//YxlWSQrp0pxzZLIDi5MwZhlRnzYF53iBHKBc=;
-        b=IiPHhhQZhSdi0GKGu2f2hiqIwIhFEVgR7jxdBoNWOgKlcJNTE32DydpKmebAk5irRg
-         rfVcWvEXPaHyLVyd/NrhGqo84s9+Wnq50bhSgv6IkPUowihP/EsP1Qbcj5Exyiwa+90j
-         cg5AnnRhtTZoU764bH7NfjZ+EdFRvM2zPyRSdfephAtTe78EP0dF4CkSSrvB2ILd1+36
-         N9JcqbqpguVzXuYsnODut1sfb53btZzh+uIchFaaaLMeOGb2zrEs/s2iXjQbGLOcu9Vo
-         hcO/4+3D+j/UXFV2w4g0OOrlPcwUfKXahPO4SGdqzcxeuWJ54dH2t0NQW3Hrf7S00enh
-         y/6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746575364; x=1747180164;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sLfEz//YxlWSQrp0pxzZLIDi5MwZhlRnzYF53iBHKBc=;
-        b=bi/OvKbHWz6AB+in4NpXxePxJeSyEpnXNUCs34VqX7ve/sgZgeJKSBUwBP/9e0HczX
-         dsCZQ0KjKm9egxDGz72likz6Uu8jADZEoMw4jA8KVgS2y4QSLBqWdjk9nGqub2dc57o8
-         8hbTWPjuWv3Z5qRiY0WKwx+XkYOwuOwM2aehV0voIfrTq3cA1VPu3clPD+8n2qujDfd1
-         dWWfjeLckm6DSTbu65xRRgrScDdr6nd07rFm/oa1lVu58gqHXPHWs2eWzKW/5ryRsK36
-         z5Zg0UInDCnwR1NiGr5FOri3kIjDHPZ3mUkeIDPFolSrKEv7PDWqrKt/irGDlHB7lxT0
-         BLug==
-X-Forwarded-Encrypted: i=1; AJvYcCUTpz7rxS4xBn54+k1qENc+D5kSPCR2OF28HWHWgHwMYVHanlNVgO+IcNVVJkmdUQeK7SgxlEDo@vger.kernel.org, AJvYcCUanD9MkAxqBx4edOEN8W3ASjsd1MXy1uMDYP4iSzDkBv76txS2zOAwL6exz23H8ilYv+Bu+iv8LBtg@vger.kernel.org, AJvYcCXn4B9Ixsw2COMwXZoiUvgWtvNlnNSo9X7NCT9nDC5fEdkHvjYE/b4AEJfi/6QBiTzM2Vb6FeMC3FzUbQOq@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDGXww7dbAknumRpdn93mRlOdC5YoTkZ/ZbGBpVDaLt9Zo9IXx
-	iMWuIzvR31ZGV9CC15e1/LpXvfVJ+6xsSJ6CC8fBD2QXMR5fh4Ll
-X-Gm-Gg: ASbGncsSRaR37p1A5qkwHkslI2r/UVDGnvyFLkF6AIFiLTh5lh97UhWlJeDIOMiUHX9
-	NLJp8NKS4M+plPZeaEbGvG9XbxLwy2F75U0zxYUZSz5yT8NhMYwBPGw0eIqxgDw64xPBHWCu6L8
-	xksB0KaLLi3xu7VpnNCJFMH6KMxu7Lt9TPa4KjeoHZSB1Bypgp1nWd2W58jL3bjNU/VrlyduBTw
-	0KwkhEjGLEhE1kQhiothleYdIpQbLs3k8uoif72lVHv+ahJrXQmnRzzWi8ecxyJOz6/gVur9Bf8
-	n1dU++U7lx3YyEdF
-X-Google-Smtp-Source: AGHT+IFNc9H3OqbhDKWVWD4by0j8urZWA+6ou0PeVS7Ar9B3flHhOj6AnypYnW3OvckJNbDCCZLsQg==
-X-Received: by 2002:a05:620a:f12:b0:7c7:a5cd:5bd3 with SMTP id af79cd13be357-7caf73b1a87mr181273185a.28.1746575363534;
-        Tue, 06 May 2025 16:49:23 -0700 (PDT)
-Received: from localhost ([2001:da8:7001:11::cb])
-        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7caf752b635sm48956385a.43.2025.05.06.16.49.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 May 2025 16:49:23 -0700 (PDT)
-From: Inochi Amaoto <inochiama@gmail.com>
-To: Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Chen Wang <unicorn_wang@outlook.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Alexander Sverdlin <alexander.sverdlin@gmail.com>,
-	Nikita Shubin <nikita.shubin@maquefel.me>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Inochi Amaoto <inochiama@gmail.com>
-Cc: linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	sophgo@lists.linux.dev,
+	s=arc-20240116; t=1746575824; c=relaxed/simple;
+	bh=ykAHd5Is/09WaVAT2pFbXqZo5I4E9ja1ZRV8IBy1puE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=krPcBv4LLs2WW95bIbejCfYxMp9P0OVmknY5a/Z0UIHdGTHmq3SMslYLV3DFzrhnu8qiNyaA6B2Co4U/sxk6qUPAngf5eWT98fbCP/ZEhJLt0BwKI9C2Sp+NzGCPWPv/lV6Ze0UGWFvOLGD7jrT7TfjAdbQw/8ZsEcpO2e/G1s0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1uCS3l-000000004RO-19ao;
+	Tue, 06 May 2025 23:56:44 +0000
+Date: Wed, 7 May 2025 00:56:38 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Sean Anderson <sean.anderson@linux.dev>, netdev@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>, upstream@airoha.com,
+	Christian Marangi <ansuelsmth@gmail.com>,
 	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Yixun Lan <dlan@gentoo.org>,
-	Longbin Li <looong.bin@gmail.com>
-Subject: Re: (subset) [PATCH v5 0/5] clk: sophgo: add SG2044 clock controller support
-Date: Wed,  7 May 2025 07:48:58 +0800
-Message-ID: <174657533290.212327.15123615268219732476.b4-ty@gmail.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250418020325.421257-1-inochiama@gmail.com>
-References: <20250418020325.421257-1-inochiama@gmail.com>
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Joyce Ooi <joyce.ooi@intel.com>,
+	Madalin Bucur <madalin.bucur@nxp.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	UNGLinuxDriver@microchip.com, Wei Fang <wei.fang@nxp.com>,
+	imx@lists.linux.dev, linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [net-next PATCH v3 05/11] net: pcs: lynx: Convert to an MDIO
+ driver
+Message-ID: <aBqhtl3m03J6pw3V@makrotopia.org>
+References: <20250415193323.2794214-6-sean.anderson@linux.dev>
+ <20250506215841.54rnxy3wqtlywxgb@skbuf>
+ <20250415193323.2794214-1-sean.anderson@linux.dev>
+ <20250415193323.2794214-1-sean.anderson@linux.dev>
+ <20250415193323.2794214-6-sean.anderson@linux.dev>
+ <20250415193323.2794214-6-sean.anderson@linux.dev>
+ <20250506215841.54rnxy3wqtlywxgb@skbuf>
+ <50e809ea-62a4-413d-af63-7900929c3247@linux.dev>
+ <50e809ea-62a4-413d-af63-7900929c3247@linux.dev>
+ <20250506221834.uw5ijjeyinehdm3x@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250506221834.uw5ijjeyinehdm3x@skbuf>
 
-On Fri, 18 Apr 2025 10:03:19 +0800, Inochi Amaoto wrote:
-> The clock controller of SG2044 provides multiple clocks for various
-> IPs on the SoC, including PLL, mux, div and gates. As the PLL and
-> div have obvious changed and do not fit the framework of SG2042,
-> a new implement is provided to handle these.
+On Wed, May 07, 2025 at 01:18:34AM +0300, Vladimir Oltean wrote:
+> On Tue, May 06, 2025 at 06:03:35PM -0400, Sean Anderson wrote:
+> > On 5/6/25 17:58, Vladimir Oltean wrote:
+> > > Hello Sean,
+> > > 
+> > > On Tue, Apr 15, 2025 at 03:33:17PM -0400, Sean Anderson wrote:
+> > >> diff --git a/drivers/net/pcs/pcs-lynx.c b/drivers/net/pcs/pcs-lynx.c
+> > >> index 23b40e9eacbb..bacba1dd52e2 100644
+> > >> --- a/drivers/net/pcs/pcs-lynx.c
+> > >> +++ b/drivers/net/pcs/pcs-lynx.c
+> > >> @@ -1,11 +1,15 @@
+> > >> -// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
+> > >> -/* Copyright 2020 NXP
+> > >> +// SPDX-License-Identifier: GPL-2.0+
+> > >> +/* Copyright (C) 2022 Sean Anderson <seanga2@gmail.com>
+> > >> + * Copyright 2020 NXP
+> > >>   * Lynx PCS MDIO helpers
+> > >>   */
+> > >>  
+> > >> -MODULE_DESCRIPTION("NXP Lynx PCS phylink library");
+> > >> -MODULE_LICENSE("Dual BSD/GPL");
+> > >> +MODULE_DESCRIPTION("NXP Lynx PCS phylink driver");
+> > >> +MODULE_LICENSE("GPL");
+> > > 
+> > > What's the idea with the license change for this code?
+> > 
+> > I would like to license my contributions under the GPL in order to
+> > ensure that they remain free software.
+> > 
+> > --Sean
 > 
-> Changed from v4:
-> 1. patch 1,3: Applied Krzysztof's tag.
-> 2. patch 1: fix header path in description.
-> 3. patch 4: drop duplicated module alias.
-> 4. patch 5: make sg2044_clk_desc_data const.
+> But in the process, you are relicensing code which is not yours.
+> Do you have agreement from the copyright owners of this file that the
+> license can be changed?
 > 
-> [...]
 
-Applied to soc-for-next, thanks!
+I think there is a misunderstanding here.
 
-[2/5] soc: sophgo: sg2044: Add support for SG2044 TOP syscon device
-      https://github.com/sophgo/linux/commit/f18198c0de56ea636c74312bd09b9d67273412d8
-
-Thanks,
-Inochi
-
+Of course the licence for the file remains dual BSD-3-Clause and GPL-2.0+ up
+to the change Sean wants to contribute. However, as he only permits GPL-2.0+
+the file after applying the change would then only be covered by GPL-2.0+ and
+no longer by BSD-3-Clause. Legally speaking there is no need to ask any of the
+previous authors for permission because they already agreed on having the
+code under GPL-2.0+ **OR** BSD-3-Clause, which means that everyone is free
+to distribute it under GPL-2.0+ (which is already the case when distributing
+it along with the Linux Kernel, obviously). Only netdev maintainers need to
+agree to drop the BSD-3-Clause licence **from future versions including his
+changes**, and there are obviously reasons for and against that.
 
