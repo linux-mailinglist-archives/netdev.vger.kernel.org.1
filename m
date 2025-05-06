@@ -1,132 +1,208 @@
-Return-Path: <netdev+bounces-188307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188308-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C977EAAC0ED
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 12:08:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B83F3AAC10F
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 12:14:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 09B347BD0C1
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 10:07:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A95453AD1A5
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 10:13:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20F5B26AAB2;
-	Tue,  6 May 2025 10:08:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fVCYukBZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 378652750EB;
+	Tue,  6 May 2025 10:13:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AD432701B6
-	for <netdev@vger.kernel.org>; Tue,  6 May 2025 10:08:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB502749FA
+	for <netdev@vger.kernel.org>; Tue,  6 May 2025 10:13:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746526088; cv=none; b=EKjmUXqNbkZbSNkpiqeGr9CjGfPvJZJ0oHhBLt3TDd4eljOWr6DFhv7mdwbwklrCjeWtYImlBKVuv8lqdCI7byGuBSGjh2KW6b+RXg1yAHqOJzayIMVRQqJmr4p15SM+/d1YtZVRvZb7voFeTT8S5arHSTEkMr8JvrP+BBKBaRQ=
+	t=1746526433; cv=none; b=KR4B2BsAEG1LKHzeSjlRjt7upflmL0UxXi931zMPmt9v1qA9751b0z1QoDcrw9toHFetASGRKbhmu40Js83HY5C6NHKKdss25liCpcYUVfYbe2EYwWJ0HbCCeqs4331RvchvQsIt/SDG/djYcRoSdtTGw9AvLa9XsS1NAmZesi4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746526088; c=relaxed/simple;
-	bh=Wz6GfcLllA8wXtKZftbfMGr8twZTF0gIGI34vcXnxvA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Uk23mL14mgAtn8ytdDIxjtCazLn9bS1UxPi6fO87tI9+KA/WERkK5kX3QyQmJxEHO8DK98nTEWsEhpjY6FveqEDM8z+zSWi735x6Qjokp/Y83KkDJXBPQunwHLzFvngTL8KASTtAuQk2kQmhGg3WtVcyPAkuZwsrB51O/2+sUvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fVCYukBZ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746526085;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2KtQkNqGsM537amwwqhIUa++uqwpFX6sC1hurxsMCHI=;
-	b=fVCYukBZAHcpNHxC5l7aWX7MxV7r3Xaqfu8pedC+lsO3H0/OpjrnAl5l8/gjAw8U2qLuI9
-	ePCuOYmoJ5+qi/qWOtI+FzqEraPlzMHJCxxzZV8z0FBZDCPNv9z+r+xPAloQQVyRzT8fWU
-	GMFahnY1ok+YbT7zeWqEHFMRRtnEzXg=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-347-fscVzhC2MwaZWNm_Q-BVlg-1; Tue, 06 May 2025 06:08:04 -0400
-X-MC-Unique: fscVzhC2MwaZWNm_Q-BVlg-1
-X-Mimecast-MFC-AGG-ID: fscVzhC2MwaZWNm_Q-BVlg_1746526083
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43cf172ff63so26288725e9.3
-        for <netdev@vger.kernel.org>; Tue, 06 May 2025 03:08:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746526083; x=1747130883;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2KtQkNqGsM537amwwqhIUa++uqwpFX6sC1hurxsMCHI=;
-        b=jQy91HjndQiX6sLDP8gxu4xI8orjpcoeMjRZxcaaVc7feGdVIFiBCln/8X8XvXs6bm
-         WcNLx3yneBaLCkFzgppTIOvkRqNUNvLKbpZ34ZJMkZYRq8B1aNIRPX3KS/+TVPRuSBqd
-         xyKAZvNaeClRq7VJxHyBkhN9b+/CN86MKtwf+yJ0kcyjY9BDf7mgBmZjzLAlv+rBLS1e
-         pG4BDTcJaGeh3EMmKmWjT/OD78fFv9cO3+OCsog9XUX/aipUevZz3Y1hwPFwHUSfWcDy
-         eko/dElGv62H7Lej97myjQnYXDoQJ4F9wkMLNGA21Eg5c9F53wGsjoNKvKy4FNlyNjzu
-         lFQA==
-X-Forwarded-Encrypted: i=1; AJvYcCViGsoS3s9s3hsAv7YZlXulLtN63UXY0Upceasaf/LYkfKCTNVHrmwPl8KT5OGD0Amu+zSZVlU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6M2D1nYzvbA8BIGG7nIzhkKf/PfUR7B0p+6MBzZb6Oi1zyNWK
-	5ZjTTlVqiVPdg1+g4jwQbjUBF5DjirxUreEDYLcwYCX+b/O/iCRlPDIiVn2XaWQnaeFVhXwfKBf
-	UkhIqo8HRHhKqZVWtDrHgGjahq+fh0XwcRImjU/Ch+4cZZHi3S2TurA==
-X-Gm-Gg: ASbGncsZlH3E9glt+1Uas1IjcZqQO3d1Es3yTFoWSNsx7/vLVNE4GuYPIhvekvGOXs8
-	FYs7B6CNVbwHjt34+kJyxQqrlxPOGjMdbokmlHMyWSC2KpGgRqV8HQHuybvTrjRFSaNACLy6Xe7
-	ACY2Lmh/SmP0gIyDJco9vO9nW7NKU1nPpai8OhIWscXebSyP4dsFCFpPiw6qiL3bPROF3lYhv8j
-	sp3BwFImTaWo5Ord+8rLOuCxg7A/IxyQtp4JASSWPTo3GyQT7M8qxce7LkXPZKdRpXfiV6oRcv6
-	mVrHXkeBEFdyrr5ZvSFq4LUloYgB00pCiE5UpWNxZP6RFs8hjYUdXGv78LI=
-X-Received: by 2002:a05:600c:5304:b0:43c:fe15:41e1 with SMTP id 5b1f17b1804b1-441bbea0afbmr153287055e9.4.1746526082870;
-        Tue, 06 May 2025 03:08:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFhc03MBzoZWgjKorEMXR128n+knjgaDZEvqQTT3kpgSCz4Z047896lj5XIARk7un2ADQgeHA==
-X-Received: by 2002:a05:600c:5304:b0:43c:fe15:41e1 with SMTP id 5b1f17b1804b1-441bbea0afbmr153286675e9.4.1746526082521;
-        Tue, 06 May 2025 03:08:02 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2706:e010:b099:aac6:4e70:6198? ([2a0d:3344:2706:e010:b099:aac6:4e70:6198])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-441b2aecb60sm207881215e9.11.2025.05.06.03.07.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 May 2025 03:08:01 -0700 (PDT)
-Message-ID: <19f4f38b-9962-41d6-97b7-e254db3c6dee@redhat.com>
-Date: Tue, 6 May 2025 12:07:58 +0200
+	s=arc-20240116; t=1746526433; c=relaxed/simple;
+	bh=s0Sn9shh2OdtQ1A6mVl68Za//3NVUY5JIadoaSrHycY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Yw2pC7Fkn7ZweiWKfSkQOmZtuV5Kq85sA++NPTvf6e/XCKWHmEbUWRFGri9oA/y16mq2GeOc2n84SgrkTWMCtQBDPKA0ujt2kkY7jmQ5r1p6DseKhnxvQAQxvUa5+i7gTF3YuPg2t+7zHQtNmK1M1E6eJULd01x6T9UhHnfceH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uCFIp-0002e5-1m; Tue, 06 May 2025 12:13:31 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uCFIn-001NTM-1n;
+	Tue, 06 May 2025 12:13:29 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uCFIn-006WxM-1K;
+	Tue, 06 May 2025 12:13:29 +0200
+Date: Tue, 6 May 2025 12:13:29 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Thangaraj.S@microchip.com
+Cc: andrew+netdev@lunn.ch, rmk+kernel@armlinux.org.uk, davem@davemloft.net,
+	Rengarajan.S@microchip.com, Woojung.Huh@microchip.com,
+	pabeni@redhat.com, edumazet@google.com, kuba@kernel.org,
+	phil@raspberrypi.org, kernel@pengutronix.de, horms@kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com, maxime.chevallier@bootlin.com
+Subject: Re: [PATCH net-next v8 3/7] net: usb: lan78xx: refactor PHY init to
+ separate detection and MAC configuration
+Message-ID: <aBngyYuyyXqV18G4@pengutronix.de>
+References: <20250505084341.824165-1-o.rempel@pengutronix.de>
+ <20250505084341.824165-4-o.rempel@pengutronix.de>
+ <c1b45ed298748aafbe3557d637707820bc37e2d2.camel@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 03/11] net: ti: prueth: Adds PRUETH HW and SW
- configuration
-To: Parvathi Pudi <parvathi@couthit.com>, danishanwar@ti.com,
- rogerq@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, nm@ti.com, ssantosh@kernel.org, tony@atomide.com,
- richardcochran@gmail.com, glaroque@baylibre.com, schnelle@linux.ibm.com,
- m-karicheri2@ti.com, s.hauer@pengutronix.de, rdunlap@infradead.org,
- diogo.ivo@siemens.com, basharath@couthit.com, horms@kernel.org,
- jacob.e.keller@intel.com, m-malladi@ti.com, javier.carrasco.cruz@gmail.com,
- afd@ti.com, s-anna@ti.com
-Cc: linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, pratheesh@ti.com,
- prajith@ti.com, vigneshr@ti.com, praneeth@ti.com, srk@ti.com, rogerq@ti.com,
- krishna@couthit.com, pmohan@couthit.com, mohan@couthit.com
-References: <20250503121107.1973888-1-parvathi@couthit.com>
- <20250503121107.1973888-4-parvathi@couthit.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250503121107.1973888-4-parvathi@couthit.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <c1b45ed298748aafbe3557d637707820bc37e2d2.camel@microchip.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 5/3/25 2:10 PM, Parvathi Pudi wrote:
-> +static int icssm_prueth_emac_config(struct prueth_emac *emac)
-> +{
-> +	struct prueth *prueth = emac->prueth;
-> +
-> +	/* PRU needs local shared RAM address for C28 */
-> +	u32 sharedramaddr = ICSS_LOCAL_SHARED_RAM;
-> +
-> +	/* PRU needs real global OCMC address for C30*/
-> +	u32 ocmcaddr = (u32)prueth->mem[PRUETH_MEM_OCMC].pa;
-> +	void __iomem *dram_base;
-> +	void __iomem *mac_addr;
-> +	void __iomem *dram;
+Hi Thangaraj,
 
-Minor nit: please respect the reverse christmas tree order above.
+Thanks for the review!
 
-/P
+On Tue, May 06, 2025 at 05:31:30AM +0000, Thangaraj.S@microchip.com wrote:
+> Hi Oleksj.
+> Thanks for the patch.
+> 
+> On Mon, 2025-05-05 at 10:43 +0200, Oleksij Rempel wrote:
+> > EXTERNAL EMAIL: Do not click links or open attachments unless you
+> > know the content is safe
+> > 
+> > Split out PHY detection into lan78xx_get_phy() and MAC-side setup
+> > into
+> > lan78xx_mac_prepare_for_phy(), making the main lan78xx_phy_init()
+> > cleaner
+> > and easier to follow.
+> > 
+> > This improves separation of concerns and prepares the code for a
+> > future
+> > transition to phylink. Fixed PHY registration and interface selection
+> > are now handled in lan78xx_get_phy(), while MAC-side delay
+> > configuration
+> > is done in lan78xx_mac_prepare_for_phy().
+> > 
+> > The fixed PHY fallback is preserved for setups like EVB-KSZ9897-1,
+> > where LAN7801 connects directly to a KSZ switch without a standard
+> > PHY
+> > or device tree support.
+> > 
+> > No functional changes intended.
+> > 
+> > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> > ---
+> > changes v6:
+> > - this patch is added in v6
+> > ---
+> >  drivers/net/usb/lan78xx.c | 174 ++++++++++++++++++++++++++++------
+> > ----
+> >  1 file changed, 128 insertions(+), 46 deletions(-)
+> > 
+> > diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
+> > index 9c0658227bde..7f1ecc415d53 100644
+> > --- a/drivers/net/usb/lan78xx.c
+> > +++ b/drivers/net/usb/lan78xx.c
+> > @@ -2508,53 +2508,145 @@ static void lan78xx_remove_irq_domain(struct
+> > lan78xx_net *dev)
+> >         dev->domain_data.irqdomain = NULL;
+> >  }
+> > 
+> > 
+> >  static int lan78xx_phy_init(struct lan78xx_net *dev)
+> > @@ -2564,31 +2656,13 @@ static int lan78xx_phy_init(struct
+> > lan78xx_net *dev)
+> >         u32 mii_adv;
+> >         struct phy_device *phydev;
+> > 
+> > -       switch (dev->chipid) {
+> > -       case ID_REV_CHIP_ID_7801_:
+> > -               phydev = lan7801_phy_init(dev);
+> > -               if (IS_ERR(phydev)) {
+> > -                       netdev_err(dev->net, "lan7801: failed to init
+> > PHY: %pe\n",
+> > -                                  phydev);
+> > -                       return PTR_ERR(phydev);
+> > -               }
+> > -               break;
+> > -
+> > -       case ID_REV_CHIP_ID_7800_:
+> > -       case ID_REV_CHIP_ID_7850_:
+> > -               phydev = phy_find_first(dev->mdiobus);
+> > -               if (!phydev) {
+> > -                       netdev_err(dev->net, "no PHY found\n");
+> > -                       return -ENODEV;
+> > -               }
+> > -               phydev->is_internal = true;
+> > -               dev->interface = PHY_INTERFACE_MODE_GMII;
+> > -               break;
+> > +       phydev = lan78xx_get_phy(dev);
+> > +       if (IS_ERR(phydev))
+> > +               return PTR_ERR(phydev);
+> > 
+> > -       default:
+> > -               netdev_err(dev->net, "Unknown CHIP ID found\n");
+> > -               return -ENODEV;
+> > -       }
+> > +       ret = lan78xx_mac_prepare_for_phy(dev);
+> > +       if (ret < 0)
+> > +               goto free_phy;
+> > 
+> >         /* if phyirq is not set, use polling mode in phylib */
+> >         if (dev->domain_data.phyirq > 0)
+> > @@ -2662,6 +2736,14 @@ static int lan78xx_phy_init(struct lan78xx_net
+> > *dev)
+> >         dev->fc_autoneg = phydev->autoneg;
+> > 
+> >         return 0;
+> > +
+> > +free_phy:
+> > +       if (phy_is_pseudo_fixed_link(phydev)) {
+> > +               fixed_phy_unregister(phydev);
+> > +               phy_device_free(phydev);
+> > +       }
+> > +
+> > +       return ret;
+> >  }
+> 
+> Could see as per implementation, this case might hit on normal phy
+> other than fixed-phy too. Should we not add any cleanup for phydev
+> here?
 
+You're right to ask — but in this case, we don't need to clean up
+non-fixed PHYs, since we only probe them using phy_find_first(), and do
+not allocate, register, or attach them in lan78xx_get_phy(). So no extra
+cleanup is needed in the error path for those cases.
+
+If we ever call phy_connect_direct() earlier in the flow, we would need
+to add a corresponding phy_disconnect(), but that's not the case here
+yet.
+
+Best regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
