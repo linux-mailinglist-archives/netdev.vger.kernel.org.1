@@ -1,92 +1,99 @@
-Return-Path: <netdev+bounces-188329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 887FFAAC336
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 13:59:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6788AAC347
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 14:01:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9D2E5073EF
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 11:59:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76D7C3B085F
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 11:59:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D62CB27CB2E;
-	Tue,  6 May 2025 11:59:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96CE427CCD7;
+	Tue,  6 May 2025 11:59:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="dTiLF/vD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p7L5EbSz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A7227CCEF
-	for <netdev@vger.kernel.org>; Tue,  6 May 2025 11:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7009127CB31;
+	Tue,  6 May 2025 11:59:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746532752; cv=none; b=nhtyCMu8wpIO1fP6aV2C8eRhXxdn1SpUfiTnFmRW9Ela5+hU+6oUnKtZLVcz/ewxXrSr9fJcS0JfKzyTxfe0I3te3hB7KqchxZNnW47zjP4RY57Zb29n6m9Tdx2bphe7QuJD9+FQ4zUFokA3/Si/TguqELj9oWgrmdjXrBa5Chs=
+	t=1746532795; cv=none; b=eCcZQdIjHPZBnLBL5oBT8KVEr+ozZSkxPn7CXLcK5CxH0VW0RrpEXXbveyL7jfmhrbrRWsorsrWYx09sgM67mSLyjxjFsonSFy0aUyOR5XMcYnQ6tARokdsn4BnmuatI6JpxWgxDaCBYF5G9ige/WHQtjaAz35b3SV5LJkXNo2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746532752; c=relaxed/simple;
-	bh=NyqlLtehw6NEZwHZhrtwtvudG/4S1rt+vJ+01aCwitU=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=YJWbe3fCy8FNRMtOl5KYAX5W2bClWCITpw99yfruBmukCE6VkoReh600DTHazZ2J7jN3l2xrYLJKE39PZ/mWaEkHZY9As1feXXS6/onE49cMSu0tfNfINrmZlfeC4VPvPKQtsXTKzd3gK20VWbajJ0OXwCExwldUqtjW+oeqVWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=dTiLF/vD; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-73bf5aa95e7so5224195b3a.1
-        for <netdev@vger.kernel.org>; Tue, 06 May 2025 04:59:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1746532750; x=1747137550; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=NyqlLtehw6NEZwHZhrtwtvudG/4S1rt+vJ+01aCwitU=;
-        b=dTiLF/vD0QZLiVUo/vLoEArK8s96RVwwsQad9Ek4iBWNH//nK4AC6UTKgwHFfTba81
-         zp1HMTnQoe6nx02qJeWRc+wbokqZfH5SHTGYR05FEj6TxWhFPf/Islf+cjRaRRy0O99f
-         NtGHL40HRcA9lAIFoNWn14Jjpbwi0yNF49WCbFi9+v1bpkEBZT6UEIeWBoPV8EeA4cmW
-         BjhJzpBkMD04jPaay2chMKfT7oLC1KDPV9cmbS5BAC1XkVQSeohA+Vr4DcamuF0AeOf1
-         pUqhkVXgtrm6Cpl3JF8Hm+ptZQQMHQMSjsyoPmXfzCHYH3UuotToA+CA8neZmmx1waLt
-         wkCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746532750; x=1747137550;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NyqlLtehw6NEZwHZhrtwtvudG/4S1rt+vJ+01aCwitU=;
-        b=FlPzjnva9nlz9WfshFUF8jjHWM94POEaVZkfD12xpnmTul+uhwpWcdwAfUIh+WD67n
-         LnEEEDGxnsdayVTIDRkCzBzw/pO8APmnqb1VrnMya6kBIgw5SbZZSgLpypaQzKxvaFB8
-         NPX6df3KAskrvYEi5JK4CA2DcLGLC3dS0QtgiH1dwn0aTjy2mgPIz5l2yoZuoYFGfFha
-         fnFI+yS9fg20klxFzax2OJQ6EDB2AKAqN2b4UoT+lADYl033ga+dHDxptaXb1o7BMU56
-         zTHyg13AYZz8y4z37F1WkTRtMQfxRNpgtEKm4JGX1vKQMI0q5jWL0+svMQgOaveXg7Er
-         CVew==
-X-Forwarded-Encrypted: i=1; AJvYcCWe67oDQPeiOdmnMChiqZFXzUCccvbn92ewPraZHYN5thWznZk03EUJapPHB5yrpOQwxteuAfI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeGaguuz92TFSHWm9Nd9veobsZd94ke+vUJ106OJrl0qajZ5kE
-	nhb/6Nasu7MEuc7h4COkRsF2Eyv+f6Y0gkCGId3FY5AG8DwHfJNCFro3elXDm7XEP3R4Gom3GPK
-	kcONRxA6qVeeTrJxubzS8j2s+Y91ny+Ti2C7G
-X-Gm-Gg: ASbGnctydpz9qUQp9lSzaDgK+RyTjwu7GvTpFXjBRVM7H2HL6tC14wsTrF/J4+9EBKL
-	FPEpfqfj+Mt8VI932EIRt9YWhpCbnJKtan0Fnhu4rBMimhxpDJsg60Yv43zfBSgWPWNHSIQ8ddZ
-	qn0QPLnxF/VmuZ9Yrqdi8y
-X-Google-Smtp-Source: AGHT+IH6C/0gFATwnZjsJhbxrm8TTvV5eoVuZpAaU1+U/3Qp7nKP9FlafeyEQWCCVx80cUFCf/4eCpYmdRIlY6BBgno=
-X-Received: by 2002:a05:6a00:410a:b0:736:a694:1a0c with SMTP id
- d2e1a72fcca58-7406f1a3c57mr14800393b3a.21.1746532750370; Tue, 06 May 2025
- 04:59:10 -0700 (PDT)
+	s=arc-20240116; t=1746532795; c=relaxed/simple;
+	bh=7Sg/XeS6j36e1f9i8iczSP4VRhrz2+oSrIEypk8cmQY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=rdlXK3dSKLgRenFB2uHEGWZflj4PAgYHX6sPYIXvmz6iUHnfZo0hhM+VUIkiBdJYK2dboZJcrJWhiyVmcN08t98SNJJ0wfJ6lxW1cnADz4A/Xgz+Qx5NwzkFIbaPtuMmAV/RcVt+oehCnsPxw3jbV1s8GMICAQWKK6uPKlePOOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p7L5EbSz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E4C6C4CEE4;
+	Tue,  6 May 2025 11:59:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746532795;
+	bh=7Sg/XeS6j36e1f9i8iczSP4VRhrz2+oSrIEypk8cmQY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=p7L5EbSz9jf4lgXejuBDmiHsIB8vp2yrK00DAaLNIfQzP3YUtZLKpLTAaKBy1QoNL
+	 DVzKr9nJsY+/7E9ibfhlKaXo/FRxqU6XQIPOnhY+gUdksQkRjw2hnyQZ10AleXI+LW
+	 1hz5vBWeetFITqYFZaP8cz1q/1uynNJKPiSNzPaKVCLWjcQ569G1AyIGhSd4McjWWC
+	 gNvgvWqAReYkUWfmZY8Lh2WrXIsNsG0GJJmgsHuPV24p0vf4Zt8WMsPlnYApSti+mK
+	 zimRmcP5z+xAmwjiu2gckR9w/qYJ0J9/DZs3JojQrMn8wAYRTveWq5gZYuiMC0+8/L
+	 LFkdteZ2LTMAA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDB9380CFD7;
+	Tue,  6 May 2025 12:00:35 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Tue, 6 May 2025 07:58:59 -0400
-X-Gm-Features: ATxdqUGK0ZJBoMWyZuod1iyhP7hESb5eVicVgHc1O5BqtxAsguzHp6UUTdQwdfw
-Message-ID: <CAM0EoM=OSi8njcK5aLUVKRNH8TxQKfx_y=iXQZ2ySaTccuBtaQ@mail.gmail.com>
-Subject: 0x19: Slides up!
-To: people <people@netdevconf.info>
-Cc: program-committee@netdevconf.info, 
-	Lael Santos <lael.santos@expertisesolutions.com.br>, 
-	Christie Geldart <christie@ambedia.com>, Kimberley Jeffries <kimberleyjeffries@gmail.com>, 
-	Bruno Banelli <bruno.banelli@sartura.hr>, lwn@lwn.net, 
-	Linux Kernel Network Developers <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2 1/2] net: ethernet: mtk_eth_soc: reset all TX queues
+ on DMA free
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174653283451.1493761.12837257504091062082.git-patchwork-notify@kernel.org>
+Date: Tue, 06 May 2025 12:00:34 +0000
+References: <c9ff9adceac4f152239a0f65c397f13547639175.1746406763.git.daniel@makrotopia.org>
+In-Reply-To: <c9ff9adceac4f152239a0f65c397f13547639175.1746406763.git.daniel@makrotopia.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: nbd@nbd.name, sean.wang@mediatek.com, lorenzo@kernel.org,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, eladwf@gmail.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
 
-As the subject says: slides/papers for netdevconf 0x19 are up. Enjoy!
-0x19https://netdevconf.info/0x19/pages/sessions.html #netdevconf
+Hello:
 
-cheers,
-jamal
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Mon, 5 May 2025 02:07:32 +0100 you wrote:
+> The purpose of resetting the TX queue is to reset the byte and packet
+> count as well as to clear the software flow control XOFF bit.
+> 
+> MediaTek developers pointed out that netdev_reset_queue would only
+> resets queue 0 of the network device.
+> 
+> Queues that are not reset may cause unexpected issues.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2,1/2] net: ethernet: mtk_eth_soc: reset all TX queues on DMA free
+    https://git.kernel.org/netdev/net/c/4db6c75124d8
+  - [net,v2,2/2] net: ethernet: mtk_eth_soc: do not reset PSE when setting FE
+    https://git.kernel.org/netdev/net/c/e8716b5b0dff
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
