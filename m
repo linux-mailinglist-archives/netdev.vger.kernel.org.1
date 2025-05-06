@@ -1,269 +1,289 @@
-Return-Path: <netdev+bounces-188317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B48BBAAC27F
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 13:26:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F595AAC288
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 13:27:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F33C1C26F59
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 11:26:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B3271C27CAE
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 11:27:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52EE1279787;
-	Tue,  6 May 2025 11:25:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E612627A457;
+	Tue,  6 May 2025 11:27:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="qy5MOflZ"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Es+siBr3"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2040.outbound.protection.outlook.com [40.107.223.40])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2047.outbound.protection.outlook.com [40.107.94.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95826278E5D
-	for <netdev@vger.kernel.org>; Tue,  6 May 2025 11:25:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F7DC220F56;
+	Tue,  6 May 2025 11:27:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.47
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746530724; cv=fail; b=qi6D+rOP5C8xbm9yAd898idvsH4A7TF37yQ8c4D/nMCDfVqBYc7CnEu2cxweX2oErbLz3wIb6GqsDWnVfvXhLzXERoWEl5zGDDHrFfeNE+ZBaBWKqVAEBouJG6y4jPMFIJHlvMfl5Y90UHfBU1iTa8cS0PczSfcRuZiZ3iJOtdc=
+	t=1746530853; cv=fail; b=fe2zXNil02tz0wqfukI9mIlRB3BD77WksdCWAZP8khTIXE5QCA8ZwKr3QfoMmjnni45sqono6l7PCQS37TKyILM4XPn0LbF567kXtj7+bAIF8ANi5Tlfv3TGnAFM85vqENT7YAgAM/h2pjSmIa8CYwm1Xq/o0/8fcC52ml0Z690=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746530724; c=relaxed/simple;
-	bh=xJ/R0y07jIrsL1A2/T6XCOwbsaoPQZ6EIyPxY1XR4WI=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=D0cX358CiP9dYgknpLFKI10z4scJegQIhmG2ocAsw3KB4qjFWu2v9ugDP842GJpZYyfRCP/1vtO34qCeJ3Jj2d/2fK9uFZxIEdd5sBZZGi6OYNe5smDvOrvSWYPelOFnjz2KJQUuHAGBeoeFEi0/nF3URjaBmA/SDMeU+dwAjw0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=qy5MOflZ; arc=fail smtp.client-ip=40.107.223.40
+	s=arc-20240116; t=1746530853; c=relaxed/simple;
+	bh=/NgFLTfsCkLkeuFDRUdW2w6qIDHdzsiPUp9napo0ozY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tiz33Syh3CpZDjL4UzzhhPhrcbdrjX++NYfIoj+0mK8Fq3SRLzmP6iXwpR/KE1+TfbCRftVPi9DtJrbnhljdNoz+/zpwXCsTDB1GpWHrlwwJsyD7mE5HrWJhcVRLnJsYl06n31EHWrEz4wGktQzg4jyXz7fBk7oNAqDu5TMsr5Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Es+siBr3; arc=fail smtp.client-ip=40.107.94.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tUDV19w5L9xmGxjfA6Q17ZcLi/mU6bcU3WQEO/N4VKj/0YRe1xUVMq2bF44SIUseq6aNXFgWCrEzO/Cl5eXuyzp+9vdUI55UmEyxzC88ieaZxTZZfTL9Pu5a+Fig9kNOBJMpALkL+YkR7CsxknEVnxPAZsyv01GsM6zi60Rso/xKYhBwknv7h93MUee5TMy6yD/tYrD5jCm/bgZA+UJsok0vgm+q8kHOpqgTjqtz8KkEakekmsh5i+FD6k7cRvBuTIVI3/q/y8eKpMOmxcs32hX7ZdPUAEJDZbXuEtDhSqKcGYr8a3jhMyzABTHdwUN5vvYxXk+3gNT86JEzUUjo7w==
+ b=gkhg0M471dZE6PJhWw0o3WSiNHbkCJ9MLOve1D/4KPDj7vXb+G+wNxd+VV6ZqXxD4zZaVDUIueAzHDamtVzSlrXd+KfEX2DfQVSl8qKb8EY357xskTmcFs98ayAfJs+xg62FIyR7U+NX+Xn7vJ4Td4Ff9Rfm6PsXkbIubeUhOoCzuyiFnPPnnyta7wkkkoprx4K/BScID2J+97B2Qzc6WwwXGTKSWgz0zJtiiJnC1o2jv9milk1pzC39FGFTT8bPR8rWuL634/5ICypL9MEmVzpwk/TAfjj9lWUSErgJLYmRxX4WJEg9rr9KJYvxrf+vzsYYgrELv9tKnP2Qs18a6w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=x2yzsfV84eSuX78QDcFYfbjo8/6wktiaja6jc+Nt6L0=;
- b=Ky/fx5TktoMe7TrCOk723SFpxWWl5xERBfT2OcnNfaj51Poqo9hVMs0aMFoDgPfLGYrZAzW/5cV2/CKI4LcM6988XXougO07plKiIS2aVpw/9m/vI7lRQshCcBvs0stohmb7L5nFFy6Axy/WUzCcuZ1fGloTV2ZV/TpbCejSCDqltsjWRGtEwLFLvOMY3pt8HWUPbSXWrSlT1ZudP38YiqFKmWCjGAl6ZwzfgBi7GxBzFMq1P6vwErOOVexvSzO6/bKBlNeyVphQNYS4JHBlfCAd7pqJUNbWSPweJgdg++JrFHh7Jf/Om+LTOogvLhPyX0T4q0r2iC79o9fuxNPTjA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
+ bh=6lRTcniRxYxYRNdf6QHvAMnQPmoqc903mY0H4Jjaky0=;
+ b=wL+sx7JeNlfYiyu/WrDFYyhYtw2hpcfVDQ9G7VWPDz+IycEEM1Bs6e0KWyGEWJLx5IeXO2Tby/WgrjadFMW3IyYZZah9SlNExxxC1oUop3zCbropvemEfrILyPsikDQ9Qpp6ErM9Dso/KgFzw6UaqaMjUolE2kT2lW14HzA3rIFfRnkPTcnLjBoDz+4Dzblk8sfU9slj1nRqgiWzLrVIbJDNfO8dWeepnacfcABIcajiXhGeuf6nPOMb7WdS5suow+ICAiCIz8Lj4zEXX91p3hNutAKUVhoqgY/wr3GsH8SlqZrqJFYPtIZQCSr/ioMRwuXN69kK8S+ac3Edad0kJw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=x2yzsfV84eSuX78QDcFYfbjo8/6wktiaja6jc+Nt6L0=;
- b=qy5MOflZCZ/VI+h0O69BRDF3/9aeqoCNsyig5pV147nehMGtZtvcPGES+kG3u32xv4cHrNIKqvz9SMafuQA9kR6viBdmQpCbtMrfRNvU97yUa5fvOfTczTq3v+FrJTZt9Pey7yh25y7k0Gbc4r3OEbZbB2xCz/86cHpG+lQwXRJ9WXjwnUQvhY0tRDgZXfcWnCUbzgVVg5nJi2BWNn1T7oYoZZtlEQDsjtpeu+TWByz8CK58fIX/PYB00ALunAI2S9MQz4ShAUAuuAlNPiXOqRRp4sgiCgOaekqcdhmwLqkZ6a0rT2J1XPrE91d8RI09zr/f28tEvYueJo7ZjXvpsQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB7548.namprd12.prod.outlook.com (2603:10b6:610:144::12)
- by CH2PR12MB4133.namprd12.prod.outlook.com (2603:10b6:610:7a::13) with
+ bh=6lRTcniRxYxYRNdf6QHvAMnQPmoqc903mY0H4Jjaky0=;
+ b=Es+siBr3n1lmHqiJv880Q1fr6UUKf0tnIQvBQLz77RXbOtMyENIPbxN+ySDarnfzbg1tDrQzufZYoDxy5Jmd134BlTslO6/md997lKIINvbKTPKzyqBFxos5M5QIdj7VKn3yBn5ckXnV4g305uiAG972u/QB4h2Q3pPaRLGBcKycxEja4xCUAqhKx2EscprNHk0fGmBBFtlXYu0LAweVVeFzFyJN+Vre6LI09wQ8CaTgNIiy1/ua6yxbJ627nw4toy4mZA82IijF6WSCsKDeYSRmIzMRr8eI/Fhzx/0Y0V523LBLBe36X9Q7vCb6gGu732cAIwDPV8FE19iJFmhzow==
+Received: from DM6PR02CA0126.namprd02.prod.outlook.com (2603:10b6:5:1b4::28)
+ by MN0PR12MB5786.namprd12.prod.outlook.com (2603:10b6:208:375::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.29; Tue, 6 May
- 2025 11:25:15 +0000
-Received: from CH3PR12MB7548.namprd12.prod.outlook.com
- ([fe80::e8c:e992:7287:cb06]) by CH3PR12MB7548.namprd12.prod.outlook.com
- ([fe80::e8c:e992:7287:cb06%3]) with mapi id 15.20.8699.026; Tue, 6 May 2025
- 11:25:14 +0000
-Message-ID: <c19e7dec-7aae-449d-b454-4078c8fbd926@nvidia.com>
-Date: Tue, 6 May 2025 14:25:10 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net-next 0/5] devlink: Add unique identifier to devlink port
- function
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Moshe Shemesh <moshe@nvidia.com>, netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Donald Hunter <donald.hunter@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
- Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Tariq Toukan <tariqt@nvidia.com>
-References: <1745416242-1162653-1-git-send-email-moshe@nvidia.com>
- <20250424162425.1c0b46d1@kernel.org>
- <95888476-26e8-425b-b6ae-c2576125f484@nvidia.com>
- <20250428111909.16dd7488@kernel.org>
- <507c9e1f-f31a-489c-8161-3e61ae425615@nvidia.com>
- <20250501173922.6d797778@kernel.org>
- <d5241829-bd20-4c41-9dec-d805ce5b9bcc@nvidia.com>
- <20250505115512.0fa2e186@kernel.org>
-Content-Language: en-US
-From: Mark Bloch <mbloch@nvidia.com>
-In-Reply-To: <20250505115512.0fa2e186@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR0P281CA0109.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a8::9) To CH3PR12MB7548.namprd12.prod.outlook.com
- (2603:10b6:610:144::12)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.19; Tue, 6 May
+ 2025 11:27:23 +0000
+Received: from CY4PEPF0000EE36.namprd05.prod.outlook.com
+ (2603:10b6:5:1b4:cafe::9b) by DM6PR02CA0126.outlook.office365.com
+ (2603:10b6:5:1b4::28) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8699.31 via Frontend Transport; Tue,
+ 6 May 2025 11:27:23 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ CY4PEPF0000EE36.mail.protection.outlook.com (10.167.242.42) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8722.18 via Frontend Transport; Tue, 6 May 2025 11:27:22 +0000
+Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 6 May 2025
+ 04:27:09 -0700
+Received: from drhqmail201.nvidia.com (10.126.190.180) by
+ drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Tue, 6 May 2025 04:27:10 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
+ (10.126.190.180) with Microsoft SMTP Server id 15.2.1544.14 via Frontend
+ Transport; Tue, 6 May 2025 04:27:05 -0700
+From: Tariq Toukan <tariqt@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
+ Lunn" <andrew+netdev@lunn.ch>
+CC: Jiri Pirko <jiri@nvidia.com>, Gal Pressman <gal@nvidia.com>, "Leon
+ Romanovsky" <leonro@nvidia.com>, Donald Hunter <donald.hunter@gmail.com>,
+	"Jiri Pirko" <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>, Saeed
+ Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan
+	<tariqt@nvidia.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, Moshe Shemesh <moshe@nvidia.com>, Mark Bloch
+	<mbloch@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>, Cosmin Ratiu
+	<cratiu@nvidia.com>
+Subject: [PATCH net-next V8 0/5] Support rate management on traffic classes in devlink and mlx5
+Date: Tue, 6 May 2025 14:26:38 +0300
+Message-ID: <1746530803-450152-1-git-send-email-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.8.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB7548:EE_|CH2PR12MB4133:EE_
-X-MS-Office365-Filtering-Correlation-Id: d61decae-041d-4841-94d4-08dd8c90abc2
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE36:EE_|MN0PR12MB5786:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5a33cce1-9208-4120-dabe-08dd8c90f898
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016|7416014;
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|7416014|376014|13003099007;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?U0JpOVV0VGh5ZUdDTHlCcDJmMU8wQnhOckhiZ1F5YzRXS1pJSHNlK3dadGZN?=
- =?utf-8?B?aU1YdUltN1BucytRdGY1RTk1L1MvQnpOWDRRVnViVXVKM0dCY2JqVWdlanZB?=
- =?utf-8?B?a1BhWEVrcSthcnBVdlNNVkk5UWFKY0RLRG1Idy85WHF0dE9sOHB1YkY1TG14?=
- =?utf-8?B?WHg3Y24wOXJjdmIyVnV0S24wcG5HR3lsWXUyOHRudzhqUm9NaWE3UTlvODBN?=
- =?utf-8?B?MVJDeVdCSTM1ajZpOTQxTzJCK0xObE4wcm9iQjRQUlZjb0JWN2dkSG8wbWxi?=
- =?utf-8?B?THlmMGlpdWhvZ29aUlF1Smt6ekxraEVTWmc4TFdKM2V6UjdnREdCV25na1Q0?=
- =?utf-8?B?Q3pTcWU0bUMyQnluVC80NXh0TEhvK1NmSm9wZSt4cmFiRWlCdVNTZTNSRU9i?=
- =?utf-8?B?N2c5MWZwNjdVa2V3NzRCdENnOFQzMVZtYlNjK1lWcDNWUWpWSE05YW9NQ2Fz?=
- =?utf-8?B?QmExTGQ2TlBUaGpnTXR5S3FEZWVxNzAwQVI1ZDFnSlA2dFd0ZjJ2dnZ0bWR1?=
- =?utf-8?B?NEZ1YnhjMHlwVVl2OGJBb2R6cUdZd0ZXV09LeGJINVNGZWM1emJQZ25LU2NP?=
- =?utf-8?B?N2MxS3RjV3BXMU05aTRocWRzSm9nWlQ0Mlgyb2hnbUJsaEpxWms4K25rbVlq?=
- =?utf-8?B?eCttVkhyNVNKRFNHbjZ3MGV3OHFpY0FwYzZLT3VjN1o4aVZxSkNEV3FadTV6?=
- =?utf-8?B?ZjFlaktISWJHTmhmbnJiOXprZXpzUFgvdUZzUGtTMHdCOVdBdHBiNVBQbXlG?=
- =?utf-8?B?b3YxTWQ5K0wzakwxZlQ1Q1FuckN1eVd6MVNtRVRXVG5sK2tjcFpHQVRQZytG?=
- =?utf-8?B?S2FLdk1rSkpHalhKbUdCQmdnU0NsQXROczNqbWFlQTZJTnpWTGVpYTA3Qk1B?=
- =?utf-8?B?UDZiTXJYTURaanczTnBIczhWMHRxcnlqSGw3akJHY1V1Ylg1aDNHT0RHNkdp?=
- =?utf-8?B?ZEZwSTIrbDdqbUNuNElySkpnTm85b3Q1YUNNTlU1TVk4SnJ2REdKS1c2N0lh?=
- =?utf-8?B?YVk1M3VQUnlteTlXZ016YnpjTkFHUG1Tc2RVWVU4T1Z1S0hiT3c3d2h0V1h2?=
- =?utf-8?B?SkFOMytETFd4b3pNalNTVDlkamJIVXltTlZmYjFDSmZ6NWZKb2RwdnQvY1ph?=
- =?utf-8?B?Y3daWkFwMTY5MldEUVRXc3dLVGVsK2JMMlhWOVFCY2xJcHFTbU9FZ0RjL1cy?=
- =?utf-8?B?ZXQ4b1FwQnFyVGM4a2ZkYXJMUlZ3Sk1zWDUxcTlRUStrdklqNnJ3NDVMS3Bn?=
- =?utf-8?B?VFR2T2RCL2VWa1lsdlJOekZhRmJjZEl6bERvbG5tdFloMXZGSEQ2aHcvRXd2?=
- =?utf-8?B?YnZva0ZmNi9KZnExV2o0L1NMOGhIRHZwcjZNV2JwWXJ1SDJpSDZRZ3ZZVWdG?=
- =?utf-8?B?Tys3RlErWEFqeUt1UEpNZTlFaDFpZDE0UEx6RktEdmRjemVIM1hPQUk4ejhZ?=
- =?utf-8?B?QUlZMVhmdkpuWjRVZS9leHM2YVM4b21oWEwvMGN1UEpMdHNDdFBKSnhVdlU4?=
- =?utf-8?B?VzFvNVVXVzQ4eEw3bGM5T1EvRWlucEZseWpUMWVaMUhHcWZhQ3dac1VaalNU?=
- =?utf-8?B?dXBLRm9aODVqdmJud24wV2tUeFNLZitEVjY1bzRxZG9aM1JhRVg4RW9UeUVZ?=
- =?utf-8?B?S0xJNDNTU0xyVy92ME1RL2M4ZW85ODlTRjdnUWR0QTBHV3pNSG5YZU1OQmNP?=
- =?utf-8?B?M0IzN21FTzhvam5aR2VxbTdXaXV0YkhzQjQ5bUN4dGgwV0YwbmxNSHZpQzVj?=
- =?utf-8?B?T1VwNlFKT1NGcnFrcG9FN2NDTVAvTTdiUkdXZXpBWWM5UUFYUUJmZHV6Z201?=
- =?utf-8?B?eG5QZ3F0UXZwRVlQckRZc2hFUFI4Rkt2R1JENmpyNGFYSit0VlBYZ21VVzhm?=
- =?utf-8?B?Z21MdnR5YmZmZ2RBbzlQbFcwQXFEWnBNb0pMb2FVVkhLYldIaEJYekJtY0ZR?=
- =?utf-8?Q?aGr41Ut33ko=3D?=
+	=?utf-8?B?K3JYbDQ5dm4xV2ZrZ3piWDl4NytvZFF6NCtyd3BtVVpjQVNaOVpaUVYwRGt1?=
+ =?utf-8?B?Nk83M0RDOS9mZzkyZjhVTVFTQ1BKM2pmUjdoaFpTQ3BkdkpibkRqOTJaUmhV?=
+ =?utf-8?B?ZTRIL3dUWFQ0NUErVElXRGh2a0cyaEFKRllVWjFTK1Uyb3JvdUFrU1RPd1o1?=
+ =?utf-8?B?bnlFOElRK3Z2dHgrRE5FVW9tdnNOVnhvLzA0Nll4M1ZlZ3pndSt6aEdCU2Zo?=
+ =?utf-8?B?eGZLUVo1QVRFSVltUXA5bjlaVnA3dXIvbVhuVWVJZFdNVmlUZDVOenNNbHZM?=
+ =?utf-8?B?QlNrV01yZGtCTWFaa3gwM3pXcWwwZEk4WGlYRWx5dWFwWWgzdWc3cEtYc2gz?=
+ =?utf-8?B?YlV6bU5OYXZZNzVjQ3h2K284NW5tMnROZ053QUlIVy9aa1FmV1hJZndwcmtE?=
+ =?utf-8?B?eDNmNkhRZkQrOGVxZVMxSkMzZGRYbm5MQ05VTThYU2FtZ3dkYkdZb0JGUGJy?=
+ =?utf-8?B?SXViVnpvY25NU2ttUzkrTk1LazUzRFN5Qzc2YVRPYXZ0alNHNEpMcmNrT0VQ?=
+ =?utf-8?B?WS9vYUU2OE5pWmJMclVVZEhjQ2pUc1NQMk10cG01OHBONElReWdxTStZUUtr?=
+ =?utf-8?B?WnUvMFB2YVJLS0tFWmw3eldXZERIZXV4WDh3TldhWXY4RWZxTW5PeWF3c1dM?=
+ =?utf-8?B?dHNDU3pacFNoYnlucUhWZnZTeUNBU0dmcmpuaHdhL2ErL0xDVlVzT3dyZ25Z?=
+ =?utf-8?B?cFFpSWU0Smc1bFhwT1RuZEt2ZzZqSW5XWDBWaDZwcDVqL1RycURUNFE1YUpM?=
+ =?utf-8?B?Wm1IREkrdzJSazYzNzZKMHNleFdYTzVNa3lEWCtTNTM4bC9mWllJVlZZOUV6?=
+ =?utf-8?B?ZGx2dXFsUUxZaGo2dkh5UW04KytTMVFMSGlaWTRzb0xHR3hsdXA4TkxydS93?=
+ =?utf-8?B?a2Mwd0J5dko2dmtMTUVjMGpCVndSZzYwbmV5SThYNFBRc0VmdllDREJRMm9v?=
+ =?utf-8?B?V3pQZ2hKQ0FHaytkVnFoWndsWWhueGdxaXU2aFlIcnRjZlZwT0ZyRTlUdUFr?=
+ =?utf-8?B?Qk1BNHRlWEMxbGUyY2hjcE9ZUDRqMnVLa0w5OWxaZktCTHNUdHJoZElSUFJh?=
+ =?utf-8?B?SDBBNXhRSWM2ZGcveHUra0ZlY3BrTFl2NVd2TGdVemxCbHk0VFZzOFJoMGVQ?=
+ =?utf-8?B?L0pmaENDRTRjanFnYjgyUVNQamtVWmk3OFNCMFMzenRISzVsb3p2UHFtY08y?=
+ =?utf-8?B?bkYwMWIxUXRsWVlxNk9qM3Mxc01RYko3OFh4MlpIZDM0SU9NYkFpTEttUzlN?=
+ =?utf-8?B?UGhGQ1BOaDk4eVZSdkxWaGl1dnZOQmNyQkZaNFJwaXg4UDhNWHQ1SkRCSmNG?=
+ =?utf-8?B?RnY0NmxXSUlBZUUzVlcvOXZ6MmhBUkU2a29WeVZNekF5WmRXUzdPSXA3clNu?=
+ =?utf-8?B?ZWpvY2tENjZDNUp4MjZtQW1aSlh4L3N0djNYMHA4SVRuQlRZQTJScnoyOUJD?=
+ =?utf-8?B?aDRNMk53VFM2VGdvSmhZa0JCRi9UOG5UN0J0dVNyWVdzc092WmY3VFRwOGc0?=
+ =?utf-8?B?MURXSnN6em5tekdDbW9ZOWdCeW5oQlNJaU90bEw1S2M4RFY4bXpRQXBVck9i?=
+ =?utf-8?B?TXZ1TmRqN2JnVXk1bkl1R2EyM1IvdEtqSE1BV0g3Z1djQkdhbGsyRkt3bnpz?=
+ =?utf-8?B?Q2lvUXJrTXNZOXVVeHhGeVdPQkEzNlAyYkxMMFpreFlDVXkyQ1dweXRZZG9n?=
+ =?utf-8?B?YkI5dFh2TVRPWnVyQXhDenU1RVQwUlBrSmY5TE9EQW9uNU1XTkxVU1hIOUF0?=
+ =?utf-8?B?cDlDVWpvZFR4WjVtSXVJZFJ1VVhZcW4yMHBrR2IzTXhvb0MwZ2M4NzVqR09C?=
+ =?utf-8?B?TjBFVVRFR3hDbUlwNks3Z1RXd2xZcHp6bW9SVWx2TERXdjJ4L2kyMzZKOXNu?=
+ =?utf-8?B?UU9uQU5TN1l4TG1kKzJ1RUtMSzFVemNNL1lIY3NrOFJBRlhOZWc0eC9Meitv?=
+ =?utf-8?B?QUMwV3o4RldMUjRMODQreitZZDlwTk9UR1pKZnZpWTAxc256b3I4MUUzRlh6?=
+ =?utf-8?B?OEhuRTFkWEFqVkh2UE5WelRYV25WTkt4Y2pDTC94ZzEzMm1jRkFtUDRuUWZa?=
+ =?utf-8?B?SDFiZWFNUk12U1FKSTk1VVlZRzYvWVMzOWhHUT09?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7548.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?MTVzWkQxYmdSQUo2SEdLRU9RM2graExJZjVwMTZ0bHc1eFYxWW93ajRJY1hI?=
- =?utf-8?B?MkZqaWVSUUFCbFg0OUVzMFd0NVZUdUpjMU1USUJyV1pOKzNua2ZnZUhoSkZ4?=
- =?utf-8?B?Y3lKZzJDemI2b3VpbW5PdTJocGMyYkUwa2RWZ2FpcURPVjdiL1UzcmlXcDlL?=
- =?utf-8?B?UExBZmtrelFqTEx3L3F2aWxiWFg4eE04Q0ZRbHNuYWtnU0hobU5CRmhkMk5i?=
- =?utf-8?B?SFF0RThxb1diQ1NyWS95Vjg5aHNxU1VMZWJTcXcxMzhHZU9yMjZKUDlQQXJh?=
- =?utf-8?B?UVZoYnJRTXJJb1RvcnYzQjZqZHVtMFNTMmNaTmMvdjcrMlVvZ05Ic2xTYkZh?=
- =?utf-8?B?QlZCUHptVXN4eVBBd0E4WDJSQWdyT0dQaDV4RFl1aUN0NlBacDRNNWNSelRW?=
- =?utf-8?B?RUkvVzZ5NlJrMklqTEovQWMzZmVlVlp6OVpKSzVzZTZCeXZmRlhiY3BreWcy?=
- =?utf-8?B?dDJ5Qng3aVV0d0pVdlRiTUxNRThpMnpHYmpVSFdKR1pUaWQyTnhQbzRZN21U?=
- =?utf-8?B?dCs0N21mNVU2T2QzYTZKZGJpajhwSHdJa0RReXp6TXhEcWZ0VW1Zd0RuVU5S?=
- =?utf-8?B?L2VUbVhtNjJUVEdPa0xmQUVBS2JMRllFZE44TXQ2ejh2TnhiTmJJb3I0bXdw?=
- =?utf-8?B?b295aHNNdGRIL2t5NzQvUGNQVHVjSTBYNGNFdmx6VzRLdWxBUTFVNFNpYllL?=
- =?utf-8?B?a2svL1dKTnRZSks5K3FlSnlIOFM1V0h6dXVzVVBJakp3b0RzZ0JYMWJSMzRh?=
- =?utf-8?B?QU9wcUR0b3VzSE5LSmdtZGRKWWR1bWlRc1kvOWZmaWdGZ09RU3JUZGJXRno1?=
- =?utf-8?B?SDZsd3J4Q1JZR2FtdFdHb1NGYWZJRmgyNGpUYjdNWTh3S0NlL3BaVWRhM2xK?=
- =?utf-8?B?Z1Mrb3FIbTQ4bEYyeTkwdGRWWGZYa0wyK3c2dDRuWWZhRlJkcFNCalh3RGFu?=
- =?utf-8?B?UTAzdSs3ZFo3WEFDaThjN3NiRE5SOWhpQkNNWGhaMnZmejJVSnJRNjFwTjNW?=
- =?utf-8?B?RlNndEJUdktBWXF0YnBicGZ3QXBNM3d1SHo4VGU4aGZpYm1hdDlGaS90RHoz?=
- =?utf-8?B?c3o5OU1ISU52UTVYbkt6ZmJDaHFsZ3dxSndyT2xSOFpXa2VxdmQrL3RoZ21t?=
- =?utf-8?B?SzFhODczMTJLak9qUU9xZ3JvT09oemNYVDU2QmZZdDNQeldxdjlMNExnV1pw?=
- =?utf-8?B?cTFWTE1EdnRmSXZ2UEVsYWxmWVhnNVZoRGlKYUpjVzhydHRSbEI1SDJRQk5O?=
- =?utf-8?B?UWJMOUZYc2RtTHFCOW03MEVFTTdaaWtiTkhySXNRTDl3VmRNalNZd2RNaXdB?=
- =?utf-8?B?MW1SUHU3blZuaUYzQzFNczB6MVVnNmZxQWxXUDR2SzU0Wmo3L09NWEFDazEr?=
- =?utf-8?B?QTYvQ21BMU5SSnRPU3RuVjlwaTJvZzhoTitpajg0NThMY1FLcGYwZi92b0tq?=
- =?utf-8?B?MjFzc3VxY0RuVk1QTkRtV3ZHZm5nUGsycmtVSUJqdS9NWW1HYjlaSGl2Mm13?=
- =?utf-8?B?cWFVVEYrTnp5S25EM1hDZDFRUlRzUzVwelFVMGVkdGh5dDVtL1dyWTFjWUZR?=
- =?utf-8?B?VXcvdHlLd1ZncEp1SmNvNzh6UGQxa2hueHpzaGtBVFBHSWVubmsvMXN4b00v?=
- =?utf-8?B?aWlJbDNWdmMzalYzd1dRbThlZGZLbDJIaVhCNGtuUDJCQzVNejRTbzR1Wllv?=
- =?utf-8?B?ZGpEN0Q5THhsRXRwTFJnT2dFWmVEZmVSanhGV01DTzNIWXFKVGMvNHdYUzRV?=
- =?utf-8?B?T2JENytYWDJsM3picWR2RTMveHZLV1UwTm5kUW5nRHh2OHRkS3FXd1VocUdI?=
- =?utf-8?B?NTFZYUk4Y3BZbEZ6RjFQMHNYWWlPanU1a2ZpVzBuWXF6dmd4QXZKczQwaVNB?=
- =?utf-8?B?NDJQU3dNYmRFeXdpTXVLMmxZeWc3UlNqaEtsQU0xQTZFNWFHYS81TGpZSWpz?=
- =?utf-8?B?SzFyYThCNHNXZHhhcm5VTXJzamtuckdLcHFkTG9iTEJCelE0bmxJU1ZHQVkw?=
- =?utf-8?B?RGpmQlQ1TDBUaUtRYi9keEwvMFRUb2p5VCtPK3o3Y2RwdmQrVXBGc1Fnb3Iz?=
- =?utf-8?B?bEZIbDJjb0VVbVhWa2svaU8vekxzSXVoRXZNd1R1dkRCRFFUWVRMYUtQdEU4?=
- =?utf-8?Q?qfJkh6aAgbn5HgSxikzDb9RB4?=
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(7416014)(376014)(13003099007);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d61decae-041d-4841-94d4-08dd8c90abc2
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7548.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2025 11:25:14.4392
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2025 11:27:22.9789
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5a33cce1-9208-4120-dabe-08dd8c90f898
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: e1zcHOcG4icA0tubpR5x1RLKQ80pacKSdaMdHG9AOxQUbjA5TiK68GJWfPOhztxrRUndqNqAQ0vhRSn/9AoErw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4133
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE36.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5786
+
+Hi,
+
+This patch series by Carolina is V8 of the feature that adds rate
+management support on traffic classes in devlink and mlx5, see full
+description by Carolina below [0].
+
+V8:
+- Extend the cover letter.
+- Limit line width to 80 characters in mlx5 changes instead of 100.
+- Increase the scheduling node levels to support TC arbitration.
+- Ensure parent nodes are set correctly in all code paths that extend
+  the hierarchy depth for TC arbitration.
+- Extended the cover letter with the ongoing discussion on devlink-rate
+  and net-shapers.
+- Extended the cover letter with the Netdev talk link on this series.
+
+Regards,
+Tariq
 
 
+[0]
+This patch series extends the devlink-rate API to support traffic class
+(TC) bandwidth management, enabling more granular control over traffic
+shaping and rate limiting across multiple TCs. The API now allows users
+to specify bandwidth proportions for different traffic classes in a
+single command. This is particularly useful for managing Enhanced
+Transmission Selection (ETS) for groups of Virtual Functions (VFs),
+allowing precise bandwidth allocation across traffic classes.
 
-On 05/05/2025 21:55, Jakub Kicinski wrote:
-> On Sun, 4 May 2025 20:46:51 +0300 Mark Bloch wrote:
->> On the DPU (ARM), we see representors for each BDF. For simplicity,
->> assume each BDF corresponds to a single devlink port. So the ARM would
->> expose:
->>
->> PF0_HOST0_REP
->> UPLINK0_REP
->> PF0_HOST1_REP
->> UPLINK1_REP
->>
->> In devlink terms, we're referring to the c argument in phys_port_name,
->> which represents the controller, effectively indicating which host
->> the BDF belongs to.
->>
->> The problem we're addressing is matching the PF seen on a host to its
->> corresponding representor on the DPU. From the ARM side, we know that
->> this rep X belongs to pf0 on host y, but we don't which host is which.
->> From within each host, you can't tell which host you are, because all
->> see their PF as PF0.
->>
->> With the proposed feature (along with Jiri's changes), this becomes
->> trivial, you just match the function UID and you're done.
-> 
-> Thanks for explaining the setup. Could you please explain the user
-> scenario now? Perhaps thinking of it as a sequence diagram would
-> be helpful, but whatever is easiest, just make it concrete.
-> 
+Additionally the series refines the QoS handling in net/mlx5 to support
+TC arbitration and bandwidth management on vports and rate nodes.
 
-It's a rough flow, but I believe it clearly illustrates the use case
-we're targeting:
- 
-Some system configuration info:
- 
-- A static mapping file exists that defines the relationship between
-  a host and the corresponding ARM/DPU host that manages it.
- 
-- OVN, OVS and Kubernetes are used to manage network connectivity and
-  resource allocation.
- 
-Flow:
-1. A user requests a container with networking connectivity.
-2. Kubernetes allocates a VF on host X. An agent on the host handles VF
-   configuration and sends the PF number and VF index to the central
-   management software.
-3. An agent on the DPU side detects the changes made on host X. Using
-   the PF number and VF index, it identifies the corresponding
-   representor, attaches it to an OVS bridge, and allows OVN to program
-   the relevant steering rules.
- 
-This setup works well when the mapping file defines a one-to-one
-relationship between a host and a single ARM/DPU host.
-It's already supported in upstream today [1]
- 
-However, in a slightly more generic scenario like:
- 
-Control Host A: External host X
-                External host Y
- 
-A single ARM/DPU host manages multiple external hosts. In this case, step
-2—where only the PF number and VF index are sent is insufficient. During
-step 3, the agent on the DPU reads the data but cannot determine which
-external host created the VF. As a result, it cannot correctly associate
-the representor with the appropriate OVS bridge.
- 
-To resolve this, we plan to modify step 2 to include the VUID along with
-the PF number and VF index. The DPU-side agent will use the VUID to match
-it with the FUID, identify the correct PF representor, and then use
-standard devlink mechanisms to locate the corresponding VF representor.
+Discussions on traffic class shaping in net-shapers began in V5 [1],
+where we discussed with maintainers whether net-shapers should support
+traffic classes and how this could be implemented.
 
-1: https://github.com/ovn-kubernetes/ovn-kubernetes
-You can look at: go-controller/pkg/util/dpu_annotations.go for more info.
+Later, after further conversations with Paolo Abeni and Simon Horman,
+Cosmin provided an update [2], confirming that net-shapers' tree-based
+hierarchy aligns well with traffic classes when treated as distinct
+subsets of netdev queues. Since mlx5 enforces a 1:1 mapping between TX
+queues and traffic classes, this approach seems feasible, though some
+open questions remain regarding queue reconfiguration and certain mlx5
+scheduling behaviors.
 
-Mark
+Building on that discussion, Cosmin has now shared a concrete
+implementation plan on the netdev mailing list [3]. The plan, developed
+in collaboration with Paolo and Simon, outlines how net-shapers can be
+extended to support the same use cases currently covered by
+devlink-rate, with the eventual goal of aligning both and simplifying
+the shaping infrastructure in the kernel.
 
->> As a side note, I believe this feature has merit even beyond this
->> specific use case. 
-> 
-> I also had that belief when I implemented something similar for the NFP
-> long time ago. Jiri didn't like the solution / understand the problem 
-> at the time. But it turned out not to matter in practice.
+This work was presented at Netdev 0x19 in Zagreb [4].
+There we presented how TC scheduling is enforced in mlx5 hardware,
+which led to discussions on the mailing list.
+
+A summary of how things work:
+
+Classification means labeling a packet with a traffic class based on the
+packet's DSCP or VLAN PCP field, then treating packets with different
+traffic classes differently during transmit processing.
+
+In a virtualized setup, VFs are untrusted and do not control
+classification or shaping.  Classification is done by the hardware using
+a prio-to-TC mapping set by the hypervisor. VFs only select which send
+queue to use and are expected to respect the classification logic by
+sending each traffic class on its dedicated queue. As stated in the
+net-shapers plan [3], each transmit queue should carry only a single
+traffic class. Mixing classes in a single queue can lead to HOL
+blocking.
+
+In the mlx5 implementation, if the queue used does not match the
+classified traffic class, the hardware moves the queue to the correct TC
+scheduler. This movement is not a reclassification; it’s a necessary
+enforcement step to ensure traffic class isolation is maintained.
+
+Extend devlink-rate API to support rate management on TCs:
+- devlink: Extend the devlink rate API to support traffic class
+  bandwidth management
+
+Introduce a no-op implementation:
+- net/mlx5: Add no-op implementation for setting tc-bw on rate objects
+
+Add support for enabling and disabling TC QoS on vports and nodes:
+- net/mlx5: Add support for setting tc-bw on nodes
+- net/mlx5: Add traffic class scheduling support for vport QoS
+
+Support for setting tc-bw on rate objects:
+- net/mlx5: Manage TC arbiter nodes and implement full support for
+  tc-bw
+
+[1]
+https://lore.kernel.org/netdev/20241204220931.254964-1-tariqt@nvidia.com/
+[2]
+https://lore.kernel.org/netdev/67df1a562614b553dcab043f347a0d7c5393ff83.camel@nvidia.com/
+[3]
+https://lore.kernel.org/netdev/d9831d0c940a7b77419abe7c7330e822bbfd1cfb.camel@nvidia.com/T/
+[4]
+https://netdevconf.info/0x19/sessions/talk/optimizing-bandwidth-allocation-with-ets-and-traffic-classes.html
+
+Carolina Jubran (5):
+  devlink: Extend devlink rate API with traffic classes bandwidth
+    management
+  net/mlx5: Add no-op implementation for setting tc-bw on rate objects
+  net/mlx5: Add support for setting tc-bw on nodes
+  net/mlx5: Add traffic class scheduling support for vport QoS
+  net/mlx5: Manage TC arbiter nodes and implement full support for tc-bw
+
+ Documentation/netlink/specs/devlink.yaml      |   36 +-
+ .../networking/devlink/devlink-port.rst       |    7 +
+ .../net/ethernet/mellanox/mlx5/core/devlink.c |    2 +
+ .../net/ethernet/mellanox/mlx5/core/esw/qos.c | 1007 ++++++++++++++++-
+ .../net/ethernet/mellanox/mlx5/core/esw/qos.h |    8 +
+ .../net/ethernet/mellanox/mlx5/core/eswitch.h |   14 +-
+ include/net/devlink.h                         |    9 +
+ include/uapi/linux/devlink.h                  |    4 +
+ net/devlink/netlink_gen.c                     |   16 +-
+ net/devlink/netlink_gen.h                     |    2 +
+ net/devlink/rate.c                            |  127 +++
+ 11 files changed, 1195 insertions(+), 37 deletions(-)
+
+
+base-commit: 836b313a14a316290886dcc2ce7e78bf5ecc8658
+-- 
+2.31.1
+
 
