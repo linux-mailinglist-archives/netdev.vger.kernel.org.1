@@ -1,116 +1,132 @@
-Return-Path: <netdev+bounces-188473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B88F5AACED7
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 22:35:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72A99AACED9
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 22:40:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D322498001A
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 20:34:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F55A1C074CF
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 20:40:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C21DA1388;
-	Tue,  6 May 2025 20:35:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD91111CA0;
+	Tue,  6 May 2025 20:40:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="o8b2u6h+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aMjCBo89"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B557376;
-	Tue,  6 May 2025 20:35:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AEB5CA6B
+	for <netdev@vger.kernel.org>; Tue,  6 May 2025 20:40:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746563713; cv=none; b=Hpcw/r36xXMooMaChptyoGUtCb3yIFfXDbSQrdsxhwAqLgPTBrzhZaQdbPtang9Qb90C5llM7tXLOu63yOC84m3Mi86S9f+o42mDkxzHNci55JYtD7uA448BNgoxupw6NElGHe7kdjysCoWKmHRc3V92sPMAePPwbcroxuSRxYw=
+	t=1746564019; cv=none; b=Ia59VgEqSZEU7KDkj+M+qMwpczMG1bj8SuUzo4jsnuEnh62QltR7p+Di+FyOzVNG69XSKroWBdd/C8F7uCn0JpnV31WXFHExfyJAdmo+55h1rRHJeO/8kxJdwMlC2/tPotXffX4G7xZUtNWlahKsNp1logWKTWUKro973B3pHwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746563713; c=relaxed/simple;
-	bh=xSh2thmLjVVk5UUvW7JPsibAXpxOu+YieUAxYQu3Tt0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Cu5+6C3V0aovad0pyNtDG1zpHz+YEmvxjmMSwntGL8nst0hzU+dOS3KsQYe6zRbb5SaxANluAVdfRNDgwQJI7F15X6a+bygjsCI0NiK+c7vBFpywOKpNk8dvGLdG0IVpjZKdk0s6/lhhulOOECOC766r7YSQn/bnPAtjcYgcS5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=o8b2u6h+; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
-	Resent-Message-ID:In-Reply-To:References;
-	bh=8HZY0uPsXCl4a9MDq72cUwjhUqSkV5rr2KaWLadzDRQ=; t=1746563711; x=1747773311; 
-	b=o8b2u6h+EvwnzJujiJK3ohHnbrQjgXZUJlIRAiE8wvYrre3/5lLQ0FXUmdFTS+PthUp8ZnCReHq
-	B3Jle0/wAyI6H9Maab9ZuwdhfhUIGyASrr3sCF1DJSgi00bqBvvypa1tcs/VdXORO+hOzo2bZC4OJ
-	PCK1k6xroEmw5JLXbB77JhK6BcpfC1XnVWnql4qbvaFVAWQQZiF0HCaUi5/6/9KEVwGwGA30R+ZQB
-	BcidNz7R/i7qbVT3bwSrxZfq9e3yR1V+4BippRfIiGb0QKFFIsVv5YVIAlVpO3r/lnxDJm/qjn0YS
-	6Dds1tf47ffucxkUNYDI8yxeHVAKCF/QsC6A==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.1)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1uCP0P-00000006LZ9-10KB;
-	Tue, 06 May 2025 22:35:09 +0200
-From: Johannes Berg <johannes@sipsolutions.net>
-To: netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Subject: [GIT PULL] wireless-2025-05-06
-Date: Tue,  6 May 2025 22:33:39 +0200
-Message-ID: <20250506203506.158818-3-johannes@sipsolutions.net>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1746564019; c=relaxed/simple;
+	bh=fHPMFFzOMABPaX3VDb1UExZue0kUfOn449yA23fqF0Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IUXGdaVOB6r+t0sS1oxONQvN/ofzHbZukiIaK5678swG8N2hBhxzF34PiEZWCeRe49SVWeKDMCps55Bw/plFvMp6hF2uX3o+SbLPhIxMtZb2RPCxKG3QsGzeLYGBfNbDak+HGHBUtH4BdaHPO0obSQReDClH79fs2BY6EKSMq7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aMjCBo89; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-74068f95d9fso3219844b3a.0
+        for <netdev@vger.kernel.org>; Tue, 06 May 2025 13:40:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746564017; x=1747168817; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Pprqtj6nNwJ7kvGMAS6wH9Xjmd67CzDbSMXZu91bNsE=;
+        b=aMjCBo89YY9HY0W9ZojqLkHgFOqAeVsAK9631X2j7gkcONwIcuHvmkhWTQd1XElk33
+         QXj/a20FkDeoQJzZrD4ltSJqnev4KP9cS+I0D+jVf3YFARi5bUUvkJK6KbN5/1BR+/OH
+         Ejb8SfRam2gbxSryLsKKiPmZbbRpG0XxACn9DR/yczkxY9Jg203bLw59UuSubLcy7qhZ
+         96mtv2RcBibbul8qeEsmePoE2xYF6wwsl99NryXXpiKhOgSprqnW/mYzTCo2n81v0zeh
+         faznZ6E+mr77jINx3JOhVTYrde/Eh+K9wVK5cl+DNcttu1E9zJzHnHtXHJCbqP7CJlHS
+         mMLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746564017; x=1747168817;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Pprqtj6nNwJ7kvGMAS6wH9Xjmd67CzDbSMXZu91bNsE=;
+        b=tnF4S5LLWUNKzBauUnw8APRVkQ8LtgPDKDMQY95sWQcIUbQS+zK9sPYOmY0xR8/coi
+         C27UrL0nVx+OLYIrkNrQQjnKRn/G1xrkJ2xKLppLWFSsS7U+gA4pI9Zckvxq/lOLAiJp
+         K5zzNhxfclmhzp2Re+R+KZFxjfARxyQhTfL2ha7fp6wFGINVYvJbyC85xbqp4Q12ftKy
+         0Altt2lyJUsoj366ytwpKFvIQDuEDsOFaAbg15RTP9+aDoWPX/ioDtBGHZZLfBGD6eUr
+         oc3lr61wXS2hvMVSlWOkqi0s+73HqBpHE7g08mUm7Z24Fg58nby/7q2DKgfplGXFAygO
+         7Hog==
+X-Gm-Message-State: AOJu0YwAffWMDGOhhOLMTNpZ6Cw1zTGbW8s1hNrdQ1X53YUX9bel6/UL
+	j+w1fidsvGaTZMFkzJn57BupVcmO1q0oV6wUt+zZpZr+1Y255rH0
+X-Gm-Gg: ASbGncvHUrSZIoWmMnYlLijL2sCX+tu2EMfkudafwnLq5BIZIJ2cLULOdPn+Cc+aBBJ
+	CFAkb3b7aHNvfSakTkWzFe//SlLQnpEt0rrwKBOfoEaJSbvqlP8JbgLAk4H3GnNf+tzZHtyuVMS
+	xuJ1lW2TYgmR8BDLTfFLNwM7Vn7p+d0F4lw2+qGcIQm9j9udhCAvGZSr2T774JGs61evMkGQye4
+	QgdCk+QRlMXefVSmhyhcCb4L6uQ87hcxo7NEkfBR2VwvNfL/gFhuAt9B3TIOn9Rx0OoUgVzKmoN
+	9TuYnjmWdZ2cinDeDKzsqIdJxpmyr6VKLL6zTuXYddWH
+X-Google-Smtp-Source: AGHT+IEF1s7O9vut6ixzO5bv4GCT3R+Po0/p4+ioZsXM8d+LagD0fdM3d1tsS0fQb9+wxwn/G0iXSg==
+X-Received: by 2002:a05:6a21:1193:b0:1f5:8e33:c417 with SMTP id adf61e73a8af0-2148b526afdmr1023524637.2.1746564017439;
+        Tue, 06 May 2025 13:40:17 -0700 (PDT)
+Received: from localhost ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b1fb3b5ace3sm6670464a12.21.2025.05.06.13.40.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 May 2025 13:40:16 -0700 (PDT)
+Date: Tue, 6 May 2025 13:40:15 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Savy <savy@syst3mfailure.io>
+Cc: netdev@vger.kernel.org, jiri@resnulli.us, jhs@mojatatu.com,
+	willsroot@protonmail.com
+Subject: Re: [Patch net 1/2] net_sched: Flush gso_skb list too during
+ ->change()
+Message-ID: <aBpzr1ey7MmHObLR@pop-os.localdomain>
+References: <20250506001549.65391-1-xiyou.wangcong@gmail.com>
+ <20250506001549.65391-2-xiyou.wangcong@gmail.com>
+ <krDuBwNbhtDxUlG2tgiXBwSA9KUwph1GfKqwvjBxYDSJv6nVQ98S_inVmQxaRBsndKdgg-rh_vN0xouX4zraF6V3UyQHpWNJUv-rvd-Cwfg=@syst3mfailure.io>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <krDuBwNbhtDxUlG2tgiXBwSA9KUwph1GfKqwvjBxYDSJv6nVQ98S_inVmQxaRBsndKdgg-rh_vN0xouX4zraF6V3UyQHpWNJUv-rvd-Cwfg=@syst3mfailure.io>
 
-Hi,
+On Tue, May 06, 2025 at 02:00:36PM +0000, Savy wrote:
+> On Tuesday, May 6th, 2025 at 12:15 AM, Cong Wang <xiyou.wangcong@gmail.com> wrote:
+> 
+> > 
+> > the main skb queue was trimmed, potentially leaving packets in the gso_skb
+> > list. This could result in NULL pointer dereference when we only check
+> > sch->q.qlen against sch->limit.
+> > 
+> > 
+> 
+> Hi Cong,
+> 
+> With this version of the patch, the null-ptr-deref can still be triggered.
+> We also need to decrement sch->q.qlen if __skb_dequeue() returns a valid skb.
+> 
+> We will take Codel as an example.
+> 
+>         while (sch->q.qlen > sch->limit) {
+>                 struct sk_buff *skb = qdisc_dequeue_internal(sch, true);
+>                 ...
+>         }
+> 
+> If sch->q.qlen is 1 and there is a single packet in the gso_skb list,
+> if sch->limit is dropped to 0 in codel_change, then qdisc_dequeue_internal() -> __skb_dequeue()
+> will remove the skb from the gso_skb list, leaving sch->q.qlen unaltered.
+> At this point, the while loop continues, as sch->q.qlen is still 1, but now both the main queue and gso_skb are empty,
+> so when qdisc_dequeue_internal() is called again, it returns NULL, and the null-ptr-deref occurs.
 
-Couple more fixes, that's probably all for 6.15, I don't
-really see anything more coming. Never say never though,
-I guess.
+Excellent catch!
 
-The whole device ID management in iwlwifi is in a bit of
-a rework right now for -next, so there will be conflicts.
-I'm trying to get as much of that resolved in my tree,
-but with this new commit we'll have to see where it'll
-need to be resolved.
+You are right, I missed qlen--.
 
-Please pull and let us know if there's any problem.
+Also, actually I accidentally messed up the 2nd boolean parameter for
+some Qdisc's.
 
-Thanks,
-johannes
+I will update the patch and send out V2 shortly today.
 
-
-
-The following changes since commit 30763f1adf69233fcfdc836370f69056a1be9d27:
-
-  Merge tag 'wireless-2025-04-24' of https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless (2025-04-24 11:10:57 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2025-05-06
-
-for you to fetch changes up to ebedf8b7f05b9c886d68d63025db8d1b12343157:
-
-  wifi: iwlwifi: add support for Killer on MTL (2025-05-06 21:50:19 +0200)
-
-----------------------------------------------------------------
-Couple of fixes:
- * iwlwifi: add two missing device entries
- * cfg80211: fix a potential out-of-bounds access
- * mac80211: fix format of TID to link mapping action frames
-
-----------------------------------------------------------------
-Johannes Berg (1):
-      wifi: iwlwifi: add support for Killer on MTL
-
-Michael-CY Lee (1):
-      wifi: mac80211: fix the type of status_code for negotiated TID to Link Mapping
-
-Veerendranath Jakkam (1):
-      wifi: cfg80211: fix out-of-bounds access during multi-link element defragmentation
-
- drivers/net/wireless/intel/iwlwifi/pcie/drv.c |  2 ++
- include/linux/ieee80211.h                     |  2 +-
- net/mac80211/mlme.c                           | 12 ++++++------
- net/wireless/scan.c                           |  2 +-
- 4 files changed, 10 insertions(+), 8 deletions(-)
+Thanks!
 
