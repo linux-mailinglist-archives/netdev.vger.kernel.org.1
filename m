@@ -1,124 +1,128 @@
-Return-Path: <netdev+bounces-188333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 586D5AAC375
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 14:10:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9ECAAAC430
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 14:32:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32B1F173907
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 12:10:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 017DF3B5161
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 12:31:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A991D27F17E;
-	Tue,  6 May 2025 12:10:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="me/MwPh3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0097280028;
+	Tue,  6 May 2025 12:27:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from gardel.0pointer.net (gardel.0pointer.net [85.214.157.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD10F27F17D;
-	Tue,  6 May 2025 12:10:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DF1627FD5F;
+	Tue,  6 May 2025 12:27:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.157.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746533418; cv=none; b=NOa0UBWKG0dD+j3LZwOsPKuFime2trl03lPemCEiSu+mzkUMaBhDeY9Ouu+R3eDIzYiYwe5t+L87GMUsfJ/aTy+SCnNe9aAdLbmtKAUKgtWShD1QduYcN5QqIi+7EyJJ6rpA3NRBWczpyK5Nb/HHO8ijHkq6PJXX7II2pm/atzQ=
+	t=1746534445; cv=none; b=otfILYGVeFoffVvrLywbXBSeRtj8pCovM2JZbrQh1ViU2phPKnfjUW5Ehu1bIzuv+ypuFWxoxDQoyz0lOtfqiYaMOYq8eSs2bIWhALOE82kWoH1xPFkr9+WWJVQUjD4brkayo3e4A1SS1LjjxNvZm8i+MmZkDRXCCqyuLN4hQCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746533418; c=relaxed/simple;
-	bh=TfGf41BI+CEpoOqGEKh3oXOKY+QC+CgLE8Pee51SleQ=;
+	s=arc-20240116; t=1746534445; c=relaxed/simple;
+	bh=m7SBsfQfLVW4xNj3QrIhN2V3ELt1ceEG+cP+bc5hvNs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eJ2fLGqujDjc+3F4TU8V7Wp4OXnk7dATo2qViDmWI8LywNjDQ3Ea51N0yrWr+OYsjG6CCru3QeJyUr8G8LrtLVEolyZ5qE+By1i+yxiI0x7MqzwMu8/Oxz51picBNrMosciiFXppCEborv9jcEDRH1rWDzo8gsqqTjZMkTjYN0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=me/MwPh3; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=LjFg4NzOfHgj1oyywetZuH3fvyYFzX5T7Wr9eejsvHY=; b=me
-	/MwPh3urNw/U+weqBX9npRAbNuLn2pVCx5lAmrjCRsvWkQ9hmAV/0A6/YuglFD2cFELRrL/jtrpyq
-	TNa9qwVfzmUl48jPFAZXyfT4TGNqlcs00lW94ouJBvKQ29uuDhIdWN4KfnKRXvg2rXuRLgxoCBbvd
-	Z2EcZmCZd31OYO4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uCH7h-00Bksz-7V; Tue, 06 May 2025 14:10:09 +0200
-Date: Tue, 6 May 2025 14:10:09 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Thangaraj.S@microchip.com
-Cc: Bryan.Whitehead@microchip.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, linux-kernel@vger.kernel.org,
-	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
-	netdev@vger.kernel.org, UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH v1 net-next] net: lan743x: configure interrupt moderation
- timers based on speed
-Message-ID: <e489b483-26bb-4e63-aa6d-39315818b455@lunn.ch>
-References: <20250505072943.123943-1-thangaraj.s@microchip.com>
- <e2d7079b-f2d3-443d-a0e5-cb4f7a85b1e6@lunn.ch>
- <42768d74fc73cd3409f9cdd5c5c872747c2d7216.camel@microchip.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=nh5Wo4Zb7U0gSlVNWxuGiR/qV1HW1wRYwcm0OBUo3v2wC8smutP2WJ38N5VPWr0rb6k475ow3FtNk34kvcUfk2GDUwMT4zJ7t48c2aWfgzL0GOGmocgCa2/yvJGDJwjOLIBu3GcIP/qtYKsEyaIMKiJu3VdIE4onFO0mXyQgpno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=poettering.net; spf=pass smtp.mailfrom=poettering.net; arc=none smtp.client-ip=85.214.157.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=poettering.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=poettering.net
+Received: from zeta (p200300ea6f02a700ee7fde6810ab8036.dip0.t-ipconnect.de [IPv6:2003:ea:6f02:a700:ee7f:de68:10ab:8036])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by gardel.0pointer.net (Postfix) with ESMTPSA id 89EC9E802CC;
+	Tue,  6 May 2025 14:17:24 +0200 (CEST)
+Date: Tue, 6 May 2025 14:17:22 +0200
+From: Lennart Poettering <lennart@poettering.net>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: Martin KaFai Lau <martin.lau@linux.dev>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	=?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
+	=?iso-8859-1?Q?G=FCnther?= Noack <gnoack@google.com>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Stephen Smalley <stephen.smalley.work@gmail.com>,
+	Ondrej Mosnacek <omosnace@redhat.com>,
+	Casey Schaufler <casey@schaufler-ca.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, linux-security-module@vger.kernel.org,
+	selinux@vger.kernel.org
+Subject: Re: [PATCH v1 bpf-next 0/5] af_unix: Allow BPF LSM to scrub
+ SCM_RIGHTS at sendmsg().
+Message-ID: <aBn90vJ49ymBT3LW@zeta>
+References: <20250505215802.48449-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <42768d74fc73cd3409f9cdd5c5c872747c2d7216.camel@microchip.com>
+In-Reply-To: <20250505215802.48449-1-kuniyu@amazon.com>
 
-On Tue, May 06, 2025 at 04:02:30AM +0000, Thangaraj.S@microchip.com wrote:
-> Hi Andrew,
-> Thanks for reviewing the patch,
-> 
-> On Mon, 2025-05-05 at 14:15 +0200, Andrew Lunn wrote:
-> > EXTERNAL EMAIL: Do not click links or open attachments unless you
-> > know the content is safe
-> > 
-> > On Mon, May 05, 2025 at 12:59:43PM +0530, Thangaraj Samynathan wrote:
-> > > Configures the interrupt moderation timer value to 64us for 2.5G,
-> > > 150us for 1G, 330us for 10/100M. Earlier this was 400us for all
-> > > speeds. This improvess UDP TX and Bidirectional performance to
-> > > 2.3Gbps from 1.4Gbps in 2.5G. These values are derived after
-> > > experimenting with different values.
-> > 
-> > It would be good to also implement:
-> > 
-> >        ethtool -c|--show-coalesce devname
-> > 
-> >        ethtool -C|--coalesce devname [adaptive-rx on|off] [adaptive-
-> > tx on|off]
-> >               [rx-usecs N] [rx-frames N] [rx-usecs-irq N] [rx-frames-
-> > irq N]
-> >               [tx-usecs N] [tx-frames N] [tx-usecs-irq N] [tx-frames-
-> > irq N]
-> >               [stats-block-usecs N] [pkt-rate-low N] [rx-usecs-low N]
-> >               [rx-frames-low N] [tx-usecs-low N] [tx-frames-low N]
-> >               [pkt-rate-high N] [rx-usecs-high N] [rx-frames-high N]
-> >               [tx-usecs-high N] [tx-frames-high N] [sample-interval
-> > N]
-> >               [cqe-mode-rx on|off] [cqe-mode-tx on|off] [tx-aggr-max-
-> > bytes N]
-> >               [tx-aggr-max-frames N] [tx-aggr-time-usecs N]
-> > 
-> > so the user can configure it. Sometimes lower power is more important
-> > than high speed.
-> > 
-> >         Andrew
-> 
-> We've tuned the interrupt moderation values based on testing to improve
-> performance. For now, we’ll keep these fixed values optimized for
-> performance across all speeds. That said, we agree that adding ethtool
-> -c/-C support would provide valuable flexibility for users to balance
-> power and performance, and we’ll consider implementing that in a future
-> update.
+On Mo, 05.05.25 14:56, Kuniyuki Iwashima (kuniyu@amazon.com) wrote:
 
-As you said, you have optimised for performance. That might cause
-regressions for some users. We try to avoid regressions, and if
-somebody does report a regression, we will have to revert this change.
-If you were to implement this ethtool option, we are a lot less likely
-to make a revert, we can instruct the user how to set the coalesce for
-there use case.
+> As long as recvmsg() or recvmmsg() is used with cmsg, it is not
+> possible to avoid receiving file descriptors via SCM_RIGHTS.
+>
+> This behaviour has occasionally been flagged as problematic.
+>
+> For instance, as noted on the uAPI Group page [0], an untrusted peer
+> could send a file descriptor pointing to a hung NFS mount and then
+> close it.  Once the receiver calls recvmsg() with msg_control, the
+> descriptor is automatically installed, and then the responsibility
+> for the final close() now falls on the receiver, which may result
+> in blocking the process for a long time.
+>
+> systemd calls cmsg_close_all() [1] after each recvmsg() to close()
+> unwanted file descriptors sent via SCM_RIGHTS.
+>
+> However, this cannot work around the issue because the last fput()
+> could occur on the receiver side once sendmsg() with SCM_RIGHTS
+> succeeds.  Also, even filtering by LSM at recvmsg() does not work
+> for the same reason.
+>
+> Thus, we need a better way to filter SCM_RIGHTS on the sender side.
+>
+> This series allows BPF LSM to inspect skb at sendmsg() and scrub
+> SCM_RIGHTS fds by kfunc.
 
-	Andrew
+Frankly, this sounds like a bad idea to me. The number and order of
+the fds passed matters, and if you magically make some fds disappear
+everything becomes a complete mess for most protocols. Hence, making
+fds disappear from a messasge mid-flight is really not a realistic
+option, already for compat. Not for systemd, and not for other tools
+either I am sure.
+
+I also think it's pointless to enforce this on the receiving side,
+because the deed is done by then. i.e. it doesn't matter if we have to
+close the fd via bpf or in userspace, we still have to wait for it to
+be closed on the receiving side, hence we have to pay. i.e. focus must
+be to refuse the fds on the sender side, instead of allowing this to
+go to the receiver side.
+
+From my perspective this must be enforced on sender side. And more
+importantly, for systemd's usecase it would be a lot more relevant to
+have a simple, dumb boolean per socket instead of the full bpf
+machinery. I mean, as much as I like the lsm-bpf concept it's not
+clear to me that this is the right place to make use of it. I
+personally would really like to see a SO_PASSRIGHTS sockopt, that is
+modelled after SO_PASSCREDS and SO_PASSSEC.
+
+Lennart
+
+--
+Lennart Poettering, Berlin
 
