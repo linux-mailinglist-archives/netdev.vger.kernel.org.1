@@ -1,108 +1,158 @@
-Return-Path: <netdev+bounces-188368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9D65AAC7F8
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 16:30:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38ECAAAC813
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 16:34:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 975397B1156
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 14:28:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E4F24E20FF
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 14:34:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16CFD2820B8;
-	Tue,  6 May 2025 14:29:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D3E0267712;
+	Tue,  6 May 2025 14:34:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hLnxM3cc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PugnSh8e"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 686CC270EA1
-	for <netdev@vger.kernel.org>; Tue,  6 May 2025 14:29:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BEF31862;
+	Tue,  6 May 2025 14:34:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746541793; cv=none; b=MZQ5Aub28gTreDUrwFWwedSgO0hK6kgUfwMyLQJDmPCP226U2oPYjGb+fJCABtyfeyO5Yb06RqKlIjtI5lQmzPBqqGgbhZDWRV844ApGPWZRCsFuVqPioaPwT5KdjuLJRt1WPxCztl0kMh6JwfMV2gmewzeLuAdZkYOKncae5X8=
+	t=1746542059; cv=none; b=EJcLZRKppjJmToqgReoIN4Kd5scNC4wyGUfJ6HzT5LV1hMYmH3Rbd1wjpkb2E87MWgyL+ps8o9yL6po4Cb08313Xvf80AzUpOlikW+Ryfr6d6i5HaxmINBs2QSLsSl6cApdjX9+TR6eSOq1bpWw30Yx/xncnftm5z3/WhyT81v8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746541793; c=relaxed/simple;
-	bh=lRUBkf0WiCGEs94dMZU4r9VWJAzTPNKc9POGWT1r5n0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=U8ATEk2H/iQz9vbGj2iEzMnnJsQVxyGKbr/t8vZZm7QaFxlV3DNrOzYbBp8AbrHVBaJr8Ewi9E2LZhuR2+KAu2pSKDnKoVTUlbD6U1RLFXe0WzM0TH5OExPbvZNYWVG9p2hKbwP3yIUEozreGQ6kRsbFPSttr/1C2nZb8h5/d/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hLnxM3cc; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746541790;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Z6IAMOzx8anJjTuW2oX0nCMNbivsaEXJ8bAbqHltAYM=;
-	b=hLnxM3ccvD6ik5iv/2pJ8hkknofpbw6Hk5uSVbq/3fq7CxNQiNtRe6BaplXb2d1Vc8JLP5
-	lziQZ7530ppF2HvFsyCE/aYNZqdfYS4xJf2D5XtECMRuLovzoQZ0biVLGbk+S6Nl/dqZ8Q
-	5HJ0OIEKdSt8ghGw1XybbYlyavTNXb0=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-37-EEv7XtbtOPaGOIZj1a278A-1; Tue,
- 06 May 2025 10:29:47 -0400
-X-MC-Unique: EEv7XtbtOPaGOIZj1a278A-1
-X-Mimecast-MFC-AGG-ID: EEv7XtbtOPaGOIZj1a278A_1746541785
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 990CB1955D6F;
-	Tue,  6 May 2025 14:29:45 +0000 (UTC)
-Received: from ebuild.redhat.com (unknown [10.44.33.52])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EF64D19560A3;
-	Tue,  6 May 2025 14:29:41 +0000 (UTC)
-From: Eelco Chaudron <echaudro@redhat.com>
-To: netdev@vger.kernel.org
-Cc: dev@openvswitch.org,
-	aconole@redhat.com,
-	echaudro@redhat.com,
-	i.maximets@ovn.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Subject: [PATCH net] openvswitch: Fix unsafe attribute parsing in output_userspace()
-Date: Tue,  6 May 2025 16:28:54 +0200
-Message-ID: <0bd65949df61591d9171c0dc13e42cea8941da10.1746541734.git.echaudro@redhat.com>
+	s=arc-20240116; t=1746542059; c=relaxed/simple;
+	bh=LHaPPpwPca6kcj5NTuDFy2qHBqEn3ONm9X4gAbWeSgM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=N6JumF1oHcUughs3HLvPEr382vj21Dn2Bn45j0P1VMjkGnWqLtF3r6gxWRuhoWPm2FemGnhrqqMRMR0klgN5NzbJXAqV5uThdDrHBabjhDAEdAJOohRFjafFBbJq/vWuIpKryuHzQTslsScwXNREVf1Tv/Jvbzhb45oLVPcMPaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PugnSh8e; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-476a304a8edso70315741cf.3;
+        Tue, 06 May 2025 07:34:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746542057; x=1747146857; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=StuB9y+BMojZ5vD2oKAZyZwlKbmEBqnfY2yebCn+Als=;
+        b=PugnSh8ewiQBcoksicYEIx9uEf7sHyJ1aXPvwE7SOEkKbuHJst5b1Mcrfpfv4dEr8n
+         KtnPsekr+i3IrX7ajlv+ngka6LCU88hsqDXXFLncQFIpJgbIVobj4quQFIqXDB9G8TYe
+         9uqIzxp2DluGmCJzKQkPXioL8bSRt7UKl4BnhVw80XWoYqAjKNQCdcIsD+dlDHhUv4fK
+         N6N5lDkBUCLlLa/2/JRdotQoMwizNtDa+s6xwQLnylyhtOjS+GLzmuHHCcncoU88S1EL
+         8AX2mynviU6FGZx9eWv/ftyxT3+wi4jJdtd8WrskzICNlLkzv7GWL+w7M+uZyM7X9tJy
+         x1hQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746542057; x=1747146857;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=StuB9y+BMojZ5vD2oKAZyZwlKbmEBqnfY2yebCn+Als=;
+        b=AbbE6+KHrh5tiFL9h8baEOMhAHnQ1KMoa3EK97QnRF1zv6d3hrsXHXCg0jUs2j0Pn4
+         FXqKSm/fTfOzISm0S960AGdr+vmunR9QRYoDg2qehu8LQ+VATLj/UaR3IPJu7vXFiGlg
+         PfW8wtW/3jr8ikd2NkFTcyhQtRtVGDhAmyeaW5HojIrPdsLnm2bDNqif71IFAXpdkL56
+         6qJM2GPL1y2X1QiUFyF/VIlmZQHxId1It5ceKsyQT0zFIrj7ciR9ayF3x6UoRA7d8npn
+         gWY9W8yBc+JDKXOrMpxyAqylSWE3259HqtUbVN5I/bEYdEA3ijY5Jx5KGF927ewLZo2t
+         Inmg==
+X-Forwarded-Encrypted: i=1; AJvYcCWapWOiFnnYdtR9Ypx/nZyLwsAt1mepz1rRm12QzpTQHuX8pH8pMjvsoSk8seD82x9vLvckFG8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzilHcSI/T2Wfahc7ngHA1TACmod+h8BzT+T/ZgHtCkAjBkL8ub
+	lJG7Jd9i0ebVwd/suWpGlw/eDOGlSFKPhU4d2vQaCUX20LzmKTWTIQWCqtvOnnL/INz4I/laSqR
+	OvRZWRBXPubTPCiyA6IkvNJ1nG6I=
+X-Gm-Gg: ASbGncu1EzESvODPJQZA1H/kARGwYj7doSmC5d+vtc3/31aBGHX1nBnVB7UV62gjPvH
+	GoDpjC+oAHOUDboXKWJC0p7bOoYaQblXXq5I0AVyGlY0/pw9bSIPsAxWva3r+JYkSUIuyEA5XF+
+	2xvNu0A7vOJ0oxMJlqhRS1hf0MHlea19A=
+X-Google-Smtp-Source: AGHT+IHtr6ibI5qatfCXKLwwmfLr6Qne/aSffQUrP0zvR9uPdOQ7tTGSzG9ulDYSVkUq8zzGWsDVbg0WFje76C/bDVM=
+X-Received: by 2002:a05:622a:580b:b0:476:b02d:2b4a with SMTP id
+ d75a77b69052e-4910ca57e5fmr50336411cf.27.1746542056992; Tue, 06 May 2025
+ 07:34:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+References: <cover.1746097431.git.asml.silence@gmail.com>
+In-Reply-To: <cover.1746097431.git.asml.silence@gmail.com>
+From: Alexey Charkov <alchark@gmail.com>
+Date: Tue, 6 May 2025 18:34:06 +0400
+X-Gm-Features: ATxdqUEPdSxTv8cThP_o2Pc53GH7dN6KGGj3rg-UQL_ryuYNnVzqSRrhJFCF1M0
+Message-ID: <CABjd4YzAJqvLiNid7RoVpLospTrAFzrBpTcFHuem2-JxfkzpmA@mail.gmail.com>
+Subject: Re: [PATCH io_uring 0/5] Add dmabuf support for io_uring zcrx
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: io-uring@vger.kernel.org, David Wei <dw@davidwei.uk>, netdev@vger.kernel.org, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
+	Victor Nogueira <victor@mojatatu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This patch replaces the manual Netlink attribute iteration in
-output_userspace() with nla_for_each_nested(), which ensures that only
-well-formed attributes are processed.
+On Tue, May 6, 2025 at 6:29=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.c=
+om> wrote:
+>
+> Currently, io_uring zcrx uses regular user pages to populate the
+> area for page pools, this series allows the user to pass a dmabuf
+> instead.
+>
+> Patches 1-4 are preparatory and do code shuffling. All dmabuf
+> touching changes are in the last patch. A basic example can be
+> found at:
+>
+> https://github.com/isilence/liburing/tree/zcrx-dmabuf
+> https://github.com/isilence/liburing.git zcrx-dmabuf
+>
+> Pavel Begunkov (5):
+>   io_uring/zcrx: improve area validation
+>   io_uring/zcrx: resolve netdev before area creation
+>   io_uring/zcrx: split out memory holders from area
+>   io_uring/zcrx: split common area map/unmap parts
+>   io_uring/zcrx: dmabuf backed zerocopy receive
+>
+>  include/uapi/linux/io_uring.h |   6 +-
+>  io_uring/rsrc.c               |  27 ++--
+>  io_uring/rsrc.h               |   2 +-
+>  io_uring/zcrx.c               | 260 +++++++++++++++++++++++++++-------
+>  io_uring/zcrx.h               |  18 ++-
+>  5 files changed, 248 insertions(+), 65 deletions(-)
 
-Fixes: ccb1352e76cf ("net: Add Open vSwitch kernel components.")
-Signed-off-by: Eelco Chaudron <echaudro@redhat.com>
----
- net/openvswitch/actions.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Hi Pavel,
 
-diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-index 61fea7baae5d..2f22ca59586f 100644
---- a/net/openvswitch/actions.c
-+++ b/net/openvswitch/actions.c
-@@ -975,8 +975,7 @@ static int output_userspace(struct datapath *dp, struct sk_buff *skb,
- 	upcall.cmd = OVS_PACKET_CMD_ACTION;
- 	upcall.mru = OVS_CB(skb)->mru;
- 
--	for (a = nla_data(attr), rem = nla_len(attr); rem > 0;
--	     a = nla_next(a, &rem)) {
-+	nla_for_each_nested(a, attr, rem) {
- 		switch (nla_type(a)) {
- 		case OVS_USERSPACE_ATTR_USERDATA:
- 			upcall.userdata = a;
--- 
-2.47.1
+Looks like another "depends" line might be needed in io_uring/Kconfig:
 
+diff --git a/io_uring/Kconfig b/io_uring/Kconfig
+index 4b949c42c0bf..9fa2cf502940 100644
+--- a/io_uring/Kconfig
++++ b/io_uring/Kconfig
+@@ -9,3 +9,4 @@ config IO_URING_ZCRX
+        depends on PAGE_POOL
+        depends on INET
+        depends on NET_RX_BUSY_POLL
++       depends on DMA_SHARED_BUFFER
+
+Otherwise I'm having trouble compiling the next-20250506 kernel for
+VT8500, which doesn't select DMA_BUF by default. The following linking
+error appears at the very end:
+
+armv7a-unknown-linux-gnueabihf-ld: io_uring/zcrx.o: in function
+`io_release_dmabuf':
+zcrx.c:(.text+0x1c): undefined reference to `dma_buf_unmap_attachment_unloc=
+ked'
+armv7a-unknown-linux-gnueabihf-ld: zcrx.c:(.text+0x30): undefined
+reference to `dma_buf_detach'
+armv7a-unknown-linux-gnueabihf-ld: zcrx.c:(.text+0x40): undefined
+reference to `dma_buf_put'
+armv7a-unknown-linux-gnueabihf-ld: io_uring/zcrx.o: in function
+`io_register_zcrx_ifq':
+zcrx.c:(.text+0x15cc): undefined reference to `dma_buf_get'
+armv7a-unknown-linux-gnueabihf-ld: zcrx.c:(.text+0x15e8): undefined
+reference to `dma_buf_attach'
+armv7a-unknown-linux-gnueabihf-ld: zcrx.c:(.text+0x1604): undefined
+reference to `dma_buf_map_attachment_unlocked'
+make[2]: *** [scripts/Makefile.vmlinux:91: vmlinux] Error 1
+make[1]: *** [/home/alchark/linux/Makefile:1242: vmlinux] Error 2
+make: *** [Makefile:248: __sub-make] Error 2
+
+Best regards,
+Alexey
 
