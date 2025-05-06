@@ -1,406 +1,544 @@
-Return-Path: <netdev+bounces-188497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188498-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7634DAAD18C
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 01:30:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D8A6AAD18E
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 01:30:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDC7B4C20B4
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 23:29:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24D741B64390
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 23:30:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C77E221CC45;
-	Tue,  6 May 2025 23:29:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0337C21CFFF;
+	Tue,  6 May 2025 23:30:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="H6puJc2P"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="VCTnyxb5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF92821CA13
-	for <netdev@vger.kernel.org>; Tue,  6 May 2025 23:29:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26961C32;
+	Tue,  6 May 2025 23:30:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746574169; cv=none; b=hjsBMYSX1s4lnp3NY8q4yxaaMxw7lBgF1WtX7ezNbziaANtCvJAkK/G38fvKtTfRxgCQITEongYwzhAK5GIzeKLIHZsgCEJVoPqt3rN/cw13fLRasPOHFMcyIFuY0heJ9aPN9WepHrli7dN4Bicy3IzLEhQ/V3RFxi9VFcEC23E=
+	t=1746574233; cv=none; b=sE7DpuVypol92y2h8usgpu6JS2/aBB+PNmMNpoMZX7tJPeNsJeVFuHeaEuh2a9t2QDNHt1SHPJ2KXzUKOXxjeMMnJeXAOwHvXCrEr+SADdAV4E+84hizR4kit+T6DwTjfEwtxLWS/LDc8CJKhd0SGVTO5mSp1ir0yi/hgbVLlt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746574169; c=relaxed/simple;
-	bh=CzRfEycE8St/H8jiikmRHP9ZHIgFKaRBy78XxdH4pus=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bafFh8TAKs0f4Kqrtyafk90p2/AU/P8dJMCFFyGApS8J2TAVy3wZN5a8aJw10gUn4HyAe54CxPGWo4+3pM3sKJw+0Si2YEoOtZz4jlYIT+OBkXymE03ZIAd4OGizSRi9Ccx8vszS/x+bvN4ElW4ZcFN3Vp1vIJMxGx1rKWZqn+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=H6puJc2P; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=urZOLOK3hGp0X8ehBzjC8CxIMlGG4rRlhh5lkdEqVPQ=; t=1746574167; x=1747438167; 
-	b=H6puJc2Pwq0z8/MUKCHgZ9wXOwb4P8Ik/GZ5wUXlefiHUgg/FMZkh81O5j7GbvmDLFSXYpvqcyE
-	kKg4lrtzLfusrlnsc0EDBVe9fm0UN0bby8CX45MOtZL6JFJCg3vk0uW1Sjl3J9O2WDppM5dxmgNBk
-	M8uQWIidgf+vyD5hviLNkX/uNzFsWukgMSTOZ3nXnjY7xHtKJeg+bxGjeHR8IXrzGXCgh27kt3PpW
-	e/NQ07CGuzCiKhdk94BLcOg4hqlefTd2b++l4ka0FP79nWyPDJe7vHvtcBc3EvplNa88Ul2cktC1K
-	I1op4W4naxQXiuTQyncAR94BCIVx6WHCgkwA==;
-Received: from mail-il1-f177.google.com ([209.85.166.177]:52681)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1uCRj3-0004JL-R3
-	for netdev@vger.kernel.org; Tue, 06 May 2025 16:29:27 -0700
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3d57143ee39so55809185ab.1
-        for <netdev@vger.kernel.org>; Tue, 06 May 2025 16:29:25 -0700 (PDT)
-X-Gm-Message-State: AOJu0YxJhrrUThblXYdbcgJoxWOzh8qvPsPD7g1N7djfajN0UYwXo8aB
-	4my7OdulUyF8cYZi/v2dma4Ij6az2aIlEO/9vIxW62pEJ+/DFVfjaI/kRNlX3Hd3z+2LguBle1P
-	vaMH2l456mk20S5JUSOhGlfwOtSQ=
-X-Google-Smtp-Source: AGHT+IG9Gly1goecGsjK0mpOyoyL5HdM5yhJEbPXriD3Ocm91zzkUXAZlz9bSWW4VtYvxjlw33Rw2JvQ4yWUiB9rsRI=
-X-Received: by 2002:a05:6820:1793:b0:608:271a:8d7a with SMTP id
- 006d021491bc7-60828d75860mr1067081eaf.7.1746574155116; Tue, 06 May 2025
- 16:29:15 -0700 (PDT)
+	s=arc-20240116; t=1746574233; c=relaxed/simple;
+	bh=OrNL7WvHDum/UWFyBEH0tiVOnrf+MDVBMg0FLwQb88g=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DhQeDOfN1uokotobsuMuO7LY2Sf6zyOUILooG3tePS5KQd+yqC0ZrUsW6fZ2O1dsF6PqMg1AUE9rDALE3IiqxiUeSmHJhWeVy0gTWj2F7GxsXsZdn34zw1asfdvolCNfHytfzXpc/3PowbCmPoCy0YGZ23u/VZMa+tKhUO4NOW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=VCTnyxb5; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1746574232; x=1778110232;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=OrNL7WvHDum/UWFyBEH0tiVOnrf+MDVBMg0FLwQb88g=;
+  b=VCTnyxb5HF0/0Z1K7knrDnWrFS6fb2acibAdg0VBRiVv8OrWn8G/L9+u
+   C0nGFALfcrhlSbCtb4Oa5VBl3HScGivlV6BbZg5Wpk8DVb7X/3lh5BWJY
+   vZfBQBvI2HUugT+jkIR5RN4vWrgg4mArc5mzrwgDWZVr5r5spGLHuJLE5
+   WtiexARfy/bb8kc5LXB14t1gUVOPykDkbbjKsktnbEeX3hekax0wP5Ytf
+   N4n1EjRQ1STpAnhLFYc5Hkr/EhYKgdf9mfrBk9y+So2Ag89wY9z6rc0xr
+   +YAIrERuFggyqASc1W0xM7VAXfKhx7aRI5dzMUe4cgluy+Qgjx+1cwO8O
+   w==;
+X-CSE-ConnectionGUID: QuRni8LORfafBKEKwluuMQ==
+X-CSE-MsgGUID: crphkMgTSNay1+ZA1ZVNPQ==
+X-IronPort-AV: E=Sophos;i="6.15,267,1739862000"; 
+   d="scan'208";a="41302789"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 May 2025 16:30:31 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Tue, 6 May 2025 16:29:50 -0700
+Received: from pop-os.microchip.com (10.10.85.11) by chn-vm-ex04.mchp-main.com
+ (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
+ Transport; Tue, 6 May 2025 16:29:49 -0700
+From: <Tristram.Ha@microchip.com>
+To: Andrew Lunn <andrew@lunn.ch>, Woojung Huh <woojung.huh@microchip.com>,
+	Russell King <linux@armlinux.org.uk>, Vladimir Oltean <olteanv@gmail.com>
+CC: Heiner Kallweit <hkallweit1@gmail.com>, Maxime Chevallier
+	<maxime.chevallier@bootlin.com>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, <UNGLinuxDriver@microchip.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Tristram Ha
+	<tristram.ha@microchip.com>
+Subject: [PATCH net-next] net: dsa: microchip: Add SGMII port support to KSZ9477 switch
+Date: Tue, 6 May 2025 16:29:49 -0700
+Message-ID: <20250506232949.12246-1-Tristram.Ha@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250502233729.64220-1-ouster@cs.stanford.edu>
- <20250502233729.64220-5-ouster@cs.stanford.edu> <1d7a6230-5ece-48f8-9b7d-ec19d6189677@redhat.com>
-In-Reply-To: <1d7a6230-5ece-48f8-9b7d-ec19d6189677@redhat.com>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Tue, 6 May 2025 16:28:38 -0700
-X-Gmail-Original-Message-ID: <CAGXJAmyizsc1Jk9VytJJ8OcCOTHoqUrgzGZUc1WDeanGyEV6pg@mail.gmail.com>
-X-Gm-Features: ATxdqUF7DLt07fgj_8SipOtTfRg_h3BTpcmadqDh55IgId83TXnlcv_xS_YVS8A
-Message-ID: <CAGXJAmyizsc1Jk9VytJJ8OcCOTHoqUrgzGZUc1WDeanGyEV6pg@mail.gmail.com>
-Subject: Re: [PATCH net-next v8 04/15] net: homa: create homa_pool.h and homa_pool.c
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Spam-Level: 
-X-Scan-Signature: 1f26ecfccd24954124942d3c02091509
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Mon, May 5, 2025 at 2:51=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
->
-> On 5/3/25 1:37 AM, John Ousterhout wrote:
-> [...]
-> > +/**
-> > + * set_bpages_needed() - Set the bpages_needed field of @pool based
-> > + * on the length of the first RPC that's waiting for buffer space.
-> > + * The caller must own the lock for @pool->hsk.
-> > + * @pool: Pool to update.
-> > + */
-> > +static void set_bpages_needed(struct homa_pool *pool)
-> > +{
-> > +     struct homa_rpc *rpc =3D list_first_entry(&pool->hsk->waiting_for=
-_bufs,
-> > +                     struct homa_rpc, buf_links);
->
-> Minor nit: please insert an empty line between variable declaration and
-> code.
+From: Tristram Ha <tristram.ha@microchip.com>
 
-Done. For some reason checkpatch.pl doesn't complain about this (or
-the next comment below). Until yesterday I wasn't aware of the
---strict argument to checkpatch.pl, which may explain why patchwork
-was finding checkpatch errors even though I was running checkpatch. I
-have now made a pass over all the Homa code to clean up --strict
-issues. But even with --strict, checkpatch.pl doesn't complain about
-the indentation problem above. Are there additional switches I should
-be giving to checkpatch.pl in addition to --strict?
+The KSZ9477 switch driver uses the XPCS driver to operate its SGMII
+port.  However there are some hardware bugs in the KSZ9477 SGMII
+module so workarounds are needed.  There was a proposal to update the
+XPCS driver to accommodate KSZ9477, but the new code is not generic
+enough to be used by other vendors.  It is better to do all these
+workarounds inside the KSZ9477 driver instead of modifying the XPCS
+driver.
 
-> > +     pool->bpages_needed =3D (rpc->msgin.length + HOMA_BPAGE_SIZE - 1)
-> > +                     >> HOMA_BPAGE_SHIFT;
->
-> Minor nit: please fix the indentation above
+There are 3 hardware issues.  The first is the MII_ADVERTISE register
+needs to be write once after reset for the correct code word to be
+sent.  The XPCS driver disables auto-negotiation first before
+configuring the SGMII/1000BASE-X mode and then enables it back.  The
+KSZ9477 driver then writes the MII_ADVERTISE register before enabling
+auto-negotiation.  In 1000BASE-X mode the MII_ADVERTISE register will
+be set, so KSZ9477 driver does not need to write it.
 
-Fixed.
+The second issue is the MII_BMCR register needs to set the exact speed
+and duplex mode when running in SGMII mode.  During link polling the
+KSZ9477 will check the speed and duplex mode are different from
+previous ones and update the MII_BMCR register accordingly.
 
-> > +/**
-> > + * homa_pool_new() - Allocate and initialize a new homa_pool (it will =
-have
-> > + * no region associated with it until homa_pool_set_region is invoked)=
-.
-> > + * @hsk:          Socket the pool will be associated with.
-> > + * Return: A pointer to the new pool or a negative errno.
-> > + */
-> > +struct homa_pool *homa_pool_new(struct homa_sock *hsk)
->
-> The proferrend name includes for an allocator includes 'alloc', not 'new'=
-.
+The last issue is 1000BASE-X mode does not work with auto-negotiation
+on.  The cause is the local port hardware does not know the link is up
+and so network traffic is not forwarded.  The workaround is to write 2
+additional bits when 1000BASE-X mode is configured.
 
-Got it. I have scanned the code base and replaced 'new' everywhere
-with 'alloc'. I also replaced 'destroy' with 'free'.
+Note the SGMII interrupt in the port cannot be masked.  As that
+interrupt is not handled in the KSZ9477 driver the SGMII interrupt bit
+will not be set even when the XPCS driver sets it.
 
-> > +{
-> > +     struct homa_pool *pool;
-> > +
-> > +     pool =3D kzalloc(sizeof(*pool), GFP_ATOMIC);
->
-> You should try to use GFP_KERNEL allocation as much as you can, and use
-> GFP_ATOMIC only in atomic context. If needed, try to move the function
-> outside the atomic scope doing the allocation before acquiring the
-> lock/rcu.
+Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
+---
+ drivers/net/dsa/microchip/ksz9477.c    | 191 ++++++++++++++++++++++++-
+ drivers/net/dsa/microchip/ksz9477.h    |   4 +-
+ drivers/net/dsa/microchip/ksz_common.c |  36 ++++-
+ drivers/net/dsa/microchip/ksz_common.h |  23 ++-
+ 4 files changed, 247 insertions(+), 7 deletions(-)
 
-Will do. I was able to refactor the homa_pool code so that it doesn't
-need GFP_ATOMIC.
+diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
+index 29fe79ea74cd..825aa570eed9 100644
+--- a/drivers/net/dsa/microchip/ksz9477.c
++++ b/drivers/net/dsa/microchip/ksz9477.c
+@@ -2,7 +2,7 @@
+ /*
+  * Microchip KSZ9477 switch driver main logic
+  *
+- * Copyright (C) 2017-2024 Microchip Technology Inc.
++ * Copyright (C) 2017-2025 Microchip Technology Inc.
+  */
+ 
+ #include <linux/kernel.h>
+@@ -161,6 +161,187 @@ static int ksz9477_wait_alu_sta_ready(struct ksz_device *dev)
+ 					10, 1000);
+ }
+ 
++static void port_sgmii_s(struct ksz_device *dev, uint port, u16 devid, u16 reg)
++{
++	u32 data;
++
++	data = (devid & MII_MMD_CTRL_DEVAD_MASK) << 16;
++	data |= reg;
++	ksz_pwrite32(dev, port, REG_PORT_SGMII_ADDR__4, data);
++}
++
++static void port_sgmii_r(struct ksz_device *dev, uint port, u16 devid, u16 reg,
++			 u16 *buf)
++{
++	port_sgmii_s(dev, port, devid, reg);
++	ksz_pread16(dev, port, REG_PORT_SGMII_DATA__4 + 2, buf);
++}
++
++static void port_sgmii_w(struct ksz_device *dev, uint port, u16 devid, u16 reg,
++			 u16 buf)
++{
++	port_sgmii_s(dev, port, devid, reg);
++	ksz_pwrite32(dev, port, REG_PORT_SGMII_DATA__4, buf);
++}
++
++static int ksz9477_pcs_read(struct mii_bus *bus, int phy, int mmd, int reg)
++{
++	struct ksz_device *dev = bus->priv;
++	int port = ksz_get_sgmii_port(dev);
++	u16 val;
++
++	port_sgmii_r(dev, port, mmd, reg, &val);
++
++	/* Simulate a value to activate special code in the XPCS driver if
++	 * supported.
++	 */
++	if (mmd == MDIO_MMD_PMAPMD) {
++		if (reg == MDIO_DEVID1)
++			val = 0x9477;
++		else if (reg == MDIO_DEVID2)
++			val = 0x22 << 10;
++	} else if (mmd == MDIO_MMD_VEND2) {
++		struct ksz_port *p = &dev->ports[port];
++
++		/* Need to update MII_BMCR register with the exact speed and
++		 * duplex mode when running in SGMII mode and this register is
++		 * used to detect connected speed in that mode.
++		 */
++		if (reg == MMD_SR_MII_AUTO_NEG_STATUS) {
++			int duplex, speed;
++
++			if (val & SR_MII_STAT_LINK_UP) {
++				speed = (val >> SR_MII_STAT_S) & SR_MII_STAT_M;
++				if (speed == SR_MII_STAT_1000_MBPS)
++					speed = SPEED_1000;
++				else if (speed == SR_MII_STAT_100_MBPS)
++					speed = SPEED_100;
++				else
++					speed = SPEED_10;
++
++				if (val & SR_MII_STAT_FULL_DUPLEX)
++					duplex = DUPLEX_FULL;
++				else
++					duplex = DUPLEX_HALF;
++
++				if (!p->phydev.link ||
++				    p->phydev.speed != speed ||
++				    p->phydev.duplex != duplex) {
++					u16 ctrl;
++
++					p->phydev.link = 1;
++					p->phydev.speed = speed;
++					p->phydev.duplex = duplex;
++					port_sgmii_r(dev, port, mmd, MII_BMCR,
++						     &ctrl);
++					ctrl &= BMCR_ANENABLE;
++					ctrl |= mii_bmcr_encode_fixed(speed,
++								      duplex);
++					port_sgmii_w(dev, port, mmd, MII_BMCR,
++						     ctrl);
++				}
++			} else {
++				p->phydev.link = 0;
++			}
++		} else if (reg == MII_BMSR) {
++			p->phydev.link = (val & BMSR_LSTATUS);
++		}
++	}
++	return val;
++}
++
++static int ksz9477_pcs_write(struct mii_bus *bus, int phy, int mmd, int reg,
++			     u16 val)
++{
++	struct ksz_device *dev = bus->priv;
++	int port = ksz_get_sgmii_port(dev);
++
++	if (mmd == MDIO_MMD_VEND2) {
++		struct ksz_port *p = &dev->ports[port];
++
++		if (reg == MMD_SR_MII_AUTO_NEG_CTRL) {
++			u16 sgmii_mode = SR_MII_PCS_SGMII << SR_MII_PCS_MODE_S;
++
++			/* Need these bits for 1000BASE-X mode to work with
++			 * AN on.
++			 */
++			if (!(val & sgmii_mode))
++				val |= SR_MII_SGMII_LINK_UP |
++				       SR_MII_TX_CFG_PHY_MASTER;
++
++			/* SGMII interrupt in the port cannot be masked, so
++			 * make sure interrupt is not enabled as it is not
++			 * handled.
++			 */
++			val &= ~SR_MII_AUTO_NEG_COMPLETE_INTR;
++		} else if (reg == MII_BMCR) {
++			/* The MII_ADVERTISE register needs to write once
++			 * before doing auto-negotiation for the correct
++			 * config_word to be sent out after reset.
++			 */
++			if ((val & BMCR_ANENABLE) && !p->sgmii_adv_write) {
++				u16 adv;
++
++				/* The SGMII port cannot disable flow contrl
++				 * so it is better to just advertise symmetric
++				 * pause.
++				 */
++				port_sgmii_r(dev, port, mmd, MII_ADVERTISE,
++					     &adv);
++				adv |= ADVERTISE_1000XPAUSE;
++				adv &= ~ADVERTISE_1000XPSE_ASYM;
++				port_sgmii_w(dev, port, mmd, MII_ADVERTISE,
++					     adv);
++				p->sgmii_adv_write = 1;
++			} else if (val & BMCR_RESET) {
++				p->sgmii_adv_write = 0;
++			}
++		} else if (reg == MII_ADVERTISE) {
++			/* XPCS driver writes to this register so there is no
++			 * need to update it for the errata.
++			 */
++			p->sgmii_adv_write = 1;
++		}
++	}
++	port_sgmii_w(dev, port, mmd, reg, val);
++	return 0;
++}
++
++int ksz9477_pcs_create(struct ksz_device *dev)
++{
++	/* This chip has a SGMII port. */
++	if (ksz_has_sgmii_port(dev)) {
++		int port = ksz_get_sgmii_port(dev);
++		struct ksz_port *p = &dev->ports[port];
++		struct phylink_pcs *pcs;
++		struct mii_bus *bus;
++		int ret;
++
++		bus = devm_mdiobus_alloc(dev->dev);
++		if (!bus)
++			return -ENOMEM;
++
++		bus->name = "ksz_pcs_mdio_bus";
++		snprintf(bus->id, MII_BUS_ID_SIZE, "%s-pcs",
++			 dev_name(dev->dev));
++		bus->read_c45 = &ksz9477_pcs_read;
++		bus->write_c45 = &ksz9477_pcs_write;
++		bus->parent = dev->dev;
++		bus->phy_mask = ~0;
++		bus->priv = dev;
++
++		ret = devm_mdiobus_register(dev->dev, bus);
++		if (ret)
++			return ret;
++
++		pcs = xpcs_create_pcs_mdiodev(bus, 0);
++		if (IS_ERR(pcs))
++			return PTR_ERR(pcs);
++		p->pcs = pcs;
++	}
++	return 0;
++}
++
+ int ksz9477_reset_switch(struct ksz_device *dev)
+ {
+ 	u8 data8;
+@@ -978,6 +1159,14 @@ void ksz9477_get_caps(struct ksz_device *dev, int port,
+ 
+ 	if (dev->info->gbit_capable[port])
+ 		config->mac_capabilities |= MAC_1000FD;
++
++	if (ksz_is_sgmii_port(dev, port)) {
++		struct ksz_port *p = &dev->ports[port];
++
++		phy_interface_or(config->supported_interfaces,
++				 config->supported_interfaces,
++				 p->pcs->supported_interfaces);
++	}
+ }
+ 
+ int ksz9477_set_ageing_time(struct ksz_device *dev, unsigned int msecs)
+diff --git a/drivers/net/dsa/microchip/ksz9477.h b/drivers/net/dsa/microchip/ksz9477.h
+index d2166b0d881e..0d1a6dfda23e 100644
+--- a/drivers/net/dsa/microchip/ksz9477.h
++++ b/drivers/net/dsa/microchip/ksz9477.h
+@@ -2,7 +2,7 @@
+ /*
+  * Microchip KSZ9477 series Header file
+  *
+- * Copyright (C) 2017-2022 Microchip Technology Inc.
++ * Copyright (C) 2017-2025 Microchip Technology Inc.
+  */
+ 
+ #ifndef __KSZ9477_H
+@@ -97,4 +97,6 @@ void ksz9477_acl_match_process_l2(struct ksz_device *dev, int port,
+ 				  u16 ethtype, u8 *src_mac, u8 *dst_mac,
+ 				  unsigned long cookie, u32 prio);
+ 
++int ksz9477_pcs_create(struct ksz_device *dev);
++
+ #endif
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index b45052497f8a..c93a567a4c3b 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -2,7 +2,7 @@
+ /*
+  * Microchip switch driver main logic
+  *
+- * Copyright (C) 2017-2024 Microchip Technology Inc.
++ * Copyright (C) 2017-2025 Microchip Technology Inc.
+  */
+ 
+ #include <linux/delay.h>
+@@ -354,10 +354,26 @@ static void ksz9477_phylink_mac_link_up(struct phylink_config *config,
+ 					int speed, int duplex, bool tx_pause,
+ 					bool rx_pause);
+ 
++static struct phylink_pcs *
++ksz_phylink_mac_select_pcs(struct phylink_config *config,
++			   phy_interface_t interface)
++{
++	struct dsa_port *dp = dsa_phylink_to_port(config);
++	struct ksz_device *dev = dp->ds->priv;
++	struct ksz_port *p = &dev->ports[dp->index];
++
++	if (ksz_is_sgmii_port(dev, dp->index) &&
++	    (interface == PHY_INTERFACE_MODE_SGMII ||
++	    interface == PHY_INTERFACE_MODE_1000BASEX))
++		return p->pcs;
++	return NULL;
++}
++
+ static const struct phylink_mac_ops ksz9477_phylink_mac_ops = {
+ 	.mac_config	= ksz_phylink_mac_config,
+ 	.mac_link_down	= ksz_phylink_mac_link_down,
+ 	.mac_link_up	= ksz9477_phylink_mac_link_up,
++	.mac_select_pcs	= ksz_phylink_mac_select_pcs,
+ };
+ 
+ static const struct ksz_dev_ops ksz9477_dev_ops = {
+@@ -395,6 +411,7 @@ static const struct ksz_dev_ops ksz9477_dev_ops = {
+ 	.reset = ksz9477_reset_switch,
+ 	.init = ksz9477_switch_init,
+ 	.exit = ksz9477_switch_exit,
++	.pcs_create = ksz9477_pcs_create,
+ };
+ 
+ static const struct phylink_mac_ops lan937x_phylink_mac_ops = {
+@@ -1035,8 +1052,7 @@ static const struct regmap_range ksz9477_valid_regs[] = {
+ 	regmap_reg_range(0x701b, 0x701b),
+ 	regmap_reg_range(0x701f, 0x7020),
+ 	regmap_reg_range(0x7030, 0x7030),
+-	regmap_reg_range(0x7200, 0x7203),
+-	regmap_reg_range(0x7206, 0x7207),
++	regmap_reg_range(0x7200, 0x7207),
+ 	regmap_reg_range(0x7300, 0x7301),
+ 	regmap_reg_range(0x7400, 0x7401),
+ 	regmap_reg_range(0x7403, 0x7403),
+@@ -1552,6 +1568,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
+ 				   true, false, false},
+ 		.gbit_capable	= {true, true, true, true, true, true, true},
+ 		.ptp_capable = true,
++		.sgmii_port = 7,
+ 		.wr_table = &ksz9477_register_set,
+ 		.rd_table = &ksz9477_register_set,
+ 	},
+@@ -1944,6 +1961,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
+ 		.internal_phy	= {true, true, true, true,
+ 				   true, false, false},
+ 		.gbit_capable	= {true, true, true, true, true, true, true},
++		.sgmii_port = 7,
+ 		.wr_table = &ksz9477_register_set,
+ 		.rd_table = &ksz9477_register_set,
+ 	},
+@@ -2067,7 +2085,7 @@ void ksz_r_mib_stats64(struct ksz_device *dev, int port)
+ 
+ 	spin_unlock(&mib->stats64_lock);
+ 
+-	if (dev->info->phy_errata_9477) {
++	if (dev->info->phy_errata_9477 && !ksz_is_sgmii_port(dev, port)) {
+ 		ret = ksz9477_errata_monitor(dev, port, raw->tx_late_col);
+ 		if (ret)
+ 			dev_err(dev->dev, "Failed to monitor transmission halt\n");
+@@ -2775,6 +2793,12 @@ static int ksz_setup(struct dsa_switch *ds)
+ 	if (ret)
+ 		return ret;
+ 
++	if (ksz_has_sgmii_port(dev) && dev->dev_ops->pcs_create) {
++		ret = dev->dev_ops->pcs_create(dev);
++		if (ret)
++			return ret;
++	}
++
+ 	/* set broadcast storm protection 10% rate */
+ 	regmap_update_bits(ksz_regmap_16(dev), regs[S_BROADCAST_CTRL],
+ 			   BROADCAST_STORM_RATE,
+@@ -3613,6 +3637,10 @@ static void ksz_phylink_mac_config(struct phylink_config *config,
+ 	if (dev->info->internal_phy[port])
+ 		return;
+ 
++	/* No need to configure XMII control register when using SGMII. */
++	if (ksz_is_sgmii_port(dev, port))
++		return;
++
+ 	if (phylink_autoneg_inband(mode)) {
+ 		dev_err(dev->dev, "In-band AN not supported!\n");
+ 		return;
+diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
+index dd5429ff16ee..84e9e423980d 100644
+--- a/drivers/net/dsa/microchip/ksz_common.h
++++ b/drivers/net/dsa/microchip/ksz_common.h
+@@ -1,7 +1,7 @@
+ /* SPDX-License-Identifier: GPL-2.0 */
+ /* Microchip switch driver common header
+  *
+- * Copyright (C) 2017-2024 Microchip Technology Inc.
++ * Copyright (C) 2017-2025 Microchip Technology Inc.
+  */
+ 
+ #ifndef __KSZ_COMMON_H
+@@ -10,6 +10,7 @@
+ #include <linux/etherdevice.h>
+ #include <linux/kernel.h>
+ #include <linux/mutex.h>
++#include <linux/pcs/pcs-xpcs.h>
+ #include <linux/phy.h>
+ #include <linux/regmap.h>
+ #include <net/dsa.h>
+@@ -93,6 +94,7 @@ struct ksz_chip_data {
+ 	bool internal_phy[KSZ_MAX_NUM_PORTS];
+ 	bool gbit_capable[KSZ_MAX_NUM_PORTS];
+ 	bool ptp_capable;
++	u8 sgmii_port;
+ 	const struct regmap_access_table *wr_table;
+ 	const struct regmap_access_table *rd_table;
+ };
+@@ -132,6 +134,7 @@ struct ksz_port {
+ 	u32 force:1;
+ 	u32 read:1;			/* read MIB counters in background */
+ 	u32 freeze:1;			/* MIB counter freeze is enabled */
++	u32 sgmii_adv_write:1;
+ 
+ 	struct ksz_port_mib mib;
+ 	phy_interface_t interface;
+@@ -141,6 +144,7 @@ struct ksz_port {
+ 	void *acl_priv;
+ 	struct ksz_irq pirq;
+ 	u8 num;
++	struct phylink_pcs *pcs;
+ #if IS_ENABLED(CONFIG_NET_DSA_MICROCHIP_KSZ_PTP)
+ 	struct hwtstamp_config tstamp_config;
+ 	bool hwts_tx_en;
+@@ -440,6 +444,8 @@ struct ksz_dev_ops {
+ 	int (*reset)(struct ksz_device *dev);
+ 	int (*init)(struct ksz_device *dev);
+ 	void (*exit)(struct ksz_device *dev);
++
++	int (*pcs_create)(struct ksz_device *dev);
+ };
+ 
+ struct ksz_device *ksz_switch_alloc(struct device *base, void *priv);
+@@ -731,6 +737,21 @@ static inline bool is_lan937x_tx_phy(struct ksz_device *dev, int port)
+ 		dev->chip_id == LAN9372_CHIP_ID) && port == KSZ_PORT_4;
+ }
+ 
++static inline int ksz_get_sgmii_port(struct ksz_device *dev)
++{
++	return dev->info->sgmii_port - 1;
++}
++
++static inline bool ksz_has_sgmii_port(struct ksz_device *dev)
++{
++	return dev->info->sgmii_port > 0;
++}
++
++static inline bool ksz_is_sgmii_port(struct ksz_device *dev, int port)
++{
++	return dev->info->sgmii_port == port + 1;
++}
++
+ /* STP State Defines */
+ #define PORT_TX_ENABLE			BIT(2)
+ #define PORT_RX_ENABLE			BIT(1)
+-- 
+2.34.1
 
-> > +     pool->num_cores =3D nr_cpu_ids;
->
-> The 'num_cores' field is likely not needed, and it's never used in this
-> series.
-
-Yep, that field is no longer used. I have deleted it.
-
-> > +     pool->check_waiting_invoked =3D 0;
-> > +
-> > +     return 0;
-> > +
-> > +error:
-> > +     kfree(pool->descriptors);
-> > +     free_percpu(pool->cores);
->
-> The above assumes that 'pool' will be zeroed at allocation time, but the
-> allocator does not do that. You should probably add the __GFP_ZERO flag
-> to the pool allocator.
-
-The pool is allocated with kzalloc; that zeroes it, no?
-
-> > +bool homa_bpage_available(struct homa_bpage *bpage, u64 now)
-> > +{
-> > +     int ref_count =3D atomic_read(&bpage->refs);
-> > +
-> > +     return ref_count =3D=3D 0 || (ref_count =3D=3D 1 && bpage->owner =
->=3D 0 &&
-> > +                     bpage->expiration <=3D now);
->
-> Minor nit: please fix the indentation above. Other cases below. Please
-> validate your patch with the checkpatch.pl script.
-
-I have been running checkpatch.pl, but as I mentioned above it doesn't
-seem to be reporting everything.
-
-> > +int homa_pool_get_pages(struct homa_pool *pool, int num_pages, u32 *pa=
-ges,
-> > +                     int set_owner)
-> > +{
-> > +     int core_num =3D smp_processor_id();
-> > +     struct homa_pool_core *core;
-> > +     u64 now =3D sched_clock();
->
-> From sched_clock() documentation:
->
-> sched_clock() has no promise of monotonicity or bounded drift between
-> CPUs, use (which you should not) requires disabling IRQs.
->
-> Can't be used for an expiration time. You could use 'jiffies' instead,
-
-Jiffies are *really* coarse grain (4 ms on my servers). It's possible
-that I could make them work in this situation, but in general jiffies
-won't work for Homa. Homa needs to make decisions at
-microsecond-scale, and an RPC that takes one jiffy to complete is
-completely unacceptable. Homa needs a fine-grain (e.g. cycle level)
-clock that is monotonic and synchronous across cores, and as far as I
-know, such a clock is available on every server where Homa is likely
-to run. For example, I believe that the TSC counters on both Intel and
-AMD chips have had the right properties for at least 10-15 years. And
-isn't sched_clock based on TSC where it's available? So even though
-sched_clock makes no official promises, isn't the reality actually
-fine? Can I simply stipulate that Homa is not appropriate for any
-machine where sched_clock doesn't have the properties Homa needs (this
-won't be a significant limitation in practice)?
-
-Ultimately I think Linux needs to bite the bullet and provide an
-official fine-grain clock with ns precision.
-
-> > +
-> > +                     limit =3D pool->num_bpages
-> > +                                     - atomic_read(&pool->free_bpages)=
-;
->
-> Nit: indentation above, the operator should stay on the first line.
-
-Fixed but, again, checkpatch.pl didn't report it.
-
-> > +
-> > +             /* Figure out whether this candidate is free (or can be
-> > +              * stolen). Do a quick check without locking the page, an=
-d
-> > +              * if the page looks promising, then lock it and check ag=
-ain
-> > +              * (must check again in case someone else snuck in and
-> > +              * grabbed the page).
-> > +              */
-> > +             if (!homa_bpage_available(bpage, now))
-> > +                     continue;
->
-> homa_bpage_available() accesses bpage without lock, so needs READ_ONCE()
-> annotations on the relevant fields and you needed to add paied
-> WRITE_ONCE() when updating them.
-
-I think the code is safe as is. Even though some of the fields
-accessed by homa_bpage_accessible are not atomic, it's not a disaster
-if they return stale values, since homa_bpage_available is invoked
-again after acquiring the lock before making any final decisions. The
-worst that can happen is (a) skipping over a bpage that's actually
-available or (b) acquiring the lock only to discover the bpage wasn't
-actually available (and then skipping it). Neither of these is
-problematic.
-
-Also, I'm not sure what you mean by "READ_ONCE() annotations on the
-relevant fields". Do I need something additional in the field
-declaration, in addition to using READ_ONCE() and WRITE_ONCE() to
-access the field?
-
->
-> > +             if (!spin_trylock_bh(&bpage->lock))
->
-> Why only trylock? I have a vague memory on some discussion on this point
-> in a previous revision. You should at least add a comment here on in the
-> commit message explaning why a plain spin_lock does not fit.
-
-I think the reasoning is different here than in other situations we
-may have discussed. I have added the following comment:
-"Rather than wait for a locked page to become free, just go on to the
-next page. If the page is locked, it probably won't turn out to be
-available anyway."
-
-> > +     /* The last chunk may be less than a full bpage; for this we use
-> > +      * the bpage that we own (and reuse it for multiple messages).
-> > +      */
-> > +     partial =3D rpc->msgin.length & (HOMA_BPAGE_SIZE - 1);
-> > +     if (unlikely(partial =3D=3D 0))
-> > +             goto success;
-> > +     core_id =3D smp_processor_id();
->
-> Is this code running in non-preemptible scope? otherwise you need to use
-> get_cpu() here and put_cpu() when you are done with 'core_id'.
-
-Yes, it's non-preemptible since a spinlock is being held on the RPC.
-
->
-> > +     (pool->cores);
-> > +     bpage =3D &pool->descriptors[core->page_hint];
-> > +     if (!spin_trylock_bh(&bpage->lock))
-> > +             spin_lock_bh(&bpage->lock);
->
-> I think I already commented on this pattern. Please don't use it.
-
-Sorry, this is not intentional. It came about because the patches for
-upstreaming are generated by extracting code from the "full" version
-of Homa, removing things such as instrumentation code and
-functionality that is not part of this patch series. The stripper is
-not smart enough to recognize situations like this where the stripped
-code, though technically correct, is nonsensical. I have to go in by
-hand and add extra annotations to the source code so that the output
-looks reasonable. I have now done that for this situation.
-
-> > +
-> > +     /* We get here if there wasn't enough buffer space for this
-> > +      * message; add the RPC to hsk->waiting_for_bufs.
->
-> Please also add a comment describing why waiting RPCs are sorted by
-> message size.
-
-Done. The list is sorted in order to implement the SRPT policy (give
-priority to the shortest messages).
-
-> > +             rpc =3D list_first_entry(&pool->hsk->waiting_for_bufs,
-> > +                                    struct homa_rpc, buf_links);
-> > +             if (!homa_rpc_try_lock(rpc)) {
-> > +                     /* Can't just spin on the RPC lock because we're
-> > +                      * holding the socket lock (see sync.txt). Instea=
-d,
->
-> The documentation should live under:
->
-> Documentation/networking/
->
-> likely in its own subdir, and must be in restructured format.
->
-> Here you should just mention that the lock acquiring order is rpc ->
-> home sock lock.
-
-I have updated the comment as you requested, and I'll reformat the
-.txt files and move them to Documentation/networking/homa.
-
->
-> > +                      * release the socket lock and try the entire
-> > +                      * operation again.
-> > +                      */
-> > +                     homa_sock_unlock(pool->hsk);
-> > +                     continue;
-> > +             }
-> > +             list_del_init(&rpc->buf_links);
-> > +             if (list_empty(&pool->hsk->waiting_for_bufs))
-> > +                     pool->bpages_needed =3D INT_MAX;
-> > +             else
-> > +                     set_bpages_needed(pool);
-> > +             homa_sock_unlock(pool->hsk);
-> > +             homa_pool_allocate(rpc);
->
-> Why you don't need to check the allocation return value here?
-
-There's no need to check the return value because if the allocation
-couldn't be made, homa_pool_allocate automatically requeues the RPC.
-The only time it returns an "error" is if there is no allocation
-region. This should never happen in the first place, and if it does
-the right response is simply to ignore the error and continue.
-
-> > + * struct homa_bpage - Contains information about a single page in
-> > + * a buffer pool.
-> > + */
-> > +struct homa_bpage {
-> > +     union {
-> > +             /**
-> > +              * @cache_line: Ensures that each homa_bpage object
-> > +              * is exactly one cache line long.
-> > +              */
-> > +             char cache_line[L1_CACHE_BYTES];
->
-> Instead of the struct/union nesting just use ____cacheline_aligned
-
-Done.
-
-> [...]
-> > +* Homa's approach means that socket shutdown and deletion can potentia=
-lly
-> > +  occur while operations are underway that hold RPC locks but not the =
-socket
-> > +  lock. This creates several potential problems:
-> > +  * A socket might be deleted and its memory reclaimed while an RPC st=
-ill
-> > +    has access to it. Homa assumes that Linux will prevent socket dele=
-tion
-> > +    while the kernel call is executing.
->
-> This last sentence is not clear to me. Do you mean that the kernel
-> ensures that the socket is freed after the close() syscall?
-
-Apologies... this text is no longer accurate. A socket cannot have its
-memory reclaimed until all RPCs associated with the socket have been
-ended and reaped. I've revised that documentation so it now looks like
-this:
-
-* Homa's approach means that socket shutdown and deletion can potentially
-  begin while operations are underway that hold RPC locks but not the socke=
-t
-  lock. For example, a new RPC creation might be underway when a socket
-  is shut down, which could attempt to add the new RPC after homa_sock_shut=
-down
-  thinks it has deleted all RPCs. Handling this requires careful checking
-  of hsk->shutdown. For example, during new RPC creation the socket lock
-  must be acquired to add the new RPC to those for the socket; after acquir=
-ing
-  the lock, it must check hsk->shutdown and abort the RPC creation if the
-  socket has been shutdown.
-
-A question for you: do socket-related kernel calls such as recvmsg
-automatically take a reference on the socket or do something else to
-protect it? I've been assuming that sockets can't go away during
-callbacks such as those for recvmsg and sendmsg.
-
--John-
 
