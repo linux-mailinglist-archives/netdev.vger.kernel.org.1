@@ -1,116 +1,109 @@
-Return-Path: <netdev+bounces-188410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8309AACC01
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 19:13:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC89DAACC3D
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 19:30:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A0231C41F13
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 17:13:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 194415217CF
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 17:30:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BF1C286412;
-	Tue,  6 May 2025 17:12:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3B652836A6;
+	Tue,  6 May 2025 17:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cae0fvxh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kUqeBUWj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118312857FF;
-	Tue,  6 May 2025 17:12:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8B51227574;
+	Tue,  6 May 2025 17:30:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746551547; cv=none; b=MYivBDnfheNB9RF/mjrKjxl6HR0WAmQMI0RQK4ReiW3Vt2//WiXr3FGX3RaPXOx967IzZyTYulHgV70+OLajW1E8+SlhujZ/DhYkvv+0QfLGRlDd/2cN5c9NvhNeSQM4J86RJRsO/jzhA6aQowCfeLcowwp5Tf+ypGilTTl09CA=
+	t=1746552600; cv=none; b=k+LmWFCZeN1ulEDYJejAy4cf+ZbzkD96P8aa7IsSBuvB4Pk2Va2NHl43/8neP7cJl8DjvwnXzwk1/cc0xYCYjNn7wbcdGQ/LjaNa+NsdSKHCyq5j5decN8+Id+EBD7QMlGpp4xJEUxim3MDVFP17t4nqn5Cg8RmY0obIquoi5Xk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746551547; c=relaxed/simple;
-	bh=MsdYdJ/KW3W35ZRffxosrmbNz2P9Pc6Brwu9+do3LHY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A+wcEO89MZbwqqCank/ozQVo/3H9G8jEDY0LtQkzm7GKHVS0b++tPijbyrvhefLpvr9joiirBjXpKbwXCVCfwTh0IgwGiCPF7D3umOA5vUanaVHHdLEBSl13y5tsmEs/66wKtcGia1IQ3b4cfNgkG67bmlIJbnB29w6rKy/8I/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cae0fvxh; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7398d65476eso75276b3a.1;
-        Tue, 06 May 2025 10:12:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746551545; x=1747156345; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jPCb39rUpAp5hscXjjz62U6p2DJeSpmSm0JrT60cYSs=;
-        b=cae0fvxh+YbbcGGuPDMV+/eP7Shgmky2odpqrMnFPnajyEf48HJkbDAIiBfw45Fqxv
-         fglCwHBHgdUZIiNihbxxpQ3pKuOZRwQ7q7+ycPiVTuLMMcLW9e8usSwrUDr+yjW/gfSg
-         Q5abNwsB9ygGBuw/q72rkE6puYvAXuvUbAmOjszG9pkvRx1Z7z/BjmBfynJaKzGHhc6Y
-         tb1h1i0GnmH245AEIz9qN7aybSzCpoLhqGVQeMNwzeYGil1ftbxQOKQ/+yt+RqRECMLg
-         FoHmleCFerGDgGf9Rv6xR8VKcK98QgOkmCId3YWc/Fto3tuJitXwOBnk0ikjXg0rbjU/
-         hJQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746551545; x=1747156345;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jPCb39rUpAp5hscXjjz62U6p2DJeSpmSm0JrT60cYSs=;
-        b=mJwGOVcLUNL8d1Zl0rwLuUpF08pUFn8tYMioISnQQVbcZesb01MzXZc4Bvt1edm57k
-         Ufcv1HaHiZI4PxTZYdYe8StHxcPQ/KUHWXrvmGLtI57iGtIyhQs0t7bYjqAvD6817x6R
-         2++WWOOEryFCtATUE48w239KLvLj4VRbYpF+VvuqjIPDUxsJZt3JspJk5IbAFo76WvQU
-         YxStf792tAzn6Febe/OfdFadr6QwpVq71iYM7r4UclYsBWEGgzr9J5txGFQAOtfo19lu
-         BMVldpNYKfkd7urn/Mijn6Ms760yZmo07brh10W6ZPget1qaDuR0mSwFEyjDhVIYtnHe
-         Liqg==
-X-Forwarded-Encrypted: i=1; AJvYcCXAvD0yrIVgsRsaTJ3HxGNbzg0FLNVMGiV6pJGEmfHO9dONp7vDBPuxQDRkPkj+pMgfVv2kX11lmhU0nZaz82I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwTuPWSUuISuuOF5NtWYWchac7VcYS7MpzbyjpMaFS8pjmLtWio
-	k3LQfAWLt6GK9mKIi5XKkycdqph4kHHTbDQBR85T6ZO0F13n+HQ=
-X-Gm-Gg: ASbGncvzDuYdRqPpEehytAs+ND7KJGL31ILCKfZWMPzLlRJ+P/kcafLj07xNkE5G80n
-	u2OQmL5BJgXIhYIwrG0bQgHsFobA0fz8QweUG+Qx2aAjoLTbHRg9bzCiFd2RrsEweLDqtIKLLiP
-	kud97H33WrU604DA3BUQijKNEJMgEZ2EyZXfkLUgCqoAhLgDUeq5zCVJp3EMUzpBsmfGTEfykb2
-	5eVhevPz8LGcAYW3ZM4jWwYB84jrjR+kqBCXOaovFwP3t6DuNkh9TUJmraIjw6I/cyqgCXXrJE6
-	s3c6ogDVXhIQbJv7HU3u0xijrDnbmKWO3emojUiPJlevnTRImDBccvEpat0KU7NeCMZqz27CB2o
-	=
-X-Google-Smtp-Source: AGHT+IFsDdDD4rDYe4Kl3G3iViwO3m9GCrV6ZE2hAnc0k+Ve/Xm4RG2pejPfSu30EiVWJGdURKb3Iw==
-X-Received: by 2002:a05:6a00:3994:b0:737:cd8:2484 with SMTP id d2e1a72fcca58-7409b6788a3mr804272b3a.6.1746551544887;
-        Tue, 06 May 2025 10:12:24 -0700 (PDT)
-Received: from localhost (c-73-170-40-124.hsd1.ca.comcast.net. [73.170.40.124])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-74058dbba97sm9436665b3a.56.2025.05.06.10.12.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 May 2025 10:12:24 -0700 (PDT)
-Date: Tue, 6 May 2025 10:12:23 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Cosmin Ratiu <cratiu@nvidia.com>
-Cc: netdev@vger.kernel.org, Stanislav Fomichev <sdf@fomichev.me>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"jiri @ resnulli . us" <jiri@resnulli.us>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net] net: Lock lower level devices when updating features
-Message-ID: <aBpC9_SgUaAA2P0f@mini-arch>
-References: <20250506142117.1883598-1-cratiu@nvidia.com>
+	s=arc-20240116; t=1746552600; c=relaxed/simple;
+	bh=a5IjjeslWstXCIy0Z7FbsC1/6yjktsktZKQbGzwtkCs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ESpOfgdw+Fc/Ffbn//COxQaHlVGK2zp9LzRlQ99d9pWjMVHQF2xJxViIyqYRzBV2xiIe7/We+mZPAkhdJZX7yKji3J/2m+XFtPWCOfxxGpaw3iZE1qV6xdata5jPsWnYSpcsuq27SOuObtdzCfjB641bCXeSGr+M4Whav3spSJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kUqeBUWj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F6C4C4CEE4;
+	Tue,  6 May 2025 17:30:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746552600;
+	bh=a5IjjeslWstXCIy0Z7FbsC1/6yjktsktZKQbGzwtkCs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=kUqeBUWj43Di7dbKEYkkasDAm8gzm4WFkozz2xCJl4YzD9S8oJdX6l7Af2OL42I2e
+	 SElEkRzplvFULPXo3ClMlRcVdaNg02xnIKJTnXB/+HPEFz0klBEkGR5kCkg9LNzYam
+	 4xCBRIIE6cUDbC7T+gVmmjp05ZE3IavsijG6B6Kitu7sYNTl8LQRsxvLIvk0FgSalh
+	 QwphM5MycKvbVx4pJE8FF4uWcj01N0VAsfjHW/YZ06YE2fsQxZ45a5OoveKnyjnYZC
+	 jprKobnJG95hmeztc6tkMFRUbShSk6ysaPs6HurupuMJATL7SDj18IRhWLZdOi6HE1
+	 QuKG2IqTw+q6Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F05380CFD7;
+	Tue,  6 May 2025 17:30:40 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250506142117.1883598-1-cratiu@nvidia.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 bpf-next 0/8] bpf: Support bpf rbtree traversal and list
+ peeking
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174655263889.1598736.13266345407626279616.git-patchwork-notify@kernel.org>
+Date: Tue, 06 May 2025 17:30:38 +0000
+References: <20250506015857.817950-1-martin.lau@linux.dev>
+In-Reply-To: <20250506015857.817950-1-martin.lau@linux.dev>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: bpf@vger.kernel.org, ast@kernel.org, andrii@kernel.org,
+ daniel@iogearbox.net, memxor@gmail.com, ameryhung@gmail.com,
+ netdev@vger.kernel.org, kernel-team@meta.com
 
-On 05/06, Cosmin Ratiu wrote:
-> __netdev_update_features() expects the netdevice to be ops-locked, but
-> it gets called recursively on the lower level netdevices to sync their
-> features, and nothing locks those.
+Hello:
+
+This series was applied to bpf/bpf-next.git (master)
+by Alexei Starovoitov <ast@kernel.org>:
+
+On Mon,  5 May 2025 18:58:47 -0700 you wrote:
+> From: Martin KaFai Lau <martin.lau@kernel.org>
 > 
-> This commit fixes that, with the assumption that it shouldn't be possible
-> for both higher-level and lover-level netdevices to require the instance
-> lock, because that would lead to lock dependency warnings.
+> The RFC v1 [1] showed a fq qdisc implementation in bpf
+> that is much closer to the kernel sch_fq.c.
 > 
-> Without this, playing with higher level (e.g. vxlan) netdevices on top
-> of netdevices with instance locking enabled can run into issues:
+> The fq example and bpf qdisc changes are separated out from this set.
+> This set is to focus on the kfunc and verifier changes that
+> enable the bpf rbtree traversal and list peeking.
+> 
+> [...]
 
-Mentioning vxlan is a bit confusing here; it shouldn't let you flip lro (I
-think). Which upper are you testing against?
+Here is the summary with links:
+  - [v2,bpf-next,1/8] bpf: Check KF_bpf_rbtree_add_impl for the "case KF_ARG_PTR_TO_RB_NODE"
+    https://git.kernel.org/bpf/bpf-next/c/b183c0123d9b
+  - [v2,bpf-next,2/8] bpf: Simplify reg0 marking for the rbtree kfuncs that return a bpf_rb_node pointer
+    https://git.kernel.org/bpf/bpf-next/c/7faccdf4b47d
+  - [v2,bpf-next,3/8] bpf: Add bpf_rbtree_{root,left,right} kfunc
+    https://git.kernel.org/bpf/bpf-next/c/9e3e66c553f7
+  - [v2,bpf-next,4/8] bpf: Allow refcounted bpf_rb_node used in bpf_rbtree_{remove,left,right}
+    https://git.kernel.org/bpf/bpf-next/c/2ddef1783c43
+  - [v2,bpf-next,5/8] selftests/bpf: Add tests for bpf_rbtree_{root,left,right}
+    https://git.kernel.org/bpf/bpf-next/c/47ada65c5cf9
+  - [v2,bpf-next,6/8] bpf: Simplify reg0 marking for the list kfuncs that return a bpf_list_node pointer
+    https://git.kernel.org/bpf/bpf-next/c/3fab84f00d32
+  - [v2,bpf-next,7/8] bpf: Add bpf_list_{front,back} kfunc
+    https://git.kernel.org/bpf/bpf-next/c/fb5b480205ba
+  - [v2,bpf-next,8/8] selftests/bpf: Add test for bpf_list_{front,back}
+    https://git.kernel.org/bpf/bpf-next/c/29318b4d5dc3
 
-Trying to understand if we can cover this case in the selftests.
-netdevsim also doesn't expose F_LRO feature... (yet?)
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
