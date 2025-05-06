@@ -1,134 +1,181 @@
-Return-Path: <netdev+bounces-188309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 028CAAAC150
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 12:25:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32BC2AAC17B
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 12:37:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 254D03B4541
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 10:25:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FE1B4C851C
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 10:37:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8841B278750;
-	Tue,  6 May 2025 10:25:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CE6E278741;
+	Tue,  6 May 2025 10:37:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z8Mt6uQS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DlUkXv8E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9422B2777FC;
-	Tue,  6 May 2025 10:25:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B519278146
+	for <netdev@vger.kernel.org>; Tue,  6 May 2025 10:37:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746527122; cv=none; b=JgF4imwGsg0ACC81itnXG079o3dvKFOyrkoXl1WUNk36V3lM+K1Q+JbeAV7HeB6JB+5j8Bx2TfNSQ9wvydn9OHguh+AeNdKcCm0jt1ICRnCV3HEaJHro2RZ5Hw9my6cPWWPI3Fi5Bt9009iWokHd2L9LX1gOMudbG47FuRpF6WI=
+	t=1746527827; cv=none; b=J4izaFgpHrcVVgEw+9yhLecIbv9goTPVhOdxd6nXcxPyl4f2g0BZKSWEVdzS3wYPKshtTCa9Z2iRJKa3G9ZdF1HlX+/jr/Kpzry0aayzGuyA2cHSWuOrlW4CBm8TsdzX9g89sZ6nReWzPmVGrVkA1vaXPhSDxn0VCnBu4GXtDao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746527122; c=relaxed/simple;
-	bh=ER3+WX6Fn7TizF7Fs+zanDiEtNNqVrG5KKHsKgWbPvo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=MWLPPL4kUX//BXZTRWF2ax9+gXljjlLx8Rhc2y3Qflp6tXfdAzKPVfDBxWdA6Sz67k6cOW26sacraudo4h/74cyPJTHf+2Kv/y+A97q6AcROl7Jdg/Gh0mITiKT4gK5sXdwC0Wy1nlOrrX1viFPog22P8Mwk3mTb9uckViNAc2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z8Mt6uQS; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746527120; x=1778063120;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=ER3+WX6Fn7TizF7Fs+zanDiEtNNqVrG5KKHsKgWbPvo=;
-  b=Z8Mt6uQSKt64D28NpQRdjCWX5TQuFzFXT52a4Ngm4hxr8VdKAjgNmmly
-   XqOXgxXGZbbO4uAo+CQzzzEtabOXV/yiMsPskNwTBDo5Z2RKlxortUUop
-   INbCIzTu8/jqb+KhF3/qTZynnoBKF5wlJPAuPyKrprq6g+vhzTHpWrWsL
-   hTvcFaUDISCyEg+x1UklmmMU8W6ThTZxGAOsc6PVCVDgOmT9U5ClltOfx
-   ufD/ai4AhpLO/Y83ekCjtyteZhlYfY/9EX/x+XIosDZfnImCcDkvCWfat
-   sWX3dBnxDK7QQI0bLRQCyaWZ6ZAi2/xwjCRwg0fKLp6EjqWD6R0EAwnGG
-   A==;
-X-CSE-ConnectionGUID: ShK7N9VmS7+rQaa4u+puZA==
-X-CSE-MsgGUID: JrsFAsy7R3qa5a9Y0JlutQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11424"; a="51993564"
-X-IronPort-AV: E=Sophos;i="6.15,266,1739865600"; 
-   d="scan'208";a="51993564"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2025 03:25:18 -0700
-X-CSE-ConnectionGUID: Ck10n3cyRsacHwt1VjnfGw==
-X-CSE-MsgGUID: 3lF5rXSWRaSZ0eaBD3MM2g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,266,1739865600"; 
-   d="scan'208";a="158825654"
-Received: from smoticic-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.221])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2025 03:25:13 -0700
-From: Jani Nikula <jani.nikula@linux.intel.com>
-To: Jeff Layton <jlayton@kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Maarten
- Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard
- <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David
- Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Joonas
- Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi
- <rodrigo.vivi@intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Qasim Ijaz <qasdev00@gmail.com>,
- Nathan Chancellor <nathan@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, Jeff
- Layton <jlayton@kernel.org>
-Subject: Re: [PATCH v7 09/10] i915: add ref_tracker_dir symlinks for each
- tracker
-In-Reply-To: <20250505-reftrack-dbgfs-v7-9-f78c5d97bcca@kernel.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-References: <20250505-reftrack-dbgfs-v7-0-f78c5d97bcca@kernel.org>
- <20250505-reftrack-dbgfs-v7-9-f78c5d97bcca@kernel.org>
-Date: Tue, 06 May 2025 13:25:10 +0300
-Message-ID: <87zffqujcp.fsf@intel.com>
+	s=arc-20240116; t=1746527827; c=relaxed/simple;
+	bh=bGLHeOo/UPh/FsvGzBipG1630hXDqTjfzmZD/hU1dOg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KyniloRJ7saG4iQQuXcpLSf/aj1duFPCqMAnY/iwG7+wspbmoyfDlv02ial73PUD8WrtWNmJy27VkRmXOUt0Qm7tj6d/XqSOGGKTb4djSHyx4UBy6/UnzepOe3ZjRaq6rNLIYbdTOPGqkg0Ff7I0Zve8l+h3OujWBT0wdOZ8B5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DlUkXv8E; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746527824;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aqJrxIoT0NsSUqxGw8G610oIR60/B2YKtR0eMCHfHoU=;
+	b=DlUkXv8EfCo0ILG0N+pgQwQDvZLnRgWggoAG98Zk1MD3C4kDF4br+PBJ/MvkgrQj6YfY9Z
+	JLoVW5YRxK757Zd9j3UXOzBTS7eXskM/1XpJpqPPTSpgTjC0fkPpCgZIYAnx3jTaIrpWZu
+	QaJWgrHunTrmhCYnbTRMmP37nm+CP/E=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-642-rY1fFFvCP46tKbdABHqxCw-1; Tue, 06 May 2025 06:37:03 -0400
+X-MC-Unique: rY1fFFvCP46tKbdABHqxCw-1
+X-Mimecast-MFC-AGG-ID: rY1fFFvCP46tKbdABHqxCw_1746527822
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-39c30f26e31so3193312f8f.3
+        for <netdev@vger.kernel.org>; Tue, 06 May 2025 03:37:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746527822; x=1747132622;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aqJrxIoT0NsSUqxGw8G610oIR60/B2YKtR0eMCHfHoU=;
+        b=wrQZvyvYzBjTL3AGk73Uy/XuXybxx3siYlUGmcb/zX0GIqngw6yjLrgKbrXESqmknl
+         EnICvZahDXWPQ1T1dJ3c7pJwoj0Sf4Xwyx/FlDRWGSVp1WCH8WqMMyXWxDAKXGdgeDbb
+         OAZ42bMyKLXsN0gyW8MUb9dZxx1DENpb+uDy2RLUuhruWVYKCmgjoV7U30fwyt6LdEpn
+         xDSuIyLHjNZAaDV99+C2TE/mpewArngSXI0cP2bOJec0tTkw8nl56MiISvXONsNQY5RB
+         e4ttbbdkb4x4EIqO4TTvuKAO89CGO/xno7t1/YcCm4ngpMyOMnjTh3zM2spSkRo+k78p
+         Qn/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVwnfgYRbWngHxZ4jqSahhyWkD04EUVjHZTy/wYNQigI84v+YZChnzH+CmzEZ7x7PNpZfC8IMU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5YdWHq1XP3vwDXMEQB+zyy7XpbKuTTvrJ5Jup2RuKkqqJ1dnO
+	IvPkdWdE83Y4u2fCQRqDBnGKiCYcRZWO11EHELU1p76KADl1cI0GPYHnMjV7Z8vbklXn3Nmgewt
+	+6MhAdDkkpmDrggLKjJ7/HxLLmGTDQJ5f9TZSEtDnX3BWlx/gTNJ33w==
+X-Gm-Gg: ASbGnctdUSh4j/mju9Qub8HZLs8NY2PcrUHa8ebDEHl7L6vNoiGdItE8qSSNpxv0b/p
+	XU+IbI95Pbnumh44YqdRlVNnrFA6/C9sz9ujFs2/D/AzExFr4YMBb+nVSCjbD/BQ7PjCa6P/tl8
+	FoFS+qqqqBM6DFdjlGCGkSKYy3bo8x7MMj161QcZ+NK6Z+p9VMHkGM6H31QaQPEaur9vJKvirxM
+	TY/l/g1DpQqi4XzikVzsi0CcAhPiHPyYF+rDzWAgM9N+f045tAruWYKJYFbrv+q5MWCqbXgPOEt
+	sLIO9jp3YdM+uOzh+jfootgOtXQdJQcGOFmvz3JANcvukkBxfzZyrcl17f4=
+X-Received: by 2002:a05:6000:4383:b0:390:e1e0:1300 with SMTP id ffacd0b85a97d-3a0ac0ec4a6mr1662151f8f.33.1746527822096;
+        Tue, 06 May 2025 03:37:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEIqkSxt+T1Y7TtJsOmByWaD3BgViww9S8kLQLobpWHpxjPJOZvKt1Y7bskuQM3nS0/SlP2Zw==
+X-Received: by 2002:a05:6000:4383:b0:390:e1e0:1300 with SMTP id ffacd0b85a97d-3a0ac0ec4a6mr1662118f8f.33.1746527821579;
+        Tue, 06 May 2025 03:37:01 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2706:e010:b099:aac6:4e70:6198? ([2a0d:3344:2706:e010:b099:aac6:4e70:6198])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-441b8a2874asm162916855e9.26.2025.05.06.03.36.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 May 2025 03:37:01 -0700 (PDT)
+Message-ID: <61ebe754-d895-47cb-a4b2-bb2650b9ff7b@redhat.com>
+Date: Tue, 6 May 2025 12:36:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next v11 4/7] net: mtip: The L2 switch driver for imx287
+To: Lukasz Majewski <lukma@denx.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>
+Cc: Sascha Hauer <s.hauer@pengutronix.de>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ Stefan Wahren <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>
+References: <20250504145538.3881294-1-lukma@denx.de>
+ <20250504145538.3881294-5-lukma@denx.de>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250504145538.3881294-5-lukma@denx.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, 05 May 2025, Jeff Layton <jlayton@kernel.org> wrote:
-> Now that there is the ability to create a symlink for each tracker, do
-> so for the i915 entries.
+On 5/4/25 4:55 PM, Lukasz Majewski wrote:
+> +		/* This does 16 byte alignment, exactly what we need.
+> +		 * The packet length includes FCS, but we don't want to
+> +		 * include that when passing upstream as it messes up
+> +		 * bridging applications.
+> +		 */
+> +		skb = netdev_alloc_skb(pndev, pkt_len + NET_IP_ALIGN);
+> +		if (unlikely(!skb)) {
+> +			dev_dbg(&fep->pdev->dev,
+> +				"%s: Memory squeeze, dropping packet.\n",
+> +				pndev->name);
+> +			pndev->stats.rx_dropped++;
+> +			goto err_mem;
+> +		} else {
+> +			skb_reserve(skb, NET_IP_ALIGN);
+> +			skb_put(skb, pkt_len);      /* Make room */
+> +			skb_copy_to_linear_data(skb, data, pkt_len);
+> +			skb->protocol = eth_type_trans(skb, pndev);
+> +			napi_gro_receive(&fep->napi, skb);
+> +		}
+> +
+> +		bdp->cbd_bufaddr = dma_map_single(&fep->pdev->dev, data,
+> +						  bdp->cbd_datlen,
+> +						  DMA_FROM_DEVICE);
+> +		if (unlikely(dma_mapping_error(&fep->pdev->dev,
+> +					       bdp->cbd_bufaddr))) {
+> +			dev_err(&fep->pdev->dev,
+> +				"Failed to map descriptor rx buffer\n");
+> +			pndev->stats.rx_errors++;
+> +			pndev->stats.rx_dropped++;
+> +			dev_kfree_skb_any(skb);
+> +			goto err_mem;
+> +		}
 
-I haven't tried this, but
+This is doing the mapping and ev. dropping the skb _after_ pushing the
+skb up the stack, you must attempt the mapping first.
 
-Acked-by: Jani Nikula <jani.nikula@intel.com>
+> +static void mtip_free_buffers(struct net_device *dev)
+> +{
+> +	struct mtip_ndev_priv *priv = netdev_priv(dev);
+> +	struct switch_enet_private *fep = priv->fep;
+> +	struct sk_buff *skb;
+> +	struct cbd_t *bdp;
+> +	int i;
+> +
+> +	bdp = fep->rx_bd_base;
+> +	for (i = 0; i < RX_RING_SIZE; i++) {
+> +		skb = fep->rx_skbuff[i];
+> +
+> +		if (bdp->cbd_bufaddr)
+> +			dma_unmap_single(&fep->pdev->dev, bdp->cbd_bufaddr,
+> +					 MTIP_SWITCH_RX_FRSIZE,
+> +					 DMA_FROM_DEVICE);
+> +		if (skb)
+> +			dev_kfree_skb(skb);
 
+I suspect that on error paths mtip_free_buffers() can be invoked
+multiple consecutive times with any successful allocation in between:
+skb will be freed twice. Likely you need to clear fep->rx_skbuff[i] here.
 
->
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> ---
->  drivers/gpu/drm/i915/intel_runtime_pm.c | 1 +
->  drivers/gpu/drm/i915/intel_wakeref.c    | 1 +
->  2 files changed, 2 insertions(+)
->
-> diff --git a/drivers/gpu/drm/i915/intel_runtime_pm.c b/drivers/gpu/drm/i915/intel_runtime_pm.c
-> index 3fdab3b44c08cea16ac2f73aafc2bea2ffbb19e7..94315e952ead9be276298fb2a0200d102005a0c1 100644
-> --- a/drivers/gpu/drm/i915/intel_runtime_pm.c
-> +++ b/drivers/gpu/drm/i915/intel_runtime_pm.c
-> @@ -61,6 +61,7 @@ static void init_intel_runtime_pm_wakeref(struct intel_runtime_pm *rpm)
->  {
->  	ref_tracker_dir_init(&rpm->debug, INTEL_REFTRACK_DEAD_COUNT,
->  			     "intel_runtime_pm", dev_name(rpm->kdev));
-> +	ref_tracker_dir_symlink(&rpm->debug, "intel_runtime_pm-%s", dev_name(rpm->kdev));
->  }
->  
->  static intel_wakeref_t
-> diff --git a/drivers/gpu/drm/i915/intel_wakeref.c b/drivers/gpu/drm/i915/intel_wakeref.c
-> index 5269e64c58a49884f5d712557546272bfdeb8417..2e0498b3fa7947f994de1339d4d2bed93de1a795 100644
-> --- a/drivers/gpu/drm/i915/intel_wakeref.c
-> +++ b/drivers/gpu/drm/i915/intel_wakeref.c
-> @@ -115,6 +115,7 @@ void __intel_wakeref_init(struct intel_wakeref *wf,
->  
->  #if IS_ENABLED(CONFIG_DRM_I915_DEBUG_WAKEREF)
->  	ref_tracker_dir_init(&wf->debug, INTEL_REFTRACK_DEAD_COUNT, "intel_wakeref", name);
-> +	ref_tracker_dir_symlink(&wf->debug, "intel_wakeref-%s", name);
->  #endif
->  }
+Side note: this patch is way too big for a proper review: you need to
+break it in multiple smaller ones, introducing the basic features
+separately.
 
--- 
-Jani Nikula, Intel
+Cheers,
+
+Paolo
+
 
