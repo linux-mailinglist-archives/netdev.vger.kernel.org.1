@@ -1,271 +1,375 @@
-Return-Path: <netdev+bounces-188361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8C85AAC774
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 16:07:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 825B1AAC780
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 16:09:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 208013BCB89
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 14:06:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F15A1461B23
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 14:09:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04618281512;
-	Tue,  6 May 2025 14:06:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9ECE280A47;
+	Tue,  6 May 2025 14:09:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ctlhd/BI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DD1427979F
-	for <netdev@vger.kernel.org>; Tue,  6 May 2025 14:06:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14A348F7D
+	for <netdev@vger.kernel.org>; Tue,  6 May 2025 14:09:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746540402; cv=none; b=KqzidaP7m6+CMQkuAHbw9Nd2gYKPPs/RJMtjZ7RwEmzzASobOeBN3x1Z9F/w8/dEmS21qrc7vCvwGvGOFiHOt+kfECdYDSGDiz6JHHkTx78jed7WXSE65RZKkjOuwc3Q1QdZ6wgiOsmNX7yjp92ZR3p8mSssEdrXT36SM7YnzO8=
+	t=1746540554; cv=none; b=hd0YECU3z950yL+PIeydh94i0vZ65sSGnr8LxcSsIXKuom9Qmw+hcGavJjCop/cJVSUtrNVrdK+UIQ+CrWmm0QT/Ei6pub4KNbkxfIPfb588GTb343oV6KTmzZZYHgGebiTcVXGESK1HZmoTdfjEWVnAQGcIfLgtzYRDO/NitCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746540402; c=relaxed/simple;
-	bh=7DqWL3xPwZjzGc6iyrJyXnAjgOn0T0gdUDID/jD7zzI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=sI5sKFIj72QJVy+bv/r5rcal6HlD9o1RvFQNhUrpibeBhLz2714gxJe10ikuHxSdTNyy9YF11yQoUPuTHEZX4OZwPIk1RSl7u37qEmH+V0nDmmdCAfEsulTyJhk6GyEfsesi1ONlrpzZ3oe8A/cK22llB7AfHXWriA6lwTMLje0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-85b3a6c37e2so591708839f.0
-        for <netdev@vger.kernel.org>; Tue, 06 May 2025 07:06:40 -0700 (PDT)
+	s=arc-20240116; t=1746540554; c=relaxed/simple;
+	bh=bRU26KLZlbBwud9qep2Pf/qK9hLOd934MJTXlxSfL2I=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mqpx7G2bXBvLFOme9NHGjbTG1W4S0da2ue2z3+nynHyI0dZLyAZVmOr7hMA/NIZjg41HqJqJkh+D0g7hkcLKi2sbitWfF9Jtz9rjqeBM1D/JcFu1cC9yjd6VvkbUzhnhj6OrAuVq6rt0p3LyZ0EqaqSP+BYk2s9+bOxxBsn7d1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ctlhd/BI; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-736c3e7b390so6553700b3a.2
+        for <netdev@vger.kernel.org>; Tue, 06 May 2025 07:09:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746540552; x=1747145352; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cJEya40J9FtrZ0bUuprajy+gHJshSF046dPnFaJPcsQ=;
+        b=ctlhd/BI1FvN5fK+sVS3necwSUEN4dMUsuBkOoJD4rlvGLN8ttSljFKJMD5c+7DBKs
+         pxqYVzmDszTGhOXELib/Xq8qvdyzqiC3UvmfHuPtopUtzeSjMiTRUpEpLA32244brvZz
+         c981VnOhiGD9UfPV8dCzhwsM99kcD2TFvi8SJ1udBdT1hqpWElG4yUrDYNECJQRyuhhH
+         gJQr0G3hn9/pUuiSW6bF3R0NzD6QUhj5dPg6mQWBHrPpxqm9DSeGtZKDtopHXQ83QJZ4
+         Pb429mrTVrGxKTui+mIbA+0ds4KQxf4re66DCkEB38zx0XSDlFcliTKSDKWZl/pYazZu
+         QF4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746540400; x=1747145200;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BkoWNmadE1F1tRDTje4gKHNFMx4m5xeUfDErgLJmpMM=;
-        b=BPe19Obf+6l505PD6c/fkjSf0ZYNQt2emERg3tMODUWv99p98ikI2q1Fc0KrkqRPAD
-         OCIosV49s8Kga1g9XXEJXn+PJ+0LlSxTltvdTa9IE+7BM8FoYx8HZaZvjI5OhNjIpnzx
-         1Rcv+915KvegIjdqexj1FiaTBnmuFYnTbb68xUR60IEAp78v/9AdVT/r6Ma3oLj+YEGY
-         mLJyKvI/3nQPQPXTMijzwdqXfDYhXdO0kRt86atG6W0qboF7AJ8QFxxQ7ndzconSdJ1Z
-         MmT33E83vSE7pnpPU4n2KFWB0Ba+U2AeDqmKJ6+mh6UvdLs6lTJ+8Am+r2Xd0n0XgwLs
-         TB7A==
-X-Forwarded-Encrypted: i=1; AJvYcCW4Ro+5lqpwhFOH3Kr+NpfYoqHaF8QUpGmOd/sMl67JJBGz8JLpvGXE0ggsNfx3SlRRNG4NQRI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrbpFCwRFYFhYRugcphH18JwBf3zOkKQlr+erAByoJ6FTmQHyS
-	YXwe8dIzSHZg5/yt82r0NZZ/KRyCbRCwM5giBurM5TkGLbvbdnCJI1tQ2Sy/ZF91IXJrdIEsOel
-	eMzCfTlapzKZwOFgivbdPU2hiiqjpjL9bBgufoJ/vAqju/Q2hMtptnBM=
-X-Google-Smtp-Source: AGHT+IEPx/QglHdUWMpzC4h8uE4W0zIyY+dpcpvsrg7A0blgYvENcCMHvadkPOwQQBoEUZoOgXF9nEKjCZUXPi4coSvW2iBfZjsZ
+        d=1e100.net; s=20230601; t=1746540552; x=1747145352;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cJEya40J9FtrZ0bUuprajy+gHJshSF046dPnFaJPcsQ=;
+        b=LFR/9a24UD6W9DCGxZ8AP5Mzu7DMWXq7bZUooCmW5PkTgym1VHOI0fI6lJ4uGf0Vdx
+         4WZHAMDc8Sr8/mksOOlEYHfFAyx8feIOj+Pynu8hVPWuTGAS/aqSHjLpg6OSG8SEUfCQ
+         GT+vXoC+RBKDmedKZ5P9DOPiFgbHhx1TKDuv9AiL5BAkYZBXxB9gBZmcGEbNULqP3gr/
+         krkpgfA+dRtLsnRRPyaY5zUOqiFgKy+F8nrPoy0EfI5wotIFesAshNL97vkrbS9LaWox
+         DwoUpux+akVAer9nH+29HTbeUkrEIGwsipZazIn7dye4Q4RQT6LiHDZHTQ3QTp8YC1Ks
+         h7iw==
+X-Forwarded-Encrypted: i=1; AJvYcCVPjGfJwiDzD5HgXyRCgdDLdyHXi4OjGlwR7qVurqvKOEAOiy0aSC0kzO3bN55pYOFKsms2rig=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaGSpR3mnNB3EnEFGOdJSOCpMeM0zryAL5SovCNHFdL0BoQZ8G
+	mbCSw6Zuh8y1nNHaiE/KIC9btfq8KDRE2aYckTkM8I6oGHCBSRwE
+X-Gm-Gg: ASbGncttUcZeWnqG7s3Vug2eHOUZWRUBfM78R32v1EfEArdQd5b4jdz5FKLqovdB9Nm
+	UGYpy1fG7lUDntI9W5xibk1W+S3p7lMa4b2pPh5mBdYCOJBGxj6NURoimSIjNbHUBt1dhDQW8+g
+	PrR7rBwzLeyT2kZHTG3tesmzEzg4BHpukT4/n5qHCcxrn8pYZKpyfmUSXoCOX3vQ8zuKC5JgMB+
+	LuvEgWnLVCDa8j3HbhxTMpKxLMdA7pRiWGAVldI9ZpWCWried0KjKc9ivHSwBDujTTnLI+O3uVP
+	4d0MqdunIf+s9OvZNuRFU1UL288EYBf6Gzpt78Ot
+X-Google-Smtp-Source: AGHT+IHZ2huFfyEwugGhApYYmq/lPcn0uQpDf6wOGxaDQTapJOqMShRbSiRD/r5UnG5gnaM6nsHkjA==
+X-Received: by 2002:a05:6a21:900e:b0:1f5:7862:7f3a with SMTP id adf61e73a8af0-20e9660591dmr15804765637.14.1746540552095;
+        Tue, 06 May 2025 07:09:12 -0700 (PDT)
+Received: from ap.. ([182.213.254.91])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b1fb3b5683esm7521284a12.24.2025.05.06.07.09.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 May 2025 07:09:11 -0700 (PDT)
+From: Taehee Yoo <ap420073@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	almasrymina@google.com,
+	sdf@fomichev.me,
+	netdev@vger.kernel.org
+Cc: asml.silence@gmail.com,
+	dw@davidwei.uk,
+	skhawaja@google.com,
+	willemb@google.com,
+	jdamato@fastly.com,
+	ap420073@gmail.com
+Subject: [PATCH net v2] net: devmem: fix kernel panic when socket close after module unload
+Date: Tue,  6 May 2025 14:08:58 +0000
+Message-Id: <20250506140858.2660441-1-ap420073@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1908:b0:3d3:dd32:73d5 with SMTP id
- e9e14a558f8ab-3da5b23bd53mr112709665ab.4.1746540400213; Tue, 06 May 2025
- 07:06:40 -0700 (PDT)
-Date: Tue, 06 May 2025 07:06:40 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <681a1770.050a0220.a19a9.000d.GAE@google.com>
-Subject: [syzbot] [net?] INFO: rcu detected stall in inet_rtm_newaddr (2)
-From: syzbot <syzbot+51cd74c5dfeafd65e488@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+Kernel panic occurs when a devmem TCP socket is closed after NIC module
+is unloaded.
 
-syzbot found the following issue on:
+This is Devmem TCP unregistration scenarios. number is an order.
+(a)socket close    (b)pp destroy    (c)uninstall    result
+1                  2                3               OK
+1                  3                2               (d)Impossible
+2                  1                3               OK
+3                  1                2               (e)Kernel panic
+2                  3                1               (d)Impossible
+3                  2                1               (d)Impossible
 
-HEAD commit:    01f95500a162 Merge tag 'uml-for-linux-6.15-rc6' of git://g..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1347702f980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b39cb28b0a399ed3
-dashboard link: https://syzkaller.appspot.com/bug?extid=51cd74c5dfeafd65e488
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16cd49b3980000
+(a) netdev_nl_sock_priv_destroy() is called when devmem TCP socket is
+    closed.
+(b) page_pool_destroy() is called when the interface is down.
+(c) mp_ops->uninstall() is called when an interface is unregistered.
+(d) There is no scenario in mp_ops->uninstall() is called before
+    page_pool_destroy().
+    Because unregister_netdevice_many_notify() closes interfaces first
+    and then calls mp_ops->uninstall().
+(e) netdev_nl_sock_priv_destroy() accesses struct net_device to acquire
+    netdev_lock().
+    But if the interface module has already been removed, net_device
+    pointer is invalid, so it causes kernel panic.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/18300d795306/disk-01f95500.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/6d358d59c6dc/vmlinux-01f95500.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/bcdf944974fd/bzImage-01f95500.xz
+In summary, there are only 3 possible scenarios.
+ A. sk close -> pp destroy -> uninstall.
+ B. pp destroy -> sk close -> uninstall.
+ C. pp destroy -> uninstall -> sk close.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+51cd74c5dfeafd65e488@syzkaller.appspotmail.com
+Case C is a kernel panic scenario.
 
-rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-rcu: 	0-...!: (1 GPs behind) idle=530c/1/0x4000000000000000 softirq=17280/17282 fqs=3
-rcu: 	(detected by 1, t=10506 jiffies, g=8293, q=1787 ncpus=2)
-Sending NMI from CPU 1 to CPUs 0:
-NMI backtrace for cpu 0
-CPU: 0 UID: 0 PID: 5923 Comm: syz-executor Not tainted 6.15.0-rc5-syzkaller-00022-g01f95500a162 #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/29/2025
-RIP: 0010:pv_queued_spin_unlock arch/x86/include/asm/paravirt.h:577 [inline]
-RIP: 0010:queued_spin_unlock arch/x86/include/asm/qspinlock.h:57 [inline]
-RIP: 0010:do_raw_spin_unlock+0x172/0x230 kernel/locking/spinlock_debug.c:142
-Code: 48 ba 00 00 00 00 00 fc ff df 48 c1 e8 03 80 3c 10 00 0f 85 ba 00 00 00 48 83 3d 28 ba 89 0c 00 74 4e 48 89 df e8 0e 15 d7 09 <90> 5b 5d 41 5c c3 cc cc cc cc 48 c7 c6 e0 6c 8d 8b 48 89 df e8 45
-RSP: 0018:ffffc90000007ce8 EFLAGS: 00000046
-RAX: 0000000000000001 RBX: ffffffff9ad4e378 RCX: ffffffff81985ed3
-RDX: dffffc0000000000 RSI: 0000000000000004 RDI: ffffffff9ad4e378
-RBP: ffffffff9ad4e380 R08: 0000000000000000 R09: fffffbfff35a9c6f
-R10: ffffffff9ad4e37b R11: ffffffff9ad4e378 R12: ffffffff9ad4e388
-R13: ffff88807bc05340 R14: dffffc0000000000 R15: 1ffff92000000fa8
-FS:  0000555577c53500(0000) GS:ffff8881249df000(0000) knlGS:0000000000000000
+In order to fix this problem, It makes mp_dmabuf_devmem_uninstall() set
+binding->dev to NULL.
+It indicates an bound net_device was unregistered.
+
+It makes netdev_nl_sock_priv_destroy() do not acquire netdev_lock()
+if binding->dev is NULL.
+
+It inverts socket/netdev lock order like below:
+    netdev_lock();
+    mutex_lock(&priv->lock);
+    mutex_unlock(&priv->lock);
+    netdev_unlock();
+
+Because of inversion of locking ordering, mp_dmabuf_devmem_uninstall()
+acquires socket lock from now on.
+
+Tests:
+Scenario A:
+    ./ncdevmem -s 192.168.1.4 -c 192.168.1.2 -f $interface -l -p 8000 \
+        -v 7 -t 1 -q 1 &
+    pid=$!
+    sleep 10
+    kill $pid
+    ip link set $interface down
+    modprobe -rv $module
+
+Scenario B:
+    ./ncdevmem -s 192.168.1.4 -c 192.168.1.2 -f $interface -l -p 8000 \
+        -v 7 -t 1 -q 1 &
+    pid=$!
+    sleep 10
+    ip link set $interface down
+    kill $pid
+    modprobe -rv $module
+
+Scenario C:
+    ./ncdevmem -s 192.168.1.4 -c 192.168.1.2 -f $interface -l -p 8000 \
+        -v 7 -t 1 -q 1 &
+    pid=$!
+    sleep 10
+    modprobe -rv $module
+    sleep 5
+    kill $pid
+
+Splat looks like:
+Oops: general protection fault, probably for non-canonical address 0xdffffc001fffa9f7: 0000 [#1] SMP DEBUG_PAGEALLOC KASAN NOPTI
+KASAN: probably user-memory-access in range [0x00000000fffd4fb8-0x00000000fffd4fbf]
+CPU: 0 UID: 0 PID: 2041 Comm: ncdevmem Tainted: G    B   W           6.15.0-rc1+ #2 PREEMPT(undef)  0947ec89efa0fd68838b78e36aa1617e97ff5d7f
+Tainted: [B]=BAD_PAGE, [W]=WARN
+RIP: 0010:__mutex_lock (./include/linux/sched.h:2244 kernel/locking/mutex.c:400 kernel/locking/mutex.c:443 kernel/locking/mutex.c:605 kernel/locking/mutex.c:746)
+Code: ea 03 80 3c 02 00 0f 85 4f 13 00 00 49 8b 1e 48 83 e3 f8 74 6a 48 b8 00 00 00 00 00 fc ff df 48 8d 7b 34 48 89 fa 48 c1 ea 03 <0f> b6 f
+RSP: 0018:ffff88826f7ef730 EFLAGS: 00010203
+RAX: dffffc0000000000 RBX: 00000000fffd4f88 RCX: ffffffffaa9bc811
+RDX: 000000001fffa9f7 RSI: 0000000000000008 RDI: 00000000fffd4fbc
+RBP: ffff88826f7ef8b0 R08: 0000000000000000 R09: ffffed103e6aa1a4
+R10: 0000000000000007 R11: ffff88826f7ef442 R12: fffffbfff669f65e
+R13: ffff88812a830040 R14: ffff8881f3550d20 R15: 00000000fffd4f88
+FS:  0000000000000000(0000) GS:ffff888866c05000(0000) knlGS:0000000000000000
 CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000555562d75808 CR3: 000000005fb8a000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+CR2: 0000563bed0cb288 CR3: 00000001a7c98000 CR4: 00000000007506f0
+PKRU: 55555554
 Call Trace:
- <IRQ>
- __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:150 [inline]
- _raw_spin_unlock_irqrestore+0x22/0x80 kernel/locking/spinlock.c:194
- debug_object_activate+0x2ec/0x4c0 lib/debugobjects.c:836
- debug_hrtimer_activate kernel/time/hrtimer.c:445 [inline]
- debug_activate kernel/time/hrtimer.c:484 [inline]
- enqueue_hrtimer+0x23/0x3b0 kernel/time/hrtimer.c:1088
- __run_hrtimer kernel/time/hrtimer.c:1778 [inline]
- __hrtimer_run_queues+0x8ff/0xad0 kernel/time/hrtimer.c:1825
- hrtimer_interrupt+0x397/0x8e0 kernel/time/hrtimer.c:1887
- local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1038 [inline]
- __sysvec_apic_timer_interrupt+0x108/0x3f0 arch/x86/kernel/apic/apic.c:1055
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1049 [inline]
- sysvec_apic_timer_interrupt+0x9f/0xc0 arch/x86/kernel/apic/apic.c:1049
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-RIP: 0010:unwind_next_frame+0x671/0x20a0 arch/x86/kernel/unwind_orc.c:581
-Code: 84 f7 0f 85 a4 15 00 00 83 e0 07 38 c2 40 0f 9e c6 84 d2 0f 95 c0 40 84 c6 0f 85 8d 15 00 00 4c 0f bf 31 4d 01 fe 0f b6 41 05 <83> e0 07 3c 03 0f 84 bd 08 00 00 3c 04 0f 84 f6 07 00 00 3c 02 0f
-RSP: 0018:ffffc9000477ec48 EFLAGS: 00000292
-RAX: 0000000000000002 RBX: 0000000000000001 RCX: ffffffff91275258
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000001
-RBP: ffffc9000477ed00 R08: ffffffff9127525c R09: 0000000000000000
-R10: 0000000000000002 R11: 0000000000012081 R12: ffffc9000477ed08
-R13: ffffc9000477ecb8 R14: ffffc9000477f040 R15: ffffc9000477f018
- arch_stack_walk+0x94/0x100 arch/x86/kernel/stacktrace.c:25
- stack_trace_save+0x8e/0xc0 kernel/stacktrace.c:122
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
- kasan_save_track+0x14/0x30 mm/kasan/common.c:68
- unpoison_slab_object mm/kasan/common.c:319 [inline]
- __kasan_slab_alloc+0x89/0x90 mm/kasan/common.c:345
- kasan_slab_alloc include/linux/kasan.h:250 [inline]
- slab_post_alloc_hook mm/slub.c:4147 [inline]
- slab_alloc_node mm/slub.c:4196 [inline]
- kmem_cache_alloc_node_noprof+0x1d5/0x3b0 mm/slub.c:4248
- __alloc_skb+0x2b2/0x380 net/core/skbuff.c:658
- alloc_skb include/linux/skbuff.h:1340 [inline]
- nlmsg_new include/net/netlink.h:1019 [inline]
- rtmsg_fib+0x13e/0x520 net/ipv4/fib_semantics.c:552
- fib_table_insert+0xbaf/0x1c40 net/ipv4/fib_trie.c:1380
- fib_magic+0x4d4/0x5c0 net/ipv4/fib_frontend.c:1133
- fib_add_ifaddr+0x3a1/0x580 net/ipv4/fib_frontend.c:1170
- fib_inetaddr_event+0x147/0x270 net/ipv4/fib_frontend.c:1469
- notifier_call_chain+0xb9/0x410 kernel/notifier.c:85
- blocking_notifier_call_chain kernel/notifier.c:380 [inline]
- blocking_notifier_call_chain+0x69/0xa0 kernel/notifier.c:368
- __inet_insert_ifa+0x925/0xcd0 net/ipv4/devinet.c:567
- inet_rtm_newaddr+0xd87/0x1540 net/ipv4/devinet.c:1002
- rtnetlink_rcv_msg+0x95b/0xe90 net/core/rtnetlink.c:6955
- netlink_rcv_skb+0x16a/0x440 net/netlink/af_netlink.c:2534
- netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
- netlink_unicast+0x53a/0x7f0 net/netlink/af_netlink.c:1339
- netlink_sendmsg+0x8d1/0xdd0 net/netlink/af_netlink.c:1883
- sock_sendmsg_nosec net/socket.c:712 [inline]
- __sock_sendmsg net/socket.c:727 [inline]
- __sys_sendto+0x495/0x510 net/socket.c:2180
- __do_sys_sendto net/socket.c:2187 [inline]
- __se_sys_sendto net/socket.c:2183 [inline]
- __x64_sys_sendto+0xe0/0x1c0 net/socket.c:2183
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0x260 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f87d9f907fc
-Code: 2a 5f 02 00 44 8b 4c 24 2c 4c 8b 44 24 20 89 c5 44 8b 54 24 28 48 8b 54 24 18 b8 2c 00 00 00 48 8b 74 24 10 8b 7c 24 08 0f 05 <48> 3d 00 f0 ff ff 77 34 89 ef 48 89 44 24 08 e8 70 5f 02 00 48 8b
-RSP: 002b:00007fff248eaf20 EFLAGS: 00000293 ORIG_RAX: 000000000000002c
-RAX: ffffffffffffffda RBX: 00007f87dace4620 RCX: 00007f87d9f907fc
-RDX: 0000000000000028 RSI: 00007f87dace4670 RDI: 0000000000000003
-RBP: 0000000000000000 R08: 00007fff248eaf74 R09: 000000000000000c
-R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000003
-R13: 0000000000000000 R14: 00007f87dace4670 R15: 0000000000000000
- </TASK>
-rcu: rcu_preempt kthread starved for 10490 jiffies! g8293 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=1
-rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
-rcu: RCU grace-period kthread stack dump:
-task:rcu_preempt     state:R  running task     stack:27704 pid:16    tgid:16    ppid:2      task_flags:0x208040 flags:0x00004000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5382 [inline]
- __schedule+0x116f/0x5de0 kernel/sched/core.c:6767
- __schedule_loop kernel/sched/core.c:6845 [inline]
- schedule+0xe7/0x3a0 kernel/sched/core.c:6860
- schedule_timeout+0x123/0x290 kernel/time/sleep_timeout.c:99
- rcu_gp_fqs_loop+0x1ea/0xb00 kernel/rcu/tree.c:2046
- rcu_gp_kthread+0x270/0x380 kernel/rcu/tree.c:2248
- kthread+0x3c2/0x780 kernel/kthread.c:464
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:153
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-rcu: Stack dump where RCU GP kthread last ran:
-CPU: 1 UID: 101 PID: 5480 Comm: dhcpcd Not tainted 6.15.0-rc5-syzkaller-00022-g01f95500a162 #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/29/2025
-RIP: 0010:write_comp_data+0x8b/0x90 kernel/kcov.c:272
-Code: 00 00 4a 8d 34 dd 28 00 00 00 48 39 f2 72 1b 48 83 c7 01 48 89 38 4c 89 44 30 e0 4c 89 4c 30 e8 4c 89 54 30 f0 4a 89 4c d8 20 <c3> cc cc cc cc 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3
-RSP: 0018:ffffc90002ea77b0 EFLAGS: 00000293
-RAX: 0000000000000000 RBX: ffff8880b8441720 RCX: ffffffff81af1bb9
-RDX: ffff88802577c880 RSI: 0000000000000000 RDI: 0000000000000005
-RBP: 0000000000000003 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000000 R12: ffffed10170882e5
-R13: 0000000000000001 R14: dffffc0000000000 R15: ffff8880b853b040
-FS:  00007fe629d36740(0000) GS:ffff888124adf000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055b10a151068 CR3: 0000000025463000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- csd_lock_wait kernel/smp.c:340 [inline]
- smp_call_function_many_cond+0x4c9/0x1290 kernel/smp.c:885
- on_each_cpu_cond_mask+0x40/0x90 kernel/smp.c:1052
- __flush_tlb_multi arch/x86/include/asm/paravirt.h:91 [inline]
- flush_tlb_multi arch/x86/mm/tlb.c:1275 [inline]
- flush_tlb_mm_range+0x322/0x1780 arch/x86/mm/tlb.c:1365
- tlb_flush arch/x86/include/asm/tlb.h:23 [inline]
- tlb_flush_mmu_tlbonly include/asm-generic/tlb.h:480 [inline]
- tlb_flush_mmu_tlbonly include/asm-generic/tlb.h:470 [inline]
- tlb_flush_mmu mm/mmu_gather.c:403 [inline]
- tlb_finish_mmu+0x3c9/0x7b0 mm/mmu_gather.c:496
- vms_clear_ptes+0x55e/0x770 mm/vma.c:1191
- vms_complete_munmap_vmas+0x1ca/0x970 mm/vma.c:1233
- do_vmi_align_munmap+0x43b/0x7d0 mm/vma.c:1492
- __do_sys_brk+0x8d3/0xaa0 mm/mmap.c:176
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0x260 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fe629e04c7c
-Code: 1a 64 c7 03 01 00 00 00 eb 11 64 44 89 23 31 f6 5b 31 ff 5d 41 5c e9 41 ff ff ff 5b 83 c8 ff 5d 41 5c c3 b8 0c 00 00 00 0f 05 <48> 8b 15 d5 61 0d 00 45 31 c0 48 89 02 48 39 c7 76 12 48 8b 05 73
-RSP: 002b:00007fffc7ef0748 EFLAGS: 00000206 ORIG_RAX: 000000000000000c
-RAX: ffffffffffffffda RBX: fffffffffffdf000 RCX: 00007fe629e04c7c
-RDX: 0000558eaa832990 RSI: 0000558eaa6f2010 RDI: 0000558eaa853000
-RBP: 0000000000041670 R08: 0000000000000000 R09: ba568e78e099c46f
-R10: 00007fffc7ef06a8 R11: 0000000000000206 R12: 0000558eaa874000
-R13: 0000558eaa863f20 R14: 00007fe629edbaa0 R15: 00007fffc7ef0978
- </TASK>
+<TASK>
+ ...
+ netdev_nl_sock_priv_destroy (net/core/netdev-genl.c:953 (discriminator 3))
+ genl_release (net/netlink/genetlink.c:653 net/netlink/genetlink.c:694 net/netlink/genetlink.c:705)
+ ...
+ netlink_release (net/netlink/af_netlink.c:737)
+ ...
+ __sock_release (net/socket.c:647)
+ sock_close (net/socket.c:1393)
 
-
+Fixes: 1d22d3060b9b ("net: drop rtnl_lock for queue_mgmt operations")
+Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+v2:
+ - Fix commit message.
+ - Correct Fixes tag.
+ - Inverse locking order.
+ - Do not put a reference count of binding in
+   mp_dmabuf_devmem_uninstall().
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+In order to test this patch, driver side implementation of devmem TCP[1]
+is needed to be applied.
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+[1] https://lore.kernel.org/netdev/20250415052458.1260575-1-ap420073@gmail.com/T/#u
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+ net/core/devmem.c      |  6 ++++++
+ net/core/devmem.h      |  3 +++
+ net/core/netdev-genl.c | 27 ++++++++++++++++++---------
+ 3 files changed, 27 insertions(+), 9 deletions(-)
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+diff --git a/net/core/devmem.c b/net/core/devmem.c
+index 6e27a47d0493..636c1e82b8da 100644
+--- a/net/core/devmem.c
++++ b/net/core/devmem.c
+@@ -167,6 +167,7 @@ int net_devmem_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_idx,
+ 
+ struct net_devmem_dmabuf_binding *
+ net_devmem_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
++		       struct netdev_nl_sock *priv,
+ 		       struct netlink_ext_ack *extack)
+ {
+ 	struct net_devmem_dmabuf_binding *binding;
+@@ -189,6 +190,7 @@ net_devmem_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
+ 	}
+ 
+ 	binding->dev = dev;
++	binding->priv = priv;
+ 
+ 	err = xa_alloc_cyclic(&net_devmem_dmabuf_bindings, &binding->id,
+ 			      binding, xa_limit_32b, &id_alloc_next,
+@@ -376,12 +378,16 @@ static void mp_dmabuf_devmem_uninstall(void *mp_priv,
+ 	struct netdev_rx_queue *bound_rxq;
+ 	unsigned long xa_idx;
+ 
++	mutex_lock(&binding->priv->lock);
+ 	xa_for_each(&binding->bound_rxqs, xa_idx, bound_rxq) {
+ 		if (bound_rxq == rxq) {
+ 			xa_erase(&binding->bound_rxqs, xa_idx);
++			if (xa_empty(&binding->bound_rxqs))
++				binding->dev = NULL;
+ 			break;
+ 		}
+ 	}
++	mutex_unlock(&binding->priv->lock);
+ }
+ 
+ static const struct memory_provider_ops dmabuf_devmem_ops = {
+diff --git a/net/core/devmem.h b/net/core/devmem.h
+index 7fc158d52729..afd6320b2c9b 100644
+--- a/net/core/devmem.h
++++ b/net/core/devmem.h
+@@ -11,6 +11,7 @@
+ #define _NET_DEVMEM_H
+ 
+ #include <net/netmem.h>
++#include <net/netdev_netlink.h>
+ 
+ struct netlink_ext_ack;
+ 
+@@ -20,6 +21,7 @@ struct net_devmem_dmabuf_binding {
+ 	struct sg_table *sgt;
+ 	struct net_device *dev;
+ 	struct gen_pool *chunk_pool;
++	struct netdev_nl_sock *priv;
+ 
+ 	/* The user holds a ref (via the netlink API) for as long as they want
+ 	 * the binding to remain alive. Each page pool using this binding holds
+@@ -63,6 +65,7 @@ struct dmabuf_genpool_chunk_owner {
+ void __net_devmem_dmabuf_binding_free(struct net_devmem_dmabuf_binding *binding);
+ struct net_devmem_dmabuf_binding *
+ net_devmem_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
++		       struct netdev_nl_sock *priv,
+ 		       struct netlink_ext_ack *extack);
+ void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *binding);
+ int net_devmem_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_idx,
+diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+index 230743bdbb14..b8bb73574276 100644
+--- a/net/core/netdev-genl.c
++++ b/net/core/netdev-genl.c
+@@ -859,13 +859,11 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
+ 		goto err_genlmsg_free;
+ 	}
+ 
+-	mutex_lock(&priv->lock);
+-
+ 	err = 0;
+ 	netdev = netdev_get_by_index_lock(genl_info_net(info), ifindex);
+ 	if (!netdev) {
+ 		err = -ENODEV;
+-		goto err_unlock_sock;
++		goto err_genlmsg_free;
+ 	}
+ 	if (!netif_device_present(netdev))
+ 		err = -ENODEV;
+@@ -877,10 +875,11 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
+ 		goto err_unlock;
+ 	}
+ 
+-	binding = net_devmem_bind_dmabuf(netdev, dmabuf_fd, info->extack);
++	mutex_lock(&priv->lock);
++	binding = net_devmem_bind_dmabuf(netdev, dmabuf_fd, priv, info->extack);
+ 	if (IS_ERR(binding)) {
+ 		err = PTR_ERR(binding);
+-		goto err_unlock;
++		goto err_unlock_sock;
+ 	}
+ 
+ 	nla_for_each_attr_type(attr, NETDEV_A_DMABUF_QUEUES,
+@@ -921,18 +920,17 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
+ 	if (err)
+ 		goto err_unbind;
+ 
+-	netdev_unlock(netdev);
+-
+ 	mutex_unlock(&priv->lock);
++	netdev_unlock(netdev);
+ 
+ 	return 0;
+ 
+ err_unbind:
+ 	net_devmem_unbind_dmabuf(binding);
+-err_unlock:
+-	netdev_unlock(netdev);
+ err_unlock_sock:
+ 	mutex_unlock(&priv->lock);
++err_unlock:
++	netdev_unlock(netdev);
+ err_genlmsg_free:
+ 	nlmsg_free(rsp);
+ 	return err;
+@@ -948,14 +946,25 @@ void netdev_nl_sock_priv_destroy(struct netdev_nl_sock *priv)
+ {
+ 	struct net_devmem_dmabuf_binding *binding;
+ 	struct net_devmem_dmabuf_binding *temp;
++	netdevice_tracker dev_tracker;
+ 	struct net_device *dev;
+ 
+ 	mutex_lock(&priv->lock);
+ 	list_for_each_entry_safe(binding, temp, &priv->bindings, list) {
+ 		dev = binding->dev;
++		if (!dev) {
++			net_devmem_unbind_dmabuf(binding);
++			continue;
++		}
++		netdev_hold(dev, &dev_tracker, GFP_KERNEL);
++		mutex_unlock(&priv->lock);
+ 		netdev_lock(dev);
++		mutex_lock(&priv->lock);
+ 		net_devmem_unbind_dmabuf(binding);
++		mutex_unlock(&priv->lock);
+ 		netdev_unlock(dev);
++		netdev_put(dev, &dev_tracker);
++		mutex_lock(&priv->lock);
+ 	}
+ 	mutex_unlock(&priv->lock);
+ }
+-- 
+2.34.1
 
-If you want to undo deduplication, reply with:
-#syz undup
 
