@@ -1,95 +1,107 @@
-Return-Path: <netdev+bounces-188342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52B0CAAC585
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 15:16:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DDBFAAC684
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 15:38:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D4B91C442CD
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 13:12:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFEFD4A2C6E
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 13:35:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE18E28134E;
-	Tue,  6 May 2025 13:11:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I8IoX8lF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46999280CCD;
+	Tue,  6 May 2025 13:34:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F23280003;
-	Tue,  6 May 2025 13:11:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5993123D28F
+	for <netdev@vger.kernel.org>; Tue,  6 May 2025 13:34:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746537092; cv=none; b=aZEm/a10xtI+w3RJnJl2UVytFIDlN+kCh0up+biR5xL70xOUyoPCHzJwG961ifTq9f7bHHpNo6gaWIwy/QymeKABKBkrJCCZ83jhdm1/TNZ41lACk19+3SktudXDIe7it9xeE/j7C7VDuYl3XdwyEyY9fDtlsA9f2b8xJXRDOWg=
+	t=1746538490; cv=none; b=mhdgXo1kyPOwD3Ua7Xj/v2pG/x06McaNb5sH5aPdaZaGVMRnMidWQ+j47Tk10dNPpSWQv88M3Hntun/eRTo49Xoibl+04mrpb3HBtx8UlwH/B1/XZBMyb5d94WOzUFdyspn7hoEQQCTC13nyVnmpZNcQZx1I5a35AlQlo+8xKA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746537092; c=relaxed/simple;
-	bh=Ru8GEfjobKh/eKJnXQs806zGlXmZXUBLV7rlfClj2F4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YeujHV1jaD3Cqc+qrWdJVIRYxvWjMHPqowyicqLvczCRBQKOwiizg1uzOTIrKz37q7suOTvOqok1boxh97PQRdraHuRNWegtWAUrsggmE0MG6qnYGT+CvWp0N9/aG9o/exh2zdBc5eiyu/ZaziWKhiZFgznYJv35mMMLl9bsRTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I8IoX8lF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D707C4CEE4;
-	Tue,  6 May 2025 13:11:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746537091;
-	bh=Ru8GEfjobKh/eKJnXQs806zGlXmZXUBLV7rlfClj2F4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=I8IoX8lFYge36zjjsdGsdCn0scug3D95RuHvZ6zfvfs3AO/Gbm01hsiBtlfp+kvF0
-	 rT//Q4hXOo7/pokDoVeHTw9TPH8YQXaOdhDDqClqvINXmICLJAkSgsQgx9oPs9FTrm
-	 TNZFdAIQPPY9VjTW1vv1oixTsJgAnh/Ga0BLNsyg1QRT/5e2Zb0FHCQ+TXrA1IYXKK
-	 rkRQO81WYn7QrwycIMEMeUa8g7R4F1EXgoGPBxtHywIE4fZNP9bMl6qYttphcPaGi9
-	 LsRC5EW32vEsQEgS6Woo+t49BjxyVB4wamYQKVn/Oa0yaNL6p5WisUiejjEuH2W2RF
-	 FEEpRwStloKrQ==
-Date: Tue, 6 May 2025 06:11:25 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
- fw@strlen.de, horms@kernel.org
-Subject: Re: [PATCH nf-next 2/7] selftests: netfilter: add conntrack stress
- test
-Message-ID: <20250506061125.1a244d12@kernel.org>
-In-Reply-To: <20250505234151.228057-3-pablo@netfilter.org>
-References: <20250505234151.228057-1-pablo@netfilter.org>
-	<20250505234151.228057-3-pablo@netfilter.org>
+	s=arc-20240116; t=1746538490; c=relaxed/simple;
+	bh=OokJgCchqneXjWnsDj1Sjjodavmnvcl8YGWBPeqdGAU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XHOrpp2iY4uVicdxtFgXXu4YWDhvODm+w9JU87JK5uJpbIHq+5sYGu5FAU3OsPgAPpy82nJAWMxCMEmP3BacecMQQT7gyhkdJe/CZn3Sy1HAbL1pChsnkt4Qe3KCZu3WPyBItkpsXh7QYCtFhjehx1uqXVBdJWlK834b3VLnDk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-39c1ef4ae3aso3382254f8f.1
+        for <netdev@vger.kernel.org>; Tue, 06 May 2025 06:34:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746538487; x=1747143287;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OokJgCchqneXjWnsDj1Sjjodavmnvcl8YGWBPeqdGAU=;
+        b=nsxvL8ZlpCvmxIw0WDaWoIeiJYGX4gs9oAVXbx4SQr17+hgIXR2uCMwPUZOz6czusI
+         F9iunB2Z5KVMW6cUlAxmCiwcPzGJBJxiFHQ2u1DEuwSRJy5rt4H0jH+bUgKSbmCmFyjn
+         duKP8YGp136CSoXR7MLlK+AIHVfzgV0Ia3YO2x/E2ndmbH84rWcA400W9INMRNlidCHP
+         imrbOAp777lh4sBXWeLydqd/LqkWXWPAqF9hJJKTQRItDF1yV4TLbj9Cp5wakE6/IvKI
+         YlnbSiHTEfmYKo/qt9WjctVXn1TfkvzUD8Fi1dhUtTl4txm4d+kV4kBHBrADlahhn2mY
+         zw/A==
+X-Forwarded-Encrypted: i=1; AJvYcCWMzN+4kaUKJZPiGBFF9xZGUqCO0APqAOVO56WeBVSPD6qfA1Atj00J/+LoObbi5CvsnwLjl2g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymsBYnVdzgslEGJbZPSH5Qh3vfz+mCJaWiNjnGLWBlup5PwZZf
+	qhu/9BU12pxIjQ9d44d6/4Ahp07BXxoSzKONq/EYWawWmQCNS0VS
+X-Gm-Gg: ASbGncswgOLu5LSR7CLAqyKy8YXxDu3v+zAA2JWFSMvuxyVBW71lpjJu8L+gH1aclja
+	UT2wvxI9GM/sKNc14YGa+wvoplDzsRWAvk8Q87HPYoFSjUajLSQd6aQzZ5AJONk7cpA9WJTP72E
+	MZj7jgm4zh7jpvOC5XNRGihZQzAyMvWnkbCVcbivYtn7JKEPDj8is4Ymr+VkzrR1KuVAZ38B0yv
+	/6/b5L7FU/eqD8AplSlF1KfXY/3dGYB1eGsNtauYx4ij3pZD3HP37uY5ZlXfBJ3zRcpyHunMyvw
+	qCziuP9qGXRBYHoGNhGpf5M4UF6M5gqdqYkvTR4IuXPzYVny9yvwhOq86ZcLoYCNrgFp3YDtCuH
+	UoctgcQ==
+X-Google-Smtp-Source: AGHT+IEJ+6S2l4dL1RILDCg3dr6TjbuXO50PqYFF3qxvwSVe0eMOFGzjp+ywvS/51U169tlJf2lZOQ==
+X-Received: by 2002:a05:6000:2484:b0:3a0:8282:88e3 with SMTP id ffacd0b85a97d-3a0ab5a8bc0mr3252698f8f.27.1746538486332;
+        Tue, 06 May 2025 06:34:46 -0700 (PDT)
+Received: from [10.50.5.11] (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a099ae3cfbsm13502158f8f.40.2025.05.06.06.34.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 May 2025 06:34:46 -0700 (PDT)
+Message-ID: <4f1e9f1b-ace9-46d1-96bb-3a117d676c90@grimberg.me>
+Date: Tue, 6 May 2025 16:34:42 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v28 00/20] nvme-tcp receive offloads
+To: Keith Busch <kbusch@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: Gustavo Padovan <gus@collabora.com>, Aurelien Aptel <aaptel@nvidia.com>,
+ linux-nvme <linux-nvme@lists.infradead.org>, netdev
+ <netdev@vger.kernel.org>, hch <hch@lst.de>, axboe <axboe@fb.com>,
+ chaitanyak <chaitanyak@nvidia.com>, davem <davem@davemloft.net>,
+ "aurelien.aptel" <aurelien.aptel@gmail.com>, smalin <smalin@nvidia.com>,
+ malin1024 <malin1024@gmail.com>, ogerlitz <ogerlitz@nvidia.com>,
+ yorayz <yorayz@nvidia.com>, borisp <borisp@nvidia.com>,
+ galshalom <galshalom@nvidia.com>, mgurtovoy <mgurtovoy@nvidia.com>,
+ tariqt <tariqt@nvidia.com>, edumazet <edumazet@google.com>
+References: <20250430085741.5108-1-aaptel@nvidia.com>
+ <19686c19e11.ba39875d3947402.7647787744422691035@collabora.com>
+ <20250505134334.28389275@kernel.org>
+ <aBky09WRujm8KmEC@kbusch-mbp.dhcp.thefacebook.com>
+Content-Language: en-US
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <aBky09WRujm8KmEC@kbusch-mbp.dhcp.thefacebook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Tue,  6 May 2025 01:41:46 +0200 Pablo Neira Ayuso wrote:
-> From: Florian Westphal <fw@strlen.de>
-> 
-> Add a new test case to check:
->  - conntrack_max limit is effective
->  - conntrack_max limit cannot be exceeded from within a netns
->  - resizing the hash table while packets are inflight works
->  - removal of all conntrack rules disables conntrack in netns
->  - conntrack tool dump (conntrack -L) returns expected number
->    of (unique) entries
->  - procfs interface - if available - has same number of entries
->    as conntrack -L dump
-> 
-> Expected output with selftest framework:
->  selftests: net/netfilter: conntrack_resize.sh
->  PASS: got 1 connections: netns conntrack_max is pernet bound
->  PASS: got 100 connections: netns conntrack_max is init_net bound
->  PASS: dump in netns had same entry count (-C 1778, -L 1778, -p 1778, /proc 0)
->  PASS: dump in netns had same entry count (-C 2000, -L 2000, -p 2000, /proc 0)
->  PASS: test parallel conntrack dumps
->  PASS: resize+flood
->  PASS: got 0 connections: conntrack disabled
->  PASS: got 1 connections: conntrack enabled
-> ok 1 selftests: net/netfilter: conntrack_resize.sh
 
-This test seems quite flaky on debug kernels:
 
-https://netdev.bots.linux.dev/contest.html?test=conntrack-resize-sh&executor=vmksft-nf-dbg
+On 06/05/2025 0:51, Keith Busch wrote:
+> On Mon, May 05, 2025 at 01:43:34PM -0700, Jakub Kicinski wrote:
+>> Looks like the tests passed? But we'll drop this from our PW, again.
+>> Christoph Hellwig was pushing back on the v27. We can't do anything
+>> with these until NVMe people are all happy.
+> FWIW, I believe Sagi is okay with this as he has reviewed or acked all
+> the patches. I am also okay with this, though I'm more or less neutral
+> on the whole since it's outside my scope, but the nvme parts look fine.
+> The new additions are isolated to hardware that provides these offloads,
+> so I'm not really concerned this is going to be a problem maintaining
+> with the existing nvme-tcp driver. I trust in Sagi on this one.
 
-# FAIL: proc inconsistency after uniq filter for nsclient2-whtRtS: 1968 != 1945
+Yes, as I commented before, I'm perfectly fine with adding this.
 
