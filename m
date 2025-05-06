@@ -1,101 +1,100 @@
-Return-Path: <netdev+bounces-188336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29359AAC3CF
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 14:25:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7588AAC496
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 14:51:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BCE13B62A7
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 12:24:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E90E81C23E4B
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 12:51:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89DC327FB16;
-	Tue,  6 May 2025 12:24:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F26227FB3C;
+	Tue,  6 May 2025 12:50:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="lKI6Le0K"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RCdoV1zX"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEA1C280030;
-	Tue,  6 May 2025 12:24:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DB7727FB20
+	for <netdev@vger.kernel.org>; Tue,  6 May 2025 12:50:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746534253; cv=none; b=tJD5uE1OlnQEWwYQaJjVdnwE3HkeZupdkuuXvNYn6XYTLgDPFDIlLiIWdT4Lc3zlDrQRIIAVnEdfYGoItREVVwWeCsexB5R//wpgeZu36sMjV3xnlJg58W/ef2TlnK/ZnSX1DJVmzQkjQJ8k+I8tz9Tpyfl1WHCLcSl9Com5g+s=
+	t=1746535859; cv=none; b=dnqN3cHSEQlQmJ0WWMz+oT2rhS6qauKbxqZ+whalq2c8EcI+Nnc9hHhBnMQvcQwLIAKVA9vnz7Q/fm7W8jxsRobEy/DalRNDUfuFhOAZaU1Qh881ds+ZH7cGq97GyvjhqAUGCnjePKo2J+CAkLSdLbrDqAbooZRtbqn7sNYhUgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746534253; c=relaxed/simple;
-	bh=Pe/LD1R11v0r3nlohRwma2BBA+QuXERTLjiv7SMrDH0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n6rrUC3h1zEOVTpXLVks7LqcSmChGkYjfrWNs2mx+ajEenEr72YbKvOL5A2Fuv6mrwMt2qYhaX8GRbjcJwpKnHUw5ON5dus7RBBLJITONfhZpg9Y3c4JWDQHhmRwwSBmh/Yuu2iY6/LvVStnabn1rLC8FkE9eD788f1UZD+ilh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=lKI6Le0K; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=y94onA26ptuGt6ZZ1O0PWKBzwfWEx+cfBmv8M1gAVUg=; b=lKI6Le0KREcdNawRsk0CAI0W4h
-	YKfzlKz5/1N0rCWNPOVlKunDUiZvVYlHZTDoCy+JhPcM/aoEkLpNFsCtYibgDU2HTjR2EFXS0+FJv
-	DE7tlyBKVFtKuF5zA/ikUTG+MZr22NPuxbhEeRYNDG0B1LN6rYc+4+RAFPsE3ZJ6fARk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uCHLA-00BlBI-0c; Tue, 06 May 2025 14:24:04 +0200
-Date: Tue, 6 May 2025 14:24:03 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Stefan Wahren <wahrenst@gmx.net>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 2/5] net: vertexcom: mse102x: Add warning about
- IRQ trigger type
-Message-ID: <a9633874-a41c-4f62-9b80-33785c0eec10@lunn.ch>
-References: <20250505142427.9601-1-wahrenst@gmx.net>
- <20250505142427.9601-3-wahrenst@gmx.net>
- <14326654-2573-4bb6-b7c0-eb73681caabd@lunn.ch>
- <e75cebaf-6119-4502-ae63-a8758d0dd9f5@gmx.net>
+	s=arc-20240116; t=1746535859; c=relaxed/simple;
+	bh=iuWVZjPND+KWjhJ9x/SFAnPnmVENpipJ/a6Z85Bx/rw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WEhIoXmC6vGN8nDtGkmXC3v0Je6fl1zdZ8kQUVqUGqZDPsx+FMhuXb3Qxg6RnNCFTBXhsVO2MEIpb5EwQF5kMFq1I4VfSqHXpr2tszaq4NXZ5wnlbrwL9aVYGOBCR123cobxoJBdBeHRbkIRFQEz8diyubJLjkFAnyqS7WqgsMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RCdoV1zX; arc=none smtp.client-ip=209.85.167.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-3f8ae3ed8adso4063358b6e.3
+        for <netdev@vger.kernel.org>; Tue, 06 May 2025 05:50:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746535856; x=1747140656; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ylefJrOM0At36TRbx//OwmJb/NbumE251FEl48mtalw=;
+        b=RCdoV1zX+NvOqXZRHAInZdK16DdqIyx/gmC0ufElV3K7xzJf1VJRPqszpjrTx0CtKF
+         NuWfyXpHh4FUnIHAdoxpvRWT9IsaZUNCXVRQlJvOI6G9t5wypDSW1ywKZrgnmvjbm9zZ
+         RkZuBnBg4CQipjn7I2YPq/N1aO80n7UMtxAaMdtTZwmwrI5/2pOm70nkh24fM0RKUHzK
+         OnvFHgSynQOn6mqEfmmDgHT/VdJxHtvgRBgbNxPg9ezA5f4+JI675lBnyztxyLLXsqMS
+         p13KA7cRoeQK8vsfvSW8Y/CO6UnIRSHqcMMvpuwe5YMk0vnoAbtdVJrctv+F8PgIuHsY
+         RaoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746535856; x=1747140656;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ylefJrOM0At36TRbx//OwmJb/NbumE251FEl48mtalw=;
+        b=hrR4GM7V732gnvcmzuXZXi9bzUVSOgdXIRykLge+UBdH0ra/3kg/8muHrJdlwEGxQs
+         8fov/WCXnWziKKBFVvGWvnN8z/Lhb8azO0xH/ddM8gvHuYJ/MJSMGMh/+LLoqksN3oBO
+         Z+M1fQd2HK6vkf4y5SVQuZqcRVYh3ddS8RjCPBO4jK9ew+07/gXIlC0b8/jRJrH2KkMa
+         9VrvfV1DloZmlPAXTp9I+m7NPEoHGiOIVo+HFvQtLt4zS+PsnG0QJgpZMOab6vQzyaHK
+         xq+zVJ1vSmoS3Xt7jDIDZhi5uFY9KOi5cCudkjaFL4OqJ8/R5exod3+GQvxqvkAgKvh2
+         UUXA==
+X-Forwarded-Encrypted: i=1; AJvYcCUuNAxqza7+FUxXSiAqPoC68FUq83c2Apad2lJsvpnnFc8AC0gGXK3WvLeH59RXniZr8HxjG0A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZH3adQS6KsxTMBwfVxF6hlbg22zVfq0jcZOugHQ6vrRN9PObm
+	f2IZc1WjiZqkO+hZJGtEsA95HV9WqRwRPl9ZyZuJ1FVpmXLO5RdeOxBoD5YpNx6jgUuhwH9og9n
+	CUfHXMVA+D7kchr5z5oIvDetORn0=
+X-Gm-Gg: ASbGncsJTX1zoOlO+3q7Cz48YsSe2w5GLlUCv3HSDrcINaUxa1MWyZb3yXka2BBjHVG
+	nAfb/gWLUgP4uQonhorjWt5E7cYVgw6vaCIzibmR4/CQ4XcFxdCvr9OIILwHe07AmkezJO3ZnGI
+	dUcRM1une11FI1j7xCq3zBf3y07F/CwLBMXEW45VOC+tX9eDBcPEI=
+X-Google-Smtp-Source: AGHT+IFmwGBFGS7phY3jyDY3dBI/J+iafmWwUQmkOg9CUZCueJx38i5/OfPzybFafG53GAC4+jWYfHeZX1pXSUX/zLc=
+X-Received: by 2002:a05:6808:6c91:b0:3f7:8f77:2a9e with SMTP id
+ 5614622812f47-40341a0f05cmr10721173b6e.20.1746535856453; Tue, 06 May 2025
+ 05:50:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e75cebaf-6119-4502-ae63-a8758d0dd9f5@gmx.net>
+References: <20250505170215.253672-1-kuba@kernel.org> <20250505170215.253672-4-kuba@kernel.org>
+In-Reply-To: <20250505170215.253672-4-kuba@kernel.org>
+From: Donald Hunter <donald.hunter@gmail.com>
+Date: Tue, 6 May 2025 13:50:44 +0100
+X-Gm-Features: ATxdqUGoItTmldn3wrHwkeVY9aEbbw7bECp26wv-_DBgjHYl8slP5nNz-rB1c-M
+Message-ID: <CAD4GDZyFM0uY9WPPw3DF1F+tsDU=0PwyA1yFvbxVxv3amyfu5g@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/4] netlink: specs: remove implicit structs for
+ SNMP counters
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
+	johannes@sipsolutions.net, razor@blackwall.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, May 06, 2025 at 10:38:53AM +0200, Stefan Wahren wrote:
-> Hi Andrew,
-> 
-> Am 05.05.25 um 18:32 schrieb Andrew Lunn:
-> > > +	if (!irq_data) {
-> > > +		netdev_err(ndev, "Invalid IRQ: %d\n", ndev->irq);
-> > > +		return -EINVAL;
-> > > +	}
-> > > +
-> > > +	switch (irqd_get_trigger_type(irq_data)) {
-> > > +	case IRQ_TYPE_LEVEL_HIGH:
-> > > +	case IRQ_TYPE_LEVEL_LOW:
-> > > +		break;
-> > > +	default:
-> > > +		netdev_warn_once(ndev, "Only IRQ type level recommended, please update your firmware.\n");
-> > I would probably put DT in there somewhere. firmware is rather
-> > generic.
-> I'm fine with changing it to DT. I slightly remember of a patch for a
-> BCM2835 driver, which also had a warning to update the DT and a reviewer
-> requested it to change it to firmware. I don't remember the reason behind
-> it, maybe it's the fact that not all user know what a DT / devicetree is. A
-> quick grep shows both variants (DT vs firmware).
+On Mon, 5 May 2025 at 18:02, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+>          name: reasm-overlaps
+> -        type: u64
+>    - name: br-boolopt-multi
+>      type: struct
+>      header: linux/if_bridge.h
 
-
-The line gets long, but "Only IRQ type level recommended, please
-update your device tree firmware.\n" is good for me.
-
-	Andrew
+The patch does not apply for me, I think due to the above line
+changing in another series.
 
