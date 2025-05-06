@@ -1,85 +1,85 @@
-Return-Path: <netdev+bounces-188396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25FF0AACA53
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 18:01:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBDEFAACA5C
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 18:01:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34AB03B7055
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 16:00:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7963D526255
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 16:01:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 208F128466C;
-	Tue,  6 May 2025 16:00:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B98D0283FF3;
+	Tue,  6 May 2025 16:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e7/faSBr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nu48fuB8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52AD3284695
-	for <netdev@vger.kernel.org>; Tue,  6 May 2025 16:00:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB74284680
+	for <netdev@vger.kernel.org>; Tue,  6 May 2025 16:00:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746547223; cv=none; b=kDyOKp4S3f7eKkGeC4NbNtyXZ8DSKv9u8BiNAnYQcyOgFtFeWAQY9fDijYkQNBpesskO1dBUiLKko3XtvKAGSUDEiNd1/zzUlHWg2OBWKjDhTYAutJjthvmybwqZ1xaHrx4+dbbEYcvnIU2VYVC/ZN/PGbAGA05nN7dLy3WrKiQ=
+	t=1746547230; cv=none; b=Vu6VP015rzkPRd00WwTkkosrrzW9I9vsN3JU+vepbun0AmAu7VP7PWt1/C57ZmNo86eNhnR4jJE/sJ3muxyp/a3xD7nZsCsaUVFA6cuw/3B/Om0vzkIxSrKhxS6l0N7ZFZ9gEwVB69ZUjyAcoZ2q739CRH+FKFrqvU0ZNvr5WPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746547223; c=relaxed/simple;
-	bh=jpLNYXMPobSI6JqEU0T9RlA6cuUFXQHYyLMkobNsoVY=;
+	s=arc-20240116; t=1746547230; c=relaxed/simple;
+	bh=SmUa9MtU+6nDOGQc6r3WPaEIpjFORsT9OBNkLV+2fNM=;
 	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=W2CJBuxdYhsq8cBliw2HRmKFH6XuMmT/rCRs4pWRYxR7lgqNn1wYarGgYFgjITHQ5nPHOxlPmxv6/025xsIcfL/CqZwwNd/+C+pW8EOjLvFW+1DN2vHkw6jkO5JVUpL2Aya9zjB22fm+McHiciQrg0Q67Hm7jCtjcsfgxG+jzG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e7/faSBr; arc=none smtp.client-ip=209.85.210.179
+	 MIME-Version:Content-Type; b=bSYYFXokmJZj18o5KHmJJL+CUpAu+kMm4flMVvvsrtD6oyQ2ackpuLccmoE3p+izsVnFemXj+AsXZeLJXAL+Ret74FlbY59qn/RhrE8AWvPJWVXXc4mt9tqe4+QERBrm9F2ZdAd06R+S5JvSvlhIoqqI+JqtBc7KnlrYTYwL+Ms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nu48fuB8; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-73c17c770a7so8291773b3a.2
-        for <netdev@vger.kernel.org>; Tue, 06 May 2025 09:00:20 -0700 (PDT)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-22e15aea506so52570935ad.1
+        for <netdev@vger.kernel.org>; Tue, 06 May 2025 09:00:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746547220; x=1747152020; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1746547228; x=1747152028; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=HTFdgwrvcUmaAv0D7tyYnAQNuP6oW1vnmSxslnbhHaY=;
-        b=e7/faSBrNSSvNkNG5JMT7OiwRY9zzjCjERZMPO6/A6CescPrjFGBCrOuv+oaXC2b4N
-         zuFCAAAQO3v6Y+q1qazksOT6fYSiS2Forpjt+HfSXzJ5kduMR5Uwl977knNof/n5GyLB
-         A32C5AJEEFzomCYX3VxwPW2EIeq9edUXZBC+AjUOTFHShVUDLzOuBRucPCexvVy5BOkJ
-         oiSa+nc/qPKQwp61qigGycs44Ajds3BNBTIVsGk7vCydwRmjCmzK2/c43aQpdmlJxos/
-         v1B7wxPSM33NuQ5ttAaYg//N5AgwAaST3OYAy9m/UDxjkGqgVPNV8UmmRD+lnbNt+msb
-         eMcQ==
+        bh=NW6Tn6nahsz/hZQDHZ24xS3SM/KlmTN3E3KJkuprw+o=;
+        b=Nu48fuB81vdqKfCHCA8R0AswpayUGrinHiH4XCO3LndyQpue4JMzZswlSSq6DS/fve
+         EO73iqtcLcf8wYs4et1OgCH/yiqbI93AL4PkdtW1e4GwOAptfXVkoDEZItbDsyLDZfQ9
+         /v5O92cbp7qe6zm0HSXp1Xu2MebEROSk4cjpBalTtCOACUBnjP8z6upfx7qfO8BHy05Z
+         loDPf1w9ZMFBPLjtDCmsUOxH94sjEw41Fz/4ecSujLTiVzW6SOz3YuIaQLWBWq43UkAZ
+         rFG9Syh5ZFDq898E5S8iPDts6m9laWmxwH2GeIe32GJounOScjYefU3GPUsdyh33UD0H
+         FIJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746547220; x=1747152020;
+        d=1e100.net; s=20230601; t=1746547228; x=1747152028;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=HTFdgwrvcUmaAv0D7tyYnAQNuP6oW1vnmSxslnbhHaY=;
-        b=nrpIIizi5oUFUy3053tFjR4sb6Shz78foWILYPc2MgkkZG9l+SM5JTJqWi6jstkSif
-         n2Hm0EsJNoN8WjPHrIPstXBPK4pYY9QYN9Gy7ykiPiCIru5aySPWcCt81NkRJufWTRqV
-         fXo74VVgytTNnJXAdAYY3d7WKDEQv8AzM201A5BYNCQx1RDNHglSXRmrwxLEvw/CSWDa
-         f7Qm1zJogI4u7g/gwnKRtiYEDFixMij/P7xgnop4PSbbb8J8SlAXOtxi0QshrTJatBcK
-         3+7nMrbs2iGaV/APqO8p71IwQfNjBs5jy83XvERzzdE9XmZzPVj/9qwsxFcmkA1b4jDj
-         /RHw==
-X-Gm-Message-State: AOJu0YzE53sxYcm1zzcguSqBYVkipVxa/5116ykgCFOuWomzGoO1Zr8U
-	IgYZ/gX4Adc9Hd5uEWVFSfXYTWMZ7IlkVM/Uyhn/ygOIyCqyhotB7R3kIw==
-X-Gm-Gg: ASbGncu+PQq9Yiv1njYOUedvhOzTfLDKO+cDOUayCpa9fJosArL2uCqrKeXqtkTPiB8
-	U40qcdYU6OC0p02i67pdgMTzWr3VgZiqRDD5eUzyK+NOwSOvf0VQwa0yD+W/wwp0Aa0cG1lslkm
-	do0RnJo1YrvWvcPJ5iCuhD1m5eS5lrMNM4ZW6FPdX0jCmeCd3h9XHrrsAJpVk78A1/8sptcxKXS
-	QEbLS8B6sMFOJlPPh07hiJJyrk7hkI6WAAHvotgkR59Ty1UCvXiUljP+rEtgTY6IRPCoT5cpwsq
-	/MaPx8iPLH15CWov9It7NMiCYX5vVZ+5nbierpHd7me3IMQpJl8CTxHDcJgqvrjMRGvO+KhDpRE
-	=
-X-Google-Smtp-Source: AGHT+IHzuWuCMbeDyMqHNgTvd1UVWaqZFZyMGsofd9bER9wLyQzpdJKPBvOd/73tsYYegHXGHCHHXg==
-X-Received: by 2002:a05:6a00:2b4c:b0:740:6fa3:e429 with SMTP id d2e1a72fcca58-7406fa3ea17mr11576935b3a.11.1746547220006;
-        Tue, 06 May 2025 09:00:20 -0700 (PDT)
+        bh=NW6Tn6nahsz/hZQDHZ24xS3SM/KlmTN3E3KJkuprw+o=;
+        b=qqiNIwH4w3/Cay+FbU5+k6d/odDZNM3ABcZesVeiVKb8c6OODm8wzKjwmUu5+sNVBU
+         Itmh64xfvLgQKYIH4pGwIVL/Zm7uwCR2tFooRdLhQ00ZRjjEV2G7fFirWt5ZDiaVKgqr
+         m/H9g4qJ74jtWaByFlnOoK6lmwkRKy7sMNcPD6BazMEmphd59SFMARS8A3GwdSpX4ApF
+         rEMaw0Ey3/v1lKrRuI6cqbagEXbGg4DdeQOg11v/1PYjO+scUmdsap2/+UrKowRxqnqA
+         vJgBK5xiR4pi5QoITshJyhEYAbPmHSVceQqKzHx0N8qmRq25N9L7vHDzDvYIRfFqe5Fe
+         g7aQ==
+X-Gm-Message-State: AOJu0YxODY43S1C+JfGbf+wcgMniWYNnyPSGf+G95l/1nka7pIVljk5m
+	HedUBSoaS4mLb2QcYU0W4d5w2eRFbktNNg8WDr+6sRyRvwKh3M+0
+X-Gm-Gg: ASbGncti7eHLziKVqBLWr2VbpeBa0Uax2dIwFo0zuKJWGEBldhMzVOZNcpc7qpEAt4f
+	ts2pJDCqYBHmvzlyQJ1vU3dNAAHXHHVLWKHsg/jYg0vunBq6A52NoGgiTtuuu3vEJjC9wbFKqAz
+	nm0T5OsuH2V0IVYF0kn9fMJgELSXWQqYS9XNnzWz3a7a38Vh46JyJyvzLjJjWgUu+SXXHn7kkID
+	cm3RvmT81cBEhPS2CU/5Jip3gjRbnxAzV9XK79sURx/JrxvGNTE3L6ab0uOKj9eustHwehXi/ow
+	84UtJeFy50Ud2saMs2UTiEqYVZHw3J3vQnTIOCC5gjOcfin9/M9s4sqM1M1BuC9phdCXypv+UaF
+	F5Q4kEwhRxw==
+X-Google-Smtp-Source: AGHT+IHw1Y7Xj+u8JyOmMq0ictFKpkWhlKRIo16o1UV7WIilxj4s67gMK/zjyREHGaJwmFmVmWn6hw==
+X-Received: by 2002:a17:902:cf0e:b0:224:23be:c569 with SMTP id d9443c01a7336-22e1ea57354mr190972665ad.22.1746547226708;
+        Tue, 06 May 2025 09:00:26 -0700 (PDT)
 Received: from ahduyck-xeon-server.home.arpa ([2605:59c8:829:4c00:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74059020dd4sm9097708b3a.117.2025.05.06.09.00.19
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e459e176csm13599915ad.241.2025.05.06.09.00.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 May 2025 09:00:19 -0700 (PDT)
-Subject: [net PATCH v2 7/8] fbnic: Pull fbnic_fw_xmit_cap_msg use out of
- interrupt context
+        Tue, 06 May 2025 09:00:26 -0700 (PDT)
+Subject: [net PATCH v2 8/8] fbnic: Do not allow mailbox to toggle to ready
+ outside fbnic_mbx_poll_tx_ready
 From: Alexander Duyck <alexander.duyck@gmail.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-Date: Tue, 06 May 2025 09:00:18 -0700
+Date: Tue, 06 May 2025 09:00:25 -0700
 Message-ID: 
- <174654721876.499179.9839651602256668493.stgit@ahduyck-xeon-server.home.arpa>
+ <174654722518.499179.11612865740376848478.stgit@ahduyck-xeon-server.home.arpa>
 In-Reply-To: 
  <174654659243.499179.11194817277075480209.stgit@ahduyck-xeon-server.home.arpa>
 References: 
@@ -96,94 +96,102 @@ Content-Transfer-Encoding: 7bit
 
 From: Alexander Duyck <alexanderduyck@fb.com>
 
-This change pulls the call to fbnic_fw_xmit_cap_msg out of
-fbnic_mbx_init_desc_ring and instead places it in the polling function for
-getting the Tx ready. Doing that we can avoid the potential issue with an
-interrupt coming in later from the firmware that causes it to get fired in
-interrupt context.
+We had originally thought to have the mailbox go to ready in the background
+while we were doing other things. One issue with this though is that we
+can't disable it by clearing the ready state without also blocking
+interrupts or calls to mbx_poll as it will just pop back to life during an
+interrupt.
 
-Fixes: 20d2e88cc746 ("eth: fbnic: Add initial messaging to notify FW of our presence")
+In order to prevent that from happening we can pull the code for toggling
+to ready out of the interrupt path and instead place it in the
+fbnic_mbx_poll_tx_ready path so that it becomes the only spot where the
+Rx/Tx can toggle to the ready state. By doing this we can prevent races
+where we disable the DMA and/or free buffers only to have an interrupt fire
+and undo what we have done.
+
+Fixes: da3cde08209e ("eth: fbnic: Add FW communication mechanism")
 Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
 ---
- drivers/net/ethernet/meta/fbnic/fbnic_fw.c |   43 ++++++++++------------------
- 1 file changed, 16 insertions(+), 27 deletions(-)
+ drivers/net/ethernet/meta/fbnic/fbnic_fw.c |   27 ++++++++++-----------------
+ 1 file changed, 10 insertions(+), 17 deletions(-)
 
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
-index d344b454f28b..90a45c701543 100644
+index 90a45c701543..3d9636a6c968 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
-@@ -352,24 +352,6 @@ static int fbnic_fw_xmit_simple_msg(struct fbnic_dev *fbd, u32 msg_type)
- 	return err;
- }
- 
--/**
-- * fbnic_fw_xmit_cap_msg - Allocate and populate a FW capabilities message
-- * @fbd: FBNIC device structure
-- *
-- * Return: NULL on failure to allocate, error pointer on error, or pointer
-- * to new TLV test message.
-- *
-- * Sends a single TLV header indicating the host wants the firmware to
-- * confirm the capabilities and version.
-- **/
--static int fbnic_fw_xmit_cap_msg(struct fbnic_dev *fbd)
--{
--	int err = fbnic_fw_xmit_simple_msg(fbd, FBNIC_TLV_MSG_ID_HOST_CAP_REQ);
--
--	/* Return 0 if we are not calling this on ASIC */
--	return (err == -EOPNOTSUPP) ? 0 : err;
--}
--
- static void fbnic_mbx_init_desc_ring(struct fbnic_dev *fbd, int mbx_idx)
+@@ -356,10 +356,6 @@ static void fbnic_mbx_init_desc_ring(struct fbnic_dev *fbd, int mbx_idx)
  {
  	struct fbnic_fw_mbx *mbx = &fbd->mbx[mbx_idx];
-@@ -393,15 +375,6 @@ static void fbnic_mbx_init_desc_ring(struct fbnic_dev *fbd, int mbx_idx)
- 		/* Enable DMA reads from the device */
- 		wr32(fbd, FBNIC_PUL_OB_TLP_HDR_AR_CFG,
- 		     FBNIC_PUL_OB_TLP_HDR_AR_CFG_BME);
+ 
+-	/* This is a one time init, so just exit if it is completed */
+-	if (mbx->ready)
+-		return;
 -
--		/* Force version to 1 if we successfully requested an update
--		 * from the firmware. This should be overwritten once we get
--		 * the actual version from the firmware in the capabilities
--		 * request message.
--		 */
--		if (!fbnic_fw_xmit_cap_msg(fbd) &&
--		    !fbd->fw_cap.running.mgmt.version)
--			fbd->fw_cap.running.mgmt.version = 1;
- 		break;
+ 	mbx->ready = true;
+ 
+ 	switch (mbx_idx) {
+@@ -379,21 +375,18 @@ static void fbnic_mbx_init_desc_ring(struct fbnic_dev *fbd, int mbx_idx)
  	}
  }
-@@ -907,6 +880,7 @@ int fbnic_mbx_poll_tx_ready(struct fbnic_dev *fbd)
+ 
+-static void fbnic_mbx_postinit(struct fbnic_dev *fbd)
++static bool fbnic_mbx_event(struct fbnic_dev *fbd)
+ {
+-	int i;
+-
+ 	/* We only need to do this on the first interrupt following reset.
+ 	 * this primes the mailbox so that we will have cleared all the
+ 	 * skip descriptors.
+ 	 */
+ 	if (!(rd32(fbd, FBNIC_INTR_STATUS(0)) & (1u << FBNIC_FW_MSIX_ENTRY)))
+-		return;
++		return false;
+ 
+ 	wr32(fbd, FBNIC_INTR_CLEAR(0), 1u << FBNIC_FW_MSIX_ENTRY);
+ 
+-	for (i = 0; i < FBNIC_IPC_MBX_INDICES; i++)
+-		fbnic_mbx_init_desc_ring(fbd, i);
++	return true;
+ }
+ 
+ /**
+@@ -870,7 +863,7 @@ static void fbnic_mbx_process_rx_msgs(struct fbnic_dev *fbd)
+ 
+ void fbnic_mbx_poll(struct fbnic_dev *fbd)
+ {
+-	fbnic_mbx_postinit(fbd);
++	fbnic_mbx_event(fbd);
+ 
+ 	fbnic_mbx_process_tx_msgs(fbd);
+ 	fbnic_mbx_process_rx_msgs(fbd);
+@@ -879,11 +872,9 @@ void fbnic_mbx_poll(struct fbnic_dev *fbd)
+ int fbnic_mbx_poll_tx_ready(struct fbnic_dev *fbd)
  {
  	unsigned long timeout = jiffies + 10 * HZ + 1;
- 	struct fbnic_fw_mbx *tx_mbx;
-+	int err;
+-	struct fbnic_fw_mbx *tx_mbx;
+-	int err;
++	int err, i;
  
- 	tx_mbx = &fbd->mbx[FBNIC_IPC_MBX_TX_IDX];
- 	while (!tx_mbx->ready) {
-@@ -928,7 +902,22 @@ int fbnic_mbx_poll_tx_ready(struct fbnic_dev *fbd)
- 		fbnic_mbx_poll(fbd);
- 	}
+-	tx_mbx = &fbd->mbx[FBNIC_IPC_MBX_TX_IDX];
+-	while (!tx_mbx->ready) {
++	do {
+ 		if (!time_is_after_jiffies(timeout))
+ 			return -ETIMEDOUT;
  
-+	/* Request an update from the firmware. This should overwrite
-+	 * mgmt.version once we get the actual version from the firmware
-+	 * in the capabilities request message.
-+	 */
-+	err = fbnic_fw_xmit_simple_msg(fbd, FBNIC_TLV_MSG_ID_HOST_CAP_REQ);
-+	if (err)
-+		goto clean_mbx;
-+
-+	/* Use "1" to indicate we entered the state waiting for a response */
-+	fbd->fw_cap.running.mgmt.version = 1;
-+
- 	return 0;
-+clean_mbx:
-+	/* Cleanup Rx buffers and disable mailbox */
-+	fbnic_mbx_clean(fbd);
-+	return err;
- }
+@@ -898,9 +889,11 @@ int fbnic_mbx_poll_tx_ready(struct fbnic_dev *fbd)
+ 			return -ENODEV;
  
- static void __fbnic_fw_evict_cmpl(struct fbnic_fw_completion *cmpl_data)
+ 		msleep(20);
++	} while (!fbnic_mbx_event(fbd));
+ 
+-		fbnic_mbx_poll(fbd);
+-	}
++	/* FW has shown signs of life. Enable DMA and start Tx/Rx */
++	for (i = 0; i < FBNIC_IPC_MBX_INDICES; i++)
++		fbnic_mbx_init_desc_ring(fbd, i);
+ 
+ 	/* Request an update from the firmware. This should overwrite
+ 	 * mgmt.version once we get the actual version from the firmware
 
 
 
