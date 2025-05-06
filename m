@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-188294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B11CCAABFFB
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 11:41:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0434EAAC01A
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 11:44:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80A475221C9
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 09:40:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 667223AA37F
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 09:41:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 681FD27816A;
-	Tue,  6 May 2025 09:39:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B09B827A129;
+	Tue,  6 May 2025 09:39:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="XDATcYWj"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mhueP46V"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE87E26FDA0;
-	Tue,  6 May 2025 09:39:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5493E27585E;
+	Tue,  6 May 2025 09:39:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746524354; cv=none; b=f4qgbfz1FFITZdCh6MFZIeB6lA41hD/CwhhO747p1GDfVmukjeCo6kWUYRLcidiUpONPEJOOkhQyfJxcX3rsHBpgPZCI1Ghq2rXrYLYc1lDsQFri2YVnu6Uhvzk5IJ0C1SNpG8XWTDouYWcDzx+c1knOcfcivwoNULJm/YBeoEI=
+	t=1746524358; cv=none; b=SsonnHpX1Uf4ZLpoBmWMaCo7YVRSFV5cKphL+mXxz5ZTQezY7r3aIKfMH2XDzPI1z8TvoSFgURSK2Yeuex8CV74zqZvRYeybNhkHPqO6wcvmly830K7nu57YdcE9re/E12ohybLmsTjfWZOqjGJUbgKa472J1f8Cyt7SkK5Zz9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746524354; c=relaxed/simple;
-	bh=CdxaQWKSVnPSxzVb/HTQ3ljC/F235Khz9R59k9ph1xk=;
+	s=arc-20240116; t=1746524358; c=relaxed/simple;
+	bh=WmEveWZjqzRss1aqVnkeZwM0TY2az1FrHlYsVT2tOOQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=U5KydnN2h4jdRfot8C7HMJdpXjY/caZkVkB1BvWC2JywbVsRV6F7Q59SrLlhWfAE+mqgwM5zo5/hmeukS7PeiWVIUikaPvYVhu78TPx1byB0Rd+IDgsSTYehQy3dK9yOhtIgwAZkgn6YhGrdtCjpptRy9HHiGpV9WHJTTDW7JK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=XDATcYWj; arc=none smtp.client-ip=217.70.183.197
+	 In-Reply-To:To:Cc; b=ClYC0l26yGOar9FihaO171G8aTgDaHwvsKzGIjq0Ai6e7yRzm5zplqNYo7Hb2s9osZBfzA3k5XN64kKhRD+JQIk3//9a9sbVo2BcF3skwFum9INKuwV1ytJEKD8mMVob2RpstKXAKxmLyO8vMO0SIhY5zDQJMwt1LMeAIacQkr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=mhueP46V; arc=none smtp.client-ip=217.70.183.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 03B67439F3;
-	Tue,  6 May 2025 09:39:08 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 45B41439F1;
+	Tue,  6 May 2025 09:39:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1746524350;
+	t=1746524351;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=j9H+HTGj24jVseNGRq4HAH0RZVhPlpyQw4mPouzOwUA=;
-	b=XDATcYWjLrUUSzIT2g59bd+D5FlIbUQvIL2OL/Gs/ypTXYCZdJFVzVPZNZ5ZwTRWMoHj3b
-	M2ncMBFAVpcxm/0z4evIL8IbpFUJF5yyrxnz7rIFhX3vvIDjH6SiJgRnQKiVEJlY/TVE/C
-	Fe1WnJoe1AMPyXlja6NFtGXjhkrp+7VoYFiJOSXWoQN+6CwUWk2RG1E3EdXuiUfR14KvET
-	dzDK9cj7JsOCpDKqvLBY0HUqXepiWpD0gOlWVLrCkUu4TyFt0It8LqHfTHrJqTo9uoQRwk
-	rJOLibY/wsG8FhRQITjUOeHQG/F+6BIHEt7R2YjEIYnE8I+Sbqk7inZK5DRA2w==
+	bh=4BgQtSvIhsheDAoSRXTniM+BPNp7YA8qgjN+P6Nuyys=;
+	b=mhueP46V14WxemDravDeUbJdXPja1mUAZFUvVnY0TeDEgGGc1hnmXip0uZtv9Jj8Bdt0M2
+	oGbKTW+An9Da0WGzGEdu5UPPC2bno2GHYvYaRZKW3kCgfdpWptqw8rHTx5j/1tPlDO+2Eo
+	BHunxSmmqt/eSsniIM3mG3i4i80wlfc6c1FXVpyg6G0AO48H+19vKSLt4ZbjBesOppscg1
+	CZ6jbvuOF9lmBKXGKwRUJwgpf4f1uoLJGPs66NkyYohO4TWTWeBJUPdW1rU1MNQfGgLnfG
+	SFnF8uHEmeDTzJZDLu9J2wJVUhT8vzxFdk4ohkdfX1FfGkE+9Z5bWmyH+z6L8g==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Tue, 06 May 2025 11:38:38 +0200
-Subject: [PATCH net-next v10 06/13] net: pse-pd: Add helper to report
- hardware enable status of the PI
+Date: Tue, 06 May 2025 11:38:39 +0200
+Subject: [PATCH net-next v10 07/13] net: pse-pd: Add support for budget
+ evaluation strategies
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,8 +56,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250506-feature_poe_port_prio-v10-6-55679a4895f9@bootlin.com>
+Content-Transfer-Encoding: 8bit
+Message-Id: <20250506-feature_poe_port_prio-v10-7-55679a4895f9@bootlin.com>
 References: <20250506-feature_poe_port_prio-v10-0-55679a4895f9@bootlin.com>
 In-Reply-To: <20250506-feature_poe_port_prio-v10-0-55679a4895f9@bootlin.com>
 To: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>, 
@@ -79,83 +79,1224 @@ Cc: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
 X-Mailer: b4 0.15-dev-8cb71
 X-GND-State: clean
 X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvkeefieegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhfffugggtgffkfhgjvfevofesthejredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeevgfdvgfektefgfefggeekudfggffhtdfffedtueetheejtddvledvvdelhedtveenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedvnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghloheplgduvdejrddtrddurddungdpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvjedprhgtphhtthhopehlghhirhgufihoohgusehgmhgrihhlrdgtohhmpdhrtghpthhtoheprhhosghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegtohhnohhrodgutheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggvnhhtphhrohhjvggttheslhhinhhugihfohhunhgurghtihhonhdrohhrghdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvghrsehgmhgrihhlrdgtohhmp
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvkeefieegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhfffugggtgffkfhgjvfevofesthekredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeeikefgjedvkedugfeiheffgeeflefgteduleeuvdeitdfgtddvleetieekffffkeenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghloheplgduvdejrddtrddurddungdpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvjedprhgtphhtthhopehlghhirhgufihoohgusehgmhgrihhlrdgtohhmpdhrtghpthhtoheprhhosghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegtohhnohhrodgutheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggvnhhtphhrohhjvggttheslhhinhhugihfohhunhgurghtihhonhdrohhrghdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvghrsehgmhgrihhlrdgtohhmp
  dhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
 X-GND-Sasl: kory.maincent@bootlin.com
 
 From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-Refactor code by introducing a helper function to retrieve the hardware
-enabled state of the PI, avoiding redundant implementations in the
-future.
+This patch introduces the ability to configure the PSE PI budget evaluation
+strategies. Budget evaluation strategies is utilized by PSE controllers to
+determine which ports to turn off first in scenarios such as power budget
+exceedance.
+
+The pis_prio_max value is used to define the maximum priority level
+supported by the controller. Both the current priority and the maximum
+priority are exposed to the user through the pse_ethtool_get_status call.
+
+This patch add support for two mode of budget evaluation strategies.
+1. Static Method:
+
+   This method involves distributing power based on PD classification.
+   It’s straightforward and stable, the PSE core keeping track of the
+   budget and subtracting the power requested by each PD’s class.
+
+   Advantages: Every PD gets its promised power at any time, which
+   guarantees reliability.
+
+   Disadvantages: PD classification steps are large, meaning devices
+   request much more power than they actually need. As a result, the power
+   supply may only operate at, say, 50% capacity, which is inefficient and
+   wastes money.
+
+   Priority max value is matching the number of PSE PIs within the PSE.
+
+2. Dynamic Method:
+
+   To address the inefficiencies of the static method, vendors like
+   Microchip have introduced dynamic power budgeting, as seen in the
+   PD692x0 firmware. This method monitors the current consumption per port
+   and subtracts it from the available power budget. When the budget is
+   exceeded, lower-priority ports are shut down.
+
+   Advantages: This method optimizes resource utilization, saving costs.
+
+   Disadvantages: Low-priority devices may experience instability.
+
+   Priority max value is set by the PSE controller driver.
+
+For now, budget evaluation methods are not configurable and cannot be
+mixed. They are hardcoded in the PSE driver itself, as no current PSE
+controller supports both methods.
 
 Signed-off-by: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
-Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
 ---
+
+Change in v10:
+- Remove Olkesij Reviewed-by due to patch change.
+- Move the PSE notification report in a workqueue to avoid a deadlock
+  between pcdev_lock and pse_list_mutex. Indeed the pse_isr is now fully
+  running with pcdev_lock acquired as we are now doing actions in case of
+  events like disconnection. The pse_list_mutex is acquired to match
+  between the pse_control and the network interface. On an other hand
+  pse_control_get_internal is holding pse_list_mutex and call
+  devm_regulator_get_exclusive which acquire pcdev_lock. That is how we
+  could face a deadlock.
+  Using workqueue creates asynchronous PSE notification but I don't
+  think it is a problem.
+- Remove _isr_counter_mismatch unused variable.
+- Fixed a return value in case of enabling a port in over budget state.
+
+Change in v8:
+- Rename a few functions for better clarity following Oleksij proposals.
 
 Change in v7:
-- New patch.
----
- drivers/net/pse-pd/pse_core.c | 36 ++++++++++++++++++++++++++----------
- 1 file changed, 26 insertions(+), 10 deletions(-)
+- Move Budget evaluation strategy enum definition out of uAPI, and
+  remove ethtool prefix.
+- Add support to retry enabling port that failed to be powered in case of
+  port disconnection or priority change.
+- Update the events name in ethtool specs to match the ones described in
+  the UAPI.
 
+Change in v6:
+- Remove Budget evaluation strategy from ethtool_pse_control_status struct.
+
+Change in v5:
+- Save PI previous power allocated in set current limit to be able to
+  restore the power allocated in case of error.
+
+Change in v4:
+- Remove disconnection policy features.
+- Rename port priority to budget evaluation strategy.
+- Add kdoc
+
+Change in v3:
+- Add disconnection policy.
+- Add management of disabled port priority in the interrupt handler.
+- Move port prio mode in the power domain instead of the PSE.
+
+Change in v2:
+- Rethink the port priority support.
+---
+ Documentation/netlink/specs/ethtool.yaml |   7 +-
+ drivers/net/pse-pd/pse_core.c            | 703 +++++++++++++++++++++++++++++--
+ include/linux/pse-pd/pse.h               |  78 ++++
+ include/uapi/linux/ethtool.h             |  21 +-
+ 4 files changed, 770 insertions(+), 39 deletions(-)
+
+diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
+index 6db424d9335a..25e7b9b361e4 100644
+--- a/Documentation/netlink/specs/ethtool.yaml
++++ b/Documentation/netlink/specs/ethtool.yaml
+@@ -101,9 +101,12 @@ definitions:
+   -
+     name: pse-events
+     type: flags
+-    name-prefix: ethtool-pse-event-
++    name-prefix: ethtool-
+     header: linux/ethtool.h
+-    entries: [ over-current, over-temp ]
++    entries: [ pse-event-over-current, pse-event-over-temp,
++               c33-pse-event-detection, c33-pse-event-classification,
++               c33-pse-event-disconnection, pse-event-over-budget,
++               pse-event-sw-pw-control-error ]
+ 
+ attribute-sets:
+   -
 diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
-index 776bb058d4d8..6b0dc5e44d2c 100644
+index 6b0dc5e44d2c..a2d74550d9a4 100644
 --- a/drivers/net/pse-pd/pse_core.c
 +++ b/drivers/net/pse-pd/pse_core.c
-@@ -276,10 +276,34 @@ pse_control_find_net_by_id(struct pse_controller_dev *pcdev, int id,
- 	return NULL;
+@@ -47,11 +47,14 @@ struct pse_control {
+  * @id: ID of the power domain
+  * @supply: Power supply the Power Domain
+  * @refcnt: Number of gets of this pse_power_domain
++ * @budget_eval_strategy: Current power budget evaluation strategy of the
++ *			  power domain
+  */
+ struct pse_power_domain {
+ 	int id;
+ 	struct regulator *supply;
+ 	struct kref refcnt;
++	u32 budget_eval_strategy;
+ };
+ 
+ static int of_load_single_pse_pi_pairset(struct device_node *node,
+@@ -301,6 +304,93 @@ static int pse_pi_is_hw_enabled(struct pse_controller_dev *pcdev, int id)
+ 	return 0;
  }
  
 +/**
-+ * pse_pi_is_hw_enabled - Is PI enabled at the hardware level
++ * pse_pi_is_admin_enable_not_applied - Is power not truly being delivered
 + * @pcdev: a pointer to the PSE controller device
 + * @id: Index of the PI
 + *
-+ * Return: 1 if the PI is enabled at the hardware level, 0 if not, and
-+ *	   a failure value on error
++ * Return: true if the PI has admin enable flag set in software but not yet
++ *	   reflected in the hardware admin state, false otherwise.
 + */
-+static int pse_pi_is_hw_enabled(struct pse_controller_dev *pcdev, int id)
++static bool
++pse_pi_is_admin_enable_not_applied(struct pse_controller_dev *pcdev,
++				   int id)
 +{
-+	struct pse_admin_state admin_state = {0};
 +	int ret;
 +
-+	ret = pcdev->ops->pi_get_admin_state(pcdev, id, &admin_state);
-+	if (ret < 0)
-+		return ret;
++	/* PI not enabled or nothing is plugged */
++	if (!pcdev->pi[id].admin_state_enabled ||
++	    !pcdev->pi[id].isr_pd_detected)
++		return false;
 +
-+	/* PI is well enabled at the hardware level */
-+	if (admin_state.podl_admin_state == ETHTOOL_PODL_PSE_ADMIN_STATE_ENABLED ||
-+	    admin_state.c33_admin_state == ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED)
-+		return 1;
++	ret = pse_pi_is_hw_enabled(pcdev, id);
++	/* PSE PI is already enabled at hardware level */
++	if (ret == 1)
++		return false;
 +
-+	return 0;
++	return true;
++}
++
++static int _pse_pi_delivery_power_sw_pw_ctrl(struct pse_controller_dev *pcdev,
++					     int id,
++					     struct netlink_ext_ack *extack);
++
++/**
++ * pse_pw_d_retry_power_delivery - Retry to enable port of a PSE power domain
++ *				   that have power not truly being delivered
++ * @pcdev: a pointer to the PSE controller device
++ * @pw_d: a pointer to the PSE power domain
++ */
++static void pse_pw_d_retry_power_delivery(struct pse_controller_dev *pcdev,
++					  struct pse_power_domain *pw_d)
++{
++	int i, ret = 0;
++
++	for (i = 0; i < pcdev->nr_lines; i++) {
++		int prio_max = pcdev->nr_lines;
++		struct netlink_ext_ack extack;
++
++		if (pcdev->pi[i].pw_d != pw_d)
++			continue;
++
++		if (!pse_pi_is_admin_enable_not_applied(pcdev, i))
++			continue;
++
++		/* Do not try to enable PI with a lower prio (higher value)
++		 * than one which already can't be enabled.
++		 */
++		if (pcdev->pi[i].prio > prio_max)
++			continue;
++
++		ret = _pse_pi_delivery_power_sw_pw_ctrl(pcdev, i, &extack);
++		if (ret == -ERANGE)
++			prio_max = pcdev->pi[i].prio;
++	}
++}
++
++/**
++ * pse_pw_d_is_sw_pw_control - Is power control software managed
++ * @pcdev: a pointer to the PSE controller device
++ * @pw_d: a pointer to the PSE power domain
++ *
++ * Return: true if the power control of the power domain is managed from
++ * the software in the interrupt handler
++ */
++static bool pse_pw_d_is_sw_pw_control(struct pse_controller_dev *pcdev,
++				      struct pse_power_domain *pw_d)
++{
++	if (!pw_d)
++		return false;
++
++	if (pw_d->budget_eval_strategy == PSE_BUDGET_EVAL_STRAT_STATIC)
++		return true;
++	if (pw_d->budget_eval_strategy == PSE_BUDGET_EVAL_STRAT_DISABLED &&
++	    pcdev->ops->pi_enable && pcdev->irq)
++		return true;
++
++	return false;
 +}
 +
  static int pse_pi_is_enabled(struct regulator_dev *rdev)
  {
  	struct pse_controller_dev *pcdev = rdev_get_drvdata(rdev);
--	struct pse_admin_state admin_state = {0};
- 	const struct pse_controller_ops *ops;
- 	int id, ret;
- 
-@@ -289,15 +313,7 @@ static int pse_pi_is_enabled(struct regulator_dev *rdev)
+@@ -313,17 +403,251 @@ static int pse_pi_is_enabled(struct regulator_dev *rdev)
  
  	id = rdev_get_id(rdev);
  	mutex_lock(&pcdev->lock);
--	ret = ops->pi_get_admin_state(pcdev, id, &admin_state);
--	if (ret)
--		goto out;
--
--	if (admin_state.podl_admin_state == ETHTOOL_PODL_PSE_ADMIN_STATE_ENABLED ||
--	    admin_state.c33_admin_state == ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED)
--		ret = 1;
--
--out:
-+	ret = pse_pi_is_hw_enabled(pcdev, id);
++	if (pse_pw_d_is_sw_pw_control(pcdev, pcdev->pi[id].pw_d)) {
++		ret = pcdev->pi[id].admin_state_enabled;
++		goto out;
++	}
++
+ 	ret = pse_pi_is_hw_enabled(pcdev, id);
++
++out:
  	mutex_unlock(&pcdev->lock);
  
  	return ret;
+ }
+ 
++/**
++ * pse_pi_deallocate_pw_budget - Deallocate power budget of the PI
++ * @pi: a pointer to the PSE PI
++ */
++static void pse_pi_deallocate_pw_budget(struct pse_pi *pi)
++{
++	if (!pi->pw_d || !pi->pw_allocated_mW)
++		return;
++
++	regulator_free_power_budget(pi->pw_d->supply, pi->pw_allocated_mW);
++	pi->pw_allocated_mW = 0;
++}
++
++/**
++ * _pse_pi_disable - Call disable operation. Assumes the PSE lock has been
++ *		     acquired.
++ * @pcdev: a pointer to the PSE
++ * @id: index of the PSE control
++ *
++ * Return: 0 on success and failure value on error
++ */
++static int _pse_pi_disable(struct pse_controller_dev *pcdev, int id)
++{
++	const struct pse_controller_ops *ops = pcdev->ops;
++	int ret;
++
++	if (!ops->pi_disable)
++		return -EOPNOTSUPP;
++
++	ret = ops->pi_disable(pcdev, id);
++	if (ret)
++		return ret;
++
++	pse_pi_deallocate_pw_budget(&pcdev->pi[id]);
++
++	if (pse_pw_d_is_sw_pw_control(pcdev, pcdev->pi[id].pw_d))
++		pse_pw_d_retry_power_delivery(pcdev, pcdev->pi[id].pw_d);
++
++	return 0;
++}
++
++/**
++ * pse_disable_pi_pol - Disable a PI on a power budget policy
++ * @pcdev: a pointer to the PSE
++ * @id: index of the PSE PI
++ *
++ * Return: 0 on success and failure value on error
++ */
++static int pse_disable_pi_pol(struct pse_controller_dev *pcdev, int id)
++{
++	unsigned long notifs = ETHTOOL_PSE_EVENT_OVER_BUDGET;
++	struct pse_ntf ntf = {};
++	int ret;
++
++	dev_dbg(pcdev->dev, "Disabling PI %d to free power budget\n", id);
++
++	NL_SET_ERR_MSG_FMT(&ntf.extack,
++			   "Disabling PI %d to free power budget", id);
++
++	ret = _pse_pi_disable(pcdev, id);
++	if (ret)
++		notifs |= ETHTOOL_PSE_EVENT_SW_PW_CONTROL_ERROR;
++
++	ntf.notifs = notifs;
++	ntf.id = id;
++	kfifo_in_spinlocked(&pcdev->ntf_fifo, &ntf, 1, &pcdev->ntf_fifo_lock);
++	schedule_work(&pcdev->ntf_work);
++
++	return ret;
++}
++
++/**
++ * pse_disable_pi_prio - Disable all PIs of a given priority inside a PSE
++ *			 power domain
++ * @pcdev: a pointer to the PSE
++ * @pw_d: a pointer to the PSE power domain
++ * @prio: priority
++ *
++ * Return: 0 on success and failure value on error
++ */
++static int pse_disable_pi_prio(struct pse_controller_dev *pcdev,
++			       struct pse_power_domain *pw_d,
++			       int prio)
++{
++	int i;
++
++	for (i = 0; i < pcdev->nr_lines; i++) {
++		int ret;
++
++		if (pcdev->pi[i].prio != prio ||
++		    pcdev->pi[i].pw_d != pw_d ||
++		    pse_pi_is_hw_enabled(pcdev, i) <= 0)
++			continue;
++
++		ret = pse_disable_pi_pol(pcdev, i);
++		if (ret)
++			return ret;
++	}
++
++	return 0;
++}
++
++/**
++ * pse_pi_allocate_pw_budget_static_prio - Allocate power budget for the PI
++ *					   when the budget eval strategy is
++ *					   static
++ * @pcdev: a pointer to the PSE
++ * @id: index of the PSE control
++ * @pw_req: power requested in mW
++ * @extack: extack for error reporting
++ *
++ * Return: 0 on success and failure value on error
++ */
++static int
++pse_pi_allocate_pw_budget_static_prio(struct pse_controller_dev *pcdev, int id,
++				      int pw_req, struct netlink_ext_ack *extack)
++{
++	struct pse_pi *pi = &pcdev->pi[id];
++	int ret, _prio;
++
++	_prio = pcdev->nr_lines;
++	while (regulator_request_power_budget(pi->pw_d->supply, pw_req) == -ERANGE) {
++		if (_prio <= pi->prio) {
++			NL_SET_ERR_MSG_FMT(extack,
++					   "PI %d: not enough power budget available",
++					   id);
++			return -ERANGE;
++		}
++
++		ret = pse_disable_pi_prio(pcdev, pi->pw_d, _prio);
++		if (ret < 0)
++			return ret;
++
++		_prio--;
++	}
++
++	pi->pw_allocated_mW = pw_req;
++	return 0;
++}
++
++/**
++ * pse_pi_allocate_pw_budget - Allocate power budget for the PI
++ * @pcdev: a pointer to the PSE
++ * @id: index of the PSE control
++ * @pw_req: power requested in mW
++ * @extack: extack for error reporting
++ *
++ * Return: 0 on success and failure value on error
++ */
++static int pse_pi_allocate_pw_budget(struct pse_controller_dev *pcdev, int id,
++				     int pw_req, struct netlink_ext_ack *extack)
++{
++	struct pse_pi *pi = &pcdev->pi[id];
++
++	if (!pi->pw_d)
++		return 0;
++
++	/* PSE_BUDGET_EVAL_STRAT_STATIC */
++	if (pi->pw_d->budget_eval_strategy == PSE_BUDGET_EVAL_STRAT_STATIC)
++		return pse_pi_allocate_pw_budget_static_prio(pcdev, id, pw_req,
++							     extack);
++
++	return 0;
++}
++
++/**
++ * _pse_pi_delivery_power_sw_pw_ctrl - Enable PSE PI in case of software power
++ *				       control. Assumes the PSE lock has been
++ *				       acquired.
++ * @pcdev: a pointer to the PSE
++ * @id: index of the PSE control
++ * @extack: extack for error reporting
++ *
++ * Return: 0 on success and failure value on error
++ */
++static int _pse_pi_delivery_power_sw_pw_ctrl(struct pse_controller_dev *pcdev,
++					     int id,
++					     struct netlink_ext_ack *extack)
++{
++	const struct pse_controller_ops *ops = pcdev->ops;
++	struct pse_pi *pi = &pcdev->pi[id];
++	int ret, pw_req;
++
++	if (!ops->pi_get_pw_req) {
++		/* No power allocation management */
++		ret = ops->pi_enable(pcdev, id);
++		if (ret)
++			NL_SET_ERR_MSG_FMT(extack,
++					   "PI %d: enable error %d",
++					   id, ret);
++		return ret;
++	}
++
++	ret = ops->pi_get_pw_req(pcdev, id);
++	if (ret < 0)
++		return ret;
++
++	pw_req = ret;
++
++	/* Compare requested power with port power limit and use the lowest
++	 * one.
++	 */
++	if (ops->pi_get_pw_limit) {
++		ret = ops->pi_get_pw_limit(pcdev, id);
++		if (ret < 0)
++			return ret;
++
++		if (ret < pw_req)
++			pw_req = ret;
++	}
++
++	ret = pse_pi_allocate_pw_budget(pcdev, id, pw_req, extack);
++	if (ret)
++		return ret;
++
++	ret = ops->pi_enable(pcdev, id);
++	if (ret) {
++		pse_pi_deallocate_pw_budget(pi);
++		NL_SET_ERR_MSG_FMT(extack,
++				   "PI %d: enable error %d",
++				   id, ret);
++		return ret;
++	}
++
++	return 0;
++}
++
+ static int pse_pi_enable(struct regulator_dev *rdev)
+ {
+ 	struct pse_controller_dev *pcdev = rdev_get_drvdata(rdev);
+ 	const struct pse_controller_ops *ops;
+-	int id, ret;
++	int id, ret = 0;
+ 
+ 	ops = pcdev->ops;
+ 	if (!ops->pi_enable)
+@@ -331,6 +655,23 @@ static int pse_pi_enable(struct regulator_dev *rdev)
+ 
+ 	id = rdev_get_id(rdev);
+ 	mutex_lock(&pcdev->lock);
++	if (pse_pw_d_is_sw_pw_control(pcdev, pcdev->pi[id].pw_d)) {
++		/* Manage enabled status by software.
++		 * Real enable process will happen if a port is connected.
++		 */
++		if (pcdev->pi[id].isr_pd_detected) {
++			struct netlink_ext_ack extack;
++
++			ret = _pse_pi_delivery_power_sw_pw_ctrl(pcdev, id, &extack);
++		}
++		if (!ret || ret == -ERANGE) {
++			pcdev->pi[id].admin_state_enabled = 1;
++			ret = 0;
++		}
++		mutex_unlock(&pcdev->lock);
++		return ret;
++	}
++
+ 	ret = ops->pi_enable(pcdev, id);
+ 	if (!ret)
+ 		pcdev->pi[id].admin_state_enabled = 1;
+@@ -342,21 +683,18 @@ static int pse_pi_enable(struct regulator_dev *rdev)
+ static int pse_pi_disable(struct regulator_dev *rdev)
+ {
+ 	struct pse_controller_dev *pcdev = rdev_get_drvdata(rdev);
+-	const struct pse_controller_ops *ops;
++	struct pse_pi *pi;
+ 	int id, ret;
+ 
+-	ops = pcdev->ops;
+-	if (!ops->pi_disable)
+-		return -EOPNOTSUPP;
+-
+ 	id = rdev_get_id(rdev);
++	pi = &pcdev->pi[id];
+ 	mutex_lock(&pcdev->lock);
+-	ret = ops->pi_disable(pcdev, id);
++	ret = _pse_pi_disable(pcdev, id);
+ 	if (!ret)
+-		pcdev->pi[id].admin_state_enabled = 0;
+-	mutex_unlock(&pcdev->lock);
++		pi->admin_state_enabled = 0;
+ 
+-	return ret;
++	mutex_unlock(&pcdev->lock);
++	return 0;
+ }
+ 
+ static int _pse_pi_get_voltage(struct regulator_dev *rdev)
+@@ -631,6 +969,11 @@ static int pse_register_pw_ds(struct pse_controller_dev *pcdev)
+ 		}
+ 
+ 		pw_d->supply = supply;
++		if (pcdev->supp_budget_eval_strategies)
++			pw_d->budget_eval_strategy = pcdev->supp_budget_eval_strategies;
++		else
++			pw_d->budget_eval_strategy = PSE_BUDGET_EVAL_STRAT_DISABLED;
++		kref_init(&pw_d->refcnt);
+ 		pcdev->pi[i].pw_d = pw_d;
+ 	}
+ 
+@@ -639,6 +982,31 @@ static int pse_register_pw_ds(struct pse_controller_dev *pcdev)
+ 	return ret;
+ }
+ 
++/**
++ * pse_send_ntf_worker - Worker to send PSE notifications
++ * @work: work object
++ *
++ * Manage and send PSE netlink notifications using a workqueue to avoid
++ * deadlock between pcdev_lock and pse_list_mutex.
++ */
++static void pse_send_ntf_worker(struct work_struct *work)
++{
++	struct pse_controller_dev *pcdev;
++	struct pse_ntf ntf;
++
++	pcdev = container_of(work, struct pse_controller_dev, ntf_work);
++
++	while (kfifo_out(&pcdev->ntf_fifo, &ntf, 1)) {
++		struct net_device *netdev;
++		netdevice_tracker tracker;
++
++		netdev = pse_control_find_net_by_id(pcdev, ntf.id, &tracker);
++		if (netdev)
++			ethnl_pse_send_ntf(netdev, ntf.notifs, &ntf.extack);
++		netdev_put(netdev, &tracker);
++	}
++}
++
+ /**
+  * pse_controller_register - register a PSE controller device
+  * @pcdev: a pointer to the initialized PSE controller device
+@@ -652,6 +1020,13 @@ int pse_controller_register(struct pse_controller_dev *pcdev)
+ 
+ 	mutex_init(&pcdev->lock);
+ 	INIT_LIST_HEAD(&pcdev->pse_control_head);
++	spin_lock_init(&pcdev->ntf_fifo_lock);
++	ret = kfifo_alloc(&pcdev->ntf_fifo, pcdev->nr_lines, GFP_KERNEL);
++	if (ret) {
++		dev_err(pcdev->dev, "failed to allocate kfifo notifications\n");
++		return ret;
++	}
++	INIT_WORK(&pcdev->ntf_work, pse_send_ntf_worker);
+ 
+ 	if (!pcdev->nr_lines)
+ 		pcdev->nr_lines = 1;
+@@ -718,6 +1093,10 @@ void pse_controller_unregister(struct pse_controller_dev *pcdev)
+ {
+ 	pse_flush_pw_ds(pcdev);
+ 	pse_release_pis(pcdev);
++	if (pcdev->irq)
++		disable_irq(pcdev->irq);
++	cancel_work_sync(&pcdev->ntf_work);
++	kfifo_free(&pcdev->ntf_fifo);
+ 	mutex_lock(&pse_list_mutex);
+ 	list_del(&pcdev->list);
+ 	mutex_unlock(&pse_list_mutex);
+@@ -789,6 +1168,52 @@ static unsigned long pse_to_regulator_notifs(unsigned long notifs)
+ 	return rnotifs;
+ }
+ 
++/**
++ * pse_set_config_isr - Set PSE control config according to the PSE
++ *			notifications
++ * @pcdev: a pointer to the PSE
++ * @id: index of the PSE control
++ * @notifs: PSE event notifications
++ * @extack: extack for error reporting
++ *
++ * Return: 0 on success and failure value on error
++ */
++static int pse_set_config_isr(struct pse_controller_dev *pcdev, int id,
++			      unsigned long notifs,
++			      struct netlink_ext_ack *extack)
++{
++	int ret = 0;
++
++	if (notifs & PSE_BUDGET_EVAL_STRAT_DYNAMIC)
++		return 0;
++
++	if ((notifs & ETHTOOL_C33_PSE_EVENT_DISCONNECTION) &&
++	    ((notifs & ETHTOOL_C33_PSE_EVENT_DETECTION) ||
++	     (notifs & ETHTOOL_C33_PSE_EVENT_CLASSIFICATION))) {
++		NL_SET_ERR_MSG_FMT(extack,
++				   "PI %d: error, connection and disconnection reported simultaneously",
++				   id);
++		return -EINVAL;
++	}
++
++	if (notifs & ETHTOOL_C33_PSE_EVENT_CLASSIFICATION) {
++		pcdev->pi[id].isr_pd_detected = true;
++		if (pcdev->pi[id].admin_state_enabled) {
++			ret = _pse_pi_delivery_power_sw_pw_ctrl(pcdev, id,
++								extack);
++			if (ret == -ERANGE)
++				ret = 0;
++		}
++	} else if (notifs & ETHTOOL_C33_PSE_EVENT_DISCONNECTION) {
++		if (pcdev->pi[id].admin_state_enabled &&
++		    pcdev->pi[id].isr_pd_detected)
++			ret = _pse_pi_disable(pcdev, id);
++		pcdev->pi[id].isr_pd_detected = false;
++	}
++
++	return ret;
++}
++
+ /**
+  * pse_isr - IRQ handler for PSE
+  * @irq: irq number
+@@ -798,7 +1223,6 @@ static unsigned long pse_to_regulator_notifs(unsigned long notifs)
+  */
+ static irqreturn_t pse_isr(int irq, void *data)
+ {
+-	struct netlink_ext_ack extack = {};
+ 	struct pse_controller_dev *pcdev;
+ 	unsigned long notifs_mask = 0;
+ 	struct pse_irq_desc *desc;
+@@ -812,32 +1236,41 @@ static irqreturn_t pse_isr(int irq, void *data)
+ 	memset(h->notifs, 0, pcdev->nr_lines * sizeof(*h->notifs));
+ 	mutex_lock(&pcdev->lock);
+ 	ret = desc->map_event(irq, pcdev, h->notifs, &notifs_mask);
+-	mutex_unlock(&pcdev->lock);
+-	if (ret || !notifs_mask)
++	if (ret || !notifs_mask) {
++		mutex_unlock(&pcdev->lock);
+ 		return IRQ_NONE;
++	}
+ 
+ 	for_each_set_bit(i, &notifs_mask, pcdev->nr_lines) {
+ 		unsigned long notifs, rnotifs;
+-		struct net_device *netdev;
+-		netdevice_tracker tracker;
++		struct pse_ntf ntf = {};
+ 
+ 		/* Do nothing PI not described */
+ 		if (!pcdev->pi[i].rdev)
+ 			continue;
+ 
+ 		notifs = h->notifs[i];
++		if (pse_pw_d_is_sw_pw_control(pcdev, pcdev->pi[i].pw_d)) {
++			ret = pse_set_config_isr(pcdev, i, notifs, &ntf.extack);
++			if (ret)
++				notifs |= ETHTOOL_PSE_EVENT_SW_PW_CONTROL_ERROR;
++		}
++
+ 		dev_dbg(h->pcdev->dev,
+ 			"Sending PSE notification EVT 0x%lx\n", notifs);
+ 
+-		netdev = pse_control_find_net_by_id(pcdev, i, &tracker);
+-		if (netdev)
+-			ethnl_pse_send_ntf(netdev, notifs, &extack);
+-		netdev_put(netdev, &tracker);
++		ntf.notifs = notifs;
++		ntf.id = i;
++		kfifo_in_spinlocked(&pcdev->ntf_fifo, &ntf, 1,
++				    &pcdev->ntf_fifo_lock);
++		schedule_work(&pcdev->ntf_work);
+ 		rnotifs = pse_to_regulator_notifs(notifs);
+ 		regulator_notifier_call_chain(pcdev->pi[i].rdev, rnotifs,
+ 					      NULL);
+ 	}
+ 
++	mutex_unlock(&pcdev->lock);
++
+ 	return IRQ_HANDLED;
+ }
+ 
+@@ -961,6 +1394,20 @@ pse_control_get_internal(struct pse_controller_dev *pcdev, unsigned int index,
+ 		goto free_psec;
+ 	}
+ 
++	if (!pcdev->ops->pi_get_admin_state) {
++		ret = -EOPNOTSUPP;
++		goto free_psec;
++	}
++
++	/* Initialize admin_state_enabled before the regulator_get. This
++	 * aims to have the right value reported in the first is_enabled
++	 * call in case of control managed by software.
++	 */
++	ret = pse_pi_is_hw_enabled(pcdev, index);
++	if (ret < 0)
++		goto free_psec;
++
++	pcdev->pi[index].admin_state_enabled = ret;
+ 	psec->ps = devm_regulator_get_exclusive(pcdev->dev,
+ 						rdev_get_name(pcdev->pi[index].rdev));
+ 	if (IS_ERR(psec->ps)) {
+@@ -968,12 +1415,6 @@ pse_control_get_internal(struct pse_controller_dev *pcdev, unsigned int index,
+ 		goto put_module;
+ 	}
+ 
+-	ret = regulator_is_enabled(psec->ps);
+-	if (ret < 0)
+-		goto regulator_put;
+-
+-	pcdev->pi[index].admin_state_enabled = ret;
+-
+ 	psec->pcdev = pcdev;
+ 	list_add(&psec->list, &pcdev->pse_control_head);
+ 	psec->id = index;
+@@ -982,8 +1423,6 @@ pse_control_get_internal(struct pse_controller_dev *pcdev, unsigned int index,
+ 
+ 	return psec;
+ 
+-regulator_put:
+-	devm_regulator_put(psec->ps);
+ put_module:
+ 	module_put(pcdev->owner);
+ free_psec:
+@@ -1094,6 +1533,35 @@ struct pse_control *of_pse_control_get(struct device_node *node,
+ }
+ EXPORT_SYMBOL_GPL(of_pse_control_get);
+ 
++/**
++ * pse_get_sw_admin_state - Convert the software admin state to c33 or podl
++ *			    admin state value used in the standard
++ * @psec: PSE control pointer
++ * @admin_state: a pointer to the admin_state structure
++ */
++static void pse_get_sw_admin_state(struct pse_control *psec,
++				   struct pse_admin_state *admin_state)
++{
++	struct pse_pi *pi = &psec->pcdev->pi[psec->id];
++
++	if (pse_has_podl(psec)) {
++		if (pi->admin_state_enabled)
++			admin_state->podl_admin_state =
++				ETHTOOL_PODL_PSE_ADMIN_STATE_ENABLED;
++		else
++			admin_state->podl_admin_state =
++				ETHTOOL_PODL_PSE_ADMIN_STATE_DISABLED;
++	}
++	if (pse_has_c33(psec)) {
++		if (pi->admin_state_enabled)
++			admin_state->c33_admin_state =
++				ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED;
++		else
++			admin_state->c33_admin_state =
++				ETHTOOL_C33_PSE_ADMIN_STATE_DISABLED;
++	}
++}
++
+ /**
+  * pse_ethtool_get_status - get status of PSE control
+  * @psec: PSE control pointer
+@@ -1110,19 +1578,46 @@ int pse_ethtool_get_status(struct pse_control *psec,
+ 	struct pse_pw_status pw_status = {0};
+ 	const struct pse_controller_ops *ops;
+ 	struct pse_controller_dev *pcdev;
++	struct pse_pi *pi;
+ 	int ret;
+ 
+ 	pcdev = psec->pcdev;
+ 	ops = pcdev->ops;
++
++	pi = &pcdev->pi[psec->id];
+ 	mutex_lock(&pcdev->lock);
+-	if (pcdev->pi[psec->id].pw_d)
+-		status->pw_d_id = pcdev->pi[psec->id].pw_d->id;
++	if (pi->pw_d) {
++		status->pw_d_id = pi->pw_d->id;
++		if (pse_pw_d_is_sw_pw_control(pcdev, pi->pw_d)) {
++			pse_get_sw_admin_state(psec, &admin_state);
++		} else {
++			ret = ops->pi_get_admin_state(pcdev, psec->id,
++						      &admin_state);
++			if (ret)
++				goto out;
++		}
++		status->podl_admin_state = admin_state.podl_admin_state;
++		status->c33_admin_state = admin_state.c33_admin_state;
+ 
+-	ret = ops->pi_get_admin_state(pcdev, psec->id, &admin_state);
+-	if (ret)
+-		goto out;
+-	status->podl_admin_state = admin_state.podl_admin_state;
+-	status->c33_admin_state = admin_state.c33_admin_state;
++		switch (pi->pw_d->budget_eval_strategy) {
++		case PSE_BUDGET_EVAL_STRAT_STATIC:
++			status->prio_max = pcdev->nr_lines - 1;
++			status->prio = pi->prio;
++			break;
++		case PSE_BUDGET_EVAL_STRAT_DYNAMIC:
++			status->prio_max = pcdev->pis_prio_max;
++			if (ops->pi_get_prio) {
++				ret = ops->pi_get_prio(pcdev, psec->id);
++				if (ret < 0)
++					goto out;
++
++				status->prio = ret;
++			}
++			break;
++		default:
++			break;
++		}
++	}
+ 
+ 	ret = ops->pi_get_pw_status(pcdev, psec->id, &pw_status);
+ 	if (ret)
+@@ -1271,6 +1766,52 @@ int pse_ethtool_set_config(struct pse_control *psec,
+ }
+ EXPORT_SYMBOL_GPL(pse_ethtool_set_config);
+ 
++/**
++ * pse_pi_update_pw_budget - Update PSE power budget allocated with new
++ *			     power in mW
++ * @pcdev: a pointer to the PSE controller device
++ * @id: index of the PSE PI
++ * @pw_req: power requested
++ * @extack: extack for reporting useful error messages
++ *
++ * Return: Previous power allocated on success and failure value on error
++ */
++static int pse_pi_update_pw_budget(struct pse_controller_dev *pcdev, int id,
++				   const unsigned int pw_req,
++				   struct netlink_ext_ack *extack)
++{
++	struct pse_pi *pi = &pcdev->pi[id];
++	int previous_pw_allocated;
++	int pw_diff, ret = 0;
++
++	/* We don't want pw_allocated_mW value change in the middle of an
++	 * power budget update
++	 */
++	mutex_lock(&pcdev->lock);
++	previous_pw_allocated = pi->pw_allocated_mW;
++	pw_diff = pw_req - previous_pw_allocated;
++	if (!pw_diff) {
++		goto out;
++	} else if (pw_diff > 0) {
++		ret = regulator_request_power_budget(pi->pw_d->supply, pw_diff);
++		if (ret) {
++			NL_SET_ERR_MSG_FMT(extack,
++					   "PI %d: not enough power budget available",
++					   id);
++			goto out;
++		}
++
++	} else {
++		regulator_free_power_budget(pi->pw_d->supply, -pw_diff);
++	}
++	pi->pw_allocated_mW = pw_req;
++	ret = previous_pw_allocated;
++
++out:
++	mutex_unlock(&pcdev->lock);
++	return ret;
++}
++
+ /**
+  * pse_ethtool_set_pw_limit - set PSE control power limit
+  * @psec: PSE control pointer
+@@ -1283,7 +1824,7 @@ int pse_ethtool_set_pw_limit(struct pse_control *psec,
+ 			     struct netlink_ext_ack *extack,
+ 			     const unsigned int pw_limit)
+ {
+-	int uV, uA, ret;
++	int uV, uA, ret, previous_pw_allocated = 0;
+ 	s64 tmp_64;
+ 
+ 	if (pw_limit > MAX_PI_PW)
+@@ -1307,10 +1848,100 @@ int pse_ethtool_set_pw_limit(struct pse_control *psec,
+ 	/* uA = mW * 1000000000 / uV */
+ 	uA = DIV_ROUND_CLOSEST_ULL(tmp_64, uV);
+ 
+-	return regulator_set_current_limit(psec->ps, 0, uA);
++	/* Update power budget only in software power control case and
++	 * if a Power Device is powered.
++	 */
++	if (pse_pw_d_is_sw_pw_control(psec->pcdev,
++				      psec->pcdev->pi[psec->id].pw_d) &&
++	    psec->pcdev->pi[psec->id].admin_state_enabled &&
++	    psec->pcdev->pi[psec->id].isr_pd_detected) {
++		ret = pse_pi_update_pw_budget(psec->pcdev, psec->id,
++					      pw_limit, extack);
++		if (ret < 0)
++			return ret;
++		previous_pw_allocated = ret;
++	}
++
++	ret = regulator_set_current_limit(psec->ps, 0, uA);
++	if (ret < 0 && previous_pw_allocated) {
++		pse_pi_update_pw_budget(psec->pcdev, psec->id,
++					previous_pw_allocated, extack);
++	}
++
++	return ret;
+ }
+ EXPORT_SYMBOL_GPL(pse_ethtool_set_pw_limit);
+ 
++/**
++ * pse_ethtool_set_prio - Set PSE PI priority according to the budget
++ *			  evaluation strategy
++ * @psec: PSE control pointer
++ * @extack: extack for reporting useful error messages
++ * @prio: priovity value
++ *
++ * Return: 0 on success and failure value on error
++ */
++int pse_ethtool_set_prio(struct pse_control *psec,
++			 struct netlink_ext_ack *extack,
++			 unsigned int prio)
++{
++	struct pse_controller_dev *pcdev = psec->pcdev;
++	const struct pse_controller_ops *ops;
++	int ret = 0;
++
++	if (!pcdev->pi[psec->id].pw_d) {
++		NL_SET_ERR_MSG(extack, "no power domain attached");
++		return -EOPNOTSUPP;
++	}
++
++	/* We don't want priority change in the middle of an
++	 * enable/disable call or a priority mode change
++	 */
++	mutex_lock(&pcdev->lock);
++	switch (pcdev->pi[psec->id].pw_d->budget_eval_strategy) {
++	case PSE_BUDGET_EVAL_STRAT_STATIC:
++		if (prio >= pcdev->nr_lines) {
++			NL_SET_ERR_MSG_FMT(extack,
++					   "priority %d exceed priority max %d",
++					   prio, pcdev->nr_lines);
++			ret = -ERANGE;
++			goto out;
++		}
++
++		pcdev->pi[psec->id].prio = prio;
++		pse_pw_d_retry_power_delivery(pcdev, pcdev->pi[psec->id].pw_d);
++		break;
++
++	case PSE_BUDGET_EVAL_STRAT_DYNAMIC:
++		ops = psec->pcdev->ops;
++		if (!ops->pi_set_prio) {
++			NL_SET_ERR_MSG(extack,
++				       "pse driver does not support setting port priority");
++			ret = -EOPNOTSUPP;
++			goto out;
++		}
++
++		if (prio > pcdev->pis_prio_max) {
++			NL_SET_ERR_MSG_FMT(extack,
++					   "priority %d exceed priority max %d",
++					   prio, pcdev->pis_prio_max);
++			ret = -ERANGE;
++			goto out;
++		}
++
++		ret = ops->pi_set_prio(pcdev, psec->id, prio);
++		break;
++
++	default:
++		ret = -EOPNOTSUPP;
++	}
++
++out:
++	mutex_unlock(&pcdev->lock);
++	return ret;
++}
++EXPORT_SYMBOL_GPL(pse_ethtool_set_prio);
++
+ bool pse_has_podl(struct pse_control *psec)
+ {
+ 	return psec->pcdev->types & ETHTOOL_PSE_PODL;
+diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
+index 16835d442872..95a4c0e4333a 100644
+--- a/include/linux/pse-pd/pse.h
++++ b/include/linux/pse-pd/pse.h
+@@ -7,6 +7,8 @@
+ 
+ #include <linux/list.h>
+ #include <uapi/linux/ethtool.h>
++#include <linux/netlink.h>
++#include <linux/kfifo.h>
+ #include <linux/regulator/driver.h>
+ 
+ /* Maximum current in uA according to IEEE 802.3-2022 Table 145-1 */
+@@ -133,6 +135,9 @@ struct pse_pw_limit_ranges {
+  *	is in charge of the memory allocation
+  * @c33_pw_limit_nb_ranges: number of supported power limit configuration
+  *	ranges
++ * @prio_max: max priority allowed for the c33_prio variable value.
++ * @prio: priority of the PSE. Managed by PSE core in case of static budget
++ *	evaluation strategy.
+  */
+ struct ethtool_pse_control_status {
+ 	u32 pw_d_id;
+@@ -146,6 +151,8 @@ struct ethtool_pse_control_status {
+ 	u32 c33_avail_pw_limit;
+ 	struct ethtool_c33_pse_pw_limit_range *c33_pw_limit_ranges;
+ 	u32 c33_pw_limit_nb_ranges;
++	u32 prio_max;
++	u32 prio;
+ };
+ 
+ /**
+@@ -169,6 +176,11 @@ struct ethtool_pse_control_status {
+  *			    range. The driver is in charge of the memory
+  *			    allocation and should return the number of
+  *			    ranges.
++ * @pi_get_prio: Get the PSE PI priority.
++ * @pi_set_prio: Configure the PSE PI priority.
++ * @pi_get_pw_req: Get the power requested by a PD before enabling the PSE PI.
++ *		   This is only relevant when an interrupt is registered using
++ *		   devm_pse_irq_helper helper.
+  */
+ struct pse_controller_ops {
+ 	int (*setup_pi_matrix)(struct pse_controller_dev *pcdev);
+@@ -189,6 +201,10 @@ struct pse_controller_ops {
+ 			       int id, int max_mW);
+ 	int (*pi_get_pw_limit_ranges)(struct pse_controller_dev *pcdev, int id,
+ 				      struct pse_pw_limit_ranges *pw_limit_ranges);
++	int (*pi_get_prio)(struct pse_controller_dev *pcdev, int id);
++	int (*pi_set_prio)(struct pse_controller_dev *pcdev, int id,
++			   unsigned int prio);
++	int (*pi_get_pw_req)(struct pse_controller_dev *pcdev, int id);
+ };
+ 
+ struct module;
+@@ -224,6 +240,13 @@ struct pse_pi_pairset {
+  * @rdev: regulator represented by the PSE PI
+  * @admin_state_enabled: PI enabled state
+  * @pw_d: Power domain of the PSE PI
++ * @prio: Priority of the PSE PI. Used in static budget evaluation strategy
++ * @isr_pd_detected: PSE PI detection status managed by the interruption
++ *		     handler. This variable is relevant when the power enabled
++ *		     management is managed in software like the static
++ *		     budget evaluation strategy.
++ * @pw_allocated_mW: Power allocated to a PSE PI to manage power budget in
++ *		     static budget evaluation strategy.
+  */
+ struct pse_pi {
+ 	struct pse_pi_pairset pairset[2];
+@@ -231,6 +254,22 @@ struct pse_pi {
+ 	struct regulator_dev *rdev;
+ 	bool admin_state_enabled;
+ 	struct pse_power_domain *pw_d;
++	int prio;
++	bool isr_pd_detected;
++	int pw_allocated_mW;
++};
++
++/**
++ * struct pse_ntf - PSE notification element
++ *
++ * @id: ID of the PSE control
++ * @notifs: PSE notifications to be reported
++ * @extack: extack for reporting error messages
++ */
++struct pse_ntf {
++	int id;
++	unsigned long notifs;
++	struct netlink_ext_ack extack;
+ };
+ 
+ /**
+@@ -248,6 +287,12 @@ struct pse_pi {
+  * @pi: table of PSE PIs described in this controller device
+  * @no_of_pse_pi: flag set if the pse_pis devicetree node is not used
+  * @irq: PSE interrupt
++ * @pis_prio_max: Maximum value allowed for the PSE PIs priority
++ * @supp_budget_eval_strategies: budget evaluation strategies supported
++ *				 by the PSE
++ * @ntf_work: workqueue for PSE notification management
++ * @ntf_fifo: PSE notifications FIFO
++ * @ntf_fifo_lock: protect @ntf_fifo writer
+  */
+ struct pse_controller_dev {
+ 	const struct pse_controller_ops *ops;
+@@ -262,6 +307,29 @@ struct pse_controller_dev {
+ 	struct pse_pi *pi;
+ 	bool no_of_pse_pi;
+ 	int irq;
++	unsigned int pis_prio_max;
++	u32 supp_budget_eval_strategies;
++	struct work_struct ntf_work;
++	DECLARE_KFIFO_PTR(ntf_fifo, struct pse_ntf);
++	spinlock_t ntf_fifo_lock; /* Protect @ntf_fifo writer */
++};
++
++/**
++ * enum pse_budget_eval_strategies - PSE budget evaluation strategies.
++ * @PSE_BUDGET_EVAL_STRAT_DISABLED: Budget evaluation strategy disabled.
++ * @PSE_BUDGET_EVAL_STRAT_STATIC: PSE static budget evaluation strategy.
++ *	Budget evaluation strategy based on the power requested during PD
++ *	classification. This strategy is managed by the PSE core.
++ * @PSE_BUDGET_EVAL_STRAT_DYNAMIC: PSE dynamic budget evaluation
++ *	strategy. Budget evaluation strategy based on the current consumption
++ *	per ports compared to the total	power budget. This mode is managed by
++ *	the PSE controller.
++ */
++
++enum pse_budget_eval_strategies {
++	PSE_BUDGET_EVAL_STRAT_DISABLED	= 1 << 0,
++	PSE_BUDGET_EVAL_STRAT_STATIC	= 1 << 1,
++	PSE_BUDGET_EVAL_STRAT_DYNAMIC	= 1 << 2,
+ };
+ 
+ #if IS_ENABLED(CONFIG_PSE_CONTROLLER)
+@@ -286,6 +354,9 @@ int pse_ethtool_set_config(struct pse_control *psec,
+ int pse_ethtool_set_pw_limit(struct pse_control *psec,
+ 			     struct netlink_ext_ack *extack,
+ 			     const unsigned int pw_limit);
++int pse_ethtool_set_prio(struct pse_control *psec,
++			 struct netlink_ext_ack *extack,
++			 unsigned int prio);
+ 
+ bool pse_has_podl(struct pse_control *psec);
+ bool pse_has_c33(struct pse_control *psec);
+@@ -323,6 +394,13 @@ static inline int pse_ethtool_set_pw_limit(struct pse_control *psec,
+ 	return -EOPNOTSUPP;
+ }
+ 
++static inline int pse_ethtool_set_prio(struct pse_control *psec,
++				       struct netlink_ext_ack *extack,
++				       unsigned int prio)
++{
++	return -EOPNOTSUPP;
++}
++
+ static inline bool pse_has_podl(struct pse_control *psec)
+ {
+ 	return false;
+diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
+index 5e99daf42d44..d547514d0b43 100644
+--- a/include/uapi/linux/ethtool.h
++++ b/include/uapi/linux/ethtool.h
+@@ -1006,6 +1006,20 @@ enum ethtool_c33_pse_pw_d_status {
+  * enum ethtool_pse_events - event list of the PSE controller.
+  * @ETHTOOL_PSE_EVENT_OVER_CURRENT: PSE output current is too high.
+  * @ETHTOOL_PSE_EVENT_OVER_TEMP: PSE in over temperature state.
++ * @ETHTOOL_C33_PSE_EVENT_DETECTION: detection process occur on the PSE.
++ *	IEEE 802.3-2022 33.2.5 and 145.2.6 PSE detection of PDs.
++ *	IEEE 802.3-202 30.9.1.1.5 aPSEPowerDetectionStatus.
++ * @ETHTOOL_C33_PSE_EVENT_CLASSIFICATION: classification process occur on
++ *	the PSE. IEEE 802.3-2022 33.2.6 and 145.2.8 classification of PDs and
++ *	mutual identification.
++ *	IEEE 802.3-2022 30.9.1.1.8 aPSEPowerClassification.
++ * @ETHTOOL_C33_PSE_EVENT_DISCONNECTION: PD has been disconnected on the PSE.
++ *	IEEE 802.3-2022 33.3.8 and 145.3.9 PD Maintain Power Signature.
++ *	IEEE 802.3-2022 33.5.1.2.9 MPS Absent.
++ *	IEEE 802.3-2022 30.9.1.1.20 aPSEMPSAbsentCounter.
++ * @ETHTOOL_PSE_EVENT_OVER_BUDGET: PSE turned off due to over budget situation.
++ * @ETHTOOL_PSE_EVENT_SW_PW_CONTROL_ERROR: PSE faced an error managing the
++ *	power control from software.
+  *
+  * @ETHTOOL_PSE_EVENT_LAST: Last PSE event of the enum.
+  */
+@@ -1013,8 +1027,13 @@ enum ethtool_c33_pse_pw_d_status {
+ enum ethtool_pse_events {
+ 	ETHTOOL_PSE_EVENT_OVER_CURRENT =	1 << 0,
+ 	ETHTOOL_PSE_EVENT_OVER_TEMP =		1 << 1,
++	ETHTOOL_C33_PSE_EVENT_DETECTION =	1 << 2,
++	ETHTOOL_C33_PSE_EVENT_CLASSIFICATION =	1 << 3,
++	ETHTOOL_C33_PSE_EVENT_DISCONNECTION =	1 << 4,
++	ETHTOOL_PSE_EVENT_OVER_BUDGET =		1 << 5,
++	ETHTOOL_PSE_EVENT_SW_PW_CONTROL_ERROR =	1 << 6,
+ 
+-	ETHTOOL_PSE_EVENT_LAST = ETHTOOL_PSE_EVENT_OVER_TEMP,
++	ETHTOOL_PSE_EVENT_LAST = ETHTOOL_PSE_EVENT_SW_PW_CONTROL_ERROR,
+ };
+ 
+ /**
 
 -- 
 2.34.1
