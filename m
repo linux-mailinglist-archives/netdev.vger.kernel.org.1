@@ -1,250 +1,143 @@
-Return-Path: <netdev+bounces-188345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7D52AAC6BB
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 15:42:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2070AAC6C8
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 15:43:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 592E31BA5970
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 13:42:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 215B83B308A
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 13:42:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DA51280A55;
-	Tue,  6 May 2025 13:42:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D774227FB0D;
+	Tue,  6 May 2025 13:43:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="H+VsQc83";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="A2WDNfDn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P17d+MQ7"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 893A327A457;
-	Tue,  6 May 2025 13:42:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12EC928003B;
+	Tue,  6 May 2025 13:42:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746538922; cv=none; b=Bn00Zo+MVOp58/hHjYKax14Z20wr7b4ZheCA4Z6bpqx2j8lKyH1XAY4sUpfJQ3qz/p6oeiRiAA2gaJ5KJa4+6YZGiV+lldxiz1azbKogjaAtEec4ooj6onW8GLSpQZce7aI26CjiuCy88gjva17OpBn4nN5HewHTX6EBfmRuWSE=
+	t=1746538980; cv=none; b=awGQz+okwTkBWTn/GgomrsqKm8ueUagU98M1fN4oWZ4/gU0yMVJ3hLmGY0U+CdgU0eTJeOao7mDzn1JHMznuIo8Qq1+CXqjk7fgZ7CX8NxfqglDGwZmeiZLZV7xqsFJOPxhieChmx3AXZIjUhfFDB/W8bpVtfVadyRTZ6+dq9Ok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746538922; c=relaxed/simple;
-	bh=xid3ylr8PUedVja8ADfCHrXz8QvAkNFfRtSA6wAUKzs=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=BOWTKVe4n0LUdryLoHZH/aJfRi1sDEVCNP1qft31IJCAQDqm83zLGThbHDUMc8kpFvxSAGf5A/q+CFKuyM9iiiNzLhdmbXBSSf2PBiqlq4MOvs1X5nqZfszzi6jesuS76sYaXbCYt2eK2OfG0DFN3qGaz5srkngtoZLJn8CLe+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=H+VsQc83; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=A2WDNfDn; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1746538918;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6KIDdrTanUmKEwxmKjGlY7d/jG09aY8AhXQLqxXMqzQ=;
-	b=H+VsQc831BMBvRdCis3hR9IME8F22ohOOmKZluRXXeIChbYi1i570UHmhVD5rd7PsM0wkw
-	1HP7eA6z+5IOLUhZQhdmF7or5iTztS2QKJRbmEAgjwq+1Hky247NEhKEDwxezgoUgE8R63
-	V0qhDAjB+7b6J29c/AFLytdeXny2As20JkHKAF/cRWfC8kJjaTkOeduY468BYQE2K9Pe7t
-	RZn4xt/lidjhGxatyOKQrc3oS+XevZF44OnoNsT2EV+VMTLkWVspPyrnrP+fONNObWghO5
-	kqLvOAkiLKb35XcFpn3CDCCYGOIkDA8SOrbQ3Xkiok9AVLUm0v7enGUguU9+4Q==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1746538918;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6KIDdrTanUmKEwxmKjGlY7d/jG09aY8AhXQLqxXMqzQ=;
-	b=A2WDNfDnfT0mD/DZk/nR0ud2qdiz1r7YzlYDJPAh4yEaDeywUZVRbpTk6UzDijgMvH2IBC
-	SeknVmXTWgr5wDBA==
-To: "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
-Cc: maz@kernel.org, linux-kernel@vger.kernel.org, "Jiri Slaby (SUSE)"
- <jirislaby@kernel.org>, Aaro Koskinen <aaro.koskinen@iki.fi>, Abhinav
- Kumar <quic_abhinavk@quicinc.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>, Alexandre Ghiti
- <alex@ghiti.fr>, Alexandre Torgue <alexandre.torgue@foss.st.com>, Alex
- Deucher <alexander.deucher@amd.com>, Alex Shi <alexs@kernel.org>, Alim
- Akhtar <alim.akhtar@samsung.com>, Alvin =?utf-8?Q?=C5=A0ipraga?=
- <alsi@bang-olufsen.dk>,
- Alyssa Rosenzweig <alyssa@rosenzweig.io>, amd-gfx@lists.freedesktop.org,
- Amit Kucheria <amitk@kernel.org>, Anatolij Gustschin <agust@denx.de>, Andi
- Shyti <andi.shyti@kernel.org>, Andreas =?utf-8?Q?F=C3=A4rber?=
- <afaerber@suse.de>, Andreas
- Kemnade <andreas@kemnade.info>, Andrew Jeffery
- <andrew@codeconstruct.com.au>, Andrew Lunn <andrew@lunn.ch>, Andy
- Shevchenko <andy@kernel.org>, AngeloGioacchino Del Regno
- <angelogioacchino.delregno@collabora.com>, Antoine Tenart
- <atenart@kernel.org>, Anton Ivanov <anton.ivanov@cambridgegreys.com>, Anup
- Patel <anup@brainfault.org>, Arnd Bergmann <arnd@arndb.de>,
- asahi@lists.linux.dev, Bartosz Golaszewski <brgl@bgdev.pl>, Baruch Siach
- <baruch@tkos.co.il>, Benjamin Herrenschmidt <benh@kernel.crashing.org>,
- Bharat Kumar Gogada <bharat.kumar.gogada@amd.com>, Bjorn Andersson
- <andersson@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, Borislav
- Petkov <bp@alien8.de>, Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Claudiu Beznea
- <claudiu.beznea@tuxon.dev>, Corentin Chary <corentin.chary@gmail.com>,
- Daire McNamara <daire.mcnamara@microchip.com>, Daniel Golle
- <daniel@makrotopia.org>, Daniel Lezcano <daniel.lezcano@linaro.org>,
- Daniel Mack <daniel@zonque.org>, Daniel Palmer <daniel@thingy.jp>, Dave
- Hansen <dave.hansen@linux.intel.com>, David Airlie <airlied@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, DENG Qingfang <dqfext@gmail.com>,
- Dinh Nguyen <dinguyen@kernel.org>, Dmitry Baryshkov
- <dmitry.baryshkov@linaro.org>, Dongliang Mu <dzm91@hust.edu.cn>, Doug
- Berger <opendmb@gmail.com>, dri-devel@lists.freedesktop.org, Eddie James
- <eajames@linux.ibm.com>, Eric Dumazet <edumazet@google.com>, Fabio Estevam
- <festevam@gmail.com>, Florian Fainelli <florian.fainelli@broadcom.com>,
- Geoff Levand <geoff@infradead.org>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Gregory Clement
- <gregory.clement@bootlin.com>, Guo Ren <guoren@kernel.org>, Hans de Goede
- <hdegoede@redhat.com>, Haojian Zhuang <haojian.zhuang@gmail.com>, Haojian
- Zhuang <haojian.zhuang@linaro.org>, Heiko Stuebner <heiko@sntech.de>,
- Herve Codina <herve.codina@bootlin.com>, Hou Zhiqiang
- <Zhiqiang.Hou@nxp.com>, "H. Peter Anvin" <hpa@zytor.com>, Huacai Chen
- <chenhuacai@kernel.org>, Changhuang Liang
- <changhuang.liang@starfivetech.com>, Chen-Yu Tsai <wens@csie.org>,
- "Chester A. Unal" <chester.a.unal@arinc9.com>, Christian =?utf-8?Q?K?=
- =?utf-8?Q?=C3=B6nig?=
- <christian.koenig@amd.com>, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Chris Zankel <chris@zankel.net>, Ilpo
- =?utf-8?Q?J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, Imre Kaloz
- <kaloz@openwrt.org>,
- Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>, James
- Morse <james.morse@arm.com>, Janne Grunau <j@jannau.net>, Janusz
- Krzysztofik <jmkrzyszt@gmail.com>, Jaroslav Kysela <perex@perex.cz>, Jassi
- Brar <jassisinghbrar@gmail.com>, Jernej Skrabec
- <jernej.skrabec@gmail.com>, Jerome Brunet <jbrunet@baylibre.com>, Jianjun
- Wang <jianjun.wang@mediatek.com>, Jiawen Wu <jiawenwu@trustnetic.com>,
- Jiaxun Yang <jiaxun.yang@flygoat.com>, Jim Quinlan <jim2101024@gmail.com>,
- Jingoo Han <jingoohan1@gmail.com>, Joel Stanley <joel@jms.id.au>, Johannes
- Berg <johannes@sipsolutions.net>, John Crispin <john@phrozen.org>, John
- Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Jonas Bonn
- <jonas@southpole.se>, Jonathan Cameron <jic23@kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, Jonathan Hunter <jonathanh@nvidia.com>, Jonathan
- =?utf-8?Q?Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>, Joyce Ooi
- <joyce.ooi@intel.com>,
- Karthikeyan Mitran <m.karthikeyan@mobiveil.co.in>, Keerthy
- <j-keerthy@ti.com>, Kevin Hilman <khilman@baylibre.com>, Konrad Dybcio
- <konradybcio@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>, Krzysztof
- =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>, Kunihiko Hayashi
- <hayashi.kunihiko@socionext.com>, Lakshmi Sowjanya D
- <lakshmi.sowjanya.d@intel.com>, Lars-Peter Clausen <lars@metafoo.de>, Lee
- Jones <lee@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>, Linus Walleij
- <linus.walleij@linaro.org>, Linus Walleij <linusw@kernel.org>,
- linux-amlogic@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
- linux-arm-msm@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-edac@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-iio@vger.kernel.org, linux-i2c@vger.kernel.org,
- linux-mediatek@lists.infradead.org, linux-mips@vger.kernel.org,
- linux-omap@vger.kernel.org, linux-pci@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, linux-remoteproc@vger.kernel.org,
- linux-riscv@lists.infradead.org, linux-rpi-kernel@lists.infradead.org,
- linux-sh@vger.kernel.org, linux-snps-arc@lists.infradead.org,
- linux-sound@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-um@lists.infradead.org, linux-wireless@vger.kernel.org,
- loongarch@lists.linux.dev, Lorenzo Pieralisi <lpieralisi@kernel.org>,
- Ludovic Desroches <ludovic.desroches@microchip.com>, Lukasz Luba
- <lukasz.luba@arm.com>, "Luke D. Jones" <luke@ljones.dev>, Madhavan
- Srinivasan <maddy@linux.ibm.com>, Manivannan Sadhasivam
- <manivannan.sadhasivam@linaro.org>, Marek =?utf-8?Q?Beh=C3=BAn?=
- <kabel@kernel.org>, Marijn
- Suijten <marijn.suijten@somainline.org>, Mark Brown <broonie@kernel.org>,
- Mark-PK Tsai <mark-pk.tsai@mediatek.com>, Martin Blumenstingl
- <martin.blumenstingl@googlemail.com>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Poirier <mathieu.poirier@linaro.org>,
- Matthias Brugger <matthias.bgg@gmail.com>, Mauro Carvalho Chehab
- <mchehab@kernel.org>, Max Filippov <jcmvbkbc@gmail.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Mengyuan Lou <mengyuanlou@net-swift.com>,
- Michael Buesch <m@bues.ch>, Michael Ellerman <mpe@ellerman.id.au>, Michal
- Simek <michal.simek@amd.com>, Miodrag Dinic <miodrag.dinic@mips.com>,
- Naveen N Rao <naveen@kernel.org>, Neil Armstrong
- <neil.armstrong@linaro.org>, netdev@vger.kernel.org, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Nicolas Saenz Julienne <nsaenz@kernel.org>,
- Nicholas Piggin <npiggin@gmail.com>, Nikhil Agarwal
- <nikhil.agarwal@amd.com>, Nipun Gupta <nipun.gupta@amd.com>, Nishanth
- Menon <nm@ti.com>, Pali =?utf-8?Q?Roh=C3=A1r?= <pali@kernel.org>, Palmer
- Dabbelt
- <palmer@dabbelt.com>, Paolo Abeni <pabeni@redhat.com>, Paul Cercueil
- <paul@crapouillou.net>, Paul Walmsley <paul.walmsley@sifive.com>,
- Pengutronix Kernel Team <kernel@pengutronix.de>, Peter Rosin
- <peda@axentia.se>, Philipp Zabel <p.zabel@pengutronix.de>, Piotr
- Wojtaszczyk <piotr.wojtaszczyk@timesys.com>,
- platform-driver-x86@vger.kernel.org, Prasad Kumpatla
- <quic_pkumpatl@quicinc.com>, Qiang Zhao <qiang.zhao@nxp.com>, Qin Jian
- <qinjian@cqplus1.com>, "Rafael J. Wysocki" <rafael@kernel.org>, Randy
- Dunlap <rdunlap@infradead.org>, Ray Jui <rjui@broadcom.com>, Rengarajan
- Sundararajan <Rengarajan.S@microchip.com>, Richard Cochran
- <richardcochran@gmail.com>, Richard Weinberger <richard@nod.at>, Rich
- Felker <dalias@libc.org>, Rob Clark <robdclark@gmail.com>, Robert Jarzmik
- <robert.jarzmik@free.fr>, Robert Richter <rric@kernel.org>, Rob Herring
- <robh@kernel.org>, Roger Quadros <rogerq@kernel.org>, Russell King
- <linux@armlinux.org.uk>, Ryan Chen <ryan_chen@aspeedtech.com>, Ryder Lee
- <ryder.lee@mediatek.com>, Samuel Holland <samuel@sholland.org>, Santosh
- Shilimkar <ssantosh@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>,
- Scott Branden <sbranden@broadcom.com>, Scott Wood <oss@buserror.net>, Sean
- Paul <sean@poorly.run>, Sean Wang <sean.wang@kernel.org>, Sean Wang
- <sean.wang@mediatek.com>, Sebastian Hesselbarth
- <sebastian.hesselbarth@gmail.com>, Sergio Paracuellos
- <sergio.paracuellos@gmail.com>, Shawn Guo <shawnguo@kernel.org>, Shawn Lin
- <shawn.lin@rock-chips.com>, Siddharth Vadapalli <s-vadapalli@ti.com>,
- Simona Vetter <simona@ffwll.ch>, Stafford Horne <shorne@gmail.com>, Stefan
- Kristiansson <stefan.kristiansson@saunalahti.fi>, Stephen Boyd
- <sboyd@kernel.org>, Sven Peter <sven@svenpeter.dev>, Takashi Iwai
- <tiwai@suse.com>, Talel Shenhar <talel@amazon.com>, Tero Kristo
- <kristo@kernel.org>, Thangaraj Samynathan <Thangaraj.S@microchip.com>,
- Thara Gopinath <thara.gopinath@gmail.com>, Thierry Reding
- <thierry.reding@gmail.com>, Thomas Bogendoerfer
- <tsbogend@alpha.franken.de>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, Toan Le <toan@os.amperecomputing.com>,
- Tony Lindgren <tony@atomide.com>, Tony Luck <tony.luck@intel.com>,
- UNGLinuxDriver@microchip.com, Uwe =?utf-8?Q?Kleine-K=C3=B6nig?=
- <ukleinek@kernel.org>,
- Vignesh Raghavendra <vigneshr@ti.com>, Vineet Gupta <vgupta@kernel.org>,
- Vladimir Oltean <olteanv@gmail.com>, Vladimir Zapolskiy <vz@mleia.com>,
- WANG Xuerui <kernel@xen0n.name>, Woojung Huh <woojung.huh@microchip.com>,
- x86@kernel.org, Yanteng Si <si.yanteng@linux.dev>, Yoshinori Sato
- <ysato@users.sourceforge.jp>, Zhang Rui <rui.zhang@intel.com>
-Subject: Re: [PATCH v2 00/57] irqdomain: Cleanups and Documentation
-In-Reply-To: <20250319092951.37667-1-jirislaby@kernel.org>
-References: <20250319092951.37667-1-jirislaby@kernel.org>
-Date: Tue, 06 May 2025 15:41:57 +0200
-Message-ID: <874ixxonyy.ffs@tglx>
+	s=arc-20240116; t=1746538980; c=relaxed/simple;
+	bh=P7MmDT0YiLN9IQpLfGcRluQMRY7SmCSqoyzu3pS5XKc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bx7Lcc0XXHfqxQ2ysN6OxY5jeT3qtc493JT9izSUdVMLm5icHKfoTRZ82KT/rx76FCAuIuVvpriRdV6Cyk/jqD7kh1NK1RyO5RhunxvX4F/h5ebJR5mVuAQlcsa1eHnTrVkiJz6ykIxAH8nAMbAG3/6nAFMXKyBVsDdJjmHErPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P17d+MQ7; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-ac79fa6e1c2so107762466b.1;
+        Tue, 06 May 2025 06:42:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746538976; x=1747143776; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=iiemZaTp19eI1v1+NuBxq7gBLDW9Xde37HRgy41BFFg=;
+        b=P17d+MQ7pjI3t6e5hJRqKALDrx/vaFVrcLlKOjUU8JPrXfTXAzCVytqSmqIy/cn7ck
+         3sybM9R0ltAByBegvuJTdQesLnX87hRjHO0oQqZLBcjB9Ghso5BH5GuTfao+x2R74ZpT
+         WqE/TlT7ELBZ2csWwWJP1pnlDa1VvWf/CWa62qdSKyU5svlOE21zwwEYklFSGcPALqil
+         DGXPZXJ1ajLSuZQ3MupnSplrDay6jfTZtPHvnnF+QBYV59NwoSaM4UsVj7ZgMtPVwxrh
+         W4Ys1JdCl1B2CfB6aGgi7pUcxrSTsF67QPhjajosZFKEP/OOsynCU9F5tfE8fV+1vhAm
+         KAiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746538976; x=1747143776;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iiemZaTp19eI1v1+NuBxq7gBLDW9Xde37HRgy41BFFg=;
+        b=iJhclLOBEw0lJV3jofkKFgoLCMSHnDmxINRK+jQfTHxDG17o4TixbiywuaQKFCOFXP
+         zI7pybCaBQzAtslRdfJiwXxCF8N32rbb22oLYg/dKTMYE95kAuyclJvxaDNcKhf8pVDY
+         XVZcyTJbsPSOQJJW+y4gh+QxqSH66rddE2vbydBxxSMN3zHN1d3mhsLGwJVlO5vlMdk5
+         pqZHiOX4kiJARXEn6z19Odo9vaf8OrvYcMn2WQ5ZShpzJGrN0nrkxqbl/fI7AGRFZhqE
+         CwR0pVHijfl/Mngigm8MF7dNQz/sujmpi2yPQEkS1ycrFFpJmLYnWuao/hnbB5r1vlek
+         A1/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVXUrj6mUK8LkaKD7HbamTY2OUDSCq0GL31cctJjBM3CMI9TdvnNSgNWDKY6TGCN5monq+n5KxrDjfLOZA=@vger.kernel.org, AJvYcCWIoE4ROuRhPMljBFg5/wDq0QRkpo9PoFWRsfnSS8BECnzccZq/w6PeMlLA3MFzzPGhMY1iJVdK@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZQ5qmtSDJqzMsx4Z9wrTVJhncB8aNoGbp54gDP09UOeuKJsxA
+	sf6l5cy/mTwR1/bWZ6I4kDkPJJn3nMOPUGEjux/gUgmQhbzff7d9
+X-Gm-Gg: ASbGncuzMMFUyD/JEklyxsyfRdXIzx/FR47pvUDbfP4xQ/MHzDAuSYjImUCj15Ei5Ry
+	Ocd8kMnjDLvK9SuEcWkd5Q8E0WxPwzi6Tj9lgk7HihNFGzgIE2VNRZqkSJcqJOejfRCZkCrOTFe
+	a3scSChDqjAd+Xt/Eyy1OEiU9bPTwn0R9Pd8j3RCP62dGrzX3NgLeM6Rq/ioTBpZoPtCI6hH+EO
+	kHbPVzWKOdbdgTKsgDhyc4h62k0QBZm2SwKAL+i03Y9VqyNjS8NNYOojfsjUAkJ7lIABEXYCjoP
+	p8gf7qukz+7QWUB0KpUk6hOWMrYf
+X-Google-Smtp-Source: AGHT+IEx6UFb5TO/Fzb1ru+F2aQW/ZeYDNg8x1uGcC9VliQdtdvGz1X7rVtHdcrdZAJRaHIz8/NC7g==
+X-Received: by 2002:a17:907:7e8f:b0:abf:6c88:df53 with SMTP id a640c23a62f3a-ad17ad76092mr586855466b.4.1746538976118;
+        Tue, 06 May 2025 06:42:56 -0700 (PDT)
+Received: from skbuf ([188.25.50.178])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad1895090a1sm710347866b.137.2025.05.06.06.42.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 May 2025 06:42:55 -0700 (PDT)
+Date: Tue, 6 May 2025 16:42:52 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Jonas Gorski <jonas.gorski@gmail.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Kurt Kanzenbach <kurt@linutronix.de>,
+	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 00/11] net: dsa: b53: accumulated fixes
+Message-ID: <20250506134252.y3y2rqjxp44u74m2@skbuf>
+References: <20250429201710.330937-1-jonas.gorski@gmail.com>
+ <52f4039a-0b7e-4486-ad99-0a65fac3ae70@broadcom.com>
+ <CAOiHx=n_f9CXZf_x1Rd36Fm5ELFd03a9vbLe+wUqWajfaSY5jg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOiHx=n_f9CXZf_x1Rd36Fm5ELFd03a9vbLe+wUqWajfaSY5jg@mail.gmail.com>
 
-On Wed, Mar 19 2025 at 10:28, Jiri Slaby wrote:
+/ unrelated to patches /
 
-> Hi,
->
-> tl;dr if patches are agreed upon, I ask subsys maintainers to take the
-> respective ones via their trees (as they are split per subsys), so that
-> the IRQ tree can take only the rest. That would minimize churn/conflicts
-> during merges.
+On Wed, Apr 30, 2025 at 10:43:40AM +0200, Jonas Gorski wrote:
+> > > I have a fix/workaround for that, but as it is a bit more controversial
+> > > and makes use of an unrelated feature, I decided to hold off from that
+> > > and post it later.
+> >
+> > Can you expand on the fix/workaround you have?
+> 
+> It's setting EAP mode to simplified on standalone ports, where it
+> redirects all frames to the CPU port where there is no matching ARL
+> entry for that SA and port. That should work on everything semi recent
+> (including BCM63XX), and should work regardless of VLAN. It might
+> cause more traffic than expected to be sent to the switch, as I'm not
+> sure if multicast filtering would still work (not that I'm sure that
+> it currently works lol).
+> 
+> At first I moved standalone ports to VID 4095 for untagged traffic,
+> but that only fixed the issue for untagged traffic, and you would have
+> had the same issue again when using VLAN uppers. And VLAN uppers have
+> the same issue on vlan aware bridges, so the above would be a more
+> complete workaround.
 
-So. It's rc5 by now and I picked up everything which did not show up in
-next yet. As there are some patches in next, I delayed the removal of
-functions for the merge window so that we don't end up with merge
-dependencies.
+I don't understand the logic, can you explain "you would have had the
+same issue again when using VLAN uppers"? The original issue, as you
+presented it, is with bridges with vlan_filtering=0, and does not exist
+with vlan_filtering=1 bridges. In the problematic mode, VLAN uppers are
+not committed to hardware RX filters. And bridges with mixed
+vlan_filtering values are not permitted by dsa_port_can_apply_vlan_filtering().
+So I don't see how making VID 4095 be the PVID of just standalone ports
+(leaving VLAN-unaware bridge ports with a different VID) would not be
+sufficient for the presented problem.
 
-To reducde conflicts, I grabbed the irq branch from the PCI tree under
-the assumption that this branch is stable.
-
-The series sits now in
-
-   git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git irq/cleanups
-
-and will be in next soon. If there are duplicates showing up in next,
-I'm going to remove them from my branch, so the branch is not for basing
-development on.
-
-@Jiri, I fixed up all your subject prefixes as
-
-  'irqdomain: subsys: Switch to foo()'
-
-does not make any sense at all. These subsystems have their regular
-prefixes and these changes do not justify made up irqdomain special
-prefixes at all.
-
-Thanks,
-
-        tglx
+That being said, trapping to CPU all packets on standalone ports is not
+uncontroversial, as long as it works correctly for the hardware
+controlled by this driver. You seem concerned about losing RX filtering,
+but if you look at dsa_switch_supports_uc_filtering() and
+dsa_switch_supports_mc_filtering() you'll see b53 never had it - it
+depends, among other things, on ds->fdb_isolation == true and
+ds->vlan_filtering_is_global == false. Here you're working on improving
+the fdb_isolation requirements, but there is still no support in the
+core for devices where VLAN filtering is a global setting.
 
