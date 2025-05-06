@@ -1,240 +1,132 @@
-Return-Path: <netdev+bounces-188306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25F91AAC07A
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 11:55:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C977EAAC0ED
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 12:08:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CBBF4E1061
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 09:55:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 09B347BD0C1
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 10:07:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33721272E5C;
-	Tue,  6 May 2025 09:54:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20F5B26AAB2;
+	Tue,  6 May 2025 10:08:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mwiq0lH0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fVCYukBZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64650270EB9
-	for <netdev@vger.kernel.org>; Tue,  6 May 2025 09:54:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AD432701B6
+	for <netdev@vger.kernel.org>; Tue,  6 May 2025 10:08:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746525245; cv=none; b=t1yJT/OP9cJTDTtP0+xef3LnmVhn+wUxcO4gfG/TV3uqSa8wLuRqOOxXqhtLxtXNUIP4Lk0gk4ux2MiYLdMpXxhsggskq+8AF5CJHl2HSmQzL70UujvnXgOgAv5dcZZ1H1QrI05yFUBVZmVdoxVLIvnPe3o4q7tHN68xa8OlSZs=
+	t=1746526088; cv=none; b=EKjmUXqNbkZbSNkpiqeGr9CjGfPvJZJ0oHhBLt3TDd4eljOWr6DFhv7mdwbwklrCjeWtYImlBKVuv8lqdCI7byGuBSGjh2KW6b+RXg1yAHqOJzayIMVRQqJmr4p15SM+/d1YtZVRvZb7voFeTT8S5arHSTEkMr8JvrP+BBKBaRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746525245; c=relaxed/simple;
-	bh=WZ64pm8mCn6WauOvEK5LHUkaP/YAEqtWPN8ZVB3/f58=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BOE/L430c/yrhllRw8yHAvbU9hUjHBCHAN6QWdgaRKsnSAWfAmJMU0zlxl7ob4vhtcSJ4ec1kZoax2ZW4iyjlQtumHIgektqrlQz5QNedGR3gd5nl0ECg1HpbG9MpRnPuEmgFR1qsnxDKO6jOJNokAV3snTKOXF+GDuZg7NEbHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Mwiq0lH0; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1746526088; c=relaxed/simple;
+	bh=Wz6GfcLllA8wXtKZftbfMGr8twZTF0gIGI34vcXnxvA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Uk23mL14mgAtn8ytdDIxjtCazLn9bS1UxPi6fO87tI9+KA/WERkK5kX3QyQmJxEHO8DK98nTEWsEhpjY6FveqEDM8z+zSWi735x6Qjokp/Y83KkDJXBPQunwHLzFvngTL8KASTtAuQk2kQmhGg3WtVcyPAkuZwsrB51O/2+sUvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fVCYukBZ; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746525242;
+	s=mimecast20190719; t=1746526085;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=E6B1xjoScf7bsPJTh7xEGagDYN0nDoGDFYe9DHlpFOg=;
-	b=Mwiq0lH0P4jffVY+V/d3llJPsV8wIedPkaMJTpKOGI2DHmTpHGW/2xMFJKJ7Zm9AMThwSA
-	TEaZEwEsYVes1jkx1BPSbMxfJIlZbJdHEGKqPBSuBO3lErmX+UtpzKlXhaOTmIps7fk08/
-	aW8kENlmHIQVjjL/Qtrn8lBJNYIECdU=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=2KtQkNqGsM537amwwqhIUa++uqwpFX6sC1hurxsMCHI=;
+	b=fVCYukBZAHcpNHxC5l7aWX7MxV7r3Xaqfu8pedC+lsO3H0/OpjrnAl5l8/gjAw8U2qLuI9
+	ePCuOYmoJ5+qi/qWOtI+FzqEraPlzMHJCxxzZV8z0FBZDCPNv9z+r+xPAloQQVyRzT8fWU
+	GMFahnY1ok+YbT7zeWqEHFMRRtnEzXg=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-686-QxZOk4NfPY6lpf9eZiKdyg-1; Tue, 06 May 2025 05:54:01 -0400
-X-MC-Unique: QxZOk4NfPY6lpf9eZiKdyg-1
-X-Mimecast-MFC-AGG-ID: QxZOk4NfPY6lpf9eZiKdyg_1746525240
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-ac6caf952d7so578316366b.3
-        for <netdev@vger.kernel.org>; Tue, 06 May 2025 02:54:00 -0700 (PDT)
+ us-mta-347-fscVzhC2MwaZWNm_Q-BVlg-1; Tue, 06 May 2025 06:08:04 -0400
+X-MC-Unique: fscVzhC2MwaZWNm_Q-BVlg-1
+X-Mimecast-MFC-AGG-ID: fscVzhC2MwaZWNm_Q-BVlg_1746526083
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43cf172ff63so26288725e9.3
+        for <netdev@vger.kernel.org>; Tue, 06 May 2025 03:08:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746525240; x=1747130040;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E6B1xjoScf7bsPJTh7xEGagDYN0nDoGDFYe9DHlpFOg=;
-        b=qnkuv0nlcHrEowKkOPlGCaGCDGoKN4HjUr34Gb1u6L7870wboWAD4orwlEy8JwH2Tw
-         6X/oXF3jRYhv00zy34YBBZcI0cAtLfliYnkr/KnYtwjPXifJcDLggfEyZm2cPbwv6UkE
-         S8ru0L8aC5WLH5QwQxq9ZiGtCUDbsGv00Hyu81gPJnSiVkR07gKPyOzhs+nqZjFIOBW/
-         zNfgxT2Tomz+zBxoRVOATvmJI5KwdGCMQxybRts9EyuzD4jxlIof6NODfbPlI7T3Nw0M
-         5+Cz134mM43V9I7+9nuZrnnR4U7BjNoe8kTTGtvkSHf5cjx5ySDMr1CTwcH1mWHTmM/l
-         xuYg==
-X-Forwarded-Encrypted: i=1; AJvYcCVOORzQtA8UhO3Z5r5Ue9qA/AkCDjdS2oSqnAhiW/6koP9qu+TeySB6xKfNvmHQgZQTkXnGRiE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1n3/EcqyOoz73N9FDfB9Bztz4k75MluWc3XzwSv/+Fu7N3iyp
-	zkQKmbDZZLYex85PsGoWTQUmsr+CjAYM4WwPqo5Ix7MJ4GEGEaKJmPD7QhELqTJe0b3ZnnEBVYD
-	hzQpEkR640nG4vGrluqeDK5JCR18PBaydqP47BtscwHsnBmtVvRyMjQ==
-X-Gm-Gg: ASbGncs5nrFhcqRCzlgL6ZgmWfPwZ92UeVpcAmbAPvvlv0oiOQvIk2NwLtSkQFzMaXq
-	42s/fouKIgKiwbl/Kl2NG8BZFgls08eU76+JSUxq54Qt7+w6fKVUMgJpnDEEGiVs5jzKCLWk5rt
-	sQo67p0B+HOU3TB1G3vZoQvA5O8tJETHud30VfUsEic8s6GXdYMI1Ep7Rf1wHeE9oWmqn6NBzwY
-	4y/t//UQyrleQUKbL03vy04ygb2EejhVGQD+kQ3y8C6sjiK5iq+RVsFmV5A7uq6gO2TmN9VEt8z
-	DfVot36RzB7Zns/pUw==
-X-Received: by 2002:a17:907:8d87:b0:aca:de15:f2ad with SMTP id a640c23a62f3a-ad1d46ddad0mr219300066b.60.1746525239843;
-        Tue, 06 May 2025 02:53:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE/1oV0zciKaW3O1wacg9c1zps+3AHOJS/RUO5rgbV5p2b2yw5R1zfs8RHPWnIxlOh3Hh5OJQ==
-X-Received: by 2002:a17:907:8d87:b0:aca:de15:f2ad with SMTP id a640c23a62f3a-ad1d46ddad0mr219295266b.60.1746525239247;
-        Tue, 06 May 2025 02:53:59 -0700 (PDT)
-Received: from sgarzare-redhat ([193.207.219.197])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5fa77b8fe52sm7425752a12.55.2025.05.06.02.53.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 May 2025 02:53:58 -0700 (PDT)
-Date: Tue, 6 May 2025 11:53:51 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH net-next v4 2/3] vsock: Move lingering logic to af_vsock
- core
-Message-ID: <hcme242wm3h33zvbo6g6xinhbsjkeaawhsjjutxrhkjoh6xhin@gm5yvzv4ao7k>
-References: <20250501-vsock-linger-v4-0-beabbd8a0847@rbox.co>
- <20250501-vsock-linger-v4-2-beabbd8a0847@rbox.co>
+        d=1e100.net; s=20230601; t=1746526083; x=1747130883;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2KtQkNqGsM537amwwqhIUa++uqwpFX6sC1hurxsMCHI=;
+        b=jQy91HjndQiX6sLDP8gxu4xI8orjpcoeMjRZxcaaVc7feGdVIFiBCln/8X8XvXs6bm
+         WcNLx3yneBaLCkFzgppTIOvkRqNUNvLKbpZ34ZJMkZYRq8B1aNIRPX3KS/+TVPRuSBqd
+         xyKAZvNaeClRq7VJxHyBkhN9b+/CN86MKtwf+yJ0kcyjY9BDf7mgBmZjzLAlv+rBLS1e
+         pG4BDTcJaGeh3EMmKmWjT/OD78fFv9cO3+OCsog9XUX/aipUevZz3Y1hwPFwHUSfWcDy
+         eko/dElGv62H7Lej97myjQnYXDoQJ4F9wkMLNGA21Eg5c9F53wGsjoNKvKy4FNlyNjzu
+         lFQA==
+X-Forwarded-Encrypted: i=1; AJvYcCViGsoS3s9s3hsAv7YZlXulLtN63UXY0Upceasaf/LYkfKCTNVHrmwPl8KT5OGD0Amu+zSZVlU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6M2D1nYzvbA8BIGG7nIzhkKf/PfUR7B0p+6MBzZb6Oi1zyNWK
+	5ZjTTlVqiVPdg1+g4jwQbjUBF5DjirxUreEDYLcwYCX+b/O/iCRlPDIiVn2XaWQnaeFVhXwfKBf
+	UkhIqo8HRHhKqZVWtDrHgGjahq+fh0XwcRImjU/Ch+4cZZHi3S2TurA==
+X-Gm-Gg: ASbGncsZlH3E9glt+1Uas1IjcZqQO3d1Es3yTFoWSNsx7/vLVNE4GuYPIhvekvGOXs8
+	FYs7B6CNVbwHjt34+kJyxQqrlxPOGjMdbokmlHMyWSC2KpGgRqV8HQHuybvTrjRFSaNACLy6Xe7
+	ACY2Lmh/SmP0gIyDJco9vO9nW7NKU1nPpai8OhIWscXebSyP4dsFCFpPiw6qiL3bPROF3lYhv8j
+	sp3BwFImTaWo5Ord+8rLOuCxg7A/IxyQtp4JASSWPTo3GyQT7M8qxce7LkXPZKdRpXfiV6oRcv6
+	mVrHXkeBEFdyrr5ZvSFq4LUloYgB00pCiE5UpWNxZP6RFs8hjYUdXGv78LI=
+X-Received: by 2002:a05:600c:5304:b0:43c:fe15:41e1 with SMTP id 5b1f17b1804b1-441bbea0afbmr153287055e9.4.1746526082870;
+        Tue, 06 May 2025 03:08:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFhc03MBzoZWgjKorEMXR128n+knjgaDZEvqQTT3kpgSCz4Z047896lj5XIARk7un2ADQgeHA==
+X-Received: by 2002:a05:600c:5304:b0:43c:fe15:41e1 with SMTP id 5b1f17b1804b1-441bbea0afbmr153286675e9.4.1746526082521;
+        Tue, 06 May 2025 03:08:02 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2706:e010:b099:aac6:4e70:6198? ([2a0d:3344:2706:e010:b099:aac6:4e70:6198])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-441b2aecb60sm207881215e9.11.2025.05.06.03.07.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 May 2025 03:08:01 -0700 (PDT)
+Message-ID: <19f4f38b-9962-41d6-97b7-e254db3c6dee@redhat.com>
+Date: Tue, 6 May 2025 12:07:58 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250501-vsock-linger-v4-2-beabbd8a0847@rbox.co>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 03/11] net: ti: prueth: Adds PRUETH HW and SW
+ configuration
+To: Parvathi Pudi <parvathi@couthit.com>, danishanwar@ti.com,
+ rogerq@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, nm@ti.com, ssantosh@kernel.org, tony@atomide.com,
+ richardcochran@gmail.com, glaroque@baylibre.com, schnelle@linux.ibm.com,
+ m-karicheri2@ti.com, s.hauer@pengutronix.de, rdunlap@infradead.org,
+ diogo.ivo@siemens.com, basharath@couthit.com, horms@kernel.org,
+ jacob.e.keller@intel.com, m-malladi@ti.com, javier.carrasco.cruz@gmail.com,
+ afd@ti.com, s-anna@ti.com
+Cc: linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, pratheesh@ti.com,
+ prajith@ti.com, vigneshr@ti.com, praneeth@ti.com, srk@ti.com, rogerq@ti.com,
+ krishna@couthit.com, pmohan@couthit.com, mohan@couthit.com
+References: <20250503121107.1973888-1-parvathi@couthit.com>
+ <20250503121107.1973888-4-parvathi@couthit.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250503121107.1973888-4-parvathi@couthit.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 01, 2025 at 10:05:23AM +0200, Michal Luczaj wrote:
->Lingering should be transport-independent in the long run. In preparation
->for supporting other transports, as well the linger on shutdown(), move
->code to core.
->
->Generalize by querying vsock_transport::unsent_bytes(), guard against the
->callback being unimplemented. Do not pass sk_lingertime explicitly. Pull
->SOCK_LINGER check into vsock_linger().
->
->Flatten the function. Remove the nested block by inverting the condition:
->return early on !timeout.
->
->Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
->Signed-off-by: Michal Luczaj <mhal@rbox.co>
->---
-> include/net/af_vsock.h                  |  1 +
-> net/vmw_vsock/af_vsock.c                | 30 ++++++++++++++++++++++++++++++
-> net/vmw_vsock/virtio_transport_common.c | 23 ++---------------------
-> 3 files changed, 33 insertions(+), 21 deletions(-)
->
->diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
->index 9e85424c834353d016a527070dd62e15ff3bfce1..d56e6e135158939087d060dfcf65d3fdaea53bf3 100644
->--- a/include/net/af_vsock.h
->+++ b/include/net/af_vsock.h
->@@ -221,6 +221,7 @@ void vsock_for_each_connected_socket(struct vsock_transport *transport,
-> 				     void (*fn)(struct sock *sk));
-> int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock 
-> *psk);
-> bool vsock_find_cid(unsigned int cid);
->+void vsock_linger(struct sock *sk);
->
-> /**** TAP ****/
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index fc6afbc8d6806a4d98c66abc3af4bd139c583b08..a31ad6b141cd38d1806df4b5d417924bb8607e32 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -1013,6 +1013,36 @@ static int vsock_getname(struct socket *sock,
-> 	return err;
-> }
->
->+void vsock_linger(struct sock *sk)
->+{
->+	DEFINE_WAIT_FUNC(wait, woken_wake_function);
->+	ssize_t (*unsent)(struct vsock_sock *vsk);
->+	struct vsock_sock *vsk = vsock_sk(sk);
->+	long timeout;
->+
->+	if (!sock_flag(sk, SOCK_LINGER))
->+		return;
->+
->+	timeout = sk->sk_lingertime;
->+	if (!timeout)
->+		return;
->+
->+	/* unsent_bytes() may be unimplemented. */
+On 5/3/25 2:10 PM, Parvathi Pudi wrote:
+> +static int icssm_prueth_emac_config(struct prueth_emac *emac)
+> +{
+> +	struct prueth *prueth = emac->prueth;
+> +
+> +	/* PRU needs local shared RAM address for C28 */
+> +	u32 sharedramaddr = ICSS_LOCAL_SHARED_RAM;
+> +
+> +	/* PRU needs real global OCMC address for C30*/
+> +	u32 ocmcaddr = (u32)prueth->mem[PRUETH_MEM_OCMC].pa;
+> +	void __iomem *dram_base;
+> +	void __iomem *mac_addr;
+> +	void __iomem *dram;
 
-This comment IMO should be enriched, as it is now it doesn't add much to 
-the code. I'm thinking on something like this:
-     Transports must implement `unsent_bytes` if they want to support
-     SOCK_LINGER through `vsock_linger()` since we use it to check when
-     the socket can be closed.
+Minor nit: please respect the reverse christmas tree order above.
 
-The rest LGTM!
-
-Thanks,
-Stefano
-
->+	unsent = vsk->transport->unsent_bytes;
->+	if (!unsent)
->+		return;
->+
->+	add_wait_queue(sk_sleep(sk), &wait);
->+
->+	do {
->+		if (sk_wait_event(sk, &timeout, unsent(vsk) == 0, &wait))
->+			break;
->+	} while (!signal_pending(current) && timeout);
->+
->+	remove_wait_queue(sk_sleep(sk), &wait);
->+}
->+EXPORT_SYMBOL_GPL(vsock_linger);
->+
-> static int vsock_shutdown(struct socket *sock, int mode)
-> {
-> 	int err;
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index 
->045ac53f69735e1979162aea8c9ab5961407640c..aa308f285bf1bcf4c689407033de854c6f85a639 
->100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -1192,25 +1192,6 @@ static void virtio_transport_remove_sock(struct vsock_sock *vsk)
-> 	vsock_remove_sock(vsk);
-> }
->
->-static void virtio_transport_wait_close(struct sock *sk, long timeout)
->-{
->-	if (timeout) {
->-		DEFINE_WAIT_FUNC(wait, woken_wake_function);
->-		struct vsock_sock *vsk = vsock_sk(sk);
->-
->-		add_wait_queue(sk_sleep(sk), &wait);
->-
->-		do {
->-			if (sk_wait_event(sk, &timeout,
->-					  virtio_transport_unsent_bytes(vsk) == 0,
->-					  &wait))
->-				break;
->-		} while (!signal_pending(current) && timeout);
->-
->-		remove_wait_queue(sk_sleep(sk), &wait);
->-	}
->-}
->-
-> static void virtio_transport_cancel_close_work(struct vsock_sock *vsk,
-> 					       bool cancel_timeout)
-> {
->@@ -1280,8 +1261,8 @@ static bool virtio_transport_close(struct vsock_sock *vsk)
-> 	if ((sk->sk_shutdown & SHUTDOWN_MASK) != SHUTDOWN_MASK)
-> 		(void)virtio_transport_shutdown(vsk, SHUTDOWN_MASK);
->
->-	if (sock_flag(sk, SOCK_LINGER) && !(current->flags & PF_EXITING))
->-		virtio_transport_wait_close(sk, sk->sk_lingertime);
->+	if (!(current->flags & PF_EXITING))
->+		vsock_linger(sk);
->
-> 	if (sock_flag(sk, SOCK_DONE)) {
-> 		return true;
->
->-- 
->2.49.0
->
+/P
 
 
