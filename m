@@ -1,126 +1,136 @@
-Return-Path: <netdev+bounces-188375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA92DAAC8B9
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 16:52:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82C9BAAC8C9
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 16:54:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF5564A883E
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 14:52:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A47401885CA5
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 14:54:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02715283FE8;
-	Tue,  6 May 2025 14:52:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85252283155;
+	Tue,  6 May 2025 14:54:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q9BTVn+Y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AU+8C+x/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FAC8283FD7
-	for <netdev@vger.kernel.org>; Tue,  6 May 2025 14:52:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3AAE28315A;
+	Tue,  6 May 2025 14:54:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746543126; cv=none; b=RPZ24cV3B3FqXAxJ62bnR9ugmgzeqAMmLuZ+p/mjvCqBUy5MU878HAmZrMWnFhQOneQI+8uSZuNL0fwgqZPP1ulHnxAFQFCuzpg7QHSW3tOK/uF3frNMGw2V02IuLVQuaulACwMCupwfct/2zSoAVXeBQmsImoaPY5NQgdJdZ4M=
+	t=1746543280; cv=none; b=Dbz54uBJc+kY0b3inttMgcF6vQ8kPY74tFE6cWDfNPX5f85DgPbXx+pEeY0GmMVNk97QrcYWDvhKvrwVcanK29/tPCBY0nOTPWmEYprWsQ7uCVsrWSuE7GqfD2VoiryNqLWUrR16tfsfMe5vWZPbFGmThgVtN4KK84CtUVhAFKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746543126; c=relaxed/simple;
-	bh=x9hPRiKZTwD/NdReE9abUiOntHFDdU4cLMKbdDazvmk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NjM566QRdqoQzXGFwhYqWgSFiTcDwSU2n7cX1vl/XaiZtL6JhLLz25e41wIl0mpfacS4oTQsLdgW6bQ9ah3VsyAYs4NX/viUnrFAV01q8ggaTVA8TWBFVBO0V4ZHYY0FPneju4YK6ieOtoYU5Sy2hpebr886/gyL9S/BJ0AIoIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q9BTVn+Y; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5fab85c582fso12031a12.0
-        for <netdev@vger.kernel.org>; Tue, 06 May 2025 07:52:04 -0700 (PDT)
+	s=arc-20240116; t=1746543280; c=relaxed/simple;
+	bh=K9ogP1tmJjZSOXVBIvvRG3xIb2/GeSv/sKRRz8UlgZI=;
+	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=IiaQmh5Ezdo+Cf04C+PqTXd9NSS/Z3ydnETck+2X9Zoddo7z4Ojp9K7btMzGp6AUuttW7YPLu+q5aEEfWnGbmE3U/1ZytQRwY2xwNGG15gvdA7kVkZra4XUQIRmaG3TLlILJzhfuYA3OFQsuccMdye+AHo4FMjLID9P4QF7USZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AU+8C+x/; arc=none smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-7c5e2fe5f17so638154385a.3;
+        Tue, 06 May 2025 07:54:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746543123; x=1747147923; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1746543278; x=1747148078; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=x9hPRiKZTwD/NdReE9abUiOntHFDdU4cLMKbdDazvmk=;
-        b=Q9BTVn+YlmEf5cCv62m8neZmOklT7cqsnk1gcTsFsX5mOYjTyINhcLuEwEdgk5LDcn
-         FwUVIc844rVCfyWGEpdtX+7nKuydsV6tKUE8xOOEqe0wnxTayjda48FcnfPh7x0O/Py4
-         suu8ZRF3j6A6SZXCZb6vpKM3mCIKeXyXF7+HZZ2m1w7iaTKx1vW6rxbaUeLOYjUSpnV/
-         IHEstSBJiRgwAAptTQVYWsQVGwq1IAxKZGjb50OcV7uPZdBeYhmbC7FHUe25DiAFPO8o
-         R1zsYUQ4EFP0kgQPK/C+FkDFFfjfbxDZM1Af2XCLWzepAcZ9uX3c6jTZS/I1/Am8U7Kf
-         98mA==
+        bh=jXdU4F4hQFYW1syDEWo1uY3Vr2xLb+00dl00kT5tMQc=;
+        b=AU+8C+x/OMI8t+j7wz4Ugk+i2QVnNNorJHbgVL7IlmmaXd+qG9YDAzcnTrjU19WX/i
+         vo3LdoFceMZ/RiGfTYVfFVU733lBqNlnAQERh0o3k2IdtL4EPuI1aoGSziYDS8awYWMY
+         7ylplU7pl1+BxMahAO19yn/E5TMykj7SIsSxxKWm9+wj1v92VXtu8f7UW8KzYjw8KaIO
+         +UwnYa6X8ZNhoeOQiWky42+nBz5HnSrdbaCBHCTMbpnr7BjmU0aqPgAiMQrLtm60Cioe
+         g5XZxV/IdArXqgU9+rOzA4QuVDel0ZxhvcO8UH3xdraHVLKzIxaS94s4GwOwC6EB4dlO
+         mHzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746543123; x=1747147923;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1746543278; x=1747148078;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=x9hPRiKZTwD/NdReE9abUiOntHFDdU4cLMKbdDazvmk=;
-        b=MyMhYl88aOVCxQguQpYk9qlohLySemKQlPmLDa4k6Uy+G1XyEx8fEzdUZ9erq9HR5O
-         8MpYwx09y4LWvfy5NlA5dK+lYf+Rof8yoXkOpPm/57ayFi7LdQhwZG6GXmVR4HUMk7Tr
-         /NIE1mu6vp2cw5k1vpp7yoAqWurG+vUQoR4x4iQcXe3oWXni2BW6SUY/LnL6PRcmxp9/
-         FwM+AXKL2NS46J8tX7nvX2ZUugId95xHudmM+4LwtnQiqfOlwQWl7ovczifspO2Lf+SN
-         TuPU90SeRstoUJSp/SWdj0iQJk9p/8my1ikgeQPuAhaxbS391AT1j7y8ey7i8Grxcjhl
-         RX2w==
-X-Forwarded-Encrypted: i=1; AJvYcCUoKr+FED2azVodOJMP94kR75nLVY8/hTeuGxxEy0UDOvFQ9nrq1Jq0mC4C7/JvHcYTdrq7Uac=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwAqwkwLDZSLCCr84QXKCq+izUrBQzgZRmn8DjKDpb06CMCeEhI
-	PKM+e4Nx8YG+YzaOpwtT7cjA+7aI164JJ6t0tV9iNj7YpWQfM3G29b8uoeOt13PySuFUN4yd0AF
-	pJq9mfeMXDSWlg+kWcwfVpA9UqaEfTInkAJ6/
-X-Gm-Gg: ASbGnctGbZpB1XgiQSkEH9ZnS1UDlo/LjYchFYUdWgPV88oNiAMRMXiNF0m6OIHXoNy
-	su4a1+4Akec0nuiZaOhqqfBUKbld5BLoOrrc38v9kFpIAJwnrvWskbboep5mTfTVsGL3TEGj77Q
-	hMeJY64ptADGh1hVpZ0Q2ojzX0M9DQQwJeg9vH4cFDGvDjDTryaQ==
-X-Google-Smtp-Source: AGHT+IHLzZqsyxKnFOlVbanhCF6K+dSqiXmiGykJHfhgZkYJbBPhDSJj+AaO+At+BG53ifRemilin7/tcbsNCn+/UW8=
-X-Received: by 2002:a05:6402:34b:b0:5f8:7b57:e5c2 with SMTP id
- 4fb4d7f45d1cf-5fbe76e3f1amr2232a12.4.1746543123157; Tue, 06 May 2025 07:52:03
- -0700 (PDT)
+        bh=jXdU4F4hQFYW1syDEWo1uY3Vr2xLb+00dl00kT5tMQc=;
+        b=jPlRKW4EZIflutCjQG2Q4lWyovLdra8odlJC29S9vaavAvrhZCVuicTJv8taHGANTq
+         KYX+OTvwoPuxgA2VflVAIUXVhU2ZN/fuauxi140PM28x9D1YE/7MHUNOvcDXPV6Xcm+1
+         wL66/lPRNuoXawPbCGWhc9czrdw5OKZ1+roJtgz2vQEW2ZL7qq45yGINJ6GwmAeEBWQ5
+         b6stC6cO1G++8lStUd6hipQg3+MkVUkkv92o68TwPjc+Hv2eMKBraiM3r/EdJ6EHVyM4
+         /KqAhSSDh+R3qXQSnfwkWx9VkiqRI5kFr4Ar/10jKNuqx0FuzAvAgdSn6PKYovyVgvHf
+         ggqw==
+X-Forwarded-Encrypted: i=1; AJvYcCVzfrl3LrQqCY8uDj8HOeKzzZ3t7CAWrRdld/7wW6po59NakbsTomoG9XhDjrVtJQkJyrY=@vger.kernel.org, AJvYcCWloSbvYd3i0uo9HcZCiz7nWO4lxK49/PSg5VwCG5kSOnDFJx5QjJ4HfHws/86Gjm0IHAjZhdB4@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/5niK10A24+WtLN3BwXe95ZL21xBhIy68yy6PW4o6p3qeNalv
+	AVKl6wa48YACSJLA5uEJxpQc6fWx007QcdchiIbl0eiJwDzZHAn9
+X-Gm-Gg: ASbGnctnEKVy+fja+4vjXJz73502yJ6kgzz85ihjhj8SbIOvyJS/mqYTFfG08OHji8I
+	J5w+Ajh0DOFIXN35mEhTeLAsJv75p+AiaXa0SvEvDEbUJ07wy0dn5GFlGl+GI8nV99um3WBm2Jr
+	psUB/eSjTsE73nyHzqzKHf2e1ZE/hE4a+oDvVp+uIZdkwnYTCzcOLSPzIspKocGunKPRI+SWpZl
+	4zWc7gu/d/WV/ad/9ZPiOtFJCyXPK2muN3XV7BxEc69wHAODePUYct9jWXqqviiM6Wow5BbBv6M
+	8ZoqAr2mikfcBLGHbTdRcFBPqci1FP21PpzLulef3D+6lFx/27gcaglDER4jCywH6qYZqyjZwI/
+	PysXowlLgn6FiXv5DtcaL
+X-Google-Smtp-Source: AGHT+IFsgzLQ70WIuR2BZG4l8TtuRZ6R4lbanDP1rOl2rp3pL5f4+VL3jZRyUkMmquyu4BtqTzuX5w==
+X-Received: by 2002:a05:620a:4690:b0:7ca:efd9:7d49 with SMTP id af79cd13be357-7caf1117cd2mr444331685a.13.1746543277675;
+        Tue, 06 May 2025 07:54:37 -0700 (PDT)
+Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7cad242a486sm720632985a.67.2025.05.06.07.54.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 May 2025 07:54:36 -0700 (PDT)
+Date: Tue, 06 May 2025 10:54:36 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jon Kohler <jon@nutanix.com>, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ davem@davemloft.net, 
+ kuba@kernel.org, 
+ hawk@kernel.org, 
+ john.fastabend@gmail.com, 
+ netdev@vger.kernel.org, 
+ bpf@vger.kernel.org, 
+ jon@nutanix.com, 
+ aleksander.lobakin@intel.com
+Message-ID: <681a22ac9964d_15abb629445@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250506145530.2877229-1-jon@nutanix.com>
+References: <20250506145530.2877229-1-jon@nutanix.com>
+Subject: Re: [PATCH net-next 0/4] tun: optimize SKB allocation with NAPI cache
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250505193828.21759-1-kuniyu@amazon.com> <20250505194451.22723-1-kuniyu@amazon.com>
- <CAG48ez2YRJxDmAZEOSWVvCyz0fkHN2NaC=_mLzcLibVKVOWqHw@mail.gmail.com> <20250506-zertifikat-teint-d866c715291a@brauner>
-In-Reply-To: <20250506-zertifikat-teint-d866c715291a@brauner>
-From: Jann Horn <jannh@google.com>
-Date: Tue, 6 May 2025 16:51:25 +0200
-X-Gm-Features: ATxdqUHI--OKwW_7qiujfbC9sS_wAultDtuvkQ3Tg-rFn9ttA_E9C5i8WH_N6MI
-Message-ID: <CAG48ez25gm3kgrS_q3jPiN0k6+-AMbNG4p9MPAD4E1WByc=VBA@mail.gmail.com>
-Subject: Re: [PATCH RFC v3 08/10] net, pidfs, coredump: only allow coredumping
- tasks to connect to coredump socket
-To: Christian Brauner <brauner@kernel.org>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, alexander@mihalicyn.com, bluca@debian.org, 
-	daan.j.demeyer@gmail.com, davem@davemloft.net, david@readahead.eu, 
-	edumazet@google.com, horms@kernel.org, jack@suse.cz, kuba@kernel.org, 
-	lennart@poettering.net, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, me@yhndnzj.com, netdev@vger.kernel.org, 
-	oleg@redhat.com, pabeni@redhat.com, viro@zeniv.linux.org.uk, 
-	zbyszek@in.waw.pl
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, May 6, 2025 at 9:39=E2=80=AFAM Christian Brauner <brauner@kernel.or=
-g> wrote:
-> > ("a kernel socket" is not necessarily the same as "a kernel socket
-> > intended for core dumping")
->
-> Indeed. The usermodehelper is a kernel protocol. Here it's the task with
-> its own credentials that's connecting to a userspace socket. Which makes
-> this very elegant because it's just userspace IPC. No one is running
-> around with kernel credentials anywhere.
+Jon Kohler wrote:
+> Use the per-CPU NAPI cache for SKB allocation, leveraging bulk
+> allocation since the batch size is known at submission time. This
+> improves efficiency by reducing allocation overhead, particularly when
+> using IFF_NAPI and GRO, which can replenish the cache in a tight loop.
 
-To be clear: I think your current patch is using special kernel
-privileges in one regard, because kernel_connect() bypasses the
-security_socket_connect() security hook. I think it is a good thing
-that it bypasses security hooks in this way; I think we wouldn't want
-LSMs to get in the way of this special connect(), since the task in
-whose context the connect() call happens is not in control of this
-connection; the system administrator is the one who decided that this
-connect() should happen on core dumps. It is kind of inconsistent
-though that that separate security_unix_stream_connect() LSM hook will
-still be invoked in this case, and we might have to watch out to make
-sure that LSMs won't end up blocking such connections... which I think
-is related to what Mickael was saying on the other thread. Landlock
-currently doesn't filter abstract connections at that hook, so for now
-this would only be relevant for SELinux and Smack. I guess those are
-maybe less problematic in this regard because they work on full-system
-policies rather than app-specific policies; but still, with the
-current implementation, SELinux/Smack policies would need to be
-designed to allow processes to connect to the core dumping socket to
-make core dumping work.
+Do you have experimental data?
+ 
+> Additionally, utilize napi_build_skb and napi_consume_skb to further
+> benefit from the NAPI cache.
+> 
+> Note: This series does not address the large payload path in
+> tun_alloc_skb, which spans sock.c and skbuff.c. A separate series will
+> handle privatizing the allocation code in tun and integrating the NAPI
+> cache for that path.
+> 
+> Thanks all,
+> Jon
+> 
+> Jon Kohler (4):
+>   tun: rcu_deference xdp_prog only once per batch
+>   tun: optimize skb allocation in tun_xdp_one
+>   tun: use napi_build_skb in __tun_build_skb
+>   tun: use napi_consume_skb in tun_do_read
+> 
+>  drivers/net/tun.c | 60 +++++++++++++++++++++++++++++++++--------------
+>  1 file changed, 42 insertions(+), 18 deletions(-)
+> 
+> -- 
+> 2.43.0
+> 
+
+
 
