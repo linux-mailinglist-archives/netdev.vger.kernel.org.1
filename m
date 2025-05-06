@@ -1,148 +1,152 @@
-Return-Path: <netdev+bounces-188488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD2EDAAD0FF
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 00:30:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C6F2AAD110
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 00:40:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E8DD16CFA3
-	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 22:30:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC2081C018EE
+	for <lists+netdev@lfdr.de>; Tue,  6 May 2025 22:40:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89696217737;
-	Tue,  6 May 2025 22:30:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06B0821B1B9;
+	Tue,  6 May 2025 22:39:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jelULrxF"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dBxvYUbG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E443A4B1E7D;
-	Tue,  6 May 2025 22:30:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 997A85680
+	for <netdev@vger.kernel.org>; Tue,  6 May 2025 22:39:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746570655; cv=none; b=leWWxq7v3FoKUOIg94O1y0wFi7ZUEjgoVDVgzgIlBd3aBcCn3/U0k1A+390mVuKRmReIZB7e324XAmVFVElLq6eL3j4sv/DysjwSk7DSdmL6UDna+vYRa3MDaTlEQOZHWsSE0VK9ijH307pPZ3LavaqU3U9gAs2/zjcdjF+9hos=
+	t=1746571196; cv=none; b=X1bbIsxBZr4TRuCCmbCCynczQPLHSL8/5nWMerQ3fFWWgxzuIg9PHyfjJOOI2fJmId/HvZwmmUzegQO45t+QZglmOLaRg05PWPNHKQo2Umx5MxnCC7DTEtAtt2UazvIOhCGgmEyIZY8V0n3E3Y5Q6m6ni1LlCt+negp++niGvos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746570655; c=relaxed/simple;
-	bh=M6LPnQq+WZYUyd/hIR9a4L+W+SEAzNA+KptcRWHRs2w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kRvebPRNrX5eK8zruHm+oyvJIrWgSo2LrmkDiZuFjS4wC73R4ipT31gBnNDp2wBqip1jNECYGmyNUVcmHveROKM+G79c/gOTJIo3DmMLoVrkNVMZzNwTi4kn9pWAsy7HEzBRdShbdteelYt2NBI9CtxCot+yoJXRtRDF9JPVGlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jelULrxF; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-736b350a22cso5192137b3a.1;
-        Tue, 06 May 2025 15:30:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746570652; x=1747175452; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RGwmKF5kjz2CGDdNgVyzlfucliVOYpgZZQ98I4N81Zs=;
-        b=jelULrxFiOwsgHIvuMbYc4HwMJMbjQVbDkURwqCYfSL6lsgEb7B8JXxZzT+SDgIskM
-         POzmUR+WyFC88WBQ9M3xK1+Rn2eq9LbPKtbVnTozk2Dbtr/8HHEf6UZjhAeyaT9n76XM
-         Hsp0S6sgEZjFTf/jUSEfTX9Ni95WTEPEfb/gFzk0d//ezJJrpQvUzz99I57CUSHaU85o
-         V/Z7fz3C7TToX0pMiT2vNS46XKOzktj+BVrgxgMeG6k0Yzds2njCX+ZxnWlxPrBYd1bV
-         QDKL714X8sp89ec3sQ4bPAqpeZ7mubYNwKHlrVHtpsuMtemC/friNXLJw/dUxMK1kfbg
-         3QrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746570652; x=1747175452;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RGwmKF5kjz2CGDdNgVyzlfucliVOYpgZZQ98I4N81Zs=;
-        b=uqwB0jACQatIoj1V7O4UtytMQ9tk4K5m/I2bmmoKZWgAomwfc8mZcFDp9pZ5Pia+GU
-         5LXt5w2xnCLAF2ZrzBWP/K/j5d24hCk9ZHWQ/i/MP9XgglhSJ5rlbN+kLguaGRNrmrgo
-         JJP5jos/hljkRayaxRgQ5X4n47ylKU4Qqt7kb5nvmCqHrYpdhzjxhuUfUpS2RM23OZfD
-         xHc2DbVeTUwyXIT2YrjzDYWPV3M5drTdweIgFIteS2dQEwLyPbQWdPpm6QqCgerxyvzx
-         p1v+R004+7sjO4jNDRDWxJ5ovVBYxSHmtlf8ScRCI+yqhQPLC/kDUuJ0Cd87L/Ls0MCr
-         uZew==
-X-Forwarded-Encrypted: i=1; AJvYcCUIwLYuhm7wCSjuIlnmNUCARWvpL7RUlWn/x2xSCLA2Nmg2xBpINI/jhu8Fm+oFLPApBgn8jZDUKpLh2+SkOzBoPaFT@vger.kernel.org, AJvYcCVlwXGeWtCB6pDuvSGGFvXdt1smin3GcvctCc4ulFJP7iL8RXetsRHf6wojawQ0t3lTZ2VXuwGYKcmZu3rn@vger.kernel.org, AJvYcCW7Zy22mL/d3BhEoPAKq8QgBkt6HuzhD2zqnEACgX/lCYVYpmmgprMWkz/X+2+T6zgWyMQ3Tf/i@vger.kernel.org, AJvYcCXUoz0Q4JbMrOJHTRFY5THFhKw4KA9IcZ7J1LebRI76WaRFXJlYlk43Mn59AOPrZ738slY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx9ihxq7NkGNWufX6OxEM+oIvZjjz9jjd9G1/q/MrdN+QBVLUv5
-	a6OIy3F18K9UYf+eGbYWBe4KqBllgJmTxjcGtJxl27Z5KwY/Y96fHEgNfOICtvyFowgLex7LVJ9
-	PQncs78MfzRKSD1T+D4JEO4JGP8U=
-X-Gm-Gg: ASbGncsIzE4Elqr3GUKXtt0BRVX+YRwQnkrk0UyktH2aAVR52s/7OEo3DlsLIoNwTuC
-	iOHp32fgi6cpfHPOTbIAb/uZ0O+n2MUSYaM5YNmFdlyTVOQUG1pauHNvAToAdC3FINL8nxCpZuW
-	8lVvyf0mbGxAqq7E8ECVD/z35AU6OkqUChUJ8PBQ==
-X-Google-Smtp-Source: AGHT+IFRT4bPAgK8JDFFq+i2BzaYK8yMh7nBwFrls+mABRH23bU5PRPSRFhkLVlyskG4/ta/vyXqg25SsaMHZwnf+KI=
-X-Received: by 2002:a05:6a20:6f87:b0:203:c461:dd36 with SMTP id
- adf61e73a8af0-2148b113868mr1327166637.6.1746570652156; Tue, 06 May 2025
- 15:30:52 -0700 (PDT)
+	s=arc-20240116; t=1746571196; c=relaxed/simple;
+	bh=9GzFnldB/RPzmJjAClHv/ObE6Ew9kZSOMYJFBVJl3eg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qDIzc8vwWBtq1hiH0wTuRlt+txMC/IOvFvVuJa/m5csfZPddayH73TyQx1XRUCf8k7LUZ831iJpUKc0cXOtSsbf0wY7OFPAku6rjqmTDaFclpVxWymOcTsJw8btQPosm9VtBhoEDYYUUQHQlE0y9ineOYmBrcjvKnY6xzl+6Evc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dBxvYUbG; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <39753b36-adfd-4e00-beea-b58c1e5606e3@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1746571191;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MGtKCWxeeCvHWwIXpg+TiH0nAUubbBX52QN4JIdpmDA=;
+	b=dBxvYUbGFjSvYPErgbn2TcYVIGRVNpmNzM/8TioVlNVuOPAa0Eoy6QGm+QMdUJI1S/c5Kk
+	SH90tg7O5nhrD6XwUoh5Kwh5p7UVhNWbyid5ILzAO3KUTRUQVfpGfA+046gTFSNWjxZrFe
+	YFaKCJiQNFIjmHFD29gIbGGiKmhAgZ0=
+Date: Tue, 6 May 2025 18:39:43 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250506061434.94277-1-yangfeng59949@163.com> <20250506061434.94277-3-yangfeng59949@163.com>
-In-Reply-To: <20250506061434.94277-3-yangfeng59949@163.com>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Tue, 6 May 2025 15:30:39 -0700
-X-Gm-Features: ATxdqUETSD4zY0Brjmdir8LRxVrgW6L6sBojvZaIC7oDoprK2jltvmYBmRuBIeI
-Message-ID: <CAEf4BzbqrvgD11M5nTwP=oJeNph6n63qAZfW8Qu=MB9k3h_-ow@mail.gmail.com>
-Subject: Re: [PATCH v3 sched_ext 2/2] sched_ext: Remove bpf_scx_get_func_proto
-To: Feng Yang <yangfeng59949@163.com>, tj@kernel.org
-Cc: martin.lau@linux.dev, ast@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, eddyz87@gmail.com, song@kernel.org, 
-	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
-	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, 
-	mattbobrowski@google.com, rostedt@goodmis.org, mhiramat@kernel.org, 
-	mathieu.desnoyers@efficios.com, davem@davemloft.net, bpf@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [net-next PATCH v3 05/11] net: pcs: lynx: Convert to an MDIO
+ driver
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ upstream@airoha.com, Christian Marangi <ansuelsmth@gmail.com>,
+ linux-kernel@vger.kernel.org, Kory Maincent <kory.maincent@bootlin.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Clark Wang <xiaoning.wang@nxp.com>, Claudiu Manoil <claudiu.manoil@nxp.com>,
+ Ioana Ciornei <ioana.ciornei@nxp.com>, Joyce Ooi <joyce.ooi@intel.com>,
+ Madalin Bucur <madalin.bucur@nxp.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, UNGLinuxDriver@microchip.com,
+ Wei Fang <wei.fang@nxp.com>, imx@lists.linux.dev,
+ linux-stm32@st-md-mailman.stormreply.com
+References: <20250506215841.54rnxy3wqtlywxgb@skbuf>
+ <20250415193323.2794214-1-sean.anderson@linux.dev>
+ <20250415193323.2794214-1-sean.anderson@linux.dev>
+ <20250415193323.2794214-6-sean.anderson@linux.dev>
+ <20250415193323.2794214-6-sean.anderson@linux.dev>
+ <20250506215841.54rnxy3wqtlywxgb@skbuf>
+ <50e809ea-62a4-413d-af63-7900929c3247@linux.dev>
+ <50e809ea-62a4-413d-af63-7900929c3247@linux.dev>
+ <20250506221834.uw5ijjeyinehdm3x@skbuf>
+ <d66ac48c-8fe3-4782-9b36-8506bb1da779@linux.dev>
+ <20250506222928.fozoqcxuf7roxur5@skbuf>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <20250506222928.fozoqcxuf7roxur5@skbuf>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, May 5, 2025 at 11:15=E2=80=AFPM Feng Yang <yangfeng59949@163.com> w=
-rote:
->
-> From: Feng Yang <yangfeng@kylinos.cn>
->
-> task_storage_{get,delete} has been moved to bpf_base_func_proto.
->
-> Suggested-by: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-> Signed-off-by: Feng Yang <yangfeng@kylinos.cn>
-> ---
->  kernel/sched/ext.c | 15 +--------------
->  1 file changed, 1 insertion(+), 14 deletions(-)
->
+On 5/6/25 18:29, Vladimir Oltean wrote:
+> On Tue, May 06, 2025 at 06:20:32PM -0400, Sean Anderson wrote:
+>> On 5/6/25 18:18, Vladimir Oltean wrote:
+>> > On Tue, May 06, 2025 at 06:03:35PM -0400, Sean Anderson wrote:
+>> >> On 5/6/25 17:58, Vladimir Oltean wrote:
+>> >> > Hello Sean,
+>> >> > 
+>> >> > On Tue, Apr 15, 2025 at 03:33:17PM -0400, Sean Anderson wrote:
+>> >> >> diff --git a/drivers/net/pcs/pcs-lynx.c b/drivers/net/pcs/pcs-lynx.c
+>> >> >> index 23b40e9eacbb..bacba1dd52e2 100644
+>> >> >> --- a/drivers/net/pcs/pcs-lynx.c
+>> >> >> +++ b/drivers/net/pcs/pcs-lynx.c
+>> >> >> @@ -1,11 +1,15 @@
+>> >> >> -// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
+>> >> >> -/* Copyright 2020 NXP
+>> >> >> +// SPDX-License-Identifier: GPL-2.0+
+>> >> >> +/* Copyright (C) 2022 Sean Anderson <seanga2@gmail.com>
+>> >> >> + * Copyright 2020 NXP
+>> >> >>   * Lynx PCS MDIO helpers
+>> >> >>   */
+>> >> >>  
+>> >> >> -MODULE_DESCRIPTION("NXP Lynx PCS phylink library");
+>> >> >> -MODULE_LICENSE("Dual BSD/GPL");
+>> >> >> +MODULE_DESCRIPTION("NXP Lynx PCS phylink driver");
+>> >> >> +MODULE_LICENSE("GPL");
+>> >> > 
+>> >> > What's the idea with the license change for this code?
+>> >> 
+>> >> I would like to license my contributions under the GPL in order to
+>> >> ensure that they remain free software.
+>> >> 
+>> >> --Sean
+>> > 
+>> > But in the process, you are relicensing code which is not yours.
+>> > Do you have agreement from the copyright owners of this file that the
+>> > license can be changed?
+>> 
+>> I'm not relicensing anything. It's already (GPL OR BSD-3-Clause). I'm
+>> just choosing not to license my contributions under BSD-3-Clause.
+>> 
+>> --Sean
+> 
+> You will need to explain that better, because what I see is that the
+> "BSD-3-Clause" portion of the license has disappeared and that applies
+> file-wide, not just to your contribution.
 
-Given this has dependency on patch #1, we should either route this
-patch through bpf-next, or we'll have to delay and resend it after
-merge window.
+But I also have the option to just use the GPL-2.0+ license. When you
+have an SPDX like (GPL-2.0+ OR BSD-3-Clause) that means the authors gave
+permission to relicense it as
 
-Tejun, any preferences?
+- BSD-3-Clause
+- GPL-2.0+
+- GPL-2.0+ OR BSD-3-Clause
+- GPL-2.0
+- GPL-2.0 OR BSD-3-Clause
+- GPL-3.0
+- GPL-3.0 OR BSD-3-Clause
+- GPL-4.0 (if it ever happens)
 
-> diff --git a/kernel/sched/ext.c b/kernel/sched/ext.c
-> index fdbf249d1c68..cc628b009e11 100644
-> --- a/kernel/sched/ext.c
-> +++ b/kernel/sched/ext.c
-> @@ -5586,21 +5586,8 @@ static int bpf_scx_btf_struct_access(struct bpf_ve=
-rifier_log *log,
->         return -EACCES;
->  }
->
-> -static const struct bpf_func_proto *
-> -bpf_scx_get_func_proto(enum bpf_func_id func_id, const struct bpf_prog *=
-prog)
-> -{
-> -       switch (func_id) {
-> -       case BPF_FUNC_task_storage_get:
-> -               return &bpf_task_storage_get_proto;
-> -       case BPF_FUNC_task_storage_delete:
-> -               return &bpf_task_storage_delete_proto;
-> -       default:
-> -               return bpf_base_func_proto(func_id, prog);
-> -       }
-> -}
-> -
->  static const struct bpf_verifier_ops bpf_scx_verifier_ops =3D {
-> -       .get_func_proto =3D bpf_scx_get_func_proto,
-> +       .get_func_proto =3D bpf_base_func_proto,
->         .is_valid_access =3D bpf_scx_is_valid_access,
->         .btf_struct_access =3D bpf_scx_btf_struct_access,
->  };
-> --
-> 2.43.0
->
+I want my contributions to remain free software, so I don't want to
+allow someone to take the BSD-3-Clause option (without the GPL).
+
+--Sean
 
