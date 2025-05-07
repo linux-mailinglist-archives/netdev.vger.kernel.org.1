@@ -1,157 +1,199 @@
-Return-Path: <netdev+bounces-188548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24C2FAAD4A2
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 06:56:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84A0BAAD4D3
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 07:09:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4652C1BA719F
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 04:56:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 949CA4C58DE
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 05:09:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D95C1D8E07;
-	Wed,  7 May 2025 04:55:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31E491DF748;
+	Wed,  7 May 2025 05:09:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iCBYDu8o"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mko7YDkT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5EA71CCB4B
-	for <netdev@vger.kernel.org>; Wed,  7 May 2025 04:55:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D7E21DF742;
+	Wed,  7 May 2025 05:09:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746593759; cv=none; b=LjZKf0P0b/cOf0GNMOOSeJ6DCLuAldMGyD/qs6EebgEoHIhhGQbfwpARqngg//PySDvPxsz4W8U8d/UsCgBApNR002qPntfLBUNZI1ykaBnMpFZDm5ymaTprcl79l+YL3KWmA7vpXATmsPhsDLy2BMDka1PY/RBg1KOxUKztk60=
+	t=1746594552; cv=none; b=UIAGavYhBIPGKULGacmOagd4WmfGuymux6A+QT/6UOctSDj+S4HJyC8m/EbRvVB0rHM9dm2cBuBEdDuW4brYw/G+cdNnniY9E7vULfT2b4U3FGRz7O7xICIYi/pmKIs4nkEZd0w6X1tDY2IKwNvGRwGZtbhtkd9NskKq0Ou4QYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746593759; c=relaxed/simple;
-	bh=1r1xSJkLVHQf0qBoxkgFF271MkROdUBJRavtLRhm4wQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TWJIMBppjYmEzxzQ4zO4H7R7176+Y3phOJriWxJPbYAFo/vzL9kF0df9JDs9Ww/K11FAWe4I5UihpZd2aVHk3oxJTvW/aoU/ujROQE7SMCZuWIiK6IGXhU0GPSXtgzQgUERe8Z+R8hL8ivA/TsJ1hXNHPD7xZy3i4lJfxzm/ieQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iCBYDu8o; arc=none smtp.client-ip=209.85.208.52
+	s=arc-20240116; t=1746594552; c=relaxed/simple;
+	bh=Cg3lNgNXXlY3tbGP5L2tCy8t6w10UD5L5/hDeNrXlh8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rJ3/M+X9YVQGGWBHQ9kakyQCFDyjB0arDL16pBLwJHbpk5MGqeYa4eZxtKyTzUjNjDhyGsAMdYPgDZ9++0tnKZZ/xyHwoSnQ1GSXGaJZAZi8YbE8l9uUvBWVGK9uCfXIuR829aaK8OEnHOsRq/Y5ZI5dOK6ktU6+HZiPK0te1Ks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mko7YDkT; arc=none smtp.client-ip=209.85.216.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5fbf29d0ff1so257427a12.0
-        for <netdev@vger.kernel.org>; Tue, 06 May 2025 21:55:57 -0700 (PDT)
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-30a509649e3so3791743a91.2;
+        Tue, 06 May 2025 22:09:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746593756; x=1747198556; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PIXb84AI6REv64D0Hg8TlF/Rz/6umpvzbQF067/KzT0=;
-        b=iCBYDu8oQsl5oZ16QO3ddtf16Y0Ea4ZSP+qc8iE2d+9YSwGn1awLrZx+/IccdJ+2hU
-         g/IVHh2bklN4zdJq+SXK7y7gsPpH8UX89/AEhqosheA6DflxDvDiDdvXu52CfGGfOnFl
-         CpG0/+gqqgI77UpVP06pVvdaxqTT4nOlOSl5xgAVe3HVR3Bx9MZcrhWjQeKZbq3v76Xj
-         cpBM7SiImpXs0s9veTHA9vflwksA2LwRerXrEABW+IVFltum/yY6yt5NXTEf24p1MjN0
-         RBgm8HI6eITLYJYJT2Mye4kMg2CO7DCfvXtCHppROk611q3Ahe/9ew0IwmRVZ43eyNFI
-         QiyQ==
+        d=gmail.com; s=20230601; t=1746594549; x=1747199349; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=qDfFaWqi7aHktXrAOXgC9kWrCSEA1y5g+C1t+ku3vxY=;
+        b=Mko7YDkTZNpD12w+iwfQJK2Z4a0Kdbb1Ehd7eqTQnYrEb8/qipYNqReb4YcytRg+Tf
+         8XBxBXeeNhC1shujpfoUk027AJEE5tHuMjOW39IoP98bZY2TkVT7+QAicgGBPyfCnWog
+         4+bugis547EVPXTLlsZliZuRqIZXqWidQXEu17XHa9+yCEzB2bvg+X2T+JoW4UZSdqK0
+         o5BsvAOlE7A7exnsGRpYE9GpmaTNHJ8jZhb2d4ZkexUrmbYtQ+LWZEEA9FXNVY6HEGVT
+         UPkXFP5SJ+EEp5hFrqJBBxkzm7G7LTTbrVazJhftfghfXXGSeBDCo2Oks3jxwNEboKQS
+         Fjlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746593756; x=1747198556;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PIXb84AI6REv64D0Hg8TlF/Rz/6umpvzbQF067/KzT0=;
-        b=GBEIkzpaEF199L4aLegit/WHw4MW14rPHg5QZNkrvnzzj593WsDja2qPtUsjfax0Lm
-         jaTREYRF37wxNnbA2GB1FQaC2x8HRsLq36xviC/UyKYwV+AHFIhWdjYaShruGXeyhUu8
-         2+IlmPSJ5/jsAo9WxWyWifTUWORoQQAyDgClePNgefOMvgcH+o9EbsIGoKIpJVz4vMA8
-         oquqE/X+eklfr1m+r4pW0K9R6aEM6BFEova0xUFHUDhzDYOKT5M0UJQgviQNj+LDRi8d
-         KIM3+MN44McldUjQfngBvDkptiiBQ9aKkoOGIxyStANWMrgjbTHYNlcSBKGO4lmd2F+s
-         VrMA==
-X-Forwarded-Encrypted: i=1; AJvYcCUvD007cLJvMTEnb/rv+7Pzg4MRMl/NogRW6RRqnbcmEXDGr+NHdPZNtTLdatqsq9qCLIcYMC8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1f1TEaehG3QXU2SWBMVzyC7h6DHE8rq2NuAGbiqTSK38TgE5L
-	bnrX76R+pC2RTJ8+R3sDymSQOY3IXfoDrAtu/ksMnjRbSDUVxqp4gfAGbGkrtJxhuw1WImY3atN
-	BpFvo8jhEZ4uX2QxZTRxShojvNPg=
-X-Gm-Gg: ASbGncvLh79oivWwOb5P73n3Q5PMQ6Lj7bjUVAjbuKgGQys/RHt9bEUbPILJFkpioxN
-	ieUcBno+rOAOv3EUjhh9jeF95vKexBoUOq0/ATZQEsQIVpUpLp16ECvUyKrg0qIPqvhI7azSdqH
-	kMbNmdtcMPwKnE8vUoarrXjSg=
-X-Google-Smtp-Source: AGHT+IF0JghBmq2QnJYhLMxmt3Qfy2ByU/N6BAqNldbrHYUAcOtGLbUDtlJUxK+dbbYT32LwlwB112c29eItL2EUMb0=
-X-Received: by 2002:a05:6402:2348:b0:5f7:f52e:ec93 with SMTP id
- 4fb4d7f45d1cf-5fbe9f6a37cmr1259482a12.31.1746593755722; Tue, 06 May 2025
- 21:55:55 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1746594549; x=1747199349;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qDfFaWqi7aHktXrAOXgC9kWrCSEA1y5g+C1t+ku3vxY=;
+        b=OXhWZB3ZYx7ogQvFkdMhrudwtjF+7P9hjDzyVIdUyBAl3pGd7At5Eo3t/gTOL0np1s
+         x7cs2ChPsQQ+mgzInX6NqkeVc/iFgxmLj7yfsjEdW2yYLKd1xMvyyi5J65P6ZfPr5MKe
+         FtX+P/MqVbXmHnJpEX3DK7yneI15mFDP8azm4IUu2wawHuLV9pK7nyjIyxyT2HgfpIVw
+         ydLofPJDJsx35wPp7H5uAADuvjCFmecI5mZdCCUYK5Pc2WIOWIKarEtIxnwnGkRfgbOM
+         lw/drHelm9VsRe/HIDw6zneJPziLN3xGVFvWhNVUGyfmvqmZkbep19nM5XMKyPLF21nf
+         CekA==
+X-Forwarded-Encrypted: i=1; AJvYcCUwezCLQdlQY1rsRvq2XjoTZaGrdq2Yo+Cvy/sT5gt5GwMKsAlrYu33TKEdDTwWLXua44c=@vger.kernel.org, AJvYcCWS97lFshWuhG9ap/sxqvpI6I8/nPGy1uflb6HyY3PcQfkK1eZWu9vM/vUKUks1z3vYseRFQAQy8MH74/0XxQ5g0fTV@vger.kernel.org, AJvYcCXRvTA+BhSbm90KFTCnC5Fum0Auv+QEr5TJInk6cYBWsgX36zzALT0gKsNZIgUq9b59FsQWG2GS@vger.kernel.org, AJvYcCXgBZvGwsI9lk4rBW+JXb7hNAV3omaRFnVKoGfeQRSBLRfDP/yUJPfm1k7+Ud3gWgOUAeQvJi6sS+ySC7m8@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlUKN4ND+mryru0TvGHuwxdVCWk4Mim5PGtHxlRNk4gDEh0sLb
+	v2vX0fCWbXqX94KzgPhP6JhQsL/E+T3cnTZq9OfiXTPBk98Lb05G
+X-Gm-Gg: ASbGncvjKzFxBtKbCZDD80wD3Ls4ZGbPLQSxzLiBnHICkLcPyx5BRmDTuVDfzhbbxNi
+	ZMt39as3GaPaVB5jevaMpXpzV18QCi9JgEqCpCX5uKn4D/dhP9gA7igG2k+bT7GqtyvEAKQxhL0
+	j9r2B8wtzbkohx1CQ3w+ytk3mzbShhpFNeR247Gy4O4mw0dbMtR4HTzb486AP8dlzXxK9jeyWxS
+	cKI/73CaxHPigl+93iyTRUGblp6AszP84WzbhM8l8OphKVeeTS39lnsbu1M6IMk0g7myeNbczBi
+	IOrug25WaKqvmOozY3aB4vR/JOPvCC37h4S7HoYpCw==
+X-Google-Smtp-Source: AGHT+IHy0jV4YgMxOHksPhxh53RpeJAZ/E8UFT1rKsUGw11pv+I+0YyJ9AE3+lffwugInqcy6tb7uA==
+X-Received: by 2002:a17:90b:4ad0:b0:2ea:a9ac:eee1 with SMTP id 98e67ed59e1d1-30aac19d49bmr3325171a91.10.1746594549416;
+        Tue, 06 May 2025 22:09:09 -0700 (PDT)
+Received: from gmail.com ([98.97.36.253])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e61f3ad8asm7010665ad.211.2025.05.06.22.09.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 May 2025 22:09:08 -0700 (PDT)
+Date: Tue, 6 May 2025 22:08:35 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
+	Network Development <netdev@vger.kernel.org>,
+	linux-trace-kernel <linux-trace-kernel@vger.kernel.org>
+Subject: Re: [RESEND PATCH bpf-next v4 1/2] bpf, sockmap: Introduce tracing
+ capability for sockmap
+Message-ID: <20250507050835.4seu6rz35v2uqret@gmail.com>
+References: <20250506025131.136929-1-jiayuan.chen@linux.dev>
+ <b776fa07-de4b-44be-ae68-8bc8c362ea81@linux.dev>
+ <9c311d9944fa57cec75e06cde94496d782fe4980@linux.dev>
+ <CAADnVQKK87UV9rH_YviePfUmOO3mGXQmYfN-Q9Ax5AYv+xE8zw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250506140858.2660441-1-ap420073@gmail.com> <20250506195526.2ab7c15b@kernel.org>
-In-Reply-To: <20250506195526.2ab7c15b@kernel.org>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Wed, 7 May 2025 13:55:44 +0900
-X-Gm-Features: ATxdqUHXy8izfvK4qlrOa-P9UAWmOGKFQnwqDebpDDpI423pq0VyNN-PtbD9tvE
-Message-ID: <CAMArcTUx5cK2kh2M8BirtQRG5Qt+ArwZ_a=xwi_bTHyKJ7E+og@mail.gmail.com>
-Subject: Re: [PATCH net v2] net: devmem: fix kernel panic when socket close
- after module unload
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
-	andrew+netdev@lunn.ch, horms@kernel.org, almasrymina@google.com, 
-	sdf@fomichev.me, netdev@vger.kernel.org, asml.silence@gmail.com, 
-	dw@davidwei.uk, skhawaja@google.com, willemb@google.com, jdamato@fastly.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAADnVQKK87UV9rH_YviePfUmOO3mGXQmYfN-Q9Ax5AYv+xE8zw@mail.gmail.com>
 
-On Wed, May 7, 2025 at 11:55=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Tue,  6 May 2025 14:08:58 +0000 Taehee Yoo wrote:
-> > +     mutex_lock(&binding->priv->lock);
-> >       xa_for_each(&binding->bound_rxqs, xa_idx, bound_rxq) {
-> >               if (bound_rxq =3D=3D rxq) {
-> >                       xa_erase(&binding->bound_rxqs, xa_idx);
-> > +                     if (xa_empty(&binding->bound_rxqs))
-> > +                             binding->dev =3D NULL;
-> >                       break;
-> >               }
-> >       }
-> > +     mutex_unlock(&binding->priv->lock);
->
-> Why do we need to lock the socket around the while loop?
-> binding->bound_rxqs have its own lock, and add/del are also
-> protected by the netdev instance lock. The only thing we
-> must lock is the write to binding->dev I think ?
+On 2025-05-06 20:43:43, Alexei Starovoitov wrote:
+> On Tue, May 6, 2025 at 8:37 PM Jiayuan Chen <jiayuan.chen@linux.dev> wrote:
+> >
+> > May 7, 2025 at 04:24, "Martin KaFai Lau" <martin.lau@linux.dev> wrote:
+> >
+> > >
+> > > On 5/5/25 7:51 PM, Jiayuan Chen wrote:
+> > >
+> > > >
+> > > > Sockmap has the same high-performance forwarding capability as XDP, but
+> > > >
+> > > >  operates at Layer 7.
+> > > >
+> > > >  Introduce tracing capability for sockmap, to trace the execution results
+> > > >
+> > > >  of BPF programs without modifying the programs themselves, similar to
+> > > >
+> > > >  the existing trace_xdp_redirect{_map}.
+> > > >
+> > >
+> > > There were advancements in bpf tracing since the trace_xdp_xxx additions.
+> > >
+> > > Have you considered the fexit bpf prog and why it is not sufficient ?
+> > >
+> >
+> > 1.This patchset prints a large amount of information (e.g. inode ID, etc.),
+> > some of which require kernel-internal helpers to access. These helpers are
+> > not currently available as kfuncs, making it difficult to implement
+> > equivalent functionality with fentry/fexit.
 
-I intended to protect both binding->bound_rxq and binding->dev.
-But you're right, xarray API internally acquires a lock.
-Only binding->dev is protected by socket lock here.
+If the data is useful and can't be read normally having kfuncs/etc to
+get the data makes a lot of sense to me. Then it would be useful for
+everyone presumably.
 
->
-> Would it be cleaner to move that write and locking to a helper
-> which would live in netdev-genl.c?
+> >
+> > 2. skb->_sk_redir implicitly stores both a redir action and the socket address
+> > in a single field. Decoding this structure in fentry/fexit would require
+> > duplicating kernel-internal logic in BPF programs. This creates maintenance
+> > risks, as any future changes to the kernel's internal representation would
+> > necessitate corresponding updates to the BPF programs.
 
-You mean that the socket lock is not required to cover whole loop
-because bound_rxq is safe itself.
-So, it acquires a socket lock only for setting binding->dev to NULL,
-right? It makes sense to me.
-Making a helper in netdev-genl.c would be good, I will make it.
+If its needed we could build BPF code somewhere that decoded these
+correctly for all kernels.
 
->
-> Similarly could we move:
->
->         if (binding->list.next)
->                 list_del(&binding->list);
->
-> from net_devmem_unbind_dmabuf() to its callers?
-> The asymmetry of list_add() being directly in netdev_nl_bind_rx_doit()
-> not net_devmem_bind_dmabuf(), and list_del() being in
-> net_devmem_unbind_dmabuf() always confuses me.
+> >
+> > 3. Similar to the debate between using built-in tracepoints vs kprobes/fentry,
+> > each approach has its tradeoffs. The key advantage of a built-in tracepoint is
+> > seamless integration with existing tools like perf and bpftrace, which natively
+> > support tracepoint-based tracing. For example, simply executing
+> > 'perf trace -e 'sockmap:*' ./producer' could provide sufficient visibility
+> > without custom BPF programs.
 
-I agree with you. I will change it in the next version, too.
+We could likely teach bpftrace a new syntax if we care?
 
->
-> >+      mutex_lock(&priv->lock);
-> >+      binding =3D net_devmem_bind_dmabuf(netdev, dmabuf_fd, priv, info-=
->extack);
->
-> We shouldn't have to lock the net_devmem_bind_dmabuf(), we have the
-> instance lock so the device can't go away, and we haven't listed
-> the binding on the socket, yet. Locking around list_add() should
-> be enough?
+bpftrace -e 'skmsg:sendmsg: { @[socket, pid] = count_bytes(); }'
 
-I agree with it.
-If binding is not listed, it doesn't have to be protected by lock.
-As you mentioned, I will try doing just locking around list_add()
-in the netdev_nl_bind_rx_doit().
+might be interesting.
 
-Thanks a lot!
-Taehee Yoo
+
+> Similar to Martin I don't buy these excuses.
+> For your own debugging you can write bpftrace prog that will
+> print exact same stats and numbers without adding any kernel code.
+> 
+> We add tracepoints when they're in the path that is hard to get to
+> with tracing tools. Like functions are partially inlined.
+> Here it's not the case.
+> You want to add a tracepoint right after your own bpf prog
+> finished. All these debugging could have been part of your
+> skmsg program.
+
+I tend to agree. We've on our side found it extremely useful to have
+DEBUG infra in our BPF codes and easy ways to turn it off/on. 
+If this DEBUG is in your BPF program and you have the pretty printers
+to read it yuo can get lots of specifics about your paticular program
+logic that can't be put in the tracepoint.
+
+Thanks,
+John
+
+> 
+> pw-bot: cr
 
