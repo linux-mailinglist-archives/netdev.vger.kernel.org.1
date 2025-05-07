@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-188525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B330BAAD319
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 04:10:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81A92AAD31B
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 04:10:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EED327AFE68
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 02:08:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C7513B2143
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 02:10:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED2EA18DB29;
-	Wed,  7 May 2025 02:10:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39AC7199924;
+	Wed,  7 May 2025 02:10:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U0E1MJ+D"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mUQWIkYr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C514B18C01D;
-	Wed,  7 May 2025 02:10:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11297198A2F;
+	Wed,  7 May 2025 02:10:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746583800; cv=none; b=jWkPnSmqxpy/qWTe6pS7QojsjQY21m7/nMg9/UW03ULJ2lJpnoJDlckdUWRgbYzpm2c/v5+kAHDFIQWlO+0u9wQJxJj6dL7LDOTAbjTEhGN6kzAu6kw+/sRItszPSRfinCQl/QUqBGL+dFtV4ucKbmBkR3OWk5y+1bPUoePCvNM=
+	t=1746583802; cv=none; b=B9jTIhV5G/KP56/jWn0Nbao60Vu3m4cC7dfZrrh4LPkD5l7vRbui/5GO8y4i9R4o4AenMZXPzJfAT7Qrvw8m7HxSu012/9qjn7J5V5DcDc93zKgFQXrdZA0nE3+or147UlFg2yL7OLjhpaE69M6Qy5Ykiw9Wm7aDszNS3MGFr2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746583800; c=relaxed/simple;
-	bh=oEEDp+2Y0WUeQxIRduaIuRUjSY0AwAcy6BpWMhiCM9o=;
+	s=arc-20240116; t=1746583802; c=relaxed/simple;
+	bh=2ZI9r5V5j2LEntyu9PWQDuxxPwrYshlRnySbkDgqWX0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qtoTHxUgFK7l6rKno0i4VK+8b1Y2tl+SSIr5I2ZKGO3c+H1t4mmWPr0RPzfrAWF8HUEj5GSVoVIlaq49gQDVqdM0T9FinFgOlRsWSICuA3Doqlg0PPxTCsBSWezf+udGbNheQCObPP4E9ycsxSPTAr/B1dfQDKUV3JpAeod3VAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U0E1MJ+D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D73DC4CEEB;
-	Wed,  7 May 2025 02:10:00 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Snyb0MU06IyYn5jNUVBRmRG7sDzHOYkBigXoSTpie414LOscLDstCuRZEF1AKH6bK5S5klt1xMfY177xBCZYl1Ob0aeamuKKfcgZhV6e5LBwcGP5PnzXId7y9gGnImrBjzvU1xOj9MObugAbmg57VdrBFzISqU8yW3bDbgk+vLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mUQWIkYr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B154C4CEE4;
+	Wed,  7 May 2025 02:10:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746583800;
-	bh=oEEDp+2Y0WUeQxIRduaIuRUjSY0AwAcy6BpWMhiCM9o=;
+	s=k20201202; t=1746583801;
+	bh=2ZI9r5V5j2LEntyu9PWQDuxxPwrYshlRnySbkDgqWX0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=U0E1MJ+DaEt63UpJEjUwaM8YLJHE8z7cZpfXlv+0UrhXCCXoDewlXeoqTc2/eO0d+
-	 aJC0W2YBc4ycS00gyztqXlDb1LI9v895+XcGLitmfe4PwuRv7dLbOPzVWs+41fT2aR
-	 rSH1wA6AzwVkc425KGZ1AvZ+bFVY/Hd09yAZHqknwoR0l6HO8qNp5rkzhN39t/iFCM
-	 80D/z5xZk/yQj+eifWwoJCnkD3DuqxOHZaW1gUCqbthGNxbqLXhU6zzTRdM3EbQ5Gc
-	 Fis96tJ0QUHpFpPp8cwb5sVI8f1WaDpG54D5y6XXNe3jl8TKxjsdr2Cpr1YxzS8y4V
-	 xbdfNKT00isjA==
+	b=mUQWIkYrSkulCALl1knX/GDhk6O7EGjFxupmVHK8mUs6GNZSB87/z6ExChXayfHG0
+	 d/04UrT1v0Xf6gvKxTogASJJc+NymXEx+OygtYBPmI0oTZ/Bb7oPcxjGv9nPvO7h4U
+	 IWh/3vRhMMrrMDXTCNYdJSf5Za8y4SHDIKu8LjIaTkRGZX5lKsp0RR8rS5iO6tsLxk
+	 +5fEr3fi8zGylpUw5NJ/feGj8QSTlMURKrqRre9vwYsHTAcnoMKNXHJse6Iqs3smrW
+	 QNWX7hWNmeNmdISVXBhLEnwHyHlF2KoAdXxzwYh8sot/DPjnlgzczt4bHnBbRgROdz
+	 gb/OdSmOHnyRA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71707380664B;
-	Wed,  7 May 2025 02:10:40 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCE8380664B;
+	Wed,  7 May 2025 02:10:41 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: add missing instance lock to dev_set_promiscuity
+Subject: Re: [PATCH net] net: Lock netdevices during dev_shutdown
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174658383899.1710027.3440544946446238229.git-patchwork-notify@kernel.org>
-Date: Wed, 07 May 2025 02:10:38 +0000
-References: <20250506032328.3003050-1-sdf@fomichev.me>
-In-Reply-To: <20250506032328.3003050-1-sdf@fomichev.me>
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, andrew+netdev@lunn.ch,
- linux-kernel@vger.kernel.org
+ <174658384050.1710027.1966603658954406944.git-patchwork-notify@kernel.org>
+Date: Wed, 07 May 2025 02:10:40 +0000
+References: <20250505194713.1723399-1-cratiu@nvidia.com>
+In-Reply-To: <20250505194713.1723399-1-cratiu@nvidia.com>
+To: Cosmin Ratiu <cratiu@nvidia.com>
+Cc: netdev@vger.kernel.org, sdf@fomichev.me, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, jiri@resnulli.us,
+ saeedm@nvidia.com, dtatulea@nvidia.com, linux-kselftest@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  5 May 2025 20:23:28 -0700 you wrote:
-> Accidentally spotted while trying to understand what else needs
-> to be renamed to netif_ prefix. Most of the calls to dev_set_promiscuity
-> are adjacent to dev_set_allmulti or dev_disable_lro so it should
-> be safe to add the lock. Note that new netif_set_promiscuity is
-> currently unused, the locked paths call __dev_set_promiscuity directly.
+On Mon, 5 May 2025 22:47:13 +0300 you wrote:
+> __qdisc_destroy() calls into various qdiscs .destroy() op, which in turn
+> can call .ndo_setup_tc(), which requires the netdev instance lock.
 > 
-> Fixes: ad7c7b2172c3 ("net: hold netdev instance lock during sysfs operations")
-> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> This commit extends the critical section in
+> unregister_netdevice_many_notify() to cover dev_shutdown() (and
+> dev_tcx_uninstall() as a side-effect) and acquires the netdev instance
+> lock in __dev_change_net_namespace() for the other dev_shutdown() call.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: add missing instance lock to dev_set_promiscuity
-    https://git.kernel.org/netdev/net/c/78cd408356fe
+  - [net] net: Lock netdevices during dev_shutdown
+    https://git.kernel.org/netdev/net/c/08e9f2d584c4
 
 You are awesome, thank you!
 -- 
