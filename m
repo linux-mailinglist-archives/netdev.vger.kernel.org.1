@@ -1,213 +1,238 @@
-Return-Path: <netdev+bounces-188641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFA25AAE04C
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 15:13:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D225EAAE053
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 15:14:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6220116C474
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C93F63BAC4C
 	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 13:12:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEF9A2874E9;
-	Wed,  7 May 2025 13:09:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FD8C289E1A;
+	Wed,  7 May 2025 13:09:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M1o3vvCn"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QsHv9C0J"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B701A28981E
-	for <netdev@vger.kernel.org>; Wed,  7 May 2025 13:09:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 418B92798EB
+	for <netdev@vger.kernel.org>; Wed,  7 May 2025 13:09:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746623356; cv=none; b=otdRawZmdSKFqsqlZX1KNvmqvUR/jbmOsmxpXbH55Jbm3QnJUdskUWumaXOQQtc0We8N/6FvCPF7LF7MbCXSAasCeSYrd0Gqts2ddaX+1iqLbPlbB5kq+3CtnsS2trSXdtp/Om+3ehZZTVEh1oWJMyMenkMZ/PBXY+uZtwZyS9U=
+	t=1746623384; cv=none; b=sszglC67+2BxXbP/wcAoNZfKYrB3TeMLST3kuILvAW44hK/Kt4TRjQlIwnzAdcTSKc0U7/YxfzugeSOqpzQXeIR3rtBUhPHA+Ct6s5YuwF6Mc8w71429AAWsGazoT+0LvU22myHLNTdf/otMukzhDx2E4CiyTi+lF0Y61YDtYak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746623356; c=relaxed/simple;
-	bh=PCMX2Cr+uQWKx3vKDgl51jkFcRXqKV/9DGQU2RgRS9o=;
+	s=arc-20240116; t=1746623384; c=relaxed/simple;
+	bh=sUsJqVsBiX36KFyM8w57PKkgxwx4UZqG6pHyRD50O4w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I0Kl6sWk4MQv9f7r4VAWtzdmg7aHUxS7Vq6y0AXEJCHwFXuUXyns9m5v1giUr202vtTIK7HaeMWdLSRYb1yZce7hOZ4zHdLJknde6BZqy3Pn6sK65wTTL4H15i2TErI/aDBDCRt7aJijN40iEjWGCmlCEGHZQqwL1EFm6tOeipI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M1o3vvCn; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746623353;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qAtnwiXcU1op8DM9QOzo0SnMVizQr1PVYLn+9+GejxY=;
-	b=M1o3vvCno5QdcRM5uhRCZd8spQNizlH3oCfLFbsn5ng+lNzupVkRLMNGmQEnCbc5uRRt6e
-	E12LbNKHpNfe9k+BKSEDYx4mdHIuwIjo+Dm2B4pFVKVDyKS2Ju4biVTVKGsISnFUjspwB8
-	kfasLJty4WvlVU6i8jvwG+niI7lRxVw=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-480-Ypz4BEyYN3GJJrIxi78k1w-1; Wed, 07 May 2025 09:09:12 -0400
-X-MC-Unique: Ypz4BEyYN3GJJrIxi78k1w-1
-X-Mimecast-MFC-AGG-ID: Ypz4BEyYN3GJJrIxi78k1w_1746623351
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-acbbb00099eso589216366b.2
-        for <netdev@vger.kernel.org>; Wed, 07 May 2025 06:09:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746623350; x=1747228150;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qAtnwiXcU1op8DM9QOzo0SnMVizQr1PVYLn+9+GejxY=;
-        b=M5hOPlOEzqrGbPxbJCRNB2cS7+ng8w6+zzW5zcksb1SDLuRinpLowyH8Yjk0xJj7Xn
-         ozh6lXV1VKS4oOacJv40Otw5Tgt5TW09xt1GqpvEYBPk39DNiVDT6OdRjeChwJY53aFq
-         kgrczHEX+ZCnZ6Jy1SfT6CosddYEgtyHjIFmMCgeExi7OLsVEAjbZt/nNf4vdRb48+EL
-         SxwCTBnVSghqoAsfexf/AxgRq2BooMiCbk0NgS38Rb3muaLeTwiim1gO2NufGEPSeYfO
-         vylVeh5WUL+Vkvwl5O2wOc0fyoNLLjv3FTJEuEmCDM7p+VjHS4eUHhQqLIV0Uq2tozdb
-         h46g==
-X-Forwarded-Encrypted: i=1; AJvYcCV8rty1MjUi67yUJo88g7f4QP1YfrbnPmnBYxyXDvgKBJKlx7eO6gg1tsn2RXO2xOSXfaf+3pI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLC9hM3vKAyPhd1WlOW1OyFq8VBj5zdoP+hMKkScNDhgd90WYQ
-	qV8itx45qsj3h/YedcD6JlJXcg5WT4/EDJeF9ms0OOHAR5y/jcEJOHRkGwkp1Ijk2uMCAM311gS
-	Y4DfFW7NDXCPTLk/Kxg0FO+Wjq8iovBXw/EFuVzQN5if2iSLB99TP5LU4nWHpKg==
-X-Gm-Gg: ASbGncv/h8/pZoWTsir2RC/63CUSFMlQcLh3sgTKBtdZ1hf7ovfn5g7/X94jY/LWeb8
-	z1FA1xZ9hUiBdxWZn0D6LKaWNqDp1dWlgUPklz4jkdCJzbrWWaUKmvcHSdajrPTpWloFBuYyo4h
-	SJkWS4pPIQbEzDsCFgpFEGBY05zHpaBYDWdgmFFTddZhB8p5BLPEzjiUN4xzDiuNbECEQ4ujp6P
-	JSFDFPNYgkQD5pAds+mFuaWij+Ad+NKCHKR+blkrDyBylAASoOPo3nGqzenM+uaGzL11OnXhHMe
-	KQGF4zUah5s0jVsV
-X-Received: by 2002:a05:6402:2808:b0:5fb:f708:2641 with SMTP id 4fb4d7f45d1cf-5fbf7086b00mr1553389a12.27.1746623336761;
-        Wed, 07 May 2025 06:08:56 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEwA872SvBWeTpMMj+/e7mYjU25+jDDfjv4mDrfoJ39gjkjiqHaiiL4tGqlCQGwX9860akxCA==
-X-Received: by 2002:a05:6402:35c4:b0:5f4:9017:c6a1 with SMTP id 4fb4d7f45d1cf-5fbe9f46c84mr3009014a12.25.1746623324960;
-        Wed, 07 May 2025 06:08:44 -0700 (PDT)
-Received: from sgarzare-redhat ([193.207.183.85])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5fa77b914b4sm9371316a12.51.2025.05.07.06.08.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 May 2025 06:08:43 -0700 (PDT)
-Date: Wed, 7 May 2025 15:08:22 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Konstantin Shkolnyy <kshk@linux.ibm.com>
-Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, mjrosato@linux.ibm.com
-Subject: Re: [PATCH net] vsock/test: Fix occasional failure in SIOCOUTQ tests
-Message-ID: <sqee4iqviojcht4s42dke3mnsq4f4si6oislu77bm3nqwlowim@oz6voimaqw4m>
-References: <20250507114833.2503676-1-kshk@linux.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=KmLBXINiy5xhJWvDuQURSIE+kUQyTAZfRMfhJ/WaFEIWTJ5jgTR1t+d0+mdLnzCBC08EZ4VhWpze7D/huufSVsjh5qymdD2CtF9Uum5Fx7DyB4MpFj4SwrPkDiYmElxiKR0+8f4LAyyOtW2pC/6gaA8tJSe6vfsxRv7kvkHo+mk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QsHv9C0J; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746623382; x=1778159382;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=sUsJqVsBiX36KFyM8w57PKkgxwx4UZqG6pHyRD50O4w=;
+  b=QsHv9C0JuamRtQdlvO/2kagNmpVJFGmPdMPM7iaYBKpsTPlOwmKuu7lh
+   XErEw4eo0P8P0TYeTuQBZydc8ieeLiY/RmVc/YDqPEhvkCKFg2NPWmOxC
+   ZbpS0hvFXuho2KrFgA6wEh5Y4/uQfwmBrbjG02QWXHvBvpqTph+9MQfcP
+   yo5hQIWU7jS2ogkUXfryknZioBd56NgBJ2VeU10plvhVhGySrWd/5CV6O
+   3jppxxxDrCVvwJ6lY8iaxr7JxlafzPDig1l8mzh3L0bLTk6y1RkqfQOFP
+   hk511SWu3LBD7cq/pV7tWkZMqoSMK4DERzJYf6m71QEPOeAeKPEAnYkto
+   Q==;
+X-CSE-ConnectionGUID: e+tQBz+DQciMut8o7xOMsA==
+X-CSE-MsgGUID: FfLyV28XQ/O36/sK2txZ2A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11426"; a="48253256"
+X-IronPort-AV: E=Sophos;i="6.15,269,1739865600"; 
+   d="scan'208";a="48253256"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2025 06:09:41 -0700
+X-CSE-ConnectionGUID: q5wI3BwXRXyQdAVvtwKEpQ==
+X-CSE-MsgGUID: JANjWtvwTiC1od6Y+mQvbA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,269,1739865600"; 
+   d="scan'208";a="136346223"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by fmviesa008.fm.intel.com with ESMTP; 07 May 2025 06:09:38 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uCeWl-0007qb-0v;
+	Wed, 07 May 2025 13:09:35 +0000
+Date: Wed, 7 May 2025 21:08:36 +0800
+From: kernel test robot <lkp@intel.com>
+To: Taehee Yoo <ap420073@gmail.com>, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, andrew+netdev@lunn.ch,
+	horms@kernel.org, almasrymina@google.com, sdf@fomichev.me,
+	netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	asml.silence@gmail.com, dw@davidwei.uk, skhawaja@google.com,
+	willemb@google.com, jdamato@fastly.com, ap420073@gmail.com
+Subject: Re: [PATCH net v2] net: devmem: fix kernel panic when socket close
+ after module unload
+Message-ID: <202505072001.RHUTj8Jo-lkp@intel.com>
+References: <20250506140858.2660441-1-ap420073@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250507114833.2503676-1-kshk@linux.ibm.com>
+In-Reply-To: <20250506140858.2660441-1-ap420073@gmail.com>
 
-On Wed, May 07, 2025 at 06:48:33AM -0500, Konstantin Shkolnyy wrote:
->These tests:
->    "SOCK_STREAM ioctl(SIOCOUTQ) 0 unsent bytes"
->    "SOCK_SEQPACKET ioctl(SIOCOUTQ) 0 unsent bytes"
->output: "Unexpected 'SIOCOUTQ' value, expected 0, got 64 (CLIENT)".
->
->They test that the SIOCOUTQ ioctl reports 0 unsent bytes after the data
->have been received by the other side. However, sometimes there is a delay
->in updating this "unsent bytes" counter, and the test fails even though
->the counter properly goes to 0 several milliseconds later.
->
->The delay occurs in the kernel because the used buffer notification
->callback virtio_vsock_tx_done(), called upon receipt of the data by the
->other side, doesn't update the counter itself. It delegates that to
->a kernel thread (via vsock->tx_work). Sometimes that thread is delayed
->more than the test expects.
->
->Change the test to try SIOCOUTQ several times with small delays in between.
->
->Signed-off-by: Konstantin Shkolnyy <kshk@linux.ibm.com>
->---
-> tools/testing/vsock/vsock_test.c | 26 ++++++++++++++++----------
-> 1 file changed, 16 insertions(+), 10 deletions(-)
->
->diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->index d0f6d253ac72..143f1cba2d18 100644
->--- a/tools/testing/vsock/vsock_test.c
->+++ b/tools/testing/vsock/vsock_test.c
->@@ -1264,21 +1264,27 @@ static void test_unsent_bytes_client(const struct test_opts *opts, int type)
-> 	send_buf(fd, buf, sizeof(buf), 0, sizeof(buf));
-> 	control_expectln("RECEIVED");
->
->-	ret = ioctl(fd, SIOCOUTQ, &sock_bytes_unsent);
->-	if (ret < 0) {
->-		if (errno == EOPNOTSUPP) {
->-			fprintf(stderr, "Test skipped, SIOCOUTQ not supported.\n");
->-		} else {
->+	/* SIOCOUTQ isn't guaranteed to instantly track sent data */
->+	for (int i = 0; i < 10; i++) {
->+		ret = ioctl(fd, SIOCOUTQ, &sock_bytes_unsent);
->+		if (ret == 0 && sock_bytes_unsent == 0)
->+			goto success;
->+
->+		if (ret < 0) {
->+			if (errno == EOPNOTSUPP) {
->+				fprintf(stderr, "Test skipped, SIOCOUTQ not supported.\n");
->+				goto success;
->+			}
-> 			perror("ioctl");
-> 			exit(EXIT_FAILURE);
-> 		}
->-	} else if (ret == 0 && sock_bytes_unsent != 0) {
->-		fprintf(stderr,
->-			"Unexpected 'SIOCOUTQ' value, expected 0, got %i\n",
->-			sock_bytes_unsent);
->-		exit(EXIT_FAILURE);
->+		usleep(10 * 1000);
-> 	}
->
->+	fprintf(stderr, "Unexpected 'SIOCOUTQ' value, expected 0, got %i\n",
->+		sock_bytes_unsent);
->+	exit(EXIT_FAILURE);
->+success:
-> 	close(fd);
+Hi Taehee,
 
-I worked on something similar but I didn't yet send it.
+kernel test robot noticed the following build errors:
 
-I like the delay you put, but I prefer to use the timeout stuff we have
-to retry, like I did here:
+[auto build test ERROR on net/main]
 
-@@ -1264,20 +1270,25 @@ static void test_unsent_bytes_client(const struct test_opts *op
-ts, int type)
-         send_buf(fd, buf, sizeof(buf), 0, sizeof(buf));
-         control_expectln("RECEIVED");
+url:    https://github.com/intel-lab-lkp/linux/commits/Taehee-Yoo/net-devmem-fix-kernel-panic-when-socket-close-after-module-unload/20250506-221010
+base:   net/main
+patch link:    https://lore.kernel.org/r/20250506140858.2660441-1-ap420073%40gmail.com
+patch subject: [PATCH net v2] net: devmem: fix kernel panic when socket close after module unload
+config: i386-defconfig (https://download.01.org/0day-ci/archive/20250507/202505072001.RHUTj8Jo-lkp@intel.com/config)
+compiler: clang version 20.1.2 (https://github.com/llvm/llvm-project 58df0ef89dd64126512e4ee27b4ac3fd8ddf6247)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250507/202505072001.RHUTj8Jo-lkp@intel.com/reproduce)
 
--       ret = ioctl(fd, SIOCOUTQ, &sock_bytes_unsent);
--       if (ret < 0) {
--               if (errno == EOPNOTSUPP) {
--                       fprintf(stderr, "Test skipped, SIOCOUTQ not supported.\n");
--               } else {
--                       perror("ioctl");
--                       exit(EXIT_FAILURE);
-+       /* Although we have a control message, we are not sure that the vsock
-+        * transport has sent us notification that the buffer has been copied
-+        * and cleared, so in some cases we may still see unsent bytes.
-+        * Better to do a few iterations to be sure.
-+        */
-+       timeout_begin(TIMEOUT);
-+       do {
-+               ret = ioctl(fd, SIOCOUTQ, &sock_bytes_unsent);
-+               if (ret < 0) {
-+                       if (errno == EOPNOTSUPP) {
-+                               fprintf(stderr, "Test skipped, SIOCOUTQ not supported.\n");
-+                               break;
-+                       } else {
-+                               perror("ioctl");
-+                               exit(EXIT_FAILURE);
-+                       }
-                 }
--       } else if (ret == 0 && sock_bytes_unsent != 0) {
--               fprintf(stderr,
--                       "Unexpected 'SIOCOUTQ' value, expected 0, got %i\n",
--                       sock_bytes_unsent);
--               exit(EXIT_FAILURE);
--       }
-+       } while (sock_bytes_unsent != 0);
-+       timeout_end();
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202505072001.RHUTj8Jo-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> net/core/netdev-genl.c:879:60: error: too many arguments to function call, expected 3, have 4
+     879 |         binding = net_devmem_bind_dmabuf(netdev, dmabuf_fd, priv, info->extack);
+         |                   ~~~~~~~~~~~~~~~~~~~~~~                          ^~~~~~~~~~~~
+   net/core/devmem.h:132:1: note: 'net_devmem_bind_dmabuf' declared here
+     132 | net_devmem_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
+         | ^                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     133 |                        struct netlink_ext_ack *extack)
+         |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   1 error generated.
 
 
-What about combining the two?
+vim +879 net/core/netdev-genl.c
 
-Thanks,
-Stefano
+   827	
+   828	int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
+   829	{
+   830		struct nlattr *tb[ARRAY_SIZE(netdev_queue_id_nl_policy)];
+   831		struct net_devmem_dmabuf_binding *binding;
+   832		u32 ifindex, dmabuf_fd, rxq_idx;
+   833		struct netdev_nl_sock *priv;
+   834		struct net_device *netdev;
+   835		struct sk_buff *rsp;
+   836		struct nlattr *attr;
+   837		int rem, err = 0;
+   838		void *hdr;
+   839	
+   840		if (GENL_REQ_ATTR_CHECK(info, NETDEV_A_DEV_IFINDEX) ||
+   841		    GENL_REQ_ATTR_CHECK(info, NETDEV_A_DMABUF_FD) ||
+   842		    GENL_REQ_ATTR_CHECK(info, NETDEV_A_DMABUF_QUEUES))
+   843			return -EINVAL;
+   844	
+   845		ifindex = nla_get_u32(info->attrs[NETDEV_A_DEV_IFINDEX]);
+   846		dmabuf_fd = nla_get_u32(info->attrs[NETDEV_A_DMABUF_FD]);
+   847	
+   848		priv = genl_sk_priv_get(&netdev_nl_family, NETLINK_CB(skb).sk);
+   849		if (IS_ERR(priv))
+   850			return PTR_ERR(priv);
+   851	
+   852		rsp = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
+   853		if (!rsp)
+   854			return -ENOMEM;
+   855	
+   856		hdr = genlmsg_iput(rsp, info);
+   857		if (!hdr) {
+   858			err = -EMSGSIZE;
+   859			goto err_genlmsg_free;
+   860		}
+   861	
+   862		err = 0;
+   863		netdev = netdev_get_by_index_lock(genl_info_net(info), ifindex);
+   864		if (!netdev) {
+   865			err = -ENODEV;
+   866			goto err_genlmsg_free;
+   867		}
+   868		if (!netif_device_present(netdev))
+   869			err = -ENODEV;
+   870		else if (!netdev_need_ops_lock(netdev))
+   871			err = -EOPNOTSUPP;
+   872		if (err) {
+   873			NL_SET_BAD_ATTR(info->extack,
+   874					info->attrs[NETDEV_A_DEV_IFINDEX]);
+   875			goto err_unlock;
+   876		}
+   877	
+   878		mutex_lock(&priv->lock);
+ > 879		binding = net_devmem_bind_dmabuf(netdev, dmabuf_fd, priv, info->extack);
+   880		if (IS_ERR(binding)) {
+   881			err = PTR_ERR(binding);
+   882			goto err_unlock_sock;
+   883		}
+   884	
+   885		nla_for_each_attr_type(attr, NETDEV_A_DMABUF_QUEUES,
+   886				       genlmsg_data(info->genlhdr),
+   887				       genlmsg_len(info->genlhdr), rem) {
+   888			err = nla_parse_nested(
+   889				tb, ARRAY_SIZE(netdev_queue_id_nl_policy) - 1, attr,
+   890				netdev_queue_id_nl_policy, info->extack);
+   891			if (err < 0)
+   892				goto err_unbind;
+   893	
+   894			if (NL_REQ_ATTR_CHECK(info->extack, attr, tb, NETDEV_A_QUEUE_ID) ||
+   895			    NL_REQ_ATTR_CHECK(info->extack, attr, tb, NETDEV_A_QUEUE_TYPE)) {
+   896				err = -EINVAL;
+   897				goto err_unbind;
+   898			}
+   899	
+   900			if (nla_get_u32(tb[NETDEV_A_QUEUE_TYPE]) != NETDEV_QUEUE_TYPE_RX) {
+   901				NL_SET_BAD_ATTR(info->extack, tb[NETDEV_A_QUEUE_TYPE]);
+   902				err = -EINVAL;
+   903				goto err_unbind;
+   904			}
+   905	
+   906			rxq_idx = nla_get_u32(tb[NETDEV_A_QUEUE_ID]);
+   907	
+   908			err = net_devmem_bind_dmabuf_to_queue(netdev, rxq_idx, binding,
+   909							      info->extack);
+   910			if (err)
+   911				goto err_unbind;
+   912		}
+   913	
+   914		list_add(&binding->list, &priv->bindings);
+   915	
+   916		nla_put_u32(rsp, NETDEV_A_DMABUF_ID, binding->id);
+   917		genlmsg_end(rsp, hdr);
+   918	
+   919		err = genlmsg_reply(rsp, info);
+   920		if (err)
+   921			goto err_unbind;
+   922	
+   923		mutex_unlock(&priv->lock);
+   924		netdev_unlock(netdev);
+   925	
+   926		return 0;
+   927	
+   928	err_unbind:
+   929		net_devmem_unbind_dmabuf(binding);
+   930	err_unlock_sock:
+   931		mutex_unlock(&priv->lock);
+   932	err_unlock:
+   933		netdev_unlock(netdev);
+   934	err_genlmsg_free:
+   935		nlmsg_free(rsp);
+   936		return err;
+   937	}
+   938	
 
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
