@@ -1,145 +1,147 @@
-Return-Path: <netdev+bounces-188749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6667EAAE76A
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 19:08:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56A3BAAE780
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 19:13:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8307D1BA63D5
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 17:09:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2CED4C6919
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 17:13:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 496B228C010;
-	Wed,  7 May 2025 17:08:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3587D28C037;
+	Wed,  7 May 2025 17:13:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e7Qu/EDJ"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="d/geZy1b"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D6191F7586;
-	Wed,  7 May 2025 17:08:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E82B1A0BF1
+	for <netdev@vger.kernel.org>; Wed,  7 May 2025 17:13:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746637725; cv=none; b=o2IatKiqF17fagbc5oAB8LOaa7/yw1tUY6/5IWcIRF/G96ihUVqOcRmrXLU+F4rsMTgCYKl+jTQSElxmsVaujEp83G8/KV/MVSI5S6IEdhV20kY07GVMWD4KGQZQdCUbY8YIgnAhm895J0DEd83DTQeda6fEsOaoxkohUvz8qsk=
+	t=1746638017; cv=none; b=H814lHCaGGdmj0p+vhxoxxHVTTZPAETMp0Wvm0/kSZvKDVtp3wUXcrMNHgKS+boYkIuX7TbgU1BHX01D7RlVWrpFdH3ydqobrCRGdDn10bCCyey/tQpFj2v/QeGtuFYi4pY3ZRkyGeUHrDFQCVgejvUt0wkerlvqXhxATkRX0l0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746637725; c=relaxed/simple;
-	bh=Jq9bflgMyv//ExGbdW2q5bnL262ltP3uzPizW6R3qgQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GfYZqvCGPBr5Tjr1O4Y51SNnOWeuskm5e2+4osLms+ubxKVZZKrpsvC5FHfEnWboPy9GsIlA0GbQb6cCvPuG7q/sW4t2wvoj1RrDoFs0qU3NiFlFvgIopEGLju03eN++/9wmYiOIlAkHuSF3rifT9Kde7dByRf/ul4xJX+z2QdY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e7Qu/EDJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D120C4CEE2;
-	Wed,  7 May 2025 17:08:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746637724;
-	bh=Jq9bflgMyv//ExGbdW2q5bnL262ltP3uzPizW6R3qgQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=e7Qu/EDJig6b64oE/qqwoKYK9fSwUPPOSXLMM56GRafS+LNckWgaWgkQbvfMyNmXH
-	 VrJGB002uH44KNM4HIKdInCOpxtAdwtQIKV666ZD+fF3Y04tT1DjZrW1qJY8WcIKwE
-	 UX9D0Yr8aWD9VxZfS/v7j562BLp2c1ga71QoXBg9mtO0BcsWOeqJ+aBYojpNELyQ3u
-	 D8hclkjDfymw3CSRW65O1lsBDxxTdNomGizR3NaKVtd4WwCb23fdUoWU9BGHVLtR3d
-	 eCuahVLurdKoKssDrvzWZmnhnaeWTrMx3uB9C7m5uPeHSkx4iFO8X25S/GUkHuGo3/
-	 HPZQOxm3Lug2A==
-Message-ID: <062e886f-7c83-4d46-97f1-ebbce3ca8212@kernel.org>
-Date: Wed, 7 May 2025 19:08:38 +0200
+	s=arc-20240116; t=1746638017; c=relaxed/simple;
+	bh=J72i1Wp9oi7hk2jMR7W27GcfTd+rvOi9NRjQWL1s9Ns=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EEZxJqPGZ1q4P/m/bGiTuiMRTgGh1mnSzuw9BM7ic95c1Ue3BdNK9/rM0nsI7Mq5KlJq3mcbNtKbVbg9siX2pArZMLPMiH7+LxrJbwXrVgxAXNVsHNdhyZXGXAA2l861qBE6TUxDOCaHRor26BhReYkraLV2IvUJiGC+LiTgtmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=d/geZy1b; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 547BwCVc020032;
+	Wed, 7 May 2025 10:13:15 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:message-id:mime-version:subject:to; s=
+	pfpt0220; bh=maXAM3pb0IjEkH/dFLOHGfXfA9wJbky+XD1BhVA28PQ=; b=d/g
+	eZy1bv53ZHTDX70BDswBt3S9WhgcH4BSlO0CDpT71JNU1szR4K68kIRiJfld4Ino
+	U2RarT5Rhf3dM9vchwxV9hgIlm+fJwiK/9SyESrLvr37O3iA7ADHkmHw44TFDf39
+	94bz9r1Jx1SAu0Z2DMAnkawcYMD8HtRqa7MPuVs0RDSD4LuHHRBXVo2gNC9IQ9+G
+	WgY/Lw1IaK/tp4sQdFexrV1shdtKqzGOS2HzX7C8Ck2rW8fG3deAf3RXdcqSGvnJ
+	yuPQ35fiyBEtrNIfnJsdUQbnfTDp/OWJJUhRYXa2OH7tvrqm9szhW5iSOWg3JOPt
+	12iyBSj3a1GAI82m+hQ==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 46g4kp93nq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 07 May 2025 10:13:15 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Wed, 7 May 2025 10:13:14 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Wed, 7 May 2025 10:13:14 -0700
+Received: from hyd1358.marvell.com (unknown [10.29.37.11])
+	by maili.marvell.com (Postfix) with ESMTP id D37A03F708A;
+	Wed,  7 May 2025 10:13:10 -0700 (PDT)
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+        <gakula@marvell.com>, <hkelam@marvell.com>, <sgoutham@marvell.com>
+CC: <netdev@vger.kernel.org>, Subbaraya Sundeep <sbhatta@marvell.com>
+Subject: [PATCH] octeontx2-pf: Do not reallocate all ntuple filters
+Date: Wed, 7 May 2025 22:42:56 +0530
+Message-ID: <1746637976-10328-1-git-send-email-sbhatta@marvell.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3] xdp: Add helpers for head length, headroom,
- and metadata length
-To: Zvi Effron <zeffron@riotgames.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Stanislav Fomichev <stfomichev@gmail.com>, Jon Kohler <jon@nutanix.com>,
- Jason Wang <jasowang@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- Jacob Keller <jacob.e.keller@intel.com>
-References: <20250506125242.2685182-1-jon@nutanix.com>
- <aBpKLNPct95KdADM@mini-arch>
- <681b603ac8473_1e4406294a6@willemb.c.googlers.com.notmuch>
- <c8ad3f65-f70e-4c6e-9231-0ae709e87bfe@kernel.org>
- <CAC1LvL3nE14cbQx7Me6oWS88EdpGP4Gx2A0Um4g-Vuxk4m_7Rw@mail.gmail.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <CAC1LvL3nE14cbQx7Me6oWS88EdpGP4Gx2A0Um4g-Vuxk4m_7Rw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTA3MDE1OSBTYWx0ZWRfX2xPEGDipUm3X GfIhc+rV92gNhNQ/zGzUf0tfBckFtKlEP3mGRRxxTAcEdwZyf6uczhoU8UbvO1hYlFo7h/FC8YR s14VdHGYRvM7/4lj6m7eJKXd4/5UehcpYnO4misW7Ylz3aE1xYDjdpBqgQyncdqnCPFaQXIjdEz
+ ouLvCS+Lo+JpnN2ihQ/5uv4Yi7hvGoqzJOdXZig6fWqQYrE8hXy4h3DyDrl+ijJ1/zh/mcXP7J6 AUP0+00ZWXVpn27204aicKkE0FoyIzaEdO2Wm8xg7Hdz1+mdmEutkOdhxCLBtwmELPen1U7lTE+ yvvONgXkx8Pdfs1oIiAwbkXSQw5iL1rd2I7lhTAsXbqNBlgMf/nBnG4N7HQUk7TJ2Hu4winZFyB
+ LHJxlSC2vaYivCrSkEX26Dum3Vw0DeD7cQVcVj2yZmiTrZ8ZgRaZvthWpfv0smLrCvHo162B
+X-Proofpoint-GUID: yB-65sUR_toTfvNwrQyEwJ92AzMxhR6O
+X-Authority-Analysis: v=2.4 cv=evffzppX c=1 sm=1 tr=0 ts=681b94ab cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=dt9VzEwgFbYA:10 a=M5GUcnROAAAA:8 a=JJ9OIAJi2aS0bon4u0AA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-ORIG-GUID: yB-65sUR_toTfvNwrQyEwJ92AzMxhR6O
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-07_05,2025-05-06_01,2025-02-21_01
 
+If ntuple filters count is modified followed by
+unicast filters count using devlink then the ntuple count
+set by user is ignored and all the ntuple filters are
+being reallocated. Fix this by storing the ntuple count
+set by user using devlink.
 
+Fixes: 39c469188b6d ("octeontx2-pf: Add ucast filter count configurability via devlink.")
+Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h  | 1 +
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c | 1 +
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c   | 3 ++-
+ 3 files changed, 4 insertions(+), 1 deletion(-)
 
-On 07/05/2025 19.02, Zvi Effron wrote:
-> On Wed, May 7, 2025 at 9:37 AM Jesper Dangaard Brouer <hawk@kernel.org> wrote:
->>
->>
->>
->> On 07/05/2025 15.29, Willem de Bruijn wrote:
->>> Stanislav Fomichev wrote:
->>>> On 05/06, Jon Kohler wrote:
->>>>> Introduce new XDP helpers:
->>>>> - xdp_headlen: Similar to skb_headlen
->>
->> I really dislike xdp_headlen(). This "headlen" originates from an SKB
->> implementation detail, that I don't think we should carry over into XDP
->> land.
->> We need to come up with something that isn't easily mis-read as the
->> header-length.
-> 
-> ... snip ...
-> 
->>>> + * xdp_headlen - Calculate the length of the data in an XDP buffer
-> 
-> How about xdp_datalen()?
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+index 1e88422..d6b4b74 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+@@ -356,6 +356,7 @@ struct otx2_flow_config {
+ 	struct list_head	flow_list_tc;
+ 	u8			ucast_flt_cnt;
+ 	bool			ntuple;
++	u16			ntuple_cnt;
+ };
+ 
+ struct dev_hw_ops {
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
+index 33ec9a7..e13ae548 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
+@@ -41,6 +41,7 @@ static int otx2_dl_mcam_count_set(struct devlink *devlink, u32 id,
+ 	if (!pfvf->flow_cfg)
+ 		return 0;
+ 
++	pfvf->flow_cfg->ntuple_cnt = ctx->val.vu16;
+ 	otx2_alloc_mcam_entries(pfvf, ctx->val.vu16);
+ 
+ 	return 0;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
+index 47bfd1f..64c6d916 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
+@@ -247,7 +247,7 @@ int otx2_mcam_entry_init(struct otx2_nic *pfvf)
+ 	mutex_unlock(&pfvf->mbox.lock);
+ 
+ 	/* Allocate entries for Ntuple filters */
+-	count = otx2_alloc_mcam_entries(pfvf, OTX2_DEFAULT_FLOWCOUNT);
++	count = otx2_alloc_mcam_entries(pfvf, flow_cfg->ntuple_cnt);
+ 	if (count <= 0) {
+ 		otx2_clear_ntuple_flow_info(pfvf, flow_cfg);
+ 		return 0;
+@@ -307,6 +307,7 @@ int otx2_mcam_flow_init(struct otx2_nic *pf)
+ 	INIT_LIST_HEAD(&pf->flow_cfg->flow_list_tc);
+ 
+ 	pf->flow_cfg->ucast_flt_cnt = OTX2_DEFAULT_UNICAST_FLOWS;
++	pf->flow_cfg->ntuple_cnt = OTX2_DEFAULT_FLOWCOUNT;
+ 
+ 	/* Allocate bare minimum number of MCAM entries needed for
+ 	 * unicast and ntuple filters.
+-- 
+2.7.4
 
-Yes, I like xdp_datalen() :-)
---Jesper
-
-> On Wed, May 7, 2025 at 9:37 AM Jesper Dangaard Brouer <hawk@kernel.org> wrote:
->>
->>
->>
->> On 07/05/2025 15.29, Willem de Bruijn wrote:
->>> Stanislav Fomichev wrote:
->>>> On 05/06, Jon Kohler wrote:
->>>>> Introduce new XDP helpers:
->>>>> - xdp_headlen: Similar to skb_headlen
->>
->> I really dislike xdp_headlen().  This "headlen" originates from an SKB
->> implementation detail, that I don't think we should carry over into XDP
->> land.
->> We need to come up with something that isn't easily mis-read as the
->> header-length.
->>
->>>>> - xdp_headroom: Similar to skb_headroom
->>>>> - xdp_metadata_len: Similar to skb_metadata_len
->>>>>
->>
->> I like naming of these.
->>
->>>>> Integrate these helpers into tap, tun, and XDP implementation to start.
->>>>>
->>>>> No functional changes introduced.
->>>>>
->>>>> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
->>>>> Signed-off-by: Jon Kohler <jon@nutanix.com>
->>>>> ---
->>>>> v2->v3: Integrate feedback from Stanislav
->>>>> https://patchwork.kernel.org/project/netdevbpf/patch/20250430201120.1794658-1-jon@nutanix.com/
->>>>
->>>> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
->>>
->>> Reviewed-by: Willem de Bruijn <willemb@google.com>
->>>
->>
->> Nacked-by: Jesper Dangaard Brouer <hawk@kernel.org>
->>
->> pw: cr
->>
 
