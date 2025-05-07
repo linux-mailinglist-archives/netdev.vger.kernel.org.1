@@ -1,171 +1,105 @@
-Return-Path: <netdev+bounces-188536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5D03AAD432
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 05:44:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9588AAD43E
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 05:48:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B5BB98409E
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 03:43:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E70031BA82ED
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 03:48:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A3871C5485;
-	Wed,  7 May 2025 03:43:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBE8718B46E;
+	Wed,  7 May 2025 03:48:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MAPrLagE"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="NhEEKCNW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C446F1BC07A;
-	Wed,  7 May 2025 03:43:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3162F610D
+	for <netdev@vger.kernel.org>; Wed,  7 May 2025 03:48:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746589437; cv=none; b=MXJefBHI+Sh2vYloqKrVi3M7HWOy7AV4AZQYM0+1FaKlb6O103EZAoXmwxX87olkmvpab+jbQa+X88ohongrj9T9z9WTgVI0kF2OFSasgfI97ChYZmgWchSONrPI7Y/WJQ8hECwCu5scvzbPgVr2GT5olkZRvh02TLKsfJZyk/U=
+	t=1746589713; cv=none; b=l5l3wxbwZGeiHNKp8sWwQnA8417sYveOWhuaMotwn80S/CGi3gSQGwisP9/uPHwcipZoMn1x2Iecpr4B9HBuRG/RgkvvA5kXMJMAIKOsB/VVFK0TG9RK4DKNCzxHb7DoyfuBf17cTPWCwyxi1K/i+42dG2WEETqtUkG8wGlltK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746589437; c=relaxed/simple;
-	bh=1/TV6tMl2gNlog8KxmmJQ9ScMhNwTlfXsz6pi42aGTk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TYhOLNyhuDCt8614pCJZKbADTxE9ZlFbOkAZd1wZEN0N317wQroKHmIq8ehHH5eQcD/t7YGplv4CN+N5pONHjW93jritzx9RRPllVEAR6a7nuRcxHsx17qw+650cuafCqwYk/CxtR3Wj8E7k08GBtqiuKpG0LeCVWrRvPtI9pH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MAPrLagE; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-441ab63a415so63816045e9.3;
-        Tue, 06 May 2025 20:43:55 -0700 (PDT)
+	s=arc-20240116; t=1746589713; c=relaxed/simple;
+	bh=qn8NqRy39GWBZU7FmrVnseKqxZV6gPnEB+Yipj+ql1o=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Mwcl79uj8bmPLk7YU13F8VZZl67d0YJgkNrTx5OYCgfom0tx0H/c1Ka8gnDh70g/RNz9QfZ3xnt51ltfqbQ5i+hnZ9S/HfQmacgCgVK3jvGOKv6fWBNNuzWYNyZR/LYyad/BFtII2oD0eemSc+NVYh8uqYw2piYSQjFRn7syCek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=NhEEKCNW; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746589434; x=1747194234; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EKjjpWzv48U9LX3EX2sY4j22d7QCieaYoLqSyYGhmYE=;
-        b=MAPrLagEqcyWEV7L8kkenHgxQfXOSr6ZrSWQThVkNLdze8dC3EVQ1Y/y7x04FRO710
-         oMZxFrtI5sc0STAjdgpKSsUXpBi7hFkNKOoZ3lOrTFUf8r9q4w7Hr+sZdubJj81/S6fN
-         tXAgeUM79mg4lSsRqunPubQdR7HYnC5lTwLxT+BNS40uNcYUpH4YCFsWH9pXQJ7sZQ7S
-         H0BJU9HjtW57XH1MF5NRe+i3cGtQitGkj3wZ5FuqZg0uisnMpczTeyhUgSSYCD/mTCyE
-         jP0OwFI25OcOnLmH+Ez0uJAPyhTBEafO1iuVKfHtJXoi+fOmQ8MhDdR4X4z7Tq+OwiVX
-         rgIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746589434; x=1747194234;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EKjjpWzv48U9LX3EX2sY4j22d7QCieaYoLqSyYGhmYE=;
-        b=A6xmXgKJHNgyd4AdL6HmI6D4zExZaMezh/Dy8YCrMJTMEeXeXNPQeV5FvFr8LofOcB
-         NZOjfFyrKOx+95jdiRP+UpAPamSrFd015KerHacaO+KDw9ACgCGaPovVBJ2roN7sq9+o
-         HXqerhyDn6t0PPQHaOJEoj4iljEfeTgqY86ST74qjXlb5s+k5flIL5UaCvymk46cJnyK
-         0sbopWNy7Y3PS3ar8tN48OqVUwMoEy1PUT5wxW6gA/P71YATjXaGrlSDYPV7b3VC6S/o
-         IZwG1YGo/8smBKZPoGPyNlGrbbZXOekcBIITXMCoV87K1X/KHT52x4pBsIUnNntTMkfC
-         t07A==
-X-Forwarded-Encrypted: i=1; AJvYcCUfNO3Up6J4/RSFna8EcKDSOxwgPUVMR0hRlo15riSK8IGISsonLKLIoglXeS3TQgjvW37c4XFt38gizj3U@vger.kernel.org, AJvYcCUwW3pQ3fWU4duwj/8c8J1pMUQKeOuR3wJVkE5Z/MHYpQDFwXMYySyEn062Br0T6UHn6mMWjrGe@vger.kernel.org, AJvYcCVjIjzf4J8WGZO2G1R/f3Q3CrJg76Mp3OWpyVPdXsBLVMqRVKlAJDlv+5DxrfPWgk/PVls=@vger.kernel.org, AJvYcCXR34x1TQByDKF6FxBH2Vc1Uvc+OmwV1ah3rRA1HivSTl6/4OdsaIik1ymKarELf+pdcYdM3WGE3WKUIx8BTPqi9DXH@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7j5W1o/CgCRM1H4hhNtYIGY7vvscjvzpJAJhiwzotXBWlrS2u
-	Y9Jn9JNzW8GAmr2xAJr/hDHDLFQCI9gs7aeJky7f6lEJPJHGlP8Y+2YrLldH3xDqtxuC64J+H+Y
-	Fh69juD9YQffiJQEMT/Bj7jthiOE=
-X-Gm-Gg: ASbGncvjFufBKdqKqKSeGMdyXLFPfrShfmW1t0I/O5hEylb9aAv9PokszcFw1/FJ6Uo
-	nvOViq/sW0QimeB3C5AifKoMeJSs4zJo3rBijbSSr0sMYpuBAtHYB6EM+1iNHMFb63MaQ0LCwt0
-	mARZMevYOj0Z2ExF93m1KPTyp3UcQ0bC1B6oTx+uKptPzVnrB3qg==
-X-Google-Smtp-Source: AGHT+IGEG3zUsL0Hq6HZDsiJfGiMiVQhydWmd7Hclu84WAzBoZfmF3OvFbXv3SSqQyG4o6d2sB5Gmpt0wlD2gHsBZ3w=
-X-Received: by 2002:a05:6000:1a8b:b0:3a0:9de8:8a45 with SMTP id
- ffacd0b85a97d-3a0b49d2755mr1212225f8f.32.1746589433881; Tue, 06 May 2025
- 20:43:53 -0700 (PDT)
+	d=codeconstruct.com.au; s=2022a; t=1746589709;
+	bh=DOQTtgBzqbaK3D57XQbiGVyNWVlHZv8CmS3gBN8yxE4=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=NhEEKCNWjGULqQzm6jZgGuwi2BhFUIl14YFmtk+gIplldNHyBVclguGD1fyVMJVjF
+	 x07hjS9TRwW+Pt/8QUf3Q2OsebjUuSnuOkb+5IwUm0Tx/H8b6nRUR2et7H7hO6pjRu
+	 JItvQ+zl/xyPLrPmejzN4S+CV7ZqJsgaJ4scU4n5HlJWd0iyRq8MIe4UEDyzVGmLCd
+	 VhfSYKGt8HSDhTuPiq6fTzPh6Vieamiw9PIyqmzWTNUVENXrYRtmo61w9spvKrCma3
+	 6wlx8j6qy30eeH2q7PA8RmJbrfmtqDlHRWQaGfHW9+Nejf2TTkIvnBTn+A+3Ta9fVB
+	 BcwVTToq+qMjA==
+Received: from [192.168.14.220] (unknown [159.196.94.230])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 672A364473;
+	Wed,  7 May 2025 11:48:28 +0800 (AWST)
+Message-ID: <eca4d35dc5aa150547317f805633abc70ae994ca.camel@codeconstruct.com.au>
+Subject: Re: [PATCH net] net: mctp: Don't access ifa_index when missing
+From: Matt Johnston <matt@codeconstruct.com.au>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jeremy Kerr <jk@codeconstruct.com.au>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, 
+ syzbot+e76d52dadc089b9d197f@syzkaller.appspotmail.com, 
+ syzbot+1065a199625a388fce60@syzkaller.appspotmail.com
+Date: Wed, 07 May 2025 11:48:28 +0800
+In-Reply-To: <20250506192030.7228fcc9@kernel.org>
+References: <20250505-mctp-addr-dump-v1-1-a997013f99b8@codeconstruct.com.au>
+	 <20250506180630.148c6ada@kernel.org>
+	 <84b6bdceff61d495661dcf3500fd4bf19cf4e7be.camel@codeconstruct.com.au>
+	 <20250506184124.57700932@kernel.org>
+	 <0decca5d2af88ccbe51b7e9c88a258bd8cc6c6e8.camel@codeconstruct.com.au>
+	 <20250506192030.7228fcc9@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250506025131.136929-1-jiayuan.chen@linux.dev>
- <b776fa07-de4b-44be-ae68-8bc8c362ea81@linux.dev> <9c311d9944fa57cec75e06cde94496d782fe4980@linux.dev>
-In-Reply-To: <9c311d9944fa57cec75e06cde94496d782fe4980@linux.dev>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Tue, 6 May 2025 20:43:43 -0700
-X-Gm-Features: ATxdqUFaoJtwVj0z2KLyes9UtmvTMsURQNshsCTGx3BUOtVxeWC_uBDz5fClPus
-Message-ID: <CAADnVQKK87UV9rH_YviePfUmOO3mGXQmYfN-Q9Ax5AYv+xE8zw@mail.gmail.com>
-Subject: Re: [RESEND PATCH bpf-next v4 1/2] bpf, sockmap: Introduce tracing
- capability for sockmap
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: Martin KaFai Lau <martin.lau@linux.dev>, Jakub Sitnicki <jakub@cloudflare.com>, 
-	John Fastabend <john.fastabend@gmail.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Steven Rostedt <rostedt@goodmis.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
-	linux-trace-kernel <linux-trace-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 6, 2025 at 8:37=E2=80=AFPM Jiayuan Chen <jiayuan.chen@linux.dev=
-> wrote:
->
-> May 7, 2025 at 04:24, "Martin KaFai Lau" <martin.lau@linux.dev> wrote:
->
-> >
-> > On 5/5/25 7:51 PM, Jiayuan Chen wrote:
-> >
-> > >
-> > > Sockmap has the same high-performance forwarding capability as XDP, b=
-ut
-> > >
-> > >  operates at Layer 7.
-> > >
-> > >  Introduce tracing capability for sockmap, to trace the execution res=
-ults
-> > >
-> > >  of BPF programs without modifying the programs themselves, similar t=
-o
-> > >
-> > >  the existing trace_xdp_redirect{_map}.
-> > >
-> >
-> > There were advancements in bpf tracing since the trace_xdp_xxx addition=
-s.
-> >
-> > Have you considered the fexit bpf prog and why it is not sufficient ?
-> >
->
-> 1.This patchset prints a large amount of information (e.g. inode ID, etc.=
-),
-> some of which require kernel-internal helpers to access. These helpers ar=
-e
-> not currently available as kfuncs, making it difficult to implement
-> equivalent functionality with fentry/fexit.
->
-> 2. skb->_sk_redir implicitly stores both a redir action and the socket ad=
-dress
-> in a single field. Decoding this structure in fentry/fexit would require
-> duplicating kernel-internal logic in BPF programs. This creates maintenan=
-ce
-> risks, as any future changes to the kernel's internal representation woul=
+On Tue, 2025-05-06 at 19:20 -0700, Jakub Kicinski wrote:
+> On Wed, 07 May 2025 10:13:19 +0800 Matt Johnston wrote:
+> > > I see your point. And existing user space may expect filtering
+> > > even if !cb->strict_check but family is set to AF_MCTP? =20
+> >=20
+> > Yes, given mctp_dump_addrinfo() has always applied a filter, mctp-speci=
+fic
+> > programs likely expect that behaviour.
+>=20
+> Okay, so would this make all known user space happy?
+>=20
+> 	if (!msg short) {
+> 		ifindex =3D ifm->ifa_index
+> 	} else {
+> 		if (cb->strict_check)
+> 			return error
+> 	}
+
+I think that would work well. Some old non-mctp programs might send a full
+header but garbage ifa_index (the original reason for strict_check), but th=
+at
+would just filter out some interfaces which should be OK - that userspace
+wouldn't be handling AF_MCTP responses anyway. I'll give it some testing an=
 d
-> necessitate corresponding updates to the BPF programs.
->
-> 3. Similar to the debate between using built-in tracepoints vs kprobes/fe=
-ntry,
-> each approach has its tradeoffs. The key advantage of a built-in tracepoi=
-nt is
-> seamless integration with existing tools like perf and bpftrace, which na=
-tively
-> support tracepoint-based tracing. For example, simply executing
-> 'perf trace -e 'sockmap:*' ./producer' could provide sufficient visibilit=
-y
-> without custom BPF programs.
+get a v2. Thanks for the review.
 
-Similar to Martin I don't buy these excuses.
-For your own debugging you can write bpftrace prog that will
-print exact same stats and numbers without adding any kernel code.
+I'll have a look at nlmsg_payload() for later.=20
 
-We add tracepoints when they're in the path that is hard to get to
-with tracing tools. Like functions are partially inlined.
-Here it's not the case.
-You want to add a tracepoint right after your own bpf prog
-finished. All these debugging could have been part of your
-skmsg program.
-
-pw-bot: cr
+Cheers,
+Matt
 
