@@ -1,134 +1,125 @@
-Return-Path: <netdev+bounces-188785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F71AAAED22
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 22:37:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 283E7AAED34
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 22:43:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C73F64624C1
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 20:37:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96873524327
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 20:43:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74C3D28F933;
-	Wed,  7 May 2025 20:37:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A74CB28F94A;
+	Wed,  7 May 2025 20:43:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iumttYGI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mm58GYXC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9E928F940;
-	Wed,  7 May 2025 20:37:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CECC28C5B5;
+	Wed,  7 May 2025 20:43:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746650262; cv=none; b=CegK/aB/56R6bFVRbMXRUrt/BCv4kLg3+HQqgp1QS4hoMSRKb8+qpMCYf21kIAJfByv7Z1SZTtE7Qx3vf+Xj+DtZcHt0j/Y4GjE345zEHphUx9URyT7f22eazW91pXjCX0AcPWj3WZAUWE4mlUabNYrRwWk6hNjAGqqUFPOTtCE=
+	t=1746650616; cv=none; b=tNQU+eUDY1gg+GLwHi5dL4egT5qfPQRra3k5gYj7D+gjQfb31sfiM/42pmrdBy0IZ2+s8InIPeugkG80jKH2rLf6OEcTgUXIjgs+lkl/y6VelCk1w+QQH3zt5vXimwSaItZ3tE3YIKq5xsIgnPAVj4IZEmPOcUEhJ7KdWQqQZRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746650262; c=relaxed/simple;
-	bh=UpxWey3Bw04ZuvPug91OW+SV9bDGVrjm7kInnn7Ugp0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tqefDrKy8i02ax8+96Y8k5EqMtZEHE0C8WCB8CEtp7CfPoxV2d5ZDZageDDZC39fB2H5uwhMevBbk+Cb6n621d9yrQ7Efi6ePNxVJxe4grrfzQXT3n23KBxQTB1MHjGVsTN+Dx4xIIVFzuv94ajb2q86e8MKK68G/BKE2HLOWnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iumttYGI; arc=none smtp.client-ip=209.85.214.195
+	s=arc-20240116; t=1746650616; c=relaxed/simple;
+	bh=6rPxVYpokiEhO+TzLzqBvA7lWBd6HHd4fis1YLJuMvo=;
+	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=XoMz0gA2pdXu6+uIZSVMGaR0SqsvFlvzOs0D8s+3XLkkKafEEUDyg6LmEn4z8rOuSbJcVWsSlcV2JxFirCSvKV+hK9vVHyjBL+3UIxycZjnVvz8wEeplhOft3BUzEGFYcNWoYwAzoj/feubcthsXGghHZckto7V8hf2K92bJAME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mm58GYXC; arc=none smtp.client-ip=209.85.222.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-22c33677183so3391895ad.2;
-        Wed, 07 May 2025 13:37:39 -0700 (PDT)
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7c54f67db99so155253385a.1;
+        Wed, 07 May 2025 13:43:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746650259; x=1747255059; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=s1+zN4Yxyjl4lmJrdouerVL0ZdLm1z+cSeAbjCfaYnY=;
-        b=iumttYGIpUij5WwCeF+RuqV/wpaLgDoChSH+pLLBh8RTI04b0zt+n7OqHNeysD0kYc
-         xM3v7QzV5AJOCvxSyLmexVnjkJNvSPU3gOMVzYLEMryFo/ehWAq+/lj5gsfDnlEFQxMd
-         f62X+IVZqk6q3WxkI85GAjqG+AZZzcP2onoWUzYhn6SC0KXvt4PoGehbU6XFex6IVwd1
-         EkFdefIZUPR6qgVEc4RIYGKzGHvHIDPPQDIGqKmrqzEZoHosld1LIPA1XlkPba1TbjI8
-         K5eJNTIcx6tYACJyBozJKOU/ZBdgqfyZwDxJ9qVoD9rOxsyQw/+Z2ywne4PdnUMtRF0H
-         jZkg==
+        d=gmail.com; s=20230601; t=1746650614; x=1747255414; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tTuvkoeLz9OFKlj9Dviyt8wquS2tMT58gS6cPYVlW1g=;
+        b=mm58GYXCIAYWc89utE9BbYTDT8OYCkMJ67ebF3OMmovvbq9Nj++7MEzWPllYzajLSm
+         7PGN3z8ehGmA/tZa5B/sj3IrkrI+axOF+3R3HWK2wY4E+9pC9QIZOIugtR9gv4a/x+rT
+         V9PyPMklLzL6LH68HMZIrE+D+8hZXQZ9B8l4yhJ4vgwJSNSrGBBcKeKuznkqIyOflyNP
+         sDwDdkNrUCdfj4KEwu3dMhW8UALIij0LGqgH+6YXq1fzuEb2SoQJb3ZIfr+zpvRsQifj
+         yl5KnL+i9U8UlAhvah4xzkpn9rN3A1HOUmgbM6lAozaToUTyhb9lvQFRnS8TzvFpvbIc
+         wO8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746650259; x=1747255059;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=s1+zN4Yxyjl4lmJrdouerVL0ZdLm1z+cSeAbjCfaYnY=;
-        b=LbpsE/3EZjO3Umrxp7BaR1uqcI/wO31nLeOxJdpL+GSgSDU1CxrXdqHjFGWz+UaBXi
-         i7zPao7WVfXmBCjALvqQOXHjbLetXKklRA7YQGdnZs61KCrrPuJCs+vq1UWrmB8zXW0x
-         gh3PzpgAcj1mjyUyQ58Lsf0MRggxLGJ0wfeNbClk8Zvh6lWggY6ZDdQq9QZLhTdDQ18J
-         NewmdMMxS6acE0ll1aiF3qHcOYLnH/7+oAz43T6UX7Zi4oX2dlIIMnCccXkrVu+gtGMJ
-         piZ6DYe46pu0Dvr3hU35Jb9Vi3solB0PQ7S9F/VFacc7+q82BQbBucH2vlVZXKGhz+Sl
-         dtlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUDVugObgk1eUX7p15ELlJwmpUcvkYawfS8MxO996ewDqmf0eFasiRxyuTgxYiNXV6x4J31HfrAm8ovPEs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzG/P4+RiBC6HNcuFJM+XfZYMobB46VGjvh/j5dY8FriaBAMoNf
-	mO6YhgvBrrMqKkudUaBH3u6oSbQ7jAPlZduKF7NEEye9Y+lLGbUv
-X-Gm-Gg: ASbGncuj5f4+4Efv3Yg4A7loOZzamEZA1gsqb//yUt/bFw6g7ErUrBTL3Nb4n+t4l0W
-	D/k23iiz/LuqLyiek2JBUwf8jcqteyGZrD5hzBM9KZXna3sfxjH5rFe8i7ZJhnSH/7jrmbWowdI
-	jtBojD+sxGcdRxMyjGDmFYPSZ2/USXePftBpL9AfV63K0WOom5H0LFhh/UVla+nW6tEBwf37iQW
-	Oh7kttgYr0Q815jl2WzFzPOrqprJ7Ep2+dFjU3DP7TkmzB2rvwr8fJ/5WP++MUsk2CU0zNHaqmA
-	TTRk3nARydpJUibqYPE8nQe+8aH2XIrG76As+xNSExb9elzo2gQSyOAeruw=
-X-Google-Smtp-Source: AGHT+IHCh/GQgllGZkJ6rLLeRRGN+OTcp4gpIRwI6kl2YE70Sn8rCja8TtxtQAAUAvKV+Xh6HcPOnA==
-X-Received: by 2002:a17:903:fa4:b0:22d:e57a:2795 with SMTP id d9443c01a7336-22e5edea81bmr71012345ad.47.1746650259078;
-        Wed, 07 May 2025 13:37:39 -0700 (PDT)
-Received: from sid-Inspiron-15-3525.. ([106.222.229.91])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e62ce540fsm20193525ad.160.2025.05.07.13.37.35
+        d=1e100.net; s=20230601; t=1746650614; x=1747255414;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tTuvkoeLz9OFKlj9Dviyt8wquS2tMT58gS6cPYVlW1g=;
+        b=KHiUPWl6cemiiosheytubBmwrBLvoJGp9VL2d0+52J/ALbFTAwwY15sNVoG7ICNNFG
+         xnDV9dxuyfygxXASTg1r0uaH0zS3GW2sZT1KMfCqFa1gyaGBUKPOIT26afWe5mLM56q4
+         /vK5hzo5SK8vlciqPFy+zch8LtIfh6K7xZhvKep2i58L31JWJ1+6QVos3SLtsMHrPAeB
+         +mNti9xL1d/h+udC2e1R82+y8or9NrmtblmBS8pyBHKHk/3Bz6Nhkl9iQe2AX1KKvfWk
+         FRY9rQ/oExdAMHl0Y8rt6/8QGaA+CpD7zOkZ1upDgqpbFapvop8xHWXY5Ujpp6I/C3A+
+         ymSg==
+X-Forwarded-Encrypted: i=1; AJvYcCUsSzJMqc/fz9JP3RLld4XLQBIPlbPhnEO5h3pJZhAKRa6Zd1dQxQRrWWgzU4MRiIPLbBs=@vger.kernel.org, AJvYcCVAulJSsHQHg0yvMCx5vzw1Rmq/0aNAZNYvqzzIMsAELRirtn9pFtFB00nei4P4gEtRRq8D8eP4SmJTMs3P@vger.kernel.org, AJvYcCWT0v/La2/ZB7cEeiFmWwQtuFfy5WyvaBfohFwYKutiInGFJUdA3JRqFXDYUu3wpOrJ1tmahCy3@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz6r8tGrvckEQzkafY2oIBNCJQeppgE6pdOoHTlBM2igHgFT5mO
+	G6jLwoeLgsprx8e8IzQZq0u3VAKS2x6D0ZZ68V70a1SJmhggp8e5
+X-Gm-Gg: ASbGncssQQRND9tkpmPDfpNHcuJ6D5u616EJsdLwqB9Xv1lYVW0nf+/AbcyiZY46Rwh
+	LRyYdZklKNK1nDvHKwMJ4iW0gJv49Rygea4FQ8o8vU7mUKDsjYgI5KgrNrAkArPoU5DRdTf+Qsh
+	dJ65l9W2CcodtJ6F9edSOb58Z8gsC2uf1c9kX1eBWwcQUJwdc4e0YyXEo2FTc1MkCf7j18LvSa/
+	QY3+1F56DJzC2z1PAnkVXRShuxto9YaHJyvI1Kq9o/bg36a4o4YjHF22A5pZKyQS5eK8wd/PZdK
+	XZEDqfzgVE6wv74fqHUA3/HbR2dCGj/mNFMMdGzVlse+IzJIMJCJ/opdoPLvoobyRFz9/4pu4r/
+	NKOHWC1TlGZqbpKj26d9X
+X-Google-Smtp-Source: AGHT+IG0djn3yeJAK6hcpM8Kyq0xTsIur4G494vPRBrWDsVOBbqGXJBbHsOuIVLjON6Wq6XAQmt62g==
+X-Received: by 2002:a05:620a:f01:b0:7c7:b8bf:35cf with SMTP id af79cd13be357-7ccf9961e16mr146671085a.7.1746650613685;
+        Wed, 07 May 2025 13:43:33 -0700 (PDT)
+Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7caf75d97d9sm210196485a.101.2025.05.07.13.43.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 May 2025 13:37:38 -0700 (PDT)
-From: Siddarth Gundu <siddarthsgml@gmail.com>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org,
-	Siddarth Gundu <siddarthsgml@gmail.com>
-Subject: [PATCH net v2] fddi: skfp: fix null pointer deferenece in smt.c
-Date: Thu,  8 May 2025 02:07:06 +0530
-Message-ID: <20250507203706.42785-1-siddarthsgml@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Wed, 07 May 2025 13:43:33 -0700 (PDT)
+Date: Wed, 07 May 2025 16:43:32 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jon Kohler <jon@nutanix.com>, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ davem@davemloft.net, 
+ kuba@kernel.org, 
+ hawk@kernel.org, 
+ john.fastabend@gmail.com, 
+ netdev@vger.kernel.org, 
+ bpf@vger.kernel.org, 
+ jon@nutanix.com, 
+ aleksander.lobakin@intel.com, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jason Wang <jasowang@redhat.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ linux-kernel@vger.kernel.org (open list)
+Message-ID: <681bc5f4b261e_20dc6429482@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250506145530.2877229-2-jon@nutanix.com>
+References: <20250506145530.2877229-1-jon@nutanix.com>
+ <20250506145530.2877229-2-jon@nutanix.com>
+Subject: Re: [PATCH net-next 1/4] tun: rcu_deference xdp_prog only once per
+ batch
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-In smt_string_swap(), when a closing bracket ']' is encountered
-before any opening bracket '[' open_paren would be NULL,
-and assigning it to format would lead to a null pointer being
-dereferenced in the format++ statement.
+Jon Kohler wrote:
+> Hoist rcu_dereference(tun->xdp_prog) out of tun_xdp_one, so that
+> rcu_deference is called once during batch processing.
 
-Add a check to verify open_paren is non-NULL before assigning
-it to format
+I'm skeptical that this does anything.
 
-This issue was reported by Coverity Scan.
+The compiler can inline tun_xdp_one and indeed seems to do so. And
+then it can cache the read in a register if that is the best use of
+a register.
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Siddarth Gundu <siddarthsgml@gmail.com>
----
-v2:
- - fix commit message
- - Add mention of Coverity Scan
- - Update Fixes tag to reference initial commit
-v1: https://lore.kernel.org/all/20250505091025.27368-1-siddarthsgml@gmail.com/
-
- drivers/net/fddi/skfp/smt.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/fddi/skfp/smt.c b/drivers/net/fddi/skfp/smt.c
-index dd15af4e98c2..174f279b89ac 100644
---- a/drivers/net/fddi/skfp/smt.c
-+++ b/drivers/net/fddi/skfp/smt.c
-@@ -1857,7 +1857,8 @@ static void smt_string_swap(char *data, const char *format, int len)
- 			open_paren = format ;
- 			break ;
- 		case ']' :
--			format = open_paren ;
-+			if (open_paren)
-+				format = open_paren ;
- 			break ;
- 		case '1' :
- 		case '2' :
--- 
-2.43.0
-
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Jon Kohler <jon@nutanix.com>
 
