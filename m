@@ -1,162 +1,119 @@
-Return-Path: <netdev+bounces-188747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AA35AAE755
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 19:02:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 918B3AAE75E
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 19:04:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAAD952328E
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 17:02:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7244F188DF01
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 17:03:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E220528C024;
-	Wed,  7 May 2025 17:02:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AEA1289835;
+	Wed,  7 May 2025 17:03:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=riotgames.com header.i=@riotgames.com header.b="IwX7XXVm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L/db4WhD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B44628C03A
-	for <netdev@vger.kernel.org>; Wed,  7 May 2025 17:02:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12A844B1E4B;
+	Wed,  7 May 2025 17:03:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746637334; cv=none; b=Zl6S1V41IZA03v7jxf7VacFOd4C4HNBcXIFcMjF5dA2PsWDP1mPCxz8cowoy0Ux+BYBEer0HEXSS2DlUrKs+if3b2Jt1h4KW3PoT2kXYYbyhbK1ltdIcC3FXGHjtlbfZfegy/IlUBr5nIb/9zcfjaqeUo6sttUllE8Mn6PCCEDc=
+	t=1746637417; cv=none; b=WAZKCDEGo1hZWNxytQll8GAM6WyurVbvQ36tZUH4GRm1ORbRH83yu4Y6jchDMCEfFOFHeOGHDftd4oZMcZb366DkjHWtVKTeIYCVotDfOnf7GG8IpCVK3p8jB+zr++3qYQvadc5LIssXIcFJw5NaY6D9lx3QMhw2gPtcSSzLVKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746637334; c=relaxed/simple;
-	bh=OcE+GoKOw7LhrCuLbrKh/LcbzJpz8rlGel67AsCJzTI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=f3dFYzOI2Ry9HNT+SYH/WzBCdmv/xwb3YEiSg1EB4pfikywfO3gGM7TVDHN3U3Rr/uJcdW04EvZXwZFieAN6stcpHd9aeRkpw3LOv9l3SJrUDznPcds+enCf1e5GUFn1OnQCN6dZxxC+xsv2acT1k3g98uCzSuPnGnf6cXMhvlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=riotgames.com; spf=pass smtp.mailfrom=riotgames.com; dkim=pass (1024-bit key) header.d=riotgames.com header.i=@riotgames.com header.b=IwX7XXVm; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=riotgames.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=riotgames.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-30a8c929220so151261a91.0
-        for <netdev@vger.kernel.org>; Wed, 07 May 2025 10:02:12 -0700 (PDT)
+	s=arc-20240116; t=1746637417; c=relaxed/simple;
+	bh=8eUVJRPyYlhkarXKPhhkTVl7YZFQjmEyWmjzc3HcvWM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NOKvBK/heLAIQ23hOpjEwOG3ZRAl5Z4RVb9zyHcU9eOj8ItXPMMM+JDxHcgssfOC0nHUn9ASTU2lbK2HMpXqbg3dxh7ZVIbbdvcDnMAvCTgzBq8SK6fsbz8LM/JH7b07VqTDMnOcRbGtvvwmZ3ft8QuJV5szWOu9MrwOPqeFmD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L/db4WhD; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-47677b77725so276881cf.3;
+        Wed, 07 May 2025 10:03:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=riotgames.com; s=riotgames; t=1746637332; x=1747242132; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=evCH9GiqYG33lbncK47MNfRK8jVnMEAaPU/9KW+jEKQ=;
-        b=IwX7XXVmfZBHK1jv7uFvyWJPfH2Ob6HJJku8lJw8iIdD0Qy/IFOPLz8eL3mT2meOAe
-         C7kXnRyzAekCUrv1sRAizd2SI6LAG2UFeqg8uPtb/Nn3qBvhNAu0Xz+h0sCFkB996HLf
-         t3d0Oy4qyjyx4s0QJjog0S3kCwcuhp7Hbzsl0=
+        d=gmail.com; s=20230601; t=1746637415; x=1747242215; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kj2KnxxKGpGn2up1GoK5ThFYhXkMrp+zcnAYeJ+2nGU=;
+        b=L/db4WhDH6TJu4uxggV1bspVIN4xygXsgjadsNBj4bwRreKxrky4nMREYBxCFf/vca
+         KesfGTk74nXImZrjGCduc2XoWQgnW1yrG9uNJIfv/0KK2y/684KVW/mWXA37ELVeNB3O
+         1ocz1GghqoFCAefqCkyx3Kigl8KfITD6/cfR7gI3mLUTgaUP57lXZkaSEx3PDF/M7iSR
+         XoFlju2vAz2AF9N7T77u4NIVU91/fqcKShP1wKDAqNbAVH7L9itb8+nkBgR10aZiu3oh
+         2KxnrQrKepPPCI+kFXlThvrTNSIhg/5zpmMnuhRAScckdizhEEOmAaozsFBEN2HCqiPQ
+         WIjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746637332; x=1747242132;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=evCH9GiqYG33lbncK47MNfRK8jVnMEAaPU/9KW+jEKQ=;
-        b=ZzM9PIbsrOsnR6dL33D6/In1CBvCH4xGZC21NhREhDXVpqJupmxHV6sqOjUQKclhFw
-         90f8YXdbnoB1Vt+WyR44rer0RYIaX6i+wnq6nHJizCNXTN2ZMbsWWqf3CA5Sm8H+3sW6
-         jmQee1YuLuGqnQV05wzc/8wDTYocAMFzDDKymbUMP65HAlLxoaxjbUX7lvQdw2yGUdfm
-         iQ+jatB5eZmzHs2chmHjZLpFiulTdq83gKXwJ4TAWjXSvN/cKE4xoGSF87fn5eCQqAps
-         PszBdic2SUMKGO03R2rzczW8iACpKUaAzw4mZJ4W1A/YakDaZ6zz18P7FV5p+D+3aF18
-         FL7A==
-X-Forwarded-Encrypted: i=1; AJvYcCWrXb4oksCxIiq+tyt5+Xvzz0tLwRCHEZHaW4g6KKFFwrxAyXoJ9eOSiUtdM54Z2NfFKXg9QuI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzN+W6Gfs5wcV2iREyAt0qBYCwuRr+xSW6cs/svxHckuGs7IslA
-	Of3BcLak/OpQaHB2IrFz4e5IHpAsrEhSkhPQfSGFS+M+yQIsqEXKgOYGLpmwlJYsBksLWLEx73c
-	UVE4xGRBU558R3mXsaHYaIL4PQsTAcHPfp5wliw==
-X-Gm-Gg: ASbGncsVjCUQ8aH3hh6Kox0iqIBC/wKyukMMr+QCLrLxKrqR4vqVexas4FmmmfwiOEL
-	LBiA+qq2XIe2JHgK056vYA9HL22Sf+QytfumWl1lUxOgYe36dYTN5tXwJD0TcbSKKXDwCKKnJwY
-	lV6iHVw2SzrhnGkw+VO1UJpw==
-X-Google-Smtp-Source: AGHT+IGFj5vERsIsOzMMzWHx4KyiQNS3ACFY3x+qC86Qtz4zl4CEaYY14fFJaSflTT3GMneoxBCaK3B2zsphjb3Nipk=
-X-Received: by 2002:a17:90b:4f46:b0:30a:9025:84d1 with SMTP id
- 98e67ed59e1d1-30aac191600mr6879065a91.16.1746637332399; Wed, 07 May 2025
- 10:02:12 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1746637415; x=1747242215;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kj2KnxxKGpGn2up1GoK5ThFYhXkMrp+zcnAYeJ+2nGU=;
+        b=dHW14zQwnnkw1rP/SSUufzHX4WmU9O11aHzMXt7OrVdb2Kaw4EPsmrOV1WUl3nMd89
+         aGkNk6JS3yDNccLxoCvccBL3SNdM88ny6WFWxySHylnkWjJ6ylhvMKjsGBqh4Fa0nRfn
+         5IiBVTd8lni8BDFVQAz2D7renYr32TDY82qKZXqVJ1QRyuaXifID8oHVWLZLV9tUnrq8
+         mXdhVNhy3o2CmH2I6B+QlZRBXaCMkwHM35YLFaFBEYy7x048vG5X47QzJuTbMuJXAn0M
+         01nD0eN0BPr482zwZ8jg1x/EIGQLF7ioUVoQiLXr8P7s5hNunXQwdrpW8CqAvTP2M4Xj
+         FfBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVuLWyq/H9PfmO31cyKW6ykjBq5u/bTmIsgX6ZydpUzA9iTEnxm1Q5dThTC8Bjrfls8ExRcyqk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCaOANM6D8/SprXBjDn4oNmkHhm6+IN8eFRm9d57ljqLDA9G9O
+	ooIUjU+JMWxv82UVQ0BntcKXzMv7XT8x3axzL6cFdeoh7xoweArzqmskDOGU
+X-Gm-Gg: ASbGnctTWaRh5AF7yxvjA4rXlF3jIFp5IminhliLhheszEa/YUVZMz1k7znzyy0RS1a
+	LoUSLslK7XnYSBOPRxNXVKlbLQR784O3DNhtS7xqgyjA4SD2FUz6WZngPL/1BL+6TJVvaN7pn65
+	2ODkwN41wg0ZVuHrjHg0ek8YzrQCjpgQHE1ZGOP8eQLzAlX7uV6ugekp6+LLfBkcAMDZtGoe4sT
+	TcKOtXCth1JK0fbdHPD9mf61bu+li2DZbueZExdTxDiCKyKuhtGZOPRNGU+FAYfPsRWvNmkovcE
+	DGQyv/ej9Mdc/WvA09JAXVVUhtt7K0IxvDJrwQGClzHgPak/U22WPbWAvXcaCEMvD9vfvx0ErGN
+	Ezqxb7LJqNcMgY2NCHcJQ
+X-Google-Smtp-Source: AGHT+IEnx+ykFpDlLv2Bd3AZZno01eoVBxLekXZpwnm8r0RihtH/1KTPRogS0A887teFEGWJSZaTmA==
+X-Received: by 2002:ac8:5809:0:b0:476:a74d:f23b with SMTP id d75a77b69052e-4944963f756mr1140991cf.48.1746637403667;
+        Wed, 07 May 2025 10:03:23 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-52ae419fbd3sm2429387e0c.30.2025.05.07.10.03.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 May 2025 10:03:22 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [GIT PULL] bluetooth 2025-05-07
+Date: Wed,  7 May 2025 13:03:20 -0400
+Message-ID: <20250507170320.277453-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250506125242.2685182-1-jon@nutanix.com> <aBpKLNPct95KdADM@mini-arch>
- <681b603ac8473_1e4406294a6@willemb.c.googlers.com.notmuch> <c8ad3f65-f70e-4c6e-9231-0ae709e87bfe@kernel.org>
-In-Reply-To: <c8ad3f65-f70e-4c6e-9231-0ae709e87bfe@kernel.org>
-From: Zvi Effron <zeffron@riotgames.com>
-Date: Wed, 7 May 2025 10:02:00 -0700
-X-Gm-Features: ATxdqUHeYs9_StQV2Ta3ALi0amyLtmj3B1nixRHGF-7WCF8a8jaznKs7hOx7vKA
-Message-ID: <CAC1LvL3nE14cbQx7Me6oWS88EdpGP4Gx2A0Um4g-Vuxk4m_7Rw@mail.gmail.com>
-Subject: Re: [PATCH net-next v3] xdp: Add helpers for head length, headroom,
- and metadata length
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Stanislav Fomichev <stfomichev@gmail.com>, Jon Kohler <jon@nutanix.com>, Jason Wang <jasowang@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	John Fastabend <john.fastabend@gmail.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
-	Jacob Keller <jacob.e.keller@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, May 7, 2025 at 9:37=E2=80=AFAM Jesper Dangaard Brouer <hawk@kernel.=
-org> wrote:
->
->
->
-> On 07/05/2025 15.29, Willem de Bruijn wrote:
-> > Stanislav Fomichev wrote:
-> >> On 05/06, Jon Kohler wrote:
-> >>> Introduce new XDP helpers:
-> >>> - xdp_headlen: Similar to skb_headlen
->
-> I really dislike xdp_headlen(). This "headlen" originates from an SKB
-> implementation detail, that I don't think we should carry over into XDP
-> land.
-> We need to come up with something that isn't easily mis-read as the
-> header-length.
+The following changes since commit 9540984da649d46f699c47f28c68bbd3c9d99e4c:
 
-... snip ...
+  Merge tag 'wireless-2025-05-06' of https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless (2025-05-06 19:06:50 -0700)
 
->>> + * xdp_headlen - Calculate the length of the data in an XDP buffer
+are available in the Git repository at:
 
-How about xdp_datalen()?
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-05-07
 
-On Wed, May 7, 2025 at 9:37=E2=80=AFAM Jesper Dangaard Brouer <hawk@kernel.=
-org> wrote:
->
->
->
-> On 07/05/2025 15.29, Willem de Bruijn wrote:
-> > Stanislav Fomichev wrote:
-> >> On 05/06, Jon Kohler wrote:
-> >>> Introduce new XDP helpers:
-> >>> - xdp_headlen: Similar to skb_headlen
->
-> I really dislike xdp_headlen().  This "headlen" originates from an SKB
-> implementation detail, that I don't think we should carry over into XDP
-> land.
-> We need to come up with something that isn't easily mis-read as the
-> header-length.
->
-> >>> - xdp_headroom: Similar to skb_headroom
-> >>> - xdp_metadata_len: Similar to skb_metadata_len
-> >>>
->
-> I like naming of these.
->
-> >>> Integrate these helpers into tap, tun, and XDP implementation to star=
-t.
-> >>>
-> >>> No functional changes introduced.
-> >>>
-> >>> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> >>> Signed-off-by: Jon Kohler <jon@nutanix.com>
-> >>> ---
-> >>> v2->v3: Integrate feedback from Stanislav
-> >>> https://patchwork.kernel.org/project/netdevbpf/patch/20250430201120.1=
-794658-1-jon@nutanix.com/
-> >>
-> >> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-> >
-> > Reviewed-by: Willem de Bruijn <willemb@google.com>
-> >
->
-> Nacked-by: Jesper Dangaard Brouer <hawk@kernel.org>
->
-> pw: cr
->
+for you to fetch changes up to 9840f8ecc9105ba6e2355d2f792c5f6c78905101:
+
+  Bluetooth: hci_event: Fix not using key encryption size when its known (2025-05-07 12:59:23 -0400)
+
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - MGMT: Fix MGMT_OP_ADD_DEVICE invalid device flags
+ - hci_event: Fix not using key encryption size when its known
+
+----------------------------------------------------------------
+Luiz Augusto von Dentz (2):
+      Bluetooth: MGMT: Fix MGMT_OP_ADD_DEVICE invalid device flags
+      Bluetooth: hci_event: Fix not using key encryption size when its known
+
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_conn.c         | 24 +++++++++++++
+ net/bluetooth/hci_event.c        | 73 +++++++++++++++++++++++-----------------
+ net/bluetooth/mgmt.c             |  9 +++--
+ 4 files changed, 73 insertions(+), 34 deletions(-)
 
