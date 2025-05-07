@@ -1,197 +1,416 @@
-Return-Path: <netdev+bounces-188542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46CA9AAD44C
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 05:59:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CF7DAAD461
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 06:22:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CF239807A2
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 03:59:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0AEE4E236E
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 04:22:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FB061CAA7B;
-	Wed,  7 May 2025 03:59:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ECBF1C84CB;
+	Wed,  7 May 2025 04:22:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Pir+BSAE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IaRPmf9C"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2074.outbound.protection.outlook.com [40.107.243.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E521A0BF1;
-	Wed,  7 May 2025 03:59:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.74
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746590393; cv=fail; b=U3mPzXnmFCyWfrimf5kSRfJ8zIuxI1iySDQXuTIvmAN7GmsqRRSzQ/q2Mz0JKEheY6cwWPac3IzdC0uufuYmSATxzHQ7WkuJu5gCAW0zA8pGD3IM99CVjuZOfPGLtosp9UHVwVqT8Yh6Amwqj0TbbNi1Fgjth17piag8K6R1+Ck=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746590393; c=relaxed/simple;
-	bh=+yJbuMtfK/VKHgNiYtrSrttdiJjD691WRwqHMF9t+M4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=EhDtkW3Msxuvt2soGl2HqPgNN8K+9iOl0z6JKpmYbCybvBRLX3lb2pGxEoFF1Ycj7ATrYqAmef6FnmvZ7GeWdnL9O1TGvlITgJZ3VZL15NNFAf0b2Jf7VOLBQp1nAevM8lvUEQXiOLrktyCnDBUhFS3QQ2KYlHROGOMhENv2p2U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Pir+BSAE; arc=fail smtp.client-ip=40.107.243.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xnAfzH8ym8XUOsUZjn+6+kpnMZuJHw7GSlKj1MtWvQGQofP1zCdsDlh5Q5/Gtm9BLTxGncbJ3Qry1vdzOPNBbEmB7gE2uRgyDvLn3lbw9bCem+UCKK5/UeXRpJSMQajY3nWu5tFhxT9crSQWM+G3GtJg8gFpi2HOR54RyujKVcmuZi/YiA8sAXpMLy7usw6z7UE5vO7KwMuff3E3v+1uaAAGANq0DrYWSr2iVtkO8q3jg2288QhMs2h62ZtS1nhTsKDCxcuT5wmqbDMI8AN9cuKpD3dKml2dMH0KUrIPNuUw532zh9pUXyO15Gr88TNzuof6HKlOU/xaYauwvHN1HQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+yJbuMtfK/VKHgNiYtrSrttdiJjD691WRwqHMF9t+M4=;
- b=wBaDSEIgpEAGysEneTb8Rlgwnyfncq1byMesJrVPXPbxFpQM0ogi5Y96xWtoF5D8Da6RbpIjgHD15eaUBGurBBQFbk3OR181+80l2dpP9BocC3ht1FrWyjgHSlvtqMzDbc8l6DhJZwZy49DqdfFTr5qPZdHswzAimCURzLCX1KOCFiZqPL+UJKhwY08mv0L3XCO5/OHUsOeDyOYtn42817x4GmAchuLox6aDuj99X5YYN2x+rvM3nzifTWTdl5bpyoFg9TFWhZ7eQUCKKLN0fkPwyiMHjdAh3YlOHwZx3NAAyoq81SINBKgKxySOW/D2G0bEDzQDMVxlY9MYsxrBKQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+yJbuMtfK/VKHgNiYtrSrttdiJjD691WRwqHMF9t+M4=;
- b=Pir+BSAENNlOoG4BDC8OyMUocojgOXLPs28PehJVSQRTA9LwevxnlKpNfWCvG6MLQF2yhbVE7V6IkPLhGvCR+qJDmkR7VeASDpK6A5Brl97eBNjGAwQzsBOJmweoB+jMErbrgV9rWWKANSvipT5NPBZKcn9exi2k6Wfroe6gavKsgkVrp2/WJKM238gbMT1jDwcaBuSySlFTL/nJYRFp8gvU4zPjBmPWO2xid9wdRwivn4QfU47ZSN3HQGjWtBkt5WW8eAAsfhEU3eY35tPvEqBd1B9+gKVrA3AsVhb6jZvpTXp7PgHr09OPckd/K9Qoz9tbFin4UTCEDBd2xZhE8A==
-Received: from DM6PR11MB3209.namprd11.prod.outlook.com (2603:10b6:5:55::29) by
- DS4PPF0BAC23327.namprd11.prod.outlook.com (2603:10b6:f:fc02::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.26; Wed, 7 May
- 2025 03:59:44 +0000
-Received: from DM6PR11MB3209.namprd11.prod.outlook.com
- ([fe80::18d6:e93a:24e4:7924]) by DM6PR11MB3209.namprd11.prod.outlook.com
- ([fe80::18d6:e93a:24e4:7924%3]) with mapi id 15.20.8699.012; Wed, 7 May 2025
- 03:59:44 +0000
-From: <Thangaraj.S@microchip.com>
-To: <andrew+netdev@lunn.ch>, <rmk+kernel@armlinux.org.uk>,
-	<davem@davemloft.net>, <Rengarajan.S@microchip.com>,
-	<Woojung.Huh@microchip.com>, <pabeni@redhat.com>, <o.rempel@pengutronix.de>,
-	<edumazet@google.com>, <kuba@kernel.org>
-CC: <phil@raspberrypi.org>, <kernel@pengutronix.de>, <horms@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<UNGLinuxDriver@microchip.com>, <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v8 5/7] net: usb: lan78xx: Extract PHY interrupt
- acknowledgment to helper
-Thread-Topic: [PATCH net-next v8 5/7] net: usb: lan78xx: Extract PHY interrupt
- acknowledgment to helper
-Thread-Index: AQHbvZnZlRVpVHTkO0GGUydRZS8ViLPGjKyA
-Date: Wed, 7 May 2025 03:59:44 +0000
-Message-ID: <a00f3b209852878d37d2a42ca4cfac42701b6e6f.camel@microchip.com>
-References: <20250505084341.824165-1-o.rempel@pengutronix.de>
-	 <20250505084341.824165-6-o.rempel@pengutronix.de>
-In-Reply-To: <20250505084341.824165-6-o.rempel@pengutronix.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR11MB3209:EE_|DS4PPF0BAC23327:EE_
-x-ms-office365-filtering-correlation-id: bdf03e18-6771-4d3c-80d0-08dd8d1b9a41
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|376014|366016|1800799024|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?Rk9zS3QvSks2OS9iMDQwWURLbjI1UHVUSGM2UERYQnUzRGhaUVliQ2hya01V?=
- =?utf-8?B?RmRoRkkvU0ZLZW10cXNvaVZWZ3Z3R1I3U2VqK2lJMkpoVHhqNm9ucmg4Q3Ev?=
- =?utf-8?B?R2sySFJUVWpSd3pMT3MzQjRKN1Y3Slh2WHdtbEcyRVNqcTBMdloxQXgvR2Jp?=
- =?utf-8?B?akk1NUxML3Y2bm9ENXpuRFZSbHdsbTd6WjIzakhuZHZvVkpGaTNmUklKa1Br?=
- =?utf-8?B?MkZ0Q205ZU5hOGMvZ1hBTVdOOXlHdTlNa2xkVkJBL3VGNFg5cHM2eFhqcDJ5?=
- =?utf-8?B?N1lLaXFIclAwd3VPZ3JSRlVOeC92TWpFMHZGTlNrV201T2JWRHRjYTBpeUdO?=
- =?utf-8?B?dXFlU1M0aHJWWmVMUGZ4RDZ4bVJnU0kzV1lQanZiWkplc01mMGlUeDhiZllp?=
- =?utf-8?B?bzkzSURuTEhRamlITDNUTXBLK0kxdFdXL1kyU2J2a1RodW1kNkQ2T0pocXc0?=
- =?utf-8?B?UExDa1dlV1NpS2Rvb25ad2ZzV0MrbGRuL1A0NWtEdWtrbFEyODR2UVdpYzVw?=
- =?utf-8?B?eHpvaW1rQWZBaCtVZ0lnRDE3QWt6ajErWlRtV0dRY0ZQR2lYY0JLK2wrK0xa?=
- =?utf-8?B?WEIvNm9NR1piK01SRnZPcGdJQ1M0eStvUlZQTytuN0FkcHZVcmh6enovd3pT?=
- =?utf-8?B?TG1ta25ZaGpYM3BqRXNGaFJqanY3bll3NGdjanJOZjZudHVjTmRTZ0l3TzNs?=
- =?utf-8?B?RTVKVGxLUHNxUnVlUXRLamI2azRkbVVveGdpQ3J5V0F6YTdUcW81MnhsNXM1?=
- =?utf-8?B?SXVmNmdOUHUzdGppclZrTUI2bnRZVTJrNUFZdGFrV3hvbWIxVk5kZFJUZFp5?=
- =?utf-8?B?aGZMMW9mT3ZXdm8xbVluZ212YUpjc2lPVWdmRi9qRDhSZGJ1VjZJcE0yWG5a?=
- =?utf-8?B?QmtqVEEyako1aFFIOTd6eVFLeGtldXBNTC93TGNlN2V1bHlXdXJ3SGZnQ2Rs?=
- =?utf-8?B?ZUpKckVXaVViUnVrSmprMFVIYmdwMHo5eER2cTFxU2NCempxZmgrbEh4SHRQ?=
- =?utf-8?B?L2wvT0FWYmg3MzZvWHZTVEtBbkJ2Tm9PSWpqY1dubzhseFQ4UWFBWHpZR3p6?=
- =?utf-8?B?ZGdMVHZIWFhXY2NGNVF6TTVYc2U1aHR6TkZPR2Fjd3RBQzkzVHdsREUrOWhK?=
- =?utf-8?B?Q21jOUc3YXJkdDNLb0JCQTE0WUNtVnlSTUIvQmQ0Vk9BcFRLeXIwRWpxc2lH?=
- =?utf-8?B?YjIxdXllNDZ5eTB1dkMrNUhBTVpKampSVHdyclhXblBPVXJ2blNUdmtsOXUv?=
- =?utf-8?B?Z3JCYVI3dWFPYThNQVU1MjczNSs1b3JwMFpHNmp3UDF3c052N1huTzFQK0pl?=
- =?utf-8?B?ZzhoWDQvS3FuZUtDa1JmU3RMM1VoWWJHZzcwbHQwYjUvM2xNRUhKOGlrWm5Y?=
- =?utf-8?B?c0IwaWVyWHNlZ0xZWEF4aUcwSm5ZSnZHMzJGME5WSkF1VmlQUGYzN21OMmt3?=
- =?utf-8?B?Ym02ZFRQRVgyUERmakJSVTA1NUtSR0VMVUY0MWZhTUFidlQ5YUtIdEJTaVZs?=
- =?utf-8?B?bkh4SWN3R2VwRk1uSEpranNpZ2FMbThpV0ErSm0xd0Q1MCtqZW9Gdkg2a09G?=
- =?utf-8?B?d2xuMmF4aG1qaUpGMWVkeDBnbmF1dDFDR0svL1piZ1pNNllzWllRWXBoUDV2?=
- =?utf-8?B?WUg1QzNWOFdiM0swTWMwWWhYeGNFaWp3S0dMem5iYTRKU296QXI0WlRpczVW?=
- =?utf-8?B?UXhQcjRxSWJCSTlPaTFVVmczYVNERXoxYU10SWJHQWcrMXhVN1RJRUdqWVA2?=
- =?utf-8?B?c3VLSEMraVdUTVUvTWxxaTZCR0xNZGxVL1l1SGZZcUQ5WEpYcEo3ejc1MzJ0?=
- =?utf-8?B?MURJSjVRTFpwbFFCUTV2c3MrUmo1ckhnaEVuaHpYUGYxUjV2NU9WcVFIaU5i?=
- =?utf-8?B?eXRhLzNCamVMZ055cldpYXpxODBZZjBPeUw4dnhQSkpnZ092cXdtTWlJOW5k?=
- =?utf-8?B?NXFuZ1ByazN0akcvdFhvY0lrQlNFN0luUG51UXhURjZmN01OVktzV0xlTVll?=
- =?utf-8?Q?mLy31vGvzo2pMAXYBV+ftZ5nRQwj8o=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3209.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?cVVvWW5yR1dQaEFYMFd6K0xJOXdlTmUra1VRWUs5SU0yb3FZOFV5cExpYkhK?=
- =?utf-8?B?dDR2Skl2TXppYUlwQmhuSk1VR3llclk1VG53VDRWbUVLcmRwb2NUMS9zU2Zn?=
- =?utf-8?B?TEw5QXhGVTBNbEFuUkxVbEhxdDBIU3RWVVpKeGdrc2pEUTdabUFPbEFQQk9j?=
- =?utf-8?B?VEl1dElrV3ZZVHhvWllPMWc3OFI5Ny8zNDNtOEFoMEROaGJERDAybzhpaUlX?=
- =?utf-8?B?VGdEUk1kRzJ2M3VYbmpEZXlpWkJaNitLSERVbUlpemwxMkdySWtmcjBxV1hU?=
- =?utf-8?B?aUl0WXBDZEcvaVlMWVd4R0FITWtpcS9BV1VQU2xtS2hzVVJJL21JOGVTMDJv?=
- =?utf-8?B?RWdVa2krRExjWVliMFNUOFI3L0FodC9raWx4SmRxdEcxS250Q1ZzU3RIMFB2?=
- =?utf-8?B?eDZISWdqOEt0dVV6NVpuenVzMUttRDZXSmRRNWZQUnZLUHJlQnhYcENSNXY5?=
- =?utf-8?B?Z1FKb3NrOHN6eEFpdml1VHRJbjM4QVlKUEpNUlZmZDZOdkJPNVZOMy9tSm1N?=
- =?utf-8?B?VlM4bERLYjhmMXozbFljd2RqS3k3c1VCcjdXL0pDZWdvcW45dXo1L0RSb25K?=
- =?utf-8?B?WGdIZ0hLcVRCNHpQQTAvRG9Mb0xkVDZoTTRNYmJzVWRmRFdmNWx5YVJ3WG1T?=
- =?utf-8?B?WDhBZENvU2d2anRqR3pJZ1Q3Qlp3S01Fc3lqeXdHeXMvODl0MnNLUnp5Uzkv?=
- =?utf-8?B?Q3VLQTkwTmdsaHdaMjVnOHJFV2E4VkV1SlNZOC9YQ21PMTVtYXBNZUNWVlFY?=
- =?utf-8?B?Mlpob1puSmpTaEhBaFJhSjRFZm9OUVYyR3ZzcGFhbE13a0dGZTBnVzhlYlRE?=
- =?utf-8?B?WGVTNktEN2FnelBhdzlXMVBPOHNSbG4rSHk5dCtCc2M2MlYwRGhnZUdsL0Jn?=
- =?utf-8?B?NHpTdU01N0dERjZ6a1FsUW9hZXVVQlhvczRaQ3FCQURwc3dJMmprUWRDck0z?=
- =?utf-8?B?QTc3TEh3V2I0OTd4UjFONldhWkozcjRXM0dZUU9aWlJEZEZLcGhWRGlYbWRQ?=
- =?utf-8?B?WTF5Q1NncFlrRlVza2xZQ1JMS3gxUGJrTytaNE50K3c0S2dnK2hnOXZNTlZq?=
- =?utf-8?B?aW5KcHBweE1DOGhDL0NuNVdZZjNZNWFDdnJYdWlXeEk4YVhpTFRXVWduZXpn?=
- =?utf-8?B?V0E3bUJnbXhaVXZNY0pSMHByMHMwMklrUFFJbHlXUTFZc3BobE9TU3ZZRFU2?=
- =?utf-8?B?a0xOUWk1N2JKOHBOWmw2andRL0pJbE9nK2xGTERzM1VzUHpHbXAxdDY2OUVW?=
- =?utf-8?B?cXlzVjNBSlpUTlQrelhNenU1UE50c2hHdHVFeUNHMlN4RjJTKzl5NTBNYmdx?=
- =?utf-8?B?cUtGWmF4Q3MvUDd3VzF6ZnFIWjRleDdOUzZNYjVnWTdqVVVvTC9BNlJHcmpZ?=
- =?utf-8?B?V0lDMVdNYXZNNm04aHpkVy9mQmVBcVZPNm5MU09RV1grdGtvbXI3alJIZFZE?=
- =?utf-8?B?OVllMkdNTmlWSjkrYWdUT3VwZUlvT1NYL1B1QUVuRWhtMHU2NklUdFc0eVUv?=
- =?utf-8?B?NU14L2hQMFNPKzcvQm9ta0lHTmtNeC93M3VLUWRlNDF1N3V6T20xa21kdjZ0?=
- =?utf-8?B?aE81YW5Gb29NUnNKdTVkMlVEaWFVaEQrclpEckIreWNaamZQVjBOSnhaQVZH?=
- =?utf-8?B?UW5pT3A3MW9yd0MrK0ZKQ0JRbFIvUnlFeGI5SUViaFlYemVDRXQ1U1VEWWJ3?=
- =?utf-8?B?YmE3YSt5dEdscHNRdVI4SGdMbTA4cUU5ZUdycm5oSHJFRU9xcWpzMGh1WURB?=
- =?utf-8?B?Ym9IL0FCRXhiZkliSXZZeThtcGZ4MHNmcFR6U0Y4bzlFWjJ3Z0xCNzJibHpr?=
- =?utf-8?B?K3VCRzNYSXFYYjdsSDgzcjgrMjJ3bEtGTFc0eS9jUzYyQzNlVTllSjJodEFZ?=
- =?utf-8?B?SEQza1JINEVQTG9OSTl5SGpxSExubURldnlYWUsrdFVNbG9RZkxxa1FUYUNI?=
- =?utf-8?B?QTFjS3hkUkdFaDZaa0NsV2wrZ3Fib0FwTldNK21OUHBwS1ZQamx6VVFUWjVF?=
- =?utf-8?B?T2xEalgyYUpyYmlGWWYvMFZHb0F4UUNxK2JMeC9RbWJncnRvb2ZkWjVMZkx4?=
- =?utf-8?B?TnZDTUErQkFtblQrcUFIYjhvNWRzR3dYTGkzdWR4THJOSXNoMDdiQU1ZWGhV?=
- =?utf-8?B?bjkweHNnZXpSd2JCbWIwcmFGWFZqeDgvOXhlNnpUMk93eXg3ekpYWU85eGxR?=
- =?utf-8?B?Z3c9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D03EFB46788CBD4F9F66C5DB42288751@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE52614A4CC
+	for <netdev@vger.kernel.org>; Wed,  7 May 2025 04:22:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746591756; cv=none; b=W1fzaJSmqRdbW9Q/sWpjAArh4GfPwOfObOFLNaP5QahCW7snSE8E1jfF9Jvq7zxnS7a3pTIhUU05ARyJFErnEE261IcST5yrSZTp1hBYnkhXD7oBYaK9Yaqeqe/yMEZB1clB1C7Etn7T31asEDJJjL3iirnsof4JEDuS/O4hZVo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746591756; c=relaxed/simple;
+	bh=tlHZTmAqMiKVfngRg/8NmF1WSUEqer188V7PQlJEKcs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KXLh4zRVq0mb8EXvUtdcdBj8G75NQpzFmmUbCMtkCiZNKX/EZpWBRPpsDj6lcrnw7czKblTYIPF1dW01KYuyXAuqWNvxCY9Td2uj8B9KvcBYvxN4WGFXL47b8i5gXl6fZqN3jRBlh2ylncQbF/8lN2PDqXsms1b3d0rQY7CvCiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IaRPmf9C; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5e5e0caa151so1778549a12.0
+        for <netdev@vger.kernel.org>; Tue, 06 May 2025 21:22:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746591752; x=1747196552; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MSOdZjlVx2E0xznXZqQSM1d+tHZxHIGy6Pp9MdWn7bk=;
+        b=IaRPmf9CAe1ZNCr63OWBjocmHn9Y4CPtzHZ3A6YzxNMFOWloMYLZo4rHb9JsPr6wKl
+         tB2dqQsSGHQ95Er5Mz8Mj+XCbq3UwvoFPw1dmBBTzbLsW+UVQ7TmyYi+zsckFxEy5Q8u
+         qaWT9BEm1KFirvmqFeUJ/Ch5B+Rzp1yAkV6hrjBLJCIOBU7penmTLu6Esl7V21UPmvvf
+         sOHJ6uBaSn4UTHtbzc8R6VzNMLyhxKamBL1nshTiyHY+WVZzEZzFQp8SKadyRWOT5Ke4
+         FOXg2E1OHeEYAMFOG4MA9aNXHOgjdUaNAVtWM0rl3njoqywRfav4x2fjA9/K/WVWr/WM
+         balg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746591752; x=1747196552;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MSOdZjlVx2E0xznXZqQSM1d+tHZxHIGy6Pp9MdWn7bk=;
+        b=bF3o6DrJr1KHi94i8Xc5xvXbpw2bwO4+h4+xru2WaH51yRtVtTefTFSP7Sut2OkcYe
+         lFWWRUGf092fO5CD8oMRaQvrencd3T4HtWZBykJ4xqNg3mI3sQC/H3azCogp1+0/B7tC
+         NaJe4gHXErYfvWg0tOjzdOL2WlEJeXyYydM2IzFqTpFcwh1uBovGLBynNQ4lHAUarJed
+         g/Vt3G8OvyNFqx7UjbXUJCp4s810eVF3FkLHN/YiVRVoElLuaGQEmGV17PpcuYVhAfWF
+         eL1eXD/ZnbQli75XwBUThuIRIKf84Nh7BtO7ABZTUi1bymxaiurUCtDDXulyg5YbULzE
+         VKuA==
+X-Forwarded-Encrypted: i=1; AJvYcCUuAHWhdab7Fgx2flOLjp1LzfFkNnifcuYnHcC5U0a4uGUlT4YuWNA+roTM5+twAWFihXRdD8w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzd6nrJ/uAT+X5Si+9Hws+7T3zTaF36JeJ9g+G8BAoMyjz5DaT0
+	7eZWCKZ3s9mmRQC0owChDQ6yFFXWo3V4ywR4Z0CwRov4s3lp9hbkFpr2Nc/yR9URn2ZZHoR4oJD
+	n5SWsCUCR4+wGQxOrTZU/u7br8tM=
+X-Gm-Gg: ASbGnctTY4C+uNxstm1LLVvWEK7b5iHdZroR6yxbvSaqxazSNRLhLYmMAO5C0nvE8Vm
+	Hml547G8WzSlHgtA7K0TtEAQ0g3PrrtBqitvcnYmv7orSUlE9MkVaAtwezb9NayhaY6SeZ/CL/q
+	+up9pDszvFw87lUFkroiKTZhE=
+X-Google-Smtp-Source: AGHT+IErhCnV//bidH9DpGLdIH+ovWF9NF+3NEX4fycGbGRCvFzjty9CU9/L0j+HPEOguOO6RrZuLU+hgnLjMWGhQ2o=
+X-Received: by 2002:a05:6402:4316:b0:5d9:82bc:ad06 with SMTP id
+ 4fb4d7f45d1cf-5fbe9d77cbdmr1634204a12.3.1746591751779; Tue, 06 May 2025
+ 21:22:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microchip.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3209.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bdf03e18-6771-4d3c-80d0-08dd8d1b9a41
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 May 2025 03:59:44.7651
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: WF94HKEMyIQxaAr60vBYG1Iz8lKdY2uk0xe42+zeWVq8svjCnIoQBMI6CB1eLCVmrSJ2TMk9WvZ+UWqKligDFh0uNleYODEn4M+BWjc9lBU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PPF0BAC23327
+References: <20250506140858.2660441-1-ap420073@gmail.com> <aBpJ4GDED8cu4dKh@mini-arch>
+In-Reply-To: <aBpJ4GDED8cu4dKh@mini-arch>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Wed, 7 May 2025 13:22:19 +0900
+X-Gm-Features: ATxdqUG1FrCASYmMxq2NbIw6sM2vVgoYDqBfemXF2WFqzZ8vsr744ln5DkdJcUw
+Message-ID: <CAMArcTXM2y=MEU11GcbQoC91u4Qi93R_VdHSMQzRdRwPwALn3A@mail.gmail.com>
+Subject: Re: [PATCH net v2] net: devmem: fix kernel panic when socket close
+ after module unload
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	edumazet@google.com, andrew+netdev@lunn.ch, horms@kernel.org, 
+	almasrymina@google.com, sdf@fomichev.me, netdev@vger.kernel.org, 
+	asml.silence@gmail.com, dw@davidwei.uk, skhawaja@google.com, 
+	willemb@google.com, jdamato@fastly.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-T24gTW9uLCAyMDI1LTA1LTA1IGF0IDEwOjQzICswMjAwLCBPbGVrc2lqIFJlbXBlbCB3cm90ZToN
-Cj4gRVhURVJOQUwgRU1BSUw6IERvIG5vdCBjbGljayBsaW5rcyBvciBvcGVuIGF0dGFjaG1lbnRz
-IHVubGVzcyB5b3UNCj4ga25vdyB0aGUgY29udGVudCBpcyBzYWZlDQo+IA0KPiBNb3ZlIHRoZSBQ
-SFkgaW50ZXJydXB0IGFja25vd2xlZGdtZW50IGxvZ2ljIGZyb20gbGFuNzh4eF9saW5rX3Jlc2V0
-KCkNCj4gdG8gYSBuZXcgaGVscGVyIGZ1bmN0aW9uIGxhbjc4eHhfcGh5X2ludF9hY2soKS4gVGhp
-cyBzaW1wbGlmaWVzIHRoZQ0KPiBjb2RlIGFuZCBwcmVwYXJlcyBmb3IgcmV1c2luZyB0aGUgYWNr
-bm93bGVkZ21lbnQgbG9naWMgaW5kZXBlbmRlbnRseQ0KPiBmcm9tIHRoZSBmdWxsIGxpbmsgcmVz
-ZXQgcHJvY2Vzcywgc3VjaCBhcyB3aGVuIHVzaW5nIHBoeWxpbmsuDQo+IA0KPiBObyBmdW5jdGlv
-bmFsIGNoYW5nZSBpbnRlbmRlZC4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IE9sZWtzaWogUmVtcGVs
-IDxvLnJlbXBlbEBwZW5ndXRyb25peC5kZT4NCj4gDQpSZXZpZXdlZC1ieTogVGhhbmdhcmFqIFNh
-bXluYXRoYW4gPHRoYW5nYXJhai5zQG1pY3JvY2hpcC5jb20+DQo=
+On Wed, May 7, 2025 at 2:41=E2=80=AFAM Stanislav Fomichev <stfomichev@gmail=
+.com> wrote:
+>
+
+Hi Stanislav,
+Thanks a lot for your review!
+
+> On 05/06, Taehee Yoo wrote:
+> > Kernel panic occurs when a devmem TCP socket is closed after NIC module
+> > is unloaded.
+> >
+> > This is Devmem TCP unregistration scenarios. number is an order.
+> > (a)socket close    (b)pp destroy    (c)uninstall    result
+> > 1                  2                3               OK
+> > 1                  3                2               (d)Impossible
+> > 2                  1                3               OK
+> > 3                  1                2               (e)Kernel panic
+> > 2                  3                1               (d)Impossible
+> > 3                  2                1               (d)Impossible
+> >
+> > (a) netdev_nl_sock_priv_destroy() is called when devmem TCP socket is
+> >     closed.
+> > (b) page_pool_destroy() is called when the interface is down.
+> > (c) mp_ops->uninstall() is called when an interface is unregistered.
+> > (d) There is no scenario in mp_ops->uninstall() is called before
+> >     page_pool_destroy().
+> >     Because unregister_netdevice_many_notify() closes interfaces first
+> >     and then calls mp_ops->uninstall().
+> > (e) netdev_nl_sock_priv_destroy() accesses struct net_device to acquire
+> >     netdev_lock().
+> >     But if the interface module has already been removed, net_device
+> >     pointer is invalid, so it causes kernel panic.
+> >
+> > In summary, there are only 3 possible scenarios.
+> >  A. sk close -> pp destroy -> uninstall.
+> >  B. pp destroy -> sk close -> uninstall.
+> >  C. pp destroy -> uninstall -> sk close.
+> >
+> > Case C is a kernel panic scenario.
+> >
+> > In order to fix this problem, It makes mp_dmabuf_devmem_uninstall() set
+> > binding->dev to NULL.
+> > It indicates an bound net_device was unregistered.
+> >
+> > It makes netdev_nl_sock_priv_destroy() do not acquire netdev_lock()
+> > if binding->dev is NULL.
+> >
+> > It inverts socket/netdev lock order like below:
+> >     netdev_lock();
+> >     mutex_lock(&priv->lock);
+> >     mutex_unlock(&priv->lock);
+> >     netdev_unlock();
+> >
+> > Because of inversion of locking ordering, mp_dmabuf_devmem_uninstall()
+> > acquires socket lock from now on.
+> >
+> > Tests:
+> > Scenario A:
+> >     ./ncdevmem -s 192.168.1.4 -c 192.168.1.2 -f $interface -l -p 8000 \
+> >         -v 7 -t 1 -q 1 &
+> >     pid=3D$!
+> >     sleep 10
+> >     kill $pid
+> >     ip link set $interface down
+> >     modprobe -rv $module
+> >
+> > Scenario B:
+> >     ./ncdevmem -s 192.168.1.4 -c 192.168.1.2 -f $interface -l -p 8000 \
+> >         -v 7 -t 1 -q 1 &
+> >     pid=3D$!
+> >     sleep 10
+> >     ip link set $interface down
+> >     kill $pid
+> >     modprobe -rv $module
+> >
+> > Scenario C:
+> >     ./ncdevmem -s 192.168.1.4 -c 192.168.1.2 -f $interface -l -p 8000 \
+> >         -v 7 -t 1 -q 1 &
+> >     pid=3D$!
+> >     sleep 10
+> >     modprobe -rv $module
+> >     sleep 5
+> >     kill $pid
+> >
+> > Splat looks like:
+> > Oops: general protection fault, probably for non-canonical address 0xdf=
+fffc001fffa9f7: 0000 [#1] SMP DEBUG_PAGEALLOC KASAN NOPTI
+> > KASAN: probably user-memory-access in range [0x00000000fffd4fb8-0x00000=
+000fffd4fbf]
+> > CPU: 0 UID: 0 PID: 2041 Comm: ncdevmem Tainted: G    B   W           6.=
+15.0-rc1+ #2 PREEMPT(undef)  0947ec89efa0fd68838b78e36aa1617e97ff5d7f
+> > Tainted: [B]=3DBAD_PAGE, [W]=3DWARN
+> > RIP: 0010:__mutex_lock (./include/linux/sched.h:2244 kernel/locking/mut=
+ex.c:400 kernel/locking/mutex.c:443 kernel/locking/mutex.c:605 kernel/locki=
+ng/mutex.c:746)
+> > Code: ea 03 80 3c 02 00 0f 85 4f 13 00 00 49 8b 1e 48 83 e3 f8 74 6a 48=
+ b8 00 00 00 00 00 fc ff df 48 8d 7b 34 48 89 fa 48 c1 ea 03 <0f> b6 f
+> > RSP: 0018:ffff88826f7ef730 EFLAGS: 00010203
+> > RAX: dffffc0000000000 RBX: 00000000fffd4f88 RCX: ffffffffaa9bc811
+> > RDX: 000000001fffa9f7 RSI: 0000000000000008 RDI: 00000000fffd4fbc
+> > RBP: ffff88826f7ef8b0 R08: 0000000000000000 R09: ffffed103e6aa1a4
+> > R10: 0000000000000007 R11: ffff88826f7ef442 R12: fffffbfff669f65e
+> > R13: ffff88812a830040 R14: ffff8881f3550d20 R15: 00000000fffd4f88
+> > FS:  0000000000000000(0000) GS:ffff888866c05000(0000) knlGS:00000000000=
+00000
+> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > CR2: 0000563bed0cb288 CR3: 00000001a7c98000 CR4: 00000000007506f0
+> > PKRU: 55555554
+> > Call Trace:
+> > <TASK>
+> >  ...
+> >  netdev_nl_sock_priv_destroy (net/core/netdev-genl.c:953 (discriminator=
+ 3))
+> >  genl_release (net/netlink/genetlink.c:653 net/netlink/genetlink.c:694 =
+net/netlink/genetlink.c:705)
+> >  ...
+> >  netlink_release (net/netlink/af_netlink.c:737)
+> >  ...
+> >  __sock_release (net/socket.c:647)
+> >  sock_close (net/socket.c:1393)
+> >
+> > Fixes: 1d22d3060b9b ("net: drop rtnl_lock for queue_mgmt operations")
+> > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+> > ---
+> >
+> > v2:
+> >  - Fix commit message.
+> >  - Correct Fixes tag.
+> >  - Inverse locking order.
+> >  - Do not put a reference count of binding in
+> >    mp_dmabuf_devmem_uninstall().
+> >
+> > In order to test this patch, driver side implementation of devmem TCP[1=
+]
+> > is needed to be applied.
+> >
+> > [1] https://lore.kernel.org/netdev/20250415052458.1260575-1-ap420073@gm=
+ail.com/T/#u
+> >
+> >  net/core/devmem.c      |  6 ++++++
+> >  net/core/devmem.h      |  3 +++
+> >  net/core/netdev-genl.c | 27 ++++++++++++++++++---------
+> >  3 files changed, 27 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/net/core/devmem.c b/net/core/devmem.c
+> > index 6e27a47d0493..636c1e82b8da 100644
+> > --- a/net/core/devmem.c
+> > +++ b/net/core/devmem.c
+> > @@ -167,6 +167,7 @@ int net_devmem_bind_dmabuf_to_queue(struct net_devi=
+ce *dev, u32 rxq_idx,
+> >
+> >  struct net_devmem_dmabuf_binding *
+> >  net_devmem_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
+> > +                    struct netdev_nl_sock *priv,
+> >                      struct netlink_ext_ack *extack)
+> >  {
+> >       struct net_devmem_dmabuf_binding *binding;
+> > @@ -189,6 +190,7 @@ net_devmem_bind_dmabuf(struct net_device *dev, unsi=
+gned int dmabuf_fd,
+> >       }
+> >
+> >       binding->dev =3D dev;
+> > +     binding->priv =3D priv;
+> >
+> >       err =3D xa_alloc_cyclic(&net_devmem_dmabuf_bindings, &binding->id=
+,
+> >                             binding, xa_limit_32b, &id_alloc_next,
+> > @@ -376,12 +378,16 @@ static void mp_dmabuf_devmem_uninstall(void *mp_p=
+riv,
+> >       struct netdev_rx_queue *bound_rxq;
+> >       unsigned long xa_idx;
+> >
+> > +     mutex_lock(&binding->priv->lock);
+> >       xa_for_each(&binding->bound_rxqs, xa_idx, bound_rxq) {
+> >               if (bound_rxq =3D=3D rxq) {
+> >                       xa_erase(&binding->bound_rxqs, xa_idx);
+> > +                     if (xa_empty(&binding->bound_rxqs))
+> > +                             binding->dev =3D NULL;
+> >                       break;
+> >               }
+> >       }
+> > +     mutex_unlock(&binding->priv->lock);
+> >  }
+> >
+> >  static const struct memory_provider_ops dmabuf_devmem_ops =3D {
+> > diff --git a/net/core/devmem.h b/net/core/devmem.h
+> > index 7fc158d52729..afd6320b2c9b 100644
+> > --- a/net/core/devmem.h
+> > +++ b/net/core/devmem.h
+> > @@ -11,6 +11,7 @@
+> >  #define _NET_DEVMEM_H
+> >
+> >  #include <net/netmem.h>
+> > +#include <net/netdev_netlink.h>
+> >
+> >  struct netlink_ext_ack;
+> >
+> > @@ -20,6 +21,7 @@ struct net_devmem_dmabuf_binding {
+> >       struct sg_table *sgt;
+> >       struct net_device *dev;
+> >       struct gen_pool *chunk_pool;
+> > +     struct netdev_nl_sock *priv;
+> >
+> >       /* The user holds a ref (via the netlink API) for as long as they=
+ want
+> >        * the binding to remain alive. Each page pool using this binding=
+ holds
+> > @@ -63,6 +65,7 @@ struct dmabuf_genpool_chunk_owner {
+> >  void __net_devmem_dmabuf_binding_free(struct net_devmem_dmabuf_binding=
+ *binding);
+> >  struct net_devmem_dmabuf_binding *
+> >  net_devmem_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
+> > +                    struct netdev_nl_sock *priv,
+> >                      struct netlink_ext_ack *extack);
+> >  void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *bindin=
+g);
+> >  int net_devmem_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_id=
+x,
+> > diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+> > index 230743bdbb14..b8bb73574276 100644
+> > --- a/net/core/netdev-genl.c
+> > +++ b/net/core/netdev-genl.c
+> > @@ -859,13 +859,11 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, s=
+truct genl_info *info)
+> >               goto err_genlmsg_free;
+> >       }
+> >
+> > -     mutex_lock(&priv->lock);
+> > -
+> >       err =3D 0;
+> >       netdev =3D netdev_get_by_index_lock(genl_info_net(info), ifindex)=
+;
+> >       if (!netdev) {
+> >               err =3D -ENODEV;
+> > -             goto err_unlock_sock;
+> > +             goto err_genlmsg_free;
+> >       }
+> >       if (!netif_device_present(netdev))
+> >               err =3D -ENODEV;
+> > @@ -877,10 +875,11 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, s=
+truct genl_info *info)
+> >               goto err_unlock;
+> >       }
+> >
+> > -     binding =3D net_devmem_bind_dmabuf(netdev, dmabuf_fd, info->extac=
+k);
+> > +     mutex_lock(&priv->lock);
+> > +     binding =3D net_devmem_bind_dmabuf(netdev, dmabuf_fd, priv, info-=
+>extack);
+> >       if (IS_ERR(binding)) {
+> >               err =3D PTR_ERR(binding);
+> > -             goto err_unlock;
+> > +             goto err_unlock_sock;
+> >       }
+> >
+> >       nla_for_each_attr_type(attr, NETDEV_A_DMABUF_QUEUES,
+> > @@ -921,18 +920,17 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, s=
+truct genl_info *info)
+> >       if (err)
+> >               goto err_unbind;
+> >
+> > -     netdev_unlock(netdev);
+> > -
+> >       mutex_unlock(&priv->lock);
+> > +     netdev_unlock(netdev);
+> >
+> >       return 0;
+> >
+> >  err_unbind:
+> >       net_devmem_unbind_dmabuf(binding);
+> > -err_unlock:
+> > -     netdev_unlock(netdev);
+> >  err_unlock_sock:
+> >       mutex_unlock(&priv->lock);
+> > +err_unlock:
+> > +     netdev_unlock(netdev);
+> >  err_genlmsg_free:
+> >       nlmsg_free(rsp);
+> >       return err;
+> > @@ -948,14 +946,25 @@ void netdev_nl_sock_priv_destroy(struct netdev_nl=
+_sock *priv)
+> >  {
+> >       struct net_devmem_dmabuf_binding *binding;
+> >       struct net_devmem_dmabuf_binding *temp;
+> > +     netdevice_tracker dev_tracker;
+> >       struct net_device *dev;
+> >
+> >       mutex_lock(&priv->lock);
+> >       list_for_each_entry_safe(binding, temp, &priv->bindings, list) {
+> >               dev =3D binding->dev;
+> > +             if (!dev) {
+> > +                     net_devmem_unbind_dmabuf(binding);
+> > +                     continue;
+> > +             }
+> > +             netdev_hold(dev, &dev_tracker, GFP_KERNEL);
+> > +             mutex_unlock(&priv->lock);
+> >               netdev_lock(dev);
+> > +             mutex_lock(&priv->lock);
+> >               net_devmem_unbind_dmabuf(binding);
+> > +             mutex_unlock(&priv->lock);
+> >               netdev_unlock(dev);
+> > +             netdev_put(dev, &dev_tracker);
+> > +             mutex_lock(&priv->lock);
+>
+> nit: this feels like it deserves a comment on the lock ordering (and,
+> hence, why this dance is needed). The rest looks good!
+
+The device unreg path didn't acquire a socket lock.
+But by this patch, it sets binding->dev to NULL and binding->dev is
+protected by socket lock.
+So socket lock needs to be added to the device unreg path.
+
+The device unreg path acquires netdev_lock first, and socket close path
+acquires socket lock first. So, one of them should be changed.
+I modified the socket-close path and adjusted the locking order because,
+in my view, the socket-close path in the code is more flexible than the
+device unregistration path.
+
+I will add a comment about it in the next version.
+
+Thanks a lot!
+Taehee Yoo
 
