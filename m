@@ -1,102 +1,86 @@
-Return-Path: <netdev+bounces-188609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BF1EAADDF8
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 14:02:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F358AAADEA8
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 14:12:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67EDA1BC63ED
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 12:02:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 247F29A75C2
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 12:10:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D0222580D2;
-	Wed,  7 May 2025 12:02:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EC7325EFB7;
+	Wed,  7 May 2025 12:07:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HdpZlfgo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oKZqm9lk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF6974B1E45;
-	Wed,  7 May 2025 12:02:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7004B25EF90;
+	Wed,  7 May 2025 12:06:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746619332; cv=none; b=pN1GAKLrWuZVE+Smdzt0fhRkcoR7qngbJQDswtcXHnON9aDTtWcgIgzGss61/ht9HbVpSypHvzEXxwiMAcRb/bZS9q1IzseDSj72U9V0pJGnP+9LbcbQtJkpNqggXITVsinxeRzZDPO8kJPVt6ARwv/in3HJw3+qtWSJpi67chs=
+	t=1746619624; cv=none; b=hYmh3NfD9TCx1M+Rsz9FmEHG6StGrk1woqnlnZTJJWJZhC2kPeX0TeQrEOWTx+2oo/xdHsBXHNgJNsbmF5wDL9eN9MIF519SgfiwY0TuGvHgUjVeoPy9M9L5GeFZBn2WnsqxwFhgJsod/X8Vh+2pr3WenlfpyUbVIWVJOji7aC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746619332; c=relaxed/simple;
-	bh=G+gGUFnonfHfqvLJtT3/rMFE4bMTKjw81qinxKZTkP8=;
+	s=arc-20240116; t=1746619624; c=relaxed/simple;
+	bh=oOoppb62PQ4xraIkA9sXFx2EHtxHdAikQDEjmQ8i2oU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Bxs98oysZA1BzwhaL9UB2xO9BfQcNrjhls2nkVfpaPJW5APMSgGG95jE0tXJHn4SMxgPDr5y7mLv0nuB8pmWTVCtmXNVsQb1sAQIOsG+oUb7jAWDwWDgD2AHLqtEak9bRLguFRSDOojmUESUm0poSJ65YC0JBDRk5uKa/9K4We4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HdpZlfgo; arc=none smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6f0c30a1cf8so99166046d6.2;
-        Wed, 07 May 2025 05:02:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746619329; x=1747224129; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cB9Vli3Xxo4KwEG4QM0VC4PHMgHe2AYxc+yOmxy2QWQ=;
-        b=HdpZlfgoaRPcb4fTwldKsQn1aw2IexvtV5C5OCzyM6eWMpFuDU4XSENi40xorORDiw
-         8D7xGaG28rqAFkRThJjVVxNZ9jm4pJ4uKGju8ODLQcN8kT2bcxmhynvsed82049DduoZ
-         TlinWhpn1Ts5CCE+D1L0khVh1HqpUYQVoEmzUGxD9+auTSRbImAaDlPOreg1Yh37R/98
-         44JQEcVjHfxo/cVPseI395WeILZAEluqsdBaqcWM85dj1rYkTu4q1RW/038ddg954d9R
-         1uc8VDjSv+Drt0xZ+1irf7PkrNB072drp1vqfeQa9r3uVgS0twCO2Kdc6nme1BdqKpXj
-         BnvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746619329; x=1747224129;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cB9Vli3Xxo4KwEG4QM0VC4PHMgHe2AYxc+yOmxy2QWQ=;
-        b=kyIY4ojPueMi/N3w2yCRKJG8UZtJ9orZdStG4gExbK8BhFZpANPqDz+zWtovlfdQUZ
-         L9oeJDzXMF2moULEViHxdvLDryZMWMPAc7KoLu2sDkcgQDK/ar71yPfsAXuvciLGea2F
-         yQQygvYQ4GZGktxNZxJv0iaHc/wURiRK6UHEzXrR7MC3ItQKZBNI5L9S/oQNSZdYV8ER
-         NlFLy4JYoR1B7V5cNIeIUok66bhHJJgkYYjWajdxLia227JoRcPzfTZuD4Dk5kNhbRL6
-         LGv21T64xTvhsyNJCFX5ZOGdfxNpuHlgoxNYQNn1GDHUcr7BI649NGrIuVRXXjK3rNkF
-         nJZA==
-X-Forwarded-Encrypted: i=1; AJvYcCV22aigdEs8QKbAUXmAVFZZZK3GdvGVY7uvhEyT3NDJvr1oeD2TkzJiyzcSIMQuQsgYUvmYM+ZhyY6f92qJ@vger.kernel.org, AJvYcCVQl9KMXlA2JdhUiMF83B/bKnek8vmQK7BNl5RuHwpuAzJe1QStYEHcB/EDHKnpuBxs/HkiGE9A@vger.kernel.org, AJvYcCVhM93NyFKycSbFNoSJqecsDZvGmioI5mT6NV1PNKkKb19AEriG6jiVC+I9KTvF3lTZMCh1KyCh+GwB@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKK9KkM6qBvu12j7156KwY566r0Llru4Lbx4X2iZ1iEEnOu+00
-	Xv0Uzi7PQOm/gVBGg6jiK11BS4rRL5xlhtPrvIlwWA2XR+dqDSBSuMePtQ==
-X-Gm-Gg: ASbGncvDDiJFrXs9fOXv1hJqDFQn+SxAHXLLAGQpdi8qBWG07o69QE+UGmJS7ECTQsY
-	8uZGS1VJyoqLPaZW4+RTUyD4gMj7ODUqhSSPiaaFIlkHyCbbQ+H8p8WPfPOcM6uSDnw5HgaedkQ
-	pp3KEgBqPFR6ZMBxR6sSl5k+z9POa6f/TOdCJE6Qt2vsDs5PlXgjFczatfOS/NPqZLbeeKy8Sek
-	8MDJ8M6nHnR1IF+xfXItxMDrGlfENkIE8KSBgZw5r5HUQQKMybF0NZ6lnBURlvjiekgGlhCl7qg
-	WEtHdYg0YowqJR+w
-X-Google-Smtp-Source: AGHT+IGRl9BUi1WrHprzmvGHRtZmly2KUBbHCnPcITRG9+w3NMHRJoWIA8I9LxLmf29VDGt76SQFqg==
-X-Received: by 2002:ad4:5dc3:0:b0:6e8:ede1:237 with SMTP id 6a1803df08f44-6f542b31434mr45097126d6.43.1746619317492;
-        Wed, 07 May 2025 05:01:57 -0700 (PDT)
-Received: from localhost ([2001:da8:7001:11::cb])
-        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-6f542647e03sm13464756d6.29.2025.05.07.05.01.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 May 2025 05:01:56 -0700 (PDT)
-Date: Wed, 7 May 2025 20:01:29 +0800
-From: Inochi Amaoto <inochiama@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>, Inochi Amaoto <inochiama@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Chen Wang <unicorn_wang@outlook.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexandre Ghiti <alex@ghiti.fr>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Richard Cochran <richardcochran@gmail.com>, 
-	Guo Ren <guoren@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, 
-	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>, "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, 
-	Romain Gantois <romain.gantois@bootlin.com>, Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>, 
-	Lothar Rubusch <l.rubusch@gmail.com>, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, sophgo@lists.linux.dev, 
-	linux-riscv@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>
-Subject: Re: [PATCH net-next 0/4] riscv: sophgo: Add ethernet support for
- SG2042
-Message-ID: <2tu2mvwsnqdezjei5h43ko24vfave4c3ek2fjoatwsg72p6lpz@3vbtpmm7l73z>
-References: <20250506093256.1107770-1-inochiama@gmail.com>
- <c7a8185e-07b7-4a62-b39b-7d1e6eec64d6@lunn.ch>
- <fgao5qnim6o3gvixzl7lnftgsish6uajlia5okylxskn3nrexe@gyvgrp72jvj6>
- <ffa044e2-ee9e-4a34-af6a-2e45294144f7@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z021SsvFz5JDuhYr3oECoHSHXdRVjhnGDN4Su3Ah8J78B8Na1ouGTebN0LY8tkg+A6S0nmazZ6TJnQyS1I9RgXT5fH/3/zrJiiU7jZ4bM4Fz6NoluxMLBHW44wODUuMXuEVX7o250HG9Hsqn2yamny0LMeUKBpi86O7FDCxsqa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oKZqm9lk; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746619620; x=1778155620;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=oOoppb62PQ4xraIkA9sXFx2EHtxHdAikQDEjmQ8i2oU=;
+  b=oKZqm9lkiTULf4Y2/4gdoPMwiJPFA0RWlB8RSvrGHBG4hVuf8m3CiPzy
+   qd46UWD/+YdeyhOJ70fRJVNF3tNIBu3j2uGnxBNDpD/UqA3aQEuXgjq5U
+   ESYawQWbqE1KixWlLVNoaE4CXgLalgPtjrEmYRUF7Q9PL7SAP8IqEt0N/
+   sGnxNNgyBxdTcH61u9c4oyL9N5a+bWP2l/TWRmoD6c0AwXuoqr+FLCk+6
+   ZAg1HEM86At/ae/P+SdrnftIuVUcCjwM/Vlfiy/kTzI3LjE7NTRPTHGsJ
+   Eba7djpnlAk/tSQfeu6ZCbuzbZgctG5P/vPTpQjtgLRzkpMfNYyKmGCNI
+   g==;
+X-CSE-ConnectionGUID: cBqrmCnzRhiwVfuqw+q7lw==
+X-CSE-MsgGUID: ax7lPyvwQqiO2Rc/kUkgEg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11426"; a="58541806"
+X-IronPort-AV: E=Sophos;i="6.15,269,1739865600"; 
+   d="scan'208";a="58541806"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2025 05:06:56 -0700
+X-CSE-ConnectionGUID: qk9P2QjsTSeJSqhGWoPnZA==
+X-CSE-MsgGUID: 6xQvtvMMRae34H0jNAHM8g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,269,1739865600"; 
+   d="scan'208";a="136450457"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by fmviesa010.fm.intel.com with ESMTP; 07 May 2025 05:05:34 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uCdWl-0007kD-2G;
+	Wed, 07 May 2025 12:05:31 +0000
+Date: Wed, 7 May 2025 20:04:55 +0800
+From: kernel test robot <lkp@intel.com>
+To: Tanmay Jagdale <tanmay@marvell.com>, bbrezillon@kernel.org,
+	arno@natisbad.org, schalla@marvell.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, sgoutham@marvell.com, lcherian@marvell.com,
+	gakula@marvell.com, jerinj@marvell.com, hkelam@marvell.com,
+	sbhatta@marvell.com, andrew+netdev@lunn.ch, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, bbhushan2@marvell.com,
+	bhelgaas@google.com, pstanner@redhat.com,
+	gregkh@linuxfoundation.org, linux@treblig.org,
+	krzysztof.kozlowski@linaro.org, giovanni.cabiddu@intel.com
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, rkannoth@marvell.com, sumang@marvell.com,
+	gcherian@marvell.com, Tanmay Jagdale <tanmay@marvell.com>
+Subject: Re: [net-next PATCH v1 11/15] octeontx2-pf: ipsec: Handle NPA
+ threshold interrupt
+Message-ID: <202505071904.TWc5095k-lkp@intel.com>
+References: <20250502132005.611698-12-tanmay@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,45 +89,167 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ffa044e2-ee9e-4a34-af6a-2e45294144f7@lunn.ch>
+In-Reply-To: <20250502132005.611698-12-tanmay@marvell.com>
 
-On Wed, May 07, 2025 at 02:10:48AM +0200, Andrew Lunn wrote:
-> On Wed, May 07, 2025 at 06:24:29AM +0800, Inochi Amaoto wrote:
-> > On Tue, May 06, 2025 at 02:03:18PM +0200, Andrew Lunn wrote:
-> > > On Tue, May 06, 2025 at 05:32:50PM +0800, Inochi Amaoto wrote:
-> > > > The ethernet controller of SG2042 is Synopsys DesignWare IP with
-> > > > tx clock. Add device id for it.
-> > > > 
-> > > > This patch can only be tested on a SG2042 x4 evb board, as pioneer
-> > > > does not expose this device.
-> > > 
-> > > Do you have a patch for this EVB board? Ideally there should be a user
-> > > added at the same time as support for a device.
-> > > 
-> > > 	Andrew
-> > 
-> > Yes, I have one for this device. And Han Gao told me that he will send
-> > the board patch for the evb board. So I only send the driver.
-> > And the fragment for the evb board is likes below, I think it is kind
-> > of trivial:
-> > 
-> > &gmac0 {
-> > 	phy-handle = <&phy0>;
-> > 	phy-mode = "rgmii-txid";
-> 
-> And this is why i ask, because this is broken. For more information,
-> please see:
-> 
-> https://patchwork.kernel.org/project/netdevbpf/patch/20250430-v6-15-rc3-net-rgmii-delays-v2-1-099ae651d5e5@lunn.ch/
-> 
-> 	Andrew
+Hi Tanmay,
 
-You are right, the right phy-mode is "rgmii-id", the delay is not
-added by the PCB. It seems to be better to ask for the vendor about
-the hardware design before copying params for vendor dts. Anyway,
-thanks for reviewing this.
+kernel test robot noticed the following build warnings:
 
-Regards,
-Inochi
+[auto build test WARNING on net-next/main]
 
+url:    https://github.com/intel-lab-lkp/linux/commits/Tanmay-Jagdale/crypto-octeontx2-Share-engine-group-info-with-AF-driver/20250502-213203
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250502132005.611698-12-tanmay%40marvell.com
+patch subject: [net-next PATCH v1 11/15] octeontx2-pf: ipsec: Handle NPA threshold interrupt
+config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20250507/202505071904.TWc5095k-lkp@intel.com/config)
+compiler: clang version 20.1.2 (https://github.com/llvm/llvm-project 58df0ef89dd64126512e4ee27b4ac3fd8ddf6247)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250507/202505071904.TWc5095k-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202505071904.TWc5095k-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c:488:6: warning: variable 'pool' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
+     488 |         if (err)
+         |             ^~~
+   drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c:512:23: note: uninitialized use occurs here
+     512 |         qmem_free(pfvf->dev, pool->stack);
+         |                              ^~~~
+   drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c:488:2: note: remove the 'if' if its condition is always false
+     488 |         if (err)
+         |         ^~~~~~~~
+     489 |                 goto pool_fail;
+         |                 ~~~~~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c:466:24: note: initialize the variable 'pool' to silence this warning
+     466 |         struct otx2_pool *pool;
+         |                               ^
+         |                                = NULL
+>> drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c:528:20: warning: variable 'qset' set but not used [-Wunused-but-set-variable]
+     528 |         struct otx2_qset *qset = NULL;
+         |                           ^
+>> drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c:591:8: warning: variable 'ptr' set but not used [-Wunused-but-set-variable]
+     591 |         void *ptr;
+         |               ^
+   3 warnings generated.
+
+
+vim +/qset +528 drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+
+   521	
+   522	static void cn10k_ipsec_npa_refill_inb_ipsecq(struct work_struct *work)
+   523	{
+   524		struct cn10k_ipsec *ipsec = container_of(work, struct cn10k_ipsec,
+   525							 refill_npa_inline_ipsecq);
+   526		struct otx2_nic *pfvf = container_of(ipsec, struct otx2_nic, ipsec);
+   527		struct otx2_pool *pool = NULL;
+ > 528		struct otx2_qset *qset = NULL;
+   529		u64 val, *ptr, op_int = 0, count;
+   530		int err, pool_id, idx;
+   531		dma_addr_t bufptr;
+   532	
+   533		qset = &pfvf->qset;
+   534	
+   535		val = otx2_read64(pfvf, NPA_LF_QINTX_INT(0));
+   536		if (!(val & 1))
+   537			return;
+   538	
+   539		ptr = otx2_get_regaddr(pfvf, NPA_LF_AURA_OP_INT);
+   540		val = otx2_atomic64_add(((u64)pfvf->ipsec.inb_ipsec_pool << 44), ptr);
+   541	
+   542		/* Error interrupt bits */
+   543		if (val & 0xff)
+   544			op_int = (val & 0xff);
+   545	
+   546		/* Refill buffers on a Threshold interrupt */
+   547		if (val & (1 << 16)) {
+   548			/* Get the current number of buffers consumed */
+   549			ptr = otx2_get_regaddr(pfvf, NPA_LF_AURA_OP_CNT);
+   550			count = otx2_atomic64_add(((u64)pfvf->ipsec.inb_ipsec_pool << 44), ptr);
+   551			count &= GENMASK_ULL(35, 0);
+   552	
+   553			/* Refill */
+   554			pool_id = pfvf->ipsec.inb_ipsec_pool;
+   555			pool = &pfvf->qset.pool[pool_id];
+   556	
+   557			for (idx = 0; idx < count; idx++) {
+   558				err = otx2_alloc_rbuf(pfvf, pool, &bufptr, pool_id, idx);
+   559				if (err) {
+   560					netdev_err(pfvf->netdev,
+   561						   "Insufficient memory for IPsec pool buffers\n");
+   562					break;
+   563				}
+   564				pfvf->hw_ops->aura_freeptr(pfvf, pool_id,
+   565							    bufptr + OTX2_HEAD_ROOM);
+   566			}
+   567	
+   568			op_int |= (1 << 16);
+   569		}
+   570	
+   571		/* Clear/ACK Interrupt */
+   572		if (op_int)
+   573			otx2_write64(pfvf, NPA_LF_AURA_OP_INT,
+   574				     ((u64)pfvf->ipsec.inb_ipsec_pool << 44) | op_int);
+   575	}
+   576	
+   577	static irqreturn_t cn10k_ipsec_npa_inb_ipsecq_intr_handler(int irq, void *data)
+   578	{
+   579		struct otx2_nic *pf = data;
+   580	
+   581		schedule_work(&pf->ipsec.refill_npa_inline_ipsecq);
+   582	
+   583		return IRQ_HANDLED;
+   584	}
+   585	
+   586	static int cn10k_inb_cpt_init(struct net_device *netdev)
+   587	{
+   588		struct otx2_nic *pfvf = netdev_priv(netdev);
+   589		int ret = 0, vec;
+   590		char *irq_name;
+ > 591		void *ptr;
+   592		u64 val;
+   593	
+   594		ret = cn10k_ipsec_setup_nix_rx_hw_resources(pfvf);
+   595		if (ret) {
+   596			netdev_err(netdev, "Failed to setup NIX HW resources for IPsec\n");
+   597			return ret;
+   598		}
+   599	
+   600		/* Work entry for refilling the NPA queue for ingress inline IPSec */
+   601		INIT_WORK(&pfvf->ipsec.refill_npa_inline_ipsecq,
+   602			  cn10k_ipsec_npa_refill_inb_ipsecq);
+   603	
+   604		/* Register NPA interrupt */
+   605		vec = pfvf->hw.npa_msixoff;
+   606		irq_name = &pfvf->hw.irq_name[vec * NAME_SIZE];
+   607		snprintf(irq_name, NAME_SIZE, "%s-npa-qint", pfvf->netdev->name);
+   608	
+   609		ret = request_irq(pci_irq_vector(pfvf->pdev, vec),
+   610				  cn10k_ipsec_npa_inb_ipsecq_intr_handler, 0,
+   611				  irq_name, pfvf);
+   612		if (ret) {
+   613			dev_err(pfvf->dev,
+   614				"RVUPF%d: IRQ registration failed for NPA QINT%d\n",
+   615				rvu_get_pf(pfvf->pcifunc), 0);
+   616			return ret;
+   617		}
+   618	
+   619		/* Enable NPA threshold interrupt */
+   620		ptr = otx2_get_regaddr(pfvf, NPA_LF_AURA_OP_INT);
+   621		val = BIT_ULL(43) | BIT_ULL(17);
+   622		otx2_write64(pfvf, NPA_LF_AURA_OP_INT,
+   623			     ((u64)pfvf->ipsec.inb_ipsec_pool << 44) | val);
+   624	
+   625		/* Enable interrupt */
+   626		otx2_write64(pfvf, NPA_LF_QINTX_ENA_W1S(0), BIT_ULL(0));
+   627	
+   628		return ret;
+   629	}
+   630	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
