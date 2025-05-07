@@ -1,201 +1,263 @@
-Return-Path: <netdev+bounces-188581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75AECAAD83C
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 09:34:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F1A4AAD910
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 09:53:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 620A99A32BA
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 07:30:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B7F23B7C75
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 07:48:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1D49219A81;
-	Wed,  7 May 2025 07:30:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D6E8222575;
+	Wed,  7 May 2025 07:45:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hfwVXlMF"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="eIK7M34k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D18061DE3A7;
-	Wed,  7 May 2025 07:30:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1AD9221286;
+	Wed,  7 May 2025 07:45:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746603032; cv=none; b=oinGOyTaG9ePTjdOEuvROk9Q1x1mNnBe8VvzATZNTcqFRX4zlbkRa16bbHitXTDO5r9vDjvbHaL0AGONOpWHXtdWWL9G2Yj5+wYpI3iGC+GQoVzPaSdJDpV7njGphpB1kX6tAceHygVGNJ1j7aYDbgFnDQO46BDQvMxo8D2Tsjs=
+	t=1746603903; cv=none; b=CIHOhBnrCXFTM6KqbtWDCgdlRS8TU9noUENFSLgbtwdBYCfOEe7qc1pofKCJryTsj3XxlJfubleSBBZWrklcRaNLFnySljQ1im+y+rOHtiVo99Oc4+RbZ00yNqKJyqF9fmAWqmUxEpcD9XTxfIFB9mzXOqQ6L/s8xNVvi0NJsVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746603032; c=relaxed/simple;
-	bh=aQ7ZkE589FOqu19e0ZF0UZjG+7apZ6nuq+K9znDbbBU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VrHxKXN9HE1CtXiTbtKCVTmHAgywmYIi4xcsNEJA+HA7fuBTzvKG51Z49/O4ww/0TC6hUiyZKTl5MFKEntrR72Q3uXkLlNtJzgYphVTBXwSNCj0eE0yFNOWPDOBlX9HwbYwbpvvlZaZ2EqvRbXm+9qAMUR+thyVVHplxqMlXMVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hfwVXlMF; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3a0b308856fso680064f8f.2;
-        Wed, 07 May 2025 00:30:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746603029; x=1747207829; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=LPCrYcwgxwX8HStcX4NbBNv+gWEsQw6Mwv753/kPMak=;
-        b=hfwVXlMF00ZevEXCywvn6XDJ/98TKlv+BsgbOgTj9Xd7XsdUzJYoaZ5Dxb6cj3wD03
-         hvj49vHLt8J2+o9UjOWNpWKTG/RsUk+kZ3Q2lI+/t1Cc5faB6PUrQY3Ry8af5ziHv7xi
-         3G1MGoBSQCNprkVsOvt32Y9+DA5GkhU8vNfmlA4yI27Dt2ouP+yrIxYRHffg/xhc+OcI
-         GvdP6wOi151LSREoVP03Hpc4O++uCxVfWL1DkmglIy4ogwLvxro7djDFg63baFP7iQpb
-         +sGWw7JO1vnr1u9VISFiGkGJEVqi6Vm1pGmW3rgqwHwfhYBTVR+/PfyRqHpcXX+Ut8k6
-         i2PA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746603029; x=1747207829;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LPCrYcwgxwX8HStcX4NbBNv+gWEsQw6Mwv753/kPMak=;
-        b=pYZTwPjM51P32IcfxMFcTTMJugzUTDSUMdhe+KMmIN99SzDPvJpiKkZwHOy0Kc4HU6
-         ufenteDC4J4AcJuriO17DmpEJx3iNha5NoMj41sAjQbw0zTKwUmbPdavHUyYbkipGcKj
-         2tjNwQhRUTxkZwCfWnYlIA3YpCupCrLWQAnGH87+CZ8XESpy59QD/DO423PLYpgtimKK
-         GrtX9vBJBK/xXG+cx7CTesnBjRhDHqvSAy0h+xfyNdTzrJp6801jJBJNjg1AP5JLdgDZ
-         5We6fEp604RSCc2K/WX1z51NFTV6p/E3eFVPMnQa/i480Lvatx7iTcKdaHhY2UCap0Mx
-         FM4g==
-X-Forwarded-Encrypted: i=1; AJvYcCVMaUUm1fj3pNENADZlI+BGEgP/CYo0/jCCm5LqWFVRE1nDp3KpJvBRcUl6wngY4Cz/Cvx4ckAV@vger.kernel.org, AJvYcCWVfuEElDzN/L3QYhKGLlrxS+UBnnv7xeSYxmWDMDI29VLw4PFpWHUP02kDXK52sxaflk1XcrC4ch4ZUJQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5/L/iCQdgo4g7NDcU9NQWXUqHBnasnRruy7qLT5CJfVPtCQ3/
-	4R+9vP0sGNE2n3uB7PSPT0l17ygYzJNBa8RiLIhFeexBMI3wpBXi
-X-Gm-Gg: ASbGncsicCIG6GBrAvx7xfmxdniImsMxOBeYYYh3CUe+WvBYWWmTT4MBWjXqpNgquk7
-	/bIJ1JEbSDZOt5a+e8Q5najifPtrb2Av1tWg/ut51di3zcRU8THX1H76TfKSQkv9A/zuOcLkMtq
-	fBTOATI764aSquMueYiJ5WtnLmKTrO0Lww7F2nXTtWgstFPLnXzjERBCH57kXyzmNmj11VY8Hce
-	g/yY71XKO/wILfcY5+YLMYGDk91n4g4kuHXyAax12VWzcX2tYS87ssfMLWpfDpkpLWNXfu2LQmx
-	rQVXiuHXroTml6xnJpPDOwRONbnqmrryFUwVqYVRoIOvJQrgl/Xyl+05G5XRvOdTqfeZSzIoDR8
-	ufPfdhP9cBwYmYbxX0iOWslJNR9A=
-X-Google-Smtp-Source: AGHT+IGCDa7qdowhMpB5IoqoRUAGt/c5pP33bP9J+IxNTn23cLL/FMQq6+vqXe7WCG2WY2LOIa+Zog==
-X-Received: by 2002:a5d:5f82:0:b0:3a0:831d:267c with SMTP id ffacd0b85a97d-3a0b49a814dmr1615992f8f.18.1746603028697;
-        Wed, 07 May 2025 00:30:28 -0700 (PDT)
-Received: from [192.168.1.24] (90-47-60-187.ftth.fr.orangecustomers.net. [90.47.60.187])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a0b22bd6a3sm3426127f8f.27.2025.05.07.00.30.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 May 2025 00:30:27 -0700 (PDT)
-Message-ID: <aca3151b-e550-4e3b-b677-504151f5fff7@gmail.com>
-Date: Wed, 7 May 2025 09:30:27 +0200
+	s=arc-20240116; t=1746603903; c=relaxed/simple;
+	bh=SQsRYLRdU71LaJ3wdeA+W6LRxPDPNV2wGe+Mwnyowgo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Nbe/d09VuzATvEXbT6h1pMmVwYrmQizchoQI9xxW0odOGFYyebDwHKLC0dX3rfbVZ6FeysqroLB4YpZx30uxrYhif87Fqhstl+VDEIhTn8cxfp6K3TzIhWs6cQNXYnCpJPUP0gH7WT+XE3VnhdFjossNYLyu7SeDys0EykvovS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=eIK7M34k; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 3876A4419B;
+	Wed,  7 May 2025 07:44:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1746603893;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=h0HW6CbY74NioaSQ8ld8M44cztZr/A/kw8B41kCDVZo=;
+	b=eIK7M34kbOGrSDj67RJbY66sYJfkjUMO8K0CZTog3FdE2x5vlRgAcon+h/SWdCKOxhnmZa
+	lloNynWr58xtnndahT5HViyWiwzyZW44D4zpCJiGrtGS8ar/oNCcSV89NdU3q4XLiBriNW
+	An+emOeh1BrqFpwpyDxSBN3JdccXNUk3FqrrmuCbhE9146GEHcxJXMFgCZtlFMhgTr0OUd
+	NRln1YjsbIUpeXo43BszMw83V6hIAmBFHSJ1g57p5tqyMB0z3XDVFMdkUYkIn6xfL6n72W
+	IkYBxjpo4GXf7+lAoxNrMpk8c/oRhZmxNpHLwuMIqkDaGaUYh6qD4FI56yOU+A==
+Date: Wed, 7 May 2025 09:44:49 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: <Tristram.Ha@microchip.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Woojung Huh <woojung.huh@microchip.com>,
+ Russell King <linux@armlinux.org.uk>, Vladimir Oltean <olteanv@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ <UNGLinuxDriver@microchip.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v2] net: dsa: microchip: Add SGMII port support
+ to KSZ9477 switch
+Message-ID: <20250507094449.60885752@fedora.home>
+In-Reply-To: <20250507000911.14825-1-Tristram.Ha@microchip.com>
+References: <20250507000911.14825-1-Tristram.Ha@microchip.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 00/11] net: dsa: b53: accumulated fixes
-To: Jonas Gorski <jonas.gorski@gmail.com>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
- Florian Fainelli <florian.fainelli@broadcom.com>,
- Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- Kurt Kanzenbach <kurt@linutronix.de>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250429201710.330937-1-jonas.gorski@gmail.com>
- <52f4039a-0b7e-4486-ad99-0a65fac3ae70@broadcom.com>
- <CAOiHx=n_f9CXZf_x1Rd36Fm5ELFd03a9vbLe+wUqWajfaSY5jg@mail.gmail.com>
- <20250506134252.y3y2rqjxp44u74m2@skbuf>
- <CAOiHx=kFhH-fB0b-nHPhEzgs1M_vBnzPZN48ZCzOs8iW7YTJzA@mail.gmail.com>
- <531074c1-f818-4c0a-b8d1-be63ace38d5f@gmail.com>
- <CAOiHx=kiLgvTBVupJDqZzW1Dfn9RhiWxDfF2ZXiSR8Qk5ea2YQ@mail.gmail.com>
-Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- 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
- WlfRzlpjIPmdjgoicA==
-In-Reply-To: <CAOiHx=kiLgvTBVupJDqZzW1Dfn9RhiWxDfF2ZXiSR8Qk5ea2YQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvkeeifedtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeeftdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepleehgeevfeejgfduledtlefhlefgveelkeefffeuiedtteejheduueegiedvveehnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucfkphepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedufedprhgtphhtthhopefvrhhishhtrhgrmhdrjfgrsehmihgtrhhotghhihhprdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepf
+ ihoohhjuhhnghdrhhhuhhesmhhitghrohgthhhiphdrtghomhdprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtohepohhlthgvrghnvhesghhmrghilhdrtghomhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
+Hi Tristram,
 
+On Tue, 6 May 2025 17:09:11 -0700
+<Tristram.Ha@microchip.com> wrote:
 
-On 5/6/2025 9:48 PM, Jonas Gorski wrote:
-> On Tue, May 6, 2025 at 9:03 PM Florian Fainelli <f.fainelli@gmail.com> wrote:
->>
->>
->>
->> On 5/6/2025 4:27 PM, Jonas Gorski wrote:
->>> On Tue, May 6, 2025 at 3:42 PM Vladimir Oltean <olteanv@gmail.com> wrote:
->>>>
->>>> / unrelated to patches /
->>>>
->>>> On Wed, Apr 30, 2025 at 10:43:40AM +0200, Jonas Gorski wrote:
->>>>>>> I have a fix/workaround for that, but as it is a bit more controversial
->>>>>>> and makes use of an unrelated feature, I decided to hold off from that
->>>>>>> and post it later.
->>>>>>
->>>>>> Can you expand on the fix/workaround you have?
->>>>>
->>>>> It's setting EAP mode to simplified on standalone ports, where it
->>>>> redirects all frames to the CPU port where there is no matching ARL
->>>>> entry for that SA and port. That should work on everything semi recent
->>>>> (including BCM63XX), and should work regardless of VLAN. It might
->>>>> cause more traffic than expected to be sent to the switch, as I'm not
->>>>> sure if multicast filtering would still work (not that I'm sure that
->>>>> it currently works lol).
->>>>>
->>>>> At first I moved standalone ports to VID 4095 for untagged traffic,
->>>>> but that only fixed the issue for untagged traffic, and you would have
->>>>> had the same issue again when using VLAN uppers. And VLAN uppers have
->>>>> the same issue on vlan aware bridges, so the above would be a more
->>>>> complete workaround.
->>>>
->>>> I don't understand the logic, can you explain "you would have had the
->>>> same issue again when using VLAN uppers"? The original issue, as you
->>>> presented it, is with bridges with vlan_filtering=0, and does not exist
->>>> with vlan_filtering=1 bridges. In the problematic mode, VLAN uppers are
->>>> not committed to hardware RX filters. And bridges with mixed
->>>> vlan_filtering values are not permitted by dsa_port_can_apply_vlan_filtering().
->>>> So I don't see how making VID 4095 be the PVID of just standalone ports
->>>> (leaving VLAN-unaware bridge ports with a different VID) would not be
->>>> sufficient for the presented problem.
->>>
->>> The issue isn't the vlan filtering, it's the (missing) FDB isolation
->>> on the ASIC.
->>
->> Could not we just use double tagging to overcome that limitation?
+> From: Tristram Ha <tristram.ha@microchip.com>
 > 
-> Wouldn't that break VLAN filtering on a vlan aware bridge? AFAICT
-> double tagging mode is global, the VLAN table is then used for
-> customer (port) assignment, so you can't filter on the inner/802.1Q
-> tag anymore. Also learning would then essentially become SVL IIUCT.
-> Also I think there aren't switches that support double tagging, but
-> don't support EAP. EAP mode might be the easier way. Assuming there
-> isn't a gotcha I have overlooked.
+> The KSZ9477 switch driver uses the XPCS driver to operate its SGMII
+> port.  However there are some hardware bugs in the KSZ9477 SGMII
+> module so workarounds are needed.  There was a proposal to update the
+> XPCS driver to accommodate KSZ9477, but the new code is not generic
+> enough to be used by other vendors.  It is better to do all these
+> workarounds inside the KSZ9477 driver instead of modifying the XPCS
+> driver.
+> 
+> There are 3 hardware issues.  The first is the MII_ADVERTISE register
+> needs to be write once after reset for the correct code word to be
+> sent.  The XPCS driver disables auto-negotiation first before
+> configuring the SGMII/1000BASE-X mode and then enables it back.  The
+> KSZ9477 driver then writes the MII_ADVERTISE register before enabling
+> auto-negotiation.  In 1000BASE-X mode the MII_ADVERTISE register will
+> be set, so KSZ9477 driver does not need to write it.
+> 
+> The second issue is the MII_BMCR register needs to set the exact speed
+> and duplex mode when running in SGMII mode.  During link polling the
+> KSZ9477 will check the speed and duplex mode are different from
+> previous ones and update the MII_BMCR register accordingly.
+> 
+> The last issue is 1000BASE-X mode does not work with auto-negotiation
+> on.  The cause is the local port hardware does not know the link is up
+> and so network traffic is not forwarded.  The workaround is to write 2
+> additional bits when 1000BASE-X mode is configured.
+> 
+> Note the SGMII interrupt in the port cannot be masked.  As that
+> interrupt is not handled in the KSZ9477 driver the SGMII interrupt bit
+> will not be set even when the XPCS driver sets it.
+>
+> Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
 
-If EAP works, sure that seems like the way to go then.
--- 
-Florian
+[...]
 
+> +
+> +static int ksz9477_pcs_read(struct mii_bus *bus, int phy, int mmd, int reg)
+> +{
+> +	struct ksz_device *dev = bus->priv;
+> +	int port = ksz_get_sgmii_port(dev);
+> +	u16 val;
+> +
+> +	port_sgmii_r(dev, port, mmd, reg, &val);
+> +
+> +	/* Simulate a value to activate special code in the XPCS driver if
+> +	 * supported.
+> +	 */
+> +	if (mmd == MDIO_MMD_PMAPMD) {
+> +		if (reg == MDIO_DEVID1)
+> +			val = 0x9477;
+> +		else if (reg == MDIO_DEVID2)
+> +			val = 0x22 << 10;
+> +	} else if (mmd == MDIO_MMD_VEND2) {
+> +		struct ksz_port *p = &dev->ports[port];
+> +
+> +		/* Need to update MII_BMCR register with the exact speed and
+> +		 * duplex mode when running in SGMII mode and this register is
+> +		 * used to detect connected speed in that mode.
+> +		 */
+> +		if (reg == MMD_SR_MII_AUTO_NEG_STATUS) {
+> +			int duplex, speed;
+> +
+> +			if (val & SR_MII_STAT_LINK_UP) {
+> +				speed = (val >> SR_MII_STAT_S) & SR_MII_STAT_M;
+> +				if (speed == SR_MII_STAT_1000_MBPS)
+> +					speed = SPEED_1000;
+> +				else if (speed == SR_MII_STAT_100_MBPS)
+> +					speed = SPEED_100;
+> +				else
+> +					speed = SPEED_10;
+> +
+> +				if (val & SR_MII_STAT_FULL_DUPLEX)
+> +					duplex = DUPLEX_FULL;
+> +				else
+> +					duplex = DUPLEX_HALF;
+> +
+> +				if (!p->phydev.link ||
+> +				    p->phydev.speed != speed ||
+> +				    p->phydev.duplex != duplex) {
+> +					u16 ctrl;
+> +
+> +					p->phydev.link = 1;
+> +					p->phydev.speed = speed;
+> +					p->phydev.duplex = duplex;
+> +					port_sgmii_r(dev, port, mmd, MII_BMCR,
+> +						     &ctrl);
+> +					ctrl &= BMCR_ANENABLE;
+> +					ctrl |= mii_bmcr_encode_fixed(speed,
+> +								      duplex);
+> +					port_sgmii_w(dev, port, mmd, MII_BMCR,
+> +						     ctrl);
+> +				}
+> +			} else {
+> +				p->phydev.link = 0;
+> +			}
+> +		} else if (reg == MII_BMSR) {
+> +			p->phydev.link = (val & BMSR_LSTATUS);
+> +		}
+> +	}
+> +	return val;
+> +}
+> +
+> +static int ksz9477_pcs_write(struct mii_bus *bus, int phy, int mmd, int reg,
+> +			     u16 val)
+> +{
+> +	struct ksz_device *dev = bus->priv;
+> +	int port = ksz_get_sgmii_port(dev);
+> +
+> +	if (mmd == MDIO_MMD_VEND2) {
+> +		struct ksz_port *p = &dev->ports[port];
+> +
+> +		if (reg == MMD_SR_MII_AUTO_NEG_CTRL) {
+> +			u16 sgmii_mode = SR_MII_PCS_SGMII << SR_MII_PCS_MODE_S;
+> +
+> +			/* Need these bits for 1000BASE-X mode to work with
+> +			 * AN on.
+> +			 */
+> +			if (!(val & sgmii_mode))
+> +				val |= SR_MII_SGMII_LINK_UP |
+> +				       SR_MII_TX_CFG_PHY_MASTER;
+> +
+> +			/* SGMII interrupt in the port cannot be masked, so
+> +			 * make sure interrupt is not enabled as it is not
+> +			 * handled.
+> +			 */
+> +			val &= ~SR_MII_AUTO_NEG_COMPLETE_INTR;
+> +		} else if (reg == MII_BMCR) {
+> +			/* The MII_ADVERTISE register needs to write once
+> +			 * before doing auto-negotiation for the correct
+> +			 * config_word to be sent out after reset.
+> +			 */
+> +			if ((val & BMCR_ANENABLE) && !p->sgmii_adv_write) {
+> +				u16 adv;
+> +
+> +				/* The SGMII port cannot disable flow contrl
+> +				 * so it is better to just advertise symmetric
+> +				 * pause.
+> +				 */
+> +				port_sgmii_r(dev, port, mmd, MII_ADVERTISE,
+> +					     &adv);
+> +				adv |= ADVERTISE_1000XPAUSE;
+> +				adv &= ~ADVERTISE_1000XPSE_ASYM;
+> +				port_sgmii_w(dev, port, mmd, MII_ADVERTISE,
+> +					     adv);
+> +				p->sgmii_adv_write = 1;
+> +			} else if (val & BMCR_RESET) {
+> +				p->sgmii_adv_write = 0;
+> +			}
+> +		} else if (reg == MII_ADVERTISE) {
+> +			/* XPCS driver writes to this register so there is no
+> +			 * need to update it for the errata.
+> +			 */
+> +			p->sgmii_adv_write = 1;
+> +		}
+> +	}
+> +	port_sgmii_w(dev, port, mmd, reg, val);
+> +	return 0;
+> +}
+
+I'm a bit confused here, are you intercepting r/w ops that are supposed
+to be handled by xpcs ?
+
+Russell has sent a series [1] (not merged yet, I think we were waiting
+on some feedback from Synopsys folks ?) to properly support the XPCS
+version that's in KSZ9477, and you also had a patchset that didn't
+require all this sgmii_r/w snooping [2].
+
+I've been running your previous patchset on top of Russell's for a few
+months, if works fine with SGMII as well as 1000BaseX :)
+
+Can we maybe focus on getting pcs-xpcs to properly support this version
+of the IP instead of these 2 R/W functions ? Or did I miss something in
+the previous discussions ?
+
+Maxime
+
+[1] : https://lore.kernel.org/netdev/Z6NnPm13D1n5-Qlw@shell.armlinux.org.uk/ 
+[2] : https://lore.kernel.org/netdev/20250208002417.58634-1-Tristram.Ha@microchip.com/
 
