@@ -1,133 +1,122 @@
-Return-Path: <netdev+bounces-188653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47937AAE0C1
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 15:29:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99FD1AAE0C9
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 15:31:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A57034A69DC
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 13:29:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7CAB3A677E
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 13:30:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCF24288C12;
-	Wed,  7 May 2025 13:29:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92635253954;
+	Wed,  7 May 2025 13:31:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JqPRFpGN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BE1mNzae"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28C6D156C40;
-	Wed,  7 May 2025 13:29:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD08E2B9CD;
+	Wed,  7 May 2025 13:31:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746624584; cv=none; b=IzUyYdYiubZPGo3gZMq70McFalyf4Li7yJ5oBflPsuvHiPoRjK+fRCdpBWXGK0Dd1cb9AaEizwXPqZMzQWVegc465TyZS0XRxRd5nP8e9NtMR2YxlEgmwYteOPibGmqQRXgjjhwxGDRkVAMfLTCh8qMNVwzIs/VqXe2ll/goAIA=
+	t=1746624674; cv=none; b=b7Ww3g6OAMUxUUibYKel70bIzbYVvMrxacwXN99S3waA0pJCK3lWIzU5M6T7k31l8hXIysKPo5N2tNevAgj45nKoWpLk5r8BMtIbvP3n959wD7GOPkJK7wRRh+XdFtGZGEf9joK7bTNhVk+85/4RMhZWgCCHoRoj3GY2G4Ob95c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746624584; c=relaxed/simple;
-	bh=wQpDaP/Vr9UYsJ8lKwfHUee/hDol1chqzTFEAP6Mchs=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=jaTM/vwXt6azSxRm+Fvd7XVuIJ64wpwBkPHajvHDb9eBsHKUEu5KYGRolmWseDR8JFYq+KnUdf4rZNR+UJkW8QngfG9pidGEaWZC10cltIQYyYX2Lf58NoVvnD8bDNGbRmTqlmvzYzsPyMhvBRNfA/kM14B3tUnv0no7cX0ZhvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JqPRFpGN; arc=none smtp.client-ip=209.85.160.178
+	s=arc-20240116; t=1746624674; c=relaxed/simple;
+	bh=chnaCVam1ojV4Gi8iMvmPIZC9wt2tOR5DhXwW1v6K6A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oahy/V/f4n94CCs/g/5PSWIWP1R/sidSHOaP1rb4lPRSZJvLTNZBgi/bNvOVIb6c5W3vqDEQmp+ZhboQmXRP9XvMYa8NF+7VMKK9sh5afJw4j19+2hnK8SfaXRcqC7UFmkevm4b6ySb2YkRKRznxa0fJ5QMjcMmgiRxo49TChxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BE1mNzae; arc=none smtp.client-ip=209.85.218.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4767e969b94so31982241cf.2;
-        Wed, 07 May 2025 06:29:42 -0700 (PDT)
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-ac2bb7ca40bso1188226866b.3;
+        Wed, 07 May 2025 06:31:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746624582; x=1747229382; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1746624671; x=1747229471; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vTjiQ++FppghVzFe39984SJc83lrdjMGrmnekzjKbFo=;
-        b=JqPRFpGNyNGbkgnItafKcTBOyj8qP8LIIl2PHtrnwPwhDfv0H2gHuxxRBHesVT2kYe
-         +WI9Cd3/POdjKb83pLD03pfBaDG6nyVdTpVaqjRElk73bfm7D6UqA+Nnm4i/FSwqv3Wj
-         +Kjq17paAWM+B+nr4UWmTk2gZx2pb8MncRcIXTdC95AjLEyD1fCloTxrR4vuj5t1W4//
-         JRdGpkOKGxsJ+MMvemnt7Cpfnhdjcuf7/Jlmu6lmkYAK8PWxL5C18kiMfADSeGo7ySQ+
-         qBjA5hrUauFGhBSL3zrD01D/vsr7aryV/LyKX3J6pe6wtNB28j36vwqrn42UUXZM/mpc
-         py9w==
+        bh=CMLUK1+DSffFIbuoUTgm8AIQgo1jz7butcVN72PZbDo=;
+        b=BE1mNzaeZagzvBsDFWHORgX4Rh6ohg1mxRJcDocBeqIXSR3Ja4T6CI1Bi5dJ0JNOlM
+         1BK6A5M7SZQQVytYfU9lq7P/zjwDwWfsxw7yx7LtqkFEjEYnOXyAHflDxM5R7rambPwp
+         6clGF2fioUTN/oMATuAegnx3TNij2FuatBfn2hWSp5MxS40sIn7xXILcCkJAwTzvWPVP
+         Hc4dh/H5earTbhYK6uETcx2Z88yjqkDgiHc/LUlyjmVWYR+xOGzKM0HRUlZJCzTRU6hZ
+         TzssTINT0w8nBR4U2hXWGtGYC9P7Ja5voM74Ddo+zHQZhcloB5umyWI1nKvs/t7M5qVl
+         vEIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746624582; x=1747229382;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=vTjiQ++FppghVzFe39984SJc83lrdjMGrmnekzjKbFo=;
-        b=bhIybbl9v4cB0H91EkzYXjM3e15E1ccbliJZcsUA/xooOREJruerotQqM+VQXatx+0
-         uLcQvqMVVRUIHHMI8A7dhCVqMkbHsT+LmIKYF6Z+wv2ed3SYozPOynwV3ICy/x9fxJK6
-         jKiNvFl/ZqfGPdVIlH5l0tpQe26DRud7qFomWJ8sWgrQbTo8QeTN3tVhXKlbBEZUDErh
-         YaMaS1S7GDtulkNo0rSBOG0fzysJxTO/1d8Kwx4qDD+/1d3D+/SS4CwAsFhIfbe8loMv
-         +Asd7Nz/SFDRlyYQXHR0a+UGnyxRJgXSieQA5Xu3D1tu3hgtRo1bV/6FCakldJuCB9eM
-         VNKA==
-X-Forwarded-Encrypted: i=1; AJvYcCVbYfvM3423t9UZzD+nBVuLWBViuSk3DfyJJ7Virmn2vOGFc69FugGPs1P6os3/WqS6h4p+txfC@vger.kernel.org, AJvYcCW2zjChXDavxnW1+/CNI8VYQflwovIIRgjSgdwuesesXSb3iPxzpaTpTaKzx2okJFZdbZvx/ndn5XIniork@vger.kernel.org, AJvYcCX2pmnBvtkcecbIulI0aopEHydPMtcBdtfD8ZoHo9MUQcCowQn7cT4VuqwYk5Cgw7qI0QY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YybajaBBAIkDnm4KvJZWPfgHUBPH3zPJqKv2YVPXdLzky3QZcVH
-	haxjA48ZfmhcRigZQVYlDFTaeiwXKJpWhYEnpNmHlJ1zvC/wFkvUtR0cVQ==
-X-Gm-Gg: ASbGncuc+5nOwKTYVc8OkovzlPY6KnZh3W2bpyPvS++Ngao0f81/wfE1RM7MbxyjkDt
-	tfUD50YG+zvuib0nHwnpdMKkOdn4mB2RyxRD1pk0xWtSyyUZ3crMr0VXiI6M8fplm7Ct5yeeOOi
-	htXTqn4dyGfpkSWQmKIucPD54eLeCDA88cwkl/gduZwkWW1K0ZZQYS36pzXRf+6rV98AOJ9olMx
-	rZv/s44WH9LQio0i0E6Lason/d2EKbyv+gQnzIaaLim3+LjQxUyiMB9d/D554HbZwbfImTiUT/o
-	9mn+Ctmbqsg4l/R/JDI/y8C1nAccclgAp9wHRGLQvZ5Ba1cygfAFkqfSqONwwAI7jyEZevgNajX
-	oGiz7u/2STId177IAD7MM
-X-Google-Smtp-Source: AGHT+IEbHWi7wInP6wPATPO+pMHOSFq1YMBs1FDO6+6rZ6d9L46DFJQAU+/a6+u59/ecQb98pTs9OA==
-X-Received: by 2002:a05:622a:50:b0:48c:b30a:7714 with SMTP id d75a77b69052e-4922795df04mr59435951cf.50.1746624571631;
-        Wed, 07 May 2025 06:29:31 -0700 (PDT)
-Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-6f542780cc6sm13643016d6.83.2025.05.07.06.29.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 May 2025 06:29:31 -0700 (PDT)
-Date: Wed, 07 May 2025 09:29:30 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Stanislav Fomichev <stfomichev@gmail.com>, 
- Jon Kohler <jon@nutanix.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Simon Horman <horms@kernel.org>, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- bpf@vger.kernel.org, 
- Jacob Keller <jacob.e.keller@intel.com>
-Message-ID: <681b603ac8473_1e4406294a6@willemb.c.googlers.com.notmuch>
-In-Reply-To: <aBpKLNPct95KdADM@mini-arch>
-References: <20250506125242.2685182-1-jon@nutanix.com>
- <aBpKLNPct95KdADM@mini-arch>
-Subject: Re: [PATCH net-next v3] xdp: Add helpers for head length, headroom,
- and metadata length
+        d=1e100.net; s=20230601; t=1746624671; x=1747229471;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CMLUK1+DSffFIbuoUTgm8AIQgo1jz7butcVN72PZbDo=;
+        b=lCrq1ZgU7LwVKxXcxvSqQIOXrRqRJTvzmrgyl0q7qXjJ6dBeN9QSGtt/MSqrqym+kJ
+         J981F0eRMi0TcS+TgQHQVsghGJCWR8sBnPp4caybI73yRnEGCMU9fDe5BU08TC1zyhPH
+         2qQGr0BpqDVMNQhLh1JPi3BgcBrnZjWFls+1Q5UqJqVhrG0Tq3Tc3m27CF8zkm6gLfPn
+         UPHQx0kNam/kIvE1D0LlKT801W7eYuYVjMigKQ+4N0tZSRjyeiAaDCSHeJ0T/U24SHdA
+         RuZX4BmexJ9cr9SeZkMWJgxqM4mTvQEJUGnOd5fsX9Oz2OGOyShME7kai5iJnx+ucsP4
+         TLqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUZ5MOi78h8iXg4l1Tk4WI4Hzt17Jwed3xPARsKl56+15nLXMthnrW1n376/KmfB9EsTkvzg8lSEAus@vger.kernel.org, AJvYcCUxn0M2Z8D/VoYPhsQlkT0EiU6l3anhCWD07sAROV7Ch6LDAMeEFNKC0vnvO3j/b5U6uo3v84bzEsEV@vger.kernel.org, AJvYcCVZm6krT+ofgHLoRZ8HsXFWYUvNNJhoy/meyVCvA2Ux/gTqwdpheR2q7XTnnCuXEVh5s0P0GSHk7jqHAF6m@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOqI5vZ/XE4VpqylGKn7F4f1d80euu7pP0QOoR1VDIPVsVr8TT
+	WETjZQ5mm0hdUVK+Roiq3ljZmqA7WaXmdIq/+2SV8+UX0kz7zuNHmdoI902G+IGcG20gksyASNd
+	ho1PzPo36rU8Y8bKwsgbPa4Gaql9R2Rls
+X-Gm-Gg: ASbGncveZqEua0m/USH4kAXNnTVDfn9s0ixGT8Z7e6DTFrKhjrqxTMHwWl8IBN5AecD
+	cHQVVsvIIZSvuB+sfIPbgx/0uVJXjMi5r6EY3JTUJjPmAmfSP/UyOwgVX42GOj40LHh8CC2nIJ9
+	RI72Xdkx3GD4jKb7I/qLYGXJvxw15c9psfxs8=
+X-Google-Smtp-Source: AGHT+IHNcpkL2VTtUnMUjWG5urZVwKTC1gn3U8TME2PAES3AyvskcpMcC5URq++Hrm3nPn5DpRiyiBRSbFsFOHWWB2U=
+X-Received: by 2002:a17:907:d2a:b0:ace:9d90:cdd3 with SMTP id
+ a640c23a62f3a-ad1e8d0ba19mr359060266b.49.1746624670744; Wed, 07 May 2025
+ 06:31:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20250507124358.48776-1-ivecera@redhat.com> <20250507124358.48776-9-ivecera@redhat.com>
+In-Reply-To: <20250507124358.48776-9-ivecera@redhat.com>
+From: Andy Shevchenko <andy.shevchenko@gmail.com>
+Date: Wed, 7 May 2025 16:30:33 +0300
+X-Gm-Features: ATxdqUEq24ajhDXo1Kn1PDm2eAdnktBxZULVVBowv3DoAhXXZvLonCuEik0YGTw
+Message-ID: <CAHp75VcH81AHt5dw0cfYa6Wv8LwZrss9uo2x9ERfK9=47erbdA@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 8/8] mfd: zl3073x: Register DPLL sub-device
+ during init
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Prathosh Satish <Prathosh.Satish@microchip.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Lee Jones <lee@kernel.org>, Andy Shevchenko <andy@kernel.org>, Michal Schmidt <mschmidt@redhat.com>, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Stanislav Fomichev wrote:
-> On 05/06, Jon Kohler wrote:
-> > Introduce new XDP helpers:
-> > - xdp_headlen: Similar to skb_headlen
-> > - xdp_headroom: Similar to skb_headroom
-> > - xdp_metadata_len: Similar to skb_metadata_len
-> > 
-> > Integrate these helpers into tap, tun, and XDP implementation to start.
-> > 
-> > No functional changes introduced.
-> > 
-> > Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> > Signed-off-by: Jon Kohler <jon@nutanix.com>
-> > ---
-> > v2->v3: Integrate feedback from Stanislav
-> > https://patchwork.kernel.org/project/netdevbpf/patch/20250430201120.1794658-1-jon@nutanix.com/
-> 
-> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+On Wed, May 7, 2025 at 3:45=E2=80=AFPM Ivan Vecera <ivecera@redhat.com> wro=
+te:
+>
+> Register DPLL sub-devices to expose the functionality provided
+> by ZL3073x chip family. Each sub-device represents one of
+> the available DPLL channels.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+...
 
+> +/**
+> + * struct zl3073x_pdata - zl3073x sub-device platform data
+> + * @channel: channel to use
+> + */
+> +struct zl3073x_pdata {
+> +       u8      channel;
+> +};
+
+You can also use software nodes (via device properties).
+
+But since the current solution doesn't require any additional files or
+something like that, I don't care much.
+
+--=20
+With Best Regards,
+Andy Shevchenko
 
