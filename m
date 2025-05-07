@@ -1,267 +1,208 @@
-Return-Path: <netdev+bounces-188692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188693-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0767AAE395
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 16:54:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5205BAAE3A8
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 16:58:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BBDB172317
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 14:54:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B97501C008CD
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 14:57:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2F89213E81;
-	Wed,  7 May 2025 14:54:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A41D5289829;
+	Wed,  7 May 2025 14:57:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WSEldiVM"
+	dkim=pass (1024-bit key) header.d=palmerwirelessmedtechcom.onmicrosoft.com header.i=@palmerwirelessmedtechcom.onmicrosoft.com header.b="uR50pqpL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2109.outbound.protection.outlook.com [40.107.244.109])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 278261DA21
-	for <netdev@vger.kernel.org>; Wed,  7 May 2025 14:54:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746629659; cv=none; b=HpSFcMCRBUFjF/D5usEMZ4tLyPJEPzGMM04WtD/9I+RBE1UtX/r1uk1YG3GdiYxqqbllTlKRDDWYMOwUcLC1keg3IjdN6/dDy+dS35oGUz1aON0/NdHgyI4E59y/dobmUtqm3v19xq2VDPRiPUyUT9LeEcTJ27xDRNbMOS+Wid4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746629659; c=relaxed/simple;
-	bh=SoIhx7rYoma3x4QJjXwtem3r4voSekLN8KJ7DFJCUHQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qUGfcFn11fJ00vrGQiKeXLDJVV8H8fBwelXRtnMcsjYSsmILgjtqcgQndBSpt+YKKEox3rSoGcc7KBuC2KRc1ZW67w4ePMlROVvwf89hKnvdYQy9QVv6VrKvOF0Rudvkj8FB9llxtZn3r01we8L6mJgwuUwTlfGtqvi78ROSV08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WSEldiVM; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7376dd56eccso13659b3a.0
-        for <netdev@vger.kernel.org>; Wed, 07 May 2025 07:54:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EA5618FDBD
+	for <netdev@vger.kernel.org>; Wed,  7 May 2025 14:57:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.109
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746629857; cv=fail; b=NmBGDh1Iat6FuDOUAQH7Ifi3OaNc5KDkcFk+7f+huQpU6enoLK0Tg9CkrEj8qezXmSJ/z04bLm328h0SPyQPWhIpsGn4mdelu61DoILFchGmDtQpuaKcpew3unQ+oOyhg/hgvW52512RdZkhx44QnrUegjikos7bJfT/3Okjekc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746629857; c=relaxed/simple;
+	bh=O8YpJb0mE4zdTEBY/ZU48mCaL+myj48SB/YPw7zpXdY=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=nDc0igrJ1Xbl2zvFriX8dQPjaDyYPAs+g82JnZqgXIFpTOZg/4qEH92c7EKTfdys8MHdErnZTp3HIDXkc0khBzqBq4wp0LrMmPVwk5kIrCDpkbmZ/TUgFm1d5MzLFdR2VvFSPyJhKbtc5sSJSlOcXAN5kdUeuyJmvzMPtcq3pso=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=palmerwirelessmedtech.com; spf=pass smtp.mailfrom=palmerwirelessmedtech.com; dkim=pass (1024-bit key) header.d=palmerwirelessmedtechcom.onmicrosoft.com header.i=@palmerwirelessmedtechcom.onmicrosoft.com header.b=uR50pqpL; arc=fail smtp.client-ip=40.107.244.109
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=palmerwirelessmedtech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=palmerwirelessmedtech.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=RvFI6HZjAiWrSBhCRmIZDRSMkrEQMisQ6YvkK2Vh/vt4jcetmMNT+1a73EGtZLU4P57qzKQNp50ZcPfHizuCMy1/d0pILLBhzFRQLzkE9wztx8wB6s1jvABBjnTzXYx3DPZ3ZHvZAuXA8t6U8pVzD++61Ewefyy7kCwBF7kEVHC+mMGdXUZdx6NvuHbYHOhr9W7QatajvjCqKrygg3dIsDrNRmDGLb4jSCwQuVXQNJNNw81f+O7EjwLQPjd46amzs83hdH9UZtJSh/ERXDz9JidGVoHNaFtlhlr6h+OK3YZ6o3488ecV6NcxDMggIniAjgd3anJQBdB4PoBh5VJkuA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tMfySgOT7Rfhu4WgDXe/54T5oAHzT8mQn4p7unYHz58=;
+ b=wOz5UDD0HLBpNhJnd58ySNTvtKP7MQhKrAQKg4Zc1TIn6gQ8j62fYaKPLhR9/ithjGJ057DskBA2sYNdCOm+XTI6/vN+nAkHGp94izIGRIus3ckiFDekCWcuGGjTUMa9cZJDxBEcjRiKf20w1pzZe1hO6jP8QpRXwTtVBVwUtV8L2EE0h9BwAahAd0CNLcfdevTKZTQqTV7wbTS+CaJ/I+gH2JG3quPHw1VpJDcdUhrUqRj8vJQz8uAgRfWmSnpE8CVT8vRc5deFZnRYaMQhP0h8OYoWgurtjajN8Z5+0EstpoE90p6rt4zf/lgzGHztKa0N/OybEEDR8gEkITHjSQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=palmerwirelessmedtech.com; dmarc=pass action=none
+ header.from=palmerwirelessmedtech.com; dkim=pass
+ header.d=palmerwirelessmedtech.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746629657; x=1747234457; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EOWpuGjSjBZGrIvkeONlnGI5lOqPZS+eJFMv5U1+B30=;
-        b=WSEldiVMlvpXzZzti+3jPMBd3VV+owb6icFRLg7HjoJn50i8fp19gmQ3TXNFh9NC/C
-         BFbQbqoudEmfC/ZEL+uhp6RSeEttNZfoYLnjOn8MMBtnR0WazYMKNc5Y8nYIzhixJS3h
-         LjxzDTyDysW1fugtwm58LR4VQm01EIgDwZqkQ8lk8x5N8eINmbkxQvGnw+a56HsPDX4h
-         zzYtzNasiUhuf4xBR2UrEUZ5/Vbc20V8ZSPU/qOkHU7wS/xaOOYeKtJuTHF0MMzeWulu
-         lkCCAmcHlt3Z12B1yOE6bd7OPy6/f5fj+Gg9g4IDTOU8FWXr9ZgJpsoP2xe3QZ/rssOp
-         bjWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746629657; x=1747234457;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EOWpuGjSjBZGrIvkeONlnGI5lOqPZS+eJFMv5U1+B30=;
-        b=k4zMMw018CehRKLtz4EVlKjivHmpYTmcP+N3SYD2veY1AgDODUn373zmck8bs1503a
-         mijHNpfpKg+bRjWxOhzC7spF/HhiMiy7V4iYuIQvLgIVXWgACDZvteZnzlj/TdXTWl9Q
-         xiVEgzWrunD2/VwnmkZLA8MFu6aG1RHxdhfq7DrKkgMtkF6MqNahquzXDfmYOQytnD17
-         d8dCjbydIwwfN/IAmCOOHnOurKCqNmbKm13HjfjlKZPb8TlWRHSU9MQqXz3l9qT9xLbe
-         tptj6P8Rf+YoPXYPlY2+P9O+5snMyumSJyLNahachYC7p9hzMpKben78wsrz4FsMUv4A
-         F3qw==
-X-Forwarded-Encrypted: i=1; AJvYcCVvAutNTGyQ79kSVkMTTjp7bBaHCV6wm5NyKMgwQnA0UN9Rzxq0apmz6IIIFXXx97WpcOy1oBo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4mTVEah2DAOclH1RC/3WwijIIZrLTSQCUR7wypeJt1cObHzto
-	zsJxFNs9AQYSXZjKxRDEiB3/TlitN07V63h5oF3H04xUJl2QfQggjaPg2E8aGpA7X+u/qNPNGaO
-	/verEQ99Mo7d9OpIaCf7D+G/P1yqc/M/wAwY=
-X-Gm-Gg: ASbGnctoJkcFyQCRbNbJLCFK/cSChNhMuV3OJLq4H88UnasMj5ExpzY6wMD2KRG/LLG
-	zthUv+HVY+ZX5a3vFKPulLS0DYhlTcil2ccNaL56WnfJMbx0v0juH30JHAlUqySodaTuF7le2ar
-	3X/+DySQnYlPRCkEr2WEN6
-X-Google-Smtp-Source: AGHT+IFNvGZ+DEYEXKW0B9YV2+DO4I0tiY7sB529MeZ8z2cnx0UOs+r85SbOUXdVIFgaArcXxT5vljAEQMmGPcZyM1w=
-X-Received: by 2002:a05:6e02:144c:b0:3d8:1e50:1d51 with SMTP id
- e9e14a558f8ab-3da73908592mr37437245ab.13.1746629647101; Wed, 07 May 2025
- 07:54:07 -0700 (PDT)
+ d=palmerwirelessmedtechcom.onmicrosoft.com;
+ s=selector2-palmerwirelessmedtechcom-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tMfySgOT7Rfhu4WgDXe/54T5oAHzT8mQn4p7unYHz58=;
+ b=uR50pqpLA6qvs5ugGD8q2qwj+zs7moBGBDtOfj6tMq46blvBrfDEZwCyRoQt/CTNZyACQlQLfVZNyG2ThJqCLgTVv25v+cGmXYSDq6PpqVMeeVMMbwM6XN/byOM2y+GVUCovic66hkH8cUDR+7z/n91Ad5sIRHFLWOl44szSpsU=
+Received: from IA1PR15MB6008.namprd15.prod.outlook.com (2603:10b6:208:456::5)
+ by BL1PPF3EEE25392.namprd15.prod.outlook.com (2603:10b6:20f:fc04::e18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.23; Wed, 7 May
+ 2025 14:57:33 +0000
+Received: from IA1PR15MB6008.namprd15.prod.outlook.com
+ ([fe80::a280:9c40:1079:167e]) by IA1PR15MB6008.namprd15.prod.outlook.com
+ ([fe80::a280:9c40:1079:167e%3]) with mapi id 15.20.8699.034; Wed, 7 May 2025
+ 14:57:32 +0000
+From: Steve Broshar <steve@palmerwirelessmedtech.com>
+To: Andrew Lunn <andrew@lunn.ch>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+Subject: request for help using mv88e6xxx switch driver
+Thread-Topic: request for help using mv88e6xxx switch driver
+Thread-Index: AQHbv2Bc+TYavxBZNEG3KPwJ+KHfDQ==
+Date: Wed, 7 May 2025 14:57:32 +0000
+Message-ID:
+ <IA1PR15MB6008DCCD2E42E0B17ACBC974B588A@IA1PR15MB6008.namprd15.prod.outlook.com>
+References: <20250507065116.353114-1-quic_wasimn@quicinc.com>
+ <d87d203c-cd81-43c6-8731-00ff564bbf2f@lunn.ch>
+In-Reply-To: <d87d203c-cd81-43c6-8731-00ff564bbf2f@lunn.ch>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=palmerwirelessmedtech.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA1PR15MB6008:EE_|BL1PPF3EEE25392:EE_
+x-ms-office365-filtering-correlation-id: aa5859ea-0df3-4536-0a22-08dd8d777f18
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?FUSeh2zGIhLn40s89vuWklRwQR5Qw01EmgZQHos8opBqvKJ48nJhqH0pEwld?=
+ =?us-ascii?Q?a5PsIacGm9agxK+oIDBGEZwbngnmstB0l3hrdUQwmNxn4vwSq3LdZg5ySDBb?=
+ =?us-ascii?Q?BJEute9qxGSPg6qW8JXYaziorWKV0Unknd14U9qo6bXLtWmwvY2iAwJO6lZS?=
+ =?us-ascii?Q?aLlHiHQq8Oj8jRDHG2xSk2QykeCVm4XYM453WV2Ha7pQz1egXryWWwf6Hnkw?=
+ =?us-ascii?Q?7WlYuWJ1whWyHGLsfEJWZbGtdbF8QsFAjHgQc4droXATXKdgU5RoiRdSFXlH?=
+ =?us-ascii?Q?w6B+p1uGgF3BbZwpj4IbgF+Nb+sq8fcZam+HHBUUQpy8QU0ekZBON5irU6jJ?=
+ =?us-ascii?Q?LLU0EvPN7BrVwp1T1nIW2GaypNJBadbHUVI1xBdp+/fIy+dlnKIa5eB6NbUb?=
+ =?us-ascii?Q?9Je4T3OZdlsB/sjIBmLmd/5uVURJUTeIl9z1OCqELy20+XqquuOnwJhmUGNU?=
+ =?us-ascii?Q?rrR6uNqzCACHIi4wCa+SQHqMZbvnRpP6J6puncAy1pdm5EJb1b2gpwMyCpH5?=
+ =?us-ascii?Q?YPj0vvIbhagCQguCiiSD1Kjlg3mnEV8AAJRrIt1MmotdZ6M4Sflz23MhBjGw?=
+ =?us-ascii?Q?WcSg/v/pA2qWv53U1wcDeOOvUojK1BLtlinrubqCPj5bdXDd4mzPDeTBda0A?=
+ =?us-ascii?Q?EE91iNefFnkM4aEkJOvr8cY8rvqbE6lWaxtA4eHUWHQKgQQ6QLAzgsfHopAl?=
+ =?us-ascii?Q?F3wHN4E34q/qTJkkD1wYSezo2drXgzYdkpwEeBGbdQpaa+4f+73QWaLITfXK?=
+ =?us-ascii?Q?yhpKBBjYNCdzXMC9Id2yqE93xRi9OHhc9WFyiRBQSI3RpcazwrY7WtrX664x?=
+ =?us-ascii?Q?pDTI96kY9FjyMo4BCwpZ/g+kXCb+vtgDzh9KCiCeRcIL3vyp/U/OaGJmjs4m?=
+ =?us-ascii?Q?HLNGx5WUEGL8M79L/fr/PnIwF3+oea6o7ZoNyPaP8gq+81Alfwq3bbf6lH1D?=
+ =?us-ascii?Q?QZSHrLz8Aq9ox01qAc2HXAqA3C5incLLDDfA5Q5V1B0jIV/aE99UD9n9TL9c?=
+ =?us-ascii?Q?wM/jAxym+1T3FbNWVW0jyR/FEv9ROlhPokAIxwqvadgLoMTYCebpMF1GHA5P?=
+ =?us-ascii?Q?8rVq+/fwrtOiOkYLZoq6WTL0VdulB5US2mSOg6bmaaqjkut8pWGB9xjVSWw8?=
+ =?us-ascii?Q?ekYkYp932AA/ZSeeg+GtZS3SwaMg0NxQkzx4Po6nsi6qIKlGZe6TzTpGO/I0?=
+ =?us-ascii?Q?YVi+Ln+OC6HYPxT+RaEmexBO8ie2+YsJQCgV2ZmOsM8q/K7/bOxiXWHbnSPC?=
+ =?us-ascii?Q?RRtWvXpfcPAebWME8Rd5WUW7ZCI2ySry6HhVcKrZDX9MDzC0IaK7Xup2LWLe?=
+ =?us-ascii?Q?HyrowlKC0+LSoZO29bFJOcJajUhFv00xUla7mVXohAIaCc4iZRaf/7kJTMUl?=
+ =?us-ascii?Q?1WavBAvkvHV6+ij+v8DgaN3ISoKQTu/F7uDyZgH8WlFVcApbFl9jLM4xXmQU?=
+ =?us-ascii?Q?iQnkw4IixERnkS90Nu85v66BGiHzbqyu8OLAvUOeIgkKLFY0QFApow=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR15MB6008.namprd15.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?xxIrtXgYN4cjUq2xmDXLqNX0qlEvfmnBA/IxbHQvInlNnytr1GU+80D7QU+X?=
+ =?us-ascii?Q?63FQIvXu1/Z1KYB4l/7CDkWXHKh7XCudcz5XAHXz1L4v+289OZcyD8D//f5s?=
+ =?us-ascii?Q?c5pGkymbWH+nvNSMDcq4LcmehsF1S7YMqFuEP7CMlzCOCQp2keczkmuHVyf7?=
+ =?us-ascii?Q?W1enXqsY98htqDmxWZMdMj4MLq8A33++jhagkCsQh1J9KHUHsrUrV9b1ieW4?=
+ =?us-ascii?Q?2c4UySKqdfQQD3a0SrRB0lg16A9QCvG6Tl1QImIwqCVch1SZL3/WWSwVPwhD?=
+ =?us-ascii?Q?5Pqnqu8XDWKDbbVT5YwtpK7nWsmwiQ4g+eWRl3AV+5S1u5jyFsn/AFVzPxJM?=
+ =?us-ascii?Q?WKH8t/zASieC2vpjpVyCxTLV089WP9qgGKiRoMffl6jmDScqRo+wfZprdqBR?=
+ =?us-ascii?Q?PwGQPNntSwlX1AdqyF9JcWj7aH13IrzUqfm69S1egqyy075PxnuQWQRoPhgL?=
+ =?us-ascii?Q?tHf8Y89pbFOs3HcrZuwi8uJlGdHFLg6niR0poVrhmMjJt6pz1UFOGNzLW5t2?=
+ =?us-ascii?Q?fB2tVdhTlvYDtfWFA8j6uq2oGVZ18AvMTj2+PRvJmXuJHaE4swI45yHBE2/y?=
+ =?us-ascii?Q?GT/jtuvfnpxdBAxPoaUVEHOna5shYWRaaS6C9Ty+jPmj6AaQPwoZqpTTXE5l?=
+ =?us-ascii?Q?ObdqMedHTPEqO5NNR8nj61KfkORxRgUt7ilzl9qlABrswd8FCDjgtzltGJ5h?=
+ =?us-ascii?Q?VzzBaXaAFSFjZke6PmFbeKbrMbKxsVDwFvR84xVIJUx4Iq+mw2NeU5gXQ4+2?=
+ =?us-ascii?Q?Fu1OW96AoFcuVGD703gAdftZGmNSWKWYn2VaTcip0LrwNNX6C+0YViS13jOm?=
+ =?us-ascii?Q?9QhNcxNwTiBhs59r9gVH40w9UwcYglLfLwPQE2Rs8KdHjPXqTT7ADHQKbrK1?=
+ =?us-ascii?Q?NcWc8ewWPGLiodsVdvf20eMKOpFp7UnBT6XzQJqRx7gk1TNxA1PoQfH32zvj?=
+ =?us-ascii?Q?xwnpcsSj5LvU1z1Yanozh4AtaObHZvUsn2qGokZx3+5cIrHoLuQ6iysDBgko?=
+ =?us-ascii?Q?ZKSM9IAFtUI37HTl/gIwMit7s/NufmKoRIt96M2t717/LZ6bcixbrf3F8Wpt?=
+ =?us-ascii?Q?8E/m/MGw+OsGqK81NF6FMRmUNxsA7UcfhIuk6bhgO082nkRJdPCNITn95sph?=
+ =?us-ascii?Q?I9uIciv44AWK8kiy44lxCueILoDKWeFx6OJwzoLKN1DBR4SYQUjOrX19ZQFf?=
+ =?us-ascii?Q?Bm1HlVaalbxAbhgj4FTT77U15nZ9HRYHLEkHavgN+LSYmVirfxWrkAmqKOmn?=
+ =?us-ascii?Q?6bnkKgdtwIAk3QnvW0F2EoxT9j0Ph8tqTCgrG3SYgIFuLdzi5XFXTRca6ew0?=
+ =?us-ascii?Q?JRrzGyypRdrkvQ+VL1NYRPsCUNtkOiIjW6hgj57MNVmFb1QP/hKVF8ekILlX?=
+ =?us-ascii?Q?lZIwYp5y6OCG7WtGI19FZs+pU5Q7IyqLsbEh1tbcMdXnpX2J8R/uH5XEcddm?=
+ =?us-ascii?Q?1+qOUyRTp9+2KaWQlLjyfXyuvPKd41V3vTVxCDVzO4l675Hir7p+eHulhqZH?=
+ =?us-ascii?Q?rAoRRdoqeJdfiXO+uo4TUneqW0FYud8WPRiZVD+VE85NYwiJt45CrYk+Q1/L?=
+ =?us-ascii?Q?8v5VT7M5Bg9yyRthstvXv9QnESGLIi4a0aApSu+TWose4FhDFIAgLiD4AyCN?=
+ =?us-ascii?Q?xg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250507030804.70273-1-kerneljasonxing@gmail.com> <681b5ebc80a81_1e440629460@willemb.c.googlers.com.notmuch>
-In-Reply-To: <681b5ebc80a81_1e440629460@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 7 May 2025 22:53:31 +0800
-X-Gm-Features: ATxdqUF3LLyCla5RywYUlJILbIaorGy0nMY6kjwnpahuv7rJMFZ_9WvJuELitag
-Message-ID: <CAL+tcoC606GBfwo3BY_7vn3jPQJdC=78h9q-110hC3DCYRg7jQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: thunder: make tx software timestamp independent
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, sgoutham@marvell.com, 
-	andrew+netdev@lunn.ch, willemb@google.com, 
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: palmerwirelessmedtech.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR15MB6008.namprd15.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: aa5859ea-0df3-4536-0a22-08dd8d777f18
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 May 2025 14:57:32.8786
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 18187d5c-662c-4549-a9f0-3065d494b8dc
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: bxORQxdYag3kTpXEK8deMkswPiwGznFFoQrQfwEKV1cS6xy1ARAPYDmtxq72/1ustJj14+REv2N1pvT9Br6tVGQT3yXzjo65q7dOZ9CsoVc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PPF3EEE25392
 
-Hi Willem,
+Hi,
 
-On Wed, May 7, 2025 at 9:23=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > skb_tx_timestamp() is used for tx software timestamp enabled by
-> > SOF_TIMESTAMPING_TX_SOFTWARE while SKBTX_HW_TSTAMP is controlled by
-> > SOF_TIMESTAMPING_TX_HARDWARE. As it clearly shows they are different
-> > timestamps in two dimensions, this patch makes the software one
-> > standalone.
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> >  drivers/net/ethernet/cavium/thunder/nicvf_queues.c | 6 +++---
-> >  1 file changed, 3 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/cavium/thunder/nicvf_queues.c b/drive=
-rs/net/ethernet/cavium/thunder/nicvf_queues.c
-> > index 06397cc8bb36..d368f381b6de 100644
-> > --- a/drivers/net/ethernet/cavium/thunder/nicvf_queues.c
-> > +++ b/drivers/net/ethernet/cavium/thunder/nicvf_queues.c
-> > @@ -1389,11 +1389,11 @@ nicvf_sq_add_hdr_subdesc(struct nicvf *nic, str=
-uct snd_queue *sq, int qentry,
-> >               this_cpu_inc(nic->pnicvf->drv_stats->tx_tso);
-> >       }
-> >
-> > +     skb_tx_timestamp(skb);
-> > +
-> >       /* Check if timestamp is requested */
->
-> Nit: check if hw timestamp is requested.
+We are struggling to get ethernet working on our newly designed, custom dev=
+ice with a imx8mn processor and a mv88e6230 switch ... using the mv88e6xxx =
+driver. We have worked on it for weeks, but networking is not functional. I=
+ don't know where to find community support or maybe this is the community.=
+ I'm used to more modern things like websites; not email lists.
 
-Thanks for the review. Will change it.
+So that you understand the context at least a little: we have MDIO comms wo=
+rking, but the network interface won't come up. I get encouraging messages =
+like:
 
->
-> > -     if (!(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP)) {
-> > -             skb_tx_timestamp(skb);
-> > +     if (!(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP))
-> >               return;
-> > -     }
->
-> The SO_TIMESTAMPING behavior around both software and hardware
-> timestamps is a bit odd.
+	[    6.794063] mv88e6085 30be0000.ethernet-1:00: Link is Up - 1Gbps/Full -=
+ flow control off
+	[    6.841921] mv88e6085 30be0000.ethernet-1:00 lan3 (uninitialized): PHY =
+[mv88e6xxx-0:03] driver [Generic PHY] (irq=3DPOLL)
 
-Just a little bit. The reason why I looked into this driver is because
-I was reviewing this recent patch[1]. Then I found that the thunder
-driver uses the HW flag to test if we can generate a software
-timestamp which is also a little bit odd. Software timestamp function
-is controlled by the SW flag or SWHW flag instead of the pure HW flag.
+But near the end of boot I get messages:
 
-[1]: https://lore.kernel.org/all/20250506215508.3611977-1-stfomichev@gmail.=
-com/
+	[   11.889607] net eth0: phy NOT found
+	[   11.889617] fec 30be0000.ethernet eth0: A Unable to connect to phy
+	[   11.892275] mv88e6085 30be0000.ethernet-1:00 lan4: failed to open maste=
+r eth0
 
->
-> Unless SOF_TIMESTAMPING_OPT_TX_SWHW is set, by default a driver will
-> only return software if no hardware timestamp is also requested.
+And trying to bring it up gives:
 
-Sure thing. SOF_TIMESTAMPING_OPT_TX_SWHW can be used in this case as
-well as patch [1].
+	# ifconfig eth0 up
+	SIOCSIFFLAGS: No such device=20
+	# ifconfig lan3 up
+	SIOCSIFFLAGS: No such device
 
->
-> Through the following in __skb_tstamp_tx
->
->         if (!hwtstamps && !(tsflags & SOF_TIMESTAMPING_OPT_TX_SWHW) &&
->             skb_shinfo(orig_skb)->tx_flags & SKBTX_IN_PROGRESS)
->                 return;
->
-> There really is no good reason to have this dependency. But it is
-> historical and all drivers should implement the same behavior.
+For reference, if I specify an interface that is not configured (not in the=
+ device tree), I get a slightly different message that hints that eth0 and =
+lan3 are at least partially setup:
 
-As you said, this morning when I was reviewing patch[1], I noticed
-that thunder code is not that consistent with others.
+	# ifconfig xxx up
+	xxx: ERROR while getting interface flags: No such device
 
->
-> This automatically happens if the software timestamp request
-> skb_tx_timestamp is called after the hardware timestamp request
-> is configured, i.e., after SKBTX_IN_PROGRESS is set. That usually
-> happens because the software timestamp is requests as close to kicking
-> the doorbell as possible.
+Can you offer any advice for resolving the issue? Community sites to post t=
+o, instructions to read, videos to watch ...
 
-Right. In most cases, they implemented in such an order:
+Thanks for your time.
 
-                if (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP)
-                        skb_shinfo(skb)->tx_flags |=3D
-SKBTX_IN_PROGRESS;
+Steve Broshar
+Palmer Wireless Medtech
 
-                skb_tx_timestamp(skb);
-
-Should I adjust this patch to have the same behavior in the next
-revision like below[2]? Then we can get the conclusion:1) if only the
-HW or SW flag is set, nothing changes and only corresponding timestamp
-will be generated, 2) if HW and SW are set without the HWSW flag, it
-will check the HW first. In non TSO mode, If the non outstanding skb
-misses the HW timestamp, then the software timestamp will be
-generated, 3) if HW and SW and HWSW are set with the HWSW flag, two
-types of timestamp can be generated. To put it in a simpler way, after
-[2] patch, thunder driver works like other drivers. Or else, without
-[2], the HWSW flag doesn't even work.
-
-[2]
-diff --git a/drivers/net/ethernet/cavium/thunder/nicvf_queues.c
-b/drivers/net/ethernet/cavium/thunder/nicvf_queues.c
-index 06397cc8bb36..4be562ead392 100644
---- a/drivers/net/ethernet/cavium/thunder/nicvf_queues.c
-+++ b/drivers/net/ethernet/cavium/thunder/nicvf_queues.c
-@@ -1389,28 +1389,24 @@ nicvf_sq_add_hdr_subdesc(struct nicvf *nic,
-struct snd_queue *sq, int qentry,
-                this_cpu_inc(nic->pnicvf->drv_stats->tx_tso);
-        }
-
--       /* Check if timestamp is requested */
--       if (!(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP)) {
--               skb_tx_timestamp(skb);
--               return;
--       }
-
--       /* Tx timestamping not supported along with TSO, so ignore request =
-*/
--       if (skb_shinfo(skb)->gso_size)
--               return;
--
--       /* HW supports only a single outstanding packet to timestamp */
--       if (!atomic_add_unless(&nic->pnicvf->tx_ptp_skbs, 1, 1))
--               return;
--
--       /* Mark the SKB for later reference */
--       skb_shinfo(skb)->tx_flags |=3D SKBTX_IN_PROGRESS;
-+       /* Check if hw timestamp is requested */
-+       if (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP &&
-+           /* Tx timestamping not supported along with TSO, so ignore
-request */
-+           !skb_shinfo(skb)->gso_size &&
-+           /* HW supports only a single outstanding packet to timestamp */
-+           atomic_add_unless(&nic->pnicvf->tx_ptp_skbs, 1, 1)) {
-+               /* Mark the SKB for later reference */
-+               skb_shinfo(skb)->tx_flags |=3D SKBTX_IN_PROGRESS;
-+
-+               /* Finally enable timestamp generation
-+                * Since 'post_cqe' is also set, two CQEs will be posted
-+                * for this packet i.e CQE_TYPE_SEND and CQE_TYPE_SEND_PTP.
-+                */
-+               hdr->tstmp =3D 1;
-+       }
-
--       /* Finally enable timestamp generation
--        * Since 'post_cqe' is also set, two CQEs will be posted
--        * for this packet i.e CQE_TYPE_SEND and CQE_TYPE_SEND_PTP.
--        */
--       hdr->tstmp =3D 1;
-+       skb_tx_timestamp(skb);
- }
-
- /* SQ GATHER subdescriptor
-
-Thanks,
-Jason
-
->
-> In this driver, that would be not in nicvf_sq_add_hdr_subdesc, but
-> just before calling nicvf_sq_doorbell. Unfortunately, there are two
-> callers, TSO and non-TSO.
->
-> >
-> >       /* Tx timestamping not supported along with TSO, so ignore reques=
-t */
-> >       if (skb_shinfo(skb)->gso_size)
-> > --
-> > 2.43.5
-> >
->
->
 
