@@ -1,105 +1,99 @@
-Return-Path: <netdev+bounces-188682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0DA6AAE301
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 16:32:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1445AAE2CA
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 16:27:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C09F617A1F8
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 14:26:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79F447B9147
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 14:25:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5674228A737;
-	Wed,  7 May 2025 14:22:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DD7826B2CA;
+	Wed,  7 May 2025 14:23:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rKlEdAv9"
 X-Original-To: netdev@vger.kernel.org
-Received: from gardel.0pointer.net (gardel.0pointer.net [85.214.157.71])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A9CE25D521;
-	Wed,  7 May 2025 14:22:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.157.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C6B623;
+	Wed,  7 May 2025 14:23:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746627746; cv=none; b=HI/TNeZIIqz2pBAJtnw91aO1UnqMZicEj+xqTUgE/F+HFmrAZL14Og1BAtmtV7YRSIAX3lxcK1UAM/DjwzDPO6FVIYC9ss1s8L7yZllnQuj+iP4KTgqlpkUz1PBptoZZNgIf7qqFrhNIvGU2EPoODB2QQqb4a+zdlJ1Zl8IcTEA=
+	t=1746627839; cv=none; b=KF/nwreA+r0ZLUAYx4O/VMgMZBSxNvuERbQ83yMYcI/9oUGq3cIKpFOCtPIcVVqo/wHZC4k8DoRKLsYM2u3JLbU4Bibu9t+0nT33duVPhUhu581riVmTRYs6l/aAhjc8mJf2qJCKRu/OWUQmOWnJW7sHtr9ogKbz7yINydWW3pY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746627746; c=relaxed/simple;
-	bh=XL8XfkDiqMxumAe7zHX0ZUVrrfqkX7k7oFAaizD+w/o=;
+	s=arc-20240116; t=1746627839; c=relaxed/simple;
+	bh=Uv0EcW7glq4I2xOqbyY8pJU9J0d/EtIXL20dRyfGk7M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IChi6lxpbUcaYmg0xc0RHX15wjdH+XsMWqFyZrfu0fLqz7YoZ3/6e71Hef5Z67NJe7OXC8JaugBRHNW9kMqxCWg96lqpsyQ/b6cFzZ6++fWPZBblO0hWMyKd1IRZ9Zl97Fkx2UFkES7OqsXYwU523WuRa4+elxO/omH2ivqEUxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0pointer.de; spf=pass smtp.mailfrom=0pointer.de; arc=none smtp.client-ip=85.214.157.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0pointer.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0pointer.de
-Received: from gardel-login.0pointer.net (gardel-mail [85.214.157.71])
-	by gardel.0pointer.net (Postfix) with ESMTP id 1D7E4E802CC;
-	Wed,  7 May 2025 16:22:15 +0200 (CEST)
-Received: by gardel-login.0pointer.net (Postfix, from userid 1000)
-	id 9820E16005E; Wed,  7 May 2025 16:22:14 +0200 (CEST)
-Date: Wed, 7 May 2025 16:22:14 +0200
-From: Lennart Poettering <mzxreary@0pointer.de>
-To: =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, brauner@kernel.org,
-	alexander@mihalicyn.com, bluca@debian.org, daan.j.demeyer@gmail.com,
-	davem@davemloft.net, david@readahead.eu, edumazet@google.com,
-	horms@kernel.org, jack@suse.cz, jannh@google.com, kuba@kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-	me@yhndnzj.com, netdev@vger.kernel.org, oleg@redhat.com,
-	pabeni@redhat.com, viro@zeniv.linux.org.uk, zbyszek@in.waw.pl,
-	linux-security-module@vger.kernel.org
-Subject: Re: [PATCH RFC v3 08/10] net, pidfs, coredump: only allow
- coredumping tasks to connect to coredump socket
-Message-ID: <aBtslo-EkUCnFklN@gardel-login>
-References: <20250506-zugabe-bezog-f688fbec72d3@brauner>
- <20250506191817.14620-1-kuniyu@amazon.com>
- <20250507.ohsaiQuoh3uo@digikod.net>
+	 Content-Type:Content-Disposition:In-Reply-To; b=J3CoCxRMpmcIow7mfm/WIT+ZynN7pXmonn/LPN/tBfELk1+TGYtUxvYBo7BhCbGbcFEXZAwRJkXo2ew8+80ZZyYtVVNLQ3QzJuTclZvdCCje6XyrD3DYWy0DOQLyM9kZSQH3td1GR6EMJfb3wd21STFNu7YGBW9CqStdwPrsksQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rKlEdAv9; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ZYAy8h3huPEqHikgnxaieN04K7WhSCqt1OYSqSWNRlE=; b=rKlEdAv9rte4tbESf+4ajtYyGO
+	pATDuP6V8vr/V+uSDUo/e0JB1BezeHdUqzDGYjZn1q/NtDJNp9LnqErexEXf1sLKWbQvMx5SwhK91
+	NrnF1ryuC8HUGCACQbdP7jEQ9Q33dVADukzJM3nsrsCZ5C42JHvCCoxLNzBB5Pg5li1c=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uCfge-00BtPO-Nq; Wed, 07 May 2025 16:23:52 +0200
+Date: Wed, 7 May 2025 16:23:52 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Wasim Nazir <quic_wasimn@quicinc.com>
+Cc: Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	kernel@quicinc.com, kernel@oss.qualcomm.com
+Subject: Re: [PATCH 3/8] arm64: dts: qcom: sa8775p: Add ethernet card for
+ ride & ride-r3
+Message-ID: <c445043d-2289-455d-af62-b18704bab749@lunn.ch>
+References: <20250507065116.353114-1-quic_wasimn@quicinc.com>
+ <20250507065116.353114-4-quic_wasimn@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250507.ohsaiQuoh3uo@digikod.net>
+In-Reply-To: <20250507065116.353114-4-quic_wasimn@quicinc.com>
 
-On Mi, 07.05.25 13:51, Mickaël Salaün (mic@digikod.net) wrote:
+> +&ethernet0 {
+> +	phy-handle = <&sgmii_phy0>;
+> +	phy-mode = "sgmii";
+> +
+> +	pinctrl-0 = <&ethernet0_default>;
+> +	pinctrl-names = "default";
+> +
+> +	snps,mtl-rx-config = <&mtl_rx_setup>;
+> +	snps,mtl-tx-config = <&mtl_tx_setup>;
+> +	snps,ps-speed = <1000>;
 
-> What if the task send a "fake" coredump and just after that really
-> coredump?  There could be a race condition on the server side when
-> checking the coredump property of this pidfd.
->
-> Could we add a trusted header to the coredump payload that is always
-> written by the kernel?  This would enable to read a trusted flag
-> indicating if the following payload is a coredumped generated by the
-> kernel or not.
+SGMII can only go up to 1000, so why is this property needed?
 
-With my systemd hat on I must say I don't really care if the coredump
-is "authentic" or not. The coredump is untrusted data anyway, it needs
-to be quarantined from systemd-coredump's PoV, there's no security
-value in distinguishing if some random user's process was sent to the
-handler because the user called raise(SIGSEGV) or because the user
-called connect() to our socket. The process is under user control in
-almost all ways anyways, they can rearrange its internals in almost
-any way already, play any games they want. It's of very little value
-if the receiving side can determine if the serialization of potential
-complete garbage was written out by the kernel or by the process' own
-code.
+> +&ethernet0 {
+> +	phy-handle = <&hsgmii_phy0>;
+> +	phy-mode = "2500base-x";
+> +
+> +	pinctrl-0 = <&ethernet0_default>;
+> +	pinctrl-names = "default";
+> +
+> +	snps,mtl-rx-config = <&mtl_rx_setup>;
+> +	snps,mtl-tx-config = <&mtl_tx_setup>;
+> +	snps,ps-speed = <1000>;
 
-Moreover, in systemd-coredump we these days collect not only classic
-ELF coredumps passed to us by the kernel, but also other forms of
-crashes. For example if a Python program dies because of an uncaught
-exception this is also passed to systemd-coredump, and treated the
-same way in regards to metadata collection, logging, storage,
-recycling and so on. Conceptually a python crash like that and a
-process level crash are the same thing for us, we treat them the
-same. And of course, Python crashes like this are *inherently* a
-userspace concept, hence we explicitly want to accept them. Hence even
-if we'd be able to distinguish "true" from "fake" coredumps we'd still
-not care or change our behaviour much, because we are *as* *much*
-interested in user-level crashes as in kernel handled crashes.
+This looks odd. 2500Base-X, yet 1000?
 
-Lennart
-
---
-Lennart Poettering, Berlin
+	Andrew
 
