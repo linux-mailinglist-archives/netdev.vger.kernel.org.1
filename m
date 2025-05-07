@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-188654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99FD1AAE0C9
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 15:31:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 110FCAAE0E9
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 15:42:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7CAB3A677E
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 13:30:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC62F3BCA9F
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 13:42:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92635253954;
-	Wed,  7 May 2025 13:31:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B446280A57;
+	Wed,  7 May 2025 13:42:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BE1mNzae"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NjMWbYhz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD08E2B9CD;
-	Wed,  7 May 2025 13:31:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52C1F1519B4;
+	Wed,  7 May 2025 13:42:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746624674; cv=none; b=b7Ww3g6OAMUxUUibYKel70bIzbYVvMrxacwXN99S3waA0pJCK3lWIzU5M6T7k31l8hXIysKPo5N2tNevAgj45nKoWpLk5r8BMtIbvP3n959wD7GOPkJK7wRRh+XdFtGZGEf9joK7bTNhVk+85/4RMhZWgCCHoRoj3GY2G4Ob95c=
+	t=1746625343; cv=none; b=MoregXu2QtiTsfMLeQlduJ8gkVCocRhXszjR0kNPmbkwf5rQ6LgcS4mkQRdZ9WXuLw94UewpkAyTha9dobb42mfQNSbcJnEQy+UAMesx7D5cb/rfvIG2E0Ki84P28Pb8G3/6AOtqy6cuYyj8mAQrPpy4oa4t2ilnB0fkS2eKFXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746624674; c=relaxed/simple;
-	bh=chnaCVam1ojV4Gi8iMvmPIZC9wt2tOR5DhXwW1v6K6A=;
+	s=arc-20240116; t=1746625343; c=relaxed/simple;
+	bh=rt0gLT/Cx6uH7xEwJf4S/Dy3MmtJMMcOxB9M2SOESBs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oahy/V/f4n94CCs/g/5PSWIWP1R/sidSHOaP1rb4lPRSZJvLTNZBgi/bNvOVIb6c5W3vqDEQmp+ZhboQmXRP9XvMYa8NF+7VMKK9sh5afJw4j19+2hnK8SfaXRcqC7UFmkevm4b6ySb2YkRKRznxa0fJ5QMjcMmgiRxo49TChxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BE1mNzae; arc=none smtp.client-ip=209.85.218.47
+	 To:Cc:Content-Type; b=sJsBOwONCGx6zKv9GOCIKjRiwoiPaba7v2CAYETsYYuZGIsn3HBomrGZof6z5DSQ0b0YMWcY6pf8Clr0LhZCeepSlHZ1sRnFH3YZn5GlMOcaLxRr0vi14d7f6SZFjL/eWBwJvGNn24IJFhUIFQkbGDXJPePxORpS/tbsgylL/iA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NjMWbYhz; arc=none smtp.client-ip=209.85.218.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-ac2bb7ca40bso1188226866b.3;
-        Wed, 07 May 2025 06:31:12 -0700 (PDT)
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-acae7e7587dso1095572566b.2;
+        Wed, 07 May 2025 06:42:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746624671; x=1747229471; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1746625340; x=1747230140; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CMLUK1+DSffFIbuoUTgm8AIQgo1jz7butcVN72PZbDo=;
-        b=BE1mNzaeZagzvBsDFWHORgX4Rh6ohg1mxRJcDocBeqIXSR3Ja4T6CI1Bi5dJ0JNOlM
-         1BK6A5M7SZQQVytYfU9lq7P/zjwDwWfsxw7yx7LtqkFEjEYnOXyAHflDxM5R7rambPwp
-         6clGF2fioUTN/oMATuAegnx3TNij2FuatBfn2hWSp5MxS40sIn7xXILcCkJAwTzvWPVP
-         Hc4dh/H5earTbhYK6uETcx2Z88yjqkDgiHc/LUlyjmVWYR+xOGzKM0HRUlZJCzTRU6hZ
-         TzssTINT0w8nBR4U2hXWGtGYC9P7Ja5voM74Ddo+zHQZhcloB5umyWI1nKvs/t7M5qVl
-         vEIA==
+        bh=Fu5jAYqPptIEmaOmMbSmkEQLD/PP47xbmK8wHBaTar4=;
+        b=NjMWbYhzKaIWQHlJa5fYGRqZnVD+kZmWMAAdCN9/RdItPoskCd7n1cqNm2Pqmd0tS3
+         qob5viQ20wRc2dts1udBep55BvUUeQ7oSOSK/Vcg2o3luusGEMr5OZ7Z4W7teitG8DI1
+         DqSqq0rCNCampJkCWeO8ySMndJ44ftKHBlvts9CLGICZvFULxZWKf1F7q0sZwip1Exw3
+         5Lm9/YGKHKlmrBX9vCScoHz+Va0EfuWd/Qt68CBCYwq5MXA2SFM99jSVULhYs9a2fr/j
+         mCaC5ePGn/dIePcL1M4tIBhg9x/3TrRWhKkucorEnQX0YLL76gkZeZQ5lWviObUm+y4t
+         h53A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746624671; x=1747229471;
+        d=1e100.net; s=20230601; t=1746625340; x=1747230140;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CMLUK1+DSffFIbuoUTgm8AIQgo1jz7butcVN72PZbDo=;
-        b=lCrq1ZgU7LwVKxXcxvSqQIOXrRqRJTvzmrgyl0q7qXjJ6dBeN9QSGtt/MSqrqym+kJ
-         J981F0eRMi0TcS+TgQHQVsghGJCWR8sBnPp4caybI73yRnEGCMU9fDe5BU08TC1zyhPH
-         2qQGr0BpqDVMNQhLh1JPi3BgcBrnZjWFls+1Q5UqJqVhrG0Tq3Tc3m27CF8zkm6gLfPn
-         UPHQx0kNam/kIvE1D0LlKT801W7eYuYVjMigKQ+4N0tZSRjyeiAaDCSHeJ0T/U24SHdA
-         RuZX4BmexJ9cr9SeZkMWJgxqM4mTvQEJUGnOd5fsX9Oz2OGOyShME7kai5iJnx+ucsP4
-         TLqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUZ5MOi78h8iXg4l1Tk4WI4Hzt17Jwed3xPARsKl56+15nLXMthnrW1n376/KmfB9EsTkvzg8lSEAus@vger.kernel.org, AJvYcCUxn0M2Z8D/VoYPhsQlkT0EiU6l3anhCWD07sAROV7Ch6LDAMeEFNKC0vnvO3j/b5U6uo3v84bzEsEV@vger.kernel.org, AJvYcCVZm6krT+ofgHLoRZ8HsXFWYUvNNJhoy/meyVCvA2Ux/gTqwdpheR2q7XTnnCuXEVh5s0P0GSHk7jqHAF6m@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOqI5vZ/XE4VpqylGKn7F4f1d80euu7pP0QOoR1VDIPVsVr8TT
-	WETjZQ5mm0hdUVK+Roiq3ljZmqA7WaXmdIq/+2SV8+UX0kz7zuNHmdoI902G+IGcG20gksyASNd
-	ho1PzPo36rU8Y8bKwsgbPa4Gaql9R2Rls
-X-Gm-Gg: ASbGncveZqEua0m/USH4kAXNnTVDfn9s0ixGT8Z7e6DTFrKhjrqxTMHwWl8IBN5AecD
-	cHQVVsvIIZSvuB+sfIPbgx/0uVJXjMi5r6EY3JTUJjPmAmfSP/UyOwgVX42GOj40LHh8CC2nIJ9
-	RI72Xdkx3GD4jKb7I/qLYGXJvxw15c9psfxs8=
-X-Google-Smtp-Source: AGHT+IHNcpkL2VTtUnMUjWG5urZVwKTC1gn3U8TME2PAES3AyvskcpMcC5URq++Hrm3nPn5DpRiyiBRSbFsFOHWWB2U=
-X-Received: by 2002:a17:907:d2a:b0:ace:9d90:cdd3 with SMTP id
- a640c23a62f3a-ad1e8d0ba19mr359060266b.49.1746624670744; Wed, 07 May 2025
- 06:31:10 -0700 (PDT)
+        bh=Fu5jAYqPptIEmaOmMbSmkEQLD/PP47xbmK8wHBaTar4=;
+        b=JUeicqjw4iscys/t9Jej/UuVhpqXzUu6DCeDivyul5R3BhzZH0UpnKrv/g2LMHToDO
+         gLv6TU0Ovv+eWnt16LYPFlvx2Kn2HL/yumgIQLR97vyx+MW5sdCWXU7tyZIF4Dvq1hn4
+         Dv+mc3vFJdtdnnGaW5VmJfpmw+AyoXW0PpTSqY5GQ4SgOxpdQUN/bFkV3JpJr+gAf61j
+         tiU08xRnxUW1SDtuMmfIqGsMZTjz2rf1FQ5Fe/l89qLRYRLgqy2Yf0NYE7VxnPw7Grlx
+         LkKQD7Kp094r3TxYl85qnHdxs3xZlihYl2CL3dVxfsxP1vngrtQLbzKjycclMhn+E/NH
+         ClTA==
+X-Forwarded-Encrypted: i=1; AJvYcCU045O7C1Cf4vPQr4JyUbLWUOolfihdt3WgZyqELnw1qFbBGvv00uaBJKCck7qefELBTmqjmly9iT0P@vger.kernel.org, AJvYcCWvvUMp2tIySzeIsIDM5ScdTKXZe+rZE1JuEw5V9e+YNvUHcOnOuTtlCPZSFo1x22UfzL0jesRMnLr1uldF@vger.kernel.org, AJvYcCXse4FSWWDK+lMDmtxyrn/R9NG2BzlyXpa+ZbIcu6F0WxsB7sBwNXTajVFruUOOEE0c0r7kTLyqKRTd@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNHjgG2dcaFtqSUUjrfbSjU/8vBdFp7Rs42FL4RTzjdc2KNN0g
+	83k6tD82aKSIVWfRH8OGSPJN6sj8htV3BilTUFPeRYU3JOXmZQyjSUhH2Bld2pJBMrWG7YPTpR7
+	JYwScjRl9FohB+beeqsqhPfys+/g=
+X-Gm-Gg: ASbGnctNEq0+Obi56T2tYiEvGxeltIzn53Wxr+SbsGRSki+PZeeel9ubg2TaqrHt6Jd
+	8prRD+gSKWdDIEfFZe4l8MSLXZUnX4oqPmEeFg6PppRAEeyzuDKDUAWjJHTT8DEzLGGI48E1/Ks
+	kuSXQdkb6ssjlWe58TtEvR6jgm
+X-Google-Smtp-Source: AGHT+IGQBtHrZwxhQakHc3ARhOEyA4EPrV8tDh/xRaawNPgEr75PKZsCLFzdhfdOeCaSHRB69AiXjNW3dOcH15xOGlY=
+X-Received: by 2002:a17:907:d507:b0:ace:3af5:1de6 with SMTP id
+ a640c23a62f3a-ad1e8d2934cmr350558166b.35.1746625340440; Wed, 07 May 2025
+ 06:42:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,9 +77,9 @@ MIME-Version: 1.0
 References: <20250507124358.48776-1-ivecera@redhat.com> <20250507124358.48776-9-ivecera@redhat.com>
 In-Reply-To: <20250507124358.48776-9-ivecera@redhat.com>
 From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Date: Wed, 7 May 2025 16:30:33 +0300
-X-Gm-Features: ATxdqUEq24ajhDXo1Kn1PDm2eAdnktBxZULVVBowv3DoAhXXZvLonCuEik0YGTw
-Message-ID: <CAHp75VcH81AHt5dw0cfYa6Wv8LwZrss9uo2x9ERfK9=47erbdA@mail.gmail.com>
+Date: Wed, 7 May 2025 16:41:44 +0300
+X-Gm-Features: ATxdqUFuxCdQxMTUYJnn6Zn0Z-yNV6W-XdaPO6tDqq9cIe3Jt33eP9TAQnxP48o
+Message-ID: <CAHp75Ven0i05QhKz2djYx0UU9E9nipb7Qw3mm4e+UN+ZSF_enA@mail.gmail.com>
 Subject: Re: [PATCH net-next v7 8/8] mfd: zl3073x: Register DPLL sub-device
  during init
 To: Ivan Vecera <ivecera@redhat.com>
@@ -103,20 +103,42 @@ te:
 
 ...
 
-> +/**
-> + * struct zl3073x_pdata - zl3073x sub-device platform data
-> + * @channel: channel to use
-> + */
-> +struct zl3073x_pdata {
-> +       u8      channel;
+> +static const struct zl3073x_pdata zl3073x_pdata[ZL3073X_MAX_CHANNELS] =
+=3D {
+> +       { .channel =3D 0, },
+> +       { .channel =3D 1, },
+> +       { .channel =3D 2, },
+> +       { .channel =3D 3, },
+> +       { .channel =3D 4, },
 > +};
 
-You can also use software nodes (via device properties).
+> +static const struct mfd_cell zl3073x_devs[] =3D {
+> +       ZL3073X_CELL("zl3073x-dpll", 0),
+> +       ZL3073X_CELL("zl3073x-dpll", 1),
+> +       ZL3073X_CELL("zl3073x-dpll", 2),
+> +       ZL3073X_CELL("zl3073x-dpll", 3),
+> +       ZL3073X_CELL("zl3073x-dpll", 4),
+> +};
 
-But since the current solution doesn't require any additional files or
-something like that, I don't care much.
+> +#define ZL3073X_MAX_CHANNELS   5
 
---=20
+Btw, wouldn't be better to keep the above lists synchronised like
+
+1. Make ZL3073X_CELL() to use indexed variant
+
+[idx] =3D ...
+
+2. Define the channel numbers
+
+and use them in both data structures.
+
+...
+
+OTOH, I'm not sure why we even need this. If this is going to be
+sequential, can't we make a core to decide which cell will be given
+which id?
+
+--
 With Best Regards,
 Andy Shevchenko
 
