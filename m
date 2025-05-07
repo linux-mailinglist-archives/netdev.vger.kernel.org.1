@@ -1,194 +1,163 @@
-Return-Path: <netdev+bounces-188710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EA06AAE4C4
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 17:29:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A96FAAE4D2
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 17:30:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D5CB1C42957
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 15:28:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 148123BAB60
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 15:27:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8023528BA91;
-	Wed,  7 May 2025 15:26:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 026BE28BAB7;
+	Wed,  7 May 2025 15:26:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UzxmvMKo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JPplaysz"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DACF328BA84
-	for <netdev@vger.kernel.org>; Wed,  7 May 2025 15:26:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C180228B3FE;
+	Wed,  7 May 2025 15:26:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746631567; cv=none; b=r9cdk7uAaM4izy+9SNtQGpZaHoPTWzLj7L8wn8maHjYXwvz4syrPz+KUO8hihkr4rvDAblsLeb1PG9oweBKvPuv8k+rPw4nmLTyvJt6oAKX1RJ1+9k6/tg5djJqxmyELTuYlD+Vdp3nAeob2nyQg5TS6jjnDu3AfhC+0XdubaFs=
+	t=1746631575; cv=none; b=gVQFKKIRzJCDlooTGSKdNxzcnPoLgmY8yKN4Co3zxLFYsGmKMWmPj3cSyWJBt+vESMnYI8L7aUJuvBe6FF15DbXNywBFtC0a4RCFMYwrL+FuAaSovfYRqp41yOCeNEOV2lvNt3VTbB0tyjgrpsoRwyJpDSCljZWJj8ZrMkSq3oU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746631567; c=relaxed/simple;
-	bh=sKo4FtZtdnOcvr1oQuz2XBroEwdboLpu4/AAykZ6Geg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=F4MWsHA7w1ojPQwomJ+NfH4PxOM56i37oxqbLyJfsBMM6QCZ+H9PvYQ2IQqt1WIv/7N06BU1EOVgMdL19eysfyWf33mJxiqbfr330e0Hz9+ZlhjKzkeJYsw6y7Z+OX8+z1hEnwzjc5fkDZeIKTQZvYe+IbXNNR6gdM3VqYVx624=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UzxmvMKo; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746631565;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=N7rsTQVkWdVuIH2kV4e5IulN3mEFFY4EL8PR2r1zcwQ=;
-	b=UzxmvMKoGlNxwPndtyU/XrK/iccDlJjYx2n7gmIBgWOs9sqwYTNQY/F5UyeJs4eC8icrj8
-	a8cEq546XjBWr7bd63KHoueRPasayK/dhGlY25tOrGAfn9DA1/UhO3CqF1De7NQz+DOU5l
-	RvoecMR24Cf5bdPLx0laGUYgxRsRWiU=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-122-NNlbYunAN0qPtBkYUzqRVg-1; Wed,
- 07 May 2025 11:26:01 -0400
-X-MC-Unique: NNlbYunAN0qPtBkYUzqRVg-1
-X-Mimecast-MFC-AGG-ID: NNlbYunAN0qPtBkYUzqRVg_1746631559
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6FB2E195608C;
-	Wed,  7 May 2025 15:25:59 +0000 (UTC)
-Received: from p16v.luc.cera.cz (unknown [10.44.33.91])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 46E9230001AA;
-	Wed,  7 May 2025 15:25:54 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	s=arc-20240116; t=1746631575; c=relaxed/simple;
+	bh=slVt5lIKJTnZi3bMfiTdllvE+A/QE0g4pjjhSkT/YcU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I8mouej3hX77F582lgM4efVeXW9WXONYzXLX+56kYGuL3SIlb3+VwMhBBaH8R88t73GnR6LxQvoRJzR7wXIaqLrFMQYA53NjIokKHh3au+s9PIgFJs//Mq0DjuOLPG6cDnPwxfc6kOPzgEfl8X0SU0eCm1HCdUb70e4OI2m2CLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JPplaysz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEC3FC4CEE2;
+	Wed,  7 May 2025 15:26:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746631575;
+	bh=slVt5lIKJTnZi3bMfiTdllvE+A/QE0g4pjjhSkT/YcU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JPplaysznrNxewK4xJFXoM6FH/opMrnXUuyDlpJUQrchZDSjl+lmLHkIzGTI2aw5q
+	 5SzfCCD+9kN008ozTvtXZKxVmrOJzVrhPw9ow8PcP8a46YtFe9lKgR35VHj61VIdrj
+	 e3CwVVoH6BhjptX7AYMSFzx02/OQQ98ujl+kCP/d5X/m3dk3WkNTZ21HhPhnE3uRBs
+	 34kTOKppM/jlAg5mVFWuNRX7DfS29sxRUWLDx5h/IRS416wfEo5KdLYleSN08qYLWD
+	 NQvyPf7iYyjw7LwoBDtxCwjsFYeF6+k0PS/vWldDW2pLZ35yCtYZyNngFJQl3KT5Xc
+	 308dbhYb3NAyg==
+Date: Wed, 7 May 2025 16:26:09 +0100
+From: Lee Jones <lee@kernel.org>
+To: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
 	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Rob Herring <robh@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
 	Prathosh Satish <Prathosh.Satish@microchip.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	Lee Jones <lee@kernel.org>,
-	Andy Shevchenko <andy@kernel.org>,
-	Michal Schmidt <mschmidt@redhat.com>,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: [PATCH net-next v8 8/8] mfd: zl3073x: Register DPLL sub-device during init
-Date: Wed,  7 May 2025 17:25:04 +0200
-Message-ID: <20250507152504.85341-9-ivecera@redhat.com>
-In-Reply-To: <20250507152504.85341-1-ivecera@redhat.com>
-References: <20250507152504.85341-1-ivecera@redhat.com>
+	Michal Schmidt <mschmidt@redhat.com>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next v7 8/8] mfd: zl3073x: Register DPLL sub-device
+ during init
+Message-ID: <20250507152609.GK3865826@google.com>
+References: <20250507124358.48776-1-ivecera@redhat.com>
+ <20250507124358.48776-9-ivecera@redhat.com>
+ <CAHp75Ven0i05QhKz2djYx0UU9E9nipb7Qw3mm4e+UN+ZSF_enA@mail.gmail.com>
+ <2e3eb9e3-151d-42ef-9043-998e762d3ba6@redhat.com>
+ <aBt1N6TcSckYj23A@smile.fi.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+In-Reply-To: <aBt1N6TcSckYj23A@smile.fi.intel.com>
 
-Register DPLL sub-devices to expose the functionality provided
-by ZL3073x chip family. Each sub-device represents one of
-the available DPLL channels.
+On Wed, 07 May 2025, Andy Shevchenko wrote:
 
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
-v7->v8:
-* replaced zl3073x_pdata array ZL3073X_PDATA macro
-v6->v7:
-* use platform data to pass the channel to use
-v4->v6:
-* no change
-v3->v4:
-* use static mfd cells
----
- drivers/mfd/zl3073x-core.c  | 27 +++++++++++++++++++++++++++
- include/linux/mfd/zl3073x.h |  9 +++++++++
- 2 files changed, 36 insertions(+)
+> On Wed, May 07, 2025 at 03:56:37PM +0200, Ivan Vecera wrote:
+> > On 07. 05. 25 3:41 odp., Andy Shevchenko wrote:
+> > > On Wed, May 7, 2025 at 3:45 PM Ivan Vecera <ivecera@redhat.com> wrote:
+> 
+> ...
+> 
+> > > > +static const struct zl3073x_pdata zl3073x_pdata[ZL3073X_MAX_CHANNELS] = {
+> > > > +       { .channel = 0, },
+> > > > +       { .channel = 1, },
+> > > > +       { .channel = 2, },
+> > > > +       { .channel = 3, },
+> > > > +       { .channel = 4, },
+> > > > +};
+> > > 
+> > > > +static const struct mfd_cell zl3073x_devs[] = {
+> > > > +       ZL3073X_CELL("zl3073x-dpll", 0),
+> > > > +       ZL3073X_CELL("zl3073x-dpll", 1),
+> > > > +       ZL3073X_CELL("zl3073x-dpll", 2),
+> > > > +       ZL3073X_CELL("zl3073x-dpll", 3),
+> > > > +       ZL3073X_CELL("zl3073x-dpll", 4),
+> > > > +};
+> > > 
+> > > > +#define ZL3073X_MAX_CHANNELS   5
+> > > 
+> > > Btw, wouldn't be better to keep the above lists synchronised like
+> > > 
+> > > 1. Make ZL3073X_CELL() to use indexed variant
+> > > 
+> > > [idx] = ...
+> > > 
+> > > 2. Define the channel numbers
+> > > 
+> > > and use them in both data structures.
+> > > 
+> > > ...
+> > 
+> > WDYM?
+> > 
+> > > OTOH, I'm not sure why we even need this. If this is going to be
+> > > sequential, can't we make a core to decide which cell will be given
+> > > which id?
+> > 
+> > Just a note that after introduction of PHC sub-driver the array will look
+> > like:
+> > static const struct mfd_cell zl3073x_devs[] = {
+> >        ZL3073X_CELL("zl3073x-dpll", 0),  // DPLL sub-dev for chan 0
+> >        ZL3073X_CELL("zl3073x-phc", 0),   // PHC sub-dev for chan 0
+> >        ZL3073X_CELL("zl3073x-dpll", 1),  // ...
+> >        ZL3073X_CELL("zl3073x-phc", 1),
+> >        ZL3073X_CELL("zl3073x-dpll", 2),
+> >        ZL3073X_CELL("zl3073x-phc", 2),
+> >        ZL3073X_CELL("zl3073x-dpll", 3),
+> >        ZL3073X_CELL("zl3073x-phc", 3),
+> >        ZL3073X_CELL("zl3073x-dpll", 4),
+> >        ZL3073X_CELL("zl3073x-phc", 4),   // PHC sub-dev for chan 4
+> > };
+> 
+> Ah, this is very important piece. Then I mean only this kind of change
+> 
+> enum {
+> 	// this or whatever meaningful names
+> 	..._CH_0	0
+> 	..._CH_1	1
+> 	...
+> };
+> 
+> static const struct zl3073x_pdata zl3073x_pdata[ZL3073X_MAX_CHANNELS] = {
+>        { .channel = ..._CH_0, },
+>        ...
+> };
+> 
+> static const struct mfd_cell zl3073x_devs[] = {
+>        ZL3073X_CELL("zl3073x-dpll", ..._CH_0),
+>        ZL3073X_CELL("zl3073x-phc", ..._CH_0),
+>        ...
+> };
 
-diff --git a/drivers/mfd/zl3073x-core.c b/drivers/mfd/zl3073x-core.c
-index 0bea696a46b8..7b140b614a63 100644
---- a/drivers/mfd/zl3073x-core.c
-+++ b/drivers/mfd/zl3073x-core.c
-@@ -7,6 +7,7 @@
- #include <linux/device.h>
- #include <linux/export.h>
- #include <linux/math64.h>
-+#include <linux/mfd/core.h>
- #include <linux/mfd/zl3073x.h>
- #include <linux/module.h>
- #include <linux/netlink.h>
-@@ -755,6 +756,23 @@ static void zl3073x_devlink_unregister(void *ptr)
- 	devlink_unregister(ptr);
- }
- 
-+#define ZL3073X_PDATA(_channel)			\
-+	(&(const struct zl3073x_pdata) {	\
-+		.channel = _channel,		\
-+	})
-+
-+#define ZL3073X_CELL(_name, _channel)				\
-+	MFD_CELL_BASIC(_name, NULL, ZL3073X_PDATA(_channel),	\
-+		       sizeof(struct zl3073x_pdata), 0)
-+
-+static const struct mfd_cell zl3073x_devs[] = {
-+	ZL3073X_CELL("zl3073x-dpll", 0),
-+	ZL3073X_CELL("zl3073x-dpll", 1),
-+	ZL3073X_CELL("zl3073x-dpll", 2),
-+	ZL3073X_CELL("zl3073x-dpll", 3),
-+	ZL3073X_CELL("zl3073x-dpll", 4),
-+};
-+
- /**
-  * zl3073x_dev_probe - initialize zl3073x device
-  * @zldev: pointer to zl3073x device
-@@ -826,6 +844,15 @@ int zl3073x_dev_probe(struct zl3073x_dev *zldev,
- 	if (rc)
- 		return rc;
- 
-+	/* Add DPLL sub-device cell for each DPLL channel */
-+	rc = devm_mfd_add_devices(zldev->dev, PLATFORM_DEVID_AUTO, zl3073x_devs,
-+				  chip_info->num_channels, NULL, 0, NULL);
-+	if (rc) {
-+		dev_err_probe(zldev->dev, rc,
-+			      "Failed to add DPLL sub-device\n");
-+		return rc;
-+	}
-+
- 	/* Register the device as devlink device */
- 	devlink = priv_to_devlink(zldev);
- 	devlink_register(devlink);
-diff --git a/include/linux/mfd/zl3073x.h b/include/linux/mfd/zl3073x.h
-index 4dc68013b69f..cf4663cab72a 100644
---- a/include/linux/mfd/zl3073x.h
-+++ b/include/linux/mfd/zl3073x.h
-@@ -12,6 +12,7 @@ struct regmap;
- /*
-  * Hardware limits for ZL3073x chip family
-  */
-+#define ZL3073X_MAX_CHANNELS	5
- #define ZL3073X_NUM_INPUTS	10
- #define ZL3073X_NUM_OUTPUTS	10
- #define ZL3073X_NUM_SYNTHS	5
-@@ -48,6 +49,14 @@ struct zl3073x_synth {
- 	u8	dpll;
- };
- 
-+/**
-+ * struct zl3073x_pdata - zl3073x sub-device platform data
-+ * @channel: channel to use
-+ */
-+struct zl3073x_pdata {
-+	u8	channel;
-+};
-+
- /**
-  * struct zl3073x_dev - zl3073x device
-  * @dev: pointer to device
+This is getting hectic.  All for a sequential enumeration.  Seeing as
+there are no other differentiations, why not use IDA in the child
+instead?
+
 -- 
-2.49.0
-
+Lee Jones [李琼斯]
 
