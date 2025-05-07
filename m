@@ -1,149 +1,186 @@
-Return-Path: <netdev+bounces-188602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3C44AADD65
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 13:32:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24D65AADD99
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 13:42:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5821317F529
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 11:32:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1AD998877F
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 11:42:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A187C21019C;
-	Wed,  7 May 2025 11:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9B912441AA;
+	Wed,  7 May 2025 11:42:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R+vdEhdA"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="0Vs0EHE2";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="yIpHJvFt";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="hBp9QEAI";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="rn7ktXyD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B8B1865EB
-	for <netdev@vger.kernel.org>; Wed,  7 May 2025 11:32:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3790B2417F8
+	for <netdev@vger.kernel.org>; Wed,  7 May 2025 11:42:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746617524; cv=none; b=NhCk2HtBSSra1uxolYC50a9qXBQspC46pi2gbb6L/pCW423cT281sF19YAVZJzVQ33EiVw41CWO7uFXma7w18KqoghlE8lZSYSphXT4rvo/TA4i1YX9vndBeZ+aexTwI39j/B6lWhzxwN2i3NHH9OIBh7Z6rcTVMQM2eoRdyh1A=
+	t=1746618158; cv=none; b=Xm3KY+6D5ufSHovqVXvLs4gkBA63HTDScvH0HJn1r4D4EkUU3WV7z8fwrlQbIM2sI7yUcKzc6js4SHi10tXpo98IN2XmDllsSMuTXFWEn8o2U50WgRbPjg/oxKhyfDLma7iGPsQAtf+aqkE+/SWTYt7kiFgbU+1ya4lrahqaX14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746617524; c=relaxed/simple;
-	bh=as0rfWFd8spshSXXBQv+TjXoaOY74zNfn3PlNiDtd/Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=qLj9GLDms2NM5tzOUArPdLPTn92ZUNrtb19FWv1h3ogIBefijnRJXg444oXhONwPyMVLmg3EsY2mCpez4etKYS0WqkImR2kKfEldiekOeHachgdwxSe/6EEmyz4MgtyQFQLkk4J+yw/JAARCjrjhQG/cV5nDFwS51L0pi1ZYNTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R+vdEhdA; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43cf05f0c3eso42404495e9.0
-        for <netdev@vger.kernel.org>; Wed, 07 May 2025 04:32:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746617521; x=1747222321; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AK3A7jwAAokKcfzlNWNLa5c0EB8Ivk+5l3sSHrHeGRI=;
-        b=R+vdEhdAbCsqgJMIibqGwkjtjTwHrJ6Qjai8+Ded/SXBJRkij1iA54QTlIAVbylrt1
-         OjoOXmArXpEwtcxhn8c7RyWfbRPsFMvcOL6/u9RupW+yjkHgpmXJcECV7L6T6VeUalHW
-         nQTF8uqVz2F7uuW2LyfJj0ZSJ8E2r5w+zW4Em4754rg6de76XYKAQRaH8hKm9QALoXZy
-         u51WGB6DS1kLubaBzCzZa2hJ87nZb+x0sz9czVInHaDlXhBkcHosFcm9zyAcQvXF8yI6
-         qnvPF7XQ0mL3FJIhTO3aH8RhMF/mITT49l1O9nM8c+Z/eUvhBX07tl6ATCDp+92X1vEB
-         aSeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746617521; x=1747222321;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AK3A7jwAAokKcfzlNWNLa5c0EB8Ivk+5l3sSHrHeGRI=;
-        b=ugsJh/bkePtCS5hoSOCwqPDgte0S+cC4QTaWcPdfGfeGctvr9hiRDpSv+6B9O820VD
-         +2yrym+FDS2Zf1BEIhdXJP7adCR4CF2Klli38EkNhdjSheLev7woZQpzTffvNb2A6r8j
-         yRAY42eWJPMY963EX8zwxeg41oQxQeTnznZ4rlLgUeDPvlewMG+4SGl7GRmbZF9ghPkc
-         p+vkDMF7Mw7UhlQFdzL8/wJP5JBRHt5BH8bWIlDxuv3TISISX5ferVSXc/i9bYN44gpZ
-         Cbi9lDLBRbY4oUjndm6hMFBRk2Czi2syIagntR7kn2Y2Ivi3COvu8V8xJOJItrHTrNq3
-         Rmtg==
-X-Gm-Message-State: AOJu0YzvLU8aOImthDkgumsWQRxo2TSy5S7Nvxu2xg/W7csrCZFFvOI1
-	GAiK8wSLlNiVZJOrjYJTQWYIMpYwFYd44Ma+wgvcBNzG/bL7fWr0/ZGz+ijI
-X-Gm-Gg: ASbGncuqubxGqSV++xJscBNVp9J38Oxp9LWNBvAS5S/puTOgaB24ho6WZ9gMYvqZuKp
-	/rUlz6vAevP3cf2jwG77puDb4a1ocNhGU8L2nL8TxzVQmQAZSI5myYO0iQhlUrCPNYZUxUiLOp4
-	T/SZw20KA1LclKiu1m3CenlGe7oZhqATYzs6o8BjXzHns/ORTQgewzljze/ThD0ENiLT7W7VTa5
-	XuHRegDtsC/tTbFyY+f9deBu+7yU8sEU59Xx8toFdcL25rYaDmGxPoDTHyzuei08BNC83k+HDaV
-	7M1L7NFnsXMml9geeb1b3n/MN/wqHionLhP4OkMT98JTNmjI9m8HWZwi27UPt6aUGlCPM1iVKVQ
-	xY6vKN749cj1lKMLleKG2kueWK2PV2ZwZ4uUugg==
-X-Google-Smtp-Source: AGHT+IHnDhst9XG73Ye9yEhWnD5faVamk84UQyQexARnv89VG0xwByyDP4ZALlmIBLHvI8rvc1OZAQ==
-X-Received: by 2002:a05:6000:2288:b0:3a0:9f24:774d with SMTP id ffacd0b85a97d-3a0b4a19227mr2872570f8f.45.1746617520867;
-        Wed, 07 May 2025 04:32:00 -0700 (PDT)
-Received: from mail.gmail.com (2a01cb0889497e0081c477e20d988853.ipv6.abo.wanadoo.fr. [2a01:cb08:8949:7e00:81c4:77e2:d98:8853])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-441d4415995sm28780965e9.39.2025.05.07.04.31.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 May 2025 04:31:59 -0700 (PDT)
-Date: Wed, 7 May 2025 13:31:58 +0200
-From: Paul Chaignon <paul.chaignon@gmail.com>
-To: netdev@vger.kernel.org
-Cc: steffen.klassert@secunet.com, fw@strlen.de, pabeni@redhat.com,
-	kuba@kernel.org, Louis DeLosSantos <louis.delos.devel@gmail.com>
-Subject: [PATCH net] xfrm: Sanitize marks before insert
-Message-ID: <aBtErrG9y1Fb-_wq@mail.gmail.com>
+	s=arc-20240116; t=1746618158; c=relaxed/simple;
+	bh=/Bh3jW1bNzFgkJnbT2NX6ZtY9kjOWTe3mvKAmdAXJ4Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ISMXsWhj7sT648CiRbJFR9h1a1h/JI2sqMdOEyoAGUmJP6FVonwdYOsnCGX2yam6I6jaOSa05AGMTJiOBr8PujI/ai4KqqXGL/eHNZO+s4v3QmpRRdj+p75cCoBTzLw3r8E0Dvcg15cFZYQtkBJ1Q/5RVjxdW3emqMz2OZDWdX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=0Vs0EHE2; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=yIpHJvFt; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=hBp9QEAI; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=rn7ktXyD; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 620051F393;
+	Wed,  7 May 2025 11:42:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1746618154; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fcYaw+phsHmb4CGjsUuKwwWNlP8Li19pE0M34m/c9G0=;
+	b=0Vs0EHE244sqvREDBAkoVSSnEa9OI5gy5G0DfJgtPF4OukOQgCxxgqJ3RdutiCUvimU29o
+	WrBt7QHlNbRIFH60nR6D9OOLczkLwspzoyPK4gY5wJo1A6V9jN0ZUuaoP8qYe/9Vuqy+uf
+	213Ap+emco6ovEzha7P3pDX3kj1FVqw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1746618154;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fcYaw+phsHmb4CGjsUuKwwWNlP8Li19pE0M34m/c9G0=;
+	b=yIpHJvFtWUUasSt0l91z4u3dP3B5HxWS5hllAtCM9xkgJvaBCWFuw86276sWka5uayhoFA
+	jqtUdZph2o1TI4BQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=hBp9QEAI;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=rn7ktXyD
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1746618153; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fcYaw+phsHmb4CGjsUuKwwWNlP8Li19pE0M34m/c9G0=;
+	b=hBp9QEAIcq4vHt5+ICzOYvdzia4ggsVcKpscnwcNIs2eoiNFmPaS0V1Zro+1Ba6Gk5CcDg
+	Of6NAIYpzg552hdPaq9MXIS4yYZXgc0JAUvUaJQdZL97YLM6xAqoZJP7MItRmXQVcD+16E
+	rJtw0aq/cW/HwOIozKxCvh4UawHD3rc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1746618153;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fcYaw+phsHmb4CGjsUuKwwWNlP8Li19pE0M34m/c9G0=;
+	b=rn7ktXyD+voIbvaXlQd7Ie8eb1CRs2GRi+ZNfzpG7Kbn0sYISqGp1QSpPVPcY2vZuMj2rL
+	05T1c5z1ZdmsI5AQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 493DD13882;
+	Wed,  7 May 2025 11:42:33 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id cheRESlHG2iqIwAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Wed, 07 May 2025 11:42:33 +0000
+Message-ID: <a2925f3d-9af0-4299-aafa-70dfaf0f3230@suse.cz>
+Date: Wed, 7 May 2025 13:43:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/4] memcg: simplify consume_stock
+To: Shakeel Butt <shakeel.butt@linux.dev>,
+ Andrew Morton <akpm@linux-foundation.org>
+Cc: Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ Muchun Song <muchun.song@linux.dev>, Alexei Starovoitov <ast@kernel.org>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ linux-mm@kvack.org, cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, netdev@vger.kernel.org,
+ Meta kernel team <kernel-team@meta.com>
+References: <20250506225533.2580386-1-shakeel.butt@linux.dev>
+ <20250506225533.2580386-2-shakeel.butt@linux.dev>
+From: Vlastimil Babka <vbabka@suse.cz>
+Content-Language: en-US
+In-Reply-To: <20250506225533.2580386-2-shakeel.butt@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: 620051F393
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-3.51 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.cz:email,suse.cz:mid,suse.cz:dkim,linux.dev:email];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from]
+X-Spam-Score: -3.51
 
-Prior to this patch, the mark is sanitized (applying the state's mask to
-the state's value) only on inserts when checking if a conflicting XFRM
-state or policy exists.
+On 5/7/25 12:55 AM, Shakeel Butt wrote:
+> The consume_stock() does not need to check gfp_mask for spinning and can
+> simply trylock the local lock to decide to proceed or fail. No need to
+> spin at all for local lock.
+> 
+> One of the concern raised was that on PREEMPT_RT kernels, this trylock
+> can fail more often due to tasks having lock_lock can be preempted. This
+> can potentially cause the task which have preempted the task having the
+> local_lock to take the slow path of memcg charging.
+> 
+> However this behavior will only impact the performance if memcg charging
+> slowpath is worse than two context switches and possibly scheduling
+> delay behavior of current code. From the network intensive workload
+> experiment it does not seem like the case.
+> 
+> We ran varying number of netperf clients in different cgroups on a 72 CPU
+> machine for PREEMPT_RT config.
+> 
+>  $ netserver -6
+>  $ netperf -6 -H ::1 -l 60 -t TCP_SENDFILE -- -m 10K
+> 
+> number of clients | Without series | With series
+>   6               | 38559.1 Mbps   | 38652.6 Mbps
+>   12              | 37388.8 Mbps   | 37560.1 Mbps
+>   18              | 30707.5 Mbps   | 31378.3 Mbps
+>   24              | 25908.4 Mbps   | 26423.9 Mbps
+>   30              | 22347.7 Mbps   | 22326.5 Mbps
+>   36              | 20235.1 Mbps   | 20165.0 Mbps
+> 
+> We don't see any significant performance difference for the network
+> intensive workload with this series.
+> 
+> Signed-off-by: Shakeel Butt <shakeel.butt@linux.dev>
 
-We discovered in Cilium that this same sanitization does not occur
-in the hot-path __xfrm_state_lookup. In the hot-path, the sk_buff's mark
-is simply compared to the state's value:
-
-    if ((mark & x->mark.m) != x->mark.v)
-        continue;
-
-Therefore, users can define unsanitized marks (ex. 0xf42/0xf00) which will
-never match any packet.
-
-This commit updates __xfrm_state_insert and xfrm_policy_insert to store
-the sanitized marks, thus removing this footgun.
-
-This has the side effect of changing the ip output, as the
-returned mark will have the mask applied to it when printed.
-
-Fixes: 3d6acfa7641f ("xfrm: SA lookups with mark")
-Signed-off-by: Paul Chaignon <paul.chaignon@gmail.com>
-Signed-off-by: Louis DeLosSantos <louis.delos.devel@gmail.com>
-Co-developed-by: Louis DeLosSantos <louis.delos.devel@gmail.com>
----
- net/xfrm/xfrm_policy.c | 3 +++
- net/xfrm/xfrm_state.c  | 3 +++
- 2 files changed, 6 insertions(+)
-
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index 143ac3aa7537..f4bad8c895d6 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -1581,6 +1581,9 @@ int xfrm_policy_insert(int dir, struct xfrm_policy *policy, int excl)
- 	struct xfrm_policy *delpol;
- 	struct hlist_head *chain;
- 
-+	/* Sanitize mark before store */
-+	policy->mark.v &= policy->mark.m;
-+
- 	spin_lock_bh(&net->xfrm.xfrm_policy_lock);
- 	chain = policy_hash_bysel(net, &policy->selector, policy->family, dir);
- 	if (chain)
-diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 2f57dabcc70b..07fe8e5daa32 100644
---- a/net/xfrm/xfrm_state.c
-+++ b/net/xfrm/xfrm_state.c
-@@ -1718,6 +1718,9 @@ static void __xfrm_state_insert(struct xfrm_state *x)
- 
- 	list_add(&x->km.all, &net->xfrm.state_all);
- 
-+	/* Sanitize mark before store */
-+	x->mark.v &= x->mark.m;
-+
- 	h = xfrm_dst_hash(net, &x->id.daddr, &x->props.saddr,
- 			  x->props.reqid, x->props.family);
- 	XFRM_STATE_INSERT(bydst, &x->bydst, net->xfrm.state_bydst + h,
--- 
-2.43.0
+Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
 
 
