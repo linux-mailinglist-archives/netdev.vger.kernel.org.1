@@ -1,308 +1,157 @@
-Return-Path: <netdev+bounces-188547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188548-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D5D5AAD481
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 06:36:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 24C2FAAD4A2
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 06:56:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9317D1BC841D
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 04:36:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4652C1BA719F
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 04:56:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59E251DDC1E;
-	Wed,  7 May 2025 04:36:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D95C1D8E07;
+	Wed,  7 May 2025 04:55:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mxyBNUuX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iCBYDu8o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93FBC1DD88F
-	for <netdev@vger.kernel.org>; Wed,  7 May 2025 04:36:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5EA71CCB4B
+	for <netdev@vger.kernel.org>; Wed,  7 May 2025 04:55:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746592584; cv=none; b=cXf1LFCRVyob7YSGOcvtT/jEHnslnho+L9PgmjQnA4e2m93yEHDxro6I50GuJHO4YyFMNqbqEE6ZEfAoJkVGlkEe54VUdxegq9tTCjDTYSBl91lCMYgMCl5PjJ5OReXg3OiaA4Iq40xMTFpPB9VW4lVmN46nvpwioIee6Ba/LGk=
+	t=1746593759; cv=none; b=LjZKf0P0b/cOf0GNMOOSeJ6DCLuAldMGyD/qs6EebgEoHIhhGQbfwpARqngg//PySDvPxsz4W8U8d/UsCgBApNR002qPntfLBUNZI1ykaBnMpFZDm5ymaTprcl79l+YL3KWmA7vpXATmsPhsDLy2BMDka1PY/RBg1KOxUKztk60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746592584; c=relaxed/simple;
-	bh=SUQJwDyDelSjBYDisagH/CamsupKCyZTgx0Y0otYo1I=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=cHpOl7hGdQqfRdE6vetuj8fcHM5EDYVjNrR4QRp1bh+PX/UQdj9j9vBQYaaP4pNsJFVORWZESUiZgss6rpLbiio3Xf7L8gFZPQIYIppuCi4Q1UsA0chUsEee1CgNcqvRIKn36Lk6LYvptQx77/xCIkEpRSnNkVUyCnC2rZMzg2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mxyBNUuX; arc=none smtp.client-ip=209.85.210.178
+	s=arc-20240116; t=1746593759; c=relaxed/simple;
+	bh=1r1xSJkLVHQf0qBoxkgFF271MkROdUBJRavtLRhm4wQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TWJIMBppjYmEzxzQ4zO4H7R7176+Y3phOJriWxJPbYAFo/vzL9kF0df9JDs9Ww/K11FAWe4I5UihpZd2aVHk3oxJTvW/aoU/ujROQE7SMCZuWIiK6IGXhU0GPSXtgzQgUERe8Z+R8hL8ivA/TsJ1hXNHPD7xZy3i4lJfxzm/ieQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iCBYDu8o; arc=none smtp.client-ip=209.85.208.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7403f3ece96so8520680b3a.0
-        for <netdev@vger.kernel.org>; Tue, 06 May 2025 21:36:21 -0700 (PDT)
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5fbf29d0ff1so257427a12.0
+        for <netdev@vger.kernel.org>; Tue, 06 May 2025 21:55:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746592580; x=1747197380; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1746593756; x=1747198556; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZwudsHfxychSdk/ic8x+LNI6PSyH0BBqCifn8QiznO4=;
-        b=mxyBNUuXQlG1mLVWORom0Jui0jCwWcz+eY4FogHfx2mHAwBOYZqsElHvpmVkuzKZri
-         L+OzuGIPFThEKKj1SDE1N73O1/mGGq7s57pE5E1gXT7mDWO4zu/C6d/XYPr+00wJORiG
-         NWd2KgqP9mI1wNI3RXq68mVIUDMYC5V1SL4AvIf0/M3CfnhFMLIBT4c0JqZ3jttTg6p4
-         dtsiZKFWGfmucfPqQ11wnYV1C974oVNrXqnCuUr51RdZZOG4tQH0z2A8eeYNHZh1Pk1G
-         YmQ+q9W5JuTODo6dTXYrd9dybEHD+qxj6f6ODJ4nGmsw2Xfqk35wTg1YsyMGvnAelJmQ
-         P3/w==
+        bh=PIXb84AI6REv64D0Hg8TlF/Rz/6umpvzbQF067/KzT0=;
+        b=iCBYDu8oQsl5oZ16QO3ddtf16Y0Ea4ZSP+qc8iE2d+9YSwGn1awLrZx+/IccdJ+2hU
+         g/IVHh2bklN4zdJq+SXK7y7gsPpH8UX89/AEhqosheA6DflxDvDiDdvXu52CfGGfOnFl
+         CpG0/+gqqgI77UpVP06pVvdaxqTT4nOlOSl5xgAVe3HVR3Bx9MZcrhWjQeKZbq3v76Xj
+         cpBM7SiImpXs0s9veTHA9vflwksA2LwRerXrEABW+IVFltum/yY6yt5NXTEf24p1MjN0
+         RBgm8HI6eITLYJYJT2Mye4kMg2CO7DCfvXtCHppROk611q3Ahe/9ew0IwmRVZ43eyNFI
+         QiyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746592580; x=1747197380;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1746593756; x=1747198556;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZwudsHfxychSdk/ic8x+LNI6PSyH0BBqCifn8QiznO4=;
-        b=MUdwgeeAbi50FzyOtBA6LI4GexlPXrYHdZUbUv5vnOMgInKWcDMsypxKSh3og5alon
-         TNYJxVD/LSX04ZMJb6+Zrwe3UuIYszwy4gvs18AUtLZvJcHfXXuWPpKOTWbOHUX1g5Sp
-         y+e+1KIL18IMynys7/uKyNwlMl/3hhigl5zmpjtgUcW4jMrYYWuYBUbgSzzF0JLipFrT
-         J2WDFPPXxysw3OJO4rZ+jZyqwpRjg/OIRDntFytm99Fgn5o6enWCzgQ7y8iJNiDQ8s7Y
-         VYE7O9okUjRGJI+TvNCTaS2DOHjCjfcAYz3k0oTho//VMYUE0ZOEU2fOSVxyWtyQUaKB
-         QYcQ==
-X-Gm-Message-State: AOJu0YybKIBMs2A6gQINQuiAZudfLOOxYJajbIHkbISOIC2wzmKE3NZf
-	kNODCfDtwCB9oeBKqy7Utj1fQAzgaiGQd1v7aDX7ZwqMpRw9PYtVoVmwjN9Z
-X-Gm-Gg: ASbGncsy+O6dHeh3hxIuZKvU355RU0VziYk4OpS+VgxawsvoNI10BUgg+9UHnIL65mT
-	1mjLYes62wrXpeMMJd8PhKD3MyGEFK4QL9X+W54LQv0nJtcIJMRemud9WP2wxve/G4CEXEHirhS
-	kvHjIYsWgA+WNXd8O1NCLX2TDDkO6RdaC4ZVk0uoDMDtaBGywbotRxlm+3SBMgE9Xbmji+XtAm8
-	78BQ6aOBQH60JFpr+1VIH5YjHssQKGPCga5kITjnimez9/zyyhQzdqkgG7soDFtAh4CY6mlnbSW
-	n7lppqs6NBZ5Ni3rAQj3YUSp7gCQqSFpVqDPrRmiAQcZUg==
-X-Google-Smtp-Source: AGHT+IENPnYqpguor7mmuzWNefL4zrVxtHBLtsPA+6k9Nr74p09xNaYCtoGIz39qGPNv1UxgVZF4ZA==
-X-Received: by 2002:a05:6a00:aa8d:b0:740:9a42:a356 with SMTP id d2e1a72fcca58-7409cf1b565mr2249031b3a.11.1746592579944;
-        Tue, 06 May 2025 21:36:19 -0700 (PDT)
-Received: from pop-os.. ([2601:647:6881:9060:734b:a7b9:d649:5d9e])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7405902109dsm10350720b3a.106.2025.05.06.21.36.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 May 2025 21:36:19 -0700 (PDT)
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: netdev@vger.kernel.org
-Cc: jiri@resnulli.us,
-	jhs@mojatatu.com,
-	willsroot@protonmail.com,
-	savy@syst3mfailure.io,
-	Cong Wang <xiyou.wangcong@gmail.com>
-Subject: [Patch net v2 2/2] selftests/tc-testing: Add qdisc limit trimming tests
-Date: Tue,  6 May 2025 21:35:59 -0700
-Message-Id: <20250507043559.130022-3-xiyou.wangcong@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250507043559.130022-1-xiyou.wangcong@gmail.com>
-References: <20250507043559.130022-1-xiyou.wangcong@gmail.com>
+        bh=PIXb84AI6REv64D0Hg8TlF/Rz/6umpvzbQF067/KzT0=;
+        b=GBEIkzpaEF199L4aLegit/WHw4MW14rPHg5QZNkrvnzzj593WsDja2qPtUsjfax0Lm
+         jaTREYRF37wxNnbA2GB1FQaC2x8HRsLq36xviC/UyKYwV+AHFIhWdjYaShruGXeyhUu8
+         2+IlmPSJ5/jsAo9WxWyWifTUWORoQQAyDgClePNgefOMvgcH+o9EbsIGoKIpJVz4vMA8
+         oquqE/X+eklfr1m+r4pW0K9R6aEM6BFEova0xUFHUDhzDYOKT5M0UJQgviQNj+LDRi8d
+         KIM3+MN44McldUjQfngBvDkptiiBQ9aKkoOGIxyStANWMrgjbTHYNlcSBKGO4lmd2F+s
+         VrMA==
+X-Forwarded-Encrypted: i=1; AJvYcCUvD007cLJvMTEnb/rv+7Pzg4MRMl/NogRW6RRqnbcmEXDGr+NHdPZNtTLdatqsq9qCLIcYMC8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1f1TEaehG3QXU2SWBMVzyC7h6DHE8rq2NuAGbiqTSK38TgE5L
+	bnrX76R+pC2RTJ8+R3sDymSQOY3IXfoDrAtu/ksMnjRbSDUVxqp4gfAGbGkrtJxhuw1WImY3atN
+	BpFvo8jhEZ4uX2QxZTRxShojvNPg=
+X-Gm-Gg: ASbGncvLh79oivWwOb5P73n3Q5PMQ6Lj7bjUVAjbuKgGQys/RHt9bEUbPILJFkpioxN
+	ieUcBno+rOAOv3EUjhh9jeF95vKexBoUOq0/ATZQEsQIVpUpLp16ECvUyKrg0qIPqvhI7azSdqH
+	kMbNmdtcMPwKnE8vUoarrXjSg=
+X-Google-Smtp-Source: AGHT+IF0JghBmq2QnJYhLMxmt3Qfy2ByU/N6BAqNldbrHYUAcOtGLbUDtlJUxK+dbbYT32LwlwB112c29eItL2EUMb0=
+X-Received: by 2002:a05:6402:2348:b0:5f7:f52e:ec93 with SMTP id
+ 4fb4d7f45d1cf-5fbe9f6a37cmr1259482a12.31.1746593755722; Tue, 06 May 2025
+ 21:55:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250506140858.2660441-1-ap420073@gmail.com> <20250506195526.2ab7c15b@kernel.org>
+In-Reply-To: <20250506195526.2ab7c15b@kernel.org>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Wed, 7 May 2025 13:55:44 +0900
+X-Gm-Features: ATxdqUHXy8izfvK4qlrOa-P9UAWmOGKFQnwqDebpDDpI423pq0VyNN-PtbD9tvE
+Message-ID: <CAMArcTUx5cK2kh2M8BirtQRG5Qt+ArwZ_a=xwi_bTHyKJ7E+og@mail.gmail.com>
+Subject: Re: [PATCH net v2] net: devmem: fix kernel panic when socket close
+ after module unload
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
+	andrew+netdev@lunn.ch, horms@kernel.org, almasrymina@google.com, 
+	sdf@fomichev.me, netdev@vger.kernel.org, asml.silence@gmail.com, 
+	dw@davidwei.uk, skhawaja@google.com, willemb@google.com, jdamato@fastly.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Added new test cases for FQ, FQ_CODEL, FQ_PIE, and HHF qdiscs to verify queue
-trimming behavior when the qdisc limit is dynamically reduced.
+On Wed, May 7, 2025 at 11:55=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Tue,  6 May 2025 14:08:58 +0000 Taehee Yoo wrote:
+> > +     mutex_lock(&binding->priv->lock);
+> >       xa_for_each(&binding->bound_rxqs, xa_idx, bound_rxq) {
+> >               if (bound_rxq =3D=3D rxq) {
+> >                       xa_erase(&binding->bound_rxqs, xa_idx);
+> > +                     if (xa_empty(&binding->bound_rxqs))
+> > +                             binding->dev =3D NULL;
+> >                       break;
+> >               }
+> >       }
+> > +     mutex_unlock(&binding->priv->lock);
+>
+> Why do we need to lock the socket around the while loop?
+> binding->bound_rxqs have its own lock, and add/del are also
+> protected by the netdev instance lock. The only thing we
+> must lock is the write to binding->dev I think ?
 
-Each test injects packets, reduces the qdisc limit, and checks that the new
-limit is enforced. This is still best effort since timing qdisc backlog
-is not easy.
+I intended to protect both binding->bound_rxq and binding->dev.
+But you're right, xarray API internally acquires a lock.
+Only binding->dev is protected by socket lock here.
 
-Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
----
- .../tc-testing/tc-tests/qdiscs/codel.json     | 24 +++++++++++++++++++
- .../tc-testing/tc-tests/qdiscs/fq.json        | 22 +++++++++++++++++
- .../tc-testing/tc-tests/qdiscs/fq_codel.json  | 22 +++++++++++++++++
- .../tc-testing/tc-tests/qdiscs/fq_pie.json    | 22 +++++++++++++++++
- .../tc-testing/tc-tests/qdiscs/hhf.json       | 22 +++++++++++++++++
- .../tc-testing/tc-tests/qdiscs/pie.json       | 24 +++++++++++++++++++
- 6 files changed, 136 insertions(+)
- create mode 100644 tools/testing/selftests/tc-testing/tc-tests/qdiscs/pie.json
+>
+> Would it be cleaner to move that write and locking to a helper
+> which would live in netdev-genl.c?
 
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/codel.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/codel.json
-index e9469ee71e6f..6d515d0e5ed6 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/codel.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/codel.json
-@@ -189,5 +189,29 @@
-         "teardown": [
-             "$TC qdisc del dev $DUMMY handle 1: root"
-         ]
-+    },
-+    {
-+        "id": "deb1",
-+        "name": "CODEL test qdisc limit trimming",
-+        "category": ["qdisc", "codel"],
-+        "plugins": {
-+            "requires": ["nsPlugin", "scapyPlugin"]
-+        },
-+        "setup": [
-+            "$TC qdisc add dev $DEV1 handle 1: root codel limit 10"
-+        ],
-+        "scapy": [
-+            {
-+                "iface": "$DEV0",
-+                "count": 10,
-+                "packet": "Ether(type=0x800)/IP(src='10.0.0.10',dst='10.0.0.20')/TCP(sport=5000,dport=10)"
-+            }
-+        ],
-+        "cmdUnderTest": "$TC qdisc change dev $DEV1 handle 1: root codel limit 1",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC qdisc show dev $DEV1",
-+        "matchPattern": "qdisc codel 1: root refcnt [0-9]+ limit 1p target 5ms interval 100ms",
-+        "matchCount": "1",
-+        "teardown": ["$TC qdisc del dev $DEV1 handle 1: root"]
-     }
- ]
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fq.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fq.json
-index 3a537b2ec4c9..24faf4e12dfa 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fq.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fq.json
-@@ -377,5 +377,27 @@
-         "teardown": [
-             "$TC qdisc del dev $DUMMY handle 1: root"
-         ]
-+    },
-+    {
-+        "id": "9479",
-+        "name": "FQ test qdisc limit trimming",
-+        "category": ["qdisc", "fq"],
-+        "plugins": {"requires": ["nsPlugin", "scapyPlugin"]},
-+        "setup": [
-+            "$TC qdisc add dev $DEV1 handle 1: root fq limit 10"
-+        ],
-+        "scapy": [
-+            {
-+                "iface": "$DEV0",
-+                "count": 10,
-+                "packet": "Ether(type=0x800)/IP(src='10.0.0.10',dst='10.0.0.20')/TCP(sport=5000,dport=10)"
-+            }
-+        ],
-+        "cmdUnderTest": "$TC qdisc change dev $DEV1 handle 1: root fq limit 1",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC qdisc show dev $DEV1",
-+        "matchPattern": "qdisc fq 1: root refcnt [0-9]+ limit 1p",
-+        "matchCount": "1",
-+        "teardown": ["$TC qdisc del dev $DEV1 handle 1: root"]
-     }
- ]
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fq_codel.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fq_codel.json
-index 9774b1e8801b..4ce62b857fd7 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fq_codel.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fq_codel.json
-@@ -294,5 +294,27 @@
-         "teardown": [
-             "$TC qdisc del dev $DUMMY handle 1: root"
-         ]
-+    },
-+    {
-+        "id": "0436",
-+        "name": "FQ_CODEL test qdisc limit trimming",
-+        "category": ["qdisc", "fq_codel"],
-+        "plugins": {"requires": ["nsPlugin", "scapyPlugin"]},
-+        "setup": [
-+            "$TC qdisc add dev $DEV1 handle 1: root fq_codel limit 10"
-+        ],
-+        "scapy": [
-+            {
-+                "iface": "$DEV0",
-+                "count": 10,
-+                "packet": "Ether(type=0x800)/IP(src='10.0.0.10',dst='10.0.0.20')/TCP(sport=5000,dport=10)"
-+            }
-+        ],
-+        "cmdUnderTest": "$TC qdisc change dev $DEV1 handle 1: root fq_codel limit 1",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC qdisc show dev $DEV1",
-+        "matchPattern": "qdisc fq_codel 1: root refcnt [0-9]+ limit 1p flows 1024 quantum.*target 5ms interval 100ms memory_limit 32Mb ecn drop_batch 64",
-+        "matchCount": "1",
-+        "teardown": ["$TC qdisc del dev $DEV1 handle 1: root"]
-     }
- ]
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fq_pie.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fq_pie.json
-index d012d88d67fe..229fe1bf4a90 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fq_pie.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fq_pie.json
-@@ -18,5 +18,27 @@
-         "matchCount": "1",
-         "teardown": [
-         ]
-+    },
-+    {
-+        "id": "83bf",
-+        "name": "FQ_PIE test qdisc limit trimming",
-+        "category": ["qdisc", "fq_pie"],
-+        "plugins": {"requires": ["nsPlugin", "scapyPlugin"]},
-+        "setup": [
-+            "$TC qdisc add dev $DEV1 handle 1: root fq_pie limit 10"
-+        ],
-+        "scapy": [
-+            {
-+                "iface": "$DEV0",
-+                "count": 10,
-+                "packet": "Ether(type=0x800)/IP(src='10.0.0.10',dst='10.0.0.20')/TCP(sport=5000,dport=10)"
-+            }
-+        ],
-+        "cmdUnderTest": "$TC qdisc change dev $DEV1 handle 1: root fq_pie limit 1",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC qdisc show dev $DEV1",
-+        "matchPattern": "qdisc fq_pie 1: root refcnt [0-9]+ limit 1p",
-+        "matchCount": "1",
-+        "teardown": ["$TC qdisc del dev $DEV1 handle 1: root"]
-     }
- ]
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/hhf.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/hhf.json
-index dbef5474b26b..0ca19fac54a5 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/hhf.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/hhf.json
-@@ -188,5 +188,27 @@
-         "teardown": [
-             "$TC qdisc del dev $DUMMY handle 1: root"
-         ]
-+    },
-+    {
-+        "id": "385f",
-+        "name": "HHF test qdisc limit trimming",
-+        "category": ["qdisc", "hhf"],
-+        "plugins": {"requires": ["nsPlugin", "scapyPlugin"]},
-+        "setup": [
-+            "$TC qdisc add dev $DEV1 handle 1: root hhf limit 10"
-+        ],
-+        "scapy": [
-+            {
-+                "iface": "$DEV0",
-+                "count": 10,
-+                "packet": "Ether(type=0x800)/IP(src='10.0.0.10',dst='10.0.0.20')/TCP(sport=5000,dport=10)"
-+            }
-+        ],
-+        "cmdUnderTest": "$TC qdisc change dev $DEV1 handle 1: root hhf limit 1",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC qdisc show dev $DEV1",
-+        "matchPattern": "qdisc hhf 1: root refcnt [0-9]+ limit 1p.*hh_limit 2048 reset_timeout 40ms admit_bytes 128Kb evict_timeout 1s non_hh_weight 2",
-+        "matchCount": "1",
-+        "teardown": ["$TC qdisc del dev $DEV1 handle 1: root"]
-     }
- ]
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/pie.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/pie.json
-new file mode 100644
-index 000000000000..1a98b66e8030
---- /dev/null
-+++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/pie.json
-@@ -0,0 +1,24 @@
-+[
-+    {
-+        "id": "6158",
-+        "name": "PIE test qdisc limit trimming",
-+        "category": ["qdisc", "pie"],
-+        "plugins": {"requires": ["nsPlugin", "scapyPlugin"]},
-+        "setup": [
-+            "$TC qdisc add dev $DEV1 handle 1: root pie limit 10"
-+        ],
-+        "scapy": [
-+            {
-+                "iface": "$DEV0",
-+                "count": 10,
-+                "packet": "Ether(type=0x800)/IP(src='10.0.0.10',dst='10.0.0.20')/TCP(sport=5000,dport=10)"
-+            }
-+        ],
-+        "cmdUnderTest": "$TC qdisc change dev $DEV1 handle 1: root pie limit 1",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC qdisc show dev $DEV1",
-+        "matchPattern": "qdisc pie 1: root refcnt [0-9]+ limit 1p",
-+        "matchCount": "1",
-+        "teardown": ["$TC qdisc del dev $DEV1 handle 1: root"]
-+    }
-+]
--- 
-2.34.1
+You mean that the socket lock is not required to cover whole loop
+because bound_rxq is safe itself.
+So, it acquires a socket lock only for setting binding->dev to NULL,
+right? It makes sense to me.
+Making a helper in netdev-genl.c would be good, I will make it.
 
+>
+> Similarly could we move:
+>
+>         if (binding->list.next)
+>                 list_del(&binding->list);
+>
+> from net_devmem_unbind_dmabuf() to its callers?
+> The asymmetry of list_add() being directly in netdev_nl_bind_rx_doit()
+> not net_devmem_bind_dmabuf(), and list_del() being in
+> net_devmem_unbind_dmabuf() always confuses me.
+
+I agree with you. I will change it in the next version, too.
+
+>
+> >+      mutex_lock(&priv->lock);
+> >+      binding =3D net_devmem_bind_dmabuf(netdev, dmabuf_fd, priv, info-=
+>extack);
+>
+> We shouldn't have to lock the net_devmem_bind_dmabuf(), we have the
+> instance lock so the device can't go away, and we haven't listed
+> the binding on the socket, yet. Locking around list_add() should
+> be enough?
+
+I agree with it.
+If binding is not listed, it doesn't have to be protected by lock.
+As you mentioned, I will try doing just locking around list_add()
+in the netdev_nl_bind_rx_doit().
+
+Thanks a lot!
+Taehee Yoo
 
