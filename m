@@ -1,225 +1,125 @@
-Return-Path: <netdev+bounces-188797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98659AAEE82
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 00:10:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4710AAAEEA5
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 00:20:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F34994E1E40
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 22:10:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DEA11C06F17
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 22:20:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACD4E290DA8;
-	Wed,  7 May 2025 22:10:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A014290DAE;
+	Wed,  7 May 2025 22:20:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="GqsA1WJ6"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="SsIsgnu+";
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="T/vi+AoY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC744290D8E
-	for <netdev@vger.kernel.org>; Wed,  7 May 2025 22:10:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E426928C842;
+	Wed,  7 May 2025 22:20:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746655820; cv=none; b=n0QbdIARqXmQiw2jUW24bzWz31WOe79Qj0ypI3lJPQLh2ocG02n6iSkP+cZqPi8m5rtIma7+2WDHxTokZ4KUZMJq5FwMmVW1DbwVv4M7J/QZYDyynLvDOs5K7Ay59tsm1Gx4dQddFaikE4Ee2l4qgIk03LKfC9kjFk1i2fuM1ls=
+	t=1746656409; cv=none; b=fbOCsYxoDhLqL5jjHhPZBQ0cyKkQguRAnsuUuJ8R27ZwacoG6kkUYCUrSUjvVwhQIjE60w8erbZjiYJWQ+hHQ+E7i/KwzLaVClfMFZ8jtx2W0rtXDbypERxLSgbdv0lqlwyQPeEQtfi4k4yflQsSixymi8UJ2i34HsokfvB6AyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746655820; c=relaxed/simple;
-	bh=dYo9vKzMaOxJPsZQzZ1VgsSgO28N/5CS+Q0P9XJ9lsk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QO1b68pVW3/hgwgYEvum1z9YvxSC2AEdbONXbVA1xgVwHRVeNAqND+JnUec6HyJDDkHXxk+E41v88CnuzoadmcJH0pJOV4GyOodr22oOCLcXLt4TKpapycalECRLi5F3Z9flwL/K3rzDpNOVsunPdf12npSqw44SN/X6tgUASyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=GqsA1WJ6; arc=none smtp.client-ip=209.85.128.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-70a2970cb70so3811297b3.0
-        for <netdev@vger.kernel.org>; Wed, 07 May 2025 15:10:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1746655817; x=1747260617; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wIiUIWqYEojG1+/v0+6p5gp77rijVYSqMC0AzSN7lbc=;
-        b=GqsA1WJ6PS9iRQmZn3hhsGc7s6WkiSTFhvG9wcx4JpsRJFyhBpblYpzmUTF0ZjuIKU
-         A2jQIZAcaF7WR/rPStJx1kjs6xWFIPhUFeBpu6fmW+kb/gT+72vV0y6FjhnFmDkznZvM
-         7H7/QdM6SovoqDrjHTE1GdJXP1ChjebX832lAYptiLg37t5H4o0mdIsz/ZQg9IFUjHeF
-         7+JQOdL4e81gVUv9mo7cKn8HQ7GWBn9cWMdwVnGlq5qoTeX2EvpuxeotchBB3NJmkBwb
-         rXdqseHK5HlUKJ/lVLbQOXCJexqdCJ5Bvuu/N7MI+Hx477SHUa6Ui6bMHtIWS1VjlVP2
-         6nsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746655817; x=1747260617;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wIiUIWqYEojG1+/v0+6p5gp77rijVYSqMC0AzSN7lbc=;
-        b=MboDcXDp5POm0nNT4fKIXYcU7cnW1npp8H8rT9XHOviTR4YqFB2jURo4NWhdQUnFU5
-         A6WgdTXhigedlWMeLXnN3JVjLEOfPOQ+h1nkIs70P4tSVUsnR6MQDYZJ5etnruMt3bpt
-         aPPX2YWeAzRiR0ZmJojqPhner1/tUtzBBhDQi4qVEdPHYI6BowjfATLJ+iZL1VQ87ZDU
-         juUYPl1+AQBFwDc3zWT3kG2BRjlPsm/mZu7r1HH3cie4ZhKSKOGvdWD6ffB9ShfUGjk8
-         H2BrhmEyxmQwkLZvfmTy4mAg/p+rWmz8Hubq8ss6d695jGD06jfsFcqKMJluK8/MVaNU
-         wB1g==
-X-Forwarded-Encrypted: i=1; AJvYcCX+AHiNmbwyM1qLj8N+dzpszdHf6QPqSXhxU4KIgG28K2+755VC9mmqej/E8f3ZO6aZq/Xng9E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBZLFnLWTlr+6XdI0ATf5Lhikpvb+Fr8G2VaaEN/rSLr+uAN6x
-	zzWnLkUUyZUJHCi/tXpE1kgxyfXzSeA6PddYWaEqE+Ar5cybu2rtRjIQ/1C3WXtRB338lCwope1
-	MKipLlAKePcGAf9aThlXfit6PfURRog90zfbv
-X-Gm-Gg: ASbGncsM9PA+qAY92IWNG/u+Zgf/Mqzz02ckkkAOb1MrZH/XfQr0fROt1X1hdJM147E
-	6Mz3RakbFF0HwAOVvaFujWs4YzieLEUQMmwXe0nq4zcWARMGPa23rUnGaU1Boh92z+TMcen5cAT
-	Rj3V1TdVhCqOmBJF5c1tV9pw==
-X-Google-Smtp-Source: AGHT+IFwYzZ6ciK23Fz2b2pczQZhzZY0A6NhOxfiU/PHNVse4rkWHp1PgMap3HM1k4CDsvnj/47dt1VxNlD3Nz4tgQ4=
-X-Received: by 2002:a05:690c:4988:b0:6f9:ad48:a3c7 with SMTP id
- 00721157ae682-70a2cf202f3mr19770607b3.21.1746655816808; Wed, 07 May 2025
- 15:10:16 -0700 (PDT)
+	s=arc-20240116; t=1746656409; c=relaxed/simple;
+	bh=3vhsKSoxBtrgsdtI3vEK+p48SwPOyqIo6kmaP7qy7jg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ChHZYI5hxID4HG3rfSBQAM/GXTXaersXs6nl9cWG3rkSUdQnHInw6sI6wrkkAFdUnIvG8VikFbQ/NsvRVmRUmFeGJRt5+EZQzUe30Pvx9jI1QrxJGVoZAG8DbiX8iI+qssVqXle36tx1qDihAsvW1KVayvnvcduHa8/J6s4SVBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=SsIsgnu+; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=T/vi+AoY; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: by mail.netfilter.org (Postfix, from userid 109)
+	id D03CA602CF; Thu,  8 May 2025 00:19:58 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1746656398;
+	bh=D6Yez+xoBcGpuIjAGVDKDFIugAZYUZ+hlcAH0bP1jfk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=SsIsgnu+u2Wa5zXnXzf7rPoZJ15p1KMWkwdAX0GGIVC1dvwV++vHSAwh7mrjxY5w0
+	 kdJMYWPmGXTAPEaq/YxyfqlA2P3m5NhkiEenUQMx3oZUpvgmCJtdyqwGqchtxvDURH
+	 InKqrEAxZ1gZPXy+U0NrQA63YqmaOscipae1izEpmdEAGsbw6Hw79fCSmqOEhdPimm
+	 gbdQ81r+5xVxw2agZLD/QCL/vfvVAzu9FTGcs1pKrDAl8+ahoG1idvk4R9NylZ6QNT
+	 /0TyATxhWBDGGvCH8DLhMm0Cq5UX2IYsontAgPfCgYDd3jXHEupOvUOFfJgAahnY6Y
+	 uXsPKiB3dIVnw==
+X-Spam-Level: 
+Received: from localhost.localdomain (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id D6495602C4;
+	Thu,  8 May 2025 00:19:56 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1746656397;
+	bh=D6Yez+xoBcGpuIjAGVDKDFIugAZYUZ+hlcAH0bP1jfk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=T/vi+AoYr9D+Xd9RyqEsezQhsm3c9Bnmo1dQfH4qP/bqT8ION1oogkq/TkENEmFxO
+	 K5O/kA2YIFLWhFHwdzJc4MasbWmGZh6YrRNekTH3GdNr6ADBvKll0JjfzTBH2viTxU
+	 nWIKjCH0++75tbIMHUDI15mTjIRMVv3jzFCpmyM1FrKKvS6agBUjT2OfTlfWqR7id5
+	 rqUPowh46Fot9FBAln0R72Yi+3/4XzwdKbj5oaUryovQuF2xFSRbKnGhlmwotXnzR3
+	 zDXeQjr7JqQbUg9a8bfCSIWs2uVWHFZiCsH8H+JoAHECnKkfydVsCDfAKCVbDonXJ1
+	 IT51fHZzFg0ZQ==
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de,
+	horms@kernel.org
+Subject: [PATCH net 0/2] Netfilter/IPVS fixes for net
+Date: Thu,  8 May 2025 00:19:50 +0200
+Message-Id: <20250507221952.86505-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250506-zugabe-bezog-f688fbec72d3@brauner> <20250506191817.14620-1-kuniyu@amazon.com>
- <20250507.ohsaiQuoh3uo@digikod.net>
-In-Reply-To: <20250507.ohsaiQuoh3uo@digikod.net>
-From: Paul Moore <paul@paul-moore.com>
-Date: Wed, 7 May 2025 18:10:06 -0400
-X-Gm-Features: ATxdqUHq8EdIoIcW3r6G08_e5ZHNIf6QppZcl2fZN3xKRzQTjRIXJBOvas1ean0
-Message-ID: <CAHC9VhSXU3yPa6QiFtUpqUpmsAeyhN7jLJDFC_rZ=oRZarZijA@mail.gmail.com>
-Subject: Re: [PATCH RFC v3 08/10] net, pidfs, coredump: only allow coredumping
- tasks to connect to coredump socket
-To: =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, brauner@kernel.org, alexander@mihalicyn.com, 
-	bluca@debian.org, daan.j.demeyer@gmail.com, davem@davemloft.net, 
-	david@readahead.eu, edumazet@google.com, horms@kernel.org, jack@suse.cz, 
-	jannh@google.com, kuba@kernel.org, lennart@poettering.net, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, me@yhndnzj.com, 
-	netdev@vger.kernel.org, oleg@redhat.com, pabeni@redhat.com, 
-	viro@zeniv.linux.org.uk, zbyszek@in.waw.pl, 
-	linux-security-module@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, May 7, 2025 at 7:54=E2=80=AFAM Micka=C3=ABl Sala=C3=BCn <mic@digiko=
-d.net> wrote:
-> On Tue, May 06, 2025 at 12:18:12PM -0700, Kuniyuki Iwashima wrote:
-> > From: Christian Brauner <brauner@kernel.org>
-> > Date: Tue, 6 May 2025 10:06:27 +0200
-> > > On Mon, May 05, 2025 at 09:10:28PM +0200, Jann Horn wrote:
-> > > > On Mon, May 5, 2025 at 8:41=E2=80=AFPM Kuniyuki Iwashima <kuniyu@am=
-azon.com> wrote:
-> > > > > From: Christian Brauner <brauner@kernel.org>
-> > > > > Date: Mon, 5 May 2025 16:06:40 +0200
-> > > > > > On Mon, May 05, 2025 at 03:08:07PM +0200, Jann Horn wrote:
-> > > > > > > On Mon, May 5, 2025 at 1:14=E2=80=AFPM Christian Brauner <bra=
-uner@kernel.org> wrote:
-> > > > > > > > Make sure that only tasks that actually coredumped may conn=
-ect to the
-> > > > > > > > coredump socket. This restriction may be loosened later in =
-case
-> > > > > > > > userspace processes would like to use it to generate their =
-own
-> > > > > > > > coredumps. Though it'd be wiser if userspace just exposed a=
- separate
-> > > > > > > > socket for that.
-> > > > > > >
-> > > > > > > This implementation kinda feels a bit fragile to me... I wond=
-er if we
-> > > > > > > could instead have a flag inside the af_unix client socket th=
-at says
-> > > > > > > "this is a special client socket for coredumping".
-> > > > > >
-> > > > > > Should be easily doable with a sock_flag().
-> > > > >
-> > > > > This restriction should be applied by BPF LSM.
-> > > >
-> > > > I think we shouldn't allow random userspace processes to connect to
-> > > > the core dump handling service and provide bogus inputs; that
-> > > > unnecessarily increases the risk that a crafted coredump can be use=
-d
-> > > > to exploit a bug in the service. So I think it makes sense to enfor=
-ce
-> > > > this restriction in the kernel.
-> > > >
-> > > > My understanding is that BPF LSM creates fairly tight coupling betw=
-een
-> > > > userspace and the kernel implementation, and it is kind of unwieldy
-> > > > for userspace. (I imagine the "man 5 core" manpage would get a bit
-> > > > longer and describe more kernel implementation detail if you tried =
-to
-> > > > show how to write a BPF LSM that is capable of detecting unix domai=
-n
-> > > > socket connections to a specific address that are not initiated by
-> > > > core dumping.) I would like to keep it possible to implement core
-> > > > userspace functionality in a best-practice way without needing eBPF=
-.
-> > > >
-> > > > > It's hard to loosen such a default restriction as someone might
-> > > > > argue that's unexpected and regression.
-> > > >
-> > > > If userspace wants to allow other processes to connect to the core
-> > > > dumping service, that's easy to implement - userspace can listen on=
- a
-> > > > separate address that is not subject to these restrictions.
-> > >
-> > > I think Kuniyuki's point is defensible. And I did discuss this with
-> > > Lennart when I wrote the patch and he didn't see a point in preventin=
-g
-> > > other processes from connecting to the core dump socket. He actually
-> > > would like this to be possible because there's some userspace program=
-s
-> > > out there that generate their own coredumps (Python?) and he wanted t=
-hem
-> > > to use the general coredump socket to send them to.
+Hi,
 
-From a security perspective, it seems very reasonable to me that an
-LSM would want to potentially control which processes are allowed to
-bind or connect to the coredump socket.  Assuming that the socket
-creation, bind(), and connect() operations go through all of the
-normal LSM hooks like any other socket that shouldn't be a problem.
-Some LSMs may have challenges with the lack of a filesystem path
-associated with the socket, but abstract sockets are far from a new
-concept and those LSMs should already have a mechanism for dealing
-with such sockets.
+The following patchset contain Netfilter/IPVS fixes for net:
 
-I also want to stress that when we think about LSM controls, we need
-to think in generic terms and not solely on a specific LSM, e.g. BPF.
-It's fine and good to have documentation about how one might use a BPF
-LSM to mitigate access to a coredump socket, but it should be made
-clear in that same documentation that other LSMs may also be enforcing
-access controls on that socket.  Further, and I believe everyone here
-already knows this, but just to be clear, the kernel code should
-definitely not assume either the presence of a specific LSM, or the
-LSM in general.
+1) Fix KMSAN uninit-value in do_output_route4, reported by syzbot.
+   Patch from Julian Anastasov.
 
-> > > I just found it more elegant to simply guarantee that only connection=
-s
-> > > are made to that socket come from coredumping tasks.
-> > >
-> > > But I should note there are two ways to cleanly handle this in
-> > > userspace. I had already mentioned the bpf LSM in the contect of
-> > > rate-limiting in an earlier posting:
-> > >
-> > > (1) complex:
-> > >
-> > >     Use a bpf LSM to intercept the connection request via
-> > >     security_unix_stream_connect() in unix_stream_connect().
-> > >
-> > >     The bpf program can simply check:
-> > >
-> > >     current->signal->core_state
-> > >
-> > >     and reject any connection if it isn't set to NULL.
-> > >
-> > >     The big downside is that bpf (and security) need to be enabled.
-> > >     Neither is guaranteed and there's quite a few users out there tha=
-t
-> > >     don't enable bpf.
->
-> The kernel should indeed always have a minimal security policy in place,
-> LSM can tailored that but we should not assume that a specific LSM with
-> a specific policy is enabled/configured on the system.
+2) ipset hashtable set type breaks up the hashtable into regions of
+   2^10 buckets. Fix the macro that determines the hashtable lock
+   region to protect concurrent updates. From Jozsef Kadlecsik.
 
-None of the LSM mailing lists were CC'd so I haven't seen the full
-thread yet, and haven't had the chance to dig it up on lore, but at
-the very least I would think there should be some basic controls
-around who can bind/receive coredumps.
+Please, pull these changes from:
 
---=20
-paul-moore.com
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-25-05-08
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit 9540984da649d46f699c47f28c68bbd3c9d99e4c:
+
+  Merge tag 'wireless-2025-05-06' of https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless (2025-05-06 19:06:50 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-25-05-08
+
+for you to fetch changes up to 8478a729c0462273188263136880480729e9efca:
+
+  netfilter: ipset: fix region locking in hash types (2025-05-07 23:57:31 +0200)
+
+----------------------------------------------------------------
+netfilter pull request 25-05-08
+
+----------------------------------------------------------------
+Jozsef Kadlecsik (1):
+      netfilter: ipset: fix region locking in hash types
+
+Julian Anastasov (1):
+      ipvs: fix uninit-value for saddr in do_output_route4
+
+ net/netfilter/ipset/ip_set_hash_gen.h |  2 +-
+ net/netfilter/ipvs/ip_vs_xmit.c       | 27 ++++++++-------------------
+ 2 files changed, 9 insertions(+), 20 deletions(-)
 
