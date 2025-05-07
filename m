@@ -1,144 +1,157 @@
-Return-Path: <netdev+bounces-188655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 110FCAAE0E9
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 15:42:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 625B6AAE16C
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 15:53:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC62F3BCA9F
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 13:42:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 035191C27606
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 13:53:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B446280A57;
-	Wed,  7 May 2025 13:42:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D56528980B;
+	Wed,  7 May 2025 13:46:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NjMWbYhz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z8BU8KJs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52C1F1519B4;
-	Wed,  7 May 2025 13:42:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EE132874FE
+	for <netdev@vger.kernel.org>; Wed,  7 May 2025 13:46:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746625343; cv=none; b=MoregXu2QtiTsfMLeQlduJ8gkVCocRhXszjR0kNPmbkwf5rQ6LgcS4mkQRdZ9WXuLw94UewpkAyTha9dobb42mfQNSbcJnEQy+UAMesx7D5cb/rfvIG2E0Ki84P28Pb8G3/6AOtqy6cuYyj8mAQrPpy4oa4t2ilnB0fkS2eKFXo=
+	t=1746625576; cv=none; b=bEzqon+R+FH9WrFzfLaLbshOU26xj66HOzNMcmqtKenBMRS+q3EpLYKECmbM/ByVhaPHk9DTMUaEPdOOowdlYByDDWMPwXJueMTBOVgG+5cIJouy2Exxf1QdkhTc2UcznMRPx2B15fOqtMBdaVilOC8Faa8LCUQBpW8f0Kve8mM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746625343; c=relaxed/simple;
-	bh=rt0gLT/Cx6uH7xEwJf4S/Dy3MmtJMMcOxB9M2SOESBs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sJsBOwONCGx6zKv9GOCIKjRiwoiPaba7v2CAYETsYYuZGIsn3HBomrGZof6z5DSQ0b0YMWcY6pf8Clr0LhZCeepSlHZ1sRnFH3YZn5GlMOcaLxRr0vi14d7f6SZFjL/eWBwJvGNn24IJFhUIFQkbGDXJPePxORpS/tbsgylL/iA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NjMWbYhz; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-acae7e7587dso1095572566b.2;
-        Wed, 07 May 2025 06:42:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746625340; x=1747230140; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Fu5jAYqPptIEmaOmMbSmkEQLD/PP47xbmK8wHBaTar4=;
-        b=NjMWbYhzKaIWQHlJa5fYGRqZnVD+kZmWMAAdCN9/RdItPoskCd7n1cqNm2Pqmd0tS3
-         qob5viQ20wRc2dts1udBep55BvUUeQ7oSOSK/Vcg2o3luusGEMr5OZ7Z4W7teitG8DI1
-         DqSqq0rCNCampJkCWeO8ySMndJ44ftKHBlvts9CLGICZvFULxZWKf1F7q0sZwip1Exw3
-         5Lm9/YGKHKlmrBX9vCScoHz+Va0EfuWd/Qt68CBCYwq5MXA2SFM99jSVULhYs9a2fr/j
-         mCaC5ePGn/dIePcL1M4tIBhg9x/3TrRWhKkucorEnQX0YLL76gkZeZQ5lWviObUm+y4t
-         h53A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746625340; x=1747230140;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Fu5jAYqPptIEmaOmMbSmkEQLD/PP47xbmK8wHBaTar4=;
-        b=JUeicqjw4iscys/t9Jej/UuVhpqXzUu6DCeDivyul5R3BhzZH0UpnKrv/g2LMHToDO
-         gLv6TU0Ovv+eWnt16LYPFlvx2Kn2HL/yumgIQLR97vyx+MW5sdCWXU7tyZIF4Dvq1hn4
-         Dv+mc3vFJdtdnnGaW5VmJfpmw+AyoXW0PpTSqY5GQ4SgOxpdQUN/bFkV3JpJr+gAf61j
-         tiU08xRnxUW1SDtuMmfIqGsMZTjz2rf1FQ5Fe/l89qLRYRLgqy2Yf0NYE7VxnPw7Grlx
-         LkKQD7Kp094r3TxYl85qnHdxs3xZlihYl2CL3dVxfsxP1vngrtQLbzKjycclMhn+E/NH
-         ClTA==
-X-Forwarded-Encrypted: i=1; AJvYcCU045O7C1Cf4vPQr4JyUbLWUOolfihdt3WgZyqELnw1qFbBGvv00uaBJKCck7qefELBTmqjmly9iT0P@vger.kernel.org, AJvYcCWvvUMp2tIySzeIsIDM5ScdTKXZe+rZE1JuEw5V9e+YNvUHcOnOuTtlCPZSFo1x22UfzL0jesRMnLr1uldF@vger.kernel.org, AJvYcCXse4FSWWDK+lMDmtxyrn/R9NG2BzlyXpa+ZbIcu6F0WxsB7sBwNXTajVFruUOOEE0c0r7kTLyqKRTd@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNHjgG2dcaFtqSUUjrfbSjU/8vBdFp7Rs42FL4RTzjdc2KNN0g
-	83k6tD82aKSIVWfRH8OGSPJN6sj8htV3BilTUFPeRYU3JOXmZQyjSUhH2Bld2pJBMrWG7YPTpR7
-	JYwScjRl9FohB+beeqsqhPfys+/g=
-X-Gm-Gg: ASbGnctNEq0+Obi56T2tYiEvGxeltIzn53Wxr+SbsGRSki+PZeeel9ubg2TaqrHt6Jd
-	8prRD+gSKWdDIEfFZe4l8MSLXZUnX4oqPmEeFg6PppRAEeyzuDKDUAWjJHTT8DEzLGGI48E1/Ks
-	kuSXQdkb6ssjlWe58TtEvR6jgm
-X-Google-Smtp-Source: AGHT+IGQBtHrZwxhQakHc3ARhOEyA4EPrV8tDh/xRaawNPgEr75PKZsCLFzdhfdOeCaSHRB69AiXjNW3dOcH15xOGlY=
-X-Received: by 2002:a17:907:d507:b0:ace:3af5:1de6 with SMTP id
- a640c23a62f3a-ad1e8d2934cmr350558166b.35.1746625340440; Wed, 07 May 2025
- 06:42:20 -0700 (PDT)
+	s=arc-20240116; t=1746625576; c=relaxed/simple;
+	bh=uQKC6dtGtGKOkoBvjs8lqnwOX+h2c0EoCarFMLh5cO0=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=uItYBtHd1vCqpiZoYTHfVj7uvyjZJ+Qx78VJ1IOENCAptYcsWP9nvTB0jzumreGd+V+kWLnToKwMXBY/FIGzGtoFp5yXFDVb2XDnZWBYTPg5HRS2qpu29Ekl/L5nh5O2YXJBPNsgX5+aNrIslpCvCj+vOopiyAx5G/0Lv5YfhHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z8BU8KJs; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746625573;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zoBfKW7DBVp6fse3P8uzY8pRsN3pHi/tyXtOsqhCvq0=;
+	b=Z8BU8KJs0bBRObEjgdEjESDKqkmz5AGlMODFlZZ6j1wpD9J7wVi2GLUrXju990hbHBxS+P
+	yeR5oV6CyCSP91QSsllHPwG5malA4f9zggfeEBrQ6Cmx6s8sHppHMLNrNiMP0FjKVh4ylo
+	bxbESrqbn7EgOVX91jrxLlSTaEpgzhU=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-74-qAmCHl7iMUuSMKoTGsiyZw-1; Wed,
+ 07 May 2025 09:46:07 -0400
+X-MC-Unique: qAmCHl7iMUuSMKoTGsiyZw-1
+X-Mimecast-MFC-AGG-ID: qAmCHl7iMUuSMKoTGsiyZw_1746625565
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AEBC61800990;
+	Wed,  7 May 2025 13:46:04 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.188])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 99D6B19560A7;
+	Wed,  7 May 2025 13:45:57 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20250506112012.5779d652@kernel.org>
+References: <20250506112012.5779d652@kernel.org> <20250505131446.7448e9bf@kernel.org> <165f5d5b-34f2-40de-b0ec-8c1ca36babe8@lunn.ch> <0aa1b4a2-47b2-40a4-ae14-ce2dd457a1f7@lunn.ch> <1015189.1746187621@warthog.procyon.org.uk> <1021352.1746193306@warthog.procyon.org.uk> <1069540.1746202908@warthog.procyon.org.uk> <1216273.1746539449@warthog.procyon.org.uk>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: dhowells@redhat.com, Andrew Lunn <andrew@lunn.ch>,
+    Eric Dumazet <edumazet@google.com>,
+    "David
+ S. Miller" <davem@davemloft.net>,
+    David Hildenbrand <david@redhat.com>,
+    John Hubbard <jhubbard@nvidia.com>,
+    Christoph Hellwig <hch@infradead.org>, willy@infradead.org,
+    netdev@vger.kernel.org, linux-mm@kvack.org,
+    Willem de Bruijn <willemb@google.com>
+Subject: Re: Reorganising how the networking layer handles memory
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250507124358.48776-1-ivecera@redhat.com> <20250507124358.48776-9-ivecera@redhat.com>
-In-Reply-To: <20250507124358.48776-9-ivecera@redhat.com>
-From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Date: Wed, 7 May 2025 16:41:44 +0300
-X-Gm-Features: ATxdqUFuxCdQxMTUYJnn6Zn0Z-yNV6W-XdaPO6tDqq9cIe3Jt33eP9TAQnxP48o
-Message-ID: <CAHp75Ven0i05QhKz2djYx0UU9E9nipb7Qw3mm4e+UN+ZSF_enA@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 8/8] mfd: zl3073x: Register DPLL sub-device
- during init
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Prathosh Satish <Prathosh.Satish@microchip.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Lee Jones <lee@kernel.org>, Andy Shevchenko <andy@kernel.org>, Michal Schmidt <mschmidt@redhat.com>, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1352673.1746625556.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
+Date: Wed, 07 May 2025 14:45:56 +0100
+Message-ID: <1352674.1746625556@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Wed, May 7, 2025 at 3:45=E2=80=AFPM Ivan Vecera <ivecera@redhat.com> wro=
-te:
->
-> Register DPLL sub-devices to expose the functionality provided
-> by ZL3073x chip family. Each sub-device represents one of
-> the available DPLL channels.
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-...
+> On Tue, 06 May 2025 14:50:49 +0100 David Howells wrote:
+> > Jakub Kicinski <kuba@kernel.org> wrote:
+> > > > (2) sendmsg(MSG_ZEROCOPY) suffers from the O_DIRECT vs fork() bug =
+because
+> > > >      it doesn't use page pinning.  It needs to use the GUP routine=
+s.  =
 
-> +static const struct zl3073x_pdata zl3073x_pdata[ZL3073X_MAX_CHANNELS] =
-=3D {
-> +       { .channel =3D 0, },
-> +       { .channel =3D 1, },
-> +       { .channel =3D 2, },
-> +       { .channel =3D 3, },
-> +       { .channel =3D 4, },
-> +};
+> > > =
 
-> +static const struct mfd_cell zl3073x_devs[] =3D {
-> +       ZL3073X_CELL("zl3073x-dpll", 0),
-> +       ZL3073X_CELL("zl3073x-dpll", 1),
-> +       ZL3073X_CELL("zl3073x-dpll", 2),
-> +       ZL3073X_CELL("zl3073x-dpll", 3),
-> +       ZL3073X_CELL("zl3073x-dpll", 4),
-> +};
+> > > We end up calling iov_iter_get_pages2(). Is it not setting
+> > > FOLL_PIN is a conscious choice, or nobody cared until now?  =
 
-> +#define ZL3073X_MAX_CHANNELS   5
+> > =
 
-Btw, wouldn't be better to keep the above lists synchronised like
+> > iov_iter_get_pages*() predates GUP, I think.  There's now an
+> > iov_iter_extract_pages() that does the pinning stuff, but you have to =
+do a
+> > different cleanup, which is why I created a new API call.
+> > =
 
-1. Make ZL3073X_CELL() to use indexed variant
+> > iov_iter_extract_pages() also does no pinning at all on pages extracte=
+d from a
+> > non-user iterator (e.g. ITER_BVEC).
+> =
 
-[idx] =3D ...
+> FWIW it occurred to me after hitting send that we may not care. =
 
-2. Define the channel numbers
+> We're talking about Tx, so the user pages are read only for the kernel.
+> I don't think we have the "child gets the read data" problem?
 
-and use them in both data structures.
+Worse: if the child alters the data in the buffer to be transmitted after =
+the
+fork() (say it calls free() and malloc()), it can do so; if the parent tri=
+es
+that, there will be no effect.
 
-...
+> Likely all this will work well for ZC but not sure if we can "convert"
+> the stack to phyaddr+len.
 
-OTOH, I'm not sure why we even need this. If this is going to be
-sequential, can't we make a core to decide which cell will be given
-which id?
+Me neither.  We also use bio_vec[] to hold lists of memory and then trawl =
+them
+to do cleanup, but a conversion to holding {phys,len} will mandate being a=
+ble
+to do some sort of reverse lookup.
 
---
-With Best Regards,
-Andy Shevchenko
+> Okay, just keep in mind that we are working on 800Gbps NIC support these
+> days, and MTU does not grow. So whatever we do - it must be fast fast.
+
+Crazy:-)
+
+One thing I've noticed in the uring stuff is that it doesn't seem to like =
+the
+idea of having an sk_buff pointing to more than one ubuf_info, presumably
+because the sk_buff will point to the ubuf_info holding the zerocopyable d=
+ata.
+Is that actually necessary for SOCK_STREAM, though?
+
+My thought for SOCK_STREAM is to have an ordered list of zerocopy source
+records on the socket and a completion counter and not tag the skbuffs at =
+all.
+That way, an skbuff can carry data for multiple zerocopy send requests.
+
+David
+
 
