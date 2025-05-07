@@ -1,159 +1,265 @@
-Return-Path: <netdev+bounces-188584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E16EEAAD9A7
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 10:08:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29126AAD9D4
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 10:14:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C7541C22518
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 08:08:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B59D33B4819
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 08:08:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B26D123D28F;
-	Wed,  7 May 2025 07:59:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 799CC22128E;
+	Wed,  7 May 2025 08:02:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bOAGQg3a"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DOFaz1yC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7CE223C50E;
-	Wed,  7 May 2025 07:59:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746604746; cv=none; b=XMG8YB1VA8jqrBCxhcr+FwzbjM96gqk4kv4JiLp/bz+elbKk+IKzbMiZ2SXGBNVq9+TgOqCGW5mFpnD/S0IHZiabeWcaCR+GfQFUQ5l5ClRUsnBCNOXBkRdTz7uPMbMVKd/TAyPEJ4N14NsDJtnUKn+ZUQjBxJc+f0625koaimk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746604746; c=relaxed/simple;
-	bh=e/9srmYivr2j7snT9tUmZWrhhMUFEDe4ILwhbNTCrl8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CKa2Amz7ufOCrwOTUW5Q74xboOcx7lmqyI4Qp88+6usM+21XwalifPxR4H/8nk/3HNhNwT5NHI5z6XtsVOegHi4wwwDSKmTohKVSwFmeV3sI41+n//4nNTaauzxwlilZRLArSEA1HzC6KcJVOd/iArW7NW6v3DscDsc1caHGKN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bOAGQg3a; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC52D72601
+	for <netdev@vger.kernel.org>; Wed,  7 May 2025 08:01:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746604923; cv=fail; b=uBvwhT9JBku6nz3oGD6QeCVPN7Vlt86M/PhhG4yzMZxpUsxLqLC98FFkYIilBk94IhZxsVybOUAmCqy+7JldrQoIvkpAhx883oZI5ryLoLoCNgUF9lv/Vd5egZplnacN8twSt+tQiH/rwfq0XXcl9brWUuR+otoQyKegPpgT1zU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746604923; c=relaxed/simple;
+	bh=IAkOyI6CK6MDPH9mxP92pzbcLeA++EZPe8sGHk2DU/I=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=tVX1Z9MDLNaVxkz6vaQO1KRoBE8VMKDDtOUcKqxeuhmWqvKmSfZzQ52l37kiGEGo4GeDbIKlY0BECliHWQhsPMlrhMRf2vhjvxwaLTycfkSudkfYRAJQ8mdbiV3K9TGorpM569TJPcV61dC4OBjP4aSTPmMagsrcEjTnKeQqKXA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DOFaz1yC; arc=fail smtp.client-ip=198.175.65.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746604745; x=1778140745;
+  t=1746604921; x=1778140921;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=e/9srmYivr2j7snT9tUmZWrhhMUFEDe4ILwhbNTCrl8=;
-  b=bOAGQg3aZ+LUKqVuR+4Qo6vcwVrR3aw6bQaIQZUuiwv9WNco2aQyuW2Q
-   7O6bLVQw0jmumYjMPgTlqCMjsXelQ4pn394fdGhbQly8CPJNLWy1n5GxK
-   X13+efxKbZ5GW5co7jdgQm/5VqOcZgahFjgLoyl4Rz4IXkJ5HqzLz4flL
-   Z1uSvNTs3NjOqpoqfKq0gSEXzxjw1ax6yEFuhsy68z3Z2V+HA+fVrErsi
-   Tf0kuCs1gh38BtYKyByLKqG9i4JdaGVG+V5mos/wrn5rFHBz6vRtHdco+
-   wZbcFhppl84XIXy5GUgNfs2jLPDW1Hzc9HG8XEmeX5wKid9Xw93PWqYtW
-   w==;
-X-CSE-ConnectionGUID: 79w0Z3TuQLOoCju7LK9/JQ==
-X-CSE-MsgGUID: ex5vPLfhSsSvE9zGyHLXWQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11425"; a="65727580"
+   in-reply-to:mime-version;
+  bh=IAkOyI6CK6MDPH9mxP92pzbcLeA++EZPe8sGHk2DU/I=;
+  b=DOFaz1yCiX1yRTabpjCfC7cXIX1iN0f3lvZhI0y+LuoTlD69P0ZHNTqU
+   BN2fre0qDhzQZlX5pvVaV4o2G1shaXupSOGcI/jdqJSZo/B+2b7Gk/nn/
+   NnpFafHGA/WhHn2IwjSAfPIuK9DH2ULOgkzN7mpF6ek/8RSP4PKPmruSN
+   uFe8A6nnx5M+LaV2m1dy3QoFLw3tlVc1xd8RmOy0UwKe/1KlsjTMDxpAJ
+   LIJugVHvoHxaOB7qqYlFDc7iEzIiNv2mYxAXJcVECVoE+07G5yOY8aMDV
+   YSNkG0mayOyM+l/i4FZNFtYlXh1TnS8zyBBBcDf1+XHF1bUUjvz+xmnx/
+   g==;
+X-CSE-ConnectionGUID: qaazyWJKSOW8cbboxAji4w==
+X-CSE-MsgGUID: MDs6yHCHT0ekPZKSTye04w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11425"; a="59716071"
 X-IronPort-AV: E=Sophos;i="6.15,268,1739865600"; 
-   d="scan'208";a="65727580"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2025 00:59:04 -0700
-X-CSE-ConnectionGUID: ftQEJui7QoesuiniqJ53Tw==
-X-CSE-MsgGUID: eJ37biI+Rmu6BzW/07IiLw==
+   d="scan'208";a="59716071"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2025 01:01:48 -0700
+X-CSE-ConnectionGUID: Tya5FZLbTLKAqsLTZfyD1Q==
+X-CSE-MsgGUID: 89FYUEgsTWy3WHRjm04BDA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,268,1739865600"; 
-   d="scan'208";a="140619565"
-Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
-  by orviesa003.jf.intel.com with ESMTP; 07 May 2025 00:58:57 -0700
-Received: from kbuild by 1992f890471c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uCZg6-0007N1-2A;
-	Wed, 07 May 2025 07:58:54 +0000
-Date: Wed, 7 May 2025 15:58:18 +0800
-From: kernel test robot <lkp@intel.com>
-To: Tanmay Jagdale <tanmay@marvell.com>, bbrezillon@kernel.org,
-	arno@natisbad.org, schalla@marvell.com, herbert@gondor.apana.org.au,
-	davem@davemloft.net, sgoutham@marvell.com, lcherian@marvell.com,
-	gakula@marvell.com, jerinj@marvell.com, hkelam@marvell.com,
-	sbhatta@marvell.com, andrew+netdev@lunn.ch, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, bbhushan2@marvell.com,
-	bhelgaas@google.com, pstanner@redhat.com,
-	gregkh@linuxfoundation.org, peterz@infradead.org, linux@treblig.org,
-	krzysztof.kozlowski@linaro.org, giovanni.cabiddu@intel.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, rkannoth@marvell.com, sumang@marvell.com,
-	gcherian@marvell.com, Rakesh Kudurumalla <rkudurumalla@marvell.com>
-Subject: Re: [net-next PATCH v1 06/15] octeontx2-af: Add support for CPT
- second pass
-Message-ID: <202505071511.neU9Siwr-lkp@intel.com>
-References: <20250502132005.611698-7-tanmay@marvell.com>
+   d="scan'208";a="136815940"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2025 01:01:42 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Wed, 7 May 2025 01:01:41 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Wed, 7 May 2025 01:01:41 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.44) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Wed, 7 May 2025 01:01:39 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=mf8hBubxA700Fh1bPaikN7fjruFDwGuwxSfr/pJ5EC7NzsBz4LXE1EFIkUWbdxuxoPghJiokr00fMy50Pzsr34oea/PA6yFFDTMhUJBDLyWZhxaxLVusNcBArSGMdIi+EUYr8zRthIlgFj2QDbz6dkhZIuVfZpbiHLUa/4QYV2YWSZsjxOJcrOqnFDxLshrPrS9QW4bwItTpjjf9yGq9KTjfEmcdFVyQ/Aszm/V8B+ZPdYn/GSDfGtRhSZMa9xt3T/CjXaofVjOX9o1pHRHTIkSHN4QeFIC0ie73TCZhrmZxgiKdGsfOCvuADv3BUc6Gf49V/Ag5mWin90DOpb+Dfw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=P+MsKXunPw8hb8jUhhayQoBQQHPvT1QetgmG0pBTejo=;
+ b=DqfBYHMimfUpaItphHUin41DyHCmDs32AgllJZykoZM0itR88Nmv7mzUG7oBlfQ3zKWY1NmiutLXc9qIUa09icKulyBo/ZGGvC4jjJKrWUAhJkvcI0zd23txv846ZRJDQvE1P84fnmMHF8ekrk7jrMchv60kYwl+ndb4Kz8+QZUYar0jbtZwOKtuf7tlJ1IWuRx+SJpLQyD9rIriHJK+WvW7rwri554JW5IRj1F0y8Jo2AkiW+fvZgj5x76TRHZYpTxlBpyqavy3ZvNNqIMZ1DDoXiy5SA7ELwaoYW7sHyuv5dRqpJHBPxs7AG9batqcI1K7Z1PmlI9X7u0UqSwM+Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8665.namprd11.prod.outlook.com (2603:10b6:8:1b8::6) by
+ DM3PR11MB8669.namprd11.prod.outlook.com (2603:10b6:0:14::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8699.26; Wed, 7 May 2025 08:01:11 +0000
+Received: from DS0PR11MB8665.namprd11.prod.outlook.com
+ ([fe80::8e7e:4f8:f7e4:3955]) by DS0PR11MB8665.namprd11.prod.outlook.com
+ ([fe80::8e7e:4f8:f7e4:3955%5]) with mapi id 15.20.8699.026; Wed, 7 May 2025
+ 08:01:11 +0000
+Date: Wed, 7 May 2025 10:00:59 +0200
+From: Michal Kubiak <michal.kubiak@intel.com>
+To: Jesse Brandeburg <jbrandeburg@cloudflare.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <maciej.fijalkowski@intel.com>,
+	<aleksander.lobakin@intel.com>, <przemyslaw.kitszel@intel.com>,
+	<dawid.osuchowski@linux.intel.com>, <jacob.e.keller@intel.com>,
+	<netdev@vger.kernel.org>, <kernel-team@cloudflare.com>
+Subject: Re: [PATCH iwl-net 0/3] Fix XDP loading on machines with many CPUs
+Message-ID: <aBsTO4_LZoNniFS5@localhost.localdomain>
+References: <20250422153659.284868-1-michal.kubiak@intel.com>
+ <b36a7cb6-582b-422d-82ce-98dc8985fd0d@cloudflare.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <b36a7cb6-582b-422d-82ce-98dc8985fd0d@cloudflare.com>
+X-ClientProxiedBy: VI1PR06CA0185.eurprd06.prod.outlook.com
+ (2603:10a6:803:c8::42) To DS0PR11MB8665.namprd11.prod.outlook.com
+ (2603:10b6:8:1b8::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250502132005.611698-7-tanmay@marvell.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8665:EE_|DM3PR11MB8669:EE_
+X-MS-Office365-Filtering-Correlation-Id: a989e84e-04fb-4836-9162-08dd8d3d54a3
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?+9YWs6gIgZB0bP7k5PE8nsmaedCdwlCh35hK8chyO90aASSEw1YrtgOQhE7u?=
+ =?us-ascii?Q?1lpw0gAAbE4ZOxVYFhdKrMhr0alSFlToxcU92h1gvmWN0zzacd6HhNsuv2De?=
+ =?us-ascii?Q?cFlMnkI1Dkj1PtmBpSKKIjxRlsgDlr+RBsCbDJf9KHhQ2EfRzoWKcwWrNHId?=
+ =?us-ascii?Q?UM5BqsCnQsDU0RjyyRt1U37gCGGdVBWQnK34IGIbhniFkdVYlAXCS+mJubnU?=
+ =?us-ascii?Q?oS1+L+On/iyRhH2Rc7Qq5xvKs++6CCdPe2M2yFvF6cwFSX/hvC+RGmqVnqH2?=
+ =?us-ascii?Q?3DW4cWbB4Y+y+9TZtIVDZnySBmYysDFsxd1+TQDtXJXi/ygwJfqL5dzqhN4K?=
+ =?us-ascii?Q?6v3wv8QYmz7HXMKBFvrHZqwJAKVwrTHLFsLNzzsnwrPrAUaHkRPi2IkBRtBD?=
+ =?us-ascii?Q?JN5IAnVsLKCnSGBqZFjLGkO5g5piz6yeAGg+ksuPbynVODqRNKYi9KwSJLtw?=
+ =?us-ascii?Q?bJNxFTGs4pUmw7QQ3fsyPysiXhZwgfl28xOc5DCvZbO21d6fTED6umx6LLCB?=
+ =?us-ascii?Q?ZhqII924BEYCmuDCgwY7y4MxTyfHejCekJMmObeqRZDCdhrPvPSR77sysEXP?=
+ =?us-ascii?Q?UB+GsBgH3zvd+8FwlM8Rhil/gaBuwi+p+JQh9q0kQ/EInMtPthMput6k2zeC?=
+ =?us-ascii?Q?OSFq+XmAIzjCkIJD5KkaISKhECvoKkBH3y/hOBMxVQvcwctjxx/A49WWvD2c?=
+ =?us-ascii?Q?2a5TpmKOMEOmYFjGvgvI5MtZcWXDnHVmAY8EPPt/OyFzPgXY4Ip2+LniZKSe?=
+ =?us-ascii?Q?ZwC8wEadgN7orIFqvLOuJSF4UiYOHy8umDD8s8vF8bDRf7AdlFmIIFn3dPuE?=
+ =?us-ascii?Q?84GDbT/C4SatJUfz1a/rU9ZKSEerExL4XKzxutqd9w0wSPfHeC2Tr8yfBAeZ?=
+ =?us-ascii?Q?KH8VgDsm0yApJmJ+wnV0p5rPhRZkN49dA4T2WPQuyslILpV2MIVP3go1Pe8E?=
+ =?us-ascii?Q?RlC9aqAX9IvnzpElraCEtnnyEhKq2/vauuU8i74+GKATcvc4qsGoVA6Xdi9N?=
+ =?us-ascii?Q?UyCx4qBNM2x/FGf9x6JD7B8MZfLT7MPvYDxapR2qCwXjJDes0lapcCBTPpWq?=
+ =?us-ascii?Q?mzF54MGGWIqR+ut0ZCcXY9ONu+9hPjUFTIAKI+We6S6XRCD+5HTn+SicCD3s?=
+ =?us-ascii?Q?awLJw70aLI+YCqWNul7+VBMGkMMW72S3gAIkqgkfN7t/fB9q5nITgMMCqI2K?=
+ =?us-ascii?Q?YnbC6JSKJqOsaJkWjUfv073Cme5th/COR2S3lV+2L5mURtD/CUTvyXCE9CL2?=
+ =?us-ascii?Q?ERmYSyejkMOP0Oc3SwbpBrSzX8r8VKc9Kn9fpyA/GGfvyX92svrAOP8BLW/F?=
+ =?us-ascii?Q?nR0l6a85novd7Bb5vfc1mrxbY2phdBQJUXeAZx5I5pdTud53FN5KP8oS+DGX?=
+ =?us-ascii?Q?+dOhPgtCcIGJaFMD1lrNT2YtM5Yp54gBFFxOmUjuE5dDyRTpk11zz7HNU1AB?=
+ =?us-ascii?Q?QHcaoeEBlug=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8665.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?nDUgrOT/8Cr59ZcEZlvaOvIdcVvfdQUgIVf+zNgI6rZEyt3aPqqGqMWIs6BF?=
+ =?us-ascii?Q?M3oY5DX/PgGpIMYv4yLnyyhWLg7sdCZ9w12w/wHQ0OpBDKNqoROz2DlbkI2e?=
+ =?us-ascii?Q?ub+HMynCrL0x1zMAEDGE2jRGOwVlUIdRi8WWSVv2fa4VhhVM37hfW2eKN0sA?=
+ =?us-ascii?Q?toXZ4uvQGBymVZLgmEivNnEdSaIJUY4gz7cxxgY7AlE737B4A1YpoNZgD/XA?=
+ =?us-ascii?Q?pRWCVCkmJ8uyzu8Ams1K2hJ1HJaabe3A32MlAi00GwcxubqUWhJPG1For9QL?=
+ =?us-ascii?Q?LqE60li/d8OBclM3TXQRe69xW8yWxXijntB74CvfjAjQB4x2ZUo14boNt8NO?=
+ =?us-ascii?Q?QQu1Yaa5NfZ6Lxq9ziWrptvioJH5+MIoGz5sxeQxpryRsCXTHNs+8K9lwVfu?=
+ =?us-ascii?Q?AANwp46KJHKeu+1kHjvaGSg8aoOqyLbdxI3Qa5SZUMwD6KJ/qwvKtsWV7xxj?=
+ =?us-ascii?Q?Mlo+B+6hRHNtyoyXYkf8x4MiJOeZBSdV5VUHoDJ11utt/zo6VQT1J7z1l0ND?=
+ =?us-ascii?Q?OAy94Uc2HNKAK6l4ZR/HPy0gqz6E/++u+z043eTXNLmngxC4rnt3o/ICFBBZ?=
+ =?us-ascii?Q?mhzEi27JRhiQdAobd/r67QIQB7H0BWBoJ96Qvw6i8AzRyEzJgWyd015MuEB7?=
+ =?us-ascii?Q?Gxfkf0x+zwYuKj/gI9twnuCgdx2udaPXynm1UWgBpB3fzM8J1gpO1X8QuTVs?=
+ =?us-ascii?Q?UoZjdefGIvcal5fIylQH3LSkL/y3uaa6yPrLe3Alo1NlR3YJqWpp5Hh8abyf?=
+ =?us-ascii?Q?W5R5+MBiYpP00sB8lJ3e1YAyahDOllQ2XfPZ+VIASEcA07Hpma4K1CgNu1cM?=
+ =?us-ascii?Q?v0VFxt0rKAuBniMDvITkwaUwtJ+OAsQY7aTqnxHJFdGM+hFpG88ysvrsvt3/?=
+ =?us-ascii?Q?Zw8KNXmPRforWv2U8dlhtn2LZn5Gs84Du8klmR92nblz5PzvHFNeXVlTgkiS?=
+ =?us-ascii?Q?BmL/p7ALE4hg8W35fLFDnk8LRo4SnFOcsZ52pOjP9bS0XrN6zYDTyyJYzOM/?=
+ =?us-ascii?Q?NIiRJzV1+u7IOkZge6EEIdmYJ9jvAaAclEjflatBKPbSXcSstR6v3rET5CCM?=
+ =?us-ascii?Q?oHy17wftWrtTKEBJpqv2wnPjbgYy3SIU5wzH0QKkMRs34J6X+G4wLc2nrkc8?=
+ =?us-ascii?Q?fh5jHq6yes26c6FWt+Z/WF6MD+hBivoJrQNqzaWSse+9PS+rkq31K3xfvc8Y?=
+ =?us-ascii?Q?Tu8FvU3HZUH/6OU56ElCwEQ5XcEmH6soX6cMij/RgpEtXiRbhbK27Px7e8J/?=
+ =?us-ascii?Q?Ff6+Awit/0DStC1fZf0Togd4zTV2mywkViaHvtDd9RABNsNLOfIzFcrRG7KW?=
+ =?us-ascii?Q?mmEdu2fn50Esfn0AScpMXjOxr2AL5PngA3Lb89sIKJQZZ4fGKc6H1c5L1K2M?=
+ =?us-ascii?Q?WoGiQucyGXiD8vJ+ER74PGrqWq4xs4wq/MHZV6YUq2Urqqn0Inn2W9ZIHvV4?=
+ =?us-ascii?Q?q9EVnyN59ue3/sL+ZGr7kTSgZboab5etrnMqJ1uLPUtGxKHjOWN5/iW87T5x?=
+ =?us-ascii?Q?LLFS8GYOPerxFQS4SPt4K+3BrFi8QHWAn91VeyKSmsfGPKMh+Hpf2SB7MWY4?=
+ =?us-ascii?Q?wg5xB6PoTdB8KKRvTN2QanT0toGGKNqyGIqXP/mkNGrdjCFZU4t0sL9I3+jf?=
+ =?us-ascii?Q?0A=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: a989e84e-04fb-4836-9162-08dd8d3d54a3
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8665.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 May 2025 08:01:11.0741
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sC0Hgpr7XHvOw/8qwP59QUcPFpl1LeXdsO/kxJEPST/mZKyquuNgFFM09eEebGbrc8F1XD+1s+T3jcXt/TfV+A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR11MB8669
+X-OriginatorOrg: intel.com
 
-Hi Tanmay,
+On Tue, May 06, 2025 at 10:31:59PM -0700, Jesse Brandeburg wrote:
+> On 4/22/25 8:36 AM, Michal Kubiak wrote:
+> > Hi,
+> > 
+> > Some of our customers have reported a crash problem when trying to load
+> > the XDP program on machines with a large number of CPU cores. After
+> > extensive debugging, it became clear that the root cause of the problem
+> > lies in the Tx scheduler implementation, which does not seem to be able
+> > to handle the creation of a large number of Tx queues (even though this
+> > number does not exceed the number of available queues reported by the
+> > FW).
+> > This series addresses this problem.
+> 
+> 
+> Hi Michal,
+> 
+> Unfortunately this version of the series seems to reintroduce the original
+> problem error: -22.
 
-kernel test robot noticed the following build warnings:
+Hi Jesse,
 
-[auto build test WARNING on net-next/main]
+Thanks for testing and reporting!
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Tanmay-Jagdale/crypto-octeontx2-Share-engine-group-info-with-AF-driver/20250502-213203
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250502132005.611698-7-tanmay%40marvell.com
-patch subject: [net-next PATCH v1 06/15] octeontx2-af: Add support for CPT second pass
-config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20250507/202505071511.neU9Siwr-lkp@intel.com/config)
-compiler: clang version 20.1.2 (https://github.com/llvm/llvm-project 58df0ef89dd64126512e4ee27b4ac3fd8ddf6247)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250507/202505071511.neU9Siwr-lkp@intel.com/reproduce)
+I will take a look at the problem and try to reproduce it locally. I would also
+have a few questions inline.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202505071511.neU9Siwr-lkp@intel.com/
+First, was your original problem not the failure with error: -5? Or did you have
+both (-5 and -22), depending on the scenario/environment?
+I am asking because it seems that these two errors occurred at different
+initialization stages of the tx scheduler. Of course, the series
+was intended to address both of these issues.
 
-All warnings (new ones prefixed by >>):
+> 
+> I double checked the patches, they looked like they were applied in our test
+> version 2025.5.8 build which contained a 6.12.26 kernel with this series
+> applied (all 3)
+> 
+> Our setup is saying max 252 combined queues, but running 384 CPUs by
+> default, loads an XDP program, then reduces the number of queues using
+> ethtool, to 192. After that we get the error -22 and link is down.
+> 
 
->> drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c:6723:6: warning: variable 'rq_mask' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
-    6723 |         if (req->ipsec_cfg1.rq_mask_enable) {
-         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c:6729:41: note: uninitialized use occurs here
-    6729 |         configure_rq_mask(rvu, blkaddr, nixlf, rq_mask,
-         |                                                ^~~~~~~
-   drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c:6723:2: note: remove the 'if' if its condition is always true
-    6723 |         if (req->ipsec_cfg1.rq_mask_enable) {
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c:6710:13: note: initialize the variable 'rq_mask' to silence this warning
-    6710 |         int rq_mask, err;
-         |                    ^
-         |                     = 0
-   1 warning generated.
+To be honest, I did not test the scenario in which the number of queues is
+reduced while the XDP program is running. This is the first thing I will check.
 
+Can you please confirm that you did that step on both the current
+and the draft version of the series?
+It would also be interesting to check what happens if the queue number is reduced
+before loading the XDP program.
 
-vim +6723 drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+> Sorry to bring some bad news, and I know it took a while, it is a bit of a
+> process to test this in our lab.
+> 
+> The original version you had sent us was working fine when we tested it, so
+> the problem seems to be between those two versions. I suppose it could be
+> possible (but unlikely because I used git to apply the patches) that there
+> was something wrong with the source code, but I sincerely doubt it as the
+> patches had applied cleanly.
 
-  6702	
-  6703	int rvu_mbox_handler_nix_lf_inline_rq_cfg(struct rvu *rvu,
-  6704						  struct nix_rq_cpt_field_mask_cfg_req *req,
-  6705						  struct msg_rsp *rsp)
-  6706	{
-  6707		struct rvu_hwinfo *hw = rvu->hw;
-  6708		struct nix_hw *nix_hw;
-  6709		int blkaddr, nixlf;
-  6710		int rq_mask, err;
-  6711	
-  6712		err = nix_get_nixlf(rvu, req->hdr.pcifunc, &nixlf, &blkaddr);
-  6713		if (err)
-  6714			return err;
-  6715	
-  6716		nix_hw = get_nix_hw(rvu->hw, blkaddr);
-  6717		if (!nix_hw)
-  6718			return NIX_AF_ERR_INVALID_NIXBLK;
-  6719	
-  6720		if (!hw->cap.second_cpt_pass)
-  6721			return NIX_AF_ERR_INVALID_NIXBLK;
-  6722	
-> 6723		if (req->ipsec_cfg1.rq_mask_enable) {
+The current series contains mostly some cosmetic fixes, but the potential
+regression is still possible, so I will take a look at the diff.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> 
+> We are only able to test 6.12.y or 6.6.y stable variants of the kernel if
+> you want to make a test version of a fixed series for us to try.
+> 
+> Thanks,
+> 
+> Jesse
+> 
+
+I will keep you updated on my findings.
+
+Thanks,
+Michal
 
