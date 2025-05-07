@@ -1,199 +1,109 @@
-Return-Path: <netdev+bounces-188607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 081D0AADDBF
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 13:51:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C2728AADDE6
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 14:00:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66BCD4E2566
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 11:51:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 125354A3101
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 12:00:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E45D257AF5;
-	Wed,  7 May 2025 11:51:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43A112586D5;
+	Wed,  7 May 2025 11:59:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="GM5+LqYg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DbiFF3kG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-bc0d.mail.infomaniak.ch (smtp-bc0d.mail.infomaniak.ch [45.157.188.13])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3AA521882F
-	for <netdev@vger.kernel.org>; Wed,  7 May 2025 11:51:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1950D2580EC;
+	Wed,  7 May 2025 11:59:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746618701; cv=none; b=ReTmkAEj7Th7BgP8cJkP+GcZNhlTAR2Zo5Ea3ixvY3vQ4Ae14XhVar2tvSPRt0wFamTFr1X82rh46pEOSlcl7F3SA/J+gu12yOEqrIMxVX34XiKbjnT7Q+zwluptUDtR+Wu+JOSJgKnhi9QIy3Gs0pisB6HB4Mj02cwUE3iTVCo=
+	t=1746619199; cv=none; b=oZU3IsWkEpDMH+d1B46z90yGH7sHAzhjPGiFrVZBBBNS6tNLg4TEoJlatlJ1gQ1jz8NjnfQQNL/rPJQODdSNwsfI8P76h5NLISEJCWgZXaHWpYTQVj4O/6pXd0HL7n0iamwfjZXLkzbEdOhLhZCvSm/uVDD4RTejwlold3gGscs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746618701; c=relaxed/simple;
-	bh=kIPJFzOybRVKUZttYLjyp0h855fjPHYRSmr7h4xhlBc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c8xU8ydgrhFiEh7CDGk9luAqZWqwTTnx95GsHxgP9xO1a+0JXbcAsp3kJcwmKv7NJ3py7lCnuKFreJRTpwyPzHM0O3DA/D9n1hqkGbosh2gmT4HIdKDl75w/VO8aFgN+Bbp9DfQl1KaN9Mhyn9L7j+PV+uQU16RnRKFkLIbBxC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=GM5+LqYg; arc=none smtp.client-ip=45.157.188.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-4-0000.mail.infomaniak.ch (unknown [IPv6:2001:1600:7:10::a6b])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Zstry50t6zt16;
-	Wed,  7 May 2025 13:51:30 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1746618690;
-	bh=ukRcsiWioIJpQnZONA7OOVHLy1rF/BILBsY01ynF49o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GM5+LqYgqtdWSoNl6eaQIrraLqbPVitAXzcP6S0KIDJ7OQKcfOHf3zC7G/3SwUJN3
-	 7YDEkyhiS3lDk3BxovPVOnTNfOcMkWX9Qzdeef5kNZ8gCB/YDpPzq+HJaL7m/9YbT9
-	 fCrJQlqK0c83g4qp/xga2NlY/X5iszJ0UFyvvCqg=
-Received: from unknown by smtp-4-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4Zstrx6DJNzTf6;
-	Wed,  7 May 2025 13:51:29 +0200 (CEST)
-Date: Wed, 7 May 2025 13:51:28 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: brauner@kernel.org, alexander@mihalicyn.com, bluca@debian.org, 
-	daan.j.demeyer@gmail.com, davem@davemloft.net, david@readahead.eu, edumazet@google.com, 
-	horms@kernel.org, jack@suse.cz, jannh@google.com, kuba@kernel.org, 
-	lennart@poettering.net, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	me@yhndnzj.com, netdev@vger.kernel.org, oleg@redhat.com, pabeni@redhat.com, 
-	viro@zeniv.linux.org.uk, zbyszek@in.waw.pl, linux-security-module@vger.kernel.org
-Subject: Re: [PATCH RFC v3 08/10] net, pidfs, coredump: only allow
- coredumping tasks to connect to coredump socket
-Message-ID: <20250507.ohsaiQuoh3uo@digikod.net>
-References: <20250506-zugabe-bezog-f688fbec72d3@brauner>
- <20250506191817.14620-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1746619199; c=relaxed/simple;
+	bh=zUVxyov8pzynOlK5IOnXvIkSrF7p+GCIJi7UhZ8sRyI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=pWVURHbj9l0EpTbA6Xoj5VkReo2tQCfkdMjhxGCByDHFYhdh9T+U7exAQT17lIaQUm9iXhZhW5SDJ7imwJhzssndZURuVrbXL+DMIPpoN12itmuWeH9zQROFW7Ram8EWV2O2u+8OTPTwu/Tq3IpGJPUzU5Wq8EPKEd70yImfm8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DbiFF3kG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89A25C4CEE7;
+	Wed,  7 May 2025 11:59:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746619198;
+	bh=zUVxyov8pzynOlK5IOnXvIkSrF7p+GCIJi7UhZ8sRyI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=DbiFF3kGzr+yR+zTkEK12acmgkBbnkrDe2z65u42Ly4cs90kOmkNcmXN/qmMxkWnt
+	 a9ceL5IUsrPNM4YE8mVYhXakX61W7GjOXTMmXtrR3SDW6xf4KAHU0J3V76o2LogoEp
+	 VNnhNmhWqWosqZn41P1lYCEXHWjWrjj6mmz6xStZCLiCUgA9m6BHGqyB/3E4fVBexz
+	 bb++ZMNiS95bx1dROMBtmySZopyHre8ZsxrkNiKg/jUlfX/E7WCkQVPGJMf0qSu+Mm
+	 WyAzqWXJknhM8vc+OiB7bIvHTh/GTMLFG0Q69yvHFq+yvBd2rMTvBmx1bCcCS9eBDG
+	 qCsP1BpdVwHDQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC91380AA70;
+	Wed,  7 May 2025 12:00:38 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250506191817.14620-1-kuniyu@amazon.com>
-X-Infomaniak-Routing: alpha
+Subject: Re: [PATCH net-next v8 0/7]  lan78xx: preparation for PHYLINK conversion
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174661923750.2198858.15834248841787525369.git-patchwork-notify@kernel.org>
+Date: Wed, 07 May 2025 12:00:37 +0000
+References: <20250505084341.824165-1-o.rempel@pengutronix.de>
+In-Reply-To: <20250505084341.824165-1-o.rempel@pengutronix.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, woojung.huh@microchip.com, andrew+netdev@lunn.ch,
+ rmk+kernel@armlinux.org.uk, Thangaraj.S@microchip.com,
+ Rengarajan.S@microchip.com, kernel@pengutronix.de,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ UNGLinuxDriver@microchip.com, phil@raspberrypi.org,
+ maxime.chevallier@bootlin.com, horms@kernel.org
 
-On Tue, May 06, 2025 at 12:18:12PM -0700, Kuniyuki Iwashima wrote:
-> From: Christian Brauner <brauner@kernel.org>
-> Date: Tue, 6 May 2025 10:06:27 +0200
-> > On Mon, May 05, 2025 at 09:10:28PM +0200, Jann Horn wrote:
-> > > On Mon, May 5, 2025 at 8:41 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
-> > > > From: Christian Brauner <brauner@kernel.org>
-> > > > Date: Mon, 5 May 2025 16:06:40 +0200
-> > > > > On Mon, May 05, 2025 at 03:08:07PM +0200, Jann Horn wrote:
-> > > > > > On Mon, May 5, 2025 at 1:14 PM Christian Brauner <brauner@kernel.org> wrote:
-> > > > > > > Make sure that only tasks that actually coredumped may connect to the
-> > > > > > > coredump socket. This restriction may be loosened later in case
-> > > > > > > userspace processes would like to use it to generate their own
-> > > > > > > coredumps. Though it'd be wiser if userspace just exposed a separate
-> > > > > > > socket for that.
-> > > > > >
-> > > > > > This implementation kinda feels a bit fragile to me... I wonder if we
-> > > > > > could instead have a flag inside the af_unix client socket that says
-> > > > > > "this is a special client socket for coredumping".
-> > > > >
-> > > > > Should be easily doable with a sock_flag().
-> > > >
-> > > > This restriction should be applied by BPF LSM.
-> > > 
-> > > I think we shouldn't allow random userspace processes to connect to
-> > > the core dump handling service and provide bogus inputs; that
-> > > unnecessarily increases the risk that a crafted coredump can be used
-> > > to exploit a bug in the service. So I think it makes sense to enforce
-> > > this restriction in the kernel.
-> > > 
-> > > My understanding is that BPF LSM creates fairly tight coupling between
-> > > userspace and the kernel implementation, and it is kind of unwieldy
-> > > for userspace. (I imagine the "man 5 core" manpage would get a bit
-> > > longer and describe more kernel implementation detail if you tried to
-> > > show how to write a BPF LSM that is capable of detecting unix domain
-> > > socket connections to a specific address that are not initiated by
-> > > core dumping.) I would like to keep it possible to implement core
-> > > userspace functionality in a best-practice way without needing eBPF.
-> > > 
-> > > > It's hard to loosen such a default restriction as someone might
-> > > > argue that's unexpected and regression.
-> > > 
-> > > If userspace wants to allow other processes to connect to the core
-> > > dumping service, that's easy to implement - userspace can listen on a
-> > > separate address that is not subject to these restrictions.
-> > 
-> > I think Kuniyuki's point is defensible. And I did discuss this with
-> > Lennart when I wrote the patch and he didn't see a point in preventing
-> > other processes from connecting to the core dump socket. He actually
-> > would like this to be possible because there's some userspace programs
-> > out there that generate their own coredumps (Python?) and he wanted them
-> > to use the general coredump socket to send them to.
-> > 
-> > I just found it more elegant to simply guarantee that only connections
-> > are made to that socket come from coredumping tasks.
-> > 
-> > But I should note there are two ways to cleanly handle this in
-> > userspace. I had already mentioned the bpf LSM in the contect of
-> > rate-limiting in an earlier posting:
-> > 
-> > (1) complex:
-> > 
-> >     Use a bpf LSM to intercept the connection request via
-> >     security_unix_stream_connect() in unix_stream_connect().
-> > 
-> >     The bpf program can simply check:
-> > 
-> >     current->signal->core_state
-> > 
-> >     and reject any connection if it isn't set to NULL.
-> > 
-> >     The big downside is that bpf (and security) need to be enabled.
-> >     Neither is guaranteed and there's quite a few users out there that
-> >     don't enable bpf.
+Hello:
 
-The kernel should indeed always have a minimal security policy in place,
-LSM can tailored that but we should not assume that a specific LSM with
-a specific policy is enabled/configured on the system.
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-> > 
-> > (2) simple (and supported in this series):
-> > 
-> >     Userspace accepts a connection. It has to get SO_PEERPIDFD anyway.
-> >     It then needs to verify:
-> > 
-> >     struct pidfd_info info = {
-> >             info.mask = PIDFD_INFO_EXIT | PIDFD_INFO_COREDUMP,
-> >     };
-> > 
-> >     ioctl(pidfd, PIDFD_GET_INFO, &info);
-> >     if (!(info.mask & PIDFD_INFO_COREDUMP)) {
-> >             // Can't be from a coredumping task so we can close the
-> > 	    // connection without reading.
-> > 	    close(coredump_client_fd);
-> > 	    return;
-> >     }
-> > 
-> >     /* This has to be set and is only settable by do_coredump(). */
-> >     if (!(info.coredump_mask & PIDFD_COREDUMPED)) {
-> >             // Can't be from a coredumping task so we can close the
-> > 	    // connection without reading.
-> > 	    close(coredump_client_fd);
-> > 	    return;
-> >     }
-> > 
-> >     // Ok, this is a connection from a task that has coredumped, let's
-> >     // handle it.
-
-What if the task send a "fake" coredump and just after that really
-coredump?  There could be a race condition on the server side when
-checking the coredump property of this pidfd.
-
-Could we add a trusted header to the coredump payload that is always
-written by the kernel?  This would enable to read a trusted flag
-indicating if the following payload is a coredumped generated by the
-kernel or not.
-
-> > 
-> >     The crux is that the series guarantees that by the time the
-> >     connection is made the info whether the task/thread-group did
-> >     coredump is guaranteed to be available via the pidfd.
-> >  
-> > I think if we document that most coredump servers have to do (2) then
-> > this is fine. But I wouldn't mind a nod from Jann on this.
+On Mon,  5 May 2025 10:43:34 +0200 you wrote:
+> This patch series contains the first part of the LAN78xx driver
+> refactoring in preparation for converting the driver to use the PHYLINK
+> framework.
 > 
-> I like this approach (2) allowing users to filter the right client.
-> This way we can extend the application flexibly for another coredump
-> service.
+> The goal of this initial part is to reduce the size and complexity of
+> the final PHYLINK conversion by introducing incremental cleanups and
+> logical separation of concerns, such as:
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v8,1/7] net: usb: lan78xx: Improve error handling in PHY initialization
+    https://git.kernel.org/netdev/net-next/c/232aa459aa40
+  - [net-next,v8,2/7] net: usb: lan78xx: remove explicit check for missing PHY driver
+    https://git.kernel.org/netdev/net-next/c/3da0ae52705d
+  - [net-next,v8,3/7] net: usb: lan78xx: refactor PHY init to separate detection and MAC configuration
+    https://git.kernel.org/netdev/net-next/c/d39f339d2603
+  - [net-next,v8,4/7] net: usb: lan78xx: move LED DT configuration to helper
+    https://git.kernel.org/netdev/net-next/c/8ba1f33c55d2
+  - [net-next,v8,5/7] net: usb: lan78xx: Extract PHY interrupt acknowledgment to helper
+    https://git.kernel.org/netdev/net-next/c/f485849a381f
+  - [net-next,v8,6/7] net: usb: lan78xx: Refactor USB link power configuration into helper
+    https://git.kernel.org/netdev/net-next/c/d746e0740b28
+  - [net-next,v8,7/7] net: usb: lan78xx: Extract flow control configuration to helper
+    https://git.kernel.org/netdev/net-next/c/ef6a29e86785
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
