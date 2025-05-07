@@ -1,116 +1,99 @@
-Return-Path: <netdev+bounces-188518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07369AAD2C7
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 03:25:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DF72AAD2D1
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 03:29:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74D305076CE
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 01:25:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6ADF31BA86C7
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 01:30:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C7AA145B16;
-	Wed,  7 May 2025 01:24:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7222E142E7C;
+	Wed,  7 May 2025 01:29:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="aML28z2l"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cFhjvI1T"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8E313B280
-	for <netdev@vger.kernel.org>; Wed,  7 May 2025 01:24:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DA1B13D8A4
+	for <netdev@vger.kernel.org>; Wed,  7 May 2025 01:29:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746581074; cv=none; b=LvdvNId97TM+i4190yoCNc2H11zrdyxzOFeWt1OyOwYslD2Ep9v4sAYLgqIeBeBuqC8QSoYrlbF9OqfahnhjIhbhpCcMP/Aq7C3l5fGLOmtQymUyvLD9HP1hcYQq5If3pXlHW6ZIL5GHeuZiyAru1kDYPcV99Xwcd+Npuih8wY8=
+	t=1746581394; cv=none; b=M2mlQ6l7VRJofFJXgacPAP+bjRNdJx2Yi//W9fwt4BdQmZSAPMpwwW3qfUmg3PNWG2w1GdB0kk9+pZ74fVZVFQAGtgGIfkAh+si59TtfTMqgThtszaX/FDG7lExfBXVz8rZX6i9WTzdjJ6cFYu5/J+dEALQN4w6Rmag8eyvcw4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746581074; c=relaxed/simple;
-	bh=xV2IIQBNovFSFUm1kmG/rEr/KiOoJL8cmCmD5yNa8IU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=YXQ78vd776tOynXpdTznWMZEHROVy/lWOmLq8PXZIFRCuelS+Xhgpww+sOE7ngd7Hvk0yU3cpLkYp+wwyAytl/CmoWwHTiixVFsAV41N8/QIqevPfMVSSdQ6ROku9243Yx/b0auZY+jc8m7etxaoeyKRO+s/G8HDPy/nlu96lz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=aML28z2l; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1746581070;
-	bh=fSCOIBjEZ/DoR2mruy6mVzNzXxWOGILrWEgfSm9ifWc=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=aML28z2lu0AH1Akc8Kamgmm0/C/BmsAa7jQq1MsqVvUQPvUkbwsW06P4OBRue8xNf
-	 aya8G+nDUQG68REE1yr6rrOqXgait6O7KE+p1Y90P5yhirMtM8AVKORIQPg4xU3TlG
-	 pchcqiR1qcbIy3m5XfmM9W1FmjN1udeQrGRSFd0J2LAfEJ5jZe2454ROIpV4L7mIEL
-	 quSKJFiFc+kztw/R9WkyToSLjdMxvsiP6mFPDa13je6xMeaLL5qAQABGWZqVRZbdqm
-	 HzQ1Q/yS7jauRmn/jactMuRGyMCjrp1QNXHX9+EQOl1/coksP9DEqfkNDEXqjjNa/z
-	 VVHqLBsVgG/BA==
-Received: from [192.168.14.220] (unknown [159.196.94.230])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 25C516C00A;
-	Wed,  7 May 2025 09:24:29 +0800 (AWST)
-Message-ID: <84b6bdceff61d495661dcf3500fd4bf19cf4e7be.camel@codeconstruct.com.au>
-Subject: Re: [PATCH net] net: mctp: Don't access ifa_index when missing
-From: Matt Johnston <matt@codeconstruct.com.au>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jeremy Kerr <jk@codeconstruct.com.au>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, 
- syzbot+e76d52dadc089b9d197f@syzkaller.appspotmail.com, 
- syzbot+1065a199625a388fce60@syzkaller.appspotmail.com
-Date: Wed, 07 May 2025 09:24:29 +0800
-In-Reply-To: <20250506180630.148c6ada@kernel.org>
-References: <20250505-mctp-addr-dump-v1-1-a997013f99b8@codeconstruct.com.au>
-	 <20250506180630.148c6ada@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3-0ubuntu1 
+	s=arc-20240116; t=1746581394; c=relaxed/simple;
+	bh=Mk5cFfrIe6TKz2XR0JKXuqQVykBBzrsNm2xgFuc3EKQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=haetMVC+S/d9rDfITaqBuOYdFJps86krFrIfKk+J6V+PVqi0Pk1T/NxIGocCITlZqWanMZq2tv1luYvNrtf8P8+DZcQzdl1Jvk+eX+I3YAgFVhPEPXRpDLNxlY8Sy3Mhmz8ZNO95AxoZFqVprmQpU4LkO5u4LArLHAGciMPnfMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cFhjvI1T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5B42C4CEEF;
+	Wed,  7 May 2025 01:29:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746581393;
+	bh=Mk5cFfrIe6TKz2XR0JKXuqQVykBBzrsNm2xgFuc3EKQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=cFhjvI1TE2mCCrCjqK+PbWYPdtfXPiG0+LHDJuRZIkfaI7gLvfwOjJOtvjxfSnxkB
+	 ck8yfPkAbZSFYsssUHMTM97ze6gMjUIzNWrbXYQVqn3ZeDKdFMhLJFEousoqsKxYGN
+	 HNa7gXds0i52IysiQlGx89em2waw4rhRGCDlX7c6Sl4kUQxjXPUOkZPJsU+OrC8PyD
+	 NQAfLXb8AIFO/55/a3hO8M1JN1RYEkeuWB63tCSwip2mYFw41IVD82SbAcrp+taTkW
+	 Lq9T5ghXNXXFe9BEzQeB5/wpVcrjHEUuMhEIjCaLID7LdZw3s5s4qnlJ7xtal8f0P2
+	 u1BhuVk6G+XJw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EACD2380664B;
+	Wed,  7 May 2025 01:30:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 0/4] devlink: sanitize variable typed attributes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174658143279.1703446.8089871773110319316.git-patchwork-notify@kernel.org>
+Date: Wed, 07 May 2025 01:30:32 +0000
+References: <20250505114513.53370-1-jiri@resnulli.us>
+In-Reply-To: <20250505114513.53370-1-jiri@resnulli.us>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, saeedm@nvidia.com, horms@kernel.org,
+ donald.hunter@gmail.com
 
-On Tue, 2025-05-06 at 18:06 -0700, Jakub Kicinski wrote:
-> On Mon, 05 May 2025 17:05:12 +0800 Matt Johnston wrote:
-> > +		/* Userspace programs providing AF_MCTP must be expecting ifa_index =
-filter
-> > +		 * behaviour, as will those setting strict_check.
-> > +		 */
-> > +		if (hdr->ifa_family =3D=3D AF_MCTP || cb->strict_check)
-> > +			ifindex =3D hdr->ifa_index;
->=20
-> The use of cb->strict_check is a bit strange here. I could be wrong but
-> I though cb->strict_check should only impact validation. Not be used
-> for changing behavior.
+Hello:
 
-It was following behaviour of inet_dump_addr()/inet6_dump_addr() where
-filtering is applied if strict check is set.
-I don't have strong opinion whether strict_check makes sense for MCTP thoug=
-h
-- it depends on
-whether userspace expects strict_check to apply to all families, or just
-inet4/inet6.
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> If you have a reason to believe all user space passes a valid header -
-> how about we just return an error if message is too short?
-> IPv4 and IPv6 seem to return an error if message is short and
-> cb->strict_check, so they are more strict. MCTP doesn't have a ton of
-> legacy user space, we don't have to be lenient at all. My intuition
-> would be to always act like IP acts under cb->strict_check
+On Mon,  5 May 2025 13:45:09 +0200 you wrote:
+> From: Jiri Pirko <jiri@nvidia.com>
+> 
+> This is continuation based on first two patches
+> of https://lore.kernel.org/netdev/20250425214808.507732-1-saeed@kernel.org/
+> 
+> Better to take it as a separate patchset, as the rest of the original
+> patchset is probably settled.
+> 
+> [...]
 
-The problem is that programs will pass ifa_family=3DAF_UNSPEC with a short
-header, no strict_check=C2=A0
-(eg busybox "ip addr show").
-An AF_UNSPEC request will reach mctp_dump_addrinfo(), so we don't want that
-returning an error.
-Maybe mctp_dump_addrinfo() should ignore AF_UNSPEC requests entirely, and
-only populate
-a response when ifa_family=3DAF_MCTP. That would be OK for the existing mct=
-p
-userspace programs=C2=A0
-I know about, though there may be other users that are calling with AF_UNSP=
-EC
-but filtering=C2=A0
-userspace-side for AF_MCTP addresses.
+Here is the summary with links:
+  - [net-next,v2,1/4] tools: ynl-gen: allow noncontiguous enums
+    https://git.kernel.org/netdev/net-next/c/37006af675e8
+  - [net-next,v2,2/4] devlink: define enum for attr types of dynamic attributes
+    https://git.kernel.org/netdev/net-next/c/429ac6211494
+  - [net-next,v2,3/4] devlink: avoid param type value translations
+    https://git.kernel.org/netdev/net-next/c/f9e78932eac6
+  - [net-next,v2,4/4] devlink: use DEVLINK_VAR_ATTR_TYPE_* instead of NLA_* in fmsg
+    https://git.kernel.org/netdev/net-next/c/88debb521f15
 
-Matt
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
