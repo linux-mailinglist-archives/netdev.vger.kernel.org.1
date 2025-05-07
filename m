@@ -1,97 +1,66 @@
-Return-Path: <netdev+bounces-188744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B7D1AAE6AB
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 18:29:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 644C5AAE6B3
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 18:31:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63F714E63CD
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 16:29:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 491B87B2DCC
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 16:29:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D565D28B7CD;
-	Wed,  7 May 2025 16:29:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 957B928B7C9;
+	Wed,  7 May 2025 16:30:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gEU8Fffk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bpq6P4pP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFD84201266;
-	Wed,  7 May 2025 16:29:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66FEF153BED;
+	Wed,  7 May 2025 16:30:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746635364; cv=none; b=UeMqpmbTzOl/S8ZmgGHQXPi7YoKE/yo/pj16bYhZSumwVda9Kko5c6aBplgz0LXM5akZ6hVn5jyvYi8mYkDT2EorSypjwiIv7NdmF9omjq4KkXIliErkaOwaC7sh2SKuih9lJw/ZW25bHokmyi8BTaawZEBI9IVHJT9HMSt+L0c=
+	t=1746635458; cv=none; b=fgw3E9mq3e9jXIa99RMDtfc86QAgYX5EeiU3s5l+01e1+lHIYOgL+iSYnE2jGrXR05q/lDANKsUMSjeM62+PELWurN1UA2RRImGnR4UxxdmRBZ7Wm8O5q4V7vYGkVyRq5jiSAgvLFPiZqzFq96aopVJ/Hbzllitin66ViCA5iPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746635364; c=relaxed/simple;
-	bh=LjPYYfMdxis7ITOMKVHr/CAOCVAW0IbwVEhXnZ55sxo=;
+	s=arc-20240116; t=1746635458; c=relaxed/simple;
+	bh=6aOpju2M8SqP4rsAuVnCCFQv1NLqmuWeSfVosiG/weU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aiCkSymYBwhEpBRdf16jS2CuWuJxfLBU4nTniqmkTJa8W4h5hUkZY8lXdwetz9YRQFl9sPiK53RjBnk/QPRg/bs7dNKVMaDe86nLw7gF30XPdxXX7vjRowxH/M6sbFu3NCJPNklEmCZ4BUzgVnIeEKhPrSM2Hxrp6cTqhED5ZCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gEU8Fffk; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746635363; x=1778171363;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=LjPYYfMdxis7ITOMKVHr/CAOCVAW0IbwVEhXnZ55sxo=;
-  b=gEU8FffkmbhHbSNC5TcWOrtyETQHVIzGyNrkiJwr5CTFH9ASAHEPMckD
-   cSDvJJL3H0sy6REDaoP1dT21KyUaOlrV1feQ1YtlfOI+r4x0Q1HtpesGo
-   e5HdZPrnIQZ7lvoDauDEYYC7VpqWv+YX5e1kn9zDp9A7WLrpAJ1muIV5u
-   T6xZjCBks4bq870OZ/1AN72LAm0nctVhnMXvpzIxjGSy5dikg/F9+uASf
-   H1L0l4XsDXDU9rfCRUhI5r8n2zLmrBnj83fCBg99T9FCDkiPY23/JB5o5
-   WetBkqCacPHyuZ/cVqFGbcBpZUyrBF4TlAXlymkumYqGY/cQZkqUqlDK2
-   A==;
-X-CSE-ConnectionGUID: 7PHRl6zrRW6VOl20qfxf1A==
-X-CSE-MsgGUID: uTFjb2zaTAyKoF4cJDaQFA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11426"; a="48536568"
-X-IronPort-AV: E=Sophos;i="6.15,269,1739865600"; 
-   d="scan'208";a="48536568"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2025 09:29:22 -0700
-X-CSE-ConnectionGUID: /qLkKdV/RSK4Bax55Pv+ug==
-X-CSE-MsgGUID: q2i/ICsATHi57GGk/T2P3g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,269,1739865600"; 
-   d="scan'208";a="141201293"
-Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 07 May 2025 09:29:16 -0700
-Received: from kbuild by 1992f890471c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uChdx-0008AL-1P;
-	Wed, 07 May 2025 16:29:13 +0000
-Date: Thu, 8 May 2025 00:28:49 +0800
-From: kernel test robot <lkp@intel.com>
-To: Shradha Gupta <shradhagupta@linux.microsoft.com>,
-	linux-hyperv@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Nipun Gupta <nipun.gupta@amd.com>,
-	Yury Norov <yury.norov@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Jonathan Cameron <Jonathan.Cameron@huwei.com>,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>,
-	Shivamurthy Shastri <shivamurthy.shastri@linutronix.de>,
-	Kevin Tian <kevin.tian@intel.com>, Long Li <longli@microsoft.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Bjorn Helgaas <helgaas@kernel.org>, Rob Herring <robh@kernel.org>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Simon Horman <horms@kernel.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 2/2] net: mana: Allow MANA driver to allocate PCI vector
- dynamically
-Message-ID: <202505080049.7AvfzOGc-lkp@intel.com>
-References: <1744817781-3243-1-git-send-email-shradhagupta@linux.microsoft.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=o4KJytrfU4SsmPpVRnOr1m213AnKzY7CE+xuMFGkvzdMpL2HcWzuhtnoEHl+gC/muuNMWFPn/hjLprs66w8W+FqMu5A0t84pVyS2aux9BTxUuSc15/ZGeAPwFXhHIAAoT+esl8+8pGDag6WCrXOHkplIJ3FLCYDRHroPNebLfcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bpq6P4pP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A52CBC4CEE9;
+	Wed,  7 May 2025 16:30:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746635457;
+	bh=6aOpju2M8SqP4rsAuVnCCFQv1NLqmuWeSfVosiG/weU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Bpq6P4pPED5yegGpV1pLtibIsST/l6exbkJs4qZ/fWsUgA6Q7+jz7YsiNowEvonVy
+	 GNOHB74zZFfhGLCGG8jbc9giZiYHFphZCDOiWoSvCxgVrQGj4rbbm6VvOMGGvRG0/m
+	 7Kbu/vGz9mhof9lz8f1Fo6p52/Su/iPgUaIY2o+z5LGnGAHBBvZqgPl3OI5lajbcEV
+	 g8f0V3WwlYk2EySeOHod6s03Iz97X58ROlqaeYICXXm+hg1NsI+TQxUfsL+YVxxDB8
+	 f4sDxMexBAj46tbBczV4mE+f3vML5TsPmKjLb4WqTzc+sD7kom+wsyOebwVBDPjIWo
+	 krFO5sdbpzEEg==
+Date: Wed, 7 May 2025 17:30:50 +0100
+From: Simon Horman <horms@kernel.org>
+To: Tanmay Jagdale <tanmay@marvell.com>
+Cc: bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
+	jerinj@marvell.com, hkelam@marvell.com, sbhatta@marvell.com,
+	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, bbhushan2@marvell.com, bhelgaas@google.com,
+	pstanner@redhat.com, gregkh@linuxfoundation.org,
+	peterz@infradead.org, linux@treblig.org,
+	krzysztof.kozlowski@linaro.org, giovanni.cabiddu@intel.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, rkannoth@marvell.com, sumang@marvell.com,
+	gcherian@marvell.com
+Subject: Re: [net-next PATCH v1 14/15] octeontx2-pf: ipsec: Process CPT
+ metapackets
+Message-ID: <20250507163050.GH3339421@horms.kernel.org>
+References: <20250502132005.611698-1-tanmay@marvell.com>
+ <20250502132005.611698-15-tanmay@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,128 +69,241 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1744817781-3243-1-git-send-email-shradhagupta@linux.microsoft.com>
+In-Reply-To: <20250502132005.611698-15-tanmay@marvell.com>
 
-Hi Shradha,
+On Fri, May 02, 2025 at 06:49:55PM +0530, Tanmay Jagdale wrote:
+> CPT hardware forwards decrypted IPsec packets to NIX via the X2P bus
+> as metapackets which are of 256 bytes in length. Each metapacket
+> contains CPT_PARSE_HDR_S and initial bytes of the decrypted packet
+> that helps NIX RX in classifying and submitting to CPU. Additionally,
+> CPT also sets BIT(11) of the channel number to indicate that it's a
+> 2nd pass packet from CPT.
+> 
+> Since the metapackets are not complete packets, they don't have to go
+> through L3/L4 layer length and checksum verification so these are
+> disabled via the NIX_LF_INLINE_RQ_CFG mailbox during IPsec initialization.
+> 
+> The CPT_PARSE_HDR_S contains a WQE pointer to the complete decrypted
+> packet. Add code in the rx NAPI handler to parse the header and extract
+> WQE pointer. Later, use this WQE pointer to construct the skb, set the
+> XFRM packet mode flags to indicate successful decryption before submitting
+> it to the network stack.
+> 
+> Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
+> ---
+>  .../marvell/octeontx2/nic/cn10k_ipsec.c       | 61 +++++++++++++++++++
+>  .../marvell/octeontx2/nic/cn10k_ipsec.h       | 47 ++++++++++++++
+>  .../marvell/octeontx2/nic/otx2_struct.h       | 16 +++++
+>  .../marvell/octeontx2/nic/otx2_txrx.c         | 25 +++++++-
+>  4 files changed, 147 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+> index 91c8f13b6e48..bebf5cdedee4 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+> @@ -346,6 +346,67 @@ static int cn10k_outb_cpt_init(struct net_device *netdev)
+>  	return ret;
+>  }
+>  
+> +struct nix_wqe_rx_s *cn10k_ipsec_process_cpt_metapkt(struct otx2_nic *pfvf,
+> +						     struct nix_rx_sg_s *sg,
+> +						     struct sk_buff *skb,
+> +						     int qidx)
+> +{
+> +	struct nix_wqe_rx_s *wqe = NULL;
+> +	u64 *seg_addr = &sg->seg_addr;
+> +	struct cpt_parse_hdr_s *cptp;
+> +	struct xfrm_offload *xo;
+> +	struct otx2_pool *pool;
+> +	struct xfrm_state *xs;
+> +	struct sec_path *sp;
+> +	u64 *va_ptr;
+> +	void *va;
+> +	int i;
+> +
+> +	/* CPT_PARSE_HDR_S is present in the beginning of the buffer */
+> +	va = phys_to_virt(otx2_iova_to_phys(pfvf->iommu_domain, *seg_addr));
+> +
+> +	/* Convert CPT_PARSE_HDR_S from BE to LE */
+> +	va_ptr = (u64 *)va;
 
-kernel test robot noticed the following build warnings:
+phys_to_virt returns a void *. And there is no need to explicitly cast
+another pointer type to or from a void *.
 
-[auto build test WARNING on pci/next]
-[also build test WARNING on pci/for-linus linus/master v6.15-rc5 next-20250507]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+So probably this can simply be:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Shradha-Gupta/PCI-hv-enable-pci_hyperv-to-allow-dynamic-vector-allocation/20250416-233828
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/pci/pci.git next
-patch link:    https://lore.kernel.org/r/1744817781-3243-1-git-send-email-shradhagupta%40linux.microsoft.com
-patch subject: [PATCH 2/2] net: mana: Allow MANA driver to allocate PCI vector dynamically
-config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20250508/202505080049.7AvfzOGc-lkp@intel.com/config)
-compiler: clang version 20.1.2 (https://github.com/llvm/llvm-project 58df0ef89dd64126512e4ee27b4ac3fd8ddf6247)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250508/202505080049.7AvfzOGc-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202505080049.7AvfzOGc-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/net/ethernet/microsoft/mana/gdma_main.c:500:2: warning: variable 'gic' is used uninitialized whenever 'for' loop exits because its condition is false [-Wsometimes-uninitialized]
-     500 |         list_for_each(pos, &gc->irq_contexts) {
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/list.h:687:27: note: expanded from macro 'list_for_each'
-     687 |         for (pos = (head)->next; !list_is_head(pos, (head)); pos = pos->next)
-         |                                  ^~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/microsoft/mana/gdma_main.c:510:7: note: uninitialized use occurs here
-     510 |         if (!gic)
-         |              ^~~
-   drivers/net/ethernet/microsoft/mana/gdma_main.c:500:2: note: remove the condition if it is always true
-     500 |         list_for_each(pos, &gc->irq_contexts) {
-         |         ^
-   include/linux/list.h:687:27: note: expanded from macro 'list_for_each'
-     687 |         for (pos = (head)->next; !list_is_head(pos, (head)); pos = pos->next)
-         |                                  ^
-   drivers/net/ethernet/microsoft/mana/gdma_main.c:475:30: note: initialize the variable 'gic' to silence this warning
-     475 |         struct gdma_irq_context *gic;
-         |                                     ^
-         |                                      = NULL
-   drivers/net/ethernet/microsoft/mana/gdma_main.c:541:2: warning: variable 'gic' is used uninitialized whenever 'for' loop exits because its condition is false [-Wsometimes-uninitialized]
-     541 |         list_for_each(pos, &gc->irq_contexts) {
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/list.h:687:27: note: expanded from macro 'list_for_each'
-     687 |         for (pos = (head)->next; !list_is_head(pos, (head)); pos = pos->next)
-         |                                  ^~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/microsoft/mana/gdma_main.c:551:7: note: uninitialized use occurs here
-     551 |         if (!gic)
-         |              ^~~
-   drivers/net/ethernet/microsoft/mana/gdma_main.c:541:2: note: remove the condition if it is always true
-     541 |         list_for_each(pos, &gc->irq_contexts) {
-         |         ^
-   include/linux/list.h:687:27: note: expanded from macro 'list_for_each'
-     687 |         for (pos = (head)->next; !list_is_head(pos, (head)); pos = pos->next)
-         |                                  ^
-   drivers/net/ethernet/microsoft/mana/gdma_main.c:523:30: note: initialize the variable 'gic' to silence this warning
-     523 |         struct gdma_irq_context *gic;
-         |                                     ^
-         |                                      = NULL
-   2 warnings generated.
+	va_ptr = phys_to_virt(...);
 
 
-vim +500 drivers/net/ethernet/microsoft/mana/gdma_main.c
+> +	for (i = 0; i < (sizeof(struct cpt_parse_hdr_s) / sizeof(u64)); i++)
+> +		va_ptr[i] = be64_to_cpu(va_ptr[i]);
 
-   470	
-   471	static int mana_gd_register_irq(struct gdma_queue *queue,
-   472					const struct gdma_queue_spec *spec)
-   473	{
-   474		struct gdma_dev *gd = queue->gdma_dev;
-   475		struct gdma_irq_context *gic;
-   476		struct gdma_context *gc;
-   477		unsigned int msi_index;
-   478		struct list_head *pos;
-   479		unsigned long flags, flag_irq;
-   480		struct device *dev;
-   481		int err = 0, count;
-   482	
-   483		gc = gd->gdma_context;
-   484		dev = gc->dev;
-   485		msi_index = spec->eq.msix_index;
-   486	
-   487		if (msi_index >= gc->num_msix_usable) {
-   488			err = -ENOSPC;
-   489			dev_err(dev, "Register IRQ err:%d, msi:%u nMSI:%u",
-   490				err, msi_index, gc->num_msix_usable);
-   491	
-   492			return err;
-   493		}
-   494	
-   495		queue->eq.msix_index = msi_index;
-   496	
-   497		/* get the msi_index value from the list*/
-   498		count = 0;
-   499		spin_lock_irqsave(&gc->irq_ctxs_lock, flag_irq);
- > 500		list_for_each(pos, &gc->irq_contexts) {
-   501			if (count == msi_index) {
-   502				gic = list_entry(pos, struct gdma_irq_context, gic_list);
-   503				break;
-   504			}
-   505	
-   506			count++;
-   507		}
-   508		spin_unlock_irqrestore(&gc->irq_ctxs_lock, flag_irq);
-   509	
-   510		if (!gic)
-   511			return -1;
-   512	
-   513		spin_lock_irqsave(&gic->lock, flags);
-   514		list_add_rcu(&queue->entry, &gic->eq_list);
-   515		spin_unlock_irqrestore(&gic->lock, flags);
-   516	
-   517		return 0;
-   518	}
-   519	
+Please don't use the same variable to hold both big endian and
+host byte order values. Because tooling can no longer provide
+information about endian mismatches.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Flagged by Sparse.
+
+Also, isn't only the long word that exactly comprises the
+wqe_ptr field of cpt_parse_hdr_s used? If so, perhaps
+only that portion needs to be converted to host byte order?
+
+I'd explore describing the members of struct cpt_parse_hdr_s as __be64.
+And use FIELD_PREP and FIELD_GET to deal with parts of each __be64.
+I think that would lead to a simpler implementation.
+
+> +
+> +	cptp = (struct cpt_parse_hdr_s *)va;
+> +
+> +	/* Convert the wqe_ptr from CPT_PARSE_HDR_S to a CPU usable pointer */
+> +	wqe = (struct nix_wqe_rx_s *)phys_to_virt(otx2_iova_to_phys(pfvf->iommu_domain,
+> +								    cptp->wqe_ptr));
+
+There is probably no need to cast from void * here either.
+
+	wqe = phys_to_virt(otx2_iova_to_phys(pfvf->iommu_domain,
+	                   cptp->wqe_ptr));
+
+> +
+> +	/* Get the XFRM state pointer stored in SA context */
+> +	va_ptr = pfvf->ipsec.inb_sa->base +
+> +		(cptp->cookie * pfvf->ipsec.sa_tbl_entry_sz) + 1024;
+> +	xs = (struct xfrm_state *)*va_ptr;
+
+Maybe this can be more succinctly written as follows?
+
+	xs = pfvf->ipsec.inb_sa->base +
+		(cptp->cookie * pfvf->ipsec.sa_tbl_entry_sz) + 1024;
+
+> +
+> +	/* Set XFRM offload status and flags for successful decryption */
+> +	sp = secpath_set(skb);
+> +	if (!sp) {
+> +		netdev_err(pfvf->netdev, "Failed to secpath_set\n");
+> +		wqe = NULL;
+> +		goto err_out;
+> +	}
+> +
+> +	rcu_read_lock();
+> +	xfrm_state_hold(xs);
+> +	rcu_read_unlock();
+> +
+> +	sp->xvec[sp->len++] = xs;
+> +	sp->olen++;
+> +
+> +	xo = xfrm_offload(skb);
+> +	xo->flags = CRYPTO_DONE;
+> +	xo->status = CRYPTO_SUCCESS;
+> +
+> +err_out:
+> +	/* Free the metapacket memory here since it's not needed anymore */
+> +	pool = &pfvf->qset.pool[qidx];
+> +	otx2_free_bufs(pfvf, pool, *seg_addr - OTX2_HEAD_ROOM, pfvf->rbsize);
+> +	return wqe;
+> +}
+> +
+>  static int cn10k_inb_alloc_mcam_entry(struct otx2_nic *pfvf,
+>  				      struct cn10k_inb_sw_ctx_info *inb_ctx_info)
+>  {
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
+> index aad5ebea64ef..68046e377486 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
+> @@ -8,6 +8,7 @@
+>  #define CN10K_IPSEC_H
+>  
+>  #include <linux/types.h>
+> +#include "otx2_struct.h"
+>  
+>  DECLARE_STATIC_KEY_FALSE(cn10k_ipsec_sa_enabled);
+>  
+> @@ -302,6 +303,41 @@ struct cpt_sg_s {
+>  	u64 rsvd_63_50	: 14;
+>  };
+>  
+> +/* CPT Parse Header Structure for Inbound packets */
+> +struct cpt_parse_hdr_s {
+> +	/* Word 0 */
+> +	u64 cookie      : 32;
+> +	u64 match_id    : 16;
+> +	u64 err_sum     : 1;
+> +	u64 reas_sts    : 4;
+> +	u64 reserved_53 : 1;
+> +	u64 et_owr      : 1;
+> +	u64 pkt_fmt     : 1;
+> +	u64 pad_len     : 3;
+> +	u64 num_frags   : 3;
+> +	u64 pkt_out     : 2;
+> +
+> +	/* Word 1 */
+> +	u64 wqe_ptr;
+> +
+> +	/* Word 2 */
+> +	u64 frag_age    : 16;
+> +	u64 res_32_16   : 16;
+> +	u64 pf_func     : 16;
+> +	u64 il3_off     : 8;
+> +	u64 fi_pad      : 3;
+> +	u64 fi_offset   : 5;
+> +
+> +	/* Word 3 */
+> +	u64 hw_ccode    : 8;
+> +	u64 uc_ccode    : 8;
+> +	u64 res3_32_16  : 16;
+> +	u64 spi         : 32;
+> +
+> +	/* Word 4 */
+> +	u64 misc;
+> +};
+> +
+>  /* CPT LF_INPROG Register */
+>  #define CPT_LF_INPROG_INFLIGHT	GENMASK_ULL(8, 0)
+>  #define CPT_LF_INPROG_GRB_CNT	GENMASK_ULL(39, 32)
+
+...
+
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+
+...
+
+> @@ -355,8 +359,25 @@ static void otx2_rcv_pkt_handler(struct otx2_nic *pfvf,
+>  	if (unlikely(!skb))
+>  		return;
+>  
+> -	start = (void *)sg;
+> -	end = start + ((cqe->parse.desc_sizem1 + 1) * 16);
+> +	if (parse->chan & 0x800) {
+> +		orig_pkt_wqe = cn10k_ipsec_process_cpt_metapkt(pfvf, sg, skb, cq->cq_idx);
+> +		if (!orig_pkt_wqe) {
+> +			netdev_err(pfvf->netdev, "Invalid WQE in CPT metapacket\n");
+> +			napi_free_frags(napi);
+> +			cq->pool_ptrs++;
+> +			return;
+> +		}
+> +		/* Switch *sg to the orig_pkt_wqe's *sg which has the actual
+> +		 * complete decrypted packet by CPT.
+> +		 */
+> +		sg = &orig_pkt_wqe->sg;
+> +		start = (void *)sg;
+
+I don't think this cast is necessary, start is a void *.
+Likewise below.
+
+> +		end = start + ((orig_pkt_wqe->parse.desc_sizem1 + 1) * 16);
+> +	} else {
+> +		start = (void *)sg;
+> +		end = start + ((cqe->parse.desc_sizem1 + 1) * 16);
+> +	}
+
+The (size + 1) * 16 calculation seems to be repeated.
+Perhaps a helper function is appropriate.
+
+> +
+>  	while (start < end) {
+>  		sg = (struct nix_rx_sg_s *)start;
+>  		seg_addr = &sg->seg_addr;
+> -- 
+> 2.43.0
+> 
+> 
 
