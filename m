@@ -1,117 +1,100 @@
-Return-Path: <netdev+bounces-188506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70D63AAD233
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 02:19:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3B0FAAD239
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 02:21:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 983E21BA8AAC
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 00:20:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15C704687F9
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 00:21:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DD398F4A;
-	Wed,  7 May 2025 00:19:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51899A94A;
+	Wed,  7 May 2025 00:21:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xgPdcWUh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VXbX07mM"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E04410E0;
-	Wed,  7 May 2025 00:19:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ECCA23DE;
+	Wed,  7 May 2025 00:21:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746577186; cv=none; b=Tp67Hoj8huqkKrFkWfpZXiZ4Cn59s0Q6ft5Rkjgw7VyAi5cKmd5No+bijKUjofyoVty0+9Rv+KWzzTCMgKKPHS8nknJsUC9iWN90MKMBVB6GlHPmjODJFDEENburtXhzCSe/fPnr44qCaYZd+sTsr8SI73muXKeTZDesKOIMVfo=
+	t=1746577302; cv=none; b=KuOnpBs2z5sbq9pzdanIieOzli/kxvkrgZMcet9uBpTaboaYVvEemoGVnxprM/RfjNaovdl3O8AxAvcF7dqC8KuCyi64gdyq04yGyxazZeF1gpd5aRCRxfeDaYRU9K0dA1A3aYhjCi22V4xoDJK4/G9qTe7cGzmTbUa/wAsMuF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746577186; c=relaxed/simple;
-	bh=fZxGcNvTdZTFQLMlJzF/fwaxYwZT8e6wbu3mTrUHadg=;
+	s=arc-20240116; t=1746577302; c=relaxed/simple;
+	bh=imNfF9iMlp377Q67WylkmovEDghyzTyehxE1g7lwRfE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZSMO+LlMtJfEC9XJ6UoEPI+hea7MLOtnGzKnog0HJeJxx+R6gN/vn9D387SbIK7zjhfH59GpZt1l1XjjbPFOcBW9CzklfE0xn/bklg224xhMFH/Zul8D4bu/x6BcAnqIFWL28+dBfuiyematj8B4JWIRqCqdRCjOhX9ENAuLLag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xgPdcWUh; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=xTXkZlmGU0IUIeI5o1mZLEL2Y+CPmDfnV2Cutj83nfI=; b=xgPdcWUhv4EFQcPM13XcmfmxKb
-	aBP9zY+Xa7DSWHBgJrqyf7u/sw7qlCR0Bx+JRNdmgf2DqObdL1PgiPlD3I2EcCQdaz5yhx0qDV2go
-	qnPTEFZTNRz/ekJxgctQ4Fo8g25YfU4FFQ42XSzEzlnjWpqW9mIY7a3szBE35MoooSm0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uCSVU-00BpHj-5F; Wed, 07 May 2025 02:19:28 +0200
-Date: Wed, 7 May 2025 02:19:28 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sean Anderson <sean.anderson@linux.dev>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>, upstream@airoha.com,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Joyce Ooi <joyce.ooi@intel.com>,
-	Madalin Bucur <madalin.bucur@nxp.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	UNGLinuxDriver@microchip.com, Wei Fang <wei.fang@nxp.com>,
-	imx@lists.linux.dev, linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [net-next PATCH v3 05/11] net: pcs: lynx: Convert to an MDIO
- driver
-Message-ID: <90b2af4e-6c6e-41b9-be5b-ead443cd85b2@lunn.ch>
-References: <20250415193323.2794214-1-sean.anderson@linux.dev>
- <20250415193323.2794214-6-sean.anderson@linux.dev>
- <20250415193323.2794214-6-sean.anderson@linux.dev>
- <20250506215841.54rnxy3wqtlywxgb@skbuf>
- <50e809ea-62a4-413d-af63-7900929c3247@linux.dev>
- <50e809ea-62a4-413d-af63-7900929c3247@linux.dev>
- <20250506221834.uw5ijjeyinehdm3x@skbuf>
- <d66ac48c-8fe3-4782-9b36-8506bb1da779@linux.dev>
- <20250506222928.fozoqcxuf7roxur5@skbuf>
- <39753b36-adfd-4e00-beea-b58c1e5606e3@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZvSKVK86BA6h3+Kt41kGRE1Czb/U1PkEZUw1DHBKLnkkhsQga1K/S1nu5ojR65fyE4R84dypBnz+4QJKh25H0SOWbfwc+rBd3Uy6+6CUACK6PSC0tssStDaDUFLXzk02YgcggX7ahhbU/3oal5Bba/S04YDrw1ZtdJU0F9PNi7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VXbX07mM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65CC0C4CEE4;
+	Wed,  7 May 2025 00:21:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746577301;
+	bh=imNfF9iMlp377Q67WylkmovEDghyzTyehxE1g7lwRfE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VXbX07mMuCpkNiBHJN4rmrgcdmUORSQLm6IgjNzunCN5sfoWgzFLvNkuYZdUE7ECO
+	 eOd+g/+mj+keiM5IvV7mpm0XfueHPLgr25+sOUJqoO6oKMnLZUC6Nm4lp1PKtolQ49
+	 HfiJDRYaMAQMhNHwFUeLsw93Zg8aVjpvL5uR8Sm6dUBIzHwcwjotgbn5g73tUKFB+Y
+	 VC28aACt3MYqgq/a7LtAi4F7wtRy/sHlP+XVECundMVQ4A2YXMhICtkchUkYJXrDVD
+	 eGvWGmmb2QKOtCW2Ond1HhS+zzzt/kH/NlHmP7n/SNawCMas6xSNyll2nXIO6ks2N2
+	 EAGrveoT5N1CA==
+Date: Tue, 6 May 2025 14:21:40 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: Feng Yang <yangfeng59949@163.com>, martin.lau@linux.dev, ast@kernel.org,
+	daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com,
+	song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com,
+	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com,
+	jolsa@kernel.org, mattbobrowski@google.com, rostedt@goodmis.org,
+	mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+	davem@davemloft.net, bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v3 sched_ext 2/2] sched_ext: Remove bpf_scx_get_func_proto
+Message-ID: <aBqnlHvfMdYu3JH8@slm.duckdns.org>
+References: <20250506061434.94277-1-yangfeng59949@163.com>
+ <20250506061434.94277-3-yangfeng59949@163.com>
+ <CAEf4BzbqrvgD11M5nTwP=oJeNph6n63qAZfW8Qu=MB9k3h_-ow@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <39753b36-adfd-4e00-beea-b58c1e5606e3@linux.dev>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAEf4BzbqrvgD11M5nTwP=oJeNph6n63qAZfW8Qu=MB9k3h_-ow@mail.gmail.com>
 
-> > You will need to explain that better, because what I see is that the
-> > "BSD-3-Clause" portion of the license has disappeared and that applies
-> > file-wide, not just to your contribution.
+On Tue, May 06, 2025 at 03:30:39PM -0700, Andrii Nakryiko wrote:
+> On Mon, May 5, 2025 at 11:15 PM Feng Yang <yangfeng59949@163.com> wrote:
+> >
+> > From: Feng Yang <yangfeng@kylinos.cn>
+> >
+> > task_storage_{get,delete} has been moved to bpf_base_func_proto.
+> >
+> > Suggested-by: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+> > Signed-off-by: Feng Yang <yangfeng@kylinos.cn>
+> > ---
+> >  kernel/sched/ext.c | 15 +--------------
+> >  1 file changed, 1 insertion(+), 14 deletions(-)
+> >
 > 
-> But I also have the option to just use the GPL-2.0+ license. When you
-> have an SPDX like (GPL-2.0+ OR BSD-3-Clause) that means the authors gave
-> permission to relicense it as
+> Given this has dependency on patch #1, we should either route this
+> patch through bpf-next, or we'll have to delay and resend it after
+> merge window.
 > 
-> - BSD-3-Clause
-> - GPL-2.0+
-> - GPL-2.0+ OR BSD-3-Clause
-> - GPL-2.0
-> - GPL-2.0 OR BSD-3-Clause
-> - GPL-3.0
-> - GPL-3.0 OR BSD-3-Clause
-> - GPL-4.0 (if it ever happens)
-> 
-> I want my contributions to remain free software, so I don't want to
-> allow someone to take the BSD-3-Clause option (without the GPL).
+> Tejun, any preferences?
 
-Please can you give us a summary of the licenses of this file over its
-complete history. Maybe it started out as GPL, and somebody wanted
-their parts to be under BSD, and so added the BSD parts?
+Yeah, bpf-next sounds good to me and please feel free to add:
 
-	Andrew
+ Acked-by: Tejun Heo <tj@kernel.org>
 
+Thanks.
+
+-- 
+tejun
 
