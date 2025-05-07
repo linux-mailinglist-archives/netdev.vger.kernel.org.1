@@ -1,121 +1,150 @@
-Return-Path: <netdev+bounces-188504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70E39AAD202
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 02:12:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A724AAD20C
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 02:16:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4AD2520881
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 00:12:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1016E520D00
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 00:16:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1920C4C91;
-	Wed,  7 May 2025 00:11:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CDA74B1E4B;
+	Wed,  7 May 2025 00:16:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Zga/Aob9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YvKdCbXV"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9404EEADC;
-	Wed,  7 May 2025 00:11:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ABF1EEBA;
+	Wed,  7 May 2025 00:16:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746576685; cv=none; b=TDyyfbII0d+F/fxJYTwMIRBvA+y2jpUmo7JmekgblHJl8PTZG/1JTG5fLYUY4XNEC+1eNriX7hJiJg2viUFNjXHXXdOdIlTSo0eKqEE7WkYQEbQJP3umMFX4tgY7Rns9Bz7rVshL0B4fuXyv4MzoqogIe0LDC//I14z5VJ3V/zU=
+	t=1746577003; cv=none; b=FfIujGr58DMnJRNal0a4fyIfUWK1mp7dKMEi6STCPgvUwG5R/pW+Yw9I3qRK2B6/sdrQ3y5qGnzA/N63SlkRnkxtRPjZTDy79qdb7oowy9b0UTjJG6M765UMipjSfxQPi5KB8zz5RWz7blJBnqd0Fl3Y5DI0l3AXX3KlrvinEmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746576685; c=relaxed/simple;
-	bh=G1qOCutaiBY5l/fT4RAeuVBxtwE5c+wjYJ9a5Eg6DZc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nP05S96E5CWCnagn85+WPMgDoqASPImmSd7ptNHXqJ2ugKNmNYQEzRRp++cG/+ynmptYrlqGKrR2w1soCDfXx/rqRodedvankpj6rXp2rDK0G2jvz50+U9qoCWT3Adu7OlS1TObAxJeOcX5WrOdvZjuTyJLhxyg/rmuFCo7qpR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Zga/Aob9; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=98pflIFzNKHbzDVEXy4pjIzkWLVMBe8kC2mJxekYy5E=; b=Zga/Aob9wxV06lwi0mqp5S5X7v
-	D5tObw97kMGUxSSpg9nYOysSnSHxjdyf7RonaYzrUXSmb9Ruy9EKNemuQmj1nQDxs5JPZNTYLDlKM
-	ZfnI0EGgd+wu3r7qc2HjpxyDnmthD2HxAKtE84XCMVcnMqub4Pw9LRmCGmhWYJRElAts=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uCSN6-00BpFN-Sr; Wed, 07 May 2025 02:10:48 +0200
-Date: Wed, 7 May 2025 02:10:48 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Inochi Amaoto <inochiama@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Chen Wang <unicorn_wang@outlook.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Guo Ren <guoren@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>,
-	Lothar Rubusch <l.rubusch@gmail.com>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	sophgo@lists.linux.dev, linux-riscv@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, Yixun Lan <dlan@gentoo.org>,
-	Longbin Li <looong.bin@gmail.com>
-Subject: Re: [PATCH net-next 0/4] riscv: sophgo: Add ethernet support for
- SG2042
-Message-ID: <ffa044e2-ee9e-4a34-af6a-2e45294144f7@lunn.ch>
-References: <20250506093256.1107770-1-inochiama@gmail.com>
- <c7a8185e-07b7-4a62-b39b-7d1e6eec64d6@lunn.ch>
- <fgao5qnim6o3gvixzl7lnftgsish6uajlia5okylxskn3nrexe@gyvgrp72jvj6>
+	s=arc-20240116; t=1746577003; c=relaxed/simple;
+	bh=WIblESYxXagNVxFzdusv4dclpEA4QpzqQV7zQARweF0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aKbCr+2agNl6lJP5VwLEGM4qdbM5XeyFKORC/XKuxVbHVfcSgZNjatpWXrUNuN89duN6p/+x719Ck5/tQYeGCZRpjowvfSp8n+mF6ahqPnwvsff8K7OjGk/Kfl/6jtlXHWrkuwADc67KgPelnNbrexqBlPMIHJ0ig56Q4zfQYmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YvKdCbXV; arc=none smtp.client-ip=209.85.166.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3da739653b2so974835ab.0;
+        Tue, 06 May 2025 17:16:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746577001; x=1747181801; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ERN4tZBNNxWUBbXOxBBa/C7QnG/J+3w3a9uKSXFs/2E=;
+        b=YvKdCbXV2NwAOiz7xKTYqU5wUDecj0eh6okGZgsqt+tfB3g4pJbPMs9JHRpG0jls34
+         ltFa4zPf8yyGskqzbCNUm0NDKB9qWGovicrsPSK1pNBxWCOMcHlKymMnbJNHUtzueBRK
+         43wN32MEtk+Hyutev11OA3fo71PxPAxVVCZiAp29ShcGay+KA0Ko591f50LHwzLRUw5d
+         6yMsDeJ/h2ElGxu67W6fY0hGK7r0z50LSPpiX1TmyE6fUKRyik8GwKmiSzmkjroE1P1f
+         ZVFo2benA1GPJXlDQVUEYIUX9KYSom61M7LBfQEw/AoRcYkSAcOhXR3KGB/FAFaUxgpM
+         8Llg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746577001; x=1747181801;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ERN4tZBNNxWUBbXOxBBa/C7QnG/J+3w3a9uKSXFs/2E=;
+        b=PBtryJ5QneWurcagCN3PamnjZePtvlZ985xGdS/3kdzjPGalppL30p3JiXDM5SbzyS
+         sFqEhQUlAqL4gIrF47QsHEglk7pLL7xCqwBCXtB2mLtGEOUt0G5qGWnreQ19Cmsp0j2V
+         Me8eMHuwSnSn/GUvNIUHJJ6DQ6GMfRpxroOFd5pw+Z7olofd6UwFSVuBVCX5KSBNDmXf
+         G6M2kN0WNf/ysdH1Tcohp8TJYFhdugxEAUcna5EVPCWjo17QPL13ycUk23A0SM1O0tdN
+         zCjE01PISNGQG4mDUebKqnT488kFntIy6n7pMwkwDR0nswaUmqJioALMMU/I1fzd+rCB
+         9hwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUSV/ElePCSCiUDLD3NcrITVjDAj+R/NaV8qMRl4ilFZr3QRBfiNO+H89TwL9LXyricXlroHHJ1ug6HR04=@vger.kernel.org, AJvYcCVaTGPNt92RMXxY4jyrZaq3p6EF7ofcKZv54pT5WhG/ZjcBUCvx5Z4vETyK/6yABGnbcVVZrzDqdEcFPQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQKZCz3sNaPhseBCHasAvSRletU5VqLeFv9XBm15VgHPruHzHQ
+	KOg64etxJGJBbNoKIUZEBcEHB8JHwUIGry2ZRI4/BW/u5hTza2IIrFNjm7UFSH+Lvog6mz+Ctk9
+	6Z762TfyU49n6FqqC7t/rtEEJHq0=
+X-Gm-Gg: ASbGncs084bYV/TbcwOFtzeNHVvvegjWpXOSDvN6TAtLiSXhwAeb/S84HO8cLX47QzK
+	cP83QLxunw0ZfH5y+oQCSSr0QvFHdUldrmQlZyikDu/k9KKJHizCAd2GN5A2FTnM3x5nh5av3VU
+	v9hbFjiWz1lZVOvTZzCmyv6Q==
+X-Google-Smtp-Source: AGHT+IF+RYfQnJXX2wiCv2f8FgLw9KAqzSO3hRhozP+0qGjgOmXPg5RSE0/cNow9QHK8qnUlcemlOTjy+nWSCQxf124=
+X-Received: by 2002:a05:6e02:1d92:b0:3d3:f27a:9103 with SMTP id
+ e9e14a558f8ab-3da738ed799mr12884645ab.1.1746577001455; Tue, 06 May 2025
+ 17:16:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fgao5qnim6o3gvixzl7lnftgsish6uajlia5okylxskn3nrexe@gyvgrp72jvj6>
+References: <20250506215508.3611977-1-stfomichev@gmail.com>
+In-Reply-To: <20250506215508.3611977-1-stfomichev@gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 7 May 2025 08:16:05 +0800
+X-Gm-Features: ATxdqUHZDuiLA7f7witp6xXHQswch3oKUZrSiSSAzpg7yLhrFN5x-dJ8eqivnlA
+Message-ID: <CAL+tcoCUofwE7zNf95KO75tkiVJkcJ3O4ybu07aYFo-wbV13JA@mail.gmail.com>
+Subject: Re: [PATCH net-next] net/mlx5: support software TX timestamp
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, saeedm@nvidia.com, tariqt@nvidia.com, 
+	andrew+netdev@lunn.ch, linux-rdma@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, leon@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 07, 2025 at 06:24:29AM +0800, Inochi Amaoto wrote:
-> On Tue, May 06, 2025 at 02:03:18PM +0200, Andrew Lunn wrote:
-> > On Tue, May 06, 2025 at 05:32:50PM +0800, Inochi Amaoto wrote:
-> > > The ethernet controller of SG2042 is Synopsys DesignWare IP with
-> > > tx clock. Add device id for it.
-> > > 
-> > > This patch can only be tested on a SG2042 x4 evb board, as pioneer
-> > > does not expose this device.
-> > 
-> > Do you have a patch for this EVB board? Ideally there should be a user
-> > added at the same time as support for a device.
-> > 
-> > 	Andrew
-> 
-> Yes, I have one for this device. And Han Gao told me that he will send
-> the board patch for the evb board. So I only send the driver.
-> And the fragment for the evb board is likes below, I think it is kind
-> of trivial:
-> 
-> &gmac0 {
-> 	phy-handle = <&phy0>;
-> 	phy-mode = "rgmii-txid";
+On Wed, May 7, 2025 at 5:57=E2=80=AFAM Stanislav Fomichev <stfomichev@gmail=
+.com> wrote:
+>
+> Having a software timestamp (along with existing hardware one) is
+> useful to trace how the packets flow through the stack.
+> mlx5e_tx_skb_update_hwts_flags is called from tx paths
+> to setup HW timestamp; extend it to add software one as well.
+>
+> Signed-off-by: Stanislav Fomichev <stfomichev@gmail.com>
 
-And this is why i ask, because this is broken. For more information,
-please see:
+Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
 
-https://patchwork.kernel.org/project/netdevbpf/patch/20250430-v6-15-rc3-net-rgmii-delays-v2-1-099ae651d5e5@lunn.ch/
+Only one nit as below.
 
-	Andrew
+> ---
+>  drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c | 1 +
+>  drivers/net/ethernet/mellanox/mlx5/core/en_tx.c      | 1 +
+>  2 files changed, 2 insertions(+)
+>
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c b/drive=
+rs/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+> index fdf9e9bb99ac..e399d7a3d6cb 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+> @@ -1689,6 +1689,7 @@ int mlx5e_ethtool_get_ts_info(struct mlx5e_priv *pr=
+iv,
+>                 return 0;
+>
+>         info->so_timestamping =3D SOF_TIMESTAMPING_TX_HARDWARE |
+> +                               SOF_TIMESTAMPING_TX_SOFTWARE |
+>                                 SOF_TIMESTAMPING_RX_HARDWARE |
+>                                 SOF_TIMESTAMPING_RAW_HARDWARE;
+>
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c b/drivers/ne=
+t/ethernet/mellanox/mlx5/core/en_tx.c
+> index 4fd853d19e31..f6dd26ad29e5 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
+> @@ -341,6 +341,7 @@ static void mlx5e_tx_skb_update_hwts_flags(struct sk_=
+buff *skb)
+
+nit: the function name including 'hwts' doesn't reflect the following
+software behavior.
+
+Thanks,
+Jason
+
+>  {
+>         if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP))
+>                 skb_shinfo(skb)->tx_flags |=3D SKBTX_IN_PROGRESS;
+> +       skb_tx_timestamp(skb);
+>  }
+>
+>  static void mlx5e_tx_check_stop(struct mlx5e_txqsq *sq)
+> --
+> 2.49.0
+>
+>
 
