@@ -1,105 +1,164 @@
-Return-Path: <netdev+bounces-188783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61193AAED17
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 22:31:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC528AAED1C
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 22:33:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 423A63AFD58
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 20:31:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 037901896D67
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 20:33:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B70F28F930;
-	Wed,  7 May 2025 20:31:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4786428EA78;
+	Wed,  7 May 2025 20:33:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hIxAOst7"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bnAoLH18"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7807D205ABB
-	for <netdev@vger.kernel.org>; Wed,  7 May 2025 20:31:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E42E72147F8
+	for <netdev@vger.kernel.org>; Wed,  7 May 2025 20:33:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746649890; cv=none; b=XCXanz+kaa4DzAmGG5YJMrOxCKqoITT94VUH9reKqDFsr5zFwghOnAQHbvkpuBtEucvJPVWH9csm4TE2A45yDwP0C/8AyaWByQysJXg42KElKX53soTPu6HD1XNfm2vCc9sHwzevbiH2U+sFQ9qevED/7nLGHe+OiltwJOZ5ez8=
+	t=1746650007; cv=none; b=LcdkjOc1C2IBaXlUaTHd/aCcOFHLpG9CyMGBE3gT61s05LzEqij0lrgJw8OQbX0m5rQt5YzdAj0zn+R1sOzuh3Es4I4Am4gjMh5ZSoe1VEjGmZ8CCHRghExjfpX55VOYafn0vh4F33uo3MVvsVvJuvDSgBzumkwlRrxvbLXY6sQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746649890; c=relaxed/simple;
-	bh=K2+ro8KXG5KK7X3DjDvs1zWwAW6Yo9MEVaIqdgF5ysg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a6fb8Gb2mF8hy72QHK/0SEDb8C/pW8EYGhBtp5elArG/sqlJp2CAWgXk1QnYTyUQpgZ9dPu/5zHnxDM5VXhRzlyc8QzdvNzVzZ1b46JGqHtGwofnEq3G3rPgCxZ4JWkCElNa0L5Gb0VXzf34qEwdBSe/D1AZGdYpYf8hoah5nCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hIxAOst7; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=g/yEorNgjqZxqjjZCRjS2unOJ0chJrQIlXe8tiQPHSM=; b=hI
-	xAOst7GfoeVjD8n8TPyzlhDaXrr4uz+inKPGlDXLTbopit8euQqDg7ns8ReYzj675r3hrEXGjupKy
-	3j77snOdaluSlXCWFkksPNbHFNBmDqjg5J4zCoi55hKZi+C1t4hWJmiHIQf4Xkk99gUbofge6mPmO
-	el8fo0TBbwqXu4Q=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uClQI-00BvfO-5S; Wed, 07 May 2025 22:31:22 +0200
-Date: Wed, 7 May 2025 22:31:22 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: John Ousterhout <ouster@cs.stanford.edu>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-	edumazet@google.com, horms@kernel.org, kuba@kernel.org
-Subject: Re: [PATCH net-next v8 08/15] net: homa: create homa_pacer.h and
- homa_pacer.c
-Message-ID: <7e177e94-24cb-4090-81b9-d82b0c43a37d@lunn.ch>
-References: <20250502233729.64220-1-ouster@cs.stanford.edu>
- <20250502233729.64220-9-ouster@cs.stanford.edu>
- <a6b82986-52df-4d51-b854-a2eb5842a574@redhat.com>
- <CAGXJAmxbtj7x78KYNBWoZaCHbOf39ekeHQUX2bMZsipXUCau_Q@mail.gmail.com>
+	s=arc-20240116; t=1746650007; c=relaxed/simple;
+	bh=y8MBvhxeqi8DWYxh0P2Ln9p56JqMtNfnIvXmu2tiyBg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WANw6dV2fsApU9TmGJ9bKjwyQmFcobbuFJpHzz+PU24QIub9tkYh+qQlRkmYQ2ju4blx5M96ghF9KtIEkqeczCVhukis+KpUlmPm20V+jTDnNugls69LAD0Pa9+GbZSdulq7+uDZ4grOk3Jo0G1O94JSkSTN2cPJMt4YLOixM/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bnAoLH18; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1746649992;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=k+g64oTjgFJyAHnP4Y/YKG9x/UbiTmj9bkX5m2Mfk4E=;
+	b=bnAoLH1867dMjkEFD0vtGz87D1We1ZVTWKu6z1nRejwwhYP4L61FkJ4vGSNx+lelNMCGR4
+	18bZPqQVN3SifaeODspQdis+yOX/8tDx8W7z95NZKooTvu3dS5uZ9eLdyW26jelnTSVI0e
+	IqChsv8Y8xPAkR0DCWkhg5FSo54s5cg=
+From: Martin KaFai Lau <martin.lau@linux.dev>
+To: bpf@vger.kernel.org
+Cc: 'Alexei Starovoitov ' <ast@kernel.org>,
+	'Andrii Nakryiko ' <andrii@kernel.org>,
+	'Daniel Borkmann ' <daniel@iogearbox.net>,
+	netdev@vger.kernel.org,
+	kernel-team@meta.com,
+	Quentin Monnet <qmo@kernel.org>,
+	Takshak Chahande <ctakshak@meta.com>
+Subject: [PATCH bpf-next] bpftool: Fix cgroup command to only show cgroup bpf programs
+Date: Wed,  7 May 2025 13:32:32 -0700
+Message-ID: <20250507203232.1420762-1-martin.lau@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAGXJAmxbtj7x78KYNBWoZaCHbOf39ekeHQUX2bMZsipXUCau_Q@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, May 07, 2025 at 11:55:23AM -0700, John Ousterhout wrote:
-> In Tue, May 6, 2025 at 7:05 AM Paolo Abeni <pabeni@redhat.com> wrote:
-> >
-> > On 5/3/25 1:37 AM, John Ousterhout wrote:
-> > > +     /**
-> > > +      * @link_mbps: The raw bandwidth of the network uplink, in
-> > > +      * units of 1e06 bits per second.  Set externally via sysctl.
-> > > +      */
-> > > +     int link_mbps;
-> >
-> > This is will be extremely problematic. In practice nobody will set this
-> > correctly and in some cases the info is not even available (VM) or will
-> > change dynamically due to policing/shaping.
-> >
-> > I think you need to build your own estimator of the available B/W. I'm
-> > unsure/I don't think you can re-use bql info here.
-> 
-> I agree about the issues, but I'd like to defer addressing them. I
-> have begun working on a new Homa-specific qdisc, which will improve
-> performance when there is concurrent TCP and Homa traffic. It
-> retrieves link speed from the net_device, which will eliminate the
-> need for the link_mbps configuration option.
+From: Martin KaFai Lau <martin.lau@kernel.org>
 
-I would be sceptical of the link speed, if you mean to use ethtool
-get_link_ksettings(). Not all switches have sufficient core bandwidth
-to allow all their ports to operate at line rate at the same
-time. There could be pause frames being sent back to slow the link
-down. And there could be FEC reducing the actual bandwidth you can get
-over the media. You also need to consider congestion on switch egress,
-when multiple sources are sending to one sink etc.
+The netkit program is not a cgroup bpf program and should not be shown
+in the output of the "bpftool cgroup show" command.
 
-BQL gives you a better idea of what the link is actually capable of,
-over the last few seconds, to the first switch. But after that,
-further hops across the network, it does not help.
+However, if the netkit device happens to have ifindex 3,
+the "bpftool cgroup show" command will output the netkit
+bpf program as well:
 
-	Andrew
+> ip -d link show dev nk1
+3: nk1@if2: ...
+    link/ether ...
+    netkit mode ...
+
+> bpftool net show
+tc:
+nk1(3) netkit/peer tw_ns_nk2phy prog_id 469447
+
+> bpftool cgroup show /sys/fs/cgroup/...
+ID       AttachType      AttachFlags     Name
+...      ...                             ...
+469447   netkit_peer                     tw_ns_nk2phy
+
+The reason is that the target_fd (which is the cgroup_fd here) and
+the target_ifindex are in a union in the uapi/linux/bpf.h. The bpftool
+iterates all values in "enum bpf_attach_type" which includes
+non cgroup attach types like netkit. The cgroup_fd is usually 3 here,
+so the bug is triggered when the netkit ifindex just happens
+to be 3 as well.
+
+The bpftool's cgroup.c already has a list of cgroup-only attach type
+defined in "cgroup_attach_types[]". This patch fixes it by iterating
+over "cgroup_attach_types[]" instead of "__MAX_BPF_ATTACH_TYPE".
+
+Cc: Quentin Monnet <qmo@kernel.org>
+Reported-by: Takshak Chahande <ctakshak@meta.com>
+Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
+---
+ tools/bpf/bpftool/cgroup.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/tools/bpf/bpftool/cgroup.c b/tools/bpf/bpftool/cgroup.c
+index 3f1d6be51215..944ebe21a216 100644
+--- a/tools/bpf/bpftool/cgroup.c
++++ b/tools/bpf/bpftool/cgroup.c
+@@ -318,11 +318,11 @@ static int show_bpf_progs(int cgroup_fd, enum bpf_attach_type type,
+ 
+ static int do_show(int argc, char **argv)
+ {
+-	enum bpf_attach_type type;
+ 	int has_attached_progs;
+ 	const char *path;
+ 	int cgroup_fd;
+ 	int ret = -1;
++	unsigned int i;
+ 
+ 	query_flags = 0;
+ 
+@@ -370,14 +370,14 @@ static int do_show(int argc, char **argv)
+ 		       "AttachFlags", "Name");
+ 
+ 	btf_vmlinux = libbpf_find_kernel_btf();
+-	for (type = 0; type < __MAX_BPF_ATTACH_TYPE; type++) {
++	for (i = 0; i < ARRAY_SIZE(cgroup_attach_types); i++) {
+ 		/*
+ 		 * Not all attach types may be supported, so it's expected,
+ 		 * that some requests will fail.
+ 		 * If we were able to get the show for at least one
+ 		 * attach type, let's return 0.
+ 		 */
+-		if (show_bpf_progs(cgroup_fd, type, 0) == 0)
++		if (show_bpf_progs(cgroup_fd, cgroup_attach_types[i], 0) == 0)
+ 			ret = 0;
+ 	}
+ 
+@@ -400,9 +400,9 @@ static int do_show(int argc, char **argv)
+ static int do_show_tree_fn(const char *fpath, const struct stat *sb,
+ 			   int typeflag, struct FTW *ftw)
+ {
+-	enum bpf_attach_type type;
+ 	int has_attached_progs;
+ 	int cgroup_fd;
++	unsigned int i;
+ 
+ 	if (typeflag != FTW_D)
+ 		return 0;
+@@ -434,8 +434,8 @@ static int do_show_tree_fn(const char *fpath, const struct stat *sb,
+ 	}
+ 
+ 	btf_vmlinux = libbpf_find_kernel_btf();
+-	for (type = 0; type < __MAX_BPF_ATTACH_TYPE; type++)
+-		show_bpf_progs(cgroup_fd, type, ftw->level);
++	for (i = 0; i < ARRAY_SIZE(cgroup_attach_types); i++)
++		show_bpf_progs(cgroup_fd, cgroup_attach_types[i], ftw->level);
+ 
+ 	if (errno == EINVAL)
+ 		/* Last attach type does not support query.
+-- 
+2.47.1
+
 
