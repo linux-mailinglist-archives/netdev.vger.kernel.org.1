@@ -1,157 +1,182 @@
-Return-Path: <netdev+bounces-188656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 625B6AAE16C
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 15:53:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7987AAE17E
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 15:54:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 035191C27606
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 13:53:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 844F14A1DF8
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 13:53:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D56528980B;
-	Wed,  7 May 2025 13:46:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1F2B28A401;
+	Wed,  7 May 2025 13:46:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z8BU8KJs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U23XjGTC"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EE132874FE
-	for <netdev@vger.kernel.org>; Wed,  7 May 2025 13:46:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B4228A3F5;
+	Wed,  7 May 2025 13:46:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746625576; cv=none; b=bEzqon+R+FH9WrFzfLaLbshOU26xj66HOzNMcmqtKenBMRS+q3EpLYKECmbM/ByVhaPHk9DTMUaEPdOOowdlYByDDWMPwXJueMTBOVgG+5cIJouy2Exxf1QdkhTc2UcznMRPx2B15fOqtMBdaVilOC8Faa8LCUQBpW8f0Kve8mM=
+	t=1746625588; cv=none; b=ast8aXGZwiZY/Acj9KLZPubohX64w12qB0d/0Ud9iLFvW5H0aALmmIBm1B9uht4t7v2lfuTfJC5sL142zz89TjwKcfNfSqjGN7bFDqKXUq8vQoRZ+MhWAgzXI0VxEBR6sY9v//NELiw4jOOIOET0ysWO5nqxRG2QXzgsKdpO5FI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746625576; c=relaxed/simple;
-	bh=uQKC6dtGtGKOkoBvjs8lqnwOX+h2c0EoCarFMLh5cO0=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=uItYBtHd1vCqpiZoYTHfVj7uvyjZJ+Qx78VJ1IOENCAptYcsWP9nvTB0jzumreGd+V+kWLnToKwMXBY/FIGzGtoFp5yXFDVb2XDnZWBYTPg5HRS2qpu29Ekl/L5nh5O2YXJBPNsgX5+aNrIslpCvCj+vOopiyAx5G/0Lv5YfhHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z8BU8KJs; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746625573;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zoBfKW7DBVp6fse3P8uzY8pRsN3pHi/tyXtOsqhCvq0=;
-	b=Z8BU8KJs0bBRObEjgdEjESDKqkmz5AGlMODFlZZ6j1wpD9J7wVi2GLUrXju990hbHBxS+P
-	yeR5oV6CyCSP91QSsllHPwG5malA4f9zggfeEBrQ6Cmx6s8sHppHMLNrNiMP0FjKVh4ylo
-	bxbESrqbn7EgOVX91jrxLlSTaEpgzhU=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-74-qAmCHl7iMUuSMKoTGsiyZw-1; Wed,
- 07 May 2025 09:46:07 -0400
-X-MC-Unique: qAmCHl7iMUuSMKoTGsiyZw-1
-X-Mimecast-MFC-AGG-ID: qAmCHl7iMUuSMKoTGsiyZw_1746625565
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AEBC61800990;
-	Wed,  7 May 2025 13:46:04 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.188])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 99D6B19560A7;
-	Wed,  7 May 2025 13:45:57 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20250506112012.5779d652@kernel.org>
-References: <20250506112012.5779d652@kernel.org> <20250505131446.7448e9bf@kernel.org> <165f5d5b-34f2-40de-b0ec-8c1ca36babe8@lunn.ch> <0aa1b4a2-47b2-40a4-ae14-ce2dd457a1f7@lunn.ch> <1015189.1746187621@warthog.procyon.org.uk> <1021352.1746193306@warthog.procyon.org.uk> <1069540.1746202908@warthog.procyon.org.uk> <1216273.1746539449@warthog.procyon.org.uk>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: dhowells@redhat.com, Andrew Lunn <andrew@lunn.ch>,
-    Eric Dumazet <edumazet@google.com>,
-    "David
- S. Miller" <davem@davemloft.net>,
-    David Hildenbrand <david@redhat.com>,
-    John Hubbard <jhubbard@nvidia.com>,
-    Christoph Hellwig <hch@infradead.org>, willy@infradead.org,
-    netdev@vger.kernel.org, linux-mm@kvack.org,
-    Willem de Bruijn <willemb@google.com>
-Subject: Re: Reorganising how the networking layer handles memory
+	s=arc-20240116; t=1746625588; c=relaxed/simple;
+	bh=hEESpH98vETQIZ0+XWffGzM7BGYfcwRdDsaQ4wEquqc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CjPi5nEQF3+SVcIu5fleWSed0Y6y1Fo8cf7I/bgsGfP3DaauTWk79+37KnKubaB+qLx1sl07C4rYt82739ZJOGjIdb2ABWHnboJ8FxGKuek/CdPle3C7a+5ML1npiXGNtIGE80dkdgtdJyEm0If2MyK8KPDsX3uR0v01w4nACns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U23XjGTC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3B11C4CEE7;
+	Wed,  7 May 2025 13:46:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746625587;
+	bh=hEESpH98vETQIZ0+XWffGzM7BGYfcwRdDsaQ4wEquqc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=U23XjGTCYK3gILMz2e+THb15dqmeOQYrj8DFI6aRtrdZ/3v0LvTzpK69PdnaYokfJ
+	 zKw4hTdJ6W/vVkXZCh45Iuj8yV7QqKa12C3QUJtmLL1gvpXv7qvG5/tstFyJrLFzZZ
+	 zpBy/xFgyUplNZ1MCUCw8LDmTfn9H2z9NPHzPMMiWnR6JaJikH3KxrfrWOWZeb3EEU
+	 sgOtWpT8UG9trtkVBkV0NmMJEnEerrcTAEbzOPsWh2dGueQMUoYxbMq6DaWJ+vZ78s
+	 vXdfAoJ9atJEdatSHVOAtR8ErUMRL8e8mVNsCPTKR/cEABikNuy0+cRUQe12mIzXHf
+	 jsi8KfgGfDr5A==
+Date: Wed, 7 May 2025 14:46:20 +0100
+From: Simon Horman <horms@kernel.org>
+To: Tanmay Jagdale <tanmay@marvell.com>
+Cc: bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
+	jerinj@marvell.com, hkelam@marvell.com, sbhatta@marvell.com,
+	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, bbhushan2@marvell.com, bhelgaas@google.com,
+	pstanner@redhat.com, gregkh@linuxfoundation.org,
+	peterz@infradead.org, linux@treblig.org,
+	krzysztof.kozlowski@linaro.org, giovanni.cabiddu@intel.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, rkannoth@marvell.com, sumang@marvell.com,
+	gcherian@marvell.com
+Subject: Re: [net-next PATCH v1 10/15] octeontx2-pf: ipsec: Setup NIX HW
+ resources for inbound flows
+Message-ID: <20250507134620.GE3339421@horms.kernel.org>
+References: <20250502132005.611698-1-tanmay@marvell.com>
+ <20250502132005.611698-11-tanmay@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1352673.1746625556.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 07 May 2025 14:45:56 +0100
-Message-ID: <1352674.1746625556@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250502132005.611698-11-tanmay@marvell.com>
 
-Jakub Kicinski <kuba@kernel.org> wrote:
+On Fri, May 02, 2025 at 06:49:51PM +0530, Tanmay Jagdale wrote:
+> A incoming encrypted IPsec packet in the RVU NIX hardware needs
+> to be classified for inline fastpath processing and then assinged
 
-> On Tue, 06 May 2025 14:50:49 +0100 David Howells wrote:
-> > Jakub Kicinski <kuba@kernel.org> wrote:
-> > > > (2) sendmsg(MSG_ZEROCOPY) suffers from the O_DIRECT vs fork() bug =
-because
-> > > >      it doesn't use page pinning.  It needs to use the GUP routine=
-s.  =
+nit: assigned
 
-> > > =
+     checkpatch.pl --codespell is your friend
 
-> > > We end up calling iov_iter_get_pages2(). Is it not setting
-> > > FOLL_PIN is a conscious choice, or nobody cared until now?  =
+> a RQ and Aura pool before sending to CPT for decryption.
+> 
+> Create a dedicated RQ, Aura and Pool with the following setup
+> specifically for IPsec flows:
+>  - Set ipsech_en, ipsecd_drop_en in RQ context to enable hardware
+>    fastpath processing for IPsec flows.
+>  - Configure the dedicated Aura to raise an interrupt when
+>    it's buffer count drops below a threshold value so that the
+>    buffers can be replenished from the CPU.
+> 
+> The RQ, Aura and Pool contexts are initialized only when esp-hw-offload
+> feature is enabled via ethtool.
+> 
+> Also, move some of the RQ context macro definitions to otx2_common.h
+> so that they can be used in the IPsec driver as well.
+> 
+> Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
 
-> > =
+...
 
-> > iov_iter_get_pages*() predates GUP, I think.  There's now an
-> > iov_iter_extract_pages() that does the pinning stuff, but you have to =
-do a
-> > different cleanup, which is why I created a new API call.
-> > =
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
 
-> > iov_iter_extract_pages() also does no pinning at all on pages extracte=
-d from a
-> > non-user iterator (e.g. ITER_BVEC).
-> =
+...
 
-> FWIW it occurred to me after hitting send that we may not care. =
+> +static int cn10k_ipsec_setup_nix_rx_hw_resources(struct otx2_nic *pfvf)
+> +{
+> +	struct otx2_hw *hw = &pfvf->hw;
+> +	int stack_pages, pool_id;
+> +	struct otx2_pool *pool;
+> +	int err, ptr, num_ptrs;
+> +	dma_addr_t bufptr;
+> +
+> +	num_ptrs = 256;
+> +	pool_id = pfvf->ipsec.inb_ipsec_pool;
+> +	stack_pages = (num_ptrs + hw->stack_pg_ptrs - 1) / hw->stack_pg_ptrs;
+> +
+> +	mutex_lock(&pfvf->mbox.lock);
+> +
+> +	/* Initialize aura context */
+> +	err = cn10k_ipsec_ingress_aura_init(pfvf, pool_id, pool_id, num_ptrs);
+> +	if (err)
+> +		goto fail;
+> +
+> +	/* Initialize pool */
+> +	err = otx2_pool_init(pfvf, pool_id, stack_pages, num_ptrs, pfvf->rbsize, AURA_NIX_RQ);
+> +	if (err)
 
-> We're talking about Tx, so the user pages are read only for the kernel.
-> I don't think we have the "child gets the read data" problem?
+This appears to leak pool->fc_addr.
 
-Worse: if the child alters the data in the buffer to be transmitted after =
-the
-fork() (say it calls free() and malloc()), it can do so; if the parent tri=
-es
-that, there will be no effect.
+> +		goto fail;
+> +
+> +	/* Flush accumulated messages */
+> +	err = otx2_sync_mbox_msg(&pfvf->mbox);
+> +	if (err)
+> +		goto pool_fail;
+> +
+> +	/* Allocate pointers and free them to aura/pool */
+> +	pool = &pfvf->qset.pool[pool_id];
+> +	for (ptr = 0; ptr < num_ptrs; ptr++) {
+> +		err = otx2_alloc_rbuf(pfvf, pool, &bufptr, pool_id, ptr);
+> +		if (err) {
+> +			err = -ENOMEM;
+> +			goto pool_fail;
+> +		}
+> +		pfvf->hw_ops->aura_freeptr(pfvf, pool_id, bufptr + OTX2_HEAD_ROOM);
+> +	}
+> +
+> +	/* Initialize RQ and map buffers from pool_id */
+> +	err = cn10k_ipsec_ingress_rq_init(pfvf, pfvf->ipsec.inb_ipsec_rq, pool_id);
+> +	if (err)
+> +		goto pool_fail;
+> +
+> +	mutex_unlock(&pfvf->mbox.lock);
+> +	return 0;
+> +
+> +pool_fail:
+> +	mutex_unlock(&pfvf->mbox.lock);
+> +	qmem_free(pfvf->dev, pool->stack);
+> +	qmem_free(pfvf->dev, pool->fc_addr);
+> +	page_pool_destroy(pool->page_pool);
+> +	devm_kfree(pfvf->dev, pool->xdp);
 
-> Likely all this will work well for ZC but not sure if we can "convert"
-> the stack to phyaddr+len.
+It is not clear to me why devm_kfree() is being called here.
+I didn't look deeply. But I think it is likely that
+either pool->xdp should be freed when the device is released.
+Or pool->xdp should not be allocated (and freed) using devm functions.
 
-Me neither.  We also use bio_vec[] to hold lists of memory and then trawl =
-them
-to do cleanup, but a conversion to holding {phys,len} will mandate being a=
-ble
-to do some sort of reverse lookup.
+> +	pool->xsk_pool = NULL;
 
-> Okay, just keep in mind that we are working on 800Gbps NIC support these
-> days, and MTU does not grow. So whatever we do - it must be fast fast.
+The clean-up of pool->stack, pool->page_pool), pool->xdp, and
+pool->xsk_pool, all seem to unwind initialisation performed by
+otx2_pool_init(). And appear to be duplicated elsewhere.
+I would suggest adding a helper for that.
 
-Crazy:-)
+> +fail:
+> +	otx2_mbox_reset(&pfvf->mbox.mbox, 0);
+> +	return err;
+> +}
 
-One thing I've noticed in the uring stuff is that it doesn't seem to like =
-the
-idea of having an sk_buff pointing to more than one ubuf_info, presumably
-because the sk_buff will point to the ubuf_info holding the zerocopyable d=
-ata.
-Is that actually necessary for SOCK_STREAM, though?
-
-My thought for SOCK_STREAM is to have an ordered list of zerocopy source
-records on the socket and a completion counter and not tag the skbuffs at =
-all.
-That way, an skbuff can carry data for multiple zerocopy send requests.
-
-David
-
+...
 
