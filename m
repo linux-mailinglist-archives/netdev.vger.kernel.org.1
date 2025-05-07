@@ -1,109 +1,149 @@
-Return-Path: <netdev+bounces-188608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2728AADDE6
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 14:00:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BF1EAADDF8
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 14:02:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 125354A3101
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 12:00:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67EDA1BC63ED
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 12:02:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43A112586D5;
-	Wed,  7 May 2025 11:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D0222580D2;
+	Wed,  7 May 2025 12:02:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DbiFF3kG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HdpZlfgo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1950D2580EC;
-	Wed,  7 May 2025 11:59:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF6974B1E45;
+	Wed,  7 May 2025 12:02:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746619199; cv=none; b=oZU3IsWkEpDMH+d1B46z90yGH7sHAzhjPGiFrVZBBBNS6tNLg4TEoJlatlJ1gQ1jz8NjnfQQNL/rPJQODdSNwsfI8P76h5NLISEJCWgZXaHWpYTQVj4O/6pXd0HL7n0iamwfjZXLkzbEdOhLhZCvSm/uVDD4RTejwlold3gGscs=
+	t=1746619332; cv=none; b=pN1GAKLrWuZVE+Smdzt0fhRkcoR7qngbJQDswtcXHnON9aDTtWcgIgzGss61/ht9HbVpSypHvzEXxwiMAcRb/bZS9q1IzseDSj72U9V0pJGnP+9LbcbQtJkpNqggXITVsinxeRzZDPO8kJPVt6ARwv/in3HJw3+qtWSJpi67chs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746619199; c=relaxed/simple;
-	bh=zUVxyov8pzynOlK5IOnXvIkSrF7p+GCIJi7UhZ8sRyI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pWVURHbj9l0EpTbA6Xoj5VkReo2tQCfkdMjhxGCByDHFYhdh9T+U7exAQT17lIaQUm9iXhZhW5SDJ7imwJhzssndZURuVrbXL+DMIPpoN12itmuWeH9zQROFW7Ram8EWV2O2u+8OTPTwu/Tq3IpGJPUzU5Wq8EPKEd70yImfm8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DbiFF3kG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89A25C4CEE7;
-	Wed,  7 May 2025 11:59:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746619198;
-	bh=zUVxyov8pzynOlK5IOnXvIkSrF7p+GCIJi7UhZ8sRyI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=DbiFF3kGzr+yR+zTkEK12acmgkBbnkrDe2z65u42Ly4cs90kOmkNcmXN/qmMxkWnt
-	 a9ceL5IUsrPNM4YE8mVYhXakX61W7GjOXTMmXtrR3SDW6xf4KAHU0J3V76o2LogoEp
-	 VNnhNmhWqWosqZn41P1lYCEXHWjWrjj6mmz6xStZCLiCUgA9m6BHGqyB/3E4fVBexz
-	 bb++ZMNiS95bx1dROMBtmySZopyHre8ZsxrkNiKg/jUlfX/E7WCkQVPGJMf0qSu+Mm
-	 WyAzqWXJknhM8vc+OiB7bIvHTh/GTMLFG0Q69yvHFq+yvBd2rMTvBmx1bCcCS9eBDG
-	 qCsP1BpdVwHDQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC91380AA70;
-	Wed,  7 May 2025 12:00:38 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1746619332; c=relaxed/simple;
+	bh=G+gGUFnonfHfqvLJtT3/rMFE4bMTKjw81qinxKZTkP8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Bxs98oysZA1BzwhaL9UB2xO9BfQcNrjhls2nkVfpaPJW5APMSgGG95jE0tXJHn4SMxgPDr5y7mLv0nuB8pmWTVCtmXNVsQb1sAQIOsG+oUb7jAWDwWDgD2AHLqtEak9bRLguFRSDOojmUESUm0poSJ65YC0JBDRk5uKa/9K4We4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HdpZlfgo; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6f0c30a1cf8so99166046d6.2;
+        Wed, 07 May 2025 05:02:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746619329; x=1747224129; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cB9Vli3Xxo4KwEG4QM0VC4PHMgHe2AYxc+yOmxy2QWQ=;
+        b=HdpZlfgoaRPcb4fTwldKsQn1aw2IexvtV5C5OCzyM6eWMpFuDU4XSENi40xorORDiw
+         8D7xGaG28rqAFkRThJjVVxNZ9jm4pJ4uKGju8ODLQcN8kT2bcxmhynvsed82049DduoZ
+         TlinWhpn1Ts5CCE+D1L0khVh1HqpUYQVoEmzUGxD9+auTSRbImAaDlPOreg1Yh37R/98
+         44JQEcVjHfxo/cVPseI395WeILZAEluqsdBaqcWM85dj1rYkTu4q1RW/038ddg954d9R
+         1uc8VDjSv+Drt0xZ+1irf7PkrNB072drp1vqfeQa9r3uVgS0twCO2Kdc6nme1BdqKpXj
+         BnvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746619329; x=1747224129;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cB9Vli3Xxo4KwEG4QM0VC4PHMgHe2AYxc+yOmxy2QWQ=;
+        b=kyIY4ojPueMi/N3w2yCRKJG8UZtJ9orZdStG4gExbK8BhFZpANPqDz+zWtovlfdQUZ
+         L9oeJDzXMF2moULEViHxdvLDryZMWMPAc7KoLu2sDkcgQDK/ar71yPfsAXuvciLGea2F
+         yQQygvYQ4GZGktxNZxJv0iaHc/wURiRK6UHEzXrR7MC3ItQKZBNI5L9S/oQNSZdYV8ER
+         NlFLy4JYoR1B7V5cNIeIUok66bhHJJgkYYjWajdxLia227JoRcPzfTZuD4Dk5kNhbRL6
+         LGv21T64xTvhsyNJCFX5ZOGdfxNpuHlgoxNYQNn1GDHUcr7BI649NGrIuVRXXjK3rNkF
+         nJZA==
+X-Forwarded-Encrypted: i=1; AJvYcCV22aigdEs8QKbAUXmAVFZZZK3GdvGVY7uvhEyT3NDJvr1oeD2TkzJiyzcSIMQuQsgYUvmYM+ZhyY6f92qJ@vger.kernel.org, AJvYcCVQl9KMXlA2JdhUiMF83B/bKnek8vmQK7BNl5RuHwpuAzJe1QStYEHcB/EDHKnpuBxs/HkiGE9A@vger.kernel.org, AJvYcCVhM93NyFKycSbFNoSJqecsDZvGmioI5mT6NV1PNKkKb19AEriG6jiVC+I9KTvF3lTZMCh1KyCh+GwB@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKK9KkM6qBvu12j7156KwY566r0Llru4Lbx4X2iZ1iEEnOu+00
+	Xv0Uzi7PQOm/gVBGg6jiK11BS4rRL5xlhtPrvIlwWA2XR+dqDSBSuMePtQ==
+X-Gm-Gg: ASbGncvDDiJFrXs9fOXv1hJqDFQn+SxAHXLLAGQpdi8qBWG07o69QE+UGmJS7ECTQsY
+	8uZGS1VJyoqLPaZW4+RTUyD4gMj7ODUqhSSPiaaFIlkHyCbbQ+H8p8WPfPOcM6uSDnw5HgaedkQ
+	pp3KEgBqPFR6ZMBxR6sSl5k+z9POa6f/TOdCJE6Qt2vsDs5PlXgjFczatfOS/NPqZLbeeKy8Sek
+	8MDJ8M6nHnR1IF+xfXItxMDrGlfENkIE8KSBgZw5r5HUQQKMybF0NZ6lnBURlvjiekgGlhCl7qg
+	WEtHdYg0YowqJR+w
+X-Google-Smtp-Source: AGHT+IGRl9BUi1WrHprzmvGHRtZmly2KUBbHCnPcITRG9+w3NMHRJoWIA8I9LxLmf29VDGt76SQFqg==
+X-Received: by 2002:ad4:5dc3:0:b0:6e8:ede1:237 with SMTP id 6a1803df08f44-6f542b31434mr45097126d6.43.1746619317492;
+        Wed, 07 May 2025 05:01:57 -0700 (PDT)
+Received: from localhost ([2001:da8:7001:11::cb])
+        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-6f542647e03sm13464756d6.29.2025.05.07.05.01.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 May 2025 05:01:56 -0700 (PDT)
+Date: Wed, 7 May 2025 20:01:29 +0800
+From: Inochi Amaoto <inochiama@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>, Inochi Amaoto <inochiama@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Chen Wang <unicorn_wang@outlook.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Alexandre Ghiti <alex@ghiti.fr>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Richard Cochran <richardcochran@gmail.com>, 
+	Guo Ren <guoren@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, 
+	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>, "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, 
+	Romain Gantois <romain.gantois@bootlin.com>, Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>, 
+	Lothar Rubusch <l.rubusch@gmail.com>, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, sophgo@lists.linux.dev, 
+	linux-riscv@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>
+Subject: Re: [PATCH net-next 0/4] riscv: sophgo: Add ethernet support for
+ SG2042
+Message-ID: <2tu2mvwsnqdezjei5h43ko24vfave4c3ek2fjoatwsg72p6lpz@3vbtpmm7l73z>
+References: <20250506093256.1107770-1-inochiama@gmail.com>
+ <c7a8185e-07b7-4a62-b39b-7d1e6eec64d6@lunn.ch>
+ <fgao5qnim6o3gvixzl7lnftgsish6uajlia5okylxskn3nrexe@gyvgrp72jvj6>
+ <ffa044e2-ee9e-4a34-af6a-2e45294144f7@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v8 0/7]  lan78xx: preparation for PHYLINK conversion
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174661923750.2198858.15834248841787525369.git-patchwork-notify@kernel.org>
-Date: Wed, 07 May 2025 12:00:37 +0000
-References: <20250505084341.824165-1-o.rempel@pengutronix.de>
-In-Reply-To: <20250505084341.824165-1-o.rempel@pengutronix.de>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, woojung.huh@microchip.com, andrew+netdev@lunn.ch,
- rmk+kernel@armlinux.org.uk, Thangaraj.S@microchip.com,
- Rengarajan.S@microchip.com, kernel@pengutronix.de,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- UNGLinuxDriver@microchip.com, phil@raspberrypi.org,
- maxime.chevallier@bootlin.com, horms@kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ffa044e2-ee9e-4a34-af6a-2e45294144f7@lunn.ch>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Mon,  5 May 2025 10:43:34 +0200 you wrote:
-> This patch series contains the first part of the LAN78xx driver
-> refactoring in preparation for converting the driver to use the PHYLINK
-> framework.
+On Wed, May 07, 2025 at 02:10:48AM +0200, Andrew Lunn wrote:
+> On Wed, May 07, 2025 at 06:24:29AM +0800, Inochi Amaoto wrote:
+> > On Tue, May 06, 2025 at 02:03:18PM +0200, Andrew Lunn wrote:
+> > > On Tue, May 06, 2025 at 05:32:50PM +0800, Inochi Amaoto wrote:
+> > > > The ethernet controller of SG2042 is Synopsys DesignWare IP with
+> > > > tx clock. Add device id for it.
+> > > > 
+> > > > This patch can only be tested on a SG2042 x4 evb board, as pioneer
+> > > > does not expose this device.
+> > > 
+> > > Do you have a patch for this EVB board? Ideally there should be a user
+> > > added at the same time as support for a device.
+> > > 
+> > > 	Andrew
+> > 
+> > Yes, I have one for this device. And Han Gao told me that he will send
+> > the board patch for the evb board. So I only send the driver.
+> > And the fragment for the evb board is likes below, I think it is kind
+> > of trivial:
+> > 
+> > &gmac0 {
+> > 	phy-handle = <&phy0>;
+> > 	phy-mode = "rgmii-txid";
 > 
-> The goal of this initial part is to reduce the size and complexity of
-> the final PHYLINK conversion by introducing incremental cleanups and
-> logical separation of concerns, such as:
+> And this is why i ask, because this is broken. For more information,
+> please see:
 > 
-> [...]
+> https://patchwork.kernel.org/project/netdevbpf/patch/20250430-v6-15-rc3-net-rgmii-delays-v2-1-099ae651d5e5@lunn.ch/
+> 
+> 	Andrew
 
-Here is the summary with links:
-  - [net-next,v8,1/7] net: usb: lan78xx: Improve error handling in PHY initialization
-    https://git.kernel.org/netdev/net-next/c/232aa459aa40
-  - [net-next,v8,2/7] net: usb: lan78xx: remove explicit check for missing PHY driver
-    https://git.kernel.org/netdev/net-next/c/3da0ae52705d
-  - [net-next,v8,3/7] net: usb: lan78xx: refactor PHY init to separate detection and MAC configuration
-    https://git.kernel.org/netdev/net-next/c/d39f339d2603
-  - [net-next,v8,4/7] net: usb: lan78xx: move LED DT configuration to helper
-    https://git.kernel.org/netdev/net-next/c/8ba1f33c55d2
-  - [net-next,v8,5/7] net: usb: lan78xx: Extract PHY interrupt acknowledgment to helper
-    https://git.kernel.org/netdev/net-next/c/f485849a381f
-  - [net-next,v8,6/7] net: usb: lan78xx: Refactor USB link power configuration into helper
-    https://git.kernel.org/netdev/net-next/c/d746e0740b28
-  - [net-next,v8,7/7] net: usb: lan78xx: Extract flow control configuration to helper
-    https://git.kernel.org/netdev/net-next/c/ef6a29e86785
+You are right, the right phy-mode is "rgmii-id", the delay is not
+added by the PCB. It seems to be better to ask for the vendor about
+the hardware design before copying params for vendor dts. Anyway,
+thanks for reviewing this.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Regards,
+Inochi
 
 
