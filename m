@@ -1,81 +1,116 @@
-Return-Path: <netdev+bounces-188517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 650DAAAD2C5
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 03:24:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07369AAD2C7
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 03:25:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A01CD985FBF
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 01:24:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74D305076CE
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 01:25:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FBCF14B08A;
-	Wed,  7 May 2025 01:22:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C7AA145B16;
+	Wed,  7 May 2025 01:24:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lGB1yjcW"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="aML28z2l"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AB6613C82E
-	for <netdev@vger.kernel.org>; Wed,  7 May 2025 01:22:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8E313B280
+	for <netdev@vger.kernel.org>; Wed,  7 May 2025 01:24:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746580947; cv=none; b=VGngX450m1hNkXe/m4fLgo3+cfhhH3vI3Hki1RJb5FL1FpoQ1AMr1A5Xgflp9DWbtmKcHSqIbLUFBzws+oZ1YMtwwpTuiIS+TqeeLrelAVHMJSaQDN4RIFD4PiZVsEDApnjX1reyRUaMPRgdeCztMiXkvEnd1rEEPB7hLeuPfZw=
+	t=1746581074; cv=none; b=LvdvNId97TM+i4190yoCNc2H11zrdyxzOFeWt1OyOwYslD2Ep9v4sAYLgqIeBeBuqC8QSoYrlbF9OqfahnhjIhbhpCcMP/Aq7C3l5fGLOmtQymUyvLD9HP1hcYQq5If3pXlHW6ZIL5GHeuZiyAru1kDYPcV99Xwcd+Npuih8wY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746580947; c=relaxed/simple;
-	bh=zh2ArE0ny7JMMIi5iAr+i39WQ0nj5xlSu9vNDtm1spE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jUpp/t19La5463UHbcxAMq+nuuVVo/byQuguBueHUL6Un5lqjrpcnebK33lvfS80CGeQGXvJhz5Oqd6OACcSoBlxEzmOUw1MpB03DpeiIqjv9sHoU36u31nB8zSjc+AYD9fvhNLgvhkNmHsAfRQt5XzGjTRyQeqnWe1AWXKQI2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lGB1yjcW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13B2FC4CEE4;
-	Wed,  7 May 2025 01:22:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746580946;
-	bh=zh2ArE0ny7JMMIi5iAr+i39WQ0nj5xlSu9vNDtm1spE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lGB1yjcWUa+NjYeT66lowq7buceOZbgn57sVzjY4BsV2mtWQtB+CejjL1Aj/FBmRn
-	 HmGZ4/KgANkp6cXE0lO6JBIc0K5OXWdi77LdaejmVibcXl0KjV7QaAMwNNlm3BZYue
-	 kLowdGksoenz7UHEZCnzuvQEMPzWShOWBCs3XzBXp27m4gtKxhphv/JAqcIKWYRMmm
-	 ZH8+EEMmjPRvMn7V+5gDG39umSHvy8DmnYFGXAEl+owctZEnxxbvoiZO6fRCChn3lh
-	 8B35RdrYkWdet80QuMWLP3wsu58cnDVZ6irmDxh3XphbdbXbOGCjZI1LyJJPUvCtGL
-	 p6DB89Gqg/bHQ==
-Date: Tue, 6 May 2025 18:22:25 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, saeedm@nvidia.com, horms@kernel.org,
- donald.hunter@gmail.com
-Subject: Re: [PATCH net-next v2 1/4] tools: ynl-gen: allow noncontiguous
- enums
-Message-ID: <20250506182225.531a036e@kernel.org>
-In-Reply-To: <5mgfrsapfnljlminy67o2wnz3iwh3mqba7fazt4ku2v6xh5t4g@nwgn3rdndvng>
-References: <20250505114513.53370-1-jiri@resnulli.us>
-	<20250505114513.53370-2-jiri@resnulli.us>
-	<5mgfrsapfnljlminy67o2wnz3iwh3mqba7fazt4ku2v6xh5t4g@nwgn3rdndvng>
+	s=arc-20240116; t=1746581074; c=relaxed/simple;
+	bh=xV2IIQBNovFSFUm1kmG/rEr/KiOoJL8cmCmD5yNa8IU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=YXQ78vd776tOynXpdTznWMZEHROVy/lWOmLq8PXZIFRCuelS+Xhgpww+sOE7ngd7Hvk0yU3cpLkYp+wwyAytl/CmoWwHTiixVFsAV41N8/QIqevPfMVSSdQ6ROku9243Yx/b0auZY+jc8m7etxaoeyKRO+s/G8HDPy/nlu96lz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=aML28z2l; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=codeconstruct.com.au; s=2022a; t=1746581070;
+	bh=fSCOIBjEZ/DoR2mruy6mVzNzXxWOGILrWEgfSm9ifWc=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=aML28z2lu0AH1Akc8Kamgmm0/C/BmsAa7jQq1MsqVvUQPvUkbwsW06P4OBRue8xNf
+	 aya8G+nDUQG68REE1yr6rrOqXgait6O7KE+p1Y90P5yhirMtM8AVKORIQPg4xU3TlG
+	 pchcqiR1qcbIy3m5XfmM9W1FmjN1udeQrGRSFd0J2LAfEJ5jZe2454ROIpV4L7mIEL
+	 quSKJFiFc+kztw/R9WkyToSLjdMxvsiP6mFPDa13je6xMeaLL5qAQABGWZqVRZbdqm
+	 HzQ1Q/yS7jauRmn/jactMuRGyMCjrp1QNXHX9+EQOl1/coksP9DEqfkNDEXqjjNa/z
+	 VVHqLBsVgG/BA==
+Received: from [192.168.14.220] (unknown [159.196.94.230])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 25C516C00A;
+	Wed,  7 May 2025 09:24:29 +0800 (AWST)
+Message-ID: <84b6bdceff61d495661dcf3500fd4bf19cf4e7be.camel@codeconstruct.com.au>
+Subject: Re: [PATCH net] net: mctp: Don't access ifa_index when missing
+From: Matt Johnston <matt@codeconstruct.com.au>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jeremy Kerr <jk@codeconstruct.com.au>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, 
+ syzbot+e76d52dadc089b9d197f@syzkaller.appspotmail.com, 
+ syzbot+1065a199625a388fce60@syzkaller.appspotmail.com
+Date: Wed, 07 May 2025 09:24:29 +0800
+In-Reply-To: <20250506180630.148c6ada@kernel.org>
+References: <20250505-mctp-addr-dump-v1-1-a997013f99b8@codeconstruct.com.au>
+	 <20250506180630.148c6ada@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 
-On Tue, 6 May 2025 08:38:36 +0200 Jiri Pirko wrote:
-> Mon, May 05, 2025 at 01:45:10PM +0200, jiri@resnulli.us wrote:
-> >From: Jiri Pirko <jiri@nvidia.com>
-> >
-> >in case the enum has holes, instead of hard stop, generate a validation
-> >callback to check valid enum values.
-> >
-> >signed-off-by: jiri pirko <jiri@nvidia.com>  
-> 
-> By some accident I managed to remove uppercases from this line. Should I
-> repost or would you fix this during apply in case there are no changes
-> requested?
+On Tue, 2025-05-06 at 18:06 -0700, Jakub Kicinski wrote:
+> On Mon, 05 May 2025 17:05:12 +0800 Matt Johnston wrote:
+> > +		/* Userspace programs providing AF_MCTP must be expecting ifa_index =
+filter
+> > +		 * behaviour, as will those setting strict_check.
+> > +		 */
+> > +		if (hdr->ifa_family =3D=3D AF_MCTP || cb->strict_check)
+> > +			ifindex =3D hdr->ifa_index;
+>=20
+> The use of cb->strict_check is a bit strange here. I could be wrong but
+> I though cb->strict_check should only impact validation. Not be used
+> for changing behavior.
 
-No worries, I don't think it's a big deal as long as the email matches.
-But I'll fix when applying.
+It was following behaviour of inet_dump_addr()/inet6_dump_addr() where
+filtering is applied if strict check is set.
+I don't have strong opinion whether strict_check makes sense for MCTP thoug=
+h
+- it depends on
+whether userspace expects strict_check to apply to all families, or just
+inet4/inet6.
+
+> If you have a reason to believe all user space passes a valid header -
+> how about we just return an error if message is too short?
+> IPv4 and IPv6 seem to return an error if message is short and
+> cb->strict_check, so they are more strict. MCTP doesn't have a ton of
+> legacy user space, we don't have to be lenient at all. My intuition
+> would be to always act like IP acts under cb->strict_check
+
+The problem is that programs will pass ifa_family=3DAF_UNSPEC with a short
+header, no strict_check=C2=A0
+(eg busybox "ip addr show").
+An AF_UNSPEC request will reach mctp_dump_addrinfo(), so we don't want that
+returning an error.
+Maybe mctp_dump_addrinfo() should ignore AF_UNSPEC requests entirely, and
+only populate
+a response when ifa_family=3DAF_MCTP. That would be OK for the existing mct=
+p
+userspace programs=C2=A0
+I know about, though there may be other users that are calling with AF_UNSP=
+EC
+but filtering=C2=A0
+userspace-side for AF_MCTP addresses.
+
+Matt
+
 
