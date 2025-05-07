@@ -1,104 +1,103 @@
-Return-Path: <netdev+bounces-188543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CF7DAAD461
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 06:22:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F06B0AAD464
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 06:25:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0AEE4E236E
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 04:22:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59F0F4E72BB
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 04:25:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ECBF1C84CB;
-	Wed,  7 May 2025 04:22:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 868101D63F5;
+	Wed,  7 May 2025 04:25:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IaRPmf9C"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E17nBu63"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE52614A4CC
-	for <netdev@vger.kernel.org>; Wed,  7 May 2025 04:22:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 974201D61BC
+	for <netdev@vger.kernel.org>; Wed,  7 May 2025 04:25:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746591756; cv=none; b=W1fzaJSmqRdbW9Q/sWpjAArh4GfPwOfObOFLNaP5QahCW7snSE8E1jfF9Jvq7zxnS7a3pTIhUU05ARyJFErnEE261IcST5yrSZTp1hBYnkhXD7oBYaK9Yaqeqe/yMEZB1clB1C7Etn7T31asEDJJjL3iirnsof4JEDuS/O4hZVo=
+	t=1746591910; cv=none; b=PhvoAqOAyykj7c7pXZzKslWmMnKVmGfqZlDxEm6PmO/xM3FnVnK8DajRT63KRF06hSmVPc8rYpocS9zN49UTYyFc8Mk0RCbKawlrLz+Xnjr0J62BVq3Hr6ANiz6idQsOLcUbtkUTCRQQ8vhU3wDVg8kL3xS7hIzvgq6b/qXVwvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746591756; c=relaxed/simple;
-	bh=tlHZTmAqMiKVfngRg/8NmF1WSUEqer188V7PQlJEKcs=;
+	s=arc-20240116; t=1746591910; c=relaxed/simple;
+	bh=mb2cmlbZCfBAqDPCZeIDiTAPBOGgt8/cnAWz231nv28=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KXLh4zRVq0mb8EXvUtdcdBj8G75NQpzFmmUbCMtkCiZNKX/EZpWBRPpsDj6lcrnw7czKblTYIPF1dW01KYuyXAuqWNvxCY9Td2uj8B9KvcBYvxN4WGFXL47b8i5gXl6fZqN3jRBlh2ylncQbF/8lN2PDqXsms1b3d0rQY7CvCiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IaRPmf9C; arc=none smtp.client-ip=209.85.208.48
+	 To:Cc:Content-Type; b=uMozC4cE2EOiX/Pcpkn1Om+ptkIxrj6M94H4QTBUEu+GN+Mc/h1riGbzkxPEI4ujm/nZb4GJ0SRMKv2KNDstDTZPhlorPX189pvF1ZgtoRx02UfCHX/0qtVtBESwpSqscZpg7ptzyr6jz/8a9wKp6HkfFC/sxrh8OL8NmnXSPmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E17nBu63; arc=none smtp.client-ip=209.85.208.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5e5e0caa151so1778549a12.0
-        for <netdev@vger.kernel.org>; Tue, 06 May 2025 21:22:33 -0700 (PDT)
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5f6222c6c4cso9527872a12.1
+        for <netdev@vger.kernel.org>; Tue, 06 May 2025 21:25:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746591752; x=1747196552; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1746591907; x=1747196707; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MSOdZjlVx2E0xznXZqQSM1d+tHZxHIGy6Pp9MdWn7bk=;
-        b=IaRPmf9CAe1ZNCr63OWBjocmHn9Y4CPtzHZ3A6YzxNMFOWloMYLZo4rHb9JsPr6wKl
-         tB2dqQsSGHQ95Er5Mz8Mj+XCbq3UwvoFPw1dmBBTzbLsW+UVQ7TmyYi+zsckFxEy5Q8u
-         qaWT9BEm1KFirvmqFeUJ/Ch5B+Rzp1yAkV6hrjBLJCIOBU7penmTLu6Esl7V21UPmvvf
-         sOHJ6uBaSn4UTHtbzc8R6VzNMLyhxKamBL1nshTiyHY+WVZzEZzFQp8SKadyRWOT5Ke4
-         FOXg2E1OHeEYAMFOG4MA9aNXHOgjdUaNAVtWM0rl3njoqywRfav4x2fjA9/K/WVWr/WM
-         balg==
+        bh=6lWzG8dKexFpdnpq0HLuxvcCjazh84YNAGZlNzsjcnc=;
+        b=E17nBu63xDdCr5wjJWxvL5sTOR597VF/UNlUvf9g8SDdGClp5JPMFh1B+rQY3vC9Rg
+         LiMA6gW2a1B/+fhg2pIMkthKMRHZkpX/JjtDJmDSv6dxMCJubdAHqTwH6nuof1AVsVxt
+         tlsdgDZ71tn2a1b8BFvsZUvZ/Nwn3FPqWgq8ZSwpuursaJC3JBid7Sng1WtuHCK1JOCb
+         APAZnifcMJ8rJifGinHdKRnBVPE0HejrgiM63XVZhLDNn26eVAsPEcnXiWACT3MdXdf0
+         9cYDRDvJBabquh8poMT7ijYhLm559hbUKwp5A+u5mPeCzk5NDKGV/aLSvz9xwB2PwGxI
+         UmcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746591752; x=1747196552;
+        d=1e100.net; s=20230601; t=1746591907; x=1747196707;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=MSOdZjlVx2E0xznXZqQSM1d+tHZxHIGy6Pp9MdWn7bk=;
-        b=bF3o6DrJr1KHi94i8Xc5xvXbpw2bwO4+h4+xru2WaH51yRtVtTefTFSP7Sut2OkcYe
-         lFWWRUGf092fO5CD8oMRaQvrencd3T4HtWZBykJ4xqNg3mI3sQC/H3azCogp1+0/B7tC
-         NaJe4gHXErYfvWg0tOjzdOL2WlEJeXyYydM2IzFqTpFcwh1uBovGLBynNQ4lHAUarJed
-         g/Vt3G8OvyNFqx7UjbXUJCp4s810eVF3FkLHN/YiVRVoElLuaGQEmGV17PpcuYVhAfWF
-         eL1eXD/ZnbQli75XwBUThuIRIKf84Nh7BtO7ABZTUi1bymxaiurUCtDDXulyg5YbULzE
-         VKuA==
-X-Forwarded-Encrypted: i=1; AJvYcCUuAHWhdab7Fgx2flOLjp1LzfFkNnifcuYnHcC5U0a4uGUlT4YuWNA+roTM5+twAWFihXRdD8w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzd6nrJ/uAT+X5Si+9Hws+7T3zTaF36JeJ9g+G8BAoMyjz5DaT0
-	7eZWCKZ3s9mmRQC0owChDQ6yFFXWo3V4ywR4Z0CwRov4s3lp9hbkFpr2Nc/yR9URn2ZZHoR4oJD
-	n5SWsCUCR4+wGQxOrTZU/u7br8tM=
-X-Gm-Gg: ASbGnctTY4C+uNxstm1LLVvWEK7b5iHdZroR6yxbvSaqxazSNRLhLYmMAO5C0nvE8Vm
-	Hml547G8WzSlHgtA7K0TtEAQ0g3PrrtBqitvcnYmv7orSUlE9MkVaAtwezb9NayhaY6SeZ/CL/q
-	+up9pDszvFw87lUFkroiKTZhE=
-X-Google-Smtp-Source: AGHT+IErhCnV//bidH9DpGLdIH+ovWF9NF+3NEX4fycGbGRCvFzjty9CU9/L0j+HPEOguOO6RrZuLU+hgnLjMWGhQ2o=
-X-Received: by 2002:a05:6402:4316:b0:5d9:82bc:ad06 with SMTP id
- 4fb4d7f45d1cf-5fbe9d77cbdmr1634204a12.3.1746591751779; Tue, 06 May 2025
- 21:22:31 -0700 (PDT)
+        bh=6lWzG8dKexFpdnpq0HLuxvcCjazh84YNAGZlNzsjcnc=;
+        b=WToHAVLV5M4ZDbHy+g1EI+4AZSR7CDgmklMkbM33Vs5+gPVJvVgRBAHRJ7kJUfLtv+
+         pvaG57cddbAF/EIHmz1NFrSled7eUNILPIO12Hzj+kCyuRhsIAVZxt5+XMzwzc0ikU75
+         oQifNcb8L8u3AfZMdFwdToJDTGY79cbPEu9CgYknaWOFUQ1QVfYQwpsKjy1I6vVnnq7a
+         /SNTf8SPRhveIofWOX2YBYY643F0g38qxzV1jjUKDt+U+FQzad/mAIuO+IehtKsm3Zl/
+         k3roJowvKf4UOFulcX1iPjP8YZWnNFUrDaOT4so9QYXou5Zfy3m+9fPocDpkH/tv1aBo
+         WbyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW3DxpjRcg2Hzds0Z3MjdUELUDHtH4HBOgE2q7CcH0R0lt6xBZEpSXc89QjR6hskUh1ltuUKuU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXf/iQ3RvnV43WtHs91gjUCV9RdIrB5TsNNroKUlFI+vJd45f1
+	Naj9nywO0KC8oWbK43yX1VDe9GC+/Bdw+dRWDqQl44au8fVJerc/SVzKeJ5GXKRiS1QGEumQ6IW
+	6RQecMOIrfaA7zWwhP845N5nHTH0=
+X-Gm-Gg: ASbGnctBeESKAlcP2Rueq6jmFIbpTltL2e2l+otiUd65hhVJufVH7Ji2l+UPlZXwwx3
+	PN9Wliz2EwODsdlpyDO3o1dlfQswSlqYDb/ocjc8Wa2aMpm3Ow1kGeaZbCovsOz3PNhDUSRuow6
+	Q1lpeN57Q+PMTEn/5U1Xz3Q4U=
+X-Google-Smtp-Source: AGHT+IFXnOtbpWox/WU1+ZnC25Uim9oYjKL3qMvGxofeNE8XkNYAF1DAEzVVSXUybuqPKvSBT8wvwsBd9i9PglffrW4=
+X-Received: by 2002:a05:6402:2548:b0:5f8:77e2:b819 with SMTP id
+ 4fb4d7f45d1cf-5fbe9f46cbdmr1476168a12.23.1746591906602; Tue, 06 May 2025
+ 21:25:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250506140858.2660441-1-ap420073@gmail.com> <aBpJ4GDED8cu4dKh@mini-arch>
-In-Reply-To: <aBpJ4GDED8cu4dKh@mini-arch>
+References: <20250506140858.2660441-1-ap420073@gmail.com> <20250506150730.4ea4d66c@kernel.org>
+In-Reply-To: <20250506150730.4ea4d66c@kernel.org>
 From: Taehee Yoo <ap420073@gmail.com>
-Date: Wed, 7 May 2025 13:22:19 +0900
-X-Gm-Features: ATxdqUG1FrCASYmMxq2NbIw6sM2vVgoYDqBfemXF2WFqzZ8vsr744ln5DkdJcUw
-Message-ID: <CAMArcTXM2y=MEU11GcbQoC91u4Qi93R_VdHSMQzRdRwPwALn3A@mail.gmail.com>
+Date: Wed, 7 May 2025 13:24:55 +0900
+X-Gm-Features: ATxdqUGjrcC0iHzlJzlA1sbjSiMijDGRT7Q5ULhe5pLDfC9_py6QXDtdAb-usyA
+Message-ID: <CAMArcTV3xfOJ1-GoJriUyTAniPkAeSYYRTd85gxJc+nfiBce7w@mail.gmail.com>
 Subject: Re: [PATCH net v2] net: devmem: fix kernel panic when socket close
  after module unload
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, andrew+netdev@lunn.ch, horms@kernel.org, 
-	almasrymina@google.com, sdf@fomichev.me, netdev@vger.kernel.org, 
-	asml.silence@gmail.com, dw@davidwei.uk, skhawaja@google.com, 
-	willemb@google.com, jdamato@fastly.com
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
+	andrew+netdev@lunn.ch, horms@kernel.org, almasrymina@google.com, 
+	sdf@fomichev.me, netdev@vger.kernel.org, asml.silence@gmail.com, 
+	dw@davidwei.uk, skhawaja@google.com, willemb@google.com, jdamato@fastly.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 7, 2025 at 2:41=E2=80=AFAM Stanislav Fomichev <stfomichev@gmail=
-.com> wrote:
+On Wed, May 7, 2025 at 7:07=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
+te:
 >
 
-Hi Stanislav,
-Thanks a lot for your review!
+Hi Jakub,
+Thanks a lot for the review!
 
-> On 05/06, Taehee Yoo wrote:
+> On Tue,  6 May 2025 14:08:58 +0000 Taehee Yoo wrote:
 > > Kernel panic occurs when a devmem TCP socket is closed after NIC module
 > > is unloaded.
 > >
@@ -211,205 +210,42 @@ net/netlink/genetlink.c:705)
 > >  ...
 > >  __sock_release (net/socket.c:647)
 > >  sock_close (net/socket.c:1393)
-> >
-> > Fixes: 1d22d3060b9b ("net: drop rtnl_lock for queue_mgmt operations")
-> > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
-> > ---
-> >
-> > v2:
-> >  - Fix commit message.
-> >  - Correct Fixes tag.
-> >  - Inverse locking order.
-> >  - Do not put a reference count of binding in
-> >    mp_dmabuf_devmem_uninstall().
-> >
-> > In order to test this patch, driver side implementation of devmem TCP[1=
-]
-> > is needed to be applied.
-> >
-> > [1] https://lore.kernel.org/netdev/20250415052458.1260575-1-ap420073@gm=
-ail.com/T/#u
-> >
-> >  net/core/devmem.c      |  6 ++++++
-> >  net/core/devmem.h      |  3 +++
-> >  net/core/netdev-genl.c | 27 ++++++++++++++++++---------
-> >  3 files changed, 27 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/net/core/devmem.c b/net/core/devmem.c
-> > index 6e27a47d0493..636c1e82b8da 100644
-> > --- a/net/core/devmem.c
-> > +++ b/net/core/devmem.c
-> > @@ -167,6 +167,7 @@ int net_devmem_bind_dmabuf_to_queue(struct net_devi=
-ce *dev, u32 rxq_idx,
-> >
-> >  struct net_devmem_dmabuf_binding *
-> >  net_devmem_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
-> > +                    struct netdev_nl_sock *priv,
-> >                      struct netlink_ext_ack *extack)
-> >  {
-> >       struct net_devmem_dmabuf_binding *binding;
-> > @@ -189,6 +190,7 @@ net_devmem_bind_dmabuf(struct net_device *dev, unsi=
-gned int dmabuf_fd,
-> >       }
-> >
-> >       binding->dev =3D dev;
-> > +     binding->priv =3D priv;
-> >
-> >       err =3D xa_alloc_cyclic(&net_devmem_dmabuf_bindings, &binding->id=
-,
-> >                             binding, xa_limit_32b, &id_alloc_next,
-> > @@ -376,12 +378,16 @@ static void mp_dmabuf_devmem_uninstall(void *mp_p=
-riv,
-> >       struct netdev_rx_queue *bound_rxq;
-> >       unsigned long xa_idx;
-> >
-> > +     mutex_lock(&binding->priv->lock);
-> >       xa_for_each(&binding->bound_rxqs, xa_idx, bound_rxq) {
-> >               if (bound_rxq =3D=3D rxq) {
-> >                       xa_erase(&binding->bound_rxqs, xa_idx);
-> > +                     if (xa_empty(&binding->bound_rxqs))
-> > +                             binding->dev =3D NULL;
-> >                       break;
-> >               }
-> >       }
-> > +     mutex_unlock(&binding->priv->lock);
-> >  }
-> >
-> >  static const struct memory_provider_ops dmabuf_devmem_ops =3D {
-> > diff --git a/net/core/devmem.h b/net/core/devmem.h
-> > index 7fc158d52729..afd6320b2c9b 100644
-> > --- a/net/core/devmem.h
-> > +++ b/net/core/devmem.h
-> > @@ -11,6 +11,7 @@
-> >  #define _NET_DEVMEM_H
-> >
-> >  #include <net/netmem.h>
-> > +#include <net/netdev_netlink.h>
-> >
-> >  struct netlink_ext_ack;
-> >
-> > @@ -20,6 +21,7 @@ struct net_devmem_dmabuf_binding {
-> >       struct sg_table *sgt;
-> >       struct net_device *dev;
-> >       struct gen_pool *chunk_pool;
-> > +     struct netdev_nl_sock *priv;
-> >
-> >       /* The user holds a ref (via the netlink API) for as long as they=
- want
-> >        * the binding to remain alive. Each page pool using this binding=
- holds
-> > @@ -63,6 +65,7 @@ struct dmabuf_genpool_chunk_owner {
-> >  void __net_devmem_dmabuf_binding_free(struct net_devmem_dmabuf_binding=
- *binding);
-> >  struct net_devmem_dmabuf_binding *
-> >  net_devmem_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
-> > +                    struct netdev_nl_sock *priv,
-> >                      struct netlink_ext_ack *extack);
-> >  void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *bindin=
-g);
-> >  int net_devmem_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_id=
-x,
-> > diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-> > index 230743bdbb14..b8bb73574276 100644
-> > --- a/net/core/netdev-genl.c
-> > +++ b/net/core/netdev-genl.c
-> > @@ -859,13 +859,11 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, s=
-truct genl_info *info)
-> >               goto err_genlmsg_free;
-> >       }
-> >
-> > -     mutex_lock(&priv->lock);
-> > -
-> >       err =3D 0;
-> >       netdev =3D netdev_get_by_index_lock(genl_info_net(info), ifindex)=
-;
-> >       if (!netdev) {
-> >               err =3D -ENODEV;
-> > -             goto err_unlock_sock;
-> > +             goto err_genlmsg_free;
-> >       }
-> >       if (!netif_device_present(netdev))
-> >               err =3D -ENODEV;
-> > @@ -877,10 +875,11 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, s=
-truct genl_info *info)
-> >               goto err_unlock;
-> >       }
-> >
-> > -     binding =3D net_devmem_bind_dmabuf(netdev, dmabuf_fd, info->extac=
-k);
-> > +     mutex_lock(&priv->lock);
-> > +     binding =3D net_devmem_bind_dmabuf(netdev, dmabuf_fd, priv, info-=
->extack);
-> >       if (IS_ERR(binding)) {
-> >               err =3D PTR_ERR(binding);
-> > -             goto err_unlock;
-> > +             goto err_unlock_sock;
-> >       }
-> >
-> >       nla_for_each_attr_type(attr, NETDEV_A_DMABUF_QUEUES,
-> > @@ -921,18 +920,17 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, s=
-truct genl_info *info)
-> >       if (err)
-> >               goto err_unbind;
-> >
-> > -     netdev_unlock(netdev);
-> > -
-> >       mutex_unlock(&priv->lock);
-> > +     netdev_unlock(netdev);
-> >
-> >       return 0;
-> >
-> >  err_unbind:
-> >       net_devmem_unbind_dmabuf(binding);
-> > -err_unlock:
-> > -     netdev_unlock(netdev);
-> >  err_unlock_sock:
-> >       mutex_unlock(&priv->lock);
-> > +err_unlock:
-> > +     netdev_unlock(netdev);
-> >  err_genlmsg_free:
-> >       nlmsg_free(rsp);
-> >       return err;
-> > @@ -948,14 +946,25 @@ void netdev_nl_sock_priv_destroy(struct netdev_nl=
-_sock *priv)
-> >  {
-> >       struct net_devmem_dmabuf_binding *binding;
-> >       struct net_devmem_dmabuf_binding *temp;
-> > +     netdevice_tracker dev_tracker;
-> >       struct net_device *dev;
-> >
-> >       mutex_lock(&priv->lock);
-> >       list_for_each_entry_safe(binding, temp, &priv->bindings, list) {
-> >               dev =3D binding->dev;
-> > +             if (!dev) {
-> > +                     net_devmem_unbind_dmabuf(binding);
-> > +                     continue;
-> > +             }
-> > +             netdev_hold(dev, &dev_tracker, GFP_KERNEL);
-> > +             mutex_unlock(&priv->lock);
-> >               netdev_lock(dev);
-> > +             mutex_lock(&priv->lock);
-> >               net_devmem_unbind_dmabuf(binding);
-> > +             mutex_unlock(&priv->lock);
-> >               netdev_unlock(dev);
-> > +             netdev_put(dev, &dev_tracker);
-> > +             mutex_lock(&priv->lock);
 >
-> nit: this feels like it deserves a comment on the lock ordering (and,
-> hence, why this dance is needed). The rest looks good!
+> I'll look at the code later today, but it will need a respin for sure:
+>
+> net/core/netdev-genl.c: In function =E2=80=98netdev_nl_bind_rx_doit=E2=80=
+=99:
+> net/core/netdev-genl.c:878:61: error: passing argument 3 of =E2=80=98net_=
+devmem_bind_dmabuf=E2=80=99 from incompatible pointer type [-Werror=3Dincom=
+patible-pointer-types]
+>   878 |         binding =3D net_devmem_bind_dmabuf(netdev, dmabuf_fd, pri=
+v, info->extack);
+>       |                                                             ^~~~
+>       |                                                             |
+>       |                                                             struc=
+t netdev_nl_sock *
+> In file included from ../net/core/netdev-genl.c:16:
+> net/core/devmem.h:133:48: note: expected =E2=80=98struct netlink_ext_ack =
+*=E2=80=99 but argument is of type =E2=80=98struct netdev_nl_sock *=E2=80=
+=99
+>   133 |                        struct netlink_ext_ack *extack)
+>       |                        ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~
+> net/core/netdev-genl.c:878:19: error: too many arguments to function =E2=
+=80=98net_devmem_bind_dmabuf=E2=80=99
+>   878 |         binding =3D net_devmem_bind_dmabuf(netdev, dmabuf_fd, pri=
+v, info->extack);
+>       |                   ^~~~~~~~~~~~~~~~~~~~~~
+> In file included from ../net/core/netdev-genl.c:16:
+> net/core/devmem.h:132:1: note: declared here
+>   132 | net_devmem_bind_dmabuf(struct net_device *dev, unsigned int dmabu=
+f_fd,
+>       | ^~~~~~~~~~~~~~~~~~~~~~
+>
+> This is on the kunit build so guessing some compat was missed.
 
-The device unreg path didn't acquire a socket lock.
-But by this patch, it sets binding->dev to NULL and binding->dev is
-protected by socket lock.
-So socket lock needs to be added to the device unreg path.
-
-The device unreg path acquires netdev_lock first, and socket close path
-acquires socket lock first. So, one of them should be changed.
-I modified the socket-close path and adjusted the locking order because,
-in my view, the socket-close path in the code is more flexible than the
-device unregistration path.
-
-I will add a comment about it in the next version.
+Ah, yes, I missed updating a prototype for the netmem disabled case
+in the devmem.h
+I will fix it in the next version!
 
 Thanks a lot!
 Taehee Yoo
