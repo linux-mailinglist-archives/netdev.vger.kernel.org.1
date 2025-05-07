@@ -1,131 +1,149 @@
-Return-Path: <netdev+bounces-188701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D247DAAE46C
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 17:21:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1468AAE48A
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 17:23:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 16C147AB7CB
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 15:20:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35FB71C21B8C
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 15:24:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42FED28A40A;
-	Wed,  7 May 2025 15:21:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3AFD28A72F;
+	Wed,  7 May 2025 15:23:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S03gyzyH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DSjUC3Nc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC74D2144CD;
-	Wed,  7 May 2025 15:21:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D033A28A419
+	for <netdev@vger.kernel.org>; Wed,  7 May 2025 15:23:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746631287; cv=none; b=e0K6i3YI5yS+CDaeXuZgdOr6qMafXVa/+23NBnhViCX6Qs1rPawfMc7dD/H5NIJSDwuQyG0OVGtm3TvfBCQDsXPMOdOtdoQ7KU6fE3Re7OAx73mMHUhOiceA5BXX8aENgBKP6BppZZSaHKc8dT3XzyJsSbq9xvJ0PnWavszkYgs=
+	t=1746631421; cv=none; b=ufFnKyRrStiBWKYmDZ1mUsikXJfQQtFAtDI12k8IT0eMgaFGn5bjGtPKSXJDvvK+UAgcSLm6dyPcaQtbd1a4+0MJtqJVpvHzTdig1BApwecwMpKiVxlWCh62Anpg8JI8itYUpdRUEEAPbOeXwzc9wXXpLYvfdvYh9YyXiKhjjYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746631287; c=relaxed/simple;
-	bh=Rp2RWQ2SmfrP/wcKdEEy5VWXzW6C7wbaPad+wRFEvEc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ePzaBfMnXuFjXYGWqYbpPEFJYfhHbnNON0F4KFdxtKZ/tlj0Qs806v770gTyLhXcW8g7c5DwBf3exzzeMOZX7pPrWViSUQKytnPeje7+upX1hAQqOeUei5KroBssq9leuMtbMGp/VGCPBtFeuyH5dOG2P8aHI6W67spOTS1Pj68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S03gyzyH; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-22423adf751so80062275ad.2;
-        Wed, 07 May 2025 08:21:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746631285; x=1747236085; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=FHYXpGSD8xf0POifLdqzvkcg78XfISduLF2AQceCFVg=;
-        b=S03gyzyHAop54EyMzDzN/4TznHBg6eXllPGcydI2FEHRIu8/UIrAAj1CyaeIwRnhZr
-         4JXE8PKQD6hNlmYBNppGb/qefv7KNuR4VCDx64y5Aef5XXqr1Ev39diFUX/m/Slrlo9L
-         iumhfTni1ckZeJfoxqs4s0OT5lFLTkq4iM0WvtZNGcP5HZk95QrdFYlXtYrz3SCyJzU6
-         eItJHXfGpiJ+LqwIZmU/SAbarDgok28jcafN8Sh5aTi6LInVm19nJNrd+yKijzeGK4zn
-         XU7jAjaUCgJWOJifr1hCmaAxGUcksBUdV26OzpUSj3UqQo9yL6vIxVj4gOfqUXtpHlSR
-         02SA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746631285; x=1747236085;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FHYXpGSD8xf0POifLdqzvkcg78XfISduLF2AQceCFVg=;
-        b=eMusnHs6NpcQYmzn9xwaBRJmRvjtGfYNDBCitK19pI8jgBU3TlySajDHeWU9ARO1vH
-         wjWI5rOVVA6P0wnovHwNYrmLh4IjMOyo5+8d6MadmJPcXUWHFMSF5viK7s6cKL/kdSAN
-         rsYHKG6X7iyr0OCarmYWzvSC5mvQQ1JHxzvw5AH69aRQtlQnUGacDsWVQ6jPSWq7fi5Q
-         p+G+kuYiI4lraFALsHhbCU6idRIuXg9UFUOBaEIZRKRG9JBuRhyhxsDSudwUsT23Gb0u
-         OUVqj4DPB8i1Zc36D39clY5WG95K72iDexCI52vnbdjGYSj0l6OGwEmWXHwo9jxNXdSR
-         ztPw==
-X-Forwarded-Encrypted: i=1; AJvYcCW0kAWsLGFFiBQ8mxPgXiom4TiUf1hBaGCJx0oMaapatHzy8xEubswOM0gEeV9IrHaIOy0AJvjww9e7REE=@vger.kernel.org, AJvYcCWxCi01+2Ty6TgjbCGZe4VIyPMLMIbRpueRumP4/lQBrlrsXBIoef75Zjp4EY5v6r8XJzThke9M@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxd7g6SDcnmixPsKyC++U7ysITcMQsvss8rrpYGdHKPhkW1/jF1
-	fmeMur1hTzpftro7fjf9xFCY61EVkWGhMUwITVU6/ziAra4n+fHD
-X-Gm-Gg: ASbGncsOWtezl7+IXr+LGX1z5db/OQDzf4b6AHIaIBGkMdE8n73e85cwIYFbtKExXqo
-	tkuTiFFgkeYV/h2QvHzNvys3uSyRnIGeYR0tQAAQYdtVVF7Zqt44QbN/sQR/vD3CBbUE8iZFCrL
-	lmvwdvqCu0RHIa+0cZ/suD2sF+xVOtW+tE5KxKdqUga+sSb006Lu3KyZf8qP2+74wQC9WjSFPpM
-	Ne2bdj8oOR6OeLjI5mfiRD7vygqUfyr5OQCObMG9JSY7ZsmOntVZ9VLohxFQK3MouuE7u8+OaY/
-	AGm0t8n0zw5dczZXv75CPvPyu72D/s6lIUxy/Y2ZnoANFP2eO7DDzw==
-X-Google-Smtp-Source: AGHT+IHFUiFNkkCbXkCtoDYGospKz+U/fHm+dGtocIkZN5tVhCqe60E9zpNrlEWkcod4loYukr8TJQ==
-X-Received: by 2002:a17:903:198d:b0:224:24d3:60f4 with SMTP id d9443c01a7336-22e5ea792a6mr49831435ad.15.1746631284997;
-        Wed, 07 May 2025 08:21:24 -0700 (PDT)
-Received: from localhost.localdomain ([49.37.223.8])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-22e15228f62sm94771405ad.168.2025.05.07.08.21.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 May 2025 08:21:24 -0700 (PDT)
-From: Abdun Nihaal <abdun.nihaal@gmail.com>
-To: shshaikh@marvell.com
-Cc: Abdun Nihaal <abdun.nihaal@gmail.com>,
-	manishc@marvell.com,
-	GR-Linux-NIC-Dev@marvell.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	rajesh.borundia@qlogic.com,
-	sucheta.chakraborty@qlogic.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] qlcnic: fix memory leak in qlcnic_sriov_channel_cfg_cmd()
-Date: Wed,  7 May 2025 20:51:00 +0530
-Message-ID: <20250507152102.53783-1-abdun.nihaal@gmail.com>
-X-Mailer: git-send-email 2.47.2
+	s=arc-20240116; t=1746631421; c=relaxed/simple;
+	bh=OEYJla6yHOI5aq7uzE4QyMPKy37/w0aCSCvZZmQryAg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kdmgMUu/jMVyScFO4g5S04u2cVq2ZCnTersmV+crpyW9nbOlKbZb6fwGHWNQj3gUKDOHziRvcp6bb8mvwhqWFxYbNnUWoajXn4q4t2WsF3UfQJo2drB5F45/hiDY/sIZyhhsiE2vWME6JHhzChki9U610fCGslpVvGLwoCGtAwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DSjUC3Nc; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746631418;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/Udw3u5odw3nfkdx4NGPiBiHcQObVWVbppj9xzXvG9I=;
+	b=DSjUC3Nc+EWyOlrpB+I88FO/BlNLM5k2d4xIXa2wMDY/gkmjosEN4Uv4enGN/wmB95bv4W
+	3C+VNLWG/LlkcYGw3m6SDrYI/9hzZtqlN+rc/EvIxKSXk8msojWe1KjGP5q1fmIn7RHQVg
+	KjHVOukmoeMck33RFig0Umc/bQl6nlI=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-232-U2ae1rr7N7-WB7Gx_usSuA-1; Wed,
+ 07 May 2025 11:23:33 -0400
+X-MC-Unique: U2ae1rr7N7-WB7Gx_usSuA-1
+X-Mimecast-MFC-AGG-ID: U2ae1rr7N7-WB7Gx_usSuA_1746631411
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BECAA18001E0;
+	Wed,  7 May 2025 15:23:30 +0000 (UTC)
+Received: from [10.44.33.91] (unknown [10.44.33.91])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A488B1956058;
+	Wed,  7 May 2025 15:23:25 +0000 (UTC)
+Message-ID: <54232b53-343f-456c-9c62-bd4958e2962a@redhat.com>
+Date: Wed, 7 May 2025 17:23:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 8/8] mfd: zl3073x: Register DPLL sub-device
+ during init
+To: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Lee Jones <lee@kernel.org>, Michal Schmidt <mschmidt@redhat.com>,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org
+References: <20250507124358.48776-1-ivecera@redhat.com>
+ <20250507124358.48776-9-ivecera@redhat.com>
+ <CAHp75Ven0i05QhKz2djYx0UU9E9nipb7Qw3mm4e+UN+ZSF_enA@mail.gmail.com>
+ <7e7122b1-b5ff-4800-8e1d-b1532a7c1ecf@redhat.com>
+ <aBt1jXNRgtNVDcWC@smile.fi.intel.com>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <aBt1jXNRgtNVDcWC@smile.fi.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-In one of the error paths in qlcnic_sriov_channel_cfg_cmd(), the memory
-allocated in qlcnic_sriov_alloc_bc_mbx_args() for mailbox arguments is
-not freed. Fix that by jumping to the error path that frees them, by
-calling qlcnic_free_mbx_args().
+On 07. 05. 25 5:00 odp., Andy Shevchenko wrote:
+> On Wed, May 07, 2025 at 04:19:29PM +0200, Ivan Vecera wrote:
+>> On 07. 05. 25 3:41 odp., Andy Shevchenko wrote:
+>>> On Wed, May 7, 2025 at 3:45 PM Ivan Vecera <ivecera@redhat.com> wrote:
+> 
+> ...
+> 
+>>>> +static const struct zl3073x_pdata zl3073x_pdata[ZL3073X_MAX_CHANNELS] = {
+>>>> +       { .channel = 0, },
+>>>> +       { .channel = 1, },
+>>>> +       { .channel = 2, },
+>>>> +       { .channel = 3, },
+>>>> +       { .channel = 4, },
+>>>> +};
+>>>
+>>>> +static const struct mfd_cell zl3073x_devs[] = {
+>>>> +       ZL3073X_CELL("zl3073x-dpll", 0),
+>>>> +       ZL3073X_CELL("zl3073x-dpll", 1),
+>>>> +       ZL3073X_CELL("zl3073x-dpll", 2),
+>>>> +       ZL3073X_CELL("zl3073x-dpll", 3),
+>>>> +       ZL3073X_CELL("zl3073x-dpll", 4),
+>>>> +};
+>>>
+>>>> +#define ZL3073X_MAX_CHANNELS   5
+>>>
+>>> Btw, wouldn't be better to keep the above lists synchronised like
+>>>
+>>> 1. Make ZL3073X_CELL() to use indexed variant
+>>>
+>>> [idx] = ...
+>>>
+>>> 2. Define the channel numbers
+>>>
+>>> and use them in both data structures.
+>>>
+>> It could be possible to drop zl3073x_pdata array and modify ZL3073X_CELL
+>> this way:
+>>
+>> #define ZL3073X_CHANNEL(_channel)                               \
+>>          &(const struct zl3073x_pdata) { .channel = _channel }
+>>
+>> #define ZL3073X_CELL(_name, _channel)                           \
+>>          MFD_CELL_BASIC(_name, NULL, ZL3073X_CHANNEL(_channel),  \
+>>                         sizeof(struct zl3073x_pdata), 0)
+>>
+>> WDYT?
+> 
+> Fine with me as it looks not ugly and addresses my point.
+> 
+Will submit v8 shortly..
 
-Fixes: f197a7aa6288 ("qlcnic: VF-PF communication channel implementation")
-Signed-off-by: Abdun Nihaal <abdun.nihaal@gmail.com>
----
- drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+Thanks for review and advice.
 
-diff --git a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c
-index 28d24d59efb8..d57b976b9040 100644
---- a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c
-+++ b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c
-@@ -1484,8 +1484,11 @@ static int qlcnic_sriov_channel_cfg_cmd(struct qlcnic_adapter *adapter, u8 cmd_o
- 	}
- 
- 	cmd_op = (cmd.rsp.arg[0] & 0xff);
--	if (cmd.rsp.arg[0] >> 25 == 2)
--		return 2;
-+	if (cmd.rsp.arg[0] >> 25 == 2) {
-+		ret = 2;
-+		goto out;
-+	}
-+
- 	if (cmd_op == QLCNIC_BC_CMD_CHANNEL_INIT)
- 		set_bit(QLC_BC_VF_STATE, &vf->state);
- 	else
--- 
-2.47.2
+Ivan
 
 
