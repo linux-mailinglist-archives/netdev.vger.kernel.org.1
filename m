@@ -1,111 +1,163 @@
-Return-Path: <netdev+bounces-188751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46EB2AAE78C
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 19:17:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B86C3AAE7AE
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 19:21:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E409C1C022A9
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 17:17:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28E8A172B00
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 17:21:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C7C028C5BE;
-	Wed,  7 May 2025 17:16:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6F0428C2C1;
+	Wed,  7 May 2025 17:21:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="R9U8XFrz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T/Jtifty"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 927BE28C5B6
-	for <netdev@vger.kernel.org>; Wed,  7 May 2025 17:16:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4256810F9;
+	Wed,  7 May 2025 17:21:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746638202; cv=none; b=JJtk9aEdUBYea8MGir4lfHcs66cNlUeS7HFeanS5inawI3iHOg35Y0bSKbf8aAXEgAYtSBVMvf8f8utbbCwK/128BueFMTODCzBMuJkxLSWlckSSk1hHSKLBiM9M9T1wRfpn8b166NyGvd3spLLu3/AZ5u7PWRXefA+F7OsTqM0=
+	t=1746638511; cv=none; b=jYOkFU5CZMxkrjaCD88350s4+NughU5hZlRpRy5trwwLWuIDcne/A8Coocit8yoeNFPqH0l2JeuP4rgHopWQ7KpyyMhRFNTxT6EJsSAhDnOGubWUr+kHp1GeX/6WDb6d7ywUfhwc+kcaHUqxPCI66lILjwoLE353Dze7DRFjQ9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746638202; c=relaxed/simple;
-	bh=CJn6oSzbe9ccw1YoTIQ+Dg9eM+SbgdEpb9alHvSUxJ4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=URbCU5pVxO0Hqtfy3Oara/MVODkz+AjPfsZ4uSrfDrSgif6tVYYKxvMPDTcYAqIZpTIH+2gl/C5vvMOJ5FOrXLvxwniJHXUkRTtR9fts4yFyAHiO0AzNrbgLltQ05rlA3THo+QLdcVFVsp7JMrzS8uOgaJ+oUZDfeGDWIwgCuSY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=R9U8XFrz; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 546NTBoh016937;
-	Wed, 7 May 2025 10:16:32 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:message-id:mime-version:subject:to; s=
-	pfpt0220; bh=s1fhG5docTmshoZVLYhbfFDlJAZkmAzdrd3PkVSobGM=; b=R9U
-	8XFrzU+F14j2fxmF9CkvgWvwM55cq/XjSUxLz/smIMdA1cBHJNR6zkmGPZ5mdjc9
-	p3x79SGVJ1sYXr144tjwj/VdLv17f7VNFhWmJEb+zjxwdT9hMtxYgdPE9ALxW3ep
-	8GMF68rqYYAZ7Xm1S/5xmJcaHOHmHqtsLnwEzyeEhvYWdzqQ83YW3wqWlIGdSq2E
-	k7sdWQO7cie0Mp9b1MRds/WWkJygaxTmvR0+jE9d6nYx0RfVznQzsu/Mxf64W3uN
-	YBECU/KPaduJHIRyIGuxDvpW6HPTWdOgtBG0rPmmhCvkPNGnXqj9HPWzieAn1u7W
-	l7Q8n3frXmeQEe8BWbA==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 46fv4rt3yq-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 07 May 2025 10:16:32 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Wed, 7 May 2025 10:16:31 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Wed, 7 May 2025 10:16:31 -0700
-Received: from hyd1358.marvell.com (unknown [10.29.37.11])
-	by maili.marvell.com (Postfix) with ESMTP id A4A2D3F708A;
-	Wed,  7 May 2025 10:16:27 -0700 (PDT)
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
-        <gakula@marvell.com>, <hkelam@marvell.com>, <sgoutham@marvell.com>,
-        <lcherian@marvell.com>
-CC: <netdev@vger.kernel.org>, Subbaraya Sundeep <sbhatta@marvell.com>
-Subject: [PATCH] octeontx2-af: Send Link events one by one
-Date: Wed, 7 May 2025 22:46:23 +0530
-Message-ID: <1746638183-10509-1-git-send-email-sbhatta@marvell.com>
-X-Mailer: git-send-email 2.7.4
+	s=arc-20240116; t=1746638511; c=relaxed/simple;
+	bh=4KN9AehXbtU3i0vwYhUfPh24WVFdZf+DzWH3CNB70ys=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=BvN/0rDihZuiMZ6Shz6TJKBcFIkSSzyP2vlqwqcAL8GzlHpUXz8VWjR7O7piC3ATlYzI2LGpDod/gqcnO0a92I8lxgAyBecgRLu36x2xbiKzRNFRPxTL3Y+F4IWo+Qc7led+O58qUPwkLcYirAmF3i8lz38Pk53iqj3OJroWBS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T/Jtifty; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7c597760323so6418285a.3;
+        Wed, 07 May 2025 10:21:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746638509; x=1747243309; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4KN9AehXbtU3i0vwYhUfPh24WVFdZf+DzWH3CNB70ys=;
+        b=T/JtiftyJxYn65xmdJDmPuU1UX51mR51cV3x918CjIlEVEUkaKbpnQxISnv7cstA1D
+         kxke484hG02H9CuYBfDB1R+Fy4KqUUxdBA6lYJjJIyT4nRvJ6g8wRwuvdgtPZo6gOPpL
+         L9E8c2+Fcebgt0i9oRuB65IraCEKuYsYer/DzUJiytJJrBHfN3+mq+s0hEQjcVfNV34h
+         CGxY56lnPpQxnZhdr9HQogxZpVaKVQJ6cVjvBVycJ9FIv72fFXN8MKpcMlMlh3FDRtt8
+         VZgcg9KWKbGhpM14P3hBkfEbh2gKQAqRfzwGkJNV98bYhoRyDklCUaofUYqTGp3FE3Qy
+         tZ3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746638509; x=1747243309;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=4KN9AehXbtU3i0vwYhUfPh24WVFdZf+DzWH3CNB70ys=;
+        b=hrTVjpgGJ8vfEY657HZaSYVRhq8JFq7Py8V18W2hfBD3SyMUo0DGWLj2Fp5c7N1ONY
+         kIGK59PNJXfKBbdPbqEayIllDoN5NRr9jqSxPNBR1d2FVsIONkbS4LBoRlBWjPHpmMAG
+         XDhBPseyx9iwONeZNCUy//RhWLw3tPfLHWCX07STa1g+oQZuGvgnl/gwopr5lmgglCaz
+         j8UMrbt5DifrGBO9lu06aLyFcZIiHDLKG4/OzJNMwBrZoUGO7TvT06tw0+/YYogcLZ6A
+         CB1IVr4Nu4GmD6vLprfr8b1WqngzIA52qAJYgBJi7LGXfsxsB4RPd2Tm6YZAuYxGZUeb
+         oJAA==
+X-Forwarded-Encrypted: i=1; AJvYcCWcJZD26YFVghf/CdA9/Ax4Syv1w45fTFLbJW4IxQ9BBSr3+fek/MZIyb/qAGZsr2mRnNNrDcWQ6STIX2R1@vger.kernel.org, AJvYcCXJslpJGlvDnqDLRfVEi/JYBm/mT6TltVbllYgi+pqllEBN5l4JKva1CBeDOhIRWljcGbJag/WX@vger.kernel.org, AJvYcCXObqs6vtHu6Z80ot/y+BNpGhfXtj17hAri/M4ihVPtD3kWQDZK+qpuevhyIJ6VBkQW7no=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxbXN5NPonNXLrFmaOAg1kfabtiVCXb9n0pYdjT1mwYaBImj5t2
+	DflwRvYhHyotW1H8WmTHqcMzUcFkAmdRV77gAU7zAExE0wQT6PQx
+X-Gm-Gg: ASbGncvgpQ4X18tGYlxXlSkYZXWuEl86nU51T+eltfmEReyx+Q7w93u8YiNeQi+bgL4
+	loTpfxqm3cQYKI9sGAy8+0mpeZNiiRrPBqFAlEJVKuNG9AWTBARgBBHqBzq7+e+LCgVk5H0e5hj
+	YwosPl6Zb3QrvIbf4tNoePn5IBcLO6GzgaMy1fg0yt41940J0wKQYUhP1VmepRfaBhAqUCiXkx5
+	8d1Tpw7bbrDfW/OTbdP9OQ6yPXDfBxPb4pJUfxvuNp/T/3JHuj6L9/eVr856Hju6sB83XFKH5K5
+	ezhGHvTDKCTX76B7vt3GNd5ZoccqtKWKxP9RwoyCH0z5+kT45U4chyjfVZs3LqegIrELDbQVUZV
+	zOZqXqbM3LDrxReks1vYVaIMIIlvCRCE=
+X-Google-Smtp-Source: AGHT+IFeNep8CP7L4LAzS/uSxqoN/oIKx0uul0Rcnz5cdJfuTyulIiJ8UZMjk/2h9FPh1pGy5nXRfw==
+X-Received: by 2002:a05:620a:d87:b0:7c5:d72b:1a00 with SMTP id af79cd13be357-7caf7386bdcmr514256985a.15.1746638509060;
+        Wed, 07 May 2025 10:21:49 -0700 (PDT)
+Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7caf75b85a6sm177992785a.68.2025.05.07.10.21.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 May 2025 10:21:48 -0700 (PDT)
+Date: Wed, 07 May 2025 13:21:47 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jesper Dangaard Brouer <hawk@kernel.org>, 
+ Zvi Effron <zeffron@riotgames.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Stanislav Fomichev <stfomichev@gmail.com>, 
+ Jon Kohler <jon@nutanix.com>, 
+ Jason Wang <jasowang@redhat.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Simon Horman <horms@kernel.org>, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ bpf@vger.kernel.org, 
+ Jacob Keller <jacob.e.keller@intel.com>
+Message-ID: <681b96abe7ae4_1f6aad294c9@willemb.c.googlers.com.notmuch>
+In-Reply-To: <062e886f-7c83-4d46-97f1-ebbce3ca8212@kernel.org>
+References: <20250506125242.2685182-1-jon@nutanix.com>
+ <aBpKLNPct95KdADM@mini-arch>
+ <681b603ac8473_1e4406294a6@willemb.c.googlers.com.notmuch>
+ <c8ad3f65-f70e-4c6e-9231-0ae709e87bfe@kernel.org>
+ <CAC1LvL3nE14cbQx7Me6oWS88EdpGP4Gx2A0Um4g-Vuxk4m_7Rw@mail.gmail.com>
+ <062e886f-7c83-4d46-97f1-ebbce3ca8212@kernel.org>
+Subject: Re: [PATCH net-next v3] xdp: Add helpers for head length, headroom,
+ and metadata length
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-GUID: VT7lIkDPvyn-PvcL9OZU8aXKdbL3122n
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTA3MDE1OSBTYWx0ZWRfXzi43H/C0J/fB n8mNGqT2CDXcAzUg42U7vQk2L3+IQU3Lq+VNMs1zAEWy+8nP21Wqyb2eQhRP5cEPp9ffkRoqOO6 kIgimDQVCIiep90LErWS+VDOLlGtHDkjLTjG3NQjSKheZAJu51myGf4kXv80FLR+j8DZ/ocuqFZ
- PdinqPoUB53Acf3twjR8BqXWvlwQY6glQwE4seBCfcaT73vZXYKmLGTB667/47snXCUns5OKHv8 8zZsIAxHiRwPxIWiwddFBfmhSLE15wU498bXQcvI/4OmeIU1Dhoi7wmZqeHczj0yJNMtKYTeQlj 0sZxFvnEM5NM/UUEU7s3zI5wKxaFex0pSz20jYoIjFQUYMsh/gym78sxAiBsWdSbgxEZ5YXqzX4
- IlIKoJIkdmVJOYXLr6gg/DDd9pHMdisBD3zqsFzbwWigX8ZUsFJ7cxyM8aQV09MUxIhHro1Q
-X-Proofpoint-ORIG-GUID: VT7lIkDPvyn-PvcL9OZU8aXKdbL3122n
-X-Authority-Analysis: v=2.4 cv=TKdFS0la c=1 sm=1 tr=0 ts=681b9570 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=dt9VzEwgFbYA:10 a=M5GUcnROAAAA:8 a=QHeTzNiMllNnO-1yQAEA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-07_05,2025-05-06_01,2025-02-21_01
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Send link events one after another otherwise new message
-is overwriting the message which is being processed by PF.
+Jesper Dangaard Brouer wrote:
+> =
 
-Fixes: a88e0f936ba9 ("octeontx2: Detect the mbox up or down message via register")
-Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c | 2 ++
- 1 file changed, 2 insertions(+)
+> =
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-index 992fa0b..ebb56eb 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-@@ -272,6 +272,8 @@ static void cgx_notify_pfs(struct cgx_link_event *event, struct rvu *rvu)
- 
- 		otx2_mbox_msg_send_up(&rvu->afpf_wq_info.mbox_up, pfid);
- 
-+		otx2_mbox_wait_for_rsp(&rvu->afpf_wq_info.mbox_up, pfid);
-+
- 		mutex_unlock(&rvu->mbox_lock);
- 	} while (pfmap);
- }
--- 
-2.7.4
+> On 07/05/2025 19.02, Zvi Effron wrote:
+> > On Wed, May 7, 2025 at 9:37=E2=80=AFAM Jesper Dangaard Brouer <hawk@k=
+ernel.org> wrote:
+> >>
+> >>
+> >>
+> >> On 07/05/2025 15.29, Willem de Bruijn wrote:
+> >>> Stanislav Fomichev wrote:
+> >>>> On 05/06, Jon Kohler wrote:
+> >>>>> Introduce new XDP helpers:
+> >>>>> - xdp_headlen: Similar to skb_headlen
+> >>
+> >> I really dislike xdp_headlen(). This "headlen" originates from an SK=
+B
+> >> implementation detail, that I don't think we should carry over into =
+XDP
+> >> land.
+> >> We need to come up with something that isn't easily mis-read as the
+> >> header-length.
+> > =
 
+> > ... snip ...
+> > =
+
+> >>>> + * xdp_headlen - Calculate the length of the data in an XDP buffe=
+r
+> > =
+
+> > How about xdp_datalen()?
+> =
+
+> Yes, I like xdp_datalen() :-)
+
+This is confusing in that it is the inverse of skb->data_len:
+which is exactly the part of the data not in the skb head.
+
+There is value in consistent naming. I've never confused headlen
+with header len.
+
+But if diverging, at least let's choose something not
+associated with skbs with a different meaning.
 
