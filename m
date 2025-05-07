@@ -1,125 +1,137 @@
-Return-Path: <netdev+bounces-188786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 283E7AAED34
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 22:43:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46190AAED50
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 22:47:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96873524327
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 20:43:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 767D51BC3392
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 20:47:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A74CB28F94A;
-	Wed,  7 May 2025 20:43:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 880F428BA9F;
+	Wed,  7 May 2025 20:47:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mm58GYXC"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="qRlLrf17"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CECC28C5B5;
-	Wed,  7 May 2025 20:43:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF1E95A79B
+	for <netdev@vger.kernel.org>; Wed,  7 May 2025 20:47:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746650616; cv=none; b=tNQU+eUDY1gg+GLwHi5dL4egT5qfPQRra3k5gYj7D+gjQfb31sfiM/42pmrdBy0IZ2+s8InIPeugkG80jKH2rLf6OEcTgUXIjgs+lkl/y6VelCk1w+QQH3zt5vXimwSaItZ3tE3YIKq5xsIgnPAVj4IZEmPOcUEhJ7KdWQqQZRg=
+	t=1746650835; cv=none; b=XJ+um+CWWWgggdOW8lcXiObQxWK2l9IrF7k94d5j7EsGz38fMgjOREMaq2U40v9lcXm1ZKICrrnQTR3WRGhAaNaZcSpXdwm3b/8e8gR3NuZ/6DezPIqzeFVDbvw5zF/X/uxcn3JEpZFzKjnE8uS4Tsshxq36IhSIUJ6YllgSZ0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746650616; c=relaxed/simple;
-	bh=6rPxVYpokiEhO+TzLzqBvA7lWBd6HHd4fis1YLJuMvo=;
-	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=XoMz0gA2pdXu6+uIZSVMGaR0SqsvFlvzOs0D8s+3XLkkKafEEUDyg6LmEn4z8rOuSbJcVWsSlcV2JxFirCSvKV+hK9vVHyjBL+3UIxycZjnVvz8wEeplhOft3BUzEGFYcNWoYwAzoj/feubcthsXGghHZckto7V8hf2K92bJAME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mm58GYXC; arc=none smtp.client-ip=209.85.222.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7c54f67db99so155253385a.1;
-        Wed, 07 May 2025 13:43:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746650614; x=1747255414; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tTuvkoeLz9OFKlj9Dviyt8wquS2tMT58gS6cPYVlW1g=;
-        b=mm58GYXCIAYWc89utE9BbYTDT8OYCkMJ67ebF3OMmovvbq9Nj++7MEzWPllYzajLSm
-         7PGN3z8ehGmA/tZa5B/sj3IrkrI+axOF+3R3HWK2wY4E+9pC9QIZOIugtR9gv4a/x+rT
-         V9PyPMklLzL6LH68HMZIrE+D+8hZXQZ9B8l4yhJ4vgwJSNSrGBBcKeKuznkqIyOflyNP
-         sDwDdkNrUCdfj4KEwu3dMhW8UALIij0LGqgH+6YXq1fzuEb2SoQJb3ZIfr+zpvRsQifj
-         yl5KnL+i9U8UlAhvah4xzkpn9rN3A1HOUmgbM6lAozaToUTyhb9lvQFRnS8TzvFpvbIc
-         wO8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746650614; x=1747255414;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tTuvkoeLz9OFKlj9Dviyt8wquS2tMT58gS6cPYVlW1g=;
-        b=KHiUPWl6cemiiosheytubBmwrBLvoJGp9VL2d0+52J/ALbFTAwwY15sNVoG7ICNNFG
-         xnDV9dxuyfygxXASTg1r0uaH0zS3GW2sZT1KMfCqFa1gyaGBUKPOIT26afWe5mLM56q4
-         /vK5hzo5SK8vlciqPFy+zch8LtIfh6K7xZhvKep2i58L31JWJ1+6QVos3SLtsMHrPAeB
-         +mNti9xL1d/h+udC2e1R82+y8or9NrmtblmBS8pyBHKHk/3Bz6Nhkl9iQe2AX1KKvfWk
-         FRY9rQ/oExdAMHl0Y8rt6/8QGaA+CpD7zOkZ1upDgqpbFapvop8xHWXY5Ujpp6I/C3A+
-         ymSg==
-X-Forwarded-Encrypted: i=1; AJvYcCUsSzJMqc/fz9JP3RLld4XLQBIPlbPhnEO5h3pJZhAKRa6Zd1dQxQRrWWgzU4MRiIPLbBs=@vger.kernel.org, AJvYcCVAulJSsHQHg0yvMCx5vzw1Rmq/0aNAZNYvqzzIMsAELRirtn9pFtFB00nei4P4gEtRRq8D8eP4SmJTMs3P@vger.kernel.org, AJvYcCWT0v/La2/ZB7cEeiFmWwQtuFfy5WyvaBfohFwYKutiInGFJUdA3JRqFXDYUu3wpOrJ1tmahCy3@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz6r8tGrvckEQzkafY2oIBNCJQeppgE6pdOoHTlBM2igHgFT5mO
-	G6jLwoeLgsprx8e8IzQZq0u3VAKS2x6D0ZZ68V70a1SJmhggp8e5
-X-Gm-Gg: ASbGncssQQRND9tkpmPDfpNHcuJ6D5u616EJsdLwqB9Xv1lYVW0nf+/AbcyiZY46Rwh
-	LRyYdZklKNK1nDvHKwMJ4iW0gJv49Rygea4FQ8o8vU7mUKDsjYgI5KgrNrAkArPoU5DRdTf+Qsh
-	dJ65l9W2CcodtJ6F9edSOb58Z8gsC2uf1c9kX1eBWwcQUJwdc4e0YyXEo2FTc1MkCf7j18LvSa/
-	QY3+1F56DJzC2z1PAnkVXRShuxto9YaHJyvI1Kq9o/bg36a4o4YjHF22A5pZKyQS5eK8wd/PZdK
-	XZEDqfzgVE6wv74fqHUA3/HbR2dCGj/mNFMMdGzVlse+IzJIMJCJ/opdoPLvoobyRFz9/4pu4r/
-	NKOHWC1TlGZqbpKj26d9X
-X-Google-Smtp-Source: AGHT+IG0djn3yeJAK6hcpM8Kyq0xTsIur4G494vPRBrWDsVOBbqGXJBbHsOuIVLjON6Wq6XAQmt62g==
-X-Received: by 2002:a05:620a:f01:b0:7c7:b8bf:35cf with SMTP id af79cd13be357-7ccf9961e16mr146671085a.7.1746650613685;
-        Wed, 07 May 2025 13:43:33 -0700 (PDT)
-Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7caf75d97d9sm210196485a.101.2025.05.07.13.43.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 May 2025 13:43:33 -0700 (PDT)
-Date: Wed, 07 May 2025 16:43:32 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jon Kohler <jon@nutanix.com>, 
- ast@kernel.org, 
- daniel@iogearbox.net, 
- davem@davemloft.net, 
- kuba@kernel.org, 
- hawk@kernel.org, 
- john.fastabend@gmail.com, 
- netdev@vger.kernel.org, 
- bpf@vger.kernel.org, 
- jon@nutanix.com, 
- aleksander.lobakin@intel.com, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, 
- linux-kernel@vger.kernel.org (open list)
-Message-ID: <681bc5f4b261e_20dc6429482@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250506145530.2877229-2-jon@nutanix.com>
-References: <20250506145530.2877229-1-jon@nutanix.com>
- <20250506145530.2877229-2-jon@nutanix.com>
-Subject: Re: [PATCH net-next 1/4] tun: rcu_deference xdp_prog only once per
- batch
+	s=arc-20240116; t=1746650835; c=relaxed/simple;
+	bh=4MuzkUrWxZlQU3gtT5Jnjj61gRkWxGHJIu/GV5m4U/s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Z6h20t1VIGPuH0zZlJDg0BwF/Zl48/KkHBjd++MsJ+iwsvAOWFgrT+6bABMOrP+9eLWbojg4P34idUpML1oeW0PvBtBdYlBQ5AyhHLJEP2zJhI0P8LpaqVVS8xBN/OEedB7y6ycRE9T6Zh6voH2cJ7nZjbkTKMzJsd4fqz1VTNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=qRlLrf17; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=prrxQt8KnoX9OKhyw4WA1kYq8kHzRyfXyW47RICFr7c=; t=1746650834; x=1747514834; 
+	b=qRlLrf17ScMjr1aa53qJjIXz9reO9e58mfGZaf0xNGxTCUlay+EzfgvVbmBBF9ysWXRzSLskh+Q
+	dFInpD/eWXmq2DRBGjdBLmZSz20hT4Zekvx550Me/CEVI4g5T2e8MLbtT0jApwK7ll8PIqjjYJzSI
+	7dPmWkZsgvR7LD4roRlLaZZcUeeRnS05FqlJQTD8K4TEzHZxfKPzFFMeDdlfmckZ0LA6HFqYoOUn7
+	zGTLYlYHjKBUAH7XFTuyY0AMCBHSSnDxUuUd9ovM74llkHdfPVws1ZkNVxH21Jz3gEt4JCDMOvfMb
+	2ynIHXL9XscJ8STKBLy107aD516/RGHJy06Q==;
+Received: from mail-oi1-f178.google.com ([209.85.167.178]:53370)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1uClfc-0006E0-K7
+	for netdev@vger.kernel.org; Wed, 07 May 2025 13:47:13 -0700
+Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-3fefbbc7dd4so261335b6e.2
+        for <netdev@vger.kernel.org>; Wed, 07 May 2025 13:47:12 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU9znXeSy0XmTLCxDguLNS4c2acGEryotMdQ+fHx/RP43i97GcywFgMQUmKPpBafvGTyywoLYU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvB8Zu6IIm0tYeO5tSOdvPF0X+YV8Xqc86tCicbEbIffscFQNx
+	d8nVPB+LrqCPYIBhGecETWbp0q4OjA9bPCu36vjdyxSqseV8cb1oHE9hn0OkIplQrgMHKzvwZ80
+	k7NVQUJhUeM0mFJa2Q7FQkhAt7Nc=
+X-Google-Smtp-Source: AGHT+IHn3ixUNXJt23x8dzs+jAll9ks9Jah2BuNb1pcmQTs1mq6+dz8fGt5BxTnPJlEMp1rhhqPw5l4whrkISNdbawQ=
+X-Received: by 2002:a05:6808:3197:b0:401:e8a2:76e8 with SMTP id
+ 5614622812f47-4036f090c04mr3178694b6e.18.1746650832072; Wed, 07 May 2025
+ 13:47:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20250502233729.64220-1-ouster@cs.stanford.edu>
+ <20250502233729.64220-9-ouster@cs.stanford.edu> <a6b82986-52df-4d51-b854-a2eb5842a574@redhat.com>
+ <CAGXJAmxbtj7x78KYNBWoZaCHbOf39ekeHQUX2bMZsipXUCau_Q@mail.gmail.com> <7e177e94-24cb-4090-81b9-d82b0c43a37d@lunn.ch>
+In-Reply-To: <7e177e94-24cb-4090-81b9-d82b0c43a37d@lunn.ch>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Wed, 7 May 2025 13:46:36 -0700
+X-Gmail-Original-Message-ID: <CAGXJAmzfRJWv7tsw8jq-jR0ax3noQ9jMJEAkdtF8uki6DVDMzQ@mail.gmail.com>
+X-Gm-Features: ATxdqUEH4pEDi10fhumwCtIWkkwkEqEGDQ6VsJvH0gxNy1rkSstdUq2ohXdoJVM
+Message-ID: <CAGXJAmzfRJWv7tsw8jq-jR0ax3noQ9jMJEAkdtF8uki6DVDMzQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v8 08/15] net: homa: create homa_pacer.h and homa_pacer.c
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: -1.0
+X-Spam-Level: 
+X-Scan-Signature: 127ff6e1eac6b45a32dc112250ed777d
 
-Jon Kohler wrote:
-> Hoist rcu_dereference(tun->xdp_prog) out of tun_xdp_one, so that
-> rcu_deference is called once during batch processing.
+get_link_ksettings is what I was thinking of. Some of the issues you
+mentioned, such as switch egress contention, are explicitly handled by
+Homa, so those needn't (and shouldn't) be factored into the link
+"speed". And don't pretty much all modern datacenter switches allow
+all of their links to operate at full speed?
 
-I'm skeptical that this does anything.
+-John-
 
-The compiler can inline tun_xdp_one and indeed seems to do so. And
-then it can cache the read in a register if that is the best use of
-a register.
-
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Jon Kohler <jon@nutanix.com>
+On Wed, May 7, 2025 at 1:31=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Wed, May 07, 2025 at 11:55:23AM -0700, John Ousterhout wrote:
+> > In Tue, May 6, 2025 at 7:05=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> =
+wrote:
+> > >
+> > > On 5/3/25 1:37 AM, John Ousterhout wrote:
+> > > > +     /**
+> > > > +      * @link_mbps: The raw bandwidth of the network uplink, in
+> > > > +      * units of 1e06 bits per second.  Set externally via sysctl.
+> > > > +      */
+> > > > +     int link_mbps;
+> > >
+> > > This is will be extremely problematic. In practice nobody will set th=
+is
+> > > correctly and in some cases the info is not even available (VM) or wi=
+ll
+> > > change dynamically due to policing/shaping.
+> > >
+> > > I think you need to build your own estimator of the available B/W. I'=
+m
+> > > unsure/I don't think you can re-use bql info here.
+> >
+> > I agree about the issues, but I'd like to defer addressing them. I
+> > have begun working on a new Homa-specific qdisc, which will improve
+> > performance when there is concurrent TCP and Homa traffic. It
+> > retrieves link speed from the net_device, which will eliminate the
+> > need for the link_mbps configuration option.
+>
+> I would be sceptical of the link speed, if you mean to use ethtool
+> get_link_ksettings(). Not all switches have sufficient core bandwidth
+> to allow all their ports to operate at line rate at the same
+> time. There could be pause frames being sent back to slow the link
+> down. And there could be FEC reducing the actual bandwidth you can get
+> over the media. You also need to consider congestion on switch egress,
+> when multiple sources are sending to one sink etc.
+>
+> BQL gives you a better idea of what the link is actually capable of,
+> over the last few seconds, to the first switch. But after that,
+> further hops across the network, it does not help.
+>
+>         Andrew
 
