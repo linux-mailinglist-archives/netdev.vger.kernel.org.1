@@ -1,97 +1,169 @@
-Return-Path: <netdev+bounces-188611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188613-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25B62AADF3C
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 14:33:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF2B1AADF56
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 14:36:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22AC63A1934
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 12:30:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62A34178D6D
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 12:36:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 137071E49F;
-	Wed,  7 May 2025 12:30:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A221281343;
+	Wed,  7 May 2025 12:36:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Y8MMpzSD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BXd4NI9H"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E8BC182;
-	Wed,  7 May 2025 12:30:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B014A280005
+	for <netdev@vger.kernel.org>; Wed,  7 May 2025 12:36:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746621052; cv=none; b=R+4CsNH3qE42P8r8XgZJ7sexRUVrBfeMvVMxvYrFS9gEP+RZ2qm7iJb79BUr81OlyfFFVDtIAFgI/tXgVy9koX3z3j4izyTKuZxYMdtRkFJ3jdYqhCejwq4HyaHQVBHomsoSCKb5RQhYIARlD9ujmWYjvoEQHI1ckpOh3GspPd0=
+	t=1746621399; cv=none; b=XNG4oRueegELSbWK3Fc3rnDl0X/k2ILLw3QzdgRvqvh6gtifn/pVwFBmid45dcyCekJeeuePyneaZJ0ICWXBhgKx3rWe0K357VbZ1j44Hr0Z9L2QUeCh4N1IMCDrXXlFumd3lCDLqG2+kB3JycAmRyOh94pUr5jZhAOyIsUb5SU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746621052; c=relaxed/simple;
-	bh=Vxx0ACGp24sVEd5SknbWJ5uvARr7Cg9cs0xZD85ZQPI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TOlOzuYVew+ue/AuoPgMSMqp+o18ftxZ+1t5LH//17CJCk0jQNMEAzbrauAexxNpEHp5cg9UYHpKHqMT87kL4cdjTN4te7XlxuUcZrM6SIZCdnv9B02HlBQSNrXjdXwO2vgv7J6OFy6Cli9ztDOwvFeB6wJk+tzssVA3ioEiJcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Y8MMpzSD; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=cPP8m0+ZommNldXRYZax/cEqIRhtEpGo2CITzC/JUH0=; b=Y8MMpzSDzRMbLUu84SadJnxduB
-	ePjoEcOS7thXdPHJO5F65rZWdmdbWL2Y0gNkcRXc7o4LOSANkwZ0zevQJ3ih9RSpDYIOJoZfiNJzo
-	Z4M66AORgEhpb3VAxghF4mOgk+oXGSPMrhxwGblYTLg3242EOaupHg/keO/wM686Swn8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uCdv8-00BsVe-50; Wed, 07 May 2025 14:30:42 +0200
-Date: Wed, 7 May 2025 14:30:42 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Mark Brown <broonie@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Sander Vanheule <sander@svanheule.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] regmap: remove MDIO support
-Message-ID: <f4221c9a-751a-4ab2-8544-7d90b2f320fb@lunn.ch>
-References: <c5452c26-f947-4b0c-928d-13ba8d133a43@gmail.com>
- <aBquZCvu4v1yoVWD@finisterre.sirena.org.uk>
- <59109ac3-808d-4d65-baf6-40199124db3b@gmail.com>
- <aBr70GkoQEpe0sOt@finisterre.sirena.org.uk>
- <a975df3f-45a7-426d-8e29-f3b3e2f3f9e7@gmail.com>
+	s=arc-20240116; t=1746621399; c=relaxed/simple;
+	bh=ANQL2Z2mMkbXRvzftivNBYyTpd2FsjheCIMPkPyIky0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GD1VwPDTSPKTmnExD5hmLvrlAU7395Eec5BtAGFjSpcI+DmIn1vS2vX8NrCLZM6KtVNM045QbIUMjqgZsQZtAXPVGgn9RirZdX3bhfN8YeFb3jd5qNprzoM3fQsFzMiFlnMbILnJphIgTv7LldiWHhbcTCKXWkCBvj4ZzFoHpyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BXd4NI9H; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746621396;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=R4OangMaKmpfQS75O4hoSdU6AYI1lR2PZPMYPMmrmQc=;
+	b=BXd4NI9HEkJktrzKWBIA2UBzvOBsKCOLb4UNoSRbj7yt9XBlfLYYda6Lpx1h3Q84Cmluzz
+	hKjVOutXOf9ta7Dir6B19lyE3qJ4pKxab32lJe5LibpB7Vn9lztKkecbzqQh0n9ELm9eOL
+	bVpAxNqjszKRyQqy7tigk+8nUWsKCd0=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-301-TZ32l5kDOH2JZUq_QcgFLg-1; Wed,
+ 07 May 2025 08:36:30 -0400
+X-MC-Unique: TZ32l5kDOH2JZUq_QcgFLg-1
+X-Mimecast-MFC-AGG-ID: TZ32l5kDOH2JZUq_QcgFLg_1746621388
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 52F141955DE8;
+	Wed,  7 May 2025 12:36:28 +0000 (UTC)
+Received: from [10.44.33.91] (unknown [10.44.33.91])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C65371953B85;
+	Wed,  7 May 2025 12:36:22 +0000 (UTC)
+Message-ID: <ef8ae196-84c9-447e-98ff-071d347531d5@redhat.com>
+Date: Wed, 7 May 2025 14:36:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a975df3f-45a7-426d-8e29-f3b3e2f3f9e7@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 8/8] mfd: zl3073x: Register DPLL sub-device
+ during init
+To: Lee Jones <lee@kernel.org>
+Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Andy Shevchenko <andy@kernel.org>, Michal Schmidt <mschmidt@redhat.com>,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org
+References: <20250430101126.83708-1-ivecera@redhat.com>
+ <20250430101126.83708-9-ivecera@redhat.com>
+ <20250501132201.GP1567507@google.com>
+ <a699035f-3e8d-44d7-917d-13c693feaf2e@redhat.com>
+ <20250507110621.GJ3865826@google.com>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <20250507110621.GJ3865826@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On Wed, May 07, 2025 at 08:49:15AM +0200, Heiner Kallweit wrote:
-> On 07.05.2025 08:21, Mark Brown wrote:
-> > On Wed, May 07, 2025 at 08:09:27AM +0200, Heiner Kallweit wrote:
-> >> On 07.05.2025 02:50, Mark Brown wrote:
-> >>> On Tue, May 06, 2025 at 10:06:00PM +0200, Heiner Kallweit wrote:
-> > 
-> >>>> MDIO regmap support was added with 1f89d2fe1607 as only patch from a
-> >>>> series. The rest of the series wasn't applied. Therefore MDIO regmap
-> >>>> has never had a user.
-> > 
-> >>> Is it causing trouble, or is this just a cleanup?
-> > 
-> >> It's merely a cleanup. The only thing that otherwise would need
-> > 
-> > If it's not getting in the way I'd rather leave it there in case someone
-> > wants it, that way I don't need to get CCed into some other series
-> > again.
-> > 
-> Understood. On the other hand is has been sitting idle for 4 yrs now.
+On 07. 05. 25 1:06 odp., Lee Jones wrote:
+> On Fri, 02 May 2025, Ivan Vecera wrote:
+> 
+>>
+>>
+>> On 01. 05. 25 3:22 odp., Lee Jones wrote:
+>>> On Wed, 30 Apr 2025, Ivan Vecera wrote:
+>>>
+>>>> Register DPLL sub-devices to expose the functionality provided
+>>>> by ZL3073x chip family. Each sub-device represents one of
+>>>> the available DPLL channels.
+>>>>
+>>>> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+>>>> ---
+>>>> v4->v6:
+>>>> * no change
+>>>> v3->v4:
+>>>> * use static mfd cells
+>>>> ---
+>>>>    drivers/mfd/zl3073x-core.c | 19 +++++++++++++++++++
+>>>>    1 file changed, 19 insertions(+)
+>>>>
+>>>> diff --git a/drivers/mfd/zl3073x-core.c b/drivers/mfd/zl3073x-core.c
+>>>> index 050dc57c90c3..3e665cdf228f 100644
+>>>> --- a/drivers/mfd/zl3073x-core.c
+>>>> +++ b/drivers/mfd/zl3073x-core.c
+>>>> @@ -7,6 +7,7 @@
+>>>>    #include <linux/device.h>
+>>>>    #include <linux/export.h>
+>>>>    #include <linux/math64.h>
+>>>> +#include <linux/mfd/core.h>
+>>>>    #include <linux/mfd/zl3073x.h>
+>>>>    #include <linux/module.h>
+>>>>    #include <linux/netlink.h>
+>>>> @@ -755,6 +756,14 @@ static void zl3073x_devlink_unregister(void *ptr)
+>>>>    	devlink_unregister(ptr);
+>>>>    }
+>>>> +static const struct mfd_cell zl3073x_dpll_cells[] = {
+>>>> +	MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 0),
+>>>> +	MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 1),
+>>>> +	MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 2),
+>>>> +	MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 3),
+>>>> +	MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 4),
+>>>> +};
+>>>
+>>> What other devices / subsystems will be involved when this is finished?
+>>
+>> Lee, btw. I noticed from another discussion that you mentioned that
+>> mfd_cell->id should not be used outside MFD.
+>>
+>> My sub-drivers uses this to get DPLL channel number that should be used
+>> for the particular sub-device.
+>>
+>> E.g.
+>> 1) MFD_CELL_BASIC("zl3073x-dpll", NULL, NULL, 0, 2);
+>> 2) MFD_CELL_BASIC("zl3073x-phc", NULL, NULL, 0, 3);
+>>
+>> In these cases dpll_zl3073x sub-driver will use DPLL channel 2 for this
+>> DPLL sub-device and ptp_zl3073x sub-driver will use DPLL channel 3 for
+>> this PHC sub-device.
+>>
+>> platform_device->id cannot be used for this purpose in conjunction with
+>> PLATFORM_DEVID_AUTO as that ->id can be arbitrary.
+>>
+>> So if I cannot use mfd_cell->id what should I use for that case?
+>> Platform data per cell with e.g. the DPLL channel number?
+> 
+> Yes, using the device ID for anything other than enumeration is a hack.
+> 
+> Channel numbers and the like should be passed as platform data.
 
-It is something that a PCS driver could use. They are sometimes memory
-mapped rather than being on an MDIO bus. Using a regmap could hide
-that difference.
+OK, I will send v7 quickly.
 
-     Andrew
+Ivan
+
 
