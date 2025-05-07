@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-188523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FA9FAAD2F7
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 03:59:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A8D0AAD316
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 04:10:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89A489822EF
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 01:59:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65B913A387C
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 02:09:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EB33156228;
-	Wed,  7 May 2025 01:59:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B7DD15F41F;
+	Wed,  7 May 2025 02:10:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dXeWerSe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bhLSJTig"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AA4A4B1E5F
-	for <netdev@vger.kernel.org>; Wed,  7 May 2025 01:59:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33A104A11;
+	Wed,  7 May 2025 02:09:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746583189; cv=none; b=dXyM2CaLtwq59eUqTo7ya04VSo6iLPwXx/j4U9yniUOTQmKy8K7zwuXat3LsdoNC3IwRivHEd5l4DaDo1hpctOwmlBJH0a2k2oTc6fW1GHck4qkhZ9Jv3k9hBY1lYZrTVPFltu2Afs9XHcSFIgVL21vn8ccl1zl0uzjNYI7jdfo=
+	t=1746583800; cv=none; b=MZc/iVSY4fvKu38lyfSHk50FceGeLmI0uU13FY3Jw4UVlHDpM0/ml2uXvXS4qXx/vqs/WSUS7MFiFDdiSzml/0j9+93UL9pvJXv/nrJdFbw2rzrl4wknLE8688y/JrJNpvbcrX0BX7vAtQZBIySvsF7tRI6sc2jO0crvZdhwOA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746583189; c=relaxed/simple;
-	bh=heYj8KHMbipMXSQKHrYGOjhoY4NXK5zK5fRx0SLkcOA=;
+	s=arc-20240116; t=1746583800; c=relaxed/simple;
+	bh=4090HR87qhYEdYmGaOt0ohnlAPYBCgR8ambKKHvt4vM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ff3JL7gLhoWNNB+mDQGEFjJ++AsXeChZfJYAih0W+u9wtoJUBS8N5d5wRBBUtSxDr20nWyHyeHBEtgJ71LEbpIefVB8ZITBnVu2gqC7sAE22dfaj6n8zSNWBO5+soDwzTnVWA52X7yGOMQhcClPJOxCCczr4g373SFi7VAp9tbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dXeWerSe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAE5DC4CEEB;
-	Wed,  7 May 2025 01:59:48 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=murgF3Y7Faijl0aI87S/rLLMtSJipPIsVt5wpMyEZz4RfkoI3WPFH+ZpCX2ykzYjmY9iqM4/wGnOZ8kfMk5qmggJIryru72QPjxquhjRH8rXTsU9whFc/UCXhcFogPeNCTl6tw1wWod91LcSf9DFet4FuTl9W+fZ1lx4ksA36Gg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bhLSJTig; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6BCBC4CEE4;
+	Wed,  7 May 2025 02:09:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746583188;
-	bh=heYj8KHMbipMXSQKHrYGOjhoY4NXK5zK5fRx0SLkcOA=;
+	s=k20201202; t=1746583799;
+	bh=4090HR87qhYEdYmGaOt0ohnlAPYBCgR8ambKKHvt4vM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dXeWerSekPt6gKSqxBDvpCdhisnfdc5xCXWJtok122iHzFeedXpoyJSq9w/wW7SJj
-	 Zu5yzhJASD7ogC+IjTQhctb+GTkmAchPiHLseChOAHR39RQbDy9vm5cqXZIWu9mEz1
-	 XQ4jSHfjRkLcscv13SvOlCruckzuHVdBYjN+us+HfBuZzUsn08Becfkwxcxe3tT7mH
-	 yAwLNEAaxNPuuHu8wkqob0bOjZlhHPLxyYV9694FnTtGWU5h8I20bd1qKQFtqstyUR
-	 UE94vq4JP27fqD1HF2RjrTGA8s3eljCVxLUq6Uuvvmya4dv7ecwHxKsuEIe2UM6XiX
-	 L4i1vnIi/Os0Q==
+	b=bhLSJTigN5q0MABqslPn9GoGogKy2e5WRCbKjxYNA3LQZMkxvmxpWGw3rZRFJFv2A
+	 /pDq6uTr2EhFDfC6z6syJNi27SU24I+kxjYMOtwMSuFCPRJBrxODFCC/FuxUPGkUSN
+	 Y6lTTSvQgBdzwURwUkPEFDQOUtdCq0UrRFeJPbwyytnEPzpamSGqlJfOPE2uJbbUB4
+	 nOnmh+xbPCK/OkzhqcdE8fy9j9PZAgRv4nVfKL/hm5Pr9mkYmiZ7M7R7rZnwRJGW0Z
+	 XoR61K8G+nec5P+2nlp9tgLAvwLYZqsSw5Yfn+ItQlbMmXuGo4W4Cx7AkrWoMwM1wF
+	 4jRrl4jRJvT/Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EACE0380664B;
-	Wed,  7 May 2025 02:00:28 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EACCA380664B;
+	Wed,  7 May 2025 02:10:38 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,45 +52,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] ice: use DSN instead of PCI BDF for ice_adapter index
+Subject: Re: [PATCH net 1/6] can: m_can: m_can_class_allocate_dev(): initialize
+ spin lock on device probe
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174658322775.1708611.17170825514022969775.git-patchwork-notify@kernel.org>
-Date: Wed, 07 May 2025 02:00:27 +0000
-References: <20250505161939.2083581-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20250505161939.2083581-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
- przemyslaw.kitszel@intel.com, karol.kolacinski@intel.com,
- sergey.temerkhanov@intel.com, michal.kubiak@intel.com,
- aleksandr.loktionov@intel.com, jacob.e.keller@intel.com, mschmidt@redhat.com,
- horms@kernel.org, jiri@resnulli.us, sx.rinitha@intel.com
+ <174658383775.1710027.4745665648981488663.git-patchwork-notify@kernel.org>
+Date: Wed, 07 May 2025 02:10:37 +0000
+References: <20250506135939.652543-2-mkl@pengutronix.de>
+In-Reply-To: <20250506135939.652543-2-mkl@pengutronix.de>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ linux-can@vger.kernel.org, kernel@pengutronix.de, antonios@mwa.re,
+ mailhol.vincent@wanadoo.fr, msp@baylibre.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This series was applied to netdev/net.git (main)
+by Marc Kleine-Budde <mkl@pengutronix.de>:
 
-On Mon,  5 May 2025 09:19:38 -0700 you wrote:
-> From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+On Tue,  6 May 2025 15:56:17 +0200 you wrote:
+> From: Antonios Salios <antonios@mwa.re>
 > 
-> Use Device Serial Number instead of PCI bus/device/function for
-> the index of struct ice_adapter.
-> 
-> Functions on the same physical device should point to the very same
-> ice_adapter instance, but with two PFs, when at least one of them is
-> PCI-e passed-through to a VM, it is no longer the case - PFs will get
-> seemingly random PCI BDF values, and thus indices, what finally leds to
-> each of them being on their own instance of ice_adapter. That causes them
-> to don't attempt any synchronization of the PTP HW clock usage, or any
-> other future resources.
+> The spin lock tx_handling_spinlock in struct m_can_classdev is not
+> being initialized. This leads the following spinlock bad magic
+> complaint from the kernel, eg. when trying to send CAN frames with
+> cansend from can-utils:
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] ice: use DSN instead of PCI BDF for ice_adapter index
-    https://git.kernel.org/netdev/net/c/0093cb194a75
+  - [net,1/6] can: m_can: m_can_class_allocate_dev(): initialize spin lock on device probe
+    https://git.kernel.org/netdev/net/c/dcaeeb8ae84c
+  - [net,2/6] can: mcp251xfd: fix TDC setting for low data bit rates
+    https://git.kernel.org/netdev/net/c/5e1663810e11
+  - [net,3/6] can: mcp251xfd: mcp251xfd_remove(): fix order of unregistration calls
+    https://git.kernel.org/netdev/net/c/84f5eb833f53
+  - [net,4/6] can: rockchip_canfd: rkcanfd_remove(): fix order of unregistration calls
+    https://git.kernel.org/netdev/net/c/037ada7a3181
+  - [net,5/6] can: mcan: m_can_class_unregister(): fix order of unregistration calls
+    https://git.kernel.org/netdev/net/c/0713a1b3276b
+  - [net,6/6] can: gw: fix RCU/BH usage in cgw_create_job()
+    https://git.kernel.org/netdev/net/c/511e64e13d8c
 
 You are awesome, thank you!
 -- 
