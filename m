@@ -1,102 +1,133 @@
-Return-Path: <netdev+bounces-188533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3056FAAD3A0
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 04:55:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C059AAD3B4
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 05:08:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E26577B4C6E
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 02:54:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC6514C80D6
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 03:08:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8FC717C224;
-	Wed,  7 May 2025 02:55:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F64218B46E;
+	Wed,  7 May 2025 03:08:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mCuK1NjK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TV2eXFpf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B288879E1
-	for <netdev@vger.kernel.org>; Wed,  7 May 2025 02:55:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A1D70824
+	for <netdev@vger.kernel.org>; Wed,  7 May 2025 03:08:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746586528; cv=none; b=SGU026ZnMf1P8O5/WYA1ZrHM9zuyQULMlCifmoqSvJywth4MWHOUiTrjXh5T9Pz3Sr82XIPigRcfJ4PAJWsutM5ue2AuUTrfE7qcTi8GTa7/x5QWMF+bGYFR3X4OSWZigzpFlanPrx88GLsqsvYPJumTEwDI8b3iP+6drhVjTgo=
+	t=1746587305; cv=none; b=JLpQKjBhixtN9X7ekCpRL/DFkx12+Tgn9pXuqgttGytwW7icOx7XAY8HaOxLTSwTeIuiHjFyb7cXA1V1izorjwQlt9LecP9at94U9nzgsUxR4pqaYvq/V0h8AK8ejAEsLTcv1noQ/koVNmTijAABrDYSzDCKEckRyYXAnHVmErg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746586528; c=relaxed/simple;
-	bh=L1qVy4hAFBneyVAlDpJZ0I6LWy7/rFNUNeeEYKDyisQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VMXhGmxMJgD+2yqqSFS+daqAcOWVVZdQ6dW2/v80zN3thO5xzfoZVqVfC7VegeKzFnGPMaznHM95TnzusssdS3nm+U3fL6t15z4RYUm0J369kN15g8bFO27rMQA9ggwBTKEPG2xR4ywRtunsaub7T09ePuu5McTr8uMOQ0NG8Mk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mCuK1NjK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DAB0C4CEE4;
-	Wed,  7 May 2025 02:55:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746586528;
-	bh=L1qVy4hAFBneyVAlDpJZ0I6LWy7/rFNUNeeEYKDyisQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mCuK1NjK7qX9Fe38qMgbiEffY8GcxO7bV2fDIhSjuvf8Jz6OZKNfC8pBghxN+C/qF
-	 3GPcC5QO0AwytHPIwwt9o04GkJjxpHYbaK0UYZ2UNuXAuUjMfE9cIhKsbHW/yVFrDN
-	 eK+fsB7buRha8kQ1OQ7XbsrgzW6gMj0BKnO9ttTFd1c79a2RoEauaEfvVCGXAv+J4n
-	 /VzLYc6Udye87Zv1Ir8aVDEgkP3Z/AxO+BQPLILa/7YxRypGLJFG2cCKDDC7fQ1SYJ
-	 FjJ6GpuF8lDfkEn1ZtO3buHUWN6QGCTgB0KCSD5gFHEM4yi8PBdPWmYumJKceN94uq
-	 oPOOSab+K9Wuw==
-Date: Tue, 6 May 2025 19:55:26 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- andrew+netdev@lunn.ch, horms@kernel.org, almasrymina@google.com,
- sdf@fomichev.me, netdev@vger.kernel.org, asml.silence@gmail.com,
- dw@davidwei.uk, skhawaja@google.com, willemb@google.com, jdamato@fastly.com
-Subject: Re: [PATCH net v2] net: devmem: fix kernel panic when socket close
- after module unload
-Message-ID: <20250506195526.2ab7c15b@kernel.org>
-In-Reply-To: <20250506140858.2660441-1-ap420073@gmail.com>
-References: <20250506140858.2660441-1-ap420073@gmail.com>
+	s=arc-20240116; t=1746587305; c=relaxed/simple;
+	bh=27a4QIVw5q+PWygKH4bsHdNMq/OHqSGzPJT2igNGZGk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=curM5NkAy0EfpJbFqwHXFPDOe8ZfQOa9+NT1vyYO1lX3lysRQDMxJKzunGOFeMDYbem9Rn+O+qrxiso65D8BHO8GPkwYXWbzKHY+Varse/oal3yT0ZK85dMZC5F3Hb2QnVRGNKHbFmriXvWG+vMieglJSSBbLRWrcK9LG3no6hY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TV2eXFpf; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-22e16234307so4264365ad.0
+        for <netdev@vger.kernel.org>; Tue, 06 May 2025 20:08:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746587303; x=1747192103; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Nv9JoAvWs6gTM10vR8jVFYgQgKlyEZzVUAlrgzpixKg=;
+        b=TV2eXFpfZpqR286uvupNvq1R3bIgy1959GgVy5BtvGcO4NoCbjVvr4NkeeN4nbAdPZ
+         B2GO8rsfL4cTUCpxi37pUz2qXCHdhk9SNSVhF+RwJDN5FrJosnrujuK0xCE0m4C2PPIX
+         4Y9CqTigjwW/HTw6s1DlJaWLSca1YldHEublAd35X5dyCtIGCePRbYlIbGryiEcn+16X
+         pHsUbS9Dvkbcqj+Fc99CPKZ5MDS/DDIjRruTmUBiXJgsLhK8Ita4COzd301ap+OV4y4J
+         5lUWNO2/qRqs5F2kstwXuA2DUHOCljP281XqT7NOsTt1hubpDcdbJrakGbqIIpM5p4fo
+         JpDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746587303; x=1747192103;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Nv9JoAvWs6gTM10vR8jVFYgQgKlyEZzVUAlrgzpixKg=;
+        b=gLvuinUmQ39RjCIX2gL6rVQutA0svSY+l/LVDc3MfC6kcoCOpUTDtExfqCZGg1keXi
+         hMArcUb7UjtZvAheSWmIENj0Em8cs5inVD8jjoOpqQ+AfpwX/g5oxINXgkQdFH7E7cG2
+         A0QdiOE72Wq7ImZ27uwn1O17gD4yKxCCv1IW7X4VeMmVVKd7jo4A5VWThV+TIE36eIAJ
+         jdbD71oT1wLpJ1lomu+8Iej71GRmI5l8Tmw/9Rm252Kxr/ydIlsR48cdzRbuc+pgrlgg
+         ArExElOOZYyMsH1+eVNkSKaxYOmf1uPutfz+Vp99tSL7kuAs7ibRdq0Fsv8tzc6w52Qj
+         AyZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVVu1vrfNaBolJFgGkwdkeEeJamIRqtFA2HGb/QxP5ZqOfgMhg9QwCusc1LmVkxz8RYhgjBml4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXhdNWQt/1EfKuOtrY4oJrAmZ0wF+490ieVOwppKvjlhURg8Mk
+	q0dW1r0rHgjrX/ltlngNkSogJzYDMJrMQS/Rg6tESj2+HJYFRtGl
+X-Gm-Gg: ASbGncvAqvSyk+24v2giKesfvjwvsVKrqU7+hdx+l05qyN8LQHph449rgJdnpgSYcUN
+	QwY1s7lCrSs22dYzWs/60JplH8YHQwDy/HN4QWt+rC89omX/vjwaVXZtHyUg8uOzzATHMZNpdY8
+	hJjwnopu1ay7+05BfK3Z4oby9BlM0lYcKxst9fMLi2Sx26CguXLokSjiCs1qfMyFT4EWFwcq0WV
+	5uMEYQ1cQw1lfd8tu7Syg3zqVP8q5Np5kbuVHzyFbp+vE/Q2QV7qgze0gm3Tg3v1l47DvK5aCQf
+	FJoSPQ/4GVb3MSyi/Ro3gbDmO5o3DVi6p2PQyWlRronA+DBxRsbkN1dGXwwoZJ662c1geQd709k
+	wCLqo+PafZwbM
+X-Google-Smtp-Source: AGHT+IFwYs6I2Pfw7TuHODJ37F+9pTjMgxsBR4zPK+jGG6IHXPad4Qe4x81SoqSnB1SFpNl14YmD9Q==
+X-Received: by 2002:a17:903:1ab0:b0:215:58be:334e with SMTP id d9443c01a7336-22e61695c71mr22640025ad.10.1746587303170;
+        Tue, 06 May 2025 20:08:23 -0700 (PDT)
+Received: from KERNELXING-MB0.tencent.com ([43.132.141.24])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e15231fefsm82496035ad.210.2025.05.06.20.08.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 May 2025 20:08:22 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	sgoutham@marvell.com,
+	andrew+netdev@lunn.ch,
+	willemb@google.com
+Cc: linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next] net: thunder: make tx software timestamp independent
+Date: Wed,  7 May 2025 11:08:04 +0800
+Message-Id: <20250507030804.70273-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Tue,  6 May 2025 14:08:58 +0000 Taehee Yoo wrote:
-> +	mutex_lock(&binding->priv->lock);
->  	xa_for_each(&binding->bound_rxqs, xa_idx, bound_rxq) {
->  		if (bound_rxq == rxq) {
->  			xa_erase(&binding->bound_rxqs, xa_idx);
-> +			if (xa_empty(&binding->bound_rxqs))
-> +				binding->dev = NULL;
->  			break;
->  		}
->  	}
-> +	mutex_unlock(&binding->priv->lock);
+From: Jason Xing <kernelxing@tencent.com>
 
-Why do we need to lock the socket around the while loop?
-binding->bound_rxqs have its own lock, and add/del are also
-protected by the netdev instance lock. The only thing we
-must lock is the write to binding->dev I think ?
+skb_tx_timestamp() is used for tx software timestamp enabled by
+SOF_TIMESTAMPING_TX_SOFTWARE while SKBTX_HW_TSTAMP is controlled by
+SOF_TIMESTAMPING_TX_HARDWARE. As it clearly shows they are different
+timestamps in two dimensions, this patch makes the software one
+standalone.
 
-Would it be cleaner to move that write and locking to a helper
-which would live in netdev-genl.c?
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
+---
+ drivers/net/ethernet/cavium/thunder/nicvf_queues.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Similarly could we move:
+diff --git a/drivers/net/ethernet/cavium/thunder/nicvf_queues.c b/drivers/net/ethernet/cavium/thunder/nicvf_queues.c
+index 06397cc8bb36..d368f381b6de 100644
+--- a/drivers/net/ethernet/cavium/thunder/nicvf_queues.c
++++ b/drivers/net/ethernet/cavium/thunder/nicvf_queues.c
+@@ -1389,11 +1389,11 @@ nicvf_sq_add_hdr_subdesc(struct nicvf *nic, struct snd_queue *sq, int qentry,
+ 		this_cpu_inc(nic->pnicvf->drv_stats->tx_tso);
+ 	}
+ 
++	skb_tx_timestamp(skb);
++
+ 	/* Check if timestamp is requested */
+-	if (!(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP)) {
+-		skb_tx_timestamp(skb);
++	if (!(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP))
+ 		return;
+-	}
+ 
+ 	/* Tx timestamping not supported along with TSO, so ignore request */
+ 	if (skb_shinfo(skb)->gso_size)
+-- 
+2.43.5
 
-	if (binding->list.next)
-		list_del(&binding->list);
-
-from net_devmem_unbind_dmabuf() to its callers?
-The asymmetry of list_add() being directly in netdev_nl_bind_rx_doit()
-not net_devmem_bind_dmabuf(), and list_del() being in
-net_devmem_unbind_dmabuf() always confuses me.
-
->+	mutex_lock(&priv->lock);
->+	binding = net_devmem_bind_dmabuf(netdev, dmabuf_fd, priv, info->extack);
-
-We shouldn't have to lock the net_devmem_bind_dmabuf(), we have the
-instance lock so the device can't go away, and we haven't listed
-the binding on the socket, yet. Locking around list_add() should
-be enough?
 
