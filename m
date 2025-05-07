@@ -1,107 +1,149 @@
-Return-Path: <netdev+bounces-188601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22A3FAADD13
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 13:15:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3C44AADD65
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 13:32:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27BC19A3999
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 11:15:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5821317F529
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 11:32:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D9002144BA;
-	Wed,  7 May 2025 11:15:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A187C21019C;
+	Wed,  7 May 2025 11:32:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K+FtGndM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R+vdEhdA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA8EA2135D0
-	for <netdev@vger.kernel.org>; Wed,  7 May 2025 11:15:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B8B1865EB
+	for <netdev@vger.kernel.org>; Wed,  7 May 2025 11:32:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746616525; cv=none; b=UQ0XyY6TKxl4+2+Qw6foSVM6a2O3aUhs7AMCFXyXQN2EH9XRsZId3LggI0xSzOlLEOs8NOKDyId4g4mLiJciaEOmSm/8K9Kbl+MJc3FMgrC61i+gF78yMClDs8XphE2U0FJQZ5DbOE46M+bxDZKMXYbEawo84co3+UFhA5nsppI=
+	t=1746617524; cv=none; b=NhCk2HtBSSra1uxolYC50a9qXBQspC46pi2gbb6L/pCW423cT281sF19YAVZJzVQ33EiVw41CWO7uFXma7w18KqoghlE8lZSYSphXT4rvo/TA4i1YX9vndBeZ+aexTwI39j/B6lWhzxwN2i3NHH9OIBh7Z6rcTVMQM2eoRdyh1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746616525; c=relaxed/simple;
-	bh=MfZtBXX/WL/wnlUKMr1y6MpVWBp8aWJBWS/BUCsQ1FY=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=TJNM/7vz70lUM+9/VZaWUGJkgLavkshMMUrGsPbsx+W1hxo4ztfdXcTVLu2ZTPUy0HV8NZGUxLkuCYS+64W8C0CaOCG9p/Blr5kvYurCyzkOpGUdXDbEFHx0iZTGpxa2XL2M0M48kXdOVKN0pAT8sWe53ugW9Tu02LjO/G3Qgso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K+FtGndM; arc=none smtp.client-ip=209.85.128.45
+	s=arc-20240116; t=1746617524; c=relaxed/simple;
+	bh=as0rfWFd8spshSXXBQv+TjXoaOY74zNfn3PlNiDtd/Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=qLj9GLDms2NM5tzOUArPdLPTn92ZUNrtb19FWv1h3ogIBefijnRJXg444oXhONwPyMVLmg3EsY2mCpez4etKYS0WqkImR2kKfEldiekOeHachgdwxSe/6EEmyz4MgtyQFQLkk4J+yw/JAARCjrjhQG/cV5nDFwS51L0pi1ZYNTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R+vdEhdA; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-43cfe63c592so62780975e9.2
-        for <netdev@vger.kernel.org>; Wed, 07 May 2025 04:15:23 -0700 (PDT)
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43cf05f0c3eso42404495e9.0
+        for <netdev@vger.kernel.org>; Wed, 07 May 2025 04:32:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746616522; x=1747221322; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=MfZtBXX/WL/wnlUKMr1y6MpVWBp8aWJBWS/BUCsQ1FY=;
-        b=K+FtGndMdlrEDShYtwAHn7+qqD6qLm+LVv0JbP8MINlSPbiqbstidAgZ2tz1P3f7tH
-         UHGRE8jxveTRGUKz8k+eDjmq+eRjnIj9/OKJ3fs6h4xn0LqgnA0QRxN/Pnft5rvd9/ER
-         Wk+ZsF1vH2FozGpK2DgMIocQwij2R/PuevDz3co29gZxdjt2OrrXVatZiO25lETDyz4W
-         On3uEB9VyCI51/SyvRorgz7PprYuSvT4z7EtmZ5m1oGGnfFAhYQGhQqQl1gCoAB/kOeC
-         hhSy/wPIjhnXwSAnoIRPpWDSsosYZXAtrou8VdeGhsrWt45bj4YoA/suls2eS57EYlyq
-         xCkQ==
+        d=gmail.com; s=20230601; t=1746617521; x=1747222321; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AK3A7jwAAokKcfzlNWNLa5c0EB8Ivk+5l3sSHrHeGRI=;
+        b=R+vdEhdAbCsqgJMIibqGwkjtjTwHrJ6Qjai8+Ded/SXBJRkij1iA54QTlIAVbylrt1
+         OjoOXmArXpEwtcxhn8c7RyWfbRPsFMvcOL6/u9RupW+yjkHgpmXJcECV7L6T6VeUalHW
+         nQTF8uqVz2F7uuW2LyfJj0ZSJ8E2r5w+zW4Em4754rg6de76XYKAQRaH8hKm9QALoXZy
+         u51WGB6DS1kLubaBzCzZa2hJ87nZb+x0sz9czVInHaDlXhBkcHosFcm9zyAcQvXF8yI6
+         qnvPF7XQ0mL3FJIhTO3aH8RhMF/mITT49l1O9nM8c+Z/eUvhBX07tl6ATCDp+92X1vEB
+         aSeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746616522; x=1747221322;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MfZtBXX/WL/wnlUKMr1y6MpVWBp8aWJBWS/BUCsQ1FY=;
-        b=jd1sD7Sl9wm5a7TsMITcvdgzvQpvA2QnG6ro2/5N/MfBemaxtawBOmBS8Y7iZvZBUb
-         ftQsNAl9ucpvvtdyTlEpgHG7j2xEnI/Hc+2uHyg1xLHIQGNLtgP4lrVf0k9VMjd3l7oX
-         31UCp57W4CyJhOfYN6aGZPKjczY7X6hnUfw7yhHdUJ1LuwZXNMcz5i2MOxsB0+XCRPF4
-         u+RXf7BBCX/NO3ygShxhaW6i0mf9WOqvZjQGMAnqWyJx07LYHeFHHesNaB8QeHfL2LzO
-         PtJ9w7vHA60q1AVhOzzHx3uN44PuBEjhCGXO+rjrYTktBz104sLu63KLVUjDkgWl1r6T
-         SJdA==
-X-Forwarded-Encrypted: i=1; AJvYcCWtYUpKYIL/yAuRvr3Smyn0nQxeWoU5TRYBsB6HhEUxv6BAvl7zM/U5GvoWbkCaF6UiqJxZZwA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGnhyG/qnllo9rA3Cl7h9YqDpH3LPD2ANhvyovGjcnKr7oDj5R
-	LwvIqtF+jtTOrWH43DUv2NmvTdudkP/picXmBzX8BYv8hJPyMBIa
-X-Gm-Gg: ASbGncvjq80bZHmXkW4UBPbwbh1+GnlEMkx3QLnoG4B1/jh9A9ZrZEjFBLWVlEDnQJq
-	99slpZ+PYQO8z0mHirxW9/+sYpruAiEWlS7qFm8f/UzejXWizdLSovNWdTUMBwznZZu7RxizICg
-	+IQQhtWyYYJO83hYaEMD83Mc8169OPMhTi6HzsZXulkeb3Ak9W6xOszLNxEmmM8Brcx4A3zTf9E
-	H/S8vpqVnFPV704vuduiJYlW7XIslD4TWrosq+G3HLPkiKznMvcyxUc5qL9j/cuH/QaY0aaW4D8
-	0d851T7e2+r9d58CCogd+riHaQHmBN5DQbk6SPGPXz/TJzOEJAn8c4kW7C1WOMQr
-X-Google-Smtp-Source: AGHT+IGsepQ+KV6NbPIZglKE83MTMDlPy6EqMhB5uG2oZt8PipvFmMoXQr/60Ep/KzsN/Be3Dv2fog==
-X-Received: by 2002:a05:600c:1c03:b0:43c:f895:cb4e with SMTP id 5b1f17b1804b1-441d44c805fmr23020365e9.17.1746616521832;
-        Wed, 07 May 2025 04:15:21 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:dcb5:58d9:1622:6584])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-441d438e7f0sm28415635e9.29.2025.05.07.04.15.21
+        d=1e100.net; s=20230601; t=1746617521; x=1747222321;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AK3A7jwAAokKcfzlNWNLa5c0EB8Ivk+5l3sSHrHeGRI=;
+        b=ugsJh/bkePtCS5hoSOCwqPDgte0S+cC4QTaWcPdfGfeGctvr9hiRDpSv+6B9O820VD
+         +2yrym+FDS2Zf1BEIhdXJP7adCR4CF2Klli38EkNhdjSheLev7woZQpzTffvNb2A6r8j
+         yRAY42eWJPMY963EX8zwxeg41oQxQeTnznZ4rlLgUeDPvlewMG+4SGl7GRmbZF9ghPkc
+         p+vkDMF7Mw7UhlQFdzL8/wJP5JBRHt5BH8bWIlDxuv3TISISX5ferVSXc/i9bYN44gpZ
+         Cbi9lDLBRbY4oUjndm6hMFBRk2Czi2syIagntR7kn2Y2Ivi3COvu8V8xJOJItrHTrNq3
+         Rmtg==
+X-Gm-Message-State: AOJu0YzvLU8aOImthDkgumsWQRxo2TSy5S7Nvxu2xg/W7csrCZFFvOI1
+	GAiK8wSLlNiVZJOrjYJTQWYIMpYwFYd44Ma+wgvcBNzG/bL7fWr0/ZGz+ijI
+X-Gm-Gg: ASbGncuqubxGqSV++xJscBNVp9J38Oxp9LWNBvAS5S/puTOgaB24ho6WZ9gMYvqZuKp
+	/rUlz6vAevP3cf2jwG77puDb4a1ocNhGU8L2nL8TxzVQmQAZSI5myYO0iQhlUrCPNYZUxUiLOp4
+	T/SZw20KA1LclKiu1m3CenlGe7oZhqATYzs6o8BjXzHns/ORTQgewzljze/ThD0ENiLT7W7VTa5
+	XuHRegDtsC/tTbFyY+f9deBu+7yU8sEU59Xx8toFdcL25rYaDmGxPoDTHyzuei08BNC83k+HDaV
+	7M1L7NFnsXMml9geeb1b3n/MN/wqHionLhP4OkMT98JTNmjI9m8HWZwi27UPt6aUGlCPM1iVKVQ
+	xY6vKN749cj1lKMLleKG2kueWK2PV2ZwZ4uUugg==
+X-Google-Smtp-Source: AGHT+IHnDhst9XG73Ye9yEhWnD5faVamk84UQyQexARnv89VG0xwByyDP4ZALlmIBLHvI8rvc1OZAQ==
+X-Received: by 2002:a05:6000:2288:b0:3a0:9f24:774d with SMTP id ffacd0b85a97d-3a0b4a19227mr2872570f8f.45.1746617520867;
+        Wed, 07 May 2025 04:32:00 -0700 (PDT)
+Received: from mail.gmail.com (2a01cb0889497e0081c477e20d988853.ipv6.abo.wanadoo.fr. [2a01:cb08:8949:7e00:81c4:77e2:d98:8853])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-441d4415995sm28780965e9.39.2025.05.07.04.31.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 May 2025 04:15:21 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
-  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
-  johannes@sipsolutions.net,  razor@blackwall.org
-Subject: Re: [PATCH net-next v2 4/4] netlink: specs: rt-link: remove
- implicit structs from devconf
-In-Reply-To: <20250506194101.696272-5-kuba@kernel.org> (Jakub Kicinski's
-	message of "Tue, 6 May 2025 12:41:00 -0700")
-Date: Wed, 07 May 2025 12:15:06 +0100
-Message-ID: <m2zffon03p.fsf@gmail.com>
-References: <20250506194101.696272-1-kuba@kernel.org>
-	<20250506194101.696272-5-kuba@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        Wed, 07 May 2025 04:31:59 -0700 (PDT)
+Date: Wed, 7 May 2025 13:31:58 +0200
+From: Paul Chaignon <paul.chaignon@gmail.com>
+To: netdev@vger.kernel.org
+Cc: steffen.klassert@secunet.com, fw@strlen.de, pabeni@redhat.com,
+	kuba@kernel.org, Louis DeLosSantos <louis.delos.devel@gmail.com>
+Subject: [PATCH net] xfrm: Sanitize marks before insert
+Message-ID: <aBtErrG9y1Fb-_wq@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Jakub Kicinski <kuba@kernel.org> writes:
+Prior to this patch, the mark is sanitized (applying the state's mask to
+the state's value) only on inserts when checking if a conflicting XFRM
+state or policy exists.
 
-> devconf is even odder than SNMP. On input it reports an array of u32s
-> which seem to be indexed by the enum values - 1. On output kernel
-> expects a nest where each attr has the enum type as the nla type.
->
-> sub-type: u32 is probably best we can do right now.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+We discovered in Cilium that this same sanitization does not occur
+in the hot-path __xfrm_state_lookup. In the hot-path, the sk_buff's mark
+is simply compared to the state's value:
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+    if ((mark & x->mark.m) != x->mark.v)
+        continue;
+
+Therefore, users can define unsanitized marks (ex. 0xf42/0xf00) which will
+never match any packet.
+
+This commit updates __xfrm_state_insert and xfrm_policy_insert to store
+the sanitized marks, thus removing this footgun.
+
+This has the side effect of changing the ip output, as the
+returned mark will have the mask applied to it when printed.
+
+Fixes: 3d6acfa7641f ("xfrm: SA lookups with mark")
+Signed-off-by: Paul Chaignon <paul.chaignon@gmail.com>
+Signed-off-by: Louis DeLosSantos <louis.delos.devel@gmail.com>
+Co-developed-by: Louis DeLosSantos <louis.delos.devel@gmail.com>
+---
+ net/xfrm/xfrm_policy.c | 3 +++
+ net/xfrm/xfrm_state.c  | 3 +++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
+index 143ac3aa7537..f4bad8c895d6 100644
+--- a/net/xfrm/xfrm_policy.c
++++ b/net/xfrm/xfrm_policy.c
+@@ -1581,6 +1581,9 @@ int xfrm_policy_insert(int dir, struct xfrm_policy *policy, int excl)
+ 	struct xfrm_policy *delpol;
+ 	struct hlist_head *chain;
+ 
++	/* Sanitize mark before store */
++	policy->mark.v &= policy->mark.m;
++
+ 	spin_lock_bh(&net->xfrm.xfrm_policy_lock);
+ 	chain = policy_hash_bysel(net, &policy->selector, policy->family, dir);
+ 	if (chain)
+diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+index 2f57dabcc70b..07fe8e5daa32 100644
+--- a/net/xfrm/xfrm_state.c
++++ b/net/xfrm/xfrm_state.c
+@@ -1718,6 +1718,9 @@ static void __xfrm_state_insert(struct xfrm_state *x)
+ 
+ 	list_add(&x->km.all, &net->xfrm.state_all);
+ 
++	/* Sanitize mark before store */
++	x->mark.v &= x->mark.m;
++
+ 	h = xfrm_dst_hash(net, &x->id.daddr, &x->props.saddr,
+ 			  x->props.reqid, x->props.family);
+ 	XFRM_STATE_INSERT(bydst, &x->bydst, net->xfrm.state_bydst + h,
+-- 
+2.43.0
+
 
