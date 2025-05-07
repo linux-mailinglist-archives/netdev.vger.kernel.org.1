@@ -1,173 +1,328 @@
-Return-Path: <netdev+bounces-188588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58A35AADA54
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 10:39:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 131B4AADA8F
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 10:55:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 609DA9832E6
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 08:39:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1ABF81BC52CD
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 08:55:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACF2C2153CE;
-	Wed,  7 May 2025 08:38:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 460BE200B9B;
+	Wed,  7 May 2025 08:55:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QM1lSedd"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FUr5e6ud"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFAD51FC0F3;
-	Wed,  7 May 2025 08:38:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A040A31;
+	Wed,  7 May 2025 08:55:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746607139; cv=none; b=jNpUqSgyYy0kZwJHpp40swrHCW+sXXaykACPQeaPjZRGMqf/jhEemcvgge/VCayaM+iTaDNsO/MF1HLQ9dA/yvfggXmSJyzuh0nbtW5jAXhQGwfxJRt+gkCHkpwGzUq2cBVlOwV03HDz5oNapC8Wkm4CE5HhEhYdtivwrHxznDY=
+	t=1746608105; cv=none; b=uFcjlxcVShuWFDvCLY3GdHpl/87W9UftTJeQrHx74WFWeBBKsCJH2Z4ZInSRFbszgVlij1QMV9+6qFV0LA+TovtKlqHeA68JMaO+GKH56OIb4e1lgKaW5bQd1IpwgE7GSF39VaUEEB8fhdQgL5R48Qsho2c2TwR9TCiugA9smCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746607139; c=relaxed/simple;
-	bh=rUf/+8WEAKoqZwi0tdXW88XfEBNtnpTRxzqre/OWWBc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=er+T0rD+V/96hDMYQsrWzvLtj31tnE0b8tCCM1oyA/tRoa2PUI2DilJrVF3Z1YfQVXnpx1+rovXqbRdleA4B37A3BclEOxhNW+m0IxH/+yUyQg78QcwVxkmouhosw0ynwlln9zWZD+XFaWybNJF2aR7NleKKSmvaJmsHNrq1RQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QM1lSedd; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746607138; x=1778143138;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=rUf/+8WEAKoqZwi0tdXW88XfEBNtnpTRxzqre/OWWBc=;
-  b=QM1lSedd1/5vXbWWEz4MekqN00pONZS074nhsHz+rpXfCMCWr6pi1m17
-   lHJDb5Ru4JmRJcqH+z8IPCOGHvofhZiq5L2n+YmPcX7d4w0yJ1Ve3T5Fk
-   FjeyBUh4tIsXDbkg8kw7bSXPyYfE9jqwIXoRxc59+qmds3QJFL5D0jomx
-   rcimmK4MuSeRNYSw8cbI6TilqaTucEv0oLVp0yQ8DNdn3KRSFREpzi11V
-   yDvqSXF0sO4WJKAEQdaHxX0O6bElu/uKV76Zo+G3bDAL0KuKKlIxVV5yl
-   wxnhtUyNbWeaplwONYJMRvPmcLrK1hOstMzcOAQxoxyfwgq9DSSW84q3g
-   g==;
-X-CSE-ConnectionGUID: N7BRRnjoRnqGk42dMo1arA==
-X-CSE-MsgGUID: zM6XZ8PRTWKvEGOkGtvgcw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11425"; a="48195739"
-X-IronPort-AV: E=Sophos;i="6.15,268,1739865600"; 
-   d="scan'208";a="48195739"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2025 01:38:56 -0700
-X-CSE-ConnectionGUID: Hol80FtkT02IDDNx8FOUJA==
-X-CSE-MsgGUID: JqKBrAYiT1SdI5ZL61q8MQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,268,1739865600"; 
-   d="scan'208";a="136410607"
-Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
-  by fmviesa010.fm.intel.com with ESMTP; 07 May 2025 01:38:53 -0700
-Received: from kbuild by 1992f890471c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uCaIk-0007QD-3C;
-	Wed, 07 May 2025 08:38:50 +0000
-Date: Wed, 7 May 2025 16:37:53 +0800
-From: kernel test robot <lkp@intel.com>
-To: Raju Rangoju <Raju.Rangoju@amd.com>, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Shyam-sundar.S-k@amd.com,
-	Raju Rangoju <Raju.Rangoju@amd.com>,
-	Sudheesh Mavila <sudheesh.mavila@amd.com>
-Subject: Re: [PATCH net-next v2 3/5] amd-xgbe: add support for new XPCS
- routines
-Message-ID: <202505071632.XaIo3kvL-lkp@intel.com>
-References: <20250428150235.2938110-4-Raju.Rangoju@amd.com>
+	s=arc-20240116; t=1746608105; c=relaxed/simple;
+	bh=Mdxvz3P/0lvC5o+LTL2Rcj6haMnWaWmaczwApmDmHFI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=edzdBJdjsLNjY5/pd6mrXY0GmQM3HgJXrLq0jHZCeQ/JUxNpu2oBPl58XhzQXtKJOVbLO2tp+yzvayXIQ+QIa68o1n87UQL/H5HcDdCH47IFczMBvBurL7/mX1UHP7iVnT6bHaGzRRGCvJll7QndNXJIVlLpVA+bGxQGYbbCXFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FUr5e6ud; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 04894431EA;
+	Wed,  7 May 2025 08:54:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1746608100;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rZJ2LwiiMHVELzR8Zq8JvvI0c2JwEbGUmjNesaImVs0=;
+	b=FUr5e6uddFxN61Bnem0RZk51F/SKgbMRJyD20ARPBzyGJio/A9X+ts3+hf/D/StdS+L+Wo
+	jpylNdeaFfp9DggNNCLVdQ81iyGH3JowookXgG5KZ3jc2NXYmeoY6OvmW7f9FJrMJZYmhf
+	rlEpM5W3PAcRaSlGnn4lAO4En4qzRugh+XdmFWADdxBehT3Ir3lu08vuKrTTmGIlvzvDJR
+	1sj+0vzLPU5UOLR1cQ/wHmZBnc2kzDIB1hhOiuzGD5JfARtlsIQ4SK5Jbhd8LSc3n3/Mpo
+	wvGiMg64N2vqP/BuxzIiSTz/dIbW14+lq3eeM6GnfqNTAE4n5nFbn2Y8H6QF3A==
+Date: Wed, 7 May 2025 10:54:57 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Tristram.Ha@microchip.com, Andrew Lunn <andrew@lunn.ch>, Woojung Huh
+ <woojung.huh@microchip.com>, Vladimir Oltean <olteanv@gmail.com>, Heiner
+ Kallweit <hkallweit1@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: dsa: microchip: Add SGMII port support
+ to KSZ9477 switch
+Message-ID: <20250507105457.25a3b9cb@fedora.home>
+In-Reply-To: <aBsadO2IB_je91Jx@shell.armlinux.org.uk>
+References: <20250507000911.14825-1-Tristram.Ha@microchip.com>
+	<20250507094449.60885752@fedora.home>
+	<aBsadO2IB_je91Jx@shell.armlinux.org.uk>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250428150235.2938110-4-Raju.Rangoju@amd.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvkeeigeefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepudfgleelvddtffdvkeduieejudeuvedvveffheduhedvueduteehkeehiefgteehnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucfkphepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedufedprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtohepvfhrihhsthhrrghmrdfjrgesmhhitghrohgthhhiphdrtghomhdpr
+ hgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopeifohhojhhunhhgrdhhuhhhsehmihgtrhhotghhihhprdgtohhmpdhrtghpthhtohepohhlthgvrghnvhesghhmrghilhdrtghomhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hi Raju,
+On Wed, 7 May 2025 09:31:48 +0100
+"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
 
-kernel test robot noticed the following build errors:
+> On Wed, May 07, 2025 at 09:44:49AM +0200, Maxime Chevallier wrote:
+> > Hi Tristram,
+> > 
+> > On Tue, 6 May 2025 17:09:11 -0700
+> > <Tristram.Ha@microchip.com> wrote:
+> >   
+> > > From: Tristram Ha <tristram.ha@microchip.com>
+> > > 
+> > > The KSZ9477 switch driver uses the XPCS driver to operate its SGMII
+> > > port.  However there are some hardware bugs in the KSZ9477 SGMII
+> > > module so workarounds are needed.  There was a proposal to update the
+> > > XPCS driver to accommodate KSZ9477, but the new code is not generic
+> > > enough to be used by other vendors.  It is better to do all these
+> > > workarounds inside the KSZ9477 driver instead of modifying the XPCS
+> > > driver.
+> > > 
+> > > There are 3 hardware issues.  The first is the MII_ADVERTISE register
+> > > needs to be write once after reset for the correct code word to be
+> > > sent.  The XPCS driver disables auto-negotiation first before
+> > > configuring the SGMII/1000BASE-X mode and then enables it back.  The
+> > > KSZ9477 driver then writes the MII_ADVERTISE register before enabling
+> > > auto-negotiation.  In 1000BASE-X mode the MII_ADVERTISE register will
+> > > be set, so KSZ9477 driver does not need to write it.
+> > > 
+> > > The second issue is the MII_BMCR register needs to set the exact speed
+> > > and duplex mode when running in SGMII mode.  During link polling the
+> > > KSZ9477 will check the speed and duplex mode are different from
+> > > previous ones and update the MII_BMCR register accordingly.
+> > > 
+> > > The last issue is 1000BASE-X mode does not work with auto-negotiation
+> > > on.  The cause is the local port hardware does not know the link is up
+> > > and so network traffic is not forwarded.  The workaround is to write 2
+> > > additional bits when 1000BASE-X mode is configured.
+> > > 
+> > > Note the SGMII interrupt in the port cannot be masked.  As that
+> > > interrupt is not handled in the KSZ9477 driver the SGMII interrupt bit
+> > > will not be set even when the XPCS driver sets it.
+> > >
+> > > Signed-off-by: Tristram Ha <tristram.ha@microchip.com>  
+> > 
+> > [...]
+> >   
+> > > +
+> > > +static int ksz9477_pcs_read(struct mii_bus *bus, int phy, int mmd, int reg)
+> > > +{
+> > > +	struct ksz_device *dev = bus->priv;
+> > > +	int port = ksz_get_sgmii_port(dev);
+> > > +	u16 val;
+> > > +
+> > > +	port_sgmii_r(dev, port, mmd, reg, &val);
+> > > +
+> > > +	/* Simulate a value to activate special code in the XPCS driver if
+> > > +	 * supported.
+> > > +	 */
+> > > +	if (mmd == MDIO_MMD_PMAPMD) {
+> > > +		if (reg == MDIO_DEVID1)
+> > > +			val = 0x9477;
+> > > +		else if (reg == MDIO_DEVID2)
+> > > +			val = 0x22 << 10;
+> > > +	} else if (mmd == MDIO_MMD_VEND2) {
+> > > +		struct ksz_port *p = &dev->ports[port];
+> > > +
+> > > +		/* Need to update MII_BMCR register with the exact speed and
+> > > +		 * duplex mode when running in SGMII mode and this register is
+> > > +		 * used to detect connected speed in that mode.
+> > > +		 */
+> > > +		if (reg == MMD_SR_MII_AUTO_NEG_STATUS) {
+> > > +			int duplex, speed;
+> > > +
+> > > +			if (val & SR_MII_STAT_LINK_UP) {
+> > > +				speed = (val >> SR_MII_STAT_S) & SR_MII_STAT_M;
+> > > +				if (speed == SR_MII_STAT_1000_MBPS)
+> > > +					speed = SPEED_1000;
+> > > +				else if (speed == SR_MII_STAT_100_MBPS)
+> > > +					speed = SPEED_100;
+> > > +				else
+> > > +					speed = SPEED_10;
+> > > +
+> > > +				if (val & SR_MII_STAT_FULL_DUPLEX)
+> > > +					duplex = DUPLEX_FULL;
+> > > +				else
+> > > +					duplex = DUPLEX_HALF;
+> > > +
+> > > +				if (!p->phydev.link ||
+> > > +				    p->phydev.speed != speed ||
+> > > +				    p->phydev.duplex != duplex) {
+> > > +					u16 ctrl;
+> > > +
+> > > +					p->phydev.link = 1;
+> > > +					p->phydev.speed = speed;
+> > > +					p->phydev.duplex = duplex;
+> > > +					port_sgmii_r(dev, port, mmd, MII_BMCR,
+> > > +						     &ctrl);
+> > > +					ctrl &= BMCR_ANENABLE;
+> > > +					ctrl |= mii_bmcr_encode_fixed(speed,
+> > > +								      duplex);
+> > > +					port_sgmii_w(dev, port, mmd, MII_BMCR,
+> > > +						     ctrl);
+> > > +				}
+> > > +			} else {
+> > > +				p->phydev.link = 0;
+> > > +			}
+> > > +		} else if (reg == MII_BMSR) {
+> > > +			p->phydev.link = (val & BMSR_LSTATUS);
+> > > +		}
+> > > +	}
+> > > +	return val;
+> > > +}
+> > > +
+> > > +static int ksz9477_pcs_write(struct mii_bus *bus, int phy, int mmd, int reg,
+> > > +			     u16 val)
+> > > +{
+> > > +	struct ksz_device *dev = bus->priv;
+> > > +	int port = ksz_get_sgmii_port(dev);
+> > > +
+> > > +	if (mmd == MDIO_MMD_VEND2) {
+> > > +		struct ksz_port *p = &dev->ports[port];
+> > > +
+> > > +		if (reg == MMD_SR_MII_AUTO_NEG_CTRL) {
+> > > +			u16 sgmii_mode = SR_MII_PCS_SGMII << SR_MII_PCS_MODE_S;
+> > > +
+> > > +			/* Need these bits for 1000BASE-X mode to work with
+> > > +			 * AN on.
+> > > +			 */
+> > > +			if (!(val & sgmii_mode))
+> > > +				val |= SR_MII_SGMII_LINK_UP |
+> > > +				       SR_MII_TX_CFG_PHY_MASTER;
+> > > +
+> > > +			/* SGMII interrupt in the port cannot be masked, so
+> > > +			 * make sure interrupt is not enabled as it is not
+> > > +			 * handled.
+> > > +			 */
+> > > +			val &= ~SR_MII_AUTO_NEG_COMPLETE_INTR;
+> > > +		} else if (reg == MII_BMCR) {
+> > > +			/* The MII_ADVERTISE register needs to write once
+> > > +			 * before doing auto-negotiation for the correct
+> > > +			 * config_word to be sent out after reset.
+> > > +			 */
+> > > +			if ((val & BMCR_ANENABLE) && !p->sgmii_adv_write) {
+> > > +				u16 adv;
+> > > +
+> > > +				/* The SGMII port cannot disable flow contrl
+> > > +				 * so it is better to just advertise symmetric
+> > > +				 * pause.
+> > > +				 */
+> > > +				port_sgmii_r(dev, port, mmd, MII_ADVERTISE,
+> > > +					     &adv);
+> > > +				adv |= ADVERTISE_1000XPAUSE;
+> > > +				adv &= ~ADVERTISE_1000XPSE_ASYM;
+> > > +				port_sgmii_w(dev, port, mmd, MII_ADVERTISE,
+> > > +					     adv);
+> > > +				p->sgmii_adv_write = 1;
+> > > +			} else if (val & BMCR_RESET) {
+> > > +				p->sgmii_adv_write = 0;
+> > > +			}
+> > > +		} else if (reg == MII_ADVERTISE) {
+> > > +			/* XPCS driver writes to this register so there is no
+> > > +			 * need to update it for the errata.
+> > > +			 */
+> > > +			p->sgmii_adv_write = 1;
+> > > +		}
+> > > +	}
+> > > +	port_sgmii_w(dev, port, mmd, reg, val);
+> > > +	return 0;
+> > > +}  
+> > 
+> > I'm a bit confused here, are you intercepting r/w ops that are supposed
+> > to be handled by xpcs ?
+> > 
+> > Russell has sent a series [1] (not merged yet, I think we were waiting
+> > on some feedback from Synopsys folks ?) to properly support the XPCS
+> > version that's in KSZ9477, and you also had a patchset that didn't
+> > require all this sgmii_r/w snooping [2].
+> > 
+> > I've been running your previous patchset on top of Russell's for a few
+> > months, if works fine with SGMII as well as 1000BaseX :)
+> > 
+> > Can we maybe focus on getting pcs-xpcs to properly support this version
+> > of the IP instead of these 2 R/W functions ? Or did I miss something in
+> > the previous discussions ?  
+> 
+> Honestly, I don't think Tristram is doing anything unreasonable here,
+> given what Vladimir has been saying. Essentially, we've been blocking
+> a way forward on the pcs-xpcs driver. We've had statements from the
+> hardware designers from Microchip. We've had statements from Synopsys.
+> The two don't quite agree, but that's not atypical. Yet, we're still
+> demanding why the Microchip version of XPCS is different.
+> 
+> So what's left for Tristram to do other than to hack around the blockage
+> we're causing by intercepting the read/write ops and bodging them.
+> 
+> As I understand the situation, this is Jose's response having asked
+> internally at my request:
+> 
+> https://lore.kernel.org/netdev/DM4PR12MB5088BA650B164D5CEC33CA08D3E82@DM4PR12MB5088.namprd12.prod.outlook.com/
+> 
+> To put it another way, as far as Synopsys can tell us, they are unaware
+> of the Microchip behaviour, but customers can modify the Synopsys IP.
+> 
+> Maybe Microchip's version is based on an old Synopsys version, but
+> which was modified by Microchip a long time ago and those engineers
+> have moved on, and no one really knows anymore. I doubt that we are
+> ever going to get to the bottom of the different behaviour.
+> 
+> So, what do we do now? Do we continue playing hardball and basically
+> saying "no" to changing the XPCS driver, demanding information that
+> doesn't seem to exist anymore? Or do we try to come up with an
+> approach that works.
 
-[auto build test ERROR on net-next/main]
+Fair enough, it wasn't clear to me that this was the path forward, but
+that does make sense to avoid cluttering xpcs with things that, in that
+case, are really KSZ9477 specific.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Raju-Rangoju/amd-xgbe-reorganize-the-code-of-XPCS-access/20250428-230635
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250428150235.2938110-4-Raju.Rangoju%40amd.com
-patch subject: [PATCH net-next v2 3/5] amd-xgbe: add support for new XPCS routines
-config: i386-buildonly-randconfig-002-20250429 (https://download.01.org/0day-ci/archive/20250507/202505071632.XaIo3kvL-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-12) 11.3.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250507/202505071632.XaIo3kvL-lkp@intel.com/reproduce)
+I'll try to give this patch a try on my side soon-ish, but I'm working
+with limited access to HW for the next few days.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202505071632.XaIo3kvL-lkp@intel.com/
+> I draw attention to the last sentence in Jose's quote in his reply.
+> As far as the Synopsys folk are concerned, setting these bits to 1
+> should have no effect provided there aren't customer modifications to
+> the IP that depend on these being set to zero.
+> 
+> That last bit is where I think the sticking point between Vladimir and
+> myself is - I'm in favour of keeping things simple and just setting
+> the bits. Vladimir feels it would be safer to make it conditional,
+> which leads to more complicated code.
+> 
+> I didn't progress my series because I decided it was a waste of time
+> to try and progress this any further - I'd dug up the SJA1105 docs to
+> see what they said, I'd reached out to Synopsys and got a statement
+> back, and still Vladimir wasn't happy.
+> 
+> With Vladimir continuing to demand information from Tristram that just
+> didn't exist, I saw that the
+> 
+> [rest of the email got deleted because Linux / X11 / KDE got confused
+> about the state the backspace key and decided it was going to be
+> continuously pressed and doing nothing except shutting the laptop
+> down would stop it.]
 
-All errors (new ones prefixed by >>):
+Funny how I have the same exact issue on my laptop as well... 
 
-   drivers/net/ethernet/amd/xgbe/xgbe-dev.c: In function 'xgbe_write_mmd_regs_v3':
->> drivers/net/ethernet/amd/xgbe/xgbe-dev.c:1110:17: error: implicit declaration of function 'pci_err'; did you mean 'pr_err'? [-Werror=implicit-function-declaration]
-    1110 |                 pci_err(dev, "Failed to write data 0x%x\n", index);
-         |                 ^~~~~~~
-         |                 pr_err
-   cc1: some warnings being treated as errors
+Thanks for the quick reply, and Tristram sorry for the noise then :)
 
+Maxime
 
-vim +1110 drivers/net/ethernet/amd/xgbe/xgbe-dev.c
-
-  1094	
-  1095	static void xgbe_write_mmd_regs_v3(struct xgbe_prv_data *pdata, int prtad,
-  1096					   int mmd_reg, int mmd_data)
-  1097	{
-  1098		unsigned int pci_mmd_data, hi_mask, lo_mask;
-  1099		unsigned int mmd_address, index, offset;
-  1100		struct pci_dev *dev;
-  1101		int ret;
-  1102	
-  1103		dev = pdata->pcidev;
-  1104		mmd_address = xgbe_get_mmd_address(pdata, mmd_reg);
-  1105	
-  1106		xgbe_get_pcs_index_and_offset(pdata, mmd_address, &index, &offset);
-  1107	
-  1108		ret = amd_smn_write(0, (pdata->smn_base + pdata->xpcs_window_sel_reg), index);
-  1109		if (ret) {
-> 1110			pci_err(dev, "Failed to write data 0x%x\n", index);
-  1111			return;
-  1112		}
-  1113	
-  1114		ret = amd_smn_read(0, pdata->smn_base + offset, &pci_mmd_data);
-  1115		if (ret) {
-  1116			pci_err(dev, "Failed to read data\n");
-  1117			return;
-  1118		}
-  1119	
-  1120		if (offset % 4) {
-  1121			hi_mask = FIELD_PREP(XGBE_GEN_HI_MASK, mmd_data);
-  1122			lo_mask = FIELD_GET(XGBE_GEN_LO_MASK, pci_mmd_data);
-  1123		} else {
-  1124			hi_mask = FIELD_PREP(XGBE_GEN_HI_MASK,
-  1125					     FIELD_GET(XGBE_GEN_HI_MASK, pci_mmd_data));
-  1126			lo_mask = FIELD_GET(XGBE_GEN_LO_MASK, mmd_data);
-  1127		}
-  1128	
-  1129		pci_mmd_data = hi_mask | lo_mask;
-  1130	
-  1131		ret = amd_smn_write(0, (pdata->smn_base + pdata->xpcs_window_sel_reg), index);
-  1132		if (ret) {
-  1133			pci_err(dev, "Failed to write data 0x%x\n", index);
-  1134			return;
-  1135		}
-  1136	
-  1137		ret = amd_smn_write(0, (pdata->smn_base + offset), pci_mmd_data);
-  1138		if (ret) {
-  1139			pci_err(dev, "Failed to write data 0x%x\n", pci_mmd_data);
-  1140			return;
-  1141		}
-  1142	}
-  1143	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
