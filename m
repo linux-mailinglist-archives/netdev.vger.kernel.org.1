@@ -1,121 +1,146 @@
-Return-Path: <netdev+bounces-188788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188789-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE5D7AAED59
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 22:48:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07399AAED60
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 22:50:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7B573A84C5
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 20:47:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84DA97A23D2
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 20:49:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39C6428FAA5;
-	Wed,  7 May 2025 20:47:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6306B28FA99;
+	Wed,  7 May 2025 20:50:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SmO5wMf2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QgZ819Tm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0623B28FA9A;
-	Wed,  7 May 2025 20:47:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C694B1DE3DB;
+	Wed,  7 May 2025 20:50:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746650876; cv=none; b=YQ64Pmbw9Ot1yAdoh+nsgnQrBOQTeg+acr+sbA1pXNt5ginPe8DSZRlij0bMwXZNDwoTThZuJ46BfWk9AWCNUBfBiPAkes8Ne5FOj74y4wxwub22Ca/iVlV4KX9WquOlzk/5/Tu1O4YCnHuX54AaGDo/iFa5aOPThGIYZF2hJ14=
+	t=1746651008; cv=none; b=TD3idrpX2tODC3jWQ/zQq/gNYubUjO2Xg/xIyfmCNvVdt9RWDCThK+X2bkapBSveHQb5iwfHXoO4weG45GoZBKExS76FaYsk4JL53S5clkYWLgeKKtoGum0p8YxINjGFdY8BIt+9tc2u6OUB2KpOURWX9kb0yr23ryIT2kr2hwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746650876; c=relaxed/simple;
-	bh=ErbIIg8tFdaFpJqMqrCwmVzq5QfpdM9matIuxyQO7IU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=HuslQsrBQnzxbUjoQ6TmF/siqeHJH+ijmU3rO0m0sD3egjJMuGUlhjtWSaTVAAT0msE38Ic2yKUiu9hNetpRsUuo3rTc8LhguBYOpTIRoJxKa6lVKZu19EnTiRQswd0HcsQ/VDfa+Bx8smKy3Db3zK7lmU2FgMt4hPynYDYItHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SmO5wMf2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF80AC4CEE7;
-	Wed,  7 May 2025 20:47:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746650875;
-	bh=ErbIIg8tFdaFpJqMqrCwmVzq5QfpdM9matIuxyQO7IU=;
-	h=From:Date:Subject:To:Cc:From;
-	b=SmO5wMf20L521OhV4fbfgBID3lGNlu/rTKRiN574Gcs4ADnbwRsoScZzUzZYPMSMp
-	 AY2M2tfmSxIzFLr5qJywqkNxlDGFWVU4UG8/TUT/ucqH4JzP/1GUbVN5aGFewKXJh9
-	 uVBbTlfopPuDuGz66M86xbGonMjd9qdKjk+A320+g49z98cIbNzH3gcp40Knkb0+dd
-	 9XfmBdEvwJRqgYclSMLrG6SHpUh/dWoXlxlQeqwQ1Z52J60avek9xWn4ZTyTxuK9yK
-	 +kBN/VfW6PDtD2Ep0CGKRAnY8bVlDXqCOSu9upGis0sm+5WuHl/QDASQjZoIfkmU+j
-	 08uWc7+cI5+4Q==
-From: Nathan Chancellor <nathan@kernel.org>
-Date: Wed, 07 May 2025 21:47:45 +0100
-Subject: [PATCH net] net: qede: Initialize qede_ll_ops with designated
- initializer
+	s=arc-20240116; t=1746651008; c=relaxed/simple;
+	bh=RTzFgdYqMKIy1fECYhZ21RC3nL2J+DPf1mQUp9ZRSmw=;
+	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=K/u8YC3+xRACDULuXsI2JA+m5eovbjVdDUUCiA5lrhSLVzQ4cz1OsLH1Sls/qJPeAAZkRSmLUy/vLyPLUiLOYRKjvFmqIBs0lQI+6ItZUCU+eGJQI6XGRCDJDF4Aw1wolqFInLVCZyOBrraa2ge54mc+DWe/qttzSo5Ffs1+G04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QgZ819Tm; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7c5ba363f1aso37838485a.0;
+        Wed, 07 May 2025 13:50:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746651005; x=1747255805; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SJdYFz5H9Ac9Y1h/c2dEG8ah82bylcztNEpbEYWuC0U=;
+        b=QgZ819TmDXY5Iddg477p5LpRQQ5+DBRsyHtJ/yz6QnLEnYUZIEGJvydCycoQPAAV/o
+         PTqvmf2dkfmut7/s9jytJgyhXAjmMW7E96J1x84wnXEfPqdQdeuayMtehqI352nFJ9Nu
+         /DXv7exjkp7/erhPQH1q8i6dQ669Yqa5si2JO/bWPJFB9qCnh0ymZAfPyVSZlK98A7On
+         IJ8IeNMbt4ywzPMJeoknfyE+bvm/SC7s7TBBn9w0ElPLTfm8M/sPft5iIpe5Q3/+Fa6F
+         NvkrLQETrs/Li3touvSP8ElGMHGXJ9tFikV00BujkoUgRB3jK6VzzeFaPo+09IfckWgb
+         LulQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746651005; x=1747255805;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SJdYFz5H9Ac9Y1h/c2dEG8ah82bylcztNEpbEYWuC0U=;
+        b=hGvaFAXk4n08T/JajN7BsHRf+PnmYV5ve262lSCYRCNSgx+6/lYpwJYyASwQFyQKGZ
+         2ocRS0P5MPZPCP1hKx2le8vEheNgJHKvGTD9I+rhgkWyEPfVXMIcax/bh2nniC3CXGW7
+         qjB0rpxgVmeshRAg7kWBWSZvE5GXNLxyhqY0upEvu8OBNkHxQqq+QRvLMBt6xWnsQzaS
+         3jPrCg/TWy9BRfGaxignBnU8In1g6+rtYH+x1THybIibjGtOaHuHYkqJaNyBF17cLqMd
+         HqQL2W+O+Xcb/m06CwkEE6Kou/oI46DYxHqpTMUD2WEv/dPtLwcu0/fM4WfIGyiuE5Ul
+         AFAg==
+X-Forwarded-Encrypted: i=1; AJvYcCUAosOkIgUCvDyO0p98Wg1YtXKm8acgsKnJNIHOiKHgmxH7drp29AyzbRCq4oO2MJFBUv0=@vger.kernel.org, AJvYcCUZTo5xT4OYwlYUlUZ86qtjrXfCcl0VlmLMVKQiSZ83MbetcDirJgOws3cvxH30I/XZjRap/wTX@vger.kernel.org, AJvYcCXNiP/rJ9aZP8fgDB7oqlTpjiiyxvRbtGfg04IZQldZBfWDahPveIJGZh0//RYMw8/KGHTLuEaakhRKl0Yd@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywv8hiTiTjTwXQDK2kn0ZeON4D5qnvGPUtlyywujuZ36RvlqpHY
+	VVryOLDJEk/hwNnmX2furcB/XQGqmarvCqmMBpzBfMtVgB0z8lEk
+X-Gm-Gg: ASbGncv2Ak/U9RDLJFb6TLryAN/nVNHGERjtX3GDrWxMdKdJLElMdGpVXHnKKh3eAOv
+	mSrpDYT8rRrMd4EB3Taw1YeZS9bnmc2xGTFM/NSLZBDMwZMxaJM014n6LO2MU3Z8vSo+yatLhBw
+	XL3p6yGlMd4qAEsio9YA30e6b8WUWjfOi31TOrCV97KHXOa0qjmZEoTJptPZzr8W5XwWXMc2B4e
+	qrxzjx9mI3cfSbY6QzEJRONEpwnOWqG6dTvv7V734KkPWIKFUaZnXwf4GG+Dv8V7nvMmNHz2ClO
+	PMPQpLRvUxsvC2pO8fgMJAdXFpMOUa97Uo/BiX/X6MdL82K7IFqAugVRJfk7rbPJz0S4szdFkuC
+	lD/k87Im2dC9IMH0VwBjQ
+X-Google-Smtp-Source: AGHT+IHIENSOL5xWk2n0ZpKa2eUQ3plVdHmLfICCayO8Sn6MjIw8GtVlpnhxXvAblQvcnnj7pPvLwA==
+X-Received: by 2002:a05:620a:4491:b0:7ca:f039:7365 with SMTP id af79cd13be357-7caf736f357mr690398885a.8.1746651005517;
+        Wed, 07 May 2025 13:50:05 -0700 (PDT)
+Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7caf7529790sm211729985a.25.2025.05.07.13.50.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 May 2025 13:50:04 -0700 (PDT)
+Date: Wed, 07 May 2025 16:50:04 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jon Kohler <jon@nutanix.com>, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ davem@davemloft.net, 
+ kuba@kernel.org, 
+ hawk@kernel.org, 
+ john.fastabend@gmail.com, 
+ netdev@vger.kernel.org, 
+ bpf@vger.kernel.org, 
+ jon@nutanix.com, 
+ aleksander.lobakin@intel.com, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jason Wang <jasowang@redhat.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ linux-kernel@vger.kernel.org (open list), 
+ hawk@kernel.org
+Message-ID: <681bc77c96437_20dc642942a@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250506145530.2877229-4-jon@nutanix.com>
+References: <20250506145530.2877229-1-jon@nutanix.com>
+ <20250506145530.2877229-4-jon@nutanix.com>
+Subject: Re: [PATCH net-next 3/4] tun: use napi_build_skb in __tun_build_skb
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250507-qede-fix-clang-randstruct-v1-1-5ccc15626fba@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAPDGG2gC/x2MQQqEMAxFryJZT6AqRcerDLPQNGpAOk5aRRDvb
- nD5+O+/ExKrcIKuOEF5lyS/aFC+CqC5jxOjBGOoXOWddw3+OTCOciAtNqP2MaSsG2Us69CSf9c
- 0+Bbsvyqb97Q/EDnD97puhzeF7XAAAAA=
-X-Change-ID: 20250507-qede-fix-clang-randstruct-13d8c593cb58
-To: Manish Chopra <manishc@marvell.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Kees Cook <kees@kernel.org>
-Cc: Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
- stable@vger.kernel.org, Nathan Chancellor <nathan@kernel.org>
-X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1518; i=nathan@kernel.org;
- h=from:subject:message-id; bh=ErbIIg8tFdaFpJqMqrCwmVzq5QfpdM9matIuxyQO7IU=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDBnSx35cjmb/GXoui+vDpzDlY38mXClU/MsUuricIWrb5
- riFzVvfdZSyMIhxMciKKbJUP1Y9bmg45yzjjVOTYOawMoEMYeDiFICJGM9mZNjy6vqtDRNKinha
- dkvdOpSbkMEdV2X7RPZiWrb68YLp8XEM/1MWz7FdWPH987GdF9u33eAtTZVbVvrBeIbFI09WnZh
- n7/gB
-X-Developer-Key: i=nathan@kernel.org; a=openpgp;
- fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-After a recent change [1] in clang's randstruct implementation to
-randomize structures that only contain function pointers, there is an
-error because qede_ll_ops get randomized but does not use a designated
-initializer for the first member:
+Jon Kohler wrote:
+> Use napi_build_skb for small payload SKBs that end up using the
+> tun_build_skb path.
+> 
+> Signed-off-by: Jon Kohler <jon@nutanix.com>
+> ---
+>  drivers/net/tun.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> index f7f7490e78dc..7b13d4bf5374 100644
+> --- a/drivers/net/tun.c
+> +++ b/drivers/net/tun.c
+> @@ -1538,7 +1538,11 @@ static struct sk_buff *__tun_build_skb(struct tun_file *tfile,
+>  				       int buflen, int len, int pad,
+>  				       int metasize)
+>  {
+> -	struct sk_buff *skb = build_skb(buf, buflen);
+> +	struct sk_buff *skb;
+> +
+> +	local_bh_disable();
+> +	skb = napi_build_skb(buf, buflen);
+> +	local_bh_enable();
 
-  drivers/net/ethernet/qlogic/qede/qede_main.c:206:2: error: a randomized struct can only be initialized with a designated initializer
-    206 |         {
-        |         ^
+The goal of this whole series seems to be to use the percpu skb cache
+for bulk alloc.
 
-Explicitly initialize the common member using a designated initializer
-to fix the build.
+As all these helpers' prefix indicates, they are meant to be used with
+NAPI. Not sure using them on a tun write() datapath is deemed
+acceptable. Or even correct. Perhaps the infrastructure authors have
+an opinion.
 
-Cc: stable@vger.kernel.org
-Fixes: 035f7f87b729 ("randstruct: Enable Clang support")
-Link: https://github.com/llvm/llvm-project/commit/04364fb888eea6db9811510607bed4b200bcb082 [1]
-Signed-off-by: Nathan Chancellor <nathan@kernel.org>
----
- drivers/net/ethernet/qlogic/qede/qede_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/qlogic/qede/qede_main.c b/drivers/net/ethernet/qlogic/qede/qede_main.c
-index 99df00c30b8c..b5d744d2586f 100644
---- a/drivers/net/ethernet/qlogic/qede/qede_main.c
-+++ b/drivers/net/ethernet/qlogic/qede/qede_main.c
-@@ -203,7 +203,7 @@ static struct pci_driver qede_pci_driver = {
- };
- 
- static struct qed_eth_cb_ops qede_ll_ops = {
--	{
-+	.common = {
- #ifdef CONFIG_RFS_ACCEL
- 		.arfs_filter_op = qede_arfs_filter_op,
- #endif
-
----
-base-commit: 9540984da649d46f699c47f28c68bbd3c9d99e4c
-change-id: 20250507-qede-fix-clang-randstruct-13d8c593cb58
-
-Best regards,
--- 
-Nathan Chancellor <nathan@kernel.org>
-
+From commit 795bb1c00dd3 ("net: bulk free infrastructure for NAPI
+context, use napi_consume_skb") it does appear that technically all
+that is needed is to be called in softirq context.
 
