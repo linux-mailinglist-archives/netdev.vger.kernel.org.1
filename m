@@ -1,344 +1,310 @@
-Return-Path: <netdev+bounces-188722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B45D6AAE5D1
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 18:02:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC4D4AAE4E0
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 17:32:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC0503B37AD
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 15:59:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50E284A09B8
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 15:32:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 803C928BA91;
-	Wed,  7 May 2025 15:59:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AFDC28A71C;
+	Wed,  7 May 2025 15:32:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="XPY2udqs"
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="24gbbV55";
+	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="GTLghCcG"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE7EB233D92;
-	Wed,  7 May 2025 15:59:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746633547; cv=none; b=HMy+ZEGxF5tZhSfusCDML4skNYy9rRURzSOVYdRXAjeOjdh8SKKutjnnXkBDyRwLjuW1wu7MqRTNX36/Kn7JC9riUD2eJe6BDucsvGWhqv0TRDk56brcuyVU8XnzXm3mgdHlavHyGH7ME+n7uplctXifxK73dwxdzbzvILLfeLg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746633547; c=relaxed/simple;
-	bh=/nOczs//qTOjJOXIj8TG9Bxh9tzzfPc/7rg+v5HC8/k=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=HhQ2GCS1SFDA97IrY2/DqGHvbXq2MfdrFySFemsyqn54cNtcem3YNhV1qwMDu/LGB+W0Alz99Iap5H3DaWGqfzF6SkHVYqbLPQa5wJKTqXKSrf4kz3CXjpPjV5OFzKHqG+nlkfm2LVdSxeKyG06jP0S3xizXyQ7+KUKHPyGPLUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=XPY2udqs; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1186)
-	id 6379321199D1; Wed,  7 May 2025 08:59:05 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6379321199D1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1746633545;
-	bh=7yYjKoYCKk9cgdHl4tWxheQKNp85b+ROi69f+jf1OsA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XPY2udqsZlVq0NTKVFNMFzu/WfLQmOWZvJXp6rx11lDr+g9bEfyi/jlD7mrvx/yAv
-	 KSWIMoNXR8V24tkxVbjK3QK9iYmeIck+30nPr2JtfvtvyG9l+mcXRFcrFhKn/xB8Ni
-	 npta2uyXDZh4m07WHaGP+TXw02lJZPLo0e2zPoow=
-From: Konstantin Taranov <kotaranov@linux.microsoft.com>
-To: kotaranov@microsoft.com,
-	pabeni@redhat.com,
-	haiyangz@microsoft.com,
-	kys@microsoft.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	decui@microsoft.com,
-	wei.liu@kernel.org,
-	longli@microsoft.com,
-	jgg@ziepe.ca,
-	leon@kernel.org
-Cc: linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH rdma-next v4 4/4] net: mana: Add support for auxiliary device servicing events
-Date: Wed,  7 May 2025 08:59:05 -0700
-Message-Id: <1746633545-17653-5-git-send-email-kotaranov@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1746633545-17653-1-git-send-email-kotaranov@linux.microsoft.com>
-References: <1746633545-17653-1-git-send-email-kotaranov@linux.microsoft.com>
+Received: from mx0b-002c1b01.pphosted.com (mx0b-002c1b01.pphosted.com [148.163.155.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3252028A1F7;
+	Wed,  7 May 2025 15:32:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.155.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746631950; cv=fail; b=hCecydu3Yh2/RxZnaoVo9+S+8ACTFHm7d8JxzUGoB+ACD2HVKJ8hNVXJPcI+TZyrvtC1iMbwod/vQCdFYyCiIQqi4aToFf+hPzSi/pJV8/Xvyo/pONHQ5IDK+s77cvAwQ3EzMUY5sEg7qNs1/2JyYDFftRT9Es+pnZijQvW5OvM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746631950; c=relaxed/simple;
+	bh=kKkSHJyEs6BluvhFeuBycUvDHf485n0udp+MTYB8Hgs=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=J0fO8dws+yzrU8DWYPg5tUo5ygYucb+bPNSUGQuk7rd4g8ItyTgQ1dXPYBTZRAXByNjShPgcjELFn0NACA7iKjE6rgbNHFO43OI6RQeH6cDPjzq7rgKet7Tm4ZrPl6MmkHZCsqqaRoKUTKvuHJZCMnRZ6yBT39Mu8V0hSLb3WEk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com; spf=pass smtp.mailfrom=nutanix.com; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=24gbbV55; dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b=GTLghCcG; arc=fail smtp.client-ip=148.163.155.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nutanix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nutanix.com
+Received: from pps.filterd (m0127843.ppops.net [127.0.0.1])
+	by mx0b-002c1b01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54785SL5025158;
+	Wed, 7 May 2025 08:31:53 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=proofpoint20171006; bh=dEE//ImHiurOx
+	XDPaluhxh4uxJnRe/VHtth62Y35010=; b=24gbbV55gOQ7OS5qjSOC0DIKaZ27z
+	Pxdrpvv+/kANS9IULq25t7l6GQ3Ef1B0ZrZObIEzonWVacq4RflfJOB/u8TG/YcW
+	TyJZS8fVI4+VAjzZumoghVVaDvzAzbOqPZ253m5rZoH6gh7fP2OB444acE+MgMk5
+	Oi2u43v40K3K83ozeD0t/s8sVN2S9HYtttv9tuzJljXUV6Sj+6OTsrdpmzy49vkC
+	sL1STR8TnKyNBElbf1XD3XpBLQZ8fLwtMcO0ODuF+NHvTJEn08rJeFx0EvbnIj8T
+	qoCiefk3qe5yyHavxw6XpABxGg9FQMzMV9+6vK/nL/Hhj1UIC/qiWfoAw==
+Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2171.outbound.protection.outlook.com [104.47.58.171])
+	by mx0b-002c1b01.pphosted.com (PPS) with ESMTPS id 46dh8j1d5m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 07 May 2025 08:31:53 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=AqSN5/ABCaIvKu4UfhpbtRQQN+S3Kw+rNClYZUqKOQzYbgKESN+8Gmw6B5eSapXqxjQbJ77A/TZQE2u3VzJQRXYp70Zkr+NwggnOnQh0dk2YMcTWep7e9HnzLRIftszzZSadqpbq+o2YE6EG84x38tx/iyJnychxvEQmC/5xkfGUzu1rvH68nlz7QVgATRgSmDzjL5NAOhjUn9D6zMCVCDkYP7V7YxqfR4/WWK7Z46RvgnLAiIw0NlQfS5Vztbzly8fETZoBENj6vqwhhqdWkgJPT+tpcNGn3JBs0DJGs2UvC3jGxv5H7pofnehySidCHI+uW503tzsWepNLaONAEA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dEE//ImHiurOxXDPaluhxh4uxJnRe/VHtth62Y35010=;
+ b=caKDpwnuYGjupS+NrXRjv/f9X5RPMGqxomfmLGgU//kG2VApjpyPpV+HBawa9o1dhjre8nTm01cKKvmZjdeywKyVQE3nvm/ngB2EyMMrRIRfSsCxPKU53TJ8JkA0OLjXjhMqithicVYCOYJk5ac9AtO0Jmo9xadPH8BmnibSv33xmcr308tKcBdGcBQvW5F9HlH/6KxIBZRcnWdBidyeL9GronVFcarzxOxg3/d9TMOtAbncZEcsHRddcwzkMxq0iHYfH9kfAEczZivP72dkvLLIFucx5AdmXS9aq5SNhZ3QsEVkoe+1kOutsFUuWMzFD2GKFHWTkIYb2rTyvnsbzg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dEE//ImHiurOxXDPaluhxh4uxJnRe/VHtth62Y35010=;
+ b=GTLghCcG4QVpnhWC2n1c2vKw5cCTBcAAzuJc9X5WWS6URa2uaYZKfj12dEG141c3kWSHfwmugFqIVLDwpyXPYCZXYjHCnBXjoCbLFOyOv/RMIt1oVd2ZzXxDRgiWoc7Jcac+3kYtQGTH6qgv6lIgvZ8AMy9ursILunLy69Wey4EFt3ZmV4k8G37/MYKCaPtMqf5rAg43p92uy3KWr416vgGeudljMoI/hycZdIw5ZX4cAqPIksGYf121lVS5wsawO0TvLt0AnYAgXpYxkp7TbaNeznnmfTTHmxZA98xG7xc+Kz3FSKTw4mqOyY+/8oKa0ZuLiGoj4Q2y8PoqsYqr5Q==
+Received: from LV8PR02MB10287.namprd02.prod.outlook.com
+ (2603:10b6:408:1fa::10) by PH0PR02MB7365.namprd02.prod.outlook.com
+ (2603:10b6:510:b::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.12; Wed, 7 May
+ 2025 15:31:51 +0000
+Received: from LV8PR02MB10287.namprd02.prod.outlook.com
+ ([fe80::b769:6234:fd94:5054]) by LV8PR02MB10287.namprd02.prod.outlook.com
+ ([fe80::b769:6234:fd94:5054%4]) with mapi id 15.20.8722.020; Wed, 7 May 2025
+ 15:31:50 +0000
+From: Jon Kohler <jon@nutanix.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+        =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Cc: Jon Kohler <jon@nutanix.com>
+Subject: [PATCH net-next] vhost/net: align variable names with XDP terminology
+Date: Wed,  7 May 2025 09:02:05 -0700
+Message-ID: <20250507160206.3267692-1-jon@nutanix.com>
+X-Mailer: git-send-email 2.43.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: MN0PR02CA0015.namprd02.prod.outlook.com
+ (2603:10b6:208:530::16) To LV8PR02MB10287.namprd02.prod.outlook.com
+ (2603:10b6:408:1fa::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV8PR02MB10287:EE_|PH0PR02MB7365:EE_
+X-MS-Office365-Filtering-Correlation-Id: e3b0f8af-56af-44ba-04dd-08dd8d7c497b
+x-proofpoint-crosstenant: true
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|7416014|52116014|366016|376014|38350700014|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?46yVQQPf1PcHdlMlsqakOnw0Evw9B9ar2QNz9l16e07e+Vd+mHgKjSdot56N?=
+ =?us-ascii?Q?k8sXOkO5TkHKc1orweMaFx+cNF4AeBgAWbHQPK56x9p4nl4r/yfLDh6Bgryf?=
+ =?us-ascii?Q?EhH0zu8NHalPf1e6Hu04QF00mHGxqjKy0kZLAPkpEk+DVvC46L6Dkh2s/veC?=
+ =?us-ascii?Q?kjIyyaaFmDy2NsskS13JzHKq0HcVZZc9DrPA3vdhb42jt4js6ONj/ibMQ25B?=
+ =?us-ascii?Q?tZH062fW4FEiGZDGpHlJZXWv3sAM0j5U91IwF8Y7dXSv7U3oWu/RHsBjcgKE?=
+ =?us-ascii?Q?dv7eUF9xAVBtOmkK64INH1LvZualJHq3SWbNJ3rHEUy+mkm6ajLF8RBRXrEM?=
+ =?us-ascii?Q?eNrskdifojOaOPdkJRAemS/ME09qYJyQDUkmhE466J4AeESdrEbcLCMe0DF3?=
+ =?us-ascii?Q?oX/YevbMo/HH3D8k7gwFiiaJQ53lsskCFy2mZPcu03vX0HLvtd/RYvGMwlp8?=
+ =?us-ascii?Q?UMrzkCfRggnFRopf51MYxZBVoWUtjhddaixhygI3xgbaFufEy0042cQLFI7p?=
+ =?us-ascii?Q?6L4TwDCySaDQ5I7P+6dL2AJY+420ByiI33dcIVdhGURdUBDuWo0l7/PM0IQb?=
+ =?us-ascii?Q?37FqOMLTYB6ibJjDa2Fhb53qZROcSFnjzzTUBv/5FXq6CWZnLk59oaR7uXB1?=
+ =?us-ascii?Q?JmnCU9unV+mljpp9+68xhZVidyNhKlKRSPE441rcCO0dnxbawL3aecxxRb58?=
+ =?us-ascii?Q?wqLevB9yqg2AgKpd8RdUtO/YVPNnR2uga6A8NOLRACi5L29iyZhPidN/WynY?=
+ =?us-ascii?Q?rxuv6R4VkXUnpLK6XoY68nZ23I4KNPAqCnVNn9yLzIAwyZ3VPB3wXrkHlQhG?=
+ =?us-ascii?Q?ZeuGQNFfA7sEGBrNz+iVnpbetwjEuFybdGRfPq9wkO3TrU80W/kUfa/UrVox?=
+ =?us-ascii?Q?wl0c+BmGApc0VIauxH4Vmm1op8yGhPddnxtKUjWtB+bfl35UBT4PhOny0S+5?=
+ =?us-ascii?Q?M1yYFsdgsKL76wQxf1OsZxKRfN27h21zOZ+WRT84P9Iy9+dYkUKFKY5NUHyk?=
+ =?us-ascii?Q?9HIUO7mmo592TbKWvdjIwnYzHrWI6IKejtMhAKdOERp/ZomatdC+RN4SGBNb?=
+ =?us-ascii?Q?gXndaGs1p9XuV2A64ITPgSaU/x1VZe57h5vMr2uLLJ60GEAkyDGXJ7hUyoW9?=
+ =?us-ascii?Q?EaZKYkPa84b8SGfLlt/LMNYqI4fljJAzTd8c4IOwn44s73DcMmDrg3lbB8NW?=
+ =?us-ascii?Q?X0Q6C6HWgKKA3qSWnYn3OxZ08VnTs7cSmAjpzomOLlVLcuTBHbG0GVNahyfI?=
+ =?us-ascii?Q?IuEK6MQgp3fSda8ZmsVOiWkZnQwe6l3qR2Grt8s4TZjBniLlK2oiZ+oTyhRe?=
+ =?us-ascii?Q?XQkMO1YEzP1vQJGwnuCOQfBIi/50UJvalyupo1f2/t2c53C4EGAJy4MwORzl?=
+ =?us-ascii?Q?EVrhyITY55JZQMBcqx47iHf8T69wpn79YcW5QJv/S9Lvnwc+//7PFZEqZOcm?=
+ =?us-ascii?Q?qaWiYd0JwsAyZ9ZdxufRywi2wqSxHIzcyeH9XiP3m+wgxNH3G6nUPkTCcK4K?=
+ =?us-ascii?Q?O+cclg4nuFLJdFI=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR02MB10287.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(52116014)(366016)(376014)(38350700014)(921020);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?U4VugbPerIR1ou75gPweMe6AO3dYTv5v0q1WC0gxpHbjZeK/1m3ZOPdRNSTI?=
+ =?us-ascii?Q?tqXkdQ5pVLnp20h4RyAuaIEygTJWVibS654AB+UGmT6FrhtXI8ctOrmDGNIW?=
+ =?us-ascii?Q?yCAd5QTrTgtnExnXSEyjff5Bsp+3TmRDVPDRH5F8vVMZaImDaqR6kuXM8kI4?=
+ =?us-ascii?Q?C31s5qZUM3Qa2w8lOsaizV0XN+sDVaTTLObYeR70Fn3t8dETrKPlkjwM6bnb?=
+ =?us-ascii?Q?YHEDtgaBtQnuV5i1wSAOjx3XZjswpaCo4bnd0BRiFwy9A3WUQW5nkjpl1GAp?=
+ =?us-ascii?Q?gv+Nj/mn4xcFX7ObKMgA0jkFSQw/gmUusxoqEksRx2Sy6+d+lUn8taF3xesf?=
+ =?us-ascii?Q?8JrcFrdi6lfeWNZp2Vn70S/D2LTbYumveGofILaQ0eVM9AvN6qVn028le9kQ?=
+ =?us-ascii?Q?bEOEMtLyAeGjSFGpMmXayimaSCuTS5yLWzSTFTcCGLfTASLGFQk9SJhSJHah?=
+ =?us-ascii?Q?j9Mv9ztq9ymg/2EW1md9gDGrRDHcrFD4H+v9o6AF4SYqiiu539jc2D23Uq4t?=
+ =?us-ascii?Q?O1Wd2CB722TaPZT4iCWOFMGgIOO5Aj4Qg9fXSJS2VjyuzY5vfsNv5IZlnlo4?=
+ =?us-ascii?Q?/9G4+8ZxSjFhbezFaojIv0brQAcXUccmM45zbqzmNAZYCpxy8zLKsAlNrlW4?=
+ =?us-ascii?Q?Yo58uTkbH4cSEjuqWFw6DGduw69nONpOd1EKhVxS1ZjNqdFf4w1BUfgIzEGX?=
+ =?us-ascii?Q?b68125zxarCzfhC8BbiF/YBacqayLysAnoOSF9w8poPljYGavxdma6B0o3Xx?=
+ =?us-ascii?Q?u8R2NEKRgnf+cx1hq56M0yk+xqtysJD5Q94zDtFE7Ivh5WuMC+XcjFg2ziJB?=
+ =?us-ascii?Q?4/JuhDN7PGLuTykd9R/cUzD+BBn7bkiybvYvD5oPggzhxu8Vg+U9dddYK6mw?=
+ =?us-ascii?Q?m/yGUmwZvrioj3VidLYJ/lf8b2roFp/CVPWOcS9/T2Fp0XR4tpRwbwGpiEJ9?=
+ =?us-ascii?Q?7NxX8YiuySg1KPQzoWg4X4dQ48fQRDOCx1sdIsg3SSugRfvzin+XV92mhPn5?=
+ =?us-ascii?Q?YMlr402gUHdBACOH/JKHgGFlUiK8dP6QT+Hznsqpzr3cIGcXAqnj2OnNZUhZ?=
+ =?us-ascii?Q?W6oWa1SXzSutnO5KhUi6uXRSMJNrYbGw7ctmqXPd2btFBAlNqPooHr6WJsI/?=
+ =?us-ascii?Q?jVJ0qUwHs3vCy+5FGJhIPv8LRWG8X8ZblSH0rnX1P8JKe7StQjEyjhq0jgG3?=
+ =?us-ascii?Q?zXOYJx7t0v2UXxs6C5JDbLYfz5CNiXWYP+kYQc4rojECaAt+beLVRmGNiIMb?=
+ =?us-ascii?Q?ixJVnCExTaw3k5Kv8fL04Oop79rQDzbKx4+ygGrqH1mmA0AuR7NpLtA8n6yo?=
+ =?us-ascii?Q?flh5wuVphRI85GNgFb7u9m0mxx3cCWoF6rZY/xrjm0qTD+C6sLMiHl/N/yMn?=
+ =?us-ascii?Q?iaFkrVP/cNR2MdLXQmk7bfBw+vfXYaXYTW5F0fFOxY51EIs96Z8ZwFAum/zM?=
+ =?us-ascii?Q?6UMaAjA3kLV7M5L99bwJ7VCJFnWwANfgV+Aya2UvrfgiDjEvNdM1PN/iWSEN?=
+ =?us-ascii?Q?8dUVFeQv69ROB8jFayDbmPOwTTEIzLHwYzEhg/qKlYp+CkxkXje3PWURGzIY?=
+ =?us-ascii?Q?lBIr5yZJMXRivP5K5r7rWotY6jq38pb7ey9ENh/Fl4a42NS8ySNMrDBp9sZq?=
+ =?us-ascii?Q?hA=3D=3D?=
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e3b0f8af-56af-44ba-04dd-08dd8d7c497b
+X-MS-Exchange-CrossTenant-AuthSource: LV8PR02MB10287.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 May 2025 15:31:50.8309
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LS780KXfOIw/MHzE/4qhTfLDfT+1KxCkLRJTnxt2Eeq5P210RAH0Fhq5w9e/o2ooJ+nUvYKBSA1eqKNTGKoZjkv64W0ZRhI3DuZ3nt1ispQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR02MB7365
+X-Authority-Analysis: v=2.4 cv=B/y50PtM c=1 sm=1 tr=0 ts=681b7ce9 cx=c_pps a=b6GhQBMDPEYsGtK7UrBDFg==:117 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=dt9VzEwgFbYA:10
+ a=0kUYKlekyDsA:10 a=64Cc0HZtAAAA:8 a=jDBx4MJtfhcO1TTigScA:9
+X-Proofpoint-ORIG-GUID: 8sbzHxemAkgzA6G_cXbxV8GTD6keDeNG
+X-Proofpoint-GUID: 8sbzHxemAkgzA6G_cXbxV8GTD6keDeNG
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTA3MDE0NSBTYWx0ZWRfX5NM87VaEAJNo nQew2wkYQPmoht/hCH8NYnYBzg1MJPtPFF0QmWWMtVULfhjob/wX9JeYB7Vrd2+Pvl/hE2QJ1R4 jL/ZllqYN32RC3uU1VAdtIqT3mG89hnLpk+He+3Pb9feDMw1FY0is6Eco1bubfSP2oIoe2lioFP
+ heZzm+amigkxSRseSKQZfbkP2dGcBNkzpEbIoRjYlx0rMkZJ+WoO4MplgVTKpZJRKDD0qGROwKC TuE941o9y5jqUyPQ7XAP66pfHbW3LMRRJ82sNpzLuczsO1jxZ3bVScHYNA1BnXCi+aFBHvtanH1 o8yBnk3f+80nnrZ0MAeti/RMpRby+miMFTsGuHicxbruTa0+2lgj987Kj9rylElnCXEkL3O46LS
+ 6T+ZeHsFeYKXz59P4FoEwGi3Ew7AOQ38YZRey4w/Aa6xiFgBnSIxRS5k95f6uV5axHaD+1G6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-07_05,2025-05-06_01,2025-02-21_01
+X-Proofpoint-Spam-Reason: safe
 
-From: Shiraz Saleem <shirazsaleem@microsoft.com>
+Refactor variable names in vhost_net_build_xdp to align with XDP
+terminology, enhancing code clarity and consistency. Additionally,
+reorder variables to follow a reverse Christmas tree structure,
+improving code organization and readability.
 
-Handle soc servcing events which require the rdma auxiliary device resources to
-be cleaned up during a suspend, and re-initialized during a resume.
+This change introduces no functional modifications.
 
-Signed-off-by: Shiraz Saleem <shirazsaleem@microsoft.com>
-Signed-off-by: Konstantin Taranov <kotaranov@microsoft.com>
+Signed-off-by: Jon Kohler <jon@nutanix.com>
 ---
- .../net/ethernet/microsoft/mana/gdma_main.c   | 11 ++-
- .../net/ethernet/microsoft/mana/hw_channel.c  | 20 ++++++
- drivers/net/ethernet/microsoft/mana/mana_en.c | 69 +++++++++++++++++++
- include/net/mana/gdma.h                       | 19 +++++
- include/net/mana/hw_channel.h                 |  9 +++
- 5 files changed, 127 insertions(+), 1 deletion(-)
+ drivers/vhost/net.c | 53 ++++++++++++++++++++++-----------------------
+ 1 file changed, 26 insertions(+), 27 deletions(-)
 
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index 59e7814..3504507 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -391,6 +391,7 @@ static void mana_gd_process_eqe(struct gdma_queue *eq)
- 	case GDMA_EQE_HWC_INIT_EQ_ID_DB:
- 	case GDMA_EQE_HWC_INIT_DATA:
- 	case GDMA_EQE_HWC_INIT_DONE:
-+	case GDMA_EQE_HWC_SOC_SERVICE:
- 	case GDMA_EQE_RNIC_QP_FATAL:
- 		if (!eq->eq.callback)
- 			break;
-@@ -1468,10 +1469,14 @@ static int mana_gd_setup(struct pci_dev *pdev)
- 	mana_gd_init_registers(pdev);
- 	mana_smc_init(&gc->shm_channel, gc->dev, gc->shm_base);
+diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+index 7cbfc7d718b3..86db8add92eb 100644
+--- a/drivers/vhost/net.c
++++ b/drivers/vhost/net.c
+@@ -665,44 +665,43 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+ 	struct vhost_virtqueue *vq = &nvq->vq;
+ 	struct vhost_net *net = container_of(vq->dev, struct vhost_net,
+ 					     dev);
++	int copied, headroom, ret, sock_hlen = nvq->sock_hlen;
++	struct xdp_buff *xdp = &nvq->xdp[nvq->batched_xdp];
+ 	struct socket *sock = vhost_vq_get_backend(vq);
++	size_t data_len = iov_iter_count(from);
+ 	struct virtio_net_hdr *gso;
+-	struct xdp_buff *xdp = &nvq->xdp[nvq->batched_xdp];
+ 	struct tun_xdp_hdr *hdr;
+-	size_t len = iov_iter_count(from);
+-	int headroom = vhost_sock_xdp(sock) ? XDP_PACKET_HEADROOM : 0;
+-	int buflen = SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+-	int pad = SKB_DATA_ALIGN(VHOST_NET_RX_PAD + headroom + nvq->sock_hlen);
+-	int sock_hlen = nvq->sock_hlen;
+-	void *buf;
+-	int copied;
+-	int ret;
++	void *hard_start;
++	u32 frame_sz;
  
-+	gc->service_wq = alloc_ordered_workqueue("gdma_service_wq", 0);
-+	if (!gc->service_wq)
-+		return -ENOMEM;
+-	if (unlikely(len < nvq->sock_hlen))
++	if (unlikely(data_len < sock_hlen))
+ 		return -EFAULT;
+ 
+-	if (SKB_DATA_ALIGN(len + pad) +
+-	    SKB_DATA_ALIGN(sizeof(struct skb_shared_info)) > PAGE_SIZE)
++	headroom = SKB_DATA_ALIGN(VHOST_NET_RX_PAD + sock_hlen +
++				  vhost_sock_xdp(sock) ? XDP_PACKET_HEADROOM : 0);
 +
- 	err = mana_gd_setup_irqs(pdev);
- 	if (err) {
- 		dev_err(gc->dev, "Failed to setup IRQs: %d\n", err);
--		return err;
-+		goto free_workqueue;
++	frame_sz = SKB_HEAD_ALIGN(headroom + data_len);
++
++	if (frame_sz > PAGE_SIZE)
+ 		return -ENOSPC;
+ 
+-	buflen += SKB_DATA_ALIGN(len + pad);
+-	buf = page_frag_alloc_align(&net->pf_cache, buflen, GFP_KERNEL,
+-				    SMP_CACHE_BYTES);
+-	if (unlikely(!buf))
++	hard_start = page_frag_alloc_align(&net->pf_cache, frame_sz,
++					   GFP_KERNEL, SMP_CACHE_BYTES);
++	if (unlikely(!hard_start))
+ 		return -ENOMEM;
+ 
+-	copied = copy_from_iter(buf + offsetof(struct tun_xdp_hdr, gso),
++	copied = copy_from_iter(hard_start + offsetof(struct tun_xdp_hdr, gso),
+ 				sock_hlen, from);
+ 	if (copied != sock_hlen) {
+ 		ret = -EFAULT;
+ 		goto err;
  	}
  
- 	err = mana_hwc_create_channel(gc);
-@@ -1497,6 +1502,8 @@ destroy_hwc:
- 	mana_hwc_destroy_channel(gc);
- remove_irq:
- 	mana_gd_remove_irqs(pdev);
-+free_workqueue:
-+	destroy_workqueue(gc->service_wq);
- 	dev_err(&pdev->dev, "%s failed (error %d)\n", __func__, err);
- 	return err;
- }
-@@ -1508,6 +1515,8 @@ static void mana_gd_cleanup(struct pci_dev *pdev)
- 	mana_hwc_destroy_channel(gc);
+-	hdr = buf;
++	hdr = hard_start;
+ 	gso = &hdr->gso;
  
- 	mana_gd_remove_irqs(pdev);
-+
-+	destroy_workqueue(gc->service_wq);
- 	dev_dbg(&pdev->dev, "mana gdma cleanup successful\n");
- }
+ 	if (!sock_hlen)
+-		memset(buf, 0, pad);
++		memset(hard_start, 0, headroom);
  
-diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-index 1ba4960..60f6bc1 100644
---- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
-+++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-@@ -112,11 +112,13 @@ out:
- static void mana_hwc_init_event_handler(void *ctx, struct gdma_queue *q_self,
- 					struct gdma_event *event)
- {
-+	union hwc_init_soc_service_type service_data;
- 	struct hw_channel_context *hwc = ctx;
- 	struct gdma_dev *gd = hwc->gdma_dev;
- 	union hwc_init_type_data type_data;
- 	union hwc_init_eq_id_db eq_db;
- 	u32 type, val;
-+	int ret;
+ 	if ((gso->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) &&
+ 	    vhost16_to_cpu(vq, gso->csum_start) +
+@@ -712,29 +711,29 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+ 			       vhost16_to_cpu(vq, gso->csum_start) +
+ 			       vhost16_to_cpu(vq, gso->csum_offset) + 2);
  
- 	switch (event->type) {
- 	case GDMA_EQE_HWC_INIT_EQ_ID_DB:
-@@ -199,7 +201,25 @@ static void mana_hwc_init_event_handler(void *ctx, struct gdma_queue *q_self,
+-		if (vhost16_to_cpu(vq, gso->hdr_len) > len) {
++		if (vhost16_to_cpu(vq, gso->hdr_len) > data_len) {
+ 			ret = -EINVAL;
+ 			goto err;
  		}
+ 	}
  
- 		break;
-+	case GDMA_EQE_HWC_SOC_SERVICE:
-+		service_data.as_uint32 = event->details[0];
-+		type = service_data.type;
-+		val = service_data.value;
+-	len -= sock_hlen;
+-	copied = copy_from_iter(buf + pad, len, from);
+-	if (copied != len) {
++	data_len -= sock_hlen;
++	copied = copy_from_iter(hard_start + headroom, data_len, from);
++	if (copied != data_len) {
+ 		ret = -EFAULT;
+ 		goto err;
+ 	}
  
-+		switch (type) {
-+		case GDMA_SERVICE_TYPE_RDMA_SUSPEND:
-+		case GDMA_SERVICE_TYPE_RDMA_RESUME:
-+			ret = mana_rdma_service_event(gd->gdma_context, type);
-+			if (ret)
-+				dev_err(hwc->dev, "Failed to schedule adev service event: %d\n",
-+					ret);
-+			break;
-+		default:
-+			dev_warn(hwc->dev, "Received unknown SOC service type %u\n", type);
-+			break;
-+		}
-+
-+		break;
- 	default:
- 		dev_warn(hwc->dev, "Received unknown gdma event %u\n", event->type);
- 		/* Ignore unknown events, which should never happen. */
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 2013d0e..39e01e2 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -2992,6 +2992,70 @@ idx_fail:
+-	xdp_init_buff(xdp, buflen, NULL);
+-	xdp_prepare_buff(xdp, buf, pad, len, true);
+-	hdr->buflen = buflen;
++	xdp_init_buff(xdp, frame_sz, NULL);
++	xdp_prepare_buff(xdp, hard_start, headroom, data_len, true);
++	hdr->buflen = frame_sz;
+ 
+ 	++nvq->batched_xdp;
+ 
+ 	return 0;
+ 
+ err:
+-	page_frag_free(buf);
++	page_frag_free(hard_start);
  	return ret;
  }
  
-+static void mana_handle_rdma_servicing(struct work_struct *work)
-+{
-+	struct mana_service_work *serv_work =
-+		container_of(work, struct mana_service_work, work);
-+	struct gdma_dev *gd = serv_work->gdma_dev;
-+	struct device *dev = gd->gdma_context->dev;
-+	int ret;
-+
-+	if (READ_ONCE(gd->rdma_teardown))
-+		goto out;
-+
-+	switch (serv_work->event) {
-+	case GDMA_SERVICE_TYPE_RDMA_SUSPEND:
-+		if (!gd->adev || gd->is_suspended)
-+			break;
-+
-+		remove_adev(gd);
-+		gd->is_suspended = true;
-+		break;
-+
-+	case GDMA_SERVICE_TYPE_RDMA_RESUME:
-+		if (!gd->is_suspended)
-+			break;
-+
-+		ret = add_adev(gd, "rdma");
-+		if (ret)
-+			dev_err(dev, "Failed to add adev on resume: %d\n", ret);
-+		else
-+			gd->is_suspended = false;
-+		break;
-+
-+	default:
-+		dev_warn(dev, "unknown adev service event %u\n",
-+			 serv_work->event);
-+		break;
-+	}
-+
-+out:
-+	kfree(serv_work);
-+}
-+
-+int mana_rdma_service_event(struct gdma_context *gc, enum gdma_service_type event)
-+{
-+	struct gdma_dev *gd = &gc->mana_ib;
-+	struct mana_service_work *serv_work;
-+
-+	if (gd->dev_id.type != GDMA_DEVICE_MANA_IB) {
-+		/* RDMA device is not detected on pci */
-+		return 0;
-+	}
-+
-+	serv_work = kzalloc(sizeof(*serv_work), GFP_ATOMIC);
-+	if (!serv_work)
-+		return -ENOMEM;
-+
-+	serv_work->event = event;
-+	serv_work->gdma_dev = gd;
-+
-+	INIT_WORK(&serv_work->work, mana_handle_rdma_servicing);
-+	queue_work(gc->service_wq, &serv_work->work);
-+
-+	return 0;
-+}
-+
- int mana_probe(struct gdma_dev *gd, bool resuming)
- {
- 	struct gdma_context *gc = gd->gdma_context;
-@@ -3172,11 +3236,16 @@ int mana_rdma_probe(struct gdma_dev *gd)
- 
- void mana_rdma_remove(struct gdma_dev *gd)
- {
-+	struct gdma_context *gc = gd->gdma_context;
-+
- 	if (gd->dev_id.type != GDMA_DEVICE_MANA_IB) {
- 		/* RDMA device is not detected on pci */
- 		return;
- 	}
- 
-+	WRITE_ONCE(gd->rdma_teardown, true);
-+	flush_workqueue(gc->service_wq);
-+
- 	if (gd->adev)
- 		remove_adev(gd);
- 
-diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-index ffa9820..3ce56a8 100644
---- a/include/net/mana/gdma.h
-+++ b/include/net/mana/gdma.h
-@@ -60,6 +60,7 @@ enum gdma_eqe_type {
- 	GDMA_EQE_HWC_INIT_DONE		= 131,
- 	GDMA_EQE_HWC_SOC_RECONFIG	= 132,
- 	GDMA_EQE_HWC_SOC_RECONFIG_DATA	= 133,
-+	GDMA_EQE_HWC_SOC_SERVICE	= 134,
- 	GDMA_EQE_RNIC_QP_FATAL		= 176,
- };
- 
-@@ -70,6 +71,18 @@ enum {
- 	GDMA_DEVICE_MANA_IB	= 3,
- };
- 
-+enum gdma_service_type {
-+	GDMA_SERVICE_TYPE_NONE		= 0,
-+	GDMA_SERVICE_TYPE_RDMA_SUSPEND	= 1,
-+	GDMA_SERVICE_TYPE_RDMA_RESUME	= 2,
-+};
-+
-+struct mana_service_work {
-+	struct work_struct work;
-+	struct gdma_dev *gdma_dev;
-+	enum gdma_service_type event;
-+};
-+
- struct gdma_resource {
- 	/* Protect the bitmap */
- 	spinlock_t lock;
-@@ -224,6 +237,8 @@ struct gdma_dev {
- 	void *driver_data;
- 
- 	struct auxiliary_device *adev;
-+	bool is_suspended;
-+	bool rdma_teardown;
- };
- 
- /* MANA_PAGE_SIZE is the DMA unit */
-@@ -409,6 +424,8 @@ struct gdma_context {
- 	struct gdma_dev		mana_ib;
- 
- 	u64 pf_cap_flags1;
-+
-+	struct workqueue_struct *service_wq;
- };
- 
- static inline bool mana_gd_is_mana(struct gdma_dev *gd)
-@@ -891,4 +908,6 @@ int mana_gd_destroy_dma_region(struct gdma_context *gc, u64 dma_region_handle);
- void mana_register_debugfs(void);
- void mana_unregister_debugfs(void);
- 
-+int mana_rdma_service_event(struct gdma_context *gc, enum gdma_service_type event);
-+
- #endif /* _GDMA_H */
-diff --git a/include/net/mana/hw_channel.h b/include/net/mana/hw_channel.h
-index 158b125..83cf933 100644
---- a/include/net/mana/hw_channel.h
-+++ b/include/net/mana/hw_channel.h
-@@ -49,6 +49,15 @@ union hwc_init_type_data {
- 	};
- }; /* HW DATA */
- 
-+union hwc_init_soc_service_type {
-+	u32 as_uint32;
-+
-+	struct {
-+		u32 value	: 28;
-+		u32 type	:  4;
-+	};
-+}; /* HW DATA */
-+
- struct hwc_rx_oob {
- 	u32 type	: 6;
- 	u32 eom		: 1;
 -- 
 2.43.0
 
