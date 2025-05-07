@@ -1,174 +1,122 @@
-Return-Path: <netdev+bounces-188714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 018FAAAE51E
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 17:43:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AD3DAAE5A3
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 17:58:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB4BC9886B9
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 15:42:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 819E718883DC
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 15:56:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACB9828B40B;
-	Wed,  7 May 2025 15:42:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6657828C02B;
+	Wed,  7 May 2025 15:54:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZCbUFM7B"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GdwszruL"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB8CF28B3FE
-	for <netdev@vger.kernel.org>; Wed,  7 May 2025 15:42:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B160F28BAB4
+	for <netdev@vger.kernel.org>; Wed,  7 May 2025 15:54:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746632530; cv=none; b=nG0np9v76b1gWm7AOiq6aLaJ9q37TYK35kCCI4uamDCKgZd6GjO0ulL8IrbLnavylMkQXu/HbkZdWsnh7pK9gAMWq/d1uJmEZwgCiTsuEmzSBaeZUj9nVaEhHTSZWFIfCLMgoGLKl5rUw4HLJbKzqN8IbUJGJ52lvrRzzv6u6CI=
+	t=1746633285; cv=none; b=X69SPn+eoExAXW35FYSQz6NrVekc4JsZJzW6LPrRagiZhH82JDHXxWAAiIYyXSVoCk+Ypg91FvShzP1zUJ9RwZ4xKSQtlrbUOrnLk6c1U+Oi7WJ1S7JPBHw9Yw/JXQc4yPNzAedLeP1uoDgCoxBCoOf4QV4u47vtseuBPgLqyCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746632530; c=relaxed/simple;
-	bh=kNco2fCmuCqlZLOuCofYzSrVlJqJQWrGuA4zIfOv1wQ=;
+	s=arc-20240116; t=1746633285; c=relaxed/simple;
+	bh=ZTmRocbIlgidCiB8qAhF5u3HCmGNgSbVOzCnAG6cxyY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kFhhXckp/DGUyVqNfPnfk0YmTRnKqZk4KTX+pZEuVpW+yMmKgHLpvyM1UN6OLTrG6HUVFkEyFtf4x/AXJw/2XFiXU5QE14b+r3sTQtdNctQqg3WG9D/K9ROGM4U/MJOksbeL0/1KH3xign4JcgOygSnWv5bkKfhe3L9h8JgFVIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZCbUFM7B; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746632527;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+lio/+Ao1S9W+X9/4Leo17kpbIzqZzZSZhwzb8sw/wo=;
-	b=ZCbUFM7BUiI9dAfcbh+RK/Le+9z3iXKXtSxHSgZImUuX7XoYPwkCSfOhUSHP1zuExq6th+
-	CaynI8NOA3wxaaFHohhiPJI0tHWPLpibFqjYBk849lzAtK/IbXOVNcLFWSp5oNyFoN7YCd
-	Y4A9KlLSNYEwTu4V0fcRK6zpgfFavLQ=
-Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
- [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-261-1eK-9TwLPSKAVwjeB1L8SQ-1; Wed, 07 May 2025 11:42:06 -0400
-X-MC-Unique: 1eK-9TwLPSKAVwjeB1L8SQ-1
-X-Mimecast-MFC-AGG-ID: 1eK-9TwLPSKAVwjeB1L8SQ_1746632526
-Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-708aca58513so92637867b3.0
-        for <netdev@vger.kernel.org>; Wed, 07 May 2025 08:42:06 -0700 (PDT)
+	 To:Cc:Content-Type; b=GSMErfix7a0KOWPrZJrS5qcYVa/3DOe3uMKnUlNy7WJ4BLttTrDpHgiexS57oY2WqczCIKsfaSVfW9oxRqi8JVHoUKfWrx9H1WUFCF/q4ejjiwbp0g4yTgiV6GspzOcNua/B9SuT1qm2JVxnT8ukSxEOcYuh0nXPpLg23BMWGlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GdwszruL; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5fbee929e56so2002797a12.0
+        for <netdev@vger.kernel.org>; Wed, 07 May 2025 08:54:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746633282; x=1747238082; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=B6HVL9BX+MplgPxa8q0GRBwUe8Z4JNQg8ytJJS9YZi4=;
+        b=GdwszruLRUxd3cxD8ve7Gr43f0W/5fzo7M4OicdCCLyvJiwR0EfoZW4o1/oMjp+sBL
+         7DRBmlWQcpzf3c0g3VtbiAvYcblcF0Byi3His842XDVUnF4DGenFe9rcUJNjsyv6xONE
+         gJNVM6T2cMZ8mUFBMuikuj+Ie1rbnPsv7D+Qlt2trz8Jac6K8z6noyeQZdJymGiYPb0A
+         Fy81FD+PZT2PrNC0XuHFxW8VIM1U+XDb7PDsvE97U25Xf6z2P2+sOY88EyO/OxnYB9bk
+         92EAhbRNShO4dbNedaXZVbQBI2TJZlvOit94XVlah8+8OuhOcHNukRp7eThp1OKTtfUc
+         3dPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746632526; x=1747237326;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+lio/+Ao1S9W+X9/4Leo17kpbIzqZzZSZhwzb8sw/wo=;
-        b=hjHnEvK1pfnxP9wWOYjVoh0SMvvtczOMjCWGnR62WU999VM/5iSaMrmMWRVYSpTMdb
-         uEe5JiNhpzxEGwJtso5CLM3MUJYU8llFvqkJgCQnMeLQMaoMqI93oCZRToVvncfl+xEq
-         xr2tpU8u50OfvJ0OBKWQfW6pJnEtvsFgYmOBul0mWUo698T84Pe+wh8F3FNk4bXajocr
-         Bm6kEUIKw3d/oHEbLVtdbVa/VVMjYm+L5aQuIWKFzykOlXU/bF4eI1PQ6rKM+rVDaNOT
-         XBBMd3afwkaCqxSiML6QfUWMPmt2YTV7rWr79mytAgcnE88v0w9f9wngZWbHtXAwn0+f
-         hUrg==
-X-Forwarded-Encrypted: i=1; AJvYcCWXZ0WmSbnOQP2GYQFOUWD1zmm+LRhMGvI1JNPTZmUvc57Oe/xcbGrRyzTlqAZ0gX+qaJr7/0Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+Jk24tjG6C21ZGZrQSQTgVZ/ZUrC3ZTRenukdPWpW2cdzn6KR
-	wIosMtJ/uKIZaheOzg75w39oFgaToH8KKec9nNwUwx0nl8S1N3kWdzJQJNuZHj5Y+zZX+K1PAWG
-	fdn0PWZJocmDTzvvvC+5Y0Opu+PAhnzFi1JUe84BPKMnLAHIjuI8Q43XR3lxrX70Npbz5vExkU0
-	9DmOHqf5upF95K9PO54SMEy8iJcqG/KXXongWE
-X-Gm-Gg: ASbGnctDgYu16XzGtrOxiBNiNqw7fqLsciMLQIiKK+782m2dGPRdE8o6Uf/mcoWCDzM
-	mBYPsDtcD8j+wTSveYLY58AqcV7f5Aem3LY3uVQPv0SFvwZb3K1wx5FfFn+C6SMUx90KesQ==
-X-Received: by 2002:a05:690c:7204:b0:703:d0b5:7abc with SMTP id 00721157ae682-70a1d9f796amr52747627b3.9.1746632525932;
-        Wed, 07 May 2025 08:42:05 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG8lPZotZaA5SL3FWz6OPzfNFbWEJ+cXzbhHRMG1e8KklFqxYBqaKjznxq7FTFilMNXTgNWtfPjnZtzwsZAvl4=
-X-Received: by 2002:a05:690c:7204:b0:703:d0b5:7abc with SMTP id
- 00721157ae682-70a1d9f796amr52747237b3.9.1746632525562; Wed, 07 May 2025
- 08:42:05 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1746633282; x=1747238082;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=B6HVL9BX+MplgPxa8q0GRBwUe8Z4JNQg8ytJJS9YZi4=;
+        b=VHVt0BShts/U62TALT/9qbOYRj++/xTnsHlhwJjXw1PSzXePU3Gmz0ppKguU+Z+4aA
+         NF/AeJH2oYYjFV8iY5H6KbXJxKaZrdUymJYZ+AkjHCvuILfEbcCZSseAZN6A23BTDM+p
+         oorRma89mNiniCTih4EH5vuUjr90l4AuHekE7Yy0N+WYtJapLuXA57Yw3jGkfST1LP1P
+         66tmp0j+A6WQtxkRj2CUJgZQHeI1ZJBAKCYsfcJnLj3Jw7/Rk375JYp1gNx6sLW+G8Ru
+         FzWYaMb0XvSJBw8FxDl1hx7J7YRs+XmqiPYJ4eSbuzdIYbeMmnONMM20DcrXzTyZhEls
+         k4uw==
+X-Forwarded-Encrypted: i=1; AJvYcCVm/iPi+CHg44xoPfgyMyPU1AzI4K4M7PC/o4P5Ld1Pbac8YeHnBfzBAV2ue9srGPDBVAbx3cE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZwjyvKkG3JoBikXzYhAXWyA7mRjoksOkdsg1CcE7SvTfDgwWF
+	Bd/wvHwzkpcwRnhVWaPrcZMyJlP2KHMfGSb8F3sGXURuKBo2Y32rPOlwfg7xxuBZy8Z0Vz7bdEg
+	jLzqDqwzHQlRUX0mRj8pwk7aUku4=
+X-Gm-Gg: ASbGncvmKKS0VAMWNfg7RpuXrmqMzgLvJGmOl1w7G1QpE8IH9ck/FsWDj16O85iCH5r
+	gVDyrx//EarVw9RYiJ1qYGtxLfU90rF2hWAa5kRAu08CrZfAnVxPPRVVJknfcuBu9fBKhuwAMjB
+	Fv/C1fEr5/OrWPXSPii984awyWpn30ADU9AQ==
+X-Google-Smtp-Source: AGHT+IGl8VIgo/rRLJkE1yiyZm2FLFgx6Y1+8OGwrDDf7ItJ/KRqA1QFBb08quZbIyylqSLrwp2XEObYZK7ahUPgfpI=
+X-Received: by 2002:a05:6402:26d2:b0:5fa:fcda:bf57 with SMTP id
+ 4fb4d7f45d1cf-5fbe9e53b69mr3431797a12.17.1746633281702; Wed, 07 May 2025
+ 08:54:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250507151456.2577061-1-kshk@linux.ibm.com>
-In-Reply-To: <20250507151456.2577061-1-kshk@linux.ibm.com>
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Wed, 7 May 2025 17:41:54 +0200
-X-Gm-Features: ATxdqUEJ8STQu0YGygVRKeGWq1W_9YLNgZZxTRzXDHhASTqBwvXiIOk6Dpf4Fis
-Message-ID: <CAGxU2F6ssoadHjCH9qi6HdaproC3rH=d-CdYh2mvK+_X4-C4nw@mail.gmail.com>
-Subject: Re: [PATCH net v2] vsock/test: Fix occasional failure in SIOCOUTQ tests
-To: Konstantin Shkolnyy <kshk@linux.ibm.com>
-Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, mjrosato@linux.ibm.com
+References: <20250506140858.2660441-1-ap420073@gmail.com> <20250506195526.2ab7c15b@kernel.org>
+ <CAMArcTUx5cK2kh2M8BirtQRG5Qt+ArwZ_a=xwi_bTHyKJ7E+og@mail.gmail.com> <20250507062321.4acdf9e6@kernel.org>
+In-Reply-To: <20250507062321.4acdf9e6@kernel.org>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Thu, 8 May 2025 00:54:30 +0900
+X-Gm-Features: ATxdqUFjUKfefZ3y4ZtxFZK7swtA06XlsLH_JyBVmPclqvxrtHB9WG08ksK2Fjo
+Message-ID: <CAMArcTW4-4=4XR+KshpPqVKXgTRNmXdwATrij9gAgYKrpOcOTw@mail.gmail.com>
+Subject: Re: [PATCH net v2] net: devmem: fix kernel panic when socket close
+ after module unload
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
+	andrew+netdev@lunn.ch, horms@kernel.org, almasrymina@google.com, 
+	sdf@fomichev.me, netdev@vger.kernel.org, asml.silence@gmail.com, 
+	dw@davidwei.uk, skhawaja@google.com, willemb@google.com, jdamato@fastly.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 7 May 2025 at 17:15, Konstantin Shkolnyy <kshk@linux.ibm.com> wrote:
+On Wed, May 7, 2025 at 10:23=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
 >
-> These tests:
->     "SOCK_STREAM ioctl(SIOCOUTQ) 0 unsent bytes"
->     "SOCK_SEQPACKET ioctl(SIOCOUTQ) 0 unsent bytes"
-> output: "Unexpected 'SIOCOUTQ' value, expected 0, got 64 (CLIENT)".
+> On Wed, 7 May 2025 13:55:44 +0900 Taehee Yoo wrote:
+> > So, it acquires a socket lock only for setting binding->dev to NULL,
+> > right?
 >
-> They test that the SIOCOUTQ ioctl reports 0 unsent bytes after the data
-> have been received by the other side. However, sometimes there is a delay
-> in updating this "unsent bytes" counter, and the test fails even though
-> the counter properly goes to 0 several milliseconds later.
+> Yes.
 >
-> The delay occurs in the kernel because the used buffer notification
-> callback virtio_vsock_tx_done(), called upon receipt of the data by the
-> other side, doesn't update the counter itself. It delegates that to
-> a kernel thread (via vsock->tx_work). Sometimes that thread is delayed
-> more than the test expects.
+> BTW one more tiny nit pick:
 >
-> Change the test to poll SIOCOUTQ until it returns 0 or a timeout occurs.
+>                 net_devmem_unbind_dmabuf(binding);
+> +               mutex_unlock(&priv->lock);       << unlock
+>                 netdev_unlock(dev);
+> +               netdev_put(dev, &dev_tracker);
+> +               mutex_lock(&priv->lock);         << re-lock
 >
-> Signed-off-by: Konstantin Shkolnyy <kshk@linux.ibm.com>
-> ---
-> Changes in v2:
->  - Use timeout_check() to end polling, instead of counting iterations.
+> The two marked ops are unnecessary. We only have to acquire the locks
+> in order. Its perfectly fine to release netdev_unlock() and keep holding
+> the socket lock.
 
-Why removing the sleep?
+Wow, I didn't know that.
+As my knowledge is only ABBA is correct, and I've never thought about
+whether ABAB is possible or not.
+I will change it.
 
-Thanks,
-Stefano
-
->
->  tools/testing/vsock/vsock_test.c | 28 ++++++++++++++++------------
->  1 file changed, 16 insertions(+), 12 deletions(-)
->
-> diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-> index d0f6d253ac72..613551132a96 100644
-> --- a/tools/testing/vsock/vsock_test.c
-> +++ b/tools/testing/vsock/vsock_test.c
-> @@ -1264,21 +1264,25 @@ static void test_unsent_bytes_client(const struct test_opts *opts, int type)
->         send_buf(fd, buf, sizeof(buf), 0, sizeof(buf));
->         control_expectln("RECEIVED");
->
-> -       ret = ioctl(fd, SIOCOUTQ, &sock_bytes_unsent);
-> -       if (ret < 0) {
-> -               if (errno == EOPNOTSUPP) {
-> -                       fprintf(stderr, "Test skipped, SIOCOUTQ not supported.\n");
-> -               } else {
-> +       /* SIOCOUTQ isn't guaranteed to instantly track sent data. Even though
-> +        * the "RECEIVED" message means that the other side has received the
-> +        * data, there can be a delay in our kernel before updating the "unsent
-> +        * bytes" counter. Repeat SIOCOUTQ until it returns 0.
-> +        */
-> +       timeout_begin(TIMEOUT);
-> +       do {
-> +               ret = ioctl(fd, SIOCOUTQ, &sock_bytes_unsent);
-> +               if (ret < 0) {
-> +                       if (errno == EOPNOTSUPP) {
-> +                               fprintf(stderr, "Test skipped, SIOCOUTQ not supported.\n");
-> +                               break;
-> +                       }
->                         perror("ioctl");
->                         exit(EXIT_FAILURE);
->                 }
-> -       } else if (ret == 0 && sock_bytes_unsent != 0) {
-> -               fprintf(stderr,
-> -                       "Unexpected 'SIOCOUTQ' value, expected 0, got %i\n",
-> -                       sock_bytes_unsent);
-> -               exit(EXIT_FAILURE);
-> -       }
-> -
-> +               timeout_check("SIOCOUTQ");
-> +       } while (sock_bytes_unsent != 0);
-> +       timeout_end();
->         close(fd);
->  }
->
-> --
-> 2.34.1
->
-
+Thank you so much!
+Taehee Yoo
 
