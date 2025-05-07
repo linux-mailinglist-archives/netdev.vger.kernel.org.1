@@ -1,441 +1,181 @@
-Return-Path: <netdev+bounces-188684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA908AAE332
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 16:39:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 328E7AAE32E
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 16:38:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7959461C4B
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 14:34:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 517F71BA5EF9
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 14:36:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0980280A57;
-	Wed,  7 May 2025 14:34:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2422289372;
+	Wed,  7 May 2025 14:35:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="H9We1YYi"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="rXUEyQZw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-10627.protonmail.ch (mail-10627.protonmail.ch [79.135.106.27])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B1642820A6
-	for <netdev@vger.kernel.org>; Wed,  7 May 2025 14:34:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.27
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAB9B289365;
+	Wed,  7 May 2025 14:35:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746628455; cv=none; b=pzYNFScIgTzFE1ZSBHNfcQyStpyXxvN2S33c1yaJgjzK9vmDgwcNXU5B3UlStdjHzZB8XP7k6Bsy7InQdbK7INTXwIrCno3zhZc7ycP0Gavq1lJZXDBvPTs+M+wje49CsG4hOGjoW93tPB7p9yQP697t75DNIAC7DTduuDtB/yc=
+	t=1746628523; cv=none; b=kXexxddIwrGfKdvIv7dASOfRArz0BOqsRhvSg9x2z9U86tBsmSDKZyoQy3IzD2QmUkWd2eZ13NAEayxud6FBgUgnXGd+feHfgpL2DXQ3mcLJMOGG2NRnB/+pbzNNi2I77b4CJuw/iWB2Z3ZCJwFlK3TK/0dxHRtHuUkqoJ00CDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746628455; c=relaxed/simple;
-	bh=UhbC5hchFXdc+ZI6cDoRYjtqWd6QUeNLpt7k1Bmevo4=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qz48RYvEaBwgK3YXVeW3CxHkHT+J/izgg/rEUg+IXhvCUAtErChRzFt0JNbHpa++OyAuhQYa/muQrZ+zeCo/ruL2xeUSga9NvPTDWEFnoV1g0LqeDkAN6c5ds4PHigJpWhzzIG0/RIJtEvbWWEb1rFzy/d13bebks9ZqLJZCE6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=H9We1YYi; arc=none smtp.client-ip=79.135.106.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
-	s=protonmail; t=1746628447; x=1746887647;
-	bh=8s/OMk2iWLQtEEmkhc3F3dBuPDTjP1KSKEE+R6giHhs=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
-	b=H9We1YYiF+nKlR0/gkMKbERn+pxcULGDk2ky90ulz/d+vsEpmAT7PuqnopcBrP4c8
-	 wbvrUMuUKJDvrYTBfIeALn8AOeLaIxmhOKCi9prxwkgeV2uiteySNrTglyTIkOuzD6
-	 VjEvzNxW73aVsE6sBEX0F36g4RTkJ4UryJbBIurL0E9JDrf9/ALUYh2z9dHOD14Te5
-	 vm9iYnv6v9PUcjR9qOSjFkrN/dozynxzI5mr68lmWGAJx6L0IeIps4d6Xq5Qx4f5aw
-	 rUa04bYdv3/vqt1qutaKaBfboT55sS/jdOvEUJ2vZ97D6vqaIaYo8PsJvOWUOMg5Ut
-	 mbvUYAEuPZ+Vw==
-Date: Wed, 07 May 2025 14:34:03 +0000
-To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: William Liu <will@willsroot.io>
-Cc: Savy <savy@syst3mfailure.io>
-Subject: Re: [BUG] net/sched: Soft Lockup/Task Hang and OOM Loop in netem_dequeue
-Message-ID: <ozCLTfvSrpDG8cTUEFFXkgVy0HAHYPswyFXCXCa3pXZDM2uD7IiyaMVpz_RcAKAzbt73Q3FBCLP6Ij6ruY79E796PyN1lrEGd7Y5tnBIUx4=@willsroot.io>
-In-Reply-To: <8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1ilxsEBNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=@willsroot.io>
-References: <8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1ilxsEBNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=@willsroot.io>
-Feedback-ID: 42723359:user:proton
-X-Pm-Message-ID: c809410728ec932e2bd8f746c124d0d032da6bc0
+	s=arc-20240116; t=1746628523; c=relaxed/simple;
+	bh=nEZ/X/CSa6CpJDBkA277TD/Y7XJmH0AfsOiAQ8MtW+A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gnnDa8PcUYxKeHIPA1EENUo453tvjK/3bF/JbAQzp0k+tWkIF6PVfEAiuK9wazNioMs0476Ddnkk5r9Lv0gsaCCmsOBuanoL6koD6byhiPtFEMEe52BulNVRlewkgZjYixctozge6oNEPO1jZ2sh/5W37/+88nHiS0e7qwxxX/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=rXUEyQZw; arc=none smtp.client-ip=212.227.15.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
+	s=s31663417; t=1746628509; x=1747233309; i=wahrenst@gmx.net;
+	bh=Ut6H0hDVHeAmPZH3h31kBg4T5UPa/h5BzSiJ1oq/iGo=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=rXUEyQZwXOAJnYHbD3SY9uBkl2/+qlpXK8TJOF/kH/rYdyv7KEV4KKQ2k8+KSRDB
+	 G5B5CvWjwLzyIn2/3eTseH9yYoDUA3Mf4J2tf2njvASc2mjBXc1EdHmJKqumQVPJJ
+	 AAqQOpaMP3nRHEkL2Vxf5vguz/9JS+QHc80eNwcBGZHnIyK+CVNdMwjA2uiSA6/MT
+	 nRk1RWehnVFo0gfB5AcJ5+nEtaFci4p6JkMBzFxkDnTuByWhCFzAHrwCk/6XQRJmi
+	 +0GWic9I4R2RKn7i8eW6/JD7/xILsatdcQBnH4GIVBjTcgOFGDwusi+pndXxlIDlT
+	 l5K3WdZMU0Wcx1As6A==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [192.168.1.101] ([91.41.216.208]) by mail.gmx.net (mrgmx004
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MNswE-1uNc6H0OrY-00Oqtt; Wed, 07
+ May 2025 16:35:09 +0200
+Message-ID: <c9c2f4cb-614e-496a-852b-ca8af034c2c1@gmx.net>
+Date: Wed, 7 May 2025 16:35:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/5] net: vertexcom: mse102x: Add warning about
+ IRQ trigger type
+To: kernel test robot <lkp@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org
+References: <20250505142427.9601-3-wahrenst@gmx.net>
+ <202505071827.nbdcs1rW-lkp@intel.com>
+Content-Language: en-US
+From: Stefan Wahren <wahrenst@gmx.net>
+Autocrypt: addr=wahrenst@gmx.net; keydata=
+ xjMEZ1dOJBYJKwYBBAHaRw8BAQdA7H2MMG3q8FV7kAPko5vOAeaa4UA1I0hMgga1j5iYTTvN
+ IFN0ZWZhbiBXYWhyZW4gPHdhaHJlbnN0QGdteC5uZXQ+wo8EExYIADcWIQT3FXg+ApsOhPDN
+ NNFuwvLLwiAwigUCZ1dOJAUJB4TOAAIbAwQLCQgHBRUICQoLBRYCAwEAAAoJEG7C8svCIDCK
+ JQ4BAP4Y9uuHAxbAhHSQf6UZ+hl5BDznsZVBJvH8cZe2dSZ6AQCNgoc1Lxw1tvPscuC1Jd1C
+ TZomrGfQI47OiiJ3vGktBc44BGdXTiQSCisGAQQBl1UBBQEBB0B5M0B2E2XxySUQhU6emMYx
+ f5QR/BrEK0hs3bLT6Hb9WgMBCAfCfgQYFggAJhYhBPcVeD4Cmw6E8M000W7C8svCIDCKBQJn
+ V04kBQkHhM4AAhsMAAoJEG7C8svCIDCKJxoA/i+kqD5bphZEucrJHw77ujnOQbiKY2rLb0pE
+ aHMQoiECAQDVbj827W1Yai/0XEABIr8Ci6a+/qZ8Vz6MZzL5GJosAA==
+In-Reply-To: <202505071827.nbdcs1rW-lkp@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:HM+jVi0Q2F+6Nvpk2DtOxtn3Uwzm6lnAPq3bASXL6d2VB8Xg5fq
+ gVRdsT6+VY/qdEHHnZo7XeOwgH5IcMiwoXZJflsw3l12VVCYC4Pdr5AWKrpks0YoAoZbPkH
+ MF0AXj0/swToxOGX2XPw+zhrfPi1TW66uAhotICX62Ispg+yMlq+Gu1LbO9aMNozkBRGNgm
+ nUhoOa3W+xBm1y20rWPlg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:GxDhRsOPVo8=;9aw5O2splymu8Yz1Jeu+1+BUt4Q
+ 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
+ 6JtmM901eMbAUuCAXEPEmrruX
 
-On Tuesday, May 6th, 2025 at 4:08 PM, William Liu <will@willsroot.io> wrote=
-:
+Am 07.05.25 um 12:25 schrieb kernel test robot:
+> Hi Stefan,
+>
+> kernel test robot noticed the following build errors:
+>
+> [auto build test ERROR on net-next/main]
+>
+> url:    https://github.com/intel-lab-lkp/linux/commits/Stefan-Wahren/dt-=
+bindings-vertexcom-mse102x-Fix-IRQ-type-in-example/20250505-222628
+> base:   net-next/main
+> patch link:    https://lore.kernel.org/r/20250505142427.9601-3-wahrenst%=
+40gmx.net
+> patch subject: [PATCH net-next 2/5] net: vertexcom: mse102x: Add warning=
+ about IRQ trigger type
+> config: s390-allyesconfig (https://download.01.org/0day-ci/archive/20250=
+507/202505071827.nbdcs1rW-lkp@intel.com/config)
+> compiler: s390-linux-gcc (GCC) 14.2.0
+> reproduce (this is a W=3D1 build): (https://download.01.org/0day-ci/arch=
+ive/20250507/202505071827.nbdcs1rW-lkp@intel.com/reproduce)
+>
+> If you fix the issue in a separate patch/commit (i.e. not just a new ver=
+sion of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202505071827.nbdcs1rW-lk=
+p@intel.com/
+>
+> All errors (new ones prefixed by >>):
+>
+>     drivers/net/ethernet/vertexcom/mse102x.c: In function 'mse102x_net_o=
+pen':
+>>> drivers/net/ethernet/vertexcom/mse102x.c:525:37: error: implicit decla=
+ration of function 'irq_get_irq_data'; did you mean 'irq_set_irq_wake'? [-=
+Wimplicit-function-declaration]
+>       525 |         struct irq_data *irq_data =3D irq_get_irq_data(ndev-=
+>irq);
+>           |                                     ^~~~~~~~~~~~~~~~
+>           |                                     irq_set_irq_wake
+>
+this issue has already been reported by Jakub. I will add the missing=20
+include in the next round. Sorry about that.
 
->=20
->=20
-> Hi all,
->=20
-> We've encountered and triaged the following bug in sch_netem.c. It came u=
-p on a modified version of Syzkaller we're working on for a research projec=
-t. It works on upstream (02ddfb981de88a2c15621115dd7be2431252c568), the 6.6=
- LTS branch, and the 6.1 LTS branch. This commit (https://git.kernel.org/pu=
-b/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3Df8d4bc455047cf3903cd=
-6f85f49978987dbb3027) enabled the erroneous behavior, despite making the ql=
-en behavior according to those of a classful qdisc. The root cause though, =
-has existed since 2005 with the strange duplication handling behavior from =
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?=
-id=3D0afb51e72855971dba83b3c6b70c547c2d1161fd.
->=20
-> Here is the setup for a PoC. All VMs are booted with the following parame=
-ters:
->=20
-> qemu-system-x86_64 \
-> -m 4G \
-> -smp 2 \
-> -kernel $KERNEL/arch/x86/boot/bzImage \
-> -append "console=3DttyS0 root=3D/dev/sda earlyprintk=3Dserial net.ifnames=
-=3D0" \
-> -drive file=3D$IMAGE/bullseye.img,format=3Draw \
-> -snapshot \
-> -net user,host=3D10.0.2.10,hostfwd=3Dtcp:127.0.0.1:10021-:22 \
-> -net nic,model=3De1000 \
-> -enable-kvm \
-> -nographic
->=20
-> Now, run:
->=20
-> tc qdisc add dev lo root handle 1: netem limit 1 duplicate 100%
-> tc qdisc add dev lo parent 1: handle 2: netem gap 1 limit 1 duplicate 100=
-% delay 1us reorder 100%
-> ping -I lo -f -c1 -s48 -W0.001 127.0.0.1
->=20
-> We can achieve the following soft lockup:
->=20
-> [ 48.636305] watchdog: BUG: soft lockup - CPU#1 stuck for 26s! [ping:224]
-> [ 48.636322] Modules linked in:
-> [ 48.636328] irq event stamp: 85238283
-> [ 48.636332] hardirqs last enabled at (85238282): [<ffffffff8140f3a7>] kt=
-ime_get+0x187/0x210
->=20
-> [ 48.636369] hardirqs last disabled at (85238283): [<ffffffff82c5475e>] s=
-ysvec_apic_timer_interrupt+0xe/0x80
->=20
-> [ 48.636386] softirqs last enabled at (5206): [<ffffffff825cc028>] neigh_=
-resolve_output+0x2b8/0x340
->=20
-> [ 48.636405] softirqs last disabled at (5210): [<ffffffff825ad1aa>] __dev=
-_queue_xmit+0x8a/0x2110
->=20
-> [ 48.636430] CPU: 1 UID: 0 PID: 224 Comm: ping Not tainted 6.15.0-rc3-000=
-94-g02ddfb981de8-dirty #18 PREEMPT(voluntary)
-> [ 48.636447] Hardware name: QEMU Ubuntu 24.04 PC (i440FX + PIIX, 1996), B=
-IOS 1.16.3-debian-1.16.3-2 04/01/2014
-> [ 48.636454] RIP: 0010:netem_enqueue+0x6/0x15f0
-> [ 48.636470] Code: 89 d8 5b 5d 41 5c c3 cc cc cc cc bb ea ff ff ff eb c8 =
-66 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 41 57 <41=
-> 56 41 55 49 89 d5 41 54 49 89 fc 55 53 48 89 f3 48 83 ec 5
->=20
-> [ 48.636482] RSP: 0018:ffffc90000f5f8f0 EFLAGS: 00000293
-> [ 48.636491] RAX: ffffffff8268e400 RBX: ffff888108b38800 RCX: ffffffff826=
-8c996
-> [ 48.636500] RDX: ffffc90000f5f900 RSI: ffff888108b39000 RDI: ffff888092b=
-de400
-> [ 48.636508] RBP: ffff888092bde400 R08: 0000000000000007 R09: 00000000000=
-00000
-> [ 48.636516] R10: 0000000000000000 R11: 0000000000000001 R12: ffff888108b=
-38ac0
-> [ 48.636523] R13: 000000000000005a R14: ffff888108b39000 R15: 00000000000=
-00000
-> [ 48.636536] FS: 00007f4774777000(0000) GS:ffff8881b755a000(0000) knlGS:0=
-000000000000000
-> [ 48.636546] CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [ 48.636554] CR2: 0000563899d4b794 CR3: 0000000102242000 CR4: 00000000000=
-006f0
-> [ 48.636563] Call Trace:
-> [ 48.636567] <TASK>
->=20
-> [ 48.636573] netem_dequeue+0x2c5/0x480
-> [ 48.636590] __qdisc_run+0xdb/0x9e0
-> [ 48.636613] __dev_queue_xmit+0xec2/0x2110
-> [ 48.636638] ? lock_acquire+0xbb/0x2d0
-> [ 48.636657] ? ip_finish_output2+0x2cc/0xd40
-> [ 48.636671] ? find_held_lock+0x2b/0x80
-> [ 48.636683] ? skb_push+0x39/0x70
-> [ 48.636701] ? eth_header+0xe3/0x140
-> [ 48.636716] neigh_resolve_output+0x211/0x340
-> [ 48.636734] ip_finish_output2+0x2cc/0xd40
-> [ 48.636752] __ip_finish_output.part.0+0xda/0x1c0
-> [ 48.636770] ip_output+0x17b/0x6f0
-> [ 48.636785] ? __pfx_ip_finish_output+0x10/0x10
-> [ 48.636799] ? __pfx_ip_output+0x10/0x10
-> [ 48.636816] ip_push_pending_frames+0x1ed/0x310
-> [ 48.636836] raw_sendmsg+0xbfa/0x1cb0
-> [ 48.636862] ? lock_acquire+0xbb/0x2d0
-> [ 48.636892] ? __might_fault+0x6f/0xb0
-> [ 48.636914] ? __pfx_raw_sendmsg+0x10/0x10
-> [ 48.636932] inet_sendmsg+0xc0/0xd0
-> [ 48.636949] __sys_sendto+0x29a/0x2e0
-> [ 48.636987] __x64_sys_sendto+0x28/0x30
-> [ 48.636998] do_syscall_64+0xbb/0x1d0
-> [ 48.637015] entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> [ 48.637029] RIP: 0033:0x7f47749f7046
-> [ 48.637040] Code: 0e 0d 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f =
-1f 00 41 89 ca 64 8b 04 25 18 00 00 00 85 c0 75 11 b8 2c 00 00 00 0f 05 <48=
-> 3d 00 f0 ff ff 77 72 c3 90 55 48 83 ec 30 44 89 4c 24 2c 9
->=20
-> [ 48.637052] RSP: 002b:00007ffe5bd1ed28 EFLAGS: 00000246 ORIG_RAX: 000000=
-000000002c
-> [ 48.637062] RAX: ffffffffffffffda RBX: 00007ffe5bd204b0 RCX: 00007f47749=
-f7046
-> [ 48.637070] RDX: 0000000000000038 RSI: 00005638a58d0950 RDI: 00000000000=
-00003
-> [ 48.637078] RBP: 00005638a58d0950 R08: 00007ffe5bd2272c R09: 00000000000=
-00010
-> [ 48.637085] R10: 0000000000000000 R11: 0000000000000246 R12: 00000000000=
-00038
-> [ 48.637091] R13: 00007ffe5bd20470 R14: 00007ffe5bd1ed30 R15: 0000001d000=
-00001
-> [ 48.637107] </TASK>
->=20
-> [ 54.939688] ping: page allocation failure: order:0, mode:0x40820(GFP_ATO=
-MIC|__GFP_COMP), nodemask=3D(null),cpuset=3D/,mems_allowed=3D0
-> [ 54.943358] CPU: 1 UID: 0 PID: 224 Comm: ping Tainted: G L 6.15.0-rc3-00=
-094-g02ddfb981de8-dirty #18 PREEMPT(voluntary)
-> [ 54.943377] Tainted: [L]=3DSOFTLOCKUP
-> [ 54.943381] Hardware name: QEMU Ubuntu 24.04 PC (i440FX + PIIX, 1996), B=
-IOS 1.16.3-debian-1.16.3-2 04/01/2014
-> [ 54.943390] Call Trace:
-> [ 54.943395] <TASK>
->=20
-> [ 54.943401] dump_stack_lvl+0xf4/0x120
-> [ 54.943422] warn_alloc+0x15d/0x1e0
-> [ 54.943449] __alloc_frozen_pages_noprof+0x7ca/0x10f0
-> [ 54.943488] ? __sanitizer_cov_trace_switch+0x54/0x90
-> [ 54.943509] alloc_pages_mpol+0x6b/0x190
-> [ 54.943527] new_slab+0x2b3/0x360
-> [ 54.943545] ___slab_alloc+0x941/0xfd0
-> [ 54.943561] ? find_held_lock+0x2b/0x80
-> [ 54.943575] ? skb_clone+0xae/0x2b0
-> [ 54.943595] ? ___slab_alloc+0x442/0xfd0
-> [ 54.943613] ? skb_clone+0xae/0x2b0
-> [ 54.943626] ? kmem_cache_alloc_noprof+0x1bd/0x3e0
-> [ 54.943644] kmem_cache_alloc_noprof+0x1bd/0x3e0
-> [ 54.943666] skb_clone+0xae/0x2b0
-> [ 54.943681] netem_enqueue+0xc1a/0x15f0
-> [ 54.943701] netem_enqueue+0x19a/0x15f0
-> [ 54.943717] ? kvm_clock_get_cycles+0x40/0x70
-> [ 54.943734] netem_dequeue+0x2c5/0x480
-> [ 54.943751] __qdisc_run+0xdb/0x9e0
-> [ 54.943773] __dev_queue_xmit+0xec2/0x2110
-> [ 54.943797] ? lock_acquire+0xbb/0x2d0
-> [ 54.943816] ? ip_finish_output2+0x2cc/0xd40
-> [ 54.943830] ? find_held_lock+0x2b/0x80
-> [ 54.943844] ? skb_push+0x39/0x70
-> [ 54.943862] ? eth_header+0xe3/0x140
-> [ 54.943878] neigh_resolve_output+0x211/0x340
-> [ 54.943897] ip_finish_output2+0x2cc/0xd40
-> [ 54.943915] __ip_finish_output.part.0+0xda/0x1c0
-> [ 54.943933] ip_output+0x17b/0x6f0
-> [ 54.943949] ? __pfx_ip_finish_output+0x10/0x10
-> [ 54.943963] ? __pfx_ip_output+0x10/0x10
-> [ 54.943978] ip_push_pending_frames+0x1ed/0x310
-> [ 54.943996] raw_sendmsg+0xbfa/0x1cb0
-> [ 54.944021] ? lock_acquire+0xbb/0x2d0
-> [ 54.944039] ? __might_fault+0x6f/0xb0
-> [ 54.944060] ? __pfx_raw_sendmsg+0x10/0x10
-> [ 54.944078] inet_sendmsg+0xc0/0xd0
-> [ 54.944094] __sys_sendto+0x29a/0x2e0
-> [ 54.944133] __x64_sys_sendto+0x28/0x30
-> [ 54.944144] do_syscall_64+0xbb/0x1d0
-> [ 54.944161] entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> [ 54.944176] RIP: 0033:0x7f47749f7046
-> [ 54.944195] Code: Unable to access opcode bytes at 0x7f47749f701c.
-> [ 54.944200] RSP: 002b:00007ffe5bd1ed28 EFLAGS: 00000246 ORIG_RAX: 000000=
-000000002c
-> [ 54.944213] RAX: ffffffffffffffda RBX: 00007ffe5bd204b0 RCX: 00007f47749=
-f7046
-> [ 54.944221] RDX: 0000000000000038 RSI: 00005638a58d0950 RDI: 00000000000=
-00003
-> [ 54.944229] RBP: 00005638a58d0950 R08: 00007ffe5bd2272c R09: 00000000000=
-00010
-> [ 54.944238] R10: 0000000000000000 R11: 0000000000000246 R12: 00000000000=
-00038
-> [ 54.944245] R13: 00007ffe5bd20470 R14: 00007ffe5bd1ed30 R15: 0000001d000=
-00001
->=20
-> Afterwards, the OOM killer runs in a loop. This can be triggered from any=
- user with CAP_NET, so unprivileged users can access this through namespace=
-s.
->=20
-> The root cause for this is complex. Because of the way we setup the paren=
-t qdisc, all enqueued packets to the parent will end up in the netem tfifo =
-queue, as the gap is 0: https://elixir.bootlin.com/linux/v6.15-rc4/source/n=
-et/sched/sch_netem.c#L552. The child qdisc will have all enqueued packets e=
-nd up in sch->q instead because gap is 1 (which means that reorder is 100%,=
- so the previous conditional will never pass).
->=20
->=20
-> Note that both qdiscs have duplication set to 100%. If duplication is pos=
-sible, a clone of the packet will re-enqueue again at the root qdisc: https=
-://elixir.bootlin.com/linux/v6.15-rc4/source/net/sched/sch_netem.c#L539. Th=
-e placement of this duplication is problematic though for a root netem qdis=
-c with limit of 1. If t_len is 0, then we would end up with a t_len of 2 si=
-nce the sch->limit check happens before the current packet is added to the =
-tfifo queue and the duplicated packet is re-enqueued: https://elixir.bootli=
-n.com/linux/v6.15-rc4/source/net/sched/sch_netem.c#L525.
->=20
->=20
-> Once the parent's netem_dequeue starts, there is never anything from sch-=
->q, so it will always pull from the tfifo: https://elixir.bootlin.com/linux=
-/v6.15-rc4/source/net/sched/sch_netem.c#L714. It then enqueues the skb to t=
-he child qdisc (https://elixir.bootlin.com/linux/v6.15-rc4/source/net/sched=
-/sch_netem.c#L747), but since the duplicate flag is set in the child netem =
-qdisc too, it duplicates the packet back to the parent netem qdisc.
->=20
->=20
-> In netem_dequeue, the parent netem qdisc's t_len is decremented before th=
-e child enqueue call: https://elixir.bootlin.com/linux/v6.15-rc4/source/net=
-/sched/sch_netem.c#L726. On the first child enqueue, the parent qdisc t_len=
- is 1, so the skb will not be re-enqueued in the parent qdisc, and only get=
- added to the child sch->q. However, when the parent's netem_dequeue return=
-s back to dequeuing from the tfifo queue (https://elixir.bootlin.com/linux/=
-v6.15-rc4/source/net/sched/sch_netem.c#L756), t_len becomes 0. With the pro=
-blematic duplication logic, the parent enqueues the same packet twice again=
-, has a t_len of 2, and the packet is added to the child sch->q. This tfifo=
-_dequeue loop will never end, and cause infinite memory allocations.
->=20
->=20
-> We are unsure what the best approach to fix this bug is. Originally, we c=
-onsidered factoring in a qlen to the limit check, but https://git.kernel.or=
-g/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3Df8d4bc455047cf39=
-03cd6f85f49978987dbb3027 shows this idea is an incorrect approach. Perhaps =
-moving the duplication call after the internal enqueue in netem_enqueue can=
- fix the limit issue. However, none of this address the strange duplication=
- logic that attempts to prevent the duplication of duplicated packets. Note=
- that before re-enqueing a cloned packet, it disables duplication in the cu=
-rrent qdisc and then re-enables the original duplication setting afterwards=
-. This only works if the duplicator is the root qdisc. If the duplicator is=
- not the root qdisc, then a packet will forever be duplicated. We considere=
-d tracking packet duplication state in skb->cb, but this wouldn't hold up e=
-ither as there are no guarantees to what the previous qdisc is.
->=20
->=20
-> Feel free to let us know your thoughts and any other help we can provide.
->=20
-> Best,
-> Will(will@willsroot.io)
-> Savy (savy@syst3mfailure.io)
-
-Just as a follow up, the duplication logic also causes a soft lockup/hang w=
-ith the HFSC qdisc using rtsc as the parent, reproducible on the same versi=
-ons listed in the previous email.
-
-In hfsc_enqueue, the boolean first is set here https://elixir.bootlin.com/l=
-inux/v6.15-rc5/source/net/sched/sch_hfsc.c#L1562. Then the enqueue handler =
-from the selected class's qdisc is called. If this qdisc is netem with dupl=
-ication enabled, then it will call hfsc_enqueue again. Since the qlen from =
-hfsc perspective is still 0 (as the previous call is still waiting for the =
-child enqueue to finish), both will have first set to true and reach this i=
-nit_ed call (https://elixir.bootlin.com/linux/v6.15-rc5/source/net/sched/sc=
-h_hfsc.c#L1574), which will both reach eltree_insert (https://elixir.bootli=
-n.com/linux/v6.15-rc5/source/net/sched/sch_hfsc.c#L634).=20
-
-This becomes a serious problem because this will create a cycle in the rbtr=
-ee. So when hfsc_dequeue calls eltree_get_mindl (https://elixir.bootlin.com=
-/linux/v6.15-rc5/source/net/sched/sch_hfsc.c#L1613), the task hangs in an i=
-nfinite loop.
-
-Should netem_enqueue really insert duplicated packets from the root qdisc? =
-If so, then there should be additional corner case checking for a qdisc act=
-ing as the root handler for cases where it calls a child enqueue handler th=
-at may subsequently trigger the root handler again before the original root=
- call finishes.
-
-Below is a repro for the hfsc case:
-
-tc qdisc add dev lo root handle fff1: hfsc default 10
-tc class add dev lo parent fff1: classid fff1:10 hfsc rt m1 1kbit d 1ms m2 =
-1kbit
-tc qdisc add dev lo parent fff1:10 handle 8001: netem limit 1 delay 1us dup=
-licate 100%
-ping -I lo -f -c1 -s48 -W0.001 127.0.0.1
-
-[   52.583589] watchdog: BUG: soft lockup - CPU#1 stuck for 26s! [ping:226]
-[   52.583602] Modules linked in:
-[   52.583606] irq event stamp: 54379
-[   52.583609] hardirqs last  enabled at (54378): [<ffffffff82c55aeb>] irqe=
-ntry_exit+0x3b/0x90
-[   52.583642] hardirqs last disabled at (54379): [<ffffffff82c5475e>] sysv=
-ec_apic_timer_interrupt+0xe/0x80
-[   52.583653] softirqs last  enabled at (5070): [<ffffffff825cc928>] neigh=
-_resolve_output+0x2b8/0x340
-[   52.583668] softirqs last disabled at (5074): [<ffffffff825adaaa>] __dev=
-_queue_xmit+0x8a/0x2110
-[   52.583685] CPU: 1 UID: 0 PID: 226 Comm: ping Not tainted 6.15.0-rc3-000=
-94-g02ddfb981de8 #28 PREEMPT(voluntary)=20
-[   52.583696] Hardware name: QEMU Ubuntu 24.04 PC (i440FX + PIIX, 1996), B=
-IOS 1.16.3-debian-1.16.3-2 04/01/2014
-[   52.583702] RIP: 0010:rb_first+0x13/0x30
-[   52.583713] Code: cc cc 0f 1f 44 00 00 90 90 90 90 90 90 90 90 90 90 90 =
-90 90 90 90 90 f3 0f 1e fa 48 8b 07 48 85 c0 74 14 48 89 c2 48 8b 40 10 <48=
-> 85 c0 75 f4 48 89 d0 c3 cc cc cc cc 31 d2 eb f4 66 66 2e f
-[   52.583722] RSP: 0018:ffffc90000edf8f8 EFLAGS: 00000286
-[   52.583729] RAX: ffff8881029008a0 RBX: 0000000000000002 RCX: ffffffff814=
-0f346
-[   52.583735] RDX: ffff8881029008a0 RSI: ffffffff8140f354 RDI: ffff888106e=
-cc5d8
-[   52.583741] RBP: 0000000000000000 R08: 0000000000000004 R09: 00000000000=
-02eca
-[   52.583747] R10: 0000000000002eca R11: 0000000000000001 R12: 0000000019f=
-e24dd
-[   52.583753] R13: ffff888106ecc000 R14: 0000000000000000 R15: 00000000000=
-00010
-[   52.583762] FS:  00007fddb2296000(0000) GS:ffff8881b755a000(0000) knlGS:=
-0000000000000000
-[   52.583768] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   52.583774] CR2: 0000562b67773794 CR3: 00000001028fc000 CR4: 00000000000=
-006f0
-[   52.583779] Call Trace:
-[   52.583783]  <TASK>
-[   52.583797]  hfsc_dequeue+0x59/0x610
-[   52.583815]  ? init_ed+0x185/0x1e0
-[   52.583835]  __qdisc_run+0xdb/0x9e0
-[   52.583854]  __dev_queue_xmit+0xec2/0x2110
-[   52.583870]  ? lock_acquire+0xbb/0x2d0
-[   52.583883]  ? ip_finish_output2+0x2cc/0xd40
-[   52.583893]  ? find_held_lock+0x2b/0x80
-[   52.583903]  ? skb_push+0x39/0x70
-[   52.583915]  ? eth_header+0xe3/0x140
-[   52.583925]  neigh_resolve_output+0x211/0x340
-[   52.583937]  ip_finish_output2+0x2cc/0xd40
-[   52.583949]  __ip_finish_output.part.0+0xda/0x1c0
-[   52.583961]  ip_output+0x17b/0x6f0
-[   52.583972]  ? __pfx_ip_finish_output+0x10/0x10
-[   52.583981]  ? __pfx_ip_output+0x10/0x10
-[   52.583991]  ip_push_pending_frames+0x1ed/0x310
-[   52.584003]  raw_sendmsg+0xbfa/0x1cb0
-[   52.584019]  ? lock_acquire+0xbb/0x2d0
-[   52.584030]  ? __might_fault+0x6f/0xb0
-[   52.584044]  ? __pfx_raw_sendmsg+0x10/0x10
-[   52.584056]  inet_sendmsg+0xc0/0xd0
-[   52.584067]  __sys_sendto+0x29a/0x2e0
-[   52.584086]  __x64_sys_sendto+0x28/0x30
-[   52.584094]  do_syscall_64+0xbb/0x1d0
-[   52.584106]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-[   52.584115] RIP: 0033:0x7fddb2516046
-[   52.584123] Code: 0e 0d 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f =
-1f 00 41 89 ca 64 8b 04 25 18 00 00 00 85 c0 75 11 b8 2c 00 00 00 0f 05 <48=
-> 3d 00 f0 ff ff 77 72 c3 90 55 48 83 ec 30 44 89 4c 24 2c 9
-[   52.584131] RSP: 002b:00007ffdd1da0e88 EFLAGS: 00000246 ORIG_RAX: 000000=
-000000002c
-[   52.584138] RAX: ffffffffffffffda RBX: 00007ffdd1da2610 RCX: 00007fddb25=
-16046
-[   52.584144] RDX: 0000000000000038 RSI: 0000562b9fc5a950 RDI: 00000000000=
-00003
-[   52.584149] RBP: 0000562b9fc5a950 R08: 00007ffdd1da488c R09: 00000000000=
-00010
-[   52.584154] R10: 0000000000000000 R11: 0000000000000246 R12: 00000000000=
-00038
-[   52.584158] R13: 00007ffdd1da25d0 R14: 00007ffdd1da0e90 R15: 0000001d000=
-00001
-[   52.584170]  </TASK>
-
-
-Best,
-Will
-Savy
+Regards
 
