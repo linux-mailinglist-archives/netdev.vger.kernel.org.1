@@ -1,219 +1,169 @@
-Return-Path: <netdev+bounces-188801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F3CAAAEEC8
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 00:47:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BCB2AAEED3
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 00:50:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8E454A8662
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 22:47:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECAF14E7D93
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 22:50:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D342046B3;
-	Wed,  7 May 2025 22:47:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13880258CC1;
+	Wed,  7 May 2025 22:50:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="gcIF9BzM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="m2UicU4B"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C3351A841B;
-	Wed,  7 May 2025 22:47:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3046290BC6;
+	Wed,  7 May 2025 22:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746658039; cv=none; b=D4x9Df35KkydSCfps6bumKkCQFNdY4e3tOHIjawYoewYdoSN8RIuP/bMKxguS/kbgNiA3ByNhgXX58gAw0IarJzQJ+ePxylkiphRLl3NpwdPlVv7GxneryuCr4nr2ZXwPNCxHwc8taa542qhEVaUQSSdyEftw8kUr8QGofGfkBI=
+	t=1746658235; cv=none; b=naVQXfyjPINqR1Y0G+posKIbfYf6xE04V42TnPDRAInxzWGtrPDGlTUN1a0NI6cxa3AnUnZGyxsUHBnwgfd2TH457b9Ksi7/Yw8yfN6BUXlV6HtK6x/AvwRV7DTiMXMiBif77aeUqAHk/IiVNVmbsRU6CO2nk1igY6XiWQups1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746658039; c=relaxed/simple;
-	bh=HZ2mjWs9C+25tegEBxpz9H+k2QWvOQ/MWmcC1JPzg2M=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rfzwJyarV+66eSLpjlmKoHwar5zC4Z1xP4sW3vSB5KrrrXYw1RZQdsagjTqCylXyrPfpbHv6yic+dSHVOrjpTxx3VGtVE7EA6Muk287JasgHu7KcMlGB/HoZNhpmD3toaLaNbmct5zabTo0jmTTs4yYv/HibejbMkIVI1NAxBos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=gcIF9BzM; arc=none smtp.client-ip=72.21.196.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1746658038; x=1778194038;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=rv48TLMmF+e85KrgXd06hxEVmdhTgHCh9QhcCbrWkqg=;
-  b=gcIF9BzMDwgqlglkOYAifoULOEFFA82Y+okEqtfXEExCkW9H6ngU2DNb
-   GzePco/XXic5dcbsndFksiMLkRztiyv6XFtblB16WTSJcna2iD5jZAEB0
-   W36zqQ/3jJ9ezSPJowgn9MaRA7MpLNltz/Ce4t1ZodbVCLUOoqGMREcsF
-   Q+sEQxWThHT8/ALdkZbFGWJ6zoVCTpyzIJKN286+8yc4E0L40rWQVMd/w
-   nB0VVjS0vNnovKNsIWLIPxtgLcEg9ZI1bteiKxYFboM2BXY92lRlHqp25
-   aWBmuJ/KKYn4xdU0B5MmkY5kNbcYtxrtKBIcPa/dYtSXBmpn9E7WdKSDq
+	s=arc-20240116; t=1746658235; c=relaxed/simple;
+	bh=HbnTRcGDguTJcjdl27sUoG7yg/EIj+Ic0JSwYhwH4GQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GNkxhbkq1EYlaRhy3gnDnjf4S8Cr0LPCCWMioUD6POgpEWOKhkIDLr7T66uWXA4OXgL8n6Zn/4WOhw/N/ys4itLulQe2zw+G6uQPMop1vil3LQqAORgrUnlLPBhY7teD9J6a6KueaZ5zzpiFarXjmvttACfeEN2dvCRUFz0KWF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=m2UicU4B; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746658232; x=1778194232;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=HbnTRcGDguTJcjdl27sUoG7yg/EIj+Ic0JSwYhwH4GQ=;
+  b=m2UicU4BEGTwATDp1KciIPdFRtTM1ZrFEk6SoU+zuJPzJvrAJ47BzAiS
+   MAZRGRaT3SrRY4WUU1f6m+QtHG5bTwioFTWHPOHJ0SGXW501EoC3yo1Kp
+   7iy6OcYVE81kpy7UooYDZa3bizo/x9ELq6ymNed0d68SkRVJAorthz4Yv
+   pFpTTOR5gpWH0O3wSiCrplP7vNupiWgaVc3YxjbOqQ1EI5M6Bofzz53OI
+   BTOpwHeD6OBVDJzuJ9zbZUZrDbn5lI8USNttyzh+7wS0XyynF79rfQBcs
+   dMDlXt8Hkxr3rdY0Or3DwcAcm4IxZflL4V8odYh9ygGxy8DNV2HOHz0gO
    g==;
-X-IronPort-AV: E=Sophos;i="6.15,270,1739836800"; 
-   d="scan'208";a="490148119"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2025 22:47:13 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:14561]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.21.231:2525] with esmtp (Farcaster)
- id 8c51b74b-d7bf-4d1f-b139-25c30e4a41e5; Wed, 7 May 2025 22:47:12 +0000 (UTC)
-X-Farcaster-Flow-ID: 8c51b74b-d7bf-4d1f-b139-25c30e4a41e5
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 7 May 2025 22:47:09 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.94.46.110) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 7 May 2025 22:47:05 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <brauner@kernel.org>
-CC: <alexander@mihalicyn.com>, <bluca@debian.org>, <daan.j.demeyer@gmail.com>,
-	<davem@davemloft.net>, <david@readahead.eu>, <edumazet@google.com>,
-	<horms@kernel.org>, <jack@suse.cz>, <jannh@google.com>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <lennart@poettering.net>,
-	<linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<me@yhndnzj.com>, <netdev@vger.kernel.org>, <oleg@redhat.com>,
-	<pabeni@redhat.com>, <viro@zeniv.linux.org.uk>, <zbyszek@in.waw.pl>
-Subject: Re: [PATCH v4 04/11] net: reserve prefix
-Date: Wed, 7 May 2025 15:45:52 -0700
-Message-ID: <20250507224658.47266-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250507-work-coredump-socket-v4-4-af0ef317b2d0@kernel.org>
-References: <20250507-work-coredump-socket-v4-4-af0ef317b2d0@kernel.org>
+X-CSE-ConnectionGUID: ujL7KngaQ6aH7ZvuG1bLXA==
+X-CSE-MsgGUID: BLaT3ebLQRCCtYWROlXn5Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11426"; a="48286723"
+X-IronPort-AV: E=Sophos;i="6.15,270,1739865600"; 
+   d="scan'208";a="48286723"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2025 15:50:31 -0700
+X-CSE-ConnectionGUID: tjSTxzmcRs+u22cpdFlg1g==
+X-CSE-MsgGUID: bEjWDmubTu2agF+yhMtAEw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,270,1739865600"; 
+   d="scan'208";a="140867901"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by orviesa003.jf.intel.com with ESMTP; 07 May 2025 15:50:28 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uCnas-00097H-0K;
+	Wed, 07 May 2025 22:50:26 +0000
+Date: Thu, 8 May 2025 06:49:44 +0800
+From: kernel test robot <lkp@intel.com>
+To: Sagi Maimon <maimon.sagi@gmail.com>, jonathan.lemon@gmail.com,
+	vadim.fedorenko@linux.dev, richardcochran@gmail.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com
+Cc: oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Sagi Maimon <maimon.sagi@gmail.com>
+Subject: Re: [PATCH v1] ptp: ocp: Limit SMA/signal/freq counts in show/store
+ functions
+Message-ID: <202505080859.Ke4zJAh1-lkp@intel.com>
+References: <20250506080647.116702-1-maimon.sagi@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D044UWB004.ant.amazon.com (10.13.139.134) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250506080647.116702-1-maimon.sagi@gmail.com>
 
-From: Christian Brauner <brauner@kernel.org>
-Date: Wed, 07 May 2025 18:13:37 +0200
-> Add the reserved "linuxafsk/" prefix for AF_UNIX sockets and require
-> CAP_NET_ADMIN in the owning user namespace of the network namespace to
-> bind it. This will be used in next patches to support the coredump
-> socket but is a generally useful concept.
+Hi Sagi,
 
-I really think we shouldn't reserve address and it should be
-configurable by users via core_pattern as with the other
-coredump types.
+kernel test robot noticed the following build warnings:
 
-AF_UNIX doesn't support SO_REUSEPORT, so once the socket is
-dying, user can't start the new coredump listener until it's
-fully cleaned up, which adds unnecessary drawback.
+[auto build test WARNING on net-next/main]
+[also build test WARNING on net/main linus/master v6.15-rc5 next-20250507]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-The semantic should be same with other types, and the todo
-for the coredump service is prepare file (file, process, socket)
-that can receive data and set its name to core_pattern.
+url:    https://github.com/intel-lab-lkp/linux/commits/Sagi-Maimon/ptp-ocp-Limit-SMA-signal-freq-counts-in-show-store-functions/20250506-161305
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250506080647.116702-1-maimon.sagi%40gmail.com
+patch subject: [PATCH v1] ptp: ocp: Limit SMA/signal/freq counts in show/store functions
+config: parisc-allmodconfig (https://download.01.org/0day-ci/archive/20250508/202505080859.Ke4zJAh1-lkp@intel.com/config)
+compiler: hppa-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250508/202505080859.Ke4zJAh1-lkp@intel.com/reproduce)
 
-Also, the abstract socket is namespced by design and there is
-no point in enforcing the same restriction to non-initial netns.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202505080859.Ke4zJAh1-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/ptp/ptp_ocp.c: In function 'ptp_ocp_summary_show':
+>> drivers/ptp/ptp_ocp.c:4052:28: warning: '%d' directive writing between 1 and 11 bytes into a region of size 5 [-Wformat-overflow=]
+    4052 |         sprintf(label, "GEN%d", nr + 1);
+         |                            ^~
+   In function '_signal_summary_show',
+       inlined from 'ptp_ocp_summary_show' at drivers/ptp/ptp_ocp.c:4215:4:
+   drivers/ptp/ptp_ocp.c:4052:24: note: directive argument in the range [-2147483639, 2147483647]
+    4052 |         sprintf(label, "GEN%d", nr + 1);
+         |                        ^~~~~~~
+   drivers/ptp/ptp_ocp.c:4052:9: note: 'sprintf' output between 5 and 15 bytes into a destination of size 8
+    4052 |         sprintf(label, "GEN%d", nr + 1);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/ptp/ptp_ocp.c: In function 'ptp_ocp_summary_show':
+   drivers/ptp/ptp_ocp.c:4077:29: warning: '%d' directive writing between 1 and 11 bytes into a region of size 4 [-Wformat-overflow=]
+    4077 |         sprintf(label, "FREQ%d", nr + 1);
+         |                             ^~
+   In function '_frequency_summary_show',
+       inlined from 'ptp_ocp_summary_show' at drivers/ptp/ptp_ocp.c:4219:4:
+   drivers/ptp/ptp_ocp.c:4077:24: note: directive argument in the range [-2147483640, 2147483647]
+    4077 |         sprintf(label, "FREQ%d", nr + 1);
+         |                        ^~~~~~~~
+   drivers/ptp/ptp_ocp.c:4077:9: note: 'sprintf' output between 6 and 16 bytes into a destination of size 8
+    4077 |         sprintf(label, "FREQ%d", nr + 1);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-> 
-> The collision risk is so low that we can just start using it. Userspace
-> must already be prepared to retry if a given abstract address isn't
-> usable anyway.
-> 
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
-> ---
->  include/uapi/linux/un.h |  2 ++
->  net/unix/af_unix.c      | 39 +++++++++++++++++++++++++++++++++++----
->  2 files changed, 37 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/uapi/linux/un.h b/include/uapi/linux/un.h
-> index 0ad59dc8b686..bbd5ad508dfa 100644
-> --- a/include/uapi/linux/un.h
-> +++ b/include/uapi/linux/un.h
-> @@ -5,6 +5,8 @@
->  #include <linux/socket.h>
->  
->  #define UNIX_PATH_MAX	108
-> +/* reserved AF_UNIX socket namespace. */
-> +#define UNIX_SOCKET_NAMESPACE "linuxafsk/"
->  
->  struct sockaddr_un {
->  	__kernel_sa_family_t sun_family; /* AF_UNIX */
-> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> index 472f8aa9ea15..148d008862e7 100644
-> --- a/net/unix/af_unix.c
-> +++ b/net/unix/af_unix.c
-> @@ -114,6 +114,13 @@ static atomic_long_t unix_nr_socks;
->  static struct hlist_head bsd_socket_buckets[UNIX_HASH_SIZE / 2];
->  static spinlock_t bsd_socket_locks[UNIX_HASH_SIZE / 2];
->  
-> +static const struct sockaddr_un linuxafsk_addr = {
-> +	.sun_family = AF_UNIX,
-> +	.sun_path = "\0"UNIX_SOCKET_NAMESPACE,
-> +};
-> +
-> +#define UNIX_SOCKET_NAMESPACE_ADDR_LEN (offsetof(struct sockaddr_un, sun_path) + sizeof(UNIX_SOCKET_NAMESPACE))
-> +
->  /* SMP locking strategy:
->   *    hash table is protected with spinlock.
->   *    each socket state is protected by separate spinlock.
-> @@ -436,6 +443,30 @@ static struct sock *__unix_find_socket_byname(struct net *net,
->  	return NULL;
->  }
->  
-> +static int unix_may_bind_name(struct net *net, struct sockaddr_un *sunname,
-> +			      int len, unsigned int hash)
-> +{
-> +	struct sock *s;
-> +
-> +	s = __unix_find_socket_byname(net, sunname, len, hash);
-> +	if (s)
-> +		return -EADDRINUSE;
-> +
-> +	/*
-> +	 * Check whether this is our reserved prefix and if so ensure
-> +	 * that only privileged processes can bind it.
-> +	 */
-> +	if (UNIX_SOCKET_NAMESPACE_ADDR_LEN <= len &&
-> +	    !memcmp(&linuxafsk_addr, sunname, UNIX_SOCKET_NAMESPACE_ADDR_LEN)) {
-> +		/* Don't bind the namespace itself. */
-> +		if (UNIX_SOCKET_NAMESPACE_ADDR_LEN == len)
-> +			return -ECONNREFUSED;
-> +		if (!ns_capable(net->user_ns, CAP_NET_ADMIN))
-> +			return -ECONNREFUSED;
-> +	}
-> +	return 0;
-> +}
-> +
->  static inline struct sock *unix_find_socket_byname(struct net *net,
->  						   struct sockaddr_un *sunname,
->  						   int len, unsigned int hash)
-> @@ -1258,10 +1289,10 @@ static int unix_autobind(struct sock *sk)
->  	new_hash = unix_abstract_hash(addr->name, addr->len, sk->sk_type);
->  	unix_table_double_lock(net, old_hash, new_hash);
->  
-> -	if (__unix_find_socket_byname(net, addr->name, addr->len, new_hash)) {
-> +	if (unix_may_bind_name(net, addr->name, addr->len, new_hash)) {
->  		unix_table_double_unlock(net, old_hash, new_hash);
->  
-> -		/* __unix_find_socket_byname() may take long time if many names
-> +		/* unix_may_bind_name() may take long time if many names
->  		 * are already in use.
->  		 */
->  		cond_resched();
-> @@ -1379,7 +1410,8 @@ static int unix_bind_abstract(struct sock *sk, struct sockaddr_un *sunaddr,
->  	new_hash = unix_abstract_hash(addr->name, addr->len, sk->sk_type);
->  	unix_table_double_lock(net, old_hash, new_hash);
->  
-> -	if (__unix_find_socket_byname(net, addr->name, addr->len, new_hash))
-> +	err = unix_may_bind_name(net, addr->name, addr->len, new_hash);
-> +	if (err)
->  		goto out_spin;
->  
->  	__unix_set_addr_hash(net, sk, addr, new_hash);
-> @@ -1389,7 +1421,6 @@ static int unix_bind_abstract(struct sock *sk, struct sockaddr_un *sunaddr,
->  
->  out_spin:
->  	unix_table_double_unlock(net, old_hash, new_hash);
-> -	err = -EADDRINUSE;
->  out_mutex:
->  	mutex_unlock(&u->bindlock);
->  out:
-> 
-> -- 
-> 2.47.2
+vim +4052 drivers/ptp/ptp_ocp.c
+
+f67bf662d2cffa2 Jonathan Lemon 2021-09-14  4041  
+b325af3cfab970e Jonathan Lemon 2022-03-10  4042  static void
+b325af3cfab970e Jonathan Lemon 2022-03-10  4043  _signal_summary_show(struct seq_file *s, struct ptp_ocp *bp, int nr)
+b325af3cfab970e Jonathan Lemon 2022-03-10  4044  {
+b325af3cfab970e Jonathan Lemon 2022-03-10  4045  	struct signal_reg __iomem *reg = bp->signal_out[nr]->mem;
+b325af3cfab970e Jonathan Lemon 2022-03-10  4046  	struct ptp_ocp_signal *signal = &bp->signal[nr];
+b325af3cfab970e Jonathan Lemon 2022-03-10  4047  	char label[8];
+b325af3cfab970e Jonathan Lemon 2022-03-10  4048  	bool on;
+b325af3cfab970e Jonathan Lemon 2022-03-10  4049  	u32 val;
+b325af3cfab970e Jonathan Lemon 2022-03-10  4050  
+b325af3cfab970e Jonathan Lemon 2022-03-10  4051  	on = signal->running;
+05fc65f3f5e45e8 Jonathan Lemon 2022-03-15 @4052  	sprintf(label, "GEN%d", nr + 1);
+b325af3cfab970e Jonathan Lemon 2022-03-10  4053  	seq_printf(s, "%7s: %s, period:%llu duty:%d%% phase:%llu pol:%d",
+b325af3cfab970e Jonathan Lemon 2022-03-10  4054  		   label, on ? " ON" : "OFF",
+b325af3cfab970e Jonathan Lemon 2022-03-10  4055  		   signal->period, signal->duty, signal->phase,
+b325af3cfab970e Jonathan Lemon 2022-03-10  4056  		   signal->polarity);
+b325af3cfab970e Jonathan Lemon 2022-03-10  4057  
+b325af3cfab970e Jonathan Lemon 2022-03-10  4058  	val = ioread32(&reg->enable);
+b325af3cfab970e Jonathan Lemon 2022-03-10  4059  	seq_printf(s, " [%x", val);
+b325af3cfab970e Jonathan Lemon 2022-03-10  4060  	val = ioread32(&reg->status);
+b325af3cfab970e Jonathan Lemon 2022-03-10  4061  	seq_printf(s, " %x]", val);
+b325af3cfab970e Jonathan Lemon 2022-03-10  4062  
+b325af3cfab970e Jonathan Lemon 2022-03-10  4063  	seq_printf(s, " start:%llu\n", signal->start);
+b325af3cfab970e Jonathan Lemon 2022-03-10  4064  }
+b325af3cfab970e Jonathan Lemon 2022-03-10  4065  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
