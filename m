@@ -1,66 +1,86 @@
-Return-Path: <netdev+bounces-188612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 889B5AADF52
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 14:36:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB4A7AADF5E
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 14:37:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 89BC01C253F6
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 12:36:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24B354E36C7
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 12:37:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7853D2327A7;
-	Wed,  7 May 2025 12:36:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FC5F28003E;
+	Wed,  7 May 2025 12:37:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nh4etkXD"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UxEUkuIl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 435BD257AF6;
-	Wed,  7 May 2025 12:36:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6FAB280028;
+	Wed,  7 May 2025 12:37:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746621390; cv=none; b=r/a84wLqZaOpkENZ3BheIcfTM5wTJRHIGXxAbuFN+5igqyCGPdoRyzTkglmxTzr9yxDk6o5zTf6rkP8EksNeJq+XOuBzAe9hBLiMf6HoLsBS78Sha2zO1YYPMgjtZXnNc2MgSirV9tV5DrYup21WtKArfp1xb9xuuSEeQpAbq6g=
+	t=1746621463; cv=none; b=VaTjPQ8NTh032EXRDhvxee26Cccbcu0YdyjyqZtHnWLTQp3JQsIJFbhHB/URm2oue4MdufFqCr+k06Li58ktjHnkPc3XI9iIeXJl92xcMJSDoa7An6YXiOQBrxLdwbJj7HH2LwjnwJSmXhoFkUUL570qOn7kfLLp2W5SjoKjARw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746621390; c=relaxed/simple;
-	bh=MwSEEjKCjF/7nGabal+tGMtp0qVnx0UYQgD2hVtyBfk=;
+	s=arc-20240116; t=1746621463; c=relaxed/simple;
+	bh=xCGmUPVZuDdzuUKuQNbIIVf2waBPmWTdSstOrPdd0oE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gASyehfRM8U7b/dLowJq7RYrj60YoMtyCKEFSQ3+5dgVvvyBeAkckHm0G6PyapY88O1CZOjCp9lzAZKblxDNMpng0k/U/lmxqpVPXl7IxPkRagYdowDo58FspKx13CTAhKHGV1STd4aQaY2xqm14BgPkXbAYdFYVGHVuOON3Yos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nh4etkXD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CF24C4CEE7;
-	Wed,  7 May 2025 12:36:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746621389;
-	bh=MwSEEjKCjF/7nGabal+tGMtp0qVnx0UYQgD2hVtyBfk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Nh4etkXD2QmdXeFIxepaVQ36xE/CnoqL71J4FagfBBbAJsZH9WfLTDXPDHB7PMjNQ
-	 0Ey6JCc5Cty+Ne91cafy6vhdUgF9t/0UDambHAc0jt0Y+7lmZdzxXzwivE1+MCffeA
-	 /l4MHYO9yaCaueOyI/2h2/CMqptIWq7QNgHMKXVkeazg/LdYmjcORZh/kQqQ8VQINx
-	 4QlwnqJVsaIqTYShXwG+epsnC9Pj1pRvyHmnM8BK6E1WlbkCLGoJ7CWk5Mr3Zb/EiN
-	 Mwlpzt5drHPEuaRZYEAeSyIV+SYm6FFHiN3FPuMB3vO+/EXKF2g3yPIAwjFbQ6fgvo
-	 zmzfu0CrynEvg==
-Date: Wed, 7 May 2025 13:36:22 +0100
-From: Simon Horman <horms@kernel.org>
-To: Tanmay Jagdale <tanmay@marvell.com>
-Cc: bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
-	jerinj@marvell.com, hkelam@marvell.com, sbhatta@marvell.com,
-	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, bbhushan2@marvell.com, bhelgaas@google.com,
-	pstanner@redhat.com, gregkh@linuxfoundation.org,
-	peterz@infradead.org, linux@treblig.org,
-	krzysztof.kozlowski@linaro.org, giovanni.cabiddu@intel.com,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, rkannoth@marvell.com, sumang@marvell.com,
-	gcherian@marvell.com, Rakesh Kudurumalla <rkudurumalla@marvell.com>
-Subject: Re: [net-next PATCH v1 06/15] octeontx2-af: Add support for CPT
- second pass
-Message-ID: <20250507123622.GB3339421@horms.kernel.org>
-References: <20250502132005.611698-1-tanmay@marvell.com>
- <20250502132005.611698-7-tanmay@marvell.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=EGwqGd1MJWHR8glUNiNayBnfonzclZDr55WZIvgadXZrMzGJnTK8ZzdGNUCXO42PcHG9OghhfkZ2DzmQeACdJ0cb1e7RFGP6T3dh7unC31SfPZEw5TUYfvUZJKA9Bb7powLQtT6L+G5DwUHnC6hr50CeqBkMCCyAuD7HHOdc4pw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UxEUkuIl; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=5sPVrzUiQ+hehg1asUBhs/XYvzKveDurKf1FDpj71eU=; b=UxEUkuIlcl7krxdT+42I9uKAVB
+	YsgHWsOYxgVRqKwf7S8mlsuYxgynUv7Q9dX/JaEovXdfoebGLpb08RSV3kTRj4omig7NyEb6+V/rw
+	UceXPNJzvFZKjLe9487sxOqbkwnHbCPN4zSyyKGVVC3kyRHngUxW7FK4rGWfa2nyHZr4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uCe1T-00BsZW-F1; Wed, 07 May 2025 14:37:15 +0200
+Date: Wed, 7 May 2025 14:37:15 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Inochi Amaoto <inochiama@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chen Wang <unicorn_wang@outlook.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Guo Ren <guoren@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>,
+	Lothar Rubusch <l.rubusch@gmail.com>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	sophgo@lists.linux.dev, linux-riscv@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, Yixun Lan <dlan@gentoo.org>,
+	Longbin Li <looong.bin@gmail.com>
+Subject: Re: [PATCH net-next 0/4] riscv: sophgo: Add ethernet support for
+ SG2042
+Message-ID: <b4ce3e35-9255-4fc7-9c8d-4078b24ac3fa@lunn.ch>
+References: <20250506093256.1107770-1-inochiama@gmail.com>
+ <c7a8185e-07b7-4a62-b39b-7d1e6eec64d6@lunn.ch>
+ <fgao5qnim6o3gvixzl7lnftgsish6uajlia5okylxskn3nrexe@gyvgrp72jvj6>
+ <ffa044e2-ee9e-4a34-af6a-2e45294144f7@lunn.ch>
+ <2tu2mvwsnqdezjei5h43ko24vfave4c3ek2fjoatwsg72p6lpz@3vbtpmm7l73z>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,147 +89,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250502132005.611698-7-tanmay@marvell.com>
+In-Reply-To: <2tu2mvwsnqdezjei5h43ko24vfave4c3ek2fjoatwsg72p6lpz@3vbtpmm7l73z>
 
-On Fri, May 02, 2025 at 06:49:47PM +0530, Tanmay Jagdale wrote:
-> From: Rakesh Kudurumalla <rkudurumalla@marvell.com>
+On Wed, May 07, 2025 at 08:01:29PM +0800, Inochi Amaoto wrote:
+> On Wed, May 07, 2025 at 02:10:48AM +0200, Andrew Lunn wrote:
+> > On Wed, May 07, 2025 at 06:24:29AM +0800, Inochi Amaoto wrote:
+> > > On Tue, May 06, 2025 at 02:03:18PM +0200, Andrew Lunn wrote:
+> > > > On Tue, May 06, 2025 at 05:32:50PM +0800, Inochi Amaoto wrote:
+> > > > > The ethernet controller of SG2042 is Synopsys DesignWare IP with
+> > > > > tx clock. Add device id for it.
+> > > > > 
+> > > > > This patch can only be tested on a SG2042 x4 evb board, as pioneer
+> > > > > does not expose this device.
+> > > > 
+> > > > Do you have a patch for this EVB board? Ideally there should be a user
+> > > > added at the same time as support for a device.
+> > > > 
+> > > > 	Andrew
+> > > 
+> > > Yes, I have one for this device. And Han Gao told me that he will send
+> > > the board patch for the evb board. So I only send the driver.
+> > > And the fragment for the evb board is likes below, I think it is kind
+> > > of trivial:
+> > > 
+> > > &gmac0 {
+> > > 	phy-handle = <&phy0>;
+> > > 	phy-mode = "rgmii-txid";
+> > 
+> > And this is why i ask, because this is broken. For more information,
+> > please see:
+> > 
+> > https://patchwork.kernel.org/project/netdevbpf/patch/20250430-v6-15-rc3-net-rgmii-delays-v2-1-099ae651d5e5@lunn.ch/
+> > 
+> > 	Andrew
 > 
-> Implemented mailbox to add mechanism to allocate a
-> rq_mask and apply to nixlf to toggle RQ context fields
-> for CPT second pass packets.
-> 
-> Signed-off-by: Rakesh Kudurumalla <rkudurumalla@marvell.com>
-> Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
+> You are right, the right phy-mode is "rgmii-id", the delay is not
+> added by the PCB. It seems to be better to ask for the vendor about
+> the hardware design before copying params for vendor dts. Anyway,
+> thanks for reviewing this.
 
-...
+Please do figure this out. Since you are adding a new compatible, you
+have a bit more flexibility. If the MAC driver is doing something
+wrong, you can change its behaviour based on this new compatible
+without breaking other users of the driver using other compatibles.
 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
-> index 7fa98aeb3663..18e2a48e2de1 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cn10k.c
-> @@ -544,6 +544,7 @@ void rvu_program_channels(struct rvu *rvu)
->  
->  void rvu_nix_block_cn10k_init(struct rvu *rvu, struct nix_hw *nix_hw)
->  {
-> +	struct rvu_hwinfo *hw = rvu->hw;
->  	int blkaddr = nix_hw->blkaddr;
->  	u64 cfg;
->  
-> @@ -558,6 +559,16 @@ void rvu_nix_block_cn10k_init(struct rvu *rvu, struct nix_hw *nix_hw)
->  	cfg = rvu_read64(rvu, blkaddr, NIX_AF_CFG);
->  	cfg |= BIT_ULL(1) | BIT_ULL(2);
-
-As per my comments on an earlier patch in this series:
-bits 1 and 2 have meaning. It would be nice to use a #define to
-convey this meaning to the reader.
-
->  	rvu_write64(rvu, blkaddr, NIX_AF_CFG, cfg);
-> +
-> +	cfg = rvu_read64(rvu, blkaddr, NIX_AF_CONST);
-> +
-> +	if (!(cfg & BIT_ULL(62))) {
-> +		hw->cap.second_cpt_pass = false;
-> +		return;
-> +	}
-> +
-> +	hw->cap.second_cpt_pass = true;
-> +	nix_hw->rq_msk.total = NIX_RQ_MSK_PROFILES;
->  }
->  
->  void rvu_apr_block_cn10k_init(struct rvu *rvu)
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-> index 6bd995c45dad..b15fd331facf 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-> @@ -6612,3 +6612,123 @@ int rvu_mbox_handler_nix_mcast_grp_update(struct rvu *rvu,
->  
->  	return ret;
->  }
-> +
-> +static inline void
-> +configure_rq_mask(struct rvu *rvu, int blkaddr, int nixlf,
-> +		  u8 rq_mask, bool enable)
-> +{
-> +	u64 cfg, reg;
-> +
-> +	cfg = rvu_read64(rvu, blkaddr, NIX_AF_LFX_RX_IPSEC_CFG1(nixlf));
-> +	reg = rvu_read64(rvu, blkaddr, NIX_AF_LFX_CFG(nixlf));
-> +	if (enable) {
-> +		cfg |= BIT_ULL(43);
-> +		reg = (reg & ~GENMASK_ULL(36, 35)) | ((u64)rq_mask << 35);
-> +	} else {
-> +		cfg &= ~BIT_ULL(43);
-> +		reg = (reg & ~GENMASK_ULL(36, 35));
-> +	}
-
-Likewise for the bit, mask, and shift here.
-
-And I think that using FIELD_PREP with another mask in place of the shift
-is also appropriate here.
-
-> +	rvu_write64(rvu, blkaddr, NIX_AF_LFX_RX_IPSEC_CFG1(nixlf), cfg);
-> +	rvu_write64(rvu, blkaddr, NIX_AF_LFX_CFG(nixlf), reg);
-> +}
-> +
-> +static inline void
-> +configure_spb_cpt(struct rvu *rvu, int blkaddr, int nixlf,
-> +		  struct nix_rq_cpt_field_mask_cfg_req *req, bool enable)
-> +{
-> +	u64 cfg;
-> +
-> +	cfg = rvu_read64(rvu, blkaddr, NIX_AF_LFX_RX_IPSEC_CFG1(nixlf));
-> +	if (enable) {
-> +		cfg |= BIT_ULL(37);
-> +		cfg &= ~GENMASK_ULL(42, 38);
-> +		cfg |= ((u64)req->ipsec_cfg1.spb_cpt_sizem1 << 38);
-> +		cfg &= ~GENMASK_ULL(63, 44);
-> +		cfg |= ((u64)req->ipsec_cfg1.spb_cpt_aura << 44);
-> +	} else {
-> +		cfg &= ~BIT_ULL(37);
-> +		cfg &= ~GENMASK_ULL(42, 38);
-> +		cfg &= ~GENMASK_ULL(63, 44);
-> +	}
-
-And here too.
-
-> +	rvu_write64(rvu, blkaddr, NIX_AF_LFX_RX_IPSEC_CFG1(nixlf), cfg);
-> +}
-
-...
-
-> +int rvu_mbox_handler_nix_lf_inline_rq_cfg(struct rvu *rvu,
-> +					  struct nix_rq_cpt_field_mask_cfg_req *req,
-> +					  struct msg_rsp *rsp)
-
-It would be nice to reduce this to 80 columns wide or less.
-Perhaps like this?
-
-int
-rvu_mbox_handler_nix_lf_inline_rq_cfg(struct rvu *rvu,
-				      struct nix_rq_cpt_field_mask_cfg_req *req,
-				      struct msg_rsp *rsp)
-
-Or perhaps by renaming nix_rq_cpt_field_mask_cfg_req to be shorter.
-
-...
-
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.h
-> index 245e69fcbff9..e5e005d5d71e 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.h
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_reg.h
-> @@ -433,6 +433,8 @@
->  #define NIX_AF_MDQX_IN_MD_COUNT(a)	(0x14e0 | (a) << 16)
->  #define NIX_AF_SMQX_STATUS(a)		(0x730 | (a) << 16)
->  #define NIX_AF_MDQX_OUT_MD_COUNT(a)	(0xdb0 | (a) << 16)
-> +#define NIX_AF_RX_RQX_MASKX(a, b)       (0x4A40 | (a) << 16 | (b) << 3)
-> +#define NIX_AF_RX_RQX_SETX(a, b)        (0x4A80 | (a) << 16 | (b) << 3)
-
-FIELD_PREP could be used here in conjunction with #defines
-for appropriate masks here too.
-
->  
->  #define NIX_PRIV_AF_INT_CFG		(0x8000000)
->  #define NIX_PRIV_LFX_CFG		(0x8000010)
-
-...
+	Andrew
 
