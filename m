@@ -1,191 +1,176 @@
-Return-Path: <netdev+bounces-188628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07F5CAADFDE
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 14:57:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 477B3AAE00C
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 15:06:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A693B3A81D4
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 12:56:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACD984C7B44
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 13:06:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D0B328151E;
-	Wed,  7 May 2025 12:56:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00596205ABA;
+	Wed,  7 May 2025 13:06:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y+xQIuO2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SoANQq3h"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EEAF72635;
-	Wed,  7 May 2025 12:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8A3627738;
+	Wed,  7 May 2025 13:06:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746622593; cv=none; b=E0eoJXu+p8SwnOEJKCQ37K03cuEKhhS1H7QHfZNSpbjvg7cDekXRlPrENTQp/3xxvMt3H1n2HqSJ0jtBJsZk5WfUbbKNqSOwnZcOdAOv8Ppsz4o3FJgGhXtEZC7HsbTiXVPzQ7RAW0SJkbhYPBev0pIWNrg/3K/CPfeLHEBI5Oo=
+	t=1746623212; cv=none; b=WM85RwOjE93ZHL9uuXvFrwxWueTIW3yThRa/sh2hRnL5Qb+/5ZQLx+dkxafK2LQmQJXpOtJSEK0bMHihZV/8Ans2NL3phYHbfiF6AUMG8km2WowoUHSwYguMk5hJmCu/s1qWGdh780wGSP7h9bayW1f3RPkhFfks3qM8aPriGyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746622593; c=relaxed/simple;
-	bh=ETKPy7cscEkxT1hCjZsF04t03LagtJT/ZxD8Xi5As1c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YZf88/se1D/T3eRp1uEc7pNOStduOEu7TeX71ONGZD2wm5ZI9V/cE0yxdk0diTCbNB0SnTbjlohaaoLC9rMS/mcweo9wvL7Jtw7DkEuIhSGtVFSCiJVpSDgACOnOd3cllTnl6JP7Iipvii7Qjo70eceOQDHJ3CRVS2yo2ZRvD1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y+xQIuO2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9560DC4CEF0;
-	Wed,  7 May 2025 12:56:27 +0000 (UTC)
+	s=arc-20240116; t=1746623212; c=relaxed/simple;
+	bh=wyAYYd84JBmoBLFkIu08Qe55Uogwnq+GwPkJ9/VYoFg=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=KO+b3+e6ni+FcK47LbIWilfwtIJqvDoPAr7mUHWABOIPBZLPGN9rV8p1WFnGVC5IW5jLMO5yxGf8mQS11j6bx49SDVzu4WUnDAOv23mJa3Ll6RmhdUbb1dZT8nfQdWGxiYBYAN41r1wIW4chOhUITM1J0QgRzfkAj3ORiqcjTc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SoANQq3h; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56F45C4CEE7;
+	Wed,  7 May 2025 13:06:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746622592;
-	bh=ETKPy7cscEkxT1hCjZsF04t03LagtJT/ZxD8Xi5As1c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Y+xQIuO2q5l0LtuVPuQY0qcRWd4Ed6207mKUG5AmU2olxGhuHQoH48tfjDGyburUA
-	 OZNTdVowOXuPl9fuQVujjYoDH8jc1XbLOrRkYZRY6HCS59qOY4rss7AQ+8SebZ/7an
-	 8wjstxtgfO4JwtgnyYOnUiiO4gXw/PqzIKG2YmsYoQla4t2dcQV8MEnuWD2Z7hLeCX
-	 hhH8bLqWMTpNhyxtmbd8DnZJmRvke6iyku3t3b2VOaYIMiOdjxIBdxkbegAcjWuON9
-	 0+3yI3SyW/gTX/dtpjReRUe73WF246qEbmX4mzVXbqKIKaXQvXwfQV3ga3+H8ymoOp
-	 zl3pupL0oH5Pg==
-Date: Wed, 7 May 2025 13:56:25 +0100
-From: Simon Horman <horms@kernel.org>
-To: Tanmay Jagdale <tanmay@marvell.com>
-Cc: bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
-	jerinj@marvell.com, hkelam@marvell.com, sbhatta@marvell.com,
-	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, bbhushan2@marvell.com, bhelgaas@google.com,
-	pstanner@redhat.com, gregkh@linuxfoundation.org,
-	peterz@infradead.org, linux@treblig.org,
-	krzysztof.kozlowski@linaro.org, giovanni.cabiddu@intel.com,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, rkannoth@marvell.com, sumang@marvell.com,
-	gcherian@marvell.com
-Subject: Re: [net-next PATCH v1 09/15] octeontx2-pf: ipsec: Allocate Ingress
- SA table
-Message-ID: <20250507125625.GD3339421@horms.kernel.org>
-References: <20250502132005.611698-1-tanmay@marvell.com>
- <20250502132005.611698-10-tanmay@marvell.com>
+	s=k20201202; t=1746623212;
+	bh=wyAYYd84JBmoBLFkIu08Qe55Uogwnq+GwPkJ9/VYoFg=;
+	h=From:Subject:Date:To:Cc:From;
+	b=SoANQq3hHJQV9KgS9Z7XVfwsP/Meoxu9SvgyKX2su5wlTjqCpq2mB0G3424QgeutE
+	 Rwh1usS7XyEIKcO0zfl4dqCzVumxGUHm9shInbxDlDP7RjWuu+4kJ0HC9PL5ag+Q7t
+	 6KyjQYupU045CQgfirq6BRe+Em7esBmHnkdA7Qjati5cUHP1SczOx7/4kyNk0/MuCn
+	 jQzthBilyIpTHP7DQ5nzHChFDrq8D505lRamWrT+vjYCny8fjkQLPa5CaNfyNKSjUm
+	 Tix58VokwMdSl9frxL+ju9rhrED9SWNehYaLJ7l9Z8I1tI7tQXkliZPMn0EIMFVm7x
+	 8lggBaOdwZmrw==
+From: Jeff Layton <jlayton@kernel.org>
+Subject: [PATCH v8 00/10] ref_tracker: add ability to register a debugfs
+ file for a ref_tracker_dir
+Date: Wed, 07 May 2025 09:06:25 -0400
+Message-Id: <20250507-reftrack-dbgfs-v8-0-607717d3bb98@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250502132005.611698-10-tanmay@marvell.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIANFaG2gC/2XQwWrEIBAG4FdZPNeio0bTU9+j9KCjZmVLsugSW
+ pa8eycLpWnF0+/w/TBzZy3Vkhp7Od1ZTWtpZZkpuKcTw7Ofp8RLpMxAgBFaKl5TvlWPFx7DlBt
+ XdrBBCZUge0boSvPy+Sh8e6d8Lu221K9H/yr3358q/b9qlVzwLJRxxikAoV4vqc7p43mpE9u7V
+ jh603kgH6RD7UOUALnz6uht5xV5VNKMGhy6HDqvj951XpM36A1aN45G686bg4feG/ISQ4iZlnc
+ hdn44eCU6P5B3g0UYfaY7+s7bX0+v83a/v3Vo4mgD4l+/bds3wXPUIy0CAAA=
+X-Change-ID: 20250413-reftrack-dbgfs-3767b303e2fa
+To: Andrew Morton <akpm@linux-foundation.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+ Jani Nikula <jani.nikula@linux.intel.com>, 
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, 
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, 
+ Tvrtko Ursulin <tursulin@ursulin.net>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Qasim Ijaz <qasdev00@gmail.com>, 
+ Nathan Chancellor <nathan@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, 
+ Jeff Layton <jlayton@kernel.org>, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, 
+ Jani Nikula <jani.nikula@intel.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3668; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=wyAYYd84JBmoBLFkIu08Qe55Uogwnq+GwPkJ9/VYoFg=;
+ b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBoG1rhBJ9llmbY3ne2ZbTEU+iAzAWhkr9X5Nag1
+ ifMlVoU+BKJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaBta4QAKCRAADmhBGVaC
+ FVDzEACJu1HeohOGr7I/rjrFlmMFPaLjCvxlvM0mu2GfDxiaiQALRxoA8pWoxjyz4oomP3zlG4X
+ 6N+WX/N4lryaaX6zqwy0LVD6eBf9R8y7GBtlvHhWBSwPMqmRu1/UPhJw0jh7irTVwgSbQSn3DBz
+ KLdE6TkOx7jSSC1TukYfgHlHham+i3OQSOsjKMypJ7FlrOyAERyQTVdS5kzJTfbYMUx8jbfdr2X
+ /0N8kSYtWA0vQLC8AOEPzeDjm5TdohIbunFFp+kSYlQV79h0kP35B7JFb77hKXn5zBNvEND8Ha1
+ nvbdM6qhMrd1a6zGeAsmLM3rBAbl/kpQCIcd8Yj4dhlZ+LKAPSAkdw8hMZts98vFlFx1OcKdH7U
+ tSOHBoOYPQ6uAKCE6xplxsnVE9LLzdJfaSJYiAVoK59J/NG2IO2JEzQUi+NTVwYTxW8BmOy5u6o
+ qT/zMuztogcTyYaLIEMjzDhIsH/p+x8fsOwHogamDIzcizB6r894cHXrQ4DnNkBe+/zCVXvrflT
+ lY9JFgDYfXQ3I/RFzwjaITNu4Jezf3OcYL2nqdyRyZEeOQLH7mpsHaehPWz+tkBz8caLWQcEzRW
+ sOeV6gHrVs/Wwy50337BwAW+pTaeTgR1p+FB2Hr37aXSTTPc2amYEf4yR/DEsvymeKfYf0F6u/v
+ 2OEnPYtZ/HjBn2Q==
+X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
+ fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-On Fri, May 02, 2025 at 06:49:50PM +0530, Tanmay Jagdale wrote:
-> Every NIX LF has the facility to maintain a contiguous SA table that
-> is used by NIX RX to find the exact SA context pointer associated with
-> a particular flow. Allocate a 128-entry SA table where each entry is of
-> 2048 bytes which is enough to hold the complete inbound SA context.
-> 
-> Add the structure definitions for SA context (cn10k_rx_sa_s) and
-> SA bookkeeping information (ctx_inb_ctx_info).
-> 
-> Also, initialize the inb_sw_ctx_list to track all the SA's and their
-> associated NPC rules and hash table related data.
-> 
-> Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
+Minor update to fix up the build and some compiler warnings with more
+esoteric Kconfigs.
 
-...
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
+---
+Changes in v8:
+- fix up compiler warnings that the KTR warned about
+- ensure builds with CONFIG_DEBUG_FS=n and CONFIG_REF_TRACKER=y work
+- Link to v7: https://lore.kernel.org/r/20250505-reftrack-dbgfs-v7-0-f78c5d97bcca@kernel.org
 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
+Changes in v7:
+- include net->net_cookie in netns symlink name
+- add __ostream_printf to ref_tracker_dir_symlink() stub function
+- remove unneeded #include of seq_file.h
+- Link to v6: https://lore.kernel.org/r/20250430-reftrack-dbgfs-v6-0-867c29aff03a@kernel.org
 
-...
+Changes in v6:
+- clean up kerneldoc comment for ref_tracker_dir_debugfs()
+- add missing stub function for ref_tracker_dir_symlink()
+- temporary __maybe_unused on ref_tracker_dir_seq_print() to silence compiler warning
+- Link to v5: https://lore.kernel.org/r/20250428-reftrack-dbgfs-v5-0-1cbbdf2038bd@kernel.org
 
-> @@ -146,6 +169,76 @@ struct cn10k_tx_sa_s {
->  	u64 hw_ctx[6];		/* W31 - W36 */
->  };
->  
-> +struct cn10k_rx_sa_s {
-> +	u64 inb_ar_win_sz	: 3; /* W0 */
-> +	u64 hard_life_dec	: 1;
-> +	u64 soft_life_dec	: 1;
-> +	u64 count_glb_octets	: 1;
-> +	u64 count_glb_pkts	: 1;
-> +	u64 count_mib_bytes	: 1;
-> +	u64 count_mib_pkts	: 1;
-> +	u64 hw_ctx_off		: 7;
-> +	u64 ctx_id		: 16;
-> +	u64 orig_pkt_fabs	: 1;
-> +	u64 orig_pkt_free	: 1;
-> +	u64 pkind		: 6;
-> +	u64 rsvd_w0_40		: 1;
-> +	u64 eth_ovrwr		: 1;
-> +	u64 pkt_output		: 2;
-> +	u64 pkt_format		: 1;
-> +	u64 defrag_opt		: 2;
-> +	u64 x2p_dst		: 1;
-> +	u64 ctx_push_size	: 7;
-> +	u64 rsvd_w0_55		: 1;
-> +	u64 ctx_hdr_size	: 2;
-> +	u64 aop_valid		: 1;
-> +	u64 rsvd_w0_59		: 1;
-> +	u64 ctx_size		: 4;
-> +
-> +	u64 rsvd_w1_31_0	: 32; /* W1 */
-> +	u64 cookie		: 32;
-> +
-> +	u64 sa_valid		: 1; /* W2 Control Word */
-> +	u64 sa_dir		: 1;
-> +	u64 rsvd_w2_2_3		: 2;
-> +	u64 ipsec_mode		: 1;
-> +	u64 ipsec_protocol	: 1;
-> +	u64 aes_key_len		: 2;
-> +	u64 enc_type		: 3;
-> +	u64 life_unit		: 1;
-> +	u64 auth_type		: 4;
-> +	u64 encap_type		: 2;
-> +	u64 et_ovrwr_ddr_en	: 1;
-> +	u64 esn_en		: 1;
-> +	u64 tport_l4_incr_csum	: 1;
-> +	u64 iphdr_verify	: 2;
-> +	u64 udp_ports_verify	: 1;
-> +	u64 l2_l3_hdr_on_error	: 1;
-> +	u64 rsvd_w25_31		: 7;
-> +	u64 spi			: 32;
+Changes in v5:
+- add class string to each ref_tracker_dir
+- auto-register debugfs file for every tracker in ref_tracker_dir_init
+- add function to allow adding a symlink for each tracker
+- add patches to create symlinks for netns's and i915 entries
+- change output format to print class@%p instead of name@%p
+- eliminate the name field in ref_tracker_dir
+- fix off-by-one bug when NULL terminating name string
+- Link to v4: https://lore.kernel.org/r/20250418-reftrack-dbgfs-v4-0-5ca5c7899544@kernel.org
 
-As I understand it, this driver is only intended to run on arm64 systems.
-While it is also possible, with COMPILE_TEST test, to compile the driver
-on for 64-bit systems.
+Changes in v4:
+- Drop patch to widen ref_tracker_dir_.name, use NAME_MAX+1 (256) instead since this only affects dentry name
+- Link to v3: https://lore.kernel.org/r/20250417-reftrack-dbgfs-v3-0-c3159428c8fb@kernel.org
 
-So, given the first point above, this may be moot. But the above
-assumes that the byte order of the host is the same as the device.
-Or perhaps more to the point, it has been written for a little-endian
-host and the device is expecting the data in that byte order.
+Changes in v3:
+- don't overwrite dir->name in ref_tracker_dir_debugfs
+- define REF_TRACKER_NAMESZ and use it when setting name
+- Link to v2: https://lore.kernel.org/r/20250415-reftrack-dbgfs-v2-0-b18c4abd122f@kernel.org
 
-But u64 is supposed to represent host byte order.  And, in my understanding
-of things, this is the kind of problem that FIELD_PREP and FIELD_GET are
-intended to avoid, when combined on endian-specific integer types (in this
-case __le64 seems appropriate).
+Changes in v2:
+- Add patch to do %pK -> %p conversion in ref_tracker.c
+- Pass in output function to pr_ostream() instead of if statement
+- Widen ref_tracker_dir.name to 64 bytes to accomodate unique names
+- Eliminate error handling with debugfs manipulation
+- Incorporate pointer value into netdev name
+- Link to v1: https://lore.kernel.org/r/20250414-reftrack-dbgfs-v1-0-f03585832203@kernel.org
 
-I do hesitate in bringing this up, as the above very likely works on
-all systems on which this code is intended to run. But I do so
-because it is not correct on all systems for which this code can be
-compiled. And thus seems somehow misleading.
+---
+Jeff Layton (10):
+      ref_tracker: don't use %pK in pr_ostream() output
+      ref_tracker: add a top level debugfs directory for ref_tracker
+      ref_tracker: have callers pass output function to pr_ostream()
+      ref_tracker: add a static classname string to each ref_tracker_dir
+      ref_tracker: allow pr_ostream() to print directly to a seq_file
+      ref_tracker: automatically register a file in debugfs for a ref_tracker_dir
+      ref_tracker: add a way to create a symlink to the ref_tracker_dir debugfs file
+      net: add symlinks to ref_tracker_dir for netns
+      i915: add ref_tracker_dir symlinks for each tracker
+      ref_tracker: eliminate the ref_tracker_dir name field
 
-> +
-> +	u64 w3;			/* W3 */
-> +
-> +	u8 cipher_key[32];	/* W4 - W7 */
-> +	u32 rsvd_w8_0_31;	/* W8 : IV */
-> +	u32 iv_gcm_salt;
-> +	u64 rsvd_w9;		/* W9 */
-> +	u64 rsvd_w10;		/* W10 : UDP Encap */
-> +	u32 dest_ipaddr;	/* W11 - Tunnel mode: outer src and dest ipaddr */
-> +	u32 src_ipaddr;
-> +	u64 rsvd_w12_w30[19];	/* W12 - W30 */
-> +
-> +	u64 ar_base;		/* W31 */
-> +	u64 ar_valid_mask;	/* W32 */
-> +	u64 hard_sa_life;	/* W33 */
-> +	u64 soft_sa_life;	/* W34 */
-> +	u64 mib_octs;		/* W35 */
-> +	u64 mib_pkts;		/* W36 */
-> +	u64 ar_winbits;		/* W37 */
-> +
-> +	u64 rsvd_w38_w100[63];
-> +};
-> +
->  /* CPT instruction parameter-1 */
->  #define CN10K_IPSEC_INST_PARAM1_DIS_L4_CSUM		0x1
->  #define CN10K_IPSEC_INST_PARAM1_DIS_L3_CSUM		0x2
+ drivers/gpu/drm/display/drm_dp_tunnel.c |   2 +-
+ drivers/gpu/drm/i915/intel_runtime_pm.c |   4 +-
+ drivers/gpu/drm/i915/intel_wakeref.c    |   3 +-
+ include/linux/ref_tracker.h             |  58 +++++++++-
+ lib/ref_tracker.c                       | 190 +++++++++++++++++++++++++++++---
+ net/core/dev.c                          |   2 +-
+ net/core/net_namespace.c                |  34 +++++-
+ 7 files changed, 267 insertions(+), 26 deletions(-)
+---
+base-commit: 5bc1018675ec28a8a60d83b378d8c3991faa5a27
+change-id: 20250413-reftrack-dbgfs-3767b303e2fa
+
+Best regards,
+-- 
+Jeff Layton <jlayton@kernel.org>
+
 
