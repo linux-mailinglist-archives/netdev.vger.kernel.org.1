@@ -1,122 +1,182 @@
-Return-Path: <netdev+bounces-188717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AD3DAAE5A3
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 17:58:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC0B2AAE5C6
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 18:01:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 819E718883DC
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 15:56:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14B413A2D62
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 15:58:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6657828C02B;
-	Wed,  7 May 2025 15:54:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BDDE28A706;
+	Wed,  7 May 2025 15:58:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GdwszruL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k/h1ebp0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B160F28BAB4
-	for <netdev@vger.kernel.org>; Wed,  7 May 2025 15:54:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FE844D599;
+	Wed,  7 May 2025 15:58:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746633285; cv=none; b=X69SPn+eoExAXW35FYSQz6NrVekc4JsZJzW6LPrRagiZhH82JDHXxWAAiIYyXSVoCk+Ypg91FvShzP1zUJ9RwZ4xKSQtlrbUOrnLk6c1U+Oi7WJ1S7JPBHw9Yw/JXQc4yPNzAedLeP1uoDgCoxBCoOf4QV4u47vtseuBPgLqyCg=
+	t=1746633503; cv=none; b=dpH9XxHrZed+qV2nEjzeOiJJnFfXVn/woFpHBixf+hyeYpG4pUfNQu+h6ZWq63ASF+UrrWvZbhKXjyih+/W6Ac5uNK9UyHHsgRvHbcWHEctk+W+/yZT5cEq13Rvx71lswdFjo+8NIQm6iGJCjc6yACtYtiepdGyPYsfDyaL4New=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746633285; c=relaxed/simple;
-	bh=ZTmRocbIlgidCiB8qAhF5u3HCmGNgSbVOzCnAG6cxyY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GSMErfix7a0KOWPrZJrS5qcYVa/3DOe3uMKnUlNy7WJ4BLttTrDpHgiexS57oY2WqczCIKsfaSVfW9oxRqi8JVHoUKfWrx9H1WUFCF/q4ejjiwbp0g4yTgiV6GspzOcNua/B9SuT1qm2JVxnT8ukSxEOcYuh0nXPpLg23BMWGlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GdwszruL; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5fbee929e56so2002797a12.0
-        for <netdev@vger.kernel.org>; Wed, 07 May 2025 08:54:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746633282; x=1747238082; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=B6HVL9BX+MplgPxa8q0GRBwUe8Z4JNQg8ytJJS9YZi4=;
-        b=GdwszruLRUxd3cxD8ve7Gr43f0W/5fzo7M4OicdCCLyvJiwR0EfoZW4o1/oMjp+sBL
-         7DRBmlWQcpzf3c0g3VtbiAvYcblcF0Byi3His842XDVUnF4DGenFe9rcUJNjsyv6xONE
-         gJNVM6T2cMZ8mUFBMuikuj+Ie1rbnPsv7D+Qlt2trz8Jac6K8z6noyeQZdJymGiYPb0A
-         Fy81FD+PZT2PrNC0XuHFxW8VIM1U+XDb7PDsvE97U25Xf6z2P2+sOY88EyO/OxnYB9bk
-         92EAhbRNShO4dbNedaXZVbQBI2TJZlvOit94XVlah8+8OuhOcHNukRp7eThp1OKTtfUc
-         3dPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746633282; x=1747238082;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=B6HVL9BX+MplgPxa8q0GRBwUe8Z4JNQg8ytJJS9YZi4=;
-        b=VHVt0BShts/U62TALT/9qbOYRj++/xTnsHlhwJjXw1PSzXePU3Gmz0ppKguU+Z+4aA
-         NF/AeJH2oYYjFV8iY5H6KbXJxKaZrdUymJYZ+AkjHCvuILfEbcCZSseAZN6A23BTDM+p
-         oorRma89mNiniCTih4EH5vuUjr90l4AuHekE7Yy0N+WYtJapLuXA57Yw3jGkfST1LP1P
-         66tmp0j+A6WQtxkRj2CUJgZQHeI1ZJBAKCYsfcJnLj3Jw7/Rk375JYp1gNx6sLW+G8Ru
-         FzWYaMb0XvSJBw8FxDl1hx7J7YRs+XmqiPYJ4eSbuzdIYbeMmnONMM20DcrXzTyZhEls
-         k4uw==
-X-Forwarded-Encrypted: i=1; AJvYcCVm/iPi+CHg44xoPfgyMyPU1AzI4K4M7PC/o4P5Ld1Pbac8YeHnBfzBAV2ue9srGPDBVAbx3cE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZwjyvKkG3JoBikXzYhAXWyA7mRjoksOkdsg1CcE7SvTfDgwWF
-	Bd/wvHwzkpcwRnhVWaPrcZMyJlP2KHMfGSb8F3sGXURuKBo2Y32rPOlwfg7xxuBZy8Z0Vz7bdEg
-	jLzqDqwzHQlRUX0mRj8pwk7aUku4=
-X-Gm-Gg: ASbGncvmKKS0VAMWNfg7RpuXrmqMzgLvJGmOl1w7G1QpE8IH9ck/FsWDj16O85iCH5r
-	gVDyrx//EarVw9RYiJ1qYGtxLfU90rF2hWAa5kRAu08CrZfAnVxPPRVVJknfcuBu9fBKhuwAMjB
-	Fv/C1fEr5/OrWPXSPii984awyWpn30ADU9AQ==
-X-Google-Smtp-Source: AGHT+IGl8VIgo/rRLJkE1yiyZm2FLFgx6Y1+8OGwrDDf7ItJ/KRqA1QFBb08quZbIyylqSLrwp2XEObYZK7ahUPgfpI=
-X-Received: by 2002:a05:6402:26d2:b0:5fa:fcda:bf57 with SMTP id
- 4fb4d7f45d1cf-5fbe9e53b69mr3431797a12.17.1746633281702; Wed, 07 May 2025
- 08:54:41 -0700 (PDT)
+	s=arc-20240116; t=1746633503; c=relaxed/simple;
+	bh=9OTKdflDOR50qS6aHZW+uyRKI0CdXdUacM8H5zHJItI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tUCAbwnindWehWeKJQ7IbQRvEbjaCmgIe25yQtPDykMkXxZzLV34vJeKQvxxv2lxhQx6VQmgu4MIWbTy/eOucp5nD3JDmxMO4K2TDUd+bwD7UQ4IeH7o1NstNfEcv02BdGuh1o3mVztmDMRKjeLgy9YFZxQ3aBxLhFz5zbIjn4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k/h1ebp0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CD71C4CEE2;
+	Wed,  7 May 2025 15:58:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746633501;
+	bh=9OTKdflDOR50qS6aHZW+uyRKI0CdXdUacM8H5zHJItI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=k/h1ebp0eNDJHb8V1zpv2hW1ydgmCNDe6rxjCI6ep4mRjUs6kUSsLfFZ7T5pjf0AE
+	 xCq82YI0wQ8f8zzextQGxkj5gg5g/aEc1pQYEbprFIfNS7Ae+Hcc5fIXd1gl/tvnwY
+	 eLUpaZkc1Lqwx4O3P5aPAtG8clad+ReDG7LFJplrGLorNcKS53T8S1adKIu+4LY7vh
+	 9ZmhvQ37oX9h/vK1Mq+63z4xclfIa8fx3C3FiKIQgQPWifkrhhsBDNpC6xdd2h8w9L
+	 rjZkWEmk9sXtZNmz19kDni2aw+tUcmxiWfVY/xrzOBnIySqacmREDu09t43vH+RiSb
+	 /htHEMjuOXTOw==
+Date: Wed, 7 May 2025 16:58:14 +0100
+From: Simon Horman <horms@kernel.org>
+To: Tanmay Jagdale <tanmay@marvell.com>
+Cc: bbrezillon@kernel.org, arno@natisbad.org, schalla@marvell.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
+	jerinj@marvell.com, hkelam@marvell.com, sbhatta@marvell.com,
+	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, bbhushan2@marvell.com, bhelgaas@google.com,
+	pstanner@redhat.com, gregkh@linuxfoundation.org,
+	peterz@infradead.org, linux@treblig.org,
+	krzysztof.kozlowski@linaro.org, giovanni.cabiddu@intel.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, rkannoth@marvell.com, sumang@marvell.com,
+	gcherian@marvell.com
+Subject: Re: [net-next PATCH v1 13/15] octeontx2-pf: ipsec: Manage NPC rules
+ and SPI-to-SA table entries
+Message-ID: <20250507155814.GG3339421@horms.kernel.org>
+References: <20250502132005.611698-1-tanmay@marvell.com>
+ <20250502132005.611698-14-tanmay@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250506140858.2660441-1-ap420073@gmail.com> <20250506195526.2ab7c15b@kernel.org>
- <CAMArcTUx5cK2kh2M8BirtQRG5Qt+ArwZ_a=xwi_bTHyKJ7E+og@mail.gmail.com> <20250507062321.4acdf9e6@kernel.org>
-In-Reply-To: <20250507062321.4acdf9e6@kernel.org>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Thu, 8 May 2025 00:54:30 +0900
-X-Gm-Features: ATxdqUFjUKfefZ3y4ZtxFZK7swtA06XlsLH_JyBVmPclqvxrtHB9WG08ksK2Fjo
-Message-ID: <CAMArcTW4-4=4XR+KshpPqVKXgTRNmXdwATrij9gAgYKrpOcOTw@mail.gmail.com>
-Subject: Re: [PATCH net v2] net: devmem: fix kernel panic when socket close
- after module unload
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
-	andrew+netdev@lunn.ch, horms@kernel.org, almasrymina@google.com, 
-	sdf@fomichev.me, netdev@vger.kernel.org, asml.silence@gmail.com, 
-	dw@davidwei.uk, skhawaja@google.com, willemb@google.com, jdamato@fastly.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250502132005.611698-14-tanmay@marvell.com>
 
-On Wed, May 7, 2025 at 10:23=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Wed, 7 May 2025 13:55:44 +0900 Taehee Yoo wrote:
-> > So, it acquires a socket lock only for setting binding->dev to NULL,
-> > right?
->
-> Yes.
->
-> BTW one more tiny nit pick:
->
->                 net_devmem_unbind_dmabuf(binding);
-> +               mutex_unlock(&priv->lock);       << unlock
->                 netdev_unlock(dev);
-> +               netdev_put(dev, &dev_tracker);
-> +               mutex_lock(&priv->lock);         << re-lock
->
-> The two marked ops are unnecessary. We only have to acquire the locks
-> in order. Its perfectly fine to release netdev_unlock() and keep holding
-> the socket lock.
+On Fri, May 02, 2025 at 06:49:54PM +0530, Tanmay Jagdale wrote:
+> NPC rule for IPsec flows
+> ------------------------
+> Incoming IPsec packets are first classified for hardware fastpath
+> processing in the NPC block. Hence, allocate an MCAM entry in NPC
+> using the MCAM_ALLOC_ENTRY mailbox to add a rule for IPsec flow
+> classification.
+> 
+> Then, install an NPC rule at this entry for packet classification
+> based on ESP header and SPI value with match action as UCAST_IPSEC.
+> Also, these packets need to be directed to the dedicated receive
+> queue so provide the RQ index as part of NPC_INSTALL_FLOW mailbox.
+> Add a function to delete NPC rule as well.
+> 
+> SPI-to-SA match table
+> ---------------------
+> NIX RX maintains a common hash table for matching the SPI value from
+> in ESP packet to the SA index associated with it. This table has 2K entries
+> with 4 ways. When a packet is received with action as UCAST_IPSEC, NIXRX
+> uses the SPI from the packet header to perform lookup in the SPI-to-SA
+> hash table. This lookup, if successful, returns an SA index that is used
+> by NIXRX to calculate the exact SA context address and programs it in
+> the CPT_INST_S before submitting the packet to CPT for decryption.
+> 
+> Add functions to install the delete an entry from this table via the
+> NIX_SPI_TO_SA_ADD and NIX_SPI_TO_SA_DELETE mailbox calls respectively.
+> 
+> When the RQs are changed at runtime via ethtool, RVU PF driver frees all
+> the resources and goes through reinitialization with the new set of receive
+> queues. As part of this flow, the UCAST_IPSEC NPC rules that were installed
+> by the RVU PF/VF driver have to be reconfigured with the new RQ index.
+> 
+> So, delete the NPC rules when the interface is stopped via otx2_stop().
+> When otx2_open() is called, re-install the NPC flow and re-initialize the
+> SPI-to-SA table for every SA context that was previously installed.
+> 
+> Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
+> ---
+>  .../marvell/octeontx2/nic/cn10k_ipsec.c       | 201 ++++++++++++++++++
+>  .../marvell/octeontx2/nic/cn10k_ipsec.h       |   7 +
+>  .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   9 +
+>  3 files changed, 217 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
 
-Wow, I didn't know that.
-As my knowledge is only ABBA is correct, and I've never thought about
-whether ABAB is possible or not.
-I will change it.
+...
 
-Thank you so much!
-Taehee Yoo
+> +static int cn10k_inb_install_flow(struct otx2_nic *pfvf, struct xfrm_state *x,
+> +				  struct cn10k_inb_sw_ctx_info *inb_ctx_info)
+> +{
+> +	struct npc_install_flow_req *req;
+> +	int err;
+> +
+> +	mutex_lock(&pfvf->mbox.lock);
+> +
+> +	req = otx2_mbox_alloc_msg_npc_install_flow(&pfvf->mbox);
+> +	if (!req) {
+> +		err = -ENOMEM;
+> +		goto out;
+> +	}
+> +
+> +	req->entry = inb_ctx_info->npc_mcam_entry;
+> +	req->features |= BIT(NPC_IPPROTO_ESP) | BIT(NPC_IPSEC_SPI) | BIT(NPC_DMAC);
+> +	req->intf = NIX_INTF_RX;
+> +	req->index = pfvf->ipsec.inb_ipsec_rq;
+> +	req->match_id = 0xfeed;
+> +	req->channel = pfvf->hw.rx_chan_base;
+> +	req->op = NIX_RX_ACTIONOP_UCAST_IPSEC;
+> +	req->set_cntr = 1;
+> +	req->packet.spi = x->id.spi;
+> +	req->mask.spi = 0xffffffff;
+
+I realise that the value is isomorphic, but I would use the following
+so that the rvalue has an endian annotation that matches the lvalue.
+
+	req->mask.spi = cpu_to_be32(0xffffffff);
+
+Flagged by Sparse.
+
+> +
+> +	/* Send message to AF */
+> +	err = otx2_sync_mbox_msg(&pfvf->mbox);
+> +out:
+> +	mutex_unlock(&pfvf->mbox.lock);
+> +	return err;
+> +}
+
+...
+
+> +static int cn10k_inb_delete_spi_to_sa_match_entry(struct otx2_nic *pfvf,
+> +						  struct cn10k_inb_sw_ctx_info *inb_ctx_info)
+
+gcc-14.2.0 (at least) complains that cn10k_inb_delete_spi_to_sa_match_entry
+is unused.
+
+Likewise for cn10k_inb_delete_flow and cn10k_inb_delete_spi_to_sa_match_entry.
+
+I'm unsure of the best way to address this but it would be nice
+to avoid breaking build bisection for such a trivial reason.
+
+Some ideas:
+* Maybe it is possible to squash this and the last patch,
+  or bring part of the last patch into this patch, or otherwise
+  rearrange things to avoid this problem.
+* Add temporary __maybe_unusd annotations.
+  (I'd consider this a last resort.)
+
+  ...
 
