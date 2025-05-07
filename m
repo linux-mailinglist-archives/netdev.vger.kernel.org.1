@@ -1,80 +1,48 @@
-Return-Path: <netdev+bounces-188550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15705AAD542
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 07:32:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98F09AAD5A8
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 08:06:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6EF5F7B4715
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 05:31:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C8393BB45A
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 06:06:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A25D18952C;
-	Wed,  7 May 2025 05:32:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CFA21A9B28;
+	Wed,  7 May 2025 06:06:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="An7ue0kC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bOlxPNU6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68E3F139E
-	for <netdev@vger.kernel.org>; Wed,  7 May 2025 05:32:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F83D182D2;
+	Wed,  7 May 2025 06:06:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746595935; cv=none; b=UCK0BKAEICxLlqabThsCKQvXsaiQka1Du/VIIhl/az92VFkrxXM+nSOBb2HfEbixGVMP+3+ppgptAySWZIeqX1QSL+0cOM+dMfo56upVS0xjaLDCUHYxBG2nUOS4BVfWSvOaP2S3bDfyaDqFfU+I1dIa/9AVHUAXOUovfONI330=
+	t=1746598005; cv=none; b=W3HXrIGIyn9PdEaxrjAOHkmTB4QTyCOARAhUgAWGXgZ1PVE+tjCKeGO8hl7RTqt7KK8m1b7BvBYwNWdAT0S2jg/2OBTiJVXrIo/yDUpGhEJwQVzC7GpuIzV0UwCpE3j0KC00W4U0b4gCcJnj0KZu82mBlI0sjL5Ux5QcyDL+H8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746595935; c=relaxed/simple;
-	bh=yTF7Jp+TbY9cdTZBGOI3JrvkroGJtrZEvckT2cb/qwk=;
+	s=arc-20240116; t=1746598005; c=relaxed/simple;
+	bh=sl0h3K31emDHUrMxHF3Oe1q8RNKJCOPAyZs8N/5wF8w=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=d3P5V38H95b+s6ecKZH2TgOa8eqKTeQTL1SKmUahtuhYokjq1+tI5tP/NaRErJPGq3tld2POadnV2pTod56u1VnUrsJl8Bkv3jiUPi9IvhUjDP+Az08VmFIptj0Hi/BaD0HeTwr8fwAx23p7nkigwk1tz/F4C4d/kfsIdezTHc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=An7ue0kC; arc=none smtp.client-ip=209.85.167.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3fea67e64caso4714511b6e.2
-        for <netdev@vger.kernel.org>; Tue, 06 May 2025 22:32:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1746595932; x=1747200732; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rXHN6Gnj9+P3ptMzbsSFbhupeu9xKqhyrBaUp2v4ioo=;
-        b=An7ue0kCo8B51ct1pXlQDs2myLL719Pr+ee8SDUg7N/sPfY5ey/aYYJN79IZQamAMK
-         i1Hz3d4BkyYZpQaKrfLBR5GFXEqjTAjKoiZCnpUB7UgtPZorp3GG5l5j+IwMknOjOalh
-         8D/7yavcEGjrfhRAk+QyTuJ38l7jbX0Ea22nzP5/+yn9NpExaQsTcnJ7rmZSNKeBxfMj
-         TcgBH49nRoFgJEyw0I+YW6D36y5SysuMC0J7QFW+Fh4GDbAE8H1ynSxUlKHxJ8x96mq4
-         GST3hk2Ldya+CmsSaIUhByxcGEx1LJhr7r2VYYQ55bCYfHbrpPHB191ecixOOpzqj7Uw
-         PwJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746595932; x=1747200732;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rXHN6Gnj9+P3ptMzbsSFbhupeu9xKqhyrBaUp2v4ioo=;
-        b=pbEY5EzOV31iHm+4utRehofmfiSofMe3e1PeS3KJK0fWjLEjwRvZgGrh+BJ1lsk0jn
-         X6F1hoG6GmtgpXZoPvpCzTIOLHPhgleO2zQnwYFmiQc/CUzBrB+WHBZcb1n1BPyf6sJP
-         usQg7lPGiF3acYUCRgs816d8X+2MwQSBqctgEbFuKOP37jqeLoFGd58eUxl0pY1tM5yQ
-         iaWfw5693wSkbhq0KtSx8rENcE1fEfoZ3ZaTKHyUxnl5cA8TXo9A4PcYTks7IPlDHAyc
-         I+ngTUpDX1hj4lJzBfsFcwS5fy1fdJaTY1Ne2sFDUFydttN70abD5DtfWU9ELMGxEdvP
-         eBMg==
-X-Forwarded-Encrypted: i=1; AJvYcCUGtIRfzsGvXhC3zGFpIpHEvy+JsDD06gq4dQ5pJJxuC8bXwR/8EdEK/ws9eTgyb3bfWoC9I8E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxoaeCbbLx67YlTidlOlfCfmoCRqFPP93By9GoelSIl8QxZ3SP9
-	aN506w4aAggadd/BWDYNhjJMELZenZjOGwJnbw649LdKYFl4OWOiKWOIOUCAXN2D34lAJbQ+Ceg
-	hcWE=
-X-Gm-Gg: ASbGncv9EDXCdUlIQe5N+yk2DTzUrZD6HCrtkTtLACi76pjOBO4or3Cc7cx74nLF+P4
-	7XwlE9g+uCpMe5NtucU7FJ+zF3XSohToIqf/RDikLxgM67uPW5oebe11MsosN1fNX+qBtcmZlPD
-	i55PChdaS1Sx/Vf+8vT/sAHNQgql/zCvP73vs0SD46AdTWdH/mI+qHWQoeGW1r88tV245drW8g/
-	7K6XrVrW2PLRwLAVjPF+LyFSRKLM0JRw4DjTzSiIY3+BUFyjAhfQxMGJpY29RkeAcfIwd/jgIn1
-	T//pmEp4kpOXe+iBZ4Vmzxv1oMgKoBr12wDLn5hlBxKG+dkU2A==
-X-Google-Smtp-Source: AGHT+IFuuMQml0Hx1oiprC/PjWiEkfzDo1G+dZyDFqtYvUvWVwe8mCI5eFQYikJMh7wXdDPRJuuYvA==
-X-Received: by 2002:a05:6a00:420b:b0:732:a24:7354 with SMTP id d2e1a72fcca58-7409cf20f2cmr2862896b3a.4.1746595921472;
-        Tue, 06 May 2025 22:32:01 -0700 (PDT)
-Received: from [127.0.0.1] ([104.28.205.247])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74058d7a3a6sm10142958b3a.2.2025.05.06.22.31.59
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 06 May 2025 22:32:01 -0700 (PDT)
-Message-ID: <b36a7cb6-582b-422d-82ce-98dc8985fd0d@cloudflare.com>
-Date: Tue, 6 May 2025 22:31:59 -0700
+	 In-Reply-To:Content-Type; b=oMfUN31DSedVbOZVafde2IadNVVEhtGU3iPUjyz6Ev2ijR0O6jXky7qmSIi4yWvgsGe7h01ihw1JpA9HSRuw6ahGg4OTielKCldjVKuzYoAbs4qmCFoFaNp2vjDx/Yb00rDURRLjeAKBoJLi0jny6G7d79SAGGxyJVvi98y4iso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bOlxPNU6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33DC8C4CEEF;
+	Wed,  7 May 2025 06:06:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746598004;
+	bh=sl0h3K31emDHUrMxHF3Oe1q8RNKJCOPAyZs8N/5wF8w=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=bOlxPNU6SyploBkpfUPdZO9JRAZL6bnFIvO4SfYNu8CkHetu8NsWxKwLKc9gIs+xi
+	 GIPjxN/zKhMhdpw8iV5TXdDVc7cmYQuPmsscNwLFoJlxKDCRPTnXpFiMixpYAXkROO
+	 Ddk3I4UhNu/jRWeqWa2tHEAJFD8AFWVPw9eIKxyybetXr8xrn529fPtMlUZKRrYWH8
+	 Xc+ipHmWLGlHtEEq3C9VFr1JQzQDewJEai9BJli+25AFBQmVKAZUd28D4tRpA2oNhZ
+	 7wOrQCJ+SvwC+AnRTurDi0F72iph3GQ24VjJ5vwRG4+3fTHRovXCRf9WvRTPAHRqAW
+	 rcz8YvWf4N2Rw==
+Message-ID: <3539bd21-7a31-4e02-828a-e03c226f0f90@kernel.org>
+Date: Wed, 7 May 2025 08:06:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,101 +50,88 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-net 0/3] Fix XDP loading on machines with many CPUs
-To: Michal Kubiak <michal.kubiak@intel.com>, intel-wired-lan@lists.osuosl.org
-Cc: maciej.fijalkowski@intel.com, aleksander.lobakin@intel.com,
- przemyslaw.kitszel@intel.com, dawid.osuchowski@linux.intel.com,
- jacob.e.keller@intel.com, netdev@vger.kernel.org, kernel-team@cloudflare.com
-References: <20250422153659.284868-1-michal.kubiak@intel.com>
+Subject: Re: linux-next: manual merge of the tip tree with the net-next tree
+To: Stephen Rothwell <sfr@canb.auug.org.au>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>,
+ "H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>,
+ David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
+ Networking <netdev@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Next Mailing List <linux-next@vger.kernel.org>
+References: <20250507124900.4dad50d4@canb.auug.org.au>
 Content-Language: en-US
-From: Jesse Brandeburg <jbrandeburg@cloudflare.com>
-In-Reply-To: <20250422153659.284868-1-michal.kubiak@intel.com>
+From: Jiri Slaby <jirislaby@kernel.org>
+Autocrypt: addr=jirislaby@kernel.org; keydata=
+ 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
+In-Reply-To: <20250507124900.4dad50d4@canb.auug.org.au>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 4/22/25 8:36 AM, Michal Kubiak wrote:
-> Hi,
->
-> Some of our customers have reported a crash problem when trying to load
-> the XDP program on machines with a large number of CPU cores. After
-> extensive debugging, it became clear that the root cause of the problem
-> lies in the Tx scheduler implementation, which does not seem to be able
-> to handle the creation of a large number of Tx queues (even though this
-> number does not exceed the number of available queues reported by the
-> FW).
-> This series addresses this problem.
+On 07. 05. 25, 4:49, Stephen Rothwell wrote:
+> Hi all,
+> 
+> Today's linux-next merge of the tip tree got a conflict in:
+> 
+>    drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
+> 
+> between commit:
+> 
+>    a9843689e2de ("net: txgbe: add sriov function support")
+> 
+> from the net-next tree and commit:
+> 
+>    567b0a520912 ("net: Switch to irq_domain_create_*()")
+> 
+> from the tip tree.
+> 
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned,
 
+LGTM, thanks.
 
-Hi Michal,
-
-Unfortunately this version of the series seems to reintroduce the 
-original problem error: -22.
-
-I double checked the patches, they looked like they were applied in our 
-test version 2025.5.8 build which contained a 6.12.26 kernel with this 
-series applied (all 3)
-
-Our setup is saying max 252 combined queues, but running 384 CPUs by 
-default, loads an XDP program, then reduces the number of queues using 
-ethtool, to 192. After that we get the error -22 and link is down.
-
-Sorry to bring some bad news, and I know it took a while, it is a bit of 
-a process to test this in our lab.
-
-The original version you had sent us was working fine when we tested it, 
-so the problem seems to be between those two versions. I suppose it 
-could be possible (but unlikely because I used git to apply the patches) 
-that there was something wrong with the source code, but I sincerely 
-doubt it as the patches had applied cleanly.
-
-We are only able to test 6.12.y or 6.6.y stable variants of the kernel 
-if you want to make a test version of a fixed series for us to try.
-
-Thanks,
-
-Jesse
-
-
-some dmesg follows:
-
-sudo dmesg | grep -E "ice 0000:c1:00.0|ice:"
-
-[  20.932638] ice: Intel(R) Ethernet Connection E800 Series Linux Driver
-
-[  20.932642] ice: Copyright (c) 2018, Intel Corporation.
-
-[  21.259332] ice 0000:c1:00.0: DDP package does not support Tx 
-scheduling layers switching feature - please update to the latest DDP 
-package and try again
-
-[  21.552597] ice 0000:c1:00.0: The DDP package was successfully loaded: 
-ICE COMMS Package version 1.3.51.0
-
-[  21.610275] ice 0000:c1:00.0: 252.048 Gb/s available PCIe bandwidth 
-(16.0 GT/s PCIe x16 link)
-
-[  21.623960] ice 0000:c1:00.0: RDMA is not supported on this device
-
-[  21.672421] ice 0000:c1:00.0: DCB is enabled in the hardware, max 
-number of TCs supported on this port are 8
-
-[  21.705729] ice 0000:c1:00.0: FW LLDP is disabled, DCBx/LLDP in SW mode.
-
-[  21.722873] ice 0000:c1:00.0: Commit DCB Configuration to the hardware
-
-[  22.086346] ice 0000:c1:00.1: DDP package already present on device: 
-ICE COMMS Package version 1.3.51.0
-
-[  22.289956] ice 0000:c1:00.0 ext0: renamed from eth0
-
-[  23.137538] ice 0000:c1:00.0 ext0: NIC Link is up 25 Gbps Full Duplex, 
-Requested FEC: RS-FEC, Negotiated FEC: NONE, Autoneg Advertised: On, 
-Autoneg Negotiated: False, Flow Control: None
-
-*[ 499.643936] ice 0000:c1:00.0: Failed to set LAN Tx queue context, 
-error: -22*
-
-*
-*
-
+-- 
+js
+suse labs
 
