@@ -1,199 +1,182 @@
-Return-Path: <netdev+bounces-188549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84A0BAAD4D3
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 07:09:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15705AAD542
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 07:32:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 949CA4C58DE
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 05:09:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6EF5F7B4715
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 05:31:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31E491DF748;
-	Wed,  7 May 2025 05:09:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A25D18952C;
+	Wed,  7 May 2025 05:32:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mko7YDkT"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="An7ue0kC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D7E21DF742;
-	Wed,  7 May 2025 05:09:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68E3F139E
+	for <netdev@vger.kernel.org>; Wed,  7 May 2025 05:32:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746594552; cv=none; b=UIAGavYhBIPGKULGacmOagd4WmfGuymux6A+QT/6UOctSDj+S4HJyC8m/EbRvVB0rHM9dm2cBuBEdDuW4brYw/G+cdNnniY9E7vULfT2b4U3FGRz7O7xICIYi/pmKIs4nkEZd0w6X1tDY2IKwNvGRwGZtbhtkd9NskKq0Ou4QYk=
+	t=1746595935; cv=none; b=UCK0BKAEICxLlqabThsCKQvXsaiQka1Du/VIIhl/az92VFkrxXM+nSOBb2HfEbixGVMP+3+ppgptAySWZIeqX1QSL+0cOM+dMfo56upVS0xjaLDCUHYxBG2nUOS4BVfWSvOaP2S3bDfyaDqFfU+I1dIa/9AVHUAXOUovfONI330=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746594552; c=relaxed/simple;
-	bh=Cg3lNgNXXlY3tbGP5L2tCy8t6w10UD5L5/hDeNrXlh8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rJ3/M+X9YVQGGWBHQ9kakyQCFDyjB0arDL16pBLwJHbpk5MGqeYa4eZxtKyTzUjNjDhyGsAMdYPgDZ9++0tnKZZ/xyHwoSnQ1GSXGaJZAZi8YbE8l9uUvBWVGK9uCfXIuR829aaK8OEnHOsRq/Y5ZI5dOK6ktU6+HZiPK0te1Ks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mko7YDkT; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-30a509649e3so3791743a91.2;
-        Tue, 06 May 2025 22:09:10 -0700 (PDT)
+	s=arc-20240116; t=1746595935; c=relaxed/simple;
+	bh=yTF7Jp+TbY9cdTZBGOI3JrvkroGJtrZEvckT2cb/qwk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=d3P5V38H95b+s6ecKZH2TgOa8eqKTeQTL1SKmUahtuhYokjq1+tI5tP/NaRErJPGq3tld2POadnV2pTod56u1VnUrsJl8Bkv3jiUPi9IvhUjDP+Az08VmFIptj0Hi/BaD0HeTwr8fwAx23p7nkigwk1tz/F4C4d/kfsIdezTHc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=An7ue0kC; arc=none smtp.client-ip=209.85.167.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3fea67e64caso4714511b6e.2
+        for <netdev@vger.kernel.org>; Tue, 06 May 2025 22:32:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746594549; x=1747199349; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=qDfFaWqi7aHktXrAOXgC9kWrCSEA1y5g+C1t+ku3vxY=;
-        b=Mko7YDkTZNpD12w+iwfQJK2Z4a0Kdbb1Ehd7eqTQnYrEb8/qipYNqReb4YcytRg+Tf
-         8XBxBXeeNhC1shujpfoUk027AJEE5tHuMjOW39IoP98bZY2TkVT7+QAicgGBPyfCnWog
-         4+bugis547EVPXTLlsZliZuRqIZXqWidQXEu17XHa9+yCEzB2bvg+X2T+JoW4UZSdqK0
-         o5BsvAOlE7A7exnsGRpYE9GpmaTNHJ8jZhb2d4ZkexUrmbYtQ+LWZEEA9FXNVY6HEGVT
-         UPkXFP5SJ+EEp5hFrqJBBxkzm7G7LTTbrVazJhftfghfXXGSeBDCo2Oks3jxwNEboKQS
-         Fjlw==
+        d=cloudflare.com; s=google09082023; t=1746595932; x=1747200732; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rXHN6Gnj9+P3ptMzbsSFbhupeu9xKqhyrBaUp2v4ioo=;
+        b=An7ue0kCo8B51ct1pXlQDs2myLL719Pr+ee8SDUg7N/sPfY5ey/aYYJN79IZQamAMK
+         i1Hz3d4BkyYZpQaKrfLBR5GFXEqjTAjKoiZCnpUB7UgtPZorp3GG5l5j+IwMknOjOalh
+         8D/7yavcEGjrfhRAk+QyTuJ38l7jbX0Ea22nzP5/+yn9NpExaQsTcnJ7rmZSNKeBxfMj
+         TcgBH49nRoFgJEyw0I+YW6D36y5SysuMC0J7QFW+Fh4GDbAE8H1ynSxUlKHxJ8x96mq4
+         GST3hk2Ldya+CmsSaIUhByxcGEx1LJhr7r2VYYQ55bCYfHbrpPHB191ecixOOpzqj7Uw
+         PwJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746594549; x=1747199349;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1746595932; x=1747200732;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qDfFaWqi7aHktXrAOXgC9kWrCSEA1y5g+C1t+ku3vxY=;
-        b=OXhWZB3ZYx7ogQvFkdMhrudwtjF+7P9hjDzyVIdUyBAl3pGd7At5Eo3t/gTOL0np1s
-         x7cs2ChPsQQ+mgzInX6NqkeVc/iFgxmLj7yfsjEdW2yYLKd1xMvyyi5J65P6ZfPr5MKe
-         FtX+P/MqVbXmHnJpEX3DK7yneI15mFDP8azm4IUu2wawHuLV9pK7nyjIyxyT2HgfpIVw
-         ydLofPJDJsx35wPp7H5uAADuvjCFmecI5mZdCCUYK5Pc2WIOWIKarEtIxnwnGkRfgbOM
-         lw/drHelm9VsRe/HIDw6zneJPziLN3xGVFvWhNVUGyfmvqmZkbep19nM5XMKyPLF21nf
-         CekA==
-X-Forwarded-Encrypted: i=1; AJvYcCUwezCLQdlQY1rsRvq2XjoTZaGrdq2Yo+Cvy/sT5gt5GwMKsAlrYu33TKEdDTwWLXua44c=@vger.kernel.org, AJvYcCWS97lFshWuhG9ap/sxqvpI6I8/nPGy1uflb6HyY3PcQfkK1eZWu9vM/vUKUks1z3vYseRFQAQy8MH74/0XxQ5g0fTV@vger.kernel.org, AJvYcCXRvTA+BhSbm90KFTCnC5Fum0Auv+QEr5TJInk6cYBWsgX36zzALT0gKsNZIgUq9b59FsQWG2GS@vger.kernel.org, AJvYcCXgBZvGwsI9lk4rBW+JXb7hNAV3omaRFnVKoGfeQRSBLRfDP/yUJPfm1k7+Ud3gWgOUAeQvJi6sS+ySC7m8@vger.kernel.org
-X-Gm-Message-State: AOJu0YxlUKN4ND+mryru0TvGHuwxdVCWk4Mim5PGtHxlRNk4gDEh0sLb
-	v2vX0fCWbXqX94KzgPhP6JhQsL/E+T3cnTZq9OfiXTPBk98Lb05G
-X-Gm-Gg: ASbGncvjKzFxBtKbCZDD80wD3Ls4ZGbPLQSxzLiBnHICkLcPyx5BRmDTuVDfzhbbxNi
-	ZMt39as3GaPaVB5jevaMpXpzV18QCi9JgEqCpCX5uKn4D/dhP9gA7igG2k+bT7GqtyvEAKQxhL0
-	j9r2B8wtzbkohx1CQ3w+ytk3mzbShhpFNeR247Gy4O4mw0dbMtR4HTzb486AP8dlzXxK9jeyWxS
-	cKI/73CaxHPigl+93iyTRUGblp6AszP84WzbhM8l8OphKVeeTS39lnsbu1M6IMk0g7myeNbczBi
-	IOrug25WaKqvmOozY3aB4vR/JOPvCC37h4S7HoYpCw==
-X-Google-Smtp-Source: AGHT+IHy0jV4YgMxOHksPhxh53RpeJAZ/E8UFT1rKsUGw11pv+I+0YyJ9AE3+lffwugInqcy6tb7uA==
-X-Received: by 2002:a17:90b:4ad0:b0:2ea:a9ac:eee1 with SMTP id 98e67ed59e1d1-30aac19d49bmr3325171a91.10.1746594549416;
-        Tue, 06 May 2025 22:09:09 -0700 (PDT)
-Received: from gmail.com ([98.97.36.253])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e61f3ad8asm7010665ad.211.2025.05.06.22.09.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 May 2025 22:09:08 -0700 (PDT)
-Date: Tue, 6 May 2025 22:08:35 -0700
-From: John Fastabend <john.fastabend@gmail.com>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
-	Network Development <netdev@vger.kernel.org>,
-	linux-trace-kernel <linux-trace-kernel@vger.kernel.org>
-Subject: Re: [RESEND PATCH bpf-next v4 1/2] bpf, sockmap: Introduce tracing
- capability for sockmap
-Message-ID: <20250507050835.4seu6rz35v2uqret@gmail.com>
-References: <20250506025131.136929-1-jiayuan.chen@linux.dev>
- <b776fa07-de4b-44be-ae68-8bc8c362ea81@linux.dev>
- <9c311d9944fa57cec75e06cde94496d782fe4980@linux.dev>
- <CAADnVQKK87UV9rH_YviePfUmOO3mGXQmYfN-Q9Ax5AYv+xE8zw@mail.gmail.com>
+        bh=rXHN6Gnj9+P3ptMzbsSFbhupeu9xKqhyrBaUp2v4ioo=;
+        b=pbEY5EzOV31iHm+4utRehofmfiSofMe3e1PeS3KJK0fWjLEjwRvZgGrh+BJ1lsk0jn
+         X6F1hoG6GmtgpXZoPvpCzTIOLHPhgleO2zQnwYFmiQc/CUzBrB+WHBZcb1n1BPyf6sJP
+         usQg7lPGiF3acYUCRgs816d8X+2MwQSBqctgEbFuKOP37jqeLoFGd58eUxl0pY1tM5yQ
+         iaWfw5693wSkbhq0KtSx8rENcE1fEfoZ3ZaTKHyUxnl5cA8TXo9A4PcYTks7IPlDHAyc
+         I+ngTUpDX1hj4lJzBfsFcwS5fy1fdJaTY1Ne2sFDUFydttN70abD5DtfWU9ELMGxEdvP
+         eBMg==
+X-Forwarded-Encrypted: i=1; AJvYcCUGtIRfzsGvXhC3zGFpIpHEvy+JsDD06gq4dQ5pJJxuC8bXwR/8EdEK/ws9eTgyb3bfWoC9I8E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxoaeCbbLx67YlTidlOlfCfmoCRqFPP93By9GoelSIl8QxZ3SP9
+	aN506w4aAggadd/BWDYNhjJMELZenZjOGwJnbw649LdKYFl4OWOiKWOIOUCAXN2D34lAJbQ+Ceg
+	hcWE=
+X-Gm-Gg: ASbGncv9EDXCdUlIQe5N+yk2DTzUrZD6HCrtkTtLACi76pjOBO4or3Cc7cx74nLF+P4
+	7XwlE9g+uCpMe5NtucU7FJ+zF3XSohToIqf/RDikLxgM67uPW5oebe11MsosN1fNX+qBtcmZlPD
+	i55PChdaS1Sx/Vf+8vT/sAHNQgql/zCvP73vs0SD46AdTWdH/mI+qHWQoeGW1r88tV245drW8g/
+	7K6XrVrW2PLRwLAVjPF+LyFSRKLM0JRw4DjTzSiIY3+BUFyjAhfQxMGJpY29RkeAcfIwd/jgIn1
+	T//pmEp4kpOXe+iBZ4Vmzxv1oMgKoBr12wDLn5hlBxKG+dkU2A==
+X-Google-Smtp-Source: AGHT+IFuuMQml0Hx1oiprC/PjWiEkfzDo1G+dZyDFqtYvUvWVwe8mCI5eFQYikJMh7wXdDPRJuuYvA==
+X-Received: by 2002:a05:6a00:420b:b0:732:a24:7354 with SMTP id d2e1a72fcca58-7409cf20f2cmr2862896b3a.4.1746595921472;
+        Tue, 06 May 2025 22:32:01 -0700 (PDT)
+Received: from [127.0.0.1] ([104.28.205.247])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74058d7a3a6sm10142958b3a.2.2025.05.06.22.31.59
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 06 May 2025 22:32:01 -0700 (PDT)
+Message-ID: <b36a7cb6-582b-422d-82ce-98dc8985fd0d@cloudflare.com>
+Date: Tue, 6 May 2025 22:31:59 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-net 0/3] Fix XDP loading on machines with many CPUs
+To: Michal Kubiak <michal.kubiak@intel.com>, intel-wired-lan@lists.osuosl.org
+Cc: maciej.fijalkowski@intel.com, aleksander.lobakin@intel.com,
+ przemyslaw.kitszel@intel.com, dawid.osuchowski@linux.intel.com,
+ jacob.e.keller@intel.com, netdev@vger.kernel.org, kernel-team@cloudflare.com
+References: <20250422153659.284868-1-michal.kubiak@intel.com>
+Content-Language: en-US
+From: Jesse Brandeburg <jbrandeburg@cloudflare.com>
+In-Reply-To: <20250422153659.284868-1-michal.kubiak@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAADnVQKK87UV9rH_YviePfUmOO3mGXQmYfN-Q9Ax5AYv+xE8zw@mail.gmail.com>
 
-On 2025-05-06 20:43:43, Alexei Starovoitov wrote:
-> On Tue, May 6, 2025 at 8:37 PM Jiayuan Chen <jiayuan.chen@linux.dev> wrote:
-> >
-> > May 7, 2025 at 04:24, "Martin KaFai Lau" <martin.lau@linux.dev> wrote:
-> >
-> > >
-> > > On 5/5/25 7:51 PM, Jiayuan Chen wrote:
-> > >
-> > > >
-> > > > Sockmap has the same high-performance forwarding capability as XDP, but
-> > > >
-> > > >  operates at Layer 7.
-> > > >
-> > > >  Introduce tracing capability for sockmap, to trace the execution results
-> > > >
-> > > >  of BPF programs without modifying the programs themselves, similar to
-> > > >
-> > > >  the existing trace_xdp_redirect{_map}.
-> > > >
-> > >
-> > > There were advancements in bpf tracing since the trace_xdp_xxx additions.
-> > >
-> > > Have you considered the fexit bpf prog and why it is not sufficient ?
-> > >
-> >
-> > 1.This patchset prints a large amount of information (e.g. inode ID, etc.),
-> > some of which require kernel-internal helpers to access. These helpers are
-> > not currently available as kfuncs, making it difficult to implement
-> > equivalent functionality with fentry/fexit.
-
-If the data is useful and can't be read normally having kfuncs/etc to
-get the data makes a lot of sense to me. Then it would be useful for
-everyone presumably.
-
-> >
-> > 2. skb->_sk_redir implicitly stores both a redir action and the socket address
-> > in a single field. Decoding this structure in fentry/fexit would require
-> > duplicating kernel-internal logic in BPF programs. This creates maintenance
-> > risks, as any future changes to the kernel's internal representation would
-> > necessitate corresponding updates to the BPF programs.
-
-If its needed we could build BPF code somewhere that decoded these
-correctly for all kernels.
-
-> >
-> > 3. Similar to the debate between using built-in tracepoints vs kprobes/fentry,
-> > each approach has its tradeoffs. The key advantage of a built-in tracepoint is
-> > seamless integration with existing tools like perf and bpftrace, which natively
-> > support tracepoint-based tracing. For example, simply executing
-> > 'perf trace -e 'sockmap:*' ./producer' could provide sufficient visibility
-> > without custom BPF programs.
-
-We could likely teach bpftrace a new syntax if we care?
-
-bpftrace -e 'skmsg:sendmsg: { @[socket, pid] = count_bytes(); }'
-
-might be interesting.
+On 4/22/25 8:36 AM, Michal Kubiak wrote:
+> Hi,
+>
+> Some of our customers have reported a crash problem when trying to load
+> the XDP program on machines with a large number of CPU cores. After
+> extensive debugging, it became clear that the root cause of the problem
+> lies in the Tx scheduler implementation, which does not seem to be able
+> to handle the creation of a large number of Tx queues (even though this
+> number does not exceed the number of available queues reported by the
+> FW).
+> This series addresses this problem.
 
 
-> Similar to Martin I don't buy these excuses.
-> For your own debugging you can write bpftrace prog that will
-> print exact same stats and numbers without adding any kernel code.
-> 
-> We add tracepoints when they're in the path that is hard to get to
-> with tracing tools. Like functions are partially inlined.
-> Here it's not the case.
-> You want to add a tracepoint right after your own bpf prog
-> finished. All these debugging could have been part of your
-> skmsg program.
+Hi Michal,
 
-I tend to agree. We've on our side found it extremely useful to have
-DEBUG infra in our BPF codes and easy ways to turn it off/on. 
-If this DEBUG is in your BPF program and you have the pretty printers
-to read it yuo can get lots of specifics about your paticular program
-logic that can't be put in the tracepoint.
+Unfortunately this version of the series seems to reintroduce the 
+original problem error: -22.
+
+I double checked the patches, they looked like they were applied in our 
+test version 2025.5.8 build which contained a 6.12.26 kernel with this 
+series applied (all 3)
+
+Our setup is saying max 252 combined queues, but running 384 CPUs by 
+default, loads an XDP program, then reduces the number of queues using 
+ethtool, to 192. After that we get the error -22 and link is down.
+
+Sorry to bring some bad news, and I know it took a while, it is a bit of 
+a process to test this in our lab.
+
+The original version you had sent us was working fine when we tested it, 
+so the problem seems to be between those two versions. I suppose it 
+could be possible (but unlikely because I used git to apply the patches) 
+that there was something wrong with the source code, but I sincerely 
+doubt it as the patches had applied cleanly.
+
+We are only able to test 6.12.y or 6.6.y stable variants of the kernel 
+if you want to make a test version of a fixed series for us to try.
 
 Thanks,
-John
 
-> 
-> pw-bot: cr
+Jesse
+
+
+some dmesg follows:
+
+sudo dmesg | grep -E "ice 0000:c1:00.0|ice:"
+
+[  20.932638] ice: Intel(R) Ethernet Connection E800 Series Linux Driver
+
+[  20.932642] ice: Copyright (c) 2018, Intel Corporation.
+
+[  21.259332] ice 0000:c1:00.0: DDP package does not support Tx 
+scheduling layers switching feature - please update to the latest DDP 
+package and try again
+
+[  21.552597] ice 0000:c1:00.0: The DDP package was successfully loaded: 
+ICE COMMS Package version 1.3.51.0
+
+[  21.610275] ice 0000:c1:00.0: 252.048 Gb/s available PCIe bandwidth 
+(16.0 GT/s PCIe x16 link)
+
+[  21.623960] ice 0000:c1:00.0: RDMA is not supported on this device
+
+[  21.672421] ice 0000:c1:00.0: DCB is enabled in the hardware, max 
+number of TCs supported on this port are 8
+
+[  21.705729] ice 0000:c1:00.0: FW LLDP is disabled, DCBx/LLDP in SW mode.
+
+[  21.722873] ice 0000:c1:00.0: Commit DCB Configuration to the hardware
+
+[  22.086346] ice 0000:c1:00.1: DDP package already present on device: 
+ICE COMMS Package version 1.3.51.0
+
+[  22.289956] ice 0000:c1:00.0 ext0: renamed from eth0
+
+[  23.137538] ice 0000:c1:00.0 ext0: NIC Link is up 25 Gbps Full Duplex, 
+Requested FEC: RS-FEC, Negotiated FEC: NONE, Autoneg Advertised: On, 
+Autoneg Negotiated: False, Flow Control: None
+
+*[ 499.643936] ice 0000:c1:00.0: Failed to set LAN Tx queue context, 
+error: -22*
+
+*
+*
+
 
