@@ -1,319 +1,207 @@
-Return-Path: <netdev+bounces-188563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B722AAD64B
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 08:40:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE5CAAAD65A
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 08:43:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DD4B4C6412
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 06:40:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43A19172CA0
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 06:43:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25DE121516D;
-	Wed,  7 May 2025 06:39:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F44421171B;
+	Wed,  7 May 2025 06:43:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b="OuZ5yaxH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="H2Ugb77G"
 X-Original-To: netdev@vger.kernel.org
-Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11011048.outbound.protection.outlook.com [40.93.194.48])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA55D215078;
-	Wed,  7 May 2025 06:39:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746599951; cv=fail; b=njkY2Iw5cRUWsk0lInBlxUU9eJlSgQ3estKaeU1w+6wqhNna9WW1ehfYCtPM2sXupdtVrNFAFVqz8uPO6oLIoDJLEhZ9Y+OOUFYctDU8UzgIBk3DncnSxBLcjHggb7nMsItUW/eCY8e2Ej5lVD2qLW5UsY6vyOPh+RcJSJihAjo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746599951; c=relaxed/simple;
-	bh=GRPFVFV2EdntC+5kNjGlfAahmobY3gcAyV/V8Z23+0E=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=nYekMkrx0SG6KPQloxV9CKo61Th1g+N3DmnXL1nvriJoJ4Z3LhOkmFTTwP9YaYO+JD+uzmfxAT6zQYP41QOLJ+4rnjjIEMcqEhynH2EBkBa+r0UDxQFDDhcDdOkOrRl3EWsUJWUiM4xWsHdjfhQSZAAAYI5qHb/M8/g6WeN5gr8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=OuZ5yaxH; arc=fail smtp.client-ip=40.93.194.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altera.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=je7DKDeKNdx1JQ5m60hUqRCx5rOSs1SQmz4yv7AdlLjG/gSwLsKxi73LSlVp4AWlTqdl/eHcANBtBhjv0rG4tspC2d1+8gfAp0iaOz1WtfSt2zyPKRkouExH//IP8WgSXohHl+peEvkHLW6A4CHrUXX2g3/CwXHOAKG3hN1edXCd40jLDbxtG6IT6gf6uWfvrUwhdDwRm85/Jop/6HXH86/Vsl0u7sFTlG/DIeH77XfoLbzGS45JvQ+eSe/dSKU/ylygpGOKJ9We4Je5uJtXPo5K7GPAUIPnTSGJeHdf5B+hlWuBkHh+QlDCG8qvZfxZwty/gEBG+0NU/qW17tXUJA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jbRijd2ZEhTPLvlFVoH9cvOYmwB5ZbM/7EKgZQp3u1A=;
- b=qX2BlARLIWarwzlb9ZOgvUYolgWpMpP3B9ApAIj4Nj/BMpF6uAAxc99gdPiL93U2oJm/i3RZGT5amM5AO2OScxCpgJROu9nSowX67N1cY7pV6WAEFk8U4iAYYsg/AFKBrwZy64rihNP8ugpPbCTSSaKlipBBa/DP2OjiQauH7bGh352TbizMMRYSRVqmq8fpWNdWSPRiuxCh3Tcj20qe2+X8eMMKqLEr2mkEIAwaWP+aHu118MLFKopWGWuSHLXRKUF1sGygKTMGN4IvN+lF2f2u0rl8SrqqVQcBB0S7tEikFUPGIvz9X4T2sAg74SZ5jb4k9g5T3B0RfwHdDThw8A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
- dkim=pass header.d=altera.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jbRijd2ZEhTPLvlFVoH9cvOYmwB5ZbM/7EKgZQp3u1A=;
- b=OuZ5yaxHwcPQMEycbeFVYmY7yQUkW8t05nbsuUL3VU8XLsEoMRXqLLfqhj2VDSvl8zNk98CI+5gmvWRPdKnMhADzwVjNpJH4vvmnplyO2RtfHoiahGMnqna2TzgCIv1MfXTzyzk7N5dcPC9U/H7mRdFUCZqb6xgN1VfkHPJuU+yXb5n23G217T9JGqgHVsdVDNWl+qhNxnAd2EcOpSF/nz7AO856oBuQZWynmCP4k57o7K/v7B7Az9FFkVz1p4dcCU+Pa5kQ3KdQcOKSaVH6Cs9sqfhqJDXj3EjDxwkjpR4zAerVk0qtc5cvGzWf9VVt42TO54RKoIqG1SubQyOWOg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=altera.com;
-Received: from BN8PR03MB5073.namprd03.prod.outlook.com (2603:10b6:408:dc::21)
- by SA1PR03MB6595.namprd03.prod.outlook.com (2603:10b6:806:1ca::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.26; Wed, 7 May
- 2025 06:39:01 +0000
-Received: from BN8PR03MB5073.namprd03.prod.outlook.com
- ([fe80::7483:7886:9e3d:f62a]) by BN8PR03MB5073.namprd03.prod.outlook.com
- ([fe80::7483:7886:9e3d:f62a%5]) with mapi id 15.20.8699.022; Wed, 7 May 2025
- 06:39:01 +0000
-From: Boon Khai Ng <boon.khai.ng@altera.com>
-To: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Furong Xu <0x1207@gmail.com>,
-	Matthew Gerlach <matthew.gerlach@altera.com>,
-	Tien Sung Ang <tien.sung.ang@altera.com>,
-	Mun Yew Tham <mun.yew.tham@altera.com>,
-	G Thomas Rohan <rohan.g.thomas@altera.com>,
-	Boon Khai Ng <boon.khai.ng@altera.com>
-Subject: [PATCH net-next v5 3/3] net: stmmac: dwxgmac2: Add support for HW-accelerated VLAN stripping
-Date: Wed,  7 May 2025 14:38:12 +0800
-Message-Id: <20250507063812.34000-4-boon.khai.ng@altera.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250507063812.34000-1-boon.khai.ng@altera.com>
-References: <20250507063812.34000-1-boon.khai.ng@altera.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BY3PR05CA0012.namprd05.prod.outlook.com
- (2603:10b6:a03:254::17) To BN8PR03MB5073.namprd03.prod.outlook.com
- (2603:10b6:408:dc::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66FC721147D;
+	Wed,  7 May 2025 06:43:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746600203; cv=none; b=rq0Z/0DMmymwbuLvEUNa96vgRR1c2Id1Kp48kPjr2KeqLHkIyj7kvThp3607MTaU4ITVFjb4xaA2006CdPL75zZfSOKnVSQM4/uVIkZZNwIpTRACcHCFfE88v3mWlXv8Ip/RkmiJyQw7xHfEk/FjFq9wFQ2LHqJYdpSnZw/44Xk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746600203; c=relaxed/simple;
+	bh=i0apkUUnzBZ5ueSXEpjrnTFVG/7j8XNnBPzQ/uTBttg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JTEcqmRtNDg8fl0WwsuS+1IbOV7xb5j2ad1Wxn4dCLfLmU9/Et/IBybcS9OlnUr3+IBKPSfI17gfSnKtuRQp4nFlr9YBvE5DaJk50fwe0BaCtq5jd9yPVpl98JLxO7ArDfG40gWCqmhQMarGTQQ5mSV9706zXTmEUEnWjmyrSeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=H2Ugb77G; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746600202; x=1778136202;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=i0apkUUnzBZ5ueSXEpjrnTFVG/7j8XNnBPzQ/uTBttg=;
+  b=H2Ugb77GUdJoq5+ThWMzHrxwHz+CNnbmGyw4gridg7DELPQxuySK7y1g
+   wPrUOFzyKshu3UTmGwUG5mrDtKOW2P89XEr8xEUW6vPdrPsaEl4EWTzw3
+   Wa03cUTAvhh01oE6iqYwWoU1/0fMivmYBTxQ7bHvV6QTbBY+YitUbyU/u
+   RaAdJn7waNiKDXCL8nLsex3CkKzo0BliI8MMlRccZYcN8aI/Yhb00uGc9
+   fH1P/5ZPppYFBjO/atVUdoBGx09BhBWGna2KNFjzTnnNTnbjtPj/9N2aA
+   bUqJVHyR3TmXdfr/egCMjh5I22JblFTAyC06bWRWa2ceQui3uuxA6Op5I
+   w==;
+X-CSE-ConnectionGUID: s/zRT+v2Rd6+sgoB579grQ==
+X-CSE-MsgGUID: 7rAFV1HZR7qrLcogz+d36Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11425"; a="59299861"
+X-IronPort-AV: E=Sophos;i="6.15,268,1739865600"; 
+   d="scan'208";a="59299861"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2025 23:43:21 -0700
+X-CSE-ConnectionGUID: 6wjCPT+hTC+MlSK7liLbww==
+X-CSE-MsgGUID: 1aOjtuWkSG+iPf1O27Oerw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,268,1739865600"; 
+   d="scan'208";a="141040774"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by fmviesa004.fm.intel.com with ESMTP; 06 May 2025 23:43:14 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uCYUq-0007Dh-0P;
+	Wed, 07 May 2025 06:43:12 +0000
+Date: Wed, 7 May 2025 14:42:50 +0800
+From: kernel test robot <lkp@intel.com>
+To: Tanmay Jagdale <tanmay@marvell.com>, bbrezillon@kernel.org,
+	arno@natisbad.org, schalla@marvell.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, sgoutham@marvell.com, lcherian@marvell.com,
+	gakula@marvell.com, jerinj@marvell.com, hkelam@marvell.com,
+	sbhatta@marvell.com, andrew+netdev@lunn.ch, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, bbhushan2@marvell.com,
+	bhelgaas@google.com, pstanner@redhat.com,
+	gregkh@linuxfoundation.org, peterz@infradead.org, linux@treblig.org,
+	krzysztof.kozlowski@linaro.org, giovanni.cabiddu@intel.com
+Cc: oe-kbuild-all@lists.linux.dev, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	rkannoth@marvell.com, sumang@marvell.com, gcherian@marvell.com,
+	Tanmay Jagdale <tanmay@marvell.com>
+Subject: Re: [net-next PATCH v1 15/15] octeontx2-pf: ipsec: Add XFRM state
+ and policy hooks for inbound flows
+Message-ID: <202505071416.T1HY7g1G-lkp@intel.com>
+References: <20250502132005.611698-16-tanmay@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8PR03MB5073:EE_|SA1PR03MB6595:EE_
-X-MS-Office365-Filtering-Correlation-Id: a47150cf-bcc1-4c66-7277-08dd8d31da87
-X-MS-Exchange-AtpMessageProperties: SA
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|7416014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?r3kYBY4quu9rZVpFx2si5NC97ItV8z94/fyfpoWtbvu7KHckB3PDkj8lBJ+p?=
- =?us-ascii?Q?VatugdALRu7sCTtlV7E2Ps1K31Yjre8stl2aaZIGmgZIxSCkgNCjmF+VC2IE?=
- =?us-ascii?Q?R1Q3n5XtuE/bDlDS4YwhmE3qJ4blJQu02YgTQIH9pODLeiLIwm+jhc8tAYbH?=
- =?us-ascii?Q?LXkgLkgqDe9hUViF+l4mWhK/JmICtMEhZRKdbVB1jU/kJRro/4erI2OZpL+m?=
- =?us-ascii?Q?+9vJxEce+nCTABe05lcOd4PknX59ZZgfkYf0bQFuHjNIK02JezlCOpcfqzV4?=
- =?us-ascii?Q?jK2XLROgKbxO9oadOtSEh1NyM3PocOa60CFx5/0wbiWtk44B2EXKD7MIXqNA?=
- =?us-ascii?Q?qZVel1sR7rmcazF2CG/3NdZGmTmqHOgJXAWgcAtSFdcat9n0Cglpsb1r2WZK?=
- =?us-ascii?Q?iL3uRX+Nnihz/w9zRAyN5KMPw5Aly2fOzIjc/ogspf3ALTU6Q3MaWvYjW9Et?=
- =?us-ascii?Q?Vh28s8fgnEcrt7mCbM2gkcJmIsFZ/3GxO8ClqIvinE3txCad8r8xxoi52eIG?=
- =?us-ascii?Q?NV3oB+NiBEpv3eUbHmebb6bpWD0357DNW3Ea48hOpXXlqVnAnrAu4JzyO/4C?=
- =?us-ascii?Q?86EZq02DmlSQLY55B4LKSlnn6K/7WyHVMAgC7ZYeN8Ig82lo5Ysbg1Z2Fyll?=
- =?us-ascii?Q?d8hBtOTaZ6FTtPnQL9OD5ZYjk+hzlAQ1UKLjeWVJJvo6MLcIMpDkKY8+qYSd?=
- =?us-ascii?Q?es9JVZwu0w2RDwiUJGKCFN8bTAyZ02UQpnByTpyB+HwygxenvNHK5VKSFUw3?=
- =?us-ascii?Q?R1YHLvVGMR60B3f1XA/Qjq2PF4GlAcam2PSEKNBmSwOlIe3ombcWCKyLuF7F?=
- =?us-ascii?Q?/vRKLzLdzWtV46JaUfryV/l3wTQzmTFwaX6UdGh0uRf/RBC8O3vcTcP2Cwo/?=
- =?us-ascii?Q?cr+kmFae10I1oAY311CbjLF4d37GOtJ7FDb5k76YIHtYc4KGq4OnNghi5BCE?=
- =?us-ascii?Q?ZVO487DAvoaEJZreZy57qCqdCJxKwFp5CFBVOSHyvBNL6VHcw/X/PNOypkDp?=
- =?us-ascii?Q?vpKuzkeFtYrPIWSDY5ENbTMBh1/p6zdv31eCeuYV2lFVWd6bzfQEXNFpLX5A?=
- =?us-ascii?Q?TA7C2mm1vx38d9Byy6GslRKOZoge54ASDxO7eva8fAnLsg4AyZJGY9nbNh4o?=
- =?us-ascii?Q?IjoIBppjlPLmZR2ObeHZCQwnN5JVEbMaAyq2UisN0CSFohEGf8KHpczDznTR?=
- =?us-ascii?Q?+8BimkydDw0Bthrh3GCG9RhomtKyb17h9dl9JHDJhqvPCVbnx6PLq+fCgE0T?=
- =?us-ascii?Q?dGubYTjBwg6OjPZZTrAYqE78kLBDgOIzMomUdCS0DaKxteoX5n6PWHhW5lPo?=
- =?us-ascii?Q?oOcnyd2bywCD/bFkcg3HqUU9LjlDWLLf4oe2P2aPqzu8863F75bfDN+ZtZEO?=
- =?us-ascii?Q?sEB33nuumgQfxjYUMX++6IDIiLhq81xGPJ1KcQf+IH0in9x1n8zE1mMrlphQ?=
- =?us-ascii?Q?c2rSoEq+9EQ=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN8PR03MB5073.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?rwz4Zo9Y1mYDDZZXw9hGI3NZexCYsuaPB+Kvl8f1HLb+aNqPKQc8gRCtv0Ts?=
- =?us-ascii?Q?YdPdhGD1VgLo4dP3YuHKD/v3MygDOpqqVX/2aNariebSddmPHv30Ci7LRazv?=
- =?us-ascii?Q?FewBfyHuphZ7es9YlGYVG2QO2/UTAI5RS5FEY9I6L+hFMQV0sSGPTnhlyH4Q?=
- =?us-ascii?Q?ik3dt3/nir6/i1EUXqFVvFjslGiylwl7amF1SV/Hpt3weuWJsxKB8r/DLMUo?=
- =?us-ascii?Q?vUxwqolnpzEziw7vrQnfhhYg4jFxVqea1czd1/q9jkBaxUPrGHpXlzMv8k9d?=
- =?us-ascii?Q?uNoZp5TODvB6adOfXGl2+yOel2y2r7HGuaCwDv/TEp1oqTwaw4G0+Kf8aD8F?=
- =?us-ascii?Q?PxQFxfS4ej96ZsJBp03S9JPrwv/CuYXW38DG+qTEtjUL55gra80Q6MF93yFr?=
- =?us-ascii?Q?9S5CKDusYawD0mYURLyg/O/zo1Yn8kWeF0mRTW+L1GE7//yMPxWGP4sKtkE4?=
- =?us-ascii?Q?Sc6fxcHnyLVFBlgYU4xEcumgv2yW9X4K/EcPpIZB8ziL/2m3fA7B15zcUcKu?=
- =?us-ascii?Q?6GdJMXRCuqbfxdkcyEnYDCsfE43ZvofYmoE7MdP+dJsCtPaDj53PfaCYuVRC?=
- =?us-ascii?Q?RK9kMTSbNTkvRVDqQrRHVRsYs7qbgv4IqsBeQyshzfa01DHXsNWFlElPoYJN?=
- =?us-ascii?Q?51Du/kUZcra2ZCaRNhnh5CIAT24hVsn7xlBALnjuuc88rHWvSmcqZhcnw7gh?=
- =?us-ascii?Q?DJPis1avaaFpn/ujPHyoq8dXbGL5HwVuZaNcXwqTRRNl1rCx6G4EQ/GtPSq6?=
- =?us-ascii?Q?PgBbp/JBo4h7r5r2bNpXV5cWKfjRaoBMVN2eHtiQ5OhTlFn899wiKjHttU8O?=
- =?us-ascii?Q?bbCKYh1TWw9vM3V4lSSEGBR8YTyuOmFYvDTvF92grQkCWdzf/03qENFkX4kU?=
- =?us-ascii?Q?AfstwQJC87AWLCmg5ZbcJ6Uqv0baMRK9/fx3HjUa7pH1PjdPDUX0yIBs39AO?=
- =?us-ascii?Q?JczPZQzzPBzY46NpI0n8FOHVikWxqTx1LMDPxJLIAtKsxhcsorF8aA4BeLxu?=
- =?us-ascii?Q?GkSzdMBYpnbldUn23Vn2nn9E9bjH7t/LlvAYoK3VEq8wrkpY+wkhXWp9+Q+a?=
- =?us-ascii?Q?ECaMsKbSIUelpUdMOcWPvXcIz6GZFWhHqZNEfTxowqBthXlL7woAcznVVvS/?=
- =?us-ascii?Q?SdhMuQVSrY1q50tN7ysZKbBIO+PgftDnJukXJ7qq4loX2PCyZzjolx8fSQ0D?=
- =?us-ascii?Q?6wRErzwfTkXIF/yeq5bEtUcZ6RWTgpSt5NM4JPTNiAZknzE+3qUSeWxF2c6v?=
- =?us-ascii?Q?AlXhfQRtBi+mkC0baR+VRQsQKzlmtBH2O0i+T24keQzuNX64YSlkz1iI++7f?=
- =?us-ascii?Q?uKhdwP1YE8R9V9KeHKs0X69O53HyxwgWAWR+ZFqsaWbwzh0IZ8wEpQ7s37/0?=
- =?us-ascii?Q?YYyK9UByxA4I7alaJy4xM2rCHTGOX5UqsySCEOABxRygffJvgc7uijuGs6uc?=
- =?us-ascii?Q?OirllSlGqpb5Y2Zk0J+FL8GcIil0Mp6Vcuk5Jg9TAfLMsMRGSqL/ki0y7Pgk?=
- =?us-ascii?Q?OrVClUmoB4cAlGt6XhCSHZZZzjMlVcMwtBQo9uFKO0+wGyAFoXbvstm0OJ6m?=
- =?us-ascii?Q?rt++fnQ0CaagT7xtDnf1PIQKivsQW2Og/JqXv8KmMrnffhuZnoyrEs8bxwqE?=
- =?us-ascii?Q?cQ=3D=3D?=
-X-OriginatorOrg: altera.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a47150cf-bcc1-4c66-7277-08dd8d31da87
-X-MS-Exchange-CrossTenant-AuthSource: BN8PR03MB5073.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 May 2025 06:39:01.8481
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fbd72e03-d4a5-4110-adce-614d51f2077a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SNxJl0RpMnif4sfM9Npy1IM2foAOkmQ0AzIGAnr1rlkWgPa184l88dnox+MkMpztXvwHox/plZq2Cr8vfyjLTA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR03MB6595
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250502132005.611698-16-tanmay@marvell.com>
 
-This patch adds support for MAC level VLAN tag stripping for the
-dwxgmac2 IP. This feature can be configured through ethtool.
-If the rx-vlan-offload is off, then the VLAN tag will be stripped
-by the driver. If the rx-vlan-offload is on then the VLAN tag
-will be stripped by the MAC.
+Hi Tanmay,
 
-Signed-off-by: Boon Khai Ng <boon.khai.ng@altera.com>
-Reviewed-by: Matthew Gerlach <matthew.gerlach@altera.com>
----
- drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h | 12 ++++++++++++
- .../ethernet/stmicro/stmmac/dwxgmac2_core.c    |  2 ++
- .../ethernet/stmicro/stmmac/dwxgmac2_descs.c   | 18 ++++++++++++++++++
- .../net/ethernet/stmicro/stmmac/stmmac_main.c  |  2 +-
- .../net/ethernet/stmicro/stmmac/stmmac_vlan.c  |  5 +++++
- 5 files changed, 38 insertions(+), 1 deletion(-)
+kernel test robot noticed the following build errors:
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-index 5e369a9a2595..0d408ee17f33 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-@@ -464,6 +464,7 @@
- #define XGMAC_RDES3_RSV			BIT(26)
- #define XGMAC_RDES3_L34T		GENMASK(23, 20)
- #define XGMAC_RDES3_L34T_SHIFT		20
-+#define XGMAC_RDES3_ET_LT		GENMASK(19, 16)
- #define XGMAC_L34T_IP4TCP		0x1
- #define XGMAC_L34T_IP4UDP		0x2
- #define XGMAC_L34T_IP6TCP		0x9
-@@ -473,6 +474,17 @@
- #define XGMAC_RDES3_TSD			BIT(6)
- #define XGMAC_RDES3_TSA			BIT(4)
- 
-+/* RDES0 (write back format) */
-+#define XGMAC_RDES0_VLAN_TAG_MASK	GENMASK(15, 0)
-+
-+/* Error Type or L2 Type(ET/LT) Field Number */
-+#define XGMAC_ET_LT_VLAN_STAG		8
-+#define XGMAC_ET_LT_VLAN_CTAG		9
-+#define XGMAC_ET_LT_DVLAN_CTAG_CTAG	10
-+#define XGMAC_ET_LT_DVLAN_STAG_STAG	11
-+#define XGMAC_ET_LT_DVLAN_CTAG_STAG	12
-+#define XGMAC_ET_LT_DVLAN_STAG_CTAG	13
-+
- extern const struct stmmac_ops dwxgmac210_ops;
- extern const struct stmmac_ops dwxlgmac2_ops;
- extern const struct stmmac_dma_ops dwxgmac210_dma_ops;
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-index d9f41c047e5e..6cadf8de4fdf 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-@@ -10,6 +10,7 @@
- #include "stmmac.h"
- #include "stmmac_fpe.h"
- #include "stmmac_ptp.h"
-+#include "stmmac_vlan.h"
- #include "dwxlgmac2.h"
- #include "dwxgmac2.h"
- 
-@@ -1551,6 +1552,7 @@ int dwxgmac2_setup(struct stmmac_priv *priv)
- 	mac->mii.reg_mask = GENMASK(15, 0);
- 	mac->mii.clk_csr_shift = 19;
- 	mac->mii.clk_csr_mask = GENMASK(21, 19);
-+	mac->num_vlan = stmmac_get_num_vlan(priv->ioaddr);
- 
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c
-index 389aad7b5c1e..a2980482fcce 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c
-@@ -4,6 +4,7 @@
-  * stmmac XGMAC support.
-  */
- 
-+#include <linux/bitfield.h>
- #include <linux/stmmac.h>
- #include "common.h"
- #include "dwxgmac2.h"
-@@ -69,6 +70,21 @@ static int dwxgmac2_get_tx_ls(struct dma_desc *p)
- 	return (le32_to_cpu(p->des3) & XGMAC_RDES3_LD) > 0;
- }
- 
-+static u16 dwxgmac2_wrback_get_rx_vlan_tci(struct dma_desc *p)
-+{
-+	return le32_to_cpu(p->des0) & XGMAC_RDES0_VLAN_TAG_MASK;
-+}
-+
-+static bool dwxgmac2_wrback_get_rx_vlan_valid(struct dma_desc *p)
-+{
-+	u32 et_lt;
-+
-+	et_lt = FIELD_GET(XGMAC_RDES3_ET_LT, le32_to_cpu(p->des3));
-+
-+	return et_lt >= XGMAC_ET_LT_VLAN_STAG &&
-+	       et_lt <= XGMAC_ET_LT_DVLAN_STAG_CTAG;
-+}
-+
- static int dwxgmac2_get_rx_frame_len(struct dma_desc *p, int rx_coe)
- {
- 	return (le32_to_cpu(p->des3) & XGMAC_RDES3_PL);
-@@ -351,6 +367,8 @@ const struct stmmac_desc_ops dwxgmac210_desc_ops = {
- 	.set_tx_owner = dwxgmac2_set_tx_owner,
- 	.set_rx_owner = dwxgmac2_set_rx_owner,
- 	.get_tx_ls = dwxgmac2_get_tx_ls,
-+	.get_rx_vlan_tci = dwxgmac2_wrback_get_rx_vlan_tci,
-+	.get_rx_vlan_valid = dwxgmac2_wrback_get_rx_vlan_valid,
- 	.get_rx_frame_len = dwxgmac2_get_rx_frame_len,
- 	.enable_tx_timestamp = dwxgmac2_enable_tx_timestamp,
- 	.get_tx_timestamp_status = dwxgmac2_get_tx_timestamp_status,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 28b62bd73e23..a19b6f940bf3 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -7653,7 +7653,7 @@ int stmmac_dvr_probe(struct device *device,
- #ifdef STMMAC_VLAN_TAG_USED
- 	/* Both mac100 and gmac support receive VLAN tag detection */
- 	ndev->features |= NETIF_F_HW_VLAN_CTAG_RX | NETIF_F_HW_VLAN_STAG_RX;
--	if (priv->plat->has_gmac4) {
-+	if (priv->plat->has_gmac4 || priv->plat->has_xgmac) {
- 		ndev->hw_features |= NETIF_F_HW_VLAN_CTAG_RX;
- 		priv->hw->hw_vlan_en = true;
- 	}
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.c
-index c66233f2c697..0b6f6228ae35 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.c
-@@ -335,6 +335,11 @@ const struct stmmac_vlan_ops dwxlgmac2_vlan_ops = {
- const struct stmmac_vlan_ops dwxgmac210_vlan_ops = {
- 	.update_vlan_hash = dwxgmac2_update_vlan_hash,
- 	.enable_vlan = vlan_enable,
-+	.add_hw_vlan_rx_fltr = vlan_add_hw_rx_fltr,
-+	.del_hw_vlan_rx_fltr = vlan_del_hw_rx_fltr,
-+	.restore_hw_vlan_rx_fltr = vlan_restore_hw_rx_fltr,
-+	.rx_hw_vlan = vlan_rx_hw,
-+	.set_hw_vlan_mode = vlan_set_hw_mode,
- };
- 
- u32 stmmac_get_num_vlan(void __iomem *ioaddr)
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Tanmay-Jagdale/crypto-octeontx2-Share-engine-group-info-with-AF-driver/20250502-213203
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250502132005.611698-16-tanmay%40marvell.com
+patch subject: [net-next PATCH v1 15/15] octeontx2-pf: ipsec: Add XFRM state and policy hooks for inbound flows
+config: loongarch-allmodconfig (https://download.01.org/0day-ci/archive/20250507/202505071416.T1HY7g1G-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250507/202505071416.T1HY7g1G-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202505071416.T1HY7g1G-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c: In function 'cn10k_ipsec_npa_refill_inb_ipsecq':
+   drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c:868:27: warning: variable 'qset' set but not used [-Wunused-but-set-variable]
+     868 |         struct otx2_qset *qset = NULL;
+         |                           ^~~~
+   drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c: In function 'cn10k_inb_cpt_init':
+   drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c:932:15: warning: variable 'ptr' set but not used [-Wunused-but-set-variable]
+     932 |         void *ptr;
+         |               ^~~
+   drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c: In function 'cn10k_inb_write_sa':
+>> drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c:1214:9: error: implicit declaration of function 'dmb'; did you mean 'rmb'? [-Wimplicit-function-declaration]
+    1214 |         dmb(sy);
+         |         ^~~
+         |         rmb
+>> drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c:1214:13: error: 'sy' undeclared (first use in this function); did you mean 's8'?
+    1214 |         dmb(sy);
+         |             ^~
+         |             s8
+   drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c:1214:13: note: each undeclared identifier is reported only once for each function it appears in
+
+
+vim +1214 drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+
+  1164	
+  1165	static int cn10k_inb_write_sa(struct otx2_nic *pf,
+  1166				      struct xfrm_state *x,
+  1167				      struct cn10k_inb_sw_ctx_info *inb_ctx_info)
+  1168	{
+  1169		dma_addr_t res_iova, dptr_iova, sa_iova;
+  1170		struct cn10k_rx_sa_s *sa_dptr, *sa_cptr;
+  1171		struct cpt_inst_s inst;
+  1172		u32 sa_size, off;
+  1173		struct cpt_res_s *res;
+  1174		u64 reg_val;
+  1175		int ret;
+  1176	
+  1177		res = dma_alloc_coherent(pf->dev, sizeof(struct cpt_res_s),
+  1178					 &res_iova, GFP_ATOMIC);
+  1179		if (!res)
+  1180			return -ENOMEM;
+  1181	
+  1182		sa_cptr = inb_ctx_info->sa_entry;
+  1183		sa_iova = inb_ctx_info->sa_iova;
+  1184		sa_size = sizeof(struct cn10k_rx_sa_s);
+  1185	
+  1186		sa_dptr = dma_alloc_coherent(pf->dev, sa_size, &dptr_iova, GFP_ATOMIC);
+  1187		if (!sa_dptr) {
+  1188			dma_free_coherent(pf->dev, sizeof(struct cpt_res_s), res,
+  1189					  res_iova);
+  1190			return -ENOMEM;
+  1191		}
+  1192	
+  1193		for (off = 0; off < (sa_size / 8); off++)
+  1194			*((u64 *)sa_dptr + off) = cpu_to_be64(*((u64 *)sa_cptr + off));
+  1195	
+  1196		memset(&inst, 0, sizeof(struct cpt_inst_s));
+  1197	
+  1198		res->compcode = 0;
+  1199		inst.res_addr = res_iova;
+  1200		inst.dptr = (u64)dptr_iova;
+  1201		inst.param2 = sa_size >> 3;
+  1202		inst.dlen = sa_size;
+  1203		inst.opcode_major = CN10K_IPSEC_MAJOR_OP_WRITE_SA;
+  1204		inst.opcode_minor = CN10K_IPSEC_MINOR_OP_WRITE_SA;
+  1205		inst.cptr = sa_iova;
+  1206		inst.ctx_val = 1;
+  1207		inst.egrp = CN10K_DEF_CPT_IPSEC_EGRP;
+  1208	
+  1209		/* Re-use Outbound CPT LF to install Ingress SAs as well because
+  1210		 * the driver does not own the ingress CPT LF.
+  1211		 */
+  1212		pf->ipsec.io_addr = (__force u64)otx2_get_regaddr(pf, CN10K_CPT_LF_NQX(0));
+  1213		cn10k_cpt_inst_flush(pf, &inst, sizeof(struct cpt_inst_s));
+> 1214		dmb(sy);
+  1215	
+  1216		ret = cn10k_wait_for_cpt_respose(pf, res);
+  1217		if (ret)
+  1218			goto out;
+  1219	
+  1220		/* Trigger CTX flush to write dirty data back to DRAM */
+  1221		reg_val = FIELD_PREP(GENMASK_ULL(45, 0), sa_iova >> 7);
+  1222		otx2_write64(pf, CN10K_CPT_LF_CTX_FLUSH, reg_val);
+  1223	
+  1224	out:
+  1225		dma_free_coherent(pf->dev, sa_size, sa_dptr, dptr_iova);
+  1226		dma_free_coherent(pf->dev, sizeof(struct cpt_res_s), res, res_iova);
+  1227		return ret;
+  1228	}
+  1229	
+
 -- 
-2.25.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
