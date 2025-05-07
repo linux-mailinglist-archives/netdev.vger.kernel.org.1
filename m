@@ -1,57 +1,89 @@
-Return-Path: <netdev+bounces-188784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC528AAED1C
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 22:33:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F71AAAED22
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 22:37:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 037901896D67
-	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 20:33:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C73F64624C1
+	for <lists+netdev@lfdr.de>; Wed,  7 May 2025 20:37:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4786428EA78;
-	Wed,  7 May 2025 20:33:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74C3D28F933;
+	Wed,  7 May 2025 20:37:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bnAoLH18"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iumttYGI"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E42E72147F8
-	for <netdev@vger.kernel.org>; Wed,  7 May 2025 20:33:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9E928F940;
+	Wed,  7 May 2025 20:37:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746650007; cv=none; b=LcdkjOc1C2IBaXlUaTHd/aCcOFHLpG9CyMGBE3gT61s05LzEqij0lrgJw8OQbX0m5rQt5YzdAj0zn+R1sOzuh3Es4I4Am4gjMh5ZSoe1VEjGmZ8CCHRghExjfpX55VOYafn0vh4F33uo3MVvsVvJuvDSgBzumkwlRrxvbLXY6sQ=
+	t=1746650262; cv=none; b=CegK/aB/56R6bFVRbMXRUrt/BCv4kLg3+HQqgp1QS4hoMSRKb8+qpMCYf21kIAJfByv7Z1SZTtE7Qx3vf+Xj+DtZcHt0j/Y4GjE345zEHphUx9URyT7f22eazW91pXjCX0AcPWj3WZAUWE4mlUabNYrRwWk6hNjAGqqUFPOTtCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746650007; c=relaxed/simple;
-	bh=y8MBvhxeqi8DWYxh0P2Ln9p56JqMtNfnIvXmu2tiyBg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WANw6dV2fsApU9TmGJ9bKjwyQmFcobbuFJpHzz+PU24QIub9tkYh+qQlRkmYQ2ju4blx5M96ghF9KtIEkqeczCVhukis+KpUlmPm20V+jTDnNugls69LAD0Pa9+GbZSdulq7+uDZ4grOk3Jo0G1O94JSkSTN2cPJMt4YLOixM/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bnAoLH18; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1746649992;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=k+g64oTjgFJyAHnP4Y/YKG9x/UbiTmj9bkX5m2Mfk4E=;
-	b=bnAoLH1867dMjkEFD0vtGz87D1We1ZVTWKu6z1nRejwwhYP4L61FkJ4vGSNx+lelNMCGR4
-	18bZPqQVN3SifaeODspQdis+yOX/8tDx8W7z95NZKooTvu3dS5uZ9eLdyW26jelnTSVI0e
-	IqChsv8Y8xPAkR0DCWkhg5FSo54s5cg=
-From: Martin KaFai Lau <martin.lau@linux.dev>
-To: bpf@vger.kernel.org
-Cc: 'Alexei Starovoitov ' <ast@kernel.org>,
-	'Andrii Nakryiko ' <andrii@kernel.org>,
-	'Daniel Borkmann ' <daniel@iogearbox.net>,
-	netdev@vger.kernel.org,
-	kernel-team@meta.com,
-	Quentin Monnet <qmo@kernel.org>,
-	Takshak Chahande <ctakshak@meta.com>
-Subject: [PATCH bpf-next] bpftool: Fix cgroup command to only show cgroup bpf programs
-Date: Wed,  7 May 2025 13:32:32 -0700
-Message-ID: <20250507203232.1420762-1-martin.lau@linux.dev>
+	s=arc-20240116; t=1746650262; c=relaxed/simple;
+	bh=UpxWey3Bw04ZuvPug91OW+SV9bDGVrjm7kInnn7Ugp0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tqefDrKy8i02ax8+96Y8k5EqMtZEHE0C8WCB8CEtp7CfPoxV2d5ZDZageDDZC39fB2H5uwhMevBbk+Cb6n621d9yrQ7Efi6ePNxVJxe4grrfzQXT3n23KBxQTB1MHjGVsTN+Dx4xIIVFzuv94ajb2q86e8MKK68G/BKE2HLOWnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iumttYGI; arc=none smtp.client-ip=209.85.214.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-22c33677183so3391895ad.2;
+        Wed, 07 May 2025 13:37:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746650259; x=1747255059; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=s1+zN4Yxyjl4lmJrdouerVL0ZdLm1z+cSeAbjCfaYnY=;
+        b=iumttYGIpUij5WwCeF+RuqV/wpaLgDoChSH+pLLBh8RTI04b0zt+n7OqHNeysD0kYc
+         xM3v7QzV5AJOCvxSyLmexVnjkJNvSPU3gOMVzYLEMryFo/ehWAq+/lj5gsfDnlEFQxMd
+         f62X+IVZqk6q3WxkI85GAjqG+AZZzcP2onoWUzYhn6SC0KXvt4PoGehbU6XFex6IVwd1
+         EkFdefIZUPR6qgVEc4RIYGKzGHvHIDPPQDIGqKmrqzEZoHosld1LIPA1XlkPba1TbjI8
+         K5eJNTIcx6tYACJyBozJKOU/ZBdgqfyZwDxJ9qVoD9rOxsyQw/+Z2ywne4PdnUMtRF0H
+         jZkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746650259; x=1747255059;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=s1+zN4Yxyjl4lmJrdouerVL0ZdLm1z+cSeAbjCfaYnY=;
+        b=LbpsE/3EZjO3Umrxp7BaR1uqcI/wO31nLeOxJdpL+GSgSDU1CxrXdqHjFGWz+UaBXi
+         i7zPao7WVfXmBCjALvqQOXHjbLetXKklRA7YQGdnZs61KCrrPuJCs+vq1UWrmB8zXW0x
+         gh3PzpgAcj1mjyUyQ58Lsf0MRggxLGJ0wfeNbClk8Zvh6lWggY6ZDdQq9QZLhTdDQ18J
+         NewmdMMxS6acE0ll1aiF3qHcOYLnH/7+oAz43T6UX7Zi4oX2dlIIMnCccXkrVu+gtGMJ
+         piZ6DYe46pu0Dvr3hU35Jb9Vi3solB0PQ7S9F/VFacc7+q82BQbBucH2vlVZXKGhz+Sl
+         dtlQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUDVugObgk1eUX7p15ELlJwmpUcvkYawfS8MxO996ewDqmf0eFasiRxyuTgxYiNXV6x4J31HfrAm8ovPEs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzG/P4+RiBC6HNcuFJM+XfZYMobB46VGjvh/j5dY8FriaBAMoNf
+	mO6YhgvBrrMqKkudUaBH3u6oSbQ7jAPlZduKF7NEEye9Y+lLGbUv
+X-Gm-Gg: ASbGncuj5f4+4Efv3Yg4A7loOZzamEZA1gsqb//yUt/bFw6g7ErUrBTL3Nb4n+t4l0W
+	D/k23iiz/LuqLyiek2JBUwf8jcqteyGZrD5hzBM9KZXna3sfxjH5rFe8i7ZJhnSH/7jrmbWowdI
+	jtBojD+sxGcdRxMyjGDmFYPSZ2/USXePftBpL9AfV63K0WOom5H0LFhh/UVla+nW6tEBwf37iQW
+	Oh7kttgYr0Q815jl2WzFzPOrqprJ7Ep2+dFjU3DP7TkmzB2rvwr8fJ/5WP++MUsk2CU0zNHaqmA
+	TTRk3nARydpJUibqYPE8nQe+8aH2XIrG76As+xNSExb9elzo2gQSyOAeruw=
+X-Google-Smtp-Source: AGHT+IHCh/GQgllGZkJ6rLLeRRGN+OTcp4gpIRwI6kl2YE70Sn8rCja8TtxtQAAUAvKV+Xh6HcPOnA==
+X-Received: by 2002:a17:903:fa4:b0:22d:e57a:2795 with SMTP id d9443c01a7336-22e5edea81bmr71012345ad.47.1746650259078;
+        Wed, 07 May 2025 13:37:39 -0700 (PDT)
+Received: from sid-Inspiron-15-3525.. ([106.222.229.91])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e62ce540fsm20193525ad.160.2025.05.07.13.37.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 May 2025 13:37:38 -0700 (PDT)
+From: Siddarth Gundu <siddarthsgml@gmail.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org,
+	Siddarth Gundu <siddarthsgml@gmail.com>
+Subject: [PATCH net v2] fddi: skfp: fix null pointer deferenece in smt.c
+Date: Thu,  8 May 2025 02:07:06 +0530
+Message-ID: <20250507203706.42785-1-siddarthsgml@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,106 +91,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-From: Martin KaFai Lau <martin.lau@kernel.org>
+In smt_string_swap(), when a closing bracket ']' is encountered
+before any opening bracket '[' open_paren would be NULL,
+and assigning it to format would lead to a null pointer being
+dereferenced in the format++ statement.
 
-The netkit program is not a cgroup bpf program and should not be shown
-in the output of the "bpftool cgroup show" command.
+Add a check to verify open_paren is non-NULL before assigning
+it to format
 
-However, if the netkit device happens to have ifindex 3,
-the "bpftool cgroup show" command will output the netkit
-bpf program as well:
+This issue was reported by Coverity Scan.
 
-> ip -d link show dev nk1
-3: nk1@if2: ...
-    link/ether ...
-    netkit mode ...
-
-> bpftool net show
-tc:
-nk1(3) netkit/peer tw_ns_nk2phy prog_id 469447
-
-> bpftool cgroup show /sys/fs/cgroup/...
-ID       AttachType      AttachFlags     Name
-...      ...                             ...
-469447   netkit_peer                     tw_ns_nk2phy
-
-The reason is that the target_fd (which is the cgroup_fd here) and
-the target_ifindex are in a union in the uapi/linux/bpf.h. The bpftool
-iterates all values in "enum bpf_attach_type" which includes
-non cgroup attach types like netkit. The cgroup_fd is usually 3 here,
-so the bug is triggered when the netkit ifindex just happens
-to be 3 as well.
-
-The bpftool's cgroup.c already has a list of cgroup-only attach type
-defined in "cgroup_attach_types[]". This patch fixes it by iterating
-over "cgroup_attach_types[]" instead of "__MAX_BPF_ATTACH_TYPE".
-
-Cc: Quentin Monnet <qmo@kernel.org>
-Reported-by: Takshak Chahande <ctakshak@meta.com>
-Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Siddarth Gundu <siddarthsgml@gmail.com>
 ---
- tools/bpf/bpftool/cgroup.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+v2:
+ - fix commit message
+ - Add mention of Coverity Scan
+ - Update Fixes tag to reference initial commit
+v1: https://lore.kernel.org/all/20250505091025.27368-1-siddarthsgml@gmail.com/
 
-diff --git a/tools/bpf/bpftool/cgroup.c b/tools/bpf/bpftool/cgroup.c
-index 3f1d6be51215..944ebe21a216 100644
---- a/tools/bpf/bpftool/cgroup.c
-+++ b/tools/bpf/bpftool/cgroup.c
-@@ -318,11 +318,11 @@ static int show_bpf_progs(int cgroup_fd, enum bpf_attach_type type,
- 
- static int do_show(int argc, char **argv)
- {
--	enum bpf_attach_type type;
- 	int has_attached_progs;
- 	const char *path;
- 	int cgroup_fd;
- 	int ret = -1;
-+	unsigned int i;
- 
- 	query_flags = 0;
- 
-@@ -370,14 +370,14 @@ static int do_show(int argc, char **argv)
- 		       "AttachFlags", "Name");
- 
- 	btf_vmlinux = libbpf_find_kernel_btf();
--	for (type = 0; type < __MAX_BPF_ATTACH_TYPE; type++) {
-+	for (i = 0; i < ARRAY_SIZE(cgroup_attach_types); i++) {
- 		/*
- 		 * Not all attach types may be supported, so it's expected,
- 		 * that some requests will fail.
- 		 * If we were able to get the show for at least one
- 		 * attach type, let's return 0.
- 		 */
--		if (show_bpf_progs(cgroup_fd, type, 0) == 0)
-+		if (show_bpf_progs(cgroup_fd, cgroup_attach_types[i], 0) == 0)
- 			ret = 0;
- 	}
- 
-@@ -400,9 +400,9 @@ static int do_show(int argc, char **argv)
- static int do_show_tree_fn(const char *fpath, const struct stat *sb,
- 			   int typeflag, struct FTW *ftw)
- {
--	enum bpf_attach_type type;
- 	int has_attached_progs;
- 	int cgroup_fd;
-+	unsigned int i;
- 
- 	if (typeflag != FTW_D)
- 		return 0;
-@@ -434,8 +434,8 @@ static int do_show_tree_fn(const char *fpath, const struct stat *sb,
- 	}
- 
- 	btf_vmlinux = libbpf_find_kernel_btf();
--	for (type = 0; type < __MAX_BPF_ATTACH_TYPE; type++)
--		show_bpf_progs(cgroup_fd, type, ftw->level);
-+	for (i = 0; i < ARRAY_SIZE(cgroup_attach_types); i++)
-+		show_bpf_progs(cgroup_fd, cgroup_attach_types[i], ftw->level);
- 
- 	if (errno == EINVAL)
- 		/* Last attach type does not support query.
+ drivers/net/fddi/skfp/smt.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/fddi/skfp/smt.c b/drivers/net/fddi/skfp/smt.c
+index dd15af4e98c2..174f279b89ac 100644
+--- a/drivers/net/fddi/skfp/smt.c
++++ b/drivers/net/fddi/skfp/smt.c
+@@ -1857,7 +1857,8 @@ static void smt_string_swap(char *data, const char *format, int len)
+ 			open_paren = format ;
+ 			break ;
+ 		case ']' :
+-			format = open_paren ;
++			if (open_paren)
++				format = open_paren ;
+ 			break ;
+ 		case '1' :
+ 		case '2' :
 -- 
-2.47.1
+2.43.0
 
 
