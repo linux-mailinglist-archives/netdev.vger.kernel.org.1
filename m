@@ -1,124 +1,84 @@
-Return-Path: <netdev+bounces-188849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41303AAF10E
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 04:15:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1564AAF124
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 04:28:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DDB0985EEB
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 02:14:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B8D81BA3211
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 02:29:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D8671D5CE0;
-	Thu,  8 May 2025 02:15:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EBC21BD01D;
+	Thu,  8 May 2025 02:28:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jup+Qk+C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GtgcXnXs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D25E015B102;
-	Thu,  8 May 2025 02:15:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 595DA4B1E40
+	for <netdev@vger.kernel.org>; Thu,  8 May 2025 02:28:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746670513; cv=none; b=QMaXRRNCvNjyFuXrRbr89JsEAvboYFK64rgGn3VQ8q6FFVuo804M2tTeIyEaVHRUTnHpbyTcKSRMOvCTJYhMb7NDGKCBtLVuHON3y3YjhydHck7R1DFFuwhZ9imcAA5BpdZvb6siwSeTxhLWV/v2BHSwGkr1/bhBwBKUSHyU8n8=
+	t=1746671327; cv=none; b=mKNsV2u83q5bxWNZ48cYA78VJxPuwjEbwTQkeM95IfvolI50xjTrXgfO0V0Z0KsNNhk+AwokxRGyR4kF5nMc2OwwZlMuWsinm0JMEp7BSoymPSyQ9ytRcmj1+erRiWwVVVib3uLRBX2kMi8sjRTccETl6tdmzDg0TAOy+xz/iBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746670513; c=relaxed/simple;
-	bh=Xe71o3NwB4Jh0TFWAYLmp8xOREtAMxdCI+4weerDoiA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D5oKrtaQsIGXmMbCYF5JeRmkh3HnpTviFjRr7uDNNv4MQL5pWZWX6jCjOA74+t3b49e0IGOCGGY6+TDvQqFpTXZ1YOj9QgsK1inHBJEJNhEcVgDHdWmj/KyliT+GObDe2Z+LlAR6E4h8Z35DzZzEvo+0wIjHZxKXoMwUejeAUn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jup+Qk+C; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-22fa48f7cb2so1147325ad.1;
-        Wed, 07 May 2025 19:15:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746670511; x=1747275311; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GkADO5RX5LKak5ParSAdhE3hkIpyJGjVDD86j8FGyjI=;
-        b=Jup+Qk+CBjq2Hj3r4xbC0ajBX0Hej0PArYRz4HZ3xB7I1ZIEuAJJvlukARd4OTHTDq
-         piBDhZCR+8rNcjh4WrNNO28/Z9tTiKZ/PCokukyuqSRq4aTJwSGmUpjtESaBueEs8H7h
-         Y46mNveDw4P76Q2CKmLzoLgo33paPfEu8P6BpkZ0aRgG1ZQ5jCszXt8H1LYqkMeehPsD
-         d9eq2MAEa4d4mKUV24Eqk1rjYo1ljmOVZ9FSRtTU6bZ06/RJsQQd6REfJRiy/2jdEYE3
-         al9AGm+EGAD6Nhm6qtLcNv+WnIiBZ4F6JIVOQsx2vmRAeZw/RKIq5SlvyouAIEvZYbzy
-         PhlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746670511; x=1747275311;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GkADO5RX5LKak5ParSAdhE3hkIpyJGjVDD86j8FGyjI=;
-        b=US7Y2v3mB7GmadQY2xCpjcY0w8WrEK0D2vBPHY6OYPy3yv7OX9jXS0j5PivkGpwNKP
-         mZlRQB+R0sqOWq5VFeVMBwrfs+8nQXCUknQhaTUdGC5fd37+v4Az8p3GteuRnfjGdQl1
-         OA+Ooe3nQFQ2qBoIG57hd+vuuNEal13e5/HPh4cM+6CL+z/E8d6mkUviR5K7hGd6wvnS
-         Qe6bOScCahLgVLvni3hVKwl4SvnzNqKYePf8IFRmSVP7IE+xU0B+CZH98O4YkIDvmTq/
-         WrS3cJTw8P/mtqvMry5T6ydewZ5IY5mUGQOX2T+94l6bJnXQglzfvHPRk9eurwppKymj
-         ziMA==
-X-Forwarded-Encrypted: i=1; AJvYcCUfE+pCCQQ1Zx7X3w4nAgV9TWmjrDslWblei/jEbaGygCQfjGIiGKKOAPCHZ36uTrjyDiGV9HihYGfcawnvHew=@vger.kernel.org, AJvYcCWwDc5IUlyZ6LF/sndtQQkkQB5aX+bkO8hdbyBcejUKW+Z5qvB3iL91PVSyloEz5flGve1cgROFMi8ebliCTTfQ@vger.kernel.org
-X-Gm-Message-State: AOJu0YzkkcIpDxkc5zmos0BbEWuEonvNA79r+KyF8kAApVgx22P/0sz3
-	9hy5OlA0aucYr0J9DJuOv3NdpnbXCHshj6rFSkH8ZKUbJFH+YAd0
-X-Gm-Gg: ASbGncu7S/GJ7iIAweyKXDQXAdLcq72xRgPFvduToiSZgBeyFWhE6i0H4tFDH4tPv7w
-	sdNySXaGiNqBKdozDr6+vJ4BR1/CXxHCuWY9Niju+1zpK4UNhGlAZO8V7Sxx4qIA70JsUaOfXp3
-	GPMpsuTTTBuKu/Vt8D2OOfvmtyJ32HTBCMMLHC4X7TV5SQNc/38ImAj2XHPdxwwks+S3QUjvwc5
-	vHjBb6q0062N/UJe5yNb/QZtf1jdBcCoer7ondcWB5sLBvxJ+oSY+4kol8JSkBv0J0A5HBNUXau
-	sHDiC0xnQ45AtpY6p+vXpolDDDtChKWvchDv1Xq+YedRloOdWILtB/Th
-X-Google-Smtp-Source: AGHT+IF/g58dTcMUT9OqqraHwKir4gOqXcqsH7utlmYFK5Z6ygF7IDHvIjdM+rEucmwSxjt46URo7A==
-X-Received: by 2002:a17:903:2ec3:b0:224:910:23f6 with SMTP id d9443c01a7336-22e5ee17734mr76937385ad.45.1746670511089;
-        Wed, 07 May 2025 19:15:11 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e1521fa7bsm102582835ad.141.2025.05.07.19.15.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 May 2025 19:15:10 -0700 (PDT)
-Date: Thu, 8 May 2025 02:15:01 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Andrea Mayer <andrea.mayer@uniroma2.it>,
-	Paolo Lungaroni <paolo.lungaroni@uniroma2.it>,
-	linux-kselftest@vger.kernel.org, mptcp@lists.linux.dev,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Subject: Re: [PATCH net-next 4/6] selftests: net: use setup_ns for SRv6 tests
- and remove rp_filter configuration
-Message-ID: <aBwTpWOovuXghcRd@fedora>
-References: <20250507131856.78393-1-liuhangbin@gmail.com>
- <20250507131856.78393-5-liuhangbin@gmail.com>
- <20250507163904.0cf86c59@kernel.org>
+	s=arc-20240116; t=1746671327; c=relaxed/simple;
+	bh=f70NiPlV/i7wWT3CZwo4NHk91U1aR482RL75MAI/Jqs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PuMLoqEyHXXNRG3OtUmuk8vyFNtYoJ7GsxGXMNoyxnHYlyNDChHxQE5fnaT7jyg0HuNnhzoNYrPnGXyH8O2h3lgwJjk5s0oZoEXrvUEpUretyEDtHWuo1KyiPc1b3BimPQNT/9tcz7Ys9/rbkWfnnZsztQP7SWgVN1cE+lLaxLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GtgcXnXs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3E50C4CEE2;
+	Thu,  8 May 2025 02:28:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746671327;
+	bh=f70NiPlV/i7wWT3CZwo4NHk91U1aR482RL75MAI/Jqs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=GtgcXnXsI6tGSulBYac4hkFJhaMVIpgTPc41Zc12OmzoXrskEgLgO6Pa7xrSFpe1X
+	 YLQhqK9lpnPPLob5d1jlyqdfEAqWM5baWjaLLTYOrcNADMcgwjJERqBFnqXGHo5b3m
+	 oLPUEdZXzfcdKcTsI8/aJPDyfpUYbqB/CHdD8xS+3do3j/+cQ6E3xqU3PFHwDMWBzn
+	 UqknQ7obCF8mRRAjOrvj6FHpqHnOl7U762BFdfAH9N+WzA6cWt24Xz8vUUZtF67lb1
+	 hHlXu93V32xN3ICo3zeP3jzGVl83emtJxfQotvwMYr85uWgsmRkcrFQccLz4/JCAKR
+	 2bJHsdknqZV6A==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	donald.hunter@gmail.com,
+	jacob.e.keller@intel.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next 0/3] tools: ynl-gen: support sub-types for binary attributes
+Date: Wed,  7 May 2025 19:28:36 -0700
+Message-ID: <20250508022839.1256059-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250507163904.0cf86c59@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Wed, May 07, 2025 at 04:39:04PM -0700, Jakub Kicinski wrote:
-> On Wed,  7 May 2025 13:18:54 +0000 Hangbin Liu wrote:
-> > Some SRv6 tests manually set up network namespaces and disable rp_filter.
-> > Since the setup_ns library function already handles rp_filter configuration,
-> > convert these SRv6 tests to use setup_ns and remove the redundant rp_filter
-> > settings.
-> 
-> Missed some get_nodename calls, I think?
-> 
-> # ./srv6_hl2encap_red_l2vpn_test.sh: line 470: get_nodename: command not found
-> # SKIP: Setting up the testing environment failed
-> ok 1 selftests: net: srv6_hl2encap_red_l2vpn_test.sh # SKIP
+Binary attributes have sub-type annotations which either indicate
+that the binary object should be interpreted as a raw / C array of
+a simple type (e.g. u32), or that it's a struct.
 
-Hmm, somehow I missed testing this one before posting the patch...
+Use this information in the C codegen instead of outputting void *
+for all binary attrs. It doesn't make a huge difference in the genl
+families, but in classic Netlink there is a lot more structs.
 
-I will fix it and post a v2 patch. Sorry for taking up your time.
+Jakub Kicinski (3):
+  tools: ynl-gen: support sub-type for binary attributes
+  tools: ynl-gen: auto-indent else
+  tools: ynl-gen: support struct for binary attributes
 
-Thanks
-Hangbin
+ tools/net/ynl/pyynl/ynl_gen_c.py | 66 +++++++++++++++++++++++++++-----
+ 1 file changed, 56 insertions(+), 10 deletions(-)
+
+-- 
+2.49.0
+
 
