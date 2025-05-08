@@ -1,281 +1,233 @@
-Return-Path: <netdev+bounces-188919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C405AAF5F3
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 10:45:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75779AAF5F8
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 10:46:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A3B93AF29F
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 08:45:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84CBA1C0557C
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 08:46:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FD43214A7F;
-	Thu,  8 May 2025 08:45:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3741A21C9E9;
+	Thu,  8 May 2025 08:46:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="p0+k2Suq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ws0abTau"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2064.outbound.protection.outlook.com [40.107.94.64])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65E471CB31D;
-	Thu,  8 May 2025 08:45:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.64
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746693924; cv=fail; b=YlX4++WpNMxLwH+1UksTbG3xSofOzciJZzX7qVYpv4zNr4VK2RUsOHJynYoKvNbGkVPOzKrpWlJZf7kY9YbOd2EHboBUPJgjzDnRCWpet45ZoMkwD2yu/adQExgAI283PetkMYP2oDpjmN/KgPBjR1juzRPb73B4fAuxnY9aq+o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746693924; c=relaxed/simple;
-	bh=OafJ7131loMDRin2T4IAtVJBzggHZAvc0Nh9qKoF7fE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=u/0PvAJOtDBBsM7dzM3vNRG8w4J2D2vtuo0AXMCixsXM8XeSIHUR3BJTeIXjlO7y0d36PKz3rVcFvrGnPAuvxDLCNxEQt+EyM04D1xU2bKr1NcynMGsXDWsUNMBffIG3UeAt/N/1Vb05KI25b9gOdTnIaoHafad3ORFYaqSBsnI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=p0+k2Suq; arc=fail smtp.client-ip=40.107.94.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=J49opGJs0IOWNhKtPhC76MChcrqpO2+qNMfjlkCn5tGi/bpHItLKiypvcxHOuKSZDkc3TYUS8cRcKmqCNWh+01p2UG+dyvkE9mHgn3B7NymtbUFYOm7rD2qVM57MpvwTC/nL1oO4r9vufBbh1ROGzKBOccxRoZKv/ws4oa2TFQ0M++20WBxBJEmMl5w2MEUSPs1p+wQabfP9tVlOQshijJyc5it4lijTm7rfeVH0lg+A2Wg0Ne9hKqfW+REZSs1QOcRoKWJltwcqzdpNgy1JRet67XjjYDD7uApzymWapGw6tI4t8LxUpvXtsz97H6/J21WeaUhALN9Y+bB3n7A9MQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4Uoa4J4Q26Vv2zK2ZuNwGAnSlcPd9GoYwOlYzdm+KM4=;
- b=Lrd3GQnjCB4TAFdn7DttM992BeyMuqfICe8f9Ehji05IX8GqNuJDU/H+vLdQ308tRRuzBBgWE5+GxNV093njK8zPZDBDCwM6OShculvDrEovfbFdu/+6f45hMhxRDJGr05gxHCW4YKshiK/9qFfp/3IXDGyRje0QAsjhQw1qY/+nuWmlBNAC4ZKuligz86Aua2DGfHRTpnF24lRYF6SvzQ0Ip6B7qf7ktqbftLVgV4Rq7QmrcQiXqp3uWoXfHkcT7lGjJO1u3ET3OMuPPtcm7Srqikx89CMsW/wnrdj+qV3/nKQayevHDOJWHRDUIkEK/7To6Ojlfgf0V6ol+/DjRw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4Uoa4J4Q26Vv2zK2ZuNwGAnSlcPd9GoYwOlYzdm+KM4=;
- b=p0+k2SuqS7M3vuKUD3IFoN+uQ7lZeapUMaokVzJN79yMkmUTPm/XuMqdSteHK0VOONFtXYGH38A8ccnrHTZd8SegV9GVYyh+gbxaI2mCUmmcemrQ9QAi0J8PKG2Ugl3M5xO2RGqlIiVxRpTMtAaEZ8XY0Gbo15zZhKKgmnTXdj7P/kYbOR7xpns+naTsSWXxEgtYLViwJkuh7AIUxmEkpvm9tiEzYkDT/j2nBV1hJFir2urOSFyysU9a8o57Y4jKsoVvwrYnomfNwyTD5xe054EP6TGOG3dKMFo4p+0uiB7dUkIQ1SG7fC7NFG4Lo7B5bBoPaZ6WxI3NbEfocflAvQ==
-Received: from MN2PR08CA0015.namprd08.prod.outlook.com (2603:10b6:208:239::20)
- by SA0PR12MB7074.namprd12.prod.outlook.com (2603:10b6:806:2d5::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.31; Thu, 8 May
- 2025 08:45:18 +0000
-Received: from MN1PEPF0000ECD4.namprd02.prod.outlook.com
- (2603:10b6:208:239:cafe::87) by MN2PR08CA0015.outlook.office365.com
- (2603:10b6:208:239::20) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8722.21 via Frontend Transport; Thu,
- 8 May 2025 08:45:18 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- MN1PEPF0000ECD4.mail.protection.outlook.com (10.167.242.132) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8722.18 via Frontend Transport; Thu, 8 May 2025 08:45:17 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 8 May 2025
- 01:45:00 -0700
-Received: from c-237-113-240-247.mtl.labs.mlnx (10.126.230.35) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Thu, 8 May 2025 01:44:56 -0700
-From: Cosmin Ratiu <cratiu@nvidia.com>
-To: <netdev@vger.kernel.org>, <cratiu@nvidia.com>
-CC: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
-	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>, Joe Damato
-	<jdamato@fastly.com>, Shuah Khan <shuah@kernel.org>, Stanislav Fomichev
-	<sdf@fomichev.me>, Mina Almasry <almasrymina@google.com>, Saeed Mahameed
-	<saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Dragos Tatulea
-	<dtatulea@nvidia.com>, <linux-kselftest@vger.kernel.org>
-Subject: [PATCH net v2] tests/ncdevmem: Fix double-free of queue array
-Date: Thu, 8 May 2025 11:44:34 +0300
-Message-ID: <20250508084434.1933069-1-cratiu@nvidia.com>
-X-Mailer: git-send-email 2.45.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E35821CA0A
+	for <netdev@vger.kernel.org>; Thu,  8 May 2025 08:46:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746693984; cv=none; b=aIbaHS8D0nqAt2pAFxVROpY4rVpaUMF1E8SRMNAf85jMhsm01ECfkhylkE6V2ozahGtYvgM0eNe4NLakBcCjqqyi2ES/iNNkkP4tEdSMBWPq202uzdgk7bQxNzY3QO1jrLK9ppSA+xp9jG/EpB1hE1QYAN55W8dTguRpufEskbk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746693984; c=relaxed/simple;
+	bh=4HU8oiKCoDW8I7We41fVsq6xE7etMMpLP3NwPzozuBw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LqJJZn7gh9Upxno0020xYEgdniKYeIUf5PMdZh3zXxFSL/dITMmuKy1/eELtAvAJFXRKTAa88wgC1OaQrP17g1BDUl2z9IIXNE4hQrLfEbRwVV+JDsnTQAArTXkp9exNHo9e8O/dunWupLWDkB3P/Ke6zZ2rC/hEXWBJVIoiJYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ws0abTau; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746693981;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JZM2rfxZmGn+Pb7oDTzTtUVYRHj/xEqslB58SleMISA=;
+	b=Ws0abTaucUO61NMwpLY1sa8zYR2Xg8MgbsWHHOPNsn/fG9IeYxVbiUY0vg2fpEJUe+BbSh
+	IzFucVkNpsBr2atwsmeW4DyzhJvGn4vtWuoCuHCVGAqk0OdSaQumEUUoydvxoSJJvgPTEg
+	Tbs3nNjJzGhH4Y+mdE4YwyA3SQDxbTM=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-226-uyM9EHu4Ow-7YfZlWlAVsA-1; Thu, 08 May 2025 04:46:20 -0400
+X-MC-Unique: uyM9EHu4Ow-7YfZlWlAVsA-1
+X-Mimecast-MFC-AGG-ID: uyM9EHu4Ow-7YfZlWlAVsA_1746693979
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43efa869b19so4491605e9.2
+        for <netdev@vger.kernel.org>; Thu, 08 May 2025 01:46:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746693978; x=1747298778;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JZM2rfxZmGn+Pb7oDTzTtUVYRHj/xEqslB58SleMISA=;
+        b=oAuz66zefFZfab+qDn9FTkeT5NLRmjumUTnt42rqBwQZjTgwIvDpDrC+Zubbxzxscv
+         MGq98TRJOFwnFsqu26Kv5aJcZ2VW6BbLq1274ztXtVhrHqzeP6QFWH6TozHDhvcDqGmp
+         53hi005aNQNKhdjluxfSYNGXf3l0MA0RHZRNqkkzpewSXi3j9v/ETExyo5DBz9IGbHS4
+         awVIOu+KtC8Tav3XCw8YR6zWSOo2uGkcSsU4EtitZBmDdqNgPRGESh8T860HkWRnRmgu
+         BHpD3cEZY2DYAFvlqGAy8O6EIg7uDL76Msdqz9kJ5ZiY1QsxwdYnabEKTu+lnOF/aRm9
+         XLjQ==
+X-Gm-Message-State: AOJu0YyyKIe9y/yrn+5cDuH+eB0qozfx/hbJBs888WLzmuvYDDwt/Tbr
+	w8CtA41ka2A599odsHmhE8sUvKSCeZdAM2uCsGKfA5UuXnb0zYICN+fSQmeCk1SQEXboPXhMrb9
+	epaojPyqidn1M0sx0FKjb1qxa/FoNA/zVqEDlt/QoplHacrfSqdPMD+7pAKfasSXy
+X-Gm-Gg: ASbGncsE5kJdzWT01CUjCR8OC6Q9gMNpCf15jRhI9KEIVC+DKXwXE19/TryPfMhbB9B
+	Kjea4aU3CvnVnU2pqO53huG5O+sBxywls4nvWdaaEB/y6oGMH8hAxg8KRPkV/EYiOeHjy13dfS8
+	R4xi3YHkFZQ43eu2xA7GZAww1B7i3Cbh/8Xs5RLq3CBw9h+AFd3Oowr1kOTlG9uhkuOwNvxVhND
+	GgNeR1uunKtrHpUaFv8BENvXFB0VYGmqKxr0b6O/2nZ3zcAVxDW5rI4jHKl031mU6h4g44Ay4cQ
+	LJ/6zAS/emXBD+7Z
+X-Received: by 2002:a05:600c:1c8c:b0:43d:683:8cb2 with SMTP id 5b1f17b1804b1-441d4eeb512mr38786755e9.14.1746693978494;
+        Thu, 08 May 2025 01:46:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFnG944ZTQEsiKw7GKbX+anmpQL79FH96aDK1XjGSXilGwo4xo0Ow122A9pOfEKgJo9fzTVOA==
+X-Received: by 2002:a05:600c:1c8c:b0:43d:683:8cb2 with SMTP id 5b1f17b1804b1-441d4eeb512mr38786555e9.14.1746693978050;
+        Thu, 08 May 2025 01:46:18 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:244b:910::f39? ([2a0d:3344:244b:910::f39])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442cd32f3c2sm29339385e9.15.2025.05.08.01.46.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 08 May 2025 01:46:17 -0700 (PDT)
+Message-ID: <d52465a2-f857-4a2b-8d4e-4d30384b6247@redhat.com>
+Date: Thu, 8 May 2025 10:46:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 05/15] net: homa: create homa_peer.h and
+ homa_peer.c
+To: John Ousterhout <ouster@cs.stanford.edu>
+Cc: netdev@vger.kernel.org, edumazet@google.com, horms@kernel.org,
+ kuba@kernel.org
+References: <20250502233729.64220-1-ouster@cs.stanford.edu>
+ <20250502233729.64220-6-ouster@cs.stanford.edu>
+ <4350bd09-9aad-491c-a38d-08249f082b6d@redhat.com>
+ <CAGXJAmyN2XUjk7hp-7o0Em9b_6Y5S3iiS14KXQWSKUWJXnnOvA@mail.gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <CAGXJAmyN2XUjk7hp-7o0Em9b_6Y5S3iiS14KXQWSKUWJXnnOvA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECD4:EE_|SA0PR12MB7074:EE_
-X-MS-Office365-Filtering-Correlation-Id: 14dad2dd-179a-4422-eb6a-08dd8e0ca8ef
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|82310400026|36860700013|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?kl41C6Vkz4EirBYxR86lFUdukPptzxYRryGTns7NuYn9bH8MTgpbMJJqwnoa?=
- =?us-ascii?Q?7pn+FSBvw7rXX1rzzyeXMG0jsk3IaqvGObTUiLkqx5+1DnBEWGXJ+zld0SlV?=
- =?us-ascii?Q?R8d36n3b1GQByH3eCTHwOMraq9LcskvurHiBL8IbRmV/GEMPQuuDSYSj1G54?=
- =?us-ascii?Q?l12oek1VZVjTpNzUQuBP+M7CFV7RTl0OC9RcKmJfGf9WWD/EDmwFD2sIKdxj?=
- =?us-ascii?Q?AKyfJZX12lgvc0w+LEJbjET4CaEU9q1bOeNGzn2hCem6d6Woa9Eu8fWgYQyK?=
- =?us-ascii?Q?OaiVmPMYiH2pTNyHBdlWYcnea03WDQAcBaePlJCOSN9V5dbXzL6dSWPXfa5h?=
- =?us-ascii?Q?AHSwUqbzfNV39o6akDclvR1BMgjOSh6RTTjLsZaO6UkBXZGSDUrpqPpl744f?=
- =?us-ascii?Q?u1vnWN083nELcp0cc9E22bJ/DZi6SHOL16q0ZDbDh41cXqa0RVJQu4qKDP1q?=
- =?us-ascii?Q?Alw17Eba/bNlHwYM+n2RAujI6hwWAcGf7HoVp6OB9coiiIVsswzi+Hwvc8za?=
- =?us-ascii?Q?p7v2W8yTjaFkJyZ8Vv7FlNvuXl6xP/kXXtcGaFneHswc3z7LIANkplu7+xzR?=
- =?us-ascii?Q?HPoHDMt5nJmcAo28j6qjbxfUngH+TmHfnGgNtP7LmHECN+F8X0rjiF4N078O?=
- =?us-ascii?Q?ihubUoBwFYbAoBADXLm2oj9sQ98JHTrSxpMqVrd3lDid7CLyRaltyQYm5KnN?=
- =?us-ascii?Q?P8ck9WUZozUFOFkFKQqmk5gkkrGvf430J+frKTOUpWFDhvJOv+FnL/93lqtV?=
- =?us-ascii?Q?Pg85MeN0ZoDfLwzZlrKJvPuRKuIAHEj1RkT5vbWpXKYabCIHPfqc81KUml68?=
- =?us-ascii?Q?TSB8jX8VfNDMozrLJjuRgciILASfAtC1HRSPC+szcn1VjAKLQjwMiHOrgMI6?=
- =?us-ascii?Q?OsQ+MBMcj4ZduIrKmE79yrLw6DsMiZajUr9ynJEWKHqf0IwtYPkbdCjAlrol?=
- =?us-ascii?Q?5koWeocyoaWTggjtnHibllARl33yDOc7+l/SKiBVmZI6RbJaLCrXJ3qEjQ7i?=
- =?us-ascii?Q?8L7ysvv1tt7vg7O7dvTHquEeADRi3wmeuK73uTVQNs8mpgs9OP7uvtHQOH4D?=
- =?us-ascii?Q?saUmcRXJPd2vT4HIXvtzrXt3IDMLIKM8Upnc9CvqqVsA8NCjM9JcDN5KrsKz?=
- =?us-ascii?Q?p+SZHzKu7ZtNRYqON72NI08Nv1NFJFA+YAkCyzEiQWeZWCVOcv7h5vZifjgW?=
- =?us-ascii?Q?bYp2XRhS/nwzQQmSfX386NRbO4mumvvFYlwVQFCBSNg4e1g0aZYlVdqdROcU?=
- =?us-ascii?Q?5gg7ySIxIfrww0L3PSaO9BrCBzwbTB2uESGqtUo9wdsX0AyjXdQmtdNe5yTe?=
- =?us-ascii?Q?aOMA0IR3kaykEEjhgt4TLVtsZYfwJ+NJEwYcCvIBoYMOyuzXW5mQum8hsPhD?=
- =?us-ascii?Q?nH5vepyCiYvy/iN4HptZPC1mTeQsUjIHGlK49ME5JrJwlm/g63o9uSYu+S3I?=
- =?us-ascii?Q?IJ4d9+ZuB1LqLUDvODXo0GuSHlYzWJRw95Zlrx5xn2lLxX/CA661uZqWUChc?=
- =?us-ascii?Q?Iywafb5pwNRJLvlY9Y5dhl4X4XEsp48mgd2r?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 May 2025 08:45:17.9474
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 14dad2dd-179a-4422-eb6a-08dd8e0ca8ef
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MN1PEPF0000ECD4.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB7074
 
-netdev_bind_rx takes ownership of the queue array passed as parameter
-and frees it, so a queue array buffer cannot be reused across multiple
-netdev_bind_rx calls.
+On 5/7/25 6:11 PM, John Ousterhout wrote:
+> On Mon, May 5, 2025 at 4:06 AM Paolo Abeni <pabeni@redhat.com> wrote:
+> 
+>> On 5/3/25 1:37 AM, John Ousterhout wrote:
+>> [...]
+>>> +{
+>>> +     /* Note: when we return, the object must be initialized so it's
+>>> +      * safe to call homa_peertab_destroy, even if this function returns
+>>> +      * an error.
+>>> +      */
+>>> +     int i;
+>>> +
+>>> +     spin_lock_init(&peertab->write_lock);
+>>> +     INIT_LIST_HEAD(&peertab->dead_dsts);
+>>> +     peertab->buckets = vmalloc(HOMA_PEERTAB_BUCKETS *
+>>> +                                sizeof(*peertab->buckets));
+>>
+>> This struct looks way too big to be allocated on per netns basis. You
+>> should use a global table and include the netns in the lookup key.
+> 
+> Are there likely to be lots of netns's in a system? 
 
-This commit fixes that by always passing in a newly created queue array
-to all netdev_bind_rx calls in ncdevmem.
+Yes. In fact a relevant performance metric is the time to create and
+destroy thousands of them.
 
-Fixes: 85585b4bc8d8 ("selftests: add ncdevmem, netcat for devmem TCP")
-Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
----
- .../selftests/drivers/net/hw/ncdevmem.c       | 55 ++++++++-----------
- 1 file changed, 22 insertions(+), 33 deletions(-)
+> I thought I read
+> someplace that a hardware NIC must belong exclusively to a single
+> netns, so from that I assumed there couldn't be more than a few
+> netns's. Can there be virtual NICs, leading to lots of netns's?
 
-diff --git a/tools/testing/selftests/drivers/net/hw/ncdevmem.c b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-index 2bf14ac2b8c6..9d48004ff1a1 100644
---- a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-+++ b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-@@ -431,6 +431,22 @@ static int parse_address(const char *str, int port, struct sockaddr_in6 *sin6)
- 	return 0;
- }
- 
-+static struct netdev_queue_id *create_queues(void)
-+{
-+	struct netdev_queue_id *queues;
-+	size_t i = 0;
-+
-+	queues = calloc(num_queues, sizeof(*queues));
-+	for (i = 0; i < num_queues; i++) {
-+		queues[i]._present.type = 1;
-+		queues[i]._present.id = 1;
-+		queues[i].type = NETDEV_QUEUE_TYPE_RX;
-+		queues[i].id = start_queue + i;
-+	}
-+
-+	return queues;
-+}
-+
- int do_server(struct memory_buffer *mem)
- {
- 	char ctrl_data[sizeof(int) * 20000];
-@@ -448,7 +464,6 @@ int do_server(struct memory_buffer *mem)
- 	char buffer[256];
- 	int socket_fd;
- 	int client_fd;
--	size_t i = 0;
- 	int ret;
- 
- 	ret = parse_address(server_ip, atoi(port), &server_sin);
-@@ -471,16 +486,7 @@ int do_server(struct memory_buffer *mem)
- 
- 	sleep(1);
- 
--	queues = malloc(sizeof(*queues) * num_queues);
--
--	for (i = 0; i < num_queues; i++) {
--		queues[i]._present.type = 1;
--		queues[i]._present.id = 1;
--		queues[i].type = NETDEV_QUEUE_TYPE_RX;
--		queues[i].id = start_queue + i;
--	}
--
--	if (bind_rx_queue(ifindex, mem->fd, queues, num_queues, &ys))
-+	if (bind_rx_queue(ifindex, mem->fd, create_queues(), num_queues, &ys))
- 		error(1, 0, "Failed to bind\n");
- 
- 	tmp_mem = malloc(mem->size);
-@@ -545,7 +551,6 @@ int do_server(struct memory_buffer *mem)
- 			goto cleanup;
- 		}
- 
--		i++;
- 		for (cm = CMSG_FIRSTHDR(&msg); cm; cm = CMSG_NXTHDR(&msg, cm)) {
- 			if (cm->cmsg_level != SOL_SOCKET ||
- 			    (cm->cmsg_type != SCM_DEVMEM_DMABUF &&
-@@ -630,10 +635,8 @@ int do_server(struct memory_buffer *mem)
- 
- void run_devmem_tests(void)
- {
--	struct netdev_queue_id *queues;
- 	struct memory_buffer *mem;
- 	struct ynl_sock *ys;
--	size_t i = 0;
- 
- 	mem = provider->alloc(getpagesize() * NUM_PAGES);
- 
-@@ -641,38 +644,24 @@ void run_devmem_tests(void)
- 	if (configure_rss())
- 		error(1, 0, "rss error\n");
- 
--	queues = calloc(num_queues, sizeof(*queues));
--
- 	if (configure_headersplit(1))
- 		error(1, 0, "Failed to configure header split\n");
- 
--	if (!bind_rx_queue(ifindex, mem->fd, queues, num_queues, &ys))
-+	if (!bind_rx_queue(ifindex, mem->fd,
-+			   calloc(num_queues, sizeof(struct netdev_queue_id)),
-+			   num_queues, &ys))
- 		error(1, 0, "Binding empty queues array should have failed\n");
- 
--	for (i = 0; i < num_queues; i++) {
--		queues[i]._present.type = 1;
--		queues[i]._present.id = 1;
--		queues[i].type = NETDEV_QUEUE_TYPE_RX;
--		queues[i].id = start_queue + i;
--	}
--
- 	if (configure_headersplit(0))
- 		error(1, 0, "Failed to configure header split\n");
- 
--	if (!bind_rx_queue(ifindex, mem->fd, queues, num_queues, &ys))
-+	if (!bind_rx_queue(ifindex, mem->fd, create_queues(), num_queues, &ys))
- 		error(1, 0, "Configure dmabuf with header split off should have failed\n");
- 
- 	if (configure_headersplit(1))
- 		error(1, 0, "Failed to configure header split\n");
- 
--	for (i = 0; i < num_queues; i++) {
--		queues[i]._present.type = 1;
--		queues[i]._present.id = 1;
--		queues[i].type = NETDEV_QUEUE_TYPE_RX;
--		queues[i].id = start_queue + i;
--	}
--
--	if (bind_rx_queue(ifindex, mem->fd, queues, num_queues, &ys))
-+	if (bind_rx_queue(ifindex, mem->fd, create_queues(), num_queues, &ys))
- 		error(1, 0, "Failed to bind\n");
- 
- 	/* Deactivating a bound queue should not be legal */
--- 
-2.45.0
+Yes, veth devices a pretty ubiquitous in containerization setups
+
+> Can
+> you give me a ballpark number for how many netns's there might be in a
+> system with "lots" of them? This will be useful in making design
+> tradeoffs.
+
+You should consider at least 1K as a target number, but a large system
+should just work with 10K or more.
+
+>>> +     /* No existing entry; create a new one.
+>>> +      *
+>>> +      * Note: after we acquire the lock, we have to check again to
+>>> +      * make sure the entry still doesn't exist (it might have been
+>>> +      * created by a concurrent invocation of this function).
+>>> +      */
+>>> +     spin_lock_bh(&peertab->write_lock);
+>>> +     hlist_for_each_entry(peer, &peertab->buckets[bucket],
+>>> +                          peertab_links) {
+>>> +             if (ipv6_addr_equal(&peer->addr, addr))
+>>> +                     goto done;
+>>> +     }
+>>> +     peer = kmalloc(sizeof(*peer), GFP_ATOMIC | __GFP_ZERO);
+>>
+>> Please, move the allocation outside the atomic scope and use GFP_KERNEL.
+> 
+> I don't think I can do that because homa_peer_find is invoked in
+> softirq code, which is atomic, no? It's not disastrous if the
+> allocation fails; the worst that happens is that an incoming packet
+> must be discarded (it will be retried later).
+
+IMHO a _find() helper that allocates thing has a misleading name.
+
+Usually RX path do only lookups, and state allocation is done in the
+control path, that avoid atomic issues
+
+> 
+>>> +     if (!peer) {
+>>> +             peer = (struct homa_peer *)ERR_PTR(-ENOMEM);
+>>> +             goto done;
+>>> +     }
+>>> +     peer->addr = *addr;
+>>> +     dst = homa_peer_get_dst(peer, inet);
+>>> +     if (IS_ERR(dst)) {
+>>> +             kfree(peer);
+>>> +             peer = (struct homa_peer *)PTR_ERR(dst);
+>>> +             goto done;
+>>> +     }
+>>> +     peer->dst = dst;
+>>> +     hlist_add_head_rcu(&peer->peertab_links, &peertab->buckets[bucket]);
+>>
+>> At this point another CPU can lookup 'peer'. Since there are no memory
+>> barriers it could observe a NULL peer->dst.
+> 
+> Oops, good catch. I need to add 'smp_wmb()' just before the
+> hlist_add_head_rcu line?
+
+Barriers go in pair, one here and one in the lookup. See the relevant
+documentation for the gory details.
+
+[...]
+>> Note that freeing the peer at 'runtime' will require additional changes:
+>> i.e. likely refcounting will be beeded or the at lookup time, after the
+>> rcu unlock the code could hit HaF while accessing the looked-up peer.
+> 
+> I understand about reference counting, but I couldn't parse the last
+> 1.5 lines above. What is HaF?
+
+A lot of typos on my side, sorry.
+
+You likely need to introduce refcounting, or after the RCU unlock (end
+of RCU grace period) the peer could be freed causing Use after Free.
+
+>> [...]
+>>> +static inline struct dst_entry *homa_get_dst(struct homa_peer *peer,
+>>> +                                          struct homa_sock *hsk)
+>>> +{
+>>> +     if (unlikely(peer->dst->obsolete > 0))
+>>
+>> you need to additionally call dst->ops->check
+> 
+> I wasn't aware of dst->ops->check, and I'm a little confused by it
+> (usage in the kernel doesn't seem totally consistent):
+> * If I call dst->ops->check(), do I also need to check obsolete
+> (perhaps only call check if obsolete is true?)?
+> * What is the 'cookie' argument to dst->ops->check? Can I just use 0 safely?
+> * It looks like dst->ops->check now returns a struct dst_entry
+> pointer. What is the meaning of this? ChatGPT suggests that it is a
+> replacement dst_entry, if the original is no longer valid. 
+
+Luckily (on unfortunately depending on your PoV), the tool you mentioned
+simply does not work (yet?) for kernel code. You could (and should)
+review with extreme care basically any output about such topic.
+
+dst_check() is the reference code. You should use that helper.
+
+/P
 
 
