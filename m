@@ -1,152 +1,116 @@
-Return-Path: <netdev+bounces-188894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0B82AAF383
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 08:14:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D22F9AAF389
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 08:16:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24C791BC710E
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 06:15:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DF6B46642A
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 06:16:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BD90210F59;
-	Thu,  8 May 2025 06:14:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E90781DE3C0;
+	Thu,  8 May 2025 06:16:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J6VI+Gcy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kdq2hmc6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A48815B102;
-	Thu,  8 May 2025 06:14:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D40747F;
+	Thu,  8 May 2025 06:16:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746684891; cv=none; b=dLYmGuGEifwtx3N7ZDQvYaj2YTrj718Ge+KycLBg8FaNkPvJCAdVgIDZKHManv52symZYktM6u5zvm3FwxLjdUXfEmjNGxC56TKEC7f5kYdiL2nQnYscPuSSUIAyi9QX1bIYJWo9ORbbM2f6X/wxXJj+2nvMXc4JwVJUUWZ0NiA=
+	t=1746684997; cv=none; b=TWPGj19rTgQsV4FryGpBSUDruhHIPFmTnbyw3PLjuicPExKxGJS17RgNAd7tQd+GV7C5D74iM2UTt34PewapeadK+ypRtr1wDo3uOXStBD5IZxEUVg31tXko1uNRkbov58Bm9PJiEBwxzEUyJbbCYdCCDSCqUyH1Psb/xtg07VI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746684891; c=relaxed/simple;
-	bh=MFvOzXbBqb2FrF9xJ99n1Vvnhtq7kc+wQtyVehe0cZ4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dDxmTlW4xXOCppeRXdEzqE8Lq1lmJIQkYfQiYeczqTWsUYXx6cyHMJAuRCkIaziozdTwwBYn83aNdE8zLCu18vH43+VR+t1QUrwX4FinVJEHwLGNHl1aYpZWrRHQnrS6DwC7oJIsuBthjIfbtYaLxY/NjGZfg4KD7i6bN2HgGQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J6VI+Gcy; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-740b3a18e26so155247b3a.2;
-        Wed, 07 May 2025 23:14:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746684889; x=1747289689; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=VotcU77DWw4Y1PxH+nM5ixe9fRq+X5xufuqprZuD5/w=;
-        b=J6VI+GcyCRg8gFK6XVov7p9bACq97KB8ldIqAh+T3n/HvZMiYKEDCyCQS9BlVnHLvt
-         Nwt4hSV1D8HC6vZDBgInglmQSlSNDSe2kpNdz4tn+j6sNAsabWGHDSqTmvIj39uQ2YCc
-         uZIuubBWvkobsTlPldXFvkl5aqNPUaOxeDi9ogL49WH9USzqURMyX37v9mxfEB7HACHJ
-         e/wcVfutjUdD1NjoXr1Q9Wh+fiNxCBkNi+qRdpybEAun7XzVSHT9s4msV6W8mBI9Baij
-         He0M3YXwk7isUBUUtCshDacyLaPj6eyg2tMv+eY9YQfaS5p0bFre8PVqvJfaC/Jb1wGF
-         nXsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746684889; x=1747289689;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VotcU77DWw4Y1PxH+nM5ixe9fRq+X5xufuqprZuD5/w=;
-        b=Hhg37VD47R50lNCiFjxN5PZMi1knH9R3hDA41ZkiAD5ooYxmIiK3TUpyDOlIDGVEqM
-         GzPqWpDZ3LiSzFmXsmyswiLnuhu4MrDhBhITVwXfmgzg+JI9aAs41pTfA5RhqpNgl/yU
-         ARUPK3J+bd9yLcWZH26F8cPGxTS3rVdhcC2Jd41rOFc4tbuFN5r5nNJ+XJi2aq20h+hb
-         TeJ4G3GcXToOYJhZe3kRK8vupmJn2V5TcKJ+brkyFs27yXztT0BHzzB03ERqKz/8CQzY
-         i6/tK2n+K9eo4sb5LJF6qkfGx61t5rKGD8djIH7e8AyqoEx67pVBU8K6G2t/0R0Cogu+
-         XfrA==
-X-Forwarded-Encrypted: i=1; AJvYcCWpxxiGjECDWlTibFEIc3uca3RqYBtWpW1PymAzKtO+PfBePDNWqofwH7ljW2eQVu+2kzCQdBBfjByYTj0=@vger.kernel.org, AJvYcCXDXMSK8U2DaihQzc9RY3BkTiPY+H8eacUL591xUM/FkaHYab8GdJtMbXGNZ+92MZZNlnwqIs/l@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYp8VUGaoG/kDAQqmYYKVM5epzcNuZ2t3RiqjFG/4SdIrFbnyn
-	i8FxbPC15HRoMK3KzR6tPbSqG69DRB/kJ4yJM8O3dIyAFHK5Qee5
-X-Gm-Gg: ASbGncszCJojMFVeSTnuizJdU/QqZnQmTDFxUAOOWKf3HmjFsHsU489TJFZcyMBUsD7
-	SOPDGIZTnPfqE7q93iNWvA/93wyEEr10vWX/793NBFpb/uBIbjXpTr4HQQsPNkmn8EY5a77N36Y
-	8ivrSClIGhdcMa6O+xz8IU0iTUy2Ayu9PDbY9FYQwgbu4vRzffu7lG1JZ9U0iPwCfxjgYu+DwPV
-	MWmvOcs2S8N19l+ajthcsDz+kT1ma0ukxSIu6CUT7A3RvdD4Kfm26z+P/G9shs5V1vNavrdnYVX
-	yxg6rzKLE//bzOjGRz4akLEQxnObkSR9G5jcl5XEVX0mUD+rGH9pnntmmw==
-X-Google-Smtp-Source: AGHT+IGcccthny4wgO9JLnTYbSSOdkpYbJbM2k0A2F+LqBuKt3G8cPMktOYUDmjfyDgWjOu6qpKiCA==
-X-Received: by 2002:a05:6a20:7d9d:b0:1f5:81bc:c72e with SMTP id adf61e73a8af0-2159b04f390mr2858643637.33.1746684889489;
-        Wed, 07 May 2025 23:14:49 -0700 (PDT)
-Received: from ubuntu.. ([103.149.59.114])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-740590a489asm12771438b3a.170.2025.05.07.23.14.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 May 2025 23:14:48 -0700 (PDT)
-From: Jagadeesh Yalapalli <jagadeesharm14@gmail.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jagadeesh <jagadeesh.yalapalli@einfochips.com>
-Subject: [PATCH v1] e1000e: Replace schedule_work with delayed workqueue for watchdog.
-Date: Thu,  8 May 2025 06:14:25 +0000
-Message-ID: <20250508061439.8900-1-jagadeesharm14@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1746684997; c=relaxed/simple;
+	bh=ZlBwZgLPxWSkt3MKaad6ggNW9bvZErmmOVPw7s8z1Vw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BJDa05CqNysrlpAaf7f1iWy4EBqkCN1J5f58MU4eC0w48Mmq26oIwvH0FV+S4FwfmK3+mlC50/G9wIe/ewddYsL9+28ewv5lvmXBSRUvtxWItNv0h3jd8/GDClMAXHY38CLrLv0PttcOB+gv/8Vzryi6rZtA3++KeEGXwmDUi6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kdq2hmc6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87ECAC4CEEB;
+	Thu,  8 May 2025 06:16:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746684997;
+	bh=ZlBwZgLPxWSkt3MKaad6ggNW9bvZErmmOVPw7s8z1Vw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kdq2hmc6yKLYxjN4wRYSL5M2SjNXWkz9ldEAJauMi4XNQ6rrzcjCxQNtdlOuITKN+
+	 /7EMDg5ReERqc9cxqGXpGFs/Dx4AFOQpgepckMRMsEkZZJT0ciwm8RwbO7nhafEKbY
+	 794tUXgiNlpCycVITbSsbkoI0R4shbBA28i3+D5jEmCUxK8ux9w7pnU/la3lT596Pg
+	 ifvT6hzL9/WvUEdI52wViGgk7hkm5uWaDXDU5IWqfP6HIZnK2r0PAPwDL6Emuq+pg/
+	 uipV8G3UjoGjdXHli6BHirFpTWQoWLFIRMJft/d/wxli7Ok8/VtUWSMWdTr4RXcTXr
+	 0bQsTuGX4pH8A==
+Date: Thu, 8 May 2025 08:16:29 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: alexander@mihalicyn.com, bluca@debian.org, daan.j.demeyer@gmail.com, 
+	davem@davemloft.net, david@readahead.eu, edumazet@google.com, horms@kernel.org, 
+	jack@suse.cz, jannh@google.com, kuba@kernel.org, lennart@poettering.net, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, me@yhndnzj.com, 
+	netdev@vger.kernel.org, oleg@redhat.com, pabeni@redhat.com, viro@zeniv.linux.org.uk, 
+	zbyszek@in.waw.pl
+Subject: Re: [PATCH v4 04/11] net: reserve prefix
+Message-ID: <20250508-vorboten-herein-4ee71336e6f7@brauner>
+References: <20250507-work-coredump-socket-v4-4-af0ef317b2d0@kernel.org>
+ <20250507224658.47266-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250507224658.47266-1-kuniyu@amazon.com>
 
-From: Jagadeesh <jagadeesh.yalapalli@einfochips.com>
+On Wed, May 07, 2025 at 03:45:52PM -0700, Kuniyuki Iwashima wrote:
+> From: Christian Brauner <brauner@kernel.org>
+> Date: Wed, 07 May 2025 18:13:37 +0200
+> > Add the reserved "linuxafsk/" prefix for AF_UNIX sockets and require
+> > CAP_NET_ADMIN in the owning user namespace of the network namespace to
+> > bind it. This will be used in next patches to support the coredump
+> > socket but is a generally useful concept.
+> 
+> I really think we shouldn't reserve address and it should be
+> configurable by users via core_pattern as with the other
+> coredump types.
+> 
+> AF_UNIX doesn't support SO_REUSEPORT, so once the socket is
+> dying, user can't start the new coredump listener until it's
+> fully cleaned up, which adds unnecessary drawback.
 
-    Replace direct schedule_work() usage with queue_delayed_work() to allow
-    better timing control for the watchdog task. This resolves potential
-    race conditions during interface reset operations.
+This really doesn't matter.
 
-    - Added watchdog_wq workqueue_struct and watchdog_dq delayed_work
-    - Updated e1000_watchdog() to use queue_delayed_work()
-    - Removed obsolete TODO comment about delayed workqueue
+> The semantic should be same with other types, and the todo
+> for the coredump service is prepare file (file, process, socket)
+> that can receive data and set its name to core_pattern.
 
-    Tested in Qemu :
-    / # for i in {1..1000}; do
-    >     echo 1 > /sys/class/net/eth0/device/reset
-    >     sleep 0.1
-    > done
-    [  726.357499] e1000e 0000:00:02.0: resetting
-    [  726.390737] e1000e 0000:00:02.0: reset done
+We need to perform a capability check during bind() for the host's
+coredump socket. Otherwise if the coredump server crashes an
+unprivileged attacker can simply bind the address and receive all
+coredumps from suid binaries.
 
-Signed-off-by: Jagadeesh <jagadeesh.yalapalli@einfochips.com>
----
- drivers/net/ethernet/intel/e1000e/e1000.h  | 2 ++
- drivers/net/ethernet/intel/e1000e/netdev.c | 3 +--
- 2 files changed, 3 insertions(+), 2 deletions(-)
+This is also a problem for legitimate coredump server updates. To change
+the coredump address the coredump server must first setup a new socket
+and then update core_pattern and then shutdown the old coredump socket.
 
-diff --git a/drivers/net/ethernet/intel/e1000e/e1000.h b/drivers/net/ethernet/intel/e1000e/e1000.h
-index ba9c19e6994c..1e7b365c4f31 100644
---- a/drivers/net/ethernet/intel/e1000e/e1000.h
-+++ b/drivers/net/ethernet/intel/e1000e/e1000.h
-@@ -194,6 +194,8 @@ struct e1000_adapter {
- 	struct timer_list blink_timer;
- 
- 	struct work_struct reset_task;
-+	struct workqueue_struct *watchdog_wq;
-+	struct delayed_work watchdog_dq;
- 	struct work_struct watchdog_task;
- 
- 	const struct e1000_info *ei;
-diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
-index 8ebcb6a7d608..87a915d09f4e 100644
---- a/drivers/net/ethernet/intel/e1000e/netdev.c
-+++ b/drivers/net/ethernet/intel/e1000e/netdev.c
-@@ -5178,9 +5178,8 @@ static void e1000_watchdog(struct timer_list *t)
- 	struct e1000_adapter *adapter = from_timer(adapter, t, watchdog_timer);
- 
- 	/* Do the rest outside of interrupt context */
--	schedule_work(&adapter->watchdog_task);
-+	queue_delayed_work(adapter->watchdog_wq, &adapter->watchdog_dq, 0);
- 
--	/* TODO: make this use queue_delayed_work() */
- }
- 
- static void e1000_watchdog_task(struct work_struct *work)
--- 
-2.43.0
+Now an unprivileged attacker can rebind the old coredump socket address
+but there's still a crashing task that got scheduled out after it copied
+the old coredump server address but before it connected to the coredump
+server. The new server is now up and the old server's address has been
+reused by the attacker. Now the crashing task gets scheduled back in and
+connects to the unprivileged attacker and forwards its suid dump to the
+attacker.
 
+The name of the socket needs to be protected. This can be done by prefix
+but the simplest way is what I did in my earlier version and to just use
+a well-known name. The name really doesn't matter and all it adds is
+potential for subtle bugs. I want the coredump code I have to maintain
+to have as little moving parts as possible.
+
+I'm happy to drop the patch to reserve the prefix as that seems to
+bother you. But the coredump socket name won't be configurable. It'd be
+good if we could just compromise here. Without the capability check on
+bind we can just throw this all out as that's never going to be safe.
 
