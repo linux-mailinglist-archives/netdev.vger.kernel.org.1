@@ -1,114 +1,138 @@
-Return-Path: <netdev+bounces-189044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 428CCAB0059
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 18:23:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2CBFAB0094
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 18:40:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D02A7B2A55
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 16:22:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 461EC179C38
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 16:40:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1E91281363;
-	Thu,  8 May 2025 16:23:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YtzZg4Lh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDEEB283146;
+	Thu,  8 May 2025 16:40:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ADEE26FD88;
-	Thu,  8 May 2025 16:23:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 052E378F32;
+	Thu,  8 May 2025 16:40:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746721417; cv=none; b=Bp7mHbZzbpaWo9zsFcugp+64e5qRB1/R6veA1dhrCJkLfGQRlQ/YJQgZRuFLUjRXIiQMmT17l3XuZH9anraC9VgjYIsdfHgj8KN0JENCDrX9mZH4207d3a69Lpuq1Gy9jSuES10p7h4J0MeDcsrMTW8+OhwFiys/qW7LOpiff14=
+	t=1746722452; cv=none; b=No4ksBXwqaNYlJb1eYqivfPFJVPZ9RVfg6KKd8PfUJGN+iX3G6xnelYEqFIhyia4TBwbQjkxEIcf+PVyL8SSjg2oVM9gLpEhpGWEZWZH+OT6vA57py00P6fO6KJbQFXgqKMJwjjA9xQJ+2Bf28X3xj2rgBrqDi4k+XnoZhcVd5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746721417; c=relaxed/simple;
-	bh=PDpqQ2zJ1+LUD54W62htaI4grJde99p2dmKUmlaO2rI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XewxDDA57zmaQAEtOptzqqaWSRqt4qMdj/yODxz+WITXQh97o3RffIIP0Is0xHZyoi8oXovpMJF1n68CvlGXQTS4J/bohcE7yvv/YzvxlF+TX2CN4CMl2ieVtHc0TXK3jBpU/Pcd8jqfKwbpBvGlAWbn4gVS+y2aLHnGkI9wBuQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YtzZg4Lh; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-22c33e4fdb8so11620945ad.2;
-        Thu, 08 May 2025 09:23:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746721415; x=1747326215; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oDD4axKNwOug/15X5rmrMUOmST9IPUNgi9stIcbaCFA=;
-        b=YtzZg4LhmuBZ7pqO6qgv4uobUQskWWFLmLJU2vYzgKWHyyuOhvaSjDbRtFpipewEIv
-         elEJiKwkCWx+1bVwrlkZ2U6nSfyH98OoivylxYvNDMS5Y4RqoA3y3grHxfp8ub2rO2tI
-         VNwjl8BZt+MdFLdp8W2+ucj+lYu7smmP4XHmZjJ2abBy3BW5gOTa0gFMvttpdFP8k+Nz
-         MXTGSKUmreJTAa5aGO1gEPDRfhl5NgmNB6QBuVYrH7Z5u4kqHA1ud5hDihsHg0fwqPCQ
-         19KPzSZ1JuFjq2WdO11g7GD8qRYy7p77sABvL9rt91JEb/pCf0N1uLA9iAFJbPk3EQBx
-         U9Sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746721415; x=1747326215;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oDD4axKNwOug/15X5rmrMUOmST9IPUNgi9stIcbaCFA=;
-        b=MghoZptu33xnK1Yob2vrCOcxN4Fgp1mk2PtJo/HGqQEL1oWGeQsowsqI4h0dgVmtsp
-         CiKEKwVMz+DPw+g3jwGxkXUik8vLH/kAQBtOJ0xWcCyly66oNe1Yk1jSoie1neoyMjd9
-         ffCgnvkiKa0HAPMWHVD0TYkxQZls7SflgJ6WMv2rYE6W2VQ7rS+VJOlJ4cjuK0jdIxMi
-         JonPX14IUS1IOQWYmL8mhhyUI+FrtTyEMCLl811/y0kAHUsGk0mY48HIU9yKywgM3CM6
-         yzsW/K15R3CCXIkPrbOHn7MIGDQJL56w/PnFGMYqVoiG7wb7DaYn59QRmv32GABkZLbC
-         TMKg==
-X-Forwarded-Encrypted: i=1; AJvYcCXN3cndaN4h5ff7EV2kxrSmfvDrRdYaghb2aPVNUf3+VNfywc9is/7aNziq/ir/4WDUUBjw083B9NY7BrBndFg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyyMkpU9zPBZ6QExR/eQ5xwhfR6jtGBm175FPbSPbjJYoTC67xd
-	S63kUrMxk0sYKSPNxo5maK5yhKUsO87E0zDBJHX/WSXQzuavNb0=
-X-Gm-Gg: ASbGncvZKV//6G10PIj2/ZoFvvsDHIZV7/jIKPOlmwI8rv9a+7+L8Xb6El/yhm/9qeg
-	4lPZfifS/Jp6CqeaMahDQVEmpxXz9ADYR2SUKvh/O3nieD9eVrID6iC3byh1uVXCCQ/SJsb4rpA
-	TzMpQsTMBV5zoriKcIuCH6RGx3ory/TJJyOHpzOyUGJBW/abhccZe6SI9dv5LBseT9pB6K/T7k+
-	eoP7j5uSu4A4uwVQNcN6yVJYDpV5BN+bsSfdxLTM+bpwj3zrk1NWAGkFAI2HEfuQIOAy01ETINq
-	bShBa2SB4Rku5ldxeqiKs3O2EHxpmkOF+HgEle5FSRG+T7BnDjN/enmKiNLSSBtYv+4yDQSvOtq
-	yNA==
-X-Google-Smtp-Source: AGHT+IHUjQX5kcIE7/SgjAj5Yp9UlVRdDjfbF2VZJDOPZZtqVNafMYnOLOkiKucPdqFZ6hc8H7Dv8Q==
-X-Received: by 2002:a17:902:e94c:b0:220:e338:8d2 with SMTP id d9443c01a7336-22e85ce9aa3mr66088015ad.21.1746721415456;
-        Thu, 08 May 2025 09:23:35 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-22fc7549354sm1322465ad.32.2025.05.08.09.23.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 May 2025 09:23:35 -0700 (PDT)
-Date: Thu, 8 May 2025 09:23:34 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Cosmin Ratiu <cratiu@nvidia.com>
-Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Paolo Abeni <pabeni@redhat.com>, Joe Damato <jdamato@fastly.com>,
-	Shuah Khan <shuah@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Mina Almasry <almasrymina@google.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net v2] tests/ncdevmem: Fix double-free of queue array
-Message-ID: <aBzahvmKEiwHwciQ@mini-arch>
-References: <20250508084434.1933069-1-cratiu@nvidia.com>
+	s=arc-20240116; t=1746722452; c=relaxed/simple;
+	bh=JcfkLXi4OXLFFiEXO9+/CIIzo5G/jTTXDJTLclvLOuE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kKzsB+LRXr8McQ4rhU70RIk4sKzlKXo/pDafdm2+wt18A3Z0aJ3YsmfaG2Mjo47ZvI2UriQcg1q4KEPQmOIr69AKfeAKDnksSn5RJU357vSJvSOa6+2Uq9d9GpwL+a4f7FxzP5ctAJQiWFfHJSQm6lvNcq+uMwldjQg39IMwy6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.2.107] (p57bd98e4.dip0.t-ipconnect.de [87.189.152.228])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 4CE8A61E6479C;
+	Thu, 08 May 2025 18:39:48 +0200 (CEST)
+Message-ID: <8a9fda50-6040-4cca-b99f-46bb9258a6f0@molgen.mpg.de>
+Date: Thu, 8 May 2025 18:39:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250508084434.1933069-1-cratiu@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH v1] e1000e: Replace schedule_work with
+ delayed workqueue for watchdog.
+To: Jagadeesh Yalapalli <jagadeesharm14@gmail.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Jagadeesh <jagadeesh.yalapalli@einfochips.com>
+References: <20250508061439.8900-1-jagadeesharm14@gmail.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250508061439.8900-1-jagadeesharm14@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 05/08, Cosmin Ratiu wrote:
-> netdev_bind_rx takes ownership of the queue array passed as parameter
-> and frees it, so a queue array buffer cannot be reused across multiple
-> netdev_bind_rx calls.
-> 
-> This commit fixes that by always passing in a newly created queue array
-> to all netdev_bind_rx calls in ncdevmem.
-> 
-> Fixes: 85585b4bc8d8 ("selftests: add ncdevmem, netcat for devmem TCP")
-> Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+Dear Jagadeesh,
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+
+Thank you for your patch.
+
+Am 08.05.25 um 08:14 schrieb Jagadeesh Yalapalli:
+> From: Jagadeesh <jagadeesh.yalapalli@einfochips.com>
+
+Is this your full name, or should *Jagadeesh Yalapalli* be used?
+
+     git config --global user.name "Jagadeesh Yalapalli"
+
+> 
+>      Replace direct schedule_work() usage with queue_delayed_work() to allow
+>      better timing control for the watchdog task. This resolves potential
+>      race conditions during interface reset operations.
+
+What error do you get (without your patch)?
+
+>      - Added watchdog_wq workqueue_struct and watchdog_dq delayed_work
+>      - Updated e1000_watchdog() to use queue_delayed_work()
+>      - Removed obsolete TODO comment about delayed workqueue
+> 
+>      Tested in Qemu :
+>      / # for i in {1..1000}; do
+>      >     echo 1 > /sys/class/net/eth0/device/reset
+>      >     sleep 0.1
+>      > done
+>      [  726.357499] e1000e 0000:00:02.0: resetting
+>      [  726.390737] e1000e 0000:00:02.0: reset done
+
+Please do not copy the output of git show, but send the patch with `git 
+format-patch` and `git send-email`.
+
+> Signed-off-by: Jagadeesh <jagadeesh.yalapalli@einfochips.com>
+> ---
+>   drivers/net/ethernet/intel/e1000e/e1000.h  | 2 ++
+>   drivers/net/ethernet/intel/e1000e/netdev.c | 3 +--
+>   2 files changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/e1000e/e1000.h b/drivers/net/ethernet/intel/e1000e/e1000.h
+> index ba9c19e6994c..1e7b365c4f31 100644
+> --- a/drivers/net/ethernet/intel/e1000e/e1000.h
+> +++ b/drivers/net/ethernet/intel/e1000e/e1000.h
+> @@ -194,6 +194,8 @@ struct e1000_adapter {
+>   	struct timer_list blink_timer;
+>   
+>   	struct work_struct reset_task;
+> +	struct workqueue_struct *watchdog_wq;
+> +	struct delayed_work watchdog_dq;
+>   	struct work_struct watchdog_task;
+>   
+>   	const struct e1000_info *ei;
+> diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
+> index 8ebcb6a7d608..87a915d09f4e 100644
+> --- a/drivers/net/ethernet/intel/e1000e/netdev.c
+> +++ b/drivers/net/ethernet/intel/e1000e/netdev.c
+> @@ -5178,9 +5178,8 @@ static void e1000_watchdog(struct timer_list *t)
+>   	struct e1000_adapter *adapter = from_timer(adapter, t, watchdog_timer);
+>   
+>   	/* Do the rest outside of interrupt context */
+> -	schedule_work(&adapter->watchdog_task);
+> +	queue_delayed_work(adapter->watchdog_wq, &adapter->watchdog_dq, 0);
+>   
+> -	/* TODO: make this use queue_delayed_work() */
+>   }
+>   
+>   static void e1000_watchdog_task(struct work_struct *work)
+
+
+Kind regards,
+
+Paul
 
