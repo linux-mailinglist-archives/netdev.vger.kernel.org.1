@@ -1,131 +1,77 @@
-Return-Path: <netdev+bounces-189030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77CA7AAFF3B
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 17:30:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD592AAFF27
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 17:27:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 82C0C7A5A32
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 15:29:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56A963A5A14
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 15:24:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F4F27055B;
-	Thu,  8 May 2025 15:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19C2B26FD88;
+	Thu,  8 May 2025 15:24:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="J8CnUdJw"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="mUvuZXlJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-20.smtpout.orange.fr [80.12.242.20])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-0201.mail-europe.com (mail-0201.mail-europe.com [51.77.79.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA181223DC6;
-	Thu,  8 May 2025 15:30:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9495F1D416E
+	for <netdev@vger.kernel.org>; Thu,  8 May 2025 15:24:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.77.79.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746718236; cv=none; b=FtUZcClhy40DljnTW0jso3/9bvR9KsMqoYtOu+Ng/+2uU8mI0UhotnMX61FfOUGkUo/AXv23QlCMwM1mRGZWZZ10OB/N+jPN+DkF9VuXUheDU7KR2DS5L2npxOKaWKI1Xg4XomxEXs1BByOxqbdPOaYXqc54O9UY8w1CKpULTSs=
+	t=1746717882; cv=none; b=Uyg90sXWF+2szMsucXJzXgrDDYpvuHysFnCudtp88o9vD2nsY023QkBQBzs7IXSRf7HmKX2twHjCVmfd/pz2G1t0ikTStMZwui46E0AAUcInMcx0aUEN2qwxoCBx3Uh2zL4QE2OWS6BE4ECNsJlytb805LKTBYi1xHuS74w5LBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746718236; c=relaxed/simple;
-	bh=OHuyuDzawYwtMUYkiddu3AdB4z1CVCUAKplQq5a1zUo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eigmheckstDw02r+t4ZASevacibXHQ99KzR3haGy2ZjgNd+Way9p5plaW9Ef0xmXqCO9ldBQ+St/p8hJ7MYMImET3UkhkLBiVKc5GPLWSpjeLEBCH02uK1YT2XD6qpETXYt7nOCsnnnw0/xNDIL9RWIwexVCQ9/y7QPYByPp34k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=J8CnUdJw; arc=none smtp.client-ip=80.12.242.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [192.168.1.37] ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id D33cuMejiCaH2D33cu8B4q; Thu, 08 May 2025 17:21:11 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1746717671;
-	bh=/aqOR78xCKbgwFiDVPw/MgZTZLn+uIVqWHT4kXJ4tLc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=J8CnUdJwFn5FHAXlFR8ZkPazq64kfzu6rxQfO3bp4oYWlJR9yw7QZga+jkcHw8Lj3
-	 59DlKyXiWVDflM4F3pjSXbdRl8J3n4nmEYwk6cij3i9lBC2dXOv4jHAUS2x2ZLZ4At
-	 J4p289z8w3uB1RTTguqgEIONbMC3RwaVIU9BF5f6yRT56eUo4yOpO14QaYnwU4YTkX
-	 xPEanpuM6dKRpcweXAnz5a4iL6lmWQQtAowORrji8ha6QsrSzbCgwdJ3PXv+Nhbahj
-	 xG+HeZ7o5pMxM3CKoEseHRZwwSATlEKc2RmRq3qwY1HcWszZvxZkLh8zuz9rMTfdU5
-	 R0AYedfcV2qqQ==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Thu, 08 May 2025 17:21:11 +0200
-X-ME-IP: 90.11.132.44
-Message-ID: <23517507-bf1a-47fa-9a96-b27922e1e05f@wanadoo.fr>
-Date: Thu, 8 May 2025 17:21:08 +0200
+	s=arc-20240116; t=1746717882; c=relaxed/simple;
+	bh=rzJWcF73xdZvu9VqTSaN63XDAlkcDD0MXDP12XxNYHI=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sTi3sgTskfY2dfKps8O6qZZYntAc/1EGKhYPJpoW8sy6o9OqfFRk653gI5nnRLKNKPkLhtzhswgl2FNWh8F6LS/Jh3mjl9UK9/pUl5d29wfX+HrqZnpyFL+1Q54e5KubKVi0zusXiWjIL++5cSeaI/WMf934oKVspV+d8f4PW4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=mUvuZXlJ; arc=none smtp.client-ip=51.77.79.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+	s=protonmail3; t=1746717865; x=1746977065;
+	bh=rzJWcF73xdZvu9VqTSaN63XDAlkcDD0MXDP12XxNYHI=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
+	b=mUvuZXlJ1pkUGI/cCbGDaqXz8BSiAqkbrW5e6A9mZy+SCuPffFLfPuIIDOyYtJzwX
+	 V4KsBRElBd2e2ydKvbXwfrFVYJ8XQJWru0O8X3sZ9791nko5xhRv/JwWjYGbK/AYnW
+	 deKPxQNFVYbI092vCgBQ70tweZaTAwRKXvEQmFRk524+UdlqYaE37Tafukk+ZKNiOb
+	 WteIoeGFHaOkYgVTPw8kQvN5z4q9wai9FsUcNmmRjdh8DIBDAxX9LDw/ogIHGCCWYu
+	 cf232McSMfse3U5Sx6MrezfoAwHoYogA3oDhD0y62oAoQPVI0CVchBP9h1hwavC2ce
+	 FcV1Ja9J+sPKQ==
+Date: Thu, 08 May 2025 15:24:20 +0000
+To: Paolo Abeni <pabeni@redhat.com>
+From: Will <willsroot@protonmail.com>
+Cc: Cong Wang <xiyou.wangcong@gmail.com>, netdev@vger.kernel.org, jiri@resnulli.us, jhs@mojatatu.com, savy@syst3mfailure.io
+Subject: Re: [Patch net v2 1/2] net_sched: Flush gso_skb list too during ->change()
+Message-ID: <jnzuuJvnV58HQxA8uObgyA-i8S3SMErwTRxyALErLROzV2S8lyIOaL66hUvgEFR-GkDrnGrNvdbif5vRuXuRxNbDwNPsnGfKtEOEdPaLRPA=@protonmail.com>
+In-Reply-To: <9ad2d46f-7746-45e3-b5c3-e53d079d1b8e@redhat.com>
+References: <20250507043559.130022-1-xiyou.wangcong@gmail.com> <20250507043559.130022-2-xiyou.wangcong@gmail.com> <9ad2d46f-7746-45e3-b5c3-e53d079d1b8e@redhat.com>
+Feedback-ID: 25491499:user:proton
+X-Pm-Message-ID: 0454ea216e8c5844e8eef8f263cbf4d18d9401f8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/4] net: airoha: Fix an error handling path in
- airoha_probe()
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- netdev@vger.kernel.org
-References: <5c94b9b3850f7f29ed653e2205325620df28c3ff.1746715755.git.christophe.jaillet@wanadoo.fr>
- <3791c95da3fa3c3bd2a942210e821d9301362128.1746715755.git.christophe.jaillet@wanadoo.fr>
- <aBzJZCIvE9u_IAM-@lore-desk>
-Content-Language: en-US, fr-FR
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <aBzJZCIvE9u_IAM-@lore-desk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+On Thursday, May 8th, 2025 at 10:26 AM, Paolo Abeni <pabeni@redhat.com> wro=
+te:
 
-Le 08/05/2025 à 17:10, Lorenzo Bianconi a écrit :
->> If an error occurs after a successful airoha_hw_init() call,
->> airoha_ppe_deinit() needs to be called as already done in the remove
->> function.
->>
->> Fixes: 00a7678310fe ("net: airoha: Introduce flowtable offload support")
->> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
->> ---
->> Changes in v2:
->>    - Call airoha_ppe_init() at the right place in the error handling path
->>      of the probe   [Lorenzo Bianconi]
->>
->> Compile tested only.
->> ---
->>   drivers/net/ethernet/airoha/airoha_eth.c | 1 +
->>   1 file changed, 1 insertion(+)
->>
->> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
->> index af8c4015938c..d435179875df 100644
->> --- a/drivers/net/ethernet/airoha/airoha_eth.c
->> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
->> @@ -2967,6 +2967,7 @@ static int airoha_probe(struct platform_device *pdev)
->>   error_napi_stop:
->>   	for (i = 0; i < ARRAY_SIZE(eth->qdma); i++)
->>   		airoha_qdma_stop_napi(&eth->qdma[i]);
->> +	airoha_ppe_init(eth);
-> it was actually a typo in my previous email but this should be clearly
-> airoha_ppe_deinit().
+> LGTM, but it would be great if any of the reporters could explicitly
+> test it.
 
-My bad!
-Sorry for not spotting myself it.
+Just tested with the original PoC, and it does not trigger any bug symptoms=
+ with the patch applied.
 
-We can really trust no one, nowadays ! :)
+Best,
+Will
 
-The good news is that my cocci script would have spotted it the next 
-time I would have run it, because it would still find a 
-airoha_ppe_deinit() in the remove function, but none in the probe.
-
-I give you some time to review the other patches, and I'll a v3 later.
-
-CJ
-
->
-> Regards,
-> Lorenzo
->
->>   error_hw_cleanup:
->>   	for (i = 0; i < ARRAY_SIZE(eth->qdma); i++)
->>   		airoha_hw_cleanup(&eth->qdma[i]);
->> -- 
->> 2.49.0
->>
 
