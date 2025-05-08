@@ -1,116 +1,188 @@
-Return-Path: <netdev+bounces-188895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D22F9AAF389
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 08:16:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0688FAAF397
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 08:19:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DF6B46642A
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 06:16:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2C839E1A9E
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 06:19:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E90781DE3C0;
-	Thu,  8 May 2025 06:16:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEF431D8A0A;
+	Thu,  8 May 2025 06:19:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kdq2hmc6"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="p1EIz/YB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D40747F;
-	Thu,  8 May 2025 06:16:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 049BE1CB31D
+	for <netdev@vger.kernel.org>; Thu,  8 May 2025 06:19:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746684997; cv=none; b=TWPGj19rTgQsV4FryGpBSUDruhHIPFmTnbyw3PLjuicPExKxGJS17RgNAd7tQd+GV7C5D74iM2UTt34PewapeadK+ypRtr1wDo3uOXStBD5IZxEUVg31tXko1uNRkbov58Bm9PJiEBwxzEUyJbbCYdCCDSCqUyH1Psb/xtg07VI=
+	t=1746685171; cv=none; b=b64S1qXJ61b6tEvGVE8Exe5DfLHkOgczsEL1BHhGb3+O8xvWfj70SbIOWkHG73mUMaClqKYqK14DE54gImAZ0mo9NLr34zxMhJauqzylfr+ojFVIdm9MhCQugyiLRNSD4XJ8aX+48oTmhCdKfwxbLBqIwoFH/fC4uTAG4g5N6FA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746684997; c=relaxed/simple;
-	bh=ZlBwZgLPxWSkt3MKaad6ggNW9bvZErmmOVPw7s8z1Vw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BJDa05CqNysrlpAaf7f1iWy4EBqkCN1J5f58MU4eC0w48Mmq26oIwvH0FV+S4FwfmK3+mlC50/G9wIe/ewddYsL9+28ewv5lvmXBSRUvtxWItNv0h3jd8/GDClMAXHY38CLrLv0PttcOB+gv/8Vzryi6rZtA3++KeEGXwmDUi6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kdq2hmc6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87ECAC4CEEB;
-	Thu,  8 May 2025 06:16:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746684997;
-	bh=ZlBwZgLPxWSkt3MKaad6ggNW9bvZErmmOVPw7s8z1Vw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kdq2hmc6yKLYxjN4wRYSL5M2SjNXWkz9ldEAJauMi4XNQ6rrzcjCxQNtdlOuITKN+
-	 /7EMDg5ReERqc9cxqGXpGFs/Dx4AFOQpgepckMRMsEkZZJT0ciwm8RwbO7nhafEKbY
-	 794tUXgiNlpCycVITbSsbkoI0R4shbBA28i3+D5jEmCUxK8ux9w7pnU/la3lT596Pg
-	 ifvT6hzL9/WvUEdI52wViGgk7hkm5uWaDXDU5IWqfP6HIZnK2r0PAPwDL6Emuq+pg/
-	 uipV8G3UjoGjdXHli6BHirFpTWQoWLFIRMJft/d/wxli7Ok8/VtUWSMWdTr4RXcTXr
-	 0bQsTuGX4pH8A==
-Date: Thu, 8 May 2025 08:16:29 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: alexander@mihalicyn.com, bluca@debian.org, daan.j.demeyer@gmail.com, 
-	davem@davemloft.net, david@readahead.eu, edumazet@google.com, horms@kernel.org, 
-	jack@suse.cz, jannh@google.com, kuba@kernel.org, lennart@poettering.net, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, me@yhndnzj.com, 
-	netdev@vger.kernel.org, oleg@redhat.com, pabeni@redhat.com, viro@zeniv.linux.org.uk, 
-	zbyszek@in.waw.pl
-Subject: Re: [PATCH v4 04/11] net: reserve prefix
-Message-ID: <20250508-vorboten-herein-4ee71336e6f7@brauner>
-References: <20250507-work-coredump-socket-v4-4-af0ef317b2d0@kernel.org>
- <20250507224658.47266-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1746685171; c=relaxed/simple;
+	bh=DtYmFysUlSJqt4dIK+BH0UUapcZkTkGEqj05JbxIk9k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Xf8lJr6hhLO15q4BwJ8x8YuieZLZ4joHBzwgjOtYZRNoJPIr2zyuaQm1AvFwH8azsVOBZrKb+nRPhUFRfLATKb73bugNoa20OSFD40nc2x3AcvVYQxCu88UzrvxAmkBzXTs5tRGhrfhvBEwmzsWYOVlBtXZBvi4Cb0FQGnb9Kys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=p1EIz/YB; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1746685166;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=JQOF4qJClLbpwilGN0tAlFNmWOxZLphtkwR7tYlHPGI=;
+	b=p1EIz/YBzmUGRmku30gPRdKcF4rMdist4JBJuy1Rk3g5iqXwIarl1t9ye/MaAQs/vV8Bf8
+	GYMPUtdEwDDsWDse2hvlXAiPUJbGIl0rpw+kA2gonqUMrxcbYgTX0C7OoJyUOr/tPSmIUd
+	8ewKtI7F8lLTuW/HKL/nMP9TrC12g5s=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: bpf@vger.kernel.org
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
+	Michal Luczaj <mhal@rbox.co>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Cong Wang <cong.wang@bytedance.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH bpf-next v5] bpf, sockmap: avoid using sk_socket after free when sending
+Date: Thu,  8 May 2025 14:18:25 +0800
+Message-ID: <20250508061825.51896-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250507224658.47266-1-kuniyu@amazon.com>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, May 07, 2025 at 03:45:52PM -0700, Kuniyuki Iwashima wrote:
-> From: Christian Brauner <brauner@kernel.org>
-> Date: Wed, 07 May 2025 18:13:37 +0200
-> > Add the reserved "linuxafsk/" prefix for AF_UNIX sockets and require
-> > CAP_NET_ADMIN in the owning user namespace of the network namespace to
-> > bind it. This will be used in next patches to support the coredump
-> > socket but is a generally useful concept.
-> 
-> I really think we shouldn't reserve address and it should be
-> configurable by users via core_pattern as with the other
-> coredump types.
-> 
-> AF_UNIX doesn't support SO_REUSEPORT, so once the socket is
-> dying, user can't start the new coredump listener until it's
-> fully cleaned up, which adds unnecessary drawback.
+The sk->sk_socket is not locked or referenced in backlog thread, and
+during the call to skb_send_sock(), there is a race condition with
+the release of sk_socket. All types of sockets(tcp/udp/unix/vsock)
+will be affected.
 
-This really doesn't matter.
+Race conditions:
+'''
+CPU0                               CPU1
 
-> The semantic should be same with other types, and the todo
-> for the coredump service is prepare file (file, process, socket)
-> that can receive data and set its name to core_pattern.
+backlog::skb_send_sock
+  sendmsg_unlocked
+    sock_sendmsg
+      sock_sendmsg_nosec
+                                   close(fd):
+                                     ...
+                                     ops->release() -> sock_map_close()
+                                     sk_socket->ops = NULL
+                                     free(socket)
+      sock->ops->sendmsg
+            ^
+            panic here
+'''
 
-We need to perform a capability check during bind() for the host's
-coredump socket. Otherwise if the coredump server crashes an
-unprivileged attacker can simply bind the address and receive all
-coredumps from suid binaries.
+The ref of psock become 0 after sock_map_close() executed.
+'''
+void sock_map_close()
+{
+    ...
+    if (likely(psock)) {
+    ...
+    // !! here we remove psock and the ref of psock become 0
+    sock_map_remove_links(sk, psock)
+    psock = sk_psock_get(sk);
+    if (unlikely(!psock))
+        goto no_psock; <=== Control jumps here via goto
+        ...
+        cancel_delayed_work_sync(&psock->work); <=== not executed
+        sk_psock_put(sk, psock);
+        ...
+}
+'''
 
-This is also a problem for legitimate coredump server updates. To change
-the coredump address the coredump server must first setup a new socket
-and then update core_pattern and then shutdown the old coredump socket.
+Based on the fact that we already wait for the workqueue to finish in
+sock_map_close() if psock is held, we simply increase the psock
+reference count to avoid race conditions.
 
-Now an unprivileged attacker can rebind the old coredump socket address
-but there's still a crashing task that got scheduled out after it copied
-the old coredump server address but before it connected to the coredump
-server. The new server is now up and the old server's address has been
-reused by the attacker. Now the crashing task gets scheduled back in and
-connects to the unprivileged attacker and forwards its suid dump to the
-attacker.
+With this patch, if the backlog thread is running, sock_map_close() will
+wait for the backlog thread to complete and cancel all pending work.
 
-The name of the socket needs to be protected. This can be done by prefix
-but the simplest way is what I did in my earlier version and to just use
-a well-known name. The name really doesn't matter and all it adds is
-potential for subtle bugs. I want the coredump code I have to maintain
-to have as little moving parts as possible.
+If no backlog running, any pending work that hasn't started by then will
+fail when invoked by sk_psock_get(), as the psock reference count have
+been zeroed, and sk_psock_drop() will cancel all jobs via
+cancel_delayed_work_sync().
 
-I'm happy to drop the patch to reserve the prefix as that seems to
-bother you. But the coredump socket name won't be configurable. It'd be
-good if we could just compromise here. Without the capability check on
-bind we can just throw this all out as that's never going to be safe.
+In summary, we require synchronization to coordinate the backlog thread
+and close() thread.
+
+The panic I catched:
+'''
+Workqueue: events sk_psock_backlog
+RIP: 0010:sock_sendmsg+0x21d/0x440
+RAX: 0000000000000000 RBX: ffffc9000521fad8 RCX: 0000000000000001
+...
+Call Trace:
+ <TASK>
+ ? die_addr+0x40/0xa0
+ ? exc_general_protection+0x14c/0x230
+ ? asm_exc_general_protection+0x26/0x30
+ ? sock_sendmsg+0x21d/0x440
+ ? sock_sendmsg+0x3e0/0x440
+ ? __pfx_sock_sendmsg+0x10/0x10
+ __skb_send_sock+0x543/0xb70
+ sk_psock_backlog+0x247/0xb80
+...
+'''
+
+Reported-by: Michal Luczaj <mhal@rbox.co>
+Fixes: 799aa7f98d53 ("skmsg: Avoid lock_sock() in sk_psock_backlog()")
+Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+
+---
+This patch is extracted from my previous v4 patchset that contained
+multiple fixes, and it remains unchanged. Since this fix is relatively
+simple and easy to review, we want to separate it from other fixes to
+avoid any potential interference.
+---
+ net/core/skmsg.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+index 276934673066..34c51eb1a14f 100644
+--- a/net/core/skmsg.c
++++ b/net/core/skmsg.c
+@@ -656,6 +656,13 @@ static void sk_psock_backlog(struct work_struct *work)
+ 	bool ingress;
+ 	int ret;
+ 
++	/* Increment the psock refcnt to synchronize with close(fd) path in
++	 * sock_map_close(), ensuring we wait for backlog thread completion
++	 * before sk_socket freed. If refcnt increment fails, it indicates
++	 * sock_map_close() completed with sk_socket potentially already freed.
++	 */
++	if (!sk_psock_get(psock->sk))
++		return;
+ 	mutex_lock(&psock->work_mutex);
+ 	while ((skb = skb_peek(&psock->ingress_skb))) {
+ 		len = skb->len;
+@@ -708,6 +715,7 @@ static void sk_psock_backlog(struct work_struct *work)
+ 	}
+ end:
+ 	mutex_unlock(&psock->work_mutex);
++	sk_psock_put(psock->sk, psock);
+ }
+ 
+ struct sk_psock *sk_psock_init(struct sock *sk, int node)
+-- 
+2.47.1
+
 
