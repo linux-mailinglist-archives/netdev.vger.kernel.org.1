@@ -1,152 +1,302 @@
-Return-Path: <netdev+bounces-188975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4434DAAFB55
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 15:30:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE2C4AAFB5F
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 15:32:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 976561C224B3
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 13:30:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41CF11B62BC5
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 13:32:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D95F22C339;
-	Thu,  8 May 2025 13:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B603C22CBEC;
+	Thu,  8 May 2025 13:31:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EXvaLSSO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U/F7Okht"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D60BE22B5B1;
-	Thu,  8 May 2025 13:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C464E4B1E6D
+	for <netdev@vger.kernel.org>; Thu,  8 May 2025 13:31:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746711010; cv=none; b=PWNrP1kVctOamIDlcFmpw9aO/MNWYxkjO1heUR0OmTouBrUUR9Rh55//2vEdC0gjAxoj+ctT4p5J/7DLjPUa0s2Xuq1XrJ6dGpRV9qpgFcZ/FHbSVNWRatBkHjOc7JCsrRe/nMfSssDW7rxCdXAifSw7t2Ja83xA0vJfWXb8uWk=
+	t=1746711090; cv=none; b=TLjBqMVQsmzgUqASFgK8DzQPwxjmLXhWaw6/cjorRQ6G40p0aGfuB/DgiPhv0+PPbMOLRQBxivWhRd2s7bdItYW5M1paBPX+1LnlRm+2lHxwyU17ryx684RU8rsHD12cwVqbzAcvpoKyOIjBpyOYT7JZtt3cHQ1JgJRsWw+xtaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746711010; c=relaxed/simple;
-	bh=WIdYABlOPeMu+DWeul48wLOvFKiMYDmec9SVENPcPBo=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=a5Zlme0x0RtllnMlbeMT2IyX+QkhZeTnDkdDQlZWwj1+PYJ2O7IbzRvSfGIPI1afRcM57YD6modl/slSwxFoFH3TGARUAPL9rxewQT2d0YYF+wKZQ6aSD0iv8bDi3wPscu4T5gIhBO2oLgnFu4CPxzCY2MAbrY8yiHaPc9Eytmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EXvaLSSO; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7c9677cd6d7so111986285a.3;
-        Thu, 08 May 2025 06:30:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746711007; x=1747315807; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z5N12FBocfutG0F3Mi3MfydrH9BrYroiYk6HH8Y6qHw=;
-        b=EXvaLSSOCBRRyk6zOYC9TDUUnsBaBbxoTRVXXO66kV3xt7yQ0wShD8+RZ+tmN95QIs
-         OCsdXwwYMW7Z28OX9lj2VjPK4FzVRFelgtkzfLBk4S8Nir30w6RO4JzQ+abJ9FMPTv+i
-         VbDEOBvF972ozyUNWUm7hjlpCtTBo0qP07RutxOdLvKYA2gJKQ8JwnhAuTyQeYtrwd1M
-         Ef+Pl5wQz/y1M5FXw6qaETWA62zL6x8AkdbznAnsncsUAxsJukGtfKzIURslR0ZDgtE/
-         VHb7fEyOfhGsWvRaERkmbCoVqhiNUxZ5XhxZemFmSiR+O13w737bb8GKxOpdrpBZR3ZU
-         dDBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746711008; x=1747315808;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=z5N12FBocfutG0F3Mi3MfydrH9BrYroiYk6HH8Y6qHw=;
-        b=mVI9sVsQAJ1enxHyrlFnD+mhOOGa3I7vw4EIjifAQuIcLojf8zOqp3BtVJaVIaafxl
-         PcbTXGh25yGvHclfwDRRRU71e0i52BtY6WzhNu6B7xGMZUeNk9fctEZu6htHg09Tq3x8
-         f0388+YPtObhX0NTlBRnsCjyupr/7niMkVmZXRNE8lXZbgxMm4aZS98rMRTTJ3QsNGkG
-         YenJR7KkAOLbSGC6liYk/6/K56u4lnVl04S/w8MUOEh+hCOFixpBGgKCRBzrvvDHd+d4
-         GN6oaCLy2cBC7LLumxBp9hR70e1M7/L6LkXSuk4w8E1AYE/ed44Mf3WfxGT9Zyr2mRtn
-         S/ZA==
-X-Forwarded-Encrypted: i=1; AJvYcCXEDZsI5q9tH2jdrLiX2i89tIuYTz0VJq4EwHoiuwvsVNUKEjEq1ykPw2PPooCdK1fb7ozTgKLY@vger.kernel.org, AJvYcCXpv7Jmtuz/cTxLFfXSfzw2o4E2Vr56SBv7M/0BBQ5lom4WlLMa0tliwNlApEQk5HuqiFc=@vger.kernel.org, AJvYcCXr12QJVGiWsTzGn/h6BHYnzXIuBKg4af3rsTqW7UoWhu2lG4C7JpwBMUdQEMR6VCs2jbc9sb7vjuJ0w1vu@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJnGxY1A8yqrvfCY6/iRlzyRCM6q/Hzsf9ROWyR7r5MyiZtr42
-	1APaBEJs1+ijVHAFFdfeksuNzmbo4U1xJCjm0PFyBh0RzcfJS24u3ie66g==
-X-Gm-Gg: ASbGnct5HAq+ZLu7ZlrHg+7dcgrAi3zriQKgOlb7FHKasR2iCI51fXanXHvFyW9LRZ6
-	sjAz0kZjvDr0zJW1FNAKToW+KiySuj9py5PVUyvPkDBVkaIlqdtwdQUc1uRsfLxkgxWaQMFSiCz
-	IEkqbC4WaINDbF3/TGqdiXeIUdOBJlSq2GJvmz2XqTEP4XvxJu7c3j+sdZptphZ9UJ0hTjdMgxW
-	FaVROarsP3XhNO66nv42QMKegY/dnJdVhUXAZLqGnLiVjWlQCiru0EJ5Aat6xHF7xg3P+htTxhn
-	bFdVYfuymEG5EzYNitMSm3UlcW4cUeOhSNJ7/aY9efzRGmeU1xsgbmgVA7NZNDHfq6DkjwK8Qo6
-	C76dC+GuP8W1+wnpy+k+c
-X-Google-Smtp-Source: AGHT+IHr13Zp7M4XJ3c089EOlH5Pw2BnuNtuD6HU8HHp2gxHtaUDJxFlWmZM7iVR0TnRdARP34HZyg==
-X-Received: by 2002:a05:6214:1d03:b0:6f4:cbcf:5d46 with SMTP id 6a1803df08f44-6f54c3d0155mr55191826d6.20.1746710996931;
-        Thu, 08 May 2025 06:29:56 -0700 (PDT)
-Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-6f542623ee9sm32993196d6.5.2025.05.08.06.29.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 May 2025 06:29:56 -0700 (PDT)
-Date: Thu, 08 May 2025 09:29:56 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jon Kohler <jon@nutanix.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Jason Wang <jasowang@redhat.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>, 
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>
-Message-ID: <681cb1d4cb20_2574d529466@willemb.c.googlers.com.notmuch>
-In-Reply-To: <1DDEC6DE-C54A-4267-8F99-462552B41786@nutanix.com>
-References: <20250507161912.3271227-1-jon@nutanix.com>
- <681bc8f326126_20e9e6294b1@willemb.c.googlers.com.notmuch>
- <1DDEC6DE-C54A-4267-8F99-462552B41786@nutanix.com>
-Subject: Re: [PATCH net-next] tun: use xdp_get_frame_len()
+	s=arc-20240116; t=1746711090; c=relaxed/simple;
+	bh=IWyQOH4KJr7+U588TsFrW8c5cTPJb6v2JhKWRyh751Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=T39HlDWyhh3/GnqyhNUMIOz5+1+wfu2J+xpHGYSy59y6DW/d2udhXQQme3Vp/qjCn0LX2Ju8u5Iwojw0XxChrz1opG3Wm5Rout61ZS1sRXdSffDVwx+14jUmGfJI6nQC6VrLXy/c/MAJTkpKE7Ns0lydnACEEW80RGm8gEujnkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U/F7Okht; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746711087;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=rwNgjc6JmrjE2tRvDj3ZVBmfYQMrw/czepg62caXD9M=;
+	b=U/F7Okht8bGyiDFZU3hmVywfpJRk2X2Ya2DNmii3EP1XridSZ7d7aEe/rkEnKfuwg+pyVv
+	bbgh2u7ogh6B0lpcVUf4wRlBCK3VyoZw/AaX395Wcp/lATp8QqcK0PpybdGXU/SuhG0mD1
+	ybnuy8ehYLm1YlvOMSI3H5VM6MDP1Ic=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-107-EDork1TrMpmcVPyYQETBRQ-1; Thu,
+ 08 May 2025 09:31:21 -0400
+X-MC-Unique: EDork1TrMpmcVPyYQETBRQ-1
+X-Mimecast-MFC-AGG-ID: EDork1TrMpmcVPyYQETBRQ_1746711080
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6D67519541B6;
+	Thu,  8 May 2025 13:31:20 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.44.32.138])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 525A91953B85;
+	Thu,  8 May 2025 13:31:17 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [GIT PULL] Networking for v6.15-rc6
+Date: Thu,  8 May 2025 15:31:06 +0200
+Message-ID: <20250508133106.37026-1-pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-Jon Kohler wrote:
-> =
+Hi Linus!
 
-> =
+The following changes since commit ebd297a2affadb6f6f4d2e5d975c1eda18ac762d:
 
-> > On May 7, 2025, at 4:56=E2=80=AFPM, Willem de Bruijn <willemdebruijn.=
-kernel@gmail.com> wrote:
-> > =
+  Merge tag 'net-6.15-rc5' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-05-01 10:37:49 -0700)
 
-> > !-------------------------------------------------------------------|=
+are available in the Git repository at:
 
-> >  CAUTION: External Email
-> > =
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.15-rc6
 
-> > |-------------------------------------------------------------------!=
+for you to fetch changes up to 3c44b2d615e6ee08d650c2864fdc4e68493eac0c:
 
-> > =
+  Merge branch 'virtio-net-fix-total-qstat-values' (2025-05-08 11:56:14 +0200)
 
-> > Jon Kohler wrote:
-> >> Use xdp_get_frame_len helper to ensure xdp frame size is calculated
-> >> correctly in both single buffer and multi buffer configurations.
-> > =
+----------------------------------------------------------------
+Including fixes from CAN, WiFi and netfilter.
 
-> > Not necessarily opposed, but multi buffer is not actually possible
-> > in this code path, right?
-> > =
+We have still a comple of regressions open due to the recent
+drivers locking refactor. The patches are in-flight, but not
+ready yet.
 
-> > tun_put_user_xdp only copies xdp_frame->data, for one.
-> > =
+Current release - regressions:
 
-> > Else this would also be fix, not net-next material.
-> =
+  - core: lock netdevices during dev_shutdown
 
-> Correct, this is a prep patch for future multi buffer support,
-> I=E2=80=99m not aware of any path that can currently do that thru
-> this code.
-> =
+  - sch_htb: make htb_deactivate() idempotent
 
-> The reason for pursuing multi-buffer is to allow vhost/net
-> batching to work again for large payloads.
+  - eth: virtio-net: don't re-enable refill work too early
 
-I was not aware of that context. I'd add a comment to that in the
-commit message, and send it as part of that series.=
+Current release - new code bugs:
+
+  - eth: icssg-prueth: fix kernel panic during concurrent Tx queue access
+
+Previous releases - regressions:
+
+  - gre: fix again IPv6 link-local address generation.
+
+  - eth: b53: fix learning on VLAN unaware bridges
+
+Previous releases - always broken:
+
+  - wifi: fix out-of-bounds access during multi-link element defragmentation
+
+  - can:
+    - initialize spin lock on device probe
+    - fix order of unregistration calls
+
+  - openvswitch: fix unsafe attribute parsing in output_userspace()
+
+  - eth: virtio-net: fix total qstat values
+
+  - eth: mtk_eth_soc: reset all TX queues on DMA free
+
+  - eth: fbnic: firmware IPC mailbox fixes
+
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+
+----------------------------------------------------------------
+Alexander Duyck (8):
+      fbnic: Fix initialization of mailbox descriptor rings
+      fbnic: Gate AXI read/write enabling on FW mailbox
+      fbnic: Add additional handling of IRQs
+      fbnic: Actually flush_tx instead of stalling out
+      fbnic: Cleanup handling of completions
+      fbnic: Improve responsiveness of fbnic_mbx_poll_tx_ready
+      fbnic: Pull fbnic_fw_xmit_cap_msg use out of interrupt context
+      fbnic: Do not allow mailbox to toggle to ready outside fbnic_mbx_poll_tx_ready
+
+Andrew Lunn (1):
+      dt-bindings: net: ethernet-controller: Add informative text about RGMII delays
+
+Antonios Salios (1):
+      can: m_can: m_can_class_allocate_dev(): initialize spin lock on device probe
+
+Cong Wang (2):
+      sch_htb: make htb_deactivate() idempotent
+      selftests/tc-testing: Add a test case to cover basic HTB+FQ_CODEL case
+
+Cosmin Ratiu (1):
+      net: Lock netdevices during dev_shutdown
+
+Daniel Golle (1):
+      net: ethernet: mtk_eth_soc: reset all TX queues on DMA free
+
+David Wei (1):
+      tools: ynl-gen: validate 0 len strings from kernel
+
+Eelco Chaudron (1):
+      openvswitch: Fix unsafe attribute parsing in output_userspace()
+
+Frank Wunderlich (1):
+      net: ethernet: mtk_eth_soc: do not reset PSE when setting FE
+
+Guillaume Nault (2):
+      gre: Fix again IPv6 link-local address generation.
+      selftests: Add IPv6 link-local address generation tests for GRE devices.
+
+Jakub Kicinski (12):
+      Merge branch 'net_sched-fix-a-regression-in-sch_htb'
+      virtio-net: don't re-enable refill work too early when NAPI is disabled
+      virtio-net: free xsk_buffs on error in virtnet_xsk_pool_enable()
+      Merge branch 'gre-reapply-ipv6-link-local-address-generation-fix'
+      Merge branch 'selftests-drv-net-fix-ping-py-test-failure'
+      Merge tag 'linux-can-fixes-for-6.15-20250506' of git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can
+      Merge tag 'wireless-2025-05-06' of https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless
+      Merge tag 'nf-25-05-08' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
+      Merge branch 'bug-fixes-from-xdp-patch-series'
+      Merge branch 'net-dsa-b53-accumulated-fixes'
+      net: export a helper for adding up queue stats
+      virtio-net: fix total qstat values
+
+Johannes Berg (1):
+      wifi: iwlwifi: add support for Killer on MTL
+
+Jonas Gorski (11):
+      net: dsa: b53: allow leaky reserved multicast
+      net: dsa: b53: keep CPU port always tagged again
+      net: dsa: b53: fix clearing PVID of a port
+      net: dsa: b53: fix flushing old pvid VLAN on pvid change
+      net: dsa: b53: fix VLAN ID for untagged vlan on bridge leave
+      net: dsa: b53: always rejoin default untagged VLAN on bridge leave
+      net: dsa: b53: do not allow to configure VLAN 0
+      net: dsa: b53: do not program vlans when vlan filtering is off
+      net: dsa: b53: fix toggling vlan_filtering
+      net: dsa: b53: fix learning on VLAN unaware bridges
+      net: dsa: b53: do not set learning and unicast/multicast on up
+
+Jozsef Kadlecsik (1):
+      netfilter: ipset: fix region locking in hash types
+
+Julian Anastasov (1):
+      ipvs: fix uninit-value for saddr in do_output_route4
+
+Kelsey Maes (1):
+      can: mcp251xfd: fix TDC setting for low data bit rates
+
+Lorenzo Bianconi (1):
+      net: airoha: Add missing field to ppe_mbox_data struct
+
+Marc Kleine-Budde (4):
+      can: mcp251xfd: mcp251xfd_remove(): fix order of unregistration calls
+      can: rockchip_canfd: rkcanfd_remove(): fix order of unregistration calls
+      can: mcan: m_can_class_unregister(): fix order of unregistration calls
+      Merge patch series "can: rx-offload: fix order of unregistration calls"
+
+Meghana Malladi (3):
+      net: ti: icssg-prueth: Set XDP feature flags for ndev
+      net: ti: icssg-prueth: Fix kernel panic during concurrent Tx queue access
+      net: ti: icssg-prueth: Report BQL before sending XDP packets
+
+Michael-CY Lee (1):
+      wifi: mac80211: fix the type of status_code for negotiated TID to Link Mapping
+
+Mohsin Bashir (3):
+      selftests: drv: net: fix test failure on ipv6 sys
+      selftests: drv: net: avoid skipping tests
+      selftests: drv: net: add version indicator
+
+Oliver Hartkopp (1):
+      can: gw: fix RCU/BH usage in cgw_create_job()
+
+Paolo Abeni (2):
+      Merge branch 'fbnic-fw-ipc-mailbox-fixes'
+      Merge branch 'virtio-net-fix-total-qstat-values'
+
+Paul Chaignon (2):
+      bpf: Scrub packet on bpf_redirect_peer
+      bpf: Clarify handling of mark and tstamp by redirect_peer
+
+Przemek Kitszel (1):
+      ice: use DSN instead of PCI BDF for ice_adapter index
+
+Stanislav Fomichev (1):
+      net: add missing instance lock to dev_set_promiscuity
+
+Veerendranath Jakkam (1):
+      wifi: cfg80211: fix out-of-bounds access during multi-link element defragmentation
+
+ .../bindings/net/ethernet-controller.yaml          |  97 +++++++++-
+ drivers/net/can/m_can/m_can.c                      |   3 +-
+ drivers/net/can/rockchip/rockchip_canfd-core.c     |   2 +-
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c     |  42 ++++-
+ drivers/net/dsa/b53/b53_common.c                   | 207 +++++++++++++++------
+ drivers/net/dsa/b53/b53_priv.h                     |   3 +
+ drivers/net/dsa/bcm_sf2.c                          |   1 +
+ drivers/net/ethernet/airoha/airoha_npu.c           |  10 +-
+ drivers/net/ethernet/intel/ice/ice_adapter.c       |  47 ++---
+ drivers/net/ethernet/intel/ice/ice_adapter.h       |   6 +-
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c        |  19 +-
+ drivers/net/ethernet/meta/fbnic/fbnic.h            |   8 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_csr.h        |   2 +
+ drivers/net/ethernet/meta/fbnic/fbnic_fw.c         | 197 ++++++++++++--------
+ drivers/net/ethernet/meta/fbnic/fbnic_irq.c        | 142 +++++++++-----
+ drivers/net/ethernet/meta/fbnic/fbnic_mac.c        |   6 -
+ drivers/net/ethernet/meta/fbnic/fbnic_netdev.c     |   5 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_pci.c        |  14 +-
+ drivers/net/ethernet/ti/icssg/icssg_common.c       |  15 +-
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c       |  16 +-
+ drivers/net/virtio_net.c                           |  23 ++-
+ drivers/net/wireless/intel/iwlwifi/pcie/drv.c      |   2 +
+ include/linux/ieee80211.h                          |   2 +-
+ include/linux/netdevice.h                          |   1 +
+ include/net/netdev_queues.h                        |   6 +
+ include/uapi/linux/bpf.h                           |   3 +
+ net/can/gw.c                                       | 149 +++++++++------
+ net/core/dev.c                                     |  18 +-
+ net/core/dev_api.c                                 |  23 +++
+ net/core/filter.c                                  |   1 +
+ net/core/netdev-genl.c                             |  69 +++++--
+ net/ipv6/addrconf.c                                |  15 +-
+ net/mac80211/mlme.c                                |  12 +-
+ net/netfilter/ipset/ip_set_hash_gen.h              |   2 +-
+ net/netfilter/ipvs/ip_vs_xmit.c                    |  27 +--
+ net/openvswitch/actions.c                          |   3 +-
+ net/sched/sch_htb.c                                |  15 +-
+ net/wireless/scan.c                                |   2 +-
+ tools/include/uapi/linux/bpf.h                     |   3 +
+ tools/net/ynl/lib/ynl.c                            |   2 +-
+ tools/testing/selftests/drivers/net/ping.py        |  45 +++--
+ tools/testing/selftests/net/Makefile               |   1 +
+ tools/testing/selftests/net/gre_ipv6_lladdr.sh     | 177 ++++++++++++++++++
+ .../tc-testing/tc-tests/infra/qdiscs.json          |  35 ++++
+ 44 files changed, 1049 insertions(+), 429 deletions(-)
+ create mode 100755 tools/testing/selftests/net/gre_ipv6_lladdr.sh
+
 
