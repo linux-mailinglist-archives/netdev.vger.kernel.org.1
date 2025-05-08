@@ -1,233 +1,184 @@
-Return-Path: <netdev+bounces-188920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75779AAF5F8
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 10:46:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07A69AAF633
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 11:00:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84CBA1C0557C
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 08:46:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCBFB9E052C
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 09:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3741A21C9E9;
-	Thu,  8 May 2025 08:46:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D89E32144BF;
+	Thu,  8 May 2025 09:00:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ws0abTau"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fDFg46TJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E35821CA0A
-	for <netdev@vger.kernel.org>; Thu,  8 May 2025 08:46:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF4692557C;
+	Thu,  8 May 2025 09:00:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746693984; cv=none; b=aIbaHS8D0nqAt2pAFxVROpY4rVpaUMF1E8SRMNAf85jMhsm01ECfkhylkE6V2ozahGtYvgM0eNe4NLakBcCjqqyi2ES/iNNkkP4tEdSMBWPq202uzdgk7bQxNzY3QO1jrLK9ppSA+xp9jG/EpB1hE1QYAN55W8dTguRpufEskbk=
+	t=1746694846; cv=none; b=Yw61jvz2A3uV6R6AsIam3IqXWG5lNCjbODV4CuJi4XEq7mGp+8Kza7QlkpwpNNTa9KL9h8abTkZanhYLFpdYcy7um44bPGVW/VNHhVeARhsb4NbQBA/Z/o/rUhLdsVvrBOrlFragLU+QDGjCnwVhqg1JiR+Coy00uzgX7FFMyvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746693984; c=relaxed/simple;
-	bh=4HU8oiKCoDW8I7We41fVsq6xE7etMMpLP3NwPzozuBw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LqJJZn7gh9Upxno0020xYEgdniKYeIUf5PMdZh3zXxFSL/dITMmuKy1/eELtAvAJFXRKTAa88wgC1OaQrP17g1BDUl2z9IIXNE4hQrLfEbRwVV+JDsnTQAArTXkp9exNHo9e8O/dunWupLWDkB3P/Ke6zZ2rC/hEXWBJVIoiJYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ws0abTau; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1746693981;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JZM2rfxZmGn+Pb7oDTzTtUVYRHj/xEqslB58SleMISA=;
-	b=Ws0abTaucUO61NMwpLY1sa8zYR2Xg8MgbsWHHOPNsn/fG9IeYxVbiUY0vg2fpEJUe+BbSh
-	IzFucVkNpsBr2atwsmeW4DyzhJvGn4vtWuoCuHCVGAqk0OdSaQumEUUoydvxoSJJvgPTEg
-	Tbs3nNjJzGhH4Y+mdE4YwyA3SQDxbTM=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-226-uyM9EHu4Ow-7YfZlWlAVsA-1; Thu, 08 May 2025 04:46:20 -0400
-X-MC-Unique: uyM9EHu4Ow-7YfZlWlAVsA-1
-X-Mimecast-MFC-AGG-ID: uyM9EHu4Ow-7YfZlWlAVsA_1746693979
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43efa869b19so4491605e9.2
-        for <netdev@vger.kernel.org>; Thu, 08 May 2025 01:46:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746693978; x=1747298778;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JZM2rfxZmGn+Pb7oDTzTtUVYRHj/xEqslB58SleMISA=;
-        b=oAuz66zefFZfab+qDn9FTkeT5NLRmjumUTnt42rqBwQZjTgwIvDpDrC+Zubbxzxscv
-         MGq98TRJOFwnFsqu26Kv5aJcZ2VW6BbLq1274ztXtVhrHqzeP6QFWH6TozHDhvcDqGmp
-         53hi005aNQNKhdjluxfSYNGXf3l0MA0RHZRNqkkzpewSXi3j9v/ETExyo5DBz9IGbHS4
-         awVIOu+KtC8Tav3XCw8YR6zWSOo2uGkcSsU4EtitZBmDdqNgPRGESh8T860HkWRnRmgu
-         BHpD3cEZY2DYAFvlqGAy8O6EIg7uDL76Msdqz9kJ5ZiY1QsxwdYnabEKTu+lnOF/aRm9
-         XLjQ==
-X-Gm-Message-State: AOJu0YyyKIe9y/yrn+5cDuH+eB0qozfx/hbJBs888WLzmuvYDDwt/Tbr
-	w8CtA41ka2A599odsHmhE8sUvKSCeZdAM2uCsGKfA5UuXnb0zYICN+fSQmeCk1SQEXboPXhMrb9
-	epaojPyqidn1M0sx0FKjb1qxa/FoNA/zVqEDlt/QoplHacrfSqdPMD+7pAKfasSXy
-X-Gm-Gg: ASbGncsE5kJdzWT01CUjCR8OC6Q9gMNpCf15jRhI9KEIVC+DKXwXE19/TryPfMhbB9B
-	Kjea4aU3CvnVnU2pqO53huG5O+sBxywls4nvWdaaEB/y6oGMH8hAxg8KRPkV/EYiOeHjy13dfS8
-	R4xi3YHkFZQ43eu2xA7GZAww1B7i3Cbh/8Xs5RLq3CBw9h+AFd3Oowr1kOTlG9uhkuOwNvxVhND
-	GgNeR1uunKtrHpUaFv8BENvXFB0VYGmqKxr0b6O/2nZ3zcAVxDW5rI4jHKl031mU6h4g44Ay4cQ
-	LJ/6zAS/emXBD+7Z
-X-Received: by 2002:a05:600c:1c8c:b0:43d:683:8cb2 with SMTP id 5b1f17b1804b1-441d4eeb512mr38786755e9.14.1746693978494;
-        Thu, 08 May 2025 01:46:18 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFnG944ZTQEsiKw7GKbX+anmpQL79FH96aDK1XjGSXilGwo4xo0Ow122A9pOfEKgJo9fzTVOA==
-X-Received: by 2002:a05:600c:1c8c:b0:43d:683:8cb2 with SMTP id 5b1f17b1804b1-441d4eeb512mr38786555e9.14.1746693978050;
-        Thu, 08 May 2025 01:46:18 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:244b:910::f39? ([2a0d:3344:244b:910::f39])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442cd32f3c2sm29339385e9.15.2025.05.08.01.46.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 May 2025 01:46:17 -0700 (PDT)
-Message-ID: <d52465a2-f857-4a2b-8d4e-4d30384b6247@redhat.com>
-Date: Thu, 8 May 2025 10:46:16 +0200
+	s=arc-20240116; t=1746694846; c=relaxed/simple;
+	bh=ROSi/Orgbexv11jRgsW2OyCxC3aIhDhDNPIcDThao00=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m7Umajn2sycXOmtz0YHQ8txJndnQOKtB1DyCGLUsdLIvG3h5BT2DBUl4L3thDnQN0GWCWddnektnnxPvEJ0fC/rTZUXvBP8HSrCeO+a+LUo73Kqi7N2Ugjrksbg1jYCz+6EexXM5Y1T79PAfCba57nostVHpfQWXVu1x3HNSXnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fDFg46TJ; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746694845; x=1778230845;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ROSi/Orgbexv11jRgsW2OyCxC3aIhDhDNPIcDThao00=;
+  b=fDFg46TJ8pCHlpQUuAVymCLoE4TQ5iFCpZyz9yRcwx6fNKFOVcNEnvKJ
+   FHUFzr6Y+6Bf7CgLKuobUMCtOPFvBHM2iMaAuZos2F0xEWRjHEDAG5ao9
+   4huP6cT9Zqaqo4K2jNZORrkscBqoVyaKEEfbHACN483rxB6mq6ypxyNbM
+   UXJlrloYnzKId5ILOrnf7T3WoLDfbYAtJUqnqamGVucUgT9xyIUe5KG3A
+   gwL5u5NfXZNYxOqyCkLKtAXwLPwKVsU3j1B8cGfcdyuTtB+pczOWcF412
+   Bdd2y5RSI6ef6d4DjCIethDhOQMdn0jG+Y5m5Y0DNexOz2xKdNtmHypKl
+   A==;
+X-CSE-ConnectionGUID: iA2pm336TiqfFxJwKo0WHQ==
+X-CSE-MsgGUID: +PvKgsoHTmC3GxkOw4gm4Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11426"; a="48550097"
+X-IronPort-AV: E=Sophos;i="6.15,271,1739865600"; 
+   d="scan'208";a="48550097"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2025 02:00:44 -0700
+X-CSE-ConnectionGUID: 8ne1VkpKSKGUTK3JlySqFw==
+X-CSE-MsgGUID: 1IfokcpxT6e6H6SFHsVAmA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,271,1739865600"; 
+   d="scan'208";a="136160406"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by orviesa006.jf.intel.com with ESMTP; 08 May 2025 02:00:39 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uCx7L-000AoB-3B;
+	Thu, 08 May 2025 09:00:35 +0000
+Date: Thu, 8 May 2025 17:00:04 +0800
+From: kernel test robot <lkp@intel.com>
+To: Stefan Wahren <wahrenst@gmx.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, Stefan Wahren <wahrenst@gmx.net>
+Subject: Re: [PATCH net-next 2/5] net: vertexcom: mse102x: Add warning about
+ IRQ trigger type
+Message-ID: <202505081612.wbRgFMC7-lkp@intel.com>
+References: <20250505142427.9601-3-wahrenst@gmx.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 05/15] net: homa: create homa_peer.h and
- homa_peer.c
-To: John Ousterhout <ouster@cs.stanford.edu>
-Cc: netdev@vger.kernel.org, edumazet@google.com, horms@kernel.org,
- kuba@kernel.org
-References: <20250502233729.64220-1-ouster@cs.stanford.edu>
- <20250502233729.64220-6-ouster@cs.stanford.edu>
- <4350bd09-9aad-491c-a38d-08249f082b6d@redhat.com>
- <CAGXJAmyN2XUjk7hp-7o0Em9b_6Y5S3iiS14KXQWSKUWJXnnOvA@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CAGXJAmyN2XUjk7hp-7o0Em9b_6Y5S3iiS14KXQWSKUWJXnnOvA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250505142427.9601-3-wahrenst@gmx.net>
 
-On 5/7/25 6:11 PM, John Ousterhout wrote:
-> On Mon, May 5, 2025 at 4:06 AM Paolo Abeni <pabeni@redhat.com> wrote:
-> 
->> On 5/3/25 1:37 AM, John Ousterhout wrote:
->> [...]
->>> +{
->>> +     /* Note: when we return, the object must be initialized so it's
->>> +      * safe to call homa_peertab_destroy, even if this function returns
->>> +      * an error.
->>> +      */
->>> +     int i;
->>> +
->>> +     spin_lock_init(&peertab->write_lock);
->>> +     INIT_LIST_HEAD(&peertab->dead_dsts);
->>> +     peertab->buckets = vmalloc(HOMA_PEERTAB_BUCKETS *
->>> +                                sizeof(*peertab->buckets));
->>
->> This struct looks way too big to be allocated on per netns basis. You
->> should use a global table and include the netns in the lookup key.
-> 
-> Are there likely to be lots of netns's in a system? 
+Hi Stefan,
 
-Yes. In fact a relevant performance metric is the time to create and
-destroy thousands of them.
+kernel test robot noticed the following build warnings:
 
-> I thought I read
-> someplace that a hardware NIC must belong exclusively to a single
-> netns, so from that I assumed there couldn't be more than a few
-> netns's. Can there be virtual NICs, leading to lots of netns's?
+[auto build test WARNING on net-next/main]
 
-Yes, veth devices a pretty ubiquitous in containerization setups
+url:    https://github.com/intel-lab-lkp/linux/commits/Stefan-Wahren/dt-bindings-vertexcom-mse102x-Fix-IRQ-type-in-example/20250505-222628
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250505142427.9601-3-wahrenst%40gmx.net
+patch subject: [PATCH net-next 2/5] net: vertexcom: mse102x: Add warning about IRQ trigger type
+config: i386-allmodconfig (https://download.01.org/0day-ci/archive/20250508/202505081612.wbRgFMC7-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250508/202505081612.wbRgFMC7-lkp@intel.com/reproduce)
 
-> Can
-> you give me a ballpark number for how many netns's there might be in a
-> system with "lots" of them? This will be useful in making design
-> tradeoffs.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202505081612.wbRgFMC7-lkp@intel.com/
 
-You should consider at least 1K as a target number, but a large system
-should just work with 10K or more.
+All warnings (new ones prefixed by >>):
 
->>> +     /* No existing entry; create a new one.
->>> +      *
->>> +      * Note: after we acquire the lock, we have to check again to
->>> +      * make sure the entry still doesn't exist (it might have been
->>> +      * created by a concurrent invocation of this function).
->>> +      */
->>> +     spin_lock_bh(&peertab->write_lock);
->>> +     hlist_for_each_entry(peer, &peertab->buckets[bucket],
->>> +                          peertab_links) {
->>> +             if (ipv6_addr_equal(&peer->addr, addr))
->>> +                     goto done;
->>> +     }
->>> +     peer = kmalloc(sizeof(*peer), GFP_ATOMIC | __GFP_ZERO);
->>
->> Please, move the allocation outside the atomic scope and use GFP_KERNEL.
-> 
-> I don't think I can do that because homa_peer_find is invoked in
-> softirq code, which is atomic, no? It's not disastrous if the
-> allocation fails; the worst that happens is that an incoming packet
-> must be discarded (it will be retried later).
+   drivers/net/ethernet/vertexcom/mse102x.c: In function 'mse102x_net_open':
+   drivers/net/ethernet/vertexcom/mse102x.c:525:37: error: implicit declaration of function 'irq_get_irq_data'; did you mean 'irq_set_irq_wake'? [-Werror=implicit-function-declaration]
+     525 |         struct irq_data *irq_data = irq_get_irq_data(ndev->irq);
+         |                                     ^~~~~~~~~~~~~~~~
+         |                                     irq_set_irq_wake
+>> drivers/net/ethernet/vertexcom/mse102x.c:525:37: warning: initialization of 'struct irq_data *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+   drivers/net/ethernet/vertexcom/mse102x.c:535:17: error: implicit declaration of function 'irqd_get_trigger_type'; did you mean 'led_get_trigger_data'? [-Werror=implicit-function-declaration]
+     535 |         switch (irqd_get_trigger_type(irq_data)) {
+         |                 ^~~~~~~~~~~~~~~~~~~~~
+         |                 led_get_trigger_data
+   drivers/net/ethernet/vertexcom/mse102x.c:536:14: error: 'IRQ_TYPE_LEVEL_HIGH' undeclared (first use in this function)
+     536 |         case IRQ_TYPE_LEVEL_HIGH:
+         |              ^~~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/vertexcom/mse102x.c:536:14: note: each undeclared identifier is reported only once for each function it appears in
+   drivers/net/ethernet/vertexcom/mse102x.c:537:14: error: 'IRQ_TYPE_LEVEL_LOW' undeclared (first use in this function)
+     537 |         case IRQ_TYPE_LEVEL_LOW:
+         |              ^~~~~~~~~~~~~~~~~~
+   cc1: some warnings being treated as errors
 
-IMHO a _find() helper that allocates thing has a misleading name.
 
-Usually RX path do only lookups, and state allocation is done in the
-control path, that avoid atomic issues
+vim +525 drivers/net/ethernet/vertexcom/mse102x.c
 
-> 
->>> +     if (!peer) {
->>> +             peer = (struct homa_peer *)ERR_PTR(-ENOMEM);
->>> +             goto done;
->>> +     }
->>> +     peer->addr = *addr;
->>> +     dst = homa_peer_get_dst(peer, inet);
->>> +     if (IS_ERR(dst)) {
->>> +             kfree(peer);
->>> +             peer = (struct homa_peer *)PTR_ERR(dst);
->>> +             goto done;
->>> +     }
->>> +     peer->dst = dst;
->>> +     hlist_add_head_rcu(&peer->peertab_links, &peertab->buckets[bucket]);
->>
->> At this point another CPU can lookup 'peer'. Since there are no memory
->> barriers it could observe a NULL peer->dst.
-> 
-> Oops, good catch. I need to add 'smp_wmb()' just before the
-> hlist_add_head_rcu line?
+   522	
+   523	static int mse102x_net_open(struct net_device *ndev)
+   524	{
+ > 525		struct irq_data *irq_data = irq_get_irq_data(ndev->irq);
+   526		struct mse102x_net *mse = netdev_priv(ndev);
+   527		struct mse102x_net_spi *mses = to_mse102x_spi(mse);
+   528		int ret;
+   529	
+   530		if (!irq_data) {
+   531			netdev_err(ndev, "Invalid IRQ: %d\n", ndev->irq);
+   532			return -EINVAL;
+   533		}
+   534	
+   535		switch (irqd_get_trigger_type(irq_data)) {
+   536		case IRQ_TYPE_LEVEL_HIGH:
+   537		case IRQ_TYPE_LEVEL_LOW:
+   538			break;
+   539		default:
+   540			netdev_warn_once(ndev, "Only IRQ type level recommended, please update your firmware.\n");
+   541			break;
+   542		}
+   543	
+   544		ret = request_threaded_irq(ndev->irq, NULL, mse102x_irq, IRQF_ONESHOT,
+   545					   ndev->name, mse);
+   546		if (ret < 0) {
+   547			netdev_err(ndev, "Failed to get irq: %d\n", ret);
+   548			return ret;
+   549		}
+   550	
+   551		netif_dbg(mse, ifup, ndev, "opening\n");
+   552	
+   553		netif_start_queue(ndev);
+   554	
+   555		netif_carrier_on(ndev);
+   556	
+   557		/* The SPI interrupt can stuck in case of pending packet(s).
+   558		 * So poll for possible packet(s) to re-arm the interrupt.
+   559		 */
+   560		mutex_lock(&mses->lock);
+   561		mse102x_rx_pkt_spi(mse);
+   562		mutex_unlock(&mses->lock);
+   563	
+   564		netif_dbg(mse, ifup, ndev, "network device up\n");
+   565	
+   566		return 0;
+   567	}
+   568	
 
-Barriers go in pair, one here and one in the lookup. See the relevant
-documentation for the gory details.
-
-[...]
->> Note that freeing the peer at 'runtime' will require additional changes:
->> i.e. likely refcounting will be beeded or the at lookup time, after the
->> rcu unlock the code could hit HaF while accessing the looked-up peer.
-> 
-> I understand about reference counting, but I couldn't parse the last
-> 1.5 lines above. What is HaF?
-
-A lot of typos on my side, sorry.
-
-You likely need to introduce refcounting, or after the RCU unlock (end
-of RCU grace period) the peer could be freed causing Use after Free.
-
->> [...]
->>> +static inline struct dst_entry *homa_get_dst(struct homa_peer *peer,
->>> +                                          struct homa_sock *hsk)
->>> +{
->>> +     if (unlikely(peer->dst->obsolete > 0))
->>
->> you need to additionally call dst->ops->check
-> 
-> I wasn't aware of dst->ops->check, and I'm a little confused by it
-> (usage in the kernel doesn't seem totally consistent):
-> * If I call dst->ops->check(), do I also need to check obsolete
-> (perhaps only call check if obsolete is true?)?
-> * What is the 'cookie' argument to dst->ops->check? Can I just use 0 safely?
-> * It looks like dst->ops->check now returns a struct dst_entry
-> pointer. What is the meaning of this? ChatGPT suggests that it is a
-> replacement dst_entry, if the original is no longer valid. 
-
-Luckily (on unfortunately depending on your PoV), the tool you mentioned
-simply does not work (yet?) for kernel code. You could (and should)
-review with extreme care basically any output about such topic.
-
-dst_check() is the reference code. You should use that helper.
-
-/P
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
