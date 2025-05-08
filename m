@@ -1,603 +1,117 @@
-Return-Path: <netdev+bounces-188905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0060DAAF4BB
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 09:37:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1496AAF4E2
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 09:43:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60C984A7B7D
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 07:37:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 407B71C03C6E
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 07:43:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDF1E221737;
-	Thu,  8 May 2025 07:37:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="WSuqJa19"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 781AC22173A;
+	Thu,  8 May 2025 07:43:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614E7220F51
-	for <netdev@vger.kernel.org>; Thu,  8 May 2025 07:37:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDA8B195FE8;
+	Thu,  8 May 2025 07:43:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746689822; cv=none; b=DLGbz02FanBDUlbL25pAPXfl3rIJU390x96A4VFWdAFIoIjTmM3ZktDIMDAZar4/Qm8lCdcQxUqC8QCSfgxvkdZRIxwr/CaPiNhu88qgZ2NtdH/PXtCx9pf/hKuWqO2XQD8raizx3v0clPPqcsXb5vWcMv7DxtksWdl06rESmXQ=
+	t=1746690201; cv=none; b=WAAGZahRxMcmRsZv1ONGp4fn88DEP8lBfMZ8le7RGpSB5pvW+a2c07uhegnk3hx/UWDMwqYVhhXbai8GVXqWxK2MFR4F4yPqNuK3r8AL2KlylHjrmZCeFjT7K2p/OwA3583WlfBgpJBWOckVH/nT7TBIu5cZwY1Fl0VKphS8BUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746689822; c=relaxed/simple;
-	bh=jIAH7xhMCDdlfMotDFe4GxlNPHf494KwvKJEOfCkk+4=;
+	s=arc-20240116; t=1746690201; c=relaxed/simple;
+	bh=Ym+Lkz4dVd8U8c1KC8lpqlMzy5nIzSo6HU+Kw5o5UVU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=D2Omlu3KTSYwKg3FJWK95ThOYHcq/kBarBRVQVJrZYMUeAtpnSqI3wKUYhYKrnfwrX1njmul/tf3ZKkc93qV0o864rPTQ+GlzYRs/ENFYPQE239lZCfV61kJ5xiI1sUb5CB/YTeGGQ4XnrVcieEmaYeYOpgPbz6q5/hdL8a7QMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=WSuqJa19; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7410c18bb00so111644b3a.3
-        for <netdev@vger.kernel.org>; Thu, 08 May 2025 00:37:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1746689819; x=1747294619; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=PuoM5fa6hLsSIw6kD375gMsgJSjhhYPCehcgiLZbrd0=;
-        b=WSuqJa19Ge4egiU6h0MRjwE5JoGKT+AUwCdBMb8zTdjCU7jYDs/y3IbuozPOQeSDuU
-         dpZDAgd0ZAELEnwbpO5b+cdZv0d8/acrGDUdpXJ+qQXIoM19dv5QrXY6ubVDaz1+Edoo
-         HtNeNg7wf2G2cwo6eDwPcx6VvmPu3Tr7VhEHE=
+	 To:Cc:Content-Type; b=dsKV56W8PebpGUD3qUHz/gNN/AUoouZOUeejFBrzgecTm0Bo9Vqnn4nFrXFL8e6Dse4Ui30N4UY8zDWczhEvWpxdQmgBCTI1EhfkCeVh+aov8+EwUujfQF/Rga66SCF2hgV26i/ubZy1SPeHGoe2EsD5b3tgk7jChREh8qEwclY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-523ffbe0dbcso594546e0c.0;
+        Thu, 08 May 2025 00:43:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746689819; x=1747294619;
+        d=1e100.net; s=20230601; t=1746690197; x=1747294997;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=PuoM5fa6hLsSIw6kD375gMsgJSjhhYPCehcgiLZbrd0=;
-        b=VVdcyHB4IZ1AkgpG9RBVNGIw2RhEdYBCNkvNLHMwjAAudvnnv9+4AY8/BRBDAs1y4y
-         C1rgPqh7LrE4n/kazEQhoD5YtQJnOwigfez8z8mx2MBfdXqxGnVrNUqKlsWc+/WY0CwP
-         xtVM/V/PbwzDqm4SwnS04skq1N8wyLsQTdZo6MixE3xNTEkEMVH938ZXwGcSqj+MTugw
-         Zr5CRGUcyq/qJjjHWbrssj0IGI32QSmhV7VEraO2VKq6Av5MDb1YK8eKZftVcvrewqsi
-         XmxQC6UiwAxqpQBXnxg4Vyxy/YzQIf5LfJWDFweV123kacHeXQ6ry2UpUtKk+bN0BDh/
-         CxLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVnA5jcLNUXr4AztGmlML8qkHRoRKV/4PfqjDqWmrlp1ZWaQbbCEKoSey7yrf/T04yvmXzFXFY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqrTkxA9t9Gm7U3sWf88eRo3VqKT+WTnqlfWxEBPqWtDpA9wp4
-	G/DcbUWCBuc0VCnaoUckSWBiM6NgUhNQF+ZIG64hTf/9MSQVgzi1LIMimSJpUV+6+Oy3Zqg1eyN
-	bVhxVtcSpveT8EhlE/suHosToXt5n8gM3Cgve
-X-Gm-Gg: ASbGncuij8cB+MUdiFxZ5QQn5u/fttjuzcsbyJOjleuXir9IWAEKmaaJ9gEbR3TeDpk
-	VxateZZgF0ob+kwvodj4HFdlUxSX7qpD1MZTVbv6hOt1phXFLTm+z+vz1MVQxOPTzq18EIa1TDs
-	Sg6ZhRJTrS0inzK0TZtA3q
-X-Google-Smtp-Source: AGHT+IFB8JkFGRlbnlOVYykX7v/f06YcLbeGlLW2aAxnTBsvwBu08mIWRTh3ZelYym01WYd+YNsc/0ZnZEOLCsunXrY=
-X-Received: by 2002:aa7:9316:0:b0:736:2a73:6756 with SMTP id
- d2e1a72fcca58-7409cfef303mr9062460b3a.21.1746689819508; Thu, 08 May 2025
- 00:36:59 -0700 (PDT)
+        bh=D1mZPJi/TC7bkF9tYWR7m5qAV1sln0wgKCmrPsKpu/U=;
+        b=FpHc6Chxj4HflWa9YozHX6jsauPO9ADfXJNNUeq7xmvU5ebZ+WHPGcGljjWzj63b6r
+         yIgbS0PKMMUlTpZkqWdEKiaGucMQJYyTmh21A3vSgAwdgkn1j/OFdxMJwPAiSfAMW7AM
+         I9yLokxeNN0PD6MJXeYmr0m5Hr0CS0K0wMth+TqDrpo7p0Mfj2ZEr+R5ADINTkOUxqRD
+         5uBsj1PDwnolIZ5zvI3P0qQg6FkU51NWQPAwc+Fh6SH4PSOSZn7XnQMztpwRhciFDsvK
+         z0gRJVfbOa8ii0v162q9wXyvEyBS+Q0fkvbH6L149NSD+KEqTV/uoH679E2FbO2JEo2I
+         yF3g==
+X-Forwarded-Encrypted: i=1; AJvYcCUSwoAF70fb2/j9pSVzn0W2epYP14S38rUd5T9wZrcTSZzIhK8tFB3TOxwQ7B7QeG9g17WXW1TWVn8YWLck@vger.kernel.org, AJvYcCUwyRQXTH0ZKRHW9p3ToRHYCiLVml21OVvyNb/bclBtXHnGi6ZeR/U9XXY40vgBMisQl34VGwBB@vger.kernel.org, AJvYcCV6C16ubE3QFM8L1ezR9P751hF7QE5+zX9Q4L5OTBTgiMwXglJzAl9VIDaz3lMe8scZg5jjrYwa5iMIoUanUJXhBOI=@vger.kernel.org, AJvYcCVeb2+q4JUpwJKYXUS1gcRcXi6bheV9zTxgo27LaKHyAb7F9CbCUaISM/JjW1dPPHKZN8jiMRB9hUJN@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2yxIWzGHUzhAbg0jY2GdBtpKtmsBw0TZ+QXbMjDl+BgHCTJmk
+	lJmQgnOAdhF5hc878zjo69U91ku2dVLWuXZNG9FSikzB/3bPnQzuFw/YDM9T
+X-Gm-Gg: ASbGncsJfUkNFq0ZdjQm0x3r6blxmRByNhDLRAIumifH915WzjpikR4P7gfYdBzv06e
+	7mb+prBNvHSVgOuygM1uRDdZq+KFSnzQ0REpsTbzoKFAcsAIKz7h5zXLvsnWcWYJIgaPds9MmxG
+	kW2wHickaKXNbWEI655oQVL9qUpGuu7Mq3G+G4wkT2H63dFDm+8tPTdASxlzACQEk82C/CIVABJ
+	aEMSTFtyQVdBUhF2GcSvU/11Wnhzjh6bcTT6uxBzJx8GUgrIctKXwnXTpta4CCrhgU6pRaG9fV/
+	+YjKihvpWgTBollNrN1wiCFIiUBNbNmJUL9Fxi5a9lTtN2VEr5+LvLJ7HTD4iS0kNHFX5RNx2Rf
+	jL1E=
+X-Google-Smtp-Source: AGHT+IFuNabeBCcYQ+k8DwvRGbG1CP7k3GBFsUA8uOozojZOERjbyOPYyKnT9LNty+fvxibMuH7RuA==
+X-Received: by 2002:a05:6122:3290:b0:523:e2bd:b937 with SMTP id 71dfb90a1353d-52c379c81efmr5047428e0c.3.1746690196861;
+        Thu, 08 May 2025 00:43:16 -0700 (PDT)
+Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com. [209.85.222.50])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-52ae401eecasm2886570e0c.19.2025.05.08.00.43.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 08 May 2025 00:43:16 -0700 (PDT)
+Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-879467794efso382550241.3;
+        Thu, 08 May 2025 00:43:16 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU7Vz1XAGrQv1uJDBQmuiC+8a4zmH2UIM5iYRqAiqSmgjG//hIGjrNJlDTlG8VPIxugygkNC55c4Fzc@vger.kernel.org, AJvYcCUCrZGYzpLmeT1xCqoxvrLsHzxOfFQiZ+KQwnb5n/7cS4afQuYDsrZP/aYboouZW+xLNo67KLzoWA5eN3pj@vger.kernel.org, AJvYcCWRWTNNKXwJqoadXi1otI7kHhGGXQQsaJf8SkBKePL7r0YwUmoincc6uslhG9RtFVsZqq1VVI1k@vger.kernel.org, AJvYcCXVHv3uje+4W2k0V0UDdXM5FiCvEMmwCny94d5HH5EdgNFUQxpzKuYksAifTbkKwYXtEWWgVjiDfP1A5J9Q4t+psU4=@vger.kernel.org
+X-Received: by 2002:a05:6102:334e:b0:4bb:623:e1f7 with SMTP id
+ ada2fe7eead31-4dc738955famr4431871137.16.1746690195810; Thu, 08 May 2025
+ 00:43:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250508045957.2823318-1-abhijit.gangurde@amd.com> <20250508045957.2823318-9-abhijit.gangurde@amd.com>
-In-Reply-To: <20250508045957.2823318-9-abhijit.gangurde@amd.com>
-From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Thu, 8 May 2025 13:06:47 +0530
-X-Gm-Features: ATxdqUGhazH4PlIoFulZVFyin8xyWDgso205DYpeeWHlQh8sghrJfFsB8Owk4B0
-Message-ID: <CAH-L+nM86KduwFfEUDdGOSx865Dq=YHaVfUZU8GRqb2C3tq7dQ@mail.gmail.com>
-Subject: Re: [PATCH v2 08/14] RDMA/ionic: Register auxiliary module for ionic
- ethernet adapter
-To: Abhijit Gangurde <abhijit.gangurde@amd.com>
-Cc: shannon.nelson@amd.com, brett.creeley@amd.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net, 
-	jgg@ziepe.ca, leon@kernel.org, andrew+netdev@lunn.ch, allen.hubbe@amd.com, 
-	nikhil.agarwal@amd.com, linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Andrew Boyer <andrew.boyer@amd.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000003f28d206349aead9"
-
---0000000000003f28d206349aead9
+References: <20250507173551.100280-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+In-Reply-To: <20250507173551.100280-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 8 May 2025 09:43:03 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdXDZhmo3n69rOxffkBfBTv4LCK+kSrxHsEPNXwvK4qWYQ@mail.gmail.com>
+X-Gm-Features: ATxdqUFoas8aJgrUByAlkGW74O02u3sZ5ocQGbHP-j-KPDbz6l1iLg3pGEPVMKU
+Message-ID: <CAMuHMdXDZhmo3n69rOxffkBfBTv4LCK+kSrxHsEPNXwvK4qWYQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] dt-bindings: net: renesas-gbeth: Add support for
+ RZ/V2N (R9A09G056) SoC
+To: Prabhakar <prabhakar.csengg@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Magnus Damm <magnus.damm@gmail.com>, netdev@vger.kernel.org, 
+	linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Biju Das <biju.das.jz@bp.renesas.com>, 
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 8, 2025 at 10:33=E2=80=AFAM Abhijit Gangurde
-<abhijit.gangurde@amd.com> wrote:
+On Wed, 7 May 2025 at 19:35, Prabhakar <prabhakar.csengg@gmail.com> wrote:
+> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 >
-> Register auxiliary module to create ibdevice for ionic
-> ethernet adapter.
+> Document support for the GBETH IP found on the Renesas RZ/V2N (R9A09G056)
+> SoC. The GBETH controller on the RZ/V2N SoC is functionally identical to
+> the one found on the RZ/V2H(P) (R9A09G057) SoC, so `renesas,rzv2h-gbeth`
+> will be used as a fallback compatible.
 >
-> Co-developed-by: Andrew Boyer <andrew.boyer@amd.com>
-> Signed-off-by: Andrew Boyer <andrew.boyer@amd.com>
-> Co-developed-by: Allen Hubbe <allen.hubbe@amd.com>
-> Signed-off-by: Allen Hubbe <allen.hubbe@amd.com>
-> Signed-off-by: Abhijit Gangurde <abhijit.gangurde@amd.com>
-> ---
-> v1->v2
->   - Removed netdev references from ionic RDMA driver
->   - Moved to ionic_lif* instead of void* to convey information between
->     aux devices and drivers.
->
->  drivers/infiniband/hw/ionic/ionic_ibdev.c   | 135 ++++++++++++++++++++
->  drivers/infiniband/hw/ionic/ionic_ibdev.h   |  21 +++
->  drivers/infiniband/hw/ionic/ionic_lif_cfg.c | 121 ++++++++++++++++++
->  drivers/infiniband/hw/ionic/ionic_lif_cfg.h |  65 ++++++++++
->  4 files changed, 342 insertions(+)
->  create mode 100644 drivers/infiniband/hw/ionic/ionic_ibdev.c
->  create mode 100644 drivers/infiniband/hw/ionic/ionic_ibdev.h
->  create mode 100644 drivers/infiniband/hw/ionic/ionic_lif_cfg.c
->  create mode 100644 drivers/infiniband/hw/ionic/ionic_lif_cfg.h
->
-> diff --git a/drivers/infiniband/hw/ionic/ionic_ibdev.c b/drivers/infiniba=
-nd/hw/ionic/ionic_ibdev.c
-> new file mode 100644
-> index 000000000000..ca047a789378
-> --- /dev/null
-> +++ b/drivers/infiniband/hw/ionic/ionic_ibdev.c
-> @@ -0,0 +1,135 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright (C) 2018-2025, Advanced Micro Devices, Inc. */
-> +
-> +#include <linux/module.h>
-> +#include <linux/printk.h>
-> +#include <net/addrconf.h>
-> +
-> +#include "ionic_ibdev.h"
-> +
-> +#define DRIVER_DESCRIPTION "AMD Pensando RoCE HCA driver"
-> +#define DEVICE_DESCRIPTION "AMD Pensando RoCE HCA"
-> +
-> +MODULE_AUTHOR("Allen Hubbe <allen.hubbe@amd.com>");
-> +MODULE_DESCRIPTION(DRIVER_DESCRIPTION);
-> +MODULE_LICENSE("GPL");
-> +MODULE_IMPORT_NS("NET_IONIC");
-> +
-> +static const struct auxiliary_device_id ionic_aux_id_table[] =3D {
-> +       { .name =3D "ionic.rdma", },
-> +       {},
-> +};
-> +
-> +MODULE_DEVICE_TABLE(auxiliary, ionic_aux_id_table);
-> +
-> +static void ionic_destroy_ibdev(struct ionic_ibdev *dev)
-> +{
-> +       ib_unregister_device(&dev->ibdev);
-> +       ib_dealloc_device(&dev->ibdev);
-> +}
-> +
-> +static struct ionic_ibdev *ionic_create_ibdev(struct ionic_aux_dev *ioni=
-c_adev)
-> +{
-> +       struct ib_device *ibdev;
-> +       struct ionic_ibdev *dev;
-> +       int rc;
-> +
-> +       rc =3D ionic_version_check(&ionic_adev->adev.dev, ionic_adev->lif=
-);
-> +       if (rc)
-> +               goto err_dev;
-You can return directly from here
-> +
-> +       dev =3D ib_alloc_device(ionic_ibdev, ibdev);
-> +       if (!dev) {
-> +               rc =3D -ENOMEM;
-> +               goto err_dev;
-You can return directly from here
-> +       }
-> +
-> +       ionic_fill_lif_cfg(ionic_adev->lif, &dev->lif_cfg);
-> +
-> +       ibdev =3D &dev->ibdev;
-> +       ibdev->dev.parent =3D dev->lif_cfg.hwdev;
-> +
-> +       strscpy(ibdev->name, "ionic_%d", IB_DEVICE_NAME_MAX);
-> +       strscpy(ibdev->node_desc, DEVICE_DESCRIPTION, IB_DEVICE_NODE_DESC=
-_MAX);
-> +
-> +       ibdev->node_type =3D RDMA_NODE_IB_CA;
-> +       ibdev->phys_port_cnt =3D 1;
-> +
-> +       /* the first two eq are reserved for async events */
-> +       ibdev->num_comp_vectors =3D dev->lif_cfg.eq_count - 2;
-> +
-> +       addrconf_ifid_eui48((u8 *)&ibdev->node_guid,
-> +                           ionic_lif_netdev(ionic_adev->lif));
-> +
-> +       rc =3D ib_device_set_netdev(ibdev, ionic_lif_netdev(ionic_adev->l=
-if), 1);
-> +       if (rc)
-> +               goto err_admin;
-> +
-> +       rc =3D ib_register_device(ibdev, "ionic_%d", ibdev->dev.parent);
-> +       if (rc)
-> +               goto err_register;
-> +
-> +       return dev;
-> +
-> +err_register:
-Unnecessary label
-> +err_admin:
-> +       ib_dealloc_device(&dev->ibdev);
-> +err_dev:
-> +       return ERR_PTR(rc);
-> +}
-> +
-> +static int ionic_aux_probe(struct auxiliary_device *adev,
-> +                          const struct auxiliary_device_id *id)
-> +{
-> +       struct ionic_aux_dev *ionic_adev;
-> +       struct ionic_ibdev *dev;
-> +
-> +       ionic_adev =3D container_of(adev, struct ionic_aux_dev, adev);
-> +       dev =3D ionic_create_ibdev(ionic_adev);
-> +       if (IS_ERR(dev))
-> +               return dev_err_probe(&adev->dev, PTR_ERR(dev),
-> +                                    "Failed to register ibdev\n");
-> +
-> +       auxiliary_set_drvdata(adev, dev);
-> +       ibdev_dbg(&dev->ibdev, "registered\n");
-> +
-> +       return 0;
-> +}
-> +
-> +static void ionic_aux_remove(struct auxiliary_device *adev)
-> +{
-> +       struct ionic_ibdev *dev =3D auxiliary_get_drvdata(adev);
-> +
-> +       dev_dbg(&adev->dev, "unregister ibdev\n");
-> +       ionic_destroy_ibdev(dev);
-> +       dev_dbg(&adev->dev, "unregistered\n");
-> +}
-> +
-> +static struct auxiliary_driver ionic_aux_r_driver =3D {
-> +       .name =3D "rdma",
-> +       .probe =3D ionic_aux_probe,
-> +       .remove =3D ionic_aux_remove,
-> +       .id_table =3D ionic_aux_id_table,
-> +};
-> +
-> +static int __init ionic_mod_init(void)
-> +{
-> +       int rc;
-> +
-> +       rc =3D auxiliary_driver_register(&ionic_aux_r_driver);
-> +       if (rc)
-> +               goto err_aux;
-> +
-> +       return 0;
-> +
-> +err_aux:
-> +       return rc;
-You can simplify this function as "return
-auxiliary_driver_register(&ionic_aux_r_driver);"
-> +}
-> +
-> +static void __exit ionic_mod_exit(void)
-> +{
-> +       auxiliary_driver_unregister(&ionic_aux_r_driver);
-> +}
-> +
-> +module_init(ionic_mod_init);
-> +module_exit(ionic_mod_exit);
-> diff --git a/drivers/infiniband/hw/ionic/ionic_ibdev.h b/drivers/infiniba=
-nd/hw/ionic/ionic_ibdev.h
-> new file mode 100644
-> index 000000000000..e13adff390d7
-> --- /dev/null
-> +++ b/drivers/infiniband/hw/ionic/ionic_ibdev.h
-> @@ -0,0 +1,21 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/* Copyright (C) 2018-2025, Advanced Micro Devices, Inc. */
-> +
-> +#ifndef _IONIC_IBDEV_H_
-> +#define _IONIC_IBDEV_H_
-> +
-> +#include <rdma/ib_verbs.h>
-> +#include <ionic_api.h>
-> +
-> +#include "ionic_lif_cfg.h"
-> +
-> +#define IONIC_MIN_RDMA_VERSION 0
-> +#define IONIC_MAX_RDMA_VERSION 2
-> +
-> +struct ionic_ibdev {
-> +       struct ib_device        ibdev;
-> +
-> +       struct ionic_lif_cfg    lif_cfg;
-> +};
-> +
-> +#endif /* _IONIC_IBDEV_H_ */
-> diff --git a/drivers/infiniband/hw/ionic/ionic_lif_cfg.c b/drivers/infini=
-band/hw/ionic/ionic_lif_cfg.c
-> new file mode 100644
-> index 000000000000..a02eb2f5bd45
-> --- /dev/null
-> +++ b/drivers/infiniband/hw/ionic/ionic_lif_cfg.c
-> @@ -0,0 +1,121 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright (C) 2018-2025, Advanced Micro Devices, Inc. */
-> +
-> +#include <linux/kernel.h>
-> +
-> +#include <ionic.h>
-> +#include <ionic_lif.h>
-> +
-> +#include "ionic_lif_cfg.h"
-> +
-> +#define IONIC_MIN_RDMA_VERSION 0
-> +#define IONIC_MAX_RDMA_VERSION 2
-> +
-> +static u8 ionic_get_expdb(struct ionic_lif *lif)
-> +{
-> +       u8 expdb_support =3D 0;
-> +
-> +       if (lif->ionic->idev.phy_cmb_expdb64_pages)
-> +               expdb_support |=3D IONIC_EXPDB_64B_WQE;
-> +       if (lif->ionic->idev.phy_cmb_expdb128_pages)
-> +               expdb_support |=3D IONIC_EXPDB_128B_WQE;
-> +       if (lif->ionic->idev.phy_cmb_expdb256_pages)
-> +               expdb_support |=3D IONIC_EXPDB_256B_WQE;
-> +       if (lif->ionic->idev.phy_cmb_expdb512_pages)
-> +               expdb_support |=3D IONIC_EXPDB_512B_WQE;
-> +
-> +       return expdb_support;
-> +}
-> +
-> +void ionic_fill_lif_cfg(struct ionic_lif *lif, struct ionic_lif_cfg *cfg=
-)
-> +{
-> +       union ionic_lif_identity *ident =3D &lif->ionic->ident.lif;
-> +
-> +       cfg->lif =3D lif;
-> +       cfg->hwdev =3D &lif->ionic->pdev->dev;
-> +       cfg->lif_index =3D lif->index;
-> +       cfg->lif_hw_index =3D lif->hw_index;
-> +
-> +       cfg->dbid =3D lif->kern_pid;
-> +       cfg->dbid_count =3D le32_to_cpu(lif->ionic->ident.dev.ndbpgs_per_=
-lif);
-> +       cfg->dbpage =3D lif->kern_dbpage;
-> +       cfg->intr_ctrl =3D lif->ionic->idev.intr_ctrl;
-> +
-> +       cfg->db_phys =3D lif->ionic->bars[IONIC_PCI_BAR_DBELL].bus_addr;
-> +
-> +       if (IONIC_VERSION(ident->rdma.version, ident->rdma.minor_version)=
- >=3D
-> +           IONIC_VERSION(2, 1))
-> +               cfg->page_size_supported =3D
-> +                   cpu_to_le64(ident->rdma.page_size_cap);
-> +       else
-> +               cfg->page_size_supported =3D IONIC_PAGE_SIZE_SUPPORTED;
-> +
-> +       cfg->rdma_version =3D ident->rdma.version;
-> +       cfg->qp_opcodes =3D ident->rdma.qp_opcodes;
-> +       cfg->admin_opcodes =3D ident->rdma.admin_opcodes;
-> +
-> +       cfg->stats_type =3D cpu_to_le16(ident->rdma.stats_type);
-> +       cfg->npts_per_lif =3D le32_to_cpu(ident->rdma.npts_per_lif);
-> +       cfg->nmrs_per_lif =3D le32_to_cpu(ident->rdma.nmrs_per_lif);
-> +       cfg->nahs_per_lif =3D le32_to_cpu(ident->rdma.nahs_per_lif);
-> +
-> +       cfg->aq_base =3D le32_to_cpu(ident->rdma.aq_qtype.qid_base);
-> +       cfg->cq_base =3D le32_to_cpu(ident->rdma.cq_qtype.qid_base);
-> +       cfg->eq_base =3D le32_to_cpu(ident->rdma.eq_qtype.qid_base);
-> +
-> +       /*
-> +        * ionic_create_rdma_admin() may reduce aq_count or eq_count if
-> +        * it is unable to allocate all that were requested.
-> +        * aq_count is tunable; see ionic_aq_count
-> +        * eq_count is tunable; see ionic_eq_count
-> +        */
-> +       cfg->aq_count =3D le32_to_cpu(ident->rdma.aq_qtype.qid_count);
-> +       cfg->eq_count =3D le32_to_cpu(ident->rdma.eq_qtype.qid_count);
-> +       cfg->cq_count =3D le32_to_cpu(ident->rdma.cq_qtype.qid_count);
-> +       cfg->qp_count =3D le32_to_cpu(ident->rdma.sq_qtype.qid_count);
-> +       cfg->dbid_count =3D le32_to_cpu(lif->ionic->ident.dev.ndbpgs_per_=
-lif);
-> +
-> +       cfg->aq_qtype =3D ident->rdma.aq_qtype.qtype;
-> +       cfg->sq_qtype =3D ident->rdma.sq_qtype.qtype;
-> +       cfg->rq_qtype =3D ident->rdma.rq_qtype.qtype;
-> +       cfg->cq_qtype =3D ident->rdma.cq_qtype.qtype;
-> +       cfg->eq_qtype =3D ident->rdma.eq_qtype.qtype;
-> +       cfg->udma_qgrp_shift =3D ident->rdma.udma_shift;
-> +       cfg->udma_count =3D 2;
-> +
-> +       cfg->max_stride =3D ident->rdma.max_stride;
-> +       cfg->expdb_mask =3D ionic_get_expdb(lif);
-> +
-> +       cfg->sq_expdb =3D
-> +           !!(lif->qtype_info[IONIC_QTYPE_TXQ].features & IONIC_QIDENT_F=
-_EXPDB);
-> +       cfg->rq_expdb =3D
-> +           !!(lif->qtype_info[IONIC_QTYPE_RXQ].features & IONIC_QIDENT_F=
-_EXPDB);
-> +}
-> +
-> +struct net_device *ionic_lif_netdev(struct ionic_lif *lif)
-> +{
-> +       return lif->netdev;
-> +}
-> +
-> +int ionic_version_check(const struct device *dev, struct ionic_lif *lif)
-> +{
-> +       union ionic_lif_identity *ident =3D &lif->ionic->ident.lif;
-> +       int rc;
-local variable "rc" is not needed here, you can return directly.
-> +
-> +       if (ident->rdma.version < IONIC_MIN_RDMA_VERSION ||
-> +           ident->rdma.version > IONIC_MAX_RDMA_VERSION) {
-> +               rc =3D -EINVAL;
-> +               dev_err_probe(dev, rc,
-> +                             "ionic_rdma: incompatible version, fw ver %=
-u\n",
-> +                             ident->rdma.version);
-> +               dev_err_probe(dev, rc,
-> +                             "ionic_rdma: Driver Min Version %u\n",
-> +                             IONIC_MIN_RDMA_VERSION);
-> +               dev_err_probe(dev, rc,
-> +                             "ionic_rdma: Driver Max Version %u\n",
-> +                             IONIC_MAX_RDMA_VERSION);
-> +               return rc;
-> +       }
-> +
-> +       return 0;
-> +}
-> diff --git a/drivers/infiniband/hw/ionic/ionic_lif_cfg.h b/drivers/infini=
-band/hw/ionic/ionic_lif_cfg.h
-> new file mode 100644
-> index 000000000000..b095637c54cf
-> --- /dev/null
-> +++ b/drivers/infiniband/hw/ionic/ionic_lif_cfg.h
-> @@ -0,0 +1,65 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/* Copyright (C) 2018-2025, Advanced Micro Devices, Inc. */
-> +
-> +#ifndef _IONIC_LIF_CFG_H_
-> +
-> +#define IONIC_VERSION(a, b) (((a) << 16) + ((b) << 8))
-> +#define IONIC_PAGE_SIZE_SUPPORTED      0x40201000 /* 4kb, 2Mb, 1Gb */
-> +
-> +#define IONIC_EXPDB_64B_WQE    BIT(0)
-> +#define IONIC_EXPDB_128B_WQE   BIT(1)
-> +#define IONIC_EXPDB_256B_WQE   BIT(2)
-> +#define IONIC_EXPDB_512B_WQE   BIT(3)
-> +
-> +struct ionic_lif_cfg {
-> +       struct device *hwdev;
-> +       struct ionic_lif *lif;
-> +
-> +       int lif_index;
-> +       int lif_hw_index;
-> +
-> +       u32 dbid;
-> +       int dbid_count;
-> +       u64 __iomem *dbpage;
-> +       struct ionic_intr __iomem *intr_ctrl;
-> +       phys_addr_t db_phys;
-> +
-> +       u64 page_size_supported;
-> +       u32 npts_per_lif;
-> +       u32 nmrs_per_lif;
-> +       u32 nahs_per_lif;
-> +
-> +       u32 aq_base;
-> +       u32 cq_base;
-> +       u32 eq_base;
-> +
-> +       int aq_count;
-> +       int eq_count;
-> +       int cq_count;
-> +       int qp_count;
-> +
-> +       u16 stats_type;
-> +       u8 aq_qtype;
-> +       u8 sq_qtype;
-> +       u8 rq_qtype;
-> +       u8 cq_qtype;
-> +       u8 eq_qtype;
-> +
-> +       u8 udma_count;
-> +       u8 udma_qgrp_shift;
-> +
-> +       u8 rdma_version;
-> +       u8 qp_opcodes;
-> +       u8 admin_opcodes;
-> +
-> +       u8 max_stride;
-> +       bool sq_expdb;
-> +       bool rq_expdb;
-> +       u8 expdb_mask;
-> +};
-> +
-> +int ionic_version_check(const struct device *dev, struct ionic_lif *lif)=
-;
-> +void ionic_fill_lif_cfg(struct ionic_lif *lif, struct ionic_lif_cfg *cfg=
-);
-> +struct net_device *ionic_lif_netdev(struct ionic_lif *lif);
-> +
-> +#endif /* _IONIC_LIF_CFG_H_ */
-> --
-> 2.34.1
->
->
+> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 
+LGTM (limited info in the hardware docs due to censoring)
+Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
---=20
-Regards,
-Kalesh AP
+Gr{oetje,eeting}s,
 
---0000000000003f28d206349aead9
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+                        Geert
 
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
-BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
-hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
-JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
-aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
-FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
-T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
-o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
-aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
-YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
-cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
-ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
-HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
-Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
-LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
-zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
-4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
-cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
-u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
-a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
-x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJgMIICXAIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
-VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
-bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcN
-AQkEMSIEIDgR1CvKUA/YJ9TaZgbXzZS0o/ciG1B2oj/8Su/KrNyBMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDUwODA3MzY1OVowXAYJKoZIhvcNAQkPMU8wTTAL
-BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBABk5PFg28mfGH4Yogmgxa1whmS1z
-GsieMJFtSKO3NPCYcTEfRrh/HvoXgxW+7cNtNO0fp3+MZe4Y8SSGeDza7VnvZyMQEQvKdue7pEw/
-PDFELuNUiqPDAQh/3n/R6kpTDECPQ2MV5IM7hRUgibfMQCyKBnCPrD9Ixdsto8Q3YX0k+JMDR1aN
-+Bm3G1dEI8P4/WgwpebdbuYRVTZNAjlWtfg+j8W32NnuFUXKBG9p7cP6qBreGkgGJjirV3d5Hieh
-IvkWILfMh2KymQelQB9abh2bVVWAbmkt+yG49Wx3CqXVeOll4KbLYip1reFPIBQAebv7YoZvfKcR
-DJAeDEy0hKo=
---0000000000003f28d206349aead9--
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
