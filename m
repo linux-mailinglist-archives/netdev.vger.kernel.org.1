@@ -1,124 +1,126 @@
-Return-Path: <netdev+bounces-189100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 144CEAB05E2
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 00:15:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5CD6AB05FC
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 00:33:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5DFC3A78B6
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 22:15:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A73309E53B6
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 22:33:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD8BD15624D;
-	Thu,  8 May 2025 22:15:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E59C223DE7;
+	Thu,  8 May 2025 22:33:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pnm/AbNs"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FSXIVHaI"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0357E1
-	for <netdev@vger.kernel.org>; Thu,  8 May 2025 22:15:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1F811AB52D;
+	Thu,  8 May 2025 22:33:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746742546; cv=none; b=rYnMgVNRXUaaptU/QjQG5mp7brdIV5QjYTSnMcms7NwGmYGkKdzg+wQeRCHK5QdwWYRtPzuMV2JaAAFAFCI7XYW8+G1d7hKOUY4z2U/r18xFEfrwIJ35uXDmxImmwAF7wLB8u4x9HRov5v8s3CyAaPm2/FnlVkbll8YyW+HGV2Y=
+	t=1746743598; cv=none; b=iUAA9gU2EzJRvMl0+X4P5NqPEwHvGVKT5hbB0FcAg4YxoAdCAQ4UoNotjF6Xa/qaGr90hvxsrXwZppEXZ+vsxFqFZoGtbIgyLR47QuZ9MSo+VTYFjHK3FxeEWH8i+xPDb7k2ug579ADACixEgQAMRmN5/ZhbEGq/cvUbx1gao34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746742546; c=relaxed/simple;
-	bh=h1gJmKSPX8Aqf4DE5miz7vFOkB0UzrYOWBn1TTkc6tY=;
+	s=arc-20240116; t=1746743598; c=relaxed/simple;
+	bh=Dy9dAmDEtYv1D1W6Os+Dt16ZXrkNQpIpd0MNSk4apV4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Pfiij4uBpSHmD+TREXXYubAO2yzlzC72DYbXakXT7YJy4nrPNoTLPRCBggxD93mCrmwEvAj35ilG42bOwkliUN/LG/oGy7p9U7QhFyijN8itOuXhIEpgX4sJIdXNxMdHnpOrmqXcAx/43BGB1rXyzGK8SqrxxUiRufNXfplbAXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pnm/AbNs; arc=none smtp.client-ip=95.215.58.187
+	 In-Reply-To:Content-Type; b=O7C1ydvh03rO9+bJBWt8LCW3r/sKn9ii2+ZPGPuUfrsbK3QWbNOe1cbkjVJJtcVhQ0O4Wy4B6OY8dvdm9zX90OgJZqZVs8YFoj/ZvNp5quorfUNTmLprlTz7hipLsjhB64dcoH8xfw8uJQ56iYrvI5xXonxWUyiJKoaUb2FfaIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FSXIVHaI; arc=none smtp.client-ip=91.218.175.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <904c9113-0b01-4b9d-995f-f2729426281e@linux.dev>
+Message-ID: <de814321-7ede-4325-be9e-3dd40be68391@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1746742542;
+	t=1746743590;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+qPlOIrbF6O7aqwbaQXtNOg0sgeetX70jL3/HgUCUYs=;
-	b=pnm/AbNskz79gn7Jtq+/4DiJrPRL1aVTE2j/xFucRrcf1uWwe2LXY+GODZ6FuwGHNbQuN8
-	bEfms0aWUHaFGxp1Y0rxvLw0GnXwuHlpfBJk+fuwtjF2dVzHqRf2FaTqFv9bx6TI9ajhiR
-	rIDR3NAuVJs+2A68FeEVzt2Vm8AE0y8=
-Date: Thu, 8 May 2025 23:15:30 +0100
+	bh=HV1W+KoOI60y8Ce+gIw6Y3x5sJ2+CPiqPPkkq5vBFig=;
+	b=FSXIVHaIvZLd/3dFmQP+DEjKwMczBbR7FVxNA0dt1iehlcJmWJTMeUWU2vV52R7ZjmXSi/
+	iZSiHbUXW/brHwj2ZaScr2boAQLjjy7IVhxH40k/jUPZy6464j5wWBzp43HORJSsyQAH/u
+	DYb9uje6klYkCpm74g+UuEhYvJAzkbI=
+Date: Thu, 8 May 2025 23:33:06 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next] net: dsa: convert to ndo_hwtstamp_get() and
- ndo_hwtstamp_set()
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, =?UTF-8?Q?K=C3=83=C2=B6ry_Maincent?=
- <kory.maincent@bootlin.com>, Kurt Kanzenbach <kurt@linutronix.de>,
- Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+Subject: Re: [PATCH net-next 1/3] net: cpsw: return proper RX timestamping
+ filter in cpsw_hwtstamp_get()
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
+Cc: =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ Andrew Lunn <andrew@lunn.ch>, Siddharth Vadapalli <s-vadapalli@ti.com>,
+ Roger Quadros <rogerq@kernel.org>, "David S. Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Woojung Huh <woojung.huh@microchip.com>,
- UNGLinuxDriver@microchip.com, Claudiu Manoil <claudiu.manoil@nxp.com>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Simon Horman <horms@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
- Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org
-References: <20250508095236.887789-1-vladimir.oltean@nxp.com>
- <21e9e805-1582-4960-8250-61fe47b2d0aa@linux.dev>
- <20250508204059.msdda5kll4s7coti@skbuf>
- <1aab25ca-aed5-4041-a42a-59922b909c02@linux.dev>
- <20250508205641.dsoksrasn4wicz76@skbuf>
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
+ linux-omap@vger.kernel.org
+References: <20250508194825.3058929-1-vladimir.oltean@nxp.com>
+ <20250508194825.3058929-2-vladimir.oltean@nxp.com>
 Content-Language: en-US
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250508205641.dsoksrasn4wicz76@skbuf>
+In-Reply-To: <20250508194825.3058929-2-vladimir.oltean@nxp.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
 
-On 08/05/2025 21:56, Vladimir Oltean wrote:
-> On Thu, May 08, 2025 at 09:48:40PM +0100, Vadim Fedorenko wrote:
->> On 08/05/2025 21:40, Vladimir Oltean wrote:
->>> On Thu, May 08, 2025 at 09:25:14PM +0100, Vadim Fedorenko wrote:
->>>> The new interface also supports providing error explanation via extack,
->>>> it would be great to add some error messages in case when setter fails.
->>>> For example, HIRSCHMANN HellCreek switch doesn't support disabling
->>>> of timestamps, it's not obvious from general -ERANGE error code, but can
->>>> be explained by the text in extack message.
->>>
->>> I wanted to keep the patches spartan and not lose track of the conversion
->>> subtleties in embelishments like extack messages which can be added later
->>> and do not require nearly as much attention to the flow before and after.
->>> I'm afraid if I say "yes" here to the request to add extack to hellcreek
->>> I'm opening the door to further requests to do that for other DSA drivers,
->>> and sadly I do not have infinite time to fulfill them. Plus, I would
->>> like to finalize the conversion tree-wide by the end of this development
->>> cycle.
->>>
->>> Even if I were to follow through with your request, I would do so in a
->>> separate patch. I've self-reviewed this patch prior to posting it, and I
->>> was already of the impression that it is pretty busy as it is.
->>
->> I agree that the patch is pretty busy, and the extack additions should
->> go into separate patch. The only thing which bothers me is that it may never
->> happen if it's not done with this patch.
-> 
-> That may well be. But look at it another way, I wrote this patch in July
-> 2023 and never got to upstream it, then Kory pinged me because it's
-> necessary to get rid of the old API. I don't want to go back and spend
-> time on extack messages when there's still a long way to go, and the
-> priority is obviously somewhere else. I've added this request to my
-> to-do list, and if I still have time at the end of all conversions, I'll
-> go through DSA drivers and see what can be improved.
-> 
->> Anyway, the conversion code looks good, so
->>
->> Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-> 
-> Thanks for the review, here and elsewhere. Do you want me to copy you on
-> the remaining conversions?
+On 08/05/2025 20:48, Vladimir Oltean wrote:
+> priv->rx_ts_enabled is a boolean variable (0 or 1). Overlapped over enum
+> hwtstamp_rx_filters, it makes cfg.rx_filter take the value of either
+> HWTSTAMP_FILTER_NONE (when 0) or HWTSTAMP_FILTER_ALL (when 1).
 
-Yes, please. I'm trying to follow all PTP-related things as it's my
-current focus.
+Hmm.. I have to disagree here. rx_ts_enabled is int, not bool:
 
-Thanks,
-Vadim
+struct cpsw_priv {
+         struct net_device               *ndev;
+         struct device                   *dev;
+         u32                             msg_enable;
+         u8                              mac_addr[ETH_ALEN];
+         bool                            rx_pause;
+         bool                            tx_pause;
+         bool                            mqprio_hw;
+         int                             fifo_bw[CPSW_TC_NUM];
+         int                             shp_cfg_speed;
+         int                             tx_ts_enabled;
+         int                             rx_ts_enabled;
+         struct bpf_prog                 *xdp_prog;
+	....
+
+
+And it's assigned a value of HWTSTAMP_FILTER_PTP_V2_EVENT in
+cpsw_hwtstamp_set(). Not sure this change is actually needed.
+
+> 
+> But this is inconsistent with what is returned in cpsw_hwtstamp_set().
+> There, HWTSTAMP_FILTER_ALL is refused (-ERANGE), and a subset of the RX
+> filters requestable by user space are all replaced with
+> HWTSTAMP_FILTER_PTP_V2_EVENT. So the driver should be reporting this
+> value during SIOCGHWTSTAMP as well.
+> 
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> ---
+>   drivers/net/ethernet/ti/cpsw_priv.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/ti/cpsw_priv.c b/drivers/net/ethernet/ti/cpsw_priv.c
+> index 6fe4edabba44..68d8f7ea0e44 100644
+> --- a/drivers/net/ethernet/ti/cpsw_priv.c
+> +++ b/drivers/net/ethernet/ti/cpsw_priv.c
+> @@ -687,7 +687,8 @@ static int cpsw_hwtstamp_get(struct net_device *dev, struct ifreq *ifr)
+>   
+>   	cfg.flags = 0;
+>   	cfg.tx_type = priv->tx_ts_enabled ? HWTSTAMP_TX_ON : HWTSTAMP_TX_OFF;
+> -	cfg.rx_filter = priv->rx_ts_enabled;
+> +	cfg.rx_filter = priv->rx_ts_enabled ? HWTSTAMP_FILTER_PTP_V2_EVENT :
+> +			HWTSTAMP_FILTER_NONE;
+>   
+>   	return copy_to_user(ifr->ifr_data, &cfg, sizeof(cfg)) ? -EFAULT : 0;
+>   }
+
 
