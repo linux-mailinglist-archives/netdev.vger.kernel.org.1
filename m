@@ -1,203 +1,116 @@
-Return-Path: <netdev+bounces-188931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 943CDAAF6F6
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 11:43:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65CEAAAF723
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 11:50:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A606A1C06BE8
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 09:44:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D703817CE0E
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 09:50:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CDB1264F86;
-	Thu,  8 May 2025 09:43:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C67021A434;
+	Thu,  8 May 2025 09:50:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="J+KqvhBk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PaD4TaOf"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABA6F263F4E;
-	Thu,  8 May 2025 09:43:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 576DE2165E2
+	for <netdev@vger.kernel.org>; Thu,  8 May 2025 09:49:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746697433; cv=none; b=dNxEqiAT+tMEZbpzl7N4QeqrDUGqGCWeRSeRd2hnfXfaofdTZ8BU4tEkXZfadwQG3k9rfLLguM4mJ6mKFzp3+E+uMQN4ht83D6ELagKsPuttAb5kMpCb99MXvG7cHlxbXkKpvG+vB/FaVwf+/BOglhQxNzG80qAUKzhhrVYbdcw=
+	t=1746697800; cv=none; b=dhGbqSa7jsDOve79n20OzygrGQmi0KeTlr+34awh8WVEQpHonFHLUCcarf1F9lYFXcA9wt8rZB2S0YpULxwEv2HkjwKB1lBSkCehej8FXfaGkmArHCOfJ9Cr+sm2942RXyp9I7tq9xQG/wSloBCUSQLRlMfaXEg+Ljoa12DIei4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746697433; c=relaxed/simple;
-	bh=H/WhQNKlzogJE4QdmSUmR0gkiVXIC0GbzPbzBw7pZ5k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SG4OsLfotsQplrwGWo2evWiQrAxULMo7X0qGDoTLnuxu1EGCbP+gRE0FfkEeR2875QvsZKSopQIoruMXJ2Ai/twRzLgddxuwvitlUCwtBUR/rQSCxl0wXwljCWRGRZLLDjSXZeZMDcMIc0r2J2hahdirBvjX5JiQqw4/BJvRDl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=J+KqvhBk; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id 382CD21199E0; Thu,  8 May 2025 02:43:51 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 382CD21199E0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1746697431;
-	bh=T55MVOVWe61rHi3lJfC1UHDy1Z+yOeyzZCnQiMX1Uo4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=J+KqvhBkERu+CQQma0RImBsW5LhVreeG9YYNffcEWSycBij+lh93WmlyNcF60pvxY
-	 5jBHglrAgT/MZ2QfE7n74bZ+Il6OEFOcm+jODe3kV8EbPDgU4U1/ggwjXDqA8w2hvf
-	 yulekqL+wc8ni0Xqki+vOAWIXEeX4rD6Ax8zRHSQ=
-Date: Thu, 8 May 2025 02:43:51 -0700
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	decui@microsoft.com, stephen@networkplumber.org, kys@microsoft.com,
-	paulros@microsoft.com, olaf@aepfle.de, vkuznets@redhat.com,
-	davem@davemloft.net, wei.liu@kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, leon@kernel.org,
-	longli@microsoft.com, ssengar@linux.microsoft.com,
-	linux-rdma@vger.kernel.org, daniel@iogearbox.net,
-	john.fastabend@gmail.com, bpf@vger.kernel.org, ast@kernel.org,
-	hawk@kernel.org, tglx@linutronix.de, andrew+netdev@lunn.ch,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: mana: Add handler for hardware servicing
- events
-Message-ID: <20250508094351.GA8528@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1746633519-17549-1-git-send-email-haiyangz@microsoft.com>
- <20250508092924.GA2081@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	s=arc-20240116; t=1746697800; c=relaxed/simple;
+	bh=vOtBj2Vnw5BDXga/uzONvGjiNLhJD/6z6u/T5IBQcG0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=CvPiJ42Up2y7aL3caPPOicv2nPzL2tJg/iMmH5XmMO2RsEZQwXHc8gPbMQ5xYpy/T2TukpY4+x/Aw9ijrJ7CmwJnizhjswqJxLC5qevfIwmCbX8cjVpGutQQ0R7sH1E4uCSX1JcYg/egZ542dDm/jdrUc++Yzqp3JHoOO3rUVBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PaD4TaOf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEDA8C4CEE7;
+	Thu,  8 May 2025 09:49:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746697799;
+	bh=vOtBj2Vnw5BDXga/uzONvGjiNLhJD/6z6u/T5IBQcG0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=PaD4TaOfZx5dp9OZQYQaZ7psH6sZs+HVyIqiNbgsCg4XVnwliIm2DSsvNmSYdm4CL
+	 xpEgdLErDjfoekvWydH3RcMlFEtH4KXKqAwL0NZHcM0pJY9hEu60IOlc3NyIxrOPxs
+	 dFkmeJiACdLmUQyw/KhHPNwb0G4sRr9b8yJp90iz4H+g0RNNYCeiAK0Sc/Ddg5l4md
+	 3d5UTvr+W2MSTqZV2vw8Fw8/yCr1EzoQ4zJOGCvwgGI6pqqfrKAjmW8PyU726AQLh5
+	 NMzty9ZIBD/HcCdlYgm12hY2frShMmMbaL2Dzi5Aq9/wNWCOpKfLNiRgTjlyuNG06+
+	 ZXCHiy5TTja7A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC5A380AA70;
+	Thu,  8 May 2025 09:50:39 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250508092924.GA2081@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Transfer-Encoding: 8bit
+Subject: Re: [net PATCH v2 0/8] fbnic: FW IPC Mailbox fixes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174669783849.2854047.4602231655832293886.git-patchwork-notify@kernel.org>
+Date: Thu, 08 May 2025 09:50:38 +0000
+References: <174654659243.499179.11194817277075480209.stgit@ahduyck-xeon-server.home.arpa>
+In-Reply-To: <174654659243.499179.11194817277075480209.stgit@ahduyck-xeon-server.home.arpa>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org
 
-On Thu, May 08, 2025 at 02:29:24AM -0700, Shradha Gupta wrote:
-> On Wed, May 07, 2025 at 08:58:39AM -0700, Haiyang Zhang wrote:
-> > To collaborate with hardware servicing events, upon receiving the special
-> > EQE notification from the HW channel, remove the devices on this bus.
-> > Then, after a waiting period based on the device specs, rescan the parent
-> > bus to recover the devices.
-> > 
-> > Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
-> > ---
-> >  .../net/ethernet/microsoft/mana/gdma_main.c   | 61 +++++++++++++++++++
-> >  include/net/mana/gdma.h                       |  5 +-
-> >  2 files changed, 65 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > index 4ffaf7588885..aa2ccf4d0ec6 100644
-> > --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > @@ -352,11 +352,52 @@ void mana_gd_ring_cq(struct gdma_queue *cq, u8 arm_bit)
-> >  }
-> >  EXPORT_SYMBOL_NS(mana_gd_ring_cq, "NET_MANA");
-> >  
-> > +#define MANA_SERVICE_PERIOD 10
-> > +
-> > +struct mana_serv_work {
-> > +	struct work_struct serv_work;
-> > +	struct pci_dev *pdev;
-> > +};
-> > +
-> > +static void mana_serv_func(struct work_struct *w)
-> > +{
-> > +	struct mana_serv_work *mns_wk = container_of(w, struct mana_serv_work, serv_work);
-> > +	struct pci_dev *pdev = mns_wk->pdev;
-> > +	struct pci_bus *bus, *parent;
-> > +
-> > +	if (!pdev)
-> > +		goto out;
-> > +
-> > +	bus = pdev->bus;
-> > +	if (!bus) {
-> > +		dev_err(&pdev->dev, "MANA service: no bus\n");
-> > +		goto out;
-> > +	}
-> > +
-> > +	parent = bus->parent;
-> > +	if (!parent) {
-> > +		dev_err(&pdev->dev, "MANA service: no parent bus\n");
-> > +		goto out;
-> > +	}
-> > +
-> > +	pci_stop_and_remove_bus_device_locked(bus->self);
-> > +
-> > +	msleep(MANA_SERVICE_PERIOD * 1000);
-> > +
-> > +	pci_lock_rescan_remove();
-> > +	pci_rescan_bus(parent);
-> > +	pci_unlock_rescan_remove();
-> > +
-> > +out:
-> > +	kfree(mns_wk);
-> 
-> Shouldn't gc->in_service be set to false again?
+Hello:
 
-ah, nevermind. That won't be needed. Thanks
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Tue, 06 May 2025 08:59:33 -0700 you wrote:
+> This series is meant to address a number of issues that have been found in
+> the FW IPC mailbox over the past several months.
 > 
-> > +}
-> > +
-> >  static void mana_gd_process_eqe(struct gdma_queue *eq)
-> >  {
-> >  	u32 head = eq->head % (eq->queue_size / GDMA_EQE_SIZE);
-> >  	struct gdma_context *gc = eq->gdma_dev->gdma_context;
-> >  	struct gdma_eqe *eq_eqe_ptr = eq->queue_mem_ptr;
-> > +	struct mana_serv_work *mns_wk;
-> >  	union gdma_eqe_info eqe_info;
-> >  	enum gdma_eqe_type type;
-> >  	struct gdma_event event;
-> > @@ -400,6 +441,26 @@ static void mana_gd_process_eqe(struct gdma_queue *eq)
-> >  		eq->eq.callback(eq->eq.context, eq, &event);
-> >  		break;
-> >  
-> > +	case GDMA_EQE_HWC_FPGA_RECONFIG:
-> > +	case GDMA_EQE_HWC_SOCMANA_CRASH:
+> The main issues addressed are:
+> 1. Resolve a potential race between host and FW during initialization that
+> can cause the FW to only have the lower 32b of an address.
+> 2. Block the FW from issuing DMA requests after we have closed the mailbox
+> and before we have started issuing requests on it.
+> 3. Fix races in the IRQ handlers that can cause the IRQ to unmask itself if
+> it is being processed while we are trying to disable it.
+> 4. Cleanup the Tx flush logic so that we actually lock down the Tx path
+> before we start flushing it instead of letting it free run while we are
+> shutting it down.
+> 5. Fix several memory leaks that could occur if we failed initialization.
+> 6. Cleanup the mailbox completion if we are flushing Tx since we are no
+> longer processing Rx.
+> 7. Move several allocations out of a potential IRQ/atomic context.
 > 
-> may be we also add a log(dev_dbg) to indicate if the servicing is for
-> FPGA reconfig or socmana crash.
-> 
-> > +		if (gc->in_service) {
-> > +			dev_info(gc->dev, "Already in service\n");
-> > +			break;
-> > +		}
-> > +
-> > +		mns_wk = kzalloc(sizeof(*mns_wk), GFP_ATOMIC);
-> > +		if (!mns_wk) {
-> > +			dev_err(gc->dev, "Fail to alloc mana_serv_work\n");
-> > +			break;
-> > +		}
-> > +
-> > +		dev_info(gc->dev, "Start MANA service\n");
-> > +		gc->in_service = true;
-> > +		mns_wk->pdev = to_pci_dev(gc->dev);
-> > +		INIT_WORK(&mns_wk->serv_work, mana_serv_func);
-> > +		schedule_work(&mns_wk->serv_work);
-> > +		break;
-> > +
-> >  	default:
-> >  		break;
-> >  	}
-> > diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-> > index 228603bf03f2..13cfbcf67815 100644
-> > --- a/include/net/mana/gdma.h
-> > +++ b/include/net/mana/gdma.h
-> > @@ -58,8 +58,9 @@ enum gdma_eqe_type {
-> >  	GDMA_EQE_HWC_INIT_EQ_ID_DB	= 129,
-> >  	GDMA_EQE_HWC_INIT_DATA		= 130,
-> >  	GDMA_EQE_HWC_INIT_DONE		= 131,
-> > -	GDMA_EQE_HWC_SOC_RECONFIG	= 132,
-> > +	GDMA_EQE_HWC_FPGA_RECONFIG	= 132,
-> >  	GDMA_EQE_HWC_SOC_RECONFIG_DATA	= 133,
-> > +	GDMA_EQE_HWC_SOCMANA_CRASH	= 135,
-> >  	GDMA_EQE_RNIC_QP_FATAL		= 176,
-> >  };
-> >  
-> > @@ -388,6 +389,8 @@ struct gdma_context {
-> >  	u32			test_event_eq_id;
-> >  
-> >  	bool			is_pf;
-> > +	bool			in_service;
-> > +
-> >  	phys_addr_t		bar0_pa;
-> >  	void __iomem		*bar0_va;
-> >  	void __iomem		*shm_base;
-> > -- 
-> > 2.34.1
+> [...]
+
+Here is the summary with links:
+  - [net,v2,1/8] fbnic: Fix initialization of mailbox descriptor rings
+    https://git.kernel.org/netdev/net/c/f34343cc11af
+  - [net,v2,2/8] fbnic: Gate AXI read/write enabling on FW mailbox
+    https://git.kernel.org/netdev/net/c/3b12f00ddd08
+  - [net,v2,3/8] fbnic: Add additional handling of IRQs
+    https://git.kernel.org/netdev/net/c/682a61281d10
+  - [net,v2,4/8] fbnic: Actually flush_tx instead of stalling out
+    https://git.kernel.org/netdev/net/c/0f9a959a0add
+  - [net,v2,5/8] fbnic: Cleanup handling of completions
+    https://git.kernel.org/netdev/net/c/cdbb2dc3996a
+  - [net,v2,6/8] fbnic: Improve responsiveness of fbnic_mbx_poll_tx_ready
+    https://git.kernel.org/netdev/net/c/ab064f600597
+  - [net,v2,7/8] fbnic: Pull fbnic_fw_xmit_cap_msg use out of interrupt context
+    https://git.kernel.org/netdev/net/c/1b34d1c1dc83
+  - [net,v2,8/8] fbnic: Do not allow mailbox to toggle to ready outside fbnic_mbx_poll_tx_ready
+    https://git.kernel.org/netdev/net/c/ce2fa1dba204
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
