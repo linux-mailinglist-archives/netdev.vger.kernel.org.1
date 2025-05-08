@@ -1,145 +1,222 @@
-Return-Path: <netdev+bounces-188892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABA6FAAF2C5
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 07:18:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E16ADAAF32D
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 07:52:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21B1F4A810F
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 05:18:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C1921C058E3
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 05:52:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BACA205AC1;
-	Thu,  8 May 2025 05:18:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF42E2153C7;
+	Thu,  8 May 2025 05:52:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="EmYmdajx"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="fOxb1Rzs"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CFBD86323
-	for <netdev@vger.kernel.org>; Thu,  8 May 2025 05:18:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00DD68C1E
+	for <netdev@vger.kernel.org>; Thu,  8 May 2025 05:52:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746681521; cv=none; b=s0xJMmML7yq++62c4a6nLNOp5CEKdafA5ZMcRobBILORGyVBid4Fs0M0e3WSEx7zn2/zxcUlkFxPIUH+D8Yc399uLy0QKQ3QPfewpSu7HrgU0UsOXqonYLORXcygamldu8LCZfS8V496tPDyx1IWUk5eaMOXhzjQC8xmxKBzXLg=
+	t=1746683548; cv=none; b=cG8VSpqJ6jFi6MsNJd7lUYh6RU0CEyn62T33/nTpH35dAgIFKIjCu0v3RwIgRvRWpCKW5WEvdFI90RZUBAd2+CfoQP7bLxrnDZxKy96dSumMglzFOpGgHKpVLs1LvAsdGcZXzlqzikhsOg05gI7MCxMrRojdh3u4NNWpQioWPWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746681521; c=relaxed/simple;
-	bh=QDmtF33IX1rswxe11r3HdSIjVhOQm88dBvSGNf7V/Hg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Lo4PBLhGhxBYQyAK6rlCdGM9veKGhDmelw3DY33d2J2EiC0nkwjnrVleIiBytRCxh2yldzu0BC4vcz/i9sVbgEfuhuUrY/msMbrffjrQHRubumcsF+v0Qv1a3PQinqZHmIVWzhY+l+STZ4ZbKoFwkk7OJYjXLCgDVPWO/NMZuN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=EmYmdajx; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+	s=arc-20240116; t=1746683548; c=relaxed/simple;
+	bh=Bdr0Y12g3c39kjcWKCc2YzMJ3H9Q6kgUJpj4VDFpyrY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=R1Ml+Tkj/I2NM1VAMP6K/yy8aYeaI7ZuLv9ilAWPU4zYNvvbRao6MqVXNnSgfry6COsESqA6+6CO97eZoyYPOZoBnMB0ija7W81lTInnhjq0qvDppX3WZhb1z/p7aVv6sFAcrz2F7iVtAUQ2nDqVxardWnpeQkVNE4ejYiUdk2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=fOxb1Rzs; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7369ce5d323so589795b3a.1
+        for <netdev@vger.kernel.org>; Wed, 07 May 2025 22:52:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1746681517;
-	bh=VjFq/n+F8OJWeyaEcotA5o0tCPu8V1Jf8iYVj8KWFDs=;
-	h=From:Date:Subject:To:Cc;
-	b=EmYmdajxl3QyFI5EbuDPKFAReZQxCHHn+DCyL1G0fnUz1rYl4/obKWgMY0adcBV5d
-	 4urqNlKh2Rw1vtnbkaxPpvu489ZzGCiT5XykDTHdLa5IPVCpCKG5s7slyfNTNrLarI
-	 LxrIr/w124VSQU4WQ1ku59VoURafl2uG8M2t3/mGhPUmuMe+11qcwQLDtlqJ1SScPT
-	 7PpnMa5dBLA2jj7F9AT9f5Sd2WoueQMCu4uEc+fErI97TAywaH5t/x1Hw4P9wRYJDK
-	 3a6F7VU4427J57JwP9yeec953e/UyWrZ4H8UMXWWYO2n9f7PLkplpStUBDuKE+XfCL
-	 Yu6+ThY+GT+sQ==
-Received: by codeconstruct.com.au (Postfix, from userid 10001)
-	id 53D637E97C; Thu,  8 May 2025 13:18:37 +0800 (AWST)
-From: Matt Johnston <matt@codeconstruct.com.au>
-Date: Thu, 08 May 2025 13:18:32 +0800
-Subject: [PATCH net v2] net: mctp: Don't access ifa_index when missing
+        d=cloudflare.com; s=google09082023; t=1746683546; x=1747288346; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=i96evhJ3L1i9OAU+AfaaUL87qGEjMeohLnza5fm08Wg=;
+        b=fOxb1Rzsxp+u1f29STC6FGnaeVCbF8GWYstGl6Kr2bvDwP8Tb6T36udDZulkmXbSex
+         DciRl0l2Qf1OgDdaFw7oBfMio7J+Eik++dMzzXWfJzPRoPo/7nySTN+OnZRVz29RUJR1
+         7pfCzBxRJ+IFRe/fhCrxuZOhetlZJSws2MBcSujN+hxptJOWdtPJCb73FSqus7rKHEZ5
+         OojjNOXZKwd+ymdNosQfjTOX4OTx5LzY1rgovcdPATQ1t9kkToxrn7/Mxv+WSC3tJD6X
+         II4EcPCc9HiC9CCqKAy6/p6XDa2w8X7KtyyYUSCP21LMQtzoiZe5f/AZf3YPQZ9RVCmp
+         D7TA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746683546; x=1747288346;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=i96evhJ3L1i9OAU+AfaaUL87qGEjMeohLnza5fm08Wg=;
+        b=Yd4oF6nqk1EemugT+LlORbP7ttFq6wCn0DWYAuCxdIjhyiyzJ947nU3YzV53BBLoKA
+         OY8crqqDyFOpDoLzTAJUiIee433l8YTOA+GN/qtgoscSY3kb/Q9kY98CN4CrkhSe693w
+         6fCi+Di/MHkveAKxCgVOk/Ex8kyptvmw+03WD/Em8oYQ0BpXyfSJp9VWgPazl+5pKdn7
+         z+rAv9iN/Niq/ACaK5UxD0WFEPi1EU7jgT12w6CvQmzF66BJHCDNiuRFEd3kKrGT3jOi
+         tZwvkVda6SWc/jOUbq15ySSq+jZ033TVy0js9zgWw7m3XkcRabsKm9/7soJS5ZOyrrLC
+         rs/w==
+X-Forwarded-Encrypted: i=1; AJvYcCVMHAvCG0Z3z3Py1zkQ5oYaQoPrunoRwJGUq5IyVIICX+t8mG8KAhFDPJvAStfa0j4cMJZqOTA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+jPs23WRR5S+fhVwy/0zzY7hvq0TpXCgtr/2rF055B3B8ES9i
+	ShXGAExeQY3XIb7CfimpgMIHATmeqjZskocADwAIcXf+PzUOxzKQ7Tc4eRnD4Hg=
+X-Gm-Gg: ASbGncvyr7mj9HjTpEon55UfNTOmcbv3YsEjW0KE3Tii1wlJnW/u2PyTmQfIyCQvg7G
+	189Xpg/oFCZtmdK4zQGacwBVeFmXP3KmFlcqx6x6kGjo9Bsmk2u5nsQ1ylwlvu+f95C8CoEdwWD
+	IveMofG9Ij2oQgcnwGbjptwHK5lgY4QQg1AFEAo1yfDAOwcNOCwvT/iD75lr3CUntMqIl4xIvWF
+	il5f9yZYEHVQnmo6K7eYAA6Rl8jMCkBVJtFgydJy+951a1XEdHRytUuFdVyeHwn4sJkJ+2xg4Ob
+	Oz2tBGRERJL8S2x5zRNLMfLHO/BtMXt91JFO0KriJqchM9wsHg==
+X-Google-Smtp-Source: AGHT+IGmwK30GKDHe76KfJPNmh+RRFgtlk9wRBYzR5kfcfKZL7Pabnt4BlHQN5A4h5RiewR3yM1+wQ==
+X-Received: by 2002:a05:6a00:428a:b0:740:6f69:f52a with SMTP id d2e1a72fcca58-740a98634bbmr3130848b3a.0.1746683546092;
+        Wed, 07 May 2025 22:52:26 -0700 (PDT)
+Received: from [127.0.0.1] ([104.28.205.247])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74058dbbb15sm12759071b3a.58.2025.05.07.22.52.24
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 07 May 2025 22:52:25 -0700 (PDT)
+Message-ID: <cf46f385-0e85-4b71-baad-3b88b1d49376@cloudflare.com>
+Date: Wed, 7 May 2025 22:51:47 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250508-mctp-addr-dump-v2-1-c8a53fd2dd66@codeconstruct.com.au>
-X-B4-Tracking: v=1; b=H4sIAKc+HGgC/3WNwQ6DIBBEf8XsuWtA2yqe+h+NB7qslYNAAE0b4
- 7+XeG/m9GYyMzskjpYTDNUOkTebrHcFmksFNGv3ZrSmMDSiuYkiXCgH1MZENOsS8N61LCZDXa+
- uUEoh8mQ/5+ATHGcYiznblH38niebPKN/e5tEiVqpTsh2UurVP8gbJu9SjivlmvxS6xXG4zh+7
- cdF3bwAAAA=
-X-Change-ID: 20250505-mctp-addr-dump-673e0fdc7894
-To: Jeremy Kerr <jk@codeconstruct.com.au>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, 
- syzbot+e76d52dadc089b9d197f@syzkaller.appspotmail.com, 
- syzbot+1065a199625a388fce60@syzkaller.appspotmail.com, 
- Matt Johnston <matt@codeconstruct.com.au>
-X-Mailer: b4 0.15-dev-cbbb4
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1746681516; l=2606;
- i=matt@codeconstruct.com.au; s=20241018; h=from:subject:message-id;
- bh=QDmtF33IX1rswxe11r3HdSIjVhOQm88dBvSGNf7V/Hg=;
- b=x/GNydGA51/AgTwrUGYeK8noExytrs1tfv9DFp7JB6GYNXvvisMPalsI7lM1cghfi2VMJyZfQ
- dC7Oro0TODMDwNil9iBH+H8YdodZN2Edt/By0STceGT7nWOc4enxoI/
-X-Developer-Key: i=matt@codeconstruct.com.au; a=ed25519;
- pk=exersTcCYD/pEBOzXGO6HkLd6kKXRuWxHhj+LXn3DYE=
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-net 0/3] Fix XDP loading on machines with many CPUs
+To: Michal Kubiak <michal.kubiak@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, maciej.fijalkowski@intel.com,
+ aleksander.lobakin@intel.com, przemyslaw.kitszel@intel.com,
+ dawid.osuchowski@linux.intel.com, jacob.e.keller@intel.com,
+ netdev@vger.kernel.org, kernel-team@cloudflare.com
+References: <20250422153659.284868-1-michal.kubiak@intel.com>
+ <b36a7cb6-582b-422d-82ce-98dc8985fd0d@cloudflare.com>
+ <aBsTO4_LZoNniFS5@localhost.localdomain>
+Content-Language: en-US
+From: Jesse Brandeburg <jbrandeburg@cloudflare.com>
+In-Reply-To: <aBsTO4_LZoNniFS5@localhost.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-In mctp_dump_addrinfo, ifa_index can be used to filter interfaces, but
-only when the struct ifaddrmsg is provided. Otherwise it will be
-comparing to uninitialised memory - reproducible in the syzkaller case from
-dhcpd, or busybox "ip addr show".
+On 5/7/25 1:00 AM, Michal Kubiak wrote:
+> On Tue, May 06, 2025 at 10:31:59PM -0700, Jesse Brandeburg wrote:
+>> On 4/22/25 8:36 AM, Michal Kubiak wrote:
+>>> Hi,
+>>>
+>>> Some of our customers have reported a crash problem when trying to load
+>>> the XDP program on machines with a large number of CPU cores. After
+>>> extensive debugging, it became clear that the root cause of the problem
+>>> lies in the Tx scheduler implementation, which does not seem to be able
+>>> to handle the creation of a large number of Tx queues (even though this
+>>> number does not exceed the number of available queues reported by the
+>>> FW).
+>>> This series addresses this problem.
+>>
+>> Hi Michal,
+>>
+>> Unfortunately this version of the series seems to reintroduce the original
+>> problem error: -22.
+> Hi Jesse,
+>
+> Thanks for testing and reporting!
+>
+> I will take a look at the problem and try to reproduce it locally. I would also
+> have a few questions inline.
+>
+> First, was your original problem not the failure with error: -5? Or did you have
+> both (-5 and -22), depending on the scenario/environment?
+> I am asking because it seems that these two errors occurred at different
+> initialization stages of the tx scheduler. Of course, the series
+> was intended to address both of these issues.
 
-The kernel MCTP implementation has always filtered by ifa_index, so
-existing userspace programs expecting to dump MCTP addresses must
-already be passing a valid ifa_index value (either 0 or a real index).
 
-BUG: KMSAN: uninit-value in mctp_dump_addrinfo+0x208/0xac0 net/mctp/device.c:128
- mctp_dump_addrinfo+0x208/0xac0 net/mctp/device.c:128
- rtnl_dump_all+0x3ec/0x5b0 net/core/rtnetlink.c:4380
- rtnl_dumpit+0xd5/0x2f0 net/core/rtnetlink.c:6824
- netlink_dump+0x97b/0x1690 net/netlink/af_netlink.c:2309
+We had a few issues to work through, I believe the original problem we 
+had was -22 (just confirmed) with more than 320 CPUs.
 
-Fixes: 583be982d934 ("mctp: Add device handling and netlink interface")
-Reported-by: syzbot+e76d52dadc089b9d197f@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/68135815.050a0220.3a872c.000e.GAE@google.com/
-Reported-by: syzbot+1065a199625a388fce60@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/681357d6.050a0220.14dd7d.000d.GAE@google.com/
-Signed-off-by: Matt Johnston <matt@codeconstruct.com.au>
----
-Changes in v2:
-- Don't test for ifa_family=AF_MCTP
-- Fail if strict_check is set and header is short
-- Link to v1: https://lore.kernel.org/r/20250505-mctp-addr-dump-v1-1-a997013f99b8@codeconstruct.com.au
----
- net/mctp/device.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+>> I double checked the patches, they looked like they were applied in our test
+>> version 2025.5.8 build which contained a 6.12.26 kernel with this series
+>> applied (all 3)
+>>
+>> Our setup is saying max 252 combined queues, but running 384 CPUs by
+>> default, loads an XDP program, then reduces the number of queues using
+>> ethtool, to 192. After that we get the error -22 and link is down.
+>>
+> To be honest, I did not test the scenario in which the number of queues is
+> reduced while the XDP program is running. This is the first thing I will check.
 
-diff --git a/net/mctp/device.c b/net/mctp/device.c
-index 8e0724c56723de328592bfe5c6fc8085cd3102fe..7c0dcf3df3196207af6e1a1c002f388265c49fa1 100644
---- a/net/mctp/device.c
-+++ b/net/mctp/device.c
-@@ -117,11 +117,18 @@ static int mctp_dump_addrinfo(struct sk_buff *skb, struct netlink_callback *cb)
- 	struct net_device *dev;
- 	struct ifaddrmsg *hdr;
- 	struct mctp_dev *mdev;
--	int ifindex, rc;
-+	int ifindex = 0, rc;
- 
--	hdr = nlmsg_data(cb->nlh);
--	// filter by ifindex if requested
--	ifindex = hdr->ifa_index;
-+	/* Filter by ifindex if a header is provided */
-+	if (cb->nlh->nlmsg_len >= nlmsg_msg_size(sizeof(*hdr))) {
-+		hdr = nlmsg_data(cb->nlh);
-+		ifindex = hdr->ifa_index;
-+	} else {
-+		if (cb->strict_check) {
-+			NL_SET_ERR_MSG(cb->extack, "mctp: Invalid header for addr dump request");
-+			return -EINVAL;
-+		}
-+	}
- 
- 	rcu_read_lock();
- 	for_each_netdev_dump(net, dev, mcb->ifindex) {
+Cool, I hope it will help your repro, but see below.
 
----
-base-commit: ebd297a2affadb6f6f4d2e5d975c1eda18ac762d
-change-id: 20250505-mctp-addr-dump-673e0fdc7894
+> Can you please confirm that you did that step on both the current
+> and the draft version of the series?
+> It would also be interesting to check what happens if the queue number is reduced
+> before loading the XDP program.
 
-Best regards,
--- 
-Matt Johnston <matt@codeconstruct.com.au>
+We noticed we had a difference in the testing of draft and current. We 
+have a patch against the kernel that was helping us work around this 
+issue, which looked like this:
+
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_irq.c 
+b/drivers/net/ethernet/intel/ice/ice_irq.c
+index ad82ff7d1995..622d409efbce 100644
+--- a/drivers/net/ethernet/intel/ice/ice_irq.c
++++ b/drivers/net/ethernet/intel/ice/ice_irq.c
+@@ -126,6 +126,10 @@ static void ice_reduce_msix_usage(struct ice_pf 
+*pf, int v_remain)
+      }
+  }
+
++static int num_msix = -1;
++module_param(num_msix, int, 0644);
++MODULE_PARM_DESC(num_msix, "Default limit of MSI-X vectors for LAN");
++
+  /**
+   * ice_ena_msix_range - Request a range of MSIX vectors from the OS
+   * @pf: board private structure
+@@ -156,7 +160,16 @@ static int ice_ena_msix_range(struct ice_pf *pf)
+      v_wanted = v_other;
+
+      /* LAN traffic */
+-    pf->num_lan_msix = num_cpus;
++    /* Cloudflare: allocate the msix vector count based on module param
++     * num_msix. Alternately, default to half the number of CPUs or 128,
++     * whichever is smallest, and should the number of CPUs be 2, 1, or
++     * 0, then default to 2 vectors
++     */
++    if (num_msix != -1)
++        pf->num_lan_msix = num_msix;
++    else
++        pf->num_lan_msix = min_t(u16, (num_cpus / 2) ?: 2, 128);
++
+      v_wanted += pf->num_lan_msix;
+
+      /* RDMA auxiliary driver */
+
+
+The module parameter helped us limit the number of vectors, which 
+allowed our machines to finish booting before your new patches were 
+available.
+
+The failure of the new patch was when this value was set to 252, and the 
+"draft" patch also fails in this configuration (this is new info from today)
+
+
+>> The original version you had sent us was working fine when we tested it, so
+>> the problem seems to be between those two versions. I suppose it could be
+So the problem is also related to the inital number of queues the driver 
+starts with. When we
+>> possible (but unlikely because I used git to apply the patches) that there
+>> was something wrong with the source code, but I sincerely doubt it as the
+>> patches had applied cleanly.
+The reason it worked fine was we tested "draft" (and now the new patches 
+too) with the module parameter set to 384 queues (with 384 CPUs), or 
+letting it default to 128 queues, both worked with the new and old 
+series. 252 seems to be some magic failure causing number with both 
+patches, we don't know why.
+
+
+Thanks for your patience while we worked through the testing differences 
+here today. Hope this helps and let me know if you have more questions.
+
+
+Jesse
 
 
