@@ -1,161 +1,281 @@
-Return-Path: <netdev+bounces-188918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B97BAAF5E9
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 10:41:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C405AAF5F3
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 10:45:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03CF816EDE8
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 08:41:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A3B93AF29F
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 08:45:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13FBE2222BD;
-	Thu,  8 May 2025 08:41:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FD43214A7F;
+	Thu,  8 May 2025 08:45:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="USdIOoaw"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="p0+k2Suq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2064.outbound.protection.outlook.com [40.107.94.64])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8206215748F
-	for <netdev@vger.kernel.org>; Thu,  8 May 2025 08:41:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746693685; cv=none; b=LXveIPWLTRhS5M2akKySLK1hP8c864FfSEmbLthIUiEN/dIRzEM6LCMWQm8hTe6UUfEdwUjxZlZ3nUX9m+VbFUysstJlYys6um9cosJY5bAXM0Iw6kjWfHfjEz3o4p+rRLYZPIU10/jiDCkFufpwf5FtrTesfRAkUiOcRdXJZyc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746693685; c=relaxed/simple;
-	bh=1u+85/yQCaFAql4dv+UvGPvxmyVDFWnbqdq21xRso1k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dIU215QMpR6DpTn7bl629AVrqHpSYym/RpZUpwP5SnvkcF56Qi7h+Nd0jLy3xGxxY4Eqo+6PIyLU37YMnd/+J5DMAPiS9z3X+j+i1q2l+L5mPAKapo2A1xzNwpQhHshIphqEgUgOUWvlBFNVpOg0eoP16Hx5dK8S9sNcug4M4B0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=USdIOoaw; arc=none smtp.client-ip=209.85.166.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3d91db4f0c3so3728115ab.3
-        for <netdev@vger.kernel.org>; Thu, 08 May 2025 01:41:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746693682; x=1747298482; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=06V0SS4xl9NrencCcbDKamANFiU6WEUFYCHR8UmLwS0=;
-        b=USdIOoawzcu6H3RaIjJqghFbHcLlOdWVW8FAO/uYUfCqn0B5jDNF5fH5UCEe3T92N0
-         b7eofl/1pBpwTVKbcEvyJFsDm2kzNFZNVCcVwKdDVKDqPSZK54m/f4BqKd64ZwHDv5Lt
-         C5zRtHP2uCUagVYakvjsrWak19PWJuiUrVCS03QSIuceXzRK5PcdVSKUXrH6wCMoyGHi
-         i9plsbi5+UW3VMlkDUMVuW9qwnT18JXg5accWOfL2/proS4exn8DeGV23RZLYP+3kPWW
-         efHSOJwz/CQQt0vEodYcf5Q3rRQmTxFhxQPIf2fsKDvaNmUbqULfQBYmB6XphM2E16gZ
-         x0Pg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746693682; x=1747298482;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=06V0SS4xl9NrencCcbDKamANFiU6WEUFYCHR8UmLwS0=;
-        b=ZZSdrsgPiEOLff5LhX2hL8dcW0DYeUExPNiCPp4kXSUYURZn4zHCiV1yh8DW1q/WV8
-         4SKDyyy/50MW8AuZxT8cD/aWsnUWxk/lKeIb2tU1TcgbwCIxly7r5BAA2SEUNMK3unOw
-         3DXdMwPyjLcN9+mjn3IitRZ9C/UgCmrDK/oIPn5+4rt29qKFfcIsnqEz+21zNLMyY6HY
-         p6UsJCRXB8+dr7kV0SINMwt6g3PxOx6Ai8SeOPymO/jFZNbGqW53HamYIooTC0vF8g1j
-         jcD9i1RZTOms+KOnK/lTwZU0S6eQndhha0nknM4OU4YUFkDUG2y041F6ml1ScUxvu9kB
-         d+Rg==
-X-Forwarded-Encrypted: i=1; AJvYcCWli61F4db/aXj8a5rU5pDJk6PZHbI/Ua8Pw6lBraP3JqisC84aqU6z+1oucxhwJwnHBibAckk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPET7SBpS2gM7O9FzQGwwh04oUdH95YqXxt+VDPlOHj448z1s4
-	LusWHEYWBUbweVrCe17XgnFXLEMQ7dDQPmWpKgAQjTBsTbCUI0QregKv3S43p1kRkjbw21qMG8L
-	w+IkR5/dxxo2PGfrD6AONlLWiuro=
-X-Gm-Gg: ASbGnctJzzbYbaqpum5+LjAob7BMGfykeqzVAnb+JpKCdqjb7G+t8w5ZLC/VLOnzU9F
-	89L+zUaQq+Rsqvg0cRkgGFDdCYu+PQqVWcYQlQ9AxJtfcIX7OR36QwwXNt1pajwiVPiS1g0yt3h
-	5u+zkZGaya85nyLAy/ICY+bg==
-X-Google-Smtp-Source: AGHT+IEmLMp/D0QNJevDYMLRMp0mBTWELujqPt8xXnR9sEVc1PByWElS1L80M8Da1ScWVQSTQUb1nxbOD2vClVz1m7w=
-X-Received: by 2002:a92:cdaf:0:b0:3d8:975:b825 with SMTP id
- e9e14a558f8ab-3da738d5b28mr76314015ab.5.1746693682592; Thu, 08 May 2025
- 01:41:22 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65E471CB31D;
+	Thu,  8 May 2025 08:45:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.64
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746693924; cv=fail; b=YlX4++WpNMxLwH+1UksTbG3xSofOzciJZzX7qVYpv4zNr4VK2RUsOHJynYoKvNbGkVPOzKrpWlJZf7kY9YbOd2EHboBUPJgjzDnRCWpet45ZoMkwD2yu/adQExgAI283PetkMYP2oDpjmN/KgPBjR1juzRPb73B4fAuxnY9aq+o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746693924; c=relaxed/simple;
+	bh=OafJ7131loMDRin2T4IAtVJBzggHZAvc0Nh9qKoF7fE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=u/0PvAJOtDBBsM7dzM3vNRG8w4J2D2vtuo0AXMCixsXM8XeSIHUR3BJTeIXjlO7y0d36PKz3rVcFvrGnPAuvxDLCNxEQt+EyM04D1xU2bKr1NcynMGsXDWsUNMBffIG3UeAt/N/1Vb05KI25b9gOdTnIaoHafad3ORFYaqSBsnI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=p0+k2Suq; arc=fail smtp.client-ip=40.107.94.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=J49opGJs0IOWNhKtPhC76MChcrqpO2+qNMfjlkCn5tGi/bpHItLKiypvcxHOuKSZDkc3TYUS8cRcKmqCNWh+01p2UG+dyvkE9mHgn3B7NymtbUFYOm7rD2qVM57MpvwTC/nL1oO4r9vufBbh1ROGzKBOccxRoZKv/ws4oa2TFQ0M++20WBxBJEmMl5w2MEUSPs1p+wQabfP9tVlOQshijJyc5it4lijTm7rfeVH0lg+A2Wg0Ne9hKqfW+REZSs1QOcRoKWJltwcqzdpNgy1JRet67XjjYDD7uApzymWapGw6tI4t8LxUpvXtsz97H6/J21WeaUhALN9Y+bB3n7A9MQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4Uoa4J4Q26Vv2zK2ZuNwGAnSlcPd9GoYwOlYzdm+KM4=;
+ b=Lrd3GQnjCB4TAFdn7DttM992BeyMuqfICe8f9Ehji05IX8GqNuJDU/H+vLdQ308tRRuzBBgWE5+GxNV093njK8zPZDBDCwM6OShculvDrEovfbFdu/+6f45hMhxRDJGr05gxHCW4YKshiK/9qFfp/3IXDGyRje0QAsjhQw1qY/+nuWmlBNAC4ZKuligz86Aua2DGfHRTpnF24lRYF6SvzQ0Ip6B7qf7ktqbftLVgV4Rq7QmrcQiXqp3uWoXfHkcT7lGjJO1u3ET3OMuPPtcm7Srqikx89CMsW/wnrdj+qV3/nKQayevHDOJWHRDUIkEK/7To6Ojlfgf0V6ol+/DjRw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4Uoa4J4Q26Vv2zK2ZuNwGAnSlcPd9GoYwOlYzdm+KM4=;
+ b=p0+k2SuqS7M3vuKUD3IFoN+uQ7lZeapUMaokVzJN79yMkmUTPm/XuMqdSteHK0VOONFtXYGH38A8ccnrHTZd8SegV9GVYyh+gbxaI2mCUmmcemrQ9QAi0J8PKG2Ugl3M5xO2RGqlIiVxRpTMtAaEZ8XY0Gbo15zZhKKgmnTXdj7P/kYbOR7xpns+naTsSWXxEgtYLViwJkuh7AIUxmEkpvm9tiEzYkDT/j2nBV1hJFir2urOSFyysU9a8o57Y4jKsoVvwrYnomfNwyTD5xe054EP6TGOG3dKMFo4p+0uiB7dUkIQ1SG7fC7NFG4Lo7B5bBoPaZ6WxI3NbEfocflAvQ==
+Received: from MN2PR08CA0015.namprd08.prod.outlook.com (2603:10b6:208:239::20)
+ by SA0PR12MB7074.namprd12.prod.outlook.com (2603:10b6:806:2d5::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.31; Thu, 8 May
+ 2025 08:45:18 +0000
+Received: from MN1PEPF0000ECD4.namprd02.prod.outlook.com
+ (2603:10b6:208:239:cafe::87) by MN2PR08CA0015.outlook.office365.com
+ (2603:10b6:208:239::20) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8722.21 via Frontend Transport; Thu,
+ 8 May 2025 08:45:18 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ MN1PEPF0000ECD4.mail.protection.outlook.com (10.167.242.132) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8722.18 via Frontend Transport; Thu, 8 May 2025 08:45:17 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 8 May 2025
+ 01:45:00 -0700
+Received: from c-237-113-240-247.mtl.labs.mlnx (10.126.230.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Thu, 8 May 2025 01:44:56 -0700
+From: Cosmin Ratiu <cratiu@nvidia.com>
+To: <netdev@vger.kernel.org>, <cratiu@nvidia.com>
+CC: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
+	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>, Joe Damato
+	<jdamato@fastly.com>, Shuah Khan <shuah@kernel.org>, Stanislav Fomichev
+	<sdf@fomichev.me>, Mina Almasry <almasrymina@google.com>, Saeed Mahameed
+	<saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Dragos Tatulea
+	<dtatulea@nvidia.com>, <linux-kselftest@vger.kernel.org>
+Subject: [PATCH net v2] tests/ncdevmem: Fix double-free of queue array
+Date: Thu, 8 May 2025 11:44:34 +0300
+Message-ID: <20250508084434.1933069-1-cratiu@nvidia.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250508033328.12507-1-kerneljasonxing@gmail.com>
- <20250508033328.12507-5-kerneljasonxing@gmail.com> <20250508070700.m3bufh2q4v4llbfx@DEN-DL-M31836.microchip.com>
-In-Reply-To: <20250508070700.m3bufh2q4v4llbfx@DEN-DL-M31836.microchip.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 8 May 2025 16:40:45 +0800
-X-Gm-Features: ATxdqUEcxKj-NjeNAJFeUmwL48LxaGkk92YGikxUXT0m3HVba_HcMEWlVXVCuUY
-Message-ID: <CAL+tcoCuvxfQUbzjSfk+7vPWLEqQgVK8muqkOQe+N6jQQwXfUw@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 4/4] net: lan966x: generate software timestamp
- just before the doorbell
-To: Horatiu Vultur <horatiu.vultur@microchip.com>
-Cc: irusskikh@marvell.com, andrew+netdev@lunn.ch, bharat@chelsio.com, 
-	ayush.sawal@chelsio.com, UNGLinuxDriver@microchip.com, 
-	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	sgoutham@marvell.com, willemb@google.com, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECD4:EE_|SA0PR12MB7074:EE_
+X-MS-Office365-Filtering-Correlation-Id: 14dad2dd-179a-4422-eb6a-08dd8e0ca8ef
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|82310400026|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?kl41C6Vkz4EirBYxR86lFUdukPptzxYRryGTns7NuYn9bH8MTgpbMJJqwnoa?=
+ =?us-ascii?Q?7pn+FSBvw7rXX1rzzyeXMG0jsk3IaqvGObTUiLkqx5+1DnBEWGXJ+zld0SlV?=
+ =?us-ascii?Q?R8d36n3b1GQByH3eCTHwOMraq9LcskvurHiBL8IbRmV/GEMPQuuDSYSj1G54?=
+ =?us-ascii?Q?l12oek1VZVjTpNzUQuBP+M7CFV7RTl0OC9RcKmJfGf9WWD/EDmwFD2sIKdxj?=
+ =?us-ascii?Q?AKyfJZX12lgvc0w+LEJbjET4CaEU9q1bOeNGzn2hCem6d6Woa9Eu8fWgYQyK?=
+ =?us-ascii?Q?OaiVmPMYiH2pTNyHBdlWYcnea03WDQAcBaePlJCOSN9V5dbXzL6dSWPXfa5h?=
+ =?us-ascii?Q?AHSwUqbzfNV39o6akDclvR1BMgjOSh6RTTjLsZaO6UkBXZGSDUrpqPpl744f?=
+ =?us-ascii?Q?u1vnWN083nELcp0cc9E22bJ/DZi6SHOL16q0ZDbDh41cXqa0RVJQu4qKDP1q?=
+ =?us-ascii?Q?Alw17Eba/bNlHwYM+n2RAujI6hwWAcGf7HoVp6OB9coiiIVsswzi+Hwvc8za?=
+ =?us-ascii?Q?p7v2W8yTjaFkJyZ8Vv7FlNvuXl6xP/kXXtcGaFneHswc3z7LIANkplu7+xzR?=
+ =?us-ascii?Q?HPoHDMt5nJmcAo28j6qjbxfUngH+TmHfnGgNtP7LmHECN+F8X0rjiF4N078O?=
+ =?us-ascii?Q?ihubUoBwFYbAoBADXLm2oj9sQ98JHTrSxpMqVrd3lDid7CLyRaltyQYm5KnN?=
+ =?us-ascii?Q?P8ck9WUZozUFOFkFKQqmk5gkkrGvf430J+frKTOUpWFDhvJOv+FnL/93lqtV?=
+ =?us-ascii?Q?Pg85MeN0ZoDfLwzZlrKJvPuRKuIAHEj1RkT5vbWpXKYabCIHPfqc81KUml68?=
+ =?us-ascii?Q?TSB8jX8VfNDMozrLJjuRgciILASfAtC1HRSPC+szcn1VjAKLQjwMiHOrgMI6?=
+ =?us-ascii?Q?OsQ+MBMcj4ZduIrKmE79yrLw6DsMiZajUr9ynJEWKHqf0IwtYPkbdCjAlrol?=
+ =?us-ascii?Q?5koWeocyoaWTggjtnHibllARl33yDOc7+l/SKiBVmZI6RbJaLCrXJ3qEjQ7i?=
+ =?us-ascii?Q?8L7ysvv1tt7vg7O7dvTHquEeADRi3wmeuK73uTVQNs8mpgs9OP7uvtHQOH4D?=
+ =?us-ascii?Q?saUmcRXJPd2vT4HIXvtzrXt3IDMLIKM8Upnc9CvqqVsA8NCjM9JcDN5KrsKz?=
+ =?us-ascii?Q?p+SZHzKu7ZtNRYqON72NI08Nv1NFJFA+YAkCyzEiQWeZWCVOcv7h5vZifjgW?=
+ =?us-ascii?Q?bYp2XRhS/nwzQQmSfX386NRbO4mumvvFYlwVQFCBSNg4e1g0aZYlVdqdROcU?=
+ =?us-ascii?Q?5gg7ySIxIfrww0L3PSaO9BrCBzwbTB2uESGqtUo9wdsX0AyjXdQmtdNe5yTe?=
+ =?us-ascii?Q?aOMA0IR3kaykEEjhgt4TLVtsZYfwJ+NJEwYcCvIBoYMOyuzXW5mQum8hsPhD?=
+ =?us-ascii?Q?nH5vepyCiYvy/iN4HptZPC1mTeQsUjIHGlK49ME5JrJwlm/g63o9uSYu+S3I?=
+ =?us-ascii?Q?IJ4d9+ZuB1LqLUDvODXo0GuSHlYzWJRw95Zlrx5xn2lLxX/CA661uZqWUChc?=
+ =?us-ascii?Q?Iywafb5pwNRJLvlY9Y5dhl4X4XEsp48mgd2r?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 May 2025 08:45:17.9474
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 14dad2dd-179a-4422-eb6a-08dd8e0ca8ef
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MN1PEPF0000ECD4.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB7074
 
-Hi Horatiu,
+netdev_bind_rx takes ownership of the queue array passed as parameter
+and frees it, so a queue array buffer cannot be reused across multiple
+netdev_bind_rx calls.
 
-On Thu, May 8, 2025 at 3:08=E2=80=AFPM Horatiu Vultur
-<horatiu.vultur@microchip.com> wrote:
->
-> The 05/08/2025 11:33, Jason Xing wrote:
-> >
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > Make sure the call of skb_tx_timestamp as close to the doorbell.
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> >  drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c b/dr=
-ivers/net/ethernet/microchip/lan966x/lan966x_fdma.c
-> > index 502670718104..e030f23e5145 100644
-> > --- a/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c
-> > +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c
-> > @@ -730,7 +730,6 @@ int lan966x_fdma_xmit(struct sk_buff *skb, __be32 *=
-ifh, struct net_device *dev)
-> >                 }
-> >         }
-> >
-> > -       skb_tx_timestamp(skb);
->
-> Changing this will break the PHY timestamping because the frame gets
-> modified in the next line, meaning that the classify function will
-> always return PTP_CLASS_NONE.
+This commit fixes that by always passing in a newly created queue array
+to all netdev_bind_rx calls in ncdevmem.
 
-Sorry that I'm not that familiar with the details. I will remove it
-from this series, but still trying to figure out what cases could be.
+Fixes: 85585b4bc8d8 ("selftests: add ncdevmem, netcat for devmem TCP")
+Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+---
+ .../selftests/drivers/net/hw/ncdevmem.c       | 55 ++++++++-----------
+ 1 file changed, 22 insertions(+), 33 deletions(-)
 
-Do you mean it can break when bpf prog is loaded because
-'skb_push(skb, IFH_LEN_BYTES);' expands the skb->data area?  May I ask
-how the modified data of skb breaks the PHY timestamping feature?
+diff --git a/tools/testing/selftests/drivers/net/hw/ncdevmem.c b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
+index 2bf14ac2b8c6..9d48004ff1a1 100644
+--- a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
++++ b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
+@@ -431,6 +431,22 @@ static int parse_address(const char *str, int port, struct sockaddr_in6 *sin6)
+ 	return 0;
+ }
+ 
++static struct netdev_queue_id *create_queues(void)
++{
++	struct netdev_queue_id *queues;
++	size_t i = 0;
++
++	queues = calloc(num_queues, sizeof(*queues));
++	for (i = 0; i < num_queues; i++) {
++		queues[i]._present.type = 1;
++		queues[i]._present.id = 1;
++		queues[i].type = NETDEV_QUEUE_TYPE_RX;
++		queues[i].id = start_queue + i;
++	}
++
++	return queues;
++}
++
+ int do_server(struct memory_buffer *mem)
+ {
+ 	char ctrl_data[sizeof(int) * 20000];
+@@ -448,7 +464,6 @@ int do_server(struct memory_buffer *mem)
+ 	char buffer[256];
+ 	int socket_fd;
+ 	int client_fd;
+-	size_t i = 0;
+ 	int ret;
+ 
+ 	ret = parse_address(server_ip, atoi(port), &server_sin);
+@@ -471,16 +486,7 @@ int do_server(struct memory_buffer *mem)
+ 
+ 	sleep(1);
+ 
+-	queues = malloc(sizeof(*queues) * num_queues);
+-
+-	for (i = 0; i < num_queues; i++) {
+-		queues[i]._present.type = 1;
+-		queues[i]._present.id = 1;
+-		queues[i].type = NETDEV_QUEUE_TYPE_RX;
+-		queues[i].id = start_queue + i;
+-	}
+-
+-	if (bind_rx_queue(ifindex, mem->fd, queues, num_queues, &ys))
++	if (bind_rx_queue(ifindex, mem->fd, create_queues(), num_queues, &ys))
+ 		error(1, 0, "Failed to bind\n");
+ 
+ 	tmp_mem = malloc(mem->size);
+@@ -545,7 +551,6 @@ int do_server(struct memory_buffer *mem)
+ 			goto cleanup;
+ 		}
+ 
+-		i++;
+ 		for (cm = CMSG_FIRSTHDR(&msg); cm; cm = CMSG_NXTHDR(&msg, cm)) {
+ 			if (cm->cmsg_level != SOL_SOCKET ||
+ 			    (cm->cmsg_type != SCM_DEVMEM_DMABUF &&
+@@ -630,10 +635,8 @@ int do_server(struct memory_buffer *mem)
+ 
+ void run_devmem_tests(void)
+ {
+-	struct netdev_queue_id *queues;
+ 	struct memory_buffer *mem;
+ 	struct ynl_sock *ys;
+-	size_t i = 0;
+ 
+ 	mem = provider->alloc(getpagesize() * NUM_PAGES);
+ 
+@@ -641,38 +644,24 @@ void run_devmem_tests(void)
+ 	if (configure_rss())
+ 		error(1, 0, "rss error\n");
+ 
+-	queues = calloc(num_queues, sizeof(*queues));
+-
+ 	if (configure_headersplit(1))
+ 		error(1, 0, "Failed to configure header split\n");
+ 
+-	if (!bind_rx_queue(ifindex, mem->fd, queues, num_queues, &ys))
++	if (!bind_rx_queue(ifindex, mem->fd,
++			   calloc(num_queues, sizeof(struct netdev_queue_id)),
++			   num_queues, &ys))
+ 		error(1, 0, "Binding empty queues array should have failed\n");
+ 
+-	for (i = 0; i < num_queues; i++) {
+-		queues[i]._present.type = 1;
+-		queues[i]._present.id = 1;
+-		queues[i].type = NETDEV_QUEUE_TYPE_RX;
+-		queues[i].id = start_queue + i;
+-	}
+-
+ 	if (configure_headersplit(0))
+ 		error(1, 0, "Failed to configure header split\n");
+ 
+-	if (!bind_rx_queue(ifindex, mem->fd, queues, num_queues, &ys))
++	if (!bind_rx_queue(ifindex, mem->fd, create_queues(), num_queues, &ys))
+ 		error(1, 0, "Configure dmabuf with header split off should have failed\n");
+ 
+ 	if (configure_headersplit(1))
+ 		error(1, 0, "Failed to configure header split\n");
+ 
+-	for (i = 0; i < num_queues; i++) {
+-		queues[i]._present.type = 1;
+-		queues[i]._present.id = 1;
+-		queues[i].type = NETDEV_QUEUE_TYPE_RX;
+-		queues[i].id = start_queue + i;
+-	}
+-
+-	if (bind_rx_queue(ifindex, mem->fd, queues, num_queues, &ys))
++	if (bind_rx_queue(ifindex, mem->fd, create_queues(), num_queues, &ys))
+ 		error(1, 0, "Failed to bind\n");
+ 
+ 	/* Deactivating a bound queue should not be legal */
+-- 
+2.45.0
 
-Thanks,
-Jason
-
->
-> Nacked-by: Horatiu Vultur <horatiu.vultur@microchip.com>
->
-> >         skb_push(skb, IFH_LEN_BYTES);
-> >         memcpy(skb->data, ifh, IFH_LEN_BYTES);
-> >         skb_put(skb, 4);
-> > @@ -768,6 +767,7 @@ int lan966x_fdma_xmit(struct sk_buff *skb, __be32 *=
-ifh, struct net_device *dev)
-> >                 next_dcb_buf->ptp =3D true;
-> >
-> >         /* Start the transmission */
-> > +       skb_tx_timestamp(skb);
-> >         lan966x_fdma_tx_start(tx);
-> >
-> >         return NETDEV_TX_OK;
-> > --
-> > 2.43.5
-> >
->
-> --
-> /Horatiu
 
