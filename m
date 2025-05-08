@@ -1,110 +1,148 @@
-Return-Path: <netdev+bounces-189022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE6BDAAFEB4
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 17:14:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8205AAAFEC9
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 17:15:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 736C9A00E27
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 15:12:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD637B42C46
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 15:13:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2024627B4E1;
-	Thu,  8 May 2025 15:07:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LG78GHTG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E5C927978F;
+	Thu,  8 May 2025 15:09:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DCA328751F;
-	Thu,  8 May 2025 15:07:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EF47279347
+	for <netdev@vger.kernel.org>; Thu,  8 May 2025 15:09:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746716829; cv=none; b=nuG/Cr4uyKxLUPFlz4AzHt3FZZt0AKfH8e9ITnrGQ/ZjMAZMRrLuh2c6nIs8nMXjgUbCKQWfws+dBUI/xjY1jfAGKuCRxvz7lc5LBWrvmfo8uY0fCs8jUBAv7v6dxxK+v+/3uXSfLyZxGiOVrnakSLdEE5ov38HL8wVHobNo3dU=
+	t=1746716947; cv=none; b=LOOZN6NJsRs9w35ST0Ryk43U55C9LFoazrjR995M906Odwc5I07fFiKtFVBcI18G2G+WrjXO+g9oE6lVm/4OOyDM3SLq50Yy7EI9BKwGHVSIVnlj1U5dxhO9Jp658VyzFCAs5hE2sr27wuWXS9F7sJ6HoEbVgLgOkfgzvd3KQIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746716829; c=relaxed/simple;
-	bh=gkIDMz5TEBKXM/Y+ME2NrXi07S8weRmBSmKKYT2U8wY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IMs2TVwXMtBxUveJMZ4D5BET8Ufu9/v4jzRySlDaGZkxFz+TjISVbd3DAoUCWac2epWvNxDlLORFZKZu6SHwWxGjVUH6Dt5Z/e24FZH/bn2op4srGet8t8rXxYJV0htup7xScn1g3qGPrr6hLv6DlH+AOj/aX82UOLzs0yoBp14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LG78GHTG; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-ad212f4030aso37738466b.2;
-        Thu, 08 May 2025 08:07:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746716825; x=1747321625; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HiVkKNZFxbP0htxLifSGKzwIRCP5A7bJf/YYu6PDh0A=;
-        b=LG78GHTGsi+iztqi9znG7zK3umUag0rBgEjgXwj2Nl2QMd/TYPjSXK/xRe9ZY2vtM2
-         KEybVLOhbFM9AOo/5EwnxdFzn0rOJ5rZL1n6EI8mjCVfrn14BQ5Q1wYnVI1+Jy69Nr2t
-         AAKO7SX2LtdYZ+e9N1eUC++aAwDU1yelSPz4w3i7ebzfxcZ5nJaOMlBg2aES6IgeFMtc
-         OcpNPXKp2SWyjebiE2wEQrmPM/RivD8GsoPodQ+oWvYLR1LDeCu9XVyFopqAeGV+2qRA
-         yqZhx7ZC3ZIfS5+craxsJP+f+9y/djabA98Kc2UhTxP6eUa5Uy+nvzJ1ugXwHSWF4HxF
-         Nelg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746716825; x=1747321625;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HiVkKNZFxbP0htxLifSGKzwIRCP5A7bJf/YYu6PDh0A=;
-        b=WxAWEnEIX3PxNu2S5ukKPkA24lCsNHYalzR1fptuVMg+8OrMLvr7qrZkO568zSTfIm
-         6uI44XxQjw045rUkK1Z96u2QHsgE/i2M9sIMANJajsiQy/cHTVOJJ0tgQk0UsMIwsT3m
-         M0OSs5lPYubgJsHJDoAHzjdxxrpUXCWzR2GMWEv312tpO3qI8Id3LyHorZhGJm30V/Ds
-         gzIfQ+ITQ7cuFmeZcwbHZTUmSORlhgadvSmwxArS12NkwuqxcPCpYusrCRUINVx7UPHx
-         jSwqZl+FzC2hu8qsp7EPTAA1ppYe8aCvFxcPKfX/EzPWc19fNKEpYV7ZIjfULnkyP8Iz
-         2KTA==
-X-Forwarded-Encrypted: i=1; AJvYcCUnwQPv4yru29EJnYDof2KOeWHkw+A3FlTrwpflxlRFE4jT+PWpu2opHH8Io8kV9HZxA4sxkOPs7wE=@vger.kernel.org, AJvYcCXWkcFsQunbeJDzvcYQMos/B/cnPXrDxixfMBjFWKp2TvJ3/QOCSyDyS3xVKQgRZ8sUtl+CIVg9@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx343UR4iVG+t4wLA6BiSTLF6OZju/ttvNR2KHtHHgBh38j8xEP
-	8uSnnT/uLukpuKZzPKGDAdOrHs3e5xgWb3rHaIADsyYAZymflrkZLIdRnA==
-X-Gm-Gg: ASbGncsM6DJxr+hPrSwRteX1Ex/wc/ll2J5sgIUSV1d6Q+LeDMSe5Zt+stUfQY6072W
-	dKFCWRcaikv59ApepQMfbjCZ5fokkCzpj/ULxJOD3xFS89ob/URyy86Ud2xzlsZpvs4aLqCyi6a
-	rB9rAsAao5cF6Eip7p4GD7ilSeQ4hYO2+BJPxoi71SePGB3247zTaAoekcRxis3wIYh6XxmPhGY
-	4Bj6dBmgpQmeQ44Eyifc6Lpgwcnoww2e1rGBDlcZ8F1KxueHXaM1LceUcXIu5L/Bjg/S/7tBege
-	uc3pOipmj+5WL7P83GhST6Qqjy6YeHtHXbcYy2t8ulngnNEYLsHHzXqabF+A4JJshReVmLcdAl/
-	J6O4lB5XknRq61VetHlADCPWBAT8/
-X-Google-Smtp-Source: AGHT+IHdkDjzLYixOJEgs5zQT1V8olt+pRAWuT7ub3y030yXBTkyLYaB47yPJfQGeZ71e21BfUEE2g==
-X-Received: by 2002:a05:6402:2809:b0:5fc:348a:e21 with SMTP id 4fb4d7f45d1cf-5fc348a34a1mr2971318a12.31.1746716814421;
-        Thu, 08 May 2025 08:06:54 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442cd2b3be5sm41005585e9.0.2025.05.08.08.06.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 May 2025 08:06:54 -0700 (PDT)
-Message-ID: <ab7323df-380c-497b-806b-66bfbd7c4af0@gmail.com>
-Date: Thu, 8 May 2025 16:06:53 +0100
+	s=arc-20240116; t=1746716947; c=relaxed/simple;
+	bh=EUta3aTRjT21bXtQrcK4rhz7dH2rAHVXhefracRyNDo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hkGuMEArFUgo1vhsRj0c+LvG0sr0CdTjsxn76fsJLxwcWeDzxVVHQqjn/5OfY1g/QYagciiezxZ4UlPIsxMc+HdWrlCOnut/jCJUDECvkF0loJFRV6Y+WJ9QrWjRMVbfBi0xK/d8AYbcSDDk1YQUnbFMiG0gkhhVP9mC9qaXFEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1uD2rJ-0006ko-49; Thu, 08 May 2025 17:08:25 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1uD2rG-001kE3-0o;
+	Thu, 08 May 2025 17:08:22 +0200
+Received: from pengutronix.de (p5b1645f7.dip0.t-ipconnect.de [91.22.69.247])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id CA5A940BC73;
+	Thu, 08 May 2025 15:08:21 +0000 (UTC)
+Date: Thu, 8 May 2025 17:08:15 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Ming Yu <a0282524688@gmail.com>
+Cc: lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
+	andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org, 
+	linux-usb@vger.kernel.org, Ming Yu <tmyu0@nuvoton.com>
+Subject: Re: [PATCH v10 4/7] can: Add Nuvoton NCT6694 CANFD support
+Message-ID: <20250508-prudent-festive-puffin-83f666-mkl@pengutronix.de>
+References: <20250423094058.1656204-1-tmyu0@nuvoton.com>
+ <20250423094058.1656204-5-tmyu0@nuvoton.com>
+ <20250503-fulmar-of-sexy-upgrade-1184a7-mkl@pengutronix.de>
+ <CAOoeyxWbr6jfZjPvYFD+vHKMZ9CpM6SLt+2xo-4E-NnhGinfvg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 08/22] sfc: initialize dpa
-To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
- netdev@vger.kernel.org, dan.j.williams@intel.com, edward.cree@amd.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, dave.jiang@intel.com
-Cc: Alejandro Lucero <alucerop@amd.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>
-References: <20250417212926.1343268-1-alejandro.lucero-palau@amd.com>
- <20250417212926.1343268-9-alejandro.lucero-palau@amd.com>
-Content-Language: en-GB
-From: Edward Cree <ecree.xilinx@gmail.com>
-In-Reply-To: <20250417212926.1343268-9-alejandro.lucero-palau@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="fkxqes6nz57lm4hv"
+Content-Disposition: inline
+In-Reply-To: <CAOoeyxWbr6jfZjPvYFD+vHKMZ9CpM6SLt+2xo-4E-NnhGinfvg@mail.gmail.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 17/04/2025 22:29, alejandro.lucero-palau@amd.com wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
-> 
-> Use hardcoded values for defining and initializing dpa as there is no
-> mbox available.
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 
-Acked-by: Edward Cree <ecree.xilinx@gmail.com>
+--fkxqes6nz57lm4hv
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v10 4/7] can: Add Nuvoton NCT6694 CANFD support
+MIME-Version: 1.0
+
+On 08.05.2025 11:26:09, Ming Yu wrote:
+> > > This driver supports Socket CANFD functionality for NCT6694 MFD
+> > > device based on USB interface.
+> > >
+> > > Signed-off-by: Ming Yu <tmyu0@nuvoton.com>
+> >
+> > The destroy functions nct6694_canfd_close() and nct6694_canfd_remove()
+> > are not the exact inverse of their init functions. Se comments inline.
+> >
+> > Please fix and add:
+> >
+> > Reviewed-by: Marc Kleine-Budde <mkl@pengutronix.de>
+> >
+> > Feel free to mainline this patch as part of the series outside of the
+> > linux-can-next tree. Better ask the netdev maintainers for their OK, to=
+o.
+> >
+> > What about transceiver delay compensation for higher CAN-FD bitrates?
+> > How does you device handle these?
+> >
+>=20
+> In the CAN CMD0's DBTP field, bit 23 is the TDC flag, I will add
+> support for enabling tdc, and firmware will automatically configure
+> tdco. Do you think this approach is appropriate?
+
+Can you configure the TDC manually via USB?
+
+If the firmware does automatic TDCO configuration, does it take care of
+not enabling TCDO if the Data-BRP is > 2?
+
+BTW: What's the CAN clock of the device? I want to add it to the
+can-utils' bitrate calculation tool.
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--fkxqes6nz57lm4hv
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmgcyNwACgkQDHRl3/mQ
+kZzE7Af9FGhvmDVRrnQ/F4bSbWoG2NTq/f6c3fZSGEWA89N5tefMfjZvh7dlyYji
+VaHiukxhQV4tR1h1zXxI/eZ9VQA3NyE5dv4XDcTtPDQILQ03+/sEQOOCSoI8Nb+d
+1WJ6Wvj7apYZa6Qvl+s9K5JVrgaRiQOBFXeKIQYAqTaR0DpQ8nB0gYdClnRowTeB
+gTYVRD/j3fNoE6Cm2DTMs/rzDxp57S/RTZTWuqpbo6i39xQZnv4c6IX6kRHS51Lg
+pQQNi1JctlAO52n2YZnYbBVa3P6XM3f/qLDmL7PYzYFo4v5O19avY0wiuanBk+hK
+wllO7zAOx6+Zxj0ABxJ9edXuP0H61g==
+=EkV4
+-----END PGP SIGNATURE-----
+
+--fkxqes6nz57lm4hv--
 
