@@ -1,271 +1,229 @@
-Return-Path: <netdev+bounces-189016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F3D9AAFDF0
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 16:57:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D426AAFE2E
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 17:04:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF3ED4E728D
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 14:57:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72A534C0A89
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 15:02:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABAA0279790;
-	Thu,  8 May 2025 14:55:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D493279781;
+	Thu,  8 May 2025 15:02:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="UdV0XT9v"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BH99HF57"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2072.outbound.protection.outlook.com [40.107.243.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC927278172;
-	Thu,  8 May 2025 14:55:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.72
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746716122; cv=fail; b=tPoSSBEJAsqkOUJc/syQ7H/QxUF7WHJqfIouHQgbtGi/xNurPxvbzMIp6bWo1XkmV6SUU0v3PgtTQOchS1juiGYQjrj2/wgoICot7HFI9mtP4s9QIpjqUYlHif/kt9gOLKVQN3Hfo5fT0nDWcDoXbl3KMBTQjVcMl4SslCw+r6g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746716122; c=relaxed/simple;
-	bh=V72ShbBLlb83myDolHEYluZffTrEQJPAKnxOjUGGYOs=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=sR/LiqP287yVhDv1zuNFexQNIuBsu5VHiS0y4fnQLHICjWpmmEqU7Dbp8yDP2kxrO7i3OqcNgzl1DR73pJVgB6bli5rGwSro4/aO2Ek1tSOVQeWrlN3TXNBR+p8Cew+sm86HExDTUtPEH/i5j+5FfMNcw9b6VfGVuhxud86eeHk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=UdV0XT9v; arc=fail smtp.client-ip=40.107.243.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=eaQnJs0XFh/KyGrMtVeZ6S1Jr83hT5gVN2JTH+s6wzNaWFWL62Xf/lyM7EW6A3JnswkucV8e2fUOp+ZfjRUiMyeC8CGi9jI0p/bqjR7EWbqdlWa3gltLo77OMlTkSbicmow3O4p/gl/1Y6H0C/TtdZAlSYBFttE3ibtSZ54NBfVBgSMLyT+gny492r3TxAYnR3yfknRGErQg3ATAUDInEprj5yIfQfhWHOprVUG8c8+dY7Qz/uwTwtnuwk17j6KgjxSyXGBxcCbP4HGrZFbmkImYSaNUSd2g6zt+Ummnu7M4D0axic3VwdehfwE9gmop1tQeJWPHcQK/dZD5ECMtMQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TcmHfZ8Alg9Q6wQHlsF39vo/0exR5ZEB7nLZMbCh2GQ=;
- b=SP8/QYlhhuAn5vEKZCvubD4rBXd2ASKKyEtX5lXMTuA0wORGMgadU8JQzPMkCnXa5ZW60v+Vw8KA/VA3rDb3UpcAFwR1LM7YMBPBMnYMVy37h7PlVmFbn3ZW9MxtPvVstQ5lKamTaeQxq7DIqD9N6Cdk+afbr4krf53e15sP/tpAzGsNhOypfVLN0tGW1TsLuZliWTcLNdXC6ZKJRwZCSNfMC/U8agLGOWUrd7TKJR/TJC2f+nMOGUfhnQiCeDd7iSwFz7K/l6ZgX9wydYQDfVkmg6T2r8Qo51SkfGecfVY8ooCPZg9ieA6kbOw6Zx42guF6+hxVSAc0fHew0nJGiw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TcmHfZ8Alg9Q6wQHlsF39vo/0exR5ZEB7nLZMbCh2GQ=;
- b=UdV0XT9v11lPAh5iol0NCdj17sEsJ+7GQ6ujr5IsXBqZUMvxr8Uu2UDHTQcskFIlhJFPPXYp1ypEyjlBIoMJIxhLL2XMNh5k05ePOZGJ2xu2dIMj+cqBlTDlyh5R3LEP4NhoUYsR0sfQ2NVksXeLQ1fCoyMx5GUrQRPP6JI23Wg=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
- by SN7PR12MB8171.namprd12.prod.outlook.com (2603:10b6:806:322::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.24; Thu, 8 May
- 2025 14:55:16 +0000
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79%4]) with mapi id 15.20.8722.021; Thu, 8 May 2025
- 14:55:16 +0000
-Message-ID: <1bfb63d8-d16e-4779-b23a-8fbf34342ead@amd.com>
-Date: Thu, 8 May 2025 15:55:10 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 00/22] Type2 device basic support
-Content-Language: en-US
-To: Alison Schofield <alison.schofield@intel.com>,
- alejandro.lucero-palau@amd.com
-Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
- dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
-References: <20250417212926.1343268-1-alejandro.lucero-palau@amd.com>
- <aBwQGNx4uK0f9aCS@aschofie-mobl2.lan>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <aBwQGNx4uK0f9aCS@aschofie-mobl2.lan>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DU2PR04CA0153.eurprd04.prod.outlook.com
- (2603:10a6:10:2b0::8) To DM6PR12MB4202.namprd12.prod.outlook.com
- (2603:10b6:5:219::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E8EE279325
+	for <netdev@vger.kernel.org>; Thu,  8 May 2025 15:02:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746716565; cv=none; b=iegTAhhDCkn5j7PMf9mmIOFM41HmNGNklwRyCJ/pvZIWJv2L5w9FbUi76tqUMO2iM7kMsrSKZexB6gRZAagbSAmliV3CQwUMlZJipA0EU+I9D+ecDccA7YLdwRZgN3CTvuPmGY+pFDsJBFqIUHUk+ChaWDIXhQMxOZc195+5mKY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746716565; c=relaxed/simple;
+	bh=EZCvFRjapwT1JiMrANLJ7ekCA73CkioldVqCMyA1sNU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=k8fEWrnSp36Pp5mrKqHx7akV7VDQb6kTlFjYn/f01ccB0tkRgUbcAdMYwdn+ZY9qsSs13XxFJwjbRuvpa5AGDTi+JUHSh+bD8MQwV7ichoYY0Wi+MRugGUuauxyiensU/e19RNcf00rmtN6yjTOARagDteepY85/uSKO0FhQrDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BH99HF57; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-47ae894e9b7so2632581cf.3
+        for <netdev@vger.kernel.org>; Thu, 08 May 2025 08:02:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1746716559; x=1747321359; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nW1P+DXju6yG1XR81dsWPHfLBDLXKnzB7JGh49YcNog=;
+        b=BH99HF577pEYwChZV2646VxoPn+c9Qm6H4kCcoss6Apha+Fs2g0lLapU9C/DvgoPok
+         knjFa9hxO98p6Ftjthao6P++D3ONQ24jGYxaKTQ/pGfQTKG+y6OkVT80lY6COM1YxVUc
+         z7PanyBrrPN11fsM6s+PkK3+/QdZ1LWhVg7EilhgIajQ7Ye5nyCQXB2LU+VMsChvQaAy
+         W4EISy0lSv2rlUkUmfz6CiQTwqjmW0cGZwKJNTukzni+D/++YvrGiF5glprrMzUWdJ7k
+         qcuBQGzuOddKHf5Dg4nXtEh7EmnuqeMw6wD36tzpNibYAPIG2NQmPV6lZMPqdd4gTyZn
+         fkyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746716559; x=1747321359;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nW1P+DXju6yG1XR81dsWPHfLBDLXKnzB7JGh49YcNog=;
+        b=KBRGEWpEcOIuEZzcT9j9WJ326DMiuOOl2H89M+DqKbKkOAm5R1bs4kk2dQZayTzmCR
+         ytjy7chpXbp0Pj5tQQhz5LczDlhABNaRrUuir7k5gujqwZx49AVCPNIzInS6xRNFE9NG
+         Rj2KJlILcoMSbzo1YCzilp8BOEFth3eI3mntbgo3S2ds5Muefcn0+mqzPSfBVjPTOtmh
+         oYc4lnpN63mmwYIPqHVuGdlbfiYp63GSltvk1v5BZ8UpPdqYnJhymB+15wO3tOeYlZVz
+         ryHhaq+SYBqotavBHj5EDqGf5Zg//jiaPz25JI0I8pJL1ijtrf3y9YdnuILPh81+bFxK
+         64vA==
+X-Forwarded-Encrypted: i=1; AJvYcCXuUx0fRMLpQjl8MAN0RN2QAUPZrx8rcDBpfOOEw4RitcNvcNgA960Owomi1GjF9+pItv0R138=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywu8k1kwAMu1tsw57ZZotN7z+t3vletCf9aFm9QusXQc8qECMqj
+	xeW+nqjVh/d+wOR264aa2RFhX4rT6JybPuHFROlcIdeVdDalJ+tfca2lp2djeF9IDVYLmKDsscL
+	0y92D+Gpt3aZhvE6dwybAeiLCOHMVQEs4zhQB
+X-Gm-Gg: ASbGncvAGyD0bbxaocC230idq9CbUUNLZ3HbjEd334bxfrRPp+mZl/SD8iWchz6iGgT
+	sjWwgneQXIKH5l/K53OA8PlIj37pkN67Y+tTkLSw3p6IMuqOyGIHdDCL9cHhfsBUV17Z/E1zUac
+	wkhgviu562YfrczGUSSmhJ
+X-Google-Smtp-Source: AGHT+IFX2bbcbZYx5CWRt8rOHd81GYWCQ65Vrbx5GwA0ylDFOFZZIynXcSAh4JOJrwr3lCWbeujeVOk3ZZrLLvUwLsM=
+X-Received: by 2002:ac8:7c53:0:b0:476:b461:249b with SMTP id
+ d75a77b69052e-49225b36f9dmr102225771cf.12.1746716558628; Thu, 08 May 2025
+ 08:02:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|SN7PR12MB8171:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7c72a2cd-5b78-4bb0-3b59-08dd8e4057eb
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Qi9qb1VIbXI3eE15UnR6SWt6SFpCcTUwMFRwUHlwaTZqQmFzK3JscXhid3hC?=
- =?utf-8?B?N3E1RUk2T2RDVUFhUkRWZVBtSFdJalY1U2VqNGNLYVVPcHp0dHJHaFBjMVkr?=
- =?utf-8?B?SThBUjJEU2dIZjJwbkkzdGFkd0xrdklVdUR3YzVCRHRTaCtQRnBzR25CUEQ3?=
- =?utf-8?B?N3l0STFZY0MrWDE2RTkxaktZMVVtcUt6SzNmMXdvaFBjU1BZOERJQXk5RWxs?=
- =?utf-8?B?SnlvVHNKeGt0RUJkNk9pOTY1b0tCZlQzK3pPY0NsMDZzdmZGUjhQUDgxSWRY?=
- =?utf-8?B?eXhGc2tML0pSL1RVMzdqT21hUGQzNUZBRSswZUp3VmFoTkduT3ZlZkhXSkFu?=
- =?utf-8?B?aDBQbG1TZUEvOGNnV1grZjNIK3FQRmNIRnJ6a2VFS2EzSzNVVElvV0lMTHlh?=
- =?utf-8?B?WkxhRGlGc1QzNkY2NGlxSlUzNllvU1NmZ1BnSVFqMHFRQjloNFJRdmQ0NTlG?=
- =?utf-8?B?ZmlKSHFobXVMeHBpLzZ0bnRIUk5HZ2orQWFIU0NEYnlaSEpoWUJzUExDSGxM?=
- =?utf-8?B?WHpIeUcyaVhLOE80VFl5K3lXSEpBVlQ1cjBCZVN3Um1kWHVvdVZrMEVXdCtH?=
- =?utf-8?B?aW8rZmU3a2ZzNUNyclU5c0xtZ2M5eXptb3U0YUYwZC9HTUpRTWVTcy9tQVF1?=
- =?utf-8?B?Z01EcGtVM2ZFQngzSFJFQjVwKysyRUZLaUd1Y01OTHJadjZjVUdUSUF0V1RT?=
- =?utf-8?B?V2k0OXMvRXRqN0ZuV3BieXZEWVJQbkdORzBjN1I1UzJTcmNmVC9lM0NxOFgx?=
- =?utf-8?B?cm1NYlBKZUVUNUgvdnp0a0NqdG1BZ08ydjlwc2h3Y2xoUmtNcFRobHpldWZ4?=
- =?utf-8?B?MERFbWxlOW96UlpiczUvWlh2N25kOVlKY1RvTDJMTjY1RXhQd1dJVlMxekNX?=
- =?utf-8?B?UWZzc1FCWllpZXZpeUxzRWdGdi9oZVRFaktZVnA5MUxsbUVOVFBkenNNZ1lL?=
- =?utf-8?B?SCtyWHBZSTBXVDE2T3poR0YraUZZYmVKK1NUM0I0NCsyaHc4T0pQUm5yUVds?=
- =?utf-8?B?UVMxTmVRODVUUWRNUEx4TTVFaFF6YXhyOTNPU3NQOXFhSWVmeFpXbmpYMlNx?=
- =?utf-8?B?WWZOblRmKzRNM1gyM3MvakcwUWJIS0p0LzJUdkppOTEvZVBzemtqVUh6aHNq?=
- =?utf-8?B?YkxqSDRRY2Vlbmg0SFN2YURmZ0RuWEoyVkRPQStlWkR6WTdGaWxvS041SnAr?=
- =?utf-8?B?MjVVcG9LYlRsSlJKVENvVUllZjNnOUV1TG5pcXVNdUtpandqQUUrRmVWRWZq?=
- =?utf-8?B?Uy90V0pOWW1XSEFsdFBHbUhNS2I2NHI4T2oxdTZMTjVaS2h1MXVQTlZMM2k4?=
- =?utf-8?B?aE12cGE3c09maFIvQkhYdVhQK0ZiRS95dTM0eThoSGp2Mzg5bmtEb3FvcnVa?=
- =?utf-8?B?UHVNMWExYkVBbGtoZFdtYVkyaUptbWxMZ2U1SjlKZHB3ZFZreTZoVC9JdkVM?=
- =?utf-8?B?Z3RLK1FsTmEyY1pLMG1VVy9JKzZDNHhWRFY3Vlg1dEdELzJjSlpiS0tZWmUz?=
- =?utf-8?B?YzFiYTJ5bzZ0WW9GWGFydzlkeWNISVd0UFFpSGpJS1JhQVkzaW03VlFaa28x?=
- =?utf-8?B?aERsMjF2Slh3WUJlZ252TzhoTnhkZktMVG5zWHVvaEFxNmNZblhrb0E1UkNz?=
- =?utf-8?B?SWxRUkRNMm9lYy9jMHZ4NjJqTytzK1RKaGNuS1JJK1VlVFNRNVI3b09oRXhT?=
- =?utf-8?B?NnhoNUJ2VVc1dXdsV21ubFNENEh1NTU3VEJqMmdwbkYxK1JJa2V0Tk41RXFy?=
- =?utf-8?B?Nkp5Z0NFQ256OCtVRzRudE1qaEV2WkRaUFlGSTVlemc4REZvYVU3Q1lGYStv?=
- =?utf-8?B?VTg3RzZzZ3hkTTF0VG9iL1VBSkg1R2tUY3VZaURKd3lKU09rcVdsMVBVTmZG?=
- =?utf-8?B?YVIvR2ZKOEYyQThKT3JJdUhqdzdiam5JY1k3OU03WFJOYW9zT2tFekRlMm92?=
- =?utf-8?Q?gWA6qulkoFs=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?SzNTaVhFUmJndTRBODQ2WTJyUHlGekNvOFdDZTRXNmg3eXZGOURJT0JLQlZQ?=
- =?utf-8?B?eWpQa2ZiUjd4MmJ0RDVsU3FKcnRYR0RVWVdtamJaLzMyNXl6QTMxUko0SU95?=
- =?utf-8?B?Q0J5RG1ldkw3VTVoTkZYQkxQMmJDVVNLeWNkQmp1OEViR1c3VEJ5Slo0Qktk?=
- =?utf-8?B?aTMvKzhTSHVKR1A5dTRQN0pSc3BEVHZ6UTNydXIvU0ppR1RCQk9sUHl0Z1Rv?=
- =?utf-8?B?SGN5MEVYaGtoZGc5TlJ3cVZob2gycFUxOXFGNWZ3cUI0Vk1FVnpTOE0xT0Vo?=
- =?utf-8?B?Ykp4L1UrWUE1eVphUVVFZHVhTlRKVTNHdk14ckdRQkZSZFlnSVJuaTUzN09D?=
- =?utf-8?B?Q3hIQ3NVN2E0REJnNko3MTNzbE9VcHQzWmREeHBiaEF6MVNNTFN5bnNHMFNu?=
- =?utf-8?B?K0JPenp2STcvZ2lxNnBWVTMwQU40SVozQ3VyVFJzR3JFdU1DclYyRWJwRk1s?=
- =?utf-8?B?OGFqTlVxTzFSMHJaQW1mU25Kb09uRmg4ZlBrVDZCbTRBMU85WGtDS21VaXRx?=
- =?utf-8?B?YlhJSHlaVWUrb3h3OVVtc04rRTdGWEVhSzJWYUdIUzJIdkFoOGxjbXowMnBH?=
- =?utf-8?B?ZHU2Z0s3R0V6R2R6VDBILzJLUFpFc2FKNk93eFRJSjFBZjhZTzJWLzZ2ZTBZ?=
- =?utf-8?B?VTFXZC9KYStYVTRsSE92aGNqTmRvLzY4bFdlaEJKalYwcGNWMzZsYWd5VU13?=
- =?utf-8?B?amJWbytDU2ZwSzJMYnlhV0dqek9MeXE4bDl0M0N0NHlQcXJaQ2c2ck5lWU1F?=
- =?utf-8?B?aVhtSGFqWFlpWlBQRWt0dzd3WHNlYy9Md1dhcWlieUd6WGhqTVlGT0VvU3VY?=
- =?utf-8?B?dlYvRU5RVG8zK1hwWmc1NzAzVmMvTitOMkpJblp1QllqSUc4S0JTY1kvWUlH?=
- =?utf-8?B?VUNWaEhBR3JKUmlza1c1MHlyYnJTbGF2QkFobVRCSnpzSzBpREl1T3RkNEVE?=
- =?utf-8?B?OG0rc2FvN1l4OEh1UWFIK3QxdGRxL0JvRGxHd3VvQlBtYXJJOHptL0JXU2Iv?=
- =?utf-8?B?WHpSN0ZnalgxQ0g4OG9CZ3o1VVpoQVdqeHhOajlGU3pJNWRsdDFBNTREK0kv?=
- =?utf-8?B?VXVYQXVoVFVqSXAwRitRUTdmdHd5SDA0VEd0TG05Nm5QSEJhajFCMHZBWnJS?=
- =?utf-8?B?blJmL2Y0NWM1aXVySVI2VXJWdFAwZ1dBbzR4MFZUT1BRbG5EWHEwdzEzdHlE?=
- =?utf-8?B?RENkRG1SQmI0c01jaDJRYytpb0JsUE5nWi9IVTJYMGxiekdqcGtIZjMwc2hV?=
- =?utf-8?B?aDRjUDhlM3hJdW9rdWllWHFUS3Q0L0R5YUFOeG9iM1VkZlZjVW55SSsrSDZn?=
- =?utf-8?B?N3BZcUdjOGkxclA3bEpRSE9jWWtBNjBzNUplODZJQ0F2VStNcUtIdUwvaDNM?=
- =?utf-8?B?U3BKVjZhQTVtcU0wZEZXZFR4S3NPWVJJcjI2cVN6akJSQ0RWUlFtUWk4ZGRn?=
- =?utf-8?B?VjRDTUw2bjdUZjlmZ0RLNXYwaXZpOXVEZk85T3RSbmxTcTkyODhaQ1BEdXNK?=
- =?utf-8?B?VjRtaXk4ZlJYS2tVRHZNSXJyKzJsMjdrZE9QWWV6Z3I0MGRmeDByejc4UEQ4?=
- =?utf-8?B?dGhLM0YyVDJGRVNFeHNaMDhYa0MrMlcxQlRUaDlKN3hOdXF0Z1I1aGNCV3dX?=
- =?utf-8?B?NEhTUjFuQUF4V3BwZW9QSXVCWEVFbDIyM0Q0K0czVEw5aEhYKy81aGRWMnhC?=
- =?utf-8?B?WngxcFRTWmIyR0poK0J4RXBjYXh1Kys5YklJTHVlZTNDOVhxalVlQ1FoM092?=
- =?utf-8?B?b0RncVdUVGF1Qk8zNHdPNENKN0U0NStMR3ZNSTBvWG04QU1GbDlUcTVsVDJQ?=
- =?utf-8?B?OEFPS0RnTW9rdnVEbmQrY3dVZHkwd1Z1OS9MMmJIQnNHSm1ZVm5qQWxaMkN3?=
- =?utf-8?B?NFpCUnRIWlpYL0ZYYzdTUDdPeHRrdFZ0SXNDUFFOLzlVcVhYaW0rVWNHMVRl?=
- =?utf-8?B?VjYxdGEwbmhmcHcrb3lDZHdsaE5GOEtKalVEdkZPcGo4UzdXc2UyVFUzUnB3?=
- =?utf-8?B?Q1g3OHZlQjRXT1B2Q0FzSzh3aGdpMEhJNHN2T2NQaFZSVjdIbGt2aW1UYmgz?=
- =?utf-8?B?MFV5M3h3M080UzA5dnZIOGNxdGJzQkNoWHhtbGhKbHo3WVFGYk1LRytvQTZL?=
- =?utf-8?Q?oUGkrvmc6O63s4dac0+pFN9dh?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7c72a2cd-5b78-4bb0-3b59-08dd8e4057eb
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 May 2025 14:55:16.1754
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: kwBBaVxwC6zdzYX3L2BzDCLq6oRZIvHKSy8cWpjYld/6+eRPeKiz4fKYZXvutCS8roADh4+Twb3z+ytHjaWnAQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8171
+References: <CADvZ6EoGrp9SCvkVKEV0i=NW-7XZmxbmZkmxd8TPFboPTAUF_g@mail.gmail.com>
+ <01100196af6a2181-4f17e5a7-799c-46cd-99f3-9393545834b1-000000@eu-north-1.amazonses.com>
+ <CADVnQykrenhejQCcsNE6JBsk3bE5_rNTeQe3izrZd9qp8zmkYg@mail.gmail.com> <01100196b0157e73-161274ae-dd13-401c-b7ac-d7dd7d50f017-000000@eu-north-1.amazonses.com>
+In-Reply-To: <01100196b0157e73-161274ae-dd13-401c-b7ac-d7dd7d50f017-000000@eu-north-1.amazonses.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 8 May 2025 08:02:27 -0700
+X-Gm-Features: ATxdqUGRZWQV34Q6KIsWrg2SQHgdyWq0NfthQaiLCNVQULIzg_E48YaUwLGgimk
+Message-ID: <CANn89iKeafqV+pTptNZtEsjNchRSxe2mC7FOaWtwXNMaXjzcPQ@mail.gmail.com>
+Subject: Re: [PATCH] net: ipv4: Fix destination address determination in flowi4_init_output
+To: Ozgur Kara <ozgur@goosey.org>
+Cc: Neal Cardwell <ncardwell@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, May 8, 2025 at 6:28=E2=80=AFAM Ozgur Kara <ozgur@goosey.org> wrote:
 >
-> Hi Alejandro,
-
-
-Hi Allison,
-
-
-Thank you for your reviews.
-
-
-My replies below.
-
-
+> Neal Cardwell <ncardwell@google.com>, 8 May 2025 Per, 15:54 tarihinde
+> =C5=9Funu yazd=C4=B1:
+> >
+> > On Thu, May 8, 2025 at 6:21=E2=80=AFAM Ozgur Kara <ozgur@goosey.org> wr=
+ote:
+> > >
+> > > From: Ozgur Karatas <ozgur@goosey.org>
+> > >
+> > > flowi4_init_output() function returns an argument and if opt->srr is
+> > > true and opt->faddr is assigned to be checked before opt->faddr is
+> > > used but if opt->srr seems to be true and opt->faddr is not set
+> > > properly yet.
+> > >
+> > > opt itself will be an incompletely initialized struct and this access
+> > > may cause a crash.
+> > > * added daddr
+> > > * like readability by passing a single daddr argument to
+> > > flowi4_init_output() call.
+> > >
+> > > Signed-off-by: Ozgur Karatas <ozgur@goosey.org>
+> >
+> > For bug fixes, please include a Fixes: footer; there are more details h=
+ere:
+> >    https://www.kernel.org/doc/html/v6.12/process/submitting-patches.htm=
+l
+> >
 >
-> I commented on a few things in the individual patches and had a couple
-> of series wide comments that I'll share here.
+> Hello Neal, I will pay attention to this sorry.
 >
-> I came into this set with the expectation that it was a model for Type 2
-> device support and I expect it is, but without the summary I was hoping
-> for. As I review the patches I can pick this stuff out, but would have
-> appreciated each patch commit message stating its purpose more clearly.
-> We get so use to reading this as a patchset, ie a short story, but once
-> this set merges, the patches all must stand on their own, so including as
-> much story in each commit message is needed. At the minimum, every patch to
-> drivers/cxl/ in this set should explicitly state that this is being done in
-> support of, or in preparation for, Type 2.
-
-
-I understand and fully agree. I'll be sure about all patches clearly 
-linked to the type2 support.
-
-
-> I sorted the set into 3 buckets as I read.
+> > > ---
+> > >  net/ipv4/syncookies.c | 14 +++++++++++++-
+> > >  1 file changed, 13 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
+> > > index 5459a78b9809..2ff92d512825 100644
+> > > --- a/net/ipv4/syncookies.c
+> > > +++ b/net/ipv4/syncookies.c
+> > > @@ -408,6 +408,7 @@ struct sock *cookie_v4_check(struct sock *sk,
+> > > struct sk_buff *skb)
+> > >         struct flowi4 fl4;
+> > >         struct rtable *rt;
+> > >         __u8 rcv_wscale;
+> > > +       __be32 daddr;
+> > >         int full_space;
+> > >         SKB_DR(reason);
+> > >
+> > > @@ -442,6 +443,17 @@ struct sock *cookie_v4_check(struct sock *sk,
+> > > struct sk_buff *skb)
+> > >                 goto out_free;
+> > >         }
+> > >
+> > > +        /* Safely determine destination address considered SRR optio=
+n.
+> > > +         * The flowi4 destination address is derived from opt->faddr
+> > > if opt->srr is set.
+> > > +         * However IP options are not always present in the skb and
+> > > accessing opt->faddr
+> > > +         * without validating opt->optlen and opt->srr can lead to
+> > > undefined behavior.
+> > > +         */
+> > > +        if (opt && opt->optlen && opt->srr) {
+> > > +                daddr =3D opt->faddr;
+> > > +        } else {
+> > > +                daddr =3D ireq->ir_rmt_addr;
+> > > +        }
+> >
+> > Can you please explain how opt could be NULL, given how it is
+> > initialized, like this:
+> >         struct ip_options *opt =3D &TCP_SKB_CB(skb)->header.h4.opt;
+> > ?
+> >
+> > And can you please explain how opt->srr could be set if opt->optlen is
+> > 0? I'm not seeing how it's possible, given how the
+> > __ip_options_compile() code is structured. But perhaps I am missing
+> > something.
+> >
 >
-> 1)These are the changes made to existing paths in the CXL driver to enable
->    Type 2. These change the existing driver behavior.
+> The issue is more nuanced than opt being only NULL, while opt =3D
+> &TCP_SKB_CB(skb)->header.h4.opt gives a valid pointer to a structure
+> and the contents of that structure might be uninitialized or invalid
+> in certain code paths.
+
+It must not.
+
+TCP stack is called after IPv4 traversal.
+
+We are not going to add in TCP defensive code.
+
+Instead, if you think there is a bug in the way IPv4 options are
+decoded (before reaching TCP),
+please fix it in the correct layer.
+
+Thanks.
+
+> My patch adds defensive programming by checking three conditions
+> before accessing opt->faddr: whether opt itself is valid, opt->optlen
+> is non-zero and opt->srr is set.
+> This prevents undefined behavior when accessing opt->faddr in cases
+> where the structure's fields haven't been properly initialized.
 >
-> 2)These are the patches that add new functionality to the CXL driver,
->    that is only exported for use by the Type 2 driver. These new
->    functions are not used in drivers/cxl/.
+> The previous code (opt->srr ? opt->faddr : ireq->ir_rmt_addr) assumed
+> opt->srr was always valid, while the new code safely establishes daddr
+> =3D ireq->ir_rmt_addr as the default, only using opt->faddr when all
+> safety conditions are met.
+>  However, the issue lies in the validity of the struct ip_options
+> content, particularly opt->srr and opt->faddr. If the
+> TCP_SKB_CB(skb)->header.h4.opt structure is uninitialized or reset
+> (e.g., via memset or incomplete parsing), fields like opt->optlen and
+> opt->srr may contain garbage values, leading to undefined behavior
+> when accessed.
 >
-> 3)The sfx driver code. (which I glanced at)
+> A specific example of this vulnerability occurs during early SYN
+> transactions, particularly if tcp_v4_cookie_check() is called
+> directly.
+
+How 'directly' is this done ? Are you talking about an out-of-tree code ?
+
+ In this scenario, opt->optlen might be zero while other
+> fields contain garbage values, which could lead to memory corruption
+> or security issues.
+> So this patch ensures robustness against invalid options, especially
+> in edge cases like malformed SYN packets, with minimal overhead.
 >
-> I'm wondering if bucket #2 is something to be documented in the
-> Documentation/driver-api/cxl/.
-
-
-It makes sense. But if I may say this, I think this could wait for a 
-following-up as a Type2 driver guide including some of the problems I'm 
-struggling with right now, not about the patchset itself, but some 
-assumptions about what the BIOS does. Also, as the cover letter 
-mentions, this is "basic support", so a first step which will have more 
-steps following soon hopefully paving the proper road for this CXL 
-functionality.
-
-
+> am i mistaken? if there is missing information please forward it.
 >
-> Other general comments:
+> Regards
 >
-> - Consider each drivers/cxl/ function exported for use in sfc for a kernel
->    doc comment if not already present.
-
-
-OK.
-
-
+> Ozgur
 >
-> - Some of the added Kernel-doc headers are missing  a Return: field
-
-
-I'll check it.
-
-
->
-> - "Printing numbers in parentheses (%d) adds no value and should be avoided."
->     See: Documentation/process/coding-style.rst.
-
-
-I'll fix those.
-
-
->
-> - Follow cxl conventions. Commit messages in drivers/cxl begine w uppercase
-
-
-I'll fix those as well.
-
-
-Thank you!
-
-
->
->
-> -- Alison
->
+> > thanks,
+> > neal
+> >
+> >
 
