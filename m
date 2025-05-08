@@ -1,156 +1,158 @@
-Return-Path: <netdev+bounces-189039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87508AAFFE8
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 18:06:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 485DDAAFFFA
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 18:12:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 334BC3AE6E2
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 16:06:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 343129C48FC
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 16:12:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 102DD27C877;
-	Thu,  8 May 2025 16:06:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4525327B4E2;
+	Thu,  8 May 2025 16:12:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="ATwY6ABM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G/UY3Y8j"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-75.smtpout.orange.fr [80.12.242.75])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B89A127AC47;
-	Thu,  8 May 2025 16:06:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.75
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5707221294
+	for <netdev@vger.kernel.org>; Thu,  8 May 2025 16:12:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746720402; cv=none; b=kwODx6550o+AoqadTZycxs9MYexyJ6Ov4BhEbfUmnUmvbEgDOlgVdwffBVbcH6QVXYXwEx9vkQBldcnJ1g7nUsXuWyBtbdji8uXAsxFDHr3h2Eel0u0K5CMhKBxKjed53Uff4S6Ie60Gb3sTghHtqb7k1jg8BnchRSO9G+iLqdM=
+	t=1746720775; cv=none; b=SxvJsxw7JOuX65NTLiTGTCHrrKJVpRYo/pt/UMZXWdbfJxn5iimWgtfssY170Ek4W9X0Y9w970jORqHThKb6Ygfyi4wSAkuCqeKrcv0Ipp+2GxEclLdfwQF0lEkisQO8rO2AOgYlpX+u46ocsS0i0MeFw7BOGLebXLvqkHan+SE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746720402; c=relaxed/simple;
-	bh=ZXF39FFw9bSaoaPc3UbH1V0LnHSE+53rFY6xbOMm1J8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hnI6xyUSom4D70YzdnXbgVurcvYzVLVDq2ag3xhxIdaoaUXLxmRANi4vJaFMYFlitQdborq2oGFettSJSbD4sEAaj64apsiwjMEsqMvoDBT+lMK23rZ/fdsWCJbEW6SiWuTGqL1VYC1RSkhJMOUas90o6DjKjsKANB4Tm6T7mMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=ATwY6ABM; arc=none smtp.client-ip=80.12.242.75
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [192.168.1.37] ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id D3kUuhiTn5oOhD3kUuQpGk; Thu, 08 May 2025 18:05:29 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1746720329;
-	bh=i3Zcprdv1SvQj0eiycKQXI51YCMEuANQ9KWCXytXxLs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=ATwY6ABMjL9h2bymt7e78pl9aKcyh+EW5/LzWCMpLnKdY3A2MnCK2IfN54Cblz188
-	 frUSBSmFo3Mlo+ZWoWEk6Gk6woIflGmSyUb+BEg9JuLGXjzvWEzbQnuhtX9xd8xDN3
-	 1HcGPT8iZJNsZH964+0wBxoS09nQ7HOhHtgS4XMixHUiF8qDVtN16RE8zjFEUeMmve
-	 l9oD4xuiMRY97u+tI1uWtlIPxAgUeGkX1KFYAfUQmJNZp/7IAeCnt6EPJpwUU34YfO
-	 /xiXGagHB/5+fIGOLgaCdeSONbXd0FhUslqS+faTY2gQ/df8VyzjbAtPlQZ4qoOPXS
-	 1G/utI/oMG2Kg==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Thu, 08 May 2025 18:05:29 +0200
-X-ME-IP: 90.11.132.44
-Message-ID: <68149c51-ba75-4f0f-a86a-bd810d47d684@wanadoo.fr>
-Date: Thu, 8 May 2025 18:05:26 +0200
+	s=arc-20240116; t=1746720775; c=relaxed/simple;
+	bh=8Oggs8PdgpfLcLDN+S/j+k/Ui3sW4XRzeu7Tl9IKj44=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BnoyFzuZOAbptTM5RzbvJpgIhgFhHYFVFKP0BgUflosD3BlLsqFznRnA29jdSNk9u65PjX3jPgHB7qgEgWr+r975Bu0hw4nhl4OPvAiXr2N2d8lEqyooFfmnXywKO3pNVQ2zhSyovFIlxzRkX4m1kVOlRIJG6TBoQd3ajdcnWP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G/UY3Y8j; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-22e5df32197so13937765ad.0
+        for <netdev@vger.kernel.org>; Thu, 08 May 2025 09:12:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746720773; x=1747325573; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xo//ERntUiY4++Xepbawc+oUVWeHukMmfxNVhqyfjLM=;
+        b=G/UY3Y8j9kVjgG5HkV3mbuArEbvnLt75Wo08AjiRuW/gUp5HJMQMp3KTmA9L+Ga6EV
+         zewUpJM2AiyqUiui/wU3mTaiDqpgO2rndQlbovcf5+u/ZhNhF0Jm+Jis56SEn+m1rgsh
+         O7kqzbruxIulfHPweS1PSGue6sSvvp9kmL1ML2tYTR1K8d3TiOULH4o6vKdFG5vhZG8x
+         pWJ21XsDcAPZjA1GSpIh3cADh+WzOJD77fRGPwIxu62je135mtDEbUe+K157T93WWRAG
+         KEat9ZEQQJZCGmpsDqe4DOGxnaWn2phWmu6Xu3FNGVqg/P/kAm3djkfSUbhJEB/hsy8t
+         C57g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746720773; x=1747325573;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Xo//ERntUiY4++Xepbawc+oUVWeHukMmfxNVhqyfjLM=;
+        b=REiayhK8OY/v7Sp276qDex8QThG7yxZzQvJQ/J9c7gm+dZ8Rv5QPzMwtZRfoocrvUE
+         BRWmEc4PlA6xkUcmrQ75H4BRL1rZKZQY0YvtNtM5hebSxg+1IR5OlN9rQ0CU0DUQtWBQ
+         9PiLX7A3OlrmdwPDVAzLIIP82yVDxw10TuZIj4iXmgNHnYVOHdHLHh9Q4VeTM7NbK2me
+         1cI6fnmK1RDn+LApt7MomUIwlZubnzaZiu4Solm0ddIUUfHWBaoKJI5rHxH3NgNNP7y5
+         frM/fGdoM18yDfsM3Wxv+Xdo/qTmvmDXRBquJCnUfYs2Ur7fAfXw9d6K4BxBjBw7aLev
+         CivA==
+X-Gm-Message-State: AOJu0YzS3jLCul5uuIIBSun2Cgdq1DzjSLb/fDmDp0a3Z++b0hCDGP1Q
+	yR7LGpQwnjRL+zqXr15gqyozvjV2WUBZIgg2jx8JNtlUXMpErmx12rjf
+X-Gm-Gg: ASbGncu92IPTGVH+DRFZDPGZ31HriDP0RLmQGIDP4N87G7Oxm0CguxiSCi8Es6J5p08
+	kooni2FxI49UgNuCbi8v3VjPmzaKVI96OiBzYticwgf6j8+qXOKXZM1AiRSZbeNs8JcMw/6NH/e
+	JjgwEiIYy7BDvXbGmVKbAteud8BTiUnVnG96mBgrWggSyxRfxGGlZBliyyYu1Th2ZoW8QUVuY8i
+	6ymJmCWGKJVRYCUs+CcYQpVniazDd79qvmYOah6KVZ3ZthLPPOqkQWAR9DhlPOuEkhWBEGdnAEW
+	ZUjXU8qmn0oVOpTYniBpmr0mTJZvkpAq+0/X+YWXzNoceclOIU6i6klAw0e7OKFxGF3PzgpgWqH
+	JIA==
+X-Google-Smtp-Source: AGHT+IGGlNauS8xf0axwiEKc/9oblXu8rgdzaBDklimPVo6kp6TmhpB1152RU7EZnbhttLEgCk2WXw==
+X-Received: by 2002:a17:903:2352:b0:224:93e:b5d7 with SMTP id d9443c01a7336-22e5eded337mr137944345ad.34.1746720772778;
+        Thu, 08 May 2025 09:12:52 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-22fc82bfadcsm770585ad.248.2025.05.08.09.12.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 May 2025 09:12:52 -0700 (PDT)
+Date: Thu, 8 May 2025 09:12:51 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Cosmin Ratiu <cratiu@nvidia.com>
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: Re: [PATCH net v2] net: Lock lower level devices when updating
+ features
+Message-ID: <aBzYAzPtf_TlhT0n@mini-arch>
+References: <20250508145459.1998067-1-cratiu@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/4] net: airoha: Fix an error handling path in
- airoha_alloc_gdm_port()
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- netdev@vger.kernel.org
-References: <5c94b9b3850f7f29ed653e2205325620df28c3ff.1746715755.git.christophe.jaillet@wanadoo.fr>
- <aBzOaiU6Ac3ZTU-4@lore-desk>
-Content-Language: en-US, fr-FR
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <aBzOaiU6Ac3ZTU-4@lore-desk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250508145459.1998067-1-cratiu@nvidia.com>
 
-Le 08/05/2025 à 17:31, Lorenzo Bianconi a écrit :
->> If register_netdev() fails, the error handling path of the probe will not
->> free the memory allocated by the previous airoha_metadata_dst_alloc() call
->> because port->dev->reg_state will not be NETREG_REGISTERED.
->>
->> So, an explicit airoha_metadata_dst_free() call is needed in this case to
->> avoid a memory leak.
->>
->> Fixes: af3cf757d5c9 ("net: airoha: Move DSA tag in DMA descriptor")
->> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
->> ---
->> Changes in v2:
->>    - New patch
->>
->> Compile tested only.
->> ---
->>   drivers/net/ethernet/airoha/airoha_eth.c | 10 +++++++++-
->>   1 file changed, 9 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
->> index 16c7896f931f..af8c4015938c 100644
->> --- a/drivers/net/ethernet/airoha/airoha_eth.c
->> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
->> @@ -2873,7 +2873,15 @@ static int airoha_alloc_gdm_port(struct airoha_eth *eth,
->>   	if (err)
->>   		return err;
->>   
->> -	return register_netdev(dev);
->> +	err = register_netdev(dev);
->> +	if (err)
->> +		goto free_metadata_dst;
->> +
->> +	return 0;
->> +
->> +free_metadata_dst:
->> +	airoha_metadata_dst_free(port);
->> +	return err;
->>   }
->>   
->>   static int airoha_probe(struct platform_device *pdev)
->> -- 
->> 2.49.0
->>
+On 05/08, Cosmin Ratiu wrote:
+> __netdev_update_features() expects the netdevice to be ops-locked, but
+> it gets called recursively on the lower level netdevices to sync their
+> features, and nothing locks those.
 > 
-> I have not tested it but I think the right fix here would be something like:
+> This commit fixes that, with the assumption that it shouldn't be possible
+> for both higher-level and lover-level netdevices to require the instance
+> lock, because that would lead to lock dependency warnings.
 > 
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-> index b1ca8322d4eb..33f8926bba25 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> @@ -2996,10 +2996,12 @@ static int airoha_probe(struct platform_device *pdev)
->   	for (i = 0; i < ARRAY_SIZE(eth->ports); i++) {
->   		struct airoha_gdm_port *port = eth->ports[i];
->   
-> -		if (port && port->dev->reg_state == NETREG_REGISTERED) {
-> +		if (!port)
-> +			continue;
-
-I think it works.
-
-We can still have port non NULL and airoha_metadata_dst_alloc() which 
-fails, but airoha_metadata_dst_free() seems to handle it correctly.
-
-CJ
-
-
-> +
-> +		if (port->dev->reg_state == NETREG_REGISTERED)
->   			unregister_netdev(port->dev);
-> -			airoha_metadata_dst_free(port);
-> -		}
-> +		airoha_metadata_dst_free(port);
->   	}
->   	free_netdev(eth->napi_dev);
->   	platform_set_drvdata(pdev, NULL);
+> Without this, playing with higher level (e.g. vxlan) netdevices on top
+> of netdevices with instance locking enabled can run into issues:
 > 
-> Regards,
-> Lorenzo
+> WARNING: CPU: 59 PID: 206496 at ./include/net/netdev_lock.h:17 netif_napi_add_weight_locked+0x753/0xa60
+> [...]
+> Call Trace:
+>  <TASK>
+>  mlx5e_open_channel+0xc09/0x3740 [mlx5_core]
+>  mlx5e_open_channels+0x1f0/0x770 [mlx5_core]
+>  mlx5e_safe_switch_params+0x1b5/0x2e0 [mlx5_core]
+>  set_feature_lro+0x1c2/0x330 [mlx5_core]
+>  mlx5e_handle_feature+0xc8/0x140 [mlx5_core]
+>  mlx5e_set_features+0x233/0x2e0 [mlx5_core]
+>  __netdev_update_features+0x5be/0x1670
+>  __netdev_update_features+0x71f/0x1670
+>  dev_ethtool+0x21c5/0x4aa0
+>  dev_ioctl+0x438/0xae0
+>  sock_ioctl+0x2ba/0x690
+>  __x64_sys_ioctl+0xa78/0x1700
+>  do_syscall_64+0x6d/0x140
+>  entry_SYSCALL_64_after_hwframe+0x4b/0x53
+>  </TASK>
+> 
+> Fixes: 7e4d784f5810 ("net: hold netdev instance lock during rtnetlink operations")
+> Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+> ---
+>  net/core/dev.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 1be7cb73a602..4b5df59d6246 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -10454,7 +10454,9 @@ static void netdev_sync_lower_features(struct net_device *upper,
+>  			netdev_dbg(upper, "Disabling feature %pNF on lower dev %s.\n",
+>  				   &feature, lower->name);
+>  			lower->wanted_features &= ~feature;
+> +			netdev_lock_ops(lower);
+>  			__netdev_update_features(lower);
+> +			netdev_unlock_ops(lower);
+>  
+>  			if (unlikely(lower->features & feature))
+>  				netdev_WARN(upper, "failed to disable %pNF on %s!\n",
 
+Any reason not to cover the whole section under the if()? For example,
+looking at netdev_features_change, most of its invocations are under the
+lock, so keeping the lock around it might help with consistency (and
+we can clarify it as such in Documentation/networking/netdevices.rst).
+Plus, wanted_features is already sort of ops-protected (looking at
+netif_disable_lro+dev_disable_lro).
 
