@@ -1,169 +1,203 @@
-Return-Path: <netdev+bounces-188932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2AC6AAF6FC
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 11:45:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 943CDAAF6F6
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 11:43:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A3704A1589
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 09:44:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A606A1C06BE8
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 09:44:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6CE8264FAF;
-	Thu,  8 May 2025 09:44:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CDB1264F86;
+	Thu,  8 May 2025 09:43:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="hUi/+wI5"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="J+KqvhBk"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE9CF263C6A
-	for <netdev@vger.kernel.org>; Thu,  8 May 2025 09:44:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABA6F263F4E;
+	Thu,  8 May 2025 09:43:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746697448; cv=none; b=TzAOAPATKxX8xk4WY8kGTDqR8yF20uf6WcFf1xz4HByNt2WR+TWlPZPhlpY6MGJKfuqovSgue4Zgvng+zWHJl0nPDwXS7borHP/VlsD4GjxTP4ZF85iwukFWgVE3khgChtvvIu9hqwgYHuejP2KOwBpOXkueTJmykzbhaHAObPE=
+	t=1746697433; cv=none; b=dNxEqiAT+tMEZbpzl7N4QeqrDUGqGCWeRSeRd2hnfXfaofdTZ8BU4tEkXZfadwQG3k9rfLLguM4mJ6mKFzp3+E+uMQN4ht83D6ELagKsPuttAb5kMpCb99MXvG7cHlxbXkKpvG+vB/FaVwf+/BOglhQxNzG80qAUKzhhrVYbdcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746697448; c=relaxed/simple;
-	bh=nPT/F3W9N+by11bdaqC4yK2ZudPzdLXlWraniupgjJw=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KGvtZSZrk1aQT0jwRLY3+LEjCRHukEGRiu9/TO5REanDttBPZalGp52XWq4wXiPDEQrOalvYX19xjsfpk1XwttHJ2LvkqFRL/lui+xoY+WseyEOG65uHolH2k/M3trLAu/fwfwG0XiA+BTZOUqHPmBZnPTcfCUJkeyOtscQRO3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=hUi/+wI5; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1746697446; x=1778233446;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=nPT/F3W9N+by11bdaqC4yK2ZudPzdLXlWraniupgjJw=;
-  b=hUi/+wI52r9++99vjjZX9f6ymsTDvEuy/UQZ/XM8FrGK1p9K9G5uMaEX
-   FuYDOLM2ws/TY9JKCd2A/CqWpXsiDTid/opyP77QjYcMiU8ePspAiMDNb
-   COhMsR4FoNL4fxDKSAT7U8PpWwUZklQAG04BFh3fvau4cdQy+dNUjS8rN
-   /aR+7Os267KKNsIR4JS1FwmzY4h/e1iSxCaIltPfUb4RjRtxc4HVDtwSv
-   6jxfgetXkA0LhiYWIufmRz42msz6SuJd1wAL76k7znDdVkd1JR70UwUKs
-   mwEVYiOisH0qE32vDJyTa65nmaeIlRwtK3g61KFnhgYvjACAayQAaXypk
-   A==;
-X-CSE-ConnectionGUID: dgXtX5N7RouoR3jSWbnLcw==
-X-CSE-MsgGUID: 6CsaHletTeu58H0FkJHF0g==
-X-IronPort-AV: E=Sophos;i="6.15,271,1739862000"; 
-   d="scan'208";a="208871395"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 08 May 2025 02:44:00 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Thu, 8 May 2025 02:43:19 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
- Transport; Thu, 8 May 2025 02:43:19 -0700
-Date: Thu, 8 May 2025 11:41:56 +0200
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-CC: <irusskikh@marvell.com>, <andrew+netdev@lunn.ch>, <bharat@chelsio.com>,
-	<ayush.sawal@chelsio.com>, <UNGLinuxDriver@microchip.com>,
-	<mcoquelin.stm32@gmail.com>, <alexandre.torgue@foss.st.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>, <sgoutham@marvell.com>,
-	<willemb@google.com>, <linux-stm32@st-md-mailman.stormreply.com>,
-	<linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>, Jason Xing
-	<kernelxing@tencent.com>
-Subject: Re: [PATCH net-next v1 4/4] net: lan966x: generate software
- timestamp just before the doorbell
-Message-ID: <20250508094156.kbegdd5vianotsrr@DEN-DL-M31836.microchip.com>
-References: <20250508033328.12507-1-kerneljasonxing@gmail.com>
- <20250508033328.12507-5-kerneljasonxing@gmail.com>
- <20250508070700.m3bufh2q4v4llbfx@DEN-DL-M31836.microchip.com>
- <CAL+tcoCuvxfQUbzjSfk+7vPWLEqQgVK8muqkOQe+N6jQQwXfUw@mail.gmail.com>
+	s=arc-20240116; t=1746697433; c=relaxed/simple;
+	bh=H/WhQNKlzogJE4QdmSUmR0gkiVXIC0GbzPbzBw7pZ5k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SG4OsLfotsQplrwGWo2evWiQrAxULMo7X0qGDoTLnuxu1EGCbP+gRE0FfkEeR2875QvsZKSopQIoruMXJ2Ai/twRzLgddxuwvitlUCwtBUR/rQSCxl0wXwljCWRGRZLLDjSXZeZMDcMIc0r2J2hahdirBvjX5JiQqw4/BJvRDl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=J+KqvhBk; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1134)
+	id 382CD21199E0; Thu,  8 May 2025 02:43:51 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 382CD21199E0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1746697431;
+	bh=T55MVOVWe61rHi3lJfC1UHDy1Z+yOeyzZCnQiMX1Uo4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=J+KqvhBkERu+CQQma0RImBsW5LhVreeG9YYNffcEWSycBij+lh93WmlyNcF60pvxY
+	 5jBHglrAgT/MZ2QfE7n74bZ+Il6OEFOcm+jODe3kV8EbPDgU4U1/ggwjXDqA8w2hvf
+	 yulekqL+wc8ni0Xqki+vOAWIXEeX4rD6Ax8zRHSQ=
+Date: Thu, 8 May 2025 02:43:51 -0700
+From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+To: Haiyang Zhang <haiyangz@microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	decui@microsoft.com, stephen@networkplumber.org, kys@microsoft.com,
+	paulros@microsoft.com, olaf@aepfle.de, vkuznets@redhat.com,
+	davem@davemloft.net, wei.liu@kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, leon@kernel.org,
+	longli@microsoft.com, ssengar@linux.microsoft.com,
+	linux-rdma@vger.kernel.org, daniel@iogearbox.net,
+	john.fastabend@gmail.com, bpf@vger.kernel.org, ast@kernel.org,
+	hawk@kernel.org, tglx@linutronix.de, andrew+netdev@lunn.ch,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: mana: Add handler for hardware servicing
+ events
+Message-ID: <20250508094351.GA8528@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1746633519-17549-1-git-send-email-haiyangz@microsoft.com>
+ <20250508092924.GA2081@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL+tcoCuvxfQUbzjSfk+7vPWLEqQgVK8muqkOQe+N6jQQwXfUw@mail.gmail.com>
+In-Reply-To: <20250508092924.GA2081@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-The 05/08/2025 16:40, Jason Xing wrote:
-> Hi Horatiu,
-
-Hi Jason,
-
+On Thu, May 08, 2025 at 02:29:24AM -0700, Shradha Gupta wrote:
+> On Wed, May 07, 2025 at 08:58:39AM -0700, Haiyang Zhang wrote:
+> > To collaborate with hardware servicing events, upon receiving the special
+> > EQE notification from the HW channel, remove the devices on this bus.
+> > Then, after a waiting period based on the device specs, rescan the parent
+> > bus to recover the devices.
+> > 
+> > Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
+> > ---
+> >  .../net/ethernet/microsoft/mana/gdma_main.c   | 61 +++++++++++++++++++
+> >  include/net/mana/gdma.h                       |  5 +-
+> >  2 files changed, 65 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> > index 4ffaf7588885..aa2ccf4d0ec6 100644
+> > --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> > +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> > @@ -352,11 +352,52 @@ void mana_gd_ring_cq(struct gdma_queue *cq, u8 arm_bit)
+> >  }
+> >  EXPORT_SYMBOL_NS(mana_gd_ring_cq, "NET_MANA");
+> >  
+> > +#define MANA_SERVICE_PERIOD 10
+> > +
+> > +struct mana_serv_work {
+> > +	struct work_struct serv_work;
+> > +	struct pci_dev *pdev;
+> > +};
+> > +
+> > +static void mana_serv_func(struct work_struct *w)
+> > +{
+> > +	struct mana_serv_work *mns_wk = container_of(w, struct mana_serv_work, serv_work);
+> > +	struct pci_dev *pdev = mns_wk->pdev;
+> > +	struct pci_bus *bus, *parent;
+> > +
+> > +	if (!pdev)
+> > +		goto out;
+> > +
+> > +	bus = pdev->bus;
+> > +	if (!bus) {
+> > +		dev_err(&pdev->dev, "MANA service: no bus\n");
+> > +		goto out;
+> > +	}
+> > +
+> > +	parent = bus->parent;
+> > +	if (!parent) {
+> > +		dev_err(&pdev->dev, "MANA service: no parent bus\n");
+> > +		goto out;
+> > +	}
+> > +
+> > +	pci_stop_and_remove_bus_device_locked(bus->self);
+> > +
+> > +	msleep(MANA_SERVICE_PERIOD * 1000);
+> > +
+> > +	pci_lock_rescan_remove();
+> > +	pci_rescan_bus(parent);
+> > +	pci_unlock_rescan_remove();
+> > +
+> > +out:
+> > +	kfree(mns_wk);
 > 
-> On Thu, May 8, 2025 at 3:08 PM Horatiu Vultur
-> <horatiu.vultur@microchip.com> wrote:
-> >
-> > The 05/08/2025 11:33, Jason Xing wrote:
-> > >
-> > > From: Jason Xing <kernelxing@tencent.com>
-> > >
-> > > Make sure the call of skb_tx_timestamp as close to the doorbell.
-> > >
-> > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > > ---
-> > >  drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > >
-> > > diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c b/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c
-> > > index 502670718104..e030f23e5145 100644
-> > > --- a/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c
-> > > +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c
-> > > @@ -730,7 +730,6 @@ int lan966x_fdma_xmit(struct sk_buff *skb, __be32 *ifh, struct net_device *dev)
-> > >                 }
-> > >         }
-> > >
-> > > -       skb_tx_timestamp(skb);
-> >
-> > Changing this will break the PHY timestamping because the frame gets
-> > modified in the next line, meaning that the classify function will
-> > always return PTP_CLASS_NONE.
+> Shouldn't gc->in_service be set to false again?
+
+ah, nevermind. That won't be needed. Thanks
 > 
-> Sorry that I'm not that familiar with the details. I will remove it
-> from this series, but still trying to figure out what cases could be.
+> > +}
+> > +
+> >  static void mana_gd_process_eqe(struct gdma_queue *eq)
+> >  {
+> >  	u32 head = eq->head % (eq->queue_size / GDMA_EQE_SIZE);
+> >  	struct gdma_context *gc = eq->gdma_dev->gdma_context;
+> >  	struct gdma_eqe *eq_eqe_ptr = eq->queue_mem_ptr;
+> > +	struct mana_serv_work *mns_wk;
+> >  	union gdma_eqe_info eqe_info;
+> >  	enum gdma_eqe_type type;
+> >  	struct gdma_event event;
+> > @@ -400,6 +441,26 @@ static void mana_gd_process_eqe(struct gdma_queue *eq)
+> >  		eq->eq.callback(eq->eq.context, eq, &event);
+> >  		break;
+> >  
+> > +	case GDMA_EQE_HWC_FPGA_RECONFIG:
+> > +	case GDMA_EQE_HWC_SOCMANA_CRASH:
 > 
-> Do you mean it can break when bpf prog is loaded because
-> 'skb_push(skb, IFH_LEN_BYTES);' expands the skb->data area?
-
-Well, the bpf program will check if it is a PTP frame that needs to be
-timestamp when it runs ptp_classify_raw, and as we push some data in
-front of the frame, the bpf will run from that point meaning that it
-would failed to detect the PTP frames.
-
-> May I ask
-> how the modified data of skb breaks the PHY timestamping feature?
-
-If it fails to detect that it is a PTP frame, then the frame will not be
-passed to the PHY using the callback txtstamp. So the PHY will timestamp the
-frame but it doesn't have the frame to attach the timestamp.
-
+> may be we also add a log(dev_dbg) to indicate if the servicing is for
+> FPGA reconfig or socmana crash.
 > 
-> Thanks,
-> Jason
-> 
-> >
-> > Nacked-by: Horatiu Vultur <horatiu.vultur@microchip.com>
-> >
-> > >         skb_push(skb, IFH_LEN_BYTES);
-> > >         memcpy(skb->data, ifh, IFH_LEN_BYTES);
-> > >         skb_put(skb, 4);
-> > > @@ -768,6 +767,7 @@ int lan966x_fdma_xmit(struct sk_buff *skb, __be32 *ifh, struct net_device *dev)
-> > >                 next_dcb_buf->ptp = true;
-> > >
-> > >         /* Start the transmission */
-> > > +       skb_tx_timestamp(skb);
-> > >         lan966x_fdma_tx_start(tx);
-> > >
-> > >         return NETDEV_TX_OK;
-> > > --
-> > > 2.43.5
-> > >
-> >
-> > --
-> > /Horatiu
-
--- 
-/Horatiu
+> > +		if (gc->in_service) {
+> > +			dev_info(gc->dev, "Already in service\n");
+> > +			break;
+> > +		}
+> > +
+> > +		mns_wk = kzalloc(sizeof(*mns_wk), GFP_ATOMIC);
+> > +		if (!mns_wk) {
+> > +			dev_err(gc->dev, "Fail to alloc mana_serv_work\n");
+> > +			break;
+> > +		}
+> > +
+> > +		dev_info(gc->dev, "Start MANA service\n");
+> > +		gc->in_service = true;
+> > +		mns_wk->pdev = to_pci_dev(gc->dev);
+> > +		INIT_WORK(&mns_wk->serv_work, mana_serv_func);
+> > +		schedule_work(&mns_wk->serv_work);
+> > +		break;
+> > +
+> >  	default:
+> >  		break;
+> >  	}
+> > diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
+> > index 228603bf03f2..13cfbcf67815 100644
+> > --- a/include/net/mana/gdma.h
+> > +++ b/include/net/mana/gdma.h
+> > @@ -58,8 +58,9 @@ enum gdma_eqe_type {
+> >  	GDMA_EQE_HWC_INIT_EQ_ID_DB	= 129,
+> >  	GDMA_EQE_HWC_INIT_DATA		= 130,
+> >  	GDMA_EQE_HWC_INIT_DONE		= 131,
+> > -	GDMA_EQE_HWC_SOC_RECONFIG	= 132,
+> > +	GDMA_EQE_HWC_FPGA_RECONFIG	= 132,
+> >  	GDMA_EQE_HWC_SOC_RECONFIG_DATA	= 133,
+> > +	GDMA_EQE_HWC_SOCMANA_CRASH	= 135,
+> >  	GDMA_EQE_RNIC_QP_FATAL		= 176,
+> >  };
+> >  
+> > @@ -388,6 +389,8 @@ struct gdma_context {
+> >  	u32			test_event_eq_id;
+> >  
+> >  	bool			is_pf;
+> > +	bool			in_service;
+> > +
+> >  	phys_addr_t		bar0_pa;
+> >  	void __iomem		*bar0_va;
+> >  	void __iomem		*shm_base;
+> > -- 
+> > 2.34.1
 
