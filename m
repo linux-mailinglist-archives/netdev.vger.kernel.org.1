@@ -1,163 +1,79 @@
-Return-Path: <netdev+bounces-189032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 598B2AAFF6D
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 17:44:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77BB3AAFF7A
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 17:46:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7FC0F7A2672
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 15:42:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB1963AACFE
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 15:45:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 620BB2797A0;
-	Thu,  8 May 2025 15:43:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EA2B202C2D;
+	Thu,  8 May 2025 15:46:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ebQTAwBC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="npIFmjOF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31A49279791;
-	Thu,  8 May 2025 15:43:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA9791C84D3;
+	Thu,  8 May 2025 15:46:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746719036; cv=none; b=s4HbGnZmnvRZYY948JKMuyLKzsCRDEOLBYJtuguderdZWOW/OhrDfEPe4Eqrc7y2dNBUbsJTs7V6vC5qrBNpM5q8aRHygI29QKAqyAMK5ZfkAW8VMq+vH9N5aA0FzpVXn4PN9DnF6L88UKlNryEjNP6w81rqZyHXXNhtybWEEQo=
+	t=1746719175; cv=none; b=bzOHow0wAy1Ccni6aZdNf3mF8LY8rZASiiwphTAz2kAa6GbKCoDtheFjDxXMpYc0cwADWw1fDO3ej24NfACCiHGXMA8+xedr8woxEMaJtKLVivRivc2YeFEJMr54MMgdK3IopwRWPiVVHwlgAZ+5UgZbLi839cBjdEpHwOkSpDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746719036; c=relaxed/simple;
-	bh=T6p70PtHkjOvSfKheTE9RIe/1B7E/b+kxUGvqGGghc4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=izxSEIEgehbUkZu1tJNKWh++aITU2t7W3f++a/vOZY4/5OLEaQvFXQN5PpkZmhNoIo9I33K1uyCuXWoBZI2metdXvqqHI5yvXKBfMpBQeLTwcWxPgQsgzhPZRndF0SHHnjYpjdR0RU5YPME1HxLUpjrDEOsHmRkCox07KTSP+h8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ebQTAwBC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B382C4CEE7;
-	Thu,  8 May 2025 15:43:54 +0000 (UTC)
+	s=arc-20240116; t=1746719175; c=relaxed/simple;
+	bh=4WaJvCV6xeKS3CkSM9i09ZXYupOurO/XyWA7cc0swlA=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=KABLUlhfz0J0yTqjMxljSW+hPuRsYKY/3jumizXw0E7bJc8Q5AHNrYAVUKOQfEX8aWesYXy6KmCz5DNBgOP872vwtCK6SImXPQ0zTmr5e8UGIbxPoZP3SivLnylWMSNYeieHxE6mmGXkKjILdJZ5FYxl6xUYfZ/9vjeCSI+EHyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=npIFmjOF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C464FC4CEED;
+	Thu,  8 May 2025 15:46:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746719035;
-	bh=T6p70PtHkjOvSfKheTE9RIe/1B7E/b+kxUGvqGGghc4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ebQTAwBCFZt7fGX2PkSuWO3qgF32hEtffzoI4TppSq3DEI8Minyy7ijI/389xE1E3
-	 95j8+WBZ6awF0Md43Vfk/2gNY7LG/uCiueeLWmv5CC0jJDnM/NgHGSfz31D/W18UCq
-	 pnwHxx29Gppo/eEutif8PGanh7fmJteJFplJd8tAKshf/L6pWK5SlV++TMdIAC1SXe
-	 /YLakK8aREkwqjzmzAK2ACSB61xID0PTyFXBBw4C1K8jFeBqNm/WJTzHkcOYWrwbtA
-	 oROnW51xBB/gKvv1GtqwhMSEZ4jYyeiqxR8bRsJvJJOhOgB8d0tNU+vyeKTem60MVs
-	 0dsXxwOXAl1TQ==
-Date: Thu, 8 May 2025 17:43:53 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 4/4] net: airoha: Use dev_err_probe()
-Message-ID: <aBzROQyQ_5oHmYr3@lore-desk>
-References: <5c94b9b3850f7f29ed653e2205325620df28c3ff.1746715755.git.christophe.jaillet@wanadoo.fr>
- <1b67aa9ea0245325c3779d32dde46cdf5c232db9.1746715755.git.christophe.jaillet@wanadoo.fr>
+	s=k20201202; t=1746719174;
+	bh=4WaJvCV6xeKS3CkSM9i09ZXYupOurO/XyWA7cc0swlA=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=npIFmjOFhWxrkQcIN5sQ4aBabOETHeiLhqscN1dSHZ/04GquTACQ+TwYSYHa0NLRs
+	 E9FZxyHPdIj48TeXKAej3OX+qIeFrNE9U3xFojq7Z2EmXpfSa2VrGXN8GvKjp0bQ5w
+	 ygxLQ95OklYUGWeitBV/oeEuv6U6NXMJn/2cbyUPXPBD+ML9OriopoO4kO2lGrrNqt
+	 mRXoMOCzksdTpZ9su6X0aAqG62u6GnsWywS9JoRrIDbud4dTrsOo+VJSUyUiPF9eUX
+	 Qfu2ASuq1zke0mMvf+87rI+DL+RP/o13zpC1iq5BAuBw/xRm5UP12GdBtXd2Mvbutc
+	 qk5hUxmsO4dvw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE030380AA70;
+	Thu,  8 May 2025 15:46:54 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.15-rc6
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20250508133106.37026-1-pabeni@redhat.com>
+References: <20250508133106.37026-1-pabeni@redhat.com>
+X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20250508133106.37026-1-pabeni@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.15-rc6
+X-PR-Tracked-Commit-Id: 3c44b2d615e6ee08d650c2864fdc4e68493eac0c
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 2c89c1b655c0b06823f4ee8b055140d8628fc4da
+Message-Id: <174671921310.2957681.9131930593450476912.pr-tracker-bot@kernel.org>
+Date: Thu, 08 May 2025 15:46:53 +0000
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="cyhlDYaZG9bgrtv1"
-Content-Disposition: inline
-In-Reply-To: <1b67aa9ea0245325c3779d32dde46cdf5c232db9.1746715755.git.christophe.jaillet@wanadoo.fr>
 
+The pull request you sent on Thu,  8 May 2025 15:31:06 +0200:
 
---cyhlDYaZG9bgrtv1
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.15-rc6
 
-On May 08, Christophe JAILLET wrote:
-> Use dev_err_probe() to slightly simplify the code.
-> It is less verbose, more informational and makes error logging more
-> consistent in the probe.
->=20
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> ---
-> Changes in v2:
->   - New patch
->=20
-> Compile tested only.
-> ---
->  drivers/net/ethernet/airoha/airoha_eth.c | 21 +++++++++------------
->  1 file changed, 9 insertions(+), 12 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ether=
-net/airoha/airoha_eth.c
-> index 2335aa59b06f..7404ee894467 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> @@ -2896,10 +2896,9 @@ static int airoha_probe(struct platform_device *pd=
-ev)
->  	eth->dev =3D &pdev->dev;
-> =20
->  	err =3D dma_set_mask_and_coherent(eth->dev, DMA_BIT_MASK(32));
-> -	if (err) {
-> -		dev_err(eth->dev, "failed configuring DMA mask\n");
-> -		return err;
-> -	}
-> +	if (err)
-> +		return dev_err_probe(eth->dev, err,
-> +				     "failed configuring DMA mask\n");
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/2c89c1b655c0b06823f4ee8b055140d8628fc4da
 
-Can dma_set_mask_and_coherent() return -EPROBE_DEFER? The other parts are f=
-ine.
+Thank you!
 
-Regards,
-Lorenzo
-
-> =20
->  	eth->fe_regs =3D devm_platform_ioremap_resource_byname(pdev, "fe");
->  	if (IS_ERR(eth->fe_regs))
-> @@ -2912,10 +2911,9 @@ static int airoha_probe(struct platform_device *pd=
-ev)
->  	err =3D devm_reset_control_bulk_get_exclusive(eth->dev,
->  						    ARRAY_SIZE(eth->rsts),
->  						    eth->rsts);
-> -	if (err) {
-> -		dev_err(eth->dev, "failed to get bulk reset lines\n");
-> -		return err;
-> -	}
-> +	if (err)
-> +		return dev_err_probe(eth->dev, err,
-> +				     "failed to get bulk reset lines\n");
-> =20
->  	eth->xsi_rsts[0].id =3D "xsi-mac";
->  	eth->xsi_rsts[1].id =3D "hsi0-mac";
-> @@ -2925,10 +2923,9 @@ static int airoha_probe(struct platform_device *pd=
-ev)
->  	err =3D devm_reset_control_bulk_get_exclusive(eth->dev,
->  						    ARRAY_SIZE(eth->xsi_rsts),
->  						    eth->xsi_rsts);
-> -	if (err) {
-> -		dev_err(eth->dev, "failed to get bulk xsi reset lines\n");
-> -		return err;
-> -	}
-> +	if (err)
-> +		return dev_err_probe(eth->dev, err,
-> +				     "failed to get bulk xsi reset lines\n");
-> =20
->  	eth->napi_dev =3D alloc_netdev_dummy(0);
->  	if (!eth->napi_dev)
-> --=20
-> 2.49.0
->=20
-
---cyhlDYaZG9bgrtv1
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaBzROAAKCRA6cBh0uS2t
-rFUMAQDpd0Xn+koxS18cJkCYXHZdZTj2Iyhx4nRlRK9NFE7f9QD/W6UmXacIPR+Y
-bxz9OGSYFknzz3Tw588fLCsHr2Ur7QU=
-=7evt
------END PGP SIGNATURE-----
-
---cyhlDYaZG9bgrtv1--
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
