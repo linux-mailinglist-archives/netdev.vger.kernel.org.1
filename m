@@ -1,87 +1,88 @@
-Return-Path: <netdev+bounces-188947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 040F9AAF889
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 13:13:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5081AAAF8A7
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 13:21:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C5F34A7117
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 11:13:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 57D057AEB15
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 11:20:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 541D3211484;
-	Thu,  8 May 2025 11:13:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5DA021D3E2;
+	Thu,  8 May 2025 11:21:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="LtaZKSur"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RuLV3o++"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2089.outbound.protection.outlook.com [40.107.102.89])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6EDB1F582E
-	for <netdev@vger.kernel.org>; Thu,  8 May 2025 11:13:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.89
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746702829; cv=fail; b=GL8zGtdcGxX7lFZaPCbbWyBtCbch9v5Ck3lvgEyVOOKgM2fGauH0LklVO7Wov+B3v7yrPel1GHe5Zn6zrklB3PeTD72hkh+1baITfHO8BefFsmfn3eE085vtBOu8Q+IWHLZhvtxnc0aZZID18fS53SWYLGzG4RSwH1rJyM4F0OA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746702829; c=relaxed/simple;
-	bh=qiQBZtd2xFwCXWN7bCeGmyVLyfU4VrqGYbzlSGJPHw8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=u/8ZB3DewZ9FggI0wHIFkUVr18Zj3iUP2YLrZdy+MCYaxBR3jbtA42u7VoZV1fjWia6q+1HdAv2eoSKJ+VDEhPOw5EyjqMuxsdtl4GFYqJiHv8l0Qw6uC3mGVGXbdqy0u15xKXt81ZG77/ag/0uOI+npg8CUG7p8vqxg+N0p6PM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=LtaZKSur; arc=fail smtp.client-ip=40.107.102.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GoMDqrqi6lP0mUMBlUpxUyfcxHqpjoAQBd9LuHO8kOAmFR2/vUTkr8rC3DUlDwt7VIPWYTzaOl8Dzc9NPN1Qbu8IA372ZClAr8Hgrbp00tXV2wNr7hxXNMNaqn/PhBbgfYv3T7Xg5YyWtzA/NWJnkPKi0PAueZlVgKId7SPk0liwvS6vix8ghqnMKgYCTN34fQHXVn2lk0wWmAwGRUHWUJZG977/0rT+Se5J/hlQnz8Fxang+2WpP6m/RObyM87Zbv+/RNj9DxpQ88myaeHJgg+LPLvlK/06mvvKYSHd2aIaA3SPdO3pEgPBlwWfX/ntsVrauF1jFsIhq8FQ9Hy4vg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZrD8mgnjlABlxYGDLeFZWCuA7rIYKQlcg3iLXXCoNyc=;
- b=oeSWi+iG7xNNrYZDdR1+1qzciZQiUpEW8Od3tj3VYB/E/FgThGhewRU1uK/eM+p9TiDSsXVDrsfFAlQxeJBTs3rZ7XAKwGfNlazEzKPzU5/90korHxZ4L6KJbTTCfkFvWrWqGNQyBIHaP0dY8DRLAEO1y2qWPXwBPAd6mG+JmzTwB6AHTitS7ClDww0ilMQy/lIHE45+KRcIdKA2+HGawsi+rIdr3P7jtexzYwJ65S1zFebLtHE0fqydSKuQKKX1M0K5wf2YYnJy3KayBs6p+JZkxQHC/7RTPMO0CNzRmOxfdpKXDfLugQGCK3pTQspPUSmC5AJxZ2PounK/vYTESg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZrD8mgnjlABlxYGDLeFZWCuA7rIYKQlcg3iLXXCoNyc=;
- b=LtaZKSureOKQZbwiWAgLmIt9+5Z+1pfxDHwpvB9HEbomp+cWe/+MoAqV0nShcW/W9xRNH5Ezt2uSdJJFPkFCQNUQQfANaYvO4M5+ah/jivTdT1OZivLGHLIA3t2S6bykRYcO8CHrwDqPjvH1cRf+bZlCX5EbUoppWJWtolf3fFEl8MRuXnH84llIdn6cnu+2cng0eLL2CPfvv1YCk4osJ1P+3HW3pY0/ZWC5TXZYoGTQ4LgUZLciBN+XyyCj+tpVyVW3Lzw8YoHpPUXS2VHkM4c6bZMRxVPpPd0bJn/iUOk0UukPwG2YyPwHHE4IvCZyisnHuilO9Oe37nLdKB751Q==
-Received: from DS7PR06CA0051.namprd06.prod.outlook.com (2603:10b6:8:54::21) by
- MW4PR12MB7309.namprd12.prod.outlook.com (2603:10b6:303:22f::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.26; Thu, 8 May
- 2025 11:13:41 +0000
-Received: from DS3PEPF0000C37F.namprd04.prod.outlook.com
- (2603:10b6:8:54:cafe::9b) by DS7PR06CA0051.outlook.office365.com
- (2603:10b6:8:54::21) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8699.30 via Frontend Transport; Thu,
- 8 May 2025 11:13:41 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- DS3PEPF0000C37F.mail.protection.outlook.com (10.167.23.9) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8722.18 via Frontend Transport; Thu, 8 May 2025 11:13:40 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 8 May 2025
- 04:13:27 -0700
-Received: from shredder.mtl.com (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Thu, 8 May
- 2025 04:13:24 -0700
-From: Ido Schimmel <idosch@nvidia.com>
-To: <netdev@vger.kernel.org>
-CC: <dsahern@gmail.com>, <stephen@networkplumber.org>, <petrm@nvidia.com>,
-	"Ido Schimmel" <idosch@nvidia.com>
-Subject: [PATCH iproute2-next] ip ntable: Add support for "mcast_reprobes" parameter
-Date: Thu, 8 May 2025 14:13:01 +0300
-Message-ID: <20250508111301.544391-1-idosch@nvidia.com>
-X-Mailer: git-send-email 2.49.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 324871C3F02
+	for <netdev@vger.kernel.org>; Thu,  8 May 2025 11:21:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746703276; cv=none; b=GWOTZDpyE8DCXsysvog2zYlU7WlNYXp/0i66dkRpjhoFctbo4/UCiMSr5Th7Lvnyp3KCu2efWpi7Y8g0rCx5Gd5+roR5S3kTMbieMoJ1PnaR+bygaOxrFOP4dg0EW8IJlDfJjSUXjeF3hONhmPb/ny37xJe4A6O59gZNVqjY89k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746703276; c=relaxed/simple;
+	bh=A3qx6E/jCpqYf4i/M6+ll2towAT/4y0LtCLU37VMv3Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hmcA4tvc3KyCpuylF9yAqdx/yxzjfw4Qh64RGqm+kYqnZCC+YeeA1/vmUKGNwa7c7eylJeWiXcal5fOzGi56/nzJvM2WSBsLzH8j4KvA1fI7dilrOCAPhYiQZHuNPzR5C+M9YmyRKqoNqrTKDv/MNP6hutepVy5XkPolsWPk83o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RuLV3o++; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3a0b135d18eso503444f8f.2
+        for <netdev@vger.kernel.org>; Thu, 08 May 2025 04:21:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746703273; x=1747308073; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LHxqh7UcluosWIW4kKSeGdafk8w5yhUEvHvez8ibNfI=;
+        b=RuLV3o++Wu4RZUUsDoSWZOBI/KYamT4TNEm8YMRKRKh3DO8fH8bZoGG2dHAtzNw4mx
+         A9e6id2cu86fBdIDVLkLDI4rHVoRXNcueljPCt2gFGiDYIaRd9O84UmDgovt3IhQwJH+
+         Yl+fKzBMD5RZE/GuLFOhLbj9e+GGTRrsKV+KGZCZxc/gea0hItb3oynzh/dLbZw/831l
+         4FiQ+rZontYrLTDoq7PBsc58olZKAG7nguqhJp4FQvt7xJQbmwfGUCIGVdybc2cNmL7m
+         +WYlNTvvnW3hLrR67va0UDBIRiP5yYATq/444lEFfMdKSZ3CUzJ6kc/7b6mCX0fv0u4r
+         aYdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746703273; x=1747308073;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LHxqh7UcluosWIW4kKSeGdafk8w5yhUEvHvez8ibNfI=;
+        b=QxHzg9jls6LItfS+K/h9b0qk9YhzDwdPRwTZ7nETXkPC1ljFj5mTtVR3tcasnVb9Cj
+         5iG+czeDr+n/LgZhiiqy7lHMqKuRKETUJUCwtbXIoFV15HhBs5lOOv5bJ3yAf5whsSM7
+         oVHkWVhB6ieMEgv+kccil7aIvgP6tVs3vkasHZcKubKFRfWQ46JmmiHnQ/9UzHqodiMO
+         XcQCWVCkPUGWX6a3xqc1TJz1LP/Ebfmocp0SKgA8JNgk+lvctlf631LORSM/Fq0jgcg2
+         yjBDJP4EPZ2JPKXvhnL+acwlQTz2Wo+/eU+tFfIXcPtEHYytjBfR35SdAdWL6i1x9tfR
+         rYfA==
+X-Gm-Message-State: AOJu0YyuVWBbsj9mMEo9a3Z5qfObblFrekmLtJ9tIeNwHOLbzon1DgXf
+	YGxrAVkV51IST+mMp60bQrB9wFJOuuoM9ffMazEO+MzAvU003yFZOD7CEg==
+X-Gm-Gg: ASbGncsg2dBa99yUw/hBt9uPXpXIDkl8wMWySH2M15ftxIkfm+OnGD5mHN280UgNrOP
+	1NG0oVnG3b3/vWGdc4vIqM98dvJ6c8uM0zIUp/DotiMVVqZ4ivqYg9GDmemLP3uFAeJcYocWGuf
+	OKdJtXonAGMrAdTrMqH4LzK6spHfRyUHw0uOJHwyi3aYLPdSuzn6cRecnvpBJQPGq4HkQQ52XD+
+	blgZ0qIwBGpxUROHA1NFoO+RiUNA38iFFHkiMazquxgiDfiLBSs6YIS+FENL7lJLh2TDpWKUCmn
+	nDRTTy6FUHOZ62zSp95jdw3UdsJyKfowamO5O4aQDDSGU27D4GufVIMvW1Rxw+6+
+X-Google-Smtp-Source: AGHT+IGf3ykzqKc9tD5Jfik+cxL+VmgRguw9fPhxZiipI2ssCYUbBdqHAjH6x2OnQLOAWR3dZkWL5g==
+X-Received: by 2002:adf:f502:0:b0:3a0:b550:c6f1 with SMTP id ffacd0b85a97d-3a0b550c6f6mr4693056f8f.9.1746703272928;
+        Thu, 08 May 2025 04:21:12 -0700 (PDT)
+Received: from imac.lan ([2a02:8010:60a0:0:858e:52f7:3f18:c35c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a0adceddb5sm8116628f8f.2.2025.05.08.04.21.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 May 2025 04:21:12 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jan Stancek <jstancek@redhat.com>
+Cc: donald.hunter@redhat.com,
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH net-next v1] tools: ynl: handle broken pipe gracefully in CLI
+Date: Thu,  8 May 2025 12:21:02 +0100
+Message-ID: <20250508112102.63539-1-donald.hunter@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,172 +90,62 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF0000C37F:EE_|MW4PR12MB7309:EE_
-X-MS-Office365-Filtering-Correlation-Id: bce63f0c-c3aa-4ce2-b640-08dd8e216374
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?BarJFdjUyABc3srk44IoPvNEpYe/iAsgEu22yKAcbTNB/SbEm4t2j+6jAXbS?=
- =?us-ascii?Q?qFxFxWETc2xwrkDcmHZnkLQ4h0nFRxNG0uuUlqxfpD8I7jXsrzhrdYbhJZiN?=
- =?us-ascii?Q?42NNB1q5C4/+htFIR7xRXWucJWKCjfx8zssO+fvZyrf8tZREIO65cRAxhddx?=
- =?us-ascii?Q?vw6wiqUAryksa6ddzubHYyNk/Cu4VAVeLTlz7HOzUEAe6OMBOObyZFQ3FWMH?=
- =?us-ascii?Q?icou9s64geo276JhexusasEa+IVLOhyyNrULqT8r+GuS5bJpTFHSEIZ+9G6y?=
- =?us-ascii?Q?vcq9WhpQwuOzO9NNX4gxgpS9gXWLPDCLML6diXA+53FLci9K4zlGwn8MYrOp?=
- =?us-ascii?Q?OOI8BpD2JUbjlXwDUbGh3W+ra+r/PtQtlaYCgVBqloZY6MXDg5bcYbntyAwQ?=
- =?us-ascii?Q?IE3UIiQuThduu6jsrKjs7APpad2D55rYYLcG8k0x/PyjQUe4pyld50Rf+oEJ?=
- =?us-ascii?Q?WZPVjVnEOCueAaIDJqo96ZbgKZ7OUIkbM01YoffxN6DVrSFyf4cQ4D4kfyek?=
- =?us-ascii?Q?zrdlGjguvE3yjDtPH+itP23zogHqfCJ+zoYqgktArJwBBZrMh9jTOkLtXbYi?=
- =?us-ascii?Q?8oVrupVQrwh+TLlqULSqw6XzRbM1ZdNk5ZhEFJ96OGsUDU4KGQuksPD/gcff?=
- =?us-ascii?Q?JKCI2kN3DOMmNlyJ/czEKNk7hfZSW1AfxqahTbdtWna/C94EFEH4rP71+TUg?=
- =?us-ascii?Q?C7XHntbqbBfoA3tRbLJvbAysH+9o0Vqv+ZEvnbWxMBoJbaRXy57fYKMhrB7p?=
- =?us-ascii?Q?u4q4iP07BwHNWrx8nqcNZc0mDh7YKXtKimWGZRFcgC4rOuP7OSeLxMK3izE3?=
- =?us-ascii?Q?RS/IiKr6dw9Dd8iaUwBNqFe5hqK23W1D1TYYARkBgGcvD2OO3Ltg+3QF4+Ou?=
- =?us-ascii?Q?9EqIEiNwC8UzolVzJki9FoZ5DO6IuRZAKy06nNdmY0TtT/NiyHQXa2rvfHfS?=
- =?us-ascii?Q?/HRiCDcj8mlEtrUOoFF00Ruv/Njv94BPj3cX1hxBNOh/dXOjnYZMsSwSKbcs?=
- =?us-ascii?Q?g6z0TVP9P53095fg7nupb+sNf7OhsInwioSK9f84J0Eis4hIn/xkbHjtuk6b?=
- =?us-ascii?Q?UCVDCawIUAJtrIyU12eb7xy895n3aO4AaV/Py5/70JNG9H2ZCARlctlcbzVA?=
- =?us-ascii?Q?9dPMac0v6kVTr6rrXjeJqPCOLUPnVTRDpHHxG2WlJrE5ZOiAWkw1SadBeFoC?=
- =?us-ascii?Q?lNgNrSQ91LUuoBaLV3jkhnOM3APzS7wpHHOwryr3Chj7pSJShVikD1Yay+cM?=
- =?us-ascii?Q?F1dBkR/MMCZNrRllN/mKonJ0nSUafG9iGpF/xErg836BhmQC6w+tBaLDlj45?=
- =?us-ascii?Q?VaaYPcqOWDx3XCsfHwkO4k/l2Gq4cn8w/fK7tnV0zWwySwyDJSpFo90Hp0LM?=
- =?us-ascii?Q?FrqtASTy3UDLOIQBGdd9ZdPObwOnMiT9juu3rSU5SKdiLmITPHemRQbQK4BY?=
- =?us-ascii?Q?ZhiNKubX+kV4EJ0EPoXIYQdUJbrnzkL6zXXdpLlps6EZwQZ7WunC1HrV8auR?=
- =?us-ascii?Q?rcqp4fPtEuwLdrKErxRyWo6DewCkwmbrv2VA?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 May 2025 11:13:40.8772
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: bce63f0c-c3aa-4ce2-b640-08dd8e216374
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF0000C37F.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7309
 
-Kernel commit 8da86466b837 ("net: neighbour: Add mcast_resolicit to
-configure the number of multicast resolicitations in PROBE state.")
-added the "NDTPA_MCAST_REPROBES" netlink attribute that allows user
-space to set / get the number of multicast probes that are sent by the
-kernel in PROBE state after unicast probes did not solicit a response.
+When sending YNL CLI output into a pipe, closing the pipe causes a
+BrokenPipeError. E.g. running the following and quitting less:
 
-Add support for this parameter in iproute2.
+./tools/net/ynl/pyynl/cli.py --family rt-link --dump getlink | less
+Traceback (most recent call last):
+  File "/home/donaldh/net-next/./tools/net/ynl/pyynl/cli.py", line 160, in <module>
+    main()
+    ~~~~^^
+  File "/home/donaldh/net-next/./tools/net/ynl/pyynl/cli.py", line 142, in main
+    output(reply)
+    ~~~~~~^^^^^^^
+  File "/home/donaldh/net-next/./tools/net/ynl/pyynl/cli.py", line 97, in output
+    pprint.PrettyPrinter().pprint(msg)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+[...]
+BrokenPipeError: [Errno 32] Broken pipe
 
-Example usage and output:
+Consolidate the try block for ops and notifications, and gracefully
+handle the BrokenPipeError by adding an exception handler to the
+consolidated try block.
 
- $ ip ntable show dev dummy0 name arp_cache
- inet arp_cache
-     dev dummy0
-     refcnt 1 reachable 43430 base_reachable 30000 retrans 1000
-     gc_stale 60000 delay_probe 5000 queue 101
-     app_probes 0 ucast_probes 3 mcast_probes 3 mcast_reprobes 0
-     anycast_delay 1000 proxy_delay 800 proxy_queue 64 locktime 1000
-
- # ip ntable change name arp_cache dev dummy0 mcast_reprobes 5
- $ ip ntable show dev dummy0 name arp_cache
- inet arp_cache
-     dev dummy0
-     refcnt 1 reachable 43430 base_reachable 30000 retrans 1000
-     gc_stale 60000 delay_probe 5000 queue 101
-     app_probes 0 ucast_probes 3 mcast_probes 3 mcast_reprobes 5
-     anycast_delay 1000 proxy_delay 800 proxy_queue 64 locktime 1000
-
- $ ip -j -p ntable show dev dummy0 name arp_cache
- [ {
-         "family": "inet",
-         "name": "arp_cache",
-         "dev": "dummy0",
-         "refcnt": 1,
-         "reachable": 43430,
-         "base_reachable": 30000,
-         "retrans": 1000,
-         "gc_stale": 60000,
-         "delay_probe": 5000,
-         "queue": 101,
-         "app_probes": 0,
-         "ucast_probes": 3,
-         "mcast_probes": 3,
-         "mcast_reprobes": 5,
-         "anycast_delay": 1000,
-         "proxy_delay": 800,
-         "proxy_queue": 64,
-         "locktime": 1000
-     } ]
-
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
 ---
- ip/ipntable.c        | 21 ++++++++++++++++++++-
- man/man8/ip-ntable.8 |  2 ++
- 2 files changed, 22 insertions(+), 1 deletion(-)
+ tools/net/ynl/pyynl/cli.py | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/ip/ipntable.c b/ip/ipntable.c
-index 4ce02a315fe1..54db9b62c837 100644
---- a/ip/ipntable.c
-+++ b/ip/ipntable.c
-@@ -40,7 +40,8 @@ static void usage(void)
- 		"PARMS := [ base_reachable MSEC ] [ retrans MSEC ] [ gc_stale MSEC ]\n"
- 		"         [ delay_probe MSEC ] [ queue LEN ]\n"
- 		"         [ app_probes VAL ] [ ucast_probes VAL ] [ mcast_probes VAL ]\n"
--		"         [ anycast_delay MSEC ] [ proxy_delay MSEC ] [ proxy_queue LEN ]\n"
-+		"         [ mcast_reprobes VAL ] [ anycast_delay MSEC ]\n"
-+		"         [ proxy_delay MSEC ] [ proxy_queue LEN ]\n"
- 		"         [ locktime MSEC ]\n"
- 		);
+diff --git a/tools/net/ynl/pyynl/cli.py b/tools/net/ynl/pyynl/cli.py
+index 794e3c7dcc65..33ccc5c1843b 100755
+--- a/tools/net/ynl/pyynl/cli.py
++++ b/tools/net/ynl/pyynl/cli.py
+@@ -144,16 +144,17 @@ def main():
+             ops = [ (item[0], json.loads(item[1]), args.flags or []) for item in args.multi ]
+             reply = ynl.do_multi(ops)
+             output(reply)
+-    except NlError as e:
+-        print(e)
+-        exit(1)
  
-@@ -223,6 +224,17 @@ static int ipntable_modify(int cmd, int flags, int argc, char **argv)
- 			rta_addattr32(parms_rta, sizeof(parms_buf),
- 				      NDTPA_MCAST_PROBES, mprobe);
- 			parms_change = 1;
-+		} else if (strcmp(*argv, "mcast_reprobes") == 0) {
-+			__u32 mreprobe;
-+
-+			NEXT_ARG();
-+
-+			if (get_u32(&mreprobe, *argv, 0))
-+				invarg("\"mcast_reprobes\" value is invalid", *argv);
-+
-+			rta_addattr32(parms_rta, sizeof(parms_buf),
-+				      NDTPA_MCAST_REPROBES, mreprobe);
-+			parms_change = 1;
- 		} else if (strcmp(*argv, "anycast_delay") == 0) {
- 			__u64 anycast_delay;
+-    if args.ntf:
+-        try:
++        if args.ntf:
+             for msg in ynl.poll_ntf(duration=args.duration):
+                 output(msg)
+-        except KeyboardInterrupt:
+-            pass
++    except NlError as e:
++        print(e)
++        exit(1)
++    except KeyboardInterrupt:
++        pass
++    except BrokenPipeError:
++        pass
  
-@@ -440,6 +452,13 @@ static void print_ndtparams(struct rtattr *tpb[])
- 			   "mcast_probes %u ", mprobe);
- 	}
  
-+	if (tpb[NDTPA_MCAST_REPROBES]) {
-+		__u32 mreprobe = rta_getattr_u32(tpb[NDTPA_MCAST_REPROBES]);
-+
-+		print_uint(PRINT_ANY, "mcast_reprobes",
-+			   "mcast_reprobes %u ", mreprobe);
-+	}
-+
- 	print_string(PRINT_FP, NULL, "%s    ", _SL_);
- 
- 	if (tpb[NDTPA_ANYCAST_DELAY]) {
-diff --git a/man/man8/ip-ntable.8 b/man/man8/ip-ntable.8
-index 4f0f2e548a21..56108afe6586 100644
---- a/man/man8/ip-ntable.8
-+++ b/man/man8/ip-ntable.8
-@@ -42,6 +42,8 @@ ip-ntable - neighbour table configuration
- .IR VAL " ] ["
- .B mcast_probes
- .IR VAL " ] ["
-+.B mcast_reprobes
-+.IR VAL " ] ["
- .B anycast_delay
- .IR MSEC " ] ["
- .B proxy_delay
+ if __name__ == "__main__":
 -- 
 2.49.0
 
