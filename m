@@ -1,245 +1,244 @@
-Return-Path: <netdev+bounces-189102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21A92AB0608
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 00:42:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06503AB060E
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 00:46:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E99A39C53C5
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 22:41:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B8657BE224
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 22:44:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6049222ACEF;
-	Thu,  8 May 2025 22:41:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABD3722DA12;
+	Thu,  8 May 2025 22:45:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=invisiblethingslab.com header.i=@invisiblethingslab.com header.b="dUw5uSud";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ZPLRDzMU"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rbui3bY1"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b3-smtp.messagingengine.com (fhigh-b3-smtp.messagingengine.com [202.12.124.154])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1962B21D581;
-	Thu,  8 May 2025 22:41:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43E9D2153D3
+	for <netdev@vger.kernel.org>; Thu,  8 May 2025 22:45:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746744116; cv=none; b=gqe3Nn8aQm0qH6R0IhXxkGIKVCcWZcy8dKcfAICH7F01NavBqy6gZopjnJ17MRdeilCLZ7LJnhHiKHDlA1XX7hBwjzr716y73ftf86oL7xJqsOgfOpyCSxaSXWIgfU/pkm7KSRyix6T4OuEwi85H3sWyiUtIPAwz1I1bRCkMclc=
+	t=1746744356; cv=none; b=pOYeF35MbReX5G5jpkOCMhUIV7NKG5LyJXyI7JXGLvyUNLPKFsh2ROAYUp+Qng2c4MrTMB0ryGOxx/IS8SlXNz+VYh/3RqbkWOqbbaGN03d/4BSpWqWBZgcDGbROYGmkXr/i9OqQli+XaFeHgtJxXJbMJ5NlaOB8/ZpYQcPd7ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746744116; c=relaxed/simple;
-	bh=4PZwf9e6K4WSvgnejvVdPeUCF8/tOcE6qy9/pSqPL3A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=vGHSAF5CuAR1L/8jM08CjFOsU0i/7jaaj1aBGqJphHrTY2tfq7KuL8pbruWEuIP39/XAatvhpghlsr5Evzpw4rnb9GM0IW65ybyfF2NiNOd0G24irD6bOqKAhyvKxx/jtNWhp+z4ap3uz4+4CB/I6+5B/BfaUiUdkz1I9DK/F6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=invisiblethingslab.com; spf=pass smtp.mailfrom=invisiblethingslab.com; dkim=pass (2048-bit key) header.d=invisiblethingslab.com header.i=@invisiblethingslab.com header.b=dUw5uSud; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ZPLRDzMU; arc=none smtp.client-ip=202.12.124.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=invisiblethingslab.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=invisiblethingslab.com
-Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 0EC7225400EE;
-	Thu,  8 May 2025 18:41:53 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-04.internal (MEProxy); Thu, 08 May 2025 18:41:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	invisiblethingslab.com; h=cc:cc:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1746744112;
-	 x=1746830512; bh=VhyooSbDZMIl9H6nssdWpcCnSqUmlpGN+MP3g89gs7k=; b=
-	dUw5uSudTrZewD8hmlUgYu8m24AL5VLqyf6sD/D2y8zgeCaO5wHG9D/r3EOtDAtK
-	rh5U7VC4v/16LEYT06zlsVwSS2n0Ceeb6r9zoBiwwdSmDvt59hl9B9VLuUtrZ2rr
-	En3DplLGmpI2ObvYKOvKx7uuyCw471V8XyHYpZ9qRBxFI8BYu7n1a0UuU41oLb0d
-	M7wk1lKiIt3Fgo6wvfETDHZ2+uocMTgiseA4y+exEJkJA+jfcI8+AdZvNq2DbVuR
-	K+bMC4+e5yLUSzqidcu4FZBpVq4ibt6bZ7owBFZ/BKzti/MdSumHS2enSN735lsp
-	5ByB3D8BZ3kvLN9iuwbyfg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1746744112; x=1746830512; bh=VhyooSbDZMIl9H6nssdWpcCnSqUmlpGN+MP
-	3g89gs7k=; b=ZPLRDzMU2XFCAZZYz8m8Ev8uebRz4kfSHRe9KU7lQjAZAwKggJy
-	OPSldOoTvBsOvHpLi2x4IkIV0Jdn6QK1xjMioPkJceeVfYsA5gfhu9vKG+ir9eHO
-	EeTZ25SiMWF9+x1x4aI1Xo6AY/S19vXkyR/7ywMIZh6idORWMRqDMZLm4dCcTVpI
-	xhLN4BjWmZPPb2Qu34euHTZNnw6IndZvdJSpa3sY2FidNOi/2/sRKVskhLibaNXm
-	yD+WuB1ggRqwQblX1dmfT9+tfleoMVLALrrzffETE/xE0IwPOFGurS6y1UOhKjLN
-	Wfxcl3keYBl7ETF/J+dIKTYPs5WbbzXYDxw==
-X-ME-Sender: <xms:MDMdaGa_CoOphFTFXptVYDRYag88XXYylFBWPrjgfsv9cujFYyP2-Q>
-    <xme:MDMdaJY-h6EQPwfEAhUwh-jx96JcYyZuSR3XvkJvprN4xFGuyO6ipB3yZneryvIRQ
-    -xFEaRFBV8XqA>
-X-ME-Received: <xmr:MDMdaA_CeAasc107GpBMBt4DUwmndiFBpSeHlP0IAThSOIW5j7SyeLXh_11cDIYGomZaucvmfEj9SFh06vzLDK9TUz5YXjJ5BA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvledtleeiucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesghdtreertddt
-    jeenucfhrhhomhepofgrrhgvkhcuofgrrhgtiiihkhhofihskhhiqdfikphrvggtkhhiuc
-    eomhgrrhhmrghrvghksehinhhvihhsihgslhgvthhhihhnghhslhgrsgdrtghomheqnecu
-    ggftrfgrthhtvghrnhepgfduleetfeevhfefheeiteeliefhjefhleduveetteekveettd
-    dvgeeuteefjedunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhf
-    rhhomhepmhgrrhhmrghrvghksehinhhvihhsihgslhgvthhhihhnghhslhgrsgdrtghomh
-    dpnhgspghrtghpthhtohepkedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepvhhi
-    thgrlhihrdhlihhfshhhihhtshesihhnthgvlhdrtghomhdprhgtphhtthhopehjvghssh
-    gvrdgsrhgrnhguvggsuhhrghesihhnthgvlhdrtghomhdprhgtphhtthhopegrnhhthhho
-    nhihrdhlrdhnghhuhigvnhesihhnthgvlhdrtghomhdprhgtphhtthhopehnvghtuggvvh
-    esvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehinhhtvghlqdifihhrvggu
-    qdhlrghnsehlihhsthhsrdhoshhuohhslhdrohhrghdprhgtphhtthhopehrvghgrhgvsh
-    hsihhonhhssehlihhsthhsrdhlihhnuhigrdguvghvpdhrtghpthhtohepshhtrggslhgv
-    sehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshgrshhhrghlsehkvghrnh
-    gvlhdrohhrgh
-X-ME-Proxy: <xmx:MDMdaIqGe2wGDbLyoym4cZiDUNQG7a-ObBYGxPLtYTyk9XAnrb4nVw>
-    <xmx:MDMdaBoJ9BoktY3WGncL6lWjxkHNICXBtkCb30wnvJ1kpB2uw3KEUg>
-    <xmx:MDMdaGTY8yq9MgAIDxx4wiNu7WM_Gjt1O67BSjl7AyWHkhUF_5HHJA>
-    <xmx:MDMdaBqMCgWvOw5lZ7ot8TP1ihqXP6Ac-jdWt25PF-idUCIO01uvKA>
-    <xmx:MDMdaNdPV0_TjXIHalq_XB7LYCf4YhLxsmbvc5aOg2xV5Ju8Ybst0tye>
-Feedback-ID: i1568416f:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 8 May 2025 18:41:51 -0400 (EDT)
-Date: Fri, 9 May 2025 00:41:46 +0200
-From: Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>
-To: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>, netdev@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org, regressions@lists.linux.dev,
-	stable@vger.kernel.org, Sasha Levin <sashal@kernel.org>
-Subject: Re: [Intel-wired-lan] [REGRESSION] e1000e heavy packet loss on
- Meteor Lake - 6.14.2
-Message-ID: <aB0zLQawNrImVqPE@mail-itl>
-References: <Z_z9EjcKtwHCQcZR@mail-itl>
- <b1f5e997-033c-33ed-5e3b-6fe2632bf718@intel.com>
- <Z_0GYR8jR-5NWZ9K@mail-itl>
- <50da66d0-fe66-0563-4d34-7bd2e25695a4@intel.com>
- <b5d72f51-3cd0-aeca-60af-41a20ad59cd5@intel.com>
- <Z_-l2q9ZhszFxiqA@mail-itl>
- <d37a7c9e-7b3f-afc2-b010-e9785f39a785@intel.com>
- <aAZF0JUKCF0UvfF6@mail-itl>
- <aAZH7fpaGf7hvX6T@mail-itl>
- <e0034a96-e285-98c8-b526-fb167747aedc@intel.com>
+	s=arc-20240116; t=1746744356; c=relaxed/simple;
+	bh=0A2PyAe0FEWxU24BYezBxE14ElWWg1cQepZASFQ5RhM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=n+fD/AMqrCDADQZd/oJSnwsMY45vCBJi9sFpgoNg+9g+TETFaV6qS+fgQQrlsK8jWZVCZa+G1QP81BzEX8noopTDJH85UztmOjj0AXsWAlumCP9s1rLWWYWQfd6t5lrQqvTr3LJxWB40b/LEzUNH0s0SnVXdlndqDhyQBiOXVeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rbui3bY1; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <dfb57a6c-8db7-4ab5-9d51-eec40cf8662e@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1746744352;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0zLrDmNRPDlp9ApamVxJavibI7Ej0iwc88PKAJoessY=;
+	b=rbui3bY13NbbvkEFY4U4IDhY6PQ4MkQDV8Ny74RuhuERdEElVBZrLnJLZ+eMo3jsHBBsXG
+	+2BtXVvxsRyoQYKz0ygcR7tXSVoxxLSR6nMSqqJiFUyz58n/eMozy1tOufWdNNlWpR/sLz
+	PZs4V8gfxkQ13Ya+4NAyoBwfcs5Co+M=
+Date: Thu, 8 May 2025 23:45:48 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ByRfoeeiVZcoSeIO"
-Content-Disposition: inline
-In-Reply-To: <e0034a96-e285-98c8-b526-fb167747aedc@intel.com>
+Subject: Re: [PATCH net-next] net: ixp4xx_eth: convert to ndo_hwtstamp_get()
+ and ndo_hwtstamp_set()
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
+Cc: =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ Linus Walleij <linusw@kernel.org>, Imre Kaloz <kaloz@openwrt.org>,
+ linux-arm-kernel@lists.infradead.org, Andrew Lunn <andrew@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
+ linux-kernel@vger.kernel.org
+References: <20250508211043.3388702-1-vladimir.oltean@nxp.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20250508211043.3388702-1-vladimir.oltean@nxp.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+
+On 08/05/2025 22:10, Vladimir Oltean wrote:
+> New timestamping API was introduced in commit 66f7223039c0 ("net: add
+> NDOs for configuring hardware timestamping") from kernel v6.6. It is
+> time to convert the intel ixp4xx ethernet driver to the new API, so that
+> the ndo_eth_ioctl() path can be removed completely.
+> 
+> hwtstamp_get() and hwtstamp_set() are only called if netif_running()
+> when the code path is engaged through the legacy ioctl. As I don't
+> want to make an unnecessary functional change which I can't test,
+> preserve that restriction when going through the new operations.
+> 
+> When cpu_is_ixp46x() is false, the execution of SIOCGHWTSTAMP and
+> SIOCSHWTSTAMP falls through to phy_mii_ioctl(), which may process it in
+> case of a timestamping PHY, or may return -EOPNOTSUPP. In the new API,
+> the core handles timestamping PHYs directly and does not call the netdev
+> driver, so just return -EOPNOTSUPP directly for equivalent logic.
+> 
+> A gratuitous change I chose to do anyway is prefixing hwtstamp_get() and
+> hwtstamp_set() with the driver name, ipx4xx. This reflects modern coding
+> sensibilities, and we are touching the involved lines anyway.
+> 
+> The remainder of eth_ioctl() is exactly equivalent to
+> phy_do_ioctl_running(), so use that.
+> 
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> ---
+>   drivers/net/ethernet/xscale/ixp4xx_eth.c | 61 +++++++++++-------------
+>   1 file changed, 29 insertions(+), 32 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/xscale/ixp4xx_eth.c b/drivers/net/ethernet/xscale/ixp4xx_eth.c
+> index a2ab1c150822..e1e7f65553e7 100644
+> --- a/drivers/net/ethernet/xscale/ixp4xx_eth.c
+> +++ b/drivers/net/ethernet/xscale/ixp4xx_eth.c
+> @@ -394,16 +394,20 @@ static void ixp_tx_timestamp(struct port *port, struct sk_buff *skb)
+>   	__raw_writel(TX_SNAPSHOT_LOCKED, &regs->channel[ch].ch_event);
+>   }
+>   
+> -static int hwtstamp_set(struct net_device *netdev, struct ifreq *ifr)
+> +static int ixp4xx_hwtstamp_set(struct net_device *netdev,
+> +			       struct kernel_hwtstamp_config *cfg,
+> +			       struct netlink_ext_ack *extack)
+>   {
+> -	struct hwtstamp_config cfg;
+>   	struct ixp46x_ts_regs *regs;
+>   	struct port *port = netdev_priv(netdev);
+>   	int ret;
+>   	int ch;
+>   
+> -	if (copy_from_user(&cfg, ifr->ifr_data, sizeof(cfg)))
+> -		return -EFAULT;
+> +	if (!cpu_is_ixp46x())
+> +		return -EOPNOTSUPP;
+> +
+> +	if (!netif_running(netdev))
+> +		return -EINVAL;
+>   
+>   	ret = ixp46x_ptp_find(&port->timesync_regs, &port->phc_index);
+>   	if (ret)
+> @@ -412,10 +416,10 @@ static int hwtstamp_set(struct net_device *netdev, struct ifreq *ifr)
+>   	ch = PORT2CHANNEL(port);
+>   	regs = port->timesync_regs;
+>   
+> -	if (cfg.tx_type != HWTSTAMP_TX_OFF && cfg.tx_type != HWTSTAMP_TX_ON)
+> +	if (cfg->tx_type != HWTSTAMP_TX_OFF && cfg->tx_type != HWTSTAMP_TX_ON)
+>   		return -ERANGE;
+>   
+> -	switch (cfg.rx_filter) {
+> +	switch (cfg->rx_filter) {
+>   	case HWTSTAMP_FILTER_NONE:
+>   		port->hwts_rx_en = 0;
+>   		break;
+> @@ -431,39 +435,45 @@ static int hwtstamp_set(struct net_device *netdev, struct ifreq *ifr)
+>   		return -ERANGE;
+>   	}
+>   
+> -	port->hwts_tx_en = cfg.tx_type == HWTSTAMP_TX_ON;
+> +	port->hwts_tx_en = cfg->tx_type == HWTSTAMP_TX_ON;
+>   
+>   	/* Clear out any old time stamps. */
+>   	__raw_writel(TX_SNAPSHOT_LOCKED | RX_SNAPSHOT_LOCKED,
+>   		     &regs->channel[ch].ch_event);
+>   
+> -	return copy_to_user(ifr->ifr_data, &cfg, sizeof(cfg)) ? -EFAULT : 0;
+> +	return 0;
+>   }
+>   
+> -static int hwtstamp_get(struct net_device *netdev, struct ifreq *ifr)
+> +static int ixp4xx_hwtstamp_get(struct net_device *netdev,
+> +			       struct kernel_hwtstamp_config *cfg)
+>   {
+> -	struct hwtstamp_config cfg;
+>   	struct port *port = netdev_priv(netdev);
+>   
+> -	cfg.flags = 0;
+> -	cfg.tx_type = port->hwts_tx_en ? HWTSTAMP_TX_ON : HWTSTAMP_TX_OFF;
+> +	if (!cpu_is_ixp46x())
+> +		return -EOPNOTSUPP;
+> +
+> +	if (!netif_running(netdev))
+> +		return -EINVAL;
+
+One interesting fact is that phy_do_ioctl_running() will return -ENODEV
+in case of !netif_running(netdev) while previous code would return
+-EINVAL. Probably it's ok, but may be it's better to have consistent
+error path for both options.
+
+Otherwise LGTM,
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
 
---ByRfoeeiVZcoSeIO
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 9 May 2025 00:41:46 +0200
-From: Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>
-To: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>, netdev@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org, regressions@lists.linux.dev,
-	stable@vger.kernel.org, Sasha Levin <sashal@kernel.org>
-Subject: Re: [Intel-wired-lan] [REGRESSION] e1000e heavy packet loss on
- Meteor Lake - 6.14.2
+> +
+> +	cfg->flags = 0;
+> +	cfg->tx_type = port->hwts_tx_en ? HWTSTAMP_TX_ON : HWTSTAMP_TX_OFF;
+>   
+>   	switch (port->hwts_rx_en) {
+>   	case 0:
+> -		cfg.rx_filter = HWTSTAMP_FILTER_NONE;
+> +		cfg->rx_filter = HWTSTAMP_FILTER_NONE;
+>   		break;
+>   	case PTP_SLAVE_MODE:
+> -		cfg.rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_SYNC;
+> +		cfg->rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_SYNC;
+>   		break;
+>   	case PTP_MASTER_MODE:
+> -		cfg.rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ;
+> +		cfg->rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ;
+>   		break;
+>   	default:
+>   		WARN_ON_ONCE(1);
+>   		return -ERANGE;
+>   	}
+>   
+> -	return copy_to_user(ifr->ifr_data, &cfg, sizeof(cfg)) ? -EFAULT : 0;
+> +	return 0;
+>   }
+>   
+>   static int ixp4xx_mdio_cmd(struct mii_bus *bus, int phy_id, int location,
+> @@ -985,21 +995,6 @@ static void eth_set_mcast_list(struct net_device *dev)
+>   }
+>   
+>   
+> -static int eth_ioctl(struct net_device *dev, struct ifreq *req, int cmd)
+> -{
+> -	if (!netif_running(dev))
+> -		return -EINVAL;
+> -
+> -	if (cpu_is_ixp46x()) {
+> -		if (cmd == SIOCSHWTSTAMP)
+> -			return hwtstamp_set(dev, req);
+> -		if (cmd == SIOCGHWTSTAMP)
+> -			return hwtstamp_get(dev, req);
+> -	}
+> -
+> -	return phy_mii_ioctl(dev->phydev, req, cmd);
+> -}
+> -
+>   /* ethtool support */
+>   
+>   static void ixp4xx_get_drvinfo(struct net_device *dev,
+> @@ -1433,9 +1428,11 @@ static const struct net_device_ops ixp4xx_netdev_ops = {
+>   	.ndo_change_mtu = ixp4xx_eth_change_mtu,
+>   	.ndo_start_xmit = eth_xmit,
+>   	.ndo_set_rx_mode = eth_set_mcast_list,
+> -	.ndo_eth_ioctl = eth_ioctl,
+> +	.ndo_eth_ioctl = phy_do_ioctl_running,
+>   	.ndo_set_mac_address = eth_mac_addr,
+>   	.ndo_validate_addr = eth_validate_addr,
+> +	.ndo_hwtstamp_get = ixp4xx_hwtstamp_get,
+> +	.ndo_hwtstamp_set = ixp4xx_hwtstamp_set,
+>   };
+>   
+>   static struct eth_plat_info *ixp4xx_of_get_platdata(struct device *dev)
 
-On Thu, May 08, 2025 at 09:26:18AM +0300, Lifshits, Vitaly wrote:
->=20
->=20
-> On 4/21/2025 4:28 PM, Marek Marczykowski-G=C3=B3recki wrote:
-> > On Mon, Apr 21, 2025 at 03:19:12PM +0200, Marek Marczykowski-G=C3=B3rec=
-ki wrote:
-> > > On Mon, Apr 21, 2025 at 03:44:02PM +0300, Lifshits, Vitaly wrote:
-> > > >=20
-> > > >=20
-> > > > On 4/16/2025 3:43 PM, Marek Marczykowski-G=C3=B3recki wrote:
-> > > > > On Wed, Apr 16, 2025 at 03:09:39PM +0300, Lifshits, Vitaly wrote:
-> > > > > > Can you please also share the output of ethtool -i? I would lik=
-e to know the
-> > > > > > NVM version that you have on your device.
-> > > > >=20
-> > > > > driver: e1000e
-> > > > > version: 6.14.1+
-> > > > > firmware-version: 1.1-4
-> > > > > expansion-rom-version:
-> > > > > bus-info: 0000:00:1f.6
-> > > > > supports-statistics: yes
-> > > > > supports-test: yes
-> > > > > supports-eeprom-access: yes
-> > > > > supports-register-dump: yes
-> > > > > supports-priv-flags: yes
-> > > > >=20
-> > > >=20
-> > > > Your firmware version is not the latest, can you check with the boa=
-rd
-> > > > manufacturer if there is a BIOS update to your system?
-> > >=20
-> > > I can check, but still, it's a regression in the Linux driver - old
-> > > kernel did work perfectly well on this hw. Maybe new driver tries to =
-use
-> > > some feature that is missing (or broken) in the old firmware?
-> >=20
-> > A little bit of context: I'm maintaining the kernel package for a Qubes
-> > OS distribution. While I can try to update firmware on my test system, I
-> > have no influence on what hardware users will use this kernel, and
-> > which firmware version they will use (and whether all the vendors
-> > provide newer firmware at all). I cannot ship a kernel that is known
-> > to break network on some devices.
-> >=20
-> > > > Also, you mentioned that on another system this issue doesn't repro=
-duce, do
-> > > > they have the same firmware version?
-> > >=20
-> > > The other one has also 1.1-4 firmware. And I re-checked, e1000e from
-> > > 6.14.2 works fine there.
-> >=20
->=20
-> Dear Marek,
->=20
-> Thank you for your detailed feedback and for providing the requested
-> information.
->=20
-> We have conducted extensive testing of this patch across multiple systems
-> and have not observed any packet loss issues. Upon comparing the mentioned
-> setups, we noted that while the LAN controller is similar, the CPU differ=
-s.
-> We believe that the issue may be related to transitions in the CPU's low
-> power states.
->=20
-> Consequently, we kindly request that you disable the CPU low power state
-> transitions in the S0 system state and verify if the issue persists. You =
-can
-> disable this in the kernel parameters on the command line with idle=3Dpol=
-l.
-> Please note that this command is intended for debugging purposes only, as=
- it
-> may result in higher power consumption.
-
-I tried with idle=3Dpoll, and it didn't help, I still see a lot of packet
-losses. But I can also confirm that idle=3Dpoll makes the system use
-significantly more power (previously at 25-30W, with this option stays
-at about 42W).
-
-Is there any other info I can provide, enable some debug features or
-something?
-
-I see the problem is with receiving packets - in my simple ping test,
-the ping target sees all the echo requests (and respond to them), but
-the responses aren't reaching ping back (and are not visible on tcpdump
-on the problematic system either).
-
---=20
-Best Regards,
-Marek Marczykowski-G=C3=B3recki
-Invisible Things Lab
-
---ByRfoeeiVZcoSeIO
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhrpukzGPukRmQqkK24/THMrX1ywFAmgdMy0ACgkQ24/THMrX
-1ywpfwgAgaXr4R1HDblvJIBuWQENhB81vk6s0R2CM+y6Can3PiR0JQP4wLO5/ShS
-UFZmjEHvg49VVGNVKE4XeYsaeZQz+yYWx38LGRI8RfuFzm4ITN7zSTcIv3ihQOKz
-HTnewvpPKIJba1LkFHhmZzq7y0F5ignOaAZhkgfYhxgI3u7x7RUUZLJ4YulA5iaI
-ZnACpz914NppIRzAdLY7zWeLtNSK5I4Gt2gSakNT5vSLGh5qTgqRUUsMBMF24i5V
-IMd1Ute2aLCPScgBLrtgUgBw8AX2BSp7uNS8pqlH1F/pQdw3LtnshkrW49GWCGP5
-xrpSUbxcCsHprXGjENoBb6puUPvdpw==
-=Mrw1
------END PGP SIGNATURE-----
-
---ByRfoeeiVZcoSeIO--
 
