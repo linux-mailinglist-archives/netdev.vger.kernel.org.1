@@ -1,151 +1,154 @@
-Return-Path: <netdev+bounces-188940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3502FAAF7B3
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 12:21:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8562AAF7C0
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 12:26:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A74984E2E11
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 10:21:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14B847AAE2E
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 10:25:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEE8B1F5433;
-	Thu,  8 May 2025 10:21:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C44A1F5821;
+	Thu,  8 May 2025 10:26:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=goosey.org header.i=@goosey.org header.b="O6QgfjUj";
-	dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b="ZeEyxzJn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DPBtOwcU"
 X-Original-To: netdev@vger.kernel.org
-Received: from e240-11.smtp-out.eu-north-1.amazonses.com (e240-11.smtp-out.eu-north-1.amazonses.com [23.251.240.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 682521C8612;
-	Thu,  8 May 2025 10:21:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.251.240.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E0124B1E5C
+	for <netdev@vger.kernel.org>; Thu,  8 May 2025 10:26:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746699694; cv=none; b=WvZV1GK4zV4COB2nRebojEL5086eVP/hq+roLwJn6+jkYx7voXFXAU6P1nKrIobBL2U06Bfq4yjccKHoR6RA9bje6F0FS2hmN6ETj/tYvo4sFfxJj64bizYSnqASCaCvIhWyTYOPESeTuuGOFvrakxYeb88UoYOHHXuEetBMurI=
+	t=1746700000; cv=none; b=t2Z//H5oFXzqtpW6F1sCD7dHwQYdzkoDsR0igRtAqhgFeajfXezZchJc8mBdXnpQyvrB8jAaqZdo+z+YkN8hfJJSBgU3yiyt15WDOWY8mz7hK6ucL2jA7tQt/9Qr88G+hGTJ8jmu+uDPSZUMbZzJZRc8eUVB5mFcKUZfJp/+YIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746699694; c=relaxed/simple;
-	bh=/8u1KODPrLFiUyf+6uu0tMV6N9iXNJ4ag3Xpu+q56xg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bG8huThZZlSkNHaAhQWFUcuH3X5lwzScY4dFHVpWdKZjx6k9dkhFQRilfaM5S0EPRY8RaJQel2p41ZgxPujj/uKGOWvs2ZeBLR1SwJ6yLwqxn/zZuH80kZhEb09Rpmt2LogYZyVrb5poNDmbtCREVtdnSALMEPZw6y/vSftnkbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goosey.org; spf=pass smtp.mailfrom=eu-north-1.amazonses.com; dkim=pass (2048-bit key) header.d=goosey.org header.i=@goosey.org header.b=O6QgfjUj; dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b=ZeEyxzJn; arc=none smtp.client-ip=23.251.240.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goosey.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eu-north-1.amazonses.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-	s=iuunfi4kzpbzwuqjzrd5q2mr652n55fx; d=goosey.org; t=1746699690;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:Content-Type;
-	bh=/8u1KODPrLFiUyf+6uu0tMV6N9iXNJ4ag3Xpu+q56xg=;
-	b=O6QgfjUjVSYPg/f6j4GfAHcTj4KwgdC2+3bdWtf+MN8INCghYPzJ/LBsZ6pcAx0o
-	Mqc8i7LBaR251bpGCfT6irkwIfI6auiBtiMWJKalT6HZN6VkYQUTH4Uk/pWJwWAbzlf
-	erm/2nAOcV7rgJonunzrcOcZxislmCicE3iITpyXAbO9IWLzckeoOBbUd87CMSY+ZR6
-	qosHllhHoDbOLNLgkOpKCrTsSdKy/FA+RxV4TcJAfEG72JqPA+9i00YrT4rBotzLD/A
-	EgB4I2NipEVEEfTNy/4h79Yr9StLX3bnre4bpu7kUXgNMn/6xMcgDy3l+h6Yq2wzGBl
-	AgitIjeg6A==
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-	s=bw45wyq3hkghdoq32obql4uyexcghmc7; d=amazonses.com; t=1746699690;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:Content-Type:Feedback-ID;
-	bh=/8u1KODPrLFiUyf+6uu0tMV6N9iXNJ4ag3Xpu+q56xg=;
-	b=ZeEyxzJnkeMfePQufQmyftio+C4s7MYiA+fQC8gVVSRJWYVdsStKKn2tr2aVvOUK
-	Rb6Ee7+fqogSPhIh1NKfuvtGa7XPYIGuliVe9weYYQ4LEAxXx/t+JVmVL8FTLBbNRSB
-	B8+WqJ4I6nDVfLvGBCWFPWq/eBKqZSPWCinNIRYk=
-X-Forwarded-Encrypted: i=1; AJvYcCUWYYXs7GnM1Pzb541hG/fp1LMgFfz5CYvKHmqB0QZJjY2orlK7l94b7lWEmmfaDpe9d35YxKnjs9BefVA=@vger.kernel.org, AJvYcCXroK05G17PFV3TffcRui1SkSS1kCR0ZNMzQ4dXyP0PRA7qfClXBNp03FteW92W8mc+EeLHVzB1@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFt4Vy1ywjcN7tSQzLgAT/sfLEWxsRRbvyd6n3lfYMQdkm33u2
-	/SlV4HhmOt9nTmQ+e7HCncVhXruMzZZgt8hSUiCmZPe/D+QusmMbEhC8pMD3rHqZdTpwCKP26X/
-	olnuMCTxQWNboqmMfUvQTDKjSZbE=
-X-Google-Smtp-Source: AGHT+IEWWHYer6YlrEAMD9KQ9dotaFtd/lyg7ysgb7EU3ezigUEiXVfbU/UizDskSCDrYKfUSKyklj5LGEbbXIqI5Lk=
-X-Received: by 2002:a17:90b:3d8c:b0:306:b593:4557 with SMTP id
- 98e67ed59e1d1-30aac17a1a7mr10671549a91.4.1746699687895; Thu, 08 May 2025
- 03:21:27 -0700 (PDT)
+	s=arc-20240116; t=1746700000; c=relaxed/simple;
+	bh=O5sg1BdVwS+BGVIQFRAuuA3B+8BgbatoZX8uGiY0FZg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=K4gsG4bCRIV5OqXuM5e9v4QJuaDi3430eHjeHG+60btkZ5xpVNybY3jmYc4GKdfobjPArWdgWyElCxwN4dxuK9XEfq8DqN3VkzRdCMzVwu0pSBo0kyr94o+PqzD7t4vOZFciCZIhxTkTBmj8pVpP0CipLWOFLOytYayI4ZiS6oo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DPBtOwcU; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1746699996;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=b4GAeEZPp8CdpyBS3JXJkVNkHtqroVKhF9UFtHhwxv8=;
+	b=DPBtOwcUr4/tn0RnroCPyESPKoBfS3aaPjT1jt2upJgCcQDcMfy8WpFgo+BlUGPgvLWmiB
+	bufYa0LY23v6arujetyZEhZ/NNlmyFYx0MhKOlA6AqnOQJQULLsyyEf/Iss1oCJx5vXARg
+	nrOiR8GvYLb0qei1T0c4wqrnU5C1j8g=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-607-76Z_CCwJPgGHk-stwuGbwQ-1; Thu, 08 May 2025 06:26:35 -0400
+X-MC-Unique: 76Z_CCwJPgGHk-stwuGbwQ-1
+X-Mimecast-MFC-AGG-ID: 76Z_CCwJPgGHk-stwuGbwQ_1746699994
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a0ac55e628so296951f8f.3
+        for <netdev@vger.kernel.org>; Thu, 08 May 2025 03:26:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746699994; x=1747304794;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=b4GAeEZPp8CdpyBS3JXJkVNkHtqroVKhF9UFtHhwxv8=;
+        b=sPODdLsNQs7exKRbaaZdkI5LXlvYtTC45NI4vlCTevFGQW2xn3FI/ZGwvcjkskev/h
+         7eRpAkCPO1RYcUN5I3Hsigq/dTkqOq6oFkWhN+Rpzr7+huSM9PLPksnZIHtcZDBxpdp8
+         FoUP4F84cwbvzjeS0ZRL8WeVjlXbnCTxVR4/VqZOQMvxXtFasyZAyMz3d4GArnCiU7q/
+         LGgEuEoud+q2VfWnYKNuh9kll5wWwj9e3jjebqM1aurw0TMAW6MpfMz6ew+NHmnFvftk
+         JDgMwh5VkCRyJ+1ND+Sqjtnbd2T0OY53BW3HZVbUk0KC0+DaCs9jU4Krw8RT+IyoT6GX
+         4B4w==
+X-Forwarded-Encrypted: i=1; AJvYcCXb9okkJ3BLCcSPYoZLy779EZJkYZ9DizAGFjDvrkf/Ca7wwQ/tvXno4p9zPYUm5ZHaD7Rh+yQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzP4psCPngHHhQgZSGCOALPmTJ8Ssu4o+UhxdCeBbgHEj2u4TWr
+	Zh/7R1mZDhysggBQExVw4Ql4pPKUv66W8qth9h2vx+cLrag70WzhfwN4f9gBHwTn1mB7L7X6WNo
+	rP2xQAmiWlDcEiHoPeQvtclaNrAnc+mLd+cecYpiAGqv6Y0Cceb04Zg==
+X-Gm-Gg: ASbGncutzZRSq2R3hS3tR0YI6lAk7SFuC6n1ueGZK5Hm3ervLNTo9jNp7MRVh38fS87
+	PH1uKRCdwAYK8Zsy08xQSifnI2VObyyoLmYv1DEYeJ3pAeKm5+bbOzw6XkXGEPpc+ZXAL2K3DJ5
+	iWNA+Roiz8vgt+dasffEvBP+e6Ku44qm4dDlb05yKY7eKg7K5zseU2IoGowrpKWeVHbdb+tRZcn
+	EzlBWqWR7jjpIN44Y/TD/kDbDAj5f5Fi0XFMkvajELHXS8PDBh9my3TERamGff9EQdcbq+TCfBJ
+	GZb4y7/Cso3Kfq2q
+X-Received: by 2002:a05:6000:1ace:b0:3a0:8429:a2e2 with SMTP id ffacd0b85a97d-3a0b4a22cb9mr5617136f8f.32.1746699994464;
+        Thu, 08 May 2025 03:26:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG94ERxZ5WyE5e2t5JPzgyvWW3/AfvlPu2y1cqUqf9ltONYcTXbLCYaddar4/JAmCyCYOdq6g==
+X-Received: by 2002:a05:6000:1ace:b0:3a0:8429:a2e2 with SMTP id ffacd0b85a97d-3a0b4a22cb9mr5617114f8f.32.1746699994068;
+        Thu, 08 May 2025 03:26:34 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:244b:910::f39? ([2a0d:3344:244b:910::f39])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a0b6d0e1ebsm4070674f8f.80.2025.05.08.03.26.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 08 May 2025 03:26:33 -0700 (PDT)
+Message-ID: <9ad2d46f-7746-45e3-b5c3-e53d079d1b8e@redhat.com>
+Date: Thu, 8 May 2025 12:26:32 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CADvZ6EoGrp9SCvkVKEV0i=NW-7XZmxbmZkmxd8TPFboPTAUF_g@mail.gmail.com>
-In-Reply-To: <CADvZ6EoGrp9SCvkVKEV0i=NW-7XZmxbmZkmxd8TPFboPTAUF_g@mail.gmail.com>
-From: Ozgur Kara <ozgur@goosey.org>
-Date: Thu, 8 May 2025 10:21:30 +0000
-X-Gmail-Original-Message-ID: <CADvZ6Eps=cb9Cm_C92UTF6B=umrnnGVsZG+z7H3h2wQy+HXi_g@mail.gmail.com>
-X-Gm-Features: ATxdqUE2usigunOejbmaJU3uCvDWQY8558XJ5AlxjSJTsyUQTWJe3cLonnDs6RU
-Message-ID: <01100196af6a2191-3abcd0ea-31eb-4cb7-a1a2-ffc925cdbeed-000000@eu-north-1.amazonses.com>
-Subject: [PATCH] net: ipv4: Fix destination address determination in flowi4_init_output
-To: Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	netdev@vger.kernel.org, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Feedback-ID: ::1.eu-north-1.jZlAFvO9+f8tc21Z4t7ANdAU3Nw/ALd5VHiFFAqIVOg=:AmazonSES
-X-SES-Outgoing: 2025.05.08-23.251.240.11
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Patch net v2 1/2] net_sched: Flush gso_skb list too during
+ ->change()
+To: Cong Wang <xiyou.wangcong@gmail.com>, netdev@vger.kernel.org
+Cc: jiri@resnulli.us, jhs@mojatatu.com, willsroot@protonmail.com,
+ savy@syst3mfailure.io
+References: <20250507043559.130022-1-xiyou.wangcong@gmail.com>
+ <20250507043559.130022-2-xiyou.wangcong@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250507043559.130022-2-xiyou.wangcong@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Ozgur Karatas <ozgur@goosey.org>
+On 5/7/25 6:35 AM, Cong Wang wrote:
+> Previously, when reducing a qdisc's limit via the ->change() operation, only
+> the main skb queue was trimmed, potentially leaving packets in the gso_skb
+> list. This could result in NULL pointer dereference when we only check
+> sch->limit against sch->q.qlen.
+> 
+> This patch introduces a new helper, qdisc_dequeue_internal(), which ensures
+> both the gso_skb list and the main queue are properly flushed when trimming
+> excess packets. All relevant qdiscs (codel, fq, fq_codel, fq_pie, hhf, pie)
+> are updated to use this helper in their ->change() routines.
 
-flowi4_init_output() function returns an argument and if opt->srr is
-true and opt->faddr is assigned to be checked before opt->faddr is
-used but if opt->srr seems to be true and opt->faddr is not set
-properly yet.
+A side effect is that now queue reduction will incur in an indirect call
+per packet, but that should be irrelevant as it happens only in the
+control path.
 
-opt itself will be an incompletely initialized struct and this access
-may cause a crash.
-* added daddr
-* like readability by passing a single daddr argument to
-flowi4_init_output() call.
+> Fixes: 76e3cc126bb2 ("codel: Controlled Delay AQM")
+> Fixes: 4b549a2ef4be ("fq_codel: Fair Queue Codel AQM")
+> Fixes: afe4fd062416 ("pkt_sched: fq: Fair Queue packet scheduler")
+> Fixes: ec97ecf1ebe4 ("net: sched: add Flow Queue PIE packet scheduler")
+> Fixes: 10239edf86f1 ("net-qdisc-hhf: Heavy-Hitter Filter (HHF) qdisc")
+> Fixes: d4b36210c2e6 ("net: pkt_sched: PIE AQM scheme")
+> Reported-by: Will <willsroot@protonmail.com>
+> Reported-by: Savy <savy@syst3mfailure.io>
+> Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
 
-Signed-off-by: Ozgur Karatas <ozgur@goosey.org>
+LGTM, but it would be great if any of the reporters could explicitly
+test it.
 
----
- net/ipv4/syncookies.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+> diff --git a/net/sched/sch_codel.c b/net/sched/sch_codel.c
+> index 12dd71139da3..c93761040c6e 100644
+> --- a/net/sched/sch_codel.c
+> +++ b/net/sched/sch_codel.c
+> @@ -144,7 +144,7 @@ static int codel_change(struct Qdisc *sch, struct nlattr *opt,
+>  
+>  	qlen = sch->q.qlen;
+>  	while (sch->q.qlen > sch->limit) {
+> -		struct sk_buff *skb = __qdisc_dequeue_head(&sch->q);
+> +		struct sk_buff *skb = qdisc_dequeue_internal(sch, true);
+>  
+>  		dropped += qdisc_pkt_len(skb);
+>  		qdisc_qstats_backlog_dec(sch, skb);
 
-diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
-index 5459a78b9809..2ff92d512825 100644
---- a/net/ipv4/syncookies.c
-+++ b/net/ipv4/syncookies.c
-@@ -408,6 +408,7 @@ struct sock *cookie_v4_check(struct sock *sk,
-struct sk_buff *skb)
-        struct flowi4 fl4;
-        struct rtable *rt;
-        __u8 rcv_wscale;
-+       __be32 daddr;
-        int full_space;
-        SKB_DR(reason);
+Side note: it looks like there is room for a possible net-next follow-up
+de-duplicating this loop code from most of the involved qdisc via a
+shared helper.
 
-@@ -442,6 +443,17 @@ struct sock *cookie_v4_check(struct sock *sk,
-struct sk_buff *skb)
-                goto out_free;
-        }
+Thanks,
 
-+        /* Safely determine destination address considered SRR option.
-+         * The flowi4 destination address is derived from opt->faddr
-if opt->srr is set.
-+         * However IP options are not always present in the skb and
-accessing opt->faddr
-+         * without validating opt->optlen and opt->srr can lead to
-undefined behavior.
-+         */
-+        if (opt && opt->optlen && opt->srr) {
-+                daddr = opt->faddr;
-+        } else {
-+                daddr = ireq->ir_rmt_addr;
-+        }
-+
-        tcp_ao_syncookie(sk, skb, req, AF_INET);
+Paolo
 
-        /*
-@@ -453,7 +465,7 @@ struct sock *cookie_v4_check(struct sock *sk,
-struct sk_buff *skb)
-        flowi4_init_output(&fl4, ireq->ir_iif, ireq->ir_mark,
-                           ip_sock_rt_tos(sk), ip_sock_rt_scope(sk),
-                           IPPROTO_TCP, inet_sk_flowi_flags(sk),
--                          opt->srr ? opt->faddr : ireq->ir_rmt_addr,
-+                          daddr,
-                           ireq->ir_loc_addr, th->source, th->dest, sk->sk_uid);
-        security_req_classify_flow(req, flowi4_to_flowi_common(&fl4));
-        rt = ip_route_output_key(net, &fl4);
---
-2.39.5
 
