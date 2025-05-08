@@ -1,187 +1,117 @@
-Return-Path: <netdev+bounces-188854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1505DAAF12E
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 04:37:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11C9EAAF131
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 04:40:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 025173ABE6D
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 02:37:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 777994C5B2F
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 02:40:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39BF71DA617;
-	Thu,  8 May 2025 02:37:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C2C61D8E07;
+	Thu,  8 May 2025 02:40:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LAwWNS7s"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AC/vVkwj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 555A41F94A;
-	Thu,  8 May 2025 02:37:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E553C2CA9;
+	Thu,  8 May 2025 02:40:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746671838; cv=none; b=pfpF83fWYl9rWliJSmd8D2PE6Z+9FD4odh4kwplXENRBSd+qxf+y6tKyUBEAAgr2GXYXhxOPPCl01/HIYA0IMat22ZaZwE85nbZ3OM6wsVXo3X74CPFKSmkwR/N6kSpyQZjy0c84uWYda0WyQ6JBXg0qwr2hxfABRNsEi7ZG478=
+	t=1746672005; cv=none; b=FGZhQIRSkWK4IZ84P5IBtHl8UM+YYinp0TOdGmfGQldWePNns5np7b3rTB2diLjepWIi7+9VqCuKrUpYgMzSvkGb8gA1bGDQDlWHA4xhZ+reifhMWiIHiWg/6KiTWl/AtVr/lz6K7O0G4ysA+aPeIvEKxyiCd8Vt7DGkTrg5gDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746671838; c=relaxed/simple;
-	bh=lbcruhGKAWZRzOTb1H0zOgqukDxfRer4cbf00zWqjV0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ue97GE+NtTyMND6h4w8laZOFldOap7nBloK3dgN4+SzC9ZpiC3NqSyACSXqiKmH/rasDxou9LRzCLbQ+wjYcXhN+AWCin9CbujsP7yBSjbLjdjXM7od9DzsVHu3Y6wuxL0KMUZBkJHr4KIyDfloR63aLyeYYb9DWLCoD7RqSeZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LAwWNS7s; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1746671833; x=1778207833;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=lbcruhGKAWZRzOTb1H0zOgqukDxfRer4cbf00zWqjV0=;
-  b=LAwWNS7sIUaNQ7Rgko+Lmn7IPxbOgNCzUD8BvavfY/zLkKsZh/vT87jl
-   Ui4MRXvZSi4Vf1i4pw3RfbBBw5Cextq1ZMCBvYw8pt+TeoFiaokh86VlX
-   IP4E3XJ5krHnbTujTaziypAkxl96tfi1qB0wxnsxaqJZXrBtf9lkfBFSQ
-   OMOKh9bEqIna5rvFWLERzo6tMOmkr3rw4IuhTx5O8vfe3UOJUXP3KkDbY
-   aUJniCIE4BgB7TcjmMrx2COF0Jf78KRRq9a1zpCNUtkN0pFdQM96l4O3B
-   tUJxYTVQfoNAFy2RZ+pXM3dpKEGig6Whb9RnyojI67b4QzH5hylILSk6m
-   Q==;
-X-CSE-ConnectionGUID: wADH9SPRQPqzikYFC3nOEA==
-X-CSE-MsgGUID: PHkSmGpCTSmZ+FalOkg7og==
-X-IronPort-AV: E=McAfee;i="6700,10204,11426"; a="59095160"
-X-IronPort-AV: E=Sophos;i="6.15,271,1739865600"; 
-   d="scan'208";a="59095160"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2025 19:37:12 -0700
-X-CSE-ConnectionGUID: I+QNqCn1Sf+Wre8qqSyiGA==
-X-CSE-MsgGUID: L40G57OYRHOWr/ji854nug==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,271,1739865600"; 
-   d="scan'208";a="136084715"
-Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
-  by orviesa006.jf.intel.com with ESMTP; 07 May 2025 19:37:06 -0700
-Received: from kbuild by 1992f890471c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uCr8C-0009Sh-08;
-	Thu, 08 May 2025 02:37:04 +0000
-Date: Thu, 8 May 2025 10:36:59 +0800
-From: kernel test robot <lkp@intel.com>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	vger.kernel.org@web.codeaurora.org
-Cc: oe-kbuild-all@lists.linux.dev, Jiayuan Chen <jiayuan.chen@linux.dev>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org
-Subject: Re: [RESEND PATCH bpf-next v4 2/2] bpf: Move the BPF net tracepoint
- definitions to net directory
-Message-ID: <202505081003.T2Tv4puD-lkp@intel.com>
-References: <20250506025131.136929-2-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1746672005; c=relaxed/simple;
+	bh=PPsSM14gHTW97fJBqtwnlogegPfFs55g12PqrVl+Eho=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=BBXh7sZiPwvLQs+UDs/UqIAaC1fdzoa4DM3c1mKFsN9tfPYfxSsq6sjCfr1xir2TzXR9q4+XxKYSychzgYUMlng2inQRmKaxpn3TXzzTf88MFzBRK+WH4u9QMI4K27GLjZzRlRG0K8Uep3q51Y1I7qwmXrrDkhQltcwm02gk5fM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AC/vVkwj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2C30C4CEE2;
+	Thu,  8 May 2025 02:40:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746672004;
+	bh=PPsSM14gHTW97fJBqtwnlogegPfFs55g12PqrVl+Eho=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=AC/vVkwjFGcdbSI4+CeK7CpuwM5EqAyltxacJpTRwO3312wwVsCGl5zqi/POjiypU
+	 LKXPYYXcnJzJb8o98Pq2+pXBByOBITWt4fWVnBwy/pwnl6utFTjh+i4seOdEbbZbZq
+	 7i8KJpKVXqr1AwJiVish5Tfl4sLpzJBjL42vSrpYe45F9F0QJZuz/3aBrxHkEP/sh2
+	 omW52qKiWUL0u+C1j1Hg+gX4aPlcOaJPqLTggRhNCLT+bblbUcphodLXIc2aJt1J3s
+	 3wRk6B6iUKc6nDoh39PPexAtBVtCbNo136CbkzjLYzESUti4Fti3CADCw9au0KsMaH
+	 vkA/8jjr9Npgg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC0B380AA70;
+	Thu,  8 May 2025 02:40:43 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250506025131.136929-2-jiayuan.chen@linux.dev>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 00/11] net: dsa: b53: accumulated fixes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174667204220.2431099.5916949487538340315.git-patchwork-notify@kernel.org>
+Date: Thu, 08 May 2025 02:40:42 +0000
+References: <20250429201710.330937-1-jonas.gorski@gmail.com>
+In-Reply-To: <20250429201710.330937-1-jonas.gorski@gmail.com>
+To: Jonas Gorski <jonas.gorski@gmail.com>
+Cc: florian.fainelli@broadcom.com, andrew@lunn.ch, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux@armlinux.org.uk, kurt@linutronix.de, f.fainelli@gmail.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Jiayuan,
+Hello:
 
-kernel test robot noticed the following build errors:
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-[auto build test ERROR on bpf-next/master]
+On Tue, 29 Apr 2025 22:16:59 +0200 you wrote:
+> This patchset aims at fixing most issues observed while running the
+> vlan_unaware_bridge, vlan_aware_bridge and local_termination selftests.
+> 
+> Most tests succeed with these patches on BCM53115, connected to a
+> BCM6368.
+> 
+> It took me a while to figure out that a lot of tests will fail if all
+> ports have the same MAC address, as the switches drop any frames with
+> DA == SA. Luckily BCM63XX boards often have enough MACs allocated for
+> all ports, so I just needed to assign them.
+> 
+> [...]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jiayuan-Chen/bpf-Move-the-BPF-net-tracepoint-definitions-to-net-directory/20250506-150437
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
-patch link:    https://lore.kernel.org/r/20250506025131.136929-2-jiayuan.chen%40linux.dev
-patch subject: [RESEND PATCH bpf-next v4 2/2] bpf: Move the BPF net tracepoint definitions to net directory
-config: arc-defconfig (https://download.01.org/0day-ci/archive/20250508/202505081003.T2Tv4puD-lkp@intel.com/config)
-compiler: arc-linux-gcc (GCC) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250508/202505081003.T2Tv4puD-lkp@intel.com/reproduce)
+Here is the summary with links:
+  - [net,01/11] net: dsa: b53: allow leaky reserved multicast
+    https://git.kernel.org/netdev/net/c/5f93185a757f
+  - [net,02/11] net: dsa: b53: keep CPU port always tagged again
+    https://git.kernel.org/netdev/net/c/425f11d4cc9b
+  - [net,03/11] net: dsa: b53: fix clearing PVID of a port
+    https://git.kernel.org/netdev/net/c/f48085198104
+  - [net,04/11] net: dsa: b53: fix flushing old pvid VLAN on pvid change
+    https://git.kernel.org/netdev/net/c/083c6b28c0cb
+  - [net,05/11] net: dsa: b53: fix VLAN ID for untagged vlan on bridge leave
+    https://git.kernel.org/netdev/net/c/a1c1901c5cc8
+  - [net,06/11] net: dsa: b53: always rejoin default untagged VLAN on bridge leave
+    https://git.kernel.org/netdev/net/c/13b152ae4049
+  - [net,07/11] net: dsa: b53: do not allow to configure VLAN 0
+    https://git.kernel.org/netdev/net/c/45e9d59d3950
+  - [net,08/11] net: dsa: b53: do not program vlans when vlan filtering is off
+    https://git.kernel.org/netdev/net/c/f089652b6b16
+  - [net,09/11] net: dsa: b53: fix toggling vlan_filtering
+    https://git.kernel.org/netdev/net/c/2dc2bd571115
+  - [net,10/11] net: dsa: b53: fix learning on VLAN unaware bridges
+    https://git.kernel.org/netdev/net/c/9f34ad89bcf0
+  - [net,11/11] net: dsa: b53: do not set learning and unicast/multicast on up
+    https://git.kernel.org/netdev/net/c/2e7179c628d3
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202505081003.T2Tv4puD-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   arc-linux-ld: net/core/dev.o: in function `netif_receive_generic_xdp':
->> dev.c:(.text+0xb3b4): undefined reference to `__tracepoint_xdp_exception'
->> arc-linux-ld: dev.c:(.text+0xb3b4): undefined reference to `__tracepoint_xdp_exception'
->> arc-linux-ld: dev.c:(.text+0xb3e8): undefined reference to `__traceiter_xdp_exception'
->> arc-linux-ld: dev.c:(.text+0xb3e8): undefined reference to `__traceiter_xdp_exception'
-   arc-linux-ld: net/core/dev.o: in function `generic_xdp_tx':
-   dev.c:(.text+0xb488): undefined reference to `__tracepoint_xdp_exception'
-   arc-linux-ld: dev.c:(.text+0xb488): undefined reference to `__tracepoint_xdp_exception'
-   arc-linux-ld: dev.c:(.text+0xb4c4): undefined reference to `__tracepoint_xdp_exception'
-   arc-linux-ld: dev.c:(.text+0xb4c4): undefined reference to `__tracepoint_xdp_exception'
-   arc-linux-ld: dev.c:(.text+0xb594): undefined reference to `__traceiter_xdp_exception'
-   arc-linux-ld: dev.c:(.text+0xb594): undefined reference to `__traceiter_xdp_exception'
-   arc-linux-ld: net/core/filter.o: in function `__do_trace_xdp_redirect_err':
->> filter.c:(.text+0x6f88): undefined reference to `__traceiter_xdp_redirect_err'
->> arc-linux-ld: filter.c:(.text+0x6f88): undefined reference to `__traceiter_xdp_redirect_err'
-   arc-linux-ld: net/core/filter.o: in function `xdp_do_redirect_frame':
->> filter.c:(.text+0xc45e): undefined reference to `__tracepoint_xdp_redirect_err'
->> arc-linux-ld: filter.c:(.text+0xc45e): undefined reference to `__tracepoint_xdp_redirect_err'
->> arc-linux-ld: filter.c:(.text+0xc490): undefined reference to `__tracepoint_xdp_redirect'
->> arc-linux-ld: filter.c:(.text+0xc490): undefined reference to `__tracepoint_xdp_redirect'
->> arc-linux-ld: filter.c:(.text+0xc500): undefined reference to `__traceiter_xdp_redirect'
->> arc-linux-ld: filter.c:(.text+0xc500): undefined reference to `__traceiter_xdp_redirect'
-   arc-linux-ld: filter.c:(.text+0xc55a): undefined reference to `__traceiter_xdp_redirect_err'
-   arc-linux-ld: filter.c:(.text+0xc55a): undefined reference to `__traceiter_xdp_redirect_err'
-   arc-linux-ld: filter.c:(.text+0xc594): undefined reference to `__tracepoint_xdp_redirect_err'
-   arc-linux-ld: filter.c:(.text+0xc594): undefined reference to `__tracepoint_xdp_redirect_err'
-   arc-linux-ld: net/core/filter.o: in function `xdp_do_redirect':
-   filter.c:(.text+0xc682): undefined reference to `__tracepoint_xdp_redirect_err'
-   arc-linux-ld: filter.c:(.text+0xc682): undefined reference to `__tracepoint_xdp_redirect_err'
-   arc-linux-ld: filter.c:(.text+0xc6ba): undefined reference to `__tracepoint_xdp_redirect'
-   arc-linux-ld: filter.c:(.text+0xc6ba): undefined reference to `__tracepoint_xdp_redirect'
-   arc-linux-ld: filter.c:(.text+0xc734): undefined reference to `__traceiter_xdp_redirect'
-   arc-linux-ld: filter.c:(.text+0xc734): undefined reference to `__traceiter_xdp_redirect'
-   arc-linux-ld: filter.c:(.text+0xc7d6): undefined reference to `__traceiter_xdp_redirect_err'
-   arc-linux-ld: filter.c:(.text+0xc7d6): undefined reference to `__traceiter_xdp_redirect_err'
-   arc-linux-ld: filter.c:(.text+0xc810): undefined reference to `__tracepoint_xdp_redirect_err'
-   arc-linux-ld: filter.c:(.text+0xc810): undefined reference to `__tracepoint_xdp_redirect_err'
-   arc-linux-ld: net/core/filter.o: in function `xdp_do_generic_redirect':
-   filter.c:(.text+0xd326): undefined reference to `__tracepoint_xdp_redirect_err'
-   arc-linux-ld: filter.c:(.text+0xd326): undefined reference to `__tracepoint_xdp_redirect_err'
-   arc-linux-ld: filter.c:(.text+0xd3a4): undefined reference to `__tracepoint_xdp_redirect'
-   arc-linux-ld: filter.c:(.text+0xd3a4): undefined reference to `__tracepoint_xdp_redirect'
-   arc-linux-ld: filter.c:(.text+0xd3ea): undefined reference to `__tracepoint_xdp_redirect'
-   arc-linux-ld: filter.c:(.text+0xd3ea): undefined reference to `__tracepoint_xdp_redirect'
-   arc-linux-ld: filter.c:(.text+0xd454): undefined reference to `__traceiter_xdp_redirect_err'
-   arc-linux-ld: filter.c:(.text+0xd454): undefined reference to `__traceiter_xdp_redirect_err'
-   arc-linux-ld: filter.c:(.text+0xd4b2): undefined reference to `__traceiter_xdp_redirect'
-   arc-linux-ld: filter.c:(.text+0xd4b2): undefined reference to `__traceiter_xdp_redirect'
-   arc-linux-ld: filter.c:(.text+0xd4ec): undefined reference to `__tracepoint_xdp_redirect_err'
-   arc-linux-ld: filter.c:(.text+0xd4ec): undefined reference to `__tracepoint_xdp_redirect_err'
-   arc-linux-ld: filter.c:(.text+0xd532): undefined reference to `__traceiter_xdp_redirect_err'
-   arc-linux-ld: filter.c:(.text+0xd532): undefined reference to `__traceiter_xdp_redirect_err'
-   arc-linux-ld: filter.c:(.text+0xd594): undefined reference to `__traceiter_xdp_redirect'
-   arc-linux-ld: filter.c:(.text+0xd594): undefined reference to `__traceiter_xdp_redirect'
-   arc-linux-ld: net/core/xdp.o: in function `xdp_rxq_info_reg_mem_model':
->> xdp.c:(.text+0x58e): undefined reference to `__tracepoint_mem_connect'
->> arc-linux-ld: xdp.c:(.text+0x58e): undefined reference to `__tracepoint_mem_connect'
->> arc-linux-ld: xdp.c:(.text+0x5d2): undefined reference to `__traceiter_mem_connect'
->> arc-linux-ld: xdp.c:(.text+0x5d2): undefined reference to `__traceiter_mem_connect'
-
+You are awesome, thank you!
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
