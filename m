@@ -1,228 +1,285 @@
-Return-Path: <netdev+bounces-188897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F83DAAF3A9
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 08:24:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBEE9AAF3AD
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 08:26:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CBBA3AA72C
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 06:24:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E71331C20C07
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 06:26:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F4144AEE0;
-	Thu,  8 May 2025 06:24:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5681F212F94;
+	Thu,  8 May 2025 06:26:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="j6vSFg8z"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X9cecayI"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C056747F
-	for <netdev@vger.kernel.org>; Thu,  8 May 2025 06:24:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746685484; cv=none; b=cZiTJefGXCCPkW5uT+/NzA5oZwr64uU8+3mE2oC8pOItmKDkTJCD8kqhK02KRHALuiN1zPuYopunfLzje12aUmapUdXtrviV/WyDVa/vJqiJxUH+lgSEREAKaqi+M87ia4aPxEMK9PS6uQmwegwdLJfzP/Pw9dAP3bCuv/xOJfY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746685484; c=relaxed/simple;
-	bh=p/VdULAVeF4K2Q+upl4+rwoadWVrqvXYpynC63s0o6E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Z+lR2xCqa/ZUJ/SFLvnf1lsJW2jetHptMzQFpn/SQHTQnGEQgbVz1FW+aneeYQbbTnLJOKbbwsRcEU5q8nGGN1zB1iVr5VgFRhn3L1AhVsUfxacgiRT5+WFAsM3OWGRGo4B00hP9Ok3TVCvxLnduA+EYS7iYxu0xTvDkaMnIXE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=j6vSFg8z; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1746685478;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Ei4PX0Vl85kv5sOEPUuFgHeGfJKMG2wW4+tzyXrfHA4=;
-	b=j6vSFg8zlUnRI+4FgIxe8tjodDfHTAMbx/eAL+u4pKT4ndQ5QNRHZ94lMh/TRF/Cqqbi+W
-	/bsYj5tiGWCmhD49SeWQOoH0x0IJc1GfOXvOr4eXAYeVCXciB4L2f90Ckd3Z5BRBfjQHtT
-	Cq3VhrozBKPGFLEp7qGa3tzyOtsrzRI=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: bpf@vger.kernel.org
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Cong Wang <cong.wang@bytedance.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH bpf-next v1] bpf, sockmap: Fix concurrency issues between memory charge and uncharge
-Date: Thu,  8 May 2025 14:24:22 +0800
-Message-ID: <20250508062423.51978-1-jiayuan.chen@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E3D1CB31D;
+	Thu,  8 May 2025 06:26:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746685591; cv=fail; b=m0tmGggGa9y8BMPlbM2sq02OgFW9MqWUsS7R+QaYvNqmG2Qm25z0FLWvhjpJUCxvGo1xl6wsJ+AGZ7mnA3nPG0NGcg19kxa2f0SO+FGgxzAWJW1C88NLM9QY5OQMiUOoLl1hkcWgnGLzM5ca5E+S21kOtNaV/QMVsxkFLpcuEew=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746685591; c=relaxed/simple;
+	bh=4ZjBFUdE3fpYxVGCgU2QaFeWz4ramPnZaZdogjop9I0=;
+	h=Subject:To:CC:References:From:Message-ID:Date:In-Reply-To:
+	 Content-Type:MIME-Version; b=BDqmr13OfV8+myzIDeA6ed4IXVtsGuweEAbPAZoL1xuS7l0EuTqCma7Aez9bP/Pfb9IeT4NcVoBAsaJIzHKGGT5/P2h/h1sbTyFvNfZmJxgoFHV1qxam4cx/2Ui91AOqIbJfooduXzCpxzOps0NDOtEeLA3DLEoj1ho3IUOp28k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=X9cecayI; arc=fail smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746685589; x=1778221589;
+  h=subject:to:cc:references:from:message-id:date:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=4ZjBFUdE3fpYxVGCgU2QaFeWz4ramPnZaZdogjop9I0=;
+  b=X9cecayIl/fUBFEVWxZnBBtQXPLp+PJ7P4Mnw5aVreN9xkaAB8ozRfWi
+   hzELbGQL7J0QzjG11P3bbAHn9cnoXYapSgzha3HsoAvPtS7TcS7IbrY71
+   gA2zcaN+mxJID76c9C8w7ZjXVx7knG9uOZ3VjubDalNfkUg+LsvaWAXz1
+   0Bzau2xLSQ/UvGgmH+umH4ATATduVCNShIKEPh+QlwMcDNEyLwRn5MzTA
+   Au3P9vB71bQ3tKQzwDG27wa71E4dU/O9OdCeaJ3HU1LOaoVGCrW64gsTA
+   jpJsGQw/xiePKLHuTi5v7fQF0dJCPJgzeSrhijJZWRI4bKPFUXBU+I+Xi
+   A==;
+X-CSE-ConnectionGUID: wesDRZssTYydxpSJIuw2gw==
+X-CSE-MsgGUID: fdT/jdIbSSOA4nhRphp1oQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11426"; a="48532822"
+X-IronPort-AV: E=Sophos;i="6.15,271,1739865600"; 
+   d="scan'208";a="48532822"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2025 23:26:29 -0700
+X-CSE-ConnectionGUID: oOVNtRo8TcqRXXW/Yp5QxA==
+X-CSE-MsgGUID: B0vxoQVpRZ2oVq/hxqweHw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,271,1739865600"; 
+   d="scan'208";a="141153131"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2025 23:26:29 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Wed, 7 May 2025 23:26:28 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Wed, 7 May 2025 23:26:28 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.173)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Wed, 7 May 2025 23:26:27 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Zh5pk1NW2SZJrRXyA5VwEZYH96FiCrK/L+ZMQ2rnGKV5e4oA/u8VsrVJGTrnW2LfK2iELP/jfYGtHc7W7iIfts7QNsiUgpksgF5pqzLCEiNu9Gw7LL0x6Bn/uS6m/nOa34NB6gtyjLrLLcjVtsQMhqdeyGm50qbHemlXsYVo57HsOJzBFvVqqzrUjBj//LHsR939w0ccrvVIuHLIi7V113pTHaSBDeLlvT24AtsIZjfLeNJa5lczmeBHIWZOY2F7ZrrsSLQ3o7mH/DG/RP/QBm4+UHIDmhD3DdYQ8taLUY/31MtdBdCi4K/nTIsV1cksdD0j4q+fyUHfCqpQaFw95A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wmJDuv7pRJHKrFZ94xcl9qXb4YQFFU3VvjI7ue+id0U=;
+ b=BLeUhhlYT2umjdaLCe1B+p4AN6jUmtqHdk68rD82wfsQdK7iktcqRXzhW3j7dnTK7NvHHA6Kap//h5OFztrVjlRY25qu6eoIz+DyuQwNo5Ssm9sIcTuV8iOlZwXK//aQ7ZV/N1jrzvTsF9CMtlMgJjw39VHrWuj9VRIhInUzBspMfU4+RWUqfbUjMMeR/0O/qOlnkusOmNzuyPGNXu7UPyuiZttD5OaKEXTjiU9oZlOvB0c4uiQq8oFKlIH0AgosP641Xi9aAulkidjOr/yS1Dnqi9UFZf/hk1LbXKEgj/rjlNnhkw5DcHsrcj1kNsmOABED6eud4F6ziq7FkLP2Bw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB5949.namprd11.prod.outlook.com (2603:10b6:510:144::6)
+ by LV2PR11MB5974.namprd11.prod.outlook.com (2603:10b6:408:14c::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.35; Thu, 8 May
+ 2025 06:26:24 +0000
+Received: from PH0PR11MB5949.namprd11.prod.outlook.com
+ ([fe80::1c5d:e556:f779:e861]) by PH0PR11MB5949.namprd11.prod.outlook.com
+ ([fe80::1c5d:e556:f779:e861%6]) with mapi id 15.20.8699.019; Thu, 8 May 2025
+ 06:26:24 +0000
+Subject: Re: [Intel-wired-lan] [REGRESSION] e1000e heavy packet loss on Meteor
+ Lake - 6.14.2
+To: =?UTF-8?Q?Marek_Marczykowski-G=c3=b3recki?=
+	<marmarek@invisiblethingslab.com>
+CC: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, <netdev@vger.kernel.org>,
+	<intel-wired-lan@lists.osuosl.org>, <regressions@lists.linux.dev>,
+	<stable@vger.kernel.org>, Sasha Levin <sashal@kernel.org>
+References: <Z_z9EjcKtwHCQcZR@mail-itl>
+ <b1f5e997-033c-33ed-5e3b-6fe2632bf718@intel.com> <Z_0GYR8jR-5NWZ9K@mail-itl>
+ <50da66d0-fe66-0563-4d34-7bd2e25695a4@intel.com>
+ <b5d72f51-3cd0-aeca-60af-41a20ad59cd5@intel.com> <Z_-l2q9ZhszFxiqA@mail-itl>
+ <d37a7c9e-7b3f-afc2-b010-e9785f39a785@intel.com> <aAZF0JUKCF0UvfF6@mail-itl>
+ <aAZH7fpaGf7hvX6T@mail-itl>
+From: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
+Message-ID: <e0034a96-e285-98c8-b526-fb167747aedc@intel.com>
+Date: Thu, 8 May 2025 09:26:18 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
+In-Reply-To: <aAZH7fpaGf7hvX6T@mail-itl>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: TL0P290CA0002.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:5::10) To PH0PR11MB5949.namprd11.prod.outlook.com
+ (2603:10b6:510:144::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB5949:EE_|LV2PR11MB5974:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4295fcd5-acee-48ed-01a1-08dd8df94137
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?UzhHWG5oVFVlcmVraUMwY3hqeVdqQjdyY1RzZFp0MWwybVg3SjFlUWFmVnll?=
+ =?utf-8?B?K08vRVEzejhDUlNIVCtzU25MMVp5RWhORDU5cnpvUlZmZDlFc0tMa3VsU3ZB?=
+ =?utf-8?B?UndiNUh3N0dOeTRNZWtwWHovTTdVZXUxUkVDTGsvTERTUnA1Y0ZIWDVzdmdj?=
+ =?utf-8?B?czhRbGtNR0FUcnlBWHBKQVZ4aVU4MElQSXZucmJqdVRoVWhib0l6K01BUFZM?=
+ =?utf-8?B?ZWRCMHhZZjE2djVDNHdFWGJHeGNwaWYvR1lTNU5nZnF5U0FtR3pIdWtxVVcw?=
+ =?utf-8?B?WkgzSlhEeHMvcndDK01nWVJCSHdPSGk1UmsxdTkycmxiZ3dyL2w3MDVram5l?=
+ =?utf-8?B?NzREaDAzREJKazk0Wk45RFEwaGNXaU0vVFRCZGhDZ2xSVzUyeURHUXRuSzE2?=
+ =?utf-8?B?L245TkxFbzFJQnRaeDAzbEFjL2xNTjcxVi9DeXhJRmt2cEJGWDlvQmIrQ09U?=
+ =?utf-8?B?UTBlbUZDeStoRWUzdHJEU2V6ODNWeTJVQVZFMm9IcVVTd0hPUm42NUZGSjVI?=
+ =?utf-8?B?VjdqdmhjT3N4bkttNktNVldtL3orZEpVNi80bjRQMDNUYzE0QXpGMnZnODFo?=
+ =?utf-8?B?QjE5VTM3TzczdGtYcGF0b05WNjlUWEZaUEhVUklhdEF4MUtjZ2ZnbllZYnFl?=
+ =?utf-8?B?bzUzbWU5OVFvbVJVOEcvemhYQ0pKcTRZTStpN2lpdWZGclhYUHZsWUtsUWND?=
+ =?utf-8?B?MVhiL1ZJdzhlYkFkS3RxLysyQUl1QVlKcHpmdnpXdUF4ay9pMW5pRGVLekEv?=
+ =?utf-8?B?Yk9NTXRTdTJocHpEMkI4cWY1RGlGME42VndwNEtuT2ZBT1hQSWVGeWpSbmYy?=
+ =?utf-8?B?U3NtMFovTFNuM1JnMUMzcm5NejdMNGVHWndCOTYvOUp2Sklra0QvS21OUVFJ?=
+ =?utf-8?B?Y0tXUlp1SHMvS3ptVFAxazhwY0NBUDJpSEoxbXBvaUNCcGxkYmxtU3YvWC9L?=
+ =?utf-8?B?YkFaYUQ1ekpCRndudTdEdFM1LzA4eEpvVzByelBpbXZuK0Q2SHpPSjBKQStt?=
+ =?utf-8?B?eEtLc0l6M2lYM0lWaGFsRFpxWFI0RWNPWFYvSjlYMWdJcXN5MzBFL2dwYTNJ?=
+ =?utf-8?B?RWFVWW5HK040VWE0Rzc3blBrUy91dWpodUVUMTl6Z25ZalhEMFlqY1A1SEQy?=
+ =?utf-8?B?TTd0NTFxK1BLQ1VsK29CR0RaNUszY2JQbVdxL0FmZ0FjUWVsTWlyZlZrYWpX?=
+ =?utf-8?B?WmJyVkFleHVvYVFXaWVlOGJBNEdUZ1RUeFpQRjM5U2VENi9pUExYQ3BCZ2ZM?=
+ =?utf-8?B?NVBTdVhldWYvanAvWDNjMmtGbDhlMHphL2s2aFNkTzJpN0N6ZnJtbEpDZldw?=
+ =?utf-8?B?eFJ4cDZLd3RSdkxTbHNyR1l0cDZUeU9UQTc3Wlp3emw2VURMQyswcm1kSWhP?=
+ =?utf-8?B?SzlKMXFoOXRldEJ3VTZ1bjhBQmg5V3M2SCt1cktqa1B6V2NISU1WOUlNRW9S?=
+ =?utf-8?B?c21qVWg4SGRpY1h4c1VQQThVQ3hLS1dlSGc5OTExeWxQcEFDNmlQbjN5SllH?=
+ =?utf-8?B?dFA5WkNpUFE1c1pkczliNnBlSGhpb3p6bm5CekdrekQwa0dUOEJkOE5TVnRC?=
+ =?utf-8?B?bHl6ci9xQTRrU0lIcWxnN3hXRlZlTCsxSUF3OU8xZVNEK3lSVjVOZlROYkMv?=
+ =?utf-8?B?dHRRcHpicVVXc1lVbUFVcm82UHAwejJ6NTRRdVR0czQwcXUwMUdENE5oYmha?=
+ =?utf-8?B?TklSMjcwNkxzRUszbG9EeFFYdVpWSkJMVHJYNmxJclFDY2Y0dE9JR3lVTlp0?=
+ =?utf-8?B?ZVpKMUJ3T2trbEZ0dnVxcXJhTDI0TkQ0ejMzb1ZaWHRKQWhqTXRueHBPUXhw?=
+ =?utf-8?B?Z0U1UnRhWW1vRWFVeW5GTHIxdjlLMWxmWU16bHhRYmZ5MmhIak41WC9HUlBw?=
+ =?utf-8?B?d0h0dnQwUWdXL25pdW5pQXZOZkZSY0lRcVd5eHdNcUtndWFxeFZlZkxUWXVH?=
+ =?utf-8?Q?dDa4s91sAA8=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5949.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VnltZ1hHb3A4RzN2NEtZN3A5NUVyMkNwTHIwZjJPUytqKzBGWkxPbHk3WlRI?=
+ =?utf-8?B?ZXo1ZzZJZERjajVzbDdiSGFJd3l6U3dSVXk1alRVWXVEbUQrdUh1VUZVNXJC?=
+ =?utf-8?B?T3RSWUQ1UktYTmdDckZUbnNiSHVzK1JPZEVXNExLU1B3MFZGaXNjNHQ3RS81?=
+ =?utf-8?B?dHBTQThYMVlrM2ViekpNZVc3c0k2aTVzWmVBUFV0TFhNdkFZUHNrSkR2aGJ2?=
+ =?utf-8?B?aDhIY0dOTDdkZ1lXelRRSXFHYWs4VWdEVUtuUTFxRmp0aGE5bVRvOHJ3QmZ1?=
+ =?utf-8?B?MHY1QzlDOVJmV2lsK1NpR3M0QzZVcEdNaEh6cUdrM0VLSWhLRmVWVmk2aEhj?=
+ =?utf-8?B?eVJzRk1DUC83eml1U1FoOUhUVkNFOUJmUGhUWTZPZ1ZIeStJZmxCUFVYdEhF?=
+ =?utf-8?B?T3Z3MDhNUFY2aWJRdGdMblF6aWJ0RG5hYzBtaUZJUmcyNTNSRUZycWR1aDZI?=
+ =?utf-8?B?SVNrOERRQkFaT3NsZ2tNemV0Y2twQ1NLTG1NMTQwd0doRXVac05uTVBtL3hw?=
+ =?utf-8?B?bS93WURWWVNUVnNncVBpc2l1Q2hpajBXN2I2aFBVOEZKYS8wbnRsNW5DNnY2?=
+ =?utf-8?B?K2VnZzc0MC9FR2lReWJnL2hPQ0FRYXJuRFhUcjRrM21vUVJxdVJ6bjloWGdS?=
+ =?utf-8?B?VlBSbXN0N3p4SlpENWVqZGNtQTlsVUVuc0R1Tm5BTmNIZVlFUUUwRUhnNGxo?=
+ =?utf-8?B?b1N0SVVPd2ZTREc3QURuTkJ2MGpJditPMTV2b2d1VkhYQlFCNTZhODMwbHF4?=
+ =?utf-8?B?eklNUkJDdWcyVWNDMVNDVnI0SlFnbDRLK3JReERvNmZ4akM3R1I2VlV2SUFS?=
+ =?utf-8?B?RldZRzA5YXU2L1Bvd0VlM1dWQkE1Vzl3VlRQb3BtUGluanF5ZE5rdklKUS91?=
+ =?utf-8?B?dzBZKzZEL0RMSElROXFibURBaFFlWlg0Zmgyb3JEZmcyZEp5bFNIZVo4YmNq?=
+ =?utf-8?B?Mlo4TTFEQkE3dDRiaS92M3JqUUUyZlV0aWJaNS9tYkpyNkM4ZTJJQ1FOMWhy?=
+ =?utf-8?B?YW8wazJxc2MyandKY2tObitRdjZtOFAxdzBIbldhZlJaWXIvUXBsREluNm9l?=
+ =?utf-8?B?aG9OUDRjVEo0M3d0ajhZd0picEw0T0c4UlZ0RmtRUG9XTVMwM04yRHJZZUtt?=
+ =?utf-8?B?MTFiaFl2YXI1U0c5eGVKTWF2dWhrY3VENk1rQ0F6NkJwRmtFTlhWaFVWZnY3?=
+ =?utf-8?B?eE9GaE5sZVpnT0xwRmZVL28ySkRraTBsYnIxZHJGYW0vWk1CYzFtdzhqYW5a?=
+ =?utf-8?B?cVZUZUdNOUc4dHVOV1B6Y2JhQnVVM1hJV1hYRFQzand3UFRlbUtRZHJXWEhE?=
+ =?utf-8?B?N0hyQlNwa0pLaU5zVE1KK0RBaGh3cGVRWUMyYzk2WkFjcHlXTWhxdVVDbGRR?=
+ =?utf-8?B?V3haYVJJT0dIbWVnY2pDSmkzdk1SVzVQQWlJYjFQb3YrdzRVVTNnTnpJYWlP?=
+ =?utf-8?B?VnF2VmpmcGdDSGVGSWZubTBZSS9MakNPbC9aR0I5d2hPZDRxWXhvMHRtVzRG?=
+ =?utf-8?B?WE5HSDZ4cXBmVmJxVEFQenZaSVhpSkhZakIzV004OXpqZlpFdU9sZ2xtQ0Zi?=
+ =?utf-8?B?MzFiaWIyTzJReVRqaVN3K0FKVHIxK2V6SXlsdzlOZUhFNWtiOFM0Vm5WUmYx?=
+ =?utf-8?B?YS9JWXJjT0VIc3dNVFQwampqOVNtZFRrTk9LcnMvcm5ranllTTNmMFA3MEJu?=
+ =?utf-8?B?MDNFTTVUMFBzMGZlM1BDUUhFcGVYdUVIU0lmL0JONENwRGxPbWdJMHZoQXoz?=
+ =?utf-8?B?RlBKUmcrVFpKQ1FWZ0Zsam9VQTRDNWQ0RXlVdWxvR0x4ODFhSXlwTFVHUzR4?=
+ =?utf-8?B?enN2dGYrckw2emwvTGtIemNzZVJXbHJLQ3F4b2tmR2djdDhDZkk3d3BVdHBq?=
+ =?utf-8?B?TFk1OUxKQzI2c3hZRlpCL1FTZGE5M1hmVTRGWUZldkExVTEzL3hoaVBoeEJ3?=
+ =?utf-8?B?M0h6Vk1DZUVyai9qUVkrL1dTME9PSTJaVk1LelU2U3JqZVhFUmNlcDMvMmNR?=
+ =?utf-8?B?VEFRQVAxbXB3UTJmWjczZXZ6cDZVWSsvRy9DamVlSFg2NjFvOW9ia24zVFkx?=
+ =?utf-8?B?UnRNY0liZTRPN3NrdDBzUjY4b3BINVgwaGtOSnVqM2RKMk1leHRXNFkwRU0z?=
+ =?utf-8?B?SDFHUUozU0l6Y0xVcHZPWktBVE5aREdnRXVZYk5tYnI4RWZuUWwzRG5vQU8v?=
+ =?utf-8?B?Q3c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4295fcd5-acee-48ed-01a1-08dd8df94137
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5949.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 May 2025 06:26:24.0131
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZSeDH+Zf8SwcEA2BDEeklI4eUYpJQmoP1l9ouqE0+5kSErET6BuRT+ynS2U9ENtaCX13U17gtG4C7ON+tanahLZTo7BgHZUhB6roNXEnmeo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR11MB5974
+X-OriginatorOrg: intel.com
 
-Triggering WARN_ON_ONCE(sk->sk_forward_alloc) by running the following
-command, followed by pressing Ctrl-C after 2 seconds:
-./bench sockmap -c 2 -p 1 -a --rx-verdict-ingress
-'''
-------------[ cut here ]------------
-WARNING: CPU: 2 PID: 40 at net/ipv4/af_inet.c inet_sock_destruct
 
-Call Trace:
-<TASK>
-__sk_destruct+0x46/0x222
-sk_psock_destroy+0x22f/0x242
-process_one_work+0x504/0x8a8
-? process_one_work+0x39d/0x8a8
-? __pfx_process_one_work+0x10/0x10
-? worker_thread+0x44/0x2ae
-? __list_add_valid_or_report+0x83/0xea
-? srso_return_thunk+0x5/0x5f
-? __list_add+0x45/0x52
-process_scheduled_works+0x73/0x82
-worker_thread+0x1ce/0x2ae
-'''
 
-Reason:
-When we are in the backlog process, we allocate sk_msg and then perform
-the charge process. Meanwhile, in the user process context, the recvmsg()
-operation performs the uncharge process, leading to concurrency issues
-between them.
+On 4/21/2025 4:28 PM, Marek Marczykowski-Górecki wrote:
+> On Mon, Apr 21, 2025 at 03:19:12PM +0200, Marek Marczykowski-Górecki wrote:
+>> On Mon, Apr 21, 2025 at 03:44:02PM +0300, Lifshits, Vitaly wrote:
+>>>
+>>>
+>>> On 4/16/2025 3:43 PM, Marek Marczykowski-Górecki wrote:
+>>>> On Wed, Apr 16, 2025 at 03:09:39PM +0300, Lifshits, Vitaly wrote:
+>>>>> Can you please also share the output of ethtool -i? I would like to know the
+>>>>> NVM version that you have on your device.
+>>>>
+>>>> driver: e1000e
+>>>> version: 6.14.1+
+>>>> firmware-version: 1.1-4
+>>>> expansion-rom-version:
+>>>> bus-info: 0000:00:1f.6
+>>>> supports-statistics: yes
+>>>> supports-test: yes
+>>>> supports-eeprom-access: yes
+>>>> supports-register-dump: yes
+>>>> supports-priv-flags: yes
+>>>>
+>>>
+>>> Your firmware version is not the latest, can you check with the board
+>>> manufacturer if there is a BIOS update to your system?
+>>
+>> I can check, but still, it's a regression in the Linux driver - old
+>> kernel did work perfectly well on this hw. Maybe new driver tries to use
+>> some feature that is missing (or broken) in the old firmware?
+> 
+> A little bit of context: I'm maintaining the kernel package for a Qubes
+> OS distribution. While I can try to update firmware on my test system, I
+> have no influence on what hardware users will use this kernel, and
+> which firmware version they will use (and whether all the vendors
+> provide newer firmware at all). I cannot ship a kernel that is known
+> to break network on some devices.
+> 
+>>> Also, you mentioned that on another system this issue doesn't reproduce, do
+>>> they have the same firmware version?
+>>
+>> The other one has also 1.1-4 firmware. And I re-checked, e1000e from
+>> 6.14.2 works fine there.
+> 
 
-The charge process (2 functions):
-1. sk_rmem_schedule(size) -> sk_forward_alloc increases by PAGE_SIZE
-                             multiples
-2. sk_mem_charge(size)    -> sk_forward_alloc -= size
+Dear Marek,
 
-The uncharge process (sk_mem_uncharge()):
-3. sk_forward_alloc += size
-4. check if sk_forward_alloc > PAGE_SIZE
-5. reclaim    -> sk_forward_alloc decreases, possibly becoming 0
+Thank you for your detailed feedback and for providing the requested 
+information.
 
-Because the sk performing charge and uncharge is not locked
-(mainly because the backlog process does not lock the socket), therefore,
-steps 1 to 5 will execute concurrently as follows:
+We have conducted extensive testing of this patch across multiple 
+systems and have not observed any packet loss issues. Upon comparing the 
+mentioned setups, we noted that while the LAN controller is similar, the 
+CPU differs. We believe that the issue may be related to transitions in 
+the CPU's low power states.
 
-cpu0                                cpu1
-1
-                                    3
-                                    4   --> sk_forward_alloc >= PAGE_SIZE
-                                    5   --> reclaim sk_forward_alloc
-2 --> sk_forward_alloc may
-      become negative
+Consequently, we kindly request that you disable the CPU low power state 
+transitions in the S0 system state and verify if the issue persists. You 
+can disable this in the kernel parameters on the command line with 
+idle=poll. Please note that this command is intended for debugging 
+purposes only, as it may result in higher power consumption.
 
-Solution:
-1. Add locking to the kfree_sk_msg() process, which is only called in the
-   user process context.
-2. Integrate the charge process into sk_psock_create_ingress_msg() in the
-   backlog process and add locking.
-3. Reuse the existing psock->ingress_lock.
+Please inform us if disabling the CPU low power states resolves the 
+issue or if further investigation is required. As previously mentioned, 
+this patch is critical for the operation of Meteor Lake LAN devices, and 
+therefore, we are unable to revert it.
 
-Fixes: 799aa7f98d53 ("skmsg: Avoid lock_sock() in sk_psock_backlog()")
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
----
- include/linux/skmsg.h |  7 +++++--
- net/core/skmsg.c      | 37 +++++++++++++++++++++++++------------
- 2 files changed, 30 insertions(+), 14 deletions(-)
-
-diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
-index 0b9095a281b8..3967b85ce1c0 100644
---- a/include/linux/skmsg.h
-+++ b/include/linux/skmsg.h
-@@ -378,10 +378,13 @@ static inline bool sk_psock_queue_empty(const struct sk_psock *psock)
- 	return psock ? list_empty(&psock->ingress_msg) : true;
- }
- 
--static inline void kfree_sk_msg(struct sk_msg *msg)
-+static inline void kfree_sk_msg(struct sk_psock *psock, struct sk_msg *msg)
- {
--	if (msg->skb)
-+	if (msg->skb) {
-+		spin_lock_bh(&psock->ingress_lock);
- 		consume_skb(msg->skb);
-+		spin_unlock_bh(&psock->ingress_lock);
-+	}
- 	kfree(msg);
- }
- 
-diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-index 276934673066..77c698627b16 100644
---- a/net/core/skmsg.c
-+++ b/net/core/skmsg.c
-@@ -480,7 +480,7 @@ int sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
- 		msg_rx->sg.start = i;
- 		if (!sge->length && (i == msg_rx->sg.end || sg_is_last(sge))) {
- 			msg_rx = sk_psock_dequeue_msg(psock);
--			kfree_sk_msg(msg_rx);
-+			kfree_sk_msg(psock, msg_rx);
- 		}
- 		msg_rx = sk_psock_peek_msg(psock);
- 	}
-@@ -514,16 +514,36 @@ static struct sk_msg *alloc_sk_msg(gfp_t gfp)
- 	return msg;
- }
- 
--static struct sk_msg *sk_psock_create_ingress_msg(struct sock *sk,
-+static struct sk_msg *sk_psock_create_ingress_msg(struct sk_psock *psock,
-+						  struct sock *sk,
- 						  struct sk_buff *skb)
- {
-+	spin_lock_bh(&psock->ingress_lock);
- 	if (atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf)
--		return NULL;
-+		goto unlock_err;
- 
- 	if (!sk_rmem_schedule(sk, skb, skb->truesize))
--		return NULL;
-+		goto unlock_err;
-+
-+	/* This will transition ownership of the data from the socket where
-+	 * the BPF program was run initiating the redirect to the socket
-+	 * we will eventually receive this data on. The data will be released
-+	 * from consume_skb whether in sk_msg_recvmsg() after its been copied
-+	 * into user buffers or in other skb release processes.
-+	 */
-+	skb_set_owner_r(skb, sk);
-+	spin_unlock_bh(&psock->ingress_lock);
- 
-+	/* sk_msg itself is not under sk memory limitations and we only concern
-+	 * sk_msg->skb, hence no lock protection is needed here. Furthermore,
-+	 * adding a ingress_lock would trigger a warning from lockdep about
-+	 * 'softirq-safe to softirq-unsafe'.
-+	 */
- 	return alloc_sk_msg(GFP_KERNEL);
-+
-+unlock_err:
-+	spin_unlock_bh(&psock->ingress_lock);
-+	return NULL;
- }
- 
- static int sk_psock_skb_ingress_enqueue(struct sk_buff *skb,
-@@ -585,17 +605,10 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
- 	 */
- 	if (unlikely(skb->sk == sk))
- 		return sk_psock_skb_ingress_self(psock, skb, off, len, true);
--	msg = sk_psock_create_ingress_msg(sk, skb);
-+	msg = sk_psock_create_ingress_msg(psock, sk, skb);
- 	if (!msg)
- 		return -EAGAIN;
- 
--	/* This will transition ownership of the data from the socket where
--	 * the BPF program was run initiating the redirect to the socket
--	 * we will eventually receive this data on. The data will be released
--	 * from skb_consume found in __tcp_bpf_recvmsg() after its been copied
--	 * into user buffers.
--	 */
--	skb_set_owner_r(skb, sk);
- 	err = sk_psock_skb_ingress_enqueue(skb, off, len, psock, sk, msg, true);
- 	if (err < 0)
- 		kfree(msg);
--- 
-2.47.1
-
+Thank you for your cooperation.
 
