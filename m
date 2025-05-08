@@ -1,540 +1,261 @@
-Return-Path: <netdev+bounces-188946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188947-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79B4BAAF869
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 12:57:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 040F9AAF889
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 13:13:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D77AD4A6388
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 10:57:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C5F34A7117
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 11:13:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0342211484;
-	Thu,  8 May 2025 10:57:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 541D3211484;
+	Thu,  8 May 2025 11:13:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bc/dXdeY"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="LtaZKSur"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2089.outbound.protection.outlook.com [40.107.102.89])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B023120B813;
-	Thu,  8 May 2025 10:57:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746701828; cv=none; b=cPPWjf1K31zAibs3Wd3CFLlsQW0hIGmUDJjaiyZFRrO7QClD3iCF/z6e27x9RYqPSIQ5uY3mn6s/WD61wEF7WshqFG9gf+bvm0XWYRntXh6Yvdb7iHalHS0A//NBnORfX6NGBtfscaUYh2u9iq3YSzyDqBZab5ioPtJjdfYG2go=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746701828; c=relaxed/simple;
-	bh=BG7Y3JTwmDtgsJp4V3DTXD53Jk/adf0nr1Wnyy/PYFQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ShcPTXKHS3C8sbPdX9zvkwUwPK+o9HIUZctQvE5eUktKk7hQqAQVoCuRsVYkS/oXqtfjaZJ1NWuz8y5zXEy9X0CUoXOgFk5HltBfAW9ZZdiEVPcbwlMNm+w8cWxpp0onGPVjXl4Z8SgPFPDSHKsJ/f3SQrrus2e8y4nlylraJiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bc/dXdeY; arc=none smtp.client-ip=209.85.128.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-703cd93820fso8071587b3.2;
-        Thu, 08 May 2025 03:57:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746701825; x=1747306625; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fOG3ikubiSyZnwsEmMWPgLMUnvjPrgL9XeKVEgejbNk=;
-        b=Bc/dXdeYIV3wFNoAWq4gw1MxnpsV9RKLPFkfOWdDj5ZPog1aHIp8tw/onc0DfP++Xo
-         0xWvrXtZxh6JBQU034imLDGqnzz8cq3k0SqmB/x4yKtBr6oWlDAQyqF1E6MLIvvKq7z1
-         iULb7Z0wTXm9uw1qUSNkUMlQabAdOgSWLkm6W3zyqnwNKQZS36yiuq7ZbjCGKox/ytbD
-         J+gz6uvkpJcNMAqm2C5Np7s4ikkSmWqp+o4ITV6Jkshr7KMXHJRGY3x7599vq+UMk6IR
-         ExiWSL2YiMhUzuzz6c3mvNoKmq0cXgUn0g1jskkjxmCDVJ3kbjscsk58SrN85hJk27Wc
-         J2GQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746701825; x=1747306625;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fOG3ikubiSyZnwsEmMWPgLMUnvjPrgL9XeKVEgejbNk=;
-        b=cOsqdwI0X7i08jraW7lb3g2wKLjpXkYVm+rfmMumqEcM3nR+gr8YKht6pw8YElXhYT
-         +dRbIhOxiiybRFnyskZ1MZ3hB6BQHwz1UbiJk9+eLVagsZBzwahrhuKIYBleDktjljdj
-         JU6xciX9m8hUQZCDYIavzODrhkmQ200AWq8dgVitQIxfI6iZMDEfroLwQKIkZu15RPoO
-         xHw4BnEST0AjfQv5skp5RnyUFpM1uqecrDyM2FJoKbvVoULrH1YSzIvzlfqOqJLhkvmZ
-         4jWonCw+zhSxnuT7OUTYWLYVMc7QMQec3OMwHWRBMrm1jADDmc8Ej/UYKH+DUBXNF8ea
-         FKZw==
-X-Forwarded-Encrypted: i=1; AJvYcCVCRP9FhZH/YQH8mI139Q2Mnlg8jajVfl+H3NtJKywR50ecVMg4FMHvpC8Dul+rt1J581MBpUzi@vger.kernel.org, AJvYcCVH2O0YLpZVz5cnfO5+P3QXlAYc/TMuhxdYiTsBvB7tS/3RkM0ltOlPF5W51eZ4kQcUGYvC5FKaPtayTXg=@vger.kernel.org, AJvYcCXNOvMIlYgl5pcyQ0J8WYb79KBw2p30Eoortoc7X2QTJl/mNF+6h4WzFUurvALyg6VOHC4lvzq9foc5/iW6@vger.kernel.org
-X-Gm-Message-State: AOJu0YwiJGwvPhCsUZtXVUULLsXEGTAdRTIj+Txxr35KM6KAj28P6fcy
-	RjkfV0AK7aBiR4kRQSYiwBFGiAgkphJlMOaCSX0iGKN97S6G/DrxRAowdB+daMhDJ7+E9+JowrO
-	JktUP364pxcFrzKx5e8nJxuBfajE=
-X-Gm-Gg: ASbGnctqkmzPVVr+LK+opHj7ZJ7cLpsP0JndZxtG2xH/dhPI6j3nTVkP41s5cgDkqkx
-	vnnRRgdkL+np18ZXRl4KmvHj12Gr1kF66ZiNM9Thzov4NY4nhqeBG/qU9nd08GzD2H3SayeSBVj
-	iBemd/e+lZrrz+DZDsDTPA
-X-Google-Smtp-Source: AGHT+IHqzoe/iNKl1xQ24DnirDS2g8leH+NhoYSPmAlGfKke6DDz1jKPnpNkjRfmStDnIfKQh/aOuGeqgNqfDw72s94=
-X-Received: by 2002:a05:690c:6f11:b0:708:a778:b447 with SMTP id
- 00721157ae682-70a1da3a702mr94184747b3.20.1746701825458; Thu, 08 May 2025
- 03:57:05 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6EDB1F582E
+	for <netdev@vger.kernel.org>; Thu,  8 May 2025 11:13:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.89
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746702829; cv=fail; b=GL8zGtdcGxX7lFZaPCbbWyBtCbch9v5Ck3lvgEyVOOKgM2fGauH0LklVO7Wov+B3v7yrPel1GHe5Zn6zrklB3PeTD72hkh+1baITfHO8BefFsmfn3eE085vtBOu8Q+IWHLZhvtxnc0aZZID18fS53SWYLGzG4RSwH1rJyM4F0OA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746702829; c=relaxed/simple;
+	bh=qiQBZtd2xFwCXWN7bCeGmyVLyfU4VrqGYbzlSGJPHw8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=u/8ZB3DewZ9FggI0wHIFkUVr18Zj3iUP2YLrZdy+MCYaxBR3jbtA42u7VoZV1fjWia6q+1HdAv2eoSKJ+VDEhPOw5EyjqMuxsdtl4GFYqJiHv8l0Qw6uC3mGVGXbdqy0u15xKXt81ZG77/ag/0uOI+npg8CUG7p8vqxg+N0p6PM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=LtaZKSur; arc=fail smtp.client-ip=40.107.102.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=GoMDqrqi6lP0mUMBlUpxUyfcxHqpjoAQBd9LuHO8kOAmFR2/vUTkr8rC3DUlDwt7VIPWYTzaOl8Dzc9NPN1Qbu8IA372ZClAr8Hgrbp00tXV2wNr7hxXNMNaqn/PhBbgfYv3T7Xg5YyWtzA/NWJnkPKi0PAueZlVgKId7SPk0liwvS6vix8ghqnMKgYCTN34fQHXVn2lk0wWmAwGRUHWUJZG977/0rT+Se5J/hlQnz8Fxang+2WpP6m/RObyM87Zbv+/RNj9DxpQ88myaeHJgg+LPLvlK/06mvvKYSHd2aIaA3SPdO3pEgPBlwWfX/ntsVrauF1jFsIhq8FQ9Hy4vg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZrD8mgnjlABlxYGDLeFZWCuA7rIYKQlcg3iLXXCoNyc=;
+ b=oeSWi+iG7xNNrYZDdR1+1qzciZQiUpEW8Od3tj3VYB/E/FgThGhewRU1uK/eM+p9TiDSsXVDrsfFAlQxeJBTs3rZ7XAKwGfNlazEzKPzU5/90korHxZ4L6KJbTTCfkFvWrWqGNQyBIHaP0dY8DRLAEO1y2qWPXwBPAd6mG+JmzTwB6AHTitS7ClDww0ilMQy/lIHE45+KRcIdKA2+HGawsi+rIdr3P7jtexzYwJ65S1zFebLtHE0fqydSKuQKKX1M0K5wf2YYnJy3KayBs6p+JZkxQHC/7RTPMO0CNzRmOxfdpKXDfLugQGCK3pTQspPUSmC5AJxZ2PounK/vYTESg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZrD8mgnjlABlxYGDLeFZWCuA7rIYKQlcg3iLXXCoNyc=;
+ b=LtaZKSureOKQZbwiWAgLmIt9+5Z+1pfxDHwpvB9HEbomp+cWe/+MoAqV0nShcW/W9xRNH5Ezt2uSdJJFPkFCQNUQQfANaYvO4M5+ah/jivTdT1OZivLGHLIA3t2S6bykRYcO8CHrwDqPjvH1cRf+bZlCX5EbUoppWJWtolf3fFEl8MRuXnH84llIdn6cnu+2cng0eLL2CPfvv1YCk4osJ1P+3HW3pY0/ZWC5TXZYoGTQ4LgUZLciBN+XyyCj+tpVyVW3Lzw8YoHpPUXS2VHkM4c6bZMRxVPpPd0bJn/iUOk0UukPwG2YyPwHHE4IvCZyisnHuilO9Oe37nLdKB751Q==
+Received: from DS7PR06CA0051.namprd06.prod.outlook.com (2603:10b6:8:54::21) by
+ MW4PR12MB7309.namprd12.prod.outlook.com (2603:10b6:303:22f::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.26; Thu, 8 May
+ 2025 11:13:41 +0000
+Received: from DS3PEPF0000C37F.namprd04.prod.outlook.com
+ (2603:10b6:8:54:cafe::9b) by DS7PR06CA0051.outlook.office365.com
+ (2603:10b6:8:54::21) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8699.30 via Frontend Transport; Thu,
+ 8 May 2025 11:13:41 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ DS3PEPF0000C37F.mail.protection.outlook.com (10.167.23.9) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8722.18 via Frontend Transport; Thu, 8 May 2025 11:13:40 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 8 May 2025
+ 04:13:27 -0700
+Received: from shredder.mtl.com (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Thu, 8 May
+ 2025 04:13:24 -0700
+From: Ido Schimmel <idosch@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <dsahern@gmail.com>, <stephen@networkplumber.org>, <petrm@nvidia.com>,
+	"Ido Schimmel" <idosch@nvidia.com>
+Subject: [PATCH iproute2-next] ip ntable: Add support for "mcast_reprobes" parameter
+Date: Thu, 8 May 2025 14:13:01 +0300
+Message-ID: <20250508111301.544391-1-idosch@nvidia.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250502132005.611698-1-tanmay@marvell.com> <20250502132005.611698-3-tanmay@marvell.com>
- <20250506202413.GY3339421@horms.kernel.org>
-In-Reply-To: <20250506202413.GY3339421@horms.kernel.org>
-From: Bharat Bhushan <bharatb.linux@gmail.com>
-Date: Thu, 8 May 2025 16:26:52 +0530
-X-Gm-Features: ATxdqUEo3r-cozPvN7RAcVJFX9fHA1iSYVl0F1Itk67xge1xIzkz790DOCV_uss
-Message-ID: <CAAeCc_naw2xvONjW9uW4cOm1-O8WXFdyKPaS3E88Zfb7g7vOgw@mail.gmail.com>
-Subject: Re: [net-next PATCH v1 02/15] octeontx2-af: Configure crypto hardware
- for inline ipsec
-To: Simon Horman <horms@kernel.org>
-Cc: Tanmay Jagdale <tanmay@marvell.com>, bbrezillon@kernel.org, arno@natisbad.org, 
-	schalla@marvell.com, herbert@gondor.apana.org.au, davem@davemloft.net, 
-	sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com, 
-	jerinj@marvell.com, hkelam@marvell.com, sbhatta@marvell.com, 
-	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, bbhushan2@marvell.com, bhelgaas@google.com, 
-	pstanner@redhat.com, gregkh@linuxfoundation.org, peterz@infradead.org, 
-	linux@treblig.org, krzysztof.kozlowski@linaro.org, giovanni.cabiddu@intel.com, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, rkannoth@marvell.com, sumang@marvell.com, 
-	gcherian@marvell.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF0000C37F:EE_|MW4PR12MB7309:EE_
+X-MS-Office365-Filtering-Correlation-Id: bce63f0c-c3aa-4ce2-b640-08dd8e216374
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?BarJFdjUyABc3srk44IoPvNEpYe/iAsgEu22yKAcbTNB/SbEm4t2j+6jAXbS?=
+ =?us-ascii?Q?qFxFxWETc2xwrkDcmHZnkLQ4h0nFRxNG0uuUlqxfpD8I7jXsrzhrdYbhJZiN?=
+ =?us-ascii?Q?42NNB1q5C4/+htFIR7xRXWucJWKCjfx8zssO+fvZyrf8tZREIO65cRAxhddx?=
+ =?us-ascii?Q?vw6wiqUAryksa6ddzubHYyNk/Cu4VAVeLTlz7HOzUEAe6OMBOObyZFQ3FWMH?=
+ =?us-ascii?Q?icou9s64geo276JhexusasEa+IVLOhyyNrULqT8r+GuS5bJpTFHSEIZ+9G6y?=
+ =?us-ascii?Q?vcq9WhpQwuOzO9NNX4gxgpS9gXWLPDCLML6diXA+53FLci9K4zlGwn8MYrOp?=
+ =?us-ascii?Q?OOI8BpD2JUbjlXwDUbGh3W+ra+r/PtQtlaYCgVBqloZY6MXDg5bcYbntyAwQ?=
+ =?us-ascii?Q?IE3UIiQuThduu6jsrKjs7APpad2D55rYYLcG8k0x/PyjQUe4pyld50Rf+oEJ?=
+ =?us-ascii?Q?WZPVjVnEOCueAaIDJqo96ZbgKZ7OUIkbM01YoffxN6DVrSFyf4cQ4D4kfyek?=
+ =?us-ascii?Q?zrdlGjguvE3yjDtPH+itP23zogHqfCJ+zoYqgktArJwBBZrMh9jTOkLtXbYi?=
+ =?us-ascii?Q?8oVrupVQrwh+TLlqULSqw6XzRbM1ZdNk5ZhEFJ96OGsUDU4KGQuksPD/gcff?=
+ =?us-ascii?Q?JKCI2kN3DOMmNlyJ/czEKNk7hfZSW1AfxqahTbdtWna/C94EFEH4rP71+TUg?=
+ =?us-ascii?Q?C7XHntbqbBfoA3tRbLJvbAysH+9o0Vqv+ZEvnbWxMBoJbaRXy57fYKMhrB7p?=
+ =?us-ascii?Q?u4q4iP07BwHNWrx8nqcNZc0mDh7YKXtKimWGZRFcgC4rOuP7OSeLxMK3izE3?=
+ =?us-ascii?Q?RS/IiKr6dw9Dd8iaUwBNqFe5hqK23W1D1TYYARkBgGcvD2OO3Ltg+3QF4+Ou?=
+ =?us-ascii?Q?9EqIEiNwC8UzolVzJki9FoZ5DO6IuRZAKy06nNdmY0TtT/NiyHQXa2rvfHfS?=
+ =?us-ascii?Q?/HRiCDcj8mlEtrUOoFF00Ruv/Njv94BPj3cX1hxBNOh/dXOjnYZMsSwSKbcs?=
+ =?us-ascii?Q?g6z0TVP9P53095fg7nupb+sNf7OhsInwioSK9f84J0Eis4hIn/xkbHjtuk6b?=
+ =?us-ascii?Q?UCVDCawIUAJtrIyU12eb7xy895n3aO4AaV/Py5/70JNG9H2ZCARlctlcbzVA?=
+ =?us-ascii?Q?9dPMac0v6kVTr6rrXjeJqPCOLUPnVTRDpHHxG2WlJrE5ZOiAWkw1SadBeFoC?=
+ =?us-ascii?Q?lNgNrSQ91LUuoBaLV3jkhnOM3APzS7wpHHOwryr3Chj7pSJShVikD1Yay+cM?=
+ =?us-ascii?Q?F1dBkR/MMCZNrRllN/mKonJ0nSUafG9iGpF/xErg836BhmQC6w+tBaLDlj45?=
+ =?us-ascii?Q?VaaYPcqOWDx3XCsfHwkO4k/l2Gq4cn8w/fK7tnV0zWwySwyDJSpFo90Hp0LM?=
+ =?us-ascii?Q?FrqtASTy3UDLOIQBGdd9ZdPObwOnMiT9juu3rSU5SKdiLmITPHemRQbQK4BY?=
+ =?us-ascii?Q?ZhiNKubX+kV4EJ0EPoXIYQdUJbrnzkL6zXXdpLlps6EZwQZ7WunC1HrV8auR?=
+ =?us-ascii?Q?rcqp4fPtEuwLdrKErxRyWo6DewCkwmbrv2VA?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 May 2025 11:13:40.8772
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: bce63f0c-c3aa-4ce2-b640-08dd8e216374
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS3PEPF0000C37F.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7309
 
-On Wed, May 7, 2025 at 2:20=E2=80=AFAM Simon Horman <horms@kernel.org> wrot=
-e:
->
-> On Fri, May 02, 2025 at 06:49:43PM +0530, Tanmay Jagdale wrote:
-> > From: Bharat Bhushan <bbhushan2@marvell.com>
-> >
-> > Currently cpt_rx_inline_lf_cfg mailbox is handled by CPT PF
-> > driver to configures inbound inline ipsec. Ideally inbound
-> > inline ipsec configuration should be done by AF driver.
-> >
-> > This patch adds support to allocate, attach and initialize
-> > a cptlf from AF. It also configures NIX to send CPT instruction
-> > if the packet needs inline ipsec processing and configures
-> > CPT LF to handle inline inbound instruction received from NIX.
-> >
-> > Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
-> > Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
->
-> Hi Bharat and Tanmay,
->
-> Some minor feedback from my side.
+Kernel commit 8da86466b837 ("net: neighbour: Add mcast_resolicit to
+configure the number of multicast resolicitations in PROBE state.")
+added the "NDTPA_MCAST_REPROBES" netlink attribute that allows user
+space to set / get the number of multicast probes that are sent by the
+kernel in PROBE state after unicast probes did not solicit a response.
 
-Hi Simon,
+Add support for this parameter in iproute2.
 
-Most of the comments are ack. Please see inline
+Example usage and output:
 
->
-> ...
->
-> > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers=
-/net/ethernet/marvell/octeontx2/af/mbox.h
-> > index 973ff5cf1a7d..8540a04a92f9 100644
-> > --- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-> > +++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-> > @@ -1950,6 +1950,20 @@ enum otx2_cpt_eng_type {
-> >       OTX2_CPT_MAX_ENG_TYPES,
-> >  };
-> >
-> > +struct cpt_rx_inline_lf_cfg_msg {
-> > +     struct mbox_msghdr hdr;
-> > +     u16 sso_pf_func;
-> > +     u16 param1;
-> > +     u16 param2;
-> > +     u16 opcode;
-> > +     u32 credit;
-> > +     u32 credit_th;
-> > +     u16 bpid;
->
-> On arm64 (at least) there will be a 2 byte hole here. Is that intended?
+ $ ip ntable show dev dummy0 name arp_cache
+ inet arp_cache
+     dev dummy0
+     refcnt 1 reachable 43430 base_reachable 30000 retrans 1000
+     gc_stale 60000 delay_probe 5000 queue 101
+     app_probes 0 ucast_probes 3 mcast_probes 3 mcast_reprobes 0
+     anycast_delay 1000 proxy_delay 800 proxy_queue 64 locktime 1000
 
-It is not intentional, will mark as reserved.
+ # ip ntable change name arp_cache dev dummy0 mcast_reprobes 5
+ $ ip ntable show dev dummy0 name arp_cache
+ inet arp_cache
+     dev dummy0
+     refcnt 1 reachable 43430 base_reachable 30000 retrans 1000
+     gc_stale 60000 delay_probe 5000 queue 101
+     app_probes 0 ucast_probes 3 mcast_probes 3 mcast_reprobes 5
+     anycast_delay 1000 proxy_delay 800 proxy_queue 64 locktime 1000
 
->
-> And, not strictly related to this patch, struct mboxhdr also has
-> a 2 byte hole before it's rc member. Perhaps would be nice
-> if it was it filled by a reserved member?
+ $ ip -j -p ntable show dev dummy0 name arp_cache
+ [ {
+         "family": "inet",
+         "name": "arp_cache",
+         "dev": "dummy0",
+         "refcnt": 1,
+         "reachable": 43430,
+         "base_reachable": 30000,
+         "retrans": 1000,
+         "gc_stale": 60000,
+         "delay_probe": 5000,
+         "queue": 101,
+         "app_probes": 0,
+         "ucast_probes": 3,
+         "mcast_probes": 3,
+         "mcast_reprobes": 5,
+         "anycast_delay": 1000,
+         "proxy_delay": 800,
+         "proxy_queue": 64,
+         "locktime": 1000
+     } ]
 
-struct mbox_msghdr is not used globally, will prefer not to touch that
-as part of this patch series.
+Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+---
+ ip/ipntable.c        | 21 ++++++++++++++++++++-
+ man/man8/ip-ntable.8 |  2 ++
+ 2 files changed, 22 insertions(+), 1 deletion(-)
 
->
-> > +     u32 reserved;
-> > +     u8 ctx_ilen_valid : 1;
-> > +     u8 ctx_ilen : 7;
-> > +};
-> > +
-> >  struct cpt_set_egrp_num {
-> >       struct mbox_msghdr hdr;
-> >       bool set;
->
-> ...
->
-> > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/=
-net/ethernet/marvell/octeontx2/af/rvu.h
-> > index fa403da555ff..6923fd756b19 100644
-> > --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-> > +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-> > @@ -525,8 +525,38 @@ struct rvu_cpt_eng_grp {
-> >       u8 grp_num;
-> >  };
-> >
-> > +struct rvu_cpt_rx_inline_lf_cfg {
-> > +     u16 sso_pf_func;
-> > +     u16 param1;
-> > +     u16 param2;
-> > +     u16 opcode;
-> > +     u32 credit;
-> > +     u32 credit_th;
-> > +     u16 bpid;
->
-> FWIIW, there is a hole here too.
+diff --git a/ip/ipntable.c b/ip/ipntable.c
+index 4ce02a315fe1..54db9b62c837 100644
+--- a/ip/ipntable.c
++++ b/ip/ipntable.c
+@@ -40,7 +40,8 @@ static void usage(void)
+ 		"PARMS := [ base_reachable MSEC ] [ retrans MSEC ] [ gc_stale MSEC ]\n"
+ 		"         [ delay_probe MSEC ] [ queue LEN ]\n"
+ 		"         [ app_probes VAL ] [ ucast_probes VAL ] [ mcast_probes VAL ]\n"
+-		"         [ anycast_delay MSEC ] [ proxy_delay MSEC ] [ proxy_queue LEN ]\n"
++		"         [ mcast_reprobes VAL ] [ anycast_delay MSEC ]\n"
++		"         [ proxy_delay MSEC ] [ proxy_queue LEN ]\n"
+ 		"         [ locktime MSEC ]\n"
+ 		);
+ 
+@@ -223,6 +224,17 @@ static int ipntable_modify(int cmd, int flags, int argc, char **argv)
+ 			rta_addattr32(parms_rta, sizeof(parms_buf),
+ 				      NDTPA_MCAST_PROBES, mprobe);
+ 			parms_change = 1;
++		} else if (strcmp(*argv, "mcast_reprobes") == 0) {
++			__u32 mreprobe;
++
++			NEXT_ARG();
++
++			if (get_u32(&mreprobe, *argv, 0))
++				invarg("\"mcast_reprobes\" value is invalid", *argv);
++
++			rta_addattr32(parms_rta, sizeof(parms_buf),
++				      NDTPA_MCAST_REPROBES, mreprobe);
++			parms_change = 1;
+ 		} else if (strcmp(*argv, "anycast_delay") == 0) {
+ 			__u64 anycast_delay;
+ 
+@@ -440,6 +452,13 @@ static void print_ndtparams(struct rtattr *tpb[])
+ 			   "mcast_probes %u ", mprobe);
+ 	}
+ 
++	if (tpb[NDTPA_MCAST_REPROBES]) {
++		__u32 mreprobe = rta_getattr_u32(tpb[NDTPA_MCAST_REPROBES]);
++
++		print_uint(PRINT_ANY, "mcast_reprobes",
++			   "mcast_reprobes %u ", mreprobe);
++	}
++
+ 	print_string(PRINT_FP, NULL, "%s    ", _SL_);
+ 
+ 	if (tpb[NDTPA_ANYCAST_DELAY]) {
+diff --git a/man/man8/ip-ntable.8 b/man/man8/ip-ntable.8
+index 4f0f2e548a21..56108afe6586 100644
+--- a/man/man8/ip-ntable.8
++++ b/man/man8/ip-ntable.8
+@@ -42,6 +42,8 @@ ip-ntable - neighbour table configuration
+ .IR VAL " ] ["
+ .B mcast_probes
+ .IR VAL " ] ["
++.B mcast_reprobes
++.IR VAL " ] ["
+ .B anycast_delay
+ .IR MSEC " ] ["
+ .B proxy_delay
+-- 
+2.49.0
 
-ACK, will mark reserved.
-
->
-> > +     u32 reserved;
-> > +     u8 ctx_ilen_valid : 1;
-> > +     u8 ctx_ilen : 7;
-> > +};
->
-> ...
->
-> > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c b/driv=
-ers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
->
-> ...
->
-> > @@ -1087,6 +1115,72 @@ static void cpt_rxc_teardown(struct rvu *rvu, in=
-t blkaddr)
-> >  #define DQPTR      GENMASK_ULL(19, 0)
-> >  #define NQPTR      GENMASK_ULL(51, 32)
-> >
-> > +static void cpt_rx_ipsec_lf_enable_iqueue(struct rvu *rvu, int blkaddr=
-,
-> > +                                       int slot)
-> > +{
-> > +     u64 val;
-> > +
-> > +     /* Set Execution Enable of instruction queue */
-> > +     val =3D otx2_cpt_read64(rvu->pfreg_base, blkaddr, slot, CPT_LF_IN=
-PROG);
-> > +     val |=3D BIT_ULL(16);
->
-> Bit 16 seems to have a meaning, it would be nice if a #define was used
-> I mean something like this (but probably not actually this :)
->
-> #define CPT_LF_INPROG_ENA_QUEUE BIT_ULL(16)
->
-> Perhaps defined near where CPT_LF_INPROG is defined.
-
-ACK
-
->
-> > +     otx2_cpt_write64(rvu->pfreg_base, blkaddr, slot, CPT_LF_INPROG, v=
-al);
-> > +
-> > +     /* Set iqueue's enqueuing */
-> > +     val =3D otx2_cpt_read64(rvu->pfreg_base, blkaddr, slot, CPT_LF_CT=
-L);
-> > +     val |=3D BIT_ULL(0);
->
-> Ditto.
-
-ACK
-
->
-> > +     otx2_cpt_write64(rvu->pfreg_base, blkaddr, slot, CPT_LF_CTL, val)=
-;
-> > +}
-> > +
-> > +static void cpt_rx_ipsec_lf_disable_iqueue(struct rvu *rvu, int blkadd=
-r,
-> > +                                        int slot)
-> > +{
-> > +     int timeout =3D 1000000;
-> > +     u64 inprog, inst_ptr;
-> > +     u64 qsize, pending;
-> > +     int i =3D 0;
-> > +
-> > +     /* Disable instructions enqueuing */
-> > +     otx2_cpt_write64(rvu->pfreg_base, blkaddr, slot, CPT_LF_CTL, 0x0)=
-;
-> > +
-> > +     inprog =3D otx2_cpt_read64(rvu->pfreg_base, blkaddr, slot, CPT_LF=
-_INPROG);
-> > +     inprog |=3D BIT_ULL(16);
-> > +     otx2_cpt_write64(rvu->pfreg_base, blkaddr, slot, CPT_LF_INPROG, i=
-nprog);
-> > +
-> > +     qsize =3D otx2_cpt_read64(rvu->pfreg_base, blkaddr, slot, CPT_LF_=
-Q_SIZE)
-> > +              & 0x7FFF;
-> > +     do {
-> > +             inst_ptr =3D otx2_cpt_read64(rvu->pfreg_base, blkaddr, sl=
-ot,
-> > +                                        CPT_LF_Q_INST_PTR);
-> > +             pending =3D (FIELD_GET(XQ_XOR, inst_ptr) * qsize * 40) +
-> > +                       FIELD_GET(NQPTR, inst_ptr) -
-> > +                       FIELD_GET(DQPTR, inst_ptr);
->
-> nit: I don't think you need the outer parentheses here.
->      But if you do, the two lines above sould be indented by one more
->      character.
->
-> > +             udelay(1);
-> > +             timeout--;
-> > +     } while ((pending !=3D 0) && (timeout !=3D 0));
->
-> nit: I don't think you need the inner parenthese here (x2).
-
-okay,
-
->
-> > +
-> > +     if (timeout =3D=3D 0)
-> > +             dev_warn(rvu->dev, "TIMEOUT: CPT poll on pending instruct=
-ions\n");
-> > +
-> > +     timeout =3D 1000000;
-> > +     /* Wait for CPT queue to become execution-quiescent */
-> > +     do {
-> > +             inprog =3D otx2_cpt_read64(rvu->pfreg_base, blkaddr, slot=
-,
-> > +                                      CPT_LF_INPROG);
-> > +             if ((FIELD_GET(INFLIGHT, inprog) =3D=3D 0) &&
-> > +                 (FIELD_GET(GRB_CNT, inprog) =3D=3D 0)) {
-> > +                     i++;
-> > +             } else {
-> > +                     i =3D 0;
-> > +                     timeout--;
-> > +             }
-> > +     } while ((timeout !=3D 0) && (i < 10));
-> > +
-> > +     if (timeout =3D=3D 0)
-> > +             dev_warn(rvu->dev, "TIMEOUT: CPT poll on inflight count\n=
-");
-> > +     /* Wait for 2 us to flush all queue writes to memory */
-> > +     udelay(2);
-> > +}
-> > +
-> >  static void cpt_lf_disable_iqueue(struct rvu *rvu, int blkaddr, int sl=
-ot)
-> >  {
-> >       int timeout =3D 1000000;
-> > @@ -1310,6 +1404,474 @@ int rvu_cpt_ctx_flush(struct rvu *rvu, u16 pcif=
-unc)
-> >       return 0;
-> >  }
-> >
-> > +static irqreturn_t rvu_cpt_rx_ipsec_misc_intr_handler(int irq, void *p=
-tr)
-> > +{
-> > +     struct rvu_block *block =3D ptr;
-> > +     struct rvu *rvu =3D block->rvu;
-> > +     int blkaddr =3D block->addr;
-> > +     struct device *dev =3D rvu->dev;
-> > +     int slot =3D 0;
-> > +     u64 val;
-> > +
-> > +     val =3D otx2_cpt_read64(rvu->pfreg_base, blkaddr, slot, CPT_LF_MI=
-SC_INT);
-> > +
-> > +     if (val & (1 << 6)) {
->
-> Allong the lines of my earlier comment, bit 6 seems to have a meaning too=
-.
-> Likewise for other bits below.
-
-ack
-
->
-> > +             dev_err(dev, "Memory error detected while executing CPT_I=
-NST_S, LF %d.\n",
-> > +                     slot);
-> > +     } else if (val & (1 << 5)) {
-> > +             dev_err(dev, "HW error from an engine executing CPT_INST_=
-S, LF %d.",
-> > +                     slot);
-> > +     } else if (val & (1 << 3)) {
-> > +             dev_err(dev, "SMMU fault while writing CPT_RES_S to CPT_I=
-NST_S[RES_ADDR], LF %d.\n",
-> > +                     slot);
-> > +     } else if (val & (1 << 2)) {
-> > +             dev_err(dev, "Memory error when accessing instruction mem=
-ory queue CPT_LF_Q_BASE[ADDR].\n");
-> > +     } else if (val & (1 << 1)) {
-> > +             dev_err(dev, "Error enqueuing an instruction received at =
-CPT_LF_NQ.\n");
-> > +     } else {
-> > +             dev_err(dev, "Unhandled interrupt in CPT LF %d\n", slot);
-> > +             return IRQ_NONE;
-> > +     }
-> > +
-> > +     /* Acknowledge interrupts */
-> > +     otx2_cpt_write64(rvu->pfreg_base, blkaddr, slot, CPT_LF_MISC_INT,
-> > +                      val & CPT_LF_MISC_INT_MASK);
-> > +
-> > +     return IRQ_HANDLED;
-> > +}
->
-> ...
->
-> > +/* Allocate memory for CPT outbound Instruction queue.
-> > + * Instruction queue memory format is:
-> > + *      -----------------------------
-> > + *     | Instruction Group memory    |
-> > + *     |  (CPT_LF_Q_SIZE[SIZE_DIV40] |
-> > + *     |   x 16 Bytes)               |
-> > + *     |                             |
-> > + *      ----------------------------- <-- CPT_LF_Q_BASE[ADDR]
-> > + *     | Flow Control (128 Bytes)    |
-> > + *     |                             |
-> > + *      -----------------------------
-> > + *     |  Instruction Memory         |
-> > + *     |  (CPT_LF_Q_SIZE[SIZE_DIV40] |
-> > + *     |   =C3=97 40 =C3=97 64 bytes)          |
-> > + *     |                             |
-> > + *      -----------------------------
-> > + */
->
-> Nice diagram :)
-
-:), somehow the line alignment does not look good here over email. But
-looks good when patch applied. Will see how i can fix this
-
->
-> ...
->
-> > +static int rvu_rx_cpt_set_grp_pri_ilen(struct rvu *rvu, int blkaddr, i=
-nt cptlf)
-> > +{
-> > +     u64 reg_val;
-> > +
-> > +     reg_val =3D rvu_read64(rvu, blkaddr, CPT_AF_LFX_CTL(cptlf));
-> > +     /* Set High priority */
-> > +     reg_val |=3D 1;
-> > +     /* Set engine group */
-> > +     reg_val |=3D ((1ULL << rvu->rvu_cpt.inline_ipsec_egrp) << 48);
-> > +     /* Set ilen if valid */
-> > +     if (rvu->rvu_cpt.rx_cfg.ctx_ilen_valid)
-> > +             reg_val |=3D rvu->rvu_cpt.rx_cfg.ctx_ilen  << 17;
->
-> Along the same lines. 48 and 17 seem to have meaning.
-> Perhaps define appropriate masks created using GENMASK_ULL
-> and use FIELD_PREP?
-
-ack
-
->
-> > +
-> > +     rvu_write64(rvu, blkaddr, CPT_AF_LFX_CTL(cptlf), reg_val);
-> > +     return 0;
-> > +}
->
-> ...
->
-> > +static void rvu_rx_cptlf_cleanup(struct rvu *rvu, int blkaddr, int slo=
-t)
-> > +{
-> > +     /* IRQ cleanup */
-> > +     rvu_cpt_rx_inline_cleanup_irq(rvu, blkaddr, slot);
-> > +
-> > +     /* CPTLF cleanup */
-> > +     rvu_cpt_rx_inline_cptlf_clean(rvu, blkaddr, slot);
-> > +}
-> > +
-> > +int rvu_mbox_handler_cpt_rx_inline_lf_cfg(struct rvu *rvu,
-> > +                                       struct cpt_rx_inline_lf_cfg_msg=
- *req,
-> > +                                       struct msg_rsp *rsp)
->
-> Compilers warn that rvu_mbox_handler_cpt_rx_inline_lf_cfg doesn't have
-> a prototype.
->
-> I think this can be resolved by squashing the following hunk,
-> which appears in a subsequent patch in this series, into this patch.
->
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/n=
-et/ethernet/marvell/octeontx2/af/mbox.h
-> index 8540a04a92f9..ad74a27888da 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-> @@ -213,6 +213,8 @@ M(CPT_FLT_ENG_INFO,     0xA09, cpt_flt_eng_info, cpt_=
-flt_eng_info_req,      \
->                                cpt_flt_eng_info_rsp)                    \
->  M(CPT_SET_ENG_GRP_NUM,  0xA0A, cpt_set_eng_grp_num, cpt_set_egrp_num,   =
-\
->                                 msg_rsp)                                \
-> +M(CPT_RX_INLINE_LF_CFG, 0xBFE, cpt_rx_inline_lf_cfg, cpt_rx_inline_lf_cf=
-g_msg, \
-> +                               msg_rsp) \
->  /* SDP mbox IDs (range 0x1000 - 0x11FF) */                             \
->  M(SET_SDP_CHAN_INFO, 0x1000, set_sdp_chan_info, sdp_chan_info_msg, msg_r=
-sp) \
->  M(GET_SDP_CHAN_INFO, 0x1001, get_sdp_chan_info, msg_req, sdp_get_chan_in=
-fo_msg) \
-
-ack
-
->
-> ...
->
-> > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.h b/driv=
-ers/net/ethernet/marvell/octeontx2/af/rvu_cpt.h
->
-> ...
->
-> > +/* CPT instruction queue length in bytes */
-> > +#define RVU_CPT_INST_QLEN_BYTES                                       =
-        \
-> > +             ((RVU_CPT_SIZE_DIV40 * 40 * RVU_CPT_INST_SIZE) +         =
-    \
-> > +             RVU_CPT_INST_QLEN_EXTRA_BYTES)
->
-> nit: I think the line above should be indented by one more character
-
-Somehow this looks good when this patch applied, I need to see why
-indentation got broken in email.
-
->
-> > +
-> > +/* CPT instruction group queue length in bytes */
-> > +#define RVU_CPT_INST_GRP_QLEN_BYTES                                   =
-        \
-> > +             ((RVU_CPT_SIZE_DIV40 + RVU_CPT_EXTRA_SIZE_DIV40) * 16)
-> > +
-> > +/* CPT FC length in bytes */
-> > +#define RVU_CPT_Q_FC_LEN 128
-> > +
-> > +/* CPT LF_Q_SIZE Register */
-> > +#define CPT_LF_Q_SIZE_DIV40 GENMASK_ULL(14, 0)
-> > +
-> > +/* CPT invalid engine group num */
-> > +#define OTX2_CPT_INVALID_CRYPTO_ENG_GRP 0xFF
-> > +
-> > +/* Fastpath ipsec opcode with inplace processing */
-> > +#define OTX2_CPT_INLINE_RX_OPCODE (0x26 | (1 << 6))
-> > +#define CN10K_CPT_INLINE_RX_OPCODE (0x29 | (1 << 6))
->
-> Along the lines of earlier comments, bit 6 seems to have a meaning here.
-
-ack
-
->
-> > +
-> > +/* Calculate CPT register offset */
-> > +#define CPT_RVU_FUNC_ADDR_S(blk, slot, offs) \
-> > +             (((blk) << 20) | ((slot) << 12) | (offs))
->
-> And perhaps this is another candidate for GENMASK + FIELD_PREP.
-
-ack.
-
-Thanks
--Bharat
-
->
-> ...
->
 
