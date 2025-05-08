@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-189097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41EC9AB05A7
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 23:59:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD8CCAB05CF
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 00:07:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FDFD984523
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 21:59:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C01511C0741A
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 22:07:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AAF52248B4;
-	Thu,  8 May 2025 21:59:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1455224AF0;
+	Thu,  8 May 2025 22:07:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="hMDnF7Bx"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="Fvs9jJjC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EB8A20FA86
-	for <netdev@vger.kernel.org>; Thu,  8 May 2025 21:59:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 747F12222BA
+	for <netdev@vger.kernel.org>; Thu,  8 May 2025 22:07:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746741556; cv=none; b=AuNKKsHNdewjjtNzSQInU/OGlk/sVQRlSq+QJIhiaUic5cf2IhogudrXhIRfsEoYq6NaOJGGsvf8Mjea4mqG/FnVkPjdlpJgDQ/V2M5Fzu6OJ+oPeupSG9iJHCruPNtFKprjcyMHgcQHxBKGcdNalqQwQqmJhw+NuqaQoK+kVMg=
+	t=1746742024; cv=none; b=bLJAckeenb/hO7AoYr0E9D/CaRMI+3ymW+5M9O7Yer4oeDMldxucqdqZjGDvXm6rMBkT1FHC/bxdgs+XYGNCmO2LW1bdiTzoGlrCtyGrt9oTfThjmzjsuXRrQRznhsyxboZh9tVK8I9fFsgitOdAzDHOVQy+BErsod9144zz+90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746741556; c=relaxed/simple;
-	bh=RcMpxjM0SBsWiUvaLtv7ypt2hc1LOWKx7i2yRwa9bbI=;
+	s=arc-20240116; t=1746742024; c=relaxed/simple;
+	bh=383tmOsOwIYI+sEuL4lBtsooiMu54rXi0r4rNmVC88Q=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oSsxmKd2OGdKc8soGeSTlxGqQEogk6kODDNJUj6BKKfcpQhd+Z9mK2r51SwjZ0dzDl5mx1+fGnWEt067HwPMCAGiVlwTIF6ovNvQve5J95Dbo83Yhw8Xh3nRgtmHdKcgz5Z4DWwKRRiAia9uH0+F7vMAk8d9uAztLh1SYPEaoyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=hMDnF7Bx; arc=none smtp.client-ip=209.85.214.181
+	 In-Reply-To:Content-Type; b=F1aXaWGRj4dDH/UhIcdGm+QVOYN7dMqO2QeBioRQBfbZcQDgQGPNV2tqXhsMOVy9JUNV7GgvXE1f6rGOoznGHQVQTGSZLaRLc7otTqMHveuqIbljV1/InL8TIdLIVjimRjlpasijnKzfBt0LqpCXfRJ38FqNQyg0exaMLTFV5ig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=Fvs9jJjC; arc=none smtp.client-ip=209.85.215.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-22e730c05ddso15276955ad.2
-        for <netdev@vger.kernel.org>; Thu, 08 May 2025 14:59:15 -0700 (PDT)
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-b074d908e56so983482a12.2
+        for <netdev@vger.kernel.org>; Thu, 08 May 2025 15:07:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1746741555; x=1747346355; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1746742023; x=1747346823; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=mEDc2EtJgKPJGqy02JAFGdLWN2lNiFsVQXcu8wIsSmw=;
-        b=hMDnF7BxMJ2T6w68R9N+CTQrRmepW4Z0cnOdDJhQhW5aRt2a/pNgvTv/0yRfUBgvSl
-         Chgy1OODk+vhK1LD0GLnrSfHMst6ZaLwwiCsqUvOq2B9ODUVdgyIB7ajPgIM5B31yJyT
-         Ak6b5G9AZwS8UMQT8mb5jMv7IMweNO7V0O9P1Z2o1VCNcjKghKNVOuY78y+p08GduEJY
-         V0GW0MR/d9lMr+Q9VHyE17iYCuOKOEmkqW8lLb7tvmmQBGZLyarkrCufsNMl0h9JWIxz
-         GyJGqke8TLPef5g0hOfQpPNNnucr324ftKS2kQ18DuFmsggGZCdABHPkYvUaAGCzD9W2
-         3Ewg==
+        bh=YygRvJatc+ZX+R8V8t/EbZhKaAFDzTF1VLryimoeTCY=;
+        b=Fvs9jJjCZA4qvkKIwgp/yztqSEnSgTkFenWluSNhjWThIue+Fx0Wm8LjHVcCnJTNIq
+         l8ckVV7njOMFoFJboaaUMW9kePx/pQVy05RuXebXf+bpTP2M87dKmHAZqPgPGe9WmPBm
+         UTOAhhtnzuPMaphYuaPZvOQMr7726Cfh8IlsiyUgrSn5NcRnE1qxe/8bxC/ywng42qGg
+         nio4h6jRGlDHtctDpZjwoKu/dEMG8QtnmwJVEcf071MELCu9eiexqPvcn5XYJtLePOMv
+         1xoNR3RIb75M1BkeLTXLLDi20laF2E03c9g308INwolink5IO/4wiOKjG7eNw38ayo+a
+         uYCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746741555; x=1747346355;
+        d=1e100.net; s=20230601; t=1746742023; x=1747346823;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mEDc2EtJgKPJGqy02JAFGdLWN2lNiFsVQXcu8wIsSmw=;
-        b=lGQw70QhGX0n2kICZuUBDdMYCBxvX4630J4GKFgEbJErMRtUlIT1qTDp6Wgl1hZsNP
-         k3wFqoBEX/68WX1zeAKvKCOcWX4lHMxBLRmZzLa3N45Y1SoSM39PPh5HfGd9IBP1PT/s
-         ga12VSXMsuFYMtrHx6Gzm7i1pkyftxBBv3pwgoCbmGFvFF11fCjQTMs5S7I16ukueJVM
-         5fPKM3QrvOE85BETad4Su0WV8Qc/ISYXHR4IYG9Qyqvwe4iiFFXdScwYgtRAt828Gf+2
-         vJTAi/vwnOXjupbeS3xx5FUPC+Sxevc6WwREnF29lVgtLOK7yUgQvhlYDfqLRyQmmGLW
-         rIXQ==
-X-Gm-Message-State: AOJu0Yzs5KGeepQf4Tco0BaRwYPEsATf0MvSAcCJVUZlRb4+g2UlzWax
-	/mTIw0TI9Xj7fdYl57yWhimbZ70vInsgooBFjwkjqj3Y0N3RlkMduKBJYEGoVBo=
-X-Gm-Gg: ASbGncuzvflLvW4ZPPAsYa4lSR6sVRmEO/LV2MiktsL5gZ3tSiazD8AN1M743/cEnx2
-	PunANIw0bKyXGmR4D4e1SHc1e8Yzw+dN4XXcf/gTO2rXjPz+V6YcaZB7sw1FSToAH92s9DYHL+u
-	rhjEzPKU4E9sATvtpWKjuYd67K1gjciEYZnjvpNoJ6hzhwYaORro/k7FzcqOIWJ9kFh2+Bajofz
-	X7MxreR+EnDG7PQc73l3D5DRpPykXOGeL9MYLSJHU+8epm5fRa7Ou29J4q52vZEEM0lM2gZMrxw
-	+zawDTRcXvnq0huz0ZzsHkESeFJzR8iYr9y8CmcQGFbpTJ9jpl/lQvd0mpw9c0lKLvQTO9E7N6F
-	dUfQ=
-X-Google-Smtp-Source: AGHT+IEQc8Chr3MQouZYg+naSTE2nFIyRZdRZh97Oepc5jfMUidKqI1wUYOzkkoyAHeAUOkCkEvLrA==
-X-Received: by 2002:a17:902:e84d:b0:22e:8183:1fae with SMTP id d9443c01a7336-22fc8e94b54mr14491915ad.41.1746741554770;
-        Thu, 08 May 2025 14:59:14 -0700 (PDT)
+        bh=YygRvJatc+ZX+R8V8t/EbZhKaAFDzTF1VLryimoeTCY=;
+        b=kMHXQPXaIei7P8d7DHHPY0FRzdBsuCSNqL/QSMu0YpeHmyzJ5SoiV/B0C/SeEidK5M
+         LVuoasOMDtbHmkwxatVoWGHXQqTZkzoKVtx8b10wMI4P5zyS0X910zn+R4tPQMXcTc4R
+         Ij+3wWhtoxBRrczcoEnOS2UOBsZBZd91s54GNcCn6mQgfYX9qVLFLJLkHRUpX9935Ub4
+         PitkpCkmpKBnyU9UCFNMx5FebW+WrtjxJ+5FDrHDm1Q39YqRSOyU6quqDzezSPgAbJmt
+         MUnGgNb25qkLqM0+ZDOkEXf8qOHO+eTf0OdmClkWlakOZUPWxhBRMNshwxwb2rfFjy+C
+         rxEA==
+X-Gm-Message-State: AOJu0Yzqf3ejSI8qiENKwpnLmFJdm/Zq75WVTQ51tMvdkl2T9DL+JkLr
+	246m4FLnxsz78MOGUxCSgIMVHZproD/zsuKLTKKY/6DD3Zat9LMKYR59kOVKUdg=
+X-Gm-Gg: ASbGncuqfrSWGQf59fXZhkNnAbfXHAarz1VuqL2tg7l6T6iZlBulNGVJLrQ7YD2Y/R7
+	yDR+Vf1M2GnPgTy7HBzNGTD9eaROlblUAEI4DHySDqHsxjawrIXKvqbhT8zfejGCVgmyicXS70G
+	Q73+FVN1+gc+kOT+B8TpzWQQu6QjGSTdoqEw0zIv5KHRQlYdO61UbvUJu+azpFq89yByZOhAliT
+	1g7CgJ51Owe7Y4+nPgmuHcyGTvtr/cATj9rgnLIwRjwyJS7RoUyoHt/uTj7TIvmCQfXVAMnj1I6
+	ra8vIYafPzkK7rcekWs8kz0n5fwXp82IWDb8X1DIVs5W0Utt178ysW8Gqf2wANeFeMqqpnvvkX4
+	qoQc=
+X-Google-Smtp-Source: AGHT+IFDbySgvmGLH2XmHKIsynb+ZCgAYVd6wTaGIi1rv2a6LbtUmPB+B0JLB6XZqjrHPFrWey94Vw==
+X-Received: by 2002:a17:903:32ca:b0:223:f408:c3f8 with SMTP id d9443c01a7336-22fc8b41077mr14475565ad.14.1746742022673;
+        Thu, 08 May 2025 15:07:02 -0700 (PDT)
 Received: from ?IPV6:2a03:83e0:1156:1:1079:4a23:3f58:8abc? ([2620:10d:c090:500::5:2fc5])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22fc828a3a5sm4337645ad.161.2025.05.08.14.59.13
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22fc7540056sm4813755ad.23.2025.05.08.15.07.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 May 2025 14:59:14 -0700 (PDT)
-Message-ID: <e339c382-c0f5-40dd-994e-34b388c68181@davidwei.uk>
-Date: Thu, 8 May 2025 14:59:12 -0700
+        Thu, 08 May 2025 15:07:02 -0700 (PDT)
+Message-ID: <6f40402c-dbef-4eed-807c-dd0ea5438732@davidwei.uk>
+Date: Thu, 8 May 2025 15:07:00 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,67 +81,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] selftests: drv-net: ping: make sure the ping
- test restores checksum offload
+Subject: Re: [PATCH net-next] selftests: net-drv: remove the nic_performance
+ and nic_link_layer tests
 To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
 Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
  andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20250508214005.1518013-1-kuba@kernel.org>
+ willemb@google.com, sdf@fomichev.me, mohan.prasad@microchip.com,
+ petrm@nvidia.com, linux-kselftest@vger.kernel.org
+References: <20250507140109.929801-1-kuba@kernel.org>
 Content-Language: en-US
 From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20250508214005.1518013-1-kuba@kernel.org>
+In-Reply-To: <20250507140109.929801-1-kuba@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 5/8/25 14:40, Jakub Kicinski wrote:
-> The ping test flips checksum offload on and off.
-> Make sure the original value is restored if test fails.
+On 5/7/25 07:01, Jakub Kicinski wrote:
+> Revert fbbf93556f0c ("selftests: nic_performance: Add selftest for performance of NIC driver")
+> Revert c087dc54394b ("selftests: nic_link_layer: Add selftest case for speed and duplex states")
+> Revert 6116075e18f7 ("selftests: nic_link_layer: Add link layer selftest for NIC driver")
+> 
+> These tests don't clean up after themselves, don't use the disruptive
+> annotations, don't get included in make install etc. etc. The tests
+> were added before we have any "HW" runner, so the issues were missed.
+> Our CI doesn't have any way of excluding broken tests, remove these
+> for now to stop the random pollution of results due to broken env.
+> We can always add them back once / if fixed.
 > 
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: shuah@kernel.org
-> CC: linux-kselftest@vger.kernel.org
-> ---
->   tools/testing/selftests/drivers/net/ping.py | 16 ++++++++++++++++
->   1 file changed, 16 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/drivers/net/ping.py b/tools/testing/selftests/drivers/net/ping.py
-> index af8df2313a3b..e0f114612c1a 100755
-> --- a/tools/testing/selftests/drivers/net/ping.py
-> +++ b/tools/testing/selftests/drivers/net/ping.py
-> @@ -50,6 +50,16 @@ no_sleep=False
->           cmd(f"echo {test_string} | socat -t 2 -u STDIN TCP:{cfg.remote_baddr}:{port}", shell=True)
->       ksft_eq(nc.stdout.strip(), test_string)
->   
-> +def _schedule_checksum_reset(cfg, netnl) -> None:
-> +    features = ethtool(f"-k {cfg.ifname}", json=True)
-> +    setting = ""
-> +    for side in ["tx", "rx"]:
-> +        f = features[0][side + "-checksumming"]
-> +        if not f["fixed"]:
 
-I checked and found that "fixed" is a ternary:
+Reviewed-by: David Wei <dw@davidwei.uk>
 
-         "rx-checksumming": {
-             "active": true,
-             "fixed": false,
-             "requested": true
-         },
-         "tx-checksumming": {
-             "active": true,
-             "fixed": null,
-             "requested": null
-         },
-
-Python loads this JSON as False and None types respectively, and `not
-f["fixed"]` is true for both False and None. Maybe this doesn't matter
-but flagging it.
-
-> +            setting += " " + side
-> +            setting += " " + ("on" if f["requested"] or f["active"] else "off")
-> +    defer(ethtool, f" -K {cfg.ifname} " + setting)
-
-This does rx/tx-gro too even if not explicitly requested. I assume that
-is okay?
 
