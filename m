@@ -1,145 +1,124 @@
-Return-Path: <netdev+bounces-188848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-188849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B5C2AAF10A
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 04:14:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41303AAF10E
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 04:15:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A03B1C04183
-	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 02:14:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DDB0985EEB
+	for <lists+netdev@lfdr.de>; Thu,  8 May 2025 02:14:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35D621B0402;
-	Thu,  8 May 2025 02:14:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D8671D5CE0;
+	Thu,  8 May 2025 02:15:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=goosey.org header.i=@goosey.org header.b="P07wVs0u";
-	dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b="VyXn+uXp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jup+Qk+C"
 X-Original-To: netdev@vger.kernel.org
-Received: from e240-11.smtp-out.eu-north-1.amazonses.com (e240-11.smtp-out.eu-north-1.amazonses.com [23.251.240.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 191DB1D5165;
-	Thu,  8 May 2025 02:14:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.251.240.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D25E015B102;
+	Thu,  8 May 2025 02:15:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746670445; cv=none; b=u+tY883HhKkevpm+6Il7/+OjG5koq/Kfbvvasri/CT1z7yMWcr611kyMKwQqtIwQLuteoC68BGrqhYPb/sFL9sO9FaN35pL9KuNFLkBY/4GUtAE/h6hpyw/+HmIwV0MwVjEQs9mgxXpQqtmYUJceD2pk8WgyVthDhno8268BZEc=
+	t=1746670513; cv=none; b=QMaXRRNCvNjyFuXrRbr89JsEAvboYFK64rgGn3VQ8q6FFVuo804M2tTeIyEaVHRUTnHpbyTcKSRMOvCTJYhMb7NDGKCBtLVuHON3y3YjhydHck7R1DFFuwhZ9imcAA5BpdZvb6siwSeTxhLWV/v2BHSwGkr1/bhBwBKUSHyU8n8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746670445; c=relaxed/simple;
-	bh=poefmGJfofvP15Nt36Hm35/aBbmaEdFRT7/Zbyr7/yE=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=iT7kn2+pNwEQFf4Gg2tKnl7qcf5INytnVtcxDLRvB4lkZ5EXlY2Fqu+O9fNzWLW0BvZmHIlCvtSOvXApmwqR6lRvM83kMm/Z6lMlKIakenHuBw+sGADhbuQeEQFc0n+KJ9L93TQwi/eTW8toVWKEDqlHTO03zITptQI+qUigMk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goosey.org; spf=pass smtp.mailfrom=eu-north-1.amazonses.com; dkim=pass (2048-bit key) header.d=goosey.org header.i=@goosey.org header.b=P07wVs0u; dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b=VyXn+uXp; arc=none smtp.client-ip=23.251.240.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goosey.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eu-north-1.amazonses.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-	s=iuunfi4kzpbzwuqjzrd5q2mr652n55fx; d=goosey.org; t=1746670441;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type;
-	bh=poefmGJfofvP15Nt36Hm35/aBbmaEdFRT7/Zbyr7/yE=;
-	b=P07wVs0uKJuayteT8U7j5g1MuPLLaAB3JBY8e0NCuzBfSlLiObAaaqxiscMeIK6a
-	kCS4XWypQicuWjacwOlpYhxQv4oHdY4YAagHyBI2s/1qIQ5d+gS66R4sL2rBHMv+OcP
-	ypd+PAxBmEbwvRtCNkTJCKmGUThqD4G7rJGGvdpnl9g6ElwSHURLU82YaBevR4XOINY
-	haRHoshPNZ/Ps/q4fQpEntvvEUCm06SfyUqAeyWmm9Bnl1R6ifI8GRJH6Pss9RC7Jl3
-	XTS6mzUERkRXfaaTOhgoO0abkIQO0sR8HsX0tk7zMuz7lRbKHgBpZSVwVFY+PJsjRBR
-	iXbiidEZrg==
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-	s=bw45wyq3hkghdoq32obql4uyexcghmc7; d=amazonses.com; t=1746670441;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type:Feedback-ID;
-	bh=poefmGJfofvP15Nt36Hm35/aBbmaEdFRT7/Zbyr7/yE=;
-	b=VyXn+uXpescqmYp21gl4+QF45hTuoqGSuFqKno7WpdoX4jRruzEE82VcZFXRVOwI
-	TiWORE5PaHmpyVXHhw9O5HFaHGsOs7Wmr1lRoUowsXnE44kcFlXR5tNVLzIBFE26mEW
-	OTkY7qGZvcGs+fDhqJKHgp/CfjJ2EbekJYqlZd7c=
-X-Forwarded-Encrypted: i=1; AJvYcCUmYVU0hwrvssQ80uhDDG3WRQ3u7/MtAc2TlS9dllG5V6N8lrB72SAvsrPuF5347Iwu9OHZbj6m@vger.kernel.org, AJvYcCXl7+vbuE+u5CvUJsWBJnoyE2+yf2N8VZMCN6y0NlDfgYZ5kBl5SgPW0VXElrtvbSlVmZ/nqk9liZfOBPI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAXcsbd/PjxcCj8xPOSnNXSDx117J5v4s/k26qp0sEgvGnxowy
-	9UQMhM+fapeLvcV0mNHS+xB2snHGISmPz0G7ybrgEV+jDZA1pZawqPT2D7QtyaAgt1aoaE+0NnY
-	atg2eIZ+/Cj+7ouH969q+zdjqfXw=
-X-Google-Smtp-Source: AGHT+IHFHTyfZ4T9ifPqXr73kDs7FxJtuk6pjrvncrBRp7/QMzmuo2IRKunODixNeWJ3aNsMClg+F8wIGMj8cKoeL/0=
-X-Received: by 2002:a17:902:ec8e:b0:22e:5406:4f62 with SMTP id
- d9443c01a7336-22e847ce326mr24568875ad.24.1746670438201; Wed, 07 May 2025
- 19:13:58 -0700 (PDT)
+	s=arc-20240116; t=1746670513; c=relaxed/simple;
+	bh=Xe71o3NwB4Jh0TFWAYLmp8xOREtAMxdCI+4weerDoiA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D5oKrtaQsIGXmMbCYF5JeRmkh3HnpTviFjRr7uDNNv4MQL5pWZWX6jCjOA74+t3b49e0IGOCGGY6+TDvQqFpTXZ1YOj9QgsK1inHBJEJNhEcVgDHdWmj/KyliT+GObDe2Z+LlAR6E4h8Z35DzZzEvo+0wIjHZxKXoMwUejeAUn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jup+Qk+C; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-22fa48f7cb2so1147325ad.1;
+        Wed, 07 May 2025 19:15:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746670511; x=1747275311; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GkADO5RX5LKak5ParSAdhE3hkIpyJGjVDD86j8FGyjI=;
+        b=Jup+Qk+CBjq2Hj3r4xbC0ajBX0Hej0PArYRz4HZ3xB7I1ZIEuAJJvlukARd4OTHTDq
+         piBDhZCR+8rNcjh4WrNNO28/Z9tTiKZ/PCokukyuqSRq4aTJwSGmUpjtESaBueEs8H7h
+         Y46mNveDw4P76Q2CKmLzoLgo33paPfEu8P6BpkZ0aRgG1ZQ5jCszXt8H1LYqkMeehPsD
+         d9eq2MAEa4d4mKUV24Eqk1rjYo1ljmOVZ9FSRtTU6bZ06/RJsQQd6REfJRiy/2jdEYE3
+         al9AGm+EGAD6Nhm6qtLcNv+WnIiBZ4F6JIVOQsx2vmRAeZw/RKIq5SlvyouAIEvZYbzy
+         PhlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746670511; x=1747275311;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GkADO5RX5LKak5ParSAdhE3hkIpyJGjVDD86j8FGyjI=;
+        b=US7Y2v3mB7GmadQY2xCpjcY0w8WrEK0D2vBPHY6OYPy3yv7OX9jXS0j5PivkGpwNKP
+         mZlRQB+R0sqOWq5VFeVMBwrfs+8nQXCUknQhaTUdGC5fd37+v4Az8p3GteuRnfjGdQl1
+         OA+Ooe3nQFQ2qBoIG57hd+vuuNEal13e5/HPh4cM+6CL+z/E8d6mkUviR5K7hGd6wvnS
+         Qe6bOScCahLgVLvni3hVKwl4SvnzNqKYePf8IFRmSVP7IE+xU0B+CZH98O4YkIDvmTq/
+         WrS3cJTw8P/mtqvMry5T6ydewZ5IY5mUGQOX2T+94l6bJnXQglzfvHPRk9eurwppKymj
+         ziMA==
+X-Forwarded-Encrypted: i=1; AJvYcCUfE+pCCQQ1Zx7X3w4nAgV9TWmjrDslWblei/jEbaGygCQfjGIiGKKOAPCHZ36uTrjyDiGV9HihYGfcawnvHew=@vger.kernel.org, AJvYcCWwDc5IUlyZ6LF/sndtQQkkQB5aX+bkO8hdbyBcejUKW+Z5qvB3iL91PVSyloEz5flGve1cgROFMi8ebliCTTfQ@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkkcIpDxkc5zmos0BbEWuEonvNA79r+KyF8kAApVgx22P/0sz3
+	9hy5OlA0aucYr0J9DJuOv3NdpnbXCHshj6rFSkH8ZKUbJFH+YAd0
+X-Gm-Gg: ASbGncu7S/GJ7iIAweyKXDQXAdLcq72xRgPFvduToiSZgBeyFWhE6i0H4tFDH4tPv7w
+	sdNySXaGiNqBKdozDr6+vJ4BR1/CXxHCuWY9Niju+1zpK4UNhGlAZO8V7Sxx4qIA70JsUaOfXp3
+	GPMpsuTTTBuKu/Vt8D2OOfvmtyJ32HTBCMMLHC4X7TV5SQNc/38ImAj2XHPdxwwks+S3QUjvwc5
+	vHjBb6q0062N/UJe5yNb/QZtf1jdBcCoer7ondcWB5sLBvxJ+oSY+4kol8JSkBv0J0A5HBNUXau
+	sHDiC0xnQ45AtpY6p+vXpolDDDtChKWvchDv1Xq+YedRloOdWILtB/Th
+X-Google-Smtp-Source: AGHT+IF/g58dTcMUT9OqqraHwKir4gOqXcqsH7utlmYFK5Z6ygF7IDHvIjdM+rEucmwSxjt46URo7A==
+X-Received: by 2002:a17:903:2ec3:b0:224:910:23f6 with SMTP id d9443c01a7336-22e5ee17734mr76937385ad.45.1746670511089;
+        Wed, 07 May 2025 19:15:11 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22e1521fa7bsm102582835ad.141.2025.05.07.19.15.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 May 2025 19:15:10 -0700 (PDT)
+Date: Thu, 8 May 2025 02:15:01 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Andrea Mayer <andrea.mayer@uniroma2.it>,
+	Paolo Lungaroni <paolo.lungaroni@uniroma2.it>,
+	linux-kselftest@vger.kernel.org, mptcp@lists.linux.dev,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+Subject: Re: [PATCH net-next 4/6] selftests: net: use setup_ns for SRv6 tests
+ and remove rp_filter configuration
+Message-ID: <aBwTpWOovuXghcRd@fedora>
+References: <20250507131856.78393-1-liuhangbin@gmail.com>
+ <20250507131856.78393-5-liuhangbin@gmail.com>
+ <20250507163904.0cf86c59@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Ozgur Kara <ozgur@goosey.org>
-Date: Thu, 8 May 2025 02:14:00 +0000
-X-Gmail-Original-Message-ID: <CADvZ6EoGrp9SCvkVKEV0i=NW-7XZmxbmZkmxd8TPFboPTAUF_g@mail.gmail.com>
-X-Gm-Features: ATxdqUEBQMdn1y1DGa-OqpAdEqho1UUS-FmqZpaLp_rDz0VPLAPMSxPSHAUfHd8
-Message-ID: <01100196adabd0d2-24bf9783-b3d5-4566-9f98-9eda0c1f4833-000000@eu-north-1.amazonses.com>
-Subject: [PATCH] net: ethernet: Fixe issue in nvmem_get_mac_address() where
- invalid mac addresses
-To: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, 
-	Nikolay Aleksandrov <razor@blackwall.org>, 
-	Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Feedback-ID: ::1.eu-north-1.jZlAFvO9+f8tc21Z4t7ANdAU3Nw/ALd5VHiFFAqIVOg=:AmazonSES
-X-SES-Outgoing: 2025.05.08-23.251.240.11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250507163904.0cf86c59@kernel.org>
 
-From: Ozgur Karatas <ozgur@goosey.org>
+On Wed, May 07, 2025 at 04:39:04PM -0700, Jakub Kicinski wrote:
+> On Wed,  7 May 2025 13:18:54 +0000 Hangbin Liu wrote:
+> > Some SRv6 tests manually set up network namespaces and disable rp_filter.
+> > Since the setup_ns library function already handles rp_filter configuration,
+> > convert these SRv6 tests to use setup_ns and remove the redundant rp_filter
+> > settings.
+> 
+> Missed some get_nodename calls, I think?
+> 
+> # ./srv6_hl2encap_red_l2vpn_test.sh: line 470: get_nodename: command not found
+> # SKIP: Setting up the testing environment failed
+> ok 1 selftests: net: srv6_hl2encap_red_l2vpn_test.sh # SKIP
 
-it's necessary to log error returned from
-fwnode_property_read_u8_array because there is no detailed information
-when addr returns an invalid mac address.
+Hmm, somehow I missed testing this one before posting the patch...
 
-kfree(mac) should actually be marked as kfree((void *)mac) because mac
-pointer is of type const void * and type conversion is required so
-data returned from nvmem_cell_read() is of same type.
+I will fix it and post a v2 patch. Sorry for taking up your time.
 
-This patch fixes the issue in nvmem_get_mac_address() where invalid
-mac addresses could be read due to improper error handling.
-
-Signed-off-by: Ozgur Karatas <ozgur@goosey.org>
-
----
- net/ethernet/eth.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
-
-diff --git a/net/ethernet/eth.c b/net/ethernet/eth.c
-index 4e3651101b86..1c5649b956e9 100644
---- a/net/ethernet/eth.c
-+++ b/net/ethernet/eth.c
-@@ -549,12 +549,12 @@ int nvmem_get_mac_address(struct device *dev,
-void *addrbuf)
-                return PTR_ERR(mac);
-
-        if (len != ETH_ALEN || !is_valid_ether_addr(mac)) {
--               kfree(mac);
-+               kfree((void *)mac);
-                return -EINVAL;
-        }
-
-        ether_addr_copy(addrbuf, mac);
--       kfree(mac);
-+       kfree((void *)mac);
-
-        return 0;
- }
-@@ -565,11 +565,16 @@ static int fwnode_get_mac_addr(struct
-fwnode_handle *fwnode,
-        int ret;
-
-        ret = fwnode_property_read_u8_array(fwnode, name, addr, ETH_ALEN);
--       if (ret)
-+       if (ret) {
-+               pr_err("Failed to read MAC address property %s\n", name);
-                return ret;
-+        }
-
--       if (!is_valid_ether_addr(addr))
-+       if (!is_valid_ether_addr(addr)) {
-+               pr_err("Invalid MAC address read for %s\n", name);
-                return -EINVAL;
-+        }
-+
-        return 0;
- }
-
---
-2.39.5
+Thanks
+Hangbin
 
