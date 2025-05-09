@@ -1,279 +1,318 @@
-Return-Path: <netdev+bounces-189329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC4F6AB1992
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 18:00:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A106AB19D0
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 18:08:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCB0E52594D
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 15:58:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90E071C442B4
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 16:03:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 343B7270556;
-	Fri,  9 May 2025 15:54:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC4F9233736;
+	Fri,  9 May 2025 16:01:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ClrPljYm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QHzLnWJc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C4162356A3;
-	Fri,  9 May 2025 15:54:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6AEA235046
+	for <netdev@vger.kernel.org>; Fri,  9 May 2025 16:01:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746806087; cv=none; b=k9w35HFI/28NMxEhJVZ6xG2kXFFBz/9x+CLp6beNEcvgc8rac020RzrXL2IoMPgP2UquVHga9GyA87UmM5YWR7ouxrZFEN7TfTsM5dZzARGzkpW5wuouU55v7EdWmIojQPerHA2h5O83zF7ScOiKsWpvIUy1gALGx/ORiNlVtxk=
+	t=1746806472; cv=none; b=kzBNtQmzPI7IwRb6tx+Lu/yVAlH5nP9n2itbB+F79hROkih+lM5A+sZTc2ln4WVs7/r6idAighBLbKjiKmXsKeKby6gmHFzZ/aVBhCVVYnoZn1ulnENFULwvDlpUIgaX+rXa769Ca72qjEMCEAR8CcwDOnIevqWUqZKVxUSSeAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746806087; c=relaxed/simple;
-	bh=U7kTRtDKEyi26UTZypbYVJmh4wa4LgmaBdSpf8+xSlU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=QbL9txdg2qU71kJb1shBAzVO+8rR3WJHrm01Gmu58GgrnM9DB4MpO3MuF1KCsTLsGo4qyKcYVWZYbUmndHUryX5EYsouP+LjGrSWzasF5EqFgwawjG7madb/p81T0ZDZhdZBfYAPrb+8LiMXcW9lO+8fjq/D+K0woEVl3XUsckg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ClrPljYm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B826EC4CEF0;
-	Fri,  9 May 2025 15:54:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746806086;
-	bh=U7kTRtDKEyi26UTZypbYVJmh4wa4LgmaBdSpf8+xSlU=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=ClrPljYmGwXqXnD83Pe5KMkCq6Cv3JHy+4PeVZ9LW7q4nQ/7uyVypqq8XFI1fY+pe
-	 jwNZljIvtBVXhglIXUiKEFHPJX40Ip/cuvslwfPYeb7yYjskKA0W4aoLMHIs5rxKkL
-	 yYxSg5hDtGJQOQ6s0k+PWC3KBrn/Rs2uSBzkaLbFwtzvNlhk1jD6g5nrJzjusivW4x
-	 D3ynAB/gF/MjLwnbz/6JSu1Afdt6KUm/eKCE1LCazH3Nbrh3ZqJdsI5uiWecUxaG2W
-	 psvmKNW96qpCH1QlBq75MklUczPOSPn575vSrNlMAqrpBCn7FgN7sJGdULdjgnTJPC
-	 anSwY/JodVi5A==
-From: Jeff Layton <jlayton@kernel.org>
-Date: Fri, 09 May 2025 11:53:46 -0400
-Subject: [PATCH v9 10/10] ref_tracker: eliminate the ref_tracker_dir name
- field
+	s=arc-20240116; t=1746806472; c=relaxed/simple;
+	bh=gn3Fw1yd0mZmv++vMxgROLHDSfzvO3kgVKf+g+bpWE8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=F4JOqjA0gqI/LUkM+UvCyH/iqraggDak+7b0y4o5flVXEziVPSk4N/Wj5l7hDkqqOh2TyfTezJeYieg5Y1y4riGrH47Ei9X6aol0oEJfS+NVMzv3tgiZwrtCbh+JcMMiTR3psY5S2RLabBSR+6RR7S/LUX1v6qSEHYtbogEIBHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QHzLnWJc; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-74019695377so1794499b3a.3
+        for <netdev@vger.kernel.org>; Fri, 09 May 2025 09:01:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1746806470; x=1747411270; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Oxm6HAf+zZ7S5Y7Hy0bvLmZt7BM16qnH9wQPy3cRVRY=;
+        b=QHzLnWJcAj2u/dWH1Z3YYRXRWQaeqo2vJrR9uS1dxVgL7GwXv3cu+2dQ1/hLtlWjeF
+         yKo7tGvPwaZRz/5BYV3lgquVPTexJ6cCGVudVvCXUIoJy5V8A86IJ+fMJPygHElWgNSP
+         XiTMfkl3whJ+TW3E+nhDb7M0ZPuqpqhB72aVQEJN9lI3CoSVaoaL1fRD0KEXnGoS2hYf
+         VdBPda1T035nBjFfkrkCQft5SexTV/IONhR6SPjHTPb16RpGsUsd+UDlsTYnkpTKmMo+
+         JVKjQ4P9x1dYStvkR80PRGnYbB7WYIaXGz+9ocxdlEIJJtZWJKB9IxJrxYXBLzqDZo+g
+         fwUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746806470; x=1747411270;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Oxm6HAf+zZ7S5Y7Hy0bvLmZt7BM16qnH9wQPy3cRVRY=;
+        b=WV072/tYGyunUg+4XzDfeqfZpCawlWChzr9HMYGf/SilW/SIAbXpd8DLACOwIB4QoT
+         wHc9ct34pjTYaoNITnBf9ENpBeHEFrPk5ra/vQX/8HDFl0MVR7U0GCZ9X9Egy+yn89Bb
+         lncOqQnBDokdKyR21WmjLw8rn6/I3rAG1UVNHwYBR7iQhD6rPaOiUIVKxx1o+Fr/uXCL
+         czUYQH3PPO3Yo0VRYSbjPcvS8BQ3zvRUZp9t+J9MJLTzlSggFfv4Xug2Gi3Dg1iATprP
+         4MEPAtzM1/9Vedy+4MeeIoAuvLDqeTnzkLnm+ClMCphgMYsTR2iwQoWZgrvgwbqQbwug
+         OB5A==
+X-Forwarded-Encrypted: i=1; AJvYcCXBE4rCQmxGi4/3P+GLfZ3IP7uUQBPqQrBX1uoxUa/rR0LWEpGw8ipaaZSYKhftB3XFHo7O4U0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1QFO4aTiLdHLnzztD7jUerlNTKTH3eRrC88QWaomGQ4VQcial
+	h7vPJ65CitPN1VuM7xuaxDT1C9at7owzY53rdBdg2/VnVpwbDxnt
+X-Gm-Gg: ASbGncsQpuRGQlyioklNimT9K1A3T9c59wbNp63OKDe+rQVVTnWUwMXt2hDmy8tq+49
+	et7QEV63krp1yQmQ7Msi30YpHHcAQgHq8iXViY4v5B/Psbb5ZZCws+Nz8AwLOuJKjyCMAO7L5Mn
+	pWw5xEvOo5ak2NJEzqm6e1qQIhM8vHhw4fQomIW4BbkgxfNvG0ypalJkHwuQSk3KTCo+ScvXVyN
+	3LIKbaNPgrh3g7CR7Mfn7zpVGOCzMZOwyko6NHEKFDgY4TjywNgSpggjR48Jci2XDLbMGF/OgAF
+	4yj15glxzjR267Y3XlFeVHmxRmQySw==
+X-Google-Smtp-Source: AGHT+IHyOdyI8kkrRJiNO5R30PyOa6kiOz+U9h9sNzoeXqfcOtNy+18e2Pi4p7SxQopbOMlRZwa2/g==
+X-Received: by 2002:a05:6a20:7283:b0:1f5:520d:fb93 with SMTP id adf61e73a8af0-215abb3ba5cmr5661530637.24.1746806469615;
+        Fri, 09 May 2025 09:01:09 -0700 (PDT)
+Received: from ap.. ([182.213.254.91])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b234a0b76ccsm1648085a12.27.2025.05.09.09.01.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 May 2025 09:01:08 -0700 (PDT)
+From: Taehee Yoo <ap420073@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	horms@kernel.org,
+	almasrymina@google.com,
+	sdf@fomichev.me,
+	netdev@vger.kernel.org
+Cc: asml.silence@gmail.com,
+	dw@davidwei.uk,
+	skhawaja@google.com,
+	kaiyuanz@google.com,
+	jdamato@fastly.com,
+	ap420073@gmail.com
+Subject: [PATCH net v3] net: devmem: fix kernel panic when netlink socket close after module unload
+Date: Fri,  9 May 2025 16:00:55 +0000
+Message-Id: <20250509160055.261803-1-ap420073@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250509-reftrack-dbgfs-v9-10-8ab888a4524d@kernel.org>
-References: <20250509-reftrack-dbgfs-v9-0-8ab888a4524d@kernel.org>
-In-Reply-To: <20250509-reftrack-dbgfs-v9-0-8ab888a4524d@kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
- Jani Nikula <jani.nikula@linux.intel.com>, 
- Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, 
- Rodrigo Vivi <rodrigo.vivi@intel.com>, 
- Tvrtko Ursulin <tursulin@ursulin.net>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Qasim Ijaz <qasdev00@gmail.com>, 
- Nathan Chancellor <nathan@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, 
- Jeff Layton <jlayton@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=7622; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=U7kTRtDKEyi26UTZypbYVJmh4wa4LgmaBdSpf8+xSlU=;
- b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBoHiUwuTNC/LNoDy5x85rg9NT/5Jr8iJxv8nNdi
- QqV3ruQECeJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaB4lMAAKCRAADmhBGVaC
- FdHPD/9Kz2fFDOZ0GbHQ+AIsH/45Bjuk8QMpIRGJjTAaUUzTsMqeMqEG0M3s7L25OgPw//f9LZy
- HxajSiSSOwp7K1HoIEmZuAeqW6ltWv8iMhuVHQVXi7VwE/g6Ramekdgwi0nt4n9Cs8gAE6XV1Ux
- 4faNZgD3qrX6FkOpq/0lvFy6XcLxVbPs+PPNmv1c4Rv77VfF9Xy+TcmrohK+qFlTv0yYY82Ejr1
- qOtENhvJAUftZPpzJxM0FTyMKxOBIMXgZSYBSxm0vpiV1L4mU/jATfq6SfznVhIkDtpDeJu7KL9
- HRqTMc6t+xzBxAu1lNCdc8yYQrirLd++CtMDOkFhiXft8d1D9FIBqJUoYoocHv0gK2FuO+0Nqn5
- y6eUVXSfYvi5mIlWp5keXmzjzP3/abxgPeexxhhlexVvxpVJZnlFjjR6RELwr3P4+5RFlO08pcZ
- YYWUr4miY4xG7nFLRt9BiOvzTboC5PZOkFLjH+pWAABKFYe/af24qSQQjtHXjOucSMNlt70rOq/
- 0iWYG5/IjZJODZOmbnXArXqoHyd8AS/LypE/hQKcMOdL0BQj6/seWUTQbDaR9hN/pYz4WNUql4+
- Evu/8hLhtzTBtuHFrDqHdTXLa3bUmuWeHJADp8WQZZDjeRdGMDT3R4MClhTaR1hP1eC1FQGwhq1
- khmJBhE2oO2dTfg==
-X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
- fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
+Content-Transfer-Encoding: 8bit
 
-Now that we have dentries and the ability to create meaningful symlinks
-to them, don't keep a name string in each tracker. Switch the output
-format to print "class@address", and drop the name field.
+Kernel panic occurs when a devmem TCP socket is closed after NIC module
+is unloaded.
 
-Also, add a kerneldoc header for ref_tracker_dir_init().
+This is Devmem TCP unregistration scenarios. number is an order.
+(a)netlink socket close    (b)pp destroy    (c)uninstall    result
+1                          2                3               OK
+1                          3                2               (d)Impossible
+2                          1                3               OK
+3                          1                2               (e)Kernel panic
+2                          3                1               (d)Impossible
+3                          2                1               (d)Impossible
 
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
+(a) netdev_nl_sock_priv_destroy() is called when devmem TCP socket is
+    closed.
+(b) page_pool_destroy() is called when the interface is down.
+(c) mp_ops->uninstall() is called when an interface is unregistered.
+(d) There is no scenario in mp_ops->uninstall() is called before
+    page_pool_destroy().
+    Because unregister_netdevice_many_notify() closes interfaces first
+    and then calls mp_ops->uninstall().
+(e) netdev_nl_sock_priv_destroy() accesses struct net_device to acquire
+    netdev_lock().
+    But if the interface module has already been removed, net_device
+    pointer is invalid, so it causes kernel panic.
+
+In summary, there are only 3 possible scenarios.
+ A. sk close -> pp destroy -> uninstall.
+ B. pp destroy -> sk close -> uninstall.
+ C. pp destroy -> uninstall -> sk close.
+
+Case C is a kernel panic scenario.
+
+In order to fix this problem, It makes mp_dmabuf_devmem_uninstall() set
+binding->dev to NULL.
+It indicates an bound net_device was unregistered.
+
+It makes netdev_nl_sock_priv_destroy() do not acquire netdev_lock()
+if binding->dev is NULL.
+
+A new binding->lock is added to protect members of a binding.
+
+Tests:
+Scenario A:
+    ./ncdevmem -s 192.168.1.4 -c 192.168.1.2 -f $interface -l -p 8000 \
+        -v 7 -t 1 -q 1 &
+    pid=$!
+    sleep 10
+    kill $pid
+    ip link set $interface down
+    modprobe -rv $module
+
+Scenario B:
+    ./ncdevmem -s 192.168.1.4 -c 192.168.1.2 -f $interface -l -p 8000 \
+        -v 7 -t 1 -q 1 &
+    pid=$!
+    sleep 10
+    ip link set $interface down
+    kill $pid
+    modprobe -rv $module
+
+Scenario C:
+    ./ncdevmem -s 192.168.1.4 -c 192.168.1.2 -f $interface -l -p 8000 \
+        -v 7 -t 1 -q 1 &
+    pid=$!
+    sleep 10
+    modprobe -rv $module
+    sleep 5
+    kill $pid
+
+Splat looks like:
+Oops: general protection fault, probably for non-canonical address 0xdffffc001fffa9f7: 0000 [#1] SMP DEBUG_PAGEALLOC KASAN NOPTI
+KASAN: probably user-memory-access in range [0x00000000fffd4fb8-0x00000000fffd4fbf]
+CPU: 0 UID: 0 PID: 2041 Comm: ncdevmem Tainted: G    B   W           6.15.0-rc1+ #2 PREEMPT(undef)  0947ec89efa0fd68838b78e36aa1617e97ff5d7f
+Tainted: [B]=BAD_PAGE, [W]=WARN
+RIP: 0010:__mutex_lock (./include/linux/sched.h:2244 kernel/locking/mutex.c:400 kernel/locking/mutex.c:443 kernel/locking/mutex.c:605 kernel/locking/mutex.c:746)
+Code: ea 03 80 3c 02 00 0f 85 4f 13 00 00 49 8b 1e 48 83 e3 f8 74 6a 48 b8 00 00 00 00 00 fc ff df 48 8d 7b 34 48 89 fa 48 c1 ea 03 <0f> b6 f
+RSP: 0018:ffff88826f7ef730 EFLAGS: 00010203
+RAX: dffffc0000000000 RBX: 00000000fffd4f88 RCX: ffffffffaa9bc811
+RDX: 000000001fffa9f7 RSI: 0000000000000008 RDI: 00000000fffd4fbc
+RBP: ffff88826f7ef8b0 R08: 0000000000000000 R09: ffffed103e6aa1a4
+R10: 0000000000000007 R11: ffff88826f7ef442 R12: fffffbfff669f65e
+R13: ffff88812a830040 R14: ffff8881f3550d20 R15: 00000000fffd4f88
+FS:  0000000000000000(0000) GS:ffff888866c05000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000563bed0cb288 CR3: 00000001a7c98000 CR4: 00000000007506f0
+PKRU: 55555554
+Call Trace:
+<TASK>
+ ...
+ netdev_nl_sock_priv_destroy (net/core/netdev-genl.c:953 (discriminator 3))
+ genl_release (net/netlink/genetlink.c:653 net/netlink/genetlink.c:694 net/netlink/genetlink.c:705)
+ ...
+ netlink_release (net/netlink/af_netlink.c:737)
+ ...
+ __sock_release (net/socket.c:647)
+ sock_close (net/socket.c:1393)
+
+Fixes: 1d22d3060b9b ("net: drop rtnl_lock for queue_mgmt operations")
+Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 ---
- drivers/gpu/drm/display/drm_dp_tunnel.c |  2 +-
- drivers/gpu/drm/i915/intel_runtime_pm.c |  2 +-
- drivers/gpu/drm/i915/intel_wakeref.c    |  2 +-
- include/linux/ref_tracker.h             | 20 ++++++++++++++------
- lib/ref_tracker.c                       |  6 +++---
- lib/test_ref_tracker.c                  |  2 +-
- net/core/dev.c                          |  2 +-
- net/core/net_namespace.c                |  4 ++--
- 8 files changed, 24 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/gpu/drm/display/drm_dp_tunnel.c b/drivers/gpu/drm/display/drm_dp_tunnel.c
-index f2a8ef6abf34d89a642d7c7708c41e5b1dc9dece..f8d1f9c60e86c5a7b1866e1c9f6425e99d4ca9c6 100644
---- a/drivers/gpu/drm/display/drm_dp_tunnel.c
-+++ b/drivers/gpu/drm/display/drm_dp_tunnel.c
-@@ -1920,7 +1920,7 @@ drm_dp_tunnel_mgr_create(struct drm_device *dev, int max_group_count)
- 	}
- 
- #ifdef CONFIG_DRM_DISPLAY_DP_TUNNEL_STATE_DEBUG
--	ref_tracker_dir_init(&mgr->ref_tracker, 16, "drm_dptun", "dptun");
-+	ref_tracker_dir_init(&mgr->ref_tracker, 16, "drm_dptun");
- #endif
- 
- 	for (i = 0; i < max_group_count; i++) {
-diff --git a/drivers/gpu/drm/i915/intel_runtime_pm.c b/drivers/gpu/drm/i915/intel_runtime_pm.c
-index 94315e952ead9be276298fb2a0200d102005a0c1..d560f94af7a86f1fc139204a4e901eaea22c6ef1 100644
---- a/drivers/gpu/drm/i915/intel_runtime_pm.c
-+++ b/drivers/gpu/drm/i915/intel_runtime_pm.c
-@@ -60,7 +60,7 @@ static struct drm_i915_private *rpm_to_i915(struct intel_runtime_pm *rpm)
- static void init_intel_runtime_pm_wakeref(struct intel_runtime_pm *rpm)
- {
- 	ref_tracker_dir_init(&rpm->debug, INTEL_REFTRACK_DEAD_COUNT,
--			     "intel_runtime_pm", dev_name(rpm->kdev));
-+			     "intel_runtime_pm");
- 	ref_tracker_dir_symlink(&rpm->debug, "intel_runtime_pm-%s", dev_name(rpm->kdev));
- }
- 
-diff --git a/drivers/gpu/drm/i915/intel_wakeref.c b/drivers/gpu/drm/i915/intel_wakeref.c
-index 2e0498b3fa7947f994de1339d4d2bed93de1a795..bbd5171ce0a22435e540f10821f2a0dad59c1d2f 100644
---- a/drivers/gpu/drm/i915/intel_wakeref.c
-+++ b/drivers/gpu/drm/i915/intel_wakeref.c
-@@ -114,7 +114,7 @@ void __intel_wakeref_init(struct intel_wakeref *wf,
- 			 "wakeref.work", &key->work, 0);
- 
- #if IS_ENABLED(CONFIG_DRM_I915_DEBUG_WAKEREF)
--	ref_tracker_dir_init(&wf->debug, INTEL_REFTRACK_DEAD_COUNT, "intel_wakeref", name);
-+	ref_tracker_dir_init(&wf->debug, INTEL_REFTRACK_DEAD_COUNT, "intel_wakeref");
- 	ref_tracker_dir_symlink(&wf->debug, "intel_wakeref-%s", name);
- #endif
- }
-diff --git a/include/linux/ref_tracker.h b/include/linux/ref_tracker.h
-index ddc5a7b2bd84692bbc1e1ae67674ec2c6857e1ec..5878e7fce712930700054033ff5f21547e75224f 100644
---- a/include/linux/ref_tracker.h
-+++ b/include/linux/ref_tracker.h
-@@ -24,7 +24,6 @@ struct ref_tracker_dir {
- 	struct dentry		*dentry;
- 	struct dentry		*symlink;
- #endif
--	char			name[32];
- #endif
- };
- 
-@@ -48,10 +47,21 @@ void ref_tracker_dir_symlink(struct ref_tracker_dir *dir, const char *fmt, ...)
- 
- #endif /* CONFIG_DEBUG_FS */
- 
-+/**
-+ * ref_tracker_dir_init - initialize a ref_tracker dir
-+ * @dir: ref_tracker_dir to be initialized
-+ * @quarantine_count: max number of entries to be tracked
-+ * @class: pointer to static string that describes object type
-+ *
-+ * Initialize a ref_tracker_dir. If debugfs is configured, then a file
-+ * will also be created for it under the top-level ref_tracker debugfs
-+ * directory.
-+ *
-+ * Note that @class must point to a static string.
-+ */
- static inline void ref_tracker_dir_init(struct ref_tracker_dir *dir,
- 					unsigned int quarantine_count,
--					const char *class,
--					const char *name)
-+					const char *class)
- {
- 	INIT_LIST_HEAD(&dir->list);
- 	INIT_LIST_HEAD(&dir->quarantine);
-@@ -65,7 +75,6 @@ static inline void ref_tracker_dir_init(struct ref_tracker_dir *dir,
- 	dir->dentry = NULL;
- 	dir->symlink = NULL;
- #endif
--	strscpy(dir->name, name, sizeof(dir->name));
- 	ref_tracker_dir_debugfs(dir);
- 	stack_depot_init();
- }
-@@ -90,8 +99,7 @@ int ref_tracker_free(struct ref_tracker_dir *dir,
- 
- static inline void ref_tracker_dir_init(struct ref_tracker_dir *dir,
- 					unsigned int quarantine_count,
--					const char *class,
--					const char *name)
-+					const char *class)
- {
- }
- 
-diff --git a/lib/ref_tracker.c b/lib/ref_tracker.c
-index 5e84e5fd78e147a036d4adb511e657da07866a55..5fb384dd919e1f1ad632eaf595b954118bcfddab 100644
---- a/lib/ref_tracker.c
-+++ b/lib/ref_tracker.c
-@@ -123,7 +123,7 @@ __ref_tracker_dir_pr_ostream(struct ref_tracker_dir *dir,
- 	stats = ref_tracker_get_stats(dir, display_limit);
- 	if (IS_ERR(stats)) {
- 		pr_ostream(s, "%s%s@%p: couldn't get stats, error %pe\n",
--			   s->prefix, dir->name, dir, stats);
-+			   s->prefix, dir->class, dir, stats);
- 		return;
- 	}
- 
-@@ -134,14 +134,14 @@ __ref_tracker_dir_pr_ostream(struct ref_tracker_dir *dir,
- 		if (sbuf && !stack_depot_snprint(stack, sbuf, STACK_BUF_SIZE, 4))
- 			sbuf[0] = 0;
- 		pr_ostream(s, "%s%s@%p has %d/%d users at\n%s\n", s->prefix,
--			   dir->name, dir, stats->stacks[i].count,
-+			   dir->class, dir, stats->stacks[i].count,
- 			   stats->total, sbuf);
- 		skipped -= stats->stacks[i].count;
- 	}
- 
- 	if (skipped)
- 		pr_ostream(s, "%s%s@%p skipped reports about %d/%d users.\n",
--			   s->prefix, dir->name, dir, skipped, stats->total);
-+			   s->prefix, dir->class, dir, skipped, stats->total);
- 
- 	kfree(sbuf);
- 
-diff --git a/lib/test_ref_tracker.c b/lib/test_ref_tracker.c
-index d263502a4c1db248f64a66a468e96c8e4cffab25..b983ceb12afcb84ad60360a1e6fec0072e78ef79 100644
---- a/lib/test_ref_tracker.c
-+++ b/lib/test_ref_tracker.c
-@@ -64,7 +64,7 @@ static int __init test_ref_tracker_init(void)
- {
- 	int i;
- 
--	ref_tracker_dir_init(&ref_dir, 100, "selftest", "selftest");
-+	ref_tracker_dir_init(&ref_dir, 100, "selftest");
- 
- 	timer_setup(&test_ref_tracker_timer, test_ref_tracker_timer_func, 0);
- 	mod_timer(&test_ref_tracker_timer, jiffies + 1);
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 380d07bec15a1f62ed27c31a6e211e74f3a5561d..00776cba0276554066c94a6fc86f5ed4df430cfa 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -11620,7 +11620,7 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
- 
- 	dev->priv_len = sizeof_priv;
- 
--	ref_tracker_dir_init(&dev->refcnt_tracker, 128, "netdev", name);
-+	ref_tracker_dir_init(&dev->refcnt_tracker, 128, "netdev");
- #ifdef CONFIG_PCPU_DEV_REFCNT
- 	dev->pcpu_refcnt = alloc_percpu(int);
- 	if (!dev->pcpu_refcnt)
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index 1c5e0289f0f0b37c61852d95d4e11a8c12a868f3..5b06a0bf88e62c19f6f610eca3a4c4750ff4a2ea 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -324,8 +324,8 @@ static __net_init void preinit_net(struct net *net, struct user_namespace *user_
- {
- 	refcount_set(&net->passive, 1);
- 	refcount_set(&net->ns.count, 1);
--	ref_tracker_dir_init(&net->refcnt_tracker, 128, "net_refcnt", "net_refcnt");
--	ref_tracker_dir_init(&net->notrefcnt_tracker, 128, "net_notrefcnt", "net_notrefcnt");
-+	ref_tracker_dir_init(&net->refcnt_tracker, 128, "net_refcnt");
-+	ref_tracker_dir_init(&net->notrefcnt_tracker, 128, "net_notrefcnt");
- 
- 	get_random_bytes(&net->hash_mix, sizeof(u32));
- 	net->dev_base_seq = 1;
+v3:
+ - Add binding->lock for protecting members of a binding.
+ - Add a net_devmem_unset_dev() helper function.
+ - Do not reorder locks.
+ - Fix build failure.
 
+v2:
+ - Fix commit message.
+ - Correct Fixes tag.
+ - Inverse locking order.
+ - Do not put a reference count of binding in
+   mp_dmabuf_devmem_uninstall().
+
+In order to test this patch, driver side implementation of devmem TCP[1]
+is needed to be applied.
+
+[1] https://lore.kernel.org/netdev/20250415052458.1260575-1-ap420073@gmail.com/T/#u
+
+ net/core/devmem.c      | 14 +++++++++++---
+ net/core/devmem.h      |  2 ++
+ net/core/netdev-genl.c | 13 +++++++++++++
+ 3 files changed, 26 insertions(+), 3 deletions(-)
+
+diff --git a/net/core/devmem.c b/net/core/devmem.c
+index 6e27a47d0493..ffbf50337413 100644
+--- a/net/core/devmem.c
++++ b/net/core/devmem.c
+@@ -33,6 +33,13 @@ bool net_is_devmem_iov(struct net_iov *niov)
+ 	return niov->pp->mp_ops == &dmabuf_devmem_ops;
+ }
+ 
++static void net_devmem_unset_dev(struct net_devmem_dmabuf_binding *binding)
++{
++	mutex_lock(&binding->lock);
++	binding->dev = NULL;
++	mutex_unlock(&binding->lock);
++}
++
+ static void net_devmem_dmabuf_free_chunk_owner(struct gen_pool *genpool,
+ 					       struct gen_pool_chunk *chunk,
+ 					       void *not_used)
+@@ -117,9 +124,6 @@ void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *binding)
+ 	unsigned long xa_idx;
+ 	unsigned int rxq_idx;
+ 
+-	if (binding->list.next)
+-		list_del(&binding->list);
+-
+ 	xa_for_each(&binding->bound_rxqs, xa_idx, rxq) {
+ 		const struct pp_memory_provider_params mp_params = {
+ 			.mp_priv	= binding,
+@@ -200,6 +204,8 @@ net_devmem_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
+ 
+ 	refcount_set(&binding->ref, 1);
+ 
++	mutex_init(&binding->lock);
++
+ 	binding->dmabuf = dmabuf;
+ 
+ 	binding->attachment = dma_buf_attach(binding->dmabuf, dev->dev.parent);
+@@ -379,6 +385,8 @@ static void mp_dmabuf_devmem_uninstall(void *mp_priv,
+ 	xa_for_each(&binding->bound_rxqs, xa_idx, bound_rxq) {
+ 		if (bound_rxq == rxq) {
+ 			xa_erase(&binding->bound_rxqs, xa_idx);
++			if (xa_empty(&binding->bound_rxqs))
++				net_devmem_unset_dev(binding);
+ 			break;
+ 		}
+ 	}
+diff --git a/net/core/devmem.h b/net/core/devmem.h
+index 7fc158d52729..b69adca6cd44 100644
+--- a/net/core/devmem.h
++++ b/net/core/devmem.h
+@@ -20,6 +20,8 @@ struct net_devmem_dmabuf_binding {
+ 	struct sg_table *sgt;
+ 	struct net_device *dev;
+ 	struct gen_pool *chunk_pool;
++	/* Protect all members */
++	struct mutex lock;
+ 
+ 	/* The user holds a ref (via the netlink API) for as long as they want
+ 	 * the binding to remain alive. Each page pool using this binding holds
+diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+index dae9f0d432fb..bd5d58604ec0 100644
+--- a/net/core/netdev-genl.c
++++ b/net/core/netdev-genl.c
+@@ -979,14 +979,27 @@ void netdev_nl_sock_priv_destroy(struct netdev_nl_sock *priv)
+ {
+ 	struct net_devmem_dmabuf_binding *binding;
+ 	struct net_devmem_dmabuf_binding *temp;
++	netdevice_tracker dev_tracker;
+ 	struct net_device *dev;
+ 
+ 	mutex_lock(&priv->lock);
+ 	list_for_each_entry_safe(binding, temp, &priv->bindings, list) {
++		list_del(&binding->list);
++
++		mutex_lock(&binding->lock);
+ 		dev = binding->dev;
++		if (!dev) {
++			mutex_unlock(&binding->lock);
++			net_devmem_unbind_dmabuf(binding);
++			continue;
++		}
++		netdev_hold(dev, &dev_tracker, GFP_KERNEL);
++		mutex_unlock(&binding->lock);
++
+ 		netdev_lock(dev);
+ 		net_devmem_unbind_dmabuf(binding);
+ 		netdev_unlock(dev);
++		netdev_put(dev, &dev_tracker);
+ 	}
+ 	mutex_unlock(&priv->lock);
+ }
 -- 
-2.49.0
+2.34.1
 
 
