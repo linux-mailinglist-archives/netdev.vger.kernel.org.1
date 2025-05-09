@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-189211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83CC2AB1297
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 13:53:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1801AB129C
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 13:53:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEACC1C22879
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 11:53:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95C5EA05164
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 11:53:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B7F22918E9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98023292092;
 	Fri,  9 May 2025 11:51:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAD48290BA3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 164AF28FAB0;
 	Fri,  9 May 2025 11:51:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746791507; cv=none; b=Dpxb6Eav5sTO3i8NQgP2Zpl57yqSrpKCnA/JAMp8wf78Qhfk8wU9AXEYvSg/acg4mEIOv63RL+NMb88Lj0ToKAW7BB9R+wcYerDnEFYm1X3dcOxZIFZqRQ/WYvJIrmgSl+ZYFCvZdI2zBKCYZnVkbUHjDIn+XM9RLM9gpObd1RY=
+	t=1746791508; cv=none; b=P8AshW8v0rJefNmyc3/QL/88iHjfnYLs7q/qUMIv4Zs4QrWaSKqKY4qYespQxnWu+vS6Q1cg/mmlib+5bj+DBRjoJ0Jg9VXLW2dg/KsDohY5s2ogRSPO8MacU9T/awin8ZEc+7zpbKJZ32PgMDIj3uYPIqPnsaONNxNxMdJWcH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746791507; c=relaxed/simple;
-	bh=M9cEjEFmrsQNR82PG/c3T/1k29MAQSnNtwed2DDOtHw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=JJ8BIJLQ6FhUzD4RwkOPLY7P+98jsHkf4x93DNW58usTSA+VVkFFF3ViQXFOrI4+/XCnaZ3IPckQG8lFNbl4BHjZ9DEwPehOwE2blPVpsQAJxPcvjd4b/G8GnWPTGLJGB034vanLI7upioZvIOE8e0guBTP0bSarVArhgdJOqt8=
+	s=arc-20240116; t=1746791508; c=relaxed/simple;
+	bh=IZDwWSa7tYG0AzeeZd4fNbcoiMSc2mSeAQfzyNwQjpc=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=Kv+6MwNpHI6Y4amnNmXfebuY+DVSrSPEfalzXCYhnA3ILGZ9ldYiE5zIFd0wGyY9RKa5dBzWOOrb5GQrVkTgj/I7uHzjES580Hqf7sSkKRopg27QH/HhrQLg10qeCjDBg5azkPTFEAbXIEL/ar4ZmorQSqwJ+CO9uFaEM0Ynqfw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-669ff7000002311f-6e-681dec49e29b
+X-AuditID: a67dfc5b-669ff7000002311f-74-681dec49a92a
 From: Byungchul Park <byungchul@sk.com>
 To: willy@infradead.org,
 	netdev@vger.kernel.org
@@ -47,36 +47,36 @@ Cc: linux-kernel@vger.kernel.org,
 	edumazet@google.com,
 	pabeni@redhat.com,
 	vishal.moola@gmail.com
-Subject: [RFC 12/19] netmem: introduce page_pool_recycle_direct_netmem()
-Date: Fri,  9 May 2025 20:51:19 +0900
-Message-Id: <20250509115126.63190-13-byungchul@sk.com>
+Subject: [RFC 13/19] page_pool: expand scope of is_pp_{netmem,page}() to global
+Date: Fri,  9 May 2025 20:51:20 +0900
+Message-Id: <20250509115126.63190-14-byungchul@sk.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20250509115126.63190-1-byungchul@sk.com>
 References: <20250509115126.63190-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrJLMWRmVeSWpSXmKPExsXC9ZZnoa7nG9kMgxn79S3mrF/DZrH6R4XF
-	8gc7WC2+/LzNbrF44TdmiznnW1gsnh57xG5xf9kzFos97duZLXpbfjNbNO1YwWRxYVsfq8Xl
-	XXPYLO6t+c9qcWyBmMW3028YLdbvu8Fq8fvHHDYHIY8tK28yeeycdZfdY8GmUo/NK7Q8um5c
-	YvbYtKqTzWPTp0nsHneu7WHzODHjN4vHzh2fmTw+Pr3F4vF+31U2j8+b5AJ4o7hsUlJzMstS
-	i/TtErgyrv46yl7wj73ixmLFBsaHbF2MnBwSAiYSuw58Z4exZ6/tZgSx2QTUJW7c+MkMYosI
-	GEp8fnScpYuRi4NZYCGzxJXFP4EaODiEBTwkNvy3BqlhEVCVWHtpI1g9r4CZxL/OdcwQM+Ul
-	Vm84wAxSzgkU7/+oDhIWEjCVWDZlARvISAmB/2wS36b9Z4Kol5Q4uOIGywRG3gWMDKsYhTLz
-	ynITM3NM9DIq8zIr9JLzczcxAiNgWe2f6B2Mny4EH2IU4GBU4uG1eC6bIcSaWFZcmXuIUYKD
-	WUmE93mnTIYQb0piZVVqUX58UWlOavEhRmkOFiVxXqNv5SlCAumJJanZqakFqUUwWSYOTqkG
-	xlqFd+duFOZr+GxKtC3OPjTV+kd7tvDtCzIxvysnZ0XwZjaqHy/YWyieErNh5bMHIhdNz6ZN
-	7Hr3Z/avj/YzTS/+MX33QbbyiNvyJ6ka6sqJk5dMSGTk5mZ+yJB0suuYlrrG60MmTxW0nGRM
-	zu9tk1u15/f6hYdK9608t37ujrSzjRMLpv3PKlFiKc5INNRiLipOBABInBU4fAIAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrALMWRmVeSWpSXmKPExsXC5WfdrOv5RjbDYO5bZYs569ewWaz+UWGx
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrNLMWRmVeSWpSXmKPExsXC9ZZnka7nG9kMg8b9hhZz1q9hs1j9o8Ji
+	+YMdrBZfft5mt1i88BuzxZzzLSwWT489Yre4v+wZi8We9u3MFr0tv5ktmnasYLK4sK2P1eLy
+	rjlsFvfW/Ge1OLZAzOLb6TeMFuv33WC1+P1jDpuDkMeWlTeZPHbOusvusWBTqcfmFVoeXTcu
+	MXtsWtXJ5rHp0yR2jzvX9rB5nJjxm8Vj547PTB4fn95i8Xi/7yqbx+dNcgG8UVw2Kak5mWWp
+	Rfp2CVwZvecnshRcE6houDmLuYHxJ28XIyeHhICJxOQT59hh7Bn/e5lBbDYBdYkbN36C2SIC
+	hhKfHx1n6WLk4mAWWMgscWXxT7AGYQF/iZ87vjOC2CwCqhLH7nWwgNi8AmYSc75dY4MYKi+x
+	esMBoEEcHJxA8f6P6iBhIQFTiWVTFrCBzJQQ+M8msfLDVSaIekmJgytusExg5F3AyLCKUSgz
+	ryw3MTPHRC+jMi+zQi85P3cTIzAKltX+id7B+OlC8CFGAQ5GJR5ei+eyGUKsiWXFlbmHGCU4
+	mJVEeJ93ymQI8aYkVlalFuXHF5XmpBYfYpTmYFES5zX6Vp4iJJCeWJKanZpakFoEk2Xi4JRq
+	YGy6FcNzyfLWP6uLmY/PlPyvzq5OVsyflHLn9zTN8+KPSkQXltzrfymcu19Jc/JngZIj5+6K
+	iE3cqdi0brfMVWm3vlSTeUJtHq9OBl7xa2Dd2hay90FSpHW3iZf5sRaODco3biU33SkplyrP
+	yXvGwan0JdE/WebP1X9/0k+VHtXeXdVtuPqAqxJLcUaioRZzUXEiAL7nXy9+AgAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrELMWRmVeSWpSXmKPExsXC5WfdrOv5RjbDYPoxDYs569ewWaz+UWGx
 	/MEOVosvP2+zWyxe+I3ZYs75FhaLp8cesVvcX/aMxWJP+3Zmi96W38wWTTtWMFkcnnuS1eLC
 	tj5Wi8u75rBZ3Fvzn9Xi2AIxi2+n3zBarN93g9Xi9485bA7CHltW3mTy2DnrLrvHgk2lHptX
 	aHl03bjE7LFpVSebx6ZPk9g97lzbw+ZxYsZvFo+dOz4zeXx8eovF4/2+q2wei198YPL4vEku
-	gC+KyyYlNSezLLVI3y6BK+Pqr6PsBf/YK24sVmxgfMjWxcjJISFgIjF7bTcjiM0moC5x48ZP
-	ZhBbRMBQ4vOj4yxdjFwczAILmSWuLP7J3sXIwSEs4CGx4b81SA2LgKrE2ksbwep5Bcwk/nWu
-	Y4aYKS+xesMBZpByTqB4/0d1kLCQgKnEsikL2CYwci1gZFjFKJKZV5abmJljqlecnVGZl1mh
-	l5yfu4kRGM7Lav9M3MH45bL7IUYBDkYlHl6L57IZQqyJZcWVuYcYJTiYlUR4n3fKZAjxpiRW
-	VqUW5ccXleakFh9ilOZgURLn9QpPTRASSE8sSc1OTS1ILYLJMnFwSjUw7r6+07+PoXHHRDXt
-	I5HnVJb2iPUYaRs/d9tYEVJz/f6/cxfLe61+n+ywtaqZc7o49mqf3pbQ4IR/Bi8tv7/a4GHX
-	2Gzbv27T5Pq/ma/CPV3Os89TOTkt7bi1V/g/811n1i+8mKh/b+Uvew4HpieLYwW9Z96ztz0y
-	d/2hG2msWsdmZzCIbbWvVmIpzkg01GIuKk4EACkoVnBjAgAA
+	gC+KyyYlNSezLLVI3y6BK6P3/ESWgmsCFQ03ZzE3MP7k7WLk5JAQMJGY8b+XGcRmE1CXuHHj
+	J5gtImAo8fnRcZYuRi4OZoGFzBJXFv9kB0kIC/hL/NzxnRHEZhFQlTh2r4MFxOYVMJOY8+0a
+	G8RQeYnVGw4ADeLg4ASK939UBwkLCZhKLJuygG0CI9cCRoZVjCKZeWW5iZk5pnrF2RmVeZkV
+	esn5uZsYgSG9rPbPxB2MXy67H2IU4GBU4uG1eC6bIcSaWFZcmXuIUYKDWUmE93mnTIYQb0pi
+	ZVVqUX58UWlOavEhRmkOFiVxXq/w1AQhgfTEktTs1NSC1CKYLBMHp1QDI4tcX5xwzgmdQ46q
+	AVvmhL5vdZdObP0rqHhi6cJFP7ZVc1U9v7YqmzGGc4l8XEe5477Ct83vlPgz+RZFP7m5ep5A
+	3aPDG7ecPM57Zv4ltjqruM+STIeDWC6s/3Q2WzKb/XiXZb+vruHvOYXK7a/8c5e9fNjq97ym
+	sP0hd5eUQV/rWdYX0jc5lViKMxINtZiLihMB7kIiDmUCAAA=
 X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -84,34 +84,66 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
-All the callers to page_pool_recycle_direct() need to be converted to
-use netmem descriptor and API instead of struct page things.
+Other than skbuff.c might need to check if a page or netmem is for page
+pool, for example, page_alloc.c needs to check the page state, whether
+it comes from page pool or not for their own purpose.
 
-As part of the work, introduce page_pool_recycle_direct_netmem()
-allowing the callers to use netmem descriptor and API.
+Expand the scope of is_pp_netmem() and introduce is_pp_page() newly, so
+that those who want to check the source can achieve the checking without
+accessing page pool member, page->pp_magic, directly.
 
 Signed-off-by: Byungchul Park <byungchul@sk.com>
 ---
- include/net/page_pool/helpers.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ include/net/page_pool/types.h |  2 ++
+ net/core/page_pool.c          | 10 ++++++++++
+ net/core/skbuff.c             |  5 -----
+ 3 files changed, 12 insertions(+), 5 deletions(-)
 
-diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
-index 582a3d00cbe23..9b7a3a996bbea 100644
---- a/include/net/page_pool/helpers.h
-+++ b/include/net/page_pool/helpers.h
-@@ -395,6 +395,12 @@ static inline void page_pool_recycle_direct(struct page_pool *pool,
- 	page_pool_put_full_page(pool, page, true);
- }
+diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
+index 36eb57d73abc6..d3e1a52f01e09 100644
+--- a/include/net/page_pool/types.h
++++ b/include/net/page_pool/types.h
+@@ -299,4 +299,6 @@ static inline bool is_page_pool_compiled_in(void)
+ /* Caller must provide appropriate safe context, e.g. NAPI. */
+ void page_pool_update_nid(struct page_pool *pool, int new_nid);
  
-+static inline void page_pool_recycle_direct_netmem(struct page_pool *pool,
-+						   netmem_ref netmem)
++bool is_pp_netmem(netmem_ref netmem);
++bool is_pp_page(struct page *page);
+ #endif /* _NET_PAGE_POOL_H */
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index b61c1038f4c68..9c553e5a1b555 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -1225,3 +1225,13 @@ void net_mp_niov_clear_page_pool(struct netmem_desc *niov)
+ 
+ 	page_pool_clear_pp_info(netmem);
+ }
++
++bool is_pp_netmem(netmem_ref netmem)
 +{
-+	page_pool_put_full_netmem(pool, netmem, true);
++	return (netmem_get_pp_magic(netmem) & ~0x3UL) == PP_SIGNATURE;
 +}
 +
- #define PAGE_POOL_32BIT_ARCH_WITH_64BIT_DMA	\
- 		(sizeof(dma_addr_t) > sizeof(unsigned long))
++bool is_pp_page(struct page *page)
++{
++	return is_pp_netmem(page_to_netmem(page));
++}
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 6cbf77bc61fce..11098c204fe3e 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -893,11 +893,6 @@ static void skb_clone_fraglist(struct sk_buff *skb)
+ 		skb_get(list);
+ }
  
+-static bool is_pp_netmem(netmem_ref netmem)
+-{
+-	return (netmem_get_pp_magic(netmem) & ~0x3UL) == PP_SIGNATURE;
+-}
+-
+ int skb_pp_cow_data(struct page_pool *pool, struct sk_buff **pskb,
+ 		    unsigned int headroom)
+ {
 -- 
 2.17.1
 
