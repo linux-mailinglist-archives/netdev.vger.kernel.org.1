@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-189307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189308-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73C2FAB190F
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 17:43:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F28FAB190C
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 17:42:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3072E520FBB
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 15:42:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C80B1C46600
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 15:42:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B243E22D9E6;
-	Fri,  9 May 2025 15:42:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A77417D2;
+	Fri,  9 May 2025 15:42:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Te96ibQV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HyZs3o6z"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E198EC2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 068A823026B
 	for <netdev@vger.kernel.org>; Fri,  9 May 2025 15:42:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746805339; cv=none; b=jvJ/+Qf3jDUCeJUsG3huhiNrKbWYnXKyBw02+Afs3SFCMk3N5Jbb/40rEQfZcgRbTz8Frl/OetxZvOa239zjTbPSqj9CBe1AHvMK+3fGTyVXIP/UW8k8eTua8u81tuaQt1W70gi27oKppvQpRUM/OUjMIuj2o7HDj76MY9H+ASQ=
+	t=1746805341; cv=none; b=IkWA8AEasja6es6O5bY0EH7/7NT1nCsevDCU/CW19k8J7D+ui3veip+tPIJSIRIvJ7HjgrEtu90jlx1Jga3nWCWEgKhVR4PzOdM/fljkxQTBM5gR04wgOpaWkAG+9JSdFG0VHgdpAqwW4Taoxr/+VwlyC7KZukgdtxOcQyShFBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746805339; c=relaxed/simple;
-	bh=1VnA6LjAIOmQymxqKrC9/HFXU5n621QV2vQf9xhPqiw=;
+	s=arc-20240116; t=1746805341; c=relaxed/simple;
+	bh=O3KIz5VwT9bfBJ4zuS5ljbcCvbfJS177vEZ0YdiGdog=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ROofWKlCuCIjjdLbm23GVAODvIlpJU6UKNt3cxrH3POtUyblD8iMvF6/687ciz1VKO3HkIJ8rAX49xz6J7NGkj4mvJYWxp59G0/+2dO7F5MwAqMOkaWLJAYgJ2ISLnT98DsbckbF5CxIwNoclmMrkmrwDcWdaZKYJDyJKZTIdKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Te96ibQV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF98DC4CEF0;
-	Fri,  9 May 2025 15:42:18 +0000 (UTC)
+	 MIME-Version; b=cSz8fhaiNiSoBR9mBjD6X0U5VnRsrCEv6oh5dqPTcXoBSPB33pVO1mMs4PqOh3laadkHMECYr6SO37D073FBWrMNxgi22IZUTmofsa74QwHw0MBGc+3AzRPGMsb2+AEFIwFTug2HQ0aJC54gecgfss5iUEdn7eoJyq2bVwGsmBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HyZs3o6z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34849C4CEF1;
+	Fri,  9 May 2025 15:42:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1746805339;
-	bh=1VnA6LjAIOmQymxqKrC9/HFXU5n621QV2vQf9xhPqiw=;
+	bh=O3KIz5VwT9bfBJ4zuS5ljbcCvbfJS177vEZ0YdiGdog=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Te96ibQV3VnH+CWL1lOb5FIZzWOuRW8bAXphoV7f3LYiRiVecCnbZk4binQCN0ile
-	 irCqffRbdCT6Fl37oSWTNqqgCY3emn8/MAc9SeHbbTT/EsxquQXusfcQON5WyZNNY2
-	 Suxm8KLeWG82DgVwyVuUi8ZRn+yUs15Uoe46733sb69ZAHIaZEkVZRUkkOb3q+H13k
-	 VMPC498ttxEcZYx8jt97pN79fkoEyKaNCGAK/sKbYF1pdSrrmooDHaG4HIxevI2+t3
-	 GYTnZ10MDWw9JM2SnrFM+bi/K7LdfcETfhwZleg++ejawsOYGDv9qAfL8O8KLndtHT
-	 NIj/gse7TKvwQ==
+	b=HyZs3o6zqf6Ld3lad+LlOP87clqdeNXqZ2D+yWTkr4qbJrI84f4E0a5k6P5FPa/FZ
+	 wIufvXjwS9EmvNk0xGc1EwFkNFPOh2+rVJLM8KOCrqupKhtO+oF5G+gBLOvK6AXWsH
+	 pPEjNOOtMVBBo0EErKLWH+BiGEbm8RLI6m8pfZie01eP//aEotEoQ0kSAIYylYYKbt
+	 FHEm6ewW4e15ZCB+hSf6nRMgEAOGZ9nw3R7yC8cL5Dk8n+U+jNeVN7sdn8lG2KQSkH
+	 BoAYRqrN4jV1fDQpUs9QVtOTo3X/N0Svqo9j6z+0fmNHTjxhJfvZ+9dEEZuObjWOpH
+	 DSyj4IsUvLdJQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -51,9 +51,9 @@ Cc: netdev@vger.kernel.org,
 	donald.hunter@gmail.com,
 	jacob.e.keller@intel.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 1/3] tools: ynl-gen: support sub-type for binary attributes
-Date: Fri,  9 May 2025 08:42:11 -0700
-Message-ID: <20250509154213.1747885-2-kuba@kernel.org>
+Subject: [PATCH net-next v2 2/3] tools: ynl-gen: auto-indent else
+Date: Fri,  9 May 2025 08:42:12 -0700
+Message-ID: <20250509154213.1747885-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250509154213.1747885-1-kuba@kernel.org>
 References: <20250509154213.1747885-1-kuba@kernel.org>
@@ -65,111 +65,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Sub-type annotation on binary attributes may indicate that the attribute
-carries an array of simple types (also referred to as "C array" in docs).
-Support rendering them as such in the C user code. For example for u32,
-instead of:
+We auto-indent if statements (increase the indent of the subsequent
+line by 1), do the same thing for else branches without a block.
+There hasn't been any else branches before but we're about to add one.
 
-  struct {
-    u32 arr;
-  } _len;
-
-  void *arr;
-
-render:
-
-  struct {
-    u32 arr;
-  } _count;
-
-  __u32 *arr;
-
-Note that count is the number of elements while len was the length in bytes.
-
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-v2:
- - create a separate class
-v1: https://lore.kernel.org/20250508022839.1256059-2-kuba@kernel.org/
----
- tools/net/ynl/pyynl/ynl_gen_c.py | 43 +++++++++++++++++++++++++++++---
- 1 file changed, 40 insertions(+), 3 deletions(-)
+ tools/net/ynl/pyynl/ynl_gen_c.py | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
-index 4a2d3cc07e14..4e2ae738c0aa 100755
+index 4e2ae738c0aa..9a5c65966e9d 100755
 --- a/tools/net/ynl/pyynl/ynl_gen_c.py
 +++ b/tools/net/ynl/pyynl/ynl_gen_c.py
-@@ -163,7 +163,7 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-         return False
- 
-     def _free_lines(self, ri, var, ref):
--        if self.is_multi_val() or self.presence_type() == 'len':
-+        if self.is_multi_val() or self.presence_type() in {'count', 'len'}:
-             return [f'free({var}->{ref}{self.c_name});']
-         return []
- 
-@@ -566,6 +566,40 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-                 f'memcpy({member}, {self.c_name}, {presence});']
- 
- 
-+class TypeBinaryScalarArray(TypeBinary):
-+    def arg_member(self, ri):
-+        return [f'__{self.get("sub-type")} *{self.c_name}', 'size_t count']
-+
-+    def presence_type(self):
-+        return 'count'
-+
-+    def struct_member(self, ri):
-+        ri.cw.p(f'__{self.get("sub-type")} *{self.c_name};')
-+
-+    def attr_put(self, ri, var):
-+        presence = self.presence_type()
-+        ri.cw.block_start(line=f"if ({var}->_{presence}.{self.c_name})")
-+        ri.cw.p(f"i = {var}->_{presence}.{self.c_name} * sizeof(__{self.get('sub-type')});")
-+        ri.cw.p(f"ynl_attr_put(nlh, {self.enum_name}, " +
-+                f"{var}->{self.c_name}, i);")
-+        ri.cw.block_end()
-+
-+    def _attr_get(self, ri, var):
-+        len_mem = var + '->_count.' + self.c_name
-+        return [f"{len_mem} = len / sizeof(__{self.get('sub-type')});",
-+                f"len = {len_mem} * sizeof(__{self.get('sub-type')});",
-+                f"{var}->{self.c_name} = malloc(len);",
-+                f"memcpy({var}->{self.c_name}, ynl_attr_data(attr), len);"], \
-+               ['len = ynl_attr_data_len(attr);'], \
-+               ['unsigned int len;']
-+
-+    def _setter_lines(self, ri, member, presence):
-+        return [f"{presence} = count;",
-+                f"count *= sizeof(__{self.get('sub-type')});",
-+                f"{member} = malloc(count);",
-+                f'memcpy({member}, {self.c_name}, count);']
-+
-+
- class TypeBitfield32(Type):
-     def _complex_member_type(self, ri):
-         return "struct nla_bitfield32"
-@@ -672,7 +706,7 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-         lines = []
-         if self.attr['type'] in scalars:
-             lines += [f"free({var}->{ref}{self.c_name});"]
--        elif self.attr['type'] == 'binary' and 'struct' in self.attr:
-+        elif self.attr['type'] == 'binary':
-             lines += [f"free({var}->{ref}{self.c_name});"]
-         elif self.attr['type'] == 'string':
-             lines += [
-@@ -976,7 +1010,10 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-         elif elem['type'] == 'string':
-             t = TypeString(self.family, self, elem, value)
-         elif elem['type'] == 'binary':
--            t = TypeBinary(self.family, self, elem, value)
-+            if elem.get('sub-type') in scalars:
-+                t = TypeBinaryScalarArray(self.family, self, elem, value)
-+            else:
-+                t = TypeBinary(self.family, self, elem, value)
-         elif elem['type'] == 'bitfield32':
-             t = TypeBitfield32(self.family, self, elem, value)
-         elif elem['type'] == 'nest':
+@@ -1458,6 +1458,7 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
+         if self._silent_block:
+             ind += 1
+         self._silent_block = line.endswith(')') and CodeWriter._is_cond(line)
++        self._silent_block |= line.strip() == 'else'
+         if line[0] == '#':
+             ind = 0
+         if add_ind:
 -- 
 2.49.0
 
