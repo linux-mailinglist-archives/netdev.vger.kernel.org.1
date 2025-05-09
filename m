@@ -1,51 +1,52 @@
-Return-Path: <netdev+bounces-189230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5151AAB12ED
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 14:05:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 69E7DAB12F6
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 14:06:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88E7DA0135D
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 12:04:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91438A043AF
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 12:05:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FA66290BAA;
-	Fri,  9 May 2025 12:04:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E725C290DBC;
+	Fri,  9 May 2025 12:04:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="fHoepJuZ"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="kT+YU9nW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C51290BA0;
-	Fri,  9 May 2025 12:04:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C50FB290BB3;
+	Fri,  9 May 2025 12:04:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746792289; cv=none; b=ALW3tguReN1l06gkJj86eq71O9EYSj8qaxHByBUJhqoskguO4cKhTuprMLAQGZN8m37cDHBPldhG7VNYhZAhlqdeJ37rLgQlOadyzgt1SSJkd5a45ec/pT0VY2Zd8IRNSteYyFcqRZAjQvgRhF2sRKF7E63Kuko9r1ysq0i/6rQ=
+	t=1746792295; cv=none; b=a/tFKv/6VlQawQEdeyod7amuVfBuUP3LdnQHroqXHKF7sU4ZNJeIC/0p6orSmttM5lyRaon05QSP3mrGu579PqpWRlM7aKF0Ec6bVXG0KVX8D952wd8t1HR0Q3PU2f4KugN52tBqG5/i4SL7bI3A1TcCs7uVS6i3344TViU5pak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746792289; c=relaxed/simple;
-	bh=vmfHZSIt1ejNXSsXOb9OK4hl3H/Az8e5YvWTRNvnHco=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LehHB+A7oY7m4qe9nwFU5FmtJo4zKU3kpx4EvyIuHLsvH1XMQc9EDfaINSO3UCjssqJP/hxGhZBoAOMKPDX7zr3Hey2U+JONd5R5GAxlp39EUiRlR2J3fuTYW4fqdVJoew9+o7Ly4Tzw2p6byzFWIaSzPjFNRIBzCj+CobR6oCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=fHoepJuZ; arc=none smtp.client-ip=212.227.17.21
+	s=arc-20240116; t=1746792295; c=relaxed/simple;
+	bh=bSFVDwN8D4G1us96dI4iB9j9aOSFB1APZESYIHOs2LA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=iMXBGkuVGbc8Qk1L2xs3zLmuhip6IGuDzrGDxwr0nwXyrtHqgnJpuBKtp1ebaVhKI10piPjFntLkSHG8uBnyUG9BUCXTBt2QrVc03P0uZsXR///3TWhrl6S1dXfhCgreHZ3i4WSSa8nvpfL0hgnqPvgeBVLZ8uopDh1QZOpa37k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=kT+YU9nW; arc=none smtp.client-ip=212.227.17.22
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1746792281; x=1747397081; i=wahrenst@gmx.net;
-	bh=QxpyD8wMaxzufHPxLkJGzjDohgxWzZQt3Fz5KBSlXWA=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-Id:
-	 MIME-Version:Content-Transfer-Encoding:cc:
+	s=s31663417; t=1746792282; x=1747397082; i=wahrenst@gmx.net;
+	bh=GU9F06VWTq6RKZnt3xFBDMIUJGjf9pRtqn9SeNwBKQs=;
+	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-Id:In-Reply-To:
+	 References:MIME-Version:Content-Transfer-Encoding:cc:
 	 content-transfer-encoding:content-type:date:from:message-id:
 	 mime-version:reply-to:subject:to;
-	b=fHoepJuZ70LFp+vZioi09wU9QpWsOAcfEjkNW9/TBXtcwghEk6NxuF6YEJLdFQ9E
-	 1XzMK4yaLoutdy2puYNhTyQ63wrOHdAD1t95Ci2sTy1ahbOp/6aUADXjNfFxqHHM+
-	 xuh5ORmJiT6GWwUFPIR9rHv2A9OZ86JIddaMk2wyQtK3yVTSeyJy1G6DJ3NNwigZ/
-	 KdBShJ4BxqraXuGklmkclocT7OH0Jua8IkkUZ616FcWRbxl5zGuVxQUHwTXCzQeRk
-	 62haz2ve0cm01GeeUSOjXj0VSEa7aMfhqPOPbPcK4os6XKy9DAR5UBOrXbwXHASev
-	 Z5F7xnf3paSKRhZoxQ==
+	b=kT+YU9nWslwse2W670mja00b5EaJCKm5u/+A53cH/n1V5Lvy/4bsF+lkhEMZaSJz
+	 V9ISYJIu8/6y+T8kREjpgo0ycG1esz4fPjJdzYzgOBx1WSq+p+BwoPfUuz8GDx04F
+	 Vfqy824uJTxPE3F9vzGLCr3yGWqWrNDmRwfXR4LDjaXUIB0LKy9C5bUZo1l4GN5WI
+	 DyLXC7YfKl928I25OT/VDtsC307D6HAT7aQFB4W5y5WJx1CJhMOw8WPWnyEGuA3Ij
+	 J1X1CbivvYHH8CuNfnMrhhvtyK5C6FAl5zXCw/IuRQdgYNXLTpLhdkFD22G0l4yOv
+	 nsr+gAnDJDPzjDEnVA==
 X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
 Received: from stefanw-SCHENKER ([91.41.216.208]) by mail.gmx.net (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MxlzC-1uwnwd1mLG-00szjw; Fri, 09
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1M7sDq-1u9WiB3Y6k-0034ye; Fri, 09
  May 2025 14:04:41 +0200
 From: Stefan Wahren <wahrenst@gmx.net>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -58,11 +59,14 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Conor Dooley <conor+dt@kernel.org>
 Cc: netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
-	Stefan Wahren <wahrenst@gmx.net>
-Subject: [PATCH net-next V3 0/6] net: vertexcom: mse102x: Improve RX handling
-Date: Fri,  9 May 2025 14:04:29 +0200
-Message-Id: <20250509120435.43646-1-wahrenst@gmx.net>
+	Stefan Wahren <wahrenst@gmx.net>,
+	Andrew Lunn <andrew@lunn.ch>
+Subject: [PATCH net-next V3 1/6] dt-bindings: vertexcom-mse102x: Fix IRQ type in example
+Date: Fri,  9 May 2025 14:04:30 +0200
+Message-Id: <20250509120435.43646-2-wahrenst@gmx.net>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250509120435.43646-1-wahrenst@gmx.net>
+References: <20250509120435.43646-1-wahrenst@gmx.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,83 +74,81 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:fIIU0TixX7JuZNaBOzYHIoHs97yGSGYkWSCGKsaOYSmjfwkuCVp
- 7CSAlRmWyf+A8gXoyZI/28Y4HkF3iYejPjuyyxbbd/kifgW/tMw0J8Ch7MzzHjT6FU9UUEX
- TKMadkToPLmkui5DmadBJMwy7j1df3DdaKszXwGYoES3GqhgRW0RjL15sYoRl+OiIERWPIy
- KuZvZpd2MszNoZar5fcLw==
+X-Provags-ID: V03:K1:B9f35Slo1ehizVftZtTa/La9brD9AMeRU4oYKK3XZNozqm/2Pwl
+ ZUAG/L2F9ScePF9PyT+qdpeHOSh7F6Xm7+9Gn4yktINLx3Gd9GKbgPOPm3eW827irfh7Po/
+ IWj9DD1rlWiRg4j82eWIhha8GRHP2HzTHmFeqM4kuZkYGpYX9vUKpRnyVsbjT10r7SdEHlb
+ dzzQGOuYd1QILO15xdb0A==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:/plVsZjKjQg=;pvdxhsm3EB11ajolSrpwWbNCLYL
- 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
+UI-OutboundReport: notjunk:1;M01:P0:OTT0taEpeS0=;Ykk6tuVw1hUFarnxTyOhqwSubfd
+ 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
 
-This series is the second part of two series for the Vertexcom driver.
-It contains some improvements for the RX handling of the Vertexcom MSE102x=
-.
+According to the MSE102x documentation the trigger type is a
+high level.
 
-Changes in V3:
-- Fix whitespace issue in patch 4
+Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+=2D--
+ Documentation/devicetree/bindings/net/vertexcom-mse102x.yaml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Changes in V2:
-- Add Andrew's Reviewed-by to patch 1-2
-- Fix build issue reported by Jakub & kernel test bot in patch 2
-- Use Andrew's suggestion for netdev_warn_once in patch 2
-- Improve commit logs for patch 3 & 5
-- Add new patch 4 to compensate loss of invalid CMD counter
-
-Stefan Wahren (6):
-  dt-bindings: vertexcom-mse102x: Fix IRQ type in example
-  net: vertexcom: mse102x: Add warning about IRQ trigger type
-  net: vertexcom: mse102x: Drop invalid cmd stats
-  net: vertexcom: mse102x: Implement flag for valid CMD
-  net: vertexcom: mse102x: Return code for mse102x_rx_pkt_spi
-  net: vertexcom: mse102x: Simplify mse102x_rx_pkt_spi
-
- .../bindings/net/vertexcom-mse102x.yaml       |  2 +-
- drivers/net/ethernet/vertexcom/mse102x.c      | 80 +++++++++++--------
- 2 files changed, 47 insertions(+), 35 deletions(-)
-
+diff --git a/Documentation/devicetree/bindings/net/vertexcom-mse102x.yaml =
+b/Documentation/devicetree/bindings/net/vertexcom-mse102x.yaml
+index 4158673f723c..8359de7ad272 100644
+=2D-- a/Documentation/devicetree/bindings/net/vertexcom-mse102x.yaml
++++ b/Documentation/devicetree/bindings/net/vertexcom-mse102x.yaml
+@@ -63,7 +63,7 @@ examples:
+             compatible =3D "vertexcom,mse1021";
+             reg =3D <0>;
+             interrupt-parent =3D <&gpio>;
+-            interrupts =3D <23 IRQ_TYPE_EDGE_RISING>;
++            interrupts =3D <23 IRQ_TYPE_LEVEL_HIGH>;
+             spi-cpha;
+             spi-cpol;
+             spi-max-frequency =3D <7142857>;
 =2D-=20
 2.34.1
 
