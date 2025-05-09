@@ -1,49 +1,50 @@
-Return-Path: <netdev+bounces-189327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189328-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F5AFAB198A
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 17:59:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 029A8AB198C
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 17:59:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FB351885E5D
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 15:57:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7ED21C46DBA
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 15:58:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3830B23FC7D;
-	Fri,  9 May 2025 15:54:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D624242909;
+	Fri,  9 May 2025 15:54:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C9vg4ykV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G/1Z1FF2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FDA823F41D;
-	Fri,  9 May 2025 15:54:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E222417F0;
+	Fri,  9 May 2025 15:54:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746806083; cv=none; b=Z/aCEvFosw/K801BNla8iiFzmTJMrDaiWFqEo8ovqeJZ5snR36uxLXsognWy8Nw2xFXD+Aqzzo6btQnV5yENmfAkD9J40BPbjxRcxnF0fQyFRtGGHYOL6lYi9tXPtDwTdRgXZCgUh9jYvsurQS9M9kNL/OT/6+1Btr6ByRS8DNQ=
+	t=1746806085; cv=none; b=SoddLC22WQ9gXopUYioT8tBvnhUfunz+ZFOzuzIZZneuVpQCuPqDS1nrV2V+0BokaLxqtx3mPIwhbvJJEvgBGICByokQdVdNFQZRskypDYPSRKQ55k+uScj2n6K4melJOFp5ulk16T4IAxq3YnjehSKujtMHU5XM1KJfcnK8wf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746806083; c=relaxed/simple;
-	bh=HO4xbozyJMxD8zWDiEa6K7DNK6Y9m2+KGX7iMwR0BG8=;
+	s=arc-20240116; t=1746806085; c=relaxed/simple;
+	bh=Les2Q1JDGDchAASaheHbCbzDsZvfcnT1V7XgBGKxhhs=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=X0MQDdK4xDACk3FDnBy1eA4fXeD5oGSMeKD6svLn2n1nVwAVcMmOJCidjHNtleOYL/5TJlC/vMAIC4zsMTAmfS6Ob3D2S/A5v5bW/DFSWEsICO6cqzBj/o2jbKlf2EUBO7mDoBAriBBNL6oYGUpc3PZRE673w7Oi28nC9nZ7uCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C9vg4ykV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B16BFC4CEEF;
-	Fri,  9 May 2025 15:54:40 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=JJzC3SnHlmPqzEr1sgrbrHrhsQELJr+pMGHOqbMKllECd6QLijyZIyBPfyPz9LPYDNmCkmfvT2HXDZ7EWrn1NF92YanvHeyIBQelYD8dsCjVgcAJQ2XDkVjmdW/iNch3h6uQZE7USqql4A7rK6lb/jnPC5GwVh/ai4/u3WBaNww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G/1Z1FF2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABF7BC4CEED;
+	Fri,  9 May 2025 15:54:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746806082;
-	bh=HO4xbozyJMxD8zWDiEa6K7DNK6Y9m2+KGX7iMwR0BG8=;
+	s=k20201202; t=1746806084;
+	bh=Les2Q1JDGDchAASaheHbCbzDsZvfcnT1V7XgBGKxhhs=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=C9vg4ykVk4V/bn+FJSZiX9or5Xb2CHkrni7GKVTaFnmmp6cfh7WxTdJ0bqVaHL3ic
-	 n1h7lsP7MR2PehoFh3opW77CawZHHzUVBvbig0mmgRNv3YMOqqXjIEiAS7G/0G3dwm
-	 FR7sd4oRwzEgdvpxAeVP+1OatRz367Zl5J9duMLnULJdnyCHisNz17nDHB6rYq1Ia5
-	 QwSNefDUKQ1n5wh4lnXifUxC6R+p6foyXga9LP3KN0/dJnd92xEqeAESNMxgTwSKUa
-	 vMDPdKLsuVR4ZvMNJzl2IeMTj6JwTo8kfSeF9jlxNCaNIExLaIHvU96ehgnSqh9LuX
-	 0Wd8auZuoDo4g==
+	b=G/1Z1FF2sDlh8rzNTtBhbPYIpla0iT1GaPO57MPPrbIvXy1+h38PirspvcoWIyjJ7
+	 AbcSD550VKMMjXQ22K+NyEPy1k6X6sTQY6nVMQ1xc2EKZQRnMk2Hvp3LYJ60UPdovs
+	 4HYXWX+KycCl22/wbaGaWqCXgXJpwtm7Ey1/iWVPwAJjE8BiddUwIKu1m8wythLgWs
+	 f7TLz7ZkioQhJWJ9RlaG6eRY88vect+hVl3V6G/7EmYSkth3rbY00yUlyOtdXGc/Et
+	 FqkK81zdYkXge/373CLUCNnOdhTxO1dH1CqTXqhEhbukG5lxvpwUFCZozlE9XSaBrj
+	 KUqFJau6vZU7Q==
 From: Jeff Layton <jlayton@kernel.org>
-Date: Fri, 09 May 2025 11:53:44 -0400
-Subject: [PATCH v9 08/10] net: add symlinks to ref_tracker_dir for netns
+Date: Fri, 09 May 2025 11:53:45 -0400
+Subject: [PATCH v9 09/10] i915: add ref_tracker_dir symlinks for each
+ tracker
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,7 +53,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250509-reftrack-dbgfs-v9-8-8ab888a4524d@kernel.org>
+Message-Id: <20250509-reftrack-dbgfs-v9-9-8ab888a4524d@kernel.org>
 References: <20250509-reftrack-dbgfs-v9-0-8ab888a4524d@kernel.org>
 In-Reply-To: <20250509-reftrack-dbgfs-v9-0-8ab888a4524d@kernel.org>
 To: Andrew Morton <akpm@linux-foundation.org>, 
@@ -70,84 +71,59 @@ Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Qasim Ijaz <qasdev00@gmail.com>,
  Nathan Chancellor <nathan@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
  linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
  dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, 
- Jeff Layton <jlayton@kernel.org>
+ Jeff Layton <jlayton@kernel.org>, Jani Nikula <jani.nikula@intel.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1849; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=HO4xbozyJMxD8zWDiEa6K7DNK6Y9m2+KGX7iMwR0BG8=;
- b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBoHiUvlAQQocoaJK/ytWY/RnDG9yXvfUBn3xDsF
- ODOiyJTA2GJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaB4lLwAKCRAADmhBGVaC
- FaRrD/4tuPMdB9+m+eEEjmwxR0dyUaU70WNTU9byec8w0ld0DuH62XIFK2JLglAzCmQM8QtTw/z
- fVkO6dgPCliopqLtBVQDnsF69XJnIjQ3Rul61w3uCkCWlmhCgKzhRv39ZMbNjFHmg1/MTTyInuj
- 3iugHd9BjQgM2+khIARWbSYM/q2m8GUspoa1MHaeDHGRSFLT+B9eA6tT9yZU2KgfIto0ygP40TG
- GwHpq6Q5VVNQ6Gw+OxvmZl/Jz7rMQ6mqBWBLz9qdfxFkUDFDxKhbwX1EaAkVMQ8UWYhCHwnjBbk
- iDdLVTBrwq0XP51tBt6ByFCEDk3spn6pnfQ+/jb+snujC60fbQf7rF5EOFBd2GfjpyHj9thgy5A
- dsFGQzSzzUl3nllRVEVOGWtvk2ZvgUeEeZPaC8LUS50OBwZ1kQ1ANz8Owxyq2+TuYCa+LK53FlW
- BtoWwVoNTHK74Si2s0uUvgvEvQ7GumOhec+bOq5WG2m6bseRn81VczY3vqOUcSKtRiTRiEZifUe
- XSthEU/KxgdrbhbHsZUdauYRrVwHAWks78Gcclw6cZFxRJcKeGpxIhuKy8GfbB5dKuWMxR1Viq7
- LSlv/EB2CEyQwFw5GHrws/BBtzmhAI5Lk6t2ecA3V96U04nqgYu0tLEO2Wgvylz7755rexxkawf
- P8qv8t6/pS/X+Ng==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1532; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=Les2Q1JDGDchAASaheHbCbzDsZvfcnT1V7XgBGKxhhs=;
+ b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBoHiUwgYXNMuLWTr7s6QnRaLRoXJ0I2i/1kYd1u
+ w+TY6LosRKJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaB4lMAAKCRAADmhBGVaC
+ FbuBEACyCMSaZdQrb5+qfWbknXd2TSel14YSmialcBJY+8oYVkleiO28T5yl4M/TqgXhUSuTzJ4
+ SWSiCysPWTP7wGowlokclp5TRjSjd/sZkhLyGOqpt4nB0v6JgdIeGujIqdVRFrajC2HEjmLwauh
+ dl1eAiZpKv9soPKhFROa17/XLgFlkWNRBHtE52GBpA+YIKRsF/JrarbIXKu+nvhUuOJw7V4EZ2l
+ YZWBjgN6q8O9abfP42+99yycuYjV+kft4+u80Tu9rM46ABTwtTreS7fL4n/EugPIapSbAgy4aq8
+ OkX8cSYqGP4kvE6soX5mAh6gnf1zoD5KgCj0MRRlHFRNhhsqobsOaxyrmHpndZOGtaW3XOjBAh7
+ rZKpaGAlnEGjcooGs0FxK0Ml/EN2x+YCan1ywIxW2peCVeipH9PKKvv7gHrGTw5ONXomfDx9UZ+
+ oiZtILhxYnM/vzkDjFOblcM/Qi6MpdR37hJnXpmJsp7pyICslcMPmLZNrtZm/ZDLxFfacX5SXP7
+ aCLb5BmBemu5qzMl9OINqd8Sxz4m4oyjvqN/LASHueGnm9QA58lXJJ101Sm7cyGPMVLmpr75mOo
+ W1hjzTVkKEgJLXsN+ZAz1Xa5tJZR/M27GMDuM8tgTIur8DB4JXujXPYz0oV1vI84ykb+MiO545G
+ rpoBUFbP6rgwvTw==
 X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
  fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-After assigning the inode number to the namespace, use it to create a
-unique name for each netns refcount tracker with the ns.inum and
-net_cookie values in it, and register a symlink to the debugfs file for
-it.
+Now that there is the ability to create a symlink for each tracker, do
+so for the i915 entries.
 
-init_net is registered before the ref_tracker dir is created, so add a
-late_initcall() to register its files and symlinks.
-
+Acked-by: Jani Nikula <jani.nikula@intel.com>
 Signed-off-by: Jeff Layton <jlayton@kernel.org>
 ---
- net/core/net_namespace.c | 30 +++++++++++++++++++++++++++++-
- 1 file changed, 29 insertions(+), 1 deletion(-)
+ drivers/gpu/drm/i915/intel_runtime_pm.c | 1 +
+ drivers/gpu/drm/i915/intel_wakeref.c    | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index 008de9675ea98fa8c18628b2f1c3aee7f3ebc9c6..1c5e0289f0f0b37c61852d95d4e11a8c12a868f3 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -763,12 +763,40 @@ struct net *get_net_ns_by_pid(pid_t pid)
- }
- EXPORT_SYMBOL_GPL(get_net_ns_by_pid);
- 
-+#ifdef CONFIG_NET_NS_REFCNT_TRACKER
-+static void net_ns_net_debugfs(struct net *net)
-+{
-+	ref_tracker_dir_symlink(&net->refcnt_tracker, "netns--%lx-%u-refcnt",
-+				net->net_cookie, net->ns.inum);
-+	ref_tracker_dir_symlink(&net->notrefcnt_tracker, "netns-%lx-%u-notrefcnt",
-+				net->net_cookie, net->ns.inum);
-+}
-+
-+static int __init init_net_debugfs(void)
-+{
-+	ref_tracker_dir_debugfs(&init_net.refcnt_tracker);
-+	ref_tracker_dir_debugfs(&init_net.notrefcnt_tracker);
-+	net_ns_net_debugfs(&init_net);
-+	return 0;
-+}
-+late_initcall(init_net_debugfs);
-+#else
-+static void net_ns_net_debugfs(struct net *net)
-+{
-+}
-+#endif
-+
- static __net_init int net_ns_net_init(struct net *net)
+diff --git a/drivers/gpu/drm/i915/intel_runtime_pm.c b/drivers/gpu/drm/i915/intel_runtime_pm.c
+index 3fdab3b44c08cea16ac2f73aafc2bea2ffbb19e7..94315e952ead9be276298fb2a0200d102005a0c1 100644
+--- a/drivers/gpu/drm/i915/intel_runtime_pm.c
++++ b/drivers/gpu/drm/i915/intel_runtime_pm.c
+@@ -61,6 +61,7 @@ static void init_intel_runtime_pm_wakeref(struct intel_runtime_pm *rpm)
  {
-+	int ret;
-+
- #ifdef CONFIG_NET_NS
- 	net->ns.ops = &netns_operations;
- #endif
--	return ns_alloc_inum(&net->ns);
-+	ret = ns_alloc_inum(&net->ns);
-+	if (!ret)
-+		net_ns_net_debugfs(net);
-+	return ret;
+ 	ref_tracker_dir_init(&rpm->debug, INTEL_REFTRACK_DEAD_COUNT,
+ 			     "intel_runtime_pm", dev_name(rpm->kdev));
++	ref_tracker_dir_symlink(&rpm->debug, "intel_runtime_pm-%s", dev_name(rpm->kdev));
  }
  
- static __net_exit void net_ns_net_exit(struct net *net)
+ static intel_wakeref_t
+diff --git a/drivers/gpu/drm/i915/intel_wakeref.c b/drivers/gpu/drm/i915/intel_wakeref.c
+index 5269e64c58a49884f5d712557546272bfdeb8417..2e0498b3fa7947f994de1339d4d2bed93de1a795 100644
+--- a/drivers/gpu/drm/i915/intel_wakeref.c
++++ b/drivers/gpu/drm/i915/intel_wakeref.c
+@@ -115,6 +115,7 @@ void __intel_wakeref_init(struct intel_wakeref *wf,
+ 
+ #if IS_ENABLED(CONFIG_DRM_I915_DEBUG_WAKEREF)
+ 	ref_tracker_dir_init(&wf->debug, INTEL_REFTRACK_DEAD_COUNT, "intel_wakeref", name);
++	ref_tracker_dir_symlink(&wf->debug, "intel_wakeref-%s", name);
+ #endif
+ }
+ 
 
 -- 
 2.49.0
