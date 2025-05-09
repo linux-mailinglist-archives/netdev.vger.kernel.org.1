@@ -1,108 +1,260 @@
-Return-Path: <netdev+bounces-189339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BE2BAB1B8E
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 19:30:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64265AB1B9F
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 19:33:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E8E01C466EF
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 17:30:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40D827B9AEE
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 17:31:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11E4A239E91;
-	Fri,  9 May 2025 17:30:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BB71239E8D;
+	Fri,  9 May 2025 17:32:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j7G5iLCm"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="EG8A5YIH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD96A22CBF6;
-	Fri,  9 May 2025 17:30:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F551239090;
+	Fri,  9 May 2025 17:32:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746811819; cv=none; b=Dez0emfn467879TcMhrWVUnYZy5vbCIoF110TZkzBbq19V/N+ChJb5Y1IJagV7AFt9KvPNr/IbZ/Sy42WZk8EPBlblIkADG+qS/vxs62lfLyhDwp8r41VcarjbebMIenbjeuTgC9V7EpURBR2DvQpwS2lYm6qg6C+22FywVubuU=
+	t=1746811953; cv=none; b=AjkPVFLweEjxiT+2XPtUJOvSTd3GAELBOht+qJNSlBKgwp9JDeS8aFYPYAcrkHcoOF5LSDLC5T0dNFiB29MZ4WPmqq1Z3xvFUnsid/5INOuxBugZ2JHeYDN2vHqoUZ68b0eBn5zaIllX+TdVhk+8TiEC04xqhYuh28C2zie2hII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746811819; c=relaxed/simple;
-	bh=mW7Q4WOzI5YU1FYLOgmozqSQi3IAzhyUp6jsc2gvljI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GSKfsrOPwMvd90r+WXKIYepS4apUtvi/XRx/qpc/1zE+GLgeoyhugSxa4jNqGqFn2GWW6mJ5IaDRGirpXsj4K6mIpudg3RVCXKnelf5+JQ0NY1pHy/QJObLkF/8ta2PI7IKt7B9l89qSuJX6Wn6txg1Zcl8IDidyRDx5f0xdgeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j7G5iLCm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B7BEC4CEE4;
-	Fri,  9 May 2025 17:30:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746811818;
-	bh=mW7Q4WOzI5YU1FYLOgmozqSQi3IAzhyUp6jsc2gvljI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=j7G5iLCmXAjHqnDymoGSMYCHKt0FGONZ2280C13jjahlcYvubNWIgN9NnDcCqdQnu
-	 AEO58bEaRAqF14/wxZDzBySNJp3+LSN0Y74nNO7YDkmqh7EqPV2ge7s3dXT0BUhSaq
-	 VGZLa6RVkWQv2g+dTRak/4qnig5LDJfO1RV6ibSJdYly7zm6+P0W4xbCfk5vZC+GzO
-	 2m7mL+xResoyVFbcavHB6yjSJYO+FMm+HYOCMjo6ikq2vwh868xV2zec2bzWmTz+D3
-	 0nYEDHor6jzucViInfWQJ32KQ6OdKkkEzpLZt2R+zg3SKxemCNK26WyuLt8ELwxxad
-	 7iqtTUsTqya+w==
-Date: Fri, 9 May 2025 18:30:14 +0100
-From: Simon Horman <horms@kernel.org>
-To: Ozgur Kara <ozgur@goosey.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] net: ethernet: Fixe issue in nvmem_get_mac_address()
- where invalid mac addresses
-Message-ID: <20250509173014.GQ3339421@horms.kernel.org>
-References: <01100196adabd19e-0056f10b-0ffb-4076-8a6b-779f87c327b6-000000@eu-north-1.amazonses.com>
+	s=arc-20240116; t=1746811953; c=relaxed/simple;
+	bh=R3XHrj5LgYG9CyDHTHAoHFZHVpFk3t23LN8geisvNxI=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=u7TGXcHJZjrdodgjzzHPu1+UE6MEMkD4HsAM8am2KCkDFG5nqhWcdPhEr8sxXwebCElEWq36tcJnDvRAr59hrdFZmNzVa8BpTB9qFKG440FxMjG9k5WGS5lZQJpotnZ4vUdnwEPe156PhIX+NC65xeLXsrsWpTvJB4QYFfjil2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=EG8A5YIH; arc=none smtp.client-ip=52.119.213.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1746811952; x=1778347952;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=yhpp9QC5ncFxyeHZjaDDxMYBWmdWgq6kB+j0hfRTrj0=;
+  b=EG8A5YIHpyPOQFpCTP2oF4kmNz2tNpb3dNyG8eZ7zqNBX8PCw1ebcELE
+   i2YiRSItIlUOZ0kLIcGVc+pE0jj8yAcnpOIJpFZsppuAnJtQ4Udi3ajmi
+   tfm7q0cixrHe/gBSiVWn6N4p6tVqgTzfkcumvWLQOi1I2SjCz7asUsXKe
+   OjO0dVkyEw4JdjNGOYWdKjwK7PW2BM04Y+ZvEG3VtmYVvaUSULqg1+ES0
+   kVYwByxhvVzpVpuB8wq+UjPdYSURSZNxJ7riY6stdLBJMksrLqgedCEDz
+   Lja8t3gI7bE34Ag7lum3dokP4g03E/ivP8KBPW/sGNs24vGuo93/PbTY4
+   A==;
+X-IronPort-AV: E=Sophos;i="6.15,275,1739836800"; 
+   d="scan'208";a="721297076"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2025 17:32:27 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:41304]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.21.68:2525] with esmtp (Farcaster)
+ id a919e1f1-8c4f-4e88-b09f-73ac0d9e22d4; Fri, 9 May 2025 17:32:26 +0000 (UTC)
+X-Farcaster-Flow-ID: a919e1f1-8c4f-4e88-b09f-73ac0d9e22d4
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 9 May 2025 17:32:25 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.187.170.14) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 9 May 2025 17:32:21 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <brauner@kernel.org>
+CC: <alexander@mihalicyn.com>, <bluca@debian.org>, <daan.j.demeyer@gmail.com>,
+	<daniel@iogearbox.net>, <davem@davemloft.net>, <david@readahead.eu>,
+	<edumazet@google.com>, <horms@kernel.org>, <jack@suse.cz>,
+	<jannh@google.com>, <kuba@kernel.org>, <kuniyu@amazon.com>,
+	<lennart@poettering.net>, <linux-fsdevel@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
+	<me@yhndnzj.com>, <netdev@vger.kernel.org>, <oleg@redhat.com>,
+	<pabeni@redhat.com>, <viro@zeniv.linux.org.uk>, <zbyszek@in.waw.pl>
+Subject: Re: [PATCH v5 4/9] coredump: add coredump socket
+Date: Fri, 9 May 2025 10:30:41 -0700
+Message-ID: <20250509173213.36201-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250509-querschnitt-fotokopien-6ae91dfdac45@brauner>
+References: <20250509-querschnitt-fotokopien-6ae91dfdac45@brauner>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <01100196adabd19e-0056f10b-0ffb-4076-8a6b-779f87c327b6-000000@eu-north-1.amazonses.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D042UWA002.ant.amazon.com (10.13.139.17) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Thu, May 08, 2025 at 02:14:00AM +0000, Ozgur Kara wrote:
-> From: Ozgur Karatas <ozgur@goosey.org>
+From: Christian Brauner <brauner@kernel.org>
+Date: Fri, 9 May 2025 17:40:14 +0200
+> > Userspace can set /proc/sys/kernel/core_pattern to:
+> > 
+> >         @linuxafsk/coredump_socket
 > 
-> it's necessary to log error returned from
-> fwnode_property_read_u8_array because there is no detailed information
-> when addr returns an invalid mac address.
-
-Maybe "useful" would be better wording than "necessary".
-Logging doesn't seem to be a hard requirement to me.
-
-Moreover, I'm not sure that logging is appropriate.
-E.g. fwnode_get_mac_addr() is called by fwnode_get_mac_address(),
-which is in turn called by acpi_get_mac_address(), which logs if call
-fails.
-
-> kfree(mac) should actually be marked as kfree((void *)mac) because mac
-> pointer is of type const void * and type conversion is required so
-> data returned from nvmem_cell_read() is of same type.
-
-It seems to me that nvmem_cell_read returns void *.
-So a good approach would be to change type of mac to void *.
-In any case I don't think casting away const is the right approach;
-what is the point of const if it is selectively ignored?
-
-Also, I think this should be a separate patch to the logging change:
-one patch per issue. If there is more than one patch then I would
-suggest collecting them together in a patch-set with a cover letter.
-
+> I have one other proposal that:
 > 
-> This patch fixes the issue in nvmem_get_mac_address() where invalid
-> mac addresses could be read due to improper error handling.
-
-I don't see any changes to the program flow for error handling in this patch.
-It doesn't seem like a fix to me.
-
+> - avoids reserving a specific address
+> - doesn't require bpf or lsm to be safe
+> - allows for safe restart and crashes of the coredump sever
 > 
-> Signed-off-by: Ozgur Karatas <ozgur@goosey.org>
+> To set up a coredump socket the coredump server must allocate a socket
+> cookie for the listening socket via SO_COOKIE. The socket cookie must be
+> used as the prefix in the abstract address for the coredump socket. It
+> can be followed by a \0 byte and then followed by whatever the coredump
+> server wants. For example:
+> 
+> 12345678\0coredump.socket
+> 
+> When a task crashes and generates a coredump it will find the provided
+> address but also compare the prefixed SO_COOKIE value with the socket
+> cookie of the socket listening at that address. If they don't match it
+> will refuse to connect.
+> 
+> So even if the coredump server restarts or crashes and unprivileged
+> userspace recycles the socket address for an attack the crashing process
+> will detect this as the new listening socket will have gotten either a
+> new or no SO_COOKIE and the crashing process will not connect.
+> 
+> The coredump server just sets /proc/sys/kernel/core_pattern to:
+> 
+>         @SO_COOKIE/whatever
+> 
+> The "@" at the beginning indicates to the kernel that the abstract
+> AF_UNIX coredump socket will be used to process coredumps and the
+> indicating the end of the SO_COOKIE and the rest of the name.
+> 
+> Appended what that would look like.
 
--- 
-pw-bot: changes-requested
+Thank you, this looks much nicer to me.
+
+
+[...]
+> Userspace can set /proc/sys/kernel/core_pattern to:
+> 
+>         @SO_COOKIE/whatever
+> 
+> The "@" at the beginning indicates to the kernel that the abstract
+> AF_UNIX coredump socket will be used to process coredumps.
+> 
+> When the coredump server sets up a coredump socket it must allocate a
+> socket cookie for it and use it as the prefix in the abstract address.
+> It may be followed by a zero byte and whatever other name the server may
+> want.
+[...]
+> +
+> +		/* Format is @socket_cookie\0whatever. */
+> +		p = strchr(addr.sun_path + 1, '/');
+> +		if (p)
+> +			*p = '\0';
+
+nit: the '\0' seems optional, @SO_COOKIEwhatever\0
+
+
+
+> diff --git a/include/linux/net.h b/include/linux/net.h
+> index 0ff950eecc6b..3f467786bdc9 100644
+> --- a/include/linux/net.h
+> +++ b/include/linux/net.h
+> @@ -82,6 +82,8 @@ enum sock_type {
+>  #define SOCK_NONBLOCK	O_NONBLOCK
+>  #endif
+>  
+> +#define SOCK_COREDUMP O_NOCTTY
+> +
+>  #endif /* ARCH_HAS_SOCKET_TYPES */
+>  
+>  /**
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index 472f8aa9ea15..944248d7c5be 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -101,6 +101,7 @@
+>  #include <linux/string.h>
+>  #include <linux/uaccess.h>
+>  #include <linux/pidfs.h>
+> +#include <linux/kstrtox.h>
+
+nit: please sort in alphabetical order.  It was cleaned up recently.
+
+
+>  #include <net/af_unix.h>
+>  #include <net/net_namespace.h>
+>  #include <net/scm.h>
+> @@ -1191,7 +1192,7 @@ static struct sock *unix_find_bsd(struct sockaddr_un *sunaddr, int addr_len,
+>  
+>  static struct sock *unix_find_abstract(struct net *net,
+>  				       struct sockaddr_un *sunaddr,
+> -				       int addr_len, int type)
+> +				       int addr_len, int type, int flags)
+>  {
+>  	unsigned int hash = unix_abstract_hash(sunaddr, addr_len, type);
+>  	struct dentry *dentry;
+> @@ -1201,6 +1202,15 @@ static struct sock *unix_find_abstract(struct net *net,
+>  	if (!sk)
+>  		return ERR_PTR(-ECONNREFUSED);
+>  
+> +	if (flags & SOCK_COREDUMP) {
+> +		u64 cookie;
+> +
+> +		if (kstrtou64(sunaddr->sun_path, 0, &cookie))
+> +			return ERR_PTR(-ECONNREFUSED);
+> +		if (cookie != atomic64_read(&sk->sk_cookie))
+> +			return ERR_PTR(-ECONNREFUSED);
+> +	}
+> +
+>  	dentry = unix_sk(sk)->path.dentry;
+>  	if (dentry)
+>  		touch_atime(&unix_sk(sk)->path);
+> @@ -1210,14 +1220,14 @@ static struct sock *unix_find_abstract(struct net *net,
+>  
+>  static struct sock *unix_find_other(struct net *net,
+>  				    struct sockaddr_un *sunaddr,
+> -				    int addr_len, int type)
+> +				    int addr_len, int type, int flags)
+>  {
+>  	struct sock *sk;
+>  
+>  	if (sunaddr->sun_path[0])
+>  		sk = unix_find_bsd(sunaddr, addr_len, type);
+>  	else
+> -		sk = unix_find_abstract(net, sunaddr, addr_len, type);
+> +		sk = unix_find_abstract(net, sunaddr, addr_len, type, flags);
+>  
+>  	return sk;
+>  }
+> @@ -1473,7 +1483,7 @@ static int unix_dgram_connect(struct socket *sock, struct sockaddr *addr,
+>  		}
+>  
+>  restart:
+> -		other = unix_find_other(sock_net(sk), sunaddr, alen, sock->type);
+> +		other = unix_find_other(sock_net(sk), sunaddr, alen, sock->type, flags);
+
+The flag should be 0 as we don't use SOCK_DGRAM for coredump.
+
+
+>  		if (IS_ERR(other)) {
+>  			err = PTR_ERR(other);
+>  			goto out;
+> @@ -1620,7 +1630,7 @@ static int unix_stream_connect(struct socket *sock, struct sockaddr *uaddr,
+>
+>  restart:
+>  	/*  Find listening sock. */
+> -	other = unix_find_other(net, sunaddr, addr_len, sk->sk_type);
+> +	other = unix_find_other(net, sunaddr, addr_len, sk->sk_type, flags);
+>  	if (IS_ERR(other)) {
+>  		err = PTR_ERR(other);
+>  		goto out_free_skb;
+> @@ -2089,7 +2099,7 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
+>  	if (msg->msg_namelen) {
+>  lookup:
+>  		other = unix_find_other(sock_net(sk), msg->msg_name,
+> -					msg->msg_namelen, sk->sk_type);
+> +					msg->msg_namelen, sk->sk_type, 0);
+>  		if (IS_ERR(other)) {
+>  			err = PTR_ERR(other);
+>  			goto out_free;
+> -- 
+> 2.47.2
 
