@@ -1,100 +1,165 @@
-Return-Path: <netdev+bounces-189237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 699EFAB136C
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 14:31:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3196AB13D2
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 14:52:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FE933AFD72
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 12:31:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D6EC1B6672D
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 12:53:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B33F290DAE;
-	Fri,  9 May 2025 12:31:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44912290D80;
+	Fri,  9 May 2025 12:52:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="SYQKkljQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CkgAuKj2"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 771E128ECEF;
-	Fri,  9 May 2025 12:31:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8887E28EA44;
+	Fri,  9 May 2025 12:52:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746793878; cv=none; b=XD3kp9aPjaP4ErJhR2b9rhz3Fjc5sW0NRCe3xoJlkFBg0a8kB45WgfZxk8RX5mNsPJmqpQ515PfqnMaTMjYgrGKvvC4+E0hL7xPnre3dscvZ7/4t9qhcfQXxsRlX6FSzEWD8+rwXFAqgcTqZTZGaA6pLaZMWJ1RePPEua2sWHkg=
+	t=1746795170; cv=none; b=UgR0IlgyCr6yby37xszF4Cjf0Bp+7YUInTBKzSKG8mdgM/ykrvGbkeF07u/+kSdGOK5EIdqCEUQBO8YZ/jG2v+Yc2K8YJiA3n3yGDwwp6AQ5JDbfU8cN3PlxOKckPhJ615bjN3PCEf8iTGqJLlZEkA2fJGNiZf2IfARitDDY01w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746793878; c=relaxed/simple;
-	bh=JoF6YrLrptR6OSMKdIf3o4Fo9pPrScNdNl9AV6MjYP8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nNHy3v/xA2/VyALGWUFABIu++eoRlmxIasvndstRxtI/Gmyjkfi34tWaE9ejW67S+PNHgotT15kH7uYM+vdDPjhoT20pI6Yt/FmO6VcjSEQ8Y5fAxM8ztkExwmThnkM9Q5McOneUfThz9PqpU2YZkPdtxaPM9p88XkHaCsivedc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=SYQKkljQ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=YdoNmHUxjZnTmMzliQNATPMV+jIfhdQyI5B/8F0nKfY=; b=SYQKkljQwKbuZytfsG/eMkKU8q
-	2an+LhOYR9Kpx+je1D2+ZpbQAXS+WtaUFOLHk2rSQwukr1hmhir16Ud3YzZRRx9pFlWqOsL0UiZcw
-	7jjGfZfnhuikVy15gbwVtz4QvQ4Pjpe6lAyCXkLIyCRJEz6YNMhA2KfHZ+2T1HGq59IE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uDMsW-00C6oZ-T9; Fri, 09 May 2025 14:31:00 +0200
-Date: Fri, 9 May 2025 14:31:00 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jakob Unterwurzacher <jakobunt@gmail.com>
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, quentin.schulz@cherry.de,
-	Jakob Unterwurzacher <jakob.unterwurzacher@cherry.de>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	George McCollister <george.mccollister@gmail.com>
-Subject: Re: [PATCH] net: dsa: microchip: linearize skb for tail-tagging
- switches
-Message-ID: <e76f230c-a513-4185-ae3f-72c033aeeb1e@lunn.ch>
-References: <20250509071820.4100022-1-jakob.unterwurzacher@cherry.de>
+	s=arc-20240116; t=1746795170; c=relaxed/simple;
+	bh=BgRoUXYcSrAqisgxPiDX6UXaKvPPaCgwsEZyfhyMlFw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LC7uaEPN/kH27z61pmMMrahLhtrUL4N0clE3htgZabM6YB/v6joc+QtIKIvE1J1tNtyCulAXjJ7oWafno0UAmX6/ghaHejINY7b1RNjGFC86VT2OCwxgsMNVk9t/VVjMIBCtWBweGU+Olji7TOgAzCu5wIy5uK+tuMB7MW86Nw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CkgAuKj2; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746795169; x=1778331169;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=BgRoUXYcSrAqisgxPiDX6UXaKvPPaCgwsEZyfhyMlFw=;
+  b=CkgAuKj2My4lk1JD/F4A5meH4iJsUwEpSm/m1aqb5FG2WHiAVcemvKUE
+   Qm5awLe23Lr1NMBQbr6FD7SjEWiVsaVgh+XeN4YiRLUb9TWHX//rpwf+x
+   TiDxN6yT6XKt3DiNuW6kYW9UFx7z5f2UzSoHGbmDzWZP6UPbYojsIU/zy
+   zzBWjWUnXCtmvo/1z3LA1yrU25Tn3wFtZmXRaLd/0VY08mduSN4alZg+j
+   XaF9FAIAywZ4dxnYZfqH0/ldIIxM7VnrkdwaRT/6eg1slb2zkV2SBramK
+   6mH8jcs3XFKbyI314LHgQcujyaiXw6zYODEYtszm5MuLGrwgLZUAWwTdu
+   Q==;
+X-CSE-ConnectionGUID: RSQlkGvHRb6l0DN4TlFUiQ==
+X-CSE-MsgGUID: SwwYXuLUQ4emDGyVODG5xQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11427"; a="66027268"
+X-IronPort-AV: E=Sophos;i="6.15,275,1739865600"; 
+   d="scan'208";a="66027268"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2025 05:52:49 -0700
+X-CSE-ConnectionGUID: BZDHX1swTe6uzMx0D0o0oQ==
+X-CSE-MsgGUID: 5ESaZ+aCS+yJh0Vw/9f4vw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,275,1739865600"; 
+   d="scan'208";a="141828269"
+Received: from amlin-018-114.igk.intel.com ([10.102.18.114])
+  by fmviesa004.fm.intel.com with ESMTP; 09 May 2025 05:52:43 -0700
+From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+To: donald.hunter@gmail.com,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	vadim.fedorenko@linux.dev,
+	jiri@resnulli.us,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch,
+	aleksandr.loktionov@intel.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	linux-rdma@vger.kernel.org,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Subject: [PATCH net-next v2 0/3] dpll: add Reference SYNC feature
+Date: Fri,  9 May 2025 14:46:48 +0200
+Message-Id: <20250509124651.1227098-1-arkadiusz.kubalewski@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250509071820.4100022-1-jakob.unterwurzacher@cherry.de>
+Content-Transfer-Encoding: 8bit
 
-On Fri, May 09, 2025 at 09:18:19AM +0200, Jakob Unterwurzacher wrote:
-> The pointer arithmentic for accessing the tail tag does not
-> seem to handle nonlinear skbs.
-> 
-> For nonlinear skbs, it reads uninitialized memory inside the
-> skb headroom, essentially randomizing the tag, breaking user
-> traffic.
+The device may support the Reference SYNC feature, which allows the
+combination of two inputs into a Reference SYNC pair. In this
+configuration, clock signals from both inputs are used to synchronize
+the dpll device. The higher frequency signal is utilized for the loop
+bandwidth of the DPLL, while the lower frequency signal is used to
+syntonize the output signal of the DPLL device. This feature enables
+the provision of a high-quality loop bandwidth signal from an external
+source.
 
-Both tag_rtl8_4.c & tag_trailer.c also linearize, so i would say this
-is correct.
+A capable input provides a list of inputs that can be paired to create
+a Reference SYNC pair. To control this feature, the user must request a
+desired state for a target pin: use ``DPLL_PIN_STATE_CONNECTED`` to
+enable or ``DPLL_PIN_STATE_DISCONNECTED`` to disable the feature. Only
+two pins can be bound to form a Reference SYNC pair at any given time.
 
-What is interesting is that both xrs700x_rcv() and
-sja1110_rcv_inband_control_extension() also don't call
-skb_linearize().
+Verify pins bind state/capabilities:
+$ ./tools/net/ynl/pyynl/cli.py \
+ --spec Documentation/netlink/specs/dpll.yaml \
+ --do pin-get \
+ --json '{"id":0}'
+{'board-label': 'CVL-SDP22',
+ 'id': 0,
+ [...]
+ 'reference-sync': [{'id': 1, 'state': 'disconnected'}],
+ [...]}
 
-Vladimir? George?
+Bind the pins by setting connected state between them:
+$ ./tools/net/ynl/pyynl/cli.py \
+ --spec Documentation/netlink/specs/dpll.yaml \
+ --do pin-set \
+ --json '{"id":0, "reference-sync":{"id":1, "state":"connected"}}'
 
-> Tested on v6.12.19 and today's master (d76bb1ebb5587f66b).
+Verify pins bind state:
+$ ./tools/net/ynl/pyynl/cli.py \
+ --spec Documentation/netlink/specs/dpll.yaml \
+ --do pin-get \
+ --json '{"id":0}'
+{'board-label': 'CVL-SDP22',
+ 'id': 0,
+ [...]
+ 'reference-sync': [{'id': 1, 'state': 'connected'}],
+ [...]}
 
-Please read:
+Unbind the pins by setting disconnected state between them:
+$ ./tools/net/ynl/pyynl/cli.py \
+ --spec Documentation/netlink/specs/dpll.yaml \
+ --do pin-set \
+ --json '{"id":0, "reference-sync":{"id":1, "state":"disconnected"}}'
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+v2:
+- improved cover letter description of the feature
 
-This patch should be for net, and you need a Fixes: tag.
+Arkadiusz Kubalewski (3):
+  dpll: add reference-sync netlink attribute
+  dpll: add reference sync get/set
+  ice: add ref-sync dpll pins
 
-    Andrew
+ Documentation/driver-api/dpll.rst             |  25 +++
+ Documentation/netlink/specs/dpll.yaml         |  19 ++
+ drivers/dpll/dpll_core.c                      |  27 +++
+ drivers/dpll/dpll_core.h                      |   2 +
+ drivers/dpll/dpll_netlink.c                   | 188 ++++++++++++++++--
+ drivers/dpll/dpll_nl.c                        |  10 +-
+ drivers/dpll/dpll_nl.h                        |   1 +
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   2 +
+ drivers/net/ethernet/intel/ice/ice_dpll.c     | 186 +++++++++++++++++
+ include/linux/dpll.h                          |  10 +
+ include/uapi/linux/dpll.h                     |   1 +
+ 11 files changed, 451 insertions(+), 20 deletions(-)
 
----
-pw-bot: cr
+
+base-commit: 46431fd5224f7f3bab2823992ae1cf6f2700f1ce
+-- 
+2.38.1
+
 
