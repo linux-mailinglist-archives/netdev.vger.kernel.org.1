@@ -1,127 +1,117 @@
-Return-Path: <netdev+bounces-189133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56B3EAB0938
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 06:34:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB8F5AB093F
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 06:39:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C52E74A4311
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 04:34:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A8891C062F7
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 04:39:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E0742222BD;
-	Fri,  9 May 2025 04:34:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8285922DFA4;
+	Fri,  9 May 2025 04:39:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="UBhFuKjb"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="HqCvL0bI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8C945038
-	for <netdev@vger.kernel.org>; Fri,  9 May 2025 04:34:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0A13322E
+	for <netdev@vger.kernel.org>; Fri,  9 May 2025 04:39:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746765256; cv=none; b=oqKxfvtT4otV9rJHOoK4lLl/2rI8sLtrxJq4SdrNXq9b5xTXQRsINfnwPrIVuTx7gi46vfdc6WQA6eXl4DbobyNBvDIeBqQ+LakBTvuzvg9Hg/oNWxCF9omfu8/kP1v8OPuHGFXhGsUWD1Sro4kOJBQP7MElGBt2dUKUGsXnboc=
+	t=1746765550; cv=none; b=GltUzVcXGRAIz28WRR7v+9kwtMiKdHCI7tIyQORlV4buHJconQNeh7zkqPJudPvjjUjyzIfXfx9ZM6z2rOq6Laz6Us/wMWaNj5EhouiXnRdiHoP8xhU6KdbfoyyD58vFBggDc+EptUk5mzSnVpOZFYiZgkYBGnG8nJB3k9m4zMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746765256; c=relaxed/simple;
-	bh=lRXs+btgAF22JonG0WjXB55OVOTHb44eCwBIXnZLCis=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Oc+Rjd3B2n6UR/dkNoRN7O9BiUbthdSAMfO79zeASB1YD5o5DZZKYTh7OQfe/SO9SIpE6kfis/D747nNuDkk1bYxfeMZf/W+qfNmLhhzRN7Deqmw+a7uJc8UCIWFu5yS1m6rmOuZBc/OKeQfgnFvSFgN4jF+03QhlObYxZxkjjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=UBhFuKjb; arc=none smtp.client-ip=72.21.196.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1746765255; x=1778301255;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=e6sD3KzXBTVKLiEOAJd5UURlCNDdOQUIVJ6ZFaNdIis=;
-  b=UBhFuKjbXam/7mkDTO7EJyv5jzI9meI47wqrkIUl3G0RvvhgPFdNu2Ko
-   6Ww6NHylppalfgCs6UPM/Ff/egGqw5ZP5bUixoO4Zzvxs3V2mnn/ptZOq
-   sPnbZrxmRnFWN8OdX5WHYy6qt0AqxY8JO1JjBvrEHpKS5mxxxZtgyMljB
-   rFCkhUHtacbrwSv6MbibkkjlR+nMhT8lTQ5mqEmwMlfzI+2N86seDnn1+
-   54C2HfS2XULQ5c4xmbSLk1uIEa9oX0ema5Ihqp9ITTzsL26ypWah/rXHp
-   Q1hxsnfAq5N/u1cFRzIg6ngrdDXmuutK3U3Yz7f/BwFAg3VzW0/8/F+Oi
-   Q==;
-X-IronPort-AV: E=Sophos;i="6.15,274,1739836800"; 
-   d="scan'208";a="490559616"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2025 04:34:11 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:63426]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.10.32:2525] with esmtp (Farcaster)
- id 4bbedb25-dffc-4697-aba6-11367dc5370d; Fri, 9 May 2025 04:34:10 +0000 (UTC)
-X-Farcaster-Flow-ID: 4bbedb25-dffc-4697-aba6-11367dc5370d
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 9 May 2025 04:34:09 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.106.100.30) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 9 May 2025 04:34:06 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuba@kernel.org>
-CC: <brauner@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-	<horms@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <willemb@google.com>
-Subject: Re: [PATCH v1 net-next 4/7] af_unix: Move SOCK_PASS{CRED,PIDFD,SEC} to sk->sk_flags.
-Date: Thu, 8 May 2025 21:33:52 -0700
-Message-ID: <20250509043358.14640-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250508201502.5bbbc51e@kernel.org>
-References: <20250508201502.5bbbc51e@kernel.org>
+	s=arc-20240116; t=1746765550; c=relaxed/simple;
+	bh=QZFvDgkUvmLldGSWuy/vcBIHE/Al4bNz0J/V8/anpOc=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SE07JB17WVYACUmv/riBRztO2P0Guzt6yCFTYMYkCzfUHo+WYcxSJLoM54LHXSxl/weUXJbngjnpP3fevquPobZKE+stc7x7y9IlFCSLg01ECMyfpuk/RssNADWHKhzuhmkNtyd4hKJgUYPcbSJePYi8hod0W6csCURlYc1D0h4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=HqCvL0bI; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5492iaar031007;
+	Thu, 8 May 2025 21:38:47 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=U1Z8zb6AsUv6pJEiZmb68fCSw
+	2RlNTFie/wckJvW6ME=; b=HqCvL0bITxQ+rtm1qvrxjEa7PHMiTo3RBv5uUKwuC
+	akMqKvSNkZd0oxRM4CpyO+SL9NAe+9ji4upzs/0jGz799seFP9msi2fZ+O7DggBl
+	md4KhuAu84ufW1kKR6G23OBzQhToL+vrH1KNpCtF4qzH4GZhPQmr9cwDfBqGdOMp
+	SGk9H8pmaRsobmwBM6QTntX3GtdN3gdsruGD1voiSKF0vHbccqCjkSpZUzCEbyH+
+	nlhtVj7K02XoQISizBX5d1X2B7kdn1AQEhz7a6Q48aWWlHokefEePeJLKwN5NyJZ
+	jclwXvG8eec++VmygCl22Kqolq0NNzIS+pg5QBuOGUPew==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 46h96c06q9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 08 May 2025 21:38:47 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Thu, 8 May 2025 21:38:46 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Thu, 8 May 2025 21:38:46 -0700
+Received: from ce1afb5360f2 (unknown [10.193.77.153])
+	by maili.marvell.com (Postfix) with SMTP id 950D53F7050;
+	Thu,  8 May 2025 21:38:42 -0700 (PDT)
+Date: Fri, 9 May 2025 04:38:40 +0000
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: Simon Horman <horms@kernel.org>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <gakula@marvell.com>,
+        <hkelam@marvell.com>, <sgoutham@marvell.com>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH] octeontx2-pf: Do not reallocate all ntuple filters
+Message-ID: <aB2G0MdH-NEMteKr@ce1afb5360f2>
+References: <1746637976-10328-1-git-send-email-sbhatta@marvell.com>
+ <20250508185731.GO3339421@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D045UWA002.ant.amazon.com (10.13.139.12) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250508185731.GO3339421@horms.kernel.org>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTA5MDA0MiBTYWx0ZWRfXx1vkOeO3fRng gLtGLGDphvFUI+zY8J3aHm9S/tXKKxE71qPEJqtuwfSQ5aH9JZ57zHQovYa1GMB/Q/tf3JdEdt0 VgnqW2uPztS0TuUS0IJxYTwhXUTM95SX0mUBfYb6Fyb/tqUP0oYT6kzIxA3onjSSKxk9wQQ2Mm5
+ MnXyIcyJYE6rKKKbxVtR6fQsePDX3/+9ff7o+ChZ0nxuD/AU/+BbvC2KLYcTEZwhL6OmBDRUMPE h47Htl6e6C9+Vgm9KRDwbIaXtBK+k9Psn5czQK23gy/30jHbD6OhKM1OrVdF3/eTZm10gB6pZYH 20oQHR8iEHcOn5g10RGDxYtlhthrkL0A10C1yd4ss3mgJdjSk6qarFdVCNCqw9iyRWCpPSSgK2Y
+ iBg8JYmFUzjQVWzk6oqG6RoozF5VmlVUEWSNTucFf7nCfZ3iLY28jOtN2ZNCFN6Y0Z3LXGoO
+X-Proofpoint-GUID: F4ItJidzsCrBMVE3uOuAhesRpfT_I6RD
+X-Proofpoint-ORIG-GUID: F4ItJidzsCrBMVE3uOuAhesRpfT_I6RD
+X-Authority-Analysis: v=2.4 cv=dpXbC0g4 c=1 sm=1 tr=0 ts=681d86d7 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=AALDOkYYfIM4LSDXbRQA:9 a=CjuIK1q_8ugA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22 a=lhd_8Stf4_Oa5sg58ivl:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-09_01,2025-05-08_04,2025-02-21_01
 
-From: Jakub Kicinski <kuba@kernel.org>
-Date: Thu, 8 May 2025 20:15:02 -0700
-> On Wed, 7 May 2025 18:29:16 -0700 Kuniyuki Iwashima wrote:
-> > diff --git a/include/net/sock.h b/include/net/sock.h
-> > index f0fabb9fd28a..48b8856e2615 100644
-> > --- a/include/net/sock.h
-> > +++ b/include/net/sock.h
-> > @@ -964,6 +964,10 @@ enum sock_flags {
-> >  	SOCK_RCVMARK, /* Receive SO_MARK  ancillary data with packet */
-> >  	SOCK_RCVPRIORITY, /* Receive SO_PRIORITY ancillary data with packet */
-> >  	SOCK_TIMESTAMPING_ANY, /* Copy of sk_tsflags & TSFLAGS_ANY */
-> > +	SOCK_PASSCRED, /* Receive SCM_CREDENTIALS ancillary data with packet */
-> > +	SOCK_PASSPIDFD, /* Receive SCM_PIDFD ancillary data with packet */
-> > +	SOCK_PASSSEC, /* Receive SCM_SECURITY ancillary data with packet */
-> > +	SOCK_FLAG_MAX,
-> >  };
+Hi Simon,
+
+On 2025-05-08 at 18:57:31, Simon Horman (horms@kernel.org) wrote:
+> On Wed, May 07, 2025 at 10:42:56PM +0530, Subbaraya Sundeep wrote:
+> > If ntuple filters count is modified followed by
+> > unicast filters count using devlink then the ntuple count
+> > set by user is ignored and all the ntuple filters are
+> > being reallocated. Fix this by storing the ntuple count
+> > set by user using devlink.
+> > 
+> > Fixes: 39c469188b6d ("octeontx2-pf: Add ucast filter count configurability via devlink.")
+> > Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
 > 
-> 32b builds break:
+> Hi Subbaraya,
 > 
-> include/linux/compiler_types.h:557:45: error: call to ‘__compiletime_assert_809’ declared with attribute error: BUILD_BUG_ON failed: BYTES_TO_BITS(sizeof(sk->sk_flags)) <= SOCK_FLAG_MAX
+> I am wondering if this is more of a but fix or more of a cleanup.
+> 
+> If it is a bug then I think an explanation of how it manifests is
+> warranted, and the patch should be targeted at net. If not, the Fixes tag
+> should be dropped, and the patch should be targeted at net-next.
+These patches target net indeed. My bad I missed net prefix in subject. 
+I will send v2 with net prefix.
 
-Oops, thanks for catching!
-
-Will create a space like this in v2.
-
----8<---
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 371053316d2c..59c077df9eb8 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -521,8 +521,9 @@ struct sock {
- #if BITS_PER_LONG==32
- 	seqlock_t		sk_stamp_seq;
- #endif
--	int			sk_disconnects;
-+	u16			sk_disconnects;
- 
-+	u8			sk_csm_flags;
- 	u8			sk_txrehash;
- 	u8			sk_clockid;
- 	u8			sk_txtime_deadline_mode : 1,
----8<---
+Thanks,
+Sundeep
+> 
+> ...
 
