@@ -1,92 +1,93 @@
-Return-Path: <netdev+bounces-189117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5427AB0790
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 03:50:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CAD35AB0797
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 03:51:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89D469E1412
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 01:49:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A04CB9E5A31
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 01:51:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 787331547F5;
-	Fri,  9 May 2025 01:49:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D55EE139D0A;
+	Fri,  9 May 2025 01:51:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qi/Wu+bM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tzudw4Km"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D447145FE0;
-	Fri,  9 May 2025 01:49:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A649928682;
+	Fri,  9 May 2025 01:51:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746755394; cv=none; b=e3GH55pPpdXdyZdeIFWEbAGeRQbedRPkbZr3DxafdU5HK9XelOowtWgCa5y73rajdJhO+v687Kd77dG3a+an3F11uQesIurgp3qOzFDLmsi3qdNIFAmitwnTtcU0hj1u335lqtcH1mFw/vDQOis/G5rr7e8xDMP3SSgX0qlzDaM=
+	t=1746755502; cv=none; b=qrfkrm36DP9fEoOUzVd8nJA7UzKD4XF+XXexidNPJjTcVwTUWy/rZQB0VGfGxElggTxUpHbrGuE84qzgDyoBKRGF1ts4W74/xPDROBjU2vzBts4fkvOKAhb1g+2zOum61ItORZT3htgyyEhUzBaYJ8qfZqAps7nrqpRI3U5GMVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746755394; c=relaxed/simple;
-	bh=bNe3PWOhezlLQpVjDvwr37Wk4UyMK2cGxjI+lpuW+wY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tMn63RSosFNb6p4Kiet7rtACiNP/un93fmKoYpB+Qevx9ohiPhm6KWsh0NcYY+k/kZ7XWB5dTvzux7q5NclNP+ViZHwHjhQIvwkHJZdZh+Y3EP2R1WQ3Vl/OFutxtVf8O8mEsME8InqQ9+GOWoH48ylr3EdK4VYlCNAgmBvHB48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qi/Wu+bM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1607C4CEED;
-	Fri,  9 May 2025 01:49:53 +0000 (UTC)
+	s=arc-20240116; t=1746755502; c=relaxed/simple;
+	bh=T+0Q4j3MxfhBAraC6JNdvOq+YPwmYa27MFXEx5piVGo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=U6wVt+J20J8fQu7ah5kSa3mFZzBaeyc2nPswBPDw7K7FfIeFTZ3pKFSyMfJwQwtH1BtupLC6LNd0xQkieufwsA91WFl2dGmt3wJ6l6MbD1+kREsh7inVNCRQk2ru54IkSUN0rXFfqP8zMmjmyfS4xaCLkz5TnCMGHFT/6TlBJbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tzudw4Km; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 056F2C4CEE7;
+	Fri,  9 May 2025 01:51:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746755393;
-	bh=bNe3PWOhezlLQpVjDvwr37Wk4UyMK2cGxjI+lpuW+wY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qi/Wu+bMJJXJmf3OtzTlS2gwN2CCyCRIu/KsEyelGggk3dzxTvfPMzbtDJEAOF9ju
-	 v2Tk0H8s6DTHWI9c6TL7W3t2GrBhJWCGmcsfhHMR/GaeJZONRPECk0S9D1YT8/+eaC
-	 fNZAXwosErQhHomhmSk7TmOpsqQ2tAOWCJ38ErcAo3NDyF34aJIDhmHaXRaPxGTi0d
-	 sY0H17JpTFS39pb7vSX65TTGjyC4M5h8dcHHKOEkB0ZZtOs80KCxq986iU41434q5U
-	 wdi1qxD//Ww1hFG69wLAJHsxPsX4eeuOrqlJUflHZdkuOPcgX4g82AiCo+YX0p9iug
-	 EwvfYKlUrERTg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE28380AA7D;
-	Fri,  9 May 2025 01:50:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1746755501;
+	bh=T+0Q4j3MxfhBAraC6JNdvOq+YPwmYa27MFXEx5piVGo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Tzudw4KmBThifSMpYc7W7axYTh2IOejdGBQzfSlTyhpDun4fADce3rhT+rbLXgyFH
+	 WeVwMJ6rtnbnVI64ZmOiWnMgYl8FC/usqBLKxVnM8zlOELp8TtWy5HBDvGALKiWUf3
+	 74bJiMNfP1RR+WiknPHo6y3b/WDp6izOGynUrI84EAS3tbeUz7ysFIVIXgPiP3hosQ
+	 sjTWYS1ZuoAkDWnltTX/7Su589UipCycLv37+9wbq1CUu9AeohthlcIfQ+znHiYpiB
+	 4f3DdAY9bnVQ1IDAQxnahUu8JVNrccVTkpqQmY+tzH83jvfO0EjBe+2c4vEaqt82PY
+	 GCUoZe59P+zCQ==
+Date: Thu, 8 May 2025 18:51:38 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Gur Stavi <gur.stavi@huawei.com>
+Cc: Fan Gong <gongfan1@huawei.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ <linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Bjorn
+ Helgaas <helgaas@kernel.org>, luosifu <luosifu@huawei.com>, Xin Guo
+ <guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>, Zhou
+ Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
+ <shijing34@huawei.com>, Meny Yossefi <meny.yossefi@huawei.com>, Lee Trager
+ <lee@trager.us>, Michael Ellerman <mpe@ellerman.id.au>, Suman Ghosh
+ <sumang@marvell.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, Joe
+ Damato <jdamato@fastly.com>, Christophe JAILLET
+ <christophe.jaillet@wanadoo.fr>
+Subject: Re: [PATCH net-next v14 1/1] hinic3: module initialization and
+ tx/rx logic
+Message-ID: <20250508185138.44849a7a@kernel.org>
+In-Reply-To: <35f370e77ceaec7ebff5e160e9daee2f9c7b98f0.1746689795.git.gur.stavi@huawei.com>
+References: <cover.1746689795.git.gur.stavi@huawei.com>
+	<35f370e77ceaec7ebff5e160e9daee2f9c7b98f0.1746689795.git.gur.stavi@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] bluetooth 2025-05-08
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174675543250.3097595.8572509299736152827.git-patchwork-notify@kernel.org>
-Date: Fri, 09 May 2025 01:50:32 +0000
-References: <20250508150927.385675-1-luiz.dentz@gmail.com>
-In-Reply-To: <20250508150927.385675-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 8 May 2025 10:56:47 +0300 Gur Stavi wrote:
+> +	if (unlikely(__netif_subqueue_stopped(netdev, q_id) &&
+> +		     hinic3_wq_free_wqebbs(&txq->sq->wq) >= 1 &&
+> +		     test_bit(HINIC3_INTF_UP, &nic_dev->flags))) {
+> +		struct netdev_queue *netdev_txq =
+> +				netdev_get_tx_queue(netdev, q_id);
+> +
+> +		__netif_tx_lock(netdev_txq, smp_processor_id());
+> +		/* avoid re-waking subqueue with xmit_frame */
+> +		if (__netif_subqueue_stopped(netdev, q_id))
+> +			netif_wake_subqueue(netdev, q_id);
+> +
+> +		__netif_tx_unlock(netdev_txq);
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu,  8 May 2025 11:09:27 -0400 you wrote:
-> The following changes since commit 9540984da649d46f699c47f28c68bbd3c9d99e4c:
-> 
->   Merge tag 'wireless-2025-05-06' of https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless (2025-05-06 19:06:50 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-05-08
-> 
-> [...]
-
-Here is the summary with links:
-  - [GIT,PULL] bluetooth 2025-05-08
-    https://git.kernel.org/netdev/net/c/ea9a83d7f371
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Have you tried the macros in net/net_queue.h ?
+netif_subqueue_maybe_stop() and netif_subqueue_completed_wake()
+They implement tried and tested ordering, the lock shouldn't be
+necessary.
 
