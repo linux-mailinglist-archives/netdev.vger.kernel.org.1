@@ -1,219 +1,251 @@
-Return-Path: <netdev+bounces-189333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AB4BAB19DE
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 18:09:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F3FDAB1A8F
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 18:34:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31F097BD747
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 16:07:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DB6B3B02D6
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 16:33:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B7A42356DA;
-	Fri,  9 May 2025 16:08:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9830E23BD09;
+	Fri,  9 May 2025 16:31:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="F0UnNh9u"
+	dkim=pass (1024-bit key) header.d=mihalicyn.com header.i=@mihalicyn.com header.b="bcKgA4hm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59AE5235073;
-	Fri,  9 May 2025 16:08:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5E523A9BF
+	for <netdev@vger.kernel.org>; Fri,  9 May 2025 16:31:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746806923; cv=none; b=B8nUh+cMeNKXq14biWRiyATtsETMcP44A7qhSXrXjRe6Vr8qxyxG1mDZklaD2F2ZT6L4BKVlZQcBpifT5hXNSBauzQW+8dRCAnndJrrX9PfDWCqmLPWbTRezLBcyKxeoqPAOW7nR4S0SppTLryaRDKFBuWw9v0dKdfBjDsv9p+s=
+	t=1746808267; cv=none; b=B2dcukFZ73YFe3KqmHwRGKoeq0vwqCWScMoNNbPTpBlG3wUP1naxenrlSsf4RfRMfb4dn49H/tIsNzeui4qtHOE5Lp79RUnHPgWh8Fv8rfSZIReux7i3TfwvEofn5nlqI6v6SxVKcMIgf8SaCat5djigt1n4uV4fBL+OoL7FvLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746806923; c=relaxed/simple;
-	bh=RtOPI/DsxM1LZcAWF42dPpfdNPGAFh8TELrLyWLyS1o=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MtgJOGiFZZ2RKOqJN670llg0U6yb7XraLQp+XwGoFwFWL43KtGb1u8/QK4Ja9pJdf+MrudH7dTCaIdKfsVCb/ATXMdeRFc5O8BtOibnOw9yKh+Cp/SiQkUKO+sWQreWSJeeHdwcfnP4ZmdGwTXGHqQJUK1nF2H8eKp7BcmsPV54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=F0UnNh9u; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 549Bpi3T002461;
-	Fri, 9 May 2025 16:08:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	5s1FY5CT9goxhPTr851JPrtvAQnIM6QWFPyD9XtgGJ0=; b=F0UnNh9uSSgTpLcd
-	eWDdR2Sus+u4Yc5Zwt/QMjjo8qpbOtINWI8vCRQD0Xd7F/vZJ76c4UTuqZxoecB1
-	AwK55cAeKsE89/ah2CNSbmbYf4tLbslLGh6jbQifpR9RaFClhvKATovONxb2QDFW
-	2Fwq4jR4fahRi0ZpyD57xAqDeQlKjAUOORqNd1/mpKKotj3NsjkOQlIWqJFgCcRq
-	jntozNpHU2pRTVdzKqjnl9IogaT/XcEA56uqZcA0Zcg5Bzy9O70UtUYBjdoA4pOQ
-	sUXTZOZboxIt3ovQh20sTV+cCTyenctThvQQLhBdJFSAmgng8qT79HUF04M1uf2I
-	i/wa9Q==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 46gnp5d5vu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 09 May 2025 16:08:17 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 549G8GF4029185
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 9 May 2025 16:08:16 GMT
-Received: from PHILBER.na.qualcomm.com (10.80.80.8) by
- nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Fri, 9 May 2025 09:08:11 -0700
-From: Peter Hilber <quic_philber@quicinc.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-        Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>
-CC: Trilok Soni <quic_tsoni@quicinc.com>,
-        Peter Hilber
-	<quic_philber@quicinc.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-        <linux-kernel@vger.kernel.org>, <virtualization@lists.linux.dev>,
-        "David
- Woodhouse" <dwmw2@infradead.org>,
-        "Ridoux, Julien" <ridouxj@amazon.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Alexandre Belloni
-	<alexandre.belloni@bootlin.com>,
-        Parav Pandit <parav@nvidia.com>,
-        "Matias
- Ezequiel Vara Larsen" <mvaralar@redhat.com>,
-        Cornelia Huck
-	<cohuck@redhat.com>, Simon Horman <horms@kernel.org>,
-        <virtio-dev@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
-        "Richard Cochran" <richardcochran@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v7 3/4] virtio_rtc: Add Arm Generic Timer cross-timestamping
-Date: Fri, 9 May 2025 18:07:24 +0200
-Message-ID: <20250509160734.1772-4-quic_philber@quicinc.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250509160734.1772-1-quic_philber@quicinc.com>
-References: <20250509160734.1772-1-quic_philber@quicinc.com>
+	s=arc-20240116; t=1746808267; c=relaxed/simple;
+	bh=3F3cDCq8FuqEGRjFqwlZc4GvvKGUzJBMJDglBCvafpo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=p6rIJgp2suCfDV8R63TGP1sRhcaWA+LUZdnCTrz4XPUV7XK8CvbIXu1t97jpqgaetSskboRIn8aPN/TtqSLQUCzuRWcythsNuQAS0gOZ5AOhRXkk0QBiFr+AMEjn8X3cOUgb/+6peyspGH2Xk3+OYay8rDfgdxMA9zoh/tYcLvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mihalicyn.com; spf=pass smtp.mailfrom=mihalicyn.com; dkim=pass (1024-bit key) header.d=mihalicyn.com header.i=@mihalicyn.com header.b=bcKgA4hm; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mihalicyn.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mihalicyn.com
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-54d3ee30af1so1752477e87.0
+        for <netdev@vger.kernel.org>; Fri, 09 May 2025 09:31:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mihalicyn.com; s=mihalicyn; t=1746808263; x=1747413063; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dczfm41jf/+ot0pq62ZLpRDZZlZmNUxw7VlnOz5PeIg=;
+        b=bcKgA4hm3ZZk1/EMhUj9SJIEokxBhQTjq6FFbpy4XtpNnAPWMQTVrlUI7j1tqhEwud
+         35Yi+NfdhYzJSKQzuP0iWeYF+LjB1snPteoO5j5VbHNJAqTtbA4uXncbS9lHKXr0J82+
+         QYFkUIbVhn2rU+2i5vVBOkQatyC+PZefwanLU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746808263; x=1747413063;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Dczfm41jf/+ot0pq62ZLpRDZZlZmNUxw7VlnOz5PeIg=;
+        b=Hbd9YqLjG0VhztS1LqKc/b0+aYu0un7J1SbgvdEim4bYg1crz06viiU7MDRVEGAjgL
+         0w87+jih4Mz1GZWM2uINRmtcXMb8kJX4LQV4nNBlvwH4ZpvVYQEOIVnQLSxOA82EnC3b
+         Go1ter0aPweNJvoPQHu5E0D2BM6kqMFINTTx57v7G7OiOszlCg+HS7e1T5NcBVpfsPFs
+         CYxml+7ksOhOxVSNeRUVBSYouIdzFmTFiJ0G0hGOWQhE6ORTcWzXBydEQ0gmCIAc0QlT
+         gktRKXcrh/xO7ML7jzAAOM1eTHM1iuskkXBI+mp7c2Ju3yM7gpRYM7sbVHHAc77G6fOU
+         QqmA==
+X-Forwarded-Encrypted: i=1; AJvYcCUNQFBDnAgzqh+/LYcRIQmQvvZ25NYfBr9t8p6Kap5SP77nIPBQ1RtSDkxi1X2FeW6EV2EzF4k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YycpX61dU8mqoumtlLbYslmEjldOmvXxSbIEDGB83ApmCSCUDaM
+	qE/ErfArxOl5chUyzcAHCCaynTxx990vJ8Io8ItbQG73sPWX4AbFcdYMBnedavWKuGCBjKmTeWr
+	niECsyLNVCTyJlxxj/0XQYPdF97vS+3wPr6yQiw==
+X-Gm-Gg: ASbGncvH6K33P5aBmSla7It4B6TrSUPtmqMUfR0Z6Ns6UnJJ2uM3YM9mSOmJd2SWPrT
+	Tg66myre0KF2n97GqK6DhbXR5IvuFX9Eg3L0wtE62HoRT1KFZHwjZudV63UzCCdQf7zHWhvAqYu
+	q1SAHMggzmMOWiYuVstLdoOsghON5LE6esFQ==
+X-Google-Smtp-Source: AGHT+IHGg7ev8Us7cUxKeueai1BHjAHTYxTZouDrum8k4bUq3CW+5ojYIautOJhDd40fC5MrdLRm1S6TK6IgZ8w6Od8=
+X-Received: by 2002:a05:651c:547:b0:30d:dad4:e074 with SMTP id
+ 38308e7fff4ca-326c459a4e1mr17086891fa.6.1746808262468; Fri, 09 May 2025
+ 09:31:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Authority-Analysis: v=2.4 cv=XL0wSRhE c=1 sm=1 tr=0 ts=681e2871 cx=c_pps
- a=ouPCqIW2jiPt+lZRy3xVPw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
- a=GEpy-HfZoHoA:10 a=dt9VzEwgFbYA:10 a=COk6AnOGAAAA:8 a=7oUh35WbpK7Jc3m_RqkA:9
- a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-GUID: X0TyMq46uLtEqPJB9-Bf0oQrryMyX-6d
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTA5MDE1OSBTYWx0ZWRfX1dyLxOnPtdJl
- ZX3NmqHSswSZ/yAkm5kV5X3GQKs0l7VQF6r1d+5Hnn2Fe80JxKcMWWat8XjuaQ10jsqUbyI1p45
- EMIsJBXKkBfz7PgqFx7+AQV4nDc73MLqOHKbt4cjyYNQimvOmdWyZUKZW08Pph4VcdUTL6/DQUy
- HXs8igIncSxOAQq4kiDVrnmyifOrYOhMeirkXsR4ApLR1QeG9hakTRWJEGvAgc2f3dPVySFSddQ
- 6UdjSG144Xgm73mvY2s5LJoz0ykqC1u+9fh7Wi8i/rYVRXCJE7Zyo6v/IujsaBZDcn8kqu9dvbc
- g3U3A1orDF9NUZNz0QDeCs5nlsyp7FIaC4oBdkFqVGHyhtIdJN4BGbldM0JYhfPHi/F63L3ro0J
- xCKcb/Rm8Mr2BIxFymM0R5Lca+VcGJH/sa411VpyY8wPRVEEG3U1Dfk+fTvdJMUrxzu6K56B
-X-Proofpoint-ORIG-GUID: X0TyMq46uLtEqPJB9-Bf0oQrryMyX-6d
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-09_06,2025-05-09_01,2025-02-21_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 mlxscore=0 clxscore=1015 lowpriorityscore=0 suspectscore=0
- mlxlogscore=999 malwarescore=0 adultscore=0 priorityscore=1501 bulkscore=0
- spamscore=0 phishscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2504070000
- definitions=main-2505090159
+References: <20250509-work-coredump-socket-v5-0-23c5b14df1bc@kernel.org> <20250509-work-coredump-socket-v5-2-23c5b14df1bc@kernel.org>
+In-Reply-To: <20250509-work-coredump-socket-v5-2-23c5b14df1bc@kernel.org>
+From: Alexander Mikhalitsyn <alexander@mihalicyn.com>
+Date: Fri, 9 May 2025 18:30:51 +0200
+X-Gm-Features: AX0GCFui91OodDSa1dR8yv60GLGFoEtNuUM3aekOlc8fePpHrMC4CU4IloaWT7c
+Message-ID: <CAJqdLrrcEwF1s0uLm-z=2DhkmtYLjqwttNujuQ3vT83m-PYLoQ@mail.gmail.com>
+Subject: Re: [PATCH v5 2/9] coredump: massage do_coredump()
+To: Christian Brauner <brauner@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, Jann Horn <jannh@google.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	Eric Dumazet <edumazet@google.com>, Oleg Nesterov <oleg@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Daan De Meyer <daan.j.demeyer@gmail.com>, David Rheinsberg <david@readahead.eu>, 
+	Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>, 
+	Lennart Poettering <lennart@poettering.net>, Luca Boccassi <bluca@debian.org>, Mike Yuan <me@yhndnzj.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	=?UTF-8?Q?Zbigniew_J=C4=99drzejewski=2DSzmek?= <zbyszek@in.waw.pl>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-security-module@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-For platforms using the Arm Generic Timer, add precise cross-timestamping
-support to virtio_rtc.
+Am Fr., 9. Mai 2025 um 12:26 Uhr schrieb Christian Brauner <brauner@kernel.org>:
+>
+> We're going to extend the coredump code in follow-up patches.
+> Clean it up so we can do this more easily.
+>
+> Signed-off-by: Christian Brauner <brauner@kernel.org>
 
-Always report the CP15 virtual counter as the HW counter in use by
-arm_arch_timer, since the Linux kernel's usage of the Arm Generic Timer
-should always be compatible with this.
+Reviewed-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
 
-Signed-off-by: Peter Hilber <quic_philber@quicinc.com>
----
-
-Notes:
-    v4:
-    
-    - Update names and types to spec v6.
-    
-    v2:
-    
-    - Depend on prerequisite patch series "treewide: Use clocksource id for
-      get_device_system_crosststamp()".
-    
-    - Return clocksource id instead of calling dropped arm_arch_timer helpers.
-    
-    - Always report the CP15 virtual counter to be in use by arm_arch_timer,
-      since distinction of Arm physical and virtual counter appears unneeded
-      after discussion with Marc Zyngier.
-
- drivers/virtio/Kconfig          | 13 +++++++++++++
- drivers/virtio/Makefile         |  1 +
- drivers/virtio/virtio_rtc_arm.c | 23 +++++++++++++++++++++++
- 3 files changed, 37 insertions(+)
- create mode 100644 drivers/virtio/virtio_rtc_arm.c
-
-diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
-index a14a2b77e142..3d8b366c0625 100644
---- a/drivers/virtio/Kconfig
-+++ b/drivers/virtio/Kconfig
-@@ -221,6 +221,19 @@ config VIRTIO_RTC_PTP
- 
- 	 If unsure, say Y.
- 
-+config VIRTIO_RTC_ARM
-+	bool "Virtio RTC cross-timestamping using Arm Generic Timer"
-+	default y
-+	depends on VIRTIO_RTC_PTP && ARM_ARCH_TIMER
-+	help
-+	 This enables Virtio RTC cross-timestamping using the Arm Generic Timer.
-+	 It only has an effect if the Virtio RTC device also supports this. The
-+	 cross-timestamp is available through the PTP clock driver precise
-+	 cross-timestamp ioctl (PTP_SYS_OFFSET_PRECISE2 aka
-+	 PTP_SYS_OFFSET_PRECISE).
-+
-+	 If unsure, say Y.
-+
- endif # VIRTIO_RTC
- 
- endif # VIRTIO_MENU
-diff --git a/drivers/virtio/Makefile b/drivers/virtio/Makefile
-index 88d6fb8d4731..dbd77f124ba9 100644
---- a/drivers/virtio/Makefile
-+++ b/drivers/virtio/Makefile
-@@ -17,3 +17,4 @@ obj-$(CONFIG_VIRTIO_DEBUG) += virtio_debug.o
- obj-$(CONFIG_VIRTIO_RTC) += virtio_rtc.o
- virtio_rtc-y := virtio_rtc_driver.o
- virtio_rtc-$(CONFIG_VIRTIO_RTC_PTP) += virtio_rtc_ptp.o
-+virtio_rtc-$(CONFIG_VIRTIO_RTC_ARM) += virtio_rtc_arm.o
-diff --git a/drivers/virtio/virtio_rtc_arm.c b/drivers/virtio/virtio_rtc_arm.c
-new file mode 100644
-index 000000000000..211299d72870
---- /dev/null
-+++ b/drivers/virtio/virtio_rtc_arm.c
-@@ -0,0 +1,23 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * Provides cross-timestamp params for Arm.
-+ *
-+ * Copyright (C) 2022-2023 OpenSynergy GmbH
-+ * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
-+ */
-+
-+#include <linux/clocksource_ids.h>
-+
-+#include <uapi/linux/virtio_rtc.h>
-+
-+#include "virtio_rtc_internal.h"
-+
-+/* see header for doc */
-+
-+int viortc_hw_xtstamp_params(u8 *hw_counter, enum clocksource_ids *cs_id)
-+{
-+	*hw_counter = VIRTIO_RTC_COUNTER_ARM_VCT;
-+	*cs_id = CSID_ARM_ARCH_COUNTER;
-+
-+	return 0;
-+}
--- 
-2.43.0
-
+> ---
+>  fs/coredump.c | 122 +++++++++++++++++++++++++++++++---------------------------
+>  1 file changed, 65 insertions(+), 57 deletions(-)
+>
+> diff --git a/fs/coredump.c b/fs/coredump.c
+> index 281320ea351f..41491dbfafdf 100644
+> --- a/fs/coredump.c
+> +++ b/fs/coredump.c
+> @@ -646,63 +646,8 @@ void do_coredump(const kernel_siginfo_t *siginfo)
+>                 goto fail_unlock;
+>         }
+>
+> -       if (cn.core_type == COREDUMP_PIPE) {
+> -               int argi;
+> -               int dump_count;
+> -               char **helper_argv;
+> -               struct subprocess_info *sub_info;
+> -
+> -               if (cprm.limit == 1) {
+> -                       /* See umh_coredump_setup() which sets RLIMIT_CORE = 1.
+> -                        *
+> -                        * Normally core limits are irrelevant to pipes, since
+> -                        * we're not writing to the file system, but we use
+> -                        * cprm.limit of 1 here as a special value, this is a
+> -                        * consistent way to catch recursive crashes.
+> -                        * We can still crash if the core_pattern binary sets
+> -                        * RLIM_CORE = !1, but it runs as root, and can do
+> -                        * lots of stupid things.
+> -                        *
+> -                        * Note that we use task_tgid_vnr here to grab the pid
+> -                        * of the process group leader.  That way we get the
+> -                        * right pid if a thread in a multi-threaded
+> -                        * core_pattern process dies.
+> -                        */
+> -                       coredump_report_failure("RLIMIT_CORE is set to 1, aborting core");
+> -                       goto fail_unlock;
+> -               }
+> -               cprm.limit = RLIM_INFINITY;
+> -
+> -               dump_count = atomic_inc_return(&core_dump_count);
+> -               if (core_pipe_limit && (core_pipe_limit < dump_count)) {
+> -                       coredump_report_failure("over core_pipe_limit, skipping core dump");
+> -                       goto fail_dropcount;
+> -               }
+> -
+> -               helper_argv = kmalloc_array(argc + 1, sizeof(*helper_argv),
+> -                                           GFP_KERNEL);
+> -               if (!helper_argv) {
+> -                       coredump_report_failure("%s failed to allocate memory", __func__);
+> -                       goto fail_dropcount;
+> -               }
+> -               for (argi = 0; argi < argc; argi++)
+> -                       helper_argv[argi] = cn.corename + argv[argi];
+> -               helper_argv[argi] = NULL;
+> -
+> -               retval = -ENOMEM;
+> -               sub_info = call_usermodehelper_setup(helper_argv[0],
+> -                                               helper_argv, NULL, GFP_KERNEL,
+> -                                               umh_coredump_setup, NULL, &cprm);
+> -               if (sub_info)
+> -                       retval = call_usermodehelper_exec(sub_info,
+> -                                                         UMH_WAIT_EXEC);
+> -
+> -               kfree(helper_argv);
+> -               if (retval) {
+> -                       coredump_report_failure("|%s pipe failed", cn.corename);
+> -                       goto close_fail;
+> -               }
+> -       } else if (cn.core_type == COREDUMP_FILE) {
+> +       switch (cn.core_type) {
+> +       case COREDUMP_FILE: {
+>                 struct mnt_idmap *idmap;
+>                 struct inode *inode;
+>                 int open_flags = O_CREAT | O_WRONLY | O_NOFOLLOW |
+> @@ -796,6 +741,69 @@ void do_coredump(const kernel_siginfo_t *siginfo)
+>                 if (do_truncate(idmap, cprm.file->f_path.dentry,
+>                                 0, 0, cprm.file))
+>                         goto close_fail;
+> +               break;
+> +       }
+> +       case COREDUMP_PIPE: {
+> +               int argi;
+> +               int dump_count;
+> +               char **helper_argv;
+> +               struct subprocess_info *sub_info;
+> +
+> +               if (cprm.limit == 1) {
+> +                       /* See umh_coredump_setup() which sets RLIMIT_CORE = 1.
+> +                        *
+> +                        * Normally core limits are irrelevant to pipes, since
+> +                        * we're not writing to the file system, but we use
+> +                        * cprm.limit of 1 here as a special value, this is a
+> +                        * consistent way to catch recursive crashes.
+> +                        * We can still crash if the core_pattern binary sets
+> +                        * RLIM_CORE = !1, but it runs as root, and can do
+> +                        * lots of stupid things.
+> +                        *
+> +                        * Note that we use task_tgid_vnr here to grab the pid
+> +                        * of the process group leader.  That way we get the
+> +                        * right pid if a thread in a multi-threaded
+> +                        * core_pattern process dies.
+> +                        */
+> +                       coredump_report_failure("RLIMIT_CORE is set to 1, aborting core");
+> +                       goto fail_unlock;
+> +               }
+> +               cprm.limit = RLIM_INFINITY;
+> +
+> +               dump_count = atomic_inc_return(&core_dump_count);
+> +               if (core_pipe_limit && (core_pipe_limit < dump_count)) {
+> +                       coredump_report_failure("over core_pipe_limit, skipping core dump");
+> +                       goto fail_dropcount;
+> +               }
+> +
+> +               helper_argv = kmalloc_array(argc + 1, sizeof(*helper_argv),
+> +                                           GFP_KERNEL);
+> +               if (!helper_argv) {
+> +                       coredump_report_failure("%s failed to allocate memory", __func__);
+> +                       goto fail_dropcount;
+> +               }
+> +               for (argi = 0; argi < argc; argi++)
+> +                       helper_argv[argi] = cn.corename + argv[argi];
+> +               helper_argv[argi] = NULL;
+> +
+> +               retval = -ENOMEM;
+> +               sub_info = call_usermodehelper_setup(helper_argv[0],
+> +                                               helper_argv, NULL, GFP_KERNEL,
+> +                                               umh_coredump_setup, NULL, &cprm);
+> +               if (sub_info)
+> +                       retval = call_usermodehelper_exec(sub_info,
+> +                                                         UMH_WAIT_EXEC);
+> +
+> +               kfree(helper_argv);
+> +               if (retval) {
+> +                       coredump_report_failure("|%s pipe failed", cn.corename);
+> +                       goto close_fail;
+> +               }
+> +               break;
+> +       }
+> +       default:
+> +               WARN_ON_ONCE(true);
+> +               goto close_fail;
+>         }
+>
+>         /* get us an unshared descriptor table; almost always a no-op */
+>
+> --
+> 2.47.2
+>
 
