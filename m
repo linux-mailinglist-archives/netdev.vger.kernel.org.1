@@ -1,124 +1,160 @@
-Return-Path: <netdev+bounces-189395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18337AB1F92
-	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 00:02:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 743A3AB1FC0
+	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 00:13:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E6221C4460C
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 22:02:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B2D81C26627
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 22:14:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 127B521D3F6;
-	Fri,  9 May 2025 22:02:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71EE5262FFC;
+	Fri,  9 May 2025 22:13:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SIzYbLGd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IYKV3aNs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBEC73B2A0;
-	Fri,  9 May 2025 22:01:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3C83261565;
+	Fri,  9 May 2025 22:13:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746828120; cv=none; b=UmvVbbwCXZ1VbfHsiCaOA6/kH417TysGk9zVGRUhAZIyhQnQi7WmAhXeI+5wraUJDNS55Ki3xr9hcvbY1XtCbCiBjYkiM0zkjKty9T1q8eu9H2jOM0DkVZqwwUCq14jajAYy+h3Baqwb8NiQQ7eP8sjlYfIqAUR+/Th1I2Ax3nw=
+	t=1746828817; cv=none; b=YDFZ0pGErLwGJLhJ/LSfHLRVM3XfzkR8lT03RmKoqlxwZySE4eUwUU+nie+gvAVp7e+FRDLPUHcPSSN4INqbXBlxBmhZgHExtUeQy98hXMDrRfx6IASFxSTymrN7z5XN6K346FZipInFEJ231U6xmv2IxqhikbTTRc1xNHWXZKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746828120; c=relaxed/simple;
-	bh=gNZ3Syvjxa7YmkuREENTU9TsK6j8EtpbYbPGp0Oz+iM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D8tP9N/Jmuf5liCSHpP9v5oylx1l5GVNR0/PHBd5YZSYN2ZJiL6ZaFpeHKLfnDFwJ+RGHTmQ+Gvcq+HPv0gQqc19qbpYQAZu+NL81hWwSUZVtIl/cOnbvY+lAkGam7k4mBw7SgS5MfSyXvBelinYiOUVvoIBsuWwcWnbJbfBovs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SIzYbLGd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA2B5C4CEE4;
-	Fri,  9 May 2025 22:01:57 +0000 (UTC)
+	s=arc-20240116; t=1746828817; c=relaxed/simple;
+	bh=JEtojtxozBeZKb4L4slRczK0pe/giC0x9qDchrNk1q8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DMEZicljxU4WleBdeNhhJlfDS5+SiICeb0rhebwqK3gwI8QV05POED5l11jsjITj966Kw1MdswzGyyfmKqy7XiUrvfjRJbAgKlnw+2AcMyKLfBL3F1636/0eQvZb9ebwsu/hOkJQ5mUHePloSwt1BK+Mx8QHL4vgy+2lL8Nklvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IYKV3aNs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 862ABC4CEEE;
+	Fri,  9 May 2025 22:13:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746828118;
-	bh=gNZ3Syvjxa7YmkuREENTU9TsK6j8EtpbYbPGp0Oz+iM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SIzYbLGdKoxCOsVq94Z3lV63td2xvY+ylEJqzlgtqKp86q7mcV31BKzACjDfOtw0J
-	 k3uakoWbnAmEQ4CC9N1ER2LtjucJQnhC30Npo6Xko9BgUzLaeLWz1QpzGbiGIsFJ6q
-	 qyXbKgH50PayyUCY6qhovbnsv5MEc/NbUKNlR/u6XrBA2r9UA+UJWT76iMtN8v3FoL
-	 7Ee7VjXWZin5NJ19EFuoxh3P4XX8yusHSgK3p+ZxTdBaLaZjKuHWFxieLlGldgum86
-	 BNoIyDAhyrYRCuzh03K8PPQ0JByfbgA5tKRASU7/XtWHLsKmQHr+u6+kvgreDXSvoM
-	 LBrQ4f+yYMoAA==
-Date: Fri, 9 May 2025 15:01:57 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Sagi Maimon <maimon.sagi@gmail.com>
-Cc: jonathan.lemon@gmail.com, vadim.fedorenko@linux.dev,
- richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: [PATCH v2] ptp: ocp: Limit SMA/signal/freq counts in show/store
- functions
-Message-ID: <20250509150157.6cdf620c@kernel.org>
-In-Reply-To: <20250508071901.135057-1-maimon.sagi@gmail.com>
-References: <20250508071901.135057-1-maimon.sagi@gmail.com>
+	s=k20201202; t=1746828816;
+	bh=JEtojtxozBeZKb4L4slRczK0pe/giC0x9qDchrNk1q8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=IYKV3aNsMm0whQPXKjXlBEOn2trCbtazdDfHlO5yPtdyE5J3GweuFhzrUbr7Snoww
+	 qqZF7RYOoIR380q1jSD71Ck0351FOW3wBU334Ik2Q8iw6QLTEG3x62c0dOEubnlHGU
+	 uDwQ2z3vTuJcEfDVgiuuK7uYNS+RlyuRpoFTmbRRkVTsb++SFB42yPStgJALge6Uh1
+	 iF8eehmqqX8IawRvuD2N01tJxqP6opnaPgKie0o23LHTLxL8bziAXGZWya9r08SVRj
+	 YaudW4inWVVWlif6YhdroDU16ct+tjyIvqBrqpaI4K+X8q6bXBgXXjr35mKh6wnh0W
+	 8QSTtY9VxavPA==
+From: Bjorn Andersson <andersson@kernel.org>
+To: Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Wim Van Sebroeck <wim@linux-watchdog.org>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Rajendra Nayak <quic_rjendra@quicinc.com>,
+	Jassi Brar <jassisinghbrar@gmail.com>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Amit Kucheria <amitk@kernel.org>,
+	Thara Gopinath <thara.gopinath@gmail.com>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Zhang Rui <rui.zhang@intel.com>,
+	Lukasz Luba <lukasz.luba@arm.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Wesley Cheng <quic_wcheng@quicinc.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Souradeep Chowdhury <quic_schowdhu@quicinc.com>,
+	Lee Jones <lee@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alex Elder <elder@kernel.org>,
+	Alim Akhtar <alim.akhtar@samsung.com>,
+	Avri Altman <avri.altman@wdc.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Andy Gross <agross@kernel.org>,
+	Srinivas Kandagatla <srini@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Georgi Djakov <djakov@kernel.org>,
+	Loic Poulain <loic.poulain@oss.qualcomm.com>,
+	Robert Foss <rfoss@kernel.org>,
+	Andi Shyti <andi.shyti@kernel.org>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Taniya Das <quic_tdas@quicinc.com>,
+	Sibi Sankar <quic_sibis@quicinc.com>,
+	Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Imran Shaik <quic_imrashai@quicinc.com>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Jessica Zhang <quic_jesszhan@quicinc.com>,
+	David Airlie <airlied@gmail.com>,
+	Simona Vetter <simona@ffwll.ch>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Kees Cook <kees@kernel.org>,
+	Tony Luck <tony.luck@intel.com>,
+	"Guilherme G . Piccoli" <gpiccoli@igalia.com>,
+	David Wronek <david@mainlining.org>,
+	Jens Reidel <adrian@mainlining.org>,
+	Danila Tikhonov <danila@jiaxyga.com>
+Cc: devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-pm@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-watchdog@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-phy@lists.infradead.org,
+	linux-mmc@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	dmaengine@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-i2c@vger.kernel.org,
+	linux-clk@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	iommu@lists.linux.dev,
+	linux-remoteproc@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	linux-hardening@vger.kernel.org,
+	linux@mainlining.org,
+	~postmarketos/upstreaming@lists.sr.ht
+Subject: Re: (subset) [PATCH 17/33] dt-bindings: nvmem: qfprom: Add the SM7150 compatible
+Date: Fri,  9 May 2025 17:13:23 -0500
+Message-ID: <174682880484.49052.7211478690993150122.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250422213137.80366-1-danila@jiaxyga.com>
+References: <20250422213137.80366-1-danila@jiaxyga.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Thu,  8 May 2025 10:19:01 +0300 Sagi Maimon wrote:
-> The sysfs show/store operations could access uninitialized elements in
-> the freq_in[], signal_out[], and sma[] arrays, leading to NULL pointer
-> dereferences. This patch introduces u8 fields (nr_freq_in, nr_signal_out,
-> nr_sma) to track the actual number of initialized elements, capping the
-> maximum at 4 for each array. The affected show/store functions are updated to
 
-This line is too long. I think the recommended limit for commit message
-is / was 72 or 74 chars.
+On Wed, 23 Apr 2025 00:31:21 +0300, Danila Tikhonov wrote:
+> Document QFPROM compatible for SM7150.
+> 
+> 
 
-> respect these limits, preventing out-of-bounds access and ensuring safe
-> array handling.
+Applied, thanks!
 
-What do you mean by out-of-bounds access here. Is there any access with
-index > 4 possible? Or just with index > 1 for Adva?
+[31/33] dt-bindings: arm: qcom: Add SM7150 Google Pixel 4a
+        commit: bd4718d97d308fdc20ddcd471444b3e398ce877d
 
-We need more precise information about the problem to decide if this is
-a fix or an improvement 
-
-> +	bp->sma_nr  = 4;
-
-nit: double space in all the sma_nr assignments
-
->  
->  	ptp_ocp_fb_set_version(bp);
->  
-> @@ -2862,6 +2870,9 @@ ptp_ocp_art_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
->  	bp->fw_version = ioread32(&bp->reg->version);
->  	bp->fw_tag = 2;
->  	bp->sma_op = &ocp_art_sma_op;
-> +	bp->signals_nr = 4;
-> +	bp->freq_in_nr = 4;
-> +	bp->sma_nr  = 4;
->  
->  	/* Enable MAC serial port during initialisation */
->  	iowrite32(1, &bp->board_config->mro50_serial_activate);
-> @@ -2888,6 +2899,9 @@ ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
->  	bp->flash_start = 0xA00000;
->  	bp->eeprom_map = fb_eeprom_map;
->  	bp->sma_op = &ocp_adva_sma_op;
-> +	bp->signals_nr = 2;
-> +	bp->freq_in_nr = 2;
-> +	bp->sma_nr  = 2;
->  
->  	version = ioread32(&bp->image->version);
->  	/* if lower 16 bits are empty, this is the fw loader. */
-> @@ -3002,6 +3016,9 @@ ptp_ocp_sma_show(struct ptp_ocp *bp, int sma_nr, char *buf,
->  	const struct ocp_selector * const *tbl;
->  	u32 val;
->  
-> +	if (sma_nr > bp->sma_nr)
-> +		return 0;
-
-Why are you returning 0 and not an error?
-
-As a matter of fact why register the sysfs files for things which don't
-exists?
+Best regards,
 -- 
-pw-bot: cr
+Bjorn Andersson <andersson@kernel.org>
 
