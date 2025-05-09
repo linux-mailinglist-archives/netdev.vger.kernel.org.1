@@ -1,135 +1,163 @@
-Return-Path: <netdev+bounces-189199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE1A9AB127C
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 13:50:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6704FAB1290
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 13:52:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 027451BC7562
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 11:50:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4D464A60D8
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 11:52:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E077328F934;
-	Fri,  9 May 2025 11:50:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rDMP5Xzr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BB2A291166;
+	Fri,  9 May 2025 11:51:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F091A4B1E5D
-	for <netdev@vger.kernel.org>; Fri,  9 May 2025 11:50:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9927E28ECD8;
+	Fri,  9 May 2025 11:51:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746791433; cv=none; b=uhdKesm+3ChhKwLCcjBJYhg3e7J+9jeayIsQS1YfOwgPr6R97cLAGfbsRdWpPRoVLm2LVc2mBkUbBZFqdVzkzKZ6u5h+igPpcjnt6TPid0NEEnA9NKfj37p97OgZZs6zU8dPb0UEUkq4JJhN5WvLQt9z/dU7k7Vk/P+BxKGsexw=
+	t=1746791504; cv=none; b=lx579mM2O8vJbEKZALHEvp6bR9yabhugpvjlCuLnHxyLYsW5+JNcXFtYapwuzLvAwZV1KBjD6XO5wGvCdCoSfnW6c1HC2k618MmIT8XSqncvz4PzEotJeKtj8qNhn5Yj5oGrO5zTV8+d9zu616bwM6350SRQxrXFfA+ATdXd9rY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746791433; c=relaxed/simple;
-	bh=6bSX9UNo+ut9uhyeztVWH22aZ+WPLHdTGC7kWwCUCXg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dWhcnopxQ7hUbTCUwYAftTepTwC8kzqLm00FDD/XrIqVRfBE2mvEjK+Vfv3fMBZvYSOcv0a/uDrHDcKigl5MCQUY7Pu96ySGH+vtzBbuzZU9nrTpE9wiaqLAHSffB/G0ZK1fOI/o+bRAjmDHktr/BeXRTT8hDgO9Gwm0eMQpIp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=rDMP5Xzr; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-54c090fc7adso2997078e87.2
-        for <netdev@vger.kernel.org>; Fri, 09 May 2025 04:50:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1746791430; x=1747396230; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6bSX9UNo+ut9uhyeztVWH22aZ+WPLHdTGC7kWwCUCXg=;
-        b=rDMP5XzrQ88umTP+9l67/zJpEOw9Tf5QRqmG8aid0Jm776jOYiSyw2ws4geCLljooS
-         JCnksf09yvbYgNnZrOpyZ4cmJktwmGqdGkqo2vEo5Io5P24KiCjl3aKESEHxnLLWs1NH
-         2lUA37eKUFR5c5QlKodJORWKFRN6wN+LCC8S3RKJcsImFCoknUUjmZiIZOSlyaFI/ftQ
-         iz02M+0jkawlqKfEL0vbGX54kzdzRkX5lP4Sge71epwG0v5DENaKpj/P1FEBxYwk9PeI
-         eRdTUV4XUD5FraSmI5vLEuJ+K5PdCjHH3uAAxFV/2TVnQpF1qz7ZGwUW01bx2ByhIc/c
-         LIFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746791430; x=1747396230;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6bSX9UNo+ut9uhyeztVWH22aZ+WPLHdTGC7kWwCUCXg=;
-        b=Kn6lx+CWf3OQFHi2RQsjpm+nZds2Wy+JHOE/1k3su+J5fpirUSQPwVdnf20Wg0vrbt
-         6o4Y2nCaljXSa77I34wHZCPGS3zwA4q+SbqSabdF8LUB7B5g6f8rLZ07NFX9/q2Zv+6u
-         bcsozKwytkLMUd99Mcdf4p2KnoNUUAc0O1GhLa0PSSht7L0z569G0IlaqYVjJvA5hah+
-         VS0DRe4LDblnuIIQ8N8nNavI9PfqOeBtK0NSxOK/N7nsYWAyg0EBqIba+g16IjSLB0tp
-         zLD/afmMtY/v3h029zhTch2zDrUd2k5GxZ9+G/wRCk2tgtP4C2/rOwyt+e/9ptzClgrh
-         vgwg==
-X-Forwarded-Encrypted: i=1; AJvYcCVfZJv3GCm8rt3x1MqqMtg+34i44+yvIfQPaggQNzm7SJpvHiRAybD1Dzf6Gzgn20M4sluWc6o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPGTq+XaaNGgO/ijPtwnfWsxmf0LYTTEHfURHqDMGstrL6435x
-	u/Oz6nJL5TJ9NIfJ91+r3U2ejF6VOQsxG+DVAVNsAI7p/mjw5tIGfPMuj2bS4rHTUcRd2eRZJnv
-	f60pRWV4o0xKIqIkVa4eor7ffzlyhYgRhPk2/2alIY6eiUoVy
-X-Gm-Gg: ASbGncvi0U+iH5Qh8B7ovv38Y2LsO+r2I4EBd2h20/RFIMNLOtZs9l8sPsBoA1+Y/VX
-	596Hj8JamcXILOyf4qLwgLy37FORpOQjFTc4eLF81Z5pqJRL5XBtthhI4sMME2LAZX1UKkf0pwv
-	VYnBSDlXx8VqG8RQEeNCkvYBuAe628f4TN
-X-Google-Smtp-Source: AGHT+IE9OA/TgX88UK8wnm39DMsSy6I7xruaMSROXFg88YbOwzBbcaNlmJPRpQ8Ckx3l33XEBcNwePAgT7TtPdM2+0E=
-X-Received: by 2002:a2e:a991:0:b0:300:26bc:4311 with SMTP id
- 38308e7fff4ca-326c4575642mr10757241fa.18.1746791429976; Fri, 09 May 2025
- 04:50:29 -0700 (PDT)
+	s=arc-20240116; t=1746791504; c=relaxed/simple;
+	bh=ahRvGyDp/0glVQdyyjcRPGs0TtGVJN5Yys2SjqBdLGg=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=jYStlKyFw3AllEGuA6J21WWMU7scTqCGlFbkyMc1g8y16MbbfUf7pkA2S1hOHxLrOPTyBTceoDn5PYHuFp9xJAEAa4B7InwmiwsKGFY22O2H1d+iM2FvRKIHmkU2S2yEYognZ5jDchjS7vjnZONHMFH0XSjcIVFRGiGzuxdmHw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-669ff7000002311f-26-681dec488b68
+From: Byungchul Park <byungchul@sk.com>
+To: willy@infradead.org,
+	netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	kernel_team@skhynix.com,
+	kuba@kernel.org,
+	almasrymina@google.com,
+	ilias.apalodimas@linaro.org,
+	harry.yoo@oracle.com,
+	hawk@kernel.org,
+	akpm@linux-foundation.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	davem@davemloft.net,
+	john.fastabend@gmail.com,
+	andrew+netdev@lunn.ch,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	vishal.moola@gmail.com
+Subject: [RFC 00/19] Split netmem from struct page
+Date: Fri,  9 May 2025 20:51:07 +0900
+Message-Id: <20250509115126.63190-1-byungchul@sk.com>
+X-Mailer: git-send-email 2.17.1
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrMLMWRmVeSWpSXmKPExsXC9ZZnoa7nG9kMgzfPWCzmrF/DZrH6R4XF
+	8gc7WC2+/LzNbrF44TdmiznnW1gsnh57xG5xfxlQ2Z727cwWvS2/mS2adqxgsriwrY/V4vKu
+	OWwW99b8Z7U4tkDM4tvpN4wW6/fdYLX4/WMOm4OQx5aVN5k8ds66y+6xYFOpx+YVWh5dNy4x
+	e2xa1cnmsenTJHaPO9f2sHmcmPGbxWPnjs9MHh+f3mLxeL/vKpvH501yAbxRXDYpqTmZZalF
+	+nYJXBnPFjxnKrgmW3F+TQtrA+MKsS5GDg4JAROJu6dkuhg5wcxFS7+zg9hsAuoSN278ZAax
+	RQQMJT4/Os7SxcjFwSywkFniyuKfYEXCAkYSl2Y1MoLYLAKqEtcmzwWL8wqYSqzvPMAMMVRe
+	YvUGEJsLyH7OJrFo+h5WiISkxMEVN1gmMHIvYGRYxSiUmVeWm5iZY6KXUZmXWaGXnJ+7iREY
+	1Mtq/0TvYPx0IfgQowAHoxIPr8Vz2Qwh1sSy4srcQ4wSHMxKIrzPO2UyhHhTEiurUovy44tK
+	c1KLDzFKc7AoifMafStPERJITyxJzU5NLUgtgskycXBKNTC2fZr8+MCl43p2HluFon31V26z
+	31j13pA9J9owrEM7vynmxYW7B/bI6Qv+25J2VnKVjWOGb6yi8lnz2cnn7GZVvRNqKJlcc2K5
+	0O1GnxczbiTyznKImfJ7Dn+9RcGZXb1uSq/2S0XcUlb1ZufhPb+CV7BvOctip1d8xfIyV5WS
+	jrCujXcKvKLEUpyRaKjFXFScCACqmHYCZgIAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrNLMWRmVeSWpSXmKPExsXC5WfdrOvxRjbDYPpfE4s569ewWaz+UWGx
+	/MEOVosvP2+zWyxe+I3ZYs75FhaLp8cesVvcX/aMxWJP+3Zmi96W38wWTTtWMFkcnnuS1eLC
+	tj5Wi8u75rBZ3Fvzn9Xi2AIxi2+n3zBarN93g9Xi9485bA7CHltW3mTy2DnrLrvHgk2lHptX
+	aHl03bjE7LFpVSebx6ZPk9g97lzbw+ZxYsZvFo+dOz4zeXx8eovF4/2+q2wei198YPL4vEku
+	gC+KyyYlNSezLLVI3y6BK+PZgudMBddkK86vaWFtYFwh1sXIySEhYCKxaOl3dhCbTUBd4saN
+	n8wgtoiAocTnR8dZuhi5OJgFFjJLXFn8E6xIWMBI4tKsRkYQm0VAVeLa5LlgcV4BU4n1nQeY
+	IYbKS6zecIB5AiPHAkaGVYwimXlluYmZOaZ6xdkZlXmZFXrJ+bmbGIFBuqz2z8QdjF8uux9i
+	FOBgVOLhtXgumyHEmlhWXJl7iFGCg1lJhPd5p0yGEG9KYmVValF+fFFpTmrxIUZpDhYlcV6v
+	8NQEIYH0xJLU7NTUgtQimCwTB6dUA2PRj46qU44VK5mOLPNqucitmi+kce6fqtIVoTPbhDat
+	qH4qsc412FRw6fRdHiUSdxrV9QKmz9fOevNgosyKnldteRXTaw8Xrf4fP08gbr4A8/f7Sws5
+	W2UqOc+cibTe+zO0R+g4b0HhvM/szmb6x810+fROJxXI5TZ/ffh/M/8FoZO1xy9bzVFiKc5I
+	NNRiLipOBABTo7tITgIAAA==
+X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250424-01-sun55i-emac0-v2-0-833f04d23e1d@gentoo.org>
- <20250424-01-sun55i-emac0-v2-3-833f04d23e1d@gentoo.org> <CAGb2v66a4ERAf_YhPkMWJjm26SsfjO3ze_Zp=QqkXNDLaLnBRg@mail.gmail.com>
- <20250425104128.14f953f3@donnerap.manchester.arm.com> <CAGb2v65QUrCjgHXWAb72Sdppqg1AUxXyD_ZcXShtkRSHCQBbOg@mail.gmail.com>
- <20250425160535.5a18adbb@donnerap.manchester.arm.com>
-In-Reply-To: <20250425160535.5a18adbb@donnerap.manchester.arm.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Fri, 9 May 2025 13:50:18 +0200
-X-Gm-Features: ATxdqUG6U2bPxTcfQiBy-oW1Lju29rGeV9-TYLkpQrHjbRn14HSqGi03f0yvO10
-Message-ID: <CACRpkdZH+NnP0-GkLe+nHK-Oi_Z=FzPaM=k1U-gZddp+P2+DTw@mail.gmail.com>
-Subject: Re: [PATCH v2 3/5] arm64: dts: allwinner: a523: Add EMAC0 ethernet MAC
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Chen-Yu Tsai <wens@csie.org>, Yixun Lan <dlan@gentoo.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, 
-	Maxime Ripard <mripard@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Corentin Labbe <clabbe.montjoie@gmail.com>, devicetree@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 25, 2025 at 5:05=E2=80=AFPM Andre Przywara <andre.przywara@arm.=
-com> wrote:
-> On Fri, 25 Apr 2025 22:35:59 +0800
-> Chen-Yu Tsai <wens@csie.org> wrote:
->
-> adding LinusW for a more generic pinctrl question ...
+The MM subsystem is trying to reduce struct page to a single pointer.
+The first step towards that is splitting struct page by its individual
+users, as has already been done with folio and slab.  This patchset does
+that for netmem which is used for page pools.
 
-OK!
+Matthew Wilcox tried and stopped the same work, you can see in:
 
-> > There isn't any assumption, as in we were fine with either the reset
-> > default or whatever the bootloader left it in. However in projects at
-> > work I learned that it's better to have explicit settings despite
-> > working defaults.
->
-> I totally agree, but my point was that this applies basically to every
-> pinctrl user. I usually think of the bias settings as "do we need
-> pull-ups or pull-downs", and if nothing is specified, I somewhat assume
-> bias-disable.
->
-> So I am fine with this being added here, but was wondering if we should
-> look at a more generic solution.
->
-> Linus: is bias-disable assumed to be the default, that pinctrl drivers
-> should set in absence of explicit properties? Or is this "whatever is in
-> the registers at boot" the default we have to live with?
+   https://lore.kernel.org/linux-mm/20230111042214.907030-1-willy@infradead.org/
 
-We have never hammered down the semantics of that, so it's a bit
-up to the specific driver how they implement it (yeah a grey area...)
+Mina Almasry already has done a lot fo prerequisite works by luck, he
+said :).  I stacked my patches on the top of his work e.i. netmem.
 
-There are many drivers that are carful to not touch register boot
-values but others who set them to some default, and people
-have different opinions on that.
+I focused on removing the page pool members in struct page this time,
+not moving the allocation code of page pool from net to mm.  It can be
+done later if needed.
 
-Yours,
-Linus Walleij
+There are still a lot of works to do, to remove the dependency on struct
+page in the network subsystem.  I will continue to work on this after
+this base patchset is merged.
+
+This patchset is based on mm tree's mm-unstable branch.
+
+Byungchul Park (19):
+  netmem: rename struct net_iov to struct netmem_desc
+  netmem: introduce netmem alloc/put API to wrap page alloc/put API
+  page_pool: use netmem alloc/put API in __page_pool_alloc_page_order()
+  page_pool: rename __page_pool_alloc_page_order() to
+    __page_pool_alloc_large_netmem()
+  page_pool: use netmem alloc/put API in __page_pool_alloc_pages_slow()
+  page_pool: rename page_pool_return_page() to page_pool_return_netmem()
+  page_pool: use netmem alloc/put API in page_pool_return_netmem()
+  page_pool: rename __page_pool_release_page_dma() to
+    __page_pool_release_netmem_dma()
+  page_pool: rename __page_pool_put_page() to __page_pool_put_netmem()
+  page_pool: rename __page_pool_alloc_pages_slow() to
+    __page_pool_alloc_netmems_slow()
+  mlx4: use netmem descriptor and API for page pool
+  netmem: introduce page_pool_recycle_direct_netmem()
+  page_pool: expand scope of is_pp_{netmem,page}() to global
+  mm: page_alloc: do not directly access page->pp_magic but use
+    is_pp_page()
+  mlx5: use netmem descriptor and API for page pool
+  netmem: use _Generic to cover const casting for page_to_netmem()
+  netmem: remove __netmem_get_pp()
+  page_pool: make page_pool_get_dma_addr() just wrap
+    page_pool_get_dma_addr_netmem()
+  mm, netmem: remove the page pool members in struct page
+
+ drivers/net/ethernet/mellanox/mlx4/en_rx.c    |  46 ++++----
+ drivers/net/ethernet/mellanox/mlx4/en_tx.c    |   8 +-
+ drivers/net/ethernet/mellanox/mlx4/mlx4_en.h  |   4 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en.h  |   4 +-
+ .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |  18 +--
+ .../net/ethernet/mellanox/mlx5/core/en/xdp.h  |   2 +-
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |  15 ++-
+ .../net/ethernet/mellanox/mlx5/core/en_rx.c   |  66 +++++------
+ include/linux/mm_types.h                      |  13 +--
+ include/linux/skbuff.h                        |  18 ++-
+ include/net/netmem.h                          |  88 +++++----------
+ include/net/netmem_type.h                     |  22 ++++
+ include/net/page_pool/helpers.h               |  17 ++-
+ include/net/page_pool/memory_provider.h       |   6 +-
+ include/net/page_pool/types.h                 |   2 +
+ io_uring/zcrx.c                               |  42 +++----
+ mm/page_alloc.c                               |   5 +-
+ net/core/devmem.c                             |  14 +--
+ net/core/devmem.h                             |  24 ++--
+ net/core/page_pool.c                          | 106 ++++++++++--------
+ net/core/skbuff.c                             |   5 -
+ net/ipv4/tcp.c                                |   2 +-
+ 22 files changed, 272 insertions(+), 255 deletions(-)
+ create mode 100644 include/net/netmem_type.h
+
+
+base-commit: fd93b3350b4314eebd8fbf0fea3ca7fe48d777e3
+-- 
+2.17.1
+
 
