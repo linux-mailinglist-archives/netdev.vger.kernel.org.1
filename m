@@ -1,140 +1,127 @@
-Return-Path: <netdev+bounces-189132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B36D9AB090E
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 06:10:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56B3EAB0938
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 06:34:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 150951B6377E
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 04:10:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C52E74A4311
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 04:34:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8896423D29F;
-	Fri,  9 May 2025 04:10:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E0742222BD;
+	Fri,  9 May 2025 04:34:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="H78EiTAG"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="UBhFuKjb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF4751D7985
-	for <netdev@vger.kernel.org>; Fri,  9 May 2025 04:10:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8C945038
+	for <netdev@vger.kernel.org>; Fri,  9 May 2025 04:34:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746763816; cv=none; b=RkfFYAjNsug0Se+9MPSsc/rZc1um3nXY8uhY5mO0nbHig7ZxFRelXUrglFQFwedHhOQD6/MQbWmWR/t7RQw3n5pXfWvbMtcmJNvcp3clYhg4cfAM9BtF2sVhNcZCLPH3hBvqPQOpyFpw/nZPN8N6Eb+2zdZ3S3JZvnIO5USVwVs=
+	t=1746765256; cv=none; b=oqKxfvtT4otV9rJHOoK4lLl/2rI8sLtrxJq4SdrNXq9b5xTXQRsINfnwPrIVuTx7gi46vfdc6WQA6eXl4DbobyNBvDIeBqQ+LakBTvuzvg9Hg/oNWxCF9omfu8/kP1v8OPuHGFXhGsUWD1Sro4kOJBQP7MElGBt2dUKUGsXnboc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746763816; c=relaxed/simple;
-	bh=qn0j00Q4lWXNjM61TVOR73jQu4hSjMBc//b4ByjjlDQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qcIsQEACqXxHHGUc7McpjPE71fP4EIEkj5jNqDWTpM8VqBoMfjZ/CMrw58oHJe2KLQrNCaIW5DrINNTi/SjoH2knYCemdI9SuIe1s4IOPNERvyDInJBjuoak4e4gpBp72JvONPYQudz8piWknLQNzgJwgdOEyWe8ULGBSFlufYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=H78EiTAG; arc=none smtp.client-ip=209.85.215.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-b1f7357b5b6so1071691a12.0
-        for <netdev@vger.kernel.org>; Thu, 08 May 2025 21:10:14 -0700 (PDT)
+	s=arc-20240116; t=1746765256; c=relaxed/simple;
+	bh=lRXs+btgAF22JonG0WjXB55OVOTHb44eCwBIXnZLCis=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Oc+Rjd3B2n6UR/dkNoRN7O9BiUbthdSAMfO79zeASB1YD5o5DZZKYTh7OQfe/SO9SIpE6kfis/D747nNuDkk1bYxfeMZf/W+qfNmLhhzRN7Deqmw+a7uJc8UCIWFu5yS1m6rmOuZBc/OKeQfgnFvSFgN4jF+03QhlObYxZxkjjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=UBhFuKjb; arc=none smtp.client-ip=72.21.196.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1746763814; x=1747368614; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gOPt985lsryufrF2f8Rp/LqwNq9TFhhzPNpr6WI7mLk=;
-        b=H78EiTAGBP/eSZtpKU4O7AkmbB7c0NwV4GOoLa6j98Z8i5LuY846ffMW9OvosBR57E
-         7pTiLxd5Rcpj7vhvmMtlZsQjGkYA3mpJknQThjvk64fpQQq/MA6wOE4xs1smA37QalR4
-         t0YLmgoGt6DYQSrleEY14yvZ9E3tW3CS8JFtThPBb4HvE/c6yd8W33X40gDztNwmHbgz
-         KBY8dGLlJQEEmfrAPTkQLC2TRl7bwgL7QONB7DsHu7L/RF2N85KiAdiprebR9Wvc2X5+
-         +CUfqo9bFSWXa0Z7xyRrKlSHP5KjjYVyvDsGTCfEtyueRVSBPiAHaKerJ1LIBWIKdLa9
-         MrDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746763814; x=1747368614;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gOPt985lsryufrF2f8Rp/LqwNq9TFhhzPNpr6WI7mLk=;
-        b=vC2EeyvikVKetgUD8ukC6MHZrfGVdJP2rNO3QHWecaKWK/Syd13JHZkFvCXR/1Pv4v
-         M9fcW4OUPZXjUgpvP4ZWnvrVfo2qhgPCwwhffcv5bl0Jg/BtOdC9rVBXBB/jE1BfgGJt
-         QJqRzR3aArWVU5yqvASiv5MsxMOi1Pl/nrJYQE/yJcEM/PzTNyI9n4M1S4mb0WvrBrxZ
-         F5h+AyjN/qhJcsn+FxdLUF6lQs1GdcFYNio89rJ+9ByoZtl7egfI8DsPUBHfJsnJV+21
-         g8YsPA3482J3ol7EwKe3WmHZZqIIeZE27kNqgeNd7+6a1OwNEnaudCiq5FPszOfMct57
-         Wkdg==
-X-Forwarded-Encrypted: i=1; AJvYcCVUipfgM1i8ZFOKDGHR7FV5IZff2sndj16nCRigVHog28YRst4sTtMg0K4faytMg0JmPEcoQDY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzcCaAkCuRAFoAUpWx5jm+ysuYNcpDHrEvAGAcGe0ur5O6gN3yy
-	/dXIFNyx0mOiqXMNGbcqndPsWjI1DBW6zJaKsQKHRWW7mygkp/TvopTklCYcwWc=
-X-Gm-Gg: ASbGncsMawqmTySWEQIY7ZkKtrF8qti8yWkDaSsTPZTK5CEon+iZjUG/nCOA2lbkzgW
-	ETyWmJun+axuL8VZ4A5L1G7z6XV2IzDS69ZYOA2tAyjaSVFpMf1MUbl4us+HfcoyjQfSGhTuepU
-	A1FHuOTP7lL3yeJrW3z8VYWWLpgfZMcgoedMDTsvxntFpy5J/iHo7c2yr0ibnP5CNZwkoghjPmg
-	hd11s5YX7eHXkLqLBGbZIFyhmXpDfhaHK2+DuxtSnaz6F/CneFrlUDXXzcGb0PlnMIXGljIfGgE
-	iNh1G89r3i6XiXfJ4jpjSIbGeP7h1Nwx6e/NGogCwq974HY=
-X-Google-Smtp-Source: AGHT+IGld+rlMK8n8nhzZTd9tL87p1xppP25t3sLIo0ygGvlHlV56UBGyyKEeAa17jr3ahMyKHEBTw==
-X-Received: by 2002:a17:902:ea0c:b0:22e:17ac:9dd8 with SMTP id d9443c01a7336-22fc8c7d71emr24684365ad.29.1746763814065;
-        Thu, 08 May 2025 21:10:14 -0700 (PDT)
-Received: from [192.168.1.21] ([97.126.136.10])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22fc773ee47sm8139185ad.63.2025.05.08.21.10.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 May 2025 21:10:13 -0700 (PDT)
-Message-ID: <d8693a9b-697a-49d7-a064-fc7349ec2d63@davidwei.uk>
-Date: Thu, 8 May 2025 21:10:13 -0700
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1746765255; x=1778301255;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=e6sD3KzXBTVKLiEOAJd5UURlCNDdOQUIVJ6ZFaNdIis=;
+  b=UBhFuKjbXam/7mkDTO7EJyv5jzI9meI47wqrkIUl3G0RvvhgPFdNu2Ko
+   6Ww6NHylppalfgCs6UPM/Ff/egGqw5ZP5bUixoO4Zzvxs3V2mnn/ptZOq
+   sPnbZrxmRnFWN8OdX5WHYy6qt0AqxY8JO1JjBvrEHpKS5mxxxZtgyMljB
+   rFCkhUHtacbrwSv6MbibkkjlR+nMhT8lTQ5mqEmwMlfzI+2N86seDnn1+
+   54C2HfS2XULQ5c4xmbSLk1uIEa9oX0ema5Ihqp9ITTzsL26ypWah/rXHp
+   Q1hxsnfAq5N/u1cFRzIg6ngrdDXmuutK3U3Yz7f/BwFAg3VzW0/8/F+Oi
+   Q==;
+X-IronPort-AV: E=Sophos;i="6.15,274,1739836800"; 
+   d="scan'208";a="490559616"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2025 04:34:11 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:63426]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.10.32:2525] with esmtp (Farcaster)
+ id 4bbedb25-dffc-4697-aba6-11367dc5370d; Fri, 9 May 2025 04:34:10 +0000 (UTC)
+X-Farcaster-Flow-ID: 4bbedb25-dffc-4697-aba6-11367dc5370d
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 9 May 2025 04:34:09 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.106.100.30) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 9 May 2025 04:34:06 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kuba@kernel.org>
+CC: <brauner@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<horms@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <willemb@google.com>
+Subject: Re: [PATCH v1 net-next 4/7] af_unix: Move SOCK_PASS{CRED,PIDFD,SEC} to sk->sk_flags.
+Date: Thu, 8 May 2025 21:33:52 -0700
+Message-ID: <20250509043358.14640-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250508201502.5bbbc51e@kernel.org>
+References: <20250508201502.5bbbc51e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] selftests: drv-net: ping: make sure the ping
- test restores checksum offload
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- shuah@kernel.org, linux-kselftest@vger.kernel.org
-References: <20250508214005.1518013-1-kuba@kernel.org>
- <e339c382-c0f5-40dd-994e-34b388c68181@davidwei.uk>
- <20250508183736.74707daf@kernel.org>
-Content-Language: en-US
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20250508183736.74707daf@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D045UWA002.ant.amazon.com (10.13.139.12) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 5/8/25 18:37, Jakub Kicinski wrote:
-> On Thu, 8 May 2025 14:59:12 -0700 David Wei wrote:
->>> +def _schedule_checksum_reset(cfg, netnl) -> None:
->>> +    features = ethtool(f"-k {cfg.ifname}", json=True)
->>> +    setting = ""
->>> +    for side in ["tx", "rx"]:
->>> +        f = features[0][side + "-checksumming"]
->>> +        if not f["fixed"]:
->>
->> I checked and found that "fixed" is a ternary:
->>
->>           "rx-checksumming": {
->>               "active": true,
->>               "fixed": false,
->>               "requested": true
->>           },
->>           "tx-checksumming": {
->>               "active": true,
->>               "fixed": null,
->>               "requested": null
->>           },
->>
->> Python loads this JSON as False and None types respectively, and `not
->> f["fixed"]` is true for both False and None. Maybe this doesn't matter
->> but flagging it.
+From: Jakub Kicinski <kuba@kernel.org>
+Date: Thu, 8 May 2025 20:15:02 -0700
+> On Wed, 7 May 2025 18:29:16 -0700 Kuniyuki Iwashima wrote:
+> > diff --git a/include/net/sock.h b/include/net/sock.h
+> > index f0fabb9fd28a..48b8856e2615 100644
+> > --- a/include/net/sock.h
+> > +++ b/include/net/sock.h
+> > @@ -964,6 +964,10 @@ enum sock_flags {
+> >  	SOCK_RCVMARK, /* Receive SO_MARK  ancillary data with packet */
+> >  	SOCK_RCVPRIORITY, /* Receive SO_PRIORITY ancillary data with packet */
+> >  	SOCK_TIMESTAMPING_ANY, /* Copy of sk_tsflags & TSFLAGS_ANY */
+> > +	SOCK_PASSCRED, /* Receive SCM_CREDENTIALS ancillary data with packet */
+> > +	SOCK_PASSPIDFD, /* Receive SCM_PIDFD ancillary data with packet */
+> > +	SOCK_PASSSEC, /* Receive SCM_SECURITY ancillary data with packet */
+> > +	SOCK_FLAG_MAX,
+> >  };
 > 
-> I think so, yes.
+> 32b builds break:
 > 
->>> +            setting += " " + side
->>> +            setting += " " + ("on" if f["requested"] or f["active"] else "off")
->>> +    defer(ethtool, f" -K {cfg.ifname} " + setting)
->>
->> This does rx/tx-gro too even if not explicitly requested. I assume that
->> is okay?
-> 
-> You mean because those are automatically updated when we change
-> checksumming? If so then yes.
+> include/linux/compiler_types.h:557:45: error: call to ‘__compiletime_assert_809’ declared with attribute error: BUILD_BUG_ON failed: BYTES_TO_BITS(sizeof(sk->sk_flags)) <= SOCK_FLAG_MAX
 
-Thanks for responding.
+Oops, thanks for catching!
 
-Reviewed-by: David Wei <dw@davidwei.uk>
+Will create a space like this in v2.
+
+---8<---
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 371053316d2c..59c077df9eb8 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -521,8 +521,9 @@ struct sock {
+ #if BITS_PER_LONG==32
+ 	seqlock_t		sk_stamp_seq;
+ #endif
+-	int			sk_disconnects;
++	u16			sk_disconnects;
+ 
++	u8			sk_csm_flags;
+ 	u8			sk_txrehash;
+ 	u8			sk_clockid;
+ 	u8			sk_txtime_deadline_mode : 1,
+---8<---
 
