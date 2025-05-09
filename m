@@ -1,56 +1,68 @@
-Return-Path: <netdev+bounces-189352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A9A9AB1D6C
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 21:46:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1631BAB1D76
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 21:48:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81D221C410D9
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 19:46:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB2613B063E
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 19:48:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A189A23C8C5;
-	Fri,  9 May 2025 19:46:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34A7C25E477;
+	Fri,  9 May 2025 19:48:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ihZVhp6M"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="JtkAbn2m"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7916A22E3E9;
-	Fri,  9 May 2025 19:46:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEBEB25E45B;
+	Fri,  9 May 2025 19:48:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746819986; cv=none; b=NEaZm/NhCLeALNFYzdvtJLpF6Q3pmLK0GJkeiUgv67Ds8lFQNlBX7XbPENTW4d5Yk84ZkW+LHoFg0GfXF7V6CvCsjtI7xN6/jaKOhyPEFvaUVQMzjsOf3TlDsQPmgZmRV09aVY8PIMO+2X0UcV0Bu3ZSF73DMn37BgJYNyrufvY=
+	t=1746820126; cv=none; b=dS1bN+4Q1aF89GW7Cze749VI5BS2WZCW4RxT0GCPDVioVvFfPc7ltBsJlgL7GQy8WsqfFR0OSKNDDTSaifTDsbGgAUEU37izgcZqA5KUYMlQYzgb88J5Puuiyr4pR5ETHGe1/jxGx6KQRxJxrShaAHoNCq3Y5v7VsWT2lfE3pT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746819986; c=relaxed/simple;
-	bh=xMrb+rDPrSCIyK2OkucvlROXsFEcbJSgaNN+mqQk+QI=;
+	s=arc-20240116; t=1746820126; c=relaxed/simple;
+	bh=KGhFHYEIxwjIBJu3+qNdIII2b9QWNi6R/vnEJwBpNio=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q88eLSx8SNFFT42eGM5ndGLhivmbjo4SloVdz0CSsY+4ZwhevhMu9u3wAqF5mwNQDCI/wtx9o8KGt4QvT5OOA0c5cHr1kVANxKbG0O/GBJFiHKnbon70Veu5SoVCSSBH1fSZQ5V1kIXayfGjo2c32tbE0PUtoNAFX3A/LmL6XXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ihZVhp6M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD83AC4CEE4;
-	Fri,  9 May 2025 19:46:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746819985;
-	bh=xMrb+rDPrSCIyK2OkucvlROXsFEcbJSgaNN+mqQk+QI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ihZVhp6MdL77p7iiThFGHHufeeiTopYAZUKPxTMGInJTVI7xr9SBmFL8S87Yc7+SS
-	 TPn8tS4qiwlGAQu37oxIAPR5sIE/nSdKGlRvRjGThNkJQMKpqRdJZ+Voo1iGTUI9hC
-	 6gUfWDt41RosJC2OO8eKOJf8JxYAnMxXu7mK8zaqtWb2oBLlPMYhsTgEIK6J1uC0HK
-	 hZYaBco5+Ox6oCQs+YYD94K9Ka9VYOOnZLRNZ4iY8J6Bi78s25cEUVpVgH7p1CUPRg
-	 FjMeaCEmNrOT4gDHAFUtJeVzpL9PnfkPlC83A0O6Fi2keISBX4DVGCEYwip4hNpSd0
-	 aTzLmKrFPASAA==
-Date: Fri, 9 May 2025 12:46:22 -0700
-From: Kees Cook <kees@kernel.org>
-To: syzbot <syzbot+628f93722c08dc5aabe0@syzkaller.appspotmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] UBSAN: array-index-out-of-bounds in
- llc_conn_state_process (2)
-Message-ID: <202505091223.3C51585567@keescook>
-References: <0000000000009767ec0619fe6a1d@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=kQfHh3otxPxCZiNi5Zvl/uUKHIXLyyhezdSDtEu3P24zTZzJAg7Er+35hoXa8I8gtLUjOKSjgAJ342NmEtCTXgfiYBXnqN0OmGsVd8iKBL0A36wSnQso/vHDkJ83ndDiJbADDA3JmqBLglOQrK8C3RGzLbbl1UQBjpEkzbYuU/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=JtkAbn2m; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=LHzIEA61Md5/xpeDzeP5A1UdrB0NGR5BHd5W1xhlBOs=; b=JtkAbn2mI5hQHgI6W7flVzUtrh
+	mpI1gsSyMvrONBoXr3Zj/SOFDfINrQ4etEVWyKOw8ZuwruWJJ2depHPJc6SbVr6digw77yzcyQhLe
+	pZ37NhsrRcVzroJdOhFDB2qvriramcVdh2Y8a5pBw05k/p2J4U3AFiZFb0H5ssU80NoSj2lachYXK
+	fWHuJeSvmJuwSLqHbeqSZPCnmqbLqEftte0N6IGtrjeH02unmwWnkdvWjts06PMAU1U9Igz7WAXtD
+	4lp8YFtAYhnQV46q8I90J9k8nU3Xxn5icnEKgJNBZWk37Xv1QwCOOIKH1wNwl8eorM8VJJ+ouFwQs
+	Fs6mNgZQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uDThc-0000000H3Vg-1HTz;
+	Fri, 09 May 2025 19:48:12 +0000
+Date: Fri, 9 May 2025 20:48:12 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Byungchul Park <byungchul@sk.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	kernel_team@skhynix.com, kuba@kernel.org,
+	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
+	akpm@linux-foundation.org, ast@kernel.org, daniel@iogearbox.net,
+	davem@davemloft.net, john.fastabend@gmail.com,
+	andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
+	vishal.moola@gmail.com
+Subject: Re: [RFC 19/19] mm, netmem: remove the page pool members in struct
+ page
+Message-ID: <aB5b_FmBlcqQk09l@casper.infradead.org>
+References: <20250509115126.63190-1-byungchul@sk.com>
+ <20250509115126.63190-20-byungchul@sk.com>
+ <CAHS8izMoS4wwmc363TFJU_XCtOX9vOv5ZQwD_k2oHx40D8hAPA@mail.gmail.com>
+ <aB5FUKRV86Tg92b6@casper.infradead.org>
+ <CAHS8izMJx=+229iLt7GphUwioeAK5=CL0Fxi7TVywS2D+c-PKw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,147 +71,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0000000000009767ec0619fe6a1d@google.com>
+In-Reply-To: <CAHS8izMJx=+229iLt7GphUwioeAK5=CL0Fxi7TVywS2D+c-PKw@mail.gmail.com>
 
-On Mon, Jun 03, 2024 at 08:59:20AM -0700, syzbot wrote:
-> HEAD commit:    6d7ddd805123 Merge tag 'soc-fixes-6.9-3' of git://git.kern..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=12596604980000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=7144b4fe7fbf5900
-> dashboard link: https://syzkaller.appspot.com/bug?extid=628f93722c08dc5aabe0
-> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-> 
-> Unfortunately, I don't have any reproducer for this issue yet.
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/4d60cb47fbb1/disk-6d7ddd80.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/f3ff90de7db5/vmlinux-6d7ddd80.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/d452970444cd/bzImage-6d7ddd80.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+628f93722c08dc5aabe0@syzkaller.appspotmail.com
-> 
-> ------------[ cut here ]------------
-> UBSAN: array-index-out-of-bounds in net/llc/llc_conn.c:694:24
-> index -1 is out of range for type 'int [12][5]'
-> CPU: 0 PID: 15346 Comm: syz-executor.4 Not tainted 6.9.0-rc7-syzkaller-00023-g6d7ddd805123 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
-> Call Trace:
->  <IRQ>
->  __dump_stack lib/dump_stack.c:88 [inline]
->  dump_stack_lvl+0x16c/0x1f0 lib/dump_stack.c:114
->  ubsan_epilogue lib/ubsan.c:231 [inline]
->  __ubsan_handle_out_of_bounds+0x110/0x150 lib/ubsan.c:429
->  llc_find_offset net/llc/llc_conn.c:694 [inline]
+On Fri, May 09, 2025 at 12:04:37PM -0700, Mina Almasry wrote:
+> Right, all I'm saying is that if it's at all possible to keep net_iov
+> something that can be extended with fields unrelated to struct page,
+> lets do that. net_iov already has fields that should not belong in
+> struct page like net_iov_owner and I think more will be added.
 
-static int llc_find_offset(int state, int ev_type)
-...
-                rc = llc_offset_table[state][3]; break;
+Sure, that's fine.
 
-But this seems to be racing against:
+> I'm thinking netmem_desc can be the fields that are shared between
+> struct net_iov and struct page (but both can have more specific to the
+> different memory types). As you say, for now netmem_desc can currently
+> overlap fields in struct page and struct net_iov, and a follow up
+> change can replace it with something that gets kmalloced and (I
+> guess?) there is a pointer in struct page or struct net_iov that
+> refers to the netmem_desc that contains the shared fields.
 
->  llc_qualify_conn_ev net/llc/llc_conn.c:401 [inline]
+I'm sure I've pointed you at
+https://kernelnewbies.org/MatthewWilcox/Memdescs before.
 
-static const struct llc_conn_state_trans *llc_qualify_conn_ev(struct sock *sk,
-                                                              struct sk_buff *skb)
-...
-        struct llc_conn_state *curr_state =
-                                        &llc_conn_state_table[llc->state - 1]; // <<<<<<
-...
-        for (next_trans = curr_state->transitions +
-                llc_find_offset(llc->state - 1, ev->type);
+But I wouldn't expect to have net_iov contain a pointer to netmem_desc,
+rather it would embed a netmem_desc.  Unless there's a good reason to
+separate them.
 
-Otherwise the first one would have crashed too (a -1 array index). Is
-something racing:
-
-void llc_sk_free(struct sock *sk)
-...
-        llc->state = LLC_CONN_OUT_OF_SVC;	// = 0
-        /* Stop all (possibly) running timers */
-        llc_sk_stop_all_timers(sk, true);
-
-
->  llc_conn_service net/llc/llc_conn.c:366 [inline]
->  llc_conn_state_process+0x1381/0x14e0 net/llc/llc_conn.c:72
->  llc_process_tmr_ev net/llc/llc_c_ac.c:1445 [inline]
->  llc_conn_tmr_common_cb+0x450/0x8e0 net/llc/llc_c_ac.c:1331
->  call_timer_fn+0x1a0/0x610 kernel/time/timer.c:1793
->  expire_timers kernel/time/timer.c:1844 [inline]
-
-Given this is in a timer, it seems likely, especially given the above
-"llc_sk_stop_all_timer()" call. And llc_conn_tmr_common_cb() is reachable
-from several timers:
-
-void llc_conn_pf_cycle_tmr_cb(struct timer_list *t)
-{
-        struct llc_sock *llc = from_timer(llc, t, pf_cycle_timer.timer);
-
-        llc_conn_tmr_common_cb(&llc->sk, LLC_CONN_EV_TYPE_P_TMR);
-}
-
-void llc_conn_busy_tmr_cb(struct timer_list *t)
-{
-        struct llc_sock *llc = from_timer(llc, t, busy_state_timer.timer);
-
-        llc_conn_tmr_common_cb(&llc->sk, LLC_CONN_EV_TYPE_BUSY_TMR);
-}
-
-void llc_conn_ack_tmr_cb(struct timer_list *t)
-{
-        struct llc_sock *llc = from_timer(llc, t, ack_timer.timer);
-
-        llc_conn_tmr_common_cb(&llc->sk, LLC_CONN_EV_TYPE_ACK_TMR);
-}
-
-void llc_conn_rej_tmr_cb(struct timer_list *t)
-{
-        struct llc_sock *llc = from_timer(llc, t, rej_sent_timer.timer);
-
-        llc_conn_tmr_common_cb(&llc->sk, LLC_CONN_EV_TYPE_REJ_TMR);
-}
-
-llc_ui_release() does:
-
-        sock_put(sk);
-        sock_orphan(sk);
-        sock->sk = NULL;
-        llc_sk_free(sk);
-
-And I see llc_sk_free() also does:
-
-	sock_put(sk);
-
-What holds locking on llc? The timer callback is locking itself, but I
-don't see any locks in llc_sk_free(), but in theory there should be no
-locks left?
-
-What's supposed to be happening here? Moving the state assignment later
-doesn't look right, given the explicit check here:
-
-static void llc_process_tmr_ev(struct sock *sk, struct sk_buff *skb)
-{
-        if (llc_sk(sk)->state == LLC_CONN_OUT_OF_SVC) {
-                printk(KERN_WARNING "%s: timer called on closed connection\n",
-                       __func__);
-                kfree_skb(skb);
-
-Is it just that a lock is missing in llc_sk_free?
-
-diff --git a/net/llc/llc_conn.c b/net/llc/llc_conn.c
-index 5c0ac243b248..99c4f06477eb 100644
---- a/net/llc/llc_conn.c
-+++ b/net/llc/llc_conn.c
-@@ -974,7 +974,9 @@ void llc_sk_free(struct sock *sk)
- {
- 	struct llc_sock *llc = llc_sk(sk);
- 
-+	bh_lock_sock(sk);
- 	llc->state = LLC_CONN_OUT_OF_SVC;
-+	bh_unlock_sock(sk);
- 	/* Stop all (possibly) running timers */
- 	llc_sk_stop_all_timers(sk, true);
- #ifdef DEBUG_LLC_CONN_ALLOC
-
--- 
-Kees Cook
+Actually, I'd hope to do away with net_iov entirely.  Networking should
+handle memory-on-PCI-devices the same way everybody else does (as
+hotplugged memory) rather than with its own special structures.
 
