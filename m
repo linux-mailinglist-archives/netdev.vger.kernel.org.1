@@ -1,254 +1,183 @@
-Return-Path: <netdev+bounces-189311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3F4CAB1927
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 17:46:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1AAEAB1949
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 17:50:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E65947B6316
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 15:45:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D869D4C3E3E
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 15:50:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B344B2309BE;
-	Fri,  9 May 2025 15:46:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C447923185E;
+	Fri,  9 May 2025 15:50:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mihalicyn.com header.i=@mihalicyn.com header.b="RYgdbCHf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dPN+BgY9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B513B22A4C5
-	for <netdev@vger.kernel.org>; Fri,  9 May 2025 15:46:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D50323182E;
+	Fri,  9 May 2025 15:49:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746805597; cv=none; b=XCmUZ+IEv0ghmZnNA5cH/QwnO5DDik9pCFvS/MmKZLhEaDBGegFirVgYaK4IEHg/M9/QS5TPdb0YKifE7Yfyg12V3u62RYAirnBBzuEu9Xzygd8D1F4cmG6FKk5wcTfjDmSdvrEE88ZkQVp6clEIH+gGWPXdshRuU/MezwQngRY=
+	t=1746805801; cv=none; b=UJnRHnGHYzyYIhVJt2Mu+Dqx/BWTTBaFrHyGvCHm6gMOeBrypIE9WetvwKhqCGjF0zYSyqfOI9nixU0TwLMxvKAywzTpg86P0xIP6XvRnuREAWTzzANBK02XQ4Tf5YLLF5aOEFGgVyQgz9x1YZdqo1Ot3n8p9nDfrG4EmhIW7pY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746805597; c=relaxed/simple;
-	bh=DeBCrTmdTR5yKShLY0vZqCOTCX0K9ctcUoU2nBe6LVA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=J2NPrsaE+bH4gPNmwjRY9aDBhVD6D9mK06xJSyk0MkUbNvFr3BsubAtSXHCUHkHgqg1cNIETcgFD+R6ALWXdjlfq+6/7tcacBAC0siZXd5Oips8gS+haDKmuYzqaaMaSTO+8MhyDSLHuR7t9Lro2c1XXN7guBfLZ/0w+YKFN3AM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mihalicyn.com; spf=pass smtp.mailfrom=mihalicyn.com; dkim=pass (1024-bit key) header.d=mihalicyn.com header.i=@mihalicyn.com header.b=RYgdbCHf; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mihalicyn.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mihalicyn.com
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-3105ef2a06cso21068411fa.2
-        for <netdev@vger.kernel.org>; Fri, 09 May 2025 08:46:34 -0700 (PDT)
+	s=arc-20240116; t=1746805801; c=relaxed/simple;
+	bh=zQ1c+z3DU2vCiy7RW7edMeE1/mWOk8neFuh84o59zlY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ixjCNH43NgE3GzO3LhXlPCjCV5kW7XNf7jKgjRGNCwEGbfZtZTZR8e5n4IISxD4STOjTSA8KNG0+4N8NcVI0k9Nj+4PDCL7P+wpzUgi690f1CdQwIuZq0pAGoAoXa7ET9iwl2CA9jjNy9UsOKyBLn1E32R2aRTYDoShNZfpOyd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dPN+BgY9; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7423fb98cb1so703155b3a.3;
+        Fri, 09 May 2025 08:49:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mihalicyn.com; s=mihalicyn; t=1746805593; x=1747410393; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=9xNbDuhYMNEOPQ0iDaGg7WmsIQAL98DsMilo3FOILHE=;
-        b=RYgdbCHfoSKZLpdRCIWD/iPlUS9k46KL5BNo5lmTXtbn7IaDHnKqc50vvx/xBcKQzm
-         /JlDDMmg5gmbeYurfPcGQ5tibFSr7uRtrFIfXqbSfv8PP5Jm5UkwkvrRlPC+xCyIBU2z
-         mKPZgn+F80bC4/FqDYh50m47qBFef+DUY2FLc=
+        d=gmail.com; s=20230601; t=1746805799; x=1747410599; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6qJxB7qnX5LFLqWFBhUK9DfojI/2BwlgTRn1G+RNsSs=;
+        b=dPN+BgY9xLlECYCT6MN9yPd7Wq+GJK+mKCp2qxNxvisCIZldhTDi1LItRogcTnyFKx
+         xXeDTLUGcx8SR2gPZwB5WEqg+cJd90ToGass2zj5olThOgVtP4+lGfMamyuh/rcIa2pw
+         alyMKaOiOAGDW1Qei4aS+LcaRuzjUA+BXpHWlNBRI2B0qzz0LO7v62KJZTVn4QTJaqbm
+         atyBZA4qcXlNHHl+xakCHa0J/C8SZQonKNi63OAAWpKMWBzZr1z8odDPW2EGySsBe14F
+         XPBU316xicW6KhoSZbm2zGcWnlcEXqDsCBmMoaptY5yE2GDQFuwWi8YHP0N9uscgFSIs
+         hilA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746805593; x=1747410393;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9xNbDuhYMNEOPQ0iDaGg7WmsIQAL98DsMilo3FOILHE=;
-        b=Ov1Y4fA9o+zY8EhZ6KEYpr7Kod0r5E0s83nEyAoalbnkET9H5PUAZhnrp/Ctw07ViJ
-         Jc13Xo4PQElb2lxSB9it80BRy8e6RiTIQ72EaDcloLbTKbj1Z4tbh1sL1l45G+o1GUK7
-         hpw+O8i9Uh9q8bUCaVArmyCooCURBi1qHvQ8BUvQA1mQK6WLqyz6AgjC9WT5JX0zto7d
-         t93DOv9m84W9VBQZTccS42wE4vP2e8GNwE+CLxV37Jsnyh7Q76nZs59or7xMhpV7hPla
-         RlKm7eXVGH+Fpp5iywsAENJQBFzC5c7zNg00E4s/rp2Ji3tx+FsexTdiPNW4adf2StfD
-         S5Xw==
-X-Forwarded-Encrypted: i=1; AJvYcCXLipabhV49/Ud0SnvWxoPtEW8ZKUREbsaL2EM5smPk+1IPyLFmvO0qzUoDBXa3efyFRrYJnHk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGl4b+ltUATeigOcgVDWMTPQjwuhfo+Uz2A0Qi6DDMVvpZeDIH
-	sFJ0gNsoTQLM4Tgiu2JYGiCNeYVvRNOTJ+zElbQxVKV9JoaVJfc8m0GuzJd22pTGD7EhBj2g0n8
-	6REKODTFTtIQPUY87OEFIpDAxr8GLKRo+4Ijn+Q==
-X-Gm-Gg: ASbGncvj6W4B5+P9MDl/xJGX37BcZa/zR0KER5YCvxQtNob1zoqgy22vLH7HQ0Yqzs9
-	Yq/X1G5ltO9TBZ+W13XbzV7W0zlnABrqKR5B7AyvtN8JVTw205zjTeddBgxUalCOkJuay3LsNOh
-	swGnN+Co1NclpFxrPFtYAvzs8=
-X-Google-Smtp-Source: AGHT+IHoJp8wBzITN88S1HfrprVuyMRPvWzwS4HbJbfLM7QXMEGjXdAedeYOhNSQ8zXWIJlwtoij1I0pkOJyZ9tEoRk=
-X-Received: by 2002:a05:651c:210a:b0:30c:aae:6d4a with SMTP id
- 38308e7fff4ca-326c4627d80mr18504001fa.26.1746805592184; Fri, 09 May 2025
- 08:46:32 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1746805799; x=1747410599;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6qJxB7qnX5LFLqWFBhUK9DfojI/2BwlgTRn1G+RNsSs=;
+        b=MviphyIpmtLX8QMo0lfMKNbQz+qy3uX/k3PSntXWSGdwvcu9NRXO2b8i8bUA/OZ0Tj
+         4QZK66UFFnwbBhv9Q6YrjSUDN0jIFyx97AAKOaWAbaVzuWjADEm7AZa/t7jEDYAf/IUy
+         9guW1o0bcU7uMVqndPKYFGXPba+uSVlYJvNczH3Y+K6pPEbkxHF+ffRNsQvxJOjWPbJQ
+         tboQEo7HE6wZECeK1gbgrMgAZzEpDr0Y2d6FQoI3bGZXm/FKuFdMDFvVQfla+jLmPeMV
+         GK6s/fLhfAJai6vdw9W65EFUm4jZigJcnU1VrxJ6koZSycb0BRARoj3pqjeMO8GhZT4b
+         YHtw==
+X-Forwarded-Encrypted: i=1; AJvYcCUWy2h7OpMFK241PC6w1V4BNMUHKUx/BEPW0QDaYkV4AR65H1TRBvywHemFZU6V6GUXVRHa1sXHY7wzaA==@vger.kernel.org, AJvYcCUYOtKrTMlCELVcudSN9Bs0aYq8fYPkWDFC+EsxqRubhN3bYBeFcnsdHE2KgJBSPyvBSffcHkyHjFniHVY=@vger.kernel.org, AJvYcCVdF8IXEko5J4037Rc3X3njGQqf6w9jVROsYNz01gh1c3CQIUghLWzH4eSo3db3sXsxGKRVcOb2M6X4t9rq@vger.kernel.org, AJvYcCWUGWoAWTZpENUsHx8yLygSlBPKVsAmLH1aGMXjORYIIi0QHKomhjzaos9f9k4pqgSCjF6p26dC@vger.kernel.org, AJvYcCWpp9TjUPvStyv/r6I7Yvu7NyRZR//RtcgzV8Od9VKj52KJSQo7Rh2dmUI2uaRWwZ4ER5SXZlB4SILF@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxt8O1ZjqM+B4btg+fjcsYwJxXhIjuohUR17O7KO1xWqjAUvRXq
+	/26a2cxyCP+/RglF0NZTvqsFhOe4Ofl7BpNcs0xgrexXi8X4/rmv
+X-Gm-Gg: ASbGncv3yK2xLMdTrxwDKM/7rCj6On1dk1hWZqc2mT2HUey7whvuJLnhyM7+OPtsgcX
+	LgLMY60RtL2SDH0KSHu/HMXfo1pd7hI0M4E2YEFWS/uBHFY3UImeJb+hWvSugig/+Aii0+3PjsV
+	Gc6wwkDj6NkHOEt3Lhb7knib/KQBHm41oZYlJOj+eWHeeTjm3CKHA0ROz0ADFz+re2oHGpd4A9l
+	CNTU8HDYOrDfVETUoCU3a+Nl2roOcjxkQ9sQ8gnA0EL93iZMwRCMqvTxCXDrDwZ+BW1qDDW0jib
+	JvR4DXoTknUx9SjXJ8jXSk+OD2rx2WsECVdmbU5W
+X-Google-Smtp-Source: AGHT+IFIh0uHRzJCT7/GnkTq7w++wVD/1lCTkum2tABfnk4IkfODFcEQ0pNzHdqudOyEjI24/Mih9A==
+X-Received: by 2002:a17:903:1787:b0:216:393b:23d4 with SMTP id d9443c01a7336-22fc8b193ebmr64273025ad.11.1746805799099;
+        Fri, 09 May 2025 08:49:59 -0700 (PDT)
+Received: from localhost ([216.228.127.129])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22fc7741d9fsm18904205ad.81.2025.05.09.08.49.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 May 2025 08:49:58 -0700 (PDT)
+Date: Fri, 9 May 2025 11:49:56 -0400
+From: Yury Norov <yury.norov@gmail.com>
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Cc: Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Simon Horman <horms@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+	Maxim Levitsky <mlevitsk@redhat.com>,
+	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
+	Peter Zijlstra <peterz@infradead.org>, linux-hyperv@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Nipun Gupta <nipun.gupta@amd.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Jonathan Cameron <Jonathan.Cameron@huwei.com>,
+	Anna-Maria Behnsen <anna-maria@linutronix.de>,
+	Kevin Tian <kevin.tian@intel.com>, Long Li <longli@microsoft.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Bjorn Helgaas <bhelgaas@google.com>, Rob Herring <robh@kernel.org>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Krzysztof =?utf-8?Q?Wilczy=EF=BF=BD~Dski?= <kw@linux.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, Paul Rosswurm <paulros@microsoft.com>,
+	Shradha Gupta <shradhagupta@microsoft.com>
+Subject: Re: [PATCH v3 3/4] net: mana: Allow irq_setup() to skip cpus for
+ affinity
+Message-ID: <aB4kJNG2duAsP8bK@yury>
+References: <1746785566-4337-1-git-send-email-shradhagupta@linux.microsoft.com>
+ <1746785625-4753-1-git-send-email-shradhagupta@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250509-work-coredump-socket-v5-0-23c5b14df1bc@kernel.org> <20250509-work-coredump-socket-v5-1-23c5b14df1bc@kernel.org>
-In-Reply-To: <20250509-work-coredump-socket-v5-1-23c5b14df1bc@kernel.org>
-From: Alexander Mikhalitsyn <alexander@mihalicyn.com>
-Date: Fri, 9 May 2025 17:46:21 +0200
-X-Gm-Features: AX0GCFuTWF2y33BQszs3BPl-6caIW4wVI9SlZUstCcjjk5CXp49SmJp1kj1c_ao
-Message-ID: <CAJqdLrqCkkA=TcEU0Oo5w=6Xrp=y1VepGZncBC4yKRU1hv2iDg@mail.gmail.com>
-Subject: Re: [PATCH v5 1/9] coredump: massage format_corname()
-To: Christian Brauner <brauner@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, Jann Horn <jannh@google.com>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Eric Dumazet <edumazet@google.com>, Oleg Nesterov <oleg@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, David Rheinsberg <david@readahead.eu>, 
-	Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>, 
-	Lennart Poettering <lennart@poettering.net>, Luca Boccassi <bluca@debian.org>, Mike Yuan <me@yhndnzj.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	=?UTF-8?Q?Zbigniew_J=C4=99drzejewski=2DSzmek?= <zbyszek@in.waw.pl>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-security-module@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1746785625-4753-1-git-send-email-shradhagupta@linux.microsoft.com>
 
-Hi Christian!
-
-Am Fr., 9. Mai 2025 um 12:25 Uhr schrieb Christian Brauner <brauner@kernel.org>:
->
-> We're going to extend the coredump code in follow-up patches.
-> Clean it up so we can do this more easily.
->
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
+On Fri, May 09, 2025 at 03:13:45AM -0700, Shradha Gupta wrote:
+> In order to prepare the MANA driver to allocate the MSI-X IRQs
+> dynamically, we need to prepare the irq_setup() to allow skipping
+> affinitizing IRQs to first CPU sibling group.
+> 
+> This would be for cases when number of IRQs is less than or equal
+> to number of online CPUs. In such cases for dynamically added IRQs
+> the first CPU sibling group would already be affinitized with HWC IRQ
+> 
+> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
 > ---
->  fs/coredump.c | 41 ++++++++++++++++++++++++-----------------
->  1 file changed, 24 insertions(+), 17 deletions(-)
->
-> diff --git a/fs/coredump.c b/fs/coredump.c
-> index d740a0411266..281320ea351f 100644
-> --- a/fs/coredump.c
-> +++ b/fs/coredump.c
-> @@ -76,9 +76,15 @@ static char core_pattern[CORENAME_MAX_SIZE] = "core";
->  static int core_name_size = CORENAME_MAX_SIZE;
->  unsigned int core_file_note_size_limit = CORE_FILE_NOTE_SIZE_DEFAULT;
->
-> +enum coredump_type_t {
-> +       COREDUMP_FILE = 1,
-> +       COREDUMP_PIPE = 2,
-> +};
-> +
->  struct core_name {
->         char *corename;
->         int used, size;
-> +       enum coredump_type_t core_type;
->  };
->
->  static int expand_corename(struct core_name *cn, int size)
-> @@ -218,18 +224,21 @@ static int format_corename(struct core_name *cn, struct coredump_params *cprm,
->  {
->         const struct cred *cred = current_cred();
->         const char *pat_ptr = core_pattern;
-> -       int ispipe = (*pat_ptr == '|');
->         bool was_space = false;
->         int pid_in_pattern = 0;
->         int err = 0;
->
->         cn->used = 0;
->         cn->corename = NULL;
-> +       if (*pat_ptr == '|')
-> +               cn->core_type = COREDUMP_PIPE;
-> +       else
-> +               cn->core_type = COREDUMP_FILE;
->         if (expand_corename(cn, core_name_size))
->                 return -ENOMEM;
->         cn->corename[0] = '\0';
->
-> -       if (ispipe) {
-> +       if (cn->core_type == COREDUMP_PIPE) {
->                 int argvs = sizeof(core_pattern) / 2;
->                 (*argv) = kmalloc_array(argvs, sizeof(**argv), GFP_KERNEL);
->                 if (!(*argv))
-> @@ -247,7 +256,7 @@ static int format_corename(struct core_name *cn, struct coredump_params *cprm,
->                  * Split on spaces before doing template expansion so that
->                  * %e and %E don't get split if they have spaces in them
->                  */
-> -               if (ispipe) {
-> +               if (cn->core_type == COREDUMP_PIPE) {
->                         if (isspace(*pat_ptr)) {
->                                 if (cn->used != 0)
->                                         was_space = true;
-> @@ -353,7 +362,7 @@ static int format_corename(struct core_name *cn, struct coredump_params *cprm,
->                                  * Installing a pidfd only makes sense if
->                                  * we actually spawn a usermode helper.
->                                  */
-> -                               if (!ispipe)
-> +                               if (!(cn->core_type != COREDUMP_PIPE))
-
-Shouldn't it be:
-if (cn->core_type != COREDUMP_PIPE)
-
-Except this, LGTM
-
-Reviewed-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-
->                                         break;
->
->                                 /*
-> @@ -384,12 +393,12 @@ static int format_corename(struct core_name *cn, struct coredump_params *cprm,
->          * If core_pattern does not include a %p (as is the default)
->          * and core_uses_pid is set, then .%pid will be appended to
->          * the filename. Do not do this for piped commands. */
-> -       if (!ispipe && !pid_in_pattern && core_uses_pid) {
-> +       if (!(cn->core_type == COREDUMP_PIPE) && !pid_in_pattern && core_uses_pid) {
->                 err = cn_printf(cn, ".%d", task_tgid_vnr(current));
->                 if (err)
->                         return err;
->         }
-> -       return ispipe;
-> +       return 0;
+>  drivers/net/ethernet/microsoft/mana/gdma_main.c | 16 ++++++++++++++--
+>  1 file changed, 14 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> index 4ffaf7588885..2de42ce43373 100644
+> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> @@ -1288,7 +1288,8 @@ void mana_gd_free_res_map(struct gdma_resource *r)
+>  	r->size = 0;
 >  }
->
->  static int zap_process(struct signal_struct *signal, int exit_code)
-> @@ -583,7 +592,6 @@ void do_coredump(const kernel_siginfo_t *siginfo)
->         const struct cred *old_cred;
->         struct cred *cred;
->         int retval = 0;
-> -       int ispipe;
->         size_t *argv = NULL;
->         int argc = 0;
->         /* require nonrelative corefile path and be extra careful */
-> @@ -632,19 +640,18 @@ void do_coredump(const kernel_siginfo_t *siginfo)
->
->         old_cred = override_creds(cred);
->
-> -       ispipe = format_corename(&cn, &cprm, &argv, &argc);
-> +       retval = format_corename(&cn, &cprm, &argv, &argc);
-> +       if (retval < 0) {
-> +               coredump_report_failure("format_corename failed, aborting core");
-> +               goto fail_unlock;
-> +       }
->
-> -       if (ispipe) {
-> +       if (cn.core_type == COREDUMP_PIPE) {
->                 int argi;
->                 int dump_count;
->                 char **helper_argv;
->                 struct subprocess_info *sub_info;
->
-> -               if (ispipe < 0) {
-> -                       coredump_report_failure("format_corename failed, aborting core");
-> -                       goto fail_unlock;
-> -               }
-> -
->                 if (cprm.limit == 1) {
->                         /* See umh_coredump_setup() which sets RLIMIT_CORE = 1.
->                          *
-> @@ -695,7 +702,7 @@ void do_coredump(const kernel_siginfo_t *siginfo)
->                         coredump_report_failure("|%s pipe failed", cn.corename);
->                         goto close_fail;
->                 }
-> -       } else {
-> +       } else if (cn.core_type == COREDUMP_FILE) {
->                 struct mnt_idmap *idmap;
->                 struct inode *inode;
->                 int open_flags = O_CREAT | O_WRONLY | O_NOFOLLOW |
-> @@ -823,13 +830,13 @@ void do_coredump(const kernel_siginfo_t *siginfo)
->                 file_end_write(cprm.file);
->                 free_vma_snapshot(&cprm);
->         }
-> -       if (ispipe && core_pipe_limit)
-> +       if ((cn.core_type == COREDUMP_PIPE) && core_pipe_limit)
->                 wait_for_dump_helpers(cprm.file);
->  close_fail:
->         if (cprm.file)
->                 filp_close(cprm.file, NULL);
->  fail_dropcount:
-> -       if (ispipe)
-> +       if (cn.core_type == COREDUMP_PIPE)
->                 atomic_dec(&core_dump_count);
->  fail_unlock:
->         kfree(argv);
->
-> --
-> 2.47.2
->
+>  
+> -static int irq_setup(unsigned int *irqs, unsigned int len, int node)
+> +static int irq_setup(unsigned int *irqs, unsigned int len, int node,
+> +		     bool skip_first_cpu)
+>  {
+>  	const struct cpumask *next, *prev = cpu_none_mask;
+>  	cpumask_var_t cpus __free(free_cpumask_var);
+> @@ -1303,9 +1304,20 @@ static int irq_setup(unsigned int *irqs, unsigned int len, int node)
+>  		while (weight > 0) {
+>  			cpumask_andnot(cpus, next, prev);
+>  			for_each_cpu(cpu, cpus) {
+> +				/*
+> +				 * if the CPU sibling set is to be skipped we
+> +				 * just move on to the next CPUs without len--
+> +				 */
+> +				if (unlikely(skip_first_cpu)) {
+> +					skip_first_cpu = false;
+> +					goto next_cpumask;
+> +				}
+> +
+>  				if (len-- == 0)
+>  					goto done;
+> +
+>  				irq_set_affinity_and_hint(*irqs++, topology_sibling_cpumask(cpu));
+> +next_cpumask:
+>  				cpumask_andnot(cpus, cpus, topology_sibling_cpumask(cpu));
+>  				--weight;
+>  			}
+> @@ -1403,7 +1415,7 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
+>  		}
+>  	}
+>  
+> -	err = irq_setup(irqs, (nvec - start_irq_index), gc->numa_node);
+> +	err = irq_setup(irqs, (nvec - start_irq_index), gc->numa_node, false);
+
+What for the 2nd parameter is parenthesized?
+
+>  	if (err)
+>  		goto free_irq;
+>  
+> -- 
+> 2.34.1
+
+
+Reviewed-by: Yury Norov [NVIDIA] <yury.norov@gmail.com>
 
