@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-189234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69E7DAB12F6
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 14:06:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B7D9FAB12F2
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 14:05:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91438A043AF
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 12:05:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66FAFA043E9
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 12:04:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E725C290DBC;
-	Fri,  9 May 2025 12:04:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B415290BB6;
+	Fri,  9 May 2025 12:04:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="kT+YU9nW"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="JjbPbZVH"
 X-Original-To: netdev@vger.kernel.org
 Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C50FB290BB3;
-	Fri,  9 May 2025 12:04:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58E3F27A925;
+	Fri,  9 May 2025 12:04:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746792295; cv=none; b=a/tFKv/6VlQawQEdeyod7amuVfBuUP3LdnQHroqXHKF7sU4ZNJeIC/0p6orSmttM5lyRaon05QSP3mrGu579PqpWRlM7aKF0Ec6bVXG0KVX8D952wd8t1HR0Q3PU2f4KugN52tBqG5/i4SL7bI3A1TcCs7uVS6i3344TViU5pak=
+	t=1746792294; cv=none; b=VgfVwQSr1L4r0C0slTW0t4q9qJeoBxj7yUwLy+Qt1ZZ8us3h0P270uSVeujr1ofDXiIEvKK0hlt6pwzZHuSOcmE2H0eHPFO4Ip+vkAke054d8l35thzBtYmQOWYqAOIJpSdFpaFsdHZ/jFvsl1qE/cDosBvsLeWNmMLfZlGUR3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746792295; c=relaxed/simple;
-	bh=bSFVDwN8D4G1us96dI4iB9j9aOSFB1APZESYIHOs2LA=;
+	s=arc-20240116; t=1746792294; c=relaxed/simple;
+	bh=DXlb1yQTnHKRCntsXxDNHtVLAFrSWHcArFdBEY2pbIU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=iMXBGkuVGbc8Qk1L2xs3zLmuhip6IGuDzrGDxwr0nwXyrtHqgnJpuBKtp1ebaVhKI10piPjFntLkSHG8uBnyUG9BUCXTBt2QrVc03P0uZsXR///3TWhrl6S1dXfhCgreHZ3i4WSSa8nvpfL0hgnqPvgeBVLZ8uopDh1QZOpa37k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=kT+YU9nW; arc=none smtp.client-ip=212.227.17.22
+	 MIME-Version; b=TAAke3oq95kryj76ZCG50R3MZNHiZyfvxAUGnBIzE4IVLm4wHu2QeP+0Gk7q7Aut/GnPXyyKCsf1D8DYdhcizzTQwD62XLN5e2AwYB4G9iUUHBQxF56htaodpD6bCbN+ShcONBX5RjNhsgMZ4naU9dx0E2JTp0WgHIZyPyF9v58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=JjbPbZVH; arc=none smtp.client-ip=212.227.17.22
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
 	s=s31663417; t=1746792282; x=1747397082; i=wahrenst@gmx.net;
-	bh=GU9F06VWTq6RKZnt3xFBDMIUJGjf9pRtqn9SeNwBKQs=;
+	bh=o2ClX6bqKoDyuncls4p4vcndsL4vRhh+9X4jhInKLKw=;
 	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-Id:In-Reply-To:
 	 References:MIME-Version:Content-Transfer-Encoding:cc:
 	 content-transfer-encoding:content-type:date:from:message-id:
 	 mime-version:reply-to:subject:to;
-	b=kT+YU9nWslwse2W670mja00b5EaJCKm5u/+A53cH/n1V5Lvy/4bsF+lkhEMZaSJz
-	 V9ISYJIu8/6y+T8kREjpgo0ycG1esz4fPjJdzYzgOBx1WSq+p+BwoPfUuz8GDx04F
-	 Vfqy824uJTxPE3F9vzGLCr3yGWqWrNDmRwfXR4LDjaXUIB0LKy9C5bUZo1l4GN5WI
-	 DyLXC7YfKl928I25OT/VDtsC307D6HAT7aQFB4W5y5WJx1CJhMOw8WPWnyEGuA3Ij
-	 J1X1CbivvYHH8CuNfnMrhhvtyK5C6FAl5zXCw/IuRQdgYNXLTpLhdkFD22G0l4yOv
-	 nsr+gAnDJDPzjDEnVA==
+	b=JjbPbZVHoGgwFO65+wxymSG5dXk63F9r792t/J+uM6fii+wEoZxUTqBq+owOIBEN
+	 bSNZ9r1arbOxHC/ougPCY8lCZaL4Wz8rB0Zs8kklQF1G1teH2bxbfbph4+eg0/wkV
+	 89lVW0EmDoQS3/XbHOS4e/GGHzzHhiY2Hb5EpEvB3KHXITyYiDiTNIC7oSKZWSsAP
+	 9NTUPsmfpyg5OY0QMTaAXGBR+XgGdTu/qmaEgdw7MTqX3HnFZpkSk1vmBm3d6Wy1T
+	 /MbhqwnqelxCzYletmGv8I03SUrWEj0UuYhgX+HjmBPIkDpDw/VQmIi5N3wwIlGtg
+	 YKSaCykBfa9hFghexA==
 X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
 Received: from stefanw-SCHENKER ([91.41.216.208]) by mail.gmx.net (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1M7sDq-1u9WiB3Y6k-0034ye; Fri, 09
- May 2025 14:04:41 +0200
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1MVNB1-1ucp9J14tD-00Yisf; Fri, 09
+ May 2025 14:04:42 +0200
 From: Stefan Wahren <wahrenst@gmx.net>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -61,9 +61,9 @@ Cc: netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	Stefan Wahren <wahrenst@gmx.net>,
 	Andrew Lunn <andrew@lunn.ch>
-Subject: [PATCH net-next V3 1/6] dt-bindings: vertexcom-mse102x: Fix IRQ type in example
-Date: Fri,  9 May 2025 14:04:30 +0200
-Message-Id: <20250509120435.43646-2-wahrenst@gmx.net>
+Subject: [PATCH net-next V3 2/6] net: vertexcom: mse102x: Add warning about IRQ trigger type
+Date: Fri,  9 May 2025 14:04:31 +0200
+Message-Id: <20250509120435.43646-3-wahrenst@gmx.net>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250509120435.43646-1-wahrenst@gmx.net>
 References: <20250509120435.43646-1-wahrenst@gmx.net>
@@ -74,81 +74,109 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:B9f35Slo1ehizVftZtTa/La9brD9AMeRU4oYKK3XZNozqm/2Pwl
- ZUAG/L2F9ScePF9PyT+qdpeHOSh7F6Xm7+9Gn4yktINLx3Gd9GKbgPOPm3eW827irfh7Po/
- IWj9DD1rlWiRg4j82eWIhha8GRHP2HzTHmFeqM4kuZkYGpYX9vUKpRnyVsbjT10r7SdEHlb
- dzzQGOuYd1QILO15xdb0A==
+X-Provags-ID: V03:K1:3nvDcPMlwXE7an2IHdleuobfBQu8HLKOHbli5Z7js/B+2GwQflA
+ 4zWKpq4wS/9gNHPmdq7bwmrV5mxZYjnbfpy5nhKw0cd03sUVHtkYy3SATgDGat2AQ6rjJ1B
+ 9TAoHtXCncPP0qHRlq0fcELj5K7UlGiqHUjrWavMdo7zKly8vluhg3bI9wAbPZ8g1JVavIE
+ kvUizEBgRHVhnRIZVT1YA==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:OTT0taEpeS0=;Ykk6tuVw1hUFarnxTyOhqwSubfd
- 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
+UI-OutboundReport: notjunk:1;M01:P0:oGp3q0/WhjQ=;Hpv/UUzOwAj6OsYglevtCjhXTY2
+ fQIiOCVs23paXJ8aWnQc/SHvonMbDiYlE0tlOKbiHz1tRmqlQ5q7rqWJ8KKFzaGtz8sW016K6
+ KakLYvqc6aMy/UTcPwmLrdSfIr2xs4X736buAovzLbvzd8XvDrxnja+N+pciQIFbAqmUG05WZ
+ VEk19gFuvXzIsEl7TzHNqEga8EkornCpFnLUuy/tVLJikUANpCsqumKPykGY/fYxwppdbHF/M
+ PcOPAqYPsXVoQ/JteZKTXSHX+o3j4rw0BfZHK3UBOFEHEFZZkmguOa0a/8eLyqPbeg98N4o3b
+ UmieX7PRF8XKkCqfdHgy3/VMMdm5pFijKITVdeaNCI6zVqvUmK3i4klCZIMvtHL5elEuyAKv2
+ lnjpptrwMGIu05GBebDrmnw1HNzBl2qk6aOPc1HMgRKzWTYuAHhns9noF7XAwkaWgAIAXfUCF
+ FwIhxcXDq9gRspZ0S5/PlyyiqRwpRf1rCZA0k9BGSU8qzaQnNZ+rK3z4iGARR7S9uvhU4kQaL
+ SNgbx62WrJVPybn3DF66pmL8BUbDTBemEa0qVdJ22XvTFPFB9j1KKdXwDWlg65bvbMRoxlZMz
+ ivJcm23fvJClOzhXsF8vuOjZFo+1Kw1yXX/c/Oi6SrdBXRGZzFjjfiVnptTw7tP6arvviG7QG
+ MwwK9izuLVuB8kEydBd3xNc58vRG3uCwlOeV9MTeyLGW7UQOtPhekKMbshPCgR0ZMGSaI58ku
+ 1t1bvhfqIO7CDu6sGKOlm9g/LRluioiNtXUyzsIcnQCpxXdVK9ly6kXdTF0fdx2UYtctbeX8g
+ ciJuYJrPrMFBtrQi68um9p4XhpaQJ8sg7mjPpKYYwf+F7ISQD5VKaY2cARNu78xIWpAUhlkqL
+ doGk5BTXzsrhjQ5XJh+XKe3SR0zSiUCu3K5NutOw0ujaSP7cCQkcNoxQgKaupVGoxt/J0/vE6
+ K0W4KMxfOow3TUhDwMpDgDHHl7EomZMSclUrz8hf//LDHSQbtGoIdWwzY7nnIcaIQTZg71MUl
+ fZlmmUjDi6VawjvVabT5YwJpJCp+eHtb+0SrPUTa1zwlGyJj9LGUpW2xgaE9AxIMFNzF92red
+ +lDoqWwVw67OQNLh6t/ZdsKDtirWWS/lWvpHhSLpiUPwzqlOXkO1VSOOSb/QlaAo2QitPorRS
+ RKZzEgGna6fZLQS4vyFb3Nbhpn2hSYKXluW4gmOpj/QGq7FS7BN3c+Tz0/Di6bnL60vg2WhhS
+ Vd10zLAberqzosHj4fYU3jLNQAwIpgSw5o4kIcUfovQvkiMy+FjVbw4JJVKgVlNbSSmOxHz6T
+ CaIleuQD8gpCRNegOwcpMFki7Z0TWJER9xVedFBmFc7ClZbKCMUA5WmCkNnKV67M3BV54EFBI
+ 4ou5byYXldpL9g7OyLcS1fTgv1GVOsvhmVaenmOkUL0G26dNA28ayxbhTUAjOFBEg3LVcXNB+
+ y0v5w3Aaw7UYxemNIyvyadjpS4rwF5CFTrNROEhuLBeyg+ZRRl1bUFvlfk9d5W5G5MCo+7Qq4
+ 40lMij87sSAW73g1v+JYqi/KPlS7KfmIYJYJtL1MP2ub4mGbuwFjZwwgCvocj/dh2MNIUkv4j
+ RXjAdyiF2aATfOulKsFpM+SZV1kkuPZprrlKH0PGGbfBxIulQS8GIBLGVFy+poTqflBh271/w
+ HUgp6mC80qngq1loFK4eCPYqQhY/Oe8Yemr5aH/PenbPKcimBRG4k9X9KBH40F2Zs4vVzayWq
+ eupqwFn8E5BDwOTsCVJW26xEgsaGJqGo4LBpvGdxmjnfXeJAS8Str+Ivbk5i8z99r0IrrFJgN
+ XIT1mRpPW6Hj6mKRs1N4rCLNmnDYd8pp5/h0qZRouJZQDBaBQrGLdfHbHH6eQT1uahIUF06NG
+ U2RzaiYD5hwDMJZZyGiyZcc06M1r6iHtJqgsdJ474CDBoev1QohLUEJRdt4IAGZEG0vST7URW
+ AUIrLMtIgBP7vxg9HGOtj3dk877x1CYU4iv1v7WZBSZ+ZDCbhChE/moUvzcU7QASe/pMcPZAI
+ kvUbuA2q58uzqTnvrn1rdO78nWajz3PpJqKsEEUBUGGd8myl05b9p8eQFayDE3UXx1E38gbu/
+ +73uZNprKihdog2tS8b4jkyqpOPYR5XfSmVw79EbNhSlOZI2qxGCoT5UxFKryNyPxnykDY0NY
+ Zz+zwsbA5d7uccIfXjsZ7N2taTSBivkefGJy5nl12xhnBu0S4DCVXEKhvvJWJVOkoZfwB8jIh
+ EP3sNAVn2mTMf/ZE2lgSNz9koiswzhdBT2r4lrEVHy8fdZ6MSoI5y0Yn8/tC8zpE1is+eeFI2
+ yPKtznFlYfjMcIgTVYPOG3RXruqf3YFM6y2h/6E4e64gotvP/+J4cKxlf6w70ExQsIOcMpHkK
+ ig63fpqLTCVZGT+StI7ozXUAV0hIXbDiYkCBSX6QDeSSTfKNikSO/E/uSm5abNSTJbUApdWKT
+ 5xgtjeS5hjnVrRsUFXNl4zNXMK/dtL3Os6jDjdcVvJfGg+ei5RcjXtNwXCw/23mpUMKHO0sJb
+ XDjXTZpT4VCM0o+JeWmC7Tt0xUC2LMsV8fj3U2kgXQR+y9yv3ULjknSX+02XehJ+Qh0k7+UNp
+ BOO9d09ouT46kp718GqTdMlWzOE7Hty6xfVAnW3fgiaQHLe0xXgJZKTb7dev+xHlXDIEYs/aW
+ EQn6CmXaY104h4YJqZ7Ro5bOUeLIpzoLndrlXznwO/Pe0RAglkL1OU3HXAZ5YYL8QR/njRkaI
+ w9DlX4VgmBbO8T96mq1Uv6qljLs4cE5Rkw/lbk/JKm2IgvBY5pcQYWqGGJ3lHaesAOKuDS7yP
+ cv1gJR+4ijWy1fWKQ6jIMUEUn6UdJAzL5S8hPxqxhRYmi4B05rC9Dt/w56XqxJ0fMqyenGvB/
+ M1kzDmd4WPm2rPJfoEjALoyHuwvtSp+VUuB1gzLT/lPsEmoWvaNhbNXR/P9P51ySvqyGDT1oN
+ ytkn89HKJC4wxBlUbZwbqSj4PH60paF2pDkM441Bt3eh7IMrqvNak3FXm/lFK42erXdjiOKiD
+ Iig3SiP05QHxP/3m0duticg3M8IEdDF2iT1AxoO1P1Ql33F6qgS744a6RaSX2O9ef1c56aEAq
+ 4yqu7F/7jQDJdQ2L1E+VHHG6OnVHgxyW6xylSveiekWCpYsWh6pZ+9bwSsVVOEPYhzH0+9OEc
+ sSHaHSjJ7sEO4lb2uBBMEh7TwT+R+jWXINHEmsxY7Fe6FZ/QQj06reFdrIyBGyZGA0gnhJDlc
+ W/w2vuXV7c0SOhxT
 
-According to the MSE102x documentation the trigger type is a
-high level.
+The example of the initial DT binding of the Vertexcom MSE 102x suggested
+a IRQ_TYPE_EDGE_RISING, which is wrong. So warn everyone to fix their
+device tree to level based IRQ.
 
 Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 =2D--
- Documentation/devicetree/bindings/net/vertexcom-mse102x.yaml | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/vertexcom/mse102x.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/vertexcom-mse102x.yaml =
-b/Documentation/devicetree/bindings/net/vertexcom-mse102x.yaml
-index 4158673f723c..8359de7ad272 100644
-=2D-- a/Documentation/devicetree/bindings/net/vertexcom-mse102x.yaml
-+++ b/Documentation/devicetree/bindings/net/vertexcom-mse102x.yaml
-@@ -63,7 +63,7 @@ examples:
-             compatible =3D "vertexcom,mse1021";
-             reg =3D <0>;
-             interrupt-parent =3D <&gpio>;
--            interrupts =3D <23 IRQ_TYPE_EDGE_RISING>;
-+            interrupts =3D <23 IRQ_TYPE_LEVEL_HIGH>;
-             spi-cpha;
-             spi-cpol;
-             spi-max-frequency =3D <7142857>;
+diff --git a/drivers/net/ethernet/vertexcom/mse102x.c b/drivers/net/ethern=
+et/vertexcom/mse102x.c
+index e4d993f31374..78a50a68c567 100644
+=2D-- a/drivers/net/ethernet/vertexcom/mse102x.c
++++ b/drivers/net/ethernet/vertexcom/mse102x.c
+@@ -8,6 +8,7 @@
+=20
+ #include <linux/if_vlan.h>
+ #include <linux/interrupt.h>
++#include <linux/irq.h>
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+ #include <linux/netdevice.h>
+@@ -522,10 +523,25 @@ static irqreturn_t mse102x_irq(int irq, void *_mse)
+=20
+ static int mse102x_net_open(struct net_device *ndev)
+ {
++	struct irq_data *irq_data =3D irq_get_irq_data(ndev->irq);
+ 	struct mse102x_net *mse =3D netdev_priv(ndev);
+ 	struct mse102x_net_spi *mses =3D to_mse102x_spi(mse);
+ 	int ret;
+=20
++	if (!irq_data) {
++		netdev_err(ndev, "Invalid IRQ: %d\n", ndev->irq);
++		return -EINVAL;
++	}
++
++	switch (irqd_get_trigger_type(irq_data)) {
++	case IRQ_TYPE_LEVEL_HIGH:
++	case IRQ_TYPE_LEVEL_LOW:
++		break;
++	default:
++		netdev_warn_once(ndev, "Only IRQ type level recommended, please update =
+your device tree firmware.\n");
++		break;
++	}
++
+ 	ret =3D request_threaded_irq(ndev->irq, NULL, mse102x_irq, IRQF_ONESHOT,
+ 				   ndev->name, mse);
+ 	if (ret < 0) {
 =2D-=20
 2.34.1
 
