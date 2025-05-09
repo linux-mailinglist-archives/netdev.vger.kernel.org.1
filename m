@@ -1,85 +1,264 @@
-Return-Path: <netdev+bounces-189290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16234AB1795
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 16:41:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16A65AB17A7
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 16:46:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79D307BE2E2
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 14:39:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 142A417DFA0
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 14:46:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAE4F228CB0;
-	Fri,  9 May 2025 14:40:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 771DC21B9CE;
+	Fri,  9 May 2025 14:46:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Cxoy9r7h"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QUxefT/u"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37530227E87
-	for <netdev@vger.kernel.org>; Fri,  9 May 2025 14:40:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746801657; cv=none; b=Gc+lYIEOeUfPuCOFitDPeKbNcGScGSIcpwDiLx/NVGN1TdO3GTHP9dSaMEK0EbtVXrM9B/ku5GlumRnPOnUMMDQNgzoQ1pCa28rorH3wt0GZIMvBtADMtNhbmhWfIS+kImzkWfmRtkpV1q/+gAdrrc+fAsNkZ5lmEmxE5E8EJHc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746801657; c=relaxed/simple;
-	bh=4yVAJBnAAr6M4zx1sfX3IcM1zaOvpmCjIhGoeuBwgps=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fIcadZ3GMZvUALl2Z+gtkznQR1JpMn+xkG19ASfM4B9MxPt8B8sqRCUhntUg8ED9+SWiY97i62rehSsJ+D1Shbo1dxxKTxaUvIoISmhMEJJ0XiJCnPQhPzv8+Mi3ICElWXwfMiTPU3rN8QF6gvOOS7w+tq7eOPyMHaI2JNbdiUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Cxoy9r7h; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=k4hgG5ctNXkl8DyQIeS5FOj/RRZxp4TZdPf9lvmO7F0=; b=Cx
-	oy9r7hgtmaIr84tWAMTtqb/UmgxnD8Sqj5YTom4FIoKTs7Om67aFScTm9InUYdEfrFDvtzP2yQnMr
-	++gmtgDyYYw4p17ZNAjAjrh818kDTK20J6l9eyl1WDepbgOYLXvNhqEKrQhiwz6Dx8Tk74HzeFXF/
-	3lHSysZFitfGzvQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uDOuD-00C7lD-Nk; Fri, 09 May 2025 16:40:53 +0200
-Date: Fri, 9 May 2025 16:40:53 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Sabrina Dubroca <sd@queasysnail.net>
-Subject: Re: [PATCH net-next 00/10] pull request for net-next: ovpn 2025-05-09
-Message-ID: <5e2b95fd-4bb5-43fd-bba6-680a6f2d41fa@lunn.ch>
-References: <20250509142630.6947-1-antonio@openvpn.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E49923184E
+	for <netdev@vger.kernel.org>; Fri,  9 May 2025 14:46:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746801962; cv=fail; b=or2n1eDuQ4GQ1GQX+/LRKqv3l1IuRgho89JBXU94IOz4yD1MpSKIPRmB12i28+vQ+3Ef6G9GRl58eGPiD92IZQtK/3hYpJQ4uX96q0vcGlpWvkdiW7ziW9wSIS4epjl7Sgx+jqCId95YEDET/WVrjYOP+yrVp32uh6e4GjePmok=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746801962; c=relaxed/simple;
+	bh=ngarJa3lOcP4bpkXtOQzUpVblZeIODnXnYy5nG1c8ZI=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=UGebo17JP3kpR9tJ1kpM4OtWuaT+eIsMHgDAZXgS68Es68Pt2sYvTrrTeNlbJLykpP+D9XPzq5eceaAjmreRbmrEackqzOWlTKC9S1kvpXdtjN1VWarwIY0FlieZqJqnBLpw9TOUeMTe3woyKFYevfHVxGzjKcuwgamiNqrEK3s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QUxefT/u; arc=fail smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746801961; x=1778337961;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=ngarJa3lOcP4bpkXtOQzUpVblZeIODnXnYy5nG1c8ZI=;
+  b=QUxefT/ufQ9Re89TmYMwm3sMpgyEfBmuSis3mMARPf1pl8uoUYXe02ml
+   d9BqBILj8PtgN98aa4IZv+A9fIwq6Gn5Puo8N/IP/3FffzwCPkEQIbJJf
+   NE9RekXLj6idjX+4/X5XxokqNqcpjg5FXcW69KMayEZ8ThHiE2HEgDMua
+   dCMDNxLlE+Uclh2dTl67ThKvDjhG4J00ULDO2cSieB5nRENF8EjwShsNi
+   KmG0lTm5iHbSlUBvkp8ZiWKoA9n92CCDT2pe8Hlh9Af7LZtbgwpdw1v4u
+   9pCQXgB2tIhWB0dIZDfFW6Cc6kwBwmv2lJRMgDOpbkZTXz/RsSo7zhgzv
+   g==;
+X-CSE-ConnectionGUID: NQtopDUsSYGXUptWvijlJg==
+X-CSE-MsgGUID: RrIKzDc+T1WSPInPw1r9/g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11427"; a="48713436"
+X-IronPort-AV: E=Sophos;i="6.15,275,1739865600"; 
+   d="scan'208";a="48713436"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2025 07:46:00 -0700
+X-CSE-ConnectionGUID: 2iE4eRggSkqlnDpoPZjleQ==
+X-CSE-MsgGUID: epRRLYfVS9mX+TOnU8wLXg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,275,1739865600"; 
+   d="scan'208";a="141747609"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2025 07:46:00 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Fri, 9 May 2025 07:45:59 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Fri, 9 May 2025 07:45:59 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.175)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Fri, 9 May 2025 07:45:59 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=nOtk1h81nNJhpCxI/2XCC6R/IYwYMBNbMEdCiMH1pT0t3D/jN/0S4BSWM0AsV8qFrCrDp1thfSFGXGVM2KapjAajIBbpRdDxBctIK0WeNzgv66roQT0/z3NXYFD5GS3ElvPzDN92uEFiQ/YclSNuuE3lvgsdYaPi/E9u4PAx5z/TScLnbt/s/P5Y7KzKe6Xsu0wlVkagO/z58IfE9o5ZX85yfjJOiGus7biJZk137wIbYxO8E5v4x3Cc6oxUfi2hQQWb537dbsl82U6TS2dH4AUApwSH9QZjcSwdVr7E4ClLH3udFAb07alhhL/cXntsE0IcfCqTf9SE+t40lbQlZQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FVORdIedFzGXMTTMnbm1a3FZDf/UIkwBKwG2l+Emqr8=;
+ b=v3viJyo4n6y7cUrxIRLSM03sJTJcrBjOwTUvB+Y3FSLgqsTxrVO+1WbxiVmxYDTiIQWXKIYWdiuAlH2LvfCjmIfpG4jJYz9xl9Jb+PATbIFUmdXQBNBZFZdfoESa3FqmsnuyrxHv84Nc+l+gJto0Vffu/6Aicq4qIgGrWNpbzQo/m77B8Ni+9KSbWgcBoxV0lyN2I9IsnmcTcbOG1KCkWNqyKXMSzZ0RMW7/csFEk1huZPXjG5BrhzP3m3Mi5JCU9gEHPy3M4Vaw4ch3EcvezDyC7VFiP2KEe6cs4RxNYBWM1MR3S8HEMD1RvET5pRvRdjOGTbREgKyppiLJ12ak4Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8665.namprd11.prod.outlook.com (2603:10b6:8:1b8::6) by
+ PH0PR11MB4774.namprd11.prod.outlook.com (2603:10b6:510:40::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8699.26; Fri, 9 May 2025 14:45:12 +0000
+Received: from DS0PR11MB8665.namprd11.prod.outlook.com
+ ([fe80::8e7e:4f8:f7e4:3955]) by DS0PR11MB8665.namprd11.prod.outlook.com
+ ([fe80::8e7e:4f8:f7e4:3955%5]) with mapi id 15.20.8699.026; Fri, 9 May 2025
+ 14:45:12 +0000
+Date: Fri, 9 May 2025 16:45:01 +0200
+From: Michal Kubiak <michal.kubiak@intel.com>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+CC: <maciej.fijalkowski@intel.com>, <aleksander.lobakin@intel.com>,
+	<dawid.osuchowski@linux.intel.com>, <jacob.e.keller@intel.com>,
+	<jbrandeburg@cloudflare.com>, <netdev@vger.kernel.org>,
+	<intel-wired-lan@lists.osuosl.org>
+Subject: Re: [PATCH iwl-net v2 3/3] ice: fix rebuilding the Tx scheduler tree
+ for large queue counts
+Message-ID: <aB4U7TBtr75ouKzi@localhost.localdomain>
+References: <20250509094233.197245-1-michal.kubiak@intel.com>
+ <20250509094233.197245-4-michal.kubiak@intel.com>
+ <a214afa6-e9d7-4152-9b43-146cf7ce0076@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <a214afa6-e9d7-4152-9b43-146cf7ce0076@intel.com>
+X-ClientProxiedBy: VE1PR03CA0022.eurprd03.prod.outlook.com
+ (2603:10a6:802:a0::34) To DS0PR11MB8665.namprd11.prod.outlook.com
+ (2603:10b6:8:1b8::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250509142630.6947-1-antonio@openvpn.net>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8665:EE_|PH0PR11MB4774:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0295a853-f8b7-44e1-d3dc-08dd8f081a43
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?CLeO0e3n3XiC5zp8ggaN4zzyZqlB+wZssMnKwnkdCzPXg4LU6w/e18ACLkuQ?=
+ =?us-ascii?Q?nDrEfc9fikUTUSIwKuWZwLQ+nfAJdRD26SlkPAxmy711lb/DeOspNnFTy4Mv?=
+ =?us-ascii?Q?i7vgk8sQyElx0c9qqWhaory7VYTU9G1Sfmy1mDe+XM4lCRTJo4QSHJZamUEY?=
+ =?us-ascii?Q?ZCMzpfALC9SbhzOOOlDNYWbQIn3wlECHOQRYucEnV3U+wPu9oZt4CDny+f6M?=
+ =?us-ascii?Q?gsuDRr6q8rZz7go7SlRXQ/ZGdNWUSnQePT0YTY/0ZelMeaQstO21k/rQjDAP?=
+ =?us-ascii?Q?uTEJsu1eIjm7dNOG9h7aGD+/Vu7ry7a32yzOF4WRrzTBO86jjqy5EHPtvMdS?=
+ =?us-ascii?Q?pMdfImOmmlDX48PYUJhalYbRiBD/8dfmTBEwxNZ5S0a1V4T0gbeA6H43NYnD?=
+ =?us-ascii?Q?wq7uAuqhh9nLCfme8RRzZZWLva1l2FIE9Z7e+NwZ40bg5gYjBHqJTwfVchi0?=
+ =?us-ascii?Q?/42qetPeZbJzNDpyswSI3wJpPXZGsHkqERapVgGTTb3Fg6ofzY1FbYwarhNa?=
+ =?us-ascii?Q?P8Ix+6pYwZ/QE+Hru9eRTZPv5uVzNZCWDWa6T9ycQJGm56m0Hz50uflvJmuX?=
+ =?us-ascii?Q?B1NO/hkUk0KNf1cxLmu1JzZJNsJhyQrdrcI+XX7Ir+jTlRHvdMSaDXN+KRqp?=
+ =?us-ascii?Q?MNJsyFc1WxtM5xgEs8o+ckcOuHb4XSlaDxY1Qa8Pi/i4qHQ1e7cfDNu9JWJi?=
+ =?us-ascii?Q?UuQt/wtKeBmg+fWBWLhAOayHRh4MU+m8DVriTphCW5VqraGnLZrBByfjVJzG?=
+ =?us-ascii?Q?Y2VhsDJVF/aP3PYSA1MGyoL6WX5SqU7xQv4meSbmc2rM/S785ctnXPlKYGTh?=
+ =?us-ascii?Q?DINbtN9HQmOMYFc0DA+lnMwVi/chtv6rOQ6D5kf6gf51jKfq5cBA1vNB8q7f?=
+ =?us-ascii?Q?TKAr1mR3SqkX32Es+ILsB/ZJKB8aGKQyz+hbxwobEHMIQlAtjYaF+vOP7vIK?=
+ =?us-ascii?Q?Ab970wVe9io447Qhy6/8MTt85x7u1l1e45PR/0eqeQw2o5AXRvEI83akvZEJ?=
+ =?us-ascii?Q?O9kezhnIK1T9jlJJNUTDeosnZG3ki7RdWkZALoOdlXwx/h3Y5o6wifZ099Ey?=
+ =?us-ascii?Q?7jsc3QszaTLsn3QN3H3hAY6sOOmZcfG+lcXrMUD/1az5j1uhlXRbxeVo94H+?=
+ =?us-ascii?Q?t2NmeDyFJHDSA3yAvuNGulOIIMeX32uLHcrxAO+sAs1Z5lGxsEYou0/m/gWk?=
+ =?us-ascii?Q?nGmWaz0d2pqSXN7y5Rbxe7IrtPVfvf5Ae1Wqsghx5I/1Ox2sK2dWD5dDrwpG?=
+ =?us-ascii?Q?eZ2BR6DqTkt4uKxcXhKgr7n0nd1VfinMr/Wg1xmMvq5pWt/A8Kb4LAQCYf8k?=
+ =?us-ascii?Q?k1xnx2nUFdI/1mImzO4hjeCQdjpGx/CwjtfWzKMPlnmZDSwevdNUsOVKE/2W?=
+ =?us-ascii?Q?tSutoFBX/62TG32VOxDo+DsQiDnLQvjX1Xw5z53e6C91eTO7D7BTJO6V0w8x?=
+ =?us-ascii?Q?YpqsrqmeomQ=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8665.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?+0ABj3FWAaWKqgMDli82fNodmBwn1eBAIH7pTaTgc5mV3sS0MqDe3jHCfpZH?=
+ =?us-ascii?Q?SmDWRxOcBXY5Rm5jwz26F9LuFlLHZWqsFf5tBrzR+B3lxuKwXSNWsChy0yUk?=
+ =?us-ascii?Q?F9TxfEeoYgGaQaOzK2tnmld20ho1kDFomzQGlZ4i26eFKtv/xyDuUu07WSWT?=
+ =?us-ascii?Q?Hd9aSKk/JqaI0+TgZnJXyCnO/cnOXqBbTt8ENf5kKp/VldK9lVzUEy70ldsl?=
+ =?us-ascii?Q?kNEaRu3NvSduu6Lj63EJ59RRXhFR5fxBtsl0G8cZIzgNPHpT1GdjNZGkk+BD?=
+ =?us-ascii?Q?9TFDPaYBs30ZkQUgBCkc9Q46JQOJcLZrzJwY5NSS+ZbkBjm6HGcEaxFGIw/p?=
+ =?us-ascii?Q?P7lWKaxOd43LOAG90rvEzCMYLUQHX2Lru2V0NsqyFhNNvQcn46LKoS4sZxrm?=
+ =?us-ascii?Q?T0PrcvARjdOdqgGniUqZFYtCCWfs4FUI1CmUeXrZgkJfn8IvU1Q20wtkWN8U?=
+ =?us-ascii?Q?p8h4FL/u6gjE+e14c+3ZFzkiYkeJaNtEGcIp33XT4i6EtFFgMPJbj1UYvhQl?=
+ =?us-ascii?Q?LwYv3C3r20irSlJJVDUs1UeLDfs2Mni15TM8sURaizUikQpLQeZ8GyTUkzlH?=
+ =?us-ascii?Q?p4Zu4GuY4xpbYYBSlCs2wWBxgXKUVrCdEqJ3q/C5zalhE7lotBzEjTxMzcNR?=
+ =?us-ascii?Q?YI5xS+9tIlrMGMNajm6nPbEtzgFKsAyKhInbNm0Xa1Iu9bpsG6SylqVNS5Zh?=
+ =?us-ascii?Q?5D24GkYAM2vJhfQ6w2t34z9zt2gdHX4S3A1i3yAy1c40NR5xIMOo/4akAz52?=
+ =?us-ascii?Q?7ugZOeQzSiGY5ULnfaLRqdunwXJXOedxj8OVHW2FbS39WfVbgqUGSElApBe9?=
+ =?us-ascii?Q?zf0XBmGNhKRE+BedBb72dA4PZrqL9GgY59ZvrJf+QrHb+kNgWz8YcZ0MljlK?=
+ =?us-ascii?Q?K0zapwpl/7CcIS5WBJKD+M3GtAxofoisAaJOH1SL4CWs81Z4xVAovXgOr7ee?=
+ =?us-ascii?Q?PwDMc5XOgCbKn4KRPwERZy8xoPfxVUtz2mD7CQrfFv79f2WQFCNLbvRo15PV?=
+ =?us-ascii?Q?VIyEBZ5FQe+jCg5pqRYV9QMSDAqfBBrYjC1S1j5/tvSQ3cmZ9R4aHfoxIjlA?=
+ =?us-ascii?Q?gSbwcjSdPIipJMEeqZdoaUsUUUolW2S86LdaZaoVTR8HOoPMfCy/X6QmylfN?=
+ =?us-ascii?Q?tEU3eBvP5y4LS7RgUgglLMZRplowvdZ2ef7kE+sfSKNzdZVqnjBFaKjSIR05?=
+ =?us-ascii?Q?9eGAGTJt9isoOpIlH7erqNWKU4p7bDlRAstbaSYbzkHEUu6EI5ZtbVDK4yGx?=
+ =?us-ascii?Q?j8FxCtFCjEgKkBisjvEAfAH4H8wnXWHv1FkX1QgQEJk8ApP8gegYlN4vG+ZZ?=
+ =?us-ascii?Q?F+knaHfNTMzx+k+3RLnOEquCU8BXKhoXEMhpaCjXJmegx/ARNadW/Cmr+Gl5?=
+ =?us-ascii?Q?Q6BUbTOkwQ/XmuL8+Ql7hmswYNhFj7xjGlqQsqTtZbRyyP+GsUGCTlTljr1K?=
+ =?us-ascii?Q?UL+sNxq9MRbyhyuJV7vC5PpmldxxNbUIW0WRbzLryDJt+0n0GrMSTfQDQaNk?=
+ =?us-ascii?Q?MsnTolU8XOM8q8sd/VWqxxeoqdqIYPMs22tQ738yqKMsJULO5TRIbT3Z8Huz?=
+ =?us-ascii?Q?XISvf/VOczu1wZhTHLtsmE6wEhi6fIHHwKWK9+9OCVqum0tkh8v+iiE7ybR0?=
+ =?us-ascii?Q?WQ=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0295a853-f8b7-44e1-d3dc-08dd8f081a43
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8665.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 May 2025 14:45:12.1162
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6MpUTt2uEvmp3i4H/9oVvJ8myPNuXm51VLd0nze3G4Aax6CnTeeX5OxnuayXHxLIuEuihjjmzrt5Os3G1rewIQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4774
+X-OriginatorOrg: intel.com
 
-On Fri, May 09, 2025 at 04:26:10PM +0200, Antonio Quartulli wrote:
-> Hi Jakub,
+On Fri, May 09, 2025 at 03:07:56PM +0200, Przemek Kitszel wrote:
 > 
-> here is my first pull request for the ovpn kernel module!
+> > +ice_sched_rm_vsi_subtree(struct ice_port_info *pi,
+> > +			 struct ice_sched_node *vsi_node, u8 owner, u8 tc)
+> > +{
+> > +	u16 vsi_handle = vsi_node->vsi_handle;
+> > +	bool all_vsi_nodes_removed = true;
+> > +	int j = 0;
+> > +
+> > +	while (vsi_node) {
+> > +		struct ice_sched_node *next_vsi_node;
+> > +
+> > +		if (ice_sched_is_leaf_node_present(vsi_node)) {
+> > +			ice_debug(pi->hw, ICE_DBG_SCHED, "VSI has leaf nodes in TC %d\n", tc);
+> > +			return -EBUSY;
+> > +		}
+> > +		while (j < vsi_node->num_children) {
+> > +			if (vsi_node->children[j]->owner == owner) {
+> > +				ice_free_sched_node(pi, vsi_node->children[j]);
+> > +
+> > +				/* reset the counter again since the num
+> > +				 * children will be updated after node removal
+> > +				 */
+> > +				j = 0;
 > 
-> As you can see in the patches, we have various tags from
-> Gert Döring, the main maintainer of openvpn userspace,
-> who was eager to test and report malfunctionings.
-> He reported bugs, stared at fixes and tested them, hence
-> the Reported/Acked/Tested-by tags. If you think such
-> combination of tags is not truly appropriate, please let
-> me know.
+> I know this code is a copy-pasta, but it looks that there is no need to
+> reset the counter (whole array isn't reshuffled), just don't increase it
+> 
+You are right. After analyzing the `ice_free_sched_node()` function, it seems
+we should just keep the value of `j`. After removing the child node, other
+children nodes will be shifted towards the beginning of the array.
 
-Ideally, all this discussion should have happened on the netdev, where
-others can take part and learn more about how ovpn works. If this
-happened in the open on some other list, please could you include a
-link in the patches.
+> IOW, would be good to check if this line (and the semi-obvious and
+> half-wrong comment) could be removed.
 
-       Andrew
+I would prefer to change the code, since I'm touching it.
+
+> 
+> you could keep my RB tag, thank you again for the series!
+>
+
+Let's wait until early next week to gather more potential comments.
+Then I will address it in v3.
+
+This minor fix will not be directly related to the core of the series,
+so the v2 can still be used to test the workings of XDP on multi-core machines.
+
+Thanks,
+Michal
+
+> > +			} else {
+> > +				j++;
+> > +			}
+> > +		}
+> > +
+> > +		next_vsi_node = ice_sched_find_next_vsi_node(vsi_node);
+> > +
+> > +		/* remove the VSI if it has no children */
+> > +		if (!vsi_node->num_children)
+> > +			ice_free_sched_node(pi, vsi_node);
+> > +		else
+> > +			all_vsi_nodes_removed = false;
+> > +
+> > +		vsi_node = next_vsi_node;
+> > +	}
+> > +
+> > +	/* clean up aggregator related VSI info if any */
+> > +	if (all_vsi_nodes_removed)
+> > +		ice_sched_rm_agg_vsi_info(pi, vsi_handle);
+> > +
+> > +	return 0;
+> > +}
 
