@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-189222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBA0CAB12CD
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 14:01:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 472F3AB12CF
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 14:01:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FC6A3A5943
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 12:01:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0D913A786F
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 12:01:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD754268C69;
-	Fri,  9 May 2025 12:01:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24E4128ECE9;
+	Fri,  9 May 2025 12:01:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="Czfk5M3Q"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="HcS9NxBI"
 X-Original-To: netdev@vger.kernel.org
 Received: from mout.gmx.net (mout.gmx.net [212.227.17.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68DE01A2C3A;
-	Fri,  9 May 2025 12:01:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A9422129F;
+	Fri,  9 May 2025 12:01:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746792094; cv=none; b=rjZwWb/K2Hgc58KjQas5+5fHmOCJsxVwEc17J+fpiSQnsQ9pkNILuA8nHx/OcbQonAfHUVY9j9US5K6fY5giH/M8ifyiKEtX3WE4FRwtH+KAA8IaGTgnOVHw805OataRYy4dy7SoHOO9UEfOLzaq+Lp1M1ujJBlLZbK4L63h8xg=
+	t=1746792095; cv=none; b=OGlCdXAf2yx1uiKcIf3lyseAK1plPoTiH+g/rcOCXewgrw2ZUs6LmQetnBeAt4s9+pbDC0MEhatzseJvTyynvwoTZuNNGSjkLepBoOuKAe81nZ068yIggjL7FjTyr3Ib9PdA6L5MOa77TMSO3cOJ7nZYBtv6o+Ui9Qx362faPDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746792094; c=relaxed/simple;
-	bh=ZHYdH6Cjd2ni/INiqSaFkkwBq9QJrWol4zYm1bSxO34=;
+	s=arc-20240116; t=1746792095; c=relaxed/simple;
+	bh=szttWa0JPEC+JvhU8cBYMvI//h7+JuD+0EvoFmpegX8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lHe1MRwYEVjzBtKCPfaI87iyD7MJIYNhMbt5E3yXz77y4PI7DTGYgBjIN5pA1H7zDV1YVqJWpYVWgsYP4CBzWWnIMV4Y0ZgPwt16+K5s/oFi+40d+zbcVxxNZ0faN+8ofL0p5wIQ9EDJtjne6n/0N0EiGoXEQ+9Zjuzyl9B8Rr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=Czfk5M3Q; arc=none smtp.client-ip=212.227.17.20
+	 MIME-Version; b=tzb+tWlNVWTf+CYdQaMf0Myuj5Cjo97ZSjoZXhumF8wM7S5+ToUlq3J+9Pa3bJvEx+sLcX/mEZ/g0GLAJgefr0A01MMFJtSe4YOtDgq0wKr6T7OPwdoloszJo19aP/ZKkd7BRPzrHPtju1YLvmj9/92d9PDmTlp+7ZQKyj2lcww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=HcS9NxBI; arc=none smtp.client-ip=212.227.17.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1746792090; x=1747396890; i=wahrenst@gmx.net;
-	bh=LFXqYk180vc4BWrbIG8j8Csao+70h4RA417Ern7Ps/8=;
+	s=s31663417; t=1746792091; x=1747396891; i=wahrenst@gmx.net;
+	bh=r8QbWdy35aMAZoLD6+7Ut+Lr+Nax9SROXt4VZiabsgI=;
 	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-Id:In-Reply-To:
 	 References:MIME-Version:Content-Transfer-Encoding:cc:
 	 content-transfer-encoding:content-type:date:from:message-id:
 	 mime-version:reply-to:subject:to;
-	b=Czfk5M3QTB+lKl3jGIdo9euxY8xBuKO7tE587+d/xQlbVNOYJ6DxHxly6HL2Tf0x
-	 ixOzGudTmWJ4C/iIQvaHD3Q52NORB+NMSullbl6VwHFG2ZPGpxd1C597zQI1svndc
-	 ytDUD/ZZBD7djYRCbz8jrBUWR0sCTMeLZger20FnQTaTOAOwULQQkR0kGVsaLJ/qZ
-	 HYGFj4pw9K+eLuRkeqwa19dnOKMZfrIuAdWd2SBnAAqhr/9RqclVeC/iKeK6afZug
-	 3hgygdSRWHyHDxxKHIK9QHiXazUI2fWcNvtZbr7sdm9I3Rk4kqTRiGmHurVkzYcQi
-	 vREJ6DAJoKwOCkZFCw==
+	b=HcS9NxBILA65f4jTQYU7m29DNSLtTXt6Cm42MjwxLvDaTyPBGxKsgayhWigQczAr
+	 ynMMF1KWcZRr/B1rBVz1ZQ3n4JfOrzS4W/YeSt1WYrRcr/j9HtFcrfxhuuFoVs2GS
+	 /NYgbUE+aoSYsjK0IF18WCe1DqmP4KNLl+jzKL9MMQ0LYDrb/EYgjMoU9U2M3rpr1
+	 rKXnpY5c2+RptSk6p8vZvPCizL/qteW/mVQGaxPNkxI1RDxocjSoaf5Kt+LuENp6M
+	 23jev6+1wTZQawAMOpG08xi5xHOA6KCipW07kiCHXTi4XE7ufqf5ExSallu0rFKYg
+	 Wl0CnbXWMYjHbaOTPg==
 X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
 Received: from stefanw-SCHENKER ([91.41.216.208]) by mail.gmx.net (mrgmx105
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MwwZX-1uxdL712vD-014sHZ; Fri, 09
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1MiJZO-1uhTu02bP4-00qNhU; Fri, 09
  May 2025 14:01:30 +0200
 From: Stefan Wahren <wahrenst@gmx.net>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -60,9 +60,9 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
 Cc: netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	Stefan Wahren <wahrenst@gmx.net>
-Subject: [PATCH net-next V2 4/6] net: vertexcom: mse102x: Implement flag for valid CMD
-Date: Fri,  9 May 2025 14:01:15 +0200
-Message-Id: <20250509120117.43318-5-wahrenst@gmx.net>
+Subject: [PATCH net-next V2 5/6] net: vertexcom: mse102x: Return code for mse102x_rx_pkt_spi
+Date: Fri,  9 May 2025 14:01:16 +0200
+Message-Id: <20250509120117.43318-6-wahrenst@gmx.net>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250509120117.43318-1-wahrenst@gmx.net>
 References: <20250509120117.43318-1-wahrenst@gmx.net>
@@ -73,124 +73,142 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:7LnhgWlf0qdQshLn2Yp9k03d8UkUCblCoQVf/1cF7cdMHpJ/9sG
- 8lq+pYno3ELydvGOhaqOQ6nWKIrkooGyQuNOyubPFfUHUx2pUY+g2OY6DDfht98N35FnYkr
- 1wx0hA5ZTD1gKZchP5xSOsAFJ4TkKFCqVWceuR1+6xBhE/hH7LFKMbKkG1ymp1ShvZUFRzY
- lx/3Kwrniq6/aJBhDHGtw==
+X-Provags-ID: V03:K1:FOEqY1ScwkYx/a/OJHymdUA/IRmwABt6lWHtPNSucubxI+gq5qT
+ 0MWnw1nxnBQxUQI7lihXn8eZPal6/JfrQpHN+0ldFbaNgWBImgJgk+cEyOL0EDKkYDt9oLf
+ J2oaflvu3ctodVyjEoiMXwyz5PLTDuhjQxt1yeYWVKAMXu7ZyH3JgtPBGeTBitQRbkKf3vh
+ vGpWQN3yCncJkTJeuAdKA==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:2f7ERuVY86s=;zcO7IKpkDOaoz2b3D4G81FV57fH
- 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
+UI-OutboundReport: notjunk:1;M01:P0:XJxSL87oAYk=;EyODfAD7uHm/+O53xjD5OeDhHc+
+ 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
+ zspeejd3jmUfvZDMj7ZM1/YWA
 
-After removal of the invalid command counter only a relevant debug
-message is left, which can be cumbersome. So add a new flag to debugfs,
-which indicates whether the driver has ever received a valid CMD.
-This helps to differentiate between general and temporary receive
-issues.
+The MSE102x doesn't provide any interrupt register, so the only way
+to handle the level interrupt is to fetch the whole packet from
+the MSE102x internal buffer via SPI. So in cases the interrupt
+handler fails to do this, it should return IRQ_NONE. This allows
+the core to disable the interrupt in case the issue persists
+and prevent an interrupt storm.
 
 Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
 =2D--
- drivers/net/ethernet/vertexcom/mse102x.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/vertexcom/mse102x.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/net/ethernet/vertexcom/mse102x.c b/drivers/net/ethern=
 et/vertexcom/mse102x.c
-index 954256fddd7c..c2b8df604238 100644
+index c2b8df604238..62219fd818f5 100644
 =2D-- a/drivers/net/ethernet/vertexcom/mse102x.c
 +++ b/drivers/net/ethernet/vertexcom/mse102x.c
-@@ -17,6 +17,7 @@
- #include <linux/cache.h>
- #include <linux/debugfs.h>
- #include <linux/seq_file.h>
-+#include <linux/string_choices.h>
-=20
- #include <linux/spi/spi.h>
- #include <linux/of_net.h>
-@@ -84,6 +85,8 @@ struct mse102x_net_spi {
- 	struct spi_message	spi_msg;
- 	struct spi_transfer	spi_xfer;
-=20
-+	bool 			valid_cmd_received;
-+
- #ifdef CONFIG_DEBUG_FS
- 	struct dentry		*device_root;
- #endif
-@@ -97,16 +100,18 @@ static int mse102x_info_show(struct seq_file *s, void=
- *what)
- {
- 	struct mse102x_net_spi *mses =3D s->private;
-=20
--	seq_printf(s, "TX ring size        : %u\n",
-+	seq_printf(s, "TX ring size            : %u\n",
- 		   skb_queue_len(&mses->mse102x.txq));
-=20
--	seq_printf(s, "IRQ                 : %d\n",
-+	seq_printf(s, "IRQ                     : %d\n",
- 		   mses->spidev->irq);
-=20
--	seq_printf(s, "SPI effective speed : %lu\n",
-+	seq_printf(s, "SPI effective speed     : %lu\n",
- 		   (unsigned long)mses->spi_xfer.effective_speed_hz);
--	seq_printf(s, "SPI mode            : %x\n",
-+	seq_printf(s, "SPI mode                : %x\n",
- 		   mses->spidev->mode);
-+	seq_printf(s, "Received valid CMD once : %s\n",
-+		   str_yes_no(mses->valid_cmd_received));
-=20
- 	return 0;
+@@ -310,7 +310,7 @@ static void mse102x_dump_packet(const char *msg, int l=
+en, const char *data)
+ 		       data, len, true);
  }
-@@ -196,6 +201,7 @@ static int mse102x_rx_cmd_spi(struct mse102x_net *mse,=
- u8 *rxb)
- 		ret =3D -EIO;
- 	} else {
- 		memcpy(rxb, trx + 2, 2);
-+		mses->valid_cmd_received =3D true;
+=20
+-static void mse102x_rx_pkt_spi(struct mse102x_net *mse)
++static irqreturn_t mse102x_rx_pkt_spi(struct mse102x_net *mse)
+ {
+ 	struct sk_buff *skb;
+ 	unsigned int rxalign;
+@@ -331,7 +331,7 @@ static void mse102x_rx_pkt_spi(struct mse102x_net *mse=
+)
+ 		mse102x_tx_cmd_spi(mse, CMD_CTR);
+ 		ret =3D mse102x_rx_cmd_spi(mse, (u8 *)&rx);
+ 		if (ret)
+-			return;
++			return IRQ_NONE;
+=20
+ 		cmd_resp =3D be16_to_cpu(rx);
+ 		if ((cmd_resp & CMD_MASK) !=3D CMD_RTS) {
+@@ -364,7 +364,7 @@ static void mse102x_rx_pkt_spi(struct mse102x_net *mse=
+)
+ 	rxalign =3D ALIGN(rxlen + DET_SOF_LEN + DET_DFT_LEN, 4);
+ 	skb =3D netdev_alloc_skb_ip_align(mse->ndev, rxalign);
+ 	if (!skb)
+-		return;
++		return IRQ_NONE;
+=20
+ 	/* 2 bytes Start of frame (before ethernet header)
+ 	 * 2 bytes Data frame tail (after ethernet frame)
+@@ -374,7 +374,7 @@ static void mse102x_rx_pkt_spi(struct mse102x_net *mse=
+)
+ 	if (mse102x_rx_frame_spi(mse, rxpkt, rxlen, drop)) {
+ 		mse->ndev->stats.rx_errors++;
+ 		dev_kfree_skb(skb);
+-		return;
++		return IRQ_HANDLED;
  	}
 =20
- 	return ret;
+ 	if (netif_msg_pktdata(mse))
+@@ -385,6 +385,8 @@ static void mse102x_rx_pkt_spi(struct mse102x_net *mse=
+)
+=20
+ 	mse->ndev->stats.rx_packets++;
+ 	mse->ndev->stats.rx_bytes +=3D rxlen;
++
++	return IRQ_HANDLED;
+ }
+=20
+ static int mse102x_tx_pkt_spi(struct mse102x_net *mse, struct sk_buff *tx=
+b,
+@@ -516,12 +518,13 @@ static irqreturn_t mse102x_irq(int irq, void *_mse)
+ {
+ 	struct mse102x_net *mse =3D _mse;
+ 	struct mse102x_net_spi *mses =3D to_mse102x_spi(mse);
++	irqreturn_t ret;
+=20
+ 	mutex_lock(&mses->lock);
+-	mse102x_rx_pkt_spi(mse);
++	ret =3D mse102x_rx_pkt_spi(mse);
+ 	mutex_unlock(&mses->lock);
+=20
+-	return IRQ_HANDLED;
++	return ret;
+ }
+=20
+ static int mse102x_net_open(struct net_device *ndev)
 =2D-=20
 2.34.1
 
