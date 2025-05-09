@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-189314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 018BDAB1956
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 17:54:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0333AAB1972
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 17:55:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9F7E0B222F0
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 15:53:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3DBA4C5A76
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 15:54:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2198723237B;
-	Fri,  9 May 2025 15:54:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79C6B235340;
+	Fri,  9 May 2025 15:54:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="DEdcppJu"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="hRIioSPb"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2070.outbound.protection.outlook.com [40.107.237.70])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2051.outbound.protection.outlook.com [40.107.236.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD7B6232368;
-	Fri,  9 May 2025 15:54:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5B63235072;
+	Fri,  9 May 2025 15:54:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.51
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746806049; cv=fail; b=EmFfT4TqMLN1c1KX/2ThS2urOcwggB7q0p85Zvlu845yKiseo3q5MT56fYJaFcb4ZuzJb6DOs3Mk4oidAlVa1ozVCodjr45Nx/yiuY3+KNpes242VR852hwQXy9unGDsLt9VhI+unDyV/WQyGijr3X3/kwyYC03KdNc7ItEMF98=
+	t=1746806053; cv=fail; b=dKY0Q5ADkzQ+4dBqcZvQwkNyu/+1WgGuSY/LYSCG+WEJsHl5yc1UPP01RtN/8CY2HpkWUapXJqKpdxUzecphIu2kVgD+Dwq7VyQcz1LYin3Ra8ET80WLqOHGVz9uQUlLPLOYTeNRX08Eo8N9NhnbW/85j2ICQc7r5mKubCYuLLI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746806049; c=relaxed/simple;
-	bh=N56JMvcqjB7KIcdVOQH2uOJ+HLzo6H1q/26iqKzjR6o=;
+	s=arc-20240116; t=1746806053; c=relaxed/simple;
+	bh=RFJ4hVQD5aXRs4DmdYwUBgxhIdKpwqb1cRj9BfD8bXY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=q2wNIBiG11b9oaKTFf4PBHO9Jfu/mU+Uf1EHSW071G3VpcyUSekTmqaNGaMOeoObBobNYMbru01ovwdGWcRDUC0Ku5nrMjrMidvWhrBxPIeIug4pPOLYIIY1WVrIkXruPVuxiU1ou04FxSxO3AXHil70OZUqTyM0fhBDaq132tE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=DEdcppJu; arc=fail smtp.client-ip=40.107.237.70
+	 MIME-Version:Content-Type; b=Xn4abbOmd/94oNXtsjen3SH5qAbe9IQg9OgwQOjieiqYr1e1cuZSjotuVf79sFCJ2Ut2Pt78WdTmIFFFfVKpGUgr1gtv0CxzFz8hrt9Oe0m3G/ILDSRHRznG7nr3qF+6vvKd8gRcz1n6d+hD+L5OgV8efGqF3cNFZ6cbp0gJANw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=hRIioSPb; arc=fail smtp.client-ip=40.107.236.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=owlb7uXCvTdKIw83jqwpFgvSEAAYmJ5bxG3M9nQ57B3JV5WU9VhHxWMMnlSl1bEyI4g88qjr3GDS833ekloNDu8kfEMNkMbUvMJnetLYeDJX/KJtDy+JfCBEc9D4RLo5E6K9H/DpmK16uw1cOzWth2zJZJjlD6MqsumXCuwRG6sTIV2iCBLegKyHi6irp6MR1E+fUPWS+iF9iUwZGWdmfGrdbmlDcTEK4ivjwTMFted8fLQweDuSymHFS6oNguQTAsoNJKRiRc+Mc5eFG2QBaCXoMGSoLfn6ckRsB2dFFJS4xcWEy5Wb7rcRnXSm0/XYgmxaraBjdE09/Fnvfhkq3g==
+ b=D7BC8xCCGwQ0mMXKYEr50fYMYfIsJWx0u6XX9tGtUK1ms5tG/tRzHNqylfhk8VBCXa6OnizR+xHYsS7YftmOq5AgJOHZZ4SciBe2RvuyYW0LXaIl/dpx7NUCxBrRU1px09GaDNwYdpeLTVn2mVysO/Jp7bf3MFlTMw5vS7gUwWVjjRUyfOvH+OY4jAMaNlcLRfu2xy6oFP/MFjcdJJnc0fCRRRzRjma8drfBWyIWhPjgGuYugWd+OicvGbmmAnz5IzKy372pF72tdF0tOs6Xwijx+WDD3gnXN4C1c5qJ7PqhXHGpTuZ86sh/FCUTXHIQ6dbvTW9Uux3f76cSTDpYqw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DvIcfp8idZp7VuLuD+VK+dMpE9Ed8TMSTsEaPy5opJU=;
- b=Hudw6n9vGJUNH6t7rmNa2w5hSHQgIBV2lkwNGF+hlRRuGsBC5nzdZX3gJT6fZSVdFGl3Ux87gdKucm4Rl1036GRHQg3qjAXNvrMINfPz8BPKy8oR1QA94OxblwggiFGrx7A0exOifGNRlfEKeen9u9hyETq60aBy3FnDkqcyAXeWM6pPwk/ZAk/fzhnbHm9CBsSZwa+dUTsNcFYpRjEGj9iicNKnyEhcV26VGjAx7EVnJ9EIjaFUEmJmyNhF6hQxoM6nwmlQcOckEKxIiDeWcECq11mlir7y4lKJEfxt9K1YVZUXXvuZDvFTAl0fWEt6loERTTI2T7pTdj9nfY3euA==
+ bh=xi2jvWxnEFE6LJfsHyc+cxcxxUcudINwoObWqx/9bHY=;
+ b=ZtModoiD8je4q1LZLW2GhC9iiCPYdYTEiHhXeuS0bE2Z3fUY4t8kN3Wtw+HWaCTayOfjHHGNb4Wb8ql1ZpN8bWcI6g1XZs1NqxISeCdhzFYVUsuMpyoPzjhvjdSAT6HnuKWt05kn0ovYxx0Pjx2ALfzyfcWcWbwusHJDsl03Y9BfWoXpV+0DjS4xTCrQ74K2v3659LV3G/+J99xjck/Fq0+O+TS8Vj3tvWmqamzlPSUmA/DscGpvcr6EBW7chd5bzugewqEMEZD42k81MPuLtQdjbn2oBzgk/OwQvbdlD8a9pf663L8Qs4Vv7UEUDQUzCSS6nC4t0B89yVA2iygl5g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DvIcfp8idZp7VuLuD+VK+dMpE9Ed8TMSTsEaPy5opJU=;
- b=DEdcppJuQAJvHkjxE3HMd5PbqYjbAlVwKVEoCDoijQOXgSq7qDlT9UmKDtqgr5Xns35BOelPvrZoAYgKIHuWaW2b89+D+e10RIUhK8GYp4DJ71nOqmW1mcfHomhWMFoBeFZvdvkKN2F9jTULxmuVbFn6q2kobq3DLFdGO6cFcsg=
-Received: from MW4PR03CA0007.namprd03.prod.outlook.com (2603:10b6:303:8f::12)
- by SJ0PR12MB7007.namprd12.prod.outlook.com (2603:10b6:a03:486::8) with
+ bh=xi2jvWxnEFE6LJfsHyc+cxcxxUcudINwoObWqx/9bHY=;
+ b=hRIioSPbLKRAGZhp+uf65mpf2Za5ERc/BjxHoA8TOx4IpUH1HhxDcJjJ4F67SZdgGEoo3NLRLbmA3Y/YDDTSNmZyc96Xk+KuYjPlxtBzgCMN5hGcK5vx+gl1tsEQD2lIHHgiGbT2ANKOS+8XqTx3bZ7f+wba8wtsTxrdT7ZRO48=
+Received: from SJ0PR13CA0179.namprd13.prod.outlook.com (2603:10b6:a03:2c7::34)
+ by CY8PR12MB8213.namprd12.prod.outlook.com (2603:10b6:930:71::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.23; Fri, 9 May
- 2025 15:54:01 +0000
-Received: from SJ5PEPF000001C9.namprd05.prod.outlook.com
- (2603:10b6:303:8f:cafe::fc) by MW4PR03CA0007.outlook.office365.com
- (2603:10b6:303:8f::12) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8699.32 via Frontend Transport; Fri,
- 9 May 2025 15:54:01 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.20; Fri, 9 May
+ 2025 15:54:07 +0000
+Received: from SJ5PEPF000001CE.namprd05.prod.outlook.com
+ (2603:10b6:a03:2c7:cafe::31) by SJ0PR13CA0179.outlook.office365.com
+ (2603:10b6:a03:2c7::34) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8722.21 via Frontend Transport; Fri,
+ 9 May 2025 15:54:07 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,21 +63,21 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ5PEPF000001C9.mail.protection.outlook.com (10.167.242.37) with Microsoft
+ SJ5PEPF000001CE.mail.protection.outlook.com (10.167.242.38) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8722.18 via Frontend Transport; Fri, 9 May 2025 15:54:00 +0000
+ 15.20.8722.18 via Frontend Transport; Fri, 9 May 2025 15:54:07 +0000
 Received: from airavat.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 9 May
- 2025 10:53:57 -0500
+ 2025 10:54:01 -0500
 From: Raju Rangoju <Raju.Rangoju@amd.com>
 To: <horms@kernel.org>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
 	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<Shyam-sundar.S-k@amd.com>, Raju Rangoju <Raju.Rangoju@amd.com>
-Subject: [PATCH net-next v3 1/5] amd-xgbe: reorganize the code of XPCS access
-Date: Fri, 9 May 2025 21:23:21 +0530
-Message-ID: <20250509155325.720499-2-Raju.Rangoju@amd.com>
+Subject: [PATCH net-next v3 2/5] amd-xgbe: reorganize the xgbe_pci_probe() code path
+Date: Fri, 9 May 2025 21:23:22 +0530
+Message-ID: <20250509155325.720499-3-Raju.Rangoju@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250509155325.720499-1-Raju.Rangoju@amd.com>
 References: <20250509155325.720499-1-Raju.Rangoju@amd.com>
@@ -93,173 +93,123 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001C9:EE_|SJ0PR12MB7007:EE_
-X-MS-Office365-Filtering-Correlation-Id: 140a24e7-eabf-45e7-d9e9-08dd8f11b756
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001CE:EE_|CY8PR12MB8213:EE_
+X-MS-Office365-Filtering-Correlation-Id: 634ef5f7-e3b7-4981-3ba3-08dd8f11bb0f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014;
+	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?3WbgRK+TT02Wn/84lOOWUjzExHWUy9VIJuFyUXEDwXCQ3G6ox5/B6dVIe7o4?=
- =?us-ascii?Q?rPCdu6TOfd0vX49vsVBPMqGJx6ym4hD2KkkibO88jCDQURPJQpUzIsRZcml6?=
- =?us-ascii?Q?Y9OPvseELsT/VOrUAkhcdM/2PX0v+Zye2Kw/vqlKoTnlDIsHOZgJD7k9Spet?=
- =?us-ascii?Q?FXzfA0zIeht8EVxBbxrLwLo80bZryPh4gyu11Rs+aYyaUTOENIcYtxzYWNwE?=
- =?us-ascii?Q?r1v9Ok2vm+oHoAbSKUp5kK/audpLc9nwUlG8gH0Q5GCBe39yvJw112QiKkwG?=
- =?us-ascii?Q?NoydjDlBwICxss+Mg/YZEN8MaJeihoCPK05Y6bM/X2ahaetqgPKctz0NbMuR?=
- =?us-ascii?Q?OY9qRoxLB+aCZwhNq5RI7qnnjZeAPjDxOBEaBMxIkYH5wr6Q9gIRdcSzHgtE?=
- =?us-ascii?Q?7a/QVR9Rhrk7pWlE4UUvvcshV+gK+V7DjY9Hej5kwcJTQveeqdWG2iNluYPy?=
- =?us-ascii?Q?IMWmFZCO5Fk6Mbq5WP82fjfGCkaMIgg2HRX5k1c/B43ZO+0PR7gbX6o3Pix1?=
- =?us-ascii?Q?nBMcHKKYI73VVHW8XRpm0qVA11YgTgPztSeD13KNi9mqoe33RXKebIx1veYq?=
- =?us-ascii?Q?Fuw6Xx4J/r2W1xx7qT3lxYjoJyS8ajRHhbHXNnzKKtrfct4lr/YpU6hGEJoT?=
- =?us-ascii?Q?2d0jISDBGLLifNsKSjpy2szXt2bqyhF5DaaqYi+uPgLQqo4Y42tW9jtsXeD2?=
- =?us-ascii?Q?Q9yfZW4iWozVDABovV7nbGusB68HMqcC/c7TymCMJ3oOR/53aL5XrC9ZCwiy?=
- =?us-ascii?Q?MmYGVmqD/8rf2WizBN9mlISxGqKTAHbSvzKEuEAON0AhCS22zFFmaBBTZO08?=
- =?us-ascii?Q?1Ko04Nt9DdNt9htPfwfW7lUgUzxT0eNGEKhcg1d+MNgYqlktZNs28cP3rBIJ?=
- =?us-ascii?Q?NWdz4UAvGE4e6xFIBW/CGFK60myygalapTNaOuMp/oLWj6n96VTUK42y0t62?=
- =?us-ascii?Q?fC7sKRsO9r+vyKHu40hLRdsYZenQR2UghQVEFg5pNv60rNy1Ftvz9irgv2wn?=
- =?us-ascii?Q?6dA4IaacENL1kXjjSBV91X0n5+oHyO/eZvFJHIoLo0xyH0LKLU53ZeJcxqJW?=
- =?us-ascii?Q?c3cLChws0GoNNPV8zsjSxOdr1UsQMRzvDs7d16p/1GCmYZbwY0TMswp6/n6+?=
- =?us-ascii?Q?42ll6xCKtJ0Iog519da52GlqtuzFL4OulvzUSZmtSfELiH9ALlyN1FGuHPKU?=
- =?us-ascii?Q?PJokjhHd+VKpPjqrSAZqZtIy5jWGV9UIPXN/eCKK0rvxTqp+ZkDDf+y7Gta8?=
- =?us-ascii?Q?ZJitPtf7o49NjcNZk0bfbehszkzxpGY/WXqtS1LfRcJNXBH20r/cfzxPoqzV?=
- =?us-ascii?Q?w6wEcrboSN0x5PlPiHjAqNu8qnu08lmgvbktA7+sQ4S1xM6VBPHQpaSsM5xC?=
- =?us-ascii?Q?xpNKSBRYVm6K/IC/imjzmxDTc2kN2LG8v9PDtM5LmJwyW1FzVnkhuywuTiX2?=
- =?us-ascii?Q?bzh3fs7dlmLmjYggTVRfLyvn8kMi065xEe8fFRFsdmm9A/cx2GxUkOUH2Qd7?=
- =?us-ascii?Q?o0U777snys7QPz6clJk/cWahgDTDmp48L354?=
+	=?us-ascii?Q?0bfafhcXrJJVuO+kI22nmIk2jZ5OtmL3KYBRtczmXetAMa1p/PV927ahmK1H?=
+ =?us-ascii?Q?KQ3UGCTpKnRJ72KC7r9BUDj8t4Jcu5QRJKLisYWsX/0cy+/IT3sIq5sCJ2kG?=
+ =?us-ascii?Q?d2Cann+7bsWzUKV4VU+qMgSmZBqQHkokxJFo+YGaQQQXJm8vOIx+kJzFLeQe?=
+ =?us-ascii?Q?L60fHGZw1IGQ6UUN0I2iFOVZ8D2jPaVZcWd92QNzhk1dOuTqkhofO3T7faCE?=
+ =?us-ascii?Q?wKSFhl37f0qgvU+B7Ntw9manJOrdLp7vJT/95HkBrNKmkc1ISfjS8hE8+06s?=
+ =?us-ascii?Q?yt3zc+a7uhT/axBWEjb5nVBVVw+frd66yroKYALYoJhpUkGEGGuYP6S0iLZJ?=
+ =?us-ascii?Q?GRl2YHCPAJtJc7QyCVbqMNyZNUgDRjUx5mXHQkbTQqzTGHhnhIvPgJmiFR5B?=
+ =?us-ascii?Q?jSptSz78YR/w1u9JrCh8hDVJBrevS0MTu/k41v8oIBbdHDKvzr9+YvrjWtQE?=
+ =?us-ascii?Q?HpuhC2XCDf07OtWmyIUYOfzDnoEsmSE0P6CvvOlsIwdjsWKXW4dB4v9QQqx7?=
+ =?us-ascii?Q?zfzEbAiOerYPoHM5Suml0oWmT0OqRk3zFkeatG6Gk5fhaNLtwJR81lYEpmE9?=
+ =?us-ascii?Q?bGguhUVWKFX3CgONtWrUVScYH1hV9lZlSfkSTZaMqf7o1H/BeOyrnEBGBHiq?=
+ =?us-ascii?Q?zU3tekw+wOuVFYrl+YjyeD4UDr/q839ROK6o+jnzE3s0n/JlnAyLp1Nxf2Cs?=
+ =?us-ascii?Q?mIjVXKlco8dGxvCNMaFs7cXOLLaxZhH9ukcr4v2t9zLEJl1y3yt59aW0GBco?=
+ =?us-ascii?Q?a3KCkfphgIEYZi4jSqQcF+msFdb5Wzut0XLEG8hG5Rr9maa9e3tcQyq4U45U?=
+ =?us-ascii?Q?ehyWCjG2rTWXYrRu+7dkDACpWQFwPY0MUjyB/gyU+Z+WP3D7I3RtdTIqxyYX?=
+ =?us-ascii?Q?/vU18AIFZxNoPzFzASxqGsppwsj9cT++hTvbuN1YchD1qTa+7+DZnAvBPMUR?=
+ =?us-ascii?Q?nV21d9FWe5cmfgA7Fnr5gyOTLwt7s3b0qwT6veqFnL26Uka8Hd+QmtJaBTEL?=
+ =?us-ascii?Q?Rr4kWASwkobFh8F9NNFfJkKjfkHouoEoN1SA1tiwITsx0talsiYQ8M2vnmpx?=
+ =?us-ascii?Q?F6MsnOkQh/xGcds96YzoPVb9B6zJxk3vHTqHSBBERAnDHDyCJHj9RNvy0lCU?=
+ =?us-ascii?Q?dFuhV3i955npKcweXuhF5otjutCEv+T3/Lw/WfMkxo6FPbE224f2B6Nja4eW?=
+ =?us-ascii?Q?S3aOgDBLjXCpgeEl2lAVkecuXLLhnFVG3twix8ncixk+kQ+pvKq3ushbvobS?=
+ =?us-ascii?Q?M0dlOKEj7rVwdhruWDH2ejuBmHkKs4cBa2pDSrwgGW3NLYqF33h1zEJruGf4?=
+ =?us-ascii?Q?k6WEt45kygNU+QfSg88mL2GCmjoa8+6rYSGZI4eVDZv5LjfC6oL4IJtsyoL8?=
+ =?us-ascii?Q?bBuBLaIeq7AM569vP2WYhW0rVC+j5K5g5t/FAseX62s6uv+x2KdEttSUR0kt?=
+ =?us-ascii?Q?qNYVfIgDJN0ZbDy5WPxIYxBXxkesy2TBPeqHhmc/CIl/HQi13TwFzTL4PyL7?=
+ =?us-ascii?Q?KO6fbAzXhFLSgPKvGzp4NkNLPPnSrsGHPvXv?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(376014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 May 2025 15:54:00.8314
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 May 2025 15:54:07.0730
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 140a24e7-eabf-45e7-d9e9-08dd8f11b756
+X-MS-Exchange-CrossTenant-Network-Message-Id: 634ef5f7-e3b7-4981-3ba3-08dd8f11bb0f
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001C9.namprd05.prod.outlook.com
+	SJ5PEPF000001CE.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB7007
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8213
 
-The xgbe_{read/write}_mmd_regs_v* functions have common code which can
-be moved to helper functions. Add new helper functions to calculate the
-mmd_address for v1/v2 of xpcs access.
+Reorganize the xgbe_pci_probe() code path to convert if/else statements
+to switch case to help add future code. This helps code look cleaner.
 
 Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
 ---
-Changes since v2:
-- follow reverse Xmass tree ordering
-- line wrap to 80 columns wide
+ drivers/net/ethernet/amd/xgbe/xgbe-pci.c | 35 ++++++++++++++----------
+ drivers/net/ethernet/amd/xgbe/xgbe.h     |  4 +++
+ 2 files changed, 25 insertions(+), 14 deletions(-)
 
- drivers/net/ethernet/amd/xgbe/xgbe-dev.c | 65 +++++++++++-------------
- 1 file changed, 29 insertions(+), 36 deletions(-)
-
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
-index d9c8f2af20ae..cdab1c24dd69 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
-@@ -1053,18 +1053,19 @@ static int xgbe_set_gpio(struct xgbe_prv_data *pdata, unsigned int gpio)
- 	return 0;
- }
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-pci.c b/drivers/net/ethernet/amd/xgbe/xgbe-pci.c
+index 3e9f31256dce..d36446e76d0a 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-pci.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-pci.c
+@@ -165,20 +165,27 @@ static int xgbe_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
  
--static int xgbe_read_mmd_regs_v2(struct xgbe_prv_data *pdata, int prtad,
--				 int mmd_reg)
-+static unsigned int xgbe_get_mmd_address(struct xgbe_prv_data *pdata,
-+					 int mmd_reg)
- {
--	unsigned long flags;
--	unsigned int mmd_address, index, offset;
--	int mmd_data;
+ 	/* Set the PCS indirect addressing definition registers */
+ 	rdev = pci_get_domain_bus_and_slot(0, 0, PCI_DEVFN(0, 0));
+-	if (rdev &&
+-	    (rdev->vendor == PCI_VENDOR_ID_AMD) && (rdev->device == 0x15d0)) {
+-		pdata->xpcs_window_def_reg = PCS_V2_RV_WINDOW_DEF;
+-		pdata->xpcs_window_sel_reg = PCS_V2_RV_WINDOW_SELECT;
+-	} else if (rdev && (rdev->vendor == PCI_VENDOR_ID_AMD) &&
+-		   (rdev->device == 0x14b5)) {
+-		pdata->xpcs_window_def_reg = PCS_V2_YC_WINDOW_DEF;
+-		pdata->xpcs_window_sel_reg = PCS_V2_YC_WINDOW_SELECT;
 -
--	if (mmd_reg & XGBE_ADDR_C45)
--		mmd_address = mmd_reg & ~XGBE_ADDR_C45;
--	else
--		mmd_address = (pdata->mdio_mmd << 16) | (mmd_reg & 0xffff);
-+	return (mmd_reg & XGBE_ADDR_C45) ?
-+		mmd_reg & ~XGBE_ADDR_C45 :
-+		(pdata->mdio_mmd << 16) | (mmd_reg & 0xffff);
-+}
- 
-+static void xgbe_get_pcs_index_and_offset(struct xgbe_prv_data *pdata,
-+					  unsigned int mmd_address,
-+					  unsigned int *index,
-+					  unsigned int *offset)
-+{
- 	/* The PCS registers are accessed using mmio. The underlying
- 	 * management interface uses indirect addressing to access the MMD
- 	 * register sets. This requires accessing of the PCS register in two
-@@ -1075,8 +1076,20 @@ static int xgbe_read_mmd_regs_v2(struct xgbe_prv_data *pdata, int prtad,
- 	 * offset 1 bit and reading 16 bits of data.
- 	 */
- 	mmd_address <<= 1;
--	index = mmd_address & ~pdata->xpcs_window_mask;
--	offset = pdata->xpcs_window + (mmd_address & pdata->xpcs_window_mask);
-+	*index = mmd_address & ~pdata->xpcs_window_mask;
-+	*offset = pdata->xpcs_window + (mmd_address & pdata->xpcs_window_mask);
-+}
+-		/* Yellow Carp devices do not need cdr workaround */
+-		pdata->vdata->an_cdr_workaround = 0;
+-
+-		/* Yellow Carp devices do not need rrc */
+-		pdata->vdata->enable_rrc = 0;
++	if (rdev && rdev->vendor == PCI_VENDOR_ID_AMD) {
++		switch (rdev->device) {
++		case XGBE_RV_PCI_DEVICE_ID:
++			pdata->xpcs_window_def_reg = PCS_V2_RV_WINDOW_DEF;
++			pdata->xpcs_window_sel_reg = PCS_V2_RV_WINDOW_SELECT;
++			break;
++		case XGBE_YC_PCI_DEVICE_ID:
++			pdata->xpcs_window_def_reg = PCS_V2_YC_WINDOW_DEF;
++			pdata->xpcs_window_sel_reg = PCS_V2_YC_WINDOW_SELECT;
 +
-+static int xgbe_read_mmd_regs_v2(struct xgbe_prv_data *pdata, int prtad,
-+				 int mmd_reg)
-+{
-+	unsigned int mmd_address, index, offset;
-+	unsigned long flags;
-+	int mmd_data;
++			/* Yellow Carp devices do not need cdr workaround */
++			pdata->vdata->an_cdr_workaround = 0;
 +
-+	mmd_address = xgbe_get_mmd_address(pdata, mmd_reg);
++			/* Yellow Carp devices do not need rrc */
++			pdata->vdata->enable_rrc = 0;
++			break;
++		default:
++			pdata->xpcs_window_def_reg = PCS_V2_WINDOW_DEF;
++			pdata->xpcs_window_sel_reg = PCS_V2_WINDOW_SELECT;
++			break;
++		}
+ 	} else {
+ 		pdata->xpcs_window_def_reg = PCS_V2_WINDOW_DEF;
+ 		pdata->xpcs_window_sel_reg = PCS_V2_WINDOW_SELECT;
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe.h b/drivers/net/ethernet/amd/xgbe/xgbe.h
+index 8ac0f3a22fb6..37e5f8fad6b2 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe.h
++++ b/drivers/net/ethernet/amd/xgbe/xgbe.h
+@@ -238,6 +238,10 @@
+ 		    (_src)->link_modes._sname,		\
+ 		    __ETHTOOL_LINK_MODE_MASK_NBITS)
+ 
++/* XGBE PCI device id */
++#define XGBE_RV_PCI_DEVICE_ID	0x15d0
++#define XGBE_YC_PCI_DEVICE_ID	0x14b5
 +
-+	xgbe_get_pcs_index_and_offset(pdata, mmd_address, &index, &offset);
+ struct xgbe_prv_data;
  
- 	spin_lock_irqsave(&pdata->xpcs_lock, flags);
- 	XPCS32_IOWRITE(pdata, pdata->xpcs_window_sel_reg, index);
-@@ -1092,23 +1105,9 @@ static void xgbe_write_mmd_regs_v2(struct xgbe_prv_data *pdata, int prtad,
- 	unsigned long flags;
- 	unsigned int mmd_address, index, offset;
- 
--	if (mmd_reg & XGBE_ADDR_C45)
--		mmd_address = mmd_reg & ~XGBE_ADDR_C45;
--	else
--		mmd_address = (pdata->mdio_mmd << 16) | (mmd_reg & 0xffff);
-+	mmd_address = xgbe_get_mmd_address(pdata, mmd_reg);
- 
--	/* The PCS registers are accessed using mmio. The underlying
--	 * management interface uses indirect addressing to access the MMD
--	 * register sets. This requires accessing of the PCS register in two
--	 * phases, an address phase and a data phase.
--	 *
--	 * The mmio interface is based on 16-bit offsets and values. All
--	 * register offsets must therefore be adjusted by left shifting the
--	 * offset 1 bit and writing 16 bits of data.
--	 */
--	mmd_address <<= 1;
--	index = mmd_address & ~pdata->xpcs_window_mask;
--	offset = pdata->xpcs_window + (mmd_address & pdata->xpcs_window_mask);
-+	xgbe_get_pcs_index_and_offset(pdata, mmd_address, &index, &offset);
- 
- 	spin_lock_irqsave(&pdata->xpcs_lock, flags);
- 	XPCS32_IOWRITE(pdata, pdata->xpcs_window_sel_reg, index);
-@@ -1123,10 +1122,7 @@ static int xgbe_read_mmd_regs_v1(struct xgbe_prv_data *pdata, int prtad,
- 	unsigned int mmd_address;
- 	int mmd_data;
- 
--	if (mmd_reg & XGBE_ADDR_C45)
--		mmd_address = mmd_reg & ~XGBE_ADDR_C45;
--	else
--		mmd_address = (pdata->mdio_mmd << 16) | (mmd_reg & 0xffff);
-+	mmd_address = xgbe_get_mmd_address(pdata, mmd_reg);
- 
- 	/* The PCS registers are accessed using mmio. The underlying APB3
- 	 * management interface uses indirect addressing to access the MMD
-@@ -1151,10 +1147,7 @@ static void xgbe_write_mmd_regs_v1(struct xgbe_prv_data *pdata, int prtad,
- 	unsigned int mmd_address;
- 	unsigned long flags;
- 
--	if (mmd_reg & XGBE_ADDR_C45)
--		mmd_address = mmd_reg & ~XGBE_ADDR_C45;
--	else
--		mmd_address = (pdata->mdio_mmd << 16) | (mmd_reg & 0xffff);
-+	mmd_address = xgbe_get_mmd_address(pdata, mmd_reg);
- 
- 	/* The PCS registers are accessed using mmio. The underlying APB3
- 	 * management interface uses indirect addressing to access the MMD
+ struct xgbe_packet_data {
 -- 
 2.34.1
 
