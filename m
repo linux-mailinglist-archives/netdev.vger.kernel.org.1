@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-189411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE864AB205E
-	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 01:50:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 994C2AB205F
+	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 01:51:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D5C8AB21874
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 23:49:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4F0C1BC7F3A
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 23:51:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BC31267736;
-	Fri,  9 May 2025 23:50:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADD2D267F57;
+	Fri,  9 May 2025 23:50:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sT4PhtEX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y9y9AYca"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 775A3267728
-	for <netdev@vger.kernel.org>; Fri,  9 May 2025 23:50:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 899A1267B96
+	for <netdev@vger.kernel.org>; Fri,  9 May 2025 23:50:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746834607; cv=none; b=AsBky8tznY8dYPXjyN306Cdcugy7qx2hWmqpkTtSK/ncpf449nWchHzSEoAOTswrCu1c7l9gFK4B09pngvrY3jS+KrQEdx7qriEi1JAy3ct2MMewNAEaxCbOKFqIqBht8juwU6qPzlJaWwaC23Ax9WAvR7tdYa9KIe4W3gsz1Pw=
+	t=1746834609; cv=none; b=YNKC419zaGezpRLjhJ3S0u9o2eTBvn7Eu0p2t//avSj2aB4DGTDNF1sKN2dgruF01zYRysadPcnDsW/cIZmxwt6UgUTYR2FtEgyrRSa24Vn7eL6YxO+UjuYsfijHGvj4iL8aFqopY99JUu+waG0kvSHAeck152xm9eQgEt8giiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746834607; c=relaxed/simple;
-	bh=kP4AsxQa5haOUwla+8nEJOkjvrvjmPyrTLAVL8UXmmE=;
+	s=arc-20240116; t=1746834609; c=relaxed/simple;
+	bh=jQ0TUhKt+NsPUcfNifvIIvpLqaYN7CrkBXArlKoGNAI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qDcu8LqxQ4FiNsHLZYbk962HEVm95gsR7Z5cp5duVwt9VMMRIEHLFMaGRPc+R3eSVn178iZ6lt3xCd3/PWyRZLM74pVXd0sNTyLC6rvFh1B2v9ZAA4QU7asDBwJFmoSb03vNBa7vRR0kRoEIigC+WUmdTFTuiqhz6M81YXGv2F4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sT4PhtEX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 554D6C4CEEE;
-	Fri,  9 May 2025 23:50:07 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=hJV1h3ojOKkIyOknW7hTuPdyPkSPyGmFUQ/QwjbtYwma/Xwo7OdiVeLM4ghKNhnZ74HMXcuxpRnDyc/jssYCWlN3ZN+KcjuXvY0GrFv2UkRO7Yu8HuHfNYVHHUVrCC+caaHsm0qCwonNopKyXg1e5i66p6Ivsg5Z5Suj/LIB07A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y9y9AYca; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF1B1C4CEED;
+	Fri,  9 May 2025 23:50:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746834607;
-	bh=kP4AsxQa5haOUwla+8nEJOkjvrvjmPyrTLAVL8UXmmE=;
+	s=k20201202; t=1746834608;
+	bh=jQ0TUhKt+NsPUcfNifvIIvpLqaYN7CrkBXArlKoGNAI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sT4PhtEXMQRJxIKVGxlNuQ8j0RTwV7Qpzm//cTicwQewL6HCmQxvmGdIlGh1GyCdj
-	 EW2tdEHZTJwjY+UKmDikCEbC2kVY3my01ASWCU2LgUJodiQgDM+C7sGmTMAotYpBBK
-	 nXeBKlpV/VUPP1ygGik6MaiiCj8olyl9zvOnPvOVvyoj1pp22FYelSWHGUf4OhFPOd
-	 MdYuttlgIAgkjZ9LB+0E2+9pDOkqO1fGnLSCfz0tqWFltmwt1/i7/FlrBzlTaFpwZp
-	 g56PEa1cDA7rERK02qThSsyKou2hPXFFZ6gGJacYJaD0mLDSmUl2b6HEWjm1xSNCxd
-	 9v1B+T16cnjSg==
+	b=Y9y9AYcahh8mMCLRxsUy6aSsngS8ZD7aODjDkgXL0g0V62tfl9wf4fmTkj7k0szze
+	 hdncpkElodioLSnBGG/JIVGvxtxsDbVu3QLpxlpym2fyjnbaPV7i7Sosea01ikQmjT
+	 cGi47EP61xoYYmslGskjSsNP51NUiloPUXHrHmtrpNZE5dOIjnf5tGn32MZOfQhtru
+	 WoyJVlbQ2WpMJL/mxLauYey557qRbU4E+Lgv84rKueRkvt1znBjLAACuLwdgBbYyRj
+	 8ZM1QjxAsBwSb9om6AKb6KgOuzQXXjKETIy2DU+CwXLrCHSvlTKTuqOXoGRHTCqlgR
+	 jl3TnEuutnb2g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADC0381091A;
-	Fri,  9 May 2025 23:50:46 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70B99381091A;
+	Fri,  9 May 2025 23:50:48 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,46 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v1] tools: ynl: handle broken pipe gracefully in CLI
+Subject: Re: [PATCH net-next v2] ethtool: Block setting of symmetric RSS when
+ non-symmetric rx-flow-hash is requested
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174683464575.3845363.2215498873352428279.git-patchwork-notify@kernel.org>
-Date: Fri, 09 May 2025 23:50:45 +0000
-References: <20250508112102.63539-1-donald.hunter@gmail.com>
-In-Reply-To: <20250508112102.63539-1-donald.hunter@gmail.com>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- jstancek@redhat.com, donald.hunter@redhat.com
+ <174683464701.3845363.17062737128371358602.git-patchwork-notify@kernel.org>
+Date: Fri, 09 May 2025 23:50:47 +0000
+References: <20250508103034.885536-1-gal@nvidia.com>
+In-Reply-To: <20250508103034.885536-1-gal@nvidia.com>
+To: Gal Pressman <gal@nvidia.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
+ horms@kernel.org, andrew@lunn.ch, tariqt@nvidia.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu,  8 May 2025 12:21:02 +0100 you wrote:
-> When sending YNL CLI output into a pipe, closing the pipe causes a
-> BrokenPipeError. E.g. running the following and quitting less:
+On Thu, 8 May 2025 13:30:34 +0300 you wrote:
+> Symmetric RSS hash requires that:
+> * No other fields besides IP src/dst and/or L4 src/dst are set
+> * If src is set, dst must also be set
 > 
-> ./tools/net/ynl/pyynl/cli.py --family rt-link --dump getlink | less
-> Traceback (most recent call last):
->   File "/home/donaldh/net-next/./tools/net/ynl/pyynl/cli.py", line 160, in <module>
->     main()
->     ~~~~^^
->   File "/home/donaldh/net-next/./tools/net/ynl/pyynl/cli.py", line 142, in main
->     output(reply)
->     ~~~~~~^^^^^^^
->   File "/home/donaldh/net-next/./tools/net/ynl/pyynl/cli.py", line 97, in output
->     pprint.PrettyPrinter().pprint(msg)
->     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
-> [...]
-> BrokenPipeError: [Errno 32] Broken pipe
+> This restriction was only enforced when RXNFC was configured after
+> symmetric hash was enabled. In the opposite order of operations (RXNFC
+> then symmetric enablement) the check was not performed.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v1] tools: ynl: handle broken pipe gracefully in CLI
-    https://git.kernel.org/netdev/net-next/c/0df6932485a0
+  - [net-next,v2] ethtool: Block setting of symmetric RSS when non-symmetric rx-flow-hash is requested
+    https://git.kernel.org/netdev/net-next/c/1b2900db0119
 
 You are awesome, thank you!
 -- 
