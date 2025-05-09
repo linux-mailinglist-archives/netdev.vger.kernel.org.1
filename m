@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-189208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3038BAB1299
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 13:53:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD5B2AB1298
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 13:53:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69232A041C9
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 11:52:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1CFC4A5B0D
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 11:53:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC68F2918C5;
-	Fri,  9 May 2025 11:51:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 158432918EE;
+	Fri,  9 May 2025 11:51:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 838F528FFED;
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83A9928FFEE;
 	Fri,  9 May 2025 11:51:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746791507; cv=none; b=STBnbqrlqU/YJGGVK0jCQnT574fK833OQyqkBs3taipzS0ifgANPhQEgpq/lleTG0iwG/i2XkMv/zqz1yLtZeuQkEe6KhDhb7aaDqqS1GUabYHZtTVos2NfWDL1GQVQFjzRnckqB6JHg6w+WMaOJM3dd09lgu7aH6iJze7sX2Vg=
+	t=1746791507; cv=none; b=sxczGiWC7YawfeVVBvnmkMZkpoDuLM8RBYdODWhMYj1qTS3hTxQsw39QLdWqcrSf2ktNKB/yFPdEXBVAPP2cuTqaTZjHuqNsJ8YzRXvV1S84CzM9B23NwnDhnwNWwgZJkHMdDO6tEGVqnuVrWQ3xos9UfJ2Vnq/5Po2v38xkRoo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1746791507; c=relaxed/simple;
-	bh=Bad1PLduXW27p+j9Xa6JrsTsCSPwcFD0YvcDAM5wysQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=FJ1KTpP+W653rYHdM/Lh9pl0/bcxen+lHCAR2QFUmxyaWrCfRblRVtDPANPHTX/4Yj9BT/dgkOnBUz543Ouruh7vbCOhBJRyCenVf01vcXvwJGQyBeTWDtFZx2PxhW/fAemHbbj1Gx96P8CFW8SHH9Wf807z0X3H3vChF/UNpNA=
+	bh=40hhzcReE9lzoseTEMmVCYl1hIewehLeKTS2dWTVKHc=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=t3NJFQlnFyP1x5FBA4pH897HSk3DkemV416aXVJY//s7nv0JLMhXwD5XOdeggdk5yVmCpDTIZL2tz9JaAL43I2pM/BtVTNNJBNjo4eJntAoWHYlJ9eeFeMmdSCoQksls4EwkhgAe31Fz3eP/qo/aQWMlCaAEt6l0vIeSklgUv/A=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-669ff7000002311f-62-681dec49e1aa
+X-AuditID: a67dfc5b-669ff7000002311f-68-681dec49076f
 From: Byungchul Park <byungchul@sk.com>
 To: willy@infradead.org,
 	netdev@vger.kernel.org
@@ -47,36 +47,36 @@ Cc: linux-kernel@vger.kernel.org,
 	edumazet@google.com,
 	pabeni@redhat.com,
 	vishal.moola@gmail.com
-Subject: [RFC 10/19] page_pool: rename __page_pool_alloc_pages_slow() to __page_pool_alloc_netmems_slow()
-Date: Fri,  9 May 2025 20:51:17 +0900
-Message-Id: <20250509115126.63190-11-byungchul@sk.com>
+Subject: [RFC 11/19] mlx4: use netmem descriptor and API for page pool
+Date: Fri,  9 May 2025 20:51:18 +0900
+Message-Id: <20250509115126.63190-12-byungchul@sk.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20250509115126.63190-1-byungchul@sk.com>
 References: <20250509115126.63190-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrBLMWRmVeSWpSXmKPExsXC9ZZnoa7nG9kMg2/NahZz1q9hs1j9o8Ji
-	+YMdrBZfft5mt1i88BuzxZzzLSwWT489Yre4v+wZi8We9u3MFr0tv5ktmnasYLK4sK2P1eLy
-	rjlsFvfW/Ge1OLZAzOLb6TeMFuv33WC1+P1jDpuDkMeWlTeZPHbOusvusWBTqcfmFVoeXTcu
-	MXtsWtXJ5rHp0yR2jzvX9rB5nJjxm8Vj547PTB4fn95i8Xi/7yqbx+dNcgG8UVw2Kak5mWWp
-	Rfp2CVwZvW1zGAuOclbMXp/RwNjH0cXIySEhYCJx6/c7dhi77+5iZhCbTUBd4saNn2C2iICh
-	xOdHx1m6GLk4mAUWMktcWfwTrEFYIFPi6sTnTF2MHBwsAqoSt9aAzeQVMJNYfPIyE8RMeYnV
-	Gw4wg5RwAsX7P6qDhIUETCWWTVnABlHyn03iySkvCFtS4uCKGywTGHkXMDKsYhTKzCvLTczM
-	MdHLqMzLrNBLzs/dxAgM/2W1f6J3MH66EHyIUYCDUYmH1+K5bIYQa2JZcWXuIUYJDmYlEd7n
-	nTIZQrwpiZVVqUX58UWlOanFhxilOViUxHmNvpWnCAmkJ5akZqemFqQWwWSZODilGhi1FQ+L
-	rLObE71FfILzw3O/zL+nzawseGfKe1u79Geql5Bt/a52ycymMs2rZwRvZNnLfJavr7KPqFJz
-	7Lt4vG6uRsf9huMn8kXvNdy8mh51Wt6k/6blzb6IPT2ves/48myefrDo7gMTH9PY4xuX7OJa
-	MuNi7c3GBXJ2Jhw33ma9mpjblWirmK3EUpyRaKjFXFScCACh66yiewIAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrALMWRmVeSWpSXmKPExsXC5WfdrOv5RjbDoOmajMWc9WvYLFb/qLBY
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrNLMWRmVeSWpSXmKPExsXC9ZZnka7nG9kMgy2rtS3mrF/DZrH6R4XF
+	8gc7WC2+/LzNbrF44TdmiznnW1gsnh57xG5xf9kzFos97duZLXpbfjNbNO1YwWRxYVsfq8Xl
+	XXPYLO6t+c9qcWyBmMW3028YLdbvu8Fq8fvHHDYHIY8tK28yeeycdZfdY8GmUo/NK7Q8um5c
+	YvbYtKqTzWPTp0nsHneu7WHzODHjN4vHzh2fmTw+Pr3F4vF+31U2j8+b5AJ4o7hsUlJzMstS
+	i/TtErgyjq9rZS6YaFXxbO4/9gbGRv0uRk4OCQETiaalu1hg7Gvd/cwgNpuAusSNGz/BbBEB
+	Q4nPj44D1XBxMAssZJa4svgnO0hCWMBN4tPvBrAiFgFVicWz1jOB2LwCZhKb9j1lhRgqL7F6
+	wwGgGg4OTqB4/0d1kLCQgKnEsikL2EBmSgj8Z5PomjYXql5S4uCKGywTGHkXMDKsYhTKzCvL
+	TczMMdHLqMzLrNBLzs/dxAiMgmW1f6J3MH66EHyIUYCDUYmH1+K5bIYQa2JZcWXuIUYJDmYl
+	Ed7nnTIZQrwpiZVVqUX58UWlOanFhxilOViUxHmNvpWnCAmkJ5akZqemFqQWwWSZODilGhjF
+	dzw9wHBwWbvYtv6Q2QJn0hbzHI18q2Ti1X/4fs+3SU0mtXs1/jw9dPRCyrpfV6IzW+59Mgnu
+	X87vYFGr4nw+MfD5laSfWwWqOc/9rBLhntHczxwZtSnLdaZinctp6y8vf53l4dw8Zb9OTOQ8
+	82k2UgIh0bLXZh85bJAp/3zXN4cJQn3OZjuUWIozEg21mIuKEwH3hxtkfgIAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrELMWRmVeSWpSXmKPExsXC5WfdrOv5RjbD4GqPvMWc9WvYLFb/qLBY
 	/mAHq8WXn7fZLRYv/MZsMed8C4vF02OP2C3uL3vGYrGnfTuzRW/Lb2aLph0rmCwOzz3JanFh
 	Wx+rxeVdc9gs7q35z2pxbIGYxbfTbxgt1u+7wWrx+8ccNgdhjy0rbzJ57Jx1l91jwaZSj80r
 	tDy6blxi9ti0qpPNY9OnSewed67tYfM4MeM3i8fOHZ+ZPD4+vcXi8X7fVTaPxS8+MHl83iQX
-	wBfFZZOSmpNZllqkb5fAldHbNoex4Chnxez1GQ2MfRxdjJwcEgImEn13FzOD2GwC6hI3bvwE
-	s0UEDCU+PzrO0sXIxcEssJBZ4srin+wgCWGBTImrE58zdTFycLAIqErcWgM2h1fATGLxyctM
-	EDPlJVZvOMAMUsIJFO//qA4SFhIwlVg2ZQHbBEauBYwMqxhFMvPKchMzc0z1irMzKvMyK/SS
-	83M3MQLDeVntn4k7GL9cdj/EKMDBqMTDa/FcNkOINbGsuDL3EKMEB7OSCO/zTpkMId6UxMqq
-	1KL8+KLSnNTiQ4zSHCxK4rxe4akJQgLpiSWp2ampBalFMFkmDk6pBkbvt0efW76vldkv2vjm
-	QEjCkUtXFus9ZU51ZNg8i7fP8PfF58p1V3a5P1R4YBF5+H61Cc/v1c7SF2eGXzkxwzBDrezq
-	pIX7fk/atf8f38cVW+oYlFo2TX9t4huwgTuJT7iGXe5f0KSGPVVTbYMNvk6zc2Rj0eG2n7Ni
-	h7PDjPBH51NXZynqtvxVYinOSDTUYi4qTgQAAsLWhmMCAAA=
+	wBfFZZOSmpNZllqkb5fAlXF8XStzwUSrimdz/7E3MDbqdzFyckgImEhc6+5nBrHZBNQlbtz4
+	CWaLCBhKfH50nKWLkYuDWWAhs8SVxT/ZQRLCAm4Sn343gBWxCKhKLJ61ngnE5hUwk9i07ykr
+	xFB5idUbDgDVcHBwAsX7P6qDhIUETCWWTVnANoGRawEjwypGkcy8stzEzBxTveLsjMq8zAq9
+	5PzcTYzAkF5W+2fiDsYvl90PMQpwMCrx8Fo8l80QYk0sK67MPcQowcGsJML7vFMmQ4g3JbGy
+	KrUoP76oNCe1+BCjNAeLkjivV3hqgpBAemJJanZqakFqEUyWiYNTqoFRKferf2BsU9GK1JP+
+	N5/qT54W8bPY/HnzQ2um3g0sfvJf52zs1XjVrKmh9W7d4ycZvz2Vyz0Mo0/rdv1SvjtZdPJt
+	q0rGJrVtpbdWrpGeJCMuyv26sdnS5fy/HBfb5Ue4+JI/R7I5hWX6R7Y5rLPj/e7za+Htjup9
+	PQfT/ukGfT+9d46ukKcSS3FGoqEWc1FxIgCbjJVbZQIAAA==
 X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -84,37 +84,206 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
-Now that __page_pool_alloc_pages_slow() is for allocating netmem, not
-struct page, rename it to __page_pool_alloc_netmems_slow() to reflect
-what it does.
+To simplify struct page, the effort to seperate its own descriptor from
+struct page is required and the work for page pool is on going.
+
+Use netmem descriptor and API for page pool in mlx4 code.
 
 Signed-off-by: Byungchul Park <byungchul@sk.com>
 ---
- net/core/page_pool.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/mellanox/mlx4/en_rx.c   | 46 +++++++++++---------
+ drivers/net/ethernet/mellanox/mlx4/en_tx.c   |  8 ++--
+ drivers/net/ethernet/mellanox/mlx4/mlx4_en.h |  4 +-
+ 3 files changed, 31 insertions(+), 27 deletions(-)
 
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index f858a5518b7a4..b61c1038f4c68 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -523,7 +523,7 @@ static netmem_ref __page_pool_alloc_large_netmem(struct page_pool *pool,
- }
+diff --git a/drivers/net/ethernet/mellanox/mlx4/en_rx.c b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
+index b33285d755b90..82c24931fa443 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/en_rx.c
++++ b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
+@@ -62,18 +62,18 @@ static int mlx4_en_alloc_frags(struct mlx4_en_priv *priv,
+ 	int i;
  
- /* slow path */
--static noinline netmem_ref __page_pool_alloc_pages_slow(struct page_pool *pool,
-+static noinline netmem_ref __page_pool_alloc_netmems_slow(struct page_pool *pool,
- 							gfp_t gfp)
+ 	for (i = 0; i < priv->num_frags; i++, frags++) {
+-		if (!frags->page) {
+-			frags->page = page_pool_alloc_pages(ring->pp, gfp);
+-			if (!frags->page) {
++		if (!frags->netmem) {
++			frags->netmem = page_pool_alloc_netmems(ring->pp, gfp);
++			if (!frags->netmem) {
+ 				ring->alloc_fail++;
+ 				return -ENOMEM;
+ 			}
+-			page_pool_fragment_page(frags->page, 1);
++			page_pool_fragment_netmem(frags->netmem, 1);
+ 			frags->page_offset = priv->rx_headroom;
+ 
+ 			ring->rx_alloc_pages++;
+ 		}
+-		dma = page_pool_get_dma_addr(frags->page);
++		dma = page_pool_get_dma_addr_netmem(frags->netmem);
+ 		rx_desc->data[i].addr = cpu_to_be64(dma + frags->page_offset);
+ 	}
+ 	return 0;
+@@ -83,10 +83,10 @@ static void mlx4_en_free_frag(const struct mlx4_en_priv *priv,
+ 			      struct mlx4_en_rx_ring *ring,
+ 			      struct mlx4_en_rx_alloc *frag)
  {
- 	const int bulk = PP_ALLOC_CACHE_REFILL;
-@@ -595,7 +595,7 @@ netmem_ref page_pool_alloc_netmems(struct page_pool *pool, gfp_t gfp)
- 	if (static_branch_unlikely(&page_pool_mem_providers) && pool->mp_ops)
- 		netmem = pool->mp_ops->alloc_netmems(pool, gfp);
- 	else
--		netmem = __page_pool_alloc_pages_slow(pool, gfp);
-+		netmem = __page_pool_alloc_netmems_slow(pool, gfp);
- 	return netmem;
+-	if (frag->page)
+-		page_pool_put_full_page(ring->pp, frag->page, false);
++	if (frag->netmem)
++		page_pool_put_full_netmem(ring->pp, frag->netmem, false);
+ 	/* We need to clear all fields, otherwise a change of priv->log_rx_info
+-	 * could lead to see garbage later in frag->page.
++	 * could lead to see garbage later in frag->netmem.
+ 	 */
+ 	memset(frag, 0, sizeof(*frag));
  }
- EXPORT_SYMBOL(page_pool_alloc_netmems);
+@@ -440,29 +440,33 @@ static int mlx4_en_complete_rx_desc(struct mlx4_en_priv *priv,
+ 	unsigned int truesize = 0;
+ 	bool release = true;
+ 	int nr, frag_size;
+-	struct page *page;
++	netmem_ref netmem;
+ 	dma_addr_t dma;
+ 
+ 	/* Collect used fragments while replacing them in the HW descriptors */
+ 	for (nr = 0;; frags++) {
+ 		frag_size = min_t(int, length, frag_info->frag_size);
+ 
+-		page = frags->page;
+-		if (unlikely(!page))
++		netmem = frags->netmem;
++		if (unlikely(!netmem))
+ 			goto fail;
+ 
+-		dma = page_pool_get_dma_addr(page);
++		dma = page_pool_get_dma_addr_netmem(netmem);
+ 		dma_sync_single_range_for_cpu(priv->ddev, dma, frags->page_offset,
+ 					      frag_size, priv->dma_dir);
+ 
+-		__skb_fill_page_desc(skb, nr, page, frags->page_offset,
++		__skb_fill_netmem_desc(skb, nr, netmem, frags->page_offset,
+ 				     frag_size);
+ 
+ 		truesize += frag_info->frag_stride;
+ 		if (frag_info->frag_stride == PAGE_SIZE / 2) {
++			struct page *page = netmem_to_page(netmem);
++			atomic_long_t *pp_ref_count =
++				netmem_get_pp_ref_count_ref(netmem);
++
+ 			frags->page_offset ^= PAGE_SIZE / 2;
+ 			release = page_count(page) != 1 ||
+-				  atomic_long_read(&page->pp_ref_count) != 1 ||
++				  atomic_long_read(pp_ref_count) != 1 ||
+ 				  page_is_pfmemalloc(page) ||
+ 				  page_to_nid(page) != numa_mem_id();
+ 		} else if (!priv->rx_headroom) {
+@@ -476,9 +480,9 @@ static int mlx4_en_complete_rx_desc(struct mlx4_en_priv *priv,
+ 			release = frags->page_offset + frag_info->frag_size > PAGE_SIZE;
+ 		}
+ 		if (release) {
+-			frags->page = NULL;
++			frags->netmem = 0;
+ 		} else {
+-			page_pool_ref_page(page);
++			page_pool_ref_netmem(netmem);
+ 		}
+ 
+ 		nr++;
+@@ -719,7 +723,7 @@ int mlx4_en_process_rx_cq(struct net_device *dev, struct mlx4_en_cq *cq, int bud
+ 		int nr;
+ 
+ 		frags = ring->rx_info + (index << priv->log_rx_info);
+-		va = page_address(frags[0].page) + frags[0].page_offset;
++		va = netmem_address(frags[0].netmem) + frags[0].page_offset;
+ 		net_prefetchw(va);
+ 		/*
+ 		 * make sure we read the CQE after we read the ownership bit
+@@ -748,7 +752,7 @@ int mlx4_en_process_rx_cq(struct net_device *dev, struct mlx4_en_cq *cq, int bud
+ 			/* Get pointer to first fragment since we haven't
+ 			 * skb yet and cast it to ethhdr struct
+ 			 */
+-			dma = page_pool_get_dma_addr(frags[0].page);
++			dma = page_pool_get_dma_addr_netmem(frags[0].netmem);
+ 			dma += frags[0].page_offset;
+ 			dma_sync_single_for_cpu(priv->ddev, dma, sizeof(*ethh),
+ 						DMA_FROM_DEVICE);
+@@ -788,7 +792,7 @@ int mlx4_en_process_rx_cq(struct net_device *dev, struct mlx4_en_cq *cq, int bud
+ 			void *orig_data;
+ 			u32 act;
+ 
+-			dma = page_pool_get_dma_addr(frags[0].page);
++			dma = page_pool_get_dma_addr_netmem(frags[0].netmem);
+ 			dma += frags[0].page_offset;
+ 			dma_sync_single_for_cpu(priv->ddev, dma,
+ 						priv->frag_info[0].frag_size,
+@@ -818,7 +822,7 @@ int mlx4_en_process_rx_cq(struct net_device *dev, struct mlx4_en_cq *cq, int bud
+ 				if (likely(!xdp_do_redirect(dev, &mxbuf.xdp, xdp_prog))) {
+ 					ring->xdp_redirect++;
+ 					xdp_redir_flush = true;
+-					frags[0].page = NULL;
++					frags[0].netmem = 0;
+ 					goto next;
+ 				}
+ 				ring->xdp_redirect_fail++;
+@@ -828,7 +832,7 @@ int mlx4_en_process_rx_cq(struct net_device *dev, struct mlx4_en_cq *cq, int bud
+ 				if (likely(!mlx4_en_xmit_frame(ring, frags, priv,
+ 							length, cq_ring,
+ 							&doorbell_pending))) {
+-					frags[0].page = NULL;
++					frags[0].netmem = 0;
+ 					goto next;
+ 				}
+ 				trace_xdp_exception(dev, xdp_prog, act);
+diff --git a/drivers/net/ethernet/mellanox/mlx4/en_tx.c b/drivers/net/ethernet/mellanox/mlx4/en_tx.c
+index 87f35bcbeff8f..b564a953da09b 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/en_tx.c
++++ b/drivers/net/ethernet/mellanox/mlx4/en_tx.c
+@@ -354,7 +354,7 @@ u32 mlx4_en_recycle_tx_desc(struct mlx4_en_priv *priv,
+ 	struct page_pool *pool = ring->recycle_ring->pp;
+ 
+ 	/* Note that napi_mode = 0 means ndo_close() path, not budget = 0 */
+-	page_pool_put_full_page(pool, tx_info->page, !!napi_mode);
++	page_pool_put_full_netmem(pool, tx_info->netmem, !!napi_mode);
+ 
+ 	return tx_info->nr_txbb;
+ }
+@@ -1191,10 +1191,10 @@ netdev_tx_t mlx4_en_xmit_frame(struct mlx4_en_rx_ring *rx_ring,
+ 	tx_desc = ring->buf + (index << LOG_TXBB_SIZE);
+ 	data = &tx_desc->data;
+ 
+-	dma = page_pool_get_dma_addr(frame->page);
++	dma = page_pool_get_dma_addr_netmem(frame->netmem);
+ 
+-	tx_info->page = frame->page;
+-	frame->page = NULL;
++	tx_info->netmem = frame->netmem;
++	frame->netmem = 0;
+ 	tx_info->map0_dma = dma;
+ 	tx_info->nr_bytes = max_t(unsigned int, length, ETH_ZLEN);
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h b/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
+index ad0d91a751848..3ef9a0a1f783d 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
++++ b/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
+@@ -213,7 +213,7 @@ enum cq_type {
+ struct mlx4_en_tx_info {
+ 	union {
+ 		struct sk_buff *skb;
+-		struct page *page;
++		netmem_ref netmem;
+ 	};
+ 	dma_addr_t	map0_dma;
+ 	u32		map0_byte_count;
+@@ -246,7 +246,7 @@ struct mlx4_en_tx_desc {
+ #define MLX4_EN_CX3_HIGH_ID	0x1005
+ 
+ struct mlx4_en_rx_alloc {
+-	struct page	*page;
++	netmem_ref	netmem;
+ 	u32		page_offset;
+ };
+ 
 -- 
 2.17.1
 
