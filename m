@@ -1,135 +1,128 @@
-Return-Path: <netdev+bounces-189274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2ECB5AB16DF
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 16:09:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8898AB16F6
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 16:14:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 819471BC3D82
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 14:09:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5CFC4E5DEC
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 14:14:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73AED2900AE;
-	Fri,  9 May 2025 14:09:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 728E7295D9C;
+	Fri,  9 May 2025 14:13:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GCvkRk4k"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IaxgZiqX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD8CF23D2AF
-	for <netdev@vger.kernel.org>; Fri,  9 May 2025 14:09:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 890572957C4;
+	Fri,  9 May 2025 14:13:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746799771; cv=none; b=kUjunxFg+fW4y/rWH+Pce/e32zq2aHtBqhpmyqzkPv8c/6yasKgneqk0d/jWxq7G3a3tSbRyhJUtOTu67b6qWK07or8O1fNvexOiLv6dskJGpfxwbeFZFnQ7wthHQz3W4KD/5GzYN/2vzBnEqKlVjZJ3kVEWuWXtkwVdEd7rMC4=
+	t=1746800010; cv=none; b=M0m8PRjn+tS0rkH8FapOsYtaipM7dDXxXhA2qUVExfUelO7jv46cG3BObE5ndXfJ00TaszGhwiuHm5xIH6UvTLHV5pPLLTc1D6JZskXHR3mQaBkLfz601YamjYuCRg/qUCRol2VLAQAKRlQqtwbiL68q9k0K2WVkI694fKMruZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746799771; c=relaxed/simple;
-	bh=vQwnaN5SIa/H+Y6ee37jwTVs6F3pxmGriu6KQ74VZEo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nAranQTlsUhwsCZZVGtF4tqqyjMBexuBP6F37Xl334Seh9sVfPJHmshmO+F18EM82GTIko35zppfnQBTrWaN80v7FaDmUQLVYwH6pqKHPb1boFWbjMlL2MYTOF/lNIINd/2U+o3guNx5uyz6RNnQD6xux5YlWq/8PWo4Sfwu2mg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GCvkRk4k; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-22e42641d7cso234805ad.0
-        for <netdev@vger.kernel.org>; Fri, 09 May 2025 07:09:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1746799769; x=1747404569; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jCiKxL6LvoeyY9W6b3RA5blUeHU2Mmy1DhVz0FZzVWc=;
-        b=GCvkRk4kEg52KvSZTakEcYv/YL0uT1qGB5CMIV23CBHwOIbUhemIDQ0yS0+Q/Td11Y
-         A4QU4ZF2Xb5wuagf8xxURV7rp6OuO7UPDBzBroBxUF1umxlASerewXL2YsUaufAJ2VqU
-         cfLIWXlDOzrbLimqmwWD4ghUt1fu1rVZuMWvfp30TSnaA8vEKP0I5NgGNwKWktK5yokD
-         8GvLDqWEeAl1+Xz00br358GmhxA57hhABolgqf2FiZ17mzX0SFLv6rDRshdB1cuJfSGN
-         YDuGAfyRWjnm5e8OYCYoy8arW7mDhbXVh7uexECpGojI8ZHO8pylz7C72XPF2lFATSn1
-         EMyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746799769; x=1747404569;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jCiKxL6LvoeyY9W6b3RA5blUeHU2Mmy1DhVz0FZzVWc=;
-        b=Uaos9mKjFiEKKCoCoTK/9wTw3I0kejWexL0pFCgm1wstJF2M7NgNKR3eVG5dalZfYB
-         uC8d/NzPYvidgx4cUXlTC5jRI1I9MJTw8VwwLUumyeHxT6FF+l23dLVuK2oBN8jyYT45
-         Y2OR/j7uiUMsYJZr4KBx7f5wWR3cVm2WToiEsIUbNAtbapjYraM37ra3n3xJ0gINg2dH
-         MT0k+VWgjsZ2qMOo8XUdzaUYW8tH0OqzuH2iJiavF1L68IomfoDm0GSgouVHChHUaHCf
-         MgW33pp70gbZJmJaNBmVGpjn5uo+pX1yjq+MO2vwDucMyrZMgKOCFb1gLSe4TdyNJOyX
-         DVag==
-X-Forwarded-Encrypted: i=1; AJvYcCXo+9IXGFUA+EHhKTPiZEl/bp+ARy+dcVl6Ldqt0UWu7vlTYURGR0w0HRyCzoBNqLYkAau+6HE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YywLVmHVV4d31xMu/gMII2N8SKWjirA1EZEiqxIKsNWvnXZ/IEg
-	6HcfXhkmiEbJGcWzJCNpTOLTPJ8k9JaXzLDy7q5XYBDw6LaXGl6r0lavMhmoRN+P0ltphl5BS4Q
-	UPzQ+qCcPF9FC6yYW596fCjTj2VStSFWFlgG5
-X-Gm-Gg: ASbGncvZsT78DX5oALLl8UC+FwehHcA3uanHfuKLtckxt/wuQ/UGxNYjbTg5LmtHW+I
-	Q1Q3wLsaZEatD2pEQPmAMpnKYY14nfln142LCEXuQubnmcB1yFukOm8PcAshoXSN5IwGfYai34n
-	xoLPHlS+1bRNBSlI4XJ/Mb9PQ=
-X-Google-Smtp-Source: AGHT+IGMI/XDr8dUmvgSvSl1rg1l31oGTBGmNKBdui7zTK+cXuKqPn5F0+EqTjHwmKRPbjb5nSBKLROp6YQHQ8mm83g=
-X-Received: by 2002:a17:903:1c3:b0:224:a93:704d with SMTP id
- d9443c01a7336-22fca87efcdmr3648795ad.2.1746799768696; Fri, 09 May 2025
- 07:09:28 -0700 (PDT)
+	s=arc-20240116; t=1746800010; c=relaxed/simple;
+	bh=w1jQYPE2Doi+HHs3NZANXjINKX3NsvtO8bwrPT1Ogwo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iof5POOZm8SPNQIpwOf7wii5RjmM//lS7tJp1qARIOvs17vjAo3RBAU4D9KAg2wp7wnouswcbVCcUyI8QWyXr8EobRI2YUcIHij7SC2bxWkMjZRbts/B5FuWLpAF9mnjukMwTabZLJJNwXJrWXXMecY4C+F8e93w8USZN6annx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IaxgZiqX; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746800009; x=1778336009;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=w1jQYPE2Doi+HHs3NZANXjINKX3NsvtO8bwrPT1Ogwo=;
+  b=IaxgZiqXtczP6oa1xAMwFafTDs9ceLBgDpkyC8Lc80oe0flODb+kZojm
+   6PrsVFHhwKJ7tKW3nxv4gJagXZSvEQSffDHhNZVGfsqAH+faLKiwpyrWx
+   nOWMdllsQL8v1bchT09LN1lGaesL5PqFa1Qcv+FXmjcMu2s6Hf5W0aFiN
+   XBlAsIt+GxObaLu+ndqZOSGawWknprUMY6e0Gm+3KMqkui5MbQXX/9Xds
+   i4v5pqXP3M4FOm3RDDMRf9i7TYkmhJrkJKGzCkP9W1nyL3loWq01KDj+M
+   BEH+5jm5PuyYnzurzEmN9YpvXRjWAixSjfE0IFi6I6K9oiCPftt0pSPbM
+   w==;
+X-CSE-ConnectionGUID: 5tWshLTSR4ezUMFPgI5/Fw==
+X-CSE-MsgGUID: B1/Si58qT7awUICXkT64Tg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11427"; a="48782042"
+X-IronPort-AV: E=Sophos;i="6.15,275,1739865600"; 
+   d="scan'208";a="48782042"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2025 07:13:28 -0700
+X-CSE-ConnectionGUID: +RFxhdCnQSasT+lMFMYEAg==
+X-CSE-MsgGUID: a91sjI53QdSfDx+i2iJY1g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,275,1739865600"; 
+   d="scan'208";a="141580846"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by orviesa004.jf.intel.com with ESMTP; 09 May 2025 07:13:22 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uDOTW-000C9L-2i;
+	Fri, 09 May 2025 14:13:18 +0000
+Date: Fri, 9 May 2025 22:13:05 +0800
+From: kernel test robot <lkp@intel.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	=?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
+	=?iso-8859-1?Q?G=FCnther?= Noack <gnoack@google.com>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Stephen Smalley <stephen.smalley.work@gmail.com>,
+	Ondrej Mosnacek <omosnace@redhat.com>,
+	Casey Schaufler <casey@schaufler-ca.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, linux-security-module@vger.kernel.org,
+	selinux@vger.kernel.org
+Subject: Re: [PATCH v1 bpf-next 3/5] af_unix: Remove redundant scm->fp check
+ in __scm_destroy().
+Message-ID: <202505092103.UWs7ZtbF-lkp@intel.com>
+References: <20250505215802.48449-4-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250509115126.63190-1-byungchul@sk.com>
-In-Reply-To: <20250509115126.63190-1-byungchul@sk.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 9 May 2025 07:09:16 -0700
-X-Gm-Features: ATxdqUEcD0TRlngE7OhKXE4b1mDY8XLhym2WmzKEPsqCbaP_I_Y7Ra0p4qdhPME
-Message-ID: <CAHS8izPFiytN_bM6cu2X8qbvyVTL6pFMeobW=qFwjgHbg5La9Q@mail.gmail.com>
-Subject: Re: [RFC 00/19] Split netmem from struct page
-To: Byungchul Park <byungchul@sk.com>, Pavel Begunkov <asml.silence@gmail.com>
-Cc: willy@infradead.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, kernel_team@skhynix.com, kuba@kernel.org, 
-	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org, 
-	akpm@linux-foundation.org, ast@kernel.org, daniel@iogearbox.net, 
-	davem@davemloft.net, john.fastabend@gmail.com, andrew+netdev@lunn.ch, 
-	edumazet@google.com, pabeni@redhat.com, vishal.moola@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250505215802.48449-4-kuniyu@amazon.com>
 
-On Fri, May 9, 2025 at 4:51=E2=80=AFAM Byungchul Park <byungchul@sk.com> wr=
-ote:
->
-> The MM subsystem is trying to reduce struct page to a single pointer.
-> The first step towards that is splitting struct page by its individual
-> users, as has already been done with folio and slab.  This patchset does
-> that for netmem which is used for page pools.
->
-> Matthew Wilcox tried and stopped the same work, you can see in:
->
->    https://lore.kernel.org/linux-mm/20230111042214.907030-1-willy@infrade=
-ad.org/
->
-> Mina Almasry already has done a lot fo prerequisite works by luck, he
-> said :).  I stacked my patches on the top of his work e.i. netmem.
->
-> I focused on removing the page pool members in struct page this time,
-> not moving the allocation code of page pool from net to mm.  It can be
-> done later if needed.
->
-> There are still a lot of works to do, to remove the dependency on struct
-> page in the network subsystem.  I will continue to work on this after
-> this base patchset is merged.
->
-> This patchset is based on mm tree's mm-unstable branch.
->
+Hi Kuniyuki,
 
-This series largely looks good to me, but a couple of things:
+kernel test robot noticed the following build errors:
 
-- For deep changes like this to the page_pool, I think we need a
-before/after run to Jesper's currently out-of-tree benchmark to see
-any regressions:
-https://lore.kernel.org/netdev/20250309084118.3080950-1-almasrymina@google.=
-com/
+[auto build test ERROR on bpf-next/master]
 
-- Also please CC Pavel on iterations related to netmem/net_iov, they
-are reusing that in io_uring code for iouring rx rc as well.
+url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/af_unix-Call-security_unix_may_send-in-sendmsg-for-all-socket-types/20250506-060219
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20250505215802.48449-4-kuniyu%40amazon.com
+patch subject: [PATCH v1 bpf-next 3/5] af_unix: Remove redundant scm->fp check in __scm_destroy().
+config: i386-randconfig-054-20250509 (https://download.01.org/0day-ci/archive/20250509/202505092103.UWs7ZtbF-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.3.0-12) 11.3.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250509/202505092103.UWs7ZtbF-lkp@intel.com/reproduce)
 
---
-Thanks,
-Mina
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202505092103.UWs7ZtbF-lkp@intel.com/
+
+All errors (new ones prefixed by >>, old ones prefixed by <<):
+
+>> ERROR: modpost: "scm_fp_destroy" [net/bluetooth/bluetooth.ko] undefined!
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
