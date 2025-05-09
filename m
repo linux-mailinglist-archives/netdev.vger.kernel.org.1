@@ -1,209 +1,210 @@
-Return-Path: <netdev+bounces-189146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D7B1AB0A49
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 08:09:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08578AB0A51
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 08:12:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 173984E005C
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 06:09:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 934709E6895
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 06:12:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE63B26A096;
-	Fri,  9 May 2025 06:09:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEB4726A1AF;
+	Fri,  9 May 2025 06:12:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="spHC5VxV"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="eIu8tQKQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2087.outbound.protection.outlook.com [40.107.105.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49A002690E7;
-	Fri,  9 May 2025 06:09:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.105.87
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746770965; cv=fail; b=cIHMzrBN0kDRyT85hRTvUNa6FN5fi9Y965fKze/bnD3d37EBLTcpJlCnIbqxpya0LfuIvXpig6ILX3MvBnx0hDcevU/Bsoy7u863K12bt63h+jb6pevki7cQMtrt8Xgxe5oCApxVtgELSUimEi0sCjz0NHJcQQyvoGB2K2+1QNY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746770965; c=relaxed/simple;
-	bh=c5Stb/MZLQrk0D5tXIMbBgbCMHNcMbz9xm1ngm7CLCE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Gl/dO4BbdXo/hPuqLObHB5QhOqhdfrC1PkSZU/qWCQSexNuzezN9PVAt9rRrDM4qYVr01ErzvU7LNiA2tWNrIM+W5aVBfCf42so+CpR92cDZ0JfAt3vHvGr6osruPf9yg+B0WOG8YsbCxLcDjDWXyBGx0u6kX/E9pZsGKkhcU7Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=spHC5VxV; arc=fail smtp.client-ip=40.107.105.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bEthjy/4CGjYK868FexayZjwlWPs+bUFB3rtfh2GmNCi8lOJchTt4AUjHKsL17wcn2D14J9mqPkZKV3I7Z/7CS6XtO9RRJn2O7xJAG16OfbC4/gDUoVoZHNi5bT+FFuc2yYiCclLG4+9AiZsh61ixzeviOJT8F0+SAAcGrRnpJ7V77EDbwo5AfPOktytPeV6zXyDML/ziUS6ZwBl/KCRTSxwrzs14jYash2J1+Xbfmz4jjXEtSCO5ZQoFblgsXiCdCoo/9MuUyNfS4iFbOdlVQ+Xt4cCH5wxzYoXx1+TQ4eDQhwx8CYJLmGSNtfRVHRXlP7DLphVtn2CTM2tbRsDWQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DDokrRmhzZu07iw69pPSSMduM6gkmPUFCD5TiMRG250=;
- b=L1eCeE9UOGzeRuKQf9jYS4yYFTQl8q1ns8H5MK6X7UDcxyEpafpPgotDpFfcHPByqRFjZEBuk6mMMw2L/1boizy9WY5tyMOoq3JdRRrhJ73e0qK/Hk0RCRJQddDDSvJuzPZ9gduv/OBJXsfUJmEsF5xeWG9Vu28oehCsl1AkKPSUao2grGby0ebENF/WZPu8f+3psofXPVRY6Y8Vedgb87N7r2+c41RXHfUd6fEugqwbL7uuc86Uyd2fP+WIwxl4OSzmDqAQPIYvUVsv2Qzq1p3ZJBGhGeQxoqeaRScLC8E2V9XVHGw4Pve8R+Tyoy6pWxJN9SsPCT3VoJMe/uzFrQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector1-NXP1-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DDokrRmhzZu07iw69pPSSMduM6gkmPUFCD5TiMRG250=;
- b=spHC5VxVBise8h3jUAH+CN0AqM7Cvuz7nVjwqW76cmI0lLbkSIdky676C0VMhk8eerSjIERJqr+PUH2muedR+1QuSpUDzPtjb7p2AEwxS/1aXiVJAonMZmPa0laAKc4yDkV5l/OGJ+9erU/1Cd9IIk9Gon1Wtuu5u8qtE8+R+m5vSLZXa4XvfdPbaKopRQOJlAhgiC6mr2wHLBQF6Z5i1HXTYEPSeCnKEFJE4sz2VAzZDRiSoiPKIe7EggD7WBPyCa16Mg5uH8dsjBxp4uWDWWC/z0JJU8CjvGx3bqbuf7QgAJEqyZROfGuYxfIPH/p1UCtwhU8NDr2h60QeOqoWGg==
-Received: from DU2PR04MB8935.eurprd04.prod.outlook.com (2603:10a6:10:2e2::20)
- by AM0PR04MB6993.eurprd04.prod.outlook.com (2603:10a6:208:17d::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.21; Fri, 9 May
- 2025 06:09:19 +0000
-Received: from DU2PR04MB8935.eurprd04.prod.outlook.com
- ([fe80::3a2e:f437:702e:b41d]) by DU2PR04MB8935.eurprd04.prod.outlook.com
- ([fe80::3a2e:f437:702e:b41d%6]) with mapi id 15.20.8722.018; Fri, 9 May 2025
- 06:09:19 +0000
-From: "Madalin Bucur (OSS)" <madalin.bucur@oss.nxp.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: =?iso-8859-1?Q?K=F6ry_Maincent?= <kory.maincent@bootlin.com>, Andrew Lunn
-	<andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Richard Cochran
-	<richardcochran@gmail.com>, Russell King <linux@armlinux.org.uk>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net-next 0/3] dpaa_eth conversion to ndo_hwtstamp_get()
- and ndo_hwtstamp_set()
-Thread-Topic: [PATCH net-next 0/3] dpaa_eth conversion to ndo_hwtstamp_get()
- and ndo_hwtstamp_set()
-Thread-Index: AQHbwBeED8Tb5lZS20eY5NgYnSRZD7PJ0VBA
-Date: Fri, 9 May 2025 06:09:18 +0000
-Message-ID:
- <DU2PR04MB89356DD964DEA8357F3317B6EC8AA@DU2PR04MB8935.eurprd04.prod.outlook.com>
-References: <20250508124753.1492742-1-vladimir.oltean@nxp.com>
-In-Reply-To: <20250508124753.1492742-1-vladimir.oltean@nxp.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=oss.nxp.com;
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DU2PR04MB8935:EE_|AM0PR04MB6993:EE_
-x-ms-office365-filtering-correlation-id: 4aec6d1c-d957-4b78-2ae7-08dd8ec008e8
-x-ms-exchange-sharedmailbox-routingagent-processed: True
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|376014|1800799024|366016|7053199007|38070700018;
-x-microsoft-antispam-message-info:
- =?iso-8859-1?Q?6Gc9Hakw9cZCn/apLAWqsCkX2Wo9Ajd62N541YxxdgZ0kYoZGzV3DCAPz6?=
- =?iso-8859-1?Q?sqgoGe8PrwBHkSR4ImEDZcQV7eUfEjkTO/eL0IAtl151XIGtNyhl+ku8lg?=
- =?iso-8859-1?Q?Ad4gCIq8o1aaJL+Sy+Vp/sgIU6nvuPl3qLCxdsj9SL1dySHkHX2yG4nj/f?=
- =?iso-8859-1?Q?s6r8IjagQSqsKqlCXt8ck5B1HxGp8fylQ8zvcsD8fkljMrEqmWt52f4Cmm?=
- =?iso-8859-1?Q?XuwG5JsLTuWG9dx6W/2vUWjmL4LxREp8XMed9m2jJRr7l1Z10kA+nCBDl6?=
- =?iso-8859-1?Q?r/Ch+IQVJnpQjleI+uEtffhAQ1x31IlhEiBSZwSgXkuAyKGSGX1e6l923g?=
- =?iso-8859-1?Q?uUTQJ4TN8gmVzYRozoJhMU+fg0kqjDijmF0mEDNeJMPQoeIC/EAzvIL9/H?=
- =?iso-8859-1?Q?EMwmq7MWqdY7Fv/QWf2DfjyUvCPclPYmuO7i3SrPKb9IU6vPWnNV5kIW9e?=
- =?iso-8859-1?Q?Nu0awyVt5uyHF0vi/3cl00snV2RWtk02GimuCh+TT3wqGdO2KrXx5M7EUZ?=
- =?iso-8859-1?Q?plJF0w0ZYkrHR3znP+kBEr/SlteUcQoUbjqBghazKXZVGy8WgMJt7j+u3C?=
- =?iso-8859-1?Q?L3SYDilkYwp2aVkoCuEJTyMxk48135FT6tAlmhi5z//sXs79tgCWY1qv86?=
- =?iso-8859-1?Q?GVXHrVZGEm68PASQspkS0QhZ2IPnpwunC1HkAwJ2uys7pRfkuWJhCB22WF?=
- =?iso-8859-1?Q?E0n9ajwBHWD0iZPK5kFtHCUxucTqPOBiA3s/SxNoxYj4qzVS/gK/EL5GdS?=
- =?iso-8859-1?Q?AjVbDNyOtMOufEwukFl6g9ZrhYoLjNpbk5eQLQ64ec5RozdK/FeBWR8GKY?=
- =?iso-8859-1?Q?77gKhqm+CoveeTJWpfxuEl3EegQDaWawNLGqH64Bi9zlWPo1f0EyxL/Tgr?=
- =?iso-8859-1?Q?dSSGgBVEFAkc/nq4ySugWUHqhGtt2+MI3hpzZ0nDJhROCJUeH7ODrdLs8K?=
- =?iso-8859-1?Q?wyfRbeqnd1W8Ec/WS7qEsMltuS+E6XVRF1g+wICcs6oEkBdZwU+SxZtXkB?=
- =?iso-8859-1?Q?efS3DYaxdW0T7/Uux6zJaPBBAC32r+cXWMoqDTx6c/NQFlrKvNA2Rzr4CS?=
- =?iso-8859-1?Q?M9owOHrYtQXHHXV1u8Bngrq5pk7NZCCQdnTthNhEpqY/V77WC0OD0mtSiI?=
- =?iso-8859-1?Q?RRo5CRE4YPtYrspysV+fs5qWW1ThQTAz6O4TbdO6mFx+ZfaVf621Gt8I41?=
- =?iso-8859-1?Q?bRAThi05muiztz9I/tQ08W0aHprrdIKOPGLB+LlIIYXhuhg6UGqXMgBqCe?=
- =?iso-8859-1?Q?61oLRa+Fvtx2uJsZMGaJ+Ce8tavlSJnjEYMP0pW4/sb6fRraKh83cxhmdN?=
- =?iso-8859-1?Q?nIH5m5uv5LlFEip76gVZpnLDJPIcVdzKx+baUBZuK1XZlae70zWfRrbTAy?=
- =?iso-8859-1?Q?NzyJXRmgSnD/NzIhW9LfsD5ENILCbB7r9Z0nhB1isA5fgjIdD7oLXB7yJN?=
- =?iso-8859-1?Q?nWlGgRfnhSNTSqAg4Q6Mq2PEijtOecE2NMOTA7WA5s4IuCT7XU3HdYTHgv?=
- =?iso-8859-1?Q?RPeyDJjvZN/tjxByyIqhKV45l1Obog8qRDZUp1EeTEiTsy/2qavPUhMXsf?=
- =?iso-8859-1?Q?xI+n6nk=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU2PR04MB8935.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(7053199007)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?6F9qoKgjpDXUZF5eLkms7FotCUY2exDag9XJGGGFp9qcv8eBVrcz8TMDM8?=
- =?iso-8859-1?Q?WpwjfSbT93XRv6aI3wAzykE0HsqiSXxwkkygqYIys9Klg08aBEsaEB+ayX?=
- =?iso-8859-1?Q?JyXnjxkH99DUgYvu8EjD83fKCDnSKCpXPoggD/iqvVAjxWCrZqW+2EClwk?=
- =?iso-8859-1?Q?ZloMhN3Ok0eaQvuJ4QrE2PBnfa01y5Nh+fenaK/UyZ53sjWUT4pMFR0j9t?=
- =?iso-8859-1?Q?xH7cleXwoXNlJEMdA1Un3e9tBpEy1rjQKjW5H9FWQc3xqrSp/AmJsNFN2+?=
- =?iso-8859-1?Q?5tbl3kkZSylb4eFTUhuxj1JzXiNn+arYBYEs6wiRb64FfroY1JFO0cXpSN?=
- =?iso-8859-1?Q?e9DXrTta616m7EElqkz9vAqIPHj3H3ruhqZTDCBEBKXQRPLloOxsIMmShb?=
- =?iso-8859-1?Q?vejItmGIBb3FscpYnSijyU6Ceg9i5q1eLMb1PQ2qW6+jkEOtFthREpeX/S?=
- =?iso-8859-1?Q?a7AAtsz3geh3g4TjvET+BPmBpInHXcu9vZwz6yWgu4td/7gotyp8WYqGxu?=
- =?iso-8859-1?Q?lgAvsrCjkDghF5IqI2hH7iprdxhcKa4AGpIZ8n8rsChgHyHqbnpEKFKL8h?=
- =?iso-8859-1?Q?H+WgOYnOhtgAsjglaEYXutFYoTrukk2oSKT57bL6GtoCpIY/dD6cNwS2Ul?=
- =?iso-8859-1?Q?ffB0r8Bp7lszDdhmlQp+OHJS8H6+YEScfNGJIxyO0PCbsGpeoYtsa8V7UD?=
- =?iso-8859-1?Q?qYsOyyM4bdUAstQ29tctrZ9iI6+36JeweDDXTFPeRlirBDkY/H4hhs4opO?=
- =?iso-8859-1?Q?294A1vWp8KgpNmwA4XeXUxTvN0unbVTSCuhDRrElrkknLLUcwYvzsv7J9b?=
- =?iso-8859-1?Q?KpMOUzW9eh4t3dBjfKTRecmIWvVKYkgEIGtCyZciGePORtBOO6SL4dcHvy?=
- =?iso-8859-1?Q?jQ1Q6d/ojC6t8ArNO1ytiOwsc7W2FsTbvu5jZKM+VC9Nlqyp5Jnk9iQzKV?=
- =?iso-8859-1?Q?P1lQ2CzM16S+vm3VHsbjuL8Mza/lP3zGfMoDVReID/VqnakXhyt3HrdUXP?=
- =?iso-8859-1?Q?AqTU3X6Kp81GMRt26mre47lX63nkFA5muvMdPKbTlO/zEdIKQC6gMYo6Zp?=
- =?iso-8859-1?Q?GHvpc0IFF86x/BTQbqkiDJroYruV6oEhSlpo4W6YWfQnEe5+vqAuJkOHfi?=
- =?iso-8859-1?Q?aO4yiB6+keiAvpxMnTp6LnnMrKKonl7w0Rb+hltpKVwmtp9q/TS8Cm8rnU?=
- =?iso-8859-1?Q?4WkmGFbv8xDntdnMSsALT2+NKwNo+4IiGXOKxgdYabhZZxLOh7B+pOchqg?=
- =?iso-8859-1?Q?g4tY/FMaCB0tJd8wo2n9I3GzQvREnz6y91GMAXBglETsHM9Heo7AaecLBI?=
- =?iso-8859-1?Q?5+KJahC5oiTk5Qs0XRBbt5uEQXoCo8ZnsDh81QjkWbJqJmm/WiM9IXR+yo?=
- =?iso-8859-1?Q?2x6gHRWacducv642aEUsIBK7aluMfjgoXkQdJxOV2ZNwJ5il6ZAAa0XWKR?=
- =?iso-8859-1?Q?CTgLNNGXz+xs3KJcR+hASU/kYlpEd5M8xCA9MnnDwn5OGF3mQswnGpiboa?=
- =?iso-8859-1?Q?6U5f4nRvds8TQ3O4JHHldurfCvPZ9PcAkwvOfqc0TVC6DqpvzOO03IuacC?=
- =?iso-8859-1?Q?eQy4XaEEJyHcyyP4EtS8bRlSEeiEt7iQtpMrfwmyVv62YkIdkg95im1e7P?=
- =?iso-8859-1?Q?xXGxBzi+j1pbKdGPQ3/oEbsT8uNzIsGBxH?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C891526A1AB
+	for <netdev@vger.kernel.org>; Fri,  9 May 2025 06:12:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746771131; cv=none; b=fkOlooPDCI078+qmfy04pmvi1JO4QohGvrNtjQmhqiCDRyfYXCSLBT5htVmRuTz5UP3QPlM+dtrDr3zT9YTuXGqG8xHME14qug0xgufROh5mKe6pockdS/5DJgZZRllOaalCLbHlIL+RNeG2i54hKbH2oOMmNO+kxwucbpvRvTI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746771131; c=relaxed/simple;
+	bh=SgmwctySlGbZE8Y7ECt5BO41p9Wa+WOMQmklCfcn83w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AuBlgawPgebDo/w8jWx7YEfBqx1fG4iy/xdYnX/AqYYLYzCZa7Ctzuqh6z5ov25j22KS6IiToQr2rFfg4zrSYa8bqOIR+rPeLvdxULrRpr9v24W/QHO0v2ZVhDr+uP4etqAQ4NVinUt8/J1oPdOKPoNfRwUY9IG9+UVDRbI7Mno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=eIu8tQKQ; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-acb39c45b4eso263237166b.1
+        for <netdev@vger.kernel.org>; Thu, 08 May 2025 23:12:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1746771128; x=1747375928; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JsqZgIgkSuMcTrxJQRDgcEGPZOgCfhwflJ33fpoq6jw=;
+        b=eIu8tQKQDIDwxtYY3zuBoyq8Y7VVZ87Z+VNUmaQDOeEZGgt5M6Fd1ho8251/+t2Rmh
+         Rj+iM8yioRdBwr1WNrWrCyo+skh4ZPt9FV7XnJdTJIBd8iB1Y1iiv2ghX4MGEZC+BiBF
+         QvI/xLqHTc4q9rjkDK1WjbnSvRUGCwOXlKrEhCBhezYCHoijI+g2SRQ6hrTU2T3je1lm
+         Ap/3CReNGXMzHi2f6CexEFsMYxnxHZWl+R4qGwOepXx3jcx5Bm09gt5ICoPmZwaJHqNE
+         OXQs5xLgZAKjLoeLDbaK9mWZDx5krAAqIsq3ybhFErVOM0FU0M4oAg+W5FjYZ6tfKt1Q
+         x94w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746771128; x=1747375928;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JsqZgIgkSuMcTrxJQRDgcEGPZOgCfhwflJ33fpoq6jw=;
+        b=XY/qcFuFCqcGYvxY96rMjozvNdfXDB6/k+8QkZxkLWRTWRZPm/RoRTDcri4flpVrG5
+         G6rkrmSYrRCKo244jnXkdeoYxuIMNltYfP0IiL+1QShB4XKPz2gIvpg+tYbvV4LJUaMw
+         xvxC7mAWPdBSCEx1gbXLaUc7x6jOsqyhQCu83dCrt0vhmXIVbPSBn2b2ISwbYKA1B8Bt
+         THWBxcaSd+Wh0LZ6TXy4F9AtmvzWvPb0y+ByQfH7Tbk7PIdmRHNztcsDFtSju6TQn2GE
+         8LVjIExVjtPvvrogIUbe/RkpKMdJ0d5rbKjfptmYBuIzX4cIifrsSJmr+MjuWmPf80wS
+         idhg==
+X-Forwarded-Encrypted: i=1; AJvYcCWXGq1BJs1fdP40br3mfEFc6YZ1Id/2KbI2Rc+EwQXdO02abV33qRATHiSNoNcqev8n4a+EUkA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJWQMlNdOXw4MLziAQALqnkuJIRE700J0lbG+IsSmUECny1oaV
+	yeyfEoLNhjgsNF9jjBbVgIWagTI7N2X1dilELYWCQMWCF7f4NztWXQu1gN14MJw=
+X-Gm-Gg: ASbGncsxSMhHhu0F9VRFEiMZCkMb1icUaYVIVgUg5Tp8jqd1BE8kOLVEzATdcIEHY0x
+	5RDWEVTWd6I5+vTnkgLptpUGccUdzxByFP6GaXmhc4ve2ZmUr2oEKxlVYuRjrOtrOXMUG9biCW0
+	iK0XnXWQFvBe3hMRQmB+ZoRA2E6esiAEei8N+xoyxx+wCQQrJjtA3yb26w7U/C4DeBvup/Xccm2
+	UDgwQhNFEEfUgqPBe1BYkDpJfnSdXJWz97wxmXqcQXr8dEJY+2Y3Pt2PhST2wJ8hb8dq3R8KVif
+	6jlN71SCudAQDQUCfZk1CLGAkzI3rBMw4OMMsLY+4ZOLQQ3g58sj//9VBPDjnCCIpeeKsHp0
+X-Google-Smtp-Source: AGHT+IFwTIvZ/JDXp63lVD7yCHCYF/5x6H0kXJQDeAXO5fUwzIWcY8Yr2zXT/J8iEsgfDbopaGw9rw==
+X-Received: by 2002:a17:906:bf46:b0:ac7:ec31:deb0 with SMTP id a640c23a62f3a-ad218e91c5fmr193282666b.9.1746771127738;
+        Thu, 08 May 2025 23:12:07 -0700 (PDT)
+Received: from jiri-mlt.client.nvidia.com ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad2197c5b9csm98887566b.159.2025.05.08.23.12.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 May 2025 23:12:07 -0700 (PDT)
+Date: Fri, 9 May 2025 08:11:56 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+Cc: "donald.hunter@gmail.com" <donald.hunter@gmail.com>, 
+	"kuba@kernel.org" <kuba@kernel.org>, "davem@davemloft.net" <davem@davemloft.net>, 
+	"edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>, 
+	"horms@kernel.org" <horms@kernel.org>, "vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>, 
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, 
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "saeedm@nvidia.com" <saeedm@nvidia.com>, 
+	"leon@kernel.org" <leon@kernel.org>, "tariqt@nvidia.com" <tariqt@nvidia.com>, 
+	"jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>, "richardcochran@gmail.com" <richardcochran@gmail.com>, 
+	"Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>, "Olech, Milena" <milena.olech@intel.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 1/3] dpll: add phase-offset-monitor feature
+ to netlink spec
+Message-ID: <zosr5eqz5sh2z5uqxghdko2fug2zlzr6dbwbmavesiysabvvgj@zr6pxggacpwg>
+References: <20250508122128.1216231-1-arkadiusz.kubalewski@intel.com>
+ <20250508122128.1216231-2-arkadiusz.kubalewski@intel.com>
+ <timzeiuivkgvdzmyafp752acgfkieuqhivcab55x24ow7apovp@4lsq6esrrusg>
+ <SJ2PR11MB845211DED1A8ECD92116E0019B8BA@SJ2PR11MB8452.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DU2PR04MB8935.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4aec6d1c-d957-4b78-2ae7-08dd8ec008e8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 May 2025 06:09:19.0286
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: rPk8QATiGF7Hn/aMtRft7yeK+lXV4ATB5tAiwmgD/+0NYHVCVYJVjwd/vwrLhZTdmtn0C9VFvkmANXEw0v0DkA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR04MB6993
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SJ2PR11MB845211DED1A8ECD92116E0019B8BA@SJ2PR11MB8452.namprd11.prod.outlook.com>
 
-> -----Original Message-----
-> From: Vladimir Oltean <vladimir.oltean@nxp.com>
-> Sent: Thursday, May 8, 2025 3:48 PM
-> To: netdev@vger.kernel.org
-> Cc: K=F6ry Maincent <kory.maincent@bootlin.com>; Madalin Bucur
-> <madalin.bucur@nxp.com>; Andrew Lunn <andrew@lunn.ch>; David S. Miller
-> <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
-> Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Simon
-> Horman <horms@kernel.org>; Richard Cochran <richardcochran@gmail.com>;
-> Russell King <linux@armlinux.org.uk>; linux-kernel@vger.kernel.org
-> Subject: [PATCH net-next 0/3] dpaa_eth conversion to ndo_hwtstamp_get()
-> and ndo_hwtstamp_set()
->=20
-> This is part of the effort to finalize the conversion of drivers to the
-> dedicated hardware timestamping API.
->=20
-> In the case of the DPAA1 Ethernet driver, a bit more care is needed,
-> because dpaa_ioctl() looks a bit strange. It handles the "set" IOCTL but
-> not the "get", and even the phylink_mii_ioctl() portion could do with
-> some cleanup.
->=20
-> Vladimir Oltean (3):
->   net: dpaa_eth: convert to ndo_hwtstamp_set()
->   net: dpaa_eth: add ndo_hwtstamp_get() implementation
->   net: dpaa_eth: simplify dpaa_ioctl()
->=20
->  .../net/ethernet/freescale/dpaa/dpaa_eth.c    | 41 ++++++++++---------
->  1 file changed, 21 insertions(+), 20 deletions(-)
->=20
-> --
-> 2.43.0
+Thu, May 08, 2025 at 05:29:07PM +0200, arkadiusz.kubalewski@intel.com wrote:
+>>From: Jiri Pirko <jiri@resnulli.us>
+>>Sent: Thursday, May 8, 2025 4:26 PM
+>>
+>>Thu, May 08, 2025 at 02:21:26PM +0200, arkadiusz.kubalewski@intel.com
+>>wrote:
+>>>Add enum dpll_feature_state for control over features.
+>>>
+>>>Add dpll device level attribute:
+>>>DPLL_A_PHASE_OFFSET_MONITOR - to allow control over a phase offset monitor
+>>>feature. Attribute is present and shall return current state of a feature
+>>>(enum dpll_feature_state), if the device driver provides such capability,
+>>>otherwie attribute shall not be present.
+>>>
+>>>Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+>>>Reviewed-by: Milena Olech <milena.olech@intel.com>
+>>>Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+>>>---
+>>>v3:
+>>>- replace feature flags and capabilities with per feature attribute
+>>>  approach,
+>>>- add dpll documentation for phase-offset-monitor feature.
+>>>---
+>>> Documentation/driver-api/dpll.rst     | 16 ++++++++++++++++
+>>> Documentation/netlink/specs/dpll.yaml | 24 ++++++++++++++++++++++++
+>>> drivers/dpll/dpll_nl.c                |  5 +++--
+>>> include/uapi/linux/dpll.h             | 12 ++++++++++++
+>>> 4 files changed, 55 insertions(+), 2 deletions(-)
+>>>
+>>>diff --git a/Documentation/driver-api/dpll.rst b/Documentation/driver-
+>>>api/dpll.rst
+>>>index e6855cd37e85..04efb425b411 100644
+>>>--- a/Documentation/driver-api/dpll.rst
+>>>+++ b/Documentation/driver-api/dpll.rst
+>>>@@ -214,6 +214,22 @@ offset values are fractional with 3-digit decimal
+>>>places and shell be
+>>> divided with ``DPLL_PIN_PHASE_OFFSET_DIVIDER`` to get integer part and
+>>> modulo divided to get fractional part.
+>>>
+>>>+Phase offset monitor
+>>>+====================
+>>>+
+>>>+Phase offset measurement is typically performed against the current
+>>>active
+>>>+source. However, some DPLL (Digital Phase-Locked Loop) devices may offer
+>>>+the capability to monitor phase offsets across all available inputs.
+>>>+The attribute and current feature state shall be included in the response
+>>>+message of the ``DPLL_CMD_DEVICE_GET`` command for supported DPLL
+>>devices.
+>>>+In such cases, users can also control the feature using the
+>>>+``DPLL_CMD_DEVICE_SET`` command by setting the ``enum
+>>>dpll_feature_state``
+>>>+values for the attribute.
+>>>+
+>>>+  =============================== ========================
+>>>+  ``DPLL_A_PHASE_OFFSET_MONITOR`` attr state of a feature
+>>>+  =============================== ========================
+>>>+
+>>> Embedded SYNC
+>>> =============
+>>>
+>>>diff --git a/Documentation/netlink/specs/dpll.yaml
+>>>b/Documentation/netlink/specs/dpll.yaml
+>>>index 8feefeae5376..e9774678b3f3 100644
+>>>--- a/Documentation/netlink/specs/dpll.yaml
+>>>+++ b/Documentation/netlink/specs/dpll.yaml
+>>>@@ -240,6 +240,20 @@ definitions:
+>>>       integer part of a measured phase offset value.
+>>>       Value of (DPLL_A_PHASE_OFFSET % DPLL_PHASE_OFFSET_DIVIDER) is a
+>>>       fractional part of a measured phase offset value.
+>>>+  -
+>>>+    type: enum
+>>>+    name: feature-state
+>>>+    doc: |
+>>>+      Allow control (enable/disable) and status checking over features.
+>>>+    entries:
+>>>+      -
+>>>+        name: disable
+>>>+        doc: |
+>>>+          feature shall be disabled
+>>>+      -
+>>>+        name: enable
+>>>+        doc: |
+>>>+          feature shall be enabled
+>>
+>>Is it necessary to introduce an enum for simple bool?
+>>I mean, we used to handle this by U8 attr with 0/1 value. Idk what's the
+>>usual way carry boolean values to do this these days, but enum looks
+>>like overkill.
+>>
+>
+>Well, yeah.. tricky.. There is no bool type in the attribute types?
+>Input/output pin direction or eec/pps dpll types are also 2-value-enums
+>we use same way..
+>
+>Had to use something as it is better then plain 0/1, also those values
+>could be reused for any other feature.
 
-For the series:
+Okay, I don't mind.
 
-Acked-by: Madalin Bucur <madalin.bucur@oss.nxp.com>
-
-Thank you!
+>
+>Thank you!
+>Arkadiusz
+> 
+>[...]
 
