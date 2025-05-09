@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-189224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F4211AB12D1
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 14:02:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8866AB12D9
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 14:02:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C75A61883917
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 12:02:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E40603B1171
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 12:01:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4C89290098;
-	Fri,  9 May 2025 12:01:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 418C028FFE3;
+	Fri,  9 May 2025 12:01:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="WJnAz4OR"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="NQchgrPO"
 X-Original-To: netdev@vger.kernel.org
 Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B735233735;
-	Fri,  9 May 2025 12:01:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 372CC290BC7;
+	Fri,  9 May 2025 12:01:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746792096; cv=none; b=nmjkS9AwlckDUXkkKlRT2HS/VxyVzpVg1TGNukg+o/Nsr9V8iYEKShJ6bxXnT2lMy+h1Q6icThdxOxX7jsZzTE77e3j29P8t36hI0T+dYnavF337Ld4xugrwdreRJuO9DAfO2RcyFyAIRCanU7W1CR47CJnz56BYV/a5py++hUQ=
+	t=1746792107; cv=none; b=dFcyCDqOmAYeK8MSnpXTGPfcGQ/xNHK4YBOrfIG1uEGCfYR+26xDKY5nbH+S4Tb2sdC+K0WTAPy9jEnDyYWJiiyMXeW3aQCMMepRNMnf4uNxz9fI03reuGZWMrm7io2M+HvC/dyJLlGs1jp0ixz0PoHwmjJ52DXqjujfRV5JBtQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746792096; c=relaxed/simple;
-	bh=DXlb1yQTnHKRCntsXxDNHtVLAFrSWHcArFdBEY2pbIU=;
+	s=arc-20240116; t=1746792107; c=relaxed/simple;
+	bh=1pwz2+Q0Gd+jElqkSlVjDgmKZjTx4VsdAcXYpLc4/vo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=aF2AsRUlXTeXRfqlAIoenwby/MWQlTG8rEX7W3hL/NZtRb5HDLWODQpu45UQvYpEmUWwVqgRhmDXRlGWewLGkjzdoaUAxHi3rDvxuH1sdX1p4aZn8XV1tqSfnAdp4QyVnSVTh63+FPL9FQrVI9pviaCmQKRBl/ytd7eFNQgVKhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=WJnAz4OR; arc=none smtp.client-ip=212.227.17.21
+	 MIME-Version; b=RHKayl5VlFeH7DlTXuqNzZzzIP1a91sqWLFe5RWpeyr0ft5jlIZAx2Q5jwFo/IY04SiZr+rbixnVS7zgi+//FiJsRAZ9yEBP2ZkbUwXQ3yD9NVrvXrM4su9DLHEfqSK1uFUems17LsM/+L/DNnB9BsLyO6xOnJbPUek/Bs3awto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=NQchgrPO; arc=none smtp.client-ip=212.227.17.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1746792089; x=1747396889; i=wahrenst@gmx.net;
-	bh=o2ClX6bqKoDyuncls4p4vcndsL4vRhh+9X4jhInKLKw=;
+	s=s31663417; t=1746792090; x=1747396890; i=wahrenst@gmx.net;
+	bh=bnJb0uD1IRNj1rXqCbTxVCfLPON5Hahh9t8ZRFy2s8I=;
 	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-Id:In-Reply-To:
 	 References:MIME-Version:Content-Transfer-Encoding:cc:
 	 content-transfer-encoding:content-type:date:from:message-id:
 	 mime-version:reply-to:subject:to;
-	b=WJnAz4ORpjWAIiGNqJOFmOEcejDOtm0UFV/Ayp8W1SLaY8wuSbicL4DzZpXbpFTu
-	 9rg+j6IBcMnWfnCSXKM6b6TgrC/ZPHCuNwe9IzhW4Vf5EVGPeG+KwrFqBwP5mWh4t
-	 hl2s268oo90f3zzobRL7SF985VcCycvsHc0uAm//Nom3qcNkUaK1CphF1iz8Kh6fo
-	 k8DtetCkg18aHbLhrg6+pJm5X1q/O4PK/pFzdF/h5/anWKgKw/YdA0q33GJKUtWLN
-	 efQaSumRlxdG7kZmh+1mzxWwal+PZ85NzxYrhJXAlhKgewDbWE7q9v0lmD/KAx95b
-	 aJmMPq6jSdwv6vD9fA==
+	b=NQchgrPOahW5xd5qjXNBXI9cWAFxsT4h81xe/bQ76mck+c1UjklmC37l1wHzrbKs
+	 17JHnBXS5sNcvfXMYhsXQmQCvBLRDE60rlVuxgdIeFPC5Qn4sto5jo2Gnlv9CaL47
+	 loI1ChGvD51HH5yAP42F+AboW1WHvZV6YugZcUnMY3nI1q+BMHmp95tDr/HZgLwbk
+	 5wwboPKfuP+I5xdNN8pRvJgRCdJCHZ5qdIbEdEi48xP6caBNW+l5CMxIE3Aq/aeaT
+	 hBP2dTrVlTrQrkwNN8tNjQbBju3vaPOGhPTZ9MQkPIXNxfdcoB1lFHxldbSA7bPB4
+	 qAXnAOyPUAvcv1SLAQ==
 X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
 Received: from stefanw-SCHENKER ([91.41.216.208]) by mail.gmx.net (mrgmx105
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1N9dsb-1v6xHY1vbZ-00ynkV; Fri, 09
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1MaJ3t-1uXta03VbR-00Pk2x; Fri, 09
  May 2025 14:01:29 +0200
 From: Stefan Wahren <wahrenst@gmx.net>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -59,11 +59,10 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Conor Dooley <conor+dt@kernel.org>
 Cc: netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
-	Stefan Wahren <wahrenst@gmx.net>,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: [PATCH net-next V2 2/6] net: vertexcom: mse102x: Add warning about IRQ trigger type
-Date: Fri,  9 May 2025 14:01:13 +0200
-Message-Id: <20250509120117.43318-3-wahrenst@gmx.net>
+	Stefan Wahren <wahrenst@gmx.net>
+Subject: [PATCH net-next V2 3/6] net: vertexcom: mse102x: Drop invalid cmd stats
+Date: Fri,  9 May 2025 14:01:14 +0200
+Message-Id: <20250509120117.43318-4-wahrenst@gmx.net>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250509120117.43318-1-wahrenst@gmx.net>
 References: <20250509120117.43318-1-wahrenst@gmx.net>
@@ -74,108 +73,105 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:a6X3IKbrH5dj+GDVsBC4lT9InV1s0NeH7zXFSIQvvFgbkarKiua
- MplGSKwCNUkNnJEvn7bOy4tQl8lbT7APY4J7UljoCKeU1T6jjUrWS2b5kLp/cAmrIEfM5GC
- 9fGuP2LHdoX+f2cQSZicrNQLZjsNgsygePQefyXOyi1F5C8RWY5QMx/OTWs2zFoyyNQjtGw
- dxNM1woBRSc3KkS4pnGFw==
+X-Provags-ID: V03:K1:MoYowGCeHcJ8STtNiUzilf84M6VGsAwHASWGIzOqtKTnjgikS4q
+ Z77P6Sxrc1qMSk9xlbPFJo7RpL1sSeuLC7CXfa6zzYPfZUACfyPvWAD2dIyFJOstf/hBHTh
+ /xV3JF7S8BwSLVpMG+MgnATzub3HzwLJY1sxUdYnP7Z0kqDXBxKIum56qkX0N/Z1vMQX1zk
+ NUNffZsbf+9SOkmC5TRLw==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:ECUdX7TK9g4=;sYXIj8hetzGvSFWakUNxGTa2m4h
- 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
+UI-OutboundReport: notjunk:1;M01:P0:khMUsvp2F0E=;p+ywW1bwyX2fk1kLE4sjTez8BQP
+ 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
 
-The example of the initial DT binding of the Vertexcom MSE 102x suggested
-a IRQ_TYPE_EDGE_RISING, which is wrong. So warn everyone to fix their
-device tree to level based IRQ.
+There are several reasons for an invalid command response
+by the MSE102x:
+* SPI line interferences
+* MSE102x is in reset or has no firmware
+* MSE102x is busy
+* no packet in MSE102x receive buffer
+
+So the counter for invalid command isn't very helpful without
+further context. So drop the confusing statistics counter,
+but keep the debug messages about "unexpected response" in order
+to debug possible hardware issues.
 
 Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 =2D--
- drivers/net/ethernet/vertexcom/mse102x.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ drivers/net/ethernet/vertexcom/mse102x.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
 diff --git a/drivers/net/ethernet/vertexcom/mse102x.c b/drivers/net/ethern=
 et/vertexcom/mse102x.c
-index e4d993f31374..78a50a68c567 100644
+index 78a50a68c567..954256fddd7c 100644
 =2D-- a/drivers/net/ethernet/vertexcom/mse102x.c
 +++ b/drivers/net/ethernet/vertexcom/mse102x.c
-@@ -8,6 +8,7 @@
+@@ -46,7 +46,6 @@
 =20
- #include <linux/if_vlan.h>
- #include <linux/interrupt.h>
-+#include <linux/irq.h>
- #include <linux/module.h>
- #include <linux/kernel.h>
- #include <linux/netdevice.h>
-@@ -522,10 +523,25 @@ static irqreturn_t mse102x_irq(int irq, void *_mse)
+ struct mse102x_stats {
+ 	u64 xfer_err;
+-	u64 invalid_cmd;
+ 	u64 invalid_ctr;
+ 	u64 invalid_dft;
+ 	u64 invalid_len;
+@@ -57,7 +56,6 @@ struct mse102x_stats {
 =20
- static int mse102x_net_open(struct net_device *ndev)
- {
-+	struct irq_data *irq_data =3D irq_get_irq_data(ndev->irq);
- 	struct mse102x_net *mse =3D netdev_priv(ndev);
- 	struct mse102x_net_spi *mses =3D to_mse102x_spi(mse);
- 	int ret;
-=20
-+	if (!irq_data) {
-+		netdev_err(ndev, "Invalid IRQ: %d\n", ndev->irq);
-+		return -EINVAL;
-+	}
-+
-+	switch (irqd_get_trigger_type(irq_data)) {
-+	case IRQ_TYPE_LEVEL_HIGH:
-+	case IRQ_TYPE_LEVEL_LOW:
-+		break;
-+	default:
-+		netdev_warn_once(ndev, "Only IRQ type level recommended, please update =
-your device tree firmware.\n");
-+		break;
-+	}
-+
- 	ret =3D request_threaded_irq(ndev->irq, NULL, mse102x_irq, IRQF_ONESHOT,
- 				   ndev->name, mse);
- 	if (ret < 0) {
+ static const char mse102x_gstrings_stats[][ETH_GSTRING_LEN] =3D {
+ 	"SPI transfer errors",
+-	"Invalid command",
+ 	"Invalid CTR",
+ 	"Invalid DFT",
+ 	"Invalid frame length",
+@@ -195,7 +193,6 @@ static int mse102x_rx_cmd_spi(struct mse102x_net *mse,=
+ u8 *rxb)
+ 	} else if (*cmd !=3D cpu_to_be16(DET_CMD)) {
+ 		net_dbg_ratelimited("%s: Unexpected response (0x%04x)\n",
+ 				    __func__, *cmd);
+-		mse->stats.invalid_cmd++;
+ 		ret =3D -EIO;
+ 	} else {
+ 		memcpy(rxb, trx + 2, 2);
 =2D-=20
 2.34.1
 
