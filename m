@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-189308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F28FAB190C
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 17:42:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A429AB1912
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 17:44:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C80B1C46600
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 15:42:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A833DA03ADF
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 15:42:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A77417D2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A345B2309A7;
 	Fri,  9 May 2025 15:42:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HyZs3o6z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bsM3vlCh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 068A823026B
-	for <netdev@vger.kernel.org>; Fri,  9 May 2025 15:42:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F44C230996
+	for <netdev@vger.kernel.org>; Fri,  9 May 2025 15:42:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746805341; cv=none; b=IkWA8AEasja6es6O5bY0EH7/7NT1nCsevDCU/CW19k8J7D+ui3veip+tPIJSIRIvJ7HjgrEtu90jlx1Jga3nWCWEgKhVR4PzOdM/fljkxQTBM5gR04wgOpaWkAG+9JSdFG0VHgdpAqwW4Taoxr/+VwlyC7KZukgdtxOcQyShFBw=
+	t=1746805341; cv=none; b=ICQ8gb5Evj0EItCjG/pfPzwC4aaRwTi7amDdBBkWjzBDxkDtSwViK3fhYUtM2ozfwu4oQQWzVwFpIaHbsygnDJumPf2Y6gHg3UsfPRt9fn+CejC5czzC3opo7z7L/b9GbBaHr5QOL6J2ataZtxfcCzU7kLBtZJEGYW7FrOhZj5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1746805341; c=relaxed/simple;
-	bh=O3KIz5VwT9bfBJ4zuS5ljbcCvbfJS177vEZ0YdiGdog=;
+	bh=lGdptKdhkHIzJry3exOOLjd5lSZlLAoDHph2qPfWYlo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cSz8fhaiNiSoBR9mBjD6X0U5VnRsrCEv6oh5dqPTcXoBSPB33pVO1mMs4PqOh3laadkHMECYr6SO37D073FBWrMNxgi22IZUTmofsa74QwHw0MBGc+3AzRPGMsb2+AEFIwFTug2HQ0aJC54gecgfss5iUEdn7eoJyq2bVwGsmBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HyZs3o6z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34849C4CEF1;
+	 MIME-Version; b=s7kODW+AXAtYDUqmHBnM18xPGZ6Km0nEm/H5u1TJ31wa0B5loZ19goYJRN3tBN1XvKf6go6ZD3SYVNW4bUTWEyUvCpW/2W+wQqVM+f8MfT57DMdKynbjQfxI5jsGzhDk7+0HA/g9cP5fpLc5LQL1EGhRokoS5bBp8kr7Kam8fmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bsM3vlCh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B0BBC4CEEF;
 	Fri,  9 May 2025 15:42:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1746805339;
-	bh=O3KIz5VwT9bfBJ4zuS5ljbcCvbfJS177vEZ0YdiGdog=;
+	bh=lGdptKdhkHIzJry3exOOLjd5lSZlLAoDHph2qPfWYlo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=HyZs3o6zqf6Ld3lad+LlOP87clqdeNXqZ2D+yWTkr4qbJrI84f4E0a5k6P5FPa/FZ
-	 wIufvXjwS9EmvNk0xGc1EwFkNFPOh2+rVJLM8KOCrqupKhtO+oF5G+gBLOvK6AXWsH
-	 pPEjNOOtMVBBo0EErKLWH+BiGEbm8RLI6m8pfZie01eP//aEotEoQ0kSAIYylYYKbt
-	 FHEm6ewW4e15ZCB+hSf6nRMgEAOGZ9nw3R7yC8cL5Dk8n+U+jNeVN7sdn8lG2KQSkH
-	 BoAYRqrN4jV1fDQpUs9QVtOTo3X/N0Svqo9j6z+0fmNHTjxhJfvZ+9dEEZuObjWOpH
-	 DSyj4IsUvLdJQ==
+	b=bsM3vlChJfPRQcZX6U4c0E19R7SPHRXjVdDKw5B8JEac3bT9wFRzVrJ6M/A4YlUUo
+	 SIPCGsvZdapXNMckvQS//yS9Ytig7ae3y1t3N6CNhL4avciHjwm0IxCcEpWDoLZdED
+	 ru0UQ2IbcW+X5oDxE0Juu5Zw8hbD2c0VXMRrnpd8oZXw/FpmtqpCX9EnakchDLpidc
+	 Blao74+h3/Nhh1rLiNQSwcOoyIwJFDzyGIqsn/AHIE4TiMqH4bRqxJnS7Fy+0gI9OQ
+	 l2vL4VytrZ3+YKTvqqsBFb2IgRiC5ys9T0F+YI0HAUosHOWxa58d6hUd9w/ZTyO0nL
+	 8ojCpTnAdFUYQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -51,9 +51,9 @@ Cc: netdev@vger.kernel.org,
 	donald.hunter@gmail.com,
 	jacob.e.keller@intel.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 2/3] tools: ynl-gen: auto-indent else
-Date: Fri,  9 May 2025 08:42:12 -0700
-Message-ID: <20250509154213.1747885-3-kuba@kernel.org>
+Subject: [PATCH net-next v2 3/3] tools: ynl-gen: support struct for binary attributes
+Date: Fri,  9 May 2025 08:42:13 -0700
+Message-ID: <20250509154213.1747885-4-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250509154213.1747885-1-kuba@kernel.org>
 References: <20250509154213.1747885-1-kuba@kernel.org>
@@ -65,28 +65,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-We auto-indent if statements (increase the indent of the subsequent
-line by 1), do the same thing for else branches without a block.
-There hasn't been any else branches before but we're about to add one.
+Support using a struct pointer for binary attrs. Len field is maintained
+because the structs may grow with newer kernel versions. Or, which matters
+more, be shorter if the binary is built against newer uAPI than kernel
+against which it's executed. Since we are storing a pointer to a struct
+type - always allocate at least the amount of memory needed by the struct
+per current uAPI headers (unused mem is zeroed). Technically users should
+check the length field but per modern ASAN checks storing a short object
+under a pointer seems like a bad idea.
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- tools/net/ynl/pyynl/ynl_gen_c.py | 1 +
- 1 file changed, 1 insertion(+)
+v2:
+  - create a separate class
+v1: https://lore.kernel.org/20250508022839.1256059-4-kuba@kernel.org
+---
+ tools/net/ynl/pyynl/ynl_gen_c.py | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
 
 diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
-index 4e2ae738c0aa..9a5c65966e9d 100755
+index 9a5c65966e9d..3b064c61a374 100755
 --- a/tools/net/ynl/pyynl/ynl_gen_c.py
 +++ b/tools/net/ynl/pyynl/ynl_gen_c.py
-@@ -1458,6 +1458,7 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-         if self._silent_block:
-             ind += 1
-         self._silent_block = line.endswith(')') and CodeWriter._is_cond(line)
-+        self._silent_block |= line.strip() == 'else'
-         if line[0] == '#':
-             ind = 0
-         if add_ind:
+@@ -566,6 +566,23 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
+                 f'memcpy({member}, {self.c_name}, {presence});']
+ 
+ 
++class TypeBinaryStruct(TypeBinary):
++    def struct_member(self, ri):
++        ri.cw.p(f'struct {c_lower(self.get("struct"))} *{self.c_name};')
++
++    def _attr_get(self, ri, var):
++        struct_sz = 'sizeof(struct ' + c_lower(self.get("struct")) + ')'
++        len_mem = var + '->_' + self.presence_type() + '.' + self.c_name
++        return [f"{len_mem} = len;",
++                f"if (len < {struct_sz})",
++                f"{var}->{self.c_name} = calloc(1, {struct_sz});",
++                "else",
++                f"{var}->{self.c_name} = malloc(len);",
++                f"memcpy({var}->{self.c_name}, ynl_attr_data(attr), len);"], \
++               ['len = ynl_attr_data_len(attr);'], \
++               ['unsigned int len;']
++
++
+ class TypeBinaryScalarArray(TypeBinary):
+     def arg_member(self, ri):
+         return [f'__{self.get("sub-type")} *{self.c_name}', 'size_t count']
+@@ -1010,7 +1027,9 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
+         elif elem['type'] == 'string':
+             t = TypeString(self.family, self, elem, value)
+         elif elem['type'] == 'binary':
+-            if elem.get('sub-type') in scalars:
++            if 'struct' in elem:
++                t = TypeBinaryStruct(self.family, self, elem, value)
++            elif elem.get('sub-type') in scalars:
+                 t = TypeBinaryScalarArray(self.family, self, elem, value)
+             else:
+                 t = TypeBinary(self.family, self, elem, value)
 -- 
 2.49.0
 
