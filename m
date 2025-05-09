@@ -1,179 +1,140 @@
-Return-Path: <netdev+bounces-189131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D58BDAB08F9
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 05:50:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B36D9AB090E
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 06:10:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B1514C760D
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 03:50:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 150951B6377E
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 04:10:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBA8523A9B1;
-	Fri,  9 May 2025 03:50:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8896423D29F;
+	Fri,  9 May 2025 04:10:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ffraIcol"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="H78EiTAG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242DF1372;
-	Fri,  9 May 2025 03:50:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF4751D7985
+	for <netdev@vger.kernel.org>; Fri,  9 May 2025 04:10:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746762643; cv=none; b=og9EmKyVXO+EhWry/Jbo1wn+5IL6M6JBasZdM+Pqo4ho3NFFZoRpcu2yhiQG7xzmR02YnF5LORukci2H6s7e8rxvzKQpYo3is3+9vz3Zuo49uKiBw+VcG+6uf/VCgjHFC5aNiecNSDYGC9TMbM0rwbAGHorok86+fWtqsNGSJ88=
+	t=1746763816; cv=none; b=RkfFYAjNsug0Se+9MPSsc/rZc1um3nXY8uhY5mO0nbHig7ZxFRelXUrglFQFwedHhOQD6/MQbWmWR/t7RQw3n5pXfWvbMtcmJNvcp3clYhg4cfAM9BtF2sVhNcZCLPH3hBvqPQOpyFpw/nZPN8N6Eb+2zdZ3S3JZvnIO5USVwVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746762643; c=relaxed/simple;
-	bh=hy5pzYUav/BP0YDgiOVnShocA7zS7BA61sxle7neUg4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YRLaAhBkeJrE8rLW0+ZM+9Z5flFkRO4w3Y3IbbKijLsYKiYfdCWtV/v5b++lTW0bWq/7WXXWWhh5gz3ZQpfm7RknGt8+yzyFkZiil9ydnAk87NUkxN8b7huIqIbrIEy3Tdaq9BvCRexB/3YRTfaLTfFcRUUjLY+saKXUXUzabgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ffraIcol; arc=none smtp.client-ip=209.85.166.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-3d8fc9dbce4so10680865ab.0;
-        Thu, 08 May 2025 20:50:41 -0700 (PDT)
+	s=arc-20240116; t=1746763816; c=relaxed/simple;
+	bh=qn0j00Q4lWXNjM61TVOR73jQu4hSjMBc//b4ByjjlDQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qcIsQEACqXxHHGUc7McpjPE71fP4EIEkj5jNqDWTpM8VqBoMfjZ/CMrw58oHJe2KLQrNCaIW5DrINNTi/SjoH2knYCemdI9SuIe1s4IOPNERvyDInJBjuoak4e4gpBp72JvONPYQudz8piWknLQNzgJwgdOEyWe8ULGBSFlufYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=H78EiTAG; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-b1f7357b5b6so1071691a12.0
+        for <netdev@vger.kernel.org>; Thu, 08 May 2025 21:10:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746762641; x=1747367441; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aaSQSE/HMH1qJ6r6p4XK/7TbsZvPwZPNrcjteVR+WAA=;
-        b=ffraIcolguOcG6A5hkCFVz/Mhciihmqrd4Vltqyo65uVCEvmp8l/7W30443ztZ00jq
-         l8TYkzIjxIUk8b9/V0MtDhGGCrXHhSKB9K8bETH27YgijEt7QUTIPit1cIxubc9PhW6V
-         Ybl2Ui34ZyUKEElG+oR+lY3MhAgAEA1rq05Txbs2suVUr6XrRkc9hKaYqqB89APjxQ24
-         d6NlU9zlNjjRkb9+VgED13mxRlC89gxmKZAnb43McCuxVN5Flg8eOIuq+SU8HeKtAZK8
-         K/ziml3vF3YVVLSn9SGIqoG3+To5+1LRAcBbp1Qm5GMYOFUv4z2l6tEnYBVi+pDBqC6C
-         y5xg==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1746763814; x=1747368614; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gOPt985lsryufrF2f8Rp/LqwNq9TFhhzPNpr6WI7mLk=;
+        b=H78EiTAGBP/eSZtpKU4O7AkmbB7c0NwV4GOoLa6j98Z8i5LuY846ffMW9OvosBR57E
+         7pTiLxd5Rcpj7vhvmMtlZsQjGkYA3mpJknQThjvk64fpQQq/MA6wOE4xs1smA37QalR4
+         t0YLmgoGt6DYQSrleEY14yvZ9E3tW3CS8JFtThPBb4HvE/c6yd8W33X40gDztNwmHbgz
+         KBY8dGLlJQEEmfrAPTkQLC2TRl7bwgL7QONB7DsHu7L/RF2N85KiAdiprebR9Wvc2X5+
+         +CUfqo9bFSWXa0Z7xyRrKlSHP5KjjYVyvDsGTCfEtyueRVSBPiAHaKerJ1LIBWIKdLa9
+         MrDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746762641; x=1747367441;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aaSQSE/HMH1qJ6r6p4XK/7TbsZvPwZPNrcjteVR+WAA=;
-        b=MbkiliDROCrMdzLKJGxpbou10Jysss2ssSmqDojyIxapAMFe+cd27+8t2uhW3l/NIE
-         sdW7+vRrRBwhrdS20owU7jUtkOyjo3i/oaiUMOefRQa2GaDpuGp+92xG108GxUpNDRLd
-         tMh/Vshdq27TXfima6m274lo4cBPjcpPmV2wGODWcaeW+cvu5ywlsmQpG3tFZgjYnLL4
-         KL+5el5jC5en8v9z+S3gmpqHHB3G5cmDWv9BaIv4GHtlXAdtD8PeNqGBCnb5M3evyRjw
-         72PEJCGHBFCx1dg1tfNHD4IWlBrr8CRoK1VcYuTDgBBM4TftyTwNOmQrIN9IG8dpqaQX
-         6ELQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUm9LrgCDR/DGnBX/8aq8vksYsKsoUVdgmtuKrEqqnw7WAqTcZFzZkSY7hi8tbrz/1pbb7sOMAoqmPYf6s=@vger.kernel.org, AJvYcCUxj4c5D0CdKw9PdpJ7JrFsmCogx0qQ7lkgZNXEh3LgbMNgVaoG/WYxbph002KuaamiudnHlHRcu2haNA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1wXnn+Go4oGwSGcR1oJ3FabtaJrvwjHTVZ2C3R1Z0Y6QylZDj
-	GXlaYyf/x9Il/HzewVQ2nGYPWvjGQahGVA1hRFYi47DA4M6LEJXdR0K57PZvzrKPEuM/BeESFYX
-	ZlIpZiWhcuhm4Uk+oIJ7drYBrb10=
-X-Gm-Gg: ASbGnctaUQqzGUsRRwAwOkFK1Svxidg4SCRXyrI72lXjMWYn11UR6T6/j2EmWOVgaku
-	oZkwyOtj7kcNiER4euOHuA5qDGTi/oP8fJ5mawswoQD5Izr2kc2ps98eKSyc3Mi0MyVwY8iDs7p
-	3ly8F/d7K1AkoKNzDe1+7Bk9D3AOqBnpSN
-X-Google-Smtp-Source: AGHT+IGDsiNP6b7Ntgyd9mrDWZhyyjw+qLzWqKgXqKRu/+adjAGmGTajymdrLVvCtn7gmze+JihzDCvnPKWSScgjTWc=
-X-Received: by 2002:a05:6e02:1fc8:b0:3d0:26a5:b2c with SMTP id
- e9e14a558f8ab-3da7e34871amr18179335ab.8.1746762641045; Thu, 08 May 2025
- 20:50:41 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1746763814; x=1747368614;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gOPt985lsryufrF2f8Rp/LqwNq9TFhhzPNpr6WI7mLk=;
+        b=vC2EeyvikVKetgUD8ukC6MHZrfGVdJP2rNO3QHWecaKWK/Syd13JHZkFvCXR/1Pv4v
+         M9fcW4OUPZXjUgpvP4ZWnvrVfo2qhgPCwwhffcv5bl0Jg/BtOdC9rVBXBB/jE1BfgGJt
+         QJqRzR3aArWVU5yqvASiv5MsxMOi1Pl/nrJYQE/yJcEM/PzTNyI9n4M1S4mb0WvrBrxZ
+         F5h+AyjN/qhJcsn+FxdLUF6lQs1GdcFYNio89rJ+9ByoZtl7egfI8DsPUBHfJsnJV+21
+         g8YsPA3482J3ol7EwKe3WmHZZqIIeZE27kNqgeNd7+6a1OwNEnaudCiq5FPszOfMct57
+         Wkdg==
+X-Forwarded-Encrypted: i=1; AJvYcCVUipfgM1i8ZFOKDGHR7FV5IZff2sndj16nCRigVHog28YRst4sTtMg0K4faytMg0JmPEcoQDY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcCaAkCuRAFoAUpWx5jm+ysuYNcpDHrEvAGAcGe0ur5O6gN3yy
+	/dXIFNyx0mOiqXMNGbcqndPsWjI1DBW6zJaKsQKHRWW7mygkp/TvopTklCYcwWc=
+X-Gm-Gg: ASbGncsMawqmTySWEQIY7ZkKtrF8qti8yWkDaSsTPZTK5CEon+iZjUG/nCOA2lbkzgW
+	ETyWmJun+axuL8VZ4A5L1G7z6XV2IzDS69ZYOA2tAyjaSVFpMf1MUbl4us+HfcoyjQfSGhTuepU
+	A1FHuOTP7lL3yeJrW3z8VYWWLpgfZMcgoedMDTsvxntFpy5J/iHo7c2yr0ibnP5CNZwkoghjPmg
+	hd11s5YX7eHXkLqLBGbZIFyhmXpDfhaHK2+DuxtSnaz6F/CneFrlUDXXzcGb0PlnMIXGljIfGgE
+	iNh1G89r3i6XiXfJ4jpjSIbGeP7h1Nwx6e/NGogCwq974HY=
+X-Google-Smtp-Source: AGHT+IGld+rlMK8n8nhzZTd9tL87p1xppP25t3sLIo0ygGvlHlV56UBGyyKEeAa17jr3ahMyKHEBTw==
+X-Received: by 2002:a17:902:ea0c:b0:22e:17ac:9dd8 with SMTP id d9443c01a7336-22fc8c7d71emr24684365ad.29.1746763814065;
+        Thu, 08 May 2025 21:10:14 -0700 (PDT)
+Received: from [192.168.1.21] ([97.126.136.10])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22fc773ee47sm8139185ad.63.2025.05.08.21.10.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 08 May 2025 21:10:13 -0700 (PDT)
+Message-ID: <d8693a9b-697a-49d7-a064-fc7349ec2d63@davidwei.uk>
+Date: Thu, 8 May 2025 21:10:13 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250508235109.585096-1-stfomichev@gmail.com>
-In-Reply-To: <20250508235109.585096-1-stfomichev@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 9 May 2025 11:50:04 +0800
-X-Gm-Features: AX0GCFthO-yBe0GwNZFZ1xaNDpopRKOfM4mk-G42AtzYTfPnYJnCB8Sks0K_y7Y
-Message-ID: <CAL+tcoCwAUNmBuN1KR5oa90nZGMqOeNc-xEYdi2nairE5-1BBw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] net/mlx5: support software TX timestamp
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, saeedm@nvidia.com, tariqt@nvidia.com, 
-	andrew+netdev@lunn.ch, linux-rdma@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, leon@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] selftests: drv-net: ping: make sure the ping
+ test restores checksum offload
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ shuah@kernel.org, linux-kselftest@vger.kernel.org
+References: <20250508214005.1518013-1-kuba@kernel.org>
+ <e339c382-c0f5-40dd-994e-34b388c68181@davidwei.uk>
+ <20250508183736.74707daf@kernel.org>
+Content-Language: en-US
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <20250508183736.74707daf@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, May 9, 2025 at 7:51=E2=80=AFAM Stanislav Fomichev <stfomichev@gmail=
-.com> wrote:
->
-> Having a software timestamp (along with existing hardware one) is
-> useful to trace how the packets flow through the stack.
-> mlx5e_tx_skb_update_hwts_flags is called from tx paths
-> to setup HW timestamp; extend it to add software one as well.
->
-> Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
-> Signed-off-by: Stanislav Fomichev <stfomichev@gmail.com>
+On 5/8/25 18:37, Jakub Kicinski wrote:
+> On Thu, 8 May 2025 14:59:12 -0700 David Wei wrote:
+>>> +def _schedule_checksum_reset(cfg, netnl) -> None:
+>>> +    features = ethtool(f"-k {cfg.ifname}", json=True)
+>>> +    setting = ""
+>>> +    for side in ["tx", "rx"]:
+>>> +        f = features[0][side + "-checksumming"]
+>>> +        if not f["fixed"]:
+>>
+>> I checked and found that "fixed" is a ternary:
+>>
+>>           "rx-checksumming": {
+>>               "active": true,
+>>               "fixed": false,
+>>               "requested": true
+>>           },
+>>           "tx-checksumming": {
+>>               "active": true,
+>>               "fixed": null,
+>>               "requested": null
+>>           },
+>>
+>> Python loads this JSON as False and None types respectively, and `not
+>> f["fixed"]` is true for both False and None. Maybe this doesn't matter
+>> but flagging it.
+> 
+> I think so, yes.
+> 
+>>> +            setting += " " + side
+>>> +            setting += " " + ("on" if f["requested"] or f["active"] else "off")
+>>> +    defer(ethtool, f" -K {cfg.ifname} " + setting)
+>>
+>> This does rx/tx-gro too even if not explicitly requested. I assume that
+>> is okay?
+> 
+> You mean because those are automatically updated when we change
+> checksumming? If so then yes.
 
-Thanks for working on this.
+Thanks for responding.
 
-An a bit irrelevant topic here is it seems we miss adding
-SOF_TIMESTAMPING_TX_SOFTWARE in mlx4_en_get_ts_info() since mlx4 has
-used skb_tx_timestamp function in mlx4_en_xmit(). IIUC, I'm going to
-send a patch to add this flag.
-
-Thanks,
-Jason
-
-> ---
-> v2: rename mlx5e_tx_skb_update_hwts_flags (Tariq & Jason)
-> ---
->  drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c | 1 +
->  drivers/net/ethernet/mellanox/mlx5/core/en_tx.c      | 7 ++++---
->  2 files changed, 5 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c b/drive=
-rs/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-> index fdf9e9bb99ac..e399d7a3d6cb 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-> @@ -1689,6 +1689,7 @@ int mlx5e_ethtool_get_ts_info(struct mlx5e_priv *pr=
-iv,
->                 return 0;
->
->         info->so_timestamping =3D SOF_TIMESTAMPING_TX_HARDWARE |
-> +                               SOF_TIMESTAMPING_TX_SOFTWARE |
->                                 SOF_TIMESTAMPING_RX_HARDWARE |
->                                 SOF_TIMESTAMPING_RAW_HARDWARE;
->
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c b/drivers/ne=
-t/ethernet/mellanox/mlx5/core/en_tx.c
-> index 4fd853d19e31..55a8629f0792 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
-> @@ -337,10 +337,11 @@ static void mlx5e_sq_calc_wqe_attr(struct sk_buff *=
-skb, const struct mlx5e_tx_at
->         };
->  }
->
-> -static void mlx5e_tx_skb_update_hwts_flags(struct sk_buff *skb)
-> +static void mlx5e_tx_skb_update_ts_flags(struct sk_buff *skb)
->  {
->         if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP))
->                 skb_shinfo(skb)->tx_flags |=3D SKBTX_IN_PROGRESS;
-> +       skb_tx_timestamp(skb);
->  }
->
->  static void mlx5e_tx_check_stop(struct mlx5e_txqsq *sq)
-> @@ -392,7 +393,7 @@ mlx5e_txwqe_complete(struct mlx5e_txqsq *sq, struct s=
-k_buff *skb,
->         cseg->opmod_idx_opcode =3D cpu_to_be32((sq->pc << 8) | attr->opco=
-de);
->         cseg->qpn_ds           =3D cpu_to_be32((sq->sqn << 8) | wqe_attr-=
->ds_cnt);
->
-> -       mlx5e_tx_skb_update_hwts_flags(skb);
-> +       mlx5e_tx_skb_update_ts_flags(skb);
->
->         sq->pc +=3D wi->num_wqebbs;
->
-> @@ -625,7 +626,7 @@ mlx5e_sq_xmit_mpwqe(struct mlx5e_txqsq *sq, struct sk=
-_buff *skb,
->         mlx5e_dma_push(sq, txd.dma_addr, txd.len, MLX5E_DMA_MAP_SINGLE);
->         mlx5e_skb_fifo_push(&sq->db.skb_fifo, skb);
->         mlx5e_tx_mpwqe_add_dseg(sq, &txd);
-> -       mlx5e_tx_skb_update_hwts_flags(skb);
-> +       mlx5e_tx_skb_update_ts_flags(skb);
->
->         if (unlikely(mlx5e_tx_mpwqe_is_full(&sq->mpwqe))) {
->                 /* Might stop the queue and affect the retval of __netdev=
-_tx_sent_queue. */
-> --
-> 2.49.0
->
+Reviewed-by: David Wei <dw@davidwei.uk>
 
