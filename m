@@ -1,145 +1,83 @@
-Return-Path: <netdev+bounces-189287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66347AB1768
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 16:29:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83958AB178A
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 16:35:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA38DA20ACE
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 14:28:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22E8F7B958C
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 14:33:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA2D3219302;
-	Fri,  9 May 2025 14:28:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1772E21D3CD;
+	Fri,  9 May 2025 14:34:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CDeY3Ffu"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KOWq51lH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8621E5B82;
-	Fri,  9 May 2025 14:28:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CCFC20FA96
+	for <netdev@vger.kernel.org>; Fri,  9 May 2025 14:34:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746800907; cv=none; b=BAOb7n2X+B+v/1ZwSVORKAi5KFFCD21PUPm4nLEDXMaemSEkp0dYJ5F7j695LlraGbPM5P1Ww2ZHDuu0H8xixMGcI1v+4CeiJDgw/p5cLaxe2AGO/9Ytt1Za/JCK4/U0gYrVOFofv48Ixga+gHn3/9a2yYIPZJJD2JWi2v89idk=
+	t=1746801285; cv=none; b=mYAjYT1VOpTDaSQZkSw5UpHLhbuTSouaAo7KrwLmm34R2GB6xuUjVpARSO9/xX8FVlBrVJCgY9bPZX0tmJtDCT0RBvpQIeqHQOzldg26FWC/sAFDg//bwJKfG6HRo2XLf8w9uoTkXNVgqm6zrTBKZmTKEb7EkuBFNKg0LI9U6ZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746800907; c=relaxed/simple;
-	bh=fNRLig7bAYi1L1Kq7n0i/6zijpbMaAknetCXULDY9CM=;
+	s=arc-20240116; t=1746801285; c=relaxed/simple;
+	bh=756Q5IdStUvvBkHvhRRLAq9Lg+E4LZrTlROZs67yW2A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ksJny0jhVHTzkHXk7Rw1W4Cvhii6VzjvjKABXNmp+eZkiWo5G5uSsYQLlieIRSQgUif+1QlOL9TUfHYwglTzS3e9UCFFOuYdHOj1o1/22P+Jjbs7JH8iBLe/eTRSWXZXE5R37t/eIPkS3MSmtpO/6kHKCYa4J5VXexFVDtzpCRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CDeY3Ffu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51886C4CEE4;
-	Fri,  9 May 2025 14:28:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746800906;
-	bh=fNRLig7bAYi1L1Kq7n0i/6zijpbMaAknetCXULDY9CM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CDeY3FfuWHHr5ejCUZjrZfxLJ19JvZe/RsVbusBSk3mJbCZBndZddB5O2dP/eV8HK
-	 ik/fCKZlR7BGiQ8VI7eGCgcWeQOEahApJyI22knewmpxyfvWp3wlc9gq8Ak86xvDzp
-	 pBbq/9/fR4Kky+db9ieJJltllj/DLGK2f2fHtldJI4g721+ez5je893Bp8YPKGaAfL
-	 FOPT+WtvsI5JyP6T1rRcCX09RcQlvcfP80a5gCTNvqotCeJzW7gkrH+4tQR/I/m241
-	 w3WWYeZcEBdUTPqwtf9w+4hHfkhMWt0JJiQiGKgkNxCuNbrtZaQgSajZFKkSkQxAfD
-	 MJHjru/wqRDkw==
-Date: Fri, 9 May 2025 15:28:19 +0100
-From: Lee Jones <lee@kernel.org>
-To: Ming Yu <a0282524688@gmail.com>
-Cc: linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org,
-	mkl@pengutronix.de, mailhol.vincent@wanadoo.fr,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org,
-	linux@roeck-us.net, jdelvare@suse.com,
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org,
-	linux-can@vger.kernel.org, netdev@vger.kernel.org,
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org,
-	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org,
-	Ming Yu <tmyu0@nuvoton.com>
-Subject: Re: [PATCH v10 1/7] mfd: Add core driver for Nuvoton NCT6694
-Message-ID: <20250509142819.GG2492385@google.com>
-References: <20250423094058.1656204-1-tmyu0@nuvoton.com>
- <20250423094058.1656204-2-tmyu0@nuvoton.com>
- <20250501122214.GK1567507@google.com>
- <CAOoeyxVL2MV83CJaYCXMiw0b5YUzk728H4B9GY1q9h_P8D43fg@mail.gmail.com>
- <20250502080754.GD3865826@google.com>
- <CAOoeyxWpYmcg1_FBXYqDfMi28R5ZXp2Sk2PhUo=cL10Nn3iVEw@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=WxqbZSiISyUX8zXKEfpkk7M/+6G56ULNANrHs+g9iXM8iKwR041tcGaxGw0BMle14cRt0CQh/aGfG9/lpJ5Ht8CFvkD+pSPYA+WAeGHBgeKKcsowf49Kg1ZRwKTG3XLSX5AuqijmbbM+Au1olcve6NImufeWiuo//hhAlhss/xE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KOWq51lH; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=a3Sved/6oHj+tri8LRnIQ4ykIRJJ6yaTpZEr7WgjJ+c=; b=KOWq51lH8IyhcDXh8maI6i+vim
+	vV2/Xcz0cPFYvs32nkVq4MkvKnqbaAKNTky/kTVaTWw7iqk0lJnR5hgVNcf9M1RF5IAe5aMqjVUA0
+	yIlQqtrC3N8YAlFZYdSbjSWn5toGNvnA7KJWRb2VxSOpX3vob1xo9wxCiBIClwSA3rHQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uDOoC-00C7iw-PG; Fri, 09 May 2025 16:34:40 +0200
+Date: Fri, 9 May 2025 16:34:40 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Sabrina Dubroca <sd@queasysnail.net>
+Subject: Re: [PATCH net-next 01/10] MAINTAINERS: add Sabrina as official
+ reviewer for ovpn
+Message-ID: <7ca63031-79a5-490d-b167-41cc5e53ff26@lunn.ch>
+References: <20250509142630.6947-1-antonio@openvpn.net>
+ <20250509142630.6947-2-antonio@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOoeyxWpYmcg1_FBXYqDfMi28R5ZXp2Sk2PhUo=cL10Nn3iVEw@mail.gmail.com>
+In-Reply-To: <20250509142630.6947-2-antonio@openvpn.net>
 
-On Fri, 02 May 2025, Ming Yu wrote:
-
-> Lee Jones <lee@kernel.org> 於 2025年5月2日 週五 下午4:08寫道：
-> >
-> ...
-> > > > > +static const struct mfd_cell nct6694_devs[] = {
-> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 0),
-> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 1),
-> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 2),
-> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 3),
-> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 4),
-> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 5),
-> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 6),
-> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 7),
-> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 8),
-> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 9),
-> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 10),
-> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 11),
-> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 12),
-> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 13),
-> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 14),
-> > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL, 0, 15),
-> > > >
-> > > > These are all identical.
-> > > >
-> > > > I thought you were going to use PLATFORM_DEVID_AUTO?  In fact, you are
-> > > > already using PLATFORM_DEVID_AUTO since you are calling
-> > > > mfd_add_hotplug_devices().  So you don't need this IDs.
-> > > >
-> > > > MFD_CELL_NAME() should do.
-> > > >
-> > >
-> > > Yes, it uses PLATFORM_DEVID_AUTO, but in my implementation, the
-> > > sub-devices use cell->id instead of platform_device->id, so it doesn't
-> > > affect the current behavior.
-> > > However, if you think there's a better approach or that this should be
-> > > changed for consistency or correctness, I'm happy to update it, please
-> > > let me know your recommendation.
-> > >
-> > > When using MFD_CELL_NAME(), the platform_device->id for the GPIO
-> > > devices is assigned values from 1 to 16, and for the I2C devices from
-> > > 1 to 6, but I need the ID offset to start from 0 instead.
-> >
-> > Oh no, don't do that.  mfd_cell isn't supposed to be used outside of MFD.
-> >
-> > Just use the platform_device id-- if you really need to start from 0.
-> >
-> > As an aside, I'm surprised numbering starts from 1.
-> >
+On Fri, May 09, 2025 at 04:26:11PM +0200, Antonio Quartulli wrote:
+> Sabrina put quite some effort in reviewing the ovpn module
+> during its official submission to netdev.
+> For this reason she obtain extensive knowledge of the module
+> architecture and implementation.
 > 
-> OK, I will use platform_device->id instead. However, I'm still unsure
-> why the ID starts from1.
+> Make her an official reviewer, so that I can be supported
+> in reviewing and acking new patches.
 > 
-> Additionally, I noticed that when calling mfd_add_devices()
-> separately, the IDs are also assigned consecutively (e.g., GPIO: 1~16,
-> I2C: 17~22, ...).
-> 
-> Do you have any recommendations on how I should implement this?
+> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+> Acked-by: Sabrina Dubroca <sd@queasysnail.net>
 
-If you are to use this mechanism, you'd have to submit separate
-mfd_add_devices() calls I guess.
+Agreed. She deserves the credit.
 
-However, this all seems a bit silly for simple, contextless (where
-device 3 is identical to device 10, etc) enumeration.  Can you use IDA
-instead?
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
--- 
-Lee Jones [李琼斯]
+    Andrew
 
