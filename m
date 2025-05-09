@@ -1,60 +1,76 @@
-Return-Path: <netdev+bounces-189170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52EBEAB0F25
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 11:39:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C812BAB0F6E
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 11:43:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B510C4E111E
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 09:39:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7182A1BC03A8
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 09:43:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02E4C277020;
-	Fri,  9 May 2025 09:39:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF65528C868;
+	Fri,  9 May 2025 09:43:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VnsmXF1m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E65535976;
-	Fri,  9 May 2025 09:39:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3041274FE5
+	for <netdev@vger.kernel.org>; Fri,  9 May 2025 09:43:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746783563; cv=none; b=dn10l/isJfP+CRwGPORVVoPMU1R333le2Gx0pcnE2AP6fUfgwg3teNBluGqfgCxUUc5hHWiSpDiscDnsmkF6YP+f10aSDrSqEI85Fu6J2c3JVIvH7zzyTQWdEkdy68sd1jK3wWmX86EDOfE+idmm7o1ESKc+6I8F9FjeRDyt/wc=
+	t=1746783783; cv=none; b=D3jP6FbsOXXhfl/7LSauwf/RNm3mGfP9AUAmOK5xLD94eCSZVk0oEvTHP7B94LkzoO5mx5ty7bwusqICNmNf89lEkqs1e2XqKI0SIR/4PPVhg+yGk7DoxNdkgv61VS3erzS4cEsZGVKbzLBK8qHKx0cTsZ6TK9y7W946D7+cd/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746783563; c=relaxed/simple;
-	bh=Ctc2LlgT/TBtEZb9BwfLgoa2yV+uYDSFls2xwrat8Os=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AAfxb+MHj6W5Di6V6FOIGnxIXyxzUhUkteWdvbg1ul8PYjMlE2mxfx2ZHxqx1CH8Qfcm7KgMv65Ix6pqQdmfeE5BpzOOcXq7Hpnu5X+A/3g97IoUFXisEmM3LuKo/lM/MWsPAa0UFkNvho6WfyZ7QV716S439CbhiFPbOJyf3kQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.178.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250812.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5499AZvK004245;
-	Fri, 9 May 2025 09:38:34 GMT
-Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [147.11.82.252])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 46e430pca6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Fri, 09 May 2025 09:38:34 +0000 (GMT)
-Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
- ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.43; Fri, 9 May 2025 02:38:33 -0700
-Received: from pek-lpg-core1.wrs.com (147.11.136.210) by
- ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
- 15.1.2507.43 via Frontend Transport; Fri, 9 May 2025 02:38:28 -0700
-From: <jianqi.ren.cn@windriver.com>
-To: <gregkh@linuxfoundation.org>, <stable@vger.kernel.org>
-CC: <patches@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
-        <jianqi.ren.cn@windriver.com>, <chuck.lever@oracle.com>,
-        <jlayton@kernel.org>, <trond.myklebust@hammerspace.com>,
-        <anna@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <ebiederm@xmission.com>,
-        <linux-nfs@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <liujian56@huawei.com>, <kuniyu@amazon.com>
-Subject: [PATCH 6.1.y] sunrpc: fix one UAF issue caused by sunrpc kernel tcp socket
-Date: Fri, 9 May 2025 17:38:28 +0800
-Message-ID: <20250509093828.3243368-1-jianqi.ren.cn@windriver.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1746783783; c=relaxed/simple;
+	bh=kU1eYwrtgwnm+VA+HpZ7w65H8GHTtgmzQV1UWy/XI/o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H17ZOUB1zXG4SFg4FA0qgBNG1pEhp+SVevOZf55gFUCT9rrSs/UqH5pb+JApacNC0hvCXW7v9h2/8zR4roowqcg9pYw1ej1rWPfeaMTt8vC+7kIk1jb6BBKmvn67xA2zht4TlX1a+hJ+GQfQpALWl/l2GghcW/qmvcSkezrRcHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VnsmXF1m; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1746783782; x=1778319782;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=kU1eYwrtgwnm+VA+HpZ7w65H8GHTtgmzQV1UWy/XI/o=;
+  b=VnsmXF1mL6GgLX4uhlOzkeJSF/erDjZs8kEvnifXKfPMAgOXGhdgq1Vf
+   E6NkQ4eIJod1Hf4JncN1uzm/8AR9uBR9yKm1HSK6ALXZ61VlWzWJ7pRFX
+   ql52biCW7bz++DkjDYQw1CD6dQPFrs4BY36kaT9izyPqBO+IQ9SEXkvbC
+   y0EEpu/w9J2faU6R9ai0tHoND2xKNLCfkQSlsY2UmxqGXFuN7JWUmVjYm
+   d0dGGaUwPYXhASkDlyaHuUNVUaMQz7NbpcDaoBbP2EoBtgam5WvfFm3Rd
+   Bpq/fd38rgDO2kGzmg7tNpC/EfuBT6cc85WWfVGHpR8UatvXjmez1BkuM
+   A==;
+X-CSE-ConnectionGUID: LYyPiwyESAu2OU7p3hkG/Q==
+X-CSE-MsgGUID: 0Dpyns5HSGi9Eq7x6AdF4g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11427"; a="73985808"
+X-IronPort-AV: E=Sophos;i="6.15,274,1739865600"; 
+   d="scan'208";a="73985808"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2025 02:43:01 -0700
+X-CSE-ConnectionGUID: C07zW04QQ5eCNoL/o/mRag==
+X-CSE-MsgGUID: OHnc+n6GTvWX9vS9LG1QnQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,274,1739865600"; 
+   d="scan'208";a="136266690"
+Received: from gk3153-pr4-x299-22869.igk.intel.com (HELO localhost.igk.intel.com) ([10.102.21.130])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2025 02:42:58 -0700
+From: Michal Kubiak <michal.kubiak@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: maciej.fijalkowski@intel.com,
+	aleksander.lobakin@intel.com,
+	przemyslaw.kitszel@intel.com,
+	dawid.osuchowski@linux.intel.com,
+	jacob.e.keller@intel.com,
+	jbrandeburg@cloudflare.com,
+	netdev@vger.kernel.org,
+	Michal Kubiak <michal.kubiak@intel.com>
+Subject: [PATCH iwl-net v2 0/3] Fix XDP loading on machines with many CPUs
+Date: Fri,  9 May 2025 11:42:30 +0200
+Message-ID: <20250509094233.197245-1-michal.kubiak@intel.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,188 +78,75 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=BajY0qt2 c=1 sm=1 tr=0 ts=681dcd1a cx=c_pps a=/ZJR302f846pc/tyiSlYyQ==:117 a=/ZJR302f846pc/tyiSlYyQ==:17 a=dt9VzEwgFbYA:10 a=i0EeH86SAAAA:8 a=VwQbUJbxAAAA:8 a=vggBfdFIAAAA:8 a=SEtKQCMJAAAA:8 a=t7CeM3EgAAAA:8
- a=1f2QqqMRGjE1UMYEyBAA:9 a=kyTSok1ft720jgMXX5-3:22 a=FdTzh2GWekK77mhwV6Dw:22
-X-Proofpoint-GUID: WASk0LQFlJwxy6C-Cknx7dsR8T8oJvlv
-X-Proofpoint-ORIG-GUID: WASk0LQFlJwxy6C-Cknx7dsR8T8oJvlv
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTA5MDA5MiBTYWx0ZWRfX+RG/N2dPGMh2 j1//+/kOAUg8zN2uXHGG9d8/9VJvmJ5mBMOGtlwXe3T47RjnaI0AJMm6yGv6B/2Vdnt38soIz9q WgU7xeC62TecBL8aqRaILiCaSpRRZVRecmXv+YiWkZYoZ1+mSXv7EFCQyPzX6n7WVpWN2eivLK8
- AFQPdvSP3yDbX27i7sbDR86n/EdPXevd7vcO8fXaElAGmV+FYFUZQ2HMb+hp143h4l2sKnQNGFI MSd2FXU2tO8+Uem5p+Ds9KM7Cp+FETCSuwvF/+wH1U+hYyJwL/IdLt5ORnosQrqqblBH28mkkIe BFe0K3O24hEIIrZlKUsAloM3WcG43YeKGnE1YGeA8fHKU6O8UZ4RmCdBThaZoR8CEIHBmcVSY/q
- TOS5kqXvNkoiRllesLRtM17jhLY+5hE6Fy9v4d8xCy8UR0TF/zhXV+NktlDPhjeY4ljmU1fk
-X-Sensitive_Customer_Information: Yes
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-09_03,2025-05-08_04,2025-02-21_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 suspectscore=0
- lowpriorityscore=0 phishscore=0 spamscore=0 priorityscore=1501 mlxscore=0
- impostorscore=0 bulkscore=0 adultscore=0 malwarescore=0 mlxlogscore=999
- classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.21.0-2504070000
- definitions=main-2505090092
 
-From: Liu Jian <liujian56@huawei.com>
+Hi,
 
-[ Upstream commit 3f23f96528e8fcf8619895c4c916c52653892ec1 ]
+Some of our customers have reported a crash problem when trying to load
+the XDP program on machines with a large number of CPU cores. After
+extensive debugging, it became clear that the root cause of the problem
+lies in the Tx scheduler implementation, which does not seem to be able
+to handle the creation of a large number of Tx queues (even though this
+number does not exceed the number of available queues reported by the
+FW).
+This series addresses this problem.
 
-BUG: KASAN: slab-use-after-free in tcp_write_timer_handler+0x156/0x3e0
-Read of size 1 at addr ffff888111f322cd by task swapper/0/0
+First of all, the XDP callback should not crash even if the Tx scheduler
+returns an error, so Patch #1 fixes this error handling and makes the
+XDP callback fail gracefully.
+Patch #2 fixes the problem where the Tx scheduler tries to create too
+many nodes even though some of them have already been added to the
+scheduler tree.
+Finally, Patch #3 implements an improvement to the Tx scheduler tree
+rebuild algorithm to add another VSI support node if it is necessary to
+support all requested Tx rings.
 
-CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 6.12.0-rc4-dirty #7
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1
-Call Trace:
- <IRQ>
- dump_stack_lvl+0x68/0xa0
- print_address_description.constprop.0+0x2c/0x3d0
- print_report+0xb4/0x270
- kasan_report+0xbd/0xf0
- tcp_write_timer_handler+0x156/0x3e0
- tcp_write_timer+0x66/0x170
- call_timer_fn+0xfb/0x1d0
- __run_timers+0x3f8/0x480
- run_timer_softirq+0x9b/0x100
- handle_softirqs+0x153/0x390
- __irq_exit_rcu+0x103/0x120
- irq_exit_rcu+0xe/0x20
- sysvec_apic_timer_interrupt+0x76/0x90
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20
-RIP: 0010:default_idle+0xf/0x20
-Code: 4c 01 c7 4c 29 c2 e9 72 ff ff ff 90 90 90 90 90 90 90 90 90 90 90 90
- 90 90 90 90 f3 0f 1e fa 66 90 0f 00 2d 33 f8 25 00 fb f4 <fa> c3 cc cc cc
- cc 66 66 2e 0f 1f 84 00 00 00 00 00 90 90 90 90 90
-RSP: 0018:ffffffffa2007e28 EFLAGS: 00000242
-RAX: 00000000000f3b31 RBX: 1ffffffff4400fc7 RCX: ffffffffa09c3196
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffff9f00590f
-RBP: 0000000000000000 R08: 0000000000000001 R09: ffffed102360835d
-R10: ffff88811b041aeb R11: 0000000000000001 R12: 0000000000000000
-R13: ffffffffa202d7c0 R14: 0000000000000000 R15: 00000000000147d0
- default_idle_call+0x6b/0xa0
- cpuidle_idle_call+0x1af/0x1f0
- do_idle+0xbc/0x130
- cpu_startup_entry+0x33/0x40
- rest_init+0x11f/0x210
- start_kernel+0x39a/0x420
- x86_64_start_reservations+0x18/0x30
- x86_64_start_kernel+0x97/0xa0
- common_startup_64+0x13e/0x141
- </TASK>
+As testing hints, I include sample failure scenarios below:
+  1) Number of LAN Tx/Rx queue pairs: 128
+     Number of requested XDP queues: >= 321 and <= 640
+     Error message:
+        Failed to set LAN Tx queue context, error: -22
+  2) Number of LAN Tx/Rx queue pairs: 128
+     Number of requested XDP queues: >= 641
+     Error message:
+        Failed VSI LAN queue config for XDP, error: -5
+  3) Number of LAN Tx/Rx queue pairs: 252
+     Number of CPUs in the system: 384
+        a) Load the XDP program.
+        b) Try to change (reduce or increase) the queue number using
+           the `ethtool -L` command, for example:
+                sudo ethtool -L <interface-name> combined 64
+     Error message:
+        Failed to set LAN Tx queue context, error: -22
 
-Allocated by task 595:
- kasan_save_stack+0x24/0x50
- kasan_save_track+0x14/0x30
- __kasan_slab_alloc+0x87/0x90
- kmem_cache_alloc_noprof+0x12b/0x3f0
- copy_net_ns+0x94/0x380
- create_new_namespaces+0x24c/0x500
- unshare_nsproxy_namespaces+0x75/0xf0
- ksys_unshare+0x24e/0x4f0
- __x64_sys_unshare+0x1f/0x30
- do_syscall_64+0x70/0x180
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
+Thanks,
+Michal
 
-Freed by task 100:
- kasan_save_stack+0x24/0x50
- kasan_save_track+0x14/0x30
- kasan_save_free_info+0x3b/0x60
- __kasan_slab_free+0x54/0x70
- kmem_cache_free+0x156/0x5d0
- cleanup_net+0x5d3/0x670
- process_one_work+0x776/0xa90
- worker_thread+0x2e2/0x560
- kthread+0x1a8/0x1f0
- ret_from_fork+0x34/0x60
- ret_from_fork_asm+0x1a/0x30
-
-Reproduction script:
-
-mkdir -p /mnt/nfsshare
-mkdir -p /mnt/nfs/netns_1
-mkfs.ext4 /dev/sdb
-mount /dev/sdb /mnt/nfsshare
-systemctl restart nfs-server
-chmod 777 /mnt/nfsshare
-exportfs -i -o rw,no_root_squash *:/mnt/nfsshare
-
-ip netns add netns_1
-ip link add name veth_1_peer type veth peer veth_1
-ifconfig veth_1_peer 11.11.0.254 up
-ip link set veth_1 netns netns_1
-ip netns exec netns_1 ifconfig veth_1 11.11.0.1
-
-ip netns exec netns_1 /root/iptables -A OUTPUT -d 11.11.0.254 -p tcp \
-	--tcp-flags FIN FIN  -j DROP
-
-(note: In my environment, a DESTROY_CLIENTID operation is always sent
- immediately, breaking the nfs tcp connection.)
-ip netns exec netns_1 timeout -s 9 300 mount -t nfs -o proto=tcp,vers=4.1 \
-	11.11.0.254:/mnt/nfsshare /mnt/nfs/netns_1
-
-ip netns del netns_1
-
-The reason here is that the tcp socket in netns_1 (nfs side) has been
-shutdown and closed (done in xs_destroy), but the FIN message (with ack)
-is discarded, and the nfsd side keeps sending retransmission messages.
-As a result, when the tcp sock in netns_1 processes the received message,
-it sends the message (FIN message) in the sending queue, and the tcp timer
-is re-established. When the network namespace is deleted, the net structure
-accessed by tcp's timer handler function causes problems.
-
-To fix this problem, let's hold netns refcnt for the tcp kernel socket as
-done in other modules. This is an ugly hack which can easily be backported
-to earlier kernels. A proper fix which cleans up the interfaces will
-follow, but may not be so easy to backport.
-
-Fixes: 26abe14379f8 ("net: Modify sk_alloc to not reference count the netns of kernel sockets.")
-Signed-off-by: Liu Jian <liujian56@huawei.com>
-Acked-by: Jeff Layton <jlayton@kernel.org>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Signed-off-by: Trond Myklebust <trond.myklebust@hammerspace.com>
-[Routine __netns_tracker_free() is not supported in 6.1 and so using
-netns_tracker_free() instead.]
-Signed-off-by: Jianqi Ren <jianqi.ren.cn@windriver.com>
-Signed-off-by: He Zhe <zhe.he@windriver.com>
 ---
-Verified the build test
----
- net/sunrpc/svcsock.c  | 4 ++++
- net/sunrpc/xprtsock.c | 7 +++++++
- 2 files changed, 11 insertions(+)
 
-diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-index 23b4c728de59..654579553edb 100644
---- a/net/sunrpc/svcsock.c
-+++ b/net/sunrpc/svcsock.c
-@@ -1457,6 +1457,10 @@ static struct svc_xprt *svc_create_socket(struct svc_serv *serv,
- 	newlen = error;
- 
- 	if (protocol == IPPROTO_TCP) {
-+		netns_tracker_free(net, &sock->sk->ns_tracker);
-+		sock->sk->sk_net_refcnt = 1;
-+		get_net_track(net, &sock->sk->ns_tracker, GFP_KERNEL);
-+		sock_inuse_add(net, 1);
- 		if ((error = kernel_listen(sock, 64)) < 0)
- 			goto bummer;
- 	}
-diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
-index b9dc8e197dde..181474105e4c 100644
---- a/net/sunrpc/xprtsock.c
-+++ b/net/sunrpc/xprtsock.c
-@@ -1855,6 +1855,13 @@ static struct socket *xs_create_sock(struct rpc_xprt *xprt,
- 		goto out;
- 	}
- 
-+	if (protocol == IPPROTO_TCP) {
-+		netns_tracker_free(xprt->xprt_net, &sock->sk->ns_tracker);
-+		sock->sk->sk_net_refcnt = 1;
-+		get_net_track(xprt->xprt_net, &sock->sk->ns_tracker, GFP_KERNEL);
-+		sock_inuse_add(xprt->xprt_net, 1);
-+	}
-+
- 	filp = sock_alloc_file(sock, O_NONBLOCK, NULL);
- 	if (IS_ERR(filp))
- 		return ERR_CAST(filp);
+v2:
+  - fix the bug while the `ethtool -L` command did not work while
+    the XDP program was running (Jesse),
+  - in the patch #3, add a missing extension for `ice_sched_rm_vsi_cfg()`
+    to  remove all VSI support nodes (including extra ones),
+    associated with a given VSI (to fix the root cause of the problem
+    mentioned above),
+  - add a corresponding description to the commit message of
+    the patch #3,
+  - in the cover letter, add the testing hint to check the behavior
+    on the `ethtool -L` command.
+
+v1: https://lore.kernel.org/netdev/20250422153659.284868-1-michal.kubiak@intel.com/T/#ma677de2cd78d27402eead1d2a41ea0e0f656bc00
+
+Michal Kubiak (3):
+  ice: fix Tx scheduler error handling in XDP callback
+  ice: create new Tx scheduler nodes for new queues only
+  ice: fix rebuilding the Tx scheduler tree for large queue counts
+
+ drivers/net/ethernet/intel/ice/ice_main.c  |  47 ++++--
+ drivers/net/ethernet/intel/ice/ice_sched.c | 187 +++++++++++++++++----
+ 2 files changed, 187 insertions(+), 47 deletions(-)
+
 -- 
-2.34.1
+2.45.2
 
 
