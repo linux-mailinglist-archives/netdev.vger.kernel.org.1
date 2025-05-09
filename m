@@ -1,53 +1,52 @@
-Return-Path: <netdev+bounces-189225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB572AB12D2
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 14:02:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5151AAB12ED
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 14:05:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 19C37B24F28
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 12:00:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88E7DA0135D
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 12:04:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECDB02900BE;
-	Fri,  9 May 2025 12:01:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FA66290BAA;
+	Fri,  9 May 2025 12:04:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="oABagOuj"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="fHoepJuZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE4E322129F;
-	Fri,  9 May 2025 12:01:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C51290BA0;
+	Fri,  9 May 2025 12:04:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746792098; cv=none; b=Yis0Hn0cs/CMw1HND/rqexGezD2q/K/50wmwGZok6mb1zA0f+nccHSinRRW6mXLln3fZTwwE20zvb7AFKR9Stp/yFeLsDpAF4CKUVB/0TjgN5MqtRARoJGEVEkz3cNfx1JF6qj9/4AsAkwFmyLXcCWnQETSWupOvsnio9hEbHwg=
+	t=1746792289; cv=none; b=ALW3tguReN1l06gkJj86eq71O9EYSj8qaxHByBUJhqoskguO4cKhTuprMLAQGZN8m37cDHBPldhG7VNYhZAhlqdeJ37rLgQlOadyzgt1SSJkd5a45ec/pT0VY2Zd8IRNSteYyFcqRZAjQvgRhF2sRKF7E63Kuko9r1ysq0i/6rQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746792098; c=relaxed/simple;
-	bh=RCzYpOSOm3P4uj017x38pJsarOVoBUB5ZLnKNvSzP+Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bGiA482JnwhMv013AOqWxC0Pxh961ZASCPy4tqpf60mSJEUN4gnhfR2c9pGGkbb76TSHhqyYRP+0cfUweYtcxF42Nhg35J8nKAjyqhsoRT0iweCGJEkikoZUYhqrdjaN6506qjZEfWmD4/GN+gSAeKltOeME06nE8DO/0izthww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=oABagOuj; arc=none smtp.client-ip=212.227.17.21
+	s=arc-20240116; t=1746792289; c=relaxed/simple;
+	bh=vmfHZSIt1ejNXSsXOb9OK4hl3H/Az8e5YvWTRNvnHco=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LehHB+A7oY7m4qe9nwFU5FmtJo4zKU3kpx4EvyIuHLsvH1XMQc9EDfaINSO3UCjssqJP/hxGhZBoAOMKPDX7zr3Hey2U+JONd5R5GAxlp39EUiRlR2J3fuTYW4fqdVJoew9+o7Ly4Tzw2p6byzFWIaSzPjFNRIBzCj+CobR6oCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=fHoepJuZ; arc=none smtp.client-ip=212.227.17.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1746792091; x=1747396891; i=wahrenst@gmx.net;
-	bh=rHAj/pKMFTIgfjx9y/7rawKMeW4UkOy9QjmmIK9vroE=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-Id:In-Reply-To:
-	 References:MIME-Version:Content-Transfer-Encoding:cc:
+	s=s31663417; t=1746792281; x=1747397081; i=wahrenst@gmx.net;
+	bh=QxpyD8wMaxzufHPxLkJGzjDohgxWzZQt3Fz5KBSlXWA=;
+	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-Id:
+	 MIME-Version:Content-Transfer-Encoding:cc:
 	 content-transfer-encoding:content-type:date:from:message-id:
 	 mime-version:reply-to:subject:to;
-	b=oABagOuj3SAeUiK0kiuRbkYpeXlfhtoNkUh2nILljSqbKgQxaFXXP3yW2iOSs7s6
-	 Piw8pji9N4hyLHmZasUF6Ai36jC+SnT3jn8ngCMcH89w+p9SOaHvGKF5yzhzWZk/D
-	 JcQ1oieYZJS2uMT3Qat2Dx3ulj33sJ/nRZCPam3c00dsVdANPIoL2VUd5lVqSmtRt
-	 wSrKJJ1lJzDLsBf0AQWT0mJyWU35sLF5HtCDledRfp14TDKd1iOy7fs0BeEAJ7hbj
-	 mGts6Eh3blZbf5Tfh9yvOsHJzJZRrvZ0PojKxRC5amlZY0KisqXAntpTe6A3OglM2
-	 QYD1UxWB+DJRUz66KQ==
+	b=fHoepJuZ70LFp+vZioi09wU9QpWsOAcfEjkNW9/TBXtcwghEk6NxuF6YEJLdFQ9E
+	 1XzMK4yaLoutdy2puYNhTyQ63wrOHdAD1t95Ci2sTy1ahbOp/6aUADXjNfFxqHHM+
+	 xuh5ORmJiT6GWwUFPIR9rHv2A9OZ86JIddaMk2wyQtK3yVTSeyJy1G6DJ3NNwigZ/
+	 KdBShJ4BxqraXuGklmkclocT7OH0Jua8IkkUZ616FcWRbxl5zGuVxQUHwTXCzQeRk
+	 62haz2ve0cm01GeeUSOjXj0VSEa7aMfhqPOPbPcK4os6XKy9DAR5UBOrXbwXHASev
+	 Z5F7xnf3paSKRhZoxQ==
 X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from stefanw-SCHENKER ([91.41.216.208]) by mail.gmx.net (mrgmx105
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MFbVu-1uEyiS44sw-006HO8; Fri, 09
- May 2025 14:01:31 +0200
+Received: from stefanw-SCHENKER ([91.41.216.208]) by mail.gmx.net (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1MxlzC-1uwnwd1mLG-00szjw; Fri, 09
+ May 2025 14:04:41 +0200
 From: Stefan Wahren <wahrenst@gmx.net>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -60,12 +59,10 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
 Cc: netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	Stefan Wahren <wahrenst@gmx.net>
-Subject: [PATCH net-next V2 6/6] net: vertexcom: mse102x: Simplify mse102x_rx_pkt_spi
-Date: Fri,  9 May 2025 14:01:17 +0200
-Message-Id: <20250509120117.43318-7-wahrenst@gmx.net>
+Subject: [PATCH net-next V3 0/6] net: vertexcom: mse102x: Improve RX handling
+Date: Fri,  9 May 2025 14:04:29 +0200
+Message-Id: <20250509120435.43646-1-wahrenst@gmx.net>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250509120117.43318-1-wahrenst@gmx.net>
-References: <20250509120117.43318-1-wahrenst@gmx.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,132 +70,83 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:oirQZNQW9Ij5GKnNZR8QEUX8jiWE1kg9RvYOqHNLNh0EylNTuTF
- VomE+BehiXbqnvUzlIpQpdahUDg9CrzU9w8TAe6lQFdeefytVxYsgvYF11XoaQsfD81jG/g
- LWcTdzeV11LH87fC0M1z4KNQCe+t2yjYF/39Q2GJJah9hDI1oaZcM3uAPutKqAgR6zCQrYI
- uG/KET5si5faYrLfY0f2g==
+X-Provags-ID: V03:K1:fIIU0TixX7JuZNaBOzYHIoHs97yGSGYkWSCGKsaOYSmjfwkuCVp
+ 7CSAlRmWyf+A8gXoyZI/28Y4HkF3iYejPjuyyxbbd/kifgW/tMw0J8Ch7MzzHjT6FU9UUEX
+ TKMadkToPLmkui5DmadBJMwy7j1df3DdaKszXwGYoES3GqhgRW0RjL15sYoRl+OiIERWPIy
+ KuZvZpd2MszNoZar5fcLw==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:xxq6qlOb+xg=;W/Oq05AryYNnChS8/OSYjErs1id
- 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
- JoMd60sIHMUT5YRBf/TGA2IQe
+UI-OutboundReport: notjunk:1;M01:P0:/plVsZjKjQg=;pvdxhsm3EB11ajolSrpwWbNCLYL
+ 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
 
-The function mse102x_rx_pkt_spi is used in two cases:
-* initial polling to re-arm RX interrupt
-* level based RX interrupt handler
+This series is the second part of two series for the Vertexcom driver.
+It contains some improvements for the RX handling of the Vertexcom MSE102x=
+.
 
-Both of them doesn't need an open-coded retry mechanism.
-In the first case the function can be called again, if the return code
-is IRQ_NONE. This keeps the error behavior during netdev open.
+Changes in V3:
+- Fix whitespace issue in patch 4
 
-In the second case the proper retry would be handled implicit by
-the SPI interrupt. So drop the retry code and simplify the receive path.
+Changes in V2:
+- Add Andrew's Reviewed-by to patch 1-2
+- Fix build issue reported by Jakub & kernel test bot in patch 2
+- Use Andrew's suggestion for netdev_warn_once in patch 2
+- Improve commit logs for patch 3 & 5
+- Add new patch 4 to compensate loss of invalid CMD counter
 
-Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
-=2D--
- drivers/net/ethernet/vertexcom/mse102x.c | 34 +++++++++---------------
- 1 file changed, 12 insertions(+), 22 deletions(-)
+Stefan Wahren (6):
+  dt-bindings: vertexcom-mse102x: Fix IRQ type in example
+  net: vertexcom: mse102x: Add warning about IRQ trigger type
+  net: vertexcom: mse102x: Drop invalid cmd stats
+  net: vertexcom: mse102x: Implement flag for valid CMD
+  net: vertexcom: mse102x: Return code for mse102x_rx_pkt_spi
+  net: vertexcom: mse102x: Simplify mse102x_rx_pkt_spi
 
-diff --git a/drivers/net/ethernet/vertexcom/mse102x.c b/drivers/net/ethern=
-et/vertexcom/mse102x.c
-index 62219fd818f5..873da57a1d6b 100644
-=2D-- a/drivers/net/ethernet/vertexcom/mse102x.c
-+++ b/drivers/net/ethernet/vertexcom/mse102x.c
-@@ -319,31 +319,20 @@ static irqreturn_t mse102x_rx_pkt_spi(struct mse102x=
-_net *mse)
- 	__be16 rx =3D 0;
- 	u16 cmd_resp;
- 	u8 *rxpkt;
--	int ret;
-=20
- 	mse102x_tx_cmd_spi(mse, CMD_CTR);
--	ret =3D mse102x_rx_cmd_spi(mse, (u8 *)&rx);
--	cmd_resp =3D be16_to_cpu(rx);
--
--	if (ret || ((cmd_resp & CMD_MASK) !=3D CMD_RTS)) {
-+	if (mse102x_rx_cmd_spi(mse, (u8 *)&rx)) {
- 		usleep_range(50, 100);
-+		return IRQ_NONE;
-+	}
-=20
--		mse102x_tx_cmd_spi(mse, CMD_CTR);
--		ret =3D mse102x_rx_cmd_spi(mse, (u8 *)&rx);
--		if (ret)
--			return IRQ_NONE;
--
--		cmd_resp =3D be16_to_cpu(rx);
--		if ((cmd_resp & CMD_MASK) !=3D CMD_RTS) {
--			net_dbg_ratelimited("%s: Unexpected response (0x%04x)\n",
--					    __func__, cmd_resp);
--			mse->stats.invalid_rts++;
--			drop =3D true;
--			goto drop;
--		}
--
--		net_dbg_ratelimited("%s: Unexpected response to first CMD\n",
--				    __func__);
-+	cmd_resp =3D be16_to_cpu(rx);
-+	if ((cmd_resp & CMD_MASK) !=3D CMD_RTS) {
-+		net_dbg_ratelimited("%s: Unexpected response (0x%04x)\n",
-+				    __func__, cmd_resp);
-+		mse->stats.invalid_rts++;
-+		drop =3D true;
-+		goto drop;
- 	}
-=20
- 	rxlen =3D cmd_resp & LEN_MASK;
-@@ -565,7 +554,8 @@ static int mse102x_net_open(struct net_device *ndev)
- 	 * So poll for possible packet(s) to re-arm the interrupt.
- 	 */
- 	mutex_lock(&mses->lock);
--	mse102x_rx_pkt_spi(mse);
-+	if (mse102x_rx_pkt_spi(mse) =3D=3D IRQ_NONE)
-+		mse102x_rx_pkt_spi(mse);
- 	mutex_unlock(&mses->lock);
-=20
- 	netif_dbg(mse, ifup, ndev, "network device up\n");
+ .../bindings/net/vertexcom-mse102x.yaml       |  2 +-
+ drivers/net/ethernet/vertexcom/mse102x.c      | 80 +++++++++++--------
+ 2 files changed, 47 insertions(+), 35 deletions(-)
+
 =2D-=20
 2.34.1
 
