@@ -1,584 +1,380 @@
-Return-Path: <netdev+bounces-189304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E44EFAB18FB
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 17:40:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 08ACFAB1906
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 17:41:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CC92189F022
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 15:40:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F5D41C44B66
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 15:41:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51E59230268;
-	Fri,  9 May 2025 15:40:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AF7422F767;
+	Fri,  9 May 2025 15:41:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ITCyaFlF"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="vDbV1Jt0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2072.outbound.protection.outlook.com [40.107.223.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D96722FAD4;
-	Fri,  9 May 2025 15:40:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746805222; cv=none; b=FdYASzx6xOAy8nDp/Fl8qmllCkAa81eazaFjOJh+xotCCrWOB8pzF+WGGJyLqbmZgJyHbGAJXapjRH+IjtwwJpuLeWxOZpdNP9v6xBJjn6AbT8UAKOsKsDgvryNaphQgFLjCe6M7n8WAcZWQ6ytnsKKEoWDlJkboQBRbqsLRsQk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746805222; c=relaxed/simple;
-	bh=X7Y3Bk5TpW29HCt4LTRXWPnb2e2RwdeFAZ2KkehZVxk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qoGMBj5sgPXDuwsb8xuK+ulzRYaLea6dI1KEXpHE4Owpe/4SibGSWxZoDP9l0S6swwJEhL47FtfDFM3R5oQFZ1AONomim8tOlg5VYY8unkCgw3RhbAd+T7wu7eFnnuruREPR1R1zbA6qUw/iDeKUvRHbxueUj+8/Eb9ZdYNH9Ek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ITCyaFlF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7E22C4CEF5;
-	Fri,  9 May 2025 15:40:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746805221;
-	bh=X7Y3Bk5TpW29HCt4LTRXWPnb2e2RwdeFAZ2KkehZVxk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ITCyaFlFKdntc/Z+eE3XUJ/zVMcMnk7fgcIiYV6jfd6D3d09AWugapb4lhXAbzRwi
-	 151Yyerk+Dc4XwGiAuXDgxiAJMyhfjSyZeaCxpzuadD5vgLnh2qcFnU6UZbxF2LwTb
-	 lBZBTuWCttjmFz/WMLV2hCku+SKtHiDnhJlSJwBzvSpBngn3B0ElJZHb450YF8Fhie
-	 e/iQiP0nelz6SYftu5ygz4O5OHuSUgthoPR9Yxe6SVW9wsW79z0SeqTWSPH9VzIRm6
-	 NWLCGprSk6lQqjp+f/LRrzm9l/mTQNd0exlxpIwL5fm2RWD+4MqGCFm1omxSJ0ARbl
-	 d5jupjdbUwGQQ==
-Date: Fri, 9 May 2025 17:40:14 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: linux-fsdevel@vger.kernel.org, Jann Horn <jannh@google.com>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: Eric Dumazet <edumazet@google.com>, Oleg Nesterov <oleg@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, David Rheinsberg <david@readahead.eu>, 
-	Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>, 
-	Lennart Poettering <lennart@poettering.net>, Luca Boccassi <bluca@debian.org>, Mike Yuan <me@yhndnzj.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, Alexander Mikhalitsyn <alexander@mihalicyn.com>
-Subject: Re: [PATCH v5 4/9] coredump: add coredump socket
-Message-ID: <20250509-querschnitt-fotokopien-6ae91dfdac45@brauner>
-References: <20250509-work-coredump-socket-v5-0-23c5b14df1bc@kernel.org>
- <20250509-work-coredump-socket-v5-4-23c5b14df1bc@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E3E322B8C6;
+	Fri,  9 May 2025 15:41:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.72
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1746805283; cv=fail; b=bKtHzUL+/lND2Ayhqr8L4EDth5doGYRSfBYoNQx0K+Z1rYg/bqgmG1tq0UKCVbn246sWu7FcQ0MzyyB+MNQXCkGvU+NYIeuNjjjYR0BZnys0zwh/TuITQll4xeWWo4rNyShgeln1EBV/mXvN4WqbjOE7x7ivStwrJpYQFv3fLUQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1746805283; c=relaxed/simple;
+	bh=AZBq6Z2Xe0vo4wZK0hsUuN7FVbsYXuUGdzo/xVgT4us=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=isnnDaBzXDgnLK4d2ril3Z7eJE4h67Qcvp23YArxkA3CrL39eAPJoZbFvX5cvC7O8If600IEVJM8TZZ+CTbz6znev7o+3a+by+iOwc0/LR+iMs+3TpOps2iHY2hrAWxnhwsLOq5R86ls1V1tAjE4LP0goPkxScG/tHi0BUTSc7o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=vDbV1Jt0; arc=fail smtp.client-ip=40.107.223.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=y+aLmbqE8mNRGlwP35v3wnLixGR+7R+R2qBwqf7E+pCyHCz3U3NX4EyEv0MQJiTQVaraJ09o8C1hBiecUOmB/rQ9Mpp2AvEDglkByYCHORP4p+rDn7Vli6dq+rOSNTMuqUKFZO0qhfW9ww7YVW/c6eaW6bR+DUC0mbGb9HRK0dnka6GVfKO5PF1M/nkGCnP13rJKGmk4Ff0Vq2pxu15P4HPgZLlsBBa6mGXwfuyzpDtMnnmGkBUsZKRGAyGFI8uL2wFFRfx5kMaRuIiUs2WDVxLHZP7OVixlSdyQkAfS54urhD6N7Wc+OtST05fIJuDxeMpPb+p4K/0XTJLHOzrf6w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3C9PdRAbnryFz5NlwHgd2WJTIXSY8oOlPMQpleKW3Ns=;
+ b=PdsgDBV7mucMpydmjFYn89+WxNTD5RazTXp0udlaKLQdeECqk+xAaT0kUMe665Rt/wROuLe94tUKTKqvRO3+aAfE/bVmiSHCYKds+yanI/KQlHmGggbcPYnIY5h99VrPvNG8XF36+w8moXO/dIoDkv7PjZamWREg37Th/VDztqvGxiEhG9xUSrFX53XLyJOJcNoxKmYtn8jUuODRWEQl8+ZiZWoK+IkCyzKPKlTiKFq/5Wgh/HAAcCQnyUEZnM3b27+oE2qgoyHtvPYMNfiWyUmC6SEJ3A+iyM2GW4FR7+zrkUUS9RtiWuRSP2m6wKhXOI563rtRnj1ocE1TQNfvUQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3C9PdRAbnryFz5NlwHgd2WJTIXSY8oOlPMQpleKW3Ns=;
+ b=vDbV1Jt03Xz1JMTySOa2m6KPLiD7CCplMar1vUi67znEh7hawOz59m4hOUfSzB1qvIH4Zc5s7OoOEwU3A44QCPMyUwHE1Pn/Za4kSo5qlBk0mP81ySGghW+NbM8AOpc2l8p92vihdixgeBplYheNHlel/tsmsS3+qLMG4KkvBlI=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB6395.namprd12.prod.outlook.com (2603:10b6:510:1fd::14)
+ by SA3PR12MB9160.namprd12.prod.outlook.com (2603:10b6:806:399::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.25; Fri, 9 May
+ 2025 15:41:15 +0000
+Received: from PH7PR12MB6395.namprd12.prod.outlook.com
+ ([fe80::5a9e:cee7:496:6421]) by PH7PR12MB6395.namprd12.prod.outlook.com
+ ([fe80::5a9e:cee7:496:6421%4]) with mapi id 15.20.8722.024; Fri, 9 May 2025
+ 15:41:15 +0000
+Message-ID: <65c5d5a3-ccfe-4a39-89ec-b0430fed2709@amd.com>
+Date: Fri, 9 May 2025 21:11:06 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 3/5] amd-xgbe: add support for new XPCS
+ routines
+To: Simon Horman <horms@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Shyam-sundar.S-k@amd.com,
+ Sudheesh Mavila <sudheesh.mavila@amd.com>
+References: <20250428150235.2938110-1-Raju.Rangoju@amd.com>
+ <20250428150235.2938110-4-Raju.Rangoju@amd.com>
+ <20250429193732.GQ3339421@horms.kernel.org>
+Content-Language: en-US
+From: "Rangoju, Raju" <raju.rangoju@amd.com>
+In-Reply-To: <20250429193732.GQ3339421@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN2PR01CA0241.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:21a::12) To PH7PR12MB6395.namprd12.prod.outlook.com
+ (2603:10b6:510:1fd::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="cvtza4xbbllnzmw3"
-Content-Disposition: inline
-In-Reply-To: <20250509-work-coredump-socket-v5-4-23c5b14df1bc@kernel.org>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB6395:EE_|SA3PR12MB9160:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1dc6d6e4-cb64-49cf-3d7d-08dd8f0feef8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?cU5TNTFUbUY1bHJocjg1YWNuQkZzeVhWMlZUbWl6cWlTM2NIb2E5Y1Z1TW9w?=
+ =?utf-8?B?bnlJcy90WVljd1FvOVdMejJsTTZwUHZTNVRnaFhPemUxYWFZbWx3T0VuVGdC?=
+ =?utf-8?B?cEV3Q3ZYRXZiMjc4V0JZY0VxcGZVMmQ2WWFJOXdoRkNkTW9KVjRXT3BLd3ZY?=
+ =?utf-8?B?a2tjWEx6bDR3dlJFWitCTmRuZEpXUitld0p5K29yQ284eVZ5aWVmc1BMRzZv?=
+ =?utf-8?B?RXVDVG5RM0Z1K2ovN3pNY0VkVXNtRmp3V1FLR1VzaU1vTEhkb0xncjBPZTYy?=
+ =?utf-8?B?amFINFhXeGtBOXpRWU9zY3BNeDN4MFdsUGJWMU12aFd2M3I3Kzd4a09ON3NJ?=
+ =?utf-8?B?aENTRDV3UmZ1YTRJa0dJWG9ERlMzS2JQc0lON2JpQUt3eDJsZnVUTkszQVF6?=
+ =?utf-8?B?U3hDbk5QTzBvSlZmcmdHSDdhZTVqWVEySUREZVpiSWFZZ2hGZnl2Nml0SkVG?=
+ =?utf-8?B?cXVqUVo3d2E4aGhHaS8yb2Q5Skh5YnVod3ZYQUdUZUhQYTBZeTMvakQySm91?=
+ =?utf-8?B?dVc3eGw2dWVTYkVSMVN6Q2FYUUE1dVJ1a1hZNVZhODlDTGxvRkFtZGhVTExm?=
+ =?utf-8?B?OHRCRjNZN1BzOGxEZnJaRDQ4VXVEcVl0WVJFdmNQeHhDakFkR0QxQ09uZURN?=
+ =?utf-8?B?ZGZ0RmsxN3gxSkYycGE0ZlNNcEVLcnYvRHFhbHpUeGlWZFVnRkxINWtGTW04?=
+ =?utf-8?B?VWhPTU1UUXBmbFY0RzFvNy9vVFpMZzhuaXBCNFV1NThRR3BOVFFSWU1HRU5Q?=
+ =?utf-8?B?bm90UmVNM2FiSC9oUy95YW0rM1UwYzdQakx4RXpsRmtRVi8ybU1VSktmaWo1?=
+ =?utf-8?B?VWJLc3VSdk13K3Jzdy93U214bWJNMzc3K01VM2UrYWwzL2FKWlF5NnlTSEdP?=
+ =?utf-8?B?MnBWWm16UEx0aitYaDlYVnlRK2UrVUJNTlowRDlDeGxpRTBBWDBvMXo0ZnNC?=
+ =?utf-8?B?UjhqWGxsNVlmbkE5bUJFUVZHOFRxWUxOandtaGxvTm80WHRQc2g1V2lWMXll?=
+ =?utf-8?B?aVNmVTJheTVMR2tiV250UnpaakFLdmxtV05SRUFYVmpkdm42TS93UWkxRFZh?=
+ =?utf-8?B?eVQzbW9NRkgxaUFvejdGMk5vUERRVS9ZbW5way9vS0cyYVV6ZnJLNmlZZllK?=
+ =?utf-8?B?WWdCM21sa3FYN3lSaFZZZGhQeFM3TkpuZ2kxTHJ3ejhOa3BqZU5Kak9PbGVv?=
+ =?utf-8?B?ZVRtT0NNM3NMeTBVRS9scVozZ0pNN0VpOTVYQWMyaDNBQjRRaGwvSjJ0MmFv?=
+ =?utf-8?B?WTVrcG0xREJYZjZTK2xrdTd4bmUwcEpkd2JmSnhWbmMrc01Ja1FibVdnRnBh?=
+ =?utf-8?B?QTdHbzZrM0VwM21pSHZyclZOazNSc2FzNWZCSitWUzV2VktOQzB2MkN0OXpt?=
+ =?utf-8?B?VkNwamVKbDdBOVRqeHVhOHhvZXgvN3czZTVxMmFiWGJVVHlCM0xVZmM2SWc5?=
+ =?utf-8?B?T2twbjhFUXpScUdxZy9RR2M3NS9acDFXb2p3eE4wbGZ3cEF0OS9nQ2dIaUNi?=
+ =?utf-8?B?QndMVnN5RDZ0MUw5cFc5Ty9FRS9NSHlMMlRoQWVMV3NhdTVaQVJnY1dRM1hs?=
+ =?utf-8?B?VG9BMXBEVjB5U09EL3RNMTdrdTVTUVlJanlFYVBNVTJKQ0FzN0doeiszeG0y?=
+ =?utf-8?B?SUFTUXdPbUwxdW85OTFkcEdmOVF1akhhUUtDbUFIMnhvUDA2eDRuTGVVd1dF?=
+ =?utf-8?B?Y1VCc3pGVGdkeXdweEdUWFFOemhScTlhTW5QbkRZRmgvbG9vRkxwVVpQaTZj?=
+ =?utf-8?B?RTB5MjNBYWhvUDd0d1Zkd3Q4eWNETUJ1VWVJUzFkR3VWMGJzVlZBaGNaNTND?=
+ =?utf-8?B?SUE1bHFSWUR1UU1XRmV5dFRYQ0E4VFVYcGxFM2JDRHQxSUtYaWswamRoUkE4?=
+ =?utf-8?B?eWFZWWdiM29JdVd1NVNoVElKWEFsRHJLQS9FTDJwSC9GWFFacGlNZDk2dFFU?=
+ =?utf-8?Q?xpBsAr3PN/I=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB6395.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?SFR6UGlWYzBHNUc0cy94ZFJrelFMbHA4TGJyN2V3SW04c2ZERkVUVm11N1M4?=
+ =?utf-8?B?Z0pFVmREVUVpMlNIaHpiZ2JWR3RLcnByOU9TME1OMDJGaC9veFdNNnR2QmM1?=
+ =?utf-8?B?UWoxSENyMmFzeTd1b3ZoMFJQcnZBa0tiTlM1aWlUYnd6b3FGNW5MRC9WRExJ?=
+ =?utf-8?B?SGpzR1E1WVBCOVdUR1pFa3hxUDYyalN5UVI3UExyMkNMS3MvMEZuckVmYi93?=
+ =?utf-8?B?dlFpem90Nis2dkY1SjBNMlFKU0V0cTJrZnBtcnZjS1Y0MjhRb2FENFBJWW1G?=
+ =?utf-8?B?UDJrOURXWnZpeXM0MGhqenBROGU1Q3dSWVhvWDIwVXZjSmZjNHFKTEllUVAv?=
+ =?utf-8?B?TjdEdkZGbmVjbU9UTjRObTFPQVV6dWNhc2VHRUpzQzNsbGkrYmR6SnVlSnY3?=
+ =?utf-8?B?bHg4R0t1OXZGcXNpUXM5NlhqK2F2NnE2Tk9rWTJtVjdJWmhpU3hENitkLyth?=
+ =?utf-8?B?Z1g1UW1UVkRXMjRRTHI5YWJMRmxaY0NzV2FYY2VZc3M4THhSY0RMTDRYalBM?=
+ =?utf-8?B?dVZPZDAzaTJTUVgySmhvLzFTLy9lWmtST3FyWEVYYlIvVVFCbFVqeXpMRmts?=
+ =?utf-8?B?QkVKMHlFU00rTVlmV2R5TnBtbGFYMGtac3FjQUFqQnM2a2piTytWaUxQcGJG?=
+ =?utf-8?B?RXU4QUtBL09KL0pFVlZEL3VVYzhQM3U3ZWs3bVZlMElFME93SDk2NkdndXR0?=
+ =?utf-8?B?TjgrcW12dUV1R3I0Z2s3SDM0cVZieWExSzBjZkZLaGpCczVvZmpqL1JyMHdr?=
+ =?utf-8?B?NTM1Z1Z4MzdXZkVGYmROTkl3djJDOHJoRnEzeEZiNmRnVFJCVU9kWVlTS2Zt?=
+ =?utf-8?B?eVBueFZuWVhVVVlaVnhLS2RuM2FlL0RpU3E2WVRIcmpncnUycmd5RmpXbWlu?=
+ =?utf-8?B?SVpSOXA4cUdzWmNuOHR1MkxFMVdBRFFYcWJYTnFUUDV5OXB1MGM0NTBsamlJ?=
+ =?utf-8?B?Y2VkLzIyNFFHN2ltNDg4RUZEbzBac1VXN2lHcVE3SzFnTEVVditwWnB2aUNy?=
+ =?utf-8?B?Yk9IeDJsb0lmbWlHZnJyNkpRS09GQTEwczd2Y2NlZjdyVGk5cmJrVVk0bHUv?=
+ =?utf-8?B?L0VDbUkyUG0xWFZ0Y2xqZW5IUzlHejkrbThscURBdHRYRXBrUkljczRFYXJj?=
+ =?utf-8?B?NnRnR2dET2FPMGMxVGROMlBFUHdSRk15allKNHQzNysrVjlzR1RzTU80T0Ny?=
+ =?utf-8?B?bjZIREtwb1FpQ2M4bGNsUG5JZmJmOXZsbkxDVkc4bTh5WEVoMG1uN2xRUm96?=
+ =?utf-8?B?ZlkwYm10NGZIWlBQWUNReTBsTHo0NjJ1eUM4dy9nUDlOQlZJSGVTaFcyMEVy?=
+ =?utf-8?B?SFhNamtZdmMzbDhvL01PM3JVQ2hxRWc1dlRFUHpqM2ZjZHhYVE1XVWJFSWFK?=
+ =?utf-8?B?dExqWHk0ZjJSRnhnaG1CVmF2QVJWUWxBSG1DVW9naE5udnVML0Fuek9QWTgy?=
+ =?utf-8?B?R1J3VllTMGFWazdwYXgzT2Y3RmZENEdhdTZYemFZN2JCRm9IVHZCbmVlcFBr?=
+ =?utf-8?B?dGc4OXlFdGhiY3hSdTJTOXQ1T1Nlcit2eGlDYm1VRmdEeW5vaHpVMHNnUTdn?=
+ =?utf-8?B?aDRTZCsxNkNQZzRObDBLQ2tDTzhPbGcyd0RPWUJpR0lPc3g3NnVZQXUxY0or?=
+ =?utf-8?B?QW0yQVlqUUpSYm1tYXcyL1N2TTQveUJ1bDc0VENLKzQwNkJkcmNyOEQ0MHhL?=
+ =?utf-8?B?eENsdnIxekhBaEhUdktad0pYV2tjNlp5VUJqVGZHcjRQemd1TWJXSnpkVGcr?=
+ =?utf-8?B?SWFDWTBSN1IvVmd0L1JiazJWdjA1NUZlS3JjV0M1OEgzMWg2YytiTEFVUEkw?=
+ =?utf-8?B?dnIxdUFIMHFkdEt3ekRPbXo3akdkUzR0bjZyc0U5YXJ3bkRnRHBUM1lLdXEv?=
+ =?utf-8?B?a2xqRjJpd29HZFpYSGlXKytjbjBxZGxzMWJlVjBKcGRvck9UZHM3a0J1OHJL?=
+ =?utf-8?B?ZXJZaWd4LzNMU0t2RFZXcjRRT0lVWWFITW9vTlU4VmREenVFM3A3cERQNXNK?=
+ =?utf-8?B?T3JJc1ZZdmtxS0F5S1JqSGRnUWk0ZVllOGMrc0ZsbGNlQnFCQTg4WUVGU1ly?=
+ =?utf-8?B?S01LWnhBYnRSZ3c0QnFESEkydmFlUTYwTG9VRFRPV2hwYWVubHNSRUhFWkVv?=
+ =?utf-8?Q?05/kWqweqfxb9g2BihYkcxfSN?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1dc6d6e4-cb64-49cf-3d7d-08dd8f0feef8
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB6395.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 May 2025 15:41:15.4817
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: JP41VdYQRcXDc8JhguHJFM4dc7P7qbvhQpn6cvvFghVI+/9rRimRrY/uWx4z//4mooGb6W5QYdzUUwqz6C8DDg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB9160
 
 
---cvtza4xbbllnzmw3
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 
-> Userspace can set /proc/sys/kernel/core_pattern to:
+On 4/30/2025 1:07 AM, Simon Horman wrote:
+> On Mon, Apr 28, 2025 at 08:32:33PM +0530, Raju Rangoju wrote:
+>> Add the necessary support to enable Crater ethernet device. Since the
+>> BAR1 address cannot be used to access the XPCS registers on Crater, use
+>> the smn functions.
+>>
+>> Some of the ethernet add-in-cards have dual PHY but share a single MDIO
+>> line (between the ports). In such cases, link inconsistencies are
+>> noticed during the heavy traffic and during reboot stress tests. Using
+>> smn calls helps avoid such race conditions.
+>>
+>> Suggested-by: Sudheesh Mavila <sudheesh.mavila@amd.com>
+>> Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
+>> ---
+>> - PCI config accesses can race with other drivers performing SMN accesses
+>>    so, fall back to AMD SMN API to avoid race.
+>>
+>>   drivers/net/ethernet/amd/xgbe/xgbe-dev.c | 81 ++++++++++++++++++++++++
+>>   drivers/net/ethernet/amd/xgbe/xgbe-smn.h | 30 +++++++++
+>>   drivers/net/ethernet/amd/xgbe/xgbe.h     |  6 ++
+>>   3 files changed, 117 insertions(+)
+>>   create mode 100644 drivers/net/ethernet/amd/xgbe/xgbe-smn.h
+>>
+>> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
+>> index 765f20b24722..5f367922e705 100644
+>> --- a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
+>> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
+>> @@ -14,6 +14,7 @@
 > 
->         @linuxafsk/coredump_socket
+> Hi Raju,
+> 
+> I think you need the following about here:
+> 
+> #include <linux/pci.h>
+> 
+> To make sure that pci_err(), which is used elsewhere in this patch,
+> is always defined. Building allmodconfig for arm and arm64 shows
+> that, without this change, pci_err is not defined.
 
-I have one other proposal that:
+Hi Simon,
 
-- avoids reserving a specific address
-- doesn't require bpf or lsm to be safe
-- allows for safe restart and crashes of the coredump sever
+Thanks for pointing it out. Sure, will address it in v3.
 
-To set up a coredump socket the coredump server must allocate a socket
-cookie for the listening socket via SO_COOKIE. The socket cookie must be
-used as the prefix in the abstract address for the coredump socket. It
-can be followed by a \0 byte and then followed by whatever the coredump
-server wants. For example:
+> 
+> Alternatively, perhaps netdev_err can be used instead of pci_err().
+> 
+>>   
+>>   #include "xgbe.h"
+>>   #include "xgbe-common.h"
+>> +#include "xgbe-smn.h"
+>>   
+>>   static inline unsigned int xgbe_get_max_frame(struct xgbe_prv_data *pdata)
+>>   {
+>> @@ -1066,6 +1067,80 @@ static void xgbe_get_pcs_index_and_offset(struct xgbe_prv_data *pdata,
+>>   	*offset = pdata->xpcs_window + (mmd_address & pdata->xpcs_window_mask);
+>>   }
+>>   
+>> +static int xgbe_read_mmd_regs_v3(struct xgbe_prv_data *pdata, int prtad,
+>> +				 int mmd_reg)
+>> +{
+>> +	unsigned int mmd_address, index, offset;
+>> +	int mmd_data;
+>> +	int ret;
+>> +
+>> +	mmd_address = xgbe_get_mmd_address(pdata, mmd_reg);
+>> +
+>> +	xgbe_get_pcs_index_and_offset(pdata, mmd_address, &index, &offset);
+>> +
+>> +	ret = amd_smn_write(0, (pdata->smn_base + pdata->xpcs_window_sel_reg), index);
+> 
+> nit: Please line wrap to 80 columns wide or less, as is still preferred for
+>       Networking code.  Likewise elsewhere in this patch.
+> 
+>       Flagged by checkpatch.pl --max-line-length=80
+> 
+>       Also, the inner parentheses seem to be unnecessary.
 
-12345678\0coredump.socket
+Sure, will address it in v3.
 
-When a task crashes and generates a coredump it will find the provided
-address but also compare the prefixed SO_COOKIE value with the socket
-cookie of the socket listening at that address. If they don't match it
-will refuse to connect.
+> 
+>> +	if (ret)
+>> +		return ret;
+>> +
+>> +	ret = amd_smn_read(0, pdata->smn_base + offset, &mmd_data);
+>> +	if (ret)
+>> +		return ret;
+>> +
+>> +	mmd_data = (offset % 4) ? FIELD_GET(XGBE_GEN_HI_MASK, mmd_data) :
+>> +				  FIELD_GET(XGBE_GEN_LO_MASK, mmd_data);
+>> +
+>> +	return mmd_data;
+>> +}
+>> +
+>> +static void xgbe_write_mmd_regs_v3(struct xgbe_prv_data *pdata, int prtad,
+>> +				   int mmd_reg, int mmd_data)
+>> +{
+>> +	unsigned int pci_mmd_data, hi_mask, lo_mask;
+>> +	unsigned int mmd_address, index, offset;
+>> +	struct pci_dev *dev;
+>> +	int ret;
+>> +
+>> +	dev = pdata->pcidev;
+>> +	mmd_address = xgbe_get_mmd_address(pdata, mmd_reg);
+>> +
+>> +	xgbe_get_pcs_index_and_offset(pdata, mmd_address, &index, &offset);
+>> +
+>> +	ret = amd_smn_write(0, (pdata->smn_base + pdata->xpcs_window_sel_reg), index);
+>> +	if (ret) {
+>> +		pci_err(dev, "Failed to write data 0x%x\n", index);
+>> +		return;
+>> +	}
+>> +
+>> +	ret = amd_smn_read(0, pdata->smn_base + offset, &pci_mmd_data);
+>> +	if (ret) {
+>> +		pci_err(dev, "Failed to read data\n");
+>> +		return;
+>> +	}
+>> +
+>> +	if (offset % 4) {
+>> +		hi_mask = FIELD_PREP(XGBE_GEN_HI_MASK, mmd_data);
+>> +		lo_mask = FIELD_GET(XGBE_GEN_LO_MASK, pci_mmd_data);
+>> +	} else {
+>> +		hi_mask = FIELD_PREP(XGBE_GEN_HI_MASK,
+>> +				     FIELD_GET(XGBE_GEN_HI_MASK, pci_mmd_data));
+>> +		lo_mask = FIELD_GET(XGBE_GEN_LO_MASK, mmd_data);
+>> +	}
+>> +
+>> +	pci_mmd_data = hi_mask | lo_mask;
+>> +
+>> +	ret = amd_smn_write(0, (pdata->smn_base + pdata->xpcs_window_sel_reg), index);
+>> +	if (ret) {
+>> +		pci_err(dev, "Failed to write data 0x%x\n", index);
+>> +		return;
+>> +	}
+>> +
+>> +	ret = amd_smn_write(0, (pdata->smn_base + offset), pci_mmd_data);
+>> +	if (ret) {
+>> +		pci_err(dev, "Failed to write data 0x%x\n", pci_mmd_data);
+>> +		return;
+>> +	}
+>> +}
+> 
+> ...
+> 
+>> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-smn.h b/drivers/net/ethernet/amd/xgbe/xgbe-smn.h
+>> new file mode 100644
+>> index 000000000000..a1763aa648bd
+>> --- /dev/null
+>> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-smn.h
+>> @@ -0,0 +1,30 @@
+>> +// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
+> 
+> Checkpatch says this should be:
+> 
+> /* SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause) */
 
-So even if the coredump server restarts or crashes and unprivileged
-userspace recycles the socket address for an attack the crashing process
-will detect this as the new listening socket will have gotten either a
-new or no SO_COOKIE and the crashing process will not connect.
+Sure, will address it in v3.
 
-The coredump server just sets /proc/sys/kernel/core_pattern to:
+> 
+> 
+>> +/*
+>> + * Copyright (c) 2014-2025, Advanced Micro Devices, Inc.
+>> + * Copyright (c) 2014, Synopsys, Inc.
+>> + * All rights reserved
+>> + *
+>> + * Author: Raju Rangoju <Raju.Rangoju@amd.com>
+>> + */
+>> +
+>> +#ifndef __SMN_H__
+>> +#define __SMN_H__
+>> +
+>> +#ifdef CONFIG_AMD_NB
+>> +
+>> +#include <asm/amd_nb.h>
+>> +
+>> +#else
+>> +
+>> +static inline int amd_smn_write(u16 node, u32 address, u32 value)
+>> +{
+>> +	return -ENODEV;
+>> +}
+>> +
+>> +static inline int amd_smn_read(u16 node, u32 address, u32 *value)
+>> +{
+>> +	return -ENODEV;
+>> +}
+>> +
+>> +#endif
+>> +#endif
+> 
+> It feels a little odd to provide these dummy implementation here,
+> rather than where the real implementations are declared. But I do
+> see where you are coming from with this approach. And I guess it
+> is fine so long as this is the only user of this mechanism.
 
-        @SO_COOKIE/whatever
+Sure, thank you.
 
-The "@" at the beginning indicates to the kernel that the abstract
-AF_UNIX coredump socket will be used to process coredumps and the
-indicating the end of the SO_COOKIE and the rest of the name.
+> 
+> ...
 
-Appended what that would look like.
-
---cvtza4xbbllnzmw3
-Content-Type: text/x-diff; charset=utf-8
-Content-Disposition: attachment;
-	filename="0001-coredump-add-coredump-socket.patch"
-
-From a99749a48d2aafddeca5fd1fab64b907137c1a68 Mon Sep 17 00:00:00 2001
-From: Christian Brauner <brauner@kernel.org>
-Date: Mon, 5 May 2025 11:33:44 +0200
-Subject: [PATCH] coredump: add coredump socket
-
-Coredumping currently supports two modes:
-
-(1) Dumping directly into a file somewhere on the filesystem.
-(2) Dumping into a pipe connected to a usermode helper process
-    spawned as a child of the system_unbound_wq or kthreadd.
-
-For simplicity I'm mostly ignoring (1). There's probably still some
-users of (1) out there but processing coredumps in this way can be
-considered adventurous especially in the face of set*id binaries.
-
-The most common option should be (2) by now. It works by allowing
-userspace to put a string into /proc/sys/kernel/core_pattern like:
-
-        |/usr/lib/systemd/systemd-coredump %P %u %g %s %t %c %h
-
-The "|" at the beginning indicates to the kernel that a pipe must be
-used. The path following the pipe indicator is a path to a binary that
-will be spawned as a usermode helper process. Any additional parameters
-pass information about the task that is generating the coredump to the
-binary that processes the coredump.
-
-In the example core_pattern shown above systemd-coredump is spawned as a
-usermode helper. There's various conceptual consequences of this
-(non-exhaustive list):
-
-- systemd-coredump is spawned with file descriptor number 0 (stdin)
-  connected to the read-end of the pipe. All other file descriptors are
-  closed. That specifically includes 1 (stdout) and 2 (stderr). This has
-  already caused bugs because userspace assumed that this cannot happen
-  (Whether or not this is a sane assumption is irrelevant.).
-
-- systemd-coredump will be spawned as a child of system_unbound_wq. So
-  it is not a child of any userspace process and specifically not a
-  child of PID 1. It cannot be waited upon and is in a weird hybrid
-  upcall which are difficult for userspace to control correctly.
-
-- systemd-coredump is spawned with full kernel privileges. This
-  necessitates all kinds of weird privilege dropping excercises in
-  userspace to make this safe.
-
-- A new usermode helper has to be spawned for each crashing process.
-
-This series adds a new mode:
-
-(3) Dumping into an abstract AF_UNIX socket.
-
-Userspace can set /proc/sys/kernel/core_pattern to:
-
-        @SO_COOKIE/whatever
-
-The "@" at the beginning indicates to the kernel that the abstract
-AF_UNIX coredump socket will be used to process coredumps.
-
-When the coredump server sets up a coredump socket it must allocate a
-socket cookie for it and use it as the prefix in the abstract address.
-It may be followed by a zero byte and whatever other name the server may
-want.
-
-The crashing process uses the socket cookie to verify the socket
-connection. Even if the coredump server restarts or crashes and
-unprivileged userspace recycles the socket address the kernel will
-detect that the address has been recycled as a new socket cookie will
-have been allocated for it.
-
-The coredump socket is located in the initial network namespace. To bind
-the coredump socket userspace must hold CAP_SYS_ADMIN in the initial
-user namespace. Listening and reading can happen from whatever
-unprivileged context is necessary to safely process coredumps.
-
-When a task coredumps it opens a client socket in the initial network
-namespace and connects to the coredump socket.
-
-- The coredump server uses SO_PEERPIDFD to get a stable handle on the
-  connected crashing task. The retrieved pidfd will provide a stable
-  reference even if the crashing task gets SIGKILLed while generating
-  the coredump.
-
-- By setting core_pipe_limit non-zero userspace can guarantee that the
-  crashing task cannot be reaped behind it's back and thus process all
-  necessary information in /proc/<pid>. The SO_PEERPIDFD can be used to
-  detect whether /proc/<pid> still refers to the same process.
-
-  The core_pipe_limit isn't used to rate-limit connections to the
-  socket. This can simply be done via AF_UNIX sockets directly.
-
-- The pidfd for the crashing task will grow new information how the task
-  coredumps.
-
-- The coredump server should mark itself as non-dumpable.
-  To capture coredumps for the coredump server itself a bpf program
-  should be run at connect to redirect it to another socket in
-  userspace. This can be useful for debugging crashing coredump servers.
-
-- A container coredump server in a separate network namespace can simply
-  bind to another well-know address and systemd-coredump fowards
-  coredumps to the container.
-
-- Coredumps could in the future also be handled via per-user/session
-  coredump servers that run only with that users privileges.
-
-  The coredump server listens on the coredump socket and accepts a
-  new coredump connection. It then retrieves SO_PEERPIDFD for the
-  client, inspects uid/gid and hands the accepted client to the users
-  own coredump handler which runs with the users privileges only
-  (It must of coure pay close attention to not forward crashing suid
-  binaries.).
-
-The new coredump socket will allow userspace to not have to rely on
-usermode helpers for processing coredumps and provides a safer way to
-handle them instead of relying on super privileged coredumping helpers
-that have and continue to cause significant CVEs.
-
-This will also be significantly more lightweight since no fork()+exec()
-for the usermodehelper is required for each crashing process. The
-coredump server in userspace can e.g., just keep a worker pool.
-
-This is easy to test:
-
-(a) coredump processing (we're using socat):
-
-    > cat coredump_socket.sh
-    #!/bin/bash
-
-    set -x
-
-    sudo bash -c "echo '@@socket_cookie/whatever-you-want' > /proc/sys/kernel/core_pattern"
-    sudo socat --statistics abstract-listen:socket_cookie\0whatever-you-want,fork FILE:core_file,create,append,trunc
-
-(b) trigger a coredump:
-
-    user1@localhost:~/data/scripts$ cat crash.c
-    #include <stdio.h>
-    #include <unistd.h>
-
-    int main(int argc, char *argv[])
-    {
-            fprintf(stderr, "%u\n", (1 / 0));
-            _exit(0);
-    }
-
-Signed-off-by: Christian Brauner <brauner@kernel.org>
----
- fs/coredump.c            | 133 ++++++++++++++++++++++++++++++++++++---
- include/linux/coredump.h |   2 +
- include/linux/net.h      |   2 +
- net/unix/af_unix.c       |  22 +++++--
- 4 files changed, 145 insertions(+), 14 deletions(-)
-
-diff --git a/fs/coredump.c b/fs/coredump.c
-index b2eda7b176e4..6692790bd459 100644
---- a/fs/coredump.c
-+++ b/fs/coredump.c
-@@ -44,7 +44,11 @@
- #include <linux/sysctl.h>
- #include <linux/elf.h>
- #include <linux/pidfs.h>
-+#include <linux/net.h>
-+#include <linux/socket.h>
-+#include <net/net_namespace.h>
- #include <uapi/linux/pidfd.h>
-+#include <uapi/linux/un.h>
- 
- #include <linux/uaccess.h>
- #include <asm/mmu_context.h>
-@@ -79,6 +83,7 @@ unsigned int core_file_note_size_limit = CORE_FILE_NOTE_SIZE_DEFAULT;
- enum coredump_type_t {
- 	COREDUMP_FILE = 1,
- 	COREDUMP_PIPE = 2,
-+	COREDUMP_SOCK = 3,
- };
- 
- struct core_name {
-@@ -232,13 +237,16 @@ static int format_corename(struct core_name *cn, struct coredump_params *cprm,
- 	cn->corename = NULL;
- 	if (*pat_ptr == '|')
- 		cn->core_type = COREDUMP_PIPE;
-+	else if (*pat_ptr == '@')
-+		cn->core_type = COREDUMP_SOCK;
- 	else
- 		cn->core_type = COREDUMP_FILE;
- 	if (expand_corename(cn, core_name_size))
- 		return -ENOMEM;
- 	cn->corename[0] = '\0';
- 
--	if (cn->core_type == COREDUMP_PIPE) {
-+	switch (cn->core_type) {
-+	case COREDUMP_PIPE: {
- 		int argvs = sizeof(core_pattern) / 2;
- 		(*argv) = kmalloc_array(argvs, sizeof(**argv), GFP_KERNEL);
- 		if (!(*argv))
-@@ -247,6 +255,29 @@ static int format_corename(struct core_name *cn, struct coredump_params *cprm,
- 		++pat_ptr;
- 		if (!(*pat_ptr))
- 			return -ENOMEM;
-+		break;
-+	}
-+	case COREDUMP_SOCK: {
-+		/* skip the @ */
-+		pat_ptr++;
-+		err = cn_printf(cn, "%s", pat_ptr);
-+		if (err)
-+			return err;
-+
-+		/*
-+		 * Currently no need to parse any other options.
-+		 * Relevant information can be retrieved from the peer
-+		 * pidfd retrievable via SO_PEERPIDFD by the receiver or
-+		 * via /proc/<pid>, using the SO_PEERPIDFD to guard
-+		 * against pid recycling when opening /proc/<pid>.
-+		 */
-+		return 0;
-+	}
-+	case COREDUMP_FILE:
-+		break;
-+	default:
-+		WARN_ON_ONCE(true);
-+		return -EINVAL;
- 	}
- 
- 	/* Repeat as long as we have more pattern to process and more output
-@@ -393,11 +424,20 @@ static int format_corename(struct core_name *cn, struct coredump_params *cprm,
- 	 * If core_pattern does not include a %p (as is the default)
- 	 * and core_uses_pid is set, then .%pid will be appended to
- 	 * the filename. Do not do this for piped commands. */
--	if (!(cn->core_type == COREDUMP_PIPE) && !pid_in_pattern && core_uses_pid) {
--		err = cn_printf(cn, ".%d", task_tgid_vnr(current));
--		if (err)
--			return err;
-+	if (!pid_in_pattern && core_uses_pid) {
-+		switch (cn->core_type) {
-+		case COREDUMP_FILE:
-+			return cn_printf(cn, ".%d", task_tgid_vnr(current));
-+		case COREDUMP_PIPE:
-+			break;
-+		case COREDUMP_SOCK:
-+			break;
-+		default:
-+			WARN_ON_ONCE(true);
-+			return -EINVAL;
-+		}
- 	}
-+
- 	return 0;
- }
- 
-@@ -801,6 +841,59 @@ void do_coredump(const kernel_siginfo_t *siginfo)
- 		}
- 		break;
- 	}
-+	case COREDUMP_SOCK: {
-+#ifdef CONFIG_UNIX
-+		struct file *file __free(fput) = NULL;
-+		struct sockaddr_un addr = {
-+			.sun_family = AF_UNIX,
-+		};
-+		unsigned int addr_len;
-+		struct socket *socket;
-+		char *p;
-+
-+		/*
-+		 * It is possible that the userspace process which is
-+		 * supposed to handle the coredump and is listening on
-+		 * the AF_UNIX socket coredumps. Userspace should just
-+		 * mark itself non dumpable.
-+		 */
-+
-+		retval = sock_create_kern(&init_net, AF_UNIX, SOCK_STREAM, 0, &socket);
-+		if (retval < 0)
-+			goto close_fail;
-+
-+		file = sock_alloc_file(socket, 0, NULL);
-+		if (IS_ERR(file)) {
-+			sock_release(socket);
-+			goto close_fail;
-+		}
-+
-+		retval = strscpy(addr.sun_path + 1, cn.corename, strlen(cn.corename));
-+		if (retval)
-+			goto close_fail;
-+
-+		/* Format is @socket_cookie\0whatever. */
-+		p = strchr(addr.sun_path + 1, '/');
-+		if (p)
-+			*p = '\0';
-+		addr_len = offsetof(struct sockaddr_un, sun_path) + retval + 1;
-+
-+		retval = kernel_connect(socket, (struct sockaddr *)(&addr),
-+					addr_len, O_NONBLOCK | SOCK_COREDUMP);
-+		if (retval) {
-+			if (retval == -EAGAIN)
-+				coredump_report_failure("Skipping as coredump socket connection %s couldn't complete immediately", cn.corename);
-+			goto close_fail;
-+		}
-+
-+		cprm.limit = RLIM_INFINITY;
-+		cprm.file = no_free_ptr(file);
-+#else
-+		coredump_report_failure("Core dump socket support %s disabled", cn.corename);
-+		goto close_fail;
-+#endif
-+		break;
-+	}
- 	default:
- 		WARN_ON_ONCE(true);
- 		goto close_fail;
-@@ -838,8 +931,32 @@ void do_coredump(const kernel_siginfo_t *siginfo)
- 		file_end_write(cprm.file);
- 		free_vma_snapshot(&cprm);
- 	}
--	if ((cn.core_type == COREDUMP_PIPE) && core_pipe_limit)
--		wait_for_dump_helpers(cprm.file);
-+
-+	/*
-+	 * When core_pipe_limit is set we wait for the coredump server
-+	 * or usermodehelper to finish before exiting so it can e.g.,
-+	 * inspect /proc/<pid>.
-+	 */
-+	if (core_pipe_limit) {
-+		switch (cn.core_type) {
-+		case COREDUMP_PIPE:
-+			wait_for_dump_helpers(cprm.file);
-+			break;
-+		case COREDUMP_SOCK: {
-+			/*
-+			 * We use a simple read to wait for the coredump
-+			 * processing to finish. Either the socket is
-+			 * closed or we get sent unexpected data. In
-+			 * both cases, we're done.
-+			 */
-+			__kernel_read(cprm.file, &(char){}, 1, NULL);
-+			break;
-+		}
-+		default:
-+			break;
-+		}
-+	}
-+
- close_fail:
- 	if (cprm.file)
- 		filp_close(cprm.file, NULL);
-@@ -1069,7 +1186,7 @@ EXPORT_SYMBOL(dump_align);
- void validate_coredump_safety(void)
- {
- 	if (suid_dumpable == SUID_DUMP_ROOT &&
--	    core_pattern[0] != '/' && core_pattern[0] != '|') {
-+	    core_pattern[0] != '/' && core_pattern[0] != '|' && core_pattern[0] != '@') {
- 
- 		coredump_report_failure("Unsafe core_pattern used with fs.suid_dumpable=2: "
- 			"pipe handler or fully qualified core dump path required. "
-diff --git a/include/linux/coredump.h b/include/linux/coredump.h
-index 76e41805b92d..3e4b52c769e3 100644
---- a/include/linux/coredump.h
-+++ b/include/linux/coredump.h
-@@ -7,6 +7,8 @@
- #include <linux/fs.h>
- #include <asm/siginfo.h>
- 
-+struct sockaddr_un;
-+
- #ifdef CONFIG_COREDUMP
- struct core_vma_metadata {
- 	unsigned long start, end;
-diff --git a/include/linux/net.h b/include/linux/net.h
-index 0ff950eecc6b..3f467786bdc9 100644
---- a/include/linux/net.h
-+++ b/include/linux/net.h
-@@ -82,6 +82,8 @@ enum sock_type {
- #define SOCK_NONBLOCK	O_NONBLOCK
- #endif
- 
-+#define SOCK_COREDUMP O_NOCTTY
-+
- #endif /* ARCH_HAS_SOCKET_TYPES */
- 
- /**
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 472f8aa9ea15..944248d7c5be 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -101,6 +101,7 @@
- #include <linux/string.h>
- #include <linux/uaccess.h>
- #include <linux/pidfs.h>
-+#include <linux/kstrtox.h>
- #include <net/af_unix.h>
- #include <net/net_namespace.h>
- #include <net/scm.h>
-@@ -1191,7 +1192,7 @@ static struct sock *unix_find_bsd(struct sockaddr_un *sunaddr, int addr_len,
- 
- static struct sock *unix_find_abstract(struct net *net,
- 				       struct sockaddr_un *sunaddr,
--				       int addr_len, int type)
-+				       int addr_len, int type, int flags)
- {
- 	unsigned int hash = unix_abstract_hash(sunaddr, addr_len, type);
- 	struct dentry *dentry;
-@@ -1201,6 +1202,15 @@ static struct sock *unix_find_abstract(struct net *net,
- 	if (!sk)
- 		return ERR_PTR(-ECONNREFUSED);
- 
-+	if (flags & SOCK_COREDUMP) {
-+		u64 cookie;
-+
-+		if (kstrtou64(sunaddr->sun_path, 0, &cookie))
-+			return ERR_PTR(-ECONNREFUSED);
-+		if (cookie != atomic64_read(&sk->sk_cookie))
-+			return ERR_PTR(-ECONNREFUSED);
-+	}
-+
- 	dentry = unix_sk(sk)->path.dentry;
- 	if (dentry)
- 		touch_atime(&unix_sk(sk)->path);
-@@ -1210,14 +1220,14 @@ static struct sock *unix_find_abstract(struct net *net,
- 
- static struct sock *unix_find_other(struct net *net,
- 				    struct sockaddr_un *sunaddr,
--				    int addr_len, int type)
-+				    int addr_len, int type, int flags)
- {
- 	struct sock *sk;
- 
- 	if (sunaddr->sun_path[0])
- 		sk = unix_find_bsd(sunaddr, addr_len, type);
- 	else
--		sk = unix_find_abstract(net, sunaddr, addr_len, type);
-+		sk = unix_find_abstract(net, sunaddr, addr_len, type, flags);
- 
- 	return sk;
- }
-@@ -1473,7 +1483,7 @@ static int unix_dgram_connect(struct socket *sock, struct sockaddr *addr,
- 		}
- 
- restart:
--		other = unix_find_other(sock_net(sk), sunaddr, alen, sock->type);
-+		other = unix_find_other(sock_net(sk), sunaddr, alen, sock->type, flags);
- 		if (IS_ERR(other)) {
- 			err = PTR_ERR(other);
- 			goto out;
-@@ -1620,7 +1630,7 @@ static int unix_stream_connect(struct socket *sock, struct sockaddr *uaddr,
- 
- restart:
- 	/*  Find listening sock. */
--	other = unix_find_other(net, sunaddr, addr_len, sk->sk_type);
-+	other = unix_find_other(net, sunaddr, addr_len, sk->sk_type, flags);
- 	if (IS_ERR(other)) {
- 		err = PTR_ERR(other);
- 		goto out_free_skb;
-@@ -2089,7 +2099,7 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
- 	if (msg->msg_namelen) {
- lookup:
- 		other = unix_find_other(sock_net(sk), msg->msg_name,
--					msg->msg_namelen, sk->sk_type);
-+					msg->msg_namelen, sk->sk_type, 0);
- 		if (IS_ERR(other)) {
- 			err = PTR_ERR(other);
- 			goto out_free;
--- 
-2.47.2
-
-
---cvtza4xbbllnzmw3--
 
