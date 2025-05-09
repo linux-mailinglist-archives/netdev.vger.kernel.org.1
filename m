@@ -1,97 +1,92 @@
-Return-Path: <netdev+bounces-189296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C77F2AB17E9
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 17:04:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD4BDAB17EA
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 17:04:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 356567B13B9
-	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 15:03:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 769AD3B1E1A
+	for <lists+netdev@lfdr.de>; Fri,  9 May 2025 15:04:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4360E224AF0;
-	Fri,  9 May 2025 15:04:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D096F225A2D;
+	Fri,  9 May 2025 15:04:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mx7d8mKa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MmdjvRiK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDCE5142E83
-	for <netdev@vger.kernel.org>; Fri,  9 May 2025 15:04:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56F99224882
+	for <netdev@vger.kernel.org>; Fri,  9 May 2025 15:04:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746803068; cv=none; b=lnLS3PLTaKEgl1bcQOAsL5qrdDPrFRn07nfAuo+dnskBq1QeErzhqpfQP1rZQioVQgEjI+jERcskslqNmHOLPdk71ruDnN7xeMt+6f0qTdrWbYexjFPNfQOxzueN4kZXS7MyUyCKHyNLeEVuBg8JZJs4J0kcu1/uIAYa31D5FDY=
+	t=1746803088; cv=none; b=XI5dwMq5vVrTxB0RMbPPN6y1j3aj5VGGqGerzKlUCiHP2NwpC3hbIgD+djbefL3A60H05HIFDufnrLS9SAMLPho89Xm/htEsKvWzuVHkKYx6jbOU7EDC5Qg3s8bNFww4ckHMOs98PCgnYCqlB22TCJBGwg4kEoUvUJlvQ1v9g+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746803068; c=relaxed/simple;
-	bh=so96zrxczNFnPW4zHtLR2+8194AXSxSVMw5oDXFQlm4=;
+	s=arc-20240116; t=1746803088; c=relaxed/simple;
+	bh=JapJUkZewJxb/XlJDWLv3OldsyH98W6r12b9DueXIaY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lBeoH1QZEdEz9OUwzBrdQzFten801IyOSzgILf3uKYGrjv9scwN5l4q84QYQGWvR7DH4l0ywm8VsM5zxJwj8T49yYUXlyc/Ie/AaNba5Ja6PgoCDM3cp2iwlj+ReCRnFmW1LQ1isQeK+ju4auvGwLaZugTTrnMAB96kWq3K8HWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mx7d8mKa; arc=none smtp.client-ip=209.85.216.42
+	 Content-Type:Content-Disposition:In-Reply-To; b=LDFssTZLPUmb/pcBMlSBa5uWdsduFnRvzj7reQyFQvekixYZK7FNUP0MR6LyXhdqQ52DlgP6hLXZHSjoQSTphak88Vi20ArwtCd8GQk2//1v+POvKCR7cMyOCkUbxHt2rhPSe6LS8fTRWmvwQTelfke0P+ejT/SYcMdxEP7h4bw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MmdjvRiK; arc=none smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-30ab344a1d8so2253455a91.3
-        for <netdev@vger.kernel.org>; Fri, 09 May 2025 08:04:26 -0700 (PDT)
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-739b3fe7ce8so2261450b3a.0
+        for <netdev@vger.kernel.org>; Fri, 09 May 2025 08:04:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746803066; x=1747407866; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=xn7HbBy2BRduAq+CrI+lYptVKrOLVgqBZuSqIldDfyY=;
-        b=mx7d8mKaWqGu/dVszBq2DMBcOHYX9f83ZaGTa8C9TVystz18cOG11muIMh1ac2GqGm
-         EIkIbIEYwj+DKu5zQY87xQrp00JdspYRpA388ifgOZohXBabsM1v73a8eI0WH9LyBocB
-         u/Xm42J32pacqCqCilMy1ZEGSD5vN1mkCY19hJpHP7Z6YXfdRsF1sttd5kEn4Y/GBvXs
-         +SpJ0jjbaqnvRYH4GpQhAId1RJCu7ufoqel1M4z4Yul4T0TqipPl05wnHXlOfDAc3BrZ
-         8m5AeeBzhUC9nGDnjuJEV6bOWYCIDjvkAw88IYwteRtxuFJYWQuEpqAwDDs/1cGFZg1A
-         8jNA==
+        d=gmail.com; s=20230601; t=1746803085; x=1747407885; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KdI9qhgjSr9fdQD7p5VoyB9K5jN+qP2nfZQB+6GQGyo=;
+        b=MmdjvRiKTSSycczIPf0usLPQK5RPVRJizH34VRZEO8nqKGwhE7CsAAiNkJkK2FFIdF
+         q26FPO5EnS4A0nA3yJhqi9mKyyFUln6l+xhQhJXb2XfttrID6vrqvvFI3dwqxFKkjL45
+         gDxNxfiM2VtVa0v7UlCra058uUxnSb46aa0JTzlcHn3DLItFHOeFviSrD5xK0vGTfWVB
+         B+QM9xe4MFu/KzOr21Zo7yXTHr5sZc1ReHv5rEbG+zxQuEhG4V9Igudak4mBV/d24Tqg
+         YUS1tMtpUd0HquPuePsZPPRKjSQq1XGFtOghB/7fD2XEaMoT2M7RPigQFLvHwBVR3sjU
+         Ed9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746803066; x=1747407866;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xn7HbBy2BRduAq+CrI+lYptVKrOLVgqBZuSqIldDfyY=;
-        b=u5FexkbDIM8+IkH81Ui1KZrm8fdii2pSIwvheukfjNAfnyXuiyT3mQ+dHg1ndJc/Rk
-         B6iU0TQcMMydYypfb4Wskq5c3eCkUjRC2VmKTf3zi7cO1Ty/Uhiyi5vvWzWqj5fJKVPD
-         tfm1ZMEkEprAXvavkMAlumz1R/hwFt7UwXCTKuG9OMXWyzDaMsNbqqXKZvew200zEO0x
-         TamjMxNZXlQGpzhU8+sJS/uAnSFTeF8rVBR4GKpqzK/suaoqFpRwjq3WkZu8j+yRcjeI
-         LBYFCimF6MjYWCIrax+os44OYq+QeW71Q0ToEgmt2yOl8v9Gt0T7V/2gaBq1MGPCpgfJ
-         ubsw==
-X-Forwarded-Encrypted: i=1; AJvYcCXkmFsYXnmmgmcL9TgsxX9MI4o+HSlga4mYHNQPrbL9J43ZxN2L3DOimKgFY9eAfcW7QPl0tNM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJll0SY4CU3nGs8y+KHDSnp9ztmAxFfB24WmeXhDTMRSqbWtA9
-	ABhswKcEoBA4bNay/qshjbB30OjT00YHL6BTDrLzzq+/1F+7DqQ=
-X-Gm-Gg: ASbGncvhzUHbcrEcBiYvi9M7VCVmDAJRgrk62TT7suo/UoKzuksKda0J2gpo4HlUoCE
-	Q4mhCUtb5oMcaz5K7EdWHT/12zdbyCgM4umDqKa+ZgsXhFHlIInbRzBfG5BrMgXOILiDSgY7KNf
-	zgxoG+5mGKuJA0EIUrtQPsrVA44HOaoRYeWqmn131tGvPFBb1RApxtgqdaeESZZuNvQhfC/omU5
-	fra86VTwSUMJIMG2q/VpeRysVkRmo4B9+Mmehao1RxwaTRBmlBEWl2wolINJfmmUsiqrc5kNeqf
-	EAu+sYp+QSn27l3pLNcvzh0oo1RODjv098Ep1fpt+E+Sc6ICvjRnJm2E2i2dPqYJYLZiZHCahy5
-	Ljw==
-X-Google-Smtp-Source: AGHT+IFi4qwe7Z+C8dCIedx2GfpVVNq+yYMAzqy9alNHiVXgFxfTokZlaiL8MEeyY7rMnaJvRvFb1w==
-X-Received: by 2002:a17:90b:3c85:b0:2f9:c144:9d13 with SMTP id 98e67ed59e1d1-30c3d64652fmr6676538a91.24.1746803065850;
-        Fri, 09 May 2025 08:04:25 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1746803085; x=1747407885;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KdI9qhgjSr9fdQD7p5VoyB9K5jN+qP2nfZQB+6GQGyo=;
+        b=FcJY6PC3UpXsX75ZEm1wAF7l1o50HiK7FubscDqxxblGmz7XFln2GIUk8KLodaf8KO
+         Y3EslIhzOHWv32Y076DzVQPoXmKKzuY0QrfH6JkKE50MkIzzxdAbhNSh5h2WLP4aBGHy
+         oDpvGWlCXqNE15U10qOAHW2ll6QpxhB+5Tb9mZQhomzF1IMU/f5HqIBYg/25/Po1BADs
+         /e/18cyLsp0mKsfO9sw32/1ChxXVx+zj7eUsHHogm3DEGaV6M8ljXut7DjPNWzcUeJV5
+         CmedeRwhdUn+FbrbWIBhwul+fTyO/1RE67pvJol4fHcprrbgcCAwi3RnaC2t60IAUvB7
+         CGzQ==
+X-Gm-Message-State: AOJu0Yw3DDrvbzf3VuDVn8g6qT7dAx1L8LoAO4WZ80PeyZCNL4eqzmiK
+	6kMn9/l5O5rosqmYxj3DT+gt51UiA8jnK6fKhU3IYndJN45tYwQ=
+X-Gm-Gg: ASbGncuFvKCDQp1uYtRRjm1qdORdGJVBJTkq95a5DwuJ8Cu/1rlPaR67m3dDRKPwOMk
+	x5DNy3K/nZJmcv4AUGxunmAyI8qPq7QIKkq0ZRh6GUkO4u49Qu0QgMVigu5imUr0kctlZVUoEAj
+	AfRqaZMcuFaxLlmTBUE1nKqS4gbbsbn9+1DTgFmPPB+RRkLnGtYE0lITrvdwHjiIZT/qmL4b1Kw
+	AoyhxdvjLi9meosAB73jzH0fAaLgp5oKhjcOSMnxssbYQEHS8FHVjfJXiQfyvmfdf+8jbC9hpwY
+	ol4CmWbi+je0+aGbAYotc1LflPEB7LVRvLYgExfgbnqueXg6bHWMhLgJSs9+QTY8+/PbxVt7Ta+
+	0mA==
+X-Google-Smtp-Source: AGHT+IEXRUMpZALr2HVUQpjlIexlq3/pNRm/9Nx2vgNac3dWEOAeL7Dfv02a4uGBIOSrbRmjrlqn3g==
+X-Received: by 2002:a05:6a20:cfa3:b0:1f5:80a3:afe8 with SMTP id adf61e73a8af0-215abd4f275mr5391329637.39.1746803085410;
+        Fri, 09 May 2025 08:04:45 -0700 (PDT)
 Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-30ad4fe23b2sm4138944a91.37.2025.05.09.08.04.25
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-74237a104e7sm1874178b3a.104.2025.05.09.08.04.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 May 2025 08:04:25 -0700 (PDT)
-Date: Fri, 9 May 2025 08:04:24 -0700
+        Fri, 09 May 2025 08:04:45 -0700 (PDT)
+Date: Fri, 9 May 2025 08:04:44 -0700
 From: Stanislav Fomichev <stfomichev@gmail.com>
 To: Cosmin Ratiu <cratiu@nvidia.com>
-Cc: "davem@davemloft.net" <davem@davemloft.net>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>,
-	"sdf@fomichev.me" <sdf@fomichev.me>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"edumazet@google.com" <edumazet@google.com>,
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Mina Almasry <almasrymina@google.com>,
 	Saeed Mahameed <saeedm@nvidia.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net v2] net: Lock lower level devices when updating
+	Tariq Toukan <tariqt@nvidia.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: Re: [PATCH net v3] net: Lock lower level devices when updating
  features
-Message-ID: <aB4ZeKV8m3GKL9qc@mini-arch>
-References: <20250508145459.1998067-1-cratiu@nvidia.com>
- <aBzYAzPtf_TlhT0n@mini-arch>
- <b14f2b94b9ecfcb0926c09f8bce01dc2a52a0eca.camel@nvidia.com>
+Message-ID: <aB4ZjJDLYEJnqGGH@mini-arch>
+References: <20250509072850.2002821-1-cratiu@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,44 +95,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <b14f2b94b9ecfcb0926c09f8bce01dc2a52a0eca.camel@nvidia.com>
+In-Reply-To: <20250509072850.2002821-1-cratiu@nvidia.com>
 
-On 05/08, Cosmin Ratiu wrote:
-> On Thu, 2025-05-08 at 09:12 -0700, Stanislav Fomichev wrote:
-> > > --- a/net/core/dev.c
-> > > +++ b/net/core/dev.c
-> > > @@ -10454,7 +10454,9 @@ static void
-> > > netdev_sync_lower_features(struct net_device *upper,
-> > >  			netdev_dbg(upper, "Disabling feature %pNF
-> > > on lower dev %s.\n",
-> > >  				   &feature, lower->name);
-> > >  			lower->wanted_features &= ~feature;
-> > > +			netdev_lock_ops(lower);
-> > >  			__netdev_update_features(lower);
-> > > +			netdev_unlock_ops(lower);
-> > >  
-> > >  			if (unlikely(lower->features & feature))
-> > >  				netdev_WARN(upper, "failed to
-> > > disable %pNF on %s!\n",
-> > 
-> > Any reason not to cover the whole section under the if()? For
-> > example,
-> > looking at netdev_features_change, most of its invocations are under
-> > the
-> > lock, so keeping the lock around it might help with consistency (and
-> > we can clarify it as such in
-> > Documentation/networking/netdevices.rst).
-> > Plus, wanted_features is already sort of ops-protected (looking at
-> > netif_disable_lro+dev_disable_lro).
+On 05/09, Cosmin Ratiu wrote:
+> __netdev_update_features() expects the netdevice to be ops-locked, but
+> it gets called recursively on the lower level netdevices to sync their
+> features, and nothing locks those.
 > 
-> The critical section could be extended for the whole if, but there are
-> a lot of netdev_features_change() calls in many drivers, which I am not
-> sure are ops protected. So I'd be reluctant to state that
-> NETDEV_FEAT_CHANGE is ops-protected in
-> Documentation/networking/netdevices.rst, even though all core
-> invocations would be made with the ops lock held.
+> This commit fixes that, with the assumption that it shouldn't be possible
+> for both higher-level and lover-level netdevices to require the instance
+> lock, because that would lead to lock dependency warnings.
+> 
+> Without this, playing with higher level (e.g. vxlan) netdevices on top
+> of netdevices with instance locking enabled can run into issues:
+> 
+> WARNING: CPU: 59 PID: 206496 at ./include/net/netdev_lock.h:17 netif_napi_add_weight_locked+0x753/0xa60
+> [...]
+> Call Trace:
+>  <TASK>
+>  mlx5e_open_channel+0xc09/0x3740 [mlx5_core]
+>  mlx5e_open_channels+0x1f0/0x770 [mlx5_core]
+>  mlx5e_safe_switch_params+0x1b5/0x2e0 [mlx5_core]
+>  set_feature_lro+0x1c2/0x330 [mlx5_core]
+>  mlx5e_handle_feature+0xc8/0x140 [mlx5_core]
+>  mlx5e_set_features+0x233/0x2e0 [mlx5_core]
+>  __netdev_update_features+0x5be/0x1670
+>  __netdev_update_features+0x71f/0x1670
+>  dev_ethtool+0x21c5/0x4aa0
+>  dev_ioctl+0x438/0xae0
+>  sock_ioctl+0x2ba/0x690
+>  __x64_sys_ioctl+0xa78/0x1700
+>  do_syscall_64+0x6d/0x140
+>  entry_SYSCALL_64_after_hwframe+0x4b/0x53
+>  </TASK>
+> 
+> Fixes: 7e4d784f5810 ("net: hold netdev instance lock during rtnetlink operations")
+> Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
 
-Ack, I don't think the calls in drivers/ matter, none of these are
-ops-protected drivers, but we can do that separately.
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
