@@ -1,104 +1,83 @@
-Return-Path: <netdev+bounces-189422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 966F9AB208E
-	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 02:39:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0606EAB2096
+	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 02:41:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 536673A722C
-	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 00:39:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5703C3BCAB6
+	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 00:41:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD56D1C5D4B;
-	Sat, 10 May 2025 00:39:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AA9A213224;
+	Sat, 10 May 2025 00:41:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A7+jNr0H"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UHoyM5Fl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACFC51A2C11;
-	Sat, 10 May 2025 00:39:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F20D4212B2F;
+	Sat, 10 May 2025 00:41:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746837593; cv=none; b=WUzKP5MKxTM6OihldzT5pT6qPgv+SkuiWc++844Qz/yF+Jhf/DBOZ5rSzADuxkK+vU74pIT4GvVEWDXEEYtBPuWidqg2UQTVcuSl9XlveDPNeBCxgVEhfnq2baPOBXWAXnXsRXUOcYxN4BsUn5O+OzNTvF9af61SXksdSeAbzHY=
+	t=1746837696; cv=none; b=sBuBcETGCJidko4XGUxE7t8BG2nVIQX5/pXR7VwNl9OHvGRNEEFZ4KoQ0bEpLRf9/7gHJvzV6ErDhr3PFPE9xIOebs1IRAGcSuTqDCcqmfuzp6RAFy2X82RkPOGdx8dsFmTCdHED/hfjVoHTAkMPqMgmnbMOspd1sqixdG6ihbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746837593; c=relaxed/simple;
-	bh=hU5x5nV621PCXb98dd7QNAbrE73+PaQ5xx0FQ9+8knM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Ux586yeg6S6YbWY2ZJnTytPj3UPHiDbjLhM3yjwjNdwOH2edihST2yigNbOp4Ajo/O/1mvxMR3UhikDNSrExPKeA8mCFIOMp9jk4OpKz8tQ5tOAbnUU4fuOOSA4hhNQjX4XQQ0FT8VY7SDEyLNYX4R9xCu0NlwIH10FQNNBoJYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A7+jNr0H; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DEDBC4CEE4;
-	Sat, 10 May 2025 00:39:53 +0000 (UTC)
+	s=arc-20240116; t=1746837696; c=relaxed/simple;
+	bh=UieL6rCfYVSI5KcmuBXjatBPrhUko46Fc543UCh7Pac=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pReZc45OAE7Oi/t6kJ0Oog0obg0buv7QRbuTGH+PFNTH5DGNQX+ffaZfxrBslBlL/QKd54cXcHlgTCAiqDk+JH6W7LWcgl7swk6K43kGHkUAqSVWzQcqH7qi7pJ6DOK/tVA9/llMu7UdruKHqwzeeqK677UfQFCaGtaWhRbPDfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UHoyM5Fl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 080B7C4CEE4;
+	Sat, 10 May 2025 00:41:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746837593;
-	bh=hU5x5nV621PCXb98dd7QNAbrE73+PaQ5xx0FQ9+8knM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=A7+jNr0HNwuo15U+Nm15rn6xSLrb4t7GyjtyBFUwopRjXp4IlcaNbkKMFtZvPG6nZ
-	 NulpbIMpXB5V1uGCx1zvlZoHGIP/e9UQN+kKWQBLNNlZrypakkjxhLoR6hT8PTmudr
-	 1rE/xK6DCE/gFicMObwo6gZp0L9fu+L3eI8JBgJbrXdYdk/IytKRFZOVgcm7oVN+ns
-	 0jNCP0VrtQwAH1JngkV+jh4TJIWinoppC9jA0a6q7MilxMZHAYiGzIoJAZeCXTKTuc
-	 rgAUzEk+kAOOsuvpvVo8RRfZVEfdkJKWQBGTzxbapLMe67LpwUUXhnJ9/KWaVwvnU2
-	 5ipkrFFWiCnlQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCB4381091A;
-	Sat, 10 May 2025 00:40:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1746837695;
+	bh=UieL6rCfYVSI5KcmuBXjatBPrhUko46Fc543UCh7Pac=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=UHoyM5FlIuPjdj8HCg1uhhMK9+0T0tT1Ex7P+tL68GCYTNxYl6QzBRYP8mYWRf17/
+	 INEreAUOIz2F1nMiI/LMz+ThzHzPHDMMaiGnZpwbTLNX8rj4fwrJOrACMa1hgKhYWR
+	 vo6T0CsIupeQh09hV0w0EsqPk0sfDUrAVwW7XgivGLcVMBqxZBGvfVlXLobOBAhNhp
+	 rPNfNNSVv0MiTz/ncIY2tltBgLCl4aUbEfA4rZTaR1MSUF7EhSSj5JvSnCTj5NUkIC
+	 DEW7/deRoKcNTz5nImjWmfIYM6HZYRQ0pWPvB7CZRRGueQRnY5NXSTCeoIkk9NvfsY
+	 PGo856gwtzaXg==
+Date: Fri, 9 May 2025 17:41:34 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: <Tristram.Ha@microchip.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Woojung Huh <woojung.huh@microchip.com>,
+ Russell King <linux@armlinux.org.uk>, Vladimir Oltean <olteanv@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, "Paolo Abeni" <pabeni@redhat.com>,
+ <UNGLinuxDriver@microchip.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v2] net: dsa: microchip: Add SGMII port support
+ to KSZ9477 switch
+Message-ID: <20250509174134.03c224ea@kernel.org>
+In-Reply-To: <20250507000911.14825-1-Tristram.Ha@microchip.com>
+References: <20250507000911.14825-1-Tristram.Ha@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5 0/3] Refactoring designware VLAN code. 
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174683763150.3852829.17036982288908409763.git-patchwork-notify@kernel.org>
-Date: Sat, 10 May 2025 00:40:31 +0000
-References: <20250507063812.34000-1-boon.khai.ng@altera.com>
-In-Reply-To: <20250507063812.34000-1-boon.khai.ng@altera.com>
-To: Boon Khai Ng <boon.khai.ng@altera.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
- linux@armlinux.org.uk, ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
- john.fastabend@gmail.com, 0x1207@gmail.com, matthew.gerlach@altera.com,
- tien.sung.ang@altera.com, mun.yew.tham@altera.com, rohan.g.thomas@altera.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Tue, 6 May 2025 17:09:11 -0700 Tristram.Ha@microchip.com wrote:
+>  drivers/net/dsa/microchip/Kconfig      |   1 +
+>  drivers/net/dsa/microchip/ksz9477.c    | 191 ++++++++++++++++++++++++-
+>  drivers/net/dsa/microchip/ksz9477.h    |   4 +-
+>  drivers/net/dsa/microchip/ksz_common.c |  36 ++++-
+>  drivers/net/dsa/microchip/ksz_common.h |  23 ++-
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+No longer applies cleanly, please rebase:
 
-On Wed,  7 May 2025 14:38:09 +0800 you wrote:
-> Refactoring designware VLAN code and introducing support for
-> hardware-accelerated VLAN stripping for dwxgmac2 IP,
-> the current patch set consists of two key changes:
-> 
-> 1) Refactoring VLAN Functions:
-> The first change involves moving common VLAN-related functions
-> of the DesignWare Ethernet MAC into a dedicated file, stmmac_vlan.c.
-> This refactoring aims to improve code organization and maintainability
-> by centralizing VLAN handling logic.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v5,1/3] net: stmmac: Refactor VLAN implementation
-    https://git.kernel.org/netdev/net-next/c/1d2c7a5fee31
-  - [net-next,v5,2/3] net: stmmac: stmmac_vlan: rename VLAN functions and symbol to generic symbol.
-    https://git.kernel.org/netdev/net-next/c/f3acaf7364a6
-  - [net-next,v5,3/3] net: stmmac: dwxgmac2: Add support for HW-accelerated VLAN stripping
-    https://git.kernel.org/netdev/net-next/c/534df0c1724b
-
-You are awesome, thank you!
+Applying: net: dsa: microchip: Add SGMII port support to KSZ9477 switch
+Using index info to reconstruct a base tree...
+M	drivers/net/dsa/microchip/ksz_common.h
+Falling back to patching base and 3-way merge...
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
