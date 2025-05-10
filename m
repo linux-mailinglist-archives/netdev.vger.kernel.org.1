@@ -1,91 +1,89 @@
-Return-Path: <netdev+bounces-189449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78054AB22E4
-	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 11:22:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16FFEAB22F2
+	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 11:34:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 218DA3A70D0
-	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 09:22:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95AA7A01346
+	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 09:34:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 273C71EDA0E;
-	Sat, 10 May 2025 09:22:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 953101EA7FF;
+	Sat, 10 May 2025 09:34:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QlUz5FBU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pe0H9tiR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E4EC1E9901;
-	Sat, 10 May 2025 09:22:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E3331A8F6D
+	for <netdev@vger.kernel.org>; Sat, 10 May 2025 09:34:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746868961; cv=none; b=S1NB+Uwcd4GAOvIV4sve7Xpa2p7hZYFYm3MpkcGVME+2k6GVRfKEO1XuAve+HhQ5sgQ6mjrUsvYLyIpQtQR3PzF/XsDwwwrxQyWwUoHT7RZmYv8lDkMVfovWiHtRMfzu2u/4P4IrqF1NRx1RIQnr28ZOg4VuQ8v7BdxErhnPuYU=
+	t=1746869691; cv=none; b=YOePXP7JOJSbCLXQoWTdKI+jrzfTsucmmXO0anSyCJDnbUiCLt9bRy77YkTvg8/bd6+tqaZB7jU+WkT5Va1xXm2NuoWeZGi5DdkiQaiZCtLLQo3xy5tlB2NvXgJNuzosQLYhIfw8w9ZkV2XB/CJlhQ5Qk2GDGJkOBNpbe/AoOIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746868961; c=relaxed/simple;
-	bh=inV0RfRccOu6V+1k6bacnU/OZqds2ZuOK2S735pm+GI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mzvTuFmEnR2oLDeuIlZqW0Rbf58Cd9ZxlekXkJWW8wfRVoSs0pBlBh0OySXL3ePQ84S4oRjbubojlreevNFUrdR0Qp3B7ZlAeUcp5WOFD11mubSRfnAQAxpMXPacNYd0X5oVFLCeUhvMMASEA4/ncuAY9iAlOCjyVHtfMwMr21I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QlUz5FBU; arc=none smtp.client-ip=209.85.208.45
+	s=arc-20240116; t=1746869691; c=relaxed/simple;
+	bh=f2suzP4zeF4MA4yl2JF9aR+wb/Fr32kG2i0KddKirV4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TTLa2lLZ5b/09A6Y7uT1qnpzPtYrLryL5xTQO7tR8Ggrc2bQxpP5t9D10tS4HjzHMNAQxMU8KHNqF742c+UYDjiQDLngbqpajKEk4+SKy1AJYWgFHBvOGfEjzu3o06QllQvKJlT6JgHSC2BRvpkRvxK7xlWCjfKTDxzCBbge53s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pe0H9tiR; arc=none smtp.client-ip=209.85.215.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5fc8c68dc9fso5148645a12.1;
-        Sat, 10 May 2025 02:22:38 -0700 (PDT)
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-7fd581c2bf4so2513239a12.3
+        for <netdev@vger.kernel.org>; Sat, 10 May 2025 02:34:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746868957; x=1747473757; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1746869689; x=1747474489; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6LwVXbI/uaImz8Mia1ZxOyXkkvE03E1h6lfweWlCf3c=;
-        b=QlUz5FBUW0ObBel7or+bu/OEOEWFBRmq/dj609FtrK6ZsVp+DrxYnJrir6Rr9bHtv1
-         RBHQXWsha1j5uuQy3lfkjb1WXwGrw/VWzwMmCipWwauXvV3xuKocnFh9V6XmUeUeNFwS
-         efnA17SZ43S0hPhB5ngwTi7cTA2vrskQrkBKL94M45vJ4jo2ZauxYZP25phKDl/3yfIn
-         Rvdmxf5xZZlUNCddh3owwED5/ZNISrPIUyPfXTcMVZLG5vvm6EFC1uAnTOTo3SbEexEQ
-         2+3JwRpY8Jn9NSt1mf9uRlD11BheVwhNlk1TyQkzFX2HIEemhmawRZ/Dx8upRmjzgMZh
-         sYZw==
+        bh=Be+2bPvEJorGJE8qbCFSXxwdGEZHSh74U5bGp1GxslQ=;
+        b=Pe0H9tiRtdLabuWCQSx3KJBxCgNBrkYY0ZEeAyJxR8xXaWNWYVPmoQ7XYDgOCLF8Ln
+         l/9/zQFH3xKgS8xMqazEeKMQG6I/gQHO0V77bykPD4R+X8WD4Tkdk7VM66SqEm/e0cDn
+         aSIfjEViRAnZc7smfYJ0zPPwzXSjvFfXPK+oEtdTQJXGlnQvoWCDR25RDCF2/kLNlih1
+         5tfPL/ZGkePCM9v6ch4eppwJtHDH+lHiJ/pFJyAlbknFC2q/77YEsqyVai+2Jm08OJlk
+         gUjf/FhcpsLktBocX5rD7AJJ7qBh20BmPjQhYWRhKZdQOgigikql0XwqTvMVdD8rxb9V
+         ly1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746868957; x=1747473757;
+        d=1e100.net; s=20230601; t=1746869689; x=1747474489;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=6LwVXbI/uaImz8Mia1ZxOyXkkvE03E1h6lfweWlCf3c=;
-        b=J8gy3dyV0UVwRIomwJsq0uFcmOh+ho0HIJ/tYEFqG7OZUowXcuj9c5YznklqJOI0sv
-         7HmVV9EoLT4QTJ8e9jEQlIvLGDc1UUfjGsAxMXGJYjA9XcUiJkpz/iZ19KBDDrESt3x0
-         Nm8I3pO0asUVE/2L5/W63C/V4lwp5611kLrOaUmecPJduNCH6+kUo2Uc4Kh8Z+3UNZ4D
-         lJNu5FqOboUYa7tY9jkEKkS4J0Wc1u50WTwuaMxP78c7PNnGaemAbeKF5zTDctQUeu5t
-         CS0Q4mYOyIWrDqAr3h1hGKF0w0+fHv1NysGgeGDb2uPHyfEkWSf07qhYUxYHpUy3bNAz
-         RWYA==
-X-Forwarded-Encrypted: i=1; AJvYcCXNiBJJKK+3+Q3G7MPFHvVgsLD6iugBr4OSuBFgKj1WYVIdeHgvnI59CLZjCArNdGF8XSBORbKUT5xWpvE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvYUd/jL++39SZLUKtK5OKQvA6lm0Fdfj4GA/K2Pg+RNVX+xya
-	dAl5ZjO0DH2MNrD0afGk4h+uz24+R1QleChtg1fyacN0eYY+rlX1
-X-Gm-Gg: ASbGncssP1hfLx8B2fh5VvsoRLxGDEjTv+nd+UcUvqJ/oinxV30WcYMFphjck2601pm
-	XKtahFw72t1Q9OQ7YBglBgmg+Bq00Pom00axDkbbVJRzqiW0TBTX8aY2KPrADomrAYCAb9dIziw
-	c9QvkxhON3wOcarIXxkM69CzpCaoF/mGnvwFvKvi/6W/jd4dp99eXkrE7nKo6WZ3/J77BwCrXMs
-	ptDD6TiygfaxqsmqE5DJGSEFdjewbnCp/DiBRrrQDQ4ldO98u3kANXGTGYcCu9RsuB45UBmEszk
-	I8EHw4tES8Qwy9K04DPuLkRaUBI++VfrbIQbTyBP1cuUxKSar9rkPKA7cSI6SVUchFycVSHcXHV
-	dLSeEwfakf0ZuIozHkhP/rPlvtJEJTq6kbHBSO/b7cA==
-X-Google-Smtp-Source: AGHT+IEAh+Cd49qeeWCkpvlkc1ALXf2DHLU4upT+4OE22rHLh1z9xQl0vI1i+IoUeb/AHRE96Bl/FA==
-X-Received: by 2002:a05:6402:348f:b0:5fa:9222:e875 with SMTP id 4fb4d7f45d1cf-5fca0792de0mr5385001a12.18.1746868957161;
-        Sat, 10 May 2025 02:22:37 -0700 (PDT)
-Received: from localhost (dslb-002-205-017-193.002.205.pools.vodafone-ip.de. [2.205.17.193])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5fc9cbe523bsm2643188a12.12.2025.05.10.02.22.36
+        bh=Be+2bPvEJorGJE8qbCFSXxwdGEZHSh74U5bGp1GxslQ=;
+        b=JPPlnoQczVcnKrG6Y+q668thG6HgunBA/SYyeEb9nzcnvCMDE6yM71t3G36l5RR8LG
+         qV9U0L+kgwQ4d9uRWS9YKkNFZC7wLom7PK4Vbp36/fSyEBQOJQ2YsI0Ge7oIPksQzQNI
+         SeieTF1X/5SDqtB9WWpS5GQUqS/DPhpCc52gEA4m7nr+BXwIttcU+bVHQDMFtChwXT+2
+         pBTpPJgvXEojelm3n3n3JIILKrC56nPQgPxb23IAJ7/gI1wx7fGvlZ4Z1psD4KfvvaG7
+         KeK39pfnkc3Qk2gJavHJq6n9APUpYzIjr/eTk+tzbdd9Ge//rbQNFWLcV+qELURjG45U
+         P24w==
+X-Gm-Message-State: AOJu0YzaJgNCfMiSx9Tjd/P4N3c1zPJlBQQd2qXceMTGWWXJl3H758T3
+	Wwy/j+tWkJNmW3d9yur3/o7Cmn8d0ApWOr6am4pGJHgAvbQ1SMzIXx3cvk6qiac=
+X-Gm-Gg: ASbGncuYamRfyx/EjJTXWNNM7xy9sARvb5PMXIsE8MO/A9Vwqffd9HyGBHEOr4T4ovK
+	wzZ2Sbi+1znG/6duAodaOyDVjyqo+6E5FwnwyDt8Pn2/Rb+HxLp7h5+oMuydikDNLXqgft6hJjr
+	GTd2iYfWLAeuq3RhXTj+D9axBqVVNcqs5qCfKNy/ZEbDiUZk7LzuUU7yFHZVLubjeJMOg53SjV8
+	gukzTsakC/LWYbhrS05wpwN0XwxCkBp572OuDbsCYOVf9SJIucQ1e7BELthqhUJp5RzpjEG6NXG
+	PTIriOdYqgLMaGccv+5qlizXfhMcoyTQ1YsxOWhxtXXAgr5Kz6EFi5gUG0urTnggXXY94O6P+u6
+	aPnQv4dgUqkrWvw==
+X-Google-Smtp-Source: AGHT+IEs1ubhCSSsakIFUSE8CmG4xhyw57KNJQUoMLMTX0nteHSoI2LQLeYq4aoFF73Y5koq5kkNCg==
+X-Received: by 2002:a17:902:d545:b0:21f:507b:9ad7 with SMTP id d9443c01a7336-22fc8b703acmr100906045ad.25.1746869689223;
+        Sat, 10 May 2025 02:34:49 -0700 (PDT)
+Received: from KERNELXING-MC1.tencent.com ([114.253.36.190])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22fc7742264sm30273635ad.68.2025.05.10.02.34.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 10 May 2025 02:22:36 -0700 (PDT)
-From: Jonas Gorski <jonas.gorski@gmail.com>
-To: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>
+        Sat, 10 May 2025 02:34:48 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: tariqt@nvidia.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	willemdebruijn.kernel@gmail.com
 Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] net: dsa: b53: implement setting ageing time
-Date: Sat, 10 May 2025 11:22:11 +0200
-Message-ID: <20250510092211.276541-1-jonas.gorski@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next] net: mlx4: add SOF_TIMESTAMPING_TX_SOFTWARE flag when getting ts info
+Date: Sat, 10 May 2025 17:34:42 +0800
+Message-Id: <20250510093442.79711-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,129 +92,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-b53 supported switches support configuring ageing time between 1 and
-1,048,575 seconds, so add an appropriate setter.
+From: Jason Xing <kernelxing@tencent.com>
 
-This allows b53 to pass the FDB learning test for both vlan aware and
-vlan unaware bridges.
+As mlx4 has implemented skb_tx_timestamp() in mlx4_en_xmit(), the
+SOFTWARE flag is surely needed when users are trying to get timestamp
+information.
 
-Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
 ---
-With this and the standalone port isolation patch applied b53 passes all
-test from bridge_vlan_aware and bridge_vlan_unaware.
+ drivers/net/ethernet/mellanox/mlx4/en_ethtool.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Fun fact: According to the BCM53115 datasheet its default ageing time is
-300 ns. Luckily that's just a typo.
-
- drivers/net/dsa/b53/b53_common.c | 28 ++++++++++++++++++++++++++++
- drivers/net/dsa/b53/b53_priv.h   |  1 +
- drivers/net/dsa/b53/b53_regs.h   |  7 +++++++
- drivers/net/dsa/bcm_sf2.c        |  1 +
- 4 files changed, 37 insertions(+)
-
-diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
-index 9eb39cfa5fb2..2cff88bc7a1f 100644
---- a/drivers/net/dsa/b53/b53_common.c
-+++ b/drivers/net/dsa/b53/b53_common.c
-@@ -21,6 +21,7 @@
- #include <linux/export.h>
- #include <linux/gpio.h>
- #include <linux/kernel.h>
-+#include <linux/math.h>
- #include <linux/module.h>
- #include <linux/platform_data/b53.h>
- #include <linux/phy.h>
-@@ -1175,6 +1176,10 @@ static int b53_setup(struct dsa_switch *ds)
- 	 */
- 	ds->untag_vlan_aware_bridge_pvid = true;
+diff --git a/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c
+index cd17a3f4faf8..a68cd3f0304c 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c
++++ b/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c
+@@ -1897,6 +1897,7 @@ static int mlx4_en_get_ts_info(struct net_device *dev,
+ 	if (mdev->dev->caps.flags2 & MLX4_DEV_CAP_FLAG2_TS) {
+ 		info->so_timestamping |=
+ 			SOF_TIMESTAMPING_TX_HARDWARE |
++			SOF_TIMESTAMPING_TX_SOFTWARE |
+ 			SOF_TIMESTAMPING_RX_HARDWARE |
+ 			SOF_TIMESTAMPING_RAW_HARDWARE;
  
-+	/* Ageing time is set in seconds */
-+	ds->ageing_time_min = 1 * 1000;
-+	ds->ageing_time_max = AGE_TIME_MAX * 1000;
-+
- 	ret = b53_reset_switch(dev);
- 	if (ret) {
- 		dev_err(ds->dev, "failed to reset switch\n");
-@@ -2373,6 +2378,28 @@ static int b53_get_max_mtu(struct dsa_switch *ds, int port)
- 	return B53_MAX_MTU;
- }
- 
-+int b53_set_ageing_time(struct dsa_switch *ds, unsigned int msecs)
-+{
-+	struct b53_device *dev = ds->priv;
-+	u32 atc;
-+	int reg;
-+
-+	if (is63xx(dev))
-+		reg = B53_AGING_TIME_CONTROL_63XX;
-+	else
-+		reg = B53_AGING_TIME_CONTROL;
-+
-+	atc = DIV_ROUND_CLOSEST(msecs, 1000);
-+
-+	if (!is5325(dev) && !is5365(dev))
-+		atc |= AGE_CHANGE;
-+
-+	b53_write32(dev, B53_MGMT_PAGE, reg, atc);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(b53_set_ageing_time);
-+
- static const struct phylink_mac_ops b53_phylink_mac_ops = {
- 	.mac_select_pcs	= b53_phylink_mac_select_pcs,
- 	.mac_config	= b53_phylink_mac_config,
-@@ -2396,6 +2423,7 @@ static const struct dsa_switch_ops b53_switch_ops = {
- 	.port_disable		= b53_disable_port,
- 	.support_eee		= b53_support_eee,
- 	.set_mac_eee		= b53_set_mac_eee,
-+	.set_ageing_time	= b53_set_ageing_time,
- 	.port_bridge_join	= b53_br_join,
- 	.port_bridge_leave	= b53_br_leave,
- 	.port_pre_bridge_flags	= b53_br_flags_pre,
-diff --git a/drivers/net/dsa/b53/b53_priv.h b/drivers/net/dsa/b53/b53_priv.h
-index 2cf3e6a81e37..a5ef7071ba07 100644
---- a/drivers/net/dsa/b53/b53_priv.h
-+++ b/drivers/net/dsa/b53/b53_priv.h
-@@ -343,6 +343,7 @@ void b53_get_strings(struct dsa_switch *ds, int port, u32 stringset,
- void b53_get_ethtool_stats(struct dsa_switch *ds, int port, uint64_t *data);
- int b53_get_sset_count(struct dsa_switch *ds, int port, int sset);
- void b53_get_ethtool_phy_stats(struct dsa_switch *ds, int port, uint64_t *data);
-+int b53_set_ageing_time(struct dsa_switch *ds, unsigned int msecs);
- int b53_br_join(struct dsa_switch *ds, int port, struct dsa_bridge bridge,
- 		bool *tx_fwd_offload, struct netlink_ext_ack *extack);
- void b53_br_leave(struct dsa_switch *ds, int port, struct dsa_bridge bridge);
-diff --git a/drivers/net/dsa/b53/b53_regs.h b/drivers/net/dsa/b53/b53_regs.h
-index bfbcb66bef66..2f7ee0156952 100644
---- a/drivers/net/dsa/b53/b53_regs.h
-+++ b/drivers/net/dsa/b53/b53_regs.h
-@@ -217,6 +217,13 @@
- #define   BRCM_HDR_P5_EN		BIT(1) /* Enable tagging on port 5 */
- #define   BRCM_HDR_P7_EN		BIT(2) /* Enable tagging on port 7 */
- 
-+/* Aging Time control register (32 bit) */
-+#define B53_AGING_TIME_CONTROL		0x06
-+#define B53_AGING_TIME_CONTROL_63XX	0x08
-+#define  AGE_CHANGE			BIT(20)
-+#define  AGE_TIME_MASK			0x7ffff
-+#define  AGE_TIME_MAX			1048575
-+
- /* Mirror capture control register (16 bit) */
- #define B53_MIR_CAP_CTL			0x10
- #define  CAP_PORT_MASK			0xf
-diff --git a/drivers/net/dsa/bcm_sf2.c b/drivers/net/dsa/bcm_sf2.c
-index 454a8c7fd7ee..960685596093 100644
---- a/drivers/net/dsa/bcm_sf2.c
-+++ b/drivers/net/dsa/bcm_sf2.c
-@@ -1235,6 +1235,7 @@ static const struct dsa_switch_ops bcm_sf2_ops = {
- 	.port_disable		= bcm_sf2_port_disable,
- 	.support_eee		= b53_support_eee,
- 	.set_mac_eee		= b53_set_mac_eee,
-+	.set_ageing_time	= b53_set_ageing_time,
- 	.port_bridge_join	= b53_br_join,
- 	.port_bridge_leave	= b53_br_leave,
- 	.port_pre_bridge_flags	= b53_br_flags_pre,
 -- 
-2.43.0
+2.43.5
 
 
