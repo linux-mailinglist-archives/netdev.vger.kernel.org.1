@@ -1,361 +1,253 @@
-Return-Path: <netdev+bounces-189462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17362AB236D
-	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 12:27:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4D7FAB237E
+	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 13:00:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E71924C5470
-	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 10:27:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C634A03633
+	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 11:00:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2C52248F43;
-	Sat, 10 May 2025 10:24:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UqvLFBR4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 122A72550B4;
+	Sat, 10 May 2025 11:00:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D902472B9;
-	Sat, 10 May 2025 10:24:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340D21DF98D
+	for <netdev@vger.kernel.org>; Sat, 10 May 2025 11:00:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746872684; cv=none; b=Wg9SV3qDcMmQ4FDvCEeRmhaSZAQWvCy/ujfOUpcQXB/na/TlOmATotxmCpMDdOCYoN74pmKINjLPtK/lhLAON1DeJ9ZI3RzRvcPo2188w+CjjaCZzEzqGYqIQi0Fxa54QgUwvQ2sgaP42fN0ole5Aqfh7HufX+ezAaqv8MfAd3g=
+	t=1746874828; cv=none; b=jZoN9YckHHwXUEo4+Z5AD2BgtUDnqidxNzG7HQa1/hVRfqwh7OZmFF3EnwhUfIBGSQRNopnrNf8m9pkPx3iedIhu3S5Nx5G+7LnNYNUMdawcDb08Wl8h05yuoPZpd1DT7ABIL4aB7ynj6dLgfr//1+iZhTiNZzUv/gDQYBytNdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746872684; c=relaxed/simple;
-	bh=XGK02BPGGxgATahRNdlE3joMWQ12mGGe3VfQtMEUIt4=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lc003sgJzg6vUWN3iO3T48a7iOYgjTBu3Vy3tj+rfiM3Q0PAFdKk4JYDaS6+yWYIIJR8z48rhTuHXk+udA7IAzpW4o3PlMikq92wwC6cF5yTWhx690wZtgPY+YkYhtHTQqW68BHR6EXC3JWfDROsD0Qz/L4Qnnxh10MDm/vS0qg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UqvLFBR4; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3a1d8c0966fso1477017f8f.1;
-        Sat, 10 May 2025 03:24:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746872680; x=1747477480; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6P2IsG4NpDD2fbYW/iI8BvKjWMNl+8X1z9p0WNQNKVQ=;
-        b=UqvLFBR44q69QvUshXtqY0EWNrWI40GTUI7gEqHtOYl3ff5iyDcrEk6nfhc4EdqB6B
-         9RApPikKk2YZHYSOuPmsdJkAZJoaLHkqDXk/3erIMVPufTLnAdbAYKZsZVYq+7c8lwPc
-         Ixi6js73/ctFP3N1u/lmjEjXrph0Mjb9qe5GLz4m+ujGQjTTTb/hLZ4pKdhHaNXIrQz8
-         f9d4U1Xg1sPn7aGKTQFadS/+3i9MA2vFf1O6AHfQjGSz6JbA60PVkVhF0dKnBztTph5c
-         weRpr/FDOyucWeMZJQCeTa3cXqNs4rO+TIetgVtF4sGGWCLPGEST9TPAVrPRGJS+9d19
-         nAOw==
+	s=arc-20240116; t=1746874828; c=relaxed/simple;
+	bh=pXsl0jxifGZtwSvbaZNBoTIPsoR2HbMX7cQ25fwdh58=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=tyQ0PprhGrbKXiQ5unWPufOdV3RjzBhm8OhcC3sm9lOFImTSCzeXWfpFUNDTzjbHnzPxfR+s86KtzwMzxDPzARnihEFb3ynVsB3V+JPI1KD2RDUFHKTyLUoV9Rww7y3JDAm2pWXqiZbM+pPlXGrMr0bdagQBbsj1KsdB4s5vMVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3da779063a3so34171835ab.3
+        for <netdev@vger.kernel.org>; Sat, 10 May 2025 04:00:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746872680; x=1747477480;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6P2IsG4NpDD2fbYW/iI8BvKjWMNl+8X1z9p0WNQNKVQ=;
-        b=Mmby4iCB6KAxLUomO7uBHtnOflDTj7GspgiR/vEC5AnccGBWNcgp9Ex6E8a0LHcMZr
-         uQYrhD8T6CaG20Z1ZnThv++1ttQjp7wJunZlTMxL18bzmUvw+FDkyOts8eGktpol9kmI
-         pP8DkXy6mUaElbeqAHcrfhvELpMB+tmwcKagnTVFMDgdumxvlwhlFSBc/XnuyapK86TA
-         Uuaxepei7MgMuVfYA4Po1Omw0wrf/aiTvUoTOidc2g4jzg7/H7oYsOsJqieatFKJbteG
-         ruYYm+uW88Bvbqj3TuT9m/jAKi/wS2TSI62F/LqzuEjoHdh7ykCtBCtOnMCuu9P5dkW5
-         /ksg==
-X-Forwarded-Encrypted: i=1; AJvYcCVH3UISUTGID13oT7ZoH71ULzUqbNa9FTLPc+1CHpgwg26/gH3S1YHKq1sKMBzdvCMHDZw5HSfKxAt4GJAw@vger.kernel.org, AJvYcCWR2xB6cbidsKvZ4SaNH0JfE15GbSPH6G99sY70oXWK3eWN2bJlroTwwTcjYTSyMv6kzYeDILk5@vger.kernel.org, AJvYcCXjb9r5wJ65EOazkz3/WTR/oRZKh+QvD9bFmBwyM4l+qXOG2TZdOX/dLiAAX+/M/N7xfa6/r1Pzzw3D@vger.kernel.org
-X-Gm-Message-State: AOJu0YyN0ah/VGRBaarh9XeX/ejkwpQdv6ChGZLt4WkkIdXlpabYnot4
-	HmNwoQfTmSXUEi1wei3rHUO+j97YHxL0LqP31XeX3T8REsLvdkUH
-X-Gm-Gg: ASbGncsrar+ucizkmk/ePntMHtXZG1Tc8URcmdFtnGGuziFBNyXT5lUd188NJlL3Zbf
-	NXD6AKfXtoScn17SyxzfvYYII/kCHz+L8mnkuOJFz3sD4Rf51gyBltUFvpUTwTKIhv0puPt+in4
-	VZUVUw4Pu9Wj1myo4/z4BzL8vihzqII0APwXsjk893gx3q2w7EE3EMepkOdEBEvuI0nrORbVFNN
-	ExpoiZYOyHqWZrH/68cVTGiPI6FrcwHmcgqmrKHUalXiYrFmCIBgVu2+N7K8Lwu73T1T/J3joVo
-	gw2B5ESWfXsiscfVMV1ZtU12UrXtppL7Cd0YAkUVdjMGDk4CoveS3dNMYCXHgcOADkvVTi7tnF7
-	7F0UXnRQJYiAjRnxU5s8t
-X-Google-Smtp-Source: AGHT+IGaAcxFH348QW/5C7QPg9ecKePMXYXEMnalPhZCY4oj4yf2UPL3DkEaoRM26UOdLaNwKJl6Hw==
-X-Received: by 2002:a05:6000:1a8c:b0:3a1:f538:d9d5 with SMTP id ffacd0b85a97d-3a1f538da17mr6327826f8f.28.1746872680525;
-        Sat, 10 May 2025 03:24:40 -0700 (PDT)
-Received: from localhost.localdomain (93-34-88-225.ip49.fastwebnet.it. [93.34.88.225])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-442d67df639sm57981265e9.13.2025.05.10.03.24.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 10 May 2025 03:24:40 -0700 (PDT)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [net-next PATCH v3 11/11] net: airoha: add phylink support for GDM2/3/4
-Date: Sat, 10 May 2025 12:23:31 +0200
-Message-ID: <20250510102348.14134-12-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250510102348.14134-1-ansuelsmth@gmail.com>
-References: <20250510102348.14134-1-ansuelsmth@gmail.com>
+        d=1e100.net; s=20230601; t=1746874825; x=1747479625;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=aq+tEvR2BX2GebmvQp4oKnTx8XxElrOxtRuDyDfClMg=;
+        b=Z+WHhz/BmA/K2YIebDmag6hFXoCOQXgNda+xAEua3Tpab3fFmzC8ClzlOEvK1jezeC
+         iM0MgYixFisgKQeZWRtTbiE4hX/8lX9of5UFX5OB73oLgxowpCsjtaLSNM5KhAjufn7x
+         GaOQMLxQMARW9X7P5H7cbvhvogj9oHeUFjoo0PqPC9gG0m7U/ug2E0xN2XVpQ07Giyll
+         /yPtLnVSEipw+q+0Ftt5luvHspyZPy9aALFJeGj/3l6R8dxUiRuOBaSF4CzfMWB93Oa0
+         CrhxHuZCp8pURpLElYjWE4d1rImaKLPj/MkbWc8FHImFLINvYTpO2e9K2J7KZom18Dxh
+         DqHw==
+X-Forwarded-Encrypted: i=1; AJvYcCVTbgartrP8dxfn26ptYVXVklSZof+8ybFkKKTvqloBVP2bQ8LXnATNzemFZP1z+ZBbUrlazFc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyMCuMdvH4NEr9x3HbihrR9Dse+MquzLew2Nja6rBCJo3YEPcc/
+	kPtkUsNNXLZi4fhnBr8tRMKOwDy787WXOdhJL5prU8ABRnPg5+DOgkCP3aUUJWVDnPBkEGTvJTE
+	YaIR+ytAFKIsXowc/yMSwC6AsPVcijQ+LSZNumFlL0UaDLdZE1N6m9K8=
+X-Google-Smtp-Source: AGHT+IHeCXvwxGNn4cP9NeGk6LJV0a63u/0yHIUmGn1aoxB5Z4QtlTYTGnIVgQln3lh39ezlXGtJRwNWZh0b8EvkIIC+rVWpeCGE
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:1689:b0:3d0:4b3d:75ba with SMTP id
+ e9e14a558f8ab-3da7e1e1b24mr78918425ab.4.1746874825238; Sat, 10 May 2025
+ 04:00:25 -0700 (PDT)
+Date: Sat, 10 May 2025 04:00:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <681f31c9.050a0220.f2294.0007.GAE@google.com>
+Subject: [syzbot] [usb?] KMSAN: uninit-value in usbnet_probe (3)
+From: syzbot <syzbot+3b6b9ff7b80430020c7b@syzkaller.appspotmail.com>
+To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	netdev@vger.kernel.org, oneukum@suse.com, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Add phylink support for GDM2/3/4 port that require configuration of the
-PCS to make the external PHY or attached SFP cage work.
+Hello,
 
-These needs to be defined in the GDM port node using the pcs-handle
-property.
+syzbot found the following issue on:
 
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+HEAD commit:    02ddfb981de8 Merge tag 'scsi-fixes' of git://git.kernel.or..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=128254d4580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9dc42c34a3f5c357
+dashboard link: https://syzkaller.appspot.com/bug?extid=3b6b9ff7b80430020c7b
+compiler:       Debian clang version 20.1.2 (++20250402124445+58df0ef89dd6-1~exp1~20250402004600.97), Debian LLD 20.1.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=168254d4580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16811768580000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/5ca57f5a3f77/disk-02ddfb98.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/3f23cbc11e68/vmlinux-02ddfb98.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/73e63afac354/bzImage-02ddfb98.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+3b6b9ff7b80430020c7b@syzkaller.appspotmail.com
+
+aqc111 1-1:1.105 (unnamed net_device) (uninitialized): Failed to read(0x1) reg index 0x0001: -71
+aqc111 1-1:1.105 (unnamed net_device) (uninitialized): Failed to read(0x1) reg index 0x0001: -71
+aqc111 1-1:1.105 (unnamed net_device) (uninitialized): Failed to read(0x1) reg index 0x0001: -71
+=====================================================
+BUG: KMSAN: uninit-value in is_valid_ether_addr include/linux/etherdevice.h:208 [inline]
+BUG: KMSAN: uninit-value in usbnet_probe+0x2e57/0x4390 drivers/net/usb/usbnet.c:1830
+ is_valid_ether_addr include/linux/etherdevice.h:208 [inline]
+ usbnet_probe+0x2e57/0x4390 drivers/net/usb/usbnet.c:1830
+ usb_probe_interface+0xd01/0x1310 drivers/usb/core/driver.c:396
+ call_driver_probe drivers/base/dd.c:-1 [inline]
+ really_probe+0x4d1/0xd90 drivers/base/dd.c:658
+ __driver_probe_device+0x268/0x380 drivers/base/dd.c:800
+ driver_probe_device+0x70/0x8b0 drivers/base/dd.c:830
+ __device_attach_driver+0x4ee/0x950 drivers/base/dd.c:958
+ bus_for_each_drv+0x3e0/0x680 drivers/base/bus.c:462
+ __device_attach+0x3c8/0x5c0 drivers/base/dd.c:1030
+ device_initial_probe+0x33/0x40 drivers/base/dd.c:1079
+ bus_probe_device+0x3ba/0x5e0 drivers/base/bus.c:537
+ device_add+0x12a9/0x1c10 drivers/base/core.c:3666
+ usb_set_configuration+0x3493/0x3b70 drivers/usb/core/message.c:2210
+ usb_generic_driver_probe+0xfc/0x290 drivers/usb/core/generic.c:250
+ usb_probe_device+0x38a/0x690 drivers/usb/core/driver.c:291
+ call_driver_probe drivers/base/dd.c:-1 [inline]
+ really_probe+0x4d1/0xd90 drivers/base/dd.c:658
+ __driver_probe_device+0x268/0x380 drivers/base/dd.c:800
+ driver_probe_device+0x70/0x8b0 drivers/base/dd.c:830
+ __device_attach_driver+0x4ee/0x950 drivers/base/dd.c:958
+ bus_for_each_drv+0x3e0/0x680 drivers/base/bus.c:462
+ __device_attach+0x3c8/0x5c0 drivers/base/dd.c:1030
+ device_initial_probe+0x33/0x40 drivers/base/dd.c:1079
+ bus_probe_device+0x3ba/0x5e0 drivers/base/bus.c:537
+ device_add+0x12a9/0x1c10 drivers/base/core.c:3666
+ usb_new_device+0x104b/0x20c0 drivers/usb/core/hub.c:2663
+ hub_port_connect drivers/usb/core/hub.c:5531 [inline]
+ hub_port_connect_change drivers/usb/core/hub.c:5671 [inline]
+ port_event drivers/usb/core/hub.c:5831 [inline]
+ hub_event+0x5588/0x7580 drivers/usb/core/hub.c:5913
+ process_one_work kernel/workqueue.c:3238 [inline]
+ process_scheduled_works+0xb97/0x1d90 kernel/workqueue.c:3319
+ worker_thread+0xedf/0x1590 kernel/workqueue.c:3400
+ kthread+0xd59/0xf00 kernel/kthread.c:464
+ ret_from_fork+0x6e/0x90 arch/x86/kernel/process.c:153
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+Uninit was stored to memory at:
+ dev_addr_mod+0xb0/0x550 net/core/dev_addr_lists.c:582
+ __dev_addr_set include/linux/netdevice.h:4874 [inline]
+ eth_hw_addr_set include/linux/etherdevice.h:325 [inline]
+ aqc111_bind+0x35f/0x1150 drivers/net/usb/aqc111.c:717
+ usbnet_probe+0xbe6/0x4390 drivers/net/usb/usbnet.c:1772
+ usb_probe_interface+0xd01/0x1310 drivers/usb/core/driver.c:396
+ call_driver_probe drivers/base/dd.c:-1 [inline]
+ really_probe+0x4d1/0xd90 drivers/base/dd.c:658
+ __driver_probe_device+0x268/0x380 drivers/base/dd.c:800
+ driver_probe_device+0x70/0x8b0 drivers/base/dd.c:830
+ __device_attach_driver+0x4ee/0x950 drivers/base/dd.c:958
+ bus_for_each_drv+0x3e0/0x680 drivers/base/bus.c:462
+ __device_attach+0x3c8/0x5c0 drivers/base/dd.c:1030
+ device_initial_probe+0x33/0x40 drivers/base/dd.c:1079
+ bus_probe_device+0x3ba/0x5e0 drivers/base/bus.c:537
+ device_add+0x12a9/0x1c10 drivers/base/core.c:3666
+ usb_set_configuration+0x3493/0x3b70 drivers/usb/core/message.c:2210
+ usb_generic_driver_probe+0xfc/0x290 drivers/usb/core/generic.c:250
+ usb_probe_device+0x38a/0x690 drivers/usb/core/driver.c:291
+ call_driver_probe drivers/base/dd.c:-1 [inline]
+ really_probe+0x4d1/0xd90 drivers/base/dd.c:658
+ __driver_probe_device+0x268/0x380 drivers/base/dd.c:800
+ driver_probe_device+0x70/0x8b0 drivers/base/dd.c:830
+ __device_attach_driver+0x4ee/0x950 drivers/base/dd.c:958
+ bus_for_each_drv+0x3e0/0x680 drivers/base/bus.c:462
+ __device_attach+0x3c8/0x5c0 drivers/base/dd.c:1030
+ device_initial_probe+0x33/0x40 drivers/base/dd.c:1079
+ bus_probe_device+0x3ba/0x5e0 drivers/base/bus.c:537
+ device_add+0x12a9/0x1c10 drivers/base/core.c:3666
+ usb_new_device+0x104b/0x20c0 drivers/usb/core/hub.c:2663
+ hub_port_connect drivers/usb/core/hub.c:5531 [inline]
+ hub_port_connect_change drivers/usb/core/hub.c:5671 [inline]
+ port_event drivers/usb/core/hub.c:5831 [inline]
+ hub_event+0x5588/0x7580 drivers/usb/core/hub.c:5913
+ process_one_work kernel/workqueue.c:3238 [inline]
+ process_scheduled_works+0xb97/0x1d90 kernel/workqueue.c:3319
+ worker_thread+0xedf/0x1590 kernel/workqueue.c:3400
+ kthread+0xd59/0xf00 kernel/kthread.c:464
+ ret_from_fork+0x6e/0x90 arch/x86/kernel/process.c:153
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+Uninit was stored to memory at:
+ ether_addr_copy include/linux/etherdevice.h:305 [inline]
+ aqc111_read_perm_mac drivers/net/usb/aqc111.c:663 [inline]
+ aqc111_bind+0x794/0x1150 drivers/net/usb/aqc111.c:713
+ usbnet_probe+0xbe6/0x4390 drivers/net/usb/usbnet.c:1772
+ usb_probe_interface+0xd01/0x1310 drivers/usb/core/driver.c:396
+ call_driver_probe drivers/base/dd.c:-1 [inline]
+ really_probe+0x4d1/0xd90 drivers/base/dd.c:658
+ __driver_probe_device+0x268/0x380 drivers/base/dd.c:800
+ driver_probe_device+0x70/0x8b0 drivers/base/dd.c:830
+ __device_attach_driver+0x4ee/0x950 drivers/base/dd.c:958
+ bus_for_each_drv+0x3e0/0x680 drivers/base/bus.c:462
+ __device_attach+0x3c8/0x5c0 drivers/base/dd.c:1030
+ device_initial_probe+0x33/0x40 drivers/base/dd.c:1079
+ bus_probe_device+0x3ba/0x5e0 drivers/base/bus.c:537
+ device_add+0x12a9/0x1c10 drivers/base/core.c:3666
+ usb_set_configuration+0x3493/0x3b70 drivers/usb/core/message.c:2210
+ usb_generic_driver_probe+0xfc/0x290 drivers/usb/core/generic.c:250
+ usb_probe_device+0x38a/0x690 drivers/usb/core/driver.c:291
+ call_driver_probe drivers/base/dd.c:-1 [inline]
+ really_probe+0x4d1/0xd90 drivers/base/dd.c:658
+ __driver_probe_device+0x268/0x380 drivers/base/dd.c:800
+ driver_probe_device+0x70/0x8b0 drivers/base/dd.c:830
+ __device_attach_driver+0x4ee/0x950 drivers/base/dd.c:958
+ bus_for_each_drv+0x3e0/0x680 drivers/base/bus.c:462
+ __device_attach+0x3c8/0x5c0 drivers/base/dd.c:1030
+ device_initial_probe+0x33/0x40 drivers/base/dd.c:1079
+ bus_probe_device+0x3ba/0x5e0 drivers/base/bus.c:537
+ device_add+0x12a9/0x1c10 drivers/base/core.c:3666
+ usb_new_device+0x104b/0x20c0 drivers/usb/core/hub.c:2663
+ hub_port_connect drivers/usb/core/hub.c:5531 [inline]
+ hub_port_connect_change drivers/usb/core/hub.c:5671 [inline]
+ port_event drivers/usb/core/hub.c:5831 [inline]
+ hub_event+0x5588/0x7580 drivers/usb/core/hub.c:5913
+ process_one_work kernel/workqueue.c:3238 [inline]
+ process_scheduled_works+0xb97/0x1d90 kernel/workqueue.c:3319
+ worker_thread+0xedf/0x1590 kernel/workqueue.c:3400
+ kthread+0xd59/0xf00 kernel/kthread.c:464
+ ret_from_fork+0x6e/0x90 arch/x86/kernel/process.c:153
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+Local variable buf.i created at:
+ aqc111_read_perm_mac drivers/net/usb/aqc111.c:656 [inline]
+ aqc111_bind+0x221/0x1150 drivers/net/usb/aqc111.c:713
+ usbnet_probe+0xbe6/0x4390 drivers/net/usb/usbnet.c:1772
+
+CPU: 0 UID: 0 PID: 1877 Comm: kworker/0:2 Not tainted 6.15.0-rc3-syzkaller-00094-g02ddfb981de8 #0 PREEMPT(undef) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/29/2025
+Workqueue: usb_hub_wq hub_event
+=====================================================
+
+
 ---
- drivers/net/ethernet/airoha/airoha_eth.c  | 138 ++++++++++++++++++++++
- drivers/net/ethernet/airoha/airoha_eth.h  |   3 +
- drivers/net/ethernet/airoha/airoha_regs.h |  12 ++
- 3 files changed, 153 insertions(+)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 16c7896f931f..17521be820b5 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -7,6 +7,7 @@
- #include <linux/of_net.h>
- #include <linux/platform_device.h>
- #include <linux/tcp.h>
-+#include <linux/pcs/pcs.h>
- #include <linux/u64_stats_sync.h>
- #include <net/dst_metadata.h>
- #include <net/page_pool/helpers.h>
-@@ -79,6 +80,11 @@ static bool airhoa_is_lan_gdm_port(struct airoha_gdm_port *port)
- 	return port->id == 1;
- }
- 
-+static bool airhoa_is_phy_external(struct airoha_gdm_port *port)
-+{
-+	return port->id != 1;
-+}
-+
- static void airoha_set_macaddr(struct airoha_gdm_port *port, const u8 *addr)
- {
- 	struct airoha_eth *eth = port->qdma->eth;
-@@ -1613,6 +1619,17 @@ static int airoha_dev_open(struct net_device *dev)
- 	struct airoha_gdm_port *port = netdev_priv(dev);
- 	struct airoha_qdma *qdma = port->qdma;
- 
-+	if (airhoa_is_phy_external(port)) {
-+		err = phylink_of_phy_connect(port->phylink, dev->dev.of_node, 0);
-+		if (err) {
-+			netdev_err(dev, "%s: could not attach PHY: %d\n", __func__,
-+				   err);
-+			return err;
-+		}
-+
-+		phylink_start(port->phylink);
-+	}
-+
- 	netif_tx_start_all_queues(dev);
- 	err = airoha_set_vip_for_gdm_port(port, true);
- 	if (err)
-@@ -1665,6 +1682,11 @@ static int airoha_dev_stop(struct net_device *dev)
- 		}
- 	}
- 
-+	if (airhoa_is_phy_external(port)) {
-+		phylink_stop(port->phylink);
-+		phylink_disconnect_phy(port->phylink);
-+	}
-+
- 	return 0;
- }
- 
-@@ -2795,6 +2817,110 @@ bool airoha_is_valid_gdm_port(struct airoha_eth *eth,
- 	return false;
- }
- 
-+static void airoha_mac_link_up(struct phylink_config *config, struct phy_device *phy,
-+			       unsigned int mode, phy_interface_t interface,
-+			       int speed, int duplex, bool tx_pause, bool rx_pause)
-+{
-+	struct airoha_gdm_port *port = container_of(config, struct airoha_gdm_port,
-+						    phylink_config);
-+	struct airoha_qdma *qdma = port->qdma;
-+	struct airoha_eth *eth = qdma->eth;
-+	u32 frag_size_tx, frag_size_rx;
-+
-+	switch (speed) {
-+	case SPEED_10000:
-+	case SPEED_5000:
-+		frag_size_tx = 8;
-+		frag_size_rx = 8;
-+		break;
-+	case SPEED_2500:
-+		frag_size_tx = 2;
-+		frag_size_rx = 1;
-+		break;
-+	default:
-+		frag_size_tx = 1;
-+		frag_size_rx = 0;
-+	}
-+
-+	/* Configure TX/RX frag based on speed */
-+	if (port->id == 4) {
-+		airoha_fe_rmw(eth, REG_GDMA4_TMBI_FRAG, GDMA4_SGMII0_TX_FRAG_SIZE,
-+			      FIELD_PREP(GDMA4_SGMII0_TX_FRAG_SIZE, frag_size_tx));
-+
-+		airoha_fe_rmw(eth, REG_GDMA4_RMBI_FRAG, GDMA4_SGMII0_RX_FRAG_SIZE,
-+			      FIELD_PREP(GDMA4_SGMII0_RX_FRAG_SIZE, frag_size_rx));
-+	}
-+}
-+
-+static const struct phylink_mac_ops airoha_phylink_ops = {
-+	.mac_link_up = airoha_mac_link_up,
-+};
-+
-+static int airoha_setup_phylink(struct net_device *dev)
-+{
-+	struct airoha_gdm_port *port = netdev_priv(dev);
-+	struct device_node *np = dev->dev.of_node;
-+	struct phylink_pcs **available_pcs;
-+	phy_interface_t phy_mode;
-+	struct phylink *phylink;
-+	unsigned int num_pcs;
-+	int err;
-+
-+	err = of_get_phy_mode(np, &phy_mode);
-+	if (err) {
-+		dev_err(&dev->dev, "incorrect phy-mode\n");
-+		return err;
-+	}
-+
-+	port->phylink_config.dev = &dev->dev;
-+	port->phylink_config.type = PHYLINK_NETDEV;
-+	port->phylink_config.mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
-+						MAC_10 | MAC_100 | MAC_1000 | MAC_2500FD |
-+						MAC_5000FD | MAC_10000FD;
-+
-+	err = fwnode_phylink_pcs_parse(dev_fwnode(&dev->dev), NULL, &num_pcs);
-+	if (err)
-+		return err;
-+
-+	available_pcs = kcalloc(num_pcs, sizeof(*available_pcs), GFP_KERNEL);
-+	if (!available_pcs)
-+		return -ENOMEM;
-+
-+	err = fwnode_phylink_pcs_parse(dev_fwnode(&dev->dev), available_pcs,
-+				       &num_pcs);
-+	if (err)
-+		goto out;
-+
-+	port->phylink_config.available_pcs = available_pcs;
-+	port->phylink_config.num_available_pcs = num_pcs;
-+
-+	__set_bit(PHY_INTERFACE_MODE_SGMII,
-+		  port->phylink_config.supported_interfaces);
-+	__set_bit(PHY_INTERFACE_MODE_1000BASEX,
-+		  port->phylink_config.supported_interfaces);
-+	__set_bit(PHY_INTERFACE_MODE_2500BASEX,
-+		  port->phylink_config.supported_interfaces);
-+	__set_bit(PHY_INTERFACE_MODE_USXGMII,
-+		  port->phylink_config.supported_interfaces);
-+
-+	phy_interface_copy(port->phylink_config.pcs_interfaces,
-+			   port->phylink_config.supported_interfaces);
-+
-+	phylink = phylink_create(&port->phylink_config,
-+				 of_fwnode_handle(np),
-+				 phy_mode, &airoha_phylink_ops);
-+	if (IS_ERR(phylink)) {
-+		err = PTR_ERR(phylink);
-+		goto out;
-+	}
-+
-+	port->phylink = phylink;
-+out:
-+	kfree(available_pcs);
-+
-+	return err;
-+}
-+
- static int airoha_alloc_gdm_port(struct airoha_eth *eth,
- 				 struct device_node *np, int index)
- {
-@@ -2873,6 +2999,12 @@ static int airoha_alloc_gdm_port(struct airoha_eth *eth,
- 	if (err)
- 		return err;
- 
-+	if (airhoa_is_phy_external(port)) {
-+		err = airoha_setup_phylink(dev);
-+		if (err)
-+			return err;
-+	}
-+
- 	return register_netdev(dev);
- }
- 
-@@ -2967,6 +3099,9 @@ static int airoha_probe(struct platform_device *pdev)
- 		struct airoha_gdm_port *port = eth->ports[i];
- 
- 		if (port && port->dev->reg_state == NETREG_REGISTERED) {
-+			if (airhoa_is_phy_external(port))
-+				phylink_destroy(port->phylink);
-+
- 			unregister_netdev(port->dev);
- 			airoha_metadata_dst_free(port);
- 		}
-@@ -2994,6 +3129,9 @@ static void airoha_remove(struct platform_device *pdev)
- 			continue;
- 
- 		airoha_dev_stop(port->dev);
-+		if (airhoa_is_phy_external(port))
-+			phylink_destroy(port->phylink);
-+
- 		unregister_netdev(port->dev);
- 		airoha_metadata_dst_free(port);
- 	}
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
-index 53f39083a8b0..73a500474076 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.h
-+++ b/drivers/net/ethernet/airoha/airoha_eth.h
-@@ -498,6 +498,9 @@ struct airoha_gdm_port {
- 	struct net_device *dev;
- 	int id;
- 
-+	struct phylink *phylink;
-+	struct phylink_config phylink_config;
-+
- 	struct airoha_hw_stats stats;
- 
- 	DECLARE_BITMAP(qos_sq_bmap, AIROHA_NUM_QOS_CHANNELS);
-diff --git a/drivers/net/ethernet/airoha/airoha_regs.h b/drivers/net/ethernet/airoha/airoha_regs.h
-index d931530fc96f..71c63108f0a8 100644
---- a/drivers/net/ethernet/airoha/airoha_regs.h
-+++ b/drivers/net/ethernet/airoha/airoha_regs.h
-@@ -357,6 +357,18 @@
- #define IP_FRAGMENT_PORT_MASK		GENMASK(8, 5)
- #define IP_FRAGMENT_NBQ_MASK		GENMASK(4, 0)
- 
-+#define REG_GDMA4_TMBI_FRAG		0x2028
-+#define GDMA4_SGMII1_TX_WEIGHT		GENMASK(31, 26)
-+#define GDMA4_SGMII1_TX_FRAG_SIZE	GENMASK(25, 16)
-+#define GDMA4_SGMII0_TX_WEIGHT		GENMASK(15, 10)
-+#define GDMA4_SGMII0_TX_FRAG_SIZE	GENMASK(9, 0)
-+
-+#define REG_GDMA4_RMBI_FRAG		0x202c
-+#define GDMA4_SGMII1_RX_WEIGHT		GENMASK(31, 26)
-+#define GDMA4_SGMII1_RX_FRAG_SIZE	GENMASK(25, 16)
-+#define GDMA4_SGMII0_RX_WEIGHT		GENMASK(15, 10)
-+#define GDMA4_SGMII0_RX_FRAG_SIZE	GENMASK(9, 0)
-+
- #define REG_MC_VLAN_EN			0x2100
- #define MC_VLAN_EN_MASK			BIT(0)
- 
--- 
-2.48.1
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
