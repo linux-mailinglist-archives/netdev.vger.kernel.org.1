@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-189438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57DC7AB2130
-	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 06:47:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CE5EAB2134
+	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 06:48:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE1524C4909
-	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 04:47:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17719A063F4
+	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 04:48:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 091281ADC98;
-	Sat, 10 May 2025 04:47:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36A411CBEB9;
+	Sat, 10 May 2025 04:48:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
+Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ED69C2ED
-	for <netdev@vger.kernel.org>; Sat, 10 May 2025 04:47:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A7F21C5D7B
+	for <netdev@vger.kernel.org>; Sat, 10 May 2025 04:48:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746852475; cv=none; b=lvuYmflCROR0WjmM1NSnwTrSGgL4UpHQpf6gSc3RZbuzsmxrPgjX6/QNmD3Ocixf+rU0bTSFw+OkiAWGYgpSyZOZkrnwQUMb1Dl+F8MbZTQQ7zhVKffY608nNoyJxlVrtk7R+5BnweMcgdI+m2knU0XHi5BI3lpx9JPK2BLalpw=
+	t=1746852507; cv=none; b=SJyLjnEUZiKWzteXCw4ivWg3sBOhA4RtDC/14hXQi4DAuR+amtfF9iS0Hma99aa3IpNexiCq3ORT9wDI9wIFnq7qJhUELZIiJrry2E/fojXcNHLknF6WVilVfG/GP3s8HaFyo3L8qMVK8G2LP7gOg2SKIn2jq50+l8Q8KkkM3OE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746852475; c=relaxed/simple;
-	bh=lPC9H8lVfR+LSsdVWQGqDRFZlJVUsdjGvwQzHN0H4hI=;
+	s=arc-20240116; t=1746852507; c=relaxed/simple;
+	bh=54um06UYwdjS1cGkgUJzwQjSSiNDtqmLRM+75g4bxUA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=d2Tw+tMfNKXNymhBCqFiFnXasz0L4pe7HCvcjcIfDpLGDoXjhUlMAMhX62f8yJR64qPctaxLfTkSInBcltfltFkHQ94EsWRbuCt/rT9TTYMuBH6LqlR3mgSUCo1i8kQN9fX9D/ZbZOHNWDiawh79qncpcu7K/DiDM8FA+cPbW8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=54.92.39.34
+	 MIME-Version; b=sE8mCt9AGlsO+HJVAt/Yk6LDfia54DT/cK2y3iQU7WPjR+a9EkWG22KsDrLUxqg3i9hq1LQBFgZ84pz6uhrr3B3mn8wgOLI0zMqttIvGSXqHQ8YRQFSp/Y6gO3doVjS9Wh6w4zyaKsX/w288jsdARd2boN3YfG5O9po2DCigU5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=54.206.34.216
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
-X-QQ-mid: esmtpgz12t1746852327t265f59c2
-X-QQ-Originating-IP: mlH4gltEseryWGZ634GgyMGUcWsgmcdv4mRT57kgfV8=
+X-QQ-mid: esmtpgz12t1746852331tffc1f23b
+X-QQ-Originating-IP: 4+gpm76m/G0Fv/YQxwOMRFdJ+Ya4cvAb6GmOGZKrxFU=
 Received: from macbook-dev.xiaojukeji.com ( [111.201.145.100])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Sat, 10 May 2025 12:45:24 +0800 (CST)
+	id ; Sat, 10 May 2025 12:45:28 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 3237815649446040878
+X-BIZMAIL-ID: 15960051894760270678
 EX-QQ-RecipientCnt: 10
 From: tonghao@bamaicloud.com
 To: netdev@vger.kernel.org
@@ -49,9 +49,9 @@ Cc: Tonghao Zhang <tonghao@bamaicloud.com>,
 	Simon Horman <horms@kernel.org>,
 	Jonathan Corbet <corbet@lwn.net>,
 	Andrew Lunn <andrew+netdev@lunn.ch>
-Subject: [PATCH net-next 2/4] net: bonding: add broadcast_neighbor netlink option
-Date: Sat, 10 May 2025 12:45:02 +0800
-Message-Id: <20250510044504.52618-3-tonghao@bamaicloud.com>
+Subject: [PATCH net-next 3/4] net: bonding: send peer notify when failure recovery
+Date: Sat, 10 May 2025 12:45:03 +0800
+Message-Id: <20250510044504.52618-4-tonghao@bamaicloud.com>
 X-Mailer: git-send-email 2.30.1 (Apple Git-130)
 In-Reply-To: <20250510044504.52618-1-tonghao@bamaicloud.com>
 References: <20250510044504.52618-1-tonghao@bamaicloud.com>
@@ -64,29 +64,31 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: esmtpgz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: N0Y11OQjfoyDNsAGSSlWBRYiaOKvRlOLjFc0/O2ixlJlVWkXvM9W26Jf
-	Z5QGwUYhJKKm2xYud/xpdmysROkHTulRq3XRZ8FLRg/M6faGSHF7cF43QfSTR7gkRjq8S8z
-	FoaWmIYbqwarTZDL4wy7luE5ojrLr8STvgngOOSDFCH1MgROSdWaWkl7YGstRmPrXXAfNiV
-	leWYnO04pYlZUjZgs8cRNr8aahx8m4pwjeyvtiUF7zmjT2aStmNai/jzR36N4XEwDFykbkS
-	WedKkajS9iGZ0A5CAAsSuJSEdXUO8nnjLytNHeK+jTp1kdgU6lVbUHb1PCcyQAKSkTcxPs0
-	J6v0uweoC5UfcbJ/bTKcaxlf7ErHLYHm1PphGnOynP8gVDfksskrziKbVTEfmY9rhyJrT1r
-	AyAxstPo4UHhmw0wVsavuF7K2AR7v1sclKmC5yOFsISOr9xwdAxSn8nGxRRvuv1EME+Fthj
-	HAR6GRtUnTS4Lf+klkx/r3zYMzhbe4FnNM2eOizodpZ/E/+4JOUA+gWt0g76GThvtCUnuN1
-	hrWB5aAl+6utewbh1Ao7wW2DErNlcSOcmPGviCN3YJm80cZ1ekqz6WJU/b7qhmM3GdChwDx
-	Ez/Grk7skDs4k51yDd79w0jGWrw+fBbOADZTNDkjjX3HFSIMeugLFnOkCCKAZsVNIW1EFfy
-	4mkd70lDcIaDnOpzOXoMvCvFRHKQBMbdH7e0IXlw/yuvWGDvTBuasHp9gdNYbadaEVEtdax
-	2sGaaz6+vpxb4Vg2ivyC54MP1QID4lAlSJXE7m2+7eEjLayvotYhJAfgorxraetZ/hBb/gL
-	HPJkkszQUfyWdvdIwZ3aU19PV/u6KF+mVbsieGApZhLEDUEjcu/aozv8DLcdeQh9yur9cny
-	4XIO1S2Oow5J6nQVgsoVGvS3WkGwvyAFnU3M7BAyWrYrflL1wSxJVfp+nvhheDROHs04zes
-	IdZEK81vmNKMMfmTFvjI5SGOp0FxqzFBt4IILa8v1FdN2mO6STWvmHxQhviq3QNyoaJm/ae
-	7cLV4Shw==
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
+X-QQ-XMAILINFO: MowohnWo6wX75KBabTSylOmOLDNLEHTSyPaS+oHaE95xfSUNVngYj6DW
+	csDUgJgi423o2Zhlzrt+UBSDcvSR5WVOE6+JbVsvFGPPwYylvShg0XPeyi8GK41gKNeRycp
+	ZQD1F7B1SPhAScdwqJ3DW80JeWKLrB3AHd23s6OpazZh9SliClbU1SY8G5JWBrIMi3H+QjO
+	ssMUtWeQI4eiWafxsPHDqgNLlELv4AJI9D57D56HJCqzGrgm54YopesFuWvgAm8LTNam3/U
+	wRF7FXcxdAH8ca8jw18ISRNL8bU28HBk2OAzxJoO5g7HJ/xjjB8san6As6K4DdKgUSyxP3r
+	/f9EJ8e2aFoSYN+59n0DWHrVQqmBh11Jd6yf0U81yIO6J8kuXaEptnpsEW+P+gA2cs8imC8
+	0t9zri9+AS6cQrnRkl93rfSDG3Jbsdg3tmU7yNn4rspp9EQ7BobZVgFjeyN/5m3edah5/Rf
+	6pIQs2D4U6TaSugyTCuBsC/aeDd43fGdICdqyBlnC+cPoKpPmXeGWUAmtKkoj23K42MN/Ek
+	YJ75hA5NUUabVbe0Fg83qQEf83Ct+1Z9DDPh+9TIoSgC004GUMF2F+8CczB//djzOrAc4Gh
+	3FXHwRZ3/Ikun7zqRRbqNi7+IPhGwrQ2UeKfS4wJgVsWTgbulzd4Ww3HDQlOudgT7rFgrjE
+	JZQogMN4IGmCV9vpFXIvTUS2I9GL47zWMPfCL8h7azqd8layPWpWoErRyx0vumQsTJj/2iQ
+	2EQID8F0Uiw0TfBCYKAbRh+At9iNRxjFsdhW0N6cLpkXOEGh0CeamRVJa4YzbiqmRcxhAu5
+	kYRfr8dnIlcaHIQyIlDwrXZJEsqb5zel6qowQhGgB2bq1xgK9JMQ2H//USfxy0xpSZr9pEk
+	0KBMsqd4OL6ZIIG2dXrOo58l7pQKho+WkklFCvqTAGwIOD9yl2hAllMLm7mTXM5tcGupelH
+	WPAp0hs36CrRCn+2ZE0/eJE/p391e6M25fhCmzvM4rOQn2FY2KGVET+Om
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
 X-QQ-RECHKSPAM: 0
 
 From: Tonghao Zhang <tonghao@bamaicloud.com>
 
-User can config or display the bonding broadcast_neighbor option via
-iproute2/netlink.
+While hardware failures in NICs, optical transceivers, or switches
+are unavoidable, rapid system recovery can be achieved post-restoration.
+For example, triggering immediate ARP/ND packet transmission upon
+LACP failure recovery enables the system to swiftly resume normal
+operations, thereby minimizing service downtime.
 
 Cc: Jay Vosburgh <jv@jvosburgh.net>
 Cc: "David S. Miller" <davem@davemloft.net>
@@ -98,70 +100,41 @@ Cc: Jonathan Corbet <corbet@lwn.net>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>
 Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
 ---
- drivers/net/bonding/bond_netlink.c | 16 ++++++++++++++++
- include/uapi/linux/if_link.h       |  1 +
- 2 files changed, 17 insertions(+)
+ drivers/net/bonding/bond_3ad.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/drivers/net/bonding/bond_netlink.c b/drivers/net/bonding/bond_netlink.c
-index ac5e402c34bc..57fff2421f1b 100644
---- a/drivers/net/bonding/bond_netlink.c
-+++ b/drivers/net/bonding/bond_netlink.c
-@@ -124,6 +124,7 @@ static const struct nla_policy bond_policy[IFLA_BOND_MAX + 1] = {
- 	[IFLA_BOND_MISSED_MAX]		= { .type = NLA_U8 },
- 	[IFLA_BOND_NS_IP6_TARGET]	= { .type = NLA_NESTED },
- 	[IFLA_BOND_COUPLED_CONTROL]	= { .type = NLA_U8 },
-+	[IFLA_BOND_BROADCAST_NEIGH]	= { .type = NLA_U8 },
- };
- 
- static const struct nla_policy bond_slave_policy[IFLA_BOND_SLAVE_MAX + 1] = {
-@@ -561,6 +562,16 @@ static int bond_changelink(struct net_device *bond_dev, struct nlattr *tb[],
- 			return err;
- 	}
- 
-+	if (data[IFLA_BOND_BROADCAST_NEIGH]) {
-+		int broadcast_neigh = nla_get_u8(data[IFLA_BOND_BROADCAST_NEIGH]);
-+
-+		bond_opt_initval(&newval, broadcast_neigh);
-+		err = __bond_opt_set(bond, BOND_OPT_BROADCAST_NEIGH, &newval,
-+				     data[IFLA_BOND_BROADCAST_NEIGH], extack);
-+		if (err)
-+			return err;
-+	}
-+
+diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
+index c6807e473ab7..6577ce54d115 100644
+--- a/drivers/net/bonding/bond_3ad.c
++++ b/drivers/net/bonding/bond_3ad.c
+@@ -982,6 +982,19 @@ static int ad_marker_send(struct port *port, struct bond_marker *marker)
  	return 0;
  }
  
-@@ -630,6 +641,7 @@ static size_t bond_get_size(const struct net_device *bond_dev)
- 		nla_total_size(sizeof(struct nlattr)) +
- 		nla_total_size(sizeof(struct in6_addr)) * BOND_MAX_NS_TARGETS +
- 		nla_total_size(sizeof(u8)) +	/* IFLA_BOND_COUPLED_CONTROL */
-+		nla_total_size(sizeof(u8)) +	/* IFLA_BOND_BROADCAST_NEIGH */
- 		0;
- }
- 
-@@ -793,6 +805,10 @@ static int bond_fill_info(struct sk_buff *skb,
- 		       bond->params.coupled_control))
- 		goto nla_put_failure;
- 
-+	if (nla_put_u8(skb, IFLA_BOND_BROADCAST_NEIGH,
-+		       bond->params.broadcast_neighbor))
-+		goto nla_put_failure;
++static void ad_peer_notif_send(struct port *port)
++{
++	if (!port->aggregator->is_active)
++		return;
 +
- 	if (BOND_MODE(bond) == BOND_MODE_8023AD) {
- 		struct ad_info info;
- 
-diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-index 3ad2d5d98034..53b2f6ebda8b 100644
---- a/include/uapi/linux/if_link.h
-+++ b/include/uapi/linux/if_link.h
-@@ -1534,6 +1534,7 @@ enum {
- 	IFLA_BOND_MISSED_MAX,
- 	IFLA_BOND_NS_IP6_TARGET,
- 	IFLA_BOND_COUPLED_CONTROL,
-+	IFLA_BOND_BROADCAST_NEIGH,
- 	__IFLA_BOND_MAX,
- };
- 
++	struct bonding *bond = port->slave->bond;
++	if (bond->params.broadcast_neighbor && rtnl_trylock()) {
++		bond->send_peer_notif = bond->params.num_peer_notif *
++			max(1, bond->params.peer_notif_delay);
++		rtnl_unlock();
++	}
++}
++
+ /**
+  * ad_mux_machine - handle a port's mux state machine
+  * @port: the port we're looking at
+@@ -1164,6 +1177,7 @@ static void ad_mux_machine(struct port *port, bool *update_slave_arr)
+ 			port->actor_oper_port_state |= LACP_STATE_COLLECTING;
+ 			port->actor_oper_port_state |= LACP_STATE_DISTRIBUTING;
+ 			port->actor_oper_port_state |= LACP_STATE_SYNCHRONIZATION;
++			ad_peer_notif_send(port);
+ 			ad_enable_collecting_distributing(port,
+ 							  update_slave_arr);
+ 			port->ntt = true;
 -- 
 2.34.1
 
