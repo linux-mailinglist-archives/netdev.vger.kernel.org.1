@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-189417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5198DAB207C
-	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 02:30:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 966F9AB208E
+	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 02:39:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BF8FA0318E
-	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 00:29:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 536673A722C
+	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 00:39:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6B7F5103F;
-	Sat, 10 May 2025 00:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD56D1C5D4B;
+	Sat, 10 May 2025 00:39:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iZ0s0aeR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A7+jNr0H"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 829524642D
-	for <netdev@vger.kernel.org>; Sat, 10 May 2025 00:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACFC51A2C11;
+	Sat, 10 May 2025 00:39:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746836999; cv=none; b=lLig2z21AiuWFJbK7zZSXWz+84xfowSx8A4p+QPh00ZmzU32WbOO4VSH/rWCSAqd1gywoU3/a68vg1aE3xvGgwNtblr/ae/0TPFeH2CCAF5AxbYjQcbEEYp30sUsC9m3KnARXGBkTjkIDfPG/PqLFFhYJ1yE00cW4BWbB1j7SQM=
+	t=1746837593; cv=none; b=WUzKP5MKxTM6OihldzT5pT6qPgv+SkuiWc++844Qz/yF+Jhf/DBOZ5rSzADuxkK+vU74pIT4GvVEWDXEEYtBPuWidqg2UQTVcuSl9XlveDPNeBCxgVEhfnq2baPOBXWAXnXsRXUOcYxN4BsUn5O+OzNTvF9af61SXksdSeAbzHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746836999; c=relaxed/simple;
-	bh=c7XqTLSqPZNa0TlLOhnuTYHLUQd3oJKRhOPZCIqcXVE=;
+	s=arc-20240116; t=1746837593; c=relaxed/simple;
+	bh=hU5x5nV621PCXb98dd7QNAbrE73+PaQ5xx0FQ9+8knM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qOjnU4BupQNSU+tWg5IeTtVNa0QYaE/DUcOJeCNSBq6xsRXh2rDPAQ8IahNutLrFVfvWUGoKyGVPheMnGXF8S2aTOjn/N0lkN0rC+qUTTZ9AI3rHi9MsfgMFgcxAPHMKawUolaSg49VOrcp5cLHG+WdvhXAbAvLdMSqEIBUENwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iZ0s0aeR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5730CC4CEE4;
-	Sat, 10 May 2025 00:29:59 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Ux586yeg6S6YbWY2ZJnTytPj3UPHiDbjLhM3yjwjNdwOH2edihST2yigNbOp4Ajo/O/1mvxMR3UhikDNSrExPKeA8mCFIOMp9jk4OpKz8tQ5tOAbnUU4fuOOSA4hhNQjX4XQQ0FT8VY7SDEyLNYX4R9xCu0NlwIH10FQNNBoJYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A7+jNr0H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DEDBC4CEE4;
+	Sat, 10 May 2025 00:39:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746836999;
-	bh=c7XqTLSqPZNa0TlLOhnuTYHLUQd3oJKRhOPZCIqcXVE=;
+	s=k20201202; t=1746837593;
+	bh=hU5x5nV621PCXb98dd7QNAbrE73+PaQ5xx0FQ9+8knM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=iZ0s0aeRaLN/dnLFSq1Rk17l98qP8tXVBULcYgfgumnOEBjMH6z7kJ0rMA6aduUv+
-	 kn3Y2Rjqb4UmXXQH6X2AO1Dlbhz7eGGkwbiMPNBZq++wUsMZA+BJojqOPGdan+0KnU
-	 /wEQCmjOP1AFUcheLyMxGI48/+K6tqqW9AoGiIACn46nLuRsbIcW71xpbigisNrU+p
-	 Uf/jDHxiU1NVeSBOb9C3Ud+erod9SRHLiVDJ18wWYljcTh/EiJEN6YcFQ6hiRC257L
-	 i4tgEWp5COXn+7RSM/HwRcGjV6BkpMoZdsgNbDZhqkI+N88J6+JUDeSUptzvOLvAjC
-	 XG31EE7ZqRIMQ==
+	b=A7+jNr0HNwuo15U+Nm15rn6xSLrb4t7GyjtyBFUwopRjXp4IlcaNbkKMFtZvPG6nZ
+	 NulpbIMpXB5V1uGCx1zvlZoHGIP/e9UQN+kKWQBLNNlZrypakkjxhLoR6hT8PTmudr
+	 1rE/xK6DCE/gFicMObwo6gZp0L9fu+L3eI8JBgJbrXdYdk/IytKRFZOVgcm7oVN+ns
+	 0jNCP0VrtQwAH1JngkV+jh4TJIWinoppC9jA0a6q7MilxMZHAYiGzIoJAZeCXTKTuc
+	 rgAUzEk+kAOOsuvpvVo8RRfZVEfdkJKWQBGTzxbapLMe67LpwUUXhnJ9/KWaVwvnU2
+	 5ipkrFFWiCnlQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EABB2381091A;
-	Sat, 10 May 2025 00:30:38 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCB4381091A;
+	Sat, 10 May 2025 00:40:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,43 +52,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 1/5] batman-adv: Start new development cycle
+Subject: Re: [PATCH net-next v5 0/3] Refactoring designware VLAN code. 
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174683703749.3851370.18436694245732853832.git-patchwork-notify@kernel.org>
-Date: Sat, 10 May 2025 00:30:37 +0000
-References: <20250509091041.108416-2-sw@simonwunderlich.de>
-In-Reply-To: <20250509091041.108416-2-sw@simonwunderlich.de>
-To: Simon Wunderlich <sw@simonwunderlich.de>
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
- b.a.t.m.a.n@lists.open-mesh.org
+ <174683763150.3852829.17036982288908409763.git-patchwork-notify@kernel.org>
+Date: Sat, 10 May 2025 00:40:31 +0000
+References: <20250507063812.34000-1-boon.khai.ng@altera.com>
+In-Reply-To: <20250507063812.34000-1-boon.khai.ng@altera.com>
+To: Boon Khai Ng <boon.khai.ng@altera.com>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+ linux@armlinux.org.uk, ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+ john.fastabend@gmail.com, 0x1207@gmail.com, matthew.gerlach@altera.com,
+ tien.sung.ang@altera.com, mun.yew.tham@altera.com, rohan.g.thomas@altera.com
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
-by Simon Wunderlich <sw@simonwunderlich.de>:
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri,  9 May 2025 11:10:37 +0200 you wrote:
-> This version will contain all the (major or even only minor) changes for
-> Linux 6.16.
+On Wed,  7 May 2025 14:38:09 +0800 you wrote:
+> Refactoring designware VLAN code and introducing support for
+> hardware-accelerated VLAN stripping for dwxgmac2 IP,
+> the current patch set consists of two key changes:
 > 
-> The version number isn't a semantic version number with major and minor
-> information. It is just encoding the year of the expected publishing as
-> Linux -rc1 and the number of published versions this year (starting at 0).
+> 1) Refactoring VLAN Functions:
+> The first change involves moving common VLAN-related functions
+> of the DesignWare Ethernet MAC into a dedicated file, stmmac_vlan.c.
+> This refactoring aims to improve code organization and maintainability
+> by centralizing VLAN handling logic.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/5] batman-adv: Start new development cycle
-    https://git.kernel.org/netdev/net-next/c/4a1cff317d95
-  - [net-next,2/5] batman-adv: constify and move broadcast addr definition
-    https://git.kernel.org/netdev/net-next/c/d699628dae07
-  - [net-next,3/5] batman-adv: no need to start/stop queue on mesh-iface
-    https://git.kernel.org/netdev/net-next/c/8a7bb74a79d4
-  - [net-next,4/5] batman-adv: Switch to crc32 header for crc32c
-    https://git.kernel.org/netdev/net-next/c/a608f11d3a3b
-  - [net-next,5/5] batman-adv: Drop unused net_namespace.h include
-    https://git.kernel.org/netdev/net-next/c/4e1ccc8e52e5
+  - [net-next,v5,1/3] net: stmmac: Refactor VLAN implementation
+    https://git.kernel.org/netdev/net-next/c/1d2c7a5fee31
+  - [net-next,v5,2/3] net: stmmac: stmmac_vlan: rename VLAN functions and symbol to generic symbol.
+    https://git.kernel.org/netdev/net-next/c/f3acaf7364a6
+  - [net-next,v5,3/3] net: stmmac: dwxgmac2: Add support for HW-accelerated VLAN stripping
+    https://git.kernel.org/netdev/net-next/c/534df0c1724b
 
 You are awesome, thank you!
 -- 
