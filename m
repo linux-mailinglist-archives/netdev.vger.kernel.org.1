@@ -1,178 +1,477 @@
-Return-Path: <netdev+bounces-189439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F213AAB2131
-	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 06:48:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B417AB2136
+	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 06:48:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C0F21BC1140
-	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 04:48:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 974B34C7F10
+	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 04:48:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BEE31C5F13;
-	Sat, 10 May 2025 04:48:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 452261C6FE8;
+	Sat, 10 May 2025 04:48:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="w21WE+nS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CBED1B0F33
-	for <netdev@vger.kernel.org>; Sat, 10 May 2025 04:48:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.16.166
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AFC717799F
+	for <netdev@vger.kernel.org>; Sat, 10 May 2025 04:48:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746852504; cv=none; b=F6wD21EUJxklZMTcO6lNkzyJ6AtoR6M9KVkXOLv5T+z+KlQH1LgyLjNItt7dqS+UYWPAyC+Xbvrwh+G6lAQ02sDrubOpFCWR0E/ibgguQt+LB9AFJqmocrM5awkEu3YWhIZm5i90gtKIkMktu8u1CRJmfY80DbjLCxmqidPx0HA=
+	t=1746852514; cv=none; b=Je9CZfzJ3p3rnG6QGMeTnMWo4Td9LC7ySMVhXXPzvyXp+isn6wL1dlIjA3DyFeSLeXSf9rl2X5QKe9yPs6zZ/ZoyCR1aF+ZAD93+DDp4PLwMYUphlTvCJfIKyIj8UUKcnvaUcsenIBhz9PvCe6XYxs+ex/xJk8HpVHCgwTXLock=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746852504; c=relaxed/simple;
-	bh=uPrlcZEtyzRtvySgjanORGMgKiqZEpPSyLtz19ByCsU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lS4iJNv+ubvHGa5oY7YaIg9EgRpWqa4D51+wo8hp4xJtU3gEjTBqZtPyJRX4vhNXYpVgTHrxS3MuAEcVYsutEQER23XkNe7U0RfKuTDkxToSWpWH7xeZ894d67F4cYZbYQIxoJLPEfGPtu5gcCXdg3KItouabXxCsdkfBwx4yCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=54.206.16.166
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
-X-QQ-mid: esmtpgz12t1746852336t89fe89fe
-X-QQ-Originating-IP: xU8IPsipLrv86IOHm72M0UjwugVHSeOeHBD9Jb9IzgQ=
-Received: from macbook-dev.xiaojukeji.com ( [111.201.145.100])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Sat, 10 May 2025 12:45:32 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 6556987884993357446
-EX-QQ-RecipientCnt: 10
-From: tonghao@bamaicloud.com
-To: netdev@vger.kernel.org
-Cc: Tonghao Zhang <tonghao@bamaicloud.com>,
-	Jay Vosburgh <jv@jvosburgh.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Subject: [PATCH net-next 4/4] net: bonding: add tracepoint for 802.3ad
-Date: Sat, 10 May 2025 12:45:04 +0800
-Message-Id: <20250510044504.52618-5-tonghao@bamaicloud.com>
-X-Mailer: git-send-email 2.30.1 (Apple Git-130)
-In-Reply-To: <20250510044504.52618-1-tonghao@bamaicloud.com>
-References: <20250510044504.52618-1-tonghao@bamaicloud.com>
+	s=arc-20240116; t=1746852514; c=relaxed/simple;
+	bh=1NrCr8Y7Yk8nkIQHwduC636NbB+UPP/EE9fpkwgL43s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UJ2OGu9WpunGJtaoRUOzv6CneIW20owWeYjZWtMp2bwUnnEPMearQhq2oAdDAZq/9jcH3WwaTo4ErxDHOxDtC7WceTr8BRrysSHXwcY54vR5B+veC1HDBQH5bt7dl9PV1fja4cuZW4aTOFqTAvBN4PLP4AuusjKwOIHW466cbRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=w21WE+nS; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-acb39c45b4eso429831066b.1
+        for <netdev@vger.kernel.org>; Fri, 09 May 2025 21:48:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1746852509; x=1747457309; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=U0ocF90m/d57s9zvLLyjTijFwmKaMiodfKLapvGz4i8=;
+        b=w21WE+nShwXJ4KV6PsxMvNvTQ/PLNZRMldTRcvPidFQn9f+qH0losmjfHr8HyuqwFO
+         1jncGS2cTM9Ss+/bq/5w3ekwZoJ2YaPWscDYKhdKXXXoALyLB8CedN/aWX7/w0Up9tlm
+         w8qt+Ztyr7LN6VeGlddU7HXkjN7G+SB5OU/D+fHFXPq2SuxuJQf3pJloB6/z0I73ZtQb
+         vSma+deCb572Je5n8MnP/dY6PyZcCoTf8ru2X5BOJLPq1X0jr/xU8ROlVlKVXv1Y18yw
+         QmxE1vpfGsQoe21Fa0skxF4mIPXMKgQil+8YPwvva8CugZHwB7Wbfa39V6mdQ5A1YQ5w
+         HMVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1746852509; x=1747457309;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U0ocF90m/d57s9zvLLyjTijFwmKaMiodfKLapvGz4i8=;
+        b=jHMFevr7/tsP1LcovQqoTbCwVe+XSNA3Y/if0X2m9jdcAU0L56ZOu3u7alJvI3jmdL
+         v9oeZ+z4uokkjz1S3E5sS2J0ayVjt3Oi6uq5wsNBppx15AIzxldBu3apkdYb59OQuEZ4
+         V39y9rDNrhvbyXeWcqo3Lqefxt6hexrxWcO8hJPCkIsmj7iY3ahfBLUsNzrZpZc7bkQ7
+         luPJAuqgidiKz23B/FQrtsNCF5MZ4/3uPLVfBP7ulULkofXqzsrZanTKjYzULRoBsIcE
+         etkx2brGF8kWRJlzLmdzXNZcLP+jcVbk08k7NaTQQ3GXbP3SS2mnOx8oE2q8y7pUJgiw
+         wEpw==
+X-Forwarded-Encrypted: i=1; AJvYcCWaY18vhEa1TE0lVTJCdUYBXAhVTOTpAVxN14OERMYE0vAloCJeSr8VrF2KirbD9qWxLOnh8y4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YylQ4Q2awB7qsgMqku3oNpcyNFzucHd0fLOYmfHLVLw/8PeexcQ
+	PgGBf+/QQ0sC9RZFev0vH0VQpbEzG2tYEMDSQ9LbHJUFO37bq1rkGGGyrDNgv9Q=
+X-Gm-Gg: ASbGncv3WsmbrcULRIS0voJNE0T6aqG2ewnoS1dtuGPIPa0zBLLIbRs3AYRC4/5izD+
+	GAzccODA2DzKHVnqp7e+0JiivoWCrgDSU/5dAQQXyX4KwzaA1fqAksm9Mq4VKbYXmWuVXg1UKDa
+	O9nneYQpNqa+8RGThgDM37Kl23oNmO6KZXa48gG9EOoWwVwhuFKtCSkRizncBAFGfzFtCYDPxze
+	TCh2UI38UigmPPFDBoTIYonfdp2aEQSpzzVgLBSNqewGblgIAGxKDJoOPU2tDqIegaM68SnW78E
+	cYo7CHXTQaGCCBSi9J1NCTsOJ17AJt/pM5t8KEweUiQO5mvOC8dMuNPQF2A98kknayOSn9D4ROP
+	7L52hvPtO0nkqPzrOTA==
+X-Google-Smtp-Source: AGHT+IH4k9HquIX1L6xZv+URbpyHEpEdheEI4sKIxZlStd8mde80HQ5fZ7i2WWD/eBMuhvGJMGwV5w==
+X-Received: by 2002:a17:906:794c:b0:ad2:d13:3c4e with SMTP id a640c23a62f3a-ad218e8900fmr621959566b.5.1746852508971;
+        Fri, 09 May 2025 21:48:28 -0700 (PDT)
+Received: from jiri-mlt.client.nvidia.com ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad23fc53229sm4761966b.48.2025.05.09.21.48.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 May 2025 21:48:28 -0700 (PDT)
+Date: Sat, 10 May 2025 06:48:20 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Cc: donald.hunter@gmail.com, kuba@kernel.org, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, horms@kernel.org, vadim.fedorenko@linux.dev, 
+	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch, 
+	aleksandr.loktionov@intel.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org, 
+	Milena Olech <milena.olech@intel.com>
+Subject: Re: [PATCH net-next v2 2/3] dpll: add Reference SYNC get/set
+Message-ID: <icbprtryf7dhdwymtuvntfcfvl43b4rbzxukg7romz32cx2vmn@dkgfespynxln>
+References: <20250509124651.1227098-1-arkadiusz.kubalewski@intel.com>
+ <20250509124651.1227098-3-arkadiusz.kubalewski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: MUe2PhP7Eq79QA16Lk7F1k/MdJvIHBkP91c37vJyT3FmcvqDIXjU1xdL
-	jfUOcZXaTwSHLb0C4vnvGed+9Y8bvSgIMpNHBjNy7j7TXl+XHateyJ5XgY0wDlxF/k/5djA
-	l72zD9rs0wTinPPZQim9YZdTK/K2NkdsaBbMaCWGc1k7AKatUpy2RCI/plcTbn5c7h6ZR3S
-	1UNMN7Qf/qU6HAn0fxouwLE8nmBYd7LPCQkYmRU4oDjnPz+maO86YoDlum9IHrY8k560+KE
-	9woXpJapdRcwS4PpapwGlbDdai9YqGkHWC4emXvhqYrYliG0z2yXIOhwGPjs04UoYPkepRm
-	z+bUqv0NKxyb/RjTmBxtYIGI5/Yw1X478Tw2yj/AHsOUO8cN7jzMUhRTVx3qTF7FUO+Rh3P
-	Rxqg2PDG6eSdCQv35+tHo5z2ZOqgbr7BvvXVMA1F0c5I3Cda/iu9feCAOwZMHHL+08xhgIE
-	RRr1IYCsQ5xcQ7IobZ+CfwOftkM3A0DQjYo6eyygsu6/L6NAgeXvi/CWKcHeOPfAMsESYB+
-	zfGgo9k02PdFQCOnYCGq4w+zvSq+n/91izfcLc3RwS98Bf7xs+C7xhcS0JwauAtv4KV2jVV
-	qFrKs7FfWVW2641LQFDDSVd56q2qRheQE2ACO6yv+C19w3Z3cDop6MnBFIAUpTL+JF205WY
-	0dDc6ytaxdwfgYFouzjMa9ohFOXUilhX4TJr/8R3QhUsJ9ksmNafWl08J9Ft/ox9qwKrRq8
-	CmRfbz6/qW5O+IUktYLqPjPEChv7KeHOxpyiea4kRl79COg0QfOwmC5onlXCdtCSqwtWTdy
-	l9cSf7iw2AcVraDpghaZECoR9RXQ9XuCu0+dAsNW1vYKuKVYIWovej7YtZ3nUfmS05LuJaN
-	BdTu0MCpxGliFcwTYUewKOfhO4WtY/wqkfQEjqphMfGdEt5CWPps9RTYPAC2JOgIVWL+jTi
-	JM4G9QP1RJBv6DPMpG0nWEXhaRXBJR72wG9tAFK4SRwcXUxojDhXxZPnsSpklxgf79PCrtd
-	Mofgek7w==
-X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250509124651.1227098-3-arkadiusz.kubalewski@intel.com>
 
-From: Tonghao Zhang <tonghao@bamaicloud.com>
+Fri, May 09, 2025 at 02:46:50PM +0200, arkadiusz.kubalewski@intel.com wrote:
+>Define function for Reference SYNC pin registration and callback ops to
+>set/get current feature state.
+>
+>Implement netlink handler to fill netlink messages with Reference SYNC
+>pin configuration of capable pins (pin-get).
+>
+>Implement netlink handler to call proper ops and configure Reference SYNC
+>pin state (pin-set).
+>
+>Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+>Reviewed-by: Milena Olech <milena.olech@intel.com>
+>Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+>---
+>v2:
+>- rename sync_pins -> ref_sync_pins within `struct dpll_pin` and add doxygen
+>  description of ref_sync_pins,
+>- improve commit message.
+>---
+> drivers/dpll/dpll_core.c    |  27 ++++++
+> drivers/dpll/dpll_core.h    |   2 +
+> drivers/dpll/dpll_netlink.c | 188 ++++++++++++++++++++++++++++++++----
+> include/linux/dpll.h        |  10 ++
+> 4 files changed, 209 insertions(+), 18 deletions(-)
+>
+>diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
+>index 20bdc52f63a5..805c7aca58c5 100644
+>--- a/drivers/dpll/dpll_core.c
+>+++ b/drivers/dpll/dpll_core.c
+>@@ -506,6 +506,7 @@ dpll_pin_alloc(u64 clock_id, u32 pin_idx, struct module *module,
+> 	refcount_set(&pin->refcount, 1);
+> 	xa_init_flags(&pin->dpll_refs, XA_FLAGS_ALLOC);
+> 	xa_init_flags(&pin->parent_refs, XA_FLAGS_ALLOC);
+>+	xa_init_flags(&pin->ref_sync_pins, XA_FLAGS_ALLOC);
+> 	ret = xa_alloc_cyclic(&dpll_pin_xa, &pin->id, pin, xa_limit_32b,
+> 			      &dpll_pin_xa_id, GFP_KERNEL);
+> 	if (ret < 0)
+>@@ -514,6 +515,7 @@ dpll_pin_alloc(u64 clock_id, u32 pin_idx, struct module *module,
+> err_xa_alloc:
+> 	xa_destroy(&pin->dpll_refs);
+> 	xa_destroy(&pin->parent_refs);
+>+	xa_destroy(&pin->ref_sync_pins);
+> 	dpll_pin_prop_free(&pin->prop);
+> err_pin_prop:
+> 	kfree(pin);
+>@@ -595,6 +597,7 @@ void dpll_pin_put(struct dpll_pin *pin)
+> 		xa_erase(&dpll_pin_xa, pin->id);
+> 		xa_destroy(&pin->dpll_refs);
+> 		xa_destroy(&pin->parent_refs);
+>+		xa_destroy(&pin->ref_sync_pins);
+> 		dpll_pin_prop_free(&pin->prop);
+> 		kfree_rcu(pin, rcu);
+> 	}
+>@@ -783,6 +786,30 @@ void dpll_pin_on_pin_unregister(struct dpll_pin *parent, struct dpll_pin *pin,
+> }
+> EXPORT_SYMBOL_GPL(dpll_pin_on_pin_unregister);
+> 
+>+/**
+>+ * dpll_pin_ref_sync_pair_add - create a reference sync signal pin pair
+>+ * @base: pin which produces the base frequency
+>+ * @sync: pin which produces the sync signal
+>+ *
+>+ * Once pins are paired, the user-space configuration of reference sync pair
+>+ * is possible.
+>+ * Context: Acquires a lock (dpll_lock)
+>+ * Return:
+>+ * * 0 on success
+>+ * * negative - error value
+>+ */
+>+int dpll_pin_ref_sync_pair_add(struct dpll_pin *base, struct dpll_pin *sync)
+>+{
+>+	int ret;
+>+
+>+	mutex_lock(&dpll_lock);
+>+	ret = xa_insert(&base->ref_sync_pins, sync->pin_idx, sync, GFP_KERNEL);
+>+	mutex_unlock(&dpll_lock);
+>+
+>+	return ret;
+>+}
+>+EXPORT_SYMBOL_GPL(dpll_pin_ref_sync_pair_add);
+>+
+> static struct dpll_device_registration *
+> dpll_device_registration_first(struct dpll_device *dpll)
+> {
+>diff --git a/drivers/dpll/dpll_core.h b/drivers/dpll/dpll_core.h
+>index 2b6d8ef1cdf3..d0b2b995fd62 100644
+>--- a/drivers/dpll/dpll_core.h
+>+++ b/drivers/dpll/dpll_core.h
+>@@ -44,6 +44,7 @@ struct dpll_device {
+>  * @module:		module of creator
+>  * @dpll_refs:		hold referencees to dplls pin was registered with
+>  * @parent_refs:	hold references to parent pins pin was registered with
+>+ * @ref_sync_pins	hold references to pins for Reference SYNC feature
+>  * @prop:		pin properties copied from the registerer
+>  * @rclk_dev_name:	holds name of device when pin can recover clock from it
+>  * @refcount:		refcount
+>@@ -56,6 +57,7 @@ struct dpll_pin {
+> 	struct module *module;
+> 	struct xarray dpll_refs;
+> 	struct xarray parent_refs;
+>+	struct xarray ref_sync_pins;
+> 	struct dpll_pin_properties prop;
+> 	refcount_t refcount;
+> 	struct rcu_head rcu;
+>diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
+>index c130f87147fa..7a3db0984b1e 100644
+>--- a/drivers/dpll/dpll_netlink.c
+>+++ b/drivers/dpll/dpll_netlink.c
+>@@ -48,6 +48,24 @@ dpll_msg_add_dev_parent_handle(struct sk_buff *msg, u32 id)
+> 	return 0;
+> }
+> 
+>+static bool dpll_pin_available(struct dpll_pin *pin)
+>+{
+>+	struct dpll_pin_ref *par_ref;
+>+	unsigned long i;
+>+
+>+	if (!xa_get_mark(&dpll_pin_xa, pin->id, DPLL_REGISTERED))
+>+		return false;
+>+	xa_for_each(&pin->parent_refs, i, par_ref)
+>+		if (xa_get_mark(&dpll_pin_xa, par_ref->pin->id,
+>+				DPLL_REGISTERED))
+>+			return true;
+>+	xa_for_each(&pin->dpll_refs, i, par_ref)
+>+		if (xa_get_mark(&dpll_device_xa, par_ref->dpll->id,
+>+				DPLL_REGISTERED))
+>+			return true;
+>+	return false;
+>+}
+>+
+> /**
+>  * dpll_msg_add_pin_handle - attach pin handle attribute to a given message
+>  * @msg: pointer to sk_buff message to attach a pin handle
+>@@ -408,6 +426,47 @@ dpll_msg_add_pin_esync(struct sk_buff *msg, struct dpll_pin *pin,
+> 	return -EMSGSIZE;
+> }
+> 
+>+static int
+>+dpll_msg_add_pin_ref_sync(struct sk_buff *msg, struct dpll_pin *pin,
+>+			  struct dpll_pin_ref *ref,
+>+			  struct netlink_ext_ack *extack)
+>+{
+>+	const struct dpll_pin_ops *ops = dpll_pin_ops(ref);
+>+	struct dpll_device *dpll = ref->dpll;
+>+	enum dpll_pin_state state;
+>+	void *pin_priv, *sp_priv;
+>+	struct dpll_pin *sp;
+>+	struct nlattr *nest;
+>+	unsigned long index;
+>+	int ret;
+>+
+>+	pin_priv = dpll_pin_on_dpll_priv(dpll, pin);
+>+	xa_for_each(&pin->ref_sync_pins, index, sp) {
+>+		if (!dpll_pin_available(sp))
+>+			continue;
+>+		sp_priv = dpll_pin_on_dpll_priv(dpll, sp);
+>+		if (WARN_ON(!ops->ref_sync_get))
+>+			return -EOPNOTSUPP;
+>+		ret = ops->ref_sync_get(pin, pin_priv, sp, sp_priv,
+>+					&state, extack);
+>+		if (ret)
+>+			return ret;
+>+		nest = nla_nest_start(msg, DPLL_A_PIN_REFERENCE_SYNC);
+>+		if (!nest)
+>+			return -EMSGSIZE;
+>+		if (nla_put_s32(msg, DPLL_A_PIN_ID, sp->id))
+>+			goto nest_cancel;
+>+		if (nla_put_s32(msg, DPLL_A_PIN_STATE, state))
+>+			goto nest_cancel;
+>+		nla_nest_end(msg, nest);
+>+	}
+>+	return 0;
+>+
+>+nest_cancel:
+>+	nla_nest_cancel(msg, nest);
+>+	return -EMSGSIZE;
+>+}
+>+
+> static bool dpll_pin_is_freq_supported(struct dpll_pin *pin, u32 freq)
+> {
+> 	int fs;
+>@@ -550,6 +609,10 @@ dpll_cmd_pin_get_one(struct sk_buff *msg, struct dpll_pin *pin,
+> 	if (ret)
+> 		return ret;
+> 	ret = dpll_msg_add_pin_esync(msg, pin, ref, extack);
+>+	if (ret)
+>+		return ret;
+>+	if (!xa_empty(&pin->ref_sync_pins))
+>+		ret = dpll_msg_add_pin_ref_sync(msg, pin, ref, extack);
+> 	if (ret)
+> 		return ret;
+> 	if (xa_empty(&pin->parent_refs))
+>@@ -642,24 +705,6 @@ __dpll_device_change_ntf(struct dpll_device *dpll)
+> 	return dpll_device_event_send(DPLL_CMD_DEVICE_CHANGE_NTF, dpll);
+> }
+> 
+>-static bool dpll_pin_available(struct dpll_pin *pin)
+>-{
+>-	struct dpll_pin_ref *par_ref;
+>-	unsigned long i;
+>-
+>-	if (!xa_get_mark(&dpll_pin_xa, pin->id, DPLL_REGISTERED))
+>-		return false;
+>-	xa_for_each(&pin->parent_refs, i, par_ref)
+>-		if (xa_get_mark(&dpll_pin_xa, par_ref->pin->id,
+>-				DPLL_REGISTERED))
+>-			return true;
+>-	xa_for_each(&pin->dpll_refs, i, par_ref)
+>-		if (xa_get_mark(&dpll_device_xa, par_ref->dpll->id,
+>-				DPLL_REGISTERED))
+>-			return true;
+>-	return false;
+>-}
+>-
+> /**
+>  * dpll_device_change_ntf - notify that the dpll device has been changed
+>  * @dpll: registered dpll pointer
+>@@ -887,6 +932,108 @@ dpll_pin_esync_set(struct dpll_pin *pin, struct nlattr *a,
+> 	return ret;
+> }
+> 
+>+static int
+>+dpll_pin_ref_sync_state_set(struct dpll_pin *pin, unsigned long sync_pin_idx,
+>+			    const enum dpll_pin_state state,
+>+			    struct netlink_ext_ack *extack)
+>+
+>+{
+>+	struct dpll_pin_ref *ref, *failed;
+>+	const struct dpll_pin_ops *ops;
+>+	enum dpll_pin_state old_state;
+>+	struct dpll_pin *sync_pin;
+>+	struct dpll_device *dpll;
+>+	unsigned long i;
+>+	int ret;
+>+
+>+	if (state != DPLL_PIN_STATE_CONNECTED &&
+>+	    state != DPLL_PIN_STATE_DISCONNECTED)
+>+		return -EINVAL;
+>+	sync_pin = xa_find(&pin->ref_sync_pins, &sync_pin_idx, ULONG_MAX,
+>+			   XA_PRESENT);
+>+	if (!sync_pin) {
+>+		NL_SET_ERR_MSG(extack, "reference sync pin not found");
+>+		return -EINVAL;
+>+	}
+>+	if (!dpll_pin_available(sync_pin)) {
+>+		NL_SET_ERR_MSG(extack, "reference sync pin not available");
+>+		return -EINVAL;
+>+	}
+>+	ref = dpll_xa_ref_dpll_first(&pin->dpll_refs);
+>+	ASSERT_NOT_NULL(ref);
+>+	ops = dpll_pin_ops(ref);
+>+	if (!ops->ref_sync_set || !ops->ref_sync_get) {
+>+		NL_SET_ERR_MSG(extack, "reference sync not supported by this pin");
+>+		return -EOPNOTSUPP;
+>+	}
+>+	dpll = ref->dpll;
+>+	ret = ops->ref_sync_get(pin, dpll_pin_on_dpll_priv(dpll, pin), sync_pin,
+>+				dpll_pin_on_dpll_priv(dpll, sync_pin),
+>+				&old_state, extack);
+>+	if (ret) {
+>+		NL_SET_ERR_MSG(extack, "unable to get old reference sync state");
+>+		return -EINVAL;
 
-Users can monitor NIC link status changes through netlink. However, LACP
-protocol failures may occur despite operational physical links. There is
-no way to detect LACP state changes. This patch add tracepoint at LACP state
-transition.
+Propagate ret. Not sure why you ignored my comment about this.
 
-Cc: Jay Vosburgh <jv@jvosburgh.net>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
----
- drivers/net/bonding/bond_3ad.c |  6 ++++++
- include/trace/events/bonding.h | 37 ++++++++++++++++++++++++++++++++++
- 2 files changed, 43 insertions(+)
- create mode 100644 include/trace/events/bonding.h
 
-diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
-index 6577ce54d115..962be118f3a8 100644
---- a/drivers/net/bonding/bond_3ad.c
-+++ b/drivers/net/bonding/bond_3ad.c
-@@ -16,6 +16,9 @@
- #include <net/bond_3ad.h>
- #include <net/netlink.h>
- 
-+#define CREATE_TRACE_POINTS
-+#include <trace/events/bonding.h>
-+
- /* General definitions */
- #define AD_SHORT_TIMEOUT           1
- #define AD_LONG_TIMEOUT            0
-@@ -1148,6 +1151,9 @@ static void ad_mux_machine(struct port *port, bool *update_slave_arr)
- 			  port->actor_port_number,
- 			  last_state,
- 			  port->sm_mux_state);
-+
-+		trace_3ad_mux_state(port->slave->dev, last_state, port->sm_mux_state);
-+
- 		switch (port->sm_mux_state) {
- 		case AD_MUX_DETACHED:
- 			port->actor_oper_port_state &= ~LACP_STATE_SYNCHRONIZATION;
-diff --git a/include/trace/events/bonding.h b/include/trace/events/bonding.h
-new file mode 100644
-index 000000000000..1ee4b07d912a
---- /dev/null
-+++ b/include/trace/events/bonding.h
-@@ -0,0 +1,37 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+
-+#if !defined(_TRACE_BONDING_H) || defined(TRACE_HEADER_MULTI_READ)
-+#define _TRACE_BONDING_H
-+
-+#include <linux/netdevice.h>
-+#include <linux/tracepoint.h>
-+
-+#undef TRACE_SYSTEM
-+#define TRACE_SYSTEM bonding
-+
-+TRACE_EVENT(3ad_mux_state,
-+	TP_PROTO(struct net_device *dev, u32 last_state, u32 curr_state),
-+	TP_ARGS(dev, last_state, curr_state),
-+
-+	TP_STRUCT__entry(
-+		__field(int, ifindex)
-+		__string(dev_name, dev->name)
-+		__field(u32, last_state)
-+		__field(u32, curr_state)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->ifindex = dev->ifindex;
-+		__assign_str(dev_name);
-+		__entry->last_state = last_state;
-+		__entry->curr_state = curr_state;
-+	),
-+
-+	TP_printk("ifindex %d dev %s last_state 0x%x curr_state 0x%x",
-+		  __entry->ifindex, __get_str(dev_name),
-+		  __entry->last_state, __entry->curr_state)
-+);
-+
-+#endif /* _TRACE_BONDING_H */
-+
-+#include <trace/define_trace.h>
--- 
-2.34.1
 
+>+	}
+>+	if (state == old_state)
+>+		return 0;
+>+	xa_for_each(&pin->dpll_refs, i, ref) {
+>+		ops = dpll_pin_ops(ref);
+>+		dpll = ref->dpll;
+>+		ret = ops->ref_sync_set(pin, dpll_pin_on_dpll_priv(dpll, pin),
+>+					sync_pin,
+>+					dpll_pin_on_dpll_priv(dpll, sync_pin),
+>+					state, extack);
+>+		if (ret) {
+>+			failed = ref;
+>+			NL_SET_ERR_MSG_FMT(extack, "reference sync set failed for dpll_id:%u",
+>+					   dpll->id);
+
+Why you print id? User knows what he works on, don't he?
+
+
+
+>+			goto rollback;
+>+		}
+>+	}
+>+	__dpll_pin_change_ntf(pin);
+>+
+>+	return 0;
+>+
+>+rollback:
+>+	xa_for_each(&pin->dpll_refs, i, ref) {
+>+		if (ref == failed)
+>+			break;
+>+		ops = dpll_pin_ops(ref);
+>+		dpll = ref->dpll;
+>+		if (ops->ref_sync_set(pin, dpll_pin_on_dpll_priv(dpll, pin),
+>+				      sync_pin,
+>+				      dpll_pin_on_dpll_priv(dpll, sync_pin),
+>+				      old_state, extack))
+>+			NL_SET_ERR_MSG(extack, "set reference sync rollback failed");
+>+	}
+>+	return ret;
+>+}
+>+
+>+static int
+>+dpll_pin_ref_sync_set(struct dpll_pin *pin, struct nlattr *nest,
+>+		      struct netlink_ext_ack *extack)
+>+{
+>+	struct nlattr *tb[DPLL_A_PIN_MAX + 1];
+>+	enum dpll_pin_state state;
+>+	u32 sync_pin_id;
+>+
+>+	nla_parse_nested(tb, DPLL_A_PIN_MAX, nest,
+>+			 dpll_reference_sync_nl_policy, extack);
+>+	if (!tb[DPLL_A_PIN_ID]) {
+>+		NL_SET_ERR_MSG(extack, "sync pin id expected");
+>+		return -EINVAL;
+>+	}
+>+	sync_pin_id = nla_get_u32(tb[DPLL_A_PIN_ID]);
+>+
+>+	if (!tb[DPLL_A_PIN_STATE]) {
+>+		NL_SET_ERR_MSG(extack, "sync pin state expected");
+>+		return -EINVAL;
+>+	}
+>+	state = nla_get_u32(tb[DPLL_A_PIN_STATE]);
+>+
+>+	return dpll_pin_ref_sync_state_set(pin, sync_pin_id, state, extack);
+>+}
+>+
+> static int
+> dpll_pin_on_pin_state_set(struct dpll_pin *pin, u32 parent_idx,
+> 			  enum dpll_pin_state state,
+>@@ -1193,6 +1340,11 @@ dpll_pin_set_from_nlattr(struct dpll_pin *pin, struct genl_info *info)
+> 			if (ret)
+> 				return ret;
+> 			break;
+>+		case DPLL_A_PIN_REFERENCE_SYNC:
+>+			ret = dpll_pin_ref_sync_set(pin, a, info->extack);
+>+			if (ret)
+>+				return ret;
+>+			break;
+> 		}
+> 	}
+> 
+>diff --git a/include/linux/dpll.h b/include/linux/dpll.h
+>index 5e4f9ab1cf75..f1f1fdda67fe 100644
+>--- a/include/linux/dpll.h
+>+++ b/include/linux/dpll.h
+>@@ -95,6 +95,14 @@ struct dpll_pin_ops {
+> 			 const struct dpll_device *dpll, void *dpll_priv,
+> 			 struct dpll_pin_esync *esync,
+> 			 struct netlink_ext_ack *extack);
+>+	int (*ref_sync_set)(const struct dpll_pin *pin, void *pin_priv,
+>+			    const struct dpll_pin *ref_pin, void *ref_pin_priv,
+>+			    const enum dpll_pin_state state,
+>+			    struct netlink_ext_ack *extack);
+>+	int (*ref_sync_get)(const struct dpll_pin *pin, void *pin_priv,
+>+			    const struct dpll_pin *ref_pin, void *ref_pin_priv,
+>+			    enum dpll_pin_state *state,
+>+			    struct netlink_ext_ack *extack);
+> };
+> 
+> struct dpll_pin_frequency {
+>@@ -194,6 +202,8 @@ int dpll_pin_on_pin_register(struct dpll_pin *parent, struct dpll_pin *pin,
+> void dpll_pin_on_pin_unregister(struct dpll_pin *parent, struct dpll_pin *pin,
+> 				const struct dpll_pin_ops *ops, void *priv);
+> 
+>+int dpll_pin_ref_sync_pair_add(struct dpll_pin *base, struct dpll_pin *sync);
+>+
+> int dpll_device_change_ntf(struct dpll_device *dpll);
+> 
+> int dpll_pin_change_ntf(struct dpll_pin *pin);
+>-- 
+>2.38.1
+>
 
