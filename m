@@ -1,117 +1,106 @@
-Return-Path: <netdev+bounces-189505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DE3CAB2609
-	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 03:35:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EE2E9AB26AF
+	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 06:40:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A102A189DCD7
-	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 01:35:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75C41189CE99
+	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 04:41:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25017273FE;
-	Sun, 11 May 2025 01:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D04718CBFC;
+	Sun, 11 May 2025 04:40:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="fzfiC2Ct";
-	dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="uPhnhPGs"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="WOTghqUa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.32])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD6CA139D;
-	Sun, 11 May 2025 01:35:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F04DD13AD1C
+	for <netdev@vger.kernel.org>; Sun, 11 May 2025 04:40:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746927323; cv=none; b=q0IR570MtpHurmn+0NU1Pv1uhtuWMcocxVLx5pIXV0HRmNstfoWI8YAebA5bRplyW4r+Lu6xfhHWbXDM8MPko4LzY6lOB59xu+WG67bTQc4dDOEBoiQRwVwoj2rkwqsFDpiP9+SOOB8QhED/rYQeFw5LC2MUzBKpEHiGtrdIb3o=
+	t=1746938451; cv=none; b=sCT9DW9c+AedrM03QjrhrgLzO0admDeME0OgRr6sqwMaSh67A6Lt0r09MNkmfy+KfbeYIYA+cZb8OBkR0MG5b1M830HhC9AALhhyb0+Qs96rGJHDaDY+kEJU56hmvX0K1A6U2VIGl+UHN3Aksn7sCuob1E5iglRQlFzke14rroA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746927323; c=relaxed/simple;
-	bh=Rs6jpnBP7P1WnzGa9WTZgmxvwHQOZBb+PfH5fr7joxQ=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=kdGmg5kxMSjkMQDJsuoSVBNq6mGBXzpWUPoBAkcm9pljd8QQjez4esdgmabpJUtH95CFdXgcX30JLf5ik3/q8MN4zRfiyAwLGZVH854wuojqwh8MhYCEzbnAhdOs4BaKxVY1GFzYKFLgrtnU0LKSXC7p7Qr9a3n0zSmIj0uXYI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=fzfiC2Ct; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=uPhnhPGs; arc=none smtp.client-ip=160.80.4.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
-Received: from smtpauth-2019-1.uniroma2.it (smtpauth.uniroma2.it [160.80.5.46])
-	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 54B1YXnR024460;
-	Sun, 11 May 2025 03:34:39 +0200
-Received: from lubuntu-18.04 (unknown [160.80.103.126])
-	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id A46BE12288E;
-	Sun, 11 May 2025 03:34:29 +0200 (CEST)
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
-	s=ed201904; t=1746927270; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ofX56hdJp36rarI7IXO8x0nRNPdV54JQ4yA2f+BTyKs=;
-	b=fzfiC2Ct4a6SnKma4CIVLfAL9UyPHOlQI0zaCEeLA1kMgavI/qkeINJIeteYJRtFGdmv/1
-	Ol0rQxix6EiAxTCw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
-	t=1746927270; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ofX56hdJp36rarI7IXO8x0nRNPdV54JQ4yA2f+BTyKs=;
-	b=uPhnhPGsWi/y8my6VOCZKHsvEmoF6BOkbNffNxISp2rxY0hP0DIqvUqytonz5mqQgA5rQu
-	p8QeCV7HwFSB10uD83gp9tu0KnMmaMZh/DSQ56RQ3eCIpAhLNII4zfeEZMxWZProA7oQKd
-	RSIbkjEmrSNKD+nGvDvJ2wnC9kWRXaURRebdw4seAAyj2L/qVKyiINxwjIF2elSzlj3SDL
-	kRKpGLBcbSPUZGS5JBQMv2FkztMzPW78CRHEnoQEnGpyg4gpVF2pQIQmNZy64WrivweW16
-	i9FeZUkpclGg/BtKaEO4UDPYUTnSGMMzH1Av0wXzXuNQRxLUHDs0MS1uEivtiQ==
-Date: Sun, 11 May 2025 03:34:29 +0200
-From: Andrea Mayer <andrea.mayer@uniroma2.it>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-        Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Shuah Khan
- <shuah@kernel.org>, Matthieu Baerts <matttbe@kernel.org>,
-        Mat Martineau
- <martineau@kernel.org>,
-        Geliang Tang <geliang@kernel.org>,
-        Pablo Neira
- Ayuso <pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        Paolo
- Lungaroni <paolo.lungaroni@uniroma2.it>,
-        linux-kselftest@vger.kernel.org, mptcp@lists.linux.dev,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        Andrea Mayer <andrea.mayer@uniroma2.it>
-Subject: Re: [PATCHv2 net-next 4/6] selftests: net: use setup_ns for SRv6
- tests and remove rp_filter configuration
-Message-Id: <20250511033429.aabb9627fac2d36a61c3d64d@uniroma2.it>
-In-Reply-To: <20250508081910.84216-5-liuhangbin@gmail.com>
-References: <20250508081910.84216-1-liuhangbin@gmail.com>
-	<20250508081910.84216-5-liuhangbin@gmail.com>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1746938451; c=relaxed/simple;
+	bh=g/AvqtJ6RI0mSkEAUcNUky8m1elBRkpsXVngbFSEPi8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=INTI/3xpEsvF+2RH7MjPqpqWegEhlbfOkIP0YRKVhwiyxGalHhJUiFXyS3ReYJyJmwKQLNzFnpjU7H7dqrkd2QMKA96i2sZJZuCRD0qXorAvRTwaj4N3ZY5PT60nGa2qwk8jO2NIE8Yzjr/V06buQh8ih5+MWRULvcqySSGnRSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=WOTghqUa; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54B4dFMC032750;
+	Sat, 10 May 2025 21:40:25 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:message-id:mime-version:subject:to; s=
+	pfpt0220; bh=fOwhlpBN2pSqueLvydRjr3fFtnpE4/ki12GjOJSh284=; b=WOT
+	ghqUaRW0kliFn78XQXlNsbusGdBYBWa6eT4ibkhoWDQcwWhEkaB5F/jXSntKWEIS
+	+fYd/MRgLy95VjRRzd14duy5AI89/rJfVqt0fgb4GpOpWN7+lcUOdrdfD/sFS+x6
+	h6+9GWdYsenLevUSsMF2ZYTCjg0iA3Bfi2EwlnCd1GLtxw9nCbaP0brtBSLt8yJ4
+	nwedCIhEW60xmDVSjLcTaTbDIrvbJ7EjjD7svGRfq+/fnpvyAATLt3wXTWFfUBUG
+	n4aJfDUwzEj4RfEMf1yZOByvCVTVqF/wwXPeVeiKbgqPYovMXQtJNmXlML07bVF8
+	bI3tKmBlW5S62gX9z2g==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 46j6aj8ufp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 10 May 2025 21:40:25 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Sat, 10 May 2025 21:40:24 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Sat, 10 May 2025 21:40:24 -0700
+Received: from hyd1358.marvell.com (unknown [10.29.37.11])
+	by maili.marvell.com (Postfix) with ESMTP id B6D703F7045;
+	Sat, 10 May 2025 21:40:19 -0700 (PDT)
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+        <gakula@marvell.com>, <hkelam@marvell.com>, <sgoutham@marvell.com>,
+        <lcherian@marvell.com>, <bbhushan2@marvell.com>, <jerinj@marvell.com>
+CC: <netdev@vger.kernel.org>, Subbaraya Sundeep <sbhatta@marvell.com>
+Subject: [net PATCH 0/2] octeontx2-pf: Do not detect MACSEC block based on silicon
+Date: Sun, 11 May 2025 10:10:01 +0530
+Message-ID: <1746938403-6667-1-git-send-email-sbhatta@marvell.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
-X-Virus-Status: Clean
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=ALcjjCp/ c=1 sm=1 tr=0 ts=68202a39 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=dt9VzEwgFbYA:10 a=Vyz-oGtGZ4BesLdMQXsA:9
+X-Proofpoint-ORIG-GUID: 01a1F0IJzLsC7VXoXUT07LQp9XGs1Qhm
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTExMDA0NCBTYWx0ZWRfX3ZMbz3w2VEJv piIMCD8tZKWFA2ZxS128d9nQDZuLfSnfyDgSGP0OZelkCyI9zxGflxZVCq7bS5BfM0k6RkswUnt uI2hgE7dKywTZk8SVITZa5DNV/JwJ52rMBARWPdmzOyyLybDk3dlMmiMKkbhTO3J8AZuWlq96FV
+ xYwNUnqQSJZ2nOcZbKQrhZz+4FL9rYINx1Z+LsVcPPmp75sjBatTQEv1A6Rf4Yn5zgOBkaW7R/l yZngpXhUDavl/wxO5S2P3sPEn20CvKiXFoN/jWJbO43JV/KyhmWYTJcdX3KQjhFjD/CxXqRZSPb buxNlJYbSoeDhU0FvfVDafcgoxrDCmupwMyT7/CU2tWQQE+y8AxJvJ2aaLeCVm3Io62sRR54fs6
+ JtzIxepuzuGfEGu9B7e8pmDoX/fw6+ekVbTd+zyGCLYw6EMxm5+QvokcFg1fgnuyvjvv59Lt
+X-Proofpoint-GUID: 01a1F0IJzLsC7VXoXUT07LQp9XGs1Qhm
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-11_01,2025-05-09_01,2025-02-21_01
 
-On Thu,  8 May 2025 08:19:08 +0000
-Hangbin Liu <liuhangbin@gmail.com> wrote:
+Out of various silicon variants of CN10K series some have hardware
+MACSEC block for offloading MACSEC operations and some do not.
+AF driver already has the information of whether MACSEC is present
+or not on running silicon. Hence fetch that information from
+AF via mailbox message.
 
-> Some SRv6 tests manually set up network namespaces and disable rp_filter.
-> Since the setup_ns library function already handles rp_filter configuration,
-> convert these SRv6 tests to use setup_ns and remove the redundant rp_filter
-> settings.
-> 
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+Subbaraya Sundeep (2):
+  octeontx2-af: Add MACSEC capability flag
+  octeontx2-pf: macsec: Get MACSEC capability flag from AF
 
-Acked-by: Andrea Mayer <andrea.mayer@uniroma2.it>
+ drivers/net/ethernet/marvell/octeontx2/af/mbox.h   |  2 ++
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.c    |  3 ++
+ .../ethernet/marvell/octeontx2/nic/otx2_common.c   | 37 ++++++++++++++++++++++
+ .../ethernet/marvell/octeontx2/nic/otx2_common.h   |  4 +--
+ .../net/ethernet/marvell/octeontx2/nic/otx2_pf.c   |  2 ++
+ 5 files changed, 45 insertions(+), 3 deletions(-)
 
-Changes look good to me.
+-- 
+2.7.4
 
-Thanks,
-Andrea
 
