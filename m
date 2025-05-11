@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-189567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A791FAB2A5F
-	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 20:41:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CF6DAB2A62
+	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 20:41:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7EDB7AB9AB
-	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 18:40:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7CEA3AE162
+	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 18:41:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 551D82609F3;
-	Sun, 11 May 2025 18:40:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E9A2262FD9;
+	Sun, 11 May 2025 18:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TX7sK/0C"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D3hgDRFW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F71125F969;
-	Sun, 11 May 2025 18:40:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A4E72609EE;
+	Sun, 11 May 2025 18:40:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746988825; cv=none; b=dxCYPSHWvSnPN9knS3+jDA+q8rtoGK2Aq2/fL/kTZzBS1ttQACiqLV5dr1zsQk+LqtD4ugg1nhccHApKjrEMxpBI8ZfR+RYIlXaHMzsyfmobbcAMhe76CUGDvw428RZw9G8rbvU+FeHlbP7tVIgGCBc7CtYZWfsLHPov9E2vrv4=
+	t=1746988827; cv=none; b=ETyR1dNK5d5webIhF3FnnnjWZgRJn3TR/aXLVjJDGYqznkvLokMmksnMEzXrrHZD9ts7KjtULmts3d7yigv08SFxq5+QM14Or9u9t8umqyBinWBHu0y+q3zJ/fCTv+gJvLyk8EQbS0RbuBFF+TphQCK2sTCi94nKCC0ZGVRHjAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746988825; c=relaxed/simple;
-	bh=9G4ubJ6lV4V2dWOs0FNh/K1YDBBBYb3K8frA6VqI9G8=;
+	s=arc-20240116; t=1746988827; c=relaxed/simple;
+	bh=JMeorUGvSZqGdgT8eqo1GtEKe7cqqq8Xmt0oOBKX1/Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KffF1+R1yBPZwqpuZ9sps4oZ6noEGIoRk7UsnL3bSCJkztc+8Vosz4zoZ/AfYnii6deSqJwX2OM2VFcTpFZVl6HOLrRD7NOG3Ijk6BBOHj82H1jLRTfPbPNwQlTqMFc/D7/0D8lmOl518ykZNwRFbxXsI6q8uX78RAXQ8zMiBZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TX7sK/0C; arc=none smtp.client-ip=209.85.128.46
+	 MIME-Version; b=TmhCbrywhZGlAJtqp0qY3Y+JRO07I1FHPMZGMa9k2pdA6MFYBSxd4HktRgvLWZdkXg02+NujE7GBBM6tjOr+qZ2g2fHsMwukhpQE0yz7Mj40chkYjEXjDEN5WaGMIGfU66wFHPTSo+CE5JvDIfj5XgvKzjs6zDus7HYbjvt6QaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D3hgDRFW; arc=none smtp.client-ip=209.85.128.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43cf06eabdaso37728685e9.2;
-        Sun, 11 May 2025 11:40:23 -0700 (PDT)
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-43cf06eabdaso37728825e9.2;
+        Sun, 11 May 2025 11:40:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746988822; x=1747593622; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1746988823; x=1747593623; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pvRhcUvsur4qZV9ZsxMG2pchOpKzL3rOM+elE1weNSU=;
-        b=TX7sK/0ChNLIbtiyg6YMkwTMgVQEhfs5LPT0X3veT3lP5lpi1QSjiwAjLRC0TSCjpa
-         7AmkF1/LmHEuWgND6MSp7RnB4q35/dxO7HE8OVzWRwATYonZEaA19ozIMSk3tloBYhwz
-         Xael4jfIHw+biBqt3jkX2GTa9dwCdQbHKAPwpG8PlLTItt0Ur/+t94pUfTtmeKRWa0i/
-         UU/k0neShJ+MUdZMKJvsdrfGUIYBpHjkwdSEt6N6FjrFHD3ZLT/AX62qjnYaFJkVpGIJ
-         LNexSc0fqpwFLphLa07Wh0RecwBXpUjWN/hspFlvegAIKHx1U9Iq5UJOXUEm3RHhbgll
-         M0fA==
+        bh=lTQhXTyWA+dzynRUt+APtRqGDF+FBiwvMZ8BjXEGJS4=;
+        b=D3hgDRFWDcZB10GJyPqH1QQhBp/k19WXDollwru/bYun4nU9Judkx9rUNo7jAlP1+E
+         ZBXJX8/+JxWPi0CeWIMc2qyvr/nQGMdIqExlG3ruhSXqwVxxfUlIyRLx2bO9WkD8qkm6
+         bf5WSpOwNEs13hi/NEJeEetxF/Mlc7pMojB38xNxjfGDJmvh5lAW/dq4jS0O1tECk+6v
+         NYNjSdKaHJkVe/cBKRBMyS6twSWvCvuMxTmVHSX2IDaqQxKbd26P3TYyeH6zIG9G4lw2
+         c30Tv8Tyk3HkoZZGS873X19k+h4Qld4hIeWQ9lDp+IpBra8JUqUtymwMz1opETKea5NY
+         Dq4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746988822; x=1747593622;
+        d=1e100.net; s=20230601; t=1746988823; x=1747593623;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=pvRhcUvsur4qZV9ZsxMG2pchOpKzL3rOM+elE1weNSU=;
-        b=EdwgdWa6yUat1ZxPJy470Ome7YSiKCQgaw0T1h/waq6Y4qxS0w0GQwfAMxNTFM7Rfs
-         gw3jWQAA2kDBpCBpldNqA4qYyStkMAbRHpwq3IzY/id7SDqbq+lg9A60NcWq/KI31Tl+
-         MJchZHhOOcZcMUYl0bDv7rE7PLLXW58XL2ZhU051EELmWuph9FJEdDaXVkPR57fUkSYv
-         nMUosF6Ff9FFyuZGI69n3lbMs06qyB9XkORijwAmerLa4isXu/lrfhFDPpkkxYpJc643
-         GjVQ6rD7NKCWbJ1FpAcpha50Abfrd2Isa1i28VBT+dPotbFvV2U+JEaDfZjmMEhmIZJz
-         8y0A==
-X-Forwarded-Encrypted: i=1; AJvYcCVJrccilG9qo6mdyRMzcSWRPoxydWJlc2bR0QwTcmU/DPZMx3dDimMhIH1B02ZsdkV1QpoSf+P/pClRsatJ@vger.kernel.org, AJvYcCVjl1eKk2hgLAAQs8D2MGet/Xt+gBI/ozKYw5HwLQ88o4XlgYn/QZylA/7xKa01UCyQQR9C0MxKI1gy@vger.kernel.org, AJvYcCVx8rZ2IRHi3OEOV+NFSAHaL6ILbm/te9NDbRy3t0PvHkqdk/wIJzK8uKcH4yXFXhvUoauXeMKy@vger.kernel.org
-X-Gm-Message-State: AOJu0YweX0ibPSxGkhfBhteSIqK5JHYVXElBI5G5JYMXL2Eja6Wh2Pdw
-	nz0srQXHu+bbZctTVWyEOiaT8kM2SPe/1238fpEzxgvZpvUKl8zz
-X-Gm-Gg: ASbGnct9NZNHluoGnUWjWrEOXz2/mu3FOhW2WdVOx9fB3Dg5pyD9aYjPTJae0u0TwTM
-	uFMnw+bxzb4eBuryKBhwlLnkXfd6rzG4RNMenJxm0XqmsNMxjMhkkMTkELyd6nZczwEZZhvi6LY
-	OjvwbTo+U35sx527VqLCyXGlWyv9gPKo3bL5r5u0PmLBKSXCQYrPa+SwhQUJWRhWnUWNt+v1m2t
-	dBIDNbGRK92DCcSDX92HJgryp2dEWJFC43yEp2V3It3zE/7j3uNwiOXq86i8nuRKU6NJXnVLHQT
-	5gMkI0zO9z2JJwTqakpKpclRfxgD4hUu9BUXQdbiQi35Ng4ibGi6a1aX4SgCGnFb1YWKX/NK8Ly
-	dGTSSFXCRdOi2YoO0MpoD
-X-Google-Smtp-Source: AGHT+IG1lgJdBBtBufUu7EMqcsypH7gqNW2zn6PVpB1dxzTe9b8x/aeuiNP1WuW2g0rxcg7QnIN1lg==
-X-Received: by 2002:a05:600c:510b:b0:43d:300f:fa4a with SMTP id 5b1f17b1804b1-442d6d4483fmr86993445e9.12.1746988821312;
-        Sun, 11 May 2025 11:40:21 -0700 (PDT)
+        bh=lTQhXTyWA+dzynRUt+APtRqGDF+FBiwvMZ8BjXEGJS4=;
+        b=aspjIGcVB0uJnQmHSN6h4K2lRFkGtYDKsU7VQv1JvLUS6Np93bQEtFjLZptOo3PTJQ
+         hKOdnptrCDMgqsVwFngOGbvMxnXcKfrzcYqQ3/f9sVBWfTHx5KUgD2k0gsAA9PKXRex4
+         cUWLXa/vVYCWxofN7PpkAjzMhCZMC/LzP93cyMwiFwN4mGcIvLP6jFzhMeadcYUjybDz
+         FYEsHDFdjxe4H9Mp/OuHZcT2oGGSJLAG2dRD2Rib0ZtQ4qvtswFaIOtV4EDTUX+pxe4g
+         rg1WXo60bb9HYkeoUogsyWhOvBYSyBHJqZ98/XanBR8DopVB/nowehcin4SOqlV9UbM/
+         X6PA==
+X-Forwarded-Encrypted: i=1; AJvYcCUz+ha8vo9Nz3F8VSazEcl/5IL4WEnS7Uq/egxDN4u7hAEneTYr10vEERsf3dQkjALXYym/8yHnpHLqGfA6@vger.kernel.org, AJvYcCVZyQlgeKm8juiTJx7JSyNBjSFVbGRS/DBz79nRTt0/S/G2g7Hc8RacluEMto02YWn9ruq25ERq@vger.kernel.org, AJvYcCWyx1An2euobkpji73AQqLGYXPGUxDEWPZ2rKYbkNdfrvKx5C9VCyix1xRJti4p7/tjLs9CiRFlnwH3@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBjsde/Mu+akCAn12TZCshoTT4aMspwjZLz6m/AXj+BPR70Si4
+	Zrjr1aghp6hSuJ71t5BaLUIM8PA2RsGPy5rue0NqhhnQtT3zWDut
+X-Gm-Gg: ASbGncu+t/m2r06O7j+QAUz8Sy0A8U+Z7jaiaRWTkKEh/ASccao5+/3puxoClqiqFRa
+	hsz3TUaTih1y31/z74GCdzZS4LsaXYJzCFRReOavra7cOVlMSY/gUd5Btkpe0LX6tZUP3K+i2/v
+	YpOl9CNd79JomGnKygMEl8aMrwRObbALM0Td/5QAza9uaem8GHtwPFKGdoXCwX7ltuYaSflejJl
+	/jM50LZTcvlhCZBx8NUUWtG39iPb508XTss71PWybRTRA+QqmSYYOPvPVVC2PoNbn8jiAe+nZ5c
+	lHgc8XFf/HhFMNIQrbqI5+akKGg9V0BhxWazXcdBgDTeJ9g/3giO/nMgxpk8NatyPqfVGYZjY5/
+	7gGUV0SurAuwxg+3WF81l
+X-Google-Smtp-Source: AGHT+IGaWWznm1g3/EE3XRPbpAWq5hRI4HNyqj7w1FypcqerY4CKOJ5dbZnmsHxw3yLaCugp4W2Dzw==
+X-Received: by 2002:a05:600c:a343:b0:43d:1b74:e89a with SMTP id 5b1f17b1804b1-442d6d3e238mr97781515e9.9.1746988823299;
+        Sun, 11 May 2025 11:40:23 -0700 (PDT)
 Received: from localhost.localdomain (93-34-88-225.ip49.fastwebnet.it. [93.34.88.225])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-442d76b7fd6sm61020615e9.0.2025.05.11.11.40.19
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-442d76b7fd6sm61020615e9.0.2025.05.11.11.40.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 May 2025 11:40:20 -0700 (PDT)
+        Sun, 11 May 2025 11:40:22 -0700 (PDT)
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Christian Marangi <ansuelsmth@gmail.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -96,9 +96,9 @@ To: Christian Marangi <ansuelsmth@gmail.com>,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Cc: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Subject: [net-next PATCH v9 2/6] net: phy: bcm87xx: simplify .match_phy_device OP
-Date: Sun, 11 May 2025 20:39:26 +0200
-Message-ID: <20250511183933.3749017-3-ansuelsmth@gmail.com>
+Subject: [net-next PATCH v9 3/6] net: phy: nxp-c45-tja11xx: simplify .match_phy_device OP
+Date: Sun, 11 May 2025 20:39:27 +0200
+Message-ID: <20250511183933.3749017-4-ansuelsmth@gmail.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250511183933.3749017-1-ansuelsmth@gmail.com>
 References: <20250511183933.3749017-1-ansuelsmth@gmail.com>
@@ -111,55 +111,128 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 Simplify .match_phy_device OP by using a generic function and using the
-new phy_id PHY driver info instead of hardcoding the matching PHY ID.
+new phy_id PHY driver info instead of hardcoding the matching PHY ID
+with new variant for macsec and no_macsec PHYs.
+
+Also make use of PHY_ID_MATCH_MODEL macro and drop PHY_ID_MASK define to
+introduce phy_id and phy_id_mask again in phy_driver struct.
 
 Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 ---
- drivers/net/phy/bcm87xx.c | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
+ drivers/net/phy/nxp-c45-tja11xx.c | 45 ++++++++++++++-----------------
+ 1 file changed, 20 insertions(+), 25 deletions(-)
 
-diff --git a/drivers/net/phy/bcm87xx.c b/drivers/net/phy/bcm87xx.c
-index 1e1e2259fc2b..299f9a8f30f4 100644
---- a/drivers/net/phy/bcm87xx.c
-+++ b/drivers/net/phy/bcm87xx.c
-@@ -185,16 +185,10 @@ static irqreturn_t bcm87xx_handle_interrupt(struct phy_device *phydev)
- 	return IRQ_HANDLED;
+diff --git a/drivers/net/phy/nxp-c45-tja11xx.c b/drivers/net/phy/nxp-c45-tja11xx.c
+index 22921b192a8b..4c6d905f0a9f 100644
+--- a/drivers/net/phy/nxp-c45-tja11xx.c
++++ b/drivers/net/phy/nxp-c45-tja11xx.c
+@@ -19,7 +19,6 @@
+ 
+ #include "nxp-c45-tja11xx.h"
+ 
+-#define PHY_ID_MASK			GENMASK(31, 4)
+ /* Same id: TJA1103, TJA1104 */
+ #define PHY_ID_TJA_1103			0x001BB010
+ /* Same id: TJA1120, TJA1121 */
+@@ -1966,32 +1965,24 @@ static int nxp_c45_macsec_ability(struct phy_device *phydev)
+ 	return macsec_ability;
  }
  
--static int bcm8706_match_phy_device(struct phy_device *phydev,
-+static int bcm87xx_match_phy_device(struct phy_device *phydev,
- 				    const struct phy_driver *phydrv)
+-static int tja1103_match_phy_device(struct phy_device *phydev,
+-				    const struct phy_driver *phydrv)
++static int tja11xx_no_macsec_match_phy_device(struct phy_device *phydev,
++					      const struct phy_driver *phydrv)
  {
--	return phydev->c45_ids.device_ids[4] == PHY_ID_BCM8706;
+-	return phy_id_compare(phydev->phy_id, PHY_ID_TJA_1103, PHY_ID_MASK) &&
+-	       !nxp_c45_macsec_ability(phydev);
 -}
--
--static int bcm8727_match_phy_device(struct phy_device *phydev,
++	if (!phy_id_compare(phydev->phy_id, phydrv->phy_id,
++			    phydrv->phy_id_mask))
++		return 0;
+ 
+-static int tja1104_match_phy_device(struct phy_device *phydev,
 -				    const struct phy_driver *phydrv)
 -{
--	return phydev->c45_ids.device_ids[4] == PHY_ID_BCM8727;
-+	return phydev->c45_ids.device_ids[4] == phydrv->phy_id;
+-	return phy_id_compare(phydev->phy_id, PHY_ID_TJA_1103, PHY_ID_MASK) &&
+-	       nxp_c45_macsec_ability(phydev);
++	return !nxp_c45_macsec_ability(phydev);
  }
  
- static struct phy_driver bcm87xx_driver[] = {
-@@ -208,7 +202,7 @@ static struct phy_driver bcm87xx_driver[] = {
- 	.read_status	= bcm87xx_read_status,
- 	.config_intr	= bcm87xx_config_intr,
- 	.handle_interrupt = bcm87xx_handle_interrupt,
--	.match_phy_device = bcm8706_match_phy_device,
-+	.match_phy_device = bcm87xx_match_phy_device,
- }, {
- 	.phy_id		= PHY_ID_BCM8727,
- 	.phy_id_mask	= 0xffffffff,
-@@ -219,7 +213,7 @@ static struct phy_driver bcm87xx_driver[] = {
- 	.read_status	= bcm87xx_read_status,
- 	.config_intr	= bcm87xx_config_intr,
- 	.handle_interrupt = bcm87xx_handle_interrupt,
--	.match_phy_device = bcm8727_match_phy_device,
-+	.match_phy_device = bcm87xx_match_phy_device,
- } };
+-static int tja1120_match_phy_device(struct phy_device *phydev,
+-				    const struct phy_driver *phydrv)
++static int tja11xx_macsec_match_phy_device(struct phy_device *phydev,
++					   const struct phy_driver *phydrv)
+ {
+-	return phy_id_compare(phydev->phy_id, PHY_ID_TJA_1120, PHY_ID_MASK) &&
+-	       !nxp_c45_macsec_ability(phydev);
+-}
++	if (!phy_id_compare(phydev->phy_id, phydrv->phy_id,
++			    phydrv->phy_id_mask))
++		return 0;
  
- module_phy_driver(bcm87xx_driver);
+-static int tja1121_match_phy_device(struct phy_device *phydev,
+-				    const struct phy_driver *phydrv)
+-{
+-	return phy_id_compare(phydev->phy_id, PHY_ID_TJA_1120, PHY_ID_MASK) &&
+-	       nxp_c45_macsec_ability(phydev);
++	return nxp_c45_macsec_ability(phydev);
+ }
+ 
+ static const struct nxp_c45_regmap tja1120_regmap = {
+@@ -2064,6 +2055,7 @@ static const struct nxp_c45_phy_data tja1120_phy_data = {
+ 
+ static struct phy_driver nxp_c45_driver[] = {
+ 	{
++		PHY_ID_MATCH_MODEL(PHY_ID_TJA_1103),
+ 		.name			= "NXP C45 TJA1103",
+ 		.get_features		= nxp_c45_get_features,
+ 		.driver_data		= &tja1103_phy_data,
+@@ -2085,9 +2077,10 @@ static struct phy_driver nxp_c45_driver[] = {
+ 		.get_sqi		= nxp_c45_get_sqi,
+ 		.get_sqi_max		= nxp_c45_get_sqi_max,
+ 		.remove			= nxp_c45_remove,
+-		.match_phy_device	= tja1103_match_phy_device,
++		.match_phy_device	= tja11xx_no_macsec_match_phy_device,
+ 	},
+ 	{
++		PHY_ID_MATCH_MODEL(PHY_ID_TJA_1103),
+ 		.name			= "NXP C45 TJA1104",
+ 		.get_features		= nxp_c45_get_features,
+ 		.driver_data		= &tja1103_phy_data,
+@@ -2109,9 +2102,10 @@ static struct phy_driver nxp_c45_driver[] = {
+ 		.get_sqi		= nxp_c45_get_sqi,
+ 		.get_sqi_max		= nxp_c45_get_sqi_max,
+ 		.remove			= nxp_c45_remove,
+-		.match_phy_device	= tja1104_match_phy_device,
++		.match_phy_device	= tja11xx_macsec_match_phy_device,
+ 	},
+ 	{
++		PHY_ID_MATCH_MODEL(PHY_ID_TJA_1120),
+ 		.name			= "NXP C45 TJA1120",
+ 		.get_features		= nxp_c45_get_features,
+ 		.driver_data		= &tja1120_phy_data,
+@@ -2134,9 +2128,10 @@ static struct phy_driver nxp_c45_driver[] = {
+ 		.get_sqi		= nxp_c45_get_sqi,
+ 		.get_sqi_max		= nxp_c45_get_sqi_max,
+ 		.remove			= nxp_c45_remove,
+-		.match_phy_device	= tja1120_match_phy_device,
++		.match_phy_device	= tja11xx_no_macsec_match_phy_device,
+ 	},
+ 	{
++		PHY_ID_MATCH_MODEL(PHY_ID_TJA_1120),
+ 		.name			= "NXP C45 TJA1121",
+ 		.get_features		= nxp_c45_get_features,
+ 		.driver_data		= &tja1120_phy_data,
+@@ -2159,7 +2154,7 @@ static struct phy_driver nxp_c45_driver[] = {
+ 		.get_sqi		= nxp_c45_get_sqi,
+ 		.get_sqi_max		= nxp_c45_get_sqi_max,
+ 		.remove			= nxp_c45_remove,
+-		.match_phy_device	= tja1121_match_phy_device,
++		.match_phy_device	= tja11xx_macsec_match_phy_device,
+ 	},
+ };
+ 
 -- 
 2.48.1
 
