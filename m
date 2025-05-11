@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-189539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED84EAB290C
-	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 16:28:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE97CAB28F2
+	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 16:20:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF7B03AFD3A
-	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 14:27:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5BA91893681
+	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 14:20:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA3E825B1DD;
-	Sun, 11 May 2025 14:27:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C95382580F5;
+	Sun, 11 May 2025 14:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="t6W+bX+z"
+	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="i6y8r28v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout1.routing.net (mxout1.routing.net [134.0.28.11])
+Received: from mxout2.routing.net (mxout2.routing.net [134.0.28.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE6EC25A33E;
-	Sun, 11 May 2025 14:27:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E688257ADB;
+	Sun, 11 May 2025 14:20:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746973636; cv=none; b=ib7XkTb9DpM6t7F8RqWiMZ+JsLR2SdcsClTm9ysLDjdiMSnv9ZTPRLu13qkbk0OnVO6IxawQ+tVFa6auq8umCFCDhzsGNmxBeChE52GEgoYSxTNfsOAodCvK/ipa+tCcHnDfaCzCsL30RSY0/+mSzg7yK8eYk8oeG+dM0WkaemE=
+	t=1746973204; cv=none; b=QQM5htEYcrzlDM9YKlv1ffk4xZGK7yYnVwBEbHYYqq/RRdlrKzqZRKm/lfqXpbiNQcmNCp7qXkZ22jWJCIGEE8NyEmZStlPbcoBv1gtuCy1trUDP5Ivv3Mm29i9JzPcYfBg/cEE5xvvDnNfz9XuOcTS6QHue5kZxvbl+J1/5VBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746973636; c=relaxed/simple;
-	bh=MXoHdJdXDAaIgTdoPAI3IjgNKGscDJ3hK37VxvEd/pw=;
+	s=arc-20240116; t=1746973204; c=relaxed/simple;
+	bh=ynlCTI58GBOaQCs9YFLcm28DVdN34T3OlrNDt7h9uW4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LO8vpqLOdxdqX/zrHwfO5seNAM5W6P3vQUgCxbBRQ8+cM25HQDD9+5vOl6f429dRNRyB25M5Xc6bJBmq+Of3FficQvc/APgncYgROoUxi4PiH1dKWPFIgEojNEJGvVDTGYWbsybk44w6H2UUKKJEMJmRIZgYzRzJrWEowL7d5ug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=t6W+bX+z; arc=none smtp.client-ip=134.0.28.11
+	 MIME-Version; b=C7T4OQPVVyyBa5l/VWFPsEec9UfqTgZmKlbnYBIBki+UtsnNsr32AZ1tDxeAUcfjdVk3FJ7PHyYGCRq4i9USaboX1AQ+6PGLMLXSi0B86zQJ13aYXb5YJeZcFM+f6QZ2p6FX4DJA14ReT8j8fxZKZIxpr7Zz7/ycZ/Wrg0Hgg20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=i6y8r28v; arc=none smtp.client-ip=134.0.28.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
 Received: from mxbox2.masterlogin.de (unknown [192.168.10.89])
-	by mxout1.routing.net (Postfix) with ESMTP id B2A6440094;
-	Sun, 11 May 2025 14:19:59 +0000 (UTC)
+	by mxout2.routing.net (Postfix) with ESMTP id C88A95FDD4;
+	Sun, 11 May 2025 14:20:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
-	s=20200217; t=1746973199;
+	s=20200217; t=1746973200;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Zletv3U5pRRedodS7LIwp9KMfAgSeQxiaCAd7v3PwI0=;
-	b=t6W+bX+z/KRWh9jA/wLcR8rgxTTS4oMSkzhc6kOa6+8CCchz6xVQORutqkVWCSVtNFi7cQ
-	z/7aDNcaKk7HvAAjGho2aXcBXVk02wclJ/eoIdr67suJwISesnfTaRMKfy/OfyF3tFWABH
-	h4K52HiAXDv3KU2v4e+UITQHa+tzdHc=
+	bh=qxZ32nniQ48sMzhBF0T/7YO0bN/349dEDPJEtWWeR2Q=;
+	b=i6y8r28vjKY8uzVDpC1f8gNShmUvPiASJio/YuScg6OBQgk55IjvO//BYR8N6DxIxEVsLM
+	ojhj11kU7ZYGzDcPBplp2oOhyq/2BaIkPP14js+RUOF+Pcf4vRiWXRuzaHTHnm5TLlbE0I
+	oiy8WKhWKIfZkKz5178YdQvINq0ciYc=
 Received: from frank-u24.. (fttx-pool-194.15.84.99.bambit.de [194.15.84.99])
-	by mxbox2.masterlogin.de (Postfix) with ESMTPSA id 98311100787;
-	Sun, 11 May 2025 14:19:58 +0000 (UTC)
+	by mxbox2.masterlogin.de (Postfix) with ESMTPSA id 8F3D0100500;
+	Sun, 11 May 2025 14:19:59 +0000 (UTC)
 From: Frank Wunderlich <linux@fw-web.de>
 To: Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -72,9 +72,9 @@ Cc: Frank Wunderlich <frank-w@public-files.de>,
 	linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org
-Subject: [PATCH v1 07/14] arm64: dts: mediatek: mt7988: add phy calibration efuse subnodes
-Date: Sun, 11 May 2025 16:19:23 +0200
-Message-ID: <20250511141942.10284-8-linux@fw-web.de>
+Subject: [PATCH v1 08/14] arm64: dts: mediatek: mt7988: add basic ethernet-nodes
+Date: Sun, 11 May 2025 16:19:24 +0200
+Message-ID: <20250511141942.10284-9-linux@fw-web.de>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250511141942.10284-1-linux@fw-web.de>
 References: <20250511141942.10284-1-linux@fw-web.de>
@@ -85,46 +85,174 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Mail-ID: b7327c0d-db13-43b6-8ec5-709b71d19c3b
+X-Mail-ID: 5c8e73b6-e2d6-4898-90c0-375604707c20
 
 From: Frank Wunderlich <frank-w@public-files.de>
 
-MT7988 contains buildin mt753x switch which needs calibration data from
-efuse.
+Add basic ethernet related nodes.
+
+Mac1+2 needs pcs (sgmii+usxgmii) to work correctly which will be linked
+later when driver is merged.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
 ---
- arch/arm64/boot/dts/mediatek/mt7988a.dtsi | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ arch/arm64/boot/dts/mediatek/mt7988a.dtsi | 124 +++++++++++++++++++++-
+ 1 file changed, 121 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/mediatek/mt7988a.dtsi b/arch/arm64/boot/dts/mediatek/mt7988a.dtsi
-index 64466acb0e71..029699e4eb02 100644
+index 029699e4eb02..aa0947a555aa 100644
 --- a/arch/arm64/boot/dts/mediatek/mt7988a.dtsi
 +++ b/arch/arm64/boot/dts/mediatek/mt7988a.dtsi
-@@ -696,6 +696,22 @@ efuse@11f50000 {
- 			lvts_calibration: calib@918 {
- 				reg = <0x918 0x28>;
+@@ -680,7 +680,28 @@ xphyu3port0: usb-phy@11e13000 {
  			};
-+
-+			phy_calibration_p0: calib@940 {
-+				reg = <0x940 0x10>;
-+			};
-+
-+			phy_calibration_p1: calib@954 {
-+				reg = <0x954 0x10>;
-+			};
-+
-+			phy_calibration_p2: calib@968 {
-+				reg = <0x968 0x10>;
-+			};
-+
-+			phy_calibration_p3: calib@97c {
-+				reg = <0x97c 0x10>;
-+			};
  		};
  
- 		clock-controller@15000000 {
+-		clock-controller@11f40000 {
++		xfi_tphy0: phy@11f20000 {
++			compatible = "mediatek,mt7988-xfi-tphy";
++			reg = <0 0x11f20000 0 0x10000>;
++			resets = <&watchdog 14>;
++			clocks = <&xfi_pll CLK_XFIPLL_PLL_EN>,
++				 <&topckgen CLK_TOP_XFI_PHY_0_XTAL_SEL>;
++			clock-names = "xfipll", "topxtal";
++			mediatek,usxgmii-performance-errata;
++			#phy-cells = <0>;
++		};
++
++		xfi_tphy1: phy@11f30000 {
++			compatible = "mediatek,mt7988-xfi-tphy";
++			reg = <0 0x11f30000 0 0x10000>;
++			resets = <&watchdog 15>;
++			clocks = <&xfi_pll CLK_XFIPLL_PLL_EN>,
++				 <&topckgen CLK_TOP_XFI_PHY_1_XTAL_SEL>;
++			clock-names = "xfipll", "topxtal";
++			#phy-cells = <0>;
++		};
++
++		xfi_pll: clock-controller@11f40000 {
+ 			compatible = "mediatek,mt7988-xfi-pll";
+ 			reg = <0 0x11f40000 0 0x1000>;
+ 			resets = <&watchdog 16>;
+@@ -714,19 +735,116 @@ phy_calibration_p3: calib@97c {
+ 			};
+ 		};
+ 
+-		clock-controller@15000000 {
++		ethsys: clock-controller@15000000 {
+ 			compatible = "mediatek,mt7988-ethsys", "syscon";
+ 			reg = <0 0x15000000 0 0x1000>;
+ 			#clock-cells = <1>;
+ 			#reset-cells = <1>;
+ 		};
+ 
+-		clock-controller@15031000 {
++		ethwarp: clock-controller@15031000 {
+ 			compatible = "mediatek,mt7988-ethwarp";
+ 			reg = <0 0x15031000 0 0x1000>;
+ 			#clock-cells = <1>;
+ 			#reset-cells = <1>;
+ 		};
++
++		eth: ethernet@15100000 {
++			compatible = "mediatek,mt7988-eth";
++			reg = <0 0x15100000 0 0x80000>,
++			      <0 0x15400000 0 0x200000>;
++			interrupts = <GIC_SPI 196 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 197 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 198 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 199 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&ethsys CLK_ETHDMA_CRYPT0_EN>,
++				 <&ethsys CLK_ETHDMA_FE_EN>,
++				 <&ethsys CLK_ETHDMA_GP2_EN>,
++				 <&ethsys CLK_ETHDMA_GP1_EN>,
++				 <&ethsys CLK_ETHDMA_GP3_EN>,
++				 <&ethwarp CLK_ETHWARP_WOCPU2_EN>,
++				 <&ethwarp CLK_ETHWARP_WOCPU1_EN>,
++				 <&ethwarp CLK_ETHWARP_WOCPU0_EN>,
++				 <&ethsys CLK_ETHDMA_ESW_EN>,
++				 <&topckgen CLK_TOP_ETH_GMII_SEL>,
++				 <&topckgen CLK_TOP_ETH_REFCK_50M_SEL>,
++				 <&topckgen CLK_TOP_ETH_SYS_200M_SEL>,
++				 <&topckgen CLK_TOP_ETH_SYS_SEL>,
++				 <&topckgen CLK_TOP_ETH_XGMII_SEL>,
++				 <&topckgen CLK_TOP_ETH_MII_SEL>,
++				 <&topckgen CLK_TOP_NETSYS_SEL>,
++				 <&topckgen CLK_TOP_NETSYS_500M_SEL>,
++				 <&topckgen CLK_TOP_NETSYS_PAO_2X_SEL>,
++				 <&topckgen CLK_TOP_NETSYS_SYNC_250M_SEL>,
++				 <&topckgen CLK_TOP_NETSYS_PPEFB_250M_SEL>,
++				 <&topckgen CLK_TOP_NETSYS_WARP_SEL>,
++				 <&ethsys CLK_ETHDMA_XGP1_EN>,
++				 <&ethsys CLK_ETHDMA_XGP2_EN>,
++				 <&ethsys CLK_ETHDMA_XGP3_EN>;
++			clock-names = "crypto", "fe", "gp2", "gp1",
++				      "gp3",
++				      "ethwarp_wocpu2", "ethwarp_wocpu1",
++				      "ethwarp_wocpu0", "esw", "top_eth_gmii_sel",
++				      "top_eth_refck_50m_sel", "top_eth_sys_200m_sel",
++				      "top_eth_sys_sel", "top_eth_xgmii_sel",
++				      "top_eth_mii_sel", "top_netsys_sel",
++				      "top_netsys_500m_sel", "top_netsys_pao_2x_sel",
++				      "top_netsys_sync_250m_sel",
++				      "top_netsys_ppefb_250m_sel",
++				      "top_netsys_warp_sel","xgp1", "xgp2", "xgp3";
++			assigned-clocks = <&topckgen CLK_TOP_NETSYS_2X_SEL>,
++					  <&topckgen CLK_TOP_NETSYS_GSW_SEL>,
++					  <&topckgen CLK_TOP_USXGMII_SBUS_0_SEL>,
++					  <&topckgen CLK_TOP_USXGMII_SBUS_1_SEL>,
++					  <&topckgen CLK_TOP_SGM_0_SEL>,
++					  <&topckgen CLK_TOP_SGM_1_SEL>;
++			assigned-clock-parents = <&apmixedsys CLK_APMIXED_NET2PLL>,
++						 <&topckgen CLK_TOP_NET1PLL_D4>,
++						 <&topckgen CLK_TOP_NET1PLL_D8_D4>,
++						 <&topckgen CLK_TOP_NET1PLL_D8_D4>,
++						 <&apmixedsys CLK_APMIXED_SGMPLL>,
++						 <&apmixedsys CLK_APMIXED_SGMPLL>;
++			mediatek,ethsys = <&ethsys>;
++			mediatek,infracfg = <&topmisc>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			gmac0: mac@0 {
++				compatible = "mediatek,eth-mac";
++				reg = <0>;
++				phy-mode = "internal";
++
++				fixed-link {
++					speed = <10000>;
++					full-duplex;
++					pause;
++				};
++			};
++
++			gmac1: mac@1 {
++				compatible = "mediatek,eth-mac";
++				reg = <1>;
++				status = "disabled";
++			};
++
++			gmac2: mac@2 {
++				compatible = "mediatek,eth-mac";
++				reg = <2>;
++				status = "disabled";
++			};
++
++			mdio_bus: mdio-bus {
++				#address-cells = <1>;
++				#size-cells = <0>;
++
++				/* internal 2.5G PHY */
++				int_2p5g_phy: ethernet-phy@f {
++					reg = <15>;
++					compatible = "ethernet-phy-ieee802.3-c45";
++					phy-mode = "internal";
++				};
++			};
++		};
+ 	};
+ 
+ 	thermal-zones {
 -- 
 2.43.0
 
