@@ -1,174 +1,117 @@
-Return-Path: <netdev+bounces-189504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 294C5AB25FA
-	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 02:44:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DE3CAB2609
+	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 03:35:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F18AA863975
-	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 00:43:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A102A189DCD7
+	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 01:35:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9419E1DB125;
-	Sun, 11 May 2025 00:41:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25017273FE;
+	Sun, 11 May 2025 01:35:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NZOX/xwM"
+	dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="fzfiC2Ct";
+	dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="uPhnhPGs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 641521D5CEA;
-	Sun, 11 May 2025 00:41:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD6CA139D;
+	Sun, 11 May 2025 01:35:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746924100; cv=none; b=r/6bnBbgkWuaxqmaoQoQEXLJM/FU1DjZMp4VQWyRVbB9+plvKIlUbXZdpnCOdUJxMQdWDlqNr1nOQZc3k2qc58lulGyCwdgBg6r1Vb5Y6GywTuysjKLQvtj0fshzqLILlZfYACotvjYAwnjqx1XKbi/y9h85m919gtUtCcqDVHo=
+	t=1746927323; cv=none; b=q0IR570MtpHurmn+0NU1Pv1uhtuWMcocxVLx5pIXV0HRmNstfoWI8YAebA5bRplyW4r+Lu6xfhHWbXDM8MPko4LzY6lOB59xu+WG67bTQc4dDOEBoiQRwVwoj2rkwqsFDpiP9+SOOB8QhED/rYQeFw5LC2MUzBKpEHiGtrdIb3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746924100; c=relaxed/simple;
-	bh=1M/Uxj/GlzhwSrBWvWBpAp/iDXzpGWDqYvfOyMyRoL4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pIwBYzN1AFi5rP+szGhrwM50ZLt2qU/Icspw8rgQFxkCcHeVIsJzrQt0zT1FhN0b2B4IiKLYHsc386UGvrkPdfNmfkBQAOo2ahP1wOth7LbfK4QYFK0YiACVk9m/gQnT69O2BU3IqM9AHwZnuht0sGmcnC2kcNQd0u+hQfAAtE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NZOX/xwM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 631B4C4CEEE;
-	Sun, 11 May 2025 00:41:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746924100;
-	bh=1M/Uxj/GlzhwSrBWvWBpAp/iDXzpGWDqYvfOyMyRoL4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NZOX/xwMxCnXrfMk9nmIM7VO+YI5DMYHUfROWZ/IvYpTGiJ3pS0j87VESZ6xW8kOs
-	 A5uDYUAkFqYXzdpzyeng1AI6bchZZ6NmZKvS5t+WQWxNXX9a2yGCpeNKC8dB71eEyX
-	 GpBvoEOACOz2AHtm9Y+hBGYNuikSYitAsXa0DpuuiD7xNb3RoKA2jsehoXky/JTvYR
-	 9ptSMpk7mJu4rh3cg/h/r5l042QmusHMbSP5ulzjQMAZBc+UgSwtrcAPi714mInHtX
-	 pi7Sqjxuu46+6wuIByHBS6WbVlsJnhDjcQ9CjSpFgfjY3DB5BlAaLJ3tFUyehKvot8
-	 258DbM8dcgFoA==
-From: Eric Biggers <ebiggers@kernel.org>
-To: netdev@vger.kernel.org
-Cc: linux-nvme@lists.infradead.org,
-	linux-sctp@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH net-next 10/10] net: remove skb_copy_and_hash_datagram_iter()
-Date: Sat, 10 May 2025 17:41:10 -0700
-Message-ID: <20250511004110.145171-11-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250511004110.145171-1-ebiggers@kernel.org>
-References: <20250511004110.145171-1-ebiggers@kernel.org>
+	s=arc-20240116; t=1746927323; c=relaxed/simple;
+	bh=Rs6jpnBP7P1WnzGa9WTZgmxvwHQOZBb+PfH5fr7joxQ=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=kdGmg5kxMSjkMQDJsuoSVBNq6mGBXzpWUPoBAkcm9pljd8QQjez4esdgmabpJUtH95CFdXgcX30JLf5ik3/q8MN4zRfiyAwLGZVH854wuojqwh8MhYCEzbnAhdOs4BaKxVY1GFzYKFLgrtnU0LKSXC7p7Qr9a3n0zSmIj0uXYI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=fzfiC2Ct; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=uPhnhPGs; arc=none smtp.client-ip=160.80.4.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
+Received: from smtpauth-2019-1.uniroma2.it (smtpauth.uniroma2.it [160.80.5.46])
+	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 54B1YXnR024460;
+	Sun, 11 May 2025 03:34:39 +0200
+Received: from lubuntu-18.04 (unknown [160.80.103.126])
+	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id A46BE12288E;
+	Sun, 11 May 2025 03:34:29 +0200 (CEST)
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
+	s=ed201904; t=1746927270; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ofX56hdJp36rarI7IXO8x0nRNPdV54JQ4yA2f+BTyKs=;
+	b=fzfiC2Ct4a6SnKma4CIVLfAL9UyPHOlQI0zaCEeLA1kMgavI/qkeINJIeteYJRtFGdmv/1
+	Ol0rQxix6EiAxTCw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
+	t=1746927270; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ofX56hdJp36rarI7IXO8x0nRNPdV54JQ4yA2f+BTyKs=;
+	b=uPhnhPGsWi/y8my6VOCZKHsvEmoF6BOkbNffNxISp2rxY0hP0DIqvUqytonz5mqQgA5rQu
+	p8QeCV7HwFSB10uD83gp9tu0KnMmaMZh/DSQ56RQ3eCIpAhLNII4zfeEZMxWZProA7oQKd
+	RSIbkjEmrSNKD+nGvDvJ2wnC9kWRXaURRebdw4seAAyj2L/qVKyiINxwjIF2elSzlj3SDL
+	kRKpGLBcbSPUZGS5JBQMv2FkztMzPW78CRHEnoQEnGpyg4gpVF2pQIQmNZy64WrivweW16
+	i9FeZUkpclGg/BtKaEO4UDPYUTnSGMMzH1Av0wXzXuNQRxLUHDs0MS1uEivtiQ==
+Date: Sun, 11 May 2025 03:34:29 +0200
+From: Andrea Mayer <andrea.mayer@uniroma2.it>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+        Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Shuah Khan
+ <shuah@kernel.org>, Matthieu Baerts <matttbe@kernel.org>,
+        Mat Martineau
+ <martineau@kernel.org>,
+        Geliang Tang <geliang@kernel.org>,
+        Pablo Neira
+ Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Paolo
+ Lungaroni <paolo.lungaroni@uniroma2.it>,
+        linux-kselftest@vger.kernel.org, mptcp@lists.linux.dev,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+        Andrea Mayer <andrea.mayer@uniroma2.it>
+Subject: Re: [PATCHv2 net-next 4/6] selftests: net: use setup_ns for SRv6
+ tests and remove rp_filter configuration
+Message-Id: <20250511033429.aabb9627fac2d36a61c3d64d@uniroma2.it>
+In-Reply-To: <20250508081910.84216-5-liuhangbin@gmail.com>
+References: <20250508081910.84216-1-liuhangbin@gmail.com>
+	<20250508081910.84216-5-liuhangbin@gmail.com>
+X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
+X-Virus-Status: Clean
 
-From: Eric Biggers <ebiggers@google.com>
+On Thu,  8 May 2025 08:19:08 +0000
+Hangbin Liu <liuhangbin@gmail.com> wrote:
 
-Now that skb_copy_and_hash_datagram_iter() is no longer used, remove it.
+> Some SRv6 tests manually set up network namespaces and disable rp_filter.
+> Since the setup_ns library function already handles rp_filter configuration,
+> convert these SRv6 tests to use setup_ns and remove the redundant rp_filter
+> settings.
+> 
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- include/linux/skbuff.h |  4 ----
- net/core/datagram.c    | 37 -------------------------------------
- 2 files changed, 41 deletions(-)
+Acked-by: Andrea Mayer <andrea.mayer@uniroma2.it>
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 0027f2977c02..98cecd3a2fb8 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -272,11 +272,10 @@
- /* return minimum truesize of one skb containing X bytes of data */
- #define SKB_TRUESIZE(X) ((X) +						\
- 			 SKB_DATA_ALIGN(sizeof(struct sk_buff)) +	\
- 			 SKB_DATA_ALIGN(sizeof(struct skb_shared_info)))
- 
--struct ahash_request;
- struct net_device;
- struct scatterlist;
- struct pipe_inode_info;
- struct iov_iter;
- struct napi_struct;
-@@ -4123,13 +4122,10 @@ static inline int skb_copy_datagram_msg(const struct sk_buff *from, int offset,
- {
- 	return skb_copy_datagram_iter(from, offset, &msg->msg_iter, size);
- }
- int skb_copy_and_csum_datagram_msg(struct sk_buff *skb, int hlen,
- 				   struct msghdr *msg);
--int skb_copy_and_hash_datagram_iter(const struct sk_buff *skb, int offset,
--			   struct iov_iter *to, int len,
--			   struct ahash_request *hash);
- int skb_copy_and_crc32c_datagram_iter(const struct sk_buff *skb, int offset,
- 				      struct iov_iter *to, int len, u32 *crcp);
- int skb_copy_datagram_from_iter(struct sk_buff *skb, int offset,
- 				 struct iov_iter *from, int len);
- int zerocopy_sg_from_iter(struct sk_buff *skb, struct iov_iter *frm);
-diff --git a/net/core/datagram.c b/net/core/datagram.c
-index 47a6eef83162..b83731f11fad 100644
---- a/net/core/datagram.c
-+++ b/net/core/datagram.c
-@@ -60,11 +60,10 @@
- #include <net/checksum.h>
- #include <net/sock.h>
- #include <net/tcp_states.h>
- #include <trace/events/skb.h>
- #include <net/busy_poll.h>
--#include <crypto/hash.h>
- 
- /*
-  *	Is a socket 'connection oriented' ?
-  */
- static inline int connection_based(struct sock *sk)
-@@ -480,46 +479,10 @@ static int __skb_datagram_iter(const struct sk_buff *skb, int offset,
- 		goto fault;
- 
- 	return 0;
- }
- 
--static size_t hash_and_copy_to_iter(const void *addr, size_t bytes, void *hashp,
--				    struct iov_iter *i)
--{
--#ifdef CONFIG_CRYPTO_HASH
--	struct ahash_request *hash = hashp;
--	struct scatterlist sg;
--	size_t copied;
--
--	copied = copy_to_iter(addr, bytes, i);
--	sg_init_one(&sg, addr, copied);
--	ahash_request_set_crypt(hash, &sg, NULL, copied);
--	crypto_ahash_update(hash);
--	return copied;
--#else
--	return 0;
--#endif
--}
--
--/**
-- *	skb_copy_and_hash_datagram_iter - Copy datagram to an iovec iterator
-- *          and update a hash.
-- *	@skb: buffer to copy
-- *	@offset: offset in the buffer to start copying from
-- *	@to: iovec iterator to copy to
-- *	@len: amount of data to copy from buffer to iovec
-- *      @hash: hash request to update
-- */
--int skb_copy_and_hash_datagram_iter(const struct sk_buff *skb, int offset,
--			   struct iov_iter *to, int len,
--			   struct ahash_request *hash)
--{
--	return __skb_datagram_iter(skb, offset, to, len, true,
--			hash_and_copy_to_iter, hash);
--}
--EXPORT_SYMBOL(skb_copy_and_hash_datagram_iter);
--
- #ifdef CONFIG_NET_CRC32C
- static size_t crc32c_and_copy_to_iter(const void *addr, size_t bytes,
- 				      void *_crcp, struct iov_iter *i)
- {
- 	u32 *crcp = _crcp;
--- 
-2.49.0
+Changes look good to me.
 
+Thanks,
+Andrea
 
