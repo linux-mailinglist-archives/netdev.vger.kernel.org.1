@@ -1,204 +1,253 @@
-Return-Path: <netdev+bounces-189541-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8F6AAB2919
-	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 16:29:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EA0BAB2927
+	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 16:36:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 081453B84D6
-	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 14:29:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8254C3B608B
+	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 14:36:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAD5825A2D0;
-	Sun, 11 May 2025 14:27:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b="KBO4DcHw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 045C41D8A10;
+	Sun, 11 May 2025 14:36:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
+Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79AC725A2BC;
-	Sun, 11 May 2025 14:27:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7629D2580FF
+	for <netdev@vger.kernel.org>; Sun, 11 May 2025 14:36:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.59.177.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746973651; cv=none; b=GZ7+WpIT91XwdoN45N3ET6tdLWo604gY95QeAZI4u5QMJuyfKOcdm+3G9eKuKBKC0tFLlzHLWpIvrH8bpUMpcgwQv4VvmuDF2FkrgkaC8G7tXWzO3sftrf6og478bdjR7oPW689KCIadB9mfgPg3XKfP4djmpCCQIqnolPU0rHM=
+	t=1746974203; cv=none; b=A2etjAioG/jezX7alZXUSMFwnukjELcOfj4PO4KT+o07GVHRwIL5q+xiKdX8z41mNYjR5G1rufK/a6Xt/QnVVKZ7go3Q5Yji89C97cLM+fgPeACyUfIeclAI+oGLgybkwLBMoa2C37VD4RKjLS5HMDFx5oiRv/iB9I/MYRSHd20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746973651; c=relaxed/simple;
-	bh=82yBP8PCnuqdxwRMZhbJ6tUYl+6I94IhyIK99N1dyR0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uVRazhopxCPjpQmFK+UBKWC/hAb1fmgza/hifyBKoTO+01hxY0im2BSyJ3sHh0qgLIAbNS/vwcMPUAj4K+bXNpiEuJoVyXtRSHwt5k4AM285QO93mpUsq9FbDV6skGglQlk5eA+UCoNspxlzYS7kHjy0u4H4NReyCeyIb5jwFBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de; spf=pass smtp.mailfrom=public-files.de; dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b=KBO4DcHw; arc=none smtp.client-ip=212.227.17.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=public-files.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=public-files.de;
-	s=s31663417; t=1746973626; x=1747578426; i=frank-w@public-files.de;
-	bh=RocC8rGT7EyG6giOZHaltcZyAtXeChy4q0QRRBBF5KU=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:In-Reply-To:
-	 References:MIME-Version:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=KBO4DcHwPAKUnv2geUiD8jsys9UKvAsZd6CAdSEULMemA7gbp+kkXDDiCwcksS7h
-	 XnYLS0tD6deXwbG/oGgWt96Xw61VBeDTfcq0RE4hoyP99iOit1n7gLKGRySQiRr8D
-	 3OYe7c/OznmGxupDmEBLTdZtnv1ybkDv3yOE+W6pUA/NtxjiPxoAccdSHgq37sZSX
-	 zB8Nd9RfFNiU++2PeQcwZw+WZciow9lv88xlJc8oK8brJxpccP+qSQ5AqnYiSUR/s
-	 efXhPPtd96QVJl1lhB/R62TBI4nuv2TdL0VuoVppAVv/yHFaiDsPy2taHI7MYQuAj
-	 VeJo2tunV6i2de4YZw==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from frank-u24 ([194.15.84.99]) by mail.gmx.net (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1M7JzQ-1uLok140Ts-001RRK; Sun, 11
- May 2025 16:27:06 +0200
-From: Frank Wunderlich <frank-w@public-files.de>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Frank Wunderlich <frank-w@public-files.de>,
-	=?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Felix Fietkau <nbd@nbd.name>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH v1 14/14] arm64: dts: mediatek: mt7988a-bpi-r4: configure switch phys and leds
-Date: Sun, 11 May 2025 16:26:54 +0200
-Message-ID: <20250511142655.11007-5-frank-w@public-files.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250511142655.11007-1-frank-w@public-files.de>
-References: <20250511142655.11007-1-frank-w@public-files.de>
+	s=arc-20240116; t=1746974203; c=relaxed/simple;
+	bh=PE9DCVgSqMMp9h0a16kPcB7epKdEhBzYnglzspDXIF0=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=CjW4h+lktw6LP6zHx/w6ZzxR3bvFoCGOdtEf+GA80idPAqycf9S2bG2vgkF0snK0irj5yIECoqJu4/C7R/I6v/McStOzGecurFrYO2KEvvBHPanTF/39NE0dQnP3kRVzZAnwGUO6qjWQgMqy7G4HQHiWzSt+IPZ5Xs9NcAG22o4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=52.59.177.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
+X-QQ-mid: zesmtpsz9t1746974064t8e3333de
+X-QQ-Originating-IP: qAiaizxjPEMRwCgOSreS1pFAmsgko/sX+nbMvjvpSGA=
+Received: from smtpclient.apple ( [111.201.145.100])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Sun, 11 May 2025 22:34:17 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 6622796578644939508
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
+Subject: Re: [PATCH net-next 3/4] net: bonding: send peer notify when failure
+ recovery
+From: Tonghao Zhang <tonghao@bamaicloud.com>
+In-Reply-To: <1133780.1746882081@vermin>
+Date: Sun, 11 May 2025 22:34:17 +0800
+Cc: netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:z/Xxuc+GCe4mTpAJHIfgYl+TeTpVWKg2XFz+R/eThbF5luTDdBM
- ApyXNQbv15OhkowltyGIEziaMKUer3KBP6IDRBtvBqLlJI4MJcgUTVFpohMMHylL5GdkTsL
- ZBkZeytrTqNpKLNaILFReziaSHBlYhrdkeueV6CFoK062CtKPb9b0LHbrPCMQGXGNLT0r4f
- VChxTdK8Z3ZFlcTjN5dcA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:1ObFaSmp1eQ=;ECStePRFumKIJPLYWnwsWuHXPlq
- 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
- eXJQIk8eSXfVTWmpZiS8MPkV3
+Message-Id: <82317367-CCF4-4E21-84B1-911F8388E3E7@bamaicloud.com>
+References: <20250510044504.52618-1-tonghao@bamaicloud.com>
+ <20250510044504.52618-4-tonghao@bamaicloud.com> <1133780.1746882081@vermin>
+To: Jay Vosburgh <jv@jvosburgh.net>
+X-Mailer: Apple Mail (2.3693.20.0.1.32)
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
+X-QQ-XMAILINFO: NGzHPHPeapzDfRSZakUkq/uyLvhkrINAEcDCncPYdAGLA54Hnz5bye4K
+	dHvDVtrSozn0fO6oDaJcTM2duRJv6JKy0vZUBS+CxPMwvqUxE7TUb9M/U/vyVf263RgNE5I
+	QRBYRIc2enYO+Z5EEzpHt2kPRd55mbkJXLkFdYba1WBLLb2xjbpsMQsSVyg1/ZY4azqAZ9s
+	SiBi/K7L9EIhyX/3FAQiiZnasRs1UuJlWzk5Scq1fXUG7KJRbyyy4Pv64TciKjcVWENk/yA
+	p59AST7GN+FVnT1UAWp4+Inp/2sc2fLGseNxDDuahcXgBPlEpdqpZmg6w5SPv9ORxNeZkTa
+	Mlt/rLLgffLCT5eR+cTDQUPXgFBcEHaYOkuQZXCEFq1sxdTa/N5rbQrTeBd9wEKbXEpBTyU
+	VYlhPlA5xRf15aByqZm8JWhOeDzN0BjoPsBKFoR4xjKcrziYYVfyH77vmw5gOQ695h6N/vv
+	e75Q1xoACS3G6pGA68gej51KDil0OvH3lS/hPXbaGklz+urORcLxuc6Y6YhsjlVCjCJecW5
+	duogY/vvW0rYk5qslfbgscXeLWaDuGtPHM5UNC0y9OAa9V8yz2KAgI5dFVFzTTCweDzFTfC
+	TLnkpIAOYbD6vwyxj6J6UfUAJC8AEbeuGzZeJd81Fze05t0nD7U4E04j1cNh1LyXCS42drv
+	87LQjM+N6jlZtuF2TGAEhiUKF1qNxc6RTl7rwCNzz68o8HV5/0snw9/mHkZkWjp19xr68v5
+	lOdzwhgeHaq2U/+aALV/4NcWPcAeZymb3qU40+9gpbVHTohec7WK4ERtyZU5bf/9SWex0O2
+	/LdPculJgk+lfWy5iJuHRhqiQN0KpCMWzP2ehk61GxfW2LvULwaiCv/jlFpmM+kv16IhlBJ
+	BkuBH8WhjjLKIXNAoWl47oax5HMsMPOYcvUC06/1pEfSl2pMGkHiiNx8p+3RDJkPqIH0W7Z
+	4nHAE+gLvGyCB/9c61xeT2g2/I8UuOdqpI+o=
+X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
+X-QQ-RECHKSPAM: 0
 
-Assign pinctrl to switch phys and leds.
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
-=2D--
- .../dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi | 40 +++++++++++++++++++
- 1 file changed, 40 insertions(+)
 
-diff --git a/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi b/a=
-rch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
-index d40c8dbcd18e..c67b1211af18 100644
-=2D-- a/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
-+++ b/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
-@@ -126,6 +126,46 @@ &gmac2 {
- 	phy-mode =3D "usxgmii";
- };
-=20
-+&gsw_phy0 {
-+	pinctrl-names =3D "gbe-led";
-+	pinctrl-0 =3D <&gbe0_led0_pins>;
-+};
+> 2025=E5=B9=B45=E6=9C=8810=E6=97=A5 =E4=B8=8B=E5=8D=889:01=EF=BC=8CJay =
+Vosburgh <jv@jvosburgh.net> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> tonghao@bamaicloud.com wrote:
+>=20
+>> From: Tonghao Zhang <tonghao@bamaicloud.com>
+>>=20
+>> While hardware failures in NICs, optical transceivers, or switches
+>> are unavoidable, rapid system recovery can be achieved =
+post-restoration.
+>> For example, triggering immediate ARP/ND packet transmission upon
+>> LACP failure recovery enables the system to swiftly resume normal
+>> operations, thereby minimizing service downtime.
+>=20
+> 	I think this comment needs to be prefaced with something that
+> explains that this logic is for the "no stack" architecture.  It don't
+> need the entire blurb about what that is, though.
+Ok, Update the commit message in v2.
+>=20
+>> Cc: Jay Vosburgh <jv@jvosburgh.net>
+>> Cc: "David S. Miller" <davem@davemloft.net>
+>> Cc: Eric Dumazet <edumazet@google.com>
+>> Cc: Jakub Kicinski <kuba@kernel.org>
+>> Cc: Paolo Abeni <pabeni@redhat.com>
+>> Cc: Simon Horman <horms@kernel.org>
+>> Cc: Jonathan Corbet <corbet@lwn.net>
+>> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+>> Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
+>> ---
+>> drivers/net/bonding/bond_3ad.c | 14 ++++++++++++++
+>> 1 file changed, 14 insertions(+)
+>>=20
+>> diff --git a/drivers/net/bonding/bond_3ad.c =
+b/drivers/net/bonding/bond_3ad.c
+>> index c6807e473ab7..6577ce54d115 100644
+>> --- a/drivers/net/bonding/bond_3ad.c
+>> +++ b/drivers/net/bonding/bond_3ad.c
+>> @@ -982,6 +982,19 @@ static int ad_marker_send(struct port *port, =
+struct bond_marker *marker)
+>> 	return 0;
+>> }
+>>=20
+>> +static void ad_peer_notif_send(struct port *port)
+>> +{
+>> +	if (!port->aggregator->is_active)
+>> +		return;
+>> +
+>> +	struct bonding *bond =3D port->slave->bond;
+>> +	if (bond->params.broadcast_neighbor && rtnl_trylock()) {
+>> +		bond->send_peer_notif =3D bond->params.num_peer_notif *
+>> +			max(1, bond->params.peer_notif_delay);
+>> +		rtnl_unlock();
+>> +	}
+>> +}
+>> +
+>=20
+> 	I'm not a fan of the function name, as this doesn't actually
+> send any notifications.  Perhaps "ad_cond_set_peer_notif"?  I.e.,
+> conditionally set peer notifications on?
+>=20
+>> /**
+>> * ad_mux_machine - handle a port's mux state machine
+>> * @port: the port we're looking at
+>> @@ -1164,6 +1177,7 @@ static void ad_mux_machine(struct port *port, =
+bool *update_slave_arr)
+>> 			port->actor_oper_port_state |=3D =
+LACP_STATE_COLLECTING;
+>> 			port->actor_oper_port_state |=3D =
+LACP_STATE_DISTRIBUTING;
+>> 			port->actor_oper_port_state |=3D =
+LACP_STATE_SYNCHRONIZATION;
+>> +			ad_peer_notif_send(port);
+>> 			ad_enable_collecting_distributing(port,
+>> 							  =
+update_slave_arr);
+>> 			port->ntt =3D true;
+>=20
+> 	This is in the AD_MUX_COLLECTING_DISTRIBUTING case, I think you
+> need another one of these in the AD_MUX_DISTRIBUTING case a few lines
+> further down to handle the situation when coupled_control is disabled.
+pretty good, moving the ad_cond_set_peer_notif to =
+ad_enable_collecting_distributing makes more sense.
+
+diff --git a/drivers/net/bonding/bond_3ad.c =
+b/drivers/net/bonding/bond_3ad.c
+index c6807e473ab7..d1c2d416ac87 100644
+--- a/drivers/net/bonding/bond_3ad.c
++++ b/drivers/net/bonding/bond_3ad.c
+@@ -982,6 +982,17 @@ static int ad_marker_send(struct port *port, struct =
+bond_marker *marker)
+        return 0;
+ }
+
++static void ad_cond_set_peer_notif(struct port *port)
++{
++       struct bonding *bond =3D port->slave->bond;
 +
-+&gsw_phy0_led0 {
-+	status =3D "okay";
-+	color =3D <LED_COLOR_ID_GREEN>;
-+};
++       if (bond->params.broadcast_neighbor && rtnl_trylock()) {
++               bond->send_peer_notif =3D bond->params.num_peer_notif *
++                       max(1, bond->params.peer_notif_delay);
++               rtnl_unlock();
++       }
++}
 +
-+&gsw_phy1 {
-+	pinctrl-names =3D "gbe-led";
-+	pinctrl-0 =3D <&gbe1_led0_pins>;
-+};
-+
-+&gsw_phy1_led0 {
-+	status =3D "okay";
-+	color =3D <LED_COLOR_ID_GREEN>;
-+};
-+
-+&gsw_phy2 {
-+	pinctrl-names =3D "gbe-led";
-+	pinctrl-0 =3D <&gbe2_led0_pins>;
-+};
-+
-+&gsw_phy2_led0 {
-+	status =3D "okay";
-+	color =3D <LED_COLOR_ID_GREEN>;
-+};
-+
-+&gsw_phy3 {
-+	pinctrl-names =3D "gbe-led";
-+	pinctrl-0 =3D <&gbe3_led0_pins>;
-+};
-+
-+&gsw_phy3_led0 {
-+	status =3D "okay";
-+	color =3D <LED_COLOR_ID_GREEN>;
-+};
-+
- &i2c0 {
- 	pinctrl-names =3D "default";
- 	pinctrl-0 =3D <&i2c0_pins>;
-=2D-=20
-2.43.0
+ /**
+  * ad_mux_machine - handle a port's mux state machine
+  * @port: the port we're looking at
+@@ -2061,6 +2072,8 @@ static void =
+ad_enable_collecting_distributing(struct port *port,
+                __enable_port(port);
+                /* Slave array needs update */
+                *update_slave_arr =3D true;
++               /* Should notify peers if possible */
++               ad_cond_set_peer_notif(port);
+        }
+ }
+
+
+By the way, bond_should_notify_peers should check =
+params.broadcast_neighbor, because curr_active_slave may be NULL. In my =
+test environment, ip li set slave-ethx down and when up again, =
+bond_change_active_slave will set bond->curr_active_slave in lacp mode.
+
+static bool bond_should_notify_peers(struct bonding *bond)
+{
+        struct bond_up_slave *slaves;
+        struct slave *slave =3D NULL;
+
+        if (BOND_MODE(bond) =3D=3D BOND_MODE_8023AD) {
+                if (!bond->params.broadcast_neighbor)
+                        return false;
+
+                slaves =3D rtnl_dereference(bond->usable_slaves);
+                if (!slaves || !READ_ONCE(slaves->count))
+                        return false;
+        } else {
+                slave =3D rcu_dereference_rtnl(bond->curr_active_slave);
+                if (!save || test_bit(__LINK_STATE_LINKWATCH_PENDING,
+                                      &slave->dev->state))
+                        return false;
+        }
+
+        if (!bond->send_peer_notif ||
+            bond->send_peer_notif %
+            max(1, bond->params.peer_notif_delay) !=3D 0 ||
+            !netif_carrier_ok(bond->dev))
+                return false;
+
+        netdev_dbg(bond->dev, "bond_should_notify_peers: slave %s\n",
+                   slave ? slave->dev->name : "all");
+
+        return true;
+}
+
+>=20
+> 	-J
+>=20
+>> --=20
+>> 2.34.1
+>>=20
+>=20
+> ---
+> 	-Jay Vosburgh, jv@jvosburgh.net
 
 
