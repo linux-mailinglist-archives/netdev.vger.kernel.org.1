@@ -1,127 +1,119 @@
-Return-Path: <netdev+bounces-189493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4C23AB25BA
-	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 01:27:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B372EAB25D1
+	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 02:41:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A7A14A1281
-	for <lists+netdev@lfdr.de>; Sat, 10 May 2025 23:27:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A26C189A49D
+	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 00:41:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C52CF214A6E;
-	Sat, 10 May 2025 23:27:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3873511713;
+	Sun, 11 May 2025 00:41:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AiYYlewg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U16hB7T3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D684202C2D;
-	Sat, 10 May 2025 23:26:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C0A2111;
+	Sun, 11 May 2025 00:41:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746919620; cv=none; b=uuP5PORcV0iEL2pFdrA2C1RfICFftvODB8MAuWulMlheNo6U/laQt3Mt7NjqetycHPn06QQTlGn+ppL/D2Uq0y+5YILlYHobMSRlxU08A6LoF2ruO1Yeng35UGheuasmHd1H7kLD9DCmKVsDzgOEfN60DcYjVJ1qF0Sfa1afguA=
+	t=1746924089; cv=none; b=bCXAy4/hmkSyBAHgZhL8OxCv6oyrYQrjIJeumT7CpodAqbac2ARESFTWtCulOm9zVZ+pbOMXcgEFbMKK2JW9Mv6fby21ne6UqDg03KfIgl9s+KzxfBLl6R2BFoy7FzKImu1mEJ/4EoGk5U4eldmWEr0JC2V9SX4w9JKrOPj8XXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746919620; c=relaxed/simple;
-	bh=kaEnMsoebMYZFan0+P52W3nn7t1tc5c0G4/vp1+Ptek=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cEEBWlb1M97oWa4cTMSBu2uWJFDNPW4iJ513CxNdL87KPcC7+JV21Fj4mEJ9VTqMwuzHQmTrbCURmIlI8Lh7+96Gz05y3dTX7cCjl6JGxw+iK4Azlwkd2R8tXEKFWJ3Nmd0pOV0eIQ3tB9irb9BU1fGVucr34d1mAWOaHVzJDZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AiYYlewg; arc=none smtp.client-ip=209.85.166.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3da6fb115a6so29546655ab.1;
-        Sat, 10 May 2025 16:26:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746919618; x=1747524418; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kMJfv12Za/kbJTvtY3Z4ACXKyYHr9oWqnBZEu6yWLaM=;
-        b=AiYYlewgmMJsdazMvWNn7Kv/ggORxLm0fJzTlYEGEyQYbm8J+CMZkSI8vN1i8x+zuq
-         LK6hZqWQMRpkqq59/koiLTKLoUuUBL5Yhg8tnEzE4LN9cXsP0472NuQi2nDqMUmfmmM8
-         ZjMxpp19yvQLs3b45qxVNBCj5q0fUKt8COoeeXbY+JH4eUIz6Rd5JKymVIk8W7qLAZIF
-         hj18vB06yjH1vpnyHSFPhQhRSulCInl++d4rFMTEfHrl3v8uvxdb4Mxte2QSiSkq/SrV
-         GF9/aKjS61XYjtbic8FVYBYXMdvBZGpOv9wyG+u3DJvLNhcCRtk0w/Cha2hQ0zeQs46q
-         Rfjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746919618; x=1747524418;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kMJfv12Za/kbJTvtY3Z4ACXKyYHr9oWqnBZEu6yWLaM=;
-        b=ZDcYQlA5/vylvf7KwiEucPbR6hKielZwsRru0/BB8n+UAJTpuV3lj3a9YqGBRmG+f4
-         RPbakqJ/gq8gdbt0/848MnoI3PgExNPKUxA0p79MfsTYQY5+EGhXtKp2aZdYoVwZvSHh
-         bmIL7YniWWMejj9zoW8b6nNlBXZaipwjDS+sFv5LYQ6gbd2dqq/AM5L02bjSTpRhqv7n
-         Gbdc5rZ9MRagbyyXJF8hrxLJlGtYFNg+0zaMoSLnUPpegA8OA0l7/DOXwToV4LG1X8Lc
-         RzuZc8HdEMqQNEWtEYtdaNRTdA0f9qHNODkUnXgu8tdh55mYtLaRRdpJIDgOM3jkxjfE
-         X/nw==
-X-Forwarded-Encrypted: i=1; AJvYcCUDiqCpkax1tCMxXbcQ0IEn/QOorKk24+7E8K3Zpc7kaqYjJHz0g8GgUVXW0GF4LhYrRXCLHRaw@vger.kernel.org, AJvYcCV+cngMDkDi/MaHsgEZR9HrPqHWUg8wqOCvY9DWulXtlwFj4SyMjJ7Rm3ceLofnUCNuDlEKE6E166A=@vger.kernel.org, AJvYcCWnsvzyUvrMrH/oWk8J7xbB+R5H/5QrAdMInIjJdQoPkGmpyjskLI6JrzxZFihD+5y3tOovh6qpKpMFzqRo@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4j89bvFomhW17746T8npXfVDMdT28cZnwkQVI2eDzsGnJztYz
-	SG4jVKzpFhQ53u3TDjYy06QMFOTC3Clks5N8y/3r53sO1zymnuwEAjoAeNgq+2/yJsWuCqknOaf
-	o+UjIijll9ceqvmFHEyl5MFR1zzhqFqqucnk=
-X-Gm-Gg: ASbGncst0+CgVJK+vaeNQr1wnfr4+EvbwwZVryP7JP8SxSrxoOIJ4L+JBflNU/mm9u2
-	KYQRW5Cq0Nt7JrbJHo7EU8arh3d+DKXM1SlbvErUi5JYumSKJcCCrvTVxwm/Jg8RQj3cfGhVl/B
-	7IFD8JwDDN6/eu4nxUvWaqY788bM+gin70JA5rzM4USFc=
-X-Google-Smtp-Source: AGHT+IErnj7tz3L5EUxwRu2gmyeBcMHWILvURtY3V5eVRb0i0sgKbh+mt+ZpZ7PTG4mJojoyWiHK20oHLWhd18z/gC8=
-X-Received: by 2002:a05:6e02:349a:b0:3d3:d823:5402 with SMTP id
- e9e14a558f8ab-3da7e1e77a5mr116328195ab.7.1746919618204; Sat, 10 May 2025
- 16:26:58 -0700 (PDT)
+	s=arc-20240116; t=1746924089; c=relaxed/simple;
+	bh=R+XXV9FURsEpJSl2vU49YG7wQYEwkpgw74F8OUSZ5Rc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=L1mWQFHFJK8tEJXQWnAxchWmbE3yHJIp3HszA7xe36zP2u4fvz8GZCiJFtKZ6l2c1CCXbmFbsLqU1XnZ9WYtsPKMzB7odOapx1c3ahA7VAe0EyzHcchH8qDnJUtBRkT+AJSpPs2lLWT+c6eBnSBjxsz26NpkL7igflA/r0yxRCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U16hB7T3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D96CC4CEE2;
+	Sun, 11 May 2025 00:41:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746924088;
+	bh=R+XXV9FURsEpJSl2vU49YG7wQYEwkpgw74F8OUSZ5Rc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=U16hB7T3BCEhsAUSzD3ipzJhXUtEcrXBncxv9PaEqtmHewVTs5iW1aBbYA9hjvar4
+	 5RdxggNXStq0Vy3lU4cUKTuLCqkbd7Xq5k+omQ2v2+uh/IyIPPF5z8z0qgBV5xqtY4
+	 514ldV2XSNfrXTrPnrzfQZVfocQgPKT13FyArAH7E8NDFhPNroi6xzNBCAs6LbiwMb
+	 tNszmxetLcwCMbve/SiGW3+UnS4cd5gBz/ASP2nqtZY5/qlgxACNTZ1s88oLUkB8Jl
+	 9pJr3Tikjz4t5d02cMH0oVD74WHjouCZEK8fW5zjjMUWGDrJTMuJNfGpsiKKQd6pj1
+	 u/ItEGlsiQIrQ==
+From: Eric Biggers <ebiggers@kernel.org>
+To: netdev@vger.kernel.org
+Cc: linux-nvme@lists.infradead.org,
+	linux-sctp@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH net-next 00/10] net: faster and simpler CRC32C computation
+Date: Sat, 10 May 2025 17:41:00 -0700
+Message-ID: <20250511004110.145171-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250510113046.76227-1-alperyasinak1@gmail.com>
-In-Reply-To: <20250510113046.76227-1-alperyasinak1@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sun, 11 May 2025 07:26:22 +0800
-X-Gm-Features: AX0GCFsJqm1ILQLqSHIsS6yuJgFVYUzOP6mI7QdywbA97PexMERip8nOOKS3Eww
-Message-ID: <CAL+tcoA8uYpDyHxq51rJMD2G0gQ_QXn=FRLvkJX-1x=Ro+Ronw@mail.gmail.com>
-Subject: Re: [PATCH] documentation: networking: devlink: Fix a typo in devlink-trap.rst
-To: alperak <alperyasinak1@gmail.com>
-Cc: kuba@kernel.org, jiri@resnulli.us, davem@davemloft.net, 
-	edumazet@google.com, pabeni@redhat.com, horms@kernel.org, corbet@lwn.net, 
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sat, May 10, 2025 at 7:31=E2=80=AFPM alperak <alperyasinak1@gmail.com> w=
-rote:
->
-> Fix a typo in the documentation: "errorrs" -> "errors".
->
-> Signed-off-by: alperak <alperyasinak1@gmail.com>
+Update networking code that computes the CRC32C of packets to just call
+crc32c() without unnecessary abstraction layers.  The result is faster
+and simpler code.
 
-Please show your full name in the above line. Samples can be seen in
-the git log.
+Patches 1-7 add skb_crc32c() and remove the overly-abstracted and
+inefficient __skb_checksum().
 
-Thanks,
-Jason
+Patches 8-10 replace skb_copy_and_hash_datagram_iter() with
+skb_copy_and_crc32c_datagram_iter(), eliminating the unnecessary use of
+the crypto layer.  This unblocks the conversion of nvme-tcp to call
+crc32c() directly instead of using the crypto layer, which patch 9 does.
 
-> ---
->  Documentation/networking/devlink/devlink-trap.rst | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/Documentation/networking/devlink/devlink-trap.rst b/Document=
-ation/networking/devlink/devlink-trap.rst
-> index 2c14dfe69b3a..5885e21e2212 100644
-> --- a/Documentation/networking/devlink/devlink-trap.rst
-> +++ b/Documentation/networking/devlink/devlink-trap.rst
-> @@ -451,7 +451,7 @@ be added to the following table:
->     * - ``udp_parsing``
->       - ``drop``
->       - Traps packets dropped due to an error in the UDP header parsing.
-> -       This packet trap could include checksum errorrs, an improper UDP
-> +       This packet trap could include checksum errors, an improper UDP
->         length detected (smaller than 8 bytes) or detection of header
->         truncation.
->     * - ``tcp_parsing``
-> --
-> 2.43.0
->
->
+I'm proposing that this series be taken through net-next for 6.16, but
+patch 9 could use an ack from the NVME maintainers.
+
+Eric Biggers (10):
+  net: introduce CONFIG_NET_CRC32C
+  net: add skb_crc32c()
+  net: use skb_crc32c() in skb_crc32c_csum_help()
+  RDMA/siw: use skb_crc32c() instead of __skb_checksum()
+  sctp: use skb_crc32c() instead of __skb_checksum()
+  net: fold __skb_checksum() into skb_checksum()
+  lib/crc32: remove unused support for CRC32C combination
+  net: add skb_copy_and_crc32c_datagram_iter()
+  nvme-tcp: use crc32c() and skb_copy_and_crc32c_datagram_iter()
+  net: remove skb_copy_and_hash_datagram_iter()
+
+ drivers/infiniband/sw/siw/Kconfig |   1 +
+ drivers/infiniband/sw/siw/siw.h   |  22 +----
+ drivers/nvme/host/Kconfig         |   4 +-
+ drivers/nvme/host/tcp.c           | 118 +++++++++-----------------
+ include/linux/crc32.h             |  23 ------
+ include/linux/skbuff.h            |  16 +---
+ include/net/checksum.h            |  12 ---
+ include/net/sctp/checksum.h       |  29 +------
+ lib/crc32.c                       |   6 --
+ lib/tests/crc_kunit.c             |   6 --
+ net/Kconfig                       |   4 +
+ net/core/datagram.c               |  34 ++++----
+ net/core/dev.c                    |  10 +--
+ net/core/skbuff.c                 | 132 ++++++++++++++++++------------
+ net/netfilter/Kconfig             |   4 +-
+ net/netfilter/ipvs/Kconfig        |   2 +-
+ net/openvswitch/Kconfig           |   2 +-
+ net/sched/Kconfig                 |   2 +-
+ net/sctp/Kconfig                  |   2 +-
+ net/sctp/offload.c                |   1 -
+ 20 files changed, 156 insertions(+), 274 deletions(-)
+
+
+base-commit: 0b28182c73a3d013bcabbb890dc1070a8388f55a
+-- 
+2.49.0
+
 
