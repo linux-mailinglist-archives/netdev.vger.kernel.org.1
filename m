@@ -1,108 +1,85 @@
-Return-Path: <netdev+bounces-189601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1509AB2BAD
-	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 23:45:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87388AB2BE3
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 00:22:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4115816E4A0
-	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 21:45:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A84CB7ABF08
+	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 22:21:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7389D13AA2D;
-	Sun, 11 May 2025 21:45:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D/ZRTasQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8530525D559;
+	Sun, 11 May 2025 22:22:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39F054C8E;
-	Sun, 11 May 2025 21:45:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837BE13BAF1;
+	Sun, 11 May 2025 22:22:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746999928; cv=none; b=Cqx9UIVGQc9G1vw94vfuQB8rX+bzON1+Dq6wOstN/pyzjjAA1LA79XkITA1Byju4hncywaYkqCVZY+TDJrDyP3xHOWEZXnQ+wkZKAfthOGTd6AkmdPfPDetvUhLDtRmbAi5dAjION4fERQS6JFJnOsJxLcreDROE7khrTDYpO5Y=
+	t=1747002143; cv=none; b=JAKlbrkXmfPycgia53QvtEw3NA/z6MEQ31tss9jQLiRyXzHU3jvpcf3jHnVObc3zAJLMqUUlIX4JpQHTl9nfBdItlFZn+t5F/9D6n41I6YFWTNo0YQsLBxaCv+2PtOqcQblfPw78BAMZJb2oebEgzI7Yd0iIP134WSpz/c7h47E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746999928; c=relaxed/simple;
-	bh=n6VR74UUrkjd7Li7mn4MUpvTWHM+Fg3QJMysU96a2vU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hCH9LK0VW9ovaKYGDDHf0Sg+KDNVRkkamWzIFymbfK0E/YHGir7mRzZJMJ6TLMr+g6tJlHxBvOOQtJosnc+f2Q3ao0she9Z9zdYF5qESIdDqU12x76uVg0R/IZC8tc/kJzRAw9y+sGNZA8SvVu3Nq6cXJW5SedBmY4NrtPQ/X2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D/ZRTasQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DD08C4CEEF;
-	Sun, 11 May 2025 21:45:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746999927;
-	bh=n6VR74UUrkjd7Li7mn4MUpvTWHM+Fg3QJMysU96a2vU=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=D/ZRTasQquFXwKbPNKCYUM1NIuMwA6+YLiybYZawOMprx3ipPqVo6VWG2Ilfj52GF
-	 Rr5XraDpe8fZyBTv3Noz21dBSrlpDmrQZd91yutike+MoWlDi4GxDIv2dKHWnYdlVC
-	 4c8AsLyPsmHKuooiYd6PEd0mzGIo6qyWt/zFztGM79ib+cL5O6LqOvQvD/DKNUjVFn
-	 O9smap/BiePuv1E1/pL7tAOcu/ws2OzMultORce4EgQ5aKaVfJAbjxOHtllEn/sDyH
-	 RgYUbhjQsNpGB2FtShM4/G31GhUKnPZ+bTkBXxWFZs2TxVPOobN1ecSLXQodU+TONE
-	 AV+k1my09wI0Q==
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-326cf24aa35so21928681fa.2;
-        Sun, 11 May 2025 14:45:27 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCU47SderBtHetOpksGFVN2j3yXIO5OANDpBr1Lk0a/EUvaLo1xwLxCGy2cKEOvRpxHSRFbhmZI0tifBRXs=@vger.kernel.org, AJvYcCUqwqHwWXYyvkwXNHHhTF/bxO3aHGecFZ/yXNg+al4WQbGYOOjBZuSF58x8jRxSn03/BN4YPJrS@vger.kernel.org, AJvYcCV9EOJGZqASWbQUWSUYrCK+luli4m6K1AVTbn2WI+Vo9LL7MNJae8N7i8+E3xPDAEsazW9jZonjolmzIA==@vger.kernel.org, AJvYcCWVVMYMaCrdSV3FaH3lYEknB1lzyjCBtNpeuOpdY2IpA1ELbGROeVdh5/lzXda02Ds296WKWerj2itBdg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxeeDQwubM/y765nCocp4U80oZatKscfB/QAcZ9KJTMDnYTf2KX
-	PHKi6L/PCnBPssDK9OQlVjQ6t0Pqo1VY6RYs6qw94oThr3j+ugQp5MrJOlwEJwDV71LkooFrErA
-	wSbt4GZULfanWR9tHzOAbbgdaOCc=
-X-Google-Smtp-Source: AGHT+IGXAKwBmsQgT+onQCTrcyVQm05O0hzEhnj9ZJ3lSI582XXe3FX+xmXCeVd+5a8Bm7iJP57f+ZUkw11acThSHag=
-X-Received: by 2002:a2e:bc08:0:b0:31e:261a:f3e2 with SMTP id
- 38308e7fff4ca-326c459db3amr41790571fa.1.1746999925705; Sun, 11 May 2025
- 14:45:25 -0700 (PDT)
+	s=arc-20240116; t=1747002143; c=relaxed/simple;
+	bh=xcGjkpBj/EnoapfIH+HcMnAV6qKAFn5NRJcOXJ7R3dY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LTQl+6O15d/Q4ZVgRxrtig/9EkFg/8+MBqIibTy6tmLxrzjJBtVt7mydxagUVgG0VMHJL8Y31tOW69ooeYcvLsOwuU5dZvNOSgsTOOAhEeL8KaULGhPFmT51Wqnk7e11V7i2fCCHEvv68IfsczQIA4x2dHgeyzgwjjK8PWWidrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1uEEYY-000000006sM-1X1I;
+	Sun, 11 May 2025 21:55:54 +0000
+Date: Sun, 11 May 2025 22:55:50 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Frank Wunderlich <frank-w@public-files.de>, linux@fw-web.de,
+	olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, matthias.bgg@gmail.com,
+	angelogioacchino.delregno@collabora.com, arinc.unal@arinc9.com,
+	Landen.Chao@mediatek.com, dqfext@gmail.com, sean.wang@mediatek.com,
+	lorenzo@kernel.org, nbd@nbd.name, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: Re: [PATCH v1 09/14] arm64: dts: mediatek: mt7988: add switch
+ node
+Message-ID: <aCEc5tYPivxvRVDK@makrotopia.org>
+References: <20250511141942.10284-1-linux@fw-web.de>
+ <20250511141942.10284-10-linux@fw-web.de>
+ <bfa0c158-4205-4070-9b72-f6bde9cd9997@lunn.ch>
+ <trinity-0edcdb4e-bcc9-47bb-b958-a018f5980128-1746984591926@trinity-msg-rest-gmx-gmx-live-74d694d854-ls6fz>
+ <74afe286-2adb-42d3-9491-881379053e36@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250511004110.145171-1-ebiggers@kernel.org> <b9b0f188-d873-43ff-b1e1-259e2afdda6c@lunn.ch>
- <20250511172929.GA1239@sol> <fe9fdf65-8eb1-4e33-88ce-4856a10364b2@lunn.ch>
-In-Reply-To: <fe9fdf65-8eb1-4e33-88ce-4856a10364b2@lunn.ch>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Sun, 11 May 2025 23:45:14 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXFSm9-5+uBoF3mBbZKRU6wK9jmmyh=L538FoGvZ1XVShQ@mail.gmail.com>
-X-Gm-Features: AX0GCFsoD-9jiD_NH_ReLAgqqMRiIecG31oMhtVBxXbocF6ZydM3nWnbvTXpTTA
-Message-ID: <CAMj1kXFSm9-5+uBoF3mBbZKRU6wK9jmmyh=L538FoGvZ1XVShQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 00/10] net: faster and simpler CRC32C computation
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Eric Biggers <ebiggers@kernel.org>, netdev@vger.kernel.org, 
-	linux-nvme@lists.infradead.org, linux-sctp@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Daniel Borkmann <daniel@iogearbox.net>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
-	Sagi Grimberg <sagi@grimberg.me>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <74afe286-2adb-42d3-9491-881379053e36@lunn.ch>
 
-On Sun, 11 May 2025 at 23:22, Andrew Lunn <andrew@lunn.ch> wrote:
->
-> On Sun, May 11, 2025 at 10:29:29AM -0700, Eric Biggers wrote:
-> > On Sun, May 11, 2025 at 06:30:25PM +0200, Andrew Lunn wrote:
-> > > On Sat, May 10, 2025 at 05:41:00PM -0700, Eric Biggers wrote:
-> > > > Update networking code that computes the CRC32C of packets to just call
-> > > > crc32c() without unnecessary abstraction layers.  The result is faster
-> > > > and simpler code.
-> > >
-> > > Hi Eric
-> > >
-> > > Do you have some benchmarks for these changes?
-> > >
-> > >     Andrew
-> >
-> > Do you want benchmarks that show that removing the indirect calls makes things
-> > faster?  I think that should be fairly self-evident by now after dealing with
-> > retpoline for years, but I can provide more details if you need them.
->
-> I was think more like iperf before/after? Show the CPU load has gone
-> down without the bandwidth also going down.
->
-> Eric Dumazet has a T-Shirt with a commit message on the back which
-> increased network performance by X%. At the moment, there is nothing
-> T-Shirt quotable here.
->
+On Sun, May 11, 2025 at 11:25:27PM +0200, Andrew Lunn wrote:
+> > i will move that into the board dtsi file in v2 because "normal" bpi-r4 and 2g5 variant are same here.
+> 
+> Maybe you just need to expand the commit message? What does this .dtsi
+> actually represent? The SoC, or what is common across a number of
+> boards?
 
-I think that removing layers of redundant code to ultimately call the
-same core CRC-32 implementation is a rather obvious win, especially
-when indirect calls are involved. The diffstat speaks for itself, so
-maybe you can print that on a T-shirt.
+mt7988a.dtsi represents the SoC, and thus there shouldn't be any
+labels assigned to the DSA ports.
+
+In case of the BananaPi R4 there are two different boards, one with 2x
+SFP+ and one with 1x SFP+ + 1x 2500Base-T (with PoE-in), hence there is
+a dtsi files for all the parts shared among the two boards. I suppose
+Frank meant to move the labels to that board dtsi file, and that's
+correct imho as the labels of the 1G switch ports are the same on BPi-R4
+and BPi-R4-PoE.
 
