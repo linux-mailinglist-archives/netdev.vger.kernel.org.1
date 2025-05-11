@@ -1,383 +1,210 @@
-Return-Path: <netdev+bounces-189593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0917BAB2AD0
-	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 22:16:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C41CAB2B42
+	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 23:06:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86FC1176324
-	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 20:16:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D1E861899D1A
+	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 21:06:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79826267B92;
-	Sun, 11 May 2025 20:13:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B142C1AA1D9;
+	Sun, 11 May 2025 21:06:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iZ2/sGsU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WqI5Dvi/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D84D267B6B;
-	Sun, 11 May 2025 20:13:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D53D238DF9
+	for <netdev@vger.kernel.org>; Sun, 11 May 2025 21:06:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746994422; cv=none; b=g3IpvIbTS7bOBiSnJxKcWpCH83M0dA0Lxbqlgilv5bUwDtTh6StIj4NXOn6gBR1ZA2/X+WoY0ElS1vxhnflH35h6eeuNlKi675Pix2mYE/eeJOanHTpOJi5fjj0zdmWtRYAkXbt8K2cFE4IFKujI/838dcRTK6FKhb71Ws3IOVU=
+	t=1746997585; cv=none; b=EQH402K4FSVuc/6Ptiha1Lji0IibMNU+qZwP19tD3AKxetEkCk0OFLJ2zJSoBW8E2a/ZDq8W9FB1lT6LPkhPjBhZYg4P3GoKzqPt4rlUhMY85A1SNYflU8yhASHjITgjVNPRiz00CY80H6nPVlJeSnhDRItfdTsaw1T8nZ4cSUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746994422; c=relaxed/simple;
-	bh=G4Mq4+iIJBI5HfiwtS9iw6HEiPumCZ82bnVQShbfq74=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aYUMRThGvRO2nvoK66i9++sPNrfD4V5ET6utjlncrMoDfgkapDXK5SMDG/CtK4muQq8jh5zEKmWglpjT8S9wTuPhZfXMUfJqVMCnJZ1Ut0RrIl7EZRTlbs5U7ySmuQTetSfkvRXt6F+WrE87q/7CVB7CnspCSQo4oOaED9JGLRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iZ2/sGsU; arc=none smtp.client-ip=209.85.128.46
+	s=arc-20240116; t=1746997585; c=relaxed/simple;
+	bh=Yparvh47DZUMmDg4hz1POyGhEXF3/29a+awFGUB1+3I=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=o/mTHecxH4IhIyLtbTfE3gilS/fYagUfmDDzesi8Jn05QEt+upXz7g54n+srQ+TdLT4+/Zpg9aa2SGL+KxPUaTWCVAhwgK9LasooIlmIveoCCSd/6RfLum6ojl4elD97Thokuf3e4i8ywd9WIxACbUofabuZDammGXq8gzLskrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WqI5Dvi/; arc=none smtp.client-ip=209.85.128.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43ce70f9afbso40885505e9.0;
-        Sun, 11 May 2025 13:13:40 -0700 (PDT)
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-43cfdc2c8c9so20820895e9.2
+        for <netdev@vger.kernel.org>; Sun, 11 May 2025 14:06:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746994419; x=1747599219; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=E1ldMZzRY48MPhvy74auPiCjGXjOiQBSOuH+++XP3qw=;
-        b=iZ2/sGsUCBPrG7GTiR+82NUe/gT7Q6YDBu2Rcv9vc8uj2Q7Z/4ZgttnMxV0ry2ad/t
-         vYkCRy9cOqoquU67+lZ3c9PCGmi+bHd4nHGRwDAoafwxlW85zQNGftWy27gMDMzgNiWp
-         XxTLVO4Whwdy0FptsIij8TeTH6LwjFdLBmG7bbMR7rpbcek6HKSzlZoEbEEjuGWaaXDK
-         MhudDsYrWMAAgwwv+FKTe/cxDyiB0fr4UvEZNMzCDG2MrI3tP0B4ndUa+OQ/L7x/a5rB
-         /aVWHyoDyab0TsfU6LO5Oq1VHqwQzOH8gOFTtYS6+sd0ktQjthnOrrOwijxaD6aSRuKo
-         9gvA==
+        d=gmail.com; s=20230601; t=1746997582; x=1747602382; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=tvjb4mRr9IYq+BLguoXBjbpKA7hhbwJYkSPBEc2D78U=;
+        b=WqI5Dvi/ITI1ejlChTNJNuW3DizOCreIBW2w7TxOsT8tm21mucKoWLo29lYVKxMFTF
+         b+e547ZewSJB+1dwbB7pkzJf4/HVgsNUpS4PJBC/MGjri5C7VrtCilh2JCiJ0JWcoyez
+         Yy7Sko+RMtqZV+33uzEF4M0FaMani5R3siAUTgxn7aBHGUlrAI6gMMHch29AVuPMK3pE
+         kWXXXdKPVlSX659ezHrln6wNaIR9ESJoOIYmvEkYj8tdPPcKLg/BWRUhp7LsaRj1tojq
+         aWfi91FyNjhonMlKhXSPkck2g3W9Mc7w+WqldQaWFyQ3n9dR3MfJ1ViQ060VTQllaDdM
+         LnOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746994419; x=1747599219;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=E1ldMZzRY48MPhvy74auPiCjGXjOiQBSOuH+++XP3qw=;
-        b=pvehmbCyFFy+47JiSd2uVVI/yTfNoMqjzwSKdKr083S/HhYegtEfVwgzpGiLw2md+T
-         qNQeKR1Z/kldKrKuy0GW2DxvsxDL+m3pAxfOIoHhgqUmBQs1gERAhKRBa6yWhjaNV2Fp
-         FFvUJUXOfLWrMQxk6KXpXcvmW8ffODoeySX1HQDrdLckuhecaqzBQTtDA2pH1lSyDmQP
-         iT4I5yud2KnNNCRm/xR48B/Dguw1aGKQbV1pKnHg7YALIQM/owvR1rIqJrTMzaqaENqI
-         nvCpvXSmVb/XesL2saHc1RGrEAvHpUQWJsqDtVCzVOrmuU9H3ljS1M2ptYyVW1axcoSs
-         rRhQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVVmH5injlrcM53Kr/5pWaIUo1GEscg2ZS2z65PKR8vqrzTiwKA25PMLJWwyBHwKJLXcFvubEdG@vger.kernel.org, AJvYcCVfP7jB9GtOd6PoqGkjs4yU4ApwJ4B5x3mwNgKeHMSZEe5l/4XgySV0sQ0Au6oPtzLPPtboqMjSONPx@vger.kernel.org, AJvYcCXTPD+I01pnlK67YmxKm0MQMsUsKwM1ry+hryueZrn6Ifdw7leeR/He2dpF8FggxM/Q5LBf922xH/WV12FN@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPoeDztvasXZCWGVDmNSLBFqXRh+f9KlI6iyVBZ9PFYJciCwlS
-	zMJ0RbrlfBVvRfUBcZ0Tq+QmjltTG8oVocAdt7Epb9lexvjB0NBa
-X-Gm-Gg: ASbGnct1kBVkenv8Ov0XSSgdWkxnNLfWy2AjMgPy8QVoMtMBFH5ienWPQnUKtutfK1T
-	57sGcpq1Nhh4k1AEvGDZ4Gw+xy2vZf+CQHdKnu9zlL7UpObNbjOGvilWPJTiqBTvfJmv6xXmO6G
-	wN2ooZFEt9Mod2GWn5y526vhj49MGw3L0+3MBPkP9QXbRmUXGshQ85LVZ6VD0RZ55Og1oFC2Vk7
-	ud0JeQX7JOFuIZsmc/DUD6cPUOhmsz5rFygbyVg4/C8wukEgc/8hQ0lyX1SlQFaSuGPAhhn4OeG
-	UMmRpVlU94E3IdZOqdVRs8Cff/FmsFwBdp7N1BfEbs3l5WRuwuZqTI4S3kU1M2DGFH2zUgUEmL1
-	N7uAzDKW30oj4lGwCeW0i
-X-Google-Smtp-Source: AGHT+IHNcYZefBBPiSyJBDsYxacaSeQ7MB6Qh8KUtGFVA2lBNgxp/pOIFsfBehA+M1uENnSRnn+R9A==
-X-Received: by 2002:a05:600c:3587:b0:43c:fdbe:43be with SMTP id 5b1f17b1804b1-442d6dd216fmr83241275e9.27.1746994418629;
-        Sun, 11 May 2025 13:13:38 -0700 (PDT)
-Received: from localhost.localdomain (93-34-88-225.ip49.fastwebnet.it. [93.34.88.225])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-442d67ee275sm100615165e9.19.2025.05.11.13.13.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 May 2025 13:13:37 -0700 (PDT)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	llvm@lists.linux.dev
-Subject: [net-next PATCH v4 11/11] net: airoha: add phylink support for GDM2/3/4
-Date: Sun, 11 May 2025 22:12:37 +0200
-Message-ID: <20250511201250.3789083-12-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250511201250.3789083-1-ansuelsmth@gmail.com>
-References: <20250511201250.3789083-1-ansuelsmth@gmail.com>
+        d=1e100.net; s=20230601; t=1746997582; x=1747602382;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tvjb4mRr9IYq+BLguoXBjbpKA7hhbwJYkSPBEc2D78U=;
+        b=W9sn8Msu7+yT+AMB6mNfJNj1yGKi12jG2LNfHDMShupQSC7OjIzeZ+IiwKXeR+eK2z
+         ClP/Sl0E3+WUpNFEaEny+Iz6lHmp2VJFWPYGMV91ROk/sJV3FKmShoSI6A+0vRhTriDh
+         1XudZ+4h3fniEo/uS/I8BF3uTo0tEdwUaQ2EbZCmIQ0+troM7aeseJEs66j1MK7+2C+0
+         h8A8REChrRrPTjwrEOfFMNcgCktF9fFIq8Jxn1YRztFI7cL0eU2aTqD/6viEuJoCj5ws
+         wLQQwkc69hzXypu/VKAi2NqY31Au4GlfPjAIx6+COD1YmoZ0q/UDSdfd7T7tXtogunhi
+         7pxw==
+X-Forwarded-Encrypted: i=1; AJvYcCWhvyFFDCFf3BgCvi7gIFogQXGwyepu3q1oLDaoDTa+NJ0T9Nqhk2si/7JGR3Kh27m/9mxgN38=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMrdzrK2krPCnunW5ym93eVaP3eStzhXdabYrTcvWHd7hV4jnW
+	RaSl62RA3IDxJp5+xDK/R07afqnUNjPWiVDBYMbDdJ6V5HdwzGsf
+X-Gm-Gg: ASbGncvtA/KcrNhYuogc+/ppUs0RGcVJ6ov3QCR73RbW6ux7y+e/+RSHqPLQCjJ9R8Z
+	6dq/5pkeI3qpOKe9qbs/yO7gRYKfE2S4baqV+yAkq93usIaPbnNkcUPdK6MFNrM5SpmrIj4VCBb
+	dlOTsdMQ9JLGPhlHOdkJTmGKuUcNMtqzn15RqZ4jTyGYZ83fXCMiITh7fjIxWsFnu1DwJoj0RtF
+	+kUSK4XKA2HBf88r5qR7PLl2XIQ0ytByTKlBn1XxSY2PrA/Pg2CX52cNZvvsWgeqXY2hYzA1fkt
+	Iksa//XYHq7rMDRyEF/vCRY+PpBnbRNO9tc9MZuaWzPQTGsF6vfHhQm30NOyZFXSwFrFD5ko+8G
+	8t3jPcMU9h06TseZkkKEkem7M7cECcwaez3Z7TsWr9bPQAIkJPStWwRQAz4eEbtTwwftvQF6x5O
+	Eww32lThOsv/MsIiw=
+X-Google-Smtp-Source: AGHT+IHfMrdrZYUkBPsO5gXbfZrDhjtzT+/IQ57iHwbBK0o7+FJS5fnONsRBPu61wTGfMF/VqbDzYg==
+X-Received: by 2002:a05:600c:a42:b0:43d:24d:bbe2 with SMTP id 5b1f17b1804b1-442d6ddcff4mr66728965e9.28.1746997581919;
+        Sun, 11 May 2025 14:06:21 -0700 (PDT)
+Received: from ?IPV6:2003:ea:8f15:c500:b4b8:71b1:ffc8:3022? (p200300ea8f15c500b4b871b1ffc83022.dip0.t-ipconnect.de. [2003:ea:8f15:c500:b4b8:71b1:ffc8:3022])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-442d685c3bdsm101866495e9.29.2025.05.11.14.06.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 11 May 2025 14:06:21 -0700 (PDT)
+Message-ID: <03e2e1c7-326f-4b0e-94dd-18536c2f537e@gmail.com>
+Date: Sun, 11 May 2025 23:06:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: phy: remove Kconfig symbol MDIO_DEVRES
+From: Heiner Kallweit <hkallweit1@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>
+Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Claudiu Manoil <claudiu.manoil@nxp.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, Wei Fang <wei.fang@nxp.com>,
+ Clark Wang <xiaoning.wang@nxp.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, imx@lists.linux.dev
+References: <9c2df2f8-6248-4a06-81ef-f873e5a31921@gmail.com>
+ <aBs58BUtVAHeMPip@shell.armlinux.org.uk>
+ <5ecf2ece-683b-4c7b-a648-aca82d5843ed@lunn.ch>
+ <aBtYdq2NurrTIcJi@shell.armlinux.org.uk>
+ <fbe1e3e7-cd44-4e13-8cae-9b128d896a0e@gmail.com>
+ <c7771c90-9c0e-429e-b703-661e21e2b1e5@gmail.com>
+Content-Language: en-US
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <c7771c90-9c0e-429e-b703-661e21e2b1e5@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Add phylink support for GDM2/3/4 port that require configuration of the
-PCS to make the external PHY or attached SFP cage work.
+On 07.05.2025 20:39, Heiner Kallweit wrote:
+> On 07.05.2025 16:21, Heiner Kallweit wrote:
+>> On 07.05.2025 14:56, Russell King (Oracle) wrote:
+>>> On Wed, May 07, 2025 at 02:49:05PM +0200, Andrew Lunn wrote:
+>>>> On Wed, May 07, 2025 at 11:46:08AM +0100, Russell King (Oracle) wrote:
+>>>>> On Wed, May 07, 2025 at 08:17:17AM +0200, Heiner Kallweit wrote:
+>>>>>> MDIO_DEVRES is only set where PHYLIB/PHYLINK are set which
+>>>>>> select MDIO_DEVRES. So we can remove this symbol.
+>>>>>
+>>>>> Does it make sense for mdio_devres to be a separate module from libphy?
+>>>>
+>>>> I _think_ Broadcom have one MDIO bus master which is not used for
+>>>> PHYs/Switches but regulators or GPIOs or something. In theory, you
+>>>> could build a kernel without networking, but still use those
+>>>> regulators or GPIOs. But given that Broadcom SoCs are all about
+>>>> networking, it does seem like a very unlikely situation.
+>>>
+>>> I'm pointing out that:
+>>>
+>>> libphy-y                        := phy.o phy-c45.o phy-core.o phy_device.o \
+>>>                                    linkmode.o phy_link_topology.o \
+>>>                                    phy_package.o phy_caps.o mdio_bus_provider.o
+>>>
+>>> mdio_bus_provider.o provides at least some of the functions used by
+>>> mdio_devres.
+>>>
+>>> obj-$(CONFIG_PHYLIB)            += mdio_devres.o
+>>> obj-$(CONFIG_PHYLIB)            += libphy.o
+>>>
+>>> So, when PHYLIB=m, we end up with mdio_devres and libphy as two separate
+>>> loadable modules. I'm questioning whether this makes any sense, or
+>>> whether making mdio_devres part of libphy would be more sensible.
+>>>
+>> I was asking myself the same question. If mdio_devres is a separate module,
+>> then it won't be loaded if no active phylib user requires the devres
+>> functionality, saving a little bit of memory. However mdio_devres is quite
+>> small and we don't gain much.
+>>
+>> For now I decided to keep the current behavior of mdio_devres being a
+>> separate module. However if consensus is that we better make it part of
+>> phylib, fine with me.
+>>
+> After thinking again, I'll submit a v2 and will make mdio_devres part
+> of phylib.
+> 
+kernel test robot reported circular dependencies. So I'll re-submit
+the original version, leaving mdio_devres a separate module.
 
-These needs to be defined in the GDM port node using the pcs-handle
-property.
+depmod: ERROR: Cycle detected: libphy -> of_mdio -> fixed_phy -> libphy
+depmod: ERROR: Cycle detected: libphy -> of_mdio -> libphy
+depmod: ERROR: Cycle detected: libphy -> of_mdio -> fwnode_mdio -> libphy
 
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
- drivers/net/ethernet/airoha/airoha_eth.c  | 155 +++++++++++++++++++++-
- drivers/net/ethernet/airoha/airoha_eth.h  |   3 +
- drivers/net/ethernet/airoha/airoha_regs.h |  12 ++
- 3 files changed, 169 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 16c7896f931f..3be1ae077a76 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -7,6 +7,7 @@
- #include <linux/of_net.h>
- #include <linux/platform_device.h>
- #include <linux/tcp.h>
-+#include <linux/pcs/pcs.h>
- #include <linux/u64_stats_sync.h>
- #include <net/dst_metadata.h>
- #include <net/page_pool/helpers.h>
-@@ -79,6 +80,11 @@ static bool airhoa_is_lan_gdm_port(struct airoha_gdm_port *port)
- 	return port->id == 1;
- }
- 
-+static bool airhoa_is_phy_external(struct airoha_gdm_port *port)
-+{
-+	return port->id != 1;
-+}
-+
- static void airoha_set_macaddr(struct airoha_gdm_port *port, const u8 *addr)
- {
- 	struct airoha_eth *eth = port->qdma->eth;
-@@ -1613,6 +1619,17 @@ static int airoha_dev_open(struct net_device *dev)
- 	struct airoha_gdm_port *port = netdev_priv(dev);
- 	struct airoha_qdma *qdma = port->qdma;
- 
-+	if (airhoa_is_phy_external(port)) {
-+		err = phylink_of_phy_connect(port->phylink, dev->dev.of_node, 0);
-+		if (err) {
-+			netdev_err(dev, "%s: could not attach PHY: %d\n", __func__,
-+				   err);
-+			return err;
-+		}
-+
-+		phylink_start(port->phylink);
-+	}
-+
- 	netif_tx_start_all_queues(dev);
- 	err = airoha_set_vip_for_gdm_port(port, true);
- 	if (err)
-@@ -1665,6 +1682,11 @@ static int airoha_dev_stop(struct net_device *dev)
- 		}
- 	}
- 
-+	if (airhoa_is_phy_external(port)) {
-+		phylink_stop(port->phylink);
-+		phylink_disconnect_phy(port->phylink);
-+	}
-+
- 	return 0;
- }
- 
-@@ -2795,6 +2817,115 @@ bool airoha_is_valid_gdm_port(struct airoha_eth *eth,
- 	return false;
- }
- 
-+static void airoha_mac_link_up(struct phylink_config *config, struct phy_device *phy,
-+			       unsigned int mode, phy_interface_t interface,
-+			       int speed, int duplex, bool tx_pause, bool rx_pause)
-+{
-+	struct airoha_gdm_port *port = container_of(config, struct airoha_gdm_port,
-+						    phylink_config);
-+	struct airoha_qdma *qdma = port->qdma;
-+	struct airoha_eth *eth = qdma->eth;
-+	u32 frag_size_tx, frag_size_rx;
-+
-+	if (port->id != 4)
-+		return;
-+
-+	switch (speed) {
-+	case SPEED_10000:
-+	case SPEED_5000:
-+		frag_size_tx = 8;
-+		frag_size_rx = 8;
-+		break;
-+	case SPEED_2500:
-+		frag_size_tx = 2;
-+		frag_size_rx = 1;
-+		break;
-+	default:
-+		frag_size_tx = 1;
-+		frag_size_rx = 0;
-+	}
-+
-+	/* Configure TX/RX frag based on speed */
-+	airoha_fe_rmw(eth, REG_GDMA4_TMBI_FRAG,
-+		      GDMA4_SGMII0_TX_FRAG_SIZE_MASK,
-+		      FIELD_PREP(GDMA4_SGMII0_TX_FRAG_SIZE_MASK,
-+				 frag_size_tx));
-+
-+	airoha_fe_rmw(eth, REG_GDMA4_RMBI_FRAG,
-+		      GDMA4_SGMII0_RX_FRAG_SIZE_MASK,
-+		      FIELD_PREP(GDMA4_SGMII0_RX_FRAG_SIZE_MASK,
-+				 frag_size_rx));
-+}
-+
-+static const struct phylink_mac_ops airoha_phylink_ops = {
-+	.mac_link_up = airoha_mac_link_up,
-+};
-+
-+static int airoha_setup_phylink(struct net_device *dev)
-+{
-+	struct airoha_gdm_port *port = netdev_priv(dev);
-+	struct device_node *np = dev->dev.of_node;
-+	struct phylink_pcs **available_pcs;
-+	phy_interface_t phy_mode;
-+	struct phylink *phylink;
-+	unsigned int num_pcs;
-+	int err;
-+
-+	err = of_get_phy_mode(np, &phy_mode);
-+	if (err) {
-+		dev_err(&dev->dev, "incorrect phy-mode\n");
-+		return err;
-+	}
-+
-+	port->phylink_config.dev = &dev->dev;
-+	port->phylink_config.type = PHYLINK_NETDEV;
-+	port->phylink_config.mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
-+						MAC_10 | MAC_100 | MAC_1000 | MAC_2500FD |
-+						MAC_5000FD | MAC_10000FD;
-+
-+	err = fwnode_phylink_pcs_parse(dev_fwnode(&dev->dev), NULL, &num_pcs);
-+	if (err)
-+		return err;
-+
-+	available_pcs = kcalloc(num_pcs, sizeof(*available_pcs), GFP_KERNEL);
-+	if (!available_pcs)
-+		return -ENOMEM;
-+
-+	err = fwnode_phylink_pcs_parse(dev_fwnode(&dev->dev), available_pcs,
-+				       &num_pcs);
-+	if (err)
-+		goto out;
-+
-+	port->phylink_config.available_pcs = available_pcs;
-+	port->phylink_config.num_available_pcs = num_pcs;
-+
-+	__set_bit(PHY_INTERFACE_MODE_SGMII,
-+		  port->phylink_config.supported_interfaces);
-+	__set_bit(PHY_INTERFACE_MODE_1000BASEX,
-+		  port->phylink_config.supported_interfaces);
-+	__set_bit(PHY_INTERFACE_MODE_2500BASEX,
-+		  port->phylink_config.supported_interfaces);
-+	__set_bit(PHY_INTERFACE_MODE_USXGMII,
-+		  port->phylink_config.supported_interfaces);
-+
-+	phy_interface_copy(port->phylink_config.pcs_interfaces,
-+			   port->phylink_config.supported_interfaces);
-+
-+	phylink = phylink_create(&port->phylink_config,
-+				 of_fwnode_handle(np),
-+				 phy_mode, &airoha_phylink_ops);
-+	if (IS_ERR(phylink)) {
-+		err = PTR_ERR(phylink);
-+		goto out;
-+	}
-+
-+	port->phylink = phylink;
-+out:
-+	kfree(available_pcs);
-+
-+	return err;
-+}
-+
- static int airoha_alloc_gdm_port(struct airoha_eth *eth,
- 				 struct device_node *np, int index)
- {
-@@ -2873,7 +3004,23 @@ static int airoha_alloc_gdm_port(struct airoha_eth *eth,
- 	if (err)
- 		return err;
- 
--	return register_netdev(dev);
-+	if (airhoa_is_phy_external(port)) {
-+		err = airoha_setup_phylink(dev);
-+		if (err)
-+			return err;
-+	}
-+
-+	err = register_netdev(dev);
-+	if (err)
-+		goto free_phylink;
-+
-+	return 0;
-+
-+free_phylink:
-+	if (airhoa_is_phy_external(port))
-+		phylink_destroy(port->phylink);
-+
-+	return err;
- }
- 
- static int airoha_probe(struct platform_device *pdev)
-@@ -2967,6 +3114,9 @@ static int airoha_probe(struct platform_device *pdev)
- 		struct airoha_gdm_port *port = eth->ports[i];
- 
- 		if (port && port->dev->reg_state == NETREG_REGISTERED) {
-+			if (airhoa_is_phy_external(port))
-+				phylink_destroy(port->phylink);
-+
- 			unregister_netdev(port->dev);
- 			airoha_metadata_dst_free(port);
- 		}
-@@ -2994,6 +3144,9 @@ static void airoha_remove(struct platform_device *pdev)
- 			continue;
- 
- 		airoha_dev_stop(port->dev);
-+		if (airhoa_is_phy_external(port))
-+			phylink_destroy(port->phylink);
-+
- 		unregister_netdev(port->dev);
- 		airoha_metadata_dst_free(port);
- 	}
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
-index 53f39083a8b0..73a500474076 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.h
-+++ b/drivers/net/ethernet/airoha/airoha_eth.h
-@@ -498,6 +498,9 @@ struct airoha_gdm_port {
- 	struct net_device *dev;
- 	int id;
- 
-+	struct phylink *phylink;
-+	struct phylink_config phylink_config;
-+
- 	struct airoha_hw_stats stats;
- 
- 	DECLARE_BITMAP(qos_sq_bmap, AIROHA_NUM_QOS_CHANNELS);
-diff --git a/drivers/net/ethernet/airoha/airoha_regs.h b/drivers/net/ethernet/airoha/airoha_regs.h
-index d931530fc96f..54f7079b28b0 100644
---- a/drivers/net/ethernet/airoha/airoha_regs.h
-+++ b/drivers/net/ethernet/airoha/airoha_regs.h
-@@ -357,6 +357,18 @@
- #define IP_FRAGMENT_PORT_MASK		GENMASK(8, 5)
- #define IP_FRAGMENT_NBQ_MASK		GENMASK(4, 0)
- 
-+#define REG_GDMA4_TMBI_FRAG		0x2028
-+#define GDMA4_SGMII1_TX_WEIGHT_MASK	GENMASK(31, 26)
-+#define GDMA4_SGMII1_TX_FRAG_SIZE_MASK	GENMASK(25, 16)
-+#define GDMA4_SGMII0_TX_WEIGHT_MASK	GENMASK(15, 10)
-+#define GDMA4_SGMII0_TX_FRAG_SIZE_MASK	GENMASK(9, 0)
-+
-+#define REG_GDMA4_RMBI_FRAG		0x202c
-+#define GDMA4_SGMII1_RX_WEIGHT_MASK	GENMASK(31, 26)
-+#define GDMA4_SGMII1_RX_FRAG_SIZE_MASK	GENMASK(25, 16)
-+#define GDMA4_SGMII0_RX_WEIGHT_MASK	GENMASK(15, 10)
-+#define GDMA4_SGMII0_RX_FRAG_SIZE_MASK	GENMASK(9, 0)
-+
- #define REG_MC_VLAN_EN			0x2100
- #define MC_VLAN_EN_MASK			BIT(0)
- 
--- 
-2.48.1
+>>
+>>> Maybe the only case is if mdio_devres adds dependencies we don't want
+>>> libphy to have, but I think that needs to be spelt out in the commit.
+>>>
+>>>
+>>
 
 
