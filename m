@@ -1,80 +1,94 @@
-Return-Path: <netdev+bounces-189597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ACFCAB2B8A
-	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 23:17:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41212AB2B99
+	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 23:22:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDD3D189648F
-	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 21:17:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F648166DE6
+	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 21:22:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BB4014A09C;
-	Sun, 11 May 2025 21:16:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4051C25B1F6;
+	Sun, 11 May 2025 21:22:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EnHuamI2"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="MRsbE802"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE9ED10F1
-	for <netdev@vger.kernel.org>; Sun, 11 May 2025 21:16:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8D743169;
+	Sun, 11 May 2025 21:22:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746998212; cv=none; b=OKToAT1J7oA1AopXWrwN729xI72eoElNPwymlstRPtMSM8zS/KwgUjNzg9QVXur7zu/v7GUz5aru94vzrfxLdXTn4F3LEt2jHGHR2MuL7DLxyOn1cOPI5XflZQHlHksr67pwtbi9+CefPlO2BFSBStaQFaFKZId39AwcIOsq60o=
+	t=1746998544; cv=none; b=oYqrqReffPzitxF4w/mVqUs9lTp43qXO3PfnKsotb4mZk4+pLluX+9sRtu9rAXFNE4yuXtz2CrqKRIHB+jaRHtvDmycA6pzzBw8aPzmkE3y4O2s4PydzNWs82C5RMFrLrIoLkmzd3tfAs207BF2nrC0I8uqUsKdH3yUjpoMxT00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746998212; c=relaxed/simple;
-	bh=DEK5x9m00WyglZdPJuAREjUOs2j3FtQ9OTtg8k/kUh4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p25iJaW89B0loqflO9KVm1J865hKy1rEgzOAGfHyYysee7sMlXXxmVco6bZUTFEFPWAMTCwJkNHK9LaXhUhbU0DKHRm9ovYR6uEQMlNJg7cfx87NGKsEpuRfF6FoVyjzMjLC4Fk1gwNkf6dHM+CORlAWcE3i+O6c7vtbtrnG92M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EnHuamI2; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <3bbf0da2-9ac8-4df6-8c02-a552fc599083@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1746998197;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8Sae1PPSkOP1AhspBAsozUQb8lbdc/PF6bV9NDF/DOE=;
-	b=EnHuamI2I99nVCz9h3EoahcWEvfqsQIsvRijIT8RurDuXjitWTOTLSU4wu0MLyovqCpL3u
-	tf3PF+h6ENGZnCq5YF5nGe8LYlcpPkBYchgzM0EWxEsuSrWutjvAcl3ZYxvy/W3FNYWZiU
-	U3ozTbNLZr0fC+h88K92iLMJgFhyol4=
-Date: Sun, 11 May 2025 22:16:34 +0100
+	s=arc-20240116; t=1746998544; c=relaxed/simple;
+	bh=mTem+6igHDgqrWUC8LXJOZmBzQNvwsDPdH4Z11cVT3s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UbQps5EfLRYzlb7gBKIUGzhE0iFl3ujHOxO7ks3LA4mT3whDdZ4ufBtUL6JiLxc5wPtSjJoXrWr0n7KgPhUgIMsv9QutysmsN2uuhY45nhmy3oQ+Uln9gw0Xj6fx96T3ejtoq9gJSqIF/z36ECp1EzWoYwuQ1uIY9UpgR+JhpXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=MRsbE802; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=RrNyqzWsoxW7PT7XBcAVPoXOI9p5Db8vQWoqbzcV3Bs=; b=MRsbE802EdcrNIsmJ9rJJrB3Gb
+	J27nqulZChtl/IUzRLo3poP1dnDuJTs8ZhlIKJ8x9qAZ+/ZyE5k8nQ1WpXhwwKP/1iofIltl6bscw
+	riU7Q4/Z1OGJ6K8fvVqPh8lhdHDfv9QaEDscHK/OeYuVs2oAX3HAEx5fYslxxk2ah4D0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uEE7l-00CHNm-T0; Sun, 11 May 2025 23:22:17 +0200
+Date: Sun, 11 May 2025 23:22:17 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: netdev@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-sctp@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Sagi Grimberg <sagi@grimberg.me>, Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH net-next 00/10] net: faster and simpler CRC32C computation
+Message-ID: <fe9fdf65-8eb1-4e33-88ce-4856a10364b2@lunn.ch>
+References: <20250511004110.145171-1-ebiggers@kernel.org>
+ <b9b0f188-d873-43ff-b1e1-259e2afdda6c@lunn.ch>
+ <20250511172929.GA1239@sol>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v4] ptp: ocp: Limit signal/freq counts in show/store
- functions
-To: Sagi Maimon <maimon.sagi@gmail.com>, jonathan.lemon@gmail.com,
- richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <20250511154235.101780-1-maimon.sagi@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250511154235.101780-1-maimon.sagi@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250511172929.GA1239@sol>
 
-On 11/05/2025 16:42, Sagi Maimon wrote:
-> The sysfs show/store operations could access uninitialized elements
-> in the freq_in[] and signal_out[] arrays, leading to NULL pointer
-> dereferences. This patch introduces u8 fields (nr_freq_in,
-> nr_signal_out) to track the number of initialized elements, capping
-> the maximum at 4 for each array. The show/store functions are updated
-> to respect these limits, preventing out-of-bounds access and ensuring
-> safe array handling.
+On Sun, May 11, 2025 at 10:29:29AM -0700, Eric Biggers wrote:
+> On Sun, May 11, 2025 at 06:30:25PM +0200, Andrew Lunn wrote:
+> > On Sat, May 10, 2025 at 05:41:00PM -0700, Eric Biggers wrote:
+> > > Update networking code that computes the CRC32C of packets to just call
+> > > crc32c() without unnecessary abstraction layers.  The result is faster
+> > > and simpler code.
+> > 
+> > Hi Eric
+> > 
+> > Do you have some benchmarks for these changes?
+> > 
+> > 	Andrew
 > 
-> Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
+> Do you want benchmarks that show that removing the indirect calls makes things
+> faster?  I think that should be fairly self-evident by now after dealing with
+> retpoline for years, but I can provide more details if you need them.
 
-LGTM,
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+I was think more like iperf before/after? Show the CPU load has gone
+down without the bandwidth also going down.
+
+Eric Dumazet has a T-Shirt with a commit message on the back which
+increased network performance by X%. At the moment, there is nothing
+T-Shirt quotable here.
+
+	Andrew
 
