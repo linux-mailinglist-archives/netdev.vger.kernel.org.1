@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-189533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F445AB28FF
-	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 16:26:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98913AB2902
+	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 16:27:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6AA917623E
-	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 14:26:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B07C7A8086
+	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 14:26:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C5A3259CBB;
-	Sun, 11 May 2025 14:26:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB2D2259CAE;
+	Sun, 11 May 2025 14:27:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b="dRkp7uOc"
+	dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b="gLkcsA6+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45C7F25A2AB;
-	Sun, 11 May 2025 14:26:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A688513D8B2;
+	Sun, 11 May 2025 14:27:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746973568; cv=none; b=hRsr5kWuXNZ+261UJOkwTUommPKVL/Aikpix4Q/igt/y85+IxI3I2PD7UQI5hbh8uyPgsiWln+2ed09RcVA5CTbN2DoasgMkVNyoGfGE7ZCBwP+HmZqWAdJ9GU8spx41Z66bLA5GSqzUA5mK7N3b6jpMrAWaQsLK53RYmdBdzJQ=
+	t=1746973630; cv=none; b=uYQupO3nA9U4VwEuI8j2TnQGSZpk/QTY/nFC+ZRbstPaKRZ+vzztfylvkMESSRxN74eh4KGgXKCJCWO49B989mOdMCBWk6KBAy7+LuKDCqRqfhe/JGptZmwnhC2m9l5fxMnDHaYdTs88qHx43bPfs/T8nDIku2vKCIwZU8Xp/o0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746973568; c=relaxed/simple;
-	bh=xr7hw9jQbx1PHW4jSljiTzjYw+6C1d+mvfyB69VL2ms=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZhgQ4Wng59gEQsigeqZn1gxYA2miQAMThxzr4UxfRkUvfV+T6zAcxQ6/V6HEUQ5nPTQU/zsxzvzk2zZo7PfnXHupRMTnxoGjHJWt6v/tSiaod5B1PcIo58j6WI+EETgjiFBGrQ5ghyI4hUhx0LQ90RrsEumrkwXKhBviYHBLezc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de; spf=pass smtp.mailfrom=public-files.de; dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b=dRkp7uOc; arc=none smtp.client-ip=212.227.15.18
+	s=arc-20240116; t=1746973630; c=relaxed/simple;
+	bh=a/AH7lRdToPg2le8FZz/FzlsrB22ceWnyYLSHUo7kj8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ciKQA6XKNFlrOxw0wy56Lh266LBi3otvcsCWs/VNY1AEUNkz6Udk39zsEbD2x+egb+/wPeqm/jEU1deRn5n6WULI3DdsBd95NxLf00Da0rkzTgRZgyBOrlnwWdDJ6yECTwBsWv9LT7r64kAxLUFMuXzrA1/a9EUQZ8uSdDqLkBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de; spf=pass smtp.mailfrom=public-files.de; dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b=gLkcsA6+; arc=none smtp.client-ip=212.227.17.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=public-files.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=public-files.de;
-	s=s31663417; t=1746973558; x=1747578358; i=frank-w@public-files.de;
-	bh=3EHXB+FxOQEuxjJuPZ3FDlU1soKtjeNeGrzIBOUM2w0=;
+	s=s31663417; t=1746973623; x=1747578423; i=frank-w@public-files.de;
+	bh=a7HRLWCMzDk+F+mW5CjRyNEGYp+EzILmvaquYJWnTLw=;
 	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:
 	 MIME-Version:Content-Transfer-Encoding:cc:
 	 content-transfer-encoding:content-type:date:from:message-id:
 	 mime-version:reply-to:subject:to;
-	b=dRkp7uOc33hpr4LZp+COdYyo1EAkfc0KFy7sGtytb9qSiOUXIwhvuHGz3W//v5CS
-	 sZXWIbPf0AfER9lMbM6CO6Esc2+JXVOAWomDRSX2rCmPqEY1vtZ1vxC26cQCyDXgW
-	 nwjNkY44M68NHW/wnr4SQeda1qHg+1Pi1lwlR11krWmkdT5gt2UHe/4BVigjOqfdk
-	 3s/d4FygiYG6a3EkgHj+UEy2gNhhUo7RDWKpQw98tEVxMPu69Vd5kBsrWvzFMPlj6
-	 8yWnuKWCzqB89P1timTHStx9C6Wm8Kw2vEju42LTGAZQoZMGQ+FraJgEroTYiyR3H
-	 E05Nwz/DXKg2z4APMQ==
+	b=gLkcsA6+/CAZQpfD5IJwE/oHJMlZXksCTXzWrXrAWiV1PAbEH7ZL2RG6YLOPyUuO
+	 e8yuZ7SLcP7nEvN/ByQxEfW3iNoPtYkqojlnUetDT38y90EMEtSIauGKL+PIGS1Q6
+	 atDOwn+yV4TgdadUPE5XNP6uOt3wRRIxTxxieN5Dm5CYuYdJLydx01uNMiKnlVOUo
+	 qV8h2kj2G3jaQ+E0PZJdy42crH6JvL5g3gVC0A2GOg0pCiLX/VPikykOc9KfHK610
+	 EKMK19ESLIVR7RdENSVjbXhuoFR3kQVtn3J8xGf8Xm3lsjZNg1riqIspx8y6e/c/s
+	 D4xog+Fqr/fEF8NYRQ==
 X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from frank-u24 ([194.15.84.99]) by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1My36T-1vDMoj1kTf-00z1uw; Sun, 11
- May 2025 16:25:58 +0200
+Received: from frank-u24 ([194.15.84.99]) by mail.gmx.net (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1MQMyf-1uaRkM2P8D-00Jv8J; Sun, 11
+ May 2025 16:27:03 +0200
 From: Frank Wunderlich <frank-w@public-files.de>
 To: Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -72,9 +72,9 @@ Cc: Frank Wunderlich <frank-w@public-files.de>,
 	linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org
-Subject: [PATCH v1 09/14] arm64: dts: mediatek: mt7988: add switch node
-Date: Sun, 11 May 2025 16:25:48 +0200
-Message-ID: <20250511142549.10881-1-frank-w@public-files.de>
+Subject: [PATCH v1 10/14] arm64: dts: mediatek: mt7988a-bpi-r4: Add fan and coolingmaps
+Date: Sun, 11 May 2025 16:26:50 +0200
+Message-ID: <20250511142655.11007-1-frank-w@public-files.de>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -83,251 +83,114 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:vKiLc5DHpHJt5lRc77jonAK1eTfjqeCfBfejoAeoivlrnei2XED
- rU19O80TViMd9aYFM5UGn2dL5Tl6TJ0Jv9KS9B52SXD9eAsXZieK3YEv/aYCKAJ3DJ6QH+y
- jde+tOdfuKmbvfsFOWyxGdWN/2sN1XFIqxWicedhJh0IA2M92NsSY/RrIVivVyuvMaywgix
- V0W3cy28Z5Q7bkjXvxSdg==
+X-Provags-ID: V03:K1:ewdHyBDrD1MtlKXDBxg3/gwHWv+IMGI9iR3t4gpjerlkIti5fyV
+ JseYRjEy/MWIah6Rr+q0c2KVkMJYIcFty3mD0exE/eW09mleZTU1zCxkZBI0G2nxdYQZUxP
+ wtGPJB0nqpLBBxJRwOEQUp7GffL7W1vo1LMw0S9g/PES+0kOFKwqEovejXepOhKGLP3l8pE
+ lHB8bnO93rXv50MdhjOIg==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:GsdF6h121W4=;k/a7UcqLJK2SijwMcRc3VN0bUZM
- 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
- nPnqftf2SQibkH4V703lxjEMQW32icT2RTe9132HR0KtzOO6zfC4xBua61tK9NCn00+YhIX8d
- tiN1yhr/Gh3TG8ss8y3zD+dbA8Mf9nczVb1JlfYyB/y2SP3nX0Mia07eIetn8ajrT2KviUZ1Q
- xCDkiSe9yuf28u7lPOz7HITDHggTamXy/FxPs9GPDhQEo6w+8Ff8GtXfzh87xg4VBanvXVIRN
- DzhXmbYtvnTVvVHEqFEjBi4uVALCKrYI2ujb/B6zSRCuxlbNQirj5hO/kfBUx+xFfkqLWLdcf
- lboFq2fHwf1u/LYdheAa1ArXr2s4Sb0ZWO3wtQEwhcom/Od/bjhgUKoK0Pc4PAT+yQ+iY5ibE
- m1uchC6VbdD6Bl4oAkR+E5k9MThXpoTBmA8hwwapCl5GROjjJPXnW4Zd3jUp1HSy8EsT+Szl6
- dbAPTscq5LfaHher4sSQ6AQ2G7A5GH1WHD4m2qqYMOg5MmyM+ia2VOXRmBILqLPm5gxGXcFWG
- VtO7MkPYrZEwHiatNmze5t2fQq5Q3L5W+lg+F0dYzkxm2MgfhvMPpgZDb/iQZiVPlWOHrCFEX
- ww7eZCUHByPyrPwJL03iiqSjxJRYwR6kYXi3X+gMzgLINw33rw0P9P6awJGDWd4oYKbb1fKFC
- vvMPke2aLQW3tXMyh5JgqmQUWKc38jyE7iKDrsA5RmNFmNMxXms6ndqfx2lTdZs20aRS4WJfU
- c1O1+D981IOt4xstam6xGwBGdf1LIXV/ZTDsgS5TFDyK9WMdlbK1fmsGl5lXjHWJo6u3+D8c4
- J+6OrQn/TmYVXxIXxMnJzTrYhpqJyj07/X6xW/bNxs/hV2pH92jVFT+yuM1PLUKekTV4mz7d0
- TUX6Dt5MH39V2iF9ljdAbwz1l
+UI-OutboundReport: notjunk:1;M01:P0:/vmGSP9xOTk=;/CqUqyiIWG9rM+4yfC8ec3/dz2n
+ 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
+ K428=
 
-Add mt7988 builtin mt753x switch nodes.
+Add Fan and cooling maps for Bananpi-R4 board.
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
 =2D--
- arch/arm64/boot/dts/mediatek/mt7988a.dtsi | 166 ++++++++++++++++++++++
- 1 file changed, 166 insertions(+)
+ .../dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi | 29 +++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-diff --git a/arch/arm64/boot/dts/mediatek/mt7988a.dtsi b/arch/arm64/boot/d=
-ts/mediatek/mt7988a.dtsi
-index aa0947a555aa..ab7612916a13 100644
-=2D-- a/arch/arm64/boot/dts/mediatek/mt7988a.dtsi
-+++ b/arch/arm64/boot/dts/mediatek/mt7988a.dtsi
-@@ -5,6 +5,7 @@
- #include <dt-bindings/phy/phy.h>
- #include <dt-bindings/pinctrl/mt65xx.h>
- #include <dt-bindings/reset/mediatek,mt7988-resets.h>
-+#include <dt-bindings/leds/common.h>
+diff --git a/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi b/a=
+rch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
+index 23b267cd47ac..c6f84de82a4d 100644
+=2D-- a/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
++++ b/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
+@@ -12,6 +12,15 @@ chosen {
+ 		stdout-path =3D "serial0:115200n8";
+ 	};
 =20
- / {
- 	compatible =3D "mediatek,mt7988a";
-@@ -742,6 +743,171 @@ ethsys: clock-controller@15000000 {
- 			#reset-cells =3D <1>;
++	fan: pwm-fan {
++		compatible =3D "pwm-fan";
++		/* cooling level (0, 1, 2, 3) : (0% duty, 30% duty, 50% duty, 100% duty=
+) */
++		cooling-levels =3D <0 80 128 255>;
++		#cooling-cells =3D <2>;
++		pwms =3D <&pwm 0 50000>;
++		status =3D "okay";
++	};
++
+ 	reg_1p8v: regulator-1p8v {
+ 		compatible =3D "regulator-fixed";
+ 		regulator-name =3D "fixed-1.8V";
+@@ -73,6 +82,26 @@ cpu_trip_active_low: active-low {
+ 			type =3D "active";
  		};
-=20
-+		switch: switch@15020000 {
-+			compatible =3D "mediatek,mt7988-switch";
-+			reg =3D <0 0x15020000 0 0x8000>;
-+			interrupt-controller;
-+			#interrupt-cells =3D <1>;
-+			interrupt-parent =3D <&gic>;
-+			interrupts =3D <GIC_SPI 209 IRQ_TYPE_LEVEL_HIGH>;
-+			resets =3D <&ethwarp MT7988_ETHWARP_RST_SWITCH>;
+ 	};
 +
-+			ports {
-+				#address-cells =3D <1>;
-+				#size-cells =3D <0>;
-+
-+				gsw_port0: port@0 {
-+					reg =3D <0>;
-+					label =3D "wan";
-+					phy-mode =3D "internal";
-+					phy-handle =3D <&gsw_phy0>;
-+				};
-+
-+				gsw_port1: port@1 {
-+					reg =3D <1>;
-+					label =3D "lan1";
-+					phy-mode =3D "internal";
-+					phy-handle =3D <&gsw_phy1>;
-+				};
-+
-+				gsw_port2: port@2 {
-+					reg =3D <2>;
-+					label =3D "lan2";
-+					phy-mode =3D "internal";
-+					phy-handle =3D <&gsw_phy2>;
-+				};
-+
-+				gsw_port3: port@3 {
-+					reg =3D <3>;
-+					label =3D "lan3";
-+					phy-mode =3D "internal";
-+					phy-handle =3D <&gsw_phy3>;
-+				};
-+
-+				port@6 {
-+					reg =3D <6>;
-+					ethernet =3D <&gmac0>;
-+					phy-mode =3D "internal";
-+
-+					fixed-link {
-+						speed =3D <10000>;
-+						full-duplex;
-+						pause;
-+					};
-+				};
-+			};
-+
-+			mdio {
-+				#address-cells =3D <1>;
-+				#size-cells =3D <0>;
-+				mediatek,pio =3D <&pio>;
-+
-+				gsw_phy0: ethernet-phy@0 {
-+					compatible =3D "ethernet-phy-ieee802.3-c22";
-+					reg =3D <0>;
-+					interrupts =3D <0>;
-+					phy-mode =3D "internal";
-+					nvmem-cells =3D <&phy_calibration_p0>;
-+					nvmem-cell-names =3D "phy-cal-data";
-+
-+					leds {
-+						#address-cells =3D <1>;
-+						#size-cells =3D <0>;
-+
-+						gsw_phy0_led0: led@0 {
-+							reg =3D <0>;
-+							function =3D LED_FUNCTION_LAN;
-+							status =3D "disabled";
-+						};
-+
-+						gsw_phy0_led1: led@1 {
-+							reg =3D <1>;
-+							function =3D LED_FUNCTION_LAN;
-+							status =3D "disabled";
-+						};
-+					};
-+				};
-+
-+				gsw_phy1: ethernet-phy@1 {
-+					compatible =3D "ethernet-phy-ieee802.3-c22";
-+					reg =3D <1>;
-+					interrupts =3D <1>;
-+					phy-mode =3D "internal";
-+					nvmem-cells =3D <&phy_calibration_p1>;
-+					nvmem-cell-names =3D "phy-cal-data";
-+
-+					leds {
-+						#address-cells =3D <1>;
-+						#size-cells =3D <0>;
-+
-+						gsw_phy1_led0: led@0 {
-+							reg =3D <0>;
-+							function =3D LED_FUNCTION_LAN;
-+							status =3D "disabled";
-+						};
-+
-+						gsw_phy1_led1: led@1 {
-+							reg =3D <1>;
-+							function =3D LED_FUNCTION_LAN;
-+							status =3D "disabled";
-+						};
-+					};
-+				};
-+
-+				gsw_phy2: ethernet-phy@2 {
-+					compatible =3D "ethernet-phy-ieee802.3-c22";
-+					reg =3D <2>;
-+					interrupts =3D <2>;
-+					phy-mode =3D "internal";
-+					nvmem-cells =3D <&phy_calibration_p2>;
-+					nvmem-cell-names =3D "phy-cal-data";
-+
-+					leds {
-+						#address-cells =3D <1>;
-+						#size-cells =3D <0>;
-+
-+						gsw_phy2_led0: led@0 {
-+							reg =3D <0>;
-+							function =3D LED_FUNCTION_LAN;
-+							status =3D "disabled";
-+						};
-+
-+						gsw_phy2_led1: led@1 {
-+							reg =3D <1>;
-+							function =3D LED_FUNCTION_LAN;
-+							status =3D "disabled";
-+						};
-+					};
-+				};
-+
-+				gsw_phy3: ethernet-phy@3 {
-+					compatible =3D "ethernet-phy-ieee802.3-c22";
-+					reg =3D <3>;
-+					interrupts =3D <3>;
-+					phy-mode =3D "internal";
-+					nvmem-cells =3D <&phy_calibration_p3>;
-+					nvmem-cell-names =3D "phy-cal-data";
-+
-+					leds {
-+						#address-cells =3D <1>;
-+						#size-cells =3D <0>;
-+
-+						gsw_phy3_led0: led@0 {
-+							reg =3D <0>;
-+							function =3D LED_FUNCTION_LAN;
-+							status =3D "disabled";
-+						};
-+
-+						gsw_phy3_led1: led@1 {
-+							reg =3D <1>;
-+							function =3D LED_FUNCTION_LAN;
-+							status =3D "disabled";
-+						};
-+					};
-+				};
-+			};
++	cooling-maps {
++		map-cpu-active-high {
++			/* active: set fan to cooling level 2 */
++			cooling-device =3D <&fan 3 3>;
++			trip =3D <&cpu_trip_active_high>;
 +		};
 +
- 		ethwarp: clock-controller@15031000 {
- 			compatible =3D "mediatek,mt7988-ethwarp";
- 			reg =3D <0 0x15031000 0 0x1000>;
++		map-cpu-active-med {
++			/* active: set fan to cooling level 1 */
++			cooling-device =3D <&fan 2 2>;
++			trip =3D <&cpu_trip_active_med>;
++		};
++
++		map-cpu-active-low {
++			/* active: set fan to cooling level 0 */
++			cooling-device =3D <&fan 1 1>;
++			trip =3D <&cpu_trip_active_low>;
++		};
++	};
+ };
+=20
+ &i2c0 {
 =2D-=20
 2.43.0
 
