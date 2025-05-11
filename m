@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-189535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F144AB2904
-	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 16:27:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3401BAB2914
+	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 16:28:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D72E517193B
-	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 14:27:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F12F43B7F2C
+	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 14:28:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49EA525A329;
-	Sun, 11 May 2025 14:27:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AFCD25A2AB;
+	Sun, 11 May 2025 14:27:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b="Spx2Zd1N"
+	dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b="ETMgC4t3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B04825A2C8;
-	Sun, 11 May 2025 14:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B8725A624;
+	Sun, 11 May 2025 14:27:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746973634; cv=none; b=ip9F0tg0x0ZwcBOS0yRJ4DNpQtuZB35xtOGDp/wKRqvo/UPI1zSpDR7vhlT8fTPQbTc44qDzd00TMDj5LWnXQugChHpCQyoeGf8xGf48xE53B4CKJ4dDdAnnw8jyFxwZcc5/70crNKaKwApBB8uZu+G87taYxjpj+lZ27MGvWDY=
+	t=1746973638; cv=none; b=Y2jdiiUPrPGYosOAzrT7xDJCe/bg3Xd1o5/ardEuntwEIwke/MJCpSCxPEKZsM8RiYuzHPrS+hRRuod/TKuYRgsGnEvFMORvoEdW385yfXc/TsIKDvjFzb57YaswpAc2cMQexWJncbbNHDO68yYk2lrfWv9sX/STtM8+dv7wGT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746973634; c=relaxed/simple;
-	bh=LmmVKnPbU8jgX+9Y+2e2Q6tzWKMA1huWOUYuv7Df+3o=;
+	s=arc-20240116; t=1746973638; c=relaxed/simple;
+	bh=d93z9+ehYtoAigHYNKFQesxsq3DBD3XbEKwtrYnVYBE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qlaRo0NoeFm0Fvo6A8Z2ww525JYnQkUvdUQkdhv1Ga6CMpBTL+EZlmK7H/oSKB/kVbl5YcUqzhevPoRI1ef4jvUMtEiyqqkSGG16tu76+54FdJq3ev2N8tUnZ9/mnoHUrhD1I8r97NlkGU8sU34za3Tb9JlSts69LelwQ7VBV4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de; spf=pass smtp.mailfrom=public-files.de; dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b=Spx2Zd1N; arc=none smtp.client-ip=212.227.17.22
+	 MIME-Version; b=lGbF6fBqda5U644kCSPFtQ/IQtPqPQPMTtOapQBOK0WhXJITemlBdrX0XlHFQNy4wl/0N0J0Xc3o/Dp+S/DowBU4lmJyGimtgjCM4WJB8B5RdaUOejyEChhEge280Y0F1UggKtXw1KN218buOKmpusrx/gdvjOf7u8jueSt2ESU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de; spf=pass smtp.mailfrom=public-files.de; dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b=ETMgC4t3; arc=none smtp.client-ip=212.227.17.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=public-files.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=public-files.de;
-	s=s31663417; t=1746973624; x=1747578424; i=frank-w@public-files.de;
-	bh=xQPOiEtR7UNHd2nQC/5bFGE9QHObHe7dXPPAZ9TilpI=;
+	s=s31663417; t=1746973625; x=1747578425; i=frank-w@public-files.de;
+	bh=ZzNDznxpyqlReNyoWtKo+MRxI8KqkWOoBYb9IsBg9Pk=;
 	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:In-Reply-To:
 	 References:MIME-Version:Content-Transfer-Encoding:cc:
 	 content-transfer-encoding:content-type:date:from:message-id:
 	 mime-version:reply-to:subject:to;
-	b=Spx2Zd1N1nbvSaQTOq3706izCQS+9pC8Os7OO25AoIVBFhryAo9OfkNdfaSfzXEl
-	 Z7fIpw4B6omoA3nXRh7gZQ6FhfJTUNopgnkez7b9JOL6hpofYw8OB6FCPy1GIIYFP
-	 yIlsDa+nq6E0Zgw6nfCRna+QCebU7oxeF52ExlzYmWn1TDdqqDu/oCAK7yGfmj/Jn
-	 qQ5qoea3S9hk8mD03OC9KFXTZ+dFKIJyN7ZCzaEIkKL98RoizXRJMYsXs01LvBRhH
-	 ps768oVsFVJYbSQz/FLMdmyVVWY7mlA7ZxYzxfN3ZiG9ms4AhcLCGq/DvvSrsSk0q
-	 o16k/9eRAQD4fde3Kg==
+	b=ETMgC4t3pbYkXUZThHXwp/YZhR0oUMB/tgFU220wpjmNz8ycc9bnH0tg+HU/I48t
+	 kxmy2XRcTDHwoDYCPJYeHhLLicU/7ZLQjdfKht35k6kzaHq52mDduWUvX/FEpbZtk
+	 90XFqAK6CEjGB4MEO3Xe8i5+E3o11rbmmoy3AQtiz8+11YRADvwKGwu9mcyoM/+Xv
+	 9CHJmu0WdBf3Zc4NX54BG+2ZfdUkEBhdV6yNXG6X6exU2sPk5hT/8/V/w/uKgL4OI
+	 lDxMZ/f1Ol5iQ+NPpO3OqWa2JoTO8s8PtnfcZleD5EZcXoHuA78Gx8hcEzRL9Gnn0
+	 XytW3pgLSB6apcMOSA==
 X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
 Received: from frank-u24 ([194.15.84.99]) by mail.gmx.net (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MD9XF-1u5YvB0cIj-00FOt5; Sun, 11
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1MNsw4-1ucNge3AYC-00I0O6; Sun, 11
  May 2025 16:27:04 +0200
 From: Frank Wunderlich <frank-w@public-files.de>
 To: Andrew Lunn <andrew@lunn.ch>,
@@ -73,9 +73,9 @@ Cc: Frank Wunderlich <frank-w@public-files.de>,
 	linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org
-Subject: [PATCH v1 11/14] arm64: dts: mediatek: mt7988a-bpi-r4: configure spi-nodes
-Date: Sun, 11 May 2025 16:26:51 +0200
-Message-ID: <20250511142655.11007-2-frank-w@public-files.de>
+Subject: [PATCH v1 12/14] arm64: dts: mediatek: mt7988a-bpi-r4: add proc-supply for cci
+Date: Sun, 11 May 2025 16:26:52 +0200
+Message-ID: <20250511142655.11007-3-frank-w@public-files.de>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250511142655.11007-1-frank-w@public-files.de>
 References: <20250511142655.11007-1-frank-w@public-files.de>
@@ -86,108 +86,80 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:tAcmEa8FaAS4uDeXXzw+jL2GXIN2E2kq18ViGasr5wUEniIZWNM
- IO/oT8iB0sS31c4FIi778Dn9zf0Qz06xLjIjhDDIGJ/3KaIzr4CiIr5T2mZKTQAbkm2+TK+
- ERxdS+TxvTCUBLbufNx6GhAPP71NPhNFmZyOQbUNB2ez7mzQfGp6FP+Zxr7N18zXoMowV2U
- D3UHzHHEvRjs8Sk4x1lyQ==
+X-Provags-ID: V03:K1:Qae9R1ROAS7GGhKcoocDvvfSN1lTbwmOckLSmBT/RcUE+p369Rc
+ V5vHaYCbVIVSdn/CBRPbUI168BCkmjiXQ443AqxYedYM2ygTw8zXjVK8wopC8tKzhAOV6g3
+ iq8PHXl3YJKuQpFKGXO2gfgkeu4VxeGGeefAJHmX/lSNyGCLLm9ZrJx4qMvQdM1+yRhMig4
+ K0NBiuf8j+lPrfBpHNEZg==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:sgEX27r696c=;9yZ2XzEX/OBRA7D4NPuXydIC9ju
- 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
- Vc9FJclE5ITWbHY5y7rvgTYbc
+UI-OutboundReport: notjunk:1;M01:P0:jTOjf/Ji844=;E3z+Qeg+R/XZp97Xq0gAqHj1gPn
+ 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
+ TE/Ji3L/aN5ShBNxvcubq1lhN
 
-Configure and enable SPI nodes on Bananapi R4 board.
+CCI requires proc-supply. Add it on board level.
 
 Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
 =2D--
- .../dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi | 32 +++++++++++++++++++
- 1 file changed, 32 insertions(+)
+ arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi b/a=
 rch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
-index c6f84de82a4d..81ba045e0e0e 100644
+index 81ba045e0e0e..afa9e3b2b16a 100644
 =2D-- a/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
 +++ b/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
-@@ -401,6 +401,38 @@ &serial0 {
- 	status =3D "okay";
+@@ -40,6 +40,10 @@ reg_3p3v: regulator-3p3v {
+ 	};
  };
 =20
-+&spi0 {
-+	pinctrl-names =3D "default";
-+	pinctrl-0 =3D <&spi0_flash_pins>;
-+	status =3D "okay";
-+
-+	spi_nand: flash@0 {
-+		compatible =3D "spi-nand";
-+		reg =3D <0>;
-+		spi-max-frequency =3D <52000000>;
-+		spi-tx-bus-width =3D <4>;
-+		spi-rx-bus-width =3D <4>;
-+	};
++&cci {
++	proc-supply =3D <&rt5190_buck3>;
 +};
 +
-+&spi1 {
-+	status =3D "okay";
-+};
-+
-+&spi_nand {
-+	partitions {
-+		compatible =3D "fixed-partitions";
-+		#address-cells =3D <1>;
-+		#size-cells =3D <1>;
-+
-+		partition@0 {
-+			label =3D "bl2";
-+			reg =3D <0x0 0x200000>;
-+			read-only;
-+		};
-+	};
-+};
-+
- &ssusb1 {
- 	status =3D "okay";
+ &cpu0 {
+ 	proc-supply =3D <&rt5190_buck3>;
  };
 =2D-=20
 2.43.0
