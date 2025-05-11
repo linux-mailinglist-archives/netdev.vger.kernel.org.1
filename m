@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-189598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189599-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41212AB2B99
-	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 23:22:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86AA7AB2B9D
+	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 23:25:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F648166DE6
-	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 21:22:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10C93189971F
+	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 21:26:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4051C25B1F6;
-	Sun, 11 May 2025 21:22:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9223425F97A;
+	Sun, 11 May 2025 21:25:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="MRsbE802"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FAhkc07q"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8D743169;
-	Sun, 11 May 2025 21:22:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D3F114A09C;
+	Sun, 11 May 2025 21:25:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746998544; cv=none; b=oYqrqReffPzitxF4w/mVqUs9lTp43qXO3PfnKsotb4mZk4+pLluX+9sRtu9rAXFNE4yuXtz2CrqKRIHB+jaRHtvDmycA6pzzBw8aPzmkE3y4O2s4PydzNWs82C5RMFrLrIoLkmzd3tfAs207BF2nrC0I8uqUsKdH3yUjpoMxT00=
+	t=1746998752; cv=none; b=XGdSYhaA+V4tn6lHWjGbAp1rV3TTYHO3DawV/HgQkd85/FuNmZ8BPxOCV5/eetLdFBVjlqUtdVhSAOWyq3He8mA6WTXDMWLZBjPLBmHRsXYNCE7FoOWLsCXupiLo03xpFGMfhwygfG/ERQQuU+F5Wu4uNhQIg8sO/RRtQDpDpqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746998544; c=relaxed/simple;
-	bh=mTem+6igHDgqrWUC8LXJOZmBzQNvwsDPdH4Z11cVT3s=;
+	s=arc-20240116; t=1746998752; c=relaxed/simple;
+	bh=gUWXrPZP0cgNig1Rls3XoWX2UmOwqqNTnMVATnn4H2s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UbQps5EfLRYzlb7gBKIUGzhE0iFl3ujHOxO7ks3LA4mT3whDdZ4ufBtUL6JiLxc5wPtSjJoXrWr0n7KgPhUgIMsv9QutysmsN2uuhY45nhmy3oQ+Uln9gw0Xj6fx96T3ejtoq9gJSqIF/z36ECp1EzWoYwuQ1uIY9UpgR+JhpXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=MRsbE802; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=DzuZgfpoyNQ/qgE3hVY/4se66sXtn2OFX2jtI1zqV+3FGvVOSKa+9MXscuDRJAFJqBNQzspT/y6qnXkGRQJTD3nGYk6Dk+XnEKz3R5JqoQhc+NS6coFEijGaeAGka2DsPrHUQenZGsWwf8FUkeNdzyyOOof/NohsLGTc/ncUkbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FAhkc07q; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,26 +36,31 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=RrNyqzWsoxW7PT7XBcAVPoXOI9p5Db8vQWoqbzcV3Bs=; b=MRsbE802EdcrNIsmJ9rJJrB3Gb
-	J27nqulZChtl/IUzRLo3poP1dnDuJTs8ZhlIKJ8x9qAZ+/ZyE5k8nQ1WpXhwwKP/1iofIltl6bscw
-	riU7Q4/Z1OGJ6K8fvVqPh8lhdHDfv9QaEDscHK/OeYuVs2oAX3HAEx5fYslxxk2ah4D0=;
+	bh=pFDIZWe85lWzdsVOO9D9K4RCfE3MGF8f7zr5mhPvBlE=; b=FAhkc07qAlQhbeIcSsYcowD/zh
+	28GpGuhOHupvuPXTxs3uoYu4gGBRZh48QxNridrAuo7FSpll9ucBiUpcOcV3Wasl5auLvpKmHrck9
+	XMnw0yvBadv1bjs3/UaOm8ietfTKaUB52YDpLbewhnMce8udVoP1i9PxmkQhCmtiEzSw=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1uEE7l-00CHNm-T0; Sun, 11 May 2025 23:22:17 +0200
-Date: Sun, 11 May 2025 23:22:17 +0200
+	id 1uEEAp-00CHOm-O9; Sun, 11 May 2025 23:25:27 +0200
+Date: Sun, 11 May 2025 23:25:27 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: netdev@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-sctp@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Sagi Grimberg <sagi@grimberg.me>, Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH net-next 00/10] net: faster and simpler CRC32C computation
-Message-ID: <fe9fdf65-8eb1-4e33-88ce-4856a10364b2@lunn.ch>
-References: <20250511004110.145171-1-ebiggers@kernel.org>
- <b9b0f188-d873-43ff-b1e1-259e2afdda6c@lunn.ch>
- <20250511172929.GA1239@sol>
+To: Frank Wunderlich <frank-w@public-files.de>
+Cc: linux@fw-web.de, olteanv@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+	matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+	arinc.unal@arinc9.com, Landen.Chao@mediatek.com, dqfext@gmail.com,
+	sean.wang@mediatek.com, daniel@makrotopia.org, lorenzo@kernel.org,
+	nbd@nbd.name, netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: Re: [PATCH v1 09/14] arm64: dts: mediatek: mt7988: add switch
+ node
+Message-ID: <74afe286-2adb-42d3-9491-881379053e36@lunn.ch>
+References: <20250511141942.10284-1-linux@fw-web.de>
+ <20250511141942.10284-10-linux@fw-web.de>
+ <bfa0c158-4205-4070-9b72-f6bde9cd9997@lunn.ch>
+ <trinity-0edcdb4e-bcc9-47bb-b958-a018f5980128-1746984591926@trinity-msg-rest-gmx-gmx-live-74d694d854-ls6fz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,31 +69,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250511172929.GA1239@sol>
+In-Reply-To: <trinity-0edcdb4e-bcc9-47bb-b958-a018f5980128-1746984591926@trinity-msg-rest-gmx-gmx-live-74d694d854-ls6fz>
 
-On Sun, May 11, 2025 at 10:29:29AM -0700, Eric Biggers wrote:
-> On Sun, May 11, 2025 at 06:30:25PM +0200, Andrew Lunn wrote:
-> > On Sat, May 10, 2025 at 05:41:00PM -0700, Eric Biggers wrote:
-> > > Update networking code that computes the CRC32C of packets to just call
-> > > crc32c() without unnecessary abstraction layers.  The result is faster
-> > > and simpler code.
-> > 
-> > Hi Eric
-> > 
-> > Do you have some benchmarks for these changes?
-> > 
-> > 	Andrew
-> 
-> Do you want benchmarks that show that removing the indirect calls makes things
-> faster?  I think that should be fairly self-evident by now after dealing with
-> retpoline for years, but I can provide more details if you need them.
+> i will move that into the board dtsi file in v2 because "normal" bpi-r4 and 2g5 variant are same here.
 
-I was think more like iperf before/after? Show the CPU load has gone
-down without the bandwidth also going down.
-
-Eric Dumazet has a T-Shirt with a commit message on the back which
-increased network performance by X%. At the moment, there is nothing
-T-Shirt quotable here.
+Maybe you just need to expand the commit message? What does this .dtsi
+actually represent? The SoC, or what is common across a number of
+boards?
 
 	Andrew
 
