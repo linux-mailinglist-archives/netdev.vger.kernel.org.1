@@ -1,353 +1,108 @@
-Return-Path: <netdev+bounces-189600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94A48AB2BA6
-	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 23:41:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1509AB2BAD
+	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 23:45:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 175DA3B67EE
-	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 21:40:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4115816E4A0
+	for <lists+netdev@lfdr.de>; Sun, 11 May 2025 21:45:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F28A725C70A;
-	Sun, 11 May 2025 21:41:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7389D13AA2D;
+	Sun, 11 May 2025 21:45:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dxM2b1hZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D/ZRTasQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E5D1E9B0B;
-	Sun, 11 May 2025 21:40:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39F054C8E;
+	Sun, 11 May 2025 21:45:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746999661; cv=none; b=W70f9yjX8b2a1OmmWv+LnLrxrn7GOqBDm01R/9B/hTnrr1kPuQapB1q12+6Ome2DzN0SB8ku/UCZpv0yMnD0JQlMMoILc4GQwlAY6/0WDOdQ1F6g6YMQYmXmRrp+xQaUHvSEcO9S33Istqy4w5ZqZNamBXBnlK+GsmF7nxW8its=
+	t=1746999928; cv=none; b=Cqx9UIVGQc9G1vw94vfuQB8rX+bzON1+Dq6wOstN/pyzjjAA1LA79XkITA1Byju4hncywaYkqCVZY+TDJrDyP3xHOWEZXnQ+wkZKAfthOGTd6AkmdPfPDetvUhLDtRmbAi5dAjION4fERQS6JFJnOsJxLcreDROE7khrTDYpO5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746999661; c=relaxed/simple;
-	bh=m5YqWs3A+JJxDq/2ebw9Aqpwy9KmfxthvlW6q+0Jdko=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=toChMjOHLn5zRzvJPQ+njfoVU7R55FGwccGSS/qtczb+pdSbhIWT6SvSNy10vvPAP4Os+eUFKBf7YZ2G5SOuechElbYXKBJp5WwSVUUGlTDyw258i4NRET7sXBHF76cQwwfzKkydTFCo6MlJbAwOiMrYLmM324utUgNe2CAn70s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dxM2b1hZ; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-ad2440926adso155807466b.1;
-        Sun, 11 May 2025 14:40:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1746999658; x=1747604458; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=CueOPRpV/a77O5bokU3d6RkibO4gTHAeRmkprjLnfVc=;
-        b=dxM2b1hZVAT0M7n8hRtt2Uq7ui0+lYznEMPVeNlw7EwfzG2YEeWftJIKftBwZKmYBd
-         UE6r2niLZ5eTnz2k399TdT3aA38eEkfGPFNkFlV5eHPYqjqVZZ4VyrKOikZ4Le7zGcb/
-         ZGD3ThwO7uKgZyFOhknRKau3x+qXWTo7in9wR8gzr10YKegpJg6L1pK6QANpj0Y+3ZC2
-         5ZobuZdX2GQIM4Z7DXD3jMPeT42Hwv9+lCUdKOjTIWPBIax92x2yJYY5p2K+rC/T+kkz
-         p9fPiwIVOHmN+T/mKifjz6NKfSRnpH0bT9+gq+h9Gxh91HrZahXNE3H08RcbRiXAT1nP
-         bubg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1746999658; x=1747604458;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CueOPRpV/a77O5bokU3d6RkibO4gTHAeRmkprjLnfVc=;
-        b=wPrB6qz7QYsTLgLyb38+hOAd4gOS5sfF1DEixqnvP8oXSwEtLxFwHeoOSq6c861W91
-         BARh3utsa9jGMYuT+gqyOCv5hfQDPDjP5sexubBhYWOkkOB86Lg2BOafRhiTUUi1A4cO
-         iAptkUO+alZ7OfDvlr7eEfshxtNyOCVTmY9GmI1IE5dBYDIpAwUNWqSL+cn/QGom2JkW
-         25f27rr5rfmVX/iOWhvQ+pI06d0X32JxBSwGT+eHP5drQMXkISIKs4GL6UQN1g+khrN6
-         51cf6pXAlvUgvzAJ3nHAwnBT082/n21HnA9mTu+AbRLvt6reOfMJC46ORZLTB3iI809y
-         Qcjg==
-X-Forwarded-Encrypted: i=1; AJvYcCURr/fQpA6uI7F6M5eGQV7fk6u10Nn1UdiRvtIwCDqFP/l9VFQnHlcsyXFsoyu4zSSoyFMUmTEV2KW6DVI=@vger.kernel.org, AJvYcCUoye6ziZXkLtzK1+f8wdMouoEL7tlmZGTyD1VQ1KSTPdyHk0g+M2ib1xovbBKRGKe6VvJCeTWG@vger.kernel.org
-X-Gm-Message-State: AOJu0YxH+YJPKlKBgbt5BtWUeyoiaUHvmJX6uVhWG65qv8xyJl6d5ia9
-	xTZXbx87LkrBevl1/cCN+YOX87ZlgQPr+Daxjp3/uGVupP+iBmlw
-X-Gm-Gg: ASbGncsfH9/IZuQQzrzwdQ/hStE6i8YkG3WbhGHuNkeLupaRC+f88ELZnqaRSUdf4/S
-	nTroVit3NgXolQTiYT3MtDSFwTPPke1fLiCPFe7FdtgipuGvpHvtFSFCw/x/Op4JNGSVDoBHGK2
-	bKoWN5+LF0x1RYy5uq1RSDujXNAc/VJMFvqJ/qqYkIaytNsEEeS0nEWFIEMvxdg1gqmq0PFUIQ0
-	94NsYFIVXVc9TVYTlGoPFyDCgJUov17eUvW0ThEUhJW8nKuN2mh6xmv5tIl2fidMlfzXE3Qvi4t
-	qLtDLLskRwbkzVnPqPhOVe6xrIV2x8mhWdxPokqimGLhVraAbTjaOstsIyygc9BmWxRSb+z/
-X-Google-Smtp-Source: AGHT+IGyn0ofLXJZjQCGtVxaifRfN0pWuzdUCoxClKekA4d7icx5aqxy2DGVpXDrT6uOJWc9eT5QEw==
-X-Received: by 2002:a17:907:8a8f:b0:ad2:313f:f550 with SMTP id a640c23a62f3a-ad23140714emr635144166b.29.1746999657796;
-        Sun, 11 May 2025 14:40:57 -0700 (PDT)
-Received: from debian-vm.localnet ([2a01:4b00:d20c:cd03:20c:29ff:fe56:c86])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad2193495bdsm523315866b.70.2025.05.11.14.40.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 May 2025 14:40:57 -0700 (PDT)
-From: zakkemble@gmail.com
-To: Doug Berger <opendmb@gmail.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Zak Kemble <zakkemble@gmail.com>
-Subject: [PATCH] net: bcmgenet: tidy up stats, expose more stats in ethtool
-Date: Sun, 11 May 2025 22:40:36 +0100
-Message-Id: <20250511214037.2805-1-zakkemble@gmail.com>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1746999928; c=relaxed/simple;
+	bh=n6VR74UUrkjd7Li7mn4MUpvTWHM+Fg3QJMysU96a2vU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hCH9LK0VW9ovaKYGDDHf0Sg+KDNVRkkamWzIFymbfK0E/YHGir7mRzZJMJ6TLMr+g6tJlHxBvOOQtJosnc+f2Q3ao0she9Z9zdYF5qESIdDqU12x76uVg0R/IZC8tc/kJzRAw9y+sGNZA8SvVu3Nq6cXJW5SedBmY4NrtPQ/X2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D/ZRTasQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DD08C4CEEF;
+	Sun, 11 May 2025 21:45:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1746999927;
+	bh=n6VR74UUrkjd7Li7mn4MUpvTWHM+Fg3QJMysU96a2vU=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=D/ZRTasQquFXwKbPNKCYUM1NIuMwA6+YLiybYZawOMprx3ipPqVo6VWG2Ilfj52GF
+	 Rr5XraDpe8fZyBTv3Noz21dBSrlpDmrQZd91yutike+MoWlDi4GxDIv2dKHWnYdlVC
+	 4c8AsLyPsmHKuooiYd6PEd0mzGIo6qyWt/zFztGM79ib+cL5O6LqOvQvD/DKNUjVFn
+	 O9smap/BiePuv1E1/pL7tAOcu/ws2OzMultORce4EgQ5aKaVfJAbjxOHtllEn/sDyH
+	 RgYUbhjQsNpGB2FtShM4/G31GhUKnPZ+bTkBXxWFZs2TxVPOobN1ecSLXQodU+TONE
+	 AV+k1my09wI0Q==
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-326cf24aa35so21928681fa.2;
+        Sun, 11 May 2025 14:45:27 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU47SderBtHetOpksGFVN2j3yXIO5OANDpBr1Lk0a/EUvaLo1xwLxCGy2cKEOvRpxHSRFbhmZI0tifBRXs=@vger.kernel.org, AJvYcCUqwqHwWXYyvkwXNHHhTF/bxO3aHGecFZ/yXNg+al4WQbGYOOjBZuSF58x8jRxSn03/BN4YPJrS@vger.kernel.org, AJvYcCV9EOJGZqASWbQUWSUYrCK+luli4m6K1AVTbn2WI+Vo9LL7MNJae8N7i8+E3xPDAEsazW9jZonjolmzIA==@vger.kernel.org, AJvYcCWVVMYMaCrdSV3FaH3lYEknB1lzyjCBtNpeuOpdY2IpA1ELbGROeVdh5/lzXda02Ds296WKWerj2itBdg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxeeDQwubM/y765nCocp4U80oZatKscfB/QAcZ9KJTMDnYTf2KX
+	PHKi6L/PCnBPssDK9OQlVjQ6t0Pqo1VY6RYs6qw94oThr3j+ugQp5MrJOlwEJwDV71LkooFrErA
+	wSbt4GZULfanWR9tHzOAbbgdaOCc=
+X-Google-Smtp-Source: AGHT+IGXAKwBmsQgT+onQCTrcyVQm05O0hzEhnj9ZJ3lSI582XXe3FX+xmXCeVd+5a8Bm7iJP57f+ZUkw11acThSHag=
+X-Received: by 2002:a2e:bc08:0:b0:31e:261a:f3e2 with SMTP id
+ 38308e7fff4ca-326c459db3amr41790571fa.1.1746999925705; Sun, 11 May 2025
+ 14:45:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250511004110.145171-1-ebiggers@kernel.org> <b9b0f188-d873-43ff-b1e1-259e2afdda6c@lunn.ch>
+ <20250511172929.GA1239@sol> <fe9fdf65-8eb1-4e33-88ce-4856a10364b2@lunn.ch>
+In-Reply-To: <fe9fdf65-8eb1-4e33-88ce-4856a10364b2@lunn.ch>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Sun, 11 May 2025 23:45:14 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXFSm9-5+uBoF3mBbZKRU6wK9jmmyh=L538FoGvZ1XVShQ@mail.gmail.com>
+X-Gm-Features: AX0GCFsoD-9jiD_NH_ReLAgqqMRiIecG31oMhtVBxXbocF6ZydM3nWnbvTXpTTA
+Message-ID: <CAMj1kXFSm9-5+uBoF3mBbZKRU6wK9jmmyh=L538FoGvZ1XVShQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 00/10] net: faster and simpler CRC32C computation
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Eric Biggers <ebiggers@kernel.org>, netdev@vger.kernel.org, 
+	linux-nvme@lists.infradead.org, linux-sctp@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Daniel Borkmann <daniel@iogearbox.net>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
+	Sagi Grimberg <sagi@grimberg.me>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Zak Kemble <zakkemble@gmail.com>
+On Sun, 11 May 2025 at 23:22, Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Sun, May 11, 2025 at 10:29:29AM -0700, Eric Biggers wrote:
+> > On Sun, May 11, 2025 at 06:30:25PM +0200, Andrew Lunn wrote:
+> > > On Sat, May 10, 2025 at 05:41:00PM -0700, Eric Biggers wrote:
+> > > > Update networking code that computes the CRC32C of packets to just call
+> > > > crc32c() without unnecessary abstraction layers.  The result is faster
+> > > > and simpler code.
+> > >
+> > > Hi Eric
+> > >
+> > > Do you have some benchmarks for these changes?
+> > >
+> > >     Andrew
+> >
+> > Do you want benchmarks that show that removing the indirect calls makes things
+> > faster?  I think that should be fairly self-evident by now after dealing with
+> > retpoline for years, but I can provide more details if you need them.
+>
+> I was think more like iperf before/after? Show the CPU load has gone
+> down without the bandwidth also going down.
+>
+> Eric Dumazet has a T-Shirt with a commit message on the back which
+> increased network performance by X%. At the moment, there is nothing
+> T-Shirt quotable here.
+>
 
-This patch exposes more statistics counters in ethtool and tidies up the
-counters so that they are all per-queue. The netdev counters are now only
-updated synchronously in bcmgenet_get_stats instead of a mix of sync/async
-throughout the driver. Hardware discarded packets are now counted in their
-own missed stat instead of being lumped in with general errors.
-
-Signed-off-by: Zak Kemble <zakkemble@gmail.com>
----
- .../net/ethernet/broadcom/genet/bcmgenet.c    | 89 +++++++++++++++----
- .../net/ethernet/broadcom/genet/bcmgenet.h    | 10 +++
- 2 files changed, 83 insertions(+), 16 deletions(-)
-
-diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-index 73d78dcb7..c395a071a 100644
---- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-+++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-@@ -1018,6 +1018,8 @@ struct bcmgenet_stats {
- 			tx_rings[num].packets), \
- 	STAT_GENET_SOFT_MIB("txq" __stringify(num) "_bytes", \
- 			tx_rings[num].bytes), \
-+	STAT_GENET_SOFT_MIB("txq" __stringify(num) "_errors", \
-+			tx_rings[num].errors), \
- 	STAT_GENET_SOFT_MIB("rxq" __stringify(num) "_bytes", \
- 			rx_rings[num].bytes),	 \
- 	STAT_GENET_SOFT_MIB("rxq" __stringify(num) "_packets", \
-@@ -1025,7 +1027,23 @@ struct bcmgenet_stats {
- 	STAT_GENET_SOFT_MIB("rxq" __stringify(num) "_errors", \
- 			rx_rings[num].errors), \
- 	STAT_GENET_SOFT_MIB("rxq" __stringify(num) "_dropped", \
--			rx_rings[num].dropped)
-+			rx_rings[num].dropped), \
-+	STAT_GENET_SOFT_MIB("rxq" __stringify(num) "_multicast", \
-+			rx_rings[num].multicast), \
-+	STAT_GENET_SOFT_MIB("rxq" __stringify(num) "_missed", \
-+			rx_rings[num].missed), \
-+	STAT_GENET_SOFT_MIB("rxq" __stringify(num) "_length_errors", \
-+			rx_rings[num].length_errors), \
-+	STAT_GENET_SOFT_MIB("rxq" __stringify(num) "_over_errors", \
-+			rx_rings[num].over_errors), \
-+	STAT_GENET_SOFT_MIB("rxq" __stringify(num) "_crc_errors", \
-+			rx_rings[num].crc_errors), \
-+	STAT_GENET_SOFT_MIB("rxq" __stringify(num) "_frame_errors", \
-+			rx_rings[num].frame_errors), \
-+	STAT_GENET_SOFT_MIB("rxq" __stringify(num) "_fragmented_errors", \
-+			rx_rings[num].fragmented_errors), \
-+	STAT_GENET_SOFT_MIB("rxq" __stringify(num) "_broadcast", \
-+			rx_rings[num].broadcast)
- 
- /* There is a 0xC gap between the end of RX and beginning of TX stats and then
-  * between the end of TX stats and the beginning of the RX RUNT
-@@ -1046,6 +1064,11 @@ static const struct bcmgenet_stats bcmgenet_gstrings_stats[] = {
- 	STAT_NETDEV(rx_dropped),
- 	STAT_NETDEV(tx_dropped),
- 	STAT_NETDEV(multicast),
-+	STAT_NETDEV(rx_missed_errors),
-+	STAT_NETDEV(rx_length_errors),
-+	STAT_NETDEV(rx_over_errors),
-+	STAT_NETDEV(rx_crc_errors),
-+	STAT_NETDEV(rx_frame_errors),
- 	/* UniMAC RSV counters */
- 	STAT_GENET_MIB_RX("rx_64_octets", mib.rx.pkt_cnt.cnt_64),
- 	STAT_GENET_MIB_RX("rx_65_127_oct", mib.rx.pkt_cnt.cnt_127),
-@@ -1983,7 +2006,8 @@ static void bcmgenet_tx_reclaim_all(struct net_device *dev)
-  * the transmit checksum offsets in the descriptors
-  */
- static struct sk_buff *bcmgenet_add_tsb(struct net_device *dev,
--					struct sk_buff *skb)
-+					struct sk_buff *skb,
-+					struct bcmgenet_tx_ring *ring)
- {
- 	struct bcmgenet_priv *priv = netdev_priv(dev);
- 	struct status_64 *status = NULL;
-@@ -2001,7 +2025,7 @@ static struct sk_buff *bcmgenet_add_tsb(struct net_device *dev,
- 		if (!new_skb) {
- 			dev_kfree_skb_any(skb);
- 			priv->mib.tx_realloc_tsb_failed++;
--			dev->stats.tx_dropped++;
-+			ring->dropped++;
- 			return NULL;
- 		}
- 		dev_consume_skb_any(skb);
-@@ -2089,7 +2113,7 @@ static netdev_tx_t bcmgenet_xmit(struct sk_buff *skb, struct net_device *dev)
- 	GENET_CB(skb)->bytes_sent = skb->len;
- 
- 	/* add the Transmit Status Block */
--	skb = bcmgenet_add_tsb(dev, skb);
-+	skb = bcmgenet_add_tsb(dev, skb, ring);
- 	if (!skb) {
- 		ret = NETDEV_TX_OK;
- 		goto out;
-@@ -2253,7 +2277,7 @@ static unsigned int bcmgenet_desc_rx(struct bcmgenet_rx_ring *ring,
- 		   DMA_P_INDEX_DISCARD_CNT_MASK;
- 	if (discards > ring->old_discards) {
- 		discards = discards - ring->old_discards;
--		ring->errors += discards;
-+		ring->missed += discards;
- 		ring->old_discards += discards;
- 
- 		/* Clear HW register when we reach 75% of maximum 0xFFFF */
-@@ -2306,8 +2330,7 @@ static unsigned int bcmgenet_desc_rx(struct bcmgenet_rx_ring *ring,
- 
- 		if (unlikely(len > RX_BUF_LENGTH)) {
- 			netif_err(priv, rx_status, dev, "oversized packet\n");
--			dev->stats.rx_length_errors++;
--			dev->stats.rx_errors++;
-+			ring->length_errors++;
- 			dev_kfree_skb_any(skb);
- 			goto next;
- 		}
-@@ -2315,7 +2338,7 @@ static unsigned int bcmgenet_desc_rx(struct bcmgenet_rx_ring *ring,
- 		if (unlikely(!(dma_flag & DMA_EOP) || !(dma_flag & DMA_SOP))) {
- 			netif_err(priv, rx_status, dev,
- 				  "dropping fragmented packet!\n");
--			ring->errors++;
-+			ring->fragmented_errors++;
- 			dev_kfree_skb_any(skb);
- 			goto next;
- 		}
-@@ -2329,14 +2352,19 @@ static unsigned int bcmgenet_desc_rx(struct bcmgenet_rx_ring *ring,
- 			netif_err(priv, rx_status, dev, "dma_flag=0x%x\n",
- 				  (unsigned int)dma_flag);
- 			if (dma_flag & DMA_RX_CRC_ERROR)
--				dev->stats.rx_crc_errors++;
-+				ring->crc_errors++;
- 			if (dma_flag & DMA_RX_OV)
--				dev->stats.rx_over_errors++;
-+				ring->over_errors++;
- 			if (dma_flag & DMA_RX_NO)
--				dev->stats.rx_frame_errors++;
-+				ring->frame_errors++;
- 			if (dma_flag & DMA_RX_LG)
--				dev->stats.rx_length_errors++;
--			dev->stats.rx_errors++;
-+				ring->length_errors++;
-+			if ((dma_flag & (DMA_RX_CRC_ERROR |
-+						DMA_RX_OV |
-+						DMA_RX_NO |
-+						DMA_RX_LG |
-+						DMA_RX_RXER)) == DMA_RX_RXER)
-+				ring->errors++;
- 			dev_kfree_skb_any(skb);
- 			goto next;
- 		} /* error packet */
-@@ -2359,7 +2387,9 @@ static unsigned int bcmgenet_desc_rx(struct bcmgenet_rx_ring *ring,
- 		ring->packets++;
- 		ring->bytes += len;
- 		if (dma_flag & DMA_RX_MULT)
--			dev->stats.multicast++;
-+			ring->multicast++;
-+		else if (dma_flag & DMA_RX_BRDCAST)
-+			ring->broadcast++;
- 
- 		/* Notify kernel */
- 		napi_gro_receive(&ring->napi, skb);
-@@ -3420,7 +3450,7 @@ static void bcmgenet_timeout(struct net_device *dev, unsigned int txqueue)
- 
- 	netif_trans_update(dev);
- 
--	dev->stats.tx_errors++;
-+	priv->tx_rings[txqueue].errors++;
- 
- 	netif_tx_wake_all_queues(dev);
- }
-@@ -3513,8 +3543,13 @@ static struct net_device_stats *bcmgenet_get_stats(struct net_device *dev)
- {
- 	struct bcmgenet_priv *priv = netdev_priv(dev);
- 	unsigned long tx_bytes = 0, tx_packets = 0;
-+	unsigned long tx_errors = 0, tx_dropped = 0;
- 	unsigned long rx_bytes = 0, rx_packets = 0;
- 	unsigned long rx_errors = 0, rx_dropped = 0;
-+	unsigned long rx_missed = 0, rx_length_errors = 0;
-+	unsigned long rx_over_errors = 0, rx_crc_errors = 0;
-+	unsigned long rx_frame_errors = 0, rx_fragmented_errors = 0;
-+	unsigned long multicast = 0, broadcast = 0;
- 	struct bcmgenet_tx_ring *tx_ring;
- 	struct bcmgenet_rx_ring *rx_ring;
- 	unsigned int q;
-@@ -3523,6 +3558,8 @@ static struct net_device_stats *bcmgenet_get_stats(struct net_device *dev)
- 		tx_ring = &priv->tx_rings[q];
- 		tx_bytes += tx_ring->bytes;
- 		tx_packets += tx_ring->packets;
-+		tx_errors += tx_ring->errors;
-+		tx_dropped += tx_ring->dropped;
- 	}
- 
- 	for (q = 0; q <= priv->hw_params->rx_queues; q++) {
-@@ -3532,15 +3569,35 @@ static struct net_device_stats *bcmgenet_get_stats(struct net_device *dev)
- 		rx_packets += rx_ring->packets;
- 		rx_errors += rx_ring->errors;
- 		rx_dropped += rx_ring->dropped;
-+		rx_missed += rx_ring->missed;
-+		rx_length_errors += rx_ring->length_errors;
-+		rx_over_errors += rx_ring->over_errors;
-+		rx_crc_errors += rx_ring->crc_errors;
-+		rx_frame_errors += rx_ring->frame_errors;
-+		rx_fragmented_errors += rx_ring->fragmented_errors;
-+		multicast += rx_ring->multicast;
-+		broadcast += rx_ring->broadcast;
- 	}
- 
-+	rx_errors += rx_length_errors;
-+	rx_errors += rx_crc_errors;
-+	rx_errors += rx_frame_errors;
-+	rx_errors += rx_fragmented_errors;
-+
- 	dev->stats.tx_bytes = tx_bytes;
- 	dev->stats.tx_packets = tx_packets;
-+	dev->stats.tx_errors = tx_errors;
-+	dev->stats.tx_dropped = tx_dropped;
- 	dev->stats.rx_bytes = rx_bytes;
- 	dev->stats.rx_packets = rx_packets;
- 	dev->stats.rx_errors = rx_errors;
--	dev->stats.rx_missed_errors = rx_errors;
- 	dev->stats.rx_dropped = rx_dropped;
-+	dev->stats.rx_missed_errors = rx_missed;
-+	dev->stats.rx_length_errors = rx_length_errors;
-+	dev->stats.rx_over_errors = rx_over_errors;
-+	dev->stats.rx_crc_errors = rx_crc_errors;
-+	dev->stats.rx_frame_errors = rx_frame_errors;
-+	dev->stats.multicast = multicast;
- 	return &dev->stats;
- }
- 
-diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.h b/drivers/net/ethernet/broadcom/genet/bcmgenet.h
-index 10c631bbe..429b63cc6 100644
---- a/drivers/net/ethernet/broadcom/genet/bcmgenet.h
-+++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.h
-@@ -517,6 +517,8 @@ struct bcmgenet_tx_ring {
- 	struct napi_struct napi;	/* NAPI per tx queue */
- 	unsigned long	packets;
- 	unsigned long	bytes;
-+	unsigned long	errors;
-+	unsigned long	dropped;
- 	unsigned int	index;		/* ring index */
- 	struct enet_cb	*cbs;		/* tx ring buffer control block*/
- 	unsigned int	size;		/* size of each tx ring */
-@@ -544,6 +546,14 @@ struct bcmgenet_rx_ring {
- 	unsigned long	packets;
- 	unsigned long	errors;
- 	unsigned long	dropped;
-+	unsigned long	multicast;
-+	unsigned long	missed;
-+	unsigned long	length_errors;
-+	unsigned long	over_errors;
-+	unsigned long	crc_errors;
-+	unsigned long	frame_errors;
-+	unsigned long	fragmented_errors;
-+	unsigned long	broadcast;
- 	unsigned int	index;		/* Rx ring index */
- 	struct enet_cb	*cbs;		/* Rx ring buffer control block */
- 	unsigned int	size;		/* Rx ring size */
--- 
-2.39.5
-
+I think that removing layers of redundant code to ultimately call the
+same core CRC-32 implementation is a rather obvious win, especially
+when indirect calls are involved. The diffstat speaks for itself, so
+maybe you can print that on a T-shirt.
 
