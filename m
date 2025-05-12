@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-189859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 051A0AB41B9
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 20:11:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29981AB424F
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 20:21:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D46BD8C123C
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 18:09:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B9677B78C5
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 18:12:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C5FD29A306;
-	Mon, 12 May 2025 18:04:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BDB929C356;
+	Mon, 12 May 2025 18:05:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l96ClnrO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PxNGU0r5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3E2929A302;
-	Mon, 12 May 2025 18:04:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F8EE29C349;
+	Mon, 12 May 2025 18:05:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747073079; cv=none; b=q05BzVlFpYvTVqUND9F6mpBw3J05+/64eeNge7p4Fv0Pt1RtggBFXewqJvJQn3SMHl+r9VTY0AgcNAj4S/ceUBnTwEOhDWlRmY0/y9emGEtqO1zidbeCGwH3LfTcuQZp1M8rOSALWhjg2xWuq69cM1tc7+BhuOQzQlvY3HHANVg=
+	t=1747073102; cv=none; b=VezlLp8PmTrwfH8Nn7FG7o34Y5VyE5x4fyW7eftHUIp65V35GESQ5WZ+QJ1Yy38TKa+4V1dazlGEfolxEjyAajnKhgqskPVBthc/N8J9S2X8odwzNAsB2OH4n7g7uWYIYTT7dUX++ypCYPWCd1/9uwE+0Qai9RPdnbR/8xe0yBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747073079; c=relaxed/simple;
-	bh=8d+MIh0ZJExvxWHnilQyk/lGhI/iKEiO0XS+vqKLqqo=;
+	s=arc-20240116; t=1747073102; c=relaxed/simple;
+	bh=1fXxdmjBAZoi3QflX7ew1py07w7QX9cGXStVQVebULI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tKlu5qHPcVyg1veZTu+SnplNhFvnYhb53JfTaKGOWzykTDvERau4HQtQ9HQR5c3izJoWRwmt6DJl0c80K5nBLRYimAJTDh9yI67Hp4Zae0e9+udxMPc71DsGMmoRtpyu/mUW7dquc+yCCHPRqybt7qdqlqtNytaUxb3GVOZT+4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l96ClnrO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62CCFC4CEE7;
-	Mon, 12 May 2025 18:04:37 +0000 (UTC)
+	 MIME-Version; b=Z8fZQhE8XQzLXqZzSc8EhDpIe1NbQ3F6rJ+sf1yU2qrvO6zQcKbFaA3vVwS6LGJf2H5joJwZPwnCJPT2AsN/si20MRtqvxiOuG2mqgCPGPYXAR6tlSxuiV05cDQ2CX/lWEhZDU25aoPP5q/8kNoZhlWw/pW1Ifzh0NIsAhJeDKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PxNGU0r5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA202C4CEE9;
+	Mon, 12 May 2025 18:04:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747073078;
-	bh=8d+MIh0ZJExvxWHnilQyk/lGhI/iKEiO0XS+vqKLqqo=;
+	s=k20201202; t=1747073101;
+	bh=1fXxdmjBAZoi3QflX7ew1py07w7QX9cGXStVQVebULI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=l96ClnrOe15fXvqtRziwmfo4fYHTSvvVR8aYQ/0K1j7gAEiGt+Xehn4R3g9mb2IJi
-	 8Pin9+Y2Fj5tZ22yZjH+MnZzX0+dJkvxkkwxfT7jZBRpNmeSOgnrcI3xcz1E48wVa8
-	 L833J7ngiMlxj4TfJyvjct9bNi1vPSM8TGZjF47WEWNPqydIgSw87Fu62DOW+J/Crg
-	 kdhWDu1t2oYeVo4dcsN2qTDflMGVoD2WTCp7lP0c1ogyPZsiVLSy88d6zUR1rjYxG7
-	 RovkxS1pGwTd4agNN8OtiL3MrnyeEFZ/XRYq9xPvVQn9yRLh8dYCQHmU7QuVuHOdQo
-	 qFX4A1TV8/syQ==
+	b=PxNGU0r5kmp2Ot92nRI0RFWL+krqdCL+p7gmfLSdwXShr8PX/oWrsx5HZJ34NoUlE
+	 AtU9b2rJV3vaGLgIuTKoM2roZCsLmIJkS/Sq/ticTJyApskDUP0csTX7Dg23GPzIBE
+	 OSHsn0x6dIEKrb/vQHeLnXwoxXwmXyb7BEdEO9wBDPVE9q2tpVmK+BftqxQkaAmFz5
+	 qVS4qT73pN9FVUdprrHTl7H0ne3qligPu6hhVzFz7ndn+I310GsqG5tGgPEUXeUy7E
+	 1aaF4rT9AfIX1IT+MUGlNFUgrhZQip27v85/k7LPjJH32NqGlrrl/LoLt3DcDlW1Gf
+	 lvREP2cMkM3Cw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -55,12 +55,12 @@ Cc: David Wei <dw@davidwei.uk>,
 	colin.i.king@gmail.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 05/11] tools: ynl-gen: validate 0 len strings from kernel
-Date: Mon, 12 May 2025 14:04:20 -0400
-Message-Id: <20250512180426.437627-5-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 3/6] tools: ynl-gen: validate 0 len strings from kernel
+Date: Mon, 12 May 2025 14:04:49 -0400
+Message-Id: <20250512180452.437844-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250512180426.437627-1-sashal@kernel.org>
-References: <20250512180426.437627-1-sashal@kernel.org>
+In-Reply-To: <20250512180452.437844-1-sashal@kernel.org>
+References: <20250512180452.437844-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,7 +69,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.12.28
+X-stable-base: Linux 6.6.90
 Content-Transfer-Encoding: 8bit
 
 From: David Wei <dw@davidwei.uk>
@@ -90,10 +90,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tools/net/ynl/lib/ynl.c b/tools/net/ynl/lib/ynl.c
-index ce32cb35007d6..c4da34048ef85 100644
+index ae61ae5b02bf8..0871f86c6b666 100644
 --- a/tools/net/ynl/lib/ynl.c
 +++ b/tools/net/ynl/lib/ynl.c
-@@ -364,7 +364,7 @@ int ynl_attr_validate(struct ynl_parse_arg *yarg, const struct nlattr *attr)
+@@ -368,7 +368,7 @@ int ynl_attr_validate(struct ynl_parse_arg *yarg, const struct nlattr *attr)
  		     "Invalid attribute (binary %s)", policy->name);
  		return -1;
  	case YNL_PT_NUL_STR:
