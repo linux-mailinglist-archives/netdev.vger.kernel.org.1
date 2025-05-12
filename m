@@ -1,232 +1,164 @@
-Return-Path: <netdev+bounces-189903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 331E6AB4744
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 00:29:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99089AB4741
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 00:29:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1FA18666DC
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 22:29:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F18313BE98F
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 22:29:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 943D5299AA4;
-	Mon, 12 May 2025 22:29:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BCAF299AAF;
+	Mon, 12 May 2025 22:29:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Mp/R6WwI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MpVjwt1P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9305F299A9E
-	for <netdev@vger.kernel.org>; Mon, 12 May 2025 22:29:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F11761C84BA;
+	Mon, 12 May 2025 22:29:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747088973; cv=none; b=qboNMmPYfvUUOzxKiHLupLhXu4ls9TYx8eMNuEGomslDxHgekuICP6NQOZS+tt3gzgkjhgKPt6qtxMdyZ2YlQ5eIsbPqrYIiHD3+x77GdyDjBxRyPU2mSwskwEkGUgRjPeIeiBfTPmF7yi5Ug1Uu6/sWPEUFS9hz85DY5/b50no=
+	t=1747088966; cv=none; b=kNNeEWbI2Vmq5eSJmQr4TBY5RZoLx3XDCddNtp/rR94oMEfapLkR10oX8kOeMGj2SQ4DtYi1nu0T58uEMeB+kTKSkhFKbCUL5iWU1ry3fVxgeiVMy2JPQRSzAEdXmsx8P84dT3YpIWhqeG4C/B1+t2BEgT1xafaENj2FqI1DTkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747088973; c=relaxed/simple;
-	bh=UYnsx35SJPIChz1+v6IDNAfUfXIRBIZvZZkqMS+2QdY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bcbQm6LZP+6DFDNbwl9shN8cXE+dtKq8RNj1sjXHETCZ1rYrC6HHjqvAVFsmBgRCnITa2DhUeV6TRuZgbPVJ4QDrxMszUik1nVc2TsWwjdfcqjRVyJ7G7R78ZRSmMCs6vz9ECE+BsdA7tIuoVAGl2ig6oWqm3ucfgXyO/OnGx80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Mp/R6WwI; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747088972; x=1778624972;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=UYnsx35SJPIChz1+v6IDNAfUfXIRBIZvZZkqMS+2QdY=;
-  b=Mp/R6WwIpXDwASBRAmEpGS/iHr6xSfR/IsSOYbX/emZQTmlXd/ZfS8eM
-   Acm3tMtYMonJKUMml+6v/lK46TYFjzbHW+YNka6Ms/dyLG+LI9ZdFEh6E
-   nL4TI2iRqhtJfhVUFLnRhyp4AXQz4zwPtPf+Q/V0VxKdl/yXT2MusE+RO
-   0rfTv+vdaq6STJ6EF1Y/DkXpBYOFSBWUmE9vnz8W3AjNs1CRvKi81gY2f
-   cdYz7FfeKZT6eEezEL/XdaYIZDjdylv+yW8871wVtt0Z99j+PliWTdcIe
-   WBmhfd5YTcOcS6aeYNO43AwbFixVgI96RbE5W6q1URO4xakHf+EIwM9jo
-   w==;
-X-CSE-ConnectionGUID: cgK99CcOTymzy0Zw4QJq1g==
-X-CSE-MsgGUID: WuEZbq0vSRu51x+I8yXl1Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11431"; a="66319467"
-X-IronPort-AV: E=Sophos;i="6.15,283,1739865600"; 
-   d="scan'208";a="66319467"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2025 15:29:31 -0700
-X-CSE-ConnectionGUID: SmM1cDKYQMeU8rWYeta64g==
-X-CSE-MsgGUID: ffWN8QLaTBiYG0emoBVCvw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,283,1739865600"; 
-   d="scan'208";a="137353953"
-Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
-  by orviesa010.jf.intel.com with ESMTP; 12 May 2025 15:29:28 -0700
-Received: from kbuild by 1992f890471c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uEbeH-000FUJ-0s;
-	Mon, 12 May 2025 22:29:25 +0000
-Date: Tue, 13 May 2025 06:29:03 +0800
-From: kernel test robot <lkp@intel.com>
-To: Subbaraya Sundeep <sbhatta@marvell.com>, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, gakula@marvell.com,
-	hkelam@marvell.com, sgoutham@marvell.com, lcherian@marvell.com,
-	bbhushan2@marvell.com, jerinj@marvell.com
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Subbaraya Sundeep <sbhatta@marvell.com>
-Subject: Re: [net-next PATCH 1/4] octeontx2-af: convert dev_dbg to tracepoint
- in mbox
-Message-ID: <202505130631.KZgI1tZ3-lkp@intel.com>
-References: <1747039315-3372-2-git-send-email-sbhatta@marvell.com>
+	s=arc-20240116; t=1747088966; c=relaxed/simple;
+	bh=l2xeO2rkOB0/oqLU3KotW45xj64QhuSGVliez2qkXUA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YZSDbbtErJaV+Toc+8v1IE4DdSNzilMLkXhzgkGxwIGbHzmHPUJm+F/6Sk3JSufjq05npszvZL7DAUB9e6pbYGKlbWTmCwYaelTqeEkoLP/etWcHqmGogVGiLxcrbjgrr77gD8nNLi1ZexX/U3/FeBnMRnOBiuHdwxOt4FWnTEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MpVjwt1P; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-30a9718de94so4769786a91.0;
+        Mon, 12 May 2025 15:29:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747088964; x=1747693764; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fYwVPWq3J6N1zilnpGZGRbtewnVJ2UNrxWn55cB7mUU=;
+        b=MpVjwt1PoAlTrwiNt1NVkuosAeT0MZj00PK6a5CFl0idFsjU3LqJzo0lnIPiPR0vLD
+         Zmzq9WAlmc0x3/FSjlSC6Zur0HtoFnXvLwgiGvhHeBv4EU9KzoMWxXf7/CXRsKT3vf/G
+         do77v62PWbZhhWrUkXaFbuSewjUhSbmDXIzWauL160jPQn7Wb3/y17xlL40/Qf4NlVm8
+         Zc5u58bRolLh12zdc807Izw6b/3DIy/2oT7CHmV1famCrNOcTxTEDe2eF5I4ZiIYWjuN
+         VuD0mkzD0Fmyh40ZWAum8Wh5bRrkP0+m9ZOJPLHDji9o1rDSqep+IOMGCcN/sdAhsCsH
+         bVvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747088964; x=1747693764;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fYwVPWq3J6N1zilnpGZGRbtewnVJ2UNrxWn55cB7mUU=;
+        b=bc3XeJ81MRnLCKJbIE4WU90gP1zkWfmQAyyB1y1yEV/2YVg89lXpQbTZlD0I9HZn6R
+         5se21oihRXU1L/eWKVAK/Gz+YRczk79QujzVVU54bsga2PS/C7A0nuEj4jc1eMC8qGx1
+         juW4ZF7P7QBAcLHsVzXe9+Phc9rSG90g/Woi7+hDwNFtvc/Qh06Gvoza8EFs9hHokIw1
+         TKLEIUwqBDLZHoKgZdaAOUkWVTpkjqEQj7KMDmVYc6hBILkKexCaVub4cINbxVyxjPz4
+         GPYeFHaVD+5Ox7amfyHJqfGD+yflQkqfHNj+aJJBmSwNAPKxGNSFYynEzQ8hug/du4FJ
+         4prA==
+X-Forwarded-Encrypted: i=1; AJvYcCUCfN36SQd4VvLSYmvwawjba+G4v3SxDMgZxl65BD4PxBlWEexl6qD5+u0dzGQtI9/KKhdqw8eo@vger.kernel.org, AJvYcCUZTqMiFaX/1p4cvRNV2MQ1WfnBw4UUP/Sokww2ap47aprcWbWUlXonYf6g42jC9TWAOtw=@vger.kernel.org, AJvYcCXRWBpJg2luUIqP7x9oJ8N1atLLFiklpi2MRc2fO/SKioYyXqXhOxa3bi2QtYHLLPFxgVHpXa335ijuMweHbo8XzpCv@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzwpy4sjtqBSxNA/WeVQEYKuadA2BKMaOEIAV8NYDTar1mTODj+
+	QjmnSbLPjUHbK9IJMGqRW1wPxz9Rj2gFgO41T1G4Vqif1bq7allVACW4u0kwMWPgWjhqNELzN2H
+	G3Lau9fXE8gnZU2ed4L1KwOnmSr4=
+X-Gm-Gg: ASbGncs6VrzzmI1+BWSvyxItI3To+cW89OA7Gkp54g4yVqx44Q9SGsilKoCLn08DPdj
+	PDUS1zWy/NNXj+6ZLNqvSd8UCzb01Z6BkiXowSleKou6ljBn+btUVhPmDVtzs71MQ/3KbaubwE4
+	nt4s6BK36nibKNTe+V61duSk6/D2QH3uC5ToBYe+6nHYmQEsQ3
+X-Google-Smtp-Source: AGHT+IG0iT25hedkTym++cqk89LT1uIJwoUyiWgWvV+ksUhWI84bYUpkdd5XowLKkuyq/vfitLDh2fIfw22A4/9cIJE=
+X-Received: by 2002:a17:90b:3908:b0:2fe:99cf:f566 with SMTP id
+ 98e67ed59e1d1-30c3cefe5cfmr23091186a91.13.1747088963951; Mon, 12 May 2025
+ 15:29:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1747039315-3372-2-git-send-email-sbhatta@marvell.com>
+References: <20250510163730.092fad5b@gandalf.local.home>
+In-Reply-To: <20250510163730.092fad5b@gandalf.local.home>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Mon, 12 May 2025 15:29:11 -0700
+X-Gm-Features: AX0GCFvUISD-tt7hcAgaaLgJZ-tB02v_XDVWKkiY8z1iJhBlwg18KbzxqQKGMbA
+Message-ID: <CAEf4BzammxSa48ZBxQgGQjOBbdVniJcrQ+-52-76TqMYUHx8cg@mail.gmail.com>
+Subject: Re: [PATCH v4] tracepoint: Have tracepoints created with
+ DECLARE_TRACE() have _tp suffix
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, 
+	Linux Trace Kernel <linux-trace-kernel@vger.kernel.org>, bpf@vger.kernel.org, 
+	netdev <netdev@vger.kernel.org>, Jiri Olsa <olsajiri@gmail.com>, 
+	Peter Zijlstra <peterz@infradead.org>, David Ahern <dsahern@kernel.org>, 
+	Juri Lelli <juri.lelli@gmail.com>, Breno Leitao <leitao@debian.org>, 
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>, Gabriele Monaco <gmonaco@redhat.com>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Subbaraya,
+On Sat, May 10, 2025 at 1:37=E2=80=AFPM Steven Rostedt <rostedt@goodmis.org=
+> wrote:
+>
+> From: Steven Rostedt <rostedt@goodmis.org>
+>
+> Most tracepoints in the kernel are created with TRACE_EVENT(). The
+> TRACE_EVENT() macro (and DECLARE_EVENT_CLASS() and DEFINE_EVENT() where i=
+n
+> reality, TRACE_EVENT() is just a helper macro that calls those other two
+> macros), will create not only a tracepoint (the function trace_<event>()
+> used in the kernel), it also exposes the tracepoint to user space along
+> with defining what fields will be saved by that tracepoint.
+>
+> There are a few places that tracepoints are created in the kernel that ar=
+e
+> not exposed to userspace via tracefs. They can only be accessed from code
+> within the kernel. These tracepoints are created with DEFINE_TRACE()
+>
+> Most of these tracepoints end with "_tp". This is useful as when the
+> developer sees that, they know that the tracepoint is for in-kernel only
+> (meaning it can only be accessed inside the kernel, either directly by th=
+e
+> kernel or indirectly via modules and BPF programs) and is not exposed to
+> user space.
+>
+> Instead of making this only a process to add "_tp", enforce it by making
+> the DECLARE_TRACE() append the "_tp" suffix to the tracepoint. This
+> requires adding DECLARE_TRACE_EVENT() macros for the TRACE_EVENT() macro
+> to use that keeps the original name.
+>
+> Link: https://lore.kernel.org/all/20250418083351.20a60e64@gandalf.local.h=
+ome/
+>
+> Acked-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+> Acked-by: Andrii Nakryiko <andrii@kernel.org>
+> Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+> ---
+> Changes since v3: https://lore.kernel.org/20250510092342.77371990@gandalf=
+.local.home
+>
+> - Added "_tp" suffix in bpf tests to:
+>
+>   tp_btf/bpf_testmod_test_raw_tp_null in raw_tp_null.c
+>   tp_btf/bpf_testmod_test_raw_tp_null in raw_tp_null_fail.c
+>   raw_tp.w/bpf_testmod_test_writable_bare in test_module_attach.c
+>
+>   Hopefully this passes the bpf verifier tests.
+>
 
-kernel test robot noticed the following build errors:
+Yep, BPF CI is happy, changes look good. Thanks!
 
-[auto build test ERROR on net-next/main]
+Acked-by: Andrii Nakryiko <andrii@kernel.org>
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Subbaraya-Sundeep/octeontx2-af-convert-dev_dbg-to-tracepoint-in-mbox/20250512-164344
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/1747039315-3372-2-git-send-email-sbhatta%40marvell.com
-patch subject: [net-next PATCH 1/4] octeontx2-af: convert dev_dbg to tracepoint in mbox
-config: x86_64-buildonly-randconfig-002-20250513 (https://download.01.org/0day-ci/archive/20250513/202505130631.KZgI1tZ3-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250513/202505130631.KZgI1tZ3-lkp@intel.com/reproduce)
+>  Documentation/trace/tracepoints.rst           | 17 ++++++---
+>  include/linux/tracepoint.h                    | 38 +++++++++++++------
+>  include/trace/bpf_probe.h                     |  8 ++--
+>  include/trace/define_trace.h                  | 17 ++++++++-
+>  include/trace/events/sched.h                  | 30 +++++++--------
+>  include/trace/events/tcp.h                    |  2 +-
+>  .../testing/selftests/bpf/progs/raw_tp_null.c |  2 +-
+>  .../selftests/bpf/progs/raw_tp_null_fail.c    |  2 +-
+>  .../selftests/bpf/progs/test_module_attach.c  |  4 +-
+>  .../bpf/progs/test_tp_btf_nullable.c          |  4 +-
+>  .../selftests/bpf/test_kmods/bpf_testmod.c    |  8 ++--
+>  11 files changed, 83 insertions(+), 49 deletions(-)
+>
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202505130631.KZgI1tZ3-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from include/trace/trace_events.h:468,
-                    from include/trace/define_trace.h:119,
-                    from drivers/net/ethernet/marvell/octeontx2/af/rvu_trace.h:117,
-                    from drivers/net/ethernet/marvell/octeontx2/af/rvu_trace.c:9:
->> drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:107:1: error: macro "__assign_str" passed 2 arguments, but takes just 1
-     107 | );
-         | ^~            
-   In file included from include/trace/trace_events.h:400:
-   include/trace/stages/stage6_event_callback.h:34: note: macro "__assign_str" defined here
-      34 | #define __assign_str(dst)                                               \
-         | 
-   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h: In function 'do_trace_event_raw_event_otx2_msg_wait_rsp':
->> drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:103:28: error: '__assign_str' undeclared (first use in this function)
-     103 |             TP_fast_assign(__assign_str(dev, pci_name(pdev))
-         |                            ^~~~~~~~~~~~
-   include/trace/trace_events.h:427:11: note: in definition of macro '__DECLARE_EVENT_CLASS'
-     427 |         { assign; }                                                     \
-         |           ^~~~~~
-   include/trace/trace_events.h:435:23: note: in expansion of macro 'PARAMS'
-     435 |                       PARAMS(assign), PARAMS(print))                    \
-         |                       ^~~~~~
-   include/trace/trace_events.h:40:9: note: in expansion of macro 'DECLARE_EVENT_CLASS'
-      40 |         DECLARE_EVENT_CLASS(name,                              \
-         |         ^~~~~~~~~~~~~~~~~~~
-   include/trace/trace_events.h:44:30: note: in expansion of macro 'PARAMS'
-      44 |                              PARAMS(assign),                   \
-         |                              ^~~~~~
-   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:98:1: note: in expansion of macro 'TRACE_EVENT'
-      98 | TRACE_EVENT(otx2_msg_wait_rsp,
-         | ^~~~~~~~~~~
-   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:103:13: note: in expansion of macro 'TP_fast_assign'
-     103 |             TP_fast_assign(__assign_str(dev, pci_name(pdev))
-         |             ^~~~~~~~~~~~~~
-   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:103:28: note: each undeclared identifier is reported only once for each function it appears in
-     103 |             TP_fast_assign(__assign_str(dev, pci_name(pdev))
-         |                            ^~~~~~~~~~~~
-   include/trace/trace_events.h:427:11: note: in definition of macro '__DECLARE_EVENT_CLASS'
-     427 |         { assign; }                                                     \
-         |           ^~~~~~
-   include/trace/trace_events.h:435:23: note: in expansion of macro 'PARAMS'
-     435 |                       PARAMS(assign), PARAMS(print))                    \
-         |                       ^~~~~~
-   include/trace/trace_events.h:40:9: note: in expansion of macro 'DECLARE_EVENT_CLASS'
-      40 |         DECLARE_EVENT_CLASS(name,                              \
-         |         ^~~~~~~~~~~~~~~~~~~
-   include/trace/trace_events.h:44:30: note: in expansion of macro 'PARAMS'
-      44 |                              PARAMS(assign),                   \
-         |                              ^~~~~~
-   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:98:1: note: in expansion of macro 'TRACE_EVENT'
-      98 | TRACE_EVENT(otx2_msg_wait_rsp,
-         | ^~~~~~~~~~~
-   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:103:13: note: in expansion of macro 'TP_fast_assign'
-     103 |             TP_fast_assign(__assign_str(dev, pci_name(pdev))
-         |             ^~~~~~~~~~~~~~
-   In file included from include/trace/trace_events.h:523:
-   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h: At top level:
->> drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:107:1: error: macro "__assign_str" passed 2 arguments, but takes just 1
-     107 | );
-         | ^~            
-   include/trace/stages/stage6_event_callback.h:34: note: macro "__assign_str" defined here
-      34 | #define __assign_str(dst)                                               \
-         | 
-   In file included from include/trace/perf.h:110,
-                    from include/trace/define_trace.h:120:
->> drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:107:1: error: macro "__assign_str" passed 2 arguments, but takes just 1
-     107 | );
-         | ^~            
-   In file included from include/trace/perf.h:7:
-   include/trace/stages/stage6_event_callback.h:34: note: macro "__assign_str" defined here
-      34 | #define __assign_str(dst)                                               \
-         | 
-   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h: In function 'do_perf_trace_otx2_msg_wait_rsp':
->> drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:103:28: error: '__assign_str' undeclared (first use in this function)
-     103 |             TP_fast_assign(__assign_str(dev, pci_name(pdev))
-         |                            ^~~~~~~~~~~~
-   include/trace/perf.h:51:11: note: in definition of macro '__DECLARE_EVENT_CLASS'
-      51 |         { assign; }                                                     \
-         |           ^~~~~~
-   include/trace/perf.h:67:23: note: in expansion of macro 'PARAMS'
-      67 |                       PARAMS(assign), PARAMS(print))                    \
-         |                       ^~~~~~
-   include/trace/trace_events.h:40:9: note: in expansion of macro 'DECLARE_EVENT_CLASS'
-      40 |         DECLARE_EVENT_CLASS(name,                              \
-         |         ^~~~~~~~~~~~~~~~~~~
-   include/trace/trace_events.h:44:30: note: in expansion of macro 'PARAMS'
-      44 |                              PARAMS(assign),                   \
-         |                              ^~~~~~
-   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:98:1: note: in expansion of macro 'TRACE_EVENT'
-      98 | TRACE_EVENT(otx2_msg_wait_rsp,
-         | ^~~~~~~~~~~
-   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:103:13: note: in expansion of macro 'TP_fast_assign'
-     103 |             TP_fast_assign(__assign_str(dev, pci_name(pdev))
-         |             ^~~~~~~~~~~~~~
-   In file included from include/trace/bpf_probe.h:131,
-                    from include/trace/define_trace.h:121:
-   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h: At top level:
->> drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:107:1: error: macro "__assign_str" passed 2 arguments, but takes just 1
-     107 | );
-         | ^~            
-   In file included from include/trace/bpf_probe.h:7:
-   include/trace/stages/stage6_event_callback.h:34: note: macro "__assign_str" defined here
-      34 | #define __assign_str(dst)                                               \
-         | 
-
-
-vim +/__assign_str +107 drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h
-
-    97	
-    98	TRACE_EVENT(otx2_msg_wait_rsp,
-    99		    TP_PROTO(const struct pci_dev *pdev),
-   100		    TP_ARGS(pdev),
-   101		    TP_STRUCT__entry(__string(dev, pci_name(pdev))
-   102		    ),
- > 103		    TP_fast_assign(__assign_str(dev, pci_name(pdev))
-   104		    ),
-   105		    TP_printk("[%s] timed out while waiting for response\n",
-   106			      __get_str(dev))
- > 107	);
-   108	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+[...]
 
