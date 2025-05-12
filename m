@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-189608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189611-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30F98AB2D09
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 03:34:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45008AB2D11
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 03:35:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3DCF3BB755
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 01:33:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5F61189D329
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 01:34:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66C1A20D4F4;
-	Mon, 12 May 2025 01:28:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1A3820FAB0;
+	Mon, 12 May 2025 01:28:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=silabs.com header.i=@silabs.com header.b="mnFpCRkH";
-	dkim=pass (1024-bit key) header.d=silabs.com header.i=@silabs.com header.b="WBTbl9ow"
+	dkim=pass (2048-bit key) header.d=silabs.com header.i=@silabs.com header.b="zSaJc6I3";
+	dkim=pass (1024-bit key) header.d=silabs.com header.i=@silabs.com header.b="WDaq3mKi"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-0024c301.pphosted.com (mx0b-0024c301.pphosted.com [148.163.153.153])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EFDC1E25F2;
-	Mon, 12 May 2025 01:28:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2989920CCD9;
+	Mon, 12 May 2025 01:28:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.153.153
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747013303; cv=fail; b=WUiDyiyXq28StzmrDb7Ab5Mv7rtaVPaHCN9Q8SQqW3ua/ZAbBzToEogqv5bJwGfRFouL/3o6NtPr25NRtuyaFjP1YF5O4EttoF4sOCrVWj7nUWRwHHUs/dEn1HvfIvXo6O3piWg3JSJySJMyJCvTiuVkTow3j4h+6Xtp2T0i3nU=
+	t=1747013305; cv=fail; b=l71+8f7Rp1sjAYDMjTfn0TpR0moY0XmRHIIEQYpPaYvsJo2bjJvU0Og1909GxizMd+YtBxr7rhgeAUVpuVUpiPsXWBKyrpM1eX7eiRE0g2O5phUtYU4iFYIjs4ncfJ1ncE+Wm0bImeRwg5sgTHLmgdl6y5q8xB3DD072Wda9enU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747013303; c=relaxed/simple;
-	bh=eK/k7EIovkmSZVjKEIsFaBDoRXRMlAFp2GgYQCnyZ7c=;
+	s=arc-20240116; t=1747013305; c=relaxed/simple;
+	bh=aMS60t9zTRBt0XOMx8oIpVYR9NRurNUNAmPRcoNlJHo=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=U0K78WxVbftQEqDxytx9X2C6AaYhSPrRzyiOdiVZr9QZ/iinNyPrzcXo5IpSRvp7SIXQ47888qrMajfrJExcjql3pVZe4Up895WAwsOAWjueVCSVS9wAQ/OlRHiZL38MXV3iw2e9xJWXHwS2TNYvdwsfIej4Ah9ys2u7XO15sYo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=silabs.com; spf=pass smtp.mailfrom=silabs.com; dkim=pass (2048-bit key) header.d=silabs.com header.i=@silabs.com header.b=mnFpCRkH; dkim=pass (1024-bit key) header.d=silabs.com header.i=@silabs.com header.b=WBTbl9ow; arc=fail smtp.client-ip=148.163.153.153
+	 Content-Type:MIME-Version; b=SJXaHq8EHy0Yl4DYpZzHOCFAtvgN/yVswg9SXMr7Dlq43u5ar1s822LTtF/psf2TBUDDSnHQsjzeAMe1ZDH7JAR6K8eCcrpmTdgb9K6VGOpooOFbXdN2gaIdaqJypAK6yK1fER6kOOSOysR54rcFtbIQwFO3OtK1HDm4JR+k58s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=silabs.com; spf=pass smtp.mailfrom=silabs.com; dkim=pass (2048-bit key) header.d=silabs.com header.i=@silabs.com header.b=zSaJc6I3; dkim=pass (1024-bit key) header.d=silabs.com header.i=@silabs.com header.b=WDaq3mKi; arc=fail smtp.client-ip=148.163.153.153
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=silabs.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=silabs.com
 Received: from pps.filterd (m0101742.ppops.net [127.0.0.1])
-	by mx0a-0024c301.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54BNrm01027097;
-	Sun, 11 May 2025 20:28:03 -0500
+	by mx0a-0024c301.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54BNrmxx027097;
+	Sun, 11 May 2025 20:28:01 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=silabs.com; h=
 	content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=pps12202023;
-	 bh=M/DQRublAT2MI+0O6RjdaAVpBmczJipl8PbsdN2HZEM=; b=mnFpCRkHLxs2
-	sHPsNCBJ90O8W/x3xQZE7y2gUlKX6uUW6pQX3dVHMCp46nmFCHR/nlMbJGk77/SD
-	hw1mTy3TxnJ1RANZUsvI70u7k6Tdb54fJ7f3KFeOPZTUk23D8C6qBe9Www7hxmC/
-	gIGuBc0HqkSg1hEIcR4R27FipmuJqZWc3MHAzI0Aq0h5Wi0ekKmdfxuG9Zk5Gvq+
-	lFS6VRwTwJBd/VHFH5v34p+QFzHKeB+ImQmSSLVCb5gP27Yhzd7gT+7YvQ0Cic00
-	RZq34x0k5Fu5nf1GX0DmCHBdT6q350TPRSonDSZXg2BOaRo0fsyx8iasOurKWSGA
-	7cyUMeajpQ==
+	 bh=jXjqROARcWrGFd7jep7SkaphFr1yP5nAdM7FauGXBl4=; b=zSaJc6I3/a0m
+	mHy+yt44E8SnOFCtJK0kQSFFrOoLWT/gj/a9Gu2pHEuXKl+v/YZnk81y+70DlRbB
+	hExSi0DMBXmXvXNCe8DD7hEOJceBZAkTi12ty5beecTH+OY+kgBcMMEzIZ4to+py
+	1TqMpnL3Zw1BNOD4HujYQDvUzoFlyzsfySYFlTPn2J1WbrebmGGznTzpjjr7uvh0
+	RoxOsH0gKIer21OLLfGGZ3XpXMuUABxAnmoPoLvrYcwPNBvUtK6biRSM1YmtqOM5
+	iUcJ8NeOySzdwGGH405KDTFJeEXBs234Qk6CVVsBGc9cEbelpzNVjbyzlXwk3Sit
+	+qchezFrDA==
 Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2171.outbound.protection.outlook.com [104.47.57.171])
-	by mx0a-0024c301.pphosted.com (PPS) with ESMTPS id 46j0aahxd2-3
+	by mx0a-0024c301.pphosted.com (PPS) with ESMTPS id 46j0aahxd2-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 11 May 2025 20:28:02 -0500 (CDT)
+	Sun, 11 May 2025 20:28:01 -0500 (CDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=jLHwkanHtXH7I+o/C4TtK7/y9UqoOLPO5yULjYwNSse8DeCQvDX9PBKah8JYSqfJ1P2Yso9uwCt78Wf5inwaiF5WhF4Zf2qO8dFK4/AGWhLY+qETvY1SIOqreCjSx7p4zUI0QgLawO8WPj1Y2qCWe9JRFJbnDSnX2RbPqYGxbM7P/FvX2I7A13WQLB213+JWQuANQP70qsdVnoqs7jKnWCAoIEMC9PD+NBdBrqL7eOnRiVfd/mH5apEmPc+ICKZPwLz9jZr/LfzBjaCJG0xz3hmsDg77pjOGfkNtEN3BE/qXPdx8KX8UA3ToCMnRlncMrN5F2oYMZBgO3c3H9J4Waw==
+ b=b3Smu8XjhuvGc0aWuZaDfZkdzYWFFCFHDrxogh9QdDrl5q3vgdSd98RB28NNr5YYG4w598EeNz53YRMpJwGojGfDAbigW4QzMkBfHHt4YuwzQmQmicSQRR2Hgfx5orGsefyiZXJ7uq/wj5jaKJqlLrjGDCVsbP1Xz8QJsFz7bWHsR4pzDzDITaBk5933KSCsb1wjQPAhE3hg0uN7ivmgJMLbmu+w4c0hKPZFJxenEH+7fGIlmLnIzBkByKSI0khVvozqv3G/tjYzCGEMeVTpYetX8farESxXlbNvzxTtmBOMv8RQi/pk5qTxvKm04WZm6vvFnG2hrAz6Nk2inVXGsg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=M/DQRublAT2MI+0O6RjdaAVpBmczJipl8PbsdN2HZEM=;
- b=KeuM7yv3ey87F+AxQLsqfYlMjlOqm2R6RD13LCF/lMu7oJDei4/LWHmJQeXF5s08DN7vn49LSwyIDRGjC31bjYm+qNWCjikX31QgYfzAopFkeGnAYmApNs8iQLlxyYrYZYkBXAvZI3R6YQ7nzAs1WL5N8EZymz/QEGYBrOZ6SjN3wJs0xOFJ9QY4Fcy5HYWW7a+cIQeeW1hsQmLOq5D/rooGVAS1Req2sxKSgIyraQZfNyI/TOLRVvdo6Vo90XG5R8arhkTNPxrju+JccoNxF39KvaBxOryhQFFASactVNnAV5JYKNMaBc7mbdViZiuhjfne/JnrK2brTZh3Nc0TrA==
+ bh=jXjqROARcWrGFd7jep7SkaphFr1yP5nAdM7FauGXBl4=;
+ b=Jgw/IBBNC37UnkFLbw91sil3xHfSacV68aODJk+ByzdaLAj4vHvS7j3OmnGhWD61zeglkzsQuRYD4zcME6CWbZRAyREbzEXkaZJRvdMukXPGvdUEWGV6QmwTfQIPxwATD4FGe8CgmEnEgubveBuG/EdJPiXRAv8dQi2o/z/sogJsDMR3V3LoICOFVa+K8QNuxb0SjCBVP1aaI/lsuYrLauGwA51fhpMDandLTQGenHDrJSGTLHM55sCgQd6h+K1z1+mmphuF/xSjWmhNAhAW2mLdBpPibN+nIM5izgINdVkuJRF8Dq1QvHN8gNwEy3dk2VAnOJGYjA/uiqCTZNjrPg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=silabs.com; dmarc=pass action=none header.from=silabs.com;
  dkim=pass header.d=silabs.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=silabs.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=M/DQRublAT2MI+0O6RjdaAVpBmczJipl8PbsdN2HZEM=;
- b=WBTbl9ow0gfJ4WyUV8r10HNYz/hQ8IUxfOeLNmTXZM4jeyFnJan84VSI3xcqeohxKbuaLDqrQ8I1WI7bEa7aT0cgVycGIoJi33lWYgHTaQaBk7+KFvhwbklNrbg6bTHfUnVn/P5s2spJNJOQI87HSsFR3fuXaTry+KvUXWo3MUM=
+ bh=jXjqROARcWrGFd7jep7SkaphFr1yP5nAdM7FauGXBl4=;
+ b=WDaq3mKi2+5i8C1hgFmugjyr/AGocfw0/bcH3iwAN4vb9kEJwVtV54Tz+x4qABJioIyBhjwgLyDGdPx56dFOpqh1nfisbkzz9LYo9k5UZxO0Xk9IP1ybXrH4yq6+zqHrQdxgIockhOR+wjKOCNCHQghPbwYNcTuvf21V1yLHbMk=
 Received: from DS0PR11MB8205.namprd11.prod.outlook.com (2603:10b6:8:162::17)
  by IA0PR11MB7953.namprd11.prod.outlook.com (2603:10b6:208:40d::13) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.29; Mon, 12 May
- 2025 01:27:58 +0000
+ 2025 01:27:59 +0000
 Received: from DS0PR11MB8205.namprd11.prod.outlook.com
  ([fe80::c508:9b04:3351:524a]) by DS0PR11MB8205.namprd11.prod.outlook.com
  ([fe80::c508:9b04:3351:524a%4]) with mapi id 15.20.8699.026; Mon, 12 May 2025
- 01:27:58 +0000
+ 01:27:59 +0000
 From: =?UTF-8?q?Damien=20Ri=C3=A9gel?= <damien.riegel@silabs.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
         "David S . Miller" <davem@davemloft.net>,
@@ -83,9 +83,9 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
         Silicon Labs Kernel Team <linux-devel@silabs.com>,
         netdev@vger.kernel.org, devicetree@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [RFC net-next 01/15] net: cpc: add base skeleton driver
-Date: Sun, 11 May 2025 21:27:34 -0400
-Message-ID: <20250512012748.79749-2-damien.riegel@silabs.com>
+Subject: [RFC net-next 02/15] net: cpc: add endpoint infrastructure
+Date: Sun, 11 May 2025 21:27:35 -0400
+Message-ID: <20250512012748.79749-3-damien.riegel@silabs.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250512012748.79749-1-damien.riegel@silabs.com>
 References: <20250512012748.79749-1-damien.riegel@silabs.com>
@@ -102,104 +102,104 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DS0PR11MB8205:EE_|IA0PR11MB7953:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1990e2da-79fd-48a5-55dd-08dd90f43a75
+X-MS-Office365-Filtering-Correlation-Id: fedb03cc-9b2b-4b89-535f-08dd90f43adf
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|376014|7416014|52116014|1800799024|366016|38350700014|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?aXJ3RXJ6WDZHSU9wRHhoSm5XdmlPR2ovZGxvZy9QOG05YTh2WW1nWG5pa0pI?=
- =?utf-8?B?YmRBL1JqS0FjdEVTU2E3ZWhYWGxqU1cwWm1zWTh4UWM1N1R5S0w2OFNBYWJw?=
- =?utf-8?B?UWw4Wmt0SWNHS1A0di9UUWg1LzZCdHh1QlUxN2o0Nlc4bE5SRHVOcGJPaTcw?=
- =?utf-8?B?amVCQWZyOUlSN1JobitpdlBEblU1VEtUcVVsQ3d6MnJoMW1NKzFreU1xdzV5?=
- =?utf-8?B?TGpuNmVnTHdpT0VRZUZpMVdRbm80KzE4VlBUaVlFZmFCTUVycSsrSkxNdWFW?=
- =?utf-8?B?d3NQMGthUUI2TUtscTRtbDRaU1NjYkpuaXFHbExJSXgrazQ2bXRLMDJWL0gx?=
- =?utf-8?B?Nm45cmJqUG9kdHZsc1J4ZmxOMDNmdHhuendBV1hobkwyc1VXRGl6K0dQUzFz?=
- =?utf-8?B?YVc3TXZuczgwTEhTQ1kwc2EvWVJlNEZIbGNYSzFrVGh5RWhQRVdtc1ZlUzdj?=
- =?utf-8?B?YmdEU1dLaEpPcDR2TUJwaGRPdXJMem5sRnRyRTRpS2VXZ2RIU3ZTM1pOYStk?=
- =?utf-8?B?aXZsRTd3TUdFUEJ2RjlGb1N4RDFGQVh5d1BZT2xqTms4WVB6d1ZUMkh1eVlZ?=
- =?utf-8?B?NytvbXI3UlY1ZXlPK2ZMT3B1MGtYcCtrcXkreFhIMzVqNU9iR0FNTk1yaWsr?=
- =?utf-8?B?RjRsYmw2L01qZHRQdDB1YXBqUWlkK0U3TW9nRlI1STBqbGUyZjFwL2VpWDdF?=
- =?utf-8?B?cFR6K2drdHN5WWhtdElEbWkwZE9IZ1NLbng3RkxkaEJLRGpkelhJTkJlU2tx?=
- =?utf-8?B?MkVQMVVaWHYvOUdKSk1ZaGcwcHc3VHRiOTdKS0hlOENOazRhVUFDK1pnbHZy?=
- =?utf-8?B?RmZyNkpRQUgrVDhsME5UUVUxVHVmM3lDWVpReEcvZXFNZUZiMkFUdlFQYkxu?=
- =?utf-8?B?djg5amJjZWlzRUJIOUhZejJyOXFnSDh0dkd4bFNnY2dEbHhkTCtSamtsV0Zt?=
- =?utf-8?B?MU5GMjBhWHhGVWgrc3dYT0xldlZ4d1ErUmhqMWFWMnpQUjNOYm8xenpLN0N2?=
- =?utf-8?B?cGhaSTVncHFaSGtnVWlsZ2crV0l4c3QyQjZMcUZoZUIrUitjc2hUODk4VURr?=
- =?utf-8?B?Yy9UK1B6SmQ0Y3I1UmJoZVJieHFSTk9tYk1WYnJGZTRQSzFvSDkzdEF5ZGVu?=
- =?utf-8?B?ZTRic2czWERCcllxZ1JldHJiQmtVamJRRUI1MW5QWmswcFNkL1Q2dUxNS2h3?=
- =?utf-8?B?NjFyTEh0L3ltMTNCZC9SU2hxUFNXVHdSMFhjTmpORUtWdXJZNEIwR3RKSHVU?=
- =?utf-8?B?Q1dScFpVWWRMWmdKUS9HOEUvVk03YnFCYjA2Mlh2aktKK2RiWkExclBTcjQ4?=
- =?utf-8?B?bGl1ZlBseTR1ekdxaUVmM2kyZ3ZqWU5PY2VHSjh1QmlvRnBwTXlYYks5WjB1?=
- =?utf-8?B?djFTREtUYXBXWGNDUzVuYnF1QXM2MnpiNFJDRUR3a3VyYXd1NHNyb21nSml1?=
- =?utf-8?B?Z3Jrd2lySlZoZGE4OFVTaUdnVXB5REhIaHR1a0hTV2VTeUhUK2k1bWo1ZmdY?=
- =?utf-8?B?S0FuM3R6VWZTWDJaQWNaRStYZFdwN0U5UUxKZ1IrdCtIb0JNcWszRTMzVXFn?=
- =?utf-8?B?TE1uQmh2N01ibXN0MzF0YVNSU1l2WkxwMXJHRWVOSVQ5ZFFZNTE3TkdyaG1X?=
- =?utf-8?B?bDZKVEJvTERodmZ2TmJDNHhJNnV1a2RFY1RXNlVEUnRndG9RczBPbWRBVlpr?=
- =?utf-8?B?OC9GamZ4MFpZb3kwL1B2SlUxbXhYWHFIUDYzcm02UTNEeDZRU3ZNNDBFTlVl?=
- =?utf-8?B?OEUxaTBIK1k0S1FFcjNqcUM1ZkNRM0VxUXRzcCs2Wnd3cUpoN3pwbWRsZFE2?=
- =?utf-8?B?bXBLM3Z3bElqZ3Ezd0tWdzczdE96OVIwcEJESHRvRXJOclBFOGIwQXVoUklp?=
- =?utf-8?B?dlNWRnVwRlJESnlrMS9FMm4vdDl0RTAra3NuQksxQ3hwekRjaVRKZkxxbnhk?=
- =?utf-8?B?dXRqYlJOQjlpM0x3bmIzUy9LSkZqL2FqaWQyZmNMYmhDdUVyZ2FzQzNCMmY2?=
- =?utf-8?Q?B9wuQgOEs8nYJY5y836txS7tUcz9BE=3D?=
+	=?utf-8?B?TUtMTlFiRHl0TUh4bnpFdjVkblV5M3dsNU5qUXNBaUczNFJ1RHpWNWwveG9S?=
+ =?utf-8?B?RnJNZHFYK1p3bjJ6QWNTWjdWYjRwUTIvRGg4SmRkRWxTc0t6RGpsZm1za1dr?=
+ =?utf-8?B?bVU1VlZWcjRwcmRHd1BEcjFXbnI1Z25nUWNSK3FtVy9qSE5XSVM4eWNsN2Y0?=
+ =?utf-8?B?aHVoWmlYQ295RkYvQXRjUitrd0FxZkVFMFkxVEdFWFZzS0h4azNJbWQxWkNY?=
+ =?utf-8?B?bGVsWkZLa2dRaEJzZU5UNnIrZVZDK2E0a084c0NXckZZMGxNNU9NRklWTWhD?=
+ =?utf-8?B?eGhySVo1YnVqWWd0UEF0cDc5MFZ3cnNETTZaMDBmWm5vRjMvRHBaUXZ0MGtT?=
+ =?utf-8?B?NVF5ck5iWHdaOTlGUzhSK0NUUzM0MWFMcHBCTTk2cFdvYmVwL01EdGFKQ3ln?=
+ =?utf-8?B?WjJhMThScG5UMHNPYlJlUGtqRFB2ekFydlZKQzYyZnFJMFY2NG5WK0RwVEJ0?=
+ =?utf-8?B?RnEzSVRwdmpvZFNYR3NETXI0T1ZHQ3c1QzhUNnV6WGFDVG1HUVBXRjhHMmJr?=
+ =?utf-8?B?d25FMWc1c2RwZThONzkyWlM2V1NCZU5uL1RTbzBVdFhxa1VxRjVsb1ZkZWpI?=
+ =?utf-8?B?Y1JTYjFOWU1RamRnbnNrWjFWNG5NZDdrelhGcjNib292SkNCenBsLzZTVnNO?=
+ =?utf-8?B?dHV1cURVV2dGRUhzS0JnbFNLeDRRZ0p6SDUzNXJubnZacllVeDhiWWQ0bGhk?=
+ =?utf-8?B?Ni8reTJncjF4VHBuT3QwZDVuZGxwVXJ3WlhXNmtLekJNNFFRd0VKdzV1NERU?=
+ =?utf-8?B?UnBrdFZDS1d5STV4Rkt1R1dMNEVlSlNmVHdEM3pVYkFuWk5wTEJtWE9GUEZa?=
+ =?utf-8?B?U0dUUTdEVlNNSUEvdG5Lb0NaNThNY2gwc1g5QS9DQmYyN2l2Uk4wRERDcHFp?=
+ =?utf-8?B?ak5QZ0cyNzE2U1pCNWpJNnJxSWtMUEJsWk5lSkUrQW5Bd3VFWXVhby9NV1Ja?=
+ =?utf-8?B?RmI1MDlxWElJSDBLVGFxeUFIQzZ6OXVvcndYS0xkcVVXd0N6d0VXMmxzUDlk?=
+ =?utf-8?B?MUhFZ1gzVTdkWlE5c1NKYnROMmYvckJoS1ZSenNRUnNpVExFTy9JNytCaWtr?=
+ =?utf-8?B?czNJN3pMZkNDL0wrRmtyVDl4WTZsY29aN0RPOWpmaWw2M0o0cEpaajk5bEoz?=
+ =?utf-8?B?djBYU1d3aDcrN0xPYXd4MEVtL1o4bUJJRmk4a3FjUHNsOHNVWXBzVld1M3R5?=
+ =?utf-8?B?RTlwOGZHaDBUQXVDdW1FajBiaW1Vdko2eGREMCtNb2lFUlJTaXE0OWNuaStX?=
+ =?utf-8?B?YnVCVlhRRmUyc0krT1pKRHNKbUgyZXpxRTFMVGdkYUYrcUduYnhQd2FyRkdV?=
+ =?utf-8?B?eWpUMGJ2cEJSRWIvVGw2dUE1UXBVL3dScDlWeCt5Y0M5Ym5GeXI0YlpCeTla?=
+ =?utf-8?B?dm8yRERsR1lFa2xXOTl0QTJ2enV2OXpUUnBSUURFcHJ6KzN2QkJaTG1xTWhV?=
+ =?utf-8?B?Yno1SCtRTXM0Yk9pcy9hdHMyMzRHcHNzUzljS1VKcVl2ZTFYanU1cEFkWFFT?=
+ =?utf-8?B?cVBXYVNyYjVFM1pvQTdET3dkYk41WDVuUnhtSTJVMHFhYjJQUmZvRmMwVkt2?=
+ =?utf-8?B?NDRlQVZKaHRlSWQ4MUpZZXE0dm5COUhzSFoxdTRaUGdkejZRa2F4d0dBMnBq?=
+ =?utf-8?B?MVZYRW1zTXJjZStLR3dVWlJQVFJYV21zWlR0azFPNUh6NkVrbUVUYXYrSnZS?=
+ =?utf-8?B?VmdMY20rSXRuaEd0RWNEMFBnMlRNbHpVNjkvczdiL0x4YlBveWdNUzFTK0xB?=
+ =?utf-8?B?d2tXK1I5U1VrOUpkQVczLy9lR0pRcVhtV2JwZXg3T3dqcTFuRHRLdWJmT1Fu?=
+ =?utf-8?B?ZlpTWWdzcm8rQ0Z2anJicXdlZTFFVk1KMmtjWm8xZkVPOW1xUzk3YUJaTVlL?=
+ =?utf-8?B?WlRmQzk4V0NRR1FMUXB2NkFtSFVkOXNxRzlLVlpXa2MvUFpOSmxJZEQxV0k1?=
+ =?utf-8?B?YjYrUWdwU3g4QXJtbGNjZGMvWitRTm9WaUFXZjd0L3l2dWM4TytUeU5Ld21Q?=
+ =?utf-8?Q?wKDqBcs/7l1/37nGwd8yrQ72dWEyVg=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8205.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(52116014)(1800799024)(366016)(38350700014)(921020);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?TzNGd1NJV2J2d3U2SkdhUlNIVldSMHlnSU16b3FDUXNWWWVuTXl2UXVoVFZH?=
- =?utf-8?B?dW11a2VXZ3VYdjFxTUJoajE3d1BITSs1RUY1b1doWkNZeWNhbGhLMjZ5UzNY?=
- =?utf-8?B?elRZbTBBcEthUWE5dWRnMmtUa3A4NkgyYUhHZmJiZ2Y0TTdPNUdRK05tZGN0?=
- =?utf-8?B?cjFlYzdnQTFTVHNCRmV6N2h2ZTczRjFsaEgyYkkrMlVQZytnbHhYRXhMYWV0?=
- =?utf-8?B?aWFEK1ErQ0tUV2lYT1NCZWZSRndLbkVwQjlRRGNkdUhibldiY2h4WkJUM0h6?=
- =?utf-8?B?d3lTbDN4N3NiMk9XbFAyMXlaWHErSlJzQWNJbE85Q29NbEplazZqZTFCMTZ3?=
- =?utf-8?B?L0dkMEhrUlJqY0dKT21UQ0Jtdml4alhUVkZ5akpzaEdtSEM1aUF3Ri9oRFVS?=
- =?utf-8?B?SmtqOUxsT1RnQ1E0VE9zLzZvVmQ0V1ZYbzdIbytFWXFyRi9kZnQ2bXNLY1Fi?=
- =?utf-8?B?T1VmME1SRlV0K1MwR3IwQjFZcmh2dEJaMXEwa0N0d0FsRW1lQyt6K3ZTZGhV?=
- =?utf-8?B?MDFpczNsbFdpNEI0UUg2VVhjRTlDVmQ2YlB5MkwxYWRPUDVXck1OclpZcEpK?=
- =?utf-8?B?enpBNzVDZUJHY0F4d1o0a2E4SFpKeEs4S2JHMVhYdHNqVWkzOE9UK1lqM2Jv?=
- =?utf-8?B?bXBKZUVodkVQR1JuVXRNUTRJc3dFSlNMUmpiMVh4NkQwUWkveFRQVWpaSDdp?=
- =?utf-8?B?dSszR1h3WVlua3dyakh6VllBN2t4UzJhUFJIK2dtbEVmZDcwS09abmNUSlV1?=
- =?utf-8?B?dXJPYXllQXZtQ0JTQVZrYndySjhvc0NWb3hGQjVDaTAybXgxYXZkQllaRmha?=
- =?utf-8?B?N0ZsWFM0UnBzU0NtRVh3SkEvUEp0YmtvZzdpSmxIVlJNS045MHFhelRDTlVY?=
- =?utf-8?B?ZEFzeVpKS3hnY01FTG9XNlNDVk82TWxMOEZqTkxzcktReC9zelc4UzJxOVpu?=
- =?utf-8?B?S3QxdlJuOWhqdUJtYUlRQnp4N2hFenhQV2tGallQaUt3WUJlR0Z5bk5pSTZY?=
- =?utf-8?B?SGVxVUVmQm93T3JlWmZaZDZQQTB0N0E2WnIrOEg0V0RLVmtzRTJDVWtPcWJN?=
- =?utf-8?B?K2VTY2V5enNCWFdsOXFmcjRKYzBUMHQzVEhrdjBXRXFUc3UrZENWcHFiVE1y?=
- =?utf-8?B?akNNYVJwZUlrREFhSHNvR0ZQejl2K0daZWh4Qmp1cGE1NzEyVjFMY1R0ZUI5?=
- =?utf-8?B?MXdMVVM2NXd1cE5SR01CS0tQMFZHR3JkVnFSdEdmRC9hY1pSUSs1Q2RKMFp3?=
- =?utf-8?B?cUxnRmUvNGdvbEpzaU11M2paK08wRzRkRllCVkgxM1kxa2NCaWUreHJYcDhr?=
- =?utf-8?B?bWs1VEd4UCt0bDEyaHcxendMNzdadCtkdHZTVVB0SDRxdEx0cENrWi84WnBv?=
- =?utf-8?B?UlBJSDdXbWhqWi9ncEFTWHFDaUE2N1pKeEp5bTRRQXIvMWVOTDdSSVNZSDZK?=
- =?utf-8?B?R3VTVXNiOUZyNkhLV0pyTDhhZWhGUmlsNHgzbWhWR1RnSXZrOWx6SlRpREpm?=
- =?utf-8?B?ODl4RitwZDlOcDFHeXNiSzNNYlZ4SUdoRHE1eFR1by9JNDdYQWVCRnRVYVA0?=
- =?utf-8?B?TzlwNURGeGlTeFBMcWtqajUwMEN0MURKS1VvdmF2ZUNCU0JyVkdTcDhwRzNy?=
- =?utf-8?B?M3VJdFlKOTUrZGdXNWIxL1U5VkJ6ZUgrdUN2WEJ6SjJLOG0rQVdEaHZKL3lT?=
- =?utf-8?B?QThJVEowYit5RGM2SkduZGZpQ1RaUFBlaWZKcUFZekhEVkduQ2thT1hab3Nw?=
- =?utf-8?B?WDdDTTNLTFBaaVZnSm0wWmRkdENzVGVjbktKUlMrUmgzWU5SL1cxM2o1djBK?=
- =?utf-8?B?QWM1TFd4WEM0MFF0VEhEK2FKVUZWMDkxRzlic0Q5Nkg0ejVOMlFua0ErYStr?=
- =?utf-8?B?d0NHaVRYb3J0anZnd3lBL2ZnUUtINUtXeUpDWmFYbmpYejBjUFZKcjkyM0Zn?=
- =?utf-8?B?L0JmZndLOHo1U0podWFyWFVtMDJJYlNDTm1zVGNYenlUUElidWtwanV3Z1dK?=
- =?utf-8?B?R3A2a1hMdXI5Q2JvMHlQSUZoenZEK3RlQW1qeVJOQU8vU2FRNHJpUFR3U3JM?=
- =?utf-8?B?cUM1WkRteDlGQnFBaHNIaTNlUlFGNFRXWWJiNkthQnYvTHU0WVFLcE9nTldF?=
- =?utf-8?Q?TWSZ4J0DjLAmu8X/xUFGSfvn2?=
+	=?utf-8?B?SXdhd2t6V2pwUXlIRlZzTnlxQmxNQVZ2V0sxYjgxcGhCdHhXMU5BRmdIN0lo?=
+ =?utf-8?B?VmdoakVZQUdWQTZTY1pnWFd1ZHRPSTV5ZnBxd0xxSExoaitsb2JjRWsvUHlU?=
+ =?utf-8?B?ZVlubDg5ZzY3dzdLcGorNklDRVQyT3VZcWtmbW1SRmNCSklhN1NTZHZKcFJm?=
+ =?utf-8?B?MldIbGpnUStWb0E4NTkrVFJwbjBFaGRxVEtCMVFiS25uYVZIcUw3dXZ3SUlv?=
+ =?utf-8?B?WDkvbktxNWZyRjBhaEtUQllKaE82Y3hpaEswQ2pGZ2hZV0ZRQ20vRVcrZWFN?=
+ =?utf-8?B?WE80S01uRGMrM0NRVWVFWU9talB4ajVIWndaaHhjdmNmME1FUEVZL0RYWEUz?=
+ =?utf-8?B?TWpvb1FTaW5DY3JGWmlvbjZPekpOdFNpb0FLcnZGYVNZRkpOSTA5TkV3S3dT?=
+ =?utf-8?B?OTNhdDVxT2VHeDNnUkJaazM4eEtKZklyWHlTOXFPVlVmbC9WdW44L28vcVIv?=
+ =?utf-8?B?TmNzMEpjVGFOSm03dzgrVEVwL0NOOHBvUVhtMzZIcnRlU1hnREpaR0RCaGtM?=
+ =?utf-8?B?VVg5WlFOeHFIN1JyVlBkb3dUaGQ5MVE2UGNnWGMvT3ZSblQzKzVHYms4WTR6?=
+ =?utf-8?B?VjNrNGFjcjZRUndkamNWL0pIdFFJYnRjRlkyeDIxd096SDR0bTMyQWxNL1I2?=
+ =?utf-8?B?WU15OTFmSWtDL29ESXc3QTJJTHJ4aWtmWTQyaldESTF5bkFIK0VsQU1kbVEw?=
+ =?utf-8?B?ZnExMjlhb3dTRktCd2UrR0lzaGtjQm96TXdvTVZmNm4vN3p2bjdENjZxMWNr?=
+ =?utf-8?B?R2o2RDZxbWZjRE9wZnFMRi9PcjF4TlNWYS95cDRhT3FqUE8wL21Iam5IeHJz?=
+ =?utf-8?B?OWpDU0pocHZFRXQzc0ZldlpHQXN4dEpsdmpXYkM1akJDSGNaQ1UwNmdPZEw5?=
+ =?utf-8?B?ZWdxTjhDa3Arb2hlSFdrZ2EzQkJPUXZoaGdEcFIwVnBUdm9XR1BHdng1Nmk5?=
+ =?utf-8?B?cWRMc1VXaFcvZTBXOUtQaEhqWUl4R0VTdklTZVo4dzltYXJJd2g5Q2QyRkNr?=
+ =?utf-8?B?a3ZNMkZSb3ZGTnBxa2NReTNRSEhMUjIzbHorV0dXMWVCOXREWG9pRDhNZnpu?=
+ =?utf-8?B?RllGYWxKbDhzR1daRjE0RDQ5UkpRV00yTlJwZ1hsRGlvQVRjVFNkM01QeldH?=
+ =?utf-8?B?NUVKK0NUWmJMNTBZSy9la2FEdVQ4aUdQd0hTcmdPem45ZWhqMFU5dHRqOTY2?=
+ =?utf-8?B?Z3ljb2RucFBBOXVkTVM3cSt5NzExOWhNSFJCL25GRlFRamJNRUJmNzlaemlY?=
+ =?utf-8?B?R0plb3ViZnV5bWZkSzRnZStqS0t6SGs5QzRqdXVwTy9lZDdVeFY5M0dlSHVs?=
+ =?utf-8?B?NzFxbzBwejZBOHdqUlNYa3lqd1FLTDg5MlR0SWR2WEowcEJGekZveUdCd0Iw?=
+ =?utf-8?B?eWJaMFloNXRJc2RodTA4Tm5FeDVBNW4wSWVMU3RwYmhLQWxEcVlETHFweU5s?=
+ =?utf-8?B?SnNjb0pFZWVXNndJQ201bkE2eTdsZGNlN0JESnBwbzNOdmpuay9aSUdYYjVH?=
+ =?utf-8?B?SExDR2JtK2lDZ0hzZ0JKL1pOTE1jdmFlRVdQeWx2dHcxSUpRZnpSWFZURTJa?=
+ =?utf-8?B?dFV5NWNWNjF3N1JzNTNSVHgrSnczWWJrb2FnMHI0aTNEejQwb0p0WUt4QjRt?=
+ =?utf-8?B?alRQWEMrYVdPMGVyMVZlK3kzMDI1bDJIaXptNy9icWt0eENTZFQyZ2QwK24r?=
+ =?utf-8?B?MGxXQ2QxdUFpNFR4QkZtZWdpaEZZdG1DeDlIUVF1YVl6Ynh4aXQ3L0htZWxz?=
+ =?utf-8?B?WWhaTEpvbnV6NUt4Nk5Oak1nQ0JDWDFUd0lWSTkza21kUTFGVWdLWGM0MGR6?=
+ =?utf-8?B?RXFWcUpxbUozOThiaVFzOXFoS2NHYzNiSkVrMzhrSUpXbERYVG1LQ2M3cGlq?=
+ =?utf-8?B?YzBSaGFBZkYwUjBKY1JtNzJ5M3lYcCtHTUU5Y01jV1F5NHJYUXpLbC9yczdQ?=
+ =?utf-8?B?bTlPN1R1dmkvUGpjSHZ2SkpnN3F2L0RXTkxWeitpOUdKaURtWVFoV3BEaG5D?=
+ =?utf-8?B?dXJRbVczc0NXWWZXNFZvZUoxM1p0RUpoUVJwY1BuNzFuVklGQTgvSXcyekdD?=
+ =?utf-8?B?UlFXRldTTExJSDN3SXBVWXlUS0FtRkk1dWxXc1NuR2N4RFVIOFd4WUJPK3Bz?=
+ =?utf-8?Q?8AqVYqfual7ljtxDJUr/idz68?=
 X-OriginatorOrg: silabs.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1990e2da-79fd-48a5-55dd-08dd90f43a75
+X-MS-Exchange-CrossTenant-Network-Message-Id: fedb03cc-9b2b-4b89-535f-08dd90f43adf
 X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8205.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2025 01:27:58.4845
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2025 01:27:59.2099
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 54dbd822-5231-4b20-944d-6f4abcd541fb
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ov1QQEtAB5OpM5UVyX474qRjkNo/dxdU60QID3tzuBDH5lPzAAwO/kty36a1ChmoHASVQ2JtlzbYIQp8MsjgzQ==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0WZ07FSyiQaDIiEsfiMI23lgQFhAQ5mBT81merZfZXSKQWuvtq6c+DemtkdmxP0aN/Dt+3vxYCel9WvqyyIINw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7953
-X-Proofpoint-GUID: 4y9mDwosoPb03cOtU86rCcxVcf-p3tNI
-X-Authority-Analysis: v=2.4 cv=TMNFS0la c=1 sm=1 tr=0 ts=68214ea2 cx=c_pps a=gIIqiywzzXYl0XjYY6oQCA==:117 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=dt9VzEwgFbYA:10 a=M51BFTxLslgA:10 a=i1IsUcr2s-wA:10 a=2AEO0YjSAAAA:8 a=amLC3slWZ4KB8aZvhWUA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: 4y9mDwosoPb03cOtU86rCcxVcf-p3tNI
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTEyMDAxMyBTYWx0ZWRfX49B7FK/slHNO v+NX+sJE28SKuqwTD9mV0HtV5WB1tERCDqpUaW2goGudfiF58Z7qgCdwrfFTNWIYErBf2A1TBcz jMOLFRRxef7Z9cVDg7chKxZtHIch+EGxRusS4mLsapGKj+QobXOER/wftZ1HY4iube8vB8LIiwn
- v9WalYBksouOsL1aSBYtItl7w3TVR945cwQtwym3SWHK4COqdHzNP7ZuIdymj886zMpJvNGukbm aDlM3ORcOdpjFOKlQh3/NsO4wNdx7Pj2GOCDxKLWs6UiPdpHfDdVi22qkSzHIuTBSlfc9XwBow3 Aw9BbqzxruiuB1qtEd5l6uhzBy5LND42R54koOyNVAROEns7FtCQPxHFVKZ7BfAnD9xtSABSaop
- eQPLjH0lz7u01NxtNsWays4iucF0jWFDgyCRRpKNDDmw9aw1ikaNBgzBIFvgAtiT9LNFRsSb
+X-Proofpoint-GUID: m7GQ6_qB8944kknOFpxMyXoeLT7gISB5
+X-Authority-Analysis: v=2.4 cv=TMNFS0la c=1 sm=1 tr=0 ts=68214ea1 cx=c_pps a=gIIqiywzzXYl0XjYY6oQCA==:117 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=dt9VzEwgFbYA:10 a=M51BFTxLslgA:10 a=i1IsUcr2s-wA:10 a=2AEO0YjSAAAA:8 a=FtdxCg7vcX7QgciArP4A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: m7GQ6_qB8944kknOFpxMyXoeLT7gISB5
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTEyMDAxMyBTYWx0ZWRfX8WG97dKaJNwL iyOI0bq76fN/OHkwV5cMlpboddvq7KJtdtpYaY5muewS1kU+we9H6+AA73xdY23g7JO24Zd4Jwz 6K8J1gMTsa2DALRVcJwCEctHiQy82ggh//bLjNiZlVt9PzvS8mXvjY0MwGdlejvxkub8B8TyZcG
+ feIkj83dX0SXpOeNQRB7fBggI0F5o4zj4YY7SkXA+yYo6UaFVgaSvrcg/PEavNPLRXJCK9PieRZ 18O7ZDJQlVmUiyzo/hyINx0Pou/0M40V0uTGym81S1q3JC0iVcNJaDZvOR3GBSvh36oj6yoZZN3 ZFNgh09t/swEZHzcAa79ZjwHlEPBsZDUlGEBlawgMmvrYV8htG5Kd9sknp06v9PG32yqm418QKh
+ 8oE/4nC0pJP3q4wLNDowmZLey1qEPVLwfAobKKLc+L0FTJuotr0r6zBRzNddqDZ9OZJySXA8
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
  definitions=2025-05-11_10,2025-05-09_01,2025-02-21_01
@@ -210,193 +210,238 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowprio
  route=outbound adjust=0 reason=mlx scancount=1 engine=8.21.0-2504070000
  definitions=main-2505120013
 
-This commit prepares the addition of a CPC driver. CPC, standing for
-Co-Processor Communication, enables users to have multiple stack
-protocols over a shared physical link using multiple endpoints.
+Network stacks using CPC are isolated from each other and their
+communication channels are called endpoints. Within a CPC interface,
+endpoints must have a unique Endpoint ID, which will be used to address
+messages to that specific endpoint in a latter changeset.
 
-This patch adds the basic infrastructure for the new module, and
-introduces a new structure `cpc_interface`. The goal of this structure
-is to abstract a physical link like an SPI device, a SDIO function, or a
-UART for instance.
+Endpoints are part of an interface, this is represented in the device
+model by endpoints being children of interface, and the interface
+ensuring uniqueness of the endpoint ID when a new one is added.
 
 Signed-off-by: Damien Riégel <damien.riegel@silabs.com>
 ---
- MAINTAINERS                 |  6 +++
- drivers/net/Kconfig         |  2 +
- drivers/net/Makefile        |  1 +
- drivers/net/cpc/Kconfig     | 15 ++++++
- drivers/net/cpc/Makefile    |  5 ++
- drivers/net/cpc/interface.c | 98 +++++++++++++++++++++++++++++++++++++
- drivers/net/cpc/interface.h | 88 +++++++++++++++++++++++++++++++++
- drivers/net/cpc/main.c      | 21 ++++++++
- 8 files changed, 236 insertions(+)
- create mode 100644 drivers/net/cpc/Kconfig
- create mode 100644 drivers/net/cpc/Makefile
- create mode 100644 drivers/net/cpc/interface.c
- create mode 100644 drivers/net/cpc/interface.h
- create mode 100644 drivers/net/cpc/main.c
+ drivers/net/cpc/Makefile    |   2 +-
+ drivers/net/cpc/cpc.h       | 101 ++++++++++++++++++++++
+ drivers/net/cpc/endpoint.c  | 166 ++++++++++++++++++++++++++++++++++++
+ drivers/net/cpc/interface.c |  58 +++++++++++++
+ drivers/net/cpc/interface.h |  11 +++
+ 5 files changed, 337 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/cpc/cpc.h
+ create mode 100644 drivers/net/cpc/endpoint.c
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 00e94bec401..8256ec0ff8a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -21731,6 +21731,12 @@ S:	Maintained
- F:	drivers/input/touchscreen/silead.c
- F:	drivers/platform/x86/touchscreen_dmi.c
- 
-+SILICON LABS CPC DRIVERS
-+M:	Damien Riégel <damien.riegel@silabs.com>
-+R:	Silicon Labs Kernel Team <linux-devel@silabs.com>
-+S:	Supported
-+F:	drivers/net/cpc/*
-+
- SILICON LABS WIRELESS DRIVERS (for WFxxx series)
- M:	Jérôme Pouiller <jerome.pouiller@silabs.com>
- S:	Supported
-diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-index 1fd5acdc73c..d78ca2f4de5 100644
---- a/drivers/net/Kconfig
-+++ b/drivers/net/Kconfig
-@@ -508,6 +508,8 @@ source "drivers/atm/Kconfig"
- 
- source "drivers/net/caif/Kconfig"
- 
-+source "drivers/net/cpc/Kconfig"
-+
- source "drivers/net/dsa/Kconfig"
- 
- source "drivers/net/ethernet/Kconfig"
-diff --git a/drivers/net/Makefile b/drivers/net/Makefile
-index 13743d0e83b..19878d11c62 100644
---- a/drivers/net/Makefile
-+++ b/drivers/net/Makefile
-@@ -49,6 +49,7 @@ obj-$(CONFIG_MHI_NET) += mhi_net.o
- obj-$(CONFIG_ARCNET) += arcnet/
- obj-$(CONFIG_CAIF) += caif/
- obj-$(CONFIG_CAN) += can/
-+obj-$(CONFIG_CPC) += cpc/
- ifdef CONFIG_NET_DSA
- obj-y += dsa/
- endif
-diff --git a/drivers/net/cpc/Kconfig b/drivers/net/cpc/Kconfig
-new file mode 100644
-index 00000000000..f31b6837b49
---- /dev/null
-+++ b/drivers/net/cpc/Kconfig
-@@ -0,0 +1,15 @@
-+# SPDX-License-Identifier: GPL-2.0
-+
-+menuconfig CPC
-+	tristate "Silicon Labs Co-Processor Communication (CPC) Protocol"
-+	depends on NET
-+	help
-+	  Provide support for the CPC protocol to Silicon Labs EFR32 devices.
-+
-+	  CPC provides a way to multiplex data channels over a shared physical
-+	  link. These data channels can carry Bluetooth, Wi-Fi, or any arbitrary
-+	  data. Depending on the part and the firmware, the set of available
-+	  channels may differ.
-+
-+	  Say Y here to compile support for CPC into the kernel or say M to
-+	  compile as a module.
 diff --git a/drivers/net/cpc/Makefile b/drivers/net/cpc/Makefile
-new file mode 100644
-index 00000000000..1ce7415f305
---- /dev/null
+index 1ce7415f305..673a40db424 100644
+--- a/drivers/net/cpc/Makefile
 +++ b/drivers/net/cpc/Makefile
-@@ -0,0 +1,5 @@
-+# SPDX-License-Identifier: GPL-2.0
-+
-+cpc-y := interface.o main.o
-+
-+obj-$(CONFIG_CPC)	+= cpc.o
-diff --git a/drivers/net/cpc/interface.c b/drivers/net/cpc/interface.c
+@@ -1,5 +1,5 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
+-cpc-y := interface.o main.o
++cpc-y := endpoint.o interface.o main.o
+ 
+ obj-$(CONFIG_CPC)	+= cpc.o
+diff --git a/drivers/net/cpc/cpc.h b/drivers/net/cpc/cpc.h
 new file mode 100644
-index 00000000000..4fdc78a0868
+index 00000000000..529319f4339
 --- /dev/null
-+++ b/drivers/net/cpc/interface.c
-@@ -0,0 +1,98 @@
++++ b/drivers/net/cpc/cpc.h
+@@ -0,0 +1,101 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (c) 2025, Silicon Laboratories, Inc.
++ */
++
++#ifndef __CPC_H
++#define __CPC_H
++
++#include <linux/device.h>
++#include <linux/types.h>
++
++#define CPC_ENDPOINT_NAME_MAX_LEN 128
++
++struct cpc_driver;
++struct cpc_interface;
++struct cpc_endpoint;
++
++/**
++ * struct cpc_endpoint - Representation of CPC endpointl
++ * @dev: Driver model representation of the device.
++ * @name: Endpoint name, used for matching with corresponding driver.
++ * @id: Endpoint id, uniquely identifies an endpoint within a CPC device.
++ * @intf: Pointer to CPC device this endpoint belongs to.
++ * @list_node: list_head member for linking in a CPC device.
++ *
++ * Each endpoint can send and receive data without consideration of the other endpoints sharing the
++ * same physical link.
++ */
++struct cpc_endpoint {
++	struct device dev;
++
++	char name[CPC_ENDPOINT_NAME_MAX_LEN];
++	u8 id;
++
++	struct cpc_interface *intf;
++	struct list_head list_node;
++};
++
++struct cpc_endpoint *cpc_endpoint_alloc(struct cpc_interface *intf, u8 id);
++int cpc_endpoint_register(struct cpc_endpoint *ep);
++struct cpc_endpoint *cpc_endpoint_new(struct cpc_interface *intf, u8 id, const char *ep_name);
++
++void cpc_endpoint_unregister(struct cpc_endpoint *ep);
++
++/**
++ * cpc_endpoint_from_dev() - Upcast from a device pointer.
++ * @dev: Reference to a device.
++ *
++ * Return: Reference to the cpc endpoint.
++ */
++static inline struct cpc_endpoint *cpc_endpoint_from_dev(const struct device *dev)
++{
++	return container_of(dev, struct cpc_endpoint, dev);
++}
++
++/**
++ * cpc_endpoint_get() - Get a reference to endpoint and return its pointer.
++ * @ep: Endpoint to get.
++ *
++ * Return: Endpoint pointer with its reference counter incremented, or %NULL.
++ */
++static inline struct cpc_endpoint *cpc_endpoint_get(struct cpc_endpoint *ep)
++{
++	if (!ep || !get_device(&ep->dev))
++		return NULL;
++	return ep;
++}
++
++/**
++ * cpc_endpoint_put() - Release reference to an endpoint.
++ * @ep: CPC endpoint, allocated by cpc_endpoint_alloc().
++ *
++ * Context: Process context.
++ */
++static inline void cpc_endpoint_put(struct cpc_endpoint *ep)
++{
++	if (ep)
++		put_device(&ep->dev);
++}
++
++/**
++ * cpc_endpoint_get_drvdata() - Get driver data associated with this endpoint.
++ * @ep: Endpoint.
++ *
++ * Return: Driver data, set by cpc_endpoint_set_drvdata().
++ */
++static inline void *cpc_endpoint_get_drvdata(struct cpc_endpoint *ep)
++{
++	return dev_get_drvdata(&ep->dev);
++}
++
++/**
++ * cpc_endpoint_set_drvdata() - Set driver data for this endpoint.
++ * @ep: Endpoint.
++ */
++static inline void cpc_endpoint_set_drvdata(struct cpc_endpoint *ep, void *data)
++{
++	dev_set_drvdata(&ep->dev, data);
++}
++
++#endif
+diff --git a/drivers/net/cpc/endpoint.c b/drivers/net/cpc/endpoint.c
+new file mode 100644
+index 00000000000..5aef8d7e43c
+--- /dev/null
++++ b/drivers/net/cpc/endpoint.c
+@@ -0,0 +1,166 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (c) 2025, Silicon Laboratories, Inc.
 + */
 +
-+#include <linux/module.h>
++#include <linux/string.h>
 +
++#include "cpc.h"
 +#include "interface.h"
 +
-+#define to_cpc_interface(d) container_of(d, struct cpc_interface, dev)
-+
-+static DEFINE_IDA(cpc_ida);
-+
 +/**
-+ * cpc_intf_release() - Actual release of interface.
-+ * @dev: Device embedded in struct cpc_interface
++ * cpc_ep_release() - Actual release of the CPC endpoint.
++ * @dev: Device embedded in struct cpc_endpoint.
 + *
-+ * This function should not be called directly, users are expected to use cpc_interface_put()
-+ * instead. This function will be called when the last reference to the CPC device is released.
++ * This function should not be called directly, users are expected to use cpc_endpoint_put().
 + */
-+static void cpc_intf_release(struct device *dev)
++static void cpc_ep_release(struct device *dev)
 +{
-+	struct cpc_interface *intf = to_cpc_interface(dev);
++	struct cpc_endpoint *ep = cpc_endpoint_from_dev(dev);
 +
-+	ida_free(&cpc_ida, intf->index);
-+	kfree(intf);
++	cpc_interface_put(ep->intf);
++	kfree(ep);
 +}
 +
 +/**
-+ * cpc_interface_alloc() - Allocate memory for new CPC interface.
-+ *
-+ * @parent: Parent device.
-+ * @ops: Callbacks for this device.
-+ * @priv: Pointer to private structure associated with this device.
++ * cpc_endpoint_alloc() - Allocate memory for new CPC endpoint.
++ * @intf: CPC interface owning this endpoint.
++ * @id: Endpoint ID.
 + *
 + * Context: Process context as allocations are done with @GFP_KERNEL flag
 + *
-+ * Return: allocated CPC interface or %NULL.
++ * Return: allocated CPC endpoint or %NULL.
 + */
-+struct cpc_interface *cpc_interface_alloc(struct device *parent,
-+					  const struct cpc_interface_ops *ops,
-+					  void *priv)
++struct cpc_endpoint *cpc_endpoint_alloc(struct cpc_interface *intf, u8 id)
 +{
-+	struct cpc_interface *intf;
++	struct cpc_endpoint *ep;
 +
-+	intf = kzalloc(sizeof(*intf), GFP_KERNEL);
-+	if (!intf)
++	if (!cpc_interface_get(intf))
 +		return NULL;
 +
-+	intf->index = ida_alloc(&cpc_ida, GFP_KERNEL);
-+	if (intf->index < 0) {
-+		kfree(intf);
++	ep = kzalloc(sizeof(*ep), GFP_KERNEL);
++	if (!ep) {
++		cpc_interface_put(intf);
 +		return NULL;
 +	}
 +
-+	intf->ops = ops;
++	ep->intf = intf;
++	ep->id = id;
 +
-+	intf->dev.parent = parent;
-+	intf->dev.release = cpc_intf_release;
++	ep->dev.parent = &intf->dev;
++	ep->dev.release = cpc_ep_release;
 +
-+	device_initialize(&intf->dev);
++	device_initialize(&ep->dev);
 +
-+	dev_set_name(&intf->dev, "cpc%d", intf->index);
-+	dev_set_drvdata(&intf->dev, priv);
-+
-+	return intf;
++	return ep;
 +}
 +
-+/**
-+ * cpc_interface_register() - Register CPC interface.
-+ * @intf: CPC device to register.
-+ *
-+ * Context: Process context.
-+ *
-+ * Return: 0 if successful, otherwise a negative error code.
-+ */
-+int cpc_interface_register(struct cpc_interface *intf)
++static int cpc_ep_check_unique_id(struct device *dev, void *data)
 +{
++	struct cpc_endpoint *ep = cpc_endpoint_from_dev(dev);
++	struct cpc_endpoint *new_ep = data;
++
++	if (ep->id == new_ep->id)
++		return -EBUSY;
++
++	return 0;
++}
++
++static int __cpc_endpoint_register(struct cpc_endpoint *ep)
++{
++	size_t name_len;
 +	int err;
 +
-+	err = device_add(&intf->dev);
++	name_len = strnlen(ep->name, sizeof(ep->name));
++	if (name_len == 0 || name_len == sizeof(ep->name))
++		return -EINVAL;
++
++	err = dev_set_name(&ep->dev, "%s.%d", dev_name(&ep->intf->dev), ep->id);
++	if (err) {
++		dev_err(&ep->dev, "failed to dev_set_name (%d)\n", err);
++		return err;
++	}
++
++	err = device_for_each_child(&ep->intf->dev, ep, cpc_ep_check_unique_id);
++	if (err)
++		return err;
++
++	err = device_add(&ep->dev);
 +	if (err)
 +		return err;
 +
@@ -404,137 +449,205 @@ index 00000000000..4fdc78a0868
 +}
 +
 +/**
-+ * cpc_interface_unregister() - Unregister a CPC interface.
-+ * @intf: CPC device to unregister.
++ * cpc_endpoint_register() - Register an endpoint.
++ * @ep: Endpoint to register.
 + *
-+ * Context: Process context.
++ * Companion function of cpc_endpoint_alloc(). This function adds the endpoint, making it usable by
++ * CPC drivers. As this ensures that endpoint ID is unique within a CPC interface and then adds the
++ * endpoint, the lock interface is held to prevent concurrent additions.
++ *
++ * Context: Lock "add_lock" of endpoint's interface.
++ *
++ * Return: 0 on success, negative errno otherwise.
 + */
-+void cpc_interface_unregister(struct cpc_interface *intf)
++int cpc_endpoint_register(struct cpc_endpoint *ep)
 +{
-+	device_del(&intf->dev);
-+	cpc_interface_put(intf);
++	int err;
++
++	if (!ep || !ep->intf)
++		return -EINVAL;
++
++	mutex_lock(&ep->intf->add_lock);
++	err = __cpc_endpoint_register(ep);
++	mutex_unlock(&ep->intf->add_lock);
++
++	return err;
 +}
-diff --git a/drivers/net/cpc/interface.h b/drivers/net/cpc/interface.h
-new file mode 100644
-index 00000000000..797f70119a8
---- /dev/null
-+++ b/drivers/net/cpc/interface.h
-@@ -0,0 +1,88 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (c) 2025, Silicon Laboratories, Inc.
-+ */
-+
-+#ifndef __CPC_INTERFACE_H
-+#define __CPC_INTERFACE_H
-+
-+#include <linux/device.h>
-+#include <linux/list.h>
-+#include <linux/mutex.h>
-+#include <linux/skbuff.h>
-+
-+struct cpc_interface;
-+struct cpc_interface_ops;
 +
 +/**
-+ * struct cpc_interface - Representation of a CPC interface.
-+ * @dev: Device structure for bookkeeping..
-+ * @ops: Callbacks for this device.
-+ * @index: Device index.
-+ */
-+struct cpc_interface {
-+	struct device dev;
-+
-+	const struct cpc_interface_ops *ops;
-+
-+	int index;
-+};
-+
-+/**
-+ * struct cpc_interface_ops - Callbacks from CPC core to physical bus driver.
-+ * @wake_tx: Called by CPC core to wake up the transmit task of that interface.
-+ * @csum: Callback to calculate checksum over the payload.
++ * cpc_endpoint_new() - Convenience wrapper to allocate and register an endpoint.
++ * @intf: The interface the endpoint will be attached to.
++ * @id: ID of the endpoint to add.
++ * @ep_name: Name of the endpoint to add.
 + *
-+ * This structure contains various callbacks that the bus (SDIO, SPI) driver must implement.
-+ */
-+struct cpc_interface_ops {
-+	int (*wake_tx)(struct cpc_interface *intf);
-+	void (*csum)(struct sk_buff *skb);
-+};
-+
-+struct cpc_interface *cpc_interface_alloc(struct device *parent,
-+					  const struct cpc_interface_ops *ops,
-+					  void *priv);
-+
-+int cpc_interface_register(struct cpc_interface *intf);
-+void cpc_interface_unregister(struct cpc_interface *intf);
-+
-+/**
-+ * cpc_interface_get() - Get a reference to interface and return its pointer.
-+ * @intf: Interface to get.
++ * Context: Process context, as allocation are done with GFP_KERNEL and interface's lock is
++ * acquired.
 + *
-+ * Return: Interface pointer with its reference counter incremented, or %NULL.
++ * Return: Newly added endpoint, or %NULL in case of error.
 + */
-+static inline struct cpc_interface *cpc_interface_get(struct cpc_interface *intf)
++struct cpc_endpoint *cpc_endpoint_new(struct cpc_interface *intf, u8 id, const char *ep_name)
 +{
-+	if (!intf || !get_device(&intf->dev))
++	struct cpc_endpoint *ep;
++	int err;
++
++	ep = cpc_endpoint_alloc(intf, id);
++	if (!ep)
 +		return NULL;
-+	return intf;
++
++	if (ep_name)
++		strscpy(ep->name, ep_name);
++
++	err = cpc_endpoint_register(ep);
++	if (err)
++		goto put_ep;
++
++	return ep;
++
++put_ep:
++	cpc_endpoint_put(ep);
++
++	return NULL;
 +}
 +
-+/**
-+ * cpc_interface_put() - Release reference to an interface.
-+ * @intf: CPC interface
++/** cpc_endpoint_unregister() - Unregister an endpoint.
++ * @ep: Endpoint registered with cpc_endpoint_new() or cpc_endpoint_register().
 + *
-+ * Context: Process context.
++ * Unregister an endpoint, its resource will be freed when the last reference to this
++ * endpoint is dropped.
 + */
-+static inline void cpc_interface_put(struct cpc_interface *intf)
++void cpc_endpoint_unregister(struct cpc_endpoint *ep)
 +{
-+	if (intf)
-+		put_device(&intf->dev);
++	device_del(&ep->dev);
++	put_device(&ep->dev);
 +}
+diff --git a/drivers/net/cpc/interface.c b/drivers/net/cpc/interface.c
+index 4fdc78a0868..6b3fc16f212 100644
+--- a/drivers/net/cpc/interface.c
++++ b/drivers/net/cpc/interface.c
+@@ -5,6 +5,7 @@
+ 
+ #include <linux/module.h>
+ 
++#include "cpc.h"
+ #include "interface.h"
+ 
+ #define to_cpc_interface(d) container_of(d, struct cpc_interface, dev)
+@@ -53,6 +54,10 @@ struct cpc_interface *cpc_interface_alloc(struct device *parent,
+ 		return NULL;
+ 	}
+ 
++	mutex_init(&intf->add_lock);
++	mutex_init(&intf->lock);
++	INIT_LIST_HEAD(&intf->eps);
 +
-+/**
-+ * cpc_interface_get_priv() - Get driver data associated with this interface.
-+ * @intf: Interface pointer.
-+ *
-+ * Return: Driver data, set at allocation via cpc_interface_alloc().
-+ */
-+static inline void *cpc_interface_get_priv(struct cpc_interface *intf)
+ 	intf->ops = ops;
+ 
+ 	intf->dev.parent = parent;
+@@ -85,6 +90,12 @@ int cpc_interface_register(struct cpc_interface *intf)
+ 	return 0;
+ }
+ 
++static int cpc_intf_unregister_ep(struct device *dev, void *null)
 +{
-+	if (!intf)
-+		return NULL;
-+	return dev_get_drvdata(&intf->dev);
-+}
-+
-+#endif
-diff --git a/drivers/net/cpc/main.c b/drivers/net/cpc/main.c
-new file mode 100644
-index 00000000000..ba9ab1ccf63
---- /dev/null
-+++ b/drivers/net/cpc/main.c
-@@ -0,0 +1,21 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (c) 2025, Silicon Laboratories, Inc.
-+ */
-+
-+#include <linux/module.h>
-+
-+static int __init cpc_init(void)
-+{
++	cpc_endpoint_unregister(cpc_endpoint_from_dev(dev));
 +	return 0;
 +}
-+module_init(cpc_init);
 +
-+static void __exit cpc_exit(void)
+ /**
+  * cpc_interface_unregister() - Unregister a CPC interface.
+  * @intf: CPC device to unregister.
+@@ -93,6 +104,53 @@ int cpc_interface_register(struct cpc_interface *intf)
+  */
+ void cpc_interface_unregister(struct cpc_interface *intf)
+ {
++	/* Iterate in reverse order so that system endpoint is removed last. */
++	device_for_each_child_reverse(&intf->dev, NULL, cpc_intf_unregister_ep);
++
+ 	device_del(&intf->dev);
+ 	cpc_interface_put(intf);
+ }
++
++/**
++ * __cpc_interface_get_endpoint() - get endpoint registered in CPC device with this id without lock
++ * @intf: CPC device to probe
++ * @ep_id: endpoint ID that's being looked for
++ *
++ * Get an endpoint by its ID if present in a CPC device. Endpoint's ref count is incremented and
++ * should be decremented with cpc_endpoint_put() when done.
++ *
++ * Context: This function doesn't lock device's endpoint list, caller is responsible for that.
++ *
++ * Return: a struct cpc_endpoint pointer or NULL if not found.
++ */
++static struct cpc_endpoint *__cpc_interface_get_endpoint(struct cpc_interface *intf, u8 ep_id)
 +{
-+}
-+module_exit(cpc_exit);
++	struct cpc_endpoint *ep_it;
 +
-+MODULE_DESCRIPTION("Silicon Labs CPC Protocol");
-+MODULE_AUTHOR("Damien Riégel <damien.riegel@silabs.com>");
-+MODULE_LICENSE("GPL");
++	list_for_each_entry(ep_it, &intf->eps, list_node) {
++		if (ep_it->id == ep_id)
++			return cpc_endpoint_get(ep_it);
++	}
++
++	return NULL;
++}
++
++/**
++ * cpc_interface_get_endpoint() - get endpoint registered in CPC device with this id
++ * @intf: CPC device to probe
++ * @ep_id: endpoint ID that's being looked for
++ *
++ * Context: This function locks device's endpoint list.
++ *
++ * Return: a struct cpc_endpoint pointer or NULL if not found.
++ */
++struct cpc_endpoint *cpc_interface_get_endpoint(struct cpc_interface *intf, u8 ep_id)
++{
++	struct cpc_endpoint *ep;
++
++	mutex_lock(&intf->lock);
++	ep = __cpc_interface_get_endpoint(intf, ep_id);
++	mutex_unlock(&intf->lock);
++
++	return ep;
++}
+diff --git a/drivers/net/cpc/interface.h b/drivers/net/cpc/interface.h
+index 797f70119a8..d6b6d9ce5de 100644
+--- a/drivers/net/cpc/interface.h
++++ b/drivers/net/cpc/interface.h
+@@ -17,15 +17,24 @@ struct cpc_interface_ops;
+ /**
+  * struct cpc_interface - Representation of a CPC interface.
+  * @dev: Device structure for bookkeeping..
++ * @add_lock: Lock to serialize addition of new endpoints.
+  * @ops: Callbacks for this device.
+  * @index: Device index.
++ * @lock: Protect access to endpoint list.
++ * @eps: List of endpoints managed by this device.
+  */
+ struct cpc_interface {
+ 	struct device dev;
+ 
++	/* Prevent concurrent addition of new devices */
++	struct mutex add_lock;
++
+ 	const struct cpc_interface_ops *ops;
+ 
+ 	int index;
++
++	struct mutex lock;	/* Protect eps from concurrent access. */
++	struct list_head eps;
+ };
+ 
+ /**
+@@ -47,6 +56,8 @@ struct cpc_interface *cpc_interface_alloc(struct device *parent,
+ int cpc_interface_register(struct cpc_interface *intf);
+ void cpc_interface_unregister(struct cpc_interface *intf);
+ 
++struct cpc_endpoint *cpc_interface_get_endpoint(struct cpc_interface *intf, u8 ep_id);
++
+ /**
+  * cpc_interface_get() - Get a reference to interface and return its pointer.
+  * @intf: Interface to get.
 -- 
 2.49.0
 
