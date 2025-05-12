@@ -1,80 +1,81 @@
-Return-Path: <netdev+bounces-189853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1229AB3ED4
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 19:18:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1F38AB3EDE
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 19:22:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BF131887165
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 17:18:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D24B7A4A31
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 17:20:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D32A8296D31;
-	Mon, 12 May 2025 17:18:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3209C296D09;
+	Mon, 12 May 2025 17:22:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dtK2bR71"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H800bMg9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE9492951B1
-	for <netdev@vger.kernel.org>; Mon, 12 May 2025 17:18:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D73224BBE1
+	for <netdev@vger.kernel.org>; Mon, 12 May 2025 17:22:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747070291; cv=none; b=Q9bI59R+xgEiBsbUYq32JGOXxUe7Vzt/NraZ6NBvZlwaIly76NMuSiInZjPXBIkjL17hY/0xyjWgdRTSIdcweACPd8sVrgP0GYpoIhEhDB59030zuKP9Zs4s5JHiTC4McIEa+oDbOqZ9EcWET+YNwOHPb2X2DL582vUIcxNAmb0=
+	t=1747070523; cv=none; b=a6HPUrK/sIVir6bG1HKeKKz9ygXQeDwa4tj/s5kkdX1pgHeZAJa8oKzT4Th3vifTANwoZFFNFI/PSTp8DyNP6gx3DP+5SQ8im62kLPYKlG9SUD2MpyGs285R/rkwlGeeir7Y+BFyRkPikD8TW6zAks/ncchQh9tnVBV0APDRbCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747070291; c=relaxed/simple;
-	bh=x5kBLEMiuhJd1dBI5NK8qWHIs4wHKgRm86alD4jd9JI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CWMDKFYNxjQ7Xq/UHy+lrH8Cu3c5+1P0HUBwv/SHVog1gNtwTVFn+blYiF4/OC5KQk5+7SRsr8OxOWPHr5wvEdmClons+QVrremtCmy4U8DuiglALn6G1PKtTB45I8BEImrDuh6G+QmNP8ovcVW8r6BBEfKselKTr4eM2ZxdH/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dtK2bR71; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96FC0C4CEE7;
-	Mon, 12 May 2025 17:18:09 +0000 (UTC)
+	s=arc-20240116; t=1747070523; c=relaxed/simple;
+	bh=soJO4A4AjQPFXEEm8Vly+9M2b9nOAfW43rupkSUMSm8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=giMYwL6PgGtztloUWNOfPuPzRG3JOzQVhgy5p4CNBxFoUbS6VytotXj35apGhZ8aBAg61ldHFUaN53eWB5Djm7WF6H/RtE1D2wCWIBmky7illDdx/57gETfP4+DUHjhThybehJ64uTuPY3E9rriMAR26NNfD1FbfOE1eRlxhqo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H800bMg9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01D2DC4CEE7;
+	Mon, 12 May 2025 17:22:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747070291;
-	bh=x5kBLEMiuhJd1dBI5NK8qWHIs4wHKgRm86alD4jd9JI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dtK2bR71cQoWMQCEd64hvQv3APJovdhVnciwp/ALn4qqKMe0EFd1kObrzRs6exNte
-	 sgzKi0U6TbO+bwA+lH148Ia/tAm80DUlE1DQ5iJGaxojCkzmYCl8BVxzpgNPWgxZ+i
-	 BDOJUCcea9WjITXIsZ2ef1+D14MrPp2QOrGBBGbNNqGEIsWfU2Tyk002hibbcfl35M
-	 apm3fEGXlZAmqYdkWA8hPKw3tr4vkgiICjhGtz0RQlX19YHxzlyZ72inpcPZJMMheA
-	 tyiGtDVRpjS67GzPuWifpHPZrQ1l0rOxuierxN42NRwlBXUZuLzCFAVQZ3aFPgNHAB
-	 UKc1zQ1GkqlMg==
-Date: Mon, 12 May 2025 18:18:07 +0100
-From: Simon Horman <horms@kernel.org>
-To: Eelco Chaudron <echaudro@redhat.com>
-Cc: netdev@vger.kernel.org, dev@openvswitch.org, aconole@redhat.com,
-	i.maximets@ovn.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH net-next v2] openvswitch: Stricter validation for the
- userspace action
-Message-ID: <20250512171807.GU3339421@horms.kernel.org>
-References: <67eb414e2d250e8408bb8afeb982deca2ff2b10b.1747037304.git.echaudro@redhat.com>
+	s=k20201202; t=1747070522;
+	bh=soJO4A4AjQPFXEEm8Vly+9M2b9nOAfW43rupkSUMSm8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=H800bMg9hqnv8v4VunViEWyxpF50Txz38vqJV4wqjgqkT2GMc+bvhjjfbDC3MQy6m
+	 Km+rrH7e3IAP1TXIkFgg2lhUj8Km6xdpcPjsJJpr8Tb8LQ6RGLKXThqMgr5KG5gBRH
+	 nJNNeqd3U9ltFLsSyXfiTUt3vQPR6oDCiVpCORJog11+UHcE8hLnl9UFGvGwkhDSRq
+	 F+4HQfrDryePQ7z4LGqJejC5OPcKaJNLayof8ygKBMpPIeOotQt04MepQQRGJVtcsj
+	 QoI8bVW24RVdRcmz4R9eCXWwMPffw6ZnG9mxSHshIZBfwVkMNg4jBnBudov/2XHGku
+	 a1oJc3O8R/vnw==
+Date: Mon, 12 May 2025 10:22:01 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, Russell King <linux@armlinux.org.uk>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>, Richard Cochran <richardcochran@gmail.com>,
+ Furong Xu <0x1207@gmail.com>
+Subject: Re: [PATCH net-next] net: stmmac: convert to ndo_hwtstamp_get() and
+ ndo_hwtstamp_set()
+Message-ID: <20250512102201.01a695c4@kernel.org>
+In-Reply-To: <20250512143607.595490-1-vladimir.oltean@nxp.com>
+References: <20250512143607.595490-1-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <67eb414e2d250e8408bb8afeb982deca2ff2b10b.1747037304.git.echaudro@redhat.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, May 12, 2025 at 10:08:24AM +0200, Eelco Chaudron wrote:
-> This change enhances the robustness of validate_userspace() by ensuring
-> that all Netlink attributes are fully contained within the parent
-> attribute. The previous use of nla_parse_nested_deprecated() could
-> silently skip trailing or malformed attributes, as it stops parsing at
-> the first invalid entry.
-> 
-> By switching to nla_parse_deprecated_strict(), we make sure only fully
-> validated attributes are copied for later use.
-> 
-> Signed-off-by: Eelco Chaudron <echaudro@redhat.com>
-> ---
-> v2: Changed commit message based on Ilya's feedback.
+On Mon, 12 May 2025 17:36:07 +0300 Vladimir Oltean wrote:
+> -		netdev_alert(priv->dev, "No support for HW time stamping\n");
+> +		NL_SET_ERR_MSG_MOD(extack, "No support for HW time stamping\n");
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+coccinelle says:
 
+drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:594:29-64: WARNING avoid newline at end of message in NL_SET_ERR_MSG_MOD
+
+Feel free to repost without the 24h wait.
+-- 
+pw-bot: cr
 
