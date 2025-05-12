@@ -1,710 +1,180 @@
-Return-Path: <netdev+bounces-189629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FF5FAB2D93
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 04:47:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FFCAAB2DAD
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 05:03:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9FFB177B42
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 02:47:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 128B83B0160
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 03:03:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E3EB381AF;
-	Mon, 12 May 2025 02:47:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jQ7I4Wkq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 315C7199FD0;
+	Mon, 12 May 2025 03:03:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D3C0B660;
-	Mon, 12 May 2025 02:47:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 785141A285;
+	Mon, 12 May 2025 03:03:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.166.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747018048; cv=none; b=dXCd36Y/H7uBD9U+7EByLxya/+Jvm27IKaUBp0d0LFJXtxSZkbS32T2vSrWDoWbxTsXcD09p2RSN9ZA/m3kupaYxnU7oZR21e/qnB2SfcAb5MfogvRf6JWc4nhVj8i8VxQHqFkVXOnjk2gDj5S83uoD8cWVKabMSUniSVu2aeIQ=
+	t=1747019011; cv=none; b=ZvoIzbq5OVG8lINmn7SIw7g1gmV0g+iy9sDnu/NWzb+YoXAFls17+DmET6q15saP2hDUR3rLy9aDgdvD91/sWHiqJ14pIEtKfYH41lgHiO80Y42l+imyizM8mBhTbwmFtd6tkH4e3KKdS8Wx5/c3egWtAQ6ETl1g5UpMXwYp+Ig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747018048; c=relaxed/simple;
-	bh=oa3+HU8x8Dd+MTiB2cLnujkiAWm5WLkKuAaYeZVZYF0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tyDB+AJgSV0KyUX/2ilTqJ2PhTjtpkINPu2pJDp4TO6UXzVe3mWSMQnDhFs2l84pNJE1PrfytfnaEK2vRHP0AB4v37XOcpEoDb6IglkSD0zj+17EesBI6bNZ5HFCNUUrJD04dk/5oQkfsW+jeqxXGHgV0f4JX0dPGM1v3egotpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jQ7I4Wkq; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=ghUgNKQmw53U53oRHHC5xyJr9l8MLuXdlIfwxXntF+k=; b=jQ
-	7I4WkqChLbiVa3w5FLReNskFrXgHUj4va3ldpQhvdNFqbwK8SQrev3OHq7MjxUCsMSTdByYSiP/iV
-	RAmMvveaMKOm+lT5m3EjPvpVYFBjfMQVCToUbml486p5rNbV97r6XuYE/Qj0pju6qtJWD5JzutkDl
-	WQ5lV4ZSEHuROwc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uEJCF-00CIJM-LN; Mon, 12 May 2025 04:47:15 +0200
-Date: Mon, 12 May 2025 04:47:15 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Damien =?iso-8859-1?Q?Ri=E9gel?= <damien.riegel@silabs.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Silicon Labs Kernel Team <linux-devel@silabs.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC net-next 14/15] net: cpc: add SPI interface driver
-Message-ID: <771a17d1-3f6e-4d77-b74a-15b2d52ccf87@lunn.ch>
-References: <20250512012748.79749-1-damien.riegel@silabs.com>
- <20250512012748.79749-15-damien.riegel@silabs.com>
+	s=arc-20240116; t=1747019011; c=relaxed/simple;
+	bh=Cm4FKWjXZBEEKUsvPkYE1m13P2ESiRwCZ2EaOSh08m8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KfQa4pJToVs4+FhEQCUM5Zp6DorHTRZBJwUJbfSjN1JdLvppGwGQTRBCIHxQbfNzQhE54LSb4JKE7mZJN8YqSW5ghqmp2y6UNGH8rlklSFdc4WVfqZZWoHjZkNxuRMMUzFEFFU5thGM+ChJpYEykFCznkFSdSZM4ODigYmTgB8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.166.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54C2eXqW021504;
+	Sun, 11 May 2025 20:02:58 -0700
+Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [147.11.82.254])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 46j233h4ve-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Sun, 11 May 2025 20:02:58 -0700 (PDT)
+Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.43; Sun, 11 May 2025 20:02:57 -0700
+Received: from pek-lpg-core1.wrs.com (147.11.136.210) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
+ 15.1.2507.43 via Frontend Transport; Sun, 11 May 2025 20:02:53 -0700
+From: <jianqi.ren.cn@windriver.com>
+To: <gregkh@linuxfoundation.org>, <stable@vger.kernel.org>
+CC: <patches@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+        <jianqi.ren.cn@windriver.com>, <pablo@netfilter.org>,
+        <kadlec@netfilter.org>, <fw@strlen.de>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <netfilter-devel@vger.kernel.org>, <coreteam@netfilter.org>,
+        <netdev@vger.kernel.org>
+Subject: [PATCH 6.1.y] netfilter: nf_tables: fix memleak in map from abort path
+Date: Mon, 12 May 2025 11:02:52 +0800
+Message-ID: <20250512030252.3329782-1-jianqi.ren.cn@windriver.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250512012748.79749-15-damien.riegel@silabs.com>
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=EojSrTcA c=1 sm=1 tr=0 ts=682164e2 cx=c_pps a=K4BcnWQioVPsTJd46EJO2w==:117 a=K4BcnWQioVPsTJd46EJO2w==:17 a=dt9VzEwgFbYA:10 a=3HDBlxybAAAA:8 a=t7CeM3EgAAAA:8 a=JvIdB4Z2PfN4shd601kA:9 a=laEoCiVfU_Unz3mSdgXN:22
+ a=FdTzh2GWekK77mhwV6Dw:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTEyMDAzMCBTYWx0ZWRfX4Ekq0dv7Cywu z5sXRleEKek6QFiaiDoC0eiGIFqE6JPLgCc1vnpetrJk9hJE1eC7wFdtPSQSJEhD3y4kOfUTY3n /Hoo95pb/YuP2FGWZxTP6d66t5vxzbML5EdXq90Ga6WYb9SPyN22mqaYEq0UlVz7/KicsUVxtSe
+ V3hZrudDR+VGTO0KMbg0FwbxQqKgGMNVDmEJa0ibzvjzZHtaZ/6FWvIymfXytqIxmKstjIedhh8 XOe9bv/TYTIi1Kc8sWywWDR/iGUWdXCXaWpYW2QB04WzNpJuBnQW6cfKKmvHaCX9U0Hvj60qCqB 0coPVhQ/uQI+a1uNnAqTRKU8si8JLyUcHAjBwwoOXnFGeS+pDqmdRz5R8HNH3MZ0FrqLzlAtkSY
+ NXbN+WYWvekrNslSrjOPmxXjtIJZhKicMs/e6dCAhUBpkNQk3/+YY2C0aMNKxfUpkKQ+CCBY
+X-Proofpoint-GUID: 4MpkbcK2UMrwMzWBlHEQtmEpnCYcT2TP
+X-Proofpoint-ORIG-GUID: 4MpkbcK2UMrwMzWBlHEQtmEpnCYcT2TP
+X-Sensitive_Customer_Information: Yes
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-12_01,2025-05-09_01,2025-02-21_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ phishscore=0 priorityscore=1501 mlxlogscore=999 adultscore=0
+ impostorscore=0 clxscore=1015 malwarescore=0 mlxscore=0 spamscore=0
+ bulkscore=0 suspectscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.21.0-2504070000
+ definitions=main-2505120030
 
-On Sun, May 11, 2025 at 09:27:47PM -0400, Damien Riégel wrote:
-> This adds support for CPC over SPI. CPC uses a full-duplex protocol.
-> Each frame transmission/reception is split into two parts:
->   - read and/or write header + header checksum
->   - read and/or write payload + payload checksum
-> 
-> Header frames are always 10 bytes (8 bytes of header and 2 bytes of
-> checksum). The header contains the size of the payload to receive (size
-> to transmit is already known). As the SPI device also has some
-> processing to do when it receives a header, the SPI driver must wait for
-> the interrupt line to be asserted before clocking the payload.
-> 
-> The SPI device always expects the chip select to be asserted and
-> deasserted after a header, even if there are no payloads to transmit.
-> This is used to keep headers transmission synchronized between host and
-> device. As some controllers don't support doing that if there is nothing
-> to transmit, a null byte is transmitted in that case and it will be
-> ignored by the device.
-> 
-> If there are payloads, the driver will clock the maximum length of the
-> two payloads.
-> 
-> Signed-off-by: Damien Riégel <damien.riegel@silabs.com>
-> ---
->  drivers/net/cpc/Kconfig  |   3 +-
->  drivers/net/cpc/Makefile |   2 +-
->  drivers/net/cpc/main.c   |   8 +
->  drivers/net/cpc/spi.c    | 550 +++++++++++++++++++++++++++++++++++++++
->  drivers/net/cpc/spi.h    |  12 +
->  5 files changed, 573 insertions(+), 2 deletions(-)
->  create mode 100644 drivers/net/cpc/spi.c
->  create mode 100644 drivers/net/cpc/spi.h
-> 
-> diff --git a/drivers/net/cpc/Kconfig b/drivers/net/cpc/Kconfig
-> index f31b6837b49..f5159390a82 100644
-> --- a/drivers/net/cpc/Kconfig
-> +++ b/drivers/net/cpc/Kconfig
-> @@ -2,7 +2,8 @@
->  
->  menuconfig CPC
->  	tristate "Silicon Labs Co-Processor Communication (CPC) Protocol"
-> -	depends on NET
-> +	depends on NET && SPI
-> +	select CRC_ITU_T
->  	help
->  	  Provide support for the CPC protocol to Silicon Labs EFR32 devices.
->  
-> diff --git a/drivers/net/cpc/Makefile b/drivers/net/cpc/Makefile
-> index a61af84df90..195cdf4ad62 100644
-> --- a/drivers/net/cpc/Makefile
-> +++ b/drivers/net/cpc/Makefile
-> @@ -1,5 +1,5 @@
->  # SPDX-License-Identifier: GPL-2.0
->  
-> -cpc-y := endpoint.o header.o interface.o main.o protocol.o system.o
-> +cpc-y := endpoint.o header.o interface.o main.o protocol.o spi.o system.o
->  
->  obj-$(CONFIG_CPC)	+= cpc.o
-> diff --git a/drivers/net/cpc/main.c b/drivers/net/cpc/main.c
-> index fc46a25f5dc..b4e73145ac2 100644
-> --- a/drivers/net/cpc/main.c
-> +++ b/drivers/net/cpc/main.c
-> @@ -8,6 +8,7 @@
->  
->  #include "cpc.h"
->  #include "header.h"
-> +#include "spi.h"
->  #include "system.h"
->  
->  /**
-> @@ -126,12 +127,19 @@ static int __init cpc_init(void)
->  	if (err)
->  		bus_unregister(&cpc_bus);
->  
-> +	err = cpc_spi_register_driver();
-> +	if (err) {
-> +		cpc_system_drv_unregister();
-> +		bus_unregister(&cpc_bus);
-> +	}
-> +
->  	return err;
->  }
->  module_init(cpc_init);
->  
->  static void __exit cpc_exit(void)
->  {
-> +	cpc_spi_unregister_driver();
->  	cpc_system_drv_unregister();
->  	bus_unregister(&cpc_bus);
->  }
-> diff --git a/drivers/net/cpc/spi.c b/drivers/net/cpc/spi.c
-> new file mode 100644
-> index 00000000000..2b068eeb5d4
-> --- /dev/null
-> +++ b/drivers/net/cpc/spi.c
-> @@ -0,0 +1,550 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (c) 2025, Silicon Laboratories, Inc.
-> + */
-> +
-> +#include <linux/atomic.h>
-> +#include <linux/crc-itu-t.h>
-> +#include <linux/delay.h>
-> +#include <linux/device.h>
-> +#include <linux/interrupt.h>
-> +#include <linux/kthread.h>
-> +#include <linux/minmax.h>
-> +#include <linux/of.h>
-> +#include <linux/skbuff.h>
-> +#include <linux/slab.h>
-> +#include <linux/spi/spi.h>
-> +#include <linux/unaligned.h>
-> +#include <linux/wait.h>
-> +
-> +#include "cpc.h"
-> +#include "header.h"
-> +#include "interface.h"
-> +#include "spi.h"
-> +
-> +#define CPC_SPI_CSUM_SIZE		2
-> +#define CPC_SPI_INTERRUPT_MAX_WAIT_MS	1000
-> +#define CPC_SPI_MAX_PAYLOAD_SIZE	4096
-> +
-> +struct cpc_spi {
-> +	struct spi_device *spi;
-> +	struct cpc_interface *intf;
-> +
-> +	struct task_struct *task;
-> +	wait_queue_head_t event_queue;
-> +
-> +	struct sk_buff *tx_skb;
-> +	u8 tx_csum[CPC_SPI_CSUM_SIZE];
-> +
-> +	atomic_t event_cond;
-> +	struct sk_buff *rx_skb;
-> +	unsigned int rx_len;
-> +	u8 rx_header[CPC_HEADER_SIZE + CPC_SPI_CSUM_SIZE];
-> +};
-> +
-> +static bool buffer_is_zeroes(const u8 *buffer, size_t length)
-> +{
-> +	for (size_t i = 0; i < length; i++) {
-> +		if (buffer[i] != 0)
-> +			return false;
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +static u16 cpc_spi_csum(const u8 *buffer, size_t length)
-> +{
-> +	return crc_itu_t(0, buffer, length);
-> +}
-> +
-> +static int cpc_spi_do_xfer_header(struct cpc_spi *ctx)
-> +{
-> +	struct spi_transfer xfer_header = {
-> +		.rx_buf = ctx->rx_header,
-> +		.len = CPC_HEADER_SIZE,
-> +		.speed_hz = ctx->spi->max_speed_hz,
-> +	};
-> +	struct spi_transfer xfer_csum = {
-> +		.rx_buf = &ctx->rx_header[CPC_HEADER_SIZE],
-> +		.len = sizeof(ctx->tx_csum),
-> +		.speed_hz = ctx->spi->max_speed_hz,
-> +	};
-> +	enum cpc_frame_type type;
-> +	struct spi_message msg;
-> +	size_t payload_len = 0;
-> +	struct sk_buff *skb;
-> +	u16 rx_csum;
-> +	u16 csum;
-> +	int ret;
-> +
-> +	if (ctx->tx_skb) {
-> +		u16 tx_hdr_csum = cpc_spi_csum(ctx->tx_skb->data, CPC_HEADER_SIZE);
-> +
-> +		put_unaligned_le16(tx_hdr_csum, ctx->tx_csum);
-> +
-> +		xfer_header.tx_buf = ctx->tx_skb->data;
-> +		xfer_csum.tx_buf = ctx->tx_csum;
-> +	}
-> +
-> +	spi_message_init(&msg);
-> +	spi_message_add_tail(&xfer_header, &msg);
-> +	spi_message_add_tail(&xfer_csum, &msg);
-> +
-> +	ret = spi_sync(ctx->spi, &msg);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (ctx->tx_skb) {
-> +		if (skb_headlen(ctx->tx_skb) == CPC_HEADER_SIZE) {
-> +			kfree_skb(ctx->tx_skb);
-> +			ctx->tx_skb = NULL;
-> +		} else {
-> +			skb_pull(ctx->tx_skb, CPC_HEADER_SIZE);
-> +		}
-> +	}
-> +
-> +	if (buffer_is_zeroes(ctx->rx_header, CPC_HEADER_SIZE))
-> +		return 0;
-> +
-> +	rx_csum = get_unaligned_le16(&ctx->rx_header[CPC_HEADER_SIZE]);
-> +	csum = cpc_spi_csum(ctx->rx_header, CPC_HEADER_SIZE);
-> +
-> +	if (rx_csum != csum || !cpc_header_get_type(ctx->rx_header, &type)) {
-> +		/*
-> +		 * If the header checksum is invalid, its length can't be trusted, receive
-> +		 * the maximum payload length to recover from that situation. If the frame
-> +		 * type cannot be extracted from the header, use same recovery mechanism.
-> +		 */
-> +		ctx->rx_len = CPC_SPI_MAX_PAYLOAD_SIZE;
-> +
-> +		return 0;
-> +	}
-> +
-> +	if (type == CPC_FRAME_TYPE_DATA)
-> +		payload_len = cpc_header_get_payload_len(ctx->rx_header) +
-> +			      sizeof(ctx->tx_csum);
-> +
-> +	skb = cpc_skb_alloc(payload_len, GFP_KERNEL);
-> +	if (!skb) {
-> +		/*
-> +		 * Failed to allocate memory to receive the payload. Driver must clock in
-> +		 * these bytes even if there is no room, to keep the sender in sync.
-> +		 */
-> +		ctx->rx_len = payload_len;
-> +
-> +		return 0;
-> +	}
-> +
-> +	memcpy(skb_push(skb, CPC_HEADER_SIZE), ctx->rx_header, CPC_HEADER_SIZE);
-> +
-> +	if (payload_len) {
-> +		ctx->rx_skb = skb;
-> +		ctx->rx_len = payload_len;
-> +	} else {
-> +		cpc_interface_receive_frame(ctx->intf, skb);
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int cpc_spi_do_xfer_notch(struct cpc_spi *ctx)
-> +{
-> +	struct spi_transfer xfer = {
-> +		.tx_buf = ctx->tx_csum,
-> +		.len = 1,
-> +		.speed_hz = ctx->spi->max_speed_hz,
-> +	};
-> +	struct spi_message msg;
-> +
-> +	ctx->tx_csum[0] = 0;
-> +
-> +	spi_message_init(&msg);
-> +	spi_message_add_tail(&xfer, &msg);
-> +
-> +	return spi_sync(ctx->spi, &msg);
-> +}
-> +
-> +static int cpc_spi_do_xfer_payload(struct cpc_spi *ctx)
-> +{
-> +	struct spi_transfer shared_xfer = {
-> +		.speed_hz = ctx->spi->max_speed_hz,
-> +		.rx_buf = NULL,
-> +		.tx_buf = NULL,
-> +	};
-> +	struct spi_transfer pad_xfer1 = {
-> +		.speed_hz = ctx->spi->max_speed_hz,
-> +		.rx_buf = NULL,
-> +		.tx_buf = NULL,
-> +	};
-> +	struct spi_transfer pad_xfer2 = {
-> +		.speed_hz = ctx->spi->max_speed_hz,
-> +		.rx_buf = NULL,
-> +		.tx_buf = NULL,
-> +	};
-> +	unsigned int rx_len = ctx->rx_len;
-> +	unsigned int tx_data_len;
-> +	struct spi_message msg;
-> +	int ret;
-> +
-> +	spi_message_init(&msg);
-> +	spi_message_add_tail(&shared_xfer, &msg);
-> +
-> +	/*
-> +	 * This can happen if header checksum was invalid. In that case, protocol
-> +	 * mandates to be ready to receive the maximum number of bytes that the
-> +	 * device is capable to send, in order to be sure its TX queue is flushed.
-> +	 */
-> +	if (!ctx->rx_skb && rx_len) {
-> +		shared_xfer.rx_buf = kmalloc(rx_len, GFP_KERNEL);
-> +		if (!shared_xfer.rx_buf)
-> +			return -ENOMEM;
-> +
-> +		shared_xfer.len = rx_len;
-> +	}
-> +
-> +	if (ctx->rx_skb && !ctx->tx_skb) {
-> +		shared_xfer.rx_buf = skb_put(ctx->rx_skb, rx_len);
-> +		shared_xfer.len = rx_len;
-> +	}
-> +
-> +	if (ctx->tx_skb) {
-> +		u16 csum = ctx->tx_skb->csum;
-> +
-> +		put_unaligned_le16(csum, ctx->tx_csum);
-> +
-> +		tx_data_len = ctx->tx_skb->len;
-> +
-> +		shared_xfer.tx_buf = ctx->tx_skb->data;
-> +		shared_xfer.len = tx_data_len;
-> +
-> +		if (!ctx->rx_skb) {
-> +			pad_xfer1.tx_buf = ctx->tx_csum;
-> +			pad_xfer1.len = sizeof(ctx->tx_csum);
-> +
-> +			spi_message_add_tail(&pad_xfer1, &msg);
-> +		}
-> +	}
-> +
-> +	if (ctx->rx_skb && ctx->tx_skb) {
-> +		unsigned int shared_len;
-> +		unsigned int pad_len;
-> +
-> +		shared_len = min(rx_len, tx_data_len);
-> +		pad_len = max(rx_len, tx_data_len) - shared_len;
-> +
-> +		shared_xfer.rx_buf = skb_put(ctx->rx_skb, shared_len);
-> +		shared_xfer.len = shared_len;
-> +
-> +		if (rx_len < tx_data_len) {
-> +			/*
-> +			 * |------- RX BUFFER + RX CSUM ------|
-> +			 * |------------------- TX BUFFER ------------|---- TX CSUM ----|
-> +			 *
-> +			 * |             SHARED               |
-> +			 *                                    | PAD 1 |
-> +			 *                                            |      PAD 2      |
-> +			 */
-> +			pad_xfer1.rx_buf = NULL;
-> +			pad_xfer1.tx_buf = ctx->tx_skb->data + shared_len;
-> +			pad_xfer1.len = pad_len;
-> +
-> +			pad_xfer2.rx_buf = NULL;
-> +			pad_xfer2.tx_buf = ctx->tx_csum;
-> +			pad_xfer2.len = sizeof(ctx->tx_csum);
-> +
-> +			spi_message_add_tail(&pad_xfer1, &msg);
-> +			spi_message_add_tail(&pad_xfer2, &msg);
-> +		} else if (rx_len == tx_data_len) {
-> +			/*
-> +			 * |------------- RX BUFFER + RX CSUM ---------|
-> +			 * |------------------- TX BUFFER -------------|---- TX CSUM ---|
-> +			 *
-> +			 * |             SHARED                        |
-> +			 *                                             |      PAD 1     |
-> +			 */
-> +			pad_xfer1.rx_buf = NULL;
-> +			pad_xfer1.tx_buf = ctx->tx_csum;
-> +			pad_xfer1.len = sizeof(ctx->tx_csum);
-> +
-> +			spi_message_add_tail(&pad_xfer1, &msg);
-> +		} else if (rx_len == tx_data_len + 1) {
-> +			/*
-> +			 * |----------------- RX BUFFER + RX CSUM ----------------|
-> +			 * |------------------- TX BUFFER -------------|---- TX CSUM ---|
-> +			 *
-> +			 * |             SHARED                        |
-> +			 *                                             |  PAD 1 |
-> +			 *                                                      | PAD 2 |
-> +			 */
-> +			pad_xfer1.tx_buf = ctx->tx_csum;
-> +			pad_xfer1.rx_buf = skb_put(ctx->rx_skb, 1);
-> +			pad_xfer1.len = 1;
-> +
-> +			pad_xfer2.tx_buf = &ctx->tx_csum[1];
-> +			pad_xfer2.rx_buf = NULL;
-> +			pad_xfer2.len = 1;
-> +
-> +			spi_message_add_tail(&pad_xfer1, &msg);
-> +			spi_message_add_tail(&pad_xfer2, &msg);
-> +		} else {
-> +			/*
-> +			 * |----------------------------- RX BUFFER + RX CSUM -------------------|
-> +			 * |------------------- TX BUFFER -------------|---- TX CSUM ---|
-> +			 *
-> +			 * |             SHARED                        |
-> +			 *                                             |       PAD 1    |
-> +			 *                                                              |  PAD 2 |
-> +			 */
-> +			pad_xfer1.tx_buf = ctx->tx_csum;
-> +			pad_xfer1.rx_buf = skb_put(ctx->rx_skb, sizeof(ctx->tx_csum));
-> +			pad_xfer1.len = sizeof(ctx->tx_csum);
-> +
-> +			pad_xfer2.tx_buf = NULL;
-> +			pad_xfer2.rx_buf = skb_put(ctx->rx_skb, pad_len - sizeof(ctx->tx_csum));
-> +			pad_xfer2.len = pad_len - sizeof(ctx->tx_csum);
-> +
-> +			spi_message_add_tail(&pad_xfer1, &msg);
-> +			spi_message_add_tail(&pad_xfer2, &msg);
-> +		}
-> +	}
-> +
-> +	ret = spi_sync(ctx->spi, &msg);
-> +
-> +	if (ctx->tx_skb) {
-> +		kfree_skb(ctx->tx_skb);
-> +		ctx->tx_skb = NULL;
-> +	}
-> +
-> +	if (ctx->rx_skb) {
-> +		unsigned char *csum_ptr;
-> +		u16 expected_csum;
-> +		u16 csum;
-> +
-> +		if (ret) {
-> +			kfree_skb(ctx->rx_skb);
-> +			goto exit;
-> +		}
-> +
-> +		csum_ptr = skb_tail_pointer(ctx->rx_skb) - sizeof(csum);
-> +		csum = get_unaligned_le16(csum_ptr);
-> +
-> +		expected_csum = cpc_spi_csum(ctx->rx_skb->data + CPC_HEADER_SIZE,
-> +					     ctx->rx_len - sizeof(csum));
-> +
-> +		if (csum == expected_csum) {
-> +			skb_trim(ctx->rx_skb, ctx->rx_skb->len - sizeof(csum));
-> +
-> +			cpc_interface_receive_frame(ctx->intf, ctx->rx_skb);
-> +		} else {
-> +			kfree_skb(ctx->rx_skb);
-> +		}
-> +	}
-> +
-> +exit:
-> +	ctx->rx_skb = NULL;
-> +	ctx->rx_len = 0;
-> +
-> +	return ret;
-> +}
-> +
-> +static int cpc_spi_do_xfer_thread(void *data)
-> +{
-> +	struct cpc_spi *ctx = data;
-> +	bool xfer_idle = true;
-> +	int ret;
-> +
-> +	while (!kthread_should_stop()) {
-> +		if (xfer_idle) {
-> +			ret = wait_event_interruptible(ctx->event_queue,
-> +						       (!cpc_interface_tx_queue_empty(ctx->intf) ||
-> +							atomic_read(&ctx->event_cond) == 1 ||
-> +							kthread_should_stop()));
-> +
-> +			if (ret)
-> +				continue;
-> +
-> +			if (kthread_should_stop())
-> +				return 0;
-> +
-> +			if (!ctx->tx_skb)
-> +				ctx->tx_skb = cpc_interface_dequeue(ctx->intf);
-> +
-> +			/*
-> +			 * Reset thread event right before transmission to prevent interrupts that
-> +			 * happened while the thread was already awake to wake up the thread again,
-> +			 * as the event is going to be handled by this iteration.
-> +			 */
-> +			atomic_set(&ctx->event_cond, 0);
-> +
-> +			ret = cpc_spi_do_xfer_header(ctx);
-> +			if (!ret)
-> +				xfer_idle = false;
-> +		} else {
-> +			ret = wait_event_timeout(ctx->event_queue,
-> +						 (atomic_read(&ctx->event_cond) == 1 ||
-> +						  kthread_should_stop()),
-> +						 msecs_to_jiffies(CPC_SPI_INTERRUPT_MAX_WAIT_MS));
-> +			if (ret == 0) {
-> +				dev_err_once(&ctx->spi->dev, "device didn't assert interrupt in a timely manner\n");
-> +				continue;
-> +			}
-> +
-> +			atomic_set(&ctx->event_cond, 0);
-> +
-> +			if (!ctx->tx_skb && !ctx->rx_skb)
-> +				ret = cpc_spi_do_xfer_notch(ctx);
-> +			else
-> +				ret = cpc_spi_do_xfer_payload(ctx);
-> +
-> +			if (!ret)
-> +				xfer_idle = true;
-> +		}
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static irqreturn_t cpc_spi_irq_handler(int irq, void *data)
-> +{
-> +	struct cpc_spi *ctx = data;
-> +
-> +	atomic_set(&ctx->event_cond, 1);
-> +	wake_up(&ctx->event_queue);
-> +
-> +	return IRQ_HANDLED;
-> +}
-> +
-> +static int cpc_spi_ops_wake_tx(struct cpc_interface *intf)
-> +{
-> +	struct cpc_spi *ctx = cpc_interface_get_priv(intf);
-> +
-> +	wake_up_interruptible(&ctx->event_queue);
-> +
-> +	return 0;
-> +}
-> +
-> +static void cpc_spi_ops_csum(struct sk_buff *skb)
-> +{
-> +	skb->csum = cpc_spi_csum(skb->data, skb->len);
-> +}
-> +
-> +static const struct cpc_interface_ops spi_intf_cpc_ops = {
-> +	.wake_tx = cpc_spi_ops_wake_tx,
-> +	.csum = cpc_spi_ops_csum,
-> +};
-> +
-> +static int cpc_spi_probe(struct spi_device *spi)
-> +{
-> +	struct cpc_interface *intf;
-> +	struct cpc_spi *ctx;
-> +	int err;
-> +
-> +	if (!spi->irq) {
-> +		dev_err(&spi->dev, "cannot function without IRQ, please provide one\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
-> +	if (!ctx)
-> +		return -ENOMEM;
-> +
-> +	intf = cpc_interface_alloc(&spi->dev, &spi_intf_cpc_ops, ctx);
-> +	if (IS_ERR(intf)) {
-> +		kfree(ctx);
-> +
-> +		return PTR_ERR(intf);
-> +	}
-> +
-> +	spi_set_drvdata(spi, ctx);
-> +
-> +	ctx->spi = spi;
-> +	ctx->intf = intf;
-> +
-> +	ctx->tx_skb = NULL;
-> +
-> +	atomic_set(&ctx->event_cond, 0);
-> +	ctx->rx_skb = NULL;
-> +
-> +	init_waitqueue_head(&ctx->event_queue);
-> +
-> +	err = cpc_interface_register(intf);
-> +	if (err)
-> +		goto put_interface;
-> +
-> +	err = request_irq(spi->irq, cpc_spi_irq_handler, IRQF_TRIGGER_FALLING,
-> +			  dev_name(&spi->dev), ctx);
-> +	if (err)
-> +		goto unregister_interface;
-> +
-> +	ctx->task = kthread_run(cpc_spi_do_xfer_thread, ctx, "%s",
-> +				dev_name(&spi->dev));
-> +	if (IS_ERR(ctx->task)) {
-> +		err = PTR_ERR(ctx->task);
-> +		goto free_irq;
-> +	}
-> +
-> +	return 0;
-> +
-> +free_irq:
-> +	free_irq(spi->irq, ctx);
-> +
-> +unregister_interface:
-> +	cpc_interface_unregister(intf);
-> +
-> +put_interface:
-> +	cpc_interface_put(intf);
-> +
-> +	kfree(ctx);
-> +
-> +	return err;
-> +}
-> +
-> +static void cpc_spi_remove(struct spi_device *spi)
-> +{
-> +	struct cpc_spi *ctx = spi_get_drvdata(spi);
-> +	struct cpc_interface *intf = ctx->intf;
-> +
-> +	kthread_stop(ctx->task);
-> +	free_irq(spi->irq, ctx);
-> +	cpc_interface_unregister(intf);
-> +	kfree(ctx);
-> +}
-> +
-> +static const struct of_device_id cpc_dt_ids[] = {
-> +	{ .compatible = "silabs,cpc-spi" },
-> +	{},
-> +};
-> +MODULE_DEVICE_TABLE(of, cpc_dt_ids);
-> +
-> +static const struct spi_device_id cpc_spi_ids[] = {
-> +	{ .name = "cpc-spi" },
-> +	{},
-> +};
-> +MODULE_DEVICE_TABLE(spi, cpc_spi_ids);
-> +
-> +static struct spi_driver cpc_spi_driver = {
-> +	.driver = {
-> +		.name = "cpc-spi",
-> +		.of_match_table = cpc_dt_ids,
-> +	},
+From: Pablo Neira Ayuso <pablo@netfilter.org>
 
-Quoting an earlier patch:
+[ Upstream commit 86a1471d7cde792941109b93b558b5dc078b9ee9 ]
 
-> As a very basic matching mechanism, the bus will match an endpoint
-> with its driver if driver's name (driver.name attribute) matches
-> endpoint's name.
+The delete set command does not rely on the transaction object for
+element removal, therefore, a combination of delete element + delete set
+from the abort path could result in restoring twice the refcount of the
+mapping.
 
-Don't you want silabs in the name, so you can tell it from some other
-vendors SPI bus?
+Check for inactive element in the next generation for the delete element
+command in the abort path, skip restoring state if next generation bit
+has been already cleared. This is similar to the activate logic using
+the set walk iterator.
 
-	Andrew
+[ 6170.286929] ------------[ cut here ]------------
+[ 6170.286939] WARNING: CPU: 6 PID: 790302 at net/netfilter/nf_tables_api.c:2086 nf_tables_chain_destroy+0x1f7/0x220 [nf_tables]
+[ 6170.287071] Modules linked in: [...]
+[ 6170.287633] CPU: 6 PID: 790302 Comm: kworker/6:2 Not tainted 6.9.0-rc3+ #365
+[ 6170.287768] RIP: 0010:nf_tables_chain_destroy+0x1f7/0x220 [nf_tables]
+[ 6170.287886] Code: df 48 8d 7d 58 e8 69 2e 3b df 48 8b 7d 58 e8 80 1b 37 df 48 8d 7d 68 e8 57 2e 3b df 48 8b 7d 68 e8 6e 1b 37 df 48 89 ef eb c4 <0f> 0b 48 83 c4 08 5b 5d 41 5c 41 5d 41 5e 41 5f c3 cc cc cc cc 0f
+[ 6170.287895] RSP: 0018:ffff888134b8fd08 EFLAGS: 00010202
+[ 6170.287904] RAX: 0000000000000001 RBX: ffff888125bffb28 RCX: dffffc0000000000
+[ 6170.287912] RDX: 0000000000000003 RSI: ffffffffa20298ab RDI: ffff88811ebe4750
+[ 6170.287919] RBP: ffff88811ebe4700 R08: ffff88838e812650 R09: fffffbfff0623a55
+[ 6170.287926] R10: ffffffff8311d2af R11: 0000000000000001 R12: ffff888125bffb10
+[ 6170.287933] R13: ffff888125bffb10 R14: dead000000000122 R15: dead000000000100
+[ 6170.287940] FS:  0000000000000000(0000) GS:ffff888390b00000(0000) knlGS:0000000000000000
+[ 6170.287948] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 6170.287955] CR2: 00007fd31fc00710 CR3: 0000000133f60004 CR4: 00000000001706f0
+[ 6170.287962] Call Trace:
+[ 6170.287967]  <TASK>
+[ 6170.287973]  ? __warn+0x9f/0x1a0
+[ 6170.287986]  ? nf_tables_chain_destroy+0x1f7/0x220 [nf_tables]
+[ 6170.288092]  ? report_bug+0x1b1/0x1e0
+[ 6170.287986]  ? nf_tables_chain_destroy+0x1f7/0x220 [nf_tables]
+[ 6170.288092]  ? report_bug+0x1b1/0x1e0
+[ 6170.288104]  ? handle_bug+0x3c/0x70
+[ 6170.288112]  ? exc_invalid_op+0x17/0x40
+[ 6170.288120]  ? asm_exc_invalid_op+0x1a/0x20
+[ 6170.288132]  ? nf_tables_chain_destroy+0x2b/0x220 [nf_tables]
+[ 6170.288243]  ? nf_tables_chain_destroy+0x1f7/0x220 [nf_tables]
+[ 6170.288366]  ? nf_tables_chain_destroy+0x2b/0x220 [nf_tables]
+[ 6170.288483]  nf_tables_trans_destroy_work+0x588/0x590 [nf_tables]
+
+Fixes: 591054469b3e ("netfilter: nf_tables: revisit chain/object refcounting from elements")
+Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+[fixed conflicts due to missing commits
+ 0e1ea651c9717ddcd8e0648d8468477a31867b0a ("netfilter: nf_tables: shrink
+ memory consumption of set elements") and
+ 9dad402b89e81a0516bad5e0ac009b7a0a80898f ("netfilter: nf_tables: expose
+ opaque set element as struct nft_elem_priv") so we pass the correct types
+ and values to nft_setelem_active_next() + nft_set_elem_ext()]
+Signed-off-by: Jianqi Ren <jianqi.ren.cn@windriver.com>
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+Verified the build test
+---
+ net/netfilter/nf_tables_api.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
+index 656c4fb76773..1d4d77d21d61 100644
+--- a/net/netfilter/nf_tables_api.c
++++ b/net/netfilter/nf_tables_api.c
+@@ -6772,6 +6772,16 @@ void nft_data_hold(const struct nft_data *data, enum nft_data_types type)
+ 	}
+ }
+ 
++static int nft_setelem_active_next(const struct net *net,
++				   const struct nft_set *set,
++				   struct nft_set_elem *elem)
++{
++	const struct nft_set_ext *ext = nft_set_elem_ext(set, elem->priv);
++	u8 genmask = nft_genmask_next(net);
++
++	return nft_set_elem_active(ext, genmask);
++}
++
+ static void nft_setelem_data_activate(const struct net *net,
+ 				      const struct nft_set *set,
+ 				      struct nft_set_elem *elem)
+@@ -10115,8 +10125,10 @@ static int __nf_tables_abort(struct net *net, enum nfnl_abort_action action)
+ 		case NFT_MSG_DELSETELEM:
+ 			te = (struct nft_trans_elem *)trans->data;
+ 
+-			nft_setelem_data_activate(net, te->set, &te->elem);
+-			nft_setelem_activate(net, te->set, &te->elem);
++			if (!nft_setelem_active_next(net, te->set, &te->elem)) {
++				nft_setelem_data_activate(net, te->set, &te->elem);
++				nft_setelem_activate(net, te->set, &te->elem);
++			}
+ 			if (!nft_setelem_is_catchall(te->set, &te->elem))
+ 				te->set->ndeact--;
+ 
+-- 
+2.34.1
+
 
