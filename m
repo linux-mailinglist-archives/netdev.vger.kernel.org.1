@@ -1,354 +1,238 @@
-Return-Path: <netdev+bounces-189711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C554AB349D
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 12:15:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57D5CAB3508
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 12:38:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF64D189C7A5
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 10:16:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED726189FFEF
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 10:38:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D04D570805;
-	Mon, 12 May 2025 10:15:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C30F267393;
+	Mon, 12 May 2025 10:38:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F0AVZguy"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="LqQPDMiV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2088.outbound.protection.outlook.com [40.107.93.88])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C016136C;
-	Mon, 12 May 2025 10:15:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747044946; cv=none; b=QZ+TQavdD9jqepbikKW2kZRWFJ3KAVZFNG021ZXdBgHdGrXTU9uJVpp1aorNeTdxrGyu/U16+daa27M8Kli82YaDkxw4tHcDtxf2AdAv5Dl613kL0Cp9iK5YDdoME59Og1xlIqjaefApZux5HKlEbN2XQStjiCyTUDi5OdpWvjA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747044946; c=relaxed/simple;
-	bh=YEVzF/4RhjzwytVvw9iWfdQD/vyZMyC3yGPu2a4DCkc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QNgJDKXL9xmuhNnEShpu/E/B0S7rW3MemoDBJgE5OEfHoii7eCdKDjsAMdwxygzcK7H9/lIRWoBDT8O14byW3QdEthUkXnlJRGlW+Mo3YMEoWiQpx1YX/AgWAXZbhs8duIcEsPXeuTzLZ5DeTk6CoY1fKtH18r+ZojMfccq+IXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F0AVZguy; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-ad24ee085a8so164340766b.0;
-        Mon, 12 May 2025 03:15:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747044943; x=1747649743; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=NlOkLKKLO78ZMSCYDMZCAd10hMDoDs86MSNcBVk2Ats=;
-        b=F0AVZguyxmCpmCtrgYijgmXB40/3iKKqKh27pekprEfS13dD6hGhhuZ5V+cvODYVYD
-         oySBQvrr0py2s7LIj7+XrNKb9lrmdmrB8Ch1Mq1VdSdyK0nBPvEub+W17kHDnESWC5Y8
-         g34Y65pSxYcSDNpL2GhsmnEidDbQ2vsbklwNmJsJS52mupvQKVzUCTF632aabCTVolJv
-         19VLaJDIIdoQ1VqHttXw8hnmpGdvrApgGGANecejWGypLtt1Xb3LoCtm0vOzFz1Y1XOM
-         G1FJi8XnkH2NbwCqMnlPenwBXsI+3BRg5W5BLg4U2P7Ivj1Of8FFlfHPgiZmcgETSOtP
-         JStQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747044943; x=1747649743;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NlOkLKKLO78ZMSCYDMZCAd10hMDoDs86MSNcBVk2Ats=;
-        b=wuLBODa/ZFNWgOPCMrYhkhs1L++JziQ7Wy+toliFkL4VWMnsXTTqQIUvkvylFyS0us
-         oYFOGbSxRhfwC4JqoUHUFGVkWJlWomrfApUa9w9NGxNLcqglX/vzejnZjKoBDX+AWya3
-         eyjgBL+qpHcftqPooOQhS5Q+p5P3ihhQlJ9BbPv57u2K/6yvUo6pJCu1k6b4LsvH2iqO
-         S5YtYzYlTAVY2mCg8SsVmnX64AKD6TyxRjgb+ibVWIbEXNxwtfrd+QB1g4yAhJDnXJdb
-         xbGGBWZmWx95vpGVPJCc4KfGcWNPFV0BTU4ZtRZG+2ONNGKhMhpGEWbd7vPfQsM8zopI
-         yadg==
-X-Forwarded-Encrypted: i=1; AJvYcCWBEkbmAySrmalwxLGaInczISo9uesM4ejPn54qwK4/Ez2WLUGnKnPk4bHWuG4f4L86/8cIqBHqYKECHVI=@vger.kernel.org, AJvYcCX2cBRqzTpgVIvVwmb9R1LLDzWGNuO0I8fXgAonC1Lh0jN/m4C9YHeM8ubPIpRbnXpu8ndDN0g3@vger.kernel.org
-X-Gm-Message-State: AOJu0YxV2rs+vSVC3u6NDZs5eJqFAibR0ngxH82gHRJP6MWIzb84kPn5
-	5ePAMm+yljVGUBhjKhiYoqiLlPmrmq+4bS7wKwGn7/W4JHY9OdNy
-X-Gm-Gg: ASbGncu4SC48oxa/JlJyKliNMdJjSUWq2gvTcP7YdcDZ37RzfNJXIjiEc5N+gUIYpds
-	HXUZSo5Rjj6G35n8L+7Syh8xzHwvO4WXnB0MQL0DeeC1uGvgu742VfIPbDY98qZeWSl/ehd1yfq
-	0Js4Dh3+g4c/nsUr+5YkIAmepQ1gN4TWRgUkoDc9qsecRqndmUZ5VUZlAqXEyqErdpTmtyzXkJc
-	mgGwj9nHgMXZba59v1UqCOeszOrixVbmJpDo09wDp6hUSJUNmY4SnnoVHBkHSEY+fKxyVkd0UhM
-	F6UJ3b4BQ/QFUYMkprYv95euNIH+mucVwx9tZoaJg4eTKtgXtOQD9aifAKF1iw==
-X-Google-Smtp-Source: AGHT+IHl8UycOLOMTfznPcamDojkGMvURWHkUedJ21DOo4ra8aV9W4b6j0uwidMFP5+ZW4JFdQ04jw==
-X-Received: by 2002:a17:907:a0ca:b0:acb:7105:61a5 with SMTP id a640c23a62f3a-ad218fef523mr1319402166b.32.1747044942579;
-        Mon, 12 May 2025 03:15:42 -0700 (PDT)
-Received: from debian-vm.localnet ([2a01:4b00:d20c:cd03:20c:29ff:fe56:c86])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad22a3a1501sm473051866b.121.2025.05.12.03.15.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 May 2025 03:15:42 -0700 (PDT)
-From: Zak Kemble <zakkemble@gmail.com>
-To: Doug Berger <opendmb@gmail.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Zak Kemble <zakkemble@gmail.com>
-Subject: [PATCH v2] net: bcmgenet: tidy up stats, expose more stats in ethtool
-Date: Mon, 12 May 2025 11:15:20 +0100
-Message-Id: <20250512101521.1350-1-zakkemble@gmail.com>
-X-Mailer: git-send-email 2.39.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B479254AF3;
+	Mon, 12 May 2025 10:38:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.88
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747046291; cv=fail; b=B0/aNNXCfa2j3sBt4aYwcxmH7aE15BbmWGm8liAPqF9G58NS+xU8EHcF6EUG0Vr9nHIbspGSOsFf3Ue493Tbm4PRCeAe9kxwB6HtwzAbfmozaljn5Cb3108QCvFHnnopl/i3FEP6dZZ1PE2Hw6Se66mgPGOyC0AnluyOZQJKnJs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747046291; c=relaxed/simple;
+	bh=tT0GfeLmG+/GwUiQ+mEA49+Gad2vLfVhZpDvQeIG2rI=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Zt7d3PGsJpG7LSeUd/QglRooMTd7gvBe3lJ4m0+rb9SC96Erw3/Z5IM08WNT1KZkb2qGrxou5F8QqgPwIn+gz43QeGNk5w4UKatb2+pshKq9KUF3A7KYRJGmB8XH68xCw8gQuyGlF8av4dyMOnQCtQXa6UbEsv5+NtQ2XLNrXhA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=LqQPDMiV; arc=fail smtp.client-ip=40.107.93.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=r32Og9ygvPDH0+neAIlkWl3YftknF7fihm6ZFJ9HCvEANDIPpPJGS+XewWQkDCcg76oZz60z/w6clgI3BVmD5DfVuLK9y7uBu/DFpdQTsdipXctADSCliSPfFAZx/znb7zUaMTT+wY57UrRa89IIme8YFiIlWHy5sz4kJGTjIZvBvSrqaRvC94qcEF/8I4GrKm06diUaMv/Sq7Yi67mnh6hbpWrGMdE9MLrFW43QH0Fij5aGQFqW/REvO6JweOURmeGu65klsTz5SLREWxW44ZoLY3pGSX6gXsjAm8v9x9pHL3Nv+e04oIv3Drg41P/v4EPsXj6348ddWYAcYML+PQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lxML0DhBor0zS7lBwV8ofxhWmvpjbwODcYZqz+nUhxc=;
+ b=S5T+XBBOZzmO4EZE/kXvo/jRdMipQbGD3MP3NMO39ruQsN7rwAB9hKUnZov32H3QdTHJORJ1TqUI80diVyIq/0L6DQa5gtWjZ4r0bTfq8VCuMRooNWxNcs2WikoKKs3uItkqdeWfvJmOdq1N7x5OeTX5KOFZGJbk1exrcOh4bv9tVMkm7oagWTichClBMmpHIhcSWOiyjdCi5Iw+ntdLZeSeNUE6wTEXxdQoYlWLLW0wJ0X41N+VKw3Xd6Z/1Aw00MOmsCDxRejhWTVoMEiu4153h6oZIwu4/AceOVx7vKSjFKIuppCHrwCHkFuwoH14mITuiPGnww+zE1X33LygpQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lxML0DhBor0zS7lBwV8ofxhWmvpjbwODcYZqz+nUhxc=;
+ b=LqQPDMiVTYmDilEClO8g6BVJZ7te3RmCrJhMm5rBlZXRoVTjMHbAjIrgWKRK9BaZU2We1KViJmlULhrNG3+cCrkfcw6VmdSHoN6OrKVHp7Jnrxxgn+N3wDaaEExf+jPWUOC9rADnuDNec5kFIey2VG3lqabH9cQVM8Sy6hXontE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by BL4PR12MB9723.namprd12.prod.outlook.com (2603:10b6:208:4ed::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8699.25; Mon, 12 May
+ 2025 10:38:05 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%4]) with mapi id 15.20.8722.027; Mon, 12 May 2025
+ 10:38:05 +0000
+Message-ID: <9a37931d-0e40-4b46-bf2d-93b6c98aa2fd@amd.com>
+Date: Mon, 12 May 2025 11:38:00 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v14 09/22] cxl: prepare memdev creation for type2
+Content-Language: en-US
+To: Alison Schofield <alison.schofield@intel.com>,
+ alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+ dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+ dave.jiang@intel.com, Ben Cheatham <benjamin.cheatham@amd.com>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>
+References: <20250417212926.1343268-1-alejandro.lucero-palau@amd.com>
+ <20250417212926.1343268-10-alejandro.lucero-palau@amd.com>
+ <aBwDkBCw5k-6NksY@aschofie-mobl2.lan>
+From: Alejandro Lucero Palau <alucerop@amd.com>
+In-Reply-To: <aBwDkBCw5k-6NksY@aschofie-mobl2.lan>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO6P265CA0024.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:2ff::19) To DM6PR12MB4202.namprd12.prod.outlook.com
+ (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|BL4PR12MB9723:EE_
+X-MS-Office365-Filtering-Correlation-Id: cfa4309e-7cda-4ee2-98b6-08dd914113f4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|1800799024|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?blFxTEpJSnRHVUp2OXpxR3N4K0U4Uk9ndVovekFxME94NWFkd1lXbk9xWHdP?=
+ =?utf-8?B?R0dIMVlnYUVxR04xclJDRzhMWE9XWVB3Njl1SEhyY01CcDlBVEJQZG4wNzFP?=
+ =?utf-8?B?VlJnT1JaT2VOUzlwVnh1VmhuOE1iekFVM2ViZy84UGJQMnhERUc1THZMblpo?=
+ =?utf-8?B?eHprcWd6OUVrbFRpclZtRkxBalBqK3N6bElXaTZGZkgyU2pmdHlNN2hLOWFw?=
+ =?utf-8?B?Q1QxZHBadEd4eVIwdDdHaW52TTU4dW50REltQnArUS93clZDaFlTK244dmVt?=
+ =?utf-8?B?bE4rWVM5SEZ6cWdzZ2JOcXc4emRGVXBucmNRZ2E3dkhuUFlWbTM0TjJtTXd0?=
+ =?utf-8?B?YVZ3RnFFdXVWLzRyb3pSUnFPaHlOaXFsQkVjZ3gwdVBtUXlQUm53NEttQXZE?=
+ =?utf-8?B?Ulh3ZUxpY0NKVmdNeUdGMjQ3OFg5ZmJwc0IxOVpFbjZVZjFBTFJlcG9meGor?=
+ =?utf-8?B?azhpUUt2TjhlelhNdU16NVc2YWtOMEJGeG1Obmh3TEJUQnR5K1NUUXJnd0lD?=
+ =?utf-8?B?VHZGYnk0MU5ML25ONExzdTgwQVYyekw2WVowaFNyVmttc0RRbVJiR3BjVXo4?=
+ =?utf-8?B?aG1SYThMOFJ4a0FZZzZKcHk5dFpqQmFqNWgyMGZvdEtlZWN3aG1BSXlIcmEr?=
+ =?utf-8?B?cWVOVHloV2RCRllDU1phVFZTMFRTNGVyQWZUTjhiUHhNN2t1dEpQcGMrVmtU?=
+ =?utf-8?B?bDFiby83MEJsZEtHOFFvUE9UTHZDUnY0Yk0yd1NoZGFTQW5TOWNpUTZnTUp4?=
+ =?utf-8?B?UUMrWkhXOGRTd2I5ZlBTRER6S1pNV2ZSR3Y2MkM4cEZidnJwYUdobURrSGJC?=
+ =?utf-8?B?bDJZMXNnQVlvV1dlY3I1SEF0Q3lhT0dVMkVJdzdwalRLTVh1T0ZVaFg3c3o0?=
+ =?utf-8?B?RHkrc3h5ck1qU3Nhcnl5eHlCazFUd3V4aUh4QkQ5MzRPN21vK3JVY283Ujdo?=
+ =?utf-8?B?MU00WnpJZDgvVG4vcGl0SEZYVmNHTk1GdC9XeUl3ZkxKVmdWTGprMzdwbkRV?=
+ =?utf-8?B?MEZEWmpVc3N0YXJaZFljaFdRVC8wbFdGTmIrL21HWEZ5dEp3ekg3R1AzNzg0?=
+ =?utf-8?B?ZGxjdUl2K3BLNUNMUS8rbVVMWG5QQWFuUjBDTUN2VXROZmJJQVVIaGt4U1I5?=
+ =?utf-8?B?ckNVWWROWTZKd2J4YWwxY1p2QnE1dDhVRGRIbzJCRkVBWHhUTlNtcnhYVVpS?=
+ =?utf-8?B?cUNoNHpTelZ1VS9jQm5ORExBajNQQU15d0pGbklPNWhaUk8zb0E3ZHpTd3Np?=
+ =?utf-8?B?YlBFeFRqcjVsRE4vMUdWRVpSbjJQSEVPMWFQU2tCTmd6K3o0NHFzYk04Zndy?=
+ =?utf-8?B?Y0J4aHVhY3hDTWw1Ymp4T3dtSEx5bUJXY25GdzNIRWp1VUN6dnE5VmVWOVh3?=
+ =?utf-8?B?T2UrTzJPanNjOWQwRWs3YVViTkxwS1FRK1RzNzFrc1BKZDhKaERrWkRaNkh6?=
+ =?utf-8?B?Nmx6YWJZcjd1Ym1kYVNPRjJYQ1NCMm82cUVrTVc4RThIdUJXa0tWaytiSVhO?=
+ =?utf-8?B?QWZnY2xSUDhkYXlKcG10VDFoOUNWa1N6bVFQUFBsNTE4Y3hrRC9zdnB0NkVQ?=
+ =?utf-8?B?MjBDZlMyOGVYSG4rNnBBU0hIRXZpZTIrTG1DNmc1VFE5T2xrb2lwZTdoRm9s?=
+ =?utf-8?B?ekdMRXY1WWgzaEZYYTlkNEJKbS9VdWl6OTVYSTVXYlpMcGh2VHF1ZURGeHBa?=
+ =?utf-8?B?cjBBMHlsVlJ6UFRJaTB1TnJNejZJTlZZSTFhSlo2ZEd0TFNRdURQZzBZbGF0?=
+ =?utf-8?B?WFN4c0lxQ2NDaWZRMzk2VUZSYU5UUEtoOVNsQzZXcWhTdkRQMDRTd0FtWmRI?=
+ =?utf-8?B?VWJjc3hYYnlaT25nQmlCMG94WnM0R2JTQit0Kyt1cVprOXNXQWpjcUY4KzFK?=
+ =?utf-8?B?ZWRqS0E4RG1qS2hYOHA1T3lEVlRtSCtZK2t3NUk3WXdnRlpEeDd4NnZIeGF6?=
+ =?utf-8?Q?QMOIt02oKt4=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?UTZMZ01IanBtaUgwazRSOW9BRlVvZ3lwS253RUlMcDd6SVFIQU9sOXlqcHNi?=
+ =?utf-8?B?ejlFb3laQWpqenBpdm9hOTRqTkpTL0twTjlHSWE3T1NnRXc5bkdPaU0ydnFw?=
+ =?utf-8?B?RSt6NExiTUdkNWhXTlo4emxjMmw5elhpald6d0JKQVBvdUR5cDVjY0NEWGIw?=
+ =?utf-8?B?SEhWQ1hjUGlsNmZJdnUxMVROUEppSHNqRmNRWU0yOVlhODhDZndGN09SQVVP?=
+ =?utf-8?B?OHEwcDhYY0prcnE5RUxSSTNOUXZ1eWFEbElYTGpzUEplVmtsYWd0d1JDOHNz?=
+ =?utf-8?B?alZ0bStnMVYvTzVTdEdzQkI3QzVLZ01JNE5pWW12VmQ2eElKd1EvTFJXWTI5?=
+ =?utf-8?B?R3RiUmZXRG9MQm52Z2I5RXhJVUgxRDlmcmlGaWlUZ3ZnbldCK3lYREMrVkk5?=
+ =?utf-8?B?WXV6ekp6ZnAxR2xCdHluQVBqcVNaRmphSnlVa2xjcHYzU0N0NXRuL0VmM1Z1?=
+ =?utf-8?B?Q0FIbFo5bTAxSnlkL2JYMmFCVzV5TjZqWmppM1lQL0N0QlhhU3gzd01LYkl6?=
+ =?utf-8?B?c1JLWE9aOUhWMFJOZ3VZZFpxU1ovRDFDa1ZHTFhIMTlFWmVCLzlTU3IxQVh6?=
+ =?utf-8?B?ZTVDNXZ0bnQ3U2FaNlIvU2loZFZFdk1YWEV0dFZab1NXWXJqbDhOQzZWODJj?=
+ =?utf-8?B?UURsRDRHN3NUdUZhbVpxaDVSL3FOekJkUE9tUHZrbkN1NVlsOGhZaWZBdWNW?=
+ =?utf-8?B?emxnT1JDbnR1ZDJIZTFRV29UR0NTSlVyNjhuWHg4V1NyMmIveG9pcjBCanRo?=
+ =?utf-8?B?S3lIdDhsdkY0WmloWktRU3BuRE1ZSExHNkNwQ01CNUMvTFh3YXBsbG9BMmNL?=
+ =?utf-8?B?L01XbEpNbmI1Y0dDSDFnTjRadm82NGpJblptaTE0c3RBNjUrS0xHMmU4R04z?=
+ =?utf-8?B?TTN2bmRBMndIaGNKRkdLelFhNWVadllhUjBadlNqaDFvd0JVajdiNHNZSWJG?=
+ =?utf-8?B?OHNETWRZZCsvYk11bnFnd2FJZWJSbUlUbEFCYTRvcnRwVmRFMVdHYk1Cc0hY?=
+ =?utf-8?B?SVFqOHh2dXFmZ2t5a3lFcnJpRi94ak1Ua0NBVkxSVWxXZkNvQ0N0L3VvYW5u?=
+ =?utf-8?B?WHNvZ3REc1cxb2RNZmdhNW1lQThSZC9ma3NYWlN1WllTcFVRYytXNWp5YmlU?=
+ =?utf-8?B?cFdBOS95R2YraTFOTDV4UUkyak5lc1gwQUtJQ1ZqVHc3cHUrNzdhdGJhVXpl?=
+ =?utf-8?B?N1BrWk14dklvSU8rQnRsbC9UK0l0d1g5U2h4ZnUxeVlDTGdzVlZYZHUzaEVN?=
+ =?utf-8?B?NkdNRE1pQXlyWEhyeWxhRk1rUzIzTUZOSUJ6Mm5Jclp4V1grcHAyUDRtMW5U?=
+ =?utf-8?B?U2pKSEVBSVA3ZE9OY2w3R2k1NTZLUlZsNDJqVTV3dmVESHdzQnlpdnR4UllM?=
+ =?utf-8?B?RGZkNTFPeG1obytzSS82WElQVEc5SkZzWTBSYVYzSEtPS2RNcWYwMWtObTBM?=
+ =?utf-8?B?dGdReWx3V2JSTCs5QkZXU2JuUTByODN5d2RnNmRPa2hBMWpkd1BidVU3MHA2?=
+ =?utf-8?B?Rlp3MkpaL0NBM3VIWllnb0NMMFc4VHlna0RYdndpNEdHVm1SWDBpZmtJWVZy?=
+ =?utf-8?B?QXFLRXBuSVRGbDdER3VTMEhOVDdya1poWEtZVXRycUxyQmxRRFc5VmJMdUxk?=
+ =?utf-8?B?L2ZEeENpYXdMUU1UYzM1SHRkVTE3TFhwWW5aYm5FNHAvZlVCam42UERhZnJu?=
+ =?utf-8?B?ZHd4b0J6WXFhU1FPbHJOVHNKT01DMCs1SUc5TDBnc2VpQS96NWllT3pzVmky?=
+ =?utf-8?B?WWVTWWMyUitKNW1mZzFhaldHNnMvdTMweFlWbmhkTUJSVDgzSkpLVmxHV083?=
+ =?utf-8?B?ZTdSZTBSM3RDWDBOS3dTNzhFOGwvZ250cVl0Mmp4c05oTmp2Z0ZDQ2RjQjFQ?=
+ =?utf-8?B?a1g4OG1pQXpDT2NQRlUyMjNRZHhqMVplZEp6ejIzMVVic3hndzJWNm1LcEZT?=
+ =?utf-8?B?amcvLzRMU0FQamFlT1lPc0tXdlRxWEVNcTJvU21veEFQQUdkbjBpZ0pUOGty?=
+ =?utf-8?B?S0VyUS9uNVV1TExZYWZkaEFqK0NWekppVW1MZnA1emM1WUJ5eUlPVm9FVnFJ?=
+ =?utf-8?B?VlZ4VzR5N1g2RHpLeHlkRlBxekE0RUlnd25MWXhCemIzTExrWFFtcFVrNU1Q?=
+ =?utf-8?Q?34/DrgivSDYWk+Y6JF9cAyUl1?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cfa4309e-7cda-4ee2-98b6-08dd914113f4
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2025 10:38:05.3024
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 21ZHHdoqpa6jcwcVuT4QLVddBh/V8HdR0mDUfPB4aF5jiXAcwTY2mgIM/FBsrWMfoMnzO8r9NBP80tZGgmlGUw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL4PR12MB9723
 
-This patch exposes more statistics counters in ethtool and tidies up the
-counters so that they are all per-queue. The netdev counters are now only
-updated synchronously in bcmgenet_get_stats instead of a mix of sync/async
-throughout the driver. Hardware discarded packets are now counted in their
-own missed stat instead of being lumped in with general errors.
 
-Changes in v2:
-- Remove unused variable
-- Link to v1: https://lore.kernel.org/all/20250511214037.2805-1-zakkemble%40gmail.com
+On 5/8/25 02:06, Alison Schofield wrote:
+> On Thu, Apr 17, 2025 at 10:29:12PM +0100, alejandro.lucero-palau@amd.com wrote:
+>> From: Alejandro Lucero <alucerop@amd.com>
+>>
+>> Current cxl core is relying on a CXL_DEVTYPE_CLASSMEM type device when
+>> creating a memdev leading to problems when obtaining cxl_memdev_state
+>> references from a CXL_DEVTYPE_DEVMEM type.
+>>
+>> Modify check for obtaining cxl_memdev_state adding CXL_DEVTYPE_DEVMEM
+>> support.
+>>
+>> Make devm_cxl_add_memdev accessible from a accel driver.
+>>
+>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+>> Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
+>> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+>> Reviewed-by: Dave Jiang <dave.jiang@intel.com>
 
-Signed-off-by: Zak Kemble <zakkemble@gmail.com>
----
- .../net/ethernet/broadcom/genet/bcmgenet.c    | 88 +++++++++++++++----
- .../net/ethernet/broadcom/genet/bcmgenet.h    | 10 +++
- 2 files changed, 82 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-index 73d78dcb7..77fa08878 100644
---- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-+++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-@@ -1018,6 +1018,8 @@ struct bcmgenet_stats {
- 			tx_rings[num].packets), \
- 	STAT_GENET_SOFT_MIB("txq" __stringify(num) "_bytes", \
- 			tx_rings[num].bytes), \
-+	STAT_GENET_SOFT_MIB("txq" __stringify(num) "_errors", \
-+			tx_rings[num].errors), \
- 	STAT_GENET_SOFT_MIB("rxq" __stringify(num) "_bytes", \
- 			rx_rings[num].bytes),	 \
- 	STAT_GENET_SOFT_MIB("rxq" __stringify(num) "_packets", \
-@@ -1025,7 +1027,23 @@ struct bcmgenet_stats {
- 	STAT_GENET_SOFT_MIB("rxq" __stringify(num) "_errors", \
- 			rx_rings[num].errors), \
- 	STAT_GENET_SOFT_MIB("rxq" __stringify(num) "_dropped", \
--			rx_rings[num].dropped)
-+			rx_rings[num].dropped), \
-+	STAT_GENET_SOFT_MIB("rxq" __stringify(num) "_multicast", \
-+			rx_rings[num].multicast), \
-+	STAT_GENET_SOFT_MIB("rxq" __stringify(num) "_missed", \
-+			rx_rings[num].missed), \
-+	STAT_GENET_SOFT_MIB("rxq" __stringify(num) "_length_errors", \
-+			rx_rings[num].length_errors), \
-+	STAT_GENET_SOFT_MIB("rxq" __stringify(num) "_over_errors", \
-+			rx_rings[num].over_errors), \
-+	STAT_GENET_SOFT_MIB("rxq" __stringify(num) "_crc_errors", \
-+			rx_rings[num].crc_errors), \
-+	STAT_GENET_SOFT_MIB("rxq" __stringify(num) "_frame_errors", \
-+			rx_rings[num].frame_errors), \
-+	STAT_GENET_SOFT_MIB("rxq" __stringify(num) "_fragmented_errors", \
-+			rx_rings[num].fragmented_errors), \
-+	STAT_GENET_SOFT_MIB("rxq" __stringify(num) "_broadcast", \
-+			rx_rings[num].broadcast)
- 
- /* There is a 0xC gap between the end of RX and beginning of TX stats and then
-  * between the end of TX stats and the beginning of the RX RUNT
-@@ -1046,6 +1064,11 @@ static const struct bcmgenet_stats bcmgenet_gstrings_stats[] = {
- 	STAT_NETDEV(rx_dropped),
- 	STAT_NETDEV(tx_dropped),
- 	STAT_NETDEV(multicast),
-+	STAT_NETDEV(rx_missed_errors),
-+	STAT_NETDEV(rx_length_errors),
-+	STAT_NETDEV(rx_over_errors),
-+	STAT_NETDEV(rx_crc_errors),
-+	STAT_NETDEV(rx_frame_errors),
- 	/* UniMAC RSV counters */
- 	STAT_GENET_MIB_RX("rx_64_octets", mib.rx.pkt_cnt.cnt_64),
- 	STAT_GENET_MIB_RX("rx_65_127_oct", mib.rx.pkt_cnt.cnt_127),
-@@ -1983,7 +2006,8 @@ static void bcmgenet_tx_reclaim_all(struct net_device *dev)
-  * the transmit checksum offsets in the descriptors
-  */
- static struct sk_buff *bcmgenet_add_tsb(struct net_device *dev,
--					struct sk_buff *skb)
-+					struct sk_buff *skb,
-+					struct bcmgenet_tx_ring *ring)
- {
- 	struct bcmgenet_priv *priv = netdev_priv(dev);
- 	struct status_64 *status = NULL;
-@@ -2001,7 +2025,7 @@ static struct sk_buff *bcmgenet_add_tsb(struct net_device *dev,
- 		if (!new_skb) {
- 			dev_kfree_skb_any(skb);
- 			priv->mib.tx_realloc_tsb_failed++;
--			dev->stats.tx_dropped++;
-+			ring->dropped++;
- 			return NULL;
- 		}
- 		dev_consume_skb_any(skb);
-@@ -2089,7 +2113,7 @@ static netdev_tx_t bcmgenet_xmit(struct sk_buff *skb, struct net_device *dev)
- 	GENET_CB(skb)->bytes_sent = skb->len;
- 
- 	/* add the Transmit Status Block */
--	skb = bcmgenet_add_tsb(dev, skb);
-+	skb = bcmgenet_add_tsb(dev, skb, ring);
- 	if (!skb) {
- 		ret = NETDEV_TX_OK;
- 		goto out;
-@@ -2253,7 +2277,7 @@ static unsigned int bcmgenet_desc_rx(struct bcmgenet_rx_ring *ring,
- 		   DMA_P_INDEX_DISCARD_CNT_MASK;
- 	if (discards > ring->old_discards) {
- 		discards = discards - ring->old_discards;
--		ring->errors += discards;
-+		ring->missed += discards;
- 		ring->old_discards += discards;
- 
- 		/* Clear HW register when we reach 75% of maximum 0xFFFF */
-@@ -2306,8 +2330,7 @@ static unsigned int bcmgenet_desc_rx(struct bcmgenet_rx_ring *ring,
- 
- 		if (unlikely(len > RX_BUF_LENGTH)) {
- 			netif_err(priv, rx_status, dev, "oversized packet\n");
--			dev->stats.rx_length_errors++;
--			dev->stats.rx_errors++;
-+			ring->length_errors++;
- 			dev_kfree_skb_any(skb);
- 			goto next;
- 		}
-@@ -2315,7 +2338,7 @@ static unsigned int bcmgenet_desc_rx(struct bcmgenet_rx_ring *ring,
- 		if (unlikely(!(dma_flag & DMA_EOP) || !(dma_flag & DMA_SOP))) {
- 			netif_err(priv, rx_status, dev,
- 				  "dropping fragmented packet!\n");
--			ring->errors++;
-+			ring->fragmented_errors++;
- 			dev_kfree_skb_any(skb);
- 			goto next;
- 		}
-@@ -2329,14 +2352,19 @@ static unsigned int bcmgenet_desc_rx(struct bcmgenet_rx_ring *ring,
- 			netif_err(priv, rx_status, dev, "dma_flag=0x%x\n",
- 				  (unsigned int)dma_flag);
- 			if (dma_flag & DMA_RX_CRC_ERROR)
--				dev->stats.rx_crc_errors++;
-+				ring->crc_errors++;
- 			if (dma_flag & DMA_RX_OV)
--				dev->stats.rx_over_errors++;
-+				ring->over_errors++;
- 			if (dma_flag & DMA_RX_NO)
--				dev->stats.rx_frame_errors++;
-+				ring->frame_errors++;
- 			if (dma_flag & DMA_RX_LG)
--				dev->stats.rx_length_errors++;
--			dev->stats.rx_errors++;
-+				ring->length_errors++;
-+			if ((dma_flag & (DMA_RX_CRC_ERROR |
-+						DMA_RX_OV |
-+						DMA_RX_NO |
-+						DMA_RX_LG |
-+						DMA_RX_RXER)) == DMA_RX_RXER)
-+				ring->errors++;
- 			dev_kfree_skb_any(skb);
- 			goto next;
- 		} /* error packet */
-@@ -2359,7 +2387,9 @@ static unsigned int bcmgenet_desc_rx(struct bcmgenet_rx_ring *ring,
- 		ring->packets++;
- 		ring->bytes += len;
- 		if (dma_flag & DMA_RX_MULT)
--			dev->stats.multicast++;
-+			ring->multicast++;
-+		else if (dma_flag & DMA_RX_BRDCAST)
-+			ring->broadcast++;
- 
- 		/* Notify kernel */
- 		napi_gro_receive(&ring->napi, skb);
-@@ -3420,7 +3450,7 @@ static void bcmgenet_timeout(struct net_device *dev, unsigned int txqueue)
- 
- 	netif_trans_update(dev);
- 
--	dev->stats.tx_errors++;
-+	priv->tx_rings[txqueue].errors++;
- 
- 	netif_tx_wake_all_queues(dev);
- }
-@@ -3513,8 +3543,13 @@ static struct net_device_stats *bcmgenet_get_stats(struct net_device *dev)
- {
- 	struct bcmgenet_priv *priv = netdev_priv(dev);
- 	unsigned long tx_bytes = 0, tx_packets = 0;
-+	unsigned long tx_errors = 0, tx_dropped = 0;
- 	unsigned long rx_bytes = 0, rx_packets = 0;
- 	unsigned long rx_errors = 0, rx_dropped = 0;
-+	unsigned long rx_missed = 0, rx_length_errors = 0;
-+	unsigned long rx_over_errors = 0, rx_crc_errors = 0;
-+	unsigned long rx_frame_errors = 0, rx_fragmented_errors = 0;
-+	unsigned long multicast = 0;
- 	struct bcmgenet_tx_ring *tx_ring;
- 	struct bcmgenet_rx_ring *rx_ring;
- 	unsigned int q;
-@@ -3523,6 +3558,8 @@ static struct net_device_stats *bcmgenet_get_stats(struct net_device *dev)
- 		tx_ring = &priv->tx_rings[q];
- 		tx_bytes += tx_ring->bytes;
- 		tx_packets += tx_ring->packets;
-+		tx_errors += tx_ring->errors;
-+		tx_dropped += tx_ring->dropped;
- 	}
- 
- 	for (q = 0; q <= priv->hw_params->rx_queues; q++) {
-@@ -3532,15 +3569,34 @@ static struct net_device_stats *bcmgenet_get_stats(struct net_device *dev)
- 		rx_packets += rx_ring->packets;
- 		rx_errors += rx_ring->errors;
- 		rx_dropped += rx_ring->dropped;
-+		rx_missed += rx_ring->missed;
-+		rx_length_errors += rx_ring->length_errors;
-+		rx_over_errors += rx_ring->over_errors;
-+		rx_crc_errors += rx_ring->crc_errors;
-+		rx_frame_errors += rx_ring->frame_errors;
-+		rx_fragmented_errors += rx_ring->fragmented_errors;
-+		multicast += rx_ring->multicast;
- 	}
- 
-+	rx_errors += rx_length_errors;
-+	rx_errors += rx_crc_errors;
-+	rx_errors += rx_frame_errors;
-+	rx_errors += rx_fragmented_errors;
-+
- 	dev->stats.tx_bytes = tx_bytes;
- 	dev->stats.tx_packets = tx_packets;
-+	dev->stats.tx_errors = tx_errors;
-+	dev->stats.tx_dropped = tx_dropped;
- 	dev->stats.rx_bytes = rx_bytes;
- 	dev->stats.rx_packets = rx_packets;
- 	dev->stats.rx_errors = rx_errors;
--	dev->stats.rx_missed_errors = rx_errors;
- 	dev->stats.rx_dropped = rx_dropped;
-+	dev->stats.rx_missed_errors = rx_missed;
-+	dev->stats.rx_length_errors = rx_length_errors;
-+	dev->stats.rx_over_errors = rx_over_errors;
-+	dev->stats.rx_crc_errors = rx_crc_errors;
-+	dev->stats.rx_frame_errors = rx_frame_errors;
-+	dev->stats.multicast = multicast;
- 	return &dev->stats;
- }
- 
-diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.h b/drivers/net/ethernet/broadcom/genet/bcmgenet.h
-index 10c631bbe..429b63cc6 100644
---- a/drivers/net/ethernet/broadcom/genet/bcmgenet.h
-+++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.h
-@@ -517,6 +517,8 @@ struct bcmgenet_tx_ring {
- 	struct napi_struct napi;	/* NAPI per tx queue */
- 	unsigned long	packets;
- 	unsigned long	bytes;
-+	unsigned long	errors;
-+	unsigned long	dropped;
- 	unsigned int	index;		/* ring index */
- 	struct enet_cb	*cbs;		/* tx ring buffer control block*/
- 	unsigned int	size;		/* size of each tx ring */
-@@ -544,6 +546,14 @@ struct bcmgenet_rx_ring {
- 	unsigned long	packets;
- 	unsigned long	errors;
- 	unsigned long	dropped;
-+	unsigned long	multicast;
-+	unsigned long	missed;
-+	unsigned long	length_errors;
-+	unsigned long	over_errors;
-+	unsigned long	crc_errors;
-+	unsigned long	frame_errors;
-+	unsigned long	fragmented_errors;
-+	unsigned long	broadcast;
- 	unsigned int	index;		/* Rx ring index */
- 	struct enet_cb	*cbs;		/* Rx ring buffer control block */
- 	unsigned int	size;		/* Rx ring size */
--- 
-2.39.5
+snip
 
+
+>>   
+>>   	rc = devm_add_action_or_reset(dev, remove_debugfs, dentry);
+>>   	if (rc)
+>> @@ -219,6 +225,13 @@ static umode_t cxl_mem_visible(struct kobject *kobj, struct attribute *a, int n)
+>>   	struct cxl_memdev *cxlmd = to_cxl_memdev(dev);
+>>   	struct cxl_memdev_state *mds = to_cxl_memdev_state(cxlmd->cxlds);
+>>   
+>> +	/*
+>> +	 * Avoid poison sysfs files for Type2 devices as they rely on
+>> +	 * cxl_memdev_state.
+>> +	 */
+>> +	if (!mds)
+>> +		return 0;
+>> +
+> The above 2 'if (!mds)' seem like indirect methods to avoid Type 2
+> devices. How about:
+>
+> 	/* Type 2, CXL_DEVTYPE_DEVMEM, excluded from poison setup */
+> 	if (cxlds->type == CXL_DEVTYPE_CLASSMEM) {
+>
+
+Hi Allison,
+
+
+I forgot this one.
+
+
+I think it is better to leave the current check because it makes 
+explicit the problem of cxl_memdev_state being null for Type2.
+
+
+Thanks
+
+>
+> snip
+>
 
