@@ -1,198 +1,151 @@
-Return-Path: <netdev+bounces-189749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFD81AB37CA
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 14:52:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 079BFAB37E0
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 14:54:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61684179AF1
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 12:51:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3BFE18835FA
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 12:53:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42C3C293B4D;
-	Mon, 12 May 2025 12:51:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCD7A294A12;
+	Mon, 12 May 2025 12:53:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="BSiXhqrB"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0549C28D837;
-	Mon, 12 May 2025 12:51:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E622A2949F1
+	for <netdev@vger.kernel.org>; Mon, 12 May 2025 12:52:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747054278; cv=none; b=GUm3IhPK3RaS2gB0PwzSIKiCIS2CeJ8qstACNo9CdZoGz4nQd5qOZ5O+gfmDN+j4Ussgd4KwBmpc4Z/02g9iyePwvQyjuo872XayIlQuIpNdHRBKu7xArFTYm3dKZhTIvKFjT+Ku2hCGidbJ0SCum7TrrIBXhZzfekGLfceUwcY=
+	t=1747054380; cv=none; b=D0MP+bdxNoLPULNdcGSqe4pAk4pwcq7Wsjg53/jo6Vzm3T5F7/4WDJSLzSyF5iddJBxxHdizXSDjKd2yRXcqg39COLAj4bX25MERQkM47HGsnHg9ua59o+iW1uctgR1MwzVc+VioTteK90hhLQ7+IUtbvTRm9J3wBVdMuCb++ng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747054278; c=relaxed/simple;
-	bh=Sp+I0pIT/IGYXeehVafNi5wyfUuyAh8yUEaX8aq10PI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PcmhrcmPzmNWcTThFCQkkYDdGdyN/sPFp4MOGSf4J4q8n7NbObFl846pLjw46Mk9XJlZWj/QKd6L71n7wZ7lUgZgJzLTL6cCR+fHjxxGxPJbeB2fnupzSjh4VlryY5r/ybAWRKOhYrIxnmjogqNuiNtaK2B25S/iIjW3AB/PzC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-681ff7000002311f-f2-6821eebc6fb5
-Date: Mon, 12 May 2025 21:51:03 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, kernel_team@skhynix.com, kuba@kernel.org,
-	almasrymina@google.com, ilias.apalodimas@linaro.org,
-	harry.yoo@oracle.com, hawk@kernel.org, akpm@linux-foundation.org,
-	ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net,
-	john.fastabend@gmail.com, andrew+netdev@lunn.ch,
-	edumazet@google.com, pabeni@redhat.com, vishal.moola@gmail.com
-Subject: Re: [RFC 19/19] mm, netmem: remove the page pool members in struct
- page
-Message-ID: <20250512125103.GC45370@system.software.com>
-References: <20250509115126.63190-1-byungchul@sk.com>
- <20250509115126.63190-20-byungchul@sk.com>
- <aB5DNqwP_LFV_ULL@casper.infradead.org>
+	s=arc-20240116; t=1747054380; c=relaxed/simple;
+	bh=aNmKo1Oakl3yM94F2in7pHniPeNN+XwX6ZF6pcypzag=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Wtl2yXz42jedpvK2uwpdAHKDYdd1Aaj8978jVsdx4I4P70JfsxEOYpx5tdp2zMbjk4sw+YzQcYKUmA7dTmG5UMWz8LeYevJKUJFnxLq1UwZzO0FdNMfviGZ4ukCuybsqx43gzhUo+oLjWG/K3jvkxjCXTld6wvUxxzgyw0NjU00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=BSiXhqrB; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54C0lBSc013830;
+	Mon, 12 May 2025 05:52:48 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:message-id:mime-version:subject:to; s=
+	pfpt0220; bh=yiAFpChy9Fgi/Ha1tvpLIR5S8O609BoIBfkcdBODBW4=; b=BSi
+	XhqrBUP56rn/Nz56ywT+kV5/it6XUbB3GonH3DgbbEna3bcCcqBcX8v0RKllxp4/
+	7xsPSry6X+lX5X1biwluka2PdzSdFr/eOBgkTUSl09iz1M330QPVpTPKei+Z3BMr
+	tiLRVSOlRXaUmL0qZu5O0FcIC6JifKCNnFKikd/6vKpKAo99fZy+474XiejDsceW
+	OOaGtgQrDd8HAPWN7kOI0IF2D5QQDwKmgR+wyB/UInQYQYZ13SSGBPjnptzOBT0N
+	Y2KKH7dUX7HEuri5uoshO8GNFb9L+4lYFz1mW7ECi7QMWsK5S+PTxFADqsR/E96f
+	RNvanaXL31zAu4crU0A==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 46k5trs2ja-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 12 May 2025 05:52:48 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Mon, 12 May 2025 05:52:47 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 12 May 2025 05:52:47 -0700
+Received: from hyd1358.marvell.com (unknown [10.29.37.11])
+	by maili.marvell.com (Postfix) with ESMTP id D32DE3F7097;
+	Mon, 12 May 2025 05:52:42 -0700 (PDT)
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+        <gakula@marvell.com>, <hkelam@marvell.com>, <sgoutham@marvell.com>,
+        <lcherian@marvell.com>, <bbhushan2@marvell.com>, <jerinj@marvell.com>
+CC: <netdev@vger.kernel.org>, Subbaraya Sundeep <sbhatta@marvell.com>
+Subject: [net v2] octeontx2-pf: Do not reallocate all ntuple filters
+Date: Mon, 12 May 2025 18:22:37 +0530
+Message-ID: <1747054357-5850-1-git-send-email-sbhatta@marvell.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aB5DNqwP_LFV_ULL@casper.infradead.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrAIsWRmVeSWpSXmKPExsXC9ZZnke7ed4oZBv8XclrMWb+GzWL1jwqL
-	5Q92sFp8+Xmb3WLxwm/MFnPOt7BYPD32iN3i/rJnLBZ72rczW/S2/Ga2aNqxgsniwrY+VovL
-	u+awWdxb85/V4tgCMYtvp98wWqzfd4PV4vePOWwOQh5bVt5k8tg56y67x4JNpR6bV2h5dN24
-	xOyxaVUnm8emT5PYPe5c28PmcWLGbxaPnTs+M3l8fHqLxeP9vqtsHp83yQXwRnHZpKTmZJal
-	FunbJXBlLLvYw1IwT75ic9dU1gbG/eJdjBwcEgImEqceCnQxcoKZO39dYwOxWQRUJS7ubAGz
-	2QTUJW7c+MkMUi4ioCHxZosRSJhZYCmzxPSpwiC2sECQxOTHD9lBbF4BC4m7J7uYuhi5OIQE
-	ehglts9rZINICEqcnPmEBaJZS+LGv5dMIDOZBaQllv/jAAlzAp1w+N4KRhBbVEBZ4sC242Bz
-	JAS2sUt8OdPKBnGnpMTBFTdYJjAKzEIydhaSsbMQxi5gZF7FKJSZV5abmJljopdRmZdZoZec
-	n7uJERiPy2r/RO9g/HQh+BCjAAejEg/viZeKGUKsiWXFlbmHGCU4mJVEeBu3A4V4UxIrq1KL
-	8uOLSnNSiw8xSnOwKInzGn0rTxESSE8sSc1OTS1ILYLJMnFwSjUwSsbpt64+s/r+8v2i6xTE
-	NQ05Sp3/LM972HjU4P7GOed3b27mdZm3/Mqdp7XJvzOVlANZVrql3eESY/5zuvv+pfryfObb
-	7CerGxZ+6z5WwGo3kTf/v7TShGDRxOZfnz1mevRr/+WZ+Cat89k3xaCKtt3Of79/18vd9NPy
-	6afa7kldfTFXJmdVKLEUZyQaajEXFScCAGlHrvbDAgAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprBIsWRmVeSWpSXmKPExsXC5WfdrLvnnWKGwaYXRhZz1q9hs1j9o8Ji
-	+YMdrBZfft5mt1i88BuzxZzzLSwWT489Yre4v+wZi8We9u3MFr0tv5ktmnasYLI4PPckq8WF
-	bX2sFpd3zWGzuLfmP6vFsQViFt9Ov2G0WL/vBqvF7x9z2ByEPbasvMnksXPWXXaPBZtKPTav
-	0PLounGJ2WPTqk42j02fJrF73Lm2h83jxIzfLB47d3xm8vj49BaLx/t9V9k8Fr/4wOTxeZNc
-	AF8Ul01Kak5mWWqRvl0CV8ayiz0sBfPkKzZ3TWVtYNwv3sXIySEhYCKx89c1NhCbRUBV4uLO
-	FjCbTUBd4saNn8xdjBwcIgIaEm+2GIGEmQWWMktMnyoMYgsLBElMfvyQHcTmFbCQuHuyi6mL
-	kYtDSKCHUWL7vEY2iISgxMmZT1ggmrUkbvx7yQQyk1lAWmL5Pw6QMCfQCYfvrWAEsUUFlCUO
-	bDvONIGRdxaS7llIumchdC9gZF7FKJKZV5abmJljqlecnVGZl1mhl5yfu4kRGF/Lav9M3MH4
-	5bL7IUYBDkYlHt4TLxUzhFgTy4orcw8xSnAwK4nwNm4HCvGmJFZWpRblxxeV5qQWH2KU5mBR
-	Euf1Ck9NEBJITyxJzU5NLUgtgskycXBKNTAWfd9YHjj/1q+6Fwt2Vyxb+FVzq91bf6u0ye/v
-	WF6a6+TxubyvrlZnny3vFu/PTaqnZ929H32vt0bqe5f+2rtr1Ngdp/AYG05/kfFHJ9BqwSfr
-	w1/+s5v+6JPbp/l/ot9U2TVHLpydXdDNo/v/YGhPT+sK65Srp4sVn3SbfohjiTtpceG5X81D
-	JZbijERDLeai4kQAuBwu+6sCAAA=
-X-CFilter-Loop: Reflected
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=SOBCVPvH c=1 sm=1 tr=0 ts=6821ef20 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=dt9VzEwgFbYA:10 a=M5GUcnROAAAA:8 a=JJ9OIAJi2aS0bon4u0AA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-GUID: eNaAEYOOCAGvNyqtJzEy0PPOatuyL8dv
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTEyMDEzNCBTYWx0ZWRfX/Z5PF3/T6hSc Cr+/t6drbvOPdbGkTdW6kFjvRspMJLtz2zUIIYg3SAWmplFH+A6JLby+Mo95RQKhuFt+qgrEwyQ Qil93UDcTrhGAyk66g5yCK9Z3yKiFoDoyo2u3AqZ0OOkRJqFZDaRB0PtYN2AVuW5AVxV7MmWHrJ
+ UGxKC7DDulKT39ALlkc1ObPSY0F2oAM9V39ps9/rss+nQ84c2zci6Gl0kK5eVi7oeBWAfwfoIAp K3XF7ahsag4CKpIFNUvTX5xweB/nCZ8LFH1xC1WY+tlU/wapg6u0j/HB6pJS4DrAzaikOH9Na0r 6+GWsmoxHiFhmtacP45cLmAiIkB9uRdOaKImB1RtLfH4XLUf1GGUCZbLJ1eFr6OBe+x3KGTCo/z
+ hGiFcnOJLNs+qAjkQuWKELMeT3i9jqw/WtIBZ8DKYJJFp+GYtrIcHx2L/Ix6imYBTtxkdcFz
+X-Proofpoint-ORIG-GUID: eNaAEYOOCAGvNyqtJzEy0PPOatuyL8dv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-12_04,2025-05-09_01,2025-02-21_01
 
-On Fri, May 09, 2025 at 07:02:30PM +0100, Matthew Wilcox wrote:
-> On Fri, May 09, 2025 at 08:51:26PM +0900, Byungchul Park wrote:
-> > +++ b/include/linux/mm_types.h
-> > @@ -20,6 +20,7 @@
-> >  #include <linux/seqlock.h>
-> >  #include <linux/percpu_counter.h>
-> >  #include <linux/types.h>
-> > +#include <net/netmem_type.h> /* for page pool */
-> >  
-> >  #include <asm/mmu.h>
-> >  
-> > @@ -118,17 +119,7 @@ struct page {
-> >  			 */
-> >  			unsigned long private;
-> >  		};
-> > -		struct {	/* page_pool used by netstack */
-> > -			/**
-> > -			 * @pp_magic: magic value to avoid recycling non
-> > -			 * page_pool allocated pages.
-> > -			 */
-> > -			unsigned long pp_magic;
-> > -			struct page_pool *pp;
-> > -			unsigned long _pp_mapping_pad;
-> > -			unsigned long dma_addr;
-> > -			atomic_long_t pp_ref_count;
-> > -		};
-> > +		struct __netmem_desc place_holder_1; /* for page pool */
-> >  		struct {	/* Tail pages of compound page */
-> >  			unsigned long compound_head;	/* Bit zero is set */
-> >  		};
-> 
-> The include and the place holder aren't needed.
+If ntuple filters count is modified followed by
+unicast filters count using devlink then the ntuple count
+set by user is ignored and all the ntuple filters are
+being reallocated. Fix this by storing the ntuple count
+set by user. Without this patch, say if user tries
+to modify ntuple count as 8 followed by ucast filter count as 4
+using devlink commands then ntuple count is being reverted to
+default value 16 i.e, not retaining user set value 8.
 
-Or netmem_desc overlaying struct page might be conflict with other
-fields of sturct page e.g. _mapcount, _refcount and the like, once the
-layout of struct page *extremly changes* in the future before
-netmem_desc has its own instance.
+Fixes: 39c469188b6d ("octeontx2-pf: Add ucast filter count configurability via devlink.")
+Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h  | 1 +
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c | 1 +
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c   | 3 ++-
+ 3 files changed, 4 insertions(+), 1 deletion(-)
 
-So placing a place holder like this is the safest way, IMO, to prevent
-the unextected result.  Am I missing something?
-
-> > diff --git a/include/net/netmem.h b/include/net/netmem.h
-> > index 00064e766b889..c414de6c6ab0d 100644
-> > --- a/include/net/netmem.h
-> > +++ b/include/net/netmem.h
-> > @@ -10,6 +10,7 @@
-> >  
-> >  #include <linux/mm.h>
-> >  #include <net/net_debug.h>
-> > +#include <net/netmem_type.h>
-> 
-> ... which I think means you don't need the separate header file.
-
-Agree if I don't use the place holder in mm_types.h.
-
-> >  /* net_iov */
-> >  
-> > @@ -20,15 +21,6 @@ DECLARE_STATIC_KEY_FALSE(page_pool_mem_providers);
-> >   */
-> >  #define NET_IOV 0x01UL
-> >  
-> > -struct netmem_desc {
-> > -	unsigned long __unused_padding;
-> > -	unsigned long pp_magic;
-> > -	struct page_pool *pp;
-> > -	struct net_iov_area *owner;
-> > -	unsigned long dma_addr;
-> > -	atomic_long_t pp_ref_count;
-> > -};
-> > -
-> >  struct net_iov_area {
-> >  	/* Array of net_iovs for this area. */
-> >  	struct netmem_desc *niovs;
-> > @@ -38,31 +30,6 @@ struct net_iov_area {
-> >  	unsigned long base_virtual;
-> >  };
-> >  
-> > -/* These fields in struct page are used by the page_pool and net stack:
-> > - *
-> > - *        struct {
-> > - *                unsigned long pp_magic;
-> > - *                struct page_pool *pp;
-> > - *                unsigned long _pp_mapping_pad;
-> > - *                unsigned long dma_addr;
-> > - *                atomic_long_t pp_ref_count;
-> > - *        };
-> > - *
-> > - * We mirror the page_pool fields here so the page_pool can access these fields
-> > - * without worrying whether the underlying fields belong to a page or net_iov.
-> > - *
-> > - * The non-net stack fields of struct page are private to the mm stack and must
-> > - * never be mirrored to net_iov.
-> > - */
-> > -#define NET_IOV_ASSERT_OFFSET(pg, iov)             \
-> > -	static_assert(offsetof(struct page, pg) == \
-> > -		      offsetof(struct netmem_desc, iov))
-> > -NET_IOV_ASSERT_OFFSET(pp_magic, pp_magic);
-> > -NET_IOV_ASSERT_OFFSET(pp, pp);
-> > -NET_IOV_ASSERT_OFFSET(dma_addr, dma_addr);
-> > -NET_IOV_ASSERT_OFFSET(pp_ref_count, pp_ref_count);
-> > -#undef NET_IOV_ASSERT_OFFSET
-> 
-> ... but you do want to keep asserting that netmem_desc and
-> net_iov have the same offsets.  And you want to assert that struct page
-> is big enough to hold everything in netmem_desc, like we do for slab:
-> 
-> static_assert(sizeof(struct slab) <= sizeof(struct page));
-
-I will.  However, as I mentioned above, the total size doesn't matter
-but the layout change of struct page might matter, I think.
-
-	Byungchul
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+index 1e88422..d6b4b74 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+@@ -356,6 +356,7 @@ struct otx2_flow_config {
+ 	struct list_head	flow_list_tc;
+ 	u8			ucast_flt_cnt;
+ 	bool			ntuple;
++	u16			ntuple_cnt;
+ };
+ 
+ struct dev_hw_ops {
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
+index 33ec9a7..e13ae548 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
+@@ -41,6 +41,7 @@ static int otx2_dl_mcam_count_set(struct devlink *devlink, u32 id,
+ 	if (!pfvf->flow_cfg)
+ 		return 0;
+ 
++	pfvf->flow_cfg->ntuple_cnt = ctx->val.vu16;
+ 	otx2_alloc_mcam_entries(pfvf, ctx->val.vu16);
+ 
+ 	return 0;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
+index 47bfd1f..64c6d916 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
+@@ -247,7 +247,7 @@ int otx2_mcam_entry_init(struct otx2_nic *pfvf)
+ 	mutex_unlock(&pfvf->mbox.lock);
+ 
+ 	/* Allocate entries for Ntuple filters */
+-	count = otx2_alloc_mcam_entries(pfvf, OTX2_DEFAULT_FLOWCOUNT);
++	count = otx2_alloc_mcam_entries(pfvf, flow_cfg->ntuple_cnt);
+ 	if (count <= 0) {
+ 		otx2_clear_ntuple_flow_info(pfvf, flow_cfg);
+ 		return 0;
+@@ -307,6 +307,7 @@ int otx2_mcam_flow_init(struct otx2_nic *pf)
+ 	INIT_LIST_HEAD(&pf->flow_cfg->flow_list_tc);
+ 
+ 	pf->flow_cfg->ucast_flt_cnt = OTX2_DEFAULT_UNICAST_FLOWS;
++	pf->flow_cfg->ntuple_cnt = OTX2_DEFAULT_FLOWCOUNT;
+ 
+ 	/* Allocate bare minimum number of MCAM entries needed for
+ 	 * unicast and ntuple filters.
+-- 
+2.7.4
 
 
