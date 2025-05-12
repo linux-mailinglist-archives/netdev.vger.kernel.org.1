@@ -1,172 +1,130 @@
-Return-Path: <netdev+bounces-189626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBAA0AB2D7B
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 04:26:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4BEEAB2D80
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 04:29:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 619DF17225D
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 02:26:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BC663AFCEE
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 02:28:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B4DA25334E;
-	Mon, 12 May 2025 02:26:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2629F253351;
+	Mon, 12 May 2025 02:28:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eXnI3bv7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 573EB70825
-	for <netdev@vger.kernel.org>; Mon, 12 May 2025 02:26:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE945195;
+	Mon, 12 May 2025 02:28:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747016808; cv=none; b=gDlTuesBMmj2TBBMAiAFkaNPFhGOhqtWaxU8/y6e2vr+tFNYzv1Zee/9gxw2ZxMVZjDLRw0KnlfET4OiQQkqgCVjmuZvVD+rkr35ilw6J5YDy9uWqWvXh6HLdcetMW3ZmF6MWVdio3bR2TFDQZlXBtNsvoYPhvs9IN5KOr4rS6Q=
+	t=1747016939; cv=none; b=Yq75X22dk0a69YJT9ywAh3mvuaMUJ06aMJqrciS/vtuMLZH+pNsbL+G6zGkuRQLVnlzelgN9E9jHunPHGseMFlWPppbsuYBoHHzEwymynQ+duDI3ilRsdT/Snnd7SJdPX23tFOlTkiJAjlyvTyPZg48a5RCV24dqPOr001MAbiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747016808; c=relaxed/simple;
-	bh=de7TBUm8LJing725D2jejYw1ay62rJmOAUJcva2Ru44=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=pH3XnAD5yhvFGchHj7Ou0sNDgl/NcpW0W5zPmPadsZC1J7uEv3hDjcLKok7lxYizk3wVIbznW+2et2r7kD38wjbup75/9nyhop9UIjGBS00TDntmFmrFvP3Qrtek6e/3p3usUlv0zpL7SvZxmXG1WA6no/vpKRTNg8otTuFKu/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=none smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=18.169.211.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bamaicloud.com
-X-QQ-mid: zesmtpgz1t1747016719t1271c9ad
-X-QQ-Originating-IP: Q155Ok2CSHLKDr4pELiL86iKK6+IWkQZJlKNOvG85xc=
-Received: from smtpclient.apple ( [111.202.70.100])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 12 May 2025 10:25:17 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 3493817473279601546
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1747016939; c=relaxed/simple;
+	bh=d+LeGSOURHxaZ+9jdSebxv4Bdxq4KInyp2lUp/6P4X8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UkclnjQy9i39eFyY4aXmXD3p1uVp3emnkHi6d5150YvNdJWrp99AimYHcmpW7IrERUWhm4dbwYdbj61MdhfZZyYR22Mgx7ISz+bBQp8FOtaQW+bxBYdpoxShgfLET4/EkbwDsjKJtO7kgCt6Eqgv/c8rXr8OiyFeDElsYS1ABdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eXnI3bv7; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=QrztMGFBQB8/q3cnhtp1cbW+ELoTxxoxt6567ZIMK0A=; b=eXnI3bv7yrjSk65tlVvDazkvsm
+	I/q4WiT4NRZfRIcPQf3MmEuXoidy+p6ZgI+LFMx4lZhVqMZU2/y94l/fqmnB6d5N1KNJro/3JSAMW
+	JEULZ/1MV+rspq5aTNB6710zjXgFJwng/GW6SwRW+alzeqzLaNdxNcK91X/m5hBL1wTE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uEIuO-00CIG5-15; Mon, 12 May 2025 04:28:48 +0200
+Date: Mon, 12 May 2025 04:28:48 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Damien =?iso-8859-1?Q?Ri=E9gel?= <damien.riegel@silabs.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Silicon Labs Kernel Team <linux-devel@silabs.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC net-next 02/15] net: cpc: add endpoint infrastructure
+Message-ID: <e038e209-dc4a-4dc4-9356-cd3a54535856@lunn.ch>
+References: <20250512012748.79749-1-damien.riegel@silabs.com>
+ <20250512012748.79749-3-damien.riegel@silabs.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
-Subject: Re: [PATCH net-next 1/4] net: bonding: add broadcast_neighbor option
- for 802.3ad
-From: Tonghao Zhang <tonghao@bamaicloud.com>
-In-Reply-To: <ea87b2d2-9b17-4f16-9e40-fe7212f2788d@lunn.ch>
-Date: Mon, 12 May 2025 10:25:16 +0800
-Cc: Jay Vosburgh <jv@jvosburgh.net>,
- netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <B43CC0DC-286B-44FF-8FA8-1B1BC0C990BF@bamaicloud.com>
-References: <20250510044504.52618-1-tonghao@bamaicloud.com>
- <20250510044504.52618-2-tonghao@bamaicloud.com> <1133230.1746881077@vermin>
- <CE4DB782-91EB-4DBD-9C26-CA4C4612D58C@bamaicloud.com>
- <ea87b2d2-9b17-4f16-9e40-fe7212f2788d@lunn.ch>
-To: Andrew Lunn <andrew@lunn.ch>
-X-Mailer: Apple Mail (2.3693.20.0.1.32)
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: MVbvI5amSZ2YmY6YRLetviQaThRmXIzMV2MhFugSEF6AK/Pd6HszblPY
-	QEDiOIOYKy4VyYyZUBMhUqeEAN4cDTsC5teF7kJlpifMD53dG8wZyZtBByaDXtEv2M35tXC
-	3CO2aanl/cR38E7qQq1B0tQYCd8DDSZRAPJvFl2siNLjHv/266zd5n4bT+QMMYjlGC6760e
-	jr5rFPb3ZGExhDO1kSzfKo+ii7JQ7czc1TG1hNZnXwigOzZ0rfGjb9hz+04pb32XhsNeVw1
-	CoCGfKG3FfDGlA7AJf0noInKC4V6lrWqw5TMtT0fWuLTd6JII/7yfOoooVVCPKCKtTCCoph
-	dNmsXsnYd18pKUFY5Trsi02xBLp2npe+Egxus2IRtpGiLlEiySkwbqjnBKQ4t1BASJtd+xM
-	BiLra7uyczPS2MGOXzeYzNKLWkovUxvXbrsom2PA16FJZJ23xt64Pi3yITYDUoEYaDrqZas
-	eOjS7F7e39fT+0ReTjFFwuK3vanJY9qM7a4hrSmA5MXyHqbsvDLpHTZW72akUlQ31UPpUDT
-	bVelElov318GpePJ/XbqlHVn9yl6nGZvqLyQTdN6t+RQL3WauClauyrrUhBBFSxFk6kBzgO
-	7fSF+++Z5OiTKXsawvDGOmnPPlqQCxWEWpxKURv45e4OVhZx7VWe5sDxWou/mOoJ0B59cdP
-	N5DN6MruUmOcZIWArAh7ZVpTq8ASo+UGDuoaMcHEDZW0jrQ6y69rigm9Ei+Q4uSLkcNEKQg
-	3MdBa/J2COJ9o+hjjC+1ejjmZakFG9tSFXrPi8uPUKM7K7MdnVaH5diJcrh80R3GV0ZeCF8
-	TztdluMC9C9l6qAPWJKnz1L+TMNYTthjlyp71OhD7sMFYlqy4o7zmqcbDjEbxnHR9RhlZrk
-	DTqm95lAvZb0rKy09x5CM+l6Fn3rxqRYfIBgrb+q6twGD7jBRjoQDBDFJ0lHBHyT+UqJeUQ
-	r5lA=
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-X-QQ-RECHKSPAM: 0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250512012748.79749-3-damien.riegel@silabs.com>
 
+> +/**
+> + * cpc_endpoint_register() - Register an endpoint.
+> + * @ep: Endpoint to register.
+> + *
+> + * Companion function of cpc_endpoint_alloc(). This function adds the endpoint, making it usable by
+> + * CPC drivers. As this ensures that endpoint ID is unique within a CPC interface and then adds the
+> + * endpoint, the lock interface is held to prevent concurrent additions.
+> + *
+> + * Context: Lock "add_lock" of endpoint's interface.
+> + *
+> + * Return: 0 on success, negative errno otherwise.
+> + */
+> +int cpc_endpoint_register(struct cpc_endpoint *ep)
+> +{
+> +	int err;
+> +
+> +	if (!ep || !ep->intf)
+> +		return -EINVAL;
+> +
+> +	mutex_lock(&ep->intf->add_lock);
+> +	err = __cpc_endpoint_register(ep);
+> +	mutex_unlock(&ep->intf->add_lock);
 
+What exactly is add_lock protecting?
 
-> 2025=E5=B9=B45=E6=9C=8811=E6=97=A5 =E4=B8=8B=E5=8D=8811:53=EF=BC=8CAndre=
-w Lunn <andrew@lunn.ch> =E5=86=99=E9=81=93=EF=BC=9A
->=20
->> static inline bool bond_should_broadcast_neighbor(struct bonding =
-*bond,
->>                                                  struct sk_buff *skb)
->> {
->>        if (!bond->params.broadcast_neighbor ||
->>            BOND_MODE(bond) !=3D BOND_MODE_8023AD)
->>                return false;
->=20
-> I think you missed the point. You have added these two tests to every
-> packet on the fast path. And it is very likely to return false. Is
-> bond.params.broadcast_neighbor likely to be in the cache? A cache miss
-> is expensive. Is bond.params.mode also likely to be in cache? You
-> placed broadcast_neighbor at the end of params, so it is unlikely to
-> be in the same cache line as bond.params.mode. So two cache misses.
->=20
-> What Jay would like is that the cost on the fast path is ~0 for when
-> this feature is not in use. Jump labels can achieve this. It inserts
-> either a NOP or a jump instruction, which costs nearly nothing, and
-> then uses self modifying code to swap between a NOP or a jump. You can
-> keep a global view of is any bond is using this new mode? If no, this
-No, no mode uses jump labels instead of bond.params checking.
-> test is eliminated. If yes, you do the test.
-I test the lacp mode with broadcast_neighbor enabled, there is no =
-performance drop. This patch has been running in our production =
-environment for a long time. We only use this option in lacp mode, for =
-performance, the code can be modified as follows:
-diff --git a/drivers/net/bonding/bond_main.c =
-b/drivers/net/bonding/bond_main.c
-index ce31445e85b6..8743bf007b7e 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -5330,11 +5330,12 @@ static struct slave =
-*bond_xdp_xmit_3ad_xor_slave_get(struct bonding *bond,
-        return slaves->arr[hash % count];
- }
+> +void cpc_endpoint_unregister(struct cpc_endpoint *ep)
+> +{
+> +	device_del(&ep->dev);
+> +	put_device(&ep->dev);
+> +}
 
--static inline bool bond_should_broadcast_neighbor(struct bonding *bond,
--                                                 struct sk_buff *skb)
-+static inline bool bond_should_broadcast_neighbor(struct sk_buff *skb,
-+                                                 struct net_device =
-*dev)
- {
--       if (!bond->params.broadcast_neighbor ||
--           BOND_MODE(bond) !=3D BOND_MODE_8023AD)
-+       struct bonding *bond =3D netdev_priv(dev);
-+
-+       if (!bond->params.broadcast_neighbor)
-                return false;
+Register needs a lock, but unregister does not?
 
-        if (skb->protocol =3D=3D htons(ETH_P_ARP))
-@@ -5408,9 +5409,6 @@ static netdev_tx_t bond_3ad_xor_xmit(struct =
-sk_buff *skb,
-        struct bond_up_slave *slaves;
-        struct slave *slave;
+> +/**
+> + * cpc_interface_get_endpoint() - get endpoint registered in CPC device with this id
+> + * @intf: CPC device to probe
+> + * @ep_id: endpoint ID that's being looked for
+> + *
+> + * Context: This function locks device's endpoint list.
+> + *
+> + * Return: a struct cpc_endpoint pointer or NULL if not found.
+> + */
+> +struct cpc_endpoint *cpc_interface_get_endpoint(struct cpc_interface *intf, u8 ep_id)
+> +{
+> +	struct cpc_endpoint *ep;
+> +
+> +	mutex_lock(&intf->lock);
+> +	ep = __cpc_interface_get_endpoint(intf, ep_id);
+> +	mutex_unlock(&intf->lock);
+> +
+> +	return ep;
+> +}
 
--       if (bond_should_broadcast_neighbor(bond, skb))
--               return bond_xmit_broadcast(skb, dev);
--
-        slaves =3D rcu_dereference(bond->usable_slaves);
-        slave =3D bond_xmit_3ad_xor_slave_get(bond, skb, slaves);
-        if (likely(slave))
-@@ -5625,6 +5623,9 @@ static netdev_tx_t __bond_start_xmit(struct =
-sk_buff *skb, struct net_device *dev
-        case BOND_MODE_ACTIVEBACKUP:
-                return bond_xmit_activebackup(skb, dev);
-        case BOND_MODE_8023AD:
-+               if (bond_should_broadcast_neighbor(skb, dev))
-+                       return bond_xmit_broadcast(skb, dev);
-+               fallthrough;
-        case BOND_MODE_XOR:
-                return bond_3ad_xor_xmit(skb, dev);
-        case BOND_MODE_BROADCAST:
->=20
-> 	Andrew
->=20
->=20
+cpc_interface_get_endpoint() but no cpc_interface_put_endpoint() ? Is
+this not taking a reference on the end point? Maybe this should not be
+called _get_.
 
+	Andrew
 
