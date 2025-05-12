@@ -1,94 +1,64 @@
-Return-Path: <netdev+bounces-189772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73EDCAB39F5
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 16:04:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECDA8AB3A40
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 16:16:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5F6D3A8AA6
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 14:03:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67A8917C75E
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 14:16:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CA921DC1A7;
-	Mon, 12 May 2025 14:03:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00A6F1EDA12;
+	Mon, 12 May 2025 14:15:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P+FIkSUc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k8djEoCP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDC462AD18;
-	Mon, 12 May 2025 14:03:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC7E91E505;
+	Mon, 12 May 2025 14:15:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747058636; cv=none; b=RZI7xHfrbia7Ra5iUaBKGpsudKNi4PBoMn1knPdhCZXTnXjnP/3HGzcMNYONFN4umtGQqAXWorcaGvVacfjTAuiOOmEhM1u30n16mpc4iEyb3pNgYwqITk/eM5/utMieBoJkcT5Rb7A6C3t8hzl063qlrSwtcAf+KmTnrhX3C1c=
+	t=1747059354; cv=none; b=uhonIVZLbqSrQEAwroBwT1ldu4wrabkxdvXeSjVtYZybK3AFOMr2a8Nci7Rg3ptqn9Xx3pUqrJoECGzQ1ZgnJLHXhj9Neu3Z5yJQItj7K2+58M1CGqb7zhaUsHkqnjQke+uf8qcgHzDiwQ1gy0ZjBj+OZAX3t2manY6A96QuYBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747058636; c=relaxed/simple;
-	bh=Wo2gtYcy8F8/HRgD/mguaoCC7Ih+VqVdVr7p9Tj2BO4=;
+	s=arc-20240116; t=1747059354; c=relaxed/simple;
+	bh=MEHGyJSZV6ZmVvbm4C4hI9TFH3oY2U0jBbfKq+YT31I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OqWi9oB/gy0yocuI4gXagggQ/2ZcGBCPXMXF+TpwSPGFB9KXyPdppeCJl804hLjeuvXI6zhuhFwdEtc983Cwm14lxFeGJvUrFIk2MV9xZNnyaw7UCgVzSeJfMQzPVxs6cPkO0LJpzuGqoT4BTTUjanrDhkSUEcyBRjpowKnxd6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P+FIkSUc; arc=none smtp.client-ip=209.85.160.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-2d060c62b61so4516610fac.0;
-        Mon, 12 May 2025 07:03:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747058633; x=1747663433; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dLb+JRGLVFS0BSqKTkNSyQIkAQdMTPXYGYGh/OuIIrg=;
-        b=P+FIkSUc36fwfhemX9NbXd6s9GPZHrxjVog9KmBKEzyVj0fyRP/fK130e5TgDZExP6
-         PuhbFm/zf3m1Cwv2yLzGuGHIxqCd/UFNideSXJYrzHibdTlK9tX19hnSvBPsDGycHCR+
-         FRHS0Sl3h8Drnvd2PHSnxQYI10OIkpDqt3MWsvL6Ye08npyVgVzEJ0AsfB5d5ZF3ig+z
-         kN9AYDIl3IE5xfSl12TJOhMdGlFYjnNoWOaWrAHooMpYJ/7xUqHVUQk+WcaCotcouj7a
-         xlIySSGNZ5hMe4f3yTCGA0Amk4t3jr9DSFT49j+xflfIYZsPuGS/oEWlMqW8GBkvrKBL
-         s7LA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747058633; x=1747663433;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dLb+JRGLVFS0BSqKTkNSyQIkAQdMTPXYGYGh/OuIIrg=;
-        b=rM/EZ1jLBgbKqqievYpC5VTljZsi8taKxNf7PUh8iENxLIAEYrCX0ziBS0kz4yOk/P
-         I1wdPWfiWdtXC2667gNX9xTTCTd9cIjS3dq6hMCTpLJIehwFILDdViysYuoktnqh+RDb
-         ziM1zp36MEeRzuVdEkpy+CRdh5gJ+9sE719yu+ySGnzy95uNEqss2unblxjqDDhXyRD2
-         wAl5FkKIItyvfzNM7lL4AxEwYq+bh568CclMptahyl8rcZUpUbK8VJed4Y7bj7Ep1D3d
-         SnNoBJycW95Z5Jr3QlisOY9g93DH9g5oyQv7Qr7CLBoNUXB+f9U5YgY8g6bXIU768jFk
-         /vgw==
-X-Forwarded-Encrypted: i=1; AJvYcCUhYr7vRhnLJEELGoWueUBy0rnJM7Z4mnJtbpVEBiZXHh3Rbu7DFvFTFmncxxRHFLqzW1PHGvDD1B0ld1c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJDDA7WRmkxguxGJwaLOGo7gduYjbTrJTjh2oBhT+vXeC7Wq6S
-	pNlevX60imor7FhTiAUPBd3+t90MnThFY1yqvMgqpbtpYaTDXNSt
-X-Gm-Gg: ASbGncvTtFbnENRJOI3ADbdmfCEk1oSlt2BckSgu8Hzy29DZYb5y1jj6E3fV45UQU3A
-	3IXEo46vLJvVm5mxLWw3q003SD4Q3SWH7LaAMNOx/glGlDF/p+DuXE/dHBgAl1/jlcqIPfhBjYZ
-	WygsOi2yV/NR/U52pzePd+eTiUzkcRe7+sHx1gkQk0IERgRXIlT/0PRB3KkTms702l5sxNuyfs7
-	IP1qK8cRhKBiOgqPUxzjbxPUGQa+IikaNtS3rVfwthtJgHIH/3tUN5bp3cfylvVmiklXYd5h9A9
-	6U3uvNWB32zxAfK382qZLcdgdi1RXoM++JgYfy3dg6DNcFi/TUVzqNTmkKiMJWw466c0CrU=
-X-Google-Smtp-Source: AGHT+IF1tkZYqYyXXtjmaPTB+Gkqq74Inf49XWAK+PjfZ2RlQ2OoYywpaAUFYYJ6wzuQTsDoXjEWhA==
-X-Received: by 2002:a05:6870:5246:b0:2c8:34df:8c4f with SMTP id 586e51a60fabf-2dba453cc52mr7464382fac.37.1747058628114;
-        Mon, 12 May 2025 07:03:48 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-732264d59e1sm1553171a34.34.2025.05.12.07.03.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 May 2025 07:03:46 -0700 (PDT)
-Date: Mon, 12 May 2025 07:03:43 -0700
-From: Richard Cochran <richardcochran@gmail.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Xing <kernelxing@tencent.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] docs: networking: timestamping: improve stacked PHC
- sentence
-Message-ID: <aCH_v3fSZXROUHpD@hoboy.vegasvil.org>
-References: <20250512131751.320283-1-vladimir.oltean@nxp.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=C4QHtIWcYNjDfBWQWdSsNq0vY15cJCVDSkM7MRtpN4SEF6cTY2zRvf2zV5ZXnDP7Hj3eHCz29NDiYgjQ2gL4WKQL+8n72e4czrwf/WgeEw8xuyTghNSN9aMmT7wXDLn04Z/+NzjZAGyVVkoM2qQXtNG1a6bt/dafujZWkazZbQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k8djEoCP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97AACC4CEEF;
+	Mon, 12 May 2025 14:15:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747059353;
+	bh=MEHGyJSZV6ZmVvbm4C4hI9TFH3oY2U0jBbfKq+YT31I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=k8djEoCPjVGyQx42aTZVSbqgQDZkJ/Bj5aRHJUHgLcQd/mnl/eY5cWr5F1P4swDmb
+	 lzG6JLGZU0Ux1ZZs5sjKcv5w4aTYiilPh5dzD717eImtSkvgPEpRmCKwi9n93zKQV0
+	 UKaX8fY2iUpJgoVN7Qf78dmv80A95BDTKkzqIE5TXbeFEh/O+sRPUc6YO8UxSq4o8n
+	 SlQne8XGIR0WeijFfGryo85ElqzfZXctr8HKG1FebB3u6NGhfAhjEefVEI01K1wp9R
+	 VMQDo7Zvn7Kd7dGauwJtfURxUSALzYzHGi5P79HmdlQAgQRlKnLZ30P6zhm0cKOiW1
+	 9mLZbKqtKN/CA==
+Date: Mon, 12 May 2025 15:15:46 +0100
+From: Simon Horman <horms@kernel.org>
+To: Haiyang Zhang <haiyangz@microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	decui@microsoft.com, stephen@networkplumber.org, kys@microsoft.com,
+	paulros@microsoft.com, olaf@aepfle.de, vkuznets@redhat.com,
+	davem@davemloft.net, wei.liu@kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, leon@kernel.org,
+	longli@microsoft.com, ssengar@linux.microsoft.com,
+	linux-rdma@vger.kernel.org, daniel@iogearbox.net,
+	john.fastabend@gmail.com, bpf@vger.kernel.org, ast@kernel.org,
+	hawk@kernel.org, tglx@linutronix.de,
+	shradhagupta@linux.microsoft.com, andrew+netdev@lunn.ch,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next,v2] net: mana: Add handler for hardware
+ servicing events
+Message-ID: <20250512141546.GI3339421@horms.kernel.org>
+References: <1746832603-4340-1-git-send-email-haiyangz@microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,18 +67,85 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250512131751.320283-1-vladimir.oltean@nxp.com>
+In-Reply-To: <1746832603-4340-1-git-send-email-haiyangz@microsoft.com>
 
-On Mon, May 12, 2025 at 04:17:51PM +0300, Vladimir Oltean wrote:
-> The first paragraph makes no grammatical sense. I suppose a portion of
-> the intended sentece is missing: "[The challenge with ] stacked PHCs
-> (...) is that they uncover bugs".
+On Fri, May 09, 2025 at 04:16:43PM -0700, Haiyang Zhang wrote:
+> To collaborate with hardware servicing events, upon receiving the special
+> EQE notification from the HW channel, remove the devices on this bus.
+> Then, after a waiting period based on the device specs, rescan the parent
+> bus to recover the devices.
 > 
-> Rephrase, and at the same time simplify the structure of the sentence a
-> little bit, it is not easy to follow.
+> Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
+> ---
+> v2: 
+> Added dev_dbg for service type as suggested by Shradha Gupta.
+> Added driver cap bit.
 > 
-> Fixes: 94d9f78f4d64 ("docs: networking: timestamping: add section for stacked PHC devices")
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> ---
+>  .../net/ethernet/microsoft/mana/gdma_main.c   | 63 +++++++++++++++++++
+>  include/net/mana/gdma.h                       | 11 +++-
+>  2 files changed, 72 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
 
-Acked-by: Richard Cochran <richardcochran@gmail.com>
+...
+
+> +static void mana_serv_func(struct work_struct *w)
+> +{
+> +	struct mana_serv_work *mns_wk = container_of(w, struct mana_serv_work, serv_work);
+> +	struct pci_dev *pdev = mns_wk->pdev;
+> +	struct pci_bus *bus, *parent;
+
+Please avoid lines wider than 80 columns in Networking code.  In this case
+I would suggest separating the declaration and initialisation of mns_wk and
+pdev.  Something like this (completely untested!):
+
+	struct mana_serv_work *mns_wk;
+	struct pci_bus *bus, *parent;
+	struct pci_dev *pdev;
+
+	mns_wk = container_of(w, struct mana_serv_work, serv_work);
+	pdev = mns_wk->pdev;
+
+
+...
+
+> @@ -400,6 +441,28 @@ static void mana_gd_process_eqe(struct gdma_queue *eq)
+>  		eq->eq.callback(eq->eq.context, eq, &event);
+>  		break;
+>  
+> +	case GDMA_EQE_HWC_FPGA_RECONFIG:
+> +	case GDMA_EQE_HWC_SOCMANA_CRASH:
+> +		dev_dbg(gc->dev, "Recv MANA service type:%d\n", type);
+> +
+> +		if (gc->in_service) {
+> +			dev_info(gc->dev, "Already in service\n");
+> +			break;
+> +		}
+> +
+> +		mns_wk = kzalloc(sizeof(*mns_wk), GFP_ATOMIC);
+> +		if (!mns_wk) {
+> +			dev_err(gc->dev, "Fail to alloc mana_serv_work\n");
+
+The memory allocator will log a message on error.
+So please don't also do so here.
+
+> +			break;
+> +		}
+> +
+> +		dev_info(gc->dev, "Start MANA service type:%d\n", type);
+> +		gc->in_service = true;
+> +		mns_wk->pdev = to_pci_dev(gc->dev);
+> +		INIT_WORK(&mns_wk->serv_work, mana_serv_func);
+> +		schedule_work(&mns_wk->serv_work);
+> +		break;
+> +
+>  	default:
+>  		break;
+>  	}
+
+...
+
+-- 
+pw-bot: changes-requested
 
