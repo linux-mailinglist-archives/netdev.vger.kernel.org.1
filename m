@@ -1,275 +1,230 @@
-Return-Path: <netdev+bounces-189893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBD22AB45F8
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 23:09:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1D99AB46EC
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 23:59:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22D6C7A5C4C
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 21:08:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 55D8F1B416C2
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 21:59:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE6F0299942;
-	Mon, 12 May 2025 21:09:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 373462980C9;
+	Mon, 12 May 2025 21:59:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="mlR+vg8T"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B5ujIh1s"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2065.outbound.protection.outlook.com [40.107.20.65])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26330171CD
-	for <netdev@vger.kernel.org>; Mon, 12 May 2025 21:09:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.65
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747084190; cv=fail; b=spLN82R3S501mVippPMl5sRQZp4SFYLPn0EGg+IXioUHBec08/0arfitPCq9Wlmy9lK5ue/QT8iH8Qe5w1NEUnaVu5vdOUS/wVO0dSoKqfLZHR8pOMevKtW+NKnRxjXgDIFRONyE/KsILT4mMONLRShDQdsMhYe1q8lZCYIiwvE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747084190; c=relaxed/simple;
-	bh=CXpkVfBJuwCL7TsSzDiOncNrlGK+CU3Il6aKDEE812I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=ni2Jo41mCJaZPfE3PlvDD/apdvi0j/lMgBkYRmqCcuTMXkWIn2N+DD+ks77VRjw1IDYsVtQcsGPd0++VZogL6fae+HVKq2v9LrVO91b9mX12g/oWSB3IyvJfV88rtBZFec5CqUWwOcMWU1NwnED22MtpBhznUb9itIsyCYChh7M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=mlR+vg8T; arc=fail smtp.client-ip=40.107.20.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=VFP0RMv9doBY/gZ3d8OU3dBTpcNonIH8pIOiX5UcZ8UFWzEILQVZmZVE1o3abOhZnm+tbhDKUqS4xIKer/f2oc95j6d4VelWRkhW0b87kDxloVUbnnpyLxqV2XxdZADy6orkszd+yjA0EDI79uQnS+vgfXsmwNfJRnb6fdQ3nMijlXh64VEQ7kSv3uMwMJPbhjCssIbXDmHUmH2deo+QTWIf3R4VPNAeaxhiy5eRE0mCSVwdsRsRhY8gN1/z4hsAcGkma2c689P+gbfmvj4l+2yn+b5W+GE+MoN6jU7jYRxIKG/Icym99HPSpS8ia2tziniLXBprgLscOijSTMA1ew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Op69KttYOEFt6w3NBSM8itWFKMv7c7YqxwIiib2mH3Q=;
- b=ZxGJIHdxpmOAKnaLiSHyUDuUW4nHwO6Nof/3oDVBYzuxy4/ulz6lVqIEdYJVqNddElNFSfiRAzXFZ7k/x8zewLRul2XVS8NPN/DhPU4JQS+lD09aGOiisayT/itqLZcaDhX4DI2X6uCo17zoZ/X+2b0vCRiruPdz4u1L2VMCuYLZs8mPCZMf0H47t3wRjgS+wCUjDZgT4MikIy1dxsHsoPCBYesS/qBHL8tKVwyAtVyexPyG8mpKrTP/sDkNEO68svuCzLMhv95eD4JrQzznY0DKzgnMHWL43F1LJ1fofcq04mW2ZW4UeYMv2y2TcyL9Rv69Gf9H7NvBVZ25ZwbB4A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Op69KttYOEFt6w3NBSM8itWFKMv7c7YqxwIiib2mH3Q=;
- b=mlR+vg8TXHYLu7sSzL/nf2GKzLqOcMsToMsZKttpqGo590fFan1NISjDgPR2XzWp4z+88+Zm9bnK3mTHN74bRpnyFDkQbUj4mZ+X3CgPWTY8bRigUG1+07UtVLVgNbnZOoE/vVmcsF02c5rmV2hntuZWpbNsH6YLSccm3SZXm3bKcauJeVOdmB1ffkssXCH0oEn0amdLpbF0ha/+ZkNClItqqy4R/O45ikkBJCjjvNpOaq+ny6yVb/RCUO56ExqBG4rBdTD0zi/Gu+LOf+SeCpVFJ8EHrcjuq08Cq0kBJKfSj6cJcLssGkld/eu0h2K5tFV04s2X8W1/CTEy9ohFWg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PA4PR04MB7790.eurprd04.prod.outlook.com (2603:10a6:102:cc::8)
- by AM9PR04MB8601.eurprd04.prod.outlook.com (2603:10a6:20b:438::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.29; Mon, 12 May
- 2025 21:09:45 +0000
-Received: from PA4PR04MB7790.eurprd04.prod.outlook.com
- ([fe80::6861:40f7:98b3:c2bc]) by PA4PR04MB7790.eurprd04.prod.outlook.com
- ([fe80::6861:40f7:98b3:c2bc%4]) with mapi id 15.20.8722.027; Mon, 12 May 2025
- 21:09:45 +0000
-Date: Tue, 13 May 2025 00:09:42 +0300
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Gerhard Engleder <gerhard@engleder-embedded.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: tsnep: fix timestamping with a stacked DSA
- driver
-Message-ID: <20250512210942.2bvv466abjdswhay@skbuf>
-References: <20250512132430.344473-1-vladimir.oltean@nxp.com>
- <532276c5-0c5f-41dd-add9-487f39ec1b3a@engleder-embedded.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <532276c5-0c5f-41dd-add9-487f39ec1b3a@engleder-embedded.com>
-X-ClientProxiedBy: VI1PR06CA0190.eurprd06.prod.outlook.com
- (2603:10a6:803:c8::47) To PA4PR04MB7790.eurprd04.prod.outlook.com
- (2603:10a6:102:cc::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60006239E76
+	for <netdev@vger.kernel.org>; Mon, 12 May 2025 21:59:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747087173; cv=none; b=cVgsrAz4TkQpuhmneCD5vP4rJGkk4X6QYWIp5IADZw49egr9juTw37KsNyyLL878qdjJJ2HvKscC5tICx+N4zj1LxZIjC7iHk8C3e1P8hz+U7QlD8BGeg6hNaxputnm8tvFLPKdYCot334qWmMMZebXcnsGDO7qUFmYTuzed3QU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747087173; c=relaxed/simple;
+	bh=xkYHrqmdQlLIXwChgymo7Naf+IJIZhZ+EQbUpaq9llc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lzVv5ogluTD6gCvVulfbQWhqlqch1CAWIPV/RTrleitG6dJBBjYdUr/qJuWhN3rQQVqJe8Oo+xFhakzaaqEbX5VBDSDtkbPR9sVlIYfWVRtB+humSOvHfho7fgAhac/PZCiW9zWm/Nz/atN9cQcbeln7ib18bSdjsCjCFh9nbRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B5ujIh1s; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747087170;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=WIa9wdCgF8ndkq4uSm4Tu2qsgVXpc321rtvVy6nGMgo=;
+	b=B5ujIh1soM7QQOjj/hjPbEXLLGFRhCZ4ui4Oal3wWFjRPOXJO+0awGijBs45cFEtr/lTTg
+	hXPslNzCP6ILsaYXXdQZTQA3Id/5WjYMCWsRFkFPXKOh3mYUWw0+K7SizhSCuzE77sUUL6
+	70zm1l+rTQQIyInTV12UvwYOtaaDniI=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-144-aNFSZQqBOquWjbRMp_HHJg-1; Mon, 12 May 2025 17:59:28 -0400
+X-MC-Unique: aNFSZQqBOquWjbRMp_HHJg-1
+X-Mimecast-MFC-AGG-ID: aNFSZQqBOquWjbRMp_HHJg_1747087168
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3a206f05150so1140412f8f.0
+        for <netdev@vger.kernel.org>; Mon, 12 May 2025 14:59:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747087167; x=1747691967;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=WIa9wdCgF8ndkq4uSm4Tu2qsgVXpc321rtvVy6nGMgo=;
+        b=WW+5a3EYZpMtEKBgIOFYVj/BIBGNycO2DpDkYhibfmwRhxB8mjgr5YGZ9e+D7203cq
+         JnSAK9yzS/R6FJJcjru6NI5QYRTUzc64o5qWrapxz/SFYwk138/fvfCQ0A9bnASuxx4Q
+         0nY3c4/UvADOgzgeGU7Ijnav4109nMQrkRGv+NnOISqDGGlTg1E7ecjNy+AdXErEATeZ
+         OMsd9EacBlxF3yKteOYB12jfUvOF9YC0UyRXiAher+fLeqqxT6QzU8G+XCsHUAb8pZYd
+         ttGSBFTkynWGhuFu8u7HmlNTuWn+te6PC+scDvTaRSEFCpmiugPES1Qc9XfeMvP5ujKr
+         hnIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV7L6kOczKFof7RpNwWgKFbDBVZq0+KVi4JrV6v5qG/3d4AtC32QZCbN0kxnkAaCPvN7QFNy7w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzhdpu3H+k8rr8bqYBmue2RYFN6Si1F2duRUEgnoHV0iEjM/yLg
+	3TEIYZAI6fracHxcjIZQtxljLYaOwdCsnsPLFx8WtUZEMF2bgJr23FbEaZDIFp04LPMPJY5JPnw
+	lH2L+73NbiG8KTKarcLhI8n46W8hx6rgXrn76MeOuSzj7hgnHQtoQdA==
+X-Gm-Gg: ASbGncvoBOWcIw+y4QJhrRs44u7yv19RMqlpKBgGy4p2otr4jeIIgNEufySz7R+hNGt
+	CaBtlzWsY4DBWMEejsnoKFK5RzYoL0Jk3q9fC3Hs+imQBg/w/kfLOlXgIWd8ql2xG2dCtqPBK0Z
+	jEJUK9+c9T42Pm42h0b+dDH2b+QVBZHTiZ8bMc3JzJrcbZXMNS97szW8sXnkl0H2djFKgjK9fRX
+	+DPam+HGCxN3fRdlB+EbDRaw3ygb6jujRqQ4yX9gPFPFVud0RcuWejsx6iAogeYpBYGHJE9NNTA
+	XC7X85g/efVj4xCCd6Rqh9I21cHviwrL3BFSF18GI/m3DxPzsFhUXvgwqokJuvwVhuW1a+eD8gD
+	ZFxcLugrckvtV8C3Zcs8osH29AgHySo37vAWVWN8=
+X-Received: by 2002:a5d:588a:0:b0:3a0:b2ff:fb00 with SMTP id ffacd0b85a97d-3a1f64b4557mr10225475f8f.44.1747087167672;
+        Mon, 12 May 2025 14:59:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFXZLVEy2AMg6+TJB/yJT5QNmiZbsx9yvU/SgKIjl83sV/WZpbpykp3nPL4GY/l6Cs/+499AA==
+X-Received: by 2002:a5d:588a:0:b0:3a0:b2ff:fb00 with SMTP id ffacd0b85a97d-3a1f64b4557mr10225466f8f.44.1747087167294;
+        Mon, 12 May 2025 14:59:27 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f4a:5800:f1ae:8e20:d7f4:51b0? (p200300d82f4a5800f1ae8e20d7f451b0.dip0.t-ipconnect.de. [2003:d8:2f4a:5800:f1ae:8e20:d7f4:51b0])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a1f5a4c5a4sm13747072f8f.81.2025.05.12.14.59.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 May 2025 14:59:26 -0700 (PDT)
+Message-ID: <bb31c07a-0b70-4bca-9c59-42f6233791cd@redhat.com>
+Date: Mon, 12 May 2025 23:59:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PA4PR04MB7790:EE_|AM9PR04MB8601:EE_
-X-MS-Office365-Filtering-Correlation-Id: eb71d7da-c5a1-4a5b-3ce8-08dd9199520d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?jcECE1rgroqj59G3IAnBKg+mLwk1bnCzKpfA9C1FmRUIkEE6Reg3MDaxcWK/?=
- =?us-ascii?Q?uxV1m2wGV3WHjxUvB+WWzs7aM06+JzfzoaHoIXH/29b0UT3OJoKuLnV1Ru0X?=
- =?us-ascii?Q?3mwb0pkGGIzk+tHurlz9kNcrWAiz7eD6XxCaGHqmZbHLphbl/5jSAec1fmCK?=
- =?us-ascii?Q?3HGnpPUEUv8Kggx11H+oxl6cAgjV7M7VLJkn7fZS2CI4oXpi/1TKb8uXhOIu?=
- =?us-ascii?Q?dStShTl6TOwm25NxnTswdD5/6j3vpwtFVHtXZ80IjuHuVs8S/PwTQN4XMsLA?=
- =?us-ascii?Q?RFEhgAlTP20JoUcF+X6L6z1K3OMRf41P/kJBMobU297U0T/BuTTemFE92mUl?=
- =?us-ascii?Q?A5a3sLBQ+B2OXjs4cgoRISUKGYa5g31XKqkF14evIdQQYdUqSIic4cOPIYmh?=
- =?us-ascii?Q?xzAG6xB0+C/180k51iT7LoR56WD+KyeJQ5GvbfBRvR03G03cDLCbakh1rHsR?=
- =?us-ascii?Q?ENUqLFxQqc1+SfkM9tn9/WATO7JI/GEKW5pYCSbBRJNAbcK2VfMx9+b74v/1?=
- =?us-ascii?Q?ZSdJp8W+6vA1XtTU63PznoM6h0LfeDaf9P4vCxi575Pq1Q0s7gPnVliI/nDH?=
- =?us-ascii?Q?R87oMrZtCT08i0EtTHY6R9DP9I+H2iKO4mGt+9/rd7PUrpFJnfHEhk86dIeY?=
- =?us-ascii?Q?yp3MbIII0x2kbuCch6rjRt+Kpix5bYOb+jWyj9vktx+NIndQw48wywt68aBN?=
- =?us-ascii?Q?nhxXgmUzvfvHHeSxQp2DDgV2Pash2dQe0CroRyjAwg9FU+VjmhVG2GnI27h5?=
- =?us-ascii?Q?XxPJgUY2osj3wwOEcaW6MVi02vH7ET3e5vbqbh3/FI7FCGtA5MeDrIUOcBU7?=
- =?us-ascii?Q?Qfrk7g6xUGDw8EpRSJD/y3bErZ7NAGPB+DxBvYImuAEQLufpAXmVZn9Be7dG?=
- =?us-ascii?Q?1+yyYLV/dSAmxOL6/TNS9lY301Tfdvec0cc+He2cZtydDbSpoYQQoPk8yzkn?=
- =?us-ascii?Q?zxg7yn7j8b52DFSkfxHJx7KczYJ8kKbYDundQIGzjy3aHzZHk19kKPhxmSlZ?=
- =?us-ascii?Q?rwM6XlyQ825j/ES9F+Ng3dQe7S9BYFMqzHk3Yj7p3sN/5U76EnundlNU8Yht?=
- =?us-ascii?Q?sqcmafEto4Q1MM/kiDnkkqw06Z1mG3qQGKQH9ZKKq50icAxJWklwAyhnF8eh?=
- =?us-ascii?Q?J+8MmJC0OCn4tXYPIzafPTMNtqxdvSspV7FaUgNVyd/+WmGbCdWMJiLqJo7I?=
- =?us-ascii?Q?Qy1X5GclELVzDBHxYFNS+rm4BPlJPm3yBT4wNVcZGSCfJq4sdqSwZH+9osVG?=
- =?us-ascii?Q?T3GumL2K5BPDYO/8rdaPXvalVRkZm15pMAUrQc8PW7xNF1eOw3O1TTpEyWdb?=
- =?us-ascii?Q?MeFVMiisAzfj16AxzwwfyrRKXrl4cPRHfYPfk0JA9v2l7Ejny3+PS8AlMrsc?=
- =?us-ascii?Q?kRRHd/yLvtUPUhSPYXZ0jdfT0unYQ8tP7u6l57hWZA8nOg5V1SZNOm6zbeaZ?=
- =?us-ascii?Q?KxIXqh/ObSo=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB7790.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?6ex7bb5koAgHTGzJo45d4TVw7ToQpjNIugTnJl0rHrLO1qZSQaRtUMie6Whe?=
- =?us-ascii?Q?DQ8qu2Br5IuTiYBZdTQeT5rH4vrKyCBZbL9Uwxejs+xs5jTUndKKCMtm0jF1?=
- =?us-ascii?Q?U3fhWGT7lTEazTxX5rW9c59vpZwgzvdl6+MSBiN1In5CLREVdYMvhgl8tCWQ?=
- =?us-ascii?Q?Fdb/SM/L505MkjGlTxS8+UtiWGCNImz06JOzcKlZ2LLcTvg/AR+0acS+HaR9?=
- =?us-ascii?Q?8Fh8sK0RczL95OgLiR2q5HER9Rr0NF5S5p/BhjG9qeUj5eeIDf4s49uEl5Pc?=
- =?us-ascii?Q?NMbKVRMS/ajiYD25SDhL1wKTo+UrqODyHbvq1QWqWm9IX0nZ/fDEnP2MEM6/?=
- =?us-ascii?Q?6uxXNtbvteLW0qVYrtPVhPvtCI6sUWOZpvas04+YS9jgyd8OrmoVFaRptbuI?=
- =?us-ascii?Q?6XaqDtpKEFYfo3f7llXizBvTVlTJlcYMBPMbHaoL9MLIl2Z6DHm7BAa4AVG+?=
- =?us-ascii?Q?vbTtaUMMPtwAtTt//8Vas7uChkniTRZU0U7AGG75ClAqGltwoq05oXef3zBv?=
- =?us-ascii?Q?EB0dbjprfrseVfFp6GYo/MGRRxRK0WBNOquMA4X8SFFdyNb/H3YvHFHecoNt?=
- =?us-ascii?Q?nzfF4s2wWgOqN7rSZh+6BKL3sek0h+u3friuMS3eiUivDeW+ymeQHalAOUyd?=
- =?us-ascii?Q?YGB+sA+42ZOicxDchLag0WvvOAbinTa4+ZBdbls4F/Z+K7w3dwDMampCdwNX?=
- =?us-ascii?Q?pkgyNM7HAMx0KmrMkPkNLrI6DErtMAdoYnRz3ihcQO0KT1CKfeQWftoyRAyy?=
- =?us-ascii?Q?zDPAuE4p6GNBlbdiBNOsl52yReXDlC0+breyFtBWyWz2POvBoJEeh9hQ1kfx?=
- =?us-ascii?Q?invaeVfSfzMuA1Vk+KSD/CBY8Oe+hKMkACGuJYs73yfGy8+jWo4YKGYltS8h?=
- =?us-ascii?Q?YXPNKenu77VTA1TOK+IsCi/L3QqaPUVWmBYfR3x8knpNnZLsqnEb6z+LPfrp?=
- =?us-ascii?Q?JtbZzKVaj4iFQTktmUnuR85aNlhe6EpIX6y/22y1YqClBTPqSESBUT7/cR4c?=
- =?us-ascii?Q?GdLh/CB6//P70Oof0FU6Bj3I7JHIhhutCrsZ+kL8XqTgslbuR4ZdkLFoS6Wk?=
- =?us-ascii?Q?DEWJkT6lNWQfg4vcRRSPJa/7T2Lu61lMP4nD4JiUvsCSMqBRnFGPQEZWHQgU?=
- =?us-ascii?Q?qpPw+Ljj7CWH4dQtTrIbHtchyl+f1kSQiLA3HF0enkLrJBAB5JAMSswSUT4J?=
- =?us-ascii?Q?b1fRB16iVI2z9Zmf2bseyT8X/VkpH8QfDD1GhFTC5VEXZKUk9ICe/MNa9hpe?=
- =?us-ascii?Q?F+qdn6bI8v0VUZBzDRAOiwBARAy+sHVMAPKhxLH3/YIkTGadcVsiE4OEB2GS?=
- =?us-ascii?Q?INZWR6W3kLeM8DQddedw2Jj/BoLLm6ny63ru8HfoioGoJXzinNjPNWRLcN7E?=
- =?us-ascii?Q?GCWKLNoJPzhxgLfWD00STOXiUSroclqQkqVJq2ZKKYwerhUfldEP/rr1aKpy?=
- =?us-ascii?Q?KchD7HIn9Tmm/uA3CfUtR1HqKtCBpNSnj0zx6fqGZ2vjB3FXSfkYRCe25UGG?=
- =?us-ascii?Q?bykfWevDhaO8MqAOViFkp+ul7yskhuW1Do/DZXtRYEl7SKfnQYfNQ1C6EdmV?=
- =?us-ascii?Q?cYDKI3rC2ref6oZMZPoOR/cLHdAYx8BOsq1oiAE8vlkldBBGThzxdGWb0+7/?=
- =?us-ascii?Q?Bg=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eb71d7da-c5a1-4a5b-3ce8-08dd9199520d
-X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB7790.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2025 21:09:45.1173
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: J6H+xFshXY2xqU+/PPJWKBh3aZmqkgDnHNIn7BDHHMPs3N1KutgBpX09I2Oyv2ZiqXM4hKb6f7NWOiqtwM5bsA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8601
+User-Agent: Mozilla Thunderbird
+Subject: Re: AF_UNIX/zerocopy/pipe/vmsplice/splice vs FOLL_PIN
+To: David Howells <dhowells@redhat.com>, Andrew Lunn <andrew@lunn.ch>
+Cc: Eric Dumazet <edumazet@google.com>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ John Hubbard <jhubbard@nvidia.com>, Christoph Hellwig <hch@infradead.org>,
+ willy@infradead.org, Christian Brauner <brauner@kernel.org>,
+ Al Viro <viro@zeniv.linux.org.uk>, Miklos Szeredi <mszeredi@redhat.com>,
+ torvalds@linux-foundation.org, netdev@vger.kernel.org, linux-mm@kvack.org,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1069540.1746202908@warthog.procyon.org.uk>
+ <165f5d5b-34f2-40de-b0ec-8c1ca36babe8@lunn.ch>
+ <0aa1b4a2-47b2-40a4-ae14-ce2dd457a1f7@lunn.ch>
+ <1015189.1746187621@warthog.procyon.org.uk>
+ <1021352.1746193306@warthog.procyon.org.uk>
+ <2135907.1747061490@warthog.procyon.org.uk>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
+ dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
+ QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
+ XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
+ Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
+ PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
+ WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
+ UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
+ jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
+ B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
+ ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZgEEwEIAEICGwMGCwkIBwMCBhUIAgkKCwQW
+ AgMBAh4BAheAAhkBFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl8Ox4kFCRKpKXgACgkQTd4Q
+ 9wD/g1oHcA//a6Tj7SBNjFNM1iNhWUo1lxAja0lpSodSnB2g4FCZ4R61SBR4l/psBL73xktp
+ rDHrx4aSpwkRP6Epu6mLvhlfjmkRG4OynJ5HG1gfv7RJJfnUdUM1z5kdS8JBrOhMJS2c/gPf
+ wv1TGRq2XdMPnfY2o0CxRqpcLkx4vBODvJGl2mQyJF/gPepdDfcT8/PY9BJ7FL6Hrq1gnAo4
+ 3Iv9qV0JiT2wmZciNyYQhmA1V6dyTRiQ4YAc31zOo2IM+xisPzeSHgw3ONY/XhYvfZ9r7W1l
+ pNQdc2G+o4Di9NPFHQQhDw3YTRR1opJaTlRDzxYxzU6ZnUUBghxt9cwUWTpfCktkMZiPSDGd
+ KgQBjnweV2jw9UOTxjb4LXqDjmSNkjDdQUOU69jGMUXgihvo4zhYcMX8F5gWdRtMR7DzW/YE
+ BgVcyxNkMIXoY1aYj6npHYiNQesQlqjU6azjbH70/SXKM5tNRplgW8TNprMDuntdvV9wNkFs
+ 9TyM02V5aWxFfI42+aivc4KEw69SE9KXwC7FSf5wXzuTot97N9Phj/Z3+jx443jo2NR34XgF
+ 89cct7wJMjOF7bBefo0fPPZQuIma0Zym71cP61OP/i11ahNye6HGKfxGCOcs5wW9kRQEk8P9
+ M/k2wt3mt/fCQnuP/mWutNPt95w9wSsUyATLmtNrwccz63XOwU0EVcufkQEQAOfX3n0g0fZz
+ Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
+ T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
+ 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
+ CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
+ NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
+ 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
+ 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
+ lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
+ AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
+ N7eop7uh+6bezi+rugUI+w6DABEBAAHCwXwEGAEIACYCGwwWIQQb2cqtc1xMOkYN/MpN3hD3
+ AP+DWgUCXw7HsgUJEqkpoQAKCRBN3hD3AP+DWrrpD/4qS3dyVRxDcDHIlmguXjC1Q5tZTwNB
+ boaBTPHSy/Nksu0eY7x6HfQJ3xajVH32Ms6t1trDQmPx2iP5+7iDsb7OKAb5eOS8h+BEBDeq
+ 3ecsQDv0fFJOA9ag5O3LLNk+3x3q7e0uo06XMaY7UHS341ozXUUI7wC7iKfoUTv03iO9El5f
+ XpNMx/YrIMduZ2+nd9Di7o5+KIwlb2mAB9sTNHdMrXesX8eBL6T9b+MZJk+mZuPxKNVfEQMQ
+ a5SxUEADIPQTPNvBewdeI80yeOCrN+Zzwy/Mrx9EPeu59Y5vSJOx/z6OUImD/GhX7Xvkt3kq
+ Er5KTrJz3++B6SH9pum9PuoE/k+nntJkNMmQpR4MCBaV/J9gIOPGodDKnjdng+mXliF3Ptu6
+ 3oxc2RCyGzTlxyMwuc2U5Q7KtUNTdDe8T0uE+9b8BLMVQDDfJjqY0VVqSUwImzTDLX9S4g/8
+ kC4HRcclk8hpyhY2jKGluZO0awwTIMgVEzmTyBphDg/Gx7dZU1Xf8HFuE+UZ5UDHDTnwgv7E
+ th6RC9+WrhDNspZ9fJjKWRbveQgUFCpe1sa77LAw+XFrKmBHXp9ZVIe90RMe2tRL06BGiRZr
+ jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <2135907.1747061490@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, May 12, 2025 at 10:07:52PM +0200, Gerhard Engleder wrote:
-> On 12.05.25 15:24, Vladimir Oltean wrote:
-> > This driver seems susceptible to a form of the bug explained in commit
-> > c26a2c2ddc01 ("gianfar: Fix TX timestamping with a stacked DSA driver")
-> > and in Documentation/networking/timestamping.rst section "Other caveats
-> > for MAC drivers", specifically it timestamps any skb which has
-> > SKBTX_HW_TSTAMP, and does not consider adapter->hwtstamp_config.tx_type.
+On 12.05.25 16:51, David Howells wrote:
+> I'm looking at how to make sendmsg() handle page pinning - and also working
+> towards supporting the page refcount eventually being removed and only being
+> available with certain memory types.
 > 
-> Is it necessary in general to check adapter->hwtstamp_config.tx_type for
-> HWTSTAMP_TX_ON or only to fix this bug?
+> One of the outstanding issues is in sendmsg().  Analogously with DIO writes,
+> sendmsg() should be pinning memory (FOLL_PIN/GUP) rather than simply getting
+> refs on it before it attaches it to an sk_buff.  Without this, if memory is
+> spliced into an AF_UNIX socket and then the process forks, that memory gets
+> attached to the child process, and the child can alter the data
 
-I'll start with the problem description and work my way towards an answer.
+That should not be possible. Neither the child nor the parent can modify 
+the page. Any write attempt will result in Copy-on-Write.
 
-The socket UAPI doesn't support presenting multiple TX hardware timestamps
-for the same packet, or better said, user space has no way of distinguishing
-the source of a hardware timestamp other than assuming it comes from the
-PHC reported by the ethtool get_ts_info() of the driver. If the kernel
-delivers multiple hardware timestamps to the socket error queue for the
-same packet, nothing good comes out of that, so we expect there to be
-filtering somewhere to avoid that.
+The issue is that if the parent writes to some unrelated part of the 
+page after fork() but before DIO completed, the parent will trigger 
+Copy-on-Write and the DIO will essentially be lost from the parent's POV 
+(goes to the wrong page).
 
-The way DSA switches are hooked up is by presenting themselves as a
-collection of N MAC interfaces (possibly with hardware timestamping
-capabilities of their own) stacked on top of the host port like VLANs,
-with their ndo_start_xmit() doing some packet processing and ultimately
-calling the ndo_start_xmit() of the tsnep driver.
 
-DSA is supposed to work with any MAC driver as host port as long as it
-is fairly well behaved, and as a MAC driver you don't really get to
-choose if you support it or not. One of the expectations is that the
-host port driver should only provide hardware TX timestamps only if it
-is the active TX timestamping layer for the packet. That is one level of
-filtering.
-
-DSA will prevent adapter->hwtstamp_config.tx_type from ever being
-changed from the default value by blocking driver calls to
-SIOCSHWTSTAMP, and that is another level of filtering. See
-dev_set_hwtstamp() -> dsa_conduit_hwtstamp_validate() -> ... ->
-__dsa_conduit_hwtstamp_validate().
-
-Another case where the packet visits your ndo_start_xmit() but the
-timestamping duty is "not for you" is with PHY timestamping. To user
-space, it looks the same (for better or for worse), so SKBTX_HW_TSTAMP
-is set by the usual place in __sock_tx_timestamp(), and can be found set
-during ndo_start_xmit().
-
-I didn't mention this because as opposed to DSA, PHY timestamping needs
-explicit MAC driver cooperation, and the tsnep driver does not currently
-fulfill the requirements for supporting PHY timestamping - so no user
-visible bug exists there.
-(1) the control path operations, SIOCSHWTSTAMP and SIOCGHWTSTAMP, are
-    always processed by tsnep_ptp_ioctl() and never passed on to
-    phy_mii_ioctl() -> phydev->mii_ts->hwtstamp(). So it never gives
-    timestamping PHY drivers a chance to set themselves up.
-(2) the data path hook is in skb_tx_timestamp(), which tsnep calls from
-    tsnep_xmit_frame_ring(). That part is fine, but in the future it may
-    result in one of the drivers from drivers/net/phy/ setting
-    SKBTX_IN_PROGRESS even when tsnep_xmit_frame_ring() didn't do that.
-
-(1) is something that in the new API based on ndo_hwtstamp_set() changes
-radically. After converting to the new API, the core, in dev_set_hwtstamp(),
-decides now whether to pass the SIOCSHWTSTAMP call to the MAC driver or
-to the PHY driver, it is no longer the MAC driver's choice. So it
-becomes more like DSA, you need to comply with a basic set of principles
-and then you may support stacked timestamping layers without even
-knowing it. It boils down to the same thing, only provide a timestamp
-if you're the active layer.
-
-> In Documentation/networking/timestamping.rst section "Hardware
-> Timestamping Implementation: Device Drivers" only the check of
-> (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP) is mentioned.
-
-Yeah, a more complete picture is built later on in the document, in the
-section immediately following the one you quoted.
-
-> > Evaluate the proper TX timestamping condition only once on the TX
-> > path (in tsnep_netdev_xmit_frame()) and pass it down to
-> > tsnep_xmit_frame_ring() and tsnep_tx_activate() through a bool variable.
+> probably by
+> accident, if the memory is on the stack or in the heap.
 > 
-> What about also storing the TX timestamping condition in TX entry and
-> evaluating it in tsnep_tx_poll() instead of checking
-> adapter->hwtstamp_config.tx_type again? This way the timestamping
-> decision is only done in tsnep_netdev_xmit_frame() and tsnep_tx_poll()
-> cannot decide differently e.g. if hardware timestamping was deactivated
-> in between.
-
-That would be a lot better indeed. I didn't want to make a clumsy
-attempt at that.
-
-> Also this means that SKBTX_IN_PROGRESS is only set but never evaluated
-> by tsnep, which should fix this bug AFAIU.
-
-SKBTX_IN_PROGRESS is part of the problem (and in case of gianfar was the
-only problem), but tsnep has the additional problem of not evaluating
-adapter->hwtstamp_config.tx_type even once, in the TX path. I've explained
-above the results I expect.
-
-> > Also evaluate it again in the TX confirmation path, in tsnep_tx_poll(),
-> > since I don't know whether TSNEP_DESC_EXTENDED_WRITEBACK_FLAG is a
-> > confounding condition and may be set for other reasons than hardware
-> > timestamping too.
+> Further, kernel services can use MSG_SPLICE_PAGES to attach memory directly to
+> an AF_UNIX pipe (though I'm not sure if anyone actually does this).
 > 
-> Yes, there is also some DMA statistic included besides timestamping so
-> it can be set for other reasons too in the future.
+> (For writing to TCP/UDP with MSG_ZEROCOPY, MSG_SPLICE_PAGES or vmsplice, I
+> think we're probably fine - assuming the loopback driver doesn't give the
+> receiver the transmitter's buffers to use directly...  This may be a big
+> 'if'.)
 > 
-> I can take over this patch and test it when I understand more clearly
-> what needs to be done.
+> Now, this probably wouldn't be a problem, but for the fact that one can also
+> splice this stuff back *out* of the socket.
 > 
-> Gerhard
+> The same issues exist for pipes too.
+> 
+> The question is what should happen here to a memory span for which the network
+> layer or pipe driver is not allowed to take reference, but rather must call a
+> destructor?  Particularly if, say, it's just a small part of a larger span.
+> 
+> It seems reasonable that we should allow pinned memory spans to be queued in a
+> socket or a pipe - that way, we only have to copy the data once in the event
+> that the data is extracted with read(), recvmsg() or similar.  But if it's
+> spliced out we then have all the fun of managing the lifetime - especially if
+> it's a big transfer that gets split into bits.  In such a case, I wonder if we
+> can just duplicate the memory at splice-out rather than trying to keep all the
+> tracking intact.
+> 
+> If the memory was copied in, then moving the pages should be fine - though the
+> memory may not be of a ref'able type (which would be fun if bits of such a
+> page get spliced to different places).
+> 
+> I'm sure there is some app somewhere (fuse maybe?) where this would be a
+> performance problem, though.
+> 
+> And then there's vmsplice().  The same goes for vmsplice() to AF_UNIX or to a
+> pipe.  That should also pin memory.  It may also be possible to vmsplice a
+> pinned page into the target process's VM or a page from a memory span with
+> some other type of destruction.
 
-It would be great if you could take over this patch. After the net ->
-net-next merge I can then submit the ndo_hwtstamp_get()/ndo_hwtstamp_set()
-conversion patch for tsnep, the one which initially prompted me to look
-into how this driver uses the provided configuration.
+IIRC, vmsplice() never does that optimization for that direction (map 
+pinned page into the target process). It would be a mess.
+
+But yes, vmsplice() should be using FOLL_PIN|FOLL_LONGTERM. Deprecation 
+is unlikely to happen, I'm afraid :(
+
+-- 
+Cheers,
+
+David / dhildenb
+
 
