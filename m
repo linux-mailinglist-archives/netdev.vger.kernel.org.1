@@ -1,56 +1,57 @@
-Return-Path: <netdev+bounces-189716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A17EAB3579
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 13:01:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35727AB356D
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 12:59:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28CB58628CD
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 10:57:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4A981883964
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 10:58:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB6B268FCC;
-	Mon, 12 May 2025 10:57:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2042E268FF9;
+	Mon, 12 May 2025 10:57:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iD6qfBig"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ba/XEQAG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2DC267B85
-	for <netdev@vger.kernel.org>; Mon, 12 May 2025 10:57:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF5C9268FC8
+	for <netdev@vger.kernel.org>; Mon, 12 May 2025 10:57:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747047439; cv=none; b=DPzRwmdrgRM7cYqdpkKirB4p48CbJRff3QR10P7P8yXXvdBjkx+1ikYA7CBrnkZ/G/5FZ3CwYHoq/8s6GkrTk0M87hVWJLNzsZ0Opp5IuoE6ULEuwAj23ryuOor3+JSWJTGzfJJrG6Z4g+CJlNP9BeV48n6qOq/JXK2r1JQwChs=
+	t=1747047450; cv=none; b=UGvpuZirJWufh9XcBiPdlDL7Eyh7iWnVebfuyKLM9KdCYJ4hVUeol1dUV0yqNNyMxGS4wmOV6Tj4KTm/u1rqb5oFjW84bYd5DCgVPTW7SrUIg+LBGV4NfuPuAVoUMzsLmQRLnYda0siRWY8qD3hUcmJsV4rzn3t/wCvemzgecBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747047439; c=relaxed/simple;
-	bh=i5ebpQwlcAkg+tah6S03pf4Ve/4SNna4Barm0m9q+jI=;
+	s=arc-20240116; t=1747047450; c=relaxed/simple;
+	bh=ft3tp/TGCqtIPgW7LCqFQy6icTZ1RJOHTIZlPKaVFsY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A/HQ0RF3KMTpdUK31JyUKxFQHfH2abFD9sUp8NNpB1U/A7lxoBX6p3Nxces5EImYCKnlpc0cnqSQqs2Xfn5FNS2T0Lt8hUpLzIIDXhcxZCa3r5SNH+5D4Y0ol4Z4uhjJWmFeOAyJ8DFM35voQqlbmDWM4uP3JQY7rm3BnlZ7avM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iD6qfBig; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADBDCC4CEE7;
-	Mon, 12 May 2025 10:57:14 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=inKtEMKjkU3r/wnaE1hiv4s1Ova0CsLtRrwrcINQn74XIXDUQ+5UcR9Fvkd/YewyVLKT7m3AINvTkattBtZlFY3XA0oDM+FvBiB3vnP5WKIaiRPfgNxOwaYHwydgACs02j7Oj6ikSmgJktjJIaXTfh94POJj9vnzg7It2wnDsdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ba/XEQAG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4385C4CEE7;
+	Mon, 12 May 2025 10:57:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747047436;
-	bh=i5ebpQwlcAkg+tah6S03pf4Ve/4SNna4Barm0m9q+jI=;
+	s=k20201202; t=1747047449;
+	bh=ft3tp/TGCqtIPgW7LCqFQy6icTZ1RJOHTIZlPKaVFsY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iD6qfBigbnHp2TbJamlOS3nVy6AGmXgIpzkEHqONZQj0XpjU6DA8NRRqY3bjrr3gq
-	 nQ+kjXi84LIUk8+JGth6xlbnpTmjP6mK+8uJYZ/i6WVI/jJ0iJiw1oxRd/BcGKAMwK
-	 v1npwUOmH7okvODEcxBkiZoktNOBMD77518njWZNEaYAlIieKscoVm0u8Gc0oiMl79
-	 EXf5eKyKRUU2HAWSrjX/4poiWfjP02dDYcTQOSBr46b7RedtLA0VYMVZLDMP9EMDFu
-	 3rlnI6djhdXaiL60YKmzix7SE1S0jHku8+7deZNVquE91FFGtfxaK/crYFU2Em+f1a
-	 HlQs3zd9NQCfA==
-Date: Mon, 12 May 2025 11:57:12 +0100
+	b=Ba/XEQAGdUsdNOVTsAFNF2KQcRnIHUuM7Q+EtDVBHWE9mTPK7oP7Ez0CgtlvkTMMn
+	 dgOcNk5ehuzNwefVX+xmKM3sRG0PYQYj171AxcnU+EVh2PRjJ1Tv4d8oyEHLTENfuW
+	 fbpf87BYVnzqXtE+ViKniP1tomXb+mrTjRt9s48b3WGGMEhx+4zAmNtJye9bGYFxEW
+	 trOOgbd3A1fjEol6gxm1vKJA8ZPXOWmKj5XzTCB2UMRpFHuEOMQ1qIp4A345a7rgO9
+	 deUeal1v/mkfaydHWqApqq3mO2D0ikPytIRysWvGaghR5oJBznGJTa3EXfqKsTOCLQ
+	 8mYIMAJo58KTQ==
+Date: Mon, 12 May 2025 11:57:25 +0100
 From: Simon Horman <horms@kernel.org>
 To: Jiawen Wu <jiawenwu@trustnetic.com>
 Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
 	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
 	mengyuanlou@net-swift.com
-Subject: Re: [PATCH net 2/2] net: libwx: Fix firmware interaction failure
-Message-ID: <20250512105712.GW3339421@horms.kernel.org>
+Subject: Re: [PATCH net 1/2] net: txgbe: Fix to calculate EEPROM checksum for
+ AML devices
+Message-ID: <20250512105725.GX3339421@horms.kernel.org>
 References: <20250509100003.22361-1-jiawenwu@trustnetic.com>
- <F2122F5E9DA92C07+20250509100003.22361-3-jiawenwu@trustnetic.com>
+ <AB6DC619636B23FE+20250509100003.22361-2-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,62 +60,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <F2122F5E9DA92C07+20250509100003.22361-3-jiawenwu@trustnetic.com>
+In-Reply-To: <AB6DC619636B23FE+20250509100003.22361-2-jiawenwu@trustnetic.com>
 
-On Fri, May 09, 2025 at 06:00:03PM +0800, Jiawen Wu wrote:
-> There are two issues that need to be fixed on the new SW-FW interaction.
-> 
-> The timeout waiting for the firmware to return is too short. So that
-> some mailbox commands cannot be completed. Use the 'timeout' parameter
-> instead of fixed timeout value for flexible configuration.
-> 
-> Missing the error return if there is an unknown command. It causes the
-> driver to mistakenly believe that the interaction is complete. This
-> problem occurs when new driver is paired with old firmware, which does
-> not support the new mailbox commands.
-
-Hi Jiawen Wu,
-
-Please split this patch so that each issue is fixed in a separate patch:
-the rule of thumb is one patch per fix.
-
+On Fri, May 09, 2025 at 06:00:02PM +0800, Jiawen Wu wrote:
+> In the new firmware version, the shadow ram reserves some space to store
+> I2C information, so the checksum calculation needs to skip this section.
+> Otherwise, the driver will fail to probe because the invalid EEPROM
+> checksum.
 > 
 > Fixes: 2e5af6b2ae85 ("net: txgbe: Add basic support for new AML devices")
 > Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-> ---
->  drivers/net/ethernet/wangxun/libwx/wx_hw.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-> index 3c3aa5f4ebbf..de06467898de 100644
-> --- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-> +++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-> @@ -435,7 +435,7 @@ static int wx_host_interface_command_r(struct wx *wx, u32 *buffer,
->  	wr32m(wx, WX_SW2FW_MBOX_CMD, WX_SW2FW_MBOX_CMD_VLD, WX_SW2FW_MBOX_CMD_VLD);
->  
->  	/* polling reply from FW */
-> -	err = read_poll_timeout(wx_poll_fw_reply, reply, reply, 1000, 50000,
-> +	err = read_poll_timeout(wx_poll_fw_reply, reply, reply, 2000, timeout * 1000,
->  				true, wx, buffer, send_cmd);
 
-nit: Please line-wrap so that lines remain no wider than 80 columns.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
->  	if (err) {
->  		wx_err(wx, "Polling from FW messages timeout, cmd: 0x%x, index: %d\n",
-> @@ -443,6 +443,12 @@ static int wx_host_interface_command_r(struct wx *wx, u32 *buffer,
->  		goto rel_out;
->  	}
->  
-> +	if (hdr->cmd_or_resp.ret_status == 0x80) {
-> +		wx_err(wx, "Unknown FW command: 0x%x\n", send_cmd);
-> +		err = -EINVAL;
-> +		goto rel_out;
-> +	}
-> +
->  	/* expect no reply from FW then return */
->  	if (!return_data)
->  		goto rel_out;
-
--- 
-pw-bot: changes-requested
 
