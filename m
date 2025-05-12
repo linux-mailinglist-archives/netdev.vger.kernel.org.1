@@ -1,188 +1,141 @@
-Return-Path: <netdev+bounces-189785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA264AB3B24
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 16:47:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E3243AB3B58
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 16:51:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DBF417E217
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 14:47:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76B0116769C
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 14:51:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 582E3229B28;
-	Mon, 12 May 2025 14:46:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 359F522A7E6;
+	Mon, 12 May 2025 14:51:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EEeuRNBP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YiuOr5Vc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D7AD21578F;
-	Mon, 12 May 2025 14:46:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53177217704
+	for <netdev@vger.kernel.org>; Mon, 12 May 2025 14:51:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747061215; cv=none; b=C5xNYnrkft3ynwkHv3s3ibxfsJmO6Qhu5LU4tlGwRIVWoQatPHAqBBOnoNZU3f6/jC75rteN8ha+UZYHwu/QU4cSoGKkjsJ5ycwftwYMWVUhoHUyf1riy3nytAwhG3DpWXduyCy+zrlZdxTlx3efVSuVugLBoYmTJF268CRbMuU=
+	t=1747061506; cv=none; b=QMyBKSZjz3ooPJ0YCo9eATgHr1IckwHm98CSqqf46MykfoSY2LFACNIW3OvLVBggDZJAV9uZIa93qa8Psl/wsLQD2OiNxPcGYZJFMnNFOjl3ZQZypFpZ8mlxgQ9A0gpgw61nshimGfrimEiVpOtYV4XdRIjvtlmWxnXkIpo0aE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747061215; c=relaxed/simple;
-	bh=y0vMuL7Jk3buyImcDrOCI0mRiAxBKFqw2NbBhs7V0mU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=o+fW5Eg0zaNiCKXQMQ4uzrJz+pdoB936jVVI46/4/ExMEy/ehD3tIm8nbUaW1jYV3gAGE0R8z5Dy6EqxnOzUvNPej6KaxGLpgCoe+h3b1WoduNUhHDN586GbJuDBMXbTO2hYIuGyvFZAqmHLL/VfeP11J/F6BiDCa9ygfbNqiwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EEeuRNBP; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5fcf1dc8737so4900833a12.1;
-        Mon, 12 May 2025 07:46:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747061212; x=1747666012; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=dODwYdoTP5CLtjwQLab2m40ueX2C15m4SlmDSPZB+Rw=;
-        b=EEeuRNBPe8MMCoPQg6c0+5PW/W4x7Rx+1IUooHWDYaif4kxNOAwASsARZYbTBrG7WG
-         GYwLY3GssTKnko/F1ZVDet6MjgQNHWeaCA5iemOPStJ+BzzacKz+8ODlboIztidOvsEv
-         +wkfVGT5aKehKcZqinRKYGh8PYbZf9xkJX4xIWAQVkaxNr+llWQ91A1QNrgGb9co5S+C
-         leK7OSysQHcYuGLcdMcDDnIEOBvgyxJFxVxJ381+U+S4CWbPVUpR5YdQS9Rk+4N2c92q
-         XF9UDcBTjpPAeROgt6o/enoP3kpm6LZWqTxp0cLpfoIGDC8Bt7KlCCsGZ8+NFssa/jFQ
-         45tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747061212; x=1747666012;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dODwYdoTP5CLtjwQLab2m40ueX2C15m4SlmDSPZB+Rw=;
-        b=lMraTLMG1W66jY0rvaNlf1gWTYEkos0ot7VQa4Es3EvspVBGrhntDuDgz3U0PhyKax
-         vXNIvmxyUBPvLO9Aszjg2mnvMnKbM03tNll7npDTgiGUNw4rouB7BkvCIwOW/OLXTkEA
-         VZjbuGNi3YpF08raScytJz2K69Z/XWH6se7v1Ucgx7/A+bnklvaGoRQDImFPCVIRlxu3
-         tlRwNIpsO2ucwDh4kbpb04jCnQ+Q/8JcPkQ9ItP2lW9huttehFebRPiIRYvyMD4QoHgB
-         Z1OTOKt85WAzDP+ahzdo9dobYIwTC1p4BSPTFCPKQfQU6FpuwsSnBkffLYD4y7wYqwfD
-         cLUw==
-X-Forwarded-Encrypted: i=1; AJvYcCUp+HRR/Hrms0Gbf96LFn29QogVbrgOu8iHQd0nR7/ZNaXyxbohiL9ZrAk+ipICAxQMN4EBHAaS@vger.kernel.org, AJvYcCVhZ5WHDlXajeyH+TgEqZcda/Wi6VnXDux2/s2AkQT+zrCDMgiWVhi+7M05cj+IGFoLPKza4zg+@vger.kernel.org, AJvYcCWXGA9225yW63It0+2PMJA4ZTvVnj2B0TnXx0G8I3k4V2/OhZLJxSlt3uekPUG6pRBR7wIVLIVA1M+5pB0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGglSfRfiLNXPTnuJUyql5bE4fZpqAKHd8tum83mg4cxMUMsNY
-	OHFBIUandAmII3w2ej+I78/JtKYs3DYUnn7AAv4CUWYfqagRXQeX
-X-Gm-Gg: ASbGncvzP0EZEHs8bKGENALYcLcMq/HIHhe1RvD2CvdW050k+3NG2K5wAwW2O7T25aa
-	jxATbH1y/JbCsfwR230at+fTtdQbJ4yGnzRJgABpBNeZTx55NP4SmZbHHTBGyJRgBwuLKRIUOoi
-	a/JQvQlEcWYXw9tuczchVDBJIaLCiIVgJza8XKdRgFxh6rC0JDg74OmgQyeS995wZxL0KYsE9cO
-	MNakhwC3i2EG2oHVhMtgHcgDrYo07me05mSnUhZnokZjY4CfBHD8DM4XCTiOmy0JDbAdK0mqD+f
-	/KJ4L5lbTf/eHajPKUtsDIs/gU3aX09Fv5hV3JF2IDEjEm/26xiF1P5xW2Yt0UXYfMEXlcF3ChE
-	1HT3FRSA1KK2VaQ3UW2LF49z7W+3HGg==
-X-Google-Smtp-Source: AGHT+IE2pf4YYuapDIgRwCICOjUiidG0buuxRhxKXdwb/npfu+yM/uc5CWac1o9ODhHsbILHbvroYQ==
-X-Received: by 2002:a17:907:a08d:b0:ad2:4ed5:ca4b with SMTP id a640c23a62f3a-ad24ed5cc4bmr320290066b.61.1747061211427;
-        Mon, 12 May 2025 07:46:51 -0700 (PDT)
-Received: from localhost.localdomain (ip092042140082.rev.nessus.at. [92.42.140.82])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad2197be17csm620475066b.156.2025.05.12.07.46.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 May 2025 07:46:50 -0700 (PDT)
-From: Jakob Unterwurzacher <jakobunt@gmail.com>
-X-Google-Original-From: Jakob Unterwurzacher <jakob.unterwurzacher@cherry.de>
-To: Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Marek Vasut <marex@denx.de>,
-	Tristram Ha <Tristram.Ha@microchip.com>,
-	Florian Fainelli <f.fainelli@gmail.com>
-Cc: jakob.unterwurzacher@cherry.de,
-	stable@vger.kernel.org,
-	Woojung Huh <Woojung.Huh@microchip.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2] net: dsa: microchip: linearize skb for tail-tagging switches
-Date: Mon, 12 May 2025 16:44:18 +0200
-Message-Id: <20250512144416.3697054-1-jakob.unterwurzacher@cherry.de>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1747061506; c=relaxed/simple;
+	bh=skKPBy1kNvIiJYBQKiVWoH27pofu9c5eyYPy/uPCdpQ=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=ut61XSYASYMcBAd+znQcYOzCcX3Tw4P3OMiMBSAMIkTfZ5FBE+ZCAjyFYdIcI3tP/LHx0nrOWnrhAiL2xgUeLUHkXK1lUeH6LA050SDJhqT6exyh96MWfkAl9+YqjxZ2UNqUNysaY3zEkYIWSETaNcgDULNbzP191Td0YD8SXkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YiuOr5Vc; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747061503;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ymBHISBoRGTxFMCkiuee6KTKTNeCUMLWNl/W6hAI6Kw=;
+	b=YiuOr5VcRUIaJKSLp7pnHeHbhaRKeKphk88toxvlBVvnr/wKivi/3Lj5dW8kgTOqREiS1J
+	bXgUn17WjybXZfwifRx4RZIDFkYMmB/5Tm1bX74T/sikD8vv6JRIqHdfh8HMiiAI5Zpl58
+	0vmoGHGL7IYQ+eL2zdz0Z3LeQxpY3DA=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-474-kDroPQX2Oc-xfnwc7e4WeQ-1; Mon,
+ 12 May 2025 10:51:40 -0400
+X-MC-Unique: kDroPQX2Oc-xfnwc7e4WeQ-1
+X-Mimecast-MFC-AGG-ID: kDroPQX2Oc-xfnwc7e4WeQ_1747061498
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 653311955D7F;
+	Mon, 12 May 2025 14:51:37 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.188])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DFD7030001A1;
+	Mon, 12 May 2025 14:51:31 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <1069540.1746202908@warthog.procyon.org.uk>
+References: <1069540.1746202908@warthog.procyon.org.uk> <165f5d5b-34f2-40de-b0ec-8c1ca36babe8@lunn.ch> <0aa1b4a2-47b2-40a4-ae14-ce2dd457a1f7@lunn.ch> <1015189.1746187621@warthog.procyon.org.uk> <1021352.1746193306@warthog.procyon.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: dhowells@redhat.com, Eric Dumazet <edumazet@google.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    Jakub Kicinski <kuba@kernel.org>,
+    David Hildenbrand <david@redhat.com>,
+    John Hubbard <jhubbard@nvidia.com>,
+    Christoph Hellwig <hch@infradead.org>, willy@infradead.org,
+    Christian Brauner <brauner@kernel.org>,
+    Al Viro <viro@zeniv.linux.org.uk>,
+    Miklos Szeredi <mszeredi@redhat.com>, torvalds@linux-foundation.org,
+    netdev@vger.kernel.org, linux-mm@kvack.org,
+    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: AF_UNIX/zerocopy/pipe/vmsplice/splice vs FOLL_PIN
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2135906.1747061490.1@warthog.procyon.org.uk>
+Date: Mon, 12 May 2025 15:51:30 +0100
+Message-ID: <2135907.1747061490@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-The pointer arithmentic for accessing the tail tag only works
-for linear skbs.
+I'm looking at how to make sendmsg() handle page pinning - and also working
+towards supporting the page refcount eventually being removed and only being
+available with certain memory types.
 
-For nonlinear skbs, it reads uninitialized memory inside the
-skb headroom, essentially randomizing the tag. I have observed
-it gets set to 6 most of the time.
+One of the outstanding issues is in sendmsg().  Analogously with DIO writes,
+sendmsg() should be pinning memory (FOLL_PIN/GUP) rather than simply getting
+refs on it before it attaches it to an sk_buff.  Without this, if memory is
+spliced into an AF_UNIX socket and then the process forks, that memory gets
+attached to the child process, and the child can alter the data, probably by
+accident, if the memory is on the stack or in the heap.
 
-Example where ksz9477_rcv thinks that the packet from port 1 comes from port 6
-(which does not exist for the ksz9896 that's in use), dropping the packet.
-Debug prints added by me (not included in this patch):
+Further, kernel services can use MSG_SPLICE_PAGES to attach memory directly to
+an AF_UNIX pipe (though I'm not sure if anyone actually does this).
 
-	[  256.645337] ksz9477_rcv:323 tag0=6
-	[  256.645349] skb len=47 headroom=78 headlen=0 tailroom=0
-	               mac=(64,14) mac_len=14 net=(78,0) trans=78
-	               shinfo(txflags=0 nr_frags=1 gso(size=0 type=0 segs=0))
-	               csum(0x0 start=0 offset=0 ip_summed=0 complete_sw=0 valid=0 level=0)
-	               hash(0x0 sw=0 l4=0) proto=0x00f8 pkttype=1 iif=3
-	               priority=0x0 mark=0x0 alloc_cpu=0 vlan_all=0x0
-	               encapsulation=0 inner(proto=0x0000, mac=0, net=0, trans=0)
-	[  256.645377] dev name=end1 feat=0x0002e10200114bb3
-	[  256.645386] skb headroom: 00000000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-	[  256.645395] skb headroom: 00000010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-	[  256.645403] skb headroom: 00000020: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-	[  256.645411] skb headroom: 00000030: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-	[  256.645420] skb headroom: 00000040: ff ff ff ff ff ff 00 1c 19 f2 e2 db 08 06
-	[  256.645428] skb frag:     00000000: 00 01 08 00 06 04 00 01 00 1c 19 f2 e2 db 0a 02
-	[  256.645436] skb frag:     00000010: 00 83 00 00 00 00 00 00 0a 02 a0 2f 00 00 00 00
-	[  256.645444] skb frag:     00000020: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01
-	[  256.645452] ksz_common_rcv:92 dsa_conduit_find_user returned NULL
+(For writing to TCP/UDP with MSG_ZEROCOPY, MSG_SPLICE_PAGES or vmsplice, I
+think we're probably fine - assuming the loopback driver doesn't give the
+receiver the transmitter's buffers to use directly...  This may be a big
+'if'.)
 
-Call skb_linearize before trying to access the tag.
+Now, this probably wouldn't be a problem, but for the fact that one can also
+splice this stuff back *out* of the socket.
 
-This patch fixes ksz9477_rcv which is used by the ksz9896 I have at
-hand, and also applies the same fix to ksz8795_rcv which seems to have
-the same problem.
+The same issues exist for pipes too.
 
-Signed-off-by: Jakob Unterwurzacher <jakob.unterwurzacher@cherry.de>
-Cc: stable@vger.kernel.org
-Fixes: 016e43a26bab ("net: dsa: ksz: Add KSZ8795 tag code")
-Fixes: 8b8010fb7876 ("dsa: add support for Microchip KSZ tail tagging)
----
-v1: https://lore.kernel.org/netdev/20250509071820.4100022-1-jakob.unterwurzacher@cherry.de/
-v2: add Fixes tags, Cc stable, "[PATCH net]" prefix
+The question is what should happen here to a memory span for which the network
+layer or pipe driver is not allowed to take reference, but rather must call a
+destructor?  Particularly if, say, it's just a small part of a larger span.
 
- net/dsa/tag_ksz.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+It seems reasonable that we should allow pinned memory spans to be queued in a
+socket or a pipe - that way, we only have to copy the data once in the event
+that the data is extracted with read(), recvmsg() or similar.  But if it's
+spliced out we then have all the fun of managing the lifetime - especially if
+it's a big transfer that gets split into bits.  In such a case, I wonder if we
+can just duplicate the memory at splice-out rather than trying to keep all the
+tracking intact.
 
-diff --git a/net/dsa/tag_ksz.c b/net/dsa/tag_ksz.c
-index 281bbac5539d..55ef093fe66b 100644
---- a/net/dsa/tag_ksz.c
-+++ b/net/dsa/tag_ksz.c
-@@ -140,7 +140,12 @@ static struct sk_buff *ksz8795_xmit(struct sk_buff *skb, struct net_device *dev)
- 
- static struct sk_buff *ksz8795_rcv(struct sk_buff *skb, struct net_device *dev)
- {
--	u8 *tag = skb_tail_pointer(skb) - KSZ_EGRESS_TAG_LEN;
-+	u8 *tag;
-+
-+	if (skb_linearize(skb))
-+		return NULL;
-+
-+	tag = skb_tail_pointer(skb) - KSZ_EGRESS_TAG_LEN;
- 
- 	return ksz_common_rcv(skb, dev, tag[0] & KSZ8795_TAIL_TAG_EG_PORT_M,
- 			      KSZ_EGRESS_TAG_LEN);
-@@ -311,8 +316,13 @@ static struct sk_buff *ksz9477_xmit(struct sk_buff *skb,
- 
- static struct sk_buff *ksz9477_rcv(struct sk_buff *skb, struct net_device *dev)
- {
-+	u8 *tag;
-+
-+	if (skb_linearize(skb))
-+		return NULL;
-+
- 	/* Tag decoding */
--	u8 *tag = skb_tail_pointer(skb) - KSZ_EGRESS_TAG_LEN;
-+	tag = skb_tail_pointer(skb) - KSZ_EGRESS_TAG_LEN;
- 	unsigned int port = tag[0] & KSZ9477_TAIL_TAG_EG_PORT_M;
- 	unsigned int len = KSZ_EGRESS_TAG_LEN;
- 
--- 
-2.39.5
+If the memory was copied in, then moving the pages should be fine - though the
+memory may not be of a ref'able type (which would be fun if bits of such a
+page get spliced to different places).
+
+I'm sure there is some app somewhere (fuse maybe?) where this would be a
+performance problem, though.
+
+And then there's vmsplice().  The same goes for vmsplice() to AF_UNIX or to a
+pipe.  That should also pin memory.  It may also be possible to vmsplice a
+pinned page into the target process's VM or a page from a memory span with
+some other type of destruction.  I don't suppose we can deprecate vmsplice()?
+
+David
 
 
