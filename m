@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-189612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189613-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C387AB2D14
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 03:35:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCF35AB2D21
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 03:36:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AD5F189D738
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 01:34:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03F4316720A
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 01:34:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 695A3213220;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C02F7213E71;
 	Mon, 12 May 2025 01:28:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=silabs.com header.i=@silabs.com header.b="RsqX43q1";
-	dkim=pass (1024-bit key) header.d=silabs.com header.i=@silabs.com header.b="ObSGY39Z"
+	dkim=pass (2048-bit key) header.d=silabs.com header.i=@silabs.com header.b="QYANk6lw";
+	dkim=pass (1024-bit key) header.d=silabs.com header.i=@silabs.com header.b="c8ayZtwP"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0a-0024c301.pphosted.com (mx0a-0024c301.pphosted.com [148.163.149.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBAC420E323;
-	Mon, 12 May 2025 01:28:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D8D520E718;
+	Mon, 12 May 2025 01:28:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.149.154
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747013307; cv=fail; b=cfkzDY06grHtmlnYbtMb6LNpOCWiVIAXbDJIZ0wPP7YMRvCg0zO0ca0iOnmsoGfuhZZqoEYx+TuNuMk/E2VwdfQtZCUefglbbKuuwa0fwAVr7nKIpcwWjfhqNUw4n1TmLSn7AK0BNinaVGuVf0NQwIAZJILuhbjq43iTMVAVsyw=
+	t=1747013307; cv=fail; b=iyP2WhTbpFUcioq4ny2FjkZBBYd/wTH+SjekO/mmGwapcZ7aIIAkXYz4jGR7NMSCPkuC24yDcsurFU7sDO1ZRm/QjTL4UphfIOcp/N0EqNE1OG6UG7HhIRFiSVcgXBJSqa6tTG9xQ7i0+MguXSldYMbBZa8/6cauQJmfJdOQRhI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1747013307; c=relaxed/simple;
-	bh=dAcJSUaGdxRYNzLemz09uwt37Rt3VQNTmqaA/bpJ/eg=;
+	bh=J5jZqqfqhMmRHBOqN+2/e6fmEgAlMc1/FlJT8cM195Q=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=A9+7V245MjZVR4zA7ND9j0r81HOA0H6fKeQ31NCz/Zj2Z3aXyXkUasVBpA4RJ/634g5CXmIy/Uvjkzhx6lOp2aBednymml0kNF2kAye+/7qek1qCUBP9vUuiLrWPBYee3QRqQUQl6Mqc5DG4PXUH2/UBrixMo3XYkjsCL4E6HPE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=silabs.com; spf=pass smtp.mailfrom=silabs.com; dkim=pass (2048-bit key) header.d=silabs.com header.i=@silabs.com header.b=RsqX43q1; dkim=pass (1024-bit key) header.d=silabs.com header.i=@silabs.com header.b=ObSGY39Z; arc=fail smtp.client-ip=148.163.149.154
+	 Content-Type:MIME-Version; b=e0N/eS9dDfk6tjIEcIN2ZXPG7faH8vWcG+CtujTgmKHgG4yPJbCl17AsXR0qiAX1VMGvizVquA8I+bmAVOdDK+uCGjS7td3UrXA1ArFhGO6xDcWAmisdt9iK3RUcSYhPCnCXlpTn93xygCGz7ceY1Xe9kS7sVHqu8kMwQcL4Ed0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=silabs.com; spf=pass smtp.mailfrom=silabs.com; dkim=pass (2048-bit key) header.d=silabs.com header.i=@silabs.com header.b=QYANk6lw; dkim=pass (1024-bit key) header.d=silabs.com header.i=@silabs.com header.b=c8ayZtwP; arc=fail smtp.client-ip=148.163.149.154
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=silabs.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=silabs.com
 Received: from pps.filterd (m0101743.ppops.net [127.0.0.1])
-	by mx0a-0024c301.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54BMe1Rv027700;
+	by mx0a-0024c301.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54BMe1Rw027700;
 	Sun, 11 May 2025 20:28:12 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=silabs.com; h=
 	content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=pps12202023;
-	 bh=LTvOyFFoYHjTt4R2ws8k8T62c37WSdYxkVhSLGcjEqM=; b=RsqX43q116JF
-	K7bztHNioxSgvb64czQan6Qq2q2YvbVdkFvPeGJz9AjPFS67IdEiO3e9p+IWhuTO
-	zwSjcAArLs7Es6eEryW9Jf1T6GxEBEJbpH7zzClsJZmiOqm/J1cZCeTee0CEEozM
-	ultsFUNJcSaR3tRLAuRpcomYYUMSEEAsDZ/eKds139qO+c6HhH7ua80kHTAElCdd
-	CZslBKXfWHOWgEfrl2PCSl8syCDKiYPsgduZSs21ZhAr8CdCTkVxHhmJOrUgTpc7
-	PF1ChBZ98LtpeLNaN0c+HOLutiHo2tWECtN7n9FByoFpCslgXhRR/AxEQ2VxEVAL
-	FdGZrBjeeg==
+	 bh=RWBCh0EhSmW+QtYQmugPztGTiGpOuaav1Vsd1G/u5SE=; b=QYANk6lwX0q0
+	Pla2TXdym+V8aKnW7HQiX+iHC8j9nXBaVPAV/ilwGwEtxvf04AUPfQlE3+sMU2nb
+	vzspOLuup7LfIC//shP0KTGM5QDLdYQ6JC7X6qbjQHWc7+O7QtvvDPyErBUIlE0M
+	OeSXKceI53Eop2w7IdY8N4xrPHOVzHhXECb/rlAXkWs64qvTQu/1VxciJ/S0QY8J
+	sUq5q95bkWlH72JjzyztTKA0K9yGYxyvQLMsG6E8cNC45YXYH6FH8X2BKDaEv2/r
+	Hac18UKYbgOy2heFLFpzdCmGpPleYx+ncdscYBEDeiX72khAzKTekXuBM+VrSbuV
+	dLdMtTO08A==
 Received: from nam04-dm6-obe.outbound.protection.outlook.com (mail-dm6nam04lp2044.outbound.protection.outlook.com [104.47.73.44])
-	by mx0a-0024c301.pphosted.com (PPS) with ESMTPS id 46j34csvw9-7
+	by mx0a-0024c301.pphosted.com (PPS) with ESMTPS id 46j34csvw9-8
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 11 May 2025 20:28:11 -0500 (CDT)
+	Sun, 11 May 2025 20:28:12 -0500 (CDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=EW9wCsqzYR6oibYCaRMqxYWQl2Fpxz4m3bmxqmeWy+2lts6PdMfALLNmypaG1vPuHjuiql06keC/shHwiGmIh48d2cRCSVpzOTzKpMo1ozrhzAhvSpJMHGxwzoZx0K1i0O7WmTWQNdTvnPSYJyg8XLfC6aEjHSw4NDJHHRZE6ZJLqve50UKz9CTUHBv1txPWTA+/BwNuWg+9GlmgWqB/A4GF5GFSo3LK9STnLwv9rBA5OPlsz4AvdGUEOPvUlFbDHJ5t9QkFIZDxFuEOs4sdYI4K9bfy1UKcIdfyhvo5D+ZUzeE0wMwEMK6uLxzpSB9NsdqMCUDyAXEakrxvyHxooA==
+ b=MAo6dlmi3RaB6ErijkWIlsZzYz7D2On0jxurTbzfI9ZtWvLLYJ+1sxJGkQ1wXDqb92nwp3pzLsO9oDC33X8+qwQTVmQEupeMQQNve65o8/zXLunNiT0HeFTzUd7/cNvSdOWvSugoBsABxZUYhT+QKHPJyglqPq2k9XrpDYJd+kCA8wgYhArzkx+fL0rkQhkurAJptYcGkF7MMbJT1qTMsx05FT5DYfQ1QEwMzdwcX62K2HqXdIYr3Ov0K8EEdhB7p0G6TrnrMy66lSQ4Kj92Mgvb7guqaWKC2tzYud9ZLp9zO5b/xj0jItIEc9cW7hr7dpe/NikwlkSwauOnldBh7w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LTvOyFFoYHjTt4R2ws8k8T62c37WSdYxkVhSLGcjEqM=;
- b=H/sp0NDheMI0fpYhyPzssTEMpJzbIxy5Ey9UUk+zOY8d9SCzZ1LtVtRYeP/NjDegf4UzK6ZvB5n5Nexf9k2TXusQ2yrwqTaekH1Y6PlyygOnW0tA5M5DADmb5OjAuhXaeCMn/bP9I5ID5tFdC9avKGIbWI3S8AH6/P6VPpVJKlGP1/w9ECtndb7sbhYSPVIQA8uP9g6Z4624ItqUGrCnkx7gkyC+X6w68XD0eVRqLQpeDZvapV+GGKTwc2FlIitGe8eFdk1X/J3ruWB0fzM1dJZRgJd6LTDLkJ1ia4wesr9O7pdmij9P2EIUEOvhxI0dE6xELKRq8UNYNRGbeP3pcg==
+ bh=RWBCh0EhSmW+QtYQmugPztGTiGpOuaav1Vsd1G/u5SE=;
+ b=TI/EPhDnZ3JpVyv06Npacqy2CPZxMNYYffpnywTILkEcpkO1NrpE3ov589IcvIHL+5o4fVjFB532h2jotWPoZnA6PBjAPUVPplHNieUnYVKTbRs/DD6L4kIYyKksVLXl5nlMQMtlk2nqCy/Ciu4DWw50dJKfDKrwKlBf2ss15trGP+hH4YSN7MLixWs4tCqhtHJGT8lL+nn/x5cw9PdKKRDDWlq/mQdXU6SNH8CbF4JAfCh6FOS0NT5TA1fK2yMG7Q8tde6rw52ba2bvqVl6KwojgABjKgZ/ybSMB+YgbFMeYE0zQWqmpD5+aVdJsFXgPGk5W9Obdza+24lb3aNq9Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=silabs.com; dmarc=pass action=none header.from=silabs.com;
  dkim=pass header.d=silabs.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=silabs.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LTvOyFFoYHjTt4R2ws8k8T62c37WSdYxkVhSLGcjEqM=;
- b=ObSGY39ZxLkJx5dgCzHzfVs7gT1IvoZBdlqY6Rn6LaEanDnhUApPtL0WEINYijEBYKNzACbmTvGFr0IkAeKF/DGxL1mmw4DJcc9BUIMs0VAF5RmG8qjA0o+hh8FvwqJI+wGqiP3JWWJVuA4hRXEqotl1FjrjdTYmmJHWp2Kujf4=
+ bh=RWBCh0EhSmW+QtYQmugPztGTiGpOuaav1Vsd1G/u5SE=;
+ b=c8ayZtwPQV89lWkTPkdc4wH2HyxWl2lqlwQ8HI1uNJI5icbKS5QMaQoC9ubQ5txgmyZ4NLw2eGFC7+ewF2Ipz1gpVUvcyDy+HyqUvxQjkjXHgmik3cb5mWXWqQVFVexCi3nq5Xx+scnJpIUuMePv90SxNfTPcHr2i2VJPDnMJ+M=
 Received: from DS0PR11MB8205.namprd11.prod.outlook.com (2603:10b6:8:162::17)
  by PH0PR11MB4920.namprd11.prod.outlook.com (2603:10b6:510:41::22) with
  Microsoft SMTP Server (version=TLS1_2,
@@ -83,9 +83,9 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
         Silicon Labs Kernel Team <linux-devel@silabs.com>,
         netdev@vger.kernel.org, devicetree@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [RFC net-next 14/15] net: cpc: add SPI interface driver
-Date: Sun, 11 May 2025 21:27:47 -0400
-Message-ID: <20250512012748.79749-15-damien.riegel@silabs.com>
+Subject: [RFC net-next 15/15] net: cpc: add Bluetooth HCI driver
+Date: Sun, 11 May 2025 21:27:48 -0400
+Message-ID: <20250512012748.79749-16-damien.riegel@silabs.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250512012748.79749-1-damien.riegel@silabs.com>
 References: <20250512012748.79749-1-damien.riegel@silabs.com>
@@ -102,104 +102,104 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DS0PR11MB8205:EE_|PH0PR11MB4920:EE_
-X-MS-Office365-Filtering-Correlation-Id: 12c5d7a4-c00f-434c-1f5f-08dd90f44033
+X-MS-Office365-Filtering-Correlation-Id: 7402ee25-f5c5-40f5-6d85-08dd90f4409f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|376014|7416014|52116014|366016|1800799024|38350700014|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?b0hJVFlTZFVJOWtzamJCaTc4MmkrN0hZTVcwaVBGN20vRlpvSVdPeTZYL2R6?=
- =?utf-8?B?YlhyYVRidWc0Y3lvQ1lhZWhlYUFPVU1mUHdTZG1TanJUMzcwaDBYaXpwZGw4?=
- =?utf-8?B?M3o1UG5BcTBzQ3VVUmFZTGt0ZXBqazhFalBxU240emFSSmo4VUpGdDgxeHo3?=
- =?utf-8?B?RUZ1b2c0WWxROXJidUt5NCtrbGxnaSt6WjVUYXBKZjN3NUhHdTVJNU91ZlAy?=
- =?utf-8?B?RlFXRlNjQUdPdzhxT2pPQno3ajQzMTBzdG1MV1BtYUVPQ0xsUTFRMG5JY3hy?=
- =?utf-8?B?cXF1MDMrNDBnemVvY2NpYkdkRGdxNVJsMUt3UVl0UnkwT0tCZ2R2N0trV2cr?=
- =?utf-8?B?dW83QWVYTTZxYm9QcjNEcVlORlRZZ1VPc0o3STY4NWhHZ3ZoOTZZY3ZXS3J2?=
- =?utf-8?B?WFRWaUVpdnE3YjYxZVJKMG0xNllWeTlyd0FmOUVFeFRuREdOUmR6d0RkcTZo?=
- =?utf-8?B?cFo0UzAxUmNPVzFxVDlCbjRnQjh2M283UStCVEFNZmJIL0JxNituR2I2TzRz?=
- =?utf-8?B?RXZNSWlud05RZkZDR2pibWMrVDlWTzNDYjhJRFhMVEZxMSs2OTI0WThRKzZK?=
- =?utf-8?B?aGwzRGRnT3p2eG5tZVo3RVV2YXFhWXp5bFFmazBmdXFzTHlEL1QrTkZLaGd6?=
- =?utf-8?B?Tlkwd0lwVmU5VU0yOFdaLzdLc2ZhL2xGVk5pc2IyVXhMS0RicGVmOTRjRFZU?=
- =?utf-8?B?V0l2bUVsRHlDa29BL1ZzMFFrTUFRa1BNaVdKQ0hnd0dmYlhRTEpCM2s3dTk0?=
- =?utf-8?B?enBUSDdTYXl0V3pLTFdsdHgzYm5zRUtSeFY5SHdVT0RjaDlJWDVRbkg1Q3FD?=
- =?utf-8?B?emlua1cwQmdqc2g4RjFzYjlTMXJMMUFIN2xTME9UWDdYekNWT2RodS9HRkFG?=
- =?utf-8?B?MWFUeGRURUFqVmhGK3kxNmNCVFhWQnRORmhuUWVzS2pza0lOSFJSRUFXWVFB?=
- =?utf-8?B?Tm1XU0trZkl2djZtVzR2Q1ZjV0RFdnVOcHdNQkN6ME9kWTFaMVd4cHI4OVJS?=
- =?utf-8?B?S2dNMzd3Q1pXTFBPYUFySk1YY2RWY0JHRjVhUHBZTjJFbTJ0cFBrdFpxS2xp?=
- =?utf-8?B?bjZ0akorbXA4VnBUYnJGLzhiR3VueFhxSHByM0srSGhpekJlZkkwU1JDZXhT?=
- =?utf-8?B?bVNHZ2JFMGJHbHc0SzRScldwMGJrcHF0NkI0ZUtaa004S3BQZkJqQ29EM2dG?=
- =?utf-8?B?eHcyUXZhaVZOR3hSZXQvNjl6SzNveVhtRXVidDBqbVdyT2FPUjVzY1RnQ2ly?=
- =?utf-8?B?N1NVRWNXT2F3anlUOHNvc0hFMFNqaVVEY0VKRW40cDRreGVxbXFvbkltblJB?=
- =?utf-8?B?a2R6Q2ZKMVJHWmFmM09UZlBjYnVhQVdqTnQvVGNVelRjQ2dYUkxwQ0FnT0lh?=
- =?utf-8?B?VTBjTTloVnRrQ2VsZWdyWDNXS1UwZnJBRGpHbDcrMnBEZFltVVI0S0ZkV1lv?=
- =?utf-8?B?MmpjbmtKcXRGTlRNWGNnVm9pTHhUWjcxYnVSdmNXT21JTUJST2pERVMwTW4r?=
- =?utf-8?B?SHdmTjdYaXlOU0dBb2M4REdYako0TWJLTFBiVE1pZDE3cDJ5ei9vUjlCaWVQ?=
- =?utf-8?B?NTNIeTM3OEZZdU4yRkluUXczV2R5MHdaNDFTTTk5YnQ5NmhQWWpiMjRRb2p6?=
- =?utf-8?B?MmlRSUQ2VmJOMERLcWdWeWdRT1FRMEo5Vis3VnFnbTNVVWNMamsxcXZTbWlJ?=
- =?utf-8?B?TThCc09pZHlmNWZQajZrL0ZnQWhhVkcrdDR5ZGlTRXRiVi94Q08vVDZJQ0FL?=
- =?utf-8?B?VDExMVliakJGYkdWdURPVlBZQ1FvK1RFTDYzMzd1WW02U1E1UUN1NytrV25C?=
- =?utf-8?B?M0VyZkk1VU41Nkl0YkdvbFJCcUkzK0orVGFZRmhVWE0xVjlCWlJYNXFQdmpz?=
- =?utf-8?B?TDZLSVg1blRmNGdlUjREUjVxalBoRGk2ZmVWL1NuVFIyOEh4NG15OU1qWjRw?=
- =?utf-8?B?NkJCRjFrV0puMEh6N2hjV29TWG9yekJXMlpBTHkzNjA3cUdkWE1NNzZPVERX?=
- =?utf-8?Q?QTILZ98YTKTexe3ru6JdQBxWt86zz0=3D?=
+	=?utf-8?B?Ui9rV085OU1nNXNyK2ZLMEtLV05Qam91dEo0OWRsTFZ6K3FWRmdSY3A0UWQw?=
+ =?utf-8?B?TERhL2l1Y2lJMGx5VmRPSnFRMXR5Z0hTd0luSUwvZjQ0OFBpOUFIU1lYa1VI?=
+ =?utf-8?B?QmNQemEzK1NpVUJneUpXdUdsUW5yV1NIRVV0dXdQcE1rSlBxU2VyZlRPVlpt?=
+ =?utf-8?B?UVQ0aXpWRGJmTkdENThEWXhCNklzZmc1Rmp3eHpmRmlXa1ZzbG8rU3dmcHp4?=
+ =?utf-8?B?NExsalpyRmRQdnp3YmlIcEx0eHJvWTV4d1RwMVAvK1hadjVzNG9sREFma0Zj?=
+ =?utf-8?B?M3QvLzFaU2pkNDJ6dU1OeFF3L2lPcXdoRXBabHJsV0ZBZyt6M005b3I5TkRa?=
+ =?utf-8?B?TXVEZ1lBdDgyS0gwd3ZNa1lnVW5ISmxoMEdodUFDZXE0M0xwcXRVYXFXYk00?=
+ =?utf-8?B?d2VsUXVpdmtxdGZCbVp5SE5aZWE2WW1JaUZWK1JRZFR3QjBKYW9JZW9laFpo?=
+ =?utf-8?B?Q3pyaUZFOVV0UEpKQ2hacEZUY0FadUdxbEJLRytFMUdLS0FUNXZRM2IzSW55?=
+ =?utf-8?B?ckxZMm1Cam9aRmV2eTc3cU9ENjg5a2YyYlhQSm5zcy9mYUhvSzRTMFFsOHpN?=
+ =?utf-8?B?NUEzYjVGQ0g3QlNkRFFjVFhBejN3TW1NcytUajFmeDhGczRWYjBhTVJTM1My?=
+ =?utf-8?B?UHIxWUt3d3B6T3QvRzhieVN4VnZXbXVJZlFrek1kQXB5RmhpK3JjeGVDVXJI?=
+ =?utf-8?B?RXJnSXh1cHhXcjRBSSt0TkhTbUNmaHU1djJiZ2tyV2xxWElFRjJ4bEhFaG5T?=
+ =?utf-8?B?bWhiQVR1b2ZHUEczMDlBQWVaRmdzbmMyKzlTNS9oSzRIc1hBNDhBaTkxQjV5?=
+ =?utf-8?B?RzNwaFFsVkVWeEtHdnpXaTBvSU1NTFhickRPcC85THY5UVdyWm5zUksxRlBZ?=
+ =?utf-8?B?cWM3cnBIaDZ1NG00TXZncUxGRnZMZ0RxeVEvRHZUQ3krTmdDSkNTUmkyNW41?=
+ =?utf-8?B?Rm5FMG9lMUNRTDRERmVmZXlrNWpwbGtXU1Z6eTlrNjNxL0tyR0pZTGszdmpS?=
+ =?utf-8?B?cDdWbGhVOHpySXRVYTJFdUN4OVlwMEJaanNlTjJ0VnNSNlY1aHFrVDdHQmw0?=
+ =?utf-8?B?NVVhaGdvMlQwSGwzdytkcVdFWUd3RzVoVlkxOVhjajlLeEVDOUlnbUVpSVFs?=
+ =?utf-8?B?Y3lXSm82THQ5OWJnTDR0WmY1alZnVHkwb2pFVXI1MFZPcERvVGtXN2o0ZC8v?=
+ =?utf-8?B?NDVwUS9PUnVrOUtaMzR0Y0lHdE0wemNDT2FrdnM2ZEdubllGWmFxRjBscytE?=
+ =?utf-8?B?STRraWdwTEY2QUExK0duZkIyd2hPWGw2bnJUS2NjcTdxcjUweHlpUXJOZkpE?=
+ =?utf-8?B?d2pNWDYwZ21JOWNSYVd1NmJ0QUdBenZhWVhlSDIyYjRJRjdua2dGNUt0TVRu?=
+ =?utf-8?B?WStweDc3dzV2MWY1cnVTbkhaNEwwbGpmVmFLZDZ1MmlGVW5vOHB2VlVaWUhQ?=
+ =?utf-8?B?eisrY0QrNUFrdHRNWTRTMEFKb2xVVWFKenlBaW53SkxmWVBMRFZzdVQ5OWpB?=
+ =?utf-8?B?MW9KQitpZ0hRWVlrTDZrNWpMSU9lclFoVUNyaFovam1IRUN0VHlCaTBrdVdq?=
+ =?utf-8?B?TThWTTRBOWN0T3NmblNRK3pPdWRiWElCOG5rNCszRWlNMVp0ejk1cDI3by9s?=
+ =?utf-8?B?U0NrRm1JZHNFY2dFdmhwRC9qOHRNUnBUVlc0VkF6MUgwV3FJc3JoUW9DUHFD?=
+ =?utf-8?B?MjhOV0J1UFFncGFQZ3ZjbldVbkNaUEduRlhRL0d5clVxWFh0amY0ZVkyY0FY?=
+ =?utf-8?B?S1FQZDc0Q3B5VHA4S0NRclE4aFY5WDNaN0h3dGpmTzFEbFpHTDBNbWlWSVFN?=
+ =?utf-8?B?Mmk1dlVOREhLZjJTY1RXbkVMWmVBajRGUjhYazJ1alRTaHNZRWtoRDVGcXhu?=
+ =?utf-8?B?YmNLYTN1Y1hDdE5MUklXbmZLNHdvbzNXc0RwNDVseVlYMXhwNk5KZ3FuZGpa?=
+ =?utf-8?B?eU96Y0NBN3J3cllBVEpQT0xWVnRnR0xqY0VmWUI0V2QvMzI3aWg4akpzc2Yz?=
+ =?utf-8?Q?LGB3iIeg7lKZQtglrk05fXlUFGWkA4=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8205.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(52116014)(366016)(1800799024)(38350700014)(921020);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?bFh6ekczYWl2aGszeDBRMDV1OUdMUWRWWnFBNUQ4VWFpdTgvai9ibFUwd2s1?=
- =?utf-8?B?TnpFdzhtck9uS2F2aC9HemtMVEFPOUdTU05SMVAvSW53QlVkSFBSMCs2S2pM?=
- =?utf-8?B?bjlOell4R2Raa011eWFIdUhlNWxhVG0xME1aWHR4ZTh1Z2pEaUU1T2xoRWlw?=
- =?utf-8?B?NXlERkZVYXhtSUI2am5pVnk2UFgrUWtOU2tYQjhkOThuV0g3STFqcXZHb3ph?=
- =?utf-8?B?Mm1DQ3h0YjJXckZCT2s2MUpFc1gvTDIzamtYRVg0cExxSVlyeGtlRnNTSWxY?=
- =?utf-8?B?eEZZN1luYlNKRjArRXdieWFiWVhFSHZ5WEpFZVFkMnJDOUxjNityRkhsZ2VE?=
- =?utf-8?B?TE5JY2p4NDlxUnVISnpPSkxONDdqblpuU0VuY1U4L05EU0xqcDlwRngxMkIy?=
- =?utf-8?B?S2JyRGw4K1hKTzNtL21DZnBCR1ZJNTVtMktNMjNMLzUzSTlXY3hMNitpYzV2?=
- =?utf-8?B?cXlXT3BLUEwxNlFvNEtBcFN0enlHdmZrdFpkTmFYTUFCMXFsWWFwUEpiL2VB?=
- =?utf-8?B?cEpoZzA2TXo5NHo3UTJPYVlndEdmUldMOGQxdWlhUGZPQ3hidVBIaFU1dzBV?=
- =?utf-8?B?VkRPVzNyVnpSdDRLSWdCWXBEZHM5MWIrMEpXVnp2YVEzcGtZaE96WWo3YWJt?=
- =?utf-8?B?L3o4UEdVVVJUbGthY3NKYVR3MGN0dlhPNkJ5QVA3ZGdYdnZqSDA0TmloMllq?=
- =?utf-8?B?aDljaUU1bkVKUVdPakE2bGlxL0s2dGM1UkV1Uzc3VGJGelAyd2ZPbnZUSXo4?=
- =?utf-8?B?NHFOQmxPT1YzYUYySlpEMFlmdUd6N0ZSVHg5N25GcjU0eGozbkJYQWxneXVV?=
- =?utf-8?B?MnBPVWxTdmdoM3R6REhReWxpMWdPbDVpbWhYN1BXRXBrOTRmZGFiZFRYNCs0?=
- =?utf-8?B?Q2pDNTdsblRhaWpISUxJMkZvNlBnTjNuUlloQ0JieHVmNDE0YjVNQWtTTVRI?=
- =?utf-8?B?aGdSdXJDMU8zTUtYaHk4N3M0Yjhkdk1EVHdWM3JPVlRIOHI4ZXNNd0Jiem5H?=
- =?utf-8?B?MnhzakMyV3dDb2laTDdxc2psdHZiUUx5SlFpWTJQeDFheS9mR0s1U1FTajVS?=
- =?utf-8?B?c0Q0VFl6VG9MZkhhOVBtS3BDVTNGbEdVd3l5VjJYUXVCQUdWQlFQdllUb2JK?=
- =?utf-8?B?Y2djSkVCcnZQOGVYQnovQXMzSTlzNE81VTlwVnhrdGx5ZWtxenoxem5HRGRK?=
- =?utf-8?B?UWhFd0h3NTluOTVBYzhwOFh6YUZXa28vc2pOZTk3RDBWOC9EYTB2ZW9kM1FJ?=
- =?utf-8?B?ZVFTZElYN2VOM0thZktDMzNyN3ZjSFhkbWVjd2V1dFYraDBvT0lVSWJjZXVQ?=
- =?utf-8?B?Z3hMbGxXQ095M2lNSGlxQW80T2hweTNNWGxLRFZXRzNZN1JZT1JlYXExN0dC?=
- =?utf-8?B?c0R2VVAzUVdqVmo2aS85REdpdkcxZHU1NzhxT3ZLYjNiZFFQVFBOZ21XT2py?=
- =?utf-8?B?dWQrUnUzdVB6eVo4SGM0MCtKL0lyMmJnL0xmQ3JiOEtmdTNyVmJwZHBVMThk?=
- =?utf-8?B?ajBwT3Z2T0VxNlhkZWZ0NHc1NXRTQXhKZTFCY2o0QUp0VjhuZU5PK20ySzhE?=
- =?utf-8?B?YzloVXhYT2hvc0tLS1lybjlxSFB2ZURuY25DNnJDZU5CYVRrUElWaDRweXJj?=
- =?utf-8?B?THVRRVRyTjFjaXZITURoZ2wvRzdKSWV2MSs0VkpTcEhmNVl6UHJOZk00M29D?=
- =?utf-8?B?Tzgya2NNMk52aVNXUEFKQzZRcytTYitsd1Nta08xd0lOWTI2cFVYclUyT295?=
- =?utf-8?B?VGFIcWRLeUxjWEFTanlrVW9DQXdCajdxZTZYMm0rY1FQOW15eHora1BBa2tr?=
- =?utf-8?B?ZFJmNkpwMXRPVEsveGV1Y2NkWkxMOEpxSUFxaUt5NFg0VmpnVmRnVVlzWDVU?=
- =?utf-8?B?LzhTL2t4WWdqaXYzZTBnT2k0cklKQk5PenBJSXkvdDBZQzh6OXJBUFhqTEhD?=
- =?utf-8?B?dGtVYnBJZjhKOHJBcDFKNk0xeEE5UjQxZ0RRSlBMMTk1eUtON1VrMkJub3RZ?=
- =?utf-8?B?c1pLVVR4NXRKUnJpU09EREc1eXNqUGJQdzBwWHJtYXk2RVZ5bzhjMkZzZ2U2?=
- =?utf-8?B?MkhZU1VnS2NoT1VLbS9OV2wvUmxBRWZjMWowZC9MbythQmFxc0JIdnZ3eEFN?=
- =?utf-8?Q?gJM9dekY2VVRc1O5/R0/9Ik9z?=
+	=?utf-8?B?cjNiaHdSVmt1eHUyYk9pSElRSCtFSXNmVHVReXpoQURNT2Zma0d4MmRBUmQ3?=
+ =?utf-8?B?UkR1YVlSdEpwbWh5aHNkWTREZXFPSDRhNTJHNkNiMHJlNThxYjN1WVZ6QlYx?=
+ =?utf-8?B?RThmd0JzKzJybWl4SHlPOXZCc2haMEpwdTczd2ZCNnRTdmd3clFWdHU1YjN5?=
+ =?utf-8?B?REllVmRabFJUNVptbDBWbG1Ya1BPMmU0MkNobStYSDc5ejFTUWl2QnhEb3Yx?=
+ =?utf-8?B?S1lHOCtMaEJocnVQV25kdnp3OHVoN00yc2VzTHlMNnNqQkMvSkhmeUhaMWtQ?=
+ =?utf-8?B?NWFuN2s2U21Fc3hEWVVkQUxaWlNXTVkwcVpJSlErS0o2SGcxME90cnRsZWw1?=
+ =?utf-8?B?a0V4ZXJUdGNZYmgxS1pBNEZ4ZkFPSFh3RURORDJkM3ZDTjJmVFFEbWIrQk9F?=
+ =?utf-8?B?bTF4YUpQdFdUVHN3QWMzZ0lZNEQ0ZFUzbzJyTks5TThPallIcjVhOUFOYkY4?=
+ =?utf-8?B?dFd0MC9OZFhWVDRBSDRUVHlyQXAxTExTcGlxZlZHdzExT0dkTkxzRVQ1VVJ4?=
+ =?utf-8?B?UVJITGhla3ZiblB0RTA3bTNBRE1TbnJBWC9MYy9iUUM5ckREckpqR0dCck1u?=
+ =?utf-8?B?SnhUL2R0ck5kNHJ0MURGRzZ5N3FuQ2J5THFRUWlwelRVRWdRZmRoV1lyUGNi?=
+ =?utf-8?B?QXdBRWUyajhxRGVOMW1HUU93MEdDdDUrZGRKdFB6TitJRjRsN1llK1U4L21Y?=
+ =?utf-8?B?LzBJd3ppbGdXbms2N1dRMzVRWVQ4MGJEbGVjV016YnUwZFNSemFIaDFUWXBv?=
+ =?utf-8?B?UjVRUG1UcDVQNS9qSVhhN0hJUHIxekN5c3lidmx6TjZmRHJvMjJQbGNTRkVK?=
+ =?utf-8?B?T3EyTmFKMkxVaW1hTWVBWHdwaGRmZ01IdjJlSkxKc21Sb3pxRmJERkkreGd4?=
+ =?utf-8?B?bnJxQXl2Znh0RC90YzV5aWdzRzNhYmZqL0V5Tk1UYVJjZzhJRDF3RzNMaHFx?=
+ =?utf-8?B?VytkYjdPbGpEakR1V1BpS2J3TFhjZy8vS09UZGNQbm5JNExWS01BZXdCUW00?=
+ =?utf-8?B?RDFFVGs1MXkzY1RQYXk2R202UUNwbnlkZ3pvNE1GNEVhTW1ZNnJweGFDZWRG?=
+ =?utf-8?B?SmFyTzBZK1M3bk8xUE94dmZXcGg4WkZZOEZyd01kcTE4ZXo5VDl6UWxBVzJB?=
+ =?utf-8?B?N3UxZGJFVFEvOEs3R0JWemp1eXRxQjN0Ymw2RXpZYS9OY2ZJQXZqVzZta3Zo?=
+ =?utf-8?B?WWFKNWpJazUwYVJRUHFUaTR6OW1OSUJhbkxNZzhmNjlHdm1HTWFMQnEwNFdv?=
+ =?utf-8?B?eUMzZFF4Uy9VUXh4Qk9ZMVQ4WTJWZG9YNjFNWkxKVTBla2Z4L0VldytodlE2?=
+ =?utf-8?B?NlJPcllSOWo0WDZXS3RvM3pqNGJiSitFcWpqandZOTcyS0RIM1ptZ0Y3Uk4y?=
+ =?utf-8?B?dFZONTg2SVl1enpEcXNGMjJZVEhwQm51Z2NQRFlybExvUWh4ZlMrZDNqMlFx?=
+ =?utf-8?B?SHhOYXovOTI4K05ZS0xyRmV2TzBINFo5TjF0bVppbE84dGRhM3daTlI0NjEw?=
+ =?utf-8?B?QkFJbWpvd0J4SWNPY3lKSnI4cXNjaXFtOTZkZnJMaGFGUFRGNkRaUVJHc2Vx?=
+ =?utf-8?B?KzU3RDgrN05YR2JlWjlkeEpQZ2k1TnFIQndRYlNNVUFEWW15WDN0MU12RmZL?=
+ =?utf-8?B?c2twbEJhSnRxdGl3aFVJalQ4UStnMElQdGd5RzlLTmpPWDZCcTNRemdvUlQw?=
+ =?utf-8?B?UzdmQnY2YVI3Z0dHWExQczhIZmhIZjJsd29ycTBtbndFVHoxRHBpUmt5czd2?=
+ =?utf-8?B?VitWUmJRRlI3cFBwYVNzUnE5RytQSkNYRmMxdjJCdWo4WXhFSWpFYmZFQW8y?=
+ =?utf-8?B?M1ZKM2pmNlg3TWlkTkJjd3Rnb3dOUXpQTGFsMVA1RGF2aHlvVW5pWE9zcmlN?=
+ =?utf-8?B?L1B6ZXhmbVNJemJXSHlUTzJtQzFFM0VBZExNYjBVL1RWWmRIWWlZcTdmMUt6?=
+ =?utf-8?B?NjB4amppdlVEQzVjMnE1RWJaQS9ybGFxS1FLd0g2SHp2Uy83YXdrNXF1UFY0?=
+ =?utf-8?B?M0N3TXovRHBFa25vQ2lTcjY1QTExUWIzZTF0SmlJbUtLVSt2WFBEY1ZVWmVy?=
+ =?utf-8?B?ZEY2aGx4R00zWGFJMkNKNVJreXVyMWhOTURPRVZvV0tXbFFGRjdZL0ZrUDd0?=
+ =?utf-8?Q?KGoLcEngyZ9V3H6CucgV2oXlf?=
 X-OriginatorOrg: silabs.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 12c5d7a4-c00f-434c-1f5f-08dd90f44033
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7402ee25-f5c5-40f5-6d85-08dd90f4409f
 X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8205.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2025 01:28:08.1301
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2025 01:28:08.8558
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 54dbd822-5231-4b20-944d-6f4abcd541fb
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hypHCdGPE6KJ5ipVIGpdSNkH9tb0l0V7dOyT1AWQswnq+qdsDq87R0/o6Zb3BzjK+7r7Mondx4kbGd76IR1Q7w==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4L6nBYMGU6g4/teV0sCpJtEQtPXTFRWXT2e1bLsK2nc2o1IMyZV3qYJNJ6qQRSwzrIkuAQpU/rVUzYjCmkJcJw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4920
-X-Proofpoint-GUID: FB9XpQk501Pia991ia4JGv9uUuIu98Ur
-X-Proofpoint-ORIG-GUID: FB9XpQk501Pia991ia4JGv9uUuIu98Ur
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTEyMDAxMyBTYWx0ZWRfX4Q6AqC5r/sX9 ANB9BoyNSPCCGUNaWcc8pDxTnFaFJUzr6FxAR9r7dgbdhhEqregmBzF4C/mRJ/Idh2hIBAlMhgI 9x1UTlJTYZO7noJ83Yqfd8tmkiyyfutlSwu43DahThko6iahDE0+Sul9PSfzNbQzyyp3izUf8Ql
- nHMxolzwZV8v+9yaOAtV4d1TZXXWRDPnjdXaz2+LZHgEqBDsB8UTeCgoUdKWso91aMVCdePWW1B owpxRAmw4wWZ82D8dLg3As7gvBJRYWG1Rk6uYeITyK6bBWmf/+kvPDN38f8eE1NVPsxAEvT3qor /bzj7tyt5ZTBDpMPFzzxraNvQcymY/T7x3QVG8fSPSxaEkkwC/rbiHYicMvpw4DSRig4g5B+gc2
- RZuTOGCoLW2GUBhJ+GdfvLBVPcDMEu5H/lzsmZ1dtkVSJh5qX7ZHK6U4HA58aNQd5EKMDdGg
-X-Authority-Analysis: v=2.4 cv=L/gdQ/T8 c=1 sm=1 tr=0 ts=68214eab cx=c_pps a=coA4Samo6CBVwaisclppwQ==:117 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=dt9VzEwgFbYA:10 a=M51BFTxLslgA:10 a=i1IsUcr2s-wA:10 a=2AEO0YjSAAAA:8 a=TGmY4fB2UfIvIpc1UaMA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: 5nqPBLum36HYNw2ky0pK_kBkJAiJtO3-
+X-Proofpoint-ORIG-GUID: 5nqPBLum36HYNw2ky0pK_kBkJAiJtO3-
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTEyMDAxMyBTYWx0ZWRfX3KyM5IxF8ezH fUZhMtiizerpja8frg5PCv3WJqrgkySufuONI6xxIEFAnCgsAdCaiXdF7AN9e7ahi9uqc+TJsGs 8NLpKG9LD5lk48kvQemVrvY0Vdw7nZ0dmXhodi2MrYb39+kMm7I7cpVLtr+CDX2ff8kMitgPWr9
+ 0aEOFsc65dZWHfO4NV3l5Id9oTzPwm7f/oJBr0GfO38SN0e5tO2YCF78cF4euCUcde0so5lRhD9 PPuF9FMHNNi9ANCIOrY4ACtjWAVi15FjDrN43gIVsN3zUSao2dwOOX2ng0/R6ucclBUjIHTniR6 d9nuIuKxzvO9WqUU8FculOHP1txlURuXfpS64PfvvsfVau9UanLXvq496sttlLY91ou/z5pXJ/2
+ gDsx7tKUBBWJhSjClUS5qqEbmMfCmP77nK3ly848lQNxLEzxU1ikbcndYwkBukGoMA9ufiYi
+X-Authority-Analysis: v=2.4 cv=L/gdQ/T8 c=1 sm=1 tr=0 ts=68214eac cx=c_pps a=coA4Samo6CBVwaisclppwQ==:117 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=dt9VzEwgFbYA:10 a=M51BFTxLslgA:10 a=i1IsUcr2s-wA:10 a=2AEO0YjSAAAA:8 a=KeReSjn5avopcc9GsFcA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
  definitions=2025-05-11_10,2025-05-09_01,2025-02-21_01
@@ -210,669 +210,268 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultsc
  reason=mlx scancount=1 engine=8.21.0-2504070000
  definitions=main-2505120013
 
-This adds support for CPC over SPI. CPC uses a full-duplex protocol.
-Each frame transmission/reception is split into two parts:
-  - read and/or write header + header checksum
-  - read and/or write payload + payload checksum
-
-Header frames are always 10 bytes (8 bytes of header and 2 bytes of
-checksum). The header contains the size of the payload to receive (size
-to transmit is already known). As the SPI device also has some
-processing to do when it receives a header, the SPI driver must wait for
-the interrupt line to be asserted before clocking the payload.
-
-The SPI device always expects the chip select to be asserted and
-deasserted after a header, even if there are no payloads to transmit.
-This is used to keep headers transmission synchronized between host and
-device. As some controllers don't support doing that if there is nothing
-to transmit, a null byte is transmitted in that case and it will be
-ignored by the device.
-
-If there are payloads, the driver will clock the maximum length of the
-two payloads.
+Add support for Bluetooth HCI driver. As most of the protocol is already
+handled by the remote endpoint, this driver is just doing some glue to
+plug into CPC.
 
 Signed-off-by: Damien Riégel <damien.riegel@silabs.com>
 ---
- drivers/net/cpc/Kconfig  |   3 +-
+ drivers/net/cpc/Kconfig  |   2 +-
  drivers/net/cpc/Makefile |   2 +-
- drivers/net/cpc/main.c   |   8 +
- drivers/net/cpc/spi.c    | 550 +++++++++++++++++++++++++++++++++++++++
- drivers/net/cpc/spi.h    |  12 +
- 5 files changed, 573 insertions(+), 2 deletions(-)
- create mode 100644 drivers/net/cpc/spi.c
- create mode 100644 drivers/net/cpc/spi.h
+ drivers/net/cpc/ble.c    | 147 +++++++++++++++++++++++++++++++++++++++
+ drivers/net/cpc/ble.h    |  14 ++++
+ drivers/net/cpc/main.c   |  23 ++++--
+ 5 files changed, 181 insertions(+), 7 deletions(-)
+ create mode 100644 drivers/net/cpc/ble.c
+ create mode 100644 drivers/net/cpc/ble.h
 
 diff --git a/drivers/net/cpc/Kconfig b/drivers/net/cpc/Kconfig
-index f31b6837b49..f5159390a82 100644
+index f5159390a82..e8faa351bf7 100644
 --- a/drivers/net/cpc/Kconfig
 +++ b/drivers/net/cpc/Kconfig
-@@ -2,7 +2,8 @@
+@@ -2,7 +2,7 @@
  
  menuconfig CPC
  	tristate "Silicon Labs Co-Processor Communication (CPC) Protocol"
--	depends on NET
-+	depends on NET && SPI
-+	select CRC_ITU_T
+-	depends on NET && SPI
++	depends on NET && SPI && BT
+ 	select CRC_ITU_T
  	help
  	  Provide support for the CPC protocol to Silicon Labs EFR32 devices.
- 
 diff --git a/drivers/net/cpc/Makefile b/drivers/net/cpc/Makefile
-index a61af84df90..195cdf4ad62 100644
+index 195cdf4ad62..cee40aec412 100644
 --- a/drivers/net/cpc/Makefile
 +++ b/drivers/net/cpc/Makefile
 @@ -1,5 +1,5 @@
  # SPDX-License-Identifier: GPL-2.0
  
--cpc-y := endpoint.o header.o interface.o main.o protocol.o system.o
-+cpc-y := endpoint.o header.o interface.o main.o protocol.o spi.o system.o
+-cpc-y := endpoint.o header.o interface.o main.o protocol.o spi.o system.o
++cpc-y := ble.o endpoint.o header.o interface.o main.o protocol.o spi.o system.o
  
  obj-$(CONFIG_CPC)	+= cpc.o
-diff --git a/drivers/net/cpc/main.c b/drivers/net/cpc/main.c
-index fc46a25f5dc..b4e73145ac2 100644
---- a/drivers/net/cpc/main.c
-+++ b/drivers/net/cpc/main.c
-@@ -8,6 +8,7 @@
- 
- #include "cpc.h"
- #include "header.h"
-+#include "spi.h"
- #include "system.h"
- 
- /**
-@@ -126,12 +127,19 @@ static int __init cpc_init(void)
- 	if (err)
- 		bus_unregister(&cpc_bus);
- 
-+	err = cpc_spi_register_driver();
-+	if (err) {
-+		cpc_system_drv_unregister();
-+		bus_unregister(&cpc_bus);
-+	}
-+
- 	return err;
- }
- module_init(cpc_init);
- 
- static void __exit cpc_exit(void)
- {
-+	cpc_spi_unregister_driver();
- 	cpc_system_drv_unregister();
- 	bus_unregister(&cpc_bus);
- }
-diff --git a/drivers/net/cpc/spi.c b/drivers/net/cpc/spi.c
+diff --git a/drivers/net/cpc/ble.c b/drivers/net/cpc/ble.c
 new file mode 100644
-index 00000000000..2b068eeb5d4
+index 00000000000..2b7aec4dbdf
 --- /dev/null
-+++ b/drivers/net/cpc/spi.c
-@@ -0,0 +1,550 @@
-+// SPDX-License-Identifier: GPL-2.0
++++ b/drivers/net/cpc/ble.c
+@@ -0,0 +1,147 @@
++// SPDX-License-Identifier: GPL-2.0-only
 +/*
++ * Driver for Bluetooth HCI over CPC.
++ *
 + * Copyright (c) 2025, Silicon Laboratories, Inc.
 + */
 +
-+#include <linux/atomic.h>
-+#include <linux/crc-itu-t.h>
-+#include <linux/delay.h>
-+#include <linux/device.h>
-+#include <linux/interrupt.h>
-+#include <linux/kthread.h>
-+#include <linux/minmax.h>
-+#include <linux/of.h>
 +#include <linux/skbuff.h>
-+#include <linux/slab.h>
-+#include <linux/spi/spi.h>
-+#include <linux/unaligned.h>
-+#include <linux/wait.h>
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
 +
++#include "ble.h"
 +#include "cpc.h"
-+#include "header.h"
-+#include "interface.h"
-+#include "spi.h"
 +
-+#define CPC_SPI_CSUM_SIZE		2
-+#define CPC_SPI_INTERRUPT_MAX_WAIT_MS	1000
-+#define CPC_SPI_MAX_PAYLOAD_SIZE	4096
-+
-+struct cpc_spi {
-+	struct spi_device *spi;
-+	struct cpc_interface *intf;
-+
-+	struct task_struct *task;
-+	wait_queue_head_t event_queue;
-+
-+	struct sk_buff *tx_skb;
-+	u8 tx_csum[CPC_SPI_CSUM_SIZE];
-+
-+	atomic_t event_cond;
-+	struct sk_buff *rx_skb;
-+	unsigned int rx_len;
-+	u8 rx_header[CPC_HEADER_SIZE + CPC_SPI_CSUM_SIZE];
++struct cpc_ble {
++	struct cpc_endpoint *ep;
++	struct hci_dev *hdev;
++	struct sk_buff_head txq;
 +};
 +
-+static bool buffer_is_zeroes(const u8 *buffer, size_t length)
++static int cpc_ble_open(struct hci_dev *hdev)
 +{
-+	for (size_t i = 0; i < length; i++) {
-+		if (buffer[i] != 0)
-+			return false;
-+	}
++	struct cpc_ble *ble = hci_get_drvdata(hdev);
 +
-+	return true;
++	skb_queue_head_init(&ble->txq);
++
++	return cpc_endpoint_connect(ble->ep);
 +}
 +
-+static u16 cpc_spi_csum(const u8 *buffer, size_t length)
++static int cpc_ble_close(struct hci_dev *hdev)
 +{
-+	return crc_itu_t(0, buffer, length);
-+}
++	struct cpc_ble *ble = hci_get_drvdata(hdev);
 +
-+static int cpc_spi_do_xfer_header(struct cpc_spi *ctx)
-+{
-+	struct spi_transfer xfer_header = {
-+		.rx_buf = ctx->rx_header,
-+		.len = CPC_HEADER_SIZE,
-+		.speed_hz = ctx->spi->max_speed_hz,
-+	};
-+	struct spi_transfer xfer_csum = {
-+		.rx_buf = &ctx->rx_header[CPC_HEADER_SIZE],
-+		.len = sizeof(ctx->tx_csum),
-+		.speed_hz = ctx->spi->max_speed_hz,
-+	};
-+	enum cpc_frame_type type;
-+	struct spi_message msg;
-+	size_t payload_len = 0;
-+	struct sk_buff *skb;
-+	u16 rx_csum;
-+	u16 csum;
-+	int ret;
++	cpc_endpoint_disconnect(ble->ep);
 +
-+	if (ctx->tx_skb) {
-+		u16 tx_hdr_csum = cpc_spi_csum(ctx->tx_skb->data, CPC_HEADER_SIZE);
-+
-+		put_unaligned_le16(tx_hdr_csum, ctx->tx_csum);
-+
-+		xfer_header.tx_buf = ctx->tx_skb->data;
-+		xfer_csum.tx_buf = ctx->tx_csum;
-+	}
-+
-+	spi_message_init(&msg);
-+	spi_message_add_tail(&xfer_header, &msg);
-+	spi_message_add_tail(&xfer_csum, &msg);
-+
-+	ret = spi_sync(ctx->spi, &msg);
-+	if (ret)
-+		return ret;
-+
-+	if (ctx->tx_skb) {
-+		if (skb_headlen(ctx->tx_skb) == CPC_HEADER_SIZE) {
-+			kfree_skb(ctx->tx_skb);
-+			ctx->tx_skb = NULL;
-+		} else {
-+			skb_pull(ctx->tx_skb, CPC_HEADER_SIZE);
-+		}
-+	}
-+
-+	if (buffer_is_zeroes(ctx->rx_header, CPC_HEADER_SIZE))
-+		return 0;
-+
-+	rx_csum = get_unaligned_le16(&ctx->rx_header[CPC_HEADER_SIZE]);
-+	csum = cpc_spi_csum(ctx->rx_header, CPC_HEADER_SIZE);
-+
-+	if (rx_csum != csum || !cpc_header_get_type(ctx->rx_header, &type)) {
-+		/*
-+		 * If the header checksum is invalid, its length can't be trusted, receive
-+		 * the maximum payload length to recover from that situation. If the frame
-+		 * type cannot be extracted from the header, use same recovery mechanism.
-+		 */
-+		ctx->rx_len = CPC_SPI_MAX_PAYLOAD_SIZE;
-+
-+		return 0;
-+	}
-+
-+	if (type == CPC_FRAME_TYPE_DATA)
-+		payload_len = cpc_header_get_payload_len(ctx->rx_header) +
-+			      sizeof(ctx->tx_csum);
-+
-+	skb = cpc_skb_alloc(payload_len, GFP_KERNEL);
-+	if (!skb) {
-+		/*
-+		 * Failed to allocate memory to receive the payload. Driver must clock in
-+		 * these bytes even if there is no room, to keep the sender in sync.
-+		 */
-+		ctx->rx_len = payload_len;
-+
-+		return 0;
-+	}
-+
-+	memcpy(skb_push(skb, CPC_HEADER_SIZE), ctx->rx_header, CPC_HEADER_SIZE);
-+
-+	if (payload_len) {
-+		ctx->rx_skb = skb;
-+		ctx->rx_len = payload_len;
-+	} else {
-+		cpc_interface_receive_frame(ctx->intf, skb);
-+	}
++	skb_queue_purge(&ble->txq);
 +
 +	return 0;
 +}
 +
-+static int cpc_spi_do_xfer_notch(struct cpc_spi *ctx)
++static int cpc_ble_flush(struct hci_dev *hdev)
 +{
-+	struct spi_transfer xfer = {
-+		.tx_buf = ctx->tx_csum,
-+		.len = 1,
-+		.speed_hz = ctx->spi->max_speed_hz,
-+	};
-+	struct spi_message msg;
++	struct cpc_ble *ble = hci_get_drvdata(hdev);
 +
-+	ctx->tx_csum[0] = 0;
-+
-+	spi_message_init(&msg);
-+	spi_message_add_tail(&xfer, &msg);
-+
-+	return spi_sync(ctx->spi, &msg);
-+}
-+
-+static int cpc_spi_do_xfer_payload(struct cpc_spi *ctx)
-+{
-+	struct spi_transfer shared_xfer = {
-+		.speed_hz = ctx->spi->max_speed_hz,
-+		.rx_buf = NULL,
-+		.tx_buf = NULL,
-+	};
-+	struct spi_transfer pad_xfer1 = {
-+		.speed_hz = ctx->spi->max_speed_hz,
-+		.rx_buf = NULL,
-+		.tx_buf = NULL,
-+	};
-+	struct spi_transfer pad_xfer2 = {
-+		.speed_hz = ctx->spi->max_speed_hz,
-+		.rx_buf = NULL,
-+		.tx_buf = NULL,
-+	};
-+	unsigned int rx_len = ctx->rx_len;
-+	unsigned int tx_data_len;
-+	struct spi_message msg;
-+	int ret;
-+
-+	spi_message_init(&msg);
-+	spi_message_add_tail(&shared_xfer, &msg);
-+
-+	/*
-+	 * This can happen if header checksum was invalid. In that case, protocol
-+	 * mandates to be ready to receive the maximum number of bytes that the
-+	 * device is capable to send, in order to be sure its TX queue is flushed.
-+	 */
-+	if (!ctx->rx_skb && rx_len) {
-+		shared_xfer.rx_buf = kmalloc(rx_len, GFP_KERNEL);
-+		if (!shared_xfer.rx_buf)
-+			return -ENOMEM;
-+
-+		shared_xfer.len = rx_len;
-+	}
-+
-+	if (ctx->rx_skb && !ctx->tx_skb) {
-+		shared_xfer.rx_buf = skb_put(ctx->rx_skb, rx_len);
-+		shared_xfer.len = rx_len;
-+	}
-+
-+	if (ctx->tx_skb) {
-+		u16 csum = ctx->tx_skb->csum;
-+
-+		put_unaligned_le16(csum, ctx->tx_csum);
-+
-+		tx_data_len = ctx->tx_skb->len;
-+
-+		shared_xfer.tx_buf = ctx->tx_skb->data;
-+		shared_xfer.len = tx_data_len;
-+
-+		if (!ctx->rx_skb) {
-+			pad_xfer1.tx_buf = ctx->tx_csum;
-+			pad_xfer1.len = sizeof(ctx->tx_csum);
-+
-+			spi_message_add_tail(&pad_xfer1, &msg);
-+		}
-+	}
-+
-+	if (ctx->rx_skb && ctx->tx_skb) {
-+		unsigned int shared_len;
-+		unsigned int pad_len;
-+
-+		shared_len = min(rx_len, tx_data_len);
-+		pad_len = max(rx_len, tx_data_len) - shared_len;
-+
-+		shared_xfer.rx_buf = skb_put(ctx->rx_skb, shared_len);
-+		shared_xfer.len = shared_len;
-+
-+		if (rx_len < tx_data_len) {
-+			/*
-+			 * |------- RX BUFFER + RX CSUM ------|
-+			 * |------------------- TX BUFFER ------------|---- TX CSUM ----|
-+			 *
-+			 * |             SHARED               |
-+			 *                                    | PAD 1 |
-+			 *                                            |      PAD 2      |
-+			 */
-+			pad_xfer1.rx_buf = NULL;
-+			pad_xfer1.tx_buf = ctx->tx_skb->data + shared_len;
-+			pad_xfer1.len = pad_len;
-+
-+			pad_xfer2.rx_buf = NULL;
-+			pad_xfer2.tx_buf = ctx->tx_csum;
-+			pad_xfer2.len = sizeof(ctx->tx_csum);
-+
-+			spi_message_add_tail(&pad_xfer1, &msg);
-+			spi_message_add_tail(&pad_xfer2, &msg);
-+		} else if (rx_len == tx_data_len) {
-+			/*
-+			 * |------------- RX BUFFER + RX CSUM ---------|
-+			 * |------------------- TX BUFFER -------------|---- TX CSUM ---|
-+			 *
-+			 * |             SHARED                        |
-+			 *                                             |      PAD 1     |
-+			 */
-+			pad_xfer1.rx_buf = NULL;
-+			pad_xfer1.tx_buf = ctx->tx_csum;
-+			pad_xfer1.len = sizeof(ctx->tx_csum);
-+
-+			spi_message_add_tail(&pad_xfer1, &msg);
-+		} else if (rx_len == tx_data_len + 1) {
-+			/*
-+			 * |----------------- RX BUFFER + RX CSUM ----------------|
-+			 * |------------------- TX BUFFER -------------|---- TX CSUM ---|
-+			 *
-+			 * |             SHARED                        |
-+			 *                                             |  PAD 1 |
-+			 *                                                      | PAD 2 |
-+			 */
-+			pad_xfer1.tx_buf = ctx->tx_csum;
-+			pad_xfer1.rx_buf = skb_put(ctx->rx_skb, 1);
-+			pad_xfer1.len = 1;
-+
-+			pad_xfer2.tx_buf = &ctx->tx_csum[1];
-+			pad_xfer2.rx_buf = NULL;
-+			pad_xfer2.len = 1;
-+
-+			spi_message_add_tail(&pad_xfer1, &msg);
-+			spi_message_add_tail(&pad_xfer2, &msg);
-+		} else {
-+			/*
-+			 * |----------------------------- RX BUFFER + RX CSUM -------------------|
-+			 * |------------------- TX BUFFER -------------|---- TX CSUM ---|
-+			 *
-+			 * |             SHARED                        |
-+			 *                                             |       PAD 1    |
-+			 *                                                              |  PAD 2 |
-+			 */
-+			pad_xfer1.tx_buf = ctx->tx_csum;
-+			pad_xfer1.rx_buf = skb_put(ctx->rx_skb, sizeof(ctx->tx_csum));
-+			pad_xfer1.len = sizeof(ctx->tx_csum);
-+
-+			pad_xfer2.tx_buf = NULL;
-+			pad_xfer2.rx_buf = skb_put(ctx->rx_skb, pad_len - sizeof(ctx->tx_csum));
-+			pad_xfer2.len = pad_len - sizeof(ctx->tx_csum);
-+
-+			spi_message_add_tail(&pad_xfer1, &msg);
-+			spi_message_add_tail(&pad_xfer2, &msg);
-+		}
-+	}
-+
-+	ret = spi_sync(ctx->spi, &msg);
-+
-+	if (ctx->tx_skb) {
-+		kfree_skb(ctx->tx_skb);
-+		ctx->tx_skb = NULL;
-+	}
-+
-+	if (ctx->rx_skb) {
-+		unsigned char *csum_ptr;
-+		u16 expected_csum;
-+		u16 csum;
-+
-+		if (ret) {
-+			kfree_skb(ctx->rx_skb);
-+			goto exit;
-+		}
-+
-+		csum_ptr = skb_tail_pointer(ctx->rx_skb) - sizeof(csum);
-+		csum = get_unaligned_le16(csum_ptr);
-+
-+		expected_csum = cpc_spi_csum(ctx->rx_skb->data + CPC_HEADER_SIZE,
-+					     ctx->rx_len - sizeof(csum));
-+
-+		if (csum == expected_csum) {
-+			skb_trim(ctx->rx_skb, ctx->rx_skb->len - sizeof(csum));
-+
-+			cpc_interface_receive_frame(ctx->intf, ctx->rx_skb);
-+		} else {
-+			kfree_skb(ctx->rx_skb);
-+		}
-+	}
-+
-+exit:
-+	ctx->rx_skb = NULL;
-+	ctx->rx_len = 0;
-+
-+	return ret;
-+}
-+
-+static int cpc_spi_do_xfer_thread(void *data)
-+{
-+	struct cpc_spi *ctx = data;
-+	bool xfer_idle = true;
-+	int ret;
-+
-+	while (!kthread_should_stop()) {
-+		if (xfer_idle) {
-+			ret = wait_event_interruptible(ctx->event_queue,
-+						       (!cpc_interface_tx_queue_empty(ctx->intf) ||
-+							atomic_read(&ctx->event_cond) == 1 ||
-+							kthread_should_stop()));
-+
-+			if (ret)
-+				continue;
-+
-+			if (kthread_should_stop())
-+				return 0;
-+
-+			if (!ctx->tx_skb)
-+				ctx->tx_skb = cpc_interface_dequeue(ctx->intf);
-+
-+			/*
-+			 * Reset thread event right before transmission to prevent interrupts that
-+			 * happened while the thread was already awake to wake up the thread again,
-+			 * as the event is going to be handled by this iteration.
-+			 */
-+			atomic_set(&ctx->event_cond, 0);
-+
-+			ret = cpc_spi_do_xfer_header(ctx);
-+			if (!ret)
-+				xfer_idle = false;
-+		} else {
-+			ret = wait_event_timeout(ctx->event_queue,
-+						 (atomic_read(&ctx->event_cond) == 1 ||
-+						  kthread_should_stop()),
-+						 msecs_to_jiffies(CPC_SPI_INTERRUPT_MAX_WAIT_MS));
-+			if (ret == 0) {
-+				dev_err_once(&ctx->spi->dev, "device didn't assert interrupt in a timely manner\n");
-+				continue;
-+			}
-+
-+			atomic_set(&ctx->event_cond, 0);
-+
-+			if (!ctx->tx_skb && !ctx->rx_skb)
-+				ret = cpc_spi_do_xfer_notch(ctx);
-+			else
-+				ret = cpc_spi_do_xfer_payload(ctx);
-+
-+			if (!ret)
-+				xfer_idle = true;
-+		}
-+	}
++	skb_queue_purge(&ble->txq);
 +
 +	return 0;
 +}
 +
-+static irqreturn_t cpc_spi_irq_handler(int irq, void *data)
++static int cpc_ble_send(struct hci_dev *hdev, struct sk_buff *skb)
 +{
-+	struct cpc_spi *ctx = data;
++	struct cpc_ble *ble = hci_get_drvdata(hdev);
 +
-+	atomic_set(&ctx->event_cond, 1);
-+	wake_up(&ctx->event_queue);
++	memcpy(skb_push(skb, 1), &hci_skb_pkt_type(skb), 1);
 +
-+	return IRQ_HANDLED;
++	return cpc_endpoint_write(ble->ep, skb);
 +}
 +
-+static int cpc_spi_ops_wake_tx(struct cpc_interface *intf)
++static void cpc_ble_rx_frame(struct cpc_endpoint *ep, struct sk_buff *skb)
 +{
-+	struct cpc_spi *ctx = cpc_interface_get_priv(intf);
++	struct cpc_ble *ble = cpc_endpoint_get_drvdata(ep);
 +
-+	wake_up_interruptible(&ctx->event_queue);
++	hci_skb_pkt_type(skb) = *((u8 *)skb_pull_data(skb, 1));
++	hci_skb_expect(skb) = skb->len;
 +
-+	return 0;
++	hci_recv_frame(ble->hdev, skb);
 +}
 +
-+static void cpc_spi_ops_csum(struct sk_buff *skb)
-+{
-+	skb->csum = cpc_spi_csum(skb->data, skb->len);
-+}
-+
-+static const struct cpc_interface_ops spi_intf_cpc_ops = {
-+	.wake_tx = cpc_spi_ops_wake_tx,
-+	.csum = cpc_spi_ops_csum,
++static struct cpc_endpoint_ops cpc_ble_ops = {
++	.rx = cpc_ble_rx_frame,
 +};
 +
-+static int cpc_spi_probe(struct spi_device *spi)
++static int cpc_ble_probe(struct cpc_endpoint *ep)
 +{
-+	struct cpc_interface *intf;
-+	struct cpc_spi *ctx;
++	struct cpc_ble *ble;
 +	int err;
 +
-+	if (!spi->irq) {
-+		dev_err(&spi->dev, "cannot function without IRQ, please provide one\n");
-+		return -EINVAL;
++	ble = kzalloc(sizeof(*ble), GFP_KERNEL);
++	if (!ble) {
++		err = -ENOMEM;
++		goto alloc_ble_fail;
 +	}
 +
-+	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
-+	if (!ctx)
-+		return -ENOMEM;
++	cpc_endpoint_set_ops(ep, &cpc_ble_ops);
++	cpc_endpoint_set_drvdata(ep, ble);
 +
-+	intf = cpc_interface_alloc(&spi->dev, &spi_intf_cpc_ops, ctx);
-+	if (IS_ERR(intf)) {
-+		kfree(ctx);
-+
-+		return PTR_ERR(intf);
++	ble->ep = ep;
++	ble->hdev = hci_alloc_dev();
++	if (!ble->hdev) {
++		err = -ENOMEM;
++		goto alloc_hdev_fail;
 +	}
 +
-+	spi_set_drvdata(spi, ctx);
++	hci_set_drvdata(ble->hdev, ble);
++	ble->hdev->open = cpc_ble_open;
++	ble->hdev->close = cpc_ble_close;
++	ble->hdev->flush = cpc_ble_flush;
++	ble->hdev->send = cpc_ble_send;
 +
-+	ctx->spi = spi;
-+	ctx->intf = intf;
-+
-+	ctx->tx_skb = NULL;
-+
-+	atomic_set(&ctx->event_cond, 0);
-+	ctx->rx_skb = NULL;
-+
-+	init_waitqueue_head(&ctx->event_queue);
-+
-+	err = cpc_interface_register(intf);
++	err = hci_register_dev(ble->hdev);
 +	if (err)
-+		goto put_interface;
-+
-+	err = request_irq(spi->irq, cpc_spi_irq_handler, IRQF_TRIGGER_FALLING,
-+			  dev_name(&spi->dev), ctx);
-+	if (err)
-+		goto unregister_interface;
-+
-+	ctx->task = kthread_run(cpc_spi_do_xfer_thread, ctx, "%s",
-+				dev_name(&spi->dev));
-+	if (IS_ERR(ctx->task)) {
-+		err = PTR_ERR(ctx->task);
-+		goto free_irq;
-+	}
++		goto register_hdev_fail;
 +
 +	return 0;
 +
-+free_irq:
-+	free_irq(spi->irq, ctx);
-+
-+unregister_interface:
-+	cpc_interface_unregister(intf);
-+
-+put_interface:
-+	cpc_interface_put(intf);
-+
-+	kfree(ctx);
-+
++register_hdev_fail:
++	hci_free_dev(ble->hdev);
++alloc_hdev_fail:
++	kfree(ble);
++alloc_ble_fail:
 +	return err;
 +}
 +
-+static void cpc_spi_remove(struct spi_device *spi)
++static void cpc_ble_remove(struct cpc_endpoint *ep)
 +{
-+	struct cpc_spi *ctx = spi_get_drvdata(spi);
-+	struct cpc_interface *intf = ctx->intf;
++	struct cpc_ble *ble = cpc_endpoint_get_drvdata(ep);
 +
-+	kthread_stop(ctx->task);
-+	free_irq(spi->irq, ctx);
-+	cpc_interface_unregister(intf);
-+	kfree(ctx);
++	hci_unregister_dev(ble->hdev);
++	hci_free_dev(ble->hdev);
++	kfree(ble);
 +}
 +
-+static const struct of_device_id cpc_dt_ids[] = {
-+	{ .compatible = "silabs,cpc-spi" },
-+	{},
-+};
-+MODULE_DEVICE_TABLE(of, cpc_dt_ids);
-+
-+static const struct spi_device_id cpc_spi_ids[] = {
-+	{ .name = "cpc-spi" },
-+	{},
-+};
-+MODULE_DEVICE_TABLE(spi, cpc_spi_ids);
-+
-+static struct spi_driver cpc_spi_driver = {
++static struct cpc_driver ble_driver = {
 +	.driver = {
-+		.name = "cpc-spi",
-+		.of_match_table = cpc_dt_ids,
++		.name = CPC_BLUETOOTH_ENDPOINT_NAME,
 +	},
-+	.probe = cpc_spi_probe,
-+	.remove = cpc_spi_remove,
++	.probe = cpc_ble_probe,
++	.remove = cpc_ble_remove,
 +};
 +
 +/**
-+ * cpc_spi_register_driver - Register driver to the SPI subsytem.
++ * cpc_ble_drv_register - Register the ble endpoint driver.
 + *
 + * @return: 0 on success, otherwise a negative error code.
 + */
-+int cpc_spi_register_driver(void)
++int cpc_ble_drv_register(void)
 +{
-+	return spi_register_driver(&cpc_spi_driver);
++	return cpc_driver_register(&ble_driver);
 +}
 +
 +/**
-+ * cpc_spi_unregister_driver - Unregister driver from the SPI subsytem.
++ * cpc_ble_drv_unregister - Unregister the ble endpoint driver.
 + */
-+void cpc_spi_unregister_driver(void)
++void cpc_ble_drv_unregister(void)
 +{
-+	spi_unregister_driver(&cpc_spi_driver);
++	cpc_driver_unregister(&ble_driver);
 +}
-diff --git a/drivers/net/cpc/spi.h b/drivers/net/cpc/spi.h
+diff --git a/drivers/net/cpc/ble.h b/drivers/net/cpc/ble.h
 new file mode 100644
-index 00000000000..211133c4758
+index 00000000000..ae1cac4e7e8
 --- /dev/null
-+++ b/drivers/net/cpc/spi.h
-@@ -0,0 +1,12 @@
++++ b/drivers/net/cpc/ble.h
+@@ -0,0 +1,14 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +/*
 + * Copyright (c) 2025, Silicon Laboratories, Inc.
 + */
 +
-+#ifndef __CPC_SPI_H
-+#define __CPC_SPI_H
++#ifndef __CPC_BLE_H
++#define __CPC_BLE_H
 +
-+int cpc_spi_register_driver(void);
-+void cpc_spi_unregister_driver(void);
++#define CPC_BLUETOOTH_ENDPOINT_NAME "silabs,cpc-ble"
++
++int cpc_ble_drv_register(void);
++void cpc_ble_drv_unregister(void);
 +
 +#endif
+diff --git a/drivers/net/cpc/main.c b/drivers/net/cpc/main.c
+index b4e73145ac2..e5636207d5d 100644
+--- a/drivers/net/cpc/main.c
++++ b/drivers/net/cpc/main.c
+@@ -7,6 +7,7 @@
+ #include <linux/module.h>
+ 
+ #include "cpc.h"
++#include "ble.h"
+ #include "header.h"
+ #include "spi.h"
+ #include "system.h"
+@@ -125,13 +126,24 @@ static int __init cpc_init(void)
+ 
+ 	err = cpc_system_drv_register();
+ 	if (err)
+-		bus_unregister(&cpc_bus);
++		goto unregister_bus;
++
++	err = cpc_ble_drv_register();
++	if (err)
++		goto unregister_system_driver;
+ 
+ 	err = cpc_spi_register_driver();
+-	if (err) {
+-		cpc_system_drv_unregister();
+-		bus_unregister(&cpc_bus);
+-	}
++	if (err)
++		goto unregister_ble_driver;
++
++	return 0;
++
++unregister_ble_driver:
++	cpc_ble_drv_unregister();
++unregister_system_driver:
++	cpc_system_drv_unregister();
++unregister_bus:
++	bus_unregister(&cpc_bus);
+ 
+ 	return err;
+ }
+@@ -140,6 +152,7 @@ module_init(cpc_init);
+ static void __exit cpc_exit(void)
+ {
+ 	cpc_spi_unregister_driver();
++	cpc_ble_drv_unregister();
+ 	cpc_system_drv_unregister();
+ 	bus_unregister(&cpc_bus);
+ }
 -- 
 2.49.0
 
