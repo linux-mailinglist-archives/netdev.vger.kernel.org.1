@@ -1,161 +1,148 @@
-Return-Path: <netdev+bounces-189855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8A89AB3EF7
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 19:25:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A297AB3F41
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 19:33:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33EC686423F
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 17:25:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E12819E2BE3
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 17:33:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D914E296D1A;
-	Mon, 12 May 2025 17:25:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04A88296D17;
+	Mon, 12 May 2025 17:33:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ursu.me header.i=@ursu.me header.b="0iWEBcuI";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="tXI+SdUX"
+	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="kE/5vxOH"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
+Received: from mxout2.routing.net (mxout2.routing.net [134.0.28.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59A8D248F49;
-	Mon, 12 May 2025 17:25:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02926248F71;
+	Mon, 12 May 2025 17:33:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747070736; cv=none; b=M0s8D594KctUUY1WcuzYX4ITo51Ed0y2MS4LR8fb1UyYrHAGDSPdidP9dtX4liSjAySdhGEItT/xNy0xJDFlQvJS8zY3iElCosAXAyaYXS2qs4WKw8b1Y0Ewq4gk9P+r3dhEyg6zbVk15r17O0pBBuqjx6DfGdmtQK2mniui0hQ=
+	t=1747071213; cv=none; b=bn9x78LyOBFheNr3zUhQcJvPAmUDEHblXvTomI61GsLae6LzwENRXKMLcm7PqSWJ7JqJNvkT9MTKVysJW1nuh9XuHFWNVRERpCT//usGffNkgYy4hQ8U1OFhmsN5zIItA7peXpIvmlcvDWN2DTx/f6xHjizf/F2kaMtlv+cPh/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747070736; c=relaxed/simple;
-	bh=TU3XShWd/3DQZ5w580PPlAAMZ0859W3f2Np5t6/nZWM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ieYJPlpfuKbbRFUOfpu0f5DPA8ttjfpKVM2AsokOZ7XcYE1TkvCK4lT+HQLqztvT8FFbVateppQfADO7SNRbOJF2yvC9fKAzckHSIqniPJX4Egj7+6jqEQV5SQyiSZedsiCBbWz2rWmmb2yYfxmxpH4dX3H1qS6t+hqCtamYbRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ursu.me; spf=pass smtp.mailfrom=ursu.me; dkim=pass (2048-bit key) header.d=ursu.me header.i=@ursu.me header.b=0iWEBcuI; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=tXI+SdUX; arc=none smtp.client-ip=202.12.124.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ursu.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ursu.me
-Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
-	by mailfout.stl.internal (Postfix) with ESMTP id 0D47C114018A;
-	Mon, 12 May 2025 13:25:33 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-08.internal (MEProxy); Mon, 12 May 2025 13:25:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ursu.me; h=cc:cc
-	:content-transfer-encoding:content-type:content-type:date:date
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1747070732;
-	 x=1747157132; bh=QLAq7amBMiIEJFluFSAOTD34OZxX4AinB+6TsgCfDxs=; b=
-	0iWEBcuIlBUVvcHVKw90RjcfFBz94oAukfZ57Et7Nlmcbw2WJCPVtpaDJmk8+jQE
-	8Z01PMFvFP4DpNMjOIsjS+NHUAY63DxcFVl/jV05XDcvgM/DXPB6OuRUpwev+ky3
-	cqYgdKyuKUZEK49T3e2dAyvX1jLMSf2yiZBswI+IlQaJU+akKkXJvwDMjGyvxvmU
-	aTZd3w2o5AuD7uXmG55R87WI8fYl9Gbv1ZYxMcf7TBV4QsoYvmkkm7m5TliK2hHv
-	i4X44Yl3f3ZttTGYEdSZAQezSVTaM3slkUntBvhAvsosYFHydCUpPKHhrqfKxSF2
-	0otZyjyHAPMyfK4fGn55eQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1747070732; x=
-	1747157132; bh=QLAq7amBMiIEJFluFSAOTD34OZxX4AinB+6TsgCfDxs=; b=t
-	XI+SdUXIIg5ZrZNwkarOk1C+JeriTIfTe3oOUhpogHKUf39saWiF33xYD9zLpirx
-	Z+OYtKaaRa9uZhOAIJsWYtWfGlbYQCPh/bk4JKzsgh/+ZAL0zJNRl5Ldgwk7/rvz
-	fZ4jlOweURIXXY4a8280lGp61O2OF4QncdJAOe763PAp6/mlE3qLQ8NLPhcro4Ca
-	KO0+/Xb+OULk4ALxZfIrStqq9z0VkKL1AI81P91mYLc4gPY5E+ZsXJd6uWe/dvC9
-	ZSEqWylIrx1dShJ+f4NCJBhfRQCvp3TnV6QNJAAaxrRG8c/iZ6UWSoyniOPdjbpe
-	bPk5k1XkYbbpFz7kVzq7g==
-X-ME-Sender: <xms:DC8iaGcJ2-JCC-arFCKP5MFPHK_QqT94Q2Vcr4TalyHpXHGv0jYiUQ>
-    <xme:DC8iaAOnn6bYWw9vIirHJG1inlYPO9y3ODyOVRcJR6BQ1jpFTTvyIQmOHTZ_GQTlY
-    aXI1tHg2JPdqdOeHI8>
-X-ME-Received: <xmr:DC8iaHgmK-qqWR1a2Epeac2Y6wLZN0zHMoDwOYANV-yA5lL7BJVnVwellMD3YmQ3WPOu>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeftddukeeiucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepkfffgggfuffvvehfhfgjtgfgsehtkeertddt
-    vdejnecuhfhrohhmpegglhgrugcufgftufgfuceovhhlrggusehurhhsuhdrmhgvqeenuc
-    ggtffrrghtthgvrhhnpefgudevueefveevleduvddvffeiheekkeffjefgveduudehjeet
-    gfekhffhgffhhfenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrh
-    fuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepvhhlrggusehurhhsuhdrmhgv
-    pdhnsggprhgtphhtthhopeduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepjh
-    grtggvkhesjhgrtggvkhhkrdhinhhfohdprhgtphhtthhopegrnhhthhhonhihrdhlrdhn
-    ghhuhigvnhesihhnthgvlhdrtghomhdprhgtphhtthhopehprhiivghmhihslhgrfidrkh
-    hithhsiigvlhesihhnthgvlhdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthgu
-    vghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnh
-    gvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthht
-    ohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvug
-    hhrghtrdgtohhmpdhrtghpthhtohepihhnthgvlhdqfihirhgvugdqlhgrnheslhhishht
-    shdrohhsuhhoshhlrdhorhhg
-X-ME-Proxy: <xmx:DC8iaD-dckSOs7O1aI732q0sIGe917V5FqGd-JQ6KDNU1ukGddcZAA>
-    <xmx:DC8iaCtSa_LS5VlN7llDkqus8s4imA1tTMk-pDGOTWv4C9fwo60AEw>
-    <xmx:DC8iaKE6Dy7DpEUpgXhbtFMEbsQMl-U_K1FGaLRSsuCwetFBwPvKwQ>
-    <xmx:DC8iaBMuMmiONIg7I9mvtDBloVUo-Sp67VJFFQlpZj4El9tY9JwSRg>
-    <xmx:DC8iaExoz0glxMkW1arWs-73jVb1kCkvpsb3z0tqLwaS6Dr_iJzHkhmJ>
-Feedback-ID: i9ff147ff:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 12 May 2025 13:25:29 -0400 (EDT)
-Message-ID: <23bb365c-9d96-487f-84cc-2ca1235a97bb@ursu.me>
-Date: Mon, 12 May 2025 20:25:27 +0300
+	s=arc-20240116; t=1747071213; c=relaxed/simple;
+	bh=hUF1s567+qbSPtX2zIZBeWkAIaJckfoue1ZdzRXxzXE=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=N59O1QoFQ71PVEPdNdE+C5xx6RS6mXHSWlONst+isxM8S9X4Ea3wMaHYp7qzaLrU71B7nQA2DhccXVHqR2VZ4tVAq74xuOPIaLvGdBVeLa57PM+YxQ+1SGSnWvMRjxNThdrQkc7hpRkpomObusZ473I7CXEGkiszRbDcQAw1aSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=kE/5vxOH; arc=none smtp.client-ip=134.0.28.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
+Received: from mxbox3.masterlogin.de (unknown [192.168.10.78])
+	by mxout2.routing.net (Postfix) with ESMTP id 6EBA6601D8;
+	Mon, 12 May 2025 17:33:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
+	s=20200217; t=1747071203;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fOnx2nS8BUGOff4qxVjsY99Ec3z57H2RyW27rvY/0bw=;
+	b=kE/5vxOHk4WeXfDsBzUVJQU1s7TuLuM8EKYi/1mLuGdaNckHloGXV27dRjex99Aw/g9tCf
+	5sOD403GIqwnucydRJ13DZ2OjWkkVt4yPY5+KBN9PYb5IZDHQ8v5WcKJLQ47B1i3U8Utt0
+	p6Te9xqfKW9dvjVR2RoENhB4uVrdvXg=
+Received: from [127.0.0.1] (fttx-pool-194.15.84.99.bambit.de [194.15.84.99])
+	by mxbox3.masterlogin.de (Postfix) with ESMTPSA id 238C6360303;
+	Mon, 12 May 2025 17:33:22 +0000 (UTC)
+Date: Mon, 12 May 2025 19:33:22 +0200
+From: Frank Wunderlich <linux@fw-web.de>
+To: Conor Dooley <conor@kernel.org>
+CC: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+ Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Daniel Golle <daniel@makrotopia.org>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v1_01/14=5D_dt-bindings=3A_n?=
+ =?US-ASCII?Q?et=3A_mediatek=2Cnet=3A_update_for_mt7988?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <20250512-nibble-freemason-69e0279f2f99@spud>
+References: <20250511141942.10284-1-linux@fw-web.de> <20250511141942.10284-2-linux@fw-web.de> <20250512-nibble-freemason-69e0279f2f99@spud>
+Message-ID: <05760B5E-955E-4E0E-9B69-E762783CC37B@fw-web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] e1000e: disregard NVM checksum on tgp when valid checksum
- mask is not set
-To: Jacek Kowalski <jacek@jacekk.info>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <5555d3bd-44f6-45c1-9413-c29fe28e79eb@jacekk.info>
-Content-Language: en-US
-From: Vlad URSU <vlad@ursu.me>
-In-Reply-To: <5555d3bd-44f6-45c1-9413-c29fe28e79eb@jacekk.info>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Mail-ID: 374a0106-a2a0-463f-a626-6a3e8e2d7734
 
-On 22.04.2025 10:43, Jacek Kowalski wrote:
-> Some Dell Tiger Lake systems have incorrect NVM checksum. These also
-> have a bitmask that indicates correct checksum set to "invalid".
-> 
-> Because it is impossible to determine whether the NVM write would finish
-> correctly or hang (see https://bugzilla.kernel.org/show_bug.cgi?id=213667)
-> it makes sense to skip the validation completely under these conditions.
-> 
-> Signed-off-by: Jacek Kowalski <Jacek@jacekk.info>
-> Fixes: 4051f68318ca9 ("e1000e: Do not take care about recovery NVM 
-> checksum")
-> Cc: stable@vger.kernel.org
-> ---
->   drivers/net/ethernet/intel/e1000e/ich8lan.c | 2 ++
->   1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/intel/e1000e/ich8lan.c 
-> b/drivers/net/ethernet/intel/e1000e/ich8lan.c
-> index 364378133526..df4e7d781cb1 100644
-> --- a/drivers/net/ethernet/intel/e1000e/ich8lan.c
-> +++ b/drivers/net/ethernet/intel/e1000e/ich8lan.c
-> @@ -4274,6 +4274,8 @@ static s32 
-> e1000_validate_nvm_checksum_ich8lan(struct e1000_hw *hw)
->               ret_val = e1000e_update_nvm_checksum(hw);
->               if (ret_val)
->                   return ret_val;
-> +        } else if (hw->mac.type == e1000_pch_tgp) {
-> +            return 0;
->           }
->       }
-> 
+Am 12=2E Mai 2025 18:21:45 MESZ schrieb Conor Dooley <conor@kernel=2Eorg>:
+>On Sun, May 11, 2025 at 04:19:17PM +0200, Frank Wunderlich wrote:
+>> From: Frank Wunderlich <frank-w@public-files=2Ede>
+>>=20
+>> Update binding for mt7988 which has 3 gmac and 2 reg items=2E
+>>=20
+>> Signed-off-by: Frank Wunderlich <frank-w@public-files=2Ede>
+>> ---
+>>  Documentation/devicetree/bindings/net/mediatek,net=2Eyaml | 9 +++++++-=
+-
+>>  1 file changed, 7 insertions(+), 2 deletions(-)
+>>=20
+>> diff --git a/Documentation/devicetree/bindings/net/mediatek,net=2Eyaml =
+b/Documentation/devicetree/bindings/net/mediatek,net=2Eyaml
+>> index 9e02fd80af83=2E=2E5d249da02c3a 100644
+>> --- a/Documentation/devicetree/bindings/net/mediatek,net=2Eyaml
+>> +++ b/Documentation/devicetree/bindings/net/mediatek,net=2Eyaml
+>> @@ -28,7 +28,8 @@ properties:
+>>        - ralink,rt5350-eth
+>> =20
+>>    reg:
+>> -    maxItems: 1
+>> +    minItems: 1
+>> +    maxItems: 2
+>
+>This should become an items list, with an explanation of what each of
+>the reg items represents=2E
 
-This patch doesn't work for me on an Optiplex 5090 Micro (i5-10500T). I 
-did some debugging and the platform is recognized as Tiger Lake, by the 
-driver, but the checksum valid bit is set even though the checksum is 
-not valid.
+I would change to this
 
-The network controller works fine if I patch out the validation in 
-netdev.c. The checksum word at address 0x7e read using ethtool is 0xffff.
+  reg:
+    items:
+      - description: Register for accessing the MACs=2E
+      - description: SoC internal SRAM used for DMA operations=2E
+    minItems: 1
 
-I'm also a bit confused about why the driver reports the mac type as 
-e1000_pch_tgp even though i5-10500T should be Comet Lake?
+Would this be OK this way?
+
+>> =20
+>>    clocks:
+>>      minItems: 2
+>> @@ -381,8 +382,12 @@ allOf:
+>>              - const: xgp2
+>>              - const: xgp3
+>> =20
+>> +        reg:
+>> +          minItems: 2
+>> +          maxItems: 2
+>> +
+>>  patternProperties:
+>> -  "^mac@[0-1]$":
+>> +  "^mac@[0-2]$":
+>>      type: object
+>>      unevaluatedProperties: false
+>>      allOf:
+>> --=20
+>> 2=2E43=2E0
+>>=20
+
+Hi Conor
+
+Thank you for review=2E
+regards Frank
 
