@@ -1,87 +1,101 @@
-Return-Path: <netdev+bounces-189849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B0B6AB3E86
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 18:59:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6CDFAB3EA5
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 19:08:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9EA0F7A4A49
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 16:57:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5A35165CE2
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 17:07:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64E41295515;
-	Mon, 12 May 2025 16:57:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C25F29551D;
+	Mon, 12 May 2025 17:07:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gs4AhFQB"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mkoks5cL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E3E42528EF;
-	Mon, 12 May 2025 16:57:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F018467;
+	Mon, 12 May 2025 17:07:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747069027; cv=none; b=vBKu4dHCjnjy0Njgh2PHUI10GNNKCZ64DEq3NaewNwPpj9ehDzNqmTVdHoU6CpMNRzhBYBC+lw6byQ/0OHhgX9hpTY+pSiu8zqAOthpsFsR36qntYVmewuV+Jm7LtE60NE/YMJuJM7PZZKlgiKgWSfUOWs1JB+2OwLfDYBIqirI=
+	t=1747069676; cv=none; b=CkM8tCkKBFmm5JaMEcfMJ+GRx6hoDQPgV1leT8zQfAygsTji8rNJFxWJXxRmgTMmyXM09sDDHwUmz7ZWXcnkFBlab39vLYjD27VH/SXkjF4/DAK1RgErFgOo5tUR1nOUp62pCCuDFVKNSWUNOrxQrrfrnN4aI1fZ4OiAqgSQ/vk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747069027; c=relaxed/simple;
-	bh=WmxDSQ1DuH91G8fUJbKIVxL7Ybu6v7NF21gNiUQeylA=;
+	s=arc-20240116; t=1747069676; c=relaxed/simple;
+	bh=mLmEqOzVCecMhSZ9SrTL+1guOX+BsjLm7ABFb3jdDGM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cMI3JEC6fGqPaDpt0/j9zlr+uoabBcX44eAlFuKK2oQ8yMDvRUmvpHItyVU67ruvL3lc5zdV2DdgSUFqcEG1XoZc0bGGKH0tHU+fcLMzP3JsRdAHA0ypF7iaEjEhcaQG33NqkRLgMoDejoj3FpZlcJU4nnTwarFOAFrNilftCUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gs4AhFQB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20AE3C4CEE7;
-	Mon, 12 May 2025 16:57:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747069026;
-	bh=WmxDSQ1DuH91G8fUJbKIVxL7Ybu6v7NF21gNiUQeylA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gs4AhFQBIj2vEWQp8rRjwwvLgpAAGh/WTj6O92ZXoitVTrsfFYbY7bl0prdAhTW5T
-	 mEYBVUjWil88JDQK+ra6MZFvNN71dsCMYcD2RXKJgHmY6F+/zZPnwm4OV3YysQ9lzU
-	 cX3mGSJCU/L/p9NCG/b/qrZjsjw9BDCjz5agGxBoMGC6o9Z/yF5TmFNg2GAzEXmddm
-	 3l7ZadMgnQYsJ9vBM7mWpFTaZCvXaDFBOewvCDMezzrhuQNY+4KvH2U1KL5LKdW4ME
-	 cKN84WS9mFblLebPKsZH2N6AZqDSEBfud88EKlnKwmJM32YPvMDUJu4TVaw9ZMkUCG
-	 vrVsq+GowB8yA==
-Date: Mon, 12 May 2025 17:57:01 +0100
-From: Simon Horman <horms@kernel.org>
-To: Abdun Nihaal <abdun.nihaal@gmail.com>
-Cc: shshaikh@marvell.com, manishc@marvell.com, GR-Linux-NIC-Dev@marvell.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, sucheta.chakraborty@qlogic.com,
-	rajesh.borundia@qlogic.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] qlcnic: fix memory leak in
- qlcnic_sriov_channel_cfg_cmd()
-Message-ID: <20250512165701.GT3339421@horms.kernel.org>
-References: <20250512044829.36400-1-abdun.nihaal@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=OFFERQbjTg4XteUVKluBGC4nBKXzzsGerWBkBuT1LntsXOLv3rrxc2WtFdrBib32C6TvAq2l4hQj5GWF512dLlRtENBp4ZILbZRjADXnHTH5iI7GFPxqPSrHiS0M0NHFWIh6tSVt/g4cRdcIKWqxCPLqlz1wFC59VOne1eB4Ipg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mkoks5cL; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=AIX9i9XOoogJsxM2MKGz+jWDm2A2YEEjwp/MY1BWXgM=; b=mk
+	oks5cLithMxuvu28S06tNcTQiAzT/5r6o6bwui5XQdulLQr352SjyHoSJnO5cbfs9qO2h0SIGat5q
+	sgW7QMmNRAsLza8+iTgsIcYO09hzsLjmQfBTmZyeQzYDm2FfDZxlBjOG1WXI9K7LwRUWsqpULe4av
+	eqqrJLe6239WeTk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uEWcr-00CMd6-AR; Mon, 12 May 2025 19:07:37 +0200
+Date: Mon, 12 May 2025 19:07:37 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Damien =?iso-8859-1?Q?Ri=E9gel?= <damien.riegel@silabs.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Silicon Labs Kernel Team <linux-devel@silabs.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Johan Hovold <johan@kernel.org>,
+	Alex Elder <elder@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	greybus-dev@lists.linaro.org
+Subject: Re: [RFC net-next 00/15] Add support for Silicon Labs CPC
+Message-ID: <6fea7d17-8e08-42c7-a297-d4f5a3377661@lunn.ch>
+References: <20250512012748.79749-1-damien.riegel@silabs.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20250512044829.36400-1-abdun.nihaal@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250512012748.79749-1-damien.riegel@silabs.com>
 
-On Mon, May 12, 2025 at 10:18:27AM +0530, Abdun Nihaal wrote:
-> In one of the error paths in qlcnic_sriov_channel_cfg_cmd(), the memory
-> allocated in qlcnic_sriov_alloc_bc_mbx_args() for mailbox arguments is
-> not freed. Fix that by jumping to the error path that frees them, by
-> calling qlcnic_free_mbx_args(). This was found using static analysis.
+On Sun, May 11, 2025 at 09:27:33PM -0400, Damien Riégel wrote:
+> Hi,
 > 
-> Fixes: f197a7aa6288 ("qlcnic: VF-PF communication channel implementation")
-> Signed-off-by: Abdun Nihaal <abdun.nihaal@gmail.com>
-> ---
-> This patch is only compile tested. Not tested on real hardware.
 > 
-> V1->V2 : Added information about how the bug was found and how the 
-> patch was tested, as suggested by Simon Horman.
-> 
->  drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+> This patchset brings initial support for Silicon Labs CPC protocol,
+> standing for Co-Processor Communication. This protocol is used by the
+> EFR32 Series [1]. These devices offer a variety for radio protocols,
+> such as Bluetooth, Z-Wave, Zigbee [2].
 
-Thanks for the update.
+Before we get too deep into the details of the patches, please could
+you do a compare/contrast to Greybus.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+The core of Greybus is already in the kernel, with some more bits
+being in staging. I don't know it too well, but at first glance it
+looks very similar. We should not duplicate that.
 
+Also, this patch adds Bluetooth, you talk about Z-Wave and Zigbee. But
+the EFR32 is a general purpose SoC, with I2C, SPI, PWM, UART. Greybus
+has support for these, although the code is current in staging. But
+for staging code, it is actually pretty good.
+
+Why should we add a vendor implementation when we already appear to
+have something which does most of what is needed?
+
+	Andrew
 
