@@ -1,167 +1,557 @@
-Return-Path: <netdev+bounces-189770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BDC2AB39DA
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 15:58:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F11BFAB39F3
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 16:02:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAD24188DEC8
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 13:58:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9BB9216AA56
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 14:02:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2B251DDC1D;
-	Mon, 12 May 2025 13:57:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B46031E0DF5;
+	Mon, 12 May 2025 14:02:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32B8E1DACA1
-	for <netdev@vger.kernel.org>; Mon, 12 May 2025 13:57:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BF321DE8A5
+	for <netdev@vger.kernel.org>; Mon, 12 May 2025 14:02:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747058250; cv=none; b=UEwbNsXgJ8OSJR3u1zAhLceRSHXqwpmNTknE9aquKWY1qXlKt/6zBlZIucLllHn0kqoTDYxgFjpjOIB7x+lFkbzkIF7K8p32akYqVIDrK6CJCphK/2jsEyZfPPSt48WhGBLnD/QnNTduyEgST3slzDDGO2AdrFBoKru7FLPNSqU=
+	t=1747058539; cv=none; b=uCrB4HGkkC2RwgDJhsqEPyRPHmri1wna6r1tTV8md2gJO97WWVBJMpEVbCpOM9YaInvh4IvJvWcsgRCyLxdxfTiXFR6TMzQmvN2oGWQitQ2jPpN1P0pTys6hwTXI00Obu1Ghrisv0a4b9n7KnJqQdEYrSTl+TexclfxU6BtmA8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747058250; c=relaxed/simple;
-	bh=7RAlISt8/E2mtYY1m8sG1WhEzq6hte6h11oIGnvZSlo=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Irno5923Yo4k7QSsJOOykyhPblgakppJF68Qhi5QtiBRSXtlSIp1XeGoiCxCzlmvykmELHdXhP36ayhVd7DpypbkiK1OUDmtcVdjc577aHSEWwq1Wv/Q8JHYZ8whp5C3+hk4FACtS6uLrJGHBNFrbnhT9NEMbHN4GeJeDGIf7ak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3d6c613bd79so44011115ab.2
-        for <netdev@vger.kernel.org>; Mon, 12 May 2025 06:57:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747058248; x=1747663048;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2qEldaJQrN1XLSdI/YZ+WwSugx3cmBfgPCd9rN1E+8Y=;
-        b=sXQ8hEFwt9JHv2KbANw8/e7l0tnaKbaUi/TUBEsf+Ejp7aogKVj5IMidume/TQuexw
-         6WzE7ByEqier05yBFcUrvFPGjrKoqiJfhmdfFavLlIhW5jayLHN//HWgB/Iu9mfIcNaS
-         wGGrNkEfbd2xLJHaoHqJpUfTmZ6fsL2GzSqXL0C/D/i4jAEq3Y31XWJtJ+JJBUw+zKVI
-         NAxkNY5aGRufWGzFHF1J3AQJxOjEcr9FMyVLLpenYSQ67hs9b9unEUUf+W2fZzrlJJN7
-         i+9a1M1eAkqD1rUl+2QitZomFBqcQklFgVkZWO6LUe7OkDmogx8B/XJHCevNmVfBAMGA
-         4Atg==
-X-Forwarded-Encrypted: i=1; AJvYcCWKJIH+uDQn6J0wsJYa5HUJk1frgerFUgx7d3dsexAYH9+y1tGYRW+NJr7hTGB0lOUoxf5mQQc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyB5tGCmWXVFtH385UlGHu+O/jRQK87jOG+ENqcqzVQOIxOcQF3
-	5UGol29DpKoVqhUMC2rCisH3Hb0S6i11L2DQ609JMewD6L6MXNlk1LwdMPN3QKYrxQ/L3VgLsPj
-	XU2MOjhAGuLuzP1WA9olpGwC5hnp+z7gTDgytNqudWvJ+trJh+80G9lI=
-X-Google-Smtp-Source: AGHT+IH/Oyi5JeTmBjORfU3yO+4b8SgajjuQWgF+82RhcxjkDnIy4C73RhL8Jai9ANy2dzU1rGCya6P2yKiINqQrEMlUlHgC9wAH
+	s=arc-20240116; t=1747058539; c=relaxed/simple;
+	bh=FiD/O4Z0i+Ee+ARq+xM04c6qOzAGD0HNbXwePTR76yY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DpZdvyajPeePYqdxfRdjOY+sIyy/e8bqQtxbGAzPbYuySQlpLCsbn85fRBOVWgUKFfxnPk6GRmOClBtV3hpIj13u86YrM1WRQNrYUuoT6H5wd7j1eiOdGBvS/d0+mKmGRjRoU0EHAQVCYn5SactsU/VNhWXnWAcl5GQji6tZWqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.36] (g36.guest.molgen.mpg.de [141.14.220.36])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 6183D601EBF02;
+	Mon, 12 May 2025 16:01:51 +0200 (CEST)
+Message-ID: <13094fae-7fad-42df-b915-1e40c5d290ec@molgen.mpg.de>
+Date: Mon, 12 May 2025 16:01:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:190e:b0:3d5:890b:d9df with SMTP id
- e9e14a558f8ab-3da7e20d8a3mr137789365ab.15.1747058248293; Mon, 12 May 2025
- 06:57:28 -0700 (PDT)
-Date: Mon, 12 May 2025 06:57:28 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6821fe48.050a0220.f2294.0065.GAE@google.com>
-Subject: [syzbot] [wireless?] WARNING in ieee80211_tdls_oper
-From: syzbot <syzbot+f73f203f8c9b19037380@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next 2/2] ice: update cached PHC
+ time for all ports
+To: Karol Kolacinski <karol.kolacinski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+ richardcochran@gmail.com
+References: <20250512123509.1194023-3-karol.kolacinski@intel.com>
+ <20250512123509.1194023-4-karol.kolacinski@intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250512123509.1194023-4-karol.kolacinski@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    d76bb1ebb558 Merge tag 'erofs-for-6.15-rc6-fixes' of git:/..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17814670580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=91c351a0f6229e67
-dashboard link: https://syzkaller.appspot.com/bug?extid=f73f203f8c9b19037380
-compiler:       Debian clang version 20.1.2 (++20250402124445+58df0ef89dd6-1~exp1~20250402004600.97), Debian LLD 20.1.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1744c4d4580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16a5e4f4580000
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-d76bb1eb.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/21f7d4121801/vmlinux-d76bb1eb.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/453c9d554035/bzImage-d76bb1eb.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+f73f203f8c9b19037380@syzkaller.appspotmail.com
-
-mac80211_hwsim: wmediumd released netlink socket, switching to perfect channel medium
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5415 at net/mac80211/tdls.c:1461 ieee80211_tdls_oper+0x364/0x640 net/mac80211/tdls.c:1460
-Modules linked in:
-CPU: 0 UID: 0 PID: 5415 Comm: syz-executor228 Not tainted 6.15.0-rc5-syzkaller-00043-gd76bb1ebb558 #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-RIP: 0010:ieee80211_tdls_oper+0x364/0x640 net/mac80211/tdls.c:1460
-Code: 6f 01 00 00 e8 4d 83 d7 f6 eb 22 e8 46 83 d7 f6 4c 89 e2 eb 21 e8 3c 83 d7 f6 b8 bd ff ff ff e9 1c fe ff ff e8 2d 83 d7 f6 90 <0f> 0b 90 4c 8b 7c 24 08 48 8b 14 24 4d 8d a7 2a 1d 00 00 4c 89 e0
-RSP: 0018:ffffc9000d3d7380 EFLAGS: 00010293
-RAX: ffffffff8ae84d23 RBX: dffffc0000000000 RCX: ffff88801f6f4880
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000000000 R08: ffff8880435d8187 R09: 1ffff110086bb030
-R10: dffffc0000000000 R11: ffffed10086bb031 R12: ffff888044381d2e
-R13: ffff888044380d80 R14: 1ffff110088702e4 R15: 0000000000000000
-FS:  000055556871b380(0000) GS:ffff88808d6cb000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fff650f3fe8 CR3: 000000001e235000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- rdev_tdls_oper net/wireless/rdev-ops.h:940 [inline]
- nl80211_tdls_oper+0x282/0x440 net/wireless/nl80211.c:12586
- genl_family_rcv_msg_doit+0x212/0x300 net/netlink/genetlink.c:1115
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x219/0x490 net/netlink/af_netlink.c:2534
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
- netlink_unicast+0x758/0x8d0 net/netlink/af_netlink.c:1339
- netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1883
- sock_sendmsg_nosec net/socket.c:712 [inline]
- __sock_sendmsg+0x219/0x270 net/socket.c:727
- ____sys_sendmsg+0x505/0x830 net/socket.c:2566
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
- __sys_sendmsg net/socket.c:2652 [inline]
- __do_sys_sendmsg net/socket.c:2657 [inline]
- __se_sys_sendmsg net/socket.c:2655 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2655
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xf6/0x210 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f1c4a288aa9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 01 1a 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fff650f5058 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f1c4a288aa9
-RDX: 00000000000000c0 RSI: 0000200000000240 RDI: 0000000000000003
-RBP: 0000200000000240 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00002000000001c0
-R13: 00002000000001c8 R14: 00007fff650f508c R15: 0000200000000188
- </TASK>
+Dear Karol,
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Thank you for your patch. Maybe for summary adda *at once*?
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+ice: update cached PHC time for all ports at once
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Am 12.05.25 um 14:34 schrieb Karol Kolacinski:
+> Cached PHC time can be updated simultaneously for all active ports
+> instead of each port updating it for itself.
+> 
+> This approach makes only one thread updating cached PHC time, which
+> results in less threads to prioritize and only one PHC time read instead
+> of 8 every 500 ms.
+> 
+> Remove per-PF PTP kworker and use do_aux_work for PTP periodic work and
+> system_unbound_wq for ov_work.
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Nice improvement.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+Could the kworker been seen in the process list before? Maybe add a way 
+how to test your patch?
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+> ---
+>   drivers/net/ethernet/intel/ice/ice_ptp.c | 223 +++++++++++------------
+>   drivers/net/ethernet/intel/ice/ice_ptp.h |   6 +-
+>   2 files changed, 110 insertions(+), 119 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+> index 0a1f6e0e4a22..d9393be89b0e 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+> @@ -938,6 +938,7 @@ static int ice_ptp_init_tx(struct ice_pf *pf, struct ice_ptp_tx *tx, u8 port)
+>   /**
+>    * ice_ptp_update_cached_phctime - Update the cached PHC time values
+>    * @pf: Board specific private structure
+> + * @systime: Cached PHC time to write
+>    *
+>    * This function updates the system time values which are cached in the PF
+>    * structure and the Rx rings.
+> @@ -952,11 +953,10 @@ static int ice_ptp_init_tx(struct ice_pf *pf, struct ice_ptp_tx *tx, u8 port)
+>    * * 0 - OK, successfully updated
+>    * * -EAGAIN - PF was busy, need to reschedule the update
+>    */
+> -static int ice_ptp_update_cached_phctime(struct ice_pf *pf)
+> +static int ice_ptp_update_cached_phctime(struct ice_pf *pf, u64 systime)
+>   {
+>   	struct device *dev = ice_pf_to_dev(pf);
+>   	unsigned long update_before;
+> -	u64 systime;
+>   	int i;
+>   
+>   	update_before = pf->ptp.cached_phc_jiffies + msecs_to_jiffies(2000);
+> @@ -969,13 +969,14 @@ static int ice_ptp_update_cached_phctime(struct ice_pf *pf)
+>   		pf->ptp.late_cached_phc_updates++;
+>   	}
+>   
+> -	/* Read the current PHC time */
+> -	systime = ice_ptp_read_src_clk_reg(pf, NULL);
+> -
+>   	/* Update the cached PHC time stored in the PF structure */
+>   	WRITE_ONCE(pf->ptp.cached_phc_time, systime);
+>   	WRITE_ONCE(pf->ptp.cached_phc_jiffies, jiffies);
+>   
+> +	/* Nothing to do if link is down */
+> +	if (!pf->ptp.port.link_up)
+> +		return 0;
+> +
+>   	if (test_and_set_bit(ICE_CFG_BUSY, pf->state))
+>   		return -EAGAIN;
+>   
+> @@ -1000,6 +1001,43 @@ static int ice_ptp_update_cached_phctime(struct ice_pf *pf)
+>   	return 0;
+>   }
+>   
+> +/**
+> + * ice_ptp_update_cached_phctime_all - Update the cached PHC time for all ports
+> + * @pf: Board specific private structure
+> + *
+> + * Return:
+> + * * 0 - OK, successfully updated
+> + * * -EAGAIN - PF was busy, need to reschedule the update
+> + */
+> +static int ice_ptp_update_cached_phctime_all(struct ice_pf *pf)
+> +{
+> +	u64 time = ice_ptp_read_src_clk_reg(pf, NULL);
+> +	struct list_head *entry;
+> +	int ret = 0;
+> +
+> +	list_for_each(entry, &pf->adapter->ports.ports) {
+> +		struct ice_ptp_port *port = list_entry(entry,
+> +						       struct ice_ptp_port,
+> +						       list_node);
+> +		struct ice_pf *peer_pf = ptp_port_to_pf(port);
+> +		int err;
+> +
+> +		err = ice_ptp_update_cached_phctime(peer_pf, time);
+> +		if (err) {
+> +			/* If another thread is updating the Rx rings, we won't
+> +			 * properly reset them here. This could lead to
+> +			 * reporting of invalid timestamps, but there isn't much
+> +			 * we can do.
+> +			 */
+> +			dev_warn(ice_pf_to_dev(peer_pf), "Unable to immediately update cached PHC time, err=%d\n",
+> +				 err);
 
-If you want to undo deduplication, reply with:
-#syz undup
+What should a user do in this case? Reset the device?
+
+> +			ret = err;
+
+Shouldn’t you return right away? Should the function return, how many 
+ports failed to update?
+
+> +		}
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+>   /**
+>    * ice_ptp_reset_cached_phctime - Reset cached PHC time after an update
+>    * @pf: Board specific private structure
+> @@ -1015,24 +1053,12 @@ static int ice_ptp_update_cached_phctime(struct ice_pf *pf)
+>    */
+>   static void ice_ptp_reset_cached_phctime(struct ice_pf *pf)
+>   {
+> -	struct device *dev = ice_pf_to_dev(pf);
+> -	int err;
+> -
+>   	/* Update the cached PHC time immediately if possible, otherwise
+>   	 * schedule the work item to execute soon.
+>   	 */
+> -	err = ice_ptp_update_cached_phctime(pf);
+> -	if (err) {
+> -		/* If another thread is updating the Rx rings, we won't
+> -		 * properly reset them here. This could lead to reporting of
+> -		 * invalid timestamps, but there isn't much we can do.
+> -		 */
+> -		dev_warn(dev, "%s: ICE_CFG_BUSY, unable to immediately update cached PHC time\n",
+> -			 __func__);
+> -
+> +	if (ice_ptp_update_cached_phctime_all(pf)) {
+>   		/* Queue the work item to update the Rx rings when possible */
+> -		kthread_queue_delayed_work(pf->ptp.kworker, &pf->ptp.work,
+> -					   msecs_to_jiffies(10));
+> +		ptp_schedule_worker(pf->ptp.clock, msecs_to_jiffies(10));
+>   	}
+>   
+>   	/* Mark any outstanding timestamps as stale, since they might have
+> @@ -1157,7 +1183,7 @@ static int ice_ptp_check_tx_fifo(struct ice_ptp_port *port)
+>   
+>   /**
+>    * ice_ptp_wait_for_offsets - Check for valid Tx and Rx offsets
+> - * @work: Pointer to the kthread_work structure for this task
+> + * @work: Pointer to the work_struct structure for this task
+>    *
+>    * Check whether hardware has completed measuring the Tx and Rx offset values
+>    * used to configure and enable vernier timestamp calibration.
+> @@ -1170,37 +1196,30 @@ static int ice_ptp_check_tx_fifo(struct ice_ptp_port *port)
+>    * This function reschedules itself until both Tx and Rx calibration have
+>    * completed.
+>    */
+> -static void ice_ptp_wait_for_offsets(struct kthread_work *work)
+> +static void ice_ptp_wait_for_offsets(struct work_struct *work)
+>   {
+> +	struct delayed_work *dwork = to_delayed_work(work);
+>   	struct ice_ptp_port *port;
+> +	int tx_err, rx_err;
+>   	struct ice_pf *pf;
+> -	struct ice_hw *hw;
+> -	int tx_err;
+> -	int rx_err;
+>   
+> -	port = container_of(work, struct ice_ptp_port, ov_work.work);
+> +	port = container_of(dwork, struct ice_ptp_port, ov_work);
+>   	pf = ptp_port_to_pf(port);
+> -	hw = &pf->hw;
+>   
+> -	if (ice_is_reset_in_progress(pf->state)) {
+> -		/* wait for device driver to complete reset */
+> -		kthread_queue_delayed_work(pf->ptp.kworker,
+> -					   &port->ov_work,
+> -					   msecs_to_jiffies(100));
+> -		return;
+> -	}
+> +	if (ice_is_reset_in_progress(pf->state))
+> +		goto err;
+>   
+>   	tx_err = ice_ptp_check_tx_fifo(port);
+>   	if (!tx_err)
+> -		tx_err = ice_phy_cfg_tx_offset_e82x(hw, port->port_num);
+> -	rx_err = ice_phy_cfg_rx_offset_e82x(hw, port->port_num);
+> -	if (tx_err || rx_err) {
+> -		/* Tx and/or Rx offset not yet configured, try again later */
+> -		kthread_queue_delayed_work(pf->ptp.kworker,
+> -					   &port->ov_work,
+> -					   msecs_to_jiffies(100));
+> +		tx_err = ice_phy_cfg_tx_offset_e82x(&pf->hw, port->port_num);
+> +
+> +	rx_err = ice_phy_cfg_rx_offset_e82x(&pf->hw, port->port_num);
+> +	if (tx_err || rx_err)
+>   		return;
+> -	}
+> +err:
+> +	/* Tx and/or Rx offset not yet configured, try again later */
+> +	queue_delayed_work(system_unbound_wq, &port->ov_work,
+> +			   msecs_to_jiffies(100));
+>   }
+>   
+>   /**
+> @@ -1223,7 +1242,7 @@ ice_ptp_port_phy_stop(struct ice_ptp_port *ptp_port)
+>   		err = 0;
+>   		break;
+>   	case ICE_MAC_GENERIC:
+> -		kthread_cancel_delayed_work_sync(&ptp_port->ov_work);
+> +		cancel_delayed_work_sync(&ptp_port->ov_work);
+>   
+>   		err = ice_stop_phy_timer_e82x(hw, port, true);
+>   		break;
+> @@ -1271,7 +1290,7 @@ ice_ptp_port_phy_restart(struct ice_ptp_port *ptp_port)
+>   		break;
+>   	case ICE_MAC_GENERIC:
+>   		/* Start the PHY timer in Vernier mode */
+> -		kthread_cancel_delayed_work_sync(&ptp_port->ov_work);
+> +		cancel_delayed_work_sync(&ptp_port->ov_work);
+>   
+>   		/* temporarily disable Tx timestamps while calibrating
+>   		 * PHY offset
+> @@ -1291,11 +1310,7 @@ ice_ptp_port_phy_restart(struct ice_ptp_port *ptp_port)
+>   		ptp_port->tx.calibrating = false;
+>   		spin_unlock_irqrestore(&ptp_port->tx.lock, flags);
+>   
+> -		kthread_queue_delayed_work(pf->ptp.kworker, &ptp_port->ov_work,
+> -					   0);
+> -		break;
+> -	case ICE_MAC_GENERIC_3K_E825:
+> -		err = ice_start_phy_timer_eth56g(hw, port);
+> +		queue_delayed_work(system_unbound_wq, &ptp_port->ov_work, 0);
+>   		break;
+>   	default:
+>   		err = -ENODEV;
+> @@ -2578,22 +2593,27 @@ static void ice_ptp_maybe_trigger_tx_interrupt(struct ice_pf *pf)
+>   	}
+>   }
+>   
+> -static void ice_ptp_periodic_work(struct kthread_work *work)
+> +/**
+> + * ice_ptp_periodic_work - Do PTP periodic work
+> + * @info: Driver's PTP info structure
+> + *
+> + * Return: delay of the next auxiliary work scheduling time (>=0) or negative
+> + *         value in case further scheduling is not required
+> + */
+> +static long ice_ptp_periodic_work(struct ptp_clock_info *info)
+>   {
+> -	struct ice_ptp *ptp = container_of(work, struct ice_ptp, work.work);
+> -	struct ice_pf *pf = container_of(ptp, struct ice_pf, ptp);
+> +	struct ice_pf *pf = ptp_info_to_pf(info);
+>   	int err;
+>   
+>   	if (pf->ptp.state != ICE_PTP_READY)
+> -		return;
+> +		return 0;
+>   
+> -	err = ice_ptp_update_cached_phctime(pf);
+> +	err = ice_ptp_update_cached_phctime_all(pf);
+>   
+>   	ice_ptp_maybe_trigger_tx_interrupt(pf);
+>   
+> -	/* Run twice a second or reschedule if phc update failed */
+> -	kthread_queue_delayed_work(ptp->kworker, &ptp->work,
+> -				   msecs_to_jiffies(err ? 10 : 500));
+> +	/* Run twice a second or reschedule if PHC update failed */
+> +	return msecs_to_jiffies(err ? 10 : MSEC_PER_SEC / 2);
+>   }
+>   
+>   /**
+> @@ -2617,6 +2637,7 @@ static void ice_ptp_set_caps(struct ice_pf *pf)
+>   	info->n_ext_ts = GLTSYN_EVNT_H_IDX_MAX;
+>   	info->enable = ice_ptp_gpio_enable;
+>   	info->verify = ice_verify_pin;
+> +	info->do_aux_work = ice_ptp_periodic_work;
+>   
+>   	info->supported_extts_flags = PTP_RISING_EDGE |
+>   				      PTP_FALLING_EDGE |
+> @@ -2850,7 +2871,8 @@ void ice_ptp_prepare_for_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
+>   	/* Disable timestamping for both Tx and Rx */
+>   	ice_ptp_disable_timestamp_mode(pf);
+>   
+> -	kthread_cancel_delayed_work_sync(&ptp->work);
+> +	if (ice_pf_src_tmr_owned(pf))
+> +		ptp_cancel_worker_sync(ptp->clock);
+>   
+>   	if (reset_type == ICE_RESET_PFR)
+>   		return;
+> @@ -2858,6 +2880,9 @@ void ice_ptp_prepare_for_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
+>   	if (ice_pf_src_tmr_owned(pf) && hw->mac_type == ICE_MAC_GENERIC_3K_E825)
+>   		ice_ptp_prepare_rebuild_sec(pf, false, reset_type);
+>   
+> +	if (hw->mac_type == ICE_MAC_GENERIC)
+> +		cancel_delayed_work_sync(&pf->ptp.port.ov_work);
+> +
+>   	ice_ptp_release_tx_tracker(pf, &pf->ptp.port.tx);
+>   
+>   	/* Disable periodic outputs */
+> @@ -2964,17 +2989,18 @@ void ice_ptp_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
+>   		goto err;
+>   	}
+>   
+> -	if (ice_pf_src_tmr_owned(pf) && reset_type != ICE_RESET_PFR) {
+> -		err = ice_ptp_rebuild_owner(pf);
+> -		if (err)
+> -			goto err;
+> +	if (ice_pf_src_tmr_owned(pf)) {
+> +		if (reset_type != ICE_RESET_PFR) {
+> +			err = ice_ptp_rebuild_owner(pf);
+> +			if (err)
+> +				goto err;
+> +		}
+> +
+> +		ptp_schedule_worker(ptp->clock, 0);
+>   	}
+>   
+>   	ptp->state = ICE_PTP_READY;
+>   
+> -	/* Start periodic work going */
+> -	kthread_queue_delayed_work(ptp->kworker, &ptp->work, 0);
+> -
+>   	dev_info(ice_pf_to_dev(pf), "PTP reset successful\n");
+>   	return;
+>   
+> @@ -3110,34 +3136,6 @@ static int ice_ptp_init_owner(struct ice_pf *pf)
+>   	return err;
+>   }
+>   
+> -/**
+> - * ice_ptp_init_work - Initialize PTP work threads
+> - * @pf: Board private structure
+> - * @ptp: PF PTP structure
+> - */
+> -static int ice_ptp_init_work(struct ice_pf *pf, struct ice_ptp *ptp)
+> -{
+> -	struct kthread_worker *kworker;
+> -
+> -	/* Initialize work functions */
+> -	kthread_init_delayed_work(&ptp->work, ice_ptp_periodic_work);
+> -
+> -	/* Allocate a kworker for handling work required for the ports
+> -	 * connected to the PTP hardware clock.
+> -	 */
+> -	kworker = kthread_run_worker(0, "ice-ptp-%s",
+> -					dev_name(ice_pf_to_dev(pf)));
+> -	if (IS_ERR(kworker))
+> -		return PTR_ERR(kworker);
+> -
+> -	ptp->kworker = kworker;
+> -
+> -	/* Start periodic work going */
+> -	kthread_queue_delayed_work(ptp->kworker, &ptp->work, 0);
+> -
+> -	return 0;
+> -}
+> -
+>   /**
+>    * ice_ptp_init_port - Initialize PTP port structure
+>    * @pf: Board private structure
+> @@ -3157,8 +3155,7 @@ static int ice_ptp_init_port(struct ice_pf *pf, struct ice_ptp_port *ptp_port)
+>   	case ICE_MAC_GENERIC_3K_E825:
+>   		return ice_ptp_init_tx(pf, &ptp_port->tx, ptp_port->port_num);
+>   	case ICE_MAC_GENERIC:
+> -		kthread_init_delayed_work(&ptp_port->ov_work,
+> -					  ice_ptp_wait_for_offsets);
+> +		INIT_DELAYED_WORK(&ptp_port->ov_work, ice_ptp_wait_for_offsets);
+>   		return ice_ptp_init_tx_e82x(pf, &ptp_port->tx,
+>   					    ptp_port->port_num);
+>   	default:
+> @@ -3202,8 +3199,7 @@ static void ice_ptp_init_tx_interrupt_mode(struct ice_pf *pf)
+>    * functions connected to the clock hardware.
+>    *
+>    * The clock owner will allocate and register a ptp_clock with the
+> - * PTP_1588_CLOCK infrastructure. All functions allocate a kthread and work
+> - * items used for asynchronous work such as Tx timestamps and periodic work.
+> + * PTP_1588_CLOCK infrastructure.
+>    */
+>   void ice_ptp_init(struct ice_pf *pf)
+>   {
+> @@ -3251,9 +3247,8 @@ void ice_ptp_init(struct ice_pf *pf)
+>   
+>   	ptp->state = ICE_PTP_READY;
+>   
+> -	err = ice_ptp_init_work(pf, ptp);
+> -	if (err)
+> -		goto err_exit;
+> +	if (ice_pf_src_tmr_owned(pf))
+> +		ptp_schedule_worker(ptp->clock, 0);
+>   
+>   	dev_info(ice_pf_to_dev(pf), "PTP init successful\n");
+>   	return;
+> @@ -3277,37 +3272,35 @@ void ice_ptp_init(struct ice_pf *pf)
+>    */
+>   void ice_ptp_release(struct ice_pf *pf)
+>   {
+> -	if (pf->ptp.state != ICE_PTP_READY)
+> +	struct ice_ptp *ptp = &pf->ptp;
+> +
+> +	if (ptp->state != ICE_PTP_READY)
+>   		return;
+>   
+> -	pf->ptp.state = ICE_PTP_UNINIT;
+> +	ptp->state = ICE_PTP_UNINIT;
+>   
+>   	/* Disable timestamping for both Tx and Rx */
+>   	ice_ptp_disable_timestamp_mode(pf);
+>   
+>   	ice_ptp_cleanup_pf(pf);
+>   
+> -	ice_ptp_release_tx_tracker(pf, &pf->ptp.port.tx);
+> -
+> +	ice_ptp_release_tx_tracker(pf, &ptp->port.tx);
+>   	ice_ptp_disable_all_extts(pf);
+> +	if (pf->hw.mac_type == ICE_MAC_GENERIC)
+> +		cancel_delayed_work_sync(&ptp->port.ov_work);
+> +	ice_ptp_port_phy_stop(&ptp->port);
+> +	mutex_destroy(&ptp->port.ps_lock);
+>   
+> -	kthread_cancel_delayed_work_sync(&pf->ptp.work);
+> -
+> -	ice_ptp_port_phy_stop(&pf->ptp.port);
+> -	mutex_destroy(&pf->ptp.port.ps_lock);
+> -	if (pf->ptp.kworker) {
+> -		kthread_destroy_worker(pf->ptp.kworker);
+> -		pf->ptp.kworker = NULL;
+> -	}
+> -
+> -	if (!pf->ptp.clock)
+> +	if (!ptp->clock)
+>   		return;
+>   
+>   	/* Disable periodic outputs */
+>   	ice_ptp_disable_all_perout(pf);
+> +	if (ice_pf_src_tmr_owned(pf))
+> +		ptp_cancel_worker_sync(ptp->clock);
+>   
+> -	ptp_clock_unregister(pf->ptp.clock);
+> -	pf->ptp.clock = NULL;
+> +	ptp_clock_unregister(ptp->clock);
+> +	ptp->clock = NULL;
+>   
+>   	dev_info(ice_pf_to_dev(pf), "Removed PTP clock\n");
+>   }
+> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h b/drivers/net/ethernet/intel/ice/ice_ptp.h
+> index c8dac5a5bcd9..0f6154d7f473 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_ptp.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
+> @@ -139,7 +139,7 @@ struct ice_ptp_tx {
+>    *
+>    * @list_node: list member structure
+>    * @tx: Tx timestamp tracking for this port
+> - * @ov_work: delayed work task for tracking when PHY offset is valid
+> + * @ov_work: delayed work for tracking when PHY offset is valid
+>    * @ps_lock: mutex used to protect the overall PTP PHY start procedure
+>    * @link_up: indicates whether the link is up
+>    * @tx_fifo_busy_cnt: number of times the Tx FIFO was busy
+> @@ -148,7 +148,7 @@ struct ice_ptp_tx {
+>   struct ice_ptp_port {
+>   	struct list_head list_node;
+>   	struct ice_ptp_tx tx;
+> -	struct kthread_delayed_work ov_work;
+> +	struct delayed_work ov_work;
+>   	struct mutex ps_lock; /* protects overall PTP PHY start procedure */
+>   	bool link_up;
+>   	u8 tx_fifo_busy_cnt;
+> @@ -227,7 +227,6 @@ struct ice_ptp_pin_desc {
+>    * @work: delayed work function for periodic tasks
+>    * @cached_phc_time: a cached copy of the PHC time for timestamp extension
+>    * @cached_phc_jiffies: jiffies when cached_phc_time was last updated
+> - * @kworker: kwork thread for handling periodic work
+>    * @ext_ts_irq: the external timestamp IRQ in use
+>    * @pin_desc: structure defining pins
+>    * @ice_pin_desc: internal structure describing pin relations
+> @@ -251,7 +250,6 @@ struct ice_ptp {
+>   	struct kthread_delayed_work work;
+>   	u64 cached_phc_time;
+>   	unsigned long cached_phc_jiffies;
+> -	struct kthread_worker *kworker;
+>   	u8 ext_ts_irq;
+>   	struct ptp_pin_desc pin_desc[ICE_N_PINS_MAX];
+>   	const struct ice_ptp_pin_desc *ice_pin_desc;
+
+
+Kind regards,
+
+Paul
 
