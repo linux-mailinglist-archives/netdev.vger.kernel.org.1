@@ -1,151 +1,170 @@
-Return-Path: <netdev+bounces-189646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A64CAB302E
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 09:00:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2B1FAB3076
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 09:24:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C7581725CA
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 07:00:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 246B618946BA
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 07:24:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E63F255F51;
-	Mon, 12 May 2025 07:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 618072561D7;
+	Mon, 12 May 2025 07:24:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LrRyrH4v"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="ieZauyCL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 473042561C5
-	for <netdev@vger.kernel.org>; Mon, 12 May 2025 07:00:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB72F610D
+	for <netdev@vger.kernel.org>; Mon, 12 May 2025 07:24:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747033210; cv=none; b=aDRcPYAn7uYuQfdMC214g0QCXnl9Q8sP6+1UCSqsYdc1VbnF3NgIKAn14QT1PISMmy3IOA0PWMWZXysvu3Wquh5uCJ3mAQtj0US/cmTYmeH1PX/xeg4Jgorb/rkQHcw1+sMPpcP8X/0qntN7pY1sIMCisvL5PCs36IxSv+Dc96I=
+	t=1747034658; cv=none; b=GPFSWlSPe0XYXSy/EF85tyy6fkaEslkPlzzI4aN0ekzIpmIafypCRPjIFwcVKWTjSUlQ8ZgsNhNaVi5HyFg5QptfL8Dt/4sFvc/8LcHl2llUZYlzVp54yJfbjpK8JqGHusPT7atENaq94gqe/zeXkblxlsLNCtDtqrVkQWgb/qE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747033210; c=relaxed/simple;
-	bh=Bqq1A3Sa6qHoWnzKdhLS1uicwJ9gxYebr4/OhwLudB4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DPg32Zm0ITF+UycUpahhC81byLPsolQICjyxAgxeV6P9A21uvoPTOqmCWQ8vh0QIeSpzSHx8FT0/qo1wtdAexLcwSb8+uYDLH3LAIvg6fUyoMQmLtyBBmsDDAg4J3OjM4L6/mCHlp2kynXknS7g/dqPqGziKkcAoGpY5yXxP7pQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=LrRyrH4v; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-441d1ed82dbso44008085e9.0
-        for <netdev@vger.kernel.org>; Mon, 12 May 2025 00:00:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1747033206; x=1747638006; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=f9NnMsqvqzW4Dp+QMCFVbmE2fyembB/PnH3RgqpZhfQ=;
-        b=LrRyrH4vsevmMD2hAXOiENfRTMFTaQxc0n6C9fRY3af7C0IDgC+FEXjaMpHyiTXg4d
-         W3797QZ7ZhZGTQUlHFCG8JcqKmvpBE4n3MuaBizsSiArrI7NEju1PAp7PwXhqMECQ5w7
-         mZzYfESREY/IAzPGDk5c0n40l/Vpin45AuhXFpDVTjbUUxcIy2hPNqGm0C6ATMathILL
-         kvTKeOqckeehFzAbe8B3vY3zlH/TlOkGQ1rKlvG79xg70h1eq3m9/bxxnzwE4BVhQpe4
-         S1WRjAWdXonNVqFUmJRXWq2nv+DqhZL0vjR91CpE4d4uuQcUOt7IIX74G81r66LV2oSG
-         iyUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747033206; x=1747638006;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=f9NnMsqvqzW4Dp+QMCFVbmE2fyembB/PnH3RgqpZhfQ=;
-        b=Rr8Q5Hl+JggDz3FjH7nnUVutCrvuoxtqCsviKe8il5KzXGr2p42WBZ48Hg4QtnBJBr
-         eKdpEYd7gwrmlvJrP9ofFqDo/ASM7NAFLXv0zpghgYGh9A3x2B8KcaQqUxteTcSys5du
-         7hLksirjM3RYKNbCzZ02vmFnuhcAv3/MSA7Hyt0tuAQACYBsYqud9yTt3bMzzSmLBHr/
-         n3EVfC6JgqZvVGj1nZKLFqfHeOWPo/7GnjfAyiWhSE13mEFIZbUnXeiTbSeisCDxntfN
-         nLoI1e6VrfFH7w0nioUHTbKsOBYZTLDfo4awvf0bKex77mUSxCeSgPOzgIMbOBLapGUw
-         fzDg==
-X-Forwarded-Encrypted: i=1; AJvYcCWrnGm8A8NuPr1tdMLLt7Qis2g2eDSJKMuLjuuxHqdG7pkJRGQyNUvns38lOlYpgzpzumoe0Kw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6MLMBsohHFtsW6ayM/z2bVzq/GfIc2gKFrIZWGnNIbqcUT1cc
-	+b25FxEDTyYe1mJ/kKZbB1jb9FJQxBrsNx5mCSMhZqTXqec7UsSqKRQ4QrrAlA==
-X-Gm-Gg: ASbGncuJIzd5YZQjf5kar0xkn9k0onF51VuqsY4I/QEozILvJKjHWAYdI18vBML6PWZ
-	LKFKxCy7cfRtDDpzdP/2Z5fED053DxEMAL35DaOuGzkXS8N9JGtyHL1s+gGPBkX6ezlr05868qq
-	N+o1RvNNMbJVsJ/36IDA+J5L61mmO+3g0x3xuM1IsORYZzB4QHFUL6cMvJgARh0ZvnSaDq+jP5a
-	zuJkYaoAaCCb7eYTnuU14VHg7/MDVBysfvUy1sWzlIWVxuvteSWFHwLnjcHRMV1G5hgAlqyGWlz
-	A4MUqq2sze3IOgKf6+Mes68ZVCnglS3+X0Rzu1rQYvdkrkI8LRpp7pLKRAt/cyuSg1WbxsY04Q=
-	=
-X-Google-Smtp-Source: AGHT+IF0taVe2Cjr6rPU4zVe3n0h7u5iibv2A6s+QVlkQE644yCZv4nsG7uDfUXl8mm25LJJmLR7mg==
-X-Received: by 2002:a05:600c:511f:b0:43d:4686:5cfb with SMTP id 5b1f17b1804b1-442d6de2e97mr85863985e9.27.1747033206152;
-        Mon, 12 May 2025 00:00:06 -0700 (PDT)
-Received: from thinkpad ([130.93.163.156])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442cd3aeb79sm157284445e9.27.2025.05.12.00.00.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 May 2025 00:00:05 -0700 (PDT)
-Date: Mon, 12 May 2025 12:30:04 +0530
-From: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-To: Shradha Gupta <shradhagupta@linux.microsoft.com>
-Cc: Bjorn Helgaas <bhelgaas@google.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof =?utf-8?Q?Wilczy=EF=BF=BD~Dski?= <kw@linux.com>, Lorenzo Pieralisi <lpieralisi@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
-	linux-hyperv@vger.kernel.org, linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Nipun Gupta <nipun.gupta@amd.com>, Yury Norov <yury.norov@gmail.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Cameron <Jonathan.Cameron@huwei.com>, 
-	Anna-Maria Behnsen <anna-maria@linutronix.de>, Kevin Tian <kevin.tian@intel.com>, 
-	Long Li <longli@microsoft.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Konstantin Taranov <kotaranov@microsoft.com>, 
-	Simon Horman <horms@kernel.org>, Leon Romanovsky <leon@kernel.org>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, Erni Sri Satya Vennela <ernis@linux.microsoft.com>, 
-	Peter Zijlstra <peterz@infradead.org>, netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	Paul Rosswurm <paulros@microsoft.com>, Shradha Gupta <shradhagupta@microsoft.com>
-Subject: Re: [PATCH v3 2/4] PCI: hv: Allow dynamic MSI-X vector allocation
-Message-ID: <plrpscito5e76t4dvtukgqm724stsfxim3zv3xqwnjewenee53@72dipu3yunlr>
-References: <1746785566-4337-1-git-send-email-shradhagupta@linux.microsoft.com>
- <1746785602-4600-1-git-send-email-shradhagupta@linux.microsoft.com>
+	s=arc-20240116; t=1747034658; c=relaxed/simple;
+	bh=PeXyXIHP/RU8DBQh7ZsPnR78m2y+ncwDffB4JH/enLM=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S/pcEzL/zNuaEU+nzote4Lf4b3ZpxR/dOv7DMq59BPEOIjO8onFhXy34Y/NSSCS96y7nJqFwugfuuzfeblujx6UQFoQTniJhF8Ru3dRZo/S6zJ4yXUz3KCG7rE9zp7eUX+05GwTYMnZRmkKECaxwglrZGLZuMskYrB531/OCCwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=ieZauyCL; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1747034656; x=1778570656;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=PeXyXIHP/RU8DBQh7ZsPnR78m2y+ncwDffB4JH/enLM=;
+  b=ieZauyCLiQnZLSGrhmzBqqJoV6UvesSaJFNeaVpCL4IftQJ0AAP1tolB
+   aTxlcDBa7L12zkISyhD9J2/7o12mP9ih7xkIEc6YKayQY+kD/rxx19HSs
+   hGIgjgCjn/6uVyYin+QN8lY4vHMvPpNED17KIU0ux2nvobtL4fewjTG9H
+   VTqwIomhvzoMCtCFxElxjAzLrc6DRVCDPAi0XuIpeJLiGR7AnqtZlU8tR
+   lg114wmKobMaOq9xlHjxUj7f2Mx0tIEaMMxdBoMgDx8Sjj1qOSkc/ndUO
+   f13AVnIyMQzq85XLBX+idvqYi4wURMG6jwtUGDU3muPeVJgO/FAVlRZUZ
+   w==;
+X-CSE-ConnectionGUID: 091CbATtSFuA8m3t6yrqew==
+X-CSE-MsgGUID: /Wt3H8mkQnCi7uvGKztFrQ==
+X-IronPort-AV: E=Sophos;i="6.15,281,1739862000"; 
+   d="scan'208";a="41986285"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 May 2025 00:24:15 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Mon, 12 May 2025 00:23:55 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex01.mchp-main.com
+ (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.44 via Frontend
+ Transport; Mon, 12 May 2025 00:23:54 -0700
+Date: Mon, 12 May 2025 09:22:27 +0200
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: Vladimir Oltean <olteanv@gmail.com>
+CC: Jason Xing <kerneljasonxing@gmail.com>, <irusskikh@marvell.com>,
+	<andrew+netdev@lunn.ch>, <bharat@chelsio.com>, <ayush.sawal@chelsio.com>,
+	<UNGLinuxDriver@microchip.com>, <mcoquelin.stm32@gmail.com>,
+	<alexandre.torgue@foss.st.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<sgoutham@marvell.com>, <willemb@google.com>,
+	<linux-stm32@st-md-mailman.stormreply.com>,
+	<linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>, Jason Xing
+	<kernelxing@tencent.com>
+Subject: Re: [PATCH net-next v1 4/4] net: lan966x: generate software
+ timestamp just before the doorbell
+Message-ID: <20250512072227.wseiy7kfxyxbnj2l@DEN-DL-M31836.microchip.com>
+References: <20250508033328.12507-1-kerneljasonxing@gmail.com>
+ <20250508033328.12507-5-kerneljasonxing@gmail.com>
+ <20250508070700.m3bufh2q4v4llbfx@DEN-DL-M31836.microchip.com>
+ <CAL+tcoCuvxfQUbzjSfk+7vPWLEqQgVK8muqkOQe+N6jQQwXfUw@mail.gmail.com>
+ <20250508094156.kbegdd5vianotsrr@DEN-DL-M31836.microchip.com>
+ <20250508142157.sk7u37baqsl7yb64@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1746785602-4600-1-git-send-email-shradhagupta@linux.microsoft.com>
+In-Reply-To: <20250508142157.sk7u37baqsl7yb64@skbuf>
 
-On Fri, May 09, 2025 at 03:13:22AM -0700, Shradha Gupta wrote:
-> Allow dynamic MSI-X vector allocation for pci_hyperv PCI controller
-> by adding support for the flag MSI_FLAG_PCI_MSIX_ALLOC_DYN and using
-> pci_msix_prepare_desc() to prepare the MSI-X descriptors.
+The 05/08/2025 17:21, Vladimir Oltean wrote:
 > 
-> Feature support added for both x86 and ARM64
+> Horatiu,
+
+Hi Vladimir,
+
 > 
-> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-> ---
->  Changes in v3:
->  * Add arm64 support
-> ---
->  Changes in v2:
->  * split the patch to keep changes in PCI and pci_hyperv controller
->    seperate
->  * replace strings "pci vectors" by "MSI-X vectors"
-> ---
->  drivers/pci/controller/pci-hyperv.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+> On Thu, May 08, 2025 at 11:41:56AM +0200, Horatiu Vultur wrote:
+> > > > > -       skb_tx_timestamp(skb);
+> > > >
+> > > > Changing this will break the PHY timestamping because the frame gets
+> > > > modified in the next line, meaning that the classify function will
+> > > > always return PTP_CLASS_NONE.
+> > >
+> > > Sorry that I'm not that familiar with the details. I will remove it
+> > > from this series, but still trying to figure out what cases could be.
+> > >
+> > > Do you mean it can break when bpf prog is loaded because
+> > > 'skb_push(skb, IFH_LEN_BYTES);' expands the skb->data area?
+> >
+> > Well, the bpf program will check if it is a PTP frame that needs to be
+> > timestamp when it runs ptp_classify_raw, and as we push some data in
+> > front of the frame, the bpf will run from that point meaning that it
+> > would failed to detect the PTP frames.
+> >
+> > > May I ask
+> > > how the modified data of skb breaks the PHY timestamping feature?
+> >
+> > If it fails to detect that it is a PTP frame, then the frame will not be
+> > passed to the PHY using the callback txtstamp. So the PHY will timestamp the
+> > frame but it doesn't have the frame to attach the timestamp.
 > 
-> diff --git a/drivers/pci/controller/pci-hyperv.c b/drivers/pci/controller/pci-hyperv.c
-> index ac27bda5ba26..8c8882cb0ad2 100644
-> --- a/drivers/pci/controller/pci-hyperv.c
-> +++ b/drivers/pci/controller/pci-hyperv.c
-> @@ -598,7 +598,8 @@ static unsigned int hv_msi_get_int_vector(struct irq_data *data)
->  	return cfg->vector;
->  }
->  
-> -#define hv_msi_prepare		pci_msi_prepare
-> +#define hv_msi_prepare			pci_msi_prepare
-> +#define hv_msix_prepare_desc		pci_msix_prepare_desc
+> While I was further discussing this in private with Jason, a thought
+> popped up in my head.
+> 
+> Shouldn't skb_tx_timestamp(skb); be done _before_ this section?
+> 
+>         /* skb processing */
+>         needed_headroom = max_t(int, IFH_LEN_BYTES - skb_headroom(skb), 0);
+>         needed_tailroom = max_t(int, ETH_FCS_LEN - skb_tailroom(skb), 0);
+>         if (needed_headroom || needed_tailroom || skb_header_cloned(skb)) {
+>                 err = pskb_expand_head(skb, needed_headroom, needed_tailroom,
+>                                        GFP_ATOMIC);
+>                 if (unlikely(err)) {
+>                         dev->stats.tx_dropped++;
+>                         err = NETDEV_TX_OK;
+>                         goto release;
+>                 }
+>         }
+> 
+> The idea is that skb_tx_timestamp() calls skb_clone_tx_timestamp(), and
+> that should require skb_unshare() before you make any further
+> modification like insert an IFH here, so that the IFH is not visible to
+> clones (and thus to user space, on the socket error queue).
+> 
+> I think pskb_expand_head() serves the role of skb_unshare(), because I
+> see skb_header_cloned() is one of the conditions on which it is called.
+> 
+> But the problem is that skb_header_cloned() may have been false, then
+> skb_tx_timestamp() makes skb_header_cloned() true, but pskb_expand_head()
+> has already run. So the IFH is shared with the clone made for TX
+> timestamping purposes, I guess.
+> 
+> Am I completely off?
 
-Please do not use custom macro unless its defintion changes based on some
-conditional. In this case, you should use pci_msix_prepare_desc directly for
-prepare_desc() callback.
+Sorry for late reply.
+I think you are right!. I just want to double check by actually trying
+it.
 
-- Mani
+> 
+> Also, I believe you can set dev->needed_headroom = IFH_LEN_BYTES,
+> dev->needed_tailroom = ETH_FCS_LEN, and then just call
+> skb_ensure_writable_head_tail().
 
---
-மணிவண்ணன் சதாசிவம்
+Thanks for the advice. I will look also into this.
+
+-- 
+/Horatiu
 
