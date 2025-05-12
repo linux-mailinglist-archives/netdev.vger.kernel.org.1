@@ -1,341 +1,183 @@
-Return-Path: <netdev+bounces-189794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87999AB3CB0
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 17:50:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34106AB3CDB
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 17:59:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C19D13ADAEC
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 15:50:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D57EF1639FA
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 15:59:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28AC423909F;
-	Mon, 12 May 2025 15:50:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E3F6242930;
+	Mon, 12 May 2025 15:58:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jky+qgtE"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="VRjXdNnG"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from AS8PR03CU001.outbound.protection.outlook.com (mail-westeuropeazon11012057.outbound.protection.outlook.com [52.101.71.57])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 590B0B66E
-	for <netdev@vger.kernel.org>; Mon, 12 May 2025 15:50:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747065047; cv=none; b=Zj9mGNV1rOT4oNQuQP8jqOJdRsXD8MaUxYXP6EmFe2f3p4s0oI898YkKj76prmAzbR7+tY93cYQEg9nJCNibacuvasK1qYm8oWx4IPhaymXql5Yn0DuRP/ez6t5BQx1Mmibghyw0977HQqbMCuDiBbPU1RD1alBxGs8qvPt+KV8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747065047; c=relaxed/simple;
-	bh=Y6TkNyu3mtMNzRn8iFTRi4QFPcfBCrtYps+ap36MTC8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=noMUQB5SUc/5c8RzlOdGnyyu8p/0a+6wIGlxAEn3azbHc7pilampfXHKXM83mprywMEh6C6swuq45xKlbJlJQDehZcNH/g0R6ziyYbu3Vw1erdiEe2XH4q0q+erA0Rk72h2g1miOg7PmeZnoSIqSzRtHghr3qgRExy4ZpSoRWqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jky+qgtE; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <2ca5f592-74d3-41ff-8282-4359cb5ec171@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1747065042;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=T6MXrnT3gf4UCix4NRHlqZt6S+pEnfTMsanMdKfJUb8=;
-	b=jky+qgtETsFb0biTW/1lR9LNg39rCYhPgORR6TnNYv4JuW/iyHLT3hSsmBwFCXNEYk+YPH
-	wQ6Ense3mid4zlO4UAPyAPWAU6XKuNVFxljw6h5ZZTx5zj+HOHaSMWR+7l0Q1nN43lUoZr
-	rthZf0zrQvIMq1CkLxUeovin6kWcx+k=
-Date: Mon, 12 May 2025 16:50:35 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84CCC1A08CA
+	for <netdev@vger.kernel.org>; Mon, 12 May 2025 15:58:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.71.57
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747065535; cv=fail; b=KFQePP8kuQvXwtnSmq/1P95g0YwJyQ0xKphe7su4qztR4i5gEXGRAuDoBPxd64BlvsJD0thf8WLVPflcDopBcEY1RDFgk30vWxk7D2aGr79ekouNmiZtX8miFm5J8C2YvcXSp50ee0NOV6MROuBuk+ZLwsh2pR94JhtwYufzHbk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747065535; c=relaxed/simple;
+	bh=VlaWVGcnJP6MmGxEr5+dWf8hBu/+GjfF2JV/WY0bbZA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=O4fiyES0oce+iyvyjqtbwTQt8S0Se8i5lAkW3E3LYpEfSuI2ia7oIb/18ZLl16T1XeG8HT8iBO4mHt3909zqQsrScvX1WDyAtEuBPXL1GqDb6hXrtgcHiowmygpGVb2TUeEzmxc5SuJHudosfDyrGsORUsuuMTPc0Ita00ByTdQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=VRjXdNnG; arc=fail smtp.client-ip=52.101.71.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=d9todrpDAMwlDw1jysk1szYMI5z4w3hgM0tptFt+vk5AMKtB0VPcNL7ipQMa3Ke28P51+bGNK3KycngkhIqUgNG17nmtzmvhNkJlK1jYoWeYaRzJ2xxPBb6H9kLnH3QPHjwmgi+jXNPpV9bmn2tCpaFK33QgUQT+TTXIymIyOoZyqK/CCWGRMzBTW0zxpWPpy5kCS7WozgBVdtFk5pXKygoXeaOKbNSUpdq277RoK0SpVtM3pWE9ByyGGUR/84tX6grOlfsG0Md9IRoR/agzj+VH8UNaRinz/6V1uaB/e0Qk7m1OJ9hNezmfvfAIEIhLwawecuOYyM6SdmPvop2kJg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Sf2jn9KCxWdWaoOzMX0C43Jg3QFUvUDDLDf8GVM8oEk=;
+ b=rkfDC/oDfoJwgxf/rIAk+0SeZ74babCxcapLrAnu1wloZw8P70H8I9I6i5WIEK9q/z3+HeNIxKGbOgsC5nJ/QIx/dlHiVpbh3Q0o+sIjU7WlwCrOD6nyw8Z/UJhcD3WqiLjIZdDcZqG33l5o23rJA15KULZTyBGu7pPMBnXYgmqkkGsUXY4wyJhj283Rr7v13P2ALzEWnKkomSeBaDw5hKE/QxAb8NDeAB7IilJMTxY+urJu4g2RQzwv9kLx4J2ETFh7pYmYLTJiEswIWQITJX1RjOgZD5a/MVPLIKwCNyWKBzBr4nQmC/7p3NQQ98KrDvu6XT3TWL/DuDQSyHVN2w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Sf2jn9KCxWdWaoOzMX0C43Jg3QFUvUDDLDf8GVM8oEk=;
+ b=VRjXdNnGFTVUkDUwwnh51F6WUQmTLsYspZXns42B31ElWTX9vI77J+91THUG3I+KfieqKzcz3c4JTpfvTVETdqps25JKeA065sq5VbV77AqWhyXneRQ0M/QnVN9N5bss5dcPjnxBAFbYqoZ3RzqSfJwLffqRn8W8LQv26am0LCu3c5l+/Jw5cC9o8NKoeOGH3sw0rXVrF9lyBDX3dwMOhot/iLUWv0czzNJedzj6871q7RgIP9RNqANYWKH5R66P8mItDqe03CVfH9x54OJYI5154nDTHfyzt0oMC5nMbVr+W8+HlaYCT2rV8Nm+J5ZWm3PKTT74QkwzbXcq90LsaA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
+ by PA4PR04MB7822.eurprd04.prod.outlook.com (2603:10a6:102:b8::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.28; Mon, 12 May
+ 2025 15:58:50 +0000
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2%4]) with mapi id 15.20.8722.027; Mon, 12 May 2025
+ 15:58:50 +0000
+Date: Mon, 12 May 2025 18:58:46 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: netdev@vger.kernel.org, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	Russell King <linux@armlinux.org.uk>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Furong Xu <0x1207@gmail.com>
+Subject: Re: [PATCH net-next] net: stmmac: convert to ndo_hwtstamp_get() and
+ ndo_hwtstamp_set()
+Message-ID: <20250512155846.vbmc3wrvpidbzxqc@skbuf>
+References: <20250512143607.595490-1-vladimir.oltean@nxp.com>
+ <2ca5f592-74d3-41ff-8282-4359cb5ec171@linux.dev>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2ca5f592-74d3-41ff-8282-4359cb5ec171@linux.dev>
+X-ClientProxiedBy: VI1P189CA0015.EURP189.PROD.OUTLOOK.COM
+ (2603:10a6:802:2a::28) To AM8PR04MB7779.eurprd04.prod.outlook.com
+ (2603:10a6:20b:24b::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next] net: stmmac: convert to ndo_hwtstamp_get() and
- ndo_hwtstamp_set()
-To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, Russell King <linux@armlinux.org.uk>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
- Furong Xu <0x1207@gmail.com>
-References: <20250512143607.595490-1-vladimir.oltean@nxp.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250512143607.595490-1-vladimir.oltean@nxp.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|PA4PR04MB7822:EE_
+X-MS-Office365-Filtering-Correlation-Id: cb620f09-1a5c-4c2c-51dc-08dd916de284
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?ZBHvk4b0IDefolb6KBRiYOf9/K3ca0/iw/yPchwAfuU3GBFskLDv8jmDRXYO?=
+ =?us-ascii?Q?gh449DU82q7xi3jxmIU0RLn7wn2Zum6a0gtG2tFDZkC23J6Vq0BprG+pnqr7?=
+ =?us-ascii?Q?/3NCt7MHsYTQKz2Vd46+xGFzsqhcto2yz1FT0e0gmh5CPvUuUX+T2VZkR8T+?=
+ =?us-ascii?Q?96yO8dt27l9dfKTHBheAkwsB8MP5ygoMDkRcyzWrzoIPkUU5AbUOFmPyOMr2?=
+ =?us-ascii?Q?8Jx6CAASKxLRT/4pqxXSTj7xLzr1A+7t5hU/Pp/yDNQD14FD4DgJIy2wtjf/?=
+ =?us-ascii?Q?Ds7jzvQHl/nCzr+cUaX3pJVTA4G3+W24c+AMn+t/em1cDl3tH2wBrNXoQW+f?=
+ =?us-ascii?Q?YqGJ683yiQ1RNDGki/5O/vpbHx1YZ834N7uUrQM5ZK6HmIujFV3atTqKA1D+?=
+ =?us-ascii?Q?15TrTJ3JYtLZAoiyz/ya8x7S7E67OiZkkhqsr8VvMJ/0vtdjCcrC/HmcUg1m?=
+ =?us-ascii?Q?4LzMzuv1jdogb+RYE1RmspC1+FZQAhvv+xKNmJ2CYNCcweSj4yyQMzpLXqy5?=
+ =?us-ascii?Q?NfgNx/muv2/gQnS/xqzMFZRb7AvKItWpMpAm/3zSgVQVe/iDqtAMMj6zDfZ3?=
+ =?us-ascii?Q?bMEa0dQN00se08/OG+TteCLl0bRkentRUoF9pE/jMMww7Wy5yElvZxa8Um1N?=
+ =?us-ascii?Q?LXzwfC4GSszSWvNBaLzz666i4jvKY/NDxi57l954Ep5tIWyNJvvujmsxwjQy?=
+ =?us-ascii?Q?HQ3rpR+jS1a0gAIee0O4DakjSvX+gS7rVErEqVxj/qp8qdlnr2mFsMHInVQx?=
+ =?us-ascii?Q?VgwqQuPABiGoZmTk1fdessH6QoL1InIHaky3bxTg6uXPL2zKZF69grJ29QSo?=
+ =?us-ascii?Q?tryCfV3Sc7rS9uQJKx4RROuogLgyjzU7rR2Qv/gN+QvvRCAuwE9PELUgVVBr?=
+ =?us-ascii?Q?TArAKy6GsDo9WnYWKyI36EwHjeOSe6TP5bB6JVcI//E2SszxPF4OaJGiCD+B?=
+ =?us-ascii?Q?1h1+ZKEOQ0HLslUf+bpxNMKcQFoqPP5WM5VhVaMawgfvijM9ig10oehVxiCc?=
+ =?us-ascii?Q?XfdCJ6pcds/968gttRuR69XitW1a2rfyq/AIUM5zEIC4e39e2ekypZydcc12?=
+ =?us-ascii?Q?H9mMd8gXWXdPzEiIXGzPzvkn53I5eopXYXVPAUEZQdKIRSt9DNO0p56zHHwY?=
+ =?us-ascii?Q?m8JOInSItnn3alozTmzD7m1vbw3gy5XOw/nNocRyBXw9kjIC8OWYYtul9O4D?=
+ =?us-ascii?Q?r71uJphfCYwz1wL/EwL3j7Rk68KCKB4AgPGuGK+ABdq6kvSIWFYuEA3YNqIY?=
+ =?us-ascii?Q?6v+I8lkrYOyLEZNcymb3xyae4IkorUizuWjpzy8AC2ZCq2BPEZQODkqcusXr?=
+ =?us-ascii?Q?BXQpTThZOUW5w2sMI6WOEdw2HiyErTbW0Esl0vG3B8Sk+4DyAe89cd0wH0wy?=
+ =?us-ascii?Q?ZpZixqwo//Um5RocGZ1+WgfB3IlmGNhwwrYEzuKrYEwItz+eYPYKCP+xjoti?=
+ =?us-ascii?Q?Khe1DbJMhw8=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?CF5i6SrVA/GFqN3HiKHb50+wJZCVcG6e3H+ZUq6nu+txunkr0e0RjJoc5IBl?=
+ =?us-ascii?Q?8cxq8gixwJg90a3tI5JNBdiMVyUdksr2oiASzBDRbj3L3201PeSHu53Q1ce+?=
+ =?us-ascii?Q?7max+0yOxHIlUchvwWEsQLKMUtD/fHliK4blFYTpcvOnO6xYwAqcWqibQVok?=
+ =?us-ascii?Q?DzGvDr0tHkIQhMeQpx4XBIAN5F7M5W0pEiihHQJjvp4g9wwYND+hPBV0CA1n?=
+ =?us-ascii?Q?B6R53pHT6wy6eeDRJVMNVPFtjhOZMwBjz2h10Gralt474bpOBrjkYbytuEXO?=
+ =?us-ascii?Q?vdDQnUqSCDb2C4hwKEGiuc+NJQ4NxP3pGnOlqvcyortJJrsgkQb3G/BVrzAu?=
+ =?us-ascii?Q?WS2eAXn9+bUgR3XoFGc7f/PVNd3/+Ry79Ri7yUxx95jNtMpFHgUIeWm5tndB?=
+ =?us-ascii?Q?MrXg3Lr49KmCf4hz4BxsDt3sfl/QcNPwovpcBXaYr+LD0k8Rl2xIyvG9Bqdv?=
+ =?us-ascii?Q?tOGVS4voqT/3M7mBOKf8yNPRu2u5JBWwEcMO4htMi6Nbtoruun5f2qVVeJz3?=
+ =?us-ascii?Q?QZ3Txp6PAVb7A4RVPrSkR2JPkp0ayZy3aZmYUQQvMVqUljU9kpfKSFFeZ30Q?=
+ =?us-ascii?Q?4SGK33kqkckdkH9aFYc3cOfdxrVxJxluCXF2zG328564GRBppY5GzK3taEen?=
+ =?us-ascii?Q?/AHncqgOceWjJXIedF4ffo9S1ubkTuFRudbolJ6FK7DPH42KknKDfLTl8TiM?=
+ =?us-ascii?Q?afYmugnOuVouU28x8y96uF6zs0VYfQl2SUGF4DmohfJxsfh3yIcJaZqrTcIK?=
+ =?us-ascii?Q?awaM7PJTGpro4sD9+QQCXeBhK9F/opscdhGj0HfN20ytWtjFuY8Oj6am1GL3?=
+ =?us-ascii?Q?KG84+uhnvSPc76aeK8+0eV2aY84CAf5GZXcRgbhsypIb9zzIPjgB/RmFV2wF?=
+ =?us-ascii?Q?i2488QMIJCVhN8GxFD5zVo+9CBAZL8iMXQ6lY7sason+0zgT8TW9fgj0usEI?=
+ =?us-ascii?Q?boKssSkjR4kMrJZAoifwsl6WJspQ0DFvxEXtw3mWal4AVVYbx+obE14pxHwW?=
+ =?us-ascii?Q?pwV1OpE6PoO2jQQr0hKJx7/cLlVJ7rVpsb/VrvCYg+T49RNDGEiTKn2G87OL?=
+ =?us-ascii?Q?kOVD3qn+SJzbLj/8D9lqdZFis0UZ8TdyfYtm2YKipaVWE8EAAiSeUnrE8bNh?=
+ =?us-ascii?Q?lEj08ex9QZ9XyYvle5MmSTGqJu9srCl5QwzoZZwwWO3xzPqNUNCiO01uG68t?=
+ =?us-ascii?Q?iZdcOPBwE60wMxMjaw4khyh/JfcSriN8OCPJE+cBNlO3m8sh6dUTrWEIPivX?=
+ =?us-ascii?Q?xEs53CiL7cXbvxdtgMjow0G8UneWWyrgS+8E0QsmH4ihYA22B2naTQUitL+n?=
+ =?us-ascii?Q?DxFDKovmE74DtNHbI8XE3kCIqE7mh9zdoNwbdgF2FO9771BxT/RlQPgtDixK?=
+ =?us-ascii?Q?1HAlASKHVx1W8UzBrBdsF3RH0Vj4fp8SZDcbGF5/g3hy6N/dUFzCSt+MkhWB?=
+ =?us-ascii?Q?5m/ejgExeZUyzvg2YTjed2bHcMRWSaSgZ9fAhF0CbQK1vOZ77ZQQ0jG06bj9?=
+ =?us-ascii?Q?qUOSyI7ScAa5GL31TdiJk+JzPKo4BvBoDn8YAf0iN9YRawaShhqoXrvBKtoc?=
+ =?us-ascii?Q?6Xz1KKI/wk8eqRbLFRQBBQLkYZuPNQhN+zjDjs3zCW4ZqBwKz90dnlNjdwnp?=
+ =?us-ascii?Q?mw=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cb620f09-1a5c-4c2c-51dc-08dd916de284
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2025 15:58:50.4192
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6mnBlas0vmo6m2sE+jEmFSFSV6fLCojDt2nEVs6b4wl3Pc6nWpmx5wJr7/U/DDe+q4bKm0EXDB2CCqclgzW9Mw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB7822
 
-On 12/05/2025 15:36, Vladimir Oltean wrote:
-> New timestamping API was introduced in commit 66f7223039c0 ("net: add
-> NDOs for configuring hardware timestamping") from kernel v6.6. It is
-> time to convert the stmmac driver to the new API, so that the
-> ndo_eth_ioctl() path can be removed completely.
-
-The conversion to the new API looks good, but stmmac_ioctl() isn't
-removed keeping ndo_eth_ioctl() path in place. Did I miss something in
-the patch?
-
+On Mon, May 12, 2025 at 04:50:35PM +0100, Vadim Fedorenko wrote:
+> On 12/05/2025 15:36, Vladimir Oltean wrote:
+> > New timestamping API was introduced in commit 66f7223039c0 ("net: add
+> > NDOs for configuring hardware timestamping") from kernel v6.6. It is
+> > time to convert the stmmac driver to the new API, so that the
+> > ndo_eth_ioctl() path can be removed completely.
 > 
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> ---
->   drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  2 +-
->   .../net/ethernet/stmicro/stmmac/stmmac_main.c | 80 +++++++++----------
->   2 files changed, 37 insertions(+), 45 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> index 1686e559f66e..cda09cf5dcca 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> @@ -301,7 +301,7 @@ struct stmmac_priv {
->   	unsigned int mode;
->   	unsigned int chain_mode;
->   	int extend_desc;
-> -	struct hwtstamp_config tstamp_config;
-> +	struct kernel_hwtstamp_config tstamp_config;
->   	struct ptp_clock *ptp_clock;
->   	struct ptp_clock_info ptp_clock_ops;
->   	unsigned int default_addend;
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index a19b6f940bf3..c090247d2a29 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -568,18 +568,19 @@ static void stmmac_get_rx_hwtstamp(struct stmmac_priv *priv, struct dma_desc *p,
->   /**
->    *  stmmac_hwtstamp_set - control hardware timestamping.
->    *  @dev: device pointer.
-> - *  @ifr: An IOCTL specific structure, that can contain a pointer to
-> - *  a proprietary structure used to pass information to the driver.
-> + *  @config: the timestamping configuration.
-> + *  @extack: netlink extended ack structure for error reporting.
->    *  Description:
->    *  This function configures the MAC to enable/disable both outgoing(TX)
->    *  and incoming(RX) packets time stamping based on user input.
->    *  Return Value:
->    *  0 on success and an appropriate -ve integer on failure.
->    */
-> -static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
-> +static int stmmac_hwtstamp_set(struct net_device *dev,
-> +			       struct kernel_hwtstamp_config *config,
-> +			       struct netlink_ext_ack *extack)
->   {
->   	struct stmmac_priv *priv = netdev_priv(dev);
-> -	struct hwtstamp_config config;
->   	u32 ptp_v2 = 0;
->   	u32 tstamp_all = 0;
->   	u32 ptp_over_ipv4_udp = 0;
-> @@ -590,34 +591,30 @@ static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
->   	u32 ts_event_en = 0;
->   
->   	if (!(priv->dma_cap.time_stamp || priv->adv_ts)) {
-> -		netdev_alert(priv->dev, "No support for HW time stamping\n");
-> +		NL_SET_ERR_MSG_MOD(extack, "No support for HW time stamping\n");
->   		priv->hwts_tx_en = 0;
->   		priv->hwts_rx_en = 0;
->   
->   		return -EOPNOTSUPP;
->   	}
->   
-> -	if (copy_from_user(&config, ifr->ifr_data,
-> -			   sizeof(config)))
-> -		return -EFAULT;
-> -
->   	netdev_dbg(priv->dev, "%s config flags:0x%x, tx_type:0x%x, rx_filter:0x%x\n",
-> -		   __func__, config.flags, config.tx_type, config.rx_filter);
-> +		   __func__, config->flags, config->tx_type, config->rx_filter);
->   
-> -	if (config.tx_type != HWTSTAMP_TX_OFF &&
-> -	    config.tx_type != HWTSTAMP_TX_ON)
-> +	if (config->tx_type != HWTSTAMP_TX_OFF &&
-> +	    config->tx_type != HWTSTAMP_TX_ON)
->   		return -ERANGE;
->   
->   	if (priv->adv_ts) {
-> -		switch (config.rx_filter) {
-> +		switch (config->rx_filter) {
->   		case HWTSTAMP_FILTER_NONE:
->   			/* time stamp no incoming packet at all */
-> -			config.rx_filter = HWTSTAMP_FILTER_NONE;
-> +			config->rx_filter = HWTSTAMP_FILTER_NONE;
->   			break;
->   
->   		case HWTSTAMP_FILTER_PTP_V1_L4_EVENT:
->   			/* PTP v1, UDP, any kind of event packet */
-> -			config.rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_EVENT;
-> +			config->rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_EVENT;
->   			/* 'xmac' hardware can support Sync, Pdelay_Req and
->   			 * Pdelay_resp by setting bit14 and bits17/16 to 01
->   			 * This leaves Delay_Req timestamps out.
-> @@ -631,7 +628,7 @@ static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
->   
->   		case HWTSTAMP_FILTER_PTP_V1_L4_SYNC:
->   			/* PTP v1, UDP, Sync packet */
-> -			config.rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_SYNC;
-> +			config->rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_SYNC;
->   			/* take time stamp for SYNC messages only */
->   			ts_event_en = PTP_TCR_TSEVNTENA;
->   
-> @@ -641,7 +638,7 @@ static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
->   
->   		case HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ:
->   			/* PTP v1, UDP, Delay_req packet */
-> -			config.rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ;
-> +			config->rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ;
->   			/* take time stamp for Delay_Req messages only */
->   			ts_master_en = PTP_TCR_TSMSTRENA;
->   			ts_event_en = PTP_TCR_TSEVNTENA;
-> @@ -652,7 +649,7 @@ static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
->   
->   		case HWTSTAMP_FILTER_PTP_V2_L4_EVENT:
->   			/* PTP v2, UDP, any kind of event packet */
-> -			config.rx_filter = HWTSTAMP_FILTER_PTP_V2_L4_EVENT;
-> +			config->rx_filter = HWTSTAMP_FILTER_PTP_V2_L4_EVENT;
->   			ptp_v2 = PTP_TCR_TSVER2ENA;
->   			/* take time stamp for all event messages */
->   			snap_type_sel = PTP_TCR_SNAPTYPSEL_1;
-> @@ -663,7 +660,7 @@ static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
->   
->   		case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
->   			/* PTP v2, UDP, Sync packet */
-> -			config.rx_filter = HWTSTAMP_FILTER_PTP_V2_L4_SYNC;
-> +			config->rx_filter = HWTSTAMP_FILTER_PTP_V2_L4_SYNC;
->   			ptp_v2 = PTP_TCR_TSVER2ENA;
->   			/* take time stamp for SYNC messages only */
->   			ts_event_en = PTP_TCR_TSEVNTENA;
-> @@ -674,7 +671,7 @@ static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
->   
->   		case HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ:
->   			/* PTP v2, UDP, Delay_req packet */
-> -			config.rx_filter = HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ;
-> +			config->rx_filter = HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ;
->   			ptp_v2 = PTP_TCR_TSVER2ENA;
->   			/* take time stamp for Delay_Req messages only */
->   			ts_master_en = PTP_TCR_TSMSTRENA;
-> @@ -686,7 +683,7 @@ static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
->   
->   		case HWTSTAMP_FILTER_PTP_V2_EVENT:
->   			/* PTP v2/802.AS1 any layer, any kind of event packet */
-> -			config.rx_filter = HWTSTAMP_FILTER_PTP_V2_EVENT;
-> +			config->rx_filter = HWTSTAMP_FILTER_PTP_V2_EVENT;
->   			ptp_v2 = PTP_TCR_TSVER2ENA;
->   			snap_type_sel = PTP_TCR_SNAPTYPSEL_1;
->   			if (priv->synopsys_id < DWMAC_CORE_4_10)
-> @@ -698,7 +695,7 @@ static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
->   
->   		case HWTSTAMP_FILTER_PTP_V2_SYNC:
->   			/* PTP v2/802.AS1, any layer, Sync packet */
-> -			config.rx_filter = HWTSTAMP_FILTER_PTP_V2_SYNC;
-> +			config->rx_filter = HWTSTAMP_FILTER_PTP_V2_SYNC;
->   			ptp_v2 = PTP_TCR_TSVER2ENA;
->   			/* take time stamp for SYNC messages only */
->   			ts_event_en = PTP_TCR_TSEVNTENA;
-> @@ -710,7 +707,7 @@ static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
->   
->   		case HWTSTAMP_FILTER_PTP_V2_DELAY_REQ:
->   			/* PTP v2/802.AS1, any layer, Delay_req packet */
-> -			config.rx_filter = HWTSTAMP_FILTER_PTP_V2_DELAY_REQ;
-> +			config->rx_filter = HWTSTAMP_FILTER_PTP_V2_DELAY_REQ;
->   			ptp_v2 = PTP_TCR_TSVER2ENA;
->   			/* take time stamp for Delay_Req messages only */
->   			ts_master_en = PTP_TCR_TSMSTRENA;
-> @@ -724,7 +721,7 @@ static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
->   		case HWTSTAMP_FILTER_NTP_ALL:
->   		case HWTSTAMP_FILTER_ALL:
->   			/* time stamp any incoming packet */
-> -			config.rx_filter = HWTSTAMP_FILTER_ALL;
-> +			config->rx_filter = HWTSTAMP_FILTER_ALL;
->   			tstamp_all = PTP_TCR_TSENALL;
->   			break;
->   
-> @@ -732,18 +729,18 @@ static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
->   			return -ERANGE;
->   		}
->   	} else {
-> -		switch (config.rx_filter) {
-> +		switch (config->rx_filter) {
->   		case HWTSTAMP_FILTER_NONE:
-> -			config.rx_filter = HWTSTAMP_FILTER_NONE;
-> +			config->rx_filter = HWTSTAMP_FILTER_NONE;
->   			break;
->   		default:
->   			/* PTP v1, UDP, any kind of event packet */
-> -			config.rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_EVENT;
-> +			config->rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_EVENT;
->   			break;
->   		}
->   	}
-> -	priv->hwts_rx_en = ((config.rx_filter == HWTSTAMP_FILTER_NONE) ? 0 : 1);
-> -	priv->hwts_tx_en = config.tx_type == HWTSTAMP_TX_ON;
-> +	priv->hwts_rx_en = config->rx_filter != HWTSTAMP_FILTER_NONE;
-> +	priv->hwts_tx_en = config->tx_type == HWTSTAMP_TX_ON;
->   
->   	priv->systime_flags = STMMAC_HWTS_ACTIVE;
->   
-> @@ -756,31 +753,30 @@ static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
->   
->   	stmmac_config_hw_tstamping(priv, priv->ptpaddr, priv->systime_flags);
->   
-> -	memcpy(&priv->tstamp_config, &config, sizeof(config));
-> +	priv->tstamp_config = *config;
->   
-> -	return copy_to_user(ifr->ifr_data, &config,
-> -			    sizeof(config)) ? -EFAULT : 0;
-> +	return 0;
->   }
->   
->   /**
->    *  stmmac_hwtstamp_get - read hardware timestamping.
->    *  @dev: device pointer.
-> - *  @ifr: An IOCTL specific structure, that can contain a pointer to
-> - *  a proprietary structure used to pass information to the driver.
-> + *  @config: the timestamping configuration.
->    *  Description:
->    *  This function obtain the current hardware timestamping settings
->    *  as requested.
->    */
-> -static int stmmac_hwtstamp_get(struct net_device *dev, struct ifreq *ifr)
-> +static int stmmac_hwtstamp_get(struct net_device *dev,
-> +			       struct kernel_hwtstamp_config *config)
->   {
->   	struct stmmac_priv *priv = netdev_priv(dev);
-> -	struct hwtstamp_config *config = &priv->tstamp_config;
->   
->   	if (!(priv->dma_cap.time_stamp || priv->dma_cap.atime_stamp))
->   		return -EOPNOTSUPP;
->   
-> -	return copy_to_user(ifr->ifr_data, config,
-> -			    sizeof(*config)) ? -EFAULT : 0;
-> +	*config = priv->tstamp_config;
-> +
-> +	return 0;
->   }
->   
->   /**
-> @@ -6228,12 +6224,6 @@ static int stmmac_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
->   	case SIOCSMIIREG:
->   		ret = phylink_mii_ioctl(priv->phylink, rq, cmd);
->   		break;
-> -	case SIOCSHWTSTAMP:
-> -		ret = stmmac_hwtstamp_set(dev, rq);
-> -		break;
-> -	case SIOCGHWTSTAMP:
-> -		ret = stmmac_hwtstamp_get(dev, rq);
-> -		break;
->   	default:
->   		break;
->   	}
-> @@ -7172,6 +7162,8 @@ static const struct net_device_ops stmmac_netdev_ops = {
->   	.ndo_bpf = stmmac_bpf,
->   	.ndo_xdp_xmit = stmmac_xdp_xmit,
->   	.ndo_xsk_wakeup = stmmac_xsk_wakeup,
-> +	.ndo_hwtstamp_get = stmmac_hwtstamp_get,
-> +	.ndo_hwtstamp_set = stmmac_hwtstamp_set,
->   };
->   
->   static void stmmac_reset_subtask(struct stmmac_priv *priv)
+> The conversion to the new API looks good, but stmmac_ioctl() isn't
+> removed keeping ndo_eth_ioctl() path in place. Did I miss something in
+> the patch?
 
+I was never intending with this work to remove ndo_eth_ioctl()
+completely, but instead to completely remove the timestamping
+configuration path that goes through ndo_eth_ioctl(). I apologize for
+any false marketing and I will be more explicit about this in further
+patches.
 
