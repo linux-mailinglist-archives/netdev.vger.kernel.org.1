@@ -1,153 +1,126 @@
-Return-Path: <netdev+bounces-189757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04B9BAB3807
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 15:04:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 236D9AB381E
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 15:10:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E0B0189F008
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 13:03:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 901607A20A0
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 13:08:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAAF9258CFB;
-	Mon, 12 May 2025 13:02:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7634B28D857;
+	Mon, 12 May 2025 13:10:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="E7SlaJKm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TxFX1Lnk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 273F42BAF7
-	for <netdev@vger.kernel.org>; Mon, 12 May 2025 13:02:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0AD925393A;
+	Mon, 12 May 2025 13:10:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747054974; cv=none; b=GdrPGng7CAIjLX5lAkY+52qBSrhwb2deVKUQPadseYAqNZEm5Y4/sr1sa/EbDW+Bie14C7yyTnK2NAFdssFeZH097ySPQvB1XMi5BfJGCV27OlQOYxOO3kbzNDRC7I0wtl+fG+ue3fldGQDcWsQbL66SMph2vuiKTknSY9CsCJM=
+	t=1747055407; cv=none; b=nWQO3fRs+amfeuZ10NvFoftg4nQGRg+gFdsvcKZfJYXm80z+rZUJFaYYJN8tLba1o07w8nZjTc+Q/F1MsECQGgKFVKP0F6/MmPmbU8N0WO4uVDdXS/zqMsS8/eCsq/0OqqPp7lIW/LEHWhuizhbnXtmcd0wZzs2j4fCt1bBYTdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747054974; c=relaxed/simple;
-	bh=sDuTZrD8Eaor3JG0HPFQ/ioYnhvuFz04INy+e0JE3uE=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ne8oSeQhqLD1eQ2IjK+YSAjJXMRMpoDkS74tXXc0Gci00rjTArxiE5jcYwNqY6IWAIgBbkwHMJh+RLzFQw6DDmG14Q0rdM8QdxlRKuAJOzeymvLso2l5RFTSzhFSlumYG3UxZs/qZW8yFBl993VuIk7rnqEO43Duvh5TmFvhW0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=E7SlaJKm; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54C0nrJ0017169;
-	Mon, 12 May 2025 06:02:44 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=O54lGc+HNzkzD+QPN44PhtIFt
-	JkeaDuJbjUBZuszK8M=; b=E7SlaJKmfIkJbWbyqMQHTrkmex8COHnDPIBqnbEM/
-	6A6Z7WCstYwctbMcxNmSiYy+3x0U4KlzbfkFDmVb+Q3yPN89jxvLQRRViDKpI+Vo
-	svHmgoSROvuV/3E+kvTeDCC2hr8qNItb+HJiZytgstrlhg3jeA16qdiOWQzEBc27
-	1FJGANg8hPuIYCvi+clCNFsnyvIRqt0rmDDIJooK8fBsaNDjiXmz1GeqIaLjWLSR
-	f2tBwf0Q4yi9cTymJlVxqqdowVqAXScUXmNxoRO5Nc+Fm82RQZSDtsw6a8aQBOJf
-	R15+ZtVFyBBwh14y+iR5wPgiVLN9RQQ8DL301mC7Jp5Mw==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 46k5r6h3en-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 12 May 2025 06:02:43 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Mon, 12 May 2025 06:02:41 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Mon, 12 May 2025 06:02:41 -0700
-Received: from 37b358c748b7 (HY-LT91368.marvell.com [10.29.24.116])
-	by maili.marvell.com (Postfix) with SMTP id C37283F7095;
-	Mon, 12 May 2025 06:02:37 -0700 (PDT)
-Date: Mon, 12 May 2025 13:02:35 +0000
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: Simon Horman <horms@kernel.org>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <gakula@marvell.com>,
-        <hkelam@marvell.com>, <sgoutham@marvell.com>, <lcherian@marvell.com>,
-        <netdev@vger.kernel.org>
-Subject: Re: [PATCH] octeontx2-af: Send Link events one by one
-Message-ID: <aCHxax9GgcLL-4Xk@37b358c748b7>
-References: <1746638183-10509-1-git-send-email-sbhatta@marvell.com>
- <20250512100954.GU3339421@horms.kernel.org>
- <aCHfZ_MxtfVmhXVj@90a8923ee8d1>
+	s=arc-20240116; t=1747055407; c=relaxed/simple;
+	bh=Ni5cL+XJpw8vY15iBnDFlBjmRlHAnS6aw8O7XOdlcOI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OKNcSJ826K/K2ncbMzwb39jxf8SDn/idRgUAsI4sl6R3ACBSGB0NCg5Yl2sb13BwmsJZeX7wQ2TuQbnfF0pEQQd12rUqWJiruvt06lind6t9GHh7XZDQ4utpP3Zq6co6gwMdkpgpTVAxNTXHDsSqwOt4E38bw7JxiJ2OVlPO4yY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TxFX1Lnk; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-442ea341570so480845e9.1;
+        Mon, 12 May 2025 06:10:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747055404; x=1747660204; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IY2m0GqQSOITuTvG/dP0HT4pwHEgB9sgpCG5AtHDLbM=;
+        b=TxFX1LnkfMpirw7CqmkOk6NpbNKDIj/7Xdr2+/feLsiLO7uq3tn8kQdZYlPn4RX221
+         OILIW7Dhe6GaCRfHGyRxnIo8YoyXrXVBm59cKClm6tnNLk3Y8Gh/FU0YGxKANiWtYR3D
+         LjxbF0KKxtELqHmZISizoT3cmJZ0F0V3U4R9rj4F5o++3d6+LOxEKXqQY42t5K9ZA43u
+         7pNNtbCPFre6sTuqYy/EwnBNXWMGrPUYaXx9gCS9q1oJ+hJKADMnTvJ9dAVzxsOB+WWz
+         XYMxFN09ongM1qTFDUUz4kSK2KzAd5tIKxbQNJUizt1tMzV4bc2RW5MDwY+/ROmAnm7G
+         ztMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747055404; x=1747660204;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IY2m0GqQSOITuTvG/dP0HT4pwHEgB9sgpCG5AtHDLbM=;
+        b=IDDlk1aC/vgF5HrU0dOMo1M5NU6N9reEFDxCxpqFet+pqnBLFx00RYdXsxH82Y6WE1
+         dzDTjYKWa2O0bcX7GDFkPBpByiln7kEeptLD1WLKLifmxayLAW1CxAA8NqfiBJGm+CyT
+         vG/XyRjAJOC/g4aOXyp+PbCFtJHVR7ks3gT3Etots+nlQ8Vri88Y25zjf2xJhogv1aSC
+         NcB3EikKt7z+GUdJik5e6HSqtYFQ4c/SBJrPhnuj5yX0UE+FRU3P3EEgPYY//F4qX6Qn
+         N4MeC4WdBVq+oDgG/hkOTT2L7nGyQRuhuJmOsA3M+Eq3YjRRa1RYwqH2jogkFsmMTQg8
+         19iA==
+X-Forwarded-Encrypted: i=1; AJvYcCXsLUehUjSSfVkVzORKa21ng3Q5SpavrRpaqg0R+27zFPddwxcR65L2rYy67BDeptjOeALT/aU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzwqr0Rgm327FwML2HDMDVYTJ1ZwWieWxaeA2P79xKAzVSfAjVz
+	PCX8DDKCxjHmP+zF12fvo89ig7emG+IlA0Nfmy24WNsmkLhOwjCi
+X-Gm-Gg: ASbGncsCGXtAb4nr6CkQrYGT2Pxt7UhuWZFjVukBUBT+KuwmzTRxRfkHqU1j7ai01YW
+	3i9Yc9yhd1cdq3idi/eWiu4r8WBoD9mg9HgvMugfiuSDK6C5JlFAqAwg0NVDmLfwMqeVm5mY9Cl
+	Jduz3zYpimSGp2R560kue6GNM+8BKNeTp7oKo6eMf0XWvXVMcRYpKXvQ1KbHTdIbrpnyXQHE4yx
+	F/tuwBWyaGk9I5VjUjLPTwBYB57SRmAbxkv702tqAwLfvw2ENkbJ2V5Du9WPctqf4867bTk47ki
+	57jy9jVQeUBylNk9Nhk/PWrVBPy+ArY1vse60A6Byn+L6bZTSBXhFM/KA6L2Eg==
+X-Google-Smtp-Source: AGHT+IG8LzaCUnCFaL0QXI6cC07KregUkp2uAZHkmluC00AMh0WUsjnsDUWnXZTRgi/pvFAAjvNlPA==
+X-Received: by 2002:a05:600c:c04a:b0:43d:4e9:27ff with SMTP id 5b1f17b1804b1-442d89ca284mr78221485e9.7.1747055403514;
+        Mon, 12 May 2025 06:10:03 -0700 (PDT)
+Received: from [192.168.8.100] ([148.252.146.237])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442e9f1d1bbsm5872215e9.25.2025.05.12.06.10.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 May 2025 06:10:02 -0700 (PDT)
+Message-ID: <ea4f2f83-e9e4-4512-b4be-af91b3d6b050@gmail.com>
+Date: Mon, 12 May 2025 14:11:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <aCHfZ_MxtfVmhXVj@90a8923ee8d1>
-X-Authority-Analysis: v=2.4 cv=WMp/XmsR c=1 sm=1 tr=0 ts=6821f173 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=M5GUcnROAAAA:8 a=VwQbUJbxAAAA:8 a=5P80QGrGfck98o8MOnwA:9 a=CjuIK1q_8ugA:10
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: wQkGsb3a-2O4k2GgYth7iwRKTh93GrPz
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTEyMDEzNiBTYWx0ZWRfX2m5EnNP5uTIZ C7H+fKEVfXgwVrdxRJ24bA3RcILapk1jB+DLhIJOSJ4LuPALPnHG3MgX+k+45zYQCamsJnmKMNb Z4O0FPSQ4WCkE4y1vxrgsJGCA6gfceOULiakV9S0WaWSLRLmjV5faVxMj64kYaoHY608bLqUsFh
- ZVm+J0IIxgDslfboSxwMnbNX7LzxHb1uLwlEnJG9YxFoZlA5J2dJa5msEXey7fDCxju34+Sfvkk qGPiBdA8dLzhuOF3XmzLVUkZzPsYvEAbSjHhYIRyN3RiW55NwoBMFq+2X1GKC7ScL3VQLEh7QqW BpI/jcttHbAN2/UZZ0916f75obecJEb+ccXN1mpYKD14KrmyejV3xiv//TZqm1q2muYDSQXjIxA
- oNK7sEiiB0spISbRVJYifgOIZR7se114xkonEP6OZRxVoPvdSeJaubljLfFeejhVmfucXvM4
-X-Proofpoint-ORIG-GUID: wQkGsb3a-2O4k2GgYth7iwRKTh93GrPz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-12_04,2025-05-09_01,2025-02-21_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 01/19] netmem: rename struct net_iov to struct netmem_desc
+To: Byungchul Park <byungchul@sk.com>, willy@infradead.org,
+ netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ kernel_team@skhynix.com, kuba@kernel.org, almasrymina@google.com,
+ ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
+ akpm@linux-foundation.org, ast@kernel.org, daniel@iogearbox.net,
+ davem@davemloft.net, john.fastabend@gmail.com, andrew+netdev@lunn.ch,
+ edumazet@google.com, pabeni@redhat.com, vishal.moola@gmail.com
+References: <20250509115126.63190-1-byungchul@sk.com>
+ <20250509115126.63190-2-byungchul@sk.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20250509115126.63190-2-byungchul@sk.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi again,
-
-On 2025-05-12 at 11:45:43, Subbaraya Sundeep (sbhatta@marvell.com) wrote:
-> Hi Simon,
+On 5/9/25 12:51, Byungchul Park wrote:
+> To simplify struct page, the page pool members of struct page should be
+> moved to other, allowing these members to be removed from struct page.
 > 
-> On 2025-05-12 at 10:09:54, Simon Horman (horms@kernel.org) wrote:
-> > On Wed, May 07, 2025 at 10:46:23PM +0530, Subbaraya Sundeep wrote:
-> > > Send link events one after another otherwise new message
-> > > is overwriting the message which is being processed by PF.
-> > > 
-> > > Fixes: a88e0f936ba9 ("octeontx2: Detect the mbox up or down message via register")
-> > > Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
-> > > ---
-> > >  drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c | 2 ++
-> > >  1 file changed, 2 insertions(+)
-> > > 
-> > > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-> > > index 992fa0b..ebb56eb 100644
-> > > --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-> > > +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-> > > @@ -272,6 +272,8 @@ static void cgx_notify_pfs(struct cgx_link_event *event, struct rvu *rvu)
-> > >  
-> > >  		otx2_mbox_msg_send_up(&rvu->afpf_wq_info.mbox_up, pfid);
-> > 
-> > Hi Subbaraya,
-> > 
-> > Are there other callers of otx2_mbox_msg_send_up()
-> > which also need this logic? If so, perhaps a helper is useful.
-> > If not, could you clarify why?
-> > 
-> UP messages are async notifications where we just send and forget.
-> There are other callers as I said we just send and forget everywhere
-> in the driver. Only this callsite has been modified because we have
-> seen an issue on customer setup where bunch of link events are queued
-> for a same device at one point of time.
-> > >  
-> > > +		otx2_mbox_wait_for_rsp(&rvu->afpf_wq_info.mbox_up, pfid);
-> > 
-> > This can return an error. Which is checked in otx2_sync_mbox_up_msg().
-> > Does it make sense to do so here too?
-> > 
-> Yes it makes sense to use otx2_sync_mbox_up_msg here. I will use it
-> here.
+> Reuse struct net_iov for also system memory, that already mirrored the
+> page pool members.
 > 
-I will leave it as otx2_mbox_wait_for_rsp. Since otx2_sync_mbox_up_msg
-is in nic driver and we do not include nic files in AF driver. Since
-this is a void function will print an error if otx2_mbox_wait_for_rsp
-returns error.
+> Signed-off-by: Byungchul Park <byungchul@sk.com>
+> ---
+>   include/linux/skbuff.h                  |  4 +--
+>   include/net/netmem.h                    | 20 ++++++------
+>   include/net/page_pool/memory_provider.h |  6 ++--
+>   io_uring/zcrx.c                         | 42 ++++++++++++-------------
 
-Thanks,
-Sundeep
+You're unnecessarily complicating it for yourself. It'll certainly
+conflict with changes in the io_uring tree, and hence it can't
+be taken normally through the net tree.
 
-> Thanks,
-> Sundeep
-> > > +
-> > >  		mutex_unlock(&rvu->mbox_lock);
-> > >  	} while (pfmap);
-> > >  }
-> > > -- 
-> > > 2.7.4
-> > > 
+Why are you renaming it in the first place? If there are good
+reasons, maybe you can try adding a temporary alias of the struct
+and patch io_uring later separately.
+
+-- 
+Pavel Begunkov
+
 
