@@ -1,158 +1,182 @@
-Return-Path: <netdev+bounces-189624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF666AB2D5B
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 04:13:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14E8EAB2D5E
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 04:14:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2919B17181F
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 02:13:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0B837A594C
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 02:13:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 803CE248F61;
-	Mon, 12 May 2025 02:13:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="j4Qfafm6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E5B9248F62;
+	Mon, 12 May 2025 02:14:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E1AA8633F;
-	Mon, 12 May 2025 02:13:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A168B29D0E;
+	Mon, 12 May 2025 02:14:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.166.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747016014; cv=none; b=f7NJ+BLpIwa/HoWVCM3OZ83Ba1KHr2TqIKgLs8y/UPWV3p5WlBkt0LpsX6ERGBal1cu0Z2A5SzSaQVouqHONr+9VQwzGRbrFUL6JA94Vn16HTLuxAhBwhhk5Ugn2L7PVLnGLqAoS5ko5a1mWkQOrw8s1lwLXdVv87n8KxH0xbXk=
+	t=1747016073; cv=none; b=mA4JvZy9jEsRASP7WBE6BZQ0t2w84s1VlZmzD898DvJD5lxWQyUeCuQmsOvCzWWKajsLuBmU2RdqhQX8Issi9OWZ9idEHXGpiczKGIAmwKfpX7MjLVzxoMgzF+6gtsGg9ecaAllopmztZPDYxKpH27+3gEepcVDCx0hEVU8od1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747016014; c=relaxed/simple;
-	bh=YLbZ2s6S+rAbmcXQn4qdpuboeCF33EFnDBfPvEgmIHw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GjV+SvLFf4jZeQVp6q3dS6l4MfeqFNlC62LH6aSbH+0v7clK0QQr+ZzeEHwyduOqPX/yYizG+6FvrJrInSG8OL279eHozCywS0cT83WWk1GNus9CzkRXAWmXw4tjC9RFOCo/nGtAtmrab6UBJxVShc2UYBdcWc8qbClv9mnoBmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=j4Qfafm6; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=81yI6L03drqcIE6/1CnP/3327RzWZVHHsPq4wWx9unc=; b=j4Qfafm66E2usJnBpD4aPhQcZ5
-	+bwf11m0RDtGRKSvyp2Fddw3fiLq4xMhqHW4Z1PcX88ZkhUzLUGLSZJ0+tL/A7OEwMPgt9glqviYi
-	g9do3+eFqQ0y8xaIWI2Ml1t0lWW3DDyuNYgsjbtpMgY6LiDw+KOagIMt2w6l9RHBAdbI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uEIfP-00CIBk-Ta; Mon, 12 May 2025 04:13:19 +0200
-Date: Mon, 12 May 2025 04:13:19 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Damien =?iso-8859-1?Q?Ri=E9gel?= <damien.riegel@silabs.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Silicon Labs Kernel Team <linux-devel@silabs.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC net-next 01/15] net: cpc: add base skeleton driver
-Message-ID: <17a103da-b01a-44cc-b1e4-5a4f606ed4a8@lunn.ch>
-References: <20250512012748.79749-1-damien.riegel@silabs.com>
- <20250512012748.79749-2-damien.riegel@silabs.com>
+	s=arc-20240116; t=1747016073; c=relaxed/simple;
+	bh=pnxU2CEJKSdncR1tk3EpHMB0Cwdhj1DDOuUob/OYeMQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=heQyscbdh6MA+GGpSFnqkdyAjQ/zbykXSEOVNJdI0qN0fcGL4WlHFcIHIhFjLRq2UrdPxwRGCmFCJfQTXkWQZgyaQ2cEuScWvqnTI0VR9rcJ0OqMerft4HFfOWk90WlrPvGT6xa0rptyUvAILPi3+hEdeo5KZyAw/2+GItoOLLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.166.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54C2BXPJ012129;
+	Sun, 11 May 2025 19:14:00 -0700
+Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [147.11.82.254])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 46j233h3yk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Sun, 11 May 2025 19:14:00 -0700 (PDT)
+Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.43; Sun, 11 May 2025 19:13:59 -0700
+Received: from pek-lpg-core1.wrs.com (147.11.136.210) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
+ 15.1.2507.43 via Frontend Transport; Sun, 11 May 2025 19:13:56 -0700
+From: <jianqi.ren.cn@windriver.com>
+To: <gregkh@linuxfoundation.org>, <stable@vger.kernel.org>
+CC: <patches@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+        <jianqi.ren.cn@windriver.com>, <jhs@mojatatu.com>,
+        <xiyou.wangcong@gmail.com>, <jiri@resnulli.us>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <shuah@kernel.org>, <shmulik.ladkani@gmail.com>,
+        <netdev@vger.kernel.org>, <dcaratti@redhat.com>
+Subject: [PATCH 6.1.y] net/sched: act_mirred: use the backlog for mirred ingress
+Date: Mon, 12 May 2025 10:13:55 +0800
+Message-ID: <20250512021355.3327681-1-jianqi.ren.cn@windriver.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250512012748.79749-2-damien.riegel@silabs.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=EojSrTcA c=1 sm=1 tr=0 ts=68215968 cx=c_pps a=K4BcnWQioVPsTJd46EJO2w==:117 a=K4BcnWQioVPsTJd46EJO2w==:17 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8 a=20KFwNOVAAAA:8 a=pGLkceISAAAA:8 a=A7XncKjpAAAA:8 a=J1Y8HTJGAAAA:8 a=t7CeM3EgAAAA:8
+ a=--JntEdgB-XHV1fWJyUA:9 a=R9rPLQDAdC6-Ub70kJmZ:22 a=y1Q9-5lHfBjTkpIzbSAN:22 a=FdTzh2GWekK77mhwV6Dw:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTEyMDAyMSBTYWx0ZWRfXzDyHjivNP+jo 3KQKYOQIER5TsAjwSYU3Yq3+iXEAnyTsWiY4Y5zh/4ImoT3uPxwSeK/FfE1EFQMqB/WU5AJl/XT tluMA4Kllhjyeenso1UU40nZ7lpqnYNjsXZ5WzSVMrqAPQrQN7KeSfWe1+kCcGVFWvy68axNWk6
+ V+GkPeMtZGymZTREHCUjTpepfOrnjHT8PP1d9n6Ha9KD8PAtFnK6ZB5+mFm4Hwfq+6qebu0/T9v v5W16v6Rv67vSQ9lpr9MauKSAGagzRHS43BS8EkVzncpR7zMj3EBFYA+ysLU/gqI1BasO3wZqun qGo4eBui/fonHYW1DHm/rms1Yb71VYEW3v593QdpwSphY0yAdQmiY4cHvYu38GElpzNNeHSVWeS
+ NJLIMBZZCJJPiGOccPuUL5IyNjQpIIp/Lk71kl8oivj/tiZU1ghE+vdc+e7p5DdNn5y8fIP5
+X-Proofpoint-GUID: dardaHlfkVJzYoR8YHIW5l_o7Ab7dOUM
+X-Proofpoint-ORIG-GUID: dardaHlfkVJzYoR8YHIW5l_o7Ab7dOUM
+X-Sensitive_Customer_Information: Yes
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-11_10,2025-05-09_01,2025-02-21_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ phishscore=0 priorityscore=1501 mlxlogscore=999 adultscore=0
+ impostorscore=0 clxscore=1011 malwarescore=0 mlxscore=0 spamscore=0
+ bulkscore=0 suspectscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.21.0-2504070000
+ definitions=main-2505120021
 
-> +/**
-> + * cpc_interface_register() - Register CPC interface.
-> + * @intf: CPC device to register.
-> + *
-> + * Context: Process context.
-> + *
-> + * Return: 0 if successful, otherwise a negative error code.
-> + */
-> +int cpc_interface_register(struct cpc_interface *intf)
-> +{
-> +	int err;
-> +
-> +	err = device_add(&intf->dev);
-> +	if (err)
-> +		return err;
-> +
-> +	return 0;
+From: Jakub Kicinski <kuba@kernel.org>
 
-I guess this will change in a later patch, but maybe not. This should
-just be
+[ Upstream commit 52f671db18823089a02f07efc04efdb2272ddc17 ]
 
-	return device_add(&intf->dev);
+The test Davide added in commit ca22da2fbd69 ("act_mirred: use the backlog
+for nested calls to mirred ingress") hangs our testing VMs every 10 or so
+runs, with the familiar tcp_v4_rcv -> tcp_v4_rcv deadlock reported by
+lockdep.
 
-> +}
-> +
-> +/**
-> + * cpc_interface_unregister() - Unregister a CPC interface.
-> + * @intf: CPC device to unregister.
-> + *
-> + * Context: Process context.
-> + */
-> +void cpc_interface_unregister(struct cpc_interface *intf)
-> +{
-> +	device_del(&intf->dev);
-> +	cpc_interface_put(intf);
-> +}
+The problem as previously described by Davide (see Link) is that
+if we reverse flow of traffic with the redirect (egress -> ingress)
+we may reach the same socket which generated the packet. And we may
+still be holding its socket lock. The common solution to such deadlocks
+is to put the packet in the Rx backlog, rather than run the Rx path
+inline. Do that for all egress -> ingress reversals, not just once
+we started to nest mirred calls.
 
-It seems odd that unregister is not a mirror of register?
+In the past there was a concern that the backlog indirection will
+lead to loss of error reporting / less accurate stats. But the current
+workaround does not seem to address the issue.
 
-> +/**
-> + * cpc_interface_get() - Get a reference to interface and return its pointer.
-> + * @intf: Interface to get.
-> + *
-> + * Return: Interface pointer with its reference counter incremented, or %NULL.
-> + */
-> +static inline struct cpc_interface *cpc_interface_get(struct cpc_interface *intf)
-> +{
-> +	if (!intf || !get_device(&intf->dev))
-> +		return NULL;
-> +	return intf;
-> +}
+Fixes: 53592b364001 ("net/sched: act_mirred: Implement ingress actions")
+Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Suggested-by: Davide Caratti <dcaratti@redhat.com>
+Link: https://lore.kernel.org/netdev/33dc43f587ec1388ba456b4915c75f02a8aae226.1663945716.git.dcaratti@redhat.com/
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+[Minor conflict resolved due to code context change.]
+Signed-off-by: Jianqi Ren <jianqi.ren.cn@windriver.com>
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+Verified the build test
+---
+ net/sched/act_mirred.c                             | 14 +++++---------
+ .../testing/selftests/net/forwarding/tc_actions.sh |  3 ---
+ 2 files changed, 5 insertions(+), 12 deletions(-)
 
-What is the use case for passing in NULL?
+diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+index bbc34987bd09..896bffd50aa8 100644
+--- a/net/sched/act_mirred.c
++++ b/net/sched/act_mirred.c
+@@ -205,18 +205,14 @@ static int tcf_mirred_init(struct net *net, struct nlattr *nla,
+ 	return err;
+ }
+ 
+-static bool is_mirred_nested(void)
+-{
+-	return unlikely(__this_cpu_read(mirred_nest_level) > 1);
+-}
+-
+-static int tcf_mirred_forward(bool want_ingress, struct sk_buff *skb)
++static int
++tcf_mirred_forward(bool at_ingress, bool want_ingress, struct sk_buff *skb)
+ {
+ 	int err;
+ 
+ 	if (!want_ingress)
+ 		err = tcf_dev_queue_xmit(skb, dev_queue_xmit);
+-	else if (is_mirred_nested())
++	else if (!at_ingress)
+ 		err = netif_rx(skb);
+ 	else
+ 		err = netif_receive_skb(skb);
+@@ -312,7 +308,7 @@ static int tcf_mirred_act(struct sk_buff *skb, const struct tc_action *a,
+ 
+ 		/* let's the caller reinsert the packet, if possible */
+ 		if (use_reinsert) {
+-			err = tcf_mirred_forward(want_ingress, skb);
++			err = tcf_mirred_forward(at_ingress, want_ingress, skb);
+ 			if (err)
+ 				tcf_action_inc_overlimit_qstats(&m->common);
+ 			__this_cpu_dec(mirred_nest_level);
+@@ -320,7 +316,7 @@ static int tcf_mirred_act(struct sk_buff *skb, const struct tc_action *a,
+ 		}
+ 	}
+ 
+-	err = tcf_mirred_forward(want_ingress, skb2);
++	err = tcf_mirred_forward(at_ingress, want_ingress, skb2);
+ 	if (err)
+ 		tcf_action_inc_overlimit_qstats(&m->common);
+ 	__this_cpu_dec(mirred_nest_level);
+diff --git a/tools/testing/selftests/net/forwarding/tc_actions.sh b/tools/testing/selftests/net/forwarding/tc_actions.sh
+index b0f5e55d2d0b..589629636502 100755
+--- a/tools/testing/selftests/net/forwarding/tc_actions.sh
++++ b/tools/testing/selftests/net/forwarding/tc_actions.sh
+@@ -235,9 +235,6 @@ mirred_egress_to_ingress_tcp_test()
+ 	check_err $? "didn't mirred redirect ICMP"
+ 	tc_check_packets "dev $h1 ingress" 102 10
+ 	check_err $? "didn't drop mirred ICMP"
+-	local overlimits=$(tc_rule_stats_get ${h1} 101 egress .overlimits)
+-	test ${overlimits} = 10
+-	check_err $? "wrong overlimits, expected 10 got ${overlimits}"
+ 
+ 	tc filter del dev $h1 egress protocol ip pref 100 handle 100 flower
+ 	tc filter del dev $h1 egress protocol ip pref 101 handle 101 flower
+-- 
+2.34.1
 
-> +
-> +/**
-> + * cpc_interface_put() - Release reference to an interface.
-> + * @intf: CPC interface
-> + *
-> + * Context: Process context.
-> + */
-> +static inline void cpc_interface_put(struct cpc_interface *intf)
-> +{
-> +	if (intf)
-> +		put_device(&intf->dev);
-> +}
-> +
-> +/**
-> + * cpc_interface_get_priv() - Get driver data associated with this interface.
-> + * @intf: Interface pointer.
-> + *
-> + * Return: Driver data, set at allocation via cpc_interface_alloc().
-> + */
-> +static inline void *cpc_interface_get_priv(struct cpc_interface *intf)
-> +{
-> +	if (!intf)
-> +		return NULL;
-> +	return dev_get_drvdata(&intf->dev);
-> +}
-
-What is the use case for passing in NULL?
-
-To me, this is hiding bugs. It seems better to let the kernel opp so
-you find out where you lost your intf.
-
-	Andrew
 
