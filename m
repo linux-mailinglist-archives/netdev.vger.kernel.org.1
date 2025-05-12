@@ -1,84 +1,137 @@
-Return-Path: <netdev+bounces-189635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F9BBAB2E5A
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 06:24:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 318C6AB2E6F
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 06:48:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E35C83A58C7
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 04:24:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8EFE218912BE
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 04:49:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7938424EA87;
-	Mon, 12 May 2025 04:24:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC06D253344;
+	Mon, 12 May 2025 04:48:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="IknVuQA3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UYCzzn/X"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B93621411DE
-	for <netdev@vger.kernel.org>; Mon, 12 May 2025 04:24:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F9E413CF9C;
+	Mon, 12 May 2025 04:48:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747023886; cv=none; b=TBfrFzx3FqrOdVkru3B7mA2xiyB8mLcgK5WuRU+FNUKJ0hhOt8eUpPeFrvIFKiwrstVGtm4GKQFIT0e2DcGzkjiJBu/UmGCk7vR9YdA+ckGSIz5tYbce8qutPlVpe4bFFDRnkQMgJ5kUJS3p27ETCmjVbGsVjglUOEvdkeOvOok=
+	t=1747025333; cv=none; b=hulpzqWDWvBx992cppyWZ6+elmYFcMUZ+os9A7RH/bN/PhKHpWKzbrQANu0Rc9JRlJFD9wFM09sdBthn5AHJopJ+/eDqX5C9LuXg/R0ZtYV5e+0mpUE06ZCukf1+wuNLRKjbV5kI5C2wiWO5Dy5obfUJ9FPnX6HVBvaFPkALYt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747023886; c=relaxed/simple;
-	bh=PJavjRWOpdACPSdJOLRdx5a3PHn5fJQp3edx2xrkSbU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sWY0jXx0gL6IgicoM5IL4Kx0NmApRBLSddts7rv1wNt+zLmqkXJH7cYyNuqPfoFejpLBld6hdte8lfhqWA+EWH48HXqHbZIYljKNIEe9C/W6yvklxlSgSrjDnBRwXgDrSYtRPKaakFUct5N4N94RMC6CFrbk+Se/SZzBBcGMhDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=IknVuQA3; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=qC9e38yOBZPe5pOACVwKPnNvAHgjR/ZBlShq6j7WTag=; b=IknVuQA3bofq78chLGBVguILEK
-	Eq5WZPcPxZFj51BBLYvMwVTJuPcVNFbc5UQkpWk2i0uGsvUomKIrMc4p4wKne3m+pOlqyBYa3TQg9
-	q+9sbdyNCBtaogyVvdEEHWJM0EDGfMejH5hGwnDu6Rp6nMy94RBFadLaxMEmQVkZL38hOwPU35o/c
-	seg+t3BoVLVbRZuqbT7O2qbndbzhuPq66Xms2tW2i8LpqfWvvGfzZA/EXArTvBOeVSbPyzNbt1bjf
-	e1/2QvbpE9TbBhvSBKjsm97XFAM+tNy4vL/3qyO2G5ssQ45pFm5QC5UafPpcACyzXnYofcKheUowR
-	W2ZnPcvQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uEKiU-00000008Kks-3XKM;
-	Mon, 12 May 2025 04:24:38 +0000
-Date: Sun, 11 May 2025 21:24:38 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Jakub Kicinski <kuba@kernel.org>, Byungchul Park <byungchul@sk.com>,
-	willy@infradead.org, almasrymina@google.com,
-	kernel_team@skhynix.com, 42.hyeyoo@gmail.com, linux-mm@kvack.org,
-	hawk@kernel.org, netdev@vger.kernel.org
-Subject: Re: [RFC] shrinking struct page (part of page pool)
-Message-ID: <aCF4Bm-2cpU__QDA@infradead.org>
-References: <20250414013627.GA9161@system.software.com>
- <20250414015207.GA50437@system.software.com>
- <20250414163002.166d1a36@kernel.org>
- <CAC_iWjKr-Jd7DsAameimUYPUPgu8vBrsFb0cDJiNSBLEwqKF1A@mail.gmail.com>
- <c744c40b-2b38-4911-977d-61786de73791@lunn.ch>
+	s=arc-20240116; t=1747025333; c=relaxed/simple;
+	bh=nsLmkuVPnb/28CRHfCMdwT7g2qlCdW0XWQ41Lga1Tk8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kSR8gP0Z/sk63/z6Ox0CttXi0yb7V7PTNqyXQf4YdyHRKUlaX0fAAhEKSZRB1vssPMkz13vW+CGwJY+z9Fd/6DLmJDzl+An3Q6nx9kn+PwaZrNutGNd1AxacVcp300LbgFB5zaGhMORLbmhy8100jybE8ugTIspc2Qhf/xt4x9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UYCzzn/X; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7376e311086so5624728b3a.3;
+        Sun, 11 May 2025 21:48:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747025331; x=1747630131; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LRrUBCGbVbquyMG2FItuKkkB+CmLoXA4P5uBzV0yYfw=;
+        b=UYCzzn/Xtnl1fJlkiIipNq5Csn8B3Ca8Yce2/F17oEDZKq3Fu+lh6orOjWtDz+uyVw
+         uppP/AYRbhpmB/xT1VCfsy/B/wD9fcWIRpZtSm644gB4lC9broc278KFAS/imMBlw1+8
+         VyqhyOUkwK+SG1auIeCOGVFn73vgzXU283dReaYK/NzwJyTNu2I1dVoNn6aa7BLPPmFT
+         SjhxIcr3YMEpLkb4lAoNaQQL995kdQWjgFGyEZ2F8ehTnEd9Fzy61qud4ABYU3Gs725N
+         TouRJ331vz8Q4AHp8trrycfOt82Ruc9k+d081v9lB4QUdJsC1sSUSzb6xXGqdWNQ6mKq
+         +O7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747025331; x=1747630131;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LRrUBCGbVbquyMG2FItuKkkB+CmLoXA4P5uBzV0yYfw=;
+        b=O08IwS4jXoZpqIp1lw1mABbT/AImfmLV2XnQDC/XEEIXBuP7zASK7gpUdYzMmkKMDU
+         uX1wJh/rBdi+jGyIWu0+BRBKQKzzGTT/7Tep1goVsQ3lfKDu5lLo4qXqELdFUM/nuyYj
+         +bQFI8qgOo6WoLCwcvanNTlddOBqbwcyYNfHPFzhPXKXmRdEQJIaISXIPHoMJBswVbNi
+         ctjHhDA4U3LkZfr8iT+nLhkWhNgHxdCOqhx5Q+BxS2uZXRcy20cAeBDWcQR2HhYwtdGa
+         g531Gd0f+HPx/y3JhelVKzjAjU2+rE14ZF0fb2YYjYltJaLE38BVj/TS/ix4AflhZe94
+         YuJw==
+X-Forwarded-Encrypted: i=1; AJvYcCUUan40iT2Ij7FZ2S/6LA9+UolgbMy7BMd8XXOBOOxu1KxH+ycAQ0QhzrSQvwpbdUZrITNB7xO8@vger.kernel.org, AJvYcCVRSbAnt4Lluaolzd6/S5Lu9+pW3z1PRWn85pdOA45zjkSNgIMgVBcHGjwlg35nC7OhUvHY9mORPNkjeeU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yywq6BKs4jDpZwkGjPHlGW3nzpuqREbLQZ5CPulTHN77j1X5sPM
+	PyddCDavfedlhgeiMCK1x21lJnnBZs2z65WEBtcHoilIjYktZRK1/bAT9w==
+X-Gm-Gg: ASbGncvcielHo6CfELgsI7CLPA3DHejiKQRpTOHoYhnL83NwWDPevmmtWbudS5wHKJy
+	R2+EgZj1qhg1WNPh178fqUC6+7JynY9NN+xTN2nwPouMcd0sSZq3nGaXcqj35DyeVNZ19hxTSvx
+	DK9Y4aQP//mmKDwqmDqSYiwprpyVA9ZGf846U7c/vioMXwN/HO6YvVejHCQa+W23vqsBkAyaojo
+	bbBqldN1vpOjFFuHYyAJ7Ags2wk0Y9wVkrsUs+q8oGtU7W5tU3EcLIr4t609eFAoXQHrOA8UZwZ
+	1GzuUSuuQuUBRn3ZI/ZgSVVGGUZ1tp+h9ZMyoVp056r1kHLODwq2d6e6VBg=
+X-Google-Smtp-Source: AGHT+IF5aYVaVS1Sv7vYrAOH6rCU1390+vmDNMoz53hzN6JGYcYvVfemYIWGz6WSYFL62CC1L5i7rg==
+X-Received: by 2002:a05:6a20:958e:b0:1fa:9819:c0a5 with SMTP id adf61e73a8af0-215abbbba99mr15944647637.11.1747025331539;
+        Sun, 11 May 2025 21:48:51 -0700 (PDT)
+Received: from nsys.iitm.ac.in ([103.158.43.24])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-742377041bfsm5370854b3a.12.2025.05.11.21.48.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 11 May 2025 21:48:50 -0700 (PDT)
+From: Abdun Nihaal <abdun.nihaal@gmail.com>
+To: shshaikh@marvell.com
+Cc: Abdun Nihaal <abdun.nihaal@gmail.com>,
+	horms@kernel.org,
+	manishc@marvell.com,
+	GR-Linux-NIC-Dev@marvell.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	sucheta.chakraborty@qlogic.com,
+	rajesh.borundia@qlogic.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v2] qlcnic: fix memory leak in qlcnic_sriov_channel_cfg_cmd()
+Date: Mon, 12 May 2025 10:18:27 +0530
+Message-ID: <20250512044829.36400-1-abdun.nihaal@gmail.com>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c744c40b-2b38-4911-977d-61786de73791@lunn.ch>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
 
-On Sat, May 10, 2025 at 03:53:47PM +0200, Andrew Lunn wrote:
-> > Random thoughts here until I look at the patches.
-> > The concept of devices doing DMA + recycling the used buffer
-> > transcends networking.
-> 
-> Do you know of any other subsystem which takes a page, splits it into
-> two, and then uses each half independently for DMA and recycling. A
-> typical packet is 1514 octets, so you can get two in a page.
+In one of the error paths in qlcnic_sriov_channel_cfg_cmd(), the memory
+allocated in qlcnic_sriov_alloc_bc_mbx_args() for mailbox arguments is
+not freed. Fix that by jumping to the error path that frees them, by
+calling qlcnic_free_mbx_args(). This was found using static analysis.
 
-The mm/dmapool.c code is all about this.
+Fixes: f197a7aa6288 ("qlcnic: VF-PF communication channel implementation")
+Signed-off-by: Abdun Nihaal <abdun.nihaal@gmail.com>
+---
+This patch is only compile tested. Not tested on real hardware.
+
+V1->V2 : Added information about how the bug was found and how the 
+patch was tested, as suggested by Simon Horman.
+
+ drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c
+index 28d24d59efb8..d57b976b9040 100644
+--- a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c
++++ b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c
+@@ -1484,8 +1484,11 @@ static int qlcnic_sriov_channel_cfg_cmd(struct qlcnic_adapter *adapter, u8 cmd_o
+ 	}
+ 
+ 	cmd_op = (cmd.rsp.arg[0] & 0xff);
+-	if (cmd.rsp.arg[0] >> 25 == 2)
+-		return 2;
++	if (cmd.rsp.arg[0] >> 25 == 2) {
++		ret = 2;
++		goto out;
++	}
++
+ 	if (cmd_op == QLCNIC_BC_CMD_CHANNEL_INIT)
+ 		set_bit(QLC_BC_VF_STATE, &vf->state);
+ 	else
+-- 
+2.47.2
 
 
