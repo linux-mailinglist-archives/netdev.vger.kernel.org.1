@@ -1,149 +1,153 @@
-Return-Path: <netdev+bounces-189755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00EE7AB37F1
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 14:58:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04B9BAB3807
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 15:04:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E4383B3CB0
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 12:58:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E0B0189F008
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 13:03:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88CA0293459;
-	Mon, 12 May 2025 12:58:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAAF9258CFB;
+	Mon, 12 May 2025 13:02:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="da4Tfz7x"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="E7SlaJKm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA9B11EB3D;
-	Mon, 12 May 2025 12:58:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 273F42BAF7
+	for <netdev@vger.kernel.org>; Mon, 12 May 2025 13:02:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747054695; cv=none; b=jpfmomOaBU4uIv2awEqDtkihg71X15J71l0HPwUUYFOfXFLqZI6yLGfKla12Zm4fBkTZvAgSvXixvTdo/mCNRz9i9rTXyu6KGHomiJ1OMNAk52PPubMICcs2a1awAaaekNaL5xMypeobHX9Hdqqb6+Eel1wpLqYQM5kjHxH1oOA=
+	t=1747054974; cv=none; b=GdrPGng7CAIjLX5lAkY+52qBSrhwb2deVKUQPadseYAqNZEm5Y4/sr1sa/EbDW+Bie14C7yyTnK2NAFdssFeZH097ySPQvB1XMi5BfJGCV27OlQOYxOO3kbzNDRC7I0wtl+fG+ue3fldGQDcWsQbL66SMph2vuiKTknSY9CsCJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747054695; c=relaxed/simple;
-	bh=AfD9tOaM66Cu3OzYAl7ZTm8Hk20KHJt3KcinQ34dMmk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZGvznU/7QMbfsnzNP+A9EvheK3q1VxOAIhyLgzcWa8EVhtW1Fc8cUK/LvQwcvClkzz1bHx+sfQs9kxwqTWjo6dtByeCzSiWZqhkHLGYGqxbu6zcANQiHj/bwEYUtCpblJLtKk/r2bu0sWGxrTKi4K4RaxaWUKTkRCndyOM/GANg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=da4Tfz7x; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-43cebe06e9eso32639195e9.3;
-        Mon, 12 May 2025 05:58:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747054692; x=1747659492; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YUfHzzLkVUWyZNQomKkAfvfG+NNPVh/dAwIfVzHSOio=;
-        b=da4Tfz7xA8JgrjYemPVaBlaz4w0nJcN8n8wAJlZnnbYATlXjzTmYDDtl/pawR6kkOg
-         HlYOl907VRNXXIVAOy08splmmNR02qP36x6yNjOPrTpdd2zWf4QLtHmC3nVQB1KS7WSi
-         yZDZr49KezHkpZV8Fyh3/Wc5uCNHc44BCjM0zUtvm/0wE0E/TrYhSBu4vEwRjyGB+570
-         8pxPXWfNOxq27NgvFYp4B0Sl2umERDnhNeDTv/AfYlcyXNtvy8ZHd64V9TCiCyfQ6ITl
-         SdDtoBp7FQdGor4MHJgQGVU3UehQeF+t7v+n+dg6d+FgM35JREGNXONzFFxDbfbOeUeD
-         JNog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747054692; x=1747659492;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YUfHzzLkVUWyZNQomKkAfvfG+NNPVh/dAwIfVzHSOio=;
-        b=BZ/tt3YBu14Orw/EwlMk08BtWEAhibLUfz2X2Xhif3HJX/mKNcAcgSvJQe3o9O0e9K
-         oTED/ak6mQlRXUmKJ9mKyx+JxYsdQ34fwAb0Z3Fe3DtCWzEbN5PizLCpgFjPGkLn95JW
-         wEq6pySGtweOCQJPjudj6jC6XyuQw4wcGxkpgcwFH5qoGUwClOvjfPLJPZ93yMbbHsT5
-         ATlM4ib2fukGz70PVpdB2GO/KEDkivEZaxETDYxzHohFcBI4fKHNCR1dGFg9d5b7uIGw
-         MGZAURY8SXZiHFJEcTsYB/Nro4HOT/cNVKFDloDqZe2xUp32akRxkpaTsbBnh6gvrkMt
-         rEbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU54ImcOf/ETB2eAqN2/y7HP9XFD8m3GDt6isUy5IlE72c57N2D+S6IU/hEtRHcROLaFmoP0zHOYqYptYM=@vger.kernel.org, AJvYcCUrQJVVAAzn0LXlMH+WkYgG3lqooianXgm4CHPTipPHqomnVd49JDSAe0ctTArE7hQR1mQOysya@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/2URdbVQWK2/tj1hL86fDiePIKIho5V+dj6inCkDqHZGh0z2R
-	42HOfup2yqj7YEXUbHQqnZTH2K3IQWaB+8mIyM62+r8jvNxS8e5/
-X-Gm-Gg: ASbGncsEx7PIxCLHHtf7eXkHUnYMf8XPdSXaw5XjXvRdBoHysdORQX0va2iPJiOYb66
-	uAMa3tZFlF6Vw2xhYB+maa/BZ7CDd8a5rmxZjrtDGaTTron05qFNxLFoB2aa5H5nA8c76BHJbFc
-	tugjR6ygXPWgBxMElebN+XGNePq+rZ2bWCxu8OmUhBbcmJJx56ZC2zsF1TLBxfTyEYbn3M371rH
-	xgHfFb6KrPE3ItTGyaNpaSqrk423365BMQpoOo1p43UybKwyFJzJhc/12jLF1aoLh69appmKeS1
-	r467xOVipNLwb5rU2T8trlXBRv3FSl+Gf3TT7UHDR1/RQUo+Luzkh3odfl2EyQ==
-X-Google-Smtp-Source: AGHT+IE3qc4mSsKQFbTECg8BbO2NXy9TVSwu9MLdCGGNSU6yyCc3khR5s/jlk1z6qlpukuO/50zmlw==
-X-Received: by 2002:a5d:6489:0:b0:391:253b:4046 with SMTP id ffacd0b85a97d-3a1f6431452mr9068500f8f.16.1747054691759;
-        Mon, 12 May 2025 05:58:11 -0700 (PDT)
-Received: from [192.168.8.100] ([148.252.146.237])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a1f57ddd2dsm12404291f8f.9.2025.05.12.05.58.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 May 2025 05:58:10 -0700 (PDT)
-Message-ID: <b18480f2-30c9-4598-9660-c2ca317c5de2@gmail.com>
-Date: Mon, 12 May 2025 13:59:21 +0100
+	s=arc-20240116; t=1747054974; c=relaxed/simple;
+	bh=sDuTZrD8Eaor3JG0HPFQ/ioYnhvuFz04INy+e0JE3uE=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ne8oSeQhqLD1eQ2IjK+YSAjJXMRMpoDkS74tXXc0Gci00rjTArxiE5jcYwNqY6IWAIgBbkwHMJh+RLzFQw6DDmG14Q0rdM8QdxlRKuAJOzeymvLso2l5RFTSzhFSlumYG3UxZs/qZW8yFBl993VuIk7rnqEO43Duvh5TmFvhW0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=E7SlaJKm; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54C0nrJ0017169;
+	Mon, 12 May 2025 06:02:44 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=O54lGc+HNzkzD+QPN44PhtIFt
+	JkeaDuJbjUBZuszK8M=; b=E7SlaJKmfIkJbWbyqMQHTrkmex8COHnDPIBqnbEM/
+	6A6Z7WCstYwctbMcxNmSiYy+3x0U4KlzbfkFDmVb+Q3yPN89jxvLQRRViDKpI+Vo
+	svHmgoSROvuV/3E+kvTeDCC2hr8qNItb+HJiZytgstrlhg3jeA16qdiOWQzEBc27
+	1FJGANg8hPuIYCvi+clCNFsnyvIRqt0rmDDIJooK8fBsaNDjiXmz1GeqIaLjWLSR
+	f2tBwf0Q4yi9cTymJlVxqqdowVqAXScUXmNxoRO5Nc+Fm82RQZSDtsw6a8aQBOJf
+	R15+ZtVFyBBwh14y+iR5wPgiVLN9RQQ8DL301mC7Jp5Mw==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 46k5r6h3en-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 12 May 2025 06:02:43 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Mon, 12 May 2025 06:02:41 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 12 May 2025 06:02:41 -0700
+Received: from 37b358c748b7 (HY-LT91368.marvell.com [10.29.24.116])
+	by maili.marvell.com (Postfix) with SMTP id C37283F7095;
+	Mon, 12 May 2025 06:02:37 -0700 (PDT)
+Date: Mon, 12 May 2025 13:02:35 +0000
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: Simon Horman <horms@kernel.org>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <gakula@marvell.com>,
+        <hkelam@marvell.com>, <sgoutham@marvell.com>, <lcherian@marvell.com>,
+        <netdev@vger.kernel.org>
+Subject: Re: [PATCH] octeontx2-af: Send Link events one by one
+Message-ID: <aCHxax9GgcLL-4Xk@37b358c748b7>
+References: <1746638183-10509-1-git-send-email-sbhatta@marvell.com>
+ <20250512100954.GU3339421@horms.kernel.org>
+ <aCHfZ_MxtfVmhXVj@90a8923ee8d1>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 00/19] Split netmem from struct page
-To: Byungchul Park <byungchul@sk.com>, Mina Almasry <almasrymina@google.com>
-Cc: willy@infradead.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org, kernel_team@skhynix.com,
- kuba@kernel.org, ilias.apalodimas@linaro.org, harry.yoo@oracle.com,
- hawk@kernel.org, akpm@linux-foundation.org, ast@kernel.org,
- daniel@iogearbox.net, davem@davemloft.net, john.fastabend@gmail.com,
- andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
- vishal.moola@gmail.com
-References: <20250509115126.63190-1-byungchul@sk.com>
- <CAHS8izPFiytN_bM6cu2X8qbvyVTL6pFMeobW=qFwjgHbg5La9Q@mail.gmail.com>
- <20250512123626.GB45370@system.software.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20250512123626.GB45370@system.software.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <aCHfZ_MxtfVmhXVj@90a8923ee8d1>
+X-Authority-Analysis: v=2.4 cv=WMp/XmsR c=1 sm=1 tr=0 ts=6821f173 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=M5GUcnROAAAA:8 a=VwQbUJbxAAAA:8 a=5P80QGrGfck98o8MOnwA:9 a=CjuIK1q_8ugA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-GUID: wQkGsb3a-2O4k2GgYth7iwRKTh93GrPz
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTEyMDEzNiBTYWx0ZWRfX2m5EnNP5uTIZ C7H+fKEVfXgwVrdxRJ24bA3RcILapk1jB+DLhIJOSJ4LuPALPnHG3MgX+k+45zYQCamsJnmKMNb Z4O0FPSQ4WCkE4y1vxrgsJGCA6gfceOULiakV9S0WaWSLRLmjV5faVxMj64kYaoHY608bLqUsFh
+ ZVm+J0IIxgDslfboSxwMnbNX7LzxHb1uLwlEnJG9YxFoZlA5J2dJa5msEXey7fDCxju34+Sfvkk qGPiBdA8dLzhuOF3XmzLVUkZzPsYvEAbSjHhYIRyN3RiW55NwoBMFq+2X1GKC7ScL3VQLEh7QqW BpI/jcttHbAN2/UZZ0916f75obecJEb+ccXN1mpYKD14KrmyejV3xiv//TZqm1q2muYDSQXjIxA
+ oNK7sEiiB0spISbRVJYifgOIZR7se114xkonEP6OZRxVoPvdSeJaubljLfFeejhVmfucXvM4
+X-Proofpoint-ORIG-GUID: wQkGsb3a-2O4k2GgYth7iwRKTh93GrPz
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-12_04,2025-05-09_01,2025-02-21_01
 
-On 5/12/25 13:36, Byungchul Park wrote:
-> On Fri, May 09, 2025 at 07:09:16AM -0700, Mina Almasry wrote:
->> On Fri, May 9, 2025 at 4:51 AM Byungchul Park <byungchul@sk.com> wrote:
->>>
->>> The MM subsystem is trying to reduce struct page to a single pointer.
->>> The first step towards that is splitting struct page by its individual
->>> users, as has already been done with folio and slab.  This patchset does
->>> that for netmem which is used for page pools.
->>>
->>> Matthew Wilcox tried and stopped the same work, you can see in:
->>>
->>>     https://lore.kernel.org/linux-mm/20230111042214.907030-1-willy@infradead.org/
->>>
->>> Mina Almasry already has done a lot fo prerequisite works by luck, he
->>> said :).  I stacked my patches on the top of his work e.i. netmem.
->>>
->>> I focused on removing the page pool members in struct page this time,
->>> not moving the allocation code of page pool from net to mm.  It can be
->>> done later if needed.
->>>
->>> There are still a lot of works to do, to remove the dependency on struct
->>> page in the network subsystem.  I will continue to work on this after
->>> this base patchset is merged.
->>>
->>> This patchset is based on mm tree's mm-unstable branch.
->>>
->>
->> This series largely looks good to me, but a couple of things:
->>
->> - For deep changes like this to the page_pool, I think we need a
->> before/after run to Jesper's currently out-of-tree benchmark to see
->> any regressions:
->> https://lore.kernel.org/netdev/20250309084118.3080950-1-almasrymina@google.com/
+Hi again,
+
+On 2025-05-12 at 11:45:43, Subbaraya Sundeep (sbhatta@marvell.com) wrote:
+> Hi Simon,
 > 
-> Sure.  I will check it.
+> On 2025-05-12 at 10:09:54, Simon Horman (horms@kernel.org) wrote:
+> > On Wed, May 07, 2025 at 10:46:23PM +0530, Subbaraya Sundeep wrote:
+> > > Send link events one after another otherwise new message
+> > > is overwriting the message which is being processed by PF.
+> > > 
+> > > Fixes: a88e0f936ba9 ("octeontx2: Detect the mbox up or down message via register")
+> > > Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+> > > ---
+> > >  drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c | 2 ++
+> > >  1 file changed, 2 insertions(+)
+> > > 
+> > > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
+> > > index 992fa0b..ebb56eb 100644
+> > > --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
+> > > +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
+> > > @@ -272,6 +272,8 @@ static void cgx_notify_pfs(struct cgx_link_event *event, struct rvu *rvu)
+> > >  
+> > >  		otx2_mbox_msg_send_up(&rvu->afpf_wq_info.mbox_up, pfid);
+> > 
+> > Hi Subbaraya,
+> > 
+> > Are there other callers of otx2_mbox_msg_send_up()
+> > which also need this logic? If so, perhaps a helper is useful.
+> > If not, could you clarify why?
+> > 
+> UP messages are async notifications where we just send and forget.
+> There are other callers as I said we just send and forget everywhere
+> in the driver. Only this callsite has been modified because we have
+> seen an issue on customer setup where bunch of link events are queued
+> for a same device at one point of time.
+> > >  
+> > > +		otx2_mbox_wait_for_rsp(&rvu->afpf_wq_info.mbox_up, pfid);
+> > 
+> > This can return an error. Which is checked in otx2_sync_mbox_up_msg().
+> > Does it make sense to do so here too?
+> > 
+> Yes it makes sense to use otx2_sync_mbox_up_msg here. I will use it
+> here.
 > 
->> - Also please CC Pavel on iterations related to netmem/net_iov, they
->> are reusing that in io_uring code for iouring rx rc as well.
-> 
-> I will.  Thank you.
+I will leave it as otx2_mbox_wait_for_rsp. Since otx2_sync_mbox_up_msg
+is in nic driver and we do not include nic files in AF driver. Since
+this is a void function will print an error if otx2_mbox_wait_for_rsp
+returns error.
 
-Mina, thanks for CC'ing. And since it's touching io_uring, future
-versions need to CC it as well.
+Thanks,
+Sundeep
 
--- 
-Pavel Begunkov
-
+> Thanks,
+> Sundeep
+> > > +
+> > >  		mutex_unlock(&rvu->mbox_lock);
+> > >  	} while (pfmap);
+> > >  }
+> > > -- 
+> > > 2.7.4
+> > > 
 
