@@ -1,157 +1,245 @@
-Return-Path: <netdev+bounces-189741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFB4EAB36F6
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 14:31:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BC1E6AB3724
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 14:37:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 562B73BC8C0
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 12:30:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03B678622AC
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 12:36:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF9CB13635E;
-	Mon, 12 May 2025 12:31:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E90D2920A2;
+	Mon, 12 May 2025 12:35:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Oma+lmw9"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9527F610D;
-	Mon, 12 May 2025 12:30:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBD6813635E
+	for <netdev@vger.kernel.org>; Mon, 12 May 2025 12:35:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747053065; cv=none; b=RO/1QMK2wkCNm3SukiYTZ92EygvsG4Q+KzHDAiZbFbFQRNUBGp2D4d6v+VDCvjTX7JtlogU9F76u8iYp5XSW9jNTK0G7n4gHg3i7wEZknuEv9w6DXbHhrTd705P9EqaZVQwMTanwCM1YIS1lfFXmMm8uSjCKEaitBI37Jv1nXB4=
+	t=1747053323; cv=none; b=rJX/Whdloz5V6Znu9Ix/IsgHbqWhx2r4Z3aqqXuR71x9Spj+2buWnHWu4iRcLZ8r/l+9YRkVsj6C1PQfrLAPh0RSjShIS55XlG246sOeOC/F/ObBtOKrP6OKKj5TrsO+gFAAOBrZW6MYfkXil8MZow53ymGGvTdP4hPIZW58H2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747053065; c=relaxed/simple;
-	bh=aoRENC4dK7uCxpaq2XpT/11akqxPjKkP6HAKL43p3xA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QXKNtR1DvOnmNSgWu4DGKon1Cc0ywJvyg8wtoztQ7GNAEfY4BDu7XvWQPo148kbLH9ltCkbyoWZSO8VvviG1otRMJh33fohiMBT15WOred3uM9IgvWxPIfdGCJBKm7VGoKHSXgGhA9VDZf8leDUluNgNYmiA20N7UGCI+ELVvzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-669ff7000002311f-70-6821ea0019eb
-Date: Mon, 12 May 2025 21:30:51 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: willy@infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	kernel_team@skhynix.com, kuba@kernel.org,
-	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
-	akpm@linux-foundation.org, ast@kernel.org, daniel@iogearbox.net,
-	davem@davemloft.net, john.fastabend@gmail.com,
-	andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
-	vishal.moola@gmail.com
-Subject: Re: [RFC 02/19] netmem: introduce netmem alloc/put API to wrap page
- alloc/put API
-Message-ID: <20250512123051.GA45370@system.software.com>
-References: <20250509115126.63190-1-byungchul@sk.com>
- <20250509115126.63190-3-byungchul@sk.com>
- <CAHS8izOVynwxo4ZVG8pxqocThRYYL4EqRHpEtPPFQpLViTUKLA@mail.gmail.com>
- <CAHS8izP3knY42632AcfTHcpgpSz49gP0j6CnyswUoHW6JtC3=w@mail.gmail.com>
+	s=arc-20240116; t=1747053323; c=relaxed/simple;
+	bh=vmSWxpGFDTrdWKUCaWo051UNIY/9ZBUNlmWHIEqIfSI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pICjN2sX/YXZn1ymSu34lzmoUEfWLuTebegjXQNrY96BpERLN2X7M4W6+ngofgaOx8voPUIdR14iy5fV7RUVqBZq7gZ31VuteiMNFtX/vfJeusTrfuh+5nZ6rKSVE+rbQQpK8trJ/R+8i2xWACvUpvuKQlKVnp6U2h+f7IrGjXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Oma+lmw9; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747053322; x=1778589322;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=vmSWxpGFDTrdWKUCaWo051UNIY/9ZBUNlmWHIEqIfSI=;
+  b=Oma+lmw9nxRFTt5NmwiG1xiqdfcQ3M5KVhLNyTg9ZzDtfhhqw+1vUcOj
+   DhyipQV5ozfrMKCfYfBx+YLT1Bpwj7VSjMLg1ay2K/RHGPG6ZujXKqme9
+   jiy83biBa3Mw0RKvG9v4gFe0EAZ68nnWh+LDI2z3kwpqlvi7k1L9xb8bn
+   69cXsUcKO+AF7HxyDC3IDCO/nFezCnz3f/Cu6sZch1HaB5pkfYin21o1y
+   QJu5QNz5U7kAXsKWqpcl+VMwPSFOCEM7A9GjcaKU1KpWfrVgVc6lXBsUF
+   3uk6sUGDGNeOX8ktQFrWDIl/arC2nUY0OMem/4lfCCvCO8vE5OT1AbGza
+   w==;
+X-CSE-ConnectionGUID: kE4nosoOT3iUMoDT6Q9Onw==
+X-CSE-MsgGUID: 92FcDaGOR6yHBdfSRsGUUA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11431"; a="48541789"
+X-IronPort-AV: E=Sophos;i="6.15,282,1739865600"; 
+   d="scan'208";a="48541789"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2025 05:35:20 -0700
+X-CSE-ConnectionGUID: wKCL6bwGQ0W4IrP4Pwgbcw==
+X-CSE-MsgGUID: WaLhORkWR0izdWHW1ZFg6g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,282,1739865600"; 
+   d="scan'208";a="138322794"
+Received: from kkolacin-desk1.ger.corp.intel.com (HELO kkolacin-desk1.igk.intel.com) ([10.217.160.155])
+  by fmviesa009.fm.intel.com with ESMTP; 12 May 2025 05:35:17 -0700
+From: Karol Kolacinski <karol.kolacinski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	richardcochran@gmail.com,
+	Karol Kolacinski <karol.kolacinski@intel.com>
+Subject: [PATCH iwl-next 1/2] ice: move two ice_ptp_* functions
+Date: Mon, 12 May 2025 14:34:57 +0200
+Message-ID: <20250512123509.1194023-3-karol.kolacinski@intel.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHS8izP3knY42632AcfTHcpgpSz49gP0j6CnyswUoHW6JtC3=w@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrFIsWRmVeSWpSXmKPExsXC9ZZnkS7DK8UMg+mnTS3mrF/DZrH6R4XF
-	8gc7WC2+/LzNbrF44TdmiznnW1gsnh57xG5xf9kzFos97duZLXpbfjNbNO1YwWRxYVsfq8Xl
-	XXPYLO6t+c9qcWyBmMW3028YLdbvu8Fq8fvHHDYHIY8tK28yeeycdZfdY8GmUo/NK7Q8um5c
-	YvbYtKqTzWPTp0nsHneu7WHzODHjN4vHzh2fmTw+Pr3F4vF+31U2j8+b5AJ4o7hsUlJzMstS
-	i/TtErgyNj38wFjwX6TiYsMfpgbGLoEuRk4OCQETiZ33X7HB2LsbutlBbBYBVYkDd08xgdhs
-	AuoSN278ZAaxRQQ0JZbsm8jaxcjFwSywhFli3aINLCAJYYEYiS33NoHZvAIWElvnLGAHKRIS
-	eM8o8WTTdmaIhKDEyZlPwIqYgab+mXcJKM4BZEtLLP/HARGWl2jeOhusnFMgUKLj9hdGEFtU
-	QFniwLbjTBCHHmKXeN3sD2FLShxccYNlAqPgLCQbZiHZMAthwywkGxYwsqxiFMrMK8tNzMwx
-	0cuozMus0EvOz93ECIzhZbV/oncwfroQfIhRgINRiYf3xEvFDCHWxLLiytxDjBIczEoivI3b
-	gUK8KYmVValF+fFFpTmpxYcYpTlYlMR5jb6VpwgJpCeWpGanphakFsFkmTg4pRoYdS/k2V/5
-	dOHCZh3rZ/kXGaSNHV/e3PatXeRvoTmf97x2r3S+0DjG96yF6VkhX6Lq2DPy92w1OvulaeG1
-	Pf9+KfRr9TZ3zFd01g0TXHTf/YDPs5wnkss4Q/avMN56/urN31KbOVStLr5ec5t/4spIBsM9
-	e38ELN2lNEf09p4+fcEl64Meh8suUWIpzkg01GIuKk4EAOZuEgLdAgAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrEIsWRmVeSWpSXmKPExsXC5WfdrMvwSjHD4PNJNYs569ewWaz+UWGx
-	/MEOVosvP2+zWyxe+I3ZYs75FhaLp8cesVvcX/aMxWJP+3Zmi96W38wWTTtWMFkcnnuS1eLC
-	tj5Wi8u75rBZ3Fvzn9Xi2AIxi2+n3zBarN93g9Xi9485bA7CHltW3mTy2DnrLrvHgk2lHptX
-	aHl03bjE7LFpVSebx6ZPk9g97lzbw+ZxYsZvFo+dOz4zeXx8eovF4/2+q2wei198YPL4vEku
-	gC+KyyYlNSezLLVI3y6BK2PTww+MBf9FKi42/GFqYOwS6GLk5JAQMJHY3dDNDmKzCKhKHLh7
-	ignEZhNQl7hx4ycziC0ioCmxZN9E1i5GLg5mgSXMEusWbWABSQgLxEhsubcJzOYVsJDYOmcB
-	O0iRkMB7Roknm7YzQyQEJU7OfAJWxAw09c+8S0BxDiBbWmL5Pw6IsLxE89bZYOWcAoESHbe/
-	MILYogLKEge2HWeawMg3C8mkWUgmzUKYNAvJpAWMLKsYRTLzynITM3NM9YqzMyrzMiv0kvNz
-	NzECY3JZ7Z+JOxi/XHY/xCjAwajEw3vipWKGEGtiWXFl7iFGCQ5mJRHexu1AId6UxMqq1KL8
-	+KLSnNTiQ4zSHCxK4rxe4akJQgLpiSWp2ampBalFMFkmDk6pBkaDzzG72GuPs+U9nMhr72Br
-	r/K2bsfNzHnhizM8BOwK9PmmLf7V/uHaq1fq3avy3NJl10yILnQqfSWaVf3nTDJHVGNAN4uI
-	3RMbrifaBSoLDep1YlXLHPSZNoUlO3auMvutr3Cth4VzncieyepL/5ptORQ+V/uI38qly4+d
-	7knPeWattHzGUyWW4oxEQy3mouJEAPlTfUrFAgAA
-X-CFilter-Loop: Reflected
 
-On Fri, May 09, 2025 at 07:08:23AM -0700, Mina Almasry wrote:
-> j
-> 
-> On Fri, May 9, 2025 at 6:39 AM Mina Almasry <almasrymina@google.com> wrote:
-> >
-> > On Fri, May 9, 2025 at 4:51 AM Byungchul Park <byungchul@sk.com> wrote:
-> > >
-> > > To eliminate the use of struct page in page pool, the page pool code
-> > > should use netmem descriptor and API instead.
-> > >
-> > > As part of the work, introduce netmem alloc/put API allowing the code to
-> > > use them rather than struct page things.
-> > >
-> > > Signed-off-by: Byungchul Park <byungchul@sk.com>
-> > > ---
-> > >  include/net/netmem.h | 18 ++++++++++++++++++
-> > >  1 file changed, 18 insertions(+)
-> > >
-> > > diff --git a/include/net/netmem.h b/include/net/netmem.h
-> > > index 45c209d6cc689..c87a604e980b9 100644
-> > > --- a/include/net/netmem.h
-> > > +++ b/include/net/netmem.h
-> > > @@ -138,6 +138,24 @@ static inline netmem_ref page_to_netmem(struct page *page)
-> > >         return (__force netmem_ref)page;
-> > >  }
-> > >
-> > > +static inline netmem_ref alloc_netmems_node(int nid, gfp_t gfp_mask,
-> > > +               unsigned int order)
-> > > +{
-> > > +       return page_to_netmem(alloc_pages_node(nid, gfp_mask, order));
-> > > +}
-> > > +
-> > > +static inline unsigned long alloc_netmems_bulk_node(gfp_t gfp, int nid,
-> > > +               unsigned long nr_netmems, netmem_ref *netmem_array)
-> > > +{
-> > > +       return alloc_pages_bulk_node(gfp, nid, nr_netmems,
-> > > +                       (struct page **)netmem_array);
-> > > +}
-> > > +
-> > > +static inline void put_netmem(netmem_ref netmem)
-> > > +{
-> > > +       put_page(netmem_to_page(netmem));
-> > > +}
-> >
-> > We can't really do this. netmem_ref is an abstraction that can be a
-> > struct page or struct net_iov underneath. We can't be sure when
-> > put_netmem is called that it is safe to convert to a page via
-> > netmem_to_page(). This will crash if put_netmem is called on a
-> > netmem_ref that is a net_iov underneath.
-> >
-> 
-> On a closer look, it looks like this put_netmem is only called from
-> code paths where you are sure the netmem_ref is a page underneath, so
-> this is likely fine for now. There is a net_next series that is adding
-> proper put_netmem support [1]. It's probably best to rebase your work
-> on top of that, but this should be fine in the meantime.
+Move ice_ptp_maybe_trigger_tx_interrupt() and ice_ptp_periodic_work().
 
-Indeed.  Hm..  It'd be the best to work on the top of yours.
+This will allow to assign ice_ptp_periodic_work() to PTP API's
+do_aux_work function pointer.
 
-If it takes too long, I keep working on as it is for now and will adjust
-this patch later once your work gets merged.
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_ptp.c | 132 +++++++++++------------
+ 1 file changed, 66 insertions(+), 66 deletions(-)
 
-	Byungchul
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+index 3278b96d8f01..0a1f6e0e4a22 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+@@ -2530,6 +2530,72 @@ static void ice_ptp_set_funcs_e830(struct ice_pf *pf)
+ 	ice_ptp_setup_pin_cfg(pf);
+ }
+ 
++/**
++ * ice_ptp_maybe_trigger_tx_interrupt - Trigger Tx timstamp interrupt
++ * @pf: Board private structure
++ *
++ * The device PHY issues Tx timestamp interrupts to the driver for processing
++ * timestamp data from the PHY. It will not interrupt again until all
++ * current timestamp data is read. In rare circumstances, it is possible that
++ * the driver fails to read all outstanding data.
++ *
++ * To avoid getting permanently stuck, periodically check if the PHY has
++ * outstanding timestamp data. If so, trigger an interrupt from software to
++ * process this data.
++ */
++static void ice_ptp_maybe_trigger_tx_interrupt(struct ice_pf *pf)
++{
++	struct device *dev = ice_pf_to_dev(pf);
++	struct ice_hw *hw = &pf->hw;
++	bool trigger_oicr = false;
++	unsigned int i;
++
++	if (!pf->ptp.port.tx.has_ready_bitmap)
++		return;
++
++	if (!ice_pf_src_tmr_owned(pf))
++		return;
++
++	for (i = 0; i < ICE_GET_QUAD_NUM(hw->ptp.num_lports); i++) {
++		u64 tstamp_ready;
++		int err;
++
++		err = ice_get_phy_tx_tstamp_ready(&pf->hw, i, &tstamp_ready);
++		if (!err && tstamp_ready) {
++			trigger_oicr = true;
++			break;
++		}
++	}
++
++	if (trigger_oicr) {
++		/* Trigger a software interrupt, to ensure this data
++		 * gets processed.
++		 */
++		dev_dbg(dev, "PTP periodic task detected waiting timestamps. Triggering Tx timestamp interrupt now.\n");
++
++		wr32(hw, PFINT_OICR, PFINT_OICR_TSYN_TX_M);
++		ice_flush(hw);
++	}
++}
++
++static void ice_ptp_periodic_work(struct kthread_work *work)
++{
++	struct ice_ptp *ptp = container_of(work, struct ice_ptp, work.work);
++	struct ice_pf *pf = container_of(ptp, struct ice_pf, ptp);
++	int err;
++
++	if (pf->ptp.state != ICE_PTP_READY)
++		return;
++
++	err = ice_ptp_update_cached_phctime(pf);
++
++	ice_ptp_maybe_trigger_tx_interrupt(pf);
++
++	/* Run twice a second or reschedule if phc update failed */
++	kthread_queue_delayed_work(ptp->kworker, &ptp->work,
++				   msecs_to_jiffies(err ? 10 : 500));
++}
++
+ /**
+  * ice_ptp_set_caps - Set PTP capabilities
+  * @pf: Board private structure
+@@ -2739,72 +2805,6 @@ irqreturn_t ice_ptp_ts_irq(struct ice_pf *pf)
+ 	}
+ }
+ 
+-/**
+- * ice_ptp_maybe_trigger_tx_interrupt - Trigger Tx timstamp interrupt
+- * @pf: Board private structure
+- *
+- * The device PHY issues Tx timestamp interrupts to the driver for processing
+- * timestamp data from the PHY. It will not interrupt again until all
+- * current timestamp data is read. In rare circumstances, it is possible that
+- * the driver fails to read all outstanding data.
+- *
+- * To avoid getting permanently stuck, periodically check if the PHY has
+- * outstanding timestamp data. If so, trigger an interrupt from software to
+- * process this data.
+- */
+-static void ice_ptp_maybe_trigger_tx_interrupt(struct ice_pf *pf)
+-{
+-	struct device *dev = ice_pf_to_dev(pf);
+-	struct ice_hw *hw = &pf->hw;
+-	bool trigger_oicr = false;
+-	unsigned int i;
+-
+-	if (!pf->ptp.port.tx.has_ready_bitmap)
+-		return;
+-
+-	if (!ice_pf_src_tmr_owned(pf))
+-		return;
+-
+-	for (i = 0; i < ICE_GET_QUAD_NUM(hw->ptp.num_lports); i++) {
+-		u64 tstamp_ready;
+-		int err;
+-
+-		err = ice_get_phy_tx_tstamp_ready(&pf->hw, i, &tstamp_ready);
+-		if (!err && tstamp_ready) {
+-			trigger_oicr = true;
+-			break;
+-		}
+-	}
+-
+-	if (trigger_oicr) {
+-		/* Trigger a software interrupt, to ensure this data
+-		 * gets processed.
+-		 */
+-		dev_dbg(dev, "PTP periodic task detected waiting timestamps. Triggering Tx timestamp interrupt now.\n");
+-
+-		wr32(hw, PFINT_OICR, PFINT_OICR_TSYN_TX_M);
+-		ice_flush(hw);
+-	}
+-}
+-
+-static void ice_ptp_periodic_work(struct kthread_work *work)
+-{
+-	struct ice_ptp *ptp = container_of(work, struct ice_ptp, work.work);
+-	struct ice_pf *pf = container_of(ptp, struct ice_pf, ptp);
+-	int err;
+-
+-	if (pf->ptp.state != ICE_PTP_READY)
+-		return;
+-
+-	err = ice_ptp_update_cached_phctime(pf);
+-
+-	ice_ptp_maybe_trigger_tx_interrupt(pf);
+-
+-	/* Run twice a second or reschedule if phc update failed */
+-	kthread_queue_delayed_work(ptp->kworker, &ptp->work,
+-				   msecs_to_jiffies(err ? 10 : 500));
+-}
+-
+ /**
+  * ice_ptp_prepare_rebuild_sec - Prepare second NAC for PTP reset or rebuild
+  * @pf: Board private structure
 
-> [1] https://lore.kernel.org/netdev/20250508004830.4100853-1-almasrymina@google.com/
-> 
-> --
-> Thanks,
-> Mina
+base-commit: b74ad830a99f47b47e3f8d98d7d78614edab6217
+-- 
+2.49.0
+
 
