@@ -1,237 +1,405 @@
-Return-Path: <netdev+bounces-189684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AC00AB32F3
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 11:20:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5E7FAB3314
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 11:22:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8DE46189A9D7
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 09:20:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37F0C7AA07D
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 09:21:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA434194AD5;
-	Mon, 12 May 2025 09:20:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE76E25C80B;
+	Mon, 12 May 2025 09:21:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="ZlIdfLxS";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="gC+JfBBh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G1Fbm2J6"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b6-smtp.messagingengine.com (fout-b6-smtp.messagingengine.com [202.12.124.149])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F57625B1CD
-	for <netdev@vger.kernel.org>; Mon, 12 May 2025 09:20:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BE5F25B663;
+	Mon, 12 May 2025 09:21:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747041603; cv=none; b=RCVSLza/+LKSica6X5MjgFxWS0iZg8KGFmHEL6QDDjlxxtxWqX1utCphEZJtCUf5R8jL0PcWexEVit07wTOjPT9POb/v2n39tuAsfLTD+y6lqcdvegZsjmeTqayWk2N3mN/6UtofUuTWgofjvo8N5jOMtuUgZGfv0owqlESN4hU=
+	t=1747041710; cv=none; b=r4bD+70d809C6us7t8F2kL6azpl7oL+ztaxOI/kkkG5g0e/UtzdRJ+5f5ArtHHJBpl0Uych653fXSGJDR1rkQeBZdqL2wl+qMUXmPzMx3vDThW9/SeL+kgdYlz8fyic3uwjTGY3CUh2X7HZVD5w5qLRPZeitD7cym1la2dCBAZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747041603; c=relaxed/simple;
-	bh=GBhgHqrvViVItNSIQEoeSOvD4ftqVLJv6mNeNunEfWw=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=Fi7hVNEKwAo59qYR9ru/KPEzGaI/8uTBi7KqzL+MtaJUjVVVjhBQ61Tyn6NoiutJhcShzX/KyboNujWt3haz+5CtAc2GK+hi65rE2LF+w9JxjNTdxgeHbHkVsMW3xxRgXKmsO1DrVNuX584qNscjcpkS8rVdlZ7M4u5PqszBGEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=ZlIdfLxS; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=gC+JfBBh; arc=none smtp.client-ip=202.12.124.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
-Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
-	by mailfout.stl.internal (Postfix) with ESMTP id B863D1140140;
-	Mon, 12 May 2025 05:19:59 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-08.internal (MEProxy); Mon, 12 May 2025 05:20:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
-	 t=1747041599; x=1747127999; bh=CvYftXw5Tvqsw6wj/SE2OeAjW3pvHmb7
-	FcABR9pzR58=; b=ZlIdfLxSfKr8puq0NNc3lnleVFsjmAwtV8DAFKc0wzDBGd8D
-	yo8hUkd92PRUQpp8AIpO/aabCPuaaM5wjjR1Lq0ggmQY43zbQyUgWyRCHXbyCScd
-	yBuEH5p2WXAT8ZGfWL9lS/qwvGYotH0PL5v8IfQssRHvND80udKtYT8B2mytvh3g
-	N+ZVuq9XMrhLnvdipTlj3644xV/Ku7lDvviIFHp7hNve/0Q1elynoM+hkTW+nPEi
-	4m5ozbCLVf18dgENTWI2/m6KlHpA1xhNfcmLP9GGOpBTCBzx812d3og+aHjx0Tp7
-	gDqtDChuEWv1eNxq4fxYYnOl+1eQ16zOouJFrw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1747041599; x=
-	1747127999; bh=CvYftXw5Tvqsw6wj/SE2OeAjW3pvHmb7FcABR9pzR58=; b=g
-	C+JfBBhxTe6yOGUy7VeGf1n+GGsYWg9xmxJ9T1YMVGtu9seWnU85k7fjWRxIywFx
-	44ozjZSH0gUmIcQqf0qsDcfMLlRUXjZlU9os3aYjnRU76fkH/0TIy4k3XWcLVX4P
-	MVCBFt+ZImS2rKGe/WX/96C3dq+bjhDIecOeuxxJmGtZ0cTI1XQiZeiBPZVw5pWm
-	0YRpR+yqS5Ffiz6cBMXIXSO8Dy/ijrHvjF6wXxd58O862PT7dpUIe4F0UwPSq7kM
-	pumEp6k25rLL0WR2FCa3p5LMGjnn0Xra/AnovkreIV9u3HcB2wpntKTGrLEoFXVa
-	OkgGM2pkUmGV9uewEafbA==
-X-ME-Sender: <xms:P70haB7vUHd9AfojuSRFQgNH6WDyZYT3vA924NiyRcSCGlcDHNBA8g>
-    <xme:P70haO7f6D9Ta8k5Ug7wM2j9EaXiZ0mPALZK1_a2lM4XmD3l1GmJbINxWVaqIpeh9
-    oanudK6w-olf5xQbns>
-X-ME-Received: <xmr:P70haIeEHzrvWWKcQBRCxI7bjtVOJBAhWWvT26OgkCjloDV9HR59RLncMwPKDhByNM04vOiD>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeftddtkeekucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhephffvvefujghfofggtgfgfffksehtqhertder
-    tdejnecuhfhrohhmpeflrgihucggohhssghurhhghhcuoehjvhesjhhvohhssghurhhghh
-    drnhgvtheqnecuggftrfgrthhtvghrnhepheelteehfeeukeejudetvefgueeuleejieeh
-    teefkedvkedufefhgeekfefhueejnecuffhomhgrihhnpehmohguvgdrshhonecuvehluh
-    hsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepjhhvsehjvhhoshgs
-    uhhrghhhrdhnvghtpdhnsggprhgtphhtthhopedutddpmhhouggvpehsmhhtphhouhhtpd
-    hrtghpthhtohepthhonhhghhgrohessggrmhgrihgtlhhouhgurdgtohhmpdhrtghpthht
-    ohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgrii
-    gvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdho
-    rhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrnh
-    gurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtoheprghnughrvgifsehl
-    uhhnnhdrtghhpdhrtghpthhtoheptghorhgsvghtsehlfihnrdhnvghtpdhrtghpthhtoh
-    epphgrsggvnhhisehrvgguhhgrthdrtghomh
-X-ME-Proxy: <xmx:P70haKIj1JMhoDBlYivXu-ZbLxgjFibOnrbLhkvY3jQLpUide0Bq-Q>
-    <xmx:P70haFJ88hqWx5TT53Y5C2b04p9Z6FBeYX7vS9I2cNTRot2F-lFysg>
-    <xmx:P70haDw3b42qNN8gaGL7_q683ZeuD500BzrDVyTDtRnN_Be3P4rIyQ>
-    <xmx:P70haBL-54nQIjLt3nkUBo9aQLIuGGCF0e67Z2filJ6GU6toxwtFgw>
-    <xmx:P70haGCZOgVXIS4p6t_1rFZXUODak-6VwzfKUwHsFy_p0EQpjPDOiZ9D>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 12 May 2025 05:19:58 -0400 (EDT)
-Received: by vermin.localdomain (Postfix, from userid 1000)
-	id E10471C0465; Mon, 12 May 2025 02:19:54 -0700 (PDT)
-Received: from vermin (localhost [127.0.0.1])
-	by vermin.localdomain (Postfix) with ESMTP id DEC8A1C0464;
-	Mon, 12 May 2025 11:19:54 +0200 (CEST)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: Tonghao Zhang <tonghao@bamaicloud.com>
-cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-    Jonathan Corbet <corbet@lwn.net>,
-    Andrew Lunn <andrew+netdev@lunn.ch>
-Subject: Re: [PATCH net-next 1/4] net: bonding: add broadcast_neighbor option for 802.3ad
-In-reply-to: <B43CC0DC-286B-44FF-8FA8-1B1BC0C990BF@bamaicloud.com>
-References: <20250510044504.52618-1-tonghao@bamaicloud.com> <20250510044504.52618-2-tonghao@bamaicloud.com> <1133230.1746881077@vermin> <CE4DB782-91EB-4DBD-9C26-CA4C4612D58C@bamaicloud.com> <ea87b2d2-9b17-4f16-9e40-fe7212f2788d@lunn.ch> <B43CC0DC-286B-44FF-8FA8-1B1BC0C990BF@bamaicloud.com>
-Comments: In-reply-to Tonghao Zhang <tonghao@bamaicloud.com>
-   message dated "Mon, 12 May 2025 10:25:16 +0800."
-X-Mailer: MH-E 8.6+git; nmh 1.7+dev; Emacs 29.0.50
+	s=arc-20240116; t=1747041710; c=relaxed/simple;
+	bh=t5o1U0UpFX89qHN3iGYPXHPFCpScbEOGaqvmBNXdX5A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=goYEOaPTyOseHz/XCXUEY5OzCkFT/Kpb7YwT3IgDkqX/+8WxYsnD1NCuIhPj9/hLnqX1qq66pXb9fnlpiAOkxXiLODH9tpJhcGLnEFUUMvhQ+EYpRqEYvB98N5DQwo9DlDcwRxyA3azDeWQtLD26GPxjBZKFph1TGJ+vBieRoso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G1Fbm2J6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE1E9C4CEE9;
+	Mon, 12 May 2025 09:21:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747041710;
+	bh=t5o1U0UpFX89qHN3iGYPXHPFCpScbEOGaqvmBNXdX5A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=G1Fbm2J6/MflwcGHyfl5LoLLoml/GOsZnj9Fkt4tXuhyGFpAt3Pxkg9CHKpkbfaDv
+	 m7iYtIrf3liWT6XMJQZEH/qGWwMOsKtdiYLxgMQ+LdXXIdpHKzvRm433hlwvUvomtH
+	 sWh9L3/GJceichgJZntZ5miYv95l7brIE02pc7wqkJak0PNxvfSfzsvjLwBoe0xjp+
+	 Ny23KjQG8O84daH5bOYtw5wbxX7WfqzJZoI2uM7nD/MrUdGzi02+MmKqzKLSYe+wxl
+	 CWDixsWnWe8tL9dH0175ThoWyknPKdKYIFVzzRW5gPX+4Zxc3MvDv48WR43LhtwUA2
+	 uQTmaYWrJGLqQ==
+Date: Mon, 12 May 2025 11:21:47 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, llvm@lists.linux.dev
+Subject: Re: [net-next PATCH v4 11/11] net: airoha: add phylink support for
+ GDM2/3/4
+Message-ID: <aCG9q6i7HomgilI6@lore-desk>
+References: <20250511201250.3789083-1-ansuelsmth@gmail.com>
+ <20250511201250.3789083-12-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="2yvoztbt3M/n+jtr"
+Content-Disposition: inline
+In-Reply-To: <20250511201250.3789083-12-ansuelsmth@gmail.com>
+
+
+--2yvoztbt3M/n+jtr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 12 May 2025 11:19:54 +0200
-Message-ID: <1278464.1747041594@vermin>
 
-Tonghao Zhang <tonghao@bamaicloud.com> wrote:
+> Add phylink support for GDM2/3/4 port that require configuration of the
+> PCS to make the external PHY or attached SFP cage work.
+>=20
+> These needs to be defined in the GDM port node using the pcs-handle
+> property.
+>=20
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> ---
+>  drivers/net/ethernet/airoha/airoha_eth.c  | 155 +++++++++++++++++++++-
+>  drivers/net/ethernet/airoha/airoha_eth.h  |   3 +
+>  drivers/net/ethernet/airoha/airoha_regs.h |  12 ++
+>  3 files changed, 169 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ether=
+net/airoha/airoha_eth.c
+> index 16c7896f931f..3be1ae077a76 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.c
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
+> @@ -7,6 +7,7 @@
+>  #include <linux/of_net.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/tcp.h>
+> +#include <linux/pcs/pcs.h>
+>  #include <linux/u64_stats_sync.h>
+>  #include <net/dst_metadata.h>
+>  #include <net/page_pool/helpers.h>
+> @@ -79,6 +80,11 @@ static bool airhoa_is_lan_gdm_port(struct airoha_gdm_p=
+ort *port)
+>  	return port->id =3D=3D 1;
+>  }
+> =20
+> +static bool airhoa_is_phy_external(struct airoha_gdm_port *port)
+> +{
+> +	return port->id !=3D 1;
+> +}
+> +
+>  static void airoha_set_macaddr(struct airoha_gdm_port *port, const u8 *a=
+ddr)
+>  {
+>  	struct airoha_eth *eth =3D port->qdma->eth;
+> @@ -1613,6 +1619,17 @@ static int airoha_dev_open(struct net_device *dev)
+>  	struct airoha_gdm_port *port =3D netdev_priv(dev);
+>  	struct airoha_qdma *qdma =3D port->qdma;
+> =20
+> +	if (airhoa_is_phy_external(port)) {
+> +		err =3D phylink_of_phy_connect(port->phylink, dev->dev.of_node, 0);
 
->> 2025=E5=B9=B45=E6=9C=8811=E6=97=A5 =E4=B8=8B=E5=8D=8811:53=EF=BC=8CAndre=
-w Lunn <andrew@lunn.ch> =E5=86=99=E9=81=93=EF=BC=9A
->>=20
->>> static inline bool bond_should_broadcast_neighbor(struct bonding *bond,
->>>                                                  struct sk_buff *skb)
->>> {
->>>        if (!bond->params.broadcast_neighbor ||
->>>            BOND_MODE(bond) !=3D BOND_MODE_8023AD)
->>>                return false;
->>=20
->> I think you missed the point. You have added these two tests to every
->> packet on the fast path. And it is very likely to return false. Is
->> bond.params.broadcast_neighbor likely to be in the cache? A cache miss
->> is expensive. Is bond.params.mode also likely to be in cache? You
->> placed broadcast_neighbor at the end of params, so it is unlikely to
->> be in the same cache line as bond.params.mode. So two cache misses.
->>=20
->> What Jay would like is that the cost on the fast path is ~0 for when
->> this feature is not in use. Jump labels can achieve this. It inserts
->> either a NOP or a jump instruction, which costs nearly nothing, and
->> then uses self modifying code to swap between a NOP or a jump. You can
->> keep a global view of is any bond is using this new mode? If no, this
->No, no mode uses jump labels instead of bond.params checking.
+nit: even if it is not strictly required, in order to align with the rest o=
+f the
+codebase, can you please stay below 79 columns?
 
-	The suggestion here is to use a jump label (static branch) to
-essentially eliminate the overhead of the options test for the common case
-for most users, which is with broadcast_neighbor disabled.
+> +		if (err) {
+> +			netdev_err(dev, "%s: could not attach PHY: %d\n", __func__,
+> +				   err);
 
-	As described below, the static branch would be tracked
-separately from the per-bond option.
+same here
 
->> test is eliminated. If yes, you do the test.
->I test the lacp mode with broadcast_neighbor enabled, there is no performa=
-nce drop. This patch has been running in our production environment for a l=
-ong time. We only use this option in lacp mode, for performance, the code c=
-an be modified as follows:
+> +			return err;
+> +		}
+> +
+> +		phylink_start(port->phylink);
+> +	}
+> +
+>  	netif_tx_start_all_queues(dev);
+>  	err =3D airoha_set_vip_for_gdm_port(port, true);
+>  	if (err)
+> @@ -1665,6 +1682,11 @@ static int airoha_dev_stop(struct net_device *dev)
+>  		}
+>  	}
+> =20
+> +	if (airhoa_is_phy_external(port)) {
+> +		phylink_stop(port->phylink);
+> +		phylink_disconnect_phy(port->phylink);
+> +	}
+> +
+>  	return 0;
+>  }
+> =20
+> @@ -2795,6 +2817,115 @@ bool airoha_is_valid_gdm_port(struct airoha_eth *=
+eth,
+>  	return false;
+>  }
+> =20
+> +static void airoha_mac_link_up(struct phylink_config *config, struct phy=
+_device *phy,
+> +			       unsigned int mode, phy_interface_t interface,
+> +			       int speed, int duplex, bool tx_pause, bool rx_pause)
 
-	How did you test this?  The performance under discussion here is
-that branches in the packet transmit path can affect overall packet
-transmission rates at very high rates (think in terms of small packet
-rates at 40 Gb/sec and higher).  Bonding already has a significant
-number of TX path branches, and we should be working to reduce that
-number, not increase it.
+ditto.
 
->diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_ma=
-in.c
->index ce31445e85b6..8743bf007b7e 100644
->--- a/drivers/net/bonding/bond_main.c
->+++ b/drivers/net/bonding/bond_main.c
->@@ -5330,11 +5330,12 @@ static struct slave *bond_xdp_xmit_3ad_xor_slave_g=
-et(struct bonding *bond,
->        return slaves->arr[hash % count];
-> }
->
->-static inline bool bond_should_broadcast_neighbor(struct bonding *bond,
->-                                                 struct sk_buff *skb)
->+static inline bool bond_should_broadcast_neighbor(struct sk_buff *skb,
->+                                                 struct net_device *dev)
-> {
->-       if (!bond->params.broadcast_neighbor ||
->-           BOND_MODE(bond) !=3D BOND_MODE_8023AD)
->+       struct bonding *bond =3D netdev_priv(dev);
->+
->+       if (!bond->params.broadcast_neighbor)
->                return false;
+> +{
+> +	struct airoha_gdm_port *port =3D container_of(config, struct airoha_gdm=
+_port,
+> +						    phylink_config);
 
-	Using a static branch, the above would be preceded by something
-like:
+ditto.
 
-	if (!static_branch_unlikely(&bond_bcast_neigh_enabled))
-		return false;
+> +	struct airoha_qdma *qdma =3D port->qdma;
+> +	struct airoha_eth *eth =3D qdma->eth;
+> +	u32 frag_size_tx, frag_size_rx;
+> +
+> +	if (port->id !=3D 4)
+> +		return;
+> +
+> +	switch (speed) {
+> +	case SPEED_10000:
+> +	case SPEED_5000:
+> +		frag_size_tx =3D 8;
+> +		frag_size_rx =3D 8;
+> +		break;
+> +	case SPEED_2500:
+> +		frag_size_tx =3D 2;
+> +		frag_size_rx =3D 1;
+> +		break;
+> +	default:
+> +		frag_size_tx =3D 1;
+> +		frag_size_rx =3D 0;
+> +	}
+> +
+> +	/* Configure TX/RX frag based on speed */
+> +	airoha_fe_rmw(eth, REG_GDMA4_TMBI_FRAG,
+> +		      GDMA4_SGMII0_TX_FRAG_SIZE_MASK,
+> +		      FIELD_PREP(GDMA4_SGMII0_TX_FRAG_SIZE_MASK,
+> +				 frag_size_tx));
+> +
+> +	airoha_fe_rmw(eth, REG_GDMA4_RMBI_FRAG,
+> +		      GDMA4_SGMII0_RX_FRAG_SIZE_MASK,
+> +		      FIELD_PREP(GDMA4_SGMII0_RX_FRAG_SIZE_MASK,
+> +				 frag_size_rx));
+> +}
+> +
+> +static const struct phylink_mac_ops airoha_phylink_ops =3D {
+> +	.mac_link_up =3D airoha_mac_link_up,
+> +};
+> +
+> +static int airoha_setup_phylink(struct net_device *dev)
+> +{
+> +	struct airoha_gdm_port *port =3D netdev_priv(dev);
+> +	struct device_node *np =3D dev->dev.of_node;
+> +	struct phylink_pcs **available_pcs;
+> +	phy_interface_t phy_mode;
+> +	struct phylink *phylink;
+> +	unsigned int num_pcs;
+> +	int err;
+> +
+> +	err =3D of_get_phy_mode(np, &phy_mode);
+> +	if (err) {
+> +		dev_err(&dev->dev, "incorrect phy-mode\n");
+> +		return err;
+> +	}
+> +
+> +	port->phylink_config.dev =3D &dev->dev;
+> +	port->phylink_config.type =3D PHYLINK_NETDEV;
+> +	port->phylink_config.mac_capabilities =3D MAC_ASYM_PAUSE | MAC_SYM_PAUS=
+E |
+> +						MAC_10 | MAC_100 | MAC_1000 | MAC_2500FD |
+> +						MAC_5000FD | MAC_10000FD;
 
-	With additional logic in the options code that enables and
-disables broadcast_neighbor that will increment or decrement (via
-static_branch_inc / _dec) bond_bcast_neigh_enabled as the
-broadcast_neighbor option is enabled or disabled.  The static branch
-becomes a fast way to ask "is any bond in the system using
-broadcast_neighbor" at very low cost.
+over 79 columns
 
-	As Andrew helpfully pointed out, netfilter makes extensive use
-of these; I'd suggest looking at the usage of something like
-nft_trace_enabled as an example of what we're referring to.
+> +
+> +	err =3D fwnode_phylink_pcs_parse(dev_fwnode(&dev->dev), NULL, &num_pcs);
+> +	if (err)
+> +		return err;
+> +
+> +	available_pcs =3D kcalloc(num_pcs, sizeof(*available_pcs), GFP_KERNEL);
 
-	-J
+I guess you can use devm_kcalloc() and get rid of kfree() here.
 
->        if (skb->protocol =3D=3D htons(ETH_P_ARP))
->@@ -5408,9 +5409,6 @@ static netdev_tx_t bond_3ad_xor_xmit(struct sk_buff =
-*skb,
->        struct bond_up_slave *slaves;
->        struct slave *slave;
->
->-       if (bond_should_broadcast_neighbor(bond, skb))
->-               return bond_xmit_broadcast(skb, dev);
->-
->        slaves =3D rcu_dereference(bond->usable_slaves);
->        slave =3D bond_xmit_3ad_xor_slave_get(bond, skb, slaves);
->        if (likely(slave))
->@@ -5625,6 +5623,9 @@ static netdev_tx_t __bond_start_xmit(struct sk_buff =
-*skb, struct net_device *dev
->        case BOND_MODE_ACTIVEBACKUP:
->                return bond_xmit_activebackup(skb, dev);
->        case BOND_MODE_8023AD:
->+               if (bond_should_broadcast_neighbor(skb, dev))
->+                       return bond_xmit_broadcast(skb, dev);
->+               fallthrough;
->        case BOND_MODE_XOR:
->                return bond_3ad_xor_xmit(skb, dev);
->        case BOND_MODE_BROADCAST:
->>=20
->> 	Andrew
+> +	if (!available_pcs)
+> +		return -ENOMEM;
+> +
+> +	err =3D fwnode_phylink_pcs_parse(dev_fwnode(&dev->dev), available_pcs,
+> +				       &num_pcs);
+> +	if (err)
+> +		goto out;
+> +
+> +	port->phylink_config.available_pcs =3D available_pcs;
+> +	port->phylink_config.num_available_pcs =3D num_pcs;
+> +
+> +	__set_bit(PHY_INTERFACE_MODE_SGMII,
+> +		  port->phylink_config.supported_interfaces);
+> +	__set_bit(PHY_INTERFACE_MODE_1000BASEX,
+> +		  port->phylink_config.supported_interfaces);
+> +	__set_bit(PHY_INTERFACE_MODE_2500BASEX,
+> +		  port->phylink_config.supported_interfaces);
+> +	__set_bit(PHY_INTERFACE_MODE_USXGMII,
+> +		  port->phylink_config.supported_interfaces);
+> +
+> +	phy_interface_copy(port->phylink_config.pcs_interfaces,
+> +			   port->phylink_config.supported_interfaces);
+> +
+> +	phylink =3D phylink_create(&port->phylink_config,
+> +				 of_fwnode_handle(np),
+> +				 phy_mode, &airoha_phylink_ops);
+> +	if (IS_ERR(phylink)) {
+> +		err =3D PTR_ERR(phylink);
+> +		goto out;
+> +	}
+> +
+> +	port->phylink =3D phylink;
+> +out:
+> +	kfree(available_pcs);
+> +
+> +	return err;
+> +}
+> +
+>  static int airoha_alloc_gdm_port(struct airoha_eth *eth,
+>  				 struct device_node *np, int index)
+>  {
+> @@ -2873,7 +3004,23 @@ static int airoha_alloc_gdm_port(struct airoha_eth=
+ *eth,
+>  	if (err)
+>  		return err;
+> =20
+> -	return register_netdev(dev);
+> +	if (airhoa_is_phy_external(port)) {
+> +		err =3D airoha_setup_phylink(dev);
 
----
-	-Jay Vosburgh, jv@jvosburgh.net
+This will re-introduce the issue reported here:
+https://lore.kernel.org/netdev/5c94b9b3850f7f29ed653e2205325620df28c3ff.174=
+6715755.git.christophe.jaillet@wanadoo.fr/
+
+> +		if (err)
+> +			return err;
+> +	}
+> +
+> +	err =3D register_netdev(dev);
+> +	if (err)
+> +		goto free_phylink;
+> +
+> +	return 0;
+> +
+> +free_phylink:
+> +	if (airhoa_is_phy_external(port))
+> +		phylink_destroy(port->phylink);
+> +
+> +	return err;
+>  }
+> =20
+>  static int airoha_probe(struct platform_device *pdev)
+> @@ -2967,6 +3114,9 @@ static int airoha_probe(struct platform_device *pde=
+v)
+>  		struct airoha_gdm_port *port =3D eth->ports[i];
+> =20
+>  		if (port && port->dev->reg_state =3D=3D NETREG_REGISTERED) {
+> +			if (airhoa_is_phy_external(port))
+> +				phylink_destroy(port->phylink);
+> +
+>  			unregister_netdev(port->dev);
+>  			airoha_metadata_dst_free(port);
+>  		}
+> @@ -2994,6 +3144,9 @@ static void airoha_remove(struct platform_device *p=
+dev)
+>  			continue;
+> =20
+>  		airoha_dev_stop(port->dev);
+> +		if (airhoa_is_phy_external(port))
+> +			phylink_destroy(port->phylink);
+> +
+>  		unregister_netdev(port->dev);
+>  		airoha_metadata_dst_free(port);
+>  	}
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ether=
+net/airoha/airoha_eth.h
+> index 53f39083a8b0..73a500474076 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.h
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.h
+> @@ -498,6 +498,9 @@ struct airoha_gdm_port {
+>  	struct net_device *dev;
+>  	int id;
+> =20
+> +	struct phylink *phylink;
+> +	struct phylink_config phylink_config;
+> +
+>  	struct airoha_hw_stats stats;
+> =20
+>  	DECLARE_BITMAP(qos_sq_bmap, AIROHA_NUM_QOS_CHANNELS);
+> diff --git a/drivers/net/ethernet/airoha/airoha_regs.h b/drivers/net/ethe=
+rnet/airoha/airoha_regs.h
+> index d931530fc96f..54f7079b28b0 100644
+> --- a/drivers/net/ethernet/airoha/airoha_regs.h
+> +++ b/drivers/net/ethernet/airoha/airoha_regs.h
+> @@ -357,6 +357,18 @@
+>  #define IP_FRAGMENT_PORT_MASK		GENMASK(8, 5)
+>  #define IP_FRAGMENT_NBQ_MASK		GENMASK(4, 0)
+> =20
+> +#define REG_GDMA4_TMBI_FRAG		0x2028
+> +#define GDMA4_SGMII1_TX_WEIGHT_MASK	GENMASK(31, 26)
+> +#define GDMA4_SGMII1_TX_FRAG_SIZE_MASK	GENMASK(25, 16)
+> +#define GDMA4_SGMII0_TX_WEIGHT_MASK	GENMASK(15, 10)
+> +#define GDMA4_SGMII0_TX_FRAG_SIZE_MASK	GENMASK(9, 0)
+> +
+> +#define REG_GDMA4_RMBI_FRAG		0x202c
+> +#define GDMA4_SGMII1_RX_WEIGHT_MASK	GENMASK(31, 26)
+> +#define GDMA4_SGMII1_RX_FRAG_SIZE_MASK	GENMASK(25, 16)
+> +#define GDMA4_SGMII0_RX_WEIGHT_MASK	GENMASK(15, 10)
+> +#define GDMA4_SGMII0_RX_FRAG_SIZE_MASK	GENMASK(9, 0)
+> +
+>  #define REG_MC_VLAN_EN			0x2100
+>  #define MC_VLAN_EN_MASK			BIT(0)
+> =20
+> --=20
+> 2.48.1
+>=20
+
+--2yvoztbt3M/n+jtr
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaCG9qwAKCRA6cBh0uS2t
+rGcGAP0U/LZ3yZ/JFyuZ3S3LnDaKGLcjA+OR9tlWIBeIm4lf1AD/ZSZi/2WmFx3Q
+V5z+kAb4yQHd4bFvCmn7z8/Tr4xb+Q0=
+=KPwp
+-----END PGP SIGNATURE-----
+
+--2yvoztbt3M/n+jtr--
 
