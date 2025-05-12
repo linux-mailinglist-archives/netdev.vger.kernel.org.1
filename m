@@ -1,226 +1,277 @@
-Return-Path: <netdev+bounces-189787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AC50AB3B6F
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 16:57:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22DFAAB3B88
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 17:00:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8CA037AC55D
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 14:55:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A22219E1CC6
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 15:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CC321E3772;
-	Mon, 12 May 2025 14:56:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDE55235053;
+	Mon, 12 May 2025 15:00:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="chpG0gni"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11022133.outbound.protection.outlook.com [52.101.43.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F08E134D4
-	for <netdev@vger.kernel.org>; Mon, 12 May 2025 14:56:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747061816; cv=none; b=Av+KW/6u/NXNvdStWik2JGA4O43CJfYmjyxZ9Mmp0qBUV+BNXHyXlnoIjW1BtfzykmFcXuyuAuhXtyYtfeQ44vZvZS+ifRnmQXV4+0vUaq/4+I+7AfzsHN5ptkJD7qdbU7p/6Ew2FsgrB2PdS/PdbPAUUqfi7S6zQPzjyKCa7Ow=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747061816; c=relaxed/simple;
-	bh=sodwCNvtCo01UEK6fU16HPSfsFG1qjvU3Yr64oOPusw=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=DaPA7CG5t7MU7ypLaX4rahmCthxYudfYxc9BegydOnc0IYi+t66+5cuEtWapotRZ3iNHNH0evA+ugaxvVmz9RUE34tv5I9SAMpN5x3wQ95tTEB84XoOPSC6PMKxbnhaHGW7nLbZaUD+H16vBINav6s2tixULBz4blIAeOarAOj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=54.204.34.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
-X-QQ-mid: zesmtpgz8t1747061715t84fd07df
-X-QQ-Originating-IP: mrWTICkw65KWThcxP1q7xDZ/EOK3ta2sZHK5yAk5cMM=
-Received: from smtpclient.apple ( [111.201.145.100])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 12 May 2025 22:55:13 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 8976486208275308326
-Content-Type: text/plain;
-	charset=utf-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D55C23184F;
+	Mon, 12 May 2025 15:00:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.133
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747062019; cv=fail; b=o8gxudttNglZQoeH/WOftzmWFSqY3uHxh9uIft97NzUTp/DeS9SuIgS5TPDJRd0P/DdDt1msfxNlAoMydgNmcCsG23bzhSomnh1dyFq1bGuIby83wRxVAPjj9r6mRPcu4qZulYBTPNbFXCwdgVROL41o8KkQwufwzdRSP5ybC+Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747062019; c=relaxed/simple;
+	bh=eyM/O6yf+wWVlwC0sWwJwk+oaDLNz+8tM4bmhLLWzjY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=GISdozarxLF+Rtq0L8TMz5ee7N/TGMuLQmhDiNwPYKQzJ+h5MujAYmktwEa4KHQxy2zz/yQSUwu/8DrijtX4DPYkKBIGG1BAeqX9zZXRvKunJ6e05XQPdulmDoAVYcSDtPZIxafI3VqWy/5O/06mp0NsmiwvtFay8LYdZ2ghWxA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=chpG0gni; arc=fail smtp.client-ip=52.101.43.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=oG3haRYM6Dk2rcq6XNKZbCpgB+cMoJOo5EmPjdLkXOAG+fUxAWRHr1BMU/Whf639jxYaYfmPavsmSn3iFBk8QWFyVSi0O3/lEmVEWogOE8TtkPBdEGIfw8VkV4m4P/H3z0itVzexJrQSfx8u3iCYGxcD/HQukGVROlSlAiR+LOofM2rArsmeMuN4ahgSlLFwNVqYeXPGpzYX4YEZlbo/K2VNIek1/lKpisP02z8EvlDPwk+vfZu4bwM0rQhu9XV+LTVRg6ppz3aH9LLnxcWzN6oplmgTloRb7s3K6cnGb6Nj0oEXTDNiZxrT0Fb5rHUIgb8wc4IgrscmK37rF/lPhA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nH4C9PxeKhGUpaSgSDpUHEcavZg+QfFo66TkqS9BSoc=;
+ b=mIco7YL9PSoF038jonTdKscB3X3H1uJ5tYFH3MhoiuDpnSdYQ05/QFXlG5b2Wl+QBef17qtCaDQ+xJA3uYvagvaNv/tGkV5Kmq99loKK1d+3K2GQtmsKeXI+IryyzpQFpZ+pm/P4xyunqBk7qJ7wo8VoUIDno83f7OsJAtEPzqvR1N5Ent3irlVr4t6uWzwRvnJBsuOdtqkj6PzY6nzFPfShCoZzYd9GbB5Q3Lo8HnHG3CWQ6ymJ9aGLpFwghe8vpJpVq+njSs5OdDdHLGErv7ZNZbJGUuWgoZ+5Bg6SrhjNCJueS2qQOXXvk6WvDFNtHbS1wsFykx+WRE7ReNeprA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nH4C9PxeKhGUpaSgSDpUHEcavZg+QfFo66TkqS9BSoc=;
+ b=chpG0gnir6S+G8QCx81Be7aA8Xf5+r6U8EFxZ1CxaNi65UbaRjxqYAU1W6CNAa0Whw2WUaYOZ7WEXniP81sL8RbiCD3rERM66YLieHgcOMOa2jWy2l7DJkVbkImLyg2oYsZzUWXVDL+fWTY57+RwTLmQE+QAbWKZxz9qsdXP04U=
+Received: from MN0PR21MB3437.namprd21.prod.outlook.com (2603:10b6:208:3d2::17)
+ by MN0PR21MB3558.namprd21.prod.outlook.com (2603:10b6:208:3d1::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8769.5; Mon, 12 May
+ 2025 15:00:11 +0000
+Received: from MN0PR21MB3437.namprd21.prod.outlook.com
+ ([fe80::5125:461:1c07:1a97]) by MN0PR21MB3437.namprd21.prod.outlook.com
+ ([fe80::5125:461:1c07:1a97%4]) with mapi id 15.20.8769.001; Mon, 12 May 2025
+ 15:00:11 +0000
+From: Haiyang Zhang <haiyangz@microsoft.com>
+To: Simon Horman <horms@kernel.org>
+CC: "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Dexuan Cui
+	<decui@microsoft.com>, "stephen@networkplumber.org"
+	<stephen@networkplumber.org>, KY Srinivasan <kys@microsoft.com>, Paul
+ Rosswurm <paulros@microsoft.com>, "olaf@aepfle.de" <olaf@aepfle.de>,
+	"vkuznets@redhat.com" <vkuznets@redhat.com>, "davem@davemloft.net"
+	<davem@davemloft.net>, "wei.liu@kernel.org" <wei.liu@kernel.org>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, "leon@kernel.org"
+	<leon@kernel.org>, Long Li <longli@microsoft.com>,
+	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>, "john.fastabend@gmail.com"
+	<john.fastabend@gmail.com>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"ast@kernel.org" <ast@kernel.org>, "hawk@kernel.org" <hawk@kernel.org>,
+	"tglx@linutronix.de" <tglx@linutronix.de>, "shradhagupta@linux.microsoft.com"
+	<shradhagupta@linux.microsoft.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: RE: [EXTERNAL] Re: [PATCH net-next,v2] net: mana: Add handler for
+ hardware servicing events
+Thread-Topic: [EXTERNAL] Re: [PATCH net-next,v2] net: mana: Add handler for
+ hardware servicing events
+Thread-Index: AQHbwTh1sYjMv8wJekuklPmFrwKS+7PPDkMAgAAMBSA=
+Date: Mon, 12 May 2025 15:00:11 +0000
+Message-ID:
+ <MN0PR21MB343719B3C6DBD46E5F5B343FCA97A@MN0PR21MB3437.namprd21.prod.outlook.com>
+References: <1746832603-4340-1-git-send-email-haiyangz@microsoft.com>
+ <20250512141546.GI3339421@horms.kernel.org>
+In-Reply-To: <20250512141546.GI3339421@horms.kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=d1b7df23-6472-42f7-a0ac-ff02aaf9a3af;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2025-05-12T14:58:46Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
+ 3, 0, 1;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MN0PR21MB3437:EE_|MN0PR21MB3558:EE_
+x-ms-office365-filtering-correlation-id: 36caf2cb-3f55-4aba-4fe0-08dd9165b187
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|1800799024|7416014|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?SfOSMOuAzj3w5GKuM6cC/3N6OzvgImhPSXdEKDqfJsvONj6J7rsX6R3acmDx?=
+ =?us-ascii?Q?Xxg6L1DS6rBBMCFXqu4YQnS/FjdWpdMobDA4M9Rg0kupdEyzCvceZ4h723kv?=
+ =?us-ascii?Q?a7oqFxUT+dTLdTrtFMMelR91GYI07ONKLBeCE9tDlAYD+FXp34OC9LItU5Ay?=
+ =?us-ascii?Q?thFudPPJEBDYK9OG5kP4dg4IHooOLEZ9Pm/rhHrLX39XS7mAN1MlLQU1Mye1?=
+ =?us-ascii?Q?gDwh0yS84BD3UnP8UcdXBuHGKM/HAk+o6erYIu6sgVCFGszOXnKFaOKKAhyt?=
+ =?us-ascii?Q?CzNnZ1aYSUDLKWYY32AYNFiBh8a8emAcExmE/QTsFClib5bjQnSrrh7B+PRb?=
+ =?us-ascii?Q?k40HlUFEIRDvMORX0MwCUyfvnUN3LoY3XYA4YPCWT0GXzWJ/xkX251Xe4rn6?=
+ =?us-ascii?Q?yRU+ke+Mn1/SavO41JKK3UHhSiJnxERYvGOkB2lj1/hK1nx+FAWExiOPjax+?=
+ =?us-ascii?Q?ZQo+n7s4j95P0D97YxLnxb3k6+btTV55hh2B5oXGDdg5xKgX0wEwZIlzcpd+?=
+ =?us-ascii?Q?eRULhfFIZbQPg8FxP/1eq3TtSK0I90viJ3TP1WjE1Z3VYlhWzSDxr/DdOsKx?=
+ =?us-ascii?Q?qvMSee42DvSxvYS3+GulGjjwxYAqOxr1b+38535FkA4I6bLJgcMQBHtVAARm?=
+ =?us-ascii?Q?D9LHWk+vodFdTad16QFwazcGxnpqrgye3HMv/uwVdayvjwJpVPIDRqlJkUVE?=
+ =?us-ascii?Q?9VZ5fNbT9UPmAuY3jBq6Lu1gAk3oFnfWa1EIS7lSgJru+vONQfOhCOX/bu8C?=
+ =?us-ascii?Q?46R/VKSvcKCTHT2JVKvMLEECY0bGbbAYBUk4xlpGeMsoXkxaWVLHwpi4ZURb?=
+ =?us-ascii?Q?XUtPTlaci8aDNrac9yk+4MjLwl0JybvyJBSK7x6DnmLsx3JoK3Ym4GAom90g?=
+ =?us-ascii?Q?RQ8P3g8dQtWn7Mi30oL6rFDWvh3mnlO73htPHiXZ3dpzjyY9Yd8LySPPLZoN?=
+ =?us-ascii?Q?OKHM4/D06M2XYbotZOUpD1yvyTb15DNOwBtbiVBc3yuZ62hh1horVvLwpfQr?=
+ =?us-ascii?Q?mwdxEnkg3FPkEznGIHOL5rsnqi93ncktnIdmKbXJlryjla4zGcuwBus9r/tL?=
+ =?us-ascii?Q?o/g+HLqS2GIq787SAfpJyivixyRyzkFse9jldXgnlGFqXT5l10kBSNC/iZxa?=
+ =?us-ascii?Q?R9MP3V+vESW2lDEM+Dhhg/QgL8JZ4Htxjxlum+9g9pXWsNyzXRcVVPiPsUTe?=
+ =?us-ascii?Q?PirEX6bSJnPGY7qK/Mi9OoCsSl36DTy8RGNpD/c9UQK3jVN3At9HBTn+GCI7?=
+ =?us-ascii?Q?68+QmeTb+fS37NboWt0MxQcZosr2QSBPt7fBw17H2PwnISnpdkz+wvLAh0uk?=
+ =?us-ascii?Q?LAIJD/m7bb+/9cCKJxscCIFttkar0iipxyrZ4kiofP1Jt7CWjgfPWW7tnRJp?=
+ =?us-ascii?Q?PvzbgU2iOYSdKFj7Flr8uBhNmHk80Hhx9g1Hf18wCr2r/K6Fkf/fkvz/2DCw?=
+ =?us-ascii?Q?i+qID+5C01leaScGvz4H0v0iHI6ayoSfL72GdNncbZKOkQS1jPgCzg=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR21MB3437.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(38070700018);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?G5DvOK0cof1srp9wbkLWPuBFQxQgmVjQ/HRXMr2VF6FGH9SxzZxJDHqpgQKj?=
+ =?us-ascii?Q?1cFlbvvWNWJBdoo9S1GQdNx7IWtUiTi7pY8o8yCI8PfYahDwJ08T4IpMIcKj?=
+ =?us-ascii?Q?Su097FmKuAeXs+11LfODFVIP2Xx94j2/s1a+Srq7BYPHYAOlmGoT5fCeD5+s?=
+ =?us-ascii?Q?kw7J2Y7gdZKdPjbsIWFn6/B2Tv11n7slxRSRywHhPUCKhmW9hqlgKCkOG6La?=
+ =?us-ascii?Q?5aSvw/71rwwQfHf41B3fJI8MSnh+U4KySPOM50CZv8nHmfQ+v9ctWm7e1PKa?=
+ =?us-ascii?Q?vKrM7cIJLqByaHpfniKI7Acx5DJpaoxr8WGb1iQjmBy35R3vWFUe2NaT23wX?=
+ =?us-ascii?Q?B+9CkET7hQ+DmdXM54izbGftCRsYqEkG6+fUGg6AbmtGMlW/KOSiV80+0+uq?=
+ =?us-ascii?Q?jRf6+rCIxg4dcoVBEwF+EunxOLcvWKwdAJdi+OkC3VpeApK8hSzey57dYbSB?=
+ =?us-ascii?Q?pQZnQkx1tl5sYfC3830WWih10lMSO9u7friGU4SOE1SbfMvR0aKZOUXqnA9u?=
+ =?us-ascii?Q?5KKCXym0HOsrCPpYBCkzivpsv89naPDlrBsBT8ZFxRSFAdS07/hGQFm5KgKP?=
+ =?us-ascii?Q?vCboCpzAun4nnWGPXA+S2s5Qsxrm94GwCQCFPlvqh/O1jeoIAeZW7z4mOd6/?=
+ =?us-ascii?Q?i86g2ZLfIUbnmUePuFYGpZ7GCED/q8SpdW9cZ2DXd/vjxB4PcUVsURZDmkQx?=
+ =?us-ascii?Q?cDbBvfp9IBoxSgGUx0n66YGfx/NowcdgS0JlEqFtNi+Wubzg6xgEsjMSpGvf?=
+ =?us-ascii?Q?/xOSfFQ+yUXH9oU+LwXPTxH9Ja5EAZnY06Lh0yQwS84LBQsfZ4uc1QLi6W0G?=
+ =?us-ascii?Q?5LQ/CG/IOLnkhnljOo9OMhAYlrQRStuwA3eg185aY238cHTBbwt9KNSK2JYn?=
+ =?us-ascii?Q?PdepCI357hn0Y0kRclCvbMockKxrQr+fl/v6zquHODx9wlrnXuyd0V7pm/VD?=
+ =?us-ascii?Q?a2VghncFpErPpZHV6eFGbUsB5HENbeatq8PoaxgyzUkCLy3TvwQ/lT3QkWy/?=
+ =?us-ascii?Q?PRefvaPiCXXUVZykomONAJ5Y1Jl4xmO4S/HbPeyiudb97H9ZAFqOopmQlHcG?=
+ =?us-ascii?Q?b1cHmS50q7x6ofgdh9gym9xm8kOCTIxExsHfcG+Iipq8/4ixrjDR9menZlWQ?=
+ =?us-ascii?Q?zRcyAucAV6Cy3QM9n9oovwRJY6+NmisA2JBss4PMMSfmj2DGegiiRb6EJHxn?=
+ =?us-ascii?Q?2TyN4mXaUbcwQ4HjNxzPLpCCmbbMGjWzxcKlKKftM5kvUXLPTaL0IGO1jLwJ?=
+ =?us-ascii?Q?3e1vP69nIjHgIAlqvGNLY8srWVySy9BnhW2HjWA2n0PVS9/leILedaKh66sH?=
+ =?us-ascii?Q?CbQQpitif/rN/r/kQKgF7ZACzk3YbuyCsMDgErlD9AlCNHzZVDELHBfYEFVN?=
+ =?us-ascii?Q?ovyr1ATcTeX+4TuAouNCuNbcICgHejeyRH95rSTuDcm69lM4pP186sO0SHGa?=
+ =?us-ascii?Q?gjM5+WhWET7HbguoFNPy2halk794vA+HPL1MCXabXx72dCcLNTxZgzwx0wdI?=
+ =?us-ascii?Q?QO8FtRMC60mbvwQwldQ+DoLN5yh9q1Rfij8s61FWK+588pOWIAnhZYWOlaag?=
+ =?us-ascii?Q?ypXM4719BfC8Sa/SZCfe/w/QrQdbe+BaO8OX/wKy?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.400.131.1.6\))
-Subject: Re: [PATCH net-next 1/4] net: bonding: add broadcast_neighbor option
- for 802.3ad
-From: Tonghao Zhang <tonghao@bamaicloud.com>
-In-Reply-To: <1278464.1747041594@vermin>
-Date: Mon, 12 May 2025 22:55:02 +0800
-Cc: Andrew Lunn <andrew@lunn.ch>,
- netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <638B6CB1-BCC6-4887-96F2-013196DA5138@bamaicloud.com>
-References: <20250510044504.52618-1-tonghao@bamaicloud.com>
- <20250510044504.52618-2-tonghao@bamaicloud.com> <1133230.1746881077@vermin>
- <CE4DB782-91EB-4DBD-9C26-CA4C4612D58C@bamaicloud.com>
- <ea87b2d2-9b17-4f16-9e40-fe7212f2788d@lunn.ch>
- <B43CC0DC-286B-44FF-8FA8-1B1BC0C990BF@bamaicloud.com>
- <1278464.1747041594@vermin>
-To: Jay Vosburgh <jv@jvosburgh.net>
-X-Mailer: Apple Mail (2.3826.400.131.1.6)
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: MC+kTSDGUQEXWELdWHsFOi5F5K3hWtyXGcIYHnk/zDKj/YB77PmipsCP
-	1NB3YdX8YT4hDFI/rn8PHbeJCa5NOO8OxJn5DVLNUMnMcnLekLotma5T6ZeS1ZOv6cJUmHg
-	4416mWGgOPaSfn0TrqlbJPP1mT3xMzfyKxaN8/bUqoR0mwXGTtgacpCFpSg9+EjTbdzOP0L
-	CmawdnyFWIxHUdK0ctN6hfp44i3BUgbpiEHCVMzAZZTAkVGT9nrei7XJdIAIyvy0A/xIIC5
-	8BwSXhbyWEuYGRZBqAs/z9R7eUIb7bMbL1VKY86rPHiljmi5c7BdXsSczHK1+oCCpk3uos7
-	Ua1YFDqmoIsx9wfzp4uKdJcCpAtdjtvCI0Iy/UYgQ0KWFYXq9Hcm+/vLO/+WmzRqFBYqqpW
-	lLw8Xm0vQZ41EdXFPGuB2TaVf91gJJhk+zTEa1bzINLbtjrWwzBnOesWuaDrVxtMGufCLXs
-	IpUfN/ECzp1lbTNK/ZR9cWAxlb//L2tP1ELVRvsVMjggemOOljau9QvBigPQcAE/YDo8CpJ
-	brCyZsr5SqDYr06x8brdRJ9Mswzdt1pTjDtJrpGTvNfew5cM+2hr5rNEIExhlVPNM1dbNwj
-	w0z+l6ZfmuW1NMKDEl9nhDNUcmwcP5bEPDsiSrkCahXkwmUEhrm/MPOM7bQag+YQvByXsYR
-	A5N0txgvFjcpXQ2n5yWr2MYsVlfg7VSddYxuLCkxkXE7p91Ix/Cn3o2jVkuI9GkWBH35IWr
-	P3No4AlWnJ4rRuvOr3pbPLE5vTqDtTKAXjyBPFjYI1UZZfM589nqKowDVT6w3y963e2o61j
-	fEx7ph1uVgDoGjiWNbWh8p9nA9/5PD6DaawAwdRY1TvfAKLOq+MFtpplEI+X3cgGcUfkHkg
-	zpsw6Pr8VXLNBjsc0Qk4Tg4Y/z/36FT3mWakpBvkk0kjV+GkDnGoUUew3knqn24Ahw+WwmJ
-	AW3/NSU1zncyKX00yYeM5zb03YtoQLljN6k4=
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
-X-QQ-RECHKSPAM: 0
+MIME-Version: 1.0
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR21MB3437.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 36caf2cb-3f55-4aba-4fe0-08dd9165b187
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 May 2025 15:00:11.2338
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: rP5LzazGxLR9gCagTJfRbfur/ToJTSKmnCOmmYKTCb4Ein+ycXSEBC/eMz7YKtcdtAKWrVyq7qxWQOS4aa/Vig==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR21MB3558
 
 
 
-> 2025=E5=B9=B45=E6=9C=8812=E6=97=A5 17:19=EF=BC=8CJay Vosburgh =
-<jv@jvosburgh.net> =E5=86=99=E9=81=93=EF=BC=9A
+> -----Original Message-----
+> From: Simon Horman <horms@kernel.org>
+> Sent: Monday, May 12, 2025 10:16 AM
+> To: Haiyang Zhang <haiyangz@microsoft.com>
+> Cc: linux-hyperv@vger.kernel.org; netdev@vger.kernel.org; Dexuan Cui
+> <decui@microsoft.com>; stephen@networkplumber.org; KY Srinivasan
+> <kys@microsoft.com>; Paul Rosswurm <paulros@microsoft.com>;
+> olaf@aepfle.de; vkuznets@redhat.com; davem@davemloft.net;
+> wei.liu@kernel.org; edumazet@google.com; kuba@kernel.org;
+> pabeni@redhat.com; leon@kernel.org; Long Li <longli@microsoft.com>;
+> ssengar@linux.microsoft.com; linux-rdma@vger.kernel.org;
+> daniel@iogearbox.net; john.fastabend@gmail.com; bpf@vger.kernel.org;
+> ast@kernel.org; hawk@kernel.org; tglx@linutronix.de;
+> shradhagupta@linux.microsoft.com; andrew+netdev@lunn.ch; linux-
+> kernel@vger.kernel.org
+> Subject: [EXTERNAL] Re: [PATCH net-next,v2] net: mana: Add handler for
+> hardware servicing events
 >=20
-> Tonghao Zhang <tonghao@bamaicloud.com> wrote:
+> On Fri, May 09, 2025 at 04:16:43PM -0700, Haiyang Zhang wrote:
+> > To collaborate with hardware servicing events, upon receiving the
+> special
+> > EQE notification from the HW channel, remove the devices on this bus.
+> > Then, after a waiting period based on the device specs, rescan the
+> parent
+> > bus to recover the devices.
+> >
+> > Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
+> > ---
+> > v2:
+> > Added dev_dbg for service type as suggested by Shradha Gupta.
+> > Added driver cap bit.
+> >
+> > ---
+> >  .../net/ethernet/microsoft/mana/gdma_main.c   | 63 +++++++++++++++++++
+> >  include/net/mana/gdma.h                       | 11 +++-
+> >  2 files changed, 72 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> b/drivers/net/ethernet/microsoft/mana/gdma_main.c
 >=20
->>> 2025=E5=B9=B45=E6=9C=8811=E6=97=A5 =E4=B8=8B=E5=8D=8811:53=EF=BC=8CAnd=
-rew Lunn <andrew@lunn.ch> =E5=86=99=E9=81=93=EF=BC=9A
->>>=20
->>>> static inline bool bond_should_broadcast_neighbor(struct bonding =
-*bond,
->>>>                                                 struct sk_buff =
-*skb)
->>>> {
->>>>       if (!bond->params.broadcast_neighbor ||
->>>>           BOND_MODE(bond) !=3D BOND_MODE_8023AD)
->>>>               return false;
->>>=20
->>> I think you missed the point. You have added these two tests to =
-every
->>> packet on the fast path. And it is very likely to return false. Is
->>> bond.params.broadcast_neighbor likely to be in the cache? A cache =
-miss
->>> is expensive. Is bond.params.mode also likely to be in cache? You
->>> placed broadcast_neighbor at the end of params, so it is unlikely to
->>> be in the same cache line as bond.params.mode. So two cache misses.
->>>=20
->>> What Jay would like is that the cost on the fast path is ~0 for when
->>> this feature is not in use. Jump labels can achieve this. It inserts
->>> either a NOP or a jump instruction, which costs nearly nothing, and
->>> then uses self modifying code to swap between a NOP or a jump. You =
-can
->>> keep a global view of is any bond is using this new mode? If no, =
-this
->> No, no mode uses jump labels instead of bond.params checking.
+> ...
 >=20
-> The suggestion here is to use a jump label (static branch) to
-> essentially eliminate the overhead of the options test for the common =
-case
-> for most users, which is with broadcast_neighbor disabled.
+> > +static void mana_serv_func(struct work_struct *w)
+> > +{
+> > +	struct mana_serv_work *mns_wk =3D container_of(w, struct
+> mana_serv_work, serv_work);
+> > +	struct pci_dev *pdev =3D mns_wk->pdev;
+> > +	struct pci_bus *bus, *parent;
 >=20
-> As described below, the static branch would be tracked
-> separately from the per-bond option.
+> Please avoid lines wider than 80 columns in Networking code.  In this cas=
+e
+> I would suggest separating the declaration and initialisation of mns_wk
+> and
+> pdev.  Something like this (completely untested!):
 >=20
->>> test is eliminated. If yes, you do the test.
->> I test the lacp mode with broadcast_neighbor enabled, there is no =
-performance drop. This patch has been running in our production =
-environment for a long time. We only use this option in lacp mode, for =
-performance, the code can be modified as follows:
+> 	struct mana_serv_work *mns_wk;
+> 	struct pci_bus *bus, *parent;
+> 	struct pci_dev *pdev;
 >=20
-> How did you test this?  The performance under discussion here is
-> that branches in the packet transmit path can affect overall packet
-> transmission rates at very high rates (think in terms of small packet
-> rates at 40 Gb/sec and higher).  Bonding already has a significant
-> number of TX path branches, and we should be working to reduce that
-> number, not increase it.
->=20
->> diff --git a/drivers/net/bonding/bond_main.c =
-b/drivers/net/bonding/bond_main.c
->> index ce31445e85b6..8743bf007b7e 100644
->> --- a/drivers/net/bonding/bond_main.c
->> +++ b/drivers/net/bonding/bond_main.c
->> @@ -5330,11 +5330,12 @@ static struct slave =
-*bond_xdp_xmit_3ad_xor_slave_get(struct bonding *bond,
->>       return slaves->arr[hash % count];
->> }
->>=20
->> -static inline bool bond_should_broadcast_neighbor(struct bonding =
-*bond,
->> -                                                 struct sk_buff =
-*skb)
->> +static inline bool bond_should_broadcast_neighbor(struct sk_buff =
-*skb,
->> +                                                 struct net_device =
-*dev)
->> {
->> -       if (!bond->params.broadcast_neighbor ||
->> -           BOND_MODE(bond) !=3D BOND_MODE_8023AD)
->> +       struct bonding *bond =3D netdev_priv(dev);
->> +
->> +       if (!bond->params.broadcast_neighbor)
->>               return false;
->=20
-> Using a static branch, the above would be preceded by something
-> like:
->=20
-> if (!static_branch_unlikely(&bond_bcast_neigh_enabled))
-> return false;
->=20
-> With additional logic in the options code that enables and
-> disables broadcast_neighbor that will increment or decrement (via
-> static_branch_inc / _dec) bond_bcast_neigh_enabled as the
-> broadcast_neighbor option is enabled or disabled.  The static branch
-> becomes a fast way to ask "is any bond in the system using
-> broadcast_neighbor" at very low cost.
->=20
-> As Andrew helpfully pointed out, netfilter makes extensive use
-> of these; I'd suggest looking at the usage of something like
-> nft_trace_enabled as an example of what we're referring to.
-I got it, thanks Jay, and Andrew.
->=20
-> -J
->=20
->>       if (skb->protocol =3D=3D htons(ETH_P_ARP))
->> @@ -5408,9 +5409,6 @@ static netdev_tx_t bond_3ad_xor_xmit(struct =
-sk_buff *skb,
->>       struct bond_up_slave *slaves;
->>       struct slave *slave;
->>=20
->> -       if (bond_should_broadcast_neighbor(bond, skb))
->> -               return bond_xmit_broadcast(skb, dev);
->> -
->>       slaves =3D rcu_dereference(bond->usable_slaves);
->>       slave =3D bond_xmit_3ad_xor_slave_get(bond, skb, slaves);
->>       if (likely(slave))
->> @@ -5625,6 +5623,9 @@ static netdev_tx_t __bond_start_xmit(struct =
-sk_buff *skb, struct net_device *dev
->>       case BOND_MODE_ACTIVEBACKUP:
->>               return bond_xmit_activebackup(skb, dev);
->>       case BOND_MODE_8023AD:
->> +               if (bond_should_broadcast_neighbor(skb, dev))
->> +                       return bond_xmit_broadcast(skb, dev);
->> +               fallthrough;
->>       case BOND_MODE_XOR:
->>               return bond_3ad_xor_xmit(skb, dev);
->>       case BOND_MODE_BROADCAST:
->>>=20
->>> Andrew
->=20
-> ---
-> -Jay Vosburgh, jv@jvosburgh.net
+> 	mns_wk =3D container_of(w, struct mana_serv_work, serv_work);
+> 	pdev =3D mns_wk->pdev;
+Will update.
 
+>=20
+>=20
+> ...
+>=20
+> > @@ -400,6 +441,28 @@ static void mana_gd_process_eqe(struct gdma_queue
+> *eq)
+> >  		eq->eq.callback(eq->eq.context, eq, &event);
+> >  		break;
+> >
+> > +	case GDMA_EQE_HWC_FPGA_RECONFIG:
+> > +	case GDMA_EQE_HWC_SOCMANA_CRASH:
+> > +		dev_dbg(gc->dev, "Recv MANA service type:%d\n", type);
+> > +
+> > +		if (gc->in_service) {
+> > +			dev_info(gc->dev, "Already in service\n");
+> > +			break;
+> > +		}
+> > +
+> > +		mns_wk =3D kzalloc(sizeof(*mns_wk), GFP_ATOMIC);
+> > +		if (!mns_wk) {
+> > +			dev_err(gc->dev, "Fail to alloc mana_serv_work\n");
+>=20
+> The memory allocator will log a message on error.
+> So please don't also do so here.
 
+Will remove this.
+
+Thanks,
+- Haiyang
 
