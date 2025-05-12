@@ -1,144 +1,182 @@
-Return-Path: <netdev+bounces-189884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FE88AB44D3
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 21:21:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8867EAB44D1
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 21:21:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D08487B06B1
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 19:18:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2690189E7D0
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 19:21:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 611D2296D32;
-	Mon, 12 May 2025 19:19:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACFF1298256;
+	Mon, 12 May 2025 19:20:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HHFn25QF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f65.google.com (mail-ed1-f65.google.com [209.85.208.65])
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C3302AEFD
-	for <netdev@vger.kernel.org>; Mon, 12 May 2025 19:19:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092CF23C4E5
+	for <netdev@vger.kernel.org>; Mon, 12 May 2025 19:20:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747077552; cv=none; b=Ip9RTyELeZWHvN9VzkjRP86Bk2xAuQd3P2Q66R82Sf7RLwFb6L12oC/tTdk5nf0fIZxwUrD0sgtOzr5qYkBLc6m5QfIX/0wXYV7jIgMpe8xSzNliNTbn420jUSsHV4cJbQrfzhN67H/wsgTNiYWlfomhdCzdKhgVopYoAyb8fqM=
+	t=1747077658; cv=none; b=BDCL/I9R4W35vxtGqzKtp736wgcbZiNn+Npv8/uxq0cPWDcpPPQnHThvloX3lNNBXphKIWeR8JXHVS5MWDixslp5HZ8DUJp3ujX3TpnssNb6DdOEq3HQLlDzLJpXpMc3/cT/0v71grYwS1hPTs0ovLNfw7GwCLkUaiH6KxV+bs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747077552; c=relaxed/simple;
-	bh=o3jldYgjxLNS5kgGjKz/+cPxv+Art+Qzg470GdKD1VU=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=nmPeKU0uMhxL4v5Ff+LgD9yPC6CAD/0+a8wrBaL+QpxHh5+oxqzDRL1PeeM0AjqL8A3xUDVWarggLgdONjAdfa9ZvJRtm4mFpmS941/0i6Ar6cRPSSWNx0GOs0HNuegT4vyGm78njPhSNd+5TACfTnNNJNx3VCXNawZAraLImMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+	s=arc-20240116; t=1747077658; c=relaxed/simple;
+	bh=1Xj+dW+UpEAxDo1Rez3S+2IOwJwRzdbg88zo4Vr3eiU=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=WnneFfrVnEDF0F//Lo8HfL3LoG1c4bp+d06gSd/T/FX0wq29LosjBqm6W2J0Fct5kMXNwWcnfvWGA+PLFlBylP01Rmh0K9TOS4XOZdm852t6hSIeflwTieR6vKkZKikYl1h/7bETkuZlMGvbu0vG2SthplpUiPimmd9+6+3tDzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HHFn25QF; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f65.google.com with SMTP id 4fb4d7f45d1cf-5fcc96b6a64so5270060a12.0
-        for <netdev@vger.kernel.org>; Mon, 12 May 2025 12:19:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747077549; x=1747682349;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:cc:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7c5a88b34a6so527005985a.3
+        for <netdev@vger.kernel.org>; Mon, 12 May 2025 12:20:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747077656; x=1747682456; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oQpBJvYhQGol7pXyMwJQ5lWbtzJNjPvn7U0rGgFl8tc=;
-        b=EoeA4VAgNv0lf/Lv45VXVsaKHh/YV541wnwfY7mowknU8Kk6WJhBtoel9Z9hohVPDo
-         ZpX/C9jPq5DAMdo4p7GojPrQOW/HktWU9YqfBKSG1eWOGAO57xFMLMQKIN5MUFs3IM82
-         nj71CbuaE9/tWRy0oN6CTisQh+LWcN++heR74D8VdkYWRuteJP3T5vvqIQFl4vPf8OiL
-         GN1OF1ql26byjAzHmktuJQra/GmYt5WCYW07O+fUF3UJyjdUnRkJWbWJ6ihl6CNxEA4K
-         ZwxdoHwKd6zEFHwb8GTgNF8u85jsHDjW4lecesUswYwG+KFZwSeB9Pe/BUXEwcjjV3zp
-         Fq8g==
-X-Forwarded-Encrypted: i=1; AJvYcCUTNOzhhRF3FueYw26wKaf+iXvZw+/N9Q/bMedeuhjVzfCm9NVOamscnAPZk8kgRdkE8V4BbDc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUwTLa+L2JWIRHUOl0msSrPnFzVoU0jKKjBnA/tyL1zb2wXo/h
-	UX3kCqXxIAHa6rNWBYQYNV7CgsJjiF/8925PdA1kg7bDn6DpWFSdWXDguChlsvw=
-X-Gm-Gg: ASbGncsU/AL9q45n5QqSBmwiZ3t55GCfGEwfEKD4q5TrZX1w1hne/EukPtwo5bZA26+
-	GtF7wld1GPQYIESqbLYBIoJ91m5nfzqoBM5aKIJMo592yKt+vBwBIFs6r5Yz8UeOnvfVTptmrcl
-	zley22RPy2Lhe6THnSzmwE0epUUrmPqJPa8ZlBX/PZB4peiWW9vFK67ZMCVqRqx8IhnAJIPQ2Jw
-	EnF3wQ/d8PujNWeulIvLQMfUH1sahmAcvOt6F5nkBjxrPMTt4NJi+EUM/ec13dun5ZWMWodj+iW
-	8Oy74nUkCSP9NF3oKIgw/8ZNLbcV93lgEoZKVLA1J6ZrV8F02TwcqucQw8ahJ3LUu8NcOHBsAUn
-	Xsyg2OyVaRYpa8GegP5EIK0Mzfica
-X-Google-Smtp-Source: AGHT+IGeDrgun+0/v4Lc1Q58iX10Co76cz+bFCR1suPfkRnMipzz9L6uuagi6zSG9KNvK2igxJ1UCg==
-X-Received: by 2002:a17:907:7fa6:b0:ad2:54c5:42f0 with SMTP id a640c23a62f3a-ad254c5457dmr383667566b.11.1747077548475;
-        Mon, 12 May 2025 12:19:08 -0700 (PDT)
-Received: from [192.168.88.252] (194-212-251-179.customers.tmcz.cz. [194.212.251.179])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad2192c8bacsm652916666b.6.2025.05.12.12.19.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 May 2025 12:19:08 -0700 (PDT)
-Message-ID: <d730ef45-185c-4622-bdfe-8cd896b4d940@ovn.org>
-Date: Mon, 12 May 2025 21:19:07 +0200
+        bh=mjUyFzvHznaAqLr564GzzjYcfhQQWLiVl5ZtURQrBZ0=;
+        b=HHFn25QFKQ2pavSw3xIml7CVstPoee3S5gadps42Z8tOWfSMgA7c3SyDMIuIGMM1eA
+         6c5zwGdfmUBShz0l98oU8YCIhB1i99JBek2NI0ojeCkRs8Kt3J/Fo4QLY64E/L60kx0h
+         fnvwjaLgFH4kF3Rh1xBHO+uukmnhPJ+E7zT7FhRaDsUsQyiNIZ+1KvWxT0zJHn2vkqvk
+         FC/LvMhzdyMU2mDIUetVkwu50EnKMes8WJxriT0Owb/k4B1Z6gVWB4J/7XEGMzeHlv9C
+         gxEp8Cybzb7f3ZS5ZyXKL3i2SzMZY5reyAd76n8ggoshbOl6ftWZMaDUYkukQ9+TolAK
+         QHzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747077656; x=1747682456;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=mjUyFzvHznaAqLr564GzzjYcfhQQWLiVl5ZtURQrBZ0=;
+        b=oXrnXdVgdu5CiXYtal4QjYAbb/tPSsDY2edzDZd84wZCRgPAKWZCBERkkjKRP+V3bc
+         WdWVzl7pYC50k0bls734DjLwZvj/Dv/PAatOteVevkt1a2DlnX45Q3Dk40EPnOjc18u0
+         mdaKsoTxcZ9WXbIfhJ7BPIvqjMvJj5tPwT6wSXUOdfIgJaqn1EDQ1O16tLAShzm8YQse
+         2qDdspp2sBcFsXBkdDP4DFd/wVWn9G5I8rlMgCQGgrr8lE4Iygl3/cxPzmLDEhY9ETCb
+         7gsFMT/LiOsYakRpqOENvB37t0IqiOCiwadqPYPTh8uhvn2fJsmRUr+Jvs5M67TUc5G2
+         ZX1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXCY913aBgoD6ecUt5BiIxdnPoUhWOmNzi1Ih7EFF7kx+lItXg4JaHfrmPvbmODinzuKbl5JWc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRhDodb1EfomkPgmuZ5IaFVj83FE4AJ3YkMyX023laMwTUC67L
+	aJSYmTD5VqbG9DPDZnd5hXpmPF/oa25wxvSjcJ4llROyEAvIVW7K
+X-Gm-Gg: ASbGncvHIYhrt83HD+i5SXizZkvg6/6D4PZyzGD7uCWLdiLf+Mm/JTcESzfShWRI9y6
+	oz8/KKeihfkXV464Y1zMrRaHsGb07pXXuY2zR+KEQrwdYCHfELiHqBegBDXytkyJnuLOY5t90Oi
+	SH5eP3OfDMqXIdXx5SPrSX44oqSQRijrq5bonZ33bt/wYIoOcbNpTphvfO9SBDVgZF0VUod0/39
+	4RmTzZPKjJuuRIIDfBbBfNBrhPe9nMlsLT4WCVW8CV/XCO4rOPK0vT1T5LufF+JcQBvEntWwS2p
+	QGLTPshL5k2LgmH8SDqoDb2k8PwyxvEsv7q4ScXfeafohhxStl5Fxq7aBOChcRa7elJg2lbq8ak
+	kArxNhiTqTHcp66wES0rmMOY=
+X-Google-Smtp-Source: AGHT+IH7UKbO/biwgQ5CT99u8uBc3TLVxTCYrMLGVvFskgb9PglGdxjo3J8LVOx2ty0IGOsDPudLkQ==
+X-Received: by 2002:a05:620a:4511:b0:7c5:5fa0:4617 with SMTP id af79cd13be357-7cd0113916fmr2946461285a.40.1747077655684;
+        Mon, 12 May 2025 12:20:55 -0700 (PDT)
+Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7cd00fdc5besm588665085a.89.2025.05.12.12.20.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 May 2025 12:20:55 -0700 (PDT)
+Date: Mon, 12 May 2025 15:20:54 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemb@google.com>
+Cc: Simon Horman <horms@kernel.org>, 
+ Christian Brauner <brauner@kernel.org>, 
+ Kuniyuki Iwashima <kuniyu@amazon.com>, 
+ Kuniyuki Iwashima <kuni1840@gmail.com>, 
+ netdev@vger.kernel.org
+Message-ID: <68224a16ebe11_e985e29446@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250510015652.9931-7-kuniyu@amazon.com>
+References: <20250510015652.9931-1-kuniyu@amazon.com>
+ <20250510015652.9931-7-kuniyu@amazon.com>
+Subject: Re: [PATCH v2 net-next 6/9] af_unix: Move SOCK_PASS{CRED,PIDFD,SEC}
+ to struct sock.
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: i.maximets@ovn.org, dev@openvswitch.org, aconole@redhat.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org
-Subject: Re: [PATCH net-next v2] openvswitch: Stricter validation for the
- userspace action
-To: Eelco Chaudron <echaudro@redhat.com>, netdev@vger.kernel.org
-References: <67eb414e2d250e8408bb8afeb982deca2ff2b10b.1747037304.git.echaudro@redhat.com>
-Content-Language: en-US
-From: Ilya Maximets <i.maximets@ovn.org>
-Autocrypt: addr=i.maximets@ovn.org; keydata=
- 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
-In-Reply-To: <67eb414e2d250e8408bb8afeb982deca2ff2b10b.1747037304.git.echaudro@redhat.com>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-On 5/12/25 10:08 AM, Eelco Chaudron wrote:
-> This change enhances the robustness of validate_userspace() by ensuring
-> that all Netlink attributes are fully contained within the parent
-> attribute. The previous use of nla_parse_nested_deprecated() could
-> silently skip trailing or malformed attributes, as it stops parsing at
-> the first invalid entry.
+Kuniyuki Iwashima wrote:
+> As explained in the next patch, SO_PASSRIGHTS would have a problem
+> if we assigned a corresponding bit to socket->flags, so it must be
+> managed in struct sock.
 > 
-> By switching to nla_parse_deprecated_strict(), we make sure only fully
-> validated attributes are copied for later use.
+> Mixing socket->flags and sk->sk_flags for similar options will look
+> confusing, and sk->sk_flags does not have enough space on 32bit system.
+> 
+> Also, as mentioned in commit 16e572626961 ("af_unix: dont send
+> SCM_CREDENTIALS by default"), SOCK_PASSCRED and SOCK_PASSPID handling
+> is known to be slow, and managing the flags in struct socket cannot
+> avoid that for embryo sockets.
+> 
+> Let's move SOCK_PASS{CRED,PIDFD,SEC} to struct sock.
+> 
+> While at it, other SOCK_XXX flags in net.h are grouped as enum.
+> 
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-Just to re-iterate for anyone reading this thread, copying non-validated
-attributes is not a problem as they will be ignored during execution.
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 1ab59efbafc5..9540cbe3d83e 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -1224,19 +1224,19 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
+>  		if (!sk_may_scm_recv(sk))
+>  			return -EOPNOTSUPP;
+>  
+> -		assign_bit(SOCK_PASSSEC, &sock->flags, valbool);
+> +		sk->sk_scm_security = valbool;
 
-The change looks fine to me, thanks!
+Is it safe to switch from atomic to non-atomic updates?
 
-Acked-by: Ilya Maximets <i.maximets@ovn.org>
+Reads and writes can race. Especially given that these are bit stores, so RMW.
+
+>  		return 0;
+>  	case SO_PASSCRED:
+>  		if (!sk_may_scm_recv(sk))
+>  			return -EOPNOTSUPP;
+>  
+> -		assign_bit(SOCK_PASSCRED, &sock->flags, valbool);
+> +		sk->sk_scm_credentials = valbool;
+>  		return 0;
+>  	case SO_PASSPIDFD:
+>  		if (!sk_is_unix(sk))
+>  			return -EOPNOTSUPP;
+>  
+> -		assign_bit(SOCK_PASSPIDFD, &sock->flags, valbool);
+> +		sk->sk_scm_pidfd = valbool;
+>  		return 0;
+>  	case SO_TYPE:
+>  	case SO_PROTOCOL:
+> @@ -1865,14 +1865,14 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
+>  
+>  	case SO_PASSCRED:
+>  		if (sk_may_scm_recv(sk))
+> -			v.val = !!test_bit(SOCK_PASSCRED, &sock->flags);
+> +			v.val = sk->sk_scm_credentials;
+>  		else
+>  			v.val = 0;
+>  		break;
+>  
+>  	case SO_PASSPIDFD:
+>  		if (sk_is_unix(sk))
+> -			v.val = !!test_bit(SOCK_PASSPIDFD, &sock->flags);
+> +			v.val = sk->sk_scm_pidfd;
+>  		else
+>  			v.val = 0;
+>  		break;
+> @@ -1972,7 +1972,7 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
+>  
+>  	case SO_PASSSEC:
+>  		if (sk_may_scm_recv(sk))
+> -			v.val = !!test_bit(SOCK_PASSSEC, &sock->flags);
+> +			v.val = sk->sk_scm_security;
+>  		else
+>  			v.val = 0;
+>  		break;
 
