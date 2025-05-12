@@ -1,65 +1,80 @@
-Return-Path: <netdev+bounces-189904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189906-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E013BAB4758
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 00:36:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D126AB47B2
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 00:56:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 454D83A9081
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 22:36:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8A683B0012
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 22:56:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6F1B255F5F;
-	Mon, 12 May 2025 22:36:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B78B29A9DA;
+	Mon, 12 May 2025 22:56:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iqfTbI2Q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nlyiSpoL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C02D1186A;
-	Mon, 12 May 2025 22:36:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BBEE29A9C5;
+	Mon, 12 May 2025 22:56:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747089392; cv=none; b=BFca+ezFFwWjbOy1Y+6ErMG09EvrwBSjMOIGbRy+rnHQGNXesXC71x34FXoie5hGPNaQU9BoiyaKAfG8Dh/yWLb7508oeVGHtKX3kqdJy96hyn/UrVCcmXrL7cBVhrF4TfJe33ML1xhjWSWqvhdxD/hur2M3gz1r7zLEhbPgvQw=
+	t=1747090601; cv=none; b=bWaTrELqLItsTq/1Se2hw5cn7dGgxLNzKoeYQgvFWiSPViL10QEahS8xTo1tu3i+WmiQF0t4RiawtwW0gfFCs6JvVPA5AtgxlWQ0xVnIlBAJB6VJhbwry7ujVLzSuRac3defQn6rZICLO3QQtip7zhXiKRRFNw1rx5wipeGRWVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747089392; c=relaxed/simple;
-	bh=hNfw0UtyFv6qJKeD8A6LfhjTbW8dT4O5IgZCNGKSOOM=;
+	s=arc-20240116; t=1747090601; c=relaxed/simple;
+	bh=1s9Vf3Fkit3adzUezvQrcVB4lHl6eD+qJRdC61oFkSQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MiwRdbLwh3UwGfjDtQ9veqgK5pKVsK2Ym7Fco3tvQVSYmM3AJ3MdZz4bON/0952+UoCTtDgsVnnAnITFjwnCWb0QXeXbhV7LFepyDd+CblPPQ0lszl9TYdxq7XUOYr9FaK8LbNuedzyzAy8gjDTgD+OcSvhc4yp2AhiACils2Rc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iqfTbI2Q; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747089391; x=1778625391;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=hNfw0UtyFv6qJKeD8A6LfhjTbW8dT4O5IgZCNGKSOOM=;
-  b=iqfTbI2Q3JjtGXT/qiYXYdQ74gf3MRpcPoLlRbWgvIouUFcXiA5X+4fx
-   EK2UXRD+hgSFkD4qODWtTdkhBUQcMmGU3bb5xzfqTV0kSbbyu0qi/uQKl
-   FVg7io2UpFiHFv6zfDrR5ZSddwxajQBoAluyOW4L0bKzXEdEt1KFr5d74
-   Lkk9AkTYeGfVdlv0PnoUOToEQbWZIPbVBdha+iGFJu55Wy2Lo/fr0bF4V
-   l+3bUtnyhbFRK7FX4Lhqex2azpfZfTnNhQ0U4OM98gHEO78eh9DfWv46r
-   Dr8nPIwcZ/Qc+VxgOk9bJVIGOfKTbDnyioUy0O/cGGQItCEAltiHuKMWa
-   w==;
-X-CSE-ConnectionGUID: adK6J5Z3RoSmiv95gcHdFQ==
-X-CSE-MsgGUID: zEpThNFOTymHrHhHsvHO3A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11431"; a="66451340"
-X-IronPort-AV: E=Sophos;i="6.15,283,1739865600"; 
-   d="scan'208";a="66451340"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2025 15:36:30 -0700
-X-CSE-ConnectionGUID: Zp7DIvHMTbODE3gwGNZo4Q==
-X-CSE-MsgGUID: 4c/d15JeTje4fhpNy4rQ4g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,283,1739865600"; 
-   d="scan'208";a="168597424"
-Received: from bjrankin-mobl3.amr.corp.intel.com (HELO [10.124.220.233]) ([10.124.220.233])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2025 15:36:30 -0700
-Message-ID: <59fa7e55-f563-40f9-86aa-1873806e76cc@intel.com>
-Date: Mon, 12 May 2025 15:36:27 -0700
+	 In-Reply-To:Content-Type; b=nLJb6nFg4Wb+v4VaJkHDPxpocfZQLVIjXb3zbpKweVCo9edJivnSZKTlOyw8ZggmkKIIvTeso0Bm/aIzhcavvhy+Q96fdJuRwV+T5qvvmsaFh6DKwmstZO9PAz31cZ+G4kU6E2twZY9Yo+AKZiNuASurz1o/ZPqtdVqorMxxM9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nlyiSpoL; arc=none smtp.client-ip=209.85.210.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-72ecc30903cso2762544a34.0;
+        Mon, 12 May 2025 15:56:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747090598; x=1747695398; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JQnYHyU/oLYkT3/eFqR+0DIJ/IUt+t8l37AqbBxcuEw=;
+        b=nlyiSpoLsFwZFyjtnAd+BpDp8OrmJJJIV4ouGmEjuVGU6wTCUZBzaTSu7/WSEjKrx6
+         I2vvDWn9cU0hlF/CvuP5kH0UhwxQ8Peuvsp26YgryZC9+VdtqIIiOwyjOw14/1h1rauX
+         lOUYEhOe8N5W0nW1zcNJurY8ZJ05gsrq9B8ESkGJYoDxi36pZvhJNPfWntaY9XmmCxc2
+         ItpadFfw6o3qt4hosgjGGZVTMZ8YoXMpI0jv1gyD2zah/nB+TfxAGip2JxMn9hX3qQuO
+         bevKcvLVgk6g0CyHhopLAdGXEY9fS74iIsTCD0/pGCd0V4D0I9Qiij/tetqcgyLum+3l
+         eurw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747090598; x=1747695398;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JQnYHyU/oLYkT3/eFqR+0DIJ/IUt+t8l37AqbBxcuEw=;
+        b=UMWOrvRkxFMlBYrUr++GLRQ/h3VExto7qpCvg6OhM3Tq6WUQW0oQwZTsGziKVK6upP
+         AYtrC0J/m9UUQ5bNR7BakbWrDTIX29r4Qz7+Mfkch7P0LKZ1flcJqTffkah6+Bir+G2h
+         nsx1msUIK0u/5JZFrnS03IWYYfKD8Pw7Yawy+FtbxDQO1zSUW5jTp+edCoBm/UYwd8sz
+         +3h/jHXlxY9GrCxbpxQECtccO0I+eb8K1oMC++Lubm+NeJUVXoBHlX1Lx/vAcIo5oi/c
+         k/m5WmANSwEz7icd0KeCiu4NrBiZ2gf00OfvX1Xl2RnKoc8mhXMSwmi2c66ELKDwhuDI
+         aGDg==
+X-Forwarded-Encrypted: i=1; AJvYcCVaFbIqHq3BVk9ERpamBzzJn9sNxujKJBUZEeWRkeAZZTi8XXXMbmTpQBUHR9YGNP+ibhCWhr2dj94Nop59@vger.kernel.org, AJvYcCVnLXKX9pY1/8rr11HuR9+Dywm+3e6HRWIDmi5ptOQ5VbNr9t221hQ5tPEaCiGMHvGgg6Ol8pbNqiVk@vger.kernel.org, AJvYcCWKDUHZacrMCcWsW/CCk/4hiJxmpnZBmemXApZ/0Kz+2/pLADipiypL0TbfvXd70OeJWqcCKJo3mv/qdZPZiQ==@vger.kernel.org, AJvYcCXAYD8jPI8UPnW4l6qEYGyyTqo6uXTnGtrzkbRHlXzp4QepeOAmpjlw050WHScb/euJHhxJlcEs@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGq2rik9zYMHQTAhXcCwl/5mKwZcuweMM8JIaX/QyGQ9Sq6DA5
+	Wfm2U4Fo3+Ch9W9ChJX/1eFk6mdvMJL58SIx67h96s5pacOdql0N
+X-Gm-Gg: ASbGncuJy/HoDbymSf0lrY+rv2FRhUANia3IdMrNc2K5+IzHUcaP3ee1AHgMo4q5YCt
+	XHy9LEOJovdXvWUhZdKcMtZp0MJHmxyuXsiAqYESg/5ovU+MiOesaZX59S9eBnK50OzdCst9+r0
+	8TJsWBVYz2wJYek7l4e3z9gBTA3NHMTMUnmlYr3D6Dx7dmpcsYG0+6PoXbYG79SLX5QLfBGSww8
+	jkQ0O1x0hGfXhnbyKPHngFy19/Kz/aw964I6dqMW08ibb70bUyaWqXwGyWAiROsTSrnFsluUX7P
+	YmbGCr98OQ+6FoXGPutH6FiithzejqJqpnrkAeiOHCk3NdTwjx8f09aQPm0XfTK1fVDNAP9A2Fv
+	a4xT3AwKUusJh0g==
+X-Google-Smtp-Source: AGHT+IE39odtp4AvZWbxjsbViiNWCTwsEhcIlK8o+5Hl0Hjx72MLayBL+nVAD4vihtkwI3e3H49Ahw==
+X-Received: by 2002:a05:6830:398d:b0:72b:9965:d994 with SMTP id 46e09a7af769-73226b000camr9090654a34.23.1747090598305;
+        Mon, 12 May 2025 15:56:38 -0700 (PDT)
+Received: from [192.168.7.203] (c-98-57-15-22.hsd1.tx.comcast.net. [98.57.15.22])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-732265cd91bsm1755336a34.50.2025.05.12.15.56.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 May 2025 15:56:37 -0700 (PDT)
+Message-ID: <0c1a0dbd-fd24-40d7-bec9-c81583be1081@gmail.com>
+Date: Mon, 12 May 2025 17:56:35 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,301 +82,207 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 00/22] Type2 device basic support
-To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
- netdev@vger.kernel.org, dan.j.williams@intel.com, edward.cree@amd.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
-Cc: Alejandro Lucero <alucerop@amd.com>
-References: <20250512161055.4100442-1-alejandro.lucero-palau@amd.com>
+Subject: Re: [PATCH net-next v5 0/5] Add PCS support for Qualcomm IPQ9574 SoC
+To: Lei Wei <quic_leiwei@quicinc.com>,
+ "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, quic_kkumarcs@quicinc.com,
+ quic_suruchia@quicinc.com, quic_pavir@quicinc.com, quic_linchen@quicinc.com,
+ quic_luoj@quicinc.com, srinivas.kandagatla@linaro.org,
+ bartosz.golaszewski@linaro.org, vsmuthu@qti.qualcomm.com, john@phrozen.org,
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+References: <20250207-ipq_pcs_6-14_rc1-v5-0-be2ebec32921@quicinc.com>
+ <20250211195934.47943371@kernel.org> <Z6x1xD0krK0_eycB@shell.armlinux.org.uk>
+ <71a69eb6-9e24-48ab-8301-93ec3ff43cc7@quicinc.com>
 Content-Language: en-US
-From: Dave Jiang <dave.jiang@intel.com>
-In-Reply-To: <20250512161055.4100442-1-alejandro.lucero-palau@amd.com>
-Content-Type: text/plain; charset=UTF-8
+From: mr.nuke.me@gmail.com
+In-Reply-To: <71a69eb6-9e24-48ab-8301-93ec3ff43cc7@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+On 2/19/25 4:46 AM, Lei Wei wrote:
+> 
+> On 2/12/2025 6:19 PM, Russell King (Oracle) wrote:
+>> On Tue, Feb 11, 2025 at 07:59:34PM -0800, Jakub Kicinski wrote:
+>>> On Fri, 7 Feb 2025 23:53:11 +0800 Lei Wei wrote:
+>>>> The 'UNIPHY' PCS block in the Qualcomm IPQ9574 SoC provides Ethernet
+>>>> PCS and SerDes functions. It supports 1Gbps mode PCS and 10-Gigabit
+>>>> mode PCS (XPCS) functions, and supports various interface modes for
+>>>> the connectivity between the Ethernet MAC and the external PHYs/Switch.
+>>>> There are three UNIPHY (PCS) instances in IPQ9574, supporting the six
+>>>> Ethernet ports.
+>>>>
+>>>> This patch series adds base driver support for initializing the PCS,
+>>>> and PCS phylink ops for managing the PCS modes/states. Support for
+>>>> SGMII/QSGMII (PCS) and USXGMII (XPCS) modes is being added initially.
+>>>>
+>>>> The Ethernet driver which handles the MAC operations will create the
+>>>> PCS instances and phylink for the MAC, by utilizing the API exported
+>>>> by this driver.
+>>>>
+>>>> While support is being added initially for IPQ9574, the driver is
+>>>> expected to be easily extendable later for other SoCs in the IPQ
+>>>> family such as IPQ5332.
+>>>
+>>> Could someone with PHY, or even, dare I say, phylink expertise
+>>> take a look here?
+>>
+>> I've not had the time, sorry. Looking at it now, I have lots of
+>> questions over this.
+>>
+>> 1) clocks.
+>>
+>> - Patch 2 provides clocks from this driver which are exported to the
+>>    NSCCC block that are then used to provide the MII clocks.
+>> - Patch 3 consumes clocks from the NSCCC block for use with each PCS.
+>>
+>> Surely this leads to a circular dependency, where the MSCCC driver
+>> can't get the clocks it needs until this driver has initialised, but
+>> this driver can't get the clocks it needs for each PCS from the NSCCC
+>> because the MSCCC driver needs this driver to initialise.
+>>
+> 
+> Sorry for the delay in response. Below is a description of the 
+> dependencies between the PCS/NSSCC drivers during initialization time 
+> and how the clock relationships are set up. Based on this, there should 
+> not any issue due to circular dependency, but please let me know if any 
+> improvement is possible here given the hardware clock dependency. The 
+> module loading order is as follows:
+> 
+> Step 1.) NSCC driver module
+> Step 2.) PCS driver module
+> Step 3.) Ethernet driver module
+> 
+> The 'UNIPHY' PCS clocks (from Serdes to NSSCC) are not needed to be 
+> available at the time of registration of PCS MII clocks (NSSCC to PCS 
+> MII) by the NSSCC driver (Step 1). The PCS MII clocks is registered 
+> before 'UNIPHY' PCS clock is registered, since by default the parent is 
+> initialized to 'xo' clock. Below is the output of clock tree on the 
+> board before the PCS driver is loaded.
+> 
+> xo-board-clk
+>      nss_cc_port1_rx_clk_src
+>          nss_cc_port1_rx_div_clk_src
+>              nss_cc_uniphy_port1_rx_clk
+>              nss_cc_port1_rx_clk
+> 
+> The 'UNIPHY' PCS clock is later configured as a parent to the PCS MII 
+> clock at the time when the Ethernet and PCS drivers are enabled (step3) 
+> and the MAC links up. At link up time, the NSSCC driver sets the NSSCC 
+> port clock rate (by configuring the divider) based on the link speed, 
+> during which time the NSSCC port clock's parent is switched to 'UNIPHY' 
+> PCS clock. Below is the clock tree dump after this step.
+> 
+> 7a00000.ethernet-pcs::rx_clk
+>      nss_cc_port1_rx_clk_src
+>          nss_cc_port1_rx_div_clk_src
+>              nss_cc_uniphy_port1_rx_clk
+>              nss_cc_port1_rx_clk
+> 
+
+I tried this PCS driver, and I am seeing a circular dependency in the 
+clock init. If the clock tree is:
+     GCC -> NSSCC -> PCS(uniphy) -> NSSCC -> PCS(mii)
+
+The way I understand it, the UNIPHY probe depends on the MII probe. If 
+MII .probe() returns -EPROBE_DEFER, then so will the UNIPHY .probe(). 
+But the MII cannot probe until the UNIPHY is done, due to the clock 
+dependency. How is it supposed to work?
+
+The way I found to resolve this is to move the probing of the MII clocks 
+to ipq_pcs_get().
+
+This is the kernel log that I see:
+
+[   12.008754] platform 39b00000.clock-controller: deferred probe 
+pending: platform: supplier 7a00000.ethernet-pcs not ready
+[   12.008788] mdio_bus 90000.mdio-1:18: deferred probe pending: 
+mdio_bus: supplier 7a20000.ethernet-pcs not ready
+[   12.018704] mdio_bus 90000.mdio-1:00: deferred probe pending: 
+mdio_bus: supplier 90000.mdio-1:18 not ready
+[   12.028588] mdio_bus 90000.mdio-1:01: deferred probe pending: 
+mdio_bus: supplier 90000.mdio-1:18 not ready
+[   12.038310] mdio_bus 90000.mdio-1:02: deferred probe pending: 
+mdio_bus: supplier 90000.mdio-1:18 not ready
+[   12.047943] mdio_bus 90000.mdio-1:03: deferred probe pending: 
+mdio_bus: supplier 90000.mdio-1:18 not ready
+[   12.057579] platform 7a00000.ethernet-pcs: deferred probe pending: 
+ipq9574_pcs: Failed to get MII 0 RX clock
+[   12.067209] platform 7a20000.ethernet-pcs: deferred probe pending: 
+ipq9574_pcs: Failed to get MII 0 RX clock
+[   12.077200] platform 3a000000.qcom-ppe: deferred probe pending: 
+platform: supplier 39b00000.clock-controller not ready
 
 
-On 5/12/25 9:10 AM, alejandro.lucero-palau@amd.com wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
-> 
-> v15 changes:
->  - remove reference to unused header file (Jonathan Cameron)
->  - add proper kernel docs to exported functions (Alison Schofield)
->  - using an array to map the enums to strings (Alison Schofield)
->  - clarify comment when using bitmap_subset (Jonathan Cameron)
->  - specify link to type2 support in all patches (Alison Schofield)
-> 
->   Patches changed (minor): 4, 11
->
+PHY:
+&mdio {
+	qca8k_nsscc: clock-controller@18 {
+		compatible = "qcom,qca8084-nsscc";
+		...
+	};
 
-Hi Alejandro,
-Tried to pull this series using b4. Noticed couple things.
-1. Can you run checkpatch on the entire series and fix any issues?
-2. Can you rebase against v6.15-rc4? I think there are some conflicts against the fixes went in rc4.
+	ethernet-phy-package@0 {
+		compatible = "qcom,qca8084-package";
+		...
 
-Thanks!
- 
-> v14 changes:
->  - static null initialization of bitmaps (Jonathan Cameron)
->  - Fixing cxl tests (Alison Schofield)
->  - Fixing robot compilation problems
-> 
->   Patches changed (minor): 1, 4, 6, 13
-> 
-> v13 changes:
->  - using names for headers checking more consistent (Jonathan Cameron)
->  - using helper for caps bit setting (Jonathan Cameron)
->  - provide generic function for reporting missing capabilities (Jonathan Cameron)
->  - rename cxl_pci_setup_memdev_regs to cxl_pci_accel_setup_memdev_regs (Jonathan Cameron)
->  - cxl_dpa_info size to be set by the Type2 driver (Jonathan Cameron)
->  - avoiding rc variable when possible (Jonathan Cameron)
->  - fix spelling (Simon Horman)
->  - use scoped_guard (Dave Jiang)
->  - use enum instead of bool (Dave Jiang)
->  - dropping patch with hardware symbols
->  
-> v12 changes:
->  - use new macro cxl_dev_state_create in pci driver (Ben Cheatham)
->  - add public/private sections in now exported cxl_dev_state struct (Ben
->    Cheatham)
->  - fix cxl/pci.h regarding file name for checking if defined
->  - Clarify capabilities found vs expected in error message. (Ben
->    Cheatham)
->  - Clarify new CXL_DECODER_F flag (Ben Cheatham)
->  - Fix changes about cxl memdev creation support moving code to the
->    proper patch. (Ben Cheatham)
->  - Avoid debug and function duplications (Ben Cheatham)
->  - Fix robot compilation error reported by Simon Horman as well.
->  - Add doc about new param in clx_create_region (Simon Horman).
-> 
-> v11 changes:
->  - Dropping the use of cxl_memdev_state and going back to using
->    cxl_dev_state.
->  - Using a helper for an accel driver to allocate its own cxl-related
->    struct embedding cxl_dev_state.
->  - Exporting the required structs in include/cxl/cxl.h for an accel
->    driver being able to know the cxl_dev_state size required in the
->    previously mentioned helper for allocation.
->  - Avoid using any struct for dpa initialization by the accel driver
->    adding a specific function for creating dpa partitions by accel
->    drivers without a mailbox.
-> 
-> v10 changes:
->  - Using cxl_memdev_state instead of cxl_dev_state for type2 which has a
->    memory after all and facilitates the setup.
->  - Adapt core for using cxl_memdev_state allowing accel drivers to work
->    with them without further awareness of internal cxl structs.
->  - Using last DPA changes for creating DPA partitions with accel driver
->    hardcoding mds values when no mailbox.
->  - capabilities not a new field but built up when current register maps
->    is performed and returned to the caller for checking.
->  - HPA free space supporting interleaving.
->  - DPA free space droping max-min for a simple alloc size.
-> 
-> v9 changes:
->  - adding forward definitions (Jonathan Cameron)
->  - using set_bit instead of bitmap_set (Jonathan Cameron)
->  - fix rebase problem (Jonathan Cameron)
->  - Improve error path (Jonathan Cameron)
->  - fix build problems with cxl region dependency (robot)
->  - fix error path (Simon Horman)
-> 
-> v8 changes:
->  - Change error path labeling inside sfc cxl code (Edward Cree)
->  - Properly handling checks and error in sfc cxl code (Simon Horman)
->  - Fix bug when checking resource_size (Simon Horman)
->  - Avoid bisect problems reordering patches (Edward Cree)
->  - Fix buffer allocation size in sfc (Simon Horman)
-> 
-> v7 changes:
-> 
->  - fixing kernel test robot complains
->  - fix type with Type3 mandatory capabilities (Zhi Wang)
->  - optimize code in cxl_request_resource (Kalesh Anakkur Purayil)
->  - add sanity check when dealing with resources arithmetics (Fan Ni)
->  - fix typos and blank lines (Fan Ni)
->  - keep previous log errors/warnings in sfc driver (Martin Habets)
->  - add WARN_ON_ONCE if region given is NULL
-> 
-> v6 changes:
-> 
->  - update sfc mcdi_pcol.h with full hardware changes most not related to 
->    this patchset. This is an automatic file created from hardware design
->    changes and not touched by software. It is updated from time to time
->    and it required update for the sfc driver CXL support.
->  - remove CXL capabilities definitions not used by the patchset or
->    previous kernel code. (Dave Jiang, Jonathan Cameron)
->  - Use bitmap_subset instead of reinventing the wheel ... (Ben Cheatham)
->  - Use cxl_accel_memdev for new device_type created (Ben Cheatham)
->  - Fix construct_region use of rwsem (Zhi Wang)
->  - Obtain region range instead of region params (Allison Schofield, Dave
->    Jiang)
-> 
-> v5 changes:
-> 
->  - Fix SFC configuration based on kernel CXL configuration
->  - Add subset check for capabilities.
->  - fix region creation when HDM decoders programmed by firmware/BIOS (Ben
->    Cheatham)
->  - Add option for creating dax region based on driver decission (Ben
->    Cheatham)
->  - Using sfc probe_data struct for keeping sfc cxl data
-> 
-> v4 changes:
->   
->  - Use bitmap for capabilities new field (Jonathan Cameron)
-> 
->  - Use cxl_mem attributes for sysfs based on device type (Dave Jian)
-> 
->  - Add conditional cxl sfc compilation relying on kernel CXL config (kernel test robot)
-> 
->  - Add sfc changes in different patches for facilitating backport (Jonathan Cameron)
-> 
->  - Remove patch for dealing with cxl modules dependencies and using sfc kconfig plus
->    MODULE_SOFTDEP instead.
-> 
-> v3 changes:
-> 
->  - cxl_dev_state not defined as opaque but only manipulated by accel drivers
->    through accessors.
-> 
->  - accessors names not identified as only for accel drivers.
-> 
->  - move pci code from pci driver (drivers/cxl/pci.c) to generic pci code
->    (drivers/cxl/core/pci.c).
-> 
->  - capabilities field from u8 to u32 and initialised by CXL regs discovering
->    code.
-> 
->  - add capabilities check and removing current check by CXL regs discovering
->    code.
-> 
->  - Not fail if CXL Device Registers not found. Not mandatory for Type2.
-> 
->  - add timeout in acquire_endpoint for solving a race with the endpoint port
->    creation.
-> 
->  - handle EPROBE_DEFER by sfc driver.
-> 
->  - Limiting interleave ways to 1 for accel driver HPA/DPA requests.
-> 
->  - factoring out interleave ways and granularity helpers from type2 region
->    creation patch.
-> 
->  - restricting region_creation for type2 to one endpoint decoder.
-> 
->  - add accessor for release_resource.
-> 
->  - handle errors and errors messages properly.
-> 
-> 
-> v2 changes:
-> 
-> I have removed the introduction about the concerns with BIOS/UEFI after the
-> discussion leading to confirm the need of the functionality implemented, at
-> least is some scenarios.
-> 
-> There are two main changes from the RFC:
-> 
-> 1) Following concerns about drivers using CXL core without restrictions, the CXL
-> struct to work with is opaque to those drivers, therefore functions are
-> implemented for modifying or reading those structs indirectly.
-> 
-> 2) The driver for using the added functionality is not a test driver but a real
-> one: the SFC ethernet network driver. It uses the CXL region mapped for PIO
-> buffers instead of regions inside PCIe BARs.
-> 
-> 
-> 
-> RFC:
-> 
-> Current CXL kernel code is focused on supporting Type3 CXL devices, aka memory
-> expanders. Type2 CXL devices, aka device accelerators, share some functionalities
-> but require some special handling.
-> 
-> First of all, Type2 are by definition specific to drivers doing something and not just
-> a memory expander, so it is expected to work with the CXL specifics. This implies the CXL
-> setup needs to be done by such a driver instead of by a generic CXL PCI driver
-> as for memory expanders. Most of such setup needs to use current CXL core code
-> and therefore needs to be accessible to those vendor drivers. This is accomplished
-> exporting opaque CXL structs and adding and exporting functions for working with
-> those structs indirectly.
-> 
-> Some of the patches are based on a patchset sent by Dan Williams [1] which was just
-> partially integrated, most related to making things ready for Type2 but none
-> related to specific Type2 support. Those patches based on Dan´s work have Dan´s
-> signing as co-developer, and a link to the original patch.
-> 
-> A final note about CXL.cache is needed. This patchset does not cover it at all,
-> although the emulated Type2 device advertises it. From the kernel point of view
-> supporting CXL.cache will imply to be sure the CXL path supports what the Type2
-> device needs. A device accelerator will likely be connected to a Root Switch,
-> but other configurations can not be discarded. Therefore the kernel will need to
-> check not just HPA, DPA, interleave and granularity, but also the available
-> CXL.cache support and resources in each switch in the CXL path to the Type2
-> device. I expect to contribute to this support in the following months, and
-> it would be good to discuss about it when possible.
-> 
-> [1] https://lore.kernel.org/linux-cxl/98b1f61a-e6c2-71d4-c368-50d958501b0c@intel.com/T/
-> 
-> Alejandro Lucero (22):
->   cxl: Add type2 device basic support
->   sfc: add cxl support
->   cxl: Move pci generic code
->   cxl: Move register/capability check to driver
->   cxl: Add function for type2 cxl regs setup
->   sfc: make regs setup with checking and set media ready
->   cxl: Support dpa initialization without a mailbox
->   sfc: initialize dpa
->   cxl: Prepare memdev creation for type2
->   sfc: create type2 cxl memdev
->   cxl: Define a driver interface for HPA free space enumeration
->   sfc: obtain root decoder with enough HPA free space
->   cxl: Define a driver interface for DPA allocation
->   sfc: get endpoint decoder
->   cxl: Make region type based on endpoint type
->   cxl/region: Factor out interleave ways setup
->   cxl/region: Factor out interleave granularity setup
->   cxl: Allow region creation by type2 drivers
->   cxl: Add region flag for precluding a device memory to be used for dax
->   sfc: create cxl region
->   cxl: Add function for obtaining region range
->   sfc: support pio mapping based on cxl
-> 
->  drivers/cxl/core/core.h               |   2 +
->  drivers/cxl/core/hdm.c                |  86 +++++
->  drivers/cxl/core/mbox.c               |  37 ++-
->  drivers/cxl/core/memdev.c             |  47 ++-
->  drivers/cxl/core/pci.c                | 162 ++++++++++
->  drivers/cxl/core/port.c               |   8 +-
->  drivers/cxl/core/region.c             | 433 +++++++++++++++++++++++---
->  drivers/cxl/core/regs.c               |  40 ++-
->  drivers/cxl/cxl.h                     | 111 +------
->  drivers/cxl/cxlmem.h                  | 103 +-----
->  drivers/cxl/cxlpci.h                  |  23 +-
->  drivers/cxl/mem.c                     |  25 +-
->  drivers/cxl/pci.c                     | 111 ++-----
->  drivers/cxl/port.c                    |   5 +-
->  drivers/net/ethernet/sfc/Kconfig      |  10 +
->  drivers/net/ethernet/sfc/Makefile     |   1 +
->  drivers/net/ethernet/sfc/ef10.c       |  50 ++-
->  drivers/net/ethernet/sfc/efx.c        |  15 +-
->  drivers/net/ethernet/sfc/efx_cxl.c    | 159 ++++++++++
->  drivers/net/ethernet/sfc/efx_cxl.h    |  40 +++
->  drivers/net/ethernet/sfc/net_driver.h |  12 +
->  drivers/net/ethernet/sfc/nic.h        |   3 +
->  include/cxl/cxl.h                     | 292 +++++++++++++++++
->  include/cxl/pci.h                     |  36 +++
->  tools/testing/cxl/Kbuild              |   1 -
->  tools/testing/cxl/test/mem.c          |   3 +-
->  tools/testing/cxl/test/mock.c         |  17 -
->  27 files changed, 1415 insertions(+), 417 deletions(-)
->  create mode 100644 drivers/net/ethernet/sfc/efx_cxl.c
->  create mode 100644 drivers/net/ethernet/sfc/efx_cxl.h
->  create mode 100644 include/cxl/cxl.h
->  create mode 100644 include/cxl/pci.h
-> 
-> 
-> base-commit: a223ce195741ca4f1a0e1a44f3e75ce5662b6c06
+		qca8084_0: ethernet-phy@0 {
+			compatible = "ethernet-phy-id004d.d180";
+			reg = <0>;
+			clocks = <&qca8k_nsscc NSS_CC_GEPHY0_SYS_CLK>;
+			resets = <&qca8k_nsscc NSS_CC_GEPHY0_SYS_ARES>;
+		};
+		qca8084_1: ethernet-phy@1 {
+			compatible = "ethernet-phy-id004d.d180";
+			reg = <1>;
+			clocks = <&qca8k_nsscc NSS_CC_GEPHY1_SYS_CLK>;
+			resets = <&qca8k_nsscc NSS_CC_GEPHY1_SYS_ARES>;
+		};
+		qca8084_2: ethernet-phy@2 {
+			compatible = "ethernet-phy-id004d.d180";
+			reg = <2>;
+			clocks = <&qca8k_nsscc NSS_CC_GEPHY2_SYS_CLK>;
+			resets = <&qca8k_nsscc NSS_CC_GEPHY2_SYS_ARES>;
+		};
+		qca8084_3: ethernet-phy@3 {
+			compatible = "ethernet-phy-id004d.d180";
+			reg = <3>;
+			clocks = <&qca8k_nsscc NSS_CC_GEPHY3_SYS_CLK>;
+			resets = <&qca8k_nsscc NSS_CC_GEPHY3_SYS_ARES>;
+		};
+	};
 
+	qca8081_12: ethernet-phy@12 {
+		reset-gpios = <&tlmm 36 GPIO_ACTIVE_LOW>;
+		reg = <12>;
+	};
+
+PCS:
+	pcs_uniphy0: ethernet-pcs@7a00000 {
+		compatible = "qcom,ipq9574-pcs";
+		...
+		pcsuniphy0_ch0: pcs-mii@0 {
+			reg = <0>;
+			clocks = <&nsscc NSS_CC_UNIPHY_PORT1_RX_CLK>,
+				 <&nsscc NSS_CC_UNIPHY_PORT1_TX_CLK>;
+			clock-names = "rx",
+				      "tx";
+		};
+		...
+
+MAC:
+		port@1 {
+			reg = <1>;
+			phy-mode = "usxgmii";
+			managed = "in-band-status";
+			phy-handle = <&qca8084_0>;
+			pcs-handle = <&pcsuniphy0_ch0>;
+			...
+		};
 
