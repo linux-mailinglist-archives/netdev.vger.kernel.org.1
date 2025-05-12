@@ -1,151 +1,180 @@
-Return-Path: <netdev+bounces-189773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECDA8AB3A40
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 16:16:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 897E2AB3A52
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 16:20:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67A8917C75E
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 14:16:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEF3D189D408
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 14:21:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00A6F1EDA12;
-	Mon, 12 May 2025 14:15:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 603BA21517C;
+	Mon, 12 May 2025 14:20:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k8djEoCP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gx4iblAG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC7E91E505;
-	Mon, 12 May 2025 14:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF32E215181
+	for <netdev@vger.kernel.org>; Mon, 12 May 2025 14:20:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747059354; cv=none; b=uhonIVZLbqSrQEAwroBwT1ldu4wrabkxdvXeSjVtYZybK3AFOMr2a8Nci7Rg3ptqn9Xx3pUqrJoECGzQ1ZgnJLHXhj9Neu3Z5yJQItj7K2+58M1CGqb7zhaUsHkqnjQke+uf8qcgHzDiwQ1gy0ZjBj+OZAX3t2manY6A96QuYBA=
+	t=1747059650; cv=none; b=rg2N9dSXJiP2oqgk8gWR+Zt3+YNQazcFL+x4Kujp/2arroHeGnqLqDBOe2uylnCgj7vIcNTfJHGEEykm1qvS+oNZqDLSD8PQ9pCKt3LI9goSK0n3mZEkTV3A6iIltGCkw5zxCw9tC1bnqCKB00S0tsPZf0VulyS+lds3Wp3sdGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747059354; c=relaxed/simple;
-	bh=MEHGyJSZV6ZmVvbm4C4hI9TFH3oY2U0jBbfKq+YT31I=;
+	s=arc-20240116; t=1747059650; c=relaxed/simple;
+	bh=SfQtLLV5Xv6SefUlfYM5OvYPQt5ibmnTST2aljjwdTs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C4QHtIWcYNjDfBWQWdSsNq0vY15cJCVDSkM7MRtpN4SEF6cTY2zRvf2zV5ZXnDP7Hj3eHCz29NDiYgjQ2gL4WKQL+8n72e4czrwf/WgeEw8xuyTghNSN9aMmT7wXDLn04Z/+NzjZAGyVVkoM2qQXtNG1a6bt/dafujZWkazZbQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k8djEoCP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97AACC4CEEF;
-	Mon, 12 May 2025 14:15:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747059353;
-	bh=MEHGyJSZV6ZmVvbm4C4hI9TFH3oY2U0jBbfKq+YT31I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=k8djEoCPjVGyQx42aTZVSbqgQDZkJ/Bj5aRHJUHgLcQd/mnl/eY5cWr5F1P4swDmb
-	 lzG6JLGZU0Ux1ZZs5sjKcv5w4aTYiilPh5dzD717eImtSkvgPEpRmCKwi9n93zKQV0
-	 UKaX8fY2iUpJgoVN7Qf78dmv80A95BDTKkzqIE5TXbeFEh/O+sRPUc6YO8UxSq4o8n
-	 SlQne8XGIR0WeijFfGryo85ElqzfZXctr8HKG1FebB3u6NGhfAhjEefVEI01K1wp9R
-	 VMQDo7Zvn7Kd7dGauwJtfURxUSALzYzHGi5P79HmdlQAgQRlKnLZ30P6zhm0cKOiW1
-	 9mLZbKqtKN/CA==
-Date: Mon, 12 May 2025 15:15:46 +0100
-From: Simon Horman <horms@kernel.org>
-To: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	decui@microsoft.com, stephen@networkplumber.org, kys@microsoft.com,
-	paulros@microsoft.com, olaf@aepfle.de, vkuznets@redhat.com,
-	davem@davemloft.net, wei.liu@kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, leon@kernel.org,
-	longli@microsoft.com, ssengar@linux.microsoft.com,
-	linux-rdma@vger.kernel.org, daniel@iogearbox.net,
-	john.fastabend@gmail.com, bpf@vger.kernel.org, ast@kernel.org,
-	hawk@kernel.org, tglx@linutronix.de,
-	shradhagupta@linux.microsoft.com, andrew+netdev@lunn.ch,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next,v2] net: mana: Add handler for hardware
- servicing events
-Message-ID: <20250512141546.GI3339421@horms.kernel.org>
-References: <1746832603-4340-1-git-send-email-haiyangz@microsoft.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=RZFiNwwO83B9Wr/YdGFq3o//3R2IDQMJb/0wL75q/j7jAPQHQpCqYMNloRry1T6rKO43gYTtZpFHkbtdKsSrWeiBWVTgVdfMtURCjXq12xWv+CqxSCofnVTbzqI4rpyCV5X5hJvjxnCIyuDGVCccHuVBsMy8yrD/FRDiEpOFJbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gx4iblAG; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-736c277331eso4794414b3a.1
+        for <netdev@vger.kernel.org>; Mon, 12 May 2025 07:20:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747059648; x=1747664448; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vEb9RKouaYUUh89Uq5bdAUEgyRZ+BB48LykVGqfnado=;
+        b=gx4iblAGThLkeIirSayolUVRiuSr/92ahytvTG1m1Jlr0JNQbajYBKX8s+znZUtaAE
+         mGiJWUB+s7lJTHBEkHODMu+e7tdileVZedpM8VYfoc+xf6aTE1F5kTpSw/8YGxAkQY2S
+         FfTzEPOqt8sSl1/xVNC/A2BxLHBmTqlrC+WZNu/cDMNz9YQL2MWP5eIp19UctxpLuUaf
+         o6NKWPRN9SUaJX3O0kKpF2XFWTSQR9hkKDa4Bnu3x4lVofY2HouC+EMDtsVCE6TC1miH
+         ehBiV4j9/otaWa5jhp10CrLTbizWow5jO766huAHMli36W97lRS9I6/aXkqVxiOqhsJu
+         lSxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747059648; x=1747664448;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vEb9RKouaYUUh89Uq5bdAUEgyRZ+BB48LykVGqfnado=;
+        b=p6tnfafgArTikiVXvzLvHlFt7YEA8OlpQEOApDzDLl0K+OZ/j8T6N9Kqts0b+nTbq4
+         juulYkCdKGtN+E/kqdlKTjSxHcJEx/ChU+6h7hRaaS6d2AGqzZV3XwJB8CcmwW5OLpCT
+         LM+JDBhDAdgT4hM+UAGXtuVbxrZ/dImo3KqfM8CZXpQwZvX9fawazVawMjwnFL+y884q
+         6YICvyy1O6zi72cOetB4Tqo0bnPKbwJCXQXuC6lMFv4qLnkjh/ZhvEQc7+6aU1WxKVBG
+         ujFjvomrGr0+WuXi7fv+T6L0iXilprFwQ2/UgKd+jTiwPiIZzVEiGiuOpBcjEA95dujA
+         +akw==
+X-Forwarded-Encrypted: i=1; AJvYcCUSmGanALX+KoTghwgNyYoDL9aeqxpAJv1JRT/pu0Y3VnJ2UslFpFjrXHLWfKUvpCojHKFW85o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyovUx35QibAwo5OFsxdpbowyiZQbgQGFMoSur2EWZKtyjrK2pz
+	/mSuF/Zjk5do27Q+QQFG0KjV5DnzjsEGZSLTM8jHrNbVDf9FkPgJCBaV
+X-Gm-Gg: ASbGncvPgnH1jn2z8i6XSz5ATtR6W//87avEgk3N16awZYtpgO9VyF6dVL3s7ZWILHO
+	vnq25ey0Q3Uy8WQcv08cR43Btfxp0cpkQQm41sZkZ/VCpGbBE8T4xe01w/8RhG4hDTnOPs/b85Y
+	F+EOyccC54mC/TSNaic2LpI4hF44asuaQQFhutWU2i1qvFPbrvhNUGuiZr5QQRqhy/ZTg5YMxda
+	jo9KHkqIFQWGZyzE5xaM/dbh9fGtIUfs7MlRqK2kA2TJOsMxtFVHR3FKr8WYEp7OQS78qYBk5+b
+	72GhNh5YzXqNUcvEGsd3+epXSV01ZY+HAHM71DowSbXquhrnx+PC7YV3rwNPDwgsD9Aee4Gmudf
+	lB2kczr8cejGVVnKIIcFxEo0=
+X-Google-Smtp-Source: AGHT+IGx0Pa9zKIcPTvNUkSQUu0+zse4WaYDRLfr9YhrclGYhp91O8uu/S21+M6dE+kAuqox08QzCQ==
+X-Received: by 2002:a05:6a20:111f:b0:215:d41d:9183 with SMTP id adf61e73a8af0-215d41d9208mr5238115637.1.1747059647752;
+        Mon, 12 May 2025 07:20:47 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-74237a8f4bcsm6029217b3a.159.2025.05.12.07.20.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 May 2025 07:20:47 -0700 (PDT)
+Date: Mon, 12 May 2025 07:20:46 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
+	pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com,
+	sdf@fomichev.me, Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Subject: Re: [PATCH net] bnxt_en: bring back rtnl_lock() in
+ bnxt_fw_reset_task()
+Message-ID: <aCIDvir-w1qBQo3m@mini-arch>
+References: <20250512063755.2649126-1-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1746832603-4340-1-git-send-email-haiyangz@microsoft.com>
+In-Reply-To: <20250512063755.2649126-1-michael.chan@broadcom.com>
 
-On Fri, May 09, 2025 at 04:16:43PM -0700, Haiyang Zhang wrote:
-> To collaborate with hardware servicing events, upon receiving the special
-> EQE notification from the HW channel, remove the devices on this bus.
-> Then, after a waiting period based on the device specs, rescan the parent
-> bus to recover the devices.
+On 05/11, Michael Chan wrote:
+> RTNL assertion failed in netif_set_real_num_tx_queues() in the
+> error recovery path:
 > 
-> Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
+> RTNL: assertion failed at net/core/dev.c (3178)
+> WARNING: CPU: 3 PID: 3392 at net/core/dev.c:3178 netif_set_real_num_tx_queues+0x1fd/0x210
+> 
+> Call Trace:
+>  <TASK>
+>  ? __pfx_bnxt_msix+0x10/0x10 [bnxt_en]
+>  __bnxt_open_nic+0x1ef/0xb20 [bnxt_en]
+>  bnxt_open+0xda/0x130 [bnxt_en]
+>  bnxt_fw_reset_task+0x21f/0x780 [bnxt_en]
+>  process_scheduled_works+0x9d/0x400
+> 
+> Bring back the rtnl_lock() for now in bnxt_fw_reset_task().
+> 
+> Fixes: 004b5008016a ("eth: bnxt: remove most dependencies on RTNL")
+> Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+> Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 > ---
-> v2: 
-> Added dev_dbg for service type as suggested by Shradha Gupta.
-> Added driver cap bit.
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 > 
-> ---
->  .../net/ethernet/microsoft/mana/gdma_main.c   | 63 +++++++++++++++++++
->  include/net/mana/gdma.h                       | 11 +++-
->  2 files changed, 72 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-
-...
-
-> +static void mana_serv_func(struct work_struct *w)
-> +{
-> +	struct mana_serv_work *mns_wk = container_of(w, struct mana_serv_work, serv_work);
-> +	struct pci_dev *pdev = mns_wk->pdev;
-> +	struct pci_bus *bus, *parent;
-
-Please avoid lines wider than 80 columns in Networking code.  In this case
-I would suggest separating the declaration and initialisation of mns_wk and
-pdev.  Something like this (completely untested!):
-
-	struct mana_serv_work *mns_wk;
-	struct pci_bus *bus, *parent;
-	struct pci_dev *pdev;
-
-	mns_wk = container_of(w, struct mana_serv_work, serv_work);
-	pdev = mns_wk->pdev;
-
-
-...
-
-> @@ -400,6 +441,28 @@ static void mana_gd_process_eqe(struct gdma_queue *eq)
->  		eq->eq.callback(eq->eq.context, eq, &event);
->  		break;
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> index 86a5de44b6f3..8df602663e0d 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> @@ -14960,15 +14960,17 @@ static void bnxt_fw_reset_task(struct work_struct *work)
+>  		bp->fw_reset_state = BNXT_FW_RESET_STATE_OPENING;
+>  		fallthrough;
+>  	case BNXT_FW_RESET_STATE_OPENING:
+> -		while (!netdev_trylock(bp->dev)) {
+> +		while (!rtnl_trylock()) {
+>  			bnxt_queue_fw_reset_work(bp, HZ / 10);
+>  			return;
+>  		}
+> +		netdev_lock(bp->dev);
+>  		rc = bnxt_open(bp->dev);
+>  		if (rc) {
+>  			netdev_err(bp->dev, "bnxt_open() failed during FW reset\n");
+>  			bnxt_fw_reset_abort(bp, rc);
+>  			netdev_unlock(bp->dev);
+> +			rtnl_unlock();
+>  			goto ulp_start;
+>  		}
 >  
-> +	case GDMA_EQE_HWC_FPGA_RECONFIG:
-> +	case GDMA_EQE_HWC_SOCMANA_CRASH:
-> +		dev_dbg(gc->dev, "Recv MANA service type:%d\n", type);
-> +
-> +		if (gc->in_service) {
-> +			dev_info(gc->dev, "Already in service\n");
-> +			break;
-> +		}
-> +
-> +		mns_wk = kzalloc(sizeof(*mns_wk), GFP_ATOMIC);
-> +		if (!mns_wk) {
-> +			dev_err(gc->dev, "Fail to alloc mana_serv_work\n");
+> @@ -14988,6 +14990,7 @@ static void bnxt_fw_reset_task(struct work_struct *work)
+>  			bnxt_dl_health_fw_status_update(bp, true);
+>  		}
+>  		netdev_unlock(bp->dev);
+> +		rtnl_unlock();
+>  		bnxt_ulp_start(bp, 0);
+>  		bnxt_reenable_sriov(bp);
+>  		netdev_lock(bp->dev);
+> -- 
+> 2.30.1
+> 
 
-The memory allocator will log a message on error.
-So please don't also do so here.
+Will the following work instead? netdev_ops_assert_locked should take
+care of asserting either ops lock or rtnl lock depending on the device
+properties.
 
-> +			break;
-> +		}
-> +
-> +		dev_info(gc->dev, "Start MANA service type:%d\n", type);
-> +		gc->in_service = true;
-> +		mns_wk->pdev = to_pci_dev(gc->dev);
-> +		INIT_WORK(&mns_wk->serv_work, mana_serv_func);
-> +		schedule_work(&mns_wk->serv_work);
-> +		break;
-> +
->  	default:
->  		break;
->  	}
-
-...
-
--- 
-pw-bot: changes-requested
+diff --git a/net/core/dev.c b/net/core/dev.c
+index c9013632296f..d8d29729c685 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -3177,7 +3177,6 @@ int netif_set_real_num_tx_queues(struct net_device *dev, unsigned int txq)
+ 
+ 	if (dev->reg_state == NETREG_REGISTERED ||
+ 	    dev->reg_state == NETREG_UNREGISTERING) {
+-		ASSERT_RTNL();
+ 		netdev_ops_assert_locked(dev);
+ 
+ 		rc = netdev_queue_update_kobjects(dev, dev->real_num_tx_queues,
+@@ -3227,7 +3226,6 @@ int netif_set_real_num_rx_queues(struct net_device *dev, unsigned int rxq)
+ 		return -EINVAL;
+ 
+ 	if (dev->reg_state == NETREG_REGISTERED) {
+-		ASSERT_RTNL();
+ 		netdev_ops_assert_locked(dev);
+ 
+ 		rc = net_rx_queue_update_kobjects(dev, dev->real_num_rx_queues,
 
