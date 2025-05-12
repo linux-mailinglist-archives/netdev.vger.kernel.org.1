@@ -1,288 +1,213 @@
-Return-Path: <netdev+bounces-189906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D126AB47B2
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 00:56:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72C6EAB47DC
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 01:22:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8A683B0012
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 22:56:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E48A11B41599
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 23:22:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B78B29A9DA;
-	Mon, 12 May 2025 22:56:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nlyiSpoL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BC1526739E;
+	Mon, 12 May 2025 23:22:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BBEE29A9C5;
-	Mon, 12 May 2025 22:56:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1DEE262FD9
+	for <netdev@vger.kernel.org>; Mon, 12 May 2025 23:22:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747090601; cv=none; b=bWaTrELqLItsTq/1Se2hw5cn7dGgxLNzKoeYQgvFWiSPViL10QEahS8xTo1tu3i+WmiQF0t4RiawtwW0gfFCs6JvVPA5AtgxlWQ0xVnIlBAJB6VJhbwry7ujVLzSuRac3defQn6rZICLO3QQtip7zhXiKRRFNw1rx5wipeGRWVw=
+	t=1747092147; cv=none; b=mHMhO+8d+fJfDgktFooF4PpG78WIFw/PgekPzzIXreCvctlnEkiiuVO8YqW2bV4HdMRbKSMraH9HYt323oIIs4ZByYsBDSq/nr9FODc2UxqoZalTgGa1a3HHTxqmSzLu8g/5FyP+3KWKoaUccyXAF6Yad5dykBxPBJPbj5DaveQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747090601; c=relaxed/simple;
-	bh=1s9Vf3Fkit3adzUezvQrcVB4lHl6eD+qJRdC61oFkSQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nLJb6nFg4Wb+v4VaJkHDPxpocfZQLVIjXb3zbpKweVCo9edJivnSZKTlOyw8ZggmkKIIvTeso0Bm/aIzhcavvhy+Q96fdJuRwV+T5qvvmsaFh6DKwmstZO9PAz31cZ+G4kU6E2twZY9Yo+AKZiNuASurz1o/ZPqtdVqorMxxM9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nlyiSpoL; arc=none smtp.client-ip=209.85.210.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-72ecc30903cso2762544a34.0;
-        Mon, 12 May 2025 15:56:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747090598; x=1747695398; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JQnYHyU/oLYkT3/eFqR+0DIJ/IUt+t8l37AqbBxcuEw=;
-        b=nlyiSpoLsFwZFyjtnAd+BpDp8OrmJJJIV4ouGmEjuVGU6wTCUZBzaTSu7/WSEjKrx6
-         I2vvDWn9cU0hlF/CvuP5kH0UhwxQ8Peuvsp26YgryZC9+VdtqIIiOwyjOw14/1h1rauX
-         lOUYEhOe8N5W0nW1zcNJurY8ZJ05gsrq9B8ESkGJYoDxi36pZvhJNPfWntaY9XmmCxc2
-         ItpadFfw6o3qt4hosgjGGZVTMZ8YoXMpI0jv1gyD2zah/nB+TfxAGip2JxMn9hX3qQuO
-         bevKcvLVgk6g0CyHhopLAdGXEY9fS74iIsTCD0/pGCd0V4D0I9Qiij/tetqcgyLum+3l
-         eurw==
+	s=arc-20240116; t=1747092147; c=relaxed/simple;
+	bh=mVpt63udtk6/AFzIGNSEy4WNg2GM9eyFsu4e5iEmnVU=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=d/+n83yx+Xx7mhaU67RMSv3yHdNEnMy2pGM8tdayBNHTc1PxdacjzVG/1hJf2t+0PGf8jBpBeVvtu4TJtWktdYxmf3KZpH5n3H2fcCMs8ApsJubDOZHJIwho+ITMVoxWkQ3GFgK2MhCOWE7B1ncJ4ax8faQmRz+ScTJarOljoGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3da720e0c93so118820865ab.2
+        for <netdev@vger.kernel.org>; Mon, 12 May 2025 16:22:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747090598; x=1747695398;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JQnYHyU/oLYkT3/eFqR+0DIJ/IUt+t8l37AqbBxcuEw=;
-        b=UMWOrvRkxFMlBYrUr++GLRQ/h3VExto7qpCvg6OhM3Tq6WUQW0oQwZTsGziKVK6upP
-         AYtrC0J/m9UUQ5bNR7BakbWrDTIX29r4Qz7+Mfkch7P0LKZ1flcJqTffkah6+Bir+G2h
-         nsx1msUIK0u/5JZFrnS03IWYYfKD8Pw7Yawy+FtbxDQO1zSUW5jTp+edCoBm/UYwd8sz
-         +3h/jHXlxY9GrCxbpxQECtccO0I+eb8K1oMC++Lubm+NeJUVXoBHlX1Lx/vAcIo5oi/c
-         k/m5WmANSwEz7icd0KeCiu4NrBiZ2gf00OfvX1Xl2RnKoc8mhXMSwmi2c66ELKDwhuDI
-         aGDg==
-X-Forwarded-Encrypted: i=1; AJvYcCVaFbIqHq3BVk9ERpamBzzJn9sNxujKJBUZEeWRkeAZZTi8XXXMbmTpQBUHR9YGNP+ibhCWhr2dj94Nop59@vger.kernel.org, AJvYcCVnLXKX9pY1/8rr11HuR9+Dywm+3e6HRWIDmi5ptOQ5VbNr9t221hQ5tPEaCiGMHvGgg6Ol8pbNqiVk@vger.kernel.org, AJvYcCWKDUHZacrMCcWsW/CCk/4hiJxmpnZBmemXApZ/0Kz+2/pLADipiypL0TbfvXd70OeJWqcCKJo3mv/qdZPZiQ==@vger.kernel.org, AJvYcCXAYD8jPI8UPnW4l6qEYGyyTqo6uXTnGtrzkbRHlXzp4QepeOAmpjlw050WHScb/euJHhxJlcEs@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGq2rik9zYMHQTAhXcCwl/5mKwZcuweMM8JIaX/QyGQ9Sq6DA5
-	Wfm2U4Fo3+Ch9W9ChJX/1eFk6mdvMJL58SIx67h96s5pacOdql0N
-X-Gm-Gg: ASbGncuJy/HoDbymSf0lrY+rv2FRhUANia3IdMrNc2K5+IzHUcaP3ee1AHgMo4q5YCt
-	XHy9LEOJovdXvWUhZdKcMtZp0MJHmxyuXsiAqYESg/5ovU+MiOesaZX59S9eBnK50OzdCst9+r0
-	8TJsWBVYz2wJYek7l4e3z9gBTA3NHMTMUnmlYr3D6Dx7dmpcsYG0+6PoXbYG79SLX5QLfBGSww8
-	jkQ0O1x0hGfXhnbyKPHngFy19/Kz/aw964I6dqMW08ibb70bUyaWqXwGyWAiROsTSrnFsluUX7P
-	YmbGCr98OQ+6FoXGPutH6FiithzejqJqpnrkAeiOHCk3NdTwjx8f09aQPm0XfTK1fVDNAP9A2Fv
-	a4xT3AwKUusJh0g==
-X-Google-Smtp-Source: AGHT+IE39odtp4AvZWbxjsbViiNWCTwsEhcIlK8o+5Hl0Hjx72MLayBL+nVAD4vihtkwI3e3H49Ahw==
-X-Received: by 2002:a05:6830:398d:b0:72b:9965:d994 with SMTP id 46e09a7af769-73226b000camr9090654a34.23.1747090598305;
-        Mon, 12 May 2025 15:56:38 -0700 (PDT)
-Received: from [192.168.7.203] (c-98-57-15-22.hsd1.tx.comcast.net. [98.57.15.22])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-732265cd91bsm1755336a34.50.2025.05.12.15.56.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 May 2025 15:56:37 -0700 (PDT)
-Message-ID: <0c1a0dbd-fd24-40d7-bec9-c81583be1081@gmail.com>
-Date: Mon, 12 May 2025 17:56:35 -0500
+        d=1e100.net; s=20230601; t=1747092145; x=1747696945;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RRpdss/wPX8+GTs3i2u5ajN2oMTMbZjUVLxllbstDOI=;
+        b=VHQ26Bc6/TKiCe3pO+/X4/nqgvcYNzaPoTSgIBYsavhadDKb16AaAWxyqQyUMWOHTe
+         NvJnek+j2gUPGjDic3C/hhd7bsn8I+CAw9Q5vxy0FEodWhs9UfdEUI1Jlk0d8MVPCgQ1
+         ZiJSKljyzyLaMK72bddz68UaGJzgO4xvkUyuzK0sUGEyZAvffEN5NcGx1j0VZCBJPjzK
+         iMa9JuLIp64OdJXa/g0sP8ubp/wjtXOjdYHFG+u5wF/X7811OFY18ECiYcft4eqSEpm3
+         4xX3j52ebHq4Vu9ivD67FU0ySeQ/EnBIn2dmxIIxrCEUtZCpNZHMdrCDmekvyTDMWTFv
+         iUkA==
+X-Forwarded-Encrypted: i=1; AJvYcCW07JXMT5N3/UATx5n76peErqIDEtKz0mTSdkyahEG+QwVIWS6vsVwxO+nK5C0McliwS2zrvBc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzL17UFqKAOn4uQVeVjr/H/RhsSdDlZmZ56jKwIsI/74xe+Xicq
+	a8qDVnZEZNnK6V72cBA8Oh96GlNYLX5g2MHqDW87y/8ghkUreIkT0Lxp8n0x5R2ei1KTdT6POm9
+	9Tpz3GpulMD3Xlod8tBRmwzUabSNOtGNgcDlghA9sccQ5AhesHTrOWXI=
+X-Google-Smtp-Source: AGHT+IGTMOugB4Utp3Gn6N3dI0Mzhp6j9VTw5k+IewZulu6M38eLTHh+hTnP/9clDE1JdNJMEcyHqwrFNm0G5F77Yj9hkeIY2q3Z
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 0/5] Add PCS support for Qualcomm IPQ9574 SoC
-To: Lei Wei <quic_leiwei@quicinc.com>,
- "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, quic_kkumarcs@quicinc.com,
- quic_suruchia@quicinc.com, quic_pavir@quicinc.com, quic_linchen@quicinc.com,
- quic_luoj@quicinc.com, srinivas.kandagatla@linaro.org,
- bartosz.golaszewski@linaro.org, vsmuthu@qti.qualcomm.com, john@phrozen.org,
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-References: <20250207-ipq_pcs_6-14_rc1-v5-0-be2ebec32921@quicinc.com>
- <20250211195934.47943371@kernel.org> <Z6x1xD0krK0_eycB@shell.armlinux.org.uk>
- <71a69eb6-9e24-48ab-8301-93ec3ff43cc7@quicinc.com>
-Content-Language: en-US
-From: mr.nuke.me@gmail.com
-In-Reply-To: <71a69eb6-9e24-48ab-8301-93ec3ff43cc7@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a92:cd8f:0:b0:3d9:668c:a702 with SMTP id
+ e9e14a558f8ab-3da7e1eef9bmr167134355ab.9.1747092144754; Mon, 12 May 2025
+ 16:22:24 -0700 (PDT)
+Date: Mon, 12 May 2025 16:22:24 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <682282b0.050a0220.f2294.00bc.GAE@google.com>
+Subject: [syzbot] [net?] KASAN: global-out-of-bounds Read in in_dev_finish_destroy
+From: syzbot <syzbot+dd3b9802ae13f63906d7@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 2/19/25 4:46 AM, Lei Wei wrote:
-> 
-> On 2/12/2025 6:19 PM, Russell King (Oracle) wrote:
->> On Tue, Feb 11, 2025 at 07:59:34PM -0800, Jakub Kicinski wrote:
->>> On Fri, 7 Feb 2025 23:53:11 +0800 Lei Wei wrote:
->>>> The 'UNIPHY' PCS block in the Qualcomm IPQ9574 SoC provides Ethernet
->>>> PCS and SerDes functions. It supports 1Gbps mode PCS and 10-Gigabit
->>>> mode PCS (XPCS) functions, and supports various interface modes for
->>>> the connectivity between the Ethernet MAC and the external PHYs/Switch.
->>>> There are three UNIPHY (PCS) instances in IPQ9574, supporting the six
->>>> Ethernet ports.
->>>>
->>>> This patch series adds base driver support for initializing the PCS,
->>>> and PCS phylink ops for managing the PCS modes/states. Support for
->>>> SGMII/QSGMII (PCS) and USXGMII (XPCS) modes is being added initially.
->>>>
->>>> The Ethernet driver which handles the MAC operations will create the
->>>> PCS instances and phylink for the MAC, by utilizing the API exported
->>>> by this driver.
->>>>
->>>> While support is being added initially for IPQ9574, the driver is
->>>> expected to be easily extendable later for other SoCs in the IPQ
->>>> family such as IPQ5332.
->>>
->>> Could someone with PHY, or even, dare I say, phylink expertise
->>> take a look here?
->>
->> I've not had the time, sorry. Looking at it now, I have lots of
->> questions over this.
->>
->> 1) clocks.
->>
->> - Patch 2 provides clocks from this driver which are exported to the
->>    NSCCC block that are then used to provide the MII clocks.
->> - Patch 3 consumes clocks from the NSCCC block for use with each PCS.
->>
->> Surely this leads to a circular dependency, where the MSCCC driver
->> can't get the clocks it needs until this driver has initialised, but
->> this driver can't get the clocks it needs for each PCS from the NSCCC
->> because the MSCCC driver needs this driver to initialise.
->>
-> 
-> Sorry for the delay in response. Below is a description of the 
-> dependencies between the PCS/NSSCC drivers during initialization time 
-> and how the clock relationships are set up. Based on this, there should 
-> not any issue due to circular dependency, but please let me know if any 
-> improvement is possible here given the hardware clock dependency. The 
-> module loading order is as follows:
-> 
-> Step 1.) NSCC driver module
-> Step 2.) PCS driver module
-> Step 3.) Ethernet driver module
-> 
-> The 'UNIPHY' PCS clocks (from Serdes to NSSCC) are not needed to be 
-> available at the time of registration of PCS MII clocks (NSSCC to PCS 
-> MII) by the NSSCC driver (Step 1). The PCS MII clocks is registered 
-> before 'UNIPHY' PCS clock is registered, since by default the parent is 
-> initialized to 'xo' clock. Below is the output of clock tree on the 
-> board before the PCS driver is loaded.
-> 
-> xo-board-clk
->      nss_cc_port1_rx_clk_src
->          nss_cc_port1_rx_div_clk_src
->              nss_cc_uniphy_port1_rx_clk
->              nss_cc_port1_rx_clk
-> 
-> The 'UNIPHY' PCS clock is later configured as a parent to the PCS MII 
-> clock at the time when the Ethernet and PCS drivers are enabled (step3) 
-> and the MAC links up. At link up time, the NSSCC driver sets the NSSCC 
-> port clock rate (by configuring the divider) based on the link speed, 
-> during which time the NSSCC port clock's parent is switched to 'UNIPHY' 
-> PCS clock. Below is the clock tree dump after this step.
-> 
-> 7a00000.ethernet-pcs::rx_clk
->      nss_cc_port1_rx_clk_src
->          nss_cc_port1_rx_div_clk_src
->              nss_cc_uniphy_port1_rx_clk
->              nss_cc_port1_rx_clk
-> 
+Hello,
 
-I tried this PCS driver, and I am seeing a circular dependency in the 
-clock init. If the clock tree is:
-     GCC -> NSSCC -> PCS(uniphy) -> NSSCC -> PCS(mii)
+syzbot found the following issue on:
 
-The way I understand it, the UNIPHY probe depends on the MII probe. If 
-MII .probe() returns -EPROBE_DEFER, then so will the UNIPHY .probe(). 
-But the MII cannot probe until the UNIPHY is done, due to the clock 
-dependency. How is it supposed to work?
+HEAD commit:    92a09c47464d Linux 6.15-rc5
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1238f8d4580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b39cb28b0a399ed3
+dashboard link: https://syzkaller.appspot.com/bug?extid=dd3b9802ae13f63906d7
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-The way I found to resolve this is to move the probing of the MII clocks 
-to ipq_pcs_get().
+Unfortunately, I don't have any reproducer for this issue yet.
 
-This is the kernel log that I see:
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-92a09c47.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/9dd31988ea97/vmlinux-92a09c47.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/4b4e78abb078/bzImage-92a09c47.xz
 
-[   12.008754] platform 39b00000.clock-controller: deferred probe 
-pending: platform: supplier 7a00000.ethernet-pcs not ready
-[   12.008788] mdio_bus 90000.mdio-1:18: deferred probe pending: 
-mdio_bus: supplier 7a20000.ethernet-pcs not ready
-[   12.018704] mdio_bus 90000.mdio-1:00: deferred probe pending: 
-mdio_bus: supplier 90000.mdio-1:18 not ready
-[   12.028588] mdio_bus 90000.mdio-1:01: deferred probe pending: 
-mdio_bus: supplier 90000.mdio-1:18 not ready
-[   12.038310] mdio_bus 90000.mdio-1:02: deferred probe pending: 
-mdio_bus: supplier 90000.mdio-1:18 not ready
-[   12.047943] mdio_bus 90000.mdio-1:03: deferred probe pending: 
-mdio_bus: supplier 90000.mdio-1:18 not ready
-[   12.057579] platform 7a00000.ethernet-pcs: deferred probe pending: 
-ipq9574_pcs: Failed to get MII 0 RX clock
-[   12.067209] platform 7a20000.ethernet-pcs: deferred probe pending: 
-ipq9574_pcs: Failed to get MII 0 RX clock
-[   12.077200] platform 3a000000.qcom-ppe: deferred probe pending: 
-platform: supplier 39b00000.clock-controller not ready
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+dd3b9802ae13f63906d7@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: global-out-of-bounds in ref_tracker_free+0x562/0x830 lib/ref_tracker.c:244
+Read of size 1 at addr ffffffff9af9a490 by task kworker/u32:1/13
+
+CPU: 3 UID: 0 PID: 13 Comm: kworker/u32:1 Not tainted 6.15.0-rc5-syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Workqueue: netns cleanup_net
+Call Trace:
+ <IRQ>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:408 [inline]
+ print_report+0xc3/0x670 mm/kasan/report.c:521
+ kasan_report+0xe0/0x110 mm/kasan/report.c:634
+ ref_tracker_free+0x562/0x830 lib/ref_tracker.c:244
+ netdev_tracker_free include/linux/netdevice.h:4351 [inline]
+ netdev_put include/linux/netdevice.h:4368 [inline]
+ netdev_put include/linux/netdevice.h:4364 [inline]
+ in_dev_finish_destroy+0xae/0x1d0 net/ipv4/devinet.c:258
+ in_dev_put include/linux/inetdevice.h:290 [inline]
+ inet_rcu_free_ifa+0x93/0xb0 net/ipv4/devinet.c:228
+ rcu_do_batch kernel/rcu/tree.c:2568 [inline]
+ rcu_core+0x799/0x14e0 kernel/rcu/tree.c:2824
+ handle_softirqs+0x216/0x8e0 kernel/softirq.c:579
+ __do_softirq kernel/softirq.c:613 [inline]
+ invoke_softirq kernel/softirq.c:453 [inline]
+ __irq_exit_rcu+0x109/0x170 kernel/softirq.c:680
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:696
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1049 [inline]
+ sysvec_apic_timer_interrupt+0xa4/0xc0 arch/x86/kernel/apic/apic.c:1049
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+RIP: 0010:lockdep_unregister_key+0xdd/0x130 kernel/locking/lockdep.c:6613
+Code: 48 89 ef e8 b5 fe ff ff 48 89 ef e8 cd e5 ff ff 89 c3 e8 f6 ee ff ff 9c 58 f6 c4 02 75 52 41 f7 c4 00 02 00 00 74 01 fb 84 db <75> 1b 5b 5d 41 5c e9 58 5d 0a 00 8b 05 06 83 ed 0e 31 db 85 c0 74
+RSP: 0018:ffffc90000107808 EFLAGS: 00000246
+RAX: 0000000000000046 RBX: 0000000000000000 RCX: 0000000000000001
+RDX: 0000000000000000 RSI: ffffffff8dcd20c4 RDI: ffffffff8bf48260
+RBP: ffffffff972ac028 R08: 000000000000c64e R09: ffffffff95c54c5c
+R10: 0000000000000004 R11: 0000000000000000 R12: 0000000000000246
+R13: ffff88804eaa8000 R14: ffff88804eaa84c0 R15: 0000000000000001
+ __qdisc_destroy+0x11a/0x4a0 net/sched/sch_generic.c:1080
+ qdisc_put+0xab/0xe0 net/sched/sch_generic.c:1106
+ dev_shutdown+0x1d0/0x430 net/sched/sch_generic.c:1494
+ unregister_netdevice_many_notify+0xad1/0x26f0 net/core/dev.c:11969
+ unregister_netdevice_many net/core/dev.c:12046 [inline]
+ default_device_exit_batch+0x853/0xaf0 net/core/dev.c:12538
+ ops_exit_list+0x128/0x180 net/core/net_namespace.c:177
+ cleanup_net+0x5c1/0xb30 net/core/net_namespace.c:654
+ process_one_work+0x9cc/0x1b70 kernel/workqueue.c:3238
+ process_scheduled_works kernel/workqueue.c:3319 [inline]
+ worker_thread+0x6c8/0xf10 kernel/workqueue.c:3400
+ kthread+0x3c2/0x780 kernel/kthread.c:464
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:153
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+The buggy address belongs to the variable:
+ binder_devices+0x10/0x40
+
+The buggy address belongs to the physical page:
+page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1af9a
+flags: 0xfff00000002000(reserved|node=0|zone=1|lastcpupid=0x7ff)
+raw: 00fff00000002000 ffffea00006be688 ffffea00006be688 0000000000000000
+raw: 0000000000000000 0000000000000000 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner info is not present (never set?)
+
+Memory state around the buggy address:
+ ffffffff9af9a380: 00 f9 f9 f9 f9 f9 f9 f9 00 f9 f9 f9 f9 f9 f9 f9
+ ffffffff9af9a400: 00 f9 f9 f9 f9 f9 f9 f9 00 f9 f9 f9 f9 f9 f9 f9
+>ffffffff9af9a480: 00 f9 f9 f9 f9 f9 f9 f9 00 f9 f9 f9 f9 f9 f9 f9
+                         ^
+ ffffffff9af9a500: 00 00 f9 f9 f9 f9 f9 f9 00 f9 f9 f9 f9 f9 f9 f9
+ ffffffff9af9a580: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 f9
+==================================================================
+----------------
+Code disassembly (best guess):
+   0:	48 89 ef             	mov    %rbp,%rdi
+   3:	e8 b5 fe ff ff       	call   0xfffffebd
+   8:	48 89 ef             	mov    %rbp,%rdi
+   b:	e8 cd e5 ff ff       	call   0xffffe5dd
+  10:	89 c3                	mov    %eax,%ebx
+  12:	e8 f6 ee ff ff       	call   0xffffef0d
+  17:	9c                   	pushf
+  18:	58                   	pop    %rax
+  19:	f6 c4 02             	test   $0x2,%ah
+  1c:	75 52                	jne    0x70
+  1e:	41 f7 c4 00 02 00 00 	test   $0x200,%r12d
+  25:	74 01                	je     0x28
+  27:	fb                   	sti
+  28:	84 db                	test   %bl,%bl
+* 2a:	75 1b                	jne    0x47 <-- trapping instruction
+  2c:	5b                   	pop    %rbx
+  2d:	5d                   	pop    %rbp
+  2e:	41 5c                	pop    %r12
+  30:	e9 58 5d 0a 00       	jmp    0xa5d8d
+  35:	8b 05 06 83 ed 0e    	mov    0xeed8306(%rip),%eax        # 0xeed8341
+  3b:	31 db                	xor    %ebx,%ebx
+  3d:	85 c0                	test   %eax,%eax
+  3f:	74                   	.byte 0x74
 
 
-PHY:
-&mdio {
-	qca8k_nsscc: clock-controller@18 {
-		compatible = "qcom,qca8084-nsscc";
-		...
-	};
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-	ethernet-phy-package@0 {
-		compatible = "qcom,qca8084-package";
-		...
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-		qca8084_0: ethernet-phy@0 {
-			compatible = "ethernet-phy-id004d.d180";
-			reg = <0>;
-			clocks = <&qca8k_nsscc NSS_CC_GEPHY0_SYS_CLK>;
-			resets = <&qca8k_nsscc NSS_CC_GEPHY0_SYS_ARES>;
-		};
-		qca8084_1: ethernet-phy@1 {
-			compatible = "ethernet-phy-id004d.d180";
-			reg = <1>;
-			clocks = <&qca8k_nsscc NSS_CC_GEPHY1_SYS_CLK>;
-			resets = <&qca8k_nsscc NSS_CC_GEPHY1_SYS_ARES>;
-		};
-		qca8084_2: ethernet-phy@2 {
-			compatible = "ethernet-phy-id004d.d180";
-			reg = <2>;
-			clocks = <&qca8k_nsscc NSS_CC_GEPHY2_SYS_CLK>;
-			resets = <&qca8k_nsscc NSS_CC_GEPHY2_SYS_ARES>;
-		};
-		qca8084_3: ethernet-phy@3 {
-			compatible = "ethernet-phy-id004d.d180";
-			reg = <3>;
-			clocks = <&qca8k_nsscc NSS_CC_GEPHY3_SYS_CLK>;
-			resets = <&qca8k_nsscc NSS_CC_GEPHY3_SYS_ARES>;
-		};
-	};
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-	qca8081_12: ethernet-phy@12 {
-		reset-gpios = <&tlmm 36 GPIO_ACTIVE_LOW>;
-		reg = <12>;
-	};
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-PCS:
-	pcs_uniphy0: ethernet-pcs@7a00000 {
-		compatible = "qcom,ipq9574-pcs";
-		...
-		pcsuniphy0_ch0: pcs-mii@0 {
-			reg = <0>;
-			clocks = <&nsscc NSS_CC_UNIPHY_PORT1_RX_CLK>,
-				 <&nsscc NSS_CC_UNIPHY_PORT1_TX_CLK>;
-			clock-names = "rx",
-				      "tx";
-		};
-		...
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
-MAC:
-		port@1 {
-			reg = <1>;
-			phy-mode = "usxgmii";
-			managed = "in-band-status";
-			phy-handle = <&qca8084_0>;
-			pcs-handle = <&pcsuniphy0_ch0>;
-			...
-		};
+If you want to undo deduplication, reply with:
+#syz undup
 
