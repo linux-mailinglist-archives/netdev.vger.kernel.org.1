@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-189661-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BC20AB31E8
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 10:42:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0680EAB31F1
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 10:43:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6D303A2D29
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 08:42:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2150189BF12
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 08:43:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B39BC259CBE;
-	Mon, 12 May 2025 08:42:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FEE4259CAB;
+	Mon, 12 May 2025 08:42:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Jwd3VFWs"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="LMrWgw6q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A03259CA4
-	for <netdev@vger.kernel.org>; Mon, 12 May 2025 08:42:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28792259CA3
+	for <netdev@vger.kernel.org>; Mon, 12 May 2025 08:42:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747039354; cv=none; b=sEUUNuj2ucyt6+QtJRavN4zcD8Q9ryZ0HAykoWoGULakSmuzGTsMdIeQnKfBZvrn4Kxdq1JcM3iUDOO69oVqKaLRTJXf5BtRb7G4Wfk6L7iv0Z6mNHZjQHZ85aoZUcMwqwPSrvC9wJ31yYbmrx34cwn4+Hw2sttBbyUPKUK1JGo=
+	t=1747039360; cv=none; b=fOGABdwD+NnL2PU/CnMJPbJdXLRjUTCnpH/BQ3hsqxHPanf3ghFyxBA/Wjg53dd4/kxessdvmqUobpDoF1PHTw2dXOc7tuM63y3yZCbmPt0LW8DbK6W9ksFFUO1iQS+rMDmj58Rw+GdoLUDIEkOywKhgpmgjVaAsr7oscvH+wUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747039354; c=relaxed/simple;
-	bh=Iv0VGxbZ7WZGskXAiEBiw/6txsBcaunK3Zz3dKkqqV4=;
+	s=arc-20240116; t=1747039360; c=relaxed/simple;
+	bh=Tnh7nmev4nR6ZmLLlA8QxhF6H5zVmSAgDuyKals7ncI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OKYBqzBeCn09bC/uiwB13kDCkC1C2wc5lriWtcA7aH99dI6Al0VOinQ89bXlUgO+Qij8XDi3oWl6XPtvKr3Y9p1dkkbqIemthAmIYoWWM4bsEbyqdGxWt1l1302N3t8Z0HAOBokR3zli20RAXSk8zjdUiMjx2QffJ3VY8jzt5X0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Jwd3VFWs; arc=none smtp.client-ip=67.231.148.174
+	 MIME-Version:Content-Type; b=Rf1biRiGHUS9BX2ZbTbY6OO8sJwzGNlCRmonWvtQ3sABzphBYRepYMkFsVqHiLZhgy/MY1bFex4iEYQjLvhMfLmDYi85kmxjS2UXsrpZHqS9euJTJg5NDhFBxeLCM0yNUmmbls3iYaza3DCgxbXNE6uTP/IIQ1uxFcOeRlb+ToA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=LMrWgw6q; arc=none smtp.client-ip=67.231.156.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54C7lZV6016825;
-	Mon, 12 May 2025 01:42:24 -0700
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54C0POtD011590;
+	Mon, 12 May 2025 01:42:30 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=u7YByL7yLha2dUpcDOXlrVqfV
-	Rpv4TLkRNS0Ls9zuPA=; b=Jwd3VFWsXxXE7S/+49fTKVAUevf2Ah004FWCJNxZi
-	hzkAFh+qBSSTJglxQYeO8hdOgkaYGJjjASEkyAiEkTGvWSMiVkDdEqa7hqz2YdZG
-	KJ2yK9n8cq1ZyQV8/Dvht7Pxpm2HCJ9s4F3j3iu6l/WbRd93/LxBYKv8XnQjkDl/
-	+fawtwXq8f2qTTdG24+XWtOy5VvrcLkGiN6wlJ+kV8kZ9SEx5zGFvMI6LD35NUsT
-	WEOK2hDsMF0qwSdKzVkW39UttmekxbTBrmMT96ws7Ahze1NZGESJRK0AdxhoWCiH
-	r4C3h5P0yptd24L0fhM/Hx6i/Q6ssh2ZHOObm6Xn2+2Mw==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 46k5rggnna-1
+	:references:subject:to; s=pfpt0220; bh=CeJVPeJuT5aGda62coLyC7n0a
+	asrULrB3etU2cKLNQU=; b=LMrWgw6qm7XVUezTHKGdlgRIFSzYqzNsq7Xb/R9i4
+	M+g21S/PjpMKyyWxE31E+CD1jcrlcldFotzOWE1LH9fTSELx40/8EQm//IsGr26y
+	NX04/eZ0VrD3rK/4tfjDxveZMUOhZcRHwIjfFxNkaOQwK02FOlj7N8trxjNO4YP7
+	6Z1xkkv4fAVoukA1hh0p3gpZv6h4yim5YGZtrlicadZ0gsfm/TWtXy+5ZAfxZJkG
+	+8/ZvGYy9xAPTuQ/H+KaaXR4wCwmiJqYG5ZSw97As0SS+TOmtIrWgXO/FZ0h2M2I
+	BK5BqdpAefCraNJJPnaBgCU/fXGThkfkGbQ4i98ZlbEuQ==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 46k5r6gp32-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 12 May 2025 01:42:24 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+	Mon, 12 May 2025 01:42:29 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Mon, 12 May 2025 01:42:23 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Mon, 12 May 2025 01:42:23 -0700
+ 15.2.1544.4; Mon, 12 May 2025 01:42:29 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 12 May 2025 01:42:29 -0700
 Received: from hyd1358.marvell.com (unknown [10.29.37.11])
-	by maili.marvell.com (Postfix) with ESMTP id 2531D3F7089;
-	Mon, 12 May 2025 01:42:18 -0700 (PDT)
+	by maili.marvell.com (Postfix) with ESMTP id 522C93F7089;
+	Mon, 12 May 2025 01:42:24 -0700 (PDT)
 From: Subbaraya Sundeep <sbhatta@marvell.com>
 To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
         <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
         <gakula@marvell.com>, <hkelam@marvell.com>, <sgoutham@marvell.com>,
         <lcherian@marvell.com>, <bbhushan2@marvell.com>, <jerinj@marvell.com>
 CC: <netdev@vger.kernel.org>, Subbaraya Sundeep <sbhatta@marvell.com>
-Subject: [net-next PATCH 3/4] octeontx2: Add pcifunc also to mailbox tracepoints
-Date: Mon, 12 May 2025 14:11:53 +0530
-Message-ID: <1747039315-3372-4-git-send-email-sbhatta@marvell.com>
+Subject: [net-next PATCH 3/5] octeontx2: Improve mailbox tracepoints for debugging
+Date: Mon, 12 May 2025 14:11:54 +0530
+Message-ID: <1747039315-3372-5-git-send-email-sbhatta@marvell.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1747039315-3372-1-git-send-email-sbhatta@marvell.com>
 References: <1747039315-3372-1-git-send-email-sbhatta@marvell.com>
@@ -76,16 +76,23 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Proofpoint-GUID: cR8S6VBX4-YoH_bgTLPKmeyNWyWHBTY7
-X-Proofpoint-ORIG-GUID: cR8S6VBX4-YoH_bgTLPKmeyNWyWHBTY7
-X-Authority-Analysis: v=2.4 cv=XIkwSRhE c=1 sm=1 tr=0 ts=6821b470 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=dt9VzEwgFbYA:10 a=M5GUcnROAAAA:8 a=_bv6PHYV_TvcDR7bTVsA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTEyMDA5MSBTYWx0ZWRfX0dFztl12PAu0 e+i4FhJzVYxdQFbvoqHtzX5gruE+mSMCz1TCEQpQdS7poQT98dCTCqBDHqJAJh6aP6/bDBFnVkM spo0uazMf1mjhA79uE8Xtholfs7S5yaIvibhPWuS+aMv0X5We0AglYCVzqxJ0+tmkhtwGa8sEGT
- 9QdVMmg0tcQFUzzJVboc7U9K0ZjopTAbh99Z4+FABVb9nnY6c9y7N3r3L2Nxq5sPrn3IqjKfBeo WsSU+0jl1HYZw2pkoZnNlrl0kkYtX+L31vK38HWoLiT1jSAuzMwUn/Me5/gP/mId9F+TaJ5+VzO 3G8EX1zQJHuyH/r7H2HnsMwRq5M+HHngvG0y13JIWgFIUZ5S+sAE7E9b7KaXSwmOyuo7EkOT97c
- kJk0YlL4gzoGpDVwOXe8zUCYrS6sUYPLyeTV5nXMLfiv+8gQid6nyOArNuwK4HaDFw4KmZI4
+X-Authority-Analysis: v=2.4 cv=WMp/XmsR c=1 sm=1 tr=0 ts=6821b475 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=dt9VzEwgFbYA:10 a=M5GUcnROAAAA:8 a=_bv6PHYV_TvcDR7bTVsA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-GUID: 7sckITKhiQGawjB9RvZWfF2Vo0Ft3Mrj
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTEyMDA5MSBTYWx0ZWRfX4OUIr+8SAdgm s9bOfdPiPGrbteBvbWNg2bgueLHsSkBuEXy9eEi8EUfQxbPcT9VWhqhXgijoCU9pSf2A46S294M TzzE4JJXvnxLHZsGGd7d1OlONZrWIvQ8mWNvkuwMyrAq7DS5vMmX4+dDGjUTaxXDhX0zeC+89pH
+ 3NTiW4l2KbzzECVbAlCgYjkJUEom2dQUo0mpXmulSDZRqZ9/472cJ5WmX1pF4YHUZQ8C8U19z7L Mkb7ut4AnMc4DKKBsRcDTdvOEwpdo1P+iiIEDQ+mf14NEP1eo9Aez/Hg4TjeXZ5ae/RD7MTnPO/ q8Ee9XLym/3th5yG/x/0C36sxo94xvPb1djNX+Ux6XhZpO6I+yUnOoNF/VuqN/737mEwV27uWLW
+ JzF4FvsQdyW0QKGs40siuzXujGpm1HxyCv/50VGgde3vuxp5ABVgGuD7JLLHYif3TkgA+GIS
+X-Proofpoint-ORIG-GUID: 7sckITKhiQGawjB9RvZWfF2Vo0Ft3Mrj
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
  definitions=2025-05-12_03,2025-05-09_01,2025-02-21_01
 
+There are various stages involved when a VF sends a message
+to AF. Say for a VF to send a message to AF below are the steps:
+1. VF sends message to PF
+2. PF receives interrupt from VF
+3. PF forwards to AF
+4. AF processes it and sends response back to PF
+5. PF sends back the response to VF.
 This patch adds pcifunc which represents PF and VF device to the
 tracepoints otx2_msg_alloc, otx2_msg_send, otx2_msg_process so that
 it is easier to correlate which device allocated the message, which
