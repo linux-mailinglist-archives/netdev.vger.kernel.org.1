@@ -1,358 +1,494 @@
-Return-Path: <netdev+bounces-189792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A4FFAB3C04
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 17:25:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C656CAB3C99
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 17:44:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61A2E17B2A7
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 15:25:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39C2719E0714
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 15:44:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E41823A9BB;
-	Mon, 12 May 2025 15:25:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6217023C8A3;
+	Mon, 12 May 2025 15:44:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nVFOBtSg"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="HrVr4V1x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011017.outbound.protection.outlook.com [40.107.130.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02E2A1A3175;
-	Mon, 12 May 2025 15:25:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747063535; cv=none; b=FuSNxqX7+h8JhGDe8Gn/xuZc2DUgdWa/YcpLDwkRNQEOX6ZJhyfG1RnLXBqXT25XQeEtnr5uuiURiUtwUbVfW3+iO1KyQvOEXdf6z751/ZgBkd0ZXlnhT6J1MMk52enM/arFLefzRja0FC39CmykbwZJ2jPGbpuKfWN2Uzkc2CY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747063535; c=relaxed/simple;
-	bh=Hh4ngcCl+mXW4sy2NnCK66teCUw5AGrM1ZiaNHkwmSg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DnDnZfuLZNseAkLDrr81CE7Q8I36jT28iVoLd7apzizhLSldpaAmbL/nP4ug5Y5BAw2hXpuZxjZ83wkt+ZVWOGxBtK9r6Mps7/XwU5eI91u6kK8l5UoHTOXWXtxYpeaziSTgQYYN+SQcQqQLM2ZLARGecFboyWTct+4H8ujj09w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nVFOBtSg; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3a1b8e8b2b2so2330060f8f.2;
-        Mon, 12 May 2025 08:25:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747063531; x=1747668331; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lsdd5z/QhZSAGjC5UyNunZpPklp7yFFA2Z524Ki7S3w=;
-        b=nVFOBtSglehBDOPrQcR8xFHmy3bnjbHpk39NtxK+ZE1DK9FlfruZO/cHWVPCPIQ+Q9
-         30NGfNlRPpTkRqNyxgDyqwIrP56e4cx7uagiJSPrcHhO9lq5pGuOX5u1mdU6qQgr0Qmi
-         kXEcbvnhIacLgzmEguNAqQyLsRy/VZdG5vH1mKiKUWMcXlK/b7dD2M+Ii5chCvbLqKzZ
-         wTAAKdnXfVP5JmqMFq/PHSSXabkLWpTV9tPuzINmVSGCUAoQL8mwFlG+9cc1/S6k/o0z
-         Nz15u+l3HPlag1D0thPGIM5UR0/qJN5VniZWs8yNtxZnfbTo45nX+w4OoQaiV6qq6OOR
-         Gx4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747063531; x=1747668331;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lsdd5z/QhZSAGjC5UyNunZpPklp7yFFA2Z524Ki7S3w=;
-        b=YNZSR19mw47UIJiGwgsW1Dw5ld1djpczb/LV45itaQYAcKWAmc7jRxmLPeo/9d0dxf
-         q2JJ6tByhiJ7lmvApA2SpmC5NJ3es5ae2quyW+0C8tLJCmJbpsmaGAP92CKkVLvxNdBS
-         YZBNb6cijZVa/CpDhH9oPUxvL2JcvKI0HzZrFhZwJgE/Y1JmcfQ88CsGZffgO/QoMwjp
-         t0mAjHuVbO2HgfqAr2c3+yudoCPBHaNy+iEXO8PdvFtSK+AjtgKjHxxZZobHBvrfYf5v
-         8H3/daEeYaS1bi+GQGW982J8wui5KKx4BiMnrDGUER8BSlxkq55jQlMOowjV9JWceRQv
-         X6Ag==
-X-Forwarded-Encrypted: i=1; AJvYcCUiiEYG+N5fD2IPNTpW/c74z1PUuzWwCdAAZSGyhm2CfvRcqggZsjX2IEqZzYtLnY0p10E=@vger.kernel.org, AJvYcCV59BCxEy+5nECVQIooZLc3cwYymowbrfZ173EAzJkNCP47mDJPV+5OFo6UM0jiBe2ppxtYvVeQWTNnKbHf@vger.kernel.org, AJvYcCVVTh+dNCCzRqy6SUUqHUA3rSMpeI1i9994g4w9SqIL0tZr2IWoxXZTsejg6cz7kpjolUNAoBDQYer2RheIc9lD+u+D@vger.kernel.org, AJvYcCViSh5k63uhnYijmZaBKkyacpPICKNkG1/jVPBfjaUB5auIc/A0fK5XzJBw4WbIk4d5kvsIOYL7@vger.kernel.org, AJvYcCXUM57T+3gqxhXj036TKaIJQhMkqIb9wW0e8CMkgl0nVMws+V1EGJXND+w8Psv40BU9BXfWt1AB7qUBqH+bbx8q@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFocCRLYkGEh2TMyIyUYTdYOyPHDC3J9L2kKPFTdw0f3JBsM0g
-	qQITLKBNG1hLtfSFGLbg6IzqN1ICKyCMTMDPl3ZWVRoOIxE+17rinN/kwQDPBlTcUwmT2+YxYk7
-	qpMPbkh8QOz6vlrJkSENRT/JFLp8=
-X-Gm-Gg: ASbGncv2Ky2bvwzfoRY8Ef2Htizg82h3c0BOZ45Dvdn5eusB3OGsLs4TaEE+BLVqiPV
-	F0nz8jpl6nJ5dJJc17UwBKnuxbZ2LL1a8eQdHTG0H/eFumbgRM0b0I2M6gGU84TPrVV0F5q/4Tc
-	EscKYrRzWBniHMfJZNhZHu9AodPuOTU2d7jknm3kyuOnE0pjdc
-X-Google-Smtp-Source: AGHT+IGS6Bf/2Gq+4cKVxaawephomVRRwhQZYiDwIPFiKuQgYha5yCXHc4GqLBH1nTQlx0+5brtoLUPxKHGAhV4J7hY=
-X-Received: by 2002:a05:6000:1786:b0:39c:30f9:339c with SMTP id
- ffacd0b85a97d-3a1f64449e7mr10719651f8f.28.1747063531010; Mon, 12 May 2025
- 08:25:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8810A23C514
+	for <netdev@vger.kernel.org>; Mon, 12 May 2025 15:44:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747064667; cv=fail; b=Zq8FkAPtrDVXH422U/8cMrJMA4JIfelAG6xYeXIMygeOl5C5Av6T9ONgJO2Fsrof1zTXyV4Lg+7SPEoyWmjmsHg1aAmKFiYskzIKQn8lT16fZkGtHDYf72V/aq46TpidxWG8siDHO/pDLiQuinFWkiB7fY43Pr27qQOze8t5onU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747064667; c=relaxed/simple;
+	bh=vOuZpC5GIuOjyvl7mUhkqqdoRAxT086Av2y+WKboj+A=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=oR6P93aOz7cBx5qdiOTh3Qw33fQlfnTs0JEbQxELlnnE5q7byeCBrsWdqG2cICthX27qy1qmNJQi0gmht5+j1uleZGlSlyie1k9gOG38uNb01kCRBpeyspHkoFfi4wtIBrYSmx/JFXfzDy9Smr8OeyB+sM2XH6zcbptx0/g74B8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=HrVr4V1x; arc=fail smtp.client-ip=40.107.130.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Erd7UyOleMbgTva6DXFMSzyalAfgJZmTSf2MIDjCFO81VF+rUeWAdEfWd+bK2F+hHD+eMslGFYJ3rsYeQ/2l5OuN9Ze2asumATpCHZoKThxy06kOeMbbKVQGxN+k2FzQK9qLVhbcRhOeTtt15iLu0h4k7094HPKZhbMjChXgml42z3vApxDqZPklwllRIk1gYU5SG6Mb4Q4MNlDOtNPEff7glD80DkU/40AGyn2yjWEkVKTZAgOWK2UwfNKwthHti5JyVYA25DzerLIXJF7hde7t0aNDeLGrU0bb3kD0qV+AlLpld/GiNkI/unjfIrMbq+fJ9TqKGiHG0tcsSKzAvQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Zcvk8AJ8ZJwdOZoSCjgTjvmH0CFmtap8fyXWNNA+SUc=;
+ b=GfNIjCbAwbAmA6NSeTpiwamgyuEQlQhyuu6GF6obn3t4CaDux0+4gjKb+EgZ9C+mjz9VB2CdbzSZIpCqW19nYrGwxhZroRb0sBqa6eRgBroomgxUiFRzMgruvjkOQWLxoLRVSP9w/CN2FRXRuxF98eGhdGtW7fAYHp7qpB3Ui+RaAHUKcIxDG8rD4o9c5ScaDumtEcS1/55tZvkTJbgvk/8+wcUaUjGgcEPrmrmtNgcRgQ5Iu99QPYS4qAU7eOh4E+hR+3o+e8G6YDp2qV4G2Ks5UZUTTM6+NTayN4i9EC6wSqIgyfPY/B1XEaCgstaCD4AYzX56cdfr+lP89A4/TA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Zcvk8AJ8ZJwdOZoSCjgTjvmH0CFmtap8fyXWNNA+SUc=;
+ b=HrVr4V1xFsamFws2bGkDyPQiM8hOdlzna9YM6eU1ksRMssVD/0//WV0l0BJnAl5gWcUxmFpP+D3/NLcKCxz6yRBx01AaL4YiWVvUMScWgRN0yPeTyUdV2h3w83UQtP11oL6za4VrTahkQHGjKGxSVFsh1ZMmgKnsVLhvfd7tdjS/apSP0gUDXSdKn740XNh7L3P4MhXW4WVVZsJydfkLI0Vl+Ba4x351eDSwmF0d6kJWCD64/MLXcY4T4jmvag4BXr/CnnAnZrDGu0g2imHUixs6hwIJajYjsYFDVKjzfXvMWAFPEVaw1APke+gXPel3pr0uvGsFsBlAkOcD1afx9w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
+ by PAWPR04MB10005.eurprd04.prod.outlook.com (2603:10a6:102:385::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.26; Mon, 12 May
+ 2025 15:44:21 +0000
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2%4]) with mapi id 15.20.8722.027; Mon, 12 May 2025
+ 15:44:21 +0000
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: netdev@vger.kernel.org
+Cc: Ido Schimmel <idosch@nvidia.com>,
+	Petr Machata <petrm@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Richard Cochran <richardcochran@gmail.com>
+Subject: [PATCH net-next] net: mlxsw: convert to ndo_hwtstamp_get() and ndo_hwtstamp_set()
+Date: Mon, 12 May 2025 18:44:11 +0300
+Message-ID: <20250512154411.848614-1-vladimir.oltean@nxp.com>
+X-Mailer: git-send-email 2.43.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: VI1PR07CA0137.eurprd07.prod.outlook.com
+ (2603:10a6:802:16::24) To AM8PR04MB7779.eurprd04.prod.outlook.com
+ (2603:10a6:20b:24b::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250426160027.177173-1-mannkafai@gmail.com> <20250426160027.177173-2-mannkafai@gmail.com>
- <CAADnVQ+DF18nKEf9i1RKEQN+ybH+duu7U-91YZDaa_PiqUx17g@mail.gmail.com>
- <CALqUS-6XtJ0Bb9jiykdC3jAY_OHjGuirj06Kzssjvo7eW_so2A@mail.gmail.com>
- <f951b81f-1b46-4219-82fd-0839e27ab3f3@linux.dev> <CAADnVQ+FANha0fO_BF+iHJ4iZSCPtDfoUkzR8mMFwOakw8+eCg@mail.gmail.com>
- <f1f23c1a-f4a8-4807-8028-87e247775ec8@linux.dev> <CAEf4BzZcuCrK4UVv2qpp7LAL=uXg+YqFopNW3EzCCpUBNPq-ag@mail.gmail.com>
- <16eafae1-5014-42a9-b6c4-8be40b26cf31@linux.dev>
-In-Reply-To: <16eafae1-5014-42a9-b6c4-8be40b26cf31@linux.dev>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Mon, 12 May 2025 08:25:20 -0700
-X-Gm-Features: AX0GCFujhJAQAXI_VeGEfyPL_k_CBqBecCxY4XwfRdZ7WCnc6bsfzc9e3jj798Y
-Message-ID: <CAADnVQJNekoXnai0VGOVj8Q3e5RPtTXhNRjdfxF_PxjoQLDYRA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 1/4] bpf: Allow get_func_[arg|arg_cnt] helpers in
- raw tracepoint programs
-To: Leon Hwang <leon.hwang@linux.dev>
-Cc: Andrii Nakryiko <andrii.nakryiko@gmail.com>, Kafai Wan <mannkafai@gmail.com>, 
-	Song Liu <song@kernel.org>, Jiri Olsa <jolsa@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Eduard <eddyz87@gmail.com>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
-	Matt Bobrowski <mattbobrowski@google.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	bpf <bpf@vger.kernel.org>, 
-	linux-trace-kernel <linux-trace-kernel@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|PAWPR04MB10005:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6442d574-35a7-4c25-b604-08dd916bdce3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|52116014|376014|7416014|1800799024|366016|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?0C09xjLci/h8tPps4hlO705KbLlNSrLYq0gaZlBovlykrj9HZLFBbWxSM9vw?=
+ =?us-ascii?Q?AWfJ0HH08TKKvVTd5DISL5Y+3sxnpvzm/ivnP5wNXZ5VYCi1ajgYcP8HDKpz?=
+ =?us-ascii?Q?0pctDvST9UwY0XlsWD8AKgeB7l/zC/ImFLcMmeG4MLMTKamIbUbLlPvWkmlw?=
+ =?us-ascii?Q?un6mqHmm1lst3OBpFwpE5MwRfDJKmEmKejRsFmLWEIQRsKyLdtQrMm3L3pHC?=
+ =?us-ascii?Q?I80H0nWHMDBrEcYWWWnjeQWNGuWa16Y92aR1UkJsWlzIBE9fBR5GZB7kHgMy?=
+ =?us-ascii?Q?SV0oB5wm7OS0N7YS++/GscF0qc/k+lo3Tkw1MdotRHhXKOVVC8Mo1+ONe++T?=
+ =?us-ascii?Q?F0edPV7pIIzuGWdsPpJyiExYEEWGRIWQu2nw9ym1PgT3WNpxesuMGsLL2fei?=
+ =?us-ascii?Q?zmivNZkATMyLR7dgmJ2C0aBqxrmpeoq3SXVgnoQhY2TrV87nbrtcR9yXTVhj?=
+ =?us-ascii?Q?8ZrK5g9/859kjF4UF37yJNXElN2kctxZzug27NFa00XnBJHfKKCJTQQ2kF4p?=
+ =?us-ascii?Q?h7zOv/WL0RaJiDwarzRaI/bxehby37YjonQyuku5Mt9nqPcVtp9yYCtDJ7IS?=
+ =?us-ascii?Q?Y+gU7TJwKgJQkhjOQ1JU8+aiPgLTUbgqg0Hx+So2Y6ZAGhZ7KHiAkfTrNjpS?=
+ =?us-ascii?Q?rSrEEAIIFaQTthzINmVS/+CqJHTx/bFxeoIvTle4QtmbnpqsMNNfahx0SFiE?=
+ =?us-ascii?Q?ABw1NMkS9c6nKzV2s5Kcx9HojYOnsm3zahfWDvoAelLP1I6P8ljuNzlf3JJQ?=
+ =?us-ascii?Q?d4tMX69unv2CgFQpamv52Nt6kWenxUhAdVAbg7RUImucVK1ss1qnia3agUME?=
+ =?us-ascii?Q?F+iDB96HR3Iejvj7ECqFxpCmEoPPdysQu9nAJtrV80HVFpNa8p36T0WDYnNC?=
+ =?us-ascii?Q?wtyXT4trnEd7Uq/zo1/YAty7mjMfJjm2bI+hXETTP07UhrA/ozlG8qfdJV8H?=
+ =?us-ascii?Q?YTB7wvMzA224gOGaDK4OPEeN2BKU6xOdmP/WfTo60jIS4dOqojHfw0N5g5yB?=
+ =?us-ascii?Q?ex04pGAQ/95lyrnOFMRVVsucSnQ/RSUwtRX0iRZYTJ8REee0/tnqjuestsgX?=
+ =?us-ascii?Q?edn6mixx03hJ1su7LoAjdbLXDk+tPcFIfOcimoU+GcwYndbi2uCAPccGve53?=
+ =?us-ascii?Q?9VliezdhLAymNWDarkPhton1Dnsgdl3rg7eiELunw2+exx7fPK1wk8qlviJt?=
+ =?us-ascii?Q?uMyvmFnscZNiugeb53x65241Y4JZnmRO3O/7OqTXwM33pEFHmQ61xBODjdyC?=
+ =?us-ascii?Q?TzdBUETqkWMzoXsFyvLAfg8Y4nKAneA16v/o6dBTdet2hgJWgK7dzJicyLAc?=
+ =?us-ascii?Q?vdc2JIXiQN1u+nRfcQz2e9DSvbMCprJ5l8o3LjeAnUtINnqE0zFUXPAy9CSi?=
+ =?us-ascii?Q?hmRXOoh67WiaUl4feARkDbqc9a0ae49/UScHDJzGdJt5ThOTu8X7DRH5JNQB?=
+ =?us-ascii?Q?dO/wA6rKZXMd23HzVxGkeitqQB/Wuh4FtYSRuLpivdZ7rjEpXxB7eg=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(376014)(7416014)(1800799024)(366016)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?mZ0u26X+fZccp8vx8VctK3p1V8KHzS5M16tLGAHrnWidZ2AfZs5FxALZ1pBG?=
+ =?us-ascii?Q?Bx0F8GXiatIRd43iLwRdFgQGhIz3G0yntVAhVD0lJQOzExVMB/EX9tOAJ5Zd?=
+ =?us-ascii?Q?np/Lno4M/U/z9v39ViMSGV4uzdJkYevr8SCe6NqYBBcj//CDFwO/cik97mvo?=
+ =?us-ascii?Q?c50KnieBFexPYJxcBZhlNcZ0ZkgyPjWmEUUfixzVPsk25XV9uoavqAkgFm/x?=
+ =?us-ascii?Q?iljHODJCAvKEyvjcW/BQ6E6cEM7A/isV4KpqCKb0paENQHrnmjSHlXPo0D7/?=
+ =?us-ascii?Q?rhm6WWogW+Yfi+giQz0cJ05ZbgP9u6f8aHz18mgZhzVIudztVUwZsugH/mXQ?=
+ =?us-ascii?Q?GXW0Omu5S4pRgrmJGAGt8m3Q7S4vEJ5df2W7U2nMUCZ44r5PcWXfiRH4J1zG?=
+ =?us-ascii?Q?6c04cR/b5Fn+P1NsWyFl+ExC6ANmb59FCQO/KUD9LEW5vMKGkpZVL/vlhppB?=
+ =?us-ascii?Q?DPFk5Ig0foSxFaxDQsOMnj12oUtZ3fQjgDx5IoIckuzDwh1pRpejtiUAhVCC?=
+ =?us-ascii?Q?7mUP6lpyr4clpM+c6d3Qv1/04uBCDpvxbVQHVx6S5/iIwWpx9zMzGBeYXV4t?=
+ =?us-ascii?Q?9fCVjMFEC8F7ReLN5QNrlOikIo90dwPyCqQiYjk3P0BrTIzB+G6zsGtW2J8p?=
+ =?us-ascii?Q?B1tsHDN6JGyOhSLHfQaza78BpIZ07biPsCXulOXFYu9bUTMthIgUmdqPV07N?=
+ =?us-ascii?Q?uW/zk9GTE7brkfw3SWHUf8PH9FlTU5TNjzYeqxEPHVNslNJdlZL+QwkZzHuJ?=
+ =?us-ascii?Q?q0R870fwsmRO4vZR+Kq69Yl530JgNyw0xEqQeXfiZpIe/RTKM7vMZ8Mc170y?=
+ =?us-ascii?Q?qIYKVCgLzgmHlpjIKSy0WFw2Qvs7AHlTswROtWJuH9u8X1NFywvHH6c4dEYy?=
+ =?us-ascii?Q?QPAfkhtHgyeomBrD+sLa2s3LoCoppDbX+7eg74676BFRqMCIbOZsfQyljhjX?=
+ =?us-ascii?Q?P1YywYNHOtZbRK0V3DWYI75vU6G0HwEGVj6QYTO/gZZamycanwPI/mAgnd8r?=
+ =?us-ascii?Q?tTaD6dvjpThbCAoKEUBQYOPPsUG6ZzF5ji5hQjVzZd49BscorR1nm4YK9EHI?=
+ =?us-ascii?Q?fZlyjnctszTaZl+0k7oE6l+NElrK4KKZ4BGGREwvuppViv2ja6ZIgo1MHxau?=
+ =?us-ascii?Q?22TR5bO9lL/gA8bEd6NzjHbtpMJSIzGv2BeCd2ojs9DgcWMs+s6eMXiMQwta?=
+ =?us-ascii?Q?D8u9mbuQQ4FIZurtobFBPLl/12fQLa/l5M3AZYLXAotu3VWl/QVqsoKH9jCO?=
+ =?us-ascii?Q?V8621VSBnyhUiF2T3foK5zE6lLslsYqwFr7HitT1I0fuxnl+QlONlR/eQU2W?=
+ =?us-ascii?Q?pWBrtQbhCDW2mf7bIB8Uj2C3nPRakNdDBbliUoK8o56ZhMVBGDBt84aSz9mT?=
+ =?us-ascii?Q?fWNAzIpYPoCeY1qP6cyP0POGjSxcRnleqZTCmEnzh2ozNLmCqNccFRc4wWJm?=
+ =?us-ascii?Q?RBxsOLp6zRRyzK53aNyIPMRA3iaArRbKGMB5zRDkB6nw7+JWTLq39+4pt4DI?=
+ =?us-ascii?Q?h3MqNTHzAGkHCvNuupQGLnXVtlSj4spcC4KJxOY0UXmmLT6cWO97sytstR6/?=
+ =?us-ascii?Q?3FKPOqXDgx4eP6P9Uds7fvy4bk0OuHlDZJ0GYMcXtNX3NZ0LjfZR5MYjUPX7?=
+ =?us-ascii?Q?zw=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6442d574-35a7-4c25-b604-08dd916bdce3
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2025 15:44:21.8089
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Rqn7jGT9Dg9m+g6vSSsH1oUmC6WN28wtM2NKGZJA7+wLi0HwDtYy+HpZwlAkJA7Ohxkx12DM7STPlO/rQgGugw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR04MB10005
 
-On Mon, May 12, 2025 at 4:12=E2=80=AFAM Leon Hwang <leon.hwang@linux.dev> w=
-rote:
->
->
->
-> On 2025/5/7 05:01, Andrii Nakryiko wrote:
-> > On Fri, May 2, 2025 at 7:26=E2=80=AFAM Leon Hwang <leon.hwang@linux.dev=
-> wrote:
-> >>
-> >>
-> >>
-> >> On 2025/5/1 00:53, Alexei Starovoitov wrote:
-> >>> On Wed, Apr 30, 2025 at 8:55=E2=80=AFAM Leon Hwang <leon.hwang@linux.=
-dev> wrote:
-> >>>>
-> >>>>
-> >>>>
-> >>>> On 2025/4/30 20:43, Kafai Wan wrote:
-> >>>>> On Wed, Apr 30, 2025 at 10:46=E2=80=AFAM Alexei Starovoitov
-> >>>>> <alexei.starovoitov@gmail.com> wrote:
-> >>>>>>
-> >>>>>> On Sat, Apr 26, 2025 at 9:00=E2=80=AFAM KaFai Wan <mannkafai@gmail=
-.com> wrote:
-> >>>>>>>
-> >>>>
-> >>
-> >> [...]
-> >>
-> >>>>
-> >>>>
-> >>>> bpf_get_func_arg() will be very helpful for bpfsnoop[1] when tracing=
- tp_btf.
-> >>>>
-> >>>> In bpfsnoop, it can generate a small snippet of bpf instructions to =
-use
-> >>>> bpf_get_func_arg() for retrieving and filtering arguments. For examp=
-le,
-> >>>> with the netif_receive_skb tracepoint, bpfsnoop can use
-> >>>> bpf_get_func_arg() to filter the skb argument using pcap-filter(7)[2=
-] or
-> >>>> a custom attribute-based filter. This will allow bpfsnoop to trace
-> >>>> multiple tracepoints using a single bpf program code.
-> >>>
-> >>> I doubt you thought it through end to end.
-> >>> When tracepoint prog attaches we have this check:
-> >>>         /*
-> >>>          * check that program doesn't access arguments beyond what's
-> >>>          * available in this tracepoint
-> >>>          */
-> >>>         if (prog->aux->max_ctx_offset > btp->num_args * sizeof(u64))
-> >>>                 return -EINVAL;
-> >>>
-> >>> So you cannot have a single bpf prog attached to many tracepoints
-> >>> to read many arguments as-is.
-> >>> You can hack around that limit with probe_read,
-> >>> but the values won't be trusted and you won't be able to pass
-> >>> such untrusted pointers into skb and other helpers/kfuncs.
-> >>
-> >> I understand that a single bpf program cannot be attached to multiple
-> >> tracepoints using tp_btf. However, the same bpf code can be reused to
-> >> create multiple bpf programs, each attached to a different tracepoint.
-> >>
-> >> For example:
-> >>
-> >> SEC("fentry")
-> >> int BPF_PROG(fentry_fn)
-> >> {
-> >>         /* ... */
-> >>         return BPF_OK;
-> >> }
-> >>
-> >> The above fentry code can be compiled into multiple bpf programs to
-> >> trace different kernel functions. Each program can then use the
-> >> bpf_get_func_arg() helper to access the arguments of the traced functi=
-on.
-> >>
-> >> With this patch, tp_btf will gain similar flexibility. For example:
-> >>
-> >> SEC("tp_btf")
-> >> int BPF_PROG(tp_btf_fn)
-> >> {
-> >>         /* ... */
-> >>         return BPF_OK;
-> >> }
-> >>
-> >> Here, bpf_get_func_arg() can be used to access tracepoint arguments.
-> >>
-> >> Currently, due to the lack of bpf_get_func_arg() support in tp_btf,
-> >> bpfsnoop[1] uses bpf_probe_read_kernel() to read tracepoint arguments.
-> >> This is also used when filtering specific argument attributes.
-> >>
-> >> For instance, to filter the skb argument of the netif_receive_skb
-> >> tracepoint by 'skb->dev->ifindex =3D=3D 2', the translated bpf instruc=
-tions
-> >> with bpf_probe_read_kernel() would look like this:
-> >>
-> >> bool filter_arg(__u64 * args):
-> >> ; filter_arg(__u64 *args)
-> >>  209: (79) r1 =3D *(u64 *)(r1 +0) /* all tracepoint's argument has bee=
-n
-> >> read into args using bpf_probe_read_kernel() */
-> >>  210: (bf) r3 =3D r1
-> >>  211: (07) r3 +=3D 16
-> >>  212: (b7) r2 =3D 8
-> >>  213: (bf) r1 =3D r10
-> >>  214: (07) r1 +=3D -8
-> >>  215: (85) call bpf_probe_read_kernel#-125280
-> >>  216: (79) r3 =3D *(u64 *)(r10 -8)
-> >>  217: (15) if r3 =3D=3D 0x0 goto pc+10
-> >>  218: (07) r3 +=3D 224
-> >>  219: (b7) r2 =3D 8
-> >>  220: (bf) r1 =3D r10
-> >>  221: (07) r1 +=3D -8
-> >>  222: (85) call bpf_probe_read_kernel#-125280
-> >>  223: (79) r3 =3D *(u64 *)(r10 -8)
-> >>  224: (67) r3 <<=3D 32
-> >>  225: (77) r3 >>=3D 32
-> >>  226: (b7) r0 =3D 1
-> >>  227: (15) if r3 =3D=3D 0x2 goto pc+1
-> >>  228: (af) r0 ^=3D r0
-> >>  229: (95) exit
-> >>
-> >> If bpf_get_func_arg() is supported in tp_btf, the bpf program will
-> >> instead look like:
-> >>
-> >> static __noinline bool
-> >> filter_skb(void *ctx)
-> >> {
-> >>     struct sk_buff *skb;
-> >>
-> >>     (void) bpf_get_func_arg(ctx, 0, (__u64 *) &skb);
-> >>     return skb->dev->ifindex =3D=3D 2;
-> >> }
-> >>
-> >> This will simplify the generated code and eliminate the need for
-> >> bpf_probe_read_kernel() calls. However, in my tests (on kernel
-> >> 6.8.0-35-generic, Ubuntu 24.04 LTS), the pointer returned by
-> >> bpf_get_func_arg() is marked as a scalar rather than a trusted pointer=
-:
-> >>
-> >>         0: R1=3Dctx() R10=3Dfp0
-> >>         ; if (!filter_skb(ctx))
-> >>         0: (85) call pc+3
-> >>         caller:
-> >>          R10=3Dfp0
-> >>         callee:
-> >>          frame1: R1=3Dctx() R10=3Dfp0
-> >>         4: frame1: R1=3Dctx() R10=3Dfp0
-> >>         ; filter_skb(void *ctx)
-> >>         4: (bf) r3 =3D r10                      ; frame1: R3_w=3Dfp0 R=
-10=3Dfp0
-> >>         ;
-> >>         5: (07) r3 +=3D -8                      ; frame1: R3_w=3Dfp-8
-> >>         ; (void) bpf_get_func_arg(ctx, 0, (__u64 *) &skb);
-> >>         6: (b7) r2 =3D 0                        ; frame1: R2_w=3D0
-> >>         7: (85) call bpf_get_func_arg#183     ; frame1: R0_w=3Dscalar(=
-)
-> >>         ; return skb->dev->ifindex =3D=3D 2;
-> >>         8: (79) r1 =3D *(u64 *)(r10 -8)         ; frame1: R1_w=3Dscala=
-r() R10=3Dfp0
-> >> fp-8=3Dmmmmmmmm
-> >>         ; return skb->dev->ifindex =3D=3D 2;
-> >>         9: (79) r1 =3D *(u64 *)(r1 +16)
-> >>         R1 invalid mem access 'scalar'
-> >>         processed 7 insns (limit 1000000) max_states_per_insn 0 total_=
-states 0
-> >> peak_states 0 mark_read 0
-> >>
-> >> If the returned skb is a trusted pointer, the verifier will accept
-> >> something like:
-> >>
-> >> static __noinline bool
-> >> filter_skb(struct sk_buff *skb)
-> >> {
-> >>     return skb->dev->ifindex =3D=3D 2;
-> >> }
-> >>
-> >> Which will compile into much simpler and more efficient instructions:
-> >>
-> >> bool filter_skb(struct sk_buff * skb):
-> >> ; return skb->dev->ifindex =3D=3D 2;
-> >>   92: (79) r1 =3D *(u64 *)(r1 +16)
-> >> ; return skb->dev->ifindex =3D=3D 2;
-> >>   93: (61) r1 =3D *(u32 *)(r1 +224)
-> >>   94: (b7) r0 =3D 1
-> >> ; return skb->dev->ifindex =3D=3D 2;
-> >>   95: (15) if r1 =3D=3D 0x2 goto pc+1
-> >>   96: (b7) r0 =3D 0
-> >> ; return skb->dev->ifindex =3D=3D 2;
-> >>   97: (95) exit
-> >>
-> >> In conclusion:
-> >>
-> >> 1. It will be better if the pointer returned by bpf_get_func_arg() is
-> >> trusted, only when the argument index is a known constant.
-> >
-> > bpf_get_func_arg() was never meant to return trusted arguments, so
-> > this, IMO, is pushing it too far.
-> >
-> >> 2. Adding bpf_get_func_arg() support to tp_btf will significantly
-> >> simplify and improve tools like bpfsnoop.
-> >
-> > "Significantly simplify and improve" is a bit of an exaggeration,
-> > given BPF cookies can be used for getting number of arguments of
-> > tp_btf, as for the getting rid of bpf_probe_read_kernel(), tbh, more
-> > generally useful addition would be an untyped counterpart to
-> > bpf_core_cast(), which wouldn't need BTF type information, but will
-> > treat all accessed memory as raw bytes (but will still install
-> > exception handler just like with bpf_core_cast()).
-> >
->
-> Cool! The bpf_rdonly_cast() kfunc used by the bpf_core_cast() macro
-> works well in bpfsnoop.
->
-> The expression 'skb->dev->ifindex =3D=3D 2' is translated into:
->
-> bool filter_arg(__u64 * args):
-> ; filter_arg(__u64 *args)
->  209: (bf) r9 =3D r1
->  210: (79) r8 =3D *(u64 *)(r9 +0)
->  211: (bf) r1 =3D r8
->  212: (b7) r2 =3D 6973
->  213: (bf) r0 =3D r1
->  214: (79) r1 =3D *(u64 *)(r0 +16)
->  215: (15) if r1 =3D=3D 0x0 goto pc+12
->  216: (07) r1 +=3D 224
->  217: (bf) r3 =3D r1
->  218: (b7) r2 =3D 8
->  219: (bf) r1 =3D r10
->  220: (07) r1 +=3D -8
->  221: (85) call bpf_probe_read_kernel#-125280
->  222: (79) r8 =3D *(u64 *)(r10 -8)
->  223: (67) r8 <<=3D 32
->  224: (77) r8 >>=3D 32
->  225: (55) if r8 !=3D 0x2 goto pc+2
->  226: (b7) r8 =3D 1
->  227: (05) goto pc+1
->  228: (af) r8 ^=3D r8
->  229: (bf) r0 =3D r8
->  230: (95) exit
->
-> However, since bpf_rdonly_cast() is a kfunc, it causes registers r1=E2=80=
-=93r5
-> to be considered volatile.
+New timestamping API was introduced in commit 66f7223039c0 ("net: add
+NDOs for configuring hardware timestamping") from kernel v6.6. It is
+time to convert the mlxsw driver to the new API, so that the
+ndo_eth_ioctl() path can be removed completely.
 
-It is not.
-See:
-BTF_ID_FLAGS(func, bpf_rdonly_cast, KF_FASTCALL)
-and relevant commits.
+The UAPI is still ioctl-only, but it's best to remove the "ioctl"
+mentions from the driver in case a netlink variant appears.
+
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+---
+ .../net/ethernet/mellanox/mlxsw/spectrum.c    | 63 +++++--------------
+ .../net/ethernet/mellanox/mlxsw/spectrum.h    |  7 ++-
+ .../ethernet/mellanox/mlxsw/spectrum_ptp.c    | 30 ++++-----
+ .../ethernet/mellanox/mlxsw/spectrum_ptp.h    | 20 +++---
+ 4 files changed, 48 insertions(+), 72 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
+index 3080ea032e7f..618957d65663 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
+@@ -1159,63 +1159,31 @@ static int mlxsw_sp_set_features(struct net_device *dev,
+ 	return 0;
+ }
+ 
+-static int mlxsw_sp_port_hwtstamp_set(struct mlxsw_sp_port *mlxsw_sp_port,
+-				      struct ifreq *ifr)
++static int mlxsw_sp_port_hwtstamp_set(struct net_device *dev,
++				      struct kernel_hwtstamp_config *config,
++				      struct netlink_ext_ack *extack)
+ {
+-	struct hwtstamp_config config;
+-	int err;
+-
+-	if (copy_from_user(&config, ifr->ifr_data, sizeof(config)))
+-		return -EFAULT;
+-
+-	err = mlxsw_sp_port->mlxsw_sp->ptp_ops->hwtstamp_set(mlxsw_sp_port,
+-							     &config);
+-	if (err)
+-		return err;
+-
+-	if (copy_to_user(ifr->ifr_data, &config, sizeof(config)))
+-		return -EFAULT;
++	struct mlxsw_sp_port *mlxsw_sp_port = netdev_priv(dev);
+ 
+-	return 0;
++	return mlxsw_sp_port->mlxsw_sp->ptp_ops->hwtstamp_set(mlxsw_sp_port,
++							      config, extack);
+ }
+ 
+-static int mlxsw_sp_port_hwtstamp_get(struct mlxsw_sp_port *mlxsw_sp_port,
+-				      struct ifreq *ifr)
++static int mlxsw_sp_port_hwtstamp_get(struct net_device *dev,
++				      struct kernel_hwtstamp_config *config)
+ {
+-	struct hwtstamp_config config;
+-	int err;
+-
+-	err = mlxsw_sp_port->mlxsw_sp->ptp_ops->hwtstamp_get(mlxsw_sp_port,
+-							     &config);
+-	if (err)
+-		return err;
+-
+-	if (copy_to_user(ifr->ifr_data, &config, sizeof(config)))
+-		return -EFAULT;
++	struct mlxsw_sp_port *mlxsw_sp_port = netdev_priv(dev);
+ 
+-	return 0;
++	return mlxsw_sp_port->mlxsw_sp->ptp_ops->hwtstamp_get(mlxsw_sp_port,
++							      config);
+ }
+ 
+ static inline void mlxsw_sp_port_ptp_clear(struct mlxsw_sp_port *mlxsw_sp_port)
+ {
+-	struct hwtstamp_config config = {0};
+-
+-	mlxsw_sp_port->mlxsw_sp->ptp_ops->hwtstamp_set(mlxsw_sp_port, &config);
+-}
+-
+-static int
+-mlxsw_sp_port_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
+-{
+-	struct mlxsw_sp_port *mlxsw_sp_port = netdev_priv(dev);
++	struct kernel_hwtstamp_config config = {};
+ 
+-	switch (cmd) {
+-	case SIOCSHWTSTAMP:
+-		return mlxsw_sp_port_hwtstamp_set(mlxsw_sp_port, ifr);
+-	case SIOCGHWTSTAMP:
+-		return mlxsw_sp_port_hwtstamp_get(mlxsw_sp_port, ifr);
+-	default:
+-		return -EOPNOTSUPP;
+-	}
++	mlxsw_sp_port->mlxsw_sp->ptp_ops->hwtstamp_set(mlxsw_sp_port, &config,
++						       NULL);
+ }
+ 
+ static const struct net_device_ops mlxsw_sp_port_netdev_ops = {
+@@ -1232,7 +1200,8 @@ static const struct net_device_ops mlxsw_sp_port_netdev_ops = {
+ 	.ndo_vlan_rx_add_vid	= mlxsw_sp_port_add_vid,
+ 	.ndo_vlan_rx_kill_vid	= mlxsw_sp_port_kill_vid,
+ 	.ndo_set_features	= mlxsw_sp_set_features,
+-	.ndo_eth_ioctl		= mlxsw_sp_port_ioctl,
++	.ndo_hwtstamp_get	= mlxsw_sp_port_hwtstamp_get,
++	.ndo_hwtstamp_set	= mlxsw_sp_port_hwtstamp_set,
+ };
+ 
+ static int
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum.h b/drivers/net/ethernet/mellanox/mlxsw/spectrum.h
+index 37cd1d002b3b..b03ff9e044f9 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum.h
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum.h
+@@ -233,9 +233,10 @@ struct mlxsw_sp_ptp_ops {
+ 			    u16 local_port);
+ 
+ 	int (*hwtstamp_get)(struct mlxsw_sp_port *mlxsw_sp_port,
+-			    struct hwtstamp_config *config);
++			    struct kernel_hwtstamp_config *config);
+ 	int (*hwtstamp_set)(struct mlxsw_sp_port *mlxsw_sp_port,
+-			    struct hwtstamp_config *config);
++			    struct kernel_hwtstamp_config *config,
++			    struct netlink_ext_ack *extack);
+ 	void (*shaper_work)(struct work_struct *work);
+ 	int (*get_ts_info)(struct mlxsw_sp *mlxsw_sp,
+ 			   struct kernel_ethtool_ts_info *info);
+@@ -351,7 +352,7 @@ struct mlxsw_sp_port {
+ 	struct mlxsw_sp_flow_block *eg_flow_block;
+ 	struct {
+ 		struct delayed_work shaper_dw;
+-		struct hwtstamp_config hwtstamp_config;
++		struct kernel_hwtstamp_config hwtstamp_config;
+ 		u16 ing_types;
+ 		u16 egr_types;
+ 		struct mlxsw_sp_ptp_port_stats stats;
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_ptp.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_ptp.c
+index ca8b9d18fbb9..e8182dd76c7d 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_ptp.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_ptp.c
+@@ -46,7 +46,7 @@ struct mlxsw_sp2_ptp_state {
+ 	refcount_t ptp_port_enabled_ref; /* Number of ports with time stamping
+ 					  * enabled.
+ 					  */
+-	struct hwtstamp_config config;
++	struct kernel_hwtstamp_config config;
+ 	struct mutex lock; /* Protects 'config' and HW configuration. */
+ };
+ 
+@@ -1083,14 +1083,14 @@ void mlxsw_sp1_ptp_fini(struct mlxsw_sp_ptp_state *ptp_state_common)
+ }
+ 
+ int mlxsw_sp1_ptp_hwtstamp_get(struct mlxsw_sp_port *mlxsw_sp_port,
+-			       struct hwtstamp_config *config)
++			       struct kernel_hwtstamp_config *config)
+ {
+ 	*config = mlxsw_sp_port->ptp.hwtstamp_config;
+ 	return 0;
+ }
+ 
+ static int
+-mlxsw_sp1_ptp_get_message_types(const struct hwtstamp_config *config,
++mlxsw_sp1_ptp_get_message_types(const struct kernel_hwtstamp_config *config,
+ 				u16 *p_ing_types, u16 *p_egr_types,
+ 				enum hwtstamp_rx_filters *p_rx_filter)
+ {
+@@ -1246,7 +1246,8 @@ void mlxsw_sp1_ptp_shaper_work(struct work_struct *work)
+ }
+ 
+ int mlxsw_sp1_ptp_hwtstamp_set(struct mlxsw_sp_port *mlxsw_sp_port,
+-			       struct hwtstamp_config *config)
++			       struct kernel_hwtstamp_config *config,
++			       struct netlink_ext_ack *extack)
+ {
+ 	enum hwtstamp_rx_filters rx_filter;
+ 	u16 ing_types;
+@@ -1270,7 +1271,7 @@ int mlxsw_sp1_ptp_hwtstamp_set(struct mlxsw_sp_port *mlxsw_sp_port,
+ 	if (err)
+ 		return err;
+ 
+-	/* Notify the ioctl caller what we are actually timestamping. */
++	/* Notify the caller what we are actually timestamping. */
+ 	config->rx_filter = rx_filter;
+ 
+ 	return 0;
+@@ -1451,7 +1452,7 @@ void mlxsw_sp2_ptp_transmitted(struct mlxsw_sp *mlxsw_sp,
+ }
+ 
+ int mlxsw_sp2_ptp_hwtstamp_get(struct mlxsw_sp_port *mlxsw_sp_port,
+-			       struct hwtstamp_config *config)
++			       struct kernel_hwtstamp_config *config)
+ {
+ 	struct mlxsw_sp2_ptp_state *ptp_state;
+ 
+@@ -1465,7 +1466,7 @@ int mlxsw_sp2_ptp_hwtstamp_get(struct mlxsw_sp_port *mlxsw_sp_port,
+ }
+ 
+ static int
+-mlxsw_sp2_ptp_get_message_types(const struct hwtstamp_config *config,
++mlxsw_sp2_ptp_get_message_types(const struct kernel_hwtstamp_config *config,
+ 				u16 *p_ing_types, u16 *p_egr_types,
+ 				enum hwtstamp_rx_filters *p_rx_filter)
+ {
+@@ -1542,7 +1543,7 @@ static int mlxsw_sp2_ptp_mtpcpc_set(struct mlxsw_sp *mlxsw_sp, bool ptp_trap_en,
+ 
+ static int mlxsw_sp2_ptp_enable(struct mlxsw_sp *mlxsw_sp, u16 ing_types,
+ 				u16 egr_types,
+-				struct hwtstamp_config new_config)
++				struct kernel_hwtstamp_config new_config)
+ {
+ 	struct mlxsw_sp2_ptp_state *ptp_state = mlxsw_sp2_ptp_state(mlxsw_sp);
+ 	int err;
+@@ -1556,7 +1557,7 @@ static int mlxsw_sp2_ptp_enable(struct mlxsw_sp *mlxsw_sp, u16 ing_types,
+ }
+ 
+ static int mlxsw_sp2_ptp_disable(struct mlxsw_sp *mlxsw_sp,
+-				 struct hwtstamp_config new_config)
++				 struct kernel_hwtstamp_config new_config)
+ {
+ 	struct mlxsw_sp2_ptp_state *ptp_state = mlxsw_sp2_ptp_state(mlxsw_sp);
+ 	int err;
+@@ -1571,7 +1572,7 @@ static int mlxsw_sp2_ptp_disable(struct mlxsw_sp *mlxsw_sp,
+ 
+ static int mlxsw_sp2_ptp_configure_port(struct mlxsw_sp_port *mlxsw_sp_port,
+ 					u16 ing_types, u16 egr_types,
+-					struct hwtstamp_config new_config)
++					struct kernel_hwtstamp_config new_config)
+ {
+ 	struct mlxsw_sp2_ptp_state *ptp_state;
+ 	int err;
+@@ -1592,7 +1593,7 @@ static int mlxsw_sp2_ptp_configure_port(struct mlxsw_sp_port *mlxsw_sp_port,
+ }
+ 
+ static int mlxsw_sp2_ptp_deconfigure_port(struct mlxsw_sp_port *mlxsw_sp_port,
+-					  struct hwtstamp_config new_config)
++					  struct kernel_hwtstamp_config new_config)
+ {
+ 	struct mlxsw_sp2_ptp_state *ptp_state;
+ 	int err;
+@@ -1614,11 +1615,12 @@ static int mlxsw_sp2_ptp_deconfigure_port(struct mlxsw_sp_port *mlxsw_sp_port,
+ }
+ 
+ int mlxsw_sp2_ptp_hwtstamp_set(struct mlxsw_sp_port *mlxsw_sp_port,
+-			       struct hwtstamp_config *config)
++			       struct kernel_hwtstamp_config *config,
++			       struct netlink_ext_ack *extack)
+ {
++	struct kernel_hwtstamp_config new_config;
+ 	struct mlxsw_sp2_ptp_state *ptp_state;
+ 	enum hwtstamp_rx_filters rx_filter;
+-	struct hwtstamp_config new_config;
+ 	u16 new_ing_types, new_egr_types;
+ 	bool ptp_enabled;
+ 	int err;
+@@ -1652,7 +1654,7 @@ int mlxsw_sp2_ptp_hwtstamp_set(struct mlxsw_sp_port *mlxsw_sp_port,
+ 	mlxsw_sp_port->ptp.ing_types = new_ing_types;
+ 	mlxsw_sp_port->ptp.egr_types = new_egr_types;
+ 
+-	/* Notify the ioctl caller what we are actually timestamping. */
++	/* Notify the caller what we are actually timestamping. */
+ 	config->rx_filter = rx_filter;
+ 	mutex_unlock(&ptp_state->lock);
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_ptp.h b/drivers/net/ethernet/mellanox/mlxsw/spectrum_ptp.h
+index 102db9060135..df37f1470830 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_ptp.h
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_ptp.h
+@@ -34,10 +34,11 @@ void mlxsw_sp1_ptp_got_timestamp(struct mlxsw_sp *mlxsw_sp, bool ingress,
+ 				 u64 timestamp);
+ 
+ int mlxsw_sp1_ptp_hwtstamp_get(struct mlxsw_sp_port *mlxsw_sp_port,
+-			       struct hwtstamp_config *config);
++			       struct kernel_hwtstamp_config *config);
+ 
+ int mlxsw_sp1_ptp_hwtstamp_set(struct mlxsw_sp_port *mlxsw_sp_port,
+-			       struct hwtstamp_config *config);
++			       struct kernel_hwtstamp_config *config,
++			       struct netlink_ext_ack *extack);
+ 
+ void mlxsw_sp1_ptp_shaper_work(struct work_struct *work);
+ 
+@@ -65,10 +66,11 @@ void mlxsw_sp2_ptp_transmitted(struct mlxsw_sp *mlxsw_sp,
+ 			       struct sk_buff *skb, u16 local_port);
+ 
+ int mlxsw_sp2_ptp_hwtstamp_get(struct mlxsw_sp_port *mlxsw_sp_port,
+-			       struct hwtstamp_config *config);
++			       struct kernel_hwtstamp_config *config);
+ 
+ int mlxsw_sp2_ptp_hwtstamp_set(struct mlxsw_sp_port *mlxsw_sp_port,
+-			       struct hwtstamp_config *config);
++			       struct kernel_hwtstamp_config *config,
++			       struct netlink_ext_ack *extack);
+ 
+ int mlxsw_sp2_ptp_get_ts_info(struct mlxsw_sp *mlxsw_sp,
+ 			      struct kernel_ethtool_ts_info *info);
+@@ -117,14 +119,15 @@ mlxsw_sp1_ptp_got_timestamp(struct mlxsw_sp *mlxsw_sp, bool ingress,
+ 
+ static inline int
+ mlxsw_sp1_ptp_hwtstamp_get(struct mlxsw_sp_port *mlxsw_sp_port,
+-			   struct hwtstamp_config *config)
++			   struct kernel_hwtstamp_config *config)
+ {
+ 	return -EOPNOTSUPP;
+ }
+ 
+ static inline int
+ mlxsw_sp1_ptp_hwtstamp_set(struct mlxsw_sp_port *mlxsw_sp_port,
+-			   struct hwtstamp_config *config)
++			   struct kernel_hwtstamp_config *config,
++			   struct netlink_ext_ack *extack)
+ {
+ 	return -EOPNOTSUPP;
+ }
+@@ -181,14 +184,15 @@ static inline void mlxsw_sp2_ptp_transmitted(struct mlxsw_sp *mlxsw_sp,
+ 
+ static inline int
+ mlxsw_sp2_ptp_hwtstamp_get(struct mlxsw_sp_port *mlxsw_sp_port,
+-			   struct hwtstamp_config *config)
++			   struct kernel_hwtstamp_config *config)
+ {
+ 	return -EOPNOTSUPP;
+ }
+ 
+ static inline int
+ mlxsw_sp2_ptp_hwtstamp_set(struct mlxsw_sp_port *mlxsw_sp_port,
+-			   struct hwtstamp_config *config)
++			   struct kernel_hwtstamp_config *config,
++			   struct netlink_ext_ack *extack)
+ {
+ 	return -EOPNOTSUPP;
+ }
+-- 
+2.43.0
+
 
