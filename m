@@ -1,182 +1,172 @@
-Return-Path: <netdev+bounces-189625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14E8EAB2D5E
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 04:14:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBAA0AB2D7B
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 04:26:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0B837A594C
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 02:13:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 619DF17225D
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 02:26:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E5B9248F62;
-	Mon, 12 May 2025 02:14:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B4DA25334E;
+	Mon, 12 May 2025 02:26:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
+Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A168B29D0E;
-	Mon, 12 May 2025 02:14:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.166.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 573EB70825
+	for <netdev@vger.kernel.org>; Mon, 12 May 2025 02:26:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747016073; cv=none; b=mA4JvZy9jEsRASP7WBE6BZQ0t2w84s1VlZmzD898DvJD5lxWQyUeCuQmsOvCzWWKajsLuBmU2RdqhQX8Issi9OWZ9idEHXGpiczKGIAmwKfpX7MjLVzxoMgzF+6gtsGg9ecaAllopmztZPDYxKpH27+3gEepcVDCx0hEVU8od1k=
+	t=1747016808; cv=none; b=gDlTuesBMmj2TBBMAiAFkaNPFhGOhqtWaxU8/y6e2vr+tFNYzv1Zee/9gxw2ZxMVZjDLRw0KnlfET4OiQQkqgCVjmuZvVD+rkr35ilw6J5YDy9uWqWvXh6HLdcetMW3ZmF6MWVdio3bR2TFDQZlXBtNsvoYPhvs9IN5KOr4rS6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747016073; c=relaxed/simple;
-	bh=pnxU2CEJKSdncR1tk3EpHMB0Cwdhj1DDOuUob/OYeMQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=heQyscbdh6MA+GGpSFnqkdyAjQ/zbykXSEOVNJdI0qN0fcGL4WlHFcIHIhFjLRq2UrdPxwRGCmFCJfQTXkWQZgyaQ2cEuScWvqnTI0VR9rcJ0OqMerft4HFfOWk90WlrPvGT6xa0rptyUvAILPi3+hEdeo5KZyAw/2+GItoOLLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.166.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54C2BXPJ012129;
-	Sun, 11 May 2025 19:14:00 -0700
-Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [147.11.82.254])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 46j233h3yk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Sun, 11 May 2025 19:14:00 -0700 (PDT)
-Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
- ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.43; Sun, 11 May 2025 19:13:59 -0700
-Received: from pek-lpg-core1.wrs.com (147.11.136.210) by
- ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
- 15.1.2507.43 via Frontend Transport; Sun, 11 May 2025 19:13:56 -0700
-From: <jianqi.ren.cn@windriver.com>
-To: <gregkh@linuxfoundation.org>, <stable@vger.kernel.org>
-CC: <patches@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
-        <jianqi.ren.cn@windriver.com>, <jhs@mojatatu.com>,
-        <xiyou.wangcong@gmail.com>, <jiri@resnulli.us>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <shuah@kernel.org>, <shmulik.ladkani@gmail.com>,
-        <netdev@vger.kernel.org>, <dcaratti@redhat.com>
-Subject: [PATCH 6.1.y] net/sched: act_mirred: use the backlog for mirred ingress
-Date: Mon, 12 May 2025 10:13:55 +0800
-Message-ID: <20250512021355.3327681-1-jianqi.ren.cn@windriver.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1747016808; c=relaxed/simple;
+	bh=de7TBUm8LJing725D2jejYw1ay62rJmOAUJcva2Ru44=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=pH3XnAD5yhvFGchHj7Ou0sNDgl/NcpW0W5zPmPadsZC1J7uEv3hDjcLKok7lxYizk3wVIbznW+2et2r7kD38wjbup75/9nyhop9UIjGBS00TDntmFmrFvP3Qrtek6e/3p3usUlv0zpL7SvZxmXG1WA6no/vpKRTNg8otTuFKu/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=none smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=18.169.211.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bamaicloud.com
+X-QQ-mid: zesmtpgz1t1747016719t1271c9ad
+X-QQ-Originating-IP: Q155Ok2CSHLKDr4pELiL86iKK6+IWkQZJlKNOvG85xc=
+Received: from smtpclient.apple ( [111.202.70.100])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 12 May 2025 10:25:17 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 3493817473279601546
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=EojSrTcA c=1 sm=1 tr=0 ts=68215968 cx=c_pps a=K4BcnWQioVPsTJd46EJO2w==:117 a=K4BcnWQioVPsTJd46EJO2w==:17 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8 a=20KFwNOVAAAA:8 a=pGLkceISAAAA:8 a=A7XncKjpAAAA:8 a=J1Y8HTJGAAAA:8 a=t7CeM3EgAAAA:8
- a=--JntEdgB-XHV1fWJyUA:9 a=R9rPLQDAdC6-Ub70kJmZ:22 a=y1Q9-5lHfBjTkpIzbSAN:22 a=FdTzh2GWekK77mhwV6Dw:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTEyMDAyMSBTYWx0ZWRfXzDyHjivNP+jo 3KQKYOQIER5TsAjwSYU3Yq3+iXEAnyTsWiY4Y5zh/4ImoT3uPxwSeK/FfE1EFQMqB/WU5AJl/XT tluMA4Kllhjyeenso1UU40nZ7lpqnYNjsXZ5WzSVMrqAPQrQN7KeSfWe1+kCcGVFWvy68axNWk6
- V+GkPeMtZGymZTREHCUjTpepfOrnjHT8PP1d9n6Ha9KD8PAtFnK6ZB5+mFm4Hwfq+6qebu0/T9v v5W16v6Rv67vSQ9lpr9MauKSAGagzRHS43BS8EkVzncpR7zMj3EBFYA+ysLU/gqI1BasO3wZqun qGo4eBui/fonHYW1DHm/rms1Yb71VYEW3v593QdpwSphY0yAdQmiY4cHvYu38GElpzNNeHSVWeS
- NJLIMBZZCJJPiGOccPuUL5IyNjQpIIp/Lk71kl8oivj/tiZU1ghE+vdc+e7p5DdNn5y8fIP5
-X-Proofpoint-GUID: dardaHlfkVJzYoR8YHIW5l_o7Ab7dOUM
-X-Proofpoint-ORIG-GUID: dardaHlfkVJzYoR8YHIW5l_o7Ab7dOUM
-X-Sensitive_Customer_Information: Yes
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-11_10,2025-05-09_01,2025-02-21_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- phishscore=0 priorityscore=1501 mlxlogscore=999 adultscore=0
- impostorscore=0 clxscore=1011 malwarescore=0 mlxscore=0 spamscore=0
- bulkscore=0 suspectscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.21.0-2504070000
- definitions=main-2505120021
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
+Subject: Re: [PATCH net-next 1/4] net: bonding: add broadcast_neighbor option
+ for 802.3ad
+From: Tonghao Zhang <tonghao@bamaicloud.com>
+In-Reply-To: <ea87b2d2-9b17-4f16-9e40-fe7212f2788d@lunn.ch>
+Date: Mon, 12 May 2025 10:25:16 +0800
+Cc: Jay Vosburgh <jv@jvosburgh.net>,
+ netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <B43CC0DC-286B-44FF-8FA8-1B1BC0C990BF@bamaicloud.com>
+References: <20250510044504.52618-1-tonghao@bamaicloud.com>
+ <20250510044504.52618-2-tonghao@bamaicloud.com> <1133230.1746881077@vermin>
+ <CE4DB782-91EB-4DBD-9C26-CA4C4612D58C@bamaicloud.com>
+ <ea87b2d2-9b17-4f16-9e40-fe7212f2788d@lunn.ch>
+To: Andrew Lunn <andrew@lunn.ch>
+X-Mailer: Apple Mail (2.3693.20.0.1.32)
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpgz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
+X-QQ-XMAILINFO: MVbvI5amSZ2YmY6YRLetviQaThRmXIzMV2MhFugSEF6AK/Pd6HszblPY
+	QEDiOIOYKy4VyYyZUBMhUqeEAN4cDTsC5teF7kJlpifMD53dG8wZyZtBByaDXtEv2M35tXC
+	3CO2aanl/cR38E7qQq1B0tQYCd8DDSZRAPJvFl2siNLjHv/266zd5n4bT+QMMYjlGC6760e
+	jr5rFPb3ZGExhDO1kSzfKo+ii7JQ7czc1TG1hNZnXwigOzZ0rfGjb9hz+04pb32XhsNeVw1
+	CoCGfKG3FfDGlA7AJf0noInKC4V6lrWqw5TMtT0fWuLTd6JII/7yfOoooVVCPKCKtTCCoph
+	dNmsXsnYd18pKUFY5Trsi02xBLp2npe+Egxus2IRtpGiLlEiySkwbqjnBKQ4t1BASJtd+xM
+	BiLra7uyczPS2MGOXzeYzNKLWkovUxvXbrsom2PA16FJZJ23xt64Pi3yITYDUoEYaDrqZas
+	eOjS7F7e39fT+0ReTjFFwuK3vanJY9qM7a4hrSmA5MXyHqbsvDLpHTZW72akUlQ31UPpUDT
+	bVelElov318GpePJ/XbqlHVn9yl6nGZvqLyQTdN6t+RQL3WauClauyrrUhBBFSxFk6kBzgO
+	7fSF+++Z5OiTKXsawvDGOmnPPlqQCxWEWpxKURv45e4OVhZx7VWe5sDxWou/mOoJ0B59cdP
+	N5DN6MruUmOcZIWArAh7ZVpTq8ASo+UGDuoaMcHEDZW0jrQ6y69rigm9Ei+Q4uSLkcNEKQg
+	3MdBa/J2COJ9o+hjjC+1ejjmZakFG9tSFXrPi8uPUKM7K7MdnVaH5diJcrh80R3GV0ZeCF8
+	TztdluMC9C9l6qAPWJKnz1L+TMNYTthjlyp71OhD7sMFYlqy4o7zmqcbDjEbxnHR9RhlZrk
+	DTqm95lAvZb0rKy09x5CM+l6Fn3rxqRYfIBgrb+q6twGD7jBRjoQDBDFJ0lHBHyT+UqJeUQ
+	r5lA=
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+X-QQ-RECHKSPAM: 0
 
-From: Jakub Kicinski <kuba@kernel.org>
 
-[ Upstream commit 52f671db18823089a02f07efc04efdb2272ddc17 ]
 
-The test Davide added in commit ca22da2fbd69 ("act_mirred: use the backlog
-for nested calls to mirred ingress") hangs our testing VMs every 10 or so
-runs, with the familiar tcp_v4_rcv -> tcp_v4_rcv deadlock reported by
-lockdep.
-
-The problem as previously described by Davide (see Link) is that
-if we reverse flow of traffic with the redirect (egress -> ingress)
-we may reach the same socket which generated the packet. And we may
-still be holding its socket lock. The common solution to such deadlocks
-is to put the packet in the Rx backlog, rather than run the Rx path
-inline. Do that for all egress -> ingress reversals, not just once
-we started to nest mirred calls.
-
-In the past there was a concern that the backlog indirection will
-lead to loss of error reporting / less accurate stats. But the current
-workaround does not seem to address the issue.
-
-Fixes: 53592b364001 ("net/sched: act_mirred: Implement ingress actions")
-Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Suggested-by: Davide Caratti <dcaratti@redhat.com>
-Link: https://lore.kernel.org/netdev/33dc43f587ec1388ba456b4915c75f02a8aae226.1663945716.git.dcaratti@redhat.com/
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
-[Minor conflict resolved due to code context change.]
-Signed-off-by: Jianqi Ren <jianqi.ren.cn@windriver.com>
-Signed-off-by: He Zhe <zhe.he@windriver.com>
----
-Verified the build test
----
- net/sched/act_mirred.c                             | 14 +++++---------
- .../testing/selftests/net/forwarding/tc_actions.sh |  3 ---
- 2 files changed, 5 insertions(+), 12 deletions(-)
-
-diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
-index bbc34987bd09..896bffd50aa8 100644
---- a/net/sched/act_mirred.c
-+++ b/net/sched/act_mirred.c
-@@ -205,18 +205,14 @@ static int tcf_mirred_init(struct net *net, struct nlattr *nla,
- 	return err;
+> 2025=E5=B9=B45=E6=9C=8811=E6=97=A5 =E4=B8=8B=E5=8D=8811:53=EF=BC=8CAndre=
+w Lunn <andrew@lunn.ch> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+>> static inline bool bond_should_broadcast_neighbor(struct bonding =
+*bond,
+>>                                                  struct sk_buff *skb)
+>> {
+>>        if (!bond->params.broadcast_neighbor ||
+>>            BOND_MODE(bond) !=3D BOND_MODE_8023AD)
+>>                return false;
+>=20
+> I think you missed the point. You have added these two tests to every
+> packet on the fast path. And it is very likely to return false. Is
+> bond.params.broadcast_neighbor likely to be in the cache? A cache miss
+> is expensive. Is bond.params.mode also likely to be in cache? You
+> placed broadcast_neighbor at the end of params, so it is unlikely to
+> be in the same cache line as bond.params.mode. So two cache misses.
+>=20
+> What Jay would like is that the cost on the fast path is ~0 for when
+> this feature is not in use. Jump labels can achieve this. It inserts
+> either a NOP or a jump instruction, which costs nearly nothing, and
+> then uses self modifying code to swap between a NOP or a jump. You can
+> keep a global view of is any bond is using this new mode? If no, this
+No, no mode uses jump labels instead of bond.params checking.
+> test is eliminated. If yes, you do the test.
+I test the lacp mode with broadcast_neighbor enabled, there is no =
+performance drop. This patch has been running in our production =
+environment for a long time. We only use this option in lacp mode, for =
+performance, the code can be modified as follows:
+diff --git a/drivers/net/bonding/bond_main.c =
+b/drivers/net/bonding/bond_main.c
+index ce31445e85b6..8743bf007b7e 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -5330,11 +5330,12 @@ static struct slave =
+*bond_xdp_xmit_3ad_xor_slave_get(struct bonding *bond,
+        return slaves->arr[hash % count];
  }
- 
--static bool is_mirred_nested(void)
--{
--	return unlikely(__this_cpu_read(mirred_nest_level) > 1);
--}
--
--static int tcf_mirred_forward(bool want_ingress, struct sk_buff *skb)
-+static int
-+tcf_mirred_forward(bool at_ingress, bool want_ingress, struct sk_buff *skb)
+
+-static inline bool bond_should_broadcast_neighbor(struct bonding *bond,
+-                                                 struct sk_buff *skb)
++static inline bool bond_should_broadcast_neighbor(struct sk_buff *skb,
++                                                 struct net_device =
+*dev)
  {
- 	int err;
- 
- 	if (!want_ingress)
- 		err = tcf_dev_queue_xmit(skb, dev_queue_xmit);
--	else if (is_mirred_nested())
-+	else if (!at_ingress)
- 		err = netif_rx(skb);
- 	else
- 		err = netif_receive_skb(skb);
-@@ -312,7 +308,7 @@ static int tcf_mirred_act(struct sk_buff *skb, const struct tc_action *a,
- 
- 		/* let's the caller reinsert the packet, if possible */
- 		if (use_reinsert) {
--			err = tcf_mirred_forward(want_ingress, skb);
-+			err = tcf_mirred_forward(at_ingress, want_ingress, skb);
- 			if (err)
- 				tcf_action_inc_overlimit_qstats(&m->common);
- 			__this_cpu_dec(mirred_nest_level);
-@@ -320,7 +316,7 @@ static int tcf_mirred_act(struct sk_buff *skb, const struct tc_action *a,
- 		}
- 	}
- 
--	err = tcf_mirred_forward(want_ingress, skb2);
-+	err = tcf_mirred_forward(at_ingress, want_ingress, skb2);
- 	if (err)
- 		tcf_action_inc_overlimit_qstats(&m->common);
- 	__this_cpu_dec(mirred_nest_level);
-diff --git a/tools/testing/selftests/net/forwarding/tc_actions.sh b/tools/testing/selftests/net/forwarding/tc_actions.sh
-index b0f5e55d2d0b..589629636502 100755
---- a/tools/testing/selftests/net/forwarding/tc_actions.sh
-+++ b/tools/testing/selftests/net/forwarding/tc_actions.sh
-@@ -235,9 +235,6 @@ mirred_egress_to_ingress_tcp_test()
- 	check_err $? "didn't mirred redirect ICMP"
- 	tc_check_packets "dev $h1 ingress" 102 10
- 	check_err $? "didn't drop mirred ICMP"
--	local overlimits=$(tc_rule_stats_get ${h1} 101 egress .overlimits)
--	test ${overlimits} = 10
--	check_err $? "wrong overlimits, expected 10 got ${overlimits}"
- 
- 	tc filter del dev $h1 egress protocol ip pref 100 handle 100 flower
- 	tc filter del dev $h1 egress protocol ip pref 101 handle 101 flower
--- 
-2.34.1
+-       if (!bond->params.broadcast_neighbor ||
+-           BOND_MODE(bond) !=3D BOND_MODE_8023AD)
++       struct bonding *bond =3D netdev_priv(dev);
++
++       if (!bond->params.broadcast_neighbor)
+                return false;
+
+        if (skb->protocol =3D=3D htons(ETH_P_ARP))
+@@ -5408,9 +5409,6 @@ static netdev_tx_t bond_3ad_xor_xmit(struct =
+sk_buff *skb,
+        struct bond_up_slave *slaves;
+        struct slave *slave;
+
+-       if (bond_should_broadcast_neighbor(bond, skb))
+-               return bond_xmit_broadcast(skb, dev);
+-
+        slaves =3D rcu_dereference(bond->usable_slaves);
+        slave =3D bond_xmit_3ad_xor_slave_get(bond, skb, slaves);
+        if (likely(slave))
+@@ -5625,6 +5623,9 @@ static netdev_tx_t __bond_start_xmit(struct =
+sk_buff *skb, struct net_device *dev
+        case BOND_MODE_ACTIVEBACKUP:
+                return bond_xmit_activebackup(skb, dev);
+        case BOND_MODE_8023AD:
++               if (bond_should_broadcast_neighbor(skb, dev))
++                       return bond_xmit_broadcast(skb, dev);
++               fallthrough;
+        case BOND_MODE_XOR:
+                return bond_3ad_xor_xmit(skb, dev);
+        case BOND_MODE_BROADCAST:
+>=20
+> 	Andrew
+>=20
+>=20
 
 
