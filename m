@@ -1,190 +1,486 @@
-Return-Path: <netdev+bounces-189637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDD71AB2E72
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 06:50:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4B8EAB2F07
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 07:30:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A16416A86F
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 04:50:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 320153A5B18
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 05:30:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 942A9250C0D;
-	Mon, 12 May 2025 04:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68AA0254B14;
+	Mon, 12 May 2025 05:30:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="B13CrC9p";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="pH6NnWmq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9185535D8
-	for <netdev@vger.kernel.org>; Mon, 12 May 2025 04:50:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747025427; cv=none; b=dOQY9A0aazDeZE8mp0ek1zqG+HGmbXLn4M8DjcOgWJ6DRyT+VDuDDo4muqqF2Pc3cwJsIHAWi2PdFC6wxhmpYvCDll/GWDzL+RHREKt7Skf30p+tG7g6c4OkGMUnx/+HPvhsRa/oUDsr9+HI1/0uAqFERRyf1ZcNEC9VPG9JH1E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747025427; c=relaxed/simple;
-	bh=7Xiskqa7L+6rqLDvsgiMDhwevWUAy74479EhXc1gaB4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=CVXX0Lmc/5BdzOZaxZv0jB3VFsyda2UnNl+r8r81QBRsOMGj2i0mdw8LPa8VT04IUD6awWMStRXUhcoMUujGo+AL5tp9l5f+3uFnlw0GW3x46rFEByyluYPi4X/LMh+doZCoQpL2AZ67Mh0Q4d+enhYXzjL6Kyj/X8zNwZuXH/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3da717e86b1so41744055ab.2
-        for <netdev@vger.kernel.org>; Sun, 11 May 2025 21:50:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747025425; x=1747630225;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MvJXPWPUEdy3W8iN/5cmgWQxRUqmS/kAUen/zOjXUpc=;
-        b=b0Qss1xsHCL7K2jEfFWXSv2lPS6csZeFzj7GoJQGvqiysJC+4GXZnMjUAM8EBBPPwW
-         mrnU7USi+m9Ox9itkBLikWI7ywkiuFzMR9oeztHeky1SJ2YTt+n1PQ/moVYUzd4ssH+Z
-         4JfjkRDJIgULzMChpb92bVu2dvmrBuYZBnLmaVpSNZNHYeBLXUYhofRbHd3IY6hGmpKY
-         1TRM/M/cbfENVNMpawfAMCZdV4hs/pOQPM9blnYLIFsdaQ4PadoTmDgBs0w35gPLzuwS
-         8u6+TTyiex/yPv7cshokjaeBL4B3KVRkcnhdwa99Esgbm1vi7Wu3fr9Mo6X2CHNna1tc
-         htUg==
-X-Forwarded-Encrypted: i=1; AJvYcCUp5tNYbWE5raZru/zOFiecc1/TnlKSH29/ccHiXDmEeCWI0iu70yCx6aBbQHdkojnkHDr2niQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1Cc6OiGVjzQoPqLhl7Fjw4JzvdH3vi18E+8RwnnyWjZWNrUsI
-	DSgJFsGkhuE9+dQBoub8fWlJqsE/AiVKBFSIFUPxMY3wrTrPOBtYLY6BgnIS1dq3e0Bk9KCeGp9
-	AIoxyiG1dlCedadh3ve6DWKg3DowoEgZ2+nxw8amFZYosbQ5FFl1Iols=
-X-Google-Smtp-Source: AGHT+IF2kufo9obcv02xgHnNGM9USzbpuxmaorBxbj9nUck6bXII8IoqV+dX6ca7PA1yqjKIv9/MUbHDF1UmlYu/8OspE566AuBd
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B26A1E2606;
+	Mon, 12 May 2025 05:30:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747027817; cv=fail; b=ahTQ7Q3R9Qqmi4B/6ipZq6pUWLzw+P+yCPEEnfB6RsHln+3WFUqdrihVRgmsrhtw3trSCQP1sP9KlWCOWEoTKwyKqKZ73b7PgNcdyoGZWLvXqNrgxeVIpWr7i/n9/61J54T/3mS4n3LWmiPwRJ+DEPCMlfrsFabUtZsuxRFlwfk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747027817; c=relaxed/simple;
+	bh=BQTO3gLm97W6UO4W/umYWIh8A0m8rgLe232/G2WvWFo=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Y/wd3n0CUpJeJG95k+aXOjjp1rYv3g2wE59ku8iASl55OUq2Pd7NYFk0Mi1xR2lvD4rcrKbjivW+bmBbm4sAJ8Oa57HuXOj6cC72ITPOBjIFpL4QR790Ms8qtZwddh09YtS5wZJr9W9tTx3BD9dp9S0+HqraJh6wX5M8Y0t3iqI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=B13CrC9p; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=pH6NnWmq; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54C3Zx2q024053;
+	Mon, 12 May 2025 05:29:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	corp-2025-04-25; bh=IEoT7L+TDB4wghMWhRr0zB8E4YA2U5uJ6/3AF+dR7vY=; b=
+	B13CrC9pCmSXP/XzqKP6wv3DQnz1S2RBlIIq43yJoy5g7ql/BIAAq7ET1GkePPe8
+	h7whjkMAjcCv0fH4QY5wHuz+Dq8nU9zBVFrcQm7GtErJkPZE/A2FIT4LFBv/xNdJ
+	FSOlwhoDN+U+8QWS0LLTAfMPDwAPuJXpVXDj9MQtRoffmDAcmo0OMPy057RmPR3I
+	WNN6vK7cZ/4wSXfwcBBhryOhTE51IjzcN92AbkMdiUUMVh76iF22dQ14/pHxdqUO
+	qfKRvgZwahC9oP0YaqtMz7DPQILa9mtxu5fHgcg94KFDIqipN6Qfq7F1936M1XV1
+	egq2++EA6uYQiiOEb4cz7g==
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 46j1d29pb2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 12 May 2025 05:29:56 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 54C2clXj036207;
+	Mon, 12 May 2025 05:29:56 GMT
+Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2176.outbound.protection.outlook.com [104.47.58.176])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 46hw86ybme-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 12 May 2025 05:29:55 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=arM60kvJP26nNQm8ViKyGzg9D7NnJNBMTlM5MZkFNa1wv5HbW0Gfv2XDPHLNjW9jbAz5lgzb9XNl2600ETqM/9NLpDBKO6xtLtPT+h3B51zFnzzT/0a1/n8KN8BgxA4wXm1dbXiuLyWD895T0XCzGs/zggyaGiLJVzxzuAW0FF8tN3jS/8pNe4eoGo/vFdv9obn7rKIq3+0Mt+uD+ePxNNWdeMYR4aXJJxXPTw0iXGqj00Tbv4mpJCJtkqvEHuNgk2DI1qNMMqe39w75yma0bUWzOjQXDma5Oqs1JYnVW4H8Us45HMRWu8Gx7XKnbh+WD4jlu0W2t3WC52CxYD8giw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=IEoT7L+TDB4wghMWhRr0zB8E4YA2U5uJ6/3AF+dR7vY=;
+ b=yTZIAhUmIiM6faXDEe+MfYOCvTbVNmubL+StnMN+tN7kby+CLKxCkJiORCVATTee2SBcKEOP4VAguNQqhHKBxUAmDdba1SpKAVgOATf/qpC/5H0zeb6ScvxMvXaG+CQKRrGnniYgsyQ7vxt3/FlYritDYbm4bhAixNmONL+jTQsfTnGvE88/drVRbM8Yzd/LJJWKbp/P51XHNahPQ3dGNgNG/m1pMeBJrnLqLGAnEs/deh0OPQ6nBlvWzle1qJHnUv5NUMHOB1WMmjdwBGeEmrZNWyIItgIazRtncPoMgrR261P73HCJtpaypv+f8u20BvHa6XzLxIo2aRowvVa1LA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IEoT7L+TDB4wghMWhRr0zB8E4YA2U5uJ6/3AF+dR7vY=;
+ b=pH6NnWmqiOfRD7j5vRZss8+iUmVgFoWnS/kQIQp0WAgxVgN2XtZqKZOkuHag8Q0ewdmTZzxL+snw22AiwM2XvzAlvQJXu8PMY1u9nvV/qVJ32ld1DdbcROjmG6mLx6JPD++gb8KvdaRlevmHy8zvIg0lB8VZCJoIeFs1+IupEhQ=
+Received: from DS7PR10MB5328.namprd10.prod.outlook.com (2603:10b6:5:3a6::12)
+ by MW4PR10MB5864.namprd10.prod.outlook.com (2603:10b6:303:18f::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.25; Mon, 12 May
+ 2025 05:29:53 +0000
+Received: from DS7PR10MB5328.namprd10.prod.outlook.com
+ ([fe80::ea13:c6c1:9956:b29c]) by DS7PR10MB5328.namprd10.prod.outlook.com
+ ([fe80::ea13:c6c1:9956:b29c%2]) with mapi id 15.20.8699.022; Mon, 12 May 2025
+ 05:29:52 +0000
+Message-ID: <01f27ba0-6239-4195-beda-bc3fea1a30cf@oracle.com>
+Date: Mon, 12 May 2025 10:59:43 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH rdma-next v4 4/4] net: mana: Add support for auxiliary
+ device servicing events
+To: Konstantin Taranov <kotaranov@linux.microsoft.com>,
+        kotaranov@microsoft.com, pabeni@redhat.com, haiyangz@microsoft.com,
+        kys@microsoft.com, edumazet@google.com, kuba@kernel.org,
+        davem@davemloft.net, decui@microsoft.com, wei.liu@kernel.org,
+        longli@microsoft.com, jgg@ziepe.ca, leon@kernel.org
+Cc: linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+References: <1746633545-17653-1-git-send-email-kotaranov@linux.microsoft.com>
+ <1746633545-17653-5-git-send-email-kotaranov@linux.microsoft.com>
+Content-Language: en-US
+From: ALOK TIWARI <alok.a.tiwari@oracle.com>
+In-Reply-To: <1746633545-17653-5-git-send-email-kotaranov@linux.microsoft.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BN8PR12CA0035.namprd12.prod.outlook.com
+ (2603:10b6:408:60::48) To DS7PR10MB5328.namprd10.prod.outlook.com
+ (2603:10b6:5:3a6::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:c244:0:b0:3d8:975:b808 with SMTP id
- e9e14a558f8ab-3da7e1e1a99mr134014655ab.5.1747025424839; Sun, 11 May 2025
- 21:50:24 -0700 (PDT)
-Date: Sun, 11 May 2025 21:50:24 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68217e10.050a0220.f2294.004c.GAE@google.com>
-Subject: [syzbot] [net?] WARNING in neigh_parms_release
-From: syzbot <syzbot+873424263816aca3b472@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    707df3375124 Merge tag 'media/v6.15-2' of git://git.kernel..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=145e98f4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=925afd2bdd38a581
-dashboard link: https://syzkaller.appspot.com/bug?extid=873424263816aca3b472
-compiler:       arm-linux-gnueabi-gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: arm
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/98a89b9f34e4/non_bootable_disk-707df337.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/abde9f240928/vmlinux-707df337.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/756b0378e0b9/zImage-707df337.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+873424263816aca3b472@syzkaller.appspotmail.com
-
-veth1_macvtap: left promiscuous mode
-veth0_macvtap: left promiscuous mode
-veth1_vlan: left promiscuous mode
-veth0_vlan: left promiscuous mode
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 22523 at lib/ref_tracker.c:228 ref_tracker_free+0x190/0x298 lib/ref_tracker.c:228
-Modules linked in:
-Kernel panic - not syncing: kernel: panic_on_warn set ...
-CPU: 1 UID: 0 PID: 22523 Comm: kworker/u8:3 Not tainted 6.15.0-rc5-syzkaller #0 PREEMPT 
-Hardware name: ARM-Versatile Express
-Workqueue: netns cleanup_net
-Call trace: 
-[<802019e4>] (dump_backtrace) from [<80201ae0>] (show_stack+0x18/0x1c arch/arm/kernel/traps.c:257)
- r7:00000000 r6:828227fc r5:00000000 r4:82257c34
-[<80201ac8>] (show_stack) from [<80220020>] (__dump_stack lib/dump_stack.c:94 [inline])
-[<80201ac8>] (show_stack) from [<80220020>] (dump_stack_lvl+0x54/0x7c lib/dump_stack.c:120)
-[<8021ffcc>] (dump_stack_lvl) from [<80220060>] (dump_stack+0x18/0x1c lib/dump_stack.c:129)
- r5:00000000 r4:82a70d4c
-[<80220048>] (dump_stack) from [<802025f8>] (panic+0x120/0x374 kernel/panic.c:354)
-[<802024d8>] (panic) from [<802619e8>] (check_panic_on_warn kernel/panic.c:243 [inline])
-[<802024d8>] (panic) from [<802619e8>] (get_taint+0x0/0x1c kernel/panic.c:238)
- r3:8280c604 r2:00000001 r1:8223e7fc r0:822462fc
- r7:809673f4
-[<80261974>] (check_panic_on_warn) from [<80261b4c>] (__warn+0x80/0x188 kernel/panic.c:749)
-[<80261acc>] (__warn) from [<80261dcc>] (warn_slowpath_fmt+0x178/0x1f4 kernel/panic.c:776)
- r8:00000009 r7:822b2274 r6:e06e9b54 r5:84151800 r4:00000000
-[<80261c58>] (warn_slowpath_fmt) from [<809673f4>] (ref_tracker_free+0x190/0x298 lib/ref_tracker.c:228)
- r10:00000000 r9:84a31b00 r8:84f63c00 r7:00000000 r6:00000000 r5:854c5988
- r4:84ce19cc
-[<80967264>] (ref_tracker_free) from [<8155d35c>] (netdev_tracker_free include/linux/netdevice.h:4351 [inline])
-[<80967264>] (ref_tracker_free) from [<8155d35c>] (netdev_put include/linux/netdevice.h:4368 [inline])
-[<80967264>] (ref_tracker_free) from [<8155d35c>] (netdev_put include/linux/netdevice.h:4364 [inline])
-[<80967264>] (ref_tracker_free) from [<8155d35c>] (neigh_parms_release+0x7c/0xc4 net/core/neighbour.c:1709)
- r8:84f63c00 r7:00000000 r6:00000000 r5:84ce1680 r4:854c5980
-[<8155d2e0>] (neigh_parms_release) from [<81804d0c>] (addrconf_ifdown+0x6ac/0x764 net/ipv6/addrconf.c:4008)
- r5:84f63b84 r4:84f63c00
-[<81804660>] (addrconf_ifdown) from [<8180aee0>] (addrconf_notify+0x98/0x770 net/ipv6/addrconf.c:3777)
- r10:e06e9d90 r9:84a67000 r8:8180ae48 r7:00000006 r6:84a31b00 r5:84f63c00
- r4:84c9e000
-[<8180ae48>] (addrconf_notify) from [<802926cc>] (notifier_call_chain+0x60/0x1b4 kernel/notifier.c:85)
- r10:e06e9d90 r9:84a67000 r8:8180ae48 r7:00000000 r6:ffffffd1 r5:829e490c
- r4:829e5764
-[<8029266c>] (notifier_call_chain) from [<80292904>] (raw_notifier_call_chain+0x20/0x28 kernel/notifier.c:453)
- r10:00000000 r9:84a67000 r8:847e6080 r7:00000000 r6:84a31b00 r5:00000006
- r4:e06e9d90
-[<802928e4>] (raw_notifier_call_chain) from [<8154bb5c>] (call_netdevice_notifiers_info+0x54/0xa0 net/core/dev.c:2176)
-[<8154bb08>] (call_netdevice_notifiers_info) from [<81557090>] (call_netdevice_notifiers_extack net/core/dev.c:2214 [inline])
-[<8154bb08>] (call_netdevice_notifiers_info) from [<81557090>] (call_netdevice_notifiers net/core/dev.c:2228 [inline])
-[<8154bb08>] (call_netdevice_notifiers_info) from [<81557090>] (unregister_netdevice_many_notify+0x54c/0xbc4 net/core/dev.c:11982)
- r6:00000001 r5:84c9e000 r4:000000c0
-[<81556b44>] (unregister_netdevice_many_notify) from [<8155846c>] (unregister_netdevice_many net/core/dev.c:12046 [inline])
-[<81556b44>] (unregister_netdevice_many_notify) from [<8155846c>] (default_device_exit_batch+0x304/0x384 net/core/dev.c:12538)
- r10:e06e9e70 r9:829d1ec4 r8:e06e9e90 r7:82c1f980 r6:e06e9e70 r5:84a31bf8
- r4:84a31afc
-[<81558168>] (default_device_exit_batch) from [<81539c88>] (ops_exit_list+0x64/0x68 net/core/net_namespace.c:177)
- r10:84914380 r9:829d1ec4 r8:829d1ec4 r7:e06e9e90 r6:829d2584 r5:e06e9e90
- r4:829d2584
-[<81539c24>] (ops_exit_list) from [<8153c0e8>] (cleanup_net+0x2b0/0x49c net/core/net_namespace.c:654)
- r7:e06e9e90 r6:829d1e80 r5:82c1f940 r4:829d2584
-[<8153be38>] (cleanup_net) from [<802873bc>] (process_one_work+0x1b4/0x4f4 kernel/workqueue.c:3238)
- r10:8300f070 r9:8301bc15 r8:84151800 r7:8300e600 r6:8301bc00 r5:829d1e98
- r4:85556800
-[<80287208>] (process_one_work) from [<80288004>] (process_scheduled_works kernel/workqueue.c:3319 [inline])
-[<80287208>] (process_one_work) from [<80288004>] (worker_thread+0x1fc/0x3d8 kernel/workqueue.c:3400)
- r10:61c88647 r9:84151800 r8:8555682c r7:82804d40 r6:8300e600 r5:8300e620
- r4:85556800
-[<80287e08>] (worker_thread) from [<8028f074>] (kthread+0x12c/0x280 kernel/kthread.c:464)
- r10:00000000 r9:85556800 r8:80287e08 r7:eb221e60 r6:85556e00 r5:84151800
- r4:00000001
-[<8028ef48>] (kthread) from [<80200114>] (ret_from_fork+0x14/0x20 arch/arm/kernel/entry-common.S:137)
-Exception stack(0xe06e9fb0 to 0xe06e9ff8)
-9fa0:                                     00000000 00000000 00000000 00000000
-9fc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-9fe0: 00000000 00000000 00000000 00000000 00000013 00000000
- r10:00000000 r9:00000000 r8:00000000 r7:00000000 r6:00000000 r5:8028ef48
- r4:8556ee80
-Rebooting in 86400 seconds..
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR10MB5328:EE_|MW4PR10MB5864:EE_
+X-MS-Office365-Filtering-Correlation-Id: fb7afb9d-10f7-403f-fc38-08dd9116055d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|376014|7416014|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?NTErNmtTMlBNc2F4bHExMTZVcU9NUUxjYXhybEJvdGZzU29RZ2o2eVpGYXdY?=
+ =?utf-8?B?RVh0RXRCZDBJd0tvbDBvYlNCRis5eTAySk5WOEsvWTR1bmxLbW1ZUWU1VFpJ?=
+ =?utf-8?B?S0p5SENiUFRMam1yZ0tESmt6UC9JWHl4T0FlWGFHNm1NN01CaWE5KytFdzQw?=
+ =?utf-8?B?M2hkOHdVUVloMGh6NlIxa0dtMEZtYXY2S3gyYlRZQThXbitVRTZnSGlJeDEv?=
+ =?utf-8?B?VVVuMXJIUyt1SXc3UlBRRng5Sm1meWdlOG9GT252aVZBbkNIbFNxNkR4cktP?=
+ =?utf-8?B?dVg2UmhTV01WYU9SdE5IaVhkZzUrM0dzOEpjR2VnV0VoZVd3SzZKZkxpajds?=
+ =?utf-8?B?NlcyUnhUeGhyUGU5WDJxM2RDajZTcng4eE5EQ1Z4dm1jQW1zLy81NlBGRlJl?=
+ =?utf-8?B?MkdCNGNwQ1BoZk9pQjc2Q0JQZXRCQ24vWWtPUzIwK3p0ektCblBwSmhsd1dQ?=
+ =?utf-8?B?aTQxc2w1MW5hRWR0TkloUkx0TFk1cWRNTUZNSGRVbFdrWnZ3RkRLYUNSVyt4?=
+ =?utf-8?B?dFd5emZpU2o4bjYxR05sazZPaHV6S1BFdDVZd2VGSWZrbHJndVVBbXdzc1BZ?=
+ =?utf-8?B?eHBxb2R2cnBJMUtCNlRQcWZVamlKYVVKTHFGU2hxZUZZRm94dmN6Sng3cDkv?=
+ =?utf-8?B?TEhSTmZubjY5c2NBTXJnS3BreGZDb3JWQUZLU0hoV0dzckhldzVVM3dWL0du?=
+ =?utf-8?B?ZVZpQ0ZGb1VMcXpxVlZjVmtNVU5EUmI0bWpXdHIwYWJtUTdCQ0VXc0FTR0V4?=
+ =?utf-8?B?OWhDdkNQNk9FWUgyM2RGb25MaW1FV3VNZWFYREFiR3BtZkVUdkJCYkFIRnJv?=
+ =?utf-8?B?Y1luSi9EN05qOGNlV1JBeW1MQm14WitxeDZlZzg5NXdRMTFtQmQ2OEp5dUQ5?=
+ =?utf-8?B?bXEza1FOcjEwTXEvbllJRmdLbVdDM2JPZ1VPdWh1MWVnMVRWTTJyUEkvUzhF?=
+ =?utf-8?B?c01leS9sTEtaeDVmS2N5emJxOWYxa0xtcnhiQkxxOFgxY29YUlZLbmFGM2FG?=
+ =?utf-8?B?OVRsMUFtL2tnNHdWTGUzc3ZUZmM5RlRMZmhJQUI2TGtFd0hSZkQ3ZEZxKzds?=
+ =?utf-8?B?dFZ5Q0RDTy9qeTlrSGZjQlpPUTRyRWJMRGlYSUNXZzhYMjlTVjJuWlIvcXIz?=
+ =?utf-8?B?L3ViRFJPdTFCa3VBWWx3MmV1RmFwRmdPSHdTWm5wQXJORUp6dUljRktvQTdn?=
+ =?utf-8?B?RmxMc2NubVZmL1ZBc2k3OTVvQTJGZVRmeHpPNVpDd0NUamxVRmpuYllnSFYv?=
+ =?utf-8?B?bVNKcDlQTnE3OGNveGNOK05VM08zb3BpejYwR2k2Y1ZnRU8rQXdMdkM0NDBw?=
+ =?utf-8?B?elFTRGtFaHgyKytGOWpCNXEwQnBXTCtCaVhuQStsQktKd1dhYU1TZkRGWGxI?=
+ =?utf-8?B?K3hITlBTRkpHTkNVb1Rlbm9uemorZGNoZjdQQXR2ajNVUzEwYTBzemYwQ3Q0?=
+ =?utf-8?B?NE11VmpZbVhtTHpyOG8xZ0xjVmNwSU9LNDU2TXJuNTRtWE5WcE9sa0UzcVo3?=
+ =?utf-8?B?SGxIQ2wrZkNYZmxMbE9uQkdZaDQ0VkJvbWYxWUJZVXdjTHN6U1Z5WDMyZGFx?=
+ =?utf-8?B?MFZTVVdoVXVxNElHUVR4WnJDRWxGUWhaMDNyL2h0VzJCWXJSOWs3MXVWRVV1?=
+ =?utf-8?B?S3c2cTRvVzJMVWtCWit3c0lFZW93UDcwdGZqLzkzMGZRVWxXSUR4dFM1K3U4?=
+ =?utf-8?B?dWNnZUcxMkF5TTNWS2hMVWVLUklUdDBJdkhBRUxmVDZqVmRscFZWdktNaVRQ?=
+ =?utf-8?B?SEtSbWlkNjBWZTA3bTVPalA4NkQwWjNWSXUwd1NuWnAwNGUrYmhwaFU4Q1Vw?=
+ =?utf-8?B?Yjdqa3k3a3ZLL29nSjBJeFRycVAwR3dKUjUwUVlmRkl5R3dMeElXV0VzNGVv?=
+ =?utf-8?B?QjFIbHovdGNUUkJLdTdOVFFXemI4RTl6V1BxMmpjKzNUcklWUDkxdmt4ZkJj?=
+ =?utf-8?B?WnZML0g0M1NkbnZ2OCs2Z1B4eUVnVExnZmtUdlRYSlR3SWpRWkpkQVFKNytz?=
+ =?utf-8?B?UnIxY1IveTBnPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR10MB5328.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?R1doekxJNktoUkp3S2w0bE5jUm9UQzFkdGVxaWxnL0lKaDM2bTgxR0NiNGRG?=
+ =?utf-8?B?eitHbFU3djRTQ29wMVVyb0FsNDJZZVk5dXRwUmNJSG5UTW1iQUF1Q3N5RllP?=
+ =?utf-8?B?LzBzMktxVGhHTVZMSUtoQ05ZdnZKeENkUVgxN1RGS2xQQm9saFd6V0hZR1Nm?=
+ =?utf-8?B?Q2VGWkl0czRjcnlyWVNMOWF4bndPdGR4WWw2aE9Kdy9lNEVuclNWTVdPV0tw?=
+ =?utf-8?B?V3RqNXdGS0FoKzlleTJVSjZ6TkhHZUNTdjhadDVFL1o3aVplalVod2Zrc05i?=
+ =?utf-8?B?RUxKL3ljKzVrVkl6OWZyaXBBa3cyVWZZVTdpd05GeHBsTE5WRUtma3RyS3M4?=
+ =?utf-8?B?QUwvaU45YnJFSnVUdVhBbk9pOXNmZUJJNzBUZVI1Rm0zOGt3QkFkbUdCSXlu?=
+ =?utf-8?B?VnZkWldxdWVPTmV1eXBkcG5teXpSSldNTVQ0cWphN21JazZzek9kOC9jVWdz?=
+ =?utf-8?B?bUVjdElaM3JBM053VGpyTmdrR20xY2JUelg5citqRTZuVk54dXAxRmxSUTRN?=
+ =?utf-8?B?Nmh5NnF5dXdiTG9nbkRFY2cwNS93UHhsV3ZHcHFwUGVrMTRicWhuRURFMHQz?=
+ =?utf-8?B?TWRsaDc1a3Y3N2RlZFkwdmxXZkQyc2dHbG4zOXBPWnhtejRpeEFSYk5SNjVE?=
+ =?utf-8?B?c2wvZENnV0FGaFZveTBVTk91UlNlVjlFTFhodEsvM1hhV2lvV2NHZEZRQ003?=
+ =?utf-8?B?cTN6d2M1VHk0Wlp1b2pBMHc1YWhINk9xRUt5bzlYeXhvWXJxaktUNitRdHhu?=
+ =?utf-8?B?RFpYbzRzOFVyeEJDV2NBT2N4ejljdEo0bEt4SmgwclZTRDRSc2NXNlFTaTRN?=
+ =?utf-8?B?dHVlbUlPY2ZHcU9lVHY0dk5QMDNESnJVQUl3ZzJVV1piN0FVYWF2bkxPUXFv?=
+ =?utf-8?B?WENQdk1ib2xES3Avd2pCY295cVlyNkxsUDJoclJKa2I2U2xnNGlKdUNMNzd5?=
+ =?utf-8?B?T1NoeC9BakVYRXhrWW5pV2E4TC9qYTdMYVUwbHZpWms0SWM0WlA4VWNmc0V4?=
+ =?utf-8?B?WFdzSnF5bGpYRm51Y25tOStRMExVUXhLKzhwQmVaaDllWmZRVUxJQ0tVYUVH?=
+ =?utf-8?B?QmJDMlBvaC9oNnNrNEM4STg1ZGhnUWQ4eGFyWTZIYlhGakw5Tjd0Wi83V1dW?=
+ =?utf-8?B?U0JYS1dBeVJJSzZuRDdYRjkxWXZFUmVDS2xUaUxpVG5rUndwNVY3WXhaakRG?=
+ =?utf-8?B?MEtwWUhjTGF6SkJIZUk5akdYK1MwRldJS09iTHpNMWZtZGpsNFpNaGx6YWFL?=
+ =?utf-8?B?RVljWDlWTCtZZm1HTU53NEFYWSt4ZWphZEt4WWMrUkFVVUo2M1B0UHRkeVBv?=
+ =?utf-8?B?eUdRRHA3Zng4bzdwVG5xcnhmZXVuWlFPTFhKRFQ0L1lmbWNoMlJkKys0WU5h?=
+ =?utf-8?B?SWgvZXNDaDI4cEJpRnhhYUNZd2IrbmVCblZSc29nSFpGSWFVZUxySFRrTzdL?=
+ =?utf-8?B?L2FWb0Jpb2dMQ29lYXIrR1RmQ0F3dDZyeXowU25wMHFLS0VrZVpYMnk0M2JL?=
+ =?utf-8?B?TUZNbmVadVlIeHN3TDhGSjhCb3B4UTdtWG1XQ0hlZGlMZGdCVFh6eEk5ZUty?=
+ =?utf-8?B?UDJsRG1oZFU4OWd0V2YvYVA2dW5iSVZwSmxJcXM5Q3E3T0JEU3BzNlZvcThM?=
+ =?utf-8?B?d1poVTNnVWVFaU5hOXFsTXNneHAyQXZPSHZXWEhvTUVPZVlvUTlia2J4OGtR?=
+ =?utf-8?B?QkY2eTA5WWtzbGJ1ZFdrRGpkdFc4Ti9zelB0TzU4Vld5RXZwY1JKdlhuRWdY?=
+ =?utf-8?B?c0owSTVRSm5tQkpWajN1RS9pNGJmUXp1UmVmc0JXUFkrUmRzY3hOOGtsaXU5?=
+ =?utf-8?B?L0hTcFl3ZHBQQmRhWTNQMHdObWM2ZUF6ZXdUeXc4ZUQxUkJFbitHbmM0bDN0?=
+ =?utf-8?B?ZVJSQm9rMVNkSWF6VjY0YU9NM2JBQXRPNEZ6ZkdNQU4vR0hZWjg1RWFHelM4?=
+ =?utf-8?B?RW5iTThRbEpjQThSMTJWNW9MTTcraVlqQnlmQ2svTGFxWi9Bc3ExN1NnVVpP?=
+ =?utf-8?B?MVdiYmNVcmFjTmcvNkNDVS9XK2N2YkkyOS96ekFTRm00ZmZ5NHRjWk50dCs4?=
+ =?utf-8?B?eDR5WVMrL0JCa3BEM2ovbnJzRFVpUFJWQWR3clFQcTZkdWRxaE5QWUtNa0VX?=
+ =?utf-8?B?aDVPemdqdWZsTmR2eFh5V3o1NUhESUNtaktzMURrU2JqSWVaR0VLMm84SUZR?=
+ =?utf-8?B?RXc9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	a6QYbCZaPYEz2p2QIfuGhl27kwg7tgA6CAJppRQs8Ghv3e2u0gfK1/5TKbp1x6PqzxHhiaf/9aHu5jhz2yA0YK40TMNgp3EfpSe/XuJqBmEak9PteDThz2qn8UaCvwrq6RlVELK0OXmYCMOEQacPk7qZVDinlzYQ18QHEu+IpRf8l0o1SzwHAkAP1DRFxN3GUcvHB2EkdjJpqmFexb5cD2XjNWRAW97Ce9WORghQC2MGjqmxR8ZKxUi+sTYoxUimnr/lm6Y05quDu/1VBwgxpJ43BE//LzFSVb3mvBUqX6sknhBkrNNGr+1jE7BXuzzbR1K/svJ4VQ7Wut0e7cgCGr+z3hKhbUaY3+b6MsMsFbDPR4H53tVJtEy03v3H7mSdNXuDxrM6ayTemHY9Bzsrel4sH/Eh1WDfQiXajYq0gWMsZdTYrEafUW3+TY/4DnolNtbnJEs9JM6b7Zuk40BYm3sOBC11C2mev2LIIwUWLRAgfyXg9GNEU42/RfHFQYER0S532wpmhWYxwl51XWzxa6NuBg8WtjJpzGsrQubQm3RYWG5pfg2svyxoU6Lv39hwYHCyh2/zcn8c3qo19RxDDOlrBnMW3ATcIC9khu5bJdA=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fb7afb9d-10f7-403f-fc38-08dd9116055d
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR10MB5328.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2025 05:29:52.3517
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NB5eVqJf82s28Ddqo25tdZJTq3XmuE61/YB8QTICdq8+FD4c4xkmxQRig7FFNPLSFBHD2i9rWVOiH1QZT8UYq2IrfzrXnibPW5Fss95Bwl0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR10MB5864
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-12_02,2025-05-09_01,2025-02-21_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ spamscore=0 mlxlogscore=999 phishscore=0 adultscore=0 bulkscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2504070000 definitions=main-2505120056
+X-Proofpoint-ORIG-GUID: akWinQOD10Z2CqZrB_6Dh-6f7ULWRHtk
+X-Proofpoint-GUID: akWinQOD10Z2CqZrB_6Dh-6f7ULWRHtk
+X-Authority-Analysis: v=2.4 cv=XNcwSRhE c=1 sm=1 tr=0 ts=68218754 b=1 cx=c_pps a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19
+ a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=GoEa3M9JfhUA:10 a=yMhMjlubAAAA:8 a=pFXj9o0QJveA5nBsKLAA:9 a=QEXdDO2ut3YA:10 cc=ntf awl=host:13186
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTEyMDA1NiBTYWx0ZWRfXyeFaxtiqYNRi VGcGmUB6Qq6npZj/1oST6M0tezpva9RcWPLhzlFVCNzN+Gbbf9PTGkg0hw4AVh/+rNL6cj2KkRw IjcVcEEqXHW5KkWoGwCVwezReU+PrYpla4U5N8rtKpSjnoASTbK2EwxFFX6o3/iL/rQWZBGwt/4
+ nE3UX3+4/1DI1It8UsJ7puajaXDiAyOCZ/x98qNa06gqaOUpmVGkA7b9GYjVN0M3R1gWvZ1ktMr dlj8U4TH8DIsbwBaRMXJ4QFHWyEvn3hSzyPzSaC6UTS0bvjrrInUgrMUj6uFh/m/ht7WdBMwx2z HonGfgb8F2ZAn2sD+tHH0a5bgPvlDPcvKoQhV6zKhoPpXfuxp87AM7hKbr9fK4bpyyuREPLqeIa
+ T+9FbMpNSmrsV+x7RAzk2+DNIb7auIhB/igh7LrfGr3LZrKGEYkQAtOkCwLdhOtu9Em96ET3
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+On 07-05-2025 21:29, Konstantin Taranov wrote:
+> From: Shiraz Saleem <shirazsaleem@microsoft.com>
+> 
+> Handle soc servcing events which require the rdma auxiliary device resources to
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+typo servcing ->servicing
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+> be cleaned up during a suspend, and re-initialized during a resume.
+> 
+> Signed-off-by: Shiraz Saleem <shirazsaleem@microsoft.com>
+> Signed-off-by: Konstantin Taranov <kotaranov@microsoft.com>
+> ---
+>   .../net/ethernet/microsoft/mana/gdma_main.c   | 11 ++-
+>   .../net/ethernet/microsoft/mana/hw_channel.c  | 20 ++++++
+>   drivers/net/ethernet/microsoft/mana/mana_en.c | 69 +++++++++++++++++++
+>   include/net/mana/gdma.h                       | 19 +++++
+>   include/net/mana/hw_channel.h                 |  9 +++
+>   5 files changed, 127 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> index 59e7814..3504507 100644
+> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> @@ -391,6 +391,7 @@ static void mana_gd_process_eqe(struct gdma_queue *eq)
+>   	case GDMA_EQE_HWC_INIT_EQ_ID_DB:
+>   	case GDMA_EQE_HWC_INIT_DATA:
+>   	case GDMA_EQE_HWC_INIT_DONE:
+> +	case GDMA_EQE_HWC_SOC_SERVICE:
+>   	case GDMA_EQE_RNIC_QP_FATAL:
+>   		if (!eq->eq.callback)
+>   			break;
+> @@ -1468,10 +1469,14 @@ static int mana_gd_setup(struct pci_dev *pdev)
+>   	mana_gd_init_registers(pdev);
+>   	mana_smc_init(&gc->shm_channel, gc->dev, gc->shm_base);
+>   
+> +	gc->service_wq = alloc_ordered_workqueue("gdma_service_wq", 0);
+> +	if (!gc->service_wq)
+> +		return -ENOMEM;
+> +
+>   	err = mana_gd_setup_irqs(pdev);
+>   	if (err) {
+>   		dev_err(gc->dev, "Failed to setup IRQs: %d\n", err);
+> -		return err;
+> +		goto free_workqueue;
+>   	}
+>   
+>   	err = mana_hwc_create_channel(gc);
+> @@ -1497,6 +1502,8 @@ destroy_hwc:
+>   	mana_hwc_destroy_channel(gc);
+>   remove_irq:
+>   	mana_gd_remove_irqs(pdev);
+> +free_workqueue:
+> +	destroy_workqueue(gc->service_wq);
+>   	dev_err(&pdev->dev, "%s failed (error %d)\n", __func__, err);
+>   	return err;
+>   }
+> @@ -1508,6 +1515,8 @@ static void mana_gd_cleanup(struct pci_dev *pdev)
+>   	mana_hwc_destroy_channel(gc);
+>   
+>   	mana_gd_remove_irqs(pdev);
+> +
+> +	destroy_workqueue(gc->service_wq);
+>   	dev_dbg(&pdev->dev, "mana gdma cleanup successful\n");
+>   }
+>   
+> diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+> index 1ba4960..60f6bc1 100644
+> --- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
+> +++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+> @@ -112,11 +112,13 @@ out:
+>   static void mana_hwc_init_event_handler(void *ctx, struct gdma_queue *q_self,
+>   					struct gdma_event *event)
+>   {
+> +	union hwc_init_soc_service_type service_data;
+>   	struct hw_channel_context *hwc = ctx;
+>   	struct gdma_dev *gd = hwc->gdma_dev;
+>   	union hwc_init_type_data type_data;
+>   	union hwc_init_eq_id_db eq_db;
+>   	u32 type, val;
+> +	int ret;
+>   
+>   	switch (event->type) {
+>   	case GDMA_EQE_HWC_INIT_EQ_ID_DB:
+> @@ -199,7 +201,25 @@ static void mana_hwc_init_event_handler(void *ctx, struct gdma_queue *q_self,
+>   		}
+>   
+>   		break;
+> +	case GDMA_EQE_HWC_SOC_SERVICE:
+> +		service_data.as_uint32 = event->details[0];
+> +		type = service_data.type;
+> +		val = service_data.value;
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+what is use of val?
 
-If you want to undo deduplication, reply with:
-#syz undup
+>   
+> +		switch (type) {
+> +		case GDMA_SERVICE_TYPE_RDMA_SUSPEND:
+> +		case GDMA_SERVICE_TYPE_RDMA_RESUME:
+> +			ret = mana_rdma_service_event(gd->gdma_context, type);
+> +			if (ret)
+> +				dev_err(hwc->dev, "Failed to schedule adev service event: %d\n",
+> +					ret);
+> +			break;
+> +		default:
+> +			dev_warn(hwc->dev, "Received unknown SOC service type %u\n", type);
+> +			break;
+> +		}
+> +
+> +		break;
+>   	default:
+>   		dev_warn(hwc->dev, "Received unknown gdma event %u\n", event->type);
+>   		/* Ignore unknown events, which should never happen. */
+> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> index 2013d0e..39e01e2 100644
+> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> @@ -2992,6 +2992,70 @@ idx_fail:
+>   	return ret;
+>   }
+>   
+> +static void mana_handle_rdma_servicing(struct work_struct *work)
+
+this name does not sound clearer and more aligned with typical naming 
+conventions.
+Since it is an RDMA service event handler, it could be named to 
+mana_rdma_service_handle. What are your thoughts on this?"
+
+> +{
+> +	struct mana_service_work *serv_work =
+> +		container_of(work, struct mana_service_work, work);
+> +	struct gdma_dev *gd = serv_work->gdma_dev;
+> +	struct device *dev = gd->gdma_context->dev;
+> +	int ret;
+> +
+> +	if (READ_ONCE(gd->rdma_teardown))
+> +		goto out;
+> +
+> +	switch (serv_work->event) {
+> +	case GDMA_SERVICE_TYPE_RDMA_SUSPEND:
+> +		if (!gd->adev || gd->is_suspended)
+> +			break;
+> +
+> +		remove_adev(gd);
+> +		gd->is_suspended = true;
+> +		break;
+> +
+> +	case GDMA_SERVICE_TYPE_RDMA_RESUME:
+> +		if (!gd->is_suspended)
+> +			break;
+> +
+> +		ret = add_adev(gd, "rdma");
+> +		if (ret)
+> +			dev_err(dev, "Failed to add adev on resume: %d\n", ret);
+> +		else
+> +			gd->is_suspended = false;
+> +		break;
+> +
+> +	default:
+> +		dev_warn(dev, "unknown adev service event %u\n",
+> +			 serv_work->event);
+> +		break;
+> +	}
+> +
+> +out:
+> +	kfree(serv_work);
+> +}
+> +
+> +int mana_rdma_service_event(struct gdma_context *gc, enum gdma_service_type event)
+> +{
+> +	struct gdma_dev *gd = &gc->mana_ib;
+> +	struct mana_service_work *serv_work;
+> +
+> +	if (gd->dev_id.type != GDMA_DEVICE_MANA_IB) {
+> +		/* RDMA device is not detected on pci */
+> +		return 0;
+> +	}
+> +
+> +	serv_work = kzalloc(sizeof(*serv_work), GFP_ATOMIC);
+> +	if (!serv_work)
+> +		return -ENOMEM;
+> +
+> +	serv_work->event = event;
+> +	serv_work->gdma_dev = gd;
+> +
+> +	INIT_WORK(&serv_work->work, mana_handle_rdma_servicing);
+> +	queue_work(gc->service_wq, &serv_work->work);
+> +
+> +	return 0;
+> +}
+> +
+>   int mana_probe(struct gdma_dev *gd, bool resuming)
+>   {
+>   	struct gdma_context *gc = gd->gdma_context;
+> @@ -3172,11 +3236,16 @@ int mana_rdma_probe(struct gdma_dev *gd)
+>   
+>   void mana_rdma_remove(struct gdma_dev *gd)
+>   {
+> +	struct gdma_context *gc = gd->gdma_context;
+> +
+>   	if (gd->dev_id.type != GDMA_DEVICE_MANA_IB) {
+>   		/* RDMA device is not detected on pci */
+>   		return;
+>   	}
+>   
+> +	WRITE_ONCE(gd->rdma_teardown, true);
+> +	flush_workqueue(gc->service_wq);
+> +
+>   	if (gd->adev)
+>   		remove_adev(gd);
+>   
+> diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
+> index ffa9820..3ce56a8 100644
+> --- a/include/net/mana/gdma.h
+> +++ b/include/net/mana/gdma.h
+> @@ -60,6 +60,7 @@ enum gdma_eqe_type {
+>   	GDMA_EQE_HWC_INIT_DONE		= 131,
+>   	GDMA_EQE_HWC_SOC_RECONFIG	= 132,
+>   	GDMA_EQE_HWC_SOC_RECONFIG_DATA	= 133,
+> +	GDMA_EQE_HWC_SOC_SERVICE	= 134,
+>   	GDMA_EQE_RNIC_QP_FATAL		= 176,
+>   };
+>   
+> @@ -70,6 +71,18 @@ enum {
+>   	GDMA_DEVICE_MANA_IB	= 3,
+>   };
+>   
+> +enum gdma_service_type {
+> +	GDMA_SERVICE_TYPE_NONE		= 0,
+> +	GDMA_SERVICE_TYPE_RDMA_SUSPEND	= 1,
+> +	GDMA_SERVICE_TYPE_RDMA_RESUME	= 2,
+> +};
+> +
+> +struct mana_service_work {
+> +	struct work_struct work;
+> +	struct gdma_dev *gdma_dev;
+> +	enum gdma_service_type event;
+> +};
+> +
+>   struct gdma_resource {
+>   	/* Protect the bitmap */
+>   	spinlock_t lock;
+> @@ -224,6 +237,8 @@ struct gdma_dev {
+>   	void *driver_data;
+>   
+>   	struct auxiliary_device *adev;
+> +	bool is_suspended;
+> +	bool rdma_teardown;
+>   };
+>   
+>   /* MANA_PAGE_SIZE is the DMA unit */
+> @@ -409,6 +424,8 @@ struct gdma_context {
+>   	struct gdma_dev		mana_ib;
+>   
+>   	u64 pf_cap_flags1;
+> +
+> +	struct workqueue_struct *service_wq;
+>   };
+
+Thanks,
+Alok
+
 
