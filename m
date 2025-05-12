@@ -1,1099 +1,139 @@
-Return-Path: <netdev+bounces-189678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77D8DAB327C
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 10:59:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BB7DAB327E
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 10:59:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02957189A2FB
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 08:59:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D1D63A7544
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 08:59:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69A7725B1D4;
-	Mon, 12 May 2025 08:56:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NodzJqK7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27FE325A323;
+	Mon, 12 May 2025 08:57:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 393EF25A2BA;
-	Mon, 12 May 2025 08:56:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B18A525B1FF
+	for <netdev@vger.kernel.org>; Mon, 12 May 2025 08:56:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747040189; cv=none; b=XMcFrFElDhvTFscUKj0HojrAS/m3YdY1NQDaRSScP88fkjIEqnibaVLxIVUM3RMY8co5bhfP418bc3CjhEzuFLqpfbOlXqUHDMe0bh6hN0JE3dIrE2pBxvtb6sZ8wbmODNh4Bn55XExe5kO9k5fVgYvlJHu2dE/U49PBUgdTubg=
+	t=1747040220; cv=none; b=MSKl69FQhqbcoe5N1UvbbE4FXsa2Kkf2wyNopAtJHzlqqUxBG/+vX9rWE6ClwT3UffUx8FHCu4vnZTBBm0rjjJVkHB4+lELh9ZxN1ZdRcBzxe6e5+BN6oXKsTvnb2y4crS7jjbCM7zK3/3WCK0kn1jZ4NfP7qJyfjHXCfYmBhPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747040189; c=relaxed/simple;
-	bh=q/v2mAlkLcg0KsGCqgczqMc5SELp2xv2/mYAT5TDFss=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=dhJ9QQmb1cTwP8upfuCWktQwcSityjbxqLOPfMCsdP1mJzTC/1tGeYhUf5bHqYU/7Y/IcjPYaBT1EhC1b2b36WZK2BpIxd1cdwFFsTDOMb3XJ1zBjJMwZ5Xe2TTyXTDVVN2keVk7jUeqsi8TgwJEDYWS+MLq4gUk/PkrAGI3K4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NodzJqK7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37483C4CEE9;
-	Mon, 12 May 2025 08:56:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747040189;
-	bh=q/v2mAlkLcg0KsGCqgczqMc5SELp2xv2/mYAT5TDFss=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=NodzJqK7fyaSDTRsaymrYOX+v1fpWq22DMFIVaIstRiYXJXa21WlyVtvLsI/3En4p
-	 oHnRw5Vm+NRL/9VmgCSW/cbzuRIgPGoh1uY5ox/n8oWe3c2KRf2dv5BIkG7R4AHxw+
-	 YUu+IH9BOtW3STnAMJTvy/j4oy6OwAKjg7cprzzKAJZ+ZEJAsw+EUZU2rG/hI/vSk6
-	 hlOrtsLzJvEDwxbaXU6+CHnD3SLAJMw+FwMQ9aq41Gbe82zHsywkSxklDSuEloxWJx
-	 eOfmizMhfvzupVJUyB0S2TgWhvAwKPFVp9tt9Kd1KKz/BiOwF5061gDAHuV7/QNkii
-	 /QHW1Gt9ystmw==
-From: Christian Brauner <brauner@kernel.org>
-Date: Mon, 12 May 2025 10:55:28 +0200
-Subject: [PATCH v6 9/9] selftests/coredump: add tests for AF_UNIX coredumps
+	s=arc-20240116; t=1747040220; c=relaxed/simple;
+	bh=NZeAAAI0Wk88InKWrw79wYG1C9t62SpIJwkLeDk870E=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=dAyfUq3/MNltWC0eDmJYWd5C2E+ZrHCENbDEQ/VMAPMKyYTn/iaGaqgjz9wpIwUmWPqE/FvF2sl/LQJHq95FIE+DgwRWDSEBKKRQ3rMjEtxTlYOjk14DPpoJDWQbgoKKDT2QDRriU8wMQNKWS1Aq6+LOI1hWFaUMXoCbciX14JU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=54.254.200.128
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
+X-QQ-mid: esmtpsz16t1747040138tbf057915
+X-QQ-Originating-IP: s0rjAovFxlQCmvTmfAadw9TVUJKRcRvqRhY+URv6yfo=
+Received: from smtpclient.apple ( [111.202.70.100])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 12 May 2025 16:55:36 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 5690796263493250774
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250512-work-coredump-socket-v6-9-c51bc3450727@kernel.org>
-References: <20250512-work-coredump-socket-v6-0-c51bc3450727@kernel.org>
-In-Reply-To: <20250512-work-coredump-socket-v6-0-c51bc3450727@kernel.org>
-To: linux-fsdevel@vger.kernel.org, Jann Horn <jannh@google.com>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: Eric Dumazet <edumazet@google.com>, Oleg Nesterov <oleg@redhat.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Alexander Viro <viro@zeniv.linux.org.uk>, 
- Daan De Meyer <daan.j.demeyer@gmail.com>, 
- David Rheinsberg <david@readahead.eu>, Jakub Kicinski <kuba@kernel.org>, 
- Jan Kara <jack@suse.cz>, Lennart Poettering <lennart@poettering.net>, 
- Luca Boccassi <bluca@debian.org>, Mike Yuan <me@yhndnzj.com>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- =?utf-8?q?Zbigniew_J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- linux-security-module@vger.kernel.org, 
- Christian Brauner <brauner@kernel.org>, 
- Alexander Mikhalitsyn <alexander@mihalicyn.com>
-X-Mailer: b4 0.15-dev-c25d1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=29673; i=brauner@kernel.org;
- h=from:subject:message-id; bh=q/v2mAlkLcg0KsGCqgczqMc5SELp2xv2/mYAT5TDFss=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWQobm8//rnNuGX/V9dJmRcNHjRFaHSnNVn3qW19cG3Wf
- c8yD69THaUsDGJcDLJiiiwO7Sbhcst5KjYbZWrAzGFlAhnCwMUpABPRvcDI0GJwunp2jei5i9zr
- fRqCHoc8Orr+lPBM7/d7r1+NdZTqqGH4H67VE/2ajSFAy1XKdbvcJku/txE/LgY+07jEG+Q1beF
- FHgA=
-X-Developer-Key: i=brauner@kernel.org; a=openpgp;
- fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
+Subject: Re: [PATCH net-next 1/4] net: bonding: add broadcast_neighbor option
+ for 802.3ad
+From: Tonghao Zhang <tonghao@bamaicloud.com>
+In-Reply-To: <aCGvynxFVglsf1St@fedora>
+Date: Mon, 12 May 2025 16:55:36 +0800
+Cc: netdev@vger.kernel.org,
+ Jay Vosburgh <jv@jvosburgh.net>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <DCAD8257-E275-4251-8E6D-815D583907BF@bamaicloud.com>
+References: <20250510044504.52618-1-tonghao@bamaicloud.com>
+ <20250510044504.52618-2-tonghao@bamaicloud.com> <aCGvynxFVglsf1St@fedora>
+To: Hangbin Liu <liuhangbin@gmail.com>
+X-Mailer: Apple Mail (2.3693.20.0.1.32)
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
+X-QQ-XMAILINFO: MhqidREDs1kxb6iuvtjsWc7bJXyx2/5ouOHYxYvpnSeWaikQcaBr5ASP
+	vESzn42p55129raAcj8RDPM8yJMbBE1biCm4Otj1k8BhP/386NQuAmvhPddCMLCf8IvbUQH
+	45bIQ5Ub/kDg0oV4Lx8nzrmw+D4dL77MO9iS3IfjW1BTCOLRunEkhrY8kKfeHIng3N5NGR8
+	lglYa2Xus7FsSWa/Jr1mwBs16RwuLJffOxYbtES0Z7KuH7BXSjy4g5s6ewBYtJOURvuBbGK
+	SlfdstC/0q1x7zK3ekyuRUsirYXi0u82h7M+KnybkzjrhSnxJskc+IrtrMMKRBkQx4+U3+I
+	ie+ZeKGcJwn4ULvmgbQU5aqOClpw4KKoCQ7XCX4WWDXucECxZV0q9/3DXeR5keFV+wrC2vx
+	YICOLcOuBAyKqsfNrCRrXiVQ1RljyceLyG3DGGxn4XghackOHRO4oaDR/9km6EuEC1sW3yV
+	9QzXSS4f7BmXXMRFGzckVpuScjrru0mVEwtU2jnlorsYBn4sV8klQD7mGlZUrt40pNDFj4x
+	h0K5FOtjspSBvK8NFiueEO4906DrsU3AAJ/oUAL39tR4Hn92vHQVsoltMSFCHgug/NysPj/
+	u5oCwEMleiqjwhFhErrNyAmjRklFFGJYaRcT8uDD0do9gFPwukBkKlfhCX7KUU4YsjlvzX5
+	u0LOFNG0h0y2OB/+suTEw57Lu1saKR+Rgr1Jm/6GdyZ8L7EyyfKKomnj++covUJi3B6Wxew
+	cav47RfbYYOna5N4qOcMC8FuLh+NDtnxcGDBN2KyiJ978JN+2YKlR5p/nj7j51CMUXrj1BQ
+	atcXfptUBC/uHXNmUNfu4cZWmjOkcEAddcmB6MKrOTMoIrNFjhJ1bLgeSV1WRLghJ9rntk1
+	DFl+dEK1Lvi9vffYuOogZkwf59skYGqmg4Hch4Oo5Z2wIymmJcad3dolR1/aM5CxPNFle5e
+	RMWrsAqZXrN/SisuOQNgK2pBowYIIR2P34kBKLy0Kr15Juo0NwkdCyHKL7Pl0kc2sducU5f
+	8OVv9l8wszLeqFDpoGta1qX3mqd7WrYFl947GCtQ==
+X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
+X-QQ-RECHKSPAM: 0
 
-Add a simple test for generating coredumps via AF_UNIX sockets.
 
-Signed-off-by: Christian Brauner <brauner@kernel.org>
----
- tools/testing/selftests/coredump/stackdump_test.c | 956 +++++++++++++++++++++-
- 1 file changed, 955 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/coredump/stackdump_test.c b/tools/testing/selftests/coredump/stackdump_test.c
-index fe3c728cd6be..5a74612ae42e 100644
---- a/tools/testing/selftests/coredump/stackdump_test.c
-+++ b/tools/testing/selftests/coredump/stackdump_test.c
-@@ -1,14 +1,20 @@
- // SPDX-License-Identifier: GPL-2.0
- 
- #include <fcntl.h>
-+#include <inttypes.h>
- #include <libgen.h>
- #include <linux/limits.h>
- #include <pthread.h>
- #include <string.h>
-+#include <sys/mount.h>
- #include <sys/resource.h>
-+#include <sys/stat.h>
-+#include <sys/socket.h>
-+#include <sys/un.h>
- #include <unistd.h>
- 
- #include "../kselftest_harness.h"
-+#include "../pidfd/pidfd.h"
- 
- #define STACKDUMP_FILE "stack_values"
- #define STACKDUMP_SCRIPT "stackdump"
-@@ -35,6 +41,7 @@ static void crashing_child(void)
- FIXTURE(coredump)
- {
- 	char original_core_pattern[256];
-+	pid_t pid_coredump_server;
- };
- 
- FIXTURE_SETUP(coredump)
-@@ -44,6 +51,7 @@ FIXTURE_SETUP(coredump)
- 	char *dir;
- 	int ret;
- 
-+	self->pid_coredump_server = -ESRCH;
- 	file = fopen("/proc/sys/kernel/core_pattern", "r");
- 	ASSERT_NE(NULL, file);
- 
-@@ -61,10 +69,15 @@ FIXTURE_TEARDOWN(coredump)
- {
- 	const char *reason;
- 	FILE *file;
--	int ret;
-+	int ret, status;
- 
- 	unlink(STACKDUMP_FILE);
- 
-+	if (self->pid_coredump_server > 0) {
-+		kill(self->pid_coredump_server, SIGTERM);
-+		waitpid(self->pid_coredump_server, &status, 0);
-+	}
-+
- 	file = fopen("/proc/sys/kernel/core_pattern", "w");
- 	if (!file) {
- 		reason = "Unable to open core_pattern";
-@@ -154,4 +167,945 @@ TEST_F_TIMEOUT(coredump, stackdump, 120)
- 	fclose(file);
- }
- 
-+TEST_F(coredump, socket)
-+{
-+	int fd, pidfd, ret, status;
-+	FILE *file;
-+	pid_t pid, pid_coredump_server;
-+	struct stat st;
-+	char core_file[PATH_MAX];
-+	struct pidfd_info info = {};
-+	int ipc_sockets[2];
-+	char c;
-+
-+	ASSERT_EQ(unshare(CLONE_NEWNS), 0);
-+	ASSERT_EQ(mount(NULL, "/", NULL, MS_PRIVATE | MS_REC, NULL), 0);
-+	ASSERT_EQ(mount(NULL, "/tmp", "tmpfs", 0, NULL), 0);
-+
-+	ret = socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, ipc_sockets);
-+	ASSERT_EQ(ret, 0);
-+
-+	pid_coredump_server = fork();
-+	ASSERT_GE(pid_coredump_server, 0);
-+	if (pid_coredump_server == 0) {
-+		int fd_server, fd_coredump, fd_peer_pidfd, fd_core_file;
-+		__u64 peer_cookie, server_cookie;
-+		socklen_t fd_peer_pidfd_len, peer_cookie_len, server_cookie_len;
-+		struct sockaddr_un coredump_sk = {
-+			.sun_family = AF_UNIX,
-+		};
-+		size_t coredump_sk_len;
-+
-+		close(ipc_sockets[0]);
-+
-+		fd_server = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
-+		if (fd_server < 0)
-+			_exit(EXIT_FAILURE);
-+
-+		server_cookie_len = sizeof(server_cookie);
-+		ret = getsockopt(fd_server, SOL_SOCKET, SO_COOKIE,
-+				 &server_cookie, &server_cookie_len);
-+		if (ret < 0) {
-+			fprintf(stderr, "%m - Failed to retrieve cookie for coredump socket server\n");
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		coredump_sk_len = snprintf(coredump_sk.sun_path,
-+					   sizeof(coredump_sk.sun_path),
-+					   "@coredump.socket %" PRIu64, server_cookie);
-+		if (coredump_sk_len < 0 || coredump_sk_len >= sizeof(coredump_sk.sun_path)) {
-+			fprintf(stderr, "Unable to create coredump socket path\n");
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		file = fopen("/proc/sys/kernel/core_pattern", "w");
-+		if (!file) {
-+			fprintf(stderr, "Unable to open core_pattern\n");
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		ret = fprintf(file, "%s", coredump_sk.sun_path);
-+		fclose(file);
-+		if (ret < 0) {
-+			fprintf(stderr, "Unable to write to core_pattern\n");
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		coredump_sk.sun_path[0] = '\0';
-+		memcpy(coredump_sk.sun_path, "\0coredump.socket", sizeof("coredump.socket"));
-+		coredump_sk_len = offsetof(struct sockaddr_un, sun_path) + sizeof("coredump.socket");
-+		ret = bind(fd_server, (const struct sockaddr *)&coredump_sk, coredump_sk_len);
-+		if (ret < 0) {
-+			fprintf(stderr, "Failed to bind coredump socket\n");
-+			close(fd_server);
-+			close(ipc_sockets[1]);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		ret = listen(fd_server, 1);
-+		if (ret < 0) {
-+			fprintf(stderr, "Failed to listen on coredump socket\n");
-+			close(fd_server);
-+			close(ipc_sockets[1]);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		if (write_nointr(ipc_sockets[1], "1", 1) < 0) {
-+			close(fd_server);
-+			close(ipc_sockets[1]);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		close(ipc_sockets[1]);
-+
-+		fd_coredump = accept4(fd_server, NULL, NULL, SOCK_CLOEXEC);
-+		if (fd_coredump < 0) {
-+			fprintf(stderr, "Failed to accept coredump socket connection\n");
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		peer_cookie_len = sizeof(peer_cookie);
-+		ret = getsockopt(fd_coredump, SOL_SOCKET, SO_COOKIE,
-+				 &peer_cookie, &peer_cookie_len);
-+		if (ret < 0) {
-+			fprintf(stderr, "%m - Failed to retrieve cookie for coredump socket connection\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		fd_peer_pidfd_len = sizeof(fd_peer_pidfd);
-+		ret = getsockopt(fd_coredump, SOL_SOCKET, SO_PEERPIDFD,
-+				 &fd_peer_pidfd, &fd_peer_pidfd_len);
-+		if (ret < 0) {
-+			fprintf(stderr, "%m - Failed to retrieve peer pidfd for coredump socket connection\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		memset(&info, 0, sizeof(info));
-+		info.mask = PIDFD_INFO_EXIT | PIDFD_INFO_COREDUMP;
-+		ret = ioctl(fd_peer_pidfd, PIDFD_GET_INFO, &info);
-+		if (ret < 0) {
-+			fprintf(stderr, "Failed to retrieve pidfd info from peer pidfd for coredump socket connection\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			close(fd_peer_pidfd);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		if (!(info.mask & PIDFD_INFO_COREDUMP)) {
-+			fprintf(stderr, "Missing coredump information from coredumping task\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			close(fd_peer_pidfd);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		if (!(info.coredump_mask & PIDFD_COREDUMPED)) {
-+			fprintf(stderr, "Received connection from non-coredumping task\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			close(fd_peer_pidfd);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		if (!info.coredump_cookie) {
-+			fprintf(stderr, "Missing coredump cookie\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			close(fd_peer_pidfd);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		if (info.coredump_cookie != peer_cookie) {
-+			fprintf(stderr, "Mismatching coredump cookies\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			close(fd_peer_pidfd);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		fd_core_file = creat("/tmp/coredump.file", 0644);
-+		if (fd_core_file < 0) {
-+			fprintf(stderr, "Failed to create coredump file\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			close(fd_peer_pidfd);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		for (;;) {
-+			char buffer[4096];
-+			ssize_t bytes_read, bytes_write;
-+
-+			bytes_read = read(fd_coredump, buffer, sizeof(buffer));
-+			if (bytes_read < 0) {
-+				close(fd_coredump);
-+				close(fd_server);
-+				close(fd_peer_pidfd);
-+				close(fd_core_file);
-+				_exit(EXIT_FAILURE);
-+			}
-+
-+			if (bytes_read == 0)
-+				break;
-+
-+			bytes_write = write(fd_core_file, buffer, bytes_read);
-+			if (bytes_read != bytes_write) {
-+				close(fd_coredump);
-+				close(fd_server);
-+				close(fd_peer_pidfd);
-+				close(fd_core_file);
-+				_exit(EXIT_FAILURE);
-+			}
-+		}
-+
-+		close(fd_coredump);
-+		close(fd_server);
-+		close(fd_peer_pidfd);
-+		close(fd_core_file);
-+		_exit(EXIT_SUCCESS);
-+	}
-+	self->pid_coredump_server = pid_coredump_server;
-+
-+	EXPECT_EQ(close(ipc_sockets[1]), 0);
-+	ASSERT_EQ(read_nointr(ipc_sockets[0], &c, 1), 1);
-+	EXPECT_EQ(close(ipc_sockets[0]), 0);
-+
-+	pid = fork();
-+	ASSERT_GE(pid, 0);
-+	if (pid == 0)
-+		crashing_child();
-+
-+	pidfd = sys_pidfd_open(pid, 0);
-+	ASSERT_GE(pidfd, 0);
-+
-+	waitpid(pid, &status, 0);
-+	ASSERT_TRUE(WIFSIGNALED(status));
-+	ASSERT_TRUE(WCOREDUMP(status));
-+
-+	info.mask = PIDFD_INFO_EXIT | PIDFD_INFO_COREDUMP;
-+	ASSERT_EQ(ioctl(pidfd, PIDFD_GET_INFO, &info), 0);
-+	ASSERT_GT((info.mask & PIDFD_INFO_COREDUMP), 0);
-+	ASSERT_GT((info.coredump_mask & PIDFD_COREDUMPED), 0);
-+
-+	waitpid(pid_coredump_server, &status, 0);
-+	self->pid_coredump_server = -ESRCH;
-+	ASSERT_TRUE(WIFEXITED(status));
-+	ASSERT_EQ(WEXITSTATUS(status), 0);
-+
-+	ASSERT_EQ(stat("/tmp/coredump.file", &st), 0);
-+	ASSERT_GT(st.st_size, 0);
-+	/*
-+	 * We should somehow validate the produced core file.
-+	 * For now just allow for visual inspection
-+	 */
-+	system("file /tmp/coredump.file");
-+}
-+
-+TEST_F(coredump, socket_recycled_cookie)
-+{
-+	int fd, pidfd, ret, status;
-+	FILE *file;
-+	pid_t pid, pid_coredump_server;
-+	struct stat st;
-+	char core_file[PATH_MAX];
-+	struct pidfd_info info = {};
-+	int ipc_sockets[2];
-+	char c;
-+
-+	ASSERT_EQ(unshare(CLONE_NEWNS), 0);
-+	ASSERT_EQ(mount(NULL, "/", NULL, MS_PRIVATE | MS_REC, NULL), 0);
-+	ASSERT_EQ(mount(NULL, "/tmp", "tmpfs", 0, NULL), 0);
-+
-+	ret = socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, ipc_sockets);
-+	ASSERT_EQ(ret, 0);
-+
-+	pid_coredump_server = fork();
-+	ASSERT_GE(pid_coredump_server, 0);
-+	if (pid_coredump_server == 0) {
-+		int fd_server, fd_coredump, fd_peer_pidfd, fd_core_file;
-+		__u64 peer_cookie, server_cookie;
-+		socklen_t fd_peer_pidfd_len, peer_cookie_len, server_cookie_len;
-+		struct sockaddr_un coredump_sk = {
-+			.sun_family = AF_UNIX,
-+		};
-+		size_t coredump_sk_len;
-+
-+		close(ipc_sockets[0]);
-+
-+		fd_server = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
-+		if (fd_server < 0)
-+			_exit(EXIT_FAILURE);
-+
-+		server_cookie_len = sizeof(server_cookie);
-+		ret = getsockopt(fd_server, SOL_SOCKET, SO_COOKIE,
-+				 &server_cookie, &server_cookie_len);
-+		if (ret < 0) {
-+			fprintf(stderr, "%m - Failed to retrieve cookie for coredump socket server\n");
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		/* Write invalid socket cookie to core_pattern. */
-+		coredump_sk_len = snprintf(coredump_sk.sun_path,
-+					   sizeof(coredump_sk.sun_path),
-+					   "@coredump.socket %" PRIu64, 0);
-+		if (coredump_sk_len < 0 || coredump_sk_len >= sizeof(coredump_sk.sun_path)) {
-+			fprintf(stderr, "Unable to create coredump socket path\n");
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		file = fopen("/proc/sys/kernel/core_pattern", "w");
-+		if (!file) {
-+			fprintf(stderr, "Unable to open core_pattern\n");
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		ret = fprintf(file, "%s", coredump_sk.sun_path);
-+		fclose(file);
-+		if (ret < 0) {
-+			fprintf(stderr, "Unable to write to core_pattern\n");
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		coredump_sk.sun_path[0] = '\0';
-+		memcpy(coredump_sk.sun_path, "\0coredump.socket", sizeof("coredump.socket"));
-+		coredump_sk_len = offsetof(struct sockaddr_un, sun_path) + sizeof("coredump.socket");
-+		ret = bind(fd_server, (const struct sockaddr *)&coredump_sk, coredump_sk_len);
-+		if (ret < 0) {
-+			fprintf(stderr, "Failed to bind coredump socket\n");
-+			close(fd_server);
-+			close(ipc_sockets[1]);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		ret = listen(fd_server, 1);
-+		if (ret < 0) {
-+			fprintf(stderr, "Failed to listen on coredump socket\n");
-+			close(fd_server);
-+			close(ipc_sockets[1]);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		if (write_nointr(ipc_sockets[1], "1", 1) < 0) {
-+			close(fd_server);
-+			close(ipc_sockets[1]);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		close(ipc_sockets[1]);
-+
-+		fd_coredump = accept4(fd_server, NULL, NULL, SOCK_CLOEXEC);
-+		if (fd_coredump < 0) {
-+			fprintf(stderr, "Failed to accept coredump socket connection\n");
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		peer_cookie_len = sizeof(peer_cookie);
-+		ret = getsockopt(fd_coredump, SOL_SOCKET, SO_COOKIE,
-+				 &peer_cookie, &peer_cookie_len);
-+		if (ret < 0) {
-+			fprintf(stderr, "%m - Failed to retrieve cookie for coredump socket connection\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		fd_peer_pidfd_len = sizeof(fd_peer_pidfd);
-+		ret = getsockopt(fd_coredump, SOL_SOCKET, SO_PEERPIDFD,
-+				 &fd_peer_pidfd, &fd_peer_pidfd_len);
-+		if (ret < 0) {
-+			fprintf(stderr, "%m - Failed to retrieve peer pidfd for coredump socket connection\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		memset(&info, 0, sizeof(info));
-+		info.mask = PIDFD_INFO_EXIT | PIDFD_INFO_COREDUMP;
-+		ret = ioctl(fd_peer_pidfd, PIDFD_GET_INFO, &info);
-+		if (ret < 0) {
-+			fprintf(stderr, "Failed to retrieve pidfd info from peer pidfd for coredump socket connection\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			close(fd_peer_pidfd);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		if (!(info.mask & PIDFD_INFO_COREDUMP)) {
-+			fprintf(stderr, "Missing coredump information from coredumping task\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			close(fd_peer_pidfd);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		if (!(info.coredump_mask & PIDFD_COREDUMPED)) {
-+			fprintf(stderr, "Received connection from non-coredumping task\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			close(fd_peer_pidfd);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		if (!info.coredump_cookie) {
-+			fprintf(stderr, "Missing coredump cookie\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			close(fd_peer_pidfd);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		if (info.coredump_cookie != peer_cookie) {
-+			fprintf(stderr, "Mismatching coredump cookies\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			close(fd_peer_pidfd);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		fd_core_file = creat("/tmp/coredump.file", 0644);
-+		if (fd_core_file < 0) {
-+			fprintf(stderr, "Failed to create coredump file\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			close(fd_peer_pidfd);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		for (;;) {
-+			char buffer[4096];
-+			ssize_t bytes_read, bytes_write;
-+
-+			bytes_read = read(fd_coredump, buffer, sizeof(buffer));
-+			if (bytes_read < 0) {
-+				close(fd_coredump);
-+				close(fd_server);
-+				close(fd_peer_pidfd);
-+				close(fd_core_file);
-+				_exit(EXIT_FAILURE);
-+			}
-+
-+			if (bytes_read == 0)
-+				break;
-+
-+			bytes_write = write(fd_core_file, buffer, bytes_read);
-+			if (bytes_read != bytes_write) {
-+				close(fd_coredump);
-+				close(fd_server);
-+				close(fd_peer_pidfd);
-+				close(fd_core_file);
-+				_exit(EXIT_FAILURE);
-+			}
-+		}
-+
-+		close(fd_coredump);
-+		close(fd_server);
-+		close(fd_peer_pidfd);
-+		close(fd_core_file);
-+		_exit(EXIT_SUCCESS);
-+	}
-+	self->pid_coredump_server = pid_coredump_server;
-+
-+	EXPECT_EQ(close(ipc_sockets[1]), 0);
-+	ASSERT_EQ(read_nointr(ipc_sockets[0], &c, 1), 1);
-+	EXPECT_EQ(close(ipc_sockets[0]), 0);
-+
-+	pid = fork();
-+	ASSERT_GE(pid, 0);
-+	if (pid == 0)
-+		crashing_child();
-+
-+	pidfd = sys_pidfd_open(pid, 0);
-+	ASSERT_GE(pidfd, 0);
-+
-+	waitpid(pid, &status, 0);
-+	ASSERT_TRUE(WIFSIGNALED(status));
-+	ASSERT_FALSE(WCOREDUMP(status));
-+
-+	info.mask = PIDFD_INFO_EXIT | PIDFD_INFO_COREDUMP;
-+	ASSERT_EQ(ioctl(pidfd, PIDFD_GET_INFO, &info), 0);
-+	ASSERT_GT((info.mask & PIDFD_INFO_COREDUMP), 0);
-+	ASSERT_EQ((info.coredump_mask & PIDFD_COREDUMPED), 0);
-+
-+	ASSERT_EQ(kill(pid_coredump_server, SIGKILL), 0);
-+	waitpid(pid_coredump_server, &status, 0);
-+	self->pid_coredump_server = -ESRCH;
-+	ASSERT_TRUE(WIFSIGNALED(status));
-+	ASSERT_EQ(WTERMSIG(status), SIGKILL);
-+
-+	ASSERT_NE(stat("/tmp/coredump.file", &st), 0);
-+	ASSERT_EQ(errno, ENOENT);
-+}
-+
-+TEST_F(coredump, socket_missing_cookie)
-+{
-+	int fd, pidfd, ret, status;
-+	FILE *file;
-+	pid_t pid, pid_coredump_server;
-+	struct stat st;
-+	char core_file[PATH_MAX];
-+	struct pidfd_info info = {};
-+	int ipc_sockets[2];
-+	char c;
-+
-+	ASSERT_EQ(unshare(CLONE_NEWNS), 0);
-+	ASSERT_EQ(mount(NULL, "/", NULL, MS_PRIVATE | MS_REC, NULL), 0);
-+	ASSERT_EQ(mount(NULL, "/tmp", "tmpfs", 0, NULL), 0);
-+
-+	ret = socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, ipc_sockets);
-+	ASSERT_EQ(ret, 0);
-+
-+	pid_coredump_server = fork();
-+	ASSERT_GE(pid_coredump_server, 0);
-+	if (pid_coredump_server == 0) {
-+		int fd_server, fd_coredump, fd_peer_pidfd, fd_core_file;
-+		__u64 peer_cookie, server_cookie;
-+		socklen_t fd_peer_pidfd_len, peer_cookie_len, server_cookie_len;
-+		struct sockaddr_un coredump_sk = {
-+			.sun_family = AF_UNIX,
-+		};
-+		size_t coredump_sk_len;
-+
-+		close(ipc_sockets[0]);
-+
-+		fd_server = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
-+		if (fd_server < 0)
-+			_exit(EXIT_FAILURE);
-+
-+		server_cookie_len = sizeof(server_cookie);
-+		ret = getsockopt(fd_server, SOL_SOCKET, SO_COOKIE,
-+				 &server_cookie, &server_cookie_len);
-+		if (ret < 0) {
-+			fprintf(stderr, "%m - Failed to retrieve cookie for coredump socket server\n");
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		/* Don't write socket cookie to core_pattern. */
-+		coredump_sk_len = snprintf(coredump_sk.sun_path,
-+					   sizeof(coredump_sk.sun_path),
-+					   "@coredump.socket");
-+		if (coredump_sk_len < 0 || coredump_sk_len >= sizeof(coredump_sk.sun_path)) {
-+			fprintf(stderr, "Unable to create coredump socket path\n");
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		file = fopen("/proc/sys/kernel/core_pattern", "w");
-+		if (!file) {
-+			fprintf(stderr, "Unable to open core_pattern\n");
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		ret = fprintf(file, "%s", coredump_sk.sun_path);
-+		fclose(file);
-+		if (ret < 0) {
-+			fprintf(stderr, "Unable to write to core_pattern\n");
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		coredump_sk.sun_path[0] = '\0';
-+		memcpy(coredump_sk.sun_path, "\0coredump.socket", sizeof("coredump.socket"));
-+		coredump_sk_len = offsetof(struct sockaddr_un, sun_path) + sizeof("coredump.socket");
-+		ret = bind(fd_server, (const struct sockaddr *)&coredump_sk, coredump_sk_len);
-+		if (ret < 0) {
-+			fprintf(stderr, "Failed to bind coredump socket\n");
-+			close(fd_server);
-+			close(ipc_sockets[1]);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		ret = listen(fd_server, 1);
-+		if (ret < 0) {
-+			fprintf(stderr, "Failed to listen on coredump socket\n");
-+			close(fd_server);
-+			close(ipc_sockets[1]);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		if (write_nointr(ipc_sockets[1], "1", 1) < 0) {
-+			close(fd_server);
-+			close(ipc_sockets[1]);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		close(ipc_sockets[1]);
-+
-+		fd_coredump = accept4(fd_server, NULL, NULL, SOCK_CLOEXEC);
-+		if (fd_coredump < 0) {
-+			fprintf(stderr, "Failed to accept coredump socket connection\n");
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		peer_cookie_len = sizeof(peer_cookie);
-+		ret = getsockopt(fd_coredump, SOL_SOCKET, SO_COOKIE,
-+				 &peer_cookie, &peer_cookie_len);
-+		if (ret < 0) {
-+			fprintf(stderr, "%m - Failed to retrieve cookie for coredump socket connection\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		fd_peer_pidfd_len = sizeof(fd_peer_pidfd);
-+		ret = getsockopt(fd_coredump, SOL_SOCKET, SO_PEERPIDFD,
-+				 &fd_peer_pidfd, &fd_peer_pidfd_len);
-+		if (ret < 0) {
-+			fprintf(stderr, "%m - Failed to retrieve peer pidfd for coredump socket connection\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		memset(&info, 0, sizeof(info));
-+		info.mask = PIDFD_INFO_EXIT | PIDFD_INFO_COREDUMP;
-+		ret = ioctl(fd_peer_pidfd, PIDFD_GET_INFO, &info);
-+		if (ret < 0) {
-+			fprintf(stderr, "Failed to retrieve pidfd info from peer pidfd for coredump socket connection\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			close(fd_peer_pidfd);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		if (!(info.mask & PIDFD_INFO_COREDUMP)) {
-+			fprintf(stderr, "Missing coredump information from coredumping task\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			close(fd_peer_pidfd);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		if (!(info.coredump_mask & PIDFD_COREDUMPED)) {
-+			fprintf(stderr, "Received connection from non-coredumping task\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			close(fd_peer_pidfd);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		if (!info.coredump_cookie) {
-+			fprintf(stderr, "Missing coredump cookie\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			close(fd_peer_pidfd);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		if (info.coredump_cookie != peer_cookie) {
-+			fprintf(stderr, "Mismatching coredump cookies\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			close(fd_peer_pidfd);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		fd_core_file = creat("/tmp/coredump.file", 0644);
-+		if (fd_core_file < 0) {
-+			fprintf(stderr, "Failed to create coredump file\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			close(fd_peer_pidfd);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		for (;;) {
-+			char buffer[4096];
-+			ssize_t bytes_read, bytes_write;
-+
-+			bytes_read = read(fd_coredump, buffer, sizeof(buffer));
-+			if (bytes_read < 0) {
-+				close(fd_coredump);
-+				close(fd_server);
-+				close(fd_peer_pidfd);
-+				close(fd_core_file);
-+				_exit(EXIT_FAILURE);
-+			}
-+
-+			if (bytes_read == 0)
-+				break;
-+
-+			bytes_write = write(fd_core_file, buffer, bytes_read);
-+			if (bytes_read != bytes_write) {
-+				close(fd_coredump);
-+				close(fd_server);
-+				close(fd_peer_pidfd);
-+				close(fd_core_file);
-+				_exit(EXIT_FAILURE);
-+			}
-+		}
-+
-+		close(fd_coredump);
-+		close(fd_server);
-+		close(fd_peer_pidfd);
-+		close(fd_core_file);
-+		_exit(EXIT_SUCCESS);
-+	}
-+	self->pid_coredump_server = pid_coredump_server;
-+
-+	EXPECT_EQ(close(ipc_sockets[1]), 0);
-+	ASSERT_EQ(read_nointr(ipc_sockets[0], &c, 1), 1);
-+	EXPECT_EQ(close(ipc_sockets[0]), 0);
-+
-+	pid = fork();
-+	ASSERT_GE(pid, 0);
-+	if (pid == 0)
-+		crashing_child();
-+
-+	pidfd = sys_pidfd_open(pid, 0);
-+	ASSERT_GE(pidfd, 0);
-+
-+	waitpid(pid, &status, 0);
-+	ASSERT_TRUE(WIFSIGNALED(status));
-+	ASSERT_FALSE(WCOREDUMP(status));
-+
-+	info.mask = PIDFD_INFO_EXIT | PIDFD_INFO_COREDUMP;
-+	ASSERT_EQ(ioctl(pidfd, PIDFD_GET_INFO, &info), 0);
-+	ASSERT_GT((info.mask & PIDFD_INFO_COREDUMP), 0);
-+	ASSERT_EQ((info.coredump_mask & PIDFD_COREDUMPED), 0);
-+
-+	ASSERT_EQ(kill(pid_coredump_server, SIGKILL), 0);
-+	waitpid(pid_coredump_server, &status, 0);
-+	self->pid_coredump_server = -ESRCH;
-+	ASSERT_TRUE(WIFSIGNALED(status));
-+	ASSERT_EQ(WTERMSIG(status), SIGKILL);
-+
-+	ASSERT_NE(stat("/tmp/coredump.file", &st), 0);
-+	ASSERT_EQ(errno, ENOENT);
-+}
-+
-+TEST_F(coredump, socket_detect_userspace_client)
-+{
-+	int fd, pidfd, ret, status;
-+	FILE *file;
-+	pid_t pid, pid_coredump_server;
-+	struct stat st;
-+	char core_file[PATH_MAX];
-+	struct pidfd_info info = {};
-+	int ipc_sockets[2];
-+	char c;
-+
-+	ASSERT_EQ(unshare(CLONE_NEWNS), 0);
-+	ASSERT_EQ(mount(NULL, "/", NULL, MS_PRIVATE | MS_REC, NULL), 0);
-+	ASSERT_EQ(mount(NULL, "/tmp", "tmpfs", 0, NULL), 0);
-+
-+	ret = socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, ipc_sockets);
-+	ASSERT_EQ(ret, 0);
-+
-+	pid_coredump_server = fork();
-+	ASSERT_GE(pid_coredump_server, 0);
-+	if (pid_coredump_server == 0) {
-+		int fd_server, fd_coredump, fd_peer_pidfd, fd_core_file;
-+		__u64 peer_cookie, server_cookie;
-+		socklen_t fd_peer_pidfd_len, peer_cookie_len, server_cookie_len;
-+		struct sockaddr_un coredump_sk = {
-+			.sun_family = AF_UNIX,
-+		};
-+		size_t coredump_sk_len;
-+
-+		close(ipc_sockets[0]);
-+
-+		fd_server = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
-+		if (fd_server < 0)
-+			_exit(EXIT_FAILURE);
-+
-+		server_cookie_len = sizeof(server_cookie);
-+		ret = getsockopt(fd_server, SOL_SOCKET, SO_COOKIE,
-+				 &server_cookie, &server_cookie_len);
-+		if (ret < 0) {
-+			fprintf(stderr, "%m - Failed to retrieve cookie for coredump socket server\n");
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		coredump_sk_len = snprintf(coredump_sk.sun_path,
-+					   sizeof(coredump_sk.sun_path),
-+					   "@coredump.socket %" PRIu64, server_cookie);
-+		if (coredump_sk_len < 0 || coredump_sk_len >= sizeof(coredump_sk.sun_path)) {
-+			fprintf(stderr, "Unable to create coredump socket path\n");
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		file = fopen("/proc/sys/kernel/core_pattern", "w");
-+		if (!file) {
-+			fprintf(stderr, "Unable to open core_pattern\n");
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		ret = fprintf(file, "%s", coredump_sk.sun_path);
-+		fclose(file);
-+		if (ret < 0) {
-+			fprintf(stderr, "Unable to write to core_pattern\n");
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		coredump_sk.sun_path[0] = '\0';
-+		memcpy(coredump_sk.sun_path, "\0coredump.socket", sizeof("coredump.socket"));
-+		coredump_sk_len = offsetof(struct sockaddr_un, sun_path) + sizeof("coredump.socket");
-+		ret = bind(fd_server, (const struct sockaddr *)&coredump_sk, coredump_sk_len);
-+		if (ret < 0) {
-+			fprintf(stderr, "Failed to bind coredump socket\n");
-+			close(fd_server);
-+			close(ipc_sockets[1]);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		ret = listen(fd_server, 1);
-+		if (ret < 0) {
-+			fprintf(stderr, "Failed to listen on coredump socket\n");
-+			close(fd_server);
-+			close(ipc_sockets[1]);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		if (write_nointr(ipc_sockets[1], "1", 1) < 0) {
-+			close(fd_server);
-+			close(ipc_sockets[1]);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		close(ipc_sockets[1]);
-+
-+		fd_coredump = accept4(fd_server, NULL, NULL, SOCK_CLOEXEC);
-+		if (fd_coredump < 0) {
-+			fprintf(stderr, "Failed to accept coredump socket connection\n");
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		peer_cookie_len = sizeof(peer_cookie);
-+		ret = getsockopt(fd_coredump, SOL_SOCKET, SO_COOKIE,
-+				 &peer_cookie, &peer_cookie_len);
-+		if (ret < 0) {
-+			fprintf(stderr, "%m - Failed to retrieve cookie for coredump socket connection\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		fd_peer_pidfd_len = sizeof(fd_peer_pidfd);
-+		ret = getsockopt(fd_coredump, SOL_SOCKET, SO_PEERPIDFD,
-+				 &fd_peer_pidfd, &fd_peer_pidfd_len);
-+		if (ret < 0) {
-+			fprintf(stderr, "%m - Failed to retrieve peer pidfd for coredump socket connection\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		memset(&info, 0, sizeof(info));
-+		info.mask = PIDFD_INFO_EXIT | PIDFD_INFO_COREDUMP;
-+		ret = ioctl(fd_peer_pidfd, PIDFD_GET_INFO, &info);
-+		if (ret < 0) {
-+			fprintf(stderr, "Failed to retrieve pidfd info from peer pidfd for coredump socket connection\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			close(fd_peer_pidfd);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		if (!(info.mask & PIDFD_INFO_COREDUMP)) {
-+			fprintf(stderr, "Missing coredump information from coredumping task\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			close(fd_peer_pidfd);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		if (info.coredump_mask & PIDFD_COREDUMPED) {
-+			fprintf(stderr, "Received unexpected connection from coredumping task\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			close(fd_peer_pidfd);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		if (info.coredump_cookie) {
-+			fprintf(stderr, "Received unexpected coredump cookie\n");
-+			close(fd_coredump);
-+			close(fd_server);
-+			close(fd_peer_pidfd);
-+			_exit(EXIT_FAILURE);
-+		}
-+
-+		close(fd_coredump);
-+		close(fd_server);
-+		close(fd_peer_pidfd);
-+		close(fd_core_file);
-+		_exit(EXIT_SUCCESS);
-+	}
-+	self->pid_coredump_server = pid_coredump_server;
-+
-+	EXPECT_EQ(close(ipc_sockets[1]), 0);
-+	ASSERT_EQ(read_nointr(ipc_sockets[0], &c, 1), 1);
-+	EXPECT_EQ(close(ipc_sockets[0]), 0);
-+
-+	pid = fork();
-+	ASSERT_GE(pid, 0);
-+	if (pid == 0) {
-+		struct sockaddr_un coredump_sk = {
-+			.sun_family = AF_UNIX,
-+		};
-+		socklen_t coredump_sk_len;
-+		int fd_socket;
-+		ssize_t ret;
-+
-+		fd_socket = socket(AF_UNIX, SOCK_STREAM, 0);
-+		if (fd_socket < 0)
-+			_exit(EXIT_FAILURE);
-+
-+
-+		coredump_sk.sun_path[0] = '\0';
-+		memcpy(coredump_sk.sun_path, "\0coredump.socket", sizeof("coredump.socket"));
-+		coredump_sk_len = offsetof(struct sockaddr_un, sun_path) + sizeof("coredump.socket");
-+
-+		ret = connect(fd_socket, (const struct sockaddr *)&coredump_sk, coredump_sk_len);
-+		if (ret < 0)
-+			_exit(EXIT_FAILURE);
-+
-+		(void *)write(fd_socket, &(char){ 0 }, 1);
-+		close(fd_socket);
-+		_exit(EXIT_SUCCESS);
-+	}
-+
-+	pidfd = sys_pidfd_open(pid, 0);
-+	ASSERT_GE(pidfd, 0);
-+
-+	waitpid(pid, &status, 0);
-+	ASSERT_TRUE(WIFEXITED(status));
-+	ASSERT_EQ(WEXITSTATUS(status), 0);
-+
-+	info.mask = PIDFD_INFO_EXIT | PIDFD_INFO_COREDUMP;
-+	ASSERT_EQ(ioctl(pidfd, PIDFD_GET_INFO, &info), 0);
-+	ASSERT_GT((info.mask & PIDFD_INFO_COREDUMP), 0);
-+	ASSERT_EQ((info.coredump_mask & PIDFD_COREDUMPED), 0);
-+
-+	waitpid(pid_coredump_server, &status, 0);
-+	self->pid_coredump_server = -ESRCH;
-+	ASSERT_TRUE(WIFEXITED(status));
-+	ASSERT_EQ(WEXITSTATUS(status), 0);
-+
-+	ASSERT_NE(stat("/tmp/coredump.file", &st), 0);
-+	ASSERT_EQ(errno, ENOENT);
-+}
-+
- TEST_HARNESS_MAIN
-
--- 
-2.47.2
+> 2025=E5=B9=B45=E6=9C=8812=E6=97=A5 =E4=B8=8B=E5=8D=884:22=EF=BC=8CHangbi=
+n Liu <liuhangbin@gmail.com> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> On Sat, May 10, 2025 at 12:45:01PM +0800, tonghao@bamaicloud.com =
+wrote:
+>> diff --git a/drivers/net/bonding/bond_sysfs.c =
+b/drivers/net/bonding/bond_sysfs.c
+>> index 1e13bb170515..76f2a1bf57c2 100644
+>> --- a/drivers/net/bonding/bond_sysfs.c
+>> +++ b/drivers/net/bonding/bond_sysfs.c
+>> @@ -752,6 +752,23 @@ static ssize_t =
+bonding_show_ad_user_port_key(struct device *d,
+>> static DEVICE_ATTR(ad_user_port_key, 0644,
+>> 		   bonding_show_ad_user_port_key, =
+bonding_sysfs_store_option);
+>>=20
+>> +static ssize_t bonding_show_broadcast_neighbor(struct device *d,
+>> +					       struct device_attribute =
+*attr,
+>> +					       char *buf)
+>> +{
+>> +	struct bonding *bond =3D to_bond(d);
+>> +	const struct bond_opt_value *val;
+>> +
+>> +	val =3D bond_opt_get_val(BOND_OPT_BROADCAST_NEIGH,
+>> +			bond->params.broadcast_neighbor);
+>=20
+> nit: please take care of the code alignment here
+OK
+>> +
+>> +	return sysfs_emit(buf, "%s %d\n", val->string,
+>> +			bond->params.broadcast_neighbor);
+>=20
+>                       here
+Ok, thanks Hangbin.
+>> +}
+>> +
+>> +static DEVICE_ATTR(broadcast_neighbor, 0644,
+>> +		   bonding_show_broadcast_neighbor, =
+bonding_sysfs_store_option);
+>=20
+> and here.
+OK
+>=20
+> Thanks
+> Hangbin
+>=20
 
 
