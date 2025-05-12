@@ -1,112 +1,111 @@
-Return-Path: <netdev+bounces-189908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24C4FAB47F8
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 01:35:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75F90AB4805
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 01:43:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1D9C19E407D
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 23:35:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1FCC462C3D
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 23:43:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A432D268C40;
-	Mon, 12 May 2025 23:35:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44BEA265CC1;
+	Mon, 12 May 2025 23:43:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kYziXmCW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dvGOMEdg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2118B253F2D;
-	Mon, 12 May 2025 23:35:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBB8817A2E1
+	for <netdev@vger.kernel.org>; Mon, 12 May 2025 23:43:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747092910; cv=none; b=S4qkvB86TNUBq9b6yqtwlpeG4mBBfmQGWII1Bh21HgXod3nOGRet9aJrAuXg8XWhj7yRJRVTcgmTizjKg05wSgr01VQh9qi02tG1/a5ivqepOpAOrGONy6Wa7huquF67VrHD88tRMReQufqa4DaPgFLLu2O4jjAS3Grt0eZmXoA=
+	t=1747093404; cv=none; b=Cqeh0ewUuQC1I7tjre90ActBnj5XFVJIQZfJ6EDtvzI5SyhjEmbA9MPD6DtPqA/rxKCfTUeuTJfB2AoM20H5SuWBo7qKsHot4l4iRcXv4Y3oIsyK+lWauoqtstnE1+CKfwDlPAOYLw6W0fE7iH9fC3fhdxo890abS45QptWnNiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747092910; c=relaxed/simple;
-	bh=5d7ulaWu8eLuk9+FYkxlpsohVPqS7lsPmXK7MdtDv/s=;
+	s=arc-20240116; t=1747093404; c=relaxed/simple;
+	bh=oZQGkCJXtzA6TSI2h8jnRwTgk9RakHbNqrDcQPx0ztw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I73wKUJRiZ6p3LlhwJtvgQMh0gfgxJ2LLpClOPva6GabMDQHHAuEs/3/R3Mqn8TN0PbmrBi4W5fGN5gImvj7kEy4pjZ8f8ZMtpNYNYL59k5wvT77ldAhTL08/Jd+/4ZNztAumZlJtb/g5km2jS9CcO4SbipOSl4U13+C5+6DcBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kYziXmCW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8802C4CEE7;
-	Mon, 12 May 2025 23:35:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747092909;
-	bh=5d7ulaWu8eLuk9+FYkxlpsohVPqS7lsPmXK7MdtDv/s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kYziXmCWJ/OtT/sjFSI8Qr9gwTNkyWj4GklD96Ui5yO8DqP8A6gZ70UIrRrhgtfOo
-	 7asY8czIfUUM1QV8BL12++wFoKahmsEVE0zdi4/IBtRl9V4bwGAR5VOmcl0Zm6+2kP
-	 MLdKBy0LBtwA0tA+XrXH32a1QRleYOslACSlemqRDDd6OsB1E80IURoZsKFHU8UUjH
-	 X88e7KI24/bgDqAKo3UqPeZzSQzFt4E0qwEYABe/sHIlGYvoxmj6fI0LwxKASDg39R
-	 9fRl7Tq2b1YnlyzCWpJM6shKn18JvMoSKVE/Ft3yzmkxZOY71kxb8t5YKVAxHbL9As
-	 dxyvA4g6X3T4w==
-Date: Tue, 13 May 2025 01:35:05 +0200
-From: Andi Shyti <andi.shyti@kernel.org>
-To: Danila Tikhonov <danila@jiaxyga.com>
-Cc: Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Lorenzo Pieralisi <lpieralisi@kernel.org>, "Rafael J . Wysocki" <rafael@kernel.org>, 
-	Viresh Kumar <viresh.kumar@linaro.org>, Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
-	Wim Van Sebroeck <wim@linux-watchdog.org>, Guenter Roeck <linux@roeck-us.net>, 
-	Rajendra Nayak <quic_rjendra@quicinc.com>, Jassi Brar <jassisinghbrar@gmail.com>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Amit Kucheria <amitk@kernel.org>, Thara Gopinath <thara.gopinath@gmail.com>, 
-	Daniel Lezcano <daniel.lezcano@linaro.org>, Zhang Rui <rui.zhang@intel.com>, 
-	Lukasz Luba <lukasz.luba@arm.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Wesley Cheng <quic_wcheng@quicinc.com>, 
-	Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>, 
-	Ulf Hansson <ulf.hansson@linaro.org>, Souradeep Chowdhury <quic_schowdhu@quicinc.com>, 
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alex Elder <elder@kernel.org>, 
-	Alim Akhtar <alim.akhtar@samsung.com>, Avri Altman <avri.altman@wdc.com>, 
-	Bart Van Assche <bvanassche@acm.org>, Andy Gross <agross@kernel.org>, 
-	Srinivas Kandagatla <srini@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, Georgi Djakov <djakov@kernel.org>, 
-	Loic Poulain <loic.poulain@oss.qualcomm.com>, Robert Foss <rfoss@kernel.org>, 
-	Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
-	Taniya Das <quic_tdas@quicinc.com>, Sibi Sankar <quic_sibis@quicinc.com>, 
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, 
-	Joerg Roedel <joro@8bytes.org>, Imran Shaik <quic_imrashai@quicinc.com>, 
-	Mathieu Poirier <mathieu.poirier@linaro.org>, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
-	Neil Armstrong <neil.armstrong@linaro.org>, Jessica Zhang <quic_jesszhan@quicinc.com>, 
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, Kees Cook <kees@kernel.org>, Tony Luck <tony.luck@intel.com>, 
-	"Guilherme G . Piccoli" <gpiccoli@igalia.com>, David Wronek <david@mainlining.org>, 
-	Jens Reidel <adrian@mainlining.org>, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-pm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-watchdog@vger.kernel.org, 
-	linux-usb@vger.kernel.org, linux-phy@lists.infradead.org, linux-mmc@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-scsi@vger.kernel.org, dmaengine@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-i2c@vger.kernel.org, linux-clk@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev, linux-remoteproc@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linux-hardening@vger.kernel.org, linux@mainlining.org, 
-	~postmarketos/upstreaming@lists.sr.ht
-Subject: Re: [PATCH 20/33] dt-bindings: i2c: qcom-cci: Add the SM7150
- compatible
-Message-ID: <5smj66yzv2xnfdsiedrkivxxebhm2pbbwjjsbiwxhmxr5n4fns@vugxqsm32abk>
-References: <20250422213137.80366-1-danila@jiaxyga.com>
- <20250422213137.80366-4-danila@jiaxyga.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=eUP30+kXUf4Rqp0JHuI8G1Q0p0pCVWOPqI2POdRqNTmV6CwBN6bnXU9rC7PdiFfKSj9tXln22L91ZPkxdgBUQ+mBctexibNPRRJPuGtMl5a1Ho0+83Bq9l6B/RKy/FKlNaYgr2IutmZJlykLVGTbYEX29UNZWPiGc1khFdEeCvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dvGOMEdg; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-b07d607dc83so4152405a12.1
+        for <netdev@vger.kernel.org>; Mon, 12 May 2025 16:43:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747093402; x=1747698202; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=EdBX5Gz2Km8l9THJTLL2OFIXNI3sJU88nj4fjrGP0PE=;
+        b=dvGOMEdg3Ru4LhXXOK/AMqICLDio99P8/ZAR7JJ/wSo/oOfEs8JvEqI0O3Z1qp++9s
+         46rrkYuYZ3jaJpw6Fn/Mm32wbl8PJ0rMVzen+MeWQRLbOHwqpIGy6x0S1VGuRxoMEflK
+         xDWUcIc6xbv0pZ1+puBVwy88WKnPi1uMPhbylyS7ntvkqanS5rJ8TUehUdb0hUuut95q
+         Zf3v9H/tsbgJpie/W14MQ/UqNTHLdE8sjpgZpvj6R9mb5US6OPUfdcMzgFQRTbkcBfJ1
+         f5tE38pH73AON5VVqVGr3t+Tiy5xnJpIlQu8apJJTgtS7HP2luEtZwTVjEFSjyqwGFJU
+         5uHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747093402; x=1747698202;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EdBX5Gz2Km8l9THJTLL2OFIXNI3sJU88nj4fjrGP0PE=;
+        b=R3nFpyWUDAfrbLBzh8asuTrG91XtkkHWhKhwpZtZazStuF09QsEz8IQXk5TTjlwhPO
+         9826sEBNY29ngRPYTtwJCLz/LgyGDGaJxiW7MLK9IlcKAXfREVw6t077JcruO0c+a+Lm
+         rJbyWxYUYKzYsZB/MlhXQ8txufeddRWAHK8JjR9G+BhQcCcCVaKIWkiHDQ3mie87W9W+
+         SX3fGovwGh/WUR1Zs+Ms1eEeFDf84wJXhse1pKoLtqdkqVs7tl8EafgSwQSSYNqg5Lfo
+         7IzV5joQbZNuQodKDX0zke8DTgvyVkpLl03gDQHrH+PNc8o7s1xyhtWwdjo1nZz+IMG/
+         e01g==
+X-Forwarded-Encrypted: i=1; AJvYcCXD1qLaC7gqTy6hNA285/3rrPTAyXosozT3q8dJZ4BM3zEtXz0FcaCOYNc/zVQ32u5WbIhKj/Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJvry1/DPnW0RejT4jSznEpzX1CS1xFc38m93UarkteT012ImD
+	rzc7yyCDSWXhHxkPTVeXrT6uvoZ0QbpqkHDmojgOFAQfoiZdENoCdOPe
+X-Gm-Gg: ASbGncuyOl4ncaR1H9pK885AFW4RFHqAwwW+bLozewnZKgsD8KYvPB1v54s+n9h9oT9
+	VAsjOGOflAP4IR3UbTxnztIBXCd2tA+9LtmQIyPs5JLcbqsIYXHMh1K4U2UPkygAYSlIAMbfJg/
+	+6VNCGZhE0mnDM3t///tZHPYRtKuQNR2MrwGQIYK1df9etCqsxo7cdI3Tef+TVA/kqgzopcHfU5
+	J7YgK3TjzhIdk50H8rrCA2zVe06WAdgIAmyjuNB3e/r47SvOL3wYzphTVvDWGaBapKd37r39iRE
+	H9SN9JpSXRMtMFMid3qlBBBTZxJVrMQRmVm3WrFwdq8Bevjob390qbth6y0+9OiilKNvBWHEHPw
+	g9BGk4UoyDa3O
+X-Google-Smtp-Source: AGHT+IGsG6R9UbqGuH3MXofAI/0ChTCkr/96k52D1V1Y+cDQxk3dVWr2mBNqa4vKggb1SDt481IC8A==
+X-Received: by 2002:a17:902:c7ca:b0:22f:c91f:d05f with SMTP id d9443c01a7336-22fc91fd077mr154676025ad.46.1747093401780;
+        Mon, 12 May 2025 16:43:21 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-22fc773edcesm69149195ad.71.2025.05.12.16.43.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 May 2025 16:43:13 -0700 (PDT)
+Date: Mon, 12 May 2025 16:43:12 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
+	pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com,
+	sdf@fomichev.me, Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Subject: Re: [PATCH net] bnxt_en: bring back rtnl_lock() in
+ bnxt_fw_reset_task()
+Message-ID: <aCKHkBnPmVwmpsh2@mini-arch>
+References: <20250512063755.2649126-1-michael.chan@broadcom.com>
+ <aCIDvir-w1qBQo3m@mini-arch>
+ <CACKFLikQtZ6c50q44Un-jQM4G2mvMf31Qp0+fRFUbNF9p9NJ_A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250422213137.80366-4-danila@jiaxyga.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACKFLikQtZ6c50q44Un-jQM4G2mvMf31Qp0+fRFUbNF9p9NJ_A@mail.gmail.com>
 
-Hi Danila,
-
-On Wed, Apr 23, 2025 at 12:31:24AM +0300, Danila Tikhonov wrote:
-> Add the SM7150 CCI device string compatible.
+On 05/12, Michael Chan wrote:
+> On Mon, May 12, 2025 at 7:20 AM Stanislav Fomichev <stfomichev@gmail.com> wrote:
+> > Will the following work instead? netdev_ops_assert_locked should take
+> > care of asserting either ops lock or rtnl lock depending on the device
+> > properties.
 > 
-> Signed-off-by: Danila Tikhonov <danila@jiaxyga.com>
+> It works for netif_set_real_num_tx_queues() but I also need to replace
+> the ASSERT_RTNL() with netdev_ops_assert_locked(dev) in
+> __udp_tunnel_nic_reset_ntf().
 
-Acked-by: Andi Shyti <andi.shyti@kernel.org>
-
-Thanks,
-Andi
+Sounds good!
 
