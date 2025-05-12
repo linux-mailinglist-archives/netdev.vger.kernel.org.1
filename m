@@ -1,101 +1,96 @@
-Return-Path: <netdev+bounces-189850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6CDFAB3EA5
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 19:08:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8723DAB3EB4
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 19:11:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5A35165CE2
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 17:07:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D31FC3A51DF
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 17:11:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C25F29551D;
-	Mon, 12 May 2025 17:07:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mkoks5cL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28D54295DB5;
+	Mon, 12 May 2025 17:11:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F018467;
-	Mon, 12 May 2025 17:07:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0165B24468F;
+	Mon, 12 May 2025 17:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747069676; cv=none; b=CkM8tCkKBFmm5JaMEcfMJ+GRx6hoDQPgV1leT8zQfAygsTji8rNJFxWJXxRmgTMmyXM09sDDHwUmz7ZWXcnkFBlab39vLYjD27VH/SXkjF4/DAK1RgErFgOo5tUR1nOUp62pCCuDFVKNSWUNOrxQrrfrnN4aI1fZ4OiAqgSQ/vk=
+	t=1747069906; cv=none; b=nr0aSsmMr5cLPPtpeEjmZNXxB+ttiJTcX8AVPMhhZn/oQ3yGABgDouccoAQPDpp8hoGpDZT4NIOzlTlhIV3WWjIyuYi+zkWDZpPMoQAEGNprjilCD1k2o6mDYWq3UeL9mpungVWKF9CJspYnMAR3gXkCUKNiK80CLLtRqR4OZE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747069676; c=relaxed/simple;
-	bh=mLmEqOzVCecMhSZ9SrTL+1guOX+BsjLm7ABFb3jdDGM=;
+	s=arc-20240116; t=1747069906; c=relaxed/simple;
+	bh=IVnOc9MOV2+02cQgtBlCO9R1yHhMZSXIztpUlnxj9J0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OFFERQbjTg4XteUVKluBGC4nBKXzzsGerWBkBuT1LntsXOLv3rrxc2WtFdrBib32C6TvAq2l4hQj5GWF512dLlRtENBp4ZILbZRjADXnHTH5iI7GFPxqPSrHiS0M0NHFWIh6tSVt/g4cRdcIKWqxCPLqlz1wFC59VOne1eB4Ipg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mkoks5cL; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=AIX9i9XOoogJsxM2MKGz+jWDm2A2YEEjwp/MY1BWXgM=; b=mk
-	oks5cLithMxuvu28S06tNcTQiAzT/5r6o6bwui5XQdulLQr352SjyHoSJnO5cbfs9qO2h0SIGat5q
-	sgW7QMmNRAsLza8+iTgsIcYO09hzsLjmQfBTmZyeQzYDm2FfDZxlBjOG1WXI9K7LwRUWsqpULe4av
-	eqqrJLe6239WeTk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uEWcr-00CMd6-AR; Mon, 12 May 2025 19:07:37 +0200
-Date: Mon, 12 May 2025 19:07:37 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Damien =?iso-8859-1?Q?Ri=E9gel?= <damien.riegel@silabs.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=fGHORQb+NjFnpez3sw9+LXICmMCTQTJSQAS3v+6znvUki7N5Kt3KOMovZ3Jd7dYM1k3BmmfifJELLR1NCsErliDt3miPNumIAvzdTGOGABTsPQumsFeGrshXYgvl3iBJYaGD6Pd1mtx8PXFBSfvE3oa1cmG5a4HHKuFdY73szuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1uEWau-000000006LH-25Hs;
+	Mon, 12 May 2025 17:11:32 +0000
+Date: Mon, 12 May 2025 18:11:25 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, upstream@airoha.com,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Simon Horman <horms@kernel.org>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	Claudiu Beznea <claudiu.beznea@microchip.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
 	Conor Dooley <conor+dt@kernel.org>,
-	Silicon Labs Kernel Team <linux-devel@silabs.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Johan Hovold <johan@kernel.org>,
-	Alex Elder <elder@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	greybus-dev@lists.linaro.org
-Subject: Re: [RFC net-next 00/15] Add support for Silicon Labs CPC
-Message-ID: <6fea7d17-8e08-42c7-a297-d4f5a3377661@lunn.ch>
-References: <20250512012748.79749-1-damien.riegel@silabs.com>
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Jonathan Corbet <corbet@lwn.net>, Joyce Ooi <joyce.ooi@intel.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Madalin Bucur <madalin.bucur@nxp.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Michal Simek <michal.simek@amd.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	Rob Herring <robh+dt@kernel.org>, Rob Herring <robh@kernel.org>,
+	Robert Hancock <robert.hancock@calian.com>,
+	Saravana Kannan <saravanak@google.com>,
+	UNGLinuxDriver@microchip.com,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Wei Fang <wei.fang@nxp.com>, devicetree@vger.kernel.org,
+	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [net-next PATCH v4 00/11] Add PCS core support
+Message-ID: <aCIrvTAGP5ukmwnb@makrotopia.org>
+References: <20250512161013.731955-1-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250512012748.79749-1-damien.riegel@silabs.com>
+In-Reply-To: <20250512161013.731955-1-sean.anderson@linux.dev>
 
-On Sun, May 11, 2025 at 09:27:33PM -0400, Damien Riégel wrote:
-> Hi,
+On Mon, May 12, 2025 at 12:10:02PM -0400, Sean Anderson wrote:
+> This series adds support for creating PCSs as devices on a bus with a
+> driver (patch 3). As initial users,
 > 
-> 
-> This patchset brings initial support for Silicon Labs CPC protocol,
-> standing for Co-Processor Communication. This protocol is used by the
-> EFR32 Series [1]. These devices offer a variety for radio protocols,
-> such as Bluetooth, Z-Wave, Zigbee [2].
+> - The Lynx PCS (and all of its users) is converted to this system (patch 5)
+> - The Xilinx PCS is broken out from the AXI Ethernet driver (patches 6-8)
+> - The Cadence MACB driver is converted to support external PCSs (namely
+>   the Xilinx PCS) (patches 9-10).
 
-Before we get too deep into the details of the patches, please could
-you do a compare/contrast to Greybus.
-
-The core of Greybus is already in the kernel, with some more bits
-being in staging. I don't know it too well, but at first glance it
-looks very similar. We should not duplicate that.
-
-Also, this patch adds Bluetooth, you talk about Z-Wave and Zigbee. But
-the EFR32 is a general purpose SoC, with I2C, SPI, PWM, UART. Greybus
-has support for these, although the code is current in staging. But
-for staging code, it is actually pretty good.
-
-Why should we add a vendor implementation when we already appear to
-have something which does most of what is needed?
-
-	Andrew
+Are those changes tested on real hardware?
 
