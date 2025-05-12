@@ -1,132 +1,349 @@
-Return-Path: <netdev+bounces-189657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3934DAB317C
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 10:22:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6069BAB31D3
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 10:39:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A34083A3494
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 08:22:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C45CD3B6544
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 08:38:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B953D2580F8;
-	Mon, 12 May 2025 08:22:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13275257AC6;
+	Mon, 12 May 2025 08:39:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jD1DSRcq"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PkHRUm+j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BA4B2571CC
-	for <netdev@vger.kernel.org>; Mon, 12 May 2025 08:22:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C441D528;
+	Mon, 12 May 2025 08:39:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747038164; cv=none; b=SBXqtKLlcBCgaIeNg6pMNBb6gMTUg53q6apwQ+l3TUNMwLdgXY1BZ3dt+M0kHvWSExEQhYcExh0nwgFIhP+rsiKPdhG9tRHsP6gA9vS56sZejXDK74h1QhTUhS5ZfJKdHItkXrek7GulSy0wKQ0rW6NdaT0aNzwYp2eUe9vBcFA=
+	t=1747039144; cv=none; b=LmHofKQbHZHHEmtDber9V6YeO8nJLWPdXRQIJNrR5u5RJZ8Lc5Aoxjtb60kr/7bPberf7FuyVqS2Prwkb/2bI0fhxdzo76qR3JhvfzKr4Sc2LYgLpbcNIpvrOUKnB3Fxdt0EqBMSESggZjw8emwzSkn/TqGqRBmGpd0vTC4BOco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747038164; c=relaxed/simple;
-	bh=wkPvuxzwYWOXVVomNwcvWfTH+uzlwNO2XLW2lOLJ77o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fwy40audktX3NKj5+EXn2IWvciHrizTQMDV9bJQtBVF7U68Wubc/gPJQHlpuLiwbCGqmzGKDPe17BkjcSC1/CpCsZGJ7tiTT/b1/NWq/lDcKaGexcthJHbHdZoZLse1sP1NslOLvnrDJRBC23kiR5SUGoI3NvK7FjA8dBUSd2UU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jD1DSRcq; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-22e7eff58a0so39480065ad.3
-        for <netdev@vger.kernel.org>; Mon, 12 May 2025 01:22:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747038162; x=1747642962; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SbIux9qepY/T4DtKTVBIC4DVICTqd4/QbfW6x9rAi50=;
-        b=jD1DSRcqRpDRPFewtVYCh2L2ffyE9ecRLhJkV3jZVdrmcMLoijv+xhcU2p2gLALl4J
-         5EfJLP5Nk24GcRaS3g+zd03yPP/8Z/VqavnfaX4UQXcCv6LnLquawJgPVl57fAkp9X0p
-         U5Bjjxlg/poBNxy1xTB3ODcz+YgakL7EhhNwQycMSknoRFJs7eqkKg57SePnPaXM9PZR
-         DtgP1RvFRBwewmE4rRNKu4b1BY9xBSRqkL7oidXv1ZmFc20tcDW+fh0D4ktz1gTgcswN
-         4SU1qq5+SSQVn/xFrY5HM4P6T8kVRqVKkK62OlQcZ4bl+HZKvMqFFI0oYYAf3b7+ylCc
-         pqlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747038162; x=1747642962;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SbIux9qepY/T4DtKTVBIC4DVICTqd4/QbfW6x9rAi50=;
-        b=tlBe6Dvei7pQ4n7yYFho9qySq6HbzSjaVYGsYHzjyaSFJ5Oy/tGkMEjHpBDE3xKWcA
-         sw3KtLMOociI2KVBldXkaBgNBScKvU3s64VyQwEn7Vj2k9y7K8OEJi6JZX6/xcXHepuy
-         Oi/DqQpVMHgZtyAP+1TmizqBy+AARNgrk6zuZA1G6U9VnPyeDzLODb3qBtgEmD3ITlpb
-         974LHIm51L4CLKi4Iz/ADy8XNjy7YpQCmC8WLVEkA+3j+u25Xvh4kWe0qS1W2fvlOwoK
-         sEqGqi+z81oirQw36VILaCxIK5fxQA9kwtl94JGP2MpIw786JzTgHCWXKQjvHhQd0QAP
-         ncRA==
-X-Gm-Message-State: AOJu0YzMrhXqB4SsUQDbvXUYT8hL/bfvqYpjRHNz4D0lLHEzyYttINHt
-	trZf6FWQyLKshYFzPuO6EK3E/42F4M141zTUS7rhMHaOaSDJOrTH
-X-Gm-Gg: ASbGncu+JjP5kFcT6TvUDlyMg+ItgSFqttLgT0imXhMBXda4fbmUDrhilBupLthK6hs
-	uq70zVO/OFoWeBgCZy7+fK4Weypv4Q2P0fxPwt5UNlsnicEgtslhb2iQIg7I6sQJsrwYi6bFoXE
-	A1OpsHSroQ3jsD5G1WGjDWvgSaVmiw0Ze4/LKmvLIePY1FtRxXG7/r8X5wy+O5TQNfXDUdRXU8F
-	j0GyRYsOuDptBAK3vS9n8eGcgNRwE3HKvaluoYjMR1DPo822L+RxlAbj1JU4PhwuuBTqSpKOopq
-	gi2D8qOkuqf0lki12h+tHpQsm2quqYRi6gugA0RJx4hGyeVDlo9Iigslz/QzkvpB5bM=
-X-Google-Smtp-Source: AGHT+IGo2hbcl/+mwOjQv9OuCl46lOsnKepnHbTgbeqY0OWa3iCk3KO6BPFdyOo/DXAkaSWJ/TgPqg==
-X-Received: by 2002:a17:902:db12:b0:224:2384:5b40 with SMTP id d9443c01a7336-22fc8b5fad3mr201243965ad.24.1747038161936;
-        Mon, 12 May 2025 01:22:41 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22fc75477fesm57345355ad.17.2025.05.12.01.22.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 May 2025 01:22:41 -0700 (PDT)
-Date: Mon, 12 May 2025 08:22:34 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: tonghao@bamaicloud.com
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Subject: Re: [PATCH net-next 1/4] net: bonding: add broadcast_neighbor option
- for 802.3ad
-Message-ID: <aCGvynxFVglsf1St@fedora>
-References: <20250510044504.52618-1-tonghao@bamaicloud.com>
- <20250510044504.52618-2-tonghao@bamaicloud.com>
+	s=arc-20240116; t=1747039144; c=relaxed/simple;
+	bh=L3aqGzgMRaim5pNrebRmy/pWTtf/ugG/uAv15SzoMV8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UCj7CUyGwE39YrOCVQGSMLcq4lOekNCJR2F2ZaZG9tfgUrm9NgjTNzH1noKWAPaFmkIM7BXZoFMZWnvEP55Nsco8JymoRcIkOv9POHZdIFtWA9sZqeb7V7CLGy2piz95nC6UTh3fm2a3KBcMeCRm/3SXr/xcSHRy9e6hAaETdKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PkHRUm+j; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E1B4643290;
+	Mon, 12 May 2025 08:38:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1747039139;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XOD96s7LugVHFz30PvysbvlXbAJ1uhNxsx+QFxIwIG8=;
+	b=PkHRUm+jGhCnCJ0LApHUd5UCMOIZPg2zCsGyTFhygXnBqKJ34sc+Am0w7lvkxQ36SjrAGj
+	8jzPcfUUA2ELha/+4OC9sBRLZUM6Y8+Ikd57MDcGTRAiqT6iQMISokYSMm+HQy/ESCZkrA
+	+N5Cjp4IEdBcWhc8Gmr9KG2UwkI3tDput4hHSo6n1PShVGHChOvKqDGXxV61w6TtMr0FWN
+	YOhr6GFPwdedSKZ+ZP7wvG1Vqy4Je4NtF4HUtdSTAQEPx1eOIZEHKdRZj4nWh8+Naeltmr
+	afUTnJJ9gZ2B6t9K7n3bTWp3w1DE7aI3macsbwFOSXPTJJCaIgbQx/MvZZgSeA==
+From: Romain Gantois <romain.gantois@bootlin.com>
+To: davem@davemloft.net, Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ linux-arm-kernel@lists.infradead.org,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>,
+ Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?B?Tmljb2zDsg==?= Veronese <nicveronese@gmail.com>,
+ Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+ Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
+ Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Rob Herring <robh@kernel.org>, Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Subject:
+ Re: [PATCH net-next v6 06/14] net: phy: Introduce generic SFP handling for
+ PHY drivers
+Date: Mon, 12 May 2025 10:38:52 +0200
+Message-ID: <23936783.6Emhk5qWAg@fw-rgant>
+In-Reply-To: <20250507135331.76021-7-maxime.chevallier@bootlin.com>
+References:
+ <20250507135331.76021-1-maxime.chevallier@bootlin.com>
+ <20250507135331.76021-7-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250510044504.52618-2-tonghao@bamaicloud.com>
+Content-Type: multipart/signed; boundary="nextPart2655786.Lt9SDvczpP";
+ micalg="pgp-sha256"; protocol="application/pgp-signature"
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeftddtkedtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkfgjfhggtgesghdtreertddtjeenucfhrhhomheptfhomhgrihhnucfirghnthhoihhsuceorhhomhgrihhnrdhgrghnthhoihhssegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefhvdelkeevgfeijedtudeiheefffejhfelgeduuefhleetudeiudektdeiheelgfenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepfhifqdhrghgrnhhtrdhlohgtrghlnhgvthdpmhgrihhlfhhrohhmpehrohhmrghinhdrghgrnhhtohhishessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepfedtpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrk
+ hgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqrghrmhdqmhhsmhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehthhhomhgrshdrphgvthgriiiiohhnihessghoohhtlhhinhdrtghomhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
+X-GND-Sasl: romain.gantois@bootlin.com
 
-On Sat, May 10, 2025 at 12:45:01PM +0800, tonghao@bamaicloud.com wrote:
-> diff --git a/drivers/net/bonding/bond_sysfs.c b/drivers/net/bonding/bond_sysfs.c
-> index 1e13bb170515..76f2a1bf57c2 100644
-> --- a/drivers/net/bonding/bond_sysfs.c
-> +++ b/drivers/net/bonding/bond_sysfs.c
-> @@ -752,6 +752,23 @@ static ssize_t bonding_show_ad_user_port_key(struct device *d,
->  static DEVICE_ATTR(ad_user_port_key, 0644,
->  		   bonding_show_ad_user_port_key, bonding_sysfs_store_option);
->  
-> +static ssize_t bonding_show_broadcast_neighbor(struct device *d,
-> +					       struct device_attribute *attr,
-> +					       char *buf)
-> +{
-> +	struct bonding *bond = to_bond(d);
-> +	const struct bond_opt_value *val;
+--nextPart2655786.Lt9SDvczpP
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
+From: Romain Gantois <romain.gantois@bootlin.com>
+Date: Mon, 12 May 2025 10:38:52 +0200
+Message-ID: <23936783.6Emhk5qWAg@fw-rgant>
+In-Reply-To: <20250507135331.76021-7-maxime.chevallier@bootlin.com>
+MIME-Version: 1.0
+
+Hi Maxime,
+
+On Wednesday, 7 May 2025 15:53:22 CEST Maxime Chevallier wrote:
+> There are currently 4 PHY drivers that can drive downstream SFPs:
+> marvell.c, marvell10g.c, at803x.c and marvell-88x2222.c. Most of the
+> logic is boilerplate, either calling into generic phylib helpers (for
+> SFP PHY attach, bus attach, etc.) or performing the same tasks with a
+> bit of validation :
+>  - Getting the module's expected interface mode
+>  - Making sure the PHY supports it
+>  - Optionnaly perform some configuration to make sure the PHY outputs
+>    the right mode
+> 
+> This can be made more generic by leveraging the phy_port, and its
+> configure_mii() callback which allows setting a port's interfaces when
+> the port is a serdes.
+> 
+> Introduce a generic PHY SFP support. If a driver doesn't probe the SFP
+> bus itself, but an SFP phandle is found in devicetree/firmware, then the
+> generic PHY SFP support will be used, relying on port ops.
+> 
+> PHY driver need to :
+>  - Register a .attach_port() callback
+>  - When a serdes port is registered to the PHY, drivers must set
+>    port->interfaces to the set of PHY_INTERFACE_MODE the port can output
+>  - If the port has limitations regarding speed, duplex and aneg, the
+>    port can also fine-tune the final linkmodes that can be supported
+>  - The port may register a set of ops, including .configure_mii(), that
+>    will be called at module_insert time to adjust the interface based on
+>    the module detected.
+> 
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> ---
+>  drivers/net/phy/phy_device.c | 107 +++++++++++++++++++++++++++++++++++
+>  include/linux/phy.h          |   2 +
+>  2 files changed, 109 insertions(+)
+> 
+> diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+> index aaf0eccbefba..aca3a47cbb66 100644
+> --- a/drivers/net/phy/phy_device.c
+> +++ b/drivers/net/phy/phy_device.c
+> @@ -1450,6 +1450,87 @@ void phy_sfp_detach(void *upstream, struct sfp_bus
+> *bus) }
+>  EXPORT_SYMBOL(phy_sfp_detach);
+> 
+> +static int phy_sfp_module_insert(void *upstream, const struct sfp_eeprom_id
+> *id) +{
+> +	struct phy_device *phydev = upstream;
+> +	struct phy_port *port = phy_get_sfp_port(phydev);
 > +
-> +	val = bond_opt_get_val(BOND_OPT_BROADCAST_NEIGH,
-> +			bond->params.broadcast_neighbor);
 
-nit: please take care of the code alignment here
+RCT
+
+> +	__ETHTOOL_DECLARE_LINK_MODE_MASK(sfp_support);
+> +	DECLARE_PHY_INTERFACE_MASK(interfaces);
+> +	phy_interface_t iface;
+> +
+> +	linkmode_zero(sfp_support);
+> +
+> +	if (!port)
+> +		return -EINVAL;
+> +
+> +	sfp_parse_support(phydev->sfp_bus, id, sfp_support, interfaces);
+> +
+> +	if (phydev->n_ports == 1)
+> +		phydev->port = sfp_parse_port(phydev->sfp_bus, id, 
+sfp_support);
+
+As mentionned below, this check looks a bit strange to me. Why are we only 
+parsing the SFP port if the PHY device only has one registered port?
 
 > +
-> +	return sysfs_emit(buf, "%s %d\n", val->string,
-> +			bond->params.broadcast_neighbor);
+> +	linkmode_and(sfp_support, port->supported, sfp_support);
+> +
+> +	if (linkmode_empty(sfp_support)) {
+> +		dev_err(&phydev->mdio.dev, "incompatible SFP module 
+inserted\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	iface = sfp_select_interface(phydev->sfp_bus, sfp_support);
+> +
+> +	/* Check that this interface is supported */
+> +	if (!test_bit(iface, port->interfaces)) {
+> +		dev_err(&phydev->mdio.dev, "incompatible SFP module 
+inserted\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (port->ops && port->ops->configure_mii)
+> +		return port->ops->configure_mii(port, true, iface);
 
-                       here
+The name "configure_mii()" seems a bit narrow-scoped to me, as this callback 
+might have to configure something else than a MII link. For example, if a DAC 
+SFP module is inserted, the downstream side of the transciever will have to be 
+configured to 1000Base-X or something similar.
+
+I'd suggest something like "post_sfp_insert()", please let me know what you 
+think.
+
+> +
+> +	return 0;
 > +}
 > +
-> +static DEVICE_ATTR(broadcast_neighbor, 0644,
-> +		   bonding_show_broadcast_neighbor, bonding_sysfs_store_option);
+> +static void phy_sfp_module_remove(void *upstream)
+> +{
+> +	struct phy_device *phydev = upstream;
+> +	struct phy_port *port = phy_get_sfp_port(phydev);
+> +
+> +	if (port && port->ops && port->ops->configure_mii)
+> +		port->ops->configure_mii(port, false, PHY_INTERFACE_MODE_NA);
+> +
+> +	if (phydev->n_ports == 1)
+> +		phydev->port = PORT_NONE;
 
-and here.
+This check is a bit confusing to me. Could you please explain why you're only 
+setting the phydev's SFP port to PORT_NONE if the PHY device only has one 
+registered port? Shouldn't this be done regardless?
 
-Thanks
-Hangbin
+> +}
+> +
+> +static void phy_sfp_link_up(void *upstream)
+> +{
+> +	struct phy_device *phydev = upstream;
+> +	struct phy_port *port = phy_get_sfp_port(phydev);
+> +
+> +	if (port && port->ops && port->ops->link_up)
+> +		port->ops->link_up(port);
+> +}
+> +
+> +static void phy_sfp_link_down(void *upstream)
+> +{
+> +	struct phy_device *phydev = upstream;
+> +	struct phy_port *port = phy_get_sfp_port(phydev);
+> +
+> +	if (port && port->ops && port->ops->link_down)
+> +		port->ops->link_down(port);
+> +}
+> +
+> +static const struct sfp_upstream_ops sfp_phydev_ops = {
+> +	.attach = phy_sfp_attach,
+> +	.detach = phy_sfp_detach,
+> +	.module_insert = phy_sfp_module_insert,
+> +	.module_remove = phy_sfp_module_remove,
+> +	.link_up = phy_sfp_link_up,
+> +	.link_down = phy_sfp_link_down,
+> +	.connect_phy = phy_sfp_connect_phy,
+> +	.disconnect_phy = phy_sfp_disconnect_phy,
+> +};
+> +
+>  static int phy_add_port(struct phy_device *phydev, struct phy_port *port)
+>  {
+>  	int ret = 0;
+> @@ -3351,6 +3432,13 @@ static int phy_setup_ports(struct phy_device *phydev)
+> if (ret)
+>  		return ret;
+> 
+> +	/* Use generic SFP probing only if the driver didn't do so already */
+> +	if (!phydev->sfp_bus) {
+
+Should the phy_sfp_probe() API be changed to something explicitely legacy? I 
+feel like people writing new PHY drivers could be confused if they see some 
+other drivers calling phy_sfp_probe() and others not doing anything and still 
+getting SFP busses.
+
+> +		ret = phy_sfp_probe(phydev, &sfp_phydev_ops);
+> +		if (ret)
+> +			goto out;
+> +	}
+> +
+>  	if (phydev->n_ports < phydev->max_n_ports) {
+>  		ret = phy_default_setup_single_port(phydev);
+>  		if (ret)
+> @@ -3384,6 +3472,25 @@ static int phy_setup_ports(struct phy_device *phydev)
+> return ret;
+>  }
+> 
+> +/**
+> + * phy_get_sfp_port() - Returns the first valid SFP port of a PHY
+> + * @phydev: pointer to the PHY device to get the SFP port from
+> + *
+> + * Returns: The first active SFP (serdes) port of a PHY device, NULL if
+> none + * exist.
+> + */
+> +struct phy_port *phy_get_sfp_port(struct phy_device *phydev)
+
+I'd suggest "phy_get_active_sfp_port()".
+
+> +{
+> +	struct phy_port *port;
+> +
+> +	list_for_each_entry(port, &phydev->ports, head)
+> +		if (port->active && port->is_serdes)
+> +			return port;
+> +
+> +	return NULL;
+> +}
+> +EXPORT_SYMBOL_GPL(phy_get_sfp_port);
+> +
+>  /**
+>   * fwnode_mdio_find_device - Given a fwnode, find the mdio_device
+>   * @fwnode: pointer to the mdio_device's fwnode
+> diff --git a/include/linux/phy.h b/include/linux/phy.h
+> index 0180f4d4fd7d..aef13fab8882 100644
+> --- a/include/linux/phy.h
+> +++ b/include/linux/phy.h
+> @@ -2091,6 +2091,8 @@ int __phy_hwtstamp_set(struct phy_device *phydev,
+>  		       struct kernel_hwtstamp_config *config,
+>  		       struct netlink_ext_ack *extack);
+> 
+> +struct phy_port *phy_get_sfp_port(struct phy_device *phydev);
+> +
+>  extern const struct bus_type mdio_bus_type;
+>  extern const struct class mdio_bus_class;
+
+Thanks!
+
+-- 
+Romain Gantois, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
+--nextPart2655786.Lt9SDvczpP
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEYFZBShRwOvLlRRy+3R9U/FLj284FAmghs5wACgkQ3R9U/FLj
+284G4A//fXz9TTKAHlDGItB9w6mE3I4om5NlNEFzmfoxya7idWY6IJt9b9ZqjzSu
+MnwQU1Oc5k51/RvGaLY313ScI8ZPpyIBXzfCwRmti7B44vi3JtTrKn2PW5OHf5QZ
+lJ19YYAKWbIkW8//csWElEKOaGGyca8U34sK57DP16IzHJESSp4PBpjhzTKNzdg2
+lMHSpBNCiCXdqRdKGJby2E1TL0BG3KbfHWDZ/QTSxbcWKFXlG5vigBkHdALykwYP
+kUmbxkcFbAeHx0SdydrMpzm8nrn0WRqpj6Iw3HPmopAgcurWDMzS/gEvCcNkUK7S
+i1D6T4LqmQ9NmYjdi1m6BHOFAv761d4Scao7lNI4tzvUAZDO/VTO7Ihy00bvNkam
+hljwNP4gkjRIgLBM6QuCWOuK5lsg6aBzlor4RcGegghiv6KoyEonrLmS5RPdc8VX
+m4U2fs8wMAjTTcOaOnNywTsWxeh2c8SOB7TdVUMJo8e8ae55vqahozQ/MDSEGi59
+5ao/Jxd9E9ZsCARf7GteicSEjqh7mUTrTx3vMDMBhm8aByNicO//0ERo5JdCwS/E
+f1IW6uninzWXbdLK9ces4lQyuhjzshkeB5Uh24mwoXjmgMLZ4SEbTN9WSiIWYuSR
+9FJkUp6dlrwVcPq3BiX8z1lE4UnGPgU+r8U62vGAd6hMBMrvlAM=
+=ML5+
+-----END PGP SIGNATURE-----
+
+--nextPart2655786.Lt9SDvczpP--
+
+
+
 
