@@ -1,213 +1,112 @@
-Return-Path: <netdev+bounces-189907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72C6EAB47DC
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 01:22:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 24C4FAB47F8
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 01:35:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E48A11B41599
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 23:22:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1D9C19E407D
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 23:35:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BC1526739E;
-	Mon, 12 May 2025 23:22:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A432D268C40;
+	Mon, 12 May 2025 23:35:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kYziXmCW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1DEE262FD9
-	for <netdev@vger.kernel.org>; Mon, 12 May 2025 23:22:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2118B253F2D;
+	Mon, 12 May 2025 23:35:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747092147; cv=none; b=mHMhO+8d+fJfDgktFooF4PpG78WIFw/PgekPzzIXreCvctlnEkiiuVO8YqW2bV4HdMRbKSMraH9HYt323oIIs4ZByYsBDSq/nr9FODc2UxqoZalTgGa1a3HHTxqmSzLu8g/5FyP+3KWKoaUccyXAF6Yad5dykBxPBJPbj5DaveQ=
+	t=1747092910; cv=none; b=S4qkvB86TNUBq9b6yqtwlpeG4mBBfmQGWII1Bh21HgXod3nOGRet9aJrAuXg8XWhj7yRJRVTcgmTizjKg05wSgr01VQh9qi02tG1/a5ivqepOpAOrGONy6Wa7huquF67VrHD88tRMReQufqa4DaPgFLLu2O4jjAS3Grt0eZmXoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747092147; c=relaxed/simple;
-	bh=mVpt63udtk6/AFzIGNSEy4WNg2GM9eyFsu4e5iEmnVU=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=d/+n83yx+Xx7mhaU67RMSv3yHdNEnMy2pGM8tdayBNHTc1PxdacjzVG/1hJf2t+0PGf8jBpBeVvtu4TJtWktdYxmf3KZpH5n3H2fcCMs8ApsJubDOZHJIwho+ITMVoxWkQ3GFgK2MhCOWE7B1ncJ4ax8faQmRz+ScTJarOljoGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3da720e0c93so118820865ab.2
-        for <netdev@vger.kernel.org>; Mon, 12 May 2025 16:22:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747092145; x=1747696945;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RRpdss/wPX8+GTs3i2u5ajN2oMTMbZjUVLxllbstDOI=;
-        b=VHQ26Bc6/TKiCe3pO+/X4/nqgvcYNzaPoTSgIBYsavhadDKb16AaAWxyqQyUMWOHTe
-         NvJnek+j2gUPGjDic3C/hhd7bsn8I+CAw9Q5vxy0FEodWhs9UfdEUI1Jlk0d8MVPCgQ1
-         ZiJSKljyzyLaMK72bddz68UaGJzgO4xvkUyuzK0sUGEyZAvffEN5NcGx1j0VZCBJPjzK
-         iMa9JuLIp64OdJXa/g0sP8ubp/wjtXOjdYHFG+u5wF/X7811OFY18ECiYcft4eqSEpm3
-         4xX3j52ebHq4Vu9ivD67FU0ySeQ/EnBIn2dmxIIxrCEUtZCpNZHMdrCDmekvyTDMWTFv
-         iUkA==
-X-Forwarded-Encrypted: i=1; AJvYcCW07JXMT5N3/UATx5n76peErqIDEtKz0mTSdkyahEG+QwVIWS6vsVwxO+nK5C0McliwS2zrvBc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzL17UFqKAOn4uQVeVjr/H/RhsSdDlZmZ56jKwIsI/74xe+Xicq
-	a8qDVnZEZNnK6V72cBA8Oh96GlNYLX5g2MHqDW87y/8ghkUreIkT0Lxp8n0x5R2ei1KTdT6POm9
-	9Tpz3GpulMD3Xlod8tBRmwzUabSNOtGNgcDlghA9sccQ5AhesHTrOWXI=
-X-Google-Smtp-Source: AGHT+IGTMOugB4Utp3Gn6N3dI0Mzhp6j9VTw5k+IewZulu6M38eLTHh+hTnP/9clDE1JdNJMEcyHqwrFNm0G5F77Yj9hkeIY2q3Z
+	s=arc-20240116; t=1747092910; c=relaxed/simple;
+	bh=5d7ulaWu8eLuk9+FYkxlpsohVPqS7lsPmXK7MdtDv/s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I73wKUJRiZ6p3LlhwJtvgQMh0gfgxJ2LLpClOPva6GabMDQHHAuEs/3/R3Mqn8TN0PbmrBi4W5fGN5gImvj7kEy4pjZ8f8ZMtpNYNYL59k5wvT77ldAhTL08/Jd+/4ZNztAumZlJtb/g5km2jS9CcO4SbipOSl4U13+C5+6DcBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kYziXmCW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8802C4CEE7;
+	Mon, 12 May 2025 23:35:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747092909;
+	bh=5d7ulaWu8eLuk9+FYkxlpsohVPqS7lsPmXK7MdtDv/s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kYziXmCWJ/OtT/sjFSI8Qr9gwTNkyWj4GklD96Ui5yO8DqP8A6gZ70UIrRrhgtfOo
+	 7asY8czIfUUM1QV8BL12++wFoKahmsEVE0zdi4/IBtRl9V4bwGAR5VOmcl0Zm6+2kP
+	 MLdKBy0LBtwA0tA+XrXH32a1QRleYOslACSlemqRDDd6OsB1E80IURoZsKFHU8UUjH
+	 X88e7KI24/bgDqAKo3UqPeZzSQzFt4E0qwEYABe/sHIlGYvoxmj6fI0LwxKASDg39R
+	 9fRl7Tq2b1YnlyzCWpJM6shKn18JvMoSKVE/Ft3yzmkxZOY71kxb8t5YKVAxHbL9As
+	 dxyvA4g6X3T4w==
+Date: Tue, 13 May 2025 01:35:05 +0200
+From: Andi Shyti <andi.shyti@kernel.org>
+To: Danila Tikhonov <danila@jiaxyga.com>
+Cc: Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Lorenzo Pieralisi <lpieralisi@kernel.org>, "Rafael J . Wysocki" <rafael@kernel.org>, 
+	Viresh Kumar <viresh.kumar@linaro.org>, Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
+	Wim Van Sebroeck <wim@linux-watchdog.org>, Guenter Roeck <linux@roeck-us.net>, 
+	Rajendra Nayak <quic_rjendra@quicinc.com>, Jassi Brar <jassisinghbrar@gmail.com>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Amit Kucheria <amitk@kernel.org>, Thara Gopinath <thara.gopinath@gmail.com>, 
+	Daniel Lezcano <daniel.lezcano@linaro.org>, Zhang Rui <rui.zhang@intel.com>, 
+	Lukasz Luba <lukasz.luba@arm.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Wesley Cheng <quic_wcheng@quicinc.com>, 
+	Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>, 
+	Ulf Hansson <ulf.hansson@linaro.org>, Souradeep Chowdhury <quic_schowdhu@quicinc.com>, 
+	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alex Elder <elder@kernel.org>, 
+	Alim Akhtar <alim.akhtar@samsung.com>, Avri Altman <avri.altman@wdc.com>, 
+	Bart Van Assche <bvanassche@acm.org>, Andy Gross <agross@kernel.org>, 
+	Srinivas Kandagatla <srini@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, Georgi Djakov <djakov@kernel.org>, 
+	Loic Poulain <loic.poulain@oss.qualcomm.com>, Robert Foss <rfoss@kernel.org>, 
+	Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Taniya Das <quic_tdas@quicinc.com>, Sibi Sankar <quic_sibis@quicinc.com>, 
+	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, 
+	Joerg Roedel <joro@8bytes.org>, Imran Shaik <quic_imrashai@quicinc.com>, 
+	Mathieu Poirier <mathieu.poirier@linaro.org>, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
+	Neil Armstrong <neil.armstrong@linaro.org>, Jessica Zhang <quic_jesszhan@quicinc.com>, 
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, Kees Cook <kees@kernel.org>, Tony Luck <tony.luck@intel.com>, 
+	"Guilherme G . Piccoli" <gpiccoli@igalia.com>, David Wronek <david@mainlining.org>, 
+	Jens Reidel <adrian@mainlining.org>, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-pm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-watchdog@vger.kernel.org, 
+	linux-usb@vger.kernel.org, linux-phy@lists.infradead.org, linux-mmc@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-scsi@vger.kernel.org, dmaengine@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-i2c@vger.kernel.org, linux-clk@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev, linux-remoteproc@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linux-hardening@vger.kernel.org, linux@mainlining.org, 
+	~postmarketos/upstreaming@lists.sr.ht
+Subject: Re: [PATCH 20/33] dt-bindings: i2c: qcom-cci: Add the SM7150
+ compatible
+Message-ID: <5smj66yzv2xnfdsiedrkivxxebhm2pbbwjjsbiwxhmxr5n4fns@vugxqsm32abk>
+References: <20250422213137.80366-1-danila@jiaxyga.com>
+ <20250422213137.80366-4-danila@jiaxyga.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:cd8f:0:b0:3d9:668c:a702 with SMTP id
- e9e14a558f8ab-3da7e1eef9bmr167134355ab.9.1747092144754; Mon, 12 May 2025
- 16:22:24 -0700 (PDT)
-Date: Mon, 12 May 2025 16:22:24 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <682282b0.050a0220.f2294.00bc.GAE@google.com>
-Subject: [syzbot] [net?] KASAN: global-out-of-bounds Read in in_dev_finish_destroy
-From: syzbot <syzbot+dd3b9802ae13f63906d7@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250422213137.80366-4-danila@jiaxyga.com>
 
-Hello,
+Hi Danila,
 
-syzbot found the following issue on:
+On Wed, Apr 23, 2025 at 12:31:24AM +0300, Danila Tikhonov wrote:
+> Add the SM7150 CCI device string compatible.
+> 
+> Signed-off-by: Danila Tikhonov <danila@jiaxyga.com>
 
-HEAD commit:    92a09c47464d Linux 6.15-rc5
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1238f8d4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b39cb28b0a399ed3
-dashboard link: https://syzkaller.appspot.com/bug?extid=dd3b9802ae13f63906d7
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+Acked-by: Andi Shyti <andi.shyti@kernel.org>
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-92a09c47.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/9dd31988ea97/vmlinux-92a09c47.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/4b4e78abb078/bzImage-92a09c47.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+dd3b9802ae13f63906d7@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: global-out-of-bounds in ref_tracker_free+0x562/0x830 lib/ref_tracker.c:244
-Read of size 1 at addr ffffffff9af9a490 by task kworker/u32:1/13
-
-CPU: 3 UID: 0 PID: 13 Comm: kworker/u32:1 Not tainted 6.15.0-rc5-syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Workqueue: netns cleanup_net
-Call Trace:
- <IRQ>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:408 [inline]
- print_report+0xc3/0x670 mm/kasan/report.c:521
- kasan_report+0xe0/0x110 mm/kasan/report.c:634
- ref_tracker_free+0x562/0x830 lib/ref_tracker.c:244
- netdev_tracker_free include/linux/netdevice.h:4351 [inline]
- netdev_put include/linux/netdevice.h:4368 [inline]
- netdev_put include/linux/netdevice.h:4364 [inline]
- in_dev_finish_destroy+0xae/0x1d0 net/ipv4/devinet.c:258
- in_dev_put include/linux/inetdevice.h:290 [inline]
- inet_rcu_free_ifa+0x93/0xb0 net/ipv4/devinet.c:228
- rcu_do_batch kernel/rcu/tree.c:2568 [inline]
- rcu_core+0x799/0x14e0 kernel/rcu/tree.c:2824
- handle_softirqs+0x216/0x8e0 kernel/softirq.c:579
- __do_softirq kernel/softirq.c:613 [inline]
- invoke_softirq kernel/softirq.c:453 [inline]
- __irq_exit_rcu+0x109/0x170 kernel/softirq.c:680
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:696
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1049 [inline]
- sysvec_apic_timer_interrupt+0xa4/0xc0 arch/x86/kernel/apic/apic.c:1049
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-RIP: 0010:lockdep_unregister_key+0xdd/0x130 kernel/locking/lockdep.c:6613
-Code: 48 89 ef e8 b5 fe ff ff 48 89 ef e8 cd e5 ff ff 89 c3 e8 f6 ee ff ff 9c 58 f6 c4 02 75 52 41 f7 c4 00 02 00 00 74 01 fb 84 db <75> 1b 5b 5d 41 5c e9 58 5d 0a 00 8b 05 06 83 ed 0e 31 db 85 c0 74
-RSP: 0018:ffffc90000107808 EFLAGS: 00000246
-RAX: 0000000000000046 RBX: 0000000000000000 RCX: 0000000000000001
-RDX: 0000000000000000 RSI: ffffffff8dcd20c4 RDI: ffffffff8bf48260
-RBP: ffffffff972ac028 R08: 000000000000c64e R09: ffffffff95c54c5c
-R10: 0000000000000004 R11: 0000000000000000 R12: 0000000000000246
-R13: ffff88804eaa8000 R14: ffff88804eaa84c0 R15: 0000000000000001
- __qdisc_destroy+0x11a/0x4a0 net/sched/sch_generic.c:1080
- qdisc_put+0xab/0xe0 net/sched/sch_generic.c:1106
- dev_shutdown+0x1d0/0x430 net/sched/sch_generic.c:1494
- unregister_netdevice_many_notify+0xad1/0x26f0 net/core/dev.c:11969
- unregister_netdevice_many net/core/dev.c:12046 [inline]
- default_device_exit_batch+0x853/0xaf0 net/core/dev.c:12538
- ops_exit_list+0x128/0x180 net/core/net_namespace.c:177
- cleanup_net+0x5c1/0xb30 net/core/net_namespace.c:654
- process_one_work+0x9cc/0x1b70 kernel/workqueue.c:3238
- process_scheduled_works kernel/workqueue.c:3319 [inline]
- worker_thread+0x6c8/0xf10 kernel/workqueue.c:3400
- kthread+0x3c2/0x780 kernel/kthread.c:464
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:153
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-
-The buggy address belongs to the variable:
- binder_devices+0x10/0x40
-
-The buggy address belongs to the physical page:
-page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1af9a
-flags: 0xfff00000002000(reserved|node=0|zone=1|lastcpupid=0x7ff)
-raw: 00fff00000002000 ffffea00006be688 ffffea00006be688 0000000000000000
-raw: 0000000000000000 0000000000000000 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner info is not present (never set?)
-
-Memory state around the buggy address:
- ffffffff9af9a380: 00 f9 f9 f9 f9 f9 f9 f9 00 f9 f9 f9 f9 f9 f9 f9
- ffffffff9af9a400: 00 f9 f9 f9 f9 f9 f9 f9 00 f9 f9 f9 f9 f9 f9 f9
->ffffffff9af9a480: 00 f9 f9 f9 f9 f9 f9 f9 00 f9 f9 f9 f9 f9 f9 f9
-                         ^
- ffffffff9af9a500: 00 00 f9 f9 f9 f9 f9 f9 00 f9 f9 f9 f9 f9 f9 f9
- ffffffff9af9a580: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 f9
-==================================================================
-----------------
-Code disassembly (best guess):
-   0:	48 89 ef             	mov    %rbp,%rdi
-   3:	e8 b5 fe ff ff       	call   0xfffffebd
-   8:	48 89 ef             	mov    %rbp,%rdi
-   b:	e8 cd e5 ff ff       	call   0xffffe5dd
-  10:	89 c3                	mov    %eax,%ebx
-  12:	e8 f6 ee ff ff       	call   0xffffef0d
-  17:	9c                   	pushf
-  18:	58                   	pop    %rax
-  19:	f6 c4 02             	test   $0x2,%ah
-  1c:	75 52                	jne    0x70
-  1e:	41 f7 c4 00 02 00 00 	test   $0x200,%r12d
-  25:	74 01                	je     0x28
-  27:	fb                   	sti
-  28:	84 db                	test   %bl,%bl
-* 2a:	75 1b                	jne    0x47 <-- trapping instruction
-  2c:	5b                   	pop    %rbx
-  2d:	5d                   	pop    %rbp
-  2e:	41 5c                	pop    %r12
-  30:	e9 58 5d 0a 00       	jmp    0xa5d8d
-  35:	8b 05 06 83 ed 0e    	mov    0xeed8306(%rip),%eax        # 0xeed8341
-  3b:	31 db                	xor    %ebx,%ebx
-  3d:	85 c0                	test   %eax,%eax
-  3f:	74                   	.byte 0x74
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Thanks,
+Andi
 
