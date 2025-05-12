@@ -1,156 +1,101 @@
-Return-Path: <netdev+bounces-189642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C42BAB2F95
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 08:30:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7750AB2FAF
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 08:34:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F243C188F0EF
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 06:30:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70B5D178C62
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 06:34:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96FFC255F2F;
-	Mon, 12 May 2025 06:30:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="EBBLXXnj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0A9E255F3C;
+	Mon, 12 May 2025 06:34:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6CE01A23B5;
-	Mon, 12 May 2025 06:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66A292550B9
+	for <netdev@vger.kernel.org>; Mon, 12 May 2025 06:34:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747031410; cv=none; b=VbkIF8gKv0wDU89exULhxLbOMIklmTA5Hlo+8HLlBDfzulG0kde0YgMuSX8me9LYrFFshgEvgEdbT6jDbUS5+XjKw1yYPpK8JSo2FX1XgT6QiO6lVLCaCDPhePs+mkOFPnDB/MllabRzz2RGjtPscCARKPDKo91wk+xJdn+hhFk=
+	t=1747031663; cv=none; b=Glt+IzRVCrc5gyeQ/zlLqC6g+7IAKYuDDwC5JxUynFmToaaXOI8CEOLg4nQDVODBb3id3USWD+u3ci9Ib7xqa9Di7zG6EGqnwZP3pyRuKCWbSwGA+SwKs9BsNlhQM3SU5PXI8wZnCR1nFRiwaaPdg1Mt+yp2Ku4q00L11E+7n2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747031410; c=relaxed/simple;
-	bh=IyqEvFnK0atVgTZ4NurvwzVawcVS2qz/Kyx3J5TkbVI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=h5OnPE8FM0B54a1rEpGcrNToylrydAFuHqV9VQKwHuUI0UEl+TugCmqLv9ngYUVtsAzA4Eu2CDZV5rtrfN9TfKoy4QymDJ6rG9pXgalr/vu4LfqdIiuRePejSzJbdn4qfe7sjSFSNMghTGS4JrFqfMhN2vNhZokncLZ+06UMrIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=EBBLXXnj; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54C1QBch031626;
-	Sun, 11 May 2025 23:29:46 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=+EB6sJdhVKr4rGBMH4O7DYZ
-	xvmnpv++UCvoCoKqxmzM=; b=EBBLXXnjzX+j8UKstKq4D1IbPTWCfnMDjyV0fjr
-	JcrC0xewXb/+I1RQOe7UATh3bI1O8hJYDt3iYrvWl8VfJ4P8kipqfgWjvQoiMhpQ
-	kOvEnAJhW6RWaA1ZLkEM/516UnRzV1FEZ9VhvESIh5CW7+j/PPOosYsLeWe/4S2K
-	+ZvH1y0lMFKWYoTTCeLGBXagXRrBlHCz78ndnRwucHYZs6DLCmhssxCOps9wa2B2
-	4UVwwTNs9U1azmFZk0I0Dpzhfp0NHFwEX8MykdF5FddH7J5u6hkM9oQJgId8Btkw
-	XGbN8hMf/tNoL/5dQhuq42i8FRblcb9QgfMTM4oIUD7zF9A==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 46k5rggfjn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 11 May 2025 23:29:45 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Sun, 11 May 2025 23:29:44 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Sun, 11 May 2025 23:29:44 -0700
-Received: from test-OptiPlex-Tower-Plus-7010.marvell.com (unknown [10.29.37.157])
-	by maili.marvell.com (Postfix) with ESMTP id 1F56C3F7093;
-	Sun, 11 May 2025 23:29:39 -0700 (PDT)
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Hariprasad Kelam <hkelam@marvell.com>,
-        Sunil Goutham
-	<sgoutham@marvell.com>,
-        Geetha sowjanya <gakula@marvell.com>,
-        "Subbaraya
- Sundeep" <sbhatta@marvell.com>,
-        Bharat Bhushan <bbhushan2@marvell.com>,
-        "Andrew Lunn" <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        "Eric Dumazet" <edumazet@google.com>,
-        Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Simon Horman
-	<horms@kernel.org>
-Subject: [net] octeontx2-pf: Fix ethtool support for SDP representors
-Date: Mon, 12 May 2025 11:59:01 +0530
-Message-ID: <20250512062901.629584-1-hkelam@marvell.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1747031663; c=relaxed/simple;
+	bh=dx1xwTZDbaZY9TJ/RvC0JYpCldMZJmDYnz/sEdttaWM=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ZC5Z9nxsd5vh9iO3n3lU5vGbUPPsgmCPiasIJ18NgPRp4zsEVnQ+jAV1UHANjaDv1/aNkFBRVZsleYhB3JElfdyHvQDNmf1415SjM9vcJ3cofOYBuAkiwsy/AL5DqPMCkyta+6pikvgPzM7A8lnAZSHsXSUtJlg56rkU3PUJBus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-85b402f69d4so347345639f.3
+        for <netdev@vger.kernel.org>; Sun, 11 May 2025 23:34:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747031661; x=1747636461;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xNCTCFViNT8bek4HRRT3/aNA6OTSRILgCslp5/6v4b4=;
+        b=V9uiqrwivwXsSSXFrg2un2CNLh34dQ5F1wojBXLqSnc26h8T1D3lT6xSE4jjO445Zt
+         hM2gLbLBuae/H/pfd+Yxx0TDTDVZ5qX7HEXNsWwtCUI8kri2P9CXY3knbF6zZNZbwDkW
+         LXrBHUmIjyt8sY3nC4er6QZDcs+BjksPApvHJNyh5PkunGbu2Cy965Iny91PaVBdl8yE
+         TeRXzQ4u7PslzYd/2y8GoL3hyJAR4p8/qDQJPZKj6Fv54rFpUH8cvt3PtINrRqJQf5un
+         hKMc184yhB8CjqoYek07uCH2smjHtdMYRXVPH2nFUJ9m7N58Jx1t8Vk5uCLkVYYMKCyO
+         IDXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXYhiBrrfOXZmpDo4TQRyEkuJxhEKyQHnlly0mzT6L+U8sn3dVpCh2RzyKirpoPOg9PNw0iWEk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywqe2SrduvL9jDOEqiFJpurVLv5VYy1CXE4n3SbLdQ0aCB6d0/q
+	80Xt8Pez4l3Gg4QBa/mKrWNOyqrp9XXyUbenfl6gslFXIoiwFdn73m7rn0S6RjhkhdikREN+6Qa
+	jF6Kx6AZHDeLrlyKvMZcYMgc2FGSgQIvsaPuRTZpM5Hc+hHP6lbP/ht0=
+X-Google-Smtp-Source: AGHT+IFRefKmtjW6013ms9QCXydNgmsa0owtvurRwlGX5Q5Y5xPOhLB3uM/XOrm4j0NA2Z4BXCNjuho3jkrk6R4JlWiB5NCiL7kw
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: fBP8RY3Kyw662SSAWEME3Ov0XUoT0Nb6
-X-Proofpoint-ORIG-GUID: fBP8RY3Kyw662SSAWEME3Ov0XUoT0Nb6
-X-Authority-Analysis: v=2.4 cv=XIkwSRhE c=1 sm=1 tr=0 ts=68219559 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=dt9VzEwgFbYA:10 a=M5GUcnROAAAA:8 a=zsvlLyDedhZcTVAtw6YA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTEyMDA2OCBTYWx0ZWRfX76CBORSCbRAh vsCVfiQ7ApOxMcxwnXtpsHSWrjvmVwA4jmngOvzVovid+bBSd5xFGO7DBfuGzYKmhXJ2v9yjD4X GaumGXt6B9Bac3u0w/AsBVarC+bFMSNvlSO/hJixOIU9D/iSaSZ6Djx3EZIqXtu6D/ZbVJDQ8DS
- 3CcbrDichr0RFu6nyhI5LtPAt5MaiVSsbJLMxHX/3cNoFwlWrqZSa5nojmvkvZ7ep4g3o1sP6rX QhmDoe5cUH1ZV2F4PE4YpJcI4rMeK2NiyTwp0Z7cTvqvuzW0+fPg7AA/fwGTRdQm0W5VjgNWS8Q tvh4EADIHmECyccS1SnkNn+FFVsMMontySe+bBWt16SolBHrxqmfG9/nDGGQyX6E8EuREImWyUI
- qlDEoIASmmpMoM0YryRYFcrrGGhaebENIA3EjzO32IXakdnF98m8eqNoFY0ownVN2e+OBa/3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-12_02,2025-05-09_01,2025-02-21_01
+X-Received: by 2002:a05:6602:640f:b0:85b:59f3:2ed3 with SMTP id
+ ca18e2360f4ac-867635c97d0mr1423178939f.8.1747031661590; Sun, 11 May 2025
+ 23:34:21 -0700 (PDT)
+Date: Sun, 11 May 2025 23:34:21 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6821966d.050a0220.f2294.0052.GAE@google.com>
+Subject: [syzbot] Monthly wireguard report (May 2025)
+From: syzbot <syzbot+listad97b905a104dc343053@syzkaller.appspotmail.com>
+To: Jason@zx2c4.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, wireguard@lists.zx2c4.com
+Content-Type: text/plain; charset="UTF-8"
 
-The hardware supports multiple MAC types, including RPM, SDP, and LBK.
-However, features such as link settings and pause frames are only available
-on RPM MAC, and not supported on SDP or LBK.
+Hello wireguard maintainers/developers,
 
-This patch updates the ethtool operations logic accordingly to reflect
-this behavior.
+This is a 31-day syzbot report for the wireguard subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/wireguard
 
-Fixes: 2f7f33a09516 ("octeontx2-pf: Add representors for sdp MAC")
-Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 5 issues are still open and 19 have already been fixed.
+
+Some of the still happening issues:
+
+Ref Crashes Repro Title
+<1> 12253   Yes   BUG: workqueue lockup (5)
+                  https://syzkaller.appspot.com/bug?extid=f0b66b520b54883d4b9d
+<2> 360     No    INFO: task hung in wg_netns_pre_exit (5)
+                  https://syzkaller.appspot.com/bug?extid=f2fbf7478a35a94c8b7c
+<3> 248     No    INFO: task hung in netdev_run_todo (4)
+                  https://syzkaller.appspot.com/bug?extid=894cca71fa925aabfdb2
+<4> 3       Yes   INFO: rcu detected stall in wg_packet_handshake_receive_worker (3)
+                  https://syzkaller.appspot.com/bug?extid=48f45f6dd79ca20c3283
+
 ---
- .../net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c  | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-index 010385b29988..45b8c9230184 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-@@ -315,7 +315,7 @@ static void otx2_get_pauseparam(struct net_device *netdev,
- 	struct otx2_nic *pfvf = netdev_priv(netdev);
- 	struct cgx_pause_frm_cfg *req, *rsp;
- 
--	if (is_otx2_lbkvf(pfvf->pdev))
-+	if (is_otx2_lbkvf(pfvf->pdev) || is_otx2_sdp_rep(pfvf->pdev))
- 		return;
- 
- 	mutex_lock(&pfvf->mbox.lock);
-@@ -347,7 +347,7 @@ static int otx2_set_pauseparam(struct net_device *netdev,
- 	if (pause->autoneg)
- 		return -EOPNOTSUPP;
- 
--	if (is_otx2_lbkvf(pfvf->pdev))
-+	if (is_otx2_lbkvf(pfvf->pdev) || is_otx2_sdp_rep(pfvf->pdev))
- 		return -EOPNOTSUPP;
- 
- 	if (pause->rx_pause)
-@@ -941,8 +941,8 @@ static u32 otx2_get_link(struct net_device *netdev)
- {
- 	struct otx2_nic *pfvf = netdev_priv(netdev);
- 
--	/* LBK link is internal and always UP */
--	if (is_otx2_lbkvf(pfvf->pdev))
-+	/* LBK and SDP links are internal and always UP */
-+	if (is_otx2_lbkvf(pfvf->pdev) || is_otx2_sdp_rep(pfvf->pdev))
- 		return 1;
- 	return pfvf->linfo.link_up;
- }
-@@ -1413,7 +1413,7 @@ static int otx2vf_get_link_ksettings(struct net_device *netdev,
- {
- 	struct otx2_nic *pfvf = netdev_priv(netdev);
- 
--	if (is_otx2_lbkvf(pfvf->pdev)) {
-+	if (is_otx2_lbkvf(pfvf->pdev) || is_otx2_sdp_rep(pfvf->pdev)) {
- 		cmd->base.duplex = DUPLEX_FULL;
- 		cmd->base.speed = SPEED_100000;
- 	} else {
--- 
-2.34.1
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
