@@ -1,148 +1,133 @@
-Return-Path: <netdev+bounces-189856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A297AB3F41
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 19:33:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDE2AAB3F9C
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 19:45:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E12819E2BE3
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 17:33:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B726019E6678
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 17:45:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04A88296D17;
-	Mon, 12 May 2025 17:33:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 365D7296FDF;
+	Mon, 12 May 2025 17:44:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="kE/5vxOH"
+	dkim=pass (2048-bit key) header.d=andrew.cmu.edu header.i=@andrew.cmu.edu header.b="Z1Utt1a5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout2.routing.net (mxout2.routing.net [134.0.28.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02926248F71;
-	Mon, 12 May 2025 17:33:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65B76296FD9
+	for <netdev@vger.kernel.org>; Mon, 12 May 2025 17:44:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747071213; cv=none; b=bn9x78LyOBFheNr3zUhQcJvPAmUDEHblXvTomI61GsLae6LzwENRXKMLcm7PqSWJ7JqJNvkT9MTKVysJW1nuh9XuHFWNVRERpCT//usGffNkgYy4hQ8U1OFhmsN5zIItA7peXpIvmlcvDWN2DTx/f6xHjizf/F2kaMtlv+cPh/s=
+	t=1747071857; cv=none; b=fajG1tl+az/rO39aS28ciBBo+HsrCbdW9OTqzXjoy6QxeOK7mmD3sJ60FdP40qlk2wurKC/PXXp3IKX535o/AI10+BQs5kWxBhZz0aMVqDD61P+YuqdDZDByA3jz7AdqelZQPmCLxpJZadUauCmpKNRXfxS4aSiOshDftGSiWLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747071213; c=relaxed/simple;
-	bh=hUF1s567+qbSPtX2zIZBeWkAIaJckfoue1ZdzRXxzXE=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=N59O1QoFQ71PVEPdNdE+C5xx6RS6mXHSWlONst+isxM8S9X4Ea3wMaHYp7qzaLrU71B7nQA2DhccXVHqR2VZ4tVAq74xuOPIaLvGdBVeLa57PM+YxQ+1SGSnWvMRjxNThdrQkc7hpRkpomObusZ473I7CXEGkiszRbDcQAw1aSY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=kE/5vxOH; arc=none smtp.client-ip=134.0.28.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
-Received: from mxbox3.masterlogin.de (unknown [192.168.10.78])
-	by mxout2.routing.net (Postfix) with ESMTP id 6EBA6601D8;
-	Mon, 12 May 2025 17:33:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
-	s=20200217; t=1747071203;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fOnx2nS8BUGOff4qxVjsY99Ec3z57H2RyW27rvY/0bw=;
-	b=kE/5vxOHk4WeXfDsBzUVJQU1s7TuLuM8EKYi/1mLuGdaNckHloGXV27dRjex99Aw/g9tCf
-	5sOD403GIqwnucydRJ13DZ2OjWkkVt4yPY5+KBN9PYb5IZDHQ8v5WcKJLQ47B1i3U8Utt0
-	p6Te9xqfKW9dvjVR2RoENhB4uVrdvXg=
-Received: from [127.0.0.1] (fttx-pool-194.15.84.99.bambit.de [194.15.84.99])
-	by mxbox3.masterlogin.de (Postfix) with ESMTPSA id 238C6360303;
-	Mon, 12 May 2025 17:33:22 +0000 (UTC)
-Date: Mon, 12 May 2025 19:33:22 +0200
-From: Frank Wunderlich <linux@fw-web.de>
-To: Conor Dooley <conor@kernel.org>
-CC: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Frank Wunderlich <frank-w@public-files.de>,
- =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
- Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Daniel Golle <daniel@makrotopia.org>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v1_01/14=5D_dt-bindings=3A_n?=
- =?US-ASCII?Q?et=3A_mediatek=2Cnet=3A_update_for_mt7988?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20250512-nibble-freemason-69e0279f2f99@spud>
-References: <20250511141942.10284-1-linux@fw-web.de> <20250511141942.10284-2-linux@fw-web.de> <20250512-nibble-freemason-69e0279f2f99@spud>
-Message-ID: <05760B5E-955E-4E0E-9B69-E762783CC37B@fw-web.de>
+	s=arc-20240116; t=1747071857; c=relaxed/simple;
+	bh=YDxNpw4qVAHD26tWYX1P7IPbtKx1OUnwZz8ULeCaaUY=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=AWM+dC6ftlFj+mTYItnO2J92mZPJ/nj3o1iJZuUjxXHRC7MZ28R9L0+W8lVoV5Sy7aB73j75nIBdwyP1/qTaqKLLllN+3Vd1Ul+hIbZqNs96aI2wLuceU0KweglAojoArisBYKyfOMGRS6y0Rms8sdRXtMulKJEFK6bsMJRUQME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=andrew.cmu.edu; spf=pass smtp.mailfrom=andrew.cmu.edu; dkim=pass (2048-bit key) header.d=andrew.cmu.edu header.i=@andrew.cmu.edu header.b=Z1Utt1a5; arc=none smtp.client-ip=209.85.208.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=andrew.cmu.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=andrew.cmu.edu
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-326bb1d3e34so43016901fa.3
+        for <netdev@vger.kernel.org>; Mon, 12 May 2025 10:44:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=andrew.cmu.edu; s=google-2021; t=1747071850; x=1747676650; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=YDxNpw4qVAHD26tWYX1P7IPbtKx1OUnwZz8ULeCaaUY=;
+        b=Z1Utt1a5GajP9VXvBzrpxD9EBbNdFCZEjXVuyCCTHvW1VjXaTFwdz5DCM0ASqm2rJX
+         ptZzG1A4AbnF+Xk2bjgNip9EccroLM6Kg/fi7Jk1aHJofJcZu5iCxnXz+Zq5MuU68LfQ
+         y5VYOVsGYSN6se+84FMziDrZ8USGexzfXwU0WuIwtrEn/Ua87WWm1NrqLqN4e1puQUwF
+         gnGYoSYuNfDDRsgzJWcs5hi8bLIC30ugro3JT858bgeXYe3GnQZpAZ3dBukH2MYoIxoO
+         0EeEtSBJVWZmOo0007nx/KesszcV3GgqAWSuPSFXLuqjYyO9MvrY96WyssnW4qQJqTA1
+         VJvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747071850; x=1747676650;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YDxNpw4qVAHD26tWYX1P7IPbtKx1OUnwZz8ULeCaaUY=;
+        b=JaBG67u+kncHblM+mIpUiSh8gV1xL122kuVoylYJnNR9w27YN4dLemCoWtd7VrXpn7
+         25zgN61GXJ6BU20YTPHtZdBF6QLTCPTh6146D3NxqCgk+EkJTivvuDJI34VVD7ZfHgzW
+         6yJLx3Jdhx/yG+0CRqy/qr5yhX1urEvxYZbea5PZaQNVQJqbHDLnGy1OxEpl1iBzJe7j
+         2iTpwcNU6HxbwGxyFq7SxiuPaMu5/m4itPQJZN1De9qSgmDqCDXU4j/XByHsJnoTwqDk
+         D01p0xYEaSfSakMCpjFT1HkPNONPxVTgsZIH3DCfy/nDu9fUZFNjP8tav2yd2QX6rnDy
+         Bk2w==
+X-Gm-Message-State: AOJu0YyBtfuZ35RPgMkgMUlUjpQAStWjlpSsQPoU8tTbGz2fLmkJY5CM
+	Gb3fWPfOd05HffBBdW9oHaEFYUuZrxLqiP+qkqk0CTXaUul78gyOEVmUQJsDr3oA8TAtAcDTvVl
+	l/HHDmqc9/z6lyRB/z3v+C3qgv37FkAEvd1fZ0kEyAbN1tKBMgQ==
+X-Gm-Gg: ASbGnctvSzJwWyNrQuYTgAtnN5arlmfFtFn/kun1s20WqjfG/9F4X4XubuNEgloiIT5
+	Bxo+KhiNnvLSiIQqFdSuMOiDHVJnDwN/+jlmdt2vuSDhFmNKDqh6/YCBs90L976JlKl+OmWKVvK
+	j8gK/wMwu3tOg9/sPa5XK5CRIlnuVJpA9r
+X-Google-Smtp-Source: AGHT+IFYWg1Ba6c5Rq+j2lHq7BBtD60EA0zxPTrfErMfAPUfwtUkUo5X8CWKIp3/8MwjamyDSnQ/iK3whFoEccL5CWQ=
+X-Received: by 2002:a05:651c:221b:b0:30b:d0d5:1fc6 with SMTP id
+ 38308e7fff4ca-326c45f48damr56929961fa.23.1747071850340; Mon, 12 May 2025
+ 10:44:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Mail-ID: 374a0106-a2a0-463f-a626-6a3e8e2d7734
+From: Anup Agarwal <anupa@andrew.cmu.edu>
+Date: Mon, 12 May 2025 13:43:34 -0400
+X-Gm-Features: AX0GCFtyvxMY3rcHRBhWd1ihEGWIWwgGjhMfeBhADKQ8JpQBZfnqQDLbbgdkop0
+Message-ID: <CAFYr1XPb=J0qeGt0Tco1z7QURmBH8TiWP0=uH0zhU=wCQKCtpA@mail.gmail.com>
+Subject: Potential bug in Linux TCP vegas implementation
+To: Neal Cardwell <ncardwell@google.com>
+Cc: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Am 12=2E Mai 2025 18:21:45 MESZ schrieb Conor Dooley <conor@kernel=2Eorg>:
->On Sun, May 11, 2025 at 04:19:17PM +0200, Frank Wunderlich wrote:
->> From: Frank Wunderlich <frank-w@public-files=2Ede>
->>=20
->> Update binding for mt7988 which has 3 gmac and 2 reg items=2E
->>=20
->> Signed-off-by: Frank Wunderlich <frank-w@public-files=2Ede>
->> ---
->>  Documentation/devicetree/bindings/net/mediatek,net=2Eyaml | 9 +++++++-=
--
->>  1 file changed, 7 insertions(+), 2 deletions(-)
->>=20
->> diff --git a/Documentation/devicetree/bindings/net/mediatek,net=2Eyaml =
-b/Documentation/devicetree/bindings/net/mediatek,net=2Eyaml
->> index 9e02fd80af83=2E=2E5d249da02c3a 100644
->> --- a/Documentation/devicetree/bindings/net/mediatek,net=2Eyaml
->> +++ b/Documentation/devicetree/bindings/net/mediatek,net=2Eyaml
->> @@ -28,7 +28,8 @@ properties:
->>        - ralink,rt5350-eth
->> =20
->>    reg:
->> -    maxItems: 1
->> +    minItems: 1
->> +    maxItems: 2
->
->This should become an items list, with an explanation of what each of
->the reg items represents=2E
+Hi Neal,
 
-I would change to this
+I am reaching out to you since you are listed as a point of contact
+for Linux TCP (https://docs.kernel.org/process/maintainers.html) and
+http://neal.nu/uw/linux-vegas/ seems to indicate that you also wrote
+the initial Vegas implementation in Linux kernel.
 
-  reg:
-    items:
-      - description: Register for accessing the MACs=2E
-      - description: SoC internal SRAM used for DMA operations=2E
-    minItems: 1
+I believe this commit
+https://github.com/torvalds/linux/commit/8d3a564da34e5844aca4f991b73f8ca512246b23
+introduced a bug in Vegas implementation.
 
-Would this be OK this way?
+Before this commit, the implementation compares "diff = cwnd * (RTT -
+baseRTT) / RTT" with alpha_pkts. However, after this commit, diff is
+changed to "diff = cwnd * (RTT - baseRTT) / baseRTT". This small
+change in denominator potentially changes Vegas's steady-state
+performance properties.
 
->> =20
->>    clocks:
->>      minItems: 2
->> @@ -381,8 +382,12 @@ allOf:
->>              - const: xgp2
->>              - const: xgp3
->> =20
->> +        reg:
->> +          minItems: 2
->> +          maxItems: 2
->> +
->>  patternProperties:
->> -  "^mac@[0-1]$":
->> +  "^mac@[0-2]$":
->>      type: object
->>      unevaluatedProperties: false
->>      allOf:
->> --=20
->> 2=2E43=2E0
->>=20
+Specifically, before the commit, Vegas's steady-state rate is "rate =
+alpha_pkts / delay", by substituting rate = cwnd/RTT and delay = RTT -
+baseRTT in the equation "diff = alpha_pkts" (i.e., when flows do not
+have incentive to change cwnd). After the commit, we get "rate =
+alpha_pkts/delay * baseRTT/RTT". When baseRTT is small this is close
+to "rate = alpha_pkts / delay^2".
 
-Hi Conor
+"rate = alpha_pkts / delay" is the key to ensuring weighted
+proportional fairness which Vegas has been analyzed to ensure (e.g.,
+in https://www.cs.princeton.edu/techreports/2000/628.pdf or
+https://link.springer.com/book/10.1007/978-0-8176-8216-3).
+"rate = alpha_pkts/delay^2" would not give proportional fairness. For
+instance on a parking lot topology, proportional fairness corresponds
+to a throughput ratio of O(hops), whereas the delay^2 relation gives a
+throughput ratio of O(hops^2) (derived in
+https://arxiv.org/abs/2504.18786).
 
-Thank you for review=2E
-regards Frank
+In practice, this issue or fixing it is perhaps not as important
+because of the 3 reasons below. However, since this seems to be a
+clear algebraic manipulation mistake in the commit and is an easy fix,
+the issue can perhaps be fixed nonetheless. Please let me know in case
+I missed something and this was instead an intentional change.
+
+(R1) Few people (outside of perhaps congestion control evaluation) use Vegas.
+(R2) To trigger this issue, one needs both low baseRTT and low
+capacity (to ensure delay is large enough to matter (see R3 below)).
+This implies low BDP networks at which point cwnd clamps may kick in.
+Alternatively, large alpha_pkts value could trigger the issue instead
+of low capacity.
+(R3) In my empirical tests, I start seeing issues due to RTprop
+(baseRTT) misestimation long before this issue.
+
+Best,
+Anup
 
