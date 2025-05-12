@@ -1,96 +1,71 @@
-Return-Path: <netdev+bounces-189654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 741D9AB3125
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 10:10:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FEF5AB3168
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 10:19:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1A373B29E9
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 08:10:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 413677A1D21
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 08:18:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDA65257AC3;
-	Mon, 12 May 2025 08:10:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A2962586C4;
+	Mon, 12 May 2025 08:19:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eSVKx519"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="JcP35AC7"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A1C9257441
-	for <netdev@vger.kernel.org>; Mon, 12 May 2025 08:10:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58BF22580DB;
+	Mon, 12 May 2025 08:19:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747037427; cv=none; b=fAK87HGWRRxrKDaTKL++h0QIsub2o2mwxaO5IQCWj6kaHeU1LN67eA9dZj6gEwIcxn9E/h5+CDR99zqegthp+m0cVPYdhC97WEJ8njxaTWmU4iDNv2+sPbRq4gW3U3SzEZA8WmGpqXfwRuR3So/+ECpZntD5wunzPY665DOlIDY=
+	t=1747037991; cv=none; b=dfFklgSymeft77MtgCj5q153C6WVnAw2U7Y0MkJ3mhfDhtr3CCkMAotY7yNZeUdcCrqSh3+2DYrbuHu+TvAI0BZeFiGucwCCR41ZEUmL3FcnRgkN1JO1BGbUfCqbAxSESxbpOrFc4PGc2lXQKgQGmHXHZMA8E50CjIPeui3kTs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747037427; c=relaxed/simple;
-	bh=9V6vDdViy3d2O3mDqe6gPiwcwQT0BJMFk2Cu62wHlm4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UZAyjWXrEQmEx8WMPd7cuCTj9NRFN176phhfhXaKFfq4kpp2no6HJflezQRqCZJW+q7hZUwciYI/UtBsiNfzPe/lyofTjdxTrNOdA52aYzbXBDug2EZhj0SdbEDWO7G4cYtfUJEm+8+h2GQML28WrxibATv1DbcTx0aFNFIMXtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eSVKx519; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747037425;
+	s=arc-20240116; t=1747037991; c=relaxed/simple;
+	bh=jOmPHw3PxpWmkFBx5yjdgmw5MHCKuJi6JPgf/knFaTM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZDwiNxPA4WKQTYlOPKToCUosEG+yKpSgsdx/7Q6r26NwuJ+gseB4ZDo8QevJysJXQTO8/bV589bhNnTNSjfi/F+yfHIm5QllZCXuaJwUEAR3Hqy3Vq+vLXBGKBzRzOR6n2Ok0vjanfsVqTmujS/zkI7o1pE5yQU1NW9pthW9/ZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=JcP35AC7; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 5B00B43280;
+	Mon, 12 May 2025 08:19:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1747037986;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5+S02rIdjO6W5FD4Sr6YnC+GymDvPowQYf/Bp7QCACk=;
-	b=eSVKx5191e9fqtGK2LoeOXvvCiXaNt2D17/ezgudClzSEO/57VN9CX7QsWTiJL6VxLn4Gf
-	o+/NzkvXucFfo3wbP/ly01R6QuE9n8dyBI9i25N7uScwYJMmURrNa8F6P/bhMrdQGw6r9o
-	Gv3vrvzcyQA3EZCnq0Dvcv3Uri6OB+A=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-178-9N0uN8cgPL202OGmbWAFEw-1; Mon, 12 May 2025 04:10:22 -0400
-X-MC-Unique: 9N0uN8cgPL202OGmbWAFEw-1
-X-Mimecast-MFC-AGG-ID: 9N0uN8cgPL202OGmbWAFEw_1747037422
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-ad215354231so366457366b.2
-        for <netdev@vger.kernel.org>; Mon, 12 May 2025 01:10:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747037422; x=1747642222;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5+S02rIdjO6W5FD4Sr6YnC+GymDvPowQYf/Bp7QCACk=;
-        b=lwChxwnOL+Xl96jRiedFTsSXmUQWWHAOni+uB5KwNME3jGKKpHhLUP5Kv66sXUv3nb
-         iWXnF/lZzV7W9mbyrayqD1TS2JQfcYiYlk5mjlzjGvdf1nbtAAEptMRc8xgH5hjJW/ZL
-         9/RtUMS65GgjjJCYc/zvP5tFwTF6J5esjszYKL0KOIg76bUN/2DLiHwly25jVYYbIR3X
-         tMVM+LFT6lZwLng6bwzzRobBxzgLcxrhpEvUWEc6dZIjX3/pB+H9y66PwbWzlAGi7UTi
-         WL4B417DE8j6Auf03hndqqF6zGf5pVrbwFe+NNJm5gIMwx2WjnJfYd0kU34uauWqBfiJ
-         bzTw==
-X-Gm-Message-State: AOJu0YwMNW98vejE1x6jLMoTthDJWxp1iiTS+jEiH3VPgqRAEPBTOkH/
-	JMycj7ahQZYNdJVN9n9P1jkxam1xYfZ8+4VCL0KdBK8FXAP9/LcptEGk0ZluGciZYM2HlWMUGgg
-	dzOZHqvMnn0TfZZig71GZpC4pnBMS0vDuaCOzAwQSvtB+/J6wZOzPzA==
-X-Gm-Gg: ASbGncuQM5YYpgEOWtnxDqMMPokFW3rYb5plutJOTeymxiuMKvbT6FSmcsN6pIsJLfN
-	40lh27XYrnC16lH9ehuhNoIU3/fHGhWP6pxsw2rQ7QfA+dUcKAACD4R/YF6Sdxxf+rYoP2Txj4i
-	FK0ob19rFrXV0mw7ONzxEc/NWW5AePfD1UoT7VyX4vNt9dkOOS8VDrLNZ933noyO4fEIoM5D52M
-	LBvSgrj969tekLUzmTQw218ux8db4PWc5alFOA1vpeOQgCfEq+CKtC751lFCPgfW5eQ81RJlvQS
-	AGjGH9XfIS6yAis6SnhE0SNe+NMniz6Q0a77lF+n//zzZLs+d5mDIxqXhx4p
-X-Received: by 2002:a17:906:3590:b0:ad2:2a5d:b1ab with SMTP id a640c23a62f3a-ad22a5db4fbmr784532666b.59.1747037421577;
-        Mon, 12 May 2025 01:10:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGMO8Q+6CpMt1CLsFQqVeR5SPzSS1kxASsQGqyh0PT2VydsliSWr7mhdlhPkcBKgps3LdhAVg==
-X-Received: by 2002:a17:906:3590:b0:ad2:2a5d:b1ab with SMTP id a640c23a62f3a-ad22a5db4fbmr784530366b.59.1747037421144;
-        Mon, 12 May 2025 01:10:21 -0700 (PDT)
-Received: from [172.16.2.76] (5920ab7b.static.cust.trined.nl. [89.32.171.123])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad23a5552a6sm384024366b.30.2025.05.12.01.10.19
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 12 May 2025 01:10:20 -0700 (PDT)
-From: Eelco Chaudron <echaudro@redhat.com>
-To: Ilya Maximets <i.maximets@ovn.org>
-Cc: netdev@vger.kernel.org, dev@openvswitch.org, aconole@redhat.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org
-Subject: Re: [PATCH net-next] openvswitch: Fix userspace attribute length
- validation
-Date: Mon, 12 May 2025 10:10:19 +0200
-X-Mailer: MailMate (2.0r6255)
-Message-ID: <36984A9D-1811-4F33-A6C4-310E44613E2E@redhat.com>
-In-Reply-To: <12cd8c5b-d399-4cc5-8b20-d80d567ba0cb@ovn.org>
-References: <051302b5ef5e5ac8801bbef5a20ef2ab15b997a2.1746696747.git.echaudro@redhat.com>
- <12cd8c5b-d399-4cc5-8b20-d80d567ba0cb@ovn.org>
+	bh=SJCWwWMnHakM0Z3fFPJDLj8fjIwn2K6+QB1baGulYEc=;
+	b=JcP35AC7cvlmoFIoGXOw1UKnJI3bYvWsi4unol/cpHkmvPSgpdvCsdEuwOMvcExQC02C9p
+	4b3E/cLEPGDASs8hGQpvKYG5/fWLVuzYOWf8B+QBRFmn9sX8e7c5aaB4ebIQw4F5LqaiQt
+	WMR3wW/z48LqumyhX4jke0rwihzQ/TESWYjspXl2dHOOzbNYfZSMPvDJcA9wkp2e/sDGoa
+	lLAQ6HCUd/9pZzRYAKzUKHPUodYGF/YZgn4jgAVN14mS/Wvhx/TnzZWNWJgvELMi2CtkDk
+	/4teA16FpJ3t0JQcnAW472HONr4UmualZPH5Xb62fLHUsrOGyDzy+gIV52GQFw==
+Date: Mon, 12 May 2025 10:19:42 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Donald Hunter <donald.hunter@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Jason Xing <kernelxing@tencent.com>, Richard Cochran
+ <richardcochran@gmail.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, "Russell King (Oracle)"
+ <linux@armlinux.org.uk>
+Subject: Re: [PATCH net-next v2] net: Add support for providing the PTP
+ hardware source in tsinfo
+Message-ID: <20250512101942.4a5b80a1@kmaincent-XPS-13-7390>
+In-Reply-To: <20250508193645.78e1e4d9@kernel.org>
+References: <20250506-feature_ptp_source-v2-1-dec1c3181a7e@bootlin.com>
+	<20250508193645.78e1e4d9@kernel.org>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,71 +74,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeftddtjeejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgfdutdefvedtudegvefgvedtgfdvhfdtueeltefffefffffhgfetkedvfeduieeinecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudeipdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvghrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgri
+ igvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopeifihhllhgvmhguvggsrhhuihhjnhdrkhgvrhhnvghlsehgmhgrihhlrdgtohhm
+X-GND-Sasl: kory.maincent@bootlin.com
 
+On Thu, 8 May 2025 19:36:45 -0700
+Jakub Kicinski <kuba@kernel.org> wrote:
 
+> On Tue, 06 May 2025 14:18:45 +0200 Kory Maincent wrote:
+> > +  -
+> > +    name: ts-hwtstamp-source
+> > +    enum-name: hwtstamp-source
+> > +    header: linux/ethtool.h
+> > +    type: enum
+> > +    name-prefix: hwtstamp-source
+> > +    entries: [ netdev, phylib ] =20
+>=20
+> You're missing value: 1, you should let YNL generate this to avoid
+> the discrepancies.
+>=20
+> diff --git a/Documentation/netlink/specs/ethtool.yaml
+> b/Documentation/netlink/specs/ethtool.yaml index 20c6b2bf5def..3e2f470fb2=
+13
+> 100644 --- a/Documentation/netlink/specs/ethtool.yaml
+> +++ b/Documentation/netlink/specs/ethtool.yaml
+> @@ -99,12 +99,21 @@ uapi-header: linux/ethtool_netlink_generated.h
+>      type: enum
+>      entries: [ unknown, disabled, enabled ]
+>    -
+> -    name: ts-hwtstamp-source
+> -    enum-name: hwtstamp-source
+> -    header: linux/ethtool.h
+> +    name: hwtstamp-source
+> +    name-prefix: hwtstamp-source-
+>      type: enum
+> -    name-prefix: hwtstamp-source
 
-On 9 May 2025, at 1:07, Ilya Maximets wrote:
+Should we keep the enum-name property as is is already use, or do you prefe=
+r to
+rename all its use to ethtool-hwtstamp-source?
 
-> On 5/8/25 11:32 AM, Eelco Chaudron wrote:
->> The current implementation of validate_userspace() does not verify
->> whether all Netlink attributes fit within the parent attribute. This
->> is because nla_parse_nested_deprecated() stops processing Netlink
->> attributes as soon as an invalid one is encountered.
->>
->> To address this, we use nla_parse_deprecated_strict() which will
->> return an error upon encountering attributes with an invalid size.
->>
->> Fixes: ccb1352e76cf ("net: Add Open vSwitch kernel components.")
->> Signed-off-by: Eelco Chaudron <echaudro@redhat.com>
->> ---
->
-> Hi, Eelco.  Thanks for the patch!
->
-> The code seems fine at a glance, though I didn't test it yet.
->
-> But I have a few comments about the commit message.
->
-> This change is not a bug fix - accepting unknown attributes or
-> ignoring malformed ones is just a design choice.  So, IMO, the
-> patch subject and the commit message should not be worded as if
-> we're fixing some bug here.  And it should also not include the
-> 'Fixes' tag as this change should go to net-next only and must
-> not be backported.
->
-> So, I'd suggest to re-word the subject line so it doesn't contain
-> the word 'Fix', e.g.:
->   net: openvswitch: stricter validation for the userspace action
->
-> And re-wording the commit message explaining why it is better
-> to have strict validation without implying that this change is
-> fixing some bugs.  This includes removing the 'Fixes' tag.
+> -    entries: [ netdev, phylib ]
+> +    entries:
+> +      -
+> +        name: netdev
+> +        doc: |
+> +          Hardware timestamp comes from a MAC or a device
+> +          which has MAC and PHY integrated
+> +        value: 1
+> +      -
+> +        name: phylib
+> +        doc: |
+> +          Hardware timestamp comes from one PHY device
+> +          of the network topology
 
-Thanks for the feedback Ilya! As I got no other reviews/feedback, I=E2=80=
-=99ve sent a v2 addressing your feedback.
+Oh ok, thanks for the pointers!
 
-Cheers,
-
-Eelco
-
->>  net/openvswitch/flow_netlink.c | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_net=
-link.c
->> index 518be23e48ea..ad64bb9ab5e2 100644
->> --- a/net/openvswitch/flow_netlink.c
->> +++ b/net/openvswitch/flow_netlink.c
->> @@ -3049,7 +3049,8 @@ static int validate_userspace(const struct nlatt=
-r *attr)
->>  	struct nlattr *a[OVS_USERSPACE_ATTR_MAX + 1];
->>  	int error;
->>
->> -	error =3D nla_parse_nested_deprecated(a, OVS_USERSPACE_ATTR_MAX, att=
-r,
->> +	error =3D nla_parse_deprecated_strict(a, OVS_USERSPACE_ATTR_MAX,
->> +					    nla_data(attr), nla_len(attr),
->>  					    userspace_policy, NULL);
->>  	if (error)
->>  		return error;
-
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
