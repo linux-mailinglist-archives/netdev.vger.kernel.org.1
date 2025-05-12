@@ -1,141 +1,162 @@
-Return-Path: <netdev+bounces-189733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F0A7AB3628
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 13:46:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 602ECAB362B
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 13:46:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5933417BD60
-	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 11:46:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7B4017BC36
+	for <lists+netdev@lfdr.de>; Mon, 12 May 2025 11:46:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF0B62673BE;
-	Mon, 12 May 2025 11:46:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="XCJOcLPc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 514C125A32E;
+	Mon, 12 May 2025 11:46:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60F721A316E
-	for <netdev@vger.kernel.org>; Mon, 12 May 2025 11:46:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8BBE1DD0EF
+	for <netdev@vger.kernel.org>; Mon, 12 May 2025 11:46:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747050366; cv=none; b=ickcIsW/cviGRmgQd2tASmAhaeeyIF1WPdnwt9fmU7NtZ5G493D1LBy6wcXj/wmkuYtP4RzU6oUChKsn7/q/F21DEOIlOZzo4cemxfJrO4YJ5H+lEmfj7McFeqgdC+295xllfSqQZDmvflpSCs4RBybuOin20xDMuYMR6mgMIyM=
+	t=1747050413; cv=none; b=WEk8FFaI/JD1TDbUPWUPzVLC5BZ/26mfv/B515oOfPva0QA6awvQ+fuD4KLDRj+9bmVFuHWHI5IwNIyHCQemgkekX2juaiOpf3yMNzIZcO+YmGE/LKtmOVH7L+N8OxELeb/Xo9n6W3P5FQcTMGI+IHy722/DQm6ITOYKKWNnwu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747050366; c=relaxed/simple;
-	bh=VYsbC6pjOeqbcl9PL92v/znlEfay+PSXnr/Cqf8zSOk=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WTSPBvW4PBhHU4WeEK+s4QSd9vskzyd+TdfCk+ag2p11wFFlX7pghGLxI2Px7tMC2sYWkzWQZ+GxUw16EkzYBxMk2Zuc8e4a3UbwKEPAEBpMzkU7BsOTekBooJvVaWDPW50XGC4xwxTJZSp3foNktRg55Ug4qD6jjn+ZcVsW9dY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=XCJOcLPc; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54C5BSjW019412;
-	Mon, 12 May 2025 04:45:50 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=T96oSuMItsxfy3oWU9moC4+0D
-	WoE7EDHWCxOhPQ14gA=; b=XCJOcLPcz/fSpeiMJ6Zis61LunnnDqrduPbXAxGVh
-	78F0NJJ6urXE84oxOEg+u4kCNvbI/pHm7tPyVcc0sJInlawDQflo1hV+vXWuJhdc
-	iGJvSGQqE2tPjU8DEjs/3MZ1Qk95ST9G7ozCDDCJzbvA3hoLTp8l0apmNWJyz8iX
-	9dRb3mLZvpH821QuL9epiiiqtb4kEhBgoEjJJ020V5UpjpwxLGzsAm4tUUZe8IGk
-	JspDJBp1wCfZ1ZXXZpmZSvHayAq6/kg6WepbCUFcbS9FR4l0x8xxX1/Q/5A4Ifxl
-	SoC6k1+eJIYv9vOSq+DUeJcw4gig5FTFtelXsvdqqiXCA==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 46kamdgjph-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 12 May 2025 04:45:50 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Mon, 12 May 2025 04:45:49 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Mon, 12 May 2025 04:45:49 -0700
-Received: from 90a8923ee8d1 (HY-LT91368.marvell.com [10.29.24.116])
-	by maili.marvell.com (Postfix) with SMTP id AF65E3F7060;
-	Mon, 12 May 2025 04:45:45 -0700 (PDT)
-Date: Mon, 12 May 2025 11:45:43 +0000
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: Simon Horman <horms@kernel.org>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <gakula@marvell.com>,
-        <hkelam@marvell.com>, <sgoutham@marvell.com>, <lcherian@marvell.com>,
-        <netdev@vger.kernel.org>
-Subject: Re: [PATCH] octeontx2-af: Send Link events one by one
-Message-ID: <aCHfZ_MxtfVmhXVj@90a8923ee8d1>
-References: <1746638183-10509-1-git-send-email-sbhatta@marvell.com>
- <20250512100954.GU3339421@horms.kernel.org>
+	s=arc-20240116; t=1747050413; c=relaxed/simple;
+	bh=sxe+D6WPZla4nTFWkqVGfEE6SdYt5eJKh51Gz0YFsV8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J5nq8ouFk6k/sNiz531cA4VH/6sstHrKC5TpPScff+YKfUpFZ4RpkoLTet8NEGpZWnBaOQhmiIRPCCxq1qnmwCyKjICDJnkR/Z5BEdwpvjqPbPcM/GPrf+nkXMHpSDZwepQRyWGSwnW0mlVWAvgeDOcPc6wR5JZJOfgsbsnwolw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.36] (g36.guest.molgen.mpg.de [141.14.220.36])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 5C12C61EA1BF9;
+	Mon, 12 May 2025 13:46:08 +0200 (CEST)
+Message-ID: <b5678313-0ec0-444f-962f-758a35c5a46d@molgen.mpg.de>
+Date: Mon, 12 May 2025 13:46:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250512100954.GU3339421@horms.kernel.org>
-X-Authority-Analysis: v=2.4 cv=DtpW+H/+ c=1 sm=1 tr=0 ts=6821df6e cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=EZAAayXskDsXsr5XbIwA:9 a=CjuIK1q_8ugA:10
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: Ie58mgPVRzXInmmL7-LAgxHjDqpzxsqN
-X-Proofpoint-ORIG-GUID: Ie58mgPVRzXInmmL7-LAgxHjDqpzxsqN
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTEyMDEyMyBTYWx0ZWRfXyrLgtZKzXgJT x9JXciLvGs3qYxcexO7Z8wO3M92+5TanNKIXW28HQ+7dZuHIhF/qiPu5vC3RyKf4cLFr5SsbALj sRU7EYyJRALMVJI12YsGSRT6k41x22HhDSSZ96gG8j7N8oUghHpKlz4ROjHcLZro+LBPJRKXtoK
- xOYL0oqtj64wMI31TAnwomqOkESFeXBQPJwAPJFKbl7bGXfLebktUjoO/dUgUbf9nsrPk6l1ng+ ISv40t5cguvecYd1gNimjgHSeBEnwfLVwp4+sQWjiGzLsBRrLzfH2+L2XSEa5BSqAAD1CgwlFd0 7L/yNGLJUemNP53aayAN7KSm4MAE9gQ2xKlQwQzCqyDRO4x+hbFiEGmWPl7LNTt5jrJAs7yepw9
- 1acECH22lSAemOMMG3CSlJelb0D0wwo2kXkUHgi0c0WPS/DwfBYUl2ZSlABnflVnkE6FR/45
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-12_04,2025-05-09_01,2025-02-21_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net] idpf: avoid mailbox timeout
+ delays during reset
+To: Emil Tantilov <emil.s.tantilov@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ decot@google.com, willemb@google.com, anthony.l.nguyen@intel.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, madhu.chittim@intel.com, aleksandr.loktionov@intel.com,
+ przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch, joshua.a.hay@intel.com,
+ ahmed.zaki@intel.com
+References: <20250508184715.7631-1-emil.s.tantilov@intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250508184715.7631-1-emil.s.tantilov@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Simon,
+Dear Emil,
 
-On 2025-05-12 at 10:09:54, Simon Horman (horms@kernel.org) wrote:
-> On Wed, May 07, 2025 at 10:46:23PM +0530, Subbaraya Sundeep wrote:
-> > Send link events one after another otherwise new message
-> > is overwriting the message which is being processed by PF.
-> > 
-> > Fixes: a88e0f936ba9 ("octeontx2: Detect the mbox up or down message via register")
-> > Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
-> > ---
-> >  drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> > 
-> > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-> > index 992fa0b..ebb56eb 100644
-> > --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-> > +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-> > @@ -272,6 +272,8 @@ static void cgx_notify_pfs(struct cgx_link_event *event, struct rvu *rvu)
-> >  
-> >  		otx2_mbox_msg_send_up(&rvu->afpf_wq_info.mbox_up, pfid);
-> 
-> Hi Subbaraya,
-> 
-> Are there other callers of otx2_mbox_msg_send_up()
-> which also need this logic? If so, perhaps a helper is useful.
-> If not, could you clarify why?
-> 
-UP messages are async notifications where we just send and forget.
-There are other callers as I said we just send and forget everywhere
-in the driver. Only this callsite has been modified because we have
-seen an issue on customer setup where bunch of link events are queued
-for a same device at one point of time.
-> >  
-> > +		otx2_mbox_wait_for_rsp(&rvu->afpf_wq_info.mbox_up, pfid);
-> 
-> This can return an error. Which is checked in otx2_sync_mbox_up_msg().
-> Does it make sense to do so here too?
-> 
-Yes it makes sense to use otx2_sync_mbox_up_msg here. I will use it
-here.
 
-Thanks,
-Sundeep
-> > +
-> >  		mutex_unlock(&rvu->mbox_lock);
-> >  	} while (pfmap);
-> >  }
-> > -- 
-> > 2.7.4
-> > 
+Thank you for the patch.
+
+Am 08.05.25 um 20:47 schrieb Emil Tantilov:
+> Mailbox operations are not possible while the driver is in reset.
+> Operations that require MBX exchange with the control plane will result
+> in long delays if executed while a reset is in progress:
+> 
+> ethtool -L <inf> combined 8& echo 1 > /sys/class/net/<inf>/device/reset
+> idpf 0000:83:00.0: HW reset detected
+> idpf 0000:83:00.0: Device HW Reset initiated
+> idpf 0000:83:00.0: Transaction timed-out (op:504 cookie:be00 vc_op:504 salt:be timeout:2000ms)
+> idpf 0000:83:00.0: Transaction timed-out (op:508 cookie:bf00 vc_op:508 salt:bf timeout:2000ms)
+> idpf 0000:83:00.0: Transaction timed-out (op:512 cookie:c000 vc_op:512 salt:c0 timeout:2000ms)
+> idpf 0000:83:00.0: Transaction timed-out (op:510 cookie:c100 vc_op:510 salt:c1 timeout:2000ms)
+> idpf 0000:83:00.0: Transaction timed-out (op:509 cookie:c200 vc_op:509 salt:c2 timeout:60000ms)
+> idpf 0000:83:00.0: Transaction timed-out (op:509 cookie:c300 vc_op:509 salt:c3 timeout:60000ms)
+> idpf 0000:83:00.0: Transaction timed-out (op:505 cookie:c400 vc_op:505 salt:c4 timeout:60000ms)
+> idpf 0000:83:00.0: Failed to configure queues for vport 0, -62
+> 
+> Disable mailbox communication in case of a reset, unless it's done during
+> a driver load, where the virtchnl operations are needed to configure the
+> device.
+
+Is the Linux kernel going to log something now, that the mailbox 
+operation is ignored?
+
+> Fixes: 8077c727561aa ("idpf: add controlq init and reset checks")
+> Co-developed-by: Joshua Hay <joshua.a.hay@intel.com>
+> Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
+> Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
+> Reviewed-by: Ahmed Zaki <ahmed.zaki@intel.com>
+> ---
+>   drivers/net/ethernet/intel/idpf/idpf_lib.c     | 18 +++++++++++++-----
+>   .../net/ethernet/intel/idpf/idpf_virtchnl.c    |  2 +-
+>   .../net/ethernet/intel/idpf/idpf_virtchnl.h    |  1 +
+>   3 files changed, 15 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+> index 3a033ce19cda..2ed801398971 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+> @@ -1816,11 +1816,19 @@ void idpf_vc_event_task(struct work_struct *work)
+>   	if (test_bit(IDPF_REMOVE_IN_PROG, adapter->flags))
+>   		return;
+>   
+> -	if (test_bit(IDPF_HR_FUNC_RESET, adapter->flags) ||
+> -	    test_bit(IDPF_HR_DRV_LOAD, adapter->flags)) {
+> -		set_bit(IDPF_HR_RESET_IN_PROG, adapter->flags);
+> -		idpf_init_hard_reset(adapter);
+> -	}
+> +	if (test_bit(IDPF_HR_FUNC_RESET, adapter->flags))
+> +		goto func_reset;
+> +
+> +	if (test_bit(IDPF_HR_DRV_LOAD, adapter->flags))
+> +		goto drv_load;
+> +
+> +	return;
+> +
+> +func_reset:
+> +	idpf_vc_xn_shutdown(adapter->vcxn_mngr);
+> +drv_load:
+> +	set_bit(IDPF_HR_RESET_IN_PROG, adapter->flags);
+> +	idpf_init_hard_reset(adapter);
+>   }
+>   
+>   /**
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> index 3d2413b8684f..5d2ca007f682 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> @@ -376,7 +376,7 @@ static void idpf_vc_xn_init(struct idpf_vc_xn_manager *vcxn_mngr)
+>    * All waiting threads will be woken-up and their transaction aborted. Further
+>    * operations on that object will fail.
+>    */
+> -static void idpf_vc_xn_shutdown(struct idpf_vc_xn_manager *vcxn_mngr)
+> +void idpf_vc_xn_shutdown(struct idpf_vc_xn_manager *vcxn_mngr)
+>   {
+>   	int i;
+>   
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.h b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.h
+> index 83da5d8da56b..23271cf0a216 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.h
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.h
+> @@ -66,5 +66,6 @@ int idpf_send_get_stats_msg(struct idpf_vport *vport);
+>   int idpf_send_set_sriov_vfs_msg(struct idpf_adapter *adapter, u16 num_vfs);
+>   int idpf_send_get_set_rss_key_msg(struct idpf_vport *vport, bool get);
+>   int idpf_send_get_set_rss_lut_msg(struct idpf_vport *vport, bool get);
+> +void idpf_vc_xn_shutdown(struct idpf_vc_xn_manager *vcxn_mngr);
+>   
+>   #endif /* _IDPF_VIRTCHNL_H_ */
+
+
+Kind regards,
+
+Paul
 
