@@ -1,83 +1,65 @@
-Return-Path: <netdev+bounces-189992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AFDCAB4C8F
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 09:16:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2653AB4CD5
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 09:34:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFBD63ABFFD
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 07:16:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C95E3B6186
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 07:33:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F7E417A31D;
-	Tue, 13 May 2025 07:16:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="P3YuhGDh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E41F1DE8AE;
+	Tue, 13 May 2025 07:34:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from baptiste.telenet-ops.be (baptiste.telenet-ops.be [195.130.132.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 639152AF1C;
-	Tue, 13 May 2025 07:16:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF3101C8639
+	for <netdev@vger.kernel.org>; Tue, 13 May 2025 07:34:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.130.132.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747120597; cv=none; b=JCM4AwgO+1v0YJBHnHIG0rAdcOOyUXoLdi8xNwDLoSot+qsvgPJbzhBjoluWEnVb4b7jNrgdKKc5M0JElCn6zESvQyAA6NZ817NFQOq2E3Gcx2MtKHCLfU+JQRR/wecA1SD/0diuFvliG09S5TR5Vbv27kXgoshGt+ujcmPOfqA=
+	t=1747121648; cv=none; b=eNOWUezP4BSpLzn/cmkS2+yT6h16b2lCamUL54HaMnWm4HOZHcD7ZJeq11kT8mnH1DRFWNZ2CSr0ImPZwxO9EI5GGkM+ZJVvJyIpUFnMGZQpKKbuB/HZNmrQ6+2ZiDonl99/dRJEDReiY615CHsoUsr4JeicbaAQfxFZLLwDCZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747120597; c=relaxed/simple;
-	bh=HOSCn5OY2vMFi2WBMkO799cdrMEuSpKl02X7FsfwxMk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AE6rGBzROJWxx/Fnb+jWGAD13yQgJdm57iQ5estU0WLKxirJw1d4masI1AxO5WGXNHBrPQkR5b8d91Fo2uohIkOvPHQNcuUyMkbcO5TMXKH2PZUQudoRiEslKM0Dve+iTnx8/+Yhj5KuJFpMbg3g4mQPvU2pOpiY0soSZAR5Cqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=P3YuhGDh; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54CNiMLO028930;
-	Tue, 13 May 2025 00:16:13 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=Z1uM+z70uGeKg+gMbp7OUv2
-	1zkYo9ZLgDYWqE+zAqQA=; b=P3YuhGDhU6eft6WxQktfIzvhO8MNYMFOZqbfQy+
-	XRqLCKE8PkazlSeR+l4PEX/N98BadzB9uB1hadXZQNnxv2GoFswVQgd5ZI0OJGoy
-	e5aBfqqL+QJHCi4HfO46U4BNZ3ruQe+3SmYsIsMPhNo9BTCJI+fE1wCQBB3HJfbT
-	yyFkFPCsu36fn97ee8hq5fxJqswyrohqmIPlHUrNkVPEV86FrFq5zR9rZ3d7nwhY
-	dYHhkmcSxeaZJBL/72wlwRjvatox/U1H9HIBYlwfFZlK6OzBIvF174XjUmP1ZKnJ
-	0Zcx1+yFu2SrfK7gBomXhccYCoLzZONmIKAYmYpDRmO3sDg==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 46ktw18ps9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 13 May 2025 00:16:12 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Tue, 13 May 2025 00:16:11 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Tue, 13 May 2025 00:16:11 -0700
-Received: from test-OptiPlex-Tower-Plus-7010.marvell.com (unknown [10.29.37.157])
-	by maili.marvell.com (Postfix) with ESMTP id 9E0E83F7091;
-	Tue, 13 May 2025 00:16:06 -0700 (PDT)
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Hariprasad Kelam <hkelam@marvell.com>,
-        Sunil Goutham
-	<sgoutham@marvell.com>,
-        Linu Cherian <lcherian@marvell.com>,
-        Geetha sowjanya
-	<gakula@marvell.com>,
-        Jerin Jacob <jerinj@marvell.com>,
-        Subbaraya Sundeep
-	<sbhatta@marvell.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Christina Jacob
-	<cjacob@marvell.com>
-Subject: [net] octeontx2-af: Fix CGX Receive counters
-Date: Tue, 13 May 2025 12:45:54 +0530
-Message-ID: <20250513071554.728922-1-hkelam@marvell.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1747121648; c=relaxed/simple;
+	bh=ECQSLHs8DNloR189my8SriGedu+36Q1D621A4mDdlr4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=goYzjmvxzuj6CZdf1xCqaZfk4r8YJizOfeS1UTyR0PZVsR4rUKs5mBGi/4YC2Ttgo1P6pT20mNbWqYSKXZcw+Yx3UGnx5YSukbB48ERRCm0WZ2L3g8+9sWCEaDQvdpIxWQSwostPrgGW0pysj95pXJz7GK0q1KlkZ88Z4BW5hOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be; spf=none smtp.mailfrom=linux-m68k.org; arc=none smtp.client-ip=195.130.132.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
+Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed80:e731:371c:7707:a2ae])
+	by baptiste.telenet-ops.be with cmsmtp
+	id oXZx2E00W4HZolA01XZxtQ; Tue, 13 May 2025 09:34:03 +0200
+Received: from rox.of.borg ([192.168.97.57])
+	by ramsan.of.borg with esmtp (Exim 4.97)
+	(envelope-from <geert@linux-m68k.org>)
+	id 1uEk95-00000001VdU-0En0;
+	Tue, 13 May 2025 09:33:57 +0200
+Received: from geert by rox.of.borg with local (Exim 4.97)
+	(envelope-from <geert@linux-m68k.org>)
+	id 1uEk9F-00000000AK3-3Pu8;
+	Tue, 13 May 2025 09:33:57 +0200
+From: Geert Uytterhoeven <geert+renesas@glider.be>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>
+Cc: netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	Geert Uytterhoeven <geert+renesas@glider.be>
+Subject: [PATCH] dt-bindings: net: snps,dwmac: Align mdio node in example with bindings
+Date: Tue, 13 May 2025 09:33:56 +0200
+Message-ID: <308d72c2fe8e575e6e137b99743329c2d53eceea.1747121550.git.geert+renesas@glider.be>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,46 +67,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: g8uFJp49h4XVLW6dktfElSKQmDzstYSG
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTEzMDA2NyBTYWx0ZWRfX3JGZgoXSX5nS suu5qdq+Unn92C+L8ZI181wHS35eRGedqybXDlQBF0uiiIMrk909r8u962HpPadhESkd35oFdzu zRP6PIbLJ4RfvfNp+WrpZZPmi6IiKoMPRcuS2I7or/WmbMauIOCNmRo81ap0FC5D3Yaa72+ySe5
- /iyn3mQAWgiqo0/JKyqtCZ19cbDC7Soo+KlsavxMzFoEJ7+SCzrOOD8mMdSySCyO6R+ts03qRbf QJjGVXVGv+WD+GZMcZGWVc6kbgZ0hJawg2V7KESm4TE5uvR2xRZ6ZxcGVXdPbOH3Y6i9Jx0gzkW ikWj0wn2Li6rzTibYoI0SmnLI1V/tNs4IXrK+UXXTEiR3+szznS+/2eH/GPuy8kwyusxCrrbw6Q
- h60gt8Qihk8bqQ9C5MXR7tGEPkF2lJKz33zZSOAq7VrAA7EK9Va3XgMZS1vEJfgHSu3PO5pO
-X-Proofpoint-ORIG-GUID: g8uFJp49h4XVLW6dktfElSKQmDzstYSG
-X-Authority-Analysis: v=2.4 cv=WsErMcfv c=1 sm=1 tr=0 ts=6822f1bc cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=dt9VzEwgFbYA:10 a=M5GUcnROAAAA:8 a=RxlNfrxfzKab5IRzU1AA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-12_07,2025-05-09_01,2025-02-21_01
 
-Each CGX block supports 4 logical MACs (LMACS). Receive
-counters CGX_CMR_RX_STAT0-8 are per LMAC and CGX_CMR_RX_STAT9-12
-are per CGX.
+According to the bindings, the MDIO subnode should be called "mdio".
+Update the example to match this.
 
-Due a bug in previous patch, stale Per CGX counters values observed.
-
-Fixes: 66208910e57a ("octeontx2-af: Support to retrieve CGX LMAC stats")
-Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 ---
- drivers/net/ethernet/marvell/octeontx2/af/cgx.c | 5 +++++
- 1 file changed, 5 insertions(+)
+For dwc-qos-ethernet-4.10, the Linux driver insists on "mdio".
+For other devices, the Linux driver does not seem to care, and just
+looks for subnodes that are compatible with "snps,dwmac-mdio":
+https://elixir.bootlin.com/linux/v6.14.6/source/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c#L302
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-index 0b27a695008b..971993586fb4 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-@@ -717,6 +717,11 @@ int cgx_get_rx_stats(void *cgxd, int lmac_id, int idx, u64 *rx_stat)
+Lots of DTS files are using "mdio0" (copied from the example?).
+---
+ Documentation/devicetree/bindings/net/snps,dwmac.yaml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+index b525eca5385067d8..90b79283e228b037 100644
+--- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
++++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+@@ -710,7 +710,7 @@ examples:
+             };
+         };
  
- 	if (!is_lmac_valid(cgx, lmac_id))
- 		return -ENODEV;
-+
-+	/* pass lmac as 0 for CGX_CMR_RX_STAT9-12 */
-+	if (idx >= CGX_RX_STAT_GLOBAL_INDEX)
-+		lmac_id = 0;
-+
- 	*rx_stat =  cgx_read(cgx, lmac_id, CGXX_CMRX_RX_STAT0 + (idx * 8));
- 	return 0;
- }
+-        mdio0 {
++        mdio {
+             #address-cells = <1>;
+             #size-cells = <0>;
+             compatible = "snps,dwmac-mdio";
 -- 
-2.34.1
+2.43.0
 
 
