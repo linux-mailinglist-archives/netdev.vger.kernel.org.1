@@ -1,103 +1,93 @@
-Return-Path: <netdev+bounces-190222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEA6FAB5B4F
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 19:31:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60791AB5BFE
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 20:00:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F7101B40209
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 17:30:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E4831B4766E
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 18:00:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB6872BEC2F;
-	Tue, 13 May 2025 17:29:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7061D2BEC2F;
+	Tue, 13 May 2025 18:00:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jQ1OAIti"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TQIFiGac"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFDCE645;
-	Tue, 13 May 2025 17:29:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1769D2BF964
+	for <netdev@vger.kernel.org>; Tue, 13 May 2025 18:00:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747157395; cv=none; b=UjXAS+vAGnfAj+7Ue3xTqhVhTbjwqM3FA46kWM+JEQC4/Fm4Wriwp++rmWBc/KRAQiz0I6Ia+NknGO3qNfkX5ePYRkd4WeXwuS1JaAJCNOmuxBeGRgIwjuXCc0G6zf8ZnS7emQk1HWeQHpTYo84bsWjACcPmhD/Ngg9fWey/dFg=
+	t=1747159202; cv=none; b=RUGJZMr3ZvbBtYfmynvQHK9cjoWv5U0bTwZM/dpv4P2eDjPgLpqPlkwSqCNFkBSzWOKox7pSaHTOBneYZ/eU9vPsffNIMFN754H7dFYoFzqtAAG+mnvHnRpTpF7+bMKlQ7I4fy6eQp1qCxeNNL/otb4Pi+qQeCtrURWeut8rNPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747157395; c=relaxed/simple;
-	bh=rDjH67j5NwZSbVGkBa9rq3itDu9hCffVypBXkgjOTgE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ya3RMy47wbRDhQ6bAELAuwTuan9EUbSjloGm8Z6X+sVQT5XmiMgzQhEzATcTUl4p/djJRsd/YyAIdn2bPrTjL3S2yljtDeb6q75dOyIHzc2U1WXyvi3WIcCEiHOA4JwlN4xIV++fQJt2IZTgMy7HI4rrt5qxdK23vjOWbWFhfig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jQ1OAIti; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD6BAC4CEE4;
-	Tue, 13 May 2025 17:29:54 +0000 (UTC)
+	s=arc-20240116; t=1747159202; c=relaxed/simple;
+	bh=VnjmCEpWrTnFyrZZ35gQOc+TmeLHPm7iaxQ34Iibp60=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ML1kXd5pl01QqKnGgBuKbmiY4U+8CPSu36TvADM6X6Dl26qU2lDtCm/0m41oMyo6DaGVfTuv6bMKEDNcY9wLAWW/LlaZ9xEWRUz7u8LrIvbf9bwMNtMz4lp0atEo5sKecp2MwWxc8raehWgLsrrNusA2luVigeJikDPXJbgsL+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TQIFiGac; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 449D4C4CEE4;
+	Tue, 13 May 2025 18:00:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747157395;
-	bh=rDjH67j5NwZSbVGkBa9rq3itDu9hCffVypBXkgjOTgE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jQ1OAItitifdmF8CDpkU6/7uu6waXKfKVLpQziSUL8VOfKyYvhjlyN0U82tRw3ZTP
-	 8eLBJrWxlIjLTDthgmPsDB+L+b47XdNU6puOevtQJ7J80fgF0iXEkKnYy6irVdv1nQ
-	 eUAP4Zqu253rx7Hx/iDgAA1SFBA/Rpz5GpNq5Hm59DW2WMp2M6/y4Ijh5TnbrMLhoj
-	 tuzq9bjt/sgrWPh4mvRSUngriq2ZNhRztGnoWQGbwuXyI6ZsQAPPizZlYUTdBPCwFd
-	 fAOBZnpNuPvGisqrKvR4I09j5K4rN06EV4XVP7ope2xDm57pl2jkehJ+sQiUcrWLIt
-	 WtSEnCuY6Jdjw==
-Date: Tue, 13 May 2025 10:29:54 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: Siddharth Vadapalli <s-vadapalli@ti.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell
- King <linux@armlinux.org.uk>, danishanwar@ti.com, srk@ti.com,
- linux-omap@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 8/9] net: ethernet: ti: am65-cpsw: add
- network flow classification support
-Message-ID: <20250513102954.2e537e99@kernel.org>
-In-Reply-To: <20250513-am65-cpsw-rx-class-v3-8-492d9a2586b6@kernel.org>
-References: <20250513-am65-cpsw-rx-class-v3-0-492d9a2586b6@kernel.org>
-	<20250513-am65-cpsw-rx-class-v3-8-492d9a2586b6@kernel.org>
+	s=k20201202; t=1747159201;
+	bh=VnjmCEpWrTnFyrZZ35gQOc+TmeLHPm7iaxQ34Iibp60=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=TQIFiGacDmLG/SGLaTXwXzrSdewh+j9Zospv0Mmjrwsko0+1VflGPnmf67YL1iIIC
+	 2n+A1ukEPGTuj2OHUycV4PoY6vOB0MXT0HTwVjpTI+qq+F/n/Am6hsorB9UC3GoZpe
+	 WnGSWUsacBBu59TCJT+ectEVb2iGBeY6sUAmcrfT9TeqaYCqNrI3/eK7wclFybJfVO
+	 wQuxRIZgUXTuQsFHQI8yY0eDldTxWcCkapNEom3haAnCYlSOrELdapZMbBgPDu44xJ
+	 RZqV+4gEcD+/rhPQJm3W0yYiAqvbosf0IDRrDCPxE3AY76oW7kxIANNeHZB7qt0HAg
+	 vU5DQ6XEv9qXA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ED18239D6540;
+	Tue, 13 May 2025 18:00:38 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH iproute2-next] ip ntable: Add support for "mcast_reprobes"
+ parameter
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174715923776.1748654.17847576553235256725.git-patchwork-notify@kernel.org>
+Date: Tue, 13 May 2025 18:00:37 +0000
+References: <20250508111301.544391-1-idosch@nvidia.com>
+In-Reply-To: <20250508111301.544391-1-idosch@nvidia.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, dsahern@gmail.com, stephen@networkplumber.org,
+ petrm@nvidia.com
 
-On Tue, 13 May 2025 15:13:12 +0300 Roger Quadros wrote:
-> +	mutex_lock(&port->rxnfc_lock);
-> +	loc = am65_cpsw_policer_find_match(port, &cfg);
-> +	if (loc >= 0 && loc != fs->location) {
-> +		netdev_info(port->ndev,
-> +			    "rule already exists in location %d. not adding\n",
-> +			    loc);
-> +		mutex_unlock(&port->rxnfc_lock);
-> +		return -EINVAL;
-> +	}
-> +
-> +	/* delete exisiting rule */
-> +	if (loc >= 0) {
-> +		rule = am65_cpsw_get_rule(port, loc);
-> +		if (rule)
-> +			am65_cpsw_del_rule(port, rule);
-> +	}
-> +
-> +	rule = devm_kzalloc(port->common->dev, sizeof(*rule), GFP_KERNEL);
+Hello:
 
-please don't use devm_ for objects you must support explicitly freeing
+This patch was applied to iproute2/iproute2-next.git (main)
+by David Ahern <dsahern@kernel.org>:
 
-> +	if (!rule)
-> +		return -ENOMEM;
+On Thu, 8 May 2025 14:13:01 +0300 you wrote:
+> Kernel commit 8da86466b837 ("net: neighbour: Add mcast_resolicit to
+> configure the number of multicast resolicitations in PROBE state.")
+> added the "NDTPA_MCAST_REPROBES" netlink attribute that allows user
+> space to set / get the number of multicast probes that are sent by the
+> kernel in PROBE state after unicast probes did not solicit a response.
+> 
+> Add support for this parameter in iproute2.
+> 
+> [...]
 
-missing unlock
+Here is the summary with links:
+  - [iproute2-next] ip ntable: Add support for "mcast_reprobes" parameter
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=f98940cce003
 
-> +
-> +	INIT_LIST_HEAD(&rule->list);
-> +	memcpy(&rule->cfg, &cfg, sizeof(cfg));
-> +	rule->location = fs->location;
-> +	ret = am65_cpsw_add_rule(port, rule);
-> +	mutex_unlock(&port->rxnfc_lock);
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
