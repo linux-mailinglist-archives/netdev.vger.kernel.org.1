@@ -1,157 +1,120 @@
-Return-Path: <netdev+bounces-189968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 783D6AB4A14
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 05:20:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D7A9AB4A1B
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 05:25:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7F1A1B422C0
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 03:20:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D90FA463FDA
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 03:25:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D3F01A238D;
-	Tue, 13 May 2025 03:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 844511AB6D4;
+	Tue, 13 May 2025 03:25:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="k0qsrK/x"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LFZxbPIc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A61F544C63
-	for <netdev@vger.kernel.org>; Tue, 13 May 2025 03:20:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C560F44C63
+	for <netdev@vger.kernel.org>; Tue, 13 May 2025 03:25:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747106426; cv=none; b=M6pD/wuUGIylrAVTqCpNLlAsOKWAWBfLVG7HDNiQNo8dmuHewzldjwQzKuDJjq3uHiGW8xMEBpukvvYPeDsgVgcwt/7AYEtaZer6L8r9QNd654ttxqZ4kIJ5y6CrjlkQxLXDD6vNz793xQ2ldv7IsfO2CkcGXE2aEGkDU582VW8=
+	t=1747106707; cv=none; b=QqhzOF49M/BTwTkK1tqx6NGILl1QwUOshjelnUwEVTjhMuwx+qW2UWNIEa/ySPSbGD5EY52F5NW4I+kJGdty9mUlPlmLhKO5fJBr+XVSgq3JHxZU/Ugc7TZx08L+GQRq7eMdWnQPxui/6xgpchEP/kX+Uhx3/oW4uz1zL+cPV1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747106426; c=relaxed/simple;
-	bh=S9213ov5xhJdgPRHrpI48j9SFGCtm1w+FQlA46U/YU8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DPOTh1RRaZp+STvqG89O/3jftsUObmxxfLnrZx0yLPgutAiqdu9QNswFU4ypmlniaQa+/bzDgMfnRFs3YL/ycT5OVVOM4lHc45ckHf+wEAPDoNDDnao6Ndn/m1s6K7uRLiPkU3o291asw4t4o4t8YL4/TVmtX94FOI7rma2SA7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=k0qsrK/x; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1747106707; c=relaxed/simple;
+	bh=DmoxqvxgoecErG1YUzFn+KEzYa61G9VBt3UHUK8AavY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NU/oYKKjqzd4fzfi6jO+ODFVHXYusTqGKNoJ9GFINsposiwHgyF77tYKTD8z5rAmcDL8so4liMBfentJLDEyN71j7sHfVOcSNRHMSOdICcxyRzb0FYrkPnVdZuvhbDhB59EIkhxiMl5syMNHJuN7jG3/o+0ZF0xks/9Pj6h3c3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LFZxbPIc; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-ad21a5466f6so721328966b.1
+        for <netdev@vger.kernel.org>; Mon, 12 May 2025 20:25:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1747106424; x=1778642424;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=aZrBILqJwTKMbl2YY3Wc5tJ1lY+mYSLfgVG5F2Bz2us=;
-  b=k0qsrK/xguya08XJfOZnV+wAOm/J+wkIalQxmlz3ZQX6M+hohLmelL4x
-   89NqyfT/OsIEeO3jRK1c7EJvejxuK7+f9aeYAvBIao+0o40JW9Aqtu0rM
-   BWhg9q/hXX7eXDR4aazXCWW6sAqOcDrMgv2JCPAfeLNjQOdgA9fUzypR6
-   CyhAG4yF5S9N7QbtQ2dmf2aAah0QMuqpKk2gBv2ABEEdiRKSUGv75TYlB
-   DBq7pmsdL/47rkggMQYaWWIsuhGS6S/KNC8UeLbyrDqk+bQw56AfP+WhQ
-   5fKGhGo6RUkGyQRpQyKpqncRhmxRyf5oVpF/EVM9Kw5XZBRCGHiaxRyt8
-   A==;
-X-IronPort-AV: E=Sophos;i="6.15,284,1739836800"; 
-   d="scan'208";a="199782931"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2025 03:20:22 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:15827]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.51.68:2525] with esmtp (Farcaster)
- id 1788cebf-886f-4ea8-bd19-9f13aff455f1; Tue, 13 May 2025 03:20:22 +0000 (UTC)
-X-Farcaster-Flow-ID: 1788cebf-886f-4ea8-bd19-9f13aff455f1
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 13 May 2025 03:20:22 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.187.170.42) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 13 May 2025 03:20:19 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <willemdebruijn.kernel@gmail.com>
-CC: <brauner@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-	<horms@kernel.org>, <kuba@kernel.org>, <kuni1840@gmail.com>,
-	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<willemb@google.com>
-Subject: Re: [PATCH v2 net-next 7/9] af_unix: Inherit sk_flags at connect().
-Date: Mon, 12 May 2025 20:20:07 -0700
-Message-ID: <20250513032012.95677-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <6822b2e9e484d_104f1029457@willemb.c.googlers.com.notmuch>
-References: <6822b2e9e484d_104f1029457@willemb.c.googlers.com.notmuch>
+        d=gmail.com; s=20230601; t=1747106704; x=1747711504; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cfesM74XxRY6OOy7SC9TyQ+kyNdpcMYMFbA9gW8j8BM=;
+        b=LFZxbPIcq8XESzAwklwtHYG486r4jsxY9wTmU8A8zAlqvAeMJkLoOUdwG3InRdOALR
+         SS8tQDiyBtDIBBkLlzS8tcdsqwQpWjACVR9sy3PC5rhXvtVI33taz7y9HT2nX0gcqIJg
+         UJNSkaNJ2z8HsYkCSI44CMnJggLzNwnvenOCt4t66bLLt/zfB+bu25/+bFXCf6mDiUKR
+         /GcyrpHftL00dgKMQTYBuPrAC/oAheamHtIfNn4iUUx28jIlhC6YzWD2OyqbeJfxOitv
+         iSyd62+e6jx6vmI3LAtyS1QSDVJYZ+WHEWHr5EwHEDn+La0TmMEwrxcBHmguL4s0So51
+         U5qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747106704; x=1747711504;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cfesM74XxRY6OOy7SC9TyQ+kyNdpcMYMFbA9gW8j8BM=;
+        b=WdHlhpDkuJ7k9IZfYyVjT3E9I7Hu1Xf+mB6RQh+HfCesPaNI0unC7sOzm9OlSrJsMv
+         CDupG0euefIYjjc6Nw3/v5xKxXGr3XTJ5wGbzjR8V9hDbeH+3RQ9oOrUVx0mxs1JfmS0
+         p2AFYhXgSWZnOnkBeygOS4YeJVzFfF/zimGMbdzWUcqHDP1JzW3fJMMYenG8/3h/xP3r
+         8MxxHKIVj3jfbYLKiHWcxy3dt1rVte0QD9Gl0SCWruKnb40NO8EfzS+KVkAswzOCE1w7
+         BmdUkB3kgoKCt++3/fbBgmRrOXdpY53WYF3lntLR+Bx2FE35LwqG3J00UHq9JhLak6oc
+         dypA==
+X-Forwarded-Encrypted: i=1; AJvYcCUfWCdJU6sBax2xwFZ2KSmnOErJf+mXG98sUWTg/iCSJedJQKM1Yk6FRe/cTSDYqKIVpHrArms=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxogAO9hgTziAyWIMp2Zr/mTvGCFrbUguu4FLWjszMyK24APwd1
+	4APmQ0QKVhfgwjaEHswAdtTSBEmFxn+R8xjypq9OGMvzSXQLLGuCho1HOhsJjG6Hb7jm5Gz8wFo
+	TAnFdCqAj1CaUD4rtnNnurO3nFwU=
+X-Gm-Gg: ASbGncuKaGzHOgtK7MYXTirmP+TRByaLaua7jxrZ4iN9mnRV7IpGouFBmBJpiBfcdsx
+	4O+89RXFgAW8ewTFLj/FE9RJaQoY3zl5Hq0mO1oADZ8wji1phXqpnYMKQDVd1k/aPNT5YZHAFiQ
+	ba3cL6aRrxXMUQh92/3JGzzw91BZ26rrZ+L70=
+X-Google-Smtp-Source: AGHT+IGEAI/0PVrQaF2NbVg/Jjqb4Eq4mUGI9gKi62F39tW2HdHTWwn6PeBLDNtsFXLo8AEIcis72qvWni/GEwlJ9Dg=
+X-Received: by 2002:a17:907:da15:b0:abf:48df:bf07 with SMTP id
+ a640c23a62f3a-ad4d4e212f9mr182076866b.15.1747106703426; Mon, 12 May 2025
+ 20:25:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250512084059.711037-1-ap420073@gmail.com> <20250512174442.28e6f7f6@kernel.org>
+In-Reply-To: <20250512174442.28e6f7f6@kernel.org>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Tue, 13 May 2025 12:24:52 +0900
+X-Gm-Features: AX0GCFvcbci7GDRz_QA20uk95NOxCasA-jYl6NQmiv2HVSrJabmEYVSLR40aS5Y
+Message-ID: <CAMArcTXOS4z6v5c2JCdAVg0RKjnoovrftx=cjt-09RXp29NW3Q@mail.gmail.com>
+Subject: Re: [PATCH net v4] net: devmem: fix kernel panic when netlink socket
+ close after module unload
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
+	horms@kernel.org, almasrymina@google.com, sdf@fomichev.me, 
+	netdev@vger.kernel.org, asml.silence@gmail.com, dw@davidwei.uk, 
+	skhawaja@google.com, kaiyuanz@google.com, jdamato@fastly.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D033UWC001.ant.amazon.com (10.13.139.218) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Transfer-Encoding: quoted-printable
 
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Mon, 12 May 2025 22:48:09 -0400
-> Kuniyuki Iwashima wrote:
-> > From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> > Date: Mon, 12 May 2025 15:38:13 -0400
-> > > Kuniyuki Iwashima wrote:
-> > > > For SOCK_STREAM embryo sockets, the SO_PASS{CRED,PIDFD,SEC} options
-> > > > are inherited from the parent listen()ing socket.
-> > > > 
-> > > > Currently, this inheritance happens at accept(), because these
-> > > > attributes were stored in sk->sk_socket->flags and the struct socket
-> > > > is not allocated until accept().
-> > > > 
-> > > > This leads to unintentional behaviour.
-> > > > 
-> > > > When a peer sends data to an embryo socket in the accept() queue,
-> > > > unix_maybe_add_creds() embeds credentials into the skb, even if
-> > > > neither the peer nor the listener has enabled these options.
-> > > > 
-> > > > If the option is enabled, the embryo socket receives the ancillary
-> > > > data after accept().  If not, the data is silently discarded.
-> > > > 
-> > > > This conservative approach works for SO_PASS{CRED,PIDFD,SEC}, but not
-> > > > for SO_PASSRIGHTS; once an SCM_RIGHTS with a hung file descriptor is
-> > > > sent, it’s game over.
-> > > 
-> > > Should this be a fix to net then?
-> > 
-> > Regarding SO_PASS{CRED,PIDFD,SEC}, this patch is a small optimisation
-> > to save unnecessary get_pid() etc, like 16e572626961
-> > 
-> > And, SO_PASSRIGHTS is not yet added here, so this is not a fix.
-> 
-> Ack, thanks.
->  
-> > Maybe I should have clarified like "this works but would not for SO_PASSRIGHTS".
-> > 
-> > 
-> > > 
-> > > It depends on the move of this one bit from socket to sock. So is not
-> > > a stand-alone patch. But does not need all of the previous cleanup
-> > > patches if needs to be backportable.
-> > > 
-> > > > 
-> > > > To avoid this, we will need to preserve SOCK_PASSRIGHTS even on embryo
-> > > > sockets.
-> > > > 
-> > > > A recent change made it possible to access the parent's flags in
-> > > > sendmsg() via unix_sk(other)->listener->sk->sk_socket->flags, but
-> > > > this introduces an unnecessary condition that is irrelevant for
-> > > > most sockets, accept()ed sockets and clients.
-> > > 
-> > > What is this condition and how is it irrelevant? A constraint on the
-> > > kernel having the recent change? I.e., not backportable?
-> > 
-> > Commit aed6ecef55d7 ("af_unix: Save listener for embryo socket.") is
-> > added for a new GC but is a standalone patch.
-> > 
-> > If we want to use the listener's flags, the condition will be like...
-> > 
-> > 	if (UNIXCB(skb).fp &&
-> > 	    ((other->sk_socket && other->sk_socket->sk_flags & SOCK_PASSRIGHTS) ||
-> > 	     (!other->sk_socket && unix_sk(other)->listener->sk->sk_socket->sk_flags && SOCK_PASSRIGHTS)))
-> 
-> No need to change as this stays as net-next.
-> 
-> Might we helpful to replace "a recent commit" with the full commit reference.
+On Tue, May 13, 2025 at 9:44=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
 
-Will do.
+Hi Jakub,
+Thanks a lot for the review :)
 
-Thanks!
+> On Mon, 12 May 2025 08:40:59 +0000 Taehee Yoo wrote:
+> > @@ -943,8 +943,6 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, str=
+uct genl_info *info)
+> >                       goto err_unbind;
+> >       }
+> >
+> > -     list_add(&binding->list, &priv->bindings);
+>
+> Please leave this list_add() where it was.
+
+list_add() is moved to net_devmem_bind_dmabuf() by this patch.
+So, you mean that let's make net_devmem_{bind | unbind}_dmabuf()
+don't handle list themself like the v3 patch, right?
+There is no problem, I will change it!
+
+Thanks a lot!
+Taehee Yoo
+
+> --
+> pw-bot: cr
 
