@@ -1,50 +1,60 @@
-Return-Path: <netdev+bounces-190263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CED4AB5F11
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 00:10:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B30D7AB5F28
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 00:13:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DE0C4A621A
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 22:10:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4939D4A177A
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 22:13:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADE6420F091;
-	Tue, 13 May 2025 22:10:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F53B1FFC46;
+	Tue, 13 May 2025 22:13:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tuCUKZ25"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lf+RzKLD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A28C20F06A
-	for <netdev@vger.kernel.org>; Tue, 13 May 2025 22:09:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AFEC34545
+	for <netdev@vger.kernel.org>; Tue, 13 May 2025 22:13:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747174200; cv=none; b=M93hLuhkgnVSpOLwL6FhfC8x7jmneRNDEUddVHYKUQvyGZp2k22b3pKdcry2tfq+mu4zZv25jPQkryPPoRASc9Bw81Zd9zCRnIv+5uAMPpz7H1R1YF1EMn7Do1I0BIbuJjgkxe+8Vn+c/kemhbygi/SMpDfQB1p8RcqQhHOna/E=
+	t=1747174400; cv=none; b=X2FHm+i+TbtFUJBLhEzndDvbRMC1N0drb3fh1Mb13EL14ltUJSykOfGLQSo2wxTYwQiDL9X43KDtJTXcLX49AYERoUYI1YRtzR2K0wNRghDUZtPjSwH/J4Os2NDqcsg+bmv6OFQNmUl2FwKSuNJcSEoKy9YgesXBQRcGjiUK9Ow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747174200; c=relaxed/simple;
-	bh=+zXc/Lpo15L8S44TPkPzpssZH9VR+bMfjxrf8q5dtk4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=sEoCyzLf2ujEZzE4RkA0+g3fh96/8n723BwZXFzxUy700tBUOoCLq8hINmZQTa9EFIBRyY58MoS9uE2l8DoiTZG+g0xK1cKTqEfEu6uwTUIFP5NX4NSwQnUygOVCeI/cTPRoVcZfAG/1uAaihNQ+qXyoccPJND2RTo3Bd3YQNic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tuCUKZ25; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2361C4CEEF;
-	Tue, 13 May 2025 22:09:58 +0000 (UTC)
+	s=arc-20240116; t=1747174400; c=relaxed/simple;
+	bh=zkUdi8cBOb2Hqdu6CygDKRF28BY66m3h46ngRxrtgyM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sfRJxamgkj1u3+wHiEYZg/UKkSkF8f0xDnKyrn5y4nQJlYxE8PDCdyFwM86aefDf1XP3bTXGgOC/NjJdZ4eBbQP0ECzrG2m/SzX0ipKgxsS5EQf10IQHT+WXzFFYS8JvZPW7XcCw3p8u3BAWCByhML7mUfjAy1L6gQDNPWXoqqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lf+RzKLD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96A64C4CEE4;
+	Tue, 13 May 2025 22:13:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747174199;
-	bh=+zXc/Lpo15L8S44TPkPzpssZH9VR+bMfjxrf8q5dtk4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tuCUKZ25ug1La/gkLD8q5MtgttG6RsNiZGgqpNEBKqLBYdLW7V4FyKLGFD1v1aC24
-	 uj32V/IAXPyMfHJsQ0aWdsgh9+0MTyyllVYS1owobd2gqaloC8bBoGGFivlqPDzAO+
-	 OjcauY5lxpyR3ejl9TUEYErAFE+OWTovw0qznEqevpjl5lSmefgDDB0nZv4XxfS35u
-	 aFzBIo5V40QdO3mFUDs6XGGBTwpQt6STRd3vPJB9DxYdfNmX6ZRcegTbmeumnQyQyd
-	 fatLoVkc8hK6aohcyFcFVJEKlOLOETqL/9HzzLWrWhejtFdlLDO45NYHFmj/O3VVsE
-	 KwxG1YSAdH/ew==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF80380DBE8;
-	Tue, 13 May 2025 22:10:37 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1747174397;
+	bh=zkUdi8cBOb2Hqdu6CygDKRF28BY66m3h46ngRxrtgyM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=lf+RzKLDTt2iMyHteHFissFEBvjKp7Xjj063m0/bKlYvT58SZxqfwKAw1jl4RNFLk
+	 jr8VHeRYf+GrtJ05Aj9jzugOwu1AFPsz2muK/wlNOVmOJg7RQPo4S+OxDFbMRQBHL9
+	 cSFWaCAWLwx5COjyXQBo0JHeGhT15hnycSY/x2H9yLj/tLA+xl1uPaCiOSp+UGFERw
+	 JAXF0u9ovGGvwW0uQa1CnRKlk3DG4Mx1SF+3SLps1nZwgu1R2HhKJLyvQzv3n5OYmC
+	 5UmCYH3nVctpriywLNH9DzZj3wC/+vReerZH1x3vXHZieVEYK2Ad6NUSWKNPIeYSVX
+	 JtMP7E0Nl2OXw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	donald.hunter@gmail.com,
+	ast@fiberby.net,
+	xandfury@gmail.com
+Subject: [PATCH net] netlink: specs: tc: fix a couple of attribute names
+Date: Tue, 13 May 2025 15:13:16 -0700
+Message-ID: <20250513221316.841700-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,44 +62,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] tools: ynl-gen: Allow multi-attr without
- nested-attributes again
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174717423649.1805570.8916507708937786329.git-patchwork-notify@kernel.org>
-Date: Tue, 13 May 2025 22:10:36 +0000
-References: <d6b58684b7e5bfb628f7313e6893d0097904e1d1.1746940107.git.lukas@wunner.de>
-In-Reply-To: <d6b58684b7e5bfb628f7313e6893d0097904e1d1.1746940107.git.lukas@wunner.de>
-To: Lukas Wunner <lukas@wunner.de>
-Cc: kuba@kernel.org, donald.hunter@gmail.com, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- netdev@vger.kernel.org
 
-Hello:
+Fix up spelling of two attribute names. These are clearly typoes
+and will prevent C codegen from working. Let's treat this as
+a fix to get the correction into users' hands ASAP, and prevent
+anyone depending on the wrong names.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Fixes: a1bcfde83669 ("doc/netlink/specs: Add a spec for tc")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: donald.hunter@gmail.com
+CC: ast@fiberby.net
+CC: xandfury@gmail.com
+---
+ Documentation/netlink/specs/tc.yaml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On Sun, 11 May 2025 07:12:00 +0200 you wrote:
-> Since commit ce6cb8113c84 ("tools: ynl-gen: individually free previous
-> values on double set"), specifying the "multi-attr" property raises an
-> error unless the "nested-attributes" property is specified as well:
-> 
->   File "tools/net/ynl/./pyynl/ynl_gen_c.py", line 1147, in _load_nested_sets
->     child = self.pure_nested_structs.get(nested)
->                                          ^^^^^^
->   UnboundLocalError: cannot access local variable 'nested' where it is not associated with a value
-> 
-> [...]
-
-Here is the summary with links:
-  - [net] tools: ynl-gen: Allow multi-attr without nested-attributes again
-    https://git.kernel.org/netdev/net/c/396786af1cea
-
-You are awesome, thank you!
+diff --git a/Documentation/netlink/specs/tc.yaml b/Documentation/netlink/specs/tc.yaml
+index aacccea5dfe4..5e1ff04f51f2 100644
+--- a/Documentation/netlink/specs/tc.yaml
++++ b/Documentation/netlink/specs/tc.yaml
+@@ -2745,7 +2745,7 @@ protonum: 0
+         type: u16
+         byte-order: big-endian
+       -
+-        name: key-l2-tpv3-sid
++        name: key-l2tpv3-sid
+         type: u32
+         byte-order: big-endian
+       -
+@@ -3504,7 +3504,7 @@ protonum: 0
+         name: rate64
+         type: u64
+       -
+-        name: prate4
++        name: prate64
+         type: u64
+       -
+         name: burst
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.49.0
 
 
