@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-190186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AD89AB582D
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 17:13:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28BA6AB582F
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 17:14:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 341064650F7
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 15:13:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 607381B457BC
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 15:14:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A7C02BE10F;
-	Tue, 13 May 2025 15:13:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB7B92BE7C3;
+	Tue, 13 May 2025 15:13:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="0PTuw/Lp";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="yv8qNF4p"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="XW8QfH2g";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="nWGMOUcJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5B3F2BDC21;
-	Tue, 13 May 2025 15:13:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBDD92BE7A5;
+	Tue, 13 May 2025 15:13:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747149182; cv=none; b=NrtlKwWyZ9mwVtEuFUNnf6hz08s/eKU0EH3Mym2tmXzD8ThuxHdXSHTQ/iEZ70qoszdzR8V6NN8bO9XbxRk4Qial0u6CXrQYwSXZcluyS59NBB8IqA7udgOj4EBDSAHACIN5SRJ8tDGofC5eqTFZ1kJxqXgHJMMd3hy8FK5q7Eo=
+	t=1747149184; cv=none; b=T9AL2n/b1ALvNj8y0vpJvaV7luvTKxmHJDA0zWHZJ9imFLVzIKDv0upVFrFQW0Ncq7ZpRBdml83zm0FwFGhGGPfWgxtszezS59O45D+4xjd2qqU6M5sw7ek1a5MOD+KhaMBSTubuVTIcw2DtaNbf1+Cy78ueUGSnJeujK/0Fy8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747149182; c=relaxed/simple;
-	bh=wlpwNyknMfR1RoDXQOsQOLe9nGuz+tJKa17ta22S/mA=;
+	s=arc-20240116; t=1747149184; c=relaxed/simple;
+	bh=Lk+Ge/n0L9b7paxIP1W1xbsV3HcqlVTBNKwQhmg6QUw=;
 	h=Message-ID:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Date; b=C6iwNG3+9uSNHqnV6QZYUw6ns4H0eXzjWmOAcV1ZkMUtRdAs7v1lxwdPgRZvQTVR5SjPL/Aem1Qqi0eSSNq7QuJY3AV2q3zZmBzvFiAGaZ2D/QgXeLpb6R16sTwqeUgPxRoE0+jKlv0GTQnX7SmmNa6xoJv85l2rtdvyvPDLjd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=0PTuw/Lp; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=yv8qNF4p; arc=none smtp.client-ip=193.142.43.55
+	 Content-Type:Date; b=OqQ8SHNCj6vapgr9x+JaqD7VbQxnbhWAhXozACRPelVVfsWBREKXimZYo9eF1WwCWE+ODcLpIefCZUlwcOLEpWJDKMMI+b/JtOfSg8YFPsNsEQ1gykn2ikrnXmdOHlJsWaTyZeUZwFmIpmx4T2Yr8oWOiM6LHpPiBgwE1iz5B2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=XW8QfH2g; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=nWGMOUcJ; arc=none smtp.client-ip=193.142.43.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Message-ID: <20250513145136.789188877@linutronix.de>
+Message-ID: <20250513145136.848612979@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1747149179;
+	s=2020; t=1747149181;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 references:references; bh=PLK3LOofu2itK9FE/VIdqa3Xxrw13vea1Zi9cuZZRM0=;
-	b=0PTuw/Lp3X4Op/SjEz/31xA7jO0ZZnLGQzp9AsG0QUOfbxE8m44p9j1sKBJvi0TpiUqFbW
-	BCBapiFNf0Hf60Smuf6MXEmr2NvCq189syMstHx1R8afPyvtriY+wXa0wtG+OyzNQcW2HF
-	iXSuhckWF3JzRQ/iTOuwRX9+0IWf403v11hXQ93TM6BHS2Xb9j2jifP2tmx6mg0ct3m+r0
-	h/VMGcJTCscd7Hw6vYNFxUcTE4ywcsHkwAie7up22LrdNhawNRJfnDIIjJNKMgyEO6pnt7
-	2gbe2wLBPEeOz1cK5FteKo+0yN1mp23viS4n1fg6X8bVXRWnCpA7OmDchlnrCA==
+	 references:references; bh=psJzr+vgRpQMoFewg475KsVH7KC/S/u7MOLDzDXbvoE=;
+	b=XW8QfH2gwzL+/PWPxGP6YGJvHIUSBiHFeMImR+ZhU8jB30nEoaG8v+1nyDF3wUOKlv7IGG
+	j98DfjawdUcgyE3AYS3/zllQCwUHcmyIpAUO+DK0PP15OALTZs02JV6OKD4jsaKtcL+ETI
+	fvcnVqKnd7OroGL2c7wxVHGno0osudKBdSlHO/RmUQfOCVnwJXZ70fjGzgYILLHOJnBVEg
+	BvZcznr/2JiiRz1tPCpxmR27pjkHKiZdozRy4THaiYsbjPgndEfM+Kc/MIZ8dNghZ6PoMa
+	oXloxgfpEPIgPTA1DPDE6YxoS82uvbCoX4JMD9ivaqzKJWpSMtICL0PmYqlQqA==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1747149179;
+	s=2020e; t=1747149181;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 references:references; bh=PLK3LOofu2itK9FE/VIdqa3Xxrw13vea1Zi9cuZZRM0=;
-	b=yv8qNF4pQFWbgKJeOVR5qe1q8cwIBsUHw10zzloRFjAIehDLAp1IShRMnRJ2kanIhMAdly
-	p6Fcfgl7zrYYy+DA==
+	 references:references; bh=psJzr+vgRpQMoFewg475KsVH7KC/S/u7MOLDzDXbvoE=;
+	b=nWGMOUcJOhW+UwLd/BlsS8wxlYOrsNVsCKLV/UETSZDAxbHsK4Fe7BmBypgOeeEwu+wyKL
+	VbJC90ABaLK9jBDw==
 From: Thomas Gleixner <tglx@linutronix.de>
 To: LKML <linux-kernel@vger.kernel.org>
 Cc: netdev@vger.kernel.org,
@@ -67,8 +67,7 @@ Cc: netdev@vger.kernel.org,
  Kurt Kanzenbach <kurt@linutronix.de>,
  Nam Cao <namcao@linutronix.de>,
  Alex Gieringer <gieri@linutronix.de>
-Subject: [patch 02/26] timekeeping: Cleanup kernel doc of
- __ktime_get_real_seconds()
+Subject: [patch 03/26] timekeeping: Avoid double notification in do_adjtimex()
 References: <20250513144615.252881431@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -77,32 +76,193 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Date: Tue, 13 May 2025 17:12:58 +0200 (CEST)
+Date: Tue, 13 May 2025 17:13:00 +0200 (CEST)
+
+Consolidate do_adjtimex() so that it does not notify about clock changes
+twice.
 
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
----
- kernel/time/timekeeping.c |   11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
 
+---
+ kernel/time/timekeeping.c |   98 ++++++++++++++++++++++++++--------------------
+ 1 file changed, 56 insertions(+), 42 deletions(-)
+---
 --- a/kernel/time/timekeeping.c
 +++ b/kernel/time/timekeeping.c
-@@ -975,9 +975,14 @@ time64_t ktime_get_real_seconds(void)
- EXPORT_SYMBOL_GPL(ktime_get_real_seconds);
+@@ -1413,40 +1413,49 @@ int do_settimeofday64(const struct times
+ EXPORT_SYMBOL(do_settimeofday64);
  
  /**
-- * __ktime_get_real_seconds - The same as ktime_get_real_seconds
-- * but without the sequence counter protect. This internal function
-- * is called just when timekeeping lock is already held.
-+ * __ktime_get_real_seconds - Unprotected access to CLOCK_REALTIME seconds
-+ *
-+ * The same as ktime_get_real_seconds() but without the sequence counter
-+ * protection. This function is used in restricted contexts like the x86 MCE
-+ * handler and in KGDB. It's unprotected on 32-bit vs. concurrent half
-+ * completed modification and only to be used for such critical contexts.
-+ *
-+ * Returns: Racy snapshot of the CLOCK_REALTIME seconds value
+- * timekeeping_inject_offset - Adds or subtracts from the current time.
++ * __timekeeping_inject_offset - Adds or subtracts from the current time.
+  * @ts:		Pointer to the timespec variable containing the offset
+  *
+  * Adds or subtracts an offset value from the current time.
   */
- noinstr time64_t __ktime_get_real_seconds(void)
+-static int timekeeping_inject_offset(const struct timespec64 *ts)
++static int __timekeeping_inject_offset(const struct timespec64 *ts)
  {
++	struct timekeeper *tks = &tk_core.shadow_timekeeper;
++	struct timespec64 tmp;
++
+ 	if (ts->tv_nsec < 0 || ts->tv_nsec >= NSEC_PER_SEC)
+ 		return -EINVAL;
+ 
+-	scoped_guard (raw_spinlock_irqsave, &tk_core.lock) {
+-		struct timekeeper *tks = &tk_core.shadow_timekeeper;
+-		struct timespec64 tmp;
+-
+-		timekeeping_forward_now(tks);
+ 
+-		/* Make sure the proposed value is valid */
+-		tmp = timespec64_add(tk_xtime(tks), *ts);
+-		if (timespec64_compare(&tks->wall_to_monotonic, ts) > 0 ||
+-		    !timespec64_valid_settod(&tmp)) {
+-			timekeeping_restore_shadow(&tk_core);
+-			return -EINVAL;
+-		}
++	timekeeping_forward_now(tks);
+ 
+-		tk_xtime_add(tks, ts);
+-		tk_set_wall_to_mono(tks, timespec64_sub(tks->wall_to_monotonic, *ts));
+-		timekeeping_update_from_shadow(&tk_core, TK_UPDATE_ALL);
++	/* Make sure the proposed value is valid */
++	tmp = timespec64_add(tk_xtime(tks), *ts);
++	if (timespec64_compare(&tks->wall_to_monotonic, ts) > 0 ||
++	    !timespec64_valid_settod(&tmp)) {
++		timekeeping_restore_shadow(&tk_core);
++		return -EINVAL;
+ 	}
+ 
+-	/* Signal hrtimers about time change */
+-	clock_was_set(CLOCK_SET_WALL);
++	tk_xtime_add(tks, ts);
++	tk_set_wall_to_mono(tks, timespec64_sub(tks->wall_to_monotonic, *ts));
++	timekeeping_update_from_shadow(&tk_core, TK_UPDATE_ALL);
+ 	return 0;
+ }
+ 
++static int timekeeping_inject_offset(const struct timespec64 *ts)
++{
++	int ret;
++
++	scoped_guard (raw_spinlock_irqsave, &tk_core.lock)
++		ret = __timekeeping_inject_offset(ts);
++
++	/* Signal hrtimers about time change */
++	if (!ret)
++		clock_was_set(CLOCK_SET_WALL);
++	return ret;
++}
++
+ /*
+  * Indicates if there is an offset between the system clock and the hardware
+  * clock/persistent clock/rtc.
+@@ -2181,7 +2190,7 @@ static u64 logarithmic_accumulation(stru
+  * timekeeping_advance - Updates the timekeeper to the current time and
+  * current NTP tick length
+  */
+-static bool timekeeping_advance(enum timekeeping_adv_mode mode)
++static bool __timekeeping_advance(enum timekeeping_adv_mode mode)
+ {
+ 	struct timekeeper *tk = &tk_core.shadow_timekeeper;
+ 	struct timekeeper *real_tk = &tk_core.timekeeper;
+@@ -2189,8 +2198,6 @@ static bool timekeeping_advance(enum tim
+ 	int shift = 0, maxshift;
+ 	u64 offset, orig_offset;
+ 
+-	guard(raw_spinlock_irqsave)(&tk_core.lock);
+-
+ 	/* Make sure we're fully resumed: */
+ 	if (unlikely(timekeeping_suspended))
+ 		return false;
+@@ -2244,6 +2251,12 @@ static bool timekeeping_advance(enum tim
+ 	return !!clock_set;
+ }
+ 
++static bool timekeeping_advance(enum timekeeping_adv_mode mode)
++{
++	guard(raw_spinlock_irqsave)(&tk_core.lock);
++	return __timekeeping_advance(mode);
++}
++
+ /**
+  * update_wall_time - Uses the current clocksource to increment the wall time
+  *
+@@ -2532,10 +2545,10 @@ EXPORT_SYMBOL_GPL(random_get_entropy_fal
+  */
+ int do_adjtimex(struct __kernel_timex *txc)
+ {
++	struct timespec64 delta, ts;
+ 	struct audit_ntp_data ad;
+ 	bool offset_set = false;
+ 	bool clock_set = false;
+-	struct timespec64 ts;
+ 	int ret;
+ 
+ 	/* Validate the data before disabling interrupts */
+@@ -2544,21 +2557,6 @@ int do_adjtimex(struct __kernel_timex *t
+ 		return ret;
+ 	add_device_randomness(txc, sizeof(*txc));
+ 
+-	if (txc->modes & ADJ_SETOFFSET) {
+-		struct timespec64 delta;
+-
+-		delta.tv_sec  = txc->time.tv_sec;
+-		delta.tv_nsec = txc->time.tv_usec;
+-		if (!(txc->modes & ADJ_NANO))
+-			delta.tv_nsec *= 1000;
+-		ret = timekeeping_inject_offset(&delta);
+-		if (ret)
+-			return ret;
+-
+-		offset_set = delta.tv_sec != 0;
+-		audit_tk_injoffset(delta);
+-	}
+-
+ 	audit_ntp_init(&ad);
+ 
+ 	ktime_get_real_ts64(&ts);
+@@ -2568,6 +2566,19 @@ int do_adjtimex(struct __kernel_timex *t
+ 		struct timekeeper *tks = &tk_core.shadow_timekeeper;
+ 		s32 orig_tai, tai;
+ 
++		if (txc->modes & ADJ_SETOFFSET) {
++			delta.tv_sec  = txc->time.tv_sec;
++			delta.tv_nsec = txc->time.tv_usec;
++			if (!(txc->modes & ADJ_NANO))
++				delta.tv_nsec *= 1000;
++			ret = __timekeeping_inject_offset(&delta);
++			if (ret)
++				return ret;
++
++			offset_set = delta.tv_sec != 0;
++			clock_set = true;
++		}
++
+ 		orig_tai = tai = tks->tai_offset;
+ 		ret = __do_adjtimex(txc, &ts, &tai, &ad);
+ 
+@@ -2578,13 +2589,16 @@ int do_adjtimex(struct __kernel_timex *t
+ 		} else {
+ 			tk_update_leap_state_all(&tk_core);
+ 		}
++
++		/* Update the multiplier immediately if frequency was set directly */
++		if (txc->modes & (ADJ_FREQUENCY | ADJ_TICK))
++			clock_set |= __timekeeping_advance(TK_ADV_FREQ);
+ 	}
+ 
+-	audit_ntp_log(&ad);
++	if (txc->modes & ADJ_SETOFFSET)
++		audit_tk_injoffset(delta);
+ 
+-	/* Update the multiplier immediately if frequency was set directly */
+-	if (txc->modes & (ADJ_FREQUENCY | ADJ_TICK))
+-		clock_set |= timekeeping_advance(TK_ADV_FREQ);
++	audit_ntp_log(&ad);
+ 
+ 	if (clock_set)
+ 		clock_was_set(CLOCK_SET_WALL);
 
 
