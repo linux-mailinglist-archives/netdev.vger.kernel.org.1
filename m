@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-189957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BD02AB4971
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 04:20:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DB1D1AB4972
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 04:20:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C30207AB926
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 02:19:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 279497AC3FD
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 02:19:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF10C1CACF3;
-	Tue, 13 May 2025 02:20:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0DEF1D5AB5;
+	Tue, 13 May 2025 02:20:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n/E0JMbg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IH8tzJxS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97AEC1C863B;
-	Tue, 13 May 2025 02:20:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C7F01D47B4
+	for <netdev@vger.kernel.org>; Tue, 13 May 2025 02:20:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747102801; cv=none; b=V8ZAgy4Pt+T9YqbWpoQmpTEMWE/OfDR5V+09bi81It5KElTuRTjaFVk5jcYGUsjoQKpcNl3m8PHvPBsg5+d81uciOZ2YkzZuuS5gPt/T0tnKT4hRIp7wZuhRA1EW0oh/8FFXZ+ExbyyP+Y9LAgvHWMp3mvFwJlUXBLeUmONKBho=
+	t=1747102802; cv=none; b=tsrqH8LSf7nEzxUrV0pk9C1HydVDDAYPPa1C+/rVdFXuAHP31Y8qa9I6+9kALFob5IkXNmUTaozqlXBi7O5qrp6TaQ08dfTJIOeDVDNpVOkKbW/RJOk4kL5v2dj0poaImqL9f/n4QYsl+Md2KOkUzYQ9Y+gjiLKELqjsSzRvJWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747102801; c=relaxed/simple;
-	bh=+/oP96T3QzIVp14zaVJlHh7PytdvvCWbZgiz8EI3DNw=;
+	s=arc-20240116; t=1747102802; c=relaxed/simple;
+	bh=R8DIEhmTbYX12d1Wcc09DToJujnFf2eD+zE9ky8I7AQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hB+S5pcr+CkCDjp+ArcwzLHMKAa9x8Z2TCojLcT02eLFhUVbyL3o8fAXkaEVCxrSJfz1SinlkN3Nt7KG1p0gfNhnIbcEhEJk31zY11dW7FX3RNa9vHQwlFPhhzPhEw3iJXePhujtfOSHuVNZqcHxpvujBq39rBlp2d3NSY/WOac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n/E0JMbg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F9DBC4CEEE;
-	Tue, 13 May 2025 02:20:01 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=tLSdFdW7c2TyLnz+vwIuu+6AOCKuxI7NSSMZWj1uIW15/uuV/6hzSBqvP53nmx2MWqAhcUI/xu54Atwjups4GDOvr2Y0kJfi63twr8MCLpTGASgvYC6sHCS+5e1LG1fCUFuPDSum6Tct4MwpX3cKTaykf1dOpp6ppfsKBhV9TWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IH8tzJxS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50A52C4CEE7;
+	Tue, 13 May 2025 02:20:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747102801;
-	bh=+/oP96T3QzIVp14zaVJlHh7PytdvvCWbZgiz8EI3DNw=;
+	s=k20201202; t=1747102802;
+	bh=R8DIEhmTbYX12d1Wcc09DToJujnFf2eD+zE9ky8I7AQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=n/E0JMbgRZycx4K50bO4uwblo64MNwMaRYPj0f74YNJNDRS6J/qDGyX6SXi+sph58
-	 jJNClPlMPwx8xjAkYEEViwnXz+rW81EzCDPH5YAbrc8e4uLmdPqMbc6c6kFyFZypmb
-	 s/IzSj4NpaVpNN7c4AmE2PTsUIrjHRWOqqxoNAOvUDkKC9cRJRqv3VqJPHyE1HRDEe
-	 eemavpzVByYSoshV3nlE0ycbTiM+IRBZI45IHfoSaOXjro56mi0AAd1dKm3Xej0FKA
-	 lvjlRlvrCw/JMhvnHcHgeBt/t+qyZ906KyNWilvuvi5tc89BLmSURe1T5Gj5TnvPwN
-	 N3nfzrswI/u4Q==
+	b=IH8tzJxS2gKimqPc+pgknpkFRqgNA9kxAEdhmOAPVrgvJ5RP3SQKtvamCnP+WY0lb
+	 I9WPv/NOQW9fJch5iVlbvZOLPTjXjhKXwE805zgBW6qfgvxVmUqT7B8AHWa78w8APE
+	 KH6NTU+JokyS1uMdLzBX3JEmSY961cEIpGnMbQE9xcadEJrZ/przk/K7Wh6/jx/Anx
+	 1OQZqdwom7/ZMv2G4jT0hkcHcWIgNMa+mSFA2Bn/aEq3o8D6WUHhqGJHH639HP5tA9
+	 3FwWXiKm05Ouq59xWQuBKCd450xrjKrBXOQvOZIYGRX1Gfty0IbboVScbPZ2/Dimei
+	 o31YM0Q1tI+Kw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD4D39D6541;
-	Tue, 13 May 2025 02:20:39 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 339D239D6541;
+	Tue, 13 May 2025 02:20:41 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,48 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next,rdma-next v2 1/5] iidc/ice/irdma: Rename IDC header
- file
+Subject: Re: [PATCH net-next] netlink: fix policy dump for int with validation
+ callback
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174710283849.1148099.11671684905830521702.git-patchwork-notify@kernel.org>
-Date: Tue, 13 May 2025 02:20:38 +0000
-References: <20250509200712.2911060-2-anthony.l.nguyen@intel.com>
-In-Reply-To: <20250509200712.2911060-2-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, jgg@ziepe.ca, leon@kernel.org,
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org, david.m.ertman@intel.com,
- tatyana.e.nikolova@intel.com, przemyslaw.kitszel@intel.com
+ <174710283999.1148099.10818198571300547942.git-patchwork-notify@kernel.org>
+Date: Tue, 13 May 2025 02:20:39 +0000
+References: <20250509212751.1905149-1-kuba@kernel.org>
+In-Reply-To: <20250509212751.1905149-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ syzbot+01eb26848144516e7f0a@syzkaller.appspotmail.com, jiri@resnulli.us,
+ saeedm@nvidia.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri,  9 May 2025 13:07:07 -0700 you wrote:
-> From: Dave Ertman <david.m.ertman@intel.com>
+On Fri,  9 May 2025 14:27:51 -0700 you wrote:
+> Recent devlink change added validation of an integer value
+> via NLA_POLICY_VALIDATE_FN, for sparse enums. Handle this
+> in policy dump. We can't extract any info out of the callback,
+> so report only the type.
 > 
-> To prepare for the IDC upgrade to support different CORE
-> PCI drivers, rename header file from iidc.h to iidc_rdma.h
-> since this files functionality is specifically for RDMA support.
-> 
-> Use net/dscp.h include in irdma osdep.h and DSCP_MAX type.h,
-> instead of iidc header and define.
+> Fixes: 429ac6211494 ("devlink: define enum for attr types of dynamic attributes")
+> Reported-by: syzbot+01eb26848144516e7f0a@syzkaller.appspotmail.com
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,rdma-next,v2,1/5] iidc/ice/irdma: Rename IDC header file
-    https://git.kernel.org/netdev/net-next/c/468d8b462ac6
-  - [net-next,rdma-next,v2,2/5] iidc/ice/irdma: Rename to iidc_* convention
-    https://git.kernel.org/netdev/net-next/c/97b5631aae68
-  - [net-next,rdma-next,v2,3/5] iidc/ice/irdma: Break iidc.h into two headers
-    https://git.kernel.org/netdev/net-next/c/d9251a560ba6
-  - [net-next,rdma-next,v2,4/5] ice: Replace ice specific DSCP mapping num with a kernel define
-    https://git.kernel.org/netdev/net-next/c/8239b771b94b
-  - [net-next,rdma-next,v2,5/5] iidc/ice/irdma: Update IDC to support multiple consumers
-    https://git.kernel.org/netdev/net-next/c/c24a65b6a27c
+  - [net-next] netlink: fix policy dump for int with validation callback
+    https://git.kernel.org/netdev/net-next/c/a96876057b9e
 
 You are awesome, thank you!
 -- 
