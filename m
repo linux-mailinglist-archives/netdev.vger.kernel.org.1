@@ -1,148 +1,125 @@
-Return-Path: <netdev+bounces-190172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A93EAB568D
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 15:55:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC9E1AB56A5
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 16:00:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37E7A4A2003
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 13:55:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0370B3A7874
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 14:00:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED67E2BCF6D;
-	Tue, 13 May 2025 13:55:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEA631DF277;
+	Tue, 13 May 2025 14:00:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J27i8swJ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="OkIM9Vko"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 199772BCF5A
-	for <netdev@vger.kernel.org>; Tue, 13 May 2025 13:55:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 084D745BE3;
+	Tue, 13 May 2025 14:00:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747144524; cv=none; b=Xg11ma9xuW+8ge/tDT8rMdLBopIwKnA8Jdh3qdQBfW4Ae9w3csMQ0PfAtJsvEb7zOIlxLywSNzV2Ow9MOne6bqrs621cM+05eG6fZoMkshRtOsLSMovcF0wzFn3+4PNRocdIXzT2/YzPwb/USeWf8yW/M7qs9buqWs9VrNuVEY0=
+	t=1747144839; cv=none; b=QWGQPJ2ky7CzgTgv9t2FP7H7LP5QOHZki72rAy9DO3QwEl1gOiynDJOCz+xhfJQ43G0K4EMzYFF/yvadzH/N/HvjKYIqNKrI6ZhiwUArOQ46ZsFZotS9U44WUF53K2LYraAEucthYjBEznsAkVc/qOi4y8I38n8CGruuG8VOzG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747144524; c=relaxed/simple;
-	bh=k8MO0qQYf2yjnXq8zGlgq6trmVTpsGIo34uVN9tvwMI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JZ9vc8FtVsU/+Q0XGQrHKl49+vsMOgcA6cdOYjDlzrUiqxIDwBtGTLQVP1HNpisWpjySc3pWT/m3EbtYHf5Xds1gC6VCN9diuL3ZGwdmOCW3vHUHt+Inwa8dxRwNXRv4DUt8OJnjkty080njP6wCu4lIVi6vu2Xxy/ZpwXYXbOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J27i8swJ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747144522;
+	s=arc-20240116; t=1747144839; c=relaxed/simple;
+	bh=2V3RJMoSdH5GN6pzpuraWftQOkguKespuzVKhIClrls=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pzejwLTtW/MWeasoODTOpBrzESwTZDKyogXbRLoQGn6qUz8cNFUhxW/4kaGLka0YtiN3/SOYEl21p0qY7yjD0iuVOYSfviY1OD1SdeIMk4pbmiPezAX8oJuZVDgMLLKE3Yn45xvlSYal1mhH63liz6jDX8turRgUUddQAGUsP3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=OkIM9Vko; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id EA5FF1FCEB;
+	Tue, 13 May 2025 14:00:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1747144829;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=2mDXk/1z60Kt8lR+wZMc16OkBv5Hh1LoZwzwZnjv5+0=;
-	b=J27i8swJ8QBbww//idTa1K/UB7SCT3GuYWXw1c4opSVvCUZwpsuZYdHCy7wmGC2budh0Cd
-	QZ8D94ShcHORgi73xHroujS7mMLr9hNDvkPs8FvIYPnVA+26VtTVyWYkzJoqKbyuumF8Gh
-	gLlByZF02YqG+ZHAbt3//wmA7R9+WoQ=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-367-lYI1RALPMo-qZ8k_Jgb3yA-1; Tue, 13 May 2025 09:55:19 -0400
-X-MC-Unique: lYI1RALPMo-qZ8k_Jgb3yA-1
-X-Mimecast-MFC-AGG-ID: lYI1RALPMo-qZ8k_Jgb3yA_1747144517
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a1f9ddf04bso2427579f8f.3
-        for <netdev@vger.kernel.org>; Tue, 13 May 2025 06:55:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747144517; x=1747749317;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2mDXk/1z60Kt8lR+wZMc16OkBv5Hh1LoZwzwZnjv5+0=;
-        b=wJjGR9fqxnmbnMxceha/eGAZD9L4jfwNSf7KDIdWpGKQt4rhZEQprqgZAdD601o5eV
-         vgFaMJ9P8qQhWHAXASGT+9+k1tkF+I231PkNTk1in+0ENQJN8Z7T33AowPVbq9AsBL34
-         bwOa0i44qkAEB3xKfGgDMrsAnunSTisshyhefW4XNpcoNdzLnMwqpQOVVPam0Q7H1wXW
-         Z3HWzsIR1yRIorfc3dIjniGwd3tluYnQlIlF8qxAZuXDHa7bwR284gurntzPacCg84Fa
-         w1PrPsenrB9RkT4avMGBnHq69krkYF1VTtx6NyxcAvGUAZMX3PKkA6jI3HZ2z5hWiSyS
-         XjQA==
-X-Forwarded-Encrypted: i=1; AJvYcCXTj1/uitN5gBCSSH7y72pvMsqSTSBV74xzOmd4Ybu1ireHiZ29J0qwHqgaon3WOnjJm+7yr8I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrA145ofOtug9FADuGL0qC3nx410eVItcN/HLw6Es6FSsa323r
-	dNHriqyzZvfErrvcwZKHH2Bh915Ozk29JxJMLFdxNWq0vT7T4DiT5Aq8/Apj3bHlbFi42d+zQSU
-	vhfk/0Jjkx7IgQ7To13Z/onXSqOO7S+pm/kLmNdoIq3lj/n8tcik4EQ==
-X-Gm-Gg: ASbGnct4s1yu1G11vaoXQwyDFpsnAFro+sU8CHFj1+5RPXN9GLAYw8A9y6dyDJsWzIc
-	vKDrjD3BgbD3Db3ZmJmP2+JEPm+TUepb6U+NoR6W8Dviwh1Qp+A0mHFCHeRub8aJ7SV2+t1wO+I
-	7Uziyhm3zR6/hv36WmbQIyVkmyYFxCj2oV7Zs0HMPoIildldZBuHsiBCftjJ9kIj2vmg1n05Tlb
-	k72jF5JeI9Y1UL0ZiAflwPNY6u7cYITMXpQZjBv71K0GlzZXmSkH6aROw0HrLWLIhubtZ2lJ3gt
-	7i7zbgIPLOdvysvY3VM=
-X-Received: by 2002:a5d:598e:0:b0:39c:2688:612b with SMTP id ffacd0b85a97d-3a1f64277femr15324303f8f.7.1747144517287;
-        Tue, 13 May 2025 06:55:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH/3P787hez5DUCbzjfJPJODBbn5DQDvgAda7uo/wL13u5mlBuNcHOROPQYLGn7Nvk65To4cg==
-X-Received: by 2002:a5d:598e:0:b0:39c:2688:612b with SMTP id ffacd0b85a97d-3a1f64277femr15324275f8f.7.1747144516860;
-        Tue, 13 May 2025 06:55:16 -0700 (PDT)
-Received: from ?IPV6:2a0d:3341:cc59:6510::f39? ([2a0d:3341:cc59:6510::f39])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a1f57dde0esm16586527f8f.18.2025.05.13.06.55.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 May 2025 06:55:16 -0700 (PDT)
-Message-ID: <39e06f51-621a-4d17-a4dd-17287e260e18@redhat.com>
-Date: Tue, 13 May 2025 15:55:14 +0200
+	bh=LOCvs6S0yB1k4/Je2C7sy7pn1hJL4NhQpJPWsxB0p0s=;
+	b=OkIM9VkoWq05ApH3uJJ9wnlsWXx+ZJyx43JU/8tkdn4ITLtXlec4X0PbuOnOzVw+dDRCDM
+	JaMsu4mBipS7YaOCpJOfRFtKd5Koi16gx2B2wwGL/D0jnhPYSMrf/mIZrv8wQLhlpsWlwX
+	j0Gq07O7OKeKONpvDIWR5JbXrVvOLpkgNg9synD7W5if226RZQ5xfQXZ2/kqW/iq/S5AW+
+	v84s0t47wCgugU/S+eVdAGw2KQibsaLKiLMGhSL6nVJDoWvXB5jTt4LlHAPwozZDs/MwPC
+	QBgxdywjSeHZfLJbL3qRhs353JxQ+jVgIthgxtLa1zuylKN68Pl1Zy2mxzaSGg==
+Date: Tue, 13 May 2025 16:00:15 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ linux-arm-kernel@lists.infradead.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, Marek
+ =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Oleksij Rempel
+ <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
+ <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
+ mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>,
+ devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Romain
+ Gantois <romain.gantois@bootlin.com>, Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Subject: Re: [PATCH net-next v6 04/14] net: phy: dp83822: Add support for
+ phy_port representation
+Message-ID: <20250513155957.700c1a05@kmaincent-XPS-13-7390>
+In-Reply-To: <20250507135331.76021-5-maxime.chevallier@bootlin.com>
+References: <20250507135331.76021-1-maxime.chevallier@bootlin.com>
+	<20250507135331.76021-5-maxime.chevallier@bootlin.com>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 net-next 04/15] tcp: AccECN core
-To: chia-yu.chang@nokia-bell-labs.com, horms@kernel.org, dsahern@kernel.org,
- kuniyu@amazon.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
- dave.taht@gmail.com, jhs@mojatatu.com, kuba@kernel.org,
- stephen@networkplumber.org, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- davem@davemloft.net, edumazet@google.com, andrew+netdev@lunn.ch,
- donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
- shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
- ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
- g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
- mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
- Jason_Livingood@comcast.com, vidhi_goel@apple.com
-Cc: Olivier Tilmans <olivier.tilmans@nokia.com>
-References: <20250509211820.36880-1-chia-yu.chang@nokia-bell-labs.com>
- <20250509211820.36880-5-chia-yu.chang@nokia-bell-labs.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250509211820.36880-5-chia-yu.chang@nokia-bell-labs.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeftdegvdelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgfdutdefvedtudegvefgvedtgfdvhfdtueeltefffefffffhgfetkedvfeduieeinecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppedvrgdtudemtggsudgrmeeiudemjehfkegtmegurgehjeemfeehsggsmegttdejudemiegsvdgsnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgdurgemiedumeejfhektgemuggrheejmeefhegssgemtgdtjedumeeisgdvsgdphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepfedupdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpt
+ hhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqrghrmhdqmhhsmhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehthhhomhgrshdrphgvthgriiiiohhnihessghoohhtlhhinhdrtghomhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On 5/9/25 11:18 PM, chia-yu.chang@nokia-bell-labs.com wrote:
-> @@ -5098,7 +5100,8 @@ static void __init tcp_struct_check(void)
->  	/* 32bit arches with 8byte alignment on u64 fields might need padding
->  	 * before tcp_clock_cache.
->  	 */
-> -	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_txrx, 92 + 4);
-> +	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_txrx, 96 + 4);
+On Wed,  7 May 2025 15:53:20 +0200
+Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
 
-This looks inconsistent with the pahole output in the commit message
-(the groups looks 95 bytes wide, comprising the holes)
+> With the phy_port representation intrduced, we can use .attach_port to
+> populate the port information based on either the straps or the
+> ti,fiber-mode property. This allows simplifying the probe function and
+> allow users to override the strapping configuration.
+>=20
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> ---
 
-[...]
-> @@ -382,11 +393,17 @@ static void tcp_ecn_send(struct sock *sk, struct sk_buff *skb,
->  {
->  	struct tcp_sock *tp = tcp_sk(sk);
->  
-> -	if (tcp_ecn_mode_rfc3168(tp)) {
-> +	if (!tcp_ecn_mode_any(tp))
-> +		return;
+...
+ =20
+> +static int dp83822_attach_port(struct phy_device *phydev, struct phy_port
+> *port) +{
+> +	struct dp83822_private *dp83822 =3D phydev->priv;
+> +	int ret;
 > +
-> +	INET_ECN_xmit(sk);
-> +	if (tcp_ecn_mode_accecn(tp)) {
-> +		tcp_accecn_set_ace(th, tp);
-> +		skb_shinfo(skb)->gso_type |= SKB_GSO_TCP_ACCECN;
+> +	if (port->mediums) {
+> +		if (phy_port_is_fiber(port))
+> +			dp83822->fx_enabled =3D true;
 > +	} else {
->  		/* Not-retransmitted data segment: set ECT and inject CWR. */
->  		if (skb->len != tcp_header_len &&
->  		    !before(TCP_SKB_CB(skb)->seq, tp->snd_nxt)) {
-> -			INET_ECN_xmit(sk);
+> +		ret =3D dp83822_read_straps(phydev);
+> +		if (ret)
+> +			return ret;
+> +
+> +#ifdef CONFIG_OF_MDIO
 
-The above chunk apparently changes the current behaviour for
-!tcp_ecn_mode_accecn(), unconditionally setting ECN, while before ECN
-was set only for non retrans segments.
+if IS_ENABLED(CONFIG_OF_MDIO) seems to be more used than ifdef
 
-/P
-
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
