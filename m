@@ -1,78 +1,79 @@
-Return-Path: <netdev+bounces-190150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D794DAB5518
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 14:43:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09F98AB552C
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 14:49:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 815FB19E6DF3
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 12:43:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A5ED27AF5E6
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 12:47:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1237228DF05;
-	Tue, 13 May 2025 12:43:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDCA7286439;
+	Tue, 13 May 2025 12:48:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="AR0CBqAQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HU9V43Ii"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBADB22318
-	for <netdev@vger.kernel.org>; Tue, 13 May 2025 12:43:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 224ED1D52B;
+	Tue, 13 May 2025 12:48:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747140192; cv=none; b=W2oijAwh7ms7+g2m/ZSuEHKvtaEk/PFp9jqDXukpglCEIDs/jSNLaGzUQLkGdEyZ7D4l5ZA6hYAY+zcl9pJ4Sq1UKjgkusIB2XchKu3oo+yh5ggF+i9WVWonHnEVlypKojNdfTieIDCZmNrUcKtqTWsdmbqQ/J5Hc93w4EK7jLI=
+	t=1747140531; cv=none; b=tVo/jeaKXWJwDo7dH4AyMiqWfzc8zH9xdX3ObjCBSAI0RHRXLzVHOdtuCHyIdkJMFohJtIii52OYzcpyCFYyHdRiT+cvg2DGSyAmJpHFbw5NzTGN3ZznKxWEwJRMusLc9+eFgHzzawko1ZkHfQxuta6pbdcUKOzlxwfiItoxa5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747140192; c=relaxed/simple;
-	bh=58B0X4sQJeMTZJQOhg7jKyJRL0NMhLwiEK+nhYByqAM=;
+	s=arc-20240116; t=1747140531; c=relaxed/simple;
+	bh=IRMm+C+NtzCnQzW5ekgvU/LsZ5ZGYQm9QCLC9PLIH7U=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GuI2xP8kQMpOlv7mVeY1NHP+2mRvjHYkLVLq5lX+YgTnRpUvATPvYsV7aenRrXij3XwkSgkKgBNYlzZZRy1cJWKlGMcs4LtKzG9sWmfa7So/lzn1ym5xE3jtcgPaiTI6ZOO9nUzV6QmStz2iTH3K9UcQaEHr7iLTM4Tl4/3MQBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=AR0CBqAQ; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-43ce71582e9so40923395e9.1
-        for <netdev@vger.kernel.org>; Tue, 13 May 2025 05:43:08 -0700 (PDT)
+	 In-Reply-To:Content-Type; b=JtgY2nek0mPhiatCQJo+60EBXPXBr1uCSroiJnvYSXW5gESHXxhvYBtSLy/dPhgL0jLLpRWD9Rf63Z7MNJD+hyCorKgLF77NUim+UuHBFpxDabKe1ymRS6EKAsxK7sQKyrfWfvRtioqKHhwI68HOj5CMzJqKr6DMAjf3r0/sKgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HU9V43Ii; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-43cf680d351so38896135e9.0;
+        Tue, 13 May 2025 05:48:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1747140187; x=1747744987; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=m4sK+++DOZZp+Wy5wVTVgYEMmYTYuhm5DQACBZBP2bQ=;
-        b=AR0CBqAQ7toQg4Bj7QJA1O/k/iOTSEIGNkQ1MGTKs/JTyfjY8c2tJ6FUJ9EzoLNZO5
-         8AN29razkWf0ucmnu5SKXZyiPZ+lKu5c6Hmdz3UPUZ+LVsx6fedWJYxRNMtV042S/bb0
-         hEkDoBd+32wwzq7WBo+OXkKPv9Zg1C7b4kVng=
+        d=gmail.com; s=20230601; t=1747140528; x=1747745328; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=a5TgOXyLSPHdmxHWX/DD9xraZLG6iwcHdcK24HBFLhk=;
+        b=HU9V43IipaRy17NuU15l1HKOr9KH9cnIT8fmvYJAZ9W+8sjyNhVs42ZHa0zWT2k9ne
+         YTgR2e1DMaO0CHolLi5icBnv2cQW3jv8OuE2MGOQO2bHZtG08GFAqtyBZr6r6T6Gg7PO
+         B5wTTpD8jWdgF+hB+HmVB25EogTv/OnBo1Pfg3/AzjSpC0yo2rfGkTBnzKkbPF9vhQHO
+         dtVYu0Vf+hGCbU0wJbcv9oIQOUdA5uQFBRKyk0CVFiTPWwBI4f2/7lEG0MTXiw6T5KtS
+         stbSz5ZLdBN3S8fLcms+FegHflcgDhRmjIs7QrQy5axmoprCV2+glY1UcFgIkDbwrFjb
+         LIUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747140187; x=1747744987;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=m4sK+++DOZZp+Wy5wVTVgYEMmYTYuhm5DQACBZBP2bQ=;
-        b=TEI83ptcl5zaPieWlPEsEQk5W/FeVUy28k+Qj1fQpRVhfBbE3tgy3dyXwSFBbhw7Sj
-         txCVkkKx9KzIvyVpwBnDqWFqezEvM/B4NI2NawB50kV4e54tGMrzTf5YImvdom43mf3w
-         ZbNmgOu1VgZ4QO8cDQ0zlmnYhClC9xCCkT78a0GMn8YSZdFtKyuydmLvszuMngaOX0Ei
-         4Kvx1dvYU6F4KRKltpkSIVtnKwDKNMIwmXbzN6YIBRHzqpPmIcXaUCmevoMl2kydiG7O
-         cD9cI+dRdqNHIvAFryXJGH/yH7D+UW14s37WvrLgvNWE2uVJ4+lFkdOb23nE2L5WMWQ0
-         bVGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUGm+U8kza1kb8XK0s3aeh5uBPu/e9cFGW4YeJ6AQVuXWOAJd0gjn+CakCISvHSGIHhjkWenWY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8E+9wNadrFktw7rJQ4oMMbAwrDX3Mo/Wu+KmlYEYivVzjBXzD
-	vfGWtqhMzfOMv3tSAI1/U4r3GecEuawSoiSxfTm48AVYs2rrsJX9xOiNDslDFA==
-X-Gm-Gg: ASbGncv99d659/XFzlHYprnfs1WC0QHhJQ838DOz1a62eHRt+aNScUc+gjLKchoyOlP
-	8yKZdNCvvBqVj5LQWzvnT1FBrqG2V5lgcc5zGNIntvSw/IyaaAg5fi+OL23Xz5P7IfW8EaHeP1C
-	slqQbr3uViBA9Dk3K2l4hLURpcsx8T8v2xLvQUXa/4aBTZqLrHjbkyGG3psiLV7XOLcy1W+LlDu
-	g6bVrFArvhT1njIH8mc0HHDX4MphTV85Ya0r2mZVHWIqPuaLX77BXQ0PFU+tgSgPQt6grMKlDQC
-	NGejK2A/T6lTjRheJnSJ6xJrPoLtQUuLwzQH38GOsr7HfIYghMhn2v5C1NQl88GOuhnMvfKQjiY
-	kPLw7htCP
-X-Google-Smtp-Source: AGHT+IGG5VspgVeMqtjmk9Ms4epOQhBE8NHd1Fn/B5H8qmLLiSTcfhFtj7uXh5GcNXWjtrc/AswLbw==
-X-Received: by 2002:a05:600c:6612:b0:43d:36c:f24 with SMTP id 5b1f17b1804b1-442d6d44830mr156697915e9.13.1747140187018;
-        Tue, 13 May 2025 05:43:07 -0700 (PDT)
-Received: from [10.229.41.178] ([192.19.176.227])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a1f58ebe00sm16370502f8f.38.2025.05.13.05.43.05
+        d=1e100.net; s=20230601; t=1747140528; x=1747745328;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=a5TgOXyLSPHdmxHWX/DD9xraZLG6iwcHdcK24HBFLhk=;
+        b=fx5pZI/P7/AXLu8rj/B28RUq7ZQ6kX8XUeJrhBeW3hbQQTWwbTonFvTSyTr+iah9zL
+         dyoqHeTTsPSrkn723HD/ibjUIT0iSicz21qSzJTjWX7ejfnPeXG6gUiUPtreBmafH+a4
+         gro++EaBdqOTmUnyyeQDPGzYjo0iFzbvpBwIpcuHh2U2whKj3QylmTzeewyT5yDvJ25l
+         KynbVVSQPwZbMo4mdHHmsaeBVqLAdEJ/6zgci6DfPc7NCSiGNW6tcBtm0hPSCLhd6HmT
+         940YlezRtdzVYSpfKjjHR+MUYgdLEEN+JaZ0cU/2NamgwuckoGeD/JkqmKIA66zdqyEF
+         944Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUzN3f7LJ8ncFq56vKwj5XqbUGpn2EtjHX3vqRLjT+XJuS3eGvNkTb9SomXcczQRLE0xD0Wy0EeOnNujYU=@vger.kernel.org, AJvYcCXbkYUYoGBVq7D79jF3bH88RIvCqiL9DRuPeOY5ZY8yNJ2FXdYsDnriaWGxqYf8l6AQhVMU6Wjq@vger.kernel.org
+X-Gm-Message-State: AOJu0YylawN83dRYNzUHqNa3klplQUb3zZuL7C6xtjPKWOQLB8ehX82A
+	qR4NMoE3+BskRBlG4b10IsQfwixy4ILj0eBciPV0KwU9Lf0+sYxb
+X-Gm-Gg: ASbGncsTHpH/YsFe1pmlhL1h69gUOp7MHJfB3bPlWKK4T4MljCa9q+3L/3ttd9EkWWb
+	4XIeqshA8TfFOwcvSMutY1KP/80Op52Xd497Fgfiqt84/+RBKcrsyVQM8XTnIhkGaqSIIAJJSwY
+	EwpVVcVzU429FQLo+LzD6aFvUnTbCX5K3zwigNoYE7T34CNDImTifkEJ2llF0mC8N+7Fo4GDfSn
+	TzrmtWTIuxFG3/ECy2gSaI+HtQUM2Y435SAuLDGyyZ6+EB5K/zx0gxAAs9Cqrxv/ezVokWMVQMg
+	6aksTholVGis/Il3dTWQ5A/cO1MfAroc2i42K1fupZD+XErILc+LLQOMH2RKQF53HHy/Ka2P
+X-Google-Smtp-Source: AGHT+IHBreVwaNTD250MP1ZhUthvVQWAn2cvlOqmyeNmqTywxz6tsH2Gn2/fdJuks7mp7pU/Wx6dDg==
+X-Received: by 2002:a5d:47a7:0:b0:3a0:9a02:565a with SMTP id ffacd0b85a97d-3a340d15421mr2730099f8f.3.1747140528111;
+        Tue, 13 May 2025 05:48:48 -0700 (PDT)
+Received: from [192.168.8.100] ([148.252.146.237])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442d6858566sm165365765e9.32.2025.05.13.05.48.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 May 2025 05:43:06 -0700 (PDT)
-Message-ID: <8bf0d3c9-5084-40ff-a338-15f4e0f9d8a0@broadcom.com>
-Date: Tue, 13 May 2025 14:43:05 +0200
+        Tue, 13 May 2025 05:48:47 -0700 (PDT)
+Message-ID: <eae3e1a9-1d82-40b7-a835-978be4a6ef56@gmail.com>
+Date: Tue, 13 May 2025 13:49:56 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,78 +81,62 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: dsa: b53: prevent standalone from trying to
- forward to other ports
-To: Jonas Gorski <jonas.gorski@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250508091424.26870-1-jonas.gorski@gmail.com>
+Subject: Re: [RFC 01/19] netmem: rename struct net_iov to struct netmem_desc
+To: Byungchul Park <byungchul@sk.com>
+Cc: willy@infradead.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, kernel_team@skhynix.com,
+ kuba@kernel.org, almasrymina@google.com, ilias.apalodimas@linaro.org,
+ harry.yoo@oracle.com, hawk@kernel.org, akpm@linux-foundation.org,
+ ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net,
+ john.fastabend@gmail.com, andrew+netdev@lunn.ch, edumazet@google.com,
+ pabeni@redhat.com, vishal.moola@gmail.com
+References: <20250509115126.63190-1-byungchul@sk.com>
+ <20250509115126.63190-2-byungchul@sk.com>
+ <ea4f2f83-e9e4-4512-b4be-af91b3d6b050@gmail.com>
+ <20250512132939.GF45370@system.software.com>
 Content-Language: en-US
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20250508091424.26870-1-jonas.gorski@gmail.com>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20250512132939.GF45370@system.software.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
+On 5/12/25 14:29, Byungchul Park wrote:
+> On Mon, May 12, 2025 at 02:11:13PM +0100, Pavel Begunkov wrote:
+>> On 5/9/25 12:51, Byungchul Park wrote:
+>>> To simplify struct page, the page pool members of struct page should be
+>>> moved to other, allowing these members to be removed from struct page.
+>>>
+>>> Reuse struct net_iov for also system memory, that already mirrored the
+>>> page pool members.
+>>>
+>>> Signed-off-by: Byungchul Park <byungchul@sk.com>
+>>> ---
+>>>    include/linux/skbuff.h                  |  4 +--
+>>>    include/net/netmem.h                    | 20 ++++++------
+>>>    include/net/page_pool/memory_provider.h |  6 ++--
+>>>    io_uring/zcrx.c                         | 42 ++++++++++++-------------
+>>
+>> You're unnecessarily complicating it for yourself. It'll certainly
+>> conflict with changes in the io_uring tree, and hence it can't
+>> be taken normally through the net tree.
+>>
+>> Why are you renaming it in the first place? If there are good
+> 
+> It's because the struct should be used for not only io vetor things but
+> also system memory.  Current network code uses struct page as system
 
+Not sure what you mean by "io vector things", but it can already
+point to system memory, and if anything, the use conceptually more
+resembles struct pages rather than iovec. IOW, it's just a name,
+neither gives a perfect understanding until you look up details,
+so you could just leave it net_iov. Or follow what Mina suggested,
+I like that option.
 
-On 5/8/2025 11:14 AM, Jonas Gorski wrote:
-> When bridged ports and standalone ports share a VLAN, e.g. via VLAN
-> uppers, or untagged traffic with a vlan unaware bridge, the ASIC will
-> still try to forward traffic to known FDB entries on standalone ports.
-> But since the port VLAN masks prevent forwarding to bridged ports, this
-> traffic will be dropped.
+> memory descriptor but struct page fields for page pool will be gone.
 > 
-> This e.g. can be observed in the bridge_vlan_unaware ping tests, where
-> this breaks pinging with learning on.
-> 
-> Work around this by enabling the simplified EAP mode on switches
-> supporting it for standalone ports, which causes the ASIC to redirect
-> traffic of unknown source MAC addresses to the CPU port.
-> 
-> Since standalone ports do not learn, there are no known source MAC
-> addresses, so effectively this redirects all incoming traffic to the CPU
-> port.
-> 
-> Fixes: ff39c2d68679 ("net: dsa: b53: Add bridge support")
-> Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
-
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> So I had to reuse struct net_iov and I thought renaming it made more
+> sense.  It'd be welcome if you have better idea.
 -- 
-Florian
+Pavel Begunkov
 
 
