@@ -1,144 +1,126 @@
-Return-Path: <netdev+bounces-190157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0689AB559F
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 15:09:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0D06AB55CC
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 15:17:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2192D165C73
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 13:09:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 80E581B420A4
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 13:17:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C84B528DF54;
-	Tue, 13 May 2025 13:09:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8A0F24397A;
+	Tue, 13 May 2025 13:17:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="dJB1jUbE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rWMfskZK"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7C481EA6F;
-	Tue, 13 May 2025 13:09:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B22C520D4F2
+	for <netdev@vger.kernel.org>; Tue, 13 May 2025 13:17:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747141745; cv=none; b=RuHTxCyUYXsmqnsq0GjQImsyyUigidJU0IXBpKarb0IylGMPJ00gOAOnmRtQ+c0nbfF55310v4PbNLWoq9cMZkPVex3OXjqqAR7cQ9J/bW7Qb70Uhz242rRSgGKVPhZg/aWHlX/E622mlAK73nQ9ds01e/tvaI87sBTg5TymDyo=
+	t=1747142246; cv=none; b=jtyYicQW4lqYcESWP43FrH/ZafTrbrh3AzG482faNO8R49sU6IFfpbS/rjjyWYNUrsI5HaodPTkYipsoQel/caSrhKGQFU3rCOx7bvVURanGdEYpH1zoIhxemueCcuskVVfBYBNr9+WSZf1qzOYYwD1CNs1mcxkkFhbJ6DYc5YI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747141745; c=relaxed/simple;
-	bh=8mRp/db9GQsB9zml3gT1hejcawXdpZSLrcYkeOjydhw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=G887FOsJdXbHTzGEbTWjDX+uO/Vmbqm3fkyrbBHg4/Dv8yYlitA8JxRQff6jHQXToo/RAipoppP9N6LZ24CGSrEDdahNLb9q8kVj+Sig5uffIPrlKmy8geRLJrEMtehF7fm4uPRAV0xrdAJcjKFcjWySbuUBy7IOhgfxCRvP1cE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=dJB1jUbE; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 7C60943AEF;
-	Tue, 13 May 2025 13:08:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1747141741;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8c82sCzN57Xp/rMC2k0R4691SeAEja9vwY487LmRAsM=;
-	b=dJB1jUbEdvLLep2ewCeZVcfz7OJQpDg9+pKS4PYIMIr+3THWZZ72Qqv3543e22OZEL94mL
-	HhEQ2+/o94zZpDzpMOsGqYcTZYyx0V0UG+DpNMOHkVBLqRJgEwQYbOAfmTsctFlenfpElG
-	JduKi/LcDrXkoBiGByDu1YZQLyNTtBW3p81VnlKVFXzAf0s+Sw1+msGeT6owAsoww2kVEP
-	y1r4F5JytjbisyeO2EkQPKB8Y3nRvrdlqNGV+UQbchNDLpVvAWV30VBqTXhu6v5qmKXcwX
-	jzNyBi6rBykWjxHelUBmthaAe5zkg+LrmC7R9Agfxt3Nx+sF9+ZdpHml7ZMy+w==
-Date: Tue, 13 May 2025 15:08:51 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- linux-arm-kernel@lists.infradead.org, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, Marek
- =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Oleksij Rempel
- <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
- <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
- mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>,
- devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Romain
- Gantois <romain.gantois@bootlin.com>, Daniel Golle <daniel@makrotopia.org>,
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: Re: [PATCH net-next v6 01/14] dt-bindings: net: Introduce the
- ethernet-connector description
-Message-ID: <20250513150851.5678335e@kmaincent-XPS-13-7390>
-In-Reply-To: <20250507135331.76021-2-maxime.chevallier@bootlin.com>
-References: <20250507135331.76021-1-maxime.chevallier@bootlin.com>
-	<20250507135331.76021-2-maxime.chevallier@bootlin.com>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1747142246; c=relaxed/simple;
+	bh=Fb+x8Xs5o9HycXwFBCoJ8kQrNH414riybeXH7lzWfUo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q3qFIc+9u2fJhp9SPPHvnkq1dhTPnD6P2fFDYE/YpC0xy/SzFs4yXhyzysdKutJL4tCyV512NzFo2+/HZ7XwC86tOWRbAKHqlmefW7gukCKwjr9FDrZ5PJLgCsfQRuj07AT2kycznADJbYE3sip2LFAgqbO0PudKjFMp+vvhcc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rWMfskZK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED7C3C4CEE4;
+	Tue, 13 May 2025 13:17:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747142246;
+	bh=Fb+x8Xs5o9HycXwFBCoJ8kQrNH414riybeXH7lzWfUo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rWMfskZKelxzp8LBShaUpEM6C+o1DtMON1fCMD+8raPArArTwuqHUe4W4e84SJ3/8
+	 NJrRImGF1DCvDfbm+F8Lt/wDYkGTq2GqGZ6IgX9K4kieLN+fVxamRWfsx9qJT+LCtU
+	 lhuPuEGN7krpopZLGEE2EK4VM1wRzX0hcGnaAjJ1w5m7oggg8j0zpShVW3ZJDz8gvU
+	 1gwGCMSbiKI+p+9/dRpbK9j3wUKnw646G54uwEsDroshFI9EIvibZdTSyDCsKM6GBP
+	 aAEK+G5DSteN7hgjGt1qka8L0s0ZKuMFYBgZyJ8H1VTPkLtowESXYA4CZMJi7jSuw6
+	 9rRgJVWMI5Ojw==
+Date: Tue, 13 May 2025 14:17:21 +0100
+From: Simon Horman <horms@kernel.org>
+To: Subbaraya Sundeep <sbhatta@marvell.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, gakula@marvell.com,
+	hkelam@marvell.com, sgoutham@marvell.com, lcherian@marvell.com,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH] octeontx2-af: Send Link events one by one
+Message-ID: <20250513131721.GY3339421@horms.kernel.org>
+References: <1746638183-10509-1-git-send-email-sbhatta@marvell.com>
+ <20250512100954.GU3339421@horms.kernel.org>
+ <aCHfZ_MxtfVmhXVj@90a8923ee8d1>
+ <aCHxax9GgcLL-4Xk@37b358c748b7>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeftdegudekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgfdutdefvedtudegvefgvedtgfdvhfdtueeltefffefffffhgfetkedvfeduieeinecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppedvrgdtudemtggsudgrmeeiudemjehfkegtmegurgehjeemfeehsggsmegttdejudemiegsvdgsnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgdurgemiedumeejfhektgemuggrheejmeefhegssgemtgdtjedumeeisgdvsgdphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepfedupdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpt
- hhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqrghrmhdqmhhsmhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehthhhomhgrshdrphgvthgriiiiohhnihessghoohhtlhhinhdrtghomhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aCHxax9GgcLL-4Xk@37b358c748b7>
 
-On Wed,  7 May 2025 15:53:17 +0200
-Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
+On Mon, May 12, 2025 at 01:02:35PM +0000, Subbaraya Sundeep wrote:
+> Hi again,
+> 
+> On 2025-05-12 at 11:45:43, Subbaraya Sundeep (sbhatta@marvell.com) wrote:
+> > Hi Simon,
+> > 
+> > On 2025-05-12 at 10:09:54, Simon Horman (horms@kernel.org) wrote:
+> > > On Wed, May 07, 2025 at 10:46:23PM +0530, Subbaraya Sundeep wrote:
+> > > > Send link events one after another otherwise new message
+> > > > is overwriting the message which is being processed by PF.
+> > > > 
+> > > > Fixes: a88e0f936ba9 ("octeontx2: Detect the mbox up or down message via register")
+> > > > Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+> > > > ---
+> > > >  drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c | 2 ++
+> > > >  1 file changed, 2 insertions(+)
+> > > > 
+> > > > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
+> > > > index 992fa0b..ebb56eb 100644
+> > > > --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
+> > > > +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
+> > > > @@ -272,6 +272,8 @@ static void cgx_notify_pfs(struct cgx_link_event *event, struct rvu *rvu)
+> > > >  
+> > > >  		otx2_mbox_msg_send_up(&rvu->afpf_wq_info.mbox_up, pfid);
+> > > 
+> > > Hi Subbaraya,
+> > > 
+> > > Are there other callers of otx2_mbox_msg_send_up()
+> > > which also need this logic? If so, perhaps a helper is useful.
+> > > If not, could you clarify why?
+> > > 
+> > UP messages are async notifications where we just send and forget.
+> > There are other callers as I said we just send and forget everywhere
+> > in the driver. Only this callsite has been modified because we have
+> > seen an issue on customer setup where bunch of link events are queued
+> > for a same device at one point of time.
 
-> The ability to describe the physical ports of Ethernet devices is useful
-> to describe multi-port devices, as well as to remove any ambiguity with
-> regard to the nature of the port.
->=20
-> Moreover, describing ports allows for a better description of features
-> that are tied to connectors, such as PoE through the PSE-PD devices.
->=20
-> Introduce a binding to allow describing the ports, for now with 2
-> attributes :
->=20
->  - The number of lanes, which is a quite generic property that allows
->    differentating between multiple similar technologies such as BaseT1
->    and "regular" BaseT (which usually means BaseT4).
->=20
->  - The media that can be used on that port, such as BaseT for Twisted
->    Copper, BaseC for coax copper, BaseS/L for Fiber, BaseK for backplane
->    ethernet, etc. This allows defining the nature of the port, and
->    therefore avoids the need for vendor-specific properties such as
->    "micrel,fiber-mode" or "ti,fiber-mode".
->=20
-> The port description lives in its own file, as it is intended in the
-> future to allow describing the ports for phy-less devices.
->=20
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> +description:
-> +  An Ethernet Connectr represents the output of a network component such=
- as
+Thanks for the clarification.
 
-Connector
+> > > >  
+> > > > +		otx2_mbox_wait_for_rsp(&rvu->afpf_wq_info.mbox_up, pfid);
+> > > 
+> > > This can return an error. Which is checked in otx2_sync_mbox_up_msg().
+> > > Does it make sense to do so here too?
+> > > 
+> > Yes it makes sense to use otx2_sync_mbox_up_msg here. I will use it
+> > here.
+> > 
+> I will leave it as otx2_mbox_wait_for_rsp. Since otx2_sync_mbox_up_msg
+> is in nic driver and we do not include nic files in AF driver. Since
+> this is a void function will print an error if otx2_mbox_wait_for_rsp
+> returns error.
 
-With this typo fixed:
-Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
+Sorry, I wasn't clear in my previous email.
 
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -8777,6 +8777,7 @@ R:	Russell King <linux@armlinux.org.uk>
->  L:	netdev@vger.kernel.org
->  S:	Maintained
->  F:	Documentation/ABI/testing/sysfs-class-net-phydev
-> +F:	Documentation/devicetree/bindings/net/ethernet-connector.yaml
->  F:	Documentation/devicetree/bindings/net/ethernet-phy.yaml
->  F:	Documentation/devicetree/bindings/net/mdio*
->  F:	Documentation/devicetree/bindings/net/qca,ar803x.yaml
+I was asking if it makes sense to check the return value of
+otx2_mbox_wait_for_rsp() in this patch.
 
-You will need Russell acked-by for that.=20
-
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+...
 
