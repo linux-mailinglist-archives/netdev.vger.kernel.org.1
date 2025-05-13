@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-190265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B64AAB5F30
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 00:16:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAFA2AB5F3A
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 00:18:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BDCB3A8BDD
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 22:16:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0124D7B401C
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 22:16:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B45219E806;
-	Tue, 13 May 2025 22:16:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B621FC10E;
+	Tue, 13 May 2025 22:17:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hstfxpL8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lr6Fzf7p"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05A2C41C7F
-	for <netdev@vger.kernel.org>; Tue, 13 May 2025 22:16:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 839251F03D9
+	for <netdev@vger.kernel.org>; Tue, 13 May 2025 22:17:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747174601; cv=none; b=unvihRhh7+6oX5baFsgwNF8RI8d8GahZyqiVrb3NRJEjFVqhnhiSg+w4ZHuUsW4yd40PSUJQzAUPcPDZrnlNKxMwvPpvnjyLnwHtGA6kHx+8dNibkm3zidKnUj89/+uycG/JUyAbfGLSIU8gmpVbtdjEKjZCME8HYEIHVmZ8ue0=
+	t=1747174674; cv=none; b=PPpe6HgNlDOTHqO99cotBRXR//Qycv/NIPenN5pMIfDZZcEpBNVoYZc18QKrCwlhcyTVXZQnwd/vpdb1ieBhEtOArKPp/BsTwvESmO3d6iRE2ekgDKMq35OTkLBKeEinzAfgE2d/+5Focl/pzwtqrKmnWimTey3PuJ6UsdAhtrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747174601; c=relaxed/simple;
-	bh=R9KrBFL4pcDpmcrFhMwY/yrz3VoZfkifOCHjPmrQ81A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EU2fQFUKiN90HS/YezpZOw/jNAcxQM6LEyQ/y7tjrp8Ta5Cu7cF0w5A3XNrTSw5lXMsANt8zyVacDKLVgelAsrs2QF/1Xq7dXca+TQQNvZ9JweKxriqVMY6bhIG5YjZt9Q6ly5Spha8MckaJL4mXLWFf5dWgS3ug/gWLm1hNm4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hstfxpL8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C741C4CEE4;
-	Tue, 13 May 2025 22:16:40 +0000 (UTC)
+	s=arc-20240116; t=1747174674; c=relaxed/simple;
+	bh=Usbyw9npU36eofCSxKUIwQfyA5HC9DVwjiQ9KbqWcyE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VVvsHQW5Ys173BTUggc7JxmlmQz5bsXyuwkhdtA/q5ttqtrW59egdKoeQvlJ+NFvlJGWJjucb/+7u4J88UAPJmR0LsHjzGWGeJEsYt3a6SzfuuqIZJ/BAWsPY/BEoqW8Gle5Wf9oxD+/eUcnrK6KD7Ui9vrv4Vj5uBCXFHUOSIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lr6Fzf7p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFC2DC4CEE4;
+	Tue, 13 May 2025 22:17:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747174600;
-	bh=R9KrBFL4pcDpmcrFhMwY/yrz3VoZfkifOCHjPmrQ81A=;
+	s=k20201202; t=1747174674;
+	bh=Usbyw9npU36eofCSxKUIwQfyA5HC9DVwjiQ9KbqWcyE=;
 	h=From:To:Cc:Subject:Date:From;
-	b=hstfxpL8f2l+wnKCl541A/c3YYW1BwQztd2q/EV+pPgJPwQAbD4R1pCnuJ9vfXtJV
-	 7VVrP/0HBUNQeLM63ozRM9YHpBpk7u1boJSaB6qnJaAAat2N+aavYZsmuAoUzRxE/3
-	 lTuegw24/MnoqFcLiLC7s+jB4vjKxJRKBELqb7iJk9NuoNSh7hUOQmUlnkhrpH8btv
-	 hSW9VBkAEDBIU8JMNBCqVnDnmLM4lwb+rga7868kTowCBXeZXXx5Ty5Lo4u6VuUrLV
-	 MpbVwSGIk4lLhjF893v7uxyv7U4koPCcsoucJ7FgVFABuxCsywnT2DllIT0mKTaSVD
-	 0h72XlyZLGAdg==
+	b=lr6Fzf7peeScIqfR5j0e5kB4MCPrxmMDdWxdVF77LGr0lIJbi0sZ3WIN/piN0gY2X
+	 wbMAddB5y1jz+I3PWL+cF4uiz2zSlut62oBF8wpUd2n8Dnsrkp0XUT0PAzdj4W7r5/
+	 6CeRznbSQFQwvy1uCEctyK+n/AWBVKwqq5ySIFYOEeXq+A9AjV+hzGyYORVYLb/H1f
+	 OQ9EXgJrpAm28BvymWLJ7I+j3OjRkX+BszQpbYXbVh/FpIcob/LoaQV4CzjAU8nkiU
+	 9sFCXoTOxZ4BLydr6YF85tlDNRABGJ5Lkxp6FfsC3eooRQXjHcCRAL0fcfsXxSK+Gl
+	 QwFnZjofNAlVQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -48,12 +48,12 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	horms@kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
-	donald.hunter@gmail.com,
-	ast@fiberby.net,
+	jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
 	jiri@resnulli.us
-Subject: [PATCH net] netlink: specs: tc: all actions are indexed arrays
-Date: Tue, 13 May 2025 15:16:38 -0700
-Message-ID: <20250513221638.842532-1-kuba@kernel.org>
+Subject: [PATCH net-next] net: sched: uapi: add more sanely named duplicate defines
+Date: Tue, 13 May 2025 15:17:52 -0700
+Message-ID: <20250513221752.843102-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -63,48 +63,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Some TC filters have actions listed as indexed arrays of nests
-and some as just nests. They are all indexed arrays, the handling
-is common across filters.
+The TCA_FLOWER_KEY_CFM enum has a UNSPEC and MAX with _OPT
+in the name, but the real attributes don't. Add a MAX that
+more reasonably matches the attrs.
 
-Fixes: 2267672a6190 ("doc/netlink/specs: Update the tc spec")
+The PAD in TCA_TAPRIO is the only attr which doesn't have
+_ATTR in it, perhaps signifying that it's not a real attr?
+If so interesting idea in abstract but it makes codegen painful.
+
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-This is really borderline for net vs net-next decision IMO.
-I'm posting it for net because repost will make it late for
-net-next merge. But happy to go with net-next.
-
-CC: donald.hunter@gmail.com
-CC: ast@fiberby.net
+CC: jhs@mojatatu.com
+CC: xiyou.wangcong@gmail.com
 CC: jiri@resnulli.us
 ---
- Documentation/netlink/specs/tc.yaml | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ include/uapi/linux/pkt_cls.h   | 1 +
+ include/uapi/linux/pkt_sched.h | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/Documentation/netlink/specs/tc.yaml b/Documentation/netlink/specs/tc.yaml
-index 5e1ff04f51f2..953aa837958b 100644
---- a/Documentation/netlink/specs/tc.yaml
-+++ b/Documentation/netlink/specs/tc.yaml
-@@ -2017,7 +2017,8 @@ protonum: 0
-     attributes:
-       -
-         name: act
--        type: nest
-+        type: indexed-array
-+        sub-type: nest
-         nested-attributes: tc-act-attrs
-       -
-         name: police
-@@ -2250,7 +2251,8 @@ protonum: 0
-     attributes:
-       -
-         name: act
--        type: nest
-+        type: indexed-array
-+        sub-type: nest
-         nested-attributes: tc-act-attrs
-       -
-         name: police
+diff --git a/include/uapi/linux/pkt_cls.h b/include/uapi/linux/pkt_cls.h
+index 490821364165..28d94b11d1aa 100644
+--- a/include/uapi/linux/pkt_cls.h
++++ b/include/uapi/linux/pkt_cls.h
+@@ -697,6 +697,7 @@ enum {
+ };
+ 
+ #define TCA_FLOWER_KEY_CFM_OPT_MAX (__TCA_FLOWER_KEY_CFM_OPT_MAX - 1)
++#define TCA_FLOWER_KEY_CFM_MAX	   (__TCA_FLOWER_KEY_CFM_OPT_MAX - 1)
+ 
+ #define TCA_FLOWER_MASK_FLAGS_RANGE	(1 << 0) /* Range-based match */
+ 
+diff --git a/include/uapi/linux/pkt_sched.h b/include/uapi/linux/pkt_sched.h
+index 9ea874395717..3e41349f3fa2 100644
+--- a/include/uapi/linux/pkt_sched.h
++++ b/include/uapi/linux/pkt_sched.h
+@@ -1182,6 +1182,7 @@ enum {
+ 	TCA_TAPRIO_ATTR_SCHED_SINGLE_ENTRY, /* single entry */
+ 	TCA_TAPRIO_ATTR_SCHED_CLOCKID, /* s32 */
+ 	TCA_TAPRIO_PAD,
++	TCA_TAPRIO_ATTR_PAD = TCA_TAPRIO_PAD,
+ 	TCA_TAPRIO_ATTR_ADMIN_SCHED, /* The admin sched, only used in dump */
+ 	TCA_TAPRIO_ATTR_SCHED_CYCLE_TIME, /* s64 */
+ 	TCA_TAPRIO_ATTR_SCHED_CYCLE_TIME_EXTENSION, /* s64 */
 -- 
 2.49.0
 
