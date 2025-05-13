@@ -1,257 +1,149 @@
-Return-Path: <netdev+bounces-190106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C81A8AB5335
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 12:51:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69EBDAB5340
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 12:55:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A5CB3A840E
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 10:47:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E31B3AA7AD
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 10:55:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06B5E27E7DB;
-	Tue, 13 May 2025 10:48:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16159284B5E;
+	Tue, 13 May 2025 10:55:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gwM9fmuo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QPUsFNp1"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41FB62750ED
-	for <netdev@vger.kernel.org>; Tue, 13 May 2025 10:48:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C75C18EFD4
+	for <netdev@vger.kernel.org>; Tue, 13 May 2025 10:55:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747133285; cv=none; b=rOUOaRmreju8C3SvR4lN3gxS7OLBAlAxlvSoJYro//B3wGupjWGsLBrdGJwkhxZuNd/RMh6KRU9PGgqYISTLReU4pns6gYemODxvh6kNawpbyqDgZKHoqIabRBlGLw9a7d4fj1KYAEftL8pqileQiiw2Q/WoomPwawXjEuhtnUo=
+	t=1747133751; cv=none; b=ei5rS53DWvub79eqgzhne3RI2vgwbB/9WfYcMAAocEYEenfOcBtDpZnTkMIA/085uDWcEjbopk3HI0AFntez1EFsP6tAv7GfYOHS1J+2yuY6T3Nkoe30dsOoEanTU5P027D4oZGYUGgJxYep1djKTXZL7zTs2dUx0AekM+Dg/go=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747133285; c=relaxed/simple;
-	bh=8lNXhQlFgeQ+7nrfwX45y0yjpZCb+NXoHunbbiU7Y48=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SVkljufQvU1h9g7U+WBAp18FiuH+TINA+RBl1ZOYDtexIRoOUnDHTNWC6dvwfOx7GJ4KwecooNa6Kr4IxyhSJ94SjxQKjGYMiV2kWy16BMcB5YWbNBl4e1eQD3PEnRGKEYgzVOY5GWpCdM3vYKWcq9M5vfp/bdpdXYPoydzD194=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gwM9fmuo; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747133283;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=f+wm1PKfRti2xGR/oblakeMEtVNw1jI8kFg4UxnuaZg=;
-	b=gwM9fmuopWBGqxA3QEDy0H8/XfG0NrIqUCw4xwQKFcPf19co76GcZlDtG7IPe7N49hkKtE
-	Tc7dv2apXvGULn9qiB0myVIwNuw+YY35RMV4BDNL9BrUeu6I6y1L+ZoOVdJDIlBnhVlnNF
-	zrARYqX4LebLiB8kK6R7vbsOlDA+jnU=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-678-9EQRBOt-PaaVixkLmsDEpA-1; Tue,
- 13 May 2025 06:48:00 -0400
-X-MC-Unique: 9EQRBOt-PaaVixkLmsDEpA-1
-X-Mimecast-MFC-AGG-ID: 9EQRBOt-PaaVixkLmsDEpA_1747133278
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7F0DD1955DA2;
-	Tue, 13 May 2025 10:47:57 +0000 (UTC)
-Received: from [10.44.34.49] (unknown [10.44.34.49])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1BBDE180087C;
-	Tue, 13 May 2025 10:47:51 +0000 (UTC)
-Message-ID: <6f693bb5-da3c-4363-895f-58a267e52a18@redhat.com>
-Date: Tue, 13 May 2025 12:47:50 +0200
+	s=arc-20240116; t=1747133751; c=relaxed/simple;
+	bh=BL/2TY8Cn65018DK0kWw1A4kfT5eGAtTipy6JiqXOv4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZxlGBRgXpX6d7jExnY+Teq/v2/21t14iC4I6AvztW1emKQ7im/sUOxCSIGhjiXMDMOoiExXkFiQKlSwukF+Sfs5ctXQTfZZnh0mRbSHfoQRr9R4l71iUzUKYq6Z72Cy+G0RaP8RvYpVl1Pnc6PtnBxwHsSKOsjjdllDfBxp9imQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QPUsFNp1; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747133749; x=1778669749;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=BL/2TY8Cn65018DK0kWw1A4kfT5eGAtTipy6JiqXOv4=;
+  b=QPUsFNp1y4vL5jKTcmFtf77SDdZ7Tlgfo6HVldlRyyGiWGZ6xrXgbc3K
+   hWfKeThI3ARNyOt4IofUbbAsNg4AV5eHTHc1TKO3xMrvWhFk7tR37enSh
+   g3ifkDe4tLnS31zC5coCH0Zto1ZlJ+fPXCuKIedpbcIFkOVtnLK2hGinG
+   I0iSiz/w/PHkXxRdbu1CvigucQipx9bdPm1eeQmAdkTg+t7DfOZR8SDbx
+   KEisibdMDpMFa7xsv/uFhQMPlrEHBdYZrJS0FGzntvpzXbnXkMq5VYc3x
+   7UKkl0ohV6pBJ9ZAJtj4yfwpRk3Pg1wfj9h9aChyt7UiK+w4f5K3gQnIv
+   w==;
+X-CSE-ConnectionGUID: r8QcFlBcQCmIjHT22QaexA==
+X-CSE-MsgGUID: rqsPwYp6TnKv0zg9rIeAjw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11431"; a="52630651"
+X-IronPort-AV: E=Sophos;i="6.15,285,1739865600"; 
+   d="scan'208";a="52630651"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2025 03:55:48 -0700
+X-CSE-ConnectionGUID: EfzyNQMOTkG9h5AAj7SU0g==
+X-CSE-MsgGUID: dThUDSZmTdCfTQOTjt5c2w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,285,1739865600"; 
+   d="scan'208";a="138600539"
+Received: from gk3153-pr4-x299-22869.igk.intel.com (HELO localhost.igk.intel.com) ([10.102.21.130])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2025 03:55:46 -0700
+From: Michal Kubiak <michal.kubiak@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: maciej.fijalkowski@intel.com,
+	aleksander.lobakin@intel.com,
+	przemyslaw.kitszel@intel.com,
+	dawid.osuchowski@linux.intel.com,
+	jacob.e.keller@intel.com,
+	jbrandeburg@cloudflare.com,
+	netdev@vger.kernel.org,
+	Michal Kubiak <michal.kubiak@intel.com>
+Subject: [PATCH iwl-net v3 0/3] Fix XDP loading on machines with many CPUs
+Date: Tue, 13 May 2025 12:55:26 +0200
+Message-ID: <20250513105529.241745-1-michal.kubiak@intel.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 8/8] mfd: zl3073x: Register DPLL sub-device
- during init
-To: Lee Jones <lee@kernel.org>
-Cc: Andy Shevchenko <andy.shevchenko@gmail.com>, netdev@vger.kernel.org,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Michal Schmidt <mschmidt@redhat.com>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
-References: <20250507124358.48776-1-ivecera@redhat.com>
- <20250507124358.48776-9-ivecera@redhat.com>
- <CAHp75Ven0i05QhKz2djYx0UU9E9nipb7Qw3mm4e+UN+ZSF_enA@mail.gmail.com>
- <2e3eb9e3-151d-42ef-9043-998e762d3ba6@redhat.com>
- <aBt1N6TcSckYj23A@smile.fi.intel.com> <20250507152609.GK3865826@google.com>
- <b095ffb9-c274-4520-a45e-96861268500b@redhat.com>
- <20250513094126.GF2936510@google.com>
-Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <20250513094126.GF2936510@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On 13. 05. 25 11:41 dop., Lee Jones wrote:
-> On Mon, 12 May 2025, Ivan Vecera wrote:
-> 
->> On 07. 05. 25 5:26 odp., Lee Jones wrote:
->>> On Wed, 07 May 2025, Andy Shevchenko wrote:
->>>
->>>> On Wed, May 07, 2025 at 03:56:37PM +0200, Ivan Vecera wrote:
->>>>> On 07. 05. 25 3:41 odp., Andy Shevchenko wrote:
->>>>>> On Wed, May 7, 2025 at 3:45 PM Ivan Vecera <ivecera@redhat.com> wrote:
->>>>
->>>> ...
->>>>
->>>>>>> +static const struct zl3073x_pdata zl3073x_pdata[ZL3073X_MAX_CHANNELS] = {
->>>>>>> +       { .channel = 0, },
->>>>>>> +       { .channel = 1, },
->>>>>>> +       { .channel = 2, },
->>>>>>> +       { .channel = 3, },
->>>>>>> +       { .channel = 4, },
->>>>>>> +};
->>>>>>
->>>>>>> +static const struct mfd_cell zl3073x_devs[] = {
->>>>>>> +       ZL3073X_CELL("zl3073x-dpll", 0),
->>>>>>> +       ZL3073X_CELL("zl3073x-dpll", 1),
->>>>>>> +       ZL3073X_CELL("zl3073x-dpll", 2),
->>>>>>> +       ZL3073X_CELL("zl3073x-dpll", 3),
->>>>>>> +       ZL3073X_CELL("zl3073x-dpll", 4),
->>>>>>> +};
->>>>>>
->>>>>>> +#define ZL3073X_MAX_CHANNELS   5
->>>>>>
->>>>>> Btw, wouldn't be better to keep the above lists synchronised like
->>>>>>
->>>>>> 1. Make ZL3073X_CELL() to use indexed variant
->>>>>>
->>>>>> [idx] = ...
->>>>>>
->>>>>> 2. Define the channel numbers
->>>>>>
->>>>>> and use them in both data structures.
->>>>>>
->>>>>> ...
->>>>>
->>>>> WDYM?
->>>>>
->>>>>> OTOH, I'm not sure why we even need this. If this is going to be
->>>>>> sequential, can't we make a core to decide which cell will be given
->>>>>> which id?
->>>>>
->>>>> Just a note that after introduction of PHC sub-driver the array will look
->>>>> like:
->>>>> static const struct mfd_cell zl3073x_devs[] = {
->>>>>          ZL3073X_CELL("zl3073x-dpll", 0),  // DPLL sub-dev for chan 0
->>>>>          ZL3073X_CELL("zl3073x-phc", 0),   // PHC sub-dev for chan 0
->>>>>          ZL3073X_CELL("zl3073x-dpll", 1),  // ...
->>>>>          ZL3073X_CELL("zl3073x-phc", 1),
->>>>>          ZL3073X_CELL("zl3073x-dpll", 2),
->>>>>          ZL3073X_CELL("zl3073x-phc", 2),
->>>>>          ZL3073X_CELL("zl3073x-dpll", 3),
->>>>>          ZL3073X_CELL("zl3073x-phc", 3),
->>>>>          ZL3073X_CELL("zl3073x-dpll", 4),
->>>>>          ZL3073X_CELL("zl3073x-phc", 4),   // PHC sub-dev for chan 4
->>>>> };
->>>>
->>>> Ah, this is very important piece. Then I mean only this kind of change
->>>>
->>>> enum {
->>>> 	// this or whatever meaningful names
->>>> 	..._CH_0	0
->>>> 	..._CH_1	1
->>>> 	...
->>>> };
->>>>
->>>> static const struct zl3073x_pdata zl3073x_pdata[ZL3073X_MAX_CHANNELS] = {
->>>>          { .channel = ..._CH_0, },
->>>>          ...
->>>> };
->>>>
->>>> static const struct mfd_cell zl3073x_devs[] = {
->>>>          ZL3073X_CELL("zl3073x-dpll", ..._CH_0),
->>>>          ZL3073X_CELL("zl3073x-phc", ..._CH_0),
->>>>          ...
->>>> };
->>>
->>> This is getting hectic.  All for a sequential enumeration.  Seeing as
->>> there are no other differentiations, why not use IDA in the child
->>> instead?
->>
->> For that, there have to be two IDAs, one for DPLLs and one for PHCs...
-> 
-> Sorry, can you explain a bit more.  Why is this a problem?
-> 
-> The IDA API is very simple.
-> 
-> Much better than building your own bespoke MACROs.
+Hi,
 
-I will try to explain this in more detail... This MFD driver handles
-chip family ZL3073x where the x == number of DPLL channels and can
-be from <1, 5>.
+Some of our customers have reported a crash problem when trying to load
+the XDP program on machines with a large number of CPU cores. After
+extensive debugging, it became clear that the root cause of the problem
+lies in the Tx scheduler implementation, which does not seem to be able
+to handle the creation of a large number of Tx queues (even though this
+number does not exceed the number of available queues reported by the
+FW).
+This series addresses this problem.
 
-The driver creates 'x' DPLL sub-devices during probe and has to pass
-channel number that should this sub-device use. Here can be used IDA
-in DPLL sub-driver:
-e.g. ida_alloc_max(zldev->channels, zldev->max_channels, GFP_KERNEL);
+First of all, the XDP callback should not crash even if the Tx scheduler
+returns an error, so Patch #1 fixes this error handling and makes the
+XDP callback fail gracefully.
+Patch #2 fixes the problem where the Tx scheduler tries to create too
+many nodes even though some of them have already been added to the
+scheduler tree.
+Finally, Patch #3 implements an improvement to the Tx scheduler tree
+rebuild algorithm to add another VSI support node if it is necessary to
+support all requested Tx rings.
 
-This way the DPLL sub-device get its own unique channel ID to use.
+As testing hints, I include sample failure scenarios below:
+  1) Number of LAN Tx/Rx queue pairs: 128
+     Number of requested XDP queues: >= 321 and <= 640
+     Error message:
+        Failed to set LAN Tx queue context, error: -22
+  2) Number of LAN Tx/Rx queue pairs: 128
+     Number of requested XDP queues: >= 641
+     Error message:
+        Failed VSI LAN queue config for XDP, error: -5
 
-The situation is getting more complicated with PHC sub-devices because
-the chip can provide UP TO 'x' PHC sub-devices depending on HW
-configuration. To handle this the MFD driver has to check this HW config
-for particular channel if it is capable to provide PHC functionality.
+Thanks,
+Michal
 
-E.g. ZL30735 chip has 5 channels, in this case the MFD driver should
-create 5 DPLL sub-devices. And then lets say channel 0, 2 and 4 are
-PHC capable. Then the MFD driver should create 3 PHC sub-devices and
-pass 0, 2 resp. 4 for them.
+---
 
-In that case IDA cannot be simply used as the allocation is not
-sequential.
+v3:
+  - do not reset the children counter during removing the VSI support
+    node in the patch #3 (Przemek),
+  - fix the kdoc comment for the newly added `ice_sched_rm_vsi_subtree()`
+    helper functions in the patch #3.
 
-So yes, for DPLL sub-devices IDA could be used but for the PHCs another
-approach (platform data) has to be used.
+v2:
+  - fix the bug while the `ethtool -L` command did not work while
+    the XDP program was running (Jesse),
+  - in the patch #3, add a missing extension for `ice_sched_rm_vsi_cfg()`
+    to  remove all VSI support nodes (including extra ones),
+    associated with a given VSI (to fix the root cause of the problem
+    mentioned above).
+  - add a corresponding description to the commit message of
+    the patch #3.
 
-There could be a hacky way to use IDA for PHCs: MFD would create PHC
-sub-devices for all channels and PHC sub-driver would check the channel
-config during probe and if the channel is not capable then returns
--ENODEV. But I don't think this is good idea to create MFD cells this
-way.
+v2: https://lore.kernel.org/netdev/20250509094233.197245-1-michal.kubiak@intel.com/
+v1: https://lore.kernel.org/netdev/20250422153659.284868-1-michal.kubiak@intel.com/
 
-Thanks for advices.
+Michal Kubiak (3):
+  ice: fix Tx scheduler error handling in XDP callback
+  ice: create new Tx scheduler nodes for new queues only
+  ice: fix rebuilding the Tx scheduler tree for large queue counts
 
-Ivan
+ drivers/net/ethernet/intel/ice/ice_main.c  |  47 ++++--
+ drivers/net/ethernet/intel/ice/ice_sched.c | 181 +++++++++++++++++----
+ 2 files changed, 181 insertions(+), 47 deletions(-)
 
->> The approach in my second reply in this thread is simpler and taken
->> in v8.
->>
->> <cite>
->> +#define ZL3073X_PDATA(_channel)			\
->> +	(&(const struct zl3073x_pdata) {	\
->> +		.channel = _channel,		\
->> +	})
->> +
->> +#define ZL3073X_CELL(_name, _channel)				\
->> +	MFD_CELL_BASIC(_name, NULL, ZL3073X_PDATA(_channel),	\
->> +		       sizeof(struct zl3073x_pdata), 0)
->> +
->> +static const struct mfd_cell zl3073x_devs[] = {
->> +	ZL3073X_CELL("zl3073x-dpll", 0),
->> +	ZL3073X_CELL("zl3073x-dpll", 1),
->> +	ZL3073X_CELL("zl3073x-dpll", 2),
->> +	ZL3073X_CELL("zl3073x-dpll", 3),
->> +	ZL3073X_CELL("zl3073x-dpll", 4),
->> +};
->> </cite>
->>
->> Lee, WDYT?
->>
->> Thanks,
->> Ivan
->>
-> 
+-- 
+2.45.2
 
 
