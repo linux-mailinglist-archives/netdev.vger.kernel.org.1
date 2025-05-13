@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-189955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189956-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E79DFAB496C
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 04:20:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71830AB496F
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 04:20:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71FA57AB861
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 02:18:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39B6D16B612
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 02:20:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F5391A0BE1;
-	Tue, 13 May 2025 02:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34B551B87C9;
+	Tue, 13 May 2025 02:20:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="glIicaYY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XUf3rX0i"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF501E485;
-	Tue, 13 May 2025 02:19:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F6FF1B4141
+	for <netdev@vger.kernel.org>; Tue, 13 May 2025 02:19:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747102799; cv=none; b=Y1+rd5VvcZJudaSvDks43lCyAj4xp87ZdRSGi2A3fWtl5PB62GAjdNrvoUG3EQKZ34tJXznUMn6pTSXz2xGRPO3ZRb5oo686DztzwVETJOJouisGP2zRKlJsjlATXtibo9mC0VeGUTrOILi6DY+lS0c/LJUj4RXSihwMQhduzrw=
+	t=1747102800; cv=none; b=QkJHLCAhbI6gH7H2GEobCWEKo6bhqtAj+IKF5T1OA70E/zobCfYs+RwLiw2+ao1Efy/DodgshUJbYi5hSfVGDPlUhW4vIKyokUBjAkKPRCiPSi+DTLtxnuR1RIUOqbByCZgeBO8QS5EMwJzBbAL39NgxJFuqPdPwC2tWE+joKqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747102799; c=relaxed/simple;
-	bh=9xgTcf12oF78veCiay/vGsmLyUzDOipPP2Ia5mQWu4M=;
+	s=arc-20240116; t=1747102800; c=relaxed/simple;
+	bh=OJb7dPAZhOnwBNUYtUC5Yi3nuVbB7+9KRLXItBHh1qU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Ofsq3CK9VTmWtAAFmJIKLmBmrV2nQSbGuMhfWG2BRlF6D+ZnjGabpzBSEcTBDJKk1aOw7az6irtEqZ2VTgxBTuoko7sdFdywi2z8vGoQ5euCowFUZmJeSnHU0L+OOp8+y95oU7kVf4ue2O6zUtBoKoXGkPA0IO/n7gpQFQu+mqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=glIicaYY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F821C4CEE7;
-	Tue, 13 May 2025 02:19:58 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=TtuaLGLiRG0eD0QBqZWHzsty7WrTPwBN+90VeWCjwYfEHP6d3VKqMvBjlrI7sgCjBjO9D8/OTz37t9hpIxNJOkIwAiNM21YMYHpk+I5ySaYlOl1UXDcq3Rod3XiU/RIsySGJk9kHorlBdsybDD82+yTj6726aOpHvhBJDg951mg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XUf3rX0i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84642C4CEEE;
+	Tue, 13 May 2025 02:19:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747102798;
-	bh=9xgTcf12oF78veCiay/vGsmLyUzDOipPP2Ia5mQWu4M=;
+	s=k20201202; t=1747102799;
+	bh=OJb7dPAZhOnwBNUYtUC5Yi3nuVbB7+9KRLXItBHh1qU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=glIicaYYmKBPqwkoBfTOeMq6F6d+yxJiOjwi/WNfxuaOa2b4MZ+dXZrrKMjJczvrj
-	 XwKw+g2H8oEKHVe5q7HO50NyS7pvuLlLTqnKqEP6ZK/MQ9bpJXYlHDI1TjMZzA9q8Z
-	 nnr8PCvwrDJ9TgiXXY2zprvhLXopZGDZp13kcgxVxJA2fRHLGTQIA85I02xK00M414
-	 tI4ZkdlhhBvOBlell7TOPKQxAFswP+h/8jwPBJtPg6iwlaRpd4KwAn0AKnZWTaQpI7
-	 taxPrNwUGxlVMK+IDoNq2G2eRFb4++fShCq971bLl3i9APc7Fiai7UVVe7naOetANC
-	 VyK3ggBzNP9fg==
+	b=XUf3rX0iCaxHE8gMyfbyqwygI+OrrZk0zAMhPn+Z06gDcrAbXNPSqvFrOpcMV9pS4
+	 rhgKj4VALMjFg0r6etre+VrQa8XpzzeJQuNBOoyO4H8NGdMF02d75HCzFRjcBjX+Hz
+	 oztcUYHo76MoUNIxHOAsSLZmFKuU6H4Ti7ti9MrepR8bhhAltGez9jjQFMNfkvjjvK
+	 WikemQn19wyqw2vz5E2rwIzKOkXUI/4EOtuLZwJFwayzuIKZS8D9E2PmtqfRt7Z4yr
+	 kSyT2v6SIo4n9oXINzw5WEioNLKKKmexexgtoWS8wgFPTIj6ffcIspiMiRWzUgWNhG
+	 vucEeni6QY4Ag==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33A7F39D6541;
-	Tue, 13 May 2025 02:20:37 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70B4C39D6541;
+	Tue, 13 May 2025 02:20:38 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: dsa: b53: implement setting ageing time
+Subject: Re: [PATCH net-next] net: mlx4: add SOF_TIMESTAMPING_TX_SOFTWARE flag
+ when getting ts info
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174710283601.1148099.15415155421490231622.git-patchwork-notify@kernel.org>
-Date: Tue, 13 May 2025 02:20:36 +0000
-References: <20250510092211.276541-1-jonas.gorski@gmail.com>
-In-Reply-To: <20250510092211.276541-1-jonas.gorski@gmail.com>
-To: Jonas Gorski <jonas.gorski@gmail.com>
-Cc: florian.fainelli@broadcom.com, andrew@lunn.ch, olteanv@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux@armlinux.org.uk, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <174710283724.1148099.14794480302116464100.git-patchwork-notify@kernel.org>
+Date: Tue, 13 May 2025 02:20:37 +0000
+References: <20250510093442.79711-1-kerneljasonxing@gmail.com>
+In-Reply-To: <20250510093442.79711-1-kerneljasonxing@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: tariqt@nvidia.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ willemdebruijn.kernel@gmail.com, netdev@vger.kernel.org,
+ kernelxing@tencent.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat, 10 May 2025 11:22:11 +0200 you wrote:
-> b53 supported switches support configuring ageing time between 1 and
-> 1,048,575 seconds, so add an appropriate setter.
+On Sat, 10 May 2025 17:34:42 +0800 you wrote:
+> From: Jason Xing <kernelxing@tencent.com>
 > 
-> This allows b53 to pass the FDB learning test for both vlan aware and
-> vlan unaware bridges.
+> As mlx4 has implemented skb_tx_timestamp() in mlx4_en_xmit(), the
+> SOFTWARE flag is surely needed when users are trying to get timestamp
+> information.
 > 
-> Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: dsa: b53: implement setting ageing time
-    https://git.kernel.org/netdev/net-next/c/e39d14a760c0
+  - [net-next] net: mlx4: add SOF_TIMESTAMPING_TX_SOFTWARE flag when getting ts info
+    https://git.kernel.org/netdev/net-next/c/b86bcfee3057
 
 You are awesome, thank you!
 -- 
