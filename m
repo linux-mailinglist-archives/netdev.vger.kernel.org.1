@@ -1,128 +1,122 @@
-Return-Path: <netdev+bounces-190013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4A18AB4E8C
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 10:52:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 615ACAB4E96
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 10:56:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71520188FA15
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 08:52:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7C9417A758
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 08:56:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 052A920E01A;
-	Tue, 13 May 2025 08:51:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0F5920E70E;
+	Tue, 13 May 2025 08:56:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EMHGekhJ"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="JB8+Sghq"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DA601F1524
-	for <netdev@vger.kernel.org>; Tue, 13 May 2025 08:51:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AAC820E318
+	for <netdev@vger.kernel.org>; Tue, 13 May 2025 08:56:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747126317; cv=none; b=JezMzJcYQ2bQLR5kmfA+1smh2Q43iz04GnmfIcNThHqdg4oeK6L9QL7ZiywihBCLJagdB+N4pIcSlApWUvP+o1KTE6BG88mpw+PlG/rLbviwB58KNFIa8QKPIB9KgiG5zNmBBlsusElA9mtDq7ou7n7ZstO9vlNnrQ5avVZCNrM=
+	t=1747126576; cv=none; b=W8OfVCavXtSP+xjGYCAewckE9Jw6UbRqyzc2XfLXTGqob/NxmMbuvUz9FUgDhx+cr/omX8yKaFXlKaBu44sS9OWgdQhC7pXY2isZVaB3RPUqMuUC8kg3fAHq4xQBzQXSjGQCk6N1dhAS0OkkWYcrBFUB0PcpbZdBItepULy8ni4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747126317; c=relaxed/simple;
-	bh=ioYfR82as7BxIQ6g6jQFZ3hhJuiFD+Xx+vMITtkD7po=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=D9ZfV8lBwlJwbFmRPhOjlBfjiXubx+12G8haHxkUZVIw+Lf9vHc7kY39Wsocxa+mWCY68tJ/070VyUdiH+eLKSEa6T1l/71ybZESPg/0A4fBL38eQeb+zz7vqt228yN9GTFzwBq5mEHjdlS+PFwHh7cR0DwKMWC8l1J/V4cXh8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EMHGekhJ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747126314;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eXsGs2VA+ITuyh4VRCJh/Oyjf9ibDYe324RnCVY1HpQ=;
-	b=EMHGekhJ5lMb7e/xgfNEEJ44fVfalDlWaBDhi8rqM2C7k2n2NFtWvrlc87LlJghZBy6vNh
-	AqtHZ+MITyNK/ZYQEPVafMqqVYx5eCRkpyZkC9pOCpXOwvqH1qPYxwcMw8Dm/FugvtQkbp
-	4MMfUiMBIt82I+1dfnFIdjbvN83UYxQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-349-Ia1vix_JOWOlwuirSt75wg-1; Tue, 13 May 2025 04:51:53 -0400
-X-MC-Unique: Ia1vix_JOWOlwuirSt75wg-1
-X-Mimecast-MFC-AGG-ID: Ia1vix_JOWOlwuirSt75wg_1747126312
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-442cd12d151so36224045e9.1
-        for <netdev@vger.kernel.org>; Tue, 13 May 2025 01:51:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747126312; x=1747731112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eXsGs2VA+ITuyh4VRCJh/Oyjf9ibDYe324RnCVY1HpQ=;
-        b=OcLA8F8RqQEdTo+qN6slhSzlxk8+VKesrbbbhfBWM6ws1kmOrAZvgUCQ2VTiiw8KSs
-         KtJdSEmoqt4LmLSm9+yNRms1hiCiGMvj2Og+AgNWiuow1rD/5wJ+uAKbyajEl/SSvem2
-         BVa3+xEdUONGvrT+E8PwUH+7jHSe84TYJLsgTT6Kzf1U8+TKURFUMK+Gd0sntO0ObOcR
-         SQADQndTn6aGg9nHX7nzU7kdOwm9TCwMO5uCK1lMQJQhH83DNKhHovgz2Q4+P2Gt9vZa
-         Lm9t1KhRWvu/68f8ADJpwx8RI/lN4nByl8BHAG/McWyiDUNX4dFgXGVzhv0GTPySCHUO
-         gIRA==
-X-Forwarded-Encrypted: i=1; AJvYcCXsVDjKIob9O8cEV/VyU5F4kFX1W/hUq0WETIRs4eIDLAwfR0dul8KUKTcH7yxtsvHZeO38ZlQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxpYrQl8cD9dsRctR1LLO5xDGJ713Y/wIcoI1SwWiDqB/dojxLD
-	rN+JfsIMldQIq8OkA6phMWpsYTFHSdv6GshIFFwGVju7//J7t1z6rYySuf16TcYWnQNtJq77t7H
-	L8hrTrYRswwgXZJWs5ZLZ9Fk4yGd4aeTyZ9ov7SccNFRA2rB7ESGf3Q==
-X-Gm-Gg: ASbGnctukvylkxJ+VR/QRQe2oyXne6Aw1FSFfoJ4c50Nw+KZ7sVVpi7jLIUGorH4let
-	9pib8yJw2wq7wCJXG5YIEw6GBJXREoZnDRb/10sxL4IsCWGTdLfObMx3oXLG9FOowmd8HvCAqsh
-	s+W9zjqka5BrKeUucVXaNyjBHaD6767SBM4MAitf8+VUHUlWOnKeLdQK3DE0z/jgwQRhvfMcYD9
-	pZVca2bg7qNUumRSobvlwH1mFMPRvZsBvCX54KWjkQld1prbeXDvIqhJ8oXVkJtpogZ3gcsngDw
-	NYBTnhch6/ZTMy2yl/s=
-X-Received: by 2002:a05:600c:4e0e:b0:43c:e305:6d50 with SMTP id 5b1f17b1804b1-442d6dd9d54mr144108565e9.24.1747126312092;
-        Tue, 13 May 2025 01:51:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFtul9+WMHSXrK//Kbrqv9MInD7Mc4snBmAwczFOs24A5HdJfBc9svhiLHz11Vw6gpX0UPuyg==
-X-Received: by 2002:a05:600c:4e0e:b0:43c:e305:6d50 with SMTP id 5b1f17b1804b1-442d6dd9d54mr144108295e9.24.1747126311750;
-        Tue, 13 May 2025 01:51:51 -0700 (PDT)
-Received: from ?IPV6:2a0d:3341:cc59:6510::f39? ([2a0d:3341:cc59:6510::f39])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442ed666dc7sm11376705e9.18.2025.05.13.01.51.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 May 2025 01:51:51 -0700 (PDT)
-Message-ID: <7b5f7e09-7df0-43cb-9acd-c31720002860@redhat.com>
-Date: Tue, 13 May 2025 10:51:49 +0200
+	s=arc-20240116; t=1747126576; c=relaxed/simple;
+	bh=VfErKRqIjEIlmRoRdoHsjmyuDN3yiGDJBFL0BSnxYAk=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cmEYTrj1CCZHebEKxpLsOvK9fher1FvmPeXc+bLyzQURVT0t1AkYvHNQa2QY0lTo0eWhZURo5uU32phZ/TG9TaLUahNiVHa9ZjWcVRXTs6nkFv7djOo0aA8DJWldtF32jPBaJyeU6RskpdRcUz/eGdS337phlhROBHlhwCqJ+Og=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=JB8+Sghq; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54CMFDZx006723;
+	Tue, 13 May 2025 01:56:04 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=xcgvpSdcfFr4+j6fR7qbwp/16
+	cqAv3qrMgNpEFil97w=; b=JB8+SghqEZYI/UfvsRFIeJjOjatyVd42bI1IYdWu7
+	PYIh6mMXv14+v6cj5CLvJMceOuoJW57NXDrM7FnoLOcZDtNsMPvAeoCsHfjmzw3X
+	+m6Mr1ipaV2aAwNBK4kwhLc46A7J5HdDbYnuSNwinayHl+ynQRawCmGnGgA3nEIq
+	IQdt3I4mvafQKiTEw/hXc5Qi5JoToPY1VJeryavKoFSoPg/p2ZohIWyb9T5KTJVT
+	mzF6GqXtC/geuiK+zIHGjadQk3xfPqMzpMKerG36HtFD9lyuybAinMUukbExZZHN
+	udoIcnLpqfxpWbupWXlNndpG4Qo8oxKlR+5RCTMTc4XIA==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 46ksm9h0n7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 13 May 2025 01:56:04 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Tue, 13 May 2025 01:56:03 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Tue, 13 May 2025 01:56:03 -0700
+Received: from f65018e88ba3 (HY-LT91368.marvell.com [10.29.24.116])
+	by maili.marvell.com (Postfix) with SMTP id 1FC7E3F7099;
+	Tue, 13 May 2025 01:55:58 -0700 (PDT)
+Date: Tue, 13 May 2025 08:55:57 +0000
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: Simon Horman <horms@kernel.org>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <gakula@marvell.com>,
+        <hkelam@marvell.com>, <sgoutham@marvell.com>, <lcherian@marvell.com>,
+        <bbhushan2@marvell.com>, <jerinj@marvell.com>,
+        <netdev@vger.kernel.org>
+Subject: Re: [net-next PATCH 3/5] octeontx2: Improve mailbox tracepoints for
+ debugging
+Message-ID: <aCMJHfYbws-amobR@f65018e88ba3>
+References: <1747039315-3372-1-git-send-email-sbhatta@marvell.com>
+ <1747039315-3372-5-git-send-email-sbhatta@marvell.com>
+ <20250512182544.GW3339421@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 03/10] ovpn: set skb->ignore_df = 1 before
- sending IPv6 packets out
-To: Antonio Quartulli <antonio@openvpn.net>, netdev@vger.kernel.org
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Sabrina Dubroca <sd@queasysnail.net>, Gert Doering <gert@greenie.muc.de>
-References: <20250509142630.6947-1-antonio@openvpn.net>
- <20250509142630.6947-4-antonio@openvpn.net>
- <fc07f58e-488e-490e-a33f-50f09163a0fb@redhat.com>
- <effc10de-e7a9-4721-84ee-caafcf9aedb8@openvpn.net>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <effc10de-e7a9-4721-84ee-caafcf9aedb8@openvpn.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250512182544.GW3339421@horms.kernel.org>
+X-Authority-Analysis: v=2.4 cv=LYA86ifi c=1 sm=1 tr=0 ts=68230924 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=FuWJbcO6FHvIESCxiDYA:9 a=CjuIK1q_8ugA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22 a=lhd_8Stf4_Oa5sg58ivl:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTEzMDA4NCBTYWx0ZWRfX5ED0byeqbWRh NUb04oUVST9AlJebRECYTjePxLgf5hPddbO/IpxAO/Rm22/Cimzo/fWNPlC3VEv+JDx4r6zDndd 6M9GTZKLja+auflb/MkvdvcvUoHHJxtbO7aIn60jMKI00hTh1CU38T+l/OeLGr0u8WHGuk4uJlI
+ TXORjcUMHvZEKI6Knjnci2EY87O8cnDqi/CvxnMGNpACs/Nn0AHgcvj8S0txOmR9jEtA/5rWfXO 2R7ia/Eb1uXsRAtsqRg8FfrLGeowfRVyO+dMCtsF73WinOvz7tcxP7/kFawBO4qtskVljibySQ2 8Jet+1todHhnzjjzfFru89NIDSqrfr7qquYdGMzWDedutCd+GL5NnDoAPos3w5dgKgn/+U6EYDO
+ AGEmFLl5uZuZiIi4I76axHzYj0DKwk1DU1wFE+N6Kwv7Y4KdltvST5yPsh4TG87hPmuTaTrJ
+X-Proofpoint-GUID: CIv64NzuIJ6J4rkp30GDgvyqJvAf0nDw
+X-Proofpoint-ORIG-GUID: CIv64NzuIJ6J4rkp30GDgvyqJvAf0nDw
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-12_07,2025-05-09_01,2025-02-21_01
 
-On 5/13/25 9:51 AM, Antonio Quartulli wrote:
-> On 13/05/2025 09:37, Paolo Abeni wrote:
->> On 5/9/25 4:26 PM, Antonio Quartulli wrote:
->>> IPv6 user packets (sent over the tunnel) may be larger than
->>> the outgoing interface MTU after encapsulation.
->>> When this happens ovpn should allow the kernel to fragment
->>> them because they are "locally generated".
->>>
->>> To achieve the above, we must set skb->ignore_df = 1
->>> so that ip6_fragment() can be made aware of this decision.
->>
->> Why the above applies only to IPv6? AFAICS the same could happen even
->> for IPv4.
+Hi Simon,
+
+On 2025-05-12 at 18:25:44, Simon Horman (horms@kernel.org) wrote:
+> On Mon, May 12, 2025 at 02:11:54PM +0530, Subbaraya Sundeep wrote:
+> > There are various stages involved when a VF sends a message
+> > to AF. Say for a VF to send a message to AF below are the steps:
+> > 1. VF sends message to PF
+> > 2. PF receives interrupt from VF
+> > 3. PF forwards to AF
+> > 4. AF processes it and sends response back to PF
+> > 5. PF sends back the response to VF.
+> > This patch adds pcifunc which represents PF and VF device to the
+> > tracepoints otx2_msg_alloc, otx2_msg_send, otx2_msg_process so that
+> > it is easier to correlate which device allocated the message, which
+> > device forwarded it and which device processed that message.
+> > Also add message id in otx2_msg_send tracepoint to check which
+> > message is sent at any point of time from a device.
+> > 
+> > Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
 > 
-> For IPv4 we have the 'df=0' param that is passed to 
-> udp_tunnel_xmit_skb(), which basically leads to the same result.
+> The cover letter and other patches in this series are n/4.
+> But this is patch 3/5 (there is also a patch 3/4).
+> This doesn't seem right.
+Yes you are right. Some stale patch in the directory sent by mistake.
+Please ignore this. Will send v2.
 
-You need to include (an expanded/more describing version of) the above
-in the commit message.
-
-/P
-
+Thanks,
+Sundeep
 
