@@ -1,143 +1,224 @@
-Return-Path: <netdev+bounces-189989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7D02AB4BDE
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 08:24:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCD9AAB4BE5
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 08:27:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1832A864EB4
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 06:23:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 434181677FD
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 06:27:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E1C1EA7C1;
-	Tue, 13 May 2025 06:23:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 407C91E9B12;
+	Tue, 13 May 2025 06:27:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b="gioOl9Hu"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="mf/B0kFF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 371251E9B12
-	for <netdev@vger.kernel.org>; Tue, 13 May 2025 06:23:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B4CEDF49;
+	Tue, 13 May 2025 06:27:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747117437; cv=none; b=psdC0Pbz7D7H/OD/msOtmogntVV3xt+Z0ZqM6oVSXQf37yTwj/7HN12IZlEBHWgva22sTAcKyLV6kyg94+pGxD80a3EqZK++UHy/WrFgvziJM3hO1vOtHZGoOZcCiFEwFQMYHFdHKs07jJg3IJAVvWGYtehtByqS7l5kbdv/c48=
+	t=1747117654; cv=none; b=AWtaNXD3FxJXGkU0Y/4DZPcvfCNn2iYWTwRAjK0DQP5/MPEtS+VVJXoGZjK/00UTd+DKCXCrTG6Gl3Q2qfHf1Ck2TGtj7hNHVM9KUaQ0Rgav4WHY+wj6SkHpukbZyZys4xnsq3G7DPgGsi3b27IeRiidVC9aT3sL9Gu2y8aKwNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747117437; c=relaxed/simple;
-	bh=NWDL4ww3BQl/HzMVL3Bws9NyNng7ta9aYTnl0hs9Srg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WTPXRKqQGNBcsGncPrt7/P8eeAlT5R1LUXpqAD8Hdv3lRgodPJDxAnPmy3ZiXGwYuFZMqDVE9Ki66IMGecCGQKOYy2ZgY+VxXf/wU9Yy9hOwwpPgHnN68ooz4j6sUJhuYPKLc6mXtNFLZc+MrAOY7g3Zz4Mz967qyThAE/Sd/QA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com; spf=pass smtp.mailfrom=shopee.com; dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b=gioOl9Hu; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shopee.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-7426159273fso1906033b3a.3
-        for <netdev@vger.kernel.org>; Mon, 12 May 2025 23:23:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shopee.com; s=shopee.com; t=1747117435; x=1747722235; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4Xe4uYghntGHOIEC3/13sie1Qhs4ut1BoBFJ4y42rbE=;
-        b=gioOl9HueOoo+fAbm9efI7fx1oKwy3vyGzy+7wCsqLBA8D2Fqc8O9rFW5IrcV0RUcu
-         8PssdqvhprsqZ8DiqYINK7DyTz8sqKr9eusgHs5ut6MN/LM24dsq/XfcmdjJYUTgbhdI
-         NuzwV7p6yrc8EIEoYgp/KJspyvVdM59lTI5eT+AAKp/JUPxcS02MQP2QlaO0sLm3vPhy
-         5ycUzOcNRgaPGAY588MfCeGJEzFzS27B6BwClhqePvGgSPjRkjI7rO1AthTo1TRxiruB
-         8otXPJKAnY+4fcRd0kA/48ovlBGm1MRwYPzI0VRAyG1uyjYob+3sZQIgksOFfgankAf0
-         wNNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747117435; x=1747722235;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=4Xe4uYghntGHOIEC3/13sie1Qhs4ut1BoBFJ4y42rbE=;
-        b=tAQUQnKnDsUvgLq2Ry219D8DX00fhRUdz/XS6lUWqHY9mEhcOftb3SbAvCvxbRuRbT
-         WczzliE9K55C6+R59fKAar7YaSj977p9OjhIw8N5pPmw8eNR4lOeiIjguw/wKxP0672a
-         RjZKhp573zBAwIC3OJpm7VrcgQ0DYb+7/NjtnfqlZRKfPc7rd4dAiYGp2QB7u3lh+jgN
-         zULHaSZfjqYZHyjY65MaowZhhmhBi1bNbtpVhttZX74hXgKxq7Ro5fqIB2N5MNafoOFl
-         kZQprDakFJt/vQF+AxjY/fqjqxtf1rXyGqtv86wrmdcR8AYodIdImLUwAUunwKUjTLAp
-         I3+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU1SWjdIo+V0d9HvgN2Fe0fNiOYq6ML1yx4pSnPfNoZpaNhUgo9IRsvM5oJNh8aPVLDLvXigY8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYDJeo0Oht6vi86zILGC8OC8Uhk0Sleq4VADh/+0poilnc36pG
-	LcUkIv++dFKs1akJLVLLj/YtHg51EtexPk9R1Uz6Dkhc5CEqB7k1wt9ZnCkdvLQ=
-X-Gm-Gg: ASbGncvtDISba60jTexTpvHKtXgBeUKME7tkhiHz/qTDyP+Hs6dlKbpbkk+uy755Re/
-	4ZZssFEWcq3ath6Bdlf9wL/QpiBVqdnkXIlwqUpTBmtldlLJbLk02tAtCWP2ltfXUJwmx3tUvCs
-	Y2s09aN9gPZl/r/eJ18VfzJB3rI4JaaunzI83DimcIDN6AOIpj+gfks6g9VlSrgvjkYxBswR6Xt
-	dnSKqFwMH5Ke7svHIQT/BW2Vz02Lt+Th0K/qxS2aFSRy3OQL3jghSFRh74UbiOVa7upNEoTZsu8
-	oOBoEOQVdcl1zWjxlnEsD3/6B1cTu7lQqlR/CRy01HZd3qPNQ6bkgfTo/Q0HrcOr
-X-Google-Smtp-Source: AGHT+IGaYQuRICfs2SknzMpxDQM2zuaFYRjcuLtZoCaPh500iOYbo4XJp56Xa+ir6JeYYEIEzfycdw==
-X-Received: by 2002:a05:6a00:4652:b0:740:6f69:8d94 with SMTP id d2e1a72fcca58-7423b3f12e7mr22633670b3a.0.1747117435423;
-        Mon, 12 May 2025 23:23:55 -0700 (PDT)
-Received: from [10.54.24.77] ([143.92.118.3])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74237a1088csm6987174b3a.113.2025.05.12.23.23.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 May 2025 23:23:55 -0700 (PDT)
-Message-ID: <bf9a3230-26b9-40f7-aff0-99c802fb7764@shopee.com>
-Date: Tue, 13 May 2025 14:23:50 +0800
+	s=arc-20240116; t=1747117654; c=relaxed/simple;
+	bh=NTyhw2Sxrc2FRoeNUdP0aniN1vvCdiMHWpOBLku//+k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h90qj+juehtrrLnG7dWig7gXfIOKrRdAZPjK4Bo5pGJuoFAbCz7fJBX7WeTp3FYwCwp+kU22Zo4vVUmBOEy9V7RWxhTgxM/LYXGzR9dDVLDYofmRSa5Zsyv+uYzOCGP2vJ3lOpgSjtu6AYqZgYXmhh+pRzsMcVfnzM938Gmbyr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=mf/B0kFF; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1134)
+	id 254242117449; Mon, 12 May 2025 23:27:32 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 254242117449
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1747117652;
+	bh=cC2JhmOqv91IV0Hp0w7gkJeK2Cjeqx/4eBqdSgpnygk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mf/B0kFF966OBH69THTGBU/0xKE+7M3ANOR9RORRp7mN2mOWK81ZiCKGtpXgR8/Fj
+	 FLvu8rqvD1Lu4ozNy60jJq3yFxP18B0XKYY97SO8GEkrzMg8dSpHYwXzmrBEezl557
+	 YhKo8GbEBgDybZikbVezJBCvNDdHwHkoNFxDbasg=
+Date: Mon, 12 May 2025 23:27:32 -0700
+From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+To: Haiyang Zhang <haiyangz@microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	decui@microsoft.com, stephen@networkplumber.org, kys@microsoft.com,
+	paulros@microsoft.com, olaf@aepfle.de, vkuznets@redhat.com,
+	davem@davemloft.net, wei.liu@kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, leon@kernel.org,
+	longli@microsoft.com, ssengar@linux.microsoft.com,
+	linux-rdma@vger.kernel.org, daniel@iogearbox.net,
+	john.fastabend@gmail.com, bpf@vger.kernel.org, ast@kernel.org,
+	hawk@kernel.org, tglx@linutronix.de, andrew+netdev@lunn.ch,
+	kotaranov@microsoft.com, horms@kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next,v3] net: mana: Add handler for hardware
+ servicing events
+Message-ID: <20250513062732.GA32721@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1747079874-9445-1-git-send-email-haiyangz@microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: i40e: How the packets will be processed when status_error_len is
- 0
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <0c8bf3f2-1620-420e-8858-fe1c2ff5a8e9@shopee.com>
- <CAL+tcoAYvN20aMz-WYFEUeBypS8yMJ53YgdMUHCX6FCr__qT9A@mail.gmail.com>
-From: Haifeng Xu <haifeng.xu@shopee.com>
-In-Reply-To: <CAL+tcoAYvN20aMz-WYFEUeBypS8yMJ53YgdMUHCX6FCr__qT9A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1747079874-9445-1-git-send-email-haiyangz@microsoft.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
+On Mon, May 12, 2025 at 12:57:54PM -0700, Haiyang Zhang wrote:
+> To collaborate with hardware servicing events, upon receiving the special
+> EQE notification from the HW channel, remove the devices on this bus.
+> Then, after a waiting period based on the device specs, rescan the parent
+> bus to recover the devices.
+> 
+> Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
+> ---
+> v3:
+> Updated for checkpatch warnings as suggested by Simon Horman.
+> 
+> v2:
+> Added dev_dbg for service type as suggested by Shradha Gupta.
+> Added driver cap bit.
+> 
+> ---
+>  .../net/ethernet/microsoft/mana/gdma_main.c   | 64 +++++++++++++++++++
+>  include/net/mana/gdma.h                       | 11 +++-
+>  2 files changed, 73 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> index 4ffaf7588885..3102bd2b875b 100644
+> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> @@ -352,11 +352,55 @@ void mana_gd_ring_cq(struct gdma_queue *cq, u8 arm_bit)
+>  }
+>  EXPORT_SYMBOL_NS(mana_gd_ring_cq, "NET_MANA");
+>  
+> +#define MANA_SERVICE_PERIOD 10
+> +
+> +struct mana_serv_work {
+> +	struct work_struct serv_work;
+> +	struct pci_dev *pdev;
+> +};
+> +
+> +static void mana_serv_func(struct work_struct *w)
+> +{
+> +	struct mana_serv_work *mns_wk;
+> +	struct pci_bus *bus, *parent;
+> +	struct pci_dev *pdev;
+> +
+> +	mns_wk = container_of(w, struct mana_serv_work, serv_work);
+> +	pdev = mns_wk->pdev;
+> +
+> +	if (!pdev)
+> +		goto out;
+> +
+> +	bus = pdev->bus;
+> +	if (!bus) {
+> +		dev_err(&pdev->dev, "MANA service: no bus\n");
+> +		goto out;
+> +	}
+> +
+> +	parent = bus->parent;
+> +	if (!parent) {
+> +		dev_err(&pdev->dev, "MANA service: no parent bus\n");
+> +		goto out;
+> +	}
+> +
+> +	pci_stop_and_remove_bus_device_locked(bus->self);
+> +
+> +	msleep(MANA_SERVICE_PERIOD * 1000);
+> +
+> +	pci_lock_rescan_remove();
+> +	pci_rescan_bus(parent);
+> +	pci_unlock_rescan_remove();
+> +
+> +out:
+> +	kfree(mns_wk);
+> +}
+> +
+>  static void mana_gd_process_eqe(struct gdma_queue *eq)
+>  {
+>  	u32 head = eq->head % (eq->queue_size / GDMA_EQE_SIZE);
+>  	struct gdma_context *gc = eq->gdma_dev->gdma_context;
+>  	struct gdma_eqe *eq_eqe_ptr = eq->queue_mem_ptr;
+> +	struct mana_serv_work *mns_wk;
+>  	union gdma_eqe_info eqe_info;
+>  	enum gdma_eqe_type type;
+>  	struct gdma_event event;
+> @@ -400,6 +444,26 @@ static void mana_gd_process_eqe(struct gdma_queue *eq)
+>  		eq->eq.callback(eq->eq.context, eq, &event);
+>  		break;
+>  
+> +	case GDMA_EQE_HWC_FPGA_RECONFIG:
+> +	case GDMA_EQE_HWC_SOCMANA_CRASH:
+> +		dev_dbg(gc->dev, "Recv MANA service type:%d\n", type);
+> +
+> +		if (gc->in_service) {
+> +			dev_info(gc->dev, "Already in service\n");
+> +			break;
+> +		}
+> +
+> +		mns_wk = kzalloc(sizeof(*mns_wk), GFP_ATOMIC);
+> +		if (!mns_wk)
+> +			break;
+> +
+> +		dev_info(gc->dev, "Start MANA service type:%d\n", type);
+> +		gc->in_service = true;
+> +		mns_wk->pdev = to_pci_dev(gc->dev);
+> +		INIT_WORK(&mns_wk->serv_work, mana_serv_func);
+> +		schedule_work(&mns_wk->serv_work);
+> +		break;
+> +
+>  	default:
+>  		break;
+>  	}
+> diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
+> index 228603bf03f2..d0fbc9c64cc8 100644
+> --- a/include/net/mana/gdma.h
+> +++ b/include/net/mana/gdma.h
+> @@ -58,8 +58,9 @@ enum gdma_eqe_type {
+>  	GDMA_EQE_HWC_INIT_EQ_ID_DB	= 129,
+>  	GDMA_EQE_HWC_INIT_DATA		= 130,
+>  	GDMA_EQE_HWC_INIT_DONE		= 131,
+> -	GDMA_EQE_HWC_SOC_RECONFIG	= 132,
+> +	GDMA_EQE_HWC_FPGA_RECONFIG	= 132,
+>  	GDMA_EQE_HWC_SOC_RECONFIG_DATA	= 133,
+> +	GDMA_EQE_HWC_SOCMANA_CRASH	= 135,
+>  	GDMA_EQE_RNIC_QP_FATAL		= 176,
+>  };
+>  
+> @@ -388,6 +389,8 @@ struct gdma_context {
+>  	u32			test_event_eq_id;
+>  
+>  	bool			is_pf;
+> +	bool			in_service;
+> +
+>  	phys_addr_t		bar0_pa;
+>  	void __iomem		*bar0_va;
+>  	void __iomem		*shm_base;
+> @@ -558,12 +561,16 @@ enum {
+>  /* Driver can handle holes (zeros) in the device list */
+>  #define GDMA_DRV_CAP_FLAG_1_DEV_LIST_HOLES_SUP BIT(11)
+>  
+> +/* Driver can self reset on EQE notification */
+> +#define GDMA_DRV_CAP_FLAG_1_SELF_RESET_ON_EQE BIT(14)
+> +
+>  #define GDMA_DRV_CAP_FLAGS1 \
+>  	(GDMA_DRV_CAP_FLAG_1_EQ_SHARING_MULTI_VPORT | \
+>  	 GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX | \
+>  	 GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG | \
+>  	 GDMA_DRV_CAP_FLAG_1_VARIABLE_INDIRECTION_TABLE_SUPPORT | \
+> -	 GDMA_DRV_CAP_FLAG_1_DEV_LIST_HOLES_SUP)
+> +	 GDMA_DRV_CAP_FLAG_1_DEV_LIST_HOLES_SUP | \
+> +	 GDMA_DRV_CAP_FLAG_1_SELF_RESET_ON_EQE)
+>  
+>  #define GDMA_DRV_CAP_FLAGS2 0
+>  
+> -- 
+> 2.34.1
 
-
-On 2025/5/13 14:13, Jason Xing wrote:
-> On Tue, May 13, 2025 at 12:08 PM Haifeng Xu <haifeng.xu@shopee.com> wrote:
->>
->> Hi all,
->>
->>         If the packets arrive at the rx and then raise soft irq to handle it, but in i40e_clean_rx_irq, status_error_len is 0 and return.
-> 
-> Directly "return"? What version of I40E are you looking at?
-
-stable kenrel 5.15.162,
-
-i40e_clean_rx_irq
-...
-	qword = le64_to_cpu(rx_desc->wb.qword1.status_error_len);
-	...
-	size = (qword & I40E_RXD_QW1_LENGTH_PBUF_MASK) >>
-		       I40E_RXD_QW1_LENGTH_PBUF_SHIFT;
-	if (!size)
-		break;
-...
-
-if status_error_len is 0, the i40e_clean_rx_irq returns 0.
-> 
->>         The data isn't fetchted from the rx buffer, so the how the packets arrive at the rx will be processed?
-> 
-> In i40e_clean_rx_irq(), packets are one by one constructed into the
-> sk_buff and then passed to the stack by napi_gro_receive().
-> 
-> AFAIK, common drivers implement nearly the same scenario.
-> 
-> 
-> Thanks,
-> Jason
-> 
-> 
->>
->>         FYI, the every rx/tx queue has been bounded to one cpu(64 queues, 64 cpus).
->>
->> Thanks!
->>
-
+Reviewed-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
 
