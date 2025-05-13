@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-190247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FA78AB5D3F
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 21:40:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28C06AB5D41
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 21:40:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88C0D4A0D49
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 19:40:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D808319E6611
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 19:40:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B00A2C086A;
-	Tue, 13 May 2025 19:39:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCC572BFC63;
+	Tue, 13 May 2025 19:39:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3pom3pJc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="06axBYdV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 915562BF96F
-	for <netdev@vger.kernel.org>; Tue, 13 May 2025 19:39:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29D972C0306
+	for <netdev@vger.kernel.org>; Tue, 13 May 2025 19:39:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747165180; cv=none; b=ow0QUezGEi7CkhROegL4uKb6HGGA6J9E8ZfUiMn91GSni0iEDiKZWotbzmV11Ed/mMb+1D5u/hmpAyJP2TO5TZed5tpPRBW3WY2oRzZliGiA9NcaUCecYfei+JNGdIk9059cHqiRmuCFxU+o36tkZutEXe3DscbcERIC7LyQpjg=
+	t=1747165181; cv=none; b=nNauJCApO4LrIcKkzWZzVKivZm8lULhWO1KVmU4uN8v9ktp6giH4sc5bW9X7bUzbx5h8StbuDgt7yp7UK5CAu0w8XHK0aZ0zGFKv1yU4Xree9SvOBTWSPNtE8gH3BCcH8b3NhaiIae9R6DBBrl5HyXEBAZqLws3LzdBubTMC21g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747165180; c=relaxed/simple;
-	bh=RSAenodTiuiPAqCTqOEffBLr5PA9sYV34PH9Vc5pup0=;
+	s=arc-20240116; t=1747165181; c=relaxed/simple;
+	bh=33hF+R4+3bkuq/JtvFKKLWLyc+uvw5LaQ+TcIAJb+OQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MF+bqpxE40M6Q94earI/qrYNW08OO3FMXMvczPqcmF7iWpCVsrKJyFrbk/uQ/OutKSJdUR4+Mmf13pYx62VhHytgSgT/iUTUadPJc0oKBF4e7E10JcNSX87xBqJxrPoOYUeiE6DFJuoYv2ElT4AUQP+7OFDoaymAU7CUs6lYII8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3pom3pJc; arc=none smtp.client-ip=209.85.160.201
+	 To:Cc:Content-Type; b=MInovKWcRB9djUDiJQrXPSHw8M2d6bbJBc0gNQcbuG9TxSGNcJAm5RCGyYIMTN7trj4JLaLm8ZX4EJ3cpQBzdyW93lYMt+b+r4d9M0DubbgzTzb0g7YpJmJrYpOmepoMoinx7GGl9bFQAnq7/3UJP2bfm66gZBckpyaeqNPqhFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=06axBYdV; arc=none smtp.client-ip=209.85.222.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-47ae87b5182so112491171cf.2
-        for <netdev@vger.kernel.org>; Tue, 13 May 2025 12:39:38 -0700 (PDT)
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7c5750ca8b2so858719985a.0
+        for <netdev@vger.kernel.org>; Tue, 13 May 2025 12:39:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747165177; x=1747769977; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1747165179; x=1747769979; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4rVdksWi24cwBwtgRx54BEvToF9/PIiCuOzPeG0IvBM=;
-        b=3pom3pJcS3svqgTqG0puFh2ORr7DUpYkHiO93XEggqgN1Cv/PERuxV/l+6oqGKty0/
-         gLDQWc8DZWFqm001wqqUu4tXHOEXSxVUr9P5wG1OyWV1aVfst6NbjQ2D3Zi4evfc8VxZ
-         fqEl6B0lyCiRkp7AVuPlox6QSn50MWH/UPcyOD7xllZLRGVEakNuEOJv4rdU4MicUHHv
-         +BoMvrwpj6b3M8fXjAZCZRLFOBm3mD0os45OoNNyllY5t5Fnf1KsHhyMj2usH6v0iX20
-         Vw3VfsHBR7KpramB9YmzLHtMXa+svfPupB492uV5cYm42J5WD36jdiCItEL5SlvT1ORg
-         Y4zQ==
+        bh=E/b5gd8AcBJOX2dLOtydVCeH7TNv7LdYmWiC5fZgD44=;
+        b=06axBYdVItx8sjnvyLcJYKjk4RVm4Xo0iYNbu8NusxqyrIsdKEV/X1MKdmoHupsxdt
+         uhBk0ZAGupnCRLBSp7fmoL1S3qrMDRFd+VfpLK5qSJ9YWW8g8To9sYGMUe3aeNcJUGWH
+         Nh8C2/qQHn5jV7OHarpHpCGoL775nTcQ1uGWzFIYGUfqyjD2FtZStxpSZTc4sUG1KcfB
+         7dIHszGmLhCBzBt3+H9fhL4uFAi/Wrqppq/BnE08WZaSQzkmWFRM8zXqwLBuD//gU3xF
+         KzGqGsVG0xuTrIKYJUSfqujB9imvhrZhICbCBpk0bo4zedZr6frKiIQihpXUQIwWlkvH
+         vYBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747165177; x=1747769977;
+        d=1e100.net; s=20230601; t=1747165179; x=1747769979;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4rVdksWi24cwBwtgRx54BEvToF9/PIiCuOzPeG0IvBM=;
-        b=bPrndChSHgTsZChGddcoTqEuoe6U54GoShcw+6Y44A9+oAWYJEPkYGSFh3lQrdYND7
-         iM18eh0FD4aixGIouRNb7mtGfGrIjAxvfGYBD99g37Q+U599l3NgG7YD28xHRM0zeKZ4
-         pcN4vtaVdkvB+cAD+Ax9hz9YeKPJjS3rnHa7VEcXZMKx3cD9MF9DhTlnMSOyiIi+xKP1
-         Du77yCLdUj4jJ6zepHa4tztFj86m5QFLtMd4eadtfghmwB6cUMe2E7dX5jH3EXM5n6xz
-         ucG7Q5SYNlqTBS3ITSX9NRmE03tJH449OPxCHrnfeii3Ka3fyUifQoC0dQtREXsNsw58
-         9OfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV8jI6tDXWkncqitSqqHe9oiDStPMBxwT0Q4cYuf77167mkWHi79a7frXjk9wLse/+DfDJs2uM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZGDzidaWDWzZlXVSypuWFAI2EP3MzWu69tEujUaEhSikEKgrZ
-	9EJlAwhfdz1LMNpYnhM5GDkJYyi6tjK/IUBxnI1hiRm2znbuLDaziZRRGP0r91eimiRKFbsDxLc
-	xl/WLmEFRmQ==
-X-Google-Smtp-Source: AGHT+IESF0/qPWYPzLqF5iG8bbKEu2tdR+MDeqUQxVLHkLgAGw10tthCgTsJesgQjVte4B2BY+hodU9UWKKb+g==
-X-Received: from qtbay31.prod.google.com ([2002:a05:622a:229f:b0:48d:7e8a:cdc1])
+        bh=E/b5gd8AcBJOX2dLOtydVCeH7TNv7LdYmWiC5fZgD44=;
+        b=ZDi6Uc2iFwgW8MZNBjOraZv7t3kiR53+aMxaWdME5SZUA/C6B766G6liq0jrwvT1ed
+         ffhxtxmVOO0agBLYKfL3L/RcOjOu2DxXcD06e/zNPejZ9tam4tm57tjaTHTsEpsaDmwB
+         /hlNglencSSjbdb9g+PZthuk+1OkRI/ftvdlWJtFBnRR3LQZYSxONGMhMT4eHWTWQ8jy
+         0h0SOtS5sYk8q1ikse0CYaq60ODGJ5FGE72u5Y6x3kC0+2rQ2XgkEOc4MpYvEpUmxOGG
+         gS8EXRYDQbYPoiQNUnvTE3oKCmOw5T7jpGmUxWjDFoZ/2kyOfbYg6UbB6QXTu/2qsQM1
+         qpoA==
+X-Forwarded-Encrypted: i=1; AJvYcCVkdOV2bsSu+VIDgKnm2f70b4GlFQh3U57qH6UP4hc16N6ClsgSaXl1jFG24ZYm0qRR7qJ+mC4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywh+rfreb6DZfJqDCl9xBMDv59+CKdQTNJZWI64SNmM3R5Q+JPe
+	yKqq7pWrigpV/37lvjr+rvC9GMI0DZ23j6b17XwjI3NjgCu3X6J/uu62ghhpaxc49aHDn7xdi58
+	+IWcStNg5gA==
+X-Google-Smtp-Source: AGHT+IEYh0qFloNH3Sayqtlr2ZjMJIthL4fEfUPw1nzpyGRF4AI5C835fny4OfGCootP3TQKRiHM7F3kBpm+Cw==
+X-Received: from qtbgd5.prod.google.com ([2002:a05:622a:5c05:b0:494:771a:c76f])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:1b13:b0:47a:eade:95d3 with SMTP id d75a77b69052e-49495cccfbemr12690871cf.33.1747165177496;
- Tue, 13 May 2025 12:39:37 -0700 (PDT)
-Date: Tue, 13 May 2025 19:39:18 +0000
+ 2002:a05:620a:1a21:b0:7ca:f34f:dfee with SMTP id af79cd13be357-7cd28812d1dmr98592185a.34.1747165179011;
+ Tue, 13 May 2025 12:39:39 -0700 (PDT)
+Date: Tue, 13 May 2025 19:39:19 +0000
 In-Reply-To: <20250513193919.1089692-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250513193919.1089692-1-edumazet@google.com>
 X-Mailer: git-send-email 2.49.0.1045.g170613ef41-goog
-Message-ID: <20250513193919.1089692-11-edumazet@google.com>
-Subject: [PATCH net-next 10/11] tcp: always use tcp_limit_output_bytes limitation
+Message-ID: <20250513193919.1089692-12-edumazet@google.com>
+Subject: [PATCH net-next 11/11] tcp: increase tcp_rmem[2] to 32 MB
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
@@ -84,42 +84,45 @@ Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
 	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This partially reverts commit c73e5807e4f6 ("tcp: tsq: no longer use
-limit_output_bytes for paced flows")
+Last change to tcp_rmem[2] happened in 2012, in commit b49960a05e32
+("tcp: change tcp_adv_win_scale and tcp_rmem[2]")
 
-Overriding the tcp_limit_output_bytes sysctl value
-for FQ enabled flows has the following problem:
+TCP performance on WAN is mostly limited by tcp_rmem[2] for receivers.
 
-It allows TCP to queue around 2 ms worth of data per flow,
-defeating tcp_rcv_rtt_update() accuracy on the receiver,
-forcing it to increase sk->sk_rcvbuf even if the real
-RTT is around 100 us.
-
-After this change, we keep enough packets in flight to fill
-the pipe, and let receive queues small enough to get
-good cache behavior (cpu caches and/or NIC driver page pools).
+After this series improvements, it is time to increase the default.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/ipv4/tcp_output.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ Documentation/networking/ip-sysctl.rst | 2 +-
+ net/ipv4/tcp.c                         | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 13295a59d22e65305d8c4094313e4aa37306cbff..3ac8d2d17e1ff42aaeb9adf0a9e0c99c13d141a8 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -2619,9 +2619,8 @@ static bool tcp_small_queue_check(struct sock *sk, const struct sk_buff *skb,
- 	limit = max_t(unsigned long,
- 		      2 * skb->truesize,
- 		      READ_ONCE(sk->sk_pacing_rate) >> READ_ONCE(sk->sk_pacing_shift));
--	if (sk->sk_pacing_status == SK_PACING_NONE)
--		limit = min_t(unsigned long, limit,
--			      READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_limit_output_bytes));
-+	limit = min_t(unsigned long, limit,
-+		      READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_limit_output_bytes));
- 	limit <<= factor;
+diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
+index 91b7d0a1c7fd884ee964d5be0d4dbd10ce040f76..0f1251cce31491930c3e446ae746e538d22fc5c7 100644
+--- a/Documentation/networking/ip-sysctl.rst
++++ b/Documentation/networking/ip-sysctl.rst
+@@ -735,7 +735,7 @@ tcp_rmem - vector of 3 INTEGERs: min, default, max
+ 	net.core.rmem_max.  Calling setsockopt() with SO_RCVBUF disables
+ 	automatic tuning of that socket's receive buffer size, in which
+ 	case this value is ignored.
+-	Default: between 131072 and 6MB, depending on RAM size.
++	Default: between 131072 and 32MB, depending on RAM size.
  
- 	if (static_branch_unlikely(&tcp_tx_delay_enabled) &&
+ tcp_sack - BOOLEAN
+ 	Enable select acknowledgments (SACKS).
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 0ae265d39184ed1a40a724a1ad6bb8f2f22d4fff..b7b6ab41b496f98bf82e099fab1da454dce1fe67 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -5231,7 +5231,7 @@ void __init tcp_init(void)
+ 	/* Set per-socket limits to no more than 1/128 the pressure threshold */
+ 	limit = nr_free_buffer_pages() << (PAGE_SHIFT - 7);
+ 	max_wshare = min(4UL*1024*1024, limit);
+-	max_rshare = min(6UL*1024*1024, limit);
++	max_rshare = min(32UL*1024*1024, limit);
+ 
+ 	init_net.ipv4.sysctl_tcp_wmem[0] = PAGE_SIZE;
+ 	init_net.ipv4.sysctl_tcp_wmem[1] = 16*1024;
 -- 
 2.49.0.1045.g170613ef41-goog
 
