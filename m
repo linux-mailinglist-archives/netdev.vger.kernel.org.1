@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-189938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 398BAAB48C0
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 03:20:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9350AB48C1
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 03:20:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E34F4A0B2A
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 01:20:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60D941B41C30
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 01:20:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48FC61991B6;
-	Tue, 13 May 2025 01:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1D7219ABD1;
+	Tue, 13 May 2025 01:20:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rzh5l60g"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D5O1D5fx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D5B198E77;
-	Tue, 13 May 2025 01:20:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF1C317A2E1;
+	Tue, 13 May 2025 01:20:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747099206; cv=none; b=iJaq3+d5eDkwi6IqLvUl2W9M37bHAVWtHy+tM0/kE9kdrLZ0AujhcYJCnQbPCkeJoMfPJJ3AygLNqIh2sfyQZmmoPFsPNX95C53GxeggkTLobghF/DfruRit/dcZOyAEoxx83kKJiyH8LpLcKOakbJCChRz90/hGm6TqE/n+sm0=
+	t=1747099207; cv=none; b=BdAlylGtHm/9juoCUQ9Z2wnyHPEj7TClWaCnkEk2HkHieRh1zOk58MCRd68E6/DoEjQanWj0wN5fFSol82qiRkehsErgj3MNFCK+pbolYCzsKn4xXVrMZ9u954cFCjuRd8mxRoChVfZjczBRLyLIbuJlzotqJavcsXw7nN6wllA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747099206; c=relaxed/simple;
-	bh=FC8z1wi1K6dK2m+JyJM5vOOZeOE332L5EbCrdvDc+R4=;
+	s=arc-20240116; t=1747099207; c=relaxed/simple;
+	bh=wbVTTxxBwLmuewk8BKQPc7eO8FMRyCKLF3h3mGYdRC0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hEGt0Ocbg7iYpCrdxJPhhMjSbCuudBSrb2CQIv8eu7Exn69Jfnpou/JKhc/IPSl6co0D6Z3N8S1+ukTdEmMDr9u+yf4moN4ZlWmd8qfrr+An0HBWHo7qG8dPEIp50YiMOKIzf4TxJ6y6QPTpgnB2tx4+nPCrAD+ve/50adY+zIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rzh5l60g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8077EC4CEE7;
-	Tue, 13 May 2025 01:20:05 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=OdxAy/6yHZg3AXrZnQp+iZEcSNU9rugtnHm+73J8Bn9SqNsOWuekpTXlmvrIlgY78LAonCE/X0RBXfQZnyIog2J1lGCj71IfZw7JpQkOYHIjs3qWPQUQ4gLpjXg5gcWFUlnA/kufpY7k2pMgvHiTicKNSiidF9AnmXJ8JbTmh8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D5O1D5fx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1581CC4CEEF;
+	Tue, 13 May 2025 01:20:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747099205;
-	bh=FC8z1wi1K6dK2m+JyJM5vOOZeOE332L5EbCrdvDc+R4=;
+	s=k20201202; t=1747099207;
+	bh=wbVTTxxBwLmuewk8BKQPc7eO8FMRyCKLF3h3mGYdRC0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Rzh5l60gEACP/jt67kQF1cuMCYYuCzuozE8OkbRYBih9C9G8Sy2Up2CzDAq/6DSSH
-	 R+9WM3DT5oYsiv4/Q0Npei9cPzTYNJiXtswfLnmrO64/JhSLgOGzdW48fdDleOc3sM
-	 ogdNqL010uZ7Ct7zbQ7G229Guouo6TiWNNXVEJITomJ2mzRf9AwBabMOTYM6PQ16nR
-	 fi6zvDGc/AfRMs+bbDHcsn1/6iNVv9BOnhhbLz9JNmqTLZGph8xieTEbnO1aF+mdWt
-	 Zyk0w5YnfcDsKdKoo/FHYGOXQcMPpM4PoZHk5sx13232+95L26SV2VQtylKHkbliDf
-	 DhXYyUFX4fWyQ==
+	b=D5O1D5fxixblN+NTtrU1yWGg6zQSf7AEn8BwSlDExwdLrl9MYIdUxijuYdSFSmw9/
+	 Lo4RcAlCXjqHRhG0roLrXPe9reGfnPqG7PsYl07CAN1XYD7D7rmTQEdPX/POll/RVX
+	 dY7sxZhws8ZiCa65UJWQnlrjZ7FZVceMkY0IDwcmBYqLAwP7veDoY+GWpXmWlnRYG/
+	 XWReEr2YQz0zJRKvSIomPHErVAhXGzddNehWjXN+Kfa1T+dZsiOboiPOXro4g/3GN1
+	 3FPQsr60KJhCmNKwXmWN91W5PQjQ7HLcpyuBUcxWVs/gCiE0OPfWWz7YGpYCsCbOrj
+	 JxBUixZsgZcSQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70B5739D60BA;
-	Tue, 13 May 2025 01:20:44 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE0339D60BA;
+	Tue, 13 May 2025 01:20:45 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] selftests: drv-net: ping: make sure the ping test
- restores checksum offload
+Subject: Re: [PATCH net-next] dt-bindings: net: renesas-gbeth: Add support for
+ RZ/V2N (R9A09G056) SoC
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174709924300.1134434.16948489646200403450.git-patchwork-notify@kernel.org>
-Date: Tue, 13 May 2025 01:20:43 +0000
-References: <20250508214005.1518013-1-kuba@kernel.org>
-In-Reply-To: <20250508214005.1518013-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
- linux-kselftest@vger.kernel.org
+ <174709924449.1134434.17040861965722709401.git-patchwork-notify@kernel.org>
+Date: Tue, 13 May 2025 01:20:44 +0000
+References: <20250507173551.100280-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+In-Reply-To: <20250507173551.100280-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+To: Lad@codeaurora.org, Prabhakar <prabhakar.csengg@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, geert+renesas@glider.be, magnus.damm@gmail.com,
+ netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ biju.das.jz@bp.renesas.com, fabrizio.castro.jz@renesas.com,
+ prabhakar.mahadev-lad.rj@bp.renesas.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu,  8 May 2025 14:40:05 -0700 you wrote:
-> The ping test flips checksum offload on and off.
-> Make sure the original value is restored if test fails.
+On Wed,  7 May 2025 18:35:50 +0100 you wrote:
+> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: shuah@kernel.org
-> CC: linux-kselftest@vger.kernel.org
+> Document support for the GBETH IP found on the Renesas RZ/V2N (R9A09G056)
+> SoC. The GBETH controller on the RZ/V2N SoC is functionally identical to
+> the one found on the RZ/V2H(P) (R9A09G057) SoC, so `renesas,rzv2h-gbeth`
+> will be used as a fallback compatible.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] selftests: drv-net: ping: make sure the ping test restores checksum offload
-    https://git.kernel.org/netdev/net-next/c/ef5224ed25e0
+  - [net-next] dt-bindings: net: renesas-gbeth: Add support for RZ/V2N (R9A09G056) SoC
+    https://git.kernel.org/netdev/net-next/c/6b466efc6365
 
 You are awesome, thank you!
 -- 
