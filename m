@@ -1,104 +1,107 @@
-Return-Path: <netdev+bounces-190129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83A52AB541C
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 13:49:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BDD0AB5434
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 14:00:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2CC971B46338
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 11:49:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A89B74626D9
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 12:00:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45621255E4D;
-	Tue, 13 May 2025 11:48:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C482728D8D0;
+	Tue, 13 May 2025 11:59:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fFbje9LC"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q4YsjN4N"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5FCD80B;
-	Tue, 13 May 2025 11:48:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ABBB238C34;
+	Tue, 13 May 2025 11:59:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747136935; cv=none; b=pVX41OVbmzchZ7ZfqEFXBC70gWQgLVY90WHq2FXc9Ys1OINZCVBAGSteVCY64JtptsxDU5yNtTTSmnZLr9604sYB+FClSnrzagZrV3NgsmCkOh3JOM76+JewB+G1zeqW4MvP1ZRva3uDQYnT0H3oe2Ln2ncHloKuEFJzxuxrYhg=
+	t=1747137598; cv=none; b=tJV1AoPnkYWjOx9XVh4b8d3NfQsrskpzVUj1WB6ohyDrNMXIm4uAaEE1tz5mL0pR1bhtTitwJ/L/9bLT63QZgPiXWu83RorSYpYuedcv5kR/wl86NhjgLzOSIu22QoH5EM5dnviaWWrPfunHLyYk6ALCKsVf+76UE5T4J4s43kg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747136935; c=relaxed/simple;
-	bh=PfHDASGae7GwzCjj5rJNhR8LKba7dyTry6KYd7MXJfo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Pz9MYgIqDYYwQwxnV78cCYdTIEonBWct0KpPhhOIm/s7OLPg8stutt1Q10K7WQ2UteVAVZe/F1cIzTGGnp5cJYYxemt9uNwsDwSbTQEanum1Zn9diTbMn7+Clz9ILFnswiBKJR9EciwPE4ulA7FuX6moaEjBx/MsebEdUrvTVZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fFbje9LC; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 4BB8543224;
-	Tue, 13 May 2025 11:48:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1747136925;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PfHDASGae7GwzCjj5rJNhR8LKba7dyTry6KYd7MXJfo=;
-	b=fFbje9LCo6l6XU2zxFRW5hVpKZrp8WzQUh3eW+UpxYIan3ddHX1xVjmBw90aIIxFvKC/tp
-	nKoQCCddeRToqSi/ByA5DoYeL8SEqxlz6pKwPssNtTZI5ThN9vtZTxkwTJCr0Uw6uC+Svq
-	bAtETBQghcEAsuW0f6vBqorqw3Ms6/HmSbxtJPKV+gx0Ftrv7OtjsiQqeFfeUZ44xHdGvu
-	iuODVwB+44/tmcRpSjVdZKmtIwuMFKMpsozrJeW9z9DhS5WZ8LyZhSTmmqWOnXrJXHfUf6
-	ZZIJslOKFeN/fcH9iNmPbUTGbEIMZtBMDyhc9iHkPyjS+T862lsBs0mBHJG7Jg==
-Date: Tue, 13 May 2025 13:48:39 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Piotr Kubik <piotr.kubik@adtran.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 0/2] Add Si3474 PSE controller driver
-Message-ID: <20250513134813.579ff90e@kmaincent-XPS-13-7390>
-In-Reply-To: <bf9e5c77-512d-4efb-ad1d-f14120c4e06b@adtran.com>
-References: <bf9e5c77-512d-4efb-ad1d-f14120c4e06b@adtran.com>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1747137598; c=relaxed/simple;
+	bh=7nLZ6+YQ0LEZVQ+Ha5u7twgq3seC/yQzyyA3Aw7H+8Q=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=F/eLeXV1pdCmSgJL4NMVLctShWgvdNepE0wfrvHoxpYY2RBQi9cD5/bCWMa/wREDkQo01+C1LQJumHkrM22wHa/bMVlGA6NqwtQTZDZfZrYtYymfgwQVYkAzhkEduc+xxWdifMu12zLeB60gNhf9JpspEzdOlRDQ6BboXSiidvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q4YsjN4N; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A1D1C4CEE4;
+	Tue, 13 May 2025 11:59:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747137598;
+	bh=7nLZ6+YQ0LEZVQ+Ha5u7twgq3seC/yQzyyA3Aw7H+8Q=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=q4YsjN4NOsrjD21ig93pRIXgXIlScg/u+shJuBOhY+vQuh+vsxUBUGS5QvFT7X/Jk
+	 +zfmybqLvuRKntNxcX1tZKgdBp1N2N6nvkjsCwoTY28tAI5pOmvXJwCWvUaz54QpVv
+	 WovEzZr/j3TjPJ6Ub98BQJv+N79FDFFD4xFfeMOLFr7aUl8t9zdSEnMayTapMYfnek
+	 bS6RAhNJ4+C4pR09yqEhz/KLN0OnKplO3q/Hyr2Ed/r4Nb/1n6dz4NinYWPB2zf3n9
+	 KmyGcCElo1OGz9Kv0lLTsOZfCfxw+f8qT08qxOYmB+rlIMe0pDcnVMC/5qZrd8M/tq
+	 giFshi9KzKwWw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33CE339D61FF;
+	Tue, 13 May 2025 12:00:37 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeftdegtddvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgfdutdefvedtudegvefgvedtgfdvhfdtueeltefffefffffhgfetkedvfeduieeinecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppedvrgdtudemtggsudgrmeeiudemjehfkegtmehfjeekrgemfhelvghfmeekkegttdemieefsghfnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgdurgemiedumeejfhektgemfhejkegrmehflegvfhemkeektgdtmeeifegsfhdphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudegpdhrtghpthhtohepphhiohhtrhdrkhhusghikhesrgguthhrrghnrdgtohhmpdhrtghpthhtohepohdrrhgvmhhpvghlsehpvghnghhuthhrohhnihigrdguvgdprhgtphhtthhop
- egrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheprhhosghhsehkvghrnhgvlhdrohhrgh
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3 0/5] amd-xgbe: add support for AMD Renoir
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174713763601.1640156.13599661807797356779.git-patchwork-notify@kernel.org>
+Date: Tue, 13 May 2025 12:00:36 +0000
+References: <20250509155325.720499-1-Raju.Rangoju@amd.com>
+In-Reply-To: <20250509155325.720499-1-Raju.Rangoju@amd.com>
+To: Rangoju@codeaurora.org, Raju <Raju.Rangoju@amd.com>
+Cc: horms@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Shyam-sundar.S-k@amd.com
 
-On Mon, 12 May 2025 22:02:52 +0000
-Piotr Kubik <piotr.kubik@adtran.com> wrote:
+Hello:
 
-> From: Piotr Kubik <piotr.kubik@adtran.com>
->=20
-> These patch series provide support for Skyworks Si3474 I2C
-> Power Sourcing Equipment controller.
->=20
-> Based on the TPS23881 driver code.
->=20
-> Supported features of Si3474:
-> - get port status,
-> - get port admin state,
-> - get port power,
-> - get port voltage,
-> - enable/disable port power
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-You forgot the series version in the subject like this: [PATCH net-next v2 =
-0/2]
+On Fri, 9 May 2025 21:23:20 +0530 you wrote:
+> Add support for a new AMD Ethernet device called "Renoir". It has a new
+> PCI ID, add this to the current list of supported devices in the
+> amd-xgbe devices. Also, the BAR1 addresses cannot be used to access the
+> PCS registers on Renoir platform, use the indirect addressing via SMN
+> instead.
+> 
+> Changes since v2:
+> - include linux/pci.h in xgbe-dev.c to ensure pci_err() is defined
+> - line wrap to 80 columns wide
+> - address Checkpatch warning "Improper SPDX comment style"
+> - use the correct device name Renoir instead of Crater
+> - follow reverse Xmass tree ordering
+> 
+> [...]
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Here is the summary with links:
+  - [net-next,v3,1/5] amd-xgbe: reorganize the code of XPCS access
+    https://git.kernel.org/netdev/net-next/c/2d4407160f60
+  - [net-next,v3,2/5] amd-xgbe: reorganize the xgbe_pci_probe() code path
+    https://git.kernel.org/netdev/net-next/c/bbbd7303ea18
+  - [net-next,v3,3/5] amd-xgbe: add support for new XPCS routines
+    https://git.kernel.org/netdev/net-next/c/e49479f30ef9
+  - [net-next,v3,4/5] amd-xgbe: Add XGBE_XPCS_ACCESS_V3 support to xgbe_pci_probe()
+    https://git.kernel.org/netdev/net-next/c/ab95bc9aa795
+  - [net-next,v3,5/5] amd-xgbe: add support for new pci device id 0x1641
+    https://git.kernel.org/netdev/net-next/c/795f86ff0505
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
