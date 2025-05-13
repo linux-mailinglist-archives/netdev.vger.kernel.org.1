@@ -1,217 +1,208 @@
-Return-Path: <netdev+bounces-189914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29720AB4819
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 02:03:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 75CFBAB4827
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 02:06:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 769773BFB35
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 00:02:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D28EB3B0551
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 00:06:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85F1518D;
-	Tue, 13 May 2025 00:03:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69C06A93D;
+	Tue, 13 May 2025 00:06:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dIuZSVdk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R9x4nIZK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D97CBA50
-	for <netdev@vger.kernel.org>; Tue, 13 May 2025 00:03:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4A3BA50;
+	Tue, 13 May 2025 00:06:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747094591; cv=none; b=IGa/QbnPIEysKjZBuea1tRytheTSEFrH78LLz65uQqnlfazhsrsrnQ2ynvIW+AJnmdRWzTK+IiM4ae+72fdj5bIDx/a/BnM3U22KKv55yLVm337afs5ImXkZTU9vgxfcH0KQFnYXeiFZeByLzYdRAEOLroU7Eiw9TJKjhgn4v80=
+	t=1747094785; cv=none; b=jT4JbzcKxWtfJrIreWOK64OLw+B9UiqfmWevkvA0vDJ92naY9hyGXWLJBSv1HyALT+VYF06oaF7RHGQ3qo9gMTc7wcqmCHym+pQjCcgEliF42F/Y0LquFjSe8ndDkUDo7tFegOatlrjWqHXeQajfIn+wBoe3S/zOuaW3G9gvwAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747094591; c=relaxed/simple;
-	bh=UEcV3ny/LLLcfEq+rtX2d/kLpTN0vQyp5MubamPRriY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pDlR7jw0KntPudgc27/7t+Iy9e8i8MAubGpclDYV6NzYomxpz+xyKMXTIP3fanjvsYbU5Iac9emlX60sjVWig4mAh3vQfFWw9dmj2j/ihstt/bg2EFQs10BX4Th21cTO3p8dJUY87a3AHT2R1pn1En8/zwoVRG3gqXXG8dB0fi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dIuZSVdk; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-22e39fbad5fso48855ad.1
-        for <netdev@vger.kernel.org>; Mon, 12 May 2025 17:03:09 -0700 (PDT)
+	s=arc-20240116; t=1747094785; c=relaxed/simple;
+	bh=15QlA1RvqwWBPCuQg1QOEhb8GU/p5PFuITDF0PemJyE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XT+Jp/Sbx+xIrk+PONHg2bmzvRmVWib2jTSBWugpkfT7gd7CL4AnJ7T2dKgjm9duGBAP3mzKXhgGVyJq2mB2v7dx/Wuap7yrxoRu8dY3J3FcVtzssezr0C3G35dU5lCOyfcC0xv43mibyWSgggwnDm9of+czcrr/X9nOEC0goaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R9x4nIZK; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-22e730c05ddso45738815ad.2;
+        Mon, 12 May 2025 17:06:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747094589; x=1747699389; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hxrCjaGUD3r5k3kK66meWCgUCgXIciyDBKuxrmRW22k=;
-        b=dIuZSVdkIf+WtNBcISE38dmMqyV+z9dxB4/Tx5AWVvcU0BVfnBUQxnarN+ourhjxyr
-         2LDmKEeMqIGo/A8hxdncU/sgunL0TRyZqCZiwzMcpt2bkEjsCf6/8Db+G7FIAmodsOAq
-         xxF2NaBFbDH8U2+1A6RiI6QJgLtzhENVXHWvc+pH3Lre55D9VhK9PXXf2HReGlb7kqUd
-         ujqjh8d/AfAtQUib1BuXyPbLXZfyweCoJo0gotN5ARzKyndib6U6OIFK3NT4f82R8rmm
-         04EuqSOaoK8W48fFdJwUz+T06pNiRHiYzuhfGPJrJDOxY2MPiy0EhSI5GCrsOTtz6psX
-         Vj2w==
+        d=gmail.com; s=20230601; t=1747094781; x=1747699581; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:reply-to:message-id:date
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8muQO4QFV9cfTFAot9pQ7G4buAK54OtcnnAyHHxj5uY=;
+        b=R9x4nIZK0O6YLd4fJHGWwKR2fwoD4q5OW0dxAAHjBCSjYy6BouFc5DH93i5MgO0N3y
+         dE/aQvn7LifHmAzZS012f+ooj3sXJ0/o9+H+ZJOPiwYC9trhb6ftZurQ4PbKEub1FMXc
+         YmF1GEMH39XNwK/7Lo3mBoJw3vZABV8cxqm08Dk7EI4FI1d5yiXqWY4FVSBUR91k5D81
+         EuQK3kEaKxiRCRrUlQkf2ge55kI3IJFRxCygUtjGf8uXdyOLytVtwPlkZ4Ncg8zghlXM
+         4jlBdBgJzHo+Tyb8OiRduRkn/wP4ekSIA0QN5+9HHgZkmqZlJZmXQA0USYwLLY4sGaMx
+         4Qtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747094589; x=1747699389;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hxrCjaGUD3r5k3kK66meWCgUCgXIciyDBKuxrmRW22k=;
-        b=OtaefiW2cxtP2LGK6L8RZhuk+PWVoq2pOMbdKtBy38CN6nl+w/ZoKc6jZ1eXm7tGHC
-         5By+1KgKy6GiXIq1OfBo/v6p9weCePeXR46IGuta+durFyzJIg77p5bqncdhMv6MdTvd
-         Nq0L3VSDl+r3bKZGo3V29oz/Q0tSfc7DjvEpvEj3gCfxV8NGhAIk394SdHuSLhkxn/Su
-         qvt+FX3Xp6977SDHZWsvCUln63Y4HPJEjYd0fVi0CUT8MOkmjh5YV78KzNnQrakqHciU
-         zfq9wGx6N29rN1bsnRJGdTAwXYyh0UT21lMsGs4y57RYfp0WCGOL4UbEQvXE10uEeqKU
-         ZoQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUcMuLfZl9CZuZp2g9539PND5LyflBHtoepyREJd0Y0d5kNgS5sTp5gBsQcGtwcviuT3jBUTWc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKSQqhoRJazc923W4E/GSD08Iy4h9EgoCZFUDVcRs824rKiY+6
-	jO/wv3qNJI9f/WsKWq1cbZAT2D0IaGt3S9hQCjYJ8yXS2rGrlG3sZSVPm89B0M8dscH5qV3qbjL
-	u65RCNbk2NnxW38yVfybZ4XKQa7KUyAaUQxPq45LI
-X-Gm-Gg: ASbGncvFcRaSouePIuCTNBZUnmb46s10JgOpcjuqdhD7m1rjzGxUwOsK8zJMiUqRDxj
-	bPu3PYxUHPyyi57sWusiu8xP2GO6j+JonNg7C0F4A5Jn1s+ZnYjakhJqgY0Ndd23P0NtJO5yE1C
-	gMoGTtZ4iakkKK+2Q0sPbb5n4k6CVy/8F+NBHWPAGbc3jcwWmbjK2+yXhMuphuFO4=
-X-Google-Smtp-Source: AGHT+IF7OA0Hss9q0EXyEf8yxuzN/6zw8N5Iad+oSD/SpPfTdJfxgNZBuIBO0rlNJKHyQUVpUvoTgm7Dsr/1fqa3ssE=
-X-Received: by 2002:a17:902:c944:b0:224:1fb:7b65 with SMTP id
- d9443c01a7336-2317d7dcc48mr1254075ad.22.1747094588659; Mon, 12 May 2025
- 17:03:08 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1747094781; x=1747699581;
+        h=content-transfer-encoding:mime-version:reply-to:message-id:date
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8muQO4QFV9cfTFAot9pQ7G4buAK54OtcnnAyHHxj5uY=;
+        b=Aa+unqBk4JU+t1P0BcHxSChWoyzB1gU2K+IouWHAD/UQooRn7kXEQZZ1hvRFEW7NFC
+         qsHjJQMTjZizXJiV90HdacRj978f1EHetvY1b0jWRDfiFNvZfMY2mEVk8EBVPzfnkOHr
+         E0bRm6Ekh7W6NNT8RmZWg/yzMkb8/jYbGdBjw2wWWrw+QuZkc4siE40hpqJFzc8oZIAg
+         SXBq3qIARL5omuB+LB/eaf5wLpIZtaZvXUSKvUqdwH3I1PCHE86MqNEeqO4d3rKQpoYh
+         IwOwXFxSaWfBiJjY2n9JFCr9+6udbpUKDsHXAitho1cD0A1WYqt9/a9WT/WIDFWy7Jjx
+         +qLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUMt+ZzmvJwpuDlahCl/7otsqZMkq5tu510KK81Q+PhcIYRMCHxRlnmmnLGZ8fi65Wb7qWvZxtTNIUaKg==@vger.kernel.org, AJvYcCUlAUAV0rAkVs8eC1y4QUoYJzFqu9Zq5AeU+tjdJsY+sJ3OuK0AtqtEqsfR3FS78MCjmy4AueiS@vger.kernel.org, AJvYcCVqhbAmgeoFDkpHBbFw+KCaM1X4D6NXlXuRzX9ZQbRcKCUa6gEnKZFqm5tqsJLXnWxB0E5kIBwF@vger.kernel.org, AJvYcCXFfVKFJjfuyREPqqlb+IfWJltNhkXi3jsDbaQhKIHElEbUQfYJ+uVf4F072fEj2O/wCYS1IaWDnR4N0E4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzyeMkIhRyMVRkruNCEuqgRvjoT82HxqxU7uYiK6WdYNRlUaA68
+	MOLWcEc0QeE/fPLg2do50D5rktoTXEbMZ0bLGgneUPii4SnOA+2+
+X-Gm-Gg: ASbGncvAK3Q8X1gC8cmZKOqSSwCx7au3op5KkbXxrJD/d3l52tggBJ4xHDDfJGxRGig
+	kk57xT0WB4ugBYbNpHH27L72Na8PFju3qNAX/CyaXMgUWWW0JSMYeDCcryzs9kzVFogDFAr+Ieb
+	c5Q1wjZbiclsrKI6xZK40eKd3H+sZp7x7L13j+v+ICndC10auydJT0O8CL/wuQansfo+Dcz7PpG
+	wesH4M7NlQHZlIo9CaXc4YamI+8U8S5jlMIiC3RVVj/iv+JUDI7rrU4lDTv/V6GPZlpfWfSfUGW
+	eSPUCAKCZf9UVMxkPoRjFlGSF7I0Ctv10p0B3Jk3a3U3YO7X7Q1dPYIcg6CaXugq30YJHs+Hkw+
+	/GFaaVxXjIuFyp0DrHhWsYv0RTl6byQ==
+X-Google-Smtp-Source: AGHT+IGOdy/5TRdsB8TQMESAds9fv8y6dVMhnUM3bhvm/H593j88ln37N2/fl5wL+AZFbQpPJwnybQ==
+X-Received: by 2002:a17:902:ce8b:b0:223:44c5:4eb8 with SMTP id d9443c01a7336-22fc8d98ab0mr231086305ad.32.1747094780966;
+        Mon, 12 May 2025 17:06:20 -0700 (PDT)
+Received: from localhost.localdomain (c-67-160-120-253.hsd1.wa.comcast.net. [67.160.120.253])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22fc828b491sm68470665ad.184.2025.05.12.17.06.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 May 2025 17:06:20 -0700 (PDT)
+From: mhkelley58@gmail.com
+X-Google-Original-From: mhklinux@outlook.com
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	James.Bottomley@HansenPartnership.com,
+	martin.petersen@oracle.com
+Cc: linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH net 0/5] hv_netvsc: Fix error "nvsp_rndis_pkt_complete error status: 2"
+Date: Mon, 12 May 2025 17:05:59 -0700
+Message-Id: <20250513000604.1396-1-mhklinux@outlook.com>
+X-Mailer: git-send-email 2.25.1
+Reply-To: mhklinux@outlook.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250512084059.711037-1-ap420073@gmail.com>
-In-Reply-To: <20250512084059.711037-1-ap420073@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 12 May 2025 17:02:55 -0700
-X-Gm-Features: AX0GCFv3HqWrqvK9hQXPMGc4mGne98JqnVo-OGpldUYye6UZX2CmqxfuRUkxPOY
-Message-ID: <CAHS8izM5jsbKCMb9FEmnWDuvWUpo8CkQFytnzack4LBByzeV0w@mail.gmail.com>
-Subject: Re: [PATCH net v4] net: devmem: fix kernel panic when netlink socket
- close after module unload
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, horms@kernel.org, sdf@fomichev.me, 
-	netdev@vger.kernel.org, asml.silence@gmail.com, dw@davidwei.uk, 
-	skhawaja@google.com, kaiyuanz@google.com, jdamato@fastly.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, May 12, 2025 at 1:41=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> wro=
-te:
->
-> Kernel panic occurs when a devmem TCP socket is closed after NIC module
-> is unloaded.
->
-> This is Devmem TCP unregistration scenarios. number is an order.
-> (a)netlink socket close    (b)pp destroy    (c)uninstall    result
-> 1                          2                3               OK
-> 1                          3                2               (d)Impossible
-> 2                          1                3               OK
-> 3                          1                2               (e)Kernel pan=
-ic
-> 2                          3                1               (d)Impossible
-> 3                          2                1               (d)Impossible
->
-> (a) netdev_nl_sock_priv_destroy() is called when devmem TCP socket is
->     closed.
-> (b) page_pool_destroy() is called when the interface is down.
-> (c) mp_ops->uninstall() is called when an interface is unregistered.
-> (d) There is no scenario in mp_ops->uninstall() is called before
->     page_pool_destroy().
->     Because unregister_netdevice_many_notify() closes interfaces first
->     and then calls mp_ops->uninstall().
-> (e) netdev_nl_sock_priv_destroy() accesses struct net_device to acquire
->     netdev_lock().
->     But if the interface module has already been removed, net_device
->     pointer is invalid, so it causes kernel panic.
->
-> In summary, there are only 3 possible scenarios.
->  A. sk close -> pp destroy -> uninstall.
->  B. pp destroy -> sk close -> uninstall.
->  C. pp destroy -> uninstall -> sk close.
->
-> Case C is a kernel panic scenario.
->
-> In order to fix this problem, It makes mp_dmabuf_devmem_uninstall() set
-> binding->dev to NULL.
-> It indicates an bound net_device was unregistered.
->
-> It makes netdev_nl_sock_priv_destroy() do not acquire netdev_lock()
-> if binding->dev is NULL.
->
-> A new binding->lock is added to protect a dev of a binding.
-> So, lock ordering is like below.
->  priv->lock
->  netdev_lock(dev)
->  binding->lock
->
-> Tests:
-> Scenario A:
->     ./ncdevmem -s 192.168.1.4 -c 192.168.1.2 -f $interface -l -p 8000 \
->         -v 7 -t 1 -q 1 &
->     pid=3D$!
->     sleep 10
->     kill $pid
->     ip link set $interface down
->     modprobe -rv $module
->
-> Scenario B:
->     ./ncdevmem -s 192.168.1.4 -c 192.168.1.2 -f $interface -l -p 8000 \
->         -v 7 -t 1 -q 1 &
->     pid=3D$!
->     sleep 10
->     ip link set $interface down
->     kill $pid
->     modprobe -rv $module
->
-> Scenario C:
->     ./ncdevmem -s 192.168.1.4 -c 192.168.1.2 -f $interface -l -p 8000 \
->         -v 7 -t 1 -q 1 &
->     pid=3D$!
->     sleep 10
->     modprobe -rv $module
->     sleep 5
->     kill $pid
->
-> Splat looks like:
-> Oops: general protection fault, probably for non-canonical address 0xdfff=
-fc001fffa9f7: 0000 [#1] SMP DEBUG_PAGEALLOC KASAN NOPTI
-> KASAN: probably user-memory-access in range [0x00000000fffd4fb8-0x0000000=
-0fffd4fbf]
-> CPU: 0 UID: 0 PID: 2041 Comm: ncdevmem Tainted: G    B   W           6.15=
-.0-rc1+ #2 PREEMPT(undef)  0947ec89efa0fd68838b78e36aa1617e97ff5d7f
-> Tainted: [B]=3DBAD_PAGE, [W]=3DWARN
-> RIP: 0010:__mutex_lock (./include/linux/sched.h:2244 kernel/locking/mutex=
-.c:400 kernel/locking/mutex.c:443 kernel/locking/mutex.c:605 kernel/locking=
-/mutex.c:746)
-> Code: ea 03 80 3c 02 00 0f 85 4f 13 00 00 49 8b 1e 48 83 e3 f8 74 6a 48 b=
-8 00 00 00 00 00 fc ff df 48 8d 7b 34 48 89 fa 48 c1 ea 03 <0f> b6 f
-> RSP: 0018:ffff88826f7ef730 EFLAGS: 00010203
-> RAX: dffffc0000000000 RBX: 00000000fffd4f88 RCX: ffffffffaa9bc811
-> RDX: 000000001fffa9f7 RSI: 0000000000000008 RDI: 00000000fffd4fbc
-> RBP: ffff88826f7ef8b0 R08: 0000000000000000 R09: ffffed103e6aa1a4
-> R10: 0000000000000007 R11: ffff88826f7ef442 R12: fffffbfff669f65e
-> R13: ffff88812a830040 R14: ffff8881f3550d20 R15: 00000000fffd4f88
-> FS:  0000000000000000(0000) GS:ffff888866c05000(0000) knlGS:0000000000000=
-000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000563bed0cb288 CR3: 00000001a7c98000 CR4: 00000000007506f0
-> PKRU: 55555554
-> Call Trace:
-> <TASK>
->  ...
->  netdev_nl_sock_priv_destroy (net/core/netdev-genl.c:953 (discriminator 3=
-))
->  genl_release (net/netlink/genetlink.c:653 net/netlink/genetlink.c:694 ne=
-t/netlink/genetlink.c:705)
->  ...
->  netlink_release (net/netlink/af_netlink.c:737)
->  ...
->  __sock_release (net/socket.c:647)
->  sock_close (net/socket.c:1393)
->
-> Fixes: 1d22d3060b9b ("net: drop rtnl_lock for queue_mgmt operations")
-> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+From: Michael Kelley <mhklinux@outlook.com>
 
-Thank you for the fix, and working through the review comments.
+Starting with commit dca5161f9bd0 in the 6.3 kernel, the Linux driver
+for Hyper-V synthetic networking (netvsc) occasionally reports
+"nvsp_rndis_pkt_complete error status: 2".[1] This error indicates
+that Hyper-V has rejected a network packet transmit request from the
+guest, and the outgoing network packet is dropped. Higher level
+network protocols presumably recover and resend the packet so there is
+no functional error, but performance is slightly impacted. Commit
+dca5161f9bd0 is not the cause of the error -- it only added reporting
+of an error that was already happening without any notice. The error
+has presumably been present since the netvsc driver was originally
+introduced into Linux.
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
+This patch set fixes the root cause of the problem, which is that the
+netvsc driver in Linux may send an incorrectly formatted VMBus message
+to Hyper-V when transmitting the network packet. The incorrect
+formatting occurs when the rndis header of the VMBus message crosses a
+page boundary due to how the Linux skb head memory is aligned. In such
+a case, two PFNs are required to describe the location of the rndis
+header, even though they are contiguous in guest physical address
+(GPA) space. Hyper-V requires that two PFNs be in a single "GPA range"
+data struture, but current netvsc code puts each PFN in its own GPA
+range, which Hyper-V rejects as an error in the case of the rndis
+header.
 
---=20
-Thanks,
-Mina
+The incorrect formatting occurs only for larger packets that netvsc
+must transmit via a VMBus "GPA Direct" message. There's no problem
+when netvsc transmits a smaller packet by copying it into a pre-
+allocated send buffer slot because the pre-allocated slots don't have
+page crossing issues.
+
+After commit 14ad6ed30a10 in the 6.14 kernel, the error occurs much
+more frequently in VMs with 16 or more vCPUs. It may occur every few
+seconds, or even more frequently, in a ssh session that outputs a lot
+of text. Commit 14ad6ed30a10 subtly changes how skb head memory is
+allocated, making it much more likely that the rndis header will cross
+a page boundary when the vCPU count is 16 or more.  The changes in
+commit 14ad6ed30a10 are perfectly valid -- they just had the side
+effect of making the netvsc bug more prominent.
+
+One fix is to check for adjacent PFNs in vmbus_sendpacket_pagebuffer()
+and just combine them into a single GPA range. Such a fix is very
+contained. But conceptually it is fixing the problem at the wrong
+level. So this patch set takes the broader approach of maintaining
+the already known grouping of contiguous PFNs at a higher level in
+the netvsc driver code, and propagating that grouping down to the
+creation of the VMBus message to send to Hyper-V. Maintaining the
+grouping fixes this problem, and has the added benefit of allowing
+netvsc_dma_map() to make fewer calls to dma_map_single() to do bounce
+buffering in CoCo VMs.
+
+Patch 1 is a preparatory change to allow vmbus_sendpacket_mpb_desc()
+to specify multiple GPA ranges. In current code
+vmbus_sendpacket_mpb_desc() is used only by the storvsc synthetic SCSI
+driver, and it always creates a single GPA range.
+
+Patch 2 updates the netvsc driver to use vmbus_sendpacket_mpb_desc()
+instead of vmbus_sendpacket_pagebuffer(). Because the higher levels of
+netvsc still don't group contiguous PFNs, this patch is functionally
+neutral. The VMBus message to Hyper-V still has many GPA ranges, each
+with a single PFN. But it lays the groundwork for the next patch.
+
+Patch 3 changes the higher levels of netvsc to preserve the already
+known grouping of contiguous PFNs. When the contiguous groupings are
+passed to vmbus_sendpacket_mpb_desc(), GPA ranges containing multiple
+PFNs are produced, as expected by Hyper-V. This is point at which the
+core problem is fixed.
+
+Patches 4 and 5 remove code that is no longer necessary after the
+previous patches.
+
+These changes provide a net reduction of about 65 lines of code, which
+is an added benefit.
+
+These changes have been tested in normal VMs, in SEV-SNP and TDX CoCo
+VMs, and in Dv6-series VMs where the netvsp implementation is in the
+OpenHCL paravisor instead of the Hyper-V host.
+
+These changes are built against kernel version 6.15-rc6.
+
+[1] https://bugzilla.kernel.org/show_bug.cgi?id=217503
+
+Michael Kelley (5):
+  Drivers: hv: Allow vmbus_sendpacket_mpb_desc() to create multiple
+    ranges
+  hv_netvsc: Use vmbus_sendpacket_mpb_desc() to send VMBus messages
+  hv_netvsc: Preserve contiguous PFN grouping in the page buffer array
+  hv_netvsc: Remove rmsg_pgcnt
+  Drivers: hv: vmbus: Remove vmbus_sendpacket_pagebuffer()
+
+ drivers/hv/channel.c              | 65 ++-----------------------------
+ drivers/net/hyperv/hyperv_net.h   | 13 ++++++-
+ drivers/net/hyperv/netvsc.c       | 57 ++++++++++++++++++++++-----
+ drivers/net/hyperv/netvsc_drv.c   | 62 +++++++----------------------
+ drivers/net/hyperv/rndis_filter.c | 24 +++---------
+ drivers/scsi/storvsc_drv.c        |  1 +
+ include/linux/hyperv.h            |  7 ----
+ 7 files changed, 83 insertions(+), 146 deletions(-)
+
+-- 
+2.25.1
+
 
