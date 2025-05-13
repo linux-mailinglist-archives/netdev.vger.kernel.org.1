@@ -1,88 +1,116 @@
-Return-Path: <netdev+bounces-190119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B70DAB53B2
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 13:22:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E442AB53BD
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 13:23:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF3C83A9C16
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 11:21:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B92F3B11F4
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 11:23:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7683D28D840;
-	Tue, 13 May 2025 11:22:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25DED28D85A;
+	Tue, 13 May 2025 11:23:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lhbnpTOp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="InxzWI8a"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CDC823F424;
-	Tue, 13 May 2025 11:22:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE07F28D840;
+	Tue, 13 May 2025 11:23:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747135322; cv=none; b=cjUMF5ttr2DBQOBkNjyJ9XD0AiSBuenCiqCu+a0NfjMX38XwJ3wR+Zo1kcKfDYlJqOAZwDyop/kcRpwdDdJPDquTtvMHqfr3jopz/yrX2TyQqKynXETuZCdSj14jhuetqGjNAsjG+a6n3hJvsnSuCSJOr+j+cwXRCvtrj9Oeqjg=
+	t=1747135409; cv=none; b=M27/dZE58h/ToWkUSsbbQf5QYc4KK5UlWvrnK/V9zPfEvx5OQBqVvAQ4g9Fc2a/hjNj/McJS+/WLaExpuwi2zhp81w9QK/FNZL1xb1PZMAdjdKOcNWvSlMvrbuHgABa8M9QWS1XRw5Ua/6ha2egL+SnJ4j29D8+3sOH60Xdbh0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747135322; c=relaxed/simple;
-	bh=AxOuVlY+e5hOa0nTcg6ESWbQWoTmDjPzDuHdePL7ZY0=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=RvLmGfi6od7HgOL4XkMZUMXoIJ5TfjVtyLCSlkHZnNToQM36JcXVyQYympyNYPhhVZRvBQ3YZ8BDdfBQ++uFwr/4XZWhDGm9RsGAn42c//Ho7CdGmyIvf0zf+f5Gdp8mLDW9+6Ryzd2CqZ0W9547/O9IrAfnFGmOg2IiJXFPXkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lhbnpTOp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79D88C4CEE4;
-	Tue, 13 May 2025 11:22:01 +0000 (UTC)
+	s=arc-20240116; t=1747135409; c=relaxed/simple;
+	bh=t9jS1x/YvXLsXUVlOHRpXEQ1NUosivINnVeq2109bOE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HoQ0KsTXBOLMrtIl/Ogvh3BQHZSQHIG0mL55MiZtPKim2/I03Re83v3246Q4GAzomTu3ElKFekKKgpOV/WlQAIsUDNEXD3kpxyoNXT3+KVNkpq3z2d2hiFdNhHJtcq+r0nHu7c6d/tPYDJTLFObvduj1gepoDmmN5O6e0vpRHXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=InxzWI8a; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D71B2C4CEE4;
+	Tue, 13 May 2025 11:23:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747135322;
-	bh=AxOuVlY+e5hOa0nTcg6ESWbQWoTmDjPzDuHdePL7ZY0=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=lhbnpTOpyiWhEQeLFq2ZZ1ws9ruLrfrNTuyKUvQCsMtfgoB3ugek4G3/cRqd6ThGq
-	 52iJ5c86Mlvz6zlYzOGLuwJLpXsikj3t00hLquUYlXh2JXBvLE1oydL7XtWqCqRXfz
-	 2mU0Ugac7ORgwLAuCsj84e1NbJUPnQdpZxPivpT5O+mhf/b2/R5B9TF/27DQFXetG4
-	 TDZ1nwo4b7RciIuecLsD6Z4gqR4u+3JII5VVU7dB25rPPnEfxHRL4/PfVBymZiyXZO
-	 PWb5aJImY2vNZYZEoCsJRJo4162usdz9+sqzSUi1tjD85IYqG5J0UrkMuZjvOvYH0d
-	 v4z851B39Ojcw==
-From: Leon Romanovsky <leon@kernel.org>
-To: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
- edumazet@google.com, andrew+netdev@lunn.ch, jgg@ziepe.ca, 
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
- Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: tatyana.e.nikolova@intel.com, david.m.ertman@intel.com, 
- przemyslaw.kitszel@intel.com
-In-Reply-To: <20250509200712.2911060-1-anthony.l.nguyen@intel.com>
-References: <20250509200712.2911060-1-anthony.l.nguyen@intel.com>
-Subject: Re: [PATCH net-next,rdma-next v2 0/5][pull request] Prepare for
- Intel IPU E2000 (GEN3)
-Message-Id: <174713531875.701878.11174495107114492909.b4-ty@kernel.org>
-Date: Tue, 13 May 2025 07:21:58 -0400
+	s=k20201202; t=1747135408;
+	bh=t9jS1x/YvXLsXUVlOHRpXEQ1NUosivINnVeq2109bOE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=InxzWI8a/l+p9XCiwXBwCVJzeVa9Lr+PlapJNCbDQomFGXunqynh2SeoCFm7e9PHQ
+	 bXyIiyQglFyjtrYfUp8X8v0ZNrFUAtZywLKxGUxB9ewoNf6eYCU2VKv0vLSn6ja4y9
+	 acZnfAGOwoh/by+ToBDD/iZ83ogsYWA1jDZvixR6R8gWn/npoHlGy0W07UI9oIPC5q
+	 u9/s1pBTjlxiWyen3oFmg6ztBfCi4pCK+prpxbiPpMLvcjc4Ny1sMBC74CFiHNNkvo
+	 YerZvr8Ik3dWbLbP+xGS46uxMJixhEl6oDbjk32QCP3HDHF1qnpocSrcR9Dwbeo8Yw
+	 5fVi/Sgn6Y7nQ==
+Message-ID: <5ec638ab-e61f-4fe7-b7bc-14c03a0de359@kernel.org>
+Date: Tue, 13 May 2025 14:23:23 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 7/9] net: ethernet: ti: cpsw_ale: add policer
+ save restore for PM sleep
+To: Paolo Abeni <pabeni@redhat.com>, Siddharth Vadapalli
+ <s-vadapalli@ti.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Russell King <linux@armlinux.org.uk>,
+ danishanwar@ti.com
+Cc: srk@ti.com, linux-omap@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250505-am65-cpsw-rx-class-v2-0-5359ea025144@kernel.org>
+ <20250505-am65-cpsw-rx-class-v2-7-5359ea025144@kernel.org>
+ <23278f6d-f111-46f7-a844-2cd7fbf8b623@redhat.com>
+Content-Language: en-US
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <23278f6d-f111-46f7-a844-2cd7fbf8b623@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15-dev-37811
 
 
-On Fri, 09 May 2025 13:07:06 -0700, Tony Nguyen wrote:
-> This is the first part in introducing RDMA support for idpf.
-> This shared pull request targets both net-next and rdma-next branches
-> and is based on tag v6.15-rc1.
+
+On 08/05/2025 16:49, Paolo Abeni wrote:
+> On 5/5/25 6:26 PM, Roger Quadros wrote:
+>> diff --git a/drivers/net/ethernet/ti/cpsw_ale.c b/drivers/net/ethernet/ti/cpsw_ale.c
+>> index ce216606d915..4e29702b86ea 100644
+>> --- a/drivers/net/ethernet/ti/cpsw_ale.c
+>> +++ b/drivers/net/ethernet/ti/cpsw_ale.c
+>> @@ -1823,3 +1823,45 @@ int cpsw_ale_policer_set_entry(struct cpsw_ale *ale, u32 policer_idx,
+>>  
+>>  	return 0;
+>>  }
+>> +
+>> +void cpsw_ale_policer_save(struct cpsw_ale *ale, u32 *data)
+>> +{
+>> +	int i, idx;
+>> +
+>> +	for (idx = 0; idx < ale->params.num_policers; idx++) {
+>> +		cpsw_ale_policer_read_idx(ale, idx);
+>> +
+>> +		for (i = 0; i < CPSW_ALE_POLICER_ENTRY_WORDS; i++)
+>> +			data[i] = readl_relaxed(ale->params.ale_regs +
+>> +						ALE_POLICER_PORT_OUI + 4 * i);
+>> +
+>> +		regmap_field_write(ale->fields[ALE_THREAD_CLASS_INDEX], idx);
+>> +		data[i++] = readl_relaxed(ale->params.ale_regs +
+>> +					ALE_THREAD_VAL);
+>> +		data += i * 4;
 > 
-> v2:
-> - Free cdev_info and iidc_priv in ice_deinit_rdma() (patch 5)
+> I'm confused by the '* 4' part. I think that you just need:
+> 		data += i
 > 
-> v1: https://lore.kernel.org/all/20250505212037.2092288-1-anthony.l.nguyen@intel.com/
+> to move to the next policer context. I *think* the current code causes
+> OoB?!?
+
+Good catch. Since data is u32 pointer we should not need '* 4'
+
 > 
-> [...]
+> /P
+> 
 
-Merged, thanks!
-
-https://git.kernel.org/rdma/rdma/c/21508c8c972ca0
-
-Best regards,
 -- 
-Leon Romanovsky <leon@kernel.org>
+cheers,
+-roger
 
 
