@@ -1,126 +1,167 @@
-Return-Path: <netdev+bounces-190251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02258AB5D82
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 22:02:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABED2AB5D87
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 22:07:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1AF221B45116
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 20:02:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DDD48188DD6C
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 20:07:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2ABF2BF98E;
-	Tue, 13 May 2025 20:01:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0A9C2BF3FE;
+	Tue, 13 May 2025 20:06:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ImqrZLn1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eRguNqVL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C393E28CF42
-	for <netdev@vger.kernel.org>; Tue, 13 May 2025 20:01:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FCFE28CF42
+	for <netdev@vger.kernel.org>; Tue, 13 May 2025 20:06:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747166510; cv=none; b=GnduriY3o2JKdmX1jDpzGehaYYQaj3TB4ZdHE2RNvHHxc+0C30ZNNr3gqniU55ws/hHW1pvA0HOdezeUOpxHOsZ5gbUaxKj8KPfQz1rwAbklvUzgRsr4sD+GdPigKPS8dWjithSq/fhr0+3x5gFl5uZrQUJGRj32FO5ZXkiHOgI=
+	t=1747166814; cv=none; b=mGtgCbKwFm0E5crZDwx8cYUmeZf8ouXLe2/ri8uor7Dt4p8Zx7wPwyVnZMaAQ/5bMqyoHFMH0wYz5IiFspqnvUZgY576E3GkM9Uf9pfk876u4GIMhksKIt9+i0IFGXX2zEtnD9n1upOVLWRkCpVysupHNCHcbb/9ZmMgXazJXBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747166510; c=relaxed/simple;
-	bh=PX+OIOKpV49nys5m9EOd/p9Gw7RlB/F8s5UE+EIleKQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UsjWvl65098D5Azl4fkNz+QARqHVwAmiFahAhYhv2IVeQQgs2aOYaiRVSJ3Y3C9DW5zVEbfqvlwJrHXoSYxZ3U2ZyrrQqTxrHDsUG2nfXyxkVwXRZ21FydL4MiWumXRZs85B6X7NUfgsTlMHscYcxi20axl6PyKDFQjQsPLtRhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ImqrZLn1; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-54e8e5d2cf0so6435529e87.2
-        for <netdev@vger.kernel.org>; Tue, 13 May 2025 13:01:48 -0700 (PDT)
+	s=arc-20240116; t=1747166814; c=relaxed/simple;
+	bh=o52Shuc72gvRTkEZy8IOLE/KGJmtn5JqlpBzMqM9G8s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=o/IkIAhgB2SbkFMn8xLZDyreKHRwzOtx/gIy8VsMfkJJkaHAQR5552mQUtcLfCJEaJb2N6+iLXeFz+gJqRTJNS23HdcBo/uD+9R9XOx2/fGEBYEzQgSb+GJB8uN2dewq3RHSqRsFXpy14fpL/aV5LR30TjnA0O+0qQAdIUy/qbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eRguNqVL; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-22e39fbad5fso2665ad.1
+        for <netdev@vger.kernel.org>; Tue, 13 May 2025 13:06:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747166506; x=1747771306; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=k9Yig+kNyVRJJ8BQZWn/VuTrEaP0iQwoIB+QLI82CoY=;
-        b=ImqrZLn1sXI1NaDAwxrXWNgu5fpPWglbs8kguYw5w8c2osmtrt2laB7AsE8pK8/xDf
-         JBSYKlFbU1zYCXqe4TH3kbnVIICz+kUuhYwbciXWfY9UZwnq1JVIrbkZDl540zdzZ0s3
-         Il4BfXJ8D5DALtHZkJQsxJkPYaR3yWNAkbtqcTvNIqADBV4KF/H0fU7xLlNJDJsphw6t
-         dDt6s2Ok9P2IhWEu4quGIs4vsy77RVLf/AnAIHRnGVTp+iCNDTU879esf9WE3GlzZxDp
-         PsoeRKhlVxyNRZY39k0ZChXlaoBA1FhMMiULSTv7yDHGwwnH7bdI0aQhzBEv7vo50OtH
-         ozaQ==
+        d=google.com; s=20230601; t=1747166812; x=1747771612; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+rPCmAarNPsWzOsNBR4e67cSe75uc4M7DiWlF0eW5QM=;
+        b=eRguNqVLuSyEKmUSFzjwOh35ZDOJ9a0XJdycEUVqe7/ybq9GpIp9r8azRkCtE9j7Q1
+         N4CXurt9YcArkf1BjAoqEY9Cljp2s7HiujnCyNtMdTVSSKYIjEwnekdW5dYeil4tIzv/
+         7RiUWkdxgTS5rwqEiv4hmIRAraoUmaxkTCeUSo2Mo9qjmEqiq6O/PwmjeN+D8+8udfYy
+         BxtytAHqoIg+0Cx7gXt2Pl36jYYadfxpKPvobkXzZF4CCIaj3Tjow571ry78SQc7T09+
+         cd0QlDg1mKTwlXF5Kh7gmQBq5TZSkOxmt02UZUvckaxh1bjctz8woOhp5EibwYR9oWm5
+         yXng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747166506; x=1747771306;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=k9Yig+kNyVRJJ8BQZWn/VuTrEaP0iQwoIB+QLI82CoY=;
-        b=B7AKkPeMXUns7W0Um8Ss2k+HWRlJTzwqC5WLi7Pt1ihodcnzC6gMe55lfgVrQ4wU7b
-         V873PvYkjleZ0nPZcjBAPT/m0QtznFb262FAnutoH2pLmxaaA3N85la9GFG19MYPFDhL
-         YvRsSDb1j0Kar8Dyt81COzmoGHkaYcI4zUUck1rNT2S+soPu0JW9c/QWMfImZUzp1RbE
-         lz5WcZlo+TwImXacKM8AA4syw4GiloURnwI1owFTCrc8JYFOdvDVgf/ktg552mzP0jpA
-         YADEsplJL+X+d7luMkIbj8AyAKxFgKuAS+bv6cGheHADFAHIdOWNefJ9sfUtV641KER8
-         PD8A==
-X-Gm-Message-State: AOJu0YyIRTB/h1ddqpkQz8Bm7iuwG3W2JVh1DsS3bqxOrWKgH3giyTEn
-	RZ+uf4lwH1xM8OvVuufHmI9PY28yGT1pA9cQ+ZN6wI8V2f88ksrvMTEJpYmb
-X-Gm-Gg: ASbGncsaVgl8f/L5oPbOaphh0lJNd9o3JnMwQliuSKtmQ43ut8zZVYtRe+KWUtxOfKt
-	k97/3m5JuLn7K0sBcb4moKsB2F4AHcTvq50SCpkGOThaFEUcmcdtW5RtTlBfiuSXwshy9vGJA5p
-	KnPVQxBKA57IQxXaE/JtI8zQNm7WsB5wxOj0tn+9lOYDKm74Ea5fbGhTTBhetFC+dHlHsVYcFNH
-	h0sPff7TzCcvlv+wHcpPXXCfK3ynyy+7/zM/E8fc17bMiXmhJChh6TBlDD9cxY+QKR41cJM29Ys
-	h72OVoNUnyn7yv4Sh37MBS4MSheDoDbxbsywRoX+Bf+vKAyY1J4LP3rp3yhiue83MhdY0mIRQgM
-	Cosn0ejnFBhtm43h6jXYxYRCHQ7rDqUYIWG07eozKeBMF
-X-Google-Smtp-Source: AGHT+IFLGP9H7iFV+bj+jHWnDq2iJNpSN/nrwRzRVEtzLP88yXNm+7536ikcL7yjLAmOK/Rv/6VgIA==
-X-Received: by 2002:a05:6512:1111:b0:54e:86f3:5e65 with SMTP id 2adb3069b0e04-550d5fe945dmr253267e87.56.1747166506191;
-        Tue, 13 May 2025 13:01:46 -0700 (PDT)
-Received: from localhost.localdomain (static.25.185.216.95.clients.your-server.de. [95.216.185.25])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54fc645cecasm1994988e87.62.2025.05.13.13.01.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 May 2025 13:01:45 -0700 (PDT)
-From: Anton Moryakov <ant.v.moryakov@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Anton Moryakov <ant.v.moryakov@gmail.com>
-Subject: [PATCH] netlink: add NULL check for get_string() in features.c
-Date: Tue, 13 May 2025 23:01:28 +0300
-Message-ID: <20250513200128.522-1-ant.v.moryakov@gmail.com>
-X-Mailer: git-send-email 2.48.1.windows.1
+        d=1e100.net; s=20230601; t=1747166812; x=1747771612;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+rPCmAarNPsWzOsNBR4e67cSe75uc4M7DiWlF0eW5QM=;
+        b=XIX3Ym1PoGVATtbXxv4kewK6nw/P3L/7LZr2mbIz9rOlgnfCkoeiFj4qspyOGl3FBW
+         6UQwF2i2MPu8o37nqnK7uu2UKn/D03k7TuBDElec6rCB7ivuf743Egk9ETVFEZdZZ52s
+         GxyO1fNRqgy1oH/2gNzm4swUkrxjWYONOb9f2/XEmRT/JhU+hAf+1/q5mtA3BZwo/421
+         2O7EMqU+DbW7+4CzRD29m82LGgzgOs+WzjuoDLfr20g45JcKyn9VkCUODbGKYURAlIu0
+         JVz8w9d9+NUAHjHG60+MZaOLg3jWDoQ5zpeYAq+fJ75Nnd6Slxrx2F5wayzBsXGt/xO4
+         8RpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWbXGB0OuPIGd/EwXcyLcNAHhsDcs1w1HxjUAsrN+htJ72LgApOhdF74zIYJPUkoIQliuMrEtI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkKd3EXpLg1eRz+kTNd3gbSJSSXdC2K+aKgW/LrQ7UO8K2QeA8
+	FSx07JXHJ0Y28IdgruUGfd05W7dUY/nYSuQz8c0gZ3Ef31rwq6xpyM8t87cfM8cdHLIDWDZCDlR
+	B09wrlbVud1+l9rxJhQkSeQLnmXdRg6qLECrt5UNL
+X-Gm-Gg: ASbGncvd4Td59lOKj1iDeDnPbV7ckS1PwS9ekzXKRswtvcJEixWffJCBSQcsIZQ+Wbf
+	ZngzV8EZrn9a+WT6Nqwinuw2xL5VwMob6JDVWbVGnJ8kKBEPhXwiDwn3uEven5DS2r5ut9KM7pZ
+	/uEQoINlLIc+DR2qNeTVsz6Cbbcv3BBSUImA==
+X-Google-Smtp-Source: AGHT+IGhZjk4b6G4kZV3NH5EzKI4MlUpU1dAA24xo7WpnnIHfHSJHgngBwC2SeRSa6VXICqza/ELFFsipbqOEvdH9S8=
+X-Received: by 2002:a17:903:1109:b0:215:f0c6:4dbf with SMTP id
+ d9443c01a7336-2319909c216mr753825ad.14.1747166811908; Tue, 13 May 2025
+ 13:06:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250513083123.3514193-1-dongchenchen2@huawei.com>
+In-Reply-To: <20250513083123.3514193-1-dongchenchen2@huawei.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 13 May 2025 13:06:38 -0700
+X-Gm-Features: AX0GCFs7Cbg_8YTasAUImURj1C3OFTGIiIpdUn50jxt5gDQdmG7hQgrG_-KfSqE
+Message-ID: <CAHS8izOio0bnLp3+Vzt44NVgoJpmPTJTACGjWvOXvxVqFKPSwQ@mail.gmail.com>
+Subject: Re: [BUG Report] KASAN: slab-use-after-free in page_pool_recycle_in_ring
+To: Dong Chenchen <dongchenchen2@huawei.com>
+Cc: hawk@kernel.org, ilias.apalodimas@linaro.org, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	zhangchangzhong@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Report of the static analyzer:
-Return value of a function 'get_string' is dereferenced at features.c:279
-without checking for NULL, but it is usually checked for this function (6/7).
+On Tue, May 13, 2025 at 1:28=E2=80=AFAM Dong Chenchen <dongchenchen2@huawei=
+.com> wrote:
+>
+> Hello,
+>
+> syzkaller found the UAF issue in page_pool_recycle_in_ring[1], which is
+> similar to syzbot+204a4382fcb3311f3858@syzkaller.appspotmail.com.
+>
+> root cause is as follow:
+>
+> page_pool_recycle_in_ring
+>   ptr_ring_produce
+>     spin_lock(&r->producer_lock);
+>     WRITE_ONCE(r->queue[r->producer++], ptr)
+>       //recycle last page to pool
+>                                 page_pool_release
+>                                   page_pool_scrub
+>                                     page_pool_empty_ring
+>                                       ptr_ring_consume
+>                                       page_pool_return_page //release all=
+ page
+>                                   __page_pool_destroy
+>                                      free_percpu(pool->recycle_stats);
+>                                      kfree(pool) //free
+>
+>      spin_unlock(&r->producer_lock); //pool->ring uaf read
+>   recycle_stat_inc(pool, ring);
+>
+> page_pool can be free while page pool recycle the last page in ring.
+> After adding a delay to the page_pool_recycle_in_ring(), syzlog[2] can
+> reproduce this issue with a high probability. Maybe we can fix it by
+> holding the user_cnt of the page pool during the page recycle process.
+>
+> Does anyone have a good idea to solve this problem?
+>
 
-Correct explained:
-Added NULL check for get_string() return value before passing to strcmp()
-to prevent potential NULL pointer dereference. This matches the behavior
-in other similar code paths where get_string() is used.
+Ugh. page_pool_release is not supposed to free the page_pool until all
+inflight pages have been returned. It detects that there are pending
+inflight pages by checking the atomic stats, but in this case it looks
+like we've raced checking the atomic stats with another cpu returning
+a netmem to the ptr ring (and it updates the stats _after_ it already
+returned to the ptr_ring).
 
-Triggers found by static analyzer Svace.
+My guess here is that page_pool_scrub needs to acquire the
+r->producer_lock to make sure there are no other producers returning
+netmems to the ptr_ring while it's scrubbing them (and checking after
+to make sure there are no inflight netmems).
 
-Signed-off-by: Anton Moryakov <ant.v.moryakov@gmail.com>
+Can you test this fix? It may need some massaging. I only checked it
+builds. I haven't thought through all the possible races yet:
 
----
- netlink/features.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+```
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index 2b76848659418..8654608734773 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -1146,10 +1146,17 @@ static void page_pool_scrub(struct page_pool *pool)
 
-diff --git a/netlink/features.c b/netlink/features.c
-index 5711ff4..1a8c2f5 100644
---- a/netlink/features.c
-+++ b/netlink/features.c
-@@ -275,9 +275,11 @@ static int find_feature(const char *name,
- 	const unsigned int count = get_count(feature_names);
- 	unsigned int i;
- 
--	for (i = 0; i < count; i++)
--		if (!strcmp(name, get_string(feature_names, i)))
-+	for (i = 0; i < count; i++) {
-+		const char *str = get_string(feature_names, i);
-+		if (str && !strcmp(name, str))
- 			return i;
-+	}
- 
- 	return -1;
- }
--- 
-2.30.2
+ static int page_pool_release(struct page_pool *pool)
+ {
++       bool in_softirq;
+        int inflight;
 
++
++       /* Acquire producer lock to make sure we don't race with another th=
+read
++        * returning a netmem to the ptr_ring.
++        */
++       in_softirq =3D page_pool_producer_lock(pool);
+        page_pool_scrub(pool);
+        inflight =3D page_pool_inflight(pool, true);
++       page_pool_producer_unlock(pool, in_softirq);
+        if (!inflight)
+                __page_pool_destroy(pool);
+```
 
