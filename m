@@ -1,159 +1,100 @@
-Return-Path: <netdev+bounces-190151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 101F0AB551B
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 14:43:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCA57AB54F2
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 14:38:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5902D3A3C15
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 12:43:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86CBF1B40333
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 12:38:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F91728DB6E;
-	Tue, 13 May 2025 12:43:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b="b4CK2ayA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5773028FA80;
+	Tue, 13 May 2025 12:36:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from oak.phenome.org (unknown [193.110.157.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FFB428CF68;
-	Tue, 13 May 2025 12:43:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.110.157.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9564F28F95B
+	for <netdev@vger.kernel.org>; Tue, 13 May 2025 12:36:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747140215; cv=none; b=RGv99m5jUfv8UfmFobkOYmAvTd51dLISQTw9EkgsUHoydR5K8j+Xu6VAhvlHHuPq8IYmANJx08UmW8GYMRbBdrBIW1Ed8fPXawRwkRy+3xJ99zOPr/xl3lKCd+mrBRiLb/2+LilX/5CAx0a0C5+kijQ200OMGJuF0yN2wrxNk1E=
+	t=1747139790; cv=none; b=n4KrFEsR2+OMmtHZoKcXGIBvlVajxDk1jyFPozCA8n8wo6onfcD0yc45gW9kcGI7vjhLd/pCUSvBruUHrDM6DDekYp/hnOQ4mU4c8/hA+6HmJPj6vvFO/M6KbOcWQqGR/oUfm+v+yigg+Fk7NMwpXM4TIAx0z/oi3+kR62MM3IM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747140215; c=relaxed/simple;
-	bh=6iHfKiz4WKe+cAHmUEXMyds2YmUzVKy+KnkYoWTKDQc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NdwH4A6UZ6jAOSlAwO8C4xf4fGjiyX0dxXdoLki5fx/MA30mb+LCN3wov+q26DpB3nvK04R/S4PIJE3SWcwMaVy/c/Ng8fzVIcE6YIVayBnsvgGTNNe+9UQXv2Jowh6VMSp+oF3rdCbKdSWRhUagQT4juz5yZgfwP/MvpM9Nn+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org; spf=pass smtp.mailfrom=phenome.org; dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b=b4CK2ayA; arc=none smtp.client-ip=193.110.157.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=phenome.org
-Authentication-Results: oak.phenome.org (amavisd); dkim=pass (2048-bit key)
- reason="pass (just generated, assumed good)" header.d=phenome.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=phenome.org; h=
-	in-reply-to:content-disposition:content-type:content-type
-	:mime-version:references:message-id:subject:subject:from:from
-	:date:date:received; s=oak1; t=1747139687; x=1748003688; bh=6iHf
-	Kiz4WKe+cAHmUEXMyds2YmUzVKy+KnkYoWTKDQc=; b=b4CK2ayA9+skC79kqW/v
-	hLkKn7UoVL1UlpjpXU6ADilmafCK6x4/ShcRO9IghEPaTunVxAbWlNYuxTal37dX
-	7Ou4lptWY7f0DTiyXzV3ibrZ3tYyqY4JIdGJI+HLURhPQE4gz3X2Jo+zkmY7uH7z
-	Iy0lre3EqPHkfdU4igrrEIy1cujoguSBF+zB70H7Ce3nGt6+X8Xv+WbOSlnhgJ7b
-	lxaemBA9XA3qiISOvSiG+YpEiDgCMUw93LtwteknAt4DoT7RSB4HqJ/jxMAco4T4
-	9R+B2B8D1VTeOF7iKTMWLEzkDaVxMAxxgDKnxkDcnmHchEVnwYg6HvP0Lu0jCUJs
-	tg==
-X-Virus-Scanned: amavisd at oak.phenome.org
-Received: from Antony2201.local (hal.connected.by.freedominter.net [91.132.42.103])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384)
-	(No client certificate requested)
-	by oak.phenome.org (Postfix) with ESMTPSA;
-	Tue, 13 May 2025 14:34:45 +0200 (CEST)
-Date: Tue, 13 May 2025 14:34:43 +0200
-From: Antony Antony <antony@phenome.org>
-To: Zilin Guan <zilin@seu.edu.cn>
-Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, jianhao.xu@seu.edu.cn
-Subject: Re: [RFC PATCH] xfrm: use kfree_sensitive() for SA secret zeroization
-Message-ID: <aCM8Y9iNXmbuPD5G@Antony2201.local>
-References: <20250512092808.3741865-1-zilin@seu.edu.cn>
+	s=arc-20240116; t=1747139790; c=relaxed/simple;
+	bh=2Hp279qOKoUwK53A0IlWl9Z6A9oGh6aPql8Id7/C4ec=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=NeGwoOPnkvroi7v0znDlWoOQCW1qPsD6tfgUirRegYD1CRejyFetgZB8gLjZ4TgRkhvVbBg8fNNz5hwXroXYJbgHWEt+uAtn6DrKPrRfkyZ2OuVqAp6Pd2MZ9pBW7ha7vwtNhGBHNLwF0p3Bb1pi7/7Py9bwzQfW5lRVxsoeDUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3db6dc76193so1484585ab.2
+        for <netdev@vger.kernel.org>; Tue, 13 May 2025 05:36:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747139788; x=1747744588;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DYgHQ98etugRn9nrFF/Y396tZ8D+/Ig7ihfcqGgA2as=;
+        b=mivdT60zymvLLsXJ+JHiITOH765YwfA6j1bztc2GI6Ve6Ru/7wQQSbeWbZ0abPzbB4
+         b/KQLo1ujyNbVSkpQIortqtkLgg7a5dpII3l+WclLKgH4ej9OcEV5mLcoYd1/FWJcYsD
+         jtc1jr4LsedTjweJ5KsJXT/ihtkbqhIe2f6glhDzzjdvTX2W3PpDWXk4syPO45sKClX2
+         O6OI/X4kDUjUh+/xPjDUgiF/+rU9/QGOvGy47WJTdPyUrDkxz9RJCLy2C3WGzBHTiN4N
+         G4WThOOOeGqsQMnHPTa8upv5MBaF0IaMs1EwwYKEKuHfZg91PeUnGnRtQ2SthRdVaYlX
+         mOSw==
+X-Forwarded-Encrypted: i=1; AJvYcCU0YxMxR0hTvbXDe12GzIyNThwH1vWGhyV0zgyagxY/rkr2TDwEQeTlbzskofP40djbb5Zg4c4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyV93C83erG364oOh/SwTAqV6jOpftSpVGflBHFK99YOoeG/iHn
+	n/HkZl5iHArSaLEDHJaF/Yf7mNYmqbGxJPTcXSEI8azdC8f9QRS3kIoV65Gqsu1ZWpRg14AiIQN
+	OjOrpEi0c7Yfp57MMUk/3evDqExFxTzN0wXH4qdvxpn0vH4j4UNll8Kc=
+X-Google-Smtp-Source: AGHT+IEKhD87ADuvIbZqF3IVuejXHxQwIrZ9v7DshXQN7uxn/CK9a/0SWGRW3VsRb8nou7/Bfipq9krzeFmYzST4ehdVQLjh7HaS
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250512092808.3741865-1-zilin@seu.edu.cn>
-X-Mutt-References: <20250512092808.3741865-1-zilin@seu.edu.cn>
-X-Mutt-Fcc: ~/sent
+X-Received: by 2002:a05:6e02:398f:b0:3d4:e6:d872 with SMTP id
+ e9e14a558f8ab-3da7e1e3ab8mr192584185ab.9.1747139787612; Tue, 13 May 2025
+ 05:36:27 -0700 (PDT)
+Date: Tue, 13 May 2025 05:36:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68233ccb.050a0220.f2294.09f8.GAE@google.com>
+Subject: [syzbot] Monthly wpan report (May 2025)
+From: syzbot <syzbot+list1679a20fcec2fc473afb@syzkaller.appspotmail.com>
+To: alex.aring@gmail.com, linux-kernel@vger.kernel.org, 
+	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
+	stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, May 12, 2025 at 09:28:08AM +0000, Zilin Guan wrote:
-> The XFRM subsystem supports redaction of Security Association (SA)
-> secret material when CONFIG_SECURITY lockdown for XFRM secrets is active.
-> High-level copy_to_user_* APIs already omit secret fields, but the
-> state destruction path still invokes plain kfree(), which does not zero
-> the underlying memory before freeing. This can leave SA keys and
-> other confidential data in memory, risking exposure via post-free
-> vulnerabilities.
-> 
-> This patch modifies __xfrm_state_destroy() so that, if SA secret
-> redaction is enabled, it calls kfree_sensitive() on the aead, aalg and
-> ealg structs, ensuring secure zeroization prior to deallocation. When
-> redaction is disabled, the existing kfree() behavior is preserved.
-> 
-> Note that xfrm_redact() is the identical helper function as implemented
-> in net/xfrm/xfrm_user.c. And this patch is an RFC to seek feedback on
-> whether this change is appropriate and if there is a better patch method.
+Hello wpan maintainers/developers,
 
-I would prefer to use the existing one than an additional copy. If it is 
-necessary. See the comment bellow.
+This is a 31-day syzbot report for the wpan subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/wpan
 
-> 
-> Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
-> ---
->  net/xfrm/xfrm_state.c | 19 ++++++++++++++++---
->  1 file changed, 16 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-> index 341d79ecb5c2..b6f2c329ea9d 100644
-> --- a/net/xfrm/xfrm_state.c
-> +++ b/net/xfrm/xfrm_state.c
-> @@ -593,15 +593,28 @@ void xfrm_state_free(struct xfrm_state *x)
->  }
->  EXPORT_SYMBOL(xfrm_state_free);
->  
-> +static bool xfrm_redact(void)
-> +{
-> +	return IS_ENABLED(CONFIG_SECURITY) &&
-> +		security_locked_down(LOCKDOWN_XFRM_SECRET);
-> +}
-> +
->  static void ___xfrm_state_destroy(struct xfrm_state *x)
->  {
-> +	bool redact_secret = xfrm_redact();
->  	if (x->mode_cbs && x->mode_cbs->destroy_state)
->  		x->mode_cbs->destroy_state(x);
->  	hrtimer_cancel(&x->mtimer);
->  	timer_delete_sync(&x->rtimer);
-> -	kfree(x->aead);
-> -	kfree(x->aalg);
-> -	kfree(x->ealg);
-> +	if (redact_secret) {
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 5 issues are still open and 26 have already been fixed.
 
-I recommend using kfree_sensitive() unconditionally.
-This code is not in the fast path, so the overhead compared to kfree() would 
-be acceptable?
+Some of the still happening issues:
 
-It's generally better to always wipe key material explicitly.
-When I originally  submitted the redact patch [1], I assumed that in 
-environments with a good LSM(like AppArmor or SELinux) enabled, 
-kfree_sensitive() would be the default kfree().
+Ref Crashes Repro Title
+<1> 273     Yes   KMSAN: uninit-value in ieee802154_hdr_push (2)
+                  https://syzkaller.appspot.com/bug?extid=60a66d44892b66b56545
+<2> 33      No    KASAN: global-out-of-bounds Read in mac802154_header_create (2)
+                  https://syzkaller.appspot.com/bug?extid=844d670c418e0353c6a8
+<3> 13      Yes   KMSAN: kernel-infoleak in move_addr_to_user (7)
+                  https://syzkaller.appspot.com/bug?extid=346474e3bf0b26bd3090
 
-If kfree_sensitive() is called unconditionally, the call to xfrm_redact() in 
-this file won not be necessary.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
-> +		kfree_sensitive(x->aead);
-> +		kfree_sensitive(x->aalg);
-> +		kfree_sensitive(x->ealg);
-> +	} else {
-> +		kfree(x->aead);
-> +		kfree(x->aalg);
-> +		kfree(x->ealg);
-> +	}
->  	kfree(x->calg);
->  	kfree(x->encap);
->  	kfree(x->coaddr);
-> -- 
-> 2.34.1
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
 
--antony
-
-[1] Fixes: c7a5899eb26e ("xfrm: redact SA secret with lockdown confidentiality")
+You may send multiple commands in a single email message.
 
