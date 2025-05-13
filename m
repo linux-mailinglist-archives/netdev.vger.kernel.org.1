@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-190275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C739AB5FA3
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 00:49:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC971AB5FA5
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 00:50:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E0BC3AB66C
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 22:49:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 415D34639EC
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 22:50:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F2BA1FAC50;
-	Tue, 13 May 2025 22:49:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 070B820C014;
+	Tue, 13 May 2025 22:50:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G3lGQlm7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CGz1q4wu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24C9C157A55;
-	Tue, 13 May 2025 22:49:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD8CC202C50;
+	Tue, 13 May 2025 22:50:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747176592; cv=none; b=P8fK3ICfrQUMIM+VqkN7COD59KRxFvdmSTC9CDWue74/BvnWmBLuL5wtsOZK8jZZUVXyiNRRJGjNlcveDjtjlrbsyUAe1kWWbHgPI0pDk18ZUGG7tAbHcK47kyauWyqtmCJ9+wMOdE+kwPcGHIkxD9kdbRD+vHtrW61ou7lOJEw=
+	t=1747176616; cv=none; b=n3GQVaWfYkE3OVFgacfMB7G4cpJDe1UwIMU1ezkrz1iTnZfpGL4BbLCIn7l8akWbcZ6ySPWAJ5C1S4i1ubfVuvZI2yXFAxQSYJQGKpOrbl7fTx1n+XafohoMRG34Yj+/bnDYD15oajyY6uLJVv9ka9wtyL8k1bOUJwzWjODNzGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747176592; c=relaxed/simple;
-	bh=2b5sWhBlD59bEzSlsX6RDsHKs2/EwTFMcRedAGr7dws=;
+	s=arc-20240116; t=1747176616; c=relaxed/simple;
+	bh=vHXWoX9AokPCtWu36aJY5K4HLLm9rD1D0nvR1hRVJ+E=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Jv6cTi+HZ98Y7NinwhjV3zayTJ82Nolm5xNiYYSdG0tIVYWrpy6lqHEK/+uQ4fhGZa/MZdtgT7kWY+z/Gq3KrpuAFIcePYE3btdNh7PwQLHXb7H0DxNjZSmzkiRkZSoLtYHz6/kDpYwOBHQ2DxWmwqrjzuKO9LvXiNP8uKtnS/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G3lGQlm7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8385EC4CEE4;
-	Tue, 13 May 2025 22:49:51 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=HC24GSI8f5Hq8oSWvdgG9LAqbIRmIEzaVC1n4HfKRI1O8LtVqHwbZFJ9gpjTeMCQ0t0qoX0/34YP7/PJQeV0T4gB+hzS59LcsThk1UkCE3KDfq3l0EcmGkzRe7SuZbAqsxq7HWzmEfIBptg8T/Q1yOKnXTJ4LjMqIAV+SJ3HIhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CGz1q4wu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D8EAC4CEE4;
+	Tue, 13 May 2025 22:50:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747176591;
-	bh=2b5sWhBlD59bEzSlsX6RDsHKs2/EwTFMcRedAGr7dws=;
+	s=k20201202; t=1747176616;
+	bh=vHXWoX9AokPCtWu36aJY5K4HLLm9rD1D0nvR1hRVJ+E=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=G3lGQlm7XuLzug6FQD12Ge6xK+MEOJpYHyy0t0h34ppGm11vwnuV+5MjCz83Zg281
-	 +HYiXZ79N1RfqvJL4PpQ0tZPeLQ3wEvOUwZiSVuCMfn9k0XQ8bGVZ6FyhCT8ipuf7u
-	 RKFsTQseMrdApBul0VtE5kpjj/jxFVV9lfNvnDEoZ5RFHG9k2Hf5OWUTHXKFz4BTQQ
-	 snVB7+1QO5W3x2N2JjAmM+l7G0P6kulJK//USORQXywMRf6S3iN6DHhgvu3nmFXB1i
-	 Y3RCSEr5KNeAqBMP7hnvmqktdbtlFYfiWolB2qChWIE1mi63d3bd7R2uP0ikZXZyXN
-	 LcWbAnOvYXHUg==
+	b=CGz1q4wuZlsX7Ci63/5Oc93u0fnRApFYVSGcP4FvxYf7v0O4nprg7Tm2jTCsXXQtT
+	 Hlg+OVhm2HjbrsRpXB6za2QZYLPR3XG5QBSJFeIUK7DljZxoUK+MVNousH+uUNi/hu
+	 XoR9Q46xdnO2emfdqdxajMN5ywylj43VPLyZEO9T3rXyefLDLrGWLlImvb6XRDT0ky
+	 05GMZDXbtxO4gi175bx3SVNf/Sx3KkPaTL7wPR7djsbIPmrHOsaYDKDbrIPfMSzb3b
+	 mG+/yC7m3PQ1hPTcpzRqTA/UzENJ2R/wP+XgQpg3I3lBFajRTrNX0+RkjgTeCB9LsS
+	 uWZeqUhqbBClw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B75380DBE8;
-	Tue, 13 May 2025 22:50:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF7E380DBE8;
+	Tue, 13 May 2025 22:50:54 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,57 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] docs: networking: timestamping: improve stacked PHC
- sentence
+Subject: Re: [PATCH net-next 00/10] net/mlx5: HWS,
+ Complex Matchers and rehash mechanism fixes
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174717662903.1815639.442567872632505480.git-patchwork-notify@kernel.org>
-Date: Tue, 13 May 2025 22:50:29 +0000
-References: <20250512131751.320283-1-vladimir.oltean@nxp.com>
-In-Reply-To: <20250512131751.320283-1-vladimir.oltean@nxp.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, kory.maincent@bootlin.com,
- linux-arm-kernel@lists.infradead.org, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, richardcochran@gmail.com, vadim.fedorenko@linux.dev,
- willemdebruijn.kernel@gmail.com, kernelxing@tencent.com,
- linux-kernel@vger.kernel.org
+ <174717665349.1815639.5590161791994015034.git-patchwork-notify@kernel.org>
+Date: Tue, 13 May 2025 22:50:53 +0000
+References: <1746992290-568936-1-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <1746992290-568936-1-git-send-email-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, saeedm@nvidia.com,
+ leon@kernel.org, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org, moshe@nvidia.com, mbloch@nvidia.com,
+ vdogaru@nvidia.com, kliteyn@nvidia.com, gal@nvidia.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 12 May 2025 16:17:51 +0300 you wrote:
-> The first paragraph makes no grammatical sense. I suppose a portion of
-> the intended sentece is missing: "[The challenge with ] stacked PHCs
-> (...) is that they uncover bugs".
+On Sun, 11 May 2025 22:38:00 +0300 you wrote:
+> Hi,
 > 
-> Rephrase, and at the same time simplify the structure of the sentence a
-> little bit, it is not easy to follow.
+> This series by Yevgeny adds Hardware Steering support for Complex
+> Matchers/Rules (patches 1-5), and rehash mechanism fixes (patches 6-10).
+> 
+> See detailed descriptions by Yevgeny below [1][2].
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] docs: networking: timestamping: improve stacked PHC sentence
-    https://git.kernel.org/netdev/net/c/d5c17e36549c
+  - [net-next,01/10] net/mlx5: HWS, expose function mlx5hws_table_ft_set_next_ft in header
+    https://git.kernel.org/netdev/net-next/c/d2338a27fcee
+  - [net-next,02/10] net/mlx5: HWS, add definer function to get field name str
+    https://git.kernel.org/netdev/net-next/c/fed5f4831281
+  - [net-next,03/10] net/mlx5: HWS, expose polling function in header file
+    https://git.kernel.org/netdev/net-next/c/3c739d1624e3
+  - [net-next,04/10] net/mlx5: HWS, introduce isolated matchers
+    https://git.kernel.org/netdev/net-next/c/b816743a182f
+  - [net-next,05/10] net/mlx5: HWS, support complex matchers
+    https://git.kernel.org/netdev/net-next/c/17e0accac577
+  - [net-next,06/10] net/mlx5: HWS, force rehash when rule insertion failed
+    https://git.kernel.org/netdev/net-next/c/9d4024edce10
+  - [net-next,07/10] net/mlx5: HWS, fix counting of rules in the matcher
+    https://git.kernel.org/netdev/net-next/c/4c56b5cbc323
+  - [net-next,08/10] net/mlx5: HWS, fix redundant extension of action templates
+    https://git.kernel.org/netdev/net-next/c/041861b40f59
+  - [net-next,09/10] net/mlx5: HWS, rework rehash loop
+    https://git.kernel.org/netdev/net-next/c/ef94799a8741
+  - [net-next,10/10] net/mlx5: HWS, dump bad completion details
+    https://git.kernel.org/netdev/net-next/c/578b856b5e72
 
 You are awesome, thank you!
 -- 
