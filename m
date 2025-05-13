@@ -1,125 +1,159 @@
-Return-Path: <netdev+bounces-190148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADB73AB54C7
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 14:33:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 101F0AB551B
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 14:43:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 010103BA807
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 12:32:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5902D3A3C15
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 12:43:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FCA01DE2BC;
-	Tue, 13 May 2025 12:33:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F91728DB6E;
+	Tue, 13 May 2025 12:43:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="sjemz6n5"
+	dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b="b4CK2ayA"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from oak.phenome.org (unknown [193.110.157.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31D7F7483;
-	Tue, 13 May 2025 12:32:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FFB428CF68;
+	Tue, 13 May 2025 12:43:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.110.157.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747139580; cv=none; b=mzcaKKJP1cHiMkOhfLFCaFeqJg2MwqVZtOr+jCfZW1NZ7KBnYVdHwhFpP9ycib9eda1AYTB6XO3aqpFvKReLpi1AoVq8/DX0A24GgxKgAq+eOOv20rLS7o5IpJJzJbeL1lm7mZUIYSglSEqMvW5aaF2L9RsLV2wX9KI6iAjMvtQ=
+	t=1747140215; cv=none; b=RGv99m5jUfv8UfmFobkOYmAvTd51dLISQTw9EkgsUHoydR5K8j+Xu6VAhvlHHuPq8IYmANJx08UmW8GYMRbBdrBIW1Ed8fPXawRwkRy+3xJ99zOPr/xl3lKCd+mrBRiLb/2+LilX/5CAx0a0C5+kijQ200OMGJuF0yN2wrxNk1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747139580; c=relaxed/simple;
-	bh=mLMzTDvVEsw75/6eFnr/1KEDw3sumrUGXyc25RczOGc=;
+	s=arc-20240116; t=1747140215; c=relaxed/simple;
+	bh=6iHfKiz4WKe+cAHmUEXMyds2YmUzVKy+KnkYoWTKDQc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T52zaqPW0XTvEzJNf6jbi7FXhcJ8/P4Jt19C6p2Nrf8p0Fu5JFi6IIMx8hqsWrrW4Ogxtz5C7b1h2SnfdrJ8GuV8KC10YfofIkOAprRJXqj/zRUxe1e5jfrqLbSRCZ5cCHL0FE4YHszglLLh2ObjR37gl+V/W5YV1cCR9YUvVu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=sjemz6n5; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=ikO6NxPSIIjD1kUAHzPCWxeEkTOjGoN0DmnRySn4PCk=; b=sj
-	emz6n58GPUmWdFVzAHRjKI2dWuI0rPQE8SL/5bYfGaf3w24mGVb9f0MujMpWRRsD0Uf3JyFv5eIVp
-	+S43WT3eawgxo08pQ0i2Yjr8Sx3wlWf9hSC9Jm8lJCuaesVHG56wUYi9WlyHQ/d7Um/fp9Ef8n6c4
-	Upwr265iTWTKWnU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uEooK-00CS0n-Mk; Tue, 13 May 2025 14:32:40 +0200
-Date: Tue, 13 May 2025 14:32:40 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: SkyLake Huang =?utf-8?B?KOm7g+WVn+a+pCk=?= <SkyLake.Huang@mediatek.com>
-Cc: "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"dqfext@gmail.com" <dqfext@gmail.com>,
-	Steven Liu =?utf-8?B?KOWKieS6uuixqik=?= <steven.liu@mediatek.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"daniel@makrotopia.org" <daniel@makrotopia.org>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>
-Subject: Re: [PATCH net-next v2 3/3] net: phy: mediatek: add driver for
- built-in 2.5G ethernet PHY on MT7988
-Message-ID: <8b67fa4c-a07a-4941-ba7b-23d4e1104451@lunn.ch>
-References: <20250219083910.2255981-1-SkyLake.Huang@mediatek.com>
- <20250219083910.2255981-4-SkyLake.Huang@mediatek.com>
- <Z7WleP9v6Igx2MjC@shell.armlinux.org.uk>
- <74ce0275952a9c60af87ded9d64ca7301fd69d0f.camel@mediatek.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=NdwH4A6UZ6jAOSlAwO8C4xf4fGjiyX0dxXdoLki5fx/MA30mb+LCN3wov+q26DpB3nvK04R/S4PIJE3SWcwMaVy/c/Ng8fzVIcE6YIVayBnsvgGTNNe+9UQXv2Jowh6VMSp+oF3rdCbKdSWRhUagQT4juz5yZgfwP/MvpM9Nn+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org; spf=pass smtp.mailfrom=phenome.org; dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b=b4CK2ayA; arc=none smtp.client-ip=193.110.157.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=phenome.org
+Authentication-Results: oak.phenome.org (amavisd); dkim=pass (2048-bit key)
+ reason="pass (just generated, assumed good)" header.d=phenome.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=phenome.org; h=
+	in-reply-to:content-disposition:content-type:content-type
+	:mime-version:references:message-id:subject:subject:from:from
+	:date:date:received; s=oak1; t=1747139687; x=1748003688; bh=6iHf
+	Kiz4WKe+cAHmUEXMyds2YmUzVKy+KnkYoWTKDQc=; b=b4CK2ayA9+skC79kqW/v
+	hLkKn7UoVL1UlpjpXU6ADilmafCK6x4/ShcRO9IghEPaTunVxAbWlNYuxTal37dX
+	7Ou4lptWY7f0DTiyXzV3ibrZ3tYyqY4JIdGJI+HLURhPQE4gz3X2Jo+zkmY7uH7z
+	Iy0lre3EqPHkfdU4igrrEIy1cujoguSBF+zB70H7Ce3nGt6+X8Xv+WbOSlnhgJ7b
+	lxaemBA9XA3qiISOvSiG+YpEiDgCMUw93LtwteknAt4DoT7RSB4HqJ/jxMAco4T4
+	9R+B2B8D1VTeOF7iKTMWLEzkDaVxMAxxgDKnxkDcnmHchEVnwYg6HvP0Lu0jCUJs
+	tg==
+X-Virus-Scanned: amavisd at oak.phenome.org
+Received: from Antony2201.local (hal.connected.by.freedominter.net [91.132.42.103])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384)
+	(No client certificate requested)
+	by oak.phenome.org (Postfix) with ESMTPSA;
+	Tue, 13 May 2025 14:34:45 +0200 (CEST)
+Date: Tue, 13 May 2025 14:34:43 +0200
+From: Antony Antony <antony@phenome.org>
+To: Zilin Guan <zilin@seu.edu.cn>
+Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, jianhao.xu@seu.edu.cn
+Subject: Re: [RFC PATCH] xfrm: use kfree_sensitive() for SA secret zeroization
+Message-ID: <aCM8Y9iNXmbuPD5G@Antony2201.local>
+References: <20250512092808.3741865-1-zilin@seu.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <74ce0275952a9c60af87ded9d64ca7301fd69d0f.camel@mediatek.com>
+In-Reply-To: <20250512092808.3741865-1-zilin@seu.edu.cn>
+X-Mutt-References: <20250512092808.3741865-1-zilin@seu.edu.cn>
+X-Mutt-Fcc: ~/sent
 
-On Tue, May 13, 2025 at 10:12:04AM +0000, SkyLake Huang (黃啟澤) wrote:
-> On Wed, 2025-02-19 at 09:33 +0000, Russell King (Oracle) wrote:
-> > 
-> > External email : Please do not click links or open attachments until
-> > you have verified the sender or the content.
-> > 
-> > 
-> > On Wed, Feb 19, 2025 at 04:39:10PM +0800, Sky Huang wrote:
-> > > +static int mt798x_2p5ge_phy_config_init(struct phy_device *phydev)
-> > > +{
-> > > +     struct pinctrl *pinctrl;
-> > > +     int ret;
-> > > +
-> > > +     /* Check if PHY interface type is compatible */
-> > > +     if (phydev->interface != PHY_INTERFACE_MODE_INTERNAL)
-> > > +             return -ENODEV;
-> > > +
-> > > +     ret = mt798x_2p5ge_phy_load_fw(phydev);
-> > > +     if (ret < 0)
-> > > +             return ret;
-> > 
-> > Firmware should not be loaded in the .config_init method. The above
-> > call will block while holding the RTNL which will prevent all other
-> > network configuration until the firmware has been loaded or the load
-> > fails.
-> > 
-> > Thanks.
-> > 
-> > --
-> > RMK's Patch system:
-> > https://urldefense.com/v3/__https://www.armlinux.org.uk/developer/patches/__;!!CTRNKA9wMg0ARbw!iV-1ViPFsUV-lLj7aIycan8nery6sQO3t6mkpdlb_GW8hswhxc4ejJozxqkU3s2WzxSizs4kfdC77yr7HGGRIuU$
-> > FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+On Mon, May 12, 2025 at 09:28:08AM +0000, Zilin Guan wrote:
+> The XFRM subsystem supports redaction of Security Association (SA)
+> secret material when CONFIG_SECURITY lockdown for XFRM secrets is active.
+> High-level copy_to_user_* APIs already omit secret fields, but the
+> state destruction path still invokes plain kfree(), which does not zero
+> the underlying memory before freeing. This can leave SA keys and
+> other confidential data in memory, risking exposure via post-free
+> vulnerabilities.
 > 
-> Actually, I wrote fw loading flow in .probe. However, during boot time,
-> .probe is called at very early stage (about the first 2s after booting
-> into Linux Kernel). At that time, filesystem isn't ready yet and phy
-> driver can't locate /lib/firmware/mediatek/mt7988/i2p5ge-phy-pmb.bin.
+> This patch modifies __xfrm_state_destroy() so that, if SA secret
+> redaction is enabled, it calls kfree_sensitive() on the aead, aalg and
+> ealg structs, ensuring secure zeroization prior to deallocation. When
+> redaction is disabled, the existing kfree() behavior is preserved.
+> 
+> Note that xfrm_redact() is the identical helper function as implemented
+> in net/xfrm/xfrm_user.c. And this patch is an RFC to seek feedback on
+> whether this change is appropriate and if there is a better patch method.
 
-Tell Dracut or whatever you are using to build the initramfs to
-include the firmware. That is what MODULE_FIRMWARE() is for.
+I would prefer to use the existing one than an additional copy. If it is 
+necessary. See the comment bellow.
 
-	Andrew
+> 
+> Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
+> ---
+>  net/xfrm/xfrm_state.c | 19 ++++++++++++++++---
+>  1 file changed, 16 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+> index 341d79ecb5c2..b6f2c329ea9d 100644
+> --- a/net/xfrm/xfrm_state.c
+> +++ b/net/xfrm/xfrm_state.c
+> @@ -593,15 +593,28 @@ void xfrm_state_free(struct xfrm_state *x)
+>  }
+>  EXPORT_SYMBOL(xfrm_state_free);
+>  
+> +static bool xfrm_redact(void)
+> +{
+> +	return IS_ENABLED(CONFIG_SECURITY) &&
+> +		security_locked_down(LOCKDOWN_XFRM_SECRET);
+> +}
+> +
+>  static void ___xfrm_state_destroy(struct xfrm_state *x)
+>  {
+> +	bool redact_secret = xfrm_redact();
+>  	if (x->mode_cbs && x->mode_cbs->destroy_state)
+>  		x->mode_cbs->destroy_state(x);
+>  	hrtimer_cancel(&x->mtimer);
+>  	timer_delete_sync(&x->rtimer);
+> -	kfree(x->aead);
+> -	kfree(x->aalg);
+> -	kfree(x->ealg);
+> +	if (redact_secret) {
+
+I recommend using kfree_sensitive() unconditionally.
+This code is not in the fast path, so the overhead compared to kfree() would 
+be acceptable?
+
+It's generally better to always wipe key material explicitly.
+When I originally  submitted the redact patch [1], I assumed that in 
+environments with a good LSM(like AppArmor or SELinux) enabled, 
+kfree_sensitive() would be the default kfree().
+
+If kfree_sensitive() is called unconditionally, the call to xfrm_redact() in 
+this file won not be necessary.
+
+
+> +		kfree_sensitive(x->aead);
+> +		kfree_sensitive(x->aalg);
+> +		kfree_sensitive(x->ealg);
+> +	} else {
+> +		kfree(x->aead);
+> +		kfree(x->aalg);
+> +		kfree(x->ealg);
+> +	}
+>  	kfree(x->calg);
+>  	kfree(x->encap);
+>  	kfree(x->coaddr);
+> -- 
+> 2.34.1
+
+-antony
+
+[1] Fixes: c7a5899eb26e ("xfrm: redact SA secret with lockdown confidentiality")
 
