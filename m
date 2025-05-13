@@ -1,103 +1,81 @@
-Return-Path: <netdev+bounces-189920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43137AB4837
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 02:08:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26086AB4843
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 02:09:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 259C28C5128
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 00:07:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8505019E25CD
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 00:09:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05FC31494DF;
-	Tue, 13 May 2025 00:06:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F9312AD2C;
+	Tue, 13 May 2025 00:07:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fg7peFFw"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="WFXVjDX4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3776632C8B;
-	Tue, 13 May 2025 00:06:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F16D34CF9;
+	Tue, 13 May 2025 00:07:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747094788; cv=none; b=XFd4rjZF3NNaJn7H0XfwkFdHUPnJarYZlW9hvuiNNnJuUpCojlZIH64ACPndR551/IrYzM5R5e3YMlyez0JUY05bsI4DRVyKVmof3ihH6Mr00s5j+TopxbWPguTCB3Ibzm0yb6Km1fpHiWBrIj0PNxmO/+yaC4HsMmK6Zd0ea7E=
+	t=1747094836; cv=none; b=fo8NlBzjguBW1AMZSu2S/4xEi6sgkLqyTw+O5d0wxNKNlMRJVvjkU4YP0kQDHm5mJJy1TNUeAkg2ZlI1KeQtaswQZ8Qw0aXm9y874s5/PN6TfYjhFPtfXPf0Bf7DTIz6GiWzt/RJi64ODyXR4SDyi0fJVbSkq155PL2nryzc+wg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747094788; c=relaxed/simple;
-	bh=/3/6voPULjYvpgG6Nnc+zAtZr66zlGPAla6ugxce3l4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=e5N99biuNJy4YJlrnolLY1f4FR+mahvrlXpyKe0bVxS67vjgVhomcNnrdi7xWmbmVgIXZGnzyq7qPzKNMy9LGh/D00wlTTMKjNf0rN7PxV8r4i5Zqg9ORDIn/9SzfpthTsnJr/ECpMXt3auSzyvMevCl5k9Tb6rx5APE83OXRGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fg7peFFw; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-22e16234307so53407175ad.0;
-        Mon, 12 May 2025 17:06:26 -0700 (PDT)
+	s=arc-20240116; t=1747094836; c=relaxed/simple;
+	bh=1Dv0/T1OzOI9S9kobkkQBaQjTQE082lnl34vUNXZXlU=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SwU6EiS34S008efEBg+/Eg6uwLX3KzbzrdtJuUTK0Id4RE5TjTtQnjXaAkWtpNOUakSGa8leLTIc8oAjY6Ny0nT5vpng/JzmeXKYKyoLrzlu63DUCtehxj6LAHa3AUemjVnSfH4X2Y+usAXmAYcKjjXobfkMwBcundLch6/+k6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=WFXVjDX4; arc=none smtp.client-ip=207.171.188.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747094786; x=1747699586; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:reply-to:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=nB0R2WkOeQvPRFxPtqwr6m021by5PVJe9qR5v1cbNws=;
-        b=Fg7peFFwmYvaeyhB0M6uVUetz9ad98+dY/FOYNSdaKQGhR1QSD+5OVs+BlxV6JgE4n
-         6U6t/sjjJVgphZT2xvcmJ/SxYiXwQxhSZp0td8t3oqGppjuJ93a6yzYr06usnAChJCqp
-         ic9qjygN/5eCWVPSvR3UVttTLn2nS5Ex1NNSbs9qj0FiCuoRx07cOuawC5nWt+Ft8w0+
-         VfYA/6ZmPkeA6+RGP2aQbb7xfrTZ1Z8oDs6O/X8zBc/nQgCjKBRlJEF04ueBXNetG8MH
-         jWc27i6OTaH9cAXDnOVocLbBWojROzeyR6yTvi7jJkF+Ql7oQ7BgP9NqahUMN9Xq8ee4
-         spuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747094786; x=1747699586;
-        h=content-transfer-encoding:mime-version:reply-to:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nB0R2WkOeQvPRFxPtqwr6m021by5PVJe9qR5v1cbNws=;
-        b=Lu38cYCJUnx/26MGS69LKA+dfQS6XByE8JPZsiMHAlaWCP1VP5IlE+Ce8pcLU3/g9o
-         EOT5y+B1P7Sq1t1fJxN26BgvyJPhMqF0IClSayCSW+dDBbBuQeCJ4Zkiy26Qyho+dk1f
-         t60H5BERLMEfapHLYjAjnQFqWWgPTk+WZtdwS7uH9amFHbpew4i7zY4X360RL4zsc5M7
-         HnhM9wU6g5pOIAupN0thvjZgq+VK3IJVOw1Kr7nPk8KU152pu0UWsbvYG5AIRzO2JBZa
-         AAXH/GZIeqxbc6WPCxdu0AaZHCVhmyAZLOHxOVxNMUfBiCVkEm7OxDguzfPaOyEMKRii
-         vamQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV+MG+GmtGFPeHgFmp3qMtvWwESJu4e4GhKiqTnC9Pgv+9U+R2E7cj/fJSmPL4sahsNRRF+cMPw@vger.kernel.org, AJvYcCVZgPWOALjR0Ti1uA95INX1wvsdWqcrSsFdmD5QamDIKuCErY/tmkBT0PdYfiKSVDkbXLpKR4cnNYTDbmA=@vger.kernel.org, AJvYcCWwxIKU/UvHNvt91qqeTCJge2fR/6TTgWpRtWMwhNXb3lOfHL9UGrvSduZ0S5quBP5TQf7AGMQQ@vger.kernel.org, AJvYcCXDCAAT4vy7Xj66rjl3QHkgLhwNLL4+WerppIHvnAV0HozizCGTeHUM4/CbmiUGfwDrCblmY8IoWfGgJw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQTHwBJCU4ratFWBKgfDkLDDkvXE4+bW8r2+yxaf+V/vdTzboJ
-	jrs0ZmyCJSLg+7pfVi/GonnISxqVE8WsuFpKDvEXIbEW7iIoMTbI
-X-Gm-Gg: ASbGnct5OGHPX54DVzwn5hh1aO4GXmoXVCZoBNmLLU+gBp4oU0BodbQQEkRRXffbtHW
-	05Bo5I1NnLRN2jJyTjdJX8wVdfwycEDvKiDtPqaB5I0VUbcZvC1ASKlF8YmAkB2GgXN00eOaaaM
-	5lN2sUJ69yCBLnP9aERIk0rXGIZZ2RzWAglHWQbeHO79pLOxahJyWbTd9st/qsaDd7rAdhFB4bO
-	825+xtvbP+C5Az2wtXTwSb4aIVpzJS/C2EZq+y/hPYy/95KncBqOXg/FrHnqW+/6INMV8yCrRhL
-	Wg34ol/YtE2/ulboAWZw4m9lx29dtnGsOkWfpghQxJJVue+ihvf7APYFuEMcJcEt7lWWyykMxJk
-	6q+6BWiKboZL0O9SWP1MrgkO2D1xm8g==
-X-Google-Smtp-Source: AGHT+IFLg2j6NqWasFKsMRIuMsAX6kcU4vbM8vVlA7iOsqIK1jE+GZgWt0et1u12KP0vgp5Tktg5eg==
-X-Received: by 2002:a17:902:ce8a:b0:215:ba2b:cd55 with SMTP id d9443c01a7336-2317cac7646mr19127295ad.2.1747094786386;
-        Mon, 12 May 2025 17:06:26 -0700 (PDT)
-Received: from localhost.localdomain (c-67-160-120-253.hsd1.wa.comcast.net. [67.160.120.253])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22fc828b491sm68470665ad.184.2025.05.12.17.06.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 May 2025 17:06:26 -0700 (PDT)
-From: mhkelley58@gmail.com
-X-Google-Original-From: mhklinux@outlook.com
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	James.Bottomley@HansenPartnership.com,
-	martin.petersen@oracle.com
-Cc: linux-hyperv@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net 5/5] Drivers: hv: vmbus: Remove vmbus_sendpacket_pagebuffer()
-Date: Mon, 12 May 2025 17:06:04 -0700
-Message-Id: <20250513000604.1396-6-mhklinux@outlook.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250513000604.1396-1-mhklinux@outlook.com>
-References: <20250513000604.1396-1-mhklinux@outlook.com>
-Reply-To: mhklinux@outlook.com
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1747094834; x=1778630834;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=6gd0JbqoThOAcG9lUth2CH+SlK+agzaN7UJ8hAzpZuQ=;
+  b=WFXVjDX4lRSoiC4wM/56u6wUm8A9BnNbxo28eLWA6wkruFZfUjeLm6k9
+   hRf/gKYvSQ3Uj90vNZXDu0JxcDnov8WGeSbaQ+J4HwIOXxLSTk5lVje+u
+   ubaZwuTkO70BT56cIgr4cEhikn4UnBIQDZc+oBT99GbvKRhnM8m9ihVWn
+   connI0a1F4cCO7R3S1lh6yTz1m52E3MHO1dB6eXTJk+669JQrDIwACklu
+   72s1AvL7Z8qT7weBWVOmzBiSyYP8wGOCuahRxFUnC/QlsAMBvBz1tviYT
+   5Au5sxzqDtVJwa6oljnJmXTaPZeyrJSIJJcwEVBe3cWP55GdJXgPHReMK
+   A==;
+X-IronPort-AV: E=Sophos;i="6.15,283,1739836800"; 
+   d="scan'208";a="18996074"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2025 00:07:08 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:63320]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.30.45:2525] with esmtp (Farcaster)
+ id 5ab8e38a-bd8a-4f08-93c9-5730d015e51a; Tue, 13 May 2025 00:07:08 +0000 (UTC)
+X-Farcaster-Flow-ID: 5ab8e38a-bd8a-4f08-93c9-5730d015e51a
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 13 May 2025 00:07:07 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.187.170.42) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 13 May 2025 00:07:03 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <brauner@kernel.org>
+CC: <alexander@mihalicyn.com>, <bluca@debian.org>, <daan.j.demeyer@gmail.com>,
+	<daniel@iogearbox.net>, <davem@davemloft.net>, <david@readahead.eu>,
+	<edumazet@google.com>, <horms@kernel.org>, <jack@suse.cz>,
+	<jannh@google.com>, <kuba@kernel.org>, <kuniyu@amazon.com>,
+	<lennart@poettering.net>, <linux-fsdevel@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
+	<me@yhndnzj.com>, <netdev@vger.kernel.org>, <oleg@redhat.com>,
+	<pabeni@redhat.com>, <viro@zeniv.linux.org.uk>, <zbyszek@in.waw.pl>
+Subject: Re: [PATCH v6 4/9] coredump: add coredump socket
+Date: Mon, 12 May 2025 17:06:50 -0700
+Message-ID: <20250513000654.70344-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250512-work-coredump-socket-v6-4-c51bc3450727@kernel.org>
+References: <20250512-work-coredump-socket-v6-4-c51bc3450727@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,109 +83,120 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D036UWB001.ant.amazon.com (10.13.139.133) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Michael Kelley <mhklinux@outlook.com>
+From: Christian Brauner <brauner@kernel.org>
+Date: Mon, 12 May 2025 10:55:23 +0200
+> Coredumping currently supports two modes:
+> 
+> (1) Dumping directly into a file somewhere on the filesystem.
+> (2) Dumping into a pipe connected to a usermode helper process
+>     spawned as a child of the system_unbound_wq or kthreadd.
+> 
+> For simplicity I'm mostly ignoring (1). There's probably still some
+> users of (1) out there but processing coredumps in this way can be
+> considered adventurous especially in the face of set*id binaries.
+> 
+> The most common option should be (2) by now. It works by allowing
+> userspace to put a string into /proc/sys/kernel/core_pattern like:
+> 
+>         |/usr/lib/systemd/systemd-coredump %P %u %g %s %t %c %h
+> 
+> The "|" at the beginning indicates to the kernel that a pipe must be
+> used. The path following the pipe indicator is a path to a binary that
+> will be spawned as a usermode helper process. Any additional parameters
+> pass information about the task that is generating the coredump to the
+> binary that processes the coredump.
+> 
+> In the example core_pattern shown above systemd-coredump is spawned as a
+> usermode helper. There's various conceptual consequences of this
+> (non-exhaustive list):
+> 
+> - systemd-coredump is spawned with file descriptor number 0 (stdin)
+>   connected to the read-end of the pipe. All other file descriptors are
+>   closed. That specifically includes 1 (stdout) and 2 (stderr). This has
+>   already caused bugs because userspace assumed that this cannot happen
+>   (Whether or not this is a sane assumption is irrelevant.).
+> 
+> - systemd-coredump will be spawned as a child of system_unbound_wq. So
+>   it is not a child of any userspace process and specifically not a
+>   child of PID 1. It cannot be waited upon and is in a weird hybrid
+>   upcall which are difficult for userspace to control correctly.
+> 
+> - systemd-coredump is spawned with full kernel privileges. This
+>   necessitates all kinds of weird privilege dropping excercises in
+>   userspace to make this safe.
+> 
+> - A new usermode helper has to be spawned for each crashing process.
+> 
+> This series adds a new mode:
+> 
+> (3) Dumping into an abstract AF_UNIX socket.
+> 
+> Userspace can set /proc/sys/kernel/core_pattern to:
+> 
+>         @address SO_COOKIE
+> 
+> The "@" at the beginning indicates to the kernel that the abstract
+> AF_UNIX coredump socket will be used to process coredumps. The address
+> is given by @address and must be followed by the socket cookie of the
+> coredump listening socket.
+> 
+> The socket cookie is used to verify the socket connection. If the
+> coredump server restarts or crashes and someone recycles the socket
+> address the kernel will detect that the address has been recycled as the
+> socket cookie will have necessarily changed and refuse to connect.
+> 
+> The coredump socket is located in the initial network namespace. When a
+> task coredumps it opens a client socket in the initial network namespace
+> and connects to the coredump socket.
+> 
+> - The coredump server uses SO_PEERPIDFD to get a stable handle on the
+>   connected crashing task. The retrieved pidfd will provide a stable
+>   reference even if the crashing task gets SIGKILLed while generating
+>   the coredump.
+> 
+> - By setting core_pipe_limit non-zero userspace can guarantee that the
+>   crashing task cannot be reaped behind it's back and thus process all
+>   necessary information in /proc/<pid>. The SO_PEERPIDFD can be used to
+>   detect whether /proc/<pid> still refers to the same process.
+> 
+>   The core_pipe_limit isn't used to rate-limit connections to the
+>   socket. This can simply be done via AF_UNIX sockets directly.
+> 
+> - The pidfd for the crashing task will grow new information how the task
+>   coredumps.
+> 
+> - The coredump server should mark itself as non-dumpable.
+> 
+> - A container coredump server in a separate network namespace can simply
+>   bind to another well-know address and systemd-coredump fowards
+>   coredumps to the container.
+> 
+> - Coredumps could in the future also be handled via per-user/session
+>   coredump servers that run only with that users privileges.
+> 
+>   The coredump server listens on the coredump socket and accepts a
+>   new coredump connection. It then retrieves SO_PEERPIDFD for the
+>   client, inspects uid/gid and hands the accepted client to the users
+>   own coredump handler which runs with the users privileges only
+>   (It must of coure pay close attention to not forward crashing suid
+>   binaries.).
+> 
+> The new coredump socket will allow userspace to not have to rely on
+> usermode helpers for processing coredumps and provides a safer way to
+> handle them instead of relying on super privileged coredumping helpers
+> that have and continue to cause significant CVEs.
+> 
+> This will also be significantly more lightweight since no fork()+exec()
+> for the usermodehelper is required for each crashing process. The
+> coredump server in userspace can e.g., just keep a worker pool.
+> 
+> Signed-off-by: Christian Brauner <brauner@kernel.org>
 
-With the netvsc driver changed to use vmbus_sendpacket_mpb_desc()
-instead of vmbus_sendpacket_pagebuffer(), the latter has no remaining
-callers. Remove it.
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-Cc: <stable@vger.kernel.org> # 6.1.x
-Signed-off-by: Michael Kelley <mhklinux@outlook.com>
----
- drivers/hv/channel.c   | 59 ------------------------------------------
- include/linux/hyperv.h |  7 -----
- 2 files changed, 66 deletions(-)
-
-diff --git a/drivers/hv/channel.c b/drivers/hv/channel.c
-index 4ffd5eaa7817..35f26fa1ffe7 100644
---- a/drivers/hv/channel.c
-+++ b/drivers/hv/channel.c
-@@ -1076,65 +1076,6 @@ int vmbus_sendpacket(struct vmbus_channel *channel, void *buffer,
- }
- EXPORT_SYMBOL(vmbus_sendpacket);
- 
--/*
-- * vmbus_sendpacket_pagebuffer - Send a range of single-page buffer
-- * packets using a GPADL Direct packet type. This interface allows you
-- * to control notifying the host. This will be useful for sending
-- * batched data. Also the sender can control the send flags
-- * explicitly.
-- */
--int vmbus_sendpacket_pagebuffer(struct vmbus_channel *channel,
--				struct hv_page_buffer pagebuffers[],
--				u32 pagecount, void *buffer, u32 bufferlen,
--				u64 requestid)
--{
--	int i;
--	struct vmbus_channel_packet_page_buffer desc;
--	u32 descsize;
--	u32 packetlen;
--	u32 packetlen_aligned;
--	struct kvec bufferlist[3];
--	u64 aligned_data = 0;
--
--	if (pagecount > MAX_PAGE_BUFFER_COUNT)
--		return -EINVAL;
--
--	/*
--	 * Adjust the size down since vmbus_channel_packet_page_buffer is the
--	 * largest size we support
--	 */
--	descsize = sizeof(struct vmbus_channel_packet_page_buffer) -
--			  ((MAX_PAGE_BUFFER_COUNT - pagecount) *
--			  sizeof(struct hv_page_buffer));
--	packetlen = descsize + bufferlen;
--	packetlen_aligned = ALIGN(packetlen, sizeof(u64));
--
--	/* Setup the descriptor */
--	desc.type = VM_PKT_DATA_USING_GPA_DIRECT;
--	desc.flags = VMBUS_DATA_PACKET_FLAG_COMPLETION_REQUESTED;
--	desc.dataoffset8 = descsize >> 3; /* in 8-bytes granularity */
--	desc.length8 = (u16)(packetlen_aligned >> 3);
--	desc.transactionid = VMBUS_RQST_ERROR; /* will be updated in hv_ringbuffer_write() */
--	desc.reserved = 0;
--	desc.rangecount = pagecount;
--
--	for (i = 0; i < pagecount; i++) {
--		desc.range[i].len = pagebuffers[i].len;
--		desc.range[i].offset = pagebuffers[i].offset;
--		desc.range[i].pfn	 = pagebuffers[i].pfn;
--	}
--
--	bufferlist[0].iov_base = &desc;
--	bufferlist[0].iov_len = descsize;
--	bufferlist[1].iov_base = buffer;
--	bufferlist[1].iov_len = bufferlen;
--	bufferlist[2].iov_base = &aligned_data;
--	bufferlist[2].iov_len = (packetlen_aligned - packetlen);
--
--	return hv_ringbuffer_write(channel, bufferlist, 3, requestid, NULL);
--}
--EXPORT_SYMBOL_GPL(vmbus_sendpacket_pagebuffer);
--
- /*
-  * vmbus_sendpacket_mpb_desc - Send one or more multi-page buffer packets
-  * using a GPADL Direct packet type.
-diff --git a/include/linux/hyperv.h b/include/linux/hyperv.h
-index d6ffe01962c2..b52ac40d5830 100644
---- a/include/linux/hyperv.h
-+++ b/include/linux/hyperv.h
-@@ -1167,13 +1167,6 @@ extern int vmbus_sendpacket(struct vmbus_channel *channel,
- 				  enum vmbus_packet_type type,
- 				  u32 flags);
- 
--extern int vmbus_sendpacket_pagebuffer(struct vmbus_channel *channel,
--					    struct hv_page_buffer pagebuffers[],
--					    u32 pagecount,
--					    void *buffer,
--					    u32 bufferlen,
--					    u64 requestid);
--
- extern int vmbus_sendpacket_mpb_desc(struct vmbus_channel *channel,
- 				     struct vmbus_packet_mpb_array *mpb,
- 				     u32 desc_size,
--- 
-2.25.1
-
+Thanks!
 
