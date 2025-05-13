@@ -1,153 +1,122 @@
-Return-Path: <netdev+bounces-189986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 955E6AB4BC0
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 08:12:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B6C3AB4BC5
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 08:13:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFF803A352C
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 06:12:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 125D1178F7A
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 06:13:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E41951E47BA;
-	Tue, 13 May 2025 06:12:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C1C61E5B7A;
+	Tue, 13 May 2025 06:13:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Bt65S1qM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DYrCupH0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31BFC101EE;
-	Tue, 13 May 2025 06:12:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E819B101EE;
+	Tue, 13 May 2025 06:13:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747116763; cv=none; b=OxsTf9umW/i3F1rCPx9dCeFCeXKMXnOu64Exq28Wa+NbnPcy71OfFtS+qxgZP6kCYHxi+BepClC/AY3XkZxkWGvzxLusEFD/rui8cXk8WQCZdvY1jkzlRvLd1251F6anCJUlTQCHIfcZqh/Nt54fKuhPcY4DGCuf2sUWTlOPoUY=
+	t=1747116823; cv=none; b=jlHmenFCKAAs3BNrtpuV8t1Be+2nV+QzqiZAWRU5jHrSXyQCBlIH1639i0O6nbQswSZun4SDzHULkj9+yzL4kUZKRAwWrIp0bWHIQck0dEbabJUgZy+l+v20CIDlbw7yVN7Q4Pebn1Y9IXA2OAdeyU8vHdJeDlpiEM5IUA5GmSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747116763; c=relaxed/simple;
-	bh=p64bO3K4W8tGMzIR2yPBwFJkK/o2ty54bUOLqfL09TM=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t3o9EDF5yowwfYPGj0lvzq00+BWoZ5+TRkE+zjFKaUmfv6UHwy2iwkJBtmws9lsujj5yEXn1BrjtBwvY6TAZSbjjx89xideTEADXwk0fFaSeOOKXsmVdMbAsCS7yrjxjf8fZUosEkolqw8f0DjJ4biQVcR/tofEd7B6zZ/WEcSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Bt65S1qM; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54CNfi1H026767;
-	Mon, 12 May 2025 23:12:26 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=U5kOMZuzPBvMyY4bCoAF/fh2o
-	1zBtyRTqAPgXNnaRQ8=; b=Bt65S1qMv1+fQ4Lmalt50zSvgGgoYZhMFa8m8udxL
-	eeFSEQYihR0liRKGCuu8IFmAXJ2D/hzeIb1qEC+5owPhekQI9ImnXBvtxe0jUhuJ
-	YRbbRWS2K1HRGvrTGy/5b4Nvi+8zLoVK401adNv5wwihqB8/Cf1QUTbj8/tnmHQU
-	XPWltEBuLGngUZ8S/hyKNd0VFdE4TJrzigmzJzQWAqnOVTmRSpLFtGtGBJYRG7GD
-	prlTMV1wx1POfz/EmT8G1yXNA+LseYHAlP0je3vmS5ETDSdQYnPMEAF5pLritSMs
-	j/kA8qHQ66ESP68mmpHcwPnHhk1YCD01OPVmeL1IXNTWA==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 46ktvr0kmp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 12 May 2025 23:12:25 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Mon, 12 May 2025 23:12:25 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Mon, 12 May 2025 23:12:24 -0700
-Received: from optiplex (unknown [10.28.34.253])
-	by maili.marvell.com (Postfix) with SMTP id AC5013F70A4;
-	Mon, 12 May 2025 23:12:16 -0700 (PDT)
-Date: Tue, 13 May 2025 11:42:15 +0530
-From: Tanmay Jagdale <tanmay@marvell.com>
-To: Simon Horman <horms@kernel.org>
-CC: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <sgoutham@marvell.com>, <lcherian@marvell.com>, <gakula@marvell.com>,
-        <jerinj@marvell.com>, <hkelam@marvell.com>, <sbhatta@marvell.com>,
-        <andrew+netdev@lunn.ch>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <bbhushan2@marvell.com>, <bhelgaas@google.com>,
-        <pstanner@redhat.com>, <gregkh@linuxfoundation.org>,
-        <peterz@infradead.org>, <linux@treblig.org>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <rkannoth@marvell.com>, <sumang@marvell.com>,
-        <gcherian@marvell.com>, "Kiran
- Kumar K" <kirankumark@marvell.com>,
-        Nithin Dabilpuram
-	<ndabilpuram@marvell.com>
-Subject: Re: [net-next PATCH v1 07/15] octeontx2-af: Add support for SPI to
- SA index translation
-Message-ID: <aCLivwtIq5zwVFKI@optiplex>
-References: <20250502132005.611698-1-tanmay@marvell.com>
- <20250502132005.611698-8-tanmay@marvell.com>
- <20250507124517.GC3339421@horms.kernel.org>
+	s=arc-20240116; t=1747116823; c=relaxed/simple;
+	bh=mZurxwtq+CMYvzINp//1+b6TujHGvHE82p1FPz26k+s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EkSDC8WdlSySaFX9MZqeCvkBdzY7CMoloNmHFSzJjByF31W8jtWEoKk5BuuNAbzuloCzed+oAB/chv/RMG7d5Az8ZOmxnCLCursAQXUx2ndVywRU0PAsqmK2mx+6q8HyahejYx/t9kXkvOeJQfFzimcbfBjsK7bDEKhG3AMXHBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DYrCupH0; arc=none smtp.client-ip=209.85.166.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3da7642b5deso36626265ab.2;
+        Mon, 12 May 2025 23:13:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747116821; x=1747721621; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GRrv0KBdwMIbTaSxKoyl49v0JwxRka2NNqw0EGI4u2Y=;
+        b=DYrCupH0bF7zwGCTpBXZzYPB2p48kVaRHqLkA7wUn2ydMw4OiPglt2fbl6ZLx3fFW8
+         LpvH3/s8k8SGbU24lgaZ6R7DRnbPp287QDsBPdMppBdYhD7+/eEAKhULuEfEyaDX7bo6
+         qGz/v02bRK7q0KPurQtsoGU3uE1ce5bTP+aFyKxB9k3TKUO0CGuriG3w7D/ryer20XF+
+         b7Dt5yufF3BvnydOhOXAOb75TW9OVl014c9QNDLHzyo+Mrf53nAAlpYyJ4axouY1tCNi
+         fNhCwnRruooQ2HWf1bHvMM0y6gypc4ieww4d5PpNvFA6VcmUOF4QNVsaZses2To6FLx4
+         Uduw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747116821; x=1747721621;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GRrv0KBdwMIbTaSxKoyl49v0JwxRka2NNqw0EGI4u2Y=;
+        b=k4QuYmkhRjQ6QV6tcM7dv3DJmU02H9dfrGWHGlBQX+i6F+6KDlnX4eaMg9wUfvI8n8
+         qvGXU1I1jLJnaPUd4B5DAoOubX0ToYhjDOf0Fy4n6kErgiM7pAgwl7IkLehzM8D57O/e
+         /P3TkVBN2MHBSoRV93VzpmM7T/6RXJEGuxzHarXwxzRYaDc95J9f81CvJCJmJK2iYPF8
+         jHgHX3xzEWrvRdc/64uuSif9gcoIc7E6cq2HxE4Dfj3eAJT9IMKmAIp/XH+H2WneNpSJ
+         AuAEEIzBLlbgKc8HH3tx+TOuW62yYFkdlsQNOkwm7Fv8GpM4t0LIBt7ZMF642VdN9SIe
+         Tsvg==
+X-Forwarded-Encrypted: i=1; AJvYcCXLQyRkwqRN7cEMiiPzc7LXmEiIGY1mdNSXaHf1TNDP7NH6pRImbqOR/RFPT7eHyVQkLcP109UM@vger.kernel.org, AJvYcCXyoqIlCwk+s4Yb9BLIye9Xduh7HkvXqMYgSRbWZJMt1m6F9YsD6p7A4xVHv6zw6asMLQYD1Mo4LfKzbL4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywaa5EJRoiJEkQxDu9DdnuObxJQk5umfDROhIMc6ZxHQh/vSfNa
+	bAHJ/EwQ2dslbC1rWiRZSGL26jWc+iNWAtU364lx9u0MjuHCewAJjm1n3vMgr/faF+UbZLI2KL8
+	XXZ0/bSIZDfQkit3ni0Hskiarrho=
+X-Gm-Gg: ASbGncubRXLEqTK3RG9d0kZAUuOMP9Na7aCWJw0Rl/PbCnaCZmaFWdi9IPFeQusuwKr
+	z0oitLfXAvk9DNZm6syP0bRlXBttoArfU6Iwgy1mHcqIWXTk7ovJTVM51AgntROQUeMkl4cUm65
+	KAUkn3ir1MVdt2fYC+ASpSm0sGg/skQ4E=
+X-Google-Smtp-Source: AGHT+IGJZDF4NmipsMzJ9kqrpdBnFCV6X6NeqcTgJgg52cCnXj6HQ3Wru4YWMFFl+fq0OYumq3vu6Hni/ERH+jo3xBc=
+X-Received: by 2002:a05:6e02:12e9:b0:3da:7cb7:79c with SMTP id
+ e9e14a558f8ab-3da7e1e7d16mr162013555ab.13.1747116821018; Mon, 12 May 2025
+ 23:13:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250507124517.GC3339421@horms.kernel.org>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTEzMDA1NiBTYWx0ZWRfX4pgD43kFI/cW CIA1lqbjCkuRcZJSt2JhPK7hVaLOUs1WX1bUQC3dwCTYUAln2KkbBAG3//SgFaalEtP04IjC5Yb hrFnWqd1eAX8e7MJNXPKR8eMSU5diTXFNtATaKa7tETF/Jr0BXsqYzVkEeN6nefiqFaHgpvYZkw
- ymM3vv1jTnTLKAk7YEEVCCWpSHIkA+1TppwVhmhKFedC554OseCwW3g1f3AMrirzQG1BwJw8VAD T8l2Lel64ytBkBFyB/R1qB6eFajEGUForqrOfe6KiWUHi9DKf/1gu5SK6Q6oHN8/0BX2NoKr5vt 93xJ50Am0f85nEwmThno78xdVNnNf5zIcAv43aK70CA1+NCYdTOXSjKmJkwq03FxNZNkV61f+iu
- /c5bL8AnmB1+JcKNWnLcNyxjPNZoK07JSL2edfWNfOfPc24xaj8OWBfBEkijcx9H131j6MHi
-X-Authority-Analysis: v=2.4 cv=V6x90fni c=1 sm=1 tr=0 ts=6822e2c9 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=fMs116VxaZ394lWZzjIA:9 a=CjuIK1q_8ugA:10
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: Vp5ijUOX21Gbk8xEyHqlbuNUmgRkwazK
-X-Proofpoint-GUID: Vp5ijUOX21Gbk8xEyHqlbuNUmgRkwazK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-12_07,2025-05-09_01,2025-02-21_01
+References: <0c8bf3f2-1620-420e-8858-fe1c2ff5a8e9@shopee.com>
+In-Reply-To: <0c8bf3f2-1620-420e-8858-fe1c2ff5a8e9@shopee.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 13 May 2025 14:13:05 +0800
+X-Gm-Features: AX0GCFuIQfkAVza6hbhK4sPe4d8m2OQUcFRXo71Y2QtNp3SmxPrR8NWz9WuNVT8
+Message-ID: <CAL+tcoAYvN20aMz-WYFEUeBypS8yMJ53YgdMUHCX6FCr__qT9A@mail.gmail.com>
+Subject: Re: i40e: How the packets will be processed when status_error_len is 0
+To: Haifeng Xu <haifeng.xu@shopee.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Jesse Brandeburg <jesse.brandeburg@intel.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2025-05-07 at 18:15:17, Simon Horman (horms@kernel.org) wrote:
-> On Fri, May 02, 2025 at 06:49:48PM +0530, Tanmay Jagdale wrote:
-> > From: Kiran Kumar K <kirankumark@marvell.com>
-> > 
-> > In case of IPsec, the inbound SPI can be random. HW supports mapping
-> > SPI to an arbitrary SA index. SPI to SA index is done using a lookup
-> > in NPC cam entry with key as SPI, MATCH_ID, LFID. Adding Mbox API
-> > changes to configure the match table.
-> > 
-> > Signed-off-by: Kiran Kumar K <kirankumark@marvell.com>
-> > Signed-off-by: Nithin Dabilpuram <ndabilpuram@marvell.com>
-> > Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
-> > Signed-off-by: Tanmay Jagdale <tanmay@marvell.com>
-> 
-> ...
-> 
-> > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-> > index 715efcc04c9e..5cebf10a15a7 100644
-> > --- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-> > +++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-> > @@ -326,6 +326,10 @@ M(NIX_READ_INLINE_IPSEC_CFG, 0x8023, nix_read_inline_ipsec_cfg,		\
-> >  M(NIX_LF_INLINE_RQ_CFG, 0x8024, nix_lf_inline_rq_cfg,		\
-> >  				nix_rq_cpt_field_mask_cfg_req,  \
-> >  				msg_rsp)	\
-> > +M(NIX_SPI_TO_SA_ADD,    0x8026, nix_spi_to_sa_add, nix_spi_to_sa_add_req,   \
-> > +				nix_spi_to_sa_add_rsp)                      \
-> > +M(NIX_SPI_TO_SA_DELETE, 0x8027, nix_spi_to_sa_delete, nix_spi_to_sa_delete_req,   \
-> > +				msg_rsp)                                        \
-> 
-> Please keep line length to 80 columns or less in Networking code,
-> unless it reduces readability.
-> 
-> In this case perhaps:
-> 
-> M(NIX_SPI_TO_SA_DELETE, 0x8027, nix_spi_to_sa_delete,     \
-> 				nix_spi_to_sa_delete_req, \
-> 				msg_rsp)                  \
-> 
-> Likewise throughout this patch (set).
-> checkpatch.pl --max-line-length=80 is your friend.
-ACK. I will adhere to the 80 columns in the next version.
+On Tue, May 13, 2025 at 12:08=E2=80=AFPM Haifeng Xu <haifeng.xu@shopee.com>=
+ wrote:
+>
+> Hi all,
+>
+>         If the packets arrive at the rx and then raise soft irq to handle=
+ it, but in i40e_clean_rx_irq, status_error_len is 0 and return.
 
-Regards,
-Tanmay
+Directly "return"? What version of I40E are you looking at?
 
-> 
-> >  M(NIX_MCAST_GRP_CREATE,	0x802b, nix_mcast_grp_create, nix_mcast_grp_create_req,	\
-> >  				nix_mcast_grp_create_rsp)			\
-> >  M(NIX_MCAST_GRP_DESTROY, 0x802c, nix_mcast_grp_destroy, nix_mcast_grp_destroy_req,	\
-> 
-> ...
+>         The data isn't fetchted from the rx buffer, so the how the packet=
+s arrive at the rx will be processed?
+
+In i40e_clean_rx_irq(), packets are one by one constructed into the
+sk_buff and then passed to the stack by napi_gro_receive().
+
+AFAIK, common drivers implement nearly the same scenario.
+
+
+Thanks,
+Jason
+
+
+>
+>         FYI, the every rx/tx queue has been bounded to one cpu(64 queues,=
+ 64 cpus).
+>
+> Thanks!
+>
 
