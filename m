@@ -1,199 +1,202 @@
-Return-Path: <netdev+bounces-189962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4EB0AB49B0
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 04:48:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A848AB49DA
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 05:06:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CCDD8C3C8D
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 02:48:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F6DC1711AB
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 03:06:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D91A71C863B;
-	Tue, 13 May 2025 02:48:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5455A1AED5C;
+	Tue, 13 May 2025 03:06:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YMnE2ixe"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="TJfUolF5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2929D1A5B96
-	for <netdev@vger.kernel.org>; Tue, 13 May 2025 02:48:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0219B4C6C;
+	Tue, 13 May 2025 03:06:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747104493; cv=none; b=CpKa/tozBW8xIZAUcTsKAcPSPmwrtz2cqZBybAbUdWjuusp+hwDaTZFh3iISAafY2/qOP7Xzvewu76fWx68OvtCTKBYi2km+S41xBu50mMVlaGadEtBxluzV6ZIBVkJdcfATIFj4nkPFoOijmBF4GNfLtSNUak2AprzZNUFuOOI=
+	t=1747105601; cv=none; b=I8KgtV2ABNqZDq1ZcG6ATGzCUpS5zMH81bj3XPb5JTRHMWn2tHsF72rEyaUbvXgFNfIBVGQ4sdINR6dQC8DjAQMsxZWJJEqUKllciso341DLwqTS5jM6WEau+0ly8XuL42h4kvSQ17OBvP++wQWdRQvwsXGF/u/GuIWkhy2xL0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747104493; c=relaxed/simple;
-	bh=oVAAINjf7nhgJsAWNtj+ew1E0figJJN/dk0b6bs7q3g=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=AHVg9ZFtXCv0dwCSN0nX+Ln63wDhlPGano4qDCxb3VcSbI2+YHNdRSF7aec6RxtmKuK7BGgL39XBvZEOMMergg6ACPREqpx1GCGru8NE2hPfXNCYVRHJqRlbZ6wGIeJtmKPc8G4OalUn0CLQcds2PBZksjnI9Y35OM7fLYsl9Nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YMnE2ixe; arc=none smtp.client-ip=209.85.219.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6f53d271c4cso47952106d6.3
-        for <netdev@vger.kernel.org>; Mon, 12 May 2025 19:48:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747104491; x=1747709291; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gLtlZnKZw5dOiEwgXhpAjmdeWZ1WT8xctFkKVR04ck8=;
-        b=YMnE2ixe3Cv+/+tU3QOf8PU6wwA42kzk3tbQ2L2ZxdV23b2f7d7r7xiEQ+UlA2rDyz
-         0rd42+DH8MeNnH6PsR5BRfNlMEXnfEF507xPDyfxb5kisbv/ZnCy+sEafW1uYt6F4uiq
-         u21kbmdw9HI26j0ptiwnSrPW1Vt16b9W9B/FR2V88uxalDfWGkZwKkSuPLY8/MKRg4dK
-         1ZIHaZIYFfSCi2Bu2Ts/ZKzvvpqvGngVi+df1jTBG61qkEwGsJlW1wW9HtZmk0rrlUsN
-         vw7xae6lFGA6Y8VNcqmQdoPaRI3JuZw3Oy1m4Wm0pxICOlA4YnuM3dcb7ZNot6ka8cwt
-         Bw8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747104491; x=1747709291;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=gLtlZnKZw5dOiEwgXhpAjmdeWZ1WT8xctFkKVR04ck8=;
-        b=lyNikHdOnD6dOKw1fD+WklhnQqrT9YfDbRfZ/kW5/aYIOQonaABjGO6WCzo8b9l1qe
-         Byb+Md9bPzaOAzbCeyEZz6PTtwgOnVe09wfRryIsphM2KB50iryCLEGh7EwNpaEs/5S/
-         BVx6VJDxVwZBAwsO/ulF1gHBDyFS60ZYzhOqn34sgEtcGKyOf2lgenwCg7cC1n80VU7w
-         BLruqscXQm2QInc+qV7PWsppCO0IgMl4c93NERwZdJvHZjEflR8D1BnPMGD8pgxc/rhm
-         2vPVVC4FI0Ij7mcd8J46g1N2+C2KWkwIAe2VzThK1J4nCaYi1jSoXbBya3q65b3YLA97
-         aS6A==
-X-Forwarded-Encrypted: i=1; AJvYcCXTYNdEbeFnDQuz2sq0a2WnWfA4YrLGfAb4gVwjFftoOLhT5QzwwfuMyQJKgmlTdqDdeo6OlB4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSLBVrbK1F1IG5M/2hYd19EozivOmOqqgOBV+fmK59URDFxaB5
-	mC/VPPj5xto9uB/UJcCeI47TFwHtUTIrlT9g6BLxHyvhpFjdqBef
-X-Gm-Gg: ASbGncsKZXLO9FLiK3muIAfxBB/zML58g2UZ2AzClvZAfqDaOgBy7+Tur26H4GvLBqX
-	GR5gdGyYvgSu3jgMBHwdNQlXS5/WsUx4gmYBYOg0xHNWOLAW5nWIsOUGbcgtiwBcOpSftz3Wdy+
-	OJjAsq4uwhRuZvmmzB6GtvEinEQ16nZ4OezTHwJpG7yvPrquiMO444VMwhWnUDmYAbEme+Z/dGP
-	6086TrycIMomOKYVvyyLTwYYu9q1lLrPvhNJEj6AtwIk7Ro/DLSKI6hSpvEsVd/+hr4flTatgfs
-	y20fU9QwbpSEmUCedzazbmKLEGr4EWfJC9gK5kST+JVnXgqkT0gjkzENa1VtrLgXNxPDQIji3fH
-	12AFTqtMoare5gI1eEpMD4/xy1966GqtgVw==
-X-Google-Smtp-Source: AGHT+IH/xu416V7utYk6NxJngOqvX866rhOjaRgbd7mshGZ/0ZG/pydpvFgvEglAamTUX0qkXejVig==
-X-Received: by 2002:a05:6214:8006:b0:6f8:8df1:655 with SMTP id 6a1803df08f44-6f88df107e6mr10849706d6.29.1747104490833;
-        Mon, 12 May 2025 19:48:10 -0700 (PDT)
-Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
-        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-6f6e3a600easm61278476d6.123.2025.05.12.19.48.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 May 2025 19:48:10 -0700 (PDT)
-Date: Mon, 12 May 2025 22:48:09 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>, 
- willemdebruijn.kernel@gmail.com
-Cc: brauner@kernel.org, 
- davem@davemloft.net, 
- edumazet@google.com, 
- horms@kernel.org, 
- kuba@kernel.org, 
- kuni1840@gmail.com, 
- kuniyu@amazon.com, 
- netdev@vger.kernel.org, 
- pabeni@redhat.com, 
- willemb@google.com
-Message-ID: <6822b2e9e484d_104f1029457@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250512223729.58686-1-kuniyu@amazon.com>
-References: <68224e25b13ac_eb9592943d@willemb.c.googlers.com.notmuch>
- <20250512223729.58686-1-kuniyu@amazon.com>
-Subject: Re: [PATCH v2 net-next 7/9] af_unix: Inherit sk_flags at connect().
+	s=arc-20240116; t=1747105601; c=relaxed/simple;
+	bh=tIgXaLSVizFofL4SRJwe+0I2bWrhtONCrIazmJtlLdk=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=YJvgZ/qVAHvtUVZ1zJrq9VsWYM3yklJ+4NAcEyWmH+06nO05yVtJOJAD/RzAWPg4K8X1NNWbZoiZwYYCiyhhN/RmokFAR9QpeuqKiEnBcTFnIdjJCe4QmPhIRfWDbfR4ohTWcmuYK8pqqvfI/wtWjm6K/KTdJMA8V664DmBsgjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=TJfUolF5; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1747105593;
+	bh=ayxdP8gWAbkfn0fMI/Ym542Ws5mHhmNhJ/pLVIx2Sfw=;
+	h=Date:From:To:Cc:Subject:From;
+	b=TJfUolF5Qu4L+3FUqR/hcIS/mcpl2wRYcFwH1T02kpmGvh51LyZmpKPDqCbn8qjul
+	 zZsBD3tvj1SCThzy9OabEyaF9INaBi3vJ1y7ibEAJON9WMiw0ePC5vd8WGGLK/DIiq
+	 U38ppv+4NR6y4BnyfyvuxWXtwtTNnwUtM4EfNFV9oMlu0MRzSB/BRHbaB0MIP5icHk
+	 jHfppDZNrrVZXYuuVZobIsz56SzwD2YE6XgKmfzaGygEEwsViZ3cmdNwV60lOlhIw4
+	 DW1hO4eYFSQnNV/CFc8cGzfRQZdh3YOf9BrSU3vrqE4mciYeAu8/6ocEmhxeI4HEp5
+	 aplgGW/00xgTg==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4ZxLwS67Xkz4wcd;
+	Tue, 13 May 2025 13:06:32 +1000 (AEST)
+Date: Tue, 13 May 2025 13:06:30 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Networking <netdev@vger.kernel.org>, Jason
+ Gunthorpe <jgg@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>
+Cc: Dan Carpenter <dan.carpenter@linaro.org>, Dave Ertman
+ <david.m.ertman@intel.com>, Leon Romanovsky <leon@kernel.org>, Linux Kernel
+ Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Michal Swiatkowski
+ <michal.swiatkowski@linux.intel.com>, Mustafa Ismail
+ <mustafa.ismail@intel.com>, Shiraz Saleem <shiraz.saleem@intel.com>,
+ Tatyana Nikolova <tatyana.e.nikolova@intel.com>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>
+Subject: linux-next: manual merge of the net-next tree with the rdma-fixes
+ tree
+Message-ID: <20250513130630.280ee6c5@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/vtpU+YY_BFYko292DKksJ2y";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/vtpU+YY_BFYko292DKksJ2y
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-Kuniyuki Iwashima wrote:
-> From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> Date: Mon, 12 May 2025 15:38:13 -0400
-> > Kuniyuki Iwashima wrote:
-> > > For SOCK_STREAM embryo sockets, the SO_PASS{CRED,PIDFD,SEC} options=
+Hi all,
 
-> > > are inherited from the parent listen()ing socket.
-> > > =
+Today's linux-next merge of the net-next tree got a conflict in:
 
-> > > Currently, this inheritance happens at accept(), because these
-> > > attributes were stored in sk->sk_socket->flags and the struct socke=
-t
-> > > is not allocated until accept().
-> > > =
+  drivers/infiniband/hw/irdma/main.c
 
-> > > This leads to unintentional behaviour.
-> > > =
+between commits:
 
-> > > When a peer sends data to an embryo socket in the accept() queue,
-> > > unix_maybe_add_creds() embeds credentials into the skb, even if
-> > > neither the peer nor the listener has enabled these options.
-> > > =
+  80f2ab46c2ee ("irdma: free iwdev->rf after removing MSI-X")
+  4bcc063939a5 ("ice, irdma: fix an off by one in error handling code")
 
-> > > If the option is enabled, the embryo socket receives the ancillary
-> > > data after accept().  If not, the data is silently discarded.
-> > > =
+from the rdma-fixes tree and commit:
 
-> > > This conservative approach works for SO_PASS{CRED,PIDFD,SEC}, but n=
-ot
-> > > for SO_PASSRIGHTS; once an SCM_RIGHTS with a hung file descriptor i=
-s
-> > > sent, it=E2=80=99s game over.
-> > =
+  c24a65b6a27c ("iidc/ice/irdma: Update IDC to support multiple consumers")
 
-> > Should this be a fix to net then?
-> =
+from the net-next tree.
 
-> Regarding SO_PASS{CRED,PIDFD,SEC}, this patch is a small optimisation
-> to save unnecessary get_pid() etc, like 16e572626961
-> =
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
 
-> And, SO_PASSRIGHTS is not yet added here, so this is not a fix.
+--=20
+Cheers,
+Stephen Rothwell
 
-Ack, thanks.
- =
+diff --cc drivers/infiniband/hw/irdma/main.c
+index 7599e31b5743,abb532bc8ce4..000000000000
+--- a/drivers/infiniband/hw/irdma/main.c
++++ b/drivers/infiniband/hw/irdma/main.c
+@@@ -221,8 -221,8 +221,8 @@@ static int irdma_init_interrupts(struc
+  			break;
+ =20
+  	if (i < IRDMA_MIN_MSIX) {
+ -		for (; i > 0; i--)
+ +		while (--i >=3D 0)
+- 			ice_free_rdma_qvector(pf, &rf->msix_entries[i]);
++ 			ice_free_rdma_qvector(cdev, &rf->msix_entries[i]);
+ =20
+  		kfree(rf->msix_entries);
+  		return -ENOMEM;
+@@@ -245,35 -245,40 +245,42 @@@ static void irdma_deinit_interrupts(str
+ =20
+  static void irdma_remove(struct auxiliary_device *aux_dev)
+  {
+- 	struct iidc_auxiliary_dev *iidc_adev =3D container_of(aux_dev,
+- 							    struct iidc_auxiliary_dev,
+- 							    adev);
+- 	struct ice_pf *pf =3D iidc_adev->pf;
+  	struct irdma_device *iwdev =3D auxiliary_get_drvdata(aux_dev);
++ 	struct iidc_rdma_core_auxiliary_dev *iidc_adev;
++ 	struct iidc_rdma_core_dev_info *cdev_info;
+ =20
++ 	iidc_adev =3D container_of(aux_dev, struct iidc_rdma_core_auxiliary_dev,=
+ adev);
++ 	cdev_info =3D iidc_adev->cdev_info;
++=20
++ 	ice_rdma_update_vsi_filter(cdev_info, iwdev->vsi_num, false);
+  	irdma_ib_unregister_device(iwdev);
+- 	ice_rdma_update_vsi_filter(pf, iwdev->vsi_num, false);
+- 	irdma_deinit_interrupts(iwdev->rf, pf);
++ 	irdma_deinit_interrupts(iwdev->rf, cdev_info);
+ =20
+ +	kfree(iwdev->rf);
+ +
+- 	pr_debug("INIT: Gen2 PF[%d] device remove success\n", PCI_FUNC(pf->pdev-=
+>devfn));
++ 	pr_debug("INIT: Gen2 PF[%d] device remove success\n", PCI_FUNC(cdev_info=
+->pdev->devfn));
+  }
+ =20
+- static void irdma_fill_device_info(struct irdma_device *iwdev, struct ice=
+_pf *pf,
+- 				   struct ice_vsi *vsi)
++ static void irdma_fill_device_info(struct irdma_device *iwdev,
++ 				   struct iidc_rdma_core_dev_info *cdev_info)
+  {
++ 	struct iidc_rdma_priv_dev_info *iidc_priv =3D cdev_info->iidc_priv;
+  	struct irdma_pci_f *rf =3D iwdev->rf;
+ =20
+- 	rf->cdev =3D pf;
++ 	rf->sc_dev.hw =3D &rf->hw;
++ 	rf->iwdev =3D iwdev;
++ 	rf->cdev =3D cdev_info;
++ 	rf->hw.hw_addr =3D iidc_priv->hw_addr;
++ 	rf->pcidev =3D cdev_info->pdev;
++ 	rf->hw.device =3D &rf->pcidev->dev;
++ 	rf->pf_id =3D iidc_priv->pf_id;
+  	rf->gen_ops.register_qset =3D irdma_lan_register_qset;
+  	rf->gen_ops.unregister_qset =3D irdma_lan_unregister_qset;
+- 	rf->hw.hw_addr =3D pf->hw.hw_addr;
+- 	rf->pcidev =3D pf->pdev;
+- 	rf->pf_id =3D pf->hw.pf_id;
+- 	rf->default_vsi.vsi_idx =3D vsi->vsi_num;
+- 	rf->protocol_used =3D pf->rdma_mode & IIDC_RDMA_PROTOCOL_ROCEV2 ?
+- 			    IRDMA_ROCE_PROTOCOL_ONLY : IRDMA_IWARP_PROTOCOL_ONLY;
++=20
++ 	rf->default_vsi.vsi_idx =3D iidc_priv->vport_id;
++ 	rf->protocol_used =3D
++ 		cdev_info->rdma_protocol =3D=3D IIDC_RDMA_PROTOCOL_ROCEV2 ?
++ 		IRDMA_ROCE_PROTOCOL_ONLY : IRDMA_IWARP_PROTOCOL_ONLY;
+  	rf->rdma_ver =3D IRDMA_GEN_2;
+  	rf->rsrc_profile =3D IRDMA_HMC_PROFILE_DEFAULT;
+  	rf->rst_to =3D IRDMA_RST_TIMEOUT_HZ;
 
-> Maybe I should have clarified like "this works but would not for SO_PAS=
-SRIGHTS".
-> =
+--Sig_/vtpU+YY_BFYko292DKksJ2y
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-> =
+-----BEGIN PGP SIGNATURE-----
 
-> > =
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmgitzYACgkQAVBC80lX
+0GxN2wf/TyrOJtgN7ZJw0Bz09/UfTOtj5gwx+vfMDRkoBU8Hp19s4Sfy+TQgz/NO
+8R+9c9iIzEOlHCPg0kIMS96YPmtL05NFXKzoMcHbWnZSiXyVdNe5HcQ1s6KRjKul
+u9XF9bO+phRCqbM3ixPnMxBIBl1tQcWICk9AXq8oKB6cK7U6qUUYxU7TDfoO4VU4
+GF72MJ3+CY6stJhqeh3SzUmWvmyrc5xn4szl5Zm141UD7/gYd08CJ2sz0U/15Duf
+1Z6aaCX75TKjhqacDD8JDVoFmz2dLGS+5r3LRsj9dirUPplMfxrgsvjtg476Ti4m
+lx6u0SjVXre0VszySdrKK8XZg49dIA==
+=czAo
+-----END PGP SIGNATURE-----
 
-> > It depends on the move of this one bit from socket to sock. So is not=
-
-> > a stand-alone patch. But does not need all of the previous cleanup
-> > patches if needs to be backportable.
-> > =
-
-> > > =
-
-> > > To avoid this, we will need to preserve SOCK_PASSRIGHTS even on emb=
-ryo
-> > > sockets.
-> > > =
-
-> > > A recent change made it possible to access the parent's flags in
-> > > sendmsg() via unix_sk(other)->listener->sk->sk_socket->flags, but
-> > > this introduces an unnecessary condition that is irrelevant for
-> > > most sockets, accept()ed sockets and clients.
-> > =
-
-> > What is this condition and how is it irrelevant? A constraint on the
-> > kernel having the recent change? I.e., not backportable?
-> =
-
-> Commit aed6ecef55d7 ("af_unix: Save listener for embryo socket.") is
-> added for a new GC but is a standalone patch.
-> =
-
-> If we want to use the listener's flags, the condition will be like...
-> =
-
-> 	if (UNIXCB(skb).fp &&
-> 	    ((other->sk_socket && other->sk_socket->sk_flags & SOCK_PASSRIGHTS=
-) ||
-> 	     (!other->sk_socket && unix_sk(other)->listener->sk->sk_socket->sk=
-_flags && SOCK_PASSRIGHTS)))
-
-No need to change as this stays as net-next.
-
-Might we helpful to replace "a recent commit" with the full commit refere=
-nce.
+--Sig_/vtpU+YY_BFYko292DKksJ2y--
 
