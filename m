@@ -1,75 +1,104 @@
-Return-Path: <netdev+bounces-189930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 366BAAB4888
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 02:44:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA293AB489F
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 03:00:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B22727AEC23
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 00:43:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44FC58674EC
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 00:59:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48E9B84D34;
-	Tue, 13 May 2025 00:44:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YqyT30OJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEF9C145B27;
+	Tue, 13 May 2025 00:59:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from trager.us (trager.us [52.5.81.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24BD22AE68
-	for <netdev@vger.kernel.org>; Tue, 13 May 2025 00:44:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378405695;
+	Tue, 13 May 2025 00:59:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.5.81.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747097084; cv=none; b=XhIFuU/IPhH/uUy8siAdzghViwawLPLMdjEaq+tN84EwQDvvha9Qfb5WKxc8C60vJOIHvVjVvuDFmzUFQDvCoxL4bH5Z3ty2Uzyg2NPudcZQj9iiB6KKphdXHgl9Gp1D+rmXMurtkHU6zvb+Mh5aguRanlJIauRvYmtSx6O15ZE=
+	t=1747097996; cv=none; b=OkXXgo6mV+vWpKUVsZJX9vuJb1R7ByLaLsiJM9B4s3v3PG/Q2+drXtUYJHNmLk+TDBMYOH29dWUzHGqKiW1BLm0+Xpx7W/A4ZYV6r4Xp2kXopEAXNUPI4HWCp7QkBhABxWx8sO/Rjm1ke2XaZ8LlAUtV9xNKlgctRZ7d4aTZz74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747097084; c=relaxed/simple;
-	bh=9HM0aFa6/rF5+ax2jUKIoTv7IXz4VhnWmng2lAGV6lQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UcCYwOX/r2SxL+bCmA15VxiUwm5xBryW07VKo+Owbh1rFMmF60bNN8PASl3GdScCxVhDY1dosMxkkl89sqAn6fehFgk4DplCScAbJ/xwsIzjgHl9bK+b0j1y7KOJ3Py55g1Z2dFnIfQNPqvbCItQRkh0MhdEMAk8udbdi/smUDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YqyT30OJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D78CC4CEE7;
-	Tue, 13 May 2025 00:44:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747097083;
-	bh=9HM0aFa6/rF5+ax2jUKIoTv7IXz4VhnWmng2lAGV6lQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YqyT30OJ+ltwXLJpPGubCuZ0jTld8JwRxgZ/jTZoD5R6GeJmm9JUJhw+V7+yRRfS/
-	 HAJ6nN+D3zjt99b4r9ok5ig2MYdVLIhuah9fd5ztM1ounEsgdy7/MTukfp8oKkPtOx
-	 rOwNudYPkR8j5+mtrA9wak+6XfAuVQXE39diz90IqXXt4aoQ5HnxUbnBo9JwiR7/5K
-	 /i33mApurzPd2DoAsWbyue4L0R7VyCgIvwB6uwS8Cx9Dwj9g1NMn/HmYPZ1ry9jNt6
-	 QYIsQjdcTRa1pG1rH42XYw07NV9wuUOCkkuNSImZhUwJ3MvNVv0uaR1RdL7SuVroud
-	 IMbvvQaeqBznQ==
-Date: Mon, 12 May 2025 17:44:42 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- horms@kernel.org, almasrymina@google.com, sdf@fomichev.me,
- netdev@vger.kernel.org, asml.silence@gmail.com, dw@davidwei.uk,
- skhawaja@google.com, kaiyuanz@google.com, jdamato@fastly.com
-Subject: Re: [PATCH net v4] net: devmem: fix kernel panic when netlink
- socket close after module unload
-Message-ID: <20250512174442.28e6f7f6@kernel.org>
-In-Reply-To: <20250512084059.711037-1-ap420073@gmail.com>
-References: <20250512084059.711037-1-ap420073@gmail.com>
+	s=arc-20240116; t=1747097996; c=relaxed/simple;
+	bh=QijcsHL4yO/98JvNzuDTU3gbuRArHYMYfje6GRx7III=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ulTUljT+96nnugNl1Dwf+k2XV2JokQ1R5aZnbxMuc0zfkaku6s2myEMNwjJusdLBAE6kHm/jdFYbRYIa6qh/oDJ+3a8FIN+qZM8uSFbAHABdy6zdvKk4b+ALqVXJceFqyh/sTvxX6KdqpaHFdwYCOLsVkdxYQA++o75nZoaaE8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=trager.us; spf=pass smtp.mailfrom=trager.us; arc=none smtp.client-ip=52.5.81.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=trager.us
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trager.us
+Received: from c-76-104-255-50.hsd1.wa.comcast.net ([76.104.255.50] helo=[192.168.1.225])
+	by trager.us with esmtpsa (TLSv1.3:TLS_AES_128_GCM_SHA256:128)
+	(Exim 4.92.3)
+	(envelope-from <lee@trager.us>)
+	id 1uEdzj-0007Pf-BI; Tue, 13 May 2025 00:59:43 +0000
+Message-ID: <98876971-e4e0-44f1-8faf-f791bd7a4e4e@trager.us>
+Date: Mon, 12 May 2025 17:59:35 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 2/5] eth: fbnic: Accept minimum anti-rollback
+ version from firmware
+To: Jacob Keller <jacob.e.keller@intel.com>,
+ Alexander Duyck <alexanderduyck@fb.com>, Jakub Kicinski <kuba@kernel.org>,
+ kernel-team@meta.com, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Mohsin Bashir <mohsin.bashr@gmail.com>,
+ Sanman Pradhan <sanman.p211993@gmail.com>, Su Hui <suhui@nfschina.com>,
+ Al Viro <viro@zeniv.linux.org.uk>,
+ Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250510002851.3247880-1-lee@trager.us>
+ <20250510002851.3247880-3-lee@trager.us>
+ <a406ecb3-a94d-47a7-bff8-becc6302a775@intel.com>
+Content-Language: en-US
+From: Lee Trager <lee@trager.us>
+In-Reply-To: <a406ecb3-a94d-47a7-bff8-becc6302a775@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Mon, 12 May 2025 08:40:59 +0000 Taehee Yoo wrote:
-> @@ -943,8 +943,6 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
->  			goto err_unbind;
->  	}
->  
-> -	list_add(&binding->list, &priv->bindings);
+On 5/12/25 11:47 AM, Jacob Keller wrote:
 
-Please leave this list_add() where it was.
--- 
-pw-bot: cr
+>
+> On 5/9/2025 5:21 PM, Lee Trager wrote:
+>> fbnic supports applying firmware which may not be rolled back. This is
+>> implemented in firmware however it is useful for the driver to know the
+>> minimum supported firmware version. This will enable the driver validate
+>> new firmware before it is sent to the NIC. If it is too old the driver can
+>> provide a clear message that the version is too old.
+>>
+> This reminds me of the original efforts i had with minimum firmware
+> versions for the ice E810 hardware.
+>
+> I guess for fbnic, you entirely handle this within firmware so there's
+> no reason to provide an interface to control this, and you have a lot
+> more control over verifying that the anti-rollback behavior is correct.
+>
+> The definition for the minimum version is baked into the firmware image?
+> So once a version with this anti-rollback is applied it then prevents
+> you from rolling back to lower version, and can do a verification to
+> enforce this. Unlike the similar "opt-in" behavior in ice which requires
+> a user to first apply a firmware and then set the parameter, opening up
+> a bunch of attestation issues due to not being a single atomic operation.
+
+Correct this is handled entirely in firmware. We use the normal firmware 
+update process when incrementing anti-rollback. During the updating 
+process firmware first validates that the new version number is >= to 
+the anti rollback version set in the SOTP. If not the update is 
+rejected. The drivers role is purely informational, it checks anti roll 
+back and provides devlink with a human readable error when necessary.
+
+When incrementing anti rollback the NIC first boots the new firmware. 
+Once it has validated it can boot the new firmware it increments the 
+anti roll back version in the SOTP automatically. This makes anti roll 
+back automatic and provides a way for us to abort the process if needed.
+
 
