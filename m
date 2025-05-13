@@ -1,80 +1,87 @@
-Return-Path: <netdev+bounces-190213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78F26AB588D
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 17:27:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 223B9AB5895
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 17:29:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44F5E16387C
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 15:24:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95907166FD4
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 15:29:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E595287507;
-	Tue, 13 May 2025 15:24:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CD2328E5EC;
+	Tue, 13 May 2025 15:29:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="2SyjL7xC"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="WhKTCaLc"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2067.outbound.protection.outlook.com [40.107.220.67])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2086.outbound.protection.outlook.com [40.107.220.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44C2D155A59;
-	Tue, 13 May 2025 15:24:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 636AA1A23B7;
+	Tue, 13 May 2025 15:29:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.86
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747149886; cv=fail; b=NujYzbip3khbJSVj9d0tJPC3ssGvy0VX6teMdx/rHAhqExoTCXXMdX8TUwymgN/y3pz7VlbM0tj0eBGNY2PXokZA8ujhjOxSJmI7OsJtKfHAx1/7eoUTGUz81Jk0dycYJmzeHGcReNy+CP7r9IlUkT4xlFyinGCv9AV698bFGUk=
+	t=1747150156; cv=fail; b=Ph8eK2QDioiwIYMNlyP/pZIpPua9mbbXuwn3lqdaw7sQnZehdVw02KSXeLDyD0pj+GEFduwco3l5O19UNqgkv4rZ5v7SYEOxk1SZs5ahWybGGMi1BL9XtUk3Qj/nMCWMh7bpgTEO7cqqZ1O3Ban9JPcPe1g6XKcOhyvgxAgIwvQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747149886; c=relaxed/simple;
-	bh=Mb3/zD0QgAQzavlGLUQkL6xZBVEUxheoMf7PWziRr0g=;
-	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=MM00dvGx5zKF2lW+rEk1FWS4pjch/lKnmTB0IjAUjbOn81E0JXK3QcgPHBEcem9MLoMgMT3qCA+xRPVGGffS8jqYnwgpC3NnHbcdf0R3XhDjiynqSfj4zsN1K3iLn4uqlHfu6KNcDRGd9DbwjPSmyo7Uni3BzRstsXjtg4aOndE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=2SyjL7xC; arc=fail smtp.client-ip=40.107.220.67
+	s=arc-20240116; t=1747150156; c=relaxed/simple;
+	bh=fYQjfCDuUQRyhcA2qPRQwjDFVDZyaqgPy3aJdCmTpoQ=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=TfTnzXEqzWlWIAwYyJsCKscG95fuhOdLyaul9xx/bUi2x1QLkMTxOaQWGe1D6QQhI7F/eVb5oMMm7QB8GY5zFNy5GUYH+zlYhleUpSdl14vPj8WaHfkdkTdo+ldi7PaU9wSAE+ph1M9JlwED/OYlOHGzNqrjNMBYAxiFL9jON4E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=WhKTCaLc; arc=fail smtp.client-ip=40.107.220.86
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=lejHNtK4SsWWsQh1mtWmZZjtf+uySlcfUGhWhMiliX/QFswTl4mJcGZVac1rkTOS7hrxL/fWpkUCzxRbNoWhJ1xIYYqYV7wnQ8dbA3ARCM6SpCDskKcXbIFbQbNKal7VUMjBEtavpKvM5nNMAAMfuvjzSVbV7Eyeuyf4KbJWNiQ+VBAL3Zqri1nKjkgAlb0x4xdbgvSIAqm44KFc7Q2ClQr1JjS5VUM/BgoRnpNw8nSOpUJQAeRYG6YLgAGaIq3uyjIqtsGPmr1w3vrgvTv4pBfzMUIRRhugFbkZefd0Re1ZW9kJRjKl1A54ZDSMJ/+OM9131yvwWOQ3n+9eNdz9VA==
+ b=McAUsYIFvbjUm2DBlEpSwMvUqkfSANGMMnw6XhA+aBMb6WU3r72pzCD1VwZ5QDl0+NS9NQQDOQDEnc7gWvHhjETiQSF8vKu8LhryzyM8tX4kCsDuvooW7oxPMi/A97iLlPwFO8oKlzP7IBHxHDResBq77QTtCwp7z/g7XIc0mBKaWsZk6KqC+1YeIJlgPNXms5FI++59Bi/YTwtjKtRfGsnV5i92HCy5ErNfWW/hp19pgjk1Lb5ry69YWrZNx8y/XJu6I/OwfXf7puJ7Ab3snRn3rlR7En70kHhgtg2BTsu9tIj4xgb/8dBn+N9vt7R96yvwSRCzSBhbxII7OCFcSg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tn6r9yNezIginG/cWq6c/XVLSVdGipvI6gtnWFWY17Y=;
- b=MqFHzjbZbV5saGdE8/9WthfOLxXJQmBVzLYtBMXL5KxMNxxUvQshdpU4hW5TqmU2fmjyIgmvnFA/8c80jsCeWKhjM6pStmm1pusmGrGaD1biH+3eVpDnE/MPvh2AGV3leOuPXadJpsGwwDlHBtJrp4RI0PdduC38y1gQbHqKyKoD55uizsoM0qyAeXtu+1ryVxCPhiM1QEvQ4yLggz5MW8TRuljbOPBrHaw44Jh0c8RTZtkV/D5V0an9lmSBYTcV2m0DJHZWlos6ECgW4VRs/mwfHXs4dxn+faZRaqAbg+bqw1pniXPb+WpvBZi+1X5qs2SRGLiJplq0xKLU326ukQ==
+ bh=ZpNguMNmBijmb3VHfyArpZT1zGWQT+7lX7wEyyJA7sg=;
+ b=ws8VHg5nr6Qo2ALpl0eO1O+1rOKWWvKbGaeSdHl5SPnO0BFWf9Ht1ze06yPK29r9LaKNMrJ4m8kiLFPTHKHIJWSHDMQSQfn8sIJUDYVVdV/r7x2kfkuvfCROdu0qordw+Lrb67Qv5KUEPp8ML4arp2DgBC8txCj5FxJR6AU/YcQWPMKnAdEQCfsAkwcZHnGaMIQ/BXN8lNnQG3TqsYGoG5mPUAKn7t3Fb/6vBwAGKHTnG5XePyuTPTW+gmTkxlcO0ICDI3/KBawKcpZ846PHngJDTni5U8KKLOhYL8UFzXqlrXN5EyJnj4a9BDkIB7Tv2jz1BK8s5QAtFNdNS024uw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tn6r9yNezIginG/cWq6c/XVLSVdGipvI6gtnWFWY17Y=;
- b=2SyjL7xCT5Ca/1ykr8xQeTgXYkDBPqe7KfDeieOgv8uZY9g6sZQ08vgsLcHs6AD7S34+FCmoDbuZRB9NzzmPTeLvciu5mMVelEr/qQeWIFKRe+9Jriy33UFAAVR16uq5kJeunL/EJQg57E6PgDrBeqbil7qzwhU3apNPkm24Svk=
+ bh=ZpNguMNmBijmb3VHfyArpZT1zGWQT+7lX7wEyyJA7sg=;
+ b=WhKTCaLc8MxyWq+URaxaiKey3dqNM0wpNNPDx/SPSUBWcaW0EN3Zc8v7v6FclCjjL/J94CNJGxG+X6+m8rFW+QqrQn2GOR9fj9vpIlP8swowdxWmDM1LmDgJotZD5SFPzdm8qkxjrftEziD1rV4CL3cyKFtlCu36oiIjmQ3brDg=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from MN2PR12MB4205.namprd12.prod.outlook.com (2603:10b6:208:198::10)
- by DM4PR12MB6327.namprd12.prod.outlook.com (2603:10b6:8:a2::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8722.30; Tue, 13 May 2025 15:24:41 +0000
-Received: from MN2PR12MB4205.namprd12.prod.outlook.com
- ([fe80::cdcb:a990:3743:e0bf]) by MN2PR12MB4205.namprd12.prod.outlook.com
- ([fe80::cdcb:a990:3743:e0bf%4]) with mapi id 15.20.8722.027; Tue, 13 May 2025
- 15:24:40 +0000
-Message-ID: <fd9888f1-ee5d-4943-89fa-32d6e0fb61a5@amd.com>
-Date: Tue, 13 May 2025 16:24:36 +0100
+Received: from BL1PR12MB5946.namprd12.prod.outlook.com (2603:10b6:208:399::8)
+ by DS7PR12MB6093.namprd12.prod.outlook.com (2603:10b6:8:9e::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.29; Tue, 13 May
+ 2025 15:29:10 +0000
+Received: from BL1PR12MB5946.namprd12.prod.outlook.com
+ ([fe80::dd32:e9e3:564e:a527]) by BL1PR12MB5946.namprd12.prod.outlook.com
+ ([fe80::dd32:e9e3:564e:a527%4]) with mapi id 15.20.8722.027; Tue, 13 May 2025
+ 15:29:10 +0000
+Message-ID: <6a8f1a28-29c0-4a8b-b3c2-d746a3b57950@amd.com>
+Date: Tue, 13 May 2025 20:59:02 +0530
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 00/22] Type2 device basic support
+Subject: Re: [net-next PATCH v4 09/11] net: macb: Move most of mac_config to
+ mac_prepare
 Content-Language: en-US
-To: Dave Jiang <dave.jiang@intel.com>, alejandro.lucero-palau@amd.com,
- linux-cxl@vger.kernel.org, netdev@vger.kernel.org, dan.j.williams@intel.com,
- edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com
-References: <20250512161055.4100442-1-alejandro.lucero-palau@amd.com>
- <59fa7e55-f563-40f9-86aa-1873806e76cc@intel.com>
- <8342ea50-ea07-4ae8-8607-be48936bcd11@amd.com>
- <ef2782e6-74d1-48e8-8159-069317bf6737@intel.com>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <ef2782e6-74d1-48e8-8159-069317bf6737@intel.com>
+To: Sean Anderson <sean.anderson@linux.dev>, netdev@vger.kernel.org,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Russell King <linux@armlinux.org.uk>
+Cc: upstream@airoha.com, Simon Horman <horms@kernel.org>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Kory Maincent <kory.maincent@bootlin.com>, linux-kernel@vger.kernel.org,
+ Christian Marangi <ansuelsmth@gmail.com>,
+ Claudiu Beznea <claudiu.beznea@microchip.com>,
+ Nicolas Ferre <nicolas.ferre@microchip.com>
+References: <20250512161013.731955-1-sean.anderson@linux.dev>
+ <20250512161416.732239-1-sean.anderson@linux.dev>
+From: "Karumanchi, Vineeth" <vineeth.karumanchi@amd.com>
+In-Reply-To: <20250512161416.732239-1-sean.anderson@linux.dev>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: LO4P265CA0089.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:2bc::6) To MN2PR12MB4205.namprd12.prod.outlook.com
- (2603:10b6:208:198::10)
+X-ClientProxiedBy: PN2PR01CA0021.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:25::26) To BL1PR12MB5946.namprd12.prod.outlook.com
+ (2603:10b6:208:399::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,292 +89,197 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN2PR12MB4205:EE_|DM4PR12MB6327:EE_
-X-MS-Office365-Filtering-Correlation-Id: d5f620af-f453-445d-8161-08dd923247cc
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5946:EE_|DS7PR12MB6093:EE_
+X-MS-Office365-Filtering-Correlation-Id: 602f8525-ebd3-4648-c185-08dd9232e824
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|921020;
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|7053199007;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?R1hlL1ZUTnlEYXVjOHlWWGI2blFpVXphMjMweExaN09CWGhMVXprZUVLSTlv?=
- =?utf-8?B?WDg2VlFZenJiNndvaTNDQ1lWZGNGbE5RSHFQZnJjMGlVWjZxRmVqRWE5SHlX?=
- =?utf-8?B?MFlVVzVlbVFra1Z1cHVBRlZOd0UwS090V1FiM3dLU0hWWTEwT1VCNDJncGxN?=
- =?utf-8?B?NTMySU9aUWhKcTFmSTVyZGpncDdqdEM0Tm5ua2dRd2I3MElNdFpVblNTejcr?=
- =?utf-8?B?K3ZyZHc5YnFkalB5bVNHSjM0cjNYbkpyV21lbWM1QWNLV3c4V0lOVTZMd0hG?=
- =?utf-8?B?Y1Bwd083WjFBaGp5SWgzNHBJbnIySXRwNWVFb09STTFSMHMyQUlVYXVRSWpJ?=
- =?utf-8?B?cWxvd2JtU2twb2RURUlBQmRIVnNtTDcvN0ZudXJ6NkFVWXRITllSYUwyZUV2?=
- =?utf-8?B?RGJXWDBpMVBQSktvUEpYNDVRb1E4WGE3M2ovb0w3ZVREQlVVcTZORk9rQkll?=
- =?utf-8?B?cllIaVdkanpwakhNa3VqVHZxdGhaTlc4SHJxYy9qM1lNMGMxTTBnai9GU1l0?=
- =?utf-8?B?NFdpOGRmN2VISkVYMUFsOVpseEpwaDJHckdjcXMzWHVuUGtRek56YlpZUXEr?=
- =?utf-8?B?TmhJMEkwelBkN2FLMlJ5MGxlZ25zR1pPeXZWM09QblpRU05yM1pnT1dDZkV2?=
- =?utf-8?B?Q29WOW1nbGdqU3NzV0Zld3BsUTJ3UEtwK2tOak02THArUUh2OGNxL1pOQnNO?=
- =?utf-8?B?eldUYzhCVU93ajlMV0x6KzlMc0tUMlhlc0tCcVNKSFNXK2U5WkxlZWYzTC83?=
- =?utf-8?B?TUZFQnpDVllzMDZVcHhzSmpYT0tmZDA5RVp2NVRnanpKVUFZbTFjVjRkWmtx?=
- =?utf-8?B?aGI0T2pjS0xUbytHVFdMK3RLU0YzQ1BxMU5VODVEWGs4bVpsVURONGhmN1hH?=
- =?utf-8?B?SHNQdUl2bVVpNkNhWHBkRjhTcENzTndFWlBpR3R2bFhNcXRsbk4vVi91OUt1?=
- =?utf-8?B?b1VIdWxvcmVuVzNzM283ekdLaWNPZTdBb1hTOWc1TndWbUxJYVVYbE4rZDJa?=
- =?utf-8?B?YU5FaHRxV3RSUkkvOWZVd21acWluVmNZRkNkVnhyZnZ6dDBFemsyZFRXaWc3?=
- =?utf-8?B?bk5kaStwY04zY2RzQ3VOKzUwRUR1VzF3M1oxa2dXMStqMEVESGcxOHY2S3dS?=
- =?utf-8?B?aWhuSE5rTGdKOHJ4eFdQdlpENldvMTRVQnFaNzRXZUlQaVRPTWR3NWRPRzJt?=
- =?utf-8?B?N1NzMXNzVllMUVVMbXdIRzUreEtzY2ovQkJtUGpwdS9MOWYvc2FuSldKQmFx?=
- =?utf-8?B?MEg0RTFuUHlmK3pnV0krdzhIdHBiYm1lSVV3VWEvZ3REajNwV1VMcXBuU3pW?=
- =?utf-8?B?S0t5T0lZUDg0OTNpOU15aHVwNTVlVjJwMGliR1ZMQnhRR3RzNVRFRFQwZ2RI?=
- =?utf-8?B?OUIvdWNyTUxzVHlLOTRCY2NrYjh4QXVlY0tYYU9rRnYzRlFTc3loSDBTZDFN?=
- =?utf-8?B?OWk5TEorWmYxTzA4S2hUbnpweE1wYmhNZTRyMzZBNktLSHAxamh6U3dsS0Rx?=
- =?utf-8?B?SUI2dWdtbS8wOS90RjVNaklrOFZ6ZjdpV3VHSVlvS0dCdllCUzJZZCttZW9T?=
- =?utf-8?B?MWpROEZZcXFnUGptaWtwbTlFNURMVmg5cEQ1bjBCWmg3c0VvZXFBeHA0OVNj?=
- =?utf-8?B?SEN1bXljd2pLUTN3M0tNM3hzZFU4NjMxbVMrTEQ0Y2VHNjNZT29iN3EzcXg3?=
- =?utf-8?B?KzNTcGdRZU03WHEvekVOY3NxME9hd2hmTkc4eU9TcXA0R09IMElwUFZ0MlZV?=
- =?utf-8?B?VzIzcUVBRW8xcXpBVktDU3dYbUJaQlhOZ1RmSExDNUlRazU0bnFTTEI1UFVK?=
- =?utf-8?B?clg0aGpRNmwreUpjSEYzMmVCOFJPR25QSGViQXdqMVRheU84LzRSd2I1SjNp?=
- =?utf-8?B?eFUzdXRHWWZPR2hsclRoRVkxaGtFVHExSzYvWWhtL1A5RHRnam55cFRyazIv?=
- =?utf-8?Q?n9MJEwEjpi0=3D?=
+	=?utf-8?B?eXZqd0xLUHM1QXBKSWZFRVpwd2hOSVFsUWZ1R1F0TEx1cm1Sbm1zWFpPRjBk?=
+ =?utf-8?B?VTU3UEZ2QXRLeFc3RVNXK2d0VEIyMG9ybFZHSCtrRlc0bVp4L3FzaFhTZEtI?=
+ =?utf-8?B?clNlR3Awem1CZVlwQUNWamI2UXlNV0x4OTZpaER5TlNXRkViSW1pd3ZQUTRN?=
+ =?utf-8?B?Z0JyY0xLQmc0dnFPZlB0RlpqVjlHempQaXp6bzlFYUxFeFB5YndOZE1UZ09m?=
+ =?utf-8?B?alB0bHQ2ZFpYbHJnejB3U3VOZWhVcU9MRUg3VHFMK0UreWNFanB5UWZwOWtK?=
+ =?utf-8?B?T01COGtkQ1k3cUMxRWIvUko3K3hMMGx3Uld3M082THFhekFCbzFZdjRkUXZr?=
+ =?utf-8?B?MENQOUdiU29VRGQvSDVVdi83ZU1iZTdiWXYrVEJVMVQ0VFQ0dWQvNnAyLy8y?=
+ =?utf-8?B?QThoY0d1SjM4VDVqQXFicStiNWllOU9KcUhHeWNINGRzMEFqdmFCdlBoeFEy?=
+ =?utf-8?B?VXJzbGdUVjdDcm56b3dWb2VEREs0dTFqN1Z2NC8rYzRtVTdKWmZFTTAyTDdr?=
+ =?utf-8?B?dCtlRThnVVZVVnFvNy9Ka01rTlpiT2lTSHRQMXVUVUtEbUY4Y2RxSmlIUEdI?=
+ =?utf-8?B?T1llajU4ek1DbHR6dngyeDJ4WlZiRzNWVk1IaEdVWmk0SkVnZFliY1VrRTVO?=
+ =?utf-8?B?MHp0dktUZktuaC9NMjFPRnJqK2l2ZlM3Q3JOWUpDWWVDb1RHVGJ3T3V2cVdJ?=
+ =?utf-8?B?bU5OY1JibnBSQmFGUTg0eERNOGNRd2VXQk8rTS9IaXVYUjhrSmRPQ1ZSS2py?=
+ =?utf-8?B?Rzk2b2RxbnZoTG1aTlArK0k3a09HMC9IQnoyYnRnRDF4bU1DZERZRTFKYzhy?=
+ =?utf-8?B?L3VlTVRsdmVKLzVkVTF4YjhudHpjb1pHWjdzNzBqSDNkS083UXFqYmJuTnIw?=
+ =?utf-8?B?V1U2VXpZL2dBL3NJdlFuaEdSOFVXN3A0NDdVVHphN2xmSnVTL1JLT1RkeE8x?=
+ =?utf-8?B?SXB6Sld0b09WVnliZU9JMzJ6NXVZb28rTERTVHVieDNvZEFyWFIvbElWZTRJ?=
+ =?utf-8?B?aVIwYVNBQisya1Y2aFVCUXZDNWV6NmthLzU5VlA5VTJDQmh0ZDU1cFlwdEIr?=
+ =?utf-8?B?V3hJVFdXZDY4VHRKSFZuSHZLeDhzN0VUYmFnbkNyNmhTVTVueWxIS0dxdnFy?=
+ =?utf-8?B?RkxiSE1nMGJ4MXdEREcwSjd2OTFlS2tNK1hSbW1tMzV5S1NIQys0RmJZcENQ?=
+ =?utf-8?B?UjFQY2RvbGJNY3BqTXR4NmFyQSsrSUw2VnNlaWh5bHFFc1BhbmFHd1F2MGpW?=
+ =?utf-8?B?ZmRQbk1ucU1JWkdpZGVHTmowMmFNeElpaGRuV3VJVi83alpwVWF5SjUwNmVR?=
+ =?utf-8?B?bFFmZWlZRUZsMXVueXVTOHlYRzM4MXdtck5VbCtzRk9yTmg5NmRRRzRhc1dV?=
+ =?utf-8?B?NHpaMEo0c1FSYTA3VU1FY093WUFmeUFuYmVXR1JERmZCVkpRNUlRaW9TNnA3?=
+ =?utf-8?B?UlpUN0w1aldGZlh1RUl2dDB3RnhyNUUrU0Jhd3VWWm9LSUsvcFB3Z0ppQlE0?=
+ =?utf-8?B?K3JkVDJwd01aOG00S1F1WmV0dGtPdW0rNTdHekFjaUEyeVFBaHJTMmhzNHFw?=
+ =?utf-8?B?MHN3WDEvRWhsMmVYV2xUaFQybjRaMXkzRVdYb3Bwdkd0Vy9yYWNXbnBncXlO?=
+ =?utf-8?B?VmxqNEVNMkorbGM2Uk5FVWJTQi8zMk44M0FrbUwwNG5YTHpNOEdoK1FwSW51?=
+ =?utf-8?B?blhjY3FFaFh6RXRlUnVSMWdVaStOTUdZTk1NbjlENnFEdlV4M2NLczhyUHN2?=
+ =?utf-8?B?QjJJT0tVZC9WU05TdDI2R09YSjNFK05QaHpvbWt1M1BuWXhoZ25aVS9aR3M0?=
+ =?utf-8?B?eGtrTkNFekNQUzF3Tnh0cVowc212U20zdC9jY2t2ZUhSUFpDdkJTSnV0bENh?=
+ =?utf-8?B?aVpsamNFRmVSUDdROUlhamg2ZUZRUnlNKzBUc2l0bXkvcjhUbDcySXhKNDI0?=
+ =?utf-8?Q?WQv46PdF4+o=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4205.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(921020);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5946.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(7053199007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?bUhSL3RkU2Y4V3I5a3o1QWRmM3VuWis3NytEOHlvVFcyWklIUHd1NzJHVHI2?=
- =?utf-8?B?d21ySWppQS9INmUvWTlXUDgzUURTU2FuSG85dnFaQkxDeEJaYkRrRTM5TStC?=
- =?utf-8?B?L1hwdEpKNElTd0RpMGtrb2k5RWZEN1Z4ZE1mQUVDU1YwdCtXQllFVkdZOGZB?=
- =?utf-8?B?M0htMFkxMmhXVE1FbFAxZHBIR0l2RmpwcWQwS0EwVXhmelZRckRZOU11RTY3?=
- =?utf-8?B?Wjc0bTh5cGtJWlVSN2kzSkNsWTNmcjlIdE0rKy9ML3Z4elRuT2FMNEdNMUZm?=
- =?utf-8?B?ZG1Yc1Y3SVRJcithM0FVNXFrOFdySTM2Q0t2d3M4b3BDbzhSemt4REtYSFpi?=
- =?utf-8?B?YUpkNENLM2VXTTNZWkVYUmJIb1hMQzRkMFJ4UlpycVFaaDNuTU5vcldrNE5t?=
- =?utf-8?B?WjZnYkg4TU94REQyRmkxYU1sSlZLeHBWTS90S3FKTCttZTN3M2ZRUitOWWNM?=
- =?utf-8?B?aGZTR0prRFFZMlp6OTZYWUFjQ1FwNk1SUm9QK2V2ZE40QmEyWGtkQnFNTlI2?=
- =?utf-8?B?ckZsV01YcXUyZHVjTFE1cEl1bFpqVDQvV3FBU1J0OFl3QXhoL2pwYjRDMkhR?=
- =?utf-8?B?L0Nub2JkRGJkVXVQSDhYYUczL2Y1bzVjUmVmQjdLMDJ1QlZmODZMbFZ0c3RW?=
- =?utf-8?B?SnV1dzVDWE1sa094eWxwWkhzTEVOUGpGUzRoVHhnWGdyQ3RtRWpTSjdHWXhQ?=
- =?utf-8?B?NGVseWsrYjM4eEpsVnRqZi91SVR3eVlURVBpZFVXVDdLSVgzT1FkUHIxY1pF?=
- =?utf-8?B?dmVGWDdCRlVYdm1hWDhMRFZmTy9ReGh3KzBRWWdqelBmTG9DV1pXUjA1c285?=
- =?utf-8?B?MmVWTTdqM1dxSFdJdkpyMkJLTkN5WDJXK2oycUVzMUFCSDJ1V1pOVi9QV0My?=
- =?utf-8?B?cDc3T09WQlBBd081UmNCczN4Y0ppVnJwVmRGOVJYUjQ0TWRjVFZtalRZTjZY?=
- =?utf-8?B?Sm4vQUViazV2TllVVS9HTnVjYUtidlk2OUQ2SFFBdWFBK0puWFZFUTBuWmpm?=
- =?utf-8?B?M3kvYXEwak5kVWp0TGxKRy9XN3hDWnF6QW9yVWlDSVJQTWtLbVNQcjNBTzZI?=
- =?utf-8?B?aUR5WERCQnNBQXBMYTFkNnB6RDZmWnU3RGMrZTg0QzRqQTZVNGF2d3lpSXg4?=
- =?utf-8?B?YTB5YnZQNHdFRzZic2RGSVhkUlR6aWtpWUQ1MjUyNndBZG5nZG5XdlhseHdN?=
- =?utf-8?B?NkUybytzSDVwdVFQTXRKRGV0QkpFamlpV2RNcHRIanIxS0cvM3ROb00ySXlQ?=
- =?utf-8?B?Y09HdmtvYmxuMmFRanpPTVEvN3ZnaG9nK2IzeEpiOFlCRTl4aWFmVUE3c2Ex?=
- =?utf-8?B?bVFYRG9HN055NUh6dzd6OUJVS2I1KzlxYmhDUlpNcWg4dmNFV2hqZm1ReSs4?=
- =?utf-8?B?QnZBM28yRnI1M0Iyc2g1c2w2NysyekZDelJSQ3hTVnZYTjhJcC9CODhHNUF0?=
- =?utf-8?B?LzNTZDVKbGFtNCs1eUQ0c1BDUEo1M2xuQTRYcklEU0FNREsyK0tlTmp4NTNW?=
- =?utf-8?B?NzJicHdEblkvbGZ1ektLMjRvSVB4MGlyRkhsMm1WSWVmU1huL0hpQURrUlRI?=
- =?utf-8?B?RVpRNEg5RG1tRnZKRlRvUFI3TlF4VEZ6NnJldkw2WVNhZHorTElrbk9FWTNU?=
- =?utf-8?B?SmcrU3lCQWl2eitCY0k4VWc1Z0NVUUFHazhrVTZEZ0ZmRVVBK3dFN2RXYjZ1?=
- =?utf-8?B?Zkx4aGVUU0trUmxBVHU1eXZHZkZXWWh5bDNvWnowb1QyOTAvMXcxSFNRa205?=
- =?utf-8?B?ZE4yOXlCb0dvdkxpRWlCNUJkbHlIQ3Q5UEsrVHE1aURQY3E5OG5qNCtqVkJm?=
- =?utf-8?B?cWZoeW5YT1daQVM4U2RySEpsQy9KUmxTVlIwWmMxMUlhUTI0NmVEMTUxK293?=
- =?utf-8?B?by9PY1BGK3JFQVlOQ1Y4QXFPOVl6bHVHTElKUVhVemVZQWl0QU9IcWJ4NS9B?=
- =?utf-8?B?YjI5OVBsd2c5OG9VeUJsQmhOMnZkUDZxZ25Eei9TUUxtbDFLZkRmTWpvUVJq?=
- =?utf-8?B?UFdOM3FCNGJvOUhIaG5jNnRTVWM4UzJoeG5wdm94K1MvQjljUG5ab2JGMGM0?=
- =?utf-8?B?M1dXZEFnMk1ORDRUVG9WRWlZcWF3MS9oYTZlSk1RakwzZzFIVU1HTXJVdFNp?=
- =?utf-8?Q?1daVScCwCU/SrbW91o32D+zba?=
+	=?utf-8?B?dWhRanhIRjJXUEdxRE5kc05uaTNIYWd1a3Z6MDNCelBBMjc5TEljUU9saUFa?=
+ =?utf-8?B?Y29YaVk3UHBDVk5CQUFHYkdzdDNkamZ5UTF1eGlDTWZYbFV1N0J2eS94MjdD?=
+ =?utf-8?B?TWVXK2ZIZW0rVUI1K0djSXFjcE5oaHRpclhkU29oYnorcURTMXY3MW1xbjFh?=
+ =?utf-8?B?T01lNjNFZEZvRUw1MmUxV0NmUXNnYVVRTmhTKytNKzlQY2l6ZWlWSXV3SkdP?=
+ =?utf-8?B?RlZoSFcvQWx1aU1LMU9wN1ZiUE5vbHFKSENvQS90Snd4cXNTSmNUbHBsUXFl?=
+ =?utf-8?B?MSs1RlkzbllDS0ZpamtHakQwMlpta2gwak94emQxRGhUZ0IzcHViaE41WTA4?=
+ =?utf-8?B?b0EwMHUvVVBLcDJacTltWmJUL2dXckhHTFoxRld6THNWRUxKbE1GS3paeE52?=
+ =?utf-8?B?bFlUMXlNUXlReTR4MlJXOHFUVENxeUZiMFQ2WGhsT01Ld2FPR2ZSTEpEcTlS?=
+ =?utf-8?B?alRPSndHaTRlOXZwaFpVM3E0cDAyMEZzY0tPYW0xZEJ3Y1NlRzViZjBvTnM4?=
+ =?utf-8?B?R2RJK0cwQVcwQTA0VVV0SklENTZXWlVHNjQySjZPOWEwMk1Sc1VwUytIaHU3?=
+ =?utf-8?B?dFNtT1BDZ1lKNmRkckxDcGFBWi9Ra2ZUa0pPRkNIRU14eTVOQlJTOWVUeDho?=
+ =?utf-8?B?Q2lKVzhhWWtHMW1yM2R4amhvMXFvVE1oQXdNejVzSkYzVWJOSHA3dDJLV3JN?=
+ =?utf-8?B?TzQ3R2ZPb3ZJbG9PTlgvcCtKY2RyTDRLOExsYWIrdkQ5ZEhQUDVjQlFZaEVP?=
+ =?utf-8?B?bjFrRFBtaHV2bnVxNTcvZVlLZDkzWnhycWYyZjdTZHRERmNDdWcxdFVPRFY1?=
+ =?utf-8?B?YzdIWmw3eGJjc3IrU1NHblhFeVg1dGZiRzdmRkw2d3I3MXAvcUVQbnB2OTlV?=
+ =?utf-8?B?ZVV6QmpwbFk0K2JZY2lNZVFtblNWdTRiK3NRelVvSm91cFBrOHVsRE1rdGZF?=
+ =?utf-8?B?Mlk4Vko0dzJLSW9rMDExMExyaHY3VHFUTklhZ0k1RmJLck16cHcrRHJhMzIw?=
+ =?utf-8?B?a1pBZk1YeGRXOGR6NHFPS0hWcXVTQ25xRmRHemdYQXpmVkk5bGJtY3hrU1hk?=
+ =?utf-8?B?bG5JT1BrMHlONnRmbjh0clJwWXZ3MEZFa2g2MmJyRGNwSXpVM2pwd3pWemsv?=
+ =?utf-8?B?NUZZUnJIOWNlSTFFU1VuVW0vUmRwN280VEoyRVhFbmU1QnZ1K0I0dkN4ZmlF?=
+ =?utf-8?B?VDE5d0pOdXBZY0lnc0VQanJhR3MyNDJaRXY1d3VwZ1ZyRm4xQWk4bGZodFVI?=
+ =?utf-8?B?SWFDaGZndmo5ZFZrN01JczFSZUg5MHd4OElPZHdBV1BZZEVLTEcrS0QwV3Iw?=
+ =?utf-8?B?V24vZWN6K215ODJRd0Nva2R0eHVWVFVVRThtVFVrRTNRWHplMUhRZTBwUEV1?=
+ =?utf-8?B?ZDdWT0RWTmJROTZYWUUvNFZWWGxQR0JVMXVXMHcrZW5IWHFrNWg2SDM5Nkdn?=
+ =?utf-8?B?cW9Sb2tDbkM5RDFUMEt5REZCaW9MYld5WDJxU3N3R21LMHN0cmwyUVR0VFUw?=
+ =?utf-8?B?U2FEWkZEbzlnR0IrS1VGNVoyR1Q3ajRraEJhY1FzVWwyWWFVczZrc1lNU3ZU?=
+ =?utf-8?B?ZmwxbXk0MTNCdWJQRDVMajJmU3RvV280TUNDL1NsazNjcjNwbUJvL2c2Skp2?=
+ =?utf-8?B?Zms4ZDArRzJmMkFLUUcrVjVOVHBzSkJLRkNzSkVQMm0vWFBDZEZMZk9UKzdk?=
+ =?utf-8?B?dXFBeUNiaFB2dnZsV0ZQZ0xnY29wQWFoRkVsTjhRWHZhbHpBTGt0Y1ptTDFY?=
+ =?utf-8?B?YS9XSk5Memc1TkRXcU5MMDF4RytDUC9WbWVjOFg3SWRWQ0lQbitnMFFmSFhN?=
+ =?utf-8?B?UE5rc25mRDdncmZlUFVPRkExeUtoS2poNzNtUmxHSFJITzI5eFBKYkJrVm9Y?=
+ =?utf-8?B?T2QzUjJ2VUhuTjBFK3Q4UTQwaGpublBlVzh2enllYld1WDRJSnY4aWN0K1lW?=
+ =?utf-8?B?WUp2Qk9VYk9tWXBSWUNlanQvMElBSThIc0tLZnhpY093T1pENGJVemdjTXQ2?=
+ =?utf-8?B?aUNKRGtMVDBuQnNFMmtkamRpZGNicTZJNnJCaENvV3g4ZGNGNHB0Ni9zUjg0?=
+ =?utf-8?B?aHphZ3VmNDFLSHgrbG4vT0MrS3Jlc1YreG51WnNsdVBjdDk1dGpiYU9xU1Vr?=
+ =?utf-8?Q?UM30A6f7vDkIkMMk3MsqWjns0?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d5f620af-f453-445d-8161-08dd923247cc
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4205.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 602f8525-ebd3-4648-c185-08dd9232e824
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5946.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2025 15:24:40.9005
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2025 15:29:10.0593
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QBN7ei/Kz+MbklLHKUKwOUzsi3mBAFHi4xMxJ/84KPhm20C8l0A4kI/GbZrCg3Alhnbw4zneK4ulB+uTzTi8dA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6327
+X-MS-Exchange-CrossTenant-UserPrincipalName: a245pgGAyRxTWP9rJwJPuIn0IaHNh31NFWnhaz2aDecC5LNwn/dlMm9VvgNUmcud
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6093
 
+Hi Sean,
 
-On 5/13/25 16:13, Dave Jiang wrote:
->
-> On 5/13/25 1:12 AM, Alejandro Lucero Palau wrote:
->> On 5/12/25 23:36, Dave Jiang wrote:
->>> On 5/12/25 9:10 AM, alejandro.lucero-palau@amd.com wrote:
->>>> From: Alejandro Lucero <alucerop@amd.com>
->>>>
->>>> v15 changes:
->>>>    - remove reference to unused header file (Jonathan Cameron)
->>>>    - add proper kernel docs to exported functions (Alison Schofield)
->>>>    - using an array to map the enums to strings (Alison Schofield)
->>>>    - clarify comment when using bitmap_subset (Jonathan Cameron)
->>>>    - specify link to type2 support in all patches (Alison Schofield)
->>>>
->>>>     Patches changed (minor): 4, 11
->>>>
->>> Hi Alejandro,
->>> Tried to pull this series using b4. Noticed couple things.
->>> 1. Can you run checkpatch on the entire series and fix any issues?
->>> 2. Can you rebase against v6.15-rc4? I think there are some conflicts against the fixes went in rc4.
->>>
->>> Thanks!
->>>    
->>
->> Hi Dave, I'm afraid I do not know what you mean with b4. Tempted to say it was a typo, but in any case, better if you can clarify.
-> I use the tool b4 to pull patches off the mailing list. As you can see, your series fail on rc4 apply for patch 18.
+Sorry for the delayed response.
 
+We are working on MACB with two internal PCS's (10G-BASER, 1000-BASEX) 
+supporting 1G, 2.5G, 5G, and 10G with AN disabled.
 
-But your head is not what the base for the patchset states. I did work 
-on v15 for working with the last patches in cxl-next so the HEAD should be:
+I have sent an initial RFC : 
+https://lore.kernel.org/netdev/20241009053946.3198805-1-vineeth.karumanchi@amd.com/
 
+Currently, we are working on integrating the MAC in fixed-link and 
+phy-mode.
 
-commit a223ce195741ca4f1a0e1a44f3e75ce5662b6c06 (origin/next)
-Author: Dan Carpenter <dan.carpenter@linaro.org>
-Date:   Thu Feb 22 09:14:02 2024 +0300
+Please see my inline comments.
 
-     cxl/hdm: Clean up a debug printk
-
-
->
-> ✔ ~/git/cxl-for-next [for-6.16/cxl-type2 L|…138]
-> 08:08 $ git reset --hard v6.15-rc4
-> HEAD is now at b4432656b36e Linux 6.15-rc4
-> ✔ ~/git/cxl-for-next [for-6.16/cxl-type2 L|…138]
-> 08:08 $ b4 shazam -sltSk https://lore.kernel.org/linux-cxl/20250512161055.4100442-1-alejandro.lucero-palau@amd.com/T/#m25a578eb83108678737bf14fdba0d2e5da7f76bd
-> Grabbing thread from lore.kernel.org/all/20250512161055.4100442-1-alejandro.lucero-palau@amd.com/t.mbox.gz
-> Checking for newer revisions
-> Grabbing search results from lore.kernel.org
-> Analyzing 25 messages in the thread
-> Looking for additional code-review trailers on lore.kernel.org
-> Analyzing 955 code-review messages
-> Checking attestation on all messages, may take a moment...
+On 5/12/2025 9:44 PM, Sean Anderson wrote:
+> mac_prepare is called every time the interface is changed, so we can do
+> all of our configuration there, instead of in mac_config. This will be
+> useful for the next patch where we will set the PCS bit based on whether
+> we are using our internal PCS. No functional change intended.
+> 
+> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
 > ---
->    [PATCH v15 1/22] cxl: Add type2 device basic support
->      + Link: https://patch.msgid.link/20250512161055.4100442-2-alejandro.lucero-palau@amd.com
->      + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->      ● checkpatch.pl: 563: WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
->      ● checkpatch.pl: 773: ERROR: trailing whitespace
->    [PATCH v15 2/22] sfc: add cxl support
->      + Link: https://patch.msgid.link/20250512161055.4100442-3-alejandro.lucero-palau@amd.com
->      + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->      ● checkpatch.pl: 213: WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
->    [PATCH v15 3/22] cxl: Move pci generic code
->      + Acked-by: Edward Cree <ecree.xilinx@gmail.com>
->      + Link: https://patch.msgid.link/20250512161055.4100442-4-alejandro.lucero-palau@amd.com
->      + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->      ● checkpatch.pl: passed all checks
->    [PATCH v15 4/22] cxl: Move register/capability check to driver
->      + Link: https://patch.msgid.link/20250512161055.4100442-5-alejandro.lucero-palau@amd.com
->      + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->      ● checkpatch.pl: passed all checks
->    [PATCH v15 5/22] cxl: Add function for type2 cxl regs setup
->      + Link: https://patch.msgid.link/20250512161055.4100442-6-alejandro.lucero-palau@amd.com
->      + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->      ● checkpatch.pl: passed all checks
->    [PATCH v15 6/22] sfc: make regs setup with checking and set media ready
->      + Link: https://patch.msgid.link/20250512161055.4100442-7-alejandro.lucero-palau@amd.com
->      + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->      ● checkpatch.pl: passed all checks
->    [PATCH v15 7/22] cxl: Support dpa initialization without a mailbox
->      + Link: https://patch.msgid.link/20250512161055.4100442-8-alejandro.lucero-palau@amd.com
->      + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->      ● checkpatch.pl: passed all checks
->    [PATCH v15 8/22] sfc: initialize dpa
->      + Link: https://patch.msgid.link/20250512161055.4100442-9-alejandro.lucero-palau@amd.com
->      + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->      ● checkpatch.pl: passed all checks
->    [PATCH v15 9/22] cxl: Prepare memdev creation for type2
->      + Acked-by: Edward Cree <ecree.xilinx@gmail.com>
->      + Link: https://patch.msgid.link/20250512161055.4100442-10-alejandro.lucero-palau@amd.com
->      + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->      ● checkpatch.pl: passed all checks
->    [PATCH v15 10/22] sfc: create type2 cxl memdev
->      + Link: https://patch.msgid.link/20250512161055.4100442-11-alejandro.lucero-palau@amd.com
->      + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->      ● checkpatch.pl: passed all checks
->    [PATCH v15 11/22] cxl: Define a driver interface for HPA free space enumeration
->      + Link: https://patch.msgid.link/20250512161055.4100442-12-alejandro.lucero-palau@amd.com
->      + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->      ● checkpatch.pl: 133: WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
->    [PATCH v15 12/22] sfc: obtain root decoder with enough HPA free space
->      + Link: https://patch.msgid.link/20250512161055.4100442-13-alejandro.lucero-palau@amd.com
->      + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->      ● checkpatch.pl: passed all checks
->    [PATCH v15 13/22] cxl: Define a driver interface for DPA allocation
->      + Link: https://patch.msgid.link/20250512161055.4100442-14-alejandro.lucero-palau@amd.com
->      + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->      ● checkpatch.pl: 127: WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
->    [PATCH v15 14/22] sfc: get endpoint decoder
->      + Link: https://patch.msgid.link/20250512161055.4100442-15-alejandro.lucero-palau@amd.com
->      + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->      ● checkpatch.pl: passed all checks
->    [PATCH v15 15/22] cxl: Make region type based on endpoint type
->      + Acked-by: Edward Cree <ecree.xilinx@gmail.com>
->      + Link: https://patch.msgid.link/20250512161055.4100442-16-alejandro.lucero-palau@amd.com
->      + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->      ● checkpatch.pl: passed all checks
->    [PATCH v15 16/22] cxl/region: Factor out interleave ways setup
->      + Acked-by: Edward Cree <ecree.xilinx@gmail.com>
->      + Link: https://patch.msgid.link/20250512161055.4100442-17-alejandro.lucero-palau@amd.com
->      + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->      ● checkpatch.pl: passed all checks
->    [PATCH v15 17/22] cxl/region: Factor out interleave granularity setup
->      + Acked-by: Edward Cree <ecree.xilinx@gmail.com>
->      + Link: https://patch.msgid.link/20250512161055.4100442-18-alejandro.lucero-palau@amd.com
->      + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->      ● checkpatch.pl: passed all checks
->    [PATCH v15 18/22] cxl: Allow region creation by type2 drivers
->      + Link: https://patch.msgid.link/20250512161055.4100442-19-alejandro.lucero-palau@amd.com
->      + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->      ● checkpatch.pl: 126: WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
->    [PATCH v15 19/22] cxl: Add region flag for precluding a device memory to be used for dax
->      + Acked-by: Edward Cree <ecree.xilinx@gmail.com>
->      + Link: https://patch.msgid.link/20250512161055.4100442-20-alejandro.lucero-palau@amd.com
->      + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->      ● checkpatch.pl: passed all checks
->    [PATCH v15 20/22] sfc: create cxl region
->      + Link: https://patch.msgid.link/20250512161055.4100442-21-alejandro.lucero-palau@amd.com
->      + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->      ● checkpatch.pl: passed all checks
->    [PATCH v15 21/22] cxl: Add function for obtaining region range
->      + Link: https://patch.msgid.link/20250512161055.4100442-22-alejandro.lucero-palau@amd.com
->      + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->      ● checkpatch.pl: passed all checks
->    [PATCH v15 22/22] sfc: support pio mapping based on cxl
->      + Link: https://patch.msgid.link/20250512161055.4100442-23-alejandro.lucero-palau@amd.com
->      + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->      ● checkpatch.pl: 219: CHECK: Unbalanced braces around else statement
->    ---
->    NOTE: install dkimpy for DKIM signature verification
-> ---
-> Total patches: 22
-> ---
->   Base: using specified base-commit a223ce195741ca4f1a0e1a44f3e75ce5662b6c06
-> Applying: cxl: Add type2 device basic support
-> Applying: sfc: add cxl support
-> Applying: cxl: Move pci generic code
-> Applying: cxl: Move register/capability check to driver
-> Applying: cxl: Add function for type2 cxl regs setup
-> Applying: sfc: make regs setup with checking and set media ready
-> Applying: cxl: Support dpa initialization without a mailbox
-> Applying: sfc: initialize dpa
-> Applying: cxl: Prepare memdev creation for type2
-> Applying: sfc: create type2 cxl memdev
-> Applying: cxl: Define a driver interface for HPA free space enumeration
-> Applying: sfc: obtain root decoder with enough HPA free space
-> Applying: cxl: Define a driver interface for DPA allocation
-> Applying: sfc: get endpoint decoder
-> Applying: cxl: Make region type based on endpoint type
-> Applying: cxl/region: Factor out interleave ways setup
-> Applying: cxl/region: Factor out interleave granularity setup
-> Applying: cxl: Allow region creation by type2 drivers
-> Patch failed at 0018 cxl: Allow region creation by type2 drivers
-> /home/djiang5/git/linux-kernel/.git/worktrees/cxl-for-next/rebase-apply/patch:644: trailing whitespace.
->   * @type: CXL device type
-> warning: 1 line adds whitespace errors.
-> error: patch failed: drivers/cxl/core/region.c:3607
-> error: drivers/cxl/core/region.c: patch does not apply
-> error: patch failed: drivers/cxl/port.c:33
-> error: drivers/cxl/port.c: patch does not apply
-> hint: Use 'git am --show-current-patch=diff' to see the failed patch
-> hint: When you have resolved this problem, run "git am --continue".
-> hint: If you prefer to skip this patch, run "git am --skip" instead.
-> hint: To restore the original branch and stop patching, run "git am --abort".
-> hint: Disable this message with "git config set advice.mergeConflict false"
->
->
->>
->> The patchset is against the last cxl-next commit as it it stated at the end, and that is based on v6.15.0-rc4. I had to solve some issues from v14 as last changes in core/region.c from Robert Richter required so.
->>
->>
->> About checkpatch, I did so but I have just done it again for being sure before this email, and I do not seen any issue except a trailing space in patch 1. That same patch has also warnings I do not think are a problem. Some are related to moved code and other on the new macro. FWIW, I'm running those with "checkpatch --strict".
->>
->>
->>>>
->>>> base-commit: a223ce195741ca4f1a0e1a44f3e75ce5662b6c06
+> 
+
+<...>
+
+> +static int macb_pcs_config(struct phylink_pcs *pcs, unsigned int mode,
+> +			   phy_interface_t interface,
+> +			   const unsigned long *advertising,
+> +			   bool permit_pause_to_mac)
+> +{
+> +	struct macb *bp = container_of(pcs, struct macb, phylink_sgmii_pcs);
+> +	bool changed = false;
+> +	unsigned long flags;
+> +	u32 old, new;
+> +
+> +	spin_lock_irqsave(&bp->lock, flags);
+> +	old = new = gem_readl(bp, NCFGR);
+> +	new |= GEM_BIT(SGMIIEN);
+
+This bit represents the AN feature, can we make it conditional to 
+facilitate IP's with AN disabled.
+
+> +	if (old != new) {
+> +		changed = true;
+> +		gem_writel(bp, NCFGR, new);
+> +	}
+
+<..>
+
+>   
+>   static void macb_usx_pcs_get_state(struct phylink_pcs *pcs,
+> @@ -589,45 +661,60 @@ static int macb_usx_pcs_config(struct phylink_pcs *pcs,
+>   			       bool permit_pause_to_mac)
+>   {
+>   	struct macb *bp = container_of(pcs, struct macb, phylink_usx_pcs);
+> +	unsigned long flags;
+> +	bool changed;
+> +	u16 old, new;
+>   
+> -	gem_writel(bp, USX_CONTROL, gem_readl(bp, USX_CONTROL) |
+> -		   GEM_BIT(SIGNAL_OK));
+> +	spin_lock_irqsave(&bp->lock, flags);
+> +	if (macb_pcs_config_an(bp, neg_mode, interface, advertising))
+> +		changed = true;
+>   
+> -	return 0;
+> -}
+> +	old = new = gem_readl(bp, USX_CONTROL);
+> +	new |= GEM_BIT(SIGNAL_OK);
+> +	if (old != new) {
+> +		changed = true;
+> +		gem_writel(bp, USX_CONTROL, new);
+> +	}
+>   
+> -static void macb_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
+> -			       struct phylink_link_state *state)
+> -{
+> -	state->link = 0;
+> -}
+> +	old = new = gem_readl(bp, USX_CONTROL);
+> +	new = GEM_BFINS(SERDES_RATE, MACB_SERDES_RATE_10G, new);
+> +	new = GEM_BFINS(USX_CTRL_SPEED, HS_SPEED_10000M, new);
+> +	new &= ~(GEM_BIT(TX_SCR_BYPASS) | GEM_BIT(RX_SCR_BYPASS));
+> +	new |= GEM_BIT(TX_EN);
+> +	if (old != new) {
+> +		changed = true;
+> +		gem_writel(bp, USX_CONTROL, new);
+> +	}
+
+The above speed/rate configuration was moved from macb_usx_pcs_link_up() 
+where speed is an argument, which can be leveraged to configure multiple 
+speeds.
+
+Can we achieve configuring for multiple speeds from 
+macb_usx_pcs_config() in fixed-link and phy-mode ?
+
+-- 
+🙏 vineeth
+
 
