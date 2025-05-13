@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-190280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D775AB5FEB
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 01:37:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19DA3AB5FEE
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 01:38:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E024B1B4026C
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 23:38:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37C574A4442
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 23:38:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7369A204588;
-	Tue, 13 May 2025 23:37:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6CEC20B1F7;
+	Tue, 13 May 2025 23:38:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b8NEbqXy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uQCFoXMM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4303C3FBA7;
-	Tue, 13 May 2025 23:37:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AE5B3FBA7;
+	Tue, 13 May 2025 23:38:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747179468; cv=none; b=f3P/hTeBZwxcAm9bMvHhgwr7pAfPJvCRAULw2C5tM7Ms2TV5WhXa92E7OyZgKkbfuUVtLir+jWHg87S/v9HsdPBpH0Nkgft6X1v6U84tVfI/ymz8D2fj/B3Am1ThTQwBv0mNfRyXRX18ExyagrXuxFQngMmtvP03XgMlxhgf5VA=
+	t=1747179486; cv=none; b=Qw04KoGCpTJKjj/0crPDRB+z5F98iVWRDC7wI+LKpBA+NNiLfZ6TD7aE6CjhyLSj9p/bsmknXHzRGdRwthDIGtzbNVzBCuEf4OKZ96R86NyoW2aXwFvKCnPb853W7/rDNLQk5ETfA42lVySOIZmHjbqRTVe71dQYQXGIzRyYxOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747179468; c=relaxed/simple;
-	bh=d7e15YBeDTYxkNwm52QjN3kE/RCjGpq8kBOBS3qCUZw=;
+	s=arc-20240116; t=1747179486; c=relaxed/simple;
+	bh=NjAKmuVrJ0UmQ2g6RUai7g83BbLQmuzfNTCwf9/RQ0k=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tRIWS+7428HdmLEEPTOs2zAl8gpjHlWWpeGtBfbT4nJsig8md6r6hkZQNyM/Q1p0szvexnEwQQNKebZmH78zfjC6glaDBMvBPYUyRCaozERWkwXfQBLnpiyjRdrN0B6xsUVARnQ5THZYsQzCeZtmCvwg23fnU3OzaGN4Gk0GgR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b8NEbqXy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7C54C4CEE4;
-	Tue, 13 May 2025 23:37:45 +0000 (UTC)
+	 MIME-Version:Content-Type; b=NX9xxJmLcdJwIszZSh4RqW824PNY6q+MLE77W3RZigzSYHSYBF6U2nBgZ9RgzNUKOGuhymbcFLjPJsN3jrYFc3Db84/CSQMJtyCfNyL+kqMRFMeEE5CvhalurlKnui9G/DmNojoeRTzupVD+LlEIBpKVDICxq2JdCX7/2ow/rXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uQCFoXMM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB3BAC4CEE4;
+	Tue, 13 May 2025 23:38:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747179466;
-	bh=d7e15YBeDTYxkNwm52QjN3kE/RCjGpq8kBOBS3qCUZw=;
+	s=k20201202; t=1747179486;
+	bh=NjAKmuVrJ0UmQ2g6RUai7g83BbLQmuzfNTCwf9/RQ0k=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=b8NEbqXy+C+8yutkV6fDKPrYhNMTOS2z/vEyRNe8dj94zQ6T88SNYMIU3JtcXp+aR
-	 /9DB32Hoo39leQjuT19O27r4y4xI+5Gkf1ymwVIrGoC0504QpclF5P+2Qo+QQsbjv2
-	 x51/RoZXe0ofgFPap2bPBUaOzaZrttfHB475/Bc+XksbVYVW3wxKJKVZfPit24joYC
-	 YTXMLt39iSLKqi1zoq9ENUdt+tTx9kJ/qY0km5tk9oBvXonmDfMc/IRrecQmfdlzOr
-	 VRaToepivA8WQ1sc9skAsKPwGXX+oaUdLyCpwueXQeXXScOwTZEEokoxD/uTEORJBl
-	 RqQ3bQ0nnNb/g==
-Date: Tue, 13 May 2025 16:37:44 -0700
+	b=uQCFoXMM7ratZbqEVwkZ8PqwkCqg95MKZPEd277nMmV7CFA5o56XJlCB/AY2LYtaM
+	 aYkLzGIdIv6PxJAdKIcRvki29CxPskK8ASIrqxafqmxE6j6V2BFTApk8VYXP+qx8RP
+	 kKqdL99bvBippeFXWkvYgA80xmWD2UDhViVLtF65tqr5s6RhLog8LCP4lQ+KQX7NwE
+	 B8SHck0tvCMudFtH2rh52J09CTIileAnUDYHB86F0bCAXgLtVEaiC1gAWtgXaKceMF
+	 i9Sp+03LvB1p94VcCsG412e2XSrcG3UfHrDPaT7vnL2MlV8qe3+UfEmfkAVhoQitFb
+	 nBNs8xN6VcF6A==
+Date: Tue, 13 May 2025 16:38:05 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Jakob Unterwurzacher <jakobunt@gmail.com>
 Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
@@ -54,7 +54,7 @@ Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
  linux-kernel@vger.kernel.org
 Subject: Re: [PATCH net v2] net: dsa: microchip: linearize skb for
  tail-tagging switches
-Message-ID: <20250513163744.20299747@kernel.org>
+Message-ID: <20250513163805.2d278369@kernel.org>
 In-Reply-To: <20250512144416.3697054-1-jakob.unterwurzacher@cherry.de>
 References: <20250512144416.3697054-1-jakob.unterwurzacher@cherry.de>
 Precedence: bulk
@@ -67,20 +67,7 @@ Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
 On Mon, 12 May 2025 16:44:18 +0200 Jakob Unterwurzacher wrote:
->  static struct sk_buff *ksz9477_rcv(struct sk_buff *skb, struct net_device *dev)
->  {
-> +	u8 *tag;
-> +
-> +	if (skb_linearize(skb))
-> +		return NULL;
-> +
->  	/* Tag decoding */
-> -	u8 *tag = skb_tail_pointer(skb) - KSZ_EGRESS_TAG_LEN;
-> +	tag = skb_tail_pointer(skb) - KSZ_EGRESS_TAG_LEN;
->  	unsigned int port = tag[0] & KSZ9477_TAIL_TAG_EG_PORT_M;
->  	unsigned int len = KSZ_EGRESS_TAG_LEN;
+> Fixes: 8b8010fb7876 ("dsa: add support for Microchip KSZ tail tagging)
 
-Please don't add code before variable declarations.
--- 
-pw-bot: cr
+ps. also missing closing quotation marks on this tag
 
