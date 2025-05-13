@@ -1,128 +1,180 @@
-Return-Path: <netdev+bounces-190143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08912AB5480
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 14:16:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AC1DAB545F
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 14:13:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B185A863759
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 12:15:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E73686206F
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 12:12:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 344C028DB52;
-	Tue, 13 May 2025 12:14:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F47A28D8E5;
+	Tue, 13 May 2025 12:13:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bell-sw-com.20230601.gappssmtp.com header.i=@bell-sw-com.20230601.gappssmtp.com header.b="IO41QlRz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="quYHpJec"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC0E723814A
-	for <netdev@vger.kernel.org>; Tue, 13 May 2025 12:14:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00FDF1C84A0;
+	Tue, 13 May 2025 12:13:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747138444; cv=none; b=bNPwDFNU8ZOUc9OSQpCJ+OFSTqX7162jWgqzWaiYZRL9Ja8mS46mI3oEe0f2MmopbIuoOeSCf6HdzZm23+MKON5m9R4wb8KEm0hx7j3yH1lY14MkOB9v7HvDpKAVCPxE0NedCQJVPPsaCC26Ph05crtivNp0MHRQ2FsaO7PhLxk=
+	t=1747138393; cv=none; b=GY/lvEVIy3Sk8csYECIq+LPLeue+oeN0ACOmA5v7JxuMwO742xH3ZsAVKX3Gp5bCeb3qIa9qAjc9DfzSXom9+/Mr2D4gOKZqsFoU3QB9zkBH/Zh27gboSY/pZxSjk4iFwIEd1VahctHZiBBjTqsWknxbKfLU9Xt2eVqAZ1NnnTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747138444; c=relaxed/simple;
-	bh=LA/KCLameLqFOczlCUJ/2B4/nB7vo4JUftohFXDrgXY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ye4h9Mf2E1Cy8AQ0djv8YcWqgrVJ9SJTjFU1Pfx/F6PVqPlBjCqJ4TAS1nCxhDAEO6KVheXhavksyccIJX/BX8qHLht9NaBMmiMrnmHr5m+pAUs4pCxBL9JYuGkjwGcO8nxdtCv3m839LcfvL8p+OU1dTA9OVNQoLRR9pGuscLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bell-sw.com; spf=pass smtp.mailfrom=bell-sw.com; dkim=pass (2048-bit key) header.d=bell-sw-com.20230601.gappssmtp.com header.i=@bell-sw-com.20230601.gappssmtp.com header.b=IO41QlRz; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bell-sw.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bell-sw.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-54fcb7e3474so3757768e87.2
-        for <netdev@vger.kernel.org>; Tue, 13 May 2025 05:14:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bell-sw-com.20230601.gappssmtp.com; s=20230601; t=1747138440; x=1747743240; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fBlZgEOoEfroAGDNOtFCLBH/jbcjwtEuds8r227tD1Y=;
-        b=IO41QlRzvA1J3/3k6dZolCl9QVCbpTfH3iBDZwWoiMTxW+N3rGNpk4iAYqRjmDepsB
-         Us4Rixd7qymtPtaL+i8zFrRo3CEeuQ0G67CdVjqXbJpp/EidTFZJ/6i/TMPuq1EnmZlp
-         W1vRf49mCUxXWVqTcoYMN8DBVd5d/L8nLsypfd9GhSBciK7tBVPc+QEl8NGOJI+XN6zs
-         CICYu55GRxHh/WiLEySM/ACtvi3+yLuz8SU01Z56KlG3l8Y9rRFP/BoenVSh5rloZnuE
-         4zYR9sdV2xvHd3ibO+bmjkaVdlASbzRwjvoSRfwNxdAsl0f42GO7IodySDV2K01I5VQP
-         F2lA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747138440; x=1747743240;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fBlZgEOoEfroAGDNOtFCLBH/jbcjwtEuds8r227tD1Y=;
-        b=RT+mL3RgcNzfOIPXfeI3WG/wyY33Ui4EHPFMov8+Yx6PvHEu77NzRoltHc8CZ/jtC0
-         kDPbwZvkvk1NcNZBZ+SXEqR5DUjCtJF1plib4aQW74Vj+KIAPWxhVgKNHeGIDTUQMzVp
-         3HdfN+FDejh5MYiXjbGj8tb36DiZrMrCw+ajduTRasaWAAufPyShNx5CLQzyVQ0RXL3s
-         2tybSkVIlcItqOPa2qUz5BAhXJFaktDXXqjMHPrCC22ZefZbQqa88K8Mv6FavXdfy9Kl
-         OTGG9pstjEPc1OmFU8JpT+XY53Msj7BLKVhMptgPMrRqX11mU/gSfzOrmdJCaZA5Ktzw
-         qjlA==
-X-Gm-Message-State: AOJu0YyjzIGxcmuWryaUvB7dUS0wUe139GP21r5qK3sWp9E2cioQ/OIR
-	XJRPg+x/N6YIfgPI6asCVmoH2rOSH5BV9+Iwxilk0BCaxl8BoMZ/Y4G1V2YRBA==
-X-Gm-Gg: ASbGncs+viAD5x0goaQ9osIBnD3/H9FvC+wDebBykjws1wBOmbCaLTtoWxIQoXFtrTy
-	3y6+xRitByT1wc1uVnVp5+a1dKV3aRKh2dHkqvLYKknv/aYPI8uQEoxlfntvNuka2gHBVCLsrBx
-	a6CabSyu9VqJi9xVCgKdCra4T4p4HeS5r2zrnrxDxdFJA3NJqHjiFO025Ql8OUxPry3scLKg4EX
-	mlFKiNEOoSHnAqYtx2tZ3PHIJPT32uDs3Lg9ByyYtCSeq9aX4XhU5VGpy5SnXEs+JmZi4u4QVMy
-	KRJdtwSBqszhxfZbZ3VROjljP67EItmZOpvqZiTFC7LZxJ/hS1DS56lOfwnth9G6+VA=
-X-Google-Smtp-Source: AGHT+IE+2GmTp6jx2k0URSKcwhuRxgmsdmMIIUyJ9yehgMa56iPa5P8QafOjySC9AD26kZQGxzILCA==
-X-Received: by 2002:a05:6512:6286:b0:54f:c4ab:106e with SMTP id 2adb3069b0e04-54fc67cbe49mr5266453e87.28.1747138439923;
-        Tue, 13 May 2025 05:13:59 -0700 (PDT)
-Received: from localhost.localdomain ([5.8.39.119])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54fc645cd2bsm1848085e87.73.2025.05.13.05.13.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 May 2025 05:13:59 -0700 (PDT)
-From: Alexey Kodanev <aleksei.kodanev@bell-sw.com>
-To: linux-wireless@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	Ping-Ke Shih <pkshih@realtek.com>,
-	Kalle Valo <kvalo@kernel.org>,
-	Alexey Kodanev <aleksei.kodanev@bell-sw.com>
-Subject: [PATCH v2] wifi: rtw88: fix the 'para' buffer size to avoid reading out of bounds
-Date: Tue, 13 May 2025 12:13:04 +0000
-Message-Id: <20250513121304.124141-1-aleksei.kodanev@bell-sw.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1747138393; c=relaxed/simple;
+	bh=WwRX2OejuzC52IouwPlF8ikN471u8m0tJYL5AHiFFZQ=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=dsYoqm9DoX/eJnKcK+/TQHROnG7CLHClqo4gYZWFaANS7dK0KCY8RE0ZHaAvC+KNEkEw0poTSxLybO2GBrOr8lkxuaxZzRqsb9y1rA7iWjVqKDaBwzO0NWYyfFIO33+4aruD3fIz47velCeBUSXAayvw8EppNK3e8ayhvqdmdVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=quYHpJec; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91E34C4CEE4;
+	Tue, 13 May 2025 12:13:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747138392;
+	bh=WwRX2OejuzC52IouwPlF8ikN471u8m0tJYL5AHiFFZQ=;
+	h=From:Subject:Date:To:Cc:From;
+	b=quYHpJeceb7NAVqgllAbARouzyFJ/MJGF0S6vzsUbkQcIvXknG5uCUJpOvaJrH+At
+	 usJVlmMqdwloNaUv6ZZhgxNveioXcYIWUR48M2/UxD2iV98AQE8uu6WOnnyyvEfSLd
+	 IYbxbL68NubUoJsrwIvPlU8h57j5af+qIaCN863k3i+HzNwpGUJhwoToOBptaj6P9Y
+	 ZM9+wzdE8RFeCd5REBFbYLnGO5l3GvRF3eyEoWrsiEK1SXqEL68N5v/WMphE2BrYFR
+	 cLyPmB5Pj+saMm/hysXD85mJgP367ElO3YfEfgarW1wEfNI+glDwCcgXDpvp36qi75
+	 KHIB1P1ib0TSQ==
+From: Roger Quadros <rogerq@kernel.org>
+Subject: [PATCH net-next v3 0/9] net: ethernet: ti: am65-cpsw: add network
+ flow classification support
+Date: Tue, 13 May 2025 15:13:04 +0300
+Message-Id: <20250513-am65-cpsw-rx-class-v3-0-492d9a2586b6@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAFA3I2gC/23OwQ6CMAwG4FcxO1tTBpuZJ9/DeBiswCIOspGJI
+ by7yzwYE45//vZrVxbIWwrscliZp2iDHV0K5fHAml67jsCalBlHLrBEAfopBTRTeIFfoBl0CCC
+ lRJStrpUxLC1Onlq7ZPTGHM3gaJnZPTW9DfPo3/laLHL/hQu1B8cCEHjdGjJ4rhTS9UHe0XAaf
+ Ze9yH+G2H8u8mSIUijSaaqoqj9j27YPGA7CCAMBAAA=
+To: Siddharth Vadapalli <s-vadapalli@ti.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Russell King <linux@armlinux.org.uk>, danishanwar@ti.com
+Cc: srk@ti.com, linux-omap@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Roger Quadros <rogerq@kernel.org>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3764; i=rogerq@kernel.org;
+ h=from:subject:message-id; bh=WwRX2OejuzC52IouwPlF8ikN471u8m0tJYL5AHiFFZQ=;
+ b=owEBbQKS/ZANAwAIAdJaa9O+djCTAcsmYgBoIzdU0UZBtndJE4vH9lH8ZTl3FkmTYAClNI1cU
+ AooF6jlH3WJAjMEAAEIAB0WIQRBIWXUTJ9SeA+rEFjSWmvTvnYwkwUCaCM3VAAKCRDSWmvTvnYw
+ k6ZND/0eEwTieqMEnUR66/H/wsISnBo5LcMaTIcCgHaht/YVVR3sZlEm5droTVI7uglO/+5fVMI
+ JNk175rhjvP9UiAa89nPr3+n1SZrJABLGcEDPPYTueHkBKzhg4RHxc1pfh4qiJVQgZyQNDaeer2
+ cWnQfr1946CNQUwcKjmVHfv6gzT0wDrb4IrqsZT8hrnQv62Igc/LJWGOwivOOroKmE57/SgsIY4
+ CeKUNd3kQPgF+wZXCZR5Od7pO1SY0JshJNjogMmug6mftdP22uZdelIVcPYvJIBd9sQWWxOCIpR
+ pTIGx1AI4gSCbHOL9xEqg5SLktWAtKFR6qXTIhvn4QualgSqpU7ogG8lctUNZphfyvL+lbfuh6J
+ Zkn2kBmAem+LXd8XR7GDf0Tt4zdswF6rb865Vg5ksALMryGFPNw9PYkI9lw5NfVRIJAHyqQIyOw
+ z9XzsBfNRA4UYehmjNIullWS912GUqvE/7Z1iXIhCx61/5IVtbOCWEPkE1z5oJLPu1Un4uzYKyW
+ rhhfm3kg6Ml095EbBiPJapeG46+ub9aDFE1tGeXKzonbZ344Gw+p94EMCcQEd0ENCDrrL5Bpl1x
+ BXJLzOp60tFNHDpMJqOL/rMfisvg6A8gWXf0Y1kw2PqpgWHzGU5IFL6Eqwp9c07TumltC8cjUEN
+ XbXadsEwhwoaJtg==
+X-Developer-Key: i=rogerq@kernel.org; a=openpgp;
+ fpr=412165D44C9F52780FAB1058D25A6BD3BE763093
 
-Set the size to 6 instead of 2, since 'para' array is passed to
-'rtw_fw_bt_wifi_control(rtwdev, para[0], &para[1])', which reads
-5 bytes:
+Adds support for -N/--config-nfc ethtool command for
+configuring RX classfiers.
 
-void rtw_fw_bt_wifi_control(struct rtw_dev *rtwdev, u8 op_code, u8 *data)
-{
-    ...
-    SET_BT_WIFI_CONTROL_DATA1(h2c_pkt, *data);
-    SET_BT_WIFI_CONTROL_DATA2(h2c_pkt, *(data + 1));
-    ...
-    SET_BT_WIFI_CONTROL_DATA5(h2c_pkt, *(data + 4));
+Currently only raw Ethernet (flow-type ether) matching is added
+based on source/destination addresses and VLAN Priority (PCP).
 
-Detected using the static analysis tool - Svace.
-Fixes: 4136214f7c46 ("rtw88: add BT co-existence support")
-Signed-off-by: Alexey Kodanev <aleksei.kodanev@bell-sw.com>
+The ALE policer engine is used to perform the matching and routing to
+a specific RX channel.
+
+Test cases:
+
+Increase number of RX channels to 8
+ip link set end1 down
+ip link set end0 down
+ethtool -L end0 rx 8
+
+1) Ether source address test
+	ethtool -N end0 flow-type ether src xx:yy:zz:aa:bb:cc action 5
+
+  Traffic from that address should route to channel 5
+
+2) Ether destination address test
+	ethtool -N eth0 flow-type ether dst yy:zz:aa:bb:cc:dd action 4
+
+  Traffic to that address should route to channel 4
+
+3) Drop test
+	ethtool -N end0 flow-type ether src xx:yy:zz:aa:bb:cc action -1
+
+  Traffic from that address should be dropped
+
+4) VLAN PCP test
+
+on Remote create VLAN with ID 5 and all traffic mapping to required priority to test. e.g. 7
+	sudo ip link add link eno1 name eno1.5 type vlan id 5 egress-qos-map 0:7 1:7 2:7 3:7 4:7 5:7 6:7 7:7
+	sudo ifconfig eno1.5 192.168.10.1
+
+on DUT create VLAN with id 5
+	ip link add link end0 name end0.5 type vlan id 5
+	ifconfig end0.5 192.168.10.5
+
+VLAN pcp 7 vid 5 route to RX channel 6
+	ethtool -N end0 flow-type ether vlan 0xe005 action 6
+
+  Traffic from that VLAN with PCP 7 should route to channel 6
+
+Signed-off-by: Roger Quadros <rogerq@kernel.org>
 ---
+Changes in v3:
+- Fixed bug in cpsw_ale_policer_save/restore(). '* 4' is not needed for
+  a u32 pointer.
+- Fixed reverse Christmas tree order
+- Moved mutex acquiring out of am65_cpsw_policer_find_match() and
+  at beginning of am65_cpsw_rxnfc_add_rule()
+- Link to v2: https://lore.kernel.org/r/20250505-am65-cpsw-rx-class-v2-0-5359ea025144@kernel.org
 
-v2: initializer style change
+Changes in v2:
+- Error out if VLAN_ID > 0 as VLAN ID based flow routing still doesn't
+   seem to work. Drop commented out code.
+- Limit lines to 80 characters whereever possible.
+- Change struct am65_cpsw_rxnfc_rule.location from int to unsigned int.
+- Add information about order of rules evaluation and multiple matches
+   in commit log.
+- Link to v1: https://lore.kernel.org/r/20250319-am65-cpsw-rx-class-v1-0-2bfded07490e@kernel.org
 
- drivers/net/wireless/realtek/rtw88/coex.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+---
+Roger Quadros (9):
+      net: ethernet: ti: cpsw_ale: Update Policer fields for more ALE size/ports
+      net: ethernet: ti: cpsw_ale: return ALE index in cpsw_ale_add_vlan()
+      net: ethernet: ti: cpsw_ale: return ALE index in cpsw_ale_vlan_add_modify()
+      net: ethernet: ti: cpsw_ale: return ALE index in cpsw_ale_add_ucast()
+      net: ethernet: ti: cpsw_ale: add cpsw_ale_policer_reset_entry()
+      net: ethernet: ti: cpsw_ale: add cpsw_ale_policer_set/clr_entry()
+      net: ethernet: ti: cpsw_ale: add policer save restore for PM sleep
+      net: ethernet: ti: am65-cpsw: add network flow classification support
+      net: ethernet: ti: am65-cpsw: remove cpsw_ale_classifier_setup_default()
 
-diff --git a/drivers/net/wireless/realtek/rtw88/coex.c b/drivers/net/wireless/realtek/rtw88/coex.c
-index c929db1e53ca..64904278ddad 100644
---- a/drivers/net/wireless/realtek/rtw88/coex.c
-+++ b/drivers/net/wireless/realtek/rtw88/coex.c
-@@ -309,7 +309,7 @@ static void rtw_coex_tdma_timer_base(struct rtw_dev *rtwdev, u8 type)
- {
- 	struct rtw_coex *coex = &rtwdev->coex;
- 	struct rtw_coex_stat *coex_stat = &coex->stat;
--	u8 para[2] = {0};
-+	u8 para[6] = {};
- 	u8 times;
- 	u16 tbtt_interval = coex_stat->wl_beacon_interval;
- 
+ drivers/net/ethernet/ti/am65-cpsw-ethtool.c   | 353 ++++++++++++++++++++++++++
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c      |  32 ++-
+ drivers/net/ethernet/ti/am65-cpsw-nuss.h      |  16 ++
+ drivers/net/ethernet/ti/am65-cpsw-switchdev.c |   6 +-
+ drivers/net/ethernet/ti/cpsw.c                |   4 +-
+ drivers/net/ethernet/ti/cpsw_ale.c            | 214 ++++++++++------
+ drivers/net/ethernet/ti/cpsw_ale.h            |  37 ++-
+ drivers/net/ethernet/ti/cpsw_new.c            |   4 +-
+ drivers/net/ethernet/ti/cpsw_switchdev.c      |   6 +-
+ 9 files changed, 579 insertions(+), 93 deletions(-)
+---
+base-commit: 9f607dc39b6658ba8ea647bd99725e68c66071b7
+change-id: 20250305-am65-cpsw-rx-class-666006fab9dd
+
+Best regards,
 -- 
-2.25.1
+Roger Quadros <rogerq@kernel.org>
 
 
