@@ -1,100 +1,128 @@
-Return-Path: <netdev+bounces-190012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 299AEAB4E7E
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 10:50:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4A18AB4E8C
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 10:52:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7995B3B16BE
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 08:49:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71520188FA15
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 08:52:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB377202C4E;
-	Tue, 13 May 2025 08:49:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 052A920E01A;
+	Tue, 13 May 2025 08:51:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YqijE3hd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EMHGekhJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D4651F09AC;
-	Tue, 13 May 2025 08:49:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DA601F1524
+	for <netdev@vger.kernel.org>; Tue, 13 May 2025 08:51:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747126196; cv=none; b=uK8fKGEUk6kaOMduG0KhTyz2zgYZBg5bgUV7KNPHyKH0gvKzHWHAaInp4dBzWtpwrHYeX7AYkx5I0dW8E0XNthunuy+F5VaAo/+DCYDFDKU9XLl98jca9aG4YXFj4xpxZgvrBtLjIArb7fB9JZjcNUsqrwyJrrz7hscCA3UfHJo=
+	t=1747126317; cv=none; b=JezMzJcYQ2bQLR5kmfA+1smh2Q43iz04GnmfIcNThHqdg4oeK6L9QL7ZiywihBCLJagdB+N4pIcSlApWUvP+o1KTE6BG88mpw+PlG/rLbviwB58KNFIa8QKPIB9KgiG5zNmBBlsusElA9mtDq7ou7n7ZstO9vlNnrQ5avVZCNrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747126196; c=relaxed/simple;
-	bh=MaH/3rHQVFeq82s47yVwfb8amcgYaRP6dl9IPVKdCoM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hGxBCYT7zcK7OzdTY/fomyWAtizgQK2LUBP24rS6pFmoYmX1Tv1DaBZQcyD99U1G8zVPEnCAB8LChQUG8iV+NTLqMsZeHD2ihIzNlaNHziairj9+tuHNe/BIVIp1Et8AJAT7B9MdqCurLLhN7OQMheVNCWhYUTsNOSLT5KkoTBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YqijE3hd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6EB8C4CEE4;
-	Tue, 13 May 2025 08:49:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747126196;
-	bh=MaH/3rHQVFeq82s47yVwfb8amcgYaRP6dl9IPVKdCoM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=YqijE3hd1sczb4GR7qY8e3KcvDJkso/wd5EDv4Nb0N4MlhNxMGTVYOVuNgZYpkyRs
-	 YeOb4UJLiMsVRiuVOHm8ZMVdCMGFk+AdV9x7U7YxRI8HUZ/9+r84cLGds/z4Oxu77p
-	 idS301QWUq+zh2kC2Y3RD9mATXJgalkF2XgHt9yBjD5mBBa26gxF/GqCUcPvjynom9
-	 3NDIEAyTowCBS60mQIiz1IMapcKfoedGGCZ5EuQ/0+eXszGTcyYacuEwt8/mAjlki3
-	 tSyil0CHC9sXaMuu3L5uwvKLZyq7kjfaodlFsfkqNCi4uXgQGX/VqGTE1n5utD0Ub+
-	 9d031bMpCWUQA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD4539D6553;
-	Tue, 13 May 2025 08:50:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1747126317; c=relaxed/simple;
+	bh=ioYfR82as7BxIQ6g6jQFZ3hhJuiFD+Xx+vMITtkD7po=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=D9ZfV8lBwlJwbFmRPhOjlBfjiXubx+12G8haHxkUZVIw+Lf9vHc7kY39Wsocxa+mWCY68tJ/070VyUdiH+eLKSEa6T1l/71ybZESPg/0A4fBL38eQeb+zz7vqt228yN9GTFzwBq5mEHjdlS+PFwHh7cR0DwKMWC8l1J/V4cXh8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EMHGekhJ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747126314;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eXsGs2VA+ITuyh4VRCJh/Oyjf9ibDYe324RnCVY1HpQ=;
+	b=EMHGekhJ5lMb7e/xgfNEEJ44fVfalDlWaBDhi8rqM2C7k2n2NFtWvrlc87LlJghZBy6vNh
+	AqtHZ+MITyNK/ZYQEPVafMqqVYx5eCRkpyZkC9pOCpXOwvqH1qPYxwcMw8Dm/FugvtQkbp
+	4MMfUiMBIt82I+1dfnFIdjbvN83UYxQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-349-Ia1vix_JOWOlwuirSt75wg-1; Tue, 13 May 2025 04:51:53 -0400
+X-MC-Unique: Ia1vix_JOWOlwuirSt75wg-1
+X-Mimecast-MFC-AGG-ID: Ia1vix_JOWOlwuirSt75wg_1747126312
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-442cd12d151so36224045e9.1
+        for <netdev@vger.kernel.org>; Tue, 13 May 2025 01:51:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747126312; x=1747731112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eXsGs2VA+ITuyh4VRCJh/Oyjf9ibDYe324RnCVY1HpQ=;
+        b=OcLA8F8RqQEdTo+qN6slhSzlxk8+VKesrbbbhfBWM6ws1kmOrAZvgUCQ2VTiiw8KSs
+         KtJdSEmoqt4LmLSm9+yNRms1hiCiGMvj2Og+AgNWiuow1rD/5wJ+uAKbyajEl/SSvem2
+         BVa3+xEdUONGvrT+E8PwUH+7jHSe84TYJLsgTT6Kzf1U8+TKURFUMK+Gd0sntO0ObOcR
+         SQADQndTn6aGg9nHX7nzU7kdOwm9TCwMO5uCK1lMQJQhH83DNKhHovgz2Q4+P2Gt9vZa
+         Lm9t1KhRWvu/68f8ADJpwx8RI/lN4nByl8BHAG/McWyiDUNX4dFgXGVzhv0GTPySCHUO
+         gIRA==
+X-Forwarded-Encrypted: i=1; AJvYcCXsVDjKIob9O8cEV/VyU5F4kFX1W/hUq0WETIRs4eIDLAwfR0dul8KUKTcH7yxtsvHZeO38ZlQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpYrQl8cD9dsRctR1LLO5xDGJ713Y/wIcoI1SwWiDqB/dojxLD
+	rN+JfsIMldQIq8OkA6phMWpsYTFHSdv6GshIFFwGVju7//J7t1z6rYySuf16TcYWnQNtJq77t7H
+	L8hrTrYRswwgXZJWs5ZLZ9Fk4yGd4aeTyZ9ov7SccNFRA2rB7ESGf3Q==
+X-Gm-Gg: ASbGnctukvylkxJ+VR/QRQe2oyXne6Aw1FSFfoJ4c50Nw+KZ7sVVpi7jLIUGorH4let
+	9pib8yJw2wq7wCJXG5YIEw6GBJXREoZnDRb/10sxL4IsCWGTdLfObMx3oXLG9FOowmd8HvCAqsh
+	s+W9zjqka5BrKeUucVXaNyjBHaD6767SBM4MAitf8+VUHUlWOnKeLdQK3DE0z/jgwQRhvfMcYD9
+	pZVca2bg7qNUumRSobvlwH1mFMPRvZsBvCX54KWjkQld1prbeXDvIqhJ8oXVkJtpogZ3gcsngDw
+	NYBTnhch6/ZTMy2yl/s=
+X-Received: by 2002:a05:600c:4e0e:b0:43c:e305:6d50 with SMTP id 5b1f17b1804b1-442d6dd9d54mr144108565e9.24.1747126312092;
+        Tue, 13 May 2025 01:51:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFtul9+WMHSXrK//Kbrqv9MInD7Mc4snBmAwczFOs24A5HdJfBc9svhiLHz11Vw6gpX0UPuyg==
+X-Received: by 2002:a05:600c:4e0e:b0:43c:e305:6d50 with SMTP id 5b1f17b1804b1-442d6dd9d54mr144108295e9.24.1747126311750;
+        Tue, 13 May 2025 01:51:51 -0700 (PDT)
+Received: from ?IPV6:2a0d:3341:cc59:6510::f39? ([2a0d:3341:cc59:6510::f39])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442ed666dc7sm11376705e9.18.2025.05.13.01.51.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 May 2025 01:51:51 -0700 (PDT)
+Message-ID: <7b5f7e09-7df0-43cb-9acd-c31720002860@redhat.com>
+Date: Tue, 13 May 2025 10:51:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3 0/2] address EEE regressions on KSZ switches since v6.9
- (v6.14+)
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174712623355.1237041.4249732681101911068.git-patchwork-notify@kernel.org>
-Date: Tue, 13 May 2025 08:50:33 +0000
-References: <20250504081434.424489-1-o.rempel@pengutronix.de>
-In-Reply-To: <20250504081434.424489-1-o.rempel@pengutronix.de>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: davem@davemloft.net, andrew@lunn.ch, edumazet@google.com,
- f.fainelli@gmail.com, kuba@kernel.org, pabeni@redhat.com, olteanv@gmail.com,
- woojung.huh@microchip.com, linux@armlinux.org.uk, hkallweit1@gmail.com,
- kernel@pengutronix.de, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- UNGLinuxDriver@microchip.com, stable@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 03/10] ovpn: set skb->ignore_df = 1 before
+ sending IPv6 packets out
+To: Antonio Quartulli <antonio@openvpn.net>, netdev@vger.kernel.org
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Sabrina Dubroca <sd@queasysnail.net>, Gert Doering <gert@greenie.muc.de>
+References: <20250509142630.6947-1-antonio@openvpn.net>
+ <20250509142630.6947-4-antonio@openvpn.net>
+ <fc07f58e-488e-490e-a33f-50f09163a0fb@redhat.com>
+ <effc10de-e7a9-4721-84ee-caafcf9aedb8@openvpn.net>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <effc10de-e7a9-4721-84ee-caafcf9aedb8@openvpn.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Sun,  4 May 2025 10:14:32 +0200 you wrote:
-> This patch series addresses a regression in Energy Efficient Ethernet
-> (EEE) handling for KSZ switches with integrated PHYs, introduced in
-> kernel v6.9 by commit fe0d4fd9285e ("net: phy: Keep track of EEE
-> configuration").
+On 5/13/25 9:51 AM, Antonio Quartulli wrote:
+> On 13/05/2025 09:37, Paolo Abeni wrote:
+>> On 5/9/25 4:26 PM, Antonio Quartulli wrote:
+>>> IPv6 user packets (sent over the tunnel) may be larger than
+>>> the outgoing interface MTU after encapsulation.
+>>> When this happens ovpn should allow the kernel to fragment
+>>> them because they are "locally generated".
+>>>
+>>> To achieve the above, we must set skb->ignore_df = 1
+>>> so that ip6_fragment() can be made aware of this decision.
+>>
+>> Why the above applies only to IPv6? AFAICS the same could happen even
+>> for IPv4.
 > 
-> The first patch updates the DSA driver to allow phylink to properly
-> manage PHY EEE configuration. Since integrated PHYs handle LPI
-> internally and ports without integrated PHYs do not document MAC-level
-> LPI support, dummy MAC LPI callbacks are provided.
-> 
-> [...]
+> For IPv4 we have the 'df=0' param that is passed to 
+> udp_tunnel_xmit_skb(), which basically leads to the same result.
 
-Here is the summary with links:
-  - [net,v4,1/2] net: dsa: microchip: let phylink manage PHY EEE configuration on KSZ switches
-    https://git.kernel.org/netdev/net/c/76ca05e0abe3
-  - [net,v4,2/2] net: phy: micrel: remove KSZ9477 EEE quirks now handled by phylink
-    https://git.kernel.org/netdev/net/c/8c619eb21b8e
+You need to include (an expanded/more describing version of) the above
+in the commit message.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+/P
 
 
