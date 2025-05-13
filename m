@@ -1,110 +1,56 @@
-Return-Path: <netdev+bounces-190224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7A79AB5C20
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 20:17:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F17C0AB5C27
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 20:18:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 143553B7675
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 18:16:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 109157B2839
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 18:17:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55EF7200112;
-	Tue, 13 May 2025 18:17:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 592112BEC41;
+	Tue, 13 May 2025 18:18:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=seco.com header.i=@seco.com header.b="NPJ3hJ2h";
-	dkim=pass (2048-bit key) header.d=seco.com header.i=@seco.com header.b="NPJ3hJ2h"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qPlyclbu"
 X-Original-To: netdev@vger.kernel.org
-Received: from AS8PR03CU001.outbound.protection.outlook.com (mail-westeuropeazon11022099.outbound.protection.outlook.com [52.101.71.99])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F2728DB7C;
-	Tue, 13 May 2025 18:17:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.71.99
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747160229; cv=fail; b=ElDjyWUaJwN1Y5Xlae+4kBzFbKV60qBB3wHxDaWHEScc/c8dYhAEVmxqCXYnWbgPNloCxIOufeVlPMr9h8pgv6xU2jXboYm2bFbkbDHpA1hRWckQda4qq5mvN8HCIcDXhuFqF4VF0siITAFV31ohS10NCPdtgwWTD29d7hytDhE=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747160229; c=relaxed/simple;
-	bh=PN0I+s4a3Oca2Y8dF8+9NM9ctCef67KGAQttlEXuVjY=;
-	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=b7sfhyQlURH/BBc+CIquILc3vJoqfgSzE2Tj1MK8Dzgg5TR59Jq6zHsnO97/wJW62TCoucbZTkuQ2DFMYMkBaXbxZODCvMiDbapX3QXiH9MyRmoKui48u9fI7IQZgxj0sNwn2I3ojw1rIplOe/vjDZL45qEu4Zu2jt6cQH0AkD4=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=seco.com; spf=pass smtp.mailfrom=seco.com; dkim=pass (2048-bit key) header.d=seco.com header.i=@seco.com header.b=NPJ3hJ2h; dkim=pass (2048-bit key) header.d=seco.com header.i=@seco.com header.b=NPJ3hJ2h; arc=fail smtp.client-ip=52.101.71.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=seco.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seco.com
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=QCPxixRqyPtQsy87fNe23WIdp0tbtZZ0CEVHjCFiu8mw7B4BbSmdxXFQrDtITjwH9pWMqQnU1Qt59L9BQacDtjvnvnIhXnjQlHLPKpr2UeY91S8NT35smyRA2Lu8nNz/0m0ZjdOfIADuYDZvhppNuSgodYKY+V7aBqy7NfXEYD83NNMqPUC5Y4xBMuYRxAYyEi8w8w2xdPK2ceam84p5Z+xFqgd1rJ7Z8aB9+NWUa5/S9mbqS6udpqtyHyZo1Jis12efSm2Ua2cbEXgmsKOcM2UBpleMN67+u67k3V9qqSY7rLZ1cEoTzKb8XJ1MjKVEDNCoiksdhGarCtkPBFMcwQ==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8xOUP80MmzYxdt6nvpSX9RFdQV6/AW8DY36snDMgTGA=;
- b=ywDPbLqhHahmG2fRSQFbOoGgrclbi0/VxCQJqHk2JVDyTMuyFb+cX6ddJ3Vyrcu2+0xCWp2rclQmcUwjeJxUVeJ4653Yloos7KtJK7zk6em2WsoyZ+Wmj0DncNElihw//PUn/RnT84IPIFxjeujjY6VNFRBJ5DHjsvsbq29JoNXFaiCSBeURCyxF5R9MYG5lV4NCnRfBY0ZVK6oD6dOhkb1NsA6+zI2OBH4HvP4hk9ICt3NJxu6x26DBSlp/tDNOmVoClLsQc3eSHGq+lXvqshbEoaE/AD10rGmjlgsEeh0k80/LqslZOMQ3SVBmy2CM9RFD7qEwpY/aT/2PKAH1qg==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 20.160.56.84) smtp.rcpttodomain=armlinux.org.uk smtp.mailfrom=seco.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=seco.com;
- dkim=pass (signature was verified) header.d=seco.com; arc=pass (0 oda=1
- ltdi=1 spf=[1,1,smtp.mailfrom=seco.com] dkim=[1,1,header.d=seco.com]
- dmarc=[1,1,header.from=seco.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=seco.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8xOUP80MmzYxdt6nvpSX9RFdQV6/AW8DY36snDMgTGA=;
- b=NPJ3hJ2hHs4i0Mp2z70Eyi5/axuHMkVy5jgj+SJp8TngGEM5v92Gkx9tcBzJK0nUvGKzzspnHk1pkg21iwkJ9rcTMWxC9vZs1edo53+FSkFltaXZWfS/DZ3CLmzxyDDZA8Zlst7QH0zQ+GVNzWIKMWxlKQgRyUulKoVSWZGWAvISkw181zufUwVodNrCufXn/JIDAGcCSsv+bVI/GUGIs7/dvHagIC13RlgfG4/KaUbMbQJW0ImseWr7Xsns4oX2tTp2DrHH6GEw3UNC2g4IPMxkE/++NBZpgaHsDftREP4NnSiGV0q8RGcdNLcKl84/BaNfTw3VjMxoMXJ0UNeyhA==
-Received: from DU7PR01CA0043.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:50e::21) by DBBPR03MB6796.eurprd03.prod.outlook.com
- (2603:10a6:10:207::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.30; Tue, 13 May
- 2025 18:17:01 +0000
-Received: from DB1PEPF00039231.eurprd03.prod.outlook.com
- (2603:10a6:10:50e:cafe::c9) by DU7PR01CA0043.outlook.office365.com
- (2603:10a6:10:50e::21) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8722.28 via Frontend Transport; Tue,
- 13 May 2025 18:16:53 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 20.160.56.84)
- smtp.mailfrom=seco.com; dkim=pass (signature was verified)
- header.d=seco.com;dmarc=pass action=none header.from=seco.com;
-Received-SPF: Pass (protection.outlook.com: domain of seco.com designates
- 20.160.56.84 as permitted sender) receiver=protection.outlook.com;
- client-ip=20.160.56.84; helo=repost-eu.tmcas.trendmicro.com; pr=C
-Received: from repost-eu.tmcas.trendmicro.com (20.160.56.84) by
- DB1PEPF00039231.mail.protection.outlook.com (10.167.8.104) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.8722.18
- via Frontend Transport; Tue, 13 May 2025 18:17:00 +0000
-Received: from outmta (unknown [192.168.82.134])
-	by repost-eu.tmcas.trendmicro.com (Trend Micro CAS) with ESMTP id 2CED42008008D;
-	Tue, 13 May 2025 18:17:00 +0000 (UTC)
-Received: from EUR02-VI1-obe.outbound.protection.outlook.com (unknown [104.47.11.44])
-	by repre.tmcas.trendmicro.com (Trend Micro CAS) with ESMTPS id 7D1212008006E;
-	Tue, 13 May 2025 18:16:52 +0000 (UTC)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=j1riGgMHNR/AsDxjpMIiMnEaBJkvJXsQPkowNBSbb5ehRZxKt30Sg7uFyyM5tODcUxDhPZCkSShqHBQGvEu6I5vq9HKqr2Hx4tOXGYZHqrYYKilJmePPBxXTt7S1yi514LkTa3fAmQ08Jjw0iFk1bvEt6y5RT3s7KHwRrzVpK3K0x/5ddiXX2mgV4XSdgq+3CoP5a80Q+5Civp2mJPAKF6/IfSQw8/3dB1byZeaO7vELmAfxGdgFGK+jFKD/ezsSGpY80laS+/VlcoZYWlHgcAl2f5vG657dh31zwQT7DJDhVKrkNBCP7D0gag8MlUxDK3FojIYVJDtzWDfofnswDQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8xOUP80MmzYxdt6nvpSX9RFdQV6/AW8DY36snDMgTGA=;
- b=JBtONQPHnIFRQfFAT8B2YzBl1pXNyEIyJ9mjBIAlHknpXvRh31lo7oqtqTiNyn+rBWvVt0PGNuCncYbuY4wMyZhajzvfWL++Ri+ucm+eZkd2qefoZOG47aRs/bgi292SzMtcar8t3Umz3io6lWfZSIc/I0XbglohveY9cBlrl4+X2mSiizfJn5xvd1l/kkNYbVCE7q8FUeIcoeg9btzry0kQMYb0UW3A6HVhHR+mXbYpCHXqnrrRKQWXPjHlKKCVaOZLZ/Av1iolZH0hYZ5qG4JuTv1I72Y3yLbHWAyr76iYBjJueYcIkkdPhbT86ijajErxp5h2WfPlqKyZ0HlfgA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=seco.com; dmarc=pass action=none header.from=seco.com;
- dkim=pass header.d=seco.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=seco.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8xOUP80MmzYxdt6nvpSX9RFdQV6/AW8DY36snDMgTGA=;
- b=NPJ3hJ2hHs4i0Mp2z70Eyi5/axuHMkVy5jgj+SJp8TngGEM5v92Gkx9tcBzJK0nUvGKzzspnHk1pkg21iwkJ9rcTMWxC9vZs1edo53+FSkFltaXZWfS/DZ3CLmzxyDDZA8Zlst7QH0zQ+GVNzWIKMWxlKQgRyUulKoVSWZGWAvISkw181zufUwVodNrCufXn/JIDAGcCSsv+bVI/GUGIs7/dvHagIC13RlgfG4/KaUbMbQJW0ImseWr7Xsns4oX2tTp2DrHH6GEw3UNC2g4IPMxkE/++NBZpgaHsDftREP4NnSiGV0q8RGcdNLcKl84/BaNfTw3VjMxoMXJ0UNeyhA==
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=seco.com;
-Received: from PAVPR03MB9020.eurprd03.prod.outlook.com (2603:10a6:102:329::6)
- by AM0PR03MB6305.eurprd03.prod.outlook.com (2603:10a6:20b:157::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.26; Tue, 13 May
- 2025 18:16:50 +0000
-Received: from PAVPR03MB9020.eurprd03.prod.outlook.com
- ([fe80::2174:a61d:5493:2ce]) by PAVPR03MB9020.eurprd03.prod.outlook.com
- ([fe80::2174:a61d:5493:2ce%7]) with mapi id 15.20.8722.027; Tue, 13 May 2025
- 18:16:50 +0000
-Message-ID: <50c9606b-e671-4c87-a126-6709c9364f47@seco.com>
-Date: Tue, 13 May 2025 14:16:44 -0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH v4 07/11] dt-bindings: net: ethernet-controller:
- permit to define multiple PCS
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE2FB2BE7A9;
+	Tue, 13 May 2025 18:18:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747160303; cv=none; b=i5yB6usMJdH9kIcpf8wxJ8tvxOrQg0vB3U7CZxk1m5UrKEtU5J4KKeqg3Wdk3fq0hO2l/FgurO0Bj4rYRBZz5zqdP2u75kusC6zJB3pyXa+UyfaqAN5P1hElj8qVWJpWd+Q4Zn+4nNVPMPhdPy2LRHFjoSknHy+QjHwu0RIwyTc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747160303; c=relaxed/simple;
+	bh=HBeE+0wW+om85cfwNdDKrlxMpD223ZWbB4T/sjnTmUo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=qULUXtRBMDleC8xiOBIXd64Y3lBxl0yGD7nUwoDYhttzCUDliDNde7u3oARO4gBtg8TZl4LrqzzKV3ZGj9MNrjyMcp9W1vM380qg+RYNMXgprSFPhe5yX0BuvS0n8cKSVo3MLhBsFiBzQNLTO8SXh1osKjufEOUKo9EApFZIZ/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qPlyclbu; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <5d004048-ef8f-42ad-8f17-d1e4d495f57f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1747160288;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VergU86i4ALqHioN7prEA0AAZk9+sq3Anjg1pRxRhn4=;
+	b=qPlyclbuJUlY7oA1oyMI6KtiOFLQQSlpFZTLSvv7LtOlknSkR0ugZM5yzrkqmDrUA6nA7F
+	chAbq7FK2QjJfTS8ASDxGJBEdcEMRF3Ozp/TQU43p9LTaEQ+zHFfiseu+E64QEUNbA4MOk
+	OCOzXqR7SQ05S0U4iEqYyWWuWVAf2QE=
+Date: Tue, 13 May 2025 14:18:02 -0400
+Precedence: bulk
+X-Mailing-List: netdev@vger.kernel.org
+List-Id: <netdev.vger.kernel.org>
+List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Subject: Re: [net-next PATCH v4 03/11] net: phylink: introduce internal
+ phylink PCS handling
 To: Christian Marangi <ansuelsmth@gmail.com>,
  Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
  <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
@@ -121,156 +67,414 @@ To: Christian Marangi <ansuelsmth@gmail.com>,
  linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
  llvm@lists.linux.dev
 References: <20250511201250.3789083-1-ansuelsmth@gmail.com>
- <20250511201250.3789083-8-ansuelsmth@gmail.com>
+ <20250511201250.3789083-4-ansuelsmth@gmail.com>
 Content-Language: en-US
-From: Sean Anderson <sean.anderson@seco.com>
-In-Reply-To: <20250511201250.3789083-8-ansuelsmth@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <20250511201250.3789083-4-ansuelsmth@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH2PR03CA0007.namprd03.prod.outlook.com
- (2603:10b6:610:59::17) To PAVPR03MB9020.eurprd03.prod.outlook.com
- (2603:10a6:102:329::6)
-Precedence: bulk
-X-Mailing-List: netdev@vger.kernel.org
-List-Id: <netdev.vger.kernel.org>
-List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-TrafficTypeDiagnostic:
-	PAVPR03MB9020:EE_|AM0PR03MB6305:EE_|DB1PEPF00039231:EE_|DBBPR03MB6796:EE_
-X-MS-Office365-Filtering-Correlation-Id: a65c27a7-5fbc-442c-c014-08dd924a5ada
-X-TrendMicro-CAS-OUT-LOOP-IDENTIFIER: 656f966764b7fb185830381c646b41a1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|7416014|366016|1800799024|376014|7053199007|921020;
-X-Microsoft-Antispam-Message-Info-Original:
- =?utf-8?B?ZnBPaFZUV1J4TG4yQllKTk5JeWl1K3k1ODI3TlJqcWRjSHpKcU9jNEhYcjhM?=
- =?utf-8?B?Vi84MGFTbisvQjB1enQ0N1pKaVRyQkg2dFBiZ2FXTlNOTGt5SFRnSlEyU0k1?=
- =?utf-8?B?RHBHZkpNUXdKMEZvNFVlcEx0V0tnUWkvYmFETnhaU2RwcVZuYkNmcVJ3Ym1p?=
- =?utf-8?B?NThFK2F6bjBpR2JmenFCaWJvZ0ZEYzZwMHBSYjg0bjJPSGd4alo0Zm9PSVUw?=
- =?utf-8?B?RUhhN1F0SG9La0RBYjFQL24xU2c4by83YXB6dlJFNXRKT1dVK1hzbksvRDZa?=
- =?utf-8?B?TjdoYlVicS9BcUZYb216TFVieGNnUWkydit1RFFFa1A3NVJmSVhSMHBkT2th?=
- =?utf-8?B?VEdSaGtyMWZnNlRQMnJmU0x1RjVaNWJCRjdBRXJJUFluVGlzQ0I4N0VWK1Z0?=
- =?utf-8?B?RGQ4ZkNWZkNMSUp4eUhOVk5yL2QwdFh5aGowa0cwVFVzVHNISUdoUUh4UWRw?=
- =?utf-8?B?VFF3d0k0dUNBdmJ3SUlyRk1oQ0VBME5NR2JQR1VVZ2lTM2lhYWo4eEZ2cTVU?=
- =?utf-8?B?elJQVFd3Nkd4SWR0NVRkZzljZzduMnVyQ1RhQThIQStzV1pzaEppaFlocm9W?=
- =?utf-8?B?YlpMc3Z5SEw3bExod3ZDa1o3UVAzbktGTDJaK1JSTUFrcEFUaVdBdWl1R2Zl?=
- =?utf-8?B?Sm9nS2xhKzBNSG1uVURKSkFkWkdqNVBaQjlrTVljSGtaNWhhUVo5R2RYanRi?=
- =?utf-8?B?ZEF1QmRZdFUvN3JxWFpKQitRaEswQlk3MU9RdnBCY05Fa2FNMVdzU3YvN0Rn?=
- =?utf-8?B?MkdQT2JJNHYyWDVNVTArcEZWZ2pndzU3WDJTS2hPMEh4MnQzTzJ2cmxCUWFQ?=
- =?utf-8?B?a1VxejZZVnBUbDZKZTdlb21vS28vMno5b2NBcnZ4NDJQQzlNdnB1OFBOQW5k?=
- =?utf-8?B?K0tha3lPZURicVM4clh1R0FtVWh5WEszNmRySEF2UmtuL2tLM2lXcUhkeXRm?=
- =?utf-8?B?czVxcXNDNkVlYTArT05oM0hWVWVuNEhTbWVZUVovWDdpbGIxbHk2M0xoa3dw?=
- =?utf-8?B?SFdPNG1hQnNoSmVia0JHa3Y0ajBOd0QrRVpsa1JrVXM0RzlyNFN4VzJuQ3pp?=
- =?utf-8?B?aW91S05DcnBHTEliQXQwWFJpVktzb2h0YzVnMkd1bnVtU0I3cDdQWEVrMVRF?=
- =?utf-8?B?QWMxY2FUMmRYMitXN25URlZ1NDZ5V0tabnRaSnZtaVpreEhNd05abWJSbXhE?=
- =?utf-8?B?bE5iT2F2VWxQL3Z4aFlGMlRZUVZQYzNTYURpdjBUNkhCbzhXNEJhZ0tzSVNF?=
- =?utf-8?B?b1NBQ0tjbXJqdXNHSGhpdUYyNXo5TktiVUJoNWR5U1ZXaXQyUnQwRUJkMm9x?=
- =?utf-8?B?djQ2RXB1U3ozYzZwb0hGeFlBK2d2VFRIV1dUMVFDS0JKa1M2QXU0aHo0QjdQ?=
- =?utf-8?B?ZjZwd21DSWZxVFJzWmk0ckxKUnVsRm5NMDBiQWZzZnNrOGg2N3I0WWxMYVhq?=
- =?utf-8?B?N0JwY0VkQkQvdU5CVUVqeXdVL3Y0RWVvZWNXQm5kV1gwL1d3K0Z2cElwSWxK?=
- =?utf-8?B?dnFHYzBmVkN2TEJYdjRmSnA5RzlSbFdMSE9NZHpzczU1djEvbFdGaXJ2Nm8r?=
- =?utf-8?B?SjlFZ3NqWUMyMVVhUHA3bzl3Z2lZSE5haWZqcWQ5L3p0WjAwOGZ3M0tFcnJn?=
- =?utf-8?B?MjQ4OEVDMklIWGhnZkxNOTEzV3dxQzhST3ZpTjZLaERndjNMb0hLdWxyYTVJ?=
- =?utf-8?B?a0w5d1M2RUV6ak1MbzRtRlJEYkJaTVBGb0N4cDhmRWt3ZGJQZFRSTWtGMFA2?=
- =?utf-8?B?T0hrT2JSVmFlZHRlZGsxNXMva1BhYWhwYXQ2ZGVzNFRkTVZ2VjhxRmZRZ1dU?=
- =?utf-8?B?bmliL2I5Ym5hMDNsM1JxOXFTSjNXcDhsMzdWejE2TTMxQTQ2WERUM05wMC9w?=
- =?utf-8?B?bFB4dG1NQk40Z0s2bDVYcFp0S2Ztb3BQZXl1WnhPOGxWNmh1UDZxUEdaZ1Zj?=
- =?utf-8?B?TmdGZCtzMnBGSjczYzJDS24yNjl2aldWaHhFVVFYU0ErQlVtNitGN2JXL1Qy?=
- =?utf-8?B?Smc4TktqK2dnPT0=?=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAVPR03MB9020.eurprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(1800799024)(376014)(7053199007)(921020);DIR:OUT;SFP:1102;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR03MB6305
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DB1PEPF00039231.eurprd03.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	f698e245-8677-47d1-2104-08dd924a54ad
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|35042699022|1800799024|14060799003|82310400026|376014|7416014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?b1ZvMllaSEEzYkZLd0gyU2hHRzFPd1V6Q2hVSmg1SU54a1Yrd0FONnZZTmM5?=
- =?utf-8?B?eEJVWVI1Sm5qSDQ2WC94bWtCTzB0SzBmdUpSSmo1Yzl4Q2xaQ0NGYXBuWDFa?=
- =?utf-8?B?Q0VWcmZOQ3J6N2tZbXFiNW9FdGlLRldZRmJOWUdyZ2swL2JIZ3Rhc05JSVl2?=
- =?utf-8?B?Nit1MWRrS3RqWmt1VWtmeHdyUXRxVkk2QW9WdXJwNkxmNkpzSXJvVkNnbE1q?=
- =?utf-8?B?TGRxT1ZFTE9Dc3JueXJQUW9EdDBta085VnNuaHhNaCtyN0NSblFVQWRseVpv?=
- =?utf-8?B?SFZ3SHk0V3hnWUdxODM0K1R6Z1d6bEpvOWtlWHBHaFJid3N1S3lFZHZ6YmZN?=
- =?utf-8?B?UVdUN0JZZjFEcjdCT1RlV1ZMTVhlRTZ4ZFBlMldSSGV2MTlrSE44R3lVMFlY?=
- =?utf-8?B?dmwxeWdPc0tOMFdqbUlwNExOcWpWdGNsT2kvVXBFaDhYWkQvcFJmN1NzS1hC?=
- =?utf-8?B?K3c0WHE5SzFhQnczSFhCWmZCWjhXMHhaYTIxWVhNbHg3RGp4b3FyYS9HZjE2?=
- =?utf-8?B?elcvUkJwNTQyejZWYUZoLzVhSkVxaHhSNXRBN3ZGeDVhbHU1VWM4dXN6Z0N2?=
- =?utf-8?B?SDZaRnJkRmE3SWxSY3lLTVk4b2wrVG9YdHRIRHo0S2FXTklqUHprSDJMSDZ3?=
- =?utf-8?B?WDN6L05BWDNhNFNoQ01xOWZCYlRzRjU5cFVDK0VyR2NNQkVkMnhmN1o4RlQz?=
- =?utf-8?B?RU5oaFZSNjUvem9KQVA4TWowY2E0WSsweWVPTTFJYmhCZFVJVkJMV1N5TjVK?=
- =?utf-8?B?RllkTFJ3VkJ0ckFXbFZpNE52TUZ0LzBOSDluaCtkQ0EvSkNqeDQvdUNTSFN3?=
- =?utf-8?B?SGNFSkh4R1dXaU1HM1lWTUxjN3AzcHRxa0xNbkErY3FOa3VLVitQVW1EVEJk?=
- =?utf-8?B?WUNTZXRTYmtOUng5YzM0V3VFSzhXZWVIWjJJTWZwNDV5SVRzZm01ZHBLSG15?=
- =?utf-8?B?ZG1ENElPd2hYYkdzTjQ3b3RwVzB2OHJCRHl5Z3AxYk5XdnFHUVV1NEdrWjhI?=
- =?utf-8?B?ckVSUUlma0xZZWxLWHpKclFKMkhVcHRhTkFZc053U21ndll0ekNRQlVVZUNC?=
- =?utf-8?B?Ylc3TDg3a0VsZWFQODRuSGROYmpaa1dyWDJja1pGM2tEaXhNcUFsUEczaFZ0?=
- =?utf-8?B?ajVDZng1S1duWHJXSzVIcWZ2YXpKcWZVN1BTM0hESWw0clpRUGloZTdrMEF4?=
- =?utf-8?B?TWJtVXgwdWtuMlBqV2c4WXJ6R3NuOVRmRjZQQmZjKy80V1RBdk5PWEM5MndJ?=
- =?utf-8?B?RnBHcUJPc2NqQzBSM1R6T1hzSVNzdjJvOGkrL0FXK24xMFQ1RlhKdmdFc1ls?=
- =?utf-8?B?STFvRmgyUTZYYlByYWNDcmxzWlBOeTVHcDB0TGt5MnJpU1JoNURTSTF2Z3ZP?=
- =?utf-8?B?YkpLbWx5cXFIMG03c2UwemphbXhsUzJ5bHlhcUxpN2g0S0JMZzJLQnZ4NERF?=
- =?utf-8?B?OUoreXpqTUVUcndBNUJRaDB3TzB1NGNyWjlZcUR3Mzh2MTMzRTVCTmNrc3ZC?=
- =?utf-8?B?YU9va3JnNU9EYmRtUWcvQytNOVRWQlZXR0VDa1JHb3ZSeVFielVWcGkybWFB?=
- =?utf-8?B?NGNtbnM1cThrZ2JmVjFXaGRSdi9rNC9GRzFpWGtDdDlWWFJ4bVlFMG0xbnZq?=
- =?utf-8?B?QjcyR0ErVHpxTjJVK0dZaFhWS1BMbXpJeWhmN0NYV2xsL1hFWTV6L2E2ZDRW?=
- =?utf-8?B?alBzL0tVMTF6bVBKSEJjSElRWlN4bHpTRmk1NEZrQzMvVW5aam0yUFVyeWdy?=
- =?utf-8?B?ckx5SWhPV29TVjVlaWkyKytTcHd5UnRYUVEzRUZpc0ZnZHBYYTA3S2VZNE1r?=
- =?utf-8?B?RjNzYm1GR1l6aFF5QUtUdmQxR2VHOEw1SXkyK0VCc2Vmblp2R1RwaVVFdG9F?=
- =?utf-8?B?bnQ1MklEdC84U1ZBeE54QWg0eEpzbXNFdW5FNExaaG9zV0ZFQkhOSTN1L3F0?=
- =?utf-8?B?eGNtcHNkbmFIcVJmT2g2aWlBWjV3eDlyaXBFNDFnbEI5ZDJEUFNENGpiM0NM?=
- =?utf-8?B?My9aVkhQMzdONkxPbXRidlhNT1lKdUtCM2VrUVFMQzZxc2lkYXlvWEU2d3Zv?=
- =?utf-8?B?Skh1RmxibGpvaEdtR3EvZXcydkR3Z3hYaEZSdz09?=
-X-Forefront-Antispam-Report:
-	CIP:20.160.56.84;CTRY:NL;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:repost-eu.tmcas.trendmicro.com;PTR:repost-eu.tmcas.trendmicro.com;CAT:NONE;SFS:(13230040)(36860700013)(35042699022)(1800799024)(14060799003)(82310400026)(376014)(7416014)(921020);DIR:OUT;SFP:1102;
-X-OriginatorOrg: seco.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2025 18:17:00.5268
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a65c27a7-5fbc-442c-c014-08dd924a5ada
-X-MS-Exchange-CrossTenant-Id: bebe97c3-6438-442e-ade3-ff17aa50e733
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=bebe97c3-6438-442e-ade3-ff17aa50e733;Ip=[20.160.56.84];Helo=[repost-eu.tmcas.trendmicro.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DB1PEPF00039231.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR03MB6796
+X-Migadu-Flow: FLOW_OUT
 
 On 5/11/25 16:12, Christian Marangi wrote:
-> Drop the limitation of a single PCS in pcs-handle property. Multiple PCS
-> can be defined for an ethrnet-controller node to support various PHY
-> interface mode type.
+> Introduce internal handling of PCS for phylink. This is an alternative
+> to .mac_select_pcs that moves the selection logic of the PCS entirely to
+> phylink with the usage of the supported_interface value in the PCS
+> struct.
 > 
-> It's very common for SoCs to have a 2 or more dedicated PCS for Base-X
-> (for example SGMII, 1000base-x, 2500base-x, ...) and Base-R (for example
-> USXGMII,10base-r, ...) with the MAC selecting one of the other based on
-> the attached PHY.
+> MAC should now provide an array of available PCS in phylink_config in
+> .available_pcs and fill the .num_available_pcs with the number of
+> elements in the array. MAC should also define a new bitmap,
+> pcs_interfaces, in phylink_config to define for what interface mode a
+> dedicated PCS is required.
 > 
+> On phylink_create() this array is parsed and a linked list of PCS is
+> created based on the PCS passed in phylink_config.
+> Also the supported_interface value in phylink struct is updated with the
+> new supported_interface from the provided PCS.
+> 
+> On phylink_start() every PCS in phylink PCS list gets attached to the
+> phylink instance. This is done by setting the phylink value in
+> phylink_pcs struct to the phylink instance.
+> 
+> On phylink_stop(), every PCS in phylink PCS list is detached from the
+> phylink instance. This is done by setting the phylink value in
+> phylink_pcs struct to NULL.
+> 
+> phylink_validate_mac_and_pcs(), phylink_major_config() and
+> phylink_inband_caps() are updated to support this new implementation
+> with the PCS list stored in phylink.
+> 
+> They will make use of phylink_validate_pcs_interface() that will loop
+> for every PCS in the phylink PCS available list and find one that supports
+> the passed interface.
+> 
+> phylink_validate_pcs_interface() applies the same logic of .mac_select_pcs
+> where if a supported_interface value is not set for the PCS struct, then
+> it's assumed every interface is supported.
+> 
+> A MAC is required to implement either a .mac_select_pcs or make use of
+> the PCS list implementation. Implementing both will result in a fail
+> on MAC/PCS validation.
+> 
+> phylink value in phylink_pcs struct with this implementation is used to
+> track from PCS side when it's attached to a phylink instance. PCS driver
+> will make use of this information to correctly detach from a phylink
+> instance if needed.
+> 
+> The .mac_select_pcs implementation is not changed but it's expected that
+> every MAC driver migrates to the new implementation to later deprecate
+> and remove .mac_select_pcs.
+
+This introduces a completely parallel PCS selection system used by a
+single driver. I don't think we want the maintenance burden and
+complexity of two systems in perpetuity. So what is your plan for
+conversion of existing drivers to your new system?
+
+DSA drivers typically have different PCSs for each port. At the moment
+these are selected with mac_select_pcs, allowing the use of a single
+phylink_config for each port. If you need to pass PCSs through
+phylink_config then each port will needs its own config. This may prove
+difficult to integrate with the existing API.
+
 > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 > ---
->  Documentation/devicetree/bindings/net/ethernet-controller.yaml | 2 --
->  1 file changed, 2 deletions(-)
+>  drivers/net/phy/phylink.c | 147 +++++++++++++++++++++++++++++++++-----
+>  include/linux/phylink.h   |  10 +++
+>  2 files changed, 139 insertions(+), 18 deletions(-)
 > 
-> diff --git a/Documentation/devicetree/bindings/net/ethernet-controller.yaml b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-> index 7cbf11bbe99c..60605b34d242 100644
-> --- a/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-> +++ b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-> @@ -84,8 +84,6 @@ properties:
+> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+> index ec42fd278604..95d7e06dee56 100644
+> --- a/drivers/net/phy/phylink.c
+> +++ b/drivers/net/phy/phylink.c
+> @@ -59,6 +59,9 @@ struct phylink {
+>  	/* The link configuration settings */
+>  	struct phylink_link_state link_config;
 >  
->    pcs-handle:
->      $ref: /schemas/types.yaml#/definitions/phandle-array
-> -    items:
-> -      maxItems: 1
->      description:
->        Specifies a reference to a node representing a PCS PHY device on a MDIO
->        bus to link with an external PHY (phy-handle) if exists.
+> +	/* List of available PCS */
+> +	struct list_head pcs_list;
+> +
+>  	/* What interface are supported by the current link.
+>  	 * Can change on removal or addition of new PCS.
+>  	 */
+> @@ -144,6 +147,8 @@ static const phy_interface_t phylink_sfp_interface_preference[] = {
+>  
+>  static DECLARE_PHY_INTERFACE_MASK(phylink_sfp_interfaces);
+>  
+> +static void phylink_run_resolve(struct phylink *pl);
+> +
+>  /**
+>   * phylink_set_port_modes() - set the port type modes in the ethtool mask
+>   * @mask: ethtool link mode mask
+> @@ -499,22 +504,59 @@ static void phylink_validate_mask_caps(unsigned long *supported,
+>  	linkmode_and(state->advertising, state->advertising, mask);
+>  }
+>  
+> +static int phylink_validate_pcs_interface(struct phylink_pcs *pcs,
+> +					  phy_interface_t interface)
+> +{
+> +	/* If PCS define an empty supported_interfaces value, assume
+> +	 * all interface are supported.
+> +	 */
+> +	if (phy_interface_empty(pcs->supported_interfaces))
+> +		return 0;
+> +
+> +	/* Ensure that this PCS supports the interface mode */
+> +	if (!test_bit(interface, pcs->supported_interfaces))
+> +		return -EINVAL;
+> +
+> +	return 0;
+> +}
+> +
+>  static int phylink_validate_mac_and_pcs(struct phylink *pl,
+>  					unsigned long *supported,
+>  					struct phylink_link_state *state)
+>  {
+> -	struct phylink_pcs *pcs = NULL;
+>  	unsigned long capabilities;
+> +	struct phylink_pcs *pcs;
+> +	bool pcs_found = false;
+>  	int ret;
+>  
+>  	/* Get the PCS for this interface mode */
+>  	if (pl->mac_ops->mac_select_pcs) {
+> +		/* Make sure either PCS internal validation or .mac_select_pcs
+> +		 * is used. Return error if both are defined.
+> +		 */
+> +		if (!list_empty(&pl->pcs_list)) {
+> +			phylink_err(pl, "either phylink_pcs_add() or .mac_select_pcs must be used\n");
+> +			return -EINVAL;
+> +		}
+> +
 
-This just specifies the default. Bindings for individual macs can
-override this. See fsl,fman-dtsec.yaml for an example.
+This validation should be done in phylink_create.
 
---Sean
+>  		pcs = pl->mac_ops->mac_select_pcs(pl->config, state->interface);
+>  		if (IS_ERR(pcs))
+>  			return PTR_ERR(pcs);
+> +
+> +		pcs_found = !!pcs;
+> +	} else {
+> +		/* Check every assigned PCS and search for one that supports
+> +		 * the interface.
+> +		 */
+> +		list_for_each_entry(pcs, &pl->pcs_list, list) {
+> +			if (!phylink_validate_pcs_interface(pcs, state->interface)) {
+> +				pcs_found = true;
+> +				break;
+> +			}
+> +		}
+>  	}
+>  
+> -	if (pcs) {
+> +	if (pcs_found) {
+>  		/* The PCS, if present, must be setup before phylink_create()
+>  		 * has been called. If the ops is not initialised, print an
+>  		 * error and backtrace rather than oopsing the kernel.
+> @@ -526,13 +568,10 @@ static int phylink_validate_mac_and_pcs(struct phylink *pl,
+>  			return -EINVAL;
+>  		}
+>  
+> -		/* Ensure that this PCS supports the interface which the MAC
+> -		 * returned it for. It is an error for the MAC to return a PCS
+> -		 * that does not support the interface mode.
+> -		 */
+> -		if (!phy_interface_empty(pcs->supported_interfaces) &&
+> -		    !test_bit(state->interface, pcs->supported_interfaces)) {
+> -			phylink_err(pl, "MAC returned PCS which does not support %s\n",
+> +		/* Recheck PCS to handle legacy way for .mac_select_pcs */
+> +		ret = phylink_validate_pcs_interface(pcs, state->interface);
+> +		if (ret) {
+> +			phylink_err(pl, "selected PCS does not support %s\n",
+>  				    phy_modes(state->interface));
+>  			return -EINVAL;
+>  		}
+> @@ -937,12 +976,22 @@ static unsigned int phylink_inband_caps(struct phylink *pl,
+>  					 phy_interface_t interface)
+>  {
+>  	struct phylink_pcs *pcs;
+> +	bool pcs_found = false;
+>  
+> -	if (!pl->mac_ops->mac_select_pcs)
+> -		return 0;
+> +	if (pl->mac_ops->mac_select_pcs) {
+> +		pcs = pl->mac_ops->mac_select_pcs(pl->config,
+> +						  interface);
+> +		pcs_found = !!pcs;
+> +	} else {
+> +		list_for_each_entry(pcs, &pl->pcs_list, list) {
+> +			if (!phylink_validate_pcs_interface(pcs, interface)) {
+> +				pcs_found = true;
+> +				break;
+> +			}
+> +		}
+> +	}
+>  
+> -	pcs = pl->mac_ops->mac_select_pcs(pl->config, interface);
+> -	if (!pcs)
+> +	if (!pcs_found)
+>  		return 0;
+>  
+>  	return phylink_pcs_inband_caps(pcs, interface);
+> @@ -1228,10 +1277,36 @@ static void phylink_major_config(struct phylink *pl, bool restart,
+>  			pl->major_config_failed = true;
+>  			return;
+>  		}
+> +	/* Find a PCS in available PCS list for the requested interface.
+> +	 * This doesn't overwrite the previous .mac_select_pcs as either
+> +	 * .mac_select_pcs or PCS list implementation are permitted.
+> +	 *
+> +	 * Skip searching if the MAC doesn't require a dedicaed PCS for
+
+dedicated
+
+> +	 * the requested interface.
+> +	 */
+> +	} else if (test_bit(state->interface, pl->config->pcs_interfaces)) {
+> +		bool pcs_found = false;
+> +
+> +		list_for_each_entry(pcs, &pl->pcs_list, list) {
+> +			if (!phylink_validate_pcs_interface(pcs,
+> +							    state->interface)) {
+> +				pcs_found = true;
+> +				break;
+> +			}
+> +		}
+> +
+> +		if (!pcs_found) {
+> +			phylink_err(pl,
+> +				    "couldn't find a PCS for %s\n",
+> +				    phy_modes(state->interface));
+>  
+> -		pcs_changed = pl->pcs != pcs;
+> +			pl->major_config_failed = true;
+> +			return;
+> +		}
+>  	}
+>  
+> +	pcs_changed = pl->pcs != pcs;
+> +
+>  	phylink_pcs_neg_mode(pl, pcs, state->interface, state->advertising);
+>  
+>  	phylink_dbg(pl, "major config, active %s/%s/%s\n",
+> @@ -1258,10 +1333,12 @@ static void phylink_major_config(struct phylink *pl, bool restart,
+>  	if (pcs_changed) {
+>  		phylink_pcs_disable(pl->pcs);
+>  
+> -		if (pl->pcs)
+> -			pl->pcs->phylink = NULL;
+> +		if (pl->mac_ops->mac_select_pcs) {
+> +			if (pl->pcs)
+> +				pl->pcs->phylink = NULL;
+>  
+> -		pcs->phylink = pl;
+> +			pcs->phylink = pl;
+> +		}
+>  
+>  		pl->pcs = pcs;
+>  	}
+> @@ -1797,8 +1874,9 @@ struct phylink *phylink_create(struct phylink_config *config,
+>  			       phy_interface_t iface,
+>  			       const struct phylink_mac_ops *mac_ops)
+>  {
+> +	struct phylink_pcs *pcs;
+>  	struct phylink *pl;
+> -	int ret;
+> +	int i, ret;
+>  
+>  	/* Validate the supplied configuration */
+>  	if (phy_interface_empty(config->supported_interfaces)) {
+> @@ -1813,9 +1891,21 @@ struct phylink *phylink_create(struct phylink_config *config,
+>  
+>  	mutex_init(&pl->state_mutex);
+>  	INIT_WORK(&pl->resolve, phylink_resolve);
+> +	INIT_LIST_HEAD(&pl->pcs_list);
+> +
+> +	/* Fill the PCS list with available PCS from phylink config */
+> +	for (i = 0; i < config->num_available_pcs; i++) {
+> +		pcs = config->available_pcs[i];
+> +
+> +		list_add(&pcs->list, &pl->pcs_list);
+> +	}
+
+Why do we have a separate linked list if we are getting all the PCSs
+in an array at configuration time? From what I can tell there is no
+dynamic configuration of PCSs.
+
+>  
+>  	phy_interface_copy(pl->supported_interfaces,
+>  			   config->supported_interfaces);
+> +	list_for_each_entry(pcs, &pl->pcs_list, list)
+> +		phy_interface_or(pl->supported_interfaces,
+> +				 pl->supported_interfaces,
+> +				 pcs->supported_interfaces);
+>  
+>  	pl->config = config;
+>  	if (config->type == PHYLINK_NETDEV) {
+> @@ -1894,10 +1984,16 @@ EXPORT_SYMBOL_GPL(phylink_create);
+>   */
+>  void phylink_destroy(struct phylink *pl)
+>  {
+> +	struct phylink_pcs *pcs, *tmp;
+> +
+>  	sfp_bus_del_upstream(pl->sfp_bus);
+>  	if (pl->link_gpio)
+>  		gpiod_put(pl->link_gpio);
+>  
+> +	/* Remove every PCS from phylink PCS list */
+> +	list_for_each_entry_safe(pcs, tmp, &pl->pcs_list, list)
+> +		list_del(&pcs->list);
+> +
+>  	cancel_work_sync(&pl->resolve);
+>  	kfree(pl);
+>  }
+> @@ -2374,6 +2470,7 @@ static irqreturn_t phylink_link_handler(int irq, void *data)
+>   */
+>  void phylink_start(struct phylink *pl)
+>  {
+> +	struct phylink_pcs *pcs;
+>  	bool poll = false;
+>  
+>  	ASSERT_RTNL();
+> @@ -2400,6 +2497,10 @@ void phylink_start(struct phylink *pl)
+>  
+>  	pl->pcs_state = PCS_STATE_STARTED;
+>  
+> +	/* link available PCS to phylink struct */
+> +	list_for_each_entry(pcs, &pl->pcs_list, list)
+> +		pcs->phylink = pl;
+> +
+>  	phylink_enable_and_run_resolve(pl, PHYLINK_DISABLE_STOPPED);
+>  
+>  	if (pl->cfg_link_an_mode == MLO_AN_FIXED && pl->link_gpio) {
+> @@ -2444,6 +2545,8 @@ EXPORT_SYMBOL_GPL(phylink_start);
+>   */
+>  void phylink_stop(struct phylink *pl)
+>  {
+> +	struct phylink_pcs *pcs;
+> +
+>  	ASSERT_RTNL();
+>  
+>  	if (pl->sfp_bus)
+> @@ -2461,6 +2564,14 @@ void phylink_stop(struct phylink *pl)
+>  	pl->pcs_state = PCS_STATE_DOWN;
+>  
+>  	phylink_pcs_disable(pl->pcs);
+> +
+> +	/* Drop link between phylink and PCS */
+> +	list_for_each_entry(pcs, &pl->pcs_list, list)
+> +		pcs->phylink = NULL;
+> +
+> +	/* Restore original supported interfaces */
+> +	phy_interface_copy(pl->supported_interfaces,
+> +			   pl->config->supported_interfaces);
+>  }
+>  EXPORT_SYMBOL_GPL(phylink_stop);
+>  
+> diff --git a/include/linux/phylink.h b/include/linux/phylink.h
+> index 30659b615fca..ef0b5a0729c8 100644
+> --- a/include/linux/phylink.h
+> +++ b/include/linux/phylink.h
+> @@ -150,12 +150,16 @@ enum phylink_op_type {
+>   *		     if MAC link is at %MLO_AN_FIXED mode.
+>   * @supported_interfaces: bitmap describing which PHY_INTERFACE_MODE_xxx
+>   *                        are supported by the MAC/PCS.
+> + * @pcs_interfaces: bitmap describing for which PHY_INTERFACE_MODE_xxx a
+> + *		    dedicated PCS is required.
+>   * @lpi_interfaces: bitmap describing which PHY interface modes can support
+>   *		    LPI signalling.
+>   * @mac_capabilities: MAC pause/speed/duplex capabilities.
+>   * @lpi_capabilities: MAC speeds which can support LPI signalling
+>   * @lpi_timer_default: Default EEE LPI timer setting.
+>   * @eee_enabled_default: If set, EEE will be enabled by phylink at creation time
+> + * @available_pcs: array of available phylink_pcs PCS
+> + * @num_available_pcs: num of available phylink_pcs PCS
+>   */
+>  struct phylink_config {
+>  	struct device *dev;
+> @@ -168,11 +172,14 @@ struct phylink_config {
+>  	void (*get_fixed_state)(struct phylink_config *config,
+>  				struct phylink_link_state *state);
+>  	DECLARE_PHY_INTERFACE_MASK(supported_interfaces);
+> +	DECLARE_PHY_INTERFACE_MASK(pcs_interfaces);
+>  	DECLARE_PHY_INTERFACE_MASK(lpi_interfaces);
+>  	unsigned long mac_capabilities;
+>  	unsigned long lpi_capabilities;
+>  	u32 lpi_timer_default;
+>  	bool eee_enabled_default;
+> +	struct phylink_pcs **available_pcs;
+> +	unsigned int num_available_pcs;
+>  };
+>  
+>  void phylink_limit_mac_speed(struct phylink_config *config, u32 max_speed);
+> @@ -469,6 +476,9 @@ struct phylink_pcs {
+>  	struct phylink *phylink;
+>  	bool poll;
+>  	bool rxc_always_on;
+> +
+> +	/* private: */
+> +	struct list_head list;
+>  };
+>  
+>  /**
 
