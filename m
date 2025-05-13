@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-190107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69EBDAB5340
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 12:55:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 77EB7AB5344
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 12:56:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E31B3AA7AD
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 10:55:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D8BC3AA8F3
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 10:55:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16159284B5E;
-	Tue, 13 May 2025 10:55:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F9BB28689B;
+	Tue, 13 May 2025 10:55:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QPUsFNp1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="li9VD3SJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C75C18EFD4
-	for <netdev@vger.kernel.org>; Tue, 13 May 2025 10:55:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F29561E501C
+	for <netdev@vger.kernel.org>; Tue, 13 May 2025 10:55:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747133751; cv=none; b=ei5rS53DWvub79eqgzhne3RI2vgwbB/9WfYcMAAocEYEenfOcBtDpZnTkMIA/085uDWcEjbopk3HI0AFntez1EFsP6tAv7GfYOHS1J+2yuY6T3Nkoe30dsOoEanTU5P027D4oZGYUGgJxYep1djKTXZL7zTs2dUx0AekM+Dg/go=
+	t=1747133753; cv=none; b=FSqnLRgEgIkWnCW75Wrgxk5sHD4JVvgjld2hIpVTwsXl3nbzxp/KahAVC73JZlZKcdmVXoftzFEizAHESZ+I5YUleYOar675BlGfiQvwz/4uwfaGi9B711dWE/e7tezdx2Xy8+hE+Xji0Rk/ksZn/QeZiIfDluPHZ2ptmCkarAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747133751; c=relaxed/simple;
-	bh=BL/2TY8Cn65018DK0kWw1A4kfT5eGAtTipy6JiqXOv4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZxlGBRgXpX6d7jExnY+Teq/v2/21t14iC4I6AvztW1emKQ7im/sUOxCSIGhjiXMDMOoiExXkFiQKlSwukF+Sfs5ctXQTfZZnh0mRbSHfoQRr9R4l71iUzUKYq6Z72Cy+G0RaP8RvYpVl1Pnc6PtnBxwHsSKOsjjdllDfBxp9imQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QPUsFNp1; arc=none smtp.client-ip=198.175.65.15
+	s=arc-20240116; t=1747133753; c=relaxed/simple;
+	bh=k4LqbJNigjuVf37XyTfYGGiRhYtQVXluUC2rn4JnhtA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=JzOjRW8bCqjFOVkouiBurJ5KQ5ocboqVKVVUfugr8dIrMSQOpv/kk39u5wbxXAO2y4uvIpsuujhgJgaNqnMavZ37xd/x44FjfXAsPsPEHU5+9CscrTmAm3cl55m1vTtSdbMGIyp9dOynqp9MtUaRXVnRmHtyHORDUO0q8AgsLYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=li9VD3SJ; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747133749; x=1778669749;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=BL/2TY8Cn65018DK0kWw1A4kfT5eGAtTipy6JiqXOv4=;
-  b=QPUsFNp1y4vL5jKTcmFtf77SDdZ7Tlgfo6HVldlRyyGiWGZ6xrXgbc3K
-   hWfKeThI3ARNyOt4IofUbbAsNg4AV5eHTHc1TKO3xMrvWhFk7tR37enSh
-   g3ifkDe4tLnS31zC5coCH0Zto1ZlJ+fPXCuKIedpbcIFkOVtnLK2hGinG
-   I0iSiz/w/PHkXxRdbu1CvigucQipx9bdPm1eeQmAdkTg+t7DfOZR8SDbx
-   KEisibdMDpMFa7xsv/uFhQMPlrEHBdYZrJS0FGzntvpzXbnXkMq5VYc3x
-   7UKkl0ohV6pBJ9ZAJtj4yfwpRk3Pg1wfj9h9aChyt7UiK+w4f5K3gQnIv
-   w==;
-X-CSE-ConnectionGUID: r8QcFlBcQCmIjHT22QaexA==
-X-CSE-MsgGUID: rqsPwYp6TnKv0zg9rIeAjw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11431"; a="52630651"
+  t=1747133751; x=1778669751;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=k4LqbJNigjuVf37XyTfYGGiRhYtQVXluUC2rn4JnhtA=;
+  b=li9VD3SJ26EfV5GnbY+3l0Q4fV7HAODSMnAtvCjvA8NGAUC4WZI/zxAf
+   eC7Np7nHg4rQWhwDGhb4v3rtkD/WATc6i/wDN8YuowZtsC8RMFn8LqF8s
+   arjWU7Vl2IrKqMruOWDgDVveSyLoGuNiQJbzGLZ+b7ARNHK5uBu54rOtB
+   v8pzAVKyWgPTzU0jAskXuojuSaxXxCi/sRiigHZarF7Ellsn/mALfh6EZ
+   Aszoe8FW0kkFU6BW512Ra5O7BdcXncZy9VeC1xUchk3UxSnE01m0Eyuvz
+   h4lMgeHSEjL6PDtMkHnIk4zCDYceHhkZb5/Xk7ISNG7uC2tpFQPBg6tX0
+   A==;
+X-CSE-ConnectionGUID: wLtoxaT8SPiyfXAJ3hpKRQ==
+X-CSE-MsgGUID: IYemsdoxQfWmDXy9tJztGw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11431"; a="52630659"
 X-IronPort-AV: E=Sophos;i="6.15,285,1739865600"; 
-   d="scan'208";a="52630651"
+   d="scan'208";a="52630659"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2025 03:55:48 -0700
-X-CSE-ConnectionGUID: EfzyNQMOTkG9h5AAj7SU0g==
-X-CSE-MsgGUID: dThUDSZmTdCfTQOTjt5c2w==
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2025 03:55:51 -0700
+X-CSE-ConnectionGUID: ZLGTlR/QQPqxIXoAJzuj4Q==
+X-CSE-MsgGUID: FL0j/ME3SjGSo/vEGMmfTw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,285,1739865600"; 
-   d="scan'208";a="138600539"
+   d="scan'208";a="138600547"
 Received: from gk3153-pr4-x299-22869.igk.intel.com (HELO localhost.igk.intel.com) ([10.102.21.130])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2025 03:55:46 -0700
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2025 03:55:48 -0700
 From: Michal Kubiak <michal.kubiak@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: maciej.fijalkowski@intel.com,
@@ -66,11 +67,14 @@ Cc: maciej.fijalkowski@intel.com,
 	jacob.e.keller@intel.com,
 	jbrandeburg@cloudflare.com,
 	netdev@vger.kernel.org,
-	Michal Kubiak <michal.kubiak@intel.com>
-Subject: [PATCH iwl-net v3 0/3] Fix XDP loading on machines with many CPUs
-Date: Tue, 13 May 2025 12:55:26 +0200
-Message-ID: <20250513105529.241745-1-michal.kubiak@intel.com>
+	Michal Kubiak <michal.kubiak@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: [PATCH iwl-net v3 1/3] ice: fix Tx scheduler error handling in XDP callback
+Date: Tue, 13 May 2025 12:55:27 +0200
+Message-ID: <20250513105529.241745-2-michal.kubiak@intel.com>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250513105529.241745-1-michal.kubiak@intel.com>
+References: <20250513105529.241745-1-michal.kubiak@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,70 +83,171 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi,
+When the XDP program is loaded, the XDP callback adds new Tx queues.
+This means that the callback must update the Tx scheduler with the new
+queue number. In the event of a Tx scheduler failure, the XDP callback
+should also fail and roll back any changes previously made for XDP
+preparation.
 
-Some of our customers have reported a crash problem when trying to load
-the XDP program on machines with a large number of CPU cores. After
-extensive debugging, it became clear that the root cause of the problem
-lies in the Tx scheduler implementation, which does not seem to be able
-to handle the creation of a large number of Tx queues (even though this
-number does not exceed the number of available queues reported by the
-FW).
-This series addresses this problem.
+The previous implementation had a bug that not all changes made by the
+XDP callback were rolled back. This caused the crash with the following
+call trace:
 
-First of all, the XDP callback should not crash even if the Tx scheduler
-returns an error, so Patch #1 fixes this error handling and makes the
-XDP callback fail gracefully.
-Patch #2 fixes the problem where the Tx scheduler tries to create too
-many nodes even though some of them have already been added to the
-scheduler tree.
-Finally, Patch #3 implements an improvement to the Tx scheduler tree
-rebuild algorithm to add another VSI support node if it is necessary to
-support all requested Tx rings.
+[  +9.549584] ice 0000:ca:00.0: Failed VSI LAN queue config for XDP, error: -5
+[  +0.382335] Oops: general protection fault, probably for non-canonical address 0x50a2250a90495525: 0000 [#1] SMP NOPTI
+[  +0.010710] CPU: 103 UID: 0 PID: 0 Comm: swapper/103 Not tainted 6.14.0-net-next-mar-31+ #14 PREEMPT(voluntary)
+[  +0.010175] Hardware name: Intel Corporation M50CYP2SBSTD/M50CYP2SBSTD, BIOS SE5C620.86B.01.01.0005.2202160810 02/16/2022
+[  +0.010946] RIP: 0010:__ice_update_sample+0x39/0xe0 [ice]
 
-As testing hints, I include sample failure scenarios below:
-  1) Number of LAN Tx/Rx queue pairs: 128
-     Number of requested XDP queues: >= 321 and <= 640
-     Error message:
-        Failed to set LAN Tx queue context, error: -22
-  2) Number of LAN Tx/Rx queue pairs: 128
-     Number of requested XDP queues: >= 641
-     Error message:
-        Failed VSI LAN queue config for XDP, error: -5
+[...]
 
-Thanks,
-Michal
+[  +0.002715] Call Trace:
+[  +0.002452]  <IRQ>
+[  +0.002021]  ? __die_body.cold+0x19/0x29
+[  +0.003922]  ? die_addr+0x3c/0x60
+[  +0.003319]  ? exc_general_protection+0x17c/0x400
+[  +0.004707]  ? asm_exc_general_protection+0x26/0x30
+[  +0.004879]  ? __ice_update_sample+0x39/0xe0 [ice]
+[  +0.004835]  ice_napi_poll+0x665/0x680 [ice]
+[  +0.004320]  __napi_poll+0x28/0x190
+[  +0.003500]  net_rx_action+0x198/0x360
+[  +0.003752]  ? update_rq_clock+0x39/0x220
+[  +0.004013]  handle_softirqs+0xf1/0x340
+[  +0.003840]  ? sched_clock_cpu+0xf/0x1f0
+[  +0.003925]  __irq_exit_rcu+0xc2/0xe0
+[  +0.003665]  common_interrupt+0x85/0xa0
+[  +0.003839]  </IRQ>
+[  +0.002098]  <TASK>
+[  +0.002106]  asm_common_interrupt+0x26/0x40
+[  +0.004184] RIP: 0010:cpuidle_enter_state+0xd3/0x690
 
+Fix this by performing the missing unmapping of XDP queues from
+q_vectors and setting the XDP rings pointer back to NULL after all those
+queues are released.
+Also, add an immediate exit from the XDP callback in case of ring
+preparation failure.
+
+Fixes: efc2214b6047 ("ice: Add support for XDP")
+Reviewed-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 ---
+ drivers/net/ethernet/intel/ice/ice_main.c | 47 ++++++++++++++++-------
+ 1 file changed, 33 insertions(+), 14 deletions(-)
 
-v3:
-  - do not reset the children counter during removing the VSI support
-    node in the patch #3 (Przemek),
-  - fix the kdoc comment for the newly added `ice_sched_rm_vsi_subtree()`
-    helper functions in the patch #3.
-
-v2:
-  - fix the bug while the `ethtool -L` command did not work while
-    the XDP program was running (Jesse),
-  - in the patch #3, add a missing extension for `ice_sched_rm_vsi_cfg()`
-    to  remove all VSI support nodes (including extra ones),
-    associated with a given VSI (to fix the root cause of the problem
-    mentioned above).
-  - add a corresponding description to the commit message of
-    the patch #3.
-
-v2: https://lore.kernel.org/netdev/20250509094233.197245-1-michal.kubiak@intel.com/
-v1: https://lore.kernel.org/netdev/20250422153659.284868-1-michal.kubiak@intel.com/
-
-Michal Kubiak (3):
-  ice: fix Tx scheduler error handling in XDP callback
-  ice: create new Tx scheduler nodes for new queues only
-  ice: fix rebuilding the Tx scheduler tree for large queue counts
-
- drivers/net/ethernet/intel/ice/ice_main.c  |  47 ++++--
- drivers/net/ethernet/intel/ice/ice_sched.c | 181 +++++++++++++++++----
- 2 files changed, 181 insertions(+), 47 deletions(-)
-
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 8119913b5f69..34df104ac567 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -2740,6 +2740,27 @@ void ice_map_xdp_rings(struct ice_vsi *vsi)
+ 	}
+ }
+ 
++/**
++ * ice_unmap_xdp_rings - Unmap XDP rings from interrupt vectors
++ * @vsi: the VSI with XDP rings being unmapped
++ */
++static void ice_unmap_xdp_rings(struct ice_vsi *vsi)
++{
++	int v_idx;
++
++	ice_for_each_q_vector(vsi, v_idx) {
++		struct ice_q_vector *q_vector = vsi->q_vectors[v_idx];
++		struct ice_tx_ring *ring;
++
++		ice_for_each_tx_ring(ring, q_vector->tx)
++			if (!ring->tx_buf || !ice_ring_is_xdp(ring))
++				break;
++
++		/* restore the value of last node prior to XDP setup */
++		q_vector->tx.tx_ring = ring;
++	}
++}
++
+ /**
+  * ice_prepare_xdp_rings - Allocate, configure and setup Tx rings for XDP
+  * @vsi: VSI to bring up Tx rings used by XDP
+@@ -2803,7 +2824,7 @@ int ice_prepare_xdp_rings(struct ice_vsi *vsi, struct bpf_prog *prog,
+ 	if (status) {
+ 		dev_err(dev, "Failed VSI LAN queue config for XDP, error: %d\n",
+ 			status);
+-		goto clear_xdp_rings;
++		goto unmap_xdp_rings;
+ 	}
+ 
+ 	/* assign the prog only when it's not already present on VSI;
+@@ -2819,6 +2840,8 @@ int ice_prepare_xdp_rings(struct ice_vsi *vsi, struct bpf_prog *prog,
+ 		ice_vsi_assign_bpf_prog(vsi, prog);
+ 
+ 	return 0;
++unmap_xdp_rings:
++	ice_unmap_xdp_rings(vsi);
+ clear_xdp_rings:
+ 	ice_for_each_xdp_txq(vsi, i)
+ 		if (vsi->xdp_rings[i]) {
+@@ -2835,6 +2858,8 @@ int ice_prepare_xdp_rings(struct ice_vsi *vsi, struct bpf_prog *prog,
+ 	mutex_unlock(&pf->avail_q_mutex);
+ 
+ 	devm_kfree(dev, vsi->xdp_rings);
++	vsi->xdp_rings = NULL;
++
+ 	return -ENOMEM;
+ }
+ 
+@@ -2850,7 +2875,7 @@ int ice_destroy_xdp_rings(struct ice_vsi *vsi, enum ice_xdp_cfg cfg_type)
+ {
+ 	u16 max_txqs[ICE_MAX_TRAFFIC_CLASS] = { 0 };
+ 	struct ice_pf *pf = vsi->back;
+-	int i, v_idx;
++	int i;
+ 
+ 	/* q_vectors are freed in reset path so there's no point in detaching
+ 	 * rings
+@@ -2858,17 +2883,7 @@ int ice_destroy_xdp_rings(struct ice_vsi *vsi, enum ice_xdp_cfg cfg_type)
+ 	if (cfg_type == ICE_XDP_CFG_PART)
+ 		goto free_qmap;
+ 
+-	ice_for_each_q_vector(vsi, v_idx) {
+-		struct ice_q_vector *q_vector = vsi->q_vectors[v_idx];
+-		struct ice_tx_ring *ring;
+-
+-		ice_for_each_tx_ring(ring, q_vector->tx)
+-			if (!ring->tx_buf || !ice_ring_is_xdp(ring))
+-				break;
+-
+-		/* restore the value of last node prior to XDP setup */
+-		q_vector->tx.tx_ring = ring;
+-	}
++	ice_unmap_xdp_rings(vsi);
+ 
+ free_qmap:
+ 	mutex_lock(&pf->avail_q_mutex);
+@@ -3013,11 +3028,14 @@ ice_xdp_setup_prog(struct ice_vsi *vsi, struct bpf_prog *prog,
+ 		xdp_ring_err = ice_vsi_determine_xdp_res(vsi);
+ 		if (xdp_ring_err) {
+ 			NL_SET_ERR_MSG_MOD(extack, "Not enough Tx resources for XDP");
++			goto resume_if;
+ 		} else {
+ 			xdp_ring_err = ice_prepare_xdp_rings(vsi, prog,
+ 							     ICE_XDP_CFG_FULL);
+-			if (xdp_ring_err)
++			if (xdp_ring_err) {
+ 				NL_SET_ERR_MSG_MOD(extack, "Setting up XDP Tx resources failed");
++				goto resume_if;
++			}
+ 		}
+ 		xdp_features_set_redirect_target(vsi->netdev, true);
+ 		/* reallocate Rx queues that are used for zero-copy */
+@@ -3035,6 +3053,7 @@ ice_xdp_setup_prog(struct ice_vsi *vsi, struct bpf_prog *prog,
+ 			NL_SET_ERR_MSG_MOD(extack, "Freeing XDP Rx resources failed");
+ 	}
+ 
++resume_if:
+ 	if (if_running)
+ 		ret = ice_up(vsi);
+ 
 -- 
 2.45.2
 
