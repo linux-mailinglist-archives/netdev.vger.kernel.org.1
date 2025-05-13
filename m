@@ -1,117 +1,158 @@
-Return-Path: <netdev+bounces-190146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 105B2AB54A7
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 14:25:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A345AB54A9
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 14:25:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DECBA467C4F
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 12:25:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A74D44A038C
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 12:25:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B361D28D8EE;
-	Tue, 13 May 2025 12:24:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC27328DB5F;
+	Tue, 13 May 2025 12:25:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="mjEXS3eT"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="IHJkIko3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m49198.qiye.163.com (mail-m49198.qiye.163.com [45.254.49.198])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43ED228DF17;
-	Tue, 13 May 2025 12:24:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB0A128D8EE;
+	Tue, 13 May 2025 12:25:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747139096; cv=none; b=fnTbEMZG5xLQEyneyZUdXTuJh583KL3tjGDx1U0tm0U+YwIr9IKwaRFKM+moZzcPRMekWFKldwqcslz2jCuO/UuLzSQVIjh1WDrjwwS9Hj1pCgW6s2FSMq3mraFpeoCmeGb7ZtHDZR1ZhfM78AK8kAfwqPWrm54FWxBhYfATn9I=
+	t=1747139131; cv=none; b=IZzdzu9VdinRQUJqXY6GMhlAHbCf4ijoxUrqcSrm/TLpZZwbyZB3MSJyWMXWoK568mNi9QtKO57YPK1Z7DtN+yQxe2AFzTriw4k4g9J1F24EIdeJttgZnB1DnBx0JRdnF1/MrKsHEVfytNDrIxw9JA9qg4HEkePltISwzecNAdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747139096; c=relaxed/simple;
-	bh=FOMStABYI0X0GQeb9jgruByJBKPN5L8Kc6YrlUSIUdo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tDHf5RYuHXiB4jBLXyp5jY+3p+OjhxSfgOHe+yes3iAABrLcbN62DcZHJ+AQXRgL7n8Czm8GPkElZhdTVE8tf9oAJBKJw7k0ZZnl/RVBzhzgVGn/MlPmY0aFSDukWBsNy0G+b75gKu6uOYZnOIrHbqHL3nQjitvk7AG6kE0VlwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=mjEXS3eT; arc=none smtp.client-ip=45.254.49.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
-Received: from localhost.localdomain (unknown [202.119.23.198])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 14e302593;
-	Tue, 13 May 2025 20:24:42 +0800 (GMT+08:00)
-From: Zilin Guan <zilin@seu.edu.cn>
-To: dawid.osuchowski@linux.intel.com
-Cc: andrew+netdev@lunn.ch,
-	anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	intel-wired-lan@lists.osuosl.org,
-	jianhao.xu@seu.edu.cn,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	przemyslaw.kitszel@intel.com,
-	zilin@seu.edu.cn
-Subject: Re: [PATCH] ixgbe/ipsec: use memzero_explicit() for stack SA structs
-Date: Tue, 13 May 2025 12:24:41 +0000
-Message-Id: <20250513122441.4065314-1-zilin@seu.edu.cn>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <170f287e-23b1-468b-9b59-08680de1ecf1@linux.intel.com>
-References: <170f287e-23b1-468b-9b59-08680de1ecf1@linux.intel.com>
+	s=arc-20240116; t=1747139131; c=relaxed/simple;
+	bh=nBwuhlStxBwkCxyJkMnugFYKNeLjwc5gQBpatTNN0K8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qBcICoCSlclJ30jSITWlWKIHOcQJbgjtQpS6XiGTKSGlUX/6vHD7083QjSZWxDTkrVanEXgg54xfST3p2T76qOhMYrLwEgJ2n9PSKrtsu2QS14ZU64E0Ah9r17hdgVzgAezrlkL8SfvWduecXU7mDPZy1zRpwBKWnaM0pyreXnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=IHJkIko3; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id A251D1FCF1;
+	Tue, 13 May 2025 12:25:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1747139126;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=O62I4pFc3JnVqx9L8an5wgvbSqIo9PimfybTZS4SMIw=;
+	b=IHJkIko3+qalmEz8B4hLfVjusGl44dZ59bGzjjqjVhrQFXY+txhj9bLFMSXaze5sw2eK5h
+	NBLMAsLniDK/yGv+bi5y1aE05NqCF22O07Uu++x1HspcYgAZD952b/uQH1LbiYDe1QnkN+
+	5XSx5EdkpI5TtUIKj+qZcVPnMEE1kFkTosjy/gNKQKT9gNq/wj7ZqO3ma3VLc+p3y6sfjC
+	+6ZF0SAAZ6xodv9wx5RvtLY7lVqtFmcxp1HDq0EKo/uQNi8usMAo8FnnOlXgucYM5xYQKn
+	AK31XYK5/Xz8j459TG6lPe0OKr2ZEGpa52c4ZG0wG7mOgahF3Rmmhdc8VuceyA==
+From: Romain Gantois <romain.gantois@bootlin.com>
+To: davem@davemloft.net, Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ linux-arm-kernel@lists.infradead.org,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>,
+ Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?B?Tmljb2zDsg==?= Veronese <nicveronese@gmail.com>,
+ Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+ Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
+ Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Rob Herring <robh@kernel.org>, Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Subject:
+ Re: [PATCH net-next v6 05/14] net: phy: Create a phy_port for PHY-driven SFPs
+Date: Tue, 13 May 2025 14:25:18 +0200
+Message-ID: <5411380.WoAhosY9oF@fw-rgant>
+In-Reply-To: <20250507135331.76021-6-maxime.chevallier@bootlin.com>
+References:
+ <20250507135331.76021-1-maxime.chevallier@bootlin.com>
+ <20250507135331.76021-6-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVlCSx5PVklDSEoaT05MSENMHlYeHw5VEwETFhoSFy
-	QUDg9ZV1kYEgtZQVlJS0lVSkpCVUlIVUpCQ1lXWRYaDxIVHRRZQVlPS0hVSktJQkxNTFVKS0tVS1
-	kG
-X-HM-Tid: 0a96c99ab94303a1kunm14e302593
-X-HM-MType: 10
-X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6ODY6SCo4AjE0NjoKPygULDEB
-	GhlPCxdVSlVKTE9MSkhCS0NITU5PVTMWGhIXVQESFxIVOwgeDlUeHw5VGBVFWVdZEgtZQVlJS0lV
-	SkpCVUlIVUpCQ1lXWQgBWUFJSE5NNwY+
-DKIM-Signature:a=rsa-sha256;
-	b=mjEXS3eTpXS+FDtgFSehxjOzXHe3QpO1wPmQbjgdlqYXAgB+cDCIENq9X4jYKK5VbN44pdMbV2TpRcLHMmnylKvRAkxrllmuj7nD5djWfCdFm/juAZQPW33OtTkAue0TPhCymzpFFChWcDEFwScErynzIv6GWxiwnBn4dd8UdUA=; c=relaxed/relaxed; s=default; d=seu.edu.cn; v=1;
-	bh=6tUASdzJci1Yz0hXdfUtvYYXTCY4KP/E4lVG3TUYqMA=;
-	h=date:mime-version:subject:message-id:from;
+Content-Type: multipart/signed; boundary="nextPart4316204.q3hVSFHU5c";
+ micalg="pgp-sha256"; protocol="application/pgp-signature"
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeftdeguddtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkfgjfhggtgesghdtreertddtjeenucfhrhhomheptfhomhgrihhnucfirghnthhoihhsuceorhhomhgrihhnrdhgrghnthhoihhssegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefhvdelkeevgfeijedtudeiheefffejhfelgeduuefhleetudeiudektdeiheelgfenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepfhifqdhrghgrnhhtrdhlohgtrghlnhgvthdpmhgrihhlfhhrohhmpehrohhmrghinhdrghgrnhhtohhishessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepfedtpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrk
+ hgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqrghrmhdqmhhsmhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehthhhomhgrshdrphgvthgriiiiohhnihessghoohhtlhhinhdrtghomhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
+X-GND-Sasl: romain.gantois@bootlin.com
 
-On Mon, May 12, 2025 at 02:53:12PM+0200, Dawid Osuchowski wrote:
-> Thanks for your patch.
-> 
-> Please use the correct target iwl-net for fixes, iwl-next for features 
-> and others.
-> 
-> Maybe add a tag? Fixes: 63a67fe229ea ("ixgbe: add ipsec offload add and 
-> remove SA")
-> 
-> In the future when sending patches against Intel networking drivers 
-> please send them directly To: intel-wired-lan@lists.osuosl.org and Cc: 
-> netdev@vger.kernel.org.
-> 
-OK, I will resend the patch to the iwl-net branch and include the Fixes 
-tag. Before I do that, I noticed that in ixgbe_ipsec_add_sa() we clear 
-the Tx SA struct with memset 0 on key-parsing failure but do not clear 
-the Rx SA struct in the corresponding error path:
+--nextPart4316204.q3hVSFHU5c
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
+From: Romain Gantois <romain.gantois@bootlin.com>
+Date: Tue, 13 May 2025 14:25:18 +0200
+Message-ID: <5411380.WoAhosY9oF@fw-rgant>
+In-Reply-To: <20250507135331.76021-6-maxime.chevallier@bootlin.com>
+MIME-Version: 1.0
 
-617     /* get the key and salt */
-618     ret = ixgbe_ipsec_parse_proto_keys(xs, rsa.key, &rsa.salt);
-619     if (ret) {
-620         NL_SET_ERR_MSG_MOD(extack,
-                              "Failed to get key data for Rx SA table");
-621         return ret;      /* <- no memzero_explicit() here */
-622     }
+Hi Maxime,
+
+On Wednesday, 7 May 2025 15:53:21 CEST Maxime Chevallier wrote:
+> Some PHY devices may be used as media-converters to drive SFP ports (for
+> example, to allow using SFP when the SoC can only output RGMII). This is
+> already supported to some extend by allowing PHY drivers to registers
+> themselves as being SFP upstream.
+> 
 ...
-728     if (ret) {
-729         NL_SET_ERR_MSG_MOD(extack,
-                              "Failed to get key data for Tx SA table");
-730         memset(&tsa, 0, sizeof(tsa));
-731         return ret;      /* <- clears tsa on error */
-732     }
+>   *
+> @@ -149,6 +151,21 @@ void phy_port_update_supported(struct phy_port *port)
+>  		ethtool_medium_get_supported(supported, i, port->lanes);
+>  		linkmode_or(port->supported, port->supported, supported);
+>  	}
+> +
+> +	/* Serdes ports supported may through SFP may not have any medium set,
+> +	 * as they will output PHY_INTERFACE_MODE_XXX modes. In that case, 
+derive
+> +	 * the supported list based on these interfaces
+> +	 */
+> +	if (port->is_serdes && linkmode_empty(supported)) {
 
-Both paths return immediately on key-parsing failure, should I add a 
-memzero_explicit(&rsa, sizeof(rsa)) before Rx-SA's return or remove the 
-memset(&tsa, ...) in the Tx-SA path to keep them consistent?
+The "supported" bitmap needs to be zeroed out before this check. If the port 
+has no mediums, then the bitmap won't be initialized at this point.
 
-Best Regards,
-Zilin Guan
+Thanks,
+
+-- 
+Romain Gantois, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
+--nextPart4316204.q3hVSFHU5c
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEYFZBShRwOvLlRRy+3R9U/FLj284FAmgjOi4ACgkQ3R9U/FLj
+287DUhAAngbhJUwLCvBnV5PWgoxzylrH4wZtZlKTuz1naWUfoB3fHZM+QTzrNVsB
+0+/GfPFTYYVb/3zeAbvC13AGxQIgZzCA/Xcmw4kDgzNV49gmyoGrxCkgug1BhMmS
+EXMueGmXF7bFuJ4L54czImHNdOa7olxl0F+v1XiSy46wmjD+39CDaEJhcby+hdC/
+LtzODlMPJiYd3nXRda64cERU+maoEHWw3ISNuoyv0uYFle9svUK/XJnLYHMzbSKS
+O69wa+Q1ESB8z3hNEI1gJn7QKleb01DIqY90pK91O2Lc5D9ZZSsBR50wxRW16lzd
+4tRHtX1r32BhS5A2YqrT3UsVQhh4gegJqqSnRBnNVp7+1FNWKS7d/1Y8kpehPxVC
+3JBoEK87/ULYiWYXpSbd/ZO0Wb+HwQIW+rY3YhyaGJIPNY6xZt+EcY+h0H5jmhM7
+Lcv+48vReuIOkgiQOWEmeCKCpWG818kQXuXGjNy4gh7eSTYVD3g603tLfGJUczT3
+B9cBN83/o72XNqJqjLUSbYWRx02/8teT7uje1lydlnHwApD6bEXVr3xv8vNOxcgo
+bCqgZQpnFbLu/auEs/8j1Wgn4Ajc98CYnu7s8+gtBr+rfFkiMh3IPc7RLklDiG/e
+DGI0Q5r4LD4dN/nsA5bSg5mpu3llpwS63eb59BQNueO6hiWpX9k=
+=Wa24
+-----END PGP SIGNATURE-----
+
+--nextPart4316204.q3hVSFHU5c--
+
+
+
 
