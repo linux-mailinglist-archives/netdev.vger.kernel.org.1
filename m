@@ -1,266 +1,181 @@
-Return-Path: <netdev+bounces-189974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-189975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68F0DAB4A97
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 06:37:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDD02AB4AAF
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 07:02:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B02C53BC650
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 04:37:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3D6AA7A9FF0
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 05:01:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F32C1C84AF;
-	Tue, 13 May 2025 04:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F143191F92;
+	Tue, 13 May 2025 05:02:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fp8AkG64"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78975645
-	for <netdev@vger.kernel.org>; Tue, 13 May 2025 04:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10AFA189BB5
+	for <netdev@vger.kernel.org>; Tue, 13 May 2025 05:02:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747111055; cv=none; b=Rw1zjr04/sTraRmZ5ItQuvH7/IzVUth2rgYowi5oYEqayj8eNTnItFMdl2wswwBotrRV7PZxjEu7WOqZYMPbiALaqr43Q7urewD2lTl8/YtczdnYwetrE4syn2goC6IU5OjO5kkfC7c6aXBrMi+gL4tkNqaNnKHUa1p4TGj79n4=
+	t=1747112569; cv=none; b=t2P69yTER0IIBnyKpW/JtzAp/aS43/eRot+VmUmizo3IErTUbXQyztnvboh+iXHvuwE6uYLEosfwYiHyvBAh1kj5mcKYNfj9Stbp0pdncJ7tZj0slFAH7DuwMxsIcWjjA9POyiv383FrVBNGn3Uo6wTNaabZyMFsW42ZKHpTS3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747111055; c=relaxed/simple;
-	bh=QKhxlMJf9DwcDasJT9MxJxi2H37PpU+ef3sypRqtMlM=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=R9/8gjS3PE6T3qzosKlyb3uZX+8QyGRG4chGqZXLreNVNCU9Qn6R2SQgasMQdp3dSJv5+1zw5/U8mlErRxa4N7JFLLjOruvvKDY9yVg9zizRSHKpSWs1cVJm8yOlla3nHmDUq/6GxsK67OHlg7dZsg4ysAVbi0JduvpB8flcQW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-85b3b781313so991674039f.1
-        for <netdev@vger.kernel.org>; Mon, 12 May 2025 21:37:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747111052; x=1747715852;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HerpZjjRvJPDZiVjyr+jH4mDrVVxRA8dJ6nQxvYN7yQ=;
-        b=QdPo2J1jH/aK8uBBX3NwNJzG1jiq8oaaLo7A3vKZ6In2MXE8YnkdukO1OLwYGFxNHY
-         k0/Y2+FCc4b/7sIwHbD+tmi84ilFQIgjSvpbzimx2cLlFVfScgLi6KRCEHTckSjbhYoI
-         rDmYg4Rd95m7eYACdL7hXJn9/cQKzz2NFJPUBx0n9iCshH/XfPw0pZ9U4w62W2lvvm9i
-         TdqPYKf6D1KJ2RIyZMiQ0xJ+IDDcvuq7AbsGicZy909e42LE0IlDB+oMl7FZznjBJo30
-         DXWVKpwjgubKPfDAEuS4XtEn49X58/ET2ETQf7U2TIyGfqvKlpHGy+cNhCo0+F898M6q
-         ASbA==
-X-Forwarded-Encrypted: i=1; AJvYcCWpiZD0t6hX2HR8vxfRcA4evR/bYO2hw7bXxnHR6mVPTgpz1tOpK4qG6fAPz+JXlC2EaIhuqE0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYnyDnhTYk8KgTsHin11XczXEOMyBsgmxO/1rnOtpCS/79tV1u
-	wSocpNW1iQIESzTp8XdeBn1FK5AsI5t76ySJyzLpSw1FjyUHtApK6JWcz4sy7mYFKZHDBdWGAXU
-	wTrt6jpExxNIrMRtO7KigjTMYoG/GZf4LaqcewXYZXsXDvqb/nL3Gjlg=
-X-Google-Smtp-Source: AGHT+IF4tMY+pPPj6hdS7OW+dMmVK6vEG6jfSwPOLSBcQ3udOfnpkmA8nbX+dGOeGEv0p/v5mup1L6s21CbnZQZEymE3icvtBWWE
+	s=arc-20240116; t=1747112569; c=relaxed/simple;
+	bh=QhfdHglahO7Ldn9Bfy+sJlCgnMlTEKh9gtHdFV3Pmgs=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=CSTKBznRdlQUY6PTze7w5GmtR93pV5LsmhKKaA7K17mdPkpF3bcHuZA+pHJz/Ei5aMJvbKjOd4mHxia39LquPTxDSybfsgE3XtPYXYsltLR6/WMMaHeYJs7Kip5J0FoXh5Uj2p8bxisxoh/q2O9lXkxsUMDeIJFkNwxw3PRHX9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fp8AkG64; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77A24C4CEE4
+	for <netdev@vger.kernel.org>; Tue, 13 May 2025 05:02:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747112568;
+	bh=QhfdHglahO7Ldn9Bfy+sJlCgnMlTEKh9gtHdFV3Pmgs=;
+	h=From:To:Subject:Date:From;
+	b=fp8AkG64BMGsuqfthFHv5C6fptp5pwbiLkrzr0XED4WeiZn5K73xVlHPacaSSk5xk
+	 7JjnWIoub2izxXImIlouTq8moyU5KivYKFymSJ+ZSPg94S02Pqa8YRr1pC+g4vrAYe
+	 aHuJyFOYu0j9vB6UME0eXS9eEYD8T4XBAFhZ/9eA2oI0XyHYTq2yJ1rU6V6K1+0DzK
+	 w8Bu8EmS1yN1m0kgM8nStJcxdBJSN0sYaITbriziZiJwvMA4YTHx1UXOm9QgqRajgK
+	 9qOT5aKlVINAy7NFiEmJTKuvA8PnuC3gECyE05UQBPIGyvmCcQS1DuRQjk5sY4BWf7
+	 liw+5Ii7zH1Tw==
+From: Eric Biggers <ebiggers@kernel.org>
+To: netdev@vger.kernel.org
+Subject: [PATCH net-next] net: apple: bmac: use crc32() instead of hand-rolled equivalent
+Date: Mon, 12 May 2025 22:01:42 -0700
+Message-ID: <20250513050142.635391-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:218a:b0:3d8:20f0:4006 with SMTP id
- e9e14a558f8ab-3da7e1e60a7mr156472475ab.4.1747111041909; Mon, 12 May 2025
- 21:37:21 -0700 (PDT)
-Date: Mon, 12 May 2025 21:37:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6822cc81.050a0220.f2294.00e8.GAE@google.com>
-Subject: [syzbot] [net?] BUG: sleeping function called from invalid context in dev_set_promiscuity
-From: syzbot <syzbot+53485086a41dbb43270a@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+From: Eric Biggers <ebiggers@google.com>
 
-syzbot found the following issue on:
+The calculation done by bmac_crc(addr) followed by taking the low 6 bits
+and reversing them is equivalent to taking the high 6 bits from
+crc32(~0, addr, ETH_ALEN).  Just do that instead.
 
-HEAD commit:    82f2b0b97b36 Linux 6.15-rc6
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=173c62f4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=1e4dff0626333635
-dashboard link: https://syzkaller.appspot.com/bug?extid=53485086a41dbb43270a
-compiler:       Debian clang version 20.1.2 (++20250402124445+58df0ef89dd6-1~exp1~20250402004600.97), Debian LLD 20.1.2
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/900b6a747850/disk-82f2b0b9.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/1d41ddb74da5/vmlinux-82f2b0b9.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/eb555785f64f/bzImage-82f2b0b9.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+53485086a41dbb43270a@syzkaller.appspotmail.com
-
-team0 (unregistering): left promiscuous mode
-team_slave_0: left promiscuous mode
-team_slave_1: left promiscuous mode
-bond0: left promiscuous mode
-bond_slave_0: left promiscuous mode
-bond_slave_1: left promiscuous mode
-BUG: sleeping function called from invalid context at kernel/locking/mutex.c:578
-in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 14644, name: syz.2.10383
-preempt_count: 0, expected: 0
-RCU nest depth: 1, expected: 0
-2 locks held by syz.2.10383/14644:
- #0: ffffffff8f2f6d08 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
- #0: ffffffff8f2f6d08 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_net_lock include/linux/rtnetlink.h:130 [inline]
- #0: ffffffff8f2f6d08 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_dellink+0x331/0x710 net/core/rtnetlink.c:3556
- #1: ffffffff8df3d860 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
- #1: ffffffff8df3d860 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
- #1: ffffffff8df3d860 (rcu_read_lock){....}-{1:3}, at: team_change_rx_flags+0x29/0x330 drivers/net/team/team_core.c:1781
-CPU: 1 UID: 0 PID: 14644 Comm: syz.2.10383 Not tainted 6.15.0-rc6-syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- __might_resched+0x495/0x610 kernel/sched/core.c:8818
- __mutex_lock_common kernel/locking/mutex.c:578 [inline]
- __mutex_lock+0x106/0xe80 kernel/locking/mutex.c:746
- netdev_lock include/linux/netdevice.h:2751 [inline]
- netdev_lock_ops include/net/netdev_lock.h:42 [inline]
- dev_set_promiscuity+0x10e/0x260 net/core/dev_api.c:285
- bond_set_promiscuity drivers/net/bonding/bond_main.c:922 [inline]
- bond_change_rx_flags+0x219/0x690 drivers/net/bonding/bond_main.c:4732
- dev_change_rx_flags net/core/dev.c:9145 [inline]
- __dev_set_promiscuity+0x3f5/0x590 net/core/dev.c:9189
- netif_set_promiscuity+0x50/0xe0 net/core/dev.c:9201
- dev_set_promiscuity+0x126/0x260 net/core/dev_api.c:286
- team_change_rx_flags+0x1b3/0x330 drivers/net/team/team_core.c:1785
- dev_change_rx_flags net/core/dev.c:9145 [inline]
- __dev_set_promiscuity+0x3f5/0x590 net/core/dev.c:9189
- netif_set_promiscuity+0x50/0xe0 net/core/dev.c:9201
- dev_set_promiscuity+0x126/0x260 net/core/dev_api.c:286
- hsr_del_port+0x25e/0x2d0 net/hsr/hsr_slave.c:233
- hsr_netdev_notify+0x827/0xb60 net/hsr/hsr_main.c:104
- notifier_call_chain+0x1b3/0x3e0 kernel/notifier.c:85
- call_netdevice_notifiers_extack net/core/dev.c:2214 [inline]
- call_netdevice_notifiers net/core/dev.c:2228 [inline]
- unregister_netdevice_many_notify+0x15d8/0x2330 net/core/dev.c:11970
- rtnl_delete_link net/core/rtnetlink.c:3522 [inline]
- rtnl_dellink+0x488/0x710 net/core/rtnetlink.c:3564
- rtnetlink_rcv_msg+0x7cc/0xb70 net/core/rtnetlink.c:6955
- netlink_rcv_skb+0x219/0x490 net/netlink/af_netlink.c:2534
- netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
- netlink_unicast+0x758/0x8d0 net/netlink/af_netlink.c:1339
- netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1883
- sock_sendmsg_nosec net/socket.c:712 [inline]
- __sock_sendmsg+0x219/0x270 net/socket.c:727
- ____sys_sendmsg+0x505/0x830 net/socket.c:2566
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
- __sys_sendmsg net/socket.c:2652 [inline]
- __do_sys_sendmsg net/socket.c:2657 [inline]
- __se_sys_sendmsg net/socket.c:2655 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2655
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xf6/0x210 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f8a8538e969
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f8a8298f038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f8a855b6320 RCX: 00007f8a8538e969
-RDX: 0000000000000000 RSI: 0000200000000200 RDI: 0000000000000008
-RBP: 00007f8a85410ab1 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000001 R14: 00007f8a855b6320 R15: 00007f8a856dfa28
- </TASK>
-
-=============================
-[ BUG: Invalid wait context ]
-6.15.0-rc6-syzkaller #0 Tainted: G        W          
------------------------------
-syz.2.10383/14644 is trying to lock:
-ffff88805b68cd30 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2751 [inline]
-ffff88805b68cd30 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: netdev_lock_ops include/net/netdev_lock.h:42 [inline]
-ffff88805b68cd30 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: dev_set_promiscuity+0x10e/0x260 net/core/dev_api.c:285
-other info that might help us debug this:
-context-{5:5}
-2 locks held by syz.2.10383/14644:
- #0: ffffffff8f2f6d08 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
- #0: ffffffff8f2f6d08 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_net_lock include/linux/rtnetlink.h:130 [inline]
- #0: ffffffff8f2f6d08 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_dellink+0x331/0x710 net/core/rtnetlink.c:3556
- #1: ffffffff8df3d860 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
- #1: ffffffff8df3d860 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
- #1: ffffffff8df3d860 (rcu_read_lock){....}-{1:3}, at: team_change_rx_flags+0x29/0x330 drivers/net/team/team_core.c:1781
-stack backtrace:
-CPU: 1 UID: 0 PID: 14644 Comm: syz.2.10383 Tainted: G        W           6.15.0-rc6-syzkaller #0 PREEMPT(full) 
-Tainted: [W]=WARN
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- print_lock_invalid_wait_context kernel/locking/lockdep.c:4831 [inline]
- check_wait_context kernel/locking/lockdep.c:4903 [inline]
- __lock_acquire+0xbcf/0xd20 kernel/locking/lockdep.c:5185
- lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5866
- __mutex_lock_common kernel/locking/mutex.c:601 [inline]
- __mutex_lock+0x182/0xe80 kernel/locking/mutex.c:746
- netdev_lock include/linux/netdevice.h:2751 [inline]
- netdev_lock_ops include/net/netdev_lock.h:42 [inline]
- dev_set_promiscuity+0x10e/0x260 net/core/dev_api.c:285
- bond_set_promiscuity drivers/net/bonding/bond_main.c:922 [inline]
- bond_change_rx_flags+0x219/0x690 drivers/net/bonding/bond_main.c:4732
- dev_change_rx_flags net/core/dev.c:9145 [inline]
- __dev_set_promiscuity+0x3f5/0x590 net/core/dev.c:9189
- netif_set_promiscuity+0x50/0xe0 net/core/dev.c:9201
- dev_set_promiscuity+0x126/0x260 net/core/dev_api.c:286
- team_change_rx_flags+0x1b3/0x330 drivers/net/team/team_core.c:1785
- dev_change_rx_flags net/core/dev.c:9145 [inline]
- __dev_set_promiscuity+0x3f5/0x590 net/core/dev.c:9189
- netif_set_promiscuity+0x50/0xe0 net/core/dev.c:9201
- dev_set_promiscuity+0x126/0x260 net/core/dev_api.c:286
- hsr_del_port+0x25e/0x2d0 net/hsr/hsr_slave.c:233
- hsr_netdev_notify+0x827/0xb60 net/hsr/hsr_main.c:104
- notifier_call_chain+0x1b3/0x3e0 kernel/notifier.c:85
- call_netdevice_notifiers_extack net/core/dev.c:2214 [inline]
- call_netdevice_notifiers net/core/dev.c:2228 [inline]
- unregister_netdevice_many_notify+0x15d8/0x2330 net/core/dev.c:11970
- rtnl_delete_link net/core/rtnetlink.c:3522 [inline]
- rtnl_dellink+0x488/0x710 net/core/rtnetlink.c:3564
- rtnetlink_rcv_msg+0x7cc/0xb70 net/core/rtnetlink.c:6955
- netlink_rcv_skb+0x219/0x490 net/netlink/af_netlink.c:2534
- netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
- netlink_unicast+0x758/0x8d0 net/netlink/af_netlink.c:1339
- netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1883
- sock_sendmsg_nosec net/socket.c:712 [inline]
- __sock_sendmsg+0x219/0x270 net/socket.c:727
- ____sys_sendmsg+0x505/0x830 net/socket.c:2566
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
- __sys_sendmsg net/socket.c:2652 [inline]
- __do_sys_sendmsg net/socket.c:2657 [inline]
- __se_sys_sendmsg net/socket.c:2655 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2655
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xf6/0x210 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f8a8538e969
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f8a8298f038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f8a855b6320 RCX: 00007f8a8538e969
-RDX: 0000000000000000 RSI: 0000200000000200 RDI: 0000000000000008
-RBP: 00007f8a85410ab1 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000001 R14: 00007f8a855b6320 R15: 00007f8a856dfa28
- </TASK>
-netdevsim netdevsim2 netdevsim0: left promiscuous mode
-team0 (unregistering): Port device team_slave_0 removed
-team0 (unregistering): Port device team_slave_1 removed
-team0 (unregistering): Port device bond0 removed
-
-
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/net/ethernet/apple/bmac.c | 60 ++-----------------------------
+ 1 file changed, 2 insertions(+), 58 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/drivers/net/ethernet/apple/bmac.c b/drivers/net/ethernet/apple/bmac.c
+index b9fdd61f1fdb..b50052c25a91 100644
+--- a/drivers/net/ethernet/apple/bmac.c
++++ b/drivers/net/ethernet/apple/bmac.c
+@@ -18,11 +18,10 @@
+ #include <linux/timer.h>
+ #include <linux/proc_fs.h>
+ #include <linux/init.h>
+ #include <linux/spinlock.h>
+ #include <linux/crc32.h>
+-#include <linux/crc32poly.h>
+ #include <linux/bitrev.h>
+ #include <linux/ethtool.h>
+ #include <linux/slab.h>
+ #include <linux/pgtable.h>
+ #include <asm/dbdma.h>
+@@ -794,63 +793,10 @@ static irqreturn_t bmac_txdma_intr(int irq, void *dev_id)
+ 	bmac_start(dev);
+ 	return IRQ_HANDLED;
+ }
+ 
+ #ifndef SUNHME_MULTICAST
+-/* Real fast bit-reversal algorithm, 6-bit values */
+-static int reverse6[64] = {
+-	0x0,0x20,0x10,0x30,0x8,0x28,0x18,0x38,
+-	0x4,0x24,0x14,0x34,0xc,0x2c,0x1c,0x3c,
+-	0x2,0x22,0x12,0x32,0xa,0x2a,0x1a,0x3a,
+-	0x6,0x26,0x16,0x36,0xe,0x2e,0x1e,0x3e,
+-	0x1,0x21,0x11,0x31,0x9,0x29,0x19,0x39,
+-	0x5,0x25,0x15,0x35,0xd,0x2d,0x1d,0x3d,
+-	0x3,0x23,0x13,0x33,0xb,0x2b,0x1b,0x3b,
+-	0x7,0x27,0x17,0x37,0xf,0x2f,0x1f,0x3f
+-};
+-
+-static unsigned int
+-crc416(unsigned int curval, unsigned short nxtval)
+-{
+-	unsigned int counter, cur = curval, next = nxtval;
+-	int high_crc_set, low_data_set;
+-
+-	/* Swap bytes */
+-	next = ((next & 0x00FF) << 8) | (next >> 8);
+-
+-	/* Compute bit-by-bit */
+-	for (counter = 0; counter < 16; ++counter) {
+-		/* is high CRC bit set? */
+-		if ((cur & 0x80000000) == 0) high_crc_set = 0;
+-		else high_crc_set = 1;
+-
+-		cur = cur << 1;
+-
+-		if ((next & 0x0001) == 0) low_data_set = 0;
+-		else low_data_set = 1;
+-
+-		next = next >> 1;
+-
+-		/* do the XOR */
+-		if (high_crc_set ^ low_data_set) cur = cur ^ CRC32_POLY_BE;
+-	}
+-	return cur;
+-}
+-
+-static unsigned int
+-bmac_crc(unsigned short *address)
+-{
+-	unsigned int newcrc;
+-
+-	XXDEBUG(("bmac_crc: addr=%#04x, %#04x, %#04x\n", *address, address[1], address[2]));
+-	newcrc = crc416(0xffffffff, *address);	/* address bits 47 - 32 */
+-	newcrc = crc416(newcrc, address[1]);	/* address bits 31 - 16 */
+-	newcrc = crc416(newcrc, address[2]);	/* address bits 15 - 0  */
+-
+-	return(newcrc);
+-}
+-
+ /*
+  * Add requested mcast addr to BMac's hash table filter.
+  *
+  */
+ 
+@@ -859,12 +805,11 @@ bmac_addhash(struct bmac_data *bp, unsigned char *addr)
+ {
+ 	unsigned int	 crc;
+ 	unsigned short	 mask;
+ 
+ 	if (!(*addr)) return;
+-	crc = bmac_crc((unsigned short *)addr) & 0x3f; /* Big-endian alert! */
+-	crc = reverse6[crc];	/* Hyperfast bit-reversing algorithm */
++	crc = crc32(~0, addr, ETH_ALEN) >> 26;
+ 	if (bp->hash_use_count[crc]++) return; /* This bit is already set */
+ 	mask = crc % 16;
+ 	mask = (unsigned char)1 << mask;
+ 	bp->hash_use_count[crc/16] |= mask;
+ }
+@@ -874,12 +819,11 @@ bmac_removehash(struct bmac_data *bp, unsigned char *addr)
+ {
+ 	unsigned int crc;
+ 	unsigned char mask;
+ 
+ 	/* Now, delete the address from the filter copy, as indicated */
+-	crc = bmac_crc((unsigned short *)addr) & 0x3f; /* Big-endian alert! */
+-	crc = reverse6[crc];	/* Hyperfast bit-reversing algorithm */
++	crc = crc32(~0, addr, ETH_ALEN) >> 26;
+ 	if (bp->hash_use_count[crc] == 0) return; /* That bit wasn't in use! */
+ 	if (--bp->hash_use_count[crc]) return; /* That bit is still in use */
+ 	mask = crc % 16;
+ 	mask = ((unsigned char)1 << mask) ^ 0xffff; /* To turn off bit */
+ 	bp->hash_table_mask[crc/16] &= mask;
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+base-commit: e39d14a760c039af0653e3df967e7525413924a0
+-- 
+2.49.0
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
