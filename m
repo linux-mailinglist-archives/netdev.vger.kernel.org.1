@@ -1,161 +1,153 @@
-Return-Path: <netdev+bounces-190009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD139AB4E23
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 10:32:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BEAAAB4E55
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 10:43:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D76617E91C
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 08:32:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 212B07A3139
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 08:42:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FC221F8BBD;
-	Tue, 13 May 2025 08:32:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 420C41E1E06;
+	Tue, 13 May 2025 08:43:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="RldO8bwS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WXSSj85Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 625C01F2C44
-	for <netdev@vger.kernel.org>; Tue, 13 May 2025 08:32:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7105F1E9B0B;
+	Tue, 13 May 2025 08:43:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747125146; cv=none; b=g0eDnocByJQOLAgaksH9kinswKtNVP3Y2pzh1A1fOnLjM+MLsxhr7SC12NS1LTxc9civnOsQTDCLj3p23zawk9POtZ1ODSG/ipK9+B+4mwqzdgh2j7yUuFJV/Mi6TMu/7tQiajutE9li9gBVcfDHVVYlQkNuDLTd0JE5pTorDy0=
+	t=1747125810; cv=none; b=Z8OFUDcIQtAWlUyZL7IFuUpSf0g97Xjn/ApQMlCeBTn7lErytoDCF6KuLrus1HnNQjg8mBm4i9vlKvB4oXyJtohme2OOja0bPs+qz0C4vrsBYi7AN4WCP1DcHtChoj94BjDtVoYuJU3pY62B7ZGqelk4REEafGJ9cJKxvzNsM5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747125146; c=relaxed/simple;
-	bh=faFBfjYEq8nob5YC35X7rsulHWjxG0g5WcEMYq45RtQ=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IlvB5z5OodBHpVnHrLnzdfV/OE0gRxO4tJd8cmOTp4CJUdINk8c4Lt5PLXoxMTZhKurECCJRstA+Xzu1nFGck3M29M9bncyX4Z/bUc1iBukLp+VEL5KZciczPG7UacWPKyFelbFbVCRjVSVdOHUJ6R68B5pbvxFP4ry1QPcSJPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=RldO8bwS; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54D8RwKX023877;
-	Tue, 13 May 2025 01:32:15 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=G266QBVu9i2HkTtnGgucaGscd
-	1ZLggN81JADSLgWNKY=; b=RldO8bwSNWQtK+UeazwpzAU4kt8nlFXsKmLwppH8d
-	KUbfoy+N1HWO9UjwGkU1XH9mMRgXrmtCWp2QBytuRw4nn1dfm6fnaLuKb5KL+Bs8
-	xdtw0EP/IMDoWS3WOd6/rH3qUYX+SrEszETE0KsVsphJImHV7M75w8NcHAseQ8ku
-	RkvEUJXS2H2g3x1FFIeSbfF62+onnNaqGWqOmysBVOpp+lIe8RB0JNr5xsaG6qXt
-	UF9nfZmvWXsWTxylP5ClpzEhsxbRQx2G2mChP7OjTYmfJbCy1dJzMjSbkqr3VYgw
-	GDNGmg8Zh/l2zRIqk52xr4dEPmoC1UUVLEL0bqC3P8TDQ==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 46m2kb8087-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 13 May 2025 01:32:14 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Tue, 13 May 2025 01:32:13 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Tue, 13 May 2025 01:32:13 -0700
-Received: from 59cc1f87bccd (HY-LT91368.marvell.com [10.29.24.116])
-	by maili.marvell.com (Postfix) with SMTP id 5EAFA3F7079;
-	Tue, 13 May 2025 01:32:09 -0700 (PDT)
-Date: Tue, 13 May 2025 08:32:07 +0000
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: Simon Horman <horms@kernel.org>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <gakula@marvell.com>,
-        <hkelam@marvell.com>, <sgoutham@marvell.com>, <lcherian@marvell.com>,
-        <bbhushan2@marvell.com>, <jerinj@marvell.com>,
-        <netdev@vger.kernel.org>
-Subject: Re: [net-next v2 PATCH 2/2] octeontx2-pf: macsec: Get MACSEC
- capability flag from AF
-Message-ID: <aCMDhyuY2_B-c0CE@59cc1f87bccd>
-References: <1746969767-13129-1-git-send-email-sbhatta@marvell.com>
- <1746969767-13129-3-git-send-email-sbhatta@marvell.com>
- <20250512163732.GS3339421@horms.kernel.org>
+	s=arc-20240116; t=1747125810; c=relaxed/simple;
+	bh=QjT3YOsUMwygWaYoCbEkSvebHiZ4cTlT+R0vDMfY58s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RUIU8rbqcxuF1feSd4aUdt0GfDXK8AD7cI6XsbOAk4KPfutQA7BV4v1O+kxj5gXK0O08/omkpLAU9AF86BrsVBCfB8jWcScLsZx8rH9JUq/n/s4W7ghcX64nZWElnwSEnEmxvvJs/RZZY+KQ1WcEB1oPvUAezpW9SZZuZQd+G7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WXSSj85Z; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-ad241d7680eso14942266b.3;
+        Tue, 13 May 2025 01:43:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747125807; x=1747730607; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0r9SjPagfNFQkslyQTfGS9Ycm3AlorAARH6C/r+EchE=;
+        b=WXSSj85ZjFYe47O3KMZnEr3YNBpFhCC3p4nbjrRnA5MafbthTig/RLQo4gSe5JJ377
+         stq/u6/ESf4kDvaQfoSuZrAUeVtMVOUjZMcfESV0DIwIWOKe7rbpzT4PzICTXNXv732n
+         i7kmZvSS8mkpFj8amrE1szaXeGAe73TqQjCeQZh2/YcWmMi6maPjpFnnIWmr44Pr5+nn
+         I0ADB2oVd+wLTcVdGJueLfYyTpLEjriUlAdM5TVr8diPMxow4YRh3R9QZpe/eBaG4jcd
+         REZk4bS82b3zKQLHnBJuFxRpHF5GIstJevtlKiFRmsUUKtXqtjs5lf6MYjBu3Ptg6Ssi
+         EDBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747125807; x=1747730607;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0r9SjPagfNFQkslyQTfGS9Ycm3AlorAARH6C/r+EchE=;
+        b=rVj/AD/Gipi0zIgHvXp/VLTSBNxIC6Y7H2o+xY+kxuT4Rta229BywvULL/EnMSH2v9
+         0GixuKIaCWDI1ASXpJRt3uN1T+91aoSkWnh4+Pq5Z8PWGvN0Ucn+mHlh3RlA4I6+vXtS
+         fxFxBWBy1j3WoDRfNPG3sm6X8RVe+W1EWth3QlNKcaUr0IdkD517HIGn7cgDymOuesag
+         gV1lr0ZDcvehUNqmlA/Ble5re286HjZHdFHtmn+xwqrwPKumFPialCK9FznwUASVTAem
+         MJEFhX6YLmNjMdkGiMiqb9NpcqWuzvMs8qNSfS82WfdIxtOeKkUtnMEU9tryYV2C1Cx0
+         2EEg==
+X-Forwarded-Encrypted: i=1; AJvYcCVkWqu1SZr/l5GZ1pdc6sI7IFROvHBSc7ynuTtnTO+lBAXwA5cesJGfUOjlHY+vF0ENSVOsBM0b@vger.kernel.org, AJvYcCW6NhZeNby8b/YaeEmBWiLA2DCLXyy3/xxWtnWAECRBt1DyWCUm62Bb6YMGJwhcYS7eCpn5ayFx8wKk+A4=@vger.kernel.org, AJvYcCXnABmTK0gB8qUg5u6ap90dtfpvvGqDKcZwbG0KJqs4eukXx1+aVYYtJ4C64xjkdviDQa0rLoNZ@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAOWvMO1tiV9Un8YoHBo9+yKHewRQlogNZcZ0QxRQb/eNmI+GZ
+	+nqSaZO8zDji8RKBRm76WUtWBhGYzrBoFO1IGqPZ2paArydHg7al
+X-Gm-Gg: ASbGncs7FnGaQXH/eRlj0SQlfwFLN8RDU7w70D3iJn9ovVLWPXqUwHrRyiyW3oWOThW
+	lI2XFxTxn5NRvDpu2dlucpz5mueF0NKOCAu/3AXwHJQrBRozlrnC4Xm41pEp2s7oxryucPNYFWR
+	/B9PnYWT40PiPwece+7YXkHkkdNNcNQPIX1Yl6/8qoayIZxcfpUMa3m7PpK9A7L4cylMwFtkUyM
+	JhfF3bkDDb1RmxxHhO9MZpyBebMd/sXyOnlFasWYet9sfO+33dAkhoEQXlZNUS+WU2UzpwWTnPW
+	lc8r3/D38WEEgWl9RGbq8kU4t49lbil8QIaS528=
+X-Google-Smtp-Source: AGHT+IGz63edBcJSmVH/MThA6NK/9To5w0eIvCMwZd+GCqoH9p60yoVQwuovufFZ7fYnUk7yseI/0g==
+X-Received: by 2002:a17:907:2e19:b0:acb:1d24:a9e0 with SMTP id a640c23a62f3a-ad219ac5111mr476045366b.11.1747125806328;
+        Tue, 13 May 2025 01:43:26 -0700 (PDT)
+Received: from skbuf ([188.25.50.178])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad21985127bsm737855066b.163.2025.05.13.01.43.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 May 2025 01:43:25 -0700 (PDT)
+Date: Tue, 13 May 2025 11:43:22 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Jakob Unterwurzacher <jakobunt@gmail.com>
+Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Marek Vasut <marex@denx.de>,
+	Tristram Ha <Tristram.Ha@microchip.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	jakob.unterwurzacher@cherry.de, stable@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] net: dsa: microchip: linearize skb for
+ tail-tagging switches
+Message-ID: <20250513084322.22354mkqmwxtlpy7@skbuf>
+References: <20250512144416.3697054-1-jakob.unterwurzacher@cherry.de>
+ <20250512144416.3697054-1-jakob.unterwurzacher@cherry.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250512163732.GS3339421@horms.kernel.org>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTEzMDA4MCBTYWx0ZWRfX/oD8gA7sxM5/ Re563Bjqgw/l37r4tsvG1Z0/mmY8ZBg/FDMh6HWXhol+L65AFDZQ4i5tqduIdYY7g9ECpy+hHtx 0LWKpmh5k3Gtr87zCNn6zTLblNibtEtLA6YOVEVB49yzZ9Gq5AMbJaksCSaSfi7Ig5losASr4gb
- ZxHfu5TDiGmAu1otiESrxkPTKo71oQf/FB5i9rsL6Z+B/InTKI0+E3d8TVjLboujvRcxZ+73hfu cQm7ypAaMdgBJtsc9AAlKzhI3c/jQmza96Y5h9RH2xXX62CAUdQiuCEilJKntJmik9oWVJjORlb HUGVE3s/3PG/AHg6zSiX4llH9rI3cKm51aX/ZRzEsGsZkX16QmiiPj7OeehbIhu+SGtj4mtbulP
- A+gsBx+5A5PWQ4ZzEkvf0RhqKLuYGG9VcN5vd8ZtlzGCNP9l8rXZzOWImDpDCUBeB/CSaBVU
-X-Authority-Analysis: v=2.4 cv=RvXFLDmK c=1 sm=1 tr=0 ts=6823038e cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8 a=WSI0S-zNqxrGslh8q8AA:9 a=CjuIK1q_8ugA:10
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: 3d-PqArv5CTXBuDqOXllmeb-RhWMuRbM
-X-Proofpoint-ORIG-GUID: 3d-PqArv5CTXBuDqOXllmeb-RhWMuRbM
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-12_07,2025-05-09_01,2025-02-21_01
+In-Reply-To: <20250512144416.3697054-1-jakob.unterwurzacher@cherry.de>
+ <20250512144416.3697054-1-jakob.unterwurzacher@cherry.de>
 
-Hi Simon,
+On Mon, May 12, 2025 at 04:44:18PM +0200, Jakob Unterwurzacher wrote:
+> The pointer arithmentic for accessing the tail tag only works
+> for linear skbs.
+> 
+> For nonlinear skbs, it reads uninitialized memory inside the
+> skb headroom, essentially randomizing the tag. I have observed
+> it gets set to 6 most of the time.
+> 
+> Example where ksz9477_rcv thinks that the packet from port 1 comes from port 6
+> (which does not exist for the ksz9896 that's in use), dropping the packet.
+> Debug prints added by me (not included in this patch):
+> 
+> 	[  256.645337] ksz9477_rcv:323 tag0=6
+> 	[  256.645349] skb len=47 headroom=78 headlen=0 tailroom=0
+> 	               mac=(64,14) mac_len=14 net=(78,0) trans=78
+> 	               shinfo(txflags=0 nr_frags=1 gso(size=0 type=0 segs=0))
+> 	               csum(0x0 start=0 offset=0 ip_summed=0 complete_sw=0 valid=0 level=0)
+> 	               hash(0x0 sw=0 l4=0) proto=0x00f8 pkttype=1 iif=3
+> 	               priority=0x0 mark=0x0 alloc_cpu=0 vlan_all=0x0
+> 	               encapsulation=0 inner(proto=0x0000, mac=0, net=0, trans=0)
+> 	[  256.645377] dev name=end1 feat=0x0002e10200114bb3
+> 	[  256.645386] skb headroom: 00000000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> 	[  256.645395] skb headroom: 00000010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> 	[  256.645403] skb headroom: 00000020: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> 	[  256.645411] skb headroom: 00000030: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> 	[  256.645420] skb headroom: 00000040: ff ff ff ff ff ff 00 1c 19 f2 e2 db 08 06
+> 	[  256.645428] skb frag:     00000000: 00 01 08 00 06 04 00 01 00 1c 19 f2 e2 db 0a 02
+> 	[  256.645436] skb frag:     00000010: 00 83 00 00 00 00 00 00 0a 02 a0 2f 00 00 00 00
+> 	[  256.645444] skb frag:     00000020: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01
+> 	[  256.645452] ksz_common_rcv:92 dsa_conduit_find_user returned NULL
+> 
+> Call skb_linearize before trying to access the tag.
+> 
+> This patch fixes ksz9477_rcv which is used by the ksz9896 I have at
+> hand, and also applies the same fix to ksz8795_rcv which seems to have
+> the same problem.
+> 
+> Signed-off-by: Jakob Unterwurzacher <jakob.unterwurzacher@cherry.de>
+> Cc: stable@vger.kernel.org
+> Fixes: 016e43a26bab ("net: dsa: ksz: Add KSZ8795 tag code")
+> Fixes: 8b8010fb7876 ("dsa: add support for Microchip KSZ tail tagging)
+> ---
 
-On 2025-05-12 at 16:37:32, Simon Horman (horms@kernel.org) wrote:
-> On Sun, May 11, 2025 at 06:52:47PM +0530, Subbaraya Sundeep wrote:
-> > The presence of MACSEC block is currently figured out based
-> > on the running silicon variant. This may not be correct all
-> > the times since the MACSEC block can be fused out. Hence get
-> > the macsec info from AF via mailbox.
-> > 
-> > Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
-> 
-> ...
-> 
-> > diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-> > index 7e3ddb0..7d0e39d 100644
-> > --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-> > +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-> > @@ -631,9 +631,6 @@ static inline void otx2_setup_dev_hw_settings(struct otx2_nic *pfvf)
-> >  		__set_bit(CN10K_PTP_ONESTEP, &hw->cap_flag);
-> >  		__set_bit(QOS_CIR_PIR_SUPPORT, &hw->cap_flag);
-> >  	}
-> > -
-> > -	if (is_dev_cn10kb(pfvf->pdev))
-> > -		__set_bit(CN10K_HW_MACSEC, &hw->cap_flag);
-> >  }
-> >  
-> >  /* Register read/write APIs */
-> > @@ -1043,6 +1040,7 @@ void otx2_disable_napi(struct otx2_nic *pf);
-> >  irqreturn_t otx2_cq_intr_handler(int irq, void *cq_irq);
-> >  int otx2_rq_init(struct otx2_nic *pfvf, u16 qidx, u16 lpb_aura);
-> >  int otx2_cq_init(struct otx2_nic *pfvf, u16 qidx);
-> > +int otx2_set_hw_capabilities(struct otx2_nic *pfvf);
-> >  
-> >  /* RSS configuration APIs*/
-> >  int otx2_rss_init(struct otx2_nic *pfvf);
-> > diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-> > index 0aee8e3..a8ad4a2 100644
-> > --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-> > +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-> > @@ -3126,6 +3126,8 @@ static int otx2_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-> >  	if (err)
-> >  		goto err_ptp_destroy;
-> >  
-> > +	otx2_set_hw_capabilities(pf);
-> > +
-> >  	err = cn10k_mcs_init(pf);
-> >  	if (err)
-> >  		goto err_del_mcam_entries;
-> 
-> Hi Subbaraya,
-> 
-> If I read things correctly otx2_setup_dev_hw_settings() is called
-> for both representors and non-representors, while otx2_probe is
-> only called for non-representors.
-> 
-> If so, my question is if this patch changes behaviour for representors.
-> And, again if so, if that is intentional.
-I assume you mean VF driver for representors and PF driver for
-non-representor. Yes this is intentional. We currently do not support
-macscec offload on VFs hence I changed only PF driver. In case we want
-to support macsec offload on VFs too then otx2vf_probe also need to be
-changed like:
-otx2_set_hw_capabilities(vf);
-err = cn10k_mcs_init(vf);
+One of the blamed commits appeared in v4.13 and the other in v5.4.
+I wondered whether separate patches should have been written, so that the
+bug fix for the older commit could be independently backported further.
+But then I looked at https://www.kernel.org/ and it seems that the
+oldest supported LTS branch is 5.4, so that's irrelevant.
 
-Thanks,
-Sundeep
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
