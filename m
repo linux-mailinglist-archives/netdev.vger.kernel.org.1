@@ -1,145 +1,128 @@
-Return-Path: <netdev+bounces-190131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E423BAB5448
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 14:08:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08912AB5480
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 14:16:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61456173DFC
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 12:08:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B185A863759
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 12:15:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C356B28D8D9;
-	Tue, 13 May 2025 12:08:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 344C028DB52;
+	Tue, 13 May 2025 12:14:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vE54ruPn"
+	dkim=pass (2048-bit key) header.d=bell-sw-com.20230601.gappssmtp.com header.i=@bell-sw-com.20230601.gappssmtp.com header.b="IO41QlRz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F08A28CF7C;
-	Tue, 13 May 2025 12:08:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC0E723814A
+	for <netdev@vger.kernel.org>; Tue, 13 May 2025 12:14:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747138094; cv=none; b=pDVa51dRzzEUkfv1oVdh53imtQRC9qh4/bfN+S0sYTXKE8gjzUt9yeY4lUIa+0bbJD0HWeV2qBW1sIxzB+oRCx6BPoaAjUGvNQNUfuuMNicGQJ42uGvqBc1yP5uA9IKgwcXk2aIYC9js2VXpIqD4vSon8IByC11XOF2tooUowb4=
+	t=1747138444; cv=none; b=bNPwDFNU8ZOUc9OSQpCJ+OFSTqX7162jWgqzWaiYZRL9Ja8mS46mI3oEe0f2MmopbIuoOeSCf6HdzZm23+MKON5m9R4wb8KEm0hx7j3yH1lY14MkOB9v7HvDpKAVCPxE0NedCQJVPPsaCC26Ph05crtivNp0MHRQ2FsaO7PhLxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747138094; c=relaxed/simple;
-	bh=nqVdR12YYsEgA9wg1QecAZn4HrTlrPXWWZSXA3wGALI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uRyQ/OpTZikoNEGeq8WILWDMT5BAmRqmGd5c5w7gYSRsVVGeF7GDSWxswEsm/fpvE9b0Es3tHiM78vfhXp6fD9yvB4BhNbrM0JmXSlOevzRXruyGCASawUsXqQlX6UFcVkvj2tkdtCPjnDIkCLwmJWSn5J+7pVh3ykVx9DP+EPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vE54ruPn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA81DC4CEE9;
-	Tue, 13 May 2025 12:08:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747138094;
-	bh=nqVdR12YYsEgA9wg1QecAZn4HrTlrPXWWZSXA3wGALI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=vE54ruPnrf7doS5E2jmmYBdkmsTxo5FaflAHRDTNm3+f96CbeOAw5Y8y7vhbVyWJD
-	 Uz9mycdK2xwg7Pbhrg/UzEg42hQUhqMd7nE38Cv13JKcmwVMkxE4sPl/ygRcNAB/6L
-	 umR60O7gs/mGFegfMKRcOARPtLnnjMNrcOkGNzi1EfbI/FczzhegjEYUv3ePST8nW8
-	 lJUprhs8t2C8t219Ad/gJz8a/HYzR3hT8sls4ATQw8nmaPsmWoToSlVYEYlNH4k4hV
-	 8xGl0aUXxUBUOooxVvrpEOUXj69d4DwHpfoAgivvOu8+WOSJh79OnazbMK7vFofxnM
-	 FKAiqs9orucwA==
-Date: Tue, 13 May 2025 14:08:07 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Lennart Poettering <mzxreary@0pointer.de>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, bluca@debian.org, 
-	alexander@mihalicyn.com, daan.j.demeyer@gmail.com, daniel@iogearbox.net, 
-	davem@davemloft.net, david@readahead.eu, edumazet@google.com, horms@kernel.org, 
-	jack@suse.cz, jannh@google.com, kuba@kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org, me@yhndnzj.com, 
-	netdev@vger.kernel.org, oleg@redhat.com, pabeni@redhat.com, viro@zeniv.linux.org.uk, 
-	zbyszek@in.waw.pl
-Subject: Re: [PATCH v6 4/9] coredump: add coredump socket
-Message-ID: <20250513-agitation-tastatur-327692d0caf0@brauner>
-References: <CAMw=ZnRC7Okmew=rrEocFuFn8hhrcergHciPjxFPuG4c6qH_Bw@mail.gmail.com>
- <20250513021626.86287-1-kuniyu@amazon.com>
- <aCMJI-2goig2VBDX@gardel-login>
+	s=arc-20240116; t=1747138444; c=relaxed/simple;
+	bh=LA/KCLameLqFOczlCUJ/2B4/nB7vo4JUftohFXDrgXY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ye4h9Mf2E1Cy8AQ0djv8YcWqgrVJ9SJTjFU1Pfx/F6PVqPlBjCqJ4TAS1nCxhDAEO6KVheXhavksyccIJX/BX8qHLht9NaBMmiMrnmHr5m+pAUs4pCxBL9JYuGkjwGcO8nxdtCv3m839LcfvL8p+OU1dTA9OVNQoLRR9pGuscLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bell-sw.com; spf=pass smtp.mailfrom=bell-sw.com; dkim=pass (2048-bit key) header.d=bell-sw-com.20230601.gappssmtp.com header.i=@bell-sw-com.20230601.gappssmtp.com header.b=IO41QlRz; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bell-sw.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bell-sw.com
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-54fcb7e3474so3757768e87.2
+        for <netdev@vger.kernel.org>; Tue, 13 May 2025 05:14:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bell-sw-com.20230601.gappssmtp.com; s=20230601; t=1747138440; x=1747743240; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fBlZgEOoEfroAGDNOtFCLBH/jbcjwtEuds8r227tD1Y=;
+        b=IO41QlRzvA1J3/3k6dZolCl9QVCbpTfH3iBDZwWoiMTxW+N3rGNpk4iAYqRjmDepsB
+         Us4Rixd7qymtPtaL+i8zFrRo3CEeuQ0G67CdVjqXbJpp/EidTFZJ/6i/TMPuq1EnmZlp
+         W1vRf49mCUxXWVqTcoYMN8DBVd5d/L8nLsypfd9GhSBciK7tBVPc+QEl8NGOJI+XN6zs
+         CICYu55GRxHh/WiLEySM/ACtvi3+yLuz8SU01Z56KlG3l8Y9rRFP/BoenVSh5rloZnuE
+         4zYR9sdV2xvHd3ibO+bmjkaVdlASbzRwjvoSRfwNxdAsl0f42GO7IodySDV2K01I5VQP
+         F2lA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747138440; x=1747743240;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fBlZgEOoEfroAGDNOtFCLBH/jbcjwtEuds8r227tD1Y=;
+        b=RT+mL3RgcNzfOIPXfeI3WG/wyY33Ui4EHPFMov8+Yx6PvHEu77NzRoltHc8CZ/jtC0
+         kDPbwZvkvk1NcNZBZ+SXEqR5DUjCtJF1plib4aQW74Vj+KIAPWxhVgKNHeGIDTUQMzVp
+         3HdfN+FDejh5MYiXjbGj8tb36DiZrMrCw+ajduTRasaWAAufPyShNx5CLQzyVQ0RXL3s
+         2tybSkVIlcItqOPa2qUz5BAhXJFaktDXXqjMHPrCC22ZefZbQqa88K8Mv6FavXdfy9Kl
+         OTGG9pstjEPc1OmFU8JpT+XY53Msj7BLKVhMptgPMrRqX11mU/gSfzOrmdJCaZA5Ktzw
+         qjlA==
+X-Gm-Message-State: AOJu0YyjzIGxcmuWryaUvB7dUS0wUe139GP21r5qK3sWp9E2cioQ/OIR
+	XJRPg+x/N6YIfgPI6asCVmoH2rOSH5BV9+Iwxilk0BCaxl8BoMZ/Y4G1V2YRBA==
+X-Gm-Gg: ASbGncs+viAD5x0goaQ9osIBnD3/H9FvC+wDebBykjws1wBOmbCaLTtoWxIQoXFtrTy
+	3y6+xRitByT1wc1uVnVp5+a1dKV3aRKh2dHkqvLYKknv/aYPI8uQEoxlfntvNuka2gHBVCLsrBx
+	a6CabSyu9VqJi9xVCgKdCra4T4p4HeS5r2zrnrxDxdFJA3NJqHjiFO025Ql8OUxPry3scLKg4EX
+	mlFKiNEOoSHnAqYtx2tZ3PHIJPT32uDs3Lg9ByyYtCSeq9aX4XhU5VGpy5SnXEs+JmZi4u4QVMy
+	KRJdtwSBqszhxfZbZ3VROjljP67EItmZOpvqZiTFC7LZxJ/hS1DS56lOfwnth9G6+VA=
+X-Google-Smtp-Source: AGHT+IE+2GmTp6jx2k0URSKcwhuRxgmsdmMIIUyJ9yehgMa56iPa5P8QafOjySC9AD26kZQGxzILCA==
+X-Received: by 2002:a05:6512:6286:b0:54f:c4ab:106e with SMTP id 2adb3069b0e04-54fc67cbe49mr5266453e87.28.1747138439923;
+        Tue, 13 May 2025 05:13:59 -0700 (PDT)
+Received: from localhost.localdomain ([5.8.39.119])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54fc645cd2bsm1848085e87.73.2025.05.13.05.13.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 May 2025 05:13:59 -0700 (PDT)
+From: Alexey Kodanev <aleksei.kodanev@bell-sw.com>
+To: linux-wireless@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	Ping-Ke Shih <pkshih@realtek.com>,
+	Kalle Valo <kvalo@kernel.org>,
+	Alexey Kodanev <aleksei.kodanev@bell-sw.com>
+Subject: [PATCH v2] wifi: rtw88: fix the 'para' buffer size to avoid reading out of bounds
+Date: Tue, 13 May 2025 12:13:04 +0000
+Message-Id: <20250513121304.124141-1-aleksei.kodanev@bell-sw.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aCMJI-2goig2VBDX@gardel-login>
+Content-Transfer-Encoding: 8bit
 
-On Tue, May 13, 2025 at 10:56:03AM +0200, Lennart Poettering wrote:
-> On Mo, 12.05.25 19:14, Kuniyuki Iwashima (kuniyu@amazon.com) wrote:
-> 
-> > > > Note this version does not use prefix.  Now it requires users to
-> > > > just pass the socket cookie via core_pattern so that the kernel
-> > > > can verify the peer.
-> > >
-> > > Exactly - this means the pattern cannot be static in a sysctl.d early
-> > > on boot anymore, and has to be set dynamically by <something>.
-> >
-> > You missed the socket has to be created dynamically by <something>.
-> 
-> systemd implements socket activation: the generic code in PID 1 can
-> bind a socket, and then generically forks off a process (or instances
-> of processes for connection-based sockets) once traffic is seen on
-> that socket. On a typical, current systemd system, PID 1 does this for
-> ~40 sockets by default. The code to bind AF_UNIX or AF_INET/AF_INET6
-> sockets is entirely generic.
-> 
-> Currently, in the existing systemd codebase coredumping is implemented
-> via socket activation: the core_pattern handler binary quickly hands
-> off the coredump fds to an AF_UNIX socket bound that way, and the
-> service behind that does the heavy lifting. Our hope is that with
-> Christian's work we can make the kernel deliver the coredumps directly
-> to the socket PID1 generically binds, getting rid of one middle man.
-> 
-> By requiring userspace to echo the SO_COOKIE value into the
-> core_pattern sysctl in a special formatting, you define a bespoke
-> protocol: it's not just enough to bind a socket (for which the generic
-> code in PID1 is good enough), and to write a fixed
-> string into a sysctl (for which the generic code in the current
-> /etc/sysctl.d/ manager, i.e. systemd-sysctl, works fine). But you
-> suddenly are asking from userspace, that some specific tool runs at
-> early boot, extracts the socket cookie from PID1 somehow, and writes
-> that into sysctl. We'd have to come up with a new tool for that, we
-> can no longer use generic tools. And that's the part that Luca doesn't
-> like.
-> 
-> To a large degree I agree with Luca about this. I would much prefer
-> Christian's earlier proposal (i.e. to simply define some prefix of
-> AF_UNIX abstract namespace addresses as requiring privs to bind),
-> because that would enable us to do generic handling in userspace: the
-> existing socket binding logic in PID 1, and the existing sysctl.d
-> handling in the systemd suite would be good enough to set up
-> everything for the coredump handling.
-> 
-> That said, I'd take what we can get. If enforcing privs on some
-> abstract namespace socket address prefix is not acceptable, then we
-> can probably make the SO_COOKIE proposal work (Luca: we'd just hook
-> some small tool into ExecStartPost= of the .socket unit, and make PID1
-> pass the cookie in some env var or so to it; the tool would then just
-> echo that env var into the sysctl with the fixed prefix). In my eyes,
-> it's not ideal though: it would mean the sysctl data on every instance
-> of the system system image would necessarily deviate (because the
-> socket cookie is going to be different), which mgmt tools won't like
-> (as you cannot compare sysctl state anymore), and we'd have a weak
-> conflict of ownership: right now most sysctl settings are managed by
-> /etc/sysctl.d/, but the core_pattern suddenly wouldn't be
-> anymore. This will create conflicts because suddenly two components
-> write to the thing, and will start fighting.
-> 
-> Hence: I'd *much* prefer Christian's original approach as it does not
-> have these issues. But I'll take what I can get, we can make the
-> cookie thing work, but it's much uglier.
-> 
-> I am not sure I understand why enforcing privs on some abstract
-> namespace socke address prefix is such an unacceptable idea though.
+Set the size to 6 instead of 2, since 'para' array is passed to
+'rtw_fw_bt_wifi_control(rtwdev, para[0], &para[1])', which reads
+5 bytes:
 
-I prefer the prefix approach as well. It's clean, simple and is safe by
-itself and elegant. And it fits into the generic socket activation and
-system administration models. I mainly show-cased the cookie model as an
-elaborate workaround. It can be done but it's ugly and more difficult to
-use.
+void rtw_fw_bt_wifi_control(struct rtw_dev *rtwdev, u8 op_code, u8 *data)
+{
+    ...
+    SET_BT_WIFI_CONTROL_DATA1(h2c_pkt, *data);
+    SET_BT_WIFI_CONTROL_DATA2(h2c_pkt, *(data + 1));
+    ...
+    SET_BT_WIFI_CONTROL_DATA5(h2c_pkt, *(data + 4));
 
-I do have one more idea how to solve this problem cleanly using regular
-socket paths that hopefully pleases everyone.
+Detected using the static analysis tool - Svace.
+Fixes: 4136214f7c46 ("rtw88: add BT co-existence support")
+Signed-off-by: Alexey Kodanev <aleksei.kodanev@bell-sw.com>
+---
+
+v2: initializer style change
+
+ drivers/net/wireless/realtek/rtw88/coex.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/wireless/realtek/rtw88/coex.c b/drivers/net/wireless/realtek/rtw88/coex.c
+index c929db1e53ca..64904278ddad 100644
+--- a/drivers/net/wireless/realtek/rtw88/coex.c
++++ b/drivers/net/wireless/realtek/rtw88/coex.c
+@@ -309,7 +309,7 @@ static void rtw_coex_tdma_timer_base(struct rtw_dev *rtwdev, u8 type)
+ {
+ 	struct rtw_coex *coex = &rtwdev->coex;
+ 	struct rtw_coex_stat *coex_stat = &coex->stat;
+-	u8 para[2] = {0};
++	u8 para[6] = {};
+ 	u8 times;
+ 	u16 tbtt_interval = coex_stat->wl_beacon_interval;
+ 
+-- 
+2.25.1
+
 
