@@ -1,301 +1,98 @@
-Return-Path: <netdev+bounces-190220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FC8AAB5A5F
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 18:42:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04B20AB5A6C
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 18:44:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57F7A1718EA
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 16:41:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6E06865EF3
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 16:41:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 162DA2BF3D1;
-	Tue, 13 May 2025 16:38:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71F812C0331;
+	Tue, 13 May 2025 16:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FR5L4OlY"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="v5dm0lD1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C50A92BF991;
-	Tue, 13 May 2025 16:38:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A4D12BF977
+	for <netdev@vger.kernel.org>; Tue, 13 May 2025 16:40:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747154339; cv=none; b=dMt0PqXnpYEPapy7e0KLzu/jaRfPRL3YcKbk6xUrmjjcpJUmoxHOpO2D9wdSBuafNycJIQ82WG4d53QSkc7AVRhw0kMuu9yFJSN8AblR1uMUBwbBeNeHIqZrFN6PhJTLfA29UNVXWENQgLla55JvXgg6ACAFAL7O1Cqoa1BADaI=
+	t=1747154429; cv=none; b=RirPVQQjjH7TGxfAjpx7EHdgB/0MFHpbs8YAJzF9jToxO/JzlZcy2BEqFPI1uaF4ITEjai94imSdn9BLNun2UhTABBCPbiLYITlqLiHuOlF7HyA6NMqr31jq41D7JGWufLBG6KepxAh5YFKBYk4K3BBNoNNUKiJlRqqcVHS9OQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747154339; c=relaxed/simple;
-	bh=HyI/Pk6SgKx7zVoAkM2m3oz81Ap3+TkZi8OD506y7QI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=H86IoMy6on6B08JNZ9wJYmVgbIUnMgRNMOMm70OX7pQ1VcFDAetCjveGDwTAu9f2fG0okey4yPShXNtWw7eRLd1DSi2yMJqdRukR9so4chFbIFNL6NuuewgGj+U2JL1jTsjb+4nKKwxNpKH1E7DncIVGDeoF3dg6G055Klp4gFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FR5L4OlY; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747154337; x=1778690337;
-  h=message-id:date:mime-version:subject:to:references:from:
-   in-reply-to:content-transfer-encoding;
-  bh=HyI/Pk6SgKx7zVoAkM2m3oz81Ap3+TkZi8OD506y7QI=;
-  b=FR5L4OlYTVQzxsBZ0B94A1607bstAs9nmJAHZtCfl+iytr48cuk+tlNj
-   YM28QdWeyenbLFG0hD8Q8a55pfJBEGiX4xbEoyyv/TEbkOc/2ycep6NAY
-   LkMcQM23ANEfrjnLbS1ASDZFww9K8eAhTVVehEfIjusUfoY2X8CojXJTU
-   aUfWAdo0dW2o/aKyONNbLNnN4ued4+wl36WMPCRhUuaEEj6ELawQqbvZo
-   bySUvrXbqiW5ZfRNa1xI0+6KEByfwqVskAhEPSkcQFWlnZwbO10viXd5x
-   gxylndtTLAkHreQUDKonmOJaSb8uAOyDS28v2c0VjZ1iDXVZne2Fxt4es
-   A==;
-X-CSE-ConnectionGUID: i7E1+h2BTwKvOef0EQMulA==
-X-CSE-MsgGUID: l0jGCPwDQjeNSO+qXtLEOg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11432"; a="48265396"
-X-IronPort-AV: E=Sophos;i="6.15,285,1739865600"; 
-   d="scan'208";a="48265396"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2025 09:38:56 -0700
-X-CSE-ConnectionGUID: LQL7VyssSQef5+ms3ZIZqQ==
-X-CSE-MsgGUID: +bXkOZZ4SWy734HcDgEJ0g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,285,1739865600"; 
-   d="scan'208";a="142938811"
-Received: from agladkov-desk.ger.corp.intel.com (HELO [10.125.109.12]) ([10.125.109.12])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2025 09:38:55 -0700
-Message-ID: <d83a83d1-37e7-4192-913f-243098f679e3@intel.com>
-Date: Tue, 13 May 2025 09:38:54 -0700
+	s=arc-20240116; t=1747154429; c=relaxed/simple;
+	bh=ZTvOfyt27ngXKsIHWQ1g0X5LM2B8iC/5VO98mqpFpBU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=r+aziJtL3whodXnjSPUzsRGnwGe/c8grkQe+5KSwdbydaTtDV/Wh1hzmg/F4O6e81aFiJyY76C2+StXkwZAjZ1ciRFV1ft49Ze3aWNKPhYBKLeAcLyAI2NZh1yZw2Wyg/sCvp6R6B/vEj9wQwax+4+JtXsbTkBXhfbBrgpb+9Xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=v5dm0lD1; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <964d667a-c17e-47ff-b7d8-fb5b5a2f1eef@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1747154415;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1pd8a86ouCHKkC4nVa+pxW5IeRMYr8wsSfrdSRatPCY=;
+	b=v5dm0lD1mmwG9XVDa+coeBFMQiCdVvbRDgihk9r4mx4Xi132k7MmF8jV5Yx3H79h6jAyPM
+	PFclKaNv4y/EYlD0fe02SvWUj0QquI4WwSMmdTGkkBeYo9qB6cc9t0KCoutqdL9oTi9DBD
+	tZu8+JQ0KoAmsBPlqbVYVeT3IBvKlD4=
+Date: Tue, 13 May 2025 12:40:09 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 00/22] Type2 device basic support
-To: Alejandro Lucero Palau <alucerop@amd.com>,
- alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
- netdev@vger.kernel.org, dan.j.williams@intel.com, edward.cree@amd.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
-References: <20250512161055.4100442-1-alejandro.lucero-palau@amd.com>
- <59fa7e55-f563-40f9-86aa-1873806e76cc@intel.com>
- <8342ea50-ea07-4ae8-8607-be48936bcd11@amd.com>
- <ef2782e6-74d1-48e8-8159-069317bf6737@intel.com>
- <fd9888f1-ee5d-4943-89fa-32d6e0fb61a5@amd.com>
- <7447008e-3579-47d4-9f90-28d18429d532@intel.com>
- <0891ceea-64fa-4ae7-9a7b-d91c967efaaa@amd.com>
+Subject: Re: [net-next PATCH v4 09/11] net: macb: Move most of mac_config to
+ mac_prepare
+To: "Karumanchi, Vineeth" <vineeth.karumanchi@amd.com>,
+ netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>
+Cc: upstream@airoha.com, Simon Horman <horms@kernel.org>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Kory Maincent <kory.maincent@bootlin.com>, linux-kernel@vger.kernel.org,
+ Christian Marangi <ansuelsmth@gmail.com>,
+ Claudiu Beznea <claudiu.beznea@microchip.com>,
+ Nicolas Ferre <nicolas.ferre@microchip.com>
+References: <20250512161013.731955-1-sean.anderson@linux.dev>
+ <20250512161416.732239-1-sean.anderson@linux.dev>
+ <6a8f1a28-29c0-4a8b-b3c2-d746a3b57950@amd.com>
 Content-Language: en-US
-From: Dave Jiang <dave.jiang@intel.com>
-In-Reply-To: <0891ceea-64fa-4ae7-9a7b-d91c967efaaa@amd.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <6a8f1a28-29c0-4a8b-b3c2-d746a3b57950@amd.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-
-
-On 5/13/25 9:21 AM, Alejandro Lucero Palau wrote:
+On 5/13/25 11:29, Karumanchi, Vineeth wrote:
+> Hi Sean,
 > 
-> On 5/13/25 17:04, Dave Jiang wrote:
->> CAUTION: This message has originated from an External Source. Please use proper judgment and caution when opening attachments, clicking links, or responding to this email.
->>
->>
->> On 5/13/25 8:24 AM, Alejandro Lucero Palau wrote:
->>> On 5/13/25 16:13, Dave Jiang wrote:
->>>> On 5/13/25 1:12 AM, Alejandro Lucero Palau wrote:
->>>>> On 5/12/25 23:36, Dave Jiang wrote:
->>>>>> On 5/12/25 9:10 AM, alejandro.lucero-palau@amd.com wrote:
->>>>>>> From: Alejandro Lucero <alucerop@amd.com>
->>>>>>>
->>>>>>> v15 changes:
->>>>>>>     - remove reference to unused header file (Jonathan Cameron)
->>>>>>>     - add proper kernel docs to exported functions (Alison Schofield)
->>>>>>>     - using an array to map the enums to strings (Alison Schofield)
->>>>>>>     - clarify comment when using bitmap_subset (Jonathan Cameron)
->>>>>>>     - specify link to type2 support in all patches (Alison Schofield)
->>>>>>>
->>>>>>>      Patches changed (minor): 4, 11
->>>>>>>
->>>>>> Hi Alejandro,
->>>>>> Tried to pull this series using b4. Noticed couple things.
->>>>>> 1. Can you run checkpatch on the entire series and fix any issues?
->>>>>> 2. Can you rebase against v6.15-rc4? I think there are some conflicts against the fixes went in rc4.
->>>>>>
->>>>>> Thanks!
->>>>>>
->>>>> Hi Dave, I'm afraid I do not know what you mean with b4. Tempted to say it was a typo, but in any case, better if you can clarify.
->>>> I use the tool b4 to pull patches off the mailing list. As you can see, your series fail on rc4 apply for patch 18.
->>>
->>> But your head is not what the base for the patchset states. I did work on v15 for working with the last patches in cxl-next so the HEAD should be:
->>>
->>>
->>> commit a223ce195741ca4f1a0e1a44f3e75ce5662b6c06 (origin/next)
->>> Author: Dan Carpenter <dan.carpenter@linaro.org>
->>> Date:   Thu Feb 22 09:14:02 2024 +0300
->>>
->>>      cxl/hdm: Clean up a debug printk
->>>
->> Ah yeah it's better to rebase against Linus's RC series rather than what cxl/next is for me to pull things. Otherwise it gets messy if something has to change in the cxl/next series and your code is based on that. So if you don't mind please rebase against upstream rc4 and I'll attempt to resolve the conflicts your code has against Robert's cleanups. Thank you. Sorry about the confusion. That is the lesson I learned last merge window with all the fun with the 'Features' code.
->>
->> DJ
->>
+> Sorry for the delayed response.
 > 
-> OK. I'll do so now, so should I keep v15 with another base or a new v16?
-
-Just post v16 and say rebase against rc4. Thanks!
-
-
+> We are working on MACB with two internal PCS's (10G-BASER, 1000-BASEX) supporting 1G, 2.5G, 5G, and 10G with AN disabled.
 > 
+> I have sent an initial RFC : https://lore.kernel.org/netdev/20241009053946.3198805-1-vineeth.karumanchi@amd.com/
 > 
-> Thanks
-> 
->>>> ✔ ~/git/cxl-for-next [for-6.16/cxl-type2 L|…138]
->>>> 08:08 $ git reset --hard v6.15-rc4
->>>> HEAD is now at b4432656b36e Linux 6.15-rc4
->>>> ✔ ~/git/cxl-for-next [for-6.16/cxl-type2 L|…138]
->>>> 08:08 $ b4 shazam -sltSk https://lore.kernel.org/linux-cxl/20250512161055.4100442-1-alejandro.lucero-palau@amd.com/T/#m25a578eb83108678737bf14fdba0d2e5da7f76bd
->>>> Grabbing thread from lore.kernel.org/all/20250512161055.4100442-1-alejandro.lucero-palau@amd.com/t.mbox.gz
->>>> Checking for newer revisions
->>>> Grabbing search results from lore.kernel.org
->>>> Analyzing 25 messages in the thread
->>>> Looking for additional code-review trailers on lore.kernel.org
->>>> Analyzing 955 code-review messages
->>>> Checking attestation on all messages, may take a moment...
->>>> ---
->>>>     [PATCH v15 1/22] cxl: Add type2 device basic support
->>>>       + Link: https://patch.msgid.link/20250512161055.4100442-2-alejandro.lucero-palau@amd.com
->>>>       + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->>>>       ● checkpatch.pl: 563: WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
->>>>       ● checkpatch.pl: 773: ERROR: trailing whitespace
->>>>     [PATCH v15 2/22] sfc: add cxl support
->>>>       + Link: https://patch.msgid.link/20250512161055.4100442-3-alejandro.lucero-palau@amd.com
->>>>       + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->>>>       ● checkpatch.pl: 213: WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
->>>>     [PATCH v15 3/22] cxl: Move pci generic code
->>>>       + Acked-by: Edward Cree <ecree.xilinx@gmail.com>
->>>>       + Link: https://patch.msgid.link/20250512161055.4100442-4-alejandro.lucero-palau@amd.com
->>>>       + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->>>>       ● checkpatch.pl: passed all checks
->>>>     [PATCH v15 4/22] cxl: Move register/capability check to driver
->>>>       + Link: https://patch.msgid.link/20250512161055.4100442-5-alejandro.lucero-palau@amd.com
->>>>       + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->>>>       ● checkpatch.pl: passed all checks
->>>>     [PATCH v15 5/22] cxl: Add function for type2 cxl regs setup
->>>>       + Link: https://patch.msgid.link/20250512161055.4100442-6-alejandro.lucero-palau@amd.com
->>>>       + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->>>>       ● checkpatch.pl: passed all checks
->>>>     [PATCH v15 6/22] sfc: make regs setup with checking and set media ready
->>>>       + Link: https://patch.msgid.link/20250512161055.4100442-7-alejandro.lucero-palau@amd.com
->>>>       + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->>>>       ● checkpatch.pl: passed all checks
->>>>     [PATCH v15 7/22] cxl: Support dpa initialization without a mailbox
->>>>       + Link: https://patch.msgid.link/20250512161055.4100442-8-alejandro.lucero-palau@amd.com
->>>>       + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->>>>       ● checkpatch.pl: passed all checks
->>>>     [PATCH v15 8/22] sfc: initialize dpa
->>>>       + Link: https://patch.msgid.link/20250512161055.4100442-9-alejandro.lucero-palau@amd.com
->>>>       + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->>>>       ● checkpatch.pl: passed all checks
->>>>     [PATCH v15 9/22] cxl: Prepare memdev creation for type2
->>>>       + Acked-by: Edward Cree <ecree.xilinx@gmail.com>
->>>>       + Link: https://patch.msgid.link/20250512161055.4100442-10-alejandro.lucero-palau@amd.com
->>>>       + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->>>>       ● checkpatch.pl: passed all checks
->>>>     [PATCH v15 10/22] sfc: create type2 cxl memdev
->>>>       + Link: https://patch.msgid.link/20250512161055.4100442-11-alejandro.lucero-palau@amd.com
->>>>       + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->>>>       ● checkpatch.pl: passed all checks
->>>>     [PATCH v15 11/22] cxl: Define a driver interface for HPA free space enumeration
->>>>       + Link: https://patch.msgid.link/20250512161055.4100442-12-alejandro.lucero-palau@amd.com
->>>>       + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->>>>       ● checkpatch.pl: 133: WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
->>>>     [PATCH v15 12/22] sfc: obtain root decoder with enough HPA free space
->>>>       + Link: https://patch.msgid.link/20250512161055.4100442-13-alejandro.lucero-palau@amd.com
->>>>       + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->>>>       ● checkpatch.pl: passed all checks
->>>>     [PATCH v15 13/22] cxl: Define a driver interface for DPA allocation
->>>>       + Link: https://patch.msgid.link/20250512161055.4100442-14-alejandro.lucero-palau@amd.com
->>>>       + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->>>>       ● checkpatch.pl: 127: WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
->>>>     [PATCH v15 14/22] sfc: get endpoint decoder
->>>>       + Link: https://patch.msgid.link/20250512161055.4100442-15-alejandro.lucero-palau@amd.com
->>>>       + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->>>>       ● checkpatch.pl: passed all checks
->>>>     [PATCH v15 15/22] cxl: Make region type based on endpoint type
->>>>       + Acked-by: Edward Cree <ecree.xilinx@gmail.com>
->>>>       + Link: https://patch.msgid.link/20250512161055.4100442-16-alejandro.lucero-palau@amd.com
->>>>       + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->>>>       ● checkpatch.pl: passed all checks
->>>>     [PATCH v15 16/22] cxl/region: Factor out interleave ways setup
->>>>       + Acked-by: Edward Cree <ecree.xilinx@gmail.com>
->>>>       + Link: https://patch.msgid.link/20250512161055.4100442-17-alejandro.lucero-palau@amd.com
->>>>       + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->>>>       ● checkpatch.pl: passed all checks
->>>>     [PATCH v15 17/22] cxl/region: Factor out interleave granularity setup
->>>>       + Acked-by: Edward Cree <ecree.xilinx@gmail.com>
->>>>       + Link: https://patch.msgid.link/20250512161055.4100442-18-alejandro.lucero-palau@amd.com
->>>>       + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->>>>       ● checkpatch.pl: passed all checks
->>>>     [PATCH v15 18/22] cxl: Allow region creation by type2 drivers
->>>>       + Link: https://patch.msgid.link/20250512161055.4100442-19-alejandro.lucero-palau@amd.com
->>>>       + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->>>>       ● checkpatch.pl: 126: WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
->>>>     [PATCH v15 19/22] cxl: Add region flag for precluding a device memory to be used for dax
->>>>       + Acked-by: Edward Cree <ecree.xilinx@gmail.com>
->>>>       + Link: https://patch.msgid.link/20250512161055.4100442-20-alejandro.lucero-palau@amd.com
->>>>       + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->>>>       ● checkpatch.pl: passed all checks
->>>>     [PATCH v15 20/22] sfc: create cxl region
->>>>       + Link: https://patch.msgid.link/20250512161055.4100442-21-alejandro.lucero-palau@amd.com
->>>>       + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->>>>       ● checkpatch.pl: passed all checks
->>>>     [PATCH v15 21/22] cxl: Add function for obtaining region range
->>>>       + Link: https://patch.msgid.link/20250512161055.4100442-22-alejandro.lucero-palau@amd.com
->>>>       + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->>>>       ● checkpatch.pl: passed all checks
->>>>     [PATCH v15 22/22] sfc: support pio mapping based on cxl
->>>>       + Link: https://patch.msgid.link/20250512161055.4100442-23-alejandro.lucero-palau@amd.com
->>>>       + Signed-off-by: Dave Jiang <dave.jiang@intel.com>
->>>>       ● checkpatch.pl: 219: CHECK: Unbalanced braces around else statement
->>>>     ---
->>>>     NOTE: install dkimpy for DKIM signature verification
->>>> ---
->>>> Total patches: 22
->>>> ---
->>>>    Base: using specified base-commit a223ce195741ca4f1a0e1a44f3e75ce5662b6c06
->>>> Applying: cxl: Add type2 device basic support
->>>> Applying: sfc: add cxl support
->>>> Applying: cxl: Move pci generic code
->>>> Applying: cxl: Move register/capability check to driver
->>>> Applying: cxl: Add function for type2 cxl regs setup
->>>> Applying: sfc: make regs setup with checking and set media ready
->>>> Applying: cxl: Support dpa initialization without a mailbox
->>>> Applying: sfc: initialize dpa
->>>> Applying: cxl: Prepare memdev creation for type2
->>>> Applying: sfc: create type2 cxl memdev
->>>> Applying: cxl: Define a driver interface for HPA free space enumeration
->>>> Applying: sfc: obtain root decoder with enough HPA free space
->>>> Applying: cxl: Define a driver interface for DPA allocation
->>>> Applying: sfc: get endpoint decoder
->>>> Applying: cxl: Make region type based on endpoint type
->>>> Applying: cxl/region: Factor out interleave ways setup
->>>> Applying: cxl/region: Factor out interleave granularity setup
->>>> Applying: cxl: Allow region creation by type2 drivers
->>>> Patch failed at 0018 cxl: Allow region creation by type2 drivers
->>>> /home/djiang5/git/linux-kernel/.git/worktrees/cxl-for-next/rebase-apply/patch:644: trailing whitespace.
->>>>    * @type: CXL device type
->>>> warning: 1 line adds whitespace errors.
->>>> error: patch failed: drivers/cxl/core/region.c:3607
->>>> error: drivers/cxl/core/region.c: patch does not apply
->>>> error: patch failed: drivers/cxl/port.c:33
->>>> error: drivers/cxl/port.c: patch does not apply
->>>> hint: Use 'git am --show-current-patch=diff' to see the failed patch
->>>> hint: When you have resolved this problem, run "git am --continue".
->>>> hint: If you prefer to skip this patch, run "git am --skip" instead.
->>>> hint: To restore the original branch and stop patching, run "git am --abort".
->>>> hint: Disable this message with "git config set advice.mergeConflict false"
->>>>
->>>>
->>>>> The patchset is against the last cxl-next commit as it it stated at the end, and that is based on v6.15.0-rc4. I had to solve some issues from v14 as last changes in core/region.c from Robert Richter required so.
->>>>>
->>>>>
->>>>> About checkpatch, I did so but I have just done it again for being sure before this email, and I do not seen any issue except a trailing space in patch 1. That same patch has also warnings I do not think are a problem. Some are related to moved code and other on the new macro. FWIW, I'm running those with "checkpatch --strict".
->>>>>
->>>>>
->>>>>>> base-commit: a223ce195741ca4f1a0e1a44f3e75ce5662b6c06
->>
+> Currently, we are working on integrating the MAC in fixed-link and phy-mode.
 
+I had a look your series and based on the feedback you got I think this
+patch will help you ensure the PCS changes stay separate from the MAC
+stuff. I found it confusing on first read that you were configuring the
+"1G" PCS from the USX PCS callback. I think you are using 1G/2G speeds
+with the "1G" PCS and 5G/10G speeds with the USX PCS?
+
+Do you know if there is any public documentation for 10G support
+(even on non-versal SoCs)? That will make it easier to review your
+patch.
+
+--Sean
 
