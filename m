@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-190240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81218AB5D38
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 21:40:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DBC3EAB5D3A
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 21:40:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96A0B860B7C
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 19:39:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8AEDD3BEC5E
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 19:39:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FE252C0329;
-	Tue, 13 May 2025 19:39:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA95A2C0333;
+	Tue, 13 May 2025 19:39:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GIJwgkSv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kdQemvcX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 899602C0312
-	for <netdev@vger.kernel.org>; Tue, 13 May 2025 19:39:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 385D12C0308
+	for <netdev@vger.kernel.org>; Tue, 13 May 2025 19:39:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747165169; cv=none; b=lKyED7vZVT/AZE9Ruvhw4tKjGzKjzzyNUA8YJmhScw6KwkMpv0ONTIsSniqjDbyqlU6pMoeqT5lkN0Ctux7D2QIOIi8kc+9LZqWsHaWTV9faf4wv70izfkkCc9XJCcr7Bf7yD8Xosh/WTS3c2zHlEdKF3qkoXqPcLrPZ/BSmPh0=
+	t=1747165170; cv=none; b=CPlINUKOo0wQYm5PF03g9RYietBlSlULb4EW8Z/z6eBieXWlZy3KdrfxW4iRs+7j078oxrEtErPgKeTkOD3MWnzQqAkjKr9LO93x9IUpDEwewjeEV8LUp6op1sAeVvdWiW2hMfTOsaQwJwvKCcDMuGHPXwI5mRiDBCDh++00SkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747165169; c=relaxed/simple;
-	bh=WMOYvGl5qmszYfsVQ8YE5fD5TXa947jABy+VAozdgzA=;
+	s=arc-20240116; t=1747165170; c=relaxed/simple;
+	bh=GKVX/N2wnM2YsM8IAdqvAmeDukOHwSJBU6eTDfLDSWU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=oZK44jqdr0WEIN1iqXZnpZqZAczsBeIjA9tq8CJBeoWMpKqRJYfaA2SJXdNvRVTy2mlubLJ8bMVvzLyyNX/aKGBHl+YcSWdXSBuavR16e20teYTWFa6a/QiaHcZ82HOd1l5J4bcF6Ii3O5HQkWUTHYgcVqI5tEzAtX5GiTrcMwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GIJwgkSv; arc=none smtp.client-ip=209.85.222.201
+	 To:Cc:Content-Type; b=tG6GUGo5+L0A1zhwRM3nHn2TALffl0YI/cMJzsk9rZJ0iFbaGemE6cW+gzrEOwklMweB/9gEd6kuxz6mxEIsWqAyFhbCBolR+DTOJ7Ya5xuEGOkRpWdfDNybMIJwoLbqgY+9wuc+BgbN0LTQPJaQ/ILkH1ecdzMlcdRDJMM2loc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kdQemvcX; arc=none smtp.client-ip=209.85.160.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-7caee990722so1165149885a.2
-        for <netdev@vger.kernel.org>; Tue, 13 May 2025 12:39:27 -0700 (PDT)
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-4769a8d15afso97642021cf.3
+        for <netdev@vger.kernel.org>; Tue, 13 May 2025 12:39:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747165166; x=1747769966; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1747165168; x=1747769968; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IFuP/Lqi4P3FwpuS5ICeEEdYO5MZT1/PI4tFtc2Kbx4=;
-        b=GIJwgkSvokj5Eh95/ZppFn90gcZKPVM+Zz3uRjqu8oYKRfnbcoIc9GvHFlQ1bcAIUo
-         mzX+1dV5S53AxR6soa4U2V7O9e7mwiSEkWkIPuxRftOGn7/tYNlMxM/c/7Qrjy/gZIsw
-         FUNQEvsCveFl0vwM0dzXLBpy/JXn4clpM/6ybbq2Dqu5U4pLdeZua9IYfpxKj8xtOJyf
-         WK5yJup2vGWs32cietLbr5usboYd17FzhZuuZ0wrNGPmDbVdfCOQsdxLxgFYo9/unu8t
-         VJQNmPbF3AB6k63WJonE5wXFCr0e8SmLsriatva9xmonAilMFSeBf/DLucEMdtLhsHCz
-         zOyg==
+        bh=A328vxwB0WgWj4zQSlReo28XGIYb26I0gH1ymhc0z3Y=;
+        b=kdQemvcX+MFm11+JFIqovYie+DXUdyU4tSDoO74caV77jLjVMInUFTe0egh27I8rM2
+         baXzPeIczk4Epi7Q+Xkq58omAtVSp8kDKk+qCRjs1wJcmMWWLB25WU9u5UkgFAiWjk1u
+         TryQEHTsiw5/8LcjdA6hgjYJmhJxhN0FJULsn3Ej3RdFriz6JBEy2A/ZHtPRLYL7oZgQ
+         HzVOB/D3tWuFjWtsuenkdgODH9Fv5aLqF6bDg9vba4pUJW8Bf4Br/Ilj12tHOylfp31E
+         3eVvAnP0U7A5+r3+mxVUmEzgLHSwdJmpLcRvOHnOrqH1OJsJ9Nvw8nJ/aJUl3+GegmhJ
+         WcFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747165166; x=1747769966;
+        d=1e100.net; s=20230601; t=1747165168; x=1747769968;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IFuP/Lqi4P3FwpuS5ICeEEdYO5MZT1/PI4tFtc2Kbx4=;
-        b=RR5oYlXG5GmdnZSYrYuuoh5ag1+5bLzR86Sn4BY7H/aS5qpeMR4qKX+1T1gc5TfCg1
-         MzdfXIF+LP3LEivw1i9n9Q9tfFZZLFzZToeu1+w8DxJDj6qDDwE5nb125MNDj5J+FG5b
-         ANPtdBQHpApjBJpx6R5nlLN+7YOix6aGRYJuhNleIfhsN/8SSvvHCQOumrjW2lEZVv49
-         Im626NtjOh05zbHca9PHr3w3z5yuQDQ75GKdey0n0i8sJ0nIqbgqSCzLdxu4r+7kTv1G
-         YL//0hf7TJSd0H/Bs2inBZG4azY2WBPyHYLJvyoMEr7PxB6Wyh2fW3fKu1CHZ9I6JB4J
-         8eUg==
-X-Forwarded-Encrypted: i=1; AJvYcCUeiccE3WhfIy7TTB5Qfpr3Gp4sPPpW1mZt+3cH+90762kyfW9/Qg8qHaiuC7ljA4aqrzBdlGs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUspF8F5TJJATlHMhJGC0TJfunebsfC9ZcGZ9UeZ7d7jVOmMCe
-	hQej9uI4tRn/1CSe5OqH1GueZpoZSS9eSrWOeF2vclUCfo2HDd828U3wjUnrZYl8oSc3pTo8TLh
-	QEzsm3IRMlw==
-X-Google-Smtp-Source: AGHT+IGGYTKhemjF0+7qrAh4yniE+oHB45AU5jgt7a/UZe2DmyX8nUL8hyHbzuMEO2Rlfj9JGVCjyXela8DoLw==
-X-Received: from qkpg10.prod.google.com ([2002:a05:620a:278a:b0:7cc:ccf4:e8ca])
+        bh=A328vxwB0WgWj4zQSlReo28XGIYb26I0gH1ymhc0z3Y=;
+        b=a7FSjQkEcftUCIJvK+Q7g7jvBwcgxk6g0wsKStITQoYgaaOJwEc2tJqsmiUHIbdm82
+         x3R7+jIgdenb/1C81rvtavCLgbnz8jrdQo4NjKJks6eT0hBK6VZzdg9ZZ8nK3KBfKFpT
+         wRevFMbKqn7AscuvQv2FVOUCbVLplB/GrlOS8y+Vax4Y39D765nhzyf84EPsvyvEJ1/p
+         gs3n6yQjz6E6m0JADNzpQBXQZwt5uOj9KjYB9gPk6HQGuGl5NrSpvrJN8it/1tG6VT0r
+         ev0SZ13OIHzHZMjcXMwh81dZnJPufaV6wWQONrgjXzx3cDdABu5DQkJc7w3LNgRt7SuO
+         LXZA==
+X-Forwarded-Encrypted: i=1; AJvYcCXmSN2GJ6Z2ytsdcwScmS74ZOQF7y07TtLud8vGcPjEtzXdrFfdSq9NqIsnw8iLIf7SckbY9W0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCmvckoXc/iRB0u8D4YEWZqJdnj3RfIu0eHD8qgH6FfnYuALtW
+	JV0pfxBT8t9zY1RyDm6tTACsFRab4tG0TYLlKXQoP4AcMgRhzOWqvEkYRn+qG7lcYhKUq0Oamz7
+	uMm0PRKtG/A==
+X-Google-Smtp-Source: AGHT+IHffBqfIU5RFivAUh4wqP5CdVDZdlOf0+JyVNArhumT0qK4DGASHp6epud0diV9Q8YEkXNJ1J0BfCFuew==
+X-Received: from qtbay7.prod.google.com ([2002:a05:622a:2287:b0:47a:f8e7:4a4])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:46ab:b0:7ca:c990:8fc7 with SMTP id af79cd13be357-7cd287e8bbfmr113397685a.18.1747165166396;
- Tue, 13 May 2025 12:39:26 -0700 (PDT)
-Date: Tue, 13 May 2025 19:39:11 +0000
+ 2002:a05:622a:2296:b0:476:8a5f:8cfb with SMTP id d75a77b69052e-49495d1fd16mr13109941cf.38.1747165168095;
+ Tue, 13 May 2025 12:39:28 -0700 (PDT)
+Date: Tue, 13 May 2025 19:39:12 +0000
 In-Reply-To: <20250513193919.1089692-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250513193919.1089692-1-edumazet@google.com>
 X-Mailer: git-send-email 2.49.0.1045.g170613ef41-goog
-Message-ID: <20250513193919.1089692-4-edumazet@google.com>
-Subject: [PATCH net-next 03/11] tcp: adjust rcvbuf in presence of reorders
+Message-ID: <20250513193919.1089692-5-edumazet@google.com>
+Subject: [PATCH net-next 04/11] tcp: add receive queue awareness in tcp_rcv_space_adjust()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
@@ -84,41 +84,59 @@ Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
 	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This patch takes care of the needed provisioning
-when incoming packets are stored in the out of order queue.
+If the application can not drain fast enough a TCP socket queue,
+tcp_rcv_space_adjust() can overestimate tp->rcvq_space.space.
 
-This part was not implemented in the correct way, we need
-to decouple it from tcp_rcv_space_adjust() logic.
+Then sk->sk_rcvbuf can grow and hit tcp_rmem[2] for no good reason.
 
-Without it, stalls in the pipe could happen.
+Fix this by taking into acount the number of available bytes.
+
+Keeping sk->sk_rcvbuf at the right size allows better cache efficiency.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Wei Wang <weiwan@google.com>
 ---
- net/ipv4/tcp_input.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ include/linux/tcp.h  | 2 +-
+ net/ipv4/tcp_input.c | 6 ++++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
+diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+index a8af71623ba7ca16f211cb9884f431fc9462ce9e..29f59d50dc73f8c433865e6bc116cb1bac4eafb7 100644
+--- a/include/linux/tcp.h
++++ b/include/linux/tcp.h
+@@ -340,7 +340,7 @@ struct tcp_sock {
+ 	} rcv_rtt_est;
+ /* Receiver queue space */
+ 	struct {
+-		u32	space;
++		int	space;
+ 		u32	seq;
+ 		u64	time;
+ 	} rcvq_space;
 diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 89e886bb0fa11666ca4b51b032d536f233078dca..f799200db26492730fbd042a68c8d206d85455d4 100644
+index f799200db26492730fbd042a68c8d206d85455d4..5d64a6ecfc8f78de3665afdea112d62c417cee27 100644
 --- a/net/ipv4/tcp_input.c
 +++ b/net/ipv4/tcp_input.c
-@@ -760,6 +760,9 @@ static void tcp_rcvbuf_grow(struct sock *sk)
- 	/* slow start: allow the sender to double its rate. */
- 	rcvwin = tp->rcvq_space.space << 1;
+@@ -780,8 +780,7 @@ static void tcp_rcvbuf_grow(struct sock *sk)
+ void tcp_rcv_space_adjust(struct sock *sk)
+ {
+ 	struct tcp_sock *tp = tcp_sk(sk);
+-	u32 copied;
+-	int time;
++	int time, inq, copied;
  
-+	if (!RB_EMPTY_ROOT(&tp->out_of_order_queue))
-+		rcvwin += TCP_SKB_CB(tp->ooo_last_skb)->end_seq - tp->rcv_nxt;
-+
- 	cap = READ_ONCE(net->ipv4.sysctl_tcp_rmem[2]);
+ 	trace_tcp_rcv_space_adjust(sk);
  
- 	rcvbuf = min_t(u32, tcp_space_from_win(sk, rcvwin), cap);
-@@ -5166,6 +5169,7 @@ static void tcp_data_queue_ofo(struct sock *sk, struct sk_buff *skb)
- 		skb_condense(skb);
- 		skb_set_owner_r(skb, sk);
- 	}
-+	tcp_rcvbuf_grow(sk);
- }
+@@ -792,6 +791,9 @@ void tcp_rcv_space_adjust(struct sock *sk)
  
- static int __must_check tcp_queue_rcv(struct sock *sk, struct sk_buff *skb,
+ 	/* Number of bytes copied to user in last RTT */
+ 	copied = tp->copied_seq - tp->rcvq_space.seq;
++	/* Number of bytes in receive queue. */
++	inq = tp->rcv_nxt - tp->copied_seq;
++	copied -= inq;
+ 	if (copied <= tp->rcvq_space.space)
+ 		goto new_measure;
+ 
 -- 
 2.49.0.1045.g170613ef41-goog
 
