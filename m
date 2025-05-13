@@ -1,132 +1,100 @@
-Return-Path: <netdev+bounces-190011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C972AB4E70
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 10:46:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 299AEAB4E7E
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 10:50:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B29921785B8
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 08:46:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7995B3B16BE
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 08:49:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC3A720E01A;
-	Tue, 13 May 2025 08:46:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB377202C4E;
+	Tue, 13 May 2025 08:49:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FuHxBhBn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YqijE3hd"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED7FC1E1E06
-	for <netdev@vger.kernel.org>; Tue, 13 May 2025 08:46:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D4651F09AC;
+	Tue, 13 May 2025 08:49:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747126003; cv=none; b=AC2nDcOsTWTij5Hi+SYfaUNM9BwFpXAnBdP2gbZBVvno3t4He0EHRkIC9OwPkPImsOOhx/8NMGllAbYDDQZhYTv9hzDNvGhf4pCW7PJnePZ1Zgp7MxOWa6+t2GbwZuWfEzS/wgV7B1C7N3LWIJcZQLVUlE0D42kdYP3cxkRRO6g=
+	t=1747126196; cv=none; b=uK8fKGEUk6kaOMduG0KhTyz2zgYZBg5bgUV7KNPHyKH0gvKzHWHAaInp4dBzWtpwrHYeX7AYkx5I0dW8E0XNthunuy+F5VaAo/+DCYDFDKU9XLl98jca9aG4YXFj4xpxZgvrBtLjIArb7fB9JZjcNUsqrwyJrrz7hscCA3UfHJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747126003; c=relaxed/simple;
-	bh=0GuB8YSQVYr0KabdMIst+G/9Rpiw1lRZH38yOGphJQA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nIHOQe6+1HMC+w7AFdz35HJ/FxyfiLZx+3LJZIYW6IqGRrwK/I2EJkqTxeDcTj2W3oCPUeYdEjnqWcws6d0TqbR0gfXVNEYBetOH5n4WZGJOxDmfeQ4ItsZiGVfArXeMlI69yHP3L3EwL7vAwO3jcRxRSnElHDfZXDk5Xcnr85A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FuHxBhBn; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747126000;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=D8xs4ZKnWv12yh+gYHNpynmUdUuOUulNWlTmGaOn+wA=;
-	b=FuHxBhBnqjChLEzB8f3p6iqbXYOCzF//VNwPhVW0DHiMqCGKXlxxF67Wzvm29sDrx3M1T4
-	bv0B5dSbs/+SU0moazOQCOfRg41Z3Mr7kmS6Y3XTcrB3yNr8e3gtRqvbRmrXN12dEf9/7d
-	XxeOv7EFN/0qlG+/f/VcravhP6ARkXI=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-610-HZmiAyuWPzumB7WdxEddCQ-1; Tue, 13 May 2025 04:46:39 -0400
-X-MC-Unique: HZmiAyuWPzumB7WdxEddCQ-1
-X-Mimecast-MFC-AGG-ID: HZmiAyuWPzumB7WdxEddCQ_1747125997
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3a0bcaf5f45so1634369f8f.1
-        for <netdev@vger.kernel.org>; Tue, 13 May 2025 01:46:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747125997; x=1747730797;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=D8xs4ZKnWv12yh+gYHNpynmUdUuOUulNWlTmGaOn+wA=;
-        b=C/ILU7RMfUNdZYCunx1xV+MvPHf+mjB3OWAzPdkZBBhyvXPlLLWfWzwrC+WtLADMW7
-         3aPowqCvnUJHZUV008TTrCn1Gm60s6ZlHu8A1C4EbB8u64kq3k8/d6od3jenqTXs9Xm5
-         w2agntdWfWziFWEYOk5glsoBQ6ZUF3hO49nl8ZVomWY+sLbQWSxLYHgSbqRB/AumbZY6
-         Y7zjBPar3g0ANtcpvbnUB2rHxvoiggcQU7QtRDfy0/WRaVpi9AFcObFUIx48DJnfOpdr
-         9B7Ec0+fLXwS+H1/HG6Q05tuHVR6CdKmP1eghyQvrV2X8UgsyLnfgvUShbPYpRwC/+Bm
-         6Y1w==
-X-Forwarded-Encrypted: i=1; AJvYcCVp41XpzEtQcW3FR+Z2NoKcZyHML3czuUtMDUPHnBPRJWsQEC7MLmApYSHRiCG1yXlZ2rAne2E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMRAv6MCglSY7591BaJS3hA5SB8zdxWtXn/DQbFdQA8PihX0AH
-	wFPwPTlmnlsyy8WAUccbrxAFTIdtSwTudS5dd0T7+gHakhPxMn9kaI3WFqJGrCt7gaDudB7f76M
-	xPv+UH/YTeDRn1NlxrpuQmkfprK5YrLegHDi4b19yIWW9iwT9AIgJbw==
-X-Gm-Gg: ASbGncsPCF1dX4yzc4c2dNYPkr4oEJT7tCqZiCjNLMJkKUzaQFiD1OzS9Wx/T0KDSOP
-	uEmS6p/VEcPz4ZgNHM4UwzcslkcPsMN6ANo05Mu/XjT0m/WA4mOHqmlUUOwnbss8UbW2m+Rj/Io
-	9XNLH4c7ADZ4i7vIItqfPDWzKkXGfjJuT94L+6OEk5JNmgVUeBZj2Pnj3yANtaPnW5nl7A+DiGb
-	KuS2KVVNPsuPjz7IbjQCLGvS7TQZ4Rq8NLe80Fo2owZ5VGxA9OW8eqm4ARiGK7fEISxUndGYkBV
-	DcUI5LCoZXY3am/jkfc=
-X-Received: by 2002:a05:6000:240d:b0:3a2:3b9:5c97 with SMTP id ffacd0b85a97d-3a203b95dfcmr6727882f8f.10.1747125997351;
-        Tue, 13 May 2025 01:46:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGDSttFe6Jwez3R7wkedD9iVeYiW0wRrmLZ9nP6Bo/A7PDTZwr6SDdFpC1d8B773hGd0wePnw==
-X-Received: by 2002:a05:6000:240d:b0:3a2:3b9:5c97 with SMTP id ffacd0b85a97d-3a203b95dfcmr6727864f8f.10.1747125996972;
-        Tue, 13 May 2025 01:46:36 -0700 (PDT)
-Received: from ?IPV6:2a0d:3341:cc59:6510::f39? ([2a0d:3341:cc59:6510::f39])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a1f5a4c804sm15585138f8f.95.2025.05.13.01.46.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 May 2025 01:46:36 -0700 (PDT)
-Message-ID: <2d2a92d2-1844-49de-a869-4caf2677b099@redhat.com>
-Date: Tue, 13 May 2025 10:46:35 +0200
+	s=arc-20240116; t=1747126196; c=relaxed/simple;
+	bh=MaH/3rHQVFeq82s47yVwfb8amcgYaRP6dl9IPVKdCoM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=hGxBCYT7zcK7OzdTY/fomyWAtizgQK2LUBP24rS6pFmoYmX1Tv1DaBZQcyD99U1G8zVPEnCAB8LChQUG8iV+NTLqMsZeHD2ihIzNlaNHziairj9+tuHNe/BIVIp1Et8AJAT7B9MdqCurLLhN7OQMheVNCWhYUTsNOSLT5KkoTBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YqijE3hd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6EB8C4CEE4;
+	Tue, 13 May 2025 08:49:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747126196;
+	bh=MaH/3rHQVFeq82s47yVwfb8amcgYaRP6dl9IPVKdCoM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=YqijE3hd1sczb4GR7qY8e3KcvDJkso/wd5EDv4Nb0N4MlhNxMGTVYOVuNgZYpkyRs
+	 YeOb4UJLiMsVRiuVOHm8ZMVdCMGFk+AdV9x7U7YxRI8HUZ/9+r84cLGds/z4Oxu77p
+	 idS301QWUq+zh2kC2Y3RD9mATXJgalkF2XgHt9yBjD5mBBa26gxF/GqCUcPvjynom9
+	 3NDIEAyTowCBS60mQIiz1IMapcKfoedGGCZ5EuQ/0+eXszGTcyYacuEwt8/mAjlki3
+	 tSyil0CHC9sXaMuu3L5uwvKLZyq7kjfaodlFsfkqNCi4uXgQGX/VqGTE1n5utD0Ub+
+	 9d031bMpCWUQA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD4539D6553;
+	Tue, 13 May 2025 08:50:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] vsock/test: Fix occasional failure in SIOCOUTQ
- tests
-To: Konstantin Shkolnyy <kshk@linux.ibm.com>, sgarzare@redhat.com
-Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, mjrosato@linux.ibm.com
-References: <20250507151456.2577061-1-kshk@linux.ibm.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250507151456.2577061-1-kshk@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3 0/2] address EEE regressions on KSZ switches since v6.9
+ (v6.14+)
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174712623355.1237041.4249732681101911068.git-patchwork-notify@kernel.org>
+Date: Tue, 13 May 2025 08:50:33 +0000
+References: <20250504081434.424489-1-o.rempel@pengutronix.de>
+In-Reply-To: <20250504081434.424489-1-o.rempel@pengutronix.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: davem@davemloft.net, andrew@lunn.ch, edumazet@google.com,
+ f.fainelli@gmail.com, kuba@kernel.org, pabeni@redhat.com, olteanv@gmail.com,
+ woojung.huh@microchip.com, linux@armlinux.org.uk, hkallweit1@gmail.com,
+ kernel@pengutronix.de, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ UNGLinuxDriver@microchip.com, stable@vger.kernel.org
 
-On 5/7/25 5:14 PM, Konstantin Shkolnyy wrote:
-> These tests:
->     "SOCK_STREAM ioctl(SIOCOUTQ) 0 unsent bytes"
->     "SOCK_SEQPACKET ioctl(SIOCOUTQ) 0 unsent bytes"
-> output: "Unexpected 'SIOCOUTQ' value, expected 0, got 64 (CLIENT)".
+Hello:
+
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Sun,  4 May 2025 10:14:32 +0200 you wrote:
+> This patch series addresses a regression in Energy Efficient Ethernet
+> (EEE) handling for KSZ switches with integrated PHYs, introduced in
+> kernel v6.9 by commit fe0d4fd9285e ("net: phy: Keep track of EEE
+> configuration").
 > 
-> They test that the SIOCOUTQ ioctl reports 0 unsent bytes after the data
-> have been received by the other side. However, sometimes there is a delay
-> in updating this "unsent bytes" counter, and the test fails even though
-> the counter properly goes to 0 several milliseconds later.
+> The first patch updates the DSA driver to allow phylink to properly
+> manage PHY EEE configuration. Since integrated PHYs handle LPI
+> internally and ports without integrated PHYs do not document MAC-level
+> LPI support, dummy MAC LPI callbacks are provided.
 > 
-> The delay occurs in the kernel because the used buffer notification
-> callback virtio_vsock_tx_done(), called upon receipt of the data by the
-> other side, doesn't update the counter itself. It delegates that to
-> a kernel thread (via vsock->tx_work). Sometimes that thread is delayed
-> more than the test expects.
-> 
-> Change the test to poll SIOCOUTQ until it returns 0 or a timeout occurs.
-> 
-> Signed-off-by: Konstantin Shkolnyy <kshk@linux.ibm.com>
+> [...]
 
-Could you please provide a suitable fixes tag?
+Here is the summary with links:
+  - [net,v4,1/2] net: dsa: microchip: let phylink manage PHY EEE configuration on KSZ switches
+    https://git.kernel.org/netdev/net/c/76ca05e0abe3
+  - [net,v4,2/2] net: phy: micrel: remove KSZ9477 EEE quirks now handled by phylink
+    https://git.kernel.org/netdev/net/c/8c619eb21b8e
 
-No need to repost, just reply here.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Thanks!
-
-Paolo
 
 
