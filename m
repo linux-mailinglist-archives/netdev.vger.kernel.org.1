@@ -1,251 +1,414 @@
-Return-Path: <netdev+bounces-190097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7F95AB528B
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 12:31:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B804CAB529F
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 12:33:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48D0D16545D
-	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 10:30:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EF1F37A400A
+	for <lists+netdev@lfdr.de>; Tue, 13 May 2025 10:32:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D14224EF83;
-	Tue, 13 May 2025 10:12:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C85152609FD;
+	Tue, 13 May 2025 10:18:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="F/zop4NA";
-	dkim=pass (1024-bit key) header.d=mediateko365.onmicrosoft.com header.i=@mediateko365.onmicrosoft.com header.b="kzqKJOZ8"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="DLSBLpm7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A578C24C095;
-	Tue, 13 May 2025 10:12:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=210.61.82.184
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747131138; cv=fail; b=WKy0BnqA742WZKmuh7wJiGZ391v4/YzyKFfdkO+bhIFdhBmq7RpC6djPqBJhJSYvoxsY6IfLeG0RCJGh+mXekB85qhKICwsrdwduXiH71/XAI0Rvy59XT5tTCjWGgACniP+EI4LJIADA5nsMo+c47wDNxYUiLGLWQoGktZKnOsc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747131138; c=relaxed/simple;
-	bh=MARU0BjyY0SrYojyHdub6+o8m/1k8lh/KiPGV7UPNdI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=FJm66HS3BsdXcmhq/7sLygilE6B6QsSnOghq0n37PvQAWu8I8b3K2SMWSoRP+1Ek2uW93TD8qr+60o1g8OmSqTjRo5TAHlYKvYh8OHRIBgKsCB7qeV1Ot/fmsXS0NuqFicnwqUFhxu8c7xoJ48Le2GkK8PsxmgIl2c0qIF2qGEo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=F/zop4NA; dkim=pass (1024-bit key) header.d=mediateko365.onmicrosoft.com header.i=@mediateko365.onmicrosoft.com header.b=kzqKJOZ8; arc=fail smtp.client-ip=210.61.82.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: bb92c0b02fe211f082f7f7ac98dee637-20250513
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=MIME-Version:Content-Transfer-Encoding:Content-ID:Content-Type:In-Reply-To:References:Message-ID:Date:Subject:CC:To:From; bh=MARU0BjyY0SrYojyHdub6+o8m/1k8lh/KiPGV7UPNdI=;
-	b=F/zop4NAxGOx8rnXRdbQ/vf8iJ9wU2ANjaaCLRZQqLn52p/G2Yi0sd43+yCgO1tcssvkhuv1zvDhD2HLo/Se2fOUxquzOCzaFXbenvQ+WV+AI3Duk3ez/glQla0THiX9dznDjjw8fRk9b/zY4lwR+0glFpy06WAQTHfHw3DUmOM=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.2.1,REQID:b06bee58-f03e-46d4-b6a8-b847cbea40a2,IP:0,UR
-	L:0,TC:0,Content:10,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:10
-X-CID-META: VersionHash:0ef645f,CLOUDID:af58e8e0-512b-41ef-ab70-9303a9a81417,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102|110|111,TC:nil,Conte
-	nt:4|50,EDM:-3,IP:nil,URL:80|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL
-	:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULS
-X-UUID: bb92c0b02fe211f082f7f7ac98dee637-20250513
-Received: from mtkmbs09n2.mediatek.inc [(172.21.101.94)] by mailgw02.mediatek.com
-	(envelope-from <skylake.huang@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 2116581576; Tue, 13 May 2025 18:12:10 +0800
-Received: from mtkmbs10n2.mediatek.inc (172.21.101.183) by
- mtkmbs11n1.mediatek.inc (172.21.101.185) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.39; Tue, 13 May 2025 18:12:09 +0800
-Received: from OS8PR02CU002.outbound.protection.outlook.com (172.21.101.237)
- by mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server id
- 15.2.1258.39 via Frontend Transport; Tue, 13 May 2025 18:12:08 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cuqxGrWf/LJ8XXrj7QNV48+Yw5olQ0mx/+mhwV7gJIPWoW3CSH3Uhdd5BBTOAsa+bLezRAMcbDP2enqBAULGa6shPmrOPSZqaPRtlDS4K6nC3wdmkrpvTy2D84J6htSCV/ZpNDZkR/t4MFgOB0+vDJJJbOb6/QJ3Tn0xRe867z13nHEgoTxF813PZTOunx2bp7/Y4sDvjdChEgIisZMpLjILGWDpoOefgow/Gz4euGH/0gtBoHc1WWAAB4kw0BjgSugv3LpKl56zZknhxqBAiUKb0D8XX1j7GISOvbahH+X207uQ1cO2/CWARkbQr/7dg1j2Fw8FDaUwBXtbsdLKgQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MARU0BjyY0SrYojyHdub6+o8m/1k8lh/KiPGV7UPNdI=;
- b=UY8P2n1hxMO9IMcNmfiXOZ+QtzsuxHFLq1RmiyWAzfN8RVAIYkJoZuFkOxj0RXtEScPBnvofwrGYkK8xE0RpAMLMpwkz2lgVMdp9y0UxUxkWAdTErmwmrkFHPMhWP++D0k+7jdM1QVT2tJ+yCeC0HiBlxNjZLUIksskAPLQfHMSYaPl3IP2ZbJzzEm3shOwBqVGPY9+v7ZKau8mdG7dXQuyN+pfii1WXPkYqQj3SXSMhzIHU/NYnu/vNryhG9J5NMRfSGN7PAhW3+FzOuZH10EsCU/AaEMEEJpDkx/FwnO/IDm6g9IHtdfkM2xirx0n0tSYXdeQGfDDdk+MuwRhrRg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=mediatek.com; dmarc=pass action=none header.from=mediatek.com;
- dkim=pass header.d=mediatek.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB6F2609D0
+	for <netdev@vger.kernel.org>; Tue, 13 May 2025 10:18:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747131505; cv=none; b=r1iY3Qm9S477PsATVoC5eHbcn6iA8i7QE7RquV8YEId32TNEXGHNM+4owD16vQFRRi9KYFnN3LO/cAk3bNhn0eO9pTjtkn4YjZB71H3dtVC8C7+nTxoHe5cERCL5CpDHDZMxw8JnRguAV04bhwDxCBJCz7MNS30EuC3LqrT/Rl4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747131505; c=relaxed/simple;
+	bh=UnFohL/jhoXIhwcN73g1S/6b8OrpaBzf7yqVaxHqaOI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=D7Wac5C17PWBF40r6AawQyc3tsWtfd1FdBiunJkWhG1QaYkX+Hkq2DykWdDVX9gKvFAcB+kdtIbEfF4oH6p/Vf194P5dvKABF2Bq1lUboZpvj7UYggsYV+s8UoHY/hca2AtMGWGygIDKkaObzGTt2Tbr5XMzDlakHZCMNIHfoJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=DLSBLpm7; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5f5bef591d6so11397953a12.1
+        for <netdev@vger.kernel.org>; Tue, 13 May 2025 03:18:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mediateko365.onmicrosoft.com; s=selector2-mediateko365-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MARU0BjyY0SrYojyHdub6+o8m/1k8lh/KiPGV7UPNdI=;
- b=kzqKJOZ84uV7F9HqlciIfs/fliWqOBJMoxplpmO7G+OgF/1xzT4COezxnLPGh9iHJTSEJti1BEabDel+Yx0iE2SbgGT3OmHix8egQUUpuosGCqJeKvPzlH8ztI5J9AhWxKWI9iFL6Qh65Kvfr0djMcOEP+sGtOmZZ8+FjSnWj6E=
-Received: from KL1PR03MB6226.apcprd03.prod.outlook.com (2603:1096:820:8c::14)
- by SEYPR03MB7142.apcprd03.prod.outlook.com (2603:1096:101:d7::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.30; Tue, 13 May
- 2025 10:12:06 +0000
-Received: from KL1PR03MB6226.apcprd03.prod.outlook.com
- ([fe80::f3:c11:8422:7ce3]) by KL1PR03MB6226.apcprd03.prod.outlook.com
- ([fe80::f3:c11:8422:7ce3%3]) with mapi id 15.20.8722.027; Tue, 13 May 2025
- 10:12:04 +0000
-From: =?utf-8?B?U2t5TGFrZSBIdWFuZyAo6buD5ZWf5r6kKQ==?=
-	<SkyLake.Huang@mediatek.com>
-To: "linux@armlinux.org.uk" <linux@armlinux.org.uk>
-CC: "andrew@lunn.ch" <andrew@lunn.ch>, "dqfext@gmail.com" <dqfext@gmail.com>,
-	=?utf-8?B?U3RldmVuIExpdSAo5YqJ5Lq66LGqKQ==?= <steven.liu@mediatek.com>,
-	"davem@davemloft.net" <davem@davemloft.net>, AngeloGioacchino Del Regno
-	<angelogioacchino.delregno@collabora.com>,
-	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "edumazet@google.com"
-	<edumazet@google.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "hkallweit1@gmail.com"
-	<hkallweit1@gmail.com>, "horms@kernel.org" <horms@kernel.org>,
-	"daniel@makrotopia.org" <daniel@makrotopia.org>, "kuba@kernel.org"
-	<kuba@kernel.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "matthias.bgg@gmail.com" <matthias.bgg@gmail.com>
-Subject: Re: [PATCH net-next v2 3/3] net: phy: mediatek: add driver for
- built-in 2.5G ethernet PHY on MT7988
-Thread-Topic: [PATCH net-next v2 3/3] net: phy: mediatek: add driver for
- built-in 2.5G ethernet PHY on MT7988
-Thread-Index: AQHbgqn0+oUccgrII0yLc8X4a8i6V7NOXWgAgIJ8NAA=
-Date: Tue, 13 May 2025 10:12:04 +0000
-Message-ID: <74ce0275952a9c60af87ded9d64ca7301fd69d0f.camel@mediatek.com>
-References: <20250219083910.2255981-1-SkyLake.Huang@mediatek.com>
-	 <20250219083910.2255981-4-SkyLake.Huang@mediatek.com>
-	 <Z7WleP9v6Igx2MjC@shell.armlinux.org.uk>
-In-Reply-To: <Z7WleP9v6Igx2MjC@shell.armlinux.org.uk>
-Accept-Language: zh-TW, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=mediatek.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: KL1PR03MB6226:EE_|SEYPR03MB7142:EE_
-x-ms-office365-filtering-correlation-id: 335d23c7-fc96-4a34-1ba3-08dd92069c59
-x-ld-processed: a7687ede-7a6b-4ef6-bace-642f677fbe31,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024|38070700018;
-x-microsoft-antispam-message-info: =?utf-8?B?VmdFYlRnK2YwQUxzZWRnT3NWZTNmZ3htc0xPTnFRcVRXTWlkSUVrV2Q4cWV3?=
- =?utf-8?B?QzFrb2VRSDNZUTJPbytQa0poNkplaHAyVnZrWlhuRTFpc3BQSjRDQ2p5TUhP?=
- =?utf-8?B?M2ZQeU9reVdXTVNSSDJGa1Nob0VielNlTERkeWhWb0xIV2lHbGFqQ3F6aXBY?=
- =?utf-8?B?V0NsMVI1RlpSSzJwakpJZzBDd3Y4ZFdVN0JYbjhtanZvV2ttdXhaYXp6NjVE?=
- =?utf-8?B?SnZFT0M3ZVl3Qzk2Q1lWRVdycWtPTzlQaG00TFdaNC9pSkM0UHZ5cS9HS3pC?=
- =?utf-8?B?L0srWWxmQUtoV0RMYldVR2ttbTVVUmtucnFqaWNad28yY0FwcUpXajJYVmJu?=
- =?utf-8?B?bktRMjNJR1hrOUROcVQ0UTZTQWw4eVpCYXhIOWhjRENhMWtrelBoaEVyOTVr?=
- =?utf-8?B?OFEzMEZOdVk0UkpTVndJMW9XMkdrQVpHeE9FdEdMTFpmS083NDk5Y05Sekdp?=
- =?utf-8?B?WXo0NFBVVm1HM0tNdmdBY2xmMEpjelVQNE4xRVZXQTZWZ0lQaWR4dUJjbzFX?=
- =?utf-8?B?SmV5MkNRM21JZS9kQkRFZk5CcEVsL0I0Uis5dG5NMVFkeEttc0tnekYrN2Nx?=
- =?utf-8?B?WFBqdWROQW4vKzVnZUpCYjdQWnY5bkN1VVhiMG1Sc1htRStaOVFvZE5kY0VV?=
- =?utf-8?B?Q1ljY3dmaHBuY21MUUtVOUxpTVNuYUszMTR3V0JrVU5vVTYwRC9nSDBFMitj?=
- =?utf-8?B?S0FTTk1xTmoxdExOSkdMMmpmWmthT0xsZWEyR3hxcXlFTEdTL0VkZFUvdlp6?=
- =?utf-8?B?bTBKRCsxRGdsdEhkRVZ1TWRoUmRoN2NmTTl2V002UTd3ZWFtNWNhaXB5TFFD?=
- =?utf-8?B?M2xROC9TSno5R09QaWFWajF1MGt4N3VzNEh0OE0wT2JjOVhBUjg3TFdycTVR?=
- =?utf-8?B?Q2VVajFtR3BoUDI0R01CWkpxckxnUkcwaUFrbFhMNWJkdHBReVVqbGV1Tnlj?=
- =?utf-8?B?QThJaTU1anN0Y3BFUEdBRzlCZlBtUHduaSt1ZkJnMmhtL1hSSHh2cXJRcUJv?=
- =?utf-8?B?d0NVSCszV21DVGdnQTllM3pZeWlBejREd00wTjFyR1plZ1c0aG80cndzbGli?=
- =?utf-8?B?M25FZlZYWlRCVGFoNlo5TjJKNS80eURReDFSYnR0a0pyQVFubWt5U2Z6cGd0?=
- =?utf-8?B?TDFNWE12SDBiSDU5VUNsN1BZZmVFcisxY0tlSmZUL2xkbjR4bHRwVGpSQTJQ?=
- =?utf-8?B?SlRJVFNoOHNnT2dTcTBYZHlQd3RKZFV4Yjd2KzREazQvT2ZVZDczRUZCVW9K?=
- =?utf-8?B?ellYbjBUZzRMUDM3ekhKVldmY28rbG1hTWFXeGdLUmNqVUNNdkIwNCt1WXk3?=
- =?utf-8?B?ZndGbUQ3Zkhia1F1ZUtoWTBCTjhBV0JQZFcvRTV0Tk9kVXdMcW9pQXlJUjdN?=
- =?utf-8?B?M1FKRGlJTWlQTDRLSXpzekFGd3Q4bStvb3FEd3pLNEJTMnhuT25wR0MzNVY4?=
- =?utf-8?B?VWlTeXNzbld5MXh5U3Rhb3lsMjlYZzhlekVyVEc1R1h6ZHJYSE81bEdvMXJK?=
- =?utf-8?B?Z1ZVQmhkYmpXeGNEdGVhNHJ0d2JDQzBmNy9BNU5adWV5VnZLcVRibWg5aS9Z?=
- =?utf-8?B?WTlmYzBxMVpaajZsU2FYeWZoZWkzd3Vua1dkc1BYUWpRRmhZUlFLN3ZNa3JL?=
- =?utf-8?B?NFJvZkZWOERNMzFqdVZGQkRvMUZTRVgremRrc1htRGZTcTh4bUc1YlZwMGs5?=
- =?utf-8?B?SjVZRjRONVdkS3RKbkU5S2YxL1NkdjgxMnkyUnBRdFk5V0FBYis1UGwvM1dm?=
- =?utf-8?B?VXlhSFBwME9yK3FMaUZUQ2xoSjlXRCtTNnNuYXlrMXFDVit2WFlSRm9VK3Bm?=
- =?utf-8?B?MVFkSWM2NlVERGRhU3VZV2o5VGFVVGM5UFpreTM2cUR3V1hRSGFobE9pNEFv?=
- =?utf-8?B?bFNlN2VQRkhDL0MzYTBQeGYzeStmRTV0MU5NZm1DckNDRTFQWEE4NlRRcWtO?=
- =?utf-8?Q?9+IpFoaQAIU=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:KL1PR03MB6226.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?NE81UTJiMVdiZVlPcWxseldlakk0QzVOQUlDYVZFVXhJUXE1SVl3M2pDTi9B?=
- =?utf-8?B?VkJ0ZjY4OFVZWk1HbjN4Nlp1NDAzekRWeW1RcmdoMk9KczRra05ZTDF2SHBJ?=
- =?utf-8?B?Sy85YnZENjFFUWZLZURhMlYyOFJGMm43bUhOU2NUL0FXZWFwOVYwVk9HdXly?=
- =?utf-8?B?dENIV2ZONm9vYkpiRU5HZWxxbDIySjA4WGdkN0RJbzFCUWs0OFpqZUtFN2lZ?=
- =?utf-8?B?aFl4am84ZmZLNTMwcFBHR0Erci8wU3ZsSGNGdEg0SzhxNUhVVEpNMlFyQmRy?=
- =?utf-8?B?RVZVQnF2bEFYNHRIRFJKU1djNVNId2FFQ0p1T0xHSnBGS3RHcVlzYmdneTY1?=
- =?utf-8?B?bE40MlpKN3I4SUFlMDU4VnJpd3FRaTg0ZEluMHRkZUhCVlBvamhBZkM4N3VQ?=
- =?utf-8?B?aTZLbUljNWZES09lTDB5MnQ2bWdCTlIySHNxckV5NldCWnc2OVVwSTZ2ZFBF?=
- =?utf-8?B?K2l2T2ZNSGozZnh1ZkcxOU9kWVZwQlVLQmtrZ05XQkFuamFzYSsxRXZtRUFS?=
- =?utf-8?B?MTVlZVY0UklmWSsveTFnbm1XekNTSDdFNXB3YXJONUw1a1ptdEF4Z0RSUVlp?=
- =?utf-8?B?cHZzVFU2MWVLcnZTdEppSUQyRjIzYU85SWVsZVBZbk13ZDRsNldhMGxaT1lI?=
- =?utf-8?B?citCN2NDNFVjVDdOcm5teGJEaXZYN0l3UlptMDdtdzltODJCK1JZTEdjUjRn?=
- =?utf-8?B?N2o0UlJTZU5KVUVUSTZVN3RjN3lnN0N4YzNNcmlQb0VrbEpZUDQwT2RyYmtV?=
- =?utf-8?B?MGdWcUpuSzQ1QmllWGlZMHhicTl5TVRqODhNSVZlNG4rcDZTeHg0WU5tMmxF?=
- =?utf-8?B?eTBHWmxFTXNaT0p3QXc4M0JNUDZhZmYrT1hyYjduOUFDNURlMDA2R01ObzVK?=
- =?utf-8?B?U0t0RWdIUzhnSGxKZ3VRUno1WGxKOThqRXNJblhPMytNdmhkdkM2WSs1TUpt?=
- =?utf-8?B?ekludUt4R3ZaMEovanFGK0k0M3hhTzVCRWNrMFdNU0d4TmVOTnNrRGFwZGla?=
- =?utf-8?B?ZnhJOUdYTGlxbzF0VWladGd0bmdkaDl2a3pBUUNrK2VEQVhTaDVjWkxUSDho?=
- =?utf-8?B?ZXFDRkxSUWtxOHp2bWEzTlh3U3JBMUZqY2I3c09pbC92RkJxYVpGNkVKUWxB?=
- =?utf-8?B?RUNiY2tBdmxJczJYS21sOHl6Ri8xMWNsY2ZTYnBmYnYvSjA3QWVudU5oeGUz?=
- =?utf-8?B?ZmRHWnBRM0VFckJhV21hY3ZzbEl1cTc2K2hvNUo5bFlZMGl5SEYxV3RobDZk?=
- =?utf-8?B?bE9rdHFra0c4dmNUT0p0dTJCMS9uT29UNGxseDBjbWZubHVvQXlDYytkcEVm?=
- =?utf-8?B?VG9aR2NtUkpleCtXc2dyK3N3L0tkTkEzQUNqelJNdTQyT2lkRkN1bjRoa0VI?=
- =?utf-8?B?Q3hMemc4S2JKRHdRMTNOUVF2eDFrU0dBbFgyN3pDeUR3TkxRdlA1S0dPemZI?=
- =?utf-8?B?aS9icDA4MDhRSE8vUVZneVVrNTNmbWtCZHZ5OWkzbGlJTkV5TGdwTk9Fejlr?=
- =?utf-8?B?SkJKVUVRTFEwakxvTDRJd0NrWU8rdEJRNHBLcTRTNHR5amhRc3h3cmNLNG9v?=
- =?utf-8?B?czZaekpNMXorL1R2RXdOY1lQRUFZNmpmRW1JU3RQZXdtelJTRzF3Z2VCV2U1?=
- =?utf-8?B?U0lWZkxBM0dDRjZ2SzhBclZLS01PVGdzQzBTL3ROWWFMaWdQYU5JZnJ4QXFR?=
- =?utf-8?B?eVBENi9UYk9kNXNQTjQ4S0t5a3ZYTFBVZWVXeHBHVGNaZkxZd3JOb3BlZUw1?=
- =?utf-8?B?dFVvTG1OUzZ4SXRLaWFXTFJGaGZnSUpZOENHU1dVc2p3SkgzK0Exb0hrTjFL?=
- =?utf-8?B?azBjQUpTd25CMTJML0V5YWZlMWhBV05uWlJPTlNkMWhYNUtWVWplVU1EVnY5?=
- =?utf-8?B?RVd2bG1BK21OdGUzRGJmRGZjL1ZNbDBhZTk0aytTSTJzZVBnbkdodVlqMUVw?=
- =?utf-8?B?MExjOENaM1VqRUZIa2VTNEIyUUZZVTFJMFVaVlQ1UWFrN0RhMU9mbWQ5Tytq?=
- =?utf-8?B?QkZDMU1iMTFsTHBVdm51M1lobi9XQ2o1ZHVENXp4R2s4U001MUtvWjZjTDU4?=
- =?utf-8?B?M014cHo1TjlmM1kyQVhWNkQ3am1uWW85T1E3V3AyRkVwd2JqTGpjU21Ba0Zh?=
- =?utf-8?B?YjFkQVcxaFRWaUdQZmFteDZoUkI0L2lDWlZwdkxoMDFPTkFkT2VzMWdmQkNy?=
- =?utf-8?B?ckE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <5CEAEA7CDC085A4CBB46BEBF9AC224F4@apcprd03.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1747131501; x=1747736301; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2mxezmpwdvQlOlX2DPWmgHazAevXAsYIAhjuV5eBsk4=;
+        b=DLSBLpm7BAZS74hTcivui5piLd6JscHhBLjc9MOkeXCfXOxqcacXkmueTETOPV6f2D
+         Iho6TLwDz/x3Yqca9Hy65lZSTVlEzmp1ROa3oHMIcGkk8XuU7LGh4weElLZ/XZZihokr
+         tT9Vl6+HljrcLvyp3EGYkhpZSFEeChtTg0PxW4pj5nA/HgZjOMQzq+u7VZikmAeY8M3e
+         6evGokx3o1B9eZKfcYRwH1p9hJ3bsV9Tl24lepjUOpToGlUqjul85iQX40DRm6SityvK
+         b/l6GHmSXs+6gDfDxKZE9TAbwT1Xn7ljdCrAmHxawzaM5lugEDrWoiuBtrbEu6T+6DFQ
+         ynPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747131501; x=1747736301;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2mxezmpwdvQlOlX2DPWmgHazAevXAsYIAhjuV5eBsk4=;
+        b=Bn1DiHPFABGX1jgyF/NwiNSERxmbpPWDxtArdBVuMV5X6Umayxp/UDnBHsXgZLEltc
+         mEvcq6sCJbw3S2fDLm45pcKgsAKHEGA62PuEaBxajktFN/KWbNRgchXUR+j3B31K83bv
+         g5cLFZ8TwdvHVepYV98T0Ze9C6OfW0+vKg8CvkkPRk9J99mteyWsRwv8o8A3iQLsrcZE
+         1yLl20D13lox/O084BHrSbAVV+jWY3wDO0W0+Jk25FIDNF2i4MxHYviYFGOrkFMzCSqq
+         GYNh2AjWWjXU85l8dRpTfVo1sj2yEQPf6GiOkTaU/5JfkMw2lLZ81j/W2WnHPiWjzIkI
+         am2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVAUJlmmEWKAnyB9PB2QYHlxuftPYOnkntOqtfvfy43yYstdNKkNh01KwVZfqOgW4c7OuJEhtw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YypBllWTAvj0ouoipgkxBsP5C6qRgiDm2lZyB09kTDKbuNL3xv4
+	cP8e+4SlNkL3i82/Fo0uel7C3b+XeaJ/WwneVlcZdjZlkcFe/vx3egrqLhRpXoI=
+X-Gm-Gg: ASbGncuzlPXQ845lwWhcPf+khiusB/5Y0Od0AXa2k7kP+Mo90/WjEZSpZC3CEuLC2iA
+	wxzpGq+AIIeWfu3DCRGXMvWksS3Uu12uNrF4+gJjE/WP/FUylg/fsUT8u0hYC5k8QgQXJHvTbFR
+	Djv4JjtX/oaJ4STAaMwRTOjuz2CHkwiHj2J8NynnmQz2fDUt6SInbk3R6aeAjJUHeLCa+SCVDKG
+	e6Yq3pFDwxBn8YROWB+zVyXtY21MJxFcdAalNdZ2W9bT5d6Ks1rqJ1z/fFWA3QRfopl9wwZNpel
+	VDyXDcjA89ZW/qJ1J0kZWIthS10/+0+NLEHRfQK7uCAqJqZwsWABBGQDJtnHRhFciuQRV9vmvVf
+	UupsuT8s=
+X-Google-Smtp-Source: AGHT+IEhXbuqv9SHfpGg4Pm1ImklBHv1IEgGVqzoQvMjjlW+T3A36SnDDgOSoKO9v4yOP7N4FG6uLA==
+X-Received: by 2002:a05:6402:5187:b0:5fb:e7e1:f1c1 with SMTP id 4fb4d7f45d1cf-5fca0731385mr14175814a12.3.1747131501184;
+        Tue, 13 May 2025 03:18:21 -0700 (PDT)
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5fc9cc26521sm7032152a12.18.2025.05.13.03.18.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 May 2025 03:18:20 -0700 (PDT)
+Message-ID: <f690dc4a-fde8-411d-84d8-67980555f479@blackwall.org>
+Date: Tue, 13 May 2025 13:18:19 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: KL1PR03MB6226.apcprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 335d23c7-fc96-4a34-1ba3-08dd92069c59
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 May 2025 10:12:04.6607
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a7687ede-7a6b-4ef6-bace-642f677fbe31
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: gZ0M0WwgzD9kLaDHd9L3cvMNIClwXgY9BP1CZnyzsH2fgGH2aN7HM6gTVAd3xzCDset+XOCYo5O8opt4exGC+cfQfi7vs67ojHKNbiErX8s=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEYPR03MB7142
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/4] net: bonding: add broadcast_neighbor
+ option for 802.3ad
+To: Tonghao Zhang <tonghao@bamaicloud.com>, netdev@vger.kernel.org
+Cc: Jay Vosburgh <jv@jvosburgh.net>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Zengbing Tu <tuzengbing@didiglobal.com>
+References: <20250513094750.23387-1-tonghao@bamaicloud.com>
+ <4270C010E5516F3B+20250513094750.23387-2-tonghao@bamaicloud.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <4270C010E5516F3B+20250513094750.23387-2-tonghao@bamaicloud.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-T24gV2VkLCAyMDI1LTAyLTE5IGF0IDA5OjMzICswMDAwLCBSdXNzZWxsIEtpbmcgKE9yYWNsZSkg
-d3JvdGU6DQo+IA0KPiBFeHRlcm5hbCBlbWFpbCA6IFBsZWFzZSBkbyBub3QgY2xpY2sgbGlua3Mg
-b3Igb3BlbiBhdHRhY2htZW50cyB1bnRpbA0KPiB5b3UgaGF2ZSB2ZXJpZmllZCB0aGUgc2VuZGVy
-IG9yIHRoZSBjb250ZW50Lg0KPiANCj4gDQo+IE9uIFdlZCwgRmViIDE5LCAyMDI1IGF0IDA0OjM5
-OjEwUE0gKzA4MDAsIFNreSBIdWFuZyB3cm90ZToNCj4gPiArc3RhdGljIGludCBtdDc5OHhfMnA1
-Z2VfcGh5X2NvbmZpZ19pbml0KHN0cnVjdCBwaHlfZGV2aWNlICpwaHlkZXYpDQo+ID4gK3sNCj4g
-PiArwqDCoMKgwqAgc3RydWN0IHBpbmN0cmwgKnBpbmN0cmw7DQo+ID4gK8KgwqDCoMKgIGludCBy
-ZXQ7DQo+ID4gKw0KPiA+ICvCoMKgwqDCoCAvKiBDaGVjayBpZiBQSFkgaW50ZXJmYWNlIHR5cGUg
-aXMgY29tcGF0aWJsZSAqLw0KPiA+ICvCoMKgwqDCoCBpZiAocGh5ZGV2LT5pbnRlcmZhY2UgIT0g
-UEhZX0lOVEVSRkFDRV9NT0RFX0lOVEVSTkFMKQ0KPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqAgcmV0dXJuIC1FTk9ERVY7DQo+ID4gKw0KPiA+ICvCoMKgwqDCoCByZXQgPSBtdDc5OHhfMnA1
-Z2VfcGh5X2xvYWRfZncocGh5ZGV2KTsNCj4gPiArwqDCoMKgwqAgaWYgKHJldCA8IDApDQo+ID4g
-K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm4gcmV0Ow0KPiANCj4gRmlybXdhcmUgc2hv
-dWxkIG5vdCBiZSBsb2FkZWQgaW4gdGhlIC5jb25maWdfaW5pdCBtZXRob2QuIFRoZSBhYm92ZQ0K
-PiBjYWxsIHdpbGwgYmxvY2sgd2hpbGUgaG9sZGluZyB0aGUgUlROTCB3aGljaCB3aWxsIHByZXZl
-bnQgYWxsIG90aGVyDQo+IG5ldHdvcmsgY29uZmlndXJhdGlvbiB1bnRpbCB0aGUgZmlybXdhcmUg
-aGFzIGJlZW4gbG9hZGVkIG9yIHRoZSBsb2FkDQo+IGZhaWxzLg0KPiANCj4gVGhhbmtzLg0KPiAN
-Cj4gLS0NCj4gUk1LJ3MgUGF0Y2ggc3lzdGVtOg0KPiBodHRwczovL3VybGRlZmVuc2UuY29tL3Yz
-L19faHR0cHM6Ly93d3cuYXJtbGludXgub3JnLnVrL2RldmVsb3Blci9wYXRjaGVzL19fOyEhQ1RS
-TktBOXdNZzBBUmJ3IWlWLTFWaVBGc1VWLWxMajdhSXljYW44bmVyeTZzUU8zdDZta3BkbGJfR1c4
-aHN3aHhjNGVqSm96eHFrVTNzMld6eFNpenM0a2ZkQzc3eXI3SEdHUkl1VSQNCj4gRlRUUCBpcyBo
-ZXJlISA4ME1icHMgZG93biAxME1icHMgdXAuIERlY2VudCBjb25uZWN0aXZpdHkgYXQgbGFzdCEN
-Cg0KQWN0dWFsbHksIEkgd3JvdGUgZncgbG9hZGluZyBmbG93IGluIC5wcm9iZS4gSG93ZXZlciwg
-ZHVyaW5nIGJvb3QgdGltZSwNCi5wcm9iZSBpcyBjYWxsZWQgYXQgdmVyeSBlYXJseSBzdGFnZSAo
-YWJvdXQgdGhlIGZpcnN0IDJzIGFmdGVyIGJvb3RpbmcNCmludG8gTGludXggS2VybmVsKS4gQXQg
-dGhhdCB0aW1lLCBmaWxlc3lzdGVtIGlzbid0IHJlYWR5IHlldCBhbmQgcGh5DQpkcml2ZXIgY2Fu
-J3QgbG9jYXRlIC9saWIvZmlybXdhcmUvbWVkaWF0ZWsvbXQ3OTg4L2kycDVnZS1waHktcG1iLmJp
-bi4NCkFkZGluZyAiLUVQUk9CRV9ERUZFUiIgZG9lc24ndCBoZWxwIGF0IHRoaXMgbW9tZW50LiBJ
-J20gbm90IHN1cmUgaG93DQphcXVhbnRpYSBhbmQgcXQyMDI1IGRyaXZlcnMgaGFuZGxlIHRoaXMu
-DQoNCkJ1dCBhbnl3YXksIG10Nzk4OCdzIGJ1aWx0LWluIHBoeSBkcml2ZXIgbG9hZHMgZmlybXdh
-cmUgaW4gb25seSBhIGZldw0KbXMuIFRoaXMgaXMgdmlhIGludGVybmFsIGJ1cyBpbnN0ZWFkIG9m
-IE1ESU8gYnVzLCBzbyBsb2FkaW5nIHNwZWVkIGlzDQptdWNoIGZhc3Rlci4gV2lsbCB0aGlzIGhh
-dmUgYW55IGltcGFjdCwgaWYgdGhhdCdzIHRoZSBjYXNlPw0KDQpCUnMsDQpTa3kNCg==
+On 5/13/25 12:47, Tonghao Zhang wrote:
+> Stacking technology is a type of technology used to expand ports on
+> Ethernet switches. It is widely used as a common access method in
+> large-scale Internet data center architectures. Years of practice
+> have proved that stacking technology has advantages and disadvantages
+> in high-reliability network architecture scenarios. For instance,
+> in stacking networking arch, conventional switch system upgrades
+> require multiple stacked devices to restart at the same time.
+> Therefore, it is inevitable that the business will be interrupted
+> for a while. It is for this reason that "no-stacking" in data centers
+> has become a trend. Additionally, when the stacking link connecting
+> the switches fails or is abnormal, the stack will split. Although it is
+> not common, it still happens in actual operation. The problem is that
+> after the split, it is equivalent to two switches with the same configuration
+> appearing in the network, causing network configuration conflicts and
+> ultimately interrupting the services carried by the stacking system.
+> 
+> To improve network stability, "non-stacking" solutions have been increasingly
+> adopted, particularly by public cloud providers and tech companies
+> like Alibaba, Tencent, and Didi. "non-stacking" is a method of mimicing switch
+> stacking that convinces a LACP peer, bonding in this case, connected to a set of
+> "non-stacked" switches that all of its ports are connected to a single
+> switch (i.e., LACP aggregator), as if those switches were stacked. This
+> enables the LACP peer's ports to aggregate together, and requires (a)
+> special switch configuration, described in the linked article, and (b)
+> modifications to the bonding 802.3ad (LACP) mode to send all ARP / ND
+> packets across all ports of the active aggregator.
+> 
+>   -----------     -----------
+>  |  switch1  |   |  switch2  |
+>   -----------     -----------
+>          ^           ^
+>          |           |
+>         ---------------
+>        |   bond4 lacp  |
+>         ---------------
+>          | NIC1      | NIC2
+>      ---------------------
+>     |       server        |
+>      ---------------------
+> 
+> - https://www.ruijie.com/fr-fr/support/tech-gallery/de-stack-data-center-network-architecture/
+> 
+> Cc: Jay Vosburgh <jv@jvosburgh.net>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Simon Horman <horms@kernel.org>
+> Cc: Jonathan Corbet <corbet@lwn.net>
+> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+> Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
+> Signed-off-by: Zengbing Tu <tuzengbing@didiglobal.com>
+> ---
+>  Documentation/networking/bonding.rst |  6 +++++
+>  drivers/net/bonding/bond_main.c      | 39 ++++++++++++++++++++++++++++
+>  drivers/net/bonding/bond_options.c   | 34 ++++++++++++++++++++++++
+>  drivers/net/bonding/bond_sysfs.c     | 18 +++++++++++++
+>  include/net/bond_options.h           |  1 +
+>  include/net/bonding.h                |  3 +++
+>  6 files changed, 101 insertions(+)
+> 
+> diff --git a/Documentation/networking/bonding.rst b/Documentation/networking/bonding.rst
+> index a4c1291d2561..14f7593d888d 100644
+> --- a/Documentation/networking/bonding.rst
+> +++ b/Documentation/networking/bonding.rst
+> @@ -562,6 +562,12 @@ lacp_rate
+>  
+>  	The default is slow.
+>  
+> +broadcast_neighbor
+> +
+> +	Option specifying whether to broadcast ARP/ND packets to all
+> +	active slaves.  This option has no effect in modes other than
+> +	802.3ad mode.  The default is off (0).
+> +
+>  max_bonds
+>  
+>  	Specifies the number of bonding devices to create for this
+> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+> index d05226484c64..8ee26ddddbc8 100644
+> --- a/drivers/net/bonding/bond_main.c
+> +++ b/drivers/net/bonding/bond_main.c
+> @@ -212,6 +212,9 @@ atomic_t netpoll_block_tx = ATOMIC_INIT(0);
+>  
+>  unsigned int bond_net_id __read_mostly;
+>  
+> +DEFINE_STATIC_KEY_FALSE(bond_bcast_neigh_enabled);
+> +EXPORT_SYMBOL_GPL(bond_bcast_neigh_enabled);
+
+No need to export the symbol, you can add bond helpers to inc/dec it.
+
+> +
+>  static const struct flow_dissector_key flow_keys_bonding_keys[] = {
+>  	{
+>  		.key_id = FLOW_DISSECTOR_KEY_CONTROL,
+> @@ -4480,6 +4483,9 @@ static int bond_close(struct net_device *bond_dev)
+>  		bond_alb_deinitialize(bond);
+>  	bond->recv_probe = NULL;
+>  
+> +	if (bond->params.broadcast_neighbor)
+> +		static_branch_dec(&bond_bcast_neigh_enabled);
+> +
+
+This branch doesn't get re-enabled if the bond is brought up afterwards.
+
+>  	if (bond_uses_primary(bond)) {
+>  		rcu_read_lock();
+>  		slave = rcu_dereference(bond->curr_active_slave);
+> @@ -5316,6 +5322,35 @@ static struct slave *bond_xdp_xmit_3ad_xor_slave_get(struct bonding *bond,
+>  	return slaves->arr[hash % count];
+>  }
+>  
+> +static inline bool bond_should_broadcast_neighbor(struct sk_buff *skb,
+
+don't use inline in .c files
+
+> +						  struct net_device *dev)
+> +{
+> +	struct bonding *bond = netdev_priv(dev);
+> +
+> +	if (!static_branch_unlikely(&bond_bcast_neigh_enabled))
+> +		return false;
+> +
+> +	if (!bond->params.broadcast_neighbor)
+> +		return false;
+> +
+> +	if (skb->protocol == htons(ETH_P_ARP))
+> +		return true;
+> +
+> +	if (skb->protocol == htons(ETH_P_IPV6) &&
+> +	    pskb_may_pull(skb,
+> +			  sizeof(struct ipv6hdr) + sizeof(struct icmp6hdr))) {
+> +		if (ipv6_hdr(skb)->nexthdr == IPPROTO_ICMPV6) {
+> +			struct icmp6hdr *icmph = icmp6_hdr(skb);
+> +
+> +			if ((icmph->icmp6_type == NDISC_NEIGHBOUR_SOLICITATION) ||
+> +			    (icmph->icmp6_type == NDISC_NEIGHBOUR_ADVERTISEMENT))
+> +				return true;
+> +		}
+> +	}
+> +
+> +	return false;
+> +}
+> +
+>  /* Use this Xmit function for 3AD as well as XOR modes. The current
+>   * usable slave array is formed in the control path. The xmit function
+>   * just calculates hash and sends the packet out.
+> @@ -5583,6 +5618,9 @@ static netdev_tx_t __bond_start_xmit(struct sk_buff *skb, struct net_device *dev
+>  	case BOND_MODE_ACTIVEBACKUP:
+>  		return bond_xmit_activebackup(skb, dev);
+>  	case BOND_MODE_8023AD:
+> +		if (bond_should_broadcast_neighbor(skb, dev))
+> +			return bond_xmit_broadcast(skb, dev);
+> +		fallthrough;
+>  	case BOND_MODE_XOR:
+>  		return bond_3ad_xor_xmit(skb, dev);
+>  	case BOND_MODE_BROADCAST:
+> @@ -6462,6 +6500,7 @@ static int __init bond_check_params(struct bond_params *params)
+>  	eth_zero_addr(params->ad_actor_system);
+>  	params->ad_user_port_key = ad_user_port_key;
+>  	params->coupled_control = 1;
+> +	params->broadcast_neighbor = 0;
+>  	if (packets_per_slave > 0) {
+>  		params->reciprocal_packets_per_slave =
+>  			reciprocal_value(packets_per_slave);
+> diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
+> index 91893c29b899..dca52d93f513 100644
+> --- a/drivers/net/bonding/bond_options.c
+> +++ b/drivers/net/bonding/bond_options.c
+> @@ -87,6 +87,8 @@ static int bond_option_missed_max_set(struct bonding *bond,
+>  				      const struct bond_opt_value *newval);
+>  static int bond_option_coupled_control_set(struct bonding *bond,
+>  					   const struct bond_opt_value *newval);
+> +static int bond_option_broadcast_neigh_set(struct bonding *bond,
+> +					   const struct bond_opt_value *newval);
+>  
+>  static const struct bond_opt_value bond_mode_tbl[] = {
+>  	{ "balance-rr",    BOND_MODE_ROUNDROBIN,   BOND_VALFLAG_DEFAULT},
+> @@ -240,6 +242,12 @@ static const struct bond_opt_value bond_coupled_control_tbl[] = {
+>  	{ NULL,  -1, 0},
+>  };
+>  
+> +static const struct bond_opt_value bond_broadcast_neigh_tbl[] = {
+> +	{ "on",	 1, 0},
+> +	{ "off", 0, BOND_VALFLAG_DEFAULT},
+
+I know the option above is using this order, but it is a bit counter-intuitive to
+have their places reversed wrt their values, could you please re-order these as
+the other bond on/off options? This is a small nit, I don't have a strong preference
+but it is more intuitive to have them in their value order. :)
+
+> +	{ NULL,  -1, 0}> +};
+> +
+>  static const struct bond_option bond_opts[BOND_OPT_LAST] = {
+>  	[BOND_OPT_MODE] = {
+>  		.id = BOND_OPT_MODE,
+> @@ -513,6 +521,14 @@ static const struct bond_option bond_opts[BOND_OPT_LAST] = {
+>  		.flags = BOND_OPTFLAG_IFDOWN,
+>  		.values = bond_coupled_control_tbl,
+>  		.set = bond_option_coupled_control_set,
+> +	},
+> +	[BOND_OPT_BROADCAST_NEIGH] = {
+> +		.id = BOND_OPT_BROADCAST_NEIGH,
+> +		.name = "broadcast_neighbor",
+> +		.desc = "Broadcast neighbor packets to all slaves",
+> +		.unsuppmodes = BOND_MODE_ALL_EX(BIT(BOND_MODE_8023AD)),
+> +		.values = bond_broadcast_neigh_tbl,
+> +		.set = bond_option_broadcast_neigh_set,
+>  	}
+>  };
+>  
+> @@ -1840,3 +1856,21 @@ static int bond_option_coupled_control_set(struct bonding *bond,
+>  	bond->params.coupled_control = newval->value;
+>  	return 0;
+>  }
+> +
+> +static int bond_option_broadcast_neigh_set(struct bonding *bond,
+> +					   const struct bond_opt_value *newval)
+> +{
+> +	netdev_dbg(bond->dev, "Setting broadcast_neighbor to %llu\n",
+> +		   newval->value);
+> +
+> +	if (bond->params.broadcast_neighbor == newval->value)
+> +		return 0;
+> +
+> +	bond->params.broadcast_neighbor = newval->value;
+> +	if (bond->params.broadcast_neighbor)
+> +		static_branch_inc(&bond_bcast_neigh_enabled);
+> +	else
+> +		static_branch_dec(&bond_bcast_neigh_enabled);
+
+If the bond has been brought down then the branch has been already decremented.
+You'll have to synchronize this with bond open/close or alternatively mark the option
+as being able to be changed only when the bond is up (there is an option flag for that).
+
+> +
+> +	return 0;
+> +}
+> diff --git a/drivers/net/bonding/bond_sysfs.c b/drivers/net/bonding/bond_sysfs.c
+> index 1e13bb170515..4a53850b2c68 100644
+> --- a/drivers/net/bonding/bond_sysfs.c
+> +++ b/drivers/net/bonding/bond_sysfs.c
+> @@ -752,6 +752,23 @@ static ssize_t bonding_show_ad_user_port_key(struct device *d,
+>  static DEVICE_ATTR(ad_user_port_key, 0644,
+>  		   bonding_show_ad_user_port_key, bonding_sysfs_store_option);
+>  
+> +static ssize_t bonding_show_broadcast_neighbor(struct device *d,
+> +					       struct device_attribute *attr,
+> +					       char *buf)
+> +{
+> +	struct bonding *bond = to_bond(d);
+> +	const struct bond_opt_value *val;
+> +
+> +	val = bond_opt_get_val(BOND_OPT_BROADCAST_NEIGH,
+> +			       bond->params.broadcast_neighbor);
+> +
+> +	return sysfs_emit(buf, "%s %d\n", val->string,
+> +			  bond->params.broadcast_neighbor);
+> +}
+> +
+> +static DEVICE_ATTR(broadcast_neighbor, 0644,
+> +		   bonding_show_broadcast_neighbor, bonding_sysfs_store_option);
+> +
+
+sysfs options are deprecated, please don't extend sysfs
+netlink is the preferred way for new options
+
+>  static struct attribute *per_bond_attrs[] = {
+>  	&dev_attr_slaves.attr,
+>  	&dev_attr_mode.attr,
+> @@ -791,6 +808,7 @@ static struct attribute *per_bond_attrs[] = {
+>  	&dev_attr_ad_actor_system.attr,
+>  	&dev_attr_ad_user_port_key.attr,
+>  	&dev_attr_arp_missed_max.attr,
+> +	&dev_attr_broadcast_neighbor.attr,
+>  	NULL,
+>  };
+>  
+> diff --git a/include/net/bond_options.h b/include/net/bond_options.h
+> index 18687ccf0638..022b122a9fb6 100644
+> --- a/include/net/bond_options.h
+> +++ b/include/net/bond_options.h
+> @@ -77,6 +77,7 @@ enum {
+>  	BOND_OPT_NS_TARGETS,
+>  	BOND_OPT_PRIO,
+>  	BOND_OPT_COUPLED_CONTROL,
+> +	BOND_OPT_BROADCAST_NEIGH,
+>  	BOND_OPT_LAST
+>  };
+>  
+> diff --git a/include/net/bonding.h b/include/net/bonding.h
+> index 95f67b308c19..e06f0d63b2c1 100644
+> --- a/include/net/bonding.h
+> +++ b/include/net/bonding.h
+> @@ -115,6 +115,8 @@ static inline int is_netpoll_tx_blocked(struct net_device *dev)
+>  #define is_netpoll_tx_blocked(dev) (0)
+>  #endif
+>  
+> +DECLARE_STATIC_KEY_FALSE(bond_bcast_neigh_enabled);
+> +
+>  struct bond_params {
+>  	int mode;
+>  	int xmit_policy;
+> @@ -149,6 +151,7 @@ struct bond_params {
+>  	struct in6_addr ns_targets[BOND_MAX_NS_TARGETS];
+>  #endif
+>  	int coupled_control;
+> +	int broadcast_neighbor;
+>  
+>  	/* 2 bytes of padding : see ether_addr_equal_64bits() */
+>  	u8 ad_actor_system[ETH_ALEN + 2];
+
 
