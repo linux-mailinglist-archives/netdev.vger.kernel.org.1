@@ -1,187 +1,101 @@
-Return-Path: <netdev+bounces-190394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF8A2AB6B00
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 14:07:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EF47AB6B1C
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 14:10:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03AE04C2615
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 12:07:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B99C3B1A70
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 12:10:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED24527EC6F;
-	Wed, 14 May 2025 12:04:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 142DB27702D;
+	Wed, 14 May 2025 12:09:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nQWVr4ce"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FPZ4rhXT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C36D027E7F0;
-	Wed, 14 May 2025 12:04:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A8D276056;
+	Wed, 14 May 2025 12:09:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747224298; cv=none; b=B4i/20nOJTPdjZOGY1zjGiLcw3JxvYPyGuEXrrvcrTMBdyYBYP1tKOtQHSr1PuJ5a53Cv3jA5d6RwcwAVEcxurHul6s5gppmoZx1N1ZgjDXO2n5CVlnsiomurymCOg+QHSMftQB/66whKzHhAxZvBkNyR+IsSQa9HwOTEUpoqOo=
+	t=1747224586; cv=none; b=EyVaTf1gZlGowdo9oz2oZUQgnbGcwB7FXkiLWjHtO0qD6zr+EdCUOwvGWi5nhYjX7LG5IkVkjSR6fAWWIQZCRFoYngrkzcZRPy1yQm856umrTCvYpi2DQpvNkWyzXdwy3atshPHU2p4+105tsdwJpc6fjVjJJwAL96IFHY5YZJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747224298; c=relaxed/simple;
-	bh=ZLuQ+QKiv6AHk6aYVgypKAalpJm1udHDw0jrk7Sr2HM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=jDnDmDfTydEWmpJqhnHVEhkx/Og17/H6ZVwkFPTii06KZuSjYIHSliqyk2hRUdkD9mSDKWwYPGJ58bqBxku+mTZh8L1pWGYzPDibpUdBWpRgMUEjmYIC3uaoElOsPwIYSfH8UUx9+uMok7et9kOnpdqJSStuqXRvvdAJmr44odE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nQWVr4ce; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76566C4CEF0;
-	Wed, 14 May 2025 12:04:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747224298;
-	bh=ZLuQ+QKiv6AHk6aYVgypKAalpJm1udHDw0jrk7Sr2HM=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=nQWVr4ceomZQiVyJDD2RLJXhCp007SAaQ3hux2k5W2JzwcUW/2KBfYBAbmHKSnHjd
-	 RnyovmoDllw6CW5QwAWHMMLyCYWaIYQ/zMn7vlAmsGN/9bejTckcpQ8I4RREN6lI4e
-	 qzJitNlYzDqwX1tdwZtC6OGYV6G/IHaawSHfPRaqK3FOnlrT9V0CbWlwJHJ0KJcul/
-	 4fMXX22vtyqNLLNwkSPeFglAOKTKZ3SRvyy6hz9io4Q/qFCQPzlTkW8QAdFPE95YAd
-	 zBS6Pt6PmrccdT3sK7sYj75FIAhSnNCRUHpTBJiF7ncmt/3qEwCyh7P8Rfc8BSr4QQ
-	 l6pOOP92h+Y5A==
-From: Roger Quadros <rogerq@kernel.org>
-Date: Wed, 14 May 2025 15:04:29 +0300
-Subject: [PATCH net-next v4 9/9] net: ethernet: ti: am65-cpsw: remove
- cpsw_ale_classifier_setup_default()
+	s=arc-20240116; t=1747224586; c=relaxed/simple;
+	bh=K/9Izu9qiN2K04mZ6Vdme5/q9/qVGbNktQh7S1wszeI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=df0tnF0bjd2sAS8LLqUpzEYcQ5nr6OgjCNFfKKIMi1RBOwiIJC4pWxnhasvQYYP1kjxvforJ9pX6d8RYj6KXrPai66Qjrgx1+0pMZgvQznfowbca2DskWOdcVzUMHn+Zco8xmNY53fuwLfskJhx1KwuE3s0BaK8Qm+jlwqOrtgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FPZ4rhXT; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=gR0lq2R8NskzCfbSMLb8IMLoPerOeBsRsJsnYVXF+4s=; b=FPZ4rhXTiKsUN3Trjl9BvKpKQu
+	oAbXd3SqCcB9iceCXJxRpyGZDqADqKWzvqIO43OZ+MrDU1+FyAtVczJyqlcruLupGYu7l6eHgy75s
+	cTbdb0R8ZGmxqmT51E2MsC+6saVq2qKm/yyfEtuIxxbxuxlNj3Vu2ve8CZKdvjGp9/Ug=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uFAvM-00CYMX-QN; Wed, 14 May 2025 14:09:24 +0200
+Date: Wed, 14 May 2025 14:09:24 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Sky Huang <SkyLake.Huang@mediatek.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Qingfang Deng <dqfext@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	balika011 <balika011@gmail.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Steven Liu <Steven.Liu@mediatek.com>
+Subject: Re: [PATCH net-next v3 1/2] net: phy: mediatek: Sort config and file
+ names in Kconfig and Makefile
+Message-ID: <2147e0e3-44c0-4fd8-916d-53291dc86a6a@lunn.ch>
+References: <20250514105738.1438421-1-SkyLake.Huang@mediatek.com>
+ <20250514105738.1438421-2-SkyLake.Huang@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250514-am65-cpsw-rx-class-v4-9-5202d8119241@kernel.org>
-References: <20250514-am65-cpsw-rx-class-v4-0-5202d8119241@kernel.org>
-In-Reply-To: <20250514-am65-cpsw-rx-class-v4-0-5202d8119241@kernel.org>
-To: Siddharth Vadapalli <s-vadapalli@ti.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Russell King <linux@armlinux.org.uk>, danishanwar@ti.com
-Cc: srk@ti.com, linux-omap@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Roger Quadros <rogerq@kernel.org>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4075; i=rogerq@kernel.org;
- h=from:subject:message-id; bh=ZLuQ+QKiv6AHk6aYVgypKAalpJm1udHDw0jrk7Sr2HM=;
- b=owEBbQKS/ZANAwAIAdJaa9O+djCTAcsmYgBoJIbJgvwvVRPMVMrXLHpU7je+8Sp2Temu9+DTu
- B7XMCjhsYmJAjMEAAEIAB0WIQRBIWXUTJ9SeA+rEFjSWmvTvnYwkwUCaCSGyQAKCRDSWmvTvnYw
- kyFkD/4o2JEvfduzn104O4gNsUiLmyaKFR+/ymEzhChd2ruMMvzuXYqiIApQu4hcpO/ioRp4gcu
- f3A4EMscKxuHkLTuWNHecHFy5kwU278sYmtvuZnfNeZhY0/4tDc5StzHTMjz5SrMJ34IVyYJGaz
- E5CRSXhjYozVtgvEsq1YqHd0oZWvso0C26uZjMm2A+DpLN4OblPOmvMKyB09310lk/OC9eN0Vxb
- a+k+xIuX8IC+9HjuXY8GAi8rUjTItrCBxKR9mogdwwHy+Yd+NA9zINUqa1FtuIsKaBENNwQmXTw
- +lEjvzrbq3H28uVnUNaI2DN7npfaFGB1+LAjSYdhOam80jbaDxd3GbAhKBQaQ8eOQhASxCHhxnI
- e9q2JwPMl+jP3IYAm6oetl233VNwiR9kbcyjcn0BENe4UijJ8iiDwWoXDm7z86UzaFz3SRtCYKg
- 3N0yZQcKmrqgmUnpC/YKWvIwt9JKh6SNf3HIGhB1nP1k18+Gy56fJzXS55J1c6crIU+d6TXt6ip
- /VUwfSxtrz5TG17P+NCZfm83RmXGD5uaWF+8kx/JTkLHjFoOSpT0FpRdeU8ZcCuWpyfYiZkza1Z
- dqGgiGs+tGKZXy8BYC0fDd0D1WLbdgVNsAogbq1NhbRX8AZnJYdHgI2nv86XO7Syc5aK7LuOz3n
- sKnUga6x5p6sjrA==
-X-Developer-Key: i=rogerq@kernel.org; a=openpgp;
- fpr=412165D44C9F52780FAB1058D25A6BD3BE763093
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250514105738.1438421-2-SkyLake.Huang@mediatek.com>
 
-The RX classifier can now be configured by user using ethtool -N.
-So drop cpsw_ale_classifier_setup_default().
+On Wed, May 14, 2025 at 06:57:37PM +0800, Sky Huang wrote:
+> From: Sky Huang <skylake.huang@mediatek.com>
+> 
+> Sort config and file names in Kconfig and Makefile in
+> drivers/net/phy/mediatek/ according to sequence in MAINTAINERS.
 
-Signed-off-by: Roger Quadros <rogerq@kernel.org>
+If you use "make menuconfig" you will notice PHYs are sorted by
+tristate string. So having Gigabit before Soc is correct.
+
+> --- a/drivers/net/phy/mediatek/Makefile
+> +++ b/drivers/net/phy/mediatek/Makefile
+> @@ -1,4 +1,4 @@
+>  # SPDX-License-Identifier: GPL-2.0
+> +obj-$(CONFIG_MEDIATEK_GE_SOC_PHY)	+= mtk-ge-soc.o
+>  obj-$(CONFIG_MTK_NET_PHYLIB)		+= mtk-phy-lib.o
+>  obj-$(CONFIG_MEDIATEK_GE_PHY)		+= mtk-ge.o
+> -obj-$(CONFIG_MEDIATEK_GE_SOC_PHY)	+= mtk-ge-soc.o
+
+These should be in alphabetic order based on CONFIG_. So
+CONFIG_MTK_NET_PHYLIB is what should move.
+
+    Andrew
+
 ---
- drivers/net/ethernet/ti/am65-cpsw-nuss.c |  3 --
- drivers/net/ethernet/ti/cpsw_ale.c       | 52 --------------------------------
- drivers/net/ethernet/ti/cpsw_ale.h       |  1 -
- 3 files changed, 56 deletions(-)
-
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index cdb83ae54656..0523c81a2a54 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -2497,9 +2497,6 @@ static int am65_cpsw_nuss_init_rx_chns(struct am65_cpsw_common *common)
- 		}
- 	}
- 
--	/* setup classifier to route priorities to flows */
--	cpsw_ale_classifier_setup_default(common->ale, common->rx_ch_num_flows);
--
- 	return 0;
- 
- err_request_irq:
-diff --git a/drivers/net/ethernet/ti/cpsw_ale.c b/drivers/net/ethernet/ti/cpsw_ale.c
-index 0cd27a6fe575..ba639d87706b 100644
---- a/drivers/net/ethernet/ti/cpsw_ale.c
-+++ b/drivers/net/ethernet/ti/cpsw_ale.c
-@@ -1695,58 +1695,6 @@ void cpsw_ale_policer_reset(struct cpsw_ale *ale)
- 		cpsw_ale_policer_reset_entry(ale, i);
- }
- 
--/* Default classifier is to map 8 user priorities to N receive channels */
--void cpsw_ale_classifier_setup_default(struct cpsw_ale *ale, int num_rx_ch)
--{
--	int pri, idx;
--
--	/* Reference:
--	 * IEEE802.1Q-2014, Standard for Local and metropolitan area networks
--	 *    Table I-2 - Traffic type acronyms
--	 *    Table I-3 - Defining traffic types
--	 * Section I.4 Traffic types and priority values, states:
--	 * "0 is thus used both for default priority and for Best Effort, and
--	 *  Background is associated with a priority value of 1. This means
--	 * that the value 1 effectively communicates a lower priority than 0."
--	 *
--	 * In the table below, Priority Code Point (PCP) 0 is assigned
--	 * to a higher priority thread than PCP 1 wherever possible.
--	 * The table maps which thread the PCP traffic needs to be
--	 * sent to for a given number of threads (RX channels). Upper threads
--	 * have higher priority.
--	 * e.g. if number of threads is 8 then user priority 0 will map to
--	 * pri_thread_map[8-1][0] i.e. thread 1
--	 */
--
--	int pri_thread_map[8][8] = {   /* BK,BE,EE,CA,VI,VO,IC,NC */
--					{ 0, 0, 0, 0, 0, 0, 0, 0, },
--					{ 0, 0, 0, 0, 1, 1, 1, 1, },
--					{ 0, 0, 0, 0, 1, 1, 2, 2, },
--					{ 0, 0, 1, 1, 2, 2, 3, 3, },
--					{ 0, 0, 1, 1, 2, 2, 3, 4, },
--					{ 1, 0, 2, 2, 3, 3, 4, 5, },
--					{ 1, 0, 2, 3, 4, 4, 5, 6, },
--					{ 1, 0, 2, 3, 4, 5, 6, 7 } };
--
--	cpsw_ale_policer_reset(ale);
--
--	/* use first 8 classifiers to map 8 (DSCP/PCP) priorities to channels */
--	for (pri = 0; pri < 8; pri++) {
--		idx = pri;
--
--		/* Classifier 'idx' match on priority 'pri' */
--		cpsw_ale_policer_read_idx(ale, idx);
--		regmap_field_write(ale->fields[POL_PRI_VAL], pri);
--		regmap_field_write(ale->fields[POL_PRI_MEN], 1);
--		cpsw_ale_policer_write_idx(ale, idx);
--
--		/* Map Classifier 'idx' to thread provided by the map */
--		cpsw_ale_policer_thread_idx_enable(ale, idx,
--						   pri_thread_map[num_rx_ch - 1][pri],
--						   1);
--	}
--}
--
- #define HOST_PORT_NUM 0
- 
- /* Clear Policer and associated ALE table entries */
-diff --git a/drivers/net/ethernet/ti/cpsw_ale.h b/drivers/net/ethernet/ti/cpsw_ale.h
-index dbc095397389..5c9614730998 100644
---- a/drivers/net/ethernet/ti/cpsw_ale.h
-+++ b/drivers/net/ethernet/ti/cpsw_ale.h
-@@ -223,7 +223,6 @@ int cpsw_ale_vlan_add_modify(struct cpsw_ale *ale, u16 vid, int port_mask,
- int cpsw_ale_vlan_del_modify(struct cpsw_ale *ale, u16 vid, int port_mask);
- void cpsw_ale_set_unreg_mcast(struct cpsw_ale *ale, int unreg_mcast_mask,
- 			      bool add);
--void cpsw_ale_classifier_setup_default(struct cpsw_ale *ale, int num_rx_ch);
- void cpsw_ale_policer_reset(struct cpsw_ale *ale);
- int cpsw_ale_policer_set_entry(struct cpsw_ale *ale, u32 policer_idx,
- 			       struct cpsw_ale_policer_cfg *cfg);
-
--- 
-2.34.1
-
+pw-bot: cr
 
