@@ -1,156 +1,114 @@
-Return-Path: <netdev+bounces-190554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40FAEAB7813
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 23:38:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8262CAB7819
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 23:40:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 635B73A8DF1
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 21:38:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A41BC3A8CF9
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 21:40:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CB2B204098;
-	Wed, 14 May 2025 21:38:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4742922156A;
+	Wed, 14 May 2025 21:40:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q4kDQHin"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="d9T3kbWg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0E0A2AF10;
-	Wed, 14 May 2025 21:38:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DE701EA7D6;
+	Wed, 14 May 2025 21:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747258729; cv=none; b=m/9DszC2tULh4Rfp6gN2RCGiC12UjgPiUPZfUck9+31v4yHiGmB94hExseOFUj/0SM+6NlscjQ16medi1pl6CrMUH4Cwn8ap1Srv7uhCu+f7G/qKRTL7IKMnASA+Ax8VLQ8soB5vsGSOHbzXhMraAHm4eVhHoI0oEthJJDZdpmc=
+	t=1747258839; cv=none; b=P9Fg3etNULEE9Tw1EmtF7+QrLUJ0kRnfG8MrldqZF+sdMmJCoa1/GKg9mZODX/1EjhDAu4ELd6r4Fg8+7nk2O98yqtRUZuoAA8hEKmsPF/Ko4J6NBvgsIAdtRvY71SSOsKCcw/x62Bb/u3tN6M+0MgEH3tbU3IBr99G2BS0aYfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747258729; c=relaxed/simple;
-	bh=hNb5jPe/smvHt5E9ANEvzYRWRCRcmC33IKRuFFhQTBo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ExGGcFJVJ4MdDxT43BmqUcjFz5aez3YaDv+bgG2/y9QPoKQ9LdaJ6828fwsOrhwZ8Nu6OkyAI1mGjWXEhX9Ojn6hud4/Fo5roao7rLVdG16BOniEtktQ6Utz8wp033NFi4kb7F4y/AipmW17Vjg9B2jDlqOSvVwMJUDPQ7jA8W0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q4kDQHin; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1283CC4CEE3;
-	Wed, 14 May 2025 21:38:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747258728;
-	bh=hNb5jPe/smvHt5E9ANEvzYRWRCRcmC33IKRuFFhQTBo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=q4kDQHinFMHdDSOL/WxL8/jRZy1/5inVjfVeU0U/E9uQHTG7bviMmf9ftrEP2F0qA
-	 4+di/4MA/Ufb3aaLsHEIRnH6/pHydGvfEI1vtdUNyQoAkHX1rLm7pWyu68HmGtkHuZ
-	 RpCBCjsPhdn2HFoPocB5s5NfnpnqopASVErlt8auGunyg/e5fcy8c5UiV4B+MBVXvx
-	 z3DUjlUEFR8cbNr9QiOArQBHjk4MFckDkk5VzexjMIEqgnRmaPk+o5T38inGJ+ib6v
-	 w0kTgH+0UFpcvbt0LJTDkYnIYmAx31ES01gpAHmIuE4wgmCsQz8YWSzpHnxqWmGWkg
-	 8I0IfG9yggAxg==
-Date: Wed, 14 May 2025 16:38:46 -0500
-From: Rob Herring <robh@kernel.org>
-To: Damien =?iso-8859-1?Q?Ri=E9gel?= <damien.riegel@silabs.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Silicon Labs Kernel Team <linux-devel@silabs.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC net-next 13/15] dt-bindings: net: cpc: add
- silabs,cpc-spi.yaml
-Message-ID: <20250514213846.GA3076991-robh@kernel.org>
-References: <20250512012748.79749-1-damien.riegel@silabs.com>
- <20250512012748.79749-14-damien.riegel@silabs.com>
+	s=arc-20240116; t=1747258839; c=relaxed/simple;
+	bh=ZF/eADNpfy1fbl2t8r6cgpTYI1FtnULmtTlBEy5oc6U=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=oicHUmqRPCbDQbR6+ChsPbjecTsoIPKWsOYC0r27GEyr1Xq/GhNNafnerG8FaiBqtuByFca6q0FiWiqav9a6pxpzsZrpwRezmE8kdJ74TQW2nlxUBXOsgZD72jtPBKBGG6U4hTBiuDcQeI5py+ziNTGw1VpgnnCNNtshwO+ZLxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=d9T3kbWg; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1747258838; x=1778794838;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=CTYMMtDoKtiGw6dvc8yJt46kSFhgishDPo6btXQJDJo=;
+  b=d9T3kbWgm1iC7Pomjyt8vDmRPTQe7mezV+MQP/FC6TXlEqghUU5FQ1ot
+   2rIpRUo2I8l1Oo/Ur2IO8KSF/8Z3DjEphRXOitPBUMgZf3ryBD7LsjWtr
+   rCIem65wIkL97FcF1+h2+fUS61LWO9VHtybCJ3oGczvIQdIBx/LtAhrlY
+   5aoPCRRUsxrPeHYnUPAEVZqhzNSsgBMdNd2nZti2HKZTbbfXmUHMm9/jO
+   U3DFopbnhjeJeBQTZ7vD7dH7JtFhC/pJmDpOrdeoH7lYmFEw8OOnp5KmT
+   BmZB6Nf4W1jvxXYVE69NvXDiB6RXr3takzby7g3Sc1S2j/7oK3wqECqx4
+   g==;
+X-IronPort-AV: E=Sophos;i="6.15,289,1739836800"; 
+   d="scan'208";a="93303472"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2025 21:40:34 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:63321]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.29.244:2525] with esmtp (Farcaster)
+ id b5f7b238-682b-4c39-b8ae-361665eab6b0; Wed, 14 May 2025 21:40:33 +0000 (UTC)
+X-Farcaster-Flow-ID: b5f7b238-682b-4c39-b8ae-361665eab6b0
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 14 May 2025 21:40:33 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.187.171.38) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 14 May 2025 21:40:30 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>
+CC: Mykola Lysenko <mykolal@fb.com>, Martin KaFai Lau <martin.lau@linux.dev>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <bpf@vger.kernel.org>, <netdev@vger.kernel.org>
+Subject: [PATCH v1 bpf-next] selftest: bpf: Relax TCPOPT_WINDOW validation in test_tcp_custom_syncookie.c.
+Date: Wed, 14 May 2025 14:40:20 -0700
+Message-ID: <20250514214021.85187-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250512012748.79749-14-damien.riegel@silabs.com>
+X-ClientProxiedBy: EX19D033UWC003.ant.amazon.com (10.13.139.217) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Sun, May 11, 2025 at 09:27:46PM -0400, Damien Riégel wrote:
-> Document device tree bindings for Silicon Labs CPC over a SPI bus. This
-> device requires both a chip select and an interrupt line to be able to
-> work.
+The custom syncookie test expects TCPOPT_WINDOW to be 7 based on the
+kernelâ€™s behaviour at the time, but the upcoming series [0] will bump
+it to 10.
 
-What's CPC? Never defined here.
+Let's relax the test to allow any valid TCPOPT_WINDOW value in the
+range 1â€“14.
 
-Bindings are for devices, not a SPI protocol. What if the device needs 
-reset or power or ??? before you can talk to it. Maybe it's a situation 
-where that will never matter, but you've got to spell it out here.
+Link: https://lore.kernel.org/netdev/20250513193919.1089692-1-edumazet@google.com/ #[0]
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+ tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-> 
-> Signed-off-by: Damien Riégel <damien.riegel@silabs.com>
-> ---
->  .../bindings/net/silabs,cpc-spi.yaml          | 54 +++++++++++++++++++
->  1 file changed, 54 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/silabs,cpc-spi.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/net/silabs,cpc-spi.yaml b/Documentation/devicetree/bindings/net/silabs,cpc-spi.yaml
-> new file mode 100644
-> index 00000000000..82d3cd47daa
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/silabs,cpc-spi.yaml
-> @@ -0,0 +1,54 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +# Copyright 2024 Silicon Labs Inc.
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/silabs,cpc-spi.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: SPI driver for CPC
-> +
-> +maintainers:
-> +  - Damien Riégel <damien.riegel@silabs.com>
-> +
-> +description: |
+diff --git a/tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.c b/tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.c
+index eb5cca1fce16..7d5293de1952 100644
+--- a/tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.c
++++ b/tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.c
+@@ -294,7 +294,9 @@ static int tcp_validate_sysctl(struct tcp_syncookie *ctx)
+ 	    (ctx->ipv6 && ctx->attrs.mss != MSS_LOCAL_IPV6))
+ 		goto err;
+ 
+-	if (!ctx->attrs.wscale_ok || ctx->attrs.snd_wscale != 7)
++	if (!ctx->attrs.wscale_ok ||
++	    !ctx->attrs.snd_wscale ||
++	    ctx->attrs.snd_wscale >= BPF_SYNCOOKIE_WSCALE_MASK)
+ 		goto err;
+ 
+ 	if (!ctx->attrs.tstamp_ok)
+-- 
+2.49.0
 
-Don't need '|'
-
-> +  This binding is for the implementation of CPC protocol over SPI. The protocol
-> +  consists of a chain of header+payload frames. The interrupt is used by the
-> +  device to signal it has a frame to transmit, but also between headers and
-> +  payloads to signal that it is ready to receive payload.
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - silabs,cpc-spi
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  interrupts:
-> +    maxItems: 1
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - interrupt
-> +
-> +allOf:
-> +  - $ref: /schemas/spi/spi-peripheral-props.yaml#
-> +
-> +unevaluatedProperties: false
-> +
-> +examples:
-> +  - |
-> +    #include <dt-bindings/interrupt-controller/irq.h>
-> +    spi {
-> +            #address-cells = <1>;
-> +            #size-cells = <0>;
-> +
-> +            cpcspi@0 {
-> +                  compatible = "silabs,cpc-spi";
-> +                  reg = <0>;
-> +                  spi-max-frequency = <1000000>;
-> +                  interrupt-parent = <&gpio>;
-> +                  interrupts = <23 IRQ_TYPE_EDGE_FALLING>;
-> +            };
-> +    };
-> -- 
-> 2.49.0
-> 
 
