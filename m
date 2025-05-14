@@ -1,165 +1,150 @@
-Return-Path: <netdev+bounces-190500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2307AB7174
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 18:33:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 670D2AB71ED
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 18:52:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A6F817D446
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 16:33:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F11E3AFD01
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 16:52:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C989C278E60;
-	Wed, 14 May 2025 16:33:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C08632797A0;
+	Wed, 14 May 2025 16:52:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xr8D7gC1"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="ds/4Hzc/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 225A61B040B
-	for <netdev@vger.kernel.org>; Wed, 14 May 2025 16:33:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B3E01F1931
+	for <netdev@vger.kernel.org>; Wed, 14 May 2025 16:52:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747240407; cv=none; b=nDka7JLtkUtiPd76eP1cqbtgjjqpKTQFpe+gcyoG9vP4XAss1mVsC0vF+RiLVJ1WjrklF6/PEc9CAfi6UqqEpruirxKazd11L3XDm9AuMs9Abv+7J18xEvmxoQAJ/GNteGZM2ooq1svc1HZDcOx0jMpFsjM1tpUas7KJ5Z28oRQ=
+	t=1747241562; cv=none; b=dGBQoNp4Lwf5CuAQHJY2cPu6SkqexLTSQMHDUmizbSKiOb7TQpVjz+1YphWbOR4jyPdpobquCndss6u+VgCHvXMKLB8hkXa306Y7JJU2buRonfYaIJoIGoYpT3TMaNQKXbh7zYGbkkl4Bf++ZqzXXdN8qIYDwn2DjkPl+yldxhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747240407; c=relaxed/simple;
-	bh=aN+rnFOSdvfxkAXI+G9iur3QXg0oyC1gMvypEMd3EiY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=o4vEAc504yP+DC52aPXFFIYZuYyF9V77i5T+8hVWeJfVVbL4ivK6CSMFp0dJZzY7VZ8IsYV0iOK9MLAxrcEVESPQHJRn34LAWX5HkqVpSu/7JOfndR4uGsmET3MaTpWD4RDiiattH6InGHWK0GPF5X3t62bdGwjWeysiiT1K5ZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xr8D7gC1; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4772f48f516so13165171cf.1
-        for <netdev@vger.kernel.org>; Wed, 14 May 2025 09:33:25 -0700 (PDT)
+	s=arc-20240116; t=1747241562; c=relaxed/simple;
+	bh=5nouLCzYUgsjar+wShkk5YB8FY2Cgcp2u3ojgwbzPz4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QPWrfpCyKv4i+oCTwBJnqj20MuZeS5RnxCMBt9GnS4ylI0NBYFqJGMZKDzWBl/kvD0PTcjZKX5d4PB6OCsIOsEk1gSTiTE9APetQlTUhzY//dMIKsPzSmcg54jfT/Eodj0at3T+1qCxHWbk5pmaCH/M2FJJaLdk/WDWfCB+Jud0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=ds/4Hzc/; arc=none smtp.client-ip=99.78.197.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747240405; x=1747845205; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JTr0b0obTtw9ojP0R3nWphlHo+UEF4QOrw/NKMGl+sk=;
-        b=xr8D7gC1ZNe07Y2SzrgNcjmIc9qAK0xCjyEC4fU7Wad4xurehu+oi1SuyTThuRQOuD
-         hBnc9hhbwvqvK/iWy4n3aaT8Uw0PhzGKi9f+FGSb9hlhffb6Rf7vkaAAlK7JTgqaCgQ0
-         vv927qsy38uWbQXKSCgU3czbbspXnCtgy31XYIQiDqoR2NBFLnrrs9OqBzcAY4ibkIxe
-         eafnnACsv851foLkme6aysDNI3hpn1fqeCCch5uF+5KXS7ovKQttp47Qd5QavgM2InK5
-         S4qqAAtX63Tgq+iC3jIZ5jOnsdm1owDOp3OHadoA/4eBH67kqahLUnnJpxSCGzdXBlN9
-         08Wg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747240405; x=1747845205;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JTr0b0obTtw9ojP0R3nWphlHo+UEF4QOrw/NKMGl+sk=;
-        b=sIzoVUAFr5Kt/OX5cjDWJmBeEYXVBrS6Q6QRDo9MbyaKluHr/614FRtltIjU4xOSk5
-         STQMzXpbVgriNZLSeeIgNBIh18+7VQlaQ0YugkCDQGN5C6yc83+w7j1OHp1z6ucO5d5e
-         7DFvxh1fufzbTYvYnvREhn1LwnbpRyhcZR9/vPrNf9ihP2qo/d0G5sknrY/7PtqlvQw9
-         n4y7V7jXEJHy2D/fVcdLfp+Q+kd0w34RI24gtOLs4r1m9eIqfdsJ6qw2pQ/iH+gq07u/
-         TuXd4VOpDccdMC02ghR3a1aUV3Fw44kb15cLiDxRZnyLkv1sr5ZNw4SFzcqMLbaB3frg
-         AV0w==
-X-Forwarded-Encrypted: i=1; AJvYcCX2qW9NK2x7r8LsoQKEP72KSuzTNO1ianfDZ+4FsEqO2ZPYbR+LU9nk+6CItTNap/DBgM1NKWI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy3+7GksKr/wBiUeFr6/e5IZCcBQnGKAyAePEwHwveRo1s9cI7J
-	mALsTLzXiHErBC0J3m2VpLSHq4XibGf33lcxiCkzB2jym3DRMNBYTQga6TQfM8ZsxYpP/2/ABDg
-	eRA6SVOvV0dByv+rBSjDynAMZ3fnqUWmVcm5RRIsv
-X-Gm-Gg: ASbGncs0B71a8WZupBfDOWue6o/0hzyWpsVAqZGSlOA3dWD47zpo2x/dmCDAqUN5nY+
-	ngGOlpwPnxBWcV62Vh0p63tTj+baevY0rh6rBcV4wY8Tu3iZr7zt2wnVX6KMtBxwW/aq8LjINIQ
-	/LfQPOpjzldl0hJyihuTfoUcvEL0cj6Dg6Rg==
-X-Google-Smtp-Source: AGHT+IHb/oV51+C8bHw3ZmuIYuK5a7WXuGVTrV+d0RyX6JVGCSghs3TfMaF2nT0BqI4n3GXPuMxOoRdxvnQ9GGeUkII=
-X-Received: by 2002:ac8:580a:0:b0:494:7043:8a2 with SMTP id
- d75a77b69052e-494a0e2e15bmr2650691cf.16.1747240404582; Wed, 14 May 2025
- 09:33:24 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1747241561; x=1778777561;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=kJWvWAas/G3NnMhnf52T5G2ndMv+4nnZfGlYwwB3udE=;
+  b=ds/4Hzc/PgAMsmqm5K6C95ADKvBcATGtYJHWuggx+XlQfa2Bkl7RJhb4
+   kDxuoqo1Sh3STHafo05ZHGdWzT3qA7Go9ZW6MqWtTSzHQ/pgwvPg0FJGT
+   K7kuQnc0SDV8WYYaVfbusaSEnSGvZnYDEcCwMYFR0Gv9lzBDckwaZ6rFw
+   08mzPwVNbodhBoYJ4a74kpi2MKgFcSgGUEtxPgnfCQxPg+/ThRjIJSfk7
+   KapW/n2ZVnK8nZFqsZJwj6Dh0kD5qdo5EcOIpz395iXegwIZDPLkg5pQ+
+   bWstQTOTVRkCmtdjC7iXKF2FYaEPDg1XDgZJ+B3xzN82gMlicbm1QQI5G
+   g==;
+X-IronPort-AV: E=Sophos;i="6.15,288,1739836800"; 
+   d="scan'208";a="200545620"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2025 16:52:38 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:4175]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.61.52:2525] with esmtp (Farcaster)
+ id ad2fceb1-1c2a-438d-b9f4-2a5cbbb12273; Wed, 14 May 2025 16:52:38 +0000 (UTC)
+X-Farcaster-Flow-ID: ad2fceb1-1c2a-438d-b9f4-2a5cbbb12273
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 14 May 2025 16:52:37 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.187.171.38) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 14 May 2025 16:52:35 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>
+CC: Simon Horman <horms@kernel.org>, Christian Brauner <brauner@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v3 net-next 0/9] af_unix: Introduce SO_PASSRIGHTS.
+Date: Wed, 14 May 2025 09:51:43 -0700
+Message-ID: <20250514165226.40410-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250513193919.1089692-1-edumazet@google.com> <20250513193919.1089692-2-edumazet@google.com>
- <51c7b462-500c-4c8b-92eb-d9ebae8bbe42@kernel.org> <CANn89iK3n=iCQ5z3ScMvSR5_J=oxaXhrS=JF2fzALuAfeZHoEA@mail.gmail.com>
- <a9ecd6a0-74da-4f68-81ec-5c2d5b937926@kernel.org>
-In-Reply-To: <a9ecd6a0-74da-4f68-81ec-5c2d5b937926@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 14 May 2025 09:33:12 -0700
-X-Gm-Features: AX0GCFv_-XNxDRGreezLb1JSwMwuKBM4xRHlbRamHRnqZgMLTWabCkXq18f1giA
-Message-ID: <CANn89iJCzRA-i1R57txita9F9c74gvXX0R-eOXTNTMcRJJCoMw@mail.gmail.com>
-Subject: Re: [PATCH net-next 01/11] tcp: add tcp_rcvbuf_grow() tracepoint
-To: David Ahern <dsahern@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, 
-	Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>, Rick Jones <jonesrick@google.com>, 
-	Wei Wang <weiwan@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D031UWA004.ant.amazon.com (10.13.139.19) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Wed, May 14, 2025 at 8:46=E2=80=AFAM David Ahern <dsahern@kernel.org> wr=
-ote:
->
-> On 5/14/25 9:38 AM, Eric Dumazet wrote:
-> > On Wed, May 14, 2025 at 8:30=E2=80=AFAM David Ahern <dsahern@kernel.org=
-> wrote:
-> >>
-> >> On 5/13/25 1:39 PM, Eric Dumazet wrote:
-> >>> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> >>> index a35018e2d0ba27b14d0b59d3728f7181b1a51161..88beb6d0f7b5981e65937=
-a6727a1111fd341335b 100644
-> >>> --- a/net/ipv4/tcp_input.c
-> >>> +++ b/net/ipv4/tcp_input.c
-> >>> @@ -769,6 +769,8 @@ void tcp_rcv_space_adjust(struct sock *sk)
-> >>>       if (copied <=3D tp->rcvq_space.space)
-> >>>               goto new_measure;
-> >>>
-> >>> +     trace_tcp_rcvbuf_grow(sk, time);
-> >>
-> >> tracepoints typically take on the name of the function. Patch 2 moves =
-a
-> >> lot of logic from tcp_rcv_space_adjust to tcp_rcvbuf_grow but does not
-> >> move this tracepoint into it. For sake of consistency, why not do that=
- -
-> >> and add this patch after the code move?
-> >
-> > Prior value is needed in the tracepoint, but in patch 2, I call
-> > tcp_rcvbuf_grow() after it is overwritten.
-> >
->
-> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> index 8ec92dec321a..6bfbe9005fdb 100644
-> --- a/net/ipv4/tcp_input.c
-> +++ b/net/ipv4/tcp_input.c
-> @@ -744,12 +744,16 @@ static inline void tcp_rcv_rtt_measure_ts(struct
-> sock *sk,
->         }
->  }
->
-> -static void tcp_rcvbuf_grow(struct sock *sk)
-> +static void tcp_rcvbuf_grow(struct sock *sk, int time, int copied)
->  {
->         const struct net *net =3D sock_net(sk);
->         struct tcp_sock *tp =3D tcp_sk(sk);
->         int rcvwin, rcvbuf, cap;
->
-> +       trace_tcp_rcvbuf_grow(sk, time);
-> +
-> +       tp->rcvq_space.space =3D copied;
-> +
->         if (!READ_ONCE(net->ipv4.sysctl_tcp_moderate_rcvbuf) ||
->             (sk->sk_userlocks & SOCK_RCVBUF_LOCK))
->                 return;
-> @@ -794,11 +798,7 @@ void tcp_rcv_space_adjust(struct sock *sk)
->         if (copied <=3D tp->rcvq_space.space)
->                 goto new_measure;
->
-> -       trace_tcp_rcvbuf_grow(sk, time);
-> -
-> -       tp->rcvq_space.space =3D copied;
+As long as recvmsg() or recvmmsg() is used with cmsg, it is not
+possible to avoid receiving file descriptors via SCM_RIGHTS.
 
-I think I prefer leaving this write here, instead of having to go to
-tcp_rcvbuf_grow(()
+This series introduces a new socket option, SO_PASSRIGHTS, to allow
+disabling SCM_RIGHTS.  The option is enabled by default.
 
-> -
-> -       tcp_rcvbuf_grow(sk);
-> +       tcp_rcvbuf_grow(sk, time, copied);
->
->  new_measure:
->         tp->rcvq_space.seq =3D tp->copied_seq;
->
+See patch 8 for background/context.
+
+This series is related to [0], but is split into a separate series,
+as most of the patches are specific to af_unix.
+
+The v2 of the BPF LSM extension part will be posted later, once
+this series is merged into net-next and has landed in bpf-next.
+
+[0]: https://lore.kernel.org/bpf/20250505215802.48449-1-kuniyu@amazon.com/
+
+
+Changes:
+  v3:
+    * Patch 3
+      * Remove inline in scm.c
+    * Patch 4 & 5 & 8
+      * Return -EOPNOTSUPP in getsockopt()
+    * Patch 5
+      * Add CONFIG_SECURITY_NETWORK check for SO_PASSSEC
+    * Patch 6
+      * Add kdoc for sk_scm_unused
+      * Update sk_scm_XXX under lock_sock() in setsockopt()
+    * Patch 7
+      * Update changelog (recent change -> aed6ecef55d7)
+
+  v2: https://lore.kernel.org/netdev/20250510015652.9931-1-kuniyu@amazon.com/
+    * Added patch 4 & 5 to reuse sk_txrehash for scm_recv() flags
+
+  v1: https://lore.kernel.org/netdev/20250508013021.79654-1-kuniyu@amazon.com/
+
+
+Kuniyuki Iwashima (9):
+  af_unix: Factorise test_bit() for SOCK_PASSCRED and SOCK_PASSPIDFD.
+  af_unix: Don't pass struct socket to maybe_add_creds().
+  scm: Move scm_recv() from scm.h to scm.c.
+  tcp: Restrict SO_TXREHASH to TCP socket.
+  net: Restrict SO_PASS{CRED,PIDFD,SEC} to AF_{UNIX,NETLINK,BLUETOOTH}.
+  af_unix: Move SOCK_PASS{CRED,PIDFD,SEC} to struct sock.
+  af_unix: Inherit sk_flags at connect().
+  af_unix: Introduce SO_PASSRIGHTS.
+  selftest: af_unix: Test SO_PASSRIGHTS.
+
+ arch/alpha/include/uapi/asm/socket.h          |   2 +
+ arch/mips/include/uapi/asm/socket.h           |   2 +
+ arch/parisc/include/uapi/asm/socket.h         |   2 +
+ arch/sparc/include/uapi/asm/socket.h          |   2 +
+ include/linux/net.h                           |  15 +--
+ include/net/scm.h                             | 121 +----------------
+ include/net/sock.h                            |  30 ++++-
+ include/uapi/asm-generic/socket.h             |   2 +
+ net/core/scm.c                                | 122 ++++++++++++++++++
+ net/core/sock.c                               |  63 +++++++--
+ net/unix/af_unix.c                            |  96 +++++++-------
+ tools/include/uapi/asm-generic/socket.h       |   2 +
+ .../selftests/net/af_unix/scm_rights.c        |  84 +++++++++++-
+ 13 files changed, 352 insertions(+), 191 deletions(-)
+
+-- 
+2.49.0
+
 
