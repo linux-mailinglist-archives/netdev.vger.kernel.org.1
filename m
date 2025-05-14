@@ -1,106 +1,89 @@
-Return-Path: <netdev+bounces-190485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AEE4AB6FC3
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 17:29:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77E2CAB6FCE
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 17:30:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EB46160E4F
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 15:25:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 30FE81BA065A
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 15:30:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26B0F219E4;
-	Wed, 14 May 2025 15:25:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCDAB1F37D4;
+	Wed, 14 May 2025 15:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="faZGfs+V"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kcSCcEgs"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7884013C3F6
-	for <netdev@vger.kernel.org>; Wed, 14 May 2025 15:25:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8E4D1E2847
+	for <netdev@vger.kernel.org>; Wed, 14 May 2025 15:30:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747236355; cv=none; b=RA3Heqslnixi9XKSkMoL5+i+CerWX5LKWgrvW3TUWa4Vfwz+IP0ZBVdqNRT04C4CxKmCGp2RRTepo7eS+G10azsFs5x33RYlf+ZXsixbxUuLXg58dxbfr7+n+UYqnlcA5stp7liYpnP5BiYmqgs+t6CzSWU43EWDXcYwYyANgkg=
+	t=1747236625; cv=none; b=joacuKISiQY00KuWY33EnNZtro+TgiTqVnPgQhwXGfLjI3+PN9v3D/slHor/9B63uSZkgoNGBgB+92tMpZrGqd4JYK8i8F8w0m8b1qNLtdMkpgUKkCiR6WngAEyb3HczBx3Wi/GfLkU+R5+RCPtUjVCJcldxwyBEjVdt30+yf5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747236355; c=relaxed/simple;
-	bh=CBr3S/y5LhzyciBlH6r1PxR5BG5UxI5VcLXXtJkCPgQ=;
+	s=arc-20240116; t=1747236625; c=relaxed/simple;
+	bh=npri4ZBcimeJ87Czie0TyudNHrR+eXyWl0LUsMgGP44=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eMZgTGcj/2ZNJiKYMEpkwrPTaqNNu5M9K8XJSpiAHfhQ7ulIgMLnbiEz3Ct/2NXNy9APM9bVAW12Zt8YEsD/BEAnzoVt9nBaK4O3eVdk/ieb2Kiw6ROixLOqhw6KIKTRETHmRDWgH0cX55NyNWEty6mykS94w8kjPH8xxYoh0PE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=faZGfs+V; arc=none smtp.client-ip=95.215.58.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <c2d4a2ce-8af6-4dda-87e5-2cff14fd14b1@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1747236349;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yQSYDWezbNV21vgdWfdVBPv3c/3Kd+d9bLVRsIUhXrU=;
-	b=faZGfs+V8H5XPMlWt1phf2/UhaDQZY5DJDC3rzmEvYEcxX6N+GvbMOLAZqClO+b6vee89T
-	0YBcxZO2VgGsIGBPkhFjWvp7Peg2QGSYBgIKJfP+65Ec/h4wFjOuX9gSVo1UOmRurolwPt
-	sFsGppo/n4BqFOOKIQY5SNBtAIRrXVA=
-Date: Wed, 14 May 2025 16:25:43 +0100
+	 In-Reply-To:Content-Type; b=bhHDo5/nanyPbB57zmBl4dMGwvMGkY/SmUtnKppOLqgb4rNcu/mLOwbIgv7Th/ub8f2pnH3ds2MSizSVCLHIgDL34HuLcq1Et+fZQMmi55xBVNCemb4vjRdkp2JoP9E5R4B5IAsIcufBeMFjZTG4d9rKF7Dw51HwqnZUoJPPC9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kcSCcEgs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96DE1C4CEE9;
+	Wed, 14 May 2025 15:30:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747236625;
+	bh=npri4ZBcimeJ87Czie0TyudNHrR+eXyWl0LUsMgGP44=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=kcSCcEgs9pBKrk4IxSZkqv+6M2KkM7M9azZaWilHiNuP07dKOlDpEtCy+bn3KE1K1
+	 G/eW92Ii0s+mx3rLcVTk2fVtKGy9LZBLaxAcDwqrWirkCqmZl5B6uqvIUjnnYp/ExI
+	 o/UtB++CMoSsur0NhCYedfkRBCjoAW1mlw6Z+xGlPdEiiaaR5QX2dbKanRx3ANGIcs
+	 TaXPkbYeq7s2wORjRZoF7CctfqjLO8KUjTr5YFmkZip6OBpwP3u2Klaxatdodcz+X4
+	 d/iV6UoG3+uoW+i5se+rrLuIkS2im9HXrymoH3FSdbpEbOnliby8fwT+tn7l5YqVOb
+	 1UjZ0OHvORHzg==
+Message-ID: <51c7b462-500c-4c8b-92eb-d9ebae8bbe42@kernel.org>
+Date: Wed, 14 May 2025 09:30:23 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] ptp: Add sysfs attribute to show clock is safe to open RO
-To: Andrew Lunn <andrew@lunn.ch>, Wojtek Wasko <wwasko@nvidia.com>
-Cc: richardcochran@gmail.com, netdev@vger.kernel.org
-References: <20250514143622.4104588-1-wwasko@nvidia.com>
- <64de5996-1120-4c06-9782-a172e83f9eb3@lunn.ch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 01/11] tcp: add tcp_rcvbuf_grow() tracepoint
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <64de5996-1120-4c06-9782-a172e83f9eb3@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+ Rick Jones <jonesrick@google.com>, Wei Wang <weiwan@google.com>,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20250513193919.1089692-1-edumazet@google.com>
+ <20250513193919.1089692-2-edumazet@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20250513193919.1089692-2-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 14/05/2025 15:54, Andrew Lunn wrote:
-> On Wed, May 14, 2025 at 05:36:21PM +0300, Wojtek Wasko wrote:
->> Recent patches introduced in 6.15 implement permissions checks for PTP
->> clocks. Prior to those, a process with readonly access could modify the
->> state of PTP devices, in particular the generation and consumption of
->> PPS signals.
->>
->> Userspace (e.g. udev) managing the ownership and permissions of device
->> nodes lacks information as to whether kernel implements the necessary
->> security checks and whether it is safe to expose readonly access to
->> PTP devices to unprivileged users. Kernel version checks are cumbersome
->> and prone to failure, especially if backports are considered [1].
->>
->> Add a readonly sysfs attribute to PTP clocks, "ro_safe", backed by a
->> static string.
-> 
-> ~/linux$ grep -r "ro_safe"
-> ~/linux$
-> 
-> At minimum, this needs documentation.
-> 
-> But is this really the first time an issue like this has come up?
+On 5/13/25 1:39 PM, Eric Dumazet wrote:
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index a35018e2d0ba27b14d0b59d3728f7181b1a51161..88beb6d0f7b5981e65937a6727a1111fd341335b 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+> @@ -769,6 +769,8 @@ void tcp_rcv_space_adjust(struct sock *sk)
+>  	if (copied <= tp->rcvq_space.space)
+>  		goto new_measure;
+>  
+> +	trace_tcp_rcvbuf_grow(sk, time);
 
-I haven't seen such kind of discussions previously, but it's more about
-netdev area only. The original problem was kinda hidden because all
-modern distros had udev rules preventing non-root access to PHC devices,
-which effectively means no strict access checks are needed. I cannot
-find a good example of device with the same issues quickly...
+tracepoints typically take on the name of the function. Patch 2 moves a
+lot of logic from tcp_rcv_space_adjust to tcp_rcvbuf_grow but does not
+move this tracepoint into it. For sake of consistency, why not do that -
+and add this patch after the code move?
 
-> Also, what was the argument for adding permission checks, and how was
-> it argued it was not an ABI change?
-
-The original discussion was in the thread:
-
-https://lore.kernel.org/netdev/DM4PR12MB8558AB3C0DEA666EE334D8BCBEE82@DM4PR12MB8558.namprd12.prod.outlook.com/
-
-while the change has landed in:
-
-https://lore.kernel.org/netdev/20250303161345.3053496-1-wwasko@nvidia.com/
-
+> +
+>  	/* A bit of theory :
+>  	 * copied = bytes received in previous RTT, our base window
+>  	 * To cope with packet losses, we need a 2x factor
 
 
