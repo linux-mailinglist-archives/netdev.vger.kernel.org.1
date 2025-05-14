@@ -1,143 +1,111 @@
-Return-Path: <netdev+bounces-190412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05D8CAB6C38
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 15:10:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E027AB6BDA
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 14:54:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C9DD3ABEFE
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 13:10:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7FBC16AECA
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 12:54:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D47C276038;
-	Wed, 14 May 2025 13:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83833279347;
+	Wed, 14 May 2025 12:54:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="LzdTj1mU"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hU3dXRFQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6933E1C8614;
-	Wed, 14 May 2025 13:10:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BCC425C71A;
+	Wed, 14 May 2025 12:53:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747228219; cv=none; b=o74PC4p1uBq4hXM+zAensV2fZByxOI8ZqPIFF4k03wjZdnf8f14rz7qh6d7KutR/mbrQ7rBMubT8zB/yle828taytKbXOKgCFHAnO4zTAUex3L/6DdNO/6VdYeEKljG3FWQXqG4AH03w/Or0kov0U8O3Cf+wbUlGKJrJHWLxtjM=
+	t=1747227241; cv=none; b=esDB1x5a8Ik3kpdsyjVw7WVDTftxymYE4w0hpkiyPC9maWR3byd0CH+ATV8c8bUsP+Ofe2KwFHpwHZUE14nyfw54Y73ZzN+cZVq5XQgtaWRoqTmSzKHs8a1+H4+Bc/lzbcYet1GMYBgV2WR06RvHoXe8VSCwnH0lnsRHFN1xEdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747228219; c=relaxed/simple;
-	bh=zoQUDV8YwIdtbQF4B50EXzFk7sJmiB4WiMO8xN7MYcI=;
+	s=arc-20240116; t=1747227241; c=relaxed/simple;
+	bh=scugkR344tI8V7Z0hxaim6O4g7gQTV4zdpmzPnDsWhA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Xzb4x3Nlya5r0ggumt5X8JThp+z1nXBjFj3z1lk08/gpUPg1QT2ORAFxF2zGKV5IaDbhzfskn0qsRD0yKZGxL5TPYkYrIwiOECaruRxYsyZO6wS6wtQi10Qkb3lKh5ljKU1Wq2KtHHPbh1sM5phueMsEARImw5A0iKwtNn9pIfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=LzdTj1mU; arc=none smtp.client-ip=217.70.178.249
+	 MIME-Version:Content-Type; b=kwmR6RCJSxS/HHqiftF5PgxgOFuaTfEAwbY8SEGzhP4m8+tFvcj+Y7B1CKNFHzOsp5D/8g+WSsD5+DjFe2Do7Jk+Puz3I1X2iGXBYeqyjKa63K5f9nDx/U05Bejy9KflfV688u2ctH7f/Sj36YpDRVMtjlA00oO99KznzjdKv0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hU3dXRFQ; arc=none smtp.client-ip=217.70.183.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
-	by mslow3.mail.gandi.net (Postfix) with ESMTP id A23495842D9;
-	Wed, 14 May 2025 12:49:06 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 0E54543904;
-	Wed, 14 May 2025 12:48:57 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1E16E1FD4C;
+	Wed, 14 May 2025 12:53:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1747226939;
+	t=1747227237;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=oHeZE/C0YzOV5d6A2KajzZgZmjXTnKc4hT5nUGWBwno=;
-	b=LzdTj1mU43cVIJToqB7YFG83X6KEP1+ZiULli1fpuXaIr67xS1vdXQuhIEdAy6Vjmzxe1Z
-	20ORxP7lSM845aA0Zc3HOXlnHOkyNdyMRzN07vnLeFEfpdYzoKCKQpyPlf66XE2888hXR7
-	mahMU+Ia3XszYuoS0xhdtgVM09K4ySLkQb39C0zABBpxRhvuS5dJAiCnd5HWGm7etHMqa6
-	rQ3w2sBWxfI2cPELNVUQ0hEqHt2JZZ6ImoBbHA23c3PEdVFk2wqGIxU7NFwJN2gHlB2crL
-	K28XGdFX91+3lbFW3K4xUb3sD4hRnU1ok5MnWeBjP5VA5VnlPgM/QAr8OjD0Dg==
+	bh=BPtptJ2HNoiU8PMKYqOrssaWS6cta88HVQHAl0Pn9aw=;
+	b=hU3dXRFQTHD3aiFxk4goUMdnyTgKFFjSv9ac6VTBUkjJeycYyAjqKxa5YvB8gOv5WvIjDX
+	Ym5o2RpHZ88ERll2TbB5805wvy9HaSrbRMdxGSMLb8s6cSSE60jQ4nJkmMOvLrPeeiRKPT
+	Cy3bnnw21GLJfJPSPk7VP8egScePCfEaLbX8I6iR+x8tdHHrRreHBoi/lSGivN5Yyd6LWP
+	F1X/NmL/+/IfeLEODIHWH6uogJq4QX+8G8L6ZhwQQNZbbQ6pVLDAtMUh+e09J++n9DGitw
+	wxA3XRsE/wl7rl8EO5tNIOFKAzjgqzMRDCEaeH+Wy0Nqjvp0sVyioBpGBz9kbw==
 From: Romain Gantois <romain.gantois@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Antoine Tenart <atenart@kernel.org>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
  Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org
 Subject:
- Re: [PATCH net-next 3/3] net: phy: dp83869: Support 1000Base-X SFP modules
-Date: Wed, 14 May 2025 14:48:52 +0200
-Message-ID: <9500044.CDJkKcVGEf@fw-rgant>
-In-Reply-To: <519e17e0-9739-43bc-b77a-a77fd103d8d7@lunn.ch>
+ Re: [PATCH net-next 0/3] net: phy: dp83869: Support 1Gbps fiber SFP modules
+Date: Wed, 14 May 2025 14:53:54 +0200
+Message-ID: <1877501.VLH7GnMWUR@fw-rgant>
+In-Reply-To:
+ <20250514142019.56372b4e@2a02-8440-d105-dfa7-916a-7e1b-fec1-3a90.rev.sfr.net>
 References:
  <20250514-dp83869-1000basex-v1-0-1bdb3c9c3d63@bootlin.com>
- <4702428.LvFx2qVVIh@fw-rgant> <519e17e0-9739-43bc-b77a-a77fd103d8d7@lunn.ch>
+ <20250514142019.56372b4e@2a02-8440-d105-dfa7-916a-7e1b-fec1-3a90.rev.sfr.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart3333674.5fSG56mABF";
+Content-Type: multipart/signed; boundary="nextPart8620414.NyiUUSuA9g";
  micalg="pgp-sha256"; protocol="application/pgp-signature"
 X-GND-State: clean
 X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeftdejtddvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkfgjfhggtgesghdtreertddtjeenucfhrhhomheptfhomhgrihhnucfirghnthhoihhsuceorhhomhgrihhnrdhgrghnthhoihhssegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefhvdelkeevgfeijedtudeiheefffejhfelgeduuefhleetudeiudektdeiheelgfenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepfhifqdhrghgrnhhtrdhlohgtrghlnhgvthdpmhgrihhlfhhrohhmpehrohhmrghinhdrghgrnhhtohhishessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepuddvpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtoheprghtvghnrghrtheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopegurghvvghmsegur
- ghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeftdejtdegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkfgjfhggtgesghdtreertddtjeenucfhrhhomheptfhomhgrihhnucfirghnthhoihhsuceorhhomhgrihhnrdhgrghnthhoihhssegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeetveeileegkeetvefgtdegffdviefgvdevkefhgfetieffvddvkedujeefvdfgtdenucffohhmrghinhepkhgvrhhnvghlrdhorhhgpdgsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehffidqrhhgrghnthdrlhhotggrlhhnvghtpdhmrghilhhfrhhomheprhhomhgrihhnrdhgrghnthhoihhssegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduuddprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigr
+ dhorhhgrdhukhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
 X-GND-Sasl: romain.gantois@bootlin.com
 
---nextPart3333674.5fSG56mABF
+--nextPart8620414.NyiUUSuA9g
 Content-Transfer-Encoding: 7Bit
 Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
 From: Romain Gantois <romain.gantois@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Date: Wed, 14 May 2025 14:48:52 +0200
-Message-ID: <9500044.CDJkKcVGEf@fw-rgant>
-In-Reply-To: <519e17e0-9739-43bc-b77a-a77fd103d8d7@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Date: Wed, 14 May 2025 14:53:54 +0200
+Message-ID: <1877501.VLH7GnMWUR@fw-rgant>
 MIME-Version: 1.0
 
-On Wednesday, 14 May 2025 14:32:22 CEST Andrew Lunn wrote:
-> > > > +	/* Update advertisement */
-> > > > +	if (mutex_trylock(&phydev->lock)) {
-> > > > +		ret = dp83869_config_aneg(phydev);
-> > > > +		mutex_unlock(&phydev->lock);
-> > > > +	}
-> > > 
-> > > Just skimmed through this quickly and it's not clear to me why aneg is
-> > > restarted only if there was no contention on the global phydev lock;
-> > > it's not guaranteed a concurrent holder would do the same. If this is
-> > > intended, a comment would be welcomed.
-> > 
-> > The reasoning here is that there are code paths which call
-> > dp83869_port_configure_serdes() with phydev->lock already held, for
-> > example:
-> > 
-> > phy_start() -> sfp_upstream_start() -> sfp_start() -> \
-> > 
-> > 	sfp_sm_event() -> __sfp_sm_event() -> sfp_sm_module() -> \
-> > 	sfp_module_insert() -> phy_sfp_module_insert() -> \
-> > 	dp83869_port_configure_serdes()
-> > 
-> > so taking this lock could result in a deadlock.
-> > 
-> > mutex_trylock() is definitely not a perfect solution though, but I went
-> > with it partly because the marvell-88x2222 driver already does it this
-> > way, and partly because if phydev->lock() is held, then there's a solid
-> > chance that the phy state machine is already taking care of reconfiguring
-> > the advertisement. However, I'll admit that this is a bit of a shaky
-> > argument.
-> > 
-> > If someone has a better solution in mind, I'll gladly hear it out, but for
-> > now I guess I'll just add a comment explaining why trylock() is being
-> > used.
-> The marvell10g driver should be the reference to look at.
+Hi Maxime,
+
+On Wednesday, 14 May 2025 14:20:19 CEST Maxime Chevallier wrote:
+> Hi Romain,
 > 
-> As you say, phy_start() will eventually get around to calling
-> dp83869_config_aneg(). What is more interesting here are the paths
-> which lead to this function which don't result in a call to
-> dp83869_config_aneg(). What are those?
+> On Wed, 14 May 2025 09:49:56 +0200
+> 
+> Romain Gantois <romain.gantois@bootlin.com> wrote:
+> > Hello everyone,
+> > 
+> > This is version one of my series which adds support for downstream
+> > 1000Base-X SFP modules in the DP83869 PHY driver. It depends on the
+> > following series from Maxime Chevallier, which introduces an ethernet port
+> > representation and simplifies SFP support in PHY drivers:
+> > 
+> > https://lore.kernel.org/all/20250507135331.76021-1-maxime.chevallier@bootl
+> > in.com/
+> Thanks a lot for giving this work a shot ! Maybe a small nit, but as
+> the dependency isn't merged yet, you should mark this series as RFC, as
+> it will fail on the autobuilders.
 
-Whenever you insert an SFP module, either sfp_irq() or sfp_poll() will will 
-detect it and eventually call module_insert() from the SFP state machine. As 
-far as I'm aware, this doesn't imply any calls to config_aneg().
-
-Since the DP83869 remaps fiber registers to 0 when we switch it to RGMII-
-to-1000Base-X mode, the value in MII_ADVERTISE won't be correct anymore,
-which is why we have to reconfigure the advertisement after a module is 
-inserted. It doesn't seem like the marvell10g driver does this, and I'm not 
-sure why that's the case.
+Ah I see, I'll fix that in v2 then.
 
 Thanks,
 
@@ -146,29 +114,29 @@ Romain Gantois, Bootlin
 Embedded Linux and Kernel engineering
 https://bootlin.com
 
---nextPart3333674.5fSG56mABF
+--nextPart8620414.NyiUUSuA9g
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: This is a digitally signed message part.
 Content-Transfer-Encoding: 7Bit
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCAAdFiEEYFZBShRwOvLlRRy+3R9U/FLj284FAmgkkTQACgkQ3R9U/FLj
-286nTw/9E5UQrHOfIT3uIQI3QMeqBBkA9iT8YlrYlSZ2hL4v6pNZv2BLx/yHxKfR
-JDKc2UHUstgM6rw7/z1YA70BilxrEdyg9csdDrG+Z3lHVTosZk6M4Q5dX1++SnKo
-X+l3Z1zjnkvCDyOfMwBryslJE+omgeCQDTLEhxi7BdseKt9Wd6mzIzqMwTdLijCY
-2THGLMnOoSvRjijFOHKTiCkFlzHvSVyHqDBDpl2JPXVuJmbO+QOrB8GPMXy9ONbM
-IyhOXQP+CQOh3Z9121nEOe+NjEr+/houLs6D+3IpiEo3YN4tCDq3xJyptBgoQI1K
-BfMsZIQX0IVtAjfI1bzRc6e7Bk0O/rtauxZnhf5zg77vGqOx4yX0xs/bW/j9D5Ga
-ypMZZUd9NzFBCp669Wq6GvujyruczLItB5+iZFHdqzPuO+uZkG+zVkWO8z60tvYV
-9qItf/XP1QwfiSPIDdiLeyWAeZTwzWFoy0UIXDCZZPZoerMXF3Mt2WeoHj5tJLiW
-iTt2ns+HciPwtnOmC6KlrBef0Hux4GXSncJqr73576VxeWDVZt+8hS7n4PXPIxVP
-08X43O67JPc+ODITgguFQRot3XQHg3w7mJLQ1T9i/85mg+177/uON2Cdz8Iw/Pf6
-mVc2aPN1hMUlaDfC9a6fpKESCdkM1+owvTtlaQM8pOE1IXg7R3g=
-=XgF6
+iQIzBAABCAAdFiEEYFZBShRwOvLlRRy+3R9U/FLj284FAmgkkmIACgkQ3R9U/FLj
+285jKw/+PKpg4jg8INKJQ0Mp53ofOft5er9GeMS8E7xBhcUHN2FugIo9xajYkIE8
+3TL0+QvABBCpu6VhDoP3UZ+k5joEcpOU4WgS0G7hzrxK0shjSZsOK8DM+xZ1Trql
+wlprLYM0oGu7tbk0KlBLPTZ2N8dNC6UAgnscykiBRDde+IbGmEELMmpJ3qr0Drz9
+NouBsErwEBw933FwuTnC7PmUfkLEs0XR0wZWuvXDCsiBah1L/6Vi00/AiYr/Dcmk
+jvR4x4E3oY8ovSqHmNK3G49yoxwyOXez6HARuixIBqx2M0wy6u4W7ce7GSqo5F0i
+wsDqEI1WRqjazHR11Zu00ymjXpJJ7tc3S8whH08ox/VjiG6Djea8LxSJQANx9FvG
+RQoLpszYDzt1EheQ4UXEDAIk9Mpxo8O/tnt5da7GwFG6uNoLG4aGG9VD9ayvb/df
+B1/MQNvXtrsr2zOuA5VYLROynqATx+f6QWwVQ5O27+f2V3ChSI7tPUqoreQXUXpe
+18DOS1NTqEiIGbdkvsM+Q8zAgYGDb3YIaXZD9o4kb3wdk/HR3eyzL1d/SL8H8chW
+o/5VQhaWue/cVWhVu0MyoRLfWHQEGSu6zGr4oD1a0E1oyt4TQcy02STyulqidoFF
+/auswQ0rkBI1ijzFNwiPCNKzjj8zXPTQRqkJ0dtaoXxH739S0hg=
+=4Pp+
 -----END PGP SIGNATURE-----
 
---nextPart3333674.5fSG56mABF--
+--nextPart8620414.NyiUUSuA9g--
 
 
 
