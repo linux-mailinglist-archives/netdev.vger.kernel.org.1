@@ -1,97 +1,169 @@
-Return-Path: <netdev+bounces-190550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F634AB77E8
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 23:26:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4811FAB77F1
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 23:27:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 097E41B67EE1
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 21:26:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 650A48C0D8F
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 21:27:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C4F929617F;
-	Wed, 14 May 2025 21:26:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8822C296730;
+	Wed, 14 May 2025 21:27:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AwPrqiFm"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nf7kaj9h"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21A221F0E47;
-	Wed, 14 May 2025 21:26:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE8629672C
+	for <netdev@vger.kernel.org>; Wed, 14 May 2025 21:27:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747257982; cv=none; b=U6U5yxer5mEQ+3Dgp/JQ0GozWgmcziZXzQGcB10/8ZIL1Fk3DiviaQj5gPJhDGrDGPmuG61XByQRDH5V38wjWKlSEuB+MzuFDxhDWtnCEVCwbh9AWMkMotYa002AFXv6NPVjLoiIBdCEiIDzRHLr6DOdhbJ2HmN/r10cPi6TfdI=
+	t=1747258071; cv=none; b=rVAYnDYpEag3XkWUoLHdgoLTdFZtSUOo8xmSyon5aTa3nZl+LxGsOupW8BpHE8B2SN94UGj+dypcleWOlemtxZ2xgfU5ixhQ3BP6qP8KCBzLRXuxqdvsGml0GFUCBnlGxtfR1F/ed1xgZrZ8o51UwGCd15zXPzTSERuMiUmWi+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747257982; c=relaxed/simple;
-	bh=oHrnHkrqzyYWJmEJgmA6mr3tiaYEXhO71LpqQPadZMI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=N44EJNENdq9t0sTdiqRonAguhkywtEflVn4RRmAi5Y7y2xTr5emeNKSIqSOatT7iQ3FI5QaayTomI6a1J+S6Ydfqq1R4N1C7NHUrct9WQcgIbTJijn0CoOU61/hZfxXIhGBtczQi2jakmpVqrBevVw2QeYTv16q8CrQDSmUX7YE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AwPrqiFm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26029C4CEE3;
-	Wed, 14 May 2025 21:26:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747257981;
-	bh=oHrnHkrqzyYWJmEJgmA6mr3tiaYEXhO71LpqQPadZMI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AwPrqiFmrlH7DA8KXHltGT0FlM32sqUkPfeLzeEjB7IfRQ+rcTIE94qByvgw2cIGC
-	 syT64FUId+MJ2eP5enteINF9kdHf95LWXfyANqO/LLd8SxxqpsyRF8BNfXXmStYCCB
-	 NU5x0Y3nUv3usiQDxuAmin6iVdPp6F+72CYgy7OX+sA/Zxkckyps3EwFA0w/bR5DlR
-	 IqeAiM6vZEar2Yi9A1PQUNJVsG/xgob1oWDDriAAkaK7DI79EJ4bsHhPUCincMUYpd
-	 SfFnW+CvbV0ugy5JI43ol+mXCjE3jTBMN5pnQZQbQHriiRWO3xWRkQDPft+L/2JzkO
-	 ljFUlI9l6ceag==
-Date: Wed, 14 May 2025 14:26:20 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: <bpf@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
- <eric.dumazet@gmail.com>, <horms@kernel.org>, <jonesrick@google.com>,
- <ncardwell@google.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
- <weiwan@google.com>
-Subject: Re: [PATCH net-next 11/11] tcp: increase tcp_rmem[2] to 32 MB
-Message-ID: <20250514142620.63937885@kernel.org>
-In-Reply-To: <20250514212210.82672-1-kuniyu@amazon.com>
-References: <20250514205348.78733-1-kuniyu@amazon.com>
-	<20250514212210.82672-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1747258071; c=relaxed/simple;
+	bh=B9ChNiVWhSbXwMRhQRWesptb26gGcShoINsG7retb/c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bbktWR601X+9N7TLsS5zIastiTIZOUzndD7IhwFAyeO9hvVByOa5MvOzwRKSpRASwLk16BLOAv3YEiGaBTamuVO0EO2cufe9ahPqKrHD7fK1hFw0L9lBplS3WDfmtsYxpJX+ISQRxa1OggBns1/tpwqsMtr9P3mIYbd9esypkAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nf7kaj9h; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <c7af0e1e-7ba2-48d0-9a0f-4903dbe97421@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1747258067;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=r8Jy0DYHy2WLjjfMWoqqUpHcXeSEmZ+GUyw52TRuTn4=;
+	b=nf7kaj9hrX9pi/Rz7GxOi8xEymsA21jTycRj0Plgv7FAcl3L4FoaxAKWsSyI1uWnLFRLr2
+	ovwqSZsFeZ7QbaJOUFOR67mkYJzWUZPjevhSr7Ll0eyV4gT8YSUydN7S9kT3aQeQcRa4yc
+	hZGpzbPMAgQAylAIXVmuA+0ZELrHQSg=
+Date: Wed, 14 May 2025 22:27:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH net-next 2/2] net: lan743x: implement ndo_hwtstamp_get()
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
+Cc: Bryan Whitehead <bryan.whitehead@microchip.com>,
+ Raju Lakkaraju <Raju.Lakkaraju@microchip.com>,
+ Vishvambar Panth S <vishvambarpanth.s@microchip.com>,
+ UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Richard Cochran <richardcochran@gmail.com>
+References: <20250514151931.1988047-1-vladimir.oltean@nxp.com>
+ <20250514151931.1988047-2-vladimir.oltean@nxp.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20250514151931.1988047-2-vladimir.oltean@nxp.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 14 May 2025 14:20:05 -0700 Kuniyuki Iwashima wrote:
-> > It seems ACK was not handled by BPF at tc hook on lo.
-> > 
-> > ACK was not sent or tcp_load_headers() failed to parse it ?
-> > both sounds unlikely though.
-> > 
-> > Will try to reproduce it.  
+On 14/05/2025 16:19, Vladimir Oltean wrote:
+> Permit programs such as "hwtstamp_ctl -i eth0" to retrieve the current
+> timestamping configuration of the NIC, rather than returning "Device
+> driver does not have support for non-destructive SIOCGHWTSTAMP."
 > 
-> I hard-coded the expected TCPOPT_WINDOW to be 7, and this
-> series bumps it to 10, so SYN was dropped as invalid.
+> The driver configures all channels with the same timestamping settings.
+> On TX, retrieve the settings of the first channel, those should be
+> representative for the entire NIC. On RX, save the filter settings in a
+> new adapter field.
 > 
-> This fixes the failure, and I think it's not a blocker.
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> ---
+>   drivers/net/ethernet/microchip/lan743x_main.c |  2 ++
+>   drivers/net/ethernet/microchip/lan743x_main.h |  1 +
+>   drivers/net/ethernet/microchip/lan743x_ptp.c  | 18 ++++++++++++++++++
+>   drivers/net/ethernet/microchip/lan743x_ptp.h  |  3 ++-
+>   4 files changed, 23 insertions(+), 1 deletion(-)
 > 
-> ---8<---
-> diff --git a/tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.c b/tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.c
-> index eb5cca1fce16..7d5293de1952 100644
-> --- a/tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.c
-> +++ b/tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.c
-> @@ -294,7 +294,9 @@ static int tcp_validate_sysctl(struct tcp_syncookie *ctx)
->  	    (ctx->ipv6 && ctx->attrs.mss != MSS_LOCAL_IPV6))
->  		goto err;
->  
-> -	if (!ctx->attrs.wscale_ok || ctx->attrs.snd_wscale != 7)
-> +	if (!ctx->attrs.wscale_ok ||
-> +	    !ctx->attrs.snd_wscale ||
-> +	    ctx->attrs.snd_wscale >= BPF_SYNCOOKIE_WSCALE_MASK)
->  		goto err;
->  
->  	if (!ctx->attrs.tstamp_ok)
+> diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
+> index b01695bf4f55..880681085df2 100644
+> --- a/drivers/net/ethernet/microchip/lan743x_main.c
+> +++ b/drivers/net/ethernet/microchip/lan743x_main.c
+> @@ -1729,6 +1729,7 @@ int lan743x_rx_set_tstamp_mode(struct lan743x_adapter *adapter,
+>   	default:
+>   			return -ERANGE;
+>   	}
+> +	adapter->rx_tstamp_filter = rx_filter;
+>   	return 0;
+>   }
+>   
+> @@ -3445,6 +3446,7 @@ static const struct net_device_ops lan743x_netdev_ops = {
+>   	.ndo_change_mtu		= lan743x_netdev_change_mtu,
+>   	.ndo_get_stats64	= lan743x_netdev_get_stats64,
+>   	.ndo_set_mac_address	= lan743x_netdev_set_mac_address,
+> +	.ndo_hwtstamp_get	= lan743x_ptp_hwtstamp_get,
+>   	.ndo_hwtstamp_set	= lan743x_ptp_hwtstamp_set,
+>   };
+>   
+> diff --git a/drivers/net/ethernet/microchip/lan743x_main.h b/drivers/net/ethernet/microchip/lan743x_main.h
+> index db5fc73e41cc..02a28b709163 100644
+> --- a/drivers/net/ethernet/microchip/lan743x_main.h
+> +++ b/drivers/net/ethernet/microchip/lan743x_main.h
+> @@ -1087,6 +1087,7 @@ struct lan743x_adapter {
+>   	phy_interface_t		phy_interface;
+>   	struct phylink		*phylink;
+>   	struct phylink_config	phylink_config;
+> +	int			rx_tstamp_filter;
+>   };
+>   
+>   #define LAN743X_COMPONENT_FLAG_RX(channel)  BIT(20 + (channel))
+> diff --git a/drivers/net/ethernet/microchip/lan743x_ptp.c b/drivers/net/ethernet/microchip/lan743x_ptp.c
+> index 026d1660fd74..a3b48388b3fd 100644
+> --- a/drivers/net/ethernet/microchip/lan743x_ptp.c
+> +++ b/drivers/net/ethernet/microchip/lan743x_ptp.c
+> @@ -1736,6 +1736,24 @@ void lan743x_ptp_tx_timestamp_skb(struct lan743x_adapter *adapter,
+>   	lan743x_ptp_tx_ts_complete(adapter);
+>   }
+>   
+> +int lan743x_ptp_hwtstamp_get(struct net_device *netdev,
+> +			     struct kernel_hwtstamp_config *config)
+> +{
+> +	struct lan743x_adapter *adapter = netdev_priv(netdev);
+> +	struct lan743x_tx *tx = &adapter->tx[0];
+> +
+> +	if (tx->ts_flags & TX_TS_FLAG_ONE_STEP_SYNC)
+> +		config->tx_type = HWTSTAMP_TX_ONESTEP_SYNC;
+> +	else if (tx->ts_flags & TX_TS_FLAG_TIMESTAMPING_ENABLED)
+> +		config->tx_type = HWTSTAMP_TX_ON;
+> +	else
+> +		config->tx_type = HWTSTAMP_TX_OFF;
+> +
+> +	config->rx_filter = adapter->rx_tstamp_filter;
+> +
+> +	return 0;
+> +}
+> +
+>   int lan743x_ptp_hwtstamp_set(struct net_device *netdev,
+>   			     struct kernel_hwtstamp_config *config,
+>   			     struct netlink_ext_ack *extack)
+> diff --git a/drivers/net/ethernet/microchip/lan743x_ptp.h b/drivers/net/ethernet/microchip/lan743x_ptp.h
+> index 9581a7992ff6..e8d073bfa2ca 100644
+> --- a/drivers/net/ethernet/microchip/lan743x_ptp.h
+> +++ b/drivers/net/ethernet/microchip/lan743x_ptp.h
+> @@ -51,7 +51,8 @@ int lan743x_ptp_open(struct lan743x_adapter *adapter);
+>   void lan743x_ptp_close(struct lan743x_adapter *adapter);
+>   void lan743x_ptp_update_latency(struct lan743x_adapter *adapter,
+>   				u32 link_speed);
+> -
+> +int lan743x_ptp_hwtstamp_get(struct net_device *netdev,
+> +			     struct kernel_hwtstamp_config *config);
+>   int lan743x_ptp_hwtstamp_set(struct net_device *netdev,
+>   			     struct kernel_hwtstamp_config *config,
+>   			     struct netlink_ext_ack *extack);
 
-Awesome, could you submit officially? As soon as your fix is in
-patchwork I can return Eric's series into the testing branch.
+Thanks for making this improvement. Looks like the pattern of not having
+"get" callbacks got into this from phy drivers.
+
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
