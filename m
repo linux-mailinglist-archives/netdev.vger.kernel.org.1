@@ -1,172 +1,225 @@
-Return-Path: <netdev+bounces-190525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 335EEAB74E6
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 21:00:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C814AB7601
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 21:36:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A81C34A721F
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 19:00:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE8894C215C
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 19:36:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D4491F4634;
-	Wed, 14 May 2025 19:00:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09C3228FA89;
+	Wed, 14 May 2025 19:36:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="ie6ND2Fk"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="YzRN79cc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx03lb.world4you.com (mx03lb.world4you.com [81.19.149.113])
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11021079.outbound.protection.outlook.com [52.101.62.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 586E21FCFF3
-	for <netdev@vger.kernel.org>; Wed, 14 May 2025 19:00:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.113
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747249235; cv=none; b=FhfGmd0PAA56pd4lXZLGQ5vGg4t/57Fz/acgoOnLPBDNArWnW3j3lh0N9oCM23msiqlvAobNWFPfczVro/iydiCxOnsZI52q8SiY4yJxhsUcBSDiA56jLWcbq7PziWdl2orEyJYPlB/hOPWcW4vyARdwbqn8/TZx8QywkejZyV4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747249235; c=relaxed/simple;
-	bh=jayoMvpFmY+V/6FYdWPshVom5X5zq0HGac5czDpOBB4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=b1QOge9cT6KnFGPRBF8RK8Gn4TkaKn/KP0//Yc0Rl7tHWIUXiN+wZyguBTGx2//e/9oFeLRseeaeZmrzTEraP3rKLsi2DMsm7/tv1/3JlVEeBh1/HMUiOjKKWcVVS3ZZCd/QHwsJUhadBR0TpPWcMyyTFJzeSM9OsXV59VckL/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=ie6ND2Fk; arc=none smtp.client-ip=81.19.149.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=JTN8vpCrxAyFl2EndvUMI8MWlG7TmKzwctciFXYx7HM=; b=ie6ND2FkVpX4HRLJx3sgGNFzLI
-	wokHH9V2wuntos9GUXqIB2GIT/6nistpVpXzkoXuI7Yi79RzjADcIpzdqcIYGVB3rxdh/eSHQMdPH
-	T4axOwGt06ATQh0ILHy+Y8/qAEQKU9WJI453Z3dreeGC6sh8QiQ3cdNI5o6uHKvvw1Bs=;
-Received: from [188.22.4.212] (helo=[10.0.0.160])
-	by mx03lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.97.1)
-	(envelope-from <gerhard@engleder-embedded.com>)
-	id 1uFHLB-000000004Zx-2ol1;
-	Wed, 14 May 2025 21:00:30 +0200
-Message-ID: <9fa06ba4-2052-460d-a9bd-8be7c06da6ad@engleder-embedded.com>
-Date: Wed, 14 May 2025 21:00:28 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 421E2156C6F;
+	Wed, 14 May 2025 19:36:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.79
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747251368; cv=fail; b=sceInJireSk3mvOr8tWbBmZAn1QqNhmNGLqPy2bhgynWQ/gsJdLck4/bHbiPPS2qxOboHlPzkmp3KJQUX9aqKPBg6e5vYC0bc8biYenRWGGzz2mct0kM4J3ruW6QfbM2HSTUQoc3EXI36Vqtnz9Iw4ntvnbVGKOdF3mLYEdY6BI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747251368; c=relaxed/simple;
+	bh=9Rk/VMRilcu8KzWFLBBi/d+8G9l0Nk7F+xcOpXmX7rU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=MfkaXCAPZ5es7AUmqEwUE64yspI5EOmeoYwl2jwhFtx+qx626k7ilR/xMg5GiVYKqoKKx3ykuucH1TxZl8dfQi0pm8K92M79Dxfn780wMD0iyZ1Q8NOjDlumx6Rrnhju+z6paOxgAhLMf8xcjJdZunve9CNNeHApZIrpIVxklJQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=YzRN79cc; arc=fail smtp.client-ip=52.101.62.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=c4X5b7wFSPooaz/+Qcju1v+H7EUlWyylTBqw8/yq1fC5g+eRM/jKtKuN7JueUW8DaN8Ty93/vQ7fjmywKIV8CD/1ql2Zw8lhsD52CQ++agj7eVJNzrOc7j+qrtFuRrzYgO9WCJCcTUQZkEX/qy6X2uAhYBthu2vewvn9t3OWRKY1o+jd4aqbIsvumPzmU2aUf5HfxUtlpHUIOFACFpMQJwz8t6NZbuIcoQo6btwYjEbAj9U9cm/LGRWNnSwEXYIdZ/xub4D0ZJFcRPiYkqwgPAuVDV7Aaj1/PN9vXE8Qbbjd0ZQ66ZZM1BKWr3rNt0JiiLaoXKkVamRNCbiuZTUnfw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9Rk/VMRilcu8KzWFLBBi/d+8G9l0Nk7F+xcOpXmX7rU=;
+ b=NtpZBPUXmxszd91V6lkwm/vqKFjpN9K/wWNOfuMNeSGuC0iBSUETFPb9JY3spjM3gUVENeZKOEbaYPRHQy5yIDtUe8rbjp3TIaSNaJppk3iasym9M/3r2gDX7g0kvvmV9czJ/dncoKOHPfeCl+ztZFsYg/n9+PcSGqiUEhJ7MG1d21uC22/ugQUPl3PdG5hZ9OdkUZ2CEVPu8/xcLr6bAMFMW+oupuUGVaJitwP03SVpoflFgYZ2j3IGlW8i98YysDk4B1TiiAbyY606ri8ClaSMA1Sc3Ghm2jKlgL6amdbINUZMckF5p61pznhe3oxHozpLHmy+nQ5GgVftTfBwxg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9Rk/VMRilcu8KzWFLBBi/d+8G9l0Nk7F+xcOpXmX7rU=;
+ b=YzRN79ccZsx/YDF1mI6St1AaVdNqy5HIf73lc6bkBS3kZs7x8xGtW81BkTbbHHnWpijIDjGr2lv6WLlxaC4zGU+aFDaTb8e9mNR17n+BFWdMXUbiV2aM4PnDiR9bINXc2eiY4Mmuw9VrjC+CIyLKd0Ka1VUca5yAF1X2leU6+Qo=
+Received: from MN0PR21MB3437.namprd21.prod.outlook.com (2603:10b6:208:3d2::17)
+ by BL1PR21MB3040.namprd21.prod.outlook.com (2603:10b6:208:394::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8746.3; Wed, 14 May
+ 2025 19:36:03 +0000
+Received: from MN0PR21MB3437.namprd21.prod.outlook.com
+ ([fe80::5125:461:1c07:1a97]) by MN0PR21MB3437.namprd21.prod.outlook.com
+ ([fe80::5125:461:1c07:1a97%4]) with mapi id 15.20.8769.001; Wed, 14 May 2025
+ 19:36:02 +0000
+From: Haiyang Zhang <haiyangz@microsoft.com>
+To: "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+CC: Dexuan Cui <decui@microsoft.com>, "stephen@networkplumber.org"
+	<stephen@networkplumber.org>, KY Srinivasan <kys@microsoft.com>, Paul
+ Rosswurm <paulros@microsoft.com>, "olaf@aepfle.de" <olaf@aepfle.de>,
+	"vkuznets@redhat.com" <vkuznets@redhat.com>, "davem@davemloft.net"
+	<davem@davemloft.net>, "wei.liu@kernel.org" <wei.liu@kernel.org>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, "leon@kernel.org"
+	<leon@kernel.org>, Long Li <longli@microsoft.com>,
+	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>, "john.fastabend@gmail.com"
+	<john.fastabend@gmail.com>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"ast@kernel.org" <ast@kernel.org>, "hawk@kernel.org" <hawk@kernel.org>,
+	"tglx@linutronix.de" <tglx@linutronix.de>, "shradhagupta@linux.microsoft.com"
+	<shradhagupta@linux.microsoft.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, Konstantin Taranov <kotaranov@microsoft.com>,
+	"horms@kernel.org" <horms@kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH net-next,v3] net: mana: Add handler for hardware servicing
+ events
+Thread-Topic: [PATCH net-next,v3] net: mana: Add handler for hardware
+ servicing events
+Thread-Index: AQHbw3g4KpxrP38PRECRV38WXy1PPbPSh19w
+Date: Wed, 14 May 2025 19:36:02 +0000
+Message-ID:
+ <MN0PR21MB3437621E95E27BD2EBA4923BCA91A@MN0PR21MB3437.namprd21.prod.outlook.com>
+References: <1747079874-9445-1-git-send-email-haiyangz@microsoft.com>
+In-Reply-To: <1747079874-9445-1-git-send-email-haiyangz@microsoft.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=49caaab5-9f29-4fd6-adc1-27da3cfc8dd2;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2025-05-14T19:34:06Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
+ 3, 0, 1;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MN0PR21MB3437:EE_|BL1PR21MB3040:EE_
+x-ms-office365-filtering-correlation-id: 93ffc945-df66-4e92-4de9-08dd931e8fe5
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|7416014|376014|366016|7053199007|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?AcJp1m/bqOuSSwdTGERF4CMNckNCC3wa2WnMXW/C+avP+aFRgnYtkAaAYkot?=
+ =?us-ascii?Q?jVvpw197+8HzX4j/5poq3eQGR++B7Bdh7zU5oCpUOptvbUTjtVd0ZmvpB+Y3?=
+ =?us-ascii?Q?/pUdBBgGbgMCDT+UgmYlXm/gzpC4vL46TQVEfq4nbmhheL5Gph+K0+joZEIN?=
+ =?us-ascii?Q?w0DeGaj1RvoTWjFvMk08/D/osybOWL3S6P2QZMOLWtDIokRmcIVBNrwB+uRg?=
+ =?us-ascii?Q?flt8Ue5+75QBYxlLUGs9zMV7BUpTKXDgq8H9OfMkc9OLJBcBNawOgM79RJt7?=
+ =?us-ascii?Q?AMw+EsnTw9maY2ucc5wJpzco5+iJbfeVB2zxlYHVWjmyJgrOOrP7a0+1wRGA?=
+ =?us-ascii?Q?E+0h9Lpr9+9YVPdx7pX3AXXSycuAexBoXVk2OFf21x/eb1w5k59hzoKt0hDU?=
+ =?us-ascii?Q?+9cDRpfQBaP3nyGm4M1NXdEL0Sk4wAqbPmfLft6rU5XOef+xj6MLHzwps5N3?=
+ =?us-ascii?Q?CdIgBKbijPAdP6dRPbivWPYKwYBmMnsvZpG2m0SO0UJt43lZGctGwhWat8XP?=
+ =?us-ascii?Q?fiUsYQFZWQDOpbK1WBZ1zAqkKsn8zaRJcqDqQJCkplz1msZTlOUjjf2GT+S9?=
+ =?us-ascii?Q?WA8OZmMlOybYrXcT9M/fR6q9VSOcVpgC48rE2x/5bjCHyzlLqWhwL/q9cY/p?=
+ =?us-ascii?Q?bU7tlOpOq2BwRycNz3XWC2SGYNkgSirijJFPVifE9luMmr8IC7G+sNvTkk5E?=
+ =?us-ascii?Q?sg6/+SefWfq9KHT6BesHsWPgKkwdCvuJ/I5lprrMR6webbpJE16lWzyZ1lOB?=
+ =?us-ascii?Q?Z/SuFhJu7lPFym1MwA+fSoUYyW8jkBRGr/CCR+EtUStuSQebaTRCDgHjM8+6?=
+ =?us-ascii?Q?2AkDuAa6nk5IcTYLHF1Ge10JCwfuXR4lxvuJjQyDnNa8xIbepWso4e0Xx7gO?=
+ =?us-ascii?Q?CZK4rwe7K3Y3MVoQg5CBwtNv8GfbnM5aykBf8wqSiZGpte5a0ixIT/mcpuvt?=
+ =?us-ascii?Q?LTZ7q0IcsmbZ4bhXu8Dluun+EqxcIE07g0GhoSOIxKC7LTG2zzmv0xMviw8+?=
+ =?us-ascii?Q?7XMAR2xoGy3ssi8bXL6mdML/VVMqyLkS7pn0wS4tkhM5ml3pGJ0hrV7BW16c?=
+ =?us-ascii?Q?I5QNoDkVj+XKLZUJK3S0aJy47O4iyDNHH23GwZhK3G54gJIrT63nhR1q1xG0?=
+ =?us-ascii?Q?BCzbe4JsrXpUpOpCKUdnlJxc0k0MxvtdMkMWV9QbKGkjcS7p94hb793SHnAl?=
+ =?us-ascii?Q?/AEjQ1eZjWouGCQZNAG2f6EaLD2y/fghAJcvDvWGCMWBT7yVa55/h1f3O2tb?=
+ =?us-ascii?Q?2kjfZ8yvT8EWDnVnCEEdf93YQZd6aiacr/iOEhE+NDgWAcrXc+h5PrsgIrT2?=
+ =?us-ascii?Q?fMmy+6AFxWIl4rxA/u2PgOMwYeyMeewaf7TcNNd+BUsHEP3TFR2oqoS6jrHV?=
+ =?us-ascii?Q?rTcM1qO+nk/d9JdhUhPsul/MSc39dp4ELlFgXEP/uJ/8eBgBCwbMvs3hT6cP?=
+ =?us-ascii?Q?yctlaeLaXwwy8j4LCYVTJwDh5noiXb5wXdsnlb8BzUaqXCAHbplYHA=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR21MB3437.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(7053199007)(38070700018);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?rgWxv9bDz1W2X3Nh2PI/nIiCr8WkbjJXBxgVo4vtDE2pnd0NDzntUiD9ptZj?=
+ =?us-ascii?Q?K6JfpfiiIKxAXv1mMNux1rx7swpb4ruMo8iiKMGwtzZ/XrZt1vrssYW2Khuh?=
+ =?us-ascii?Q?FPpaNJsISe1msumPTSlbNY7KvibGptpmgYuZOris7lD12GJbeQvf1qGEk/i/?=
+ =?us-ascii?Q?CqZ2TuGxOFGwyMI9pSShTQunVXpFJi/pPjf7fedMGgvclUsK9wHp7DhMTOce?=
+ =?us-ascii?Q?tDDab/4Tb6ZiVJnJH/Dq/0LdjEQfSBelrBlkL/S+jkbAGqlXXmdpSsjiX2Jk?=
+ =?us-ascii?Q?I+4iszIyJhQC+OGNRmV3x6I6pty+JjmHWBsTN1CJmrS0suSbEItH0ybbOAsn?=
+ =?us-ascii?Q?wT7uYhh/JS1iOE75Lx5EzTDsYmjGZOgiVpBu01Z7V21bduT+vGvHANEPJkIA?=
+ =?us-ascii?Q?B5kCT0xoHMQuFqKguZ/DvZYtOfpE+DDhWSdz4HXlhQpVyTuWQ3k2X10Ji22V?=
+ =?us-ascii?Q?4b1ccuFV+nRLSceSVSPUElZuQRTn/f1nIGyURmzaLEPdeSVNEr3jL+UvQZsf?=
+ =?us-ascii?Q?KjEMZzQX4J9KUpYbJZfqVoZqi+lxwTsn2DFBcOn10nWJ24UcfyYJAyeTAfps?=
+ =?us-ascii?Q?nAd35dTFTArPo2LBsSVGmEMdx9xW1vo4ZWXymkzb9QQci34wFijOqM1muRi7?=
+ =?us-ascii?Q?ocp3RQ3aLOV+lySrEnWev4BFHaPcdwGs/VckzYzvDPpj04OBGcE/El0awDtq?=
+ =?us-ascii?Q?23WERHtGUCB8ZlgKVS8NZnaD3IoB3nt/8gNdUq6l904RYxzPVY6Fbbe0l3H2?=
+ =?us-ascii?Q?xnsGYi8mW0c31pFY3IfcAi/b0YeAgRgoMr5NDu9hGz1mSqYZ7nTM29AWqBol?=
+ =?us-ascii?Q?5afJDQWSaM8En1S98ER+J2O4OnyQTV5iaXLJKOBB7UBT4o68YoiV8Z9RD4n5?=
+ =?us-ascii?Q?LX37dTJuQ3CxlYcxzHrs0vRyO+4cVyWKvpG7toeiMRUtNER1MI53wGTj21+h?=
+ =?us-ascii?Q?H4IE9xOH//+QtBdklEv4TXRItat9nag25S6b+egQltHhTikDVWVwIIswHl/9?=
+ =?us-ascii?Q?NQbmKTTg70v7BpJLzSTdfkwQ854T4J62OpYNeJP6eDlG6BcIZfvpZVJAVBMs?=
+ =?us-ascii?Q?vDwBc5m2uncuRSZv1adXRBtg+eErvQ2qSfzBh/E4KkbkHoLuhYjNtdT5inOz?=
+ =?us-ascii?Q?mmQVtBH6K5gWz2Aop43uvJI8ItDi3J0t/BguLn3KWgyHQ0Pf7X+knlhLZI2t?=
+ =?us-ascii?Q?EOcByAbR0ScjFYggJwHIEwSjY7p2eACK8qluPMU6jf5Q/L5472pYefa1aRo4?=
+ =?us-ascii?Q?wMYbXnQWC/PAu8IpCxKsbrFDUbUt+3Nwl2pFcO/saT+ki9sAa3SRhLoQBdzS?=
+ =?us-ascii?Q?2JF2ltpQzKs9lvDrMEOBmRs130JiDCepL+2FQfBnOrwobJQIf/ypL5AgcVL2?=
+ =?us-ascii?Q?rT0YLegXl9GfG4zZodsGLSyXRbi1neCByzb3nDNmo1h0+mz1IyR0RYl8dxK+?=
+ =?us-ascii?Q?TJmfJ1omSMBwuPFMWvfQhZCictchcjmKbiPPWU5Z2/VscESDAzVo9K6Bji+g?=
+ =?us-ascii?Q?KNJT2dqTHqNevTl7raSe3swAxvJLlhpeOH5F3yXa3tgzB6qyMKJv7JxRPjgE?=
+ =?us-ascii?Q?3k0+zpQ8NjFd4kteD/QvhAqG4TlmPmmct2wqpRel?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] net: lan743x: implement ndo_hwtstamp_get()
-To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
-Cc: Bryan Whitehead <bryan.whitehead@microchip.com>,
- Raju Lakkaraju <Raju.Lakkaraju@microchip.com>,
- Vishvambar Panth S <vishvambarpanth.s@microchip.com>,
- UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Vadim Fedorenko
- <vadim.fedorenko@linux.dev>, Richard Cochran <richardcochran@gmail.com>
-References: <20250514151931.1988047-1-vladimir.oltean@nxp.com>
- <20250514151931.1988047-2-vladimir.oltean@nxp.com>
-Content-Language: en-US
-From: Gerhard Engleder <gerhard@engleder-embedded.com>
-In-Reply-To: <20250514151931.1988047-2-vladimir.oltean@nxp.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AV-Do-Run: Yes
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR21MB3437.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 93ffc945-df66-4e92-4de9-08dd931e8fe5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 May 2025 19:36:02.8929
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: LgDTkv3J9+ZNCaIHdCOZFNWqAj//iw7+oU0slAD279V0cBkqTD+2W7gpjCeLICXF+eUc6ziSwm2HBZwZEfu3Aw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR21MB3040
 
-On 14.05.25 17:19, Vladimir Oltean wrote:
-> Permit programs such as "hwtstamp_ctl -i eth0" to retrieve the current
-> timestamping configuration of the NIC, rather than returning "Device
-> driver does not have support for non-destructive SIOCGHWTSTAMP."
-> 
-> The driver configures all channels with the same timestamping settings.
-> On TX, retrieve the settings of the first channel, those should be
-> representative for the entire NIC. On RX, save the filter settings in a
-> new adapter field.
-> 
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+
+
+> -----Original Message-----
+> From: LKML haiyangz <lkmlhyz@microsoft.com> On Behalf Of Haiyang Zhang
+> Sent: Monday, May 12, 2025 3:58 PM
+> To: linux-hyperv@vger.kernel.org; netdev@vger.kernel.org
+> Cc: Haiyang Zhang <haiyangz@microsoft.com>; Dexuan Cui
+> <decui@microsoft.com>; stephen@networkplumber.org; KY Srinivasan
+> <kys@microsoft.com>; Paul Rosswurm <paulros@microsoft.com>;
+> olaf@aepfle.de; vkuznets@redhat.com; davem@davemloft.net;
+> wei.liu@kernel.org; edumazet@google.com; kuba@kernel.org;
+> pabeni@redhat.com; leon@kernel.org; Long Li <longli@microsoft.com>;
+> ssengar@linux.microsoft.com; linux-rdma@vger.kernel.org;
+> daniel@iogearbox.net; john.fastabend@gmail.com; bpf@vger.kernel.org;
+> ast@kernel.org; hawk@kernel.org; tglx@linutronix.de;
+> shradhagupta@linux.microsoft.com; andrew+netdev@lunn.ch; Konstantin
+> Taranov <kotaranov@microsoft.com>; horms@kernel.org; linux-
+> kernel@vger.kernel.org
+> Subject: [PATCH net-next,v3] net: mana: Add handler for hardware servicin=
+g
+> events
+>=20
+> To collaborate with hardware servicing events, upon receiving the special
+> EQE notification from the HW channel, remove the devices on this bus.
+> Then, after a waiting period based on the device specs, rescan the parent
+> bus to recover the devices.
+>=20
+> Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
 > ---
->   drivers/net/ethernet/microchip/lan743x_main.c |  2 ++
->   drivers/net/ethernet/microchip/lan743x_main.h |  1 +
->   drivers/net/ethernet/microchip/lan743x_ptp.c  | 18 ++++++++++++++++++
->   drivers/net/ethernet/microchip/lan743x_ptp.h  |  3 ++-
->   4 files changed, 23 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
-> index b01695bf4f55..880681085df2 100644
-> --- a/drivers/net/ethernet/microchip/lan743x_main.c
-> +++ b/drivers/net/ethernet/microchip/lan743x_main.c
-> @@ -1729,6 +1729,7 @@ int lan743x_rx_set_tstamp_mode(struct lan743x_adapter *adapter,
->   	default:
->   			return -ERANGE;
->   	}
-> +	adapter->rx_tstamp_filter = rx_filter;
->   	return 0;
->   }
->   
-> @@ -3445,6 +3446,7 @@ static const struct net_device_ops lan743x_netdev_ops = {
->   	.ndo_change_mtu		= lan743x_netdev_change_mtu,
->   	.ndo_get_stats64	= lan743x_netdev_get_stats64,
->   	.ndo_set_mac_address	= lan743x_netdev_set_mac_address,
-> +	.ndo_hwtstamp_get	= lan743x_ptp_hwtstamp_get,
->   	.ndo_hwtstamp_set	= lan743x_ptp_hwtstamp_set,
->   };
->   
-> diff --git a/drivers/net/ethernet/microchip/lan743x_main.h b/drivers/net/ethernet/microchip/lan743x_main.h
-> index db5fc73e41cc..02a28b709163 100644
-> --- a/drivers/net/ethernet/microchip/lan743x_main.h
-> +++ b/drivers/net/ethernet/microchip/lan743x_main.h
-> @@ -1087,6 +1087,7 @@ struct lan743x_adapter {
->   	phy_interface_t		phy_interface;
->   	struct phylink		*phylink;
->   	struct phylink_config	phylink_config;
-> +	int			rx_tstamp_filter;
->   };
->   
->   #define LAN743X_COMPONENT_FLAG_RX(channel)  BIT(20 + (channel))
-> diff --git a/drivers/net/ethernet/microchip/lan743x_ptp.c b/drivers/net/ethernet/microchip/lan743x_ptp.c
-> index 026d1660fd74..a3b48388b3fd 100644
-> --- a/drivers/net/ethernet/microchip/lan743x_ptp.c
-> +++ b/drivers/net/ethernet/microchip/lan743x_ptp.c
-> @@ -1736,6 +1736,24 @@ void lan743x_ptp_tx_timestamp_skb(struct lan743x_adapter *adapter,
->   	lan743x_ptp_tx_ts_complete(adapter);
->   }
->   
-> +int lan743x_ptp_hwtstamp_get(struct net_device *netdev,
-> +			     struct kernel_hwtstamp_config *config)
-> +{
-> +	struct lan743x_adapter *adapter = netdev_priv(netdev);
-> +	struct lan743x_tx *tx = &adapter->tx[0];
-> +
-> +	if (tx->ts_flags & TX_TS_FLAG_ONE_STEP_SYNC)
-> +		config->tx_type = HWTSTAMP_TX_ONESTEP_SYNC;
-> +	else if (tx->ts_flags & TX_TS_FLAG_TIMESTAMPING_ENABLED)
-> +		config->tx_type = HWTSTAMP_TX_ON;
-> +	else
-> +		config->tx_type = HWTSTAMP_TX_OFF;
-> +
-> +	config->rx_filter = adapter->rx_tstamp_filter;
-> +
-> +	return 0;
-> +}
-> +
->   int lan743x_ptp_hwtstamp_set(struct net_device *netdev,
->   			     struct kernel_hwtstamp_config *config,
->   			     struct netlink_ext_ack *extack)
-> diff --git a/drivers/net/ethernet/microchip/lan743x_ptp.h b/drivers/net/ethernet/microchip/lan743x_ptp.h
-> index 9581a7992ff6..e8d073bfa2ca 100644
-> --- a/drivers/net/ethernet/microchip/lan743x_ptp.h
-> +++ b/drivers/net/ethernet/microchip/lan743x_ptp.h
-> @@ -51,7 +51,8 @@ int lan743x_ptp_open(struct lan743x_adapter *adapter);
->   void lan743x_ptp_close(struct lan743x_adapter *adapter);
->   void lan743x_ptp_update_latency(struct lan743x_adapter *adapter,
->   				u32 link_speed);
-> -
-> +int lan743x_ptp_hwtstamp_get(struct net_device *netdev,
-> +			     struct kernel_hwtstamp_config *config);
->   int lan743x_ptp_hwtstamp_set(struct net_device *netdev,
->   			     struct kernel_hwtstamp_config *config,
->   			     struct netlink_ext_ack *extack);
+> v3:
+> Updated for checkpatch warnings as suggested by Simon Horman.
+>=20
+> v2:
+> Added dev_dbg for service type as suggested by Shradha Gupta.
+> Added driver cap bit.
+>=20
+> ---
 
-Reviewed-by: Gerhard Engleder <gerhard@engleder-embedded.com>
+Thanks for the reviews.=20
+I will submit v4 soon with a minor name change.
+
+Thanks,
+- Haiyang
 
