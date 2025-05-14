@@ -1,99 +1,96 @@
-Return-Path: <netdev+bounces-190398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73EBEAB6B4A
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 14:20:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 395E5AB6B60
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 14:23:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 30FCF1B6040C
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 12:20:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A84BD188CD71
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 12:23:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB243276024;
-	Wed, 14 May 2025 12:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71B5B2749CC;
+	Wed, 14 May 2025 12:23:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="M1p5Iwb0"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="OFimIgF1"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E5F20299B;
-	Wed, 14 May 2025 12:20:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A070B2777FB;
+	Wed, 14 May 2025 12:22:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747225226; cv=none; b=MPtGbFyxB2ye8A6KT0ldZNBEV16iSBv36tK0SgHdjYGg/ooK4G5TtbYUGIheij9vY2QRv0RUT9EWj9/iI29JmSPSu9m1xx8sHuZavcN7Whc/gSpFspTEdBGKjeOq/QgvI6AG9djL4D4neeYAJD40wWR0OtoqkLmNMg2Qy6iALtg=
+	t=1747225380; cv=none; b=spzdknthtKUiFC2JrsxFfvPtItoFlZJ1ON09FZ3Ijt8qgFMcFtfmF6WZkrD+hoxMXhnvaKG5Uaxa1vxRR3GdysZN/4pGMrQWGVGMTlQPOOtAKoffq6ozJPhwOcwvpSp1UlnezyonzgbzshIExIKWs/W9iPFIXspN6UjMPKXuMbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747225226; c=relaxed/simple;
-	bh=NlajYTJSfazmLSRiirqfAL+mECUgQnC0dhtub+re41U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EMDKw+0FSEIt2eWIeNuIvpkBn663Fh8rWKd+H3Vu9HJwviarz4WZbvVWEHAYdymODOym2vLzUqbTEiClt2NpZnb7JC+V3tXuVuTtp1fUfoXPW6yDqSKBNq9uSpxfUtqX6fL36tDCTd4C4yGy7cM6+VomKflMe3J1Z33iXlMmPj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=M1p5Iwb0; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 9CB291FCEC;
-	Wed, 14 May 2025 12:20:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1747225222;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Xo1B64wUILKqKAiHJaL+05TTgFkZmbh/SeeSl0kMN+o=;
-	b=M1p5Iwb0tlv7JLuTw2+gFp4ksPtaemsttIVn9dOhwoCJ5B+4SIx0E/X8BpAftxPYsHS1w0
-	Moy16PdLUkaTy0RZRWCZib7Hr8uYoHO8IbMnOyKUU/ul+VK6OATMjySmtBCLBIqFPQc/QC
-	wLHFVxnn6j3GWCX0upkx7dzNs4prqQWKY5+f59W1HNE4TjyVhmIAumV5RuayPpUU7HuJ/M
-	qe6z6kCjjC+ZTrAPibNZNExYjIs6CWJ2194TjYKjFiKHOdP/qBYkUI6UpQj69NioHo4lDG
-	JNsOvs8bsMRfbFPS79wFlxyWbIlADHDfKlmtKhw8DJ5X5ybtzUuZfvhSAlOe7g==
-Date: Wed, 14 May 2025 14:20:19 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1747225380; c=relaxed/simple;
+	bh=kl3LU8ZOh/Nr6ImH0KVt+SK8CPEOxigB6uYi4mx9n78=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nlQ9hHzFf5NskBzVMAlng1/oFlYE9kXIp8ngGz1TkClBwPolXBdTHNWbE95qx/y2wCgz4B3/3FoluGULI3Ipja+1HBQrnFazZ6SriShWDP27xiEvLU6emV51Dl8Mua+/QpJteayVuUsLPTU2Dc/LkmxMm37DvgYVJYBX46BHYYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=OFimIgF1; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=aHcB4ipclq9No6jN4EurS7mibOSdJRLDM47C2pkSMRQ=; b=OFimIgF1i9pscT4GLbfexIK3+l
+	J+U7a7lkp+IywEWgUxOuFU+0d+9ygz8P3tkyJHYEzwssdsiebPQtCikFBnSS2TTjEsRlwDjuFplhq
+	apYw8615Zpd4y6VqsTCXFrkKf2DVGOhfraGSsyFX4I09hZemGucjbtA5s3UZjoOXxm08=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uFB8K-00CYc0-2K; Wed, 14 May 2025 14:22:48 +0200
+Date: Wed, 14 May 2025 14:22:48 +0200
+From: Andrew Lunn <andrew@lunn.ch>
 To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 0/3] net: phy: dp83869: Support 1Gbps fiber SFP
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 3/3] net: phy: dp83869: Support 1000Base-X SFP
  modules
-Message-ID: <20250514142019.56372b4e@2a02-8440-d105-dfa7-916a-7e1b-fec1-3a90.rev.sfr.net>
-In-Reply-To: <20250514-dp83869-1000basex-v1-0-1bdb3c9c3d63@bootlin.com>
+Message-ID: <99c9d8f8-1557-4f90-8762-b04a09cb497c@lunn.ch>
 References: <20250514-dp83869-1000basex-v1-0-1bdb3c9c3d63@bootlin.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+ <20250514-dp83869-1000basex-v1-3-1bdb3c9c3d63@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeftdeileejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepudfgleelvddtffdvkeduieejudeuvedvveffheduhedvueduteehkeehiefgteehnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucfkphepvdgrtddvmeekgeegtdemugdutdehmegufhgrjeemleduiegrmeejvgdusgemfhgvtgdumeefrgeltdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtvdemkeeggedtmeguuddtheemughfrgejmeeludeirgemjegvudgsmehfvggtudemfegrledtpdhhvghlohepvdgrtddvqdekgeegtddqugdutdehqdgufhgrjedqleduiegrqdejvgdusgdqfhgvtgduqdefrgeltddrrhgvvhdrshhfrhdrnhgvthdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduuddprhgtphhtthhopehrohhmrghinhdrghgrnhhtohhishess
- ghoohhtlhhinhdrtghomhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250514-dp83869-1000basex-v1-3-1bdb3c9c3d63@bootlin.com>
 
-Hi Romain,
+> +static int dp83869_port_configure_serdes(struct phy_port *port, bool enable,
+> +					 phy_interface_t interface)
+> +{
+> +	struct phy_device *phydev = port_phydev(port);
+> +	struct dp83869_private *dp83869;
+> +	int ret;
+> +
+> +	if (!enable)
+> +		return 0;
+> +
+> +	dp83869 = phydev->priv;
+> +
+> +	switch (interface) {
+> +	case PHY_INTERFACE_MODE_1000BASEX:
+> +		dp83869->mode = DP83869_RGMII_1000_BASE;
+> +		break;
+> +	default:
+> +		phydev_err(phydev, "Incompatible SFP module inserted\n");
+> +		return -EINVAL;
+> +	}
 
-On Wed, 14 May 2025 09:49:56 +0200
-Romain Gantois <romain.gantois@bootlin.com> wrote:
+There is also DP83869_RGMII_SGMII_BRIDGE. Can this be used with the
+SERDES? Copper SFPs often want SGMII.
 
-> Hello everyone,
-> 
-> This is version one of my series which adds support for downstream
-> 1000Base-X SFP modules in the DP83869 PHY driver. It depends on the
-> following series from Maxime Chevallier, which introduces an ethernet port
-> representation and simplifies SFP support in PHY drivers:
-> 
-> https://lore.kernel.org/all/20250507135331.76021-1-maxime.chevallier@bootlin.com/
-
-Thanks a lot for giving this work a shot ! Maybe a small nit, but as
-the dependency isn't merged yet, you should mark this series as RFC, as
-it will fail on the autobuilders.
-
-I'll take a deeper look into that this week.
-
-Maxime
+	Andrew
 
