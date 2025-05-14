@@ -1,91 +1,81 @@
-Return-Path: <netdev+bounces-190349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83035AB666B
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 10:50:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FFB4AB6689
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 10:54:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 081543AD5A4
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 08:49:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D01DD4A5497
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 08:53:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24035221D94;
-	Wed, 14 May 2025 08:49:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E26CA221547;
+	Wed, 14 May 2025 08:53:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WOy17hXq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rt+h7VEH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00597221729
-	for <netdev@vger.kernel.org>; Wed, 14 May 2025 08:49:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA2D221A428;
+	Wed, 14 May 2025 08:53:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747212597; cv=none; b=Gdzmx0hbgf9plODEgIU3S7dPprxpAUCo/v0L+OX3EZOAohmCTw84MbEYm9apDWKXvFf1lyeJnhmZHCrnkPcR8P10yk6smniAupIUreXWSKRzjDjAk9YI8IACahtQaxaLoPpqyobHoVJ1qUYxcr5n6LXTjK1zZcOc8JaEo+fwgrM=
+	t=1747212826; cv=none; b=QPAnmvw0LGHz3Z4JMfr0eMtFgqEcm3qahkSFUDkWNgjbMcsqZe2w38Qn5clt5RwjNg6cVoFBVbdC9wmniU0Z16IaeUXkIeJOC9zZsbiQ02lnh53IBWqwLcL+X1faj8254HdsorLrvpRvgD2SHUp969529EkG/Ey3yj8Sc9895RA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747212597; c=relaxed/simple;
-	bh=LjJhNb+NPIusx9+nibzxtjjPldfVpWbRMVl8XIL7cpA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=RdvHBr7yZ4EtRmmzDCIJnHYWheLgkbbEXzeOw/zh6FNMFbXRQY6fgy9M9CIot/LbItq9WEMjUlcxCoBHKNGnGpC+zKTE32Ujw3+Iu46nkEBfeqlZPlTb0nPnEFNYZhI1XVIbPi7eoO0ljUS6D12ybJdSYfJNyT5hXiAMZQjkkt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WOy17hXq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C9E9C4CEF0;
-	Wed, 14 May 2025 08:49:56 +0000 (UTC)
+	s=arc-20240116; t=1747212826; c=relaxed/simple;
+	bh=jphH8oNDnfTOFAMSK14ojGHuFyDi41SV2joIAPM1BkM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Rrqf7t/lkVqD100N+He2YG+lblgILlFfhIz1jEz2kw6NPbPclzqUbjOdB+od2KMlYDLbwp7zskXwiWAJdI204qTddvma35HTBCfG0sYTfbYfaCD9DWNh8T6Q1OWf7WzYOeY/ggWMmWwsk34aG92ykV03IGZF8Oqk4u0fK6lbB60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rt+h7VEH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F16E9C4CEE9;
+	Wed, 14 May 2025 08:53:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747212596;
-	bh=LjJhNb+NPIusx9+nibzxtjjPldfVpWbRMVl8XIL7cpA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WOy17hXqd6nJvuJxu8j9v3zZGRbywpDdS28DmnSSDvhUkBHc7dRlNfFZuTU50qWBK
-	 NMWaOdVGmTY7glua+So8cpVaGwFrupIb4HY8tAP3QIIo1Gs6NDwnl50AscieFJDTYi
-	 b0+wTN+6M3+04be0vThSSP4QfCjzRp5vIjt7jp9LHiqbdKvGkuYzkg6WcOvet+uIeq
-	 OJ2pc9Lt1Zp/Xd+yWERsJDicairVUA0vDZcmvzuQMecW0xHL7Uv2AHSAde2oxxjqZv
-	 9/xTB7A3j45Mzt1kQHnBYb6QpchBc0knr0kM2GcIlmhrpYZthRIsKwVben+ToiEB+C
-	 /Fv45Fn6p11cQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAFF8380AA66;
-	Wed, 14 May 2025 08:50:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1747212826;
+	bh=jphH8oNDnfTOFAMSK14ojGHuFyDi41SV2joIAPM1BkM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Rt+h7VEHFJdQPrI6Kf86AYYBjHqfox+C9NRxYFga9cDEX1gOozmPpXGIYClSmPmxj
+	 9o5lDQrBePdtCiacbDumjgZlzgKT8hPL8lti1jg3QaSTcmR3RblIng8Ky2boJtfQcM
+	 e+c3GnI0jDmAkVnJhFJSOoknfGFEtU/haZK0duUDRBULcUFsVGBQu/B9HfiW3E2Zs5
+	 7eM87gWvfq122VhNzWBhd6iy8II2LDzOBiWs44Hm4MdoqzscpSHuRV1KmC+J4JJRJt
+	 8eBKj0XcOXACyDpljurHriQQEYyEapLi9TiJTbywtdoFkoYlC6CoHAjpMbIx7+lfGi
+	 xLHbi1ajkoLhw==
+Date: Wed, 14 May 2025 09:53:41 +0100
+From: Simon Horman <horms@kernel.org>
+To: Hariprasad Kelam <hkelam@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [net] octeontx2-pf: Fix ethtool support for SDP representors
+Message-ID: <20250514085341.GD3339421@horms.kernel.org>
+References: <20250512062901.629584-1-hkelam@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: wangxun: Correct clerical errors in comments
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174721263375.1942803.6208331215896701801.git-patchwork-notify@kernel.org>
-Date: Wed, 14 May 2025 08:50:33 +0000
-References: <06CD515316BD5489+20250512020333.43433-1-jiawenwu@trustnetic.com>
-In-Reply-To: <06CD515316BD5489+20250512020333.43433-1-jiawenwu@trustnetic.com>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- mengyuanlou@net-swift.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250512062901.629584-1-hkelam@marvell.com>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Mon, 12 May 2025 10:03:33 +0800 you wrote:
-> There are wrong "#endif" comments in .h files need to be corrected.
+On Mon, May 12, 2025 at 11:59:01AM +0530, Hariprasad Kelam wrote:
+> The hardware supports multiple MAC types, including RPM, SDP, and LBK.
+> However, features such as link settings and pause frames are only available
+> on RPM MAC, and not supported on SDP or LBK.
 > 
-> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-> ---
->  drivers/net/ethernet/wangxun/libwx/wx_lib.h    | 2 +-
->  drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+> This patch updates the ethtool operations logic accordingly to reflect
+> this behavior.
+> 
+> Fixes: 2f7f33a09516 ("octeontx2-pf: Add representors for sdp MAC")
+> Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
 
-Here is the summary with links:
-  - [net-next] net: wangxun: Correct clerical errors in comments
-    https://git.kernel.org/netdev/net-next/c/838b2a28c031
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
