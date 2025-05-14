@@ -1,93 +1,146 @@
-Return-Path: <netdev+bounces-190288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1D23AB6036
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 02:30:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40C59AB60B9
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 04:29:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9262846718C
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 00:30:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E80C861B2F
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 02:28:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7833C135A53;
-	Wed, 14 May 2025 00:29:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF6671DFDA5;
+	Wed, 14 May 2025 02:29:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fUJRDRYx"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="A4PuKOf3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5425F20DF4
-	for <netdev@vger.kernel.org>; Wed, 14 May 2025 00:29:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C23928EC;
+	Wed, 14 May 2025 02:29:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747182597; cv=none; b=bKcYDxSW/+/X3iWbEZk3Mr+d5Q4QlY+S2q1hweeeyp14MOrtbu0GnYbUK82lGKXyh1WYS1Fzo9LWbR0t2ZSGRbwD/ehuGH+c4i+c2Obo1NQbM74Kh41K3ATkZXLm204rl/MEgd8s2yuPgCES2paRzuTwZA3YQRzpaQFaY03nx/U=
+	t=1747189746; cv=none; b=g9fSmqDo2moBhW0lLD0eZvLLhTCpKsxC/rEgHwQ/ju49tAhYaTxDBzsQGMxMzuRDt8vQm/e+3S3xo97B34OGAmY9jmT2JmXzncmMksb8Fes5PspCeaibIBvTu7+cZ+6eKiwPs1vnAttDEiqrrRYacHX8H3p0K0h7ytLSmsI5mqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747182597; c=relaxed/simple;
-	bh=h4ZdnFQ0+A+nYWZaSTZg75RrYcINzaKDi3dggp0CmBk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=KgW0jpsEIbU0Zt3p7iRy4gN9fLGMl4uv0HbyyvwYT+8BcJEvyBEkJ0naNuGhtq5xfpR6tQEFUYlb1h7bW9mrfZHwbAfwX3PJTg+8ECdWwar144PGIwEsUYUCwxKM49yuh2lNkUyum3o6gGsdZ6uZOb7F9RXC5qXziQDd5lnWFGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fUJRDRYx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2DDDC4CEE4;
-	Wed, 14 May 2025 00:29:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747182596;
-	bh=h4ZdnFQ0+A+nYWZaSTZg75RrYcINzaKDi3dggp0CmBk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fUJRDRYxLcf85fdKCOWaDuPFk1fgn/7bbjkDz2LnsXE4veQ7v5jRAFBPjqGqE7GOD
-	 BLtt2wybNKKAZo/S2q9p6g9T2/KQ8WLzL51k+cnR9L9mgMVGpe5+BMnwZ+pjnCuSpM
-	 4KMYTwwe0FmZPcdo/VUM4MVmiQgC24X6Xy0ALU4rv7o8QEYjMXnZF5w9141uqEu+ZB
-	 QFM1LGYBWJVOn24+VPv2I5+792pIBLLPWgyaB94AsrN9BsJOObji7B5DpEQ8PXTAQl
-	 EEvP/90lLGdc1TN4KJGe1jcJAbKU6u8TtRoDal2z+fVZgWwrsW4S6ooUBEDcoMcWtm
-	 c2qFuFtKydJwg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E15380DBE8;
-	Wed, 14 May 2025 00:30:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1747189746; c=relaxed/simple;
+	bh=zilfPsdUo4IN0FDk2yDlhKBrWAYoBz3LVX+/p9lrjg8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=cT9+4uEuNDyfGdUf/IefPnjzGqodWO44OVdRud5fe4DYR3/b87iCFyjE6kdnMzRDzdhwqehiUYx/oXf5EcQT8LBHLEVCsT9RbAbLwKBc1JBL6Yp6rHUjvmkUxWONqyoMW3YejKKXngVE2G5ckaazd1+FQeZ1ogAFD7swOtuCjdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=A4PuKOf3; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1747189742;
+	bh=6Pw5UzS8wUVrHGfY4sqUMu24u0Yi3ofodNKIO8qQmFE=;
+	h=Date:From:To:Cc:Subject:From;
+	b=A4PuKOf33wsnRwk8nVSfdy4F0atayH3QqXoYlnmTbRcm5/BM6O/2yTaePpVruAu0L
+	 3+fycW9r00oS7QCyDXiN8UsYZ6F8Q7/1MwtSrPZf846DTuhU81+v0QiOQW984nnOy7
+	 18UxlPjWJCbtUp0WbJ1ABsrAQlNyA6QBuLEf7CxUOc5WiL90CTS/yK7Q5IrwctxQFN
+	 bTkxeIV53p9iqAmawdutkPdXR1TyH76+piS+rRNcE+lEaxewfXw738jC2YtIBNmENy
+	 cL7STLNTr0DKcFP8iIbigxojrpuEc4BtoUA1wkRYJ2YL5s2dFxDYgXK6Sy0ewkDf6F
+	 OkWJVkDolmJLw==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Zxy2j5Z4Zz4x3d;
+	Wed, 14 May 2025 12:29:00 +1000 (AEST)
+Date: Wed, 14 May 2025 12:29:00 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Cosmin Ratiu <cratiu@nvidia.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
+ Mailing List <linux-next@vger.kernel.org>, Mina Almasry
+ <almasrymina@google.com>, Stanislav Fomichev <sdf@fomichev.me>
+Subject: linux-next: manual merge of the net-next tree with the net tree
+Message-ID: <20250514122900.1e77d62d@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: phy: remove stub for
- mdiobus_register_board_info
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174718263399.1832687.16964931481363607622.git-patchwork-notify@kernel.org>
-Date: Wed, 14 May 2025 00:30:33 +0000
-References: <410a2222-c4e8-45b0-9091-d49674caeb00@gmail.com>
-In-Reply-To: <410a2222-c4e8-45b0-9091-d49674caeb00@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: andrew@lunn.ch, linux@armlinux.org.uk, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, davem@davemloft.net, netdev@vger.kernel.org
+Content-Type: multipart/signed; boundary="Sig_/vNE4Bj/iXK670Gw=h1UMaN9";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-Hello:
+--Sig_/vNE4Bj/iXK670Gw=h1UMaN9
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Hi all,
 
-On Mon, 12 May 2025 22:20:59 +0200 you wrote:
-> The functionality of mdiobus_register_board_info() typically isn't
-> optional for the caller. Therefore remove the stub.
-> 
-> Note: Currently we have only one caller of mdiobus_register_board_info(),
-> in a DSA/PHYLINK context. Therefore CONFIG_MDIO_DEVICE is selected anyway.
-> 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> 
-> [...]
+Today's linux-next merge of the net-next tree got a conflict in:
 
-Here is the summary with links:
-  - [net-next] net: phy: remove stub for mdiobus_register_board_info
-    https://git.kernel.org/netdev/net-next/c/dc75c3ced10c
+  tools/testing/selftests/drivers/net/hw/ncdevmem.c
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+between commit:
 
+  97c4e094a4b2 ("tests/ncdevmem: Fix double-free of queue array")
 
+from the net tree and commit:
+
+  2f1a805f32ba ("selftests: ncdevmem: Implement devmem TCP TX")
+
+from the net-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc tools/testing/selftests/drivers/net/hw/ncdevmem.c
+index 9d48004ff1a1,f801a1b3545f..000000000000
+--- a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
++++ b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
+@@@ -431,23 -507,7 +507,23 @@@ static int parse_address(const char *st
+  	return 0;
+  }
+ =20
+ +static struct netdev_queue_id *create_queues(void)
+ +{
+ +	struct netdev_queue_id *queues;
+ +	size_t i =3D 0;
+ +
+ +	queues =3D calloc(num_queues, sizeof(*queues));
+ +	for (i =3D 0; i < num_queues; i++) {
+ +		queues[i]._present.type =3D 1;
+ +		queues[i]._present.id =3D 1;
+ +		queues[i].type =3D NETDEV_QUEUE_TYPE_RX;
+ +		queues[i].id =3D start_queue + i;
+ +	}
+ +
+ +	return queues;
+ +}
+ +
+- int do_server(struct memory_buffer *mem)
++ static int do_server(struct memory_buffer *mem)
+  {
+  	char ctrl_data[sizeof(int) * 20000];
+  	struct netdev_queue_id *queues;
+
+--Sig_/vNE4Bj/iXK670Gw=h1UMaN9
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmgj/+wACgkQAVBC80lX
+0GxV+gf/Z5ywtZMxr4/byEMpeEALNHFwFUqfRaKm+5wBVlNBk21fZPzuE32lSOht
+ViC7kM1yAkxn1RKfytyW8CihwMVjOY43P6c0ey5qCRqgvMBKQy5gTJbsAlFBHGK5
+o/QF/BA4MaVlisK2UjQ5MDNqNd7DEEixYkCmZHO8smqNJ1xx/YjxfPfRYVfO2Gxw
+TRsZayzPmXhxiYGvjyNFj+2QIf3vMvNX6cpGblgVf+axWhgTuSAAOuSB2rUIlyr4
+Ab6XMmhP1Jkf0KOdUq7VJmB/wGXy9mlgORFqSTX3tpQMUcrPZNuusN8Bbr5irtuz
+O3u4Js2ZbKE4stTVbwDbznjCtKA2WA==
+=oMrf
+-----END PGP SIGNATURE-----
+
+--Sig_/vNE4Bj/iXK670Gw=h1UMaN9--
 
