@@ -1,73 +1,72 @@
-Return-Path: <netdev+bounces-190546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190547-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82DCFAB77BD
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 23:17:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D0FCAB77C2
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 23:18:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A40309E3835
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 21:16:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 048754A7BB1
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 21:18:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69A1E2777F7;
-	Wed, 14 May 2025 21:17:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 613A028CF7B;
+	Wed, 14 May 2025 21:18:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N8XT4RXF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FysNDajb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B90418DB2F;
-	Wed, 14 May 2025 21:17:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 328A0170A0B;
+	Wed, 14 May 2025 21:18:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747257421; cv=none; b=Y2lGCJUqEdATarUhQ8b2EoIV7BClWAzomfZXnOr2cCGu8PgBHyePXcb/6cjB9MoTM6lnGgVOY1/dhqlfzyr4FSUqQQWNi9EgpqpdtueSPhkr4bWkI/j/zlD3vT6TaKAMcvZfWIoC5absLJCXNtWpA768ROIeOtie0Bwh1WTG41M=
+	t=1747257493; cv=none; b=Oszm1J2t5WYctsLAH2mA927syvIdULftlZ9zg1SQj57w27s2qO+xIT2rF45U+BHZIO4dX7zbE8CeKSLRulOic1015pznukY1NRVhZLy0Oh8ColrCOZWUqe1rywfaq+foWE3Cax51kFi6dh3mkvKDxU7jojGFtDF4XVRQ/LYOOdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747257421; c=relaxed/simple;
-	bh=XqD9mQcmolD6PXXgJ20Lz/AYkecGTq+N8Hzsb17sSuc=;
+	s=arc-20240116; t=1747257493; c=relaxed/simple;
+	bh=ZIb9Fz+xqmgrAxD9mfna0sZwGimSQAAHyT/UwWtLC/o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Jph9vN4wc8JqISriJosp1KngsZ7ah8VAFBJ3qsHLko8weyUurF3+s4NGZdwGPqanQFdI2ZS8vCvTfNrFBGgZcOs+BSxx+EXW4PB3Hq+ACt2NyoOXb5F+HTvpJCpaPAbpzJGVzvU1z1vAOXVjkRcHIzpjWq98dcs+UWkLbMwJToo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N8XT4RXF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B9DDC4CEE3;
-	Wed, 14 May 2025 21:17:00 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=mhauUqLlHXxTVSAxHZDLN/wcu02KWeIa6td7tF1bklJsfRWyT4zELxqZXnKoDKB0HF259weQEXw7gIpT71KVGkhaLBxw9MDd62+1MkDo1WXu79YJxJ6X3djvzAYVr6jhFHeyHky4s4DFrAr9bse1p2vBbWSv+1CVEWOnVingn4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FysNDajb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C9CBC4CEEF;
+	Wed, 14 May 2025 21:18:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747257420;
-	bh=XqD9mQcmolD6PXXgJ20Lz/AYkecGTq+N8Hzsb17sSuc=;
+	s=k20201202; t=1747257492;
+	bh=ZIb9Fz+xqmgrAxD9mfna0sZwGimSQAAHyT/UwWtLC/o=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=N8XT4RXFeMXxkFHhN3G5e7D+3lR2DVv7JoPlyoJ0CDr/gZSQsN4veiaikN/aQXCUk
-	 R5PdppjlHSo0+Tn10FEYSUrcIZugSoP+ge/6AUju3208V4eJlxt8c4pdXJhblvvnPB
-	 A5CV6eTdz14sxq+tHjMSI6CK/rk1dKpdiW3g4PFECTlpX37rn53iU7mqRb+pLWpA1K
-	 giJr4dPDJpL6JU7f3CUuByPCGFzhII/CYeL7t+VQ5oT4tFgZSkWIcVw9lLzpRs3Ko7
-	 ekXrit+GrBtevtHy8Sllrbow88oCXVQHubtKMH3fSznRWXXDMeg+FvxWco6vEcvGRV
-	 C2INWW2po70pg==
-Date: Wed, 14 May 2025 16:16:58 -0500
-From: "Rob Herring (Arm)" <robh@kernel.org>
+	b=FysNDajbvFLErLLS+ewABWamu9qsKftwQ/avnuariznR2rGW7L75r8/aTCRP3Y9Ep
+	 UmF//7v1v1Jaeggu5nWZjUaNDP605R5np/adPcjWhAYxvcGtkbPQg9JKyq5npQ1h0N
+	 fuFGoVT+L774iCPRmmaXhJTHMvaNGRi07aoegw38eAvR71Gl5OVHEwMKnYwZu7VLRz
+	 E1AQkBGQAme98CoiJtarJ4cZvUMW42VuIJb1npm0o/qegBKXprmaw+sL6pL8n8ylV0
+	 9c7VJZ2zAXHO7m7jgKlnkzZPdhA7ZMfoqtiDO5erTnnoAp1zses1IeoSQLX1+0YZcP
+	 l6/tMa1mvWmaw==
+Date: Wed, 14 May 2025 16:18:10 -0500
+From: Rob Herring <robh@kernel.org>
 To: Frank Wunderlich <linux@fw-web.de>
-Cc: devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	DENG Qingfang <dqfext@gmail.com>, Felix Fietkau <nbd@nbd.name>,
-	netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	linux-kernel@vger.kernel.org,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
 	Frank Wunderlich <frank-w@public-files.de>,
-	linux-mediatek@lists.infradead.org,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: Re: [PATCH v1 02/14] dt-bindings: net: dsa: mediatek,mt7530: add
- dsa-port definition for mt7988
-Message-ID: <174725741810.3051350.2895104132991545164.robh@kernel.org>
+	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH v1 03/14] dt-bindings: net: dsa: mediatek,mt7530: add
+ internal mdio bus
+Message-ID: <20250514211810.GA3051536-robh@kernel.org>
 References: <20250511141942.10284-1-linux@fw-web.de>
- <20250511141942.10284-3-linux@fw-web.de>
+ <20250511141942.10284-4-linux@fw-web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,21 +75,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250511141942.10284-3-linux@fw-web.de>
+In-Reply-To: <20250511141942.10284-4-linux@fw-web.de>
 
-
-On Sun, 11 May 2025 16:19:18 +0200, Frank Wunderlich wrote:
+On Sun, May 11, 2025 at 04:19:19PM +0200, Frank Wunderlich wrote:
 > From: Frank Wunderlich <frank-w@public-files.de>
 > 
-> Add own dsa-port binding for SoC with internal switch where only phy-mode
-> 'internal' is valid.
+> Mt7988 buildin switch has own mdio bus where ge-phys are connected.
+> Add related property for this.
 > 
 > Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
 > ---
->  .../bindings/net/dsa/mediatek,mt7530.yaml          | 14 +++++++++++++-
->  1 file changed, 13 insertions(+), 1 deletion(-)
+>  Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
+> diff --git a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+> index bb22c36749fc..5f1363278f43 100644
+> --- a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+> +++ b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+> @@ -156,6 +156,9 @@ properties:
+>      maxItems: 1
+>  
+>  patternProperties:
+> +  "^mdio(-bus)?$":
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+Really need 2 names?
 
+> +    $ref: /schemas/net/mdio.yaml#
+
+       unevaluatedProperties: false
+
+> +
+>    "^(ethernet-)?ports$":
+>      type: object
+>      additionalProperties: true
+> -- 
+> 2.43.0
+> 
 
