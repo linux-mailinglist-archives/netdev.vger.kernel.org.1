@@ -1,129 +1,139 @@
-Return-Path: <netdev+bounces-190411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3070AB6C0A
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 15:03:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83973AB6C7E
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 15:20:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8803B175CA2
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 13:03:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEAB03BD7D1
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 13:20:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4378827816B;
-	Wed, 14 May 2025 13:03:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD5EB272E79;
+	Wed, 14 May 2025 13:20:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.de header.i=amuswieck@gmx.de header.b="uHIiiM0H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NgcrfvpD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 975C3276037
-	for <netdev@vger.kernel.org>; Wed, 14 May 2025 13:03:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F2D225634;
+	Wed, 14 May 2025 13:20:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747227801; cv=none; b=NAkhAN2O+FSdnpDawdXB0IzviCGZxWtyZmrL6kNBCS7yJo5tMzT1NirYpK2G6JObSzUPa3kDFajGJ87hMmHE2+By7DsDXWwsKsNMHxL3GAMFgyGZkB4GVzjy5eSTV1J7oySYByi/8ru8w5xBvBuvPnx0qdrruOtLWZ/S+4iLAWM=
+	t=1747228842; cv=none; b=Qsib/8HDuoCLak26Gt+ldfkf+LQA0Xyu95SIIVrYa558DRfKsUhZ3zjdmbju8k/NwwP63Rc+N0Nl71Lawl7aRBAaPKepbEMhGdlAf3JmDRAjG1Ms+VrFVfhzgbajRWFV0BGrldsCNEM58Wzn+osqmSuLqqWgZKVLZuVpDOgAjPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747227801; c=relaxed/simple;
-	bh=pdbFa07OWguMYxcwvIkKOjFAZBrQm8l5Li50PMDCmd8=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=D+iNCTV9Zq7+xU+wK88wUC4WL8/qHc7yy6R9r7QkoDI0I4kQH8h/CilS45r6+h43rOa00y+q9Adg/Q5EVqDWE77QlcYECE2OocOBtdg4ueITzPSxuqcpAQTAQZaT5JoELmDDGx65o1uu3jhOPe09RVGXNB9PxlcD46tq+d/HZQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=amuswieck@gmx.de header.b=uHIiiM0H; arc=none smtp.client-ip=212.227.17.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
-	s=s31663417; t=1747227796; x=1747832596; i=amuswieck@gmx.de;
-	bh=pdbFa07OWguMYxcwvIkKOjFAZBrQm8l5Li50PMDCmd8=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:From:Subject:
-	 Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=uHIiiM0HgXDbnux8ixifKWzb/JfJHjdfmU3ecl9s8hVfJU4L/M9CBI7wZQMN0x/E
-	 7ncx6S6ZsdsfhG/Lym9beg1q25klELRg/7hHIhZ15FnYjTVUMgi/k0vS+8zbwtY1S
-	 DotTDjqp4gXXbjNH6b4JBwIf61Z0TghAj5cDzAOmTBRG5A48k5BVwWh24JOywHvXN
-	 HHWvOUS+kfBS4Of4ePdxDdciGfLF9GGarUyDjgWlw6KHwBW48JfwDhi0V4eTe/TSm
-	 Cngl9xpsfNKN9MN8bO5ACpZvhUaNGA7erVVclulDO85tx/dciaRw+/d00GdBSHinz
-	 jJN4ABUWlN824Gl5HQ==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [192.168.1.106] ([31.17.40.36]) by mail.gmx.net (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MzQgC-1vAIaa1mPA-00tXia for
- <netdev@vger.kernel.org>; Wed, 14 May 2025 15:03:16 +0200
-Message-ID: <bb856c9b-7038-4e1c-ac8b-7fc5af4ca62d@gmx.de>
-Date: Wed, 14 May 2025 15:03:15 +0200
+	s=arc-20240116; t=1747228842; c=relaxed/simple;
+	bh=ZWt19gJpyBxCO0Qx7giNrFfawsGCTWfq4f3xf3LJtvA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HFeMX/lZL9bsaULk7BYjqtHcoeoVeVwWEnaF+sIq+Ee4NJDaz28YWjj6ml4ah2idY1Nmn3ob6PiJh3fHDdDm9pUhBaFFt7YIZPH2p6Vf6knyruaWFzR0RCjfsofW1yRF/1l0cpSL+Ttlmw6OXfKwHO1DjxZGawRPes9C8WEphIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NgcrfvpD; arc=none smtp.client-ip=209.85.217.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f53.google.com with SMTP id ada2fe7eead31-4ddb1173349so2476120137.2;
+        Wed, 14 May 2025 06:20:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747228840; x=1747833640; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Fh+m4E+zucuQUlh7kBt8Qd3tic2gsjlPHHvbyOaxGzE=;
+        b=NgcrfvpDNaCXc6RLgtDhC9ZwP3Z4FLaFZ3hwy6OcQ00KYaZQ0ty3ooiBToIarJohdD
+         +9xEFi0AXpqeM1hF82QwWlGXkw39eOiRnIQ10d9KcdpaQSbCZlaDeIdDIpxQxwmYQnpb
+         LRssJKKzw3JW8Zc2OamaTmMBbA2y1wFLaG2YI78OcURwC8DXKBZVt8Id4oXbdQjvLr/W
+         nfX4b01JY3oMoX/lDBlqrwKbNXiZnfhhjmxQmMlFESkvi9C6TCXwJkffnRDLxk/Alomq
+         ZMwITj/jmhmJL+BlH1/4rOA2vOxSQ6O6n8syQTTqva17JjEWDt/29IUcRM8TPDRhcsRa
+         nEYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747228840; x=1747833640;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Fh+m4E+zucuQUlh7kBt8Qd3tic2gsjlPHHvbyOaxGzE=;
+        b=Cs0rUvMCyUHazr7SpsHCnp0N7Z7k3T1xwoYCT/0Wg51Pc6OK7WzcP9KFTkuP4obaqa
+         fFlZLlS0WhVvSQyfC5mJtrdDwkWNVdKoAYZ4ZrPMcB+qtbkQzUnDg9Ho2KjOIC7+uo+z
+         FRou9rx/TEKYoOo/RSJbxpSm94+oGxusbrLkJ3nF6rDx7akXJi2U6xgIP7TrHWzrM7ja
+         PFV9I7V/WYkLY58aP641gmXlZIolXv1oeVtgPEnZH7MgZbePCyfZWM4XRDsWhv8JxDI6
+         QgBNt2x4lK3TyTD0Dh+rr1yEft69fKsCqTbdQIGj/CBf38onhJw84+0V9DSjaqJ4Ru8Y
+         PaOw==
+X-Forwarded-Encrypted: i=1; AJvYcCUP/BY/KOyHrglCRZOQdkfAVn/TlHjIHgI9+zmSRmjCd1mUN8JEs5rtpohDfHhuiPGFYO1A2ABNWslFWPA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyrSVdM96lYbwvwMi4ww77M/xdhYgOrfh2gae9rGO7dBwBN0/57
+	5kToPrS7nuH4Y3ho+h0VHNAhtbpZwKGJYZ6LA55B3/bFD0JVD3n+ME4TJQ==
+X-Gm-Gg: ASbGncu3aj2kcY1Dmf1IIOYLK3xYH0P2aB129tREcNxg4KvRzTOujT++zSXu1biIinO
+	INFFoQbZnTUZUaauOs09ajoZ1q8JwMHkhNlAUZ/In4Uw+0TrZzEu+R5OSM7UI7Kzt1ZuC/meU89
+	uuDh2yHdEVZbEQAHW66fYjnRdfr99EIF3Pmg3F/0sDZqNAE2tfrtL/O/DeD9yofi/lo3lYXTusJ
+	fFwyWmDjSGsnA+vOLi9PXo9atKjdKRSfOPwM1wT8p288HSTzeX92k7bnNrG6RW77ZNoYFkbxumo
+	j3fJ2HQUVRK3IQOUY4pjllbZmPVtyX1KQgmRBjrXW763JKDKVoaT702W1EUzphH/mTc=
+X-Google-Smtp-Source: AGHT+IHpib3Vzj9xPKBQQRXmWA9Yet/IIH3Bc9NFE6IMw31mBiIiC/vReY9tT5T6ESniqt3i7d9cpQ==
+X-Received: by 2002:a17:902:da84:b0:22d:b305:e082 with SMTP id d9443c01a7336-231981b9729mr49477455ad.47.1747228829408;
+        Wed, 14 May 2025 06:20:29 -0700 (PDT)
+Received: from C11-068.mioffice.cn ([2408:8607:1b00:c:9e7b:efff:fe4e:6cff])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22fc7546b32sm99091275ad.11.2025.05.14.06.20.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 May 2025 06:20:28 -0700 (PDT)
+From: Pengtao He <hept.hept.hept@gmail.com>
+To: borisp@nvidia.com,
+	john.fastabend@gmail.com,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Pengtao He <hept.hept.hept@gmail.com>
+Subject: [PATCH] net/tls: fix kernel panic when alloc_page failed
+Date: Wed, 14 May 2025 21:20:13 +0800
+Message-ID: <20250514132013.17274-1-hept.hept.hept@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: netdev@vger.kernel.org
-From: Andreas Muswieck <amuswieck@gmx.de>
-Subject: Realtek RTL8125
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:TPRwxBfunO9pi7jLxaK0QP9rf3elPe66ZNluK3GXCiyP2k+Shst
- iDfhMccfHgn1CBGWZqmOue7bHzADgdKg9KzXnvczPxj6S+m8inA8rYspDLUVJA30NJpi1IB
- RVVZ8CxGGuczs9+bFCwg98gPCCcYn/st9OYA/sroV1qcZsSP9AhwRtMhB43STdxCVzTkfDH
- MamxOI+IAL2elsoQEcXeA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:j3C0CkRPVDg=;rmrhiXheKaWoKU9+ZxIDwxX1paF
- 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
- nj4TMXBQhvrUKDvzXJ6qz0DmjJYzJCg=
+Content-Transfer-Encoding: 8bit
 
-Hello,
-My new computer has had problems with the LAN chip right from the start.=
-=20
-The motherboard is an ASUS PRIME X870-P WIFI. It contains a Realtek=20
-RTL8125 chip.
-The Linux distributions Debian bookworm and Linux Mint 21 are not able=20
-to establish a LAN connection. I have also tried Debian Trixie, no=20
-connection.
-Debian bookworm recognises an r8169 with unknown chip XID 668 and=20
-recommends: contact the maintainer.
-I downloaded the LINUX driver from the Realtek website and have to=20
-reinstall it every time after an upgrade. Is there a solution for this?
+We cannot set frag_list to NULL pointer when alloc_page failed.
+It will be used in tls_strp_check_queue_ok when the next time
+tls_strp_read_sock is called.
 
-Andreas
+Unable to handle kernel NULL pointer dereference
+at virtual address 0000000000000028
+ Call trace:
+ tls_strp_check_rcv+0x128/0x27c
+ tls_strp_data_ready+0x34/0x44
+ tls_data_ready+0x3c/0x1f0
+ tcp_data_ready+0x9c/0xe4
+ tcp_data_queue+0xf6c/0x12d0
+ tcp_rcv_established+0x52c/0x798
+
+Signed-off-by: Pengtao He <hept.hept.hept@gmail.com>
+---
+ net/tls/tls_strp.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/net/tls/tls_strp.c b/net/tls/tls_strp.c
+index 77e33e1e340e..65b0da6fdf6a 100644
+--- a/net/tls/tls_strp.c
++++ b/net/tls/tls_strp.c
+@@ -396,7 +396,6 @@ static int tls_strp_read_copy(struct tls_strparser *strp, bool qshort)
+ 		return 0;
+ 
+ 	shinfo = skb_shinfo(strp->anchor);
+-	shinfo->frag_list = NULL;
+ 
+ 	/* If we don't know the length go max plus page for cipher overhead */
+ 	need_spc = strp->stm.full_len ?: TLS_MAX_PAYLOAD_SIZE + PAGE_SIZE;
+@@ -412,6 +411,8 @@ static int tls_strp_read_copy(struct tls_strparser *strp, bool qshort)
+ 				   page, 0, 0);
+ 	}
+ 
++	shinfo->frag_list = NULL;
++
+ 	strp->copy_mode = 1;
+ 	strp->stm.offset = 0;
+ 
+-- 
+2.37.1
 
 
