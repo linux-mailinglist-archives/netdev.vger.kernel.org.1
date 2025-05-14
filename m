@@ -1,102 +1,92 @@
-Return-Path: <netdev+bounces-190344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94393AB65F5
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 10:29:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 912FEAB6629
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 10:38:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F6471886988
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 08:29:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29CE0467657
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 08:38:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B521621ADB7;
-	Wed, 14 May 2025 08:29:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C778221280;
+	Wed, 14 May 2025 08:38:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="2bx1nADR";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="wc8bpNEn"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42CAD218AD4;
-	Wed, 14 May 2025 08:29:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E81FB21CC41;
+	Wed, 14 May 2025 08:37:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747211376; cv=none; b=Xyg84VhfTtv/k6Ange02OsCvmnrCYuaGtKkOmYnusGpGC4109fDkA5d/S1POS0PHVMw/LiC7NIR9goIO3VGX11zUVW/2QeSkrfNBHI13A9izH485J7GKVcvXM4Qp6Jd3Qy+4SwayTB3LgST3KR2pTlJ3ofAtfOeRY24AuMrk4A8=
+	t=1747211881; cv=none; b=WxSBQhzo7jJWErLMWdT2j7nrgsndPy6Iq+T5RyON0uykFfMJpIF7RHLaxAfJfi9qX2DDyANdktm3aFisXodOks9RVmyxGaIjOsP9q03Nw9sV60LZTVNPvKUgcjyrX19UJBS7p+itP+GXpytU46ip0UZGo5MJi23JYJnvVcDGr1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747211376; c=relaxed/simple;
-	bh=h/RoXrF9EhmVB749ozpnWoC+NsjWTVPhX7E7QNI3cwk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NS/DAgac+cgHtZ0l7ozq8PEzIlO3Rz7sqiy9NhPKBIL/77z4Zto3sRMSjVGqvQsDv+V95MXeXMyea2g4IR0eGzFy4Jo4Sbwxl4XuhmxZua97VaV3MluXxhTSZhk8BCO6fvV9ofhhqnx/XBWLNg9+3Eo5h1LnretPDY/XjQ5L/x8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [124.16.141.245])
-	by APP-05 (Coremail) with SMTP id zQCowABnpAxcVCRoIdclFQ--.54183S2;
-	Wed, 14 May 2025 16:29:18 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: idosch@nvidia.com,
-	petrm@nvidia.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>
-Subject: [PATCH] mlxsw: spectrum: Reset lossiness configuration when changing MTU
-Date: Wed, 14 May 2025 16:28:59 +0800
-Message-ID: <20250514082900.239-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.42.0.windows.2
+	s=arc-20240116; t=1747211881; c=relaxed/simple;
+	bh=+5rCn2iJM3/+15GQqNgcVtfUNJP+2pYhlwz8Biexyn4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=EI9B7VYGaA3+v/Zs3G1Lb+aKpzHHepKvp81ImeSsv+3cn4+y/HrakDK2GRmh6HQZWRCty/1NwD2b0YB8SYX5d+rXWugmYr64Uim/mjI8mtuymJd5G5IoQKke7qXirhPSgalLhOusBB4hf/YEh8qi3OC9dst5xgfEoCkRoGa7Jx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=2bx1nADR; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=wc8bpNEn; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1747211877;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=C6B1pqh0lgQxFasnFPopgGBCyTtvPXq3g8C+FwEpDug=;
+	b=2bx1nADRERLw1c5x6CjWkGVRPDkSi9fry8i+eb6LaHbEvMDSfZawA+gj+fDfSusNHKG9jo
+	Ubye+jZ+YzhTQTbuTifmatu1fJ0OU34CEMQzemMfLtuiwHAqgq24CoS78LguCa4LMeoeDx
+	3hvnN9BO3RsxHkx2dEQ2Tlit6wTCVZTJWHCG6gvBBa+91Ol3WeDA7D7J3tLIoMMg7OfvGJ
+	XoTBi5qZEO0RcUR6urKYEsRroHkdX7PiCsGfAJM9EwC4uBmQrRhP8GxwfakMrDXFcTyjci
+	yazdWqe9El/+gx30qS9AYqe96RNw+a4dvMJOPPC46Q0PhaDWAIcKjCUc3zAarA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1747211877;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=C6B1pqh0lgQxFasnFPopgGBCyTtvPXq3g8C+FwEpDug=;
+	b=wc8bpNEncnXMTG81t448Buj3vH7sV+PSILhZl3tiEQCxKd76sTF6oDSTK9w3IhML/WQNSE
+	lASdDtqQ04MN3ZBw==
+To: Antoine Tenart <atenart@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, Richard
+ Cochran <richardcochran@gmail.com>, Christopher Hall
+ <christopher.s.hall@intel.com>, David Zage <david.zage@intel.com>, John
+ Stultz <jstultz@google.com>, Frederic Weisbecker <frederic@kernel.org>,
+ Anna-Maria Behnsen <anna-maria@linutronix.de>, Miroslav Lichvar
+ <mlichvar@redhat.com>, Werner Abt <werner.abt@meinberg-usa.com>, David
+ Woodhouse <dwmw2@infradead.org>, Stephen Boyd <sboyd@kernel.org>, Thomas
+ =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, Kurt
+ Kanzenbach
+ <kurt@linutronix.de>, Nam Cao <namcao@linutronix.de>, Alex Gieringer
+ <gieri@linutronix.de>
+Subject: Re: [patch 26/26] timekeeping: Provide interface to control
+ independent PTP clocks
+In-Reply-To: <htnwor46q3435pddkafm7flmx4m2bs4553gq3mx4jzevtfgg2l@h4abniqo4dzf>
+References: <20250513144615.252881431@linutronix.de>
+ <20250513145138.212062332@linutronix.de>
+ <htnwor46q3435pddkafm7flmx4m2bs4553gq3mx4jzevtfgg2l@h4abniqo4dzf>
+Date: Wed, 14 May 2025 10:37:57 +0200
+Message-ID: <874ixnk2oq.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowABnpAxcVCRoIdclFQ--.54183S2
-X-Coremail-Antispam: 1UD129KBjvdXoW7Xr1UJFW3Cr1DJFy8trW3trb_yoWkWFXEkr
-	9rZr1rW3W5ArWYkr1a9rW5Xr9Ik3ZYvFs5GFWDuFyayr9rWrW3JF97XF1xtw4kGayjqrZ8
-	JF4fXa43Xw17AjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb3kFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
-	Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AKxVWxJr
-	0_GcWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
-	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
-	zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
-	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
-	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIda
-	VFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBgwCA2gkKjK6wAAAsl
+Content-Type: text/plain
 
-The function mlxsw_sp_port_change_mtu() reset the buffer sizes but does
-not reset the lossiness configuration of the buffers. This could lead to
-inconsistent lossiness settings. A proper implementation can be found
-in mlxsw_sp_port_headroom_ets_set().
+On Wed, May 14 2025 at 10:07, Antoine Tenart wrote:
+> On Tue, May 13, 2025 at 05:13:44PM +0200, Thomas Gleixner wrote:
+>> +++ b/Documentation/ABI/stable/sysfs-kernel-time-ptp
+>> @@ -0,0 +1,6 @@
+>> +What:		/sys/kernel/time/ptp/<ID>/enable
+>
+> The path added below is /sys/kernel/time/ptp_clocks/<ID>/enable.
 
-Add lossiness reset by calling mlxsw_sp_hdroom_bufs_reset_lossiness().
-
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
----
- drivers/net/ethernet/mellanox/mlxsw/spectrum.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
-index 3f5e5d99251b..54aa1dca5076 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
-@@ -797,6 +797,7 @@ static int mlxsw_sp_port_change_mtu(struct net_device *dev, int mtu)
- 
- 	hdroom = orig_hdroom;
- 	hdroom.mtu = mtu;
-+	mlxsw_sp_hdroom_bufs_reset_lossiness(&hdroom);
- 	mlxsw_sp_hdroom_bufs_reset_sizes(mlxsw_sp_port, &hdroom);
- 
- 	err = mlxsw_sp_hdroom_configure(mlxsw_sp_port, &hdroom);
--- 
-2.42.0.windows.2
-
+Ooops.
 
