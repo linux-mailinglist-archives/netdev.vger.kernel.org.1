@@ -1,327 +1,82 @@
-Return-Path: <netdev+bounces-190403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6C94AB6B8A
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 14:38:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA160AB6BA5
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 14:44:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C03EA3B01B4
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 12:38:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 70ECC1B67A04
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 12:44:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5610274653;
-	Wed, 14 May 2025 12:38:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41C02278153;
+	Wed, 14 May 2025 12:44:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UkX0CqQq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oXLNPOWS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2B327814B
-	for <netdev@vger.kernel.org>; Wed, 14 May 2025 12:38:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 062E7276024;
+	Wed, 14 May 2025 12:44:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747226313; cv=none; b=LNa/Ff6P4oR1+YF2T/7Ez3/031LE4UQn/0LiD5rJ96ZSVgv+dmARGByJGqRTq26gd+cq+pZoq+LtPr3TaoGhzKijKQtAaLow9jut2IazjBOVEPlhvMGS99PkQ0ykogpUB2JVeLtlWOR9dQid0Ax0AGKE9S0yCj5kkaVjmRiHJKo=
+	t=1747226643; cv=none; b=rND89FGYlfQwXrcRG3jGeTdnZNJf1IoibSH6o8wxPO7uPq7Rh8zmcgDqtFFzo+U0HQX4iFyPGyb95HBgAQBhD5nAqMbiA/N7CoXxDjpc7ujPGMqFsaAESmH3aBx/kieoXSQv3NA44EMGpsKn7y1UadPq8n16S2j85EXpn98f/8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747226313; c=relaxed/simple;
-	bh=eKeL4Uk9C33hdT/AwGDs4IDQ/vPVEBGPe+XKmEwvxdw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PFBF+8z84iYd5P052Kx9NqtGX2Z34PQ7l2UKDiwmwe7HwGv4yYqF8lTjtZZ1GL554rRvnbt/8l7RicBazuqNWADkvOeqSOmccQvA1/VJWMYF5/0fvOwUQgtUwpB7Ih7u2BVWmXQczwgnKPBWg9N8fnivN8iFAJHbZHE1kQpR3T4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UkX0CqQq; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747226312; x=1778762312;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=eKeL4Uk9C33hdT/AwGDs4IDQ/vPVEBGPe+XKmEwvxdw=;
-  b=UkX0CqQqk8OR+nvh6jF8+ONar8JjVFYHKG2BsBl7mUppHmE3GsFG3wA2
-   0mxxnXs+Thsz4EnH9OOK5ZqZjmKx0U6+6o3NxwsWwsf7Vc/v42cIUleNb
-   cW+OcVwSk3eFDLv09eho8BHAS4lTPoqB2De6yMlyoduCI7fvkvwnTUSmX
-   GNNoST7UgironHmj26Fp29KxxIIYbBZNCZJFP0zfG0nwpvZPxregXqGZh
-   fESRKNZVeV3ERtOKkoRR1GIZJp8hriljkAPn/Y/enl59G4DT7vnVQT09I
-   0qTgAhJKWj0kUzGEtBZ6ymo+XokvznlM4aET9+BgH4GlKzRpkgAPKYK/i
-   w==;
-X-CSE-ConnectionGUID: xG3QxZXER5Wc36DsZbgdQw==
-X-CSE-MsgGUID: qIIvqxwJS9Goi2dOFffP9g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11433"; a="49191877"
-X-IronPort-AV: E=Sophos;i="6.15,288,1739865600"; 
-   d="scan'208";a="49191877"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2025 05:38:31 -0700
-X-CSE-ConnectionGUID: 6iVCT7z3RJySEyb/zt7/eQ==
-X-CSE-MsgGUID: iIbhKRCRRYeRXq5tJjb+gw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,288,1739865600"; 
-   d="scan'208";a="139015526"
-Received: from gk3153-pr4-x299-22869.igk.intel.com (HELO localhost.igk.intel.com) ([10.102.21.130])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2025 05:38:29 -0700
-From: Michal Kubiak <michal.kubiak@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: maciej.fijalkowski@intel.com,
-	netdev@vger.kernel.org,
-	przemyslaw.kitszel@intel.com,
-	jacob.e.keller@intel.com,
-	horms@kernel.org,
-	anthony.l.nguyen@intel.com,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	Michal Swiatkowski <michal.swiatkowski@intel.com>
-Subject: [PATCH iwl-net v2] ice: add a separate Rx handler for flow director commands
-Date: Wed, 14 May 2025 14:37:24 +0200
-Message-ID: <20250514123724.250750-1-michal.kubiak@intel.com>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1747226643; c=relaxed/simple;
+	bh=LaaTtL18gYkBpKfIHtsydTFx7f5yvQp0LLx6M5Yb+oE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ht2u0HMmj4bhaLVvxzq3laA+pxUxerCPQ74UT4ILSe60adr9BF+zuCG16gYWi/Va0WwVVmAHIdDNryc9sUcQjzex53ioG+VIUdGZAKjj/4g701qnpb+Gx8TB5prqzi+x8Hy7ZX9/1m+jK8L8A5o8mefjPzqidHzyJ0hq4T+9Wkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oXLNPOWS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A097FC4CEE9;
+	Wed, 14 May 2025 12:43:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747226642;
+	bh=LaaTtL18gYkBpKfIHtsydTFx7f5yvQp0LLx6M5Yb+oE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oXLNPOWSAhm109xi76EG+tT1v3fLCNJ5/mYufcpeH8SRgSgX7WAuTF4QjmQEpFY6M
+	 YjDHc7+XIIviZ9Fx2tK1tLEHmGjesKHFgnd2G0kYg11hM0i5hPmJbuanwA0w/ZIyIC
+	 d9zhTuNpCR1Iu5brbAXQzxJUDzyv1i4Y6CB1Tngx7NlQtwJrImsLLXVmW56RCUY1O0
+	 NzSh2vdv1EZRjE3JJzP0JddOzN0zCDo0yI+NqXFdWkgev9dr7NQJOUM4JZK8RKDmbU
+	 1tFSHeDtFFIpoDU5KdwlYUaQ2oKcLV+hM6qp4dz1QaZeQZ1iaK+D379YfwLmOHKARs
+	 vLFbl4boVh4+g==
+Date: Wed, 14 May 2025 13:43:55 +0100
+From: Simon Horman <horms@kernel.org>
+To: Haiyang Zhang <haiyangz@microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	decui@microsoft.com, stephen@networkplumber.org, kys@microsoft.com,
+	paulros@microsoft.com, olaf@aepfle.de, vkuznets@redhat.com,
+	davem@davemloft.net, wei.liu@kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, leon@kernel.org,
+	longli@microsoft.com, ssengar@linux.microsoft.com,
+	linux-rdma@vger.kernel.org, daniel@iogearbox.net,
+	john.fastabend@gmail.com, bpf@vger.kernel.org, ast@kernel.org,
+	hawk@kernel.org, tglx@linutronix.de,
+	shradhagupta@linux.microsoft.com, andrew+netdev@lunn.ch,
+	kotaranov@microsoft.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next,v3] net: mana: Add handler for hardware
+ servicing events
+Message-ID: <20250514124355.GK3339421@horms.kernel.org>
+References: <1747079874-9445-1-git-send-email-haiyangz@microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1747079874-9445-1-git-send-email-haiyangz@microsoft.com>
 
-The "ice" driver implementation uses the control VSI to handle
-the flow director configuration for PFs and VFs.
+On Mon, May 12, 2025 at 12:57:54PM -0700, Haiyang Zhang wrote:
+> To collaborate with hardware servicing events, upon receiving the special
+> EQE notification from the HW channel, remove the devices on this bus.
+> Then, after a waiting period based on the device specs, rescan the parent
+> bus to recover the devices.
+> 
+> Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
 
-Unfortunately, although a separate VSI type was created to handle flow
-director queues, the Rx queue handler was shared between the flow
-director and a standard NAPI Rx handler.
-
-Such a design approach was not very flexible. First, it mixed hotpath
-and slowpath code, blocking their further optimization. It also created
-a huge overkill for the flow director command processing, which is
-descriptor-based only, so there is no need to allocate Rx data buffers.
-
-For the above reasons, implement a separate Rx handler for the control
-VSI. Also, remove from the NAPI handler the code dedicated to
-configuring the flow director rules on VFs.
-Do not allocate Rx data buffers to the flow director queues because
-their processing is descriptor-based only.
-Finally, allow Rx data queues to be allocated only for VSIs that have
-netdev assigned to them.
-
-This handler splitting approach is the first step in converting the
-driver to use the Page Pool (which can only be used for data queues).
-
-Test hints:
-  1. Create a VF for any PF managed by the ice driver.
-  2. In a loop, add and delete flow director rules for the VF, e.g.:
-
-       for i in {1..128}; do
-           q=$(( i % 16 ))
-           ethtool -N ens802f0v0 flow-type tcp4 dst-port "$i" action "$q"
-       done
-
-       for i in {0..127}; do
-           ethtool -N ens802f0v0 delete "$i"
-       done
-
-Suggested-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Suggested-by: Michal Swiatkowski <michal.swiatkowski@intel.com>
-Acked-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
----
-
-v2:
-   - declare the function `ice_clean_rx_irq()` as static, because now it is
-     called from "ice_txrx.c" file only (Maciej),
-   - add RB tags from Jacob and Simon.
-
-v1: https://lore.kernel.org/intel-wired-lan/20250321151357.28540-1-michal.kubiak@intel.com/
-
----
- drivers/net/ethernet/intel/ice/ice_base.c |  5 +-
- drivers/net/ethernet/intel/ice/ice_lib.c  |  3 +-
- drivers/net/ethernet/intel/ice/ice_txrx.c | 87 +++++++++++++++++++----
- drivers/net/ethernet/intel/ice/ice_txrx.h |  3 +-
- 4 files changed, 79 insertions(+), 19 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
-index 6db4ad8fc70b..270f936ce807 100644
---- a/drivers/net/ethernet/intel/ice/ice_base.c
-+++ b/drivers/net/ethernet/intel/ice/ice_base.c
-@@ -623,7 +623,10 @@ static int ice_vsi_cfg_rxq(struct ice_rx_ring *ring)
- 		return 0;
- 	}
- 
--	ice_alloc_rx_bufs(ring, num_bufs);
-+	if (ring->vsi->type == ICE_VSI_CTRL)
-+		ice_init_ctrl_rx_descs(ring, num_bufs);
-+	else
-+		ice_alloc_rx_bufs(ring, num_bufs);
- 
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index 03bb16191237..533486af9be7 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -484,8 +484,7 @@ static irqreturn_t ice_msix_clean_ctrl_vsi(int __always_unused irq, void *data)
- 	if (!q_vector->tx.tx_ring)
- 		return IRQ_HANDLED;
- 
--#define FDIR_RX_DESC_CLEAN_BUDGET 64
--	ice_clean_rx_irq(q_vector->rx.rx_ring, FDIR_RX_DESC_CLEAN_BUDGET);
-+	ice_clean_ctrl_rx_irq(q_vector->rx.rx_ring);
- 	ice_clean_ctrl_tx_irq(q_vector->tx.tx_ring);
- 
- 	return IRQ_HANDLED;
-diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
-index 0e5107fe62ad..29e0088ab6b2 100644
---- a/drivers/net/ethernet/intel/ice/ice_txrx.c
-+++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
-@@ -20,7 +20,6 @@
- 
- #define ICE_RX_HDR_SIZE		256
- 
--#define FDIR_DESC_RXDID 0x40
- #define ICE_FDIR_CLEAN_DELAY 10
- 
- /**
-@@ -706,6 +705,37 @@ ice_alloc_mapped_page(struct ice_rx_ring *rx_ring, struct ice_rx_buf *bi)
- 	return true;
- }
- 
-+/**
-+ * ice_init_ctrl_rx_descs - Initialize Rx descriptors for control vsi.
-+ * @rx_ring: ring to init descriptors on
-+ * @count: number of descriptors to initialize
-+ */
-+void ice_init_ctrl_rx_descs(struct ice_rx_ring *rx_ring, u32 count)
-+{
-+	union ice_32b_rx_flex_desc *rx_desc;
-+	u32 ntu = rx_ring->next_to_use;
-+
-+	if (!count)
-+		return;
-+
-+	rx_desc = ICE_RX_DESC(rx_ring, ntu);
-+
-+	do {
-+		rx_desc++;
-+		ntu++;
-+		if (unlikely(ntu == rx_ring->count)) {
-+			rx_desc = ICE_RX_DESC(rx_ring, 0);
-+			ntu = 0;
-+		}
-+
-+		rx_desc->wb.status_error0 = 0;
-+		count--;
-+	} while (count);
-+
-+	if (rx_ring->next_to_use != ntu)
-+		ice_release_rx_desc(rx_ring, ntu);
-+}
-+
- /**
-  * ice_alloc_rx_bufs - Replace used receive buffers
-  * @rx_ring: ring to place buffers on
-@@ -726,8 +756,7 @@ bool ice_alloc_rx_bufs(struct ice_rx_ring *rx_ring, unsigned int cleaned_count)
- 	struct ice_rx_buf *bi;
- 
- 	/* do nothing if no valid netdev defined */
--	if ((!rx_ring->netdev && rx_ring->vsi->type != ICE_VSI_CTRL) ||
--	    !cleaned_count)
-+	if (!rx_ring->netdev || !cleaned_count)
- 		return false;
- 
- 	/* get the Rx descriptor and buffer based on next_to_use */
-@@ -1183,6 +1212,45 @@ static void ice_put_rx_mbuf(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
- 	rx_ring->nr_frags = 0;
- }
- 
-+/**
-+ * ice_clean_ctrl_rx_irq - Clean descriptors from flow director Rx ring
-+ * @rx_ring: Rx descriptor ring for ctrl_vsi to transact packets on
-+ *
-+ * This function cleans Rx descriptors from the ctrl_vsi Rx ring used
-+ * to set flow director rules on VFs.
-+ */
-+void ice_clean_ctrl_rx_irq(struct ice_rx_ring *rx_ring)
-+{
-+	u32 ntc = rx_ring->next_to_clean;
-+	unsigned int total_rx_pkts = 0;
-+	u32 cnt = rx_ring->count;
-+
-+	while (likely(total_rx_pkts < ICE_DFLT_IRQ_WORK)) {
-+		struct ice_vsi *ctrl_vsi = rx_ring->vsi;
-+		union ice_32b_rx_flex_desc *rx_desc;
-+		u16 stat_err_bits;
-+
-+		rx_desc = ICE_RX_DESC(rx_ring, ntc);
-+
-+		stat_err_bits = BIT(ICE_RX_FLEX_DESC_STATUS0_DD_S);
-+		if (!ice_test_staterr(rx_desc->wb.status_error0, stat_err_bits))
-+			break;
-+
-+		dma_rmb();
-+
-+		if (ctrl_vsi->vf)
-+			ice_vc_fdir_irq_handler(ctrl_vsi, rx_desc);
-+
-+		if (++ntc == cnt)
-+			ntc = 0;
-+		total_rx_pkts++;
-+	}
-+
-+	rx_ring->first_desc = ntc;
-+	rx_ring->next_to_clean = ntc;
-+	ice_init_ctrl_rx_descs(rx_ring, ICE_RX_DESC_UNUSED(rx_ring));
-+}
-+
- /**
-  * ice_clean_rx_irq - Clean completed descriptors from Rx ring - bounce buf
-  * @rx_ring: Rx descriptor ring to transact packets on
-@@ -1195,7 +1263,7 @@ static void ice_put_rx_mbuf(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
-  *
-  * Returns amount of work completed
-  */
--int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
-+static int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
- {
- 	unsigned int total_rx_bytes = 0, total_rx_pkts = 0;
- 	unsigned int offset = rx_ring->rx_offset;
-@@ -1242,17 +1310,6 @@ int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
- 		dma_rmb();
- 
- 		ice_trace(clean_rx_irq, rx_ring, rx_desc);
--		if (rx_desc->wb.rxdid == FDIR_DESC_RXDID || !rx_ring->netdev) {
--			struct ice_vsi *ctrl_vsi = rx_ring->vsi;
--
--			if (rx_desc->wb.rxdid == FDIR_DESC_RXDID &&
--			    ctrl_vsi->vf)
--				ice_vc_fdir_irq_handler(ctrl_vsi, rx_desc);
--			if (++ntc == cnt)
--				ntc = 0;
--			rx_ring->first_desc = ntc;
--			continue;
--		}
- 
- 		size = le16_to_cpu(rx_desc->wb.pkt_len) &
- 			ICE_RX_FLX_DESC_PKT_LEN_M;
-diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/ethernet/intel/ice/ice_txrx.h
-index a4b1e9514632..fef750c5f288 100644
---- a/drivers/net/ethernet/intel/ice/ice_txrx.h
-+++ b/drivers/net/ethernet/intel/ice/ice_txrx.h
-@@ -491,6 +491,7 @@ static inline unsigned int ice_rx_pg_order(struct ice_rx_ring *ring)
- 
- union ice_32b_rx_flex_desc;
- 
-+void ice_init_ctrl_rx_descs(struct ice_rx_ring *rx_ring, u32 num_descs);
- bool ice_alloc_rx_bufs(struct ice_rx_ring *rxr, unsigned int cleaned_count);
- netdev_tx_t ice_start_xmit(struct sk_buff *skb, struct net_device *netdev);
- u16
-@@ -506,6 +507,6 @@ int ice_napi_poll(struct napi_struct *napi, int budget);
- int
- ice_prgm_fdir_fltr(struct ice_vsi *vsi, struct ice_fltr_desc *fdir_desc,
- 		   u8 *raw_packet);
--int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget);
- void ice_clean_ctrl_tx_irq(struct ice_tx_ring *tx_ring);
-+void ice_clean_ctrl_rx_irq(struct ice_rx_ring *rx_ring);
- #endif /* _ICE_TXRX_H_ */
--- 
-2.45.2
 
 
