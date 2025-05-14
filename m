@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-190514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECC87AB7268
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 19:10:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81C96AB726E
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 19:10:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B2753A3491
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 17:10:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EB924C3893
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 17:10:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 401CE27FD44;
-	Wed, 14 May 2025 17:10:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2A9E280302;
+	Wed, 14 May 2025 17:10:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CCiyJIUg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QWRfG5WW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AC351624EA
-	for <netdev@vger.kernel.org>; Wed, 14 May 2025 17:10:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE70D1624EA
+	for <netdev@vger.kernel.org>; Wed, 14 May 2025 17:10:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747242620; cv=none; b=gSZFSBiYGmNPP9zF64d0HulSU1r/Z/Cn5Zd7hIgPRjrmGOw388Mkrhy0oqet/QU6qktWMUcGV/ixDcOs+apExDPZxAotymjLECISxCVxzw/I/iJ+JfI6+2rCtz5nRRwnviR8Mn3M+KGwmTdaqDMMg+C0SHugvk5mZcEs4jhog5A=
+	t=1747242621; cv=none; b=IYGE52tWT0e/ehjdmVvRz4BrY/y7aY47R5tVxBN8rGuQ008EBh2cx3BZfJY//DFHU9Zwu02HV9NoeYIjPmu7TUHV6PgcVP5IS6HfKXQk/Y0EmMhiv//hus00BPGPtFcnEEH+umkbMbtGOGCBwnClpsjUubjwd8vtXVNPL+jUCyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747242620; c=relaxed/simple;
-	bh=jO1c6Omlx+fsF4GHMQV9/rCFGaCws6F9qRa2fiBlvu4=;
+	s=arc-20240116; t=1747242621; c=relaxed/simple;
+	bh=o4tGPCUP+p2FtuF84RsppqLlrBdww7lIkAbpeGs0ANg=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=TumtAMI3r/C8qa94PIAHEwk5odKsLuog0NyXob86PxSBA/NwIY/RjgckNKifD55EV2L3uT0zSyYK3aePFp1yDQ26RyshB20eCossny7XSqYSXvda3XVyVUM/ea6Q6h0NxT54CYADc8DeMpvZ+ujGjRBDwr9s5L10oW6TBfcpGAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CCiyJIUg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DC2BC4CEE3;
-	Wed, 14 May 2025 17:10:18 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=BKm90NBiAWaoVGCMn1LaC1Zk7kimgVzCxedZ4QqFzpKKL3i871W6z4aWy1eHQD/L4K2xp1Qoefs07ugK00UBS2XBPCWg2YY7R7DCtuTYTg//AI8BNvUCkeYSvJ9Rb8a3ufN75Ia/HY6ye0AK2WHcnI5rY5b7Vp73Xf6UFLa/iXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QWRfG5WW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7897C4CEE3;
+	Wed, 14 May 2025 17:10:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747242618;
-	bh=jO1c6Omlx+fsF4GHMQV9/rCFGaCws6F9qRa2fiBlvu4=;
+	s=k20201202; t=1747242621;
+	bh=o4tGPCUP+p2FtuF84RsppqLlrBdww7lIkAbpeGs0ANg=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=CCiyJIUgKiLhD1m2ZrwxCKNR7li+A+1nxrJ8RNMJxE4bDZ0lAK3InQY7f2qdcSBFf
-	 /zXKoNbBTAxsvCtjuqO6n3Yj8OXQjD5ZfWWh5WVwDtuCj9JDJo26vdGPaJkxHtga0Z
-	 r1dArVYtC7X/dodQycWdP0AXMUltZtv0FvzHKyu2UQCo0L03cRD3zAZCfhXOmSTNoK
-	 2uEQyfUvt1S+0InRQBFpEgQE2xvIe7BlGtDSQMP5qyz86AmtL1SW7jF7lrBbk++8uS
-	 bK6q8fO3TQUYMVm2P5eEJj/nZLJ84HlMlWPhVMeILCisD4zavAMeDhoA+vDenRC//l
-	 yAFi8/6y4vQrw==
+	b=QWRfG5WWlw9b0z2tmAjd+TDSSyxs7+S3+VVFM0geeq4PSO6yvcv6n51T2UntIP33s
+	 UqnrHQ0mebsiGKYLOI8lvp22HyHK0cjRpiwKnhyDbR+mgYjtT9Xa4MiQWBiE3amzpq
+	 vODkICBXh1G2ANHN6XzM3pTAbak22iLETte9Ew8FPWPgh+2SUnyCMWjtcWQH9ZiMlS
+	 W3ARVHoOEZ+GuBTeDOevVtGG/ftS1XB0OFtGjBo05Revun0PZ5p8LB3GSayl8Uebtf
+	 6Oi0nFriFZUiUQabyDclb0354a+WCjJIvsx19zpfBtemDE/Va67cFNDQ7W1EYHk9PF
+	 0k6jg4/HhMjAw==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Wed, 14 May 2025 19:09:57 +0200
-Subject: [PATCH net-next 1/2] net: airoha: npu: Move memory allocation in
- airoha_npu_send_msg() caller
+Date: Wed, 14 May 2025 19:09:58 +0200
+Subject: [PATCH net-next 2/2] net: airoha: Add FLOW_CLS_STATS callback
+ support
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,7 +53,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250514-airoha-en7581-flowstats-v1-1-c00ede12a2ca@kernel.org>
+Message-Id: <20250514-airoha-en7581-flowstats-v1-2-c00ede12a2ca@kernel.org>
 References: <20250514-airoha-en7581-flowstats-v1-0-c00ede12a2ca@kernel.org>
 In-Reply-To: <20250514-airoha-en7581-flowstats-v1-0-c00ede12a2ca@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -64,193 +64,639 @@ Cc: linux-arm-kernel@lists.infradead.org,
  linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
 X-Mailer: b4 0.14.2
 
-Move ppe_mbox_data struct memory allocation from airoha_npu_send_msg
-routine to the caller one. This is a preliminary patch to enable wlan NPU
-offloading and flow counter stats support.
+Introduce per-flow stats accounting to the flowtable hw offload in
+the airoha_eth driver. Flow stats are split in the PPE and NPU modules:
+- PPE: accounts for high 32bit of per-flow stats
+- NPU: accounts for low 32bit of per-flow stats
+
+FLOW_CLS_STATS can be enabled or disabled at compile time.
 
 Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- drivers/net/ethernet/airoha/airoha_npu.c | 123 ++++++++++++++++++-------------
- 1 file changed, 70 insertions(+), 53 deletions(-)
+ drivers/net/ethernet/airoha/Kconfig              |   7 +
+ drivers/net/ethernet/airoha/airoha_eth.h         |  33 +++
+ drivers/net/ethernet/airoha/airoha_npu.c         |  52 ++++-
+ drivers/net/ethernet/airoha/airoha_npu.h         |   4 +-
+ drivers/net/ethernet/airoha/airoha_ppe.c         | 265 +++++++++++++++++++++--
+ drivers/net/ethernet/airoha/airoha_ppe_debugfs.c |   9 +-
+ 6 files changed, 350 insertions(+), 20 deletions(-)
 
+diff --git a/drivers/net/ethernet/airoha/Kconfig b/drivers/net/ethernet/airoha/Kconfig
+index 1a4cf6a259f67adf9c6115e05de16b0585092573..ad3ce501e7a577b839b674406900ddaea88a9b83 100644
+--- a/drivers/net/ethernet/airoha/Kconfig
++++ b/drivers/net/ethernet/airoha/Kconfig
+@@ -24,4 +24,11 @@ config NET_AIROHA
+ 	  This driver supports the gigabit ethernet MACs in the
+ 	  Airoha SoC family.
+ 
++config NET_AIROHA_FLOW_STATS
++	default y
++	bool "Airoha flow stats"
++	depends on NET_AIROHA && NET_AIROHA_NPU
++	help
++	  Enable Aiorha flowtable statistic counters.
++
+ endif #NET_VENDOR_AIROHA
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
+index 53f39083a8b05f365056f5d063f801c03e777953..531a3c49c1562a986111a1ce1c215c8751c16e09 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.h
++++ b/drivers/net/ethernet/airoha/airoha_eth.h
+@@ -50,6 +50,14 @@
+ #define PPE_NUM				2
+ #define PPE1_SRAM_NUM_ENTRIES		(8 * 1024)
+ #define PPE_SRAM_NUM_ENTRIES		(2 * PPE1_SRAM_NUM_ENTRIES)
++#ifdef CONFIG_NET_AIROHA_FLOW_STATS
++#define PPE1_STATS_NUM_ENTRIES		(4 * 1024)
++#else
++#define PPE1_STATS_NUM_ENTRIES		0
++#endif /* CONFIG_NET_AIROHA_FLOW_STATS */
++#define PPE_STATS_NUM_ENTRIES		(2 * PPE1_STATS_NUM_ENTRIES)
++#define PPE1_SRAM_NUM_DATA_ENTRIES	(PPE1_SRAM_NUM_ENTRIES - PPE1_STATS_NUM_ENTRIES)
++#define PPE_SRAM_NUM_DATA_ENTRIES	(2 * PPE1_SRAM_NUM_DATA_ENTRIES)
+ #define PPE_DRAM_NUM_ENTRIES		(16 * 1024)
+ #define PPE_NUM_ENTRIES			(PPE_SRAM_NUM_ENTRIES + PPE_DRAM_NUM_ENTRIES)
+ #define PPE_HASH_MASK			(PPE_NUM_ENTRIES - 1)
+@@ -261,6 +269,8 @@ struct airoha_foe_mac_info {
+ 
+ 	u16 pppoe_id;
+ 	u16 src_mac_lo;
++
++	u32 meter;
+ };
+ 
+ #define AIROHA_FOE_IB1_UNBIND_PREBIND		BIT(24)
+@@ -296,6 +306,11 @@ struct airoha_foe_mac_info {
+ #define AIROHA_FOE_TUNNEL			BIT(6)
+ #define AIROHA_FOE_TUNNEL_ID			GENMASK(5, 0)
+ 
++#define AIROHA_FOE_TUNNEL_MTU			GENMASK(31, 16)
++#define AIROHA_FOE_ACNT_GRP3			GENMASK(15, 9)
++#define AIROHA_FOE_METER_GRP3			GENMASK(8, 5)
++#define AIROHA_FOE_METER_GRP2			GENMASK(4, 0)
++
+ struct airoha_foe_bridge {
+ 	u32 dest_mac_hi;
+ 
+@@ -379,6 +394,8 @@ struct airoha_foe_ipv6 {
+ 	u32 ib2;
+ 
+ 	struct airoha_foe_mac_info_common l2;
++
++	u32 meter;
+ };
+ 
+ struct airoha_foe_entry {
+@@ -397,6 +414,16 @@ struct airoha_foe_entry {
+ 	};
+ };
+ 
++struct airoha_foe_stats {
++	u32 bytes;
++	u32 packets;
++};
++
++struct airoha_foe_stats64 {
++	u64 bytes;
++	u64 packets;
++};
++
+ struct airoha_flow_data {
+ 	struct ethhdr eth;
+ 
+@@ -447,6 +474,7 @@ struct airoha_flow_table_entry {
+ 	struct hlist_node l2_subflow_node; /* PPE L2 subflow entry */
+ 	u32 hash;
+ 
++	struct airoha_foe_stats64 stats;
+ 	enum airoha_flow_entry_type type;
+ 
+ 	struct rhash_head node;
+@@ -523,6 +551,9 @@ struct airoha_ppe {
+ 	struct hlist_head *foe_flow;
+ 	u16 foe_check_time[PPE_NUM_ENTRIES];
+ 
++	struct airoha_foe_stats *foe_stats;
++	dma_addr_t foe_stats_dma;
++
+ 	struct dentry *debugfs_dir;
+ };
+ 
+@@ -582,6 +613,8 @@ int airoha_ppe_init(struct airoha_eth *eth);
+ void airoha_ppe_deinit(struct airoha_eth *eth);
+ struct airoha_foe_entry *airoha_ppe_foe_get_entry(struct airoha_ppe *ppe,
+ 						  u32 hash);
++void airoha_ppe_foe_entry_get_stats(struct airoha_ppe *ppe, u32 hash,
++				    struct airoha_foe_stats64 *stats);
+ 
+ #ifdef CONFIG_DEBUG_FS
+ int airoha_ppe_debugfs_init(struct airoha_ppe *ppe);
 diff --git a/drivers/net/ethernet/airoha/airoha_npu.c b/drivers/net/ethernet/airoha/airoha_npu.c
-index ead0625e781f57cd7c5883b6dd3d441db62292d3..2371677296aff1382f6e0516a8798739029e03fb 100644
+index 2371677296aff1382f6e0516a8798739029e03fb..a20e5916d3b0efd0859f347b33ff4e78b41e17ab 100644
 --- a/drivers/net/ethernet/airoha/airoha_npu.c
 +++ b/drivers/net/ethernet/airoha/airoha_npu.c
-@@ -124,17 +124,12 @@ static int airoha_npu_send_msg(struct airoha_npu *npu, int func_id,
- 	u16 core = 0; /* FIXME */
- 	u32 val, offset = core << 4;
- 	dma_addr_t dma_addr;
--	void *addr;
- 	int ret;
+@@ -12,6 +12,7 @@
+ #include <linux/of_reserved_mem.h>
+ #include <linux/regmap.h>
  
--	addr = kmemdup(p, size, GFP_ATOMIC);
--	if (!addr)
--		return -ENOMEM;
--
--	dma_addr = dma_map_single(npu->dev, addr, size, DMA_TO_DEVICE);
-+	dma_addr = dma_map_single(npu->dev, p, size, DMA_TO_DEVICE);
- 	ret = dma_mapping_error(npu->dev, dma_addr);
- 	if (ret)
--		goto out;
-+		return ret;
++#include "airoha_eth.h"
+ #include "airoha_npu.h"
  
- 	spin_lock_bh(&npu->cores[core].lock);
+ #define NPU_EN7581_FIRMWARE_DATA		"airoha/en7581_npu_data.bin"
+@@ -72,6 +73,7 @@ enum {
+ 	PPE_FUNC_SET_WAIT_HWNAT_INIT,
+ 	PPE_FUNC_SET_WAIT_HWNAT_DEINIT,
+ 	PPE_FUNC_SET_WAIT_API,
++	PPE_FUNC_SET_WAIT_FLOW_STATS_SETUP,
+ };
  
-@@ -155,8 +150,6 @@ static int airoha_npu_send_msg(struct airoha_npu *npu, int func_id,
- 	spin_unlock_bh(&npu->cores[core].lock);
+ enum {
+@@ -115,6 +117,10 @@ struct ppe_mbox_data {
+ 			u32 size;
+ 			u32 data;
+ 		} set_info;
++		struct {
++			u32 npu_stats_addr;
++			u32 foe_stats_addr;
++		} stats_info;
+ 	};
+ };
  
- 	dma_unmap_single(npu->dev, dma_addr, size, DMA_TO_DEVICE);
--out:
--	kfree(addr);
- 
- 	return ret;
- }
-@@ -261,76 +254,100 @@ static irqreturn_t airoha_npu_wdt_handler(int irq, void *core_instance)
- 
- static int airoha_npu_ppe_init(struct airoha_npu *npu)
- {
--	struct ppe_mbox_data ppe_data = {
--		.func_type = NPU_OP_SET,
--		.func_id = PPE_FUNC_SET_WAIT_HWNAT_INIT,
--		.init_info = {
--			.ppe_type = PPE_TYPE_L2B_IPV4_IPV6,
--			.wan_mode = QDMA_WAN_ETHER,
--		},
--	};
-+	struct ppe_mbox_data *ppe_data;
-+	int err;
- 
--	return airoha_npu_send_msg(npu, NPU_FUNC_PPE, &ppe_data,
--				   sizeof(struct ppe_mbox_data));
-+	ppe_data = kzalloc(sizeof(*ppe_data), GFP_KERNEL);
-+	if (!ppe_data)
-+		return -ENOMEM;
-+
-+	ppe_data->func_type = NPU_OP_SET;
-+	ppe_data->func_id = PPE_FUNC_SET_WAIT_HWNAT_INIT;
-+	ppe_data->init_info.ppe_type = PPE_TYPE_L2B_IPV4_IPV6;
-+	ppe_data->init_info.wan_mode = QDMA_WAN_ETHER;
-+
-+	err = airoha_npu_send_msg(npu, NPU_FUNC_PPE, ppe_data,
-+				  sizeof(*ppe_data));
-+	kfree(ppe_data);
-+
-+	return err;
+@@ -350,7 +356,40 @@ static int airoha_npu_foe_commit_entry(struct airoha_npu *npu,
+ 	return err;
  }
  
- static int airoha_npu_ppe_deinit(struct airoha_npu *npu)
- {
--	struct ppe_mbox_data ppe_data = {
--		.func_type = NPU_OP_SET,
--		.func_id = PPE_FUNC_SET_WAIT_HWNAT_DEINIT,
--	};
+-struct airoha_npu *airoha_npu_get(struct device *dev)
++static int airoha_npu_stats_setup(struct airoha_npu *npu,
++				  dma_addr_t foe_stats_addr)
++{
++	int err, size = PPE_STATS_NUM_ENTRIES * sizeof(*npu->stats);
 +	struct ppe_mbox_data *ppe_data;
-+	int err;
++	void *stats;
 +
-+	ppe_data = kzalloc(sizeof(*ppe_data), GFP_KERNEL);
-+	if (!ppe_data)
-+		return -ENOMEM;
++	if (!size) /* flow stats are disabled */
++		return 0;
 +
-+	ppe_data->func_type = NPU_OP_SET;
-+	ppe_data->func_id = PPE_FUNC_SET_WAIT_HWNAT_DEINIT;
- 
--	return airoha_npu_send_msg(npu, NPU_FUNC_PPE, &ppe_data,
--				   sizeof(struct ppe_mbox_data));
-+	err = airoha_npu_send_msg(npu, NPU_FUNC_PPE, ppe_data,
-+				  sizeof(*ppe_data));
-+	kfree(ppe_data);
-+
-+	return err;
- }
- 
- static int airoha_npu_ppe_flush_sram_entries(struct airoha_npu *npu,
- 					     dma_addr_t foe_addr,
- 					     int sram_num_entries)
- {
--	struct ppe_mbox_data ppe_data = {
--		.func_type = NPU_OP_SET,
--		.func_id = PPE_FUNC_SET_WAIT_API,
--		.set_info = {
--			.func_id = PPE_SRAM_RESET_VAL,
--			.data = foe_addr,
--			.size = sram_num_entries,
--		},
--	};
-+	struct ppe_mbox_data *ppe_data;
-+	int err;
-+
-+	ppe_data = kzalloc(sizeof(*ppe_data), GFP_KERNEL);
-+	if (!ppe_data)
-+		return -ENOMEM;
- 
--	return airoha_npu_send_msg(npu, NPU_FUNC_PPE, &ppe_data,
--				   sizeof(struct ppe_mbox_data));
-+	ppe_data->func_type = NPU_OP_SET;
-+	ppe_data->func_id = PPE_FUNC_SET_WAIT_API;
-+	ppe_data->set_info.func_id = PPE_SRAM_RESET_VAL;
-+	ppe_data->set_info.data = foe_addr;
-+	ppe_data->set_info.size = sram_num_entries;
-+
-+	err = airoha_npu_send_msg(npu, NPU_FUNC_PPE, ppe_data,
-+				  sizeof(*ppe_data));
-+	kfree(ppe_data);
-+
-+	return err;
- }
- 
- static int airoha_npu_foe_commit_entry(struct airoha_npu *npu,
- 				       dma_addr_t foe_addr,
- 				       u32 entry_size, u32 hash, bool ppe2)
- {
--	struct ppe_mbox_data ppe_data = {
--		.func_type = NPU_OP_SET,
--		.func_id = PPE_FUNC_SET_WAIT_API,
--		.set_info = {
--			.data = foe_addr,
--			.size = entry_size,
--		},
--	};
-+	struct ppe_mbox_data *ppe_data;
- 	int err;
- 
--	ppe_data.set_info.func_id = ppe2 ? PPE2_SRAM_SET_ENTRY
--					 : PPE_SRAM_SET_ENTRY;
 +	ppe_data = kzalloc(sizeof(*ppe_data), GFP_ATOMIC);
 +	if (!ppe_data)
 +		return -ENOMEM;
 +
 +	ppe_data->func_type = NPU_OP_SET;
-+	ppe_data->func_id = PPE_FUNC_SET_WAIT_API;
-+	ppe_data->set_info.data = foe_addr;
-+	ppe_data->set_info.size = entry_size;
-+	ppe_data->set_info.func_id = ppe2 ? PPE2_SRAM_SET_ENTRY
-+					  : PPE_SRAM_SET_ENTRY;
- 
--	err = airoha_npu_send_msg(npu, NPU_FUNC_PPE, &ppe_data,
--				  sizeof(struct ppe_mbox_data));
-+	err = airoha_npu_send_msg(npu, NPU_FUNC_PPE, ppe_data,
-+				  sizeof(*ppe_data));
- 	if (err)
- 		return err;
- 
--	ppe_data.set_info.func_id = PPE_SRAM_SET_VAL;
--	ppe_data.set_info.data = hash;
--	ppe_data.set_info.size = sizeof(u32);
-+	ppe_data->set_info.func_id = PPE_SRAM_SET_VAL;
-+	ppe_data->set_info.data = hash;
-+	ppe_data->set_info.size = sizeof(u32);
++	ppe_data->func_id = PPE_FUNC_SET_WAIT_FLOW_STATS_SETUP;
++	ppe_data->stats_info.foe_stats_addr = foe_stats_addr;
 +
 +	err = airoha_npu_send_msg(npu, NPU_FUNC_PPE, ppe_data,
 +				  sizeof(*ppe_data));
-+	kfree(ppe_data);
++	if (err)
++		return err;
++
++	stats = devm_ioremap(npu->dev,
++			     ppe_data->stats_info.npu_stats_addr, size);
++	if (!stats)
++		return -ENOMEM;
++
++	npu->stats = stats;
++
++	return 0;
++}
++
++struct airoha_npu *airoha_npu_get(struct device *dev, dma_addr_t *stats_addr)
+ {
+ 	struct platform_device *pdev;
+ 	struct device_node *np;
+@@ -388,6 +427,17 @@ struct airoha_npu *airoha_npu_get(struct device *dev)
+ 		goto error_module_put;
+ 	}
  
--	return airoha_npu_send_msg(npu, NPU_FUNC_PPE, &ppe_data,
--				   sizeof(struct ppe_mbox_data));
++	if (stats_addr) {
++		int err;
++
++		err = airoha_npu_stats_setup(npu, *stats_addr);
++		if (err) {
++			dev_err(dev, "failed to allocate npu stats buffer\n");
++			npu = ERR_PTR(err);
++			goto error_module_put;
++		}
++	}
++
+ 	return npu;
+ 
+ error_module_put:
+diff --git a/drivers/net/ethernet/airoha/airoha_npu.h b/drivers/net/ethernet/airoha/airoha_npu.h
+index a2b8ae4d947398c1a4f1bb40c2b5118298e40481..7faeb90db6a7347024b56e5deb2a04e45de6c052 100644
+--- a/drivers/net/ethernet/airoha/airoha_npu.h
++++ b/drivers/net/ethernet/airoha/airoha_npu.h
+@@ -17,6 +17,8 @@ struct airoha_npu {
+ 		struct work_struct wdt_work;
+ 	} cores[NPU_NUM_CORES];
+ 
++	struct airoha_foe_stats *stats;
++
+ 	struct {
+ 		int (*ppe_init)(struct airoha_npu *npu);
+ 		int (*ppe_deinit)(struct airoha_npu *npu);
+@@ -30,5 +32,5 @@ struct airoha_npu {
+ 	} ops;
+ };
+ 
+-struct airoha_npu *airoha_npu_get(struct device *dev);
++struct airoha_npu *airoha_npu_get(struct device *dev, dma_addr_t *stats_addr);
+ void airoha_npu_put(struct airoha_npu *npu);
+diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
+index 6e9787c2843bc4f09240a0bbbd1f506c099d615e..9be0020695458c4a63a10a0d990f826baecf6f94 100644
+--- a/drivers/net/ethernet/airoha/airoha_ppe.c
++++ b/drivers/net/ethernet/airoha/airoha_ppe.c
+@@ -102,7 +102,7 @@ static void airoha_ppe_hw_init(struct airoha_ppe *ppe)
+ 
+ 	if (airoha_ppe2_is_enabled(eth)) {
+ 		sram_num_entries =
+-			PPE_RAM_NUM_ENTRIES_SHIFT(PPE1_SRAM_NUM_ENTRIES);
++			PPE_RAM_NUM_ENTRIES_SHIFT(PPE1_SRAM_NUM_DATA_ENTRIES);
+ 		airoha_fe_rmw(eth, REG_PPE_TB_CFG(0),
+ 			      PPE_SRAM_TB_NUM_ENTRY_MASK |
+ 			      PPE_DRAM_TB_NUM_ENTRY_MASK,
+@@ -119,7 +119,7 @@ static void airoha_ppe_hw_init(struct airoha_ppe *ppe)
+ 					 dram_num_entries));
+ 	} else {
+ 		sram_num_entries =
+-			PPE_RAM_NUM_ENTRIES_SHIFT(PPE_SRAM_NUM_ENTRIES);
++			PPE_RAM_NUM_ENTRIES_SHIFT(PPE_SRAM_NUM_DATA_ENTRIES);
+ 		airoha_fe_rmw(eth, REG_PPE_TB_CFG(0),
+ 			      PPE_SRAM_TB_NUM_ENTRY_MASK |
+ 			      PPE_DRAM_TB_NUM_ENTRY_MASK,
+@@ -417,6 +417,77 @@ static u32 airoha_ppe_foe_get_entry_hash(struct airoha_foe_entry *hwe)
+ 	return hash;
+ }
+ 
++static u32 airoha_ppe_foe_get_flow_stats_index(struct airoha_ppe *ppe, u32 hash)
++{
++	if (!airoha_ppe2_is_enabled(ppe->eth))
++		return hash;
++
++	return hash >= PPE_STATS_NUM_ENTRIES ? hash - PPE1_STATS_NUM_ENTRIES
++					     : hash;
++}
++
++static void airoha_ppe_foe_flow_stat_entry_reset(struct airoha_ppe *ppe,
++						 struct airoha_npu *npu,
++						 int index)
++{
++	memset(&npu->stats[index], 0, sizeof(*npu->stats));
++	memset(&ppe->foe_stats[index], 0, sizeof(*ppe->foe_stats));
++}
++
++static void airoha_ppe_foe_flow_stats_reset(struct airoha_ppe *ppe,
++					    struct airoha_npu *npu)
++{
++	int i;
++
++	for (i = 0; i < PPE_STATS_NUM_ENTRIES; i++)
++		airoha_ppe_foe_flow_stat_entry_reset(ppe, npu, i);
++}
++
++static void airoha_ppe_foe_flow_stats_update(struct airoha_ppe *ppe,
++					     struct airoha_npu *npu,
++					     struct airoha_foe_entry *hwe,
++					     u32 hash)
++{
++	int type = FIELD_GET(AIROHA_FOE_IB1_BIND_PACKET_TYPE, hwe->ib1);
++	u32 index, pse_port, val, *data, *ib2, *meter;
++	u8 nbq;
++
++	index = airoha_ppe_foe_get_flow_stats_index(ppe, hash);
++	if (index >= PPE_STATS_NUM_ENTRIES)
++		return;
++
++	if (type == PPE_PKT_TYPE_BRIDGE) {
++		data = &hwe->bridge.data;
++		ib2 = &hwe->bridge.ib2;
++		meter = &hwe->bridge.l2.meter;
++	} else if (type >= PPE_PKT_TYPE_IPV6_ROUTE_3T) {
++		data = &hwe->ipv6.data;
++		ib2 = &hwe->ipv6.ib2;
++		meter = &hwe->ipv6.meter;
++	} else {
++		data = &hwe->ipv4.data;
++		ib2 = &hwe->ipv4.ib2;
++		meter = &hwe->ipv4.l2.meter;
++	}
++
++	airoha_ppe_foe_flow_stat_entry_reset(ppe, npu, index);
++
++	val = FIELD_GET(AIROHA_FOE_CHANNEL | AIROHA_FOE_QID, *data);
++	*data = (*data & ~AIROHA_FOE_ACTDP) |
++		FIELD_PREP(AIROHA_FOE_ACTDP, val);
++
++	val = *ib2 & (AIROHA_FOE_IB2_NBQ | AIROHA_FOE_IB2_PSE_PORT |
++		      AIROHA_FOE_IB2_PSE_QOS | AIROHA_FOE_IB2_FAST_PATH);
++	*meter |= FIELD_PREP(AIROHA_FOE_TUNNEL_MTU, val);
++
++	pse_port = FIELD_GET(AIROHA_FOE_IB2_PSE_PORT, *ib2);
++	nbq = pse_port == 1 ? 6 : 5;
++	*ib2 &= ~(AIROHA_FOE_IB2_NBQ | AIROHA_FOE_IB2_PSE_PORT |
++		  AIROHA_FOE_IB2_PSE_QOS);
++	*ib2 |= FIELD_PREP(AIROHA_FOE_IB2_PSE_PORT, 6) |
++		FIELD_PREP(AIROHA_FOE_IB2_NBQ, nbq);
++}
++
+ struct airoha_foe_entry *airoha_ppe_foe_get_entry(struct airoha_ppe *ppe,
+ 						  u32 hash)
+ {
+@@ -470,6 +541,8 @@ static int airoha_ppe_foe_commit_entry(struct airoha_ppe *ppe,
+ 	struct airoha_foe_entry *hwe = ppe->foe + hash * sizeof(*hwe);
+ 	u32 ts = airoha_ppe_get_timestamp(ppe);
+ 	struct airoha_eth *eth = ppe->eth;
++	struct airoha_npu *npu;
++	int err = 0;
+ 
+ 	memcpy(&hwe->d, &e->d, sizeof(*hwe) - sizeof(hwe->ib1));
+ 	wmb();
+@@ -478,25 +551,28 @@ static int airoha_ppe_foe_commit_entry(struct airoha_ppe *ppe,
+ 	e->ib1 |= FIELD_PREP(AIROHA_FOE_IB1_BIND_TIMESTAMP, ts);
+ 	hwe->ib1 = e->ib1;
+ 
++	rcu_read_lock();
++
++	npu = rcu_dereference(eth->npu);
++	if (!npu) {
++		err = -ENODEV;
++		goto unlock;
++	}
++
++	airoha_ppe_foe_flow_stats_update(ppe, npu, hwe, hash);
++
+ 	if (hash < PPE_SRAM_NUM_ENTRIES) {
+ 		dma_addr_t addr = ppe->foe_dma + hash * sizeof(*hwe);
+ 		bool ppe2 = airoha_ppe2_is_enabled(eth) &&
+ 			    hash >= PPE1_SRAM_NUM_ENTRIES;
+-		struct airoha_npu *npu;
+-		int err = -ENODEV;
+ 
+-		rcu_read_lock();
+-		npu = rcu_dereference(eth->npu);
+-		if (npu)
+-			err = npu->ops.ppe_foe_commit_entry(npu, addr,
+-							    sizeof(*hwe), hash,
+-							    ppe2);
+-		rcu_read_unlock();
+-
+-		return err;
++		err = npu->ops.ppe_foe_commit_entry(npu, addr, sizeof(*hwe),
++						    hash, ppe2);
+ 	}
++unlock:
++	rcu_read_unlock();
+ 
+-	return 0;
 +	return err;
  }
  
- struct airoha_npu *airoha_npu_get(struct device *dev)
+ static void airoha_ppe_foe_remove_flow(struct airoha_ppe *ppe,
+@@ -582,6 +658,7 @@ airoha_ppe_foe_commit_subflow_entry(struct airoha_ppe *ppe,
+ 		l2->common.etype = ETH_P_IPV6;
+ 
+ 	hwe.bridge.ib2 = e->data.bridge.ib2;
++	hwe.bridge.data = e->data.bridge.data;
+ 	airoha_ppe_foe_commit_entry(ppe, &hwe, hash);
+ 
+ 	return 0;
+@@ -681,6 +758,98 @@ static int airoha_ppe_foe_flow_commit_entry(struct airoha_ppe *ppe,
+ 	return 0;
+ }
+ 
++static int airoha_ppe_get_entry_idle_time(struct airoha_ppe *ppe, u32 ib1)
++{
++	u32 state = FIELD_GET(AIROHA_FOE_IB1_BIND_STATE, ib1);
++	u32 ts, ts_mask, now = airoha_ppe_get_timestamp(ppe);
++	int idle;
++
++	if (state == AIROHA_FOE_STATE_BIND) {
++		ts = FIELD_GET(AIROHA_FOE_IB1_BIND_TIMESTAMP, ib1);
++		ts_mask = AIROHA_FOE_IB1_BIND_TIMESTAMP;
++	} else {
++		ts = FIELD_GET(AIROHA_FOE_IB1_UNBIND_TIMESTAMP, ib1);
++		now = FIELD_GET(AIROHA_FOE_IB1_UNBIND_TIMESTAMP, now);
++		ts_mask = AIROHA_FOE_IB1_UNBIND_TIMESTAMP;
++	}
++	idle = now - ts;
++
++	return idle < 0 ? idle + ts_mask + 1 : idle;
++}
++
++static void
++airoha_ppe_foe_flow_l2_entry_update(struct airoha_ppe *ppe,
++				    struct airoha_flow_table_entry *e)
++{
++	int min_idle = airoha_ppe_get_entry_idle_time(ppe, e->data.ib1);
++	struct airoha_flow_table_entry *iter;
++	struct hlist_node *n;
++
++	lockdep_assert_held(&ppe_lock);
++
++	hlist_for_each_entry_safe(iter, n, &e->l2_flows, l2_subflow_node) {
++		struct airoha_foe_entry *hwe;
++		u32 ib1, state;
++		int idle;
++
++		hwe = airoha_ppe_foe_get_entry(ppe, iter->hash);
++		ib1 = READ_ONCE(hwe->ib1);
++
++		state = FIELD_GET(AIROHA_FOE_IB1_BIND_STATE, ib1);
++		if (state != AIROHA_FOE_STATE_BIND) {
++			iter->hash = 0xffff;
++			airoha_ppe_foe_remove_flow(ppe, iter);
++			continue;
++		}
++
++		idle = airoha_ppe_get_entry_idle_time(ppe, ib1);
++		if (idle >= min_idle)
++			continue;
++
++		min_idle = idle;
++		e->data.ib1 &= ~AIROHA_FOE_IB1_BIND_TIMESTAMP;
++		e->data.ib1 |= ib1 & AIROHA_FOE_IB1_BIND_TIMESTAMP;
++	}
++}
++
++static void airoha_ppe_foe_flow_entry_update(struct airoha_ppe *ppe,
++					     struct airoha_flow_table_entry *e)
++{
++	struct airoha_foe_entry *hwe_p, hwe = {};
++
++	spin_lock_bh(&ppe_lock);
++
++	if (e->type == FLOW_TYPE_L2) {
++		airoha_ppe_foe_flow_l2_entry_update(ppe, e);
++		goto unlock;
++	}
++
++	if (e->hash == 0xffff)
++		goto unlock;
++
++	hwe_p = airoha_ppe_foe_get_entry(ppe, e->hash);
++	if (!hwe_p)
++		goto unlock;
++
++	memcpy(&hwe, hwe_p, sizeof(*hwe_p));
++	if (!airoha_ppe_foe_compare_entry(e, &hwe)) {
++		e->hash = 0xffff;
++		goto unlock;
++	}
++
++	e->data.ib1 = hwe.ib1;
++unlock:
++	spin_unlock_bh(&ppe_lock);
++}
++
++static int airoha_ppe_entry_idle_time(struct airoha_ppe *ppe,
++				      struct airoha_flow_table_entry *e)
++{
++	airoha_ppe_foe_flow_entry_update(ppe, e);
++
++	return airoha_ppe_get_entry_idle_time(ppe, e->data.ib1);
++}
++
+ static int airoha_ppe_flow_offload_replace(struct airoha_gdm_port *port,
+ 					   struct flow_cls_offload *f)
+ {
+@@ -896,6 +1065,56 @@ static int airoha_ppe_flow_offload_destroy(struct airoha_gdm_port *port,
+ 	return 0;
+ }
+ 
++void airoha_ppe_foe_entry_get_stats(struct airoha_ppe *ppe, u32 hash,
++				    struct airoha_foe_stats64 *stats)
++{
++	u32 index = airoha_ppe_foe_get_flow_stats_index(ppe, hash);
++	struct airoha_eth *eth = ppe->eth;
++	struct airoha_npu *npu;
++
++	if (index >= PPE_STATS_NUM_ENTRIES)
++		return;
++
++	rcu_read_lock();
++
++	npu = rcu_dereference(eth->npu);
++	if (npu) {
++		stats->packets = ((u64)ppe->foe_stats[index].packets) << 32 |
++				 npu->stats[index].packets;
++		stats->bytes = ((u64)ppe->foe_stats[index].bytes) << 32 |
++			       npu->stats[index].bytes;
++	}
++
++	rcu_read_unlock();
++}
++
++static int airoha_ppe_flow_offload_stats(struct airoha_gdm_port *port,
++					 struct flow_cls_offload *f)
++{
++	struct airoha_eth *eth = port->qdma->eth;
++	struct airoha_flow_table_entry *e;
++	u32 idle;
++
++	e = rhashtable_lookup(&eth->flow_table, &f->cookie,
++			      airoha_flow_table_params);
++	if (!e)
++		return -ENOENT;
++
++	idle = airoha_ppe_entry_idle_time(eth->ppe, e);
++	f->stats.lastused = jiffies - idle * HZ;
++
++	if (e->hash != 0xffff) {
++		struct airoha_foe_stats64 stats = {};
++
++		airoha_ppe_foe_entry_get_stats(eth->ppe, e->hash, &stats);
++		f->stats.pkts += (stats.packets - e->stats.packets);
++		f->stats.bytes += (stats.bytes - e->stats.bytes);
++		e->stats = stats;
++	}
++
++	return 0;
++}
++
+ static int airoha_ppe_flow_offload_cmd(struct airoha_gdm_port *port,
+ 				       struct flow_cls_offload *f)
+ {
+@@ -904,6 +1123,8 @@ static int airoha_ppe_flow_offload_cmd(struct airoha_gdm_port *port,
+ 		return airoha_ppe_flow_offload_replace(port, f);
+ 	case FLOW_CLS_DESTROY:
+ 		return airoha_ppe_flow_offload_destroy(port, f);
++	case FLOW_CLS_STATS:
++		return airoha_ppe_flow_offload_stats(port, f);
+ 	default:
+ 		break;
+ 	}
+@@ -929,11 +1150,12 @@ static int airoha_ppe_flush_sram_entries(struct airoha_ppe *ppe,
+ 
+ static struct airoha_npu *airoha_ppe_npu_get(struct airoha_eth *eth)
+ {
+-	struct airoha_npu *npu = airoha_npu_get(eth->dev);
++	struct airoha_npu *npu = airoha_npu_get(eth->dev,
++						&eth->ppe->foe_stats_dma);
+ 
+ 	if (IS_ERR(npu)) {
+ 		request_module("airoha-npu");
+-		npu = airoha_npu_get(eth->dev);
++		npu = airoha_npu_get(eth->dev, &eth->ppe->foe_stats_dma);
+ 	}
+ 
+ 	return npu;
+@@ -956,6 +1178,8 @@ static int airoha_ppe_offload_setup(struct airoha_eth *eth)
+ 	if (err)
+ 		goto error_npu_put;
+ 
++	airoha_ppe_foe_flow_stats_reset(eth->ppe, npu);
++
+ 	rcu_assign_pointer(eth->npu, npu);
+ 	synchronize_rcu();
+ 
+@@ -1027,6 +1251,15 @@ int airoha_ppe_init(struct airoha_eth *eth)
+ 	if (!ppe->foe_flow)
+ 		return -ENOMEM;
+ 
++	foe_size = PPE_STATS_NUM_ENTRIES * sizeof(*ppe->foe_stats);
++	if (foe_size) {
++		ppe->foe_stats = dmam_alloc_coherent(eth->dev, foe_size,
++						     &ppe->foe_stats_dma,
++						     GFP_KERNEL);
++		if (!ppe->foe_stats)
++			return -ENOMEM;
++	}
++
+ 	err = rhashtable_init(&eth->flow_table, &airoha_flow_table_params);
+ 	if (err)
+ 		return err;
+diff --git a/drivers/net/ethernet/airoha/airoha_ppe_debugfs.c b/drivers/net/ethernet/airoha/airoha_ppe_debugfs.c
+index 3cdc6fd53fc751235d65c277a35c69ab6935ceec..05a756233f6a44fa51d1c57dd39d89c8ea488054 100644
+--- a/drivers/net/ethernet/airoha/airoha_ppe_debugfs.c
++++ b/drivers/net/ethernet/airoha/airoha_ppe_debugfs.c
+@@ -61,6 +61,7 @@ static int airoha_ppe_debugfs_foe_show(struct seq_file *m, void *private,
+ 		u16 *src_port = NULL, *dest_port = NULL;
+ 		struct airoha_foe_mac_info_common *l2;
+ 		unsigned char h_source[ETH_ALEN] = {};
++		struct airoha_foe_stats64 stats = {};
+ 		unsigned char h_dest[ETH_ALEN];
+ 		struct airoha_foe_entry *hwe;
+ 		u32 type, state, ib2, data;
+@@ -144,14 +145,18 @@ static int airoha_ppe_debugfs_foe_show(struct seq_file *m, void *private,
+ 				cpu_to_be16(hwe->ipv4.l2.src_mac_lo);
+ 		}
+ 
++		airoha_ppe_foe_entry_get_stats(ppe, i, &stats);
++
+ 		*((__be32 *)h_dest) = cpu_to_be32(l2->dest_mac_hi);
+ 		*((__be16 *)&h_dest[4]) = cpu_to_be16(l2->dest_mac_lo);
+ 		*((__be32 *)h_source) = cpu_to_be32(l2->src_mac_hi);
+ 
+ 		seq_printf(m, " eth=%pM->%pM etype=%04x data=%08x"
+-			      " vlan=%d,%d ib1=%08x ib2=%08x\n",
++			      " vlan=%d,%d ib1=%08x ib2=%08x"
++			      " packets=%llu bytes=%llu\n",
+ 			   h_source, h_dest, l2->etype, data,
+-			   l2->vlan1, l2->vlan2, hwe->ib1, ib2);
++			   l2->vlan1, l2->vlan2, hwe->ib1, ib2,
++			   stats.packets, stats.bytes);
+ 	}
+ 
+ 	return 0;
 
 -- 
 2.49.0
