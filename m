@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-190497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190498-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 700F9AB710F
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 18:19:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C230EAB7124
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 18:23:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3E177B659D
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 16:18:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEAAF3A7A46
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 16:23:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43F601E3762;
-	Wed, 14 May 2025 16:19:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5FC1E7C24;
+	Wed, 14 May 2025 16:23:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="fPE/i/gk"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="e9nY6fGx"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA7992798E2;
-	Wed, 14 May 2025 16:19:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03907163;
+	Wed, 14 May 2025 16:23:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747239560; cv=none; b=pTXtJ3MJ9yhc2y+XDTN/l8lJP2Di90wMqhWFtEObXg13GOP7kOLNgFq42kD+r+nlHmer78OmnbG11msR/bkJXw3j9T1xPzNocK+ZtNevmzhaffFRUvyQnpihOYQCPxguJqjIahdP1c+scyQNdm/iLUejEZIz+vKbaeWMxitt2Y4=
+	t=1747239801; cv=none; b=u0qqN3sgVr0uDZxlnRd18Xu9LaFEWoRvGjpg609EoUxxqIBNmH2d9tDmrX+F+bp0IPG0iuD22We9UYnLn69UyrdQNKC9Enoa0mBy220dELYsqKR2tmUdvHBE/vmHUmnHvZdOWcFigDN3fiKVwmtKg3//1zuDO6nG6UFE/p/ho/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747239560; c=relaxed/simple;
-	bh=z9nJMGGafha/fjcLej1oy50aoJavQPywBsNbyAAxjYM=;
+	s=arc-20240116; t=1747239801; c=relaxed/simple;
+	bh=w1foSERxjU8grH9RhGxEtcChMPrQN6xNKW0B1rX4KpM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=krf/2IwE0tDeutNS3k/fdqMJrxbYVvIob1YpxxzQdSAS9FiAmXJKe4EQ6rCvhw+jMj23g4NBAtcJAbwLHgQAXo+pLCv5PzFP0u4tjuqJCsGBGizxwvprwQym0g1mfAeyyJurOBWnZj2WkwF5skOZPy8/2fLMMV41LUt4lQqt7W0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=fPE/i/gk; arc=none smtp.client-ip=205.220.168.131
+	 In-Reply-To:Content-Type; b=sDpilMn5Yglp/mfZuPwaz0dN8wiAa394KvXHWna2mgWR2CHyIQHIgG1pg059mfyNybOWIcEUspudEGPCOl8grr8VD5Am6YadtNdMfAf1AGglEdvPTLv4kElbsqdBaaFJqrzfZr25jDP4IDN9sprLzBgoqtnuMLyZW+f3mhKsgzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=e9nY6fGx; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54EAugtk002715;
-	Wed, 14 May 2025 16:18:42 GMT
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54EAuvcD030381;
+	Wed, 14 May 2025 16:22:55 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	fC1EpdVCY3Z8PAOCNGsJVdmGg6+Oc+7eVuQdAn6LDmk=; b=fPE/i/gkvcaSaQtu
-	egGapU26yg02NqW9qBb1+DWIvl1WGLydbl6ZQlP3Yen9TZrHdL+baVhMIkm/q/Yk
-	ckKMognBlukyv1BqnVmjEBsHq3D9Pf+OFCMJEfT9gVz57IOVQE3t3QUas65/CryO
-	Uig2EBn9OqIfl7Vbl6SbmYt+cBCvkIafpRhNPUXytzVTXY6ii3BrObiYMvRdDJxt
-	WDf8LbDuWRsAYGCCltwtW9cmnAHkmniYxPDXKwLNTKDao82NqttGnCWso7KaCiGm
-	aLdmj0CAq3AFN20sSWpkDBE27hu0m4h8BKquxkxf8jk5m2PT/0l9phn1kBaMxNOZ
-	xJl9Fw==
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 46mbcpbafj-1
+	moQjiW9x6d8rT4rY0ygTWEOUErlKcF7yejmcp5bFSMw=; b=e9nY6fGxptq7C9VO
+	A0BXNPVAJX8goFPJ0qxKazjIqxsREogSKxEuPqqu2sOY3Re1CD5/YBbUtjXnb4dF
+	Il2L8RCoaZvX0+Xn5MNxDSDx7ErWc5wIKSciLCEx57vcFtTCtXsIvfLm6hD9SvUv
+	jXczCH4j8lGO0zAhxgcwWNX/K8teOkIRBU4KfGPGCpO/cJKhCDF+j4k3l7tQdpe9
+	yFBCcTnx3JBkPqZwhOGjXxNpjwQw0C+86Azx6TCPuQJiMl1g8rQ4kg2PrXWjYqjW
+	ZjflXFQ8CZemiH2kMY1SPX0fmCrndX57xXqHDVQWTYqozToc+ooblBTXC3Zw/kif
+	5/5wwA==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 46mbcnubd9-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 14 May 2025 16:18:42 +0000 (GMT)
+	Wed, 14 May 2025 16:22:55 +0000 (GMT)
 Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 54EGIf5w015233
+	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 54EGMs02014122
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 14 May 2025 16:18:41 GMT
+	Wed, 14 May 2025 16:22:54 GMT
 Received: from [10.253.10.1] (10.80.80.8) by nasanex01a.na.qualcomm.com
  (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 14 May
- 2025 09:18:37 -0700
-Message-ID: <2f9ab3f6-6477-4d94-ba8a-1f2af865461e@quicinc.com>
-Date: Thu, 15 May 2025 00:18:35 +0800
+ 2025 09:22:51 -0700
+Message-ID: <e92c87cf-2645-493c-b9d3-ce92249116d1@quicinc.com>
+Date: Thu, 15 May 2025 00:22:49 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,7 +65,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH v4 07/11] net: pcs: Add Xilinx PCS driver
+Subject: Re: [net-next PATCH v4 03/11] net: pcs: Add subsystem
 To: Sean Anderson <sean.anderson@linux.dev>, <netdev@vger.kernel.org>,
         Andrew
  Lunn <andrew+netdev@lunn.ch>,
@@ -79,675 +79,1202 @@ CC: <upstream@airoha.com>, Kory Maincent <kory.maincent@bootlin.com>,
  Horman <horms@kernel.org>,
         Christian Marangi <ansuelsmth@gmail.com>,
         <linux-kernel@vger.kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
-        Michal Simek <michal.simek@amd.com>,
-        Radhey Shyam Pandey
-	<radhey.shyam.pandey@amd.com>,
-        Robert Hancock <robert.hancock@calian.com>,
-        <linux-arm-kernel@lists.infradead.org>
+        Jonathan Corbet <corbet@lwn.net>, <linux-doc@vger.kernel.org>
 References: <20250512161013.731955-1-sean.anderson@linux.dev>
- <20250512161013.731955-8-sean.anderson@linux.dev>
+ <20250512161013.731955-4-sean.anderson@linux.dev>
 Content-Language: en-US
 From: Lei Wei <quic_leiwei@quicinc.com>
-In-Reply-To: <20250512161013.731955-8-sean.anderson@linux.dev>
+In-Reply-To: <20250512161013.731955-4-sean.anderson@linux.dev>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
  nasanex01a.na.qualcomm.com (10.52.223.231)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: ozG6ildJBPdThrqkCeZlakTGaYFt_R1g
-X-Proofpoint-ORIG-GUID: ozG6ildJBPdThrqkCeZlakTGaYFt_R1g
-X-Authority-Analysis: v=2.4 cv=cO7gskeN c=1 sm=1 tr=0 ts=6824c262 cx=c_pps
+X-Proofpoint-ORIG-GUID: AKoEpwXSYNoqa5NE5aw2oyvMjEXXvnSU
+X-Authority-Analysis: v=2.4 cv=D8dHKuRj c=1 sm=1 tr=0 ts=6824c35f cx=c_pps
  a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=zd2uoN0lAAAA:8
- a=VwQbUJbxAAAA:8 a=vE6nA0IPAAAA:8 a=P5c4bXi-YeLwHeKGcrwA:9 a=QEXdDO2ut3YA:10
- a=_s8P6U4_B6QeRRtK5oEG:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTE0MDE0NSBTYWx0ZWRfX5MO1LI8wwflF
- bpGwohZ+TP87w7cCGgjXBuxXPmRJkW1sdGafPMv5bld4TzDEn/QYhW+NjLS6iAKqZq6R0GhZic6
- ktdySquMA3VX9Qy2V9GmBl2pNjmZjQpeTHgzQJM/k6v5taog/UWLvvHEipi8pY2eEYTm5MAuUQH
- qo8bUC5t6LHE4fKqJ485h4FGnnBQz0INmnDSTZGjtsuGCLrdlA1M7bniGt2FZiYiLPaNHj8sRDC
- lEinqMv+U3BdU5aEnRJk35ci3f6s8o2/jcODZ6TRVmtHjZO3o6g0pSSqKw3eDXZ3X/AsPTfF38o
- QH5Vq4U6DUn6A7nEZaM1Y5YeGJi9fPrN4XhiMKqyFAeddtMq0Y1AjfzZ1T4YZqEBj6OrMTYh3T2
- ldJprRoaEe/EYZGEQo2IdJVir74pn/BVJfXYNBdEqLE8WR190CRoZ5UTESRVHYeBJrVqLo3a
+ a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=OGjWj8McAAAA:8
+ a=vE6nA0IPAAAA:8 a=HvN3oE3V39HdZpawzVkA:9 a=QEXdDO2ut3YA:10 a=-FEs8UIgK8oA:10
+ a=UYjydHh6ynBBc6_pBLvz:22 a=_s8P6U4_B6QeRRtK5oEG:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTE0MDE0NiBTYWx0ZWRfXx2I+o9Tozsld
+ 2WPxSMwQJODe5rxfR5Ri9JrSrHADHTBazOtm3L81UFi/4Di+/MS1ofOUs3C9Mw20l6ECHv5AJPQ
+ yjwSTCwEtbSwcMQ9lnXVOV9Hu2pKHdGLUPX1XIXAlTEKtu3rgFeQlJHKuZFB2TgkomiA22m2DJ1
+ s9+fg2Bacl1srIvhEe7fX2UeJ+Uv+syJIcyXBQ+8eyVqqf2s6x07BmSQaTDnWwpQmtP2zDKwBpj
+ CemZyjuiQ5C/bp0EsGnDtzkkwDJOcnQLPg9r87/wlMzlx3HrNiM9EFrsF8eN1tTk0HPx7aS5Lu6
+ QwX+nTeqPqEbzdUqquNlj4ebQncYxWtNlOiqUedQ4y7A8xwnY7EISxXJvvF7QEvKdP47jVjbbia
+ eWD0/VeTzUG6sv2UcmTy6B+ZHtQRq2TFKHcHUmMOoz2973iIsGMDexoucd01NKmTzP2ptiFY
+X-Proofpoint-GUID: AKoEpwXSYNoqa5NE5aw2oyvMjEXXvnSU
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
  definitions=2025-05-14_04,2025-05-14_03,2025-02-21_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxlogscore=999 spamscore=0 suspectscore=0 phishscore=0 lowpriorityscore=0
- adultscore=0 bulkscore=0 malwarescore=0 impostorscore=0 clxscore=1011
- priorityscore=1501 mlxscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505070000
- definitions=main-2505140145
+ mlxlogscore=999 spamscore=0 impostorscore=0 bulkscore=0 priorityscore=1501
+ suspectscore=0 malwarescore=0 mlxscore=0 adultscore=0 phishscore=0
+ clxscore=1011 lowpriorityscore=0 classifier=spam authscore=0 authtc=n/a
+ authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2505070000 definitions=main-2505140146
 
 
 
 On 5/13/2025 12:10 AM, Sean Anderson wrote:
-> This adds support for the Xilinx 1G/2.5G Ethernet PCS/PMA or SGMII device.
-> This is a soft device which converts between GMII and either SGMII,
-> 1000Base-X, or 2500Base-X. If configured correctly, it can also switch
-> between SGMII and 1000BASE-X at runtime. Thoretically this is also possible
-> for 2500Base-X, but that requires reconfiguring the serdes. The exact
-> capabilities depend on synthesis parameters, so they are read from the
-> devicetree.
+> This adds support for getting PCS devices from the device tree. PCS
+> drivers must first register with phylink_register_pcs. After that, MAC
+> drivers may look up their PCS using phylink_get_pcs.
 > 
-> This device has a c22-compliant PHY interface, so for the most part we can
-> just use the phylink helpers. This device supports an interrupt which is
-> triggered on autonegotiation completion. I'm not sure how useful this is,
-> since we can never detect a link down (in the PCS).
+> We wrap registered PCSs in another PCS. This wrapper PCS is refcounted
+> and can outlive the wrapped PCS (such as if the wrapped PCS's driver is
+> unbound). The wrapper forwards all PCS callbacks to the wrapped PCS,
+> first checking to make sure the wrapped PCS still exists. This design
+> was inspired by Bartosz Golaszewski's talk at LPC [1].
 > 
-> This device supports sharing some logic between different implementations
-> of the device. In this case, one device contains the "shared logic" and the
-> clocks are connected to other devices. To coordinate this, one device
-> registers a clock that the other devices can request.  The clock is enabled
-> in the probe function by releasing the device from reset. There are no othe
-> software controls, so the clock ops are empty.
+> pcs_get_by_fwnode_compat is a bit hairy, but it's necessary for
+> compatibility with existing drivers, which often attach to (devicetree)
+> nodes directly. We use the devicetree changeset system instead of
+> adding a (secondary) software node because mdio_bus_match calls
+> of_driver_match_device to match devices, and that function only works on
+> devicetree nodes.
 > 
-> Later in this series, we will convert the Xilinx AXI Ethernet driver to use
-> this PCS. To help out, we provide a compatibility function to bind this
-> driver in the event the MDIO device has no compatible.
+> [1] https://lpc.events/event/17/contributions/1627/
 > 
 > Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
 > ---
 > 
 > Changes in v4:
-> - Re-add documentation for axienet_xilinx_pcs_get that was accidentally
->    removed
+> - Adjust variable ordering in pcs_find_fwnode
+> - Annotate pcs_wrapper.wrapped with __rcu
+> - Fix PCS lookup functions missing ERR_PTR casts
+> - Fix documentation for devm_pcs_register_full
+> - Fix incorrect condition in pcs_post_config
+> - Fix linking when PCS && !OF_DYNAMIC
+> - Fix linking when PCS && OF_DYNAMIC && PHYLIB=m
+> - Reduce line lengths to under 80 characters
+> - Remove unused dev parameter to pcs_put
+> - Use a spinlock instead of a mutex to protect pcs_wrappers
 > 
 > Changes in v3:
-> - Adjust axienet_xilinx_pcs_get for changes to pcs_find_fwnode API
-> - Call devm_pcs_register instead of devm_pcs_register_provider
+> - Remove support for #pcs-cells. Upon further investigation, the
+>    requested functionality can be accomplished by specifying the PCS's
+>    fwnode manually.
 > 
 > Changes in v2:
+> - Add fallbacks for pcs_get* and pcs_put
 > - Add support for #pcs-cells
-> - Change compatible to just xlnx,pcs
-> - Drop PCS_ALTERA_TSE which was accidentally added while rebasing
-> - Rework xilinx_pcs_validate to just clear out half-duplex modes instead
->    of constraining modes based on the interface.
+> - Remove outdated comment
+> - Remove unused variable
 > 
->   MAINTAINERS                  |   6 +
->   drivers/net/pcs/Kconfig      |  21 ++
->   drivers/net/pcs/Makefile     |   2 +
->   drivers/net/pcs/pcs-xilinx.c | 488 +++++++++++++++++++++++++++++++++++
->   include/linux/pcs-xilinx.h   |  15 ++
->   5 files changed, 532 insertions(+)
->   create mode 100644 drivers/net/pcs/pcs-xilinx.c
->   create mode 100644 include/linux/pcs-xilinx.h
+>   Documentation/networking/index.rst |   1 +
+>   Documentation/networking/kapi.rst  |   4 +
+>   Documentation/networking/pcs.rst   | 102 +++++
+>   MAINTAINERS                        |   2 +
+>   drivers/net/pcs/Kconfig            |  13 +
+>   drivers/net/pcs/Makefile           |   2 +
+>   drivers/net/pcs/core.c             | 686 +++++++++++++++++++++++++++++
+>   include/linux/pcs.h                | 205 +++++++++
+>   8 files changed, 1015 insertions(+)
+>   create mode 100644 Documentation/networking/pcs.rst
+>   create mode 100644 drivers/net/pcs/core.c
+>   create mode 100644 include/linux/pcs.h
 > 
+> diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
+> index ac90b82f3ce9..ff0e5968850b 100644
+> --- a/Documentation/networking/index.rst
+> +++ b/Documentation/networking/index.rst
+> @@ -30,6 +30,7 @@ Contents:
+>      page_pool
+>      phy
+>      sfp-phylink
+> +   pcs
+>      alias
+>      bridge
+>      snmp_counter
+> diff --git a/Documentation/networking/kapi.rst b/Documentation/networking/kapi.rst
+> index 98682b9a13ee..7a48178649de 100644
+> --- a/Documentation/networking/kapi.rst
+> +++ b/Documentation/networking/kapi.rst
+> @@ -146,6 +146,10 @@ PHYLINK
+>   
+>   .. kernel-doc:: include/linux/phylink.h
+>      :internal:
+> +   :no-identifiers: phylink_pcs phylink_pcs_ops pcs_validate pcs_inband_caps
+> +      pcs_enable pcs_disable pcs_pre_config pcs_post_config pcs_get_state
+> +      pcs_config pcs_an_restart pcs_link_up pcs_disable_eee pcs_enable_eee
+> +      pcs_pre_init
+>   
+>   .. kernel-doc:: drivers/net/phy/phylink.c
+>   
+> diff --git a/Documentation/networking/pcs.rst b/Documentation/networking/pcs.rst
+> new file mode 100644
+> index 000000000000..4b41ba884160
+> --- /dev/null
+> +++ b/Documentation/networking/pcs.rst
+> @@ -0,0 +1,102 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> +=============
+> +PCS Subsystem
+> +=============
+> +
+> +The PCS (Physical Coding Sublayer) subsystem handles the registration and lookup
+> +of PCS devices. These devices contain the upper sublayers of the Ethernet
+> +physical layer, generally handling framing, scrambling, and encoding tasks. PCS
+> +devices may also include PMA (Physical Medium Attachment) components. PCS
+> +devices transfer data between the Link-layer MAC device, and the rest of the
+> +physical layer, typically via a serdes. The output of the serdes may be
+> +connected more-or-less directly to the medium when using fiber-optic or
+> +backplane connections (1000BASE-SX, 1000BASE-KX, etc). It may also communicate
+> +with a separate PHY (such as over SGMII) which handles the connection to the
+> +medium (such as 1000BASE-T).
+> +
+> +Looking up PCS Devices
+> +----------------------
+> +
+> +There are generally two ways to look up a PCS device. If the PCS device is
+> +internal to a larger device (such as a MAC or switch), and it does not share an
+> +implementation with an existing PCS, then it does not need to be registered with
+> +the PCS subsystem. Instead, you can populate a :c:type:`phylink_pcs`
+> +in your probe function. Otherwise, you must look up the PCS.
+> +
+> +If your device has a :c:type:`fwnode_handle`, you can add a PCS using the
+> +``pcs-handle`` property::
+> +
+> +    ethernet-controller {
+> +        // ...
+> +        pcs-handle = <&pcs>;
+> +        pcs-handle-names = "internal";
+> +    };
+> +
+> +Then, during your probe function, you can get the PCS using :c:func:`pcs_get`::
+> +
+> +    mac->pcs = pcs_get(dev, "internal");
+> +    if (IS_ERR(mac->pcs)) {
+> +        err = PTR_ERR(mac->pcs);
+> +        return dev_err_probe(dev, "Could not get PCS\n");
+> +    }
+> +
+> +If your device doesn't have a :c:type:`fwnode_handle`, you can get the PCS
+> +based on the providing device using :c:func:`pcs_get_by_dev`. Typically, you
+> +will create the device and bind your PCS driver to it before calling this
+> +function. This allows reuse of an existing PCS driver.
+> +
+> +Once you are done using the PCS, you must call :c:func:`pcs_put`.
+> +
+> +Using PCS Devices
+> +-----------------
+> +
+> +To select the PCS from a MAC driver, implement the ``mac_select_pcs`` callback
+> +of :c:type:`phylink_mac_ops`. In this example, the PCS is selected for SGMII
+> +and 1000BASE-X, and deselected for other interfaces::
+> +
+> +    static struct phylink_pcs *mac_select_pcs(struct phylink_config *config,
+> +                                              phy_interface_t iface)
+> +    {
+> +        struct mac *mac = config_to_mac(config);
+> +
+> +        switch (iface) {
+> +        case PHY_INTERFACE_MODE_SGMII:
+> +        case PHY_INTERFACE_MODE_1000BASEX:
+> +            return mac->pcs;
+> +        default:
+> +            return NULL;
+> +        }
+> +    }
+> +
+> +To do the same from a DSA driver, implement the ``phylink_mac_select_pcs``
+> +callback of :c:type:`dsa_switch_ops`.
+> +
+> +Writing PCS Drivers
+> +-------------------
+> +
+> +To write a PCS driver, first implement :c:type:`phylink_pcs_ops`. Then,
+> +register your PCS in your probe function using :c:func:`pcs_register`. If you
+> +need to provide multiple PCSs for the same device, then you can pass specific
+> +firmware nodes using :c:macro:`pcs_register_full`.
+> +
+> +You must call :c:func:`pcs_unregister` from your remove function. You can avoid
+> +this step by registering with :c:func:`devm_pcs_unregister`.
+> +
+> +API Reference
+> +-------------
+> +
+> +.. kernel-doc:: include/linux/phylink.h
+> +   :identifiers: phylink_pcs phylink_pcs_ops pcs_validate pcs_inband_caps
+> +      pcs_enable pcs_disable pcs_pre_config pcs_post_config pcs_get_state
+> +      pcs_config pcs_an_restart pcs_link_up pcs_disable_eee pcs_enable_eee
+> +      pcs_pre_init
+> +
+> +.. kernel-doc:: include/linux/pcs.h
+> +   :internal:
+> +
+> +.. kernel-doc:: drivers/net/pcs/core.c
+> +   :export:
+> +
+> +.. kernel-doc:: drivers/net/pcs/core.c
+> +   :internal:
 > diff --git a/MAINTAINERS b/MAINTAINERS
-> index 65f936521d65..4f41237b1f36 100644
+> index 1248443035f4..65f936521d65 100644
 > --- a/MAINTAINERS
 > +++ b/MAINTAINERS
-> @@ -26454,6 +26454,12 @@ L:	netdev@vger.kernel.org
->   S:	Orphan
->   F:	drivers/net/ethernet/xilinx/ll_temac*
->   
-> +XILINX PCS DRIVER
-> +M:	Sean Anderson <sean.anderson@linux.dev>
-> +S:	Maintained
-> +F:	Documentation/devicetree/bindings/net/xilinx,pcs.yaml
-> +F:	drivers/net/pcs/pcs-xilinx.c
-> +
->   XILINX PWM DRIVER
->   M:	Sean Anderson <sean.anderson@seco.com>
->   S:	Maintained
+> @@ -8771,6 +8771,7 @@ F:	Documentation/ABI/testing/sysfs-class-net-phydev
+>   F:	Documentation/devicetree/bindings/net/ethernet-phy.yaml
+>   F:	Documentation/devicetree/bindings/net/mdio*
+>   F:	Documentation/devicetree/bindings/net/qca,ar803x.yaml
+> +F:	Documentation/networking/pcs.rst
+>   F:	Documentation/networking/phy.rst
+>   F:	drivers/net/mdio/
+>   F:	drivers/net/mdio/acpi_mdio.c
+> @@ -8784,6 +8785,7 @@ F:	include/linux/linkmode.h
+>   F:	include/linux/mdio/*.h
+>   F:	include/linux/mii.h
+>   F:	include/linux/of_net.h
+> +F:	include/linux/pcs.h
+>   F:	include/linux/phy.h
+>   F:	include/linux/phy_fixed.h
+>   F:	include/linux/phy_link_topology.h
 > diff --git a/drivers/net/pcs/Kconfig b/drivers/net/pcs/Kconfig
-> index ef3dc57da1b5..5c2209cc8b31 100644
+> index f6aa437473de..6d19625b696d 100644
 > --- a/drivers/net/pcs/Kconfig
 > +++ b/drivers/net/pcs/Kconfig
-> @@ -51,4 +51,25 @@ config PCS_RZN1_MIIC
->   	  on RZ/N1 SoCs. This PCS converts MII to RMII/RGMII or can be set in
->   	  pass-through mode for MII.
+> @@ -5,6 +5,19 @@
 >   
-> +config PCS_XILINX
-> +	depends on OF
-> +	depends on GPIOLIB
-> +	depends on COMMON_CLK
-> +	depends on PCS
-> +	select MDIO_DEVICE
-> +	select PHYLINK
-> +	tristate "Xilinx PCS driver"
+>   menu "PCS device drivers"
+>   
+> +config PCS
+> +	bool "PCS subsystem"
+> +	select PHYLIB if OF_DYNAMIC
 > +	help
-> +	  PCS driver for the Xilinx 1G/2.5G Ethernet PCS/PMA or SGMII device.
-> +	  This device can either act as a PCS+PMA for 1000BASE-X or 2500BASE-X,
-> +	  or as a GMII-to-SGMII bridge. It can also switch between 1000BASE-X
-> +	  and SGMII dynamically if configured correctly when synthesized.
-> +	  Typical applications use this device on an FPGA connected to a GEM or
-> +	  TEMAC on the GMII side. The other side is typically connected to
-> +	  on-device gigabit transceivers, off-device SERDES devices using TBI,
-> +	  or LVDS IO resources directly.
+> +	  This provides common helper functions for registering and looking up
+> +	  Physical Coding Sublayer (PCS) devices. PCS devices translate between
+> +	  different interface types. In some use cases, they may either
+> +	  translate between different types of Medium-Independent Interfaces
+> +	  (MIIs), such as translating GMII to SGMII. This allows using a fast
+> +	  serial interface to talk to the phy which translates the MII to the
+> +	  Medium-Dependent Interface. Alternatively, they may translate a MII
+> +	  directly to an MDI, such as translating GMII to 1000Base-X.
 > +
-> +	  To compile this driver as a module, choose M here: the module
-> +	  will be called pcs-xilinx.
-> +
->   endmenu
+>   config PCS_XPCS
+>   	tristate "Synopsys DesignWare Ethernet XPCS"
+>   	select PHYLINK
 > diff --git a/drivers/net/pcs/Makefile b/drivers/net/pcs/Makefile
-> index 35e3324fc26e..347afd91f034 100644
+> index 4f7920618b90..35e3324fc26e 100644
 > --- a/drivers/net/pcs/Makefile
 > +++ b/drivers/net/pcs/Makefile
-> @@ -10,3 +10,5 @@ obj-$(CONFIG_PCS_XPCS)		+= pcs_xpcs.o
->   obj-$(CONFIG_PCS_LYNX)		+= pcs-lynx.o
->   obj-$(CONFIG_PCS_MTK_LYNXI)	+= pcs-mtk-lynxi.o
->   obj-$(CONFIG_PCS_RZN1_MIIC)	+= pcs-rzn1-miic.o
-> +obj-$(CONFIG_PCS_ALTERA_TSE)	+= pcs-altera-tse.o
-> +obj-$(CONFIG_PCS_XILINX)	+= pcs-xilinx.o
-> diff --git a/drivers/net/pcs/pcs-xilinx.c b/drivers/net/pcs/pcs-xilinx.c
+> @@ -1,6 +1,8 @@
+>   # SPDX-License-Identifier: GPL-2.0
+>   # Makefile for Linux PCS drivers
+>   
+> +obj-$(CONFIG_PCS)		+= core.o
+> +
+>   pcs_xpcs-$(CONFIG_PCS_XPCS)	:= pcs-xpcs.o pcs-xpcs-plat.o \
+>   				   pcs-xpcs-nxp.o pcs-xpcs-wx.o
+>   
+> diff --git a/drivers/net/pcs/core.c b/drivers/net/pcs/core.c
 > new file mode 100644
-> index 000000000000..cc42e2a22cd2
+> index 000000000000..133df15483f0
 > --- /dev/null
-> +++ b/drivers/net/pcs/pcs-xilinx.c
-> @@ -0,0 +1,488 @@
-> +// SPDX-License-Identifier: GPL-2.0+
+> +++ b/drivers/net/pcs/core.c
+> @@ -0,0 +1,686 @@
+> +// SPDX-License-Identifier: GPL-2.0
 > +/*
-> + * Copyright 2021-25 Sean Anderson <sean.anderson@seco.com>
-> + *
-> + * This is the driver for the Xilinx 1G/2.5G Ethernet PCS/PMA or SGMII LogiCORE
-> + * IP. A typical setup will look something like
-> + *
-> + * MAC <--GMII--> PCS/PMA <--1000BASE-X--> SFP module (PMD)
-> + *
-> + * The IEEE model mostly describes this device, but the PCS layer has a
-> + * separate sublayer for 8b/10b en/decoding:
-> + *
-> + * - When using a device-specific transceiver (serdes), the serdes handles 8b/10b
-> + *   en/decoding and PMA functions. The IP implements other PCS functions.
-> + * - When using LVDS IO resources, the IP implements PCS and PMA functions,
-> + *   including 8b/10b en/decoding and (de)serialization.
-> + * - When using an external serdes (accessed via TBI), the IP implements all
-> + *   PCS functions, including 8b/10b en/decoding.
-> + *
-> + * The link to the PMD is not modeled by this driver, except for refclk. It is
-> + * assumed that the serdes (if present) needs no configuration, though it
-> + * should be fairly easy to add support. It is also possible to go from SGMII
-> + * to GMII (PHY mode), but this is not supported.
-> + *
-> + * This driver was written with reference to PG047:
-> + * https://docs.amd.com/r/en-US/pg047-gig-eth-pcs-pma
+> + * Copyright (C) 2022-25 Sean Anderson <sean.anderson@seco.com>
 > + */
 > +
-> +#include <linux/bitmap.h>
-> +#include <linux/clk.h>
-> +#include <linux/clk-provider.h>
-> +#include <linux/gpio/consumer.h>
-> +#include <linux/iopoll.h>
-> +#include <linux/mdio.h>
+> +#define pr_fmt(fmt) "pcs-core: " fmt
+> +
+> +#include <linux/fwnode.h>
+> +#include <linux/list.h>
 > +#include <linux/of.h>
 > +#include <linux/pcs.h>
-> +#include <linux/pcs-xilinx.h>
 > +#include <linux/phylink.h>
 > +#include <linux/property.h>
+> +#include <linux/rcupdate.h>
+> +#include <linux/spinlock.h>
 > +
-> +#include "../phy/phy-caps.h"
-> +
-> +/* Vendor-specific MDIO registers */
-> +#define XILINX_PCS_ANICR 16 /* Auto-Negotiation Interrupt Control Register */
-> +#define XILINX_PCS_SSR   17 /* Standard Selection Register */
-> +
-> +#define XILINX_PCS_ANICR_IE BIT(0) /* Interrupt Enable */
-> +#define XILINX_PCS_ANICR_IS BIT(1) /* Interrupt Status */
-> +
-> +#define XILINX_PCS_SSR_SGMII BIT(0) /* Select SGMII standard */
+> +static LIST_HEAD(pcs_wrappers);
+> +/* Protects PCS (un)registration i.e. pcs_wrappers */
+> +static DEFINE_SPINLOCK(pcs_lock);
+> +/* Protects pcs_wrapper.pcs from being unregistered while we are operating on
+> + * it. One SRCU is shared by all PCSs, so drivers may wait on other drivers'
+> + * PCSs. If this becomes a problem the SRCU can be made per-PCS.
+> + */
+> +DEFINE_STATIC_SRCU(pcs_srcu);
 > +
 > +/**
-> + * struct xilinx_pcs - Private data for Xilinx PCS devices
-> + * @pcs: The phylink PCS
-> + * @mdiodev: The mdiodevice used to access the PCS
-> + * @refclk: The reference clock for the PMD
-> + * @refclk_out: Optional reference clock for other PCSs using this PCS's shared
-> + *              logic
-> + * @reset: The reset line for the PCS
-> + * @done: Optional GPIO for reset_done
-> + * @irq: IRQ, or -EINVAL if polling
-> + * @enabled: Set if @pcs.link_change is valid and we can call phylink_pcs_change()
+> + * struct pcs_wrapper - Wrapper for a registered PCS
+> + * @pcs: the wrapping PCS
+> + * @refcnt: refcount for the wrapper
+> + * @list: list head for pcs_wrappers
+> + * @dev: the device associated with this PCS
+> + * @fwnode: this PCS's firmware node; typically @dev.fwnode
+> + * @wrapped: the backing PCS
 > + */
-> +struct xilinx_pcs {
+> +struct pcs_wrapper {
 > +	struct phylink_pcs pcs;
-> +	struct clk_hw refclk_out;
-> +	struct clk *refclk;
-> +	struct gpio_desc *reset, *done;
-> +	struct mdio_device *mdiodev;
-> +	int irq;
-> +	bool enabled;
+> +	refcount_t refcnt;
+> +	struct list_head list;
+> +	struct device *dev;
+> +	struct fwnode_handle *fwnode;
+> +	struct phylink_pcs __rcu *wrapped;
 > +};
 > +
-> +static inline struct xilinx_pcs *pcs_to_xilinx(struct phylink_pcs *pcs)
+> +static const struct phylink_pcs_ops pcs_ops;
+> +
+> +static struct pcs_wrapper *pcs_to_wrapper(struct phylink_pcs *pcs)
 > +{
-> +	return container_of(pcs, struct xilinx_pcs, pcs);
+> +	WARN_ON(pcs->ops != &pcs_ops);
+> +	return container_of(pcs, struct pcs_wrapper, pcs);
 > +}
 > +
-> +static irqreturn_t xilinx_pcs_an_irq(int irq, void *dev_id)
+> +static int pcs_validate(struct phylink_pcs *pcs, unsigned long *supported,
+> +			const struct phylink_link_state *state)
 > +{
-> +	struct xilinx_pcs *xp = dev_id;
+> +	struct pcs_wrapper *wrapper = pcs_to_wrapper(pcs);
+> +	struct phylink_pcs *wrapped;
+> +	int ret, idx;
 > +
-> +	if (mdiodev_modify_changed(xp->mdiodev, XILINX_PCS_ANICR,
-> +				   XILINX_PCS_ANICR_IS, 0) <= 0)
-> +		return IRQ_NONE;
-> +
-> +	/* paired with xilinx_pcs_enable/disable; protects xp->pcs->link_change */
-> +	if (smp_load_acquire(&xp->enabled))
-> +		phylink_pcs_change(&xp->pcs, true);
-> +	return IRQ_HANDLED;
-> +}
-> +
-> +static int xilinx_pcs_enable(struct phylink_pcs *pcs)
-> +{
-> +	struct xilinx_pcs *xp = pcs_to_xilinx(pcs);
-> +	struct device *dev = &xp->mdiodev->dev;
-> +	int ret;
-> +
-> +	if (xp->irq < 0)
+> +	if (!wrapper)
 > +		return 0;
 > +
-> +	ret = mdiodev_modify(xp->mdiodev, XILINX_PCS_ANICR, 0,
-> +			     XILINX_PCS_ANICR_IE);
-> +	if (ret)
-> +		dev_err(dev, "could not clear IRQ enable: %d\n", ret);
-> +	else
-> +		/* paired with xilinx_pcs_an_irq */
-> +		smp_store_release(&xp->enabled, true);
+> +	idx = srcu_read_lock(&pcs_srcu);
+> +
+> +	wrapped = srcu_dereference(wrapper->wrapped, &pcs_srcu);
+> +	if (wrapped) {
+> +		if (wrapped->ops->pcs_validate)
+> +			ret = wrapped->ops->pcs_validate(wrapped, supported,
+> +							 state);
+> +		else
+> +			ret = 0;
+> +	} else {
+> +		ret = -ENODEV;
+> +	}
+> +
+> +	srcu_read_unlock(&pcs_srcu, idx);
 > +	return ret;
 > +}
 > +
-> +static void xilinx_pcs_disable(struct phylink_pcs *pcs)
+> +static unsigned int pcs_inband_caps(struct phylink_pcs *pcs,
+> +				    phy_interface_t interface)
 > +{
-> +	struct xilinx_pcs *xp = pcs_to_xilinx(pcs);
-> +	struct device *dev = &xp->mdiodev->dev;
-> +	int err;
+> +	struct pcs_wrapper *wrapper = pcs_to_wrapper(pcs);
+> +	struct phylink_pcs *wrapped;
+> +	int ret, idx;
 > +
-> +	if (xp->irq < 0)
-> +		return;
+> +	idx = srcu_read_lock(&pcs_srcu);
 > +
-> +	WRITE_ONCE(xp->enabled, false);
-> +	/* paired with xilinx_pcs_an_irq */
-> +	smp_wmb();
-> +
-> +	err = mdiodev_modify(xp->mdiodev, XILINX_PCS_ANICR,
-> +			     XILINX_PCS_ANICR_IE, 0);
-> +	if (err)
-> +		dev_err(dev, "could not clear IRQ enable: %d\n", err);
-> +}
-> +
-> +static __ETHTOOL_DECLARE_LINK_MODE_MASK(half_duplex) __ro_after_init;
-> +
-> +static int xilinx_pcs_validate(struct phylink_pcs *pcs,
-> +			       unsigned long *supported,
-> +			       const struct phylink_link_state *state)
-> +{
-> +	linkmode_andnot(supported, supported, half_duplex);
-> +	return 0;
-> +}
-> +
-> +static void xilinx_pcs_get_state(struct phylink_pcs *pcs,
-> +				 unsigned int neg_mode,
-> +				 struct phylink_link_state *state)
-> +{
-> +	struct xilinx_pcs *xp = pcs_to_xilinx(pcs);
-> +
-> +	phylink_mii_c22_pcs_get_state(xp->mdiodev, neg_mode, state);
-> +}
-> +
-> +static int xilinx_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
-> +			     phy_interface_t interface,
-> +			     const unsigned long *advertising,
-> +			     bool permit_pause_to_mac)
-> +{
-> +	int ret, changed = 0;
-> +	struct xilinx_pcs *xp = pcs_to_xilinx(pcs);
-> +
-> +	if (test_bit(PHY_INTERFACE_MODE_SGMII, pcs->supported_interfaces) &&
-> +	    test_bit(PHY_INTERFACE_MODE_1000BASEX, pcs->supported_interfaces)) {
-> +		u16 ssr;
-> +
-> +		if (interface == PHY_INTERFACE_MODE_SGMII)
-> +			ssr = XILINX_PCS_SSR_SGMII;
-> +		else
-> +			ssr = 0;
-> +
-> +		changed = mdiodev_modify_changed(xp->mdiodev, XILINX_PCS_SSR,
-> +						 XILINX_PCS_SSR_SGMII, ssr);
-> +		if (changed < 0)
-> +			return changed;
-> +	}
-> +
-> +	ret = phylink_mii_c22_pcs_config(xp->mdiodev, interface, advertising,
-> +					 neg_mode);
-> +	return ret ?: changed;
-> +}
-> +
-> +static void xilinx_pcs_an_restart(struct phylink_pcs *pcs)
-> +{
-> +	struct xilinx_pcs *xp = pcs_to_xilinx(pcs);
-> +
-> +	phylink_mii_c22_pcs_an_restart(xp->mdiodev);
-> +}
-> +
-> +static void xilinx_pcs_link_up(struct phylink_pcs *pcs, unsigned int mode,
-> +			       phy_interface_t interface, int speed, int duplex)
-> +{
-> +	int bmcr;
-> +	struct xilinx_pcs *xp = pcs_to_xilinx(pcs);
-> +
-> +	if (phylink_autoneg_inband(mode))
-> +		return;
-> +
-> +	bmcr = mdiodev_read(xp->mdiodev, MII_BMCR);
-> +	if (bmcr < 0) {
-> +		dev_err(&xp->mdiodev->dev, "could not read BMCR (err=%d)\n",
-> +			bmcr);
-> +		return;
-> +	}
-> +
-> +	bmcr &= ~(BMCR_SPEED1000 | BMCR_SPEED100);
-> +	switch (speed) {
-> +	case SPEED_2500:
-> +	case SPEED_1000:
-> +		bmcr |= BMCR_SPEED1000;
-> +		break;
-> +	case SPEED_100:
-> +		bmcr |= BMCR_SPEED100;
-> +		break;
-> +	case SPEED_10:
-> +		bmcr |= BMCR_SPEED10;
-> +		break;
-> +	default:
-> +		dev_err(&xp->mdiodev->dev, "invalid speed %d\n", speed);
-> +	}
-> +
-> +	bmcr = mdiodev_write(xp->mdiodev, MII_BMCR, bmcr);
-> +	if (bmcr < 0)
-> +		dev_err(&xp->mdiodev->dev, "could not write BMCR (err=%d)\n",
-> +			bmcr);
-> +}
-> +
-> +static const struct phylink_pcs_ops xilinx_pcs_ops = {
-> +	.pcs_validate = xilinx_pcs_validate,
-> +	.pcs_enable = xilinx_pcs_enable,
-> +	.pcs_disable = xilinx_pcs_disable,
-> +	.pcs_get_state = xilinx_pcs_get_state,
-> +	.pcs_config = xilinx_pcs_config,
-> +	.pcs_an_restart = xilinx_pcs_an_restart,
-> +	.pcs_link_up = xilinx_pcs_link_up,
-> +};
-> +
-> +static const struct clk_ops xilinx_pcs_clk_ops = { };
-> +
-> +static const phy_interface_t xilinx_pcs_interfaces[] = {
-> +	PHY_INTERFACE_MODE_SGMII,
-> +	PHY_INTERFACE_MODE_1000BASEX,
-> +	PHY_INTERFACE_MODE_2500BASEX,
-> +};
-> +
-> +static int xilinx_pcs_probe(struct mdio_device *mdiodev)
-> +{
-> +	struct device *dev = &mdiodev->dev;
-> +	struct fwnode_handle *fwnode = dev->fwnode;
-> +	int ret, i, j, mode_count;
-> +	struct xilinx_pcs *xp;
-> +	const char **modes;
-> +	u32 phy_id;
-> +
-> +	xp = devm_kzalloc(dev, sizeof(*xp), GFP_KERNEL);
-> +	if (!xp)
-> +		return -ENOMEM;
-> +	xp->mdiodev = mdiodev;
-> +	dev_set_drvdata(dev, xp);
-> +
-> +	xp->irq = fwnode_irq_get_byname(fwnode, "an");
-> +	/* There's no _optional variant, so this is the best we've got */
-> +	if (xp->irq < 0 && xp->irq != -EINVAL)
-> +		return dev_err_probe(dev, xp->irq, "could not get IRQ\n");
-> +
-> +	mode_count = fwnode_property_string_array_count(fwnode,
-> +							"xlnx,pcs-modes");
-> +	if (!mode_count)
-> +		mode_count = -ENODATA;
-> +	if (mode_count < 0) {
-> +		dev_err(dev, "could not read xlnx,pcs-modes: %d", mode_count);
-> +		return mode_count;
-> +	}
-> +
-> +	modes = kcalloc(mode_count, sizeof(*modes), GFP_KERNEL);
-> +	if (!modes)
-> +		return -ENOMEM;
-> +
-> +	ret = fwnode_property_read_string_array(fwnode, "xlnx,pcs-modes",
-> +						modes, mode_count);
-> +	if (ret < 0) {
-> +		dev_err(dev, "could not read xlnx,pcs-modes: %d\n", ret);
-> +		kfree(modes);
-> +		return ret;
-> +	}
-> +
-> +	for (i = 0; i < mode_count; i++) {
-> +		for (j = 0; j < ARRAY_SIZE(xilinx_pcs_interfaces); j++) {
-> +			if (!strcmp(phy_modes(xilinx_pcs_interfaces[j]), modes[i])) {
-> +				__set_bit(xilinx_pcs_interfaces[j],
-> +					  xp->pcs.supported_interfaces);
-> +				goto next;
-> +			}
-> +		}
-> +
-> +		dev_err(dev, "invalid pcs-mode \"%s\"\n", modes[i]);
-> +		kfree(modes);
-> +		return -EINVAL;
-> +next:
-> +	}
-> +
-> +	kfree(modes);
-> +	if ((test_bit(PHY_INTERFACE_MODE_SGMII, xp->pcs.supported_interfaces) ||
-> +	     test_bit(PHY_INTERFACE_MODE_1000BASEX, xp->pcs.supported_interfaces)) &&
-> +	    test_bit(PHY_INTERFACE_MODE_2500BASEX, xp->pcs.supported_interfaces)) {
-> +		dev_err(dev,
-> +			"Switching from SGMII or 1000Base-X to 2500Base-X not supported\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	xp->reset = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_HIGH);
-> +	if (IS_ERR(xp->reset))
-> +		return dev_err_probe(dev, PTR_ERR(xp->reset),
-> +				     "could not get reset gpio\n");
-> +
-> +	xp->done = devm_gpiod_get_optional(dev, "done", GPIOD_IN);
-> +	if (IS_ERR(xp->done))
-> +		return dev_err_probe(dev, PTR_ERR(xp->done),
-> +				     "could not get done gpio\n");
-> +
-> +	xp->refclk = devm_clk_get_optional_enabled(dev, "refclk");
-> +	if (IS_ERR(xp->refclk))
-> +		return dev_err_probe(dev, PTR_ERR(xp->refclk),
-> +				     "could not get/enable reference clock\n");
-> +
-> +	gpiod_set_value_cansleep(xp->reset, 0);
-> +	if (xp->done) {
-> +		if (read_poll_timeout(gpiod_get_value_cansleep, ret, ret, 1000,
-> +				      100000, true, xp->done))
-> +			return dev_err_probe(dev, -ETIMEDOUT,
-> +					     "timed out waiting for reset\n");
-> +	} else {
-> +		/* Just wait for a while and hope we're done */
-> +		usleep_range(50000, 100000);
-> +	}
-> +
-> +	if (fwnode_property_present(fwnode, "#clock-cells")) {
-> +		const char *parent = "refclk";
-> +		struct clk_init_data init = {
-> +			.name = fwnode_get_name(fwnode),
-> +			.ops = &xilinx_pcs_clk_ops,
-> +			.parent_names = &parent,
-> +			.num_parents = 1,
-> +			.flags = 0,
-> +		};
-> +
-> +		xp->refclk_out.init = &init;
-> +		ret = devm_clk_hw_register(dev, &xp->refclk_out);
-> +		if (ret)
-> +			return dev_err_probe(dev, ret,
-> +					     "could not register refclk\n");
-> +
-> +		ret = devm_of_clk_add_hw_provider(dev, of_clk_hw_simple_get,
-> +						  &xp->refclk_out);
-> +		if (ret)
-> +			return dev_err_probe(dev, ret,
-> +					     "could not register refclk\n");
-> +	}
-> +
-> +	/* Sanity check */
-> +	ret = get_phy_c22_id(mdiodev->bus, mdiodev->addr, &phy_id);
-> +	if (ret) {
-> +		dev_err_probe(dev, ret, "could not read id\n");
-> +		return ret;
-> +	}
-> +	if ((phy_id & 0xfffffff0) != 0x01740c00)
-> +		dev_warn(dev, "unknown phy id %x\n", phy_id);
-> +
-> +	if (xp->irq < 0) {
-> +		xp->pcs.poll = true;
-> +	} else {
-> +		/* The IRQ is enabled by default; turn it off */
-> +		ret = mdiodev_write(xp->mdiodev, XILINX_PCS_ANICR, 0);
-> +		if (ret) {
-> +			dev_err(dev, "could not disable IRQ: %d\n", ret);
-> +			return ret;
-> +		}
-> +
-> +		/* Some PCSs have a bad habit of re-enabling their IRQ!
-> +		 * Request the IRQ in probe so we don't end up triggering the
-> +		 * spurious IRQ logic.
-> +		 */
-> +		ret = devm_request_threaded_irq(dev, xp->irq, NULL, xilinx_pcs_an_irq,
-> +						IRQF_SHARED | IRQF_ONESHOT,
-> +						dev_name(dev), xp);
-> +		if (ret) {
-> +			dev_err(dev, "could not request IRQ: %d\n", ret);
-> +			return ret;
-> +		}
-> +	}
-> +
-> +	xp->pcs.ops = &xilinx_pcs_ops;
-> +	ret = devm_pcs_register(dev, &xp->pcs);
-> +	if (ret)
-> +		return dev_err_probe(dev, ret, "could not register PCS\n");
-> +
-> +	if (xp->irq < 0)
-> +		dev_info(dev, "probed with irq=poll\n");
+> +	wrapped = srcu_dereference(wrapper->wrapped, &pcs_srcu);
+> +	if (wrapped && wrapped->ops->pcs_inband_caps)
+> +		ret = wrapped->ops->pcs_inband_caps(wrapped, interface);
 > +	else
-> +		dev_info(dev, "probed with irq=%d\n", xp->irq);
-> +	return 0;
+> +		ret = 0;
+> +
+> +	srcu_read_unlock(&pcs_srcu, idx);
+> +	return ret;
 > +}
 > +
-> +static const struct of_device_id xilinx_pcs_of_match[] = {
-> +	{ .compatible = "xlnx,pcs", },
-> +	{},
+> +static int pcs_enable(struct phylink_pcs *pcs)
+> +{
+> +	struct pcs_wrapper *wrapper = pcs_to_wrapper(pcs);
+> +	struct phylink_pcs *wrapped;
+> +	int ret, idx;
+> +
+> +	if (!wrapper)
+> +		return 0;
+> +
+> +	idx = srcu_read_lock(&pcs_srcu);
+> +
+> +	wrapped = srcu_dereference(wrapper->wrapped, &pcs_srcu);
+> +	if (wrapped) {
+> +		if (wrapped->ops->pcs_enable)
+> +			ret = wrapped->ops->pcs_enable(wrapped);
+> +		else
+> +			ret = 0;
+> +	} else {
+> +		ret = -ENODEV;
+> +	}
+> +
+> +	srcu_read_unlock(&pcs_srcu, idx);
+> +	return ret;
+> +}
+> +
+> +static void pcs_disable(struct phylink_pcs *pcs)
+> +{
+> +	struct pcs_wrapper *wrapper = pcs_to_wrapper(pcs);
+> +	struct phylink_pcs *wrapped;
+> +	int idx;
+> +
+> +	idx = srcu_read_lock(&pcs_srcu);
+> +
+> +	wrapped = srcu_dereference(wrapper->wrapped, &pcs_srcu);
+> +	if (wrapped && wrapped->ops->pcs_disable)
+> +		wrapped->ops->pcs_disable(wrapped);
+> +
+> +	srcu_read_unlock(&pcs_srcu, idx);
+> +}
+> +
+> +static void pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
+> +			  struct phylink_link_state *state)
+> +{
+> +	struct pcs_wrapper *wrapper = pcs_to_wrapper(pcs);
+> +	struct phylink_pcs *wrapped;
+> +	int idx;
+> +
+> +	idx = srcu_read_lock(&pcs_srcu);
+> +
+> +	wrapped = srcu_dereference(wrapper->wrapped, &pcs_srcu);
+> +	if (wrapped)
+> +		wrapped->ops->pcs_get_state(wrapped, neg_mode, state);
+> +	else
+> +		state->link = 0;
+> +
+> +	srcu_read_unlock(&pcs_srcu, idx);
+> +}
+> +
+> +static void pcs_pre_config(struct phylink_pcs *pcs,
+> +			   phy_interface_t interface)
+> +{
+> +	struct pcs_wrapper *wrapper = pcs_to_wrapper(pcs);
+> +	struct phylink_pcs *wrapped;
+> +	int idx;
+> +
+> +	idx = srcu_read_lock(&pcs_srcu);
+> +
+> +	wrapped = srcu_dereference(wrapper->wrapped, &pcs_srcu);
+> +	if (wrapped && wrapped->ops->pcs_pre_config)
+> +		wrapped->ops->pcs_pre_config(wrapped, interface);
+> +
+> +	srcu_read_unlock(&pcs_srcu, idx);
+> +}
+> +
+> +static int pcs_post_config(struct phylink_pcs *pcs,
+> +			   phy_interface_t interface)
+> +{
+> +	struct pcs_wrapper *wrapper = pcs_to_wrapper(pcs);
+> +	struct phylink_pcs *wrapped;
+> +	int ret, idx;
+> +
+> +	idx = srcu_read_lock(&pcs_srcu);
+> +
+> +	wrapped = srcu_dereference(wrapper->wrapped, &pcs_srcu);
+> +	if (wrapped && wrapped->ops->pcs_post_config)
+> +		ret = wrapped->ops->pcs_post_config(wrapped, interface);
+> +	else
+> +		ret = 0;
+> +
+> +	srcu_read_unlock(&pcs_srcu, idx);
+> +	return ret;
+> +}
+> +
+> +static int pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
+> +		      phy_interface_t interface,
+> +		      const unsigned long *advertising,
+> +		      bool permit_pause_to_mac)
+> +{
+> +	struct pcs_wrapper *wrapper = pcs_to_wrapper(pcs);
+> +	struct phylink_pcs *wrapped;
+> +	int ret, idx;
+> +
+> +	idx = srcu_read_lock(&pcs_srcu);
+> +
+> +	wrapped = srcu_dereference(wrapper->wrapped, &pcs_srcu);
+> +	if (wrapped)
+> +		ret = wrapped->ops->pcs_config(wrapped, neg_mode, interface,
+> +					       advertising, permit_pause_to_mac);
+> +	else
+> +		ret = -ENODEV;
+> +
+> +	srcu_read_unlock(&pcs_srcu, idx);
+> +	return ret;
+> +}
+> +
+> +static void pcs_an_restart(struct phylink_pcs *pcs)
+> +{
+> +	struct pcs_wrapper *wrapper = pcs_to_wrapper(pcs);
+> +	struct phylink_pcs *wrapped;
+> +	int idx;
+> +
+> +	idx = srcu_read_lock(&pcs_srcu);
+> +
+> +	wrapped = srcu_dereference(wrapper->wrapped, &pcs_srcu);
+> +	if (wrapped)
+> +		wrapped->ops->pcs_an_restart(wrapped);
+> +
+> +	srcu_read_unlock(&pcs_srcu, idx);
+> +}
+> +
+> +static void pcs_link_up(struct phylink_pcs *pcs, unsigned int neg_mode,
+> +			phy_interface_t interface, int speed, int duplex)
+> +{
+> +	struct pcs_wrapper *wrapper = pcs_to_wrapper(pcs);
+> +	struct phylink_pcs *wrapped;
+> +	int idx;
+> +
+> +	idx = srcu_read_lock(&pcs_srcu);
+> +
+> +	wrapped = srcu_dereference(wrapper->wrapped, &pcs_srcu);
+> +	if (wrapped && wrapped->ops->pcs_link_up)
+> +		wrapped->ops->pcs_link_up(wrapped, neg_mode, interface, speed,
+> +					  duplex);
+> +
+> +	srcu_read_unlock(&pcs_srcu, idx);
+> +}
+> +
+> +static void pcs_disable_eee(struct phylink_pcs *pcs)
+> +{
+> +	struct pcs_wrapper *wrapper = pcs_to_wrapper(pcs);
+> +	struct phylink_pcs *wrapped;
+> +	int idx;
+> +
+> +	idx = srcu_read_lock(&pcs_srcu);
+> +
+> +	wrapped = srcu_dereference(wrapper->wrapped, &pcs_srcu);
+> +	if (wrapped && wrapped->ops->pcs_disable_eee)
+> +		wrapped->ops->pcs_disable_eee(wrapped);
+> +
+> +	srcu_read_unlock(&pcs_srcu, idx);
+> +}
+> +
+> +static void pcs_enable_eee(struct phylink_pcs *pcs)
+> +{
+> +	struct pcs_wrapper *wrapper = pcs_to_wrapper(pcs);
+> +	struct phylink_pcs *wrapped;
+> +	int idx;
+> +
+> +	idx = srcu_read_lock(&pcs_srcu);
+> +
+> +	wrapped = srcu_dereference(wrapper->wrapped, &pcs_srcu);
+> +	if (wrapped && wrapped->ops->pcs_enable_eee)
+> +		wrapped->ops->pcs_enable_eee(wrapped);
+> +
+> +	srcu_read_unlock(&pcs_srcu, idx);
+> +}
+> +
+> +static int pcs_pre_init(struct phylink_pcs *pcs)
+> +{
+> +	struct pcs_wrapper *wrapper = pcs_to_wrapper(pcs);
+> +	struct phylink_pcs *wrapped;
+> +	int ret, idx;
+> +
+> +	idx = srcu_read_lock(&pcs_srcu);
+> +
+> +	wrapped = srcu_dereference(wrapper->wrapped, &pcs_srcu);
+> +	if (wrapped) {
+> +		wrapped->rxc_always_on = pcs->rxc_always_on;
+> +		if (wrapped->ops->pcs_pre_init)
+> +			ret = wrapped->ops->pcs_pre_init(wrapped);
+> +		else
+> +			ret = 0;
+> +	} else {
+> +		ret = -ENODEV;
+> +	}
+> +
+> +	srcu_read_unlock(&pcs_srcu, idx);
+> +	return ret;
+> +}
+> +
+> +static const struct phylink_pcs_ops pcs_ops = {
+> +	.pcs_validate = pcs_validate,
+> +	.pcs_inband_caps = pcs_inband_caps,
+> +	.pcs_enable = pcs_enable,
+> +	.pcs_disable = pcs_disable,
+> +	.pcs_pre_config = pcs_pre_config,
+> +	.pcs_post_config = pcs_post_config,
+> +	.pcs_get_state = pcs_get_state,
+> +	.pcs_config = pcs_config,
+> +	.pcs_an_restart = pcs_an_restart,
+> +	.pcs_link_up = pcs_link_up,
+> +	.pcs_disable_eee = pcs_disable_eee,
+> +	.pcs_enable_eee = pcs_enable_eee,
+> +	.pcs_pre_init = pcs_pre_init,
 > +};
-> +MODULE_DEVICE_TABLE(of, xilinx_pcs_of_match);
 > +
-> +static struct mdio_driver xilinx_pcs_driver = {
-> +	.probe = xilinx_pcs_probe,
-> +	.mdiodrv.driver = {
-> +		.name = "xilinx-pcs",
-> +		.of_match_table = of_match_ptr(xilinx_pcs_of_match),
-> +		.suppress_bind_attrs = true,
-
-Do we support pcs removal for this device through the sysfs method of
-driver unbind?
-
-> +	},
-> +};
-> +
-> +static int __init xilinx_pcs_init(void)
+> +static void pcs_change_callback(void *priv, bool up)
 > +{
-> +	phy_caps_linkmodes(LINK_CAPA_10HD | LINK_CAPA_100HD | LINK_CAPA_1000HD,
-> +			   half_duplex);
-> +	return mdio_driver_register(&xilinx_pcs_driver);
-> +}
-> +module_init(xilinx_pcs_init);
+> +	struct pcs_wrapper *wrapper = priv;
 > +
-> +static void __exit xilinx_pcs_exit(void)
-> +{
-> +	mdio_driver_unregister(&xilinx_pcs_driver);
-> +}
-> +module_exit(xilinx_pcs_exit)
-> +
-> +static int axienet_xilinx_pcs_fixup(struct of_changeset *ocs,
-> +				    struct device_node *np, void *data)
-> +{
-> +#ifdef CONFIG_OF_DYNAMIC
-> +	unsigned int interface, mode_count, mode = 0;
-> +	const unsigned long *interfaces = data;
-> +	const char **modes;
-> +	int ret;
-> +
-> +	mode_count = bitmap_weight(interfaces, PHY_INTERFACE_MODE_MAX);
-> +	WARN_ON_ONCE(!mode_count);
-> +	modes = kcalloc(mode_count, sizeof(*modes), GFP_KERNEL);
-> +	if (!modes)
-> +		return -ENOMEM;
-> +
-> +	for_each_set_bit(interface, interfaces, PHY_INTERFACE_MODE_MAX)
-> +		modes[mode++] = phy_modes(interface);
-> +	ret = of_changeset_add_prop_string_array(ocs, np, "xlnx,pcs-modes",
-> +						 modes, mode_count);
-> +	kfree(modes);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return of_changeset_add_prop_string(ocs, np, "compatible",
-> +					    "xlnx,pcs");
-> +#else
-> +	return -ENODEV;
-> +#endif
+> +	phylink_pcs_change(&wrapper->pcs, up);
 > +}
 > +
 > +/**
-> + * axienet_xilinx_pcs_get() - Compatibility function for the AXI Ethernet driver
-> + * @dev: The MAC device
-> + * @interfaces: The interfaces to use as a fallback
+> + * pcs_register_full() - register a new PCS
+> + * @dev: The device requesting the PCS
+> + * @fwnode: The PCS's firmware node; typically @dev.fwnode
+> + * @pcs: The PCS to register
 > + *
-> + * This is a helper function for the AXI Ethernet driver to ensure backwards
-> + * compatibility with device trees which do not include compatible strings for
-> + * the PCS. It should not be used by new code.
+> + * Registers a new PCS which can be attached to a phylink.
 > + *
-> + * Return: a PCS, or an error pointer
+> + * Return: 0 on success, or -errno on error
 > + */
-> +struct phylink_pcs *axienet_xilinx_pcs_get(struct device *dev,
-> +					   const unsigned long *interfaces)
+> +int pcs_register_full(struct device *dev, struct fwnode_handle *fwnode,
+> +		      struct phylink_pcs *pcs)
 > +{
-> +	struct fwnode_handle *fwnode;
+> +	struct pcs_wrapper *wrapper;
+> +
+> +	if (!dev || !pcs->ops)
+> +		return -EINVAL;
+> +
+> +	if (!pcs->ops->pcs_an_restart || !pcs->ops->pcs_config ||
+> +	    !pcs->ops->pcs_get_state)
+> +		return -EINVAL;
+> +
+> +	wrapper = kzalloc(sizeof(*wrapper), GFP_KERNEL);
+> +	if (!wrapper)
+> +		return -ENOMEM;
+
+How about the case where pcs is removed and then comes back again? 
+Should we find the original wrapper and attach it to pcs again instead 
+of creating a new wrapper?
+
+> +
+> +	refcount_set(&wrapper->refcnt, 1);
+> +	INIT_LIST_HEAD(&wrapper->list);
+> +	wrapper->dev = get_device(dev);
+> +	wrapper->fwnode = fwnode_handle_get(fwnode);
+> +	RCU_INIT_POINTER(wrapper->wrapped, pcs);
+> +
+> +	wrapper->pcs.ops = &pcs_ops;
+> +	wrapper->pcs.poll = pcs->poll;
+> +	bitmap_copy(wrapper->pcs.supported_interfaces,
+> +		    pcs->supported_interfaces, PHY_INTERFACE_MODE_MAX);
+> +
+> +	pcs->link_change = pcs_change_callback;
+> +	pcs->link_change_priv = wrapper;
+> +
+> +	spin_lock(&pcs_lock);
+> +	list_add(&wrapper->list, &pcs_wrappers);
+> +	spin_unlock(&pcs_lock);
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(pcs_register_full);
+> +
+> +/**
+> + * pcs_unregister() - unregister a PCS
+> + * @pcs: a PCS previously registered with pcs_register()
+> + */
+> +void pcs_unregister(struct phylink_pcs *pcs)
+> +{
+> +	struct pcs_wrapper *wrapper;
+> +
+> +	spin_lock(&pcs_lock);
+> +	list_for_each_entry(wrapper, &pcs_wrappers, list) {
+> +		if (rcu_access_pointer(wrapper->wrapped) == pcs)
+> +			goto found;
+> +	}
+> +
+> +	spin_unlock(&pcs_lock);
+> +	WARN(1, "trying to unregister an already-unregistered PCS\n");
+> +	return;
+> +
+> +found:
+> +	list_del(&wrapper->list);
+> +	spin_unlock(&pcs_lock);
+> +
+> +	put_device(wrapper->dev);
+> +	fwnode_handle_put(wrapper->fwnode);
+> +	rcu_replace_pointer(wrapper->wrapped, NULL, true);
+> +	synchronize_srcu(&pcs_srcu);
+> +
+> +	if (!wrapper->pcs.poll)
+> +		phylink_pcs_change(&wrapper->pcs, false);
+> +	if (refcount_dec_and_test(&wrapper->refcnt))
+> +		kfree(wrapper);
+> +}
+> +EXPORT_SYMBOL_GPL(pcs_unregister);
+> +
+> +static void devm_pcs_unregister(void *pcs)
+> +{
+> +	pcs_unregister(pcs);
+> +}
+> +
+> +/**
+> + * devm_pcs_register_full - resource managed pcs_register()
+> + * @dev: device that is registering this PCS
+> + * @fwnode: The PCS's firmware node; typically @dev.fwnode
+> + * @pcs: the PCS to register
+> + *
+> + * Managed pcs_register(). For PCSs registered by this function,
+> + * pcs_unregister() is automatically called on driver detach. See
+> + * pcs_register() for more information.
+> + *
+> + * Return: 0 on success, or -errno on failure
+> + */
+> +int devm_pcs_register_full(struct device *dev, struct fwnode_handle *fwnode,
+> +			   struct phylink_pcs *pcs)
+> +{
+> +	int ret;
+> +
+> +	ret = pcs_register_full(dev, fwnode, pcs);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return devm_add_action_or_reset(dev, devm_pcs_unregister, pcs);
+> +}
+> +EXPORT_SYMBOL_GPL(devm_pcs_register_full);
+> +
+> +/**
+> + * _pcs_get_tail() - Look up and request a PCS
+> + * @dev: The device requesting the PCS
+> + * @fwnode: The PCS's fwnode
+> + * @pcs_dev: The PCS's device
+> + *
+> + * Search PCSs registered with pcs_register() for one with a matching
+> + * fwnode or device. Either @fwnode or @pcs_dev may be %NULL if matching
+> + * against a fwnode or device is not desired (respectively).
+> + *
+> + * Once a PCS is found, perform common operations necessary when getting a PCS
+> + * (increment reference counts, etc).
+> + *
+> + * You should probably call one of the pcs_get* functions instead of this one.
+> + *
+> + * Return: A PCS, or an error pointer on failure. If both @fwnode and @pcs_dev
+> + *         are %NULL, returns %NULL to allow easier chaining.
+> + */
+> +struct phylink_pcs *_pcs_get_tail(struct device *dev,
+> +				  const struct fwnode_handle *fwnode,
+> +				  const struct device *pcs_dev)
+> +{
+> +	struct pcs_wrapper *wrapper;
+> +
+> +	if (!fwnode && !pcs_dev)
+> +		return NULL;
+> +
+> +	pr_debug("looking for %pfwf or %s %s...\n", fwnode,
+> +		 pcs_dev ? dev_driver_string(pcs_dev) : "(null)",
+> +		 pcs_dev ? dev_name(pcs_dev) : "(null)");
+> +
+> +	spin_lock(&pcs_lock);
+> +	list_for_each_entry(wrapper, &pcs_wrappers, list) {
+> +		if (pcs_dev && wrapper->dev == pcs_dev)
+> +			goto found;
+> +		if (fwnode && wrapper->fwnode == fwnode)
+> +			goto found;
+> +	}
+> +	spin_unlock(&pcs_lock);
+> +	pr_debug("...not found\n");
+> +	return ERR_PTR(-EPROBE_DEFER);
+> +
+> +found:
+> +	refcount_inc(&wrapper->refcnt);
+> +	spin_unlock(&pcs_lock);
+> +	pr_debug("...found\n");
+> +	return &wrapper->pcs;
+> +}
+> +EXPORT_SYMBOL_GPL(_pcs_get_tail);
+> +
+> +/**
+> + * pcs_find_fwnode() - Find a PCS's fwnode
+> + * @mac_node: The fwnode referencing the PCS
+> + * @id: The name of the PCS to get. May be %NULL to get the first PCS.
+> + * @fallback: An optional fallback property to use if pcs-handle is absent
+> + * @optional: Whether the PCS is optional
+> + *
+> + * Find a PCS's fwnode, as referenced by @mac_node. This fwnode can later be
+> + * used with _pcs_get_tail() to get the actual PCS. ``pcs-handle-names`` is
+> + * used to match @id, then the fwnode is found using ``pcs-handle``.
+> + *
+> + * This function is internal to the PCS subsystem from a consumer
+> + * point-of-view. However, it may be used to implement fallbacks for legacy
+> + * behavior in PCS providers.
+> + *
+> + * Return: %NULL if @optional is set and the PCS cannot be found. Otherwise,
+> + *         returns a PCS if found or an error pointer on failure.
+> + */
+> +struct fwnode_handle *pcs_find_fwnode(const struct fwnode_handle *mac_node,
+> +				      const char *id, const char *fallback,
+> +				      bool optional)
+> +{
+> +	struct fwnode_handle *pcs_fwnode;
+> +	int index;
+> +
+> +	if (!mac_node)
+> +		return optional ? NULL : ERR_PTR(-ENODEV);
+> +
+> +	if (id)
+> +		index = fwnode_property_match_string(mac_node,
+> +						     "pcs-handle-names", id);
+> +	else
+> +		index = 0;
+> +
+> +	if (index < 0) {
+> +		if (optional && (index == -EINVAL || index == -ENODATA))
+> +			return NULL;
+> +		return ERR_PTR(index);
+> +	}
+> +
+> +	/* First try pcs-handle, and if that doesn't work try the fallback */
+> +	pcs_fwnode = fwnode_find_reference(mac_node, "pcs-handle", index);
+> +	if (PTR_ERR(pcs_fwnode) == -ENOENT && fallback)
+> +		pcs_fwnode = fwnode_find_reference(mac_node, fallback, index);
+> +	if (optional && !id && PTR_ERR(pcs_fwnode) == -ENOENT)
+> +		return NULL;
+> +	return pcs_fwnode;
+> +}
+> +EXPORT_SYMBOL_GPL(pcs_find_fwnode);
+> +
+> +/**
+> + * _pcs_get() - Get a PCS from a fwnode property
+> + * @dev: The device to get a PCS for
+> + * @fwnode: The fwnode to find the PCS with
+> + * @id: The name of the PCS to get. May be %NULL to get the first PCS.
+> + * @fallback: An optional fallback property to use if pcs-handle is absent
+> + * @optional: Whether the PCS is optional
+> + *
+> + * Find a PCS referenced by @fwnode and return a reference to it. Every call
+> + * to _pcs_get_by_fwnode() must be balanced with one to pcs_put().
+> + *
+> + * Return: a PCS if found, %NULL if not, or an error pointer on failure
+> + */
+> +struct phylink_pcs *_pcs_get(struct device *dev, struct fwnode_handle *fwnode,
+> +			     const char *id, const char *fallback,
+> +			     bool optional)
+> +{
+> +	struct fwnode_handle *pcs_fwnode;
 > +	struct phylink_pcs *pcs;
 > +
-> +	fwnode = pcs_find_fwnode(dev_fwnode(dev), NULL, "phy-handle", false);
-> +	if (IS_ERR(fwnode))
-> +		return ERR_CAST(fwnode);
+> +	pcs_fwnode = pcs_find_fwnode(fwnode, id, fallback, optional);
+> +	if (IS_ERR(pcs_fwnode))
+> +		return ERR_CAST(pcs_fwnode);
 > +
-> +	pcs = pcs_get_by_fwnode_compat(dev, fwnode, axienet_xilinx_pcs_fixup,
-> +				       (void *)interfaces);
-> +	fwnode_handle_put(fwnode);
+> +	pcs = _pcs_get_tail(dev, pcs_fwnode, NULL);
+> +	fwnode_handle_put(pcs_fwnode);
 > +	return pcs;
 > +}
-> +EXPORT_SYMBOL_GPL(axienet_xilinx_pcs_get);
+> +EXPORT_SYMBOL_GPL(_pcs_get);
 > +
-> +MODULE_ALIAS("platform:xilinx-pcs");
-> +MODULE_DESCRIPTION("Xilinx PCS driver");
-> +MODULE_LICENSE("GPL");
-> diff --git a/include/linux/pcs-xilinx.h b/include/linux/pcs-xilinx.h
+> +#ifdef CONFIG_OF_DYNAMIC
+> +static void of_changeset_cleanup(void *data)
+> +{
+> +	struct of_changeset *ocs = data;
+> +
+> +	if (WARN(of_changeset_revert(ocs),
+> +		 "could not revert changeset; leaking memory\n"))
+> +		return;
+> +
+> +	of_changeset_destroy(ocs);
+> +	kfree(ocs);
+> +}
+> +
+> +/**
+> + * pcs_get_by_fwnode_compat() - Get a PCS with a compatibility fallback
+> + * @dev: The device requesting the PCS
+> + * @fwnode: The &struct fwnode_handle of the PCS itself
+> + * @fixup: Callback to fix up @fwnode for compatibility
+> + * @data: Passed to @fixup
+> + *
+> + * This function looks up a PCS and retries on failure after fixing up @fwnode.
+> + * It is intended to assist in backwards-compatible behavior for drivers that
+> + * used to create a PCS directly from a &struct device_node. This function
+> + * should NOT be used in new drivers.
+> + *
+> + * @fixup modifies a devicetree changeset to create any properties necessary to
+> + * bind the PCS's &struct device_node. At the very least, it should use
+> + * of_changeset_add_prop_string() to add a compatible property.
+> + *
+> + * Note that unlike pcs_get_by_fwnode, @fwnode is the &struct fwnode_handle of
+> + * the PCS itself, and not that of the requesting device. @fwnode could be
+> + * looked up with pcs_find_fwnode() or determined by some other means for
+> + * compatibility.
+> + *
+> + * Return: A PCS on success or an error pointer on failure
+> + */
+> +struct phylink_pcs *
+> +pcs_get_by_fwnode_compat(struct device *dev, struct fwnode_handle *fwnode,
+> +			 int (*fixup)(struct of_changeset *ocs,
+> +				      struct device_node *np, void *data),
+> +			 void *data)
+> +{
+> +	struct mdio_device *mdiodev;
+> +	struct of_changeset *ocs;
+> +	struct phylink_pcs *pcs;
+> +	struct device_node *np;
+> +	struct device *pcsdev;
+> +	int err;
+> +
+> +	/* First attempt */
+> +	pcs = _pcs_get_tail(dev, fwnode, NULL);
+> +	if (PTR_ERR(pcs) != -EPROBE_DEFER)
+> +		return pcs;
+> +
+> +	/* No luck? Maybe there's no compatible... */
+> +	np = to_of_node(fwnode);
+> +	if (!np || of_property_present(np, "compatible"))
+> +		return pcs;
+> +
+> +	/* OK, let's try fixing things up */
+> +	pr_warn("%pOF is missing a compatible\n", np);
+> +	ocs = kmalloc(sizeof(*ocs), GFP_KERNEL);
+> +	if (!ocs)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	of_changeset_init(ocs);
+> +	err = fixup(ocs, np, data);
+> +	if (err)
+> +		goto err_ocs;
+> +
+> +	err = of_changeset_apply(ocs);
+> +	if (err)
+> +		goto err_ocs;
+> +
+> +	err = devm_add_action_or_reset(dev, of_changeset_cleanup, ocs);
+> +	if (err)
+> +		return ERR_PTR(err);
+> +
+> +	mdiodev = fwnode_mdio_find_device(fwnode);
+> +	if (mdiodev) {
+> +		/* Clear that pesky PHY flag so we can match PCS drivers */
+> +		device_lock(&mdiodev->dev);
+> +		mdiodev->flags &= ~MDIO_DEVICE_FLAG_PHY;
+> +		device_unlock(&mdiodev->dev);
+> +		pcsdev = &mdiodev->dev;
+> +	} else {
+> +		pcsdev = get_device(fwnode->dev);
+> +		if (!pcsdev)
+> +			return ERR_PTR(-EPROBE_DEFER);
+> +	}
+> +
+> +	err = device_reprobe(pcsdev);
+> +	put_device(pcsdev);
+> +	if (err)
+> +		return ERR_PTR(err);
+> +
+> +	return _pcs_get_tail(dev, fwnode, NULL);
+> +
+> +err_ocs:
+> +	of_changeset_destroy(ocs);
+> +	kfree(ocs);
+> +	return ERR_PTR(err);
+> +}
+> +EXPORT_SYMBOL_GPL(pcs_get_by_fwnode_compat);
+> +#endif
+> +
+> +/**
+> + * pcs_put() - Release a previously-acquired PCS
+> + * @pcs: The PCS to put
+> + *
+> + * This frees resources associated with the PCS which were acquired when it was
+> + * gotten.
+> + */
+> +void pcs_put(struct phylink_pcs *pcs)
+> +{
+> +	struct pcs_wrapper *wrapper;
+> +
+> +	if (!pcs)
+> +		return;
+> +
+> +	wrapper = pcs_to_wrapper(pcs);
+> +	if (refcount_dec_and_test(&wrapper->refcnt))
+> +		kfree(wrapper);
+> +}
+> +EXPORT_SYMBOL_GPL(pcs_put);
+> diff --git a/include/linux/pcs.h b/include/linux/pcs.h
 > new file mode 100644
-> index 000000000000..28ff65226c3c
+> index 000000000000..6f04a3d22669
 > --- /dev/null
-> +++ b/include/linux/pcs-xilinx.h
-> @@ -0,0 +1,15 @@
-> +/* SPDX-License-Identifier: GPL-2.0+ */
+> +++ b/include/linux/pcs.h
+> @@ -0,0 +1,205 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
 > +/*
-> + * Copyright 2024 Sean Anderson <sean.anderson@seco.com>
+> + * Copyright (C) 2022 Sean Anderson <sean.anderson@seco.com>
 > + */
 > +
-> +#ifndef PCS_XILINX_H
-> +#define PCS_XILINX_H
+> +#ifndef _PCS_H
+> +#define _PCS_H
 > +
-> +struct device;
+> +#include <linux/property.h>
+> +
+> +struct device_node;
+> +struct of_changeset;
 > +struct phylink_pcs;
 > +
-> +struct phylink_pcs *axienet_xilinx_pcs_get(struct device *dev,
-> +					   const unsigned long *interfaces);
+> +int pcs_register_full(struct device *dev, struct fwnode_handle *fwnode,
+> +		      struct phylink_pcs *pcs);
+> +void pcs_unregister(struct phylink_pcs *pcs);
+> +int devm_pcs_register_full(struct device *dev, struct fwnode_handle *fwnode,
+> +			   struct phylink_pcs *pcs);
 > +
-> +#endif /* PCS_XILINX_H */
+> +/**
+> + * pcs_register() - register a new PCS
+> + * @dev: The device requesting the PCS
+> + * @pcs: The PCS to register
+> + *
+> + * Registers a new PCS which can be attached to a phylink.
+> + *
+> + * Return: 0 on success, or -errno on error
+> + */
+> +static inline int pcs_register(struct device *dev, struct phylink_pcs *pcs)
+> +{
+> +	return pcs_register_full(dev, dev_fwnode(dev), pcs);
+> +}
+> +
+> +/**
+> + * devm_pcs_register - resource managed pcs_register()
+> + * @dev: device that is registering this PCS
+> + * @pcs: the PCS to register
+> + *
+> + * Managed pcs_register(). For PCSs registered by this function,
+> + * pcs_unregister() is automatically called on driver detach. See
+> + * pcs_register() for more information.
+> + *
+> + * Return: 0 on success, or -errno on failure
+> + */
+> +static inline int devm_pcs_register(struct device *dev, struct phylink_pcs *pcs)
+> +{
+> +	return devm_pcs_register_full(dev, dev_fwnode(dev), pcs);
+> +}
+> +
+> +struct fwnode_handle *pcs_find_fwnode(const struct fwnode_handle *mac_node,
+> +				      const char *id, const char *fallback,
+> +				      bool optional);
+> +
+> +#ifdef CONFIG_PCS
+> +struct phylink_pcs *_pcs_get_tail(struct device *dev,
+> +				  const struct fwnode_handle *fwnode,
+> +				  const struct device *pcs_dev);
+> +struct phylink_pcs *_pcs_get(struct device *dev, struct fwnode_handle *fwnode,
+> +			     const char *id, const char *fallback,
+> +			     bool optional);
+> +void pcs_put(struct phylink_pcs *handle);
+> +
+> +/**
+> + * pcs_get() - Get a PCS based on a fwnode
+> + * @dev: The device requesting the PCS
+> + * @id: The name of the PCS
+> + *
+> + * Find and get a PCS, as referenced by @dev's &struct fwnode_handle. See
+> + * pcs_find_fwnode() for details. Each call to this function must be balanced
+> + * with one to pcs_put().
+> + *
+> + * Return: A PCS on success or an error pointer on failure
+> + */
+> +static inline struct phylink_pcs *pcs_get(struct device *dev, const char *id)
+> +{
+> +	return _pcs_get(dev, dev_fwnode(dev), id, NULL, false);
+> +}
+> +
+> +/**
+> + * pcs_get_optional() - Optionally get a PCS based on a fwnode
+> + * @dev: The device requesting the PCS
+> + * @id: The name of the PCS
+> + *
+> + * Optionally find and get a PCS, as referenced by @dev's &struct
+> + * fwnode_handle. See pcs_find_fwnode() for details. Each call to this function
+> + * must be balanced with one to pcs_put().
+> + *
+> + * Return: A PCS on success, %NULL if none was found, or an error pointer on
+> + * *       failure
+> + */
+> +static inline struct phylink_pcs *pcs_get_optional(struct device *dev,
+> +						   const char *id)
+> +{
+> +	return _pcs_get(dev, dev_fwnode(dev), id, NULL, true);
+> +}
+> +
+> +/**
+> + * pcs_get_by_fwnode() - Get a PCS based on a fwnode
+> + * @dev: The device requesting the PCS
+> + * @fwnode: The &struct fwnode_handle referencing the PCS
+> + * @id: The name of the PCS
+> + *
+> + * Find and get a PCS, as referenced by @fwnode. See pcs_find_fwnode() for
+> + * details. Each call to this function must be balanced with one to pcs_put().
+> + *
+> + * Return: A PCS on success or an error pointer on failure
+> + */
+> +static inline struct phylink_pcs
+> +*pcs_get_by_fwnode(struct device *dev, struct fwnode_handle *fwnode,
+> +		   const char *id)
+> +{
+> +	return _pcs_get(dev, fwnode, id, NULL, false);
+> +}
+> +
+> +/**
+> + * pcs_get_by_fwnode_optional() - Optionally get a PCS based on a fwnode
+> + * @dev: The device requesting the PCS
+> + * @fwnode: The &struct fwnode_handle referencing the PCS
+> + * @id: The name of the PCS
+> + *
+> + * Optionally find and get a PCS, as referenced by @fwnode. See
+> + * pcs_find_fwnode() for details. Each call to this function must be balanced
+> + * with one to pcs_put().
+> + *
+> + * Return: A PCS on success, %NULL if none was found, or an error pointer on
+> + * *       failure
+> + */
+> +static inline struct phylink_pcs
+> +*pcs_get_by_fwnode_optional(struct device *dev, struct fwnode_handle *fwnode,
+> +			    const char *id)
+> +{
+> +	return _pcs_get(dev, fwnode, id, NULL, true);
+> +}
+> +
+> +/**
+> + * pcs_get_by_dev() - Get a PCS from its providing device
+> + * @dev: The device requesting the PCS
+> + * @pcs_dev: The device providing the PCS
+> + *
+> + * Get the first PCS registered by @pcs_dev. Each call to this function must be
+> + * balanced with one to pcs_put().
+> + *
+> + * Return: A PCS on success or an error pointer on failure
+> + */
+> +static inline struct phylink_pcs *pcs_get_by_dev(struct device *dev,
+> +						 const struct device *pcs_dev)
+> +{
+> +	return _pcs_get_tail(dev, NULL, pcs_dev);
+> +}
+> +#else /* CONFIG_PCS */
+> +static inline void pcs_put(struct phylink_pcs *handle)
+> +{
+> +}
+> +
+> +static inline struct phylink_pcs *pcs_get(struct device *dev, const char *id)
+> +{
+> +	return ERR_PTR(-EOPNOTSUPP);
+> +}
+> +
+> +static inline struct phylink_pcs *pcs_get_optional(struct device *dev,
+> +						   const char *id)
+> +{
+> +	return NULL;
+> +}
+> +
+> +static inline struct phylink_pcs
+> +*pcs_get_by_fwnode(struct device *dev, struct fwnode_handle *fwnode,
+> +		   const char *id)
+> +{
+> +	return ERR_PTR(-EOPNOTSUPP);
+> +}
+> +
+> +static inline struct phylink_pcs
+> +*pcs_get_by_fwnode_optional(struct device *dev, struct fwnode_handle *fwnode,
+> +			    const char *id)
+> +{
+> +	return NULL;
+> +}
+> +
+> +static inline struct phylink_pcs *pcs_get_by_dev(struct device *dev,
+> +						 const struct device *pcs_dev)
+> +{
+> +	return ERR_PTR(-EOPNOTSUPP);
+> +}
+> +#endif
+> +
+> +#ifdef CONFIG_OF_DYNAMIC
+> +struct phylink_pcs *
+> +pcs_get_by_fwnode_compat(struct device *dev, struct fwnode_handle *fwnode,
+> +			 int (*fixup)(struct of_changeset *ocs, struct device_node *np,
+> +				      void *data),
+> +			 void *data);
+> +#else
+> +static inline struct phylink_pcs *
+> +pcs_get_by_fwnode_compat(struct device *dev, struct fwnode_handle *fwnode,
+> +			 int (*fixup)(struct of_changeset *ocs, struct device_node *np,
+> +				      void *data),
+> +			 void *data)
+> +{
+> +	return _pcs_get_tail(dev, fwnode, NULL);
+> +}
+> +#endif
+> +
+> +#endif /* PCS_H */
 
 
