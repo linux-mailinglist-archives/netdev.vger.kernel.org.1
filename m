@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-190303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D532AB6195
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 06:33:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C23CEAB6199
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 06:34:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBA3F4A32CD
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 04:33:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E43C21B4516C
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 04:33:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8855A1FBEB6;
-	Wed, 14 May 2025 04:32:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC9731F7092;
+	Wed, 14 May 2025 04:32:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iB1Bj3VA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KxXeNpXP"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD2A81F4CB8;
-	Wed, 14 May 2025 04:31:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21C301FE45D;
+	Wed, 14 May 2025 04:32:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747197121; cv=none; b=AHzhftRcLl9SEidK5rt4FJswwcAeYtjEpod2CZTyi8gemmq34JvT4EVKeXEEf75ieeJbpY9bpCOqxlS5plc6Zlb436yyq8m7wSoXLEaAglc3Dc1yNfr7Hp60+v45f0wZD3KcVPSOtn5yBa1U2L3Ad9FiyW9m28NbiV8cifbBXmk=
+	t=1747197124; cv=none; b=WWYIpLXqIEZsNA7A0kfRjoJEb4V4ETqCZTAtiWowELXDR1dMKSH7tkzyStjmWLrxfiiRx+u32fAN7U0gvPASgtw9FwglWqUr02NTAQOVhcwTqNnGQixltAsMOrxuu+R4b5dJmBJ4PIq2OQ/z1FBw+rT3UUfkz1xwRCKNeVDmmt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747197121; c=relaxed/simple;
-	bh=0dLog9l3Xnpd+gs+hRIb40IRlDcbRwXl+QmLyBvPzOU=;
+	s=arc-20240116; t=1747197124; c=relaxed/simple;
+	bh=0fgO+QvVf9+rVnYvZZT700A8z0ZC/9q1mzSMkC20Zdw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dfeqtRBkZCBW0wptxmx0N83HB8dwmIFlpo9trSZKtzRVoHvA49nhpCTLRJkSL++WdAO1oeK9m4C7IXZ8LdkG9S489PgT3y5JEQj0zu54Nc75m9w/rPJObP5B8dyD0Li40v06+xqkvzkMmfEPbEUniX1zuD2zTT3jrb19it+Eo5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iB1Bj3VA; arc=none smtp.client-ip=192.198.163.16
+	 MIME-Version; b=Df+lG4r8trNlWZQrbZVZdsyQT+hloh0PojkMnIgdlnVFBeP4JLmVrlSvsQ+Xmc2YtdhgoEBL37g2Z0tRqwoDHm5sbiGZdcA7NJ0QGCt+wldZEI/2N5H/RlO2KEHUBDQEZ1vJ56oebAoUXHDSvrTKb7TFL1qZGnbiqpH48hn5qxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KxXeNpXP; arc=none smtp.client-ip=192.198.163.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747197119; x=1778733119;
+  t=1747197123; x=1778733123;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=0dLog9l3Xnpd+gs+hRIb40IRlDcbRwXl+QmLyBvPzOU=;
-  b=iB1Bj3VATbViy9AHZqcPjhMFjbHHDvmcCDhDjUzdBJvOldYLipI+aNYd
-   P0sykAFsKDOBU27jJ/UfHoB/Xkst214KX6j3QYnKTC1jL/fZtHUMO9LDD
-   fcR1llKyNivJ1Xsth1YJ+ZGYaWKlVddQGqbguyg4VLtAL3B00YANF77LT
-   5GGRroOEAt/a/sP7aKmS4BxhJTrLBdmXZZEdZvzf7nKV+EpK4beS6POrZ
-   CFKGpdOtxmhPs9TXEW4yzw4HsHUnXLmxCBARmoa7rgg1OGYIQBqEnCrfP
-   Ww334rNaxCLtH8TI6TjEqHit0iw7b5HF/RtaA9NsbePTs2hRSK5+rPJqA
+  bh=0fgO+QvVf9+rVnYvZZT700A8z0ZC/9q1mzSMkC20Zdw=;
+  b=KxXeNpXPw9KsbAhTaZB3dHf8ZOPLcabqGcenFpx17vpnyKlb6ENdL8NB
+   Kz8lvHZ4QBpWZt9EhTA5pQy2ZfsAZcaXvtfXqDovJtD7HZBHCt7P62XD0
+   uTyS9GoeDZqd1fWPqm6D1hfEebwT8Es6efx73ODrHIqwOB9IaayHgkMhy
+   TmnleyliH6KgUS+FEJc2jfrVRDL5tFlqtgEp+8Nj9AkNVsi45MfK9v+Z9
+   s/PP1AwEgdqLT3LAT/p7lOCZEaqGYjqrJ34mG+KlMVWdMrqoCMrr0LFGS
+   m6xHBibrAjQcifsJPSGrnCpZMloipejl0f+HZxGUpgrDroGG1huTwyxfn
    A==;
-X-CSE-ConnectionGUID: 2kXuhqn2S9+chwZ2i2rlJA==
-X-CSE-MsgGUID: +9GMx9nNTPucVrJLSD6YzA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11432"; a="36699540"
+X-CSE-ConnectionGUID: OMc6FrEkSDWGIwmLeK7vsg==
+X-CSE-MsgGUID: HsNluePsTwOn5HTfXS4Idg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11432"; a="36699593"
 X-IronPort-AV: E=Sophos;i="6.15,287,1739865600"; 
-   d="scan'208";a="36699540"
+   d="scan'208";a="36699593"
 Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2025 21:31:33 -0700
-X-CSE-ConnectionGUID: 5Zxt4s7TQt+Oj5pEhwJ6iw==
-X-CSE-MsgGUID: KxRckVdYT3ekTZxCXgeJ0Q==
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2025 21:31:41 -0700
+X-CSE-ConnectionGUID: E7KPBRBrQEeKE/TbktqJvA==
+X-CSE-MsgGUID: s7PFcjVURUm1j9RdIQp0cg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,287,1739865600"; 
-   d="scan'208";a="142861937"
+   d="scan'208";a="142861962"
 Received: from mohdfai2-ilbpg12-1.png.intel.com ([10.88.227.73])
-  by orviesa004.jf.intel.com with ESMTP; 13 May 2025 21:31:26 -0700
+  by orviesa004.jf.intel.com with ESMTP; 13 May 2025 21:31:31 -0700
 From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
 To: Tony Nguyen <anthony.l.nguyen@intel.com>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
@@ -73,9 +73,9 @@ Cc: intel-wired-lan@lists.osuosl.org,
 	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
 	Chwee-Lin Choong <chwee.lin.choong@intel.com>
-Subject: [PATCH iwl-next v2 7/8] igc: add preemptible queue support in mqprio
-Date: Wed, 14 May 2025 00:29:44 -0400
-Message-Id: <20250514042945.2685273-8-faizal.abdul.rahim@linux.intel.com>
+Subject: [PATCH iwl-next v2 8/8] igc: SW pad preemptible frames for correct mCRC calculation
+Date: Wed, 14 May 2025 00:29:45 -0400
+Message-Id: <20250514042945.2685273-9-faizal.abdul.rahim@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250514042945.2685273-1-faizal.abdul.rahim@linux.intel.com>
 References: <20250514042945.2685273-1-faizal.abdul.rahim@linux.intel.com>
@@ -87,90 +87,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-igc already supports enabling MAC Merge for FPE. This patch adds
-support for preemptible queues in mqprio.
+From: Chwee-Lin Choong <chwee.lin.choong@intel.com>
 
-Tested preemption with mqprio by:
-1. Enable FPE:
-   ethtool --set-mm enp1s0 pmac-enabled on tx-enabled on verify-enabled on
-2. Enable preemptible queue in mqprio:
-   mqprio num_tc 4 map 0 1 2 3 0 0 0 0 0 0 0 0 0 0 0 0 \
-   queues 1@0 1@1 1@2 1@3 \
-   fp P P P E
+A hardware-padded frame transmitted from the preemptible queue
+results in an incorrect mCRC computation by hardware, as the
+padding bytes are not included in the mCRC calculation.
 
+To address this, manually pad frames in preemptible queues to a
+minimum length of 60 bytes using skb_padto() before transmission.
+This ensures that the hardware includes the padding bytes in the
+mCRC computation, producing a correct mCRC value.
+
+Signed-off-by: Chwee-Lin Choong <chwee.lin.choong@intel.com>
 Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
 ---
- drivers/net/ethernet/intel/igc/igc_main.c | 9 ++-------
- drivers/net/ethernet/intel/igc/igc_tsn.c  | 9 +++++++++
- drivers/net/ethernet/intel/igc/igc_tsn.h  | 1 +
- 3 files changed, 12 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/intel/igc/igc_main.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
 diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 1da84b00d090..4d748eca0c6c 100644
+index 4d748eca0c6c..509f95651f25 100644
 --- a/drivers/net/ethernet/intel/igc/igc_main.c
 +++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -6755,6 +6755,7 @@ static int igc_tsn_enable_mqprio(struct igc_adapter *adapter,
+@@ -1685,6 +1685,15 @@ static netdev_tx_t igc_xmit_frame_ring(struct sk_buff *skb,
+ 	first->tx_flags = tx_flags;
+ 	first->protocol = protocol;
  
- 	if (!mqprio->qopt.num_tc) {
- 		adapter->strict_priority_enable = false;
-+		igc_fpe_clear_preempt_queue(adapter);
- 		netdev_reset_tc(adapter->netdev);
- 		goto apply;
- 	}
-@@ -6782,13 +6783,6 @@ static int igc_tsn_enable_mqprio(struct igc_adapter *adapter,
- 		return -EOPNOTSUPP;
- 	}
- 
--	/* Preemption is not supported yet. */
--	if (mqprio->preemptible_tcs) {
--		NL_SET_ERR_MSG_MOD(mqprio->extack,
--				   "Preemption is not supported yet");
--		return -EOPNOTSUPP;
--	}
--
- 	igc_save_mqprio_params(adapter, mqprio->qopt.num_tc,
- 			       mqprio->qopt.offset);
- 
-@@ -6808,6 +6802,7 @@ static int igc_tsn_enable_mqprio(struct igc_adapter *adapter,
- 		adapter->queue_per_tc[i] = i;
- 
- 	mqprio->qopt.hw = TC_MQPRIO_HW_OFFLOAD_TCS;
-+	igc_fpe_save_preempt_queue(adapter, mqprio);
- 
- apply:
- 	return igc_tsn_offload_apply(adapter);
-diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethernet/intel/igc/igc_tsn.c
-index 811856d66571..b23b9ca451a7 100644
---- a/drivers/net/ethernet/intel/igc/igc_tsn.c
-+++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
-@@ -160,6 +160,15 @@ void igc_fpe_init(struct igc_adapter *adapter)
- 	ethtool_mmsv_init(&adapter->fpe.mmsv, adapter->netdev, &igc_mmsv_ops);
- }
- 
-+void igc_fpe_clear_preempt_queue(struct igc_adapter *adapter)
-+{
-+	for (int i = 0; i < adapter->num_tx_queues; i++) {
-+		struct igc_ring *tx_ring = adapter->tx_ring[i];
-+
-+		tx_ring->preemptible = false;
++	/* For preemptible queue, manually pad the skb so that HW includes
++	 * padding bytes in mCRC calculation
++	 */
++	if (tx_ring->preemptible && skb->len < ETH_ZLEN) {
++		if (skb_padto(skb, ETH_ZLEN))
++			goto out_drop;
++		skb_put(skb, ETH_ZLEN - skb->len);
 +	}
-+}
 +
- static u32 igc_fpe_map_preempt_tc_to_queue(const struct igc_adapter *adapter,
- 					   unsigned long preemptible_tcs)
- {
-diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.h b/drivers/net/ethernet/intel/igc/igc_tsn.h
-index f2e8bfef4871..a95b893459d7 100644
---- a/drivers/net/ethernet/intel/igc/igc_tsn.h
-+++ b/drivers/net/ethernet/intel/igc/igc_tsn.h
-@@ -17,6 +17,7 @@ enum igc_txd_popts_type {
- DECLARE_STATIC_KEY_FALSE(igc_fpe_enabled);
- 
- void igc_fpe_init(struct igc_adapter *adapter);
-+void igc_fpe_clear_preempt_queue(struct igc_adapter *adapter);
- void igc_fpe_save_preempt_queue(struct igc_adapter *adapter,
- 				const struct tc_mqprio_qopt_offload *mqprio);
- u32 igc_fpe_get_supported_frag_size(u32 frag_size);
+ 	tso = igc_tso(tx_ring, first, launch_time, first_flag, &hdr_len);
+ 	if (tso < 0)
+ 		goto out_drop;
 -- 
 2.34.1
 
