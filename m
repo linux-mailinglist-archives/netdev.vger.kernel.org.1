@@ -1,84 +1,327 @@
-Return-Path: <netdev+bounces-190402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3DFAAB6B78
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 14:34:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6C94AB6B8A
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 14:38:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FBDB1B675CC
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 12:34:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C03EA3B01B4
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 12:38:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1D312749CC;
-	Wed, 14 May 2025 12:34:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5610274653;
+	Wed, 14 May 2025 12:38:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="VYVQYDfD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UkX0CqQq"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 111C61F8676;
-	Wed, 14 May 2025 12:34:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2B327814B
+	for <netdev@vger.kernel.org>; Wed, 14 May 2025 12:38:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747226067; cv=none; b=WhYh+EYwcT1QIAHlFkJDqxwOcsyVBe1KGaabz3HwP/EdTHIms1RJn6n8tpOHfMRxxlac7HsEiNqBsRjzQxNBgLum3efY4AXshLW1jTqX0eSKzwuDmZKCmvvYH4lIVvv5rXRM2qnyJU1Y2jLdZMeadxuHv4ghLOjxFLyyL6d4q9k=
+	t=1747226313; cv=none; b=LNa/Ff6P4oR1+YF2T/7Ez3/031LE4UQn/0LiD5rJ96ZSVgv+dmARGByJGqRTq26gd+cq+pZoq+LtPr3TaoGhzKijKQtAaLow9jut2IazjBOVEPlhvMGS99PkQ0ykogpUB2JVeLtlWOR9dQid0Ax0AGKE9S0yCj5kkaVjmRiHJKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747226067; c=relaxed/simple;
-	bh=BoX7BptIjJpFs1HwhFxu9XsSU6wZeouWq00jISncoGs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nizZJzxlX2Wmh6aCTQIyHUTWlXF1oTzn6IHG2W1SRXHa44msWD4WvcvJdQTWc57bGrFZY/hbc6YXtpgFWTPkeovKLSZNlQMq0u+8NhcU3ZEV2fezFEdQIgySG5DVJ/qWBya7EWRsUTtq/Mw+L2sboZSSmSK9Kx4TW4+mvWi9KWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=VYVQYDfD; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=cwIC9DjzDBbh5UYo4Hli25lV6RdLiigp3M/qiyFhOpM=; b=VYVQYDfDIfjAbMXrAIS4At3Mja
-	I2PCEc0mnNHiXkaGfb+76OJlnFmEoE8oPf5CI1Eo0OvUD1iYpkETlnjj43vBU19HwgoSGPvpCLPll
-	mFKgWwhMEuqU495XyzuLlHXXxVpWnurXcIU8WIM18t2GaQl9x7Y/8fE0H4LwlGtkgljc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uFBJS-00CYge-Ly; Wed, 14 May 2025 14:34:18 +0200
-Date: Wed, 14 May 2025 14:34:18 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 3/3] net: phy: dp83869: Support 1000Base-X SFP
- modules
-Message-ID: <c3c043aa-748b-4355-b830-d957f1678f12@lunn.ch>
-References: <20250514-dp83869-1000basex-v1-0-1bdb3c9c3d63@bootlin.com>
- <20250514-dp83869-1000basex-v1-3-1bdb3c9c3d63@bootlin.com>
- <99c9d8f8-1557-4f90-8762-b04a09cb497c@lunn.ch>
- <10709391.nUPlyArG6x@fw-rgant>
+	s=arc-20240116; t=1747226313; c=relaxed/simple;
+	bh=eKeL4Uk9C33hdT/AwGDs4IDQ/vPVEBGPe+XKmEwvxdw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PFBF+8z84iYd5P052Kx9NqtGX2Z34PQ7l2UKDiwmwe7HwGv4yYqF8lTjtZZ1GL554rRvnbt/8l7RicBazuqNWADkvOeqSOmccQvA1/VJWMYF5/0fvOwUQgtUwpB7Ih7u2BVWmXQczwgnKPBWg9N8fnivN8iFAJHbZHE1kQpR3T4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UkX0CqQq; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747226312; x=1778762312;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=eKeL4Uk9C33hdT/AwGDs4IDQ/vPVEBGPe+XKmEwvxdw=;
+  b=UkX0CqQqk8OR+nvh6jF8+ONar8JjVFYHKG2BsBl7mUppHmE3GsFG3wA2
+   0mxxnXs+Thsz4EnH9OOK5ZqZjmKx0U6+6o3NxwsWwsf7Vc/v42cIUleNb
+   cW+OcVwSk3eFDLv09eho8BHAS4lTPoqB2De6yMlyoduCI7fvkvwnTUSmX
+   GNNoST7UgironHmj26Fp29KxxIIYbBZNCZJFP0zfG0nwpvZPxregXqGZh
+   fESRKNZVeV3ERtOKkoRR1GIZJp8hriljkAPn/Y/enl59G4DT7vnVQT09I
+   0qTgAhJKWj0kUzGEtBZ6ymo+XokvznlM4aET9+BgH4GlKzRpkgAPKYK/i
+   w==;
+X-CSE-ConnectionGUID: xG3QxZXER5Wc36DsZbgdQw==
+X-CSE-MsgGUID: qIIvqxwJS9Goi2dOFffP9g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11433"; a="49191877"
+X-IronPort-AV: E=Sophos;i="6.15,288,1739865600"; 
+   d="scan'208";a="49191877"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2025 05:38:31 -0700
+X-CSE-ConnectionGUID: 6iVCT7z3RJySEyb/zt7/eQ==
+X-CSE-MsgGUID: iIbhKRCRRYeRXq5tJjb+gw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,288,1739865600"; 
+   d="scan'208";a="139015526"
+Received: from gk3153-pr4-x299-22869.igk.intel.com (HELO localhost.igk.intel.com) ([10.102.21.130])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2025 05:38:29 -0700
+From: Michal Kubiak <michal.kubiak@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: maciej.fijalkowski@intel.com,
+	netdev@vger.kernel.org,
+	przemyslaw.kitszel@intel.com,
+	jacob.e.keller@intel.com,
+	horms@kernel.org,
+	anthony.l.nguyen@intel.com,
+	Michal Kubiak <michal.kubiak@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@intel.com>
+Subject: [PATCH iwl-net v2] ice: add a separate Rx handler for flow director commands
+Date: Wed, 14 May 2025 14:37:24 +0200
+Message-ID: <20250514123724.250750-1-michal.kubiak@intel.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <10709391.nUPlyArG6x@fw-rgant>
+Content-Transfer-Encoding: 8bit
 
-> > There is also DP83869_RGMII_SGMII_BRIDGE. Can this be used with the
-> > SERDES? Copper SFPs often want SGMII.
-> 
-> It can definitely be used to support non-DAC copper modules. In fact, I've 
-> implemented support for these modules locally, but I'm planning to upstream 
-> this part of the SFP support later, as there is some additional trickiness to 
-> solve beforehand.
+The "ice" driver implementation uses the control VSI to handle
+the flow director configuration for PFs and VFs.
 
-Ah, yes. Please add a comment to the commit message.
+Unfortunately, although a separate VSI type was created to handle flow
+director queues, the Rx queue handler was shared between the flow
+director and a standard NAPI Rx handler.
 
-	Andrew
+Such a design approach was not very flexible. First, it mixed hotpath
+and slowpath code, blocking their further optimization. It also created
+a huge overkill for the flow director command processing, which is
+descriptor-based only, so there is no need to allocate Rx data buffers.
+
+For the above reasons, implement a separate Rx handler for the control
+VSI. Also, remove from the NAPI handler the code dedicated to
+configuring the flow director rules on VFs.
+Do not allocate Rx data buffers to the flow director queues because
+their processing is descriptor-based only.
+Finally, allow Rx data queues to be allocated only for VSIs that have
+netdev assigned to them.
+
+This handler splitting approach is the first step in converting the
+driver to use the Page Pool (which can only be used for data queues).
+
+Test hints:
+  1. Create a VF for any PF managed by the ice driver.
+  2. In a loop, add and delete flow director rules for the VF, e.g.:
+
+       for i in {1..128}; do
+           q=$(( i % 16 ))
+           ethtool -N ens802f0v0 flow-type tcp4 dst-port "$i" action "$q"
+       done
+
+       for i in {0..127}; do
+           ethtool -N ens802f0v0 delete "$i"
+       done
+
+Suggested-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Suggested-by: Michal Swiatkowski <michal.swiatkowski@intel.com>
+Acked-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
+---
+
+v2:
+   - declare the function `ice_clean_rx_irq()` as static, because now it is
+     called from "ice_txrx.c" file only (Maciej),
+   - add RB tags from Jacob and Simon.
+
+v1: https://lore.kernel.org/intel-wired-lan/20250321151357.28540-1-michal.kubiak@intel.com/
+
+---
+ drivers/net/ethernet/intel/ice/ice_base.c |  5 +-
+ drivers/net/ethernet/intel/ice/ice_lib.c  |  3 +-
+ drivers/net/ethernet/intel/ice/ice_txrx.c | 87 +++++++++++++++++++----
+ drivers/net/ethernet/intel/ice/ice_txrx.h |  3 +-
+ 4 files changed, 79 insertions(+), 19 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
+index 6db4ad8fc70b..270f936ce807 100644
+--- a/drivers/net/ethernet/intel/ice/ice_base.c
++++ b/drivers/net/ethernet/intel/ice/ice_base.c
+@@ -623,7 +623,10 @@ static int ice_vsi_cfg_rxq(struct ice_rx_ring *ring)
+ 		return 0;
+ 	}
+ 
+-	ice_alloc_rx_bufs(ring, num_bufs);
++	if (ring->vsi->type == ICE_VSI_CTRL)
++		ice_init_ctrl_rx_descs(ring, num_bufs);
++	else
++		ice_alloc_rx_bufs(ring, num_bufs);
+ 
+ 	return 0;
+ }
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index 03bb16191237..533486af9be7 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -484,8 +484,7 @@ static irqreturn_t ice_msix_clean_ctrl_vsi(int __always_unused irq, void *data)
+ 	if (!q_vector->tx.tx_ring)
+ 		return IRQ_HANDLED;
+ 
+-#define FDIR_RX_DESC_CLEAN_BUDGET 64
+-	ice_clean_rx_irq(q_vector->rx.rx_ring, FDIR_RX_DESC_CLEAN_BUDGET);
++	ice_clean_ctrl_rx_irq(q_vector->rx.rx_ring);
+ 	ice_clean_ctrl_tx_irq(q_vector->tx.tx_ring);
+ 
+ 	return IRQ_HANDLED;
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
+index 0e5107fe62ad..29e0088ab6b2 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx.c
++++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
+@@ -20,7 +20,6 @@
+ 
+ #define ICE_RX_HDR_SIZE		256
+ 
+-#define FDIR_DESC_RXDID 0x40
+ #define ICE_FDIR_CLEAN_DELAY 10
+ 
+ /**
+@@ -706,6 +705,37 @@ ice_alloc_mapped_page(struct ice_rx_ring *rx_ring, struct ice_rx_buf *bi)
+ 	return true;
+ }
+ 
++/**
++ * ice_init_ctrl_rx_descs - Initialize Rx descriptors for control vsi.
++ * @rx_ring: ring to init descriptors on
++ * @count: number of descriptors to initialize
++ */
++void ice_init_ctrl_rx_descs(struct ice_rx_ring *rx_ring, u32 count)
++{
++	union ice_32b_rx_flex_desc *rx_desc;
++	u32 ntu = rx_ring->next_to_use;
++
++	if (!count)
++		return;
++
++	rx_desc = ICE_RX_DESC(rx_ring, ntu);
++
++	do {
++		rx_desc++;
++		ntu++;
++		if (unlikely(ntu == rx_ring->count)) {
++			rx_desc = ICE_RX_DESC(rx_ring, 0);
++			ntu = 0;
++		}
++
++		rx_desc->wb.status_error0 = 0;
++		count--;
++	} while (count);
++
++	if (rx_ring->next_to_use != ntu)
++		ice_release_rx_desc(rx_ring, ntu);
++}
++
+ /**
+  * ice_alloc_rx_bufs - Replace used receive buffers
+  * @rx_ring: ring to place buffers on
+@@ -726,8 +756,7 @@ bool ice_alloc_rx_bufs(struct ice_rx_ring *rx_ring, unsigned int cleaned_count)
+ 	struct ice_rx_buf *bi;
+ 
+ 	/* do nothing if no valid netdev defined */
+-	if ((!rx_ring->netdev && rx_ring->vsi->type != ICE_VSI_CTRL) ||
+-	    !cleaned_count)
++	if (!rx_ring->netdev || !cleaned_count)
+ 		return false;
+ 
+ 	/* get the Rx descriptor and buffer based on next_to_use */
+@@ -1183,6 +1212,45 @@ static void ice_put_rx_mbuf(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
+ 	rx_ring->nr_frags = 0;
+ }
+ 
++/**
++ * ice_clean_ctrl_rx_irq - Clean descriptors from flow director Rx ring
++ * @rx_ring: Rx descriptor ring for ctrl_vsi to transact packets on
++ *
++ * This function cleans Rx descriptors from the ctrl_vsi Rx ring used
++ * to set flow director rules on VFs.
++ */
++void ice_clean_ctrl_rx_irq(struct ice_rx_ring *rx_ring)
++{
++	u32 ntc = rx_ring->next_to_clean;
++	unsigned int total_rx_pkts = 0;
++	u32 cnt = rx_ring->count;
++
++	while (likely(total_rx_pkts < ICE_DFLT_IRQ_WORK)) {
++		struct ice_vsi *ctrl_vsi = rx_ring->vsi;
++		union ice_32b_rx_flex_desc *rx_desc;
++		u16 stat_err_bits;
++
++		rx_desc = ICE_RX_DESC(rx_ring, ntc);
++
++		stat_err_bits = BIT(ICE_RX_FLEX_DESC_STATUS0_DD_S);
++		if (!ice_test_staterr(rx_desc->wb.status_error0, stat_err_bits))
++			break;
++
++		dma_rmb();
++
++		if (ctrl_vsi->vf)
++			ice_vc_fdir_irq_handler(ctrl_vsi, rx_desc);
++
++		if (++ntc == cnt)
++			ntc = 0;
++		total_rx_pkts++;
++	}
++
++	rx_ring->first_desc = ntc;
++	rx_ring->next_to_clean = ntc;
++	ice_init_ctrl_rx_descs(rx_ring, ICE_RX_DESC_UNUSED(rx_ring));
++}
++
+ /**
+  * ice_clean_rx_irq - Clean completed descriptors from Rx ring - bounce buf
+  * @rx_ring: Rx descriptor ring to transact packets on
+@@ -1195,7 +1263,7 @@ static void ice_put_rx_mbuf(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
+  *
+  * Returns amount of work completed
+  */
+-int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
++static int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
+ {
+ 	unsigned int total_rx_bytes = 0, total_rx_pkts = 0;
+ 	unsigned int offset = rx_ring->rx_offset;
+@@ -1242,17 +1310,6 @@ int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
+ 		dma_rmb();
+ 
+ 		ice_trace(clean_rx_irq, rx_ring, rx_desc);
+-		if (rx_desc->wb.rxdid == FDIR_DESC_RXDID || !rx_ring->netdev) {
+-			struct ice_vsi *ctrl_vsi = rx_ring->vsi;
+-
+-			if (rx_desc->wb.rxdid == FDIR_DESC_RXDID &&
+-			    ctrl_vsi->vf)
+-				ice_vc_fdir_irq_handler(ctrl_vsi, rx_desc);
+-			if (++ntc == cnt)
+-				ntc = 0;
+-			rx_ring->first_desc = ntc;
+-			continue;
+-		}
+ 
+ 		size = le16_to_cpu(rx_desc->wb.pkt_len) &
+ 			ICE_RX_FLX_DESC_PKT_LEN_M;
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/ethernet/intel/ice/ice_txrx.h
+index a4b1e9514632..fef750c5f288 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx.h
++++ b/drivers/net/ethernet/intel/ice/ice_txrx.h
+@@ -491,6 +491,7 @@ static inline unsigned int ice_rx_pg_order(struct ice_rx_ring *ring)
+ 
+ union ice_32b_rx_flex_desc;
+ 
++void ice_init_ctrl_rx_descs(struct ice_rx_ring *rx_ring, u32 num_descs);
+ bool ice_alloc_rx_bufs(struct ice_rx_ring *rxr, unsigned int cleaned_count);
+ netdev_tx_t ice_start_xmit(struct sk_buff *skb, struct net_device *netdev);
+ u16
+@@ -506,6 +507,6 @@ int ice_napi_poll(struct napi_struct *napi, int budget);
+ int
+ ice_prgm_fdir_fltr(struct ice_vsi *vsi, struct ice_fltr_desc *fdir_desc,
+ 		   u8 *raw_packet);
+-int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget);
+ void ice_clean_ctrl_tx_irq(struct ice_tx_ring *tx_ring);
++void ice_clean_ctrl_rx_irq(struct ice_rx_ring *rx_ring);
+ #endif /* _ICE_TXRX_H_ */
+-- 
+2.45.2
+
 
