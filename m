@@ -1,53 +1,92 @@
-Return-Path: <netdev+bounces-190332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FA9CAB6456
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 09:29:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A8F9AB648B
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 09:35:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB75B7A5563
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 07:28:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07DB016A039
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 07:35:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A647F218AC8;
-	Wed, 14 May 2025 07:28:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A12018C933;
+	Wed, 14 May 2025 07:35:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PNlmhIeA"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE291E520F;
-	Wed, 14 May 2025 07:27:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7087AE55B;
+	Wed, 14 May 2025 07:35:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747207682; cv=none; b=KGECbKpWrCYfm8RHzYr6RKF6wpoceBQTyj/A6mOqEa/gqzlb22pvLV2Act7BUTrhDUeOOnZq+b4o0oxX6SFTrWPf9XhLJoe1K/PBfIsKiS2PQtF9v8hEAvm9oR/7CW9nzL71Nl1E1E8z/T3buCdtSlSZ0yQLeXoTw7tQ+Ha9lSE=
+	t=1747208149; cv=none; b=fWLKh+cssXK/ibzdxXSKfygC2xGjbOEIFDw7J4JwgTUNYtx5CNao2U6oaevdtrhsGpt9kdgskgjQ+muWXbeLIkqwquWqCw0KSHebtBbz1+AHTKSS+VT9p6pIh0gY54OiLdBMoYmlplQjJMueVWUVZeoRHZLLPdNzybYqvDpC6AU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747207682; c=relaxed/simple;
-	bh=9dCg3FNbT51YcOLgSBbAmAz5vhbZxfJOxjdUIN93giQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WurnaJUoLoHGdJ6vl+E9IgNeSavU2+GdbbjctX7QMZelbmotNdab8Pi5vuNCusi+iYSfM9m4xuIj6g1rgUSoZgyedeKPOkJ5HOjWWtLmOXc2EHbqw6Ty01SpO6V1kmWajRcN1ejYFEJ04YwidFXCoFOM4Lmxw/R6oC0MlLA7PZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost (unknown [124.16.138.129])
-	by APP-03 (Coremail) with SMTP id rQCowAAn0j7zRSRocob6FA--.59550S2;
-	Wed, 14 May 2025 15:27:47 +0800 (CST)
-From: Chen Ni <nichen@iscas.ac.cn>
-To: saeedm@nvidia.com,
-	leon@kernel.org,
-	tariqt@nvidia.com,
+	s=arc-20240116; t=1747208149; c=relaxed/simple;
+	bh=OOOOn912lXFs2smEIwrvy1xSU9BCFYHFtFCKTzjR2xs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RIbzWt0nX+3fJMn4aXa0ufh8PeQszWBfUIelOLOkcLSgvxcpRRY9peTeS8njyJKB1GkxOuEl/sqMfWtCq49nSQAkKmD9HCh8lcyiRJHbtsTCE1g0lAE9eTKZHqvB2akqOnyhTRE2Kk4lXxLxvEeup/ETsCtkk9X4s7OTtYn/g4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PNlmhIeA; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3a1fb17bb8cso4145204f8f.0;
+        Wed, 14 May 2025 00:35:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747208145; x=1747812945; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ul5ASNAAqaRo57R6T172xXbaOjPecgoWC4kEAPl+0WA=;
+        b=PNlmhIeA2GsCzT+Pe5qxzcRqiwLEdqx7g+4Gq5XfcgbEoM7ur67/Lz4nB+Y7mE7pJ5
+         WAg32esUM6/Szeky2APvvVZuJGL/d0tx2VDbQzpuDPEnTe5jgsO9CyWHgegNEf0F6gm8
+         ZiPurvz8hNlFJAXFxjMw3cCxoj1KZlkO8B5SLZs1//IBk/Px3dsPCqde0XdvubDyjz7Y
+         omn8IjbrSnAFK/hOlTaZyy8+67/z1lXDe1Kq3pe8GRGb5zYMbc8Og9q8up9YmPmDR4eF
+         2/BXgE0GIj16TDBEeA/dpam10yRKrTTNEboktaTB+xLZOG1auoSMRpyr7sAILISC1J3E
+         SpEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747208145; x=1747812945;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ul5ASNAAqaRo57R6T172xXbaOjPecgoWC4kEAPl+0WA=;
+        b=DiuvlfvEaOh7nwhu6uQOKYkwsv8j7lXe3QiGOJlFkRtAaiyGjUyELPxUnXKSbgDNSz
+         VqdhmDgRWGXEB2T1VIrW5uvBBAOOtXjfV9gSBtA/v7aKJfJEv5Ygq4KAh75gZYBM+f9k
+         LIBP2RDf5ojD53aVgn5vlE5rG45bx5miRy+/mB2dHehHnGzD/cEPG0r1I8bw+jaHCZ3I
+         3hbsLeUXy0UbP/trSURlAg+7qMhy88s9l7X2ExkX1XLTkPhTsYP6bZP/xNiNxG/beaF7
+         K4EjP1nf5e5ICHXe02BZPox9+jNE7qKuBL+jUwrU3/nvtAF9FkdC5M/rvWpJiPDCUQwh
+         CoDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVYIbv5HRCUZl23HVSN6ISF+KitZW/l1W7KpVN9kCvWzUFThvvaWFpAnO93xHoql92i3dtdyVM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YweKCpVz0norUzosxThzDdbg0aXzYFljEQB+/ijq0K+1yHvyIR4
+	R0+aUzMjKohuKDb3J33lBoSDpx/61H2PG3XiUgUndTORnEGMwywbFNCleBsjyec=
+X-Gm-Gg: ASbGncupohApScell59T7cztBistfce0iIooGDNuTVEzBrALS6a8y3fHnh8xcxfw9KW
+	02l98eO2J/ggLzSyq5zNdAIN9hgIgDKIvZ9dx5BwQKpHTJYS0a2jUzfrtuf0tzYCITmJvo5c72b
+	LWHQmcYKZY/IhwH7W+VAfJp0xsX3VXfMp5Tj0RyXWmDeweI7cA/w5bWv+6s5nvUybc0eAJG+jdz
+	qI/OiUFZUJwEbCz2qVzLGR0D9L8uH88eZblJPkSLGPeuzrNusdqcCmP9y4MRCeko4N7QTH1HTBc
+	2WY0N5TOrHF0DnWVHL0Xtb1gQzsyrnPpc/qjg07UTFsmZ0tqAaTvWBwwP2YP3bYywgDY7Vg5muo
+	mR4w07oSl/EiI
+X-Google-Smtp-Source: AGHT+IGwSbCTBRmv6Oqn2oCWAU+RV3ceeVmjLx7z/b1CEEgub3G4qNbpYnPJ+pIaA6n08/cBLfamsw==
+X-Received: by 2002:a05:6000:1864:b0:3a2:1fd:afd9 with SMTP id ffacd0b85a97d-3a34994faf5mr1882054f8f.58.1747208144654;
+        Wed, 14 May 2025 00:35:44 -0700 (PDT)
+Received: from fedora.advaoptical.com ([82.166.23.19])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442f3951b6dsm17924165e9.17.2025.05.14.00.35.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 May 2025 00:35:44 -0700 (PDT)
+From: Sagi Maimon <maimon.sagi@gmail.com>
+To: jonathan.lemon@gmail.com,
+	vadim.fedorenko@linux.dev,
+	richardcochran@gmail.com,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Chen Ni <nichen@iscas.ac.cn>
-Subject: [PATCH net-next v2] net/mlx5: Use to_delayed_work()
-Date: Wed, 14 May 2025 15:24:19 +0800
-Message-Id: <20250514072419.2707578-1-nichen@iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Sagi Maimon <maimon.sagi@gmail.com>
+Subject: [PATCH v5] ptp: ocp: Limit signal/freq counts in summary output functions
+Date: Wed, 14 May 2025 10:35:41 +0300
+Message-ID: <20250514073541.35817-1-maimon.sagi@gmail.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,53 +94,126 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowAAn0j7zRSRocob6FA--.59550S2
-X-Coremail-Antispam: 1UD129KBjvdXoW7Gw1xJFyxZF15tF47KFWDCFg_yoWDGFb_ur
-	90vryfuw1Y9rn3Kr43ur4fAay09w4vgrs3KFZ8KFZ8J3yDKr1UZ34kZ3srCr1xWr1UAF9x
-	GrsIya13C39rJjkaLaAFLSUrUUUUbb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbf8FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
-	Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AKxVWxJr
-	0_GcWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK67AK6r4xMxAIw28IcxkI7VAKI4
-	8JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xv
-	wVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjx
-	v20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20E
-	Y4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267
-	AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUjJGYJUUUUU==
-X-CM-SenderInfo: xqlfxv3q6l2u1dvotugofq/
 
-Use to_delayed_work() instead of open-coding it.
+The debugfs summary output could access uninitialized elements in
+the freq_in[] and signal_out[] arrays, causing NULL pointer
+dereferences and triggering a kernel Oops (page_fault_oops).
+This patch adds u8 fields (nr_freq_in, nr_signal_out) to track the
+number of initialized elements, with a maximum of 4 per array.
+The summary output functions are updated to respect these limits,
+preventing out-of-bounds access and ensuring safe array handling.
 
-Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
+Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
 ---
-Changelog:
-
-v1 -> v2:
-
-1. Specify the target tree.
+Addressed comments from Vadim Fedorenko:
+- https://www.spinics.net/lists/kernel/msg5683022.html
+Addressed comments from Jakub Kicinski:
+- https://www.spinics.net/lists/netdev/msg1091131.html
+Changes since v4:
+- remove fix from signal/freq show/store routines.
 ---
- drivers/net/ethernet/mellanox/mlx5/core/cmd.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+---
+ drivers/ptp/ptp_ocp.c | 24 +++++++++++++++++-------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-index e53dbdc0a7a1..b1aeea7c4a91 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-@@ -927,8 +927,7 @@ static void mlx5_cmd_comp_handler(struct mlx5_core_dev *dev, u64 vec, bool force
+diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+index 2ccdca4f6960..e63481f24238 100644
+--- a/drivers/ptp/ptp_ocp.c
++++ b/drivers/ptp/ptp_ocp.c
+@@ -315,6 +315,8 @@ struct ptp_ocp_serial_port {
+ #define OCP_BOARD_ID_LEN		13
+ #define OCP_SERIAL_LEN			6
+ #define OCP_SMA_NUM			4
++#define OCP_SIGNAL_NUM			4
++#define OCP_FREQ_NUM			4
  
- static void cb_timeout_handler(struct work_struct *work)
+ enum {
+ 	PORT_GNSS,
+@@ -342,8 +344,8 @@ struct ptp_ocp {
+ 	struct dcf_master_reg	__iomem *dcf_out;
+ 	struct dcf_slave_reg	__iomem *dcf_in;
+ 	struct tod_reg		__iomem *nmea_out;
+-	struct frequency_reg	__iomem *freq_in[4];
+-	struct ptp_ocp_ext_src	*signal_out[4];
++	struct frequency_reg	__iomem *freq_in[OCP_FREQ_NUM];
++	struct ptp_ocp_ext_src	*signal_out[OCP_SIGNAL_NUM];
+ 	struct ptp_ocp_ext_src	*pps;
+ 	struct ptp_ocp_ext_src	*ts0;
+ 	struct ptp_ocp_ext_src	*ts1;
+@@ -378,10 +380,12 @@ struct ptp_ocp {
+ 	u32			utc_tai_offset;
+ 	u32			ts_window_adjust;
+ 	u64			fw_cap;
+-	struct ptp_ocp_signal	signal[4];
++	struct ptp_ocp_signal	signal[OCP_SIGNAL_NUM];
+ 	struct ptp_ocp_sma_connector sma[OCP_SMA_NUM];
+ 	const struct ocp_sma_op *sma_op;
+ 	struct dpll_device *dpll;
++	int signals_nr;
++	int freq_in_nr;
+ };
+ 
+ #define OCP_REQ_TIMESTAMP	BIT(0)
+@@ -2697,6 +2701,8 @@ ptp_ocp_fb_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
+ 	bp->eeprom_map = fb_eeprom_map;
+ 	bp->fw_version = ioread32(&bp->image->version);
+ 	bp->sma_op = &ocp_fb_sma_op;
++	bp->signals_nr = 4;
++	bp->freq_in_nr = 4;
+ 
+ 	ptp_ocp_fb_set_version(bp);
+ 
+@@ -2862,6 +2868,8 @@ ptp_ocp_art_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
+ 	bp->fw_version = ioread32(&bp->reg->version);
+ 	bp->fw_tag = 2;
+ 	bp->sma_op = &ocp_art_sma_op;
++	bp->signals_nr = 4;
++	bp->freq_in_nr = 4;
+ 
+ 	/* Enable MAC serial port during initialisation */
+ 	iowrite32(1, &bp->board_config->mro50_serial_activate);
+@@ -2888,6 +2896,8 @@ ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
+ 	bp->flash_start = 0xA00000;
+ 	bp->eeprom_map = fb_eeprom_map;
+ 	bp->sma_op = &ocp_adva_sma_op;
++	bp->signals_nr = 2;
++	bp->freq_in_nr = 2;
+ 
+ 	version = ioread32(&bp->image->version);
+ 	/* if lower 16 bits are empty, this is the fw loader. */
+@@ -4008,7 +4018,7 @@ _signal_summary_show(struct seq_file *s, struct ptp_ocp *bp, int nr)
  {
--	struct delayed_work *dwork = container_of(work, struct delayed_work,
--						  work);
-+	struct delayed_work *dwork = to_delayed_work(work);
- 	struct mlx5_cmd_work_ent *ent = container_of(dwork,
- 						     struct mlx5_cmd_work_ent,
- 						     cb_timeout_work);
+ 	struct signal_reg __iomem *reg = bp->signal_out[nr]->mem;
+ 	struct ptp_ocp_signal *signal = &bp->signal[nr];
+-	char label[8];
++	char label[16];
+ 	bool on;
+ 	u32 val;
+ 
+@@ -4031,7 +4041,7 @@ static void
+ _frequency_summary_show(struct seq_file *s, int nr,
+ 			struct frequency_reg __iomem *reg)
+ {
+-	char label[8];
++	char label[16];
+ 	bool on;
+ 	u32 val;
+ 
+@@ -4175,11 +4185,11 @@ ptp_ocp_summary_show(struct seq_file *s, void *data)
+ 	}
+ 
+ 	if (bp->fw_cap & OCP_CAP_SIGNAL)
+-		for (i = 0; i < 4; i++)
++		for (i = 0; i < bp->signals_nr; i++)
+ 			_signal_summary_show(s, bp, i);
+ 
+ 	if (bp->fw_cap & OCP_CAP_FREQ)
+-		for (i = 0; i < 4; i++)
++		for (i = 0; i < bp->freq_in_nr; i++)
+ 			_frequency_summary_show(s, i, bp->freq_in[i]);
+ 
+ 	if (bp->irig_out) {
 -- 
-2.25.1
+2.47.0
 
 
