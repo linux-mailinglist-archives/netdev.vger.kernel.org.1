@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-190503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16723AB71F2
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 18:53:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82953AB71F4
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 18:54:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A51D1B67F64
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 16:53:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF2263B0ECE
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 16:53:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 798D327C15B;
-	Wed, 14 May 2025 16:53:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17B201F1931;
+	Wed, 14 May 2025 16:54:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="NjReLkvJ"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="WpMb8WsE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B8013DDAA
-	for <netdev@vger.kernel.org>; Wed, 14 May 2025 16:53:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B3E113DDAA
+	for <netdev@vger.kernel.org>; Wed, 14 May 2025 16:53:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747241612; cv=none; b=jd13VibjM/0lAuzvG9iHGOv8gOFpiaECqcEyf6O9inLJ8q/n3LXSQyLs4ahV83Z1J141ckOPjHtmr2VMw/jceOKym1vwISk+u4C1/eUzAoqbe1/qdcm++BI+9gAd9mXEBX2bvXN0g9zoe/jUd+AmsdTAM1uhQF5Hmjm2geZ93Wo=
+	t=1747241642; cv=none; b=WEzf3nPSy/9sHWjk4RMyvauUbH9Hfe6NRyjpxzp+XCAZPbAEd2/UMOjR1fsGDuKQ5c7mu6QzD4vMNLF25jn9Z9Glo+HdravnxtFdNmE4EFma+HUg+jtltHTUZoHif8KcneSOqvILCNn0c+TlD5V4mLJlJ2IR0VPAEBy2SPZf3as=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747241612; c=relaxed/simple;
-	bh=K99J37eW4YetMTBywNuy2krslJsi7+VADpoYhOwNJTs=;
+	s=arc-20240116; t=1747241642; c=relaxed/simple;
+	bh=PDvD091LfRjOJtrw1iz9VGRTcVHyrV3DmVJvRrTnlcQ=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZT102qQuuP/9Qm05wGlWRvKzcHTLe5QoZ5GYoJM/Gq7xEwdPC4Fndq/xbJ+dU37FI0mE6Zb4PrJ4/blLB8S+66AZAY/OxPbw9PwSwId8nCSDNe0KTU2H7GYJocEvNT9HK8F5QA/nCWcp7KpmDxmBy5CUz+RwZQASjPHmliNoAnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=NjReLkvJ; arc=none smtp.client-ip=52.119.213.150
+	 MIME-Version:Content-Type; b=aWayenMN0nuvm5y2xC+udb3ySWlFkHNrLzbe+J1euc4zld7fFt0+EiuqexOI65oKXsXJf4RE99fDfbPamGPnAa3pjFQqbG2envriej0EVmRbnMNbd8X/VTDooEGd9RceWUy69xLxbOQ4HSWJcS+n4gijsI4+p3fey2lnM8G7kr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=WpMb8WsE; arc=none smtp.client-ip=72.21.196.25
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1747241610; x=1778777610;
+  t=1747241641; x=1778777641;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=uSGIaqLEaroildq83RekUXJ0eeSt8PNFSPl17SmUYxQ=;
-  b=NjReLkvJg5Xvv28IqJDi2ETC1yKR+HxeyscanM2jPulWJcjewc+WwtCW
-   d/1rEB0oS9JJxJaXbvcb4BSIJm7g9+FtrCMlQZPas3sJ50b/XK6hKehd9
-   S1I5OMiD/BZxmzk9vlVAH7yZXoWQi892Kd+Ka05grOZfa54KeSC86Zzrc
-   eNVyS6uhzOrqHp+J8vzWvDe1GkRvFHIojZSB9WawIduuISq4o81PfkWI0
-   r/NdQG7yS2vQTG+Tx1/E5elM+8miCWRBcl54svqjh6Yd7xzSndlLJ2fpJ
-   3SSMi2ELCus+8jpfRptdk01vFMCdLcZHWmnO2EajI50VOf7g2wAbtiwpA
-   g==;
+  bh=JcxTQLj0ekVbtKAdzlZsUKLtF0kxDD5o+d1IvLKKjGg=;
+  b=WpMb8WsEbHEPaGMMi0AIfZv0kRoG4xdbMu3K6Y3Owi1yZtNTfTSNpd5w
+   Yq3UoYhovk1DXcLy48LsxI08f0BFwCGwX9zN0I5fPO/HN2b1XkkheHoJD
+   omjKgG1BNCo83QJj/FldA1tzxs6kb5u/M7JkSDy4NyOkoOdEWzKE3K90i
+   kOuHj1+/TEOUk2mUVa1uQPyrDdxmRxbg7u7r6ayraAV57X9+dog4mWruH
+   HU9RbgY3Zf/HkbPi0Gc/m3s1T1JGtQRNS+Whp65lUWFJQxZ/ZsUuE0GAo
+   ArXLQpUbauikkS5LVz6CFkJ5sJCWZ/7Fhku74J2LgDPnG98KolGoEylna
+   A==;
 X-IronPort-AV: E=Sophos;i="6.15,288,1739836800"; 
-   d="scan'208";a="722782833"
+   d="scan'208";a="492264768"
 Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2025 16:53:27 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:47892]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.36.176:2525] with esmtp (Farcaster)
- id 48408970-c657-408d-9732-021bb1a4fb72; Wed, 14 May 2025 16:53:26 +0000 (UTC)
-X-Farcaster-Flow-ID: 48408970-c657-408d-9732-021bb1a4fb72
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2025 16:53:53 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:44233]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.61.52:2525] with esmtp (Farcaster)
+ id 2425618c-9b87-4abe-8901-36617d4875e5; Wed, 14 May 2025 16:53:51 +0000 (UTC)
+X-Farcaster-Flow-ID: 2425618c-9b87-4abe-8901-36617d4875e5
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 14 May 2025 16:53:26 +0000
+ Wed, 14 May 2025 16:53:51 +0000
 Received: from 6c7e67bfbae3.amazon.com (10.187.171.38) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 14 May 2025 16:53:24 +0000
+ Wed, 14 May 2025 16:53:48 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -67,9 +67,9 @@ To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 CC: Simon Horman <horms@kernel.org>, Christian Brauner <brauner@kernel.org>,
 	Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v3 net-next 2/9] af_unix: Don't pass struct socket to maybe_add_creds().
-Date: Wed, 14 May 2025 09:51:45 -0700
-Message-ID: <20250514165226.40410-3-kuniyu@amazon.com>
+Subject: [PATCH v3 net-next 3/9] scm: Move scm_recv() from scm.h to scm.c.
+Date: Wed, 14 May 2025 09:51:46 -0700
+Message-ID: <20250514165226.40410-4-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250514165226.40410-1-kuniyu@amazon.com>
 References: <20250514165226.40410-1-kuniyu@amazon.com>
@@ -81,112 +81,294 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWA001.ant.amazon.com (10.13.139.112) To
+X-ClientProxiedBy: EX19D038UWC002.ant.amazon.com (10.13.139.238) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-We will move SOCK_PASS{CRED,PIDFD,SEC} from struct socket.flags
-to struct sock for better handling with SOCK_PASSRIGHTS.
+scm_recv() has been placed in scm.h since the pre-git era for no
+particular reason (I think), which makes the file really fragile.
 
-Then, we don't need to access struct socket in maybe_add_creds().
+For example, when you move SOCK_PASSCRED from include/linux/net.h to
+enum sock_flags in include/net/sock.h, you will see weird build failure
+due to terrible dependency.
 
-Let's pass struct sock to maybe_add_creds() and its caller
-queue_oob().
+To avoid the build failure in the future, let's move scm_recv(_unix())?
+and its callees to scm.c.
 
-While at it, we append the unix_ prefix and fix double spaces
-around the pid assignment.
+Note that only scm_recv() needs to be exported for Bluetooth.
+
+scm_send() should be moved to scm.c too, but I'll revisit later.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- net/unix/af_unix.c | 23 ++++++++++++-----------
- 1 file changed, 12 insertions(+), 11 deletions(-)
+v3: Remove inline in scm.c
+---
+ include/net/scm.h | 121 ++-------------------------------------------
+ net/core/scm.c    | 123 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 127 insertions(+), 117 deletions(-)
 
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 464e183ffdb8..a39497fd6e98 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -1869,7 +1869,7 @@ static int unix_scm_to_skb(struct scm_cookie *scm, struct sk_buff *skb, bool sen
- {
- 	int err = 0;
- 
--	UNIXCB(skb).pid  = get_pid(scm->pid);
-+	UNIXCB(skb).pid = get_pid(scm->pid);
- 	UNIXCB(skb).uid = scm->creds.uid;
- 	UNIXCB(skb).gid = scm->creds.gid;
- 	UNIXCB(skb).fp = NULL;
-@@ -1886,15 +1886,15 @@ static int unix_scm_to_skb(struct scm_cookie *scm, struct sk_buff *skb, bool sen
-  * We include credentials if source or destination socket
-  * asserted SOCK_PASSCRED.
-  */
--static void maybe_add_creds(struct sk_buff *skb, const struct socket *sock,
--			    const struct sock *other)
-+static void unix_maybe_add_creds(struct sk_buff *skb, const struct sock *sk,
-+				 const struct sock *other)
- {
- 	if (UNIXCB(skb).pid)
- 		return;
- 
--	if (unix_may_passcred(sock->sk) ||
-+	if (unix_may_passcred(sk) ||
- 	    !other->sk_socket || unix_may_passcred(other)) {
--		UNIXCB(skb).pid  = get_pid(task_tgid(current));
-+		UNIXCB(skb).pid = get_pid(task_tgid(current));
- 		current_uid_gid(&UNIXCB(skb).uid, &UNIXCB(skb).gid);
- 	}
+diff --git a/include/net/scm.h b/include/net/scm.h
+index 22bb49589fde..84c4707e78a5 100644
+--- a/include/net/scm.h
++++ b/include/net/scm.h
+@@ -102,123 +102,10 @@ static __inline__ int scm_send(struct socket *sock, struct msghdr *msg,
+ 	return __scm_send(sock, msg, scm);
  }
-@@ -2133,7 +2133,8 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
  
- 	if (sock_flag(other, SOCK_RCVTSTAMP))
- 		__net_timestamp(skb);
--	maybe_add_creds(skb, sock, other);
+-#ifdef CONFIG_SECURITY_NETWORK
+-static inline void scm_passec(struct socket *sock, struct msghdr *msg, struct scm_cookie *scm)
+-{
+-	struct lsm_context ctx;
+-	int err;
+-
+-	if (test_bit(SOCK_PASSSEC, &sock->flags)) {
+-		err = security_secid_to_secctx(scm->secid, &ctx);
+-
+-		if (err >= 0) {
+-			put_cmsg(msg, SOL_SOCKET, SCM_SECURITY, ctx.len,
+-				 ctx.context);
+-			security_release_secctx(&ctx);
+-		}
+-	}
+-}
+-
+-static inline bool scm_has_secdata(struct socket *sock)
+-{
+-	return test_bit(SOCK_PASSSEC, &sock->flags);
+-}
+-#else
+-static inline void scm_passec(struct socket *sock, struct msghdr *msg, struct scm_cookie *scm)
+-{ }
+-
+-static inline bool scm_has_secdata(struct socket *sock)
+-{
+-	return false;
+-}
+-#endif /* CONFIG_SECURITY_NETWORK */
+-
+-static __inline__ void scm_pidfd_recv(struct msghdr *msg, struct scm_cookie *scm)
+-{
+-	struct file *pidfd_file = NULL;
+-	int len, pidfd;
+-
+-	/* put_cmsg() doesn't return an error if CMSG is truncated,
+-	 * that's why we need to opencode these checks here.
+-	 */
+-	if (msg->msg_flags & MSG_CMSG_COMPAT)
+-		len = sizeof(struct compat_cmsghdr) + sizeof(int);
+-	else
+-		len = sizeof(struct cmsghdr) + sizeof(int);
+-
+-	if (msg->msg_controllen < len) {
+-		msg->msg_flags |= MSG_CTRUNC;
+-		return;
+-	}
+-
+-	if (!scm->pid)
+-		return;
+-
+-	pidfd = pidfd_prepare(scm->pid, 0, &pidfd_file);
+-
+-	if (put_cmsg(msg, SOL_SOCKET, SCM_PIDFD, sizeof(int), &pidfd)) {
+-		if (pidfd_file) {
+-			put_unused_fd(pidfd);
+-			fput(pidfd_file);
+-		}
+-
+-		return;
+-	}
+-
+-	if (pidfd_file)
+-		fd_install(pidfd, pidfd_file);
+-}
+-
+-static inline bool __scm_recv_common(struct socket *sock, struct msghdr *msg,
+-				     struct scm_cookie *scm, int flags)
+-{
+-	if (!msg->msg_control) {
+-		if (test_bit(SOCK_PASSCRED, &sock->flags) ||
+-		    test_bit(SOCK_PASSPIDFD, &sock->flags) ||
+-		    scm->fp || scm_has_secdata(sock))
+-			msg->msg_flags |= MSG_CTRUNC;
+-		scm_destroy(scm);
+-		return false;
+-	}
+-
+-	if (test_bit(SOCK_PASSCRED, &sock->flags)) {
+-		struct user_namespace *current_ns = current_user_ns();
+-		struct ucred ucreds = {
+-			.pid = scm->creds.pid,
+-			.uid = from_kuid_munged(current_ns, scm->creds.uid),
+-			.gid = from_kgid_munged(current_ns, scm->creds.gid),
+-		};
+-		put_cmsg(msg, SOL_SOCKET, SCM_CREDENTIALS, sizeof(ucreds), &ucreds);
+-	}
+-
+-	scm_passec(sock, msg, scm);
+-
+-	if (scm->fp)
+-		scm_detach_fds(msg, scm);
+-
+-	return true;
+-}
+-
+-static inline void scm_recv(struct socket *sock, struct msghdr *msg,
+-			    struct scm_cookie *scm, int flags)
+-{
+-	if (!__scm_recv_common(sock, msg, scm, flags))
+-		return;
+-
+-	scm_destroy_cred(scm);
+-}
+-
+-static inline void scm_recv_unix(struct socket *sock, struct msghdr *msg,
+-				 struct scm_cookie *scm, int flags)
+-{
+-	if (!__scm_recv_common(sock, msg, scm, flags))
+-		return;
+-
+-	if (test_bit(SOCK_PASSPIDFD, &sock->flags))
+-		scm_pidfd_recv(msg, scm);
+-
+-	scm_destroy_cred(scm);
+-}
++void scm_recv(struct socket *sock, struct msghdr *msg,
++	      struct scm_cookie *scm, int flags);
++void scm_recv_unix(struct socket *sock, struct msghdr *msg,
++		   struct scm_cookie *scm, int flags);
+ 
+ static inline int scm_recv_one_fd(struct file *f, int __user *ufd,
+ 				  unsigned int flags)
+diff --git a/net/core/scm.c b/net/core/scm.c
+index 733c0cbd393d..66e02b18c359 100644
+--- a/net/core/scm.c
++++ b/net/core/scm.c
+@@ -404,3 +404,126 @@ struct scm_fp_list *scm_fp_dup(struct scm_fp_list *fpl)
+ 	return new_fpl;
+ }
+ EXPORT_SYMBOL(scm_fp_dup);
 +
-+	unix_maybe_add_creds(skb, sk, other);
- 	scm_stat_add(other, skb);
- 	skb_queue_tail(&other->sk_receive_queue, skb);
- 	unix_state_unlock(other);
-@@ -2161,14 +2162,14 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
- #define UNIX_SKB_FRAGS_SZ (PAGE_SIZE << get_order(32768))
- 
- #if IS_ENABLED(CONFIG_AF_UNIX_OOB)
--static int queue_oob(struct socket *sock, struct msghdr *msg, struct sock *other,
-+static int queue_oob(struct sock *sk, struct msghdr *msg, struct sock *other,
- 		     struct scm_cookie *scm, bool fds_sent)
- {
- 	struct unix_sock *ousk = unix_sk(other);
- 	struct sk_buff *skb;
- 	int err;
- 
--	skb = sock_alloc_send_skb(sock->sk, 1, msg->msg_flags & MSG_DONTWAIT, &err);
-+	skb = sock_alloc_send_skb(sk, 1, msg->msg_flags & MSG_DONTWAIT, &err);
- 
- 	if (!skb)
- 		return err;
-@@ -2192,7 +2193,7 @@ static int queue_oob(struct socket *sock, struct msghdr *msg, struct sock *other
- 		goto out;
- 	}
- 
--	maybe_add_creds(skb, sock, other);
-+	unix_maybe_add_creds(skb, sk, other);
- 	scm_stat_add(other, skb);
- 
- 	spin_lock(&other->sk_receive_queue.lock);
-@@ -2308,7 +2309,7 @@ static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
- 		    (other->sk_shutdown & RCV_SHUTDOWN))
- 			goto out_pipe_unlock;
- 
--		maybe_add_creds(skb, sock, other);
-+		unix_maybe_add_creds(skb, sk, other);
- 		scm_stat_add(other, skb);
- 		skb_queue_tail(&other->sk_receive_queue, skb);
- 		unix_state_unlock(other);
-@@ -2318,7 +2319,7 @@ static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
- 
- #if IS_ENABLED(CONFIG_AF_UNIX_OOB)
- 	if (msg->msg_flags & MSG_OOB) {
--		err = queue_oob(sock, msg, other, &scm, fds_sent);
-+		err = queue_oob(sk, msg, other, &scm, fds_sent);
- 		if (err)
- 			goto out_err;
- 		sent++;
++#ifdef CONFIG_SECURITY_NETWORK
++static void scm_passec(struct socket *sock, struct msghdr *msg, struct scm_cookie *scm)
++{
++	struct lsm_context ctx;
++	int err;
++
++	if (test_bit(SOCK_PASSSEC, &sock->flags)) {
++		err = security_secid_to_secctx(scm->secid, &ctx);
++
++		if (err >= 0) {
++			put_cmsg(msg, SOL_SOCKET, SCM_SECURITY, ctx.len,
++				 ctx.context);
++
++			security_release_secctx(&ctx);
++		}
++	}
++}
++
++static bool scm_has_secdata(struct socket *sock)
++{
++	return test_bit(SOCK_PASSSEC, &sock->flags);
++}
++#else
++static void scm_passec(struct socket *sock, struct msghdr *msg, struct scm_cookie *scm)
++{
++}
++
++static bool scm_has_secdata(struct socket *sock)
++{
++	return false;
++}
++#endif
++
++static void scm_pidfd_recv(struct msghdr *msg, struct scm_cookie *scm)
++{
++	struct file *pidfd_file = NULL;
++	int len, pidfd;
++
++	/* put_cmsg() doesn't return an error if CMSG is truncated,
++	 * that's why we need to opencode these checks here.
++	 */
++	if (msg->msg_flags & MSG_CMSG_COMPAT)
++		len = sizeof(struct compat_cmsghdr) + sizeof(int);
++	else
++		len = sizeof(struct cmsghdr) + sizeof(int);
++
++	if (msg->msg_controllen < len) {
++		msg->msg_flags |= MSG_CTRUNC;
++		return;
++	}
++
++	if (!scm->pid)
++		return;
++
++	pidfd = pidfd_prepare(scm->pid, 0, &pidfd_file);
++
++	if (put_cmsg(msg, SOL_SOCKET, SCM_PIDFD, sizeof(int), &pidfd)) {
++		if (pidfd_file) {
++			put_unused_fd(pidfd);
++			fput(pidfd_file);
++		}
++
++		return;
++	}
++
++	if (pidfd_file)
++		fd_install(pidfd, pidfd_file);
++}
++
++static bool __scm_recv_common(struct socket *sock, struct msghdr *msg,
++			      struct scm_cookie *scm, int flags)
++{
++	if (!msg->msg_control) {
++		if (test_bit(SOCK_PASSCRED, &sock->flags) ||
++		    test_bit(SOCK_PASSPIDFD, &sock->flags) ||
++		    scm->fp || scm_has_secdata(sock))
++			msg->msg_flags |= MSG_CTRUNC;
++
++		scm_destroy(scm);
++		return false;
++	}
++
++	if (test_bit(SOCK_PASSCRED, &sock->flags)) {
++		struct user_namespace *current_ns = current_user_ns();
++		struct ucred ucreds = {
++			.pid = scm->creds.pid,
++			.uid = from_kuid_munged(current_ns, scm->creds.uid),
++			.gid = from_kgid_munged(current_ns, scm->creds.gid),
++		};
++
++		put_cmsg(msg, SOL_SOCKET, SCM_CREDENTIALS, sizeof(ucreds), &ucreds);
++	}
++
++	scm_passec(sock, msg, scm);
++
++	if (scm->fp)
++		scm_detach_fds(msg, scm);
++
++	return true;
++}
++
++void scm_recv(struct socket *sock, struct msghdr *msg,
++	      struct scm_cookie *scm, int flags)
++{
++	if (!__scm_recv_common(sock, msg, scm, flags))
++		return;
++
++	scm_destroy_cred(scm);
++}
++EXPORT_SYMBOL(scm_recv);
++
++void scm_recv_unix(struct socket *sock, struct msghdr *msg,
++		   struct scm_cookie *scm, int flags)
++{
++	if (!__scm_recv_common(sock, msg, scm, flags))
++		return;
++
++	if (test_bit(SOCK_PASSPIDFD, &sock->flags))
++		scm_pidfd_recv(msg, scm);
++
++	scm_destroy_cred(scm);
++}
 -- 
 2.49.0
 
