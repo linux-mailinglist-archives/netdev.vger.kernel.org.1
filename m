@@ -1,152 +1,280 @@
-Return-Path: <netdev+bounces-190493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB5CCAB708B
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 17:58:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2466AB70A4
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 18:02:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3B317AE806
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 15:57:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AB86166FA7
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 16:01:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3AAF220F25;
-	Wed, 14 May 2025 15:58:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E421F1DF27C;
+	Wed, 14 May 2025 16:01:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W8Qk4JzG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cnRrwyoV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 447EF1A5B90
-	for <netdev@vger.kernel.org>; Wed, 14 May 2025 15:58:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B24BA33997;
+	Wed, 14 May 2025 16:01:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747238317; cv=none; b=sRVZ0dv/+TPHLxOMG+uRCxVLpj9xsekfTjkkLzxft9D8THT8jiHBSGpX2iSPqjNK9Mc/ancclIQAyoHVUc2Qub6TASq4jmDd2+hoHcl3gtX3LdvhoONF63alAdZliWIDgGznqtcrrMOcTccCEPyuph1mknlBTTuK2S1H2xUNjd0=
+	t=1747238480; cv=none; b=XhrbmJm6y5QJLDwuikCzT1CGtojbvb/+lMIH58Iq+VAbuKDhgGdoowldrLLBxbtjew0hotk6owT4etxOFo5jnilJuqeJGWBxDrurfEashhOBqPj7mPfxYUSUG7xjd3zjZ+cBrnRStgyfhv6DHRxjT2xLpeGDkxnnKhd1xE5DHEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747238317; c=relaxed/simple;
-	bh=RaqmZl58DnIVb+iisfsC6eKCVWU5TDMFnXMqPtsSq4k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=hVpljNwDH3YjlwkVHMYO8yv1xCrAi+nNEdZxQBSk7mF10QsDXOLpLOf048d6MD8FyJHu8g9vITcDbChtWjfjQ7kuANxSUR5Q4V52RVauue8+1AyS8Vl6bbfSNLcwnLnFMZ3O6ehrFNjZCxy1XGE1kdcylC3Ns6bwKCqckWD1PH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W8Qk4JzG; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43cf05f0c3eso47068065e9.0
-        for <netdev@vger.kernel.org>; Wed, 14 May 2025 08:58:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747238314; x=1747843114; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=KUtNem6dUKd/QqP9OUQxP8p92EcBLkyvEXza2/acn6w=;
-        b=W8Qk4JzGNX/Q1LUYfN4GGkVPGC9WGHPXq02nHjwZEeUjTZNssujzHg8oWjoaORuko0
-         ytyRUUZeh0ar/UpfQjrpBSgXCRIde5SdVRgSWXs9tpJxR585SptlB6Y7KOi/K0s4Kdp+
-         6f0iRcteDVZ7EfBGK523cF5bue6g7PLLacfWuIjBlaWKtZAw01h1dMiu4lI7aKw6+kq2
-         3KpfMLJHhwDxeZnh0yBTTNMkcv/Erb4bMDD8E9mCZX4S3abGSntvxWeAmBfcEYlprKXw
-         kH06RxqXVM7s1SGANmnznkBph+mu6ju2G1ww2uINtu07Dlq265d4XLQ01G+ceP6vvWVw
-         +ylQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747238314; x=1747843114;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KUtNem6dUKd/QqP9OUQxP8p92EcBLkyvEXza2/acn6w=;
-        b=UxMvYIzeSsFJW/3agXXABfTp9DFVxAZVFXCNDhRD/HQiD7VuR20Ai0e528aDQKag2s
-         IFVeCUJQ0k57wSEvjDTGelr4z8uxTxkxix9HOqSrZ3miTEfl3SGDOMM7fVqPSNB2zlMH
-         oaEGYkTc8Qxg6XW7apAJRGlmGEkKcUtVHCdQmBzRrH+I6Wp///Uf+uFb1q/6Jsnpag2B
-         mRT/hlrC79nclQ0rwqclGWMmAk8Eq774TKwo/5HNsxnw+sWflEaQu5HkTZhH7BbIa7jV
-         mvqDIdrYlqKhVZzd2VXCa3Gwh8yaUtCeBwDEdrQH0EDh7J2OWxxzipN2aCtV2vI7mBuq
-         ofWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXltnyKa0zWEwekpooTWsa42krhG1TonS9NfanPIqBF6IAbacrjF0t7hA9uwd4aQQTsB+PWkWo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVzsfWzBE1nSV2rAt6UY6Os49WCcsQsY6cEIRCak/6HML8HVg2
-	bpxCluVqCWW6zpWXmUKmOMevqe8/Cz3+Qq7OzvBcYl3d2XlnrsMo
-X-Gm-Gg: ASbGncv0m8692hzxYzsMrTaJbEQyJdxYy3vZeJitVHHbjEZ6Zalak/neQ49rg5xaTDp
-	VFG4f0VUVdWBJYj6G3X5O286Lppj7gq7o8b3Oc5c68D6A6s8atP4LQ1E4XRNrDn/+1WEu8lEodG
-	Ziq2JknwF/Ek0k8O8oWPs1nPUfcoY4XxNaCQ51yDvl/uXTAEsyweEqwHikXhAxi2ho4XcFNTnxa
-	h1dOons5ijt3sUE7K9EFPhS0Y/IT1b7l0GLz0Xexb3cnl5ufr8DA3tfAlw++EWBywRl4kvcF0hn
-	nIvtJ2XJDcrGBYkI2NGrHfL2ca7toUyiAxAUPziXk+yFm2nKtvnzhVJuW4seNMNicosObYr3iLK
-	M1onTRcymVhfi44RV6wIDBGkNE7L/NWvLUTQTK+lGEu70gfcrYbwG/yquGuM6loe8bAjzuCN9vZ
-	F/F36pOLFW88NlSSw=
-X-Google-Smtp-Source: AGHT+IGb1Of+JtusV/47FMipIy+L+FINiDvmrmxN6OT2I0H7JO94M2q06zE3qLgnX1WwKleBNPvRxQ==
-X-Received: by 2002:a05:6000:2207:b0:3a1:1227:149f with SMTP id ffacd0b85a97d-3a349695c44mr3446095f8f.2.1747238314364;
-        Wed, 14 May 2025 08:58:34 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f20:7d00:ad50:3d0d:83ac:8586? (p200300ea8f207d00ad503d0d83ac8586.dip0.t-ipconnect.de. [2003:ea:8f20:7d00:ad50:3d0d:83ac:8586])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3a1f58eca4asm19831522f8f.24.2025.05.14.08.58.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 May 2025 08:58:33 -0700 (PDT)
-Message-ID: <e9ff0335-9b4a-4b5f-adb0-c9ad9ae78f2c@gmail.com>
-Date: Wed, 14 May 2025 17:58:57 +0200
+	s=arc-20240116; t=1747238480; c=relaxed/simple;
+	bh=B2tOkM/DzG98PLHSFcOfINzeUonmNYRo9e+Y87xDuDo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QSqTAegE6U9Ieqqz5hL/pGG43YQUYj3Su05K6VjbAf182tYzIXc8QNN2fMgFh1+taZd5HGVmgd/NcwI+qYBmy2QtmjjZrgFgTImtERKD1dZSG3E/mJdT4Po6tNmkg5IIWDYBqbDZC8qc1j4O11ZyeG4t40B4YKfJNSBgR3S6eko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cnRrwyoV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5AE1C4CEE3;
+	Wed, 14 May 2025 16:01:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747238477;
+	bh=B2tOkM/DzG98PLHSFcOfINzeUonmNYRo9e+Y87xDuDo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cnRrwyoVk4xJCFtsxhj+dIJJQuynWD+NXT5oD0O0HhLpGyu8A7uaS76STzKYcQOpH
+	 scweY4N0CzWYf8oY8G7mjKLS9qwvAV6DmSS02cSLC3DgNL1xU/aXvmYwmjPHjRXNvY
+	 79o/awouzMIVHtjPJONGDOpzbNhpiULYSHJk1Rp6Qk8zZOcLysTUolbmIsx5WH8ZdY
+	 3fXcaYXifxaTVfsaHlzC37K8XtlohACuMj7GXe8OduiIbKg+KT2AbLjQQzH/fBhFYs
+	 hobh5RCftYz/r6KTdA8p07dpvtkzhyMuLaxALyAnucokq7H0mVjPzVmSzlfNT5pwxZ
+	 lJ2x9Vf6a382w==
+Date: Wed, 14 May 2025 11:01:15 -0500
+From: Rob Herring <robh@kernel.org>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	Stefan Wahren <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>
+Subject: Re: [net-next v11 1/7] dt-bindings: net: Add MTIP L2 switch
+ description
+Message-ID: <20250514160115.GA2382587-robh@kernel.org>
+References: <20250504145538.3881294-1-lukma@denx.de>
+ <20250504145538.3881294-2-lukma@denx.de>
+ <20250512164025.GA3454904-robh@kernel.org>
+ <20250513080920.7c8a2a06@wsk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Realtek RTL8125
-To: Andreas Muswieck <amuswieck@gmx.de>, netdev@vger.kernel.org
-References: <bb856c9b-7038-4e1c-ac8b-7fc5af4ca62d@gmx.de>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <bb856c9b-7038-4e1c-ac8b-7fc5af4ca62d@gmx.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250513080920.7c8a2a06@wsk>
 
-On 14.05.2025 15:03, Andreas Muswieck wrote:
-> Hello,
-> My new computer has had problems with the LAN chip right from the start. The motherboard is an ASUS PRIME X870-P WIFI. It contains a Realtek RTL8125 chip.
-> The Linux distributions Debian bookworm and Linux Mint 21 are not able to establish a LAN connection. I have also tried Debian Trixie, no connection.
-> Debian bookworm recognises an r8169 with unknown chip XID 668 and recommends: contact the maintainer.
-Likely this is a typo and you mean XID 688. This chip version is supported by r8169 from kernel version 6.13.
+On Tue, May 13, 2025 at 08:09:20AM +0200, Lukasz Majewski wrote:
+> Hi Rob,
+> 
+> > On Sun, May 04, 2025 at 04:55:32PM +0200, Lukasz Majewski wrote:
+> > > This patch provides description of the MTIP L2 switch available in
+> > > some NXP's SOCs - e.g. imx287.
+> > > 
+> > > Signed-off-by: Lukasz Majewski <lukma@denx.de>
+> > > Reviewed-by: Stefan Wahren <wahrenst@gmx.net>
+> > > 
+> > > ---
+> > > Changes for v2:
+> > > - Rename the file to match exactly the compatible
+> > >   (nxp,imx287-mtip-switch)
+> > > 
+> > > Changes for v3:
+> > > - Remove '-' from const:'nxp,imx287-mtip-switch'
+> > > - Use '^port@[12]+$' for port patternProperties
+> > > - Drop status = "okay";
+> > > - Provide proper indentation for 'example' binding (replace 8
+> > >   spaces with 4 spaces)
+> > > - Remove smsc,disable-energy-detect; property
+> > > - Remove interrupt-parent and interrupts properties as not required
+> > > - Remove #address-cells and #size-cells from required properties
+> > > check
+> > > - remove description from reg:
+> > > - Add $ref: ethernet-switch.yaml#
+> > > 
+> > > Changes for v4:
+> > > - Use $ref: ethernet-switch.yaml#/$defs/ethernet-ports and remove
+> > > already referenced properties
+> > > - Rename file to nxp,imx28-mtip-switch.yaml
+> > > 
+> > > Changes for v5:
+> > > - Provide proper description for 'ethernet-port' node
+> > > 
+> > > Changes for v6:
+> > > - Proper usage of
+> > >   $ref: ethernet-switch.yaml#/$defs/ethernet-ports/patternProperties
+> > >   when specifying the 'ethernet-ports' property
+> > > - Add description and check for interrupt-names property
+> > > 
+> > > Changes for v7:
+> > > - Change switch interrupt name from 'mtipl2sw' to 'enet_switch'
+> > > 
+> > > Changes for v8:
+> > > - None
+> > > 
+> > > Changes for v9:
+> > > - Add GPIO_ACTIVE_LOW to reset-gpios mdio phandle
+> > > 
+> > > Changes for v10:
+> > > - None
+> > > 
+> > > Changes for v11:
+> > > - None
+> > > ---
+> > >  .../bindings/net/nxp,imx28-mtip-switch.yaml   | 149
+> > > ++++++++++++++++++ 1 file changed, 149 insertions(+)
+> > >  create mode 100644
+> > > Documentation/devicetree/bindings/net/nxp,imx28-mtip-switch.yaml
+> > > 
+> > > diff --git
+> > > a/Documentation/devicetree/bindings/net/nxp,imx28-mtip-switch.yaml
+> > > b/Documentation/devicetree/bindings/net/nxp,imx28-mtip-switch.yaml
+> > > new file mode 100644 index 000000000000..35f1fe268de7 --- /dev/null
+> > > +++
+> > > b/Documentation/devicetree/bindings/net/nxp,imx28-mtip-switch.yaml
+> > > @@ -0,0 +1,149 @@ +# SPDX-License-Identifier: (GPL-2.0-only OR
+> > > BSD-2-Clause) +%YAML 1.2
+> > > +---
+> > > +$id: http://devicetree.org/schemas/net/nxp,imx28-mtip-switch.yaml#
+> > > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > > +
+> > > +title: NXP SoC Ethernet Switch Controller (L2 MoreThanIP switch)
+> > > +
+> > > +maintainers:
+> > > +  - Lukasz Majewski <lukma@denx.de>
+> > > +
+> > > +description:
+> > > +  The 2-port switch ethernet subsystem provides ethernet packet
+> > > (L2)
+> > > +  communication and can be configured as an ethernet switch. It
+> > > provides the
+> > > +  reduced media independent interface (RMII), the management data
+> > > input
+> > > +  output (MDIO) for physical layer device (PHY) management.
+> > > +
+> > > +properties:
+> > > +  compatible:
+> > > +    const: nxp,imx28-mtip-switch
+> > > +
+> > > +  reg:
+> > > +    maxItems: 1
+> > > +
+> > > +  phy-supply:
+> > > +    description:
+> > > +      Regulator that powers Ethernet PHYs.
+> > > +
+> > > +  clocks:
+> > > +    items:
+> > > +      - description: Register accessing clock
+> > > +      - description: Bus access clock
+> > > +      - description: Output clock for external device - e.g. PHY
+> > > source clock
+> > > +      - description: IEEE1588 timer clock
+> > > +
+> > > +  clock-names:
+> > > +    items:
+> > > +      - const: ipg
+> > > +      - const: ahb
+> > > +      - const: enet_out
+> > > +      - const: ptp
+> > > +
+> > > +  interrupts:
+> > > +    items:
+> > > +      - description: Switch interrupt
+> > > +      - description: ENET0 interrupt
+> > > +      - description: ENET1 interrupt
+> > > +
+> > > +  interrupt-names:
+> > > +    items:
+> > > +      - const: enet_switch
+> > > +      - const: enet0
+> > > +      - const: enet1
+> > > +
+> > > +  pinctrl-names: true
+> > > +
+> > > +  ethernet-ports:
+> > > +    type: object
+> > > +    $ref:
+> > > ethernet-switch.yaml#/$defs/ethernet-ports/patternProperties  
+> > 
+> > 'patternProperties' is wrong. Drop.
+> > 
+> 
+> When I do drop it, then
+> make dt_binding_check DT_SCHEMA_FILES=nxp,imx28-mtip-switch.yaml
+> 
+> shows:
+> 
+> nxp,imx28-mtip-switch.example.dtb: switch@800f0000: ethernet-ports:
+> 'oneOf' conditional failed, one must be fixed:
+> 
+> 'ports' is a required property 
+> 'ethernet-ports' is a required property
+>         from schema $id:
+>         http://devicetree.org/schemas/net/nxp,imx28-mtip-switch.yaml#
 
-> I downloaded the LINUX driver from the Realtek website and have to reinstall it every time after an upgrade. Is there a solution for this?
-> 
-> Andreas
-> 
-> 
+Actually, it needs to be at the top-level as well:
 
+allOf:
+  - $ref: ethernet-switch.yaml#/$defs/ethernet-ports
+
+
+> 
+> We do have ethernet-ports:
+> and we do "include" ($ref)
+> https://elixir.bootlin.com/linux/v6.14.6/source/Documentation/devicetree/bindings/net/ethernet-switch.yaml#L77
+> 
+> which is what we exactly need.
+
+The $ref is effectively pasting in what you reference, so the result 
+would be:
+
+ethernet-ports:
+  type: object
+  "^(ethernet-)?ports$":
+    patternProperties:
+      "^(ethernet-)?port@[0-9a-f]+$":
+        description: Ethernet switch ports
+        $ref: ethernet-switch-port.yaml#
+        unevaluatedProperties: false
+
+A DT node/property name and json-schema keyword at the same level is 
+never correct. json-schema behavior is to ignore (silently) any unknown 
+keyword. So the validator sees the keyword "^(ethernet-)?ports$" and 
+ignores everything below it.
+
+
+> 
+> > > +    additionalProperties: true  
+> > 
+> > Drop.
+> > 
+> 
+> When removed we do have:
+> nxp,imx28-mtip-switch.example.dtb: switch@800f0000: Unevaluated
+> properties are not allowed ('ethernet-ports' was unexpected)
+> 
+> or 
+> 
+> nxp,imx28-mtip-switch.yaml: ethernet-ports: Missing
+> additionalProperties/unevaluatedProperties constraint
+
+'additionalProperties: true' should suppress that.
+
+> 
+> Depending if I do remove 'patternProperties' above.
+> 
+> To sum up - with the current code, the DT schema checks pass. It also
+> looks like the $ref for ethernet-switch is used in an optimal way.
+> 
+> I would opt for keeping the code as is for v12.
 
