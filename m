@@ -1,173 +1,127 @@
-Return-Path: <netdev+bounces-190467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67CFAAB6DF4
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 16:18:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1687AB6DFC
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 16:19:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9506D4C00A1
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 14:18:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63C9717A4F5
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 14:19:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 421FA13B284;
-	Wed, 14 May 2025 14:18:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6EFB19CC22;
+	Wed, 14 May 2025 14:19:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="SY79hOxk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HRhDsmJN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10CDD18E377
-	for <netdev@vger.kernel.org>; Wed, 14 May 2025 14:18:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B36115574E
+	for <netdev@vger.kernel.org>; Wed, 14 May 2025 14:19:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747232297; cv=none; b=VWIuVtMVFrgSEq7Ai383a50eqhDghwbLXrfFPzwFvc6A4amF9gvY/RmYloTKvFuE9/OPHGs4+TFMZPU4nC7iQJWLufksViyvsjxD/hfp5XYDJ0OfcnnAfVvjZf+b1FKTXzhjO2KvtENVS6SEOVqgYYH022VJv4OLcrgXhuCXXA4=
+	t=1747232377; cv=none; b=TROV90ZnvkzMfh5zabPElfC+6Z18LGiDmUIo0U/bGVOqvCu1BZ1iFQ1D54ibOhEUI6/iC8CG76Q8wwUgAOCNrGYhlCOr0CqfGT9UqVJimcnFzBJ6uHuiAVFL0iey6Hzig0B8A5HxbC4mlyX0ebuz6Zj/dL0vubdnK4ZPWyTAO78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747232297; c=relaxed/simple;
-	bh=0bHYo2XIYUmHNmyvpKqSkKFCp1rKycf2xoc16jelWo4=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=l2ErjsL9YyXo0fDnL0HvXT0C0ILJYOHTSPVXDwjGBwjO4xNSFjLBWUpoh8qHpgRQZz5VB8nHUCKNMwYV+3oabs1Wd5Et/KmDSlylWu2gyjjbNW/uhrEFqE3xHjOYnfRIxEVhcyDdeXeSfc6eipuA+5qHzAM4jEnZ6M20o4zgw1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=SY79hOxk; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-43cfba466b2so77650845e9.3
-        for <netdev@vger.kernel.org>; Wed, 14 May 2025 07:18:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1747232293; x=1747837093; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:from:subject:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QS/gvn6s9evGDI7J8+gONd6hLkshn08JJh0QsMw/dQI=;
-        b=SY79hOxk21aih7WmuWD88k7Sacxz3TniIXQAYAksE6evXBc12RIemXYZ8dYXABYdPU
-         cPZ/M3p6NyCbZb67p9hlVkJ2T5H1YzwZWSrVb5eRQYvlAEyvkrZKJjSNzd0zLbEwA4Fu
-         o5NCChDDC9dmsAYhxdOjF8o6k+bBFPyb3cZFs4Yoew9Sj+e8WEGhQ+XlHfZOVUjoaoF5
-         9D4I89Q+f/r8vYiODdEAWHuYgnXD1iMG4/UL6ZvPNliZMY/puwGvmERmfEtq2FJPXpl8
-         0Fps8yHjkCrTLubVtcv8qs8bmMI4Benphixpp5Tr1v6/5d3ZjYceIM36XuQFCAdwnciM
-         ON/A==
+	s=arc-20240116; t=1747232377; c=relaxed/simple;
+	bh=wHZtwYVBdWmnMUx0cwwuokgFALLF/00lQUCEl6373K4=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=GKtvozaJ1szfFKLjFVkjPxsrMYrDswx+QYopPmkI4ekW18HRCwN1LACsWsG1SxK/SQamR1FfoCybu4TEOa8ohnSh+Y57tF/K1zKVdZ6OncRAfv4RoPWZAhwHjrC1e7KoXyDn+w4Li0/CK53r4+BX7YIPTBHpFYNJvvpIhSJELcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HRhDsmJN; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747232375;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=uRB4qyyeZ6d2cPqOCAW0MqMh5plkjaYv5Rx4lmPx+E4=;
+	b=HRhDsmJNOfJBbMQ5q3o3aX8q6LSBp6vaU5N+tLt1hlJFyKXlqoezE4zQzOHYHSJO1D030s
+	ut3RHacdzdbUstnVUhcMreQ+IFsxm0QCNTDOwHyEOJ9AbY2+WToe6MnJSwQo7ce1S6/dgE
+	3o+Q9pPeT5ETFUAspk/AQPWrNNLe4Hc=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-135-w1hV922QPCaXi7ONkQK9hw-1; Wed, 14 May 2025 10:19:33 -0400
+X-MC-Unique: w1hV922QPCaXi7ONkQK9hw-1
+X-Mimecast-MFC-AGG-ID: w1hV922QPCaXi7ONkQK9hw_1747232373
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43d007b2c79so42329935e9.2
+        for <netdev@vger.kernel.org>; Wed, 14 May 2025 07:19:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747232293; x=1747837093;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:from:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=QS/gvn6s9evGDI7J8+gONd6hLkshn08JJh0QsMw/dQI=;
-        b=NMNXV3QpNbxHD2smMQMuAPUNQz6KgZk7/ncpbGMHWVkCUCYvkZJrX1jOiwhYmqU3q1
-         Ixu0pbYvOPMn24o39/XmvgikLGKfECk0Dwljk1aj6VCFaeP4kWzxmlW2lyxtjeL7B0by
-         40a0kzDAy5IJb8vOmMpgQq2uSm4PnN0LgYXcnW3QNlH8/F73hVjCxpzeLALHZBkR8cDp
-         GHKecNO4hKzE7fjkDC2opiVkkdIttaR6G9ZHVqugUgnNK0L/fPslD78R3JpwgeETJgpa
-         GUfiZMjS2vCQitB5EVBVh1KUtRdP3Q5J8OgnkBGEvbs7JMb3J+A0XFL9vPbDlCTGeUtW
-         x6Sw==
-X-Gm-Message-State: AOJu0Yw8kUfzEVWHPN0g4Wa0PDe0GDUwwFEhUpJ1SDu47xKdjJD7L/Ub
-	y+P2qfuLbBq6w8PXbGcmjK6gago1vK4CwjyZBcNEyt01YwP1F40n8+aSBZMY61+JhopwKzAr9Qx
-	skjVXDazybJCULw5ER9VLtaz1tf3ZKpdzyp3wmhjPst8+MZQnkva0rrMiAD9o
-X-Gm-Gg: ASbGncsJnNWXc1BQ2rFVFLfykx6Bo0P5kNvNbivLaL+8qiNYxMWew0RgwHcLbUU6A9+
-	Zkjw9nU5767fnrVbr9oPo6+HU3izbH8sVLEKH+tuYWxiFUl/HdyxUwoOXRus4hTl2+laG0VB6Kg
-	A1Wpit4GW0nVZE/OJVNBC5Ox8wW9pDmbB3dVuG5RoDzHd32YECaqSlm7wa2A5tNLqN772MG8gcZ
-	6TbJmMYY2u7coppxfNdAcOlF3bXpr4TpbYfD/RoDtO3dlVWNvKgM4a117A63rgtAQXQ3igU1/ie
-	cKrYgRGPALDwwBxIccCB/62FPbwOcnJrL/cMbq0RoH9SM49dx794XJNTWU+c83lFk2YjQYfco4z
-	42zih2plTaeJ3DU+q+jeOov5/
-X-Google-Smtp-Source: AGHT+IGvzeunYQw2/8sARBt7cicj9sUMQj5XtiIYitTk+nTybk0zG0wJnz4H6zhzR0SFon3LLxffmg==
-X-Received: by 2002:a05:600c:154a:b0:441:d437:e3b8 with SMTP id 5b1f17b1804b1-442f2161baamr29121325e9.23.1747232293243;
-        Wed, 14 May 2025 07:18:13 -0700 (PDT)
-Received: from ?IPV6:2001:67c:2fbc:1:885b:396d:f436:2d38? ([2001:67c:2fbc:1:885b:396d:f436:2d38])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442f33690a1sm33460925e9.3.2025.05.14.07.18.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 May 2025 07:18:12 -0700 (PDT)
-Message-ID: <47be0947-809d-4ca1-bfa0-018853ab4df2@openvpn.net>
-Date: Wed, 14 May 2025 16:18:11 +0200
+        d=1e100.net; s=20230601; t=1747232372; x=1747837172;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uRB4qyyeZ6d2cPqOCAW0MqMh5plkjaYv5Rx4lmPx+E4=;
+        b=JD++pY4zVpZizhEc7dfsbihaoc83sonNe52Icvur+S7rLgOdHTGkdwxAyInRr8UeY3
+         kjYBPLldanfrTetiHpfd2r/qEQSwBmVAXTqy3xAISIHEhMGFFdadfWK7TljW+lWM+pv2
+         FnWGITO/1yIxJqpKfKp6LwIQRob0uxQAcmRoe32GRpEcXF4vhTHmDTAbgsm2Dw9GlY6m
+         BbTP+AHU1gPw3x0tOql/fYEzH7wBXfwrBYiph4nfqUrOR9ax/6XpC8mcNLRLYb9eGp3H
+         QnCsH5BrSkGsxk0S80sDXEm8ty1KCDy1NRzATEbu7KC90rZTCbyAG9A2rSJmeffeuwuC
+         QhFg==
+X-Gm-Message-State: AOJu0YyYeefuJK4Biv4H6JpQVwVXNKvpewf1iw8boqAdTG6HRRe8BvDo
+	rWZDQgY8eNzRnyf9fMv3swVS52z3OLm9wJWDu2nKGmjKzft5s+GPt6UHkucjYH8En1Ypn4QoRZ+
+	0+1lSSt804MG4oqEiWCCnqhTkYfjj8qxAXtiesGulTAXi8oVYcAe5YfTYI8mJVizTXgu1nilCFo
+	L9NXYzyWv3xcJ1GYtiDDvs0QJPFLvSmOqk697BcA==
+X-Gm-Gg: ASbGncumpaw1GDIn4U3ocffW/sdqkWtdJMomESE+hwWPhM5HroSo/vGP2iysm6NnuOK
+	VfnwtvRUXIVnSHSD4fjZlG1qVUQZndKuPtEZqYlFLmlXqfPzEwpuUeYqLhy+YaclSyjEnjksH6c
+	eAhQXUDgb1p0G7sz5o6TjoPwAeEeD1H6W25tu+nci0I9nb/ZgDodplSM75r/fNj4UPvcJxOebat
+	OEI26LywG9xvP/0Ig+igKU91oiVWlHK8hH7IEMrZAD7jqoJetYyI1gNmsMCA8YTp1skspF8FjoK
+	HsOyldABzixJMr3DwA==
+X-Received: by 2002:a05:600c:c0c3:10b0:43d:300f:fa1d with SMTP id 5b1f17b1804b1-442f217983bmr24467845e9.31.1747232372385;
+        Wed, 14 May 2025 07:19:32 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFZQdAMWLppZvJZaxFmIVmRmAM7GRP6r6dCT4sSkMl77fpFp0Bh3DH3ymMTUNtVtBMPIQvRow==
+X-Received: by 2002:a05:600c:c0c3:10b0:43d:300f:fa1d with SMTP id 5b1f17b1804b1-442f217983bmr24467415e9.31.1747232371811;
+        Wed, 14 May 2025 07:19:31 -0700 (PDT)
+Received: from stex1.redhat.com ([193.207.203.94])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a1f58ec98dsm19667975f8f.25.2025.05.14.07.19.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 May 2025 07:19:31 -0700 (PDT)
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: netdev@vger.kernel.org
+Cc: virtualization@lists.linux.dev,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2 0/3] vsock/test: improve sigpipe test reliability
+Date: Wed, 14 May 2025 16:19:24 +0200
+Message-ID: <20250514141927.159456-1-sgarzare@redhat.com>
+X-Mailer: git-send-email 2.49.0
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] ovpn: properly deconfigure UDP-tunnel
-From: Antonio Quartulli <antonio@openvpn.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Sabrina Dubroca <sd@queasysnail.net>,
- David Ahern <dsahern@kernel.org>
-References: <20250514095842.12067-1-antonio@openvpn.net>
- <20250514065048.3c14a599@kernel.org>
- <f74314d4-c5ab-4346-8dac-3ae8e97fb74a@openvpn.net>
-Content-Language: en-US
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <f74314d4-c5ab-4346-8dac-3ae8e97fb74a@openvpn.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 14/05/2025 16:02, Antonio Quartulli wrote:
-> 
-> 
-> On 14/05/2025 15:50, Jakub Kicinski wrote:
->> On Wed, 14 May 2025 11:58:42 +0200 Antonio Quartulli wrote:
->>> +#if IS_ENABLED(CONFIG_IPV6)
->>> +    if (READ_ONCE(sk->sk_family) == PF_INET6)
->>> +        static_branch_dec(&udpv6_encap_needed_key);
->>
->> udpv6_encap_needed_key is only exported for ipv6.ko
->> I think you need to correct the export, because with IPV6=y
->> and UDP_TUNNEL=m we get:
->>
->> ERROR: modpost: "udpv6_encap_needed_key" [net/ipv4/udp_tunnel.ko] 
->> undefined!
-> 
-> Or define and export udpv6_encap_enable() which calls only the 
+Running the tests continuously I noticed that sometimes the sigpipe
+test would fail due to a race between the control message of the test
+and the vsock transport messages.
 
-EDIT: I meant udpv6_encap_disable() here ^^
+While I was at it I also improved the test by checking the errno we
+expect.
 
-> static_branch_dec()?
-> Basically the same as the current udpv6_encap_enable().
-> 
-> This way we don't need to touch the export for udpv6_encap_needed_key.
-> 
-> Regards,
-> 
+Changelog:
+v2:
+- added a patch to provide timeout_usleep() and avoid issues with signals
+  in timeout section
+- add little sleep to avoid flooding the other peer [Paolo]
+- fixed loop exit condition [Paolo]
+
+v1: https://lore.kernel.org/netdev/20250508142005.135857-1-sgarzare@redhat.com/
+
+Stefano Garzarella (3):
+  vsock/test: add timeout_usleep() to allow sleeping in timeout sections
+  vsock/test: retry send() to avoid occasional failure in sigpipe test
+  vsock/test: check also expected errno on sigpipe test
+
+ tools/testing/vsock/timeout.h    |  1 +
+ tools/testing/vsock/timeout.c    | 18 +++++++++++++
+ tools/testing/vsock/vsock_test.c | 46 ++++++++++++++++++++++++++------
+ 3 files changed, 57 insertions(+), 8 deletions(-)
 
 -- 
-Antonio Quartulli
-OpenVPN Inc.
+2.49.0
 
 
