@@ -1,114 +1,258 @@
-Return-Path: <netdev+bounces-190316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44D32AB6318
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 08:29:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2CC1AB631D
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 08:29:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 694BD161368
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 06:29:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 526043AC384
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 06:29:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6371E1FF7B0;
-	Wed, 14 May 2025 06:28:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29D991FDA89;
+	Wed, 14 May 2025 06:29:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="iE/yiWrP"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="O2mHaFxu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A43951B0439
-	for <netdev@vger.kernel.org>; Wed, 14 May 2025 06:28:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A7F117BD9
+	for <netdev@vger.kernel.org>; Wed, 14 May 2025 06:29:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747204130; cv=none; b=ZEq3mD4c7tAwROj0nb9G52EjHXv1CS7eIRuZf9vFc9r67DBLo2MMMTGbVabJMlvrt8MeDIVbEO59YsSL5cz6q8zfiuRM8e5D+n8rXVx3rWMd66eQv85BpoUGlWmH8enGLeJU2cPdLEWe64mus9cjHmxp5zA9EaI9GbJkqjRGms4=
+	t=1747204187; cv=none; b=FkpOjeFWhU/FvAiuK5PUQkk1faywxI6LOy4Dm4msjFfIVQ04Nt+PywpMGR2z5ircKkLj8jfmjOiqPFnZzw3GtNIvUOF5NWyK3tOBIfnaNasWQB3LE5u1e6kawZ6IXkWgGfBTe4MM5NfIBE7mL63VrXC+lZcUNpKBT5NhrYXZ4UM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747204130; c=relaxed/simple;
-	bh=nKm8i174Ry24fTbUQF+lUFRBSStJlnT5EOhqcsTkUR0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=E/o8rpAFbtbWnjE3rjM8iKwByTIsIHzv8gSE0dIn95sm79g6K+FfaYxfISm/pHk1mfuGzf1jI4HNMGFIZQYwV0QLk4uLfjefwtKvPWlrdNfWD1d7RgTwL5ecKJh0iSsyQDwvtLqE640ChWWTpl6FTX3fkVDPXhLaStAoxpBLWDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=iE/yiWrP; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54DIUiF4005870;
-	Tue, 13 May 2025 23:28:37 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:message-id:mime-version:subject:to; s=
-	pfpt0220; bh=guqDUrg5IQEO8B6sebT/4OjDz+q3NVSk3fiUVsYNx+U=; b=iE/
-	yiWrPyDXm20KdxLrgkRh3yOwPV+GakVkBkvscd77urEV8/qZ+2PXhvXkQpJ9x2SB
-	/VUsavtnFELAuzygFHqA4z3Eq5zAM8ktBQMyHqBs1iEDLXjuESkNunccMXidbyNB
-	Lz7T87bx1G4RTNWXdn6zzwfU7g3QGIHccAECH03AaV6BIJHSJQQ4in+Lk7uI0HVn
-	Oxe7klHiQVhvx/IYVW1awYs5jRKo1MvKBiYmqQCQXKZfA23hU2/EIQPHDbPHMPJO
-	yZo8rWmIwKWmLyVQUt8GOD3fy05oW2RHNeOou9O2c8olFcfF6Od3V9gtNwUlw8ve
-	jGaaKz6l2e94ufs8oLw==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 46mbe215ev-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 13 May 2025 23:28:37 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Tue, 13 May 2025 23:28:36 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Tue, 13 May 2025 23:28:36 -0700
-Received: from hyd1358.marvell.com (unknown [10.29.37.11])
-	by maili.marvell.com (Postfix) with ESMTP id 7B97E5B693B;
-	Tue, 13 May 2025 23:28:31 -0700 (PDT)
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
-        <gakula@marvell.com>, <hkelam@marvell.com>, <sgoutham@marvell.com>,
-        <lcherian@marvell.com>, <bbhushan2@marvell.com>, <jerinj@marvell.com>
-CC: <netdev@vger.kernel.org>, Subbaraya Sundeep <sbhatta@marvell.com>
-Subject: [PATCH net v2] octeontx2-af: Send Link events one by one
-Date: Wed, 14 May 2025 11:58:28 +0530
-Message-ID: <1747204108-1326-1-git-send-email-sbhatta@marvell.com>
-X-Mailer: git-send-email 2.7.4
+	s=arc-20240116; t=1747204187; c=relaxed/simple;
+	bh=ZlbACqOGDQmR94yWclvEkyDAGlu8b+8r7EbSsxkGoUk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nkq37Lo+mhRAHH+xReQJXkHmjMOWqm++Yj1RH09Fd1mMWNOZgnJZxHsreDztPLoUsBo66uTFe7QmX1J6ilPWDxwIEs9dwntiVrkKS4Vvz7Vp0aQSwQ3x0YeFmvWZUcqHv+WkhD6S4ZEK9vr5lC3r73D0cT89Z+C4ZgabIAysWEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=O2mHaFxu; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-22e730c05ddso59502125ad.2
+        for <netdev@vger.kernel.org>; Tue, 13 May 2025 23:29:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1747204183; x=1747808983; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=L/g6FeELrTlPYAQJgJb1KMMX3FFmWj5K1DgWpOIL6WU=;
+        b=O2mHaFxusT/+CcaaSPPiErrI0LnvW+UeMZp8X8d9SDwQqwna/Pw7PWoNtnz9XsRS7F
+         YorASNTFU2ftsUrnl7wU38i5i/w5rLZdbKyAgPk9exI2MzoiwNTmJO9TRfcsI7VTN1nC
+         i0yOfwphoLNeVtXv2xrsR89V85NG1nKOi6FXw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747204183; x=1747808983;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=L/g6FeELrTlPYAQJgJb1KMMX3FFmWj5K1DgWpOIL6WU=;
+        b=N7UEdpJP1MI5B3+l/LqAjOuTX6lSdkQvMSRhzT+o7xHd/jzApti05YiEFjrSnaP+oy
+         Zr7pMPtHCmS7Udvf3aQrlcWtJXPsA4fxctIKEn+yCNYNkqTWOLCiphyRl9Y9wcqh7dIM
+         9u2Z0gVcRQtA0SE9I++QYWnbk9Fr+HOplz6W87bL6HjJ3ZsIcvrHA71SURr+skQAsQTx
+         TznitMpwmvlRWWF8bzIjr4KzOWUQx+MS/ma2hdmuUSdjbhglrdE2U0gMjSmNDaks7ulR
+         9fcRCXV3V9H22eWuNdW+Yd3gRKqn/ZP/QuB5snm1ZiQbQ95q+p4XBbdYIGlJokb/mrXg
+         LRtA==
+X-Gm-Message-State: AOJu0YzSCDoS/syN/di+XrIkFg3K8hNqOrkPyed+If0+kQ4cVAs4o6oH
+	w7iMDoCQOGR4M5CUuOzZrBKdKyC34cftzC228qhn8Ry3ydZ5Sz7IlISFzOOzUPT455cAjghtUXc
+	=
+X-Gm-Gg: ASbGnctE7AMdB2xhd6O4+K2wxJE/Gh7Xa/Y7EujWjtX7uKQATYDt9YZNngsY2TdUhYF
+	bMI2YozK5m7jcQ1VIbc0joyzEIoai57qLte+u2/Ew0T37aBbKxxf/wp8f6MU9f20G16k5MAl6WH
+	qQXt7YsNHYxwAavhHBX2UXdLZjqT9WYCi4ibeFuSVbZSqu9T1cUgpVJG9wmhI5/zMhN07M0QJWH
+	Ckg2QfCrPNMrJ3yyy38FGsGeYWrIvSMmOQLhpp9uqRhhfOaiZDE9pPaAr0MQCpNlcYTravTIZEO
+	2MgQ9bAwxb7UVoc8omMOaJWuOp/pIPVSEe6xOgw1YZaaS28gU6EMTVxN2acKUoLTGclpU2Y043a
+	tFg8r/RxiICbuUsP+hTQ9N+C/w6s=
+X-Google-Smtp-Source: AGHT+IHZzhx1IVQhStpUGHZ7Y+3yhXvuiCCYw8fCJqDiOIc8QOGvRwLWog5DmzxNVF2FkOa7PAru6A==
+X-Received: by 2002:a17:902:ea06:b0:223:2aab:462c with SMTP id d9443c01a7336-231981353b1mr29350965ad.15.1747204183522;
+        Tue, 13 May 2025 23:29:43 -0700 (PDT)
+Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22fc754685bsm91321395ad.50.2025.05.13.23.29.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 May 2025 23:29:43 -0700 (PDT)
+From: Michael Chan <michael.chan@broadcom.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	pavan.chebbi@broadcom.com,
+	andrew.gospodarek@broadcom.com,
+	sdf@fomichev.me,
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Subject: [PATCH net v2] bnxt_en: bring back rtnl_lock() in the bnxt_open() path
+Date: Tue, 13 May 2025 23:29:08 -0700
+Message-ID: <20250514062908.2766677-1-michael.chan@broadcom.com>
+X-Mailer: git-send-email 2.43.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: b4ctb3JZr2ccjZYF_ahxx2bOUFqZtdFg
-X-Authority-Analysis: v=2.4 cv=fbyty1QF c=1 sm=1 tr=0 ts=68243815 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=dt9VzEwgFbYA:10 a=M5GUcnROAAAA:8 a=QHeTzNiMllNnO-1yQAEA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: b4ctb3JZr2ccjZYF_ahxx2bOUFqZtdFg
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTE0MDA1NSBTYWx0ZWRfX6KGq/KdILGCs +BZdKSi41Dgxuon3unALfooxQJ5y00d+x8QMXG6tWEhB6AUygHqQohTN3B8JbWdu7bcgtcqh5PB Ckn9RAtas7Zl1nDRIt4Y9sJsNG7mKtAifzO/umTikpk6zqouSvg9YNKE1pKmR9oxl/3WgqqBANa
- 27yI8iKFwNRANGQPV6KU1HYlLgTCPi4d/1g0AHscAqMecTRg3mWzdjUQLbV4O/xUsiAIe5Uwv0y s/gZGsqzKzbbBQdvAdo+oAYO2Dp1Yb6JBLplMZRvQzJDlNCd5BVfAhlE4YgixRLunpCZXgCAR3Z HmxgPIscjLZcO6xUQS+HqwqhkK0vi2WFB7TCVB18Cnfe0+O4lo7mUt4JT+9CjZsHgcKHu6uXBeU
- 2Zl3/hT7OJTkuA4x7fgNB0RMnuV+Z/dd0LMKz58ZjUqCWxymICjg5ccpB/bEUTtXsqOFNWF4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-14_02,2025-05-14_02,2025-02-21_01
+Content-Transfer-Encoding: 8bit
 
-Send link events one after another otherwise new message
-is overwriting the message which is being processed by PF.
+Error recovery, PCIe AER, resume, and TX timeout will invoke bnxt_open()
+with netdev_lock only.  This will cause RTNL assert failure in
+netif_set_real_num_tx_queues(), netif_set_real_num_tx_queues(),
+and netif_set_real_num_tx_queues().
 
-Fixes: a88e0f936ba9 ("octeontx2: Detect the mbox up or down message via register")
-Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+Example error recovery assert:
+
+RTNL: assertion failed at net/core/dev.c (3178)
+WARNING: CPU: 3 PID: 3392 at net/core/dev.c:3178 netif_set_real_num_tx_queues+0x1fd/0x210
+
+Call Trace:
+ <TASK>
+ ? __pfx_bnxt_msix+0x10/0x10 [bnxt_en]
+ __bnxt_open_nic+0x1ef/0xb20 [bnxt_en]
+ bnxt_open+0xda/0x130 [bnxt_en]
+ bnxt_fw_reset_task+0x21f/0x780 [bnxt_en]
+ process_scheduled_works+0x9d/0x400
+
+For now, bring back rtnl_lock() in all these code paths that can invoke
+bnxt_open().  In the bnxt_queue_start() error path, we don't have
+rtnl_lock held so we just change it to call netif_close() instead of
+bnxt_reset_task() for simplicity.  This error path is unlikely so it
+should be fine.
+
+Fixes: 004b5008016a ("eth: bnxt: remove most dependencies on RTNL")
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
-v2:
- No changes. Added subject prefix net.
+v2: Expand the fix to include resume, AER, TX timeout reset.
 
- drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c | 2 ++
- 1 file changed, 2 insertions(+)
+v1: https://lore.kernel.org/netdev/20250512063755.2649126-1-michael.chan@broadcom.com/
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 36 ++++++++++++++++++-----
+ 1 file changed, 29 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-index 992fa0b..ebb56eb 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-@@ -272,6 +272,8 @@ static void cgx_notify_pfs(struct cgx_link_event *event, struct rvu *rvu)
- 
- 		otx2_mbox_msg_send_up(&rvu->afpf_wq_info.mbox_up, pfid);
- 
-+		otx2_mbox_wait_for_rsp(&rvu->afpf_wq_info.mbox_up, pfid);
-+
- 		mutex_unlock(&rvu->mbox_lock);
- 	} while (pfmap);
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 86a5de44b6f3..6afc2ab6fad2 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -14013,13 +14013,28 @@ static void bnxt_unlock_sp(struct bnxt *bp)
+ 	netdev_unlock(bp->dev);
  }
+ 
++/* Same as bnxt_lock_sp() with additional rtnl_lock */
++static void bnxt_rtnl_lock_sp(struct bnxt *bp)
++{
++	clear_bit(BNXT_STATE_IN_SP_TASK, &bp->state);
++	rtnl_lock();
++	netdev_lock(bp->dev);
++}
++
++static void bnxt_rtnl_unlock_sp(struct bnxt *bp)
++{
++	set_bit(BNXT_STATE_IN_SP_TASK, &bp->state);
++	netdev_unlock(bp->dev);
++	rtnl_unlock();
++}
++
+ /* Only called from bnxt_sp_task() */
+ static void bnxt_reset(struct bnxt *bp, bool silent)
+ {
+-	bnxt_lock_sp(bp);
++	bnxt_rtnl_lock_sp(bp);
+ 	if (test_bit(BNXT_STATE_OPEN, &bp->state))
+ 		bnxt_reset_task(bp, silent);
+-	bnxt_unlock_sp(bp);
++	bnxt_rtnl_unlock_sp(bp);
+ }
+ 
+ /* Only called from bnxt_sp_task() */
+@@ -14027,9 +14042,9 @@ static void bnxt_rx_ring_reset(struct bnxt *bp)
+ {
+ 	int i;
+ 
+-	bnxt_lock_sp(bp);
++	bnxt_rtnl_lock_sp(bp);
+ 	if (!test_bit(BNXT_STATE_OPEN, &bp->state)) {
+-		bnxt_unlock_sp(bp);
++		bnxt_rtnl_unlock_sp(bp);
+ 		return;
+ 	}
+ 	/* Disable and flush TPA before resetting the RX ring */
+@@ -14068,7 +14083,7 @@ static void bnxt_rx_ring_reset(struct bnxt *bp)
+ 	}
+ 	if (bp->flags & BNXT_FLAG_TPA)
+ 		bnxt_set_tpa(bp, true);
+-	bnxt_unlock_sp(bp);
++	bnxt_rtnl_unlock_sp(bp);
+ }
+ 
+ static void bnxt_fw_fatal_close(struct bnxt *bp)
+@@ -14960,15 +14975,17 @@ static void bnxt_fw_reset_task(struct work_struct *work)
+ 		bp->fw_reset_state = BNXT_FW_RESET_STATE_OPENING;
+ 		fallthrough;
+ 	case BNXT_FW_RESET_STATE_OPENING:
+-		while (!netdev_trylock(bp->dev)) {
++		while (!rtnl_trylock()) {
+ 			bnxt_queue_fw_reset_work(bp, HZ / 10);
+ 			return;
+ 		}
++		netdev_lock(bp->dev);
+ 		rc = bnxt_open(bp->dev);
+ 		if (rc) {
+ 			netdev_err(bp->dev, "bnxt_open() failed during FW reset\n");
+ 			bnxt_fw_reset_abort(bp, rc);
+ 			netdev_unlock(bp->dev);
++			rtnl_unlock();
+ 			goto ulp_start;
+ 		}
+ 
+@@ -14988,6 +15005,7 @@ static void bnxt_fw_reset_task(struct work_struct *work)
+ 			bnxt_dl_health_fw_status_update(bp, true);
+ 		}
+ 		netdev_unlock(bp->dev);
++		rtnl_unlock();
+ 		bnxt_ulp_start(bp, 0);
+ 		bnxt_reenable_sriov(bp);
+ 		netdev_lock(bp->dev);
+@@ -15936,7 +15954,7 @@ static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
+ 		   rc);
+ 	napi_enable_locked(&bnapi->napi);
+ 	bnxt_db_nq_arm(bp, &cpr->cp_db, cpr->cp_raw_cons);
+-	bnxt_reset_task(bp, true);
++	netif_close(dev);
+ 	return rc;
+ }
+ 
+@@ -16752,6 +16770,7 @@ static int bnxt_resume(struct device *device)
+ 	struct bnxt *bp = netdev_priv(dev);
+ 	int rc = 0;
+ 
++	rtnl_lock();
+ 	netdev_lock(dev);
+ 	rc = pci_enable_device(bp->pdev);
+ 	if (rc) {
+@@ -16796,6 +16815,7 @@ static int bnxt_resume(struct device *device)
+ 
+ resume_exit:
+ 	netdev_unlock(bp->dev);
++	rtnl_unlock();
+ 	bnxt_ulp_start(bp, rc);
+ 	if (!rc)
+ 		bnxt_reenable_sriov(bp);
+@@ -16961,6 +16981,7 @@ static void bnxt_io_resume(struct pci_dev *pdev)
+ 	int err;
+ 
+ 	netdev_info(bp->dev, "PCI Slot Resume\n");
++	rtnl_lock();
+ 	netdev_lock(netdev);
+ 
+ 	err = bnxt_hwrm_func_qcaps(bp);
+@@ -16978,6 +16999,7 @@ static void bnxt_io_resume(struct pci_dev *pdev)
+ 		netif_device_attach(netdev);
+ 
+ 	netdev_unlock(netdev);
++	rtnl_unlock();
+ 	bnxt_ulp_start(bp, err);
+ 	if (!err)
+ 		bnxt_reenable_sriov(bp);
 -- 
-2.7.4
+2.30.1
 
 
