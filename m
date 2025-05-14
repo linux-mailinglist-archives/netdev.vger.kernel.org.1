@@ -1,122 +1,113 @@
-Return-Path: <netdev+bounces-190530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38F80AB766A
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 22:08:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C74CAAB76F0
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 22:24:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E41713BCDFD
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 20:08:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 577A67A8826
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 20:22:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68E472951C9;
-	Wed, 14 May 2025 20:08:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65BDD298C2F;
+	Wed, 14 May 2025 20:20:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j3TDn86s"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="thKQ5ZlJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FBDA1E9B0C;
-	Wed, 14 May 2025 20:08:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 893CB297103
+	for <netdev@vger.kernel.org>; Wed, 14 May 2025 20:19:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747253301; cv=none; b=hkehWmH9cIEjip9QSWP3w0ODKyk7g5UJv8UWa/8tt/kis7WVW/RWS56yf5ZpcOqiVQWTJjUdw5gEPkH6LxL8UQ0cOdUPmR0S/RhdtK3BlOnhII8eIjSwXyBdQqWPZwaDlPgYllD/RWrSXWtFLs2XBlu/U+l+rfEyPC4+8FbDDK4=
+	t=1747254001; cv=none; b=IA2ub0ge2nlhC9EfzKOwupwXOzEIvPUGHlkWD4lrTr3uYtJap3PonhyvsqMSSQRoLt8CUnN4k2hUQ73XNNsybh3LsY3S8op5kBvxy9RrO9tpWAeM1hSO2b0PvwBK26qnVcgB9UE6btGPcGCE0eWkZUDBxG1FWHnqkN8+4v11DkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747253301; c=relaxed/simple;
-	bh=3WUxiz74QfrEkVVFQDowE0+qUL29wRFq5sAQpUVQaOI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pkDk3fVYfEbSW1gEPujeQ9f+aW6jiXoIqOWSG67W4HR2lv9/d4rK1iLgbxHpqDsN9xkohw+jmdK8ScSnnmMwInxKCZ+W29rKWIhe2hNGAOFUCQoiyLrF3NjDbxPj5TaZfWO0Iz7BY9GOC8pCJvDcilL++IszYbUvuohs+kct5RQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j3TDn86s; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C649C4CEE3;
-	Wed, 14 May 2025 20:08:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747253298;
-	bh=3WUxiz74QfrEkVVFQDowE0+qUL29wRFq5sAQpUVQaOI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=j3TDn86sJuOiIpUlS3N/aQHf1Vundgo9YCoc+bwdDkKux/jkXJacNmbXRTiW7WvdO
-	 DjSdaW+j2jJcRyK+RUx9PiHIZ0gdg90lmLKjTeaLslXtsqlPvzTTE0IG9rhB5rgot4
-	 pChbLMyxVHy46X/c90eDi5gqQ/DIz7IBBSe3bmtOl+LN9hnkJJfIWISIkmnuRMQ+Eb
-	 kuhYO8iXV1cjbYmyl55NeBqz818v1WYcoyPdGGACtrksGSMZsfSyUFiLMHoJD6HA9m
-	 aJbU1sh4FbaTyCUC7756UVtI5klo1RjldtCXLaj6gvWgtLam3ar89RAdL3oOpvvEau
-	 9wu/mJwzdA+zA==
-Date: Wed, 14 May 2025 15:08:16 -0500
-From: Rob Herring <robh@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: airoha: Add EN7581
- memory-region property
-Message-ID: <20250514200816.GA2934563-robh@kernel.org>
-References: <20250509-airopha-desc-sram-v2-0-9dc3d8076dfb@kernel.org>
- <20250509-airopha-desc-sram-v2-1-9dc3d8076dfb@kernel.org>
+	s=arc-20240116; t=1747254001; c=relaxed/simple;
+	bh=7BSNfVGwVIV4HSW24sU5c7Jy9PO/H7gM/t7wbEFJ4mA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jU5fej16MQz8YnC8N7WZUPP/In44SMkw+HNQm/I8DRdysTK6+l2o0swxtVI3Q55k3zKBBlZnJ+j/btPlLEO1vcNigDjwnAAeNZ2AmC7rTikDaZRcVNyNJvpRh2Qsps/JuGRU1A6ZKv+VmL/JJd1PHK1QKNpOohicBRwrF9Ea7ng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=thKQ5ZlJ; arc=none smtp.client-ip=52.119.213.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1747254000; x=1778790000;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=SQgfKc7wqAhaQvvIhxbHu1UhLW4DMDTNlHfal5y7dqg=;
+  b=thKQ5ZlJ7gmSj7VdTMWahKgFJeJIbNPLGcYk03BmfMSEp8Bc/02K9lIz
+   Q5illPWOdgQgyD1LZG/iCceu18d7puQGtZ8Fs2P8Ed2Sck0ovqKuDAb36
+   z5oDi+O/AgD8C9SThHgZrmmfp6CxDMGDCQMN6/X70rsUN0aLDcuL1X20L
+   7Mx2dekuHHfJjF3yQCk9PGh6BhXDt0uZMI6XzCw3iQ00VvzaGFD/q8wUR
+   nU+fq8owmQ5zIZU5onA9sb51okPmn1dLFhKwXim8tm78A0hPDZuxguCL1
+   LcPvtx8uhbKNHqYN1jcx3gwo0A8QxHIhHxJKWdUgrD9BtOxe1JWXuzvP5
+   w==;
+X-IronPort-AV: E=Sophos;i="6.15,289,1739836800"; 
+   d="scan'208";a="722847268"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2025 20:19:57 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:50986]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.5.62:2525] with esmtp (Farcaster)
+ id 4eb378ab-923f-480e-ab45-3162918f67a3; Wed, 14 May 2025 20:19:55 +0000 (UTC)
+X-Farcaster-Flow-ID: 4eb378ab-923f-480e-ab45-3162918f67a3
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 14 May 2025 20:19:54 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.187.171.38) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 14 May 2025 20:19:52 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>
+CC: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v1 net-next 0/7] ipv6: Follow up for RTNL-free RTM_NEWROUTE series.
+Date: Wed, 14 May 2025 13:18:53 -0700
+Message-ID: <20250514201943.74456-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250509-airopha-desc-sram-v2-1-9dc3d8076dfb@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D032UWB003.ant.amazon.com (10.13.139.165) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Fri, May 09, 2025 at 04:51:33PM +0200, Lorenzo Bianconi wrote:
-> Introduce the memory-region and memory-region-names properties for the
-> ethernet node available on EN7581 SoC. In order to improve performances,
-> EN7581 SoC supports allocating buffers for hw forwarding queues in SRAM
-> instead of DRAM if available on the system.
+Patch 1 removes rcu_read_lock() in fib6_get_table().
+Patch 2 removes rtnl_is_held arg for lwtunnel_valid_encap_type(), which
+ was short-term fix and is no longer used.
+Patch 3 fixes RCU vs GFP_KERNEL report by syzkaller.
+Patch 4~7 reverts GFP_ATOMIC uses to GFP_KERNEL.
 
-But 'reserved-memory' is generally for system memory which is DRAM 
-though we unfortunately don't enforce that. For small onchip SRAM, you 
-should be using the mmio-sram binding and the 'sram' property.
 
-> 
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
->  .../devicetree/bindings/net/airoha,en7581-eth.yaml          | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
-> index 0fdd1126541774acacc783d98e4c089b2d2b85e2..6d22131ac2f9e28390b9e785ce33e8d983eafd0f 100644
-> --- a/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
-> +++ b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
-> @@ -57,6 +57,16 @@ properties:
->        - const: hsi-mac
->        - const: xfp-mac
->  
-> +  memory-region:
-> +    items:
-> +      - description: QDMA0 buffer memory
-> +      - description: QDMA1 buffer memory
-> +
-> +  memory-region-names:
-> +    items:
-> +      - const: qdma0-buf
-> +      - const: qdma1-buf
-> +
->    "#address-cells":
->      const: 1
->  
-> @@ -140,6 +150,9 @@ examples:
->                       <GIC_SPI 49 IRQ_TYPE_LEVEL_HIGH>,
->                       <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>;
->  
-> +        memory-region = <&qdma0_buf>, <&qdma1_buf>;
-> +        memory-region-names = "qdma0-buf", "qdma1-buf";
-> +
->          airoha,npu = <&npu>;
->  
->          #address-cells = <1>;
-> 
-> -- 
-> 2.49.0
-> 
+Kuniyuki Iwashima (7):
+  ipv6: Remove rcu_read_lock() in fib6_get_table().
+  inet: Remove rtnl_is_held arg of lwtunnel_valid_encap_type(_attr)?().
+  ipv6: Narrow down RCU critical section in inet6_rtm_newroute().
+  Revert "ipv6: sr: switch to GFP_ATOMIC flag to allocate memory during
+    seg6local LWT setup"
+  Revert "ipv6: Factorise ip6_route_multipath_add()."
+  ipv6: Pass gfp_flags down to ip6_route_info_create_nh().
+  ipv6: Revert two per-cpu var allocation for RTM_NEWROUTE.
+
+ include/net/lwtunnel.h   |  13 +-
+ net/core/lwtunnel.c      |  15 +--
+ net/ipv4/fib_frontend.c  |   4 +-
+ net/ipv4/fib_semantics.c |  10 +-
+ net/ipv4/nexthop.c       |   3 +-
+ net/ipv6/ip6_fib.c       |  27 ++--
+ net/ipv6/route.c         | 269 ++++++++++++++-------------------------
+ net/ipv6/seg6_local.c    |   6 +-
+ 8 files changed, 127 insertions(+), 220 deletions(-)
+
+-- 
+2.49.0
+
 
