@@ -1,130 +1,116 @@
-Return-Path: <netdev+bounces-190491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8ACA6AB7040
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 17:46:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98231AB7091
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 17:59:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 488B51BA2116
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 15:46:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F15F3B1364
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 15:57:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D31F17A2F8;
-	Wed, 14 May 2025 15:46:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB41D220F25;
+	Wed, 14 May 2025 15:58:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hXxpVItO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gk1YqMLh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1912EAD51
-	for <netdev@vger.kernel.org>; Wed, 14 May 2025 15:46:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 477EA1DF254;
+	Wed, 14 May 2025 15:58:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747237592; cv=none; b=mXAvYtptF/RRLfQ2hRCH491ICz8kgc+vgKCavQejVdv75c0zUla5H2d9g/gSlHINVqDJV4avbLpUnkibmpGPUlCPaafoCy7O1CfyJ0acd9GChsXZlgM26WCE3221+HPM4PS+50tJeu9UyhS8qZRlV6ToboKyRpfLJ+AJCOfOFFc=
+	t=1747238288; cv=none; b=YJR/P9dcRRJlO5YkE8Vn8Tq39v4tcTm1uCsP1802opY30DlxxkaLL1y9DM3mv2JNOTJ5Ev+g2MC/riC4/JmGIFi6iJl279bRomVvnejiPFwn8jEZ0jf1YnBdAsMG1AvNrUPU87wC32KnNpNPTcyB9B9KOBn+U4Xs5QpQM3GHiTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747237592; c=relaxed/simple;
-	bh=MBFyB3CFWD2k/z2Jcfp1T75ryQzKNdPkoV1pbqMikeE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lvC0h2+sQP9AlL/hyCOFUVaxWJKt5SlHnqf4KeNd6oWdfj/TcDAnOMidEZjjkPqyExpSKxCqg4/XUGT2skWl8XGWAverZ0fXIOngZ0zByXycdqWsllRwyvV2CAyv4YfzU52Lbl2oGL1JNCYHnXONl6sg4WR0Y1bBNK8YW9yJp1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hXxpVItO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 168D5C4CEED;
-	Wed, 14 May 2025 15:46:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747237591;
-	bh=MBFyB3CFWD2k/z2Jcfp1T75ryQzKNdPkoV1pbqMikeE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=hXxpVItOLWcQi+S1Yvs2x19M57aiIGLKlciPn6ctklXbBc5qjk+d4KNriSx7u1VIj
-	 UuoAeeIAfQ3G1BZwfCZNJje5n0LrxhXU9aB2rOyIbWcnF4z3Ty5zoJm/mQS06QGPRU
-	 HxhWuRqgelzO0xQ1rwAxc4ainqxTtmDvIQGQy+vv+ztNQmiqo8KBW1aoFQo/nQg90q
-	 +TTS2trHaCb/U7P61ISt/9bSLZ+TW20eVSukMLbzyDrGOpa8JCxu8rd4m/4K/Q0MOG
-	 ncm5sL6ih1vXqtskVuc8aVCkUOoAu4ULzPKkAKr7H3Y3NnK2Cx7oDY8VEPyj/45yQh
-	 RQ5yM9/GhB1og==
-Message-ID: <a9ecd6a0-74da-4f68-81ec-5c2d5b937926@kernel.org>
-Date: Wed, 14 May 2025 09:46:30 -0600
+	s=arc-20240116; t=1747238288; c=relaxed/simple;
+	bh=fpKmBmEzp50TR8APNwZcmeWT4nycvxyHG74DrWJq0sw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HV8Y79m8dSreCezYbqFqo0OePf9uwG4+WkMzj7A2wuMTzjjLPAAz7UfDyK8O0uzG6MjPl9Fh5J/1pQUwXY9O3QWN35+uw6iSKgeVE8sWKoueJFSfht1T8HyZn5XfxnfLhgO5qF5ssWsD1t7LJeIZSeUxOYYBbkEs7aEnS4CoRp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gk1YqMLh; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-7406c6dd2b1so984352b3a.0;
+        Wed, 14 May 2025 08:58:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747238286; x=1747843086; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fpKmBmEzp50TR8APNwZcmeWT4nycvxyHG74DrWJq0sw=;
+        b=Gk1YqMLhpGHSO45TJBhS7Xv31qb4tEP0+egi4EwGD8Z0P39jGyRquxyqnt4Z2u/R91
+         +Uti/hZJBEe3wj+et/SPY7ZKkmiTLmC34yZgL/Mup56Ns6gCXwSL2ocz7Iw9gCAPctEm
+         GDpKgxz0z0bWlvcWA17nqtQXDRJVJTvNwXIZyjwfRm7MW+OgqJEdw3w/vyk7GUA8lscZ
+         bPfLy5i7erq3e4bZuKJm0BVyM/zdZBbibCmg4DX+RZU9lPcVp38Hbd5au8DAnpO99tVp
+         jktYKVeviyS97Vlky2fNzaIlKld3cpiJyYiprlvMJ+A0wfaB6rg93dDjXpMSNIqZRzp+
+         EMEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747238286; x=1747843086;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fpKmBmEzp50TR8APNwZcmeWT4nycvxyHG74DrWJq0sw=;
+        b=tEXT8Kvq3XQA6p2CXwwFJcDxBZzFMTAFZfTeqpiI7PVeYvDQIsn4L7TbUeRM66gsvc
+         8LU/wJXq9bRITazzPDnHqXF6PV78kY+H1v0B88iQNpgphjGDzLTkRFIMDmarQUQo7DaE
+         YRRoh1F4RAgBMK0h2qjvvI4s6J7X3yLEBXXDwm2kTnXfen+v33J+HF1kUt4P6j2eMMms
+         PbOj2npcrMDZuqT/D3MrvL/V8+RFSa5SqYmamLMZ4GuZvrLYI3oJFWEMuBLd9Vf8mqDq
+         Ur/SMEuhiE3mDTwddhXqQoG8MbWJPySQUYiM+vAxdWAdi1B+wvxdyy7wOfiCeFdqiESA
+         AIGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV2KIDiGfUrwCTdUevefZGkMm1bhpnuql2oq5Idx/IYMPd/icDG82LJYVwtK3j5NNE18B3OfhoO@vger.kernel.org, AJvYcCXowj3Ux3B0mSj36nW/by4OHiDfHCv9odZ6VZbUwZbx499/22MTHDk8GT3T+2Fes+FqZZhI1VfQTvEv4MY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfDKVUaJTnQzgQNzDOb7oiQblFfB5F6QrGlaiSOjKxiM5NSpjp
+	ImaXQ/C4SfL3a7ngTadHEnEbeHNl8Q5K9GujDPZUnQvsVQl/b13s
+X-Gm-Gg: ASbGncsGgxPRN9Yudjzy8CpdsvWiYbd5LSR+sDNZD4Cg5wTYTkmwapwXT4sd5zum1N+
+	uPOPgH2cLjK3H9Zi4//fkR/r2E8eko6T+iIqxy4+6sq8BBMKcypJ4ZOwtZisjfvO37jq4D8P94S
+	ccVUbblou6YIA/f0KIuIujNfBsS07O8wDn1eRJAsG1avQ8Q1AZQbp8Vx1KJlEX+HJxrXFezAldn
+	F8FZk7abt9BWSi50Ljazn/gdV+yzzPuvwxiWFMBuvY7W6fJdccYACqVxMoS6kBUIfyWcz0w639B
+	ChMvXMtT7pbHVz02h/GHop8yc5aEjOfC6pLuci4jGUtaKRdHNZMsmtuVKLwPJQ6ymzvw7yY=
+X-Google-Smtp-Source: AGHT+IEGtOwegxBLaY+Q6tQVIrHN3fYemJ8QgU8MQUPTrc4QFAGE7i3gBDzE7oFdfo9l2d909PY1ng==
+X-Received: by 2002:a17:902:ec88:b0:215:a2f4:d4ab with SMTP id d9443c01a7336-231b3985156mr930205ad.7.1747238286420;
+        Wed, 14 May 2025 08:58:06 -0700 (PDT)
+Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22fc8271f77sm100631825ad.126.2025.05.14.08.58.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 May 2025 08:58:05 -0700 (PDT)
+Date: Wed, 14 May 2025 08:58:03 -0700
+From: Richard Cochran <richardcochran@gmail.com>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: Miroslav Lichvar <mlichvar@redhat.com>,
+	LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org,
+	Christopher Hall <christopher.s.hall@intel.com>,
+	David Zage <david.zage@intel.com>, John Stultz <jstultz@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Anna-Maria Behnsen <anna-maria@linutronix.de>,
+	Werner Abt <werner.abt@meinberg-usa.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>,
+	Kurt Kanzenbach <kurt@linutronix.de>,
+	Nam Cao <namcao@linutronix.de>,
+	Alex Gieringer <gieri@linutronix.de>
+Subject: Re: [patch 00/26] timekeeping: Provide support for independent PTP
+ timekeepers
+Message-ID: <aCS9ixXXLmva5-BT@hoboy.vegasvil.org>
+References: <20250513144615.252881431@linutronix.de>
+ <aCRCe8STiX03WcxU@localhost>
+ <871psrk1x2.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 01/11] tcp: add tcp_rcvbuf_grow() tracepoint
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Neal Cardwell <ncardwell@google.com>, Simon Horman <horms@kernel.org>,
- Kuniyuki Iwashima <kuniyu@amazon.com>, Rick Jones <jonesrick@google.com>,
- Wei Wang <weiwan@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-References: <20250513193919.1089692-1-edumazet@google.com>
- <20250513193919.1089692-2-edumazet@google.com>
- <51c7b462-500c-4c8b-92eb-d9ebae8bbe42@kernel.org>
- <CANn89iK3n=iCQ5z3ScMvSR5_J=oxaXhrS=JF2fzALuAfeZHoEA@mail.gmail.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <CANn89iK3n=iCQ5z3ScMvSR5_J=oxaXhrS=JF2fzALuAfeZHoEA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <871psrk1x2.ffs@tglx>
 
-On 5/14/25 9:38 AM, Eric Dumazet wrote:
-> On Wed, May 14, 2025 at 8:30 AM David Ahern <dsahern@kernel.org> wrote:
->>
->> On 5/13/25 1:39 PM, Eric Dumazet wrote:
->>> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
->>> index a35018e2d0ba27b14d0b59d3728f7181b1a51161..88beb6d0f7b5981e65937a6727a1111fd341335b 100644
->>> --- a/net/ipv4/tcp_input.c
->>> +++ b/net/ipv4/tcp_input.c
->>> @@ -769,6 +769,8 @@ void tcp_rcv_space_adjust(struct sock *sk)
->>>       if (copied <= tp->rcvq_space.space)
->>>               goto new_measure;
->>>
->>> +     trace_tcp_rcvbuf_grow(sk, time);
->>
->> tracepoints typically take on the name of the function. Patch 2 moves a
->> lot of logic from tcp_rcv_space_adjust to tcp_rcvbuf_grow but does not
->> move this tracepoint into it. For sake of consistency, why not do that -
->> and add this patch after the code move?
-> 
-> Prior value is needed in the tracepoint, but in patch 2, I call
-> tcp_rcvbuf_grow() after it is overwritten.
-> 
+On Wed, May 14, 2025 at 10:54:33AM +0200, Thomas Gleixner wrote:
 
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 8ec92dec321a..6bfbe9005fdb 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -744,12 +744,16 @@ static inline void tcp_rcv_rtt_measure_ts(struct
-sock *sk,
-        }
- }
+> CLOCK_AUX0-7 sounds really good to me and makes sense. I picked PTP
+> because that's where I was coming from. I'll rework that accordingly and
+> make the config enablement independent of PTP as well:
 
--static void tcp_rcvbuf_grow(struct sock *sk)
-+static void tcp_rcvbuf_grow(struct sock *sk, int time, int copied)
- {
-        const struct net *net = sock_net(sk);
-        struct tcp_sock *tp = tcp_sk(sk);
-        int rcvwin, rcvbuf, cap;
++1 for using AUX naming instead of PTP.
 
-+       trace_tcp_rcvbuf_grow(sk, time);
-+
-+       tp->rcvq_space.space = copied;
-+
-        if (!READ_ONCE(net->ipv4.sysctl_tcp_moderate_rcvbuf) ||
-            (sk->sk_userlocks & SOCK_RCVBUF_LOCK))
-                return;
-@@ -794,11 +798,7 @@ void tcp_rcv_space_adjust(struct sock *sk)
-        if (copied <= tp->rcvq_space.space)
-                goto new_measure;
-
--       trace_tcp_rcvbuf_grow(sk, time);
--
--       tp->rcvq_space.space = copied;
--
--       tcp_rcvbuf_grow(sk);
-+       tcp_rcvbuf_grow(sk, time, copied);
-
- new_measure:
-        tp->rcvq_space.seq = tp->copied_seq;
-
+Thanks,
+Richard
 
