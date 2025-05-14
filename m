@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-190358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D80E5AB677F
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 11:27:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CECA3AB677E
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 11:27:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 313017B0442
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 09:26:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A3A11B621C5
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 09:27:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29937221F1B;
-	Wed, 14 May 2025 09:27:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A151A225765;
+	Wed, 14 May 2025 09:27:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
+Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17E03DDC1
-	for <netdev@vger.kernel.org>; Wed, 14 May 2025 09:27:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.243.244.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7082A225A34
+	for <netdev@vger.kernel.org>; Wed, 14 May 2025 09:27:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.19.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747214848; cv=none; b=XIVNgrw0v4iNNjfcW7oXsI6SLaHZMbR5/u6uUPnvbSgUYc5nP+BrDEqeYV5TRz8b+6aOpsSSsIqBcSNEjqbgCGNoanKdXOt2Ckj0PloNf+J+Fy7kfhVTWeyKiPJb+r+1j+dIdKzj0VXvSw5NfsLuFzHGZELTubeGs2hylSviHRY=
+	t=1747214831; cv=none; b=VjeDBCS1yMkqTynhQPev4aI6xzrqyANqcP4nyBasbXjjQZb96icSV2RwTTCFwc340lsT5wPkmp2YapFl6kkBf9BYGN0XGA1Qg0pzpt3sdTv4e0Catmwvbprw1w4Go6y+xx3dtg00fOc90LvHXd/58wqF3/+heBcSSq8A/Sl/3uo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747214848; c=relaxed/simple;
-	bh=aTBDfCF4+YIWd+vFtGRqRDTmkGPFH33dAtesQYqY8CU=;
+	s=arc-20240116; t=1747214831; c=relaxed/simple;
+	bh=cesrM2qLdmTdsfSA7TMewuQ1Y0YYHOF8/zEPUEQS3VY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ecQgzoWeyiS0eOxYZ5tSZf7250ewKw1unMeCLvJNJjPDwJguLe38tyv8napZfVRxw9BVYPYehYNFBPo0lj6mtC4bSeP6QZA0RdpcINZe7RJXMV8TiFF3hEA6luQYCNufqUcGksZKdVJGsh1XnReqODLYbuM/Xo9RlnmkENIVBY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=54.243.244.52
+	 MIME-Version; b=I/DlzcI8ihCWSJPQOABqAObPsu1dQ3w0rgBBFKcJ21Vwy7BxxX+jx36/lQirvXuYJf19e4J9aLJrrGHP7QTJWyz2eOSLyj9aok62BaNV65saTlYv6gGL08FhFDyq5/9Z4xGymi1jg7jX1GVwdtKfOTkwwIFGb6JjCa3E4i1ioo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=54.207.19.206
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
-X-QQ-mid: zesmtpsz7t1747214763tba02a587
-X-QQ-Originating-IP: /Bvx8dpW9tC5Ri1IXAla/dP4xDBm0LWsy0/zglJxQfE=
+X-QQ-mid: zesmtpsz7t1747214767t76084f78
+X-QQ-Originating-IP: ETzsnfgtSQ2u7wJW+0yivbzFjr8KielMxqL3h38ELCQ=
 Received: from localhost.localdomain ( [111.202.70.100])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 14 May 2025 17:26:00 +0800 (CST)
+	id ; Wed, 14 May 2025 17:26:05 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 3291365212908845692
-EX-QQ-RecipientCnt: 12
+X-BIZMAIL-ID: 15844397742163813519
+EX-QQ-RecipientCnt: 11
 From: Tonghao Zhang <tonghao@bamaicloud.com>
 To: netdev@vger.kernel.org
 Cc: Tonghao Zhang <tonghao@bamaicloud.com>,
@@ -49,11 +49,10 @@ Cc: Tonghao Zhang <tonghao@bamaicloud.com>,
 	Simon Horman <horms@kernel.org>,
 	Jonathan Corbet <corbet@lwn.net>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Zengbing Tu <tuzengbing@didiglobal.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>
-Subject: [PATCH net-next v4 2/4] net: bonding: add broadcast_neighbor netlink option
-Date: Wed, 14 May 2025 17:25:32 +0800
-Message-ID: <ABF23033C5EEBFAC+20250514092534.27472-3-tonghao@bamaicloud.com>
+	Zengbing Tu <tuzengbing@didiglobal.com>
+Subject: [PATCH net-next v4 3/4] net: bonding: send peer notify when failure recovery
+Date: Wed, 14 May 2025 17:25:33 +0800
+Message-ID: <FC4C7403A5BC95AD+20250514092534.27472-4-tonghao@bamaicloud.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250514092534.27472-1-tonghao@bamaicloud.com>
 References: <20250514092534.27472-1-tonghao@bamaicloud.com>
@@ -66,27 +65,30 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: zesmtpsz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: M0FOvC2kgX4gptIKZVKxqKssm6K0MZSdthequVMx1a2tsz1SK9nlYQGn
-	keV//3r6M1kW94GFlhaC+fSPcrkBYsQWQPw4DkM662UE9vrkMT0XH1FzcmMSrjhPL3Al3qy
-	WCaMxROceb92+S8/vbguSN7ioLpUYlO/mptfjLkqMdqM7357ZCYQ4SqXKWHNnOLh0ZvPqiq
-	XTeXIJvx/6LwM3ss3A4A9Iv3LRRWQsOLbNjgaM2BK98odidW7ya+AKATEDykJifCumXosEU
-	xGQSFMToMbPyd+DpOeDOhEPgBxe9NN61VV58rBFXAKk90JpSMBd8IwoV23sKAe+pGf+MXrU
-	L9BiOsJssJiyy3sPx6er2z+pyr69s/639vzPhgErXsprZcKpoidOuTrKN9dY+/MqQ1DVN8L
-	CXUloUQTU5ad6XeMQf3kWvAK9HMnMNh/LYu77NjSyzNB9FTBEfTZDU71uAHjTqzT01zwz7Z
-	xWKV45OX1Wg07At3OqYRjiNuc4GJireOzylt6LxVgA1Cy00WJBurJuRqeB7Q9qkN3+pKwmN
-	RAELJ3Tq2AFF8wcIE4UZpII4/z11YoDtJ+Mn2no/NfZ+lCZlgzsKpCXwFtfBYkwOPffdGy/
-	IE7inlvHRcxgqZhJvh7ks5nufWoflLt5Lt+BdOWR39mp5dqCWpOZBvxJS0qUA98KwwUnpXk
-	tBLdbR3j5eMjJVayfKftq41vZFEcBbbdE7VqP+cC/oFOE8jO+l99TbAoc6fZlnaIN7VN0qy
-	Dk5mOCi+ACRzTVkdeALIo5Qx7Dpd9qM/xAlWyw5bcH2CAecAOVYawo6RupkD/n0kEdOlYnm
-	lMuzHTMshRw096YEn5JXQfCpIM6PbTozQ/aKWRzw/UmFjCUcnxbZDV6Yy3Q9x72FX1Qw8pk
-	P0QUbPjLM6pFGBG3fBQek+kpTT3VpFkQ8OasQhH3BylebwnnLXLROwm6qP2kA0rmDmmLYL+
-	MHs7MmID5Nt1zie+eqg6wykYSCO/Bvd0S6c7PSDQxWfreQVkV+gDeFbCGbUADq5N5bYUapK
-	qPj1Gi0PsTkfJ4ovTj6gAhmJsZif4=
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
+X-QQ-XMAILINFO: MrY0q4FYDxnuJMblMh4pDGCy09+t97Vq3PZhA1oFEt3Ijou4nCkcOObf
+	Qg89gL4ovciMi9d6YHeZDYnpJAfNlzY5qtQPh5gwa3U82IuOQHAW8DN2hZbS+3eK7Xvf/cy
+	4XXELevhSCBhJnc467pX7iomhUJz2avy/sb+SleBGcq351aHWzmbVS3LHRfhHQsIi0qy7S4
+	qUAMUsPMzIbvz9SbXy73I3m337axpicHqljWoqrBwrMkNL1BWk2/QGGU1rTdgY+sEgLpSP9
+	WqB4VWiI83qqzq3RsHNGKNPd1Lx7+ATgNzMLQBfArdoUDCjfc8Rzpz+6yY8kCavZgPVKDtl
+	YGLUjE7YvPHsT1fnrD+O0XlVIrfYsWqT1szfUEPMkxk6bUfG6P9OQY7/LOr9AcqtlVNIk0F
+	jxtrtvBeGiYyU59aSlJx5sPghc2WqXXfJE99f1MNL518g9k7vj60kelCWqKFefBOWFPjsea
+	J/FEFqjo3d0PesrlgLm4hAC5vuSh9T8w9AQ2lNUhDDDxRns059G3yy6NofR34twbD0MGhat
+	9KbUyDPXuHbtZJnvAEjhmwk7VUJj5YqECSYlljygAKXEnlJxvfUIxgCsUeplaFtBMOajOXU
+	NK9vbKJJnOuEm6DUr3yw6Mvu9CaB1CUcQrd4qaFrOgTKiJjIn4lVQ8IJcLo31bUlPdVrjJh
+	P0ZhpwXS3gEss/BTfmvR4/sSCXIhLfldV02jMSQGD3UPNjEN//lM3zeScrVxJUhW0eXamG7
+	aqAFdvzZ4DoXj94O/4E6WJlDv3eYkv3wTkd1Gvj75PIVwLZTp0dpbWDSxIWzhSjSdHx3gLQ
+	PMbqbrQHFmvjGEye6+wzd422AAWu6JpDNWj2RLLqUwtU/DbEVU3hSEc5DPhshVhfJuNlsy4
+	vCAgI3jg9EH9w0oKNiieDJu29GdHbvsXebmC3hT0owoLXJIwrQDI1IBa3u6FuXepQtqi0Iv
+	BHJ93/JDMotS4xnFi4Iz8CBH7y4LEOFC2IXCwMPGXhAWQRHY+389wkOOYGEg23a7y3E0lf0
+	+AGC7o2I1nPWtiGw1mN6yUaRfKZEGq9aSbPw63uQ==
+X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
 X-QQ-RECHKSPAM: 0
 
-User can config or display the bonding broadcast_neighbor option via
-iproute2/netlink.
+After LACP protocol recovery, the port can transmit packets.
+However, if the bond port doesn't send gratuitous ARP/ND
+packets to the switch, the switch won't return packets through
+the current interface. This causes traffic imbalance. To resolve
+this issue, when LACP protocol recovers, send ARP/ND packets.
 
 Cc: Jay Vosburgh <jv@jvosburgh.net>
 Cc: "David S. Miller" <davem@davemloft.net>
@@ -98,72 +100,97 @@ Cc: Jonathan Corbet <corbet@lwn.net>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>
 Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
 Signed-off-by: Zengbing Tu <tuzengbing@didiglobal.com>
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 ---
- drivers/net/bonding/bond_netlink.c | 16 ++++++++++++++++
- include/uapi/linux/if_link.h       |  1 +
- 2 files changed, 17 insertions(+)
+ Documentation/networking/bonding.rst |  5 +++--
+ drivers/net/bonding/bond_3ad.c       | 13 +++++++++++++
+ drivers/net/bonding/bond_main.c      | 21 ++++++++++++++++-----
+ 3 files changed, 32 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/bonding/bond_netlink.c b/drivers/net/bonding/bond_netlink.c
-index ac5e402c34bc..57fff2421f1b 100644
---- a/drivers/net/bonding/bond_netlink.c
-+++ b/drivers/net/bonding/bond_netlink.c
-@@ -124,6 +124,7 @@ static const struct nla_policy bond_policy[IFLA_BOND_MAX + 1] = {
- 	[IFLA_BOND_MISSED_MAX]		= { .type = NLA_U8 },
- 	[IFLA_BOND_NS_IP6_TARGET]	= { .type = NLA_NESTED },
- 	[IFLA_BOND_COUPLED_CONTROL]	= { .type = NLA_U8 },
-+	[IFLA_BOND_BROADCAST_NEIGH]	= { .type = NLA_U8 },
- };
+diff --git a/Documentation/networking/bonding.rst b/Documentation/networking/bonding.rst
+index 14f7593d888d..f8f5766703d4 100644
+--- a/Documentation/networking/bonding.rst
++++ b/Documentation/networking/bonding.rst
+@@ -773,8 +773,9 @@ num_unsol_na
+ 	greater than 1.
  
- static const struct nla_policy bond_slave_policy[IFLA_BOND_SLAVE_MAX + 1] = {
-@@ -561,6 +562,16 @@ static int bond_changelink(struct net_device *bond_dev, struct nlattr *tb[],
- 			return err;
- 	}
+ 	The valid range is 0 - 255; the default value is 1.  These options
+-	affect only the active-backup mode.  These options were added for
+-	bonding versions 3.3.0 and 3.4.0 respectively.
++	affect the active-backup or 802.3ad (broadcast_neighbor enabled) mode.
++	These options were added for bonding versions 3.3.0 and 3.4.0
++	respectively.
  
-+	if (data[IFLA_BOND_BROADCAST_NEIGH]) {
-+		int broadcast_neigh = nla_get_u8(data[IFLA_BOND_BROADCAST_NEIGH]);
-+
-+		bond_opt_initval(&newval, broadcast_neigh);
-+		err = __bond_opt_set(bond, BOND_OPT_BROADCAST_NEIGH, &newval,
-+				     data[IFLA_BOND_BROADCAST_NEIGH], extack);
-+		if (err)
-+			return err;
-+	}
-+
+ 	From Linux 3.0 and bonding version 3.7.1, these notifications
+ 	are generated by the ipv4 and ipv6 code and the numbers of
+diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
+index c6807e473ab7..d1c2d416ac87 100644
+--- a/drivers/net/bonding/bond_3ad.c
++++ b/drivers/net/bonding/bond_3ad.c
+@@ -982,6 +982,17 @@ static int ad_marker_send(struct port *port, struct bond_marker *marker)
  	return 0;
  }
  
-@@ -630,6 +641,7 @@ static size_t bond_get_size(const struct net_device *bond_dev)
- 		nla_total_size(sizeof(struct nlattr)) +
- 		nla_total_size(sizeof(struct in6_addr)) * BOND_MAX_NS_TARGETS +
- 		nla_total_size(sizeof(u8)) +	/* IFLA_BOND_COUPLED_CONTROL */
-+		nla_total_size(sizeof(u8)) +	/* IFLA_BOND_BROADCAST_NEIGH */
- 		0;
++static void ad_cond_set_peer_notif(struct port *port)
++{
++	struct bonding *bond = port->slave->bond;
++
++	if (bond->params.broadcast_neighbor && rtnl_trylock()) {
++		bond->send_peer_notif = bond->params.num_peer_notif *
++			max(1, bond->params.peer_notif_delay);
++		rtnl_unlock();
++	}
++}
++
+ /**
+  * ad_mux_machine - handle a port's mux state machine
+  * @port: the port we're looking at
+@@ -2061,6 +2072,8 @@ static void ad_enable_collecting_distributing(struct port *port,
+ 		__enable_port(port);
+ 		/* Slave array needs update */
+ 		*update_slave_arr = true;
++		/* Should notify peers if possible */
++		ad_cond_set_peer_notif(port);
+ 	}
  }
  
-@@ -793,6 +805,10 @@ static int bond_fill_info(struct sk_buff *skb,
- 		       bond->params.coupled_control))
- 		goto nla_put_failure;
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 37340db6512b..21acde5309fb 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -1242,17 +1242,28 @@ static struct slave *bond_find_best_slave(struct bonding *bond)
+ /* must be called in RCU critical section or with RTNL held */
+ static bool bond_should_notify_peers(struct bonding *bond)
+ {
+-	struct slave *slave = rcu_dereference_rtnl(bond->curr_active_slave);
++	struct bond_up_slave *usable;
++	struct slave *slave = NULL;
  
-+	if (nla_put_u8(skb, IFLA_BOND_BROADCAST_NEIGH,
-+		       bond->params.broadcast_neighbor))
-+		goto nla_put_failure;
+-	if (!slave || !bond->send_peer_notif ||
++	if (!bond->send_peer_notif ||
+ 	    bond->send_peer_notif %
+ 	    max(1, bond->params.peer_notif_delay) != 0 ||
+-	    !netif_carrier_ok(bond->dev) ||
+-	    test_bit(__LINK_STATE_LINKWATCH_PENDING, &slave->dev->state))
++	    !netif_carrier_ok(bond->dev))
+ 		return false;
+ 
++	if (BOND_MODE(bond) == BOND_MODE_8023AD) {
++		usable = rtnl_dereference(bond->usable_slaves);
++		if (!usable || !READ_ONCE(usable->count))
++			return false;
++	} else {
++		slave = rcu_dereference_rtnl(bond->curr_active_slave);
++		if (!slave || test_bit(__LINK_STATE_LINKWATCH_PENDING,
++				       &slave->dev->state))
++			return false;
++	}
 +
- 	if (BOND_MODE(bond) == BOND_MODE_8023AD) {
- 		struct ad_info info;
+ 	netdev_dbg(bond->dev, "bond_should_notify_peers: slave %s\n",
+-		   slave ? slave->dev->name : "NULL");
++		   slave ? slave->dev->name : "all");
  
-diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-index 3ad2d5d98034..53b2f6ebda8b 100644
---- a/include/uapi/linux/if_link.h
-+++ b/include/uapi/linux/if_link.h
-@@ -1534,6 +1534,7 @@ enum {
- 	IFLA_BOND_MISSED_MAX,
- 	IFLA_BOND_NS_IP6_TARGET,
- 	IFLA_BOND_COUPLED_CONTROL,
-+	IFLA_BOND_BROADCAST_NEIGH,
- 	__IFLA_BOND_MAX,
- };
- 
+ 	return true;
+ }
 -- 
 2.34.1
 
