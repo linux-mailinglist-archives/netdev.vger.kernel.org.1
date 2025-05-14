@@ -1,182 +1,170 @@
-Return-Path: <netdev+bounces-190291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F5E9AB60EF
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 04:53:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F49DAB6107
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 05:00:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86F75863B40
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 02:53:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76ECD3A551E
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 03:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFD351DE8AF;
-	Wed, 14 May 2025 02:53:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gKljr2X0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49ECC29D05;
+	Wed, 14 May 2025 03:00:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092611862BB
-	for <netdev@vger.kernel.org>; Wed, 14 May 2025 02:53:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3071F4ED;
+	Wed, 14 May 2025 03:00:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747191195; cv=none; b=NlJH0Tp6nWtDMksFO+VoCrQTLdndnxNaUvxLEzUA09zQx68NCRWSZNVjG8huFZVE4DDROV6MNriz6i6AEwRBZpniQ41UNi4OBHm0ptli+wyf/Qm9ujxMDd12s49kds2qEvZK3+1p/x5T376LbRO5+jX8mNn/duN/2ke3kL8yxWg=
+	t=1747191653; cv=none; b=A6q6Z2hk7ySQESZgqAxK9i5qKcV7d5rb3iroSavdq0mb15pHrfL7WiWIFXVFDsdPy6B/vxcZehdQ1McRok+w2LNi3wTNXY+FSz8y61sFbasFtiN9auZmmpjCUA9WOWH9dEaXE34vtMjIqoEIhd40Zap65hzYzvzpUgFcRxZpZrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747191195; c=relaxed/simple;
-	bh=xYePPpPHItj0zqjq4MOZdgAxeW4nYpts1pf20lbhHIE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BjwUUDUva59it6bLQmSfvLHF+Fa2RecWocPxFpr5hr8NqZNSGZK3TTjuR32KuZDKitvZToGCJlXnfANW5DOYJz7VWkr3/ldIHNK2mjFH3m3ybpxG+4/AFJK9V01a19g7+yznM38ceWCHJbgdfErP5LXX8IkhDbbJBP1/4MVFFqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gKljr2X0; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747191192;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xYePPpPHItj0zqjq4MOZdgAxeW4nYpts1pf20lbhHIE=;
-	b=gKljr2X05hpo2MZUkwvznELECYemO2XSW9nT4xj/lBN+rp3aqGH0DcGSYIvnd4ja1w+eD0
-	IRzDMvVaqgP68AiWPEHx3l/7b74O60u0TgNeWXIqmTYq9McINSpuzMkg9b6VqckiTQe6EI
-	DqE68A7/0TtetMpOelAlgiIbfKf0SUQ=
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
- [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-517-H4Br3NT_PE-pe2AgQfKb1w-1; Tue, 13 May 2025 22:53:11 -0400
-X-MC-Unique: H4Br3NT_PE-pe2AgQfKb1w-1
-X-Mimecast-MFC-AGG-ID: H4Br3NT_PE-pe2AgQfKb1w_1747191191
-Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-7425168cfb9so2909330b3a.1
-        for <netdev@vger.kernel.org>; Tue, 13 May 2025 19:53:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747191190; x=1747795990;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xYePPpPHItj0zqjq4MOZdgAxeW4nYpts1pf20lbhHIE=;
-        b=u+f19K2guHzJ2X6P4MzlgbJVw0GBsLcfC6Ml62eZG89rVg/Juh2zCeauXL1H3CDqqa
-         eOOWP/db0EztmCoqXDxRLsClQZt4mnclD8XtBhfGmwjvqmvW1093g1n0lIVlnsP3BsJV
-         wO3DmmZQ6TOgyWRyPzl2HILtrHXJvx0d8YUyEK8ZjY74Nrj6+izStaAxrohx+OAN5MnK
-         c1iTKmiwfQ+I4YEQnvtBwlNZFDwki1od0100HeQME3yTum67EIsnU+BseY7TJu7qo80u
-         feqNF2x2AAcLSU5iBTTr96oi4P03TsZm1uFdc2bPbBz4VuMPxXyASwiCHAEucy1jKMOn
-         NTdw==
-X-Forwarded-Encrypted: i=1; AJvYcCUTMX1eRz9iUifki9ARfvoHQr0DabfSryep8lzAqKYEvlDuQ7+EtQpugwX1JiGQ03TYqCU7rNo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YziPpYs/etvEziao4X0sVoN0MJ0z8K4Mtv0QbdU1qLsE77P52Zn
-	2PDYFWi1efJ22RPVDgzHowqUU+cVVbUxjLEkr8xq8Zwn7clJBu+Tkb7kNPEu8H4RRH2JL1D+lLq
-	AUUp/RGyJ+vu5XT6bJV9zAvbNdHgs5nK7+z2hnFx3IOve0eZDiXqcQtYzDLHocX5pR3CXHGL4YH
-	uy2L+qvunKEbwbKw991rDMFf6nUd1O5kMm9YvKAmD9Pg==
-X-Gm-Gg: ASbGncufnBlvAEsdeTWPFIeGxoMez8l19mzZYV4XzCDQy/EIq/nltGF98rvjuOEbuGx
-	LaiGQJ1FbxKsHCnMzaWDnv4t+0Gj5cWQCWk1o2cLX3XICpLonuozhFVEP3StJXjneBmzv
-X-Received: by 2002:a05:6a20:914e:b0:1f5:591b:4f7a with SMTP id adf61e73a8af0-215ff1b7394mr2148411637.38.1747191190493;
-        Tue, 13 May 2025 19:53:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE2O008aj4wY4jbfsuG0wQx0LXJQV1rEC9uHaXpFHGz1hfmWDBVT1BMyztM8wnp7Gb2O/DG75zfCtDsXFNVRAs=
-X-Received: by 2002:a05:6a20:914e:b0:1f5:591b:4f7a with SMTP id
- adf61e73a8af0-215ff1b7394mr2148385637.38.1747191190148; Tue, 13 May 2025
- 19:53:10 -0700 (PDT)
+	s=arc-20240116; t=1747191653; c=relaxed/simple;
+	bh=vX8mNa31YG9zmPqphOmHRm2XjzaN7O5/YoRb0FhDIVU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ttuXnJERibiw0gBMTSQyMFEsI9+fVYBe0WD+bbPF/ttj64ORxY6i+8ltPb47bKyN21tcEpwr63+FTBcI6YR0E8ZXMxLnklf5hW5lNjE9+2YlpFJX23FPv5+nb5vH8kEMdEGaF6Mwm6GS64THPKh+BNo8yUnyBOlk8fb76vA5no4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-669ff7000002311f-65-6824075daadc
+Date: Wed, 14 May 2025 12:00:40 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
+Cc: willy@infradead.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	kernel_team@skhynix.com, kuba@kernel.org, almasrymina@google.com,
+	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org,
+	akpm@linux-foundation.org, ast@kernel.org, daniel@iogearbox.net,
+	davem@davemloft.net, john.fastabend@gmail.com,
+	andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
+	vishal.moola@gmail.com
+Subject: Re: [RFC 13/19] page_pool: expand scope of is_pp_{netmem,page}() to
+ global
+Message-ID: <20250514030040.GA48035@system.software.com>
+References: <20250509115126.63190-1-byungchul@sk.com>
+ <20250509115126.63190-14-byungchul@sk.com>
+ <87y0v22dzn.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250421024457.112163-1-lulu@redhat.com> <20250421024457.112163-5-lulu@redhat.com>
- <CACGkMEt-ewTqeHDMq847WDEGiW+x-TEPG6GTDDUbayVmuiVvzg@mail.gmail.com>
- <CACGkMEte6Lobr+tFM9ZmrDWYOpMtN6Xy=rzvTy=YxSPkHaVdPA@mail.gmail.com>
- <CACGkMEstbCKdHahYE6cXXu1kvFxiVGoBw3sr4aGs4=MiDE4azg@mail.gmail.com>
- <20250429065044-mutt-send-email-mst@kernel.org> <CACGkMEteBReoezvqp0za98z7W3k_gHOeSpALBxRMhjvj_oXcOw@mail.gmail.com>
- <20250430052424-mutt-send-email-mst@kernel.org> <CACGkMEub28qBCe4Mw13Q5r-VX4771tBZ1zG=YVuty0VBi2UeWg@mail.gmail.com>
- <20250513030744-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20250513030744-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 14 May 2025 10:52:58 +0800
-X-Gm-Features: AX0GCFtQFTgm4lfPZmx2Tv2n376ohKx-feV8h7AANGb3bjp34mVypcbh1YB90e0
-Message-ID: <CACGkMEtm75uu0SyEdhRjUGfbhGF4o=X1VT7t7_SK+uge=CzkFQ@mail.gmail.com>
-Subject: Re: [PATCH v9 4/4] vhost: Add a KConfig knob to enable IOCTL VHOST_FORK_FROM_OWNER
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Cindy Lu <lulu@redhat.com>, michael.christie@oracle.com, sgarzare@redhat.com, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87y0v22dzn.fsf@toke.dk>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrHIsWRmVeSWpSXmKPExsXC9ZZnoW4su0qGwZdHKhZz1q9hs1j9o8Ji
+	+YMdrBZfft5mt1i88BuzxZzzLSwWT489Yre4v+wZi8We9u3MFr0tv5ktmnasYLK4sK2P1eLy
+	rjlsFvfW/Ge1OLZAzOLb6TeMFpcOP2KxWL/vBqvF7x9z2ByEPbasvMnksXPWXXaPBZtKPTav
+	0PLounGJ2WPTqk42j02fJrF73Lm2h83jxIzfLB47d3xm8vj49BaLx/t9V9k8Pm+SC+CN4rJJ
+	Sc3JLEst0rdL4Mpo27+JqWCLRMXSt2cZGxgvC3cxcnJICJhILL++jwnG3nD5LSOIzSKgKnF4
+	6ytmEJtNQF3ixo2fQDYHh4iAo8TpH+ldjFwczAJ7mCUun50OVi8sECpx+lcDWD2vgIVEa1Mn
+	C4gtJFAr8WbrNXaIuKDEyZlPwOLMAjoSO7feYQOZySwgLbH8HwdEWF6ieetssDGcQCfcO/id
+	DcQWFVCWOLDtOBPIXgmBU+wSZx61skLcLClxcMUNlgmMgrOQrJiFZMUshBWzkKxYwMiyilEo
+	M68sNzEzx0QvozIvs0IvOT93EyMwlpfV/onewfjpQvAhRgEORiUeXgtd5Qwh1sSy4srcQ4wS
+	HMxKIrzXs4BCvCmJlVWpRfnxRaU5qcWHGKU5WJTEeY2+lacICaQnlqRmp6YWpBbBZJk4OKUa
+	GKW4LINn7E8+9Mtl56R9mp/50yY43sl/M6csO9d8xcTbAQtlLtgfDpP7f7ykbPvSEA7r1DeK
+	zE+ehAbFLdjamvOpKUatbokic1bx+XXvIhLcBB1UJKbISR9r1Hw9V+Pt4d0pC3IVpDcdFF4Y
+	xd0WWr960hPGIKEHuU1xsspHfktdzVhycO+yUiWW4oxEQy3mouJEAHTBG17hAgAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrKIsWRmVeSWpSXmKPExsXC5WfdrBvLrpJhMLGX12LO+jVsFqt/VFgs
+	f7CD1eLLz9vsFosXfmO2mHO+hcXi6bFH7Bb3lz1jsdjTvp3ZorflN7NF044VTBaH555ktbiw
+	rY/V4vKuOWwW99b8Z7U4tkDM4tvpN4wWlw4/YrFYv+8Gq8XvH3PYHEQ8tqy8yeSxc9Zddo8F
+	m0o9Nq/Q8ui6cYnZY9OqTjaPTZ8msXvcubaHzePEjN8sHjt3fGby+Pj0FovH+31X2TwWv/jA
+	5PF5k1wAXxSXTUpqTmZZapG+XQJXRtv+TUwFWyQqlr49y9jAeFm4i5GTQ0LARGLD5beMIDaL
+	gKrE4a2vmEFsNgF1iRs3fgLZHBwiAo4Sp3+kdzFycTAL7GGWuHx2Oli9sECoxOlfDWD1vAIW
+	Eq1NnSwgtpBArcSbrdfYIeKCEidnPgGLMwvoSOzceocNZCazgLTE8n8cEGF5ieats8HGcAKd
+	cO/gdzYQW1RAWeLAtuNMExj5ZiGZNAvJpFkIk2YhmbSAkWUVo0hmXlluYmaOqV5xdkZlXmaF
+	XnJ+7iZGYGQuq/0zcQfjl8vuhxgFOBiVeHgtdJUzhFgTy4orcw8xSnAwK4nwXs8CCvGmJFZW
+	pRblxxeV5qQWH2KU5mBREuf1Ck9NEBJITyxJzU5NLUgtgskycXBKNTD2WHh9C3wbzdLdudD1
+	5nmBgL8bX5hfc+6zkw4+VrExxfTD+s2xBQxv5h6XWXWma4rB+jBd6brCS5pbxfcJrtm4P+fO
+	rquhNvu9WwMW1oUkei9qTHgmk7qKj31vWzaLftzz6AI3ybDnEsf7zs1qWb902pFtbB3SPC4M
+	1Y81D/57utJ7/z+dV81KLMUZiYZazEXFiQD6qRSxyAIAAA==
+X-CFilter-Loop: Reflected
 
-On Tue, May 13, 2025 at 3:09=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
- wrote:
->
-> On Tue, May 13, 2025 at 12:08:51PM +0800, Jason Wang wrote:
-> > On Wed, Apr 30, 2025 at 5:27=E2=80=AFPM Michael S. Tsirkin <mst@redhat.=
-com> wrote:
-> > >
-> > > On Wed, Apr 30, 2025 at 11:34:49AM +0800, Jason Wang wrote:
-> > > > On Tue, Apr 29, 2025 at 6:56=E2=80=AFPM Michael S. Tsirkin <mst@red=
-hat.com> wrote:
-> > > > >
-> > > > > On Tue, Apr 29, 2025 at 11:39:37AM +0800, Jason Wang wrote:
-> > > > > > On Mon, Apr 21, 2025 at 11:46=E2=80=AFAM Jason Wang <jasowang@r=
-edhat.com> wrote:
-> > > > > > >
-> > > > > > > On Mon, Apr 21, 2025 at 11:45=E2=80=AFAM Jason Wang <jasowang=
-@redhat.com> wrote:
-> > > > > > > >
-> > > > > > > > On Mon, Apr 21, 2025 at 10:45=E2=80=AFAM Cindy Lu <lulu@red=
-hat.com> wrote:
-> > > > > > > > >
-> > > > > > > > > Introduce a new config knob `CONFIG_VHOST_ENABLE_FORK_OWN=
-ER_IOCTL`,
-> > > > > > > > > to control the availability of the `VHOST_FORK_FROM_OWNER=
-` ioctl.
-> > > > > > > > > When CONFIG_VHOST_ENABLE_FORK_OWNER_IOCTL is set to n, th=
-e ioctl
-> > > > > > > > > is disabled, and any attempt to use it will result in fai=
-lure.
-> > > > > > > >
-> > > > > > > > I think we need to describe why the default value was chose=
-n to be false.
-> > > > > > > >
-> > > > > > > > What's more, should we document the implications here?
-> > > > > > > >
-> > > > > > > > inherit_owner was set to false: this means "legacy" userspa=
-ce may
-> > > > > > >
-> > > > > > > I meant "true" actually.
-> > > > > >
-> > > > > > MIchael, I'd expect inherit_owner to be false. Otherwise legacy
-> > > > > > applications need to be modified in order to get the behaviour
-> > > > > > recovered which is an impossible taks.
-> > > > > >
-> > > > > > Any idea on this?
-> > > > > >
-> > > > > > Thanks
-> > >
-> > > So, let's say we had a modparam? Enough for this customer?
-> > > WDYT?
+On Mon, May 12, 2025 at 02:46:36PM +0200, Toke Høiland-Jørgensen wrote:
+> Byungchul Park <byungchul@sk.com> writes:
+> 
+> > Other than skbuff.c might need to check if a page or netmem is for page
+> > pool, for example, page_alloc.c needs to check the page state, whether
+> > it comes from page pool or not for their own purpose.
 > >
-> > Just to make sure I understand the proposal.
+> > Expand the scope of is_pp_netmem() and introduce is_pp_page() newly, so
+> > that those who want to check the source can achieve the checking without
+> > accessing page pool member, page->pp_magic, directly.
 > >
-> > Did you mean a module parameter like "inherit_owner_by_default"? I
-> > think it would be fine if we make it false by default.
+> > Signed-off-by: Byungchul Park <byungchul@sk.com>
+> > ---
+> >  include/net/page_pool/types.h |  2 ++
+> >  net/core/page_pool.c          | 10 ++++++++++
+> >  net/core/skbuff.c             |  5 -----
+> >  3 files changed, 12 insertions(+), 5 deletions(-)
 > >
-> > Thanks
->
-> I think we should keep it true by default, changing the default
-> risks regressing what we already fixes.
+> > diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
+> > index 36eb57d73abc6..d3e1a52f01e09 100644
+> > --- a/include/net/page_pool/types.h
+> > +++ b/include/net/page_pool/types.h
+> > @@ -299,4 +299,6 @@ static inline bool is_page_pool_compiled_in(void)
+> >  /* Caller must provide appropriate safe context, e.g. NAPI. */
+> >  void page_pool_update_nid(struct page_pool *pool, int new_nid);
+> >  
+> > +bool is_pp_netmem(netmem_ref netmem);
+> > +bool is_pp_page(struct page *page);
+> >  #endif /* _NET_PAGE_POOL_H */
+> > diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> > index b61c1038f4c68..9c553e5a1b555 100644
+> > --- a/net/core/page_pool.c
+> > +++ b/net/core/page_pool.c
+> > @@ -1225,3 +1225,13 @@ void net_mp_niov_clear_page_pool(struct netmem_desc *niov)
+> >  
+> >  	page_pool_clear_pp_info(netmem);
+> >  }
+> > +
+> > +bool is_pp_netmem(netmem_ref netmem)
+> > +{
+> > +	return (netmem_get_pp_magic(netmem) & ~0x3UL) == PP_SIGNATURE;
+> > +}
+> > +
+> > +bool is_pp_page(struct page *page)
+> > +{
+> > +	return is_pp_netmem(page_to_netmem(page));
+> > +}
+> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > index 6cbf77bc61fce..11098c204fe3e 100644
+> > --- a/net/core/skbuff.c
+> > +++ b/net/core/skbuff.c
+> > @@ -893,11 +893,6 @@ static void skb_clone_fraglist(struct sk_buff *skb)
+> >  		skb_get(list);
+> >  }
+> >  
+> > -static bool is_pp_netmem(netmem_ref netmem)
+> > -{
+> > -	return (netmem_get_pp_magic(netmem) & ~0x3UL) == PP_SIGNATURE;
+> > -}
+> > -
+> 
+> This has already been moved to mm.h (and the check changed) by commit:
+> 
+> cd3c93167da0 ("page_pool: Move pp_magic check into helper functions")
+> 
+> You should definitely rebase this series on top of that (and the
+> subsequent ee62ce7a1d90 ("page_pool: Track DMA-mapped pages and unmap
+> them when destroying the pool")), as these change the semantics of how
+> page_pool interacts with struct page.
+> 
+> Both of these are in net-next, which Mina already asked you to rebase
 
-I think it's not a regression since it comes since the day vhost is
-introduced. To my understanding the real regression is the user space
-noticeable behaviour changes introduced by vhost thread.
+Is this net-next you are mentioning?  I will rebase on this if so.
 
-> The specific customer can
-> flip the modparam and be happy.
+   https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/
 
-If you stick to the false as default, I'm fine.
+	Byungchul
 
-Thanks
-
->
-> > >
-> > > --
-> > > MST
-> > >
->
-
+> on, so I guess you'll pick it up there, put flagging it here just for
+> completeness :)
+> 
+> -Toke
+> 
 
