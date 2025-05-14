@@ -1,297 +1,448 @@
-Return-Path: <netdev+bounces-190472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C767AB6E0E
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 16:21:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A0E48AB6E31
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 16:33:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 912394C57EC
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 14:21:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2745C4C153A
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 14:33:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8AF9198E63;
-	Wed, 14 May 2025 14:20:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B02F19D08F;
+	Wed, 14 May 2025 14:33:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AC+aUUiy"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="A3KNRO57"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013051.outbound.protection.outlook.com [52.101.72.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBE2017A2ED;
-	Wed, 14 May 2025 14:20:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747232456; cv=none; b=t+mDRRcyJ1S9DrMAQIb4nVGLG9OhwgqOmmjsz7Vogst/6kucNZSZcQmHNkSpTH9h1wnbOIuwKlI2IMYHueohJf7Yatrti9Eg9xEA4NNUuE2gKtnz6VklHAtxP6QKIRtNJq20+G7ZBpFIdKObj1PmH+uiYyhdegD3eo8YOuOOJwA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747232456; c=relaxed/simple;
-	bh=SYHkP8iNbp+tRIk98nDCbatNATpFqCGG2Ul6GlWKyAI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hoZYzAnJbItgzdB/tDL44kR3EQOjG2EZseAKrtZnf+amdSVim9Ufy8gbWk1gMn9A0nAGH4cCcWuPOlEELamIEvGI/MACAX7fBEbwzsNj210dhjZUbu4xEaiih5Lcmdb3E08XqBwnag85xnwQdmUdTrqWFSusoJut0yz8wvk/N40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AC+aUUiy; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-22fac0694aaso52215385ad.1;
-        Wed, 14 May 2025 07:20:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747232454; x=1747837254; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=orG+BE9atlT2kbscghFy3eJDqc5DVww7vKs4SPbuWPk=;
-        b=AC+aUUiyZwL2RX5NrdPGk5b4etB7dcQ0R5Q5U6CvuyjZvxU43t3xzCakaUVCT8cTZU
-         SLYly29JjhO0vgNFM5MAq1VtTOCI+de0OW4wjtEtx8eI30TfVpXmIu5ABNdF6xUzB+JA
-         aFdP7s65fbPpAAl+nmZ76oPm47JOG289+FI7QfwvN7rlSqLaIPos1hFdMvGc9ITv7/n8
-         XK1zIJgzFNoeHN67UUocYIsF5CwKba8O9PLwUvJpIR5x9AXgE9V8w+tS9WDl4drwGQIl
-         WmAZZ65WmPm+CjtN9sgkvCch6GsBd77Q7I9RjboXwy1bMT5ljlUfuodvSY0LOQJ1ma26
-         x6Kw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747232454; x=1747837254;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=orG+BE9atlT2kbscghFy3eJDqc5DVww7vKs4SPbuWPk=;
-        b=jcvHHG4xlw7QYXZugJGZnBoVos63bcd1q4e0GSuFpQ4k9xNnMChfL2XBtpXQhZUMQD
-         XLoT2fvQFswBWS7XThorNj/GcmPbo8AhpK774s2dl4zYGcAicZHPjsQOqmbH52JyVQ+E
-         yXbsUVDbbUzk0BGJhI72MvYWrQRg+3IqHt57ZP49jbv8aOyMOiVd0nmTubTL/6q1Yr8A
-         VR9XI3qA1+5jP7fAeb/dBLWI8bVMsD35BDlpGMfAo0kkBreaCtNkAIMVmKYx45zz53rA
-         T++NAbJ0hWgkJ46vqcw+NrUiW0o+pxu3qMyLneG4fic1iLxKUnMz3DybvnuZEPT2fpH+
-         iUrg==
-X-Forwarded-Encrypted: i=1; AJvYcCUIu1IiGnNaOw0icaBbEmX+48IAZ/qJ+lNSR0SFz0DfTap/NIvhlRMH2iz0O/QsTKU7uRPLGwCy4YMHn68=@vger.kernel.org, AJvYcCX9uohK/W8/WHmDCd6AvWBnUtGzw86Q1vrts78naGcYaxtlaKybUCl/T8yeAqxgmWIEy0dIjcU4@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoaGRqI+HDLgRgSRG99smmLuI0RRmS60Dz3nesVy3PW32ScIZO
-	8FJ0u6fwkUNPHK4UWsquOWuvPSbRucxjC3hpe858SH8Xf0TsDMk=
-X-Gm-Gg: ASbGnctolic+ZpoSpa8YIOHnTml72kkoQdXvMr/zWYOetPtsnZwA6kMgtOi4W5zw1vD
-	+lRIS+2U2GoqZqpL3xDyZ0837+ycu+o8MKvRW1n32NDd8RhFkKauWeS1M3388N6FUTtXMK9TIEC
-	WeJJwjYl9qdA5rwMvd5WW3OVnUtlMvkZndrqAcdseO2+go9thdKd2sGzO43bJ1+iQ7sqqO9wY90
-	MqejmgR0DKFGAZ8aZ6wQhiOcTNthpynxfquIliiZDOeUjegjDwRDVdfowr0qUAzckDNwL5MxbaP
-	Y+/umvZ8V0gmBN2mWe4jDRcJs/kB0yaib8iX3ioLD2S01hOvJIkrVjpk5OT4kncoU5Rlyey8ZL1
-	jEWLNbCepJ2CS
-X-Google-Smtp-Source: AGHT+IH65WHI4mbV81rXsdbslgIGGWMpQpEQ6JSPuT29eKbV8LGBG2u3EImic39iHcTuLO5yoK1WNQ==
-X-Received: by 2002:a17:902:f603:b0:22f:b25b:8e93 with SMTP id d9443c01a7336-231981ccb56mr67998985ad.48.1747232453891;
-        Wed, 14 May 2025 07:20:53 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-22fc7544f9fsm100794935ad.31.2025.05.14.07.20.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 May 2025 07:20:53 -0700 (PDT)
-Date: Wed, 14 May 2025 07:20:52 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: syzbot <syzbot+53485086a41dbb43270a@syzkaller.appspotmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
-	kuba@kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] BUG: sleeping function called from invalid
- context in dev_set_promiscuity
-Message-ID: <aCSmxCbC_jynAmVA@mini-arch>
-References: <6822cc81.050a0220.f2294.00e8.GAE@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B02342260C
+	for <netdev@vger.kernel.org>; Wed, 14 May 2025 14:33:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747233186; cv=fail; b=DPxsFIWn/M4TSR+DQhRzQ48+OsuLNYRyPrN87jApopWxj0iuYcCdGXKdonaG/L30zKQMuHuJiHxNXGF2lfCCHKHYBpmA/o1qZOWO9ArF8y7oghYZ1WpxcdlT0lYJrwD2pH3ZtQKKYL3ecXtD/4Uzh4tTOjEDCLQm1NQxqFHmpNM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747233186; c=relaxed/simple;
+	bh=OEnzNTby/ybYOegObgqPsqTyiSpgwaSZi0C/QoahKoM=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=SeZ9xY+nzXPOn9teOt6zgg9OpAo/OkgwLHH7+xiKlxT+cN9q9Y32y5zhwftgT1wwoDylAZljlv4nkOXMJsaSTxFEk8Pen5zr+1Ted91FTNoKIir4j1kuwg2GBrgbePi2/XAT/GJ4Vq/i0R74xeAtrCCzelblIj6D7YwxVQwPGFk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=A3KNRO57; arc=fail smtp.client-ip=52.101.72.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=wHbII64SwEmFE+RSj5PSyagzr7Jx5mtRdd3XyOH3VcROa4BKXmOeWYDmkCao/bldZDakrgmgT9Y9qv9w8v0GCZMtnCWyCiY5IKQEtxQ4zAspbLkW/eKLQdnM7s7sZgQlR/uEDbKYDhc4HjR/MxHGPA3MJvU9Zu7BebcGTl6oHMDKqhXZBI8eCZTFLBlIz6dmAeCu4tEQXgSmiuITov7sPLSN3i1iPnpvQI7GmusmjB4kqRFk0cyaaAI+sDvFw7zDp+KIQh0W3q1ZrRDtTgb2KEESMdJi+lqCx+U12iviCG3RrbdteQMXUgArdfjdBV/d9bAOgBx23W36jpvZ24Qq8A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LaxRGIQrP34CUkAlAciKqn87vwhT8jZEGDiR24kHil4=;
+ b=M5vYQ+VuZXArsMY7J0CN+iSjFAQj4wdvbxQkmJbQ2Bn+yWs+h+k0vj70kkAmq9ssqG8qfgSfrZfABEVHSomEefa0PZB8jH2QNcfU+vk4+zq7LSuCXVdS0JWYK4syJcr8ZeN8miqWi+9Se88qa+G3m3uQZW7ulywH00/Cbx82YfNcjCgdpERdt/46XIQhqZ756PJZ/Uw7ionobLek0x42LMh2xYebQKcKi/Ov7RFWzy+I1tXq2hA9F7NSw0uDAqcv+0lIQFIF790sX8kBvsw8qoWY6JYvEcNvssPKi4kye7mn0RT85JYsZFVMA17RbOfZ8asRRZD4TlrkmXEnkhtkGQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LaxRGIQrP34CUkAlAciKqn87vwhT8jZEGDiR24kHil4=;
+ b=A3KNRO57o8DzE1mxjCqGCI/i/PJ7r6oAGgcEYKmYJ2/t8DO5/Y1K51b8guy1mtmdnwj8KuinTbPPW1NMkRDRpfBY573QtDkJu5OZrnez5bIkOxKlx9Nv2qBDhpF0EzVrd+esV8Dz96co9Enlsiu+Kkd8Asqk7BVQhuVJJU0kDJQwtaJjTUhI0c0dtaBeJ9heWaCC1+JIXiXd8ymSuRlBqb6OkBwYifCCM/0Oap4xsa0I3y2BwiALO+FlJWM1Ob2icRn1ECSAFzoJn8R715rW+w06HcO4DRM14IkrCS3sL/WJQyenOfQucI3FgTGHJys1G7Lt4dS5ysuFwEng5soggQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
+ by AM7PR04MB7013.eurprd04.prod.outlook.com (2603:10a6:20b:116::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.30; Wed, 14 May
+ 2025 14:33:00 +0000
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2%4]) with mapi id 15.20.8722.027; Wed, 14 May 2025
+ 14:33:00 +0000
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: netdev@vger.kernel.org
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	Russell King <linux@armlinux.org.uk>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Furong Xu <0x1207@gmail.com>
+Subject: [PATCH v2 net-next] net: stmmac: convert to ndo_hwtstamp_get() and ndo_hwtstamp_set()
+Date: Wed, 14 May 2025 17:32:49 +0300
+Message-ID: <20250514143249.1808377-1-vladimir.oltean@nxp.com>
+X-Mailer: git-send-email 2.43.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: VI1PR0102CA0072.eurprd01.prod.exchangelabs.com
+ (2603:10a6:803::49) To AM8PR04MB7779.eurprd04.prod.outlook.com
+ (2603:10a6:20b:24b::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <6822cc81.050a0220.f2294.00e8.GAE@google.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|AM7PR04MB7013:EE_
+X-MS-Office365-Filtering-Correlation-Id: c588c90a-599f-4a8e-4f3a-08dd92f43a48
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|7416014|52116014|376014|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?lW8Wah1IqCApRfz0LU0iQH4OKBwu4Q1cuL+YP9moHQ2gMinRtY/hbQzR9GBB?=
+ =?us-ascii?Q?owuiBOUDHelr+so9evQ7Tqd5J7AXpG87SCJjErsna/4N0OWQjauMAw9HenMP?=
+ =?us-ascii?Q?V3ZxWRYZE1bO9pdnLtICtu+h67S6goW7T+saw1H0Q+IVEdrHNfWJ6LI2HK2Z?=
+ =?us-ascii?Q?y/eFwRkw5Fhukjfh02k6lRCVHInx4p0hmrReeQWUFHwYRxMYRW+9sqdwegOu?=
+ =?us-ascii?Q?Uqowy1RrfMNtKEuJkzb+LL3zElxjmRK5MyQCIivy8c6L+fgdnoLI0NPgPtM9?=
+ =?us-ascii?Q?jG9vKsEgp2IxBq5NiW6wUWHY0p1X8gDfcN4vwDZ/8hCXgCFtVR4zQl34Use8?=
+ =?us-ascii?Q?RASr8n6ndJ8UZSpESC8qGz1UYzYPEg1AP7KKeCcWr27cXUHsdCLphwz7lMC4?=
+ =?us-ascii?Q?b90Fzku1wsNHT5eg6UrxXOsY41ehtzFBw6dC191B9SqxdWqsvFW83tFXtArJ?=
+ =?us-ascii?Q?zFdSvGsvM1jWrsjnWYNvnBAU2petwreLq7NRMA2P5iCJvpOBrP+9uyYFIJhy?=
+ =?us-ascii?Q?4fCYtTDqZ2Qpps7O1if3r0HO7iGSZQPJaDVcszczoQzQj+6ob+w578s4QTZ2?=
+ =?us-ascii?Q?H2PDPH0XI+lnb5XOORcglzCGr8MFpowaAsN3tdQq0IwQGu6axHPNYHroHqgZ?=
+ =?us-ascii?Q?iueffNlDfo8ZeReYeZeNOpZ2ZpbkHNngq53sFaE9anB2FdNabY2Q8x1eKB11?=
+ =?us-ascii?Q?7a/gwavJfpRwcHUTMdyCZbhJNshdhpDsSpc5j2/pRjSO399JSkJSqZiuBdpw?=
+ =?us-ascii?Q?Gxgod3LnmWdgKuTJ5mTwQaa9Qow7X2dTk16sOafxM/KBHI4H1Mp3a7pwkmHY?=
+ =?us-ascii?Q?hbanQXQ7XpLBErwdde1KrCrHg/tJuQ5QP+U+xidM5hOkDk3/8CIrcIJSO/Q7?=
+ =?us-ascii?Q?BypcbPPYQU0q9yAGR9KCp9GhTINh8sHZ727ibnZu9EyVXcOf3v33eq16QTwR?=
+ =?us-ascii?Q?2Ik+li7bfO7WEnnsap/G7aHcfw2bJ99ZSa/pGu8OsUXKFlNpLJwsri3TVmtv?=
+ =?us-ascii?Q?LbqcZEi0pleTx9CpB59sUGqMO3uE7japjvfaSAmqE7K9zQcJd2HeDmbXd0N1?=
+ =?us-ascii?Q?gTJHqRmpe5yqW45jOAQjyhMcblAehxITxKMbpUvNcw71en/EMd1i7gWoPJnX?=
+ =?us-ascii?Q?g4zbBkrKjzCM1wQBI6FbgwFvxv1KmJZpRSMcJsHI2w03lSEnbAz2xqkOTniZ?=
+ =?us-ascii?Q?QY5wq9AuKYsqohBtw2dISwc7XUMRaobqfz+Q4f2R0mGRSFuwLjFanOSau7uo?=
+ =?us-ascii?Q?Hv3f02oLitDfJsQJO0p/sntBREVOuIYD+IfuFIqFcYrO2XW2+Csyi/37ChDf?=
+ =?us-ascii?Q?Fpe2QnW1BIf0K2/RLeZLjEjld/9A+RsZ8Zh0i6GH8/Mtn4HDGCcSBhzmqhqu?=
+ =?us-ascii?Q?A9sj/Z54rvd74nDSQ9Udf9KPOtTCoyZPMDYjEzYvJXBDWmaJBIKxRscdCBnc?=
+ =?us-ascii?Q?T4I1jer43tBD+kK7QYuYod23Ep2Z7DCK18fFA+WBkLPTIhdNHzTtqA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(52116014)(376014)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?AZ0a5aND1fT6wvQlWLCF3CyV72p+AW22JzeAH3zpN4SKBvCQoy1vnO2OWTFd?=
+ =?us-ascii?Q?ctNI0DAVC8blF1OctkoZJaC+ZRDatQE59kwuxPxAkeQ18JQgBem8rSTy/4KQ?=
+ =?us-ascii?Q?fl7Iu+AvSXfyupolUvMrhBdoRQAy0w2RmHR5lDvraj6R+OBbvuUFyRt1dXQE?=
+ =?us-ascii?Q?cO4hFLH/QsbknFOybPXt2vYpRnBO4ozzvbJqdl/XGEAGbZQ8rq310SwZIK2t?=
+ =?us-ascii?Q?ERxs8/nxhKb8TjP535kRLa9S6D14GBi4uDSiwYhJNZaSy0+a7tuFiECHFkEm?=
+ =?us-ascii?Q?S7+noWLebx3kQaEILStGT5cedwRvQF9DtJEIoEKTQyIwFtT9STK9eKAPOiPd?=
+ =?us-ascii?Q?3rCUi6CTL2ETrDcj3jA8hgUMfqd2zJ7zqlJRz9CVdEb9e8VT4DrVCB5D1kdJ?=
+ =?us-ascii?Q?0dc15ahx1c8J2cX9XMLg16MlkgAVKng5CZw/fuB3jSgtFB5z1vtH0tMvFtE7?=
+ =?us-ascii?Q?HVOT51LIirA+e1Mj6AhRwGJ1pXXSxts6+hMRl4Ayhg4dFny0p+PHduxMVsEw?=
+ =?us-ascii?Q?je43wNuQcgG3sryrjBUHB3yT0QjcfWEwwohsCaLKaa1k5PdM8UY+jFR28+oJ?=
+ =?us-ascii?Q?9hWRsN9r/7QDN9gBMBopsu0GQFVeWCyCh816GYNMwanzn5rSwgoxrDGykc2R?=
+ =?us-ascii?Q?jjEefqlrWHfLfxlJRFV/NXrJ0VQIN4Bmc3KhcLPrLhksCYtE9V9ixILspaBK?=
+ =?us-ascii?Q?ebLp613Jj7U/wh0GwbM14C3JNKwLCSyjLeaEzqaVYkOeawK+iBKe0Z+8WfiQ?=
+ =?us-ascii?Q?rMQgUBXdR3i/GT2axRtD60bew4o+g9D2bd59wwhrfUa4nNvspwBfHXds9E/S?=
+ =?us-ascii?Q?eFO1Hi69ZHb3rQ/5h4OpFqOClTf20i9YT6r2W03zlbAXAKG5ZjRyiKQhT/pI?=
+ =?us-ascii?Q?mNF7obp90mwWGF1FYDvWBYUrsGKqsMNWKLrPubFHnT+pPKpkDi4xUvosc3Ty?=
+ =?us-ascii?Q?ykpFI1u5SnX3ZZS0dAaURSGNHQGYfVEy7O0X5rtzmlmvr/lXXvWUhtK+LNE1?=
+ =?us-ascii?Q?qoBeTX8W4xMFMAa0fw/MjxkaqX9GIYUkX5z8xi/DXY9AUVx04fwWv6JJnHod?=
+ =?us-ascii?Q?w3PVfih1KNzTXoE4sYi7csi57QCynklSL9o74NoIBrc0eTC2b23b3OCBjtGt?=
+ =?us-ascii?Q?0IIrYKGpcLSPLBB3Zc5+owrGxSs/brqZeCQK3lrJQz8kSjCgiUP1wNrteYSI?=
+ =?us-ascii?Q?/d+Yph07I06Er10nYtCe84UjKfsyYuXbfK+BXeaWUHVhiJ9ScrBdWjE6KOCp?=
+ =?us-ascii?Q?GTIquL7eIIC8h2ZNNqoiVBp+NISEJlxL+nplBYlAiQCqujlbqgypHvdZwqly?=
+ =?us-ascii?Q?ap+CTkidrXeWuL4GOdXkbA3Hs+KPJkdcWbOpGgFNcN3WEjgo4s5J2xDGDri1?=
+ =?us-ascii?Q?MxPG5BZRHhfCEQLF/4L+akjv13PDXll0JNDXuOAn0JT6Nf7EN8oClkhus3vs?=
+ =?us-ascii?Q?d3LzlVKMEnvUTQ5QY+SCAAO9ZzVNKPdG3i5oL7agvcgz6d5wquaBTPwlN7US?=
+ =?us-ascii?Q?ENErzgN0nL7uAEjZBP5QR1upP+EPEyxIQJc9IdKl77eSvVJISBax3RZODc8q?=
+ =?us-ascii?Q?5chbjM1o0Q5PJ5gROzSK45+A4P74kbtp4yW5S7APwmSbRNhW3Jff1Ihuw4/0?=
+ =?us-ascii?Q?NA=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c588c90a-599f-4a8e-4f3a-08dd92f43a48
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 May 2025 14:33:00.5843
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: KYEvktkVN55GohHCoLlsdfvR+EeEHDUcwfaDsnrj+sl1QR13BhPT9BO0QEhvjpymjZcUk9StpcBO0r7Yi5SYZA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR04MB7013
 
-On 05/12, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    82f2b0b97b36 Linux 6.15-rc6
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=173c62f4580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=1e4dff0626333635
-> dashboard link: https://syzkaller.appspot.com/bug?extid=53485086a41dbb43270a
-> compiler:       Debian clang version 20.1.2 (++20250402124445+58df0ef89dd6-1~exp1~20250402004600.97), Debian LLD 20.1.2
-> 
-> Unfortunately, I don't have any reproducer for this issue yet.
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/900b6a747850/disk-82f2b0b9.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/1d41ddb74da5/vmlinux-82f2b0b9.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/eb555785f64f/bzImage-82f2b0b9.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+53485086a41dbb43270a@syzkaller.appspotmail.com
-> 
-> team0 (unregistering): left promiscuous mode
-> team_slave_0: left promiscuous mode
-> team_slave_1: left promiscuous mode
-> bond0: left promiscuous mode
-> bond_slave_0: left promiscuous mode
-> bond_slave_1: left promiscuous mode
-> BUG: sleeping function called from invalid context at kernel/locking/mutex.c:578
-> in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 14644, name: syz.2.10383
-> preempt_count: 0, expected: 0
-> RCU nest depth: 1, expected: 0
-> 2 locks held by syz.2.10383/14644:
->  #0: ffffffff8f2f6d08 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
->  #0: ffffffff8f2f6d08 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_net_lock include/linux/rtnetlink.h:130 [inline]
->  #0: ffffffff8f2f6d08 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_dellink+0x331/0x710 net/core/rtnetlink.c:3556
->  #1: ffffffff8df3d860 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
->  #1: ffffffff8df3d860 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
->  #1: ffffffff8df3d860 (rcu_read_lock){....}-{1:3}, at: team_change_rx_flags+0x29/0x330 drivers/net/team/team_core.c:1781
-> CPU: 1 UID: 0 PID: 14644 Comm: syz.2.10383 Not tainted 6.15.0-rc6-syzkaller #0 PREEMPT(full) 
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-> Call Trace:
->  <TASK>
->  dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
->  __might_resched+0x495/0x610 kernel/sched/core.c:8818
->  __mutex_lock_common kernel/locking/mutex.c:578 [inline]
->  __mutex_lock+0x106/0xe80 kernel/locking/mutex.c:746
->  netdev_lock include/linux/netdevice.h:2751 [inline]
->  netdev_lock_ops include/net/netdev_lock.h:42 [inline]
->  dev_set_promiscuity+0x10e/0x260 net/core/dev_api.c:285
->  bond_set_promiscuity drivers/net/bonding/bond_main.c:922 [inline]
->  bond_change_rx_flags+0x219/0x690 drivers/net/bonding/bond_main.c:4732
->  dev_change_rx_flags net/core/dev.c:9145 [inline]
->  __dev_set_promiscuity+0x3f5/0x590 net/core/dev.c:9189
->  netif_set_promiscuity+0x50/0xe0 net/core/dev.c:9201
->  dev_set_promiscuity+0x126/0x260 net/core/dev_api.c:286
->  team_change_rx_flags+0x1b3/0x330 drivers/net/team/team_core.c:1785
->  dev_change_rx_flags net/core/dev.c:9145 [inline]
->  __dev_set_promiscuity+0x3f5/0x590 net/core/dev.c:9189
->  netif_set_promiscuity+0x50/0xe0 net/core/dev.c:9201
->  dev_set_promiscuity+0x126/0x260 net/core/dev_api.c:286
->  hsr_del_port+0x25e/0x2d0 net/hsr/hsr_slave.c:233
->  hsr_netdev_notify+0x827/0xb60 net/hsr/hsr_main.c:104
->  notifier_call_chain+0x1b3/0x3e0 kernel/notifier.c:85
->  call_netdevice_notifiers_extack net/core/dev.c:2214 [inline]
->  call_netdevice_notifiers net/core/dev.c:2228 [inline]
->  unregister_netdevice_many_notify+0x15d8/0x2330 net/core/dev.c:11970
->  rtnl_delete_link net/core/rtnetlink.c:3522 [inline]
->  rtnl_dellink+0x488/0x710 net/core/rtnetlink.c:3564
->  rtnetlink_rcv_msg+0x7cc/0xb70 net/core/rtnetlink.c:6955
->  netlink_rcv_skb+0x219/0x490 net/netlink/af_netlink.c:2534
->  netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
->  netlink_unicast+0x758/0x8d0 net/netlink/af_netlink.c:1339
->  netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1883
->  sock_sendmsg_nosec net/socket.c:712 [inline]
->  __sock_sendmsg+0x219/0x270 net/socket.c:727
->  ____sys_sendmsg+0x505/0x830 net/socket.c:2566
->  ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
->  __sys_sendmsg net/socket.c:2652 [inline]
->  __do_sys_sendmsg net/socket.c:2657 [inline]
->  __se_sys_sendmsg net/socket.c:2655 [inline]
->  __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2655
->  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->  do_syscall_64+0xf6/0x210 arch/x86/entry/syscall_64.c:94
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7f8a8538e969
-> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007f8a8298f038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-> RAX: ffffffffffffffda RBX: 00007f8a855b6320 RCX: 00007f8a8538e969
-> RDX: 0000000000000000 RSI: 0000200000000200 RDI: 0000000000000008
-> RBP: 00007f8a85410ab1 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-> R13: 0000000000000001 R14: 00007f8a855b6320 R15: 00007f8a856dfa28
->  </TASK>
-> 
-> =============================
-> [ BUG: Invalid wait context ]
-> 6.15.0-rc6-syzkaller #0 Tainted: G        W          
-> -----------------------------
-> syz.2.10383/14644 is trying to lock:
-> ffff88805b68cd30 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2751 [inline]
-> ffff88805b68cd30 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: netdev_lock_ops include/net/netdev_lock.h:42 [inline]
-> ffff88805b68cd30 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: dev_set_promiscuity+0x10e/0x260 net/core/dev_api.c:285
-> other info that might help us debug this:
-> context-{5:5}
-> 2 locks held by syz.2.10383/14644:
->  #0: ffffffff8f2f6d08 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
->  #0: ffffffff8f2f6d08 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_net_lock include/linux/rtnetlink.h:130 [inline]
->  #0: ffffffff8f2f6d08 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_dellink+0x331/0x710 net/core/rtnetlink.c:3556
->  #1: ffffffff8df3d860 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
->  #1: ffffffff8df3d860 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
->  #1: ffffffff8df3d860 (rcu_read_lock){....}-{1:3}, at: team_change_rx_flags+0x29/0x330 drivers/net/team/team_core.c:1781
-> stack backtrace:
-> CPU: 1 UID: 0 PID: 14644 Comm: syz.2.10383 Tainted: G        W           6.15.0-rc6-syzkaller #0 PREEMPT(full) 
-> Tainted: [W]=WARN
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-> Call Trace:
->  <TASK>
->  dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
->  print_lock_invalid_wait_context kernel/locking/lockdep.c:4831 [inline]
->  check_wait_context kernel/locking/lockdep.c:4903 [inline]
->  __lock_acquire+0xbcf/0xd20 kernel/locking/lockdep.c:5185
->  lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5866
->  __mutex_lock_common kernel/locking/mutex.c:601 [inline]
->  __mutex_lock+0x182/0xe80 kernel/locking/mutex.c:746
->  netdev_lock include/linux/netdevice.h:2751 [inline]
->  netdev_lock_ops include/net/netdev_lock.h:42 [inline]
->  dev_set_promiscuity+0x10e/0x260 net/core/dev_api.c:285
->  bond_set_promiscuity drivers/net/bonding/bond_main.c:922 [inline]
->  bond_change_rx_flags+0x219/0x690 drivers/net/bonding/bond_main.c:4732
->  dev_change_rx_flags net/core/dev.c:9145 [inline]
->  __dev_set_promiscuity+0x3f5/0x590 net/core/dev.c:9189
->  netif_set_promiscuity+0x50/0xe0 net/core/dev.c:9201
->  dev_set_promiscuity+0x126/0x260 net/core/dev_api.c:286
->  team_change_rx_flags+0x1b3/0x330 drivers/net/team/team_core.c:1785
->  dev_change_rx_flags net/core/dev.c:9145 [inline]
->  __dev_set_promiscuity+0x3f5/0x590 net/core/dev.c:9189
->  netif_set_promiscuity+0x50/0xe0 net/core/dev.c:9201
->  dev_set_promiscuity+0x126/0x260 net/core/dev_api.c:286
->  hsr_del_port+0x25e/0x2d0 net/hsr/hsr_slave.c:233
->  hsr_netdev_notify+0x827/0xb60 net/hsr/hsr_main.c:104
->  notifier_call_chain+0x1b3/0x3e0 kernel/notifier.c:85
->  call_netdevice_notifiers_extack net/core/dev.c:2214 [inline]
->  call_netdevice_notifiers net/core/dev.c:2228 [inline]
->  unregister_netdevice_many_notify+0x15d8/0x2330 net/core/dev.c:11970
->  rtnl_delete_link net/core/rtnetlink.c:3522 [inline]
->  rtnl_dellink+0x488/0x710 net/core/rtnetlink.c:3564
->  rtnetlink_rcv_msg+0x7cc/0xb70 net/core/rtnetlink.c:6955
->  netlink_rcv_skb+0x219/0x490 net/netlink/af_netlink.c:2534
->  netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
->  netlink_unicast+0x758/0x8d0 net/netlink/af_netlink.c:1339
->  netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1883
->  sock_sendmsg_nosec net/socket.c:712 [inline]
->  __sock_sendmsg+0x219/0x270 net/socket.c:727
->  ____sys_sendmsg+0x505/0x830 net/socket.c:2566
->  ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
->  __sys_sendmsg net/socket.c:2652 [inline]
->  __do_sys_sendmsg net/socket.c:2657 [inline]
->  __se_sys_sendmsg net/socket.c:2655 [inline]
->  __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2655
->  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->  do_syscall_64+0xf6/0x210 arch/x86/entry/syscall_64.c:94
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7f8a8538e969
-> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007f8a8298f038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-> RAX: ffffffffffffffda RBX: 00007f8a855b6320 RCX: 00007f8a8538e969
-> RDX: 0000000000000000 RSI: 0000200000000200 RDI: 0000000000000008
-> RBP: 00007f8a85410ab1 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-> R13: 0000000000000001 R14: 00007f8a855b6320 R15: 00007f8a856dfa28
->  </TASK>
-> netdevsim netdevsim2 netdevsim0: left promiscuous mode
-> team0 (unregistering): Port device team_slave_0 removed
-> team0 (unregistering): Port device team_slave_1 removed
-> team0 (unregistering): Port device bond0 removed
-> 
-> 
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
-> 
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> 
-> If the report is already addressed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
-> 
-> If you want to overwrite report's subsystems, reply with:
-> #syz set subsystems: new-subsystem
-> (See the list of subsystem names on the web dashboard)
-> 
-> If the report is a duplicate of another one, reply with:
-> #syz dup: exact-subject-of-another-report
-> 
-> If you want to undo deduplication, reply with:
-> #syz undup
+New timestamping API was introduced in commit 66f7223039c0 ("net: add
+NDOs for configuring hardware timestamping") from kernel v6.6.
 
-Replacing rcu_read_lock with team->lock in team_change_rx_flags should
-help in theory.. Gonna try.
+It is time to convert the stmmac driver to the new API, so that
+timestamping configuration can be removed from the ndo_eth_ioctl()
+path completely.
+
+The existing timestamping calls are guarded by netif_running(). For
+stmmac_hwtstamp_get() that is probably unnecessary, since no hardware
+access is performed. But for stmmac_hwtstamp_set() I've preserved it,
+since at least some IPs probably need pm_runtime_resume_and_get() to
+access registers, which is otherwise called by __stmmac_open().
+
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+---
+v1->v2:
+- remove \n from extack message
+- preserve netif_running() check for stmmac_hwtstamp_set()
+
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  2 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 84 +++++++++----------
+ 2 files changed, 42 insertions(+), 44 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+index 1686e559f66e..cda09cf5dcca 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+@@ -301,7 +301,7 @@ struct stmmac_priv {
+ 	unsigned int mode;
+ 	unsigned int chain_mode;
+ 	int extend_desc;
+-	struct hwtstamp_config tstamp_config;
++	struct kernel_hwtstamp_config tstamp_config;
+ 	struct ptp_clock *ptp_clock;
+ 	struct ptp_clock_info ptp_clock_ops;
+ 	unsigned int default_addend;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index a19b6f940bf3..3c88c0ed35f8 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -568,18 +568,19 @@ static void stmmac_get_rx_hwtstamp(struct stmmac_priv *priv, struct dma_desc *p,
+ /**
+  *  stmmac_hwtstamp_set - control hardware timestamping.
+  *  @dev: device pointer.
+- *  @ifr: An IOCTL specific structure, that can contain a pointer to
+- *  a proprietary structure used to pass information to the driver.
++ *  @config: the timestamping configuration.
++ *  @extack: netlink extended ack structure for error reporting.
+  *  Description:
+  *  This function configures the MAC to enable/disable both outgoing(TX)
+  *  and incoming(RX) packets time stamping based on user input.
+  *  Return Value:
+  *  0 on success and an appropriate -ve integer on failure.
+  */
+-static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
++static int stmmac_hwtstamp_set(struct net_device *dev,
++			       struct kernel_hwtstamp_config *config,
++			       struct netlink_ext_ack *extack)
+ {
+ 	struct stmmac_priv *priv = netdev_priv(dev);
+-	struct hwtstamp_config config;
+ 	u32 ptp_v2 = 0;
+ 	u32 tstamp_all = 0;
+ 	u32 ptp_over_ipv4_udp = 0;
+@@ -590,34 +591,36 @@ static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
+ 	u32 ts_event_en = 0;
+ 
+ 	if (!(priv->dma_cap.time_stamp || priv->adv_ts)) {
+-		netdev_alert(priv->dev, "No support for HW time stamping\n");
++		NL_SET_ERR_MSG_MOD(extack, "No support for HW time stamping");
+ 		priv->hwts_tx_en = 0;
+ 		priv->hwts_rx_en = 0;
+ 
+ 		return -EOPNOTSUPP;
+ 	}
+ 
+-	if (copy_from_user(&config, ifr->ifr_data,
+-			   sizeof(config)))
+-		return -EFAULT;
++	if (!netif_running(dev)) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "Cannot change timestamping configuration while up");
++		return -ENODEV;
++	}
+ 
+ 	netdev_dbg(priv->dev, "%s config flags:0x%x, tx_type:0x%x, rx_filter:0x%x\n",
+-		   __func__, config.flags, config.tx_type, config.rx_filter);
++		   __func__, config->flags, config->tx_type, config->rx_filter);
+ 
+-	if (config.tx_type != HWTSTAMP_TX_OFF &&
+-	    config.tx_type != HWTSTAMP_TX_ON)
++	if (config->tx_type != HWTSTAMP_TX_OFF &&
++	    config->tx_type != HWTSTAMP_TX_ON)
+ 		return -ERANGE;
+ 
+ 	if (priv->adv_ts) {
+-		switch (config.rx_filter) {
++		switch (config->rx_filter) {
+ 		case HWTSTAMP_FILTER_NONE:
+ 			/* time stamp no incoming packet at all */
+-			config.rx_filter = HWTSTAMP_FILTER_NONE;
++			config->rx_filter = HWTSTAMP_FILTER_NONE;
+ 			break;
+ 
+ 		case HWTSTAMP_FILTER_PTP_V1_L4_EVENT:
+ 			/* PTP v1, UDP, any kind of event packet */
+-			config.rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_EVENT;
++			config->rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_EVENT;
+ 			/* 'xmac' hardware can support Sync, Pdelay_Req and
+ 			 * Pdelay_resp by setting bit14 and bits17/16 to 01
+ 			 * This leaves Delay_Req timestamps out.
+@@ -631,7 +634,7 @@ static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
+ 
+ 		case HWTSTAMP_FILTER_PTP_V1_L4_SYNC:
+ 			/* PTP v1, UDP, Sync packet */
+-			config.rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_SYNC;
++			config->rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_SYNC;
+ 			/* take time stamp for SYNC messages only */
+ 			ts_event_en = PTP_TCR_TSEVNTENA;
+ 
+@@ -641,7 +644,7 @@ static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
+ 
+ 		case HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ:
+ 			/* PTP v1, UDP, Delay_req packet */
+-			config.rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ;
++			config->rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ;
+ 			/* take time stamp for Delay_Req messages only */
+ 			ts_master_en = PTP_TCR_TSMSTRENA;
+ 			ts_event_en = PTP_TCR_TSEVNTENA;
+@@ -652,7 +655,7 @@ static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
+ 
+ 		case HWTSTAMP_FILTER_PTP_V2_L4_EVENT:
+ 			/* PTP v2, UDP, any kind of event packet */
+-			config.rx_filter = HWTSTAMP_FILTER_PTP_V2_L4_EVENT;
++			config->rx_filter = HWTSTAMP_FILTER_PTP_V2_L4_EVENT;
+ 			ptp_v2 = PTP_TCR_TSVER2ENA;
+ 			/* take time stamp for all event messages */
+ 			snap_type_sel = PTP_TCR_SNAPTYPSEL_1;
+@@ -663,7 +666,7 @@ static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
+ 
+ 		case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
+ 			/* PTP v2, UDP, Sync packet */
+-			config.rx_filter = HWTSTAMP_FILTER_PTP_V2_L4_SYNC;
++			config->rx_filter = HWTSTAMP_FILTER_PTP_V2_L4_SYNC;
+ 			ptp_v2 = PTP_TCR_TSVER2ENA;
+ 			/* take time stamp for SYNC messages only */
+ 			ts_event_en = PTP_TCR_TSEVNTENA;
+@@ -674,7 +677,7 @@ static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
+ 
+ 		case HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ:
+ 			/* PTP v2, UDP, Delay_req packet */
+-			config.rx_filter = HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ;
++			config->rx_filter = HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ;
+ 			ptp_v2 = PTP_TCR_TSVER2ENA;
+ 			/* take time stamp for Delay_Req messages only */
+ 			ts_master_en = PTP_TCR_TSMSTRENA;
+@@ -686,7 +689,7 @@ static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
+ 
+ 		case HWTSTAMP_FILTER_PTP_V2_EVENT:
+ 			/* PTP v2/802.AS1 any layer, any kind of event packet */
+-			config.rx_filter = HWTSTAMP_FILTER_PTP_V2_EVENT;
++			config->rx_filter = HWTSTAMP_FILTER_PTP_V2_EVENT;
+ 			ptp_v2 = PTP_TCR_TSVER2ENA;
+ 			snap_type_sel = PTP_TCR_SNAPTYPSEL_1;
+ 			if (priv->synopsys_id < DWMAC_CORE_4_10)
+@@ -698,7 +701,7 @@ static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
+ 
+ 		case HWTSTAMP_FILTER_PTP_V2_SYNC:
+ 			/* PTP v2/802.AS1, any layer, Sync packet */
+-			config.rx_filter = HWTSTAMP_FILTER_PTP_V2_SYNC;
++			config->rx_filter = HWTSTAMP_FILTER_PTP_V2_SYNC;
+ 			ptp_v2 = PTP_TCR_TSVER2ENA;
+ 			/* take time stamp for SYNC messages only */
+ 			ts_event_en = PTP_TCR_TSEVNTENA;
+@@ -710,7 +713,7 @@ static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
+ 
+ 		case HWTSTAMP_FILTER_PTP_V2_DELAY_REQ:
+ 			/* PTP v2/802.AS1, any layer, Delay_req packet */
+-			config.rx_filter = HWTSTAMP_FILTER_PTP_V2_DELAY_REQ;
++			config->rx_filter = HWTSTAMP_FILTER_PTP_V2_DELAY_REQ;
+ 			ptp_v2 = PTP_TCR_TSVER2ENA;
+ 			/* take time stamp for Delay_Req messages only */
+ 			ts_master_en = PTP_TCR_TSMSTRENA;
+@@ -724,7 +727,7 @@ static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
+ 		case HWTSTAMP_FILTER_NTP_ALL:
+ 		case HWTSTAMP_FILTER_ALL:
+ 			/* time stamp any incoming packet */
+-			config.rx_filter = HWTSTAMP_FILTER_ALL;
++			config->rx_filter = HWTSTAMP_FILTER_ALL;
+ 			tstamp_all = PTP_TCR_TSENALL;
+ 			break;
+ 
+@@ -732,18 +735,18 @@ static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
+ 			return -ERANGE;
+ 		}
+ 	} else {
+-		switch (config.rx_filter) {
++		switch (config->rx_filter) {
+ 		case HWTSTAMP_FILTER_NONE:
+-			config.rx_filter = HWTSTAMP_FILTER_NONE;
++			config->rx_filter = HWTSTAMP_FILTER_NONE;
+ 			break;
+ 		default:
+ 			/* PTP v1, UDP, any kind of event packet */
+-			config.rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_EVENT;
++			config->rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_EVENT;
+ 			break;
+ 		}
+ 	}
+-	priv->hwts_rx_en = ((config.rx_filter == HWTSTAMP_FILTER_NONE) ? 0 : 1);
+-	priv->hwts_tx_en = config.tx_type == HWTSTAMP_TX_ON;
++	priv->hwts_rx_en = config->rx_filter != HWTSTAMP_FILTER_NONE;
++	priv->hwts_tx_en = config->tx_type == HWTSTAMP_TX_ON;
+ 
+ 	priv->systime_flags = STMMAC_HWTS_ACTIVE;
+ 
+@@ -756,31 +759,30 @@ static int stmmac_hwtstamp_set(struct net_device *dev, struct ifreq *ifr)
+ 
+ 	stmmac_config_hw_tstamping(priv, priv->ptpaddr, priv->systime_flags);
+ 
+-	memcpy(&priv->tstamp_config, &config, sizeof(config));
++	priv->tstamp_config = *config;
+ 
+-	return copy_to_user(ifr->ifr_data, &config,
+-			    sizeof(config)) ? -EFAULT : 0;
++	return 0;
+ }
+ 
+ /**
+  *  stmmac_hwtstamp_get - read hardware timestamping.
+  *  @dev: device pointer.
+- *  @ifr: An IOCTL specific structure, that can contain a pointer to
+- *  a proprietary structure used to pass information to the driver.
++ *  @config: the timestamping configuration.
+  *  Description:
+  *  This function obtain the current hardware timestamping settings
+  *  as requested.
+  */
+-static int stmmac_hwtstamp_get(struct net_device *dev, struct ifreq *ifr)
++static int stmmac_hwtstamp_get(struct net_device *dev,
++			       struct kernel_hwtstamp_config *config)
+ {
+ 	struct stmmac_priv *priv = netdev_priv(dev);
+-	struct hwtstamp_config *config = &priv->tstamp_config;
+ 
+ 	if (!(priv->dma_cap.time_stamp || priv->dma_cap.atime_stamp))
+ 		return -EOPNOTSUPP;
+ 
+-	return copy_to_user(ifr->ifr_data, config,
+-			    sizeof(*config)) ? -EFAULT : 0;
++	*config = priv->tstamp_config;
++
++	return 0;
+ }
+ 
+ /**
+@@ -6228,12 +6230,6 @@ static int stmmac_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
+ 	case SIOCSMIIREG:
+ 		ret = phylink_mii_ioctl(priv->phylink, rq, cmd);
+ 		break;
+-	case SIOCSHWTSTAMP:
+-		ret = stmmac_hwtstamp_set(dev, rq);
+-		break;
+-	case SIOCGHWTSTAMP:
+-		ret = stmmac_hwtstamp_get(dev, rq);
+-		break;
+ 	default:
+ 		break;
+ 	}
+@@ -7172,6 +7168,8 @@ static const struct net_device_ops stmmac_netdev_ops = {
+ 	.ndo_bpf = stmmac_bpf,
+ 	.ndo_xdp_xmit = stmmac_xdp_xmit,
+ 	.ndo_xsk_wakeup = stmmac_xsk_wakeup,
++	.ndo_hwtstamp_get = stmmac_hwtstamp_get,
++	.ndo_hwtstamp_set = stmmac_hwtstamp_set,
+ };
+ 
+ static void stmmac_reset_subtask(struct stmmac_priv *priv)
+-- 
+2.43.0
+
 
