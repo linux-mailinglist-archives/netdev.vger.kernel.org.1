@@ -1,209 +1,139 @@
-Return-Path: <netdev+bounces-190520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 108F5AB7407
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 20:07:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C424AB7443
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 20:23:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 980CC1898311
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 18:07:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8665D8C2016
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 18:23:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCB62284677;
-	Wed, 14 May 2025 17:58:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DW4PWdYm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD45027F4CA;
+	Wed, 14 May 2025 18:23:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-out.aladdin-rd.ru (mail-out.aladdin-rd.ru [91.199.251.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20902283FD5;
-	Wed, 14 May 2025 17:58:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E7C91E9B16;
+	Wed, 14 May 2025 18:23:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.199.251.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747245525; cv=none; b=JBCCXTFOtxITTEF9U5jn9HaTqjMHrD2lFWYWIAQuVkqUxa9ZZSaOe5VSIGD7amQT34MtVkr128Dxxw3glT5DY3WbXzCslWAblZmjJEDgIoZ87OzuBm5fupG80fnNKZI1gWEgcxuusC6I9wfwUuX/fjhcFBnvvzpXsWrTcDaSmRE=
+	t=1747246996; cv=none; b=Sk5BqHMrVxSKIPhjrXdTb7XHQi5Ostq9JMBz5TnQcg12vFXo9VtlaHMTT4rNf4u6DYu+MJAjIVr16z2oJOFuUgzL1uVrSPGuSLcGBdf9VFhoJb/oQ+Uf6q/rsq6hnoktpLRu5hw0n0kCUqTDZ9OTaVG2VNv1HdBoARZ39etPVcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747245525; c=relaxed/simple;
-	bh=LGi6DWjEpC9cOxvWmzOAj8f4i4+0/VuUdibXMe2cma4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TSoMMBqgQSTez9FPxm+uE1h/PUFvs7BtXV8Qj/B5PBHrkimpDp2ng58ayQOX9ays2WgvW3OOVR23Zpo4eRda2hkgKZw7D4PhRRi9ptzl5jT8gxpH1XNeHgnZ9+9jsGRL3E+iWWi93ctFnaC7RTmHJDG5LnyoVeeBrSo3k/s4YdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DW4PWdYm; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-22e4d235811so1276225ad.2;
-        Wed, 14 May 2025 10:58:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747245523; x=1747850323; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rz8UEmK4WSUnkB745SlVfM9IGUxFwWLlI6m1UkBfmaA=;
-        b=DW4PWdYmlHpPs/B0Cv+jfRpoaSg8//69Ih4AwmQ8RzpbVi0S1GCituKn4FVM5V4xBa
-         2DWNNHqW6S0A60FKsbOXwyJ1kw3Ty4K19+aN8REgFR4gG1lNLySgBavGc029kc8chcvw
-         X+fkJvS09zeeMjsvdo7pspZ/BvBR9JyDLecBUVV+OS6OYgVYIEEkhfR9OcXcDny91ePj
-         d3MpcAoK17typ8rfrVNCyCrtIcgOxX2luobzzbGcjDI1jnlJIOmb1Unvys9m4GXll0VU
-         W+YatpJopYJicpsmghTnX+lmJ/aQXk1pqwVslu+jTJDGfsH/3BOb701LOQbcyy76WMAX
-         WNvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747245523; x=1747850323;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Rz8UEmK4WSUnkB745SlVfM9IGUxFwWLlI6m1UkBfmaA=;
-        b=TkifhBZ7WB9If+deKjx7qkwpK/pCjMwWx13RR6NyA0elvJH0rB94wAkDxghIoOfWXZ
-         mTQT1hX6u8QcCKrDd799Po7goNKmrWYwSoPiAd3a1IJG5c7up+f8PEpOEa/IPRgnpAtu
-         V6obvnOCC7kE3YFNhmAeUXCLmveAIJCGWERSnsNNbfv9nb5k1mFlMzfKKyw4Uq8lKUra
-         FS94ftNmW0Q8p5F1KbPJUsM7TSXP0Fw8lRyV3Q0UqATeuSwOV5bhXJxFQlk9A9v9NPZr
-         J6nMQw1cAZz8fHbHqL8zEodTLIywhyJ0cQN1iU9RTPCxSzZwK5BztHwvrss/F3GLR9XG
-         Wr2w==
-X-Forwarded-Encrypted: i=1; AJvYcCVA2HWxm47a5qTC9pSMxF069Ei/wI0C9yxxskbl4DRz3Rkd1jmEQZlxA8mPMsPTkKFt7WUsvXhpgS94umE=@vger.kernel.org, AJvYcCVBzRZq9wHrJYAlo9O6Fnea9PP9jlNvA8JqnKuOzceoaFglHDWaaGCzDsfZznHZPO0Qa4t0NJG0heyqjQ==@vger.kernel.org, AJvYcCWp8bNDk+pW03Xkq5eJbu1/39hBKOmR38e8Z5Nbm9740meIXLeqbQ/w1gcQoihzBWhg5RHVjblikXfp@vger.kernel.org, AJvYcCX/l4Vlh4Z5wCmYD0Lo21HZS40uh0FnXBJ5jPba2nSigFqlN0JydV1hybzY+uYHega+gcRmR2JsvlkJH0GV@vger.kernel.org, AJvYcCXS0VGWM6OW30bZ5j7mYZCI+0SXczbDRnSfl5V7bZkQ6INN7WHP+TwDilj7J8K+lLrFaEUnDp/R@vger.kernel.org
-X-Gm-Message-State: AOJu0Yztnf3qAcmR7HISj2QE8YFKIMxuENVaNUhEyt47o4WqodEt/DO2
-	+ntVSzDNCw+f6iHDLbyJ2mnQvUPw1hbT39AU4IkI/SMV9eOhJF7z
-X-Gm-Gg: ASbGncs72J1UFvZYfW+ooQTW0rlSfqeRMRwsD5uFaykcS7mHKckCw2HtJd6r5+2nuEu
-	loxqhr0me/bBr2elGRJ1oYvKEHPattuqEhHG0ormwwnY8PMpUnkKYx+WVEHLYdJNows9rhawu/y
-	CTzs+1PBrei467fZToo35D49atNOFf6uCEzDl+9m7A+yxIG0QSUGWvaXfgGjeukWDv36Gocpvh5
-	T4w5M425wCb5w+PNPxzq+lzuo4pAfDmx8sS0Wk4hgHGkiGuk9MMNUSm5tN8/kXFVY5lMzqvnI03
-	bDDNJW8uMUYSiHlRb2gZ9CgIa8LAuCeneATqsPawQPgFzfKpCWw=
-X-Google-Smtp-Source: AGHT+IEeyGGKEKTQBjte0H1mQVkFdabAaUg0tK61x92eMxOEScpw39HrOLgRuI+uILMIjebb4cT/0A==
-X-Received: by 2002:a17:902:d492:b0:223:619e:71da with SMTP id d9443c01a7336-231982c8c7dmr63004855ad.49.1747245523303;
-        Wed, 14 May 2025 10:58:43 -0700 (PDT)
-Received: from localhost ([216.228.127.130])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22fc773e7aasm102346245ad.69.2025.05.14.10.58.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 May 2025 10:58:42 -0700 (PDT)
-Date: Wed, 14 May 2025 13:58:40 -0400
-From: Yury Norov <yury.norov@gmail.com>
-To: Michael Kelley <mhklinux@outlook.com>
-Cc: Shradha Gupta <shradhagupta@linux.microsoft.com>,
-	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Simon Horman <horms@kernel.org>, Leon Romanovsky <leon@kernel.org>,
-	Maxim Levitsky <mlevitsk@redhat.com>,
-	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Nipun Gupta <nipun.gupta@amd.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Jonathan Cameron <Jonathan.Cameron@huwei.com>,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>,
-	Kevin Tian <kevin.tian@intel.com>, Long Li <longli@microsoft.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Bjorn Helgaas <bhelgaas@google.com>, Rob Herring <robh@kernel.org>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Krzysztof =?utf-8?Q?Wilczy=EF=BF=BD~Dski?= <kw@linux.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	Paul Rosswurm <paulros@microsoft.com>,
-	Shradha Gupta <shradhagupta@microsoft.com>
-Subject: Re: [PATCH v3 3/4] net: mana: Allow irq_setup() to skip cpus for
- affinity
-Message-ID: <aCTZ0J8F7JkWMlYW@yury>
-References: <1746785566-4337-1-git-send-email-shradhagupta@linux.microsoft.com>
- <1746785625-4753-1-git-send-email-shradhagupta@linux.microsoft.com>
- <SN6PR02MB41577E2FAA79E2803C3384B0D491A@SN6PR02MB4157.namprd02.prod.outlook.com>
- <aCTK5PjV1n1EYOpi@yury>
- <SN6PR02MB4157AA971E41FE92B1878F9DD491A@SN6PR02MB4157.namprd02.prod.outlook.com>
+	s=arc-20240116; t=1747246996; c=relaxed/simple;
+	bh=4e1qOJWkWaFSa6R6yvbt8eruwMLzqqkT2IlDLCrqYys=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=L22IxhQcnqq3czH0E2UweUpc5fleRchqCSRMoP+GKSgoG3Rwrz8WH0br8/mTy3HgX2gELkt7YbHFeNIVr77i4eMKB5KuRBAPugf+DNPh9J9U0mKEQTDDIdNU8w8MYRnh3wpopm9Siwt3iYRvv6sHWV/V9YTJvvAVACAcB8JTTS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=aladdin.ru; spf=pass smtp.mailfrom=aladdin.ru; arc=none smtp.client-ip=91.199.251.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=aladdin.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aladdin.ru
+From: Daniil Dulov <d.dulov@aladdin.ru>
+To: <stable@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+CC: Daniil Dulov <d.dulov@aladdin.ru>, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <kafai@fb.com>, Song Liu <songliubraving@fb.com>, Yonghong
+ Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh
+	<kpsingh@kernel.org>, Roman Gushchin <guro@fb.com>, <netdev@vger.kernel.org>,
+	<bpf@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<lvc-project@linuxtesting.org>, syzbot <syzkaller@googlegroups.com>, Eric
+ Dumazet <edumazet@google.com>
+Subject: [PATCH 5.10] bpf: Avoid overflows involving hash elem_size
+Date: Wed, 14 May 2025 21:07:33 +0300
+Message-ID: <20250514180733.1271988-1-d.dulov@aladdin.ru>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SN6PR02MB4157AA971E41FE92B1878F9DD491A@SN6PR02MB4157.namprd02.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EXCH-2016-01.aladdin.ru (192.168.1.101) To
+ EXCH-2016-01.aladdin.ru (192.168.1.101)
 
-On Wed, May 14, 2025 at 05:26:45PM +0000, Michael Kelley wrote:
-> > Hope that helps.
-> 
-> Yes, that helps! So the key to understanding "weight" is that
-> NUMA locality is preferred over sibling dislocality.
-> 
-> This is a great summary!  All or most of it should go as a
-> comment describing the function and what it is trying to do.
+From: Eric Dumazet <edumazet@google.com>
 
-OK, please consider applying:
+commit e1868b9e36d0ca52e4e7c6c06953f191446e44df upstream.
 
-From abdf5cc6dabd7f433b1d1e66db86333a33a2cd15 Mon Sep 17 00:00:00 2001
-From: Yury Norov [NVIDIA] <yury.norov@gmail.com>
-Date: Wed, 14 May 2025 13:45:26 -0400
-Subject: [PATCH] net: mana: explain irq_setup() algorithm
+Use of bpf_map_charge_init() was making sure hash tables would not use more
+than 4GB of memory.
 
-Commit 91bfe210e196 ("net: mana: add a function to spread IRQs per CPUs")
-added the irq_setup() function that distributes IRQs on CPUs according
-to a tricky heuristic. The corresponding commit message explains the
-heuristic.
+Since the implicit check disappeared, we have to be more careful
+about overflows, to support big hash tables.
 
-Duplicate it in the source code to make available for readers without
-digging git in history. Also, add more detailed explanation about how
-the heuristics is implemented.
+syzbot triggers a panic using :
 
-Signed-off-by: Yury Norov [NVIDIA] <yury.norov@gmail.com>
+bpf(BPF_MAP_CREATE, {map_type=BPF_MAP_TYPE_LRU_HASH, key_size=16384, value_size=8,
+                     max_entries=262200, map_flags=0, inner_map_fd=-1, map_name="",
+                     map_ifindex=0, btf_fd=-1, btf_key_type_id=0, btf_value_type_id=0,
+                     btf_vmlinux_value_type_id=0}, 64) = ...
+
+BUG: KASAN: vmalloc-out-of-bounds in bpf_percpu_lru_populate kernel/bpf/bpf_lru_list.c:594 [inline]
+BUG: KASAN: vmalloc-out-of-bounds in bpf_lru_populate+0x4ef/0x5e0 kernel/bpf/bpf_lru_list.c:611
+Write of size 2 at addr ffffc90017e4a020 by task syz-executor.5/19786
+
+CPU: 0 PID: 19786 Comm: syz-executor.5 Not tainted 5.10.0-rc3-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x107/0x163 lib/dump_stack.c:118
+ print_address_description.constprop.0.cold+0x5/0x4c8 mm/kasan/report.c:385
+ __kasan_report mm/kasan/report.c:545 [inline]
+ kasan_report.cold+0x1f/0x37 mm/kasan/report.c:562
+ bpf_percpu_lru_populate kernel/bpf/bpf_lru_list.c:594 [inline]
+ bpf_lru_populate+0x4ef/0x5e0 kernel/bpf/bpf_lru_list.c:611
+ prealloc_init kernel/bpf/hashtab.c:319 [inline]
+ htab_map_alloc+0xf6e/0x1230 kernel/bpf/hashtab.c:507
+ find_and_alloc_map kernel/bpf/syscall.c:123 [inline]
+ map_create kernel/bpf/syscall.c:829 [inline]
+ __do_sys_bpf+0xa81/0x5170 kernel/bpf/syscall.c:4336
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+RIP: 0033:0x45deb9
+Code: 0d b4 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 db b3 fb ff c3 66 2e 0f 1f 84 00 00 00 00
+RSP: 002b:00007fd93fbc0c78 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+RAX: ffffffffffffffda RBX: 0000000000001a40 RCX: 000000000045deb9
+RDX: 0000000000000040 RSI: 0000000020000280 RDI: 0000000000000000
+RBP: 000000000119bf60 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 000000000119bf2c
+R13: 00007ffc08a7be8f R14: 00007fd93fbc19c0 R15: 000000000119bf2c
+
+Fixes: 755e5d55367a ("bpf: Eliminate rlimit-based memory accounting for hashtab maps")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Alexei Starovoitov <ast@kernel.org>
+Acked-by: Roman Gushchin <guro@fb.com>
+Link: https://lore.kernel.org/bpf/20201207182821.3940306-1-eric.dumazet@gmail.com
+Signed-off-by: Daniil Dulov <d.dulov@aladdin.ru>
 ---
- .../net/ethernet/microsoft/mana/gdma_main.c   | 41 +++++++++++++++++++
- 1 file changed, 41 insertions(+)
+ kernel/bpf/hashtab.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index 4ffaf7588885..f9e8d4d1ba3a 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -1288,6 +1288,47 @@ void mana_gd_free_res_map(struct gdma_resource *r)
- 	r->size = 0;
+diff --git a/kernel/bpf/hashtab.c b/kernel/bpf/hashtab.c
+index 4c7cab79d90e..829d6d3a8495 100644
+--- a/kernel/bpf/hashtab.c
++++ b/kernel/bpf/hashtab.c
+@@ -199,7 +199,7 @@ static void *fd_htab_map_get_ptr(const struct bpf_map *map, struct htab_elem *l)
+ 
+ static struct htab_elem *get_htab_elem(struct bpf_htab *htab, int i)
+ {
+-	return (struct htab_elem *) (htab->elems + i * htab->elem_size);
++	return (struct htab_elem *) (htab->elems + i * (u64)htab->elem_size);
  }
  
-+/*
-+ * Spread on CPUs with the following heuristics:
-+ *
-+ * 1. No more than one IRQ per CPU, if possible;
-+ * 2. NUMA locality is the second priority;
-+ * 3. Sibling dislocality is the last priority.
-+ *
-+ * Let's consider this topology:
-+ *
-+ * Node            0               1
-+ * Core        0       1       2       3
-+ * CPU       0   1   2   3   4   5   6   7
-+ *
-+ * The most performant IRQ distribution based on the above topology
-+ * and heuristics may look like this:
-+ *
-+ * IRQ     Nodes   Cores   CPUs
-+ * 0       1       0       0-1
-+ * 1       1       1       2-3
-+ * 2       1       0       0-1
-+ * 3       1       1       2-3
-+ * 4       2       2       4-5
-+ * 5       2       3       6-7
-+ * 6       2       2       4-5
-+ * 7       2       3       6-7
-+ *
-+ * The heuristics is implemented as follows.
-+ *
-+ * The outer for_each() loop resets the 'weight' to the actual number
-+ * of CPUs in the hop. Then inner for_each() loop decrements it by the
-+ * number of sibling groups (cores) while assigning first set of IRQs
-+ * to each group. IRQs 0 and 1 above are distributed this way.
-+ *
-+ * Now, because NUMA locality is more important, we should walk the
-+ * same set of siblings and assign 2nd set of IRQs (2 and 3), and it's
-+ * implemented by the medium while() loop. We do like this unless the
-+ * number of IRQs assigned on this hop will not become equal to number
-+ * of CPUs in the hop (weight == 0). Then we switch to the next hop and
-+ * do the same thing.
-+ */
-+
- static int irq_setup(unsigned int *irqs, unsigned int len, int node)
- {
- 	const struct cpumask *next, *prev = cpu_none_mask;
+ static void htab_free_elems(struct bpf_htab *htab)
+@@ -255,7 +255,7 @@ static int prealloc_init(struct bpf_htab *htab)
+ 	if (!htab_is_percpu(htab) && !htab_is_lru(htab))
+ 		num_entries += num_possible_cpus();
+ 
+-	htab->elems = bpf_map_area_alloc(htab->elem_size * num_entries,
++	htab->elems = bpf_map_area_alloc((u64)htab->elem_size * num_entries,
+ 					 htab->map.numa_node);
+ 	if (!htab->elems)
+ 		return -ENOMEM;
 -- 
-2.43.0
+2.34.1
 
 
