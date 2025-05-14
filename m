@@ -1,189 +1,116 @@
-Return-Path: <netdev+bounces-190324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F7B3AB63D8
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 09:13:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BF60AB63D9
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 09:13:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA63D4A468E
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 07:13:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE8023BA9A7
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 07:13:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 985AD203706;
-	Wed, 14 May 2025 07:12:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D15E204C0F;
+	Wed, 14 May 2025 07:13:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JaDtT3UC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aVR/tEoN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D626E1DB363
-	for <netdev@vger.kernel.org>; Wed, 14 May 2025 07:12:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD86E156C69
+	for <netdev@vger.kernel.org>; Wed, 14 May 2025 07:13:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747206773; cv=none; b=tFXNMIJyx5kec7WxyNRiI7I7UnixB28Yl64A7YppdUwdxtta6fWO8i8Ek463WMF10s9KRgq0urwHGso1wk55c+PaDGrOxJQgIqvEFTTeuDY/2v6mZ7XNtBeozCI9H3ts56iUXh+ZEjjYjNDGqau5mrFWCSFjPYW8QNjd47A/Nf0=
+	t=1747206798; cv=none; b=Uz3H5+r6R0FS2iwyk1oVpE+ZIXAZIkhKfc/Cu2zLFQgGNJOAY+zUbQozs89jYeJ9lD6M6isKj89J1MIDmFMV/7oBwPr58Q+Rp8XG0j6uda1skaM1qbQqyXDmyVSu/RBihXbH+7SLMAOdOSm1t3OjWzWyzmQ09xw7MHFE1lwYqdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747206773; c=relaxed/simple;
-	bh=seP4BbTFLOdZQv+ePaPkiK3ztl86jsTZu2vwskGm1Ts=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=deVx1x+kfOnYYhOSSckcVRk6shVKvHbOWeVSnrRl8zYz3082uvjgja7vv8CpUnqba4Ykfhq4GafXC1jsn5FYhSZbLnrXCqqtIAwrzAONEOyR3JM4DkHRkks5EmgGci4tRF4L197QeLtzzSa/hvPM6wu3hLP8ZocDoROWUsOKfbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JaDtT3UC; arc=none smtp.client-ip=209.85.166.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3da785e3f90so38326685ab.2
-        for <netdev@vger.kernel.org>; Wed, 14 May 2025 00:12:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747206771; x=1747811571; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GjMFQzsW8Gry9Hq92/gFT0YkS+5JWAyK+/6Z+2QWQ+Y=;
-        b=JaDtT3UCV2lvv74pnlJbHSzk9EobFiyYrlKmzf4D1SeIRawR1iLtDY6GGfPHMLu0dT
-         33nXprR+iahJdZnI8EtupbzpsT8tLVwewzSf+VhdTOAhS0ygEgc7zc4ww15JvqIeVKE6
-         E0IzES8y6lZldMO7HsfTRRwyrQw+CzPIp7WKMPqRlxch165/o3v6oE0eH11BY+QsJyE1
-         xIHdgP4Jkfbbvq2no2jvhbnnk7zAxNtkbI+sadp/TPhZeRZpSDh0SBWEYDqjHLmK1OX+
-         z9hWA9TBgvLBmjc3A/P35TP093le6hLg0kgo0xolFfSVI85+t8gF1T4aL6n9Qy/GRwGY
-         VjDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747206771; x=1747811571;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GjMFQzsW8Gry9Hq92/gFT0YkS+5JWAyK+/6Z+2QWQ+Y=;
-        b=q3vqsX7BC39rHeYZM+IMvsR889oOsjD2yfMiNEN3VLtcLB0mz/n1n7Wtmu8nksPKXU
-         uQD7mEmUnCjfkoKuDZoZIQz4bN/25pqXMcueZ+3r/6UgQPdd8oYYLPL97rA42ieaUYSq
-         rJf7EyoL1hcaaUsaCbPAzgrwX3cMyA3bGYW/UtCpffIwNmf8mW5ZQ1g3IzgvR222PvEM
-         uexoHRtKaTlKwIbgM0vvLqnglH8Pl4zok+vvu2O6W8o6D3wVNTwv1p6lnvglE6Tnf50O
-         s8rOsgCW+09HJ7P4K/9Bp51S531Ati4rTcvZDr307J3zx47qJeQSmT3auD8af8wkSjri
-         akmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVODRsk+yAzoRRXofIncRGMd8vSTlXPx88CvcdLH/4nKdsm2PLhpCebkHu4TNaCurLHfAlFIZY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxELtubzYdAwvR2slUqlBVx4QNNKvJLIcXw3RI5PXo6MBBXX5mX
-	h6njC7EYqK90Jk6c8JQqB6lqYrxYG89RQ4QDLy6d5qdyz3ytAa25L5o9ZCERqserOMrqf+yN76p
-	DqPYcDmzhicoH/GIjbzR2pBzNNVkjK/YKKXKtTn2XFscAZY40AFre
-X-Gm-Gg: ASbGncsAQ6xMz5cPQIPWoLA+6boUsJG22WiKBeg30PiINQqOLm6ego/ObZXz3Mz1yOj
-	COoYbYXm4GTGq/O0UuDTqUpYM7vO3rpOBdXgxlernFkWgb5OK8EbhWT6xAo0Lyu/CmJA/EaJmgf
-	kKDDFhrb69Gq4lGF8McgEg6eCJhU2YHujq
-X-Google-Smtp-Source: AGHT+IFpTFiInpVx/XhpGCCn5yY4ZScNu3ZrSvJalOE7xq7jKxhSLbKDTdApVZNOfqKZdtuFzFUgtfEd2C/uPJWfPqw=
-X-Received: by 2002:a05:622a:4c13:b0:494:7976:348e with SMTP id
- d75a77b69052e-49495c64b96mr41372841cf.1.1747206759735; Wed, 14 May 2025
- 00:12:39 -0700 (PDT)
+	s=arc-20240116; t=1747206798; c=relaxed/simple;
+	bh=2eIWOxcrNRhqnbnz2MbAjnSYx4Blh7k/OlokBmu07Jk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sQQKyqcJ+QGvYSaXhq67lRvtSLwsq/f0ruBOB2dm+z4pIXo7H09VN81K4we9ttQZaQYHyU7ZE9qQZ2sJ8DkD1Bt/vywHsTpjDb86uFB8OmwGqoh1KX7DtMKCPtvfRuQH81rMf7yl95222/6AK2/Dd6BIR4CX8GYYvMgbY3WiCHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aVR/tEoN; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747206794;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AUOZl6lxMjQuCh8vJjhRRDeN8hH1et3Rm9US7z/HtV0=;
+	b=aVR/tEoNrOJKP6EG53ZQhc4J7EHDqHgg+DQEOM77F1SJsuhk2sUWsJH+AcEEAD3yHQrVkR
+	r0yx3OJIKBReG9qML+bUnFUioksdmiKB/+sH6wUBFzPH19HO5kQXzWxBA4B+CqrGDuz0Ri
+	SksTxfP0B079Y8FC/vtZNI0l1Xa7YUE=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-31-eYDFsvi4Nq2FH8OQdLYpoA-1; Wed,
+ 14 May 2025 03:13:09 -0400
+X-MC-Unique: eYDFsvi4Nq2FH8OQdLYpoA-1
+X-Mimecast-MFC-AGG-ID: eYDFsvi4Nq2FH8OQdLYpoA_1747206787
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F316618004A7;
+	Wed, 14 May 2025 07:13:06 +0000 (UTC)
+Received: from localhost (unknown [10.43.135.229])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0454A1940E95;
+	Wed, 14 May 2025 07:13:01 +0000 (UTC)
+Date: Wed, 14 May 2025 09:12:59 +0200
+From: Miroslav Lichvar <mlichvar@redhat.com>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org,
+	Richard Cochran <richardcochran@gmail.com>,
+	Christopher Hall <christopher.s.hall@intel.com>,
+	David Zage <david.zage@intel.com>, John Stultz <jstultz@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Anna-Maria Behnsen <anna-maria@linutronix.de>,
+	Werner Abt <werner.abt@meinberg-usa.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>,
+	Kurt Kanzenbach <kurt@linutronix.de>,
+	Nam Cao <namcao@linutronix.de>,
+	Alex Gieringer <gieri@linutronix.de>
+Subject: Re: [patch 00/26] timekeeping: Provide support for independent PTP
+ timekeepers
+Message-ID: <aCRCe8STiX03WcxU@localhost>
+References: <20250513144615.252881431@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250430085741.5108-1-aaptel@nvidia.com> <20250430085741.5108-2-aaptel@nvidia.com>
-In-Reply-To: <20250430085741.5108-2-aaptel@nvidia.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 14 May 2025 00:12:28 -0700
-X-Gm-Features: AX0GCFsuKEnHR04FTvqSAVZ08Xj_h-2AZjziHyzDpVs1MANsenOZbg87rqhebn8
-Message-ID: <CANn89iLW86_BsB97jZw0joPwne_K79iiqwogCYFA7U9dZa3jhQ@mail.gmail.com>
-Subject: Re: [PATCH v28 01/20] net: Introduce direct data placement tcp offload
-To: Aurelien Aptel <aaptel@nvidia.com>
-Cc: linux-nvme@lists.infradead.org, netdev@vger.kernel.org, sagi@grimberg.me, 
-	hch@lst.de, kbusch@kernel.org, axboe@fb.com, chaitanyak@nvidia.com, 
-	davem@davemloft.net, kuba@kernel.org, Boris Pismenny <borisp@nvidia.com>, 
-	aurelien.aptel@gmail.com, smalin@nvidia.com, malin1024@gmail.com, 
-	ogerlitz@nvidia.com, yorayz@nvidia.com, galshalom@nvidia.com, 
-	mgurtovoy@nvidia.com, tariqt@nvidia.com, gus@collabora.com, pabeni@redhat.com, 
-	dsahern@kernel.org, ast@kernel.org, jacob.e.keller@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250513144615.252881431@linutronix.de>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Wed, Apr 30, 2025 at 1:58=E2=80=AFAM Aurelien Aptel <aaptel@nvidia.com> =
-wrote:
->
-> From: Boris Pismenny <borisp@nvidia.com>
->
-> This commit introduces direct data placement (DDP) offload for TCP.
->
-> The motivation is saving compute resources/cycles that are spent
-> to copy data from SKBs to the block layer buffers and CRC
-> calculation/verification for received PDUs (Protocol Data Units).
->
-> The DDP capability is accompanied by new net_device operations that
-> configure hardware contexts.
->
-> There is a context per socket, and a context per DDP operation.
-> Additionally, a resynchronization routine is used to assist
-> hardware handle TCP OOO, and continue the offload. Furthermore,
-> we let the offloading driver advertise what is the max hw
-> sectors/segments.
->
-> The interface includes the following net-device ddp operations:
->
->  1. sk_add - add offload for the queue represented by socket+config pair
->  2. sk_del - remove the offload for the socket/queue
->  3. ddp_setup - request copy offload for buffers associated with an IO
->  4. ddp_teardown - release offload resources for that IO
->  5. limits - query NIC driver for quirks and limitations (e.g.
->              max number of scatter gather entries per IO)
->  6. set_caps - request ULP DDP capabilities enablement
->  7. get_caps - request current ULP DDP capabilities
->  8. get_stats - query NIC driver for ULP DDP stats
->
-> Using this interface, the NIC hardware will scatter TCP payload
-> directly to the BIO pages according to the command_id.
->
-> To maintain the correctness of the network stack, the driver is
-> expected to construct SKBs that point to the BIO pages.
->
-> The SKB passed to the network stack from the driver represents
-> data as it is on the wire, while it is pointing directly to data
-> in destination buffers.
->
-> As a result, data from page frags should not be copied out to
-> the linear part. To avoid needless copies, such as when using
-> skb_condense, we mark the skb->no_condense bit.
-> In addition, the skb->ulp_crc will be used by the upper layers to
-> determine if CRC re-calculation is required. The two separated skb
-> indications are needed to avoid false positives GRO flushing events.
->
-> Follow-up patches will use this interface for DDP in NVMe-TCP.
->
-> Capability bits stored in net_device allow drivers to report which
-> ULP DDP capabilities a device supports. Control over these
-> capabilities will be exposed to userspace in later patches.
->
->
->
+On Tue, May 13, 2025 at 05:12:54PM +0200, Thomas Gleixner wrote:
+> This series addresses the timekeeping part by utilizing the existing
+> timekeeping and NTP infrastructure, which has been prepared for
+> multi-instance in recent kernels.
 
->  /**
-> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> index beb084ee4f4d..38b800f2593d 100644
-> --- a/include/linux/skbuff.h
-> +++ b/include/linux/skbuff.h
-> @@ -851,6 +851,8 @@ enum skb_tstamp_type {
->   *     @slow_gro: state present at GRO time, slower prepare step require=
-d
->   *     @tstamp_type: When set, skb->tstamp has the
->   *             delivery_time clock base of skb->tstamp.
-> + *     @no_condense: When set, don't condense fragments (DDP offloaded)
-> + *     @ulp_crc: CRC offloaded
->   *     @napi_id: id of the NAPI struct this skb came from
->   *     @sender_cpu: (aka @napi_id) source CPU in XPS
->   *     @alloc_cpu: CPU which did the skb allocation.
-> @@ -1028,6 +1030,10 @@ struct sk_buff {
->         __u8                    csum_not_inet:1;
->  #endif
->         __u8                    unreadable:1;
-> +#ifdef CONFIG_ULP_DDP
-> +       __u8                    no_condense:1;
-> +       __u8                    ulp_crc:1;
-> +#endif
+This looks very interesting. I ran some quick tests and it seems to
+work as expected from the user space point of view. I can enable the
+clock and synchronize it to a PTP HW clock or the system REALTIME
+clock. ADJ_TICK works too.
 
-Sorry for the late review.
+To get accuracy and stability comparable to CLOCK_REALTIME, there will
+need to be some support for cross timestamping against CLOCK_REALTIME
+and/or PTP HW clocks, e.g. a variant of the PTP_SYS_OFFSET_PRECISE and
+PTP_SYS_OFFSET_EXTENDED ioctls where the target clock can be selected.
 
-I do not think you need a precious bit for no_condense feature.
+The "PTP" naming of these new clocks doesn't seem right to me though
+and I suspect it would just create more confusion. I don't see
+anything specific to PTP here. There is no timestamping of network
+packets, no /dev/ptp device, no PTP ioctls. To me they look like
+secondary or auxiliary system realtime clocks. I propose to rename
+them from CLOCK_PTP0-7 to CLOCK_REALTIME2-9, CLOCK_AUXILIARY0-7, or
+CLOCK_AUX0-7.
 
-After all, the driver knows it deals with DDP, and can make sure to
-place the headers right before skb_shinfo() so that skb_tailroom() is
-zero.
+-- 
+Miroslav Lichvar
 
-
-If you really must prevent any pull from a page frag to skb->head
-(preventing skb->head realloc), skb->unreadable should work just fine
-?
 
