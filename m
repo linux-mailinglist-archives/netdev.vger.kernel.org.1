@@ -1,119 +1,156 @@
-Return-Path: <netdev+bounces-190553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF86AAB77FF
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 23:33:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40FAEAB7813
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 23:38:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47108176FE9
-	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 21:33:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 635B73A8DF1
+	for <lists+netdev@lfdr.de>; Wed, 14 May 2025 21:38:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AF6D221F12;
-	Wed, 14 May 2025 21:32:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CB2B204098;
+	Wed, 14 May 2025 21:38:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eklo3P8g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q4kDQHin"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53E7C221271;
-	Wed, 14 May 2025 21:32:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0E0A2AF10;
+	Wed, 14 May 2025 21:38:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747258370; cv=none; b=IE/1S9QxneJCHwFqdzJxKIRhODOihxsWZOZirblNiF7LfEVLOf46qLnPG1yHN3GNQ1HWdQ8euTOhjX0YOvmATUznSxDpt2mjP3Bzj43ID/hBOhPsE3/tRE9tBvYgkGEzU+5sAT+5KyX6Z68789lQR8r5Rw/mN5WsXEFJHCGhZes=
+	t=1747258729; cv=none; b=m/9DszC2tULh4Rfp6gN2RCGiC12UjgPiUPZfUck9+31v4yHiGmB94hExseOFUj/0SM+6NlscjQ16medi1pl6CrMUH4Cwn8ap1Srv7uhCu+f7G/qKRTL7IKMnASA+Ax8VLQ8soB5vsGSOHbzXhMraAHm4eVhHoI0oEthJJDZdpmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747258370; c=relaxed/simple;
-	bh=mXXP6jPmHjrLDq0YvJKfrILeEi0rih83V0iyKJkz37w=;
+	s=arc-20240116; t=1747258729; c=relaxed/simple;
+	bh=hNb5jPe/smvHt5E9ANEvzYRWRCRcmC33IKRuFFhQTBo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=skm0mUqAAJ+lpZP3BzSpeE9BJ9zYf2zvQgQ+CCMLAR1c8hotjsfF3GWG1lEr6JZx4KbJ5dlnZ6c4tvRdmCE0yeWk5IV063sTk56EfiBc2iZTsU7oeZM/zbWvHZhoilqoktqzLCn26pXEkrOjyHvrZZqbfeLm1ulV0xA7qMa3VEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eklo3P8g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A3D3C4CEE3;
-	Wed, 14 May 2025 21:32:49 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ExGGcFJVJ4MdDxT43BmqUcjFz5aez3YaDv+bgG2/y9QPoKQ9LdaJ6828fwsOrhwZ8Nu6OkyAI1mGjWXEhX9Ojn6hud4/Fo5roao7rLVdG16BOniEtktQ6Utz8wp033NFi4kb7F4y/AipmW17Vjg9B2jDlqOSvVwMJUDPQ7jA8W0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q4kDQHin; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1283CC4CEE3;
+	Wed, 14 May 2025 21:38:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747258369;
-	bh=mXXP6jPmHjrLDq0YvJKfrILeEi0rih83V0iyKJkz37w=;
+	s=k20201202; t=1747258728;
+	bh=hNb5jPe/smvHt5E9ANEvzYRWRCRcmC33IKRuFFhQTBo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eklo3P8gO3ZA/poAviqKg20Jo5FLMmxCWg/QyoBrT+JcE0uc8kxa0Ps8m0ovUG5aA
-	 mcUIBXxORo606F5yOGujkrHa4+2JIZgrWNg/+hhiwxwP2p+quNVO3OnVswmgVoHAp5
-	 1oOA1qsA3OfZWdpYGsi7PvNzFr6zJS2StHzUOvo/kybJAyO/8FhHEsoxbAJS7qOqik
-	 gZ1gVA7xuk/FEADQvzcwXntGdrNwBQvIBr1oXKDJn+xFcwboM8C7GPrT9GQY7+ZztA
-	 BcDCJ/l//GCCv6TV+MfNAhAejNGGt5Z+pY1VyYX9UxRBXpOwz+b1zHMJitu8Ppdiew
-	 l8FMVbVx/p6Wg==
-Date: Wed, 14 May 2025 16:32:47 -0500
+	b=q4kDQHinFMHdDSOL/WxL8/jRZy1/5inVjfVeU0U/E9uQHTG7bviMmf9ftrEP2F0qA
+	 4+di/4MA/Ufb3aaLsHEIRnH6/pHydGvfEI1vtdUNyQoAkHX1rLm7pWyu68HmGtkHuZ
+	 RpCBCjsPhdn2HFoPocB5s5NfnpnqopASVErlt8auGunyg/e5fcy8c5UiV4B+MBVXvx
+	 z3DUjlUEFR8cbNr9QiOArQBHjk4MFckDkk5VzexjMIEqgnRmaPk+o5T38inGJ+ib6v
+	 w0kTgH+0UFpcvbt0LJTDkYnIYmAx31ES01gpAHmIuE4wgmCsQz8YWSzpHnxqWmGWkg
+	 8I0IfG9yggAxg==
+Date: Wed, 14 May 2025 16:38:46 -0500
 From: Rob Herring <robh@kernel.org>
-To: Christian Marangi <ansuelsmth@gmail.com>
+To: Damien =?iso-8859-1?Q?Ri=E9gel?= <damien.riegel@silabs.com>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, llvm@lists.linux.dev
-Subject: Re: [net-next PATCH v4 07/11] dt-bindings: net: ethernet-controller:
- permit to define multiple PCS
-Message-ID: <20250514213247.GA3053278-robh@kernel.org>
-References: <20250511201250.3789083-1-ansuelsmth@gmail.com>
- <20250511201250.3789083-8-ansuelsmth@gmail.com>
+	Silicon Labs Kernel Team <linux-devel@silabs.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC net-next 13/15] dt-bindings: net: cpc: add
+ silabs,cpc-spi.yaml
+Message-ID: <20250514213846.GA3076991-robh@kernel.org>
+References: <20250512012748.79749-1-damien.riegel@silabs.com>
+ <20250512012748.79749-14-damien.riegel@silabs.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20250511201250.3789083-8-ansuelsmth@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250512012748.79749-14-damien.riegel@silabs.com>
 
-On Sun, May 11, 2025 at 10:12:33PM +0200, Christian Marangi wrote:
-> Drop the limitation of a single PCS in pcs-handle property. Multiple PCS
-> can be defined for an ethrnet-controller node to support various PHY
+On Sun, May 11, 2025 at 09:27:46PM -0400, Damien Riégel wrote:
+> Document device tree bindings for Silicon Labs CPC over a SPI bus. This
+> device requires both a chip select and an interrupt line to be able to
+> work.
 
-typo
+What's CPC? Never defined here.
 
-> interface mode type.
-> 
-> It's very common for SoCs to have a 2 or more dedicated PCS for Base-X
-> (for example SGMII, 1000base-x, 2500base-x, ...) and Base-R (for example
-> USXGMII,10base-r, ...) with the MAC selecting one of the other based on
-> the attached PHY.
-
-I'm confused what you need. The restriction was no arg cells allowed. 
-Any number of phandles was allowed. The former would need a 
-"#pcs-handle-cells" type property.
+Bindings are for devices, not a SPI protocol. What if the device needs 
+reset or power or ??? before you can talk to it. Maybe it's a situation 
+where that will never matter, but you've got to spell it out here.
 
 > 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> Signed-off-by: Damien Riégel <damien.riegel@silabs.com>
 > ---
->  Documentation/devicetree/bindings/net/ethernet-controller.yaml | 2 --
->  1 file changed, 2 deletions(-)
+>  .../bindings/net/silabs,cpc-spi.yaml          | 54 +++++++++++++++++++
+>  1 file changed, 54 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/silabs,cpc-spi.yaml
 > 
-> diff --git a/Documentation/devicetree/bindings/net/ethernet-controller.yaml b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-> index 7cbf11bbe99c..60605b34d242 100644
-> --- a/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-> +++ b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-> @@ -84,8 +84,6 @@ properties:
->  
->    pcs-handle:
->      $ref: /schemas/types.yaml#/definitions/phandle-array
-> -    items:
-> -      maxItems: 1
->      description:
->        Specifies a reference to a node representing a PCS PHY device on a MDIO
->        bus to link with an external PHY (phy-handle) if exists.
+> diff --git a/Documentation/devicetree/bindings/net/silabs,cpc-spi.yaml b/Documentation/devicetree/bindings/net/silabs,cpc-spi.yaml
+> new file mode 100644
+> index 00000000000..82d3cd47daa
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/silabs,cpc-spi.yaml
+> @@ -0,0 +1,54 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +# Copyright 2024 Silicon Labs Inc.
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/silabs,cpc-spi.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: SPI driver for CPC
+> +
+> +maintainers:
+> +  - Damien Riégel <damien.riegel@silabs.com>
+> +
+> +description: |
+
+Don't need '|'
+
+> +  This binding is for the implementation of CPC protocol over SPI. The protocol
+> +  consists of a chain of header+payload frames. The interrupt is used by the
+> +  device to signal it has a frame to transmit, but also between headers and
+> +  payloads to signal that it is ready to receive payload.
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - silabs,cpc-spi
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  interrupts:
+> +    maxItems: 1
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - interrupt
+> +
+> +allOf:
+> +  - $ref: /schemas/spi/spi-peripheral-props.yaml#
+> +
+> +unevaluatedProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/interrupt-controller/irq.h>
+> +    spi {
+> +            #address-cells = <1>;
+> +            #size-cells = <0>;
+> +
+> +            cpcspi@0 {
+> +                  compatible = "silabs,cpc-spi";
+> +                  reg = <0>;
+> +                  spi-max-frequency = <1000000>;
+> +                  interrupt-parent = <&gpio>;
+> +                  interrupts = <23 IRQ_TYPE_EDGE_FALLING>;
+> +            };
+> +    };
 > -- 
-> 2.48.1
+> 2.49.0
 > 
 
