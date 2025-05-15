@@ -1,166 +1,183 @@
-Return-Path: <netdev+bounces-190735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2DB1AB88DC
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 16:04:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5539BAB88E7
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 16:06:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16B1A1BC39F4
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 14:04:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3944C4E7FB3
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 14:06:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E51CE1ACEAC;
-	Thu, 15 May 2025 14:04:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99E57198E60;
+	Thu, 15 May 2025 14:06:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mihalicyn.com header.i=@mihalicyn.com header.b="Z72aYsf6"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JjNtrIlU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D62ED1A9B5B
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 14:04:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BDE019CC0E
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 14:06:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747317845; cv=none; b=S/EaJ8X1AOvI8pAJSNtDNPkX3403F5gVV8PLAATYXlDtg9c9lOmaeSbX12XmpIh2TswDS+vAkF+s/MNhqA05iEr7yjw0/HffGv/prgwxc+vWRzie7eU7JQqSWDnnsh3HiC7MZBSiKo/V4xsYnW+9GT0RU6/+Pg6YCylB2/MVkLo=
+	t=1747317969; cv=none; b=o2HwG24HPOLM5QRBSV2+J0CLxUq8qD0Ywa4wCPUI3qx/LfCiTj04Q4zsXMELz2G9DdbUuXlnChuCICpzcHCtxtIUSutKbFNMBUA8GpwMcoFa0brKdMP0tpaIhSYRJFAoeXcVaChZz6CWgvwgU5T5d4JTPktUcJ/miSIJH4uncek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747317845; c=relaxed/simple;
-	bh=DsRj+jneIY2sA6r65luroD5vKWTeHga6pT4b93go548=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=h3WgE+sdv0dLm8dWylYDcU2viA3QEdGtK53ncn19Z+kEEhQdRT5XZyxJAnW8aGWpX6YjWT6c0rIupRVkFFGedr1o/K54xoVm+5jeKM7KAijAFiFJLkc5k1RJ/tTdV11w+7IELW7Qv3NYJ1yhYuVT+eVCGlRho1ZUHV7bx85NcwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mihalicyn.com; spf=pass smtp.mailfrom=mihalicyn.com; dkim=pass (1024-bit key) header.d=mihalicyn.com header.i=@mihalicyn.com header.b=Z72aYsf6; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mihalicyn.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mihalicyn.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-54e816aeca6so1257124e87.2
-        for <netdev@vger.kernel.org>; Thu, 15 May 2025 07:04:03 -0700 (PDT)
+	s=arc-20240116; t=1747317969; c=relaxed/simple;
+	bh=ZX0b7+q/WHABStHBVU2DZikmc1ff9AvZgSAY2t2c/Js=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Xhhq/Gd0K7ZLWVicqkemNJC6DdULdqLsW3lPy/qDD/cPwhDeZ40hmG+p9vsbA0swB0P0WvoMAYgiBZv+0lSA1/LeFykh4MiwUPCaEduVNC2Rm1ZzPopEVSZhrtjhoiymKKSGTFJrfehpc9oEHvSOjVq3lI9hzZ/2RnAGGPvf0C8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=JjNtrIlU; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3a0b4c828c1so111666f8f.2
+        for <netdev@vger.kernel.org>; Thu, 15 May 2025 07:06:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mihalicyn.com; s=mihalicyn; t=1747317842; x=1747922642; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=d35JeSz60cGLvBbWCEkXPoHFgobJD8TSYk4oLoUb8Jc=;
-        b=Z72aYsf6Ur4NaGzBtnAtynfQr3+i9KM4Xnp1WCWPuNIHQUDl16SIHxXORgRmGZ9qhl
-         xepheZq23ouhWZRD1IEywpYuaz5sGdHufi7p0sidQAmuoeAFfHQkxlUyZnrLaRbYkcrN
-         49ktLs39h8GK+f1MT4bXn7454rnhG6EXOylKU=
+        d=linaro.org; s=google; t=1747317965; x=1747922765; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+TIgkAbsJjkBmPmDqXYIo5M6rm+d2Bew/nDM+VokxXo=;
+        b=JjNtrIlU1pZ6D68eA95fvaW9xhtPFb4tDSOltWovIAR8kqw2S9FY6BFnoV25DBoXFv
+         T23vUap+jwvsavpgbZ3W/WnPvaQ0kQMd4SN0IKc0/PZx359IgFbNS9xNXuoJ4frbUaCo
+         J3oZxsaw6PZeb2WLtMetrLXfI9EXVIBfPSYScn79/bNRkwqf7aeKHfWVbRYmwRZz4LN/
+         atJorZybH0aU/7y5YpQhWN7LmzaAeOOVjJ/8nufSpdLmYVNcsf11ltttXDBIXRbI9lSt
+         n3+J9rlMwzN1b6QMAq9sP3nun4jEdzBkoZ+oZFbSZHEGNub25QML4zEsKe/sEHDHhNPZ
+         PMSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747317842; x=1747922642;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1747317965; x=1747922765;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=d35JeSz60cGLvBbWCEkXPoHFgobJD8TSYk4oLoUb8Jc=;
-        b=tpSud+brr/M53RkGpY+xFztDi7EFvPF99ITYfr7DQgjVN2g8JuT074qOvG+s59GyeY
-         73axsyEuazVRxnnwlDGCdTTnBtH5KQxKkPvOM/psiTBv+OdXoR6d8rPAP5V4m9OJFHdl
-         fd41dwKeJdLifRvujNekXLkoy3GnFhYlbPX0fKwDVgCSTIdn1tmqz+vuu8+1LEv9i1JV
-         ZC21UYtyqikor3w50uD53+5EjChMkDUj0rCvxV1yfyq4NClEDLhgqSW9Hb3sFpbTpZyg
-         Faibnnj6I6XIZDQGfy/hF/1Gm/qKJMa5fWeVzaeQnvcJ0Acko67ezYm71EPFGGrIee3b
-         UKyw==
-X-Forwarded-Encrypted: i=1; AJvYcCVSpop5X+RdxrFzKbP44N/HjS23tn9RysdSM0AlUysjevs4GBChdbiGmgRkge9LEZhwYR4Ck2Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzpDLAOKAGStcsyAdqz4D28kq5f4eeukQEdMdTvonEJqS2csc9x
-	1mO/UJNC/x4Rvj9n4OTPvURmldabkUYS+hnJ7sKd72RA37l9sAFOZ8ZtHLfgYRax/ZwdliU3jHF
-	UQj+ArN+FH0VipM1JQ9SyvChoughDt/YmLG2wTQ==
-X-Gm-Gg: ASbGncvwS5/lsJ8ZZGDEw+jTlls674QdVpy9gdSQ3LZBXzEdB0mUNoHemWRnKGOvUPB
-	0JJ/bVwgday128n85o1np65xy2I69SUDV3NeN1Ah6H0AjWXqgdYBq4ZoPODAToZFoxn+9k87M9W
-	/EQFz6eso78N7JvtuSQTchdhVDdXGOk7r6boDeFLnMHvRW
-X-Google-Smtp-Source: AGHT+IFL9ojUwqLTPuSTYsHfs2cnzH8sa00mdSfBUjswRLfNB8BX2UwMPe5/nMKCpf2uCx4jaw02E7zhcwzkR4jIXnc=
-X-Received: by 2002:a05:6512:2618:b0:54e:86f3:5e54 with SMTP id
- 2adb3069b0e04-550d5fae056mr2628304e87.5.1747317840276; Thu, 15 May 2025
- 07:04:00 -0700 (PDT)
+        bh=+TIgkAbsJjkBmPmDqXYIo5M6rm+d2Bew/nDM+VokxXo=;
+        b=NjW7f0+rJQR6R61K5SMhvv2Bct8NFwkQOMGYqZlZmWSRVRTXodc1MxWydpGIHfTxSM
+         VantJvs4jSjMMI6W0th9WpcVqGt8+WTI9c0LAcNTj2jADMewvf0A6uA+zfMzDeULjBX2
+         CrmhVOIWTisTSZR39uk0hZykjtIhrSStnQIkBLDTuMaqBtCb0X5i7fZjYMJ+Qqlfk2k0
+         +l0ozkIlUe5ayzic/ow+8kUnzMXCaeWq5hThdxC7WO2SN+Qbk0MNk6qROyuhH3IcAu0r
+         JHYxr+AB6k0d5MuwHXYsW6tYjPzBNnLuQawGUM1DWFyoDxQaALJr0Fr9aQW/xDr+uiG0
+         PI7w==
+X-Forwarded-Encrypted: i=1; AJvYcCXVQ2VqaqHdopDAmW3o/l5qog9Z1l/dVD2zqyaDFQGUA7iFBm3njaKJFO9KE5chAUhpDokkylA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzgkFI/Qy2k2QkK7jAb8DkyU8OweWmmtExymsh30EloeQIermy/
+	fIAr4L9oclGzkzK2k+kof4bAXfLIU2II/OlaYnzPX3+79vbCcZTY953ymPhRJLI=
+X-Gm-Gg: ASbGncslCZSR9w5ucxcF0mPRkxQqCysX07K00NfzU+avSoPSluReKQ7srwISWZlP9bY
+	GrHZGWsdxU8PitgitM9WlxkTsphKdgqvCiuGQmCrtKhA3bddwd8awXaZmIl/NBGMTXShtTouiWe
+	cZYrEdzKtwHBswer2u6iIebBMTRYsNszQN8P9v2W22k/hq4F7xJfznPWcfaLu0Zp92LqXP0f6/D
+	eVsRHyYhZu4ybUTgThAGBVkA4XKRMdoRcEaHnr1kvQmch6ppYOdPnA8WNxzvih/P9JflP4iVGG7
+	xqG4d8z8/b+DiR9PM6Ye8VtwwHbktOH6bzwEtVTNRG/0ESRrWqiMr/VR5sBHLYfKcCihA7HYpv7
+	+nyX/WaQ60yZefg+809ZOX7ErQCXrCd1yGiE/Va0D5SDNZOdlRw==
+X-Google-Smtp-Source: AGHT+IGmNKfHbbVSEmUusIJS8WAr9eTgCDfqm5Zo/ICFklsk2Vg4Y/cB3sTKH0S53Bfr8a/oTyQc9A==
+X-Received: by 2002:a05:6000:4312:b0:39c:1401:6ede with SMTP id ffacd0b85a97d-3a34969a540mr2019499f8f.3.1747317965090;
+        Thu, 15 May 2025 07:06:05 -0700 (PDT)
+Received: from kuoka.c.hoisthospitality.com (110.8.30.213.rev.vodafone.pt. [213.30.8.110])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a1f5a4cc39sm22467224f8f.100.2025.05.15.07.06.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 May 2025 07:06:04 -0700 (PDT)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+To: Peter Rosin <peda@axentia.se>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Andrew Davis <afd@ti.com>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: kernel test robot <lkp@intel.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Samuel Holland <samuel@sholland.org>,
+	Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] mux: mmio: Fix missing CONFIG_REGMAP_MMIO
+Date: Thu, 15 May 2025 16:05:56 +0200
+Message-ID: <20250515140555.325601-2-krzysztof.kozlowski@linaro.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250515-work-coredump-socket-v7-0-0a1329496c31@kernel.org> <20250515-work-coredump-socket-v7-7-0a1329496c31@kernel.org>
-In-Reply-To: <20250515-work-coredump-socket-v7-7-0a1329496c31@kernel.org>
-From: Alexander Mikhalitsyn <alexander@mihalicyn.com>
-Date: Thu, 15 May 2025 16:03:49 +0200
-X-Gm-Features: AX0GCFsHLEGADAYqPdli5zm43751kHI-Zre11GNAREbwlvpOpR_Hl8TIVXvYN_M
-Message-ID: <CAJqdLroQx3v-xD279phQB1ToF70T-2cAbAA0SC-nbnAK+EHGmA@mail.gmail.com>
-Subject: Re: [PATCH v7 7/9] coredump: validate socket name as it is written
-To: Christian Brauner <brauner@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, Jann Horn <jannh@google.com>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Eric Dumazet <edumazet@google.com>, Oleg Nesterov <oleg@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, David Rheinsberg <david@readahead.eu>, 
-	Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>, 
-	Lennart Poettering <lennart@poettering.net>, Luca Boccassi <bluca@debian.org>, Mike Yuan <me@yhndnzj.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	=?UTF-8?Q?Zbigniew_J=C4=99drzejewski=2DSzmek?= <zbyszek@in.waw.pl>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-security-module@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2480; i=krzysztof.kozlowski@linaro.org;
+ h=from:subject; bh=ZX0b7+q/WHABStHBVU2DZikmc1ff9AvZgSAY2t2c/Js=;
+ b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBoJfTD9kKlTS8CAmlyX+fKZbqZ9Zq1tIycMjxZs
+ vjcWGu58G6JAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCaCX0wwAKCRDBN2bmhouD
+ 16JxD/9yafFSZ57/7CQ7fwg1SktQ8velRNocwh/6keD92+jYLMP8TMMAbSmo6Rkm4HU3NlJXxvr
+ R3+He+hbKcvadaAlHjoJDEcEZJYDRQGsJAPNYBA98+Pq1TAV3mTCMCKabBVA8OUQcTod6YgeFCu
+ bAgU5+jDiFUp72fKo13bBcnJezSvZutht/AQTcQpc7dUbX2xnOEZ/FGaqJDzvsNALGnmSZGN7Qn
+ mO44h3zirGdqvjiNjKvXR2HqJiRIcjNvAUColXZ/hqtQa6DABRPx0PL0ZZDq/baRnkD3HWNMyvq
+ NULJVPomtXBacEHDMSOzoErScbWm6PCRCnO7vAkwq1FqUYgpghUZXENWvm6ZN18TGCg20qr7nMX
+ PBhNv4loN3d5xzIUOocZdjVy0/LGpw512RPwXiLazXZSiztq3bXGzFmlQSPxxVIbj1DKVUjZHVM
+ SURHkbokvyebwCgFJP0snNf3H2s1Q+HfGoUg1YMmm9dNo949EcrMZrOKWPraZvm03QjdpyNZoY5
+ p6VramH779mQPZ91xQz2G6eb4QzedSIpHt2g+1mNucf3hfb7IGTRonmqNSzfGTTUsoqbp1A1//N
+ 8CPiNBKrJaD5tn2CqcLPlK96Rm0DN6Dlg3NGE9CKRTHqOaNtAB4DBMeMgXKwYSyyjhggoKsjai8 x21+ePNhk/B6+jQ==
+X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp; fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
+Content-Transfer-Encoding: 8bit
 
-Am Do., 15. Mai 2025 um 00:04 Uhr schrieb Christian Brauner
-<brauner@kernel.org>:
->
-> In contrast to other parameters written into
-> /proc/sys/kernel/core_pattern that never fail we can validate enabling
-> the new AF_UNIX support. This is obviously racy as hell but it's always
-> been that way.
->
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
+MMIO mux uses now regmap_init_mmio(), so one way or another
+CONFIG_REGMAP_MMIO should be enabled, because there are no stubs for
+!REGMAP_MMIO case:
 
-Reviewed-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+  ERROR: modpost: "__regmap_init_mmio_clk" [drivers/mux/mux-mmio.ko] undefined!
 
-> ---
->  fs/coredump.c | 37 ++++++++++++++++++++++++++++++++++---
->  1 file changed, 34 insertions(+), 3 deletions(-)
->
-> diff --git a/fs/coredump.c b/fs/coredump.c
-> index 6ee38e3da108..d4ff08ef03e5 100644
-> --- a/fs/coredump.c
-> +++ b/fs/coredump.c
-> @@ -1228,13 +1228,44 @@ void validate_coredump_safety(void)
->         }
->  }
->
-> +static inline bool check_coredump_socket(void)
-> +{
-> +       if (core_pattern[0] != '@')
-> +               return true;
-> +
-> +       /*
-> +        * Coredump socket must be located in the initial mount
-> +        * namespace. Don't give the that impression anything else is
-> +        * supported right now.
-> +        */
-> +       if (current->nsproxy->mnt_ns != init_task.nsproxy->mnt_ns)
-> +               return false;
-> +
-> +       /* Must be an absolute path. */
-> +       if (*(core_pattern + 1) != '/')
-> +               return false;
-> +
-> +       return true;
-> +}
-> +
->  static int proc_dostring_coredump(const struct ctl_table *table, int write,
->                   void *buffer, size_t *lenp, loff_t *ppos)
->  {
-> -       int error = proc_dostring(table, write, buffer, lenp, ppos);
-> +       int error;
-> +       ssize_t retval;
-> +       char old_core_pattern[CORENAME_MAX_SIZE];
-> +
-> +       retval = strscpy(old_core_pattern, core_pattern, CORENAME_MAX_SIZE);
-> +
-> +       error = proc_dostring(table, write, buffer, lenp, ppos);
-> +       if (error)
-> +               return error;
-> +       if (!check_coredump_socket()) {
-> +               strscpy(core_pattern, old_core_pattern, retval + 1);
-> +               return -EINVAL;
-> +       }
->
-> -       if (!error)
-> -               validate_coredump_safety();
-> +       validate_coredump_safety();
->         return error;
->  }
->
->
-> --
-> 2.47.2
->
+REGMAP_MMIO should be, because it is a non-visible symbol, but this
+causes a circular dependency:
+
+  error: recursive dependency detected!
+  symbol IRQ_DOMAIN is selected by REGMAP
+  symbol REGMAP default is visible depending on REGMAP_MMIO
+  symbol REGMAP_MMIO is selected by MUX_MMIO
+  symbol MUX_MMIO depends on MULTIPLEXER
+  symbol MULTIPLEXER is selected by MDIO_BUS_MUX_MULTIPLEXER
+  symbol MDIO_BUS_MUX_MULTIPLEXER depends on MDIO_DEVICE
+  symbol MDIO_DEVICE is selected by PHYLIB
+  symbol PHYLIB is selected by ARC_EMAC_CORE
+  symbol ARC_EMAC_CORE is selected by EMAC_ROCKCHIP
+  symbol EMAC_ROCKCHIP depends on OF_IRQ
+  symbol OF_IRQ depends on IRQ_DOMAIN
+
+... which we can break by changing dependency in EMAC_ROCKCHIP from
+OF_IRQ to OF.
+
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202505150312.dYbBqUhG-lkp@intel.com/
+Fixes: 61de83fd8256 ("mux: mmio: Do not use syscon helper to build regmap")
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
+---
+
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Samuel Holland <samuel@sholland.org>
+Cc: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/mux/Kconfig              | 1 +
+ drivers/net/ethernet/arc/Kconfig | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/mux/Kconfig b/drivers/mux/Kconfig
+index 80f015cf6e54..c68132e38138 100644
+--- a/drivers/mux/Kconfig
++++ b/drivers/mux/Kconfig
+@@ -48,6 +48,7 @@ config MUX_GPIO
+ config MUX_MMIO
+ 	tristate "MMIO/Regmap register bitfield-controlled Multiplexer"
+ 	depends on OF
++	select REGMAP_MMIO
+ 	help
+ 	  MMIO/Regmap register bitfield-controlled Multiplexer controller.
+ 
+diff --git a/drivers/net/ethernet/arc/Kconfig b/drivers/net/ethernet/arc/Kconfig
+index 0d400a7d8d91..8ccedece5339 100644
+--- a/drivers/net/ethernet/arc/Kconfig
++++ b/drivers/net/ethernet/arc/Kconfig
+@@ -26,7 +26,7 @@ config ARC_EMAC_CORE
+ config EMAC_ROCKCHIP
+ 	tristate "Rockchip EMAC support"
+ 	select ARC_EMAC_CORE
+-	depends on OF_IRQ && REGULATOR
++	depends on OF && REGULATOR
+ 	depends on ARCH_ROCKCHIP || COMPILE_TEST
+ 	help
+ 	  Support for Rockchip RK3036/RK3066/RK3188 EMAC ethernet controllers.
+-- 
+2.45.2
+
 
