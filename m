@@ -1,193 +1,141 @@
-Return-Path: <netdev+bounces-190786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D89A9AB8C85
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 18:34:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E528AB8C8D
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 18:35:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F485163F22
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 16:33:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E4321BC16F0
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 16:35:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A1B521ADA4;
-	Thu, 15 May 2025 16:33:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B99E220F3E;
+	Thu, 15 May 2025 16:35:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WmW8fGEb"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="CnvCz+XI"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDDEA1E9B2F;
-	Thu, 15 May 2025 16:33:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50F2321CC70
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 16:35:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747326794; cv=none; b=Nsm7uA0+DNmKX5fVHC4H5d1Km3fVWkSu11sbs+5ul3E2kJ2IaV7yEhMLM+fPE406MnJCjH21Q2Twt2wTkMUeVPYm4U2TCgOUIJ4lsPfl9S2u9QQztDc9pmQu7UphuQE+A6hQgEAaco2epmoeiWyr0GfjwPqTEW8rqLvMCtudaXc=
+	t=1747326936; cv=none; b=PIWQeW3h4iEQu7wDwB8EjvToQw+OxsVIlqC+gSdjMdNqXULsmC/mKWh3/UOmPaSMDuQe726vah9/MM/uoT1wzWFXO8Y+43Q5UG5avhFZuDOM8qoD21KLG5W31qqZS8hyg87LbFJ8TMpWGvRldkCe2rfQzJCpkCubRbp5BKeuBXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747326794; c=relaxed/simple;
-	bh=cAlTLdOnTQlSMWI9py+ZaIg48MiaSEwnK7HNn1m0ZSU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hQlXCcQKIj3zhRgnjpUVg29iWlfB3s4v8xnaXSD2CaLFfqnHPp3ppAVpjX+2lYoGIlmGn845TR09VuRIgEKQ50cS6EKQUCt4YzIhCU+zEA77PNt/V+W2LFxO0KODPyUrPPSO46GN9TyZilI/i7I9AyLPXqz0byPt4n9mpBHFQ1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WmW8fGEb; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=/QeUO2a8NWeRstvM0b/MVvBVRNJC5JX4+Z5IQhDNQlQ=; b=WmW8fGEbBoAAvI1Q2qGznPJZG4
-	R+C0srqjRbCmcHCple2UZPwKRZRDdC2wEsVO6EtJC2XU18fzQUcQL1Um/0IYDb54M9d/+OR9gvPV4
-	k5XWYYsZD4SNQJQ1mS1Q+YDIwfGfYA6epoDym0567jJlJ1H7O0VDZQwr7s5p8UF+zkHE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uFbW8-00CgS8-Id; Thu, 15 May 2025 18:33:08 +0200
-Date: Thu, 15 May 2025 18:33:08 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Stefano Radaelli <stefano.radaelli21@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Xu Liang <lxu@maxlinear.com>
-Subject: Re: [PATCH] net: phy: add driver for MaxLinear MxL86110 PHY
-Message-ID: <2b2ef0bd-6491-41a0-b2e1-81e2b83167ef@lunn.ch>
-References: <20250515152432.77835-1-stefano.radaelli21@gmail.com>
+	s=arc-20240116; t=1747326936; c=relaxed/simple;
+	bh=AS0D6HIT8gVFIYzu6AoWDL05TH8bK0mdYVB7qdxB9nc=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RfxwSDtuY6RMADr7uqeuX5lM9ZIQNjoZm6h8dc9auehYpNyM7DQhBkfSURXJHzfRGNz7rJwLRHigKpNoED+QyXzzGetoOWTFxM7DhNFkUcE7ZQlFlg6K52959izyqaKNySUPoMTCfXpv6hbR9ArSR5ms8AVYvNoFV/42vo3gpzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=CnvCz+XI; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54FEiOIp006623;
+	Thu, 15 May 2025 09:35:22 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=IveLT/HZ7IyIyPigWZilVN3p0
+	xtbP1jSP9LjiyskEAE=; b=CnvCz+XIlFvIbZnX+Pc4ajDKSVe1NhRES/luyhmlQ
+	zwqpz2JD5ZHxSlhormE4WeJa5JLVhe9OIE4GhU/94ChdBabBGz+nOiMg+eow9Apb
+	0f3CHAc0lqsIBV3FDBR/Js/j00IPf+cX77B5LgD6DIj+rdevc5ovC+7Zlc337h5b
+	CiwttfNwIgQpnp1o37xg/xnIbQDk73bQ1mcV1z48/aCdl3HMmkkHVqfY9ptxSPqM
+	uPV6Yhg9Oo6Tna13rYYlHX0G8dKSDb9bFY7ok22MuwB6YRnplHqvEWc33/zZz0E3
+	LzCl6sauCXTJCSfe4FL+e9CQbWc4VUL7s6y6J2shTlA6w==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 46nj9y099p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 15 May 2025 09:35:22 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Thu, 15 May 2025 09:35:20 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Thu, 15 May 2025 09:35:20 -0700
+Received: from 3958e7e617f8 (unknown [10.28.168.138])
+	by maili.marvell.com (Postfix) with SMTP id 72D933F7096;
+	Thu, 15 May 2025 09:35:16 -0700 (PDT)
+Date: Thu, 15 May 2025 16:35:14 +0000
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+        <gakula@marvell.com>, <hkelam@marvell.com>, <sgoutham@marvell.com>,
+        <lcherian@marvell.com>, <bbhushan2@marvell.com>, <jerinj@marvell.com>,
+        <netdev@vger.kernel.org>
+Subject: Re: [PATCH net v2] octeontx2-af: Send Link events one by one
+Message-ID: <aCYXwo-0CfHYGhh9@3958e7e617f8>
+References: <1747204108-1326-1-git-send-email-sbhatta@marvell.com>
+ <aCRQNJbYL2ORGmMh@mev-dev.igk.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20250515152432.77835-1-stefano.radaelli21@gmail.com>
+In-Reply-To: <aCRQNJbYL2ORGmMh@mev-dev.igk.intel.com>
+X-Proofpoint-ORIG-GUID: jKs8ejTw4JN5LTjPndHzjO40BCMTuNqZ
+X-Proofpoint-GUID: jKs8ejTw4JN5LTjPndHzjO40BCMTuNqZ
+X-Authority-Analysis: v=2.4 cv=Tq3mhCXh c=1 sm=1 tr=0 ts=682617ca cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=QyXUC8HyAAAA:8 a=M5GUcnROAAAA:8 a=EZAAayXskDsXsr5XbIwA:9 a=CjuIK1q_8ugA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22 a=ZFRsO2Wz9R1JO6LuwK9s:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTE1MDE2NSBTYWx0ZWRfX7ccaac6WW1ni DJl15+e+q/lwlPoD9WYYJPZpKCjTSWJFkLa8rsMD0F8f3rrhUtCGvOS9k5JS/supJP/CoR7RP7A czbplRKRDl2vO5cbOjCeJVHOdsoj5NNUOsqvcKq5aZAvSEifNf5akjs7l/Le5GB8a/PtK8dXK+0
+ 1+as6HR9UeYZP+Q3FmSxTr9adpBbWfruOmFfJo6cUNR9Rc0zOZGR9KML60DZMJjGqXRGwoZI3ul p+Q4kmhYgG9MS+lBva7drxJz2VOnZJ4Q+Tl5T4a+GxH+O62wCohzYKJCXADBtJxl54TUMl3+RFm hOqbDCFOfGTUAXn4cX0hjgaF63taftmywwNlNF2a6WyJf6yd4Jm/8tWwpwlmx9FJJ8QMKJzlWdr
+ PhTpo536S/iKQ8Owp7N2sQkT5ITYJpwmGo5a5JKpD/xiaPBjuGjtSWm8w4iNAJfozmoApT1v
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-15_07,2025-05-15_01,2025-03-28_01
 
-> +/* only 1 page for MXL86110 */
-> +#define MXL86110_DEFAULT_PAGE	0
+Hi Michal,
 
-> +/**
-> + * mxl86110_read_page - Read current page number
-> + * @phydev: Pointer to the PHY device
-> + *
-> + * Return: The currently selected page number, or negative errno on failure.
-> + */
-> +static int mxl86110_read_page(struct phy_device *phydev)
-> +{
-> +	return __phy_read(phydev, MXL86110_EXTD_REG_ADDR_OFFSET);
-> +};
+On 2025-05-14 at 08:11:32, Michal Swiatkowski (michal.swiatkowski@linux.intel.com) wrote:
+> On Wed, May 14, 2025 at 11:58:28AM +0530, Subbaraya Sundeep wrote:
+> > Send link events one after another otherwise new message
+> > is overwriting the message which is being processed by PF.
+> > 
+> > Fixes: a88e0f936ba9 ("octeontx2: Detect the mbox up or down message via register")
+> > Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+> > ---
+> > v2:
+> >  No changes. Added subject prefix net.
+> > 
+> >  drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> > 
+> > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
+> > index 992fa0b..ebb56eb 100644
+> > --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
+> > +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
+> > @@ -272,6 +272,8 @@ static void cgx_notify_pfs(struct cgx_link_event *event, struct rvu *rvu)
+> >  
+> >  		otx2_mbox_msg_send_up(&rvu->afpf_wq_info.mbox_up, pfid);
+> >  
+> > +		otx2_mbox_wait_for_rsp(&rvu->afpf_wq_info.mbox_up, pfid);
+> > +
+> >  		mutex_unlock(&rvu->mbox_lock);
+> 
+> Fix looks fine.
+> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> 
+> In rvu_rep_up_notify() the same send function is called (and
+> rvu_rep_up_notify() is called in do, while loop in
+> rvu_rep_wq_handler()). Doesn't it also need waiting for response?
+> Are there a message that don't need waiting? Maybe it will be best to
+> always wait for response if another call can overwrite.
+> 
+> Thanks
+> 
+Okay I will modify rvu_rep_up_notify, test and send next version along
+with this.
 
-If there is only one page, does these make any sense?
+Thanks,
+Sundeep
 
-> +static int mxl86110_write_page(struct phy_device *phydev, int page)
-> +{
-> +	return __phy_write(phydev, MXL86110_EXTD_REG_ADDR_OFFSET, page);
-> +};
-> +
-> +/**
-> + * mxl86110_write_extended_reg() - write to a PHY's extended register
-> + * @phydev: pointer to a &struct phy_device
-> + * @regnum: register number to write
-> + * @val: value to write to @regnum
-> + *
-> + * NOTE: This function assumes the caller already holds the MDIO bus lock
-> + * or otherwise has exclusive access to the PHY. If exclusive access
-> + * cannot be guaranteed, please use mxl86110_locked_write_extended_reg()
-> + * which handles locking internally.
-> + *
-> + * returns 0 or negative error code
-> + */
-> +static int mxl86110_write_extended_reg(struct phy_device *phydev, u16 regnum, u16 val)
-> +{
-> +	int ret;
-> +
-> +	ret = __phy_write(phydev, MXL86110_EXTD_REG_ADDR_OFFSET, regnum);
-
-This is confusing. It looks identical to mxl86110_write_page(). So
-regnum is actually page?
-
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	return __phy_write(phydev, MXL86110_EXTD_REG_ADDR_DATA, val);
-
-And within that page, there is a single register at address
-MXL86110_EXTD_REG_ADDR_DATA?
-
-If you keep the write_page() and read_page(), it looks like you can
-replace this with
-
-	return phy_write_paged(phydev, regnum,
-	                       MXL86110_EXTD_REG_ADDR_DATA, 
-                               val);
-			       
-> +static int mxl86110_set_wol(struct phy_device *phydev, struct ethtool_wolinfo *wol)
-> +{
-> +	struct net_device *netdev;
-> +	int page_to_restore;
-> +	const u8 *mac;
-> +	int ret = 0;
-> +
-> +	if (wol->wolopts & WAKE_MAGIC) {
-> +		netdev = phydev->attached_dev;
-> +		if (!netdev)
-> +			return -ENODEV;
-> +
-> +		page_to_restore = phy_select_page(phydev, MXL86110_DEFAULT_PAGE);
-> +		if (page_to_restore < 0)
-> +			goto error;
-
-If there is only one page, i think this can be removed. And everywhere
-else in the driver.
-
-> +	/*
-> +	 * RX_CLK delay (RXDLY) enabled via CHIP_CFG register causes a fixed
-> +	 * delay of approximately 2 ns at 125 MHz or 8 ns at 25/2.5 MHz.
-> +	 * Digital delays in RGMII_CFG1 register are additive
-> +	 */
-> +	switch (phydev->interface) {
-> +	case PHY_INTERFACE_MODE_RGMII:
-> +		val = 0;
-> +		break;
-> +	case PHY_INTERFACE_MODE_RGMII_RXID:
-> +		val = MXL86110_EXT_RGMII_CFG1_RX_DELAY_150PS;
-
-This should be 2000ps, or the nearest you can get to it.
-
-> +		break;
-> +	case PHY_INTERFACE_MODE_RGMII_TXID:
-> +		val = MXL86110_EXT_RGMII_CFG1_TX_1G_DELAY_2250PS |
-> +			MXL86110_EXT_RGMII_CFG1_TX_10MB_100MB_DELAY_2250PS;
-> +		break;
-> +	case PHY_INTERFACE_MODE_RGMII_ID:
-> +		val = MXL86110_EXT_RGMII_CFG1_TX_1G_DELAY_2250PS |
-> +			MXL86110_EXT_RGMII_CFG1_TX_10MB_100MB_DELAY_2250PS;
-> +		val |= MXL86110_EXT_RGMII_CFG1_RX_DELAY_150PS;
-
-Same here.
-
-> +		break;
-> +	default:
-> +		ret = -EINVAL;
-> +		goto err_restore_page;
-> +	}
-> +	ret = mxl86110_modify_extended_reg(phydev, MXL86110_EXT_RGMII_CFG1_REG,
-> +					   MXL86110_EXT_RGMII_CFG1_FULL_MASK, val);
-> +	if (ret < 0)
-> +		goto err_restore_page;
-> +
-> +	/* Configure RXDLY (RGMII Rx Clock Delay) to keep the default
-> +	 * delay value on RX_CLK (2 ns for 125 MHz, 8 ns for 25 MHz/2.5 MHz)
-> +	 */
-> +	ret = mxl86110_modify_extended_reg(phydev, MXL86110_EXT_CHIP_CFG_REG,
-> +					   MXL86110_EXT_CHIP_CFG_RXDLY_ENABLE, 1);
-
-So does the value 1 here mean 8ns? 0 would be 2ns?
-
-    Andrew
-
----
-pw-bot: cr
+> >  	} while (pfmap);
+> >  }
+> > -- 
+> > 2.7.4
 
