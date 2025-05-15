@@ -1,123 +1,136 @@
-Return-Path: <netdev+bounces-190655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A26DFAB820C
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 11:08:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6CEBAB8209
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 11:07:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAF703A6B33
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 09:04:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C58607B1708
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 09:06:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 440092882A8;
-	Thu, 15 May 2025 09:04:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E02D2874F6;
+	Thu, 15 May 2025 09:07:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M6LPuYVk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BHOKPIFp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E58D28B50C;
-	Thu, 15 May 2025 09:04:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CFCC1F09AD
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 09:07:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747299861; cv=none; b=KUKIA75HdVXhbljJG9+fo4hKkJUzARSRLNcM2LwB4lqcwAFgCCEdqh/ACKs8CcmBAu4rysEZE4ihzPyy0KoaxSAH5pJNqcy3Uh1dItfuj8KqtXYXkL/Pxtuy0HD3TktXuWoklHyGtRhuY2epEESbUX2sOO0SJF8oaP7u6G7L3k8=
+	t=1747300061; cv=none; b=mjVKSdrI1HI7RYVVHRDHoUC8toRSJaactiwEKfwPn0W3moVYXERJzdP6z7LnTggyklm0QcooqHpu6pINEfuCR7lboY0vLGgLzeKyhoDRFY+oeuZ12u2JhS6mzkDLZzL4WSQ8fidvfUvXdBP9ZehgXRG+37z9K3WcIDGB/eEEzks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747299861; c=relaxed/simple;
-	bh=W6IDOr6SEMFsf+ug6nMYdbCBpnZGhInsUS21olC7uWs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y2urHBb6W2UM52IBUFzGcolbKz7M438+SseVnV/8FQTqsZ5bpL8cmbi/mv401hCl8JgqYLMgh+kP9pAVFJwpmc0Kxf/VZhT7kp1BvRDdHMw5RCVJ4HybdcTpy89/YOp6bP/g4o2DuK1aW4nGeB9hjsDU3343/kXmTdkiw+2SBPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M6LPuYVk; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-32803984059so752591fa.2;
-        Thu, 15 May 2025 02:04:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747299855; x=1747904655; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=W6IDOr6SEMFsf+ug6nMYdbCBpnZGhInsUS21olC7uWs=;
-        b=M6LPuYVkKSbzqQs66HdOjEeH797DjVF27Zpntla9tKYsYCIBLRu8n6I4G1/v/Gouue
-         YUbqZFgC9fydBaz52WQ3NwjxVuw8bn42Q5tRZLIHl0ZZltx3n9rTXc5reiGZpdC2s+nA
-         71NOZZ/OwW1GjH6RgiUO2C83rjSKfmRzayCFhKRZkjabpdQBU/CfJZMaZB3dRQqBJMie
-         xmV+4MRsPAc5gXjjwC0QwWifKg0UBZG+P3be0YwZaVZEin6Ezg1++9PGW7vf92mrUu03
-         az0BnaO3JuZWVT0nTVURMrdETuJp99f73JEW3894u9HR0tESdM+jTPJrNw9O/5eIOMYT
-         C0uA==
+	s=arc-20240116; t=1747300061; c=relaxed/simple;
+	bh=Ik3I2MkzSjLoPITJGS+Lz0I4027rnhcahKmKU0rhTU4=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
+	 In-Reply-To:Content-Type; b=ZAoVkFK5ndK/FJnjWHM64mcaofJcO05L27Uqbug4x6HETT3JR65mTMhas669mBFHD9tsAYSL4nAp2S0dVBfBzrIVDe+UdJSzsWNZ4jBEgLBvtNaX+ib/FetSS9Rg6LdxwDYGinIhD9xCqJ8ACVq2qJ7tMuoswOemqnF7l632Etc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BHOKPIFp; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747300058;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=x7BWWrJviHxFybRk4KEuN/3UoBAdFc9hHZEf43H00c8=;
+	b=BHOKPIFp160VUDqy14VCVqc6dQ3MKEBVjB3DuaqI9gY0yRmFbtdKcJgIIw5HVJqZYPtNkN
+	LQqkGXJmLiYQDrWOS6+KTYiHQ9GUh98X/dTT+dgCZLBDqzU915tenAwZoLhlvsJtnfjBfz
+	apZvnfVC8vesVeP5CA51dsqwbEX+ZYs=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-204-BUkuFoJcPFSEHuhLuEgKfA-1; Thu, 15 May 2025 05:07:37 -0400
+X-MC-Unique: BUkuFoJcPFSEHuhLuEgKfA-1
+X-Mimecast-MFC-AGG-ID: BUkuFoJcPFSEHuhLuEgKfA_1747300056
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-442dc702850so4199435e9.1
+        for <netdev@vger.kernel.org>; Thu, 15 May 2025 02:07:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747299855; x=1747904655;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W6IDOr6SEMFsf+ug6nMYdbCBpnZGhInsUS21olC7uWs=;
-        b=d4yzgM4OD2BCZfO6lJzcZJPJZe62wV6kPW6VUM6NKZkvaNGOlaTlpc0Jbg3sJDu7XY
-         xfYD8Vi4kZ9ASM/GUYZTclZ2fQzdHqsFUQCW0Gi/7NfbRKbPgaSgYMjLw3gxBiuXs2T/
-         5RWLkL2wCV/pnK3MxGBNAsAUkhYM6GG5BP4kvP7NdCgo6txJJQ3c3mlCN8GTm/q9vwlt
-         CLA3/X/Dh0AmUjawtBVuMa0LQqz914RBo60xjClxA8XOvcPJLPtXeLbR7RS6J3dpZvDY
-         1mzp2MbWJ/VzWeIGyTQ2Dq2IPgMP2rdG3E9fPfxqcj40NSszPI42AAes54H/XJ3JMEHQ
-         E5eA==
-X-Forwarded-Encrypted: i=1; AJvYcCULOgqHE1646Svh3J1A6ypg/y5dycpcUtTSpCtXioz5282qob9P7S5d/hF0jDFXQMwOOJUHtNh+@vger.kernel.org, AJvYcCVmCiIR9/s+w3eNZECJfwyFrCNE5KOv9VeYh4ZsUFP9cpMGfkxB9ZCjhLGV0s1NgXnqJk30iO/DXMVy9eI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwI2USeZAXSsLB2JiR0q3MRPIoMEPLVCCFTw5IRZ9HqBZG7E+Oe
-	MiqsFYuPYCayM81bxM5dZK58q131YEoCIyiF7V12VQfgK1YIlu1uSiw2qw==
-X-Gm-Gg: ASbGncvXAAeIH/2QwOxUa2Ewa6ffyvRaV/Ux7hxHLJZCqKyP264t/a+fpxaHyJNR/3d
-	GeeZ1vh6XpPEt9jFDAj1uOPXsSRuONKqYS9FBA389k0NkKKLEYBRwFLbsJ4P9QaoN2MYHyU4Jc3
-	62Gp9RninLSO4xWkspV4HvvwsAJAfYk3y7R1bftQ7NW+/XMiQUdcJggEEKJR0gyNg0yOOG7+Xpv
-	piuMCCZ7EhrkBIilQQti62OBw3YIw4MDxAZSvLaP4A6jAbTWA+qCnnVPuemW5VVrNFwtwIN3O/H
-	+9E/AHuZ1cEQEtaVGj0sckZPzIllANrEAKIrO8kLwkFEJhLzTHivZmnfyja7ebutSQ==
-X-Google-Smtp-Source: AGHT+IFOFCKDbmDkxjyzWMrePZt7te9M6n7FOlOgj1hzkBCyLRszuUcglAS+kj2UxU4pG6BnKsLhHA==
-X-Received: by 2002:a05:651c:2222:b0:30c:1fc4:418e with SMTP id 38308e7fff4ca-327ed1ee262mr27670421fa.26.1747299855139;
-        Thu, 15 May 2025 02:04:15 -0700 (PDT)
-Received: from home.paul.comp (paulfertser.info. [2001:470:26:54b:226:9eff:fe70:80c2])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-326c339a303sm22891961fa.9.2025.05.15.02.04.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 May 2025 02:04:14 -0700 (PDT)
-Received: from home.paul.comp (home.paul.comp [IPv6:0:0:0:0:0:0:0:1])
-	by home.paul.comp (8.15.2/8.15.2/Debian-22+deb11u3) with ESMTP id 54F94BDN005942;
-	Thu, 15 May 2025 12:04:12 +0300
-Received: (from paul@localhost)
-	by home.paul.comp (8.15.2/8.15.2/Submit) id 54F9486U005941;
-	Thu, 15 May 2025 12:04:08 +0300
-Date: Thu, 15 May 2025 12:04:08 +0300
-From: Paul Fertser <fercerpav@gmail.com>
-To: Jerry C Chen <Jerry_C_Chen@wiwynn.com>
-Cc: patrick@stwcx.xyz, Samuel Mendoza-Jonas <sam@mendozajonas.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1] net/ncsi: fix buffer overflow in getting version id
-Message-ID: <aCWuCPsm+G5EBOt/@home.paul.comp>
-References: <20250515083448.3511588-1-Jerry_C_Chen@wiwynn.com>
+        d=1e100.net; s=20230601; t=1747300056; x=1747904856;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=x7BWWrJviHxFybRk4KEuN/3UoBAdFc9hHZEf43H00c8=;
+        b=NsOFEWwb6bdwDTDL/jpiVl1tq4PHLp8tIQQ34uFKb7cnXP2Akw7qYlqTIq1Vw6gng7
+         PDNRpeKy3jIZKk1ZXRF0Jhx1P1R3OX/Sw+FWwA278bN4h9BvMLtc0kkYYZkuL2MN5ugN
+         YbtfgJtqhPrO6Iwva/ecMa5ZFK82yjOQ60lhupVyK+JvxVc7cUps4YB9Gw9yFe9WbvMF
+         T/RMpuC2n61Ez1Zv30YNMLhrQU+bOESxHccezDHlhUeH0Mvs8spzuLFd/KMwz3BJRWXV
+         n6k5zl1LU1QI6PLTNeQ5/hyfXKH7mVi23uuTDySnj1kDnXmz/2L/a0std/ZC8BgVoQKq
+         0/rQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUBPKRuoKdXSKgMZm2PsjizVVOLi4vBud680pmoUxCjxupdFvG5WtOaDdNiu5Ssb2Vg9l8Tbmo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwyNoZwtioV/jSmF5tRlJ1T1YY3UjKupnGcq6I8WrAdSmpEcR1M
+	ZSnykJ/LPGdVSVL6QMzsYCNZB1ITBV87vEjphKL6wPe6EcCxfI6XtzayMM5/B/r7IZ4Bpw86HMZ
+	X116DkZ/URgJVg7Rhiv0FO4anbB99VQx61uYsoiIhVyv1WCGMgxfGjQ==
+X-Gm-Gg: ASbGncueCtqrrroODSPiq2yH33kFHHGbDP4DoGVm8l1L5sRMU5p9LDZ9qLwWzP++szV
+	5/J2fq2ezuF2li2QZLm0dVS12kGZ/weqv/S/ipZsr13sevh0Tn70vt7qVPtd57lO5RWOKVoRi78
+	LkrT3GfNJxQb7v2okiznLvut1Zb1J+JeoDjKKoKnNM0KKo6wqNv5qtLvreMG3K3ok2pRFgZ/Lhh
+	zd3/ZFxDP7pm40R0yIpYwHSXJnRjqLZHcG7oIA1y9uAoYTbaOFpvbGnIrGY3n3Ezn2WPQ1Cx0q7
+	9OqKD9ZqlfOjnjgDmqawbLQQYP4TTyVlyrR0sqX6UXWxHTsPl4lwbHJ73Ec=
+X-Received: by 2002:a05:600c:1d1c:b0:43c:fda5:41e9 with SMTP id 5b1f17b1804b1-442f2178679mr67983655e9.31.1747300055704;
+        Thu, 15 May 2025 02:07:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGtH0OlsI2VyfWjC+w6cgjXFzubp+EuImwpxVv6AW1/4AjSEgQ642Dr+JGZlhFvcEZbUhcT/Q==
+X-Received: by 2002:a05:600c:1d1c:b0:43c:fda5:41e9 with SMTP id 5b1f17b1804b1-442f2178679mr67983265e9.31.1747300055273;
+        Thu, 15 May 2025 02:07:35 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2440:8010:8dec:ae04:7daa:497f? ([2a0d:3344:2440:8010:8dec:ae04:7daa:497f])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442f33690a1sm63048215e9.3.2025.05.15.02.07.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 May 2025 02:07:34 -0700 (PDT)
+Message-ID: <a72ac9ee-941c-4e3c-ad11-8c629ee2f480@redhat.com>
+Date: Thu, 15 May 2025 11:07:32 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250515083448.3511588-1-Jerry_C_Chen@wiwynn.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v15 net-next 1/5] sched: Struct definition and parsing of
+ dualpi2 qdisc
+From: Paolo Abeni <pabeni@redhat.com>
+To: chia-yu.chang@nokia-bell-labs.com, horms@kernel.org,
+ donald.hunter@gmail.com, xandfury@gmail.com, netdev@vger.kernel.org,
+ dave.taht@gmail.com, jhs@mojatatu.com, kuba@kernel.org,
+ stephen@networkplumber.org, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, andrew+netdev@lunn.ch,
+ ast@fiberby.net, liuhangbin@gmail.com, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org, ij@kernel.org, ncardwell@google.com,
+ koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com,
+ ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
+ cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
+ vidhi_goel@apple.com
+References: <20250509214801.37306-1-chia-yu.chang@nokia-bell-labs.com>
+ <20250509214801.37306-2-chia-yu.chang@nokia-bell-labs.com>
+ <44cd376a-8fee-4d82-a465-a0e80e67135c@redhat.com>
+Content-Language: en-US
+In-Reply-To: <44cd376a-8fee-4d82-a465-a0e80e67135c@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello Jerry,
+On 5/15/25 10:51 AM, Paolo Abeni wrote:
+> On 5/9/25 11:47 PM, chia-yu.chang@nokia-bell-labs.com wrote:
+>> +struct dualpi2_sched_data {
+>> +	struct Qdisc *l_queue;	/* The L4S Low latency queue (L-queue) */
+>> +	struct Qdisc *sch;	/* The Classic queue (C-queue) */
+>> +
+>> +	/* Registered tc filters */
+>> +	struct tcf_proto __rcu *tcf_filters;
+>> +	struct tcf_block *tcf_block;
+>> +
+>> +	/* PI2 parameters */
+>> +	u64	pi2_target;	/* Target delay in nanoseconds */
+>> +	u32	pi2_tupdate;	/* Timer frequency in nanoseconds */
+> 
+> AFAICS this can be written from user-space, without any upper bound,
+> causing an integer overflow after converting the frequency from seconds
+> to nsec.
 
-This looks like an updated version of your previous patch[0] but you
-have forgotten to increase the number in the Subject. You have also
-forgotten to reply and take into account /some/ of the points I raised
-in the review.
+Sorry, I misread the time conversion (is nsec to usec). But with
+unbounded TCA_DUALPI2_TUPDATE the overflow can still happen.
 
-On Thu, May 15, 2025 at 04:34:47PM +0800, Jerry C Chen wrote:
-> In NC-SI spec v1.2 section 8.4.44.2, the firmware name doesn't
-> need to be null terminated while its size occupies the full size
-> of the field. Fix the buffer overflow issue by adding one
-> additional byte for null terminator.
-...
+/P
 
-Please give an answer to every comment I made for your previous patch
-version and either make a corresponding change or explain why exactly
-you disagree.
-
-Also please stop sending any and all "proprietary or confidential
-information".
-
-[0] https://patchwork.kernel.org/project/netdevbpf/patch/20250227055044.3878374-1-Jerry_C_Chen@wiwynn.com/
 
