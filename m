@@ -1,92 +1,79 @@
-Return-Path: <netdev+bounces-190585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B522EAB7B58
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 04:00:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5513AB7B68
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 04:09:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77F419806ED
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 01:59:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DDB417B092
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 02:09:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C355928751E;
-	Thu, 15 May 2025 01:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E1BB277808;
+	Thu, 15 May 2025 02:09:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KT97T3sq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cuoUFVv2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9507541C71;
-	Thu, 15 May 2025 01:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 773052690FB
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 02:09:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747274395; cv=none; b=UnHnUyXNUsyyPWERy+bYPAtGKQkXW5ryRsu9bKDiHYDs9NFAdHjiIKGla1dVbSol1jpo+06ueAH3fjaqfc3OY2y3dFzuaEpe9D1FYspra412Et4s5FH/bRGch7cT1UtfCrsiuu+f898J+D5iXK9VvgUBlUKHOOq4XfE+1CGn2MQ=
+	t=1747274959; cv=none; b=Z9GcFnIbxuSKS11Pp3QZnHg8L/is3lcpEJpd5VobJapiHDyxMt1nRUtKPNYRqplLfXS2oP3G6tAbUPvgBMVEhuz3KjGfn+s1pOxM9P5tRyDj7uHuaiZktdhrQmF91uYnOoH/ehXVqjtkEqxY7q2EXxLATHOSBpo5s1k9+9cGMJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747274395; c=relaxed/simple;
-	bh=ZSaRSMY8mrF5Lr9Z0tBd7ntXVliJF47zo9znQaJcDQM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gG1N/fbvSl0XMrwlv6ibVEkBZ7xZbYJI238iC4nLpyliig87qu/6DUF4Umw1sAevPiVTmbo/DoxQNwqHIoAWw/4JRHgkAnvhY04FOlcA/uQWH4UptxSwiKN2fSqfbJCvrYzgSrxbqeKFX9nYg9YvZDEPFFpyDWI2OwqjptIvzmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KT97T3sq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F4160C4CEE3;
-	Thu, 15 May 2025 01:59:54 +0000 (UTC)
+	s=arc-20240116; t=1747274959; c=relaxed/simple;
+	bh=9JLt0pzyhfvU1pbbM+JOpnBKps/nmijZ8yFfJ1YHDWs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Wo/Rl2hZH/maGUpV/beVpeyz3/Geko0LcbmoOsEIHDrVo+O8azATUq1iSQMtHy9WwFr5CemgrKn98aF7ij/DPjMD4V/5KOw8jdF3apxnWs2IHF5DpqvzPc2QKPL7ednWDsu5T6aeqwmBu7324lYPTRdoa8UcBM2zfrJhPujEoJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cuoUFVv2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B9F7C4CEE3;
+	Thu, 15 May 2025 02:09:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747274395;
-	bh=ZSaRSMY8mrF5Lr9Z0tBd7ntXVliJF47zo9znQaJcDQM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KT97T3sqA4Fc1SwOCkloHXWNkQt6F6fKE7R009N4JQEaQ7jSeQdmAG/uTR2LaHcEw
-	 ppoFHkK9H3nYH4EoJAgw44fxIjdTnmtbn+Cr2A5GdhrX6pgNPQXj4uvsUsLkFEfGdf
-	 KCqMCsw5BKmXwdvQOKoqkTSDlPSnNQEAyrvEJUTq6TPMuFf7iD1ZLdtgOQhLZAuIfW
-	 Vme/+U2V+G6Qy7eyHsvm/2fqg3TYnDoStWTsRCG09sgjFXdl3z/8isB3B8KvgKjMCX
-	 CYLewiLoFj2EPrjKxxigxBHYXhPgWdIuwBaiO4lA49B2l1EuNxPy34XGHxRX1jvNbj
-	 3zVtLrIwhHLcw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C9E380AA66;
-	Thu, 15 May 2025 02:00:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1747274958;
+	bh=9JLt0pzyhfvU1pbbM+JOpnBKps/nmijZ8yFfJ1YHDWs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=cuoUFVv2xlfrKtpuWX9A+DndNJWuO5Hfhrzhf9UvU/kUdxx+zhDuSZXHNYyGwloQa
+	 uEnz1djkPQnldoc1YbxIveuqyB9Qj53FgTTQX/MX3jL1ffuYX7JOROQPgcA/I2nWtC
+	 KSIwuHpyRPV7BWbW9c+bdvwUKBjp3mzEwD45/OT6zMf4puv2D2wHShyqU/4vUPIAVZ
+	 puKwkdryhfHaKu1mRH6/5LhUJ5jCDJoXbvzgepf7RfxcXNrbIeEJ0sB09IgLju3u/6
+	 yNY8tL8Ovps/7NAqZOXSh718ckMfUaV1AxqeZJ2XldLBcq5Xw9DpvdRzZvz0s5L1w/
+	 QLy/LuzJWovvQ==
+Date: Wed, 14 May 2025 19:09:17 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: airoha: Fix page recycling in
+ airoha_qdma_rx_process()
+Message-ID: <20250514190917.4b0ff404@kernel.org>
+In-Reply-To: <20250513-airoha-fix-rx-process-error-condition-v1-1-e5d70cd7c066@kernel.org>
+References: <20250513-airoha-fix-rx-process-error-condition-v1-1-e5d70cd7c066@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3] documentation: networking: devlink: Fix a typo in
- devlink-trap.rst
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174727443200.2577794.627412956587602762.git-patchwork-notify@kernel.org>
-Date: Thu, 15 May 2025 02:00:32 +0000
-References: <20250513092451.22387-1-alperyasinak1@gmail.com>
-In-Reply-To: <20250513092451.22387-1-alperyasinak1@gmail.com>
-To: Alper Ak <alperyasinak1@gmail.com>
-Cc: kuba@kernel.org, jiri@resnulli.us, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
- netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 13 May 2025 12:24:51 +0300 you wrote:
-> Fix a typo in the documentation: "errorrs" -> "errors".
+On Tue, 13 May 2025 18:34:44 +0200 Lorenzo Bianconi wrote:
+> Do not recycle the page twice in airoha_qdma_rx_process routine in case
+> of error. Just run dev_kfree_skb() if the skb has been allocated and marked
+> for recycling. Run page_pool_put_full_page() directly if the skb has not
+> been allocated yet.
+> Moreover, rely on DMA address from queue entry element instead of reading
+> it from the DMA descriptor for DMA syncing in airoha_qdma_rx_process().
 > 
-> Signed-off-by: Alper Ak <alperyasinak1@gmail.com>
-> ---
->  Documentation/networking/devlink/devlink-trap.rst | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Fixes: e12182ddb6e71 ("net: airoha: Enable Rx Scatter-Gather")
 
-Here is the summary with links:
-  - [v3] documentation: networking: devlink: Fix a typo in devlink-trap.rst
-    https://git.kernel.org/netdev/net-next/c/4abc1f14e2b8
-
-You are awesome, thank you!
+Missed your sign-off.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
