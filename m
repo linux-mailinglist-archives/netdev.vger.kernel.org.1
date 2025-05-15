@@ -1,109 +1,149 @@
-Return-Path: <netdev+bounces-190626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6EE4AB7E0B
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 08:33:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D6237AB7E0C
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 08:33:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E915F3A88FE
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 06:32:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2B753A8F43
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 06:33:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E6292628D;
-	Thu, 15 May 2025 06:33:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B8551A08AB;
+	Thu, 15 May 2025 06:33:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hcU7ucYn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D+BMLNUM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AACC8F6B
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 06:33:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06B3C8F6B
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 06:33:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747290784; cv=none; b=NPeOb4Gw8/mLr6bhxK3OXAlqiklQ3rmMYnfrNGjuZ6029xV6rYEK6ewKM7f7lgHnHkE1JVObg6rGpH4r2n0lu8YlQZsdPX38RUebFS6Du2ZoZACaeEdxFzqgUADZAOWKHhEjgpeb9iXViJbSUyXNoyMKjKOIqAqVbOkTwFTFOhU=
+	t=1747290816; cv=none; b=le3cxDIy5QxIIupxsSr5e8lyf2YT819lQA7fOAt3nopjLqHvxomvfRAwf6npiSRnaLIvrsafmMRgUL9sA2igsrG+f+BhxlMwGk4XIAkfTNU+qHlmZFLnDy65aiy52V1ydRzYmZ03Dg0Urq9ulNqFFGCRsSDF71goOiwYno5i36U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747290784; c=relaxed/simple;
-	bh=dTu7FCPLVb1Lmds6U8zszxWLIezt2U7rDOMAZnWiCZg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cZxlVLPaq6lJ0bk0YRxmLRQq9/rFCgtlaXJTKNexil4XeMxSnpDo3aSDSi85aaoaegqoPvK9CR5q7T8eVu4047rgLieMSO7ybfx+9LhcXwuQFvApGbUY3+56HzjzvrWpwbS6G7bhpKi92s38/rBVnTui6M+VRx62H5yMCf8a5RE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hcU7ucYn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07020C4CEE7;
-	Thu, 15 May 2025 06:33:02 +0000 (UTC)
+	s=arc-20240116; t=1747290816; c=relaxed/simple;
+	bh=cbgw9V6+Bp5MHHZNIW3rwxi/2ijk9oU/XpwF92m4FqE=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=dp/H1Nja7DxBF87azVPgGu7UxPlDGvnDoBKq+RaVCUJnl8+p2cNc5wlbpVg7aO6FXQohiYKhGQPq4g6VH+NBslvN6yuEBUv9247UD1b2Kn5vgKqD0qulwkZ6GMyWyG2d26+0PD6w5Kv25JAUAJy2vmuWXk6femYCHycYo5Xhqf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D+BMLNUM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18EF2C4CEE9;
+	Thu, 15 May 2025 06:33:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747290783;
-	bh=dTu7FCPLVb1Lmds6U8zszxWLIezt2U7rDOMAZnWiCZg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hcU7ucYnFEIkGfgSkwONAAOY9aBvKHrsovgOpGWO2SWxch5ZCzm3Bn4Q0KAUhfjNL
-	 WvWGGYeZ7MzUhx8HJmQTnNQj8+Qum7RPuHHLqeBSGtigNROXZfpht12cboWZDRIiu6
-	 JBZpAh0DObCz5in/GQIbRK4nkBknkNaabB+JVjVFqxcpWJ+JNTpQ0Mf+TZ4myXIYVW
-	 tPFo8CQk5TspWIeNiTJWFLImEt0MEVXXsXyayubDASSsfNM/EcjqOVC18tEzEct3eV
-	 1WIkEZBssQjtRWPCCiE16qV1mbfLIuM2MPetFkP9exzPQcB6nGl2veJTT2pnm2pXOf
-	 aO7c5Bn0F9WTA==
-Date: Thu, 15 May 2025 08:33:00 +0200
+	s=k20201202; t=1747290815;
+	bh=cbgw9V6+Bp5MHHZNIW3rwxi/2ijk9oU/XpwF92m4FqE=;
+	h=From:Date:Subject:To:Cc:From;
+	b=D+BMLNUMB2Vy87lZM2dhvbjvAU3/q53V4thtud/f8WqZcPx726NeWFyIziJ3hjlFK
+	 nAIdNSRVnjC/jKayjqGGOegQLLhkEcrf4Nd6uoOizkLDwfSST2y3GX2PDe3vI1sWuT
+	 LS1Uvzicy6HACYfwvKG4F6y6KBqiVej1HsYcgGRctp6MMhcuFaJvWkhfe3rm8KjaB1
+	 bFIcXfAaaPg97efmXJdUm9V+menpl4NXZc3jocs5wTSvfdJ1fb16IDWztjgi9oWIAI
+	 3w48nZrywTnS3W3HAU7kH0/7hc+CfBBElpWr79GSjaoREQshSDSfOArDrLuuo9id9Z
+	 CH4LWaIgc3Vow==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: airoha: Fix page recycling in
+Date: Thu, 15 May 2025 08:33:06 +0200
+Subject: [PATCH net v2] net: airoha: Fix page recycling in
  airoha_qdma_rx_process()
-Message-ID: <aCWKnGVkjlS_d1I2@lore-desk>
-References: <20250513-airoha-fix-rx-process-error-condition-v1-1-e5d70cd7c066@kernel.org>
- <20250514190917.4b0ff404@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="9w4VoQ4TwqdOLLxN"
-Content-Disposition: inline
-In-Reply-To: <20250514190917.4b0ff404@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250515-airoha-fix-rx-process-error-condition-v2-1-657e92c894b9@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAKGKJWgC/5WNQQ6CMBBFr0Jm7Zi2WkhceQ/DAtoBJprWTAnBE
+ O7uyA1cvp/89zYoJEwFbtUGQgsXzknBnSoIU5dGQo7K4IzzxtsLdix56nDgFWXFt+RApSCJZMG
+ QU+RZDdjX5GPv3RCvA6jrLaSPo/NolScuc5bPkV3sb/23sFi0qJHGhNgEU9f3J0mi1znLCO2+7
+ 1+YFHm82wAAAA==
+X-Change-ID: 20250513-airoha-fix-rx-process-error-condition-b6e5db52fd4f
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+X-Mailer: b4 0.14.2
 
+Do not recycle the page twice in airoha_qdma_rx_process routine in case
+of error. Just run dev_kfree_skb() if the skb has been allocated and marked
+for recycling. Run page_pool_put_full_page() directly if the skb has not
+been allocated yet.
+Moreover, rely on DMA address from queue entry element instead of reading
+it from the DMA descriptor for DMA syncing in airoha_qdma_rx_process().
 
---9w4VoQ4TwqdOLLxN
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Fixes: e12182ddb6e71 ("net: airoha: Enable Rx Scatter-Gather")
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+Changes in v2:
+- Add missing signed-off-by
+- Link to v1: https://lore.kernel.org/r/20250513-airoha-fix-rx-process-error-condition-v1-1-e5d70cd7c066@kernel.org
+---
+ drivers/net/ethernet/airoha/airoha_eth.c | 22 +++++++++-------------
+ 1 file changed, 9 insertions(+), 13 deletions(-)
 
-> On Tue, 13 May 2025 18:34:44 +0200 Lorenzo Bianconi wrote:
-> > Do not recycle the page twice in airoha_qdma_rx_process routine in case
-> > of error. Just run dev_kfree_skb() if the skb has been allocated and ma=
-rked
-> > for recycling. Run page_pool_put_full_page() directly if the skb has not
-> > been allocated yet.
-> > Moreover, rely on DMA address from queue entry element instead of readi=
-ng
-> > it from the DMA descriptor for DMA syncing in airoha_qdma_rx_process().
-> >=20
-> > Fixes: e12182ddb6e71 ("net: airoha: Enable Rx Scatter-Gather")
->=20
-> Missed your sign-off.
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+index d748dc6de92367365db9f9548f9af52a7fdac187..1e9ab65218ff144d99b47f5d4ad5ff4f9c227418 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.c
++++ b/drivers/net/ethernet/airoha/airoha_eth.c
+@@ -614,7 +614,6 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
+ 		struct airoha_queue_entry *e = &q->entry[q->tail];
+ 		struct airoha_qdma_desc *desc = &q->desc[q->tail];
+ 		u32 hash, reason, msg1 = le32_to_cpu(desc->msg1);
+-		dma_addr_t dma_addr = le32_to_cpu(desc->addr);
+ 		struct page *page = virt_to_head_page(e->buf);
+ 		u32 desc_ctrl = le32_to_cpu(desc->ctrl);
+ 		struct airoha_gdm_port *port;
+@@ -623,22 +622,16 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
+ 		if (!(desc_ctrl & QDMA_DESC_DONE_MASK))
+ 			break;
+ 
+-		if (!dma_addr)
+-			break;
+-
+-		len = FIELD_GET(QDMA_DESC_LEN_MASK, desc_ctrl);
+-		if (!len)
+-			break;
+-
+ 		q->tail = (q->tail + 1) % q->ndesc;
+ 		q->queued--;
+ 
+-		dma_sync_single_for_cpu(eth->dev, dma_addr,
++		dma_sync_single_for_cpu(eth->dev, e->dma_addr,
+ 					SKB_WITH_OVERHEAD(q->buf_size), dir);
+ 
++		len = FIELD_GET(QDMA_DESC_LEN_MASK, desc_ctrl);
+ 		data_len = q->skb ? q->buf_size
+ 				  : SKB_WITH_OVERHEAD(q->buf_size);
+-		if (data_len < len)
++		if (!len || data_len < len)
+ 			goto free_frag;
+ 
+ 		p = airoha_qdma_get_gdm_port(eth, desc);
+@@ -701,9 +694,12 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
+ 		q->skb = NULL;
+ 		continue;
+ free_frag:
+-		page_pool_put_full_page(q->page_pool, page, true);
+-		dev_kfree_skb(q->skb);
+-		q->skb = NULL;
++		if (q->skb) {
++			dev_kfree_skb(q->skb);
++			q->skb = NULL;
++		} else {
++			page_pool_put_full_page(q->page_pool, page, true);
++		}
+ 	}
+ 	airoha_qdma_fill_rx_queue(q);
+ 
 
-ops, let me fix it in v2.
+---
+base-commit: 09db7a4d287d1a2bcfc04df023c103d1213a0518
+change-id: 20250513-airoha-fix-rx-process-error-condition-b6e5db52fd4f
 
-Regards,
-Lorenzo
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
 
-> --=20
-> pw-bot: cr
-
---9w4VoQ4TwqdOLLxN
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaCWKnAAKCRA6cBh0uS2t
-rN7HAQDQFLb17eTABm57pebhvFKxz2kZe7oY+Vv5UTosiivHLAEAkRGdFjZE+cCN
-R+BHEX1w4Vw3LFDvYR0H+gPQMhIyuQM=
-=bbGj
------END PGP SIGNATURE-----
-
---9w4VoQ4TwqdOLLxN--
 
