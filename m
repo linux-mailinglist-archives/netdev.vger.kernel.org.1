@@ -1,66 +1,50 @@
-Return-Path: <netdev+bounces-190605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F063AB7BE9
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 05:01:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CA9BAB7BD9
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 05:00:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51B333B12B8
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 03:01:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 242B0188BB0A
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 03:00:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2648825B1CE;
-	Thu, 15 May 2025 03:01:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EDF728DB46;
+	Thu, 15 May 2025 02:59:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="SfAivCxz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V9DTHpJm"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52B3F269839
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 03:01:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D60D4B1E64;
+	Thu, 15 May 2025 02:59:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747278092; cv=none; b=BjXW3ybuT5M9wDXaIsfDYzQsgJXr1V0PjEUWQZbR6kDfwmT7LAVUvpE1yC6KaRw2SUa1RXvirAdNGP+/HDf3Ylkwa/eh8wwsi5UevBch3D5VcA+2LQdS8eDIG2kJEjjPmS5qaoV1B3VL2iD6gbVr6XkWJWZi7YFukw/bHSulKXg=
+	t=1747277998; cv=none; b=A5SdNU1bNL5PS3Cwp/KUEV4EmkVOevQGGIPd9t7zS0dtFVCdglruOQOoz1WLSN9WWsBNQPvxmjgzjlc6crswGQcozTV08yMQzeXAK/B2Hn6FGmpaRwLzJP9AOL6HU8moMXn0HgknApsiycrXyqPYpf4LIu7Dyb5dK+YcnETIO6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747278092; c=relaxed/simple;
-	bh=aj4jjT4Gem8VYFAtmvD9ooXIuJNfF43vLkad1jb9fl0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hsfdu+evGIrW6nw+mgv7ixuLY8p2P8AqKDnCAiVPEVRAFy/DEgqAs67sGLEtn945RyrFukH1c8GBJ0bsBKOhm6wuDnmlwyzMEtaNKm+WsoN1QtMazdKLDqejLdjVKuWy9SHhmSK0UwKzacu5YEHinuuBSkWI07+80/kYLuOMhC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=SfAivCxz; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 54F30Vd142844183, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1747278031; bh=aj4jjT4Gem8VYFAtmvD9ooXIuJNfF43vLkad1jb9fl0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type;
-	b=SfAivCxzswCuee7Craf+7HhTaRQ+RXJaZEg+bDE9e5c0EbjSZMfrfQH2VAtccUeSK
-	 C7Ducc4b32gLyArBD8E8nteZGA4jnMG5a1lSJWVQrFOGrxVf39lPq3OeB/PZWAFMny
-	 WpphfYOIpzA+uORu/JjcmLkBT6VhXHAObkn+tcf5bhLjYR2Vz3V66IfMtdAGlucd0S
-	 c/2Lmk/8mbFMjiihV2D0tQSmY2yWwlG86YFjeNDPk2iJwdpKC8lqy7rnz5yilF2Stu
-	 RERLfNVSabqE1Tiq1UlumAqTnkYoSq8o5HDNB5pvxAGZEomThUdWBH0OcukWL+gPHC
-	 hepLUyA3evDTQ==
-Received: from RS-EX-MBS2.realsil.com.cn ([172.29.17.102])
-	by rtits2.realtek.com.tw (8.15.2/3.13/5.93) with ESMTPS id 54F30Vd142844183
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 15 May 2025 11:00:31 +0800
-Received: from RS-EX-MBS1.realsil.com.cn (172.29.17.101) by
- RS-EX-MBS2.realsil.com.cn (172.29.17.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 15 May 2025 11:00:31 +0800
-Received: from 172.29.32.27 (172.29.32.27) by RS-EX-MBS1.realsil.com.cn
- (172.29.17.101) with Microsoft SMTP Server id 15.2.1544.11 via Frontend
- Transport; Thu, 15 May 2025 11:00:31 +0800
-From: ChunHao Lin <hau@realtek.com>
-To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, ChunHao Lin <hau@realtek.com>
-Subject: [PATCH net-next] net: phy: realtek: add RTL8127-internal PHY
-Date: Thu, 15 May 2025 11:00:22 +0800
-Message-ID: <20250515030022.4499-1-hau@realtek.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1747277998; c=relaxed/simple;
+	bh=PDLb/Z5CFapT4NGFtLlJZRiFyM6zo5sw4RC5O3pCj60=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=PvinJE3pEvDX3g7cjqYWxqfPlr4opROMMdOgJx30KbE38PL9X/FxBQRgixIz0R0btBOOuzA2faBbHnElSGx4kM/Mduv4qwkIYAVewZsZahDboWuiGuI5K9Si56RndU9LjTL2k8N4ym93QS2xrSQxXRk57tM07GmOpRE+XaASifY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V9DTHpJm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBC5FC4CEEB;
+	Thu, 15 May 2025 02:59:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747277997;
+	bh=PDLb/Z5CFapT4NGFtLlJZRiFyM6zo5sw4RC5O3pCj60=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=V9DTHpJmS1XdJOo7dTi7f7SBsTBdKs7B7n75z+ENLeHSUtQZgNpTNstGghGQUFP5K
+	 sWDX1QeIPCL9RWephFXnPsWqPZ2JXEKoTi6gkya1Agy7KlfNvH6CjWbUI6idmhT8Ao
+	 2gD7tm/ix4SJJCBsiQkG0P8Fho4t7vIuDwjf66CYz3rZn00jFZxeh6qx4FnMsNIQ85
+	 AsOk6n3MPNmp8Jnp/gGJmhMdGD8xpxhTNnlZMDYINBb/+vSC4yFdatZlLpiDf4IAdB
+	 +TWT8lBJIK/8/evfnk/91ncMR9Mab5VL1VrNCpguRFRuXO8Yi3QHw07bfGLhaUe93g
+	 ncZtNbubpVCGA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D20380AA66;
+	Thu, 15 May 2025 03:00:36 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,38 +52,60 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Subject: Re: [PATCH net 0/5] hv_netvsc: Fix error "nvsp_rndis_pkt_complete error
+ status: 2"
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174727803505.2590892.12386533199392905169.git-patchwork-notify@kernel.org>
+Date: Thu, 15 May 2025 03:00:35 +0000
+References: <20250513000604.1396-1-mhklinux@outlook.com>
+In-Reply-To: <20250513000604.1396-1-mhklinux@outlook.com>
+To: Michael Kelley <mhkelley58@gmail.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ James.Bottomley@HansenPartnership.com, martin.petersen@oracle.com,
+ linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-scsi@vger.kernel.org, stable@vger.kernel.org
 
-RTL8127-internal PHY is RTL8261C wihch is a integrated 10Gbps PHY with ID
-0x001cc890. It follows the code path of RTL8125/RTL8126 intrernal NBase-T
-PHY.
+Hello:
 
-Signed-off-by: ChunHao Lin <hau@realtek.com>
----
- drivers/net/phy/realtek/realtek_main.c | 2 ++
- 1 file changed, 2 insertions(+)
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-index 301fbe141b9b..b5e00cdf0123 100644
---- a/drivers/net/phy/realtek/realtek_main.c
-+++ b/drivers/net/phy/realtek/realtek_main.c
-@@ -158,6 +158,7 @@
- #define RTL_8221B_VB_CG				0x001cc849
- #define RTL_8221B_VN_CG				0x001cc84a
- #define RTL_8251B				0x001cc862
-+#define RTL_8261C				0x001cc890
- 
- /* RTL8211E and RTL8211F support up to three LEDs */
- #define RTL8211x_LED_COUNT			3
-@@ -1370,6 +1371,7 @@ static int rtl_internal_nbaset_match_phy_device(struct phy_device *phydev)
- 	case RTL_GENERIC_PHYID:
- 	case RTL_8221B:
- 	case RTL_8251B:
-+	case RTL_8261C:
- 	case 0x001cc841:
- 		break;
- 	default:
+On Mon, 12 May 2025 17:05:59 -0700 you wrote:
+> From: Michael Kelley <mhklinux@outlook.com>
+> 
+> Starting with commit dca5161f9bd0 in the 6.3 kernel, the Linux driver
+> for Hyper-V synthetic networking (netvsc) occasionally reports
+> "nvsp_rndis_pkt_complete error status: 2".[1] This error indicates
+> that Hyper-V has rejected a network packet transmit request from the
+> guest, and the outgoing network packet is dropped. Higher level
+> network protocols presumably recover and resend the packet so there is
+> no functional error, but performance is slightly impacted. Commit
+> dca5161f9bd0 is not the cause of the error -- it only added reporting
+> of an error that was already happening without any notice. The error
+> has presumably been present since the netvsc driver was originally
+> introduced into Linux.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,1/5] Drivers: hv: Allow vmbus_sendpacket_mpb_desc() to create multiple ranges
+    https://git.kernel.org/netdev/net/c/380b75d30786
+  - [net,2/5] hv_netvsc: Use vmbus_sendpacket_mpb_desc() to send VMBus messages
+    https://git.kernel.org/netdev/net/c/4f98616b855c
+  - [net,3/5] hv_netvsc: Preserve contiguous PFN grouping in the page buffer array
+    https://git.kernel.org/netdev/net/c/41a6328b2c55
+  - [net,4/5] hv_netvsc: Remove rmsg_pgcnt
+    https://git.kernel.org/netdev/net/c/5bbc644bbf4e
+  - [net,5/5] Drivers: hv: vmbus: Remove vmbus_sendpacket_pagebuffer()
+    https://git.kernel.org/netdev/net/c/45a442fe369e
+
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
