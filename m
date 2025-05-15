@@ -1,529 +1,141 @@
-Return-Path: <netdev+bounces-190651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA5C7AB816D
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 10:51:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8884BAB8176
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 10:52:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E07104C13AD
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 08:51:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 798134C1DAE
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 08:52:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A72DE296D09;
-	Thu, 15 May 2025 08:50:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C67128C852;
+	Thu, 15 May 2025 08:51:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XcMCj7gs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89BC1296716;
-	Thu, 15 May 2025 08:50:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B32288CA8
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 08:51:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747299058; cv=none; b=aj7PYzy0mn2CK9GmEPK0/wM7kl0AAEBI0BmGJZ+FAFuzsiPw1iAiI/lhQOqOunmVWo+/RfT4EqDCgPjYgi81AAVyk2uXO3GdUGcHvdKcVHbu9L0k5fkc90MXPtOfoHlzEsK5Ae09qJYEtyxL3KSwu/Fkcfva21YjdenGcUPfe7k=
+	t=1747299089; cv=none; b=YcoNGshRzxO/V+foZIuuOob2x0ZKcFb9dPSfvMTnG6FMbIv9wz17k/5+trAGCIhVIpCMfApcg07csvzSqO13uU4rF+DPX3IcM7k1Ak4pEGndbY8p3wMiOe2HM3OYC79TWKKDW5+Xi5aoi4DYvZ9oLoxTMoeAfZ82GC3BsH4YvPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747299058; c=relaxed/simple;
-	bh=EuYMndLHx2afU5zial+ZwPFgTZFXQV/bl3OOW5QG8AY=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type; b=KzIkeckDMMPJnJEyuUfoJAWTYQdVEwyXToSVRQ6hU5swwJd+PcmDJ0ndq7V1NYiteQABI4d+ltai8TYXzh5PV3FpfBbh+FH3+TeXOqh753cbXC+6vq4br0AVx7c9FlayFLcyU/OaCC49WB0xOT+b6oa7G8gnWy6z8qqANYP4W+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A07AC4CEF0;
-	Thu, 15 May 2025 08:50:58 +0000 (UTC)
-Received: from rostedt by gandalf with local (Exim 4.98.2)
-	(envelope-from <rostedt@goodmis.org>)
-	id 1uFUJL-00000005Xag-1N8F;
-	Thu, 15 May 2025 04:51:27 -0400
-Message-ID: <20250515085127.180937900@goodmis.org>
-User-Agent: quilt/0.68
-Date: Thu, 15 May 2025 04:51:11 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: linux-kernel@vger.kernel.org
-Cc: Masami Hiramatsu <mhiramat@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- netdev <netdev@vger.kernel.org>,
- Jiri Olsa <olsajiri@gmail.com>,
- Peter Zijlstra <peterz@infradead.org>,
- David Ahern <dsahern@kernel.org>,
- Juri Lelli <juri.lelli@gmail.com>,
- Breno Leitao <leitao@debian.org>,
- Alexei Starovoitov <alexei.starovoitov@gmail.com>,
- Andrii Nakryiko <andrii.nakryiko@gmail.com>,
- Gabriele Monaco <gmonaco@redhat.com>,
- Andrii Nakryiko <andrii@kernel.org>
-Subject: [for-next][PATCH 2/4] tracepoint: Have tracepoints created with DECLARE_TRACE() have _tp
- suffix
-References: <20250515085109.352233527@goodmis.org>
+	s=arc-20240116; t=1747299089; c=relaxed/simple;
+	bh=cRaLKFS/ocOSt0LrfepYH/n4LjEiQxhtD/kKJKa7j+0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=IOGZyYUQR7zUu7GbrmUgkc6qJQBmn25SI9dcW/AyN4/c8xuYu5EcNMnQNZhaQ30sqZnY3+sVI6ajPI67eDqDtBuXw4oLHFSRaKL6mh4KChJl4qD97CmYrQG3BbsROWs7U4Hdp4a93BaNbdu7piZ39Ymmumss6Y+uv32y7iDg6r4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XcMCj7gs; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747299086;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KOj3E0hi0DP4y3uOIqOU1f5cPS83JsYc9D6Xvq8dj04=;
+	b=XcMCj7gsPvT4Q9y4ysmP+tcwkIWgeiwhTZ1gHJs3vyAYywDhgHJ7JnYml3Su3RITstpjWD
+	+qEO92ckbJZsKjkpyGaVti5BGolpq52vU5Bo7sj/YPbdIH37KR3HdtQuO9uMjwyNWotZtN
+	wspJAe7G+xBzKa1WCJxqP6YBHXcGO2o=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-645-5DyaM1WsNCec0ytQj1M25g-1; Thu, 15 May 2025 04:51:24 -0400
+X-MC-Unique: 5DyaM1WsNCec0ytQj1M25g-1
+X-Mimecast-MFC-AGG-ID: 5DyaM1WsNCec0ytQj1M25g_1747299084
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43cfda30a3cso3667175e9.3
+        for <netdev@vger.kernel.org>; Thu, 15 May 2025 01:51:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747299083; x=1747903883;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KOj3E0hi0DP4y3uOIqOU1f5cPS83JsYc9D6Xvq8dj04=;
+        b=GA7dBBSq1Orz5dRpUEdSSFZWK3tUSo0abicb1hBZoeZX+A9czHovcvUrbUHOoP9DM2
+         JmXpOSlJjSg3kFyNRf2ASwG/AxdMr5aQhi/V3nsoeCI5NiCaANXFBQDH8veUQjZA/7rn
+         nKW7pLGWMNZa4+qTIsPD8hrhaBWGJwqmdivZEtziQLPZnr7qBWZgZ7z1A6ZKekGMIWyq
+         3VMqavL41K7Ktx1HMDWDGWnVe0IRXVfA/UWAy/FElf29E1rBwdfLl0pwpHwYJVmHPK6i
+         Gv+/Abj2vjuQE26y2JDXCZMPt5/bB9S9Uspx3i3FgJpRvjAgoMmz6Hw1Gn8ltoAPrDnF
+         Badw==
+X-Forwarded-Encrypted: i=1; AJvYcCUbsDsv7DLoWvs7EyvT/CjuLGrn8k4HKTNM5JeNW3Xc8JULsWoDzx7byAVZuUi6qIqmKhkwPrU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywbef8SJt7qSwO1H/2D7X62VO5jQj+6zIS7TlveEmMjxvga2D7b
+	K/8DjSbzAyP1FGM3uGt+5a9XQD0pu2SyqAS0kvwNZ0C5A+AZRjUAwumqH96YmKoMsMcIRev3VgC
+	QV1WrND0m+GLK9teKKubL0WYfZFVcwOQGpbE4H1WOWPNwemM5APAI/pJSI1tWgxuX
+X-Gm-Gg: ASbGnct2Wcl3sqTTe4EoV9uBHYObrxqY2ERuHjP70Bi8QTyhOcVf9paopl3HeCZs47i
+	zQ8FSPBU+qjQflPviyYglklhc7SvWky/QsEHTIb7lToeDBOa7zfwqYkAR6IxybVMa1T1wMkGi2f
+	rSjn2Gc9qf9dgh1TM8J5gxk8aDO4sBLVBoB6I8BEnc+vYqPEZDeBukszIRaQ4qS53OlbgQ+d9iM
+	lvTiFwSLiKfo3VB8wX/7Ging7b0wBR/6coSppCkHE3pAlePExuIHZXmYS1kHLH5LTJocZBoIjrc
+	XKkcWtZy0Wd+Up1qFdKNukcHGAfm6KsQeRTdTNzUaRBJEAMJclxsM1LknMk=
+X-Received: by 2002:a05:600c:4ed3:b0:43c:e7a7:1e76 with SMTP id 5b1f17b1804b1-442f96e6f53mr12410615e9.1.1747299083427;
+        Thu, 15 May 2025 01:51:23 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFK1IDiAKMJgGPDA6+WopmhoDhZGpoHt2rO7LudOPFoe7c++mdWYWTOkVWXB6G/HeyCcgPa9w==
+X-Received: by 2002:a05:600c:4ed3:b0:43c:e7a7:1e76 with SMTP id 5b1f17b1804b1-442f96e6f53mr12410285e9.1.1747299083028;
+        Thu, 15 May 2025 01:51:23 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2440:8010:8dec:ae04:7daa:497f? ([2a0d:3344:2440:8010:8dec:ae04:7daa:497f])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442ebd47d39sm59873815e9.1.2025.05.15.01.51.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 May 2025 01:51:22 -0700 (PDT)
+Message-ID: <44cd376a-8fee-4d82-a465-a0e80e67135c@redhat.com>
+Date: Thu, 15 May 2025 10:51:20 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v15 net-next 1/5] sched: Struct definition and parsing of
+ dualpi2 qdisc
+To: chia-yu.chang@nokia-bell-labs.com, horms@kernel.org,
+ donald.hunter@gmail.com, xandfury@gmail.com, netdev@vger.kernel.org,
+ dave.taht@gmail.com, jhs@mojatatu.com, kuba@kernel.org,
+ stephen@networkplumber.org, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, andrew+netdev@lunn.ch,
+ ast@fiberby.net, liuhangbin@gmail.com, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org, ij@kernel.org, ncardwell@google.com,
+ koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com,
+ ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
+ cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
+ vidhi_goel@apple.com
+References: <20250509214801.37306-1-chia-yu.chang@nokia-bell-labs.com>
+ <20250509214801.37306-2-chia-yu.chang@nokia-bell-labs.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250509214801.37306-2-chia-yu.chang@nokia-bell-labs.com>
 Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Steven Rostedt <rostedt@goodmis.org>
+On 5/9/25 11:47 PM, chia-yu.chang@nokia-bell-labs.com wrote:
+> +struct dualpi2_sched_data {
+> +	struct Qdisc *l_queue;	/* The L4S Low latency queue (L-queue) */
+> +	struct Qdisc *sch;	/* The Classic queue (C-queue) */
+> +
+> +	/* Registered tc filters */
+> +	struct tcf_proto __rcu *tcf_filters;
+> +	struct tcf_block *tcf_block;
+> +
+> +	/* PI2 parameters */
+> +	u64	pi2_target;	/* Target delay in nanoseconds */
+> +	u32	pi2_tupdate;	/* Timer frequency in nanoseconds */
 
-Most tracepoints in the kernel are created with TRACE_EVENT(). The
-TRACE_EVENT() macro (and DECLARE_EVENT_CLASS() and DEFINE_EVENT() where in
-reality, TRACE_EVENT() is just a helper macro that calls those other two
-macros), will create not only a tracepoint (the function trace_<event>()
-used in the kernel), it also exposes the tracepoint to user space along
-with defining what fields will be saved by that tracepoint.
+AFAICS this can be written from user-space, without any upper bound,
+causing an integer overflow after converting the frequency from seconds
+to nsec.
 
-There are a few places that tracepoints are created in the kernel that are
-not exposed to userspace via tracefs. They can only be accessed from code
-within the kernel. These tracepoints are created with DEFINE_TRACE()
+> +static enum hrtimer_restart dualpi2_timer(struct hrtimer *timer)
+> +{
+> +	struct dualpi2_sched_data *q = from_timer(q, timer, pi2_timer);
+> +
+> +	WRITE_ONCE(q->pi2_prob, calculate_probability(q->sch));
 
-Most of these tracepoints end with "_tp". This is useful as when the
-developer sees that, they know that the tracepoint is for in-kernel only
-(meaning it can only be accessed inside the kernel, either directly by the
-kernel or indirectly via modules and BPF programs) and is not exposed to
-user space.
+This runs without acquiring the qdisc_lock(). The state accessed by
+calculate_probability() could be inconsistent. You likely need to
+acquire the qdisc_lock here.
 
-Instead of making this only a process to add "_tp", enforce it by making
-the DECLARE_TRACE() append the "_tp" suffix to the tracepoint. This
-requires adding DECLARE_TRACE_EVENT() macros for the TRACE_EVENT() macro
-to use that keeps the original name.
-
-Link: https://lore.kernel.org/all/20250418083351.20a60e64@gandalf.local.home/
-
-Cc: netdev <netdev@vger.kernel.org>
-Cc: Jiri Olsa <olsajiri@gmail.com>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: David Ahern <dsahern@kernel.org>
-Cc: Juri Lelli <juri.lelli@gmail.com>
-Cc: Breno Leitao <leitao@debian.org>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: Gabriele Monaco <gmonaco@redhat.com>
-Cc: Masami Hiramatsu <mhiramat@kernel.org>
-Link: https://lore.kernel.org/20250510163730.092fad5b@gandalf.local.home
-Acked-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-Acked-by: Andrii Nakryiko <andrii@kernel.org>
-Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
----
- Documentation/trace/tracepoints.rst           | 17 ++++++---
- include/linux/tracepoint.h                    | 38 +++++++++++++------
- include/trace/bpf_probe.h                     |  8 ++--
- include/trace/define_trace.h                  | 17 ++++++++-
- include/trace/events/sched.h                  | 30 +++++++--------
- include/trace/events/tcp.h                    |  2 +-
- .../testing/selftests/bpf/progs/raw_tp_null.c |  2 +-
- .../selftests/bpf/progs/raw_tp_null_fail.c    |  2 +-
- .../selftests/bpf/progs/test_module_attach.c  |  4 +-
- .../bpf/progs/test_tp_btf_nullable.c          |  4 +-
- .../selftests/bpf/test_kmods/bpf_testmod.c    |  8 ++--
- 11 files changed, 83 insertions(+), 49 deletions(-)
-
-diff --git a/Documentation/trace/tracepoints.rst b/Documentation/trace/tracepoints.rst
-index decabcc77b56..b35c40e3abbe 100644
---- a/Documentation/trace/tracepoints.rst
-+++ b/Documentation/trace/tracepoints.rst
-@@ -71,7 +71,7 @@ In subsys/file.c (where the tracing statement must be added)::
- 	void somefct(void)
- 	{
- 		...
--		trace_subsys_eventname(arg, task);
-+		trace_subsys_eventname_tp(arg, task);
- 		...
- 	}
- 
-@@ -129,12 +129,12 @@ within an if statement with the following::
- 		for (i = 0; i < count; i++)
- 			tot += calculate_nuggets();
- 
--		trace_foo_bar(tot);
-+		trace_foo_bar_tp(tot);
- 	}
- 
--All trace_<tracepoint>() calls have a matching trace_<tracepoint>_enabled()
-+All trace_<tracepoint>_tp() calls have a matching trace_<tracepoint>_enabled()
- function defined that returns true if the tracepoint is enabled and
--false otherwise. The trace_<tracepoint>() should always be within the
-+false otherwise. The trace_<tracepoint>_tp() should always be within the
- block of the if (trace_<tracepoint>_enabled()) to prevent races between
- the tracepoint being enabled and the check being seen.
- 
-@@ -143,7 +143,10 @@ the static_key of the tracepoint to allow the if statement to be implemented
- with jump labels and avoid conditional branches.
- 
- .. note:: The convenience macro TRACE_EVENT provides an alternative way to
--      define tracepoints. Check http://lwn.net/Articles/379903,
-+      define tracepoints. Note, DECLARE_TRACE(foo) creates a function
-+      "trace_foo_tp()" whereas TRACE_EVENT(foo) creates a function
-+      "trace_foo()", and also exposes the tracepoint as a trace event in
-+      /sys/kernel/tracing/events directory.  Check http://lwn.net/Articles/379903,
-       http://lwn.net/Articles/381064 and http://lwn.net/Articles/383362
-       for a series of articles with more details.
- 
-@@ -159,7 +162,9 @@ In a C file::
- 
- 	void do_trace_foo_bar_wrapper(args)
- 	{
--		trace_foo_bar(args);
-+		trace_foo_bar_tp(args); // for tracepoints created via DECLARE_TRACE
-+					//   or
-+		trace_foo_bar(args);    // for tracepoints created via TRACE_EVENT
- 	}
- 
- In the header file::
-diff --git a/include/linux/tracepoint.h b/include/linux/tracepoint.h
-index a351763e6965..826ce3f8e1f8 100644
---- a/include/linux/tracepoint.h
-+++ b/include/linux/tracepoint.h
-@@ -464,16 +464,30 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
- #endif
- 
- #define DECLARE_TRACE(name, proto, args)				\
--	__DECLARE_TRACE(name, PARAMS(proto), PARAMS(args),		\
-+	__DECLARE_TRACE(name##_tp, PARAMS(proto), PARAMS(args),		\
- 			cpu_online(raw_smp_processor_id()),		\
- 			PARAMS(void *__data, proto))
- 
- #define DECLARE_TRACE_CONDITION(name, proto, args, cond)		\
--	__DECLARE_TRACE(name, PARAMS(proto), PARAMS(args),		\
-+	__DECLARE_TRACE(name##_tp, PARAMS(proto), PARAMS(args),		\
- 			cpu_online(raw_smp_processor_id()) && (PARAMS(cond)), \
- 			PARAMS(void *__data, proto))
- 
- #define DECLARE_TRACE_SYSCALL(name, proto, args)			\
-+	__DECLARE_TRACE_SYSCALL(name##_tp, PARAMS(proto), PARAMS(args),	\
-+				PARAMS(void *__data, proto))
-+
-+#define DECLARE_TRACE_EVENT(name, proto, args)				\
-+	__DECLARE_TRACE(name, PARAMS(proto), PARAMS(args),		\
-+			cpu_online(raw_smp_processor_id()),		\
-+			PARAMS(void *__data, proto))
-+
-+#define DECLARE_TRACE_EVENT_CONDITION(name, proto, args, cond)		\
-+	__DECLARE_TRACE(name, PARAMS(proto), PARAMS(args),		\
-+			cpu_online(raw_smp_processor_id()) && (PARAMS(cond)), \
-+			PARAMS(void *__data, proto))
-+
-+#define DECLARE_TRACE_EVENT_SYSCALL(name, proto, args)			\
- 	__DECLARE_TRACE_SYSCALL(name, PARAMS(proto), PARAMS(args),	\
- 				PARAMS(void *__data, proto))
- 
-@@ -591,32 +605,32 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
- 
- #define DECLARE_EVENT_CLASS(name, proto, args, tstruct, assign, print)
- #define DEFINE_EVENT(template, name, proto, args)		\
--	DECLARE_TRACE(name, PARAMS(proto), PARAMS(args))
-+	DECLARE_TRACE_EVENT(name, PARAMS(proto), PARAMS(args))
- #define DEFINE_EVENT_FN(template, name, proto, args, reg, unreg)\
--	DECLARE_TRACE(name, PARAMS(proto), PARAMS(args))
-+	DECLARE_TRACE_EVENT(name, PARAMS(proto), PARAMS(args))
- #define DEFINE_EVENT_PRINT(template, name, proto, args, print)	\
--	DECLARE_TRACE(name, PARAMS(proto), PARAMS(args))
-+	DECLARE_TRACE_EVENT(name, PARAMS(proto), PARAMS(args))
- #define DEFINE_EVENT_CONDITION(template, name, proto,		\
- 			       args, cond)			\
--	DECLARE_TRACE_CONDITION(name, PARAMS(proto),		\
-+	DECLARE_TRACE_EVENT_CONDITION(name, PARAMS(proto),	\
- 				PARAMS(args), PARAMS(cond))
- 
- #define TRACE_EVENT(name, proto, args, struct, assign, print)	\
--	DECLARE_TRACE(name, PARAMS(proto), PARAMS(args))
-+	DECLARE_TRACE_EVENT(name, PARAMS(proto), PARAMS(args))
- #define TRACE_EVENT_FN(name, proto, args, struct,		\
- 		assign, print, reg, unreg)			\
--	DECLARE_TRACE(name, PARAMS(proto), PARAMS(args))
--#define TRACE_EVENT_FN_COND(name, proto, args, cond, struct,		\
-+	DECLARE_TRACE_EVENT(name, PARAMS(proto), PARAMS(args))
-+#define TRACE_EVENT_FN_COND(name, proto, args, cond, struct,	\
- 		assign, print, reg, unreg)			\
--	DECLARE_TRACE_CONDITION(name, PARAMS(proto),	\
-+	DECLARE_TRACE_EVENT_CONDITION(name, PARAMS(proto),	\
- 			PARAMS(args), PARAMS(cond))
- #define TRACE_EVENT_CONDITION(name, proto, args, cond,		\
- 			      struct, assign, print)		\
--	DECLARE_TRACE_CONDITION(name, PARAMS(proto),		\
-+	DECLARE_TRACE_EVENT_CONDITION(name, PARAMS(proto),	\
- 				PARAMS(args), PARAMS(cond))
- #define TRACE_EVENT_SYSCALL(name, proto, args, struct, assign,	\
- 			    print, reg, unreg)			\
--	DECLARE_TRACE_SYSCALL(name, PARAMS(proto), PARAMS(args))
-+	DECLARE_TRACE_EVENT_SYSCALL(name, PARAMS(proto), PARAMS(args))
- 
- #define TRACE_EVENT_FLAGS(event, flag)
- 
-diff --git a/include/trace/bpf_probe.h b/include/trace/bpf_probe.h
-index 183fa2aa2935..9391d54d3f12 100644
---- a/include/trace/bpf_probe.h
-+++ b/include/trace/bpf_probe.h
-@@ -119,14 +119,14 @@ static inline void bpf_test_buffer_##call(void)				\
- 
- #undef DECLARE_TRACE
- #define DECLARE_TRACE(call, proto, args)				\
--	__BPF_DECLARE_TRACE(call, PARAMS(proto), PARAMS(args))		\
--	__DEFINE_EVENT(call, call, PARAMS(proto), PARAMS(args), 0)
-+	__BPF_DECLARE_TRACE(call##_tp, PARAMS(proto), PARAMS(args))		\
-+	__DEFINE_EVENT(call##_tp, call##_tp, PARAMS(proto), PARAMS(args), 0)
- 
- #undef DECLARE_TRACE_WRITABLE
- #define DECLARE_TRACE_WRITABLE(call, proto, args, size) \
- 	__CHECK_WRITABLE_BUF_SIZE(call, PARAMS(proto), PARAMS(args), size) \
--	__BPF_DECLARE_TRACE(call, PARAMS(proto), PARAMS(args)) \
--	__DEFINE_EVENT(call, call, PARAMS(proto), PARAMS(args), size)
-+	__BPF_DECLARE_TRACE(call##_tp, PARAMS(proto), PARAMS(args)) \
-+	__DEFINE_EVENT(call##_tp, call##_tp, PARAMS(proto), PARAMS(args), size)
- 
- #include TRACE_INCLUDE(TRACE_INCLUDE_FILE)
- 
-diff --git a/include/trace/define_trace.h b/include/trace/define_trace.h
-index ed52d0506c69..b2ba5a80583f 100644
---- a/include/trace/define_trace.h
-+++ b/include/trace/define_trace.h
-@@ -74,10 +74,18 @@
- 
- #undef DECLARE_TRACE
- #define DECLARE_TRACE(name, proto, args)	\
--	DEFINE_TRACE(name, PARAMS(proto), PARAMS(args))
-+	DEFINE_TRACE(name##_tp, PARAMS(proto), PARAMS(args))
- 
- #undef DECLARE_TRACE_CONDITION
- #define DECLARE_TRACE_CONDITION(name, proto, args, cond)	\
-+	DEFINE_TRACE(name##_tp, PARAMS(proto), PARAMS(args))
-+
-+#undef DECLARE_TRACE_EVENT
-+#define DECLARE_TRACE_EVENT(name, proto, args)	\
-+	DEFINE_TRACE(name, PARAMS(proto), PARAMS(args))
-+
-+#undef DECLARE_TRACE_EVENT_CONDITION
-+#define DECLARE_TRACE_EVENT_CONDITION(name, proto, args, cond)	\
- 	DEFINE_TRACE(name, PARAMS(proto), PARAMS(args))
- 
- /* If requested, create helpers for calling these tracepoints from Rust. */
-@@ -115,6 +123,11 @@
- #undef DECLARE_TRACE_CONDITION
- #define DECLARE_TRACE_CONDITION(name, proto, args, cond)
- 
-+#undef DECLARE_TRACE_EVENT
-+#define DECLARE_TRACE_EVENT(name, proto, args)
-+#undef DECLARE_TRACE_EVENT_CONDITION
-+#define DECLARE_TRACE_EVENT_CONDITION(name, proto, args, cond)
-+
- #ifdef TRACEPOINTS_ENABLED
- #include <trace/trace_events.h>
- #include <trace/perf.h>
-@@ -136,6 +149,8 @@
- #undef TRACE_HEADER_MULTI_READ
- #undef DECLARE_TRACE
- #undef DECLARE_TRACE_CONDITION
-+#undef DECLARE_TRACE_EVENT
-+#undef DECLARE_TRACE_EVENT_CONDITION
- 
- /* Only undef what we defined in this file */
- #ifdef UNDEF_TRACE_INCLUDE_FILE
-diff --git a/include/trace/events/sched.h b/include/trace/events/sched.h
-index 8994e97d86c1..152fc8b37aa5 100644
---- a/include/trace/events/sched.h
-+++ b/include/trace/events/sched.h
-@@ -773,64 +773,64 @@ TRACE_EVENT(sched_wake_idle_without_ipi,
-  *
-  * Postfixed with _tp to make them easily identifiable in the code.
-  */
--DECLARE_TRACE(pelt_cfs_tp,
-+DECLARE_TRACE(pelt_cfs,
- 	TP_PROTO(struct cfs_rq *cfs_rq),
- 	TP_ARGS(cfs_rq));
- 
--DECLARE_TRACE(pelt_rt_tp,
-+DECLARE_TRACE(pelt_rt,
- 	TP_PROTO(struct rq *rq),
- 	TP_ARGS(rq));
- 
--DECLARE_TRACE(pelt_dl_tp,
-+DECLARE_TRACE(pelt_dl,
- 	TP_PROTO(struct rq *rq),
- 	TP_ARGS(rq));
- 
--DECLARE_TRACE(pelt_hw_tp,
-+DECLARE_TRACE(pelt_hw,
- 	TP_PROTO(struct rq *rq),
- 	TP_ARGS(rq));
- 
--DECLARE_TRACE(pelt_irq_tp,
-+DECLARE_TRACE(pelt_irq,
- 	TP_PROTO(struct rq *rq),
- 	TP_ARGS(rq));
- 
--DECLARE_TRACE(pelt_se_tp,
-+DECLARE_TRACE(pelt_se,
- 	TP_PROTO(struct sched_entity *se),
- 	TP_ARGS(se));
- 
--DECLARE_TRACE(sched_cpu_capacity_tp,
-+DECLARE_TRACE(sched_cpu_capacity,
- 	TP_PROTO(struct rq *rq),
- 	TP_ARGS(rq));
- 
--DECLARE_TRACE(sched_overutilized_tp,
-+DECLARE_TRACE(sched_overutilized,
- 	TP_PROTO(struct root_domain *rd, bool overutilized),
- 	TP_ARGS(rd, overutilized));
- 
--DECLARE_TRACE(sched_util_est_cfs_tp,
-+DECLARE_TRACE(sched_util_est_cfs,
- 	TP_PROTO(struct cfs_rq *cfs_rq),
- 	TP_ARGS(cfs_rq));
- 
--DECLARE_TRACE(sched_util_est_se_tp,
-+DECLARE_TRACE(sched_util_est_se,
- 	TP_PROTO(struct sched_entity *se),
- 	TP_ARGS(se));
- 
--DECLARE_TRACE(sched_update_nr_running_tp,
-+DECLARE_TRACE(sched_update_nr_running,
- 	TP_PROTO(struct rq *rq, int change),
- 	TP_ARGS(rq, change));
- 
--DECLARE_TRACE(sched_compute_energy_tp,
-+DECLARE_TRACE(sched_compute_energy,
- 	TP_PROTO(struct task_struct *p, int dst_cpu, unsigned long energy,
- 		 unsigned long max_util, unsigned long busy_time),
- 	TP_ARGS(p, dst_cpu, energy, max_util, busy_time));
- 
--DECLARE_TRACE(sched_entry_tp,
-+DECLARE_TRACE(sched_entry,
- 	TP_PROTO(bool preempt, unsigned long ip),
- 	TP_ARGS(preempt, ip));
- 
--DECLARE_TRACE(sched_exit_tp,
-+DECLARE_TRACE(sched_exit,
- 	TP_PROTO(bool is_switch, unsigned long ip),
- 	TP_ARGS(is_switch, ip));
- 
--DECLARE_TRACE_CONDITION(sched_set_state_tp,
-+DECLARE_TRACE_CONDITION(sched_set_state,
- 	TP_PROTO(struct task_struct *tsk, int state),
- 	TP_ARGS(tsk, state),
- 	TP_CONDITION(!!(tsk->__state) != !!state));
-diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
-index 1a40c41ff8c3..4f9fa1b5b89b 100644
---- a/include/trace/events/tcp.h
-+++ b/include/trace/events/tcp.h
-@@ -259,7 +259,7 @@ TRACE_EVENT(tcp_retransmit_synack,
- 		  __entry->saddr_v6, __entry->daddr_v6)
- );
- 
--DECLARE_TRACE(tcp_cwnd_reduction_tp,
-+DECLARE_TRACE(tcp_cwnd_reduction,
- 	TP_PROTO(const struct sock *sk, int newly_acked_sacked,
- 		 int newly_lost, int flag),
- 	TP_ARGS(sk, newly_acked_sacked, newly_lost, flag)
-diff --git a/tools/testing/selftests/bpf/progs/raw_tp_null.c b/tools/testing/selftests/bpf/progs/raw_tp_null.c
-index 5927054b6dd9..efa416f53968 100644
---- a/tools/testing/selftests/bpf/progs/raw_tp_null.c
-+++ b/tools/testing/selftests/bpf/progs/raw_tp_null.c
-@@ -10,7 +10,7 @@ char _license[] SEC("license") = "GPL";
- int tid;
- int i;
- 
--SEC("tp_btf/bpf_testmod_test_raw_tp_null")
-+SEC("tp_btf/bpf_testmod_test_raw_tp_null_tp")
- int BPF_PROG(test_raw_tp_null, struct sk_buff *skb)
- {
- 	struct task_struct *task = bpf_get_current_task_btf();
-diff --git a/tools/testing/selftests/bpf/progs/raw_tp_null_fail.c b/tools/testing/selftests/bpf/progs/raw_tp_null_fail.c
-index 38d669957bf1..0d58114a4955 100644
---- a/tools/testing/selftests/bpf/progs/raw_tp_null_fail.c
-+++ b/tools/testing/selftests/bpf/progs/raw_tp_null_fail.c
-@@ -8,7 +8,7 @@
- char _license[] SEC("license") = "GPL";
- 
- /* Ensure module parameter has PTR_MAYBE_NULL */
--SEC("tp_btf/bpf_testmod_test_raw_tp_null")
-+SEC("tp_btf/bpf_testmod_test_raw_tp_null_tp")
- __failure __msg("R1 invalid mem access 'trusted_ptr_or_null_'")
- int test_raw_tp_null_bpf_testmod_test_raw_tp_null_arg_1(void *ctx) {
-     asm volatile("r1 = *(u64 *)(r1 +0); r1 = *(u64 *)(r1 +0);" ::: __clobber_all);
-diff --git a/tools/testing/selftests/bpf/progs/test_module_attach.c b/tools/testing/selftests/bpf/progs/test_module_attach.c
-index 7f3c233943b3..03d7f89787a1 100644
---- a/tools/testing/selftests/bpf/progs/test_module_attach.c
-+++ b/tools/testing/selftests/bpf/progs/test_module_attach.c
-@@ -19,7 +19,7 @@ int BPF_PROG(handle_raw_tp,
- 
- __u32 raw_tp_bare_write_sz = 0;
- 
--SEC("raw_tp/bpf_testmod_test_write_bare")
-+SEC("raw_tp/bpf_testmod_test_write_bare_tp")
- int BPF_PROG(handle_raw_tp_bare,
- 	     struct task_struct *task, struct bpf_testmod_test_write_ctx *write_ctx)
- {
-@@ -31,7 +31,7 @@ int raw_tp_writable_bare_in_val = 0;
- int raw_tp_writable_bare_early_ret = 0;
- int raw_tp_writable_bare_out_val = 0;
- 
--SEC("raw_tp.w/bpf_testmod_test_writable_bare")
-+SEC("raw_tp.w/bpf_testmod_test_writable_bare_tp")
- int BPF_PROG(handle_raw_tp_writable_bare,
- 	     struct bpf_testmod_test_writable_ctx *writable)
- {
-diff --git a/tools/testing/selftests/bpf/progs/test_tp_btf_nullable.c b/tools/testing/selftests/bpf/progs/test_tp_btf_nullable.c
-index 39ff06f2c834..cf0547a613ff 100644
---- a/tools/testing/selftests/bpf/progs/test_tp_btf_nullable.c
-+++ b/tools/testing/selftests/bpf/progs/test_tp_btf_nullable.c
-@@ -6,14 +6,14 @@
- #include "../test_kmods/bpf_testmod.h"
- #include "bpf_misc.h"
- 
--SEC("tp_btf/bpf_testmod_test_nullable_bare")
-+SEC("tp_btf/bpf_testmod_test_nullable_bare_tp")
- __failure __msg("R1 invalid mem access 'trusted_ptr_or_null_'")
- int BPF_PROG(handle_tp_btf_nullable_bare1, struct bpf_testmod_test_read_ctx *nullable_ctx)
- {
- 	return nullable_ctx->len;
- }
- 
--SEC("tp_btf/bpf_testmod_test_nullable_bare")
-+SEC("tp_btf/bpf_testmod_test_nullable_bare_tp")
- int BPF_PROG(handle_tp_btf_nullable_bare2, struct bpf_testmod_test_read_ctx *nullable_ctx)
- {
- 	if (nullable_ctx)
-diff --git a/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c b/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c
-index 3220f1d28697..18eded4d1d15 100644
---- a/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c
-+++ b/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c
-@@ -413,7 +413,7 @@ bpf_testmod_test_read(struct file *file, struct kobject *kobj,
- 
- 	(void)bpf_testmod_test_arg_ptr_to_struct(&struct_arg1_2);
- 
--	(void)trace_bpf_testmod_test_raw_tp_null(NULL);
-+	(void)trace_bpf_testmod_test_raw_tp_null_tp(NULL);
- 
- 	bpf_testmod_test_struct_ops3();
- 
-@@ -431,14 +431,14 @@ bpf_testmod_test_read(struct file *file, struct kobject *kobj,
- 	if (bpf_testmod_loop_test(101) > 100)
- 		trace_bpf_testmod_test_read(current, &ctx);
- 
--	trace_bpf_testmod_test_nullable_bare(NULL);
-+	trace_bpf_testmod_test_nullable_bare_tp(NULL);
- 
- 	/* Magic number to enable writable tp */
- 	if (len == 64) {
- 		struct bpf_testmod_test_writable_ctx writable = {
- 			.val = 1024,
- 		};
--		trace_bpf_testmod_test_writable_bare(&writable);
-+		trace_bpf_testmod_test_writable_bare_tp(&writable);
- 		if (writable.early_ret)
- 			return snprintf(buf, len, "%d\n", writable.val);
- 	}
-@@ -470,7 +470,7 @@ bpf_testmod_test_write(struct file *file, struct kobject *kobj,
- 		.len = len,
- 	};
- 
--	trace_bpf_testmod_test_write_bare(current, &ctx);
-+	trace_bpf_testmod_test_write_bare_tp(current, &ctx);
- 
- 	return -EIO; /* always fail */
- }
--- 
-2.47.2
-
+/P
 
 
