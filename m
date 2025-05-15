@@ -1,255 +1,401 @@
-Return-Path: <netdev+bounces-190665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B88DAB8326
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 11:47:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23FF3AB8358
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 11:53:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A325C1BC108C
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 09:47:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 305549E0137
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 09:53:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EBEF18FC89;
-	Thu, 15 May 2025 09:47:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2FBD29617F;
+	Thu, 15 May 2025 09:53:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OsFARh0I"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="Q+6Hy/Ht"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF372EBE
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 09:47:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747302427; cv=fail; b=om/3lYV6ewBws+vC4HRuxpruFUaVmmmg28eUKwjYkDhdE87DL1tRvmOCCGsdIISBADo74QabwYCXze2907jO94QiSbLjZwPZtv4garkjhcoL6PHcyN2FZJKefMQhXGXM+CRWtSasNL5UfH6KfB1BxAtQ3FZUht+qTZ5FZFfcmCE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747302427; c=relaxed/simple;
-	bh=zWJybk5hhQSNNmKRr2HlsEkXGKujrjxOMHsS9tIZrIA=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=X261crRQmMMt3HJKrL+gmzKMDaWaFPvNrsTP2BJP2R5s0XNHf9pjv5xyNZcq+2uEbzaErcgKkoiCYIdd30VidsjBtZxRrTGXU5b8b3FjF7tNQXM3hfIXjHoMu3JWqFosQankKAB8qKCWQjUe5fTYR1gLh/+A6Z5IT+eAtt6Rzrc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OsFARh0I; arc=fail smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747302426; x=1778838426;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=zWJybk5hhQSNNmKRr2HlsEkXGKujrjxOMHsS9tIZrIA=;
-  b=OsFARh0ImuHoS8iwNFzuDhg3cAGiU/b1gfHXnZxLb63v2lcaS6pUqEx8
-   AmQJNG5enkKJqR/dyektUJWrU35eDB5YZWHa0NjpMK+d4cDH4gEQbij6R
-   8dFvPB/WIuFFHIeOGg2vg130TiPZ/i6uo+MXj8sxwU3ja/A1zhCotx4iD
-   Rm4djpBf1KpefQPZK7TCMBP/BuNAxcxaeAWQNRLElQDB71YJrYljU63GW
-   xRz7xoNvBYi1wCQRZwBj89JLezva3JQl/jkoT6TfQTBnGjwlCJIh/ZRpx
-   rtKQtApmSx6lWx8e68K7u2Tw+zNXPZZQ9DNesFLiPvJFSZ4hmyKdAOESe
-   g==;
-X-CSE-ConnectionGUID: 1Zh5pnm8Rhakk4rBEWuf9Q==
-X-CSE-MsgGUID: iwBmHDPaRJayDO/Z3UQ3Nw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11433"; a="53040786"
-X-IronPort-AV: E=Sophos;i="6.15,290,1739865600"; 
-   d="scan'208";a="53040786"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2025 02:47:05 -0700
-X-CSE-ConnectionGUID: OP9eTKngQ0qePjVUpg42Hg==
-X-CSE-MsgGUID: 9cTrOAPVTouqMv9m14Z64A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,290,1739865600"; 
-   d="scan'208";a="138369640"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2025 02:47:04 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387D81E5B97;
+	Thu, 15 May 2025 09:53:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747302814; cv=none; b=N/GssCMgtEY5EXYGURYDv86Lee6Gwt3DgxLgNA3/NZQ4+vjPpW7TwJXp0cQ+n5AxszIC+t6lia0ajTuywLeoJ/0W6JMahYa4YDpYbxgK082B4MjZAP6hBINpruPcUjC4EbKEcl3keCPytJKSSpDEsvI3DgBtC2sX+pakD5oxAJg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747302814; c=relaxed/simple;
+	bh=G2Pp+zEBhwHrzDV/IgEZ8yvXQTJ6BUMUwvI4bbMyqdA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kt64NKcRM5LSewMTRgPmiKKpDpIgV5/M3SqSIOR4+GLLi3zlt/ucxlrtmxPhCFw3r/Yy49UultYUaFk2TjviqVwOSxzpHGXzkp1swX1vIQpMfb2vng7p6yKpcsKJJ3ZuG06He3rUuK/9n06lishaVxqWC52MkBDkUD2lv/pOcLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=Q+6Hy/Ht; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 54F9r8sjD3224089, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1747302788; bh=G2Pp+zEBhwHrzDV/IgEZ8yvXQTJ6BUMUwvI4bbMyqdA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=Q+6Hy/HtGwZMxeF85ZI8GPMs2j9A1zQDmP1RK3VbGON/ztWzQVMddedLKXLEFWf4t
+	 rvd6KKclrsRluttCdDlGAtpH5dL0XamjebJzB4y2Djw1+1ioZAl8mVLx1cVx1b1rgg
+	 CQkTHVPT92blkdiql1cbUR0ar0c89fiXGhYXwxtqXOrhgFbLpj4KI3xVMw1k0tO0cm
+	 M2dLyXQr4r2urwjf9fTN2z6wpQwWMRc/3Ml+br2zWMMcQ0NFbzUxBQplzNHSGWL5M0
+	 pXrtFv+ZBMlTtRkawjnmyaZaTh9qVSoXcTo9uifYuzQyBSktZPpFjtn2IEj8/CWg19
+	 3X/KgH+l6zO3g==
+Received: from RS-EX-MBS4.realsil.com.cn ([172.29.17.104])
+	by rtits2.realtek.com.tw (8.15.2/3.13/5.93) with ESMTPS id 54F9r8sjD3224089
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 15 May 2025 17:53:08 +0800
+Received: from RS-EX-MBS1.realsil.com.cn (172.29.17.101) by
+ RS-EX-MBS4.realsil.com.cn (172.29.17.104) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Thu, 15 May 2025 02:47:03 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Thu, 15 May 2025 02:47:03 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.49) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Thu, 15 May 2025 02:47:02 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tM4XDTiv3+2qORb3oSdhV3TS1CUpuEuy6aRbdH++v0NJ3TgNTo0NUoQoPUB+ml+CtdBgHw3rbpFrzEfdT6u4mnD+zWa9xWpCqQwbwHAbCZSW+niYngQQisVHjHyeRpUnlhVJEJWupPG38bj6SUKl82Snnb3Zyy0JfQ8WLky6DNIzfbUCP967Fj0NGbiiABbQDqvDYR74qByMqW9TYUET7pOh5214yuKG5aaz7Zn+tojs5BrQMxZyLGRcsH73JObmH+VGo6vZkj/rMvUeE3fMMELLphnCjrBqHS+L+PwpMqe/5nYOEyeTv186W3En75f4+9N+ymEQlf+SCRxN54iXJw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dniFtf4pMkJyecP3wMo3SaAEZri4iVZcF6Q4cTqQ68E=;
- b=qoTX+rEyNFD47LJvXiserWVRDEgZmeGz1JBwceuvLYYu0dyInkl1IVKRHe7sRDMioJoUsigVhDxT0DVy2M87jvBSbJ740LMI5gzR8rAo7rxuaxWv6cMJB66klS3GkPAkaDPzJff+SH4qM/Ho3zQOW+Dxz/QFV56kYFc5vq5i9xSZFTdN+/MhGTQF0VHjC4wkT9eeiYbEzTGXobCC7CMvKePDvmramE+2oL/uXBPIG2T3NPUP76VzEJrCPUdzpnmncb9LABF9msmOZdAgBKBgxRJTnlqRYJZ8aQw2CObpf73fWH/TZKTx8oOUWorXCL6Jdrzx67LyXeSAbKpbQLMmYQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8665.namprd11.prod.outlook.com (2603:10b6:8:1b8::6) by
- PH7PR11MB7720.namprd11.prod.outlook.com (2603:10b6:510:2b3::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.31; Thu, 15 May
- 2025 09:46:58 +0000
-Received: from DS0PR11MB8665.namprd11.prod.outlook.com
- ([fe80::8e7e:4f8:f7e4:3955]) by DS0PR11MB8665.namprd11.prod.outlook.com
- ([fe80::8e7e:4f8:f7e4:3955%5]) with mapi id 15.20.8699.026; Thu, 15 May 2025
- 09:46:58 +0000
-Date: Thu, 15 May 2025 11:46:52 +0200
-From: Michal Kubiak <michal.kubiak@intel.com>
-To: Jacob Keller <jacob.e.keller@intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <maciej.fijalkowski@intel.com>,
-	<netdev@vger.kernel.org>, <przemyslaw.kitszel@intel.com>, <horms@kernel.org>,
-	<anthony.l.nguyen@intel.com>, Michal Swiatkowski
-	<michal.swiatkowski@intel.com>
-Subject: Re: [PATCH iwl-net v2] ice: add a separate Rx handler for flow
- director commands
-Message-ID: <aCW4DDk7kUsAqCJr@localhost.localdomain>
-References: <20250514123724.250750-1-michal.kubiak@intel.com>
- <c8daed51-5935-4070-8d8b-8994d348f746@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <c8daed51-5935-4070-8d8b-8994d348f746@intel.com>
-X-ClientProxiedBy: VI1P190CA0041.EURP190.PROD.OUTLOOK.COM
- (2603:10a6:800:1bb::8) To DS0PR11MB8665.namprd11.prod.outlook.com
- (2603:10b6:8:1b8::6)
+ 15.2.1544.11; Thu, 15 May 2025 17:53:08 +0800
+Received: from 172.29.32.27 (172.29.32.27) by RS-EX-MBS1.realsil.com.cn
+ (172.29.17.101) with Microsoft SMTP Server id 15.2.1544.11 via Frontend
+ Transport; Thu, 15 May 2025 17:53:08 +0800
+From: ChunHao Lin <hau@realtek.com>
+To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <andrew+netdev@lunn.ch>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        ChunHao Lin
+	<hau@realtek.com>
+Subject: [PATCH net-next v2] r8169: add support for RTL8127A
+Date: Thu, 15 May 2025 17:53:03 +0800
+Message-ID: <20250515095303.3138-1-hau@realtek.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8665:EE_|PH7PR11MB7720:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5ec3d75d-9eb6-4429-f457-08dd93956f2c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?o5DqKlp8IX3x5bc/jSLe5HAe0dmxRpdcu6RAZsqF8Kxx/OD5MEJAnpMKl4Lc?=
- =?us-ascii?Q?C9/hJ1qVceL2jgoNl+ZSgXbQ7OlliLEqH2J4GKUgYX9XKDbAntZ20bf9gcWO?=
- =?us-ascii?Q?Hst2lcZMUxYC6Ldm4EzI6ihEJaooJnao5bFNdM9ZT/CGLpMoDKnhHfpnDuI7?=
- =?us-ascii?Q?mxYfnjrl+/fSLMZIEaiCVRGWdkh/gUz9GigYUXDQbcFumZ4PQVftu8KNLggV?=
- =?us-ascii?Q?fOsiD6Q6ZurzwU9DRjdjoy6nwpYyMob346Av1gznj7XujrrLDNfGHVIOO24M?=
- =?us-ascii?Q?w4XfCy3EfacofI8dOXOPMyHF/dsPNAagI54qpLfy+UMy8lWhzexYH+mYY9WV?=
- =?us-ascii?Q?I9S5Hh9GcjZpQ4Xx5oJGD0oojnVAmRG6NFkI2AHD+vFbwyO0t6bWI3UjX7A7?=
- =?us-ascii?Q?e6SqF0PLOwvtcdJcsQCJsrDSGb5N644nk68N2+FgnEVzOpOuBFuPziv7fJqc?=
- =?us-ascii?Q?Q+7uVGY0L1qIY5rpNkGVoDlKaLwr6hyiunZGoEb7gKOCrLa8Sqd1vK4URuAC?=
- =?us-ascii?Q?0FBu7QeYDFMKo5quYxL8U9adNhyqcHUIC0+GUu2nZwCkm+gFsMoHW1adUfco?=
- =?us-ascii?Q?tOmUWH1ikBa1p7KF14uZNGAnwwoS31bjE+RuDEbuG0c9khrITJvr+s0xrOaL?=
- =?us-ascii?Q?reJeQh9OTCmz1aPEFHfW05nyr6hAGyf+XBzHE7wy7wXqjXwWsnfPC+4U7ZAm?=
- =?us-ascii?Q?90VliIAtROqUianHfbYib0paGgwRC5zRw6Vdl0/u6pRwof6PdOsAppA/wd2V?=
- =?us-ascii?Q?ZXUnAa7HcB3rR4gQyXaHSMPgcuAvaVhrYS33r4BAEmhoAEIhPtB50+Y4jFz2?=
- =?us-ascii?Q?GSsAEUCx2mBB8Mi6KOLo1proKR2O6mrDX/g+MCS9lpH/PMXlkLfxcPeSTe7r?=
- =?us-ascii?Q?MazkfaK/77Uhpdep1tC6yXixw3og/C8mit5dUC8pjp/eRcVXTxYOH5TFGkQA?=
- =?us-ascii?Q?54zvhKP/jLBjqGPseiCCTJ7IGe/8iiGXA8U+Vz1h9ycSw++F5054I2XW0lbx?=
- =?us-ascii?Q?CeA66JdJCQ01dy24d7YNcXetyB0rG/galzTaTWaD0ETF1ruZyJmYr2+c+nDt?=
- =?us-ascii?Q?gV/xw3EJz/1xO0nnHIFCuGWJA4EaD30/7/fE11G9AGdJaae9SnL39Jl2B5ej?=
- =?us-ascii?Q?8eKChYlelklFP+h7erEpJ0bf8kVcqB4STHuKDAVEd5RFDtDKBOoKB2M53w7t?=
- =?us-ascii?Q?WFy/DeG1YA8x3HuU3MGdoL5o6ttddTs1j177RyGIQrWf6SZycmqABuH1ZKug?=
- =?us-ascii?Q?v76IjFSUXF3Sxgs7BZQEIg0fYPwO2MFYBUY1uRaVgAvZLKx/tLAgaWy95MX0?=
- =?us-ascii?Q?DdbBQjK599e7V6dV+Oy7fi7yff0tpnZBQUG2694bbl+ch5rYizO7vzz4fwF3?=
- =?us-ascii?Q?3ZiDJdv7+5ffqpwXQz3YKJQHqBasf/auNTW5UZXlV4dNp7qhWQ5I/YV2A3JN?=
- =?us-ascii?Q?LS8iG6VoyCE=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8665.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?MDBNmM0gO7Q0m66FYssN5mko85LKXaTT/CWpAXXAWnk+wO5tB0SILj2u3xyp?=
- =?us-ascii?Q?rVqGbgnUteYtigbupsObzmFbtOvCIcLF8irnMmYVshYWhj1RuCrJ0bs6VzKI?=
- =?us-ascii?Q?4Z4cZV/IOjZ+kHSCPt1r6oZzY7hah8C8i3JMW0osCzpKjnWWU7uhMomwGOKg?=
- =?us-ascii?Q?fbw9C+JA94NmiQINyflEsjzSmLM83/7uR23OeWiqiMO94Ir+BZsqS2AxbWNA?=
- =?us-ascii?Q?im8s8WUYCMdC7rJavfIVHZM5UuTcS5ZQGG8+Wcs9P9SDaLG6iTkOVqCG9bdc?=
- =?us-ascii?Q?IvRY2u4b3QXVHNH39BGD2tCqcTLdlg1QFcE9qMofWKTP9T9thZcBzy7rqbXN?=
- =?us-ascii?Q?tY1cqbMA7oHP0DxbgOd+nee6l43U0LtdbG3rjOSBMCzKxCgKsM0B5emL7loW?=
- =?us-ascii?Q?SqnZJi71g1gIqw0f5ksfvk+186aFLJDSGSgz05ehLjLXD+aPCEOhbkNZe34y?=
- =?us-ascii?Q?qJkt56aZD9PQN81TADr8WPU9fwleoKxz+S6cSU6Vl07yZOe0sM+N3LBkhTbx?=
- =?us-ascii?Q?6p8xWW1zmxQDANkt2oOaoxJgpH97pWjWo0XioCNMNo7rZmN7HaX0csFsv19y?=
- =?us-ascii?Q?09s0Ms3hJZdXU/LPg1YJA7kNTpNmlcS/23RWfBfTyG7Z/zumptyxuomDuEt7?=
- =?us-ascii?Q?SS5RBD2bzynnqrgWqXFDw/+qbTZzkbLGECt/s3aNLphx/BK8hvaeShjApm3M?=
- =?us-ascii?Q?FOxjYLBPLjvnMZOpyTm+0t4f/MkkKMjm17UNMV10BwYvvBj9H+XVlkrxMi37?=
- =?us-ascii?Q?NZfxp/3x3rnOM9RdAP+mkprMnWsB7ZX03pCnPchgek+GOAYBegumZOn6nm0A?=
- =?us-ascii?Q?0wlLJfQPFSyZsZJoCFz+die4K3KIGD+HcT10TnkdtdmSEdvs8ydhFvTRRytv?=
- =?us-ascii?Q?rW8JP8GV2EMFOje1DOIqIl7nqDLEcjSWQ0vZmaafMAUwkD4fVXh3g4B6StN7?=
- =?us-ascii?Q?nXU1TXbpRQvaATPXWaYLFE77dqX1Tg9OedqHT09CTpcHPon5tkOdnkm/YxQd?=
- =?us-ascii?Q?1FoUWHYot56YKG6v2jkjwhJMvPrXBHjn3f1DMvyfAsYAZej4nkLDVK/G4nEi?=
- =?us-ascii?Q?+PtQVEZOrBA7x+H5ltG7fVZW4aDDkPq9qfSJ0eiRZNBtcpyYguXmHNft3LmY?=
- =?us-ascii?Q?7OdrZChAgRN4cy2HUultM6YpdrhIbazBievA6SQpqcbHxRSa+W5zolhFZekd?=
- =?us-ascii?Q?DoEFtz3SIdAr8gCqUg9mP5fIcHJtqdXAy2RQKsHPyy3YdUJXzazkeFrK+mKW?=
- =?us-ascii?Q?oTc7VIryZI+4oT1i6BqMGunhYAXB7gcIkfU9H+uVArTxZxjAlQ8PiWaRO/Gt?=
- =?us-ascii?Q?lh5UAr8kjlmIpZK9zmENTT7VGmT+Gswob/QpjvA1kLf0mybsrlIEL9rD2ydK?=
- =?us-ascii?Q?VLgLFGoaORY76CGXSijdoWWXJIrEid73LAA0Oxv8yXRwGUFb2JdGAZnRnIXK?=
- =?us-ascii?Q?AxrEk5aSTpDTmjaLg5SpsKOwAhrBouleNFEO3NbpZAgs7lhw798Z4IA0dX4z?=
- =?us-ascii?Q?sXYyrDOI16zRg5KlOafm8i/YAuYqZwVKGJHIcH3q4/14EDfcNMLDC+ZbLexI?=
- =?us-ascii?Q?5jwFGpIYSBgWRordO1zK+ZkapBzJeMAGfyKR5u7pYRSPxL/yYXqqLYndFeEK?=
- =?us-ascii?Q?rg=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5ec3d75d-9eb6-4429-f457-08dd93956f2c
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8665.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 May 2025 09:46:58.2824
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Z/HPhEpqlG0xdNWt3TfaXgmp+ElgNlV8dMz2EvKcW93a80clswfswBDr6Qc+nIoqhGb65Eq/+eSSr0TCyIXelg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7720
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Wed, May 14, 2025 at 01:50:22PM -0700, Jacob Keller wrote:
-> 
-> 
-> On 5/14/2025 5:37 AM, Michal Kubiak wrote:
-> > The "ice" driver implementation uses the control VSI to handle
-> > the flow director configuration for PFs and VFs.
-> > 
-> > Unfortunately, although a separate VSI type was created to handle flow
-> > director queues, the Rx queue handler was shared between the flow
-> > director and a standard NAPI Rx handler.
-> > 
-> > Such a design approach was not very flexible. First, it mixed hotpath
-> > and slowpath code, blocking their further optimization. It also created
-> > a huge overkill for the flow director command processing, which is
-> > descriptor-based only, so there is no need to allocate Rx data buffers.
-> > 
-> > For the above reasons, implement a separate Rx handler for the control
-> > VSI. Also, remove from the NAPI handler the code dedicated to
-> > configuring the flow director rules on VFs.
-> > Do not allocate Rx data buffers to the flow director queues because
-> > their processing is descriptor-based only.
-> > Finally, allow Rx data queues to be allocated only for VSIs that have
-> > netdev assigned to them.
-> > 
-> > This handler splitting approach is the first step in converting the
-> > driver to use the Page Pool (which can only be used for data queues).
-> > 
-> > Test hints:
-> >   1. Create a VF for any PF managed by the ice driver.
-> >   2. In a loop, add and delete flow director rules for the VF, e.g.:
-> > 
-> >        for i in {1..128}; do
-> >            q=$(( i % 16 ))
-> >            ethtool -N ens802f0v0 flow-type tcp4 dst-port "$i" action "$q"
-> >        done
-> > 
-> >        for i in {0..127}; do
-> >            ethtool -N ens802f0v0 delete "$i"
-> >        done
-> > 
-> > Suggested-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> > Suggested-by: Michal Swiatkowski <michal.swiatkowski@intel.com>
-> > Acked-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> > Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> > Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> > Reviewed-by: Simon Horman <horms@kernel.org>
-> > Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
-> > ---
-> 
-> I assume you meant for this to be still targeted at iwl-next and the
-> iwl-net was a typo?
-> 
-> I'll queue on the next dev-queue.
-> 
-> Thanks,
-> Jake
+This adds support for 10Gbs chip RTL8127A.
 
+Signed-off-by: ChunHao Lin <hau@realtek.com>
+---
+v1 -> v2: update phy parameters
 
-You are right. Of course, it was a typo. My apologies for that!
-Thank you for your vigilance and double-checking!
+ drivers/net/ethernet/realtek/r8169.h          |   1 +
+ drivers/net/ethernet/realtek/r8169_main.c     |  29 ++-
+ .../net/ethernet/realtek/r8169_phy_config.c   | 166 ++++++++++++++++++
+ 3 files changed, 193 insertions(+), 3 deletions(-)
 
-Thanks,
-Michal
+diff --git a/drivers/net/ethernet/realtek/r8169.h b/drivers/net/ethernet/realtek/r8169.h
+index f05231030925..2c1a0c21af8d 100644
+--- a/drivers/net/ethernet/realtek/r8169.h
++++ b/drivers/net/ethernet/realtek/r8169.h
+@@ -70,6 +70,7 @@ enum mac_version {
+ 	RTL_GIGA_MAC_VER_64,
+ 	RTL_GIGA_MAC_VER_66,
+ 	RTL_GIGA_MAC_VER_70,
++	RTL_GIGA_MAC_VER_80,
+ 	RTL_GIGA_MAC_NONE,
+ 	RTL_GIGA_MAC_VER_LAST = RTL_GIGA_MAC_NONE - 1
+ };
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 7bf71a675362..43170500d566 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -60,6 +60,7 @@
+ #define FIRMWARE_8125BP_2	"rtl_nic/rtl8125bp-2.fw"
+ #define FIRMWARE_8126A_2	"rtl_nic/rtl8126a-2.fw"
+ #define FIRMWARE_8126A_3	"rtl_nic/rtl8126a-3.fw"
++#define FIRMWARE_8127A_1	"rtl_nic/rtl8127a-1.fw"
+ 
+ #define TX_DMA_BURST	7	/* Maximum PCI burst, '7' is unlimited */
+ #define InterFrameGap	0x03	/* 3 means InterFrameGap = the shortest one */
+@@ -98,6 +99,9 @@ static const struct rtl_chip_info {
+ 	const char *name;
+ 	const char *fw_name;
+ } rtl_chip_infos[] = {
++	/* 8127A family. */
++	{ 0x7cf, 0x6c9,	RTL_GIGA_MAC_VER_80, "RTL8127A", FIRMWARE_8127A_1 },
++
+ 	/* 8126A family. */
+ 	{ 0x7cf, 0x64a,	RTL_GIGA_MAC_VER_70, "RTL8126A", FIRMWARE_8126A_3 },
+ 	{ 0x7cf, 0x649,	RTL_GIGA_MAC_VER_70, "RTL8126A", FIRMWARE_8126A_2 },
+@@ -222,8 +226,10 @@ static const struct pci_device_id rtl8169_pci_tbl[] = {
+ 	{ 0x0001, 0x8168, PCI_ANY_ID, 0x2410 },
+ 	{ PCI_VDEVICE(REALTEK,	0x8125) },
+ 	{ PCI_VDEVICE(REALTEK,	0x8126) },
++	{ PCI_VDEVICE(REALTEK,	0x8127) },
+ 	{ PCI_VDEVICE(REALTEK,	0x3000) },
+ 	{ PCI_VDEVICE(REALTEK,	0x5000) },
++	{ PCI_VDEVICE(REALTEK,	0x0e10) },
+ 	{}
+ };
+ 
+@@ -769,6 +775,7 @@ MODULE_FIRMWARE(FIRMWARE_8125D_2);
+ MODULE_FIRMWARE(FIRMWARE_8125BP_2);
+ MODULE_FIRMWARE(FIRMWARE_8126A_2);
+ MODULE_FIRMWARE(FIRMWARE_8126A_3);
++MODULE_FIRMWARE(FIRMWARE_8127A_1);
+ 
+ static inline struct device *tp_to_dev(struct rtl8169_private *tp)
+ {
+@@ -2937,6 +2944,7 @@ static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
+ 		rtl_mod_config5(tp, 0, ASPM_en);
+ 		switch (tp->mac_version) {
+ 		case RTL_GIGA_MAC_VER_70:
++		case RTL_GIGA_MAC_VER_80:
+ 			val8 = RTL_R8(tp, INT_CFG0_8125) | INT_CFG0_CLKREQEN;
+ 			RTL_W8(tp, INT_CFG0_8125, val8);
+ 			break;
+@@ -2968,6 +2976,7 @@ static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
+ 
+ 		switch (tp->mac_version) {
+ 		case RTL_GIGA_MAC_VER_70:
++		case RTL_GIGA_MAC_VER_80:
+ 			val8 = RTL_R8(tp, INT_CFG0_8125) & ~INT_CFG0_CLKREQEN;
+ 			RTL_W8(tp, INT_CFG0_8125, val8);
+ 			break;
+@@ -3687,10 +3696,13 @@ static void rtl_hw_start_8125_common(struct rtl8169_private *tp)
+ 	/* disable new tx descriptor format */
+ 	r8168_mac_ocp_modify(tp, 0xeb58, 0x0001, 0x0000);
+ 
+-	if (tp->mac_version == RTL_GIGA_MAC_VER_70)
++	if (tp->mac_version == RTL_GIGA_MAC_VER_70 ||
++	    tp->mac_version == RTL_GIGA_MAC_VER_80)
+ 		RTL_W8(tp, 0xD8, RTL_R8(tp, 0xD8) & ~0x02);
+ 
+-	if (tp->mac_version == RTL_GIGA_MAC_VER_70)
++	if (tp->mac_version == RTL_GIGA_MAC_VER_80)
++		r8168_mac_ocp_modify(tp, 0xe614, 0x0f00, 0x0f00);
++	else if (tp->mac_version == RTL_GIGA_MAC_VER_70)
+ 		r8168_mac_ocp_modify(tp, 0xe614, 0x0700, 0x0400);
+ 	else if (tp->mac_version == RTL_GIGA_MAC_VER_63)
+ 		r8168_mac_ocp_modify(tp, 0xe614, 0x0700, 0x0200);
+@@ -3708,7 +3720,8 @@ static void rtl_hw_start_8125_common(struct rtl8169_private *tp)
+ 	r8168_mac_ocp_modify(tp, 0xe056, 0x00f0, 0x0030);
+ 	r8168_mac_ocp_modify(tp, 0xe040, 0x1000, 0x0000);
+ 	r8168_mac_ocp_modify(tp, 0xea1c, 0x0003, 0x0001);
+-	if (tp->mac_version == RTL_GIGA_MAC_VER_70)
++	if (tp->mac_version == RTL_GIGA_MAC_VER_70 ||
++	    tp->mac_version == RTL_GIGA_MAC_VER_80)
+ 		r8168_mac_ocp_modify(tp, 0xea1c, 0x0300, 0x0000);
+ 	else
+ 		r8168_mac_ocp_modify(tp, 0xea1c, 0x0004, 0x0000);
+@@ -3786,6 +3799,12 @@ static void rtl_hw_start_8126a(struct rtl8169_private *tp)
+ 	rtl_hw_start_8125_common(tp);
+ }
+ 
++static void rtl_hw_start_8127a(struct rtl8169_private *tp)
++{
++	rtl_set_def_aspm_entry_latency(tp);
++	rtl_hw_start_8125_common(tp);
++}
++
+ static void rtl_hw_config(struct rtl8169_private *tp)
+ {
+ 	static const rtl_generic_fct hw_configs[] = {
+@@ -3829,6 +3848,7 @@ static void rtl_hw_config(struct rtl8169_private *tp)
+ 		[RTL_GIGA_MAC_VER_64] = rtl_hw_start_8125d,
+ 		[RTL_GIGA_MAC_VER_66] = rtl_hw_start_8125d,
+ 		[RTL_GIGA_MAC_VER_70] = rtl_hw_start_8126a,
++		[RTL_GIGA_MAC_VER_80] = rtl_hw_start_8127a,
+ 	};
+ 
+ 	if (hw_configs[tp->mac_version])
+@@ -3846,8 +3866,11 @@ static void rtl_hw_start_8125(struct rtl8169_private *tp)
+ 	case RTL_GIGA_MAC_VER_61:
+ 	case RTL_GIGA_MAC_VER_64:
+ 	case RTL_GIGA_MAC_VER_66:
++	case RTL_GIGA_MAC_VER_80:
+ 		for (i = 0xa00; i < 0xb00; i += 4)
+ 			RTL_W32(tp, i, 0);
++		if (tp->mac_version == RTL_GIGA_MAC_VER_80)
++			RTL_W16(tp, INT_CFG1_8125, 0x0000);
+ 		break;
+ 	case RTL_GIGA_MAC_VER_63:
+ 	case RTL_GIGA_MAC_VER_70:
+diff --git a/drivers/net/ethernet/realtek/r8169_phy_config.c b/drivers/net/ethernet/realtek/r8169_phy_config.c
+index 5403f8202c79..032d9d2cfa2a 100644
+--- a/drivers/net/ethernet/realtek/r8169_phy_config.c
++++ b/drivers/net/ethernet/realtek/r8169_phy_config.c
+@@ -1130,6 +1130,171 @@ static void rtl8126a_hw_phy_config(struct rtl8169_private *tp,
+ 	rtl8125_common_config_eee_phy(phydev);
+ }
+ 
++static void rtl8127a_1_hw_phy_config(struct rtl8169_private *tp,
++				     struct phy_device *phydev)
++{
++	r8169_apply_firmware(tp);
++	rtl8168g_enable_gphy_10m(phydev);
++
++	r8168g_phy_param(phydev, 0x8415, 0xff00, 0x9300);
++	r8168g_phy_param(phydev, 0x81a3, 0xff00, 0x0f00);
++	r8168g_phy_param(phydev, 0x81ae, 0xff00, 0x0f00);
++	r8168g_phy_param(phydev, 0x81b9, 0xff00, 0xb900);
++	rtl8125_phy_param(phydev, 0x83b0, 0x0e00, 0x0000);
++	rtl8125_phy_param(phydev, 0x83C5, 0x0e00, 0x0000);
++	rtl8125_phy_param(phydev, 0x83da, 0x0e00, 0x0000);
++	rtl8125_phy_param(phydev, 0x83ef, 0x0e00, 0x0000);
++	phy_modify_paged(phydev, 0x0bf3, 0x14, 0x01f0, 0x0160);
++	phy_modify_paged(phydev, 0x0bf3, 0x15, 0x001f, 0x0014);
++	phy_modify_paged(phydev, 0x0bf2, 0x14, 0x6000, 0x0000);
++	phy_modify_paged(phydev, 0x0bf2, 0x16, 0xc000, 0x0000);
++	phy_modify_paged(phydev, 0x0bf2, 0x14, 0x1fff, 0x0187);
++	phy_modify_paged(phydev, 0x0bf2, 0x15, 0x003f, 0x0003);
++
++	r8168g_phy_param(phydev, 0x8173, 0xffff, 0x8620);
++	r8168g_phy_param(phydev, 0x8175, 0xffff, 0x8671);
++	r8168g_phy_param(phydev, 0x817c, 0x0000, 0x2000);
++	r8168g_phy_param(phydev, 0x8187, 0x0000, 0x2000);
++	r8168g_phy_param(phydev, 0x8192, 0x0000, 0x2000);
++	r8168g_phy_param(phydev, 0x819d, 0x0000, 0x2000);
++	r8168g_phy_param(phydev, 0x81a8, 0x2000, 0x0000);
++	r8168g_phy_param(phydev, 0x81b3, 0x2000, 0x0000);
++	r8168g_phy_param(phydev, 0x81be, 0x0000, 0x2000);
++	r8168g_phy_param(phydev, 0x817d, 0xff00, 0xa600);
++	r8168g_phy_param(phydev, 0x8188, 0xff00, 0xa600);
++	r8168g_phy_param(phydev, 0x8193, 0xff00, 0xa600);
++	r8168g_phy_param(phydev, 0x819e, 0xff00, 0xa600);
++	r8168g_phy_param(phydev, 0x81a9, 0xff00, 0x1400);
++	r8168g_phy_param(phydev, 0x81b4, 0xff00, 0x1400);
++	r8168g_phy_param(phydev, 0x81bf, 0xff00, 0xa600);
++
++	phy_modify_paged(phydev, 0x0aea, 0x15, 0x0028, 0x0000);
++
++	rtl8125_phy_param(phydev, 0x84f0, 0xffff, 0x201c);
++	rtl8125_phy_param(phydev, 0x84f2, 0xffff, 0x3117);
++
++	phy_write_paged(phydev, 0x0aec, 0x13, 0x0000);
++	phy_write_paged(phydev, 0x0ae2, 0x10, 0xffff);
++	phy_write_paged(phydev, 0x0aec, 0x17, 0xffff);
++	phy_write_paged(phydev, 0x0aed, 0x11, 0xffff);
++	phy_write_paged(phydev, 0x0aec, 0x14, 0x0000);
++	phy_modify_paged(phydev, 0x0aed, 0x10, 0x0001, 0x0000);
++	phy_write_paged(phydev, 0x0adb, 0x14, 0x0150);
++	rtl8125_phy_param(phydev, 0x8197, 0xff00, 0x5000);
++	rtl8125_phy_param(phydev, 0x8231, 0xff00, 0x5000);
++	rtl8125_phy_param(phydev, 0x82cb, 0xff00, 0x5000);
++	rtl8125_phy_param(phydev, 0x82cd, 0xff00, 0x5700);
++	rtl8125_phy_param(phydev, 0x8233, 0xff00, 0x5700);
++	rtl8125_phy_param(phydev, 0x8199, 0xff00, 0x5700);
++
++	rtl8125_phy_param(phydev, 0x815a, 0xffff, 0x0150);
++	rtl8125_phy_param(phydev, 0x81f4, 0xffff, 0x0150);
++	rtl8125_phy_param(phydev, 0x828e, 0xffff, 0x0150);
++	rtl8125_phy_param(phydev, 0x81b1, 0xffff, 0x0000);
++	rtl8125_phy_param(phydev, 0x824b, 0xffff, 0x0000);
++	rtl8125_phy_param(phydev, 0x82e5, 0xffff, 0x0000);
++
++	rtl8125_phy_param(phydev, 0x84f7, 0xff00, 0x2800);
++	phy_modify_paged(phydev, 0x0aec, 0x11, 0x0000, 0x1000);
++	rtl8125_phy_param(phydev, 0x81b3, 0xff00, 0xad00);
++	rtl8125_phy_param(phydev, 0x824d, 0xff00, 0xad00);
++	rtl8125_phy_param(phydev, 0x82e7, 0xff00, 0xad00);
++	phy_modify_paged(phydev, 0x0ae4, 0x17, 0x000f, 0x0001);
++	rtl8125_phy_param(phydev, 0x82ce, 0xf000, 0x4000);
++
++	rtl8125_phy_param(phydev, 0x84ac, 0xffff, 0x0000);
++	rtl8125_phy_param(phydev, 0x84ae, 0xffff, 0x0000);
++	rtl8125_phy_param(phydev, 0x84b0, 0xffff, 0xf818);
++	rtl8125_phy_param(phydev, 0x84b2, 0xff00, 0x6000);
++
++	rtl8125_phy_param(phydev, 0x8ffc, 0xffff, 0x6008);
++	rtl8125_phy_param(phydev, 0x8ffe, 0xffff, 0xf450);
++
++	rtl8125_phy_param(phydev, 0x8015, 0x0000, 0x0200);
++	rtl8125_phy_param(phydev, 0x8016, 0x0800, 0x0000);
++	rtl8125_phy_param(phydev, 0x8fe6, 0xff00, 0x0800);
++	rtl8125_phy_param(phydev, 0x8fe4, 0xffff, 0x2114);
++
++	rtl8125_phy_param(phydev, 0x8647, 0xffff, 0xa7b1);
++	rtl8125_phy_param(phydev, 0x8649, 0xffff, 0xbbca);
++	rtl8125_phy_param(phydev, 0x864b, 0xff00, 0xdc00);
++
++	rtl8125_phy_param(phydev, 0x8154, 0xc000, 0x4000);
++	rtl8125_phy_param(phydev, 0x8158, 0xc000, 0x0000);
++
++	rtl8125_phy_param(phydev, 0x826c, 0xffff, 0xffff);
++	rtl8125_phy_param(phydev, 0x826e, 0xffff, 0xffff);
++
++	rtl8125_phy_param(phydev, 0x8872, 0xff00, 0x0e00);
++	r8168g_phy_param(phydev, 0x8012, 0x0000, 0x0800);
++	r8168g_phy_param(phydev, 0x8012, 0x0000, 0x4000);
++	phy_modify_paged(phydev, 0x0b57, 0x13, 0x0000, 0x0001);
++	r8168g_phy_param(phydev, 0x834a, 0xff00, 0x0700);
++	rtl8125_phy_param(phydev, 0x8217, 0x3f00, 0x2a00);
++	r8168g_phy_param(phydev, 0x81b1, 0xff00, 0x0b00);
++	rtl8125_phy_param(phydev, 0x8fed, 0xff00, 0x4e00);
++
++	rtl8125_phy_param(phydev, 0x88ac, 0xff00, 0x2300);
++	phy_modify_paged(phydev, 0x0bf0, 0x16, 0x0000, 0x3800);
++	rtl8125_phy_param(phydev, 0x88de, 0xff00, 0x0000);
++	rtl8125_phy_param(phydev, 0x80b4, 0xffff, 0x5195);
++
++	r8168g_phy_param(phydev, 0x8370, 0xffff, 0x8671);
++	r8168g_phy_param(phydev, 0x8372, 0xffff, 0x86c8);
++
++	r8168g_phy_param(phydev, 0x8401, 0xffff, 0x86c8);
++	r8168g_phy_param(phydev, 0x8403, 0xffff, 0x86da);
++	r8168g_phy_param(phydev, 0x8406, 0x1800, 0x1000);
++	r8168g_phy_param(phydev, 0x8408, 0x1800, 0x1000);
++	r8168g_phy_param(phydev, 0x840a, 0x1800, 0x1000);
++	r8168g_phy_param(phydev, 0x840c, 0x1800, 0x1000);
++	r8168g_phy_param(phydev, 0x840e, 0x1800, 0x1000);
++	r8168g_phy_param(phydev, 0x8410, 0x1800, 0x1000);
++	r8168g_phy_param(phydev, 0x8412, 0x1800, 0x1000);
++	r8168g_phy_param(phydev, 0x8414, 0x1800, 0x1000);
++	r8168g_phy_param(phydev, 0x8416, 0x1800, 0x1000);
++
++	r8168g_phy_param(phydev, 0x82bd, 0xffff, 0x1f40);
++
++	phy_modify_paged(phydev, 0x0bfb, 0x12, 0x07ff, 0x0328);
++	phy_write_paged(phydev, 0x0bfb, 0x13, 0x3e14);
++
++	r8168g_phy_param(phydev, 0x81c4, 0xffff, 0x003b);
++	r8168g_phy_param(phydev, 0x81c6, 0xffff, 0x0086);
++	r8168g_phy_param(phydev, 0x81c8, 0xffff, 0x00b7);
++	r8168g_phy_param(phydev, 0x81ca, 0xffff, 0x00db);
++	r8168g_phy_param(phydev, 0x81cc, 0xffff, 0x00fe);
++	r8168g_phy_param(phydev, 0x81ce, 0xffff, 0x00fe);
++	r8168g_phy_param(phydev, 0x81d0, 0xffff, 0x00fe);
++	r8168g_phy_param(phydev, 0x81d2, 0xffff, 0x00fe);
++	r8168g_phy_param(phydev, 0x81d4, 0xffff, 0x00c3);
++	r8168g_phy_param(phydev, 0x81d6, 0xffff, 0x0078);
++	r8168g_phy_param(phydev, 0x81d8, 0xffff, 0x0047);
++	r8168g_phy_param(phydev, 0x81da, 0xffff, 0x0023);
++
++	rtl8125_phy_param(phydev, 0x88d7, 0xffff, 0x01a0);
++	rtl8125_phy_param(phydev, 0x88d9, 0xffff, 0x01a0);
++	rtl8125_phy_param(phydev, 0x8ffa, 0xffff, 0x002a);
++
++	rtl8125_phy_param(phydev, 0x8fee, 0xffff, 0xffdf);
++	rtl8125_phy_param(phydev, 0x8ff0, 0xffff, 0xffff);
++	rtl8125_phy_param(phydev, 0x8ff2, 0xffff, 0x0a4a);
++	rtl8125_phy_param(phydev, 0x8ff4, 0xffff, 0xaa5a);
++	rtl8125_phy_param(phydev, 0x8ff6, 0xffff, 0x0a4a);
++
++	rtl8125_phy_param(phydev, 0x8ff8, 0xffff, 0xaa5a);
++	rtl8125_phy_param(phydev, 0x88d5, 0xff00, 0x0200);
++
++	r8168g_phy_param(phydev, 0x84bb, 0xff00, 0x0a00);
++	r8168g_phy_param(phydev, 0x84c0, 0xff00, 0x1600);
++
++	phy_modify_paged(phydev, 0x0a43, 0x10, 0x0000, 0x0003);
++
++	rtl8125_legacy_force_mode(phydev);
++	rtl8168g_disable_aldps(phydev);
++	rtl8125_common_config_eee_phy(phydev);
++}
++
+ void r8169_hw_phy_config(struct rtl8169_private *tp, struct phy_device *phydev,
+ 			 enum mac_version ver)
+ {
+@@ -1181,6 +1346,7 @@ void r8169_hw_phy_config(struct rtl8169_private *tp, struct phy_device *phydev,
+ 		[RTL_GIGA_MAC_VER_64] = rtl8125d_hw_phy_config,
+ 		[RTL_GIGA_MAC_VER_66] = rtl8125bp_hw_phy_config,
+ 		[RTL_GIGA_MAC_VER_70] = rtl8126a_hw_phy_config,
++		[RTL_GIGA_MAC_VER_80] = rtl8127a_1_hw_phy_config,
+ 	};
+ 
+ 	if (phy_configs[ver])
+-- 
+2.43.0
 
 
