@@ -1,156 +1,134 @@
-Return-Path: <netdev+bounces-190804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5BADAB8E76
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 20:05:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5443AB8E7A
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 20:07:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCD33A01765
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 18:05:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CADDA1BC5B76
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 18:07:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72E2B258CDC;
-	Thu, 15 May 2025 18:05:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1E51259C83;
+	Thu, 15 May 2025 18:07:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="md5Rt4ES"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dYdO38ER"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFE741EA7F9;
-	Thu, 15 May 2025 18:05:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DF7E258CED
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 18:07:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747332343; cv=none; b=VwYTt1ktSxzNH6oCji2jz0nq5KVJi6hz4GO+a6PBsl1PPqgV4FFmVPEFlPSDzg7PJSK3DhOL57G9sWHrLikN7rxELdLCq10aBkxJduuo0EgMvIRH3xbtZM30c1TQ0EAFIfZvOL238aOJUi1tX3vvR7YefrZKOp691mylVgjrAQs=
+	t=1747332429; cv=none; b=KWfHxVEGQL3ZDR5KIf+/n1D8U/R1z5C0+TXCKiY5fRGX5BgNXHjcQ7UbdiRPAbAGzxr+gbJ4dsoOWuD3GIz/EzVe20OiAOrxX9zIfFPzw2swhtalpB6T3+6efgKDble2wrbFdZEWiKNY+d5HqSPW2yQyZR9oIqawMXX6/yBQEFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747332343; c=relaxed/simple;
-	bh=qoH6LccZOlhTi7y76NH6szhTMUifU4ew3xvC7+xhRr8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mTZhbnvDHTH1+vtexn8ZhIe4DP13k1eHlXUXfdfZmjPCXCFQfrnoH3Km+wZY6+LuiUlDwUrOrLUNANSZDoo5XezoXBW62VwDw5N7frUK4wJYkqUQ2cBaAyYNZpnlLg0Pbtu2RBQFIVwB0RcB42dzLCm57eJXfPFn9WKoNeyeiIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=md5Rt4ES; arc=none smtp.client-ip=209.85.128.46
+	s=arc-20240116; t=1747332429; c=relaxed/simple;
+	bh=UfkRAC4qpgpaZfsCDo9L4vpZKdvv/ZofwvSx8Jxm7Zc=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=gndwAHr4u9KsqoItTGYBpMTZj64yUgniBr3HRQ5spWY7NMD04LQ9398evlKzeoSWxyDaz6sQff789fVO75w1s5lOufqE9O5pMAUjRsT0fZIJX/eB81lQ+32h9Z3c+Vkqv44VEL248eO8R/9LE02SCpcx/uBCy5t1wXvv1iLJPLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dYdO38ER; arc=none smtp.client-ip=209.85.160.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43cf848528aso10337395e9.2;
-        Thu, 15 May 2025 11:05:41 -0700 (PDT)
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-47692b9d059so18739261cf.3
+        for <netdev@vger.kernel.org>; Thu, 15 May 2025 11:07:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747332340; x=1747937140; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=4THNUf1uXf81C9jvxSlBYnSoxyqZaGOpOTb4vLyxUPk=;
-        b=md5Rt4ESPXCzQaEyuulZMmaCn0Xg+ILgR+/BUsbE5SDuNkwp9H0V3HijYIyIQG6qRU
-         572aTNiTDMO1jqdbdQJghDO/Z38ihXnVIp60juLj+JMxnSFKcwQGrPlmm0qa3qfic/2w
-         Nhl8FhBNi/tOOn3SzKMgcJW6jK2M+wcEE1Ml0SWQ/sWE90YJaYgJFtalptHHxIg7mUd/
-         BoANLeHAH+crySHgrPc7kWofbPGDYXHyQdC15JehTP1iTKmt39S8y/qwVUFB++qMZ7np
-         EKAsXOCAZHAzQKJQZiKsnS7rM1kMiyloowWKxZFPOvV7+uWtMlwWy2spFKfJQ/rSSS3Z
-         ixqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747332340; x=1747937140;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1747332427; x=1747937227; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4THNUf1uXf81C9jvxSlBYnSoxyqZaGOpOTb4vLyxUPk=;
-        b=ZgqEOk+9HvewUBL8rlSX0y5A2P1VRQmpJEg8ijOohD+wYomBk08lumodUjdDx+9tXp
-         oIQmTh91LTneCMcAP6WcYS0F7BmK/WMPmBc+//KNKpmIuSb36DZivClUl9wsJ6inrlHM
-         nazHAB/iLWPbyBALQ8tygPau+SixQ2Xssq4CFP5cW3YzuuGmoDmOvM8CQcrfHQZwKQEe
-         upLBSCaK9so0WdvF8WdZLhKPhaVg1PS+eMLLt8zkATYJA1UVbD9k9qq5/VEJYoIWKz37
-         Pdcq117c7kPkk9HGGOgdxoGnTz4jQk8Q2ZQSpMd+0P3bMqu4Y33aDU1xwdodOgIrydrl
-         FZ1A==
-X-Forwarded-Encrypted: i=1; AJvYcCViGskOvtc/pFl2PujVSujvaqe1SIdo1fXdh7VvKTy6GuJjyCrziBhm+GzGekTxQ+qokhHTzSsRgXPaRYE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZGDJ6+ZAoWla2er3mpBEvb01wr7jXgzV9maZcsrF4mEKlINVU
-	thJp3W2V8xyi33ihFZYAqtGeVthdITiI7wCBPqa9QTUtnBBRKcbYmEDN
-X-Gm-Gg: ASbGncvq1UpZrPY/b3gKyN1CsVLyVRNwWC2FqjgNeJfxFAC+0JMjYXa95ihiyWrvaKR
-	AN/qnqAulJgc42SPJ9zy8gG1xDuHkkhAeOYXgkk9taxRxqVLij/17/UPvHdZfImrNfyd0jX+BY/
-	NG/VbKlfb8Mj3Uk+QvKniqKhTvJftPkRbDBSVE0LwYZ+9BNCneXHkrMuRReh1ZdE2/BfIwQivkz
-	EWz5dm70JBbxZsSrV6YJtyxUIhRLTYgTY4R2dRRFroHrchuk3/XNPY5KLKwSFu2bHsXE+cLKcoR
-	c2UAHum7pOeJ8wBveOpQfwijnOMJPhClykjphmGSgx6O3wY85IiqXdYduQT69iXjq8bg1SXRu6Q
-	yiye45wkATGr/Vqen07NIEwquhYPremcHTv5A/dnBykg/0E9p3yUEQj1O5V7m+wjsnFBolxTInf
-	2zZRKzvJrtaw==
-X-Google-Smtp-Source: AGHT+IEAMZI0gYj6jUL1XNnD21cZordm0Cbrsc9of7B1lYW2lChuusSGJbdvOqSY1ZAdEKpZBYJs0w==
-X-Received: by 2002:a05:6000:4285:b0:3a0:b990:ab72 with SMTP id ffacd0b85a97d-3a35c847d18mr690722f8f.42.1747332339783;
-        Thu, 15 May 2025 11:05:39 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f4a:2300:ec36:b14d:f12:70b? (p200300ea8f4a2300ec36b14d0f12070b.dip0.t-ipconnect.de. [2003:ea:8f4a:2300:ec36:b14d:f12:70b])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3a35ca4d1easm231079f8f.5.2025.05.15.11.05.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 May 2025 11:05:39 -0700 (PDT)
-Message-ID: <9714d7a5-196d-4f7f-ab01-dcbbf883f064@gmail.com>
-Date: Thu, 15 May 2025 20:06:05 +0200
+        bh=RR7JrnS7mfr7qhFH8RRXZCc6PLy2j/Crv9ZkvGeQOgk=;
+        b=dYdO38ERfWFuRmzu1xWKdUI+cBF2z50Tsi7uUddXOM2fSESQAus6feOlEnmjaeY1rW
+         sojGhYrR386XHq1xPzXc0GXHBxokBjDBfsluOxeiN2ABwMvGJmrmIc45uT3Xft9iMitY
+         EvFh+L+sqUl2fgWZkxL9Zrkx4zxlFEgt3uGuouBzQY2NOVlXNOSrS2/GxhmL6Nm5+mvl
+         eKh52F6KehDU6pxd9xJQ1UyU6Si169+zAKCfmoqyj9KitEK300YY7tCgf3uXxBwRm5oK
+         koTPp4oWBXbWZJrGi1pa+WAd40Q+F9EGwN21am6HWfP8CcQjJz1zeSmHaQJnROAXT4A3
+         XXWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747332427; x=1747937227;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=RR7JrnS7mfr7qhFH8RRXZCc6PLy2j/Crv9ZkvGeQOgk=;
+        b=uZQNlRLwaiy+T1UI1u6osWYJyDEtsWF7SX2PmyA13XK4e3pT+9HYN1ugVbrb+jWJhN
+         Rwgb68hhgmrrlJwFevehIu6SUfZGK2a857db1r2YKuIkEoyfMg1jlgNlUlBY9ZMX5SXw
+         0vq8QV8w7HPs2kEoMrSo0iIRdl1Pl/weKY5BSS9hjQtPw1YhUb87eqfYiMBQnjAhPDQj
+         rwkc6GVHArfMZVF2L2vAreYJI0g3E+KRbjqBV6B18KxFps3ZHIj+IOVdrmFIyu2ruKQE
+         0uNahWZzQcCaLtWuLEBtK1/mcQcsk8zJGzIW/a5tVdsl3W+kx9Kgj3zsQLPvgT55RJTm
+         Inxg==
+X-Forwarded-Encrypted: i=1; AJvYcCXSPVcl2j9UInOlCeITFdQnl7WQ2hRzt/1CXZIHuVRf9VNgaty6EicJ8YLhOyW1e281YTD9cUs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxwrpJcfZv6olYavrjo74qFUGQc1uI8qtrKxRq1fwTS7wfH6wBL
+	MIFAzx8UCQTopaAceFPQoYfuxa162DpjJ7SgXz4ik2/l6hjcjI91tbQ8
+X-Gm-Gg: ASbGnct93bXdARKklYL42dChTkEo2yxIJWYd9y06u2jlM1pwS1965UvnP6MgznIPdyP
+	23S3lM7jdbk6ewyaLRU/lz8FpwUtkoiASP8MxdLHEaGAgo3GBB6etMlDjCgEppfvyb5+DZuqPpB
+	3z6lGwsh3AJe8e+YJ9Yw/Wdi5Y1ttOEwWXAQmFJRWUlUgm2TbpLRGqgZ0AiZyXrxWf0Fv3DEACy
+	7ocuHienkIIvZ7LNvVTbTXWdpnx/DOElUzhN0vCKEOPqLDNtRLwwtcZJtdMwyIdBUTy4xG9K0yi
+	Iv6vyBQrP+DIjRarAFH35g6e/dRxQ9Gc54wKlSpnDi+Nx1+2NH5Y1apYDp9Mq/cx8DV4dTohewv
+	Tjp2xRa6vAhzsGaKLi7llNt4=
+X-Google-Smtp-Source: AGHT+IFhic3BbMv7NU/0fkBJr6GWELOAuzAJKbexx/LRz82xF//d47Uy6HV3WYMY8JiUZuNF7jOvMw==
+X-Received: by 2002:a05:622a:1f16:b0:48a:3498:92f2 with SMTP id d75a77b69052e-494ae37fb71mr6505581cf.21.1747332426955;
+        Thu, 15 May 2025 11:07:06 -0700 (PDT)
+Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7cd468b69dfsm13586185a.79.2025.05.15.11.07.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 May 2025 11:07:06 -0700 (PDT)
+Date: Thu, 15 May 2025 14:07:06 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemb@google.com>
+Cc: Simon Horman <horms@kernel.org>, 
+ Christian Brauner <brauner@kernel.org>, 
+ Kuniyuki Iwashima <kuniyu@amazon.com>, 
+ Kuniyuki Iwashima <kuni1840@gmail.com>, 
+ netdev@vger.kernel.org
+Message-ID: <68262d4ab643_25ebe529488@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250514165226.40410-2-kuniyu@amazon.com>
+References: <20250514165226.40410-1-kuniyu@amazon.com>
+ <20250514165226.40410-2-kuniyu@amazon.com>
+Subject: Re: [PATCH v3 net-next 1/9] af_unix: Factorise test_bit() for
+ SOCK_PASSCRED and SOCK_PASSPIDFD.
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] r8169: add support for RTL8127A
-To: ChunHao Lin <hau@realtek.com>, nic_swsd@realtek.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250515095303.3138-1-hau@realtek.com>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <20250515095303.3138-1-hau@realtek.com>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-On 15.05.2025 11:53, ChunHao Lin wrote:
-> This adds support for 10Gbs chip RTL8127A.
+Kuniyuki Iwashima wrote:
+> Currently, the same checks for SOCK_PASSCRED and SOCK_PASSPIDFD
+> are scattered across many places.
 > 
-> Signed-off-by: ChunHao Lin <hau@realtek.com>
+> Let's centralise the bit tests to make the following changes cleaner.
+> 
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 > ---
-> v1 -> v2: update phy parameters
+>  net/unix/af_unix.c | 37 +++++++++++++++----------------------
+>  1 file changed, 15 insertions(+), 22 deletions(-)
 > 
->  drivers/net/ethernet/realtek/r8169.h          |   1 +
->  drivers/net/ethernet/realtek/r8169_main.c     |  29 ++-
->  .../net/ethernet/realtek/r8169_phy_config.c   | 166 ++++++++++++++++++
->  3 files changed, 193 insertions(+), 3 deletions(-)
-> 
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index 2ab20821d6bb..464e183ffdb8 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -765,6 +765,14 @@ static void copy_peercred(struct sock *sk, struct sock *peersk)
+>  	spin_unlock(&sk->sk_peer_lock);
+>  }
+>  
+> +static bool unix_may_passcred(const struct sock *sk)
+> +{
+> +	struct socket *sock = sk->sk_socket;
 
-Reviewed-by: Heiner Kallweit <hkallweit1@gmail.com>
+Also const?
+
+> +
+> +	return test_bit(SOCK_PASSCRED, &sock->flags) ||
+> +		test_bit(SOCK_PASSPIDFD, &sock->flags);
+> +}
 
