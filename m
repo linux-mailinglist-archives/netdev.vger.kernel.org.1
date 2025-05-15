@@ -1,151 +1,210 @@
-Return-Path: <netdev+bounces-190667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9A67AB835F
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 11:55:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF68BAB837D
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 12:04:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75EE01BC17B0
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 09:55:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F9B6169045
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 10:04:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2B8A297B8C;
-	Thu, 15 May 2025 09:55:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6D3D20B7FB;
+	Thu, 15 May 2025 10:03:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TnSf+BX7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="N+yo7qNJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEA1C297B6E
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 09:55:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D3F18DB37
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 10:03:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747302932; cv=none; b=EAqTD3gwOTf77cXuqoUS5LJVeP2bx83c37QOxou+sBA+PKU5cfSN8t8D4R1LHET6J260QfkVSZpxY9Q1PipvRxvMCDrqdEyxXr7xpNgCtS5NI088q79KpqCr3Josng8qQWPg15dSsyZA3DiUrskKpG77UkkY8pNMQeogFDUls8k=
+	t=1747303438; cv=none; b=oZmFHs/OvAUvmyUTvZxgWuI5EutryVkJTdsBwtxIrIVNMn7/4pf7BUG6lrZY+mdr8bGxBER5ZnkMJy67Zl+eSgMsFlCKTmNsUsO/ycFCmT2u90y/hl5l/mQ+DFrkjUY7uBZKFQqu531bQ4k6/CHMzC0crnvuhMe5i1qMmHQzCnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747302932; c=relaxed/simple;
-	bh=5U6gtE5DKJs+3iz70q0Fs++Wgk0JBNMWol2ZQLojvHs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uzQuq2ZTYCTTXYqrjqFTbRiFop+WIrrA3b5helDdqnJluZfbXJo3CgoalHAbjDciA+x0DvALiHAGahfWVe8xPldA76pkiTIebWFclHaDdyiGCJwZlfRyVP+InYurHyQfmR9ov1BIAwePXqPkm5ra8AuP2P8eRFPBSg6u6n0ZgV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TnSf+BX7; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747302928;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jiz6ndGJFjTghJ7XdcRmJq3QP9TYb8f/oaZ3mhqnyAI=;
-	b=TnSf+BX7fFQsFAjfmwU6PYfLSniyR/WEhnAAxIxkMvwBvhhrvA5ZECKxMlkI/85xRObqza
-	dkwwirf8bAchzX0K045EHo4uENjPzhv9iFuCxSSOLVtgYDcRbKQlfjBrT2zyiUowEwysR1
-	s5REbGUZCJRaDzOntC5QJpE3RCuTtlE=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-441-tmf6wDitOA-ef6zbU_dU0w-1; Thu, 15 May 2025 05:55:27 -0400
-X-MC-Unique: tmf6wDitOA-ef6zbU_dU0w-1
-X-Mimecast-MFC-AGG-ID: tmf6wDitOA-ef6zbU_dU0w_1747302926
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a34f19c977so359239f8f.0
-        for <netdev@vger.kernel.org>; Thu, 15 May 2025 02:55:26 -0700 (PDT)
+	s=arc-20240116; t=1747303438; c=relaxed/simple;
+	bh=dlqEUTpJCZWaVUS+7t4dkGH0Wc1GVH4dYnUHVIMArQ8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=f361v3vRSG8RhG/F6XhcaFTPXEb1x8q0GWaSKvBBdL4voo5epJMC+bvrdSkjqkK7rzIvzKz1OG28Nn7Gy5ZGbbNTkXRlIlVaFfZEfZnTZQN6t41dAEErmkaSMymV8R63yt3IDZP+c0XFzqVngVQTPhtpVOYTvvf8lF/2oBn1WxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=N+yo7qNJ; arc=none smtp.client-ip=209.85.160.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-476753132a8so7140361cf.3
+        for <netdev@vger.kernel.org>; Thu, 15 May 2025 03:03:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1747303436; x=1747908236; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=R60PgnRqqoPYovETI12qVXUvx5mUfmV+YweplhjY7X8=;
+        b=N+yo7qNJ+io0fpW/eXyR2a3uUFwXnPkdsO5u6ASkUJCiFGuY6Amew4Jwmb6qPRoJAq
+         Q26+qVcnTQz43BiaOTQMR+BD7nH7O4Y1TLI9p5en/tPyzL/IbbksxMm1vUhT411Qb5uU
+         mEAr7j1xa97WqveF6ZKzaxrsfp0PSwSXlcqGruDzSasND/L718J8rzEH7Yo6KFfapYZd
+         CRTeCa7ZJbXbjzggdGnoFXCXRSzP+CcWLCCgK3LhMUipsVDKZ/XGA/dDTRkd/cYuOWXb
+         ILHK8wK/gDqf6ZKs+pgR24/x2HCIBCvdxYmRZe8j+9aeQuHBXWqw7MKw9Uc7BiU9xoDr
+         WhnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747302925; x=1747907725;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jiz6ndGJFjTghJ7XdcRmJq3QP9TYb8f/oaZ3mhqnyAI=;
-        b=MlgqXS47SfuZ18Ibw83E/c7x66Nqi3NhO8fRWYp3R307zK+NMnn0YYpXgsr/Kn5Mh1
-         ZJOdtKOe8D4HPS9nEMZxvxij9qUa6ts0diCkfkg3llzhG7ApQAYHyW06IijKxG6r65Ds
-         9uvzBn3pW8J9t9vGzm5crEClOQy+xSJwcKUPlYO2Q762ruipt4kgacLZ+vL6GzMaEIgj
-         KpWU7OfcP9gVIhr2fpQ2RXL0SS2vLxiIYjh57ULYr+OuNWVBvu7P7mvkux4hzZbwDjvi
-         FKpG/Bvke6eLtj7/L43WV24icvKUYIS/5U7D5lq+E9OY0bPmkApI3hKwYo0cJU8BiBzi
-         JiHg==
-X-Forwarded-Encrypted: i=1; AJvYcCWeIz+lYYGiv0wLE9pfIhij9JuJY7Gp3T+EEvUmgRa3K5JW8tH7kraMWMTFaZDbh3WRVnlwBNY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyiWDoOAQg+WtwCBc9isCosNgW2GtmgUo4dzNLyP9shUYw9lei3
-	DGsbCrFinq4Ui+B4wW7GZopQfFqa5dIodwlEQHYtMr23bpfHOF+4X39pv92lPevgaApooxE3Bf3
-	1+Y0reGj+N/vPhyF7KPF3KF9OKAanXH08lc9j9McW+kAg0FAnk+zWf7CoWScqsWK0srfL
-X-Gm-Gg: ASbGnctPv+kLxBdfQMJLJ/fMLMhmk63q3hQkkQi4QlgejTd6JykZuil4brjm/i2UkWu
-	aVIQaph3VEf2p/3rJyjm7xm91mHmI1YsuT+60HUmH6WR9A6T3j2h8oVeZ55B9QTagsxo11ZUh2p
-	E3Ot+0NbHomPGVhrKkSAScE4tBt97E1clak1gUaTxbHmoPl2+cQHlnd+RoEngGnzK93QAqB1/09
-	vzn3ui+hfQnr7HAAgbILV7rmp1gvDmpEx0Ck3TQKNJu/6pTbbte0E+pxcqUecX9/42nfhyzt7ob
-	oiXfiJZJvUFc5lUrQrHUslWAziXU7zwwphv+jjTO6t6zrDZ4/NoL+NIxh5c=
-X-Received: by 2002:a05:6000:2408:b0:3a0:b84f:46de with SMTP id ffacd0b85a97d-3a3512102b9mr2493131f8f.21.1747302925647;
-        Thu, 15 May 2025 02:55:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHE9JwGTJdw25VAJtcZJc6HTRnmqmzlBaO2XKeTPhb95VPmN8r7Vkk/2fj/yJLLse1gPsf9Hg==
-X-Received: by 2002:a05:6000:2408:b0:3a0:b84f:46de with SMTP id ffacd0b85a97d-3a3512102b9mr2493100f8f.21.1747302925244;
-        Thu, 15 May 2025 02:55:25 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2440:8010:8dec:ae04:7daa:497f? ([2a0d:3344:2440:8010:8dec:ae04:7daa:497f])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a35225355csm1734053f8f.44.2025.05.15.02.55.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 May 2025 02:55:24 -0700 (PDT)
-Message-ID: <235b93a5-6989-4131-9099-c0c03bb6afc1@redhat.com>
-Date: Thu, 15 May 2025 11:55:23 +0200
+        d=1e100.net; s=20230601; t=1747303436; x=1747908236;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=R60PgnRqqoPYovETI12qVXUvx5mUfmV+YweplhjY7X8=;
+        b=s78wVIQXhyt6Tv8QDUiDOh6XSMqGvfXca80Y1gvuUK6LK3S7dyV83bfgLk9eC0TCY7
+         Mnd+5yISKArvmjEvJ631pOjZIyP2fU/luyGrRJ5C7fmy3wo9IjIzOe9giyL7ohkMxCub
+         gCVsMXEFG+2NBLEy9qCKJUhM/UB48sdcnG9+K0po5vCkuGnO2zY39h/sGpuQovGunINE
+         nFgdj/SUaWxWA4WD/22PpyrM5g5q0ldFm+ZDrl9OCiJESncY+QTG3yKr7utW5zJ09TxH
+         qPJc9Hz0T/htObErf2k43JR2OfRMTTC/3WrUOxqri01SWsPgVNpKExnphCl3H8o2y5c2
+         3ORg==
+X-Forwarded-Encrypted: i=1; AJvYcCWIS5JfsAwNrzJn1WgHE+/0geT4Si6K2uJeYhvOhA+vGpJcBwx/8OXRXOWwztZWQb5h1X9Hy5I=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4DUQPx696eWKJnJvJuOub0FJPNZkw8PG02q9TbQjiXJTTLC+N
+	twPO9K33VLr+PMsktSyLUb5HBhiZVmJvBEQ7Q3eYzewh5FfsoVKMoq8TULGaVuypVNtVASpMTJs
+	nYG6rLNjwFA==
+X-Google-Smtp-Source: AGHT+IHSUovKXji+KhlkDpNGcstahA4r4pSrE11lQLkR0I6KExUtwEMPokhShpHqL/yV+x/U6jWzGvXp3xBORw==
+X-Received: from qtbfc26.prod.google.com ([2002:a05:622a:489a:b0:47a:e63b:ec36])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:622a:1247:b0:476:8d3d:adb6 with SMTP id d75a77b69052e-49495c99400mr134651461cf.23.1747303436033;
+ Thu, 15 May 2025 03:03:56 -0700 (PDT)
+Date: Thu, 15 May 2025 10:03:54 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 10/15] net/sched: act_mirred: Move the
- recursion counter struct netdev_xmit
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- netdev@vger.kernel.org, linux-rt-devel@lists.linux.dev,
- Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Juri Lelli <juri.lelli@redhat.com>,
- Vincent Guittot <vincent.guittot@linaro.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>
-References: <20250512092736.229935-1-bigeasy@linutronix.de>
- <20250512092736.229935-11-bigeasy@linutronix.de>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250512092736.229935-11-bigeasy@linutronix.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.1101.gccaa498523-goog
+Message-ID: <20250515100354.3339920-1-edumazet@google.com>
+Subject: [PATCH net-next] net: rfs: add sock_rps_delete_flow() helper
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Octavian Purdila <tavip@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-CC sched maintainers.
+RFS can exhibit lower performance for workloads using short-lived
+flows and a small set of 4-tuple.
 
-On 5/12/25 11:27 AM, Sebastian Andrzej Siewior wrote:
-> mirred_nest_level is a per-CPU variable and relies on disabled BH for its
-> locking. Without per-CPU locking in local_bh_disable() on PREEMPT_RT
-> this data structure requires explicit locking.
-> 
-> Move mirred_nest_level to struct netdev_xmit as u8, provide wrappers.
-> 
-> Cc: Jamal Hadi Salim <jhs@mojatatu.com>
-> Cc: Cong Wang <xiyou.wangcong@gmail.com>
-> Cc: Jiri Pirko <jiri@resnulli.us>
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> ---
->  include/linux/netdevice_xmit.h |  3 +++
->  net/sched/act_mirred.c         | 28 +++++++++++++++++++++++++---
->  2 files changed, 28 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/linux/netdevice_xmit.h b/include/linux/netdevice_xmit.h
-> index 38325e0702968..848735b3a7c02 100644
-> --- a/include/linux/netdevice_xmit.h
-> +++ b/include/linux/netdevice_xmit.h
-> @@ -8,6 +8,9 @@ struct netdev_xmit {
->  #ifdef CONFIG_NET_EGRESS
->  	u8  skip_txqueue;
->  #endif
-> +#if IS_ENABLED(CONFIG_NET_ACT_MIRRED)
-> +	u8 sched_mirred_nest;
-> +#endif
->  };
+This is often the case for load-testers, using a pair of hosts,
+if the server has a single listener port.
 
-The above struct is embedded into task_struct in RT build. The new field
- *should* use an existing hole. According to my weak knowledge in that
-area the task_struct binary layout is a critical, an explicit ack from
-SMEs would be nice.
+Typical use case :
 
-Thanks,
+Server : tcp_crr -T128 -F1000 -6 -U -l30 -R 14250
+Client : tcp_crr -T128 -F1000 -6 -U -l30 -c -H server | grep local_throughput
 
-Paolo
+This is because RFS global hash table contains stale information,
+when the same RSS key is recycled for another socket and another cpu.
+
+Make sure to undo the changes and go back to initial state when
+a flow is disconnected.
+
+Performance of the above test is increased by 22 %,
+going from 372604 transactions per second to 457773.
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reported-by: Octavian Purdila <tavip@google.com>
+---
+ include/net/rps.h          | 24 ++++++++++++++++++++++++
+ net/ipv4/inet_hashtables.c |  6 ++++--
+ net/ipv4/udp.c             |  2 ++
+ net/sctp/socket.c          |  2 +-
+ 4 files changed, 31 insertions(+), 3 deletions(-)
+
+diff --git a/include/net/rps.h b/include/net/rps.h
+index 507f4aa5d39b296e65668969a13e5732738bf531..d8ab3a08bcc4882e2ad9c84c22ef26b254c14680 100644
+--- a/include/net/rps.h
++++ b/include/net/rps.h
+@@ -123,6 +123,30 @@ static inline void sock_rps_record_flow(const struct sock *sk)
+ #endif
+ }
+ 
++static inline void sock_rps_delete_flow(const struct sock *sk)
++{
++#ifdef CONFIG_RPS
++	struct rps_sock_flow_table *table;
++	u32 hash, index;
++
++	if (!static_branch_unlikely(&rfs_needed))
++		return;
++
++	hash = READ_ONCE(sk->sk_rxhash);
++	if (!hash)
++		return;
++
++	rcu_read_lock();
++	table = rcu_dereference(net_hotdata.rps_sock_flow_table);
++	if (table) {
++		index = hash & table->mask;
++		if (READ_ONCE(table->ents[index]) != RPS_NO_CPU)
++			WRITE_ONCE(table->ents[index], RPS_NO_CPU);
++	}
++	rcu_read_unlock();
++#endif
++}
++
+ static inline u32 rps_input_queue_tail_incr(struct softnet_data *sd)
+ {
+ #ifdef CONFIG_RPS
+diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
+index da85cc30e3824ad2b0cd115854521657928eca07..77a0b52b2eabfc6b08c34acea9fda092b88a32b5 100644
+--- a/net/ipv4/inet_hashtables.c
++++ b/net/ipv4/inet_hashtables.c
+@@ -23,11 +23,12 @@
+ #if IS_ENABLED(CONFIG_IPV6)
+ #include <net/inet6_hashtables.h>
+ #endif
+-#include <net/secure_seq.h>
+ #include <net/hotdata.h>
+ #include <net/ip.h>
+-#include <net/tcp.h>
++#include <net/rps.h>
++#include <net/secure_seq.h>
+ #include <net/sock_reuseport.h>
++#include <net/tcp.h>
+ 
+ u32 inet_ehashfn(const struct net *net, const __be32 laddr,
+ 		 const __u16 lport, const __be32 faddr,
+@@ -790,6 +791,7 @@ void inet_unhash(struct sock *sk)
+ 	if (sk_unhashed(sk))
+ 		return;
+ 
++	sock_rps_delete_flow(sk);
+ 	if (sk->sk_state == TCP_LISTEN) {
+ 		struct inet_listen_hashbucket *ilb2;
+ 
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 358b49caa7b974ddef70da8482f8a35fdb003fa9..dde52b8050b8ca251ae13f20853c6c9512453dd0 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -120,6 +120,7 @@
+ #if IS_ENABLED(CONFIG_IPV6)
+ #include <net/ipv6_stubs.h>
+ #endif
++#include <net/rps.h>
+ 
+ struct udp_table udp_table __read_mostly;
+ 
+@@ -2200,6 +2201,7 @@ void udp_lib_unhash(struct sock *sk)
+ 		struct udp_table *udptable = udp_get_table_prot(sk);
+ 		struct udp_hslot *hslot, *hslot2;
+ 
++		sock_rps_delete_flow(sk);
+ 		hslot  = udp_hashslot(udptable, sock_net(sk),
+ 				      udp_sk(sk)->udp_port_hash);
+ 		hslot2 = udp_hashslot2(udptable, udp_sk(sk)->udp_portaddr_hash);
+diff --git a/net/sctp/socket.c b/net/sctp/socket.c
+index 53725ee7ba06d780e220c3a184b4f611a7cb5e51..85a9dfeff4d6a5508ce77720b34180bc971ce396 100644
+--- a/net/sctp/socket.c
++++ b/net/sctp/socket.c
+@@ -8321,7 +8321,7 @@ static int sctp_hash(struct sock *sk)
+ 
+ static void sctp_unhash(struct sock *sk)
+ {
+-	/* STUB */
++	sock_rps_delete_flow(sk);
+ }
+ 
+ /* Check if port is acceptable.  Possibly find first available port.
+-- 
+2.49.0.1101.gccaa498523-goog
 
 
