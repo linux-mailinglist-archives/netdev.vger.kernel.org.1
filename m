@@ -1,229 +1,529 @@
-Return-Path: <netdev+bounces-190650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CE1CAB8167
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 10:51:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA5C7AB816D
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 10:51:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2914E1886D34
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 08:50:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E07104C13AD
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 08:51:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3068629372A;
-	Thu, 15 May 2025 08:49:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="IXPstFGX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A72DE296D09;
+	Thu, 15 May 2025 08:50:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2053.outbound.protection.outlook.com [40.107.220.53])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 727A828DEEF
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 08:49:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747298996; cv=fail; b=XqTZs2IPwTTzRt9e+zucepp26gxLGvx1sjPO9QLfDYEW/CduTOoLJ9Y8ZH7khaxd7DGd3MPw71bHmMtBsw6ivHZqgCx/8XQ6sDMHeLOYChPmcd9xwlJYnz/ByIGMk7oemIWcOm5T1ut2c1dYGfNs4fANfB1k3TWsgob7eED6r94=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747298996; c=relaxed/simple;
-	bh=+K4vtlC7daQi+XfXiTfr6iWX7Tk9pmPLtZBLHCDgihA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZZRNv1forPERW7ojJs6uusY7BWCH6DDSOI3/B423MWVCODDTjPCfXL4gWdQXRHsQjWflsc93kk1Jp78Hw5R5pk8ZnZlp+sg/iJCyAe9rKXbPDjGSn76yFdHL+BvQTrj07kiUFsn3j9z1dsMXrRqM3FCb5PpVpaMw5lufJ++s2q0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=IXPstFGX; arc=fail smtp.client-ip=40.107.220.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=oPJP+3LG6c24bEWyBSXvRhxhPH2bWv2vZLo4FiuqrBAMCrkYzwof+nOTABA4vt04egcjMUBjybvZtA6oTsSEoJYyLPx3p7snwDoKqGGWI39Cafc2BDfv3iFxzIZ2ef7BXSrqzFF/NGZhSQKutTRnSTbjoNZigKIBqvg7T5/F9ZXs2ymnWkzU4IASTHLdt6zQmPIRFL5unvZSqZ5ZPvTCJFlSB1HotxesRU5J92KggzWqUo5nPibJ4ShHBe4Kdv94AviY2GFcEWjQADs9+zNqcpCTkl0DmhC2VItFQoLGxXQ/QRyTOSd2kDrbriaCcgxfIG3cg751NZOje+ZDrYYEVA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uqEMQLGxKwqbuc+TMyMzS32Fe0EvxpTDbXlt0cA1gNE=;
- b=KXs2phMPq0mLbqygu/8b3/W2WimcO+554wJWX+N0Mal9nVCwcwP9v85cycmVSr3Wuf1iEeA9coz6Bc2neyJmEmh3coAPX1r4smFqVQWEmm0FyEuGPFdBEpLW5FcVK1SMCvBXAO6HlREjQLPpmllGeDktHviQPucMdOV35m428/Qf+lOUo/VtYYe7m26mcT3yxuGyeX2oFM2CCrh/AlgKtX5/vzX1J2fubwB5jzpUy45h/pe+ibzM12oogj7v+Fssa52fbGfeL5v8ozJoJlk/x3xnu6M1zssaIH28/zIvlkWwLinkr6kXLSlzxImE8P3o6l2G7TTEzGr3SH8E5BW/bA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uqEMQLGxKwqbuc+TMyMzS32Fe0EvxpTDbXlt0cA1gNE=;
- b=IXPstFGXL9vWXiN3i8cprTvPY15WodWW6sNpqaXyEpeL99+0pQX6k0k0E+pISPZQ+9EO1gvMRlZ23UvLY51p+K7FlRY3G2fFfiMciwFv3O5mMaHeKAlZfQR6usMP4WGyaf1Gm68MBB66QUhuJrBj+/dhmuEYr4IDkEYGq/wcO3Bphr70pYoJGDC5YEl7tHCmsLelCwXHzxjzTXfUY7S3ub5mttwvrR5R7TXQ8WDrwSJlPvzg0IIoNps7993trkp9682yfctr74+PKduof/18dpuEcfvcZG75i1ZNspOQj1xFlPoTvosSGRi8t7zmirlYmHk5opYfIIBSfrh0iolWuw==
-Received: from PH8PR20CA0001.namprd20.prod.outlook.com (2603:10b6:510:23c::15)
- by MN2PR12MB4486.namprd12.prod.outlook.com (2603:10b6:208:263::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.31; Thu, 15 May
- 2025 08:49:49 +0000
-Received: from CY4PEPF0000FCC4.namprd03.prod.outlook.com
- (2603:10b6:510:23c:cafe::6a) by PH8PR20CA0001.outlook.office365.com
- (2603:10b6:510:23c::15) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8722.20 via Frontend Transport; Thu,
- 15 May 2025 08:49:48 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CY4PEPF0000FCC4.mail.protection.outlook.com (10.167.242.106) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8722.18 via Frontend Transport; Thu, 15 May 2025 08:49:48 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 15 May
- 2025 01:49:31 -0700
-Received: from shredder.mtl.com (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Thu, 15 May
- 2025 01:49:26 -0700
-From: Ido Schimmel <idosch@nvidia.com>
-To: <netdev@vger.kernel.org>, <bridge@lists.linux.dev>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <razor@blackwall.org>,
-	<venkat.x.venkatsubra@oracle.com>, <horms@kernel.org>, <pablo@netfilter.org>,
-	<fw@strlen.de>, Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net] bridge: netfilter: Fix forwarding of fragmented packets
-Date: Thu, 15 May 2025 11:48:48 +0300
-Message-ID: <20250515084848.727706-1-idosch@nvidia.com>
-X-Mailer: git-send-email 2.49.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89BC1296716;
+	Thu, 15 May 2025 08:50:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747299058; cv=none; b=aj7PYzy0mn2CK9GmEPK0/wM7kl0AAEBI0BmGJZ+FAFuzsiPw1iAiI/lhQOqOunmVWo+/RfT4EqDCgPjYgi81AAVyk2uXO3GdUGcHvdKcVHbu9L0k5fkc90MXPtOfoHlzEsK5Ae09qJYEtyxL3KSwu/Fkcfva21YjdenGcUPfe7k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747299058; c=relaxed/simple;
+	bh=EuYMndLHx2afU5zial+ZwPFgTZFXQV/bl3OOW5QG8AY=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type; b=KzIkeckDMMPJnJEyuUfoJAWTYQdVEwyXToSVRQ6hU5swwJd+PcmDJ0ndq7V1NYiteQABI4d+ltai8TYXzh5PV3FpfBbh+FH3+TeXOqh753cbXC+6vq4br0AVx7c9FlayFLcyU/OaCC49WB0xOT+b6oa7G8gnWy6z8qqANYP4W+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A07AC4CEF0;
+	Thu, 15 May 2025 08:50:58 +0000 (UTC)
+Received: from rostedt by gandalf with local (Exim 4.98.2)
+	(envelope-from <rostedt@goodmis.org>)
+	id 1uFUJL-00000005Xag-1N8F;
+	Thu, 15 May 2025 04:51:27 -0400
+Message-ID: <20250515085127.180937900@goodmis.org>
+User-Agent: quilt/0.68
+Date: Thu, 15 May 2025 04:51:11 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: linux-kernel@vger.kernel.org
+Cc: Masami Hiramatsu <mhiramat@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ netdev <netdev@vger.kernel.org>,
+ Jiri Olsa <olsajiri@gmail.com>,
+ Peter Zijlstra <peterz@infradead.org>,
+ David Ahern <dsahern@kernel.org>,
+ Juri Lelli <juri.lelli@gmail.com>,
+ Breno Leitao <leitao@debian.org>,
+ Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+ Andrii Nakryiko <andrii.nakryiko@gmail.com>,
+ Gabriele Monaco <gmonaco@redhat.com>,
+ Andrii Nakryiko <andrii@kernel.org>
+Subject: [for-next][PATCH 2/4] tracepoint: Have tracepoints created with DECLARE_TRACE() have _tp
+ suffix
+References: <20250515085109.352233527@goodmis.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000FCC4:EE_|MN2PR12MB4486:EE_
-X-MS-Office365-Filtering-Correlation-Id: db2cd62d-f8f7-4a23-df30-08dd938d72fb
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|7416014|82310400026|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?t+RczYOlvVkvW5w404u8ceZv+0Be9rp+/QOkyh6u98G9xYPTXHM+y+CEHAk7?=
- =?us-ascii?Q?Yg0OG63sQleYHBgxdNp1XngLgLCNR+ULGOVespV7c+vxRxQCosCr2FixVGfe?=
- =?us-ascii?Q?pz/FV1h3GHRKtJareTDLs5FH6y8MfXRJ6CpRVEVnSnDYmvsbPL68KWXjN/Dg?=
- =?us-ascii?Q?9N9s1kMDimUAid/t+ww6+6JcEyBlsaX3M097kFsAYq77aIK+rve+jBO2DWCf?=
- =?us-ascii?Q?9OUqSb5GY8nekG0tAM3egtD0tXtyAROfUxqTPwumHArhXKytVz3B4Bh2VIRu?=
- =?us-ascii?Q?sKFHmIku8T/pGLtglf9hn1cE5su+VDNWjKRfkGBUrj6GYK13XUw4MLCGpUBl?=
- =?us-ascii?Q?FjJAzN+e1+nUMq22QizFdBsOKa79wcd8sl7sDnSbJucYW6m/nszWPy3I4lCd?=
- =?us-ascii?Q?eTC5EfR/NYIo7KFsgujITa57LosZGRefo6N6QEKQNWzVQMeriJf7au8NmeJS?=
- =?us-ascii?Q?jtt1klDIsI8MuoQL1ueb72yjgLL/zVWVsD/4veYWTPi0i3lBQi5oL3MReTQO?=
- =?us-ascii?Q?LFkA4oH7DQK5jVFJccuICIFkGHlh2sUtW12YNvQD02GHXfn/VWoy8pAlNxXw?=
- =?us-ascii?Q?88YwT8Jy+j0moTW/UyCjC6f3nrLCn1jbrC+OCL93msBsSxcEmWA/l2G1rqRK?=
- =?us-ascii?Q?h9QseyXC8gBRUPqfjigMWPiP0yonmWTIuykn4jg1nTBheW9l52h7EE0DwKhu?=
- =?us-ascii?Q?WBy/QtYMLt79vKr2QOpucwXuT/q92ZtwDbaR+thqnak8AQOfvdeLO0gXRBUw?=
- =?us-ascii?Q?vYOQTjU0D47gzFVwRWwfx4BMlA48q0JlCDzfaLAQIZqyDNgtLDjFyPtr6eKU?=
- =?us-ascii?Q?erxl1zxVJyvItfnEgaXz9k+Tb2q5+79P55B4M4aOVql5yPnxbrpLELNIEkgw?=
- =?us-ascii?Q?9JvrqNwr3Nk9zQs0FHwqh8xpgEUBxNH8xmta4DBIyY1LnVhy/j5qdMuQMP0v?=
- =?us-ascii?Q?GS/pxQ6xXrCbHq3KMudGUYr9J0ePydvMamfqpfBvClY4Jk4KzH+Xulwzrz/m?=
- =?us-ascii?Q?jHHTshJ39OGln3T75yWYSfe7CN8pf9+EsXSR4U+V5u5gK4GFj3tSY6ZGPajR?=
- =?us-ascii?Q?4V7bKT2+3uamQZexdnLtQDbOMMZs5q3DgEhGisL4B4apIkb8gUw4F9C5S8Cs?=
- =?us-ascii?Q?x1IHnrFCLPY4rMWDM/2b5w12Mqu5DPGd431HRWC9vg8I9b8U2hORZHa1cWcy?=
- =?us-ascii?Q?3fRxmJrC7UTxyALaij58yMm+vU40hCBCHqXRAAWyQ2kuVH9ssEZpt0cGKxe0?=
- =?us-ascii?Q?TNj303Qq0gXGXrz+n2QIVKMmtTnSSEdEOocfZeK5SBEssAYn08AE7phcL8mb?=
- =?us-ascii?Q?/z/JAoOZeyE41ObqqAllaS32GripuLmMfx3RXjAd/cGJ0ga9QdjJLJr52Afs?=
- =?us-ascii?Q?qKvZdGwVyrPJ55H7LP0kvtI8t46n4S6XQus1csh1hFu8w0LRVyYOh5AlNO66?=
- =?us-ascii?Q?bb3w6fxcpX8g3quaHAmUjlau42e9D1DsUJVvO2EC85vXcZPNjM7xvtM2LPxh?=
- =?us-ascii?Q?aPOvBHJ2Af9NhiZ8fGVx91/LmtzQ8SIEo3dz8cVW4OgcHu9HwMZwmSTuvg?=
- =?us-ascii?Q?=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(82310400026)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 May 2025 08:49:48.3962
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: db2cd62d-f8f7-4a23-df30-08dd938d72fb
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000FCC4.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4486
+Content-Type: text/plain; charset=UTF-8
 
-When netfilter defrag hooks are loaded (due to the presence of conntrack
-rules, for example), fragmented packets entering the bridge will be
-defragged by the bridge's pre-routing hook (br_nf_pre_routing() ->
-ipv4_conntrack_defrag()).
+From: Steven Rostedt <rostedt@goodmis.org>
 
-Later on, in the bridge's post-routing hook, the defragged packet will
-be fragmented again. If the size of the largest fragment is larger than
-what the kernel has determined as the destination MTU (using
-ip_skb_dst_mtu()), the defragged packet will be dropped.
+Most tracepoints in the kernel are created with TRACE_EVENT(). The
+TRACE_EVENT() macro (and DECLARE_EVENT_CLASS() and DEFINE_EVENT() where in
+reality, TRACE_EVENT() is just a helper macro that calls those other two
+macros), will create not only a tracepoint (the function trace_<event>()
+used in the kernel), it also exposes the tracepoint to user space along
+with defining what fields will be saved by that tracepoint.
 
-Before commit ac6627a28dbf ("net: ipv4: Consolidate ipv4_mtu and
-ip_dst_mtu_maybe_forward"), ip_skb_dst_mtu() would return dst_mtu() as
-the destination MTU. Assuming the dst entry attached to the packet is
-the bridge's fake rtable one, this would simply be the bridge's MTU (see
-fake_mtu()).
+There are a few places that tracepoints are created in the kernel that are
+not exposed to userspace via tracefs. They can only be accessed from code
+within the kernel. These tracepoints are created with DEFINE_TRACE()
 
-However, after above mentioned commit, ip_skb_dst_mtu() ends up
-returning the route's MTU stored in the dst entry's metrics. Ideally, in
-case the dst entry is the bridge's fake rtable one, this should be the
-bridge's MTU as the bridge takes care of updating this metric when its
-MTU changes (see br_change_mtu()).
+Most of these tracepoints end with "_tp". This is useful as when the
+developer sees that, they know that the tracepoint is for in-kernel only
+(meaning it can only be accessed inside the kernel, either directly by the
+kernel or indirectly via modules and BPF programs) and is not exposed to
+user space.
 
-Unfortunately, the last operation is a no-op given the metrics attached
-to the fake rtable entry are marked as read-only. Therefore,
-ip_skb_dst_mtu() ends up returning 1500 (the initial MTU value) and
-defragged packets are dropped during fragmentation when dealing with
-large fragments and high MTU (e.g., 9k).
+Instead of making this only a process to add "_tp", enforce it by making
+the DECLARE_TRACE() append the "_tp" suffix to the tracepoint. This
+requires adding DECLARE_TRACE_EVENT() macros for the TRACE_EVENT() macro
+to use that keeps the original name.
 
-Fix by moving the fake rtable entry's metrics to be per-bridge (in a
-similar fashion to the fake rtable entry itself) and marking them as
-writable, thereby allowing MTU changes to be reflected.
+Link: https://lore.kernel.org/all/20250418083351.20a60e64@gandalf.local.home/
 
-Fixes: 62fa8a846d7d ("net: Implement read-only protection and COW'ing of metrics.")
-Fixes: 33eb9873a283 ("bridge: initialize fake_rtable metrics")
-Reported-by: Venkat Venkatsubra <venkat.x.venkatsubra@oracle.com>
-Closes: https://lore.kernel.org/netdev/PH0PR10MB4504888284FF4CBA648197D0ACB82@PH0PR10MB4504.namprd10.prod.outlook.com/
-Tested-by: Venkat Venkatsubra <venkat.x.venkatsubra@oracle.com>
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev <netdev@vger.kernel.org>
+Cc: Jiri Olsa <olsajiri@gmail.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: David Ahern <dsahern@kernel.org>
+Cc: Juri Lelli <juri.lelli@gmail.com>
+Cc: Breno Leitao <leitao@debian.org>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: Gabriele Monaco <gmonaco@redhat.com>
+Cc: Masami Hiramatsu <mhiramat@kernel.org>
+Link: https://lore.kernel.org/20250510163730.092fad5b@gandalf.local.home
+Acked-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Acked-by: Andrii Nakryiko <andrii@kernel.org>
+Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
 ---
- net/bridge/br_nf_core.c | 7 ++-----
- net/bridge/br_private.h | 1 +
- 2 files changed, 3 insertions(+), 5 deletions(-)
+ Documentation/trace/tracepoints.rst           | 17 ++++++---
+ include/linux/tracepoint.h                    | 38 +++++++++++++------
+ include/trace/bpf_probe.h                     |  8 ++--
+ include/trace/define_trace.h                  | 17 ++++++++-
+ include/trace/events/sched.h                  | 30 +++++++--------
+ include/trace/events/tcp.h                    |  2 +-
+ .../testing/selftests/bpf/progs/raw_tp_null.c |  2 +-
+ .../selftests/bpf/progs/raw_tp_null_fail.c    |  2 +-
+ .../selftests/bpf/progs/test_module_attach.c  |  4 +-
+ .../bpf/progs/test_tp_btf_nullable.c          |  4 +-
+ .../selftests/bpf/test_kmods/bpf_testmod.c    |  8 ++--
+ 11 files changed, 83 insertions(+), 49 deletions(-)
 
-diff --git a/net/bridge/br_nf_core.c b/net/bridge/br_nf_core.c
-index 98aea5485aae..a8c67035e23c 100644
---- a/net/bridge/br_nf_core.c
-+++ b/net/bridge/br_nf_core.c
-@@ -65,17 +65,14 @@ static struct dst_ops fake_dst_ops = {
-  * ipt_REJECT needs it.  Future netfilter modules might
-  * require us to fill additional fields.
-  */
--static const u32 br_dst_default_metrics[RTAX_MAX] = {
--	[RTAX_MTU - 1] = 1500,
--};
--
- void br_netfilter_rtable_init(struct net_bridge *br)
- {
- 	struct rtable *rt = &br->fake_rtable;
+diff --git a/Documentation/trace/tracepoints.rst b/Documentation/trace/tracepoints.rst
+index decabcc77b56..b35c40e3abbe 100644
+--- a/Documentation/trace/tracepoints.rst
++++ b/Documentation/trace/tracepoints.rst
+@@ -71,7 +71,7 @@ In subsys/file.c (where the tracing statement must be added)::
+ 	void somefct(void)
+ 	{
+ 		...
+-		trace_subsys_eventname(arg, task);
++		trace_subsys_eventname_tp(arg, task);
+ 		...
+ 	}
  
- 	rcuref_init(&rt->dst.__rcuref, 1);
- 	rt->dst.dev = br->dev;
--	dst_init_metrics(&rt->dst, br_dst_default_metrics, true);
-+	dst_init_metrics(&rt->dst, br->metrics, false);
-+	dst_metric_set(&rt->dst, RTAX_MTU, br->dev->mtu);
- 	rt->dst.flags	= DST_NOXFRM | DST_FAKE_RTABLE;
- 	rt->dst.ops = &fake_dst_ops;
- }
-diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
-index d5b3c5936a79..4715a8d6dc32 100644
---- a/net/bridge/br_private.h
-+++ b/net/bridge/br_private.h
-@@ -505,6 +505,7 @@ struct net_bridge {
- 		struct rtable		fake_rtable;
- 		struct rt6_info		fake_rt6_info;
- 	};
-+	u32				metrics[RTAX_MAX];
+@@ -129,12 +129,12 @@ within an if statement with the following::
+ 		for (i = 0; i < count; i++)
+ 			tot += calculate_nuggets();
+ 
+-		trace_foo_bar(tot);
++		trace_foo_bar_tp(tot);
+ 	}
+ 
+-All trace_<tracepoint>() calls have a matching trace_<tracepoint>_enabled()
++All trace_<tracepoint>_tp() calls have a matching trace_<tracepoint>_enabled()
+ function defined that returns true if the tracepoint is enabled and
+-false otherwise. The trace_<tracepoint>() should always be within the
++false otherwise. The trace_<tracepoint>_tp() should always be within the
+ block of the if (trace_<tracepoint>_enabled()) to prevent races between
+ the tracepoint being enabled and the check being seen.
+ 
+@@ -143,7 +143,10 @@ the static_key of the tracepoint to allow the if statement to be implemented
+ with jump labels and avoid conditional branches.
+ 
+ .. note:: The convenience macro TRACE_EVENT provides an alternative way to
+-      define tracepoints. Check http://lwn.net/Articles/379903,
++      define tracepoints. Note, DECLARE_TRACE(foo) creates a function
++      "trace_foo_tp()" whereas TRACE_EVENT(foo) creates a function
++      "trace_foo()", and also exposes the tracepoint as a trace event in
++      /sys/kernel/tracing/events directory.  Check http://lwn.net/Articles/379903,
+       http://lwn.net/Articles/381064 and http://lwn.net/Articles/383362
+       for a series of articles with more details.
+ 
+@@ -159,7 +162,9 @@ In a C file::
+ 
+ 	void do_trace_foo_bar_wrapper(args)
+ 	{
+-		trace_foo_bar(args);
++		trace_foo_bar_tp(args); // for tracepoints created via DECLARE_TRACE
++					//   or
++		trace_foo_bar(args);    // for tracepoints created via TRACE_EVENT
+ 	}
+ 
+ In the header file::
+diff --git a/include/linux/tracepoint.h b/include/linux/tracepoint.h
+index a351763e6965..826ce3f8e1f8 100644
+--- a/include/linux/tracepoint.h
++++ b/include/linux/tracepoint.h
+@@ -464,16 +464,30 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
  #endif
- 	u16				group_fwd_mask;
- 	u16				group_fwd_mask_required;
+ 
+ #define DECLARE_TRACE(name, proto, args)				\
+-	__DECLARE_TRACE(name, PARAMS(proto), PARAMS(args),		\
++	__DECLARE_TRACE(name##_tp, PARAMS(proto), PARAMS(args),		\
+ 			cpu_online(raw_smp_processor_id()),		\
+ 			PARAMS(void *__data, proto))
+ 
+ #define DECLARE_TRACE_CONDITION(name, proto, args, cond)		\
+-	__DECLARE_TRACE(name, PARAMS(proto), PARAMS(args),		\
++	__DECLARE_TRACE(name##_tp, PARAMS(proto), PARAMS(args),		\
+ 			cpu_online(raw_smp_processor_id()) && (PARAMS(cond)), \
+ 			PARAMS(void *__data, proto))
+ 
+ #define DECLARE_TRACE_SYSCALL(name, proto, args)			\
++	__DECLARE_TRACE_SYSCALL(name##_tp, PARAMS(proto), PARAMS(args),	\
++				PARAMS(void *__data, proto))
++
++#define DECLARE_TRACE_EVENT(name, proto, args)				\
++	__DECLARE_TRACE(name, PARAMS(proto), PARAMS(args),		\
++			cpu_online(raw_smp_processor_id()),		\
++			PARAMS(void *__data, proto))
++
++#define DECLARE_TRACE_EVENT_CONDITION(name, proto, args, cond)		\
++	__DECLARE_TRACE(name, PARAMS(proto), PARAMS(args),		\
++			cpu_online(raw_smp_processor_id()) && (PARAMS(cond)), \
++			PARAMS(void *__data, proto))
++
++#define DECLARE_TRACE_EVENT_SYSCALL(name, proto, args)			\
+ 	__DECLARE_TRACE_SYSCALL(name, PARAMS(proto), PARAMS(args),	\
+ 				PARAMS(void *__data, proto))
+ 
+@@ -591,32 +605,32 @@ static inline struct tracepoint *tracepoint_ptr_deref(tracepoint_ptr_t *p)
+ 
+ #define DECLARE_EVENT_CLASS(name, proto, args, tstruct, assign, print)
+ #define DEFINE_EVENT(template, name, proto, args)		\
+-	DECLARE_TRACE(name, PARAMS(proto), PARAMS(args))
++	DECLARE_TRACE_EVENT(name, PARAMS(proto), PARAMS(args))
+ #define DEFINE_EVENT_FN(template, name, proto, args, reg, unreg)\
+-	DECLARE_TRACE(name, PARAMS(proto), PARAMS(args))
++	DECLARE_TRACE_EVENT(name, PARAMS(proto), PARAMS(args))
+ #define DEFINE_EVENT_PRINT(template, name, proto, args, print)	\
+-	DECLARE_TRACE(name, PARAMS(proto), PARAMS(args))
++	DECLARE_TRACE_EVENT(name, PARAMS(proto), PARAMS(args))
+ #define DEFINE_EVENT_CONDITION(template, name, proto,		\
+ 			       args, cond)			\
+-	DECLARE_TRACE_CONDITION(name, PARAMS(proto),		\
++	DECLARE_TRACE_EVENT_CONDITION(name, PARAMS(proto),	\
+ 				PARAMS(args), PARAMS(cond))
+ 
+ #define TRACE_EVENT(name, proto, args, struct, assign, print)	\
+-	DECLARE_TRACE(name, PARAMS(proto), PARAMS(args))
++	DECLARE_TRACE_EVENT(name, PARAMS(proto), PARAMS(args))
+ #define TRACE_EVENT_FN(name, proto, args, struct,		\
+ 		assign, print, reg, unreg)			\
+-	DECLARE_TRACE(name, PARAMS(proto), PARAMS(args))
+-#define TRACE_EVENT_FN_COND(name, proto, args, cond, struct,		\
++	DECLARE_TRACE_EVENT(name, PARAMS(proto), PARAMS(args))
++#define TRACE_EVENT_FN_COND(name, proto, args, cond, struct,	\
+ 		assign, print, reg, unreg)			\
+-	DECLARE_TRACE_CONDITION(name, PARAMS(proto),	\
++	DECLARE_TRACE_EVENT_CONDITION(name, PARAMS(proto),	\
+ 			PARAMS(args), PARAMS(cond))
+ #define TRACE_EVENT_CONDITION(name, proto, args, cond,		\
+ 			      struct, assign, print)		\
+-	DECLARE_TRACE_CONDITION(name, PARAMS(proto),		\
++	DECLARE_TRACE_EVENT_CONDITION(name, PARAMS(proto),	\
+ 				PARAMS(args), PARAMS(cond))
+ #define TRACE_EVENT_SYSCALL(name, proto, args, struct, assign,	\
+ 			    print, reg, unreg)			\
+-	DECLARE_TRACE_SYSCALL(name, PARAMS(proto), PARAMS(args))
++	DECLARE_TRACE_EVENT_SYSCALL(name, PARAMS(proto), PARAMS(args))
+ 
+ #define TRACE_EVENT_FLAGS(event, flag)
+ 
+diff --git a/include/trace/bpf_probe.h b/include/trace/bpf_probe.h
+index 183fa2aa2935..9391d54d3f12 100644
+--- a/include/trace/bpf_probe.h
++++ b/include/trace/bpf_probe.h
+@@ -119,14 +119,14 @@ static inline void bpf_test_buffer_##call(void)				\
+ 
+ #undef DECLARE_TRACE
+ #define DECLARE_TRACE(call, proto, args)				\
+-	__BPF_DECLARE_TRACE(call, PARAMS(proto), PARAMS(args))		\
+-	__DEFINE_EVENT(call, call, PARAMS(proto), PARAMS(args), 0)
++	__BPF_DECLARE_TRACE(call##_tp, PARAMS(proto), PARAMS(args))		\
++	__DEFINE_EVENT(call##_tp, call##_tp, PARAMS(proto), PARAMS(args), 0)
+ 
+ #undef DECLARE_TRACE_WRITABLE
+ #define DECLARE_TRACE_WRITABLE(call, proto, args, size) \
+ 	__CHECK_WRITABLE_BUF_SIZE(call, PARAMS(proto), PARAMS(args), size) \
+-	__BPF_DECLARE_TRACE(call, PARAMS(proto), PARAMS(args)) \
+-	__DEFINE_EVENT(call, call, PARAMS(proto), PARAMS(args), size)
++	__BPF_DECLARE_TRACE(call##_tp, PARAMS(proto), PARAMS(args)) \
++	__DEFINE_EVENT(call##_tp, call##_tp, PARAMS(proto), PARAMS(args), size)
+ 
+ #include TRACE_INCLUDE(TRACE_INCLUDE_FILE)
+ 
+diff --git a/include/trace/define_trace.h b/include/trace/define_trace.h
+index ed52d0506c69..b2ba5a80583f 100644
+--- a/include/trace/define_trace.h
++++ b/include/trace/define_trace.h
+@@ -74,10 +74,18 @@
+ 
+ #undef DECLARE_TRACE
+ #define DECLARE_TRACE(name, proto, args)	\
+-	DEFINE_TRACE(name, PARAMS(proto), PARAMS(args))
++	DEFINE_TRACE(name##_tp, PARAMS(proto), PARAMS(args))
+ 
+ #undef DECLARE_TRACE_CONDITION
+ #define DECLARE_TRACE_CONDITION(name, proto, args, cond)	\
++	DEFINE_TRACE(name##_tp, PARAMS(proto), PARAMS(args))
++
++#undef DECLARE_TRACE_EVENT
++#define DECLARE_TRACE_EVENT(name, proto, args)	\
++	DEFINE_TRACE(name, PARAMS(proto), PARAMS(args))
++
++#undef DECLARE_TRACE_EVENT_CONDITION
++#define DECLARE_TRACE_EVENT_CONDITION(name, proto, args, cond)	\
+ 	DEFINE_TRACE(name, PARAMS(proto), PARAMS(args))
+ 
+ /* If requested, create helpers for calling these tracepoints from Rust. */
+@@ -115,6 +123,11 @@
+ #undef DECLARE_TRACE_CONDITION
+ #define DECLARE_TRACE_CONDITION(name, proto, args, cond)
+ 
++#undef DECLARE_TRACE_EVENT
++#define DECLARE_TRACE_EVENT(name, proto, args)
++#undef DECLARE_TRACE_EVENT_CONDITION
++#define DECLARE_TRACE_EVENT_CONDITION(name, proto, args, cond)
++
+ #ifdef TRACEPOINTS_ENABLED
+ #include <trace/trace_events.h>
+ #include <trace/perf.h>
+@@ -136,6 +149,8 @@
+ #undef TRACE_HEADER_MULTI_READ
+ #undef DECLARE_TRACE
+ #undef DECLARE_TRACE_CONDITION
++#undef DECLARE_TRACE_EVENT
++#undef DECLARE_TRACE_EVENT_CONDITION
+ 
+ /* Only undef what we defined in this file */
+ #ifdef UNDEF_TRACE_INCLUDE_FILE
+diff --git a/include/trace/events/sched.h b/include/trace/events/sched.h
+index 8994e97d86c1..152fc8b37aa5 100644
+--- a/include/trace/events/sched.h
++++ b/include/trace/events/sched.h
+@@ -773,64 +773,64 @@ TRACE_EVENT(sched_wake_idle_without_ipi,
+  *
+  * Postfixed with _tp to make them easily identifiable in the code.
+  */
+-DECLARE_TRACE(pelt_cfs_tp,
++DECLARE_TRACE(pelt_cfs,
+ 	TP_PROTO(struct cfs_rq *cfs_rq),
+ 	TP_ARGS(cfs_rq));
+ 
+-DECLARE_TRACE(pelt_rt_tp,
++DECLARE_TRACE(pelt_rt,
+ 	TP_PROTO(struct rq *rq),
+ 	TP_ARGS(rq));
+ 
+-DECLARE_TRACE(pelt_dl_tp,
++DECLARE_TRACE(pelt_dl,
+ 	TP_PROTO(struct rq *rq),
+ 	TP_ARGS(rq));
+ 
+-DECLARE_TRACE(pelt_hw_tp,
++DECLARE_TRACE(pelt_hw,
+ 	TP_PROTO(struct rq *rq),
+ 	TP_ARGS(rq));
+ 
+-DECLARE_TRACE(pelt_irq_tp,
++DECLARE_TRACE(pelt_irq,
+ 	TP_PROTO(struct rq *rq),
+ 	TP_ARGS(rq));
+ 
+-DECLARE_TRACE(pelt_se_tp,
++DECLARE_TRACE(pelt_se,
+ 	TP_PROTO(struct sched_entity *se),
+ 	TP_ARGS(se));
+ 
+-DECLARE_TRACE(sched_cpu_capacity_tp,
++DECLARE_TRACE(sched_cpu_capacity,
+ 	TP_PROTO(struct rq *rq),
+ 	TP_ARGS(rq));
+ 
+-DECLARE_TRACE(sched_overutilized_tp,
++DECLARE_TRACE(sched_overutilized,
+ 	TP_PROTO(struct root_domain *rd, bool overutilized),
+ 	TP_ARGS(rd, overutilized));
+ 
+-DECLARE_TRACE(sched_util_est_cfs_tp,
++DECLARE_TRACE(sched_util_est_cfs,
+ 	TP_PROTO(struct cfs_rq *cfs_rq),
+ 	TP_ARGS(cfs_rq));
+ 
+-DECLARE_TRACE(sched_util_est_se_tp,
++DECLARE_TRACE(sched_util_est_se,
+ 	TP_PROTO(struct sched_entity *se),
+ 	TP_ARGS(se));
+ 
+-DECLARE_TRACE(sched_update_nr_running_tp,
++DECLARE_TRACE(sched_update_nr_running,
+ 	TP_PROTO(struct rq *rq, int change),
+ 	TP_ARGS(rq, change));
+ 
+-DECLARE_TRACE(sched_compute_energy_tp,
++DECLARE_TRACE(sched_compute_energy,
+ 	TP_PROTO(struct task_struct *p, int dst_cpu, unsigned long energy,
+ 		 unsigned long max_util, unsigned long busy_time),
+ 	TP_ARGS(p, dst_cpu, energy, max_util, busy_time));
+ 
+-DECLARE_TRACE(sched_entry_tp,
++DECLARE_TRACE(sched_entry,
+ 	TP_PROTO(bool preempt, unsigned long ip),
+ 	TP_ARGS(preempt, ip));
+ 
+-DECLARE_TRACE(sched_exit_tp,
++DECLARE_TRACE(sched_exit,
+ 	TP_PROTO(bool is_switch, unsigned long ip),
+ 	TP_ARGS(is_switch, ip));
+ 
+-DECLARE_TRACE_CONDITION(sched_set_state_tp,
++DECLARE_TRACE_CONDITION(sched_set_state,
+ 	TP_PROTO(struct task_struct *tsk, int state),
+ 	TP_ARGS(tsk, state),
+ 	TP_CONDITION(!!(tsk->__state) != !!state));
+diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
+index 1a40c41ff8c3..4f9fa1b5b89b 100644
+--- a/include/trace/events/tcp.h
++++ b/include/trace/events/tcp.h
+@@ -259,7 +259,7 @@ TRACE_EVENT(tcp_retransmit_synack,
+ 		  __entry->saddr_v6, __entry->daddr_v6)
+ );
+ 
+-DECLARE_TRACE(tcp_cwnd_reduction_tp,
++DECLARE_TRACE(tcp_cwnd_reduction,
+ 	TP_PROTO(const struct sock *sk, int newly_acked_sacked,
+ 		 int newly_lost, int flag),
+ 	TP_ARGS(sk, newly_acked_sacked, newly_lost, flag)
+diff --git a/tools/testing/selftests/bpf/progs/raw_tp_null.c b/tools/testing/selftests/bpf/progs/raw_tp_null.c
+index 5927054b6dd9..efa416f53968 100644
+--- a/tools/testing/selftests/bpf/progs/raw_tp_null.c
++++ b/tools/testing/selftests/bpf/progs/raw_tp_null.c
+@@ -10,7 +10,7 @@ char _license[] SEC("license") = "GPL";
+ int tid;
+ int i;
+ 
+-SEC("tp_btf/bpf_testmod_test_raw_tp_null")
++SEC("tp_btf/bpf_testmod_test_raw_tp_null_tp")
+ int BPF_PROG(test_raw_tp_null, struct sk_buff *skb)
+ {
+ 	struct task_struct *task = bpf_get_current_task_btf();
+diff --git a/tools/testing/selftests/bpf/progs/raw_tp_null_fail.c b/tools/testing/selftests/bpf/progs/raw_tp_null_fail.c
+index 38d669957bf1..0d58114a4955 100644
+--- a/tools/testing/selftests/bpf/progs/raw_tp_null_fail.c
++++ b/tools/testing/selftests/bpf/progs/raw_tp_null_fail.c
+@@ -8,7 +8,7 @@
+ char _license[] SEC("license") = "GPL";
+ 
+ /* Ensure module parameter has PTR_MAYBE_NULL */
+-SEC("tp_btf/bpf_testmod_test_raw_tp_null")
++SEC("tp_btf/bpf_testmod_test_raw_tp_null_tp")
+ __failure __msg("R1 invalid mem access 'trusted_ptr_or_null_'")
+ int test_raw_tp_null_bpf_testmod_test_raw_tp_null_arg_1(void *ctx) {
+     asm volatile("r1 = *(u64 *)(r1 +0); r1 = *(u64 *)(r1 +0);" ::: __clobber_all);
+diff --git a/tools/testing/selftests/bpf/progs/test_module_attach.c b/tools/testing/selftests/bpf/progs/test_module_attach.c
+index 7f3c233943b3..03d7f89787a1 100644
+--- a/tools/testing/selftests/bpf/progs/test_module_attach.c
++++ b/tools/testing/selftests/bpf/progs/test_module_attach.c
+@@ -19,7 +19,7 @@ int BPF_PROG(handle_raw_tp,
+ 
+ __u32 raw_tp_bare_write_sz = 0;
+ 
+-SEC("raw_tp/bpf_testmod_test_write_bare")
++SEC("raw_tp/bpf_testmod_test_write_bare_tp")
+ int BPF_PROG(handle_raw_tp_bare,
+ 	     struct task_struct *task, struct bpf_testmod_test_write_ctx *write_ctx)
+ {
+@@ -31,7 +31,7 @@ int raw_tp_writable_bare_in_val = 0;
+ int raw_tp_writable_bare_early_ret = 0;
+ int raw_tp_writable_bare_out_val = 0;
+ 
+-SEC("raw_tp.w/bpf_testmod_test_writable_bare")
++SEC("raw_tp.w/bpf_testmod_test_writable_bare_tp")
+ int BPF_PROG(handle_raw_tp_writable_bare,
+ 	     struct bpf_testmod_test_writable_ctx *writable)
+ {
+diff --git a/tools/testing/selftests/bpf/progs/test_tp_btf_nullable.c b/tools/testing/selftests/bpf/progs/test_tp_btf_nullable.c
+index 39ff06f2c834..cf0547a613ff 100644
+--- a/tools/testing/selftests/bpf/progs/test_tp_btf_nullable.c
++++ b/tools/testing/selftests/bpf/progs/test_tp_btf_nullable.c
+@@ -6,14 +6,14 @@
+ #include "../test_kmods/bpf_testmod.h"
+ #include "bpf_misc.h"
+ 
+-SEC("tp_btf/bpf_testmod_test_nullable_bare")
++SEC("tp_btf/bpf_testmod_test_nullable_bare_tp")
+ __failure __msg("R1 invalid mem access 'trusted_ptr_or_null_'")
+ int BPF_PROG(handle_tp_btf_nullable_bare1, struct bpf_testmod_test_read_ctx *nullable_ctx)
+ {
+ 	return nullable_ctx->len;
+ }
+ 
+-SEC("tp_btf/bpf_testmod_test_nullable_bare")
++SEC("tp_btf/bpf_testmod_test_nullable_bare_tp")
+ int BPF_PROG(handle_tp_btf_nullable_bare2, struct bpf_testmod_test_read_ctx *nullable_ctx)
+ {
+ 	if (nullable_ctx)
+diff --git a/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c b/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c
+index 3220f1d28697..18eded4d1d15 100644
+--- a/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c
++++ b/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c
+@@ -413,7 +413,7 @@ bpf_testmod_test_read(struct file *file, struct kobject *kobj,
+ 
+ 	(void)bpf_testmod_test_arg_ptr_to_struct(&struct_arg1_2);
+ 
+-	(void)trace_bpf_testmod_test_raw_tp_null(NULL);
++	(void)trace_bpf_testmod_test_raw_tp_null_tp(NULL);
+ 
+ 	bpf_testmod_test_struct_ops3();
+ 
+@@ -431,14 +431,14 @@ bpf_testmod_test_read(struct file *file, struct kobject *kobj,
+ 	if (bpf_testmod_loop_test(101) > 100)
+ 		trace_bpf_testmod_test_read(current, &ctx);
+ 
+-	trace_bpf_testmod_test_nullable_bare(NULL);
++	trace_bpf_testmod_test_nullable_bare_tp(NULL);
+ 
+ 	/* Magic number to enable writable tp */
+ 	if (len == 64) {
+ 		struct bpf_testmod_test_writable_ctx writable = {
+ 			.val = 1024,
+ 		};
+-		trace_bpf_testmod_test_writable_bare(&writable);
++		trace_bpf_testmod_test_writable_bare_tp(&writable);
+ 		if (writable.early_ret)
+ 			return snprintf(buf, len, "%d\n", writable.val);
+ 	}
+@@ -470,7 +470,7 @@ bpf_testmod_test_write(struct file *file, struct kobject *kobj,
+ 		.len = len,
+ 	};
+ 
+-	trace_bpf_testmod_test_write_bare(current, &ctx);
++	trace_bpf_testmod_test_write_bare_tp(current, &ctx);
+ 
+ 	return -EIO; /* always fail */
+ }
 -- 
-2.49.0
+2.47.2
+
 
 
