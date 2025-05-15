@@ -1,673 +1,269 @@
-Return-Path: <netdev+bounces-190750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 828DFAB8991
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 16:38:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 61947AB89B2
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 16:45:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89C743A7057
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 14:37:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68FBEA012DA
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 14:44:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C5B01EBFE0;
-	Thu, 15 May 2025 14:37:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEC241E0DFE;
+	Thu, 15 May 2025 14:44:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mihalicyn.com header.i=@mihalicyn.com header.b="dwjYS4LT"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="OmKdTpQG";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="GmC6u7Li"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEAAA1E1DE2
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 14:37:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747319876; cv=none; b=tseWkDH7Q+9VawzFR1y7gxi8JDGXClfM3rKQzlRYU9ngpbSP/qak2xDExTOHfZEnCoI1AogghfYGiYKpEOPnzCZdl9SzMVrCcSru9v+19vw08DagvI4Wb2zSofvAqKX0xnpBwPekyJkDNWt5Xpvnl+q89cYDBjVW+wFZbkwplN4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747319876; c=relaxed/simple;
-	bh=3X5sko4Nwntj/peXWF9aJDG3UL9bSh5GIx4Fd527vKI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FNlfBol9lcUz1Et26jfIq/n3CS8Lv5lw0RWe+jGmBxz/mzH8ArtD2HqdDlbz3+0BnCtT1/5JURkYz4mTfg+z+D0eMjPmSwunoxLp17qm98hX3PDBilUCcTJc+mBnug3OgsgemS06ZELvfL64OJ/Up0E4w2GvsNqIwdRVaTlbI/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mihalicyn.com; spf=pass smtp.mailfrom=mihalicyn.com; dkim=pass (1024-bit key) header.d=mihalicyn.com header.i=@mihalicyn.com header.b=dwjYS4LT; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mihalicyn.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mihalicyn.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-54e7967cf67so1065772e87.0
-        for <netdev@vger.kernel.org>; Thu, 15 May 2025 07:37:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC2324174A;
+	Thu, 15 May 2025 14:44:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747320297; cv=fail; b=nDxEZKahi9s7ukb5YZgLMdgzkfVhO+toIxkZR0tMUAORxuTaVfPzForE/vaO9LkSkmOdXgjmy70XDQ0tmAyJ8kh5lZpY/QBWgU3WjLrDR9BO0c70A9MUxuY4PHAE8brGVFt95QqYHQpcQ9fxhpeW9Q8446c1co7o1vNgYoE0rh4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747320297; c=relaxed/simple;
+	bh=HcPkW7LlsQFAe4Q+IvtjIVLMzpNhrYwNQPtBaaztY+k=;
+	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=shoTu2dlxwLDcnNYMlsOT0M5eu8O5dnCaYZ6h/gA8oy2PdVbstYCQVBHJyoMutGCnedDVKuXIMP8I75Jw9PiDIn+mO+JZCdM+Ux03nkaFl/28DoG4rGl5lrp+HukYOfS42Qa7AIzNBgaxoTP1augBZ9lc26+DGBxN2dgYate0rQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=OmKdTpQG; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=GmC6u7Li; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54F7C3mF023255;
+	Thu, 15 May 2025 14:44:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	corp-2025-04-25; bh=jngUMo99wjE7BR8/q9kNrkquOaL3cRDx7gaaV8MV3D0=; b=
+	OmKdTpQG19JwXxAAs/XfzawU9n+XlC/sP9bAMlHugSG+x8EsK08I5mvZBtFkL8Wb
+	UP/U4C2oqXfrc/AEiFtBBnrQbvm+p5nkorC8E9eFv/tqpT4j91Tzv8QNhenO95Pr
+	SdqRg3308qfxpTLAJA6j4oUeaTuDSUHfZLxDpWPqR0NMURr98V1nefbc1pw+J3JV
+	So5TkCfeH+Re1uzk1prfnu/OkFICU3IDKqi7xv16JNoPhYkBPZFtdNaf3aJL+9RS
+	G+4yjaOAF5oNHX6PHiicMq0x9uP8AJa8D2XSQIZrEmbh+aHIRjXsrONtXo9unbCF
+	pnDCYQ9CKaxAlvv1236syA==
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 46mbcgv7bq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 15 May 2025 14:44:47 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 54FEMAof004936;
+	Thu, 15 May 2025 14:44:46 GMT
+Received: from dm5pr21cu001.outbound.protection.outlook.com (mail-centralusazlp17011027.outbound.protection.outlook.com [40.93.13.27])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 46mrme6gck-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 15 May 2025 14:44:46 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qRJ9TcMgynwmsbarhpJ6bTks/XJRuP3lfjbNSYeezoZFkH1ZpDkLEG9JJVS0lC/Jj/EGIoxT592Fgx8al0Lr9vhyYp6Al6cpL3xZ5RJbpGwbRPWrbJwRR+mxMdmqliUSMZRJg2qzP1Gcf5wIdTUzyTnftNbM30y+QmQ2p4mkbZmX4K3kEM81wdKgash2cMH3zMEQF/oH/RKy/AKB56yF18vgW2ReYzg29tRGsWFo5OBS7rNRftW5rtBh5AySDrByPo5Q8PBT/Z7RAIAYhniyZDl/uTm9JAmfflQkm4Xe5DX0FTQtVWHAN9inMv6ZsUrX4uonToYBJ2EmCrTVjVbrJw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jngUMo99wjE7BR8/q9kNrkquOaL3cRDx7gaaV8MV3D0=;
+ b=qO28cI2nEfWIDYFOg9SFkkz1I1Q8w365n43bPacQxx7U9KgsQaARKvxIid+B+/ieFuBEmrYBiaNCrLlPj7CFg22uy1Zw9CPQcAgdgrdWVLop5jU71daZVH0Xs/wtOK75HbY5LqB/BDBJy5JlizxFsN0HeLZOmQa12E4bSZYDYsJ6aTb9IQyTHyGFTclLIFpWwdPQK7HVc5NN/h1Cu5FDRvdiz4WEdQDCNi5Q0jufOD3699LE/XKToWgCsnpbe7ycOUfrQMivPhb/NqyqFL1KZ5slHrd7ReH/twvd54OT951amgzP9EiKOJB7BhRB0eYW8bCjttajDbc4+Dd7oFFIQQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mihalicyn.com; s=mihalicyn; t=1747319872; x=1747924672; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=DLWxBncY3MQiODrTcOgN2iyGuvC/s1EoJ4HfsOmMJYE=;
-        b=dwjYS4LT2sZAmY0ihlmXYSIg2I8BxZvaDaYXdum6Cpz61xOO2T5fn3uFKWQI93pQwW
-         aJjL582NDThd+U9CUIGDUAtI8TTomiegjeP+/6RQ1c1TTPCiRAu69IuG13pvcJ0k8V8D
-         RrA78/4Z066Yn54qzB/YRPjK7BY4ploMUPlbs=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747319872; x=1747924672;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DLWxBncY3MQiODrTcOgN2iyGuvC/s1EoJ4HfsOmMJYE=;
-        b=u3kW9vWZrR43tbts+Wn6mSIhXk3/q2x7rTo5Lv0TKkgeQurFNGub5noXR54dfu1CIn
-         21EHXu8kKXzyBT1cmmV8jUhi9vU8EhhSrved2zyiS4gkgx+AuoVh1CQ0wEazI7Oih7qR
-         wM07WB6GDGYRG48WdNbtyWBY7nRZSimizC0Ss3bdQMHolftdlJUbj9LVZIRjCAuU/IIQ
-         Fq617PTSAfTkqsTZfwTLiIM00TRClGSdwft3xMFwyvti+YS4pUUpm6aN+nlMShArRnUZ
-         FlPV9z8kJdr7H19pKHi6aKQJSDGDoHK3Il6OkkgcsyLYuB5utPH7UpnT2ETWwkXltC1I
-         kvfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWVSPlsFMBdQ5v0rNekJi6F9j+EWq8V6lAHz8V4dB4ocpmBQRuk7qC5cNWPmUG/OVJ65Oyt1Ig=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzoeIeWIdLdxQ4L/MMwXj0NyS/rF7vW8g13b575TkRYQ8VCtyAS
-	1gQzhLlyKis0nWs/wqU3CQypAXhQPfFiJ1hdRpCegQp7WVrZmaduoyhivx/DPzTmDBnr02JUxMu
-	a4kUpfeMgvjhwZrBM50ZS1aLOdK21RUdZX/To8Q==
-X-Gm-Gg: ASbGncul9PwJPtVmnp8PB5y9XJ9lq8JOib7SzLTCvD7RSC0wLGUslbyaYd/2YFf5ThE
-	0qN4tWnrCj5go4ghQ4F5YwAhpig1O6DTjAGiIojrs2RyjX88dKq1VKFteQ0ph+7XNkTWUsR0Jth
-	fO24yHlN0R/jeBpejf7IGT3p5NokSbEI7Itg==
-X-Google-Smtp-Source: AGHT+IGs+xMJJuCwF4iYMa6FQJdBL8q8BniGjGgSR2O0W6M1de6ueJ35Ugysa/FTuz2YL3zSlBWZAjD7Qf2qdI7LP1w=
-X-Received: by 2002:a05:6512:620c:b0:545:e2e:843a with SMTP id
- 2adb3069b0e04-550d5fdaf2fmr3073738e87.38.1747319871767; Thu, 15 May 2025
- 07:37:51 -0700 (PDT)
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jngUMo99wjE7BR8/q9kNrkquOaL3cRDx7gaaV8MV3D0=;
+ b=GmC6u7LiREXU/w/elUk8+xGgaFQP6sG9LrtEx+9ucj2+WE1wIhoGsVrLuJdTfIKwLfAlO7VTdugoCqbd0/0WC1NSHJIPrKAOywhEiTRO5FZTMA20b8o0+LIkTyUPPlNMggzPSQaoz3q0DiRnrvNhW52ALGYzIW2VLikkmrXzHnY=
+Received: from BN0PR10MB5128.namprd10.prod.outlook.com (2603:10b6:408:117::24)
+ by DM4PR10MB7508.namprd10.prod.outlook.com (2603:10b6:8:17d::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.31; Thu, 15 May
+ 2025 14:44:43 +0000
+Received: from BN0PR10MB5128.namprd10.prod.outlook.com
+ ([fe80::743a:3154:40da:cf90]) by BN0PR10MB5128.namprd10.prod.outlook.com
+ ([fe80::743a:3154:40da:cf90%5]) with mapi id 15.20.8699.022; Thu, 15 May 2025
+ 14:44:42 +0000
+Message-ID: <20d1d07b-a656-48ab-9e0e-7ba04214aa3f@oracle.com>
+Date: Thu, 15 May 2025 10:44:41 -0400
+User-Agent: Mozilla Thunderbird
+Subject: Re: RPC-with-TLS client does not receive traffic
+From: Chuck Lever <chuck.lever@oracle.com>
+To: Jakub Kicinski <kuba@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Steve Sears <sjs@hammerspace.com>,
+        Thomas Haynes <loghyr@hammerspace.com>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        kernel-tls-handshake <kernel-tls-handshake@lists.linux.dev>
+References: <0288b61b-6a8e-409d-8e4c-3f482526cf46@oracle.com>
+Content-Language: en-US
+In-Reply-To: <0288b61b-6a8e-409d-8e4c-3f482526cf46@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH0PR04CA0088.namprd04.prod.outlook.com
+ (2603:10b6:610:74::33) To BN0PR10MB5128.namprd10.prod.outlook.com
+ (2603:10b6:408:117::24)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250515-work-coredump-socket-v7-0-0a1329496c31@kernel.org> <20250515-work-coredump-socket-v7-9-0a1329496c31@kernel.org>
-In-Reply-To: <20250515-work-coredump-socket-v7-9-0a1329496c31@kernel.org>
-From: Alexander Mikhalitsyn <alexander@mihalicyn.com>
-Date: Thu, 15 May 2025 16:37:40 +0200
-X-Gm-Features: AX0GCFtrGV-A5-J_ULGS4Xel3JuBrliCKkWxAO8426zXTklGUPBQJetOa3ixe_w
-Message-ID: <CAJqdLrq3sy2LWiRpQtqnFXiONxo4Sx9oC0ZMc3pfRh7TS424ow@mail.gmail.com>
-Subject: Re: [PATCH v7 9/9] selftests/coredump: add tests for AF_UNIX coredumps
-To: Christian Brauner <brauner@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, Jann Horn <jannh@google.com>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Eric Dumazet <edumazet@google.com>, Oleg Nesterov <oleg@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, David Rheinsberg <david@readahead.eu>, 
-	Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>, 
-	Lennart Poettering <lennart@poettering.net>, Luca Boccassi <bluca@debian.org>, Mike Yuan <me@yhndnzj.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	=?UTF-8?Q?Zbigniew_J=C4=99drzejewski=2DSzmek?= <zbyszek@in.waw.pl>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-security-module@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN0PR10MB5128:EE_|DM4PR10MB7508:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8e3c6826-2855-47d8-48c3-08dd93bf0757
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?NGQ4cnJmSzRtMlVCQmFuUnNYTkNBNGlVUTJGcTN1T09qS0FCQTBRVCt3ZHFG?=
+ =?utf-8?B?bHFxNmZPTVNkdmRvdGJLN2NORHE0K2tucDVyRDQrTDNsQVk1dVVUSFgxZWNk?=
+ =?utf-8?B?M2x0Q0hVU01adS8zNTZ2emFSWkxFRFU5d2RRODRIQVNUaEEyY2pSK0gzbm5p?=
+ =?utf-8?B?QnRZVFJlWk41L3ZHVHdIYVZwd1B5cmpzWnpEZWprRmd3dnYzaEw0RnhPbHV4?=
+ =?utf-8?B?RWVhdklNc1VUb1ZpWjRhZ1d5MW9aT1BOT0k4aVRBeE5ObUwzNTdiU1FrbUtL?=
+ =?utf-8?B?ZW9JRHpObmh2WnhYNmxueGRZTVNZYmFvMG5KNzZIZDNzTzNxT2Q2WVdMenMx?=
+ =?utf-8?B?SEwyM0wyRVM0UTlveVRKekc2WTBiZnk1N3ZTbGk1KzVuN2s2U3EvZGdsKzRw?=
+ =?utf-8?B?OGpNMEYvamMrd1dKNnd0QUEySkgyWmtINXZFK2ZnUkt4OU9vVk5QdmlMa29Q?=
+ =?utf-8?B?cll6Q0pYTk5rM3pnQk1kUEVKbXFNbXArRG8wUWFxdDFJS0cydFZQdmJ1VkxY?=
+ =?utf-8?B?dit4bGF3Qld5Z3hpc05aM1cwTzlWTjh4Y1VKSzg1NmMvT2t0YTRFbUlkQ0Y2?=
+ =?utf-8?B?WHZkd0VNTWZyVjN1OGQzTHRIRlJWL3RsS0dIcWMvTVFEeUpac3IwOFB4TWJS?=
+ =?utf-8?B?Z2NOQ2pMRHRWSW1DcTgySGFObGE2K09ENDQ2WEFGbGFDWVBVU3BJeXFteUc0?=
+ =?utf-8?B?TnRYYjRqcXd5NFRKUmlLMkpETFF0eXYwM0dOM1FDSVJLWHVNclRWTFZwZit1?=
+ =?utf-8?B?aS9HK0h1VzBvZjhxNnpjK210WUZhbjB4S1NKZHNEQ04wQU93VEkrQXJZV1p0?=
+ =?utf-8?B?KzhFWGJ3bW9rNzd6cGtXU2hrN1BLQUNmWlIzY2lQemxYcVZZYlkxQWFDL3h3?=
+ =?utf-8?B?NzhLdENyQXl1VGVOdS9WOC9KNFM2enI3em9uR3l5ak1ZbEF2cXVEMmIyYWtu?=
+ =?utf-8?B?SDJjWG1oR0c4cHpxNHpwaVhWZ2RlbC96d2h4Y09XaldYczZZdlA5dWFrU2N3?=
+ =?utf-8?B?dngvWmVWeWdMU0dNUXdBbmxCdXBRK0xsZXFUL0tTOTlpdmtJUm1TdzdQclcr?=
+ =?utf-8?B?Wm0wUC9aWUtOMXNueThLZHp6anlXdmJQRm9QZTZmTUM5R3llUStKbkdSRnZK?=
+ =?utf-8?B?R3UvVFRHL0VZOEwyRDZyUUNZVis2SitoWmQvODZQV0pVU3hSbE9jNjhGamw0?=
+ =?utf-8?B?ZXRRUks0R0ovSTUzMCtqTHppaWV1R3gva3IzTWdESWdjVUNTamQzZkdQSU96?=
+ =?utf-8?B?WGVZeXV5OE9QQUplMFdpSzlONUo2VlBnOVFwa2xDTXBhcGNocWFndlV5c3Vt?=
+ =?utf-8?B?bDM4ODYyaFVGRCtnQ0JjMXYwTm1kZm5wQ0VHOWpYak1pUWtYdkExaGR4MVc0?=
+ =?utf-8?B?cGIyRSsyMWp2Q3R6Tit3Z0tlejBuSmt6cjVRL3NxcXB3L2NVcHNVMWl1eGUw?=
+ =?utf-8?B?T0owciszd1VyYUE0RUVmRTlrQTUyUjh3Y1JrdWxTRlVkTElXeitMd2Nnb21s?=
+ =?utf-8?B?a3YvR2pWNHpDZlpQT3dTNlY3M2Z5ZmZHR3hCWnlKczJTRTVFaHU2NkROT05K?=
+ =?utf-8?B?NlBZaTBuRDRETnJIbmYxNEw4bWRWVE43MFg3aS9adzRrUVM1ZS9WREkwbVAy?=
+ =?utf-8?B?TVIzWlkzRDliZXN5N0QxbFZsVW04elhFSi9sQm4wNitnenJEVDRaWGh1a0Jl?=
+ =?utf-8?B?UldhNWR0OHV2Z1RFZ2ZSNCtDU1FRVFRIcExLc1JXMHh3ejlmZ3dKSXVVV3Vl?=
+ =?utf-8?B?RE1lVzVjckR3WlNDeDM3K0RsZ3JnbVl0MmlOTWZCYjhjTXBiOThmNitrTG0w?=
+ =?utf-8?B?MHp1Q2NaRzdwMzJGRHlqN0o2b2ZLV29uQ1ljMVUyWGhoUy9wR0l0Z0ozMktm?=
+ =?utf-8?B?MWQ3ZW1iZW1WNlFJVGh1WVh5NXBvb0lpZTMrdlhkRmpJcUFDVWRWeDMzd3BK?=
+ =?utf-8?Q?dIW6sJVPcio=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5128.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?QXF3Y3ZQN21jNWROcUJrYnovN3lyYUI1d0VvRDZkcTFPcVh1cExiY3VYUGlM?=
+ =?utf-8?B?b1l6dk10d3VQT2ZRd1FwWG1qR2RCbmlmRGxoK0Z6NnRyUUpQY09XNE1RKzZz?=
+ =?utf-8?B?TXQ3UEc1Vm9URXV6UHhUVmRLZ2dxSXVEbDJ0d2F6ZWsxZlQ0NFlRYzEySVV1?=
+ =?utf-8?B?TVRlNFE1a0VxZWRGbXFna1FWMWZUSjNqQ25GZnlXOW9oeHRmSytiRkRqUXFr?=
+ =?utf-8?B?NzBpdjV1Q2FlT3hiNURzanh3VGgxVGQ3d0UyK2hteEp6Mkl5SVowV0M3VUFY?=
+ =?utf-8?B?WllqOUIrK3JmKzNLSUpVK1BjTUFVK25XRTd1eUxaNDdQck5VKzFkSUVNRTkw?=
+ =?utf-8?B?M0FNY3NyN2VRNytQOVRGcTAvcW5HMmtIakdRektuRW1zdEZVRjcvYmhyY09D?=
+ =?utf-8?B?OGxuYzR5YWxGeXNoL1RGeWNEdHdPNzRmWW5pa2lrdmpEMjd5T01Nci9SaXg3?=
+ =?utf-8?B?ZTFIZVVJOTF3dUJlWmdpSnJreFdUSUI2SktOOS9sY0pLQVJIelpYL3dUaEtq?=
+ =?utf-8?B?UUUySklPTXRRZWVWVnlSTEpsaVBob2N0OTN6L243VERpb2V5cVRSUFp6ZTgy?=
+ =?utf-8?B?OTh6WGFjOG5lN1B6NExRR3BDRUxubHQ1WTJ0WVZEalFUeVN2cXoxaDFNcmtR?=
+ =?utf-8?B?NThKVkpQSUxxb0czVWRUb1prOGNZV1dRY25wVzhRaUhDc1l5dy9tMzRCWFNR?=
+ =?utf-8?B?dUVUN1ozN0F1OGxWeW5PbThzbktGdnNLbHFOU2ZObk1Fb3BpNk1qZ2FNUkhz?=
+ =?utf-8?B?ajl1Q3NWcmZlQjlMbVJoKzVtbmtBTG8rS3pRaktMcVVoMGtBVld4RzdsaThT?=
+ =?utf-8?B?N3NvMlZwNFFZN2lYMHZ5WEMyRjlKQk92UGpqSW5rTjI0NW5CRXRCalozSk1i?=
+ =?utf-8?B?NEVvY1I2RjZjcjIxMmVSemxHSk5uUDcrdlFCV1lLa2c5bVVWZ0hsWWRmcHR6?=
+ =?utf-8?B?TjV4MkdQcFg1bWlReDhYOTRWSWQxMFkydlQ2dTFmWk5iZXpaZkg0Q2taMjda?=
+ =?utf-8?B?VSsyMHdGa1pQdEdYRWNJWFZ1SjJMdlg5VkdoR3BjVGJpRkd5LzZyeWtqSFh5?=
+ =?utf-8?B?aEZmclNaSzdoVW1nNFlRbHJkQ25MOU9BWUw2TElXU04rTFZpV0ZtcXNJMDkr?=
+ =?utf-8?B?ZlJFa2V5MnJZcEp0Nk9ZVE9yODJ6WUc1WGw2WG4xRTI0WFBJU2h6eHQveVZR?=
+ =?utf-8?B?VlphbEZJQWJYemRZWHBjWGpiZDNmQ3RNSVFmREQ4M2J1ckNnMGRIZnZSNmlG?=
+ =?utf-8?B?MjJVMUl4WXpLWWkrTS90OVk3MFpQQXo0ZGF0VW9nWWErcVhEYkZvWnpDMnBu?=
+ =?utf-8?B?WTJSY1U0N2dMR1A0V1BXb2UwUTFwNG1xSVpQTWsrK2lTc3QzdU9CeWJlTmhz?=
+ =?utf-8?B?ZGs0VUl4NXdlalZYY09nd3U4cHVXdCs2OEJpZk12RTYxdUFPaHg1MmxJL3J6?=
+ =?utf-8?B?S291VWM3WnJxQWQ2TWhuOE9qQXQ4eFRlQ1VraWxYTi9ZNitMMmwvUW5vblNh?=
+ =?utf-8?B?eWE0OGxxTXBxWUVJcUVYNHg3UjRrRVIvZGpyZWc5c2dFTmp0K253YnA5QUt6?=
+ =?utf-8?B?dFBFYndzTk9Ya3pacmpXUVNqdldaa0dHMGdRZktnQ2RZZk1CSXRrMDd3SDVz?=
+ =?utf-8?B?ejlWbzFLWXhFVE1YTE9kMFp1SHNRTGEyK2VxckdsZVFkeWJreGpNKzRYOVBw?=
+ =?utf-8?B?OGlxeDVZcWE0cDlmZ21aeXVtNWppbzArZzVnZ25mTUMrcWRJZis3cHl2a2hY?=
+ =?utf-8?B?RWlBS3dsOEo5YWlVc3pJc29iMUduR3Z3MCt2ajJhTmtIMHh0R0dyMEZKZ1J0?=
+ =?utf-8?B?MzNDZ0YvczNJRk5FTXVLSWtxUSsyai9jYjNldU51OXliaWczRHp1MVFvYThu?=
+ =?utf-8?B?emJaRHdOQjQ2VEQ1NDJqZXlPZllHbEtUZ2JlMEJVSDZ3RzRFQXZscHorTnZ0?=
+ =?utf-8?B?c1JURUxGUUNlamptQXpkTnNPZ2ZXdWNFNVdsUGpxbzBBOWtpYjBUVkMxR3JT?=
+ =?utf-8?B?WEVUS0w5eWxLbWFONEN5aGJjV0MvU1B4TEVaSXA1RysvYllXNnpsOHV6TDgr?=
+ =?utf-8?B?Y0J0S1BLT1pFOXFpT2VMZ2pHc21rUURWNjduOWpIV1FMNXhXTWJBV2xDcWpZ?=
+ =?utf-8?B?dlk0YW5RVEs2TDUrTjVGVzRiK0g1N1EvNG1jR0d1ZXdteUtubVY2T0lhK3dY?=
+ =?utf-8?B?UkE9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	4XzA0MeH6ck99+S/IJ1AWxK/CnwN9eKOoaw8A8iNxXrOb4ppJtaSKNAW3VT5YforKL1yVDsf5OO7wcNQphNGoRfPgOzW5ULEKA5CE3YARoH0Buc7gnEPCHdDJ6NPtqaYp2MKnxE8ANSjOhBOZNO4yh4msMpBcOJp5cH/s+qRQZyIV1/L4XzLzSZb9zENw3vHhhx0Kb46BsV07Feqgr6ZIKxlo/iuLtHot3romfL6FzlTdT1FZlmm/Z+CmAPhkF+3nPTm/ef8DRjDtKFo4hXcJNNVCiGXW32vk14/j+LgJ2Ub7C0qZasBEUI9SLjtB9LMfe2cVytldVrFJ/owNw78aUqixeejbZakyO3iqSSJ2H3UJ5cl6ZYDgJ0nIIUJhYoTCDQj1Ano5qjYc+Chn78X6ghfDNT4AA0sieBDkPvy8FSC9+VhQ4YwWF3aLbPSupxkdMw3OrE11yxB3NfyoI0tRSFw2KfZXr0WLL/pbD5/8MQiyPYvaJR32c5ScVhujUJVyR5IbpfZ1/olXXekvbj0YSbqLwV0TCsa6QlMqKhJbPXKOMLLjZE4BMVCeA1uaa+G4+JfoDkRySfha1Wl5qku8Wa2BK8y0k0ieOiZWImJUmY=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8e3c6826-2855-47d8-48c3-08dd93bf0757
+X-MS-Exchange-CrossTenant-AuthSource: BN0PR10MB5128.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 May 2025 14:44:42.9352
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: PYCqV6XGTmLzo5Q0JA9fdZrOtLjv85L+XN1ylzAB/W6Z8Fi6yPuKfO8NSecRidPaiabrML8LGZv8A040Bl6Duw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR10MB7508
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-15_06,2025-05-14_03,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 spamscore=0
+ suspectscore=0 mlxscore=0 phishscore=0 mlxlogscore=999 adultscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2505070000 definitions=main-2505150145
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTE1MDE0NSBTYWx0ZWRfXwmtxGW1Z07SX fX0qRkA6pQ8cnaSj3afE7rgTlCUtsIrGAz7z7Tf/KNDvugG96GP9Hkv/vQ0t9+XQsBWaeTYxNyn 708A0F9NLGuHnClTBH82H6jY5NVpZPdQl9SbjaSSuPQuYWZb8kDaQnRvUiuFN/cbBzCCvdCJcdj
+ v3xtxKASe4inpoJllM4Urur8aBWYa0kHWPvN2LRxhKNbnlWUwna37Nostyo15Dd5nMsX1aeclU0 TMPW1jHWlWnOGTnPoNv5YddKd+RRZ9XeAp7O7THBru6h63xfERckZj2dLMmrDDFj1kgJUSXEJmV nieCNMcNPIDYMd6RPe25VmatKrZB9uCDCR3g5FnskZZJ0VLyS3eHW2zo+NgBpQY3WC4YCZ73IzW
+ RLowQmslK2CAMyah3QXWh0z5G1Zgj9XCLcXQ/bnld7NvXzxo7fr2H++NRb4RUZwKI8duPXAg
+X-Proofpoint-GUID: CufCGAlnANUpv9QLIUKNxFlavIO5lL0f
+X-Authority-Analysis: v=2.4 cv=fvDcZE4f c=1 sm=1 tr=0 ts=6825fddf cx=c_pps a=OOZaFjgC48PWsiFpTAqLcw==:117 a=OOZaFjgC48PWsiFpTAqLcw==:17 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10
+ a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=GoEa3M9JfhUA:10 a=EFlj6mK3JSbaIrlheMcA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: CufCGAlnANUpv9QLIUKNxFlavIO5lL0f
 
-Am Do., 15. Mai 2025 um 00:04 Uhr schrieb Christian Brauner
-<brauner@kernel.org>:
->
-> Add a simple test for generating coredumps via AF_UNIX sockets.
->
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
+Resending with linux-nfs and kernel-tls-handshake on Cc
 
-Reviewed-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
 
-> ---
->  tools/testing/selftests/coredump/stackdump_test.c | 514 +++++++++++++++++++++-
->  1 file changed, 513 insertions(+), 1 deletion(-)
->
-> diff --git a/tools/testing/selftests/coredump/stackdump_test.c b/tools/testing/selftests/coredump/stackdump_test.c
-> index fe3c728cd6be..42ddcf0bdaf2 100644
-> --- a/tools/testing/selftests/coredump/stackdump_test.c
-> +++ b/tools/testing/selftests/coredump/stackdump_test.c
-> @@ -1,14 +1,20 @@
->  // SPDX-License-Identifier: GPL-2.0
->
->  #include <fcntl.h>
-> +#include <inttypes.h>
->  #include <libgen.h>
->  #include <linux/limits.h>
->  #include <pthread.h>
->  #include <string.h>
-> +#include <sys/mount.h>
->  #include <sys/resource.h>
-> +#include <sys/stat.h>
-> +#include <sys/socket.h>
-> +#include <sys/un.h>
->  #include <unistd.h>
->
->  #include "../kselftest_harness.h"
-> +#include "../pidfd/pidfd.h"
->
->  #define STACKDUMP_FILE "stack_values"
->  #define STACKDUMP_SCRIPT "stackdump"
-> @@ -35,6 +41,7 @@ static void crashing_child(void)
->  FIXTURE(coredump)
->  {
->         char original_core_pattern[256];
-> +       pid_t pid_coredump_server;
->  };
->
->  FIXTURE_SETUP(coredump)
-> @@ -44,6 +51,7 @@ FIXTURE_SETUP(coredump)
->         char *dir;
->         int ret;
->
-> +       self->pid_coredump_server = -ESRCH;
->         file = fopen("/proc/sys/kernel/core_pattern", "r");
->         ASSERT_NE(NULL, file);
->
-> @@ -61,10 +69,17 @@ FIXTURE_TEARDOWN(coredump)
->  {
->         const char *reason;
->         FILE *file;
-> -       int ret;
-> +       int ret, status;
->
->         unlink(STACKDUMP_FILE);
->
-> +       if (self->pid_coredump_server > 0) {
-> +               kill(self->pid_coredump_server, SIGTERM);
-> +               waitpid(self->pid_coredump_server, &status, 0);
-> +       }
-> +       unlink("/tmp/coredump.file");
-> +       unlink("/tmp/coredump.socket");
-> +
->         file = fopen("/proc/sys/kernel/core_pattern", "w");
->         if (!file) {
->                 reason = "Unable to open core_pattern";
-> @@ -154,4 +169,501 @@ TEST_F_TIMEOUT(coredump, stackdump, 120)
->         fclose(file);
->  }
->
-> +TEST_F(coredump, socket)
-> +{
-> +       int fd, pidfd, ret, status;
-> +       FILE *file;
-> +       pid_t pid, pid_coredump_server;
-> +       struct stat st;
-> +       char core_file[PATH_MAX];
-> +       struct pidfd_info info = {};
-> +       int ipc_sockets[2];
-> +       char c;
-> +       const struct sockaddr_un coredump_sk = {
-> +               .sun_family = AF_UNIX,
-> +               .sun_path = "/tmp/coredump.socket",
-> +       };
-> +       size_t coredump_sk_len = offsetof(struct sockaddr_un, sun_path) +
-> +                                sizeof("/tmp/coredump.socket");
-> +
-> +       ret = socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, ipc_sockets);
-> +       ASSERT_EQ(ret, 0);
-> +
-> +       file = fopen("/proc/sys/kernel/core_pattern", "w");
-> +       ASSERT_NE(file, NULL);
-> +
-> +       ret = fprintf(file, "@/tmp/coredump.socket");
-> +       ASSERT_EQ(ret, strlen("@/tmp/coredump.socket"));
-> +       ASSERT_EQ(fclose(file), 0);
-> +
-> +       pid_coredump_server = fork();
-> +       ASSERT_GE(pid_coredump_server, 0);
-> +       if (pid_coredump_server == 0) {
-> +               int fd_server, fd_coredump, fd_peer_pidfd, fd_core_file;
-> +               __u64 peer_cookie;
-> +               socklen_t fd_peer_pidfd_len, peer_cookie_len;
-> +
-> +               close(ipc_sockets[0]);
-> +
-> +               fd_server = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
-> +               if (fd_server < 0)
-> +                       _exit(EXIT_FAILURE);
-> +
-> +               ret = bind(fd_server, (const struct sockaddr *)&coredump_sk, coredump_sk_len);
-> +               if (ret < 0) {
-> +                       fprintf(stderr, "Failed to bind coredump socket\n");
-> +                       close(fd_server);
-> +                       close(ipc_sockets[1]);
-> +                       _exit(EXIT_FAILURE);
-> +               }
-> +
-> +               ret = listen(fd_server, 1);
-> +               if (ret < 0) {
-> +                       fprintf(stderr, "Failed to listen on coredump socket\n");
-> +                       close(fd_server);
-> +                       close(ipc_sockets[1]);
-> +                       _exit(EXIT_FAILURE);
-> +               }
-> +
-> +               if (write_nointr(ipc_sockets[1], "1", 1) < 0) {
-> +                       close(fd_server);
-> +                       close(ipc_sockets[1]);
-> +                       _exit(EXIT_FAILURE);
-> +               }
-> +
-> +               close(ipc_sockets[1]);
-> +
-> +               fd_coredump = accept4(fd_server, NULL, NULL, SOCK_CLOEXEC);
-> +               if (fd_coredump < 0) {
-> +                       fprintf(stderr, "Failed to accept coredump socket connection\n");
-> +                       close(fd_server);
-> +                       _exit(EXIT_FAILURE);
-> +               }
-> +
-> +               peer_cookie_len = sizeof(peer_cookie);
-> +               ret = getsockopt(fd_coredump, SOL_SOCKET, SO_COOKIE,
-> +                                &peer_cookie, &peer_cookie_len);
-> +               if (ret < 0) {
-> +                       fprintf(stderr, "%m - Failed to retrieve cookie for coredump socket connection\n");
-> +                       close(fd_coredump);
-> +                       close(fd_server);
-> +                       _exit(EXIT_FAILURE);
-> +               }
-> +
-> +               fd_peer_pidfd_len = sizeof(fd_peer_pidfd);
-> +               ret = getsockopt(fd_coredump, SOL_SOCKET, SO_PEERPIDFD,
-> +                                &fd_peer_pidfd, &fd_peer_pidfd_len);
-> +               if (ret < 0) {
-> +                       fprintf(stderr, "%m - Failed to retrieve peer pidfd for coredump socket connection\n");
-> +                       close(fd_coredump);
-> +                       close(fd_server);
-> +                       _exit(EXIT_FAILURE);
-> +               }
-> +
-> +               memset(&info, 0, sizeof(info));
-> +               info.mask = PIDFD_INFO_EXIT | PIDFD_INFO_COREDUMP;
-> +               ret = ioctl(fd_peer_pidfd, PIDFD_GET_INFO, &info);
-> +               if (ret < 0) {
-> +                       fprintf(stderr, "Failed to retrieve pidfd info from peer pidfd for coredump socket connection\n");
-> +                       close(fd_coredump);
-> +                       close(fd_server);
-> +                       close(fd_peer_pidfd);
-> +                       _exit(EXIT_FAILURE);
-> +               }
-> +
-> +               if (!(info.mask & PIDFD_INFO_COREDUMP)) {
-> +                       fprintf(stderr, "Missing coredump information from coredumping task\n");
-> +                       close(fd_coredump);
-> +                       close(fd_server);
-> +                       close(fd_peer_pidfd);
-> +                       _exit(EXIT_FAILURE);
-> +               }
-> +
-> +               if (!(info.coredump_mask & PIDFD_COREDUMPED)) {
-> +                       fprintf(stderr, "Received connection from non-coredumping task\n");
-> +                       close(fd_coredump);
-> +                       close(fd_server);
-> +                       close(fd_peer_pidfd);
-> +                       _exit(EXIT_FAILURE);
-> +               }
-> +
-> +               if (!info.coredump_cookie) {
-> +                       fprintf(stderr, "Missing coredump cookie\n");
-> +                       close(fd_coredump);
-> +                       close(fd_server);
-> +                       close(fd_peer_pidfd);
-> +                       _exit(EXIT_FAILURE);
-> +               }
-> +
-> +               if (info.coredump_cookie != peer_cookie) {
-> +                       fprintf(stderr, "Mismatching coredump cookies\n");
-> +                       close(fd_coredump);
-> +                       close(fd_server);
-> +                       close(fd_peer_pidfd);
-> +                       _exit(EXIT_FAILURE);
-> +               }
-> +
-> +               fd_core_file = creat("/tmp/coredump.file", 0644);
-> +               if (fd_core_file < 0) {
-> +                       fprintf(stderr, "Failed to create coredump file\n");
-> +                       close(fd_coredump);
-> +                       close(fd_server);
-> +                       close(fd_peer_pidfd);
-> +                       _exit(EXIT_FAILURE);
-> +               }
-> +
-> +               for (;;) {
-> +                       char buffer[4096];
-> +                       ssize_t bytes_read, bytes_write;
-> +
-> +                       bytes_read = read(fd_coredump, buffer, sizeof(buffer));
-> +                       if (bytes_read < 0) {
-> +                               close(fd_coredump);
-> +                               close(fd_server);
-> +                               close(fd_peer_pidfd);
-> +                               close(fd_core_file);
-> +                               _exit(EXIT_FAILURE);
-> +                       }
-> +
-> +                       if (bytes_read == 0)
-> +                               break;
-> +
-> +                       bytes_write = write(fd_core_file, buffer, bytes_read);
-> +                       if (bytes_read != bytes_write) {
-> +                               close(fd_coredump);
-> +                               close(fd_server);
-> +                               close(fd_peer_pidfd);
-> +                               close(fd_core_file);
-> +                               _exit(EXIT_FAILURE);
-> +                       }
-> +               }
-> +
-> +               close(fd_coredump);
-> +               close(fd_server);
-> +               close(fd_peer_pidfd);
-> +               close(fd_core_file);
-> +               _exit(EXIT_SUCCESS);
-> +       }
-> +       self->pid_coredump_server = pid_coredump_server;
-> +
-> +       EXPECT_EQ(close(ipc_sockets[1]), 0);
-> +       ASSERT_EQ(read_nointr(ipc_sockets[0], &c, 1), 1);
-> +       EXPECT_EQ(close(ipc_sockets[0]), 0);
-> +
-> +       pid = fork();
-> +       ASSERT_GE(pid, 0);
-> +       if (pid == 0)
-> +               crashing_child();
-> +
-> +       pidfd = sys_pidfd_open(pid, 0);
-> +       ASSERT_GE(pidfd, 0);
-> +
-> +       waitpid(pid, &status, 0);
-> +       ASSERT_TRUE(WIFSIGNALED(status));
-> +       ASSERT_TRUE(WCOREDUMP(status));
-> +
-> +       info.mask = PIDFD_INFO_EXIT | PIDFD_INFO_COREDUMP;
-> +       ASSERT_EQ(ioctl(pidfd, PIDFD_GET_INFO, &info), 0);
-> +       ASSERT_GT((info.mask & PIDFD_INFO_COREDUMP), 0);
-> +       ASSERT_GT((info.coredump_mask & PIDFD_COREDUMPED), 0);
-> +
-> +       waitpid(pid_coredump_server, &status, 0);
-> +       self->pid_coredump_server = -ESRCH;
-> +       ASSERT_TRUE(WIFEXITED(status));
-> +       ASSERT_EQ(WEXITSTATUS(status), 0);
-> +
-> +       ASSERT_EQ(stat("/tmp/coredump.file", &st), 0);
-> +       ASSERT_GT(st.st_size, 0);
-> +       /*
-> +        * We should somehow validate the produced core file.
-> +        * For now just allow for visual inspection
-> +        */
-> +       system("file /tmp/coredump.file");
-> +}
-> +
-> +TEST_F(coredump, socket_detect_userspace_client)
-> +{
-> +       int fd, pidfd, ret, status;
-> +       FILE *file;
-> +       pid_t pid, pid_coredump_server;
-> +       struct stat st;
-> +       char core_file[PATH_MAX];
-> +       struct pidfd_info info = {};
-> +       int ipc_sockets[2];
-> +       char c;
-> +       const struct sockaddr_un coredump_sk = {
-> +               .sun_family = AF_UNIX,
-> +               .sun_path = "/tmp/coredump.socket",
-> +       };
-> +       size_t coredump_sk_len = offsetof(struct sockaddr_un, sun_path) +
-> +                                sizeof("/tmp/coredump.socket");
-> +
-> +       file = fopen("/proc/sys/kernel/core_pattern", "w");
-> +       ASSERT_NE(file, NULL);
-> +
-> +       ret = fprintf(file, "@/tmp/coredump.socket");
-> +       ASSERT_EQ(ret, strlen("@/tmp/coredump.socket"));
-> +       ASSERT_EQ(fclose(file), 0);
-> +
-> +       ret = socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, ipc_sockets);
-> +       ASSERT_EQ(ret, 0);
-> +
-> +       pid_coredump_server = fork();
-> +       ASSERT_GE(pid_coredump_server, 0);
-> +       if (pid_coredump_server == 0) {
-> +               int fd_server, fd_coredump, fd_peer_pidfd, fd_core_file;
-> +               __u64 peer_cookie;
-> +               socklen_t fd_peer_pidfd_len, peer_cookie_len;
-> +
-> +               close(ipc_sockets[0]);
-> +
-> +               fd_server = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
-> +               if (fd_server < 0)
-> +                       _exit(EXIT_FAILURE);
-> +
-> +               ret = bind(fd_server, (const struct sockaddr *)&coredump_sk, coredump_sk_len);
-> +               if (ret < 0) {
-> +                       fprintf(stderr, "Failed to bind coredump socket\n");
-> +                       close(fd_server);
-> +                       close(ipc_sockets[1]);
-> +                       _exit(EXIT_FAILURE);
-> +               }
-> +
-> +               ret = listen(fd_server, 1);
-> +               if (ret < 0) {
-> +                       fprintf(stderr, "Failed to listen on coredump socket\n");
-> +                       close(fd_server);
-> +                       close(ipc_sockets[1]);
-> +                       _exit(EXIT_FAILURE);
-> +               }
-> +
-> +               if (write_nointr(ipc_sockets[1], "1", 1) < 0) {
-> +                       close(fd_server);
-> +                       close(ipc_sockets[1]);
-> +                       _exit(EXIT_FAILURE);
-> +               }
-> +
-> +               close(ipc_sockets[1]);
-> +
-> +               fd_coredump = accept4(fd_server, NULL, NULL, SOCK_CLOEXEC);
-> +               if (fd_coredump < 0) {
-> +                       fprintf(stderr, "Failed to accept coredump socket connection\n");
-> +                       close(fd_server);
-> +                       _exit(EXIT_FAILURE);
-> +               }
-> +
-> +               peer_cookie_len = sizeof(peer_cookie);
-> +               ret = getsockopt(fd_coredump, SOL_SOCKET, SO_COOKIE,
-> +                                &peer_cookie, &peer_cookie_len);
-> +               if (ret < 0) {
-> +                       fprintf(stderr, "%m - Failed to retrieve cookie for coredump socket connection\n");
-> +                       close(fd_coredump);
-> +                       close(fd_server);
-> +                       _exit(EXIT_FAILURE);
-> +               }
-> +
-> +               fd_peer_pidfd_len = sizeof(fd_peer_pidfd);
-> +               ret = getsockopt(fd_coredump, SOL_SOCKET, SO_PEERPIDFD,
-> +                                &fd_peer_pidfd, &fd_peer_pidfd_len);
-> +               if (ret < 0) {
-> +                       fprintf(stderr, "%m - Failed to retrieve peer pidfd for coredump socket connection\n");
-> +                       close(fd_coredump);
-> +                       close(fd_server);
-> +                       _exit(EXIT_FAILURE);
-> +               }
-> +
-> +               memset(&info, 0, sizeof(info));
-> +               info.mask = PIDFD_INFO_EXIT | PIDFD_INFO_COREDUMP;
-> +               ret = ioctl(fd_peer_pidfd, PIDFD_GET_INFO, &info);
-> +               if (ret < 0) {
-> +                       fprintf(stderr, "Failed to retrieve pidfd info from peer pidfd for coredump socket connection\n");
-> +                       close(fd_coredump);
-> +                       close(fd_server);
-> +                       close(fd_peer_pidfd);
-> +                       _exit(EXIT_FAILURE);
-> +               }
-> +
-> +               if (!(info.mask & PIDFD_INFO_COREDUMP)) {
-> +                       fprintf(stderr, "Missing coredump information from coredumping task\n");
-> +                       close(fd_coredump);
-> +                       close(fd_server);
-> +                       close(fd_peer_pidfd);
-> +                       _exit(EXIT_FAILURE);
-> +               }
-> +
-> +               if (info.coredump_mask & PIDFD_COREDUMPED) {
-> +                       fprintf(stderr, "Received unexpected connection from coredumping task\n");
-> +                       close(fd_coredump);
-> +                       close(fd_server);
-> +                       close(fd_peer_pidfd);
-> +                       _exit(EXIT_FAILURE);
-> +               }
-> +
-> +               if (info.coredump_cookie) {
-> +                       fprintf(stderr, "Received unexpected coredump cookie\n");
-> +                       close(fd_coredump);
-> +                       close(fd_server);
-> +                       close(fd_peer_pidfd);
-> +                       _exit(EXIT_FAILURE);
-> +               }
-> +
-> +               close(fd_coredump);
-> +               close(fd_server);
-> +               close(fd_peer_pidfd);
-> +               close(fd_core_file);
-> +               _exit(EXIT_SUCCESS);
-> +       }
-> +       self->pid_coredump_server = pid_coredump_server;
-> +
-> +       EXPECT_EQ(close(ipc_sockets[1]), 0);
-> +       ASSERT_EQ(read_nointr(ipc_sockets[0], &c, 1), 1);
-> +       EXPECT_EQ(close(ipc_sockets[0]), 0);
-> +
-> +       pid = fork();
-> +       ASSERT_GE(pid, 0);
-> +       if (pid == 0) {
-> +               int fd_socket;
-> +               ssize_t ret;
-> +
-> +               fd_socket = socket(AF_UNIX, SOCK_STREAM, 0);
-> +               if (fd_socket < 0)
-> +                       _exit(EXIT_FAILURE);
-> +
-> +
-> +               ret = connect(fd_socket, (const struct sockaddr *)&coredump_sk, coredump_sk_len);
-> +               if (ret < 0)
-> +                       _exit(EXIT_FAILURE);
-> +
-> +               (void *)write(fd_socket, &(char){ 0 }, 1);
-> +               close(fd_socket);
-> +               _exit(EXIT_SUCCESS);
-> +       }
-> +
-> +       pidfd = sys_pidfd_open(pid, 0);
-> +       ASSERT_GE(pidfd, 0);
-> +
-> +       waitpid(pid, &status, 0);
-> +       ASSERT_TRUE(WIFEXITED(status));
-> +       ASSERT_EQ(WEXITSTATUS(status), 0);
-> +
-> +       info.mask = PIDFD_INFO_EXIT | PIDFD_INFO_COREDUMP;
-> +       ASSERT_EQ(ioctl(pidfd, PIDFD_GET_INFO, &info), 0);
-> +       ASSERT_GT((info.mask & PIDFD_INFO_COREDUMP), 0);
-> +       ASSERT_EQ((info.coredump_mask & PIDFD_COREDUMPED), 0);
-> +
-> +       waitpid(pid_coredump_server, &status, 0);
-> +       self->pid_coredump_server = -ESRCH;
-> +       ASSERT_TRUE(WIFEXITED(status));
-> +       ASSERT_EQ(WEXITSTATUS(status), 0);
-> +
-> +       ASSERT_NE(stat("/tmp/coredump.file", &st), 0);
-> +       ASSERT_EQ(errno, ENOENT);
-> +}
-> +
-> +TEST_F(coredump, socket_enoent)
-> +{
-> +       int pidfd, ret, status;
-> +       FILE *file;
-> +       pid_t pid;
-> +       char core_file[PATH_MAX];
-> +
-> +       file = fopen("/proc/sys/kernel/core_pattern", "w");
-> +       ASSERT_NE(file, NULL);
-> +
-> +       ret = fprintf(file, "@/tmp/coredump.socket");
-> +       ASSERT_EQ(ret, strlen("@/tmp/coredump.socket"));
-> +       ASSERT_EQ(fclose(file), 0);
-> +
-> +       pid = fork();
-> +       ASSERT_GE(pid, 0);
-> +       if (pid == 0)
-> +               crashing_child();
-> +
-> +       pidfd = sys_pidfd_open(pid, 0);
-> +       ASSERT_GE(pidfd, 0);
-> +
-> +       waitpid(pid, &status, 0);
-> +       ASSERT_TRUE(WIFSIGNALED(status));
-> +       ASSERT_FALSE(WCOREDUMP(status));
-> +}
-> +
-> +TEST_F(coredump, socket_no_listener)
-> +{
-> +       int pidfd, ret, status;
-> +       FILE *file;
-> +       pid_t pid, pid_coredump_server;
-> +       int ipc_sockets[2];
-> +       char c;
-> +       const struct sockaddr_un coredump_sk = {
-> +               .sun_family = AF_UNIX,
-> +               .sun_path = "/tmp/coredump.socket",
-> +       };
-> +       size_t coredump_sk_len = offsetof(struct sockaddr_un, sun_path) +
-> +                                sizeof("/tmp/coredump.socket");
-> +
-> +       ret = socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, ipc_sockets);
-> +       ASSERT_EQ(ret, 0);
-> +
-> +       file = fopen("/proc/sys/kernel/core_pattern", "w");
-> +       ASSERT_NE(file, NULL);
-> +
-> +       ret = fprintf(file, "@/tmp/coredump.socket");
-> +       ASSERT_EQ(ret, strlen("@/tmp/coredump.socket"));
-> +       ASSERT_EQ(fclose(file), 0);
-> +
-> +       pid_coredump_server = fork();
-> +       ASSERT_GE(pid_coredump_server, 0);
-> +       if (pid_coredump_server == 0) {
-> +               int fd_server, fd_coredump, fd_peer_pidfd, fd_core_file;
-> +               __u64 peer_cookie;
-> +               socklen_t fd_peer_pidfd_len, peer_cookie_len;
-> +
-> +               close(ipc_sockets[0]);
-> +
-> +               fd_server = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
-> +               if (fd_server < 0)
-> +                       _exit(EXIT_FAILURE);
-> +
-> +               ret = bind(fd_server, (const struct sockaddr *)&coredump_sk, coredump_sk_len);
-> +               if (ret < 0) {
-> +                       fprintf(stderr, "Failed to bind coredump socket\n");
-> +                       close(fd_server);
-> +                       close(ipc_sockets[1]);
-> +                       _exit(EXIT_FAILURE);
-> +               }
-> +
-> +               if (write_nointr(ipc_sockets[1], "1", 1) < 0) {
-> +                       close(fd_server);
-> +                       close(ipc_sockets[1]);
-> +                       _exit(EXIT_FAILURE);
-> +               }
-> +
-> +               close(fd_server);
-> +               close(ipc_sockets[1]);
-> +               _exit(EXIT_SUCCESS);
-> +       }
-> +       self->pid_coredump_server = pid_coredump_server;
-> +
-> +       EXPECT_EQ(close(ipc_sockets[1]), 0);
-> +       ASSERT_EQ(read_nointr(ipc_sockets[0], &c, 1), 1);
-> +       EXPECT_EQ(close(ipc_sockets[0]), 0);
-> +
-> +       pid = fork();
-> +       ASSERT_GE(pid, 0);
-> +       if (pid == 0)
-> +               crashing_child();
-> +
-> +       pidfd = sys_pidfd_open(pid, 0);
-> +       ASSERT_GE(pidfd, 0);
-> +
-> +       waitpid(pid, &status, 0);
-> +       ASSERT_TRUE(WIFSIGNALED(status));
-> +       ASSERT_FALSE(WCOREDUMP(status));
-> +
-> +       waitpid(pid_coredump_server, &status, 0);
-> +       self->pid_coredump_server = -ESRCH;
-> +       ASSERT_TRUE(WIFEXITED(status));
-> +       ASSERT_EQ(WEXITSTATUS(status), 0);
-> +}
-> +
->  TEST_HARNESS_MAIN
->
-> --
-> 2.47.2
->
+On 5/15/25 10:35 AM, Chuck Lever wrote:
+> Hi -
+> 
+> I'm troubleshooting an issue where, after a successful handshake, the
+> kernel TLS socket's data_ready callback is never invoked. I'm able to
+> reproduce this 100% on an Atom-based system with a Realtek Ethernet
+> device. But on many other systems, the problem is intermittent or not
+> reproducible.
+> 
+> The problem seems to be that strp->msg_ready is already set when
+> tls_data_ready is called, and that prevents any further processing. I
+> see that msg_ready is set when the handshake daemon sets the ktls
+> security parameters, and is then never cleared.
+> 
+> function:             tls_setsockopt
+> function:                do_tls_setsockopt_conf
+> function:                   tls_set_device_offload_rx
+> function:                   tls_set_sw_offload
+> function:                      init_prot_info
+> function:                      tls_strp_init
+> function:                   tls_sw_strparser_arm
+> function:                   tls_strp_check_rcv
+> function:                      tls_strp_read_sock
+> function:                         tls_strp_load_anchor_with_queue
+> function:                         tls_rx_msg_size
+> function:                            tls_device_rx_resync_new_rec
+> function:                         tls_rx_msg_ready
+> 
+> For a working system (a VMware guest using a VMXNet device), setsockopt
+> leaves msg_ready set to zero:
+> 
+> function:             tls_setsockopt
+> function:                do_tls_setsockopt_conf
+> function:                   tls_set_device_offload_rx
+> function:                   tls_set_sw_offload
+> function:                      init_prot_info
+> function:                      tls_strp_init
+> function:                   tls_sw_strparser_arm
+> function:                   tls_strp_check_rcv
+> 
+> The first tls_data_ready call then handles the waiting ingress data as
+> expected.
+> 
+> Any advice is appreciated.
+> 
+
+
+-- 
+Chuck Lever
 
