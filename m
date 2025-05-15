@@ -1,192 +1,102 @@
-Return-Path: <netdev+bounces-190636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 647DAAB7F58
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 09:53:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 187EDAB7F8D
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 10:02:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F218C1BA0009
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 07:54:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 014613B32AA
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 08:01:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1333280330;
-	Thu, 15 May 2025 07:53:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ffUnYvzQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CD641ADFFE;
+	Thu, 15 May 2025 08:01:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B729280304;
-	Thu, 15 May 2025 07:53:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E3B638DD8
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 08:01:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747295632; cv=none; b=K66kjV0KqzmIs3E7FMvcEBh5KjlikxUZnsiInNYkPfVcL4R0vsQmpHSWAnNxCKdTWjx2SrQH+QFAjQGlvJ4Rf8cmYz1k065sTt/fm/OHFUOREntBPMHCNGAZS0TzSUvQS9QVL3W5lHVFEyPgHqav1yF6qdO6FLdE97NjIIjBrDA=
+	t=1747296091; cv=none; b=WCxmHEN9SMI+oC9eltsWQqKPplmfYV8zCezc66W2gAj59jr/pr7ALqbeGRvLb7cJLwWOMmjAKt4iqKgbjjL6hJ+MpEVRYHZXUXwPWjw8ZAiQBnctYXuOt9xB74/myC7B2OQwhRO7J3nIuS+lhOkbDpkuYRjOsVddPvqpDIiiDoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747295632; c=relaxed/simple;
-	bh=wUEqgSTV2QgtgOIjx6bsDxFv4ShMZp2fM80qbS8rSiw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X+phS23JiyXYHmilmlME1YnLVFEcOfSldRI0S5calzzIGbLf8eY1ZJpZ0oHVqbncK5YkXRyBB5aMvFI3RjLjOcd8skm4MrkK2UgAI4tZL6RXVugPO4nRFpeaJzmVuSo5DNB9pMW+sjimAa1cw6D3qHfm/D8v64gR2MXgLoIOzaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ffUnYvzQ; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7423fb98cb1so680306b3a.3;
-        Thu, 15 May 2025 00:53:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747295630; x=1747900430; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=d6+1l6psSc4ieMT2IvTyMfmvtZ8uQROzlTdXH4Fr4sA=;
-        b=ffUnYvzQ7XbzhYHIZhYhgBh6xzgkhlErhKH+0SHUy/cdhk0ggapLBYzO8t7rtiumo2
-         1PMuugL+cvSq1Oc1TVzk7Zy3Lw0UpuTdXe1+2nDd3c0+8Iqe3JB553WV4CUQx7MQpbQN
-         1+tk2zDnzfJGlqOBREoVhUJ7myX21SCYjg2+QVYWSlvXZDruP9NP9Cd1Pya7OtGyqphO
-         ohhqjXPOpMOoUV9sf7TJ5t2HfHsb/w4bf5MDifKEEqEJqrkLBrs3xmdYbI+oCX+CNhZI
-         zvk4uSATdF3kp/U2tbbMH9q/q0ZUh3na47esX00GvJG0+dXMT2FjslDmdQC2BlfcoWfK
-         HhfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747295630; x=1747900430;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=d6+1l6psSc4ieMT2IvTyMfmvtZ8uQROzlTdXH4Fr4sA=;
-        b=g08R7NHOTHobFExgrmznHl00taj/R0IgIMTlgq+RoMZKDlK3WferWyi9b+gZF0EwuL
-         8k3n9rciJmC64KdYogsuyx7I76zS24aLerpgUPlu1SEkFJ3iEixLEKP8uhLXDI7N+Ckd
-         e10mzR6qL/krhUNp3HH8rr8fzVywK+M+LvHRzQbkWOufeC1FwnP1adDoXQEBHpQUFqVK
-         FspemQ2AQOOfMfLz13TgK7i9j7+BJO2lEK3l3r/zKXRHtbVwciMUx3G5cT+Rn+n1FpBa
-         oLA4IlTg+jHU8gaLw2BZOD4QWzGqAFVF71gunC3x4gew0Ze/2UfOzO/tnMHCsrrsnk8w
-         YlVg==
-X-Forwarded-Encrypted: i=1; AJvYcCU1CaZSk25A5mrLeOkEkFF6d4dB9auQp1kz/0TLghtG7JpyJ7iopJSlvWws0Exji3kmkGtj+OTO@vger.kernel.org, AJvYcCXHHWfOPL7Q99SF8naafDRrRNPocsh/5VVrO5xXePYe9z6XqoI8ZgBqYePjw6fx9PPLpqG0OogU5eMBIoY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrVirB+wqsHXMsHdsolt8m0cB5p6WefMA3H6e6i1X5ZwnKGrTH
-	RpDbRMIXzpFP8uDFXp3nYeOsft/FB3uxPvgX2u5JQT+od4H9dghV
-X-Gm-Gg: ASbGncukODwTfmMrlijJK3/lBEUIi/bGXtWR0Yoa1o6z+1ta7DVgM18+ssBNlgo9Z9Q
-	dTdYV/tU2IwRy5RgI/ZnQ849c9h7rCDZJVF3sJxW9HE5NpVk1qq9P0G6e59az2+Vw4CIr8AB84e
-	+VGVQR9Oen5opW4w1KhR15AXDcGAmPtuWEQC83zHoG+zhnJm4P6A7eFdl2BOskQenK05oe9W9ql
-	3INMEB2Cx4hiIbX2l5Nw4LgVWQpJu/DWf4VRal2nPUoXA/IAE35OHdmJ9WhEuiEmounrweCenIM
-	sAncR29jSmtbrOK8/eC7gNBS3JDkfHDpiRAviiL3AN5bRQ50r+cm
-X-Google-Smtp-Source: AGHT+IHKeW/lRf4A736uiyEk8pb1EFNbX4MNRx95s1GbRRKiftyq5dFJydREqeAw1RiiX8blRyYUDg==
-X-Received: by 2002:a05:6a00:2987:b0:736:a8db:93bb with SMTP id d2e1a72fcca58-742892680f5mr7842964b3a.5.1747295630226;
-        Thu, 15 May 2025 00:53:50 -0700 (PDT)
-Received: from mythos-cloud.. ([125.138.201.7])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74237704dc0sm10666148b3a.7.2025.05.15.00.53.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 May 2025 00:53:49 -0700 (PDT)
-From: Moon Yeounsu <yyyynoom@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Moon Yeounsu <yyyynoom@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3] net: dlink: add synchronization for stats update
-Date: Thu, 15 May 2025 16:53:31 +0900
-Message-ID: <20250515075333.48290-1-yyyynoom@gmail.com>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1747296091; c=relaxed/simple;
+	bh=Glxi0h1nfMcnnRx3zvoh2aMVxWibqcmtRTyPLQT/wvQ=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OEhkf71KUm5bdNqLv1oPFQlYSlT5IeI6wq1E5L5/U08heZKutGbIK5aymJV7w3isaAXX1FdCe20rme2sepRSjA8DBkWfUUPuTBE5rH8CLScU3CJUKf/MYXZfQVXYN+u3ijJy1QTe3a1YlEiSFLma0e0EXuJDYvG71cHaITD1h6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 6B432208A6;
+	Thu, 15 May 2025 09:53:50 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Wd1uPkR_dprU; Thu, 15 May 2025 09:53:50 +0200 (CEST)
+Received: from EXCH-04.secunet.de (unknown [10.32.0.244])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id DB4C4207D8;
+	Thu, 15 May 2025 09:53:49 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com DB4C4207D8
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by EXCH-04.secunet.de
+ (10.32.0.184) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.10; Thu, 15 May
+ 2025 09:53:49 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 15 May
+ 2025 09:53:48 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 4CAF63182C0E; Thu, 15 May 2025 09:53:48 +0200 (CEST)
+Date: Thu, 15 May 2025 09:53:48 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Paul Chaignon <paul.chaignon@gmail.com>
+CC: <netdev@vger.kernel.org>, <fw@strlen.de>, <pabeni@redhat.com>,
+	<kuba@kernel.org>, Louis DeLosSantos <louis.delos.devel@gmail.com>
+Subject: Re: [PATCH net] xfrm: Sanitize marks before insert
+Message-ID: <aCWdjLjehouyturu@gauss3.secunet.de>
+References: <aBtErrG9y1Fb-_wq@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <aBtErrG9y1Fb-_wq@mail.gmail.com>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ mbx-essen-02.secunet.de (10.53.40.198)
 
-This patch synchronizes code that accesses from both user-space
-and IRQ contexts. The `get_stats()` function can be called from both
-context.
+On Wed, May 07, 2025 at 01:31:58PM +0200, Paul Chaignon wrote:
+> Prior to this patch, the mark is sanitized (applying the state's mask to
+> the state's value) only on inserts when checking if a conflicting XFRM
+> state or policy exists.
+> 
+> We discovered in Cilium that this same sanitization does not occur
+> in the hot-path __xfrm_state_lookup. In the hot-path, the sk_buff's mark
+> is simply compared to the state's value:
+> 
+>     if ((mark & x->mark.m) != x->mark.v)
+>         continue;
+> 
+> Therefore, users can define unsanitized marks (ex. 0xf42/0xf00) which will
+> never match any packet.
+> 
+> This commit updates __xfrm_state_insert and xfrm_policy_insert to store
+> the sanitized marks, thus removing this footgun.
+> 
+> This has the side effect of changing the ip output, as the
+> returned mark will have the mask applied to it when printed.
+> 
+> Fixes: 3d6acfa7641f ("xfrm: SA lookups with mark")
+> Signed-off-by: Paul Chaignon <paul.chaignon@gmail.com>
+> Signed-off-by: Louis DeLosSantos <louis.delos.devel@gmail.com>
+> Co-developed-by: Louis DeLosSantos <louis.delos.devel@gmail.com>
 
-`dev->stats.tx_errors` and `dev->stats.collisions` are also updated
-in the `tx_errors()` function. Therefore, these fields must also be
-protected by synchronized.
-
-There is no code that accessses `dev->stats.tx_errors` between the
-previous and updated lines, so the updating point can be moved.
-
-Signed-off-by: Moon Yeounsu <yyyynoom@gmail.com>
----
-Changelog:
-v1: https://lore.kernel.org/netdev/20250421191645.43526-2-yyyynoom@gmail.com/
-v2: https://lore.kernel.org/netdev/20250425231352.102535-2-yyyynoom@gmail.com/
-- fix incorrect method of updating `dev->stats.tx_errors` and
-  `dev->stats.collisions`
-v3:
-- fix incorrect locking method
----
- drivers/net/ethernet/dlink/dl2k.c | 14 +++++++++++++-
- drivers/net/ethernet/dlink/dl2k.h |  2 ++
- 2 files changed, 15 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/dlink/dl2k.c b/drivers/net/ethernet/dlink/dl2k.c
-index 232e839a9d07..038a0400c1f9 100644
---- a/drivers/net/ethernet/dlink/dl2k.c
-+++ b/drivers/net/ethernet/dlink/dl2k.c
-@@ -146,6 +146,8 @@ rio_probe1 (struct pci_dev *pdev, const struct pci_device_id *ent)
- 	np->ioaddr = ioaddr;
- 	np->chip_id = chip_idx;
- 	np->pdev = pdev;
-+
-+	spin_lock_init(&np->stats_lock);
- 	spin_lock_init (&np->tx_lock);
- 	spin_lock_init (&np->rx_lock);
- 
-@@ -865,7 +867,6 @@ tx_error (struct net_device *dev, int tx_status)
- 	frame_id = (tx_status & 0xffff0000);
- 	printk (KERN_ERR "%s: Transmit error, TxStatus %4.4x, FrameId %d.\n",
- 		dev->name, tx_status, frame_id);
--	dev->stats.tx_errors++;
- 	/* Ttransmit Underrun */
- 	if (tx_status & 0x10) {
- 		dev->stats.tx_fifo_errors++;
-@@ -902,9 +903,15 @@ tx_error (struct net_device *dev, int tx_status)
- 		rio_set_led_mode(dev);
- 		/* Let TxStartThresh stay default value */
- 	}
-+
-+	spin_lock(&np->stats_lock);
- 	/* Maximum Collisions */
- 	if (tx_status & 0x08)
- 		dev->stats.collisions++;
-+
-+	dev->stats.tx_errors++;
-+	spin_unlock(&np->stats_lock);
-+
- 	/* Restart the Tx */
- 	dw32(MACCtrl, dr16(MACCtrl) | TxEnable);
- }
-@@ -1073,7 +1080,9 @@ get_stats (struct net_device *dev)
- 	int i;
- #endif
- 	unsigned int stat_reg;
-+	unsigned long flags;
- 
-+	spin_lock_irqsave(&np->stats_lock, flags);
- 	/* All statistics registers need to be acknowledged,
- 	   else statistic overflow could cause problems */
- 
-@@ -1123,6 +1132,9 @@ get_stats (struct net_device *dev)
- 	dr16(TCPCheckSumErrors);
- 	dr16(UDPCheckSumErrors);
- 	dr16(IPCheckSumErrors);
-+
-+	spin_unlock_irqrestore(&np->stats_lock, flags);
-+
- 	return &dev->stats;
- }
- 
-diff --git a/drivers/net/ethernet/dlink/dl2k.h b/drivers/net/ethernet/dlink/dl2k.h
-index 0e33e2eaae96..56aff2f0bdbf 100644
---- a/drivers/net/ethernet/dlink/dl2k.h
-+++ b/drivers/net/ethernet/dlink/dl2k.h
-@@ -372,6 +372,8 @@ struct netdev_private {
- 	struct pci_dev *pdev;
- 	void __iomem *ioaddr;
- 	void __iomem *eeprom_addr;
-+	// To ensure synchronization when stats are updated.
-+	spinlock_t stats_lock;
- 	spinlock_t tx_lock;
- 	spinlock_t rx_lock;
- 	unsigned int rx_buf_sz;		/* Based on MTU+slack. */
--- 
-2.49.0
-
+Applied, thanks a lot!
 
