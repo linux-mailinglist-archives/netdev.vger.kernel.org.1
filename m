@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-190871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8C60AB9267
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 00:51:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB1A1AB9268
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 00:52:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BAAC87B4B6C
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 22:50:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E80E29E5269
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 22:51:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DF4128C2C2;
-	Thu, 15 May 2025 22:51:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9671928C2C2;
+	Thu, 15 May 2025 22:52:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="I0Ln2l1C"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="aI6cwGtd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAAAC28B4FE
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 22:51:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3DEB288502
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 22:52:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747349498; cv=none; b=D3AINN06Z8bE5lYANasNxx1KzmgBgzEklXwEZIWVqPk5z26TsgiJ+XnR/LKJVcynhcSO0zAGFMVd9ZOIIgnfT7v1wtGGOm7X4cd9A+XN9U0ZR7hBOsmhjmrBe5zH2QwjEZzkq+1ipNCAWwLCohu8Fiq6e1aP8reQ7DXAIaB50EU=
+	t=1747349525; cv=none; b=LpFxjgFjs1nfXpN/cBygf0KavEO2f+3As+m9O35yFtTsHkq/apej1e0LDUFLdUpLfUi8wh86GxlIsNInsGrbWkC/QxvsRIX0dJtKbY1p6N58APgUcJtYALnvrCK78J/Y4AhSP6AxpEDN3rrkml33xCC4pRpONIEtJR8O+p1UXxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747349498; c=relaxed/simple;
-	bh=P5oAQlSK3i8m08Uguo2ISLyhvkisiBa1uWCvyVLYZ3I=;
+	s=arc-20240116; t=1747349525; c=relaxed/simple;
+	bh=WfOYeIgKhhw1mGs9tugt3QGwIaA5wsi82JPT2dT1Kxg=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=p+Y5upxufBQDXKjU+Z93fzKorjwxb8cMLc7eH+g0CPxAOTYP20xYu8r5W0YYhK/t2xj1YJmS4llNgllxZy/6NiakH502m2LjG6o1iwNb0glkUUy25ikBtUdR2z12CMG+Z1jaPqwBwNKIulnlrRy+Yhs1jWISp6z1dtQoNf9PH+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=I0Ln2l1C; arc=none smtp.client-ip=99.78.197.220
+	 MIME-Version:Content-Type; b=CJsTR5p2rOfdlrRXJjRtf00t4exMbdr7mr35anDuXONG70yui/hD3pJMTND6JfVVu9X2Ux+GMfZBfh8On3xcUpDYEkzdV8vkioQbdk261hAeSDoU9iR1uvKfRcgf0WyvvarLkrH1OAIOKbwC26ow7z3/uI2LX4wBiJbIMMMWJ5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=aI6cwGtd; arc=none smtp.client-ip=52.119.213.152
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1747349496; x=1778885496;
+  t=1747349524; x=1778885524;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=MU489E+7TIP24CwvVN41FJM/5bgHQL56ksWvuWkrclM=;
-  b=I0Ln2l1CwzO+pqu8WqWZPST9QjDsR5YvvWjBOss2Fi/CzlfJHDykG/ng
-   Z8SnOk/NFOnUrw2iPSJrsvKXZI2giwIheLGlIFJz6Zc7Ht9t8qGJps0Yt
-   HaD1OrMoUKE0dPtbFCphNObFFpJ9kMZ9KKx060M/ds5aVaXJithv5pjY3
-   /Nvr0NmS+wX2tqX89OGf2mQK0cL4mI6/4oicQeHYka2cduOJ+aiaaLZI8
-   QxgsWVfl8IifPmyC5WVNFnjcY3NESZrNtDM0RRlUKSJlMsA3ZhDhF0X0S
-   vLMpGTxTv8ziAufRJjnBd3J1Kf/7IcWC45IoFuTXEpyrPd43ARmpjJJsO
-   Q==;
+  bh=lX84mVYng7du5C+evun9nBld517z2lM4zi2vzi/i7P8=;
+  b=aI6cwGtdeoUN7arzXF4GD2fD4M4/z3ck5BGLIcgFMLYMzicNS/lGOpRV
+   ouLbjozYJEIJl2b85bjrWOOMLJ3xnNcth5mgijkrpCealejwWSOUQI2Yj
+   di9EsoamC9WsJDosVKFa1UVYZrio5qP21WKpkDbeg1tDb5RtqH7GynXpX
+   iuV244UC/I9T4ACMC1iwY0zM1x33zS8dSNOvwZCdIHzb67ChoFBAmCwea
+   E65IttGD/vG0yZy0GQ2cAeBZ3/FqOeq2LDbwtu4IHLqXswKsMTsY/tLTg
+   nOFjF4uEhZDyJPMZYoBkA/BNPsXG3EaZBH4TphD2pEtT9SojZS8CwzAB+
+   A==;
 X-IronPort-AV: E=Sophos;i="6.15,292,1739836800"; 
-   d="scan'208";a="201027634"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2025 22:51:35 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:7067]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.29.53:2525] with esmtp (Farcaster)
- id 2c943f5d-e0f0-4b27-ab20-1a319f2a370a; Thu, 15 May 2025 22:51:34 +0000 (UTC)
-X-Farcaster-Flow-ID: 2c943f5d-e0f0-4b27-ab20-1a319f2a370a
+   d="scan'208";a="93703267"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2025 22:52:01 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:25111]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.26.241:2525] with esmtp (Farcaster)
+ id e148f1ff-c750-4dd7-9216-c5034ca52bbd; Thu, 15 May 2025 22:52:00 +0000 (UTC)
+X-Farcaster-Flow-ID: e148f1ff-c750-4dd7-9216-c5034ca52bbd
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 15 May 2025 22:51:34 +0000
+ Thu, 15 May 2025 22:51:59 +0000
 Received: from 6c7e67bfbae3.amazon.com (10.187.170.35) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 15 May 2025 22:51:31 +0000
+ Thu, 15 May 2025 22:51:56 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -67,9 +67,9 @@ To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 CC: Simon Horman <horms@kernel.org>, Christian Brauner <brauner@kernel.org>,
 	Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v4 net-next 4/9] tcp: Restrict SO_TXREHASH to TCP socket.
-Date: Thu, 15 May 2025 15:49:12 -0700
-Message-ID: <20250515224946.6931-5-kuniyu@amazon.com>
+Subject: [PATCH v4 net-next 5/9] net: Restrict SO_PASS{CRED,PIDFD,SEC} to AF_{UNIX,NETLINK,BLUETOOTH}.
+Date: Thu, 15 May 2025 15:49:13 -0700
+Message-ID: <20250515224946.6931-6-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250515224946.6931-1-kuniyu@amazon.com>
 References: <20250515224946.6931-1-kuniyu@amazon.com>
@@ -81,47 +81,121 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D037UWC001.ant.amazon.com (10.13.139.197) To
+X-ClientProxiedBy: EX19D038UWB001.ant.amazon.com (10.13.139.148) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-sk->sk_txrehash is only used for TCP.
+SCM_CREDENTIALS and SCM_SECURITY can be recv()ed by calling
+scm_recv() or scm_recv_unix(), and SCM_PIDFD is only used by
+scm_recv_unix().
 
-Let's restrict SO_TXREHASH to TCP to reflect this.
+scm_recv() is called from AF_NETLINK and AF_BLUETOOTH.
 
-Later, we will make sk_txrehash a part of the union for other
-protocol families.
+scm_recv_unix() is literally called from AF_UNIX.
+
+Let's restrict SO_PASSCRED and SO_PASSSEC to such sockets and
+SO_PASSPIDFD to AF_UNIX only.
+
+Later, SOCK_PASS{CRED,PIDFD,SEC} will be moved to struct sock
+and united with another field.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 Reviewed-by: Willem de Bruijn <willemb@google.com>
 ---
-v3: Return -EOPNOTSUPP for getsockopt() too
+v3:
+  * Return -EOPNOTSUPP in getsockopt() too
+  * Add CONFIG_SECURITY_NETWORK check for SO_PASSSEC
 ---
- net/core/sock.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ include/net/sock.h | 14 +++++++++++++-
+ net/core/sock.c    | 18 ++++++++++++++++++
+ 2 files changed, 31 insertions(+), 1 deletion(-)
 
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 3e15d7105ad2..56fa558d24c0 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -2773,9 +2773,14 @@ static inline bool sk_is_udp(const struct sock *sk)
+ 	       sk->sk_protocol == IPPROTO_UDP;
+ }
+ 
++static inline bool sk_is_unix(const struct sock *sk)
++{
++	return sk->sk_family == AF_UNIX;
++}
++
+ static inline bool sk_is_stream_unix(const struct sock *sk)
+ {
+-	return sk->sk_family == AF_UNIX && sk->sk_type == SOCK_STREAM;
++	return sk_is_unix(sk) && sk->sk_type == SOCK_STREAM;
+ }
+ 
+ static inline bool sk_is_vsock(const struct sock *sk)
+@@ -2783,6 +2788,13 @@ static inline bool sk_is_vsock(const struct sock *sk)
+ 	return sk->sk_family == AF_VSOCK;
+ }
+ 
++static inline bool sk_may_scm_recv(const struct sock *sk)
++{
++	return (IS_ENABLED(CONFIG_UNIX) && sk->sk_family == AF_UNIX) ||
++		sk->sk_family == AF_NETLINK ||
++		(IS_ENABLED(CONFIG_BT) && sk->sk_family == AF_BLUETOOTH);
++}
++
+ /**
+  * sk_eat_skb - Release a skb if it is no longer needed
+  * @sk: socket to eat this skb from
 diff --git a/net/core/sock.c b/net/core/sock.c
-index 347ce75482f5..d7d6d3a8efe5 100644
+index d7d6d3a8efe5..fd5f9d3873c1 100644
 --- a/net/core/sock.c
 +++ b/net/core/sock.c
-@@ -1276,6 +1276,8 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
- 		return 0;
+@@ -1221,12 +1221,21 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
  		}
- 	case SO_TXREHASH:
-+		if (!sk_is_tcp(sk))
-+			return -EOPNOTSUPP;
- 		if (val < -1 || val > 1)
- 			return -EINVAL;
- 		if ((u8)val == SOCK_TXREHASH_DEFAULT)
-@@ -2102,6 +2104,9 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
- 		break;
- 
- 	case SO_TXREHASH:
-+		if (!sk_is_tcp(sk))
+ 		return -EPERM;
+ 	case SO_PASSSEC:
++		if (!IS_ENABLED(CONFIG_SECURITY_NETWORK) || sk_may_scm_recv(sk))
 +			return -EOPNOTSUPP;
 +
- 		/* Paired with WRITE_ONCE() in sk_setsockopt() */
- 		v.val = READ_ONCE(sk->sk_txrehash);
+ 		assign_bit(SOCK_PASSSEC, &sock->flags, valbool);
+ 		return 0;
+ 	case SO_PASSCRED:
++		if (!sk_may_scm_recv(sk))
++			return -EOPNOTSUPP;
++
+ 		assign_bit(SOCK_PASSCRED, &sock->flags, valbool);
+ 		return 0;
+ 	case SO_PASSPIDFD:
++		if (!sk_is_unix(sk))
++			return -EOPNOTSUPP;
++
+ 		assign_bit(SOCK_PASSPIDFD, &sock->flags, valbool);
+ 		return 0;
+ 	case SO_TYPE:
+@@ -1855,10 +1864,16 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
  		break;
+ 
+ 	case SO_PASSCRED:
++		if (!sk_may_scm_recv(sk))
++			return -EOPNOTSUPP;
++
+ 		v.val = !!test_bit(SOCK_PASSCRED, &sock->flags);
+ 		break;
+ 
+ 	case SO_PASSPIDFD:
++		if (!sk_is_unix(sk))
++			return -EOPNOTSUPP;
++
+ 		v.val = !!test_bit(SOCK_PASSPIDFD, &sock->flags);
+ 		break;
+ 
+@@ -1956,6 +1971,9 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
+ 		break;
+ 
+ 	case SO_PASSSEC:
++		if (!IS_ENABLED(CONFIG_SECURITY_NETWORK) || !sk_may_scm_recv(sk))
++			return -EOPNOTSUPP;
++
+ 		v.val = !!test_bit(SOCK_PASSSEC, &sock->flags);
+ 		break;
+ 
 -- 
 2.49.0
 
