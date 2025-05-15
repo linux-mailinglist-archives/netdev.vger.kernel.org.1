@@ -1,51 +1,52 @@
-Return-Path: <netdev+bounces-190834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8CC7AB9087
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 22:09:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9806EAB908A
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 22:09:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 764B61BC3480
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 20:09:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 446A73B53BD
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 20:09:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42D95266B66;
-	Thu, 15 May 2025 20:09:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5C0D27990E;
+	Thu, 15 May 2025 20:09:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="E7BM5X20"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="XiJhictn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.smtpout.orange.fr (smtp-17.smtpout.orange.fr [80.12.242.17])
 	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DFF04B1E42;
-	Thu, 15 May 2025 20:09:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17584263F5E;
+	Thu, 15 May 2025 20:09:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747339745; cv=none; b=lJQKwzZQZMizI5f2H48d/cg16p3kqDq98ud5JTuHQOvP0vjH2+7OtCBoisuhvCy+9pG7aexNtWKq3P7Egqciq9DGL2KWhjsVkxPBeD4s76Tq9DRzs9iSVEwvPcOfuB4OQSFp8nNacutSp3Rqyj1OsMHjk9n6eBYcn/w54t00Pgw=
+	t=1747339753; cv=none; b=WHouqGnv7erKwAGHR9DSOEntWG/7OZwUbBtj+TUtn1undMipsuANkzJ6mtmH3S2RZoAefGSHf6t2jfRe+aalf6wASyNwabQEXhe+ue6guIW/ihWjbEEBf7wpn6c4zQFheeYEpBxixCaXlXMSMM/0Ncp4E0hzcQYh8RGQB+ww/RE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747339745; c=relaxed/simple;
-	bh=uf+Uec8jqK+aCOyw7H+7MiHxFd2PaALAT6F2kPyWT/o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lr29pLnvoR1qEzLFseO5fsZiLWpDnsDLwzgqIl24dB25I/gDbRkU0mEfxcgtrwmSnS/cyDTTxAy5+498JUZDg/rP3/YiW4jvLP0iALDlvVfuK1O9hdJdDYtVz8ggOtXW06aVGXwy+67bfmA7VauwxLpWbpU6fqK3QYEGmnwPwaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=E7BM5X20; arc=none smtp.client-ip=80.12.242.17
+	s=arc-20240116; t=1747339753; c=relaxed/simple;
+	bh=pM2/rituVspNE/+QanIb1bltePIE1U38WpgjrA9ee7k=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=cTDqEMOtx+W6QM1u/R5hwg/Hqzas354aNywAhJP5M1QC6cDcrnxHEM60kjzz3NBoUkwga3ZXnFkJePBT6hMik0PkvcbuKW67hD63o3nwhzw0hSxfJD7JylMAHDOm8x7clYT/ovbsCmpuhUma72jZfKEwEim8xxAUd82E5FTH4xY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=XiJhictn; arc=none smtp.client-ip=80.12.242.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
 Received: from localhost.localdomain ([90.11.132.44])
 	by smtp.orange.fr with ESMTPA
-	id FekBuCN6oIqMPFekCugnJy; Thu, 15 May 2025 21:59:56 +0200
+	id FekBuCN6oIqMPFekPugntG; Thu, 15 May 2025 22:00:05 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1747339196;
-	bh=MYe7aSMySa0ucT08nhb3OZlqYbxJUD++vh68yJRzj6M=;
+	s=t20230301; t=1747339205;
+	bh=9VMO2LRAf5h7BkfuRnV9EKcKqpImVHbFdSRbz9p/Fnk=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=E7BM5X20UrwkEoUQAe0akEYh/tAT6ODI+2Oc/9Zi6/yaf7wCBUufOmzwAsAZhcbZR
-	 9EgyqFCZ22tONOH0iqWDXw9v1xOKD2p27aOT2oJRtZyqOnQF/TZNzH1upW5SLFaoO1
-	 nASJ0dTx9oSlX1a/qPD2FvxfClJHSu5nQrv4N8Y+DCe4WJ04jvjw9dq0Bp2htyYABD
-	 SMqiEpVPcKXnGIdWS7RiOdM/6YjXCd/nhWE2sHCifxJkoF5sbjjKWXCre8JtDyCs88
-	 K35SYFUK6ZSLXgkFs4pvltoWu6X9uv4WsQNzgOzUArPzmHb8wUNjN+HWdPdwallz5B
-	 nJ6Cn7upIXDGw==
+	b=XiJhictn2UmnfDfwrcC7D58HZGUBO8mKzeldPQxn8LDJsMx1wkOQU0MsiB2KZ4kVq
+	 10Hpw2xwF782/Y60WN+CecmMDvWrLnwZAedpEgS8YXF9mOQaiWpSL9Fk5tQv/if4Jh
+	 JhMWHyv7/L6yq0f7u5++mrly6T1MKrR/AzXVkGVIG1CPfdi04kP3nMANLrD1mTs7GX
+	 9IOmsrTgI2+4DpSvDPFb9Gpeohr2UOl1Fxm6YoUHwSjbD6NEMIWIzsjmFd9gcz1IcH
+	 OodvnwXtf2upn8ytmXrc/FcEhP19RVn0MYJl3CLNu5Jj4GG1U3gz9wwNQX2pFHd3hY
+	 MEt5YKsE0SL1A==
 X-ME-Helo: localhost.localdomain
 X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Thu, 15 May 2025 21:59:56 +0200
+X-ME-Date: Thu, 15 May 2025 22:00:05 +0200
 X-ME-IP: 90.11.132.44
 From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 To: Lorenzo Bianconi <lorenzo@kernel.org>,
@@ -60,10 +61,12 @@ Cc: linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org,
 	netdev@vger.kernel.org
-Subject: [PATCH v3 1/4] net: airoha: Fix an error handling path in airoha_alloc_gdm_port()
-Date: Thu, 15 May 2025 21:59:35 +0200
-Message-ID: <5c94b9b345017f29ed653e2f05d25620d128c3f0.1746715755.git.christophe.jaillet@wanadoo.fr>
+Subject: [PATCH v3 3/4] net: airoha: Use for_each_child_of_node_scoped()
+Date: Thu, 15 May 2025 21:59:37 +0200
+Message-ID: <38143a6af2fb32046c92b5ba81d8e08c55426ebe.1746715755.git.christophe.jaillet@wanadoo.fr>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <5c94b9b345017f29ed653e2f05d25620d128c3f0.1746715755.git.christophe.jaillet@wanadoo.fr>
+References: <5c94b9b345017f29ed653e2f05d25620d128c3f0.1746715755.git.christophe.jaillet@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,14 +75,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If register_netdev() fails, the error handling path of the probe will not
-free the memory allocated by the previous airoha_metadata_dst_alloc() call
-because port->dev->reg_state will not be NETREG_REGISTERED.
+Use for_each_child_of_node_scoped() to slightly simplify the code.
 
-So, an explicit airoha_metadata_dst_free() call is needed in this case to
-avoid a memory leak.
-
-Fixes: af3cf757d5c9 ("net: airoha: Move DSA tag in DMA descriptor")
 Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 ---
 Changes in v3:
@@ -87,34 +84,46 @@ Changes in v3:
 
 Changes in v2:
   - New patch
-v2: https://lore.kernel.org/all/5c94b9b3850f7f29ed653e2205325620df28c3ff.1746715755.git.christophe.jaillet@wanadoo.fr/
+v2: https://lore.kernel.org/all/88143d6af26b32066c92b5ba81d8e08c55426ebe.1746715755.git.christophe.jaillet@wanadoo.fr/
 
 Compile tested only.
 ---
- drivers/net/ethernet/airoha/airoha_eth.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/airoha/airoha_eth.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 16c7896f931f..af8c4015938c 100644
+index d435179875df..2335aa59b06f 100644
 --- a/drivers/net/ethernet/airoha/airoha_eth.c
 +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -2873,7 +2873,15 @@ static int airoha_alloc_gdm_port(struct airoha_eth *eth,
- 	if (err)
- 		return err;
- 
--	return register_netdev(dev);
-+	err = register_netdev(dev);
-+	if (err)
-+		goto free_metadata_dst;
-+
-+	return 0;
-+
-+free_metadata_dst:
-+	airoha_metadata_dst_free(port);
-+	return err;
- }
+@@ -2886,7 +2886,6 @@ static int airoha_alloc_gdm_port(struct airoha_eth *eth,
  
  static int airoha_probe(struct platform_device *pdev)
+ {
+-	struct device_node *np;
+ 	struct airoha_eth *eth;
+ 	int i, err;
+ 
+@@ -2948,7 +2947,7 @@ static int airoha_probe(struct platform_device *pdev)
+ 		airoha_qdma_start_napi(&eth->qdma[i]);
+ 
+ 	i = 0;
+-	for_each_child_of_node(pdev->dev.of_node, np) {
++	for_each_child_of_node_scoped(pdev->dev.of_node, np) {
+ 		if (!of_device_is_compatible(np, "airoha,eth-mac"))
+ 			continue;
+ 
+@@ -2956,10 +2955,8 @@ static int airoha_probe(struct platform_device *pdev)
+ 			continue;
+ 
+ 		err = airoha_alloc_gdm_port(eth, np, i++);
+-		if (err) {
+-			of_node_put(np);
++		if (err)
+ 			goto error_napi_stop;
+-		}
+ 	}
+ 
+ 	return 0;
 -- 
 2.49.0
 
