@@ -1,141 +1,238 @@
-Return-Path: <netdev+bounces-190852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00D63AB9170
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 23:16:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC219AB9173
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 23:16:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04CA43BEEF5
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 21:15:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCD631C00309
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 21:16:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75D911F5858;
-	Thu, 15 May 2025 21:15:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8763F25A2C6;
+	Thu, 15 May 2025 21:16:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="CvUvtBX4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TFs/Bifq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6E0238DD8;
-	Thu, 15 May 2025 21:15:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B71441FFC59;
+	Thu, 15 May 2025 21:16:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747343756; cv=none; b=subtDdO0zItkPjSzjIwHcYZfag2xdGW+GBToRVMPOxRGCx9ABIE7D0+t87/ZC5ubLvMGNRpOi3My//srtNgqM+zMBjC0+JY3aaz7HKyyojcYjF7lRECnRiOGAJnbsW9N7Zi4h6dS2isccfvxQqesXmhWOJYOtw2/+ZeidN37cNc=
+	t=1747343770; cv=none; b=WokFLpXHkgBMkl3M40up7vBcvuKhFMeSyzPGrvKJl0w8zuyoHObAfSfVDeagVjwDR78JqfQClI6clo/P57WvrzlgNCiWKXhFLFDaJV+42LVgnT9Rw6O2oEycA5FW+T48bi8qFzVZb/4ZFnbynlwAjFh3iU+tpdSGWUEGwPmTj3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747343756; c=relaxed/simple;
-	bh=0xMKbu9JvEzTLH/t7pzwV8X6AAq3s2TjmRoUG/aZy/E=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CDD+hXBvJLKHsGmHBromhxqkPeWERlg7NTt3oyNNVcMNrrhlc4nO+dikQiNF8oGCHwMaBjG2u006a/dO2NjDMkRcWtRXoufTFassRT4pd/h4s+oEyyw57AmDDEX0eNGZoXlMC3eHBtQqRGjCgQrvCECy05vLlgaAKnbk2Fk3fN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=CvUvtBX4; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1747343770; c=relaxed/simple;
+	bh=AcBrIDsPF4SGq9K728+c++kvfXIvzuEBEc1vhBulNjk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jOY0HoUpivjmueO7/VLKprfGY7jd58dExwg9pk3IqafAendc8bVBmMCWuXKSu3iaFDhM+vojKY1oiS6rhRviT3cSrcsHC/FcCmx+8D5J0GzvXI/WrE8fZuaCMEhOXOMDuX4W2t8UkFdvD8DBqbnAFLl4Ihd5JIzrtdqTrdLp9Qw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TFs/Bifq; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-22fac0694aaso11307525ad.1;
+        Thu, 15 May 2025 14:16:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1747343754; x=1778879754;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=INKi4gWzLSgpI54JdZ2cf2sadUWhpO0o8pnubcsQ0Qo=;
-  b=CvUvtBX4vfcg6Us+iwdSXuXsCOVZrIxXqu9vNrsRVv6233rLy1hRutoM
-   7e3fa//BNShnQPZv0RAB6TjqYixeYHxj/I5gGzlWOjpUxPcW01e5sRLjk
-   fwyGKfsr0sDS7rgSCi3rOWyxhxYAZx6ZvBNM7W6iP4cVZ0WVbcLJhMYif
-   S3nq+/2OAwPwwxFt8yLD7vnm9kJ6YSqqhKH0oVMZff3mfwcOZsdc92HHi
-   55nJp31JHUAeHj2tzBzXtk5hwjfazHxtEt9HYc8Qbmn5NDMVDbGsX3ohS
-   Dk3rdIW7GuOuJQfqJGQViEoMr+TvOGK/LeFz2h7E8V6uuL5RK6YuNDNji
-   Q==;
-X-IronPort-AV: E=Sophos;i="6.15,292,1739836800"; 
-   d="scan'208";a="197320532"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2025 21:15:51 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:46432]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.0.141:2525] with esmtp (Farcaster)
- id 79f35f10-c27e-46a5-9970-bd7c79ee1730; Thu, 15 May 2025 21:15:51 +0000 (UTC)
-X-Farcaster-Flow-ID: 79f35f10-c27e-46a5-9970-bd7c79ee1730
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 15 May 2025 21:15:51 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.187.170.35) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 15 May 2025 21:15:47 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <jannh@google.com>
-CC: <alexander@mihalicyn.com>, <bluca@debian.org>, <brauner@kernel.org>,
-	<daan.j.demeyer@gmail.com>, <daniel@iogearbox.net>, <davem@davemloft.net>,
-	<david@readahead.eu>, <edumazet@google.com>, <horms@kernel.org>,
-	<jack@suse.cz>, <kuba@kernel.org>, <kuniyu@amazon.com>,
-	<lennart@poettering.net>, <linux-fsdevel@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
-	<me@yhndnzj.com>, <netdev@vger.kernel.org>, <oleg@redhat.com>,
-	<pabeni@redhat.com>, <viro@zeniv.linux.org.uk>, <zbyszek@in.waw.pl>
-Subject: Re: [PATCH v7 4/9] coredump: add coredump socket
-Date: Thu, 15 May 2025 14:15:26 -0700
-Message-ID: <20250515211539.93223-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <CAG48ez2iXeu7d8eu7L694n54qNi=_-frmBst36iuUTpq9GCFvg@mail.gmail.com>
-References: <CAG48ez2iXeu7d8eu7L694n54qNi=_-frmBst36iuUTpq9GCFvg@mail.gmail.com>
+        d=gmail.com; s=20230601; t=1747343768; x=1747948568; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=I5qe3pbOPN71oPXXzHR/CJkJVse+mtVX/cQ+ivTcRyU=;
+        b=TFs/Bifqc7MTrzL0Ld8DJtD2rqEXEcIJxaRu0pQZxNTIUhjsahXUbpfgYdxDk3SRyz
+         J2pcobmZAiYb+DR+M7YsOghfQTIf2B36MozIuq6mRsGtIsUMNvAofa/MLm8rCNOX5wvt
+         LwROORDuBwS+NJXnMIinH/w67bBrDojiDuZUxYyDx6CzIHVqkSjAAAm110oq6aWNDmCo
+         OrnfUS5JRIGNL53vBOrpPAbm+LqNh0bYT/eQEnG5ap5lMOL3qArc9+zMAw5XxHrX40e/
+         bs6kWYajo66Na5H1wIJ8qj6Lpeddspr/F61isfgljbzo9++Ju2nDEMUbwTjF6QvVw9xz
+         W+hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747343768; x=1747948568;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=I5qe3pbOPN71oPXXzHR/CJkJVse+mtVX/cQ+ivTcRyU=;
+        b=w8yAXeumD/r6tlir/WGE3SvbJZgskF5D+kg7yK5+3KaJKuJiPymU+EvbBZVDu3hfeP
+         FVh9Zks5nO/fKcPGFAV4M23CFrm9t5ScW+7TbCeZsclSLFah7lIvvgrtL8g59JApr7oA
+         elKnOP/GYFUHv6ryAuMmjB+0UYor6IcUw564Qv4fHpZ7oC49qo7vwstEVWmhnoCrYmcu
+         Fr5ogZAvbP8TQCsmjGJhgm8oITAdbndRZ8Dc65SiFgGeFhKAubF7HNNQcWUtoR8+R6Fo
+         XBkLfpkvQvznllVWOpcmIgk+0URYWujkKGfO2ppoCY875wERstKjfPWbypihJIpcSJsr
+         I4bQ==
+X-Gm-Message-State: AOJu0YxCzbNq4KInRBrxZvOc8SaqkBMofUySLr3L34otdB0LjpJZJrOq
+	Nz4GycO8YYA9dFxkRZYIgzoNtJUBkFdiU/Er1iz32Cv+50+BoXx1q3ZmItXLeQ==
+X-Gm-Gg: ASbGnctVAkB7Coyo7QVHTof4MotdQgZEtsUKEQMSad2xrinsI1XV2BY3Po85FUMf6+O
+	HY84PaTZS1nMbJtP+DwaFikvEYvPvhjBDlVzup+eNhTwBHNs1Tn6niJmDo9oHngwnFQ87lUjlOk
+	l38/0+GsYMGh3+R/R6oywMY/qAVRolwepVfa049WSmkS4+ynIGb8RTZq22E+rJcvGOtzu0Hpnq7
+	mFhXJxCxes0Ym6LfA+IYLmXAeWQxI6Kp1N/cE4sGwtLQQorR01MD/2RBCB01PcTkuRqzfBmSdAm
+	+1cj76Jv0b6PZQLKGgKvRU2htUwP3n4BFGYU4a6eaJg=
+X-Google-Smtp-Source: AGHT+IGO2j8/p9u1JFpR3wLXMPzcZBKAStGCSTzxkuEXN6Rbnnyy4dDdfu3zFYvASRei8C37lj+xPQ==
+X-Received: by 2002:a17:902:f54a:b0:231:b7a6:df1a with SMTP id d9443c01a7336-231de3ba25fmr572465ad.50.1747343767611;
+        Thu, 15 May 2025 14:16:07 -0700 (PDT)
+Received: from localhost ([2a03:2880:ff:42::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-231d4eba4bcsm2078795ad.182.2025.05.15.14.16.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 May 2025 14:16:07 -0700 (PDT)
+From: Amery Hung <ameryhung@gmail.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	alexei.starovoitov@gmail.com,
+	andrii@kernel.org,
+	daniel@iogearbox.net,
+	tj@kernel.org,
+	memxor@gmail.com,
+	martin.lau@kernel.org,
+	ameryhung@gmail.com,
+	kernel-team@meta.com
+Subject: [PATCH bpf-next v4 0/3] Task local data
+Date: Thu, 15 May 2025 14:15:59 -0700
+Message-ID: <20250515211606.2697271-1-ameryhung@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D040UWB003.ant.amazon.com (10.13.138.8) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Jann Horn <jannh@google.com>
-Date: Thu, 15 May 2025 22:54:14 +0200
-> > +               /*
-> > +                * It is possible that the userspace process which is
-> > +                * supposed to handle the coredump and is listening on
-> > +                * the AF_UNIX socket coredumps. Userspace should just
-> > +                * mark itself non dumpable.
-> > +                */
-> > +
-> > +               retval = sock_create_kern(&init_net, AF_UNIX, SOCK_STREAM, 0, &socket);
-> > +               if (retval < 0)
-> > +                       goto close_fail;
-> > +
-> > +               file = sock_alloc_file(socket, 0, NULL);
-> > +               if (IS_ERR(file)) {
-> > +                       sock_release(socket);
-> 
-> I think you missed an API gotcha here. See the sock_alloc_file() documentation:
-> 
->  * On failure @sock is released, and an ERR pointer is returned.
-> 
-> So I think basically sock_alloc_file() always consumes the socket
-> reference provided by the caller, and the sock_release() in this
-> branch is a double-free?
+* Overview *
 
-Good catch, yes, sock_release() is not needed here.
+Task local data defines an abstract storage type for storing data specific
+to each task and provides user space and bpf libraries to access it. The
+result is a fast and easy way to share per-task data between user space
+and bpf programs. The intended use case is sched_ext, where user space
+programs will pass hints to sched_ext bpf programs to affect task
+scheduling.
+
+Task local data is built on top of task local storage map and UPTR[0]
+to achieve fast per-task data sharing. UPTR is a type of special field
+supported in task local storage map value. A user page assigned to a UPTR
+will be pinned by the kernel when the map is updated. Therefore, user
+space programs can update data seen by bpf programs without syscalls.
+
+Additionally, unlike most bpf maps, task local data does not require a
+static map value definition. This design is driven by sched_ext, which
+would like to allow multiple developers to share a storage without the
+need to explicitly agree on the layout of it. While a centralized layout
+definition would have worked, the friction of synchronizing it across
+different repos is not desirable. This simplify code base management and
+makes experimenting easier.
+
+In the rest of the cover letter, "task local data" is used to refer to
+the abstract storage and TLD is used to denote a single data entry in
+the storage.
 
 
-> 
-> > +                       goto close_fail;
-> > +               }
-> [...]
-> > diff --git a/include/linux/net.h b/include/linux/net.h
-> > index 0ff950eecc6b..139c85d0f2ea 100644
-> > --- a/include/linux/net.h
-> > +++ b/include/linux/net.h
-> > @@ -81,6 +81,7 @@ enum sock_type {
-> >  #ifndef SOCK_NONBLOCK
-> >  #define SOCK_NONBLOCK  O_NONBLOCK
-> >  #endif
-> > +#define SOCK_COREDUMP  O_NOCTTY
-> 
-> Hrrrm. I looked through all the paths from which the ->connect() call
-> can come, and I think this is currently safe; but I wonder if it would
-> make sense to either give this highly privileged bit a separate value
-> that can never come from userspace, or explicitly strip it away in
-> __sys_connect_file() just to be safe.
+* Design *
 
-I had the same thought, but I think it's fine to leave the code as
-is for now.  We can revisit it later once someone reports a strange
-regression, which will be most unlikely.
+Task local data library provides simple APIs for user space and bpf
+through two header files, task_local_data.h and task_loca_data.bpf.h,
+respectively. The usage is illustrated in the following diagram.
+
+An entry of data in the task local data, TLD, first needs to be created
+in the user space by calling tld_create_key() with the size of the data
+and a name associated with the data. The function returns an opaque key
+object of tld_key_t type, which can be used to locate a TLD. The same
+key may be passed to tld_get_data() in different threads, and a pointer
+to data specific to the calling thread will be returned. The pointer will
+remain valid until the process terminates, so there is not need to call
+tld_get_data() in subsequent accesses.
+
+On the bpf side, programs will also use keys to locate TLDs. For every
+new task, a bpf program must first fetch the keys and save them for later
+uses. This is done by calling tld_fetch_key() with names specified in
+tld_create_key(). The key will be saved in a task local storage map,
+tld_key_map. The map value type, struct tld_keys, __must__ be defined by
+developers. It should contain keys used in the compilation unit. Finally,
+bpf programs can call tld_get_data() to get a pointer to a TLD that is
+shared with user space.
+
+
+ ┌─ Application ───────────────────────────────────────────────────────┐
+ │ tld_key_t kx = tld_create_key(fd, "X", sizeof(int));                │
+ │ ...                           ┌─ library A ────────────────────────┐│
+ │ int *x = tld_get_data(fd, kx);│ ky = tld_create_key(fd, "Y",       ││
+ │ if (x) *x = 123;              │                     sizeof(bool)); ││
+ │                               │ bool *y = tld_get_data(ky);        ││
+ │                         ┌─────┤ if (y) *y = true;                  ││
+ │                         │     └────────────────────────────────────┘│
+ └───────┬─────────────────│───────────────────────────────────────────┘
+         V                 V
+ + ─ Task local data ─ ─ ─ ─ ─ +  ┌─ sched_ext_ops::init_task ────────┐
+ | ┌─ tld_data_map ──────────┐ |  │ tld_init_object(task, &tld_obj);  │
+ | │ BPF Task local storage  │ |  │ tld_fetch_key(&tld_obj, "X", kx); │
+ | │                         │ |<─┤ tld_fetch_key(&tld_obj, "Y", ky); │
+ | │ data_page __uptr *data  │ |  └───────────────────────────────────┘
+ | │ metadata_page __uptr *metadata
+ | └─────────────────────────┘ |  ┌─ Other sched_ext_ops op ──────────┐
+ | ┌─ tld_key_map ───────────┐ |  │ tld_init_object(task, &tld_obj);  │
+ | │ BPF Task local storage  │ |  │ bool *y = tld_get_data(&tld_obj,  ├┐
+ | │                         │ |<─┤                        ky, 1);    ││
+ | │ tld_key_t kx;           │ |  │ if (y)                            ││
+ | │ tld_key_t ky;           │ |  │     /* do something */            ││
+ | └─────────────────────────┘ |  └┬──────────────────────────────────┘│
+ + ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ +   └───────────────────────────────────┘
+
+
+* Implementation *
+
+Task local data defines the storage to be a task local storage map with
+two UPTRs, data and metadata. Data points to a blob of memory for storing
+TLDs individual to every task. Metadata, individual to each process and
+shared by its threads, records the number of TLDs declared and the
+metadata of each TLD. Metadata for a TLD contains the key name and the
+size of the TLD in data.
+
+  struct data_page {
+          char data[PAGE_SIZE];
+  };
+
+  struct metadata_page {
+          u8 cnt;
+          struct metadata data[TLD_DATA_CNT]; 
+  };
+
+Both user space and bpf API follow the same protocol when accessing
+task local data. A pointer to a TLD is located by a key. tld_key_t
+effectively is the offset of a TLD in data. To add a TLD, user space
+API, tld_create_key(), loops through metadata->data until an empty slot
+is found and update it. It also adds sizes of prior TLDs along the way
+to derive the offset. To fetch a key, bpf API, tld_fetch_key(), also
+loops through metadata->data until the key name is found. The offset is
+also derived by adding sizes. The detail of task local data operations
+can be found in patch 1.
+
+[0] https://lore.kernel.org/bpf/20241023234759.860539-1-martin.lau@linux.dev/
+
+v3 -> v4
+  - API improvements
+      - Simplify API
+      - Drop string obfuscation
+      - Use opaque type for key
+      - Better documentation
+  - Implementation
+      - Switch to dynamic allocation for per-task data
+      - Now offer as header-only libraries
+      - No TLS map pinning; leave it to users
+  - Drop pthread dependency
+  - Add more invalid tld_create_key() test
+  - Add a race test for tld_create_key()
+  v3: https://lore.kernel.org/bpf/20250425214039.2919818-1-ameryhung@gmail.com/
+
+Amery Hung (3):
+  selftests/bpf: Introduce task local data
+  selftests/bpf: Test basic task local data operations
+  selftests/bpf: Test concurrent task local data key creation
+
+ .../bpf/prog_tests/task_local_data.h          | 263 ++++++++++++++++++
+ .../bpf/prog_tests/test_task_local_data.c     | 254 +++++++++++++++++
+ .../selftests/bpf/progs/task_local_data.bpf.h | 220 +++++++++++++++
+ .../bpf/progs/test_task_local_data.c          |  81 ++++++
+ 4 files changed, 818 insertions(+)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/task_local_data.h
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/test_task_local_data.c
+ create mode 100644 tools/testing/selftests/bpf/progs/task_local_data.bpf.h
+ create mode 100644 tools/testing/selftests/bpf/progs/test_task_local_data.c
+
+-- 
+2.47.1
+
 
