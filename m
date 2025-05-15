@@ -1,171 +1,209 @@
-Return-Path: <netdev+bounces-190763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03AAFAB8A49
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 17:09:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C5C9AB8A4B
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 17:09:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61E464E1F15
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 15:06:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA5701BC6AB1
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 15:07:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4269211494;
-	Thu, 15 May 2025 15:06:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1627A1EFF93;
+	Thu, 15 May 2025 15:07:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R+er7hAM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E4CD208994
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 15:06:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 757141A5BAB
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 15:07:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747321600; cv=none; b=aG3viIYvXx4pl7q8saBAPgQp9hapZ35jEuycAVH9tCcpt0TOO8TaGtQMjhljpWiXwiHlaLQpC7JlA/ApKaXN9XO8DUSpQf9nI3qQQS/ruf65ni2grtRQdmlWo0+fq+9tJ/ovb5NefMJ7+CutkZeHwJzRYUWn7TP56ymKXVLVJ1o=
+	t=1747321650; cv=none; b=LBPUsfHRoHB4MSH5F8FkhgO4KjNb3C4hwx+X9soijK9aR8Uvt06xNR/9LBKjs41KXFH5UtODC65OQzKD8Fmz5nFE8y0gRVfgFZwz+8B/KQ3nOrG+fkqOr+FqHE8g7aJSEdii6FGcVFtG3WZDKPPXGvG2HBueN5UlyH1qECjM6Sw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747321600; c=relaxed/simple;
-	bh=DDEfGDPw064d8TIOtPIrX0kse9ua0SZ/cndNX98QQnY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=gFfOzeus0vEPgZSoKAo/vyKpk5/ZRbC/IM4ArPkSetvyiKJNrNnoBNZqT5YNRvz6SNMgVrb+e7P9q/Vzmh0I1Q333MlyXM/IADz+QPngZF4UvevO/HBU8tuWGEGigDbtB9OaKmm09LWTp0TLtf1d/HcBuVueEz1Cvuom7VtUFxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3db6cf1e63eso11014245ab.2
-        for <netdev@vger.kernel.org>; Thu, 15 May 2025 08:06:38 -0700 (PDT)
+	s=arc-20240116; t=1747321650; c=relaxed/simple;
+	bh=VuhbrxSp5v76jr74DWunte8ghzvyMeliSb4lJxWxJCA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l6duqg4bZa7w2McO5YoM4Lx3F+WdHVO0OHxrmwRotLpTMkze8I6d37yKGnHQ4rL6cxrErIP6+HtU+lECuNXgDtQo6W7+8RCFXrAhuLaE2G60wlzpdIsLFJLnqQQYQd/SnB15BFyz420AnUZW0UcdGgsDuUPAwNUJueEANFHxW+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R+er7hAM; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-22e7e5bce38so10351455ad.1
+        for <netdev@vger.kernel.org>; Thu, 15 May 2025 08:07:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747321648; x=1747926448; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=x6oj7ezt9jvUhQfFHhzb0gtCHdhneDXF80OZSJ7C2Sg=;
+        b=R+er7hAML/4eKTIJBYXBWoCPno0Fu/dQ+dEp9KnI6rGRxvmFKemkSIIz2jMT204m7r
+         6cATl2/bDzu6r5PH55zUicIR7wuuzWjc+nW074lMBlyIwEukFT6XfCs23cn8UCkVMb+S
+         +PGFVT/eQICwuCkvVMKG0W5cEI0EQ4Lkk3yesVYDUW6KoZCuAXSM0by+iCMlrmrNIi5/
+         DXNrJcZmZ0uMe6SIro8rHPMQ9ts9m0WgY66OJk900YgcUl7eLjKDER/v+Q/ypJoqbAmp
+         W0Rc7JWMZqmeUDBBT2j5rmINlopZt6YRcQ5ruJcdwm+Os8GT5N1kk3i6ZdI9stjzYD2B
+         tZ0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747321598; x=1747926398;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GdqUBxPxMGurCy9C3+4NLc4yoL33befp7d4Bh5bR8eo=;
-        b=Oh+jh8DKtjIHhJ+/Y7YaZKjyPRYhzZTXSWVXaYufNiAlh+ZGWWzKyjE7lTzPbuWpyw
-         Tv0PuAtWJa9Hn52SZBVLR/YOFvS03U0BrBMo1c3vx1Nn7bVoXFJZtR+3mrj2fD/c0j1Q
-         iMrpFIifzM0OFKw7I833aByocK0lWsY78hr5Efn9F+6QIZnkOecj/vKgmOMfDzDsiSRI
-         F09DdGXopysPcTp9f7bO7aHqzym27mAeygJXEsRKe0gRqM1D1vdYxFpF+AQYjKKBOrBe
-         K2+liraeoer0giJPCny+JtoEJkq9iB1zhZysw3HLzMTaggCXaEFulegoBzZoJn0DI6xQ
-         cDgw==
-X-Forwarded-Encrypted: i=1; AJvYcCVlyZW4m870t7VakYOo9V6k8ibADnf3iDxiqpFQIICO203FSlmyBpWzmfrUIg2qLTJOQ1BCmyQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz3ai0hAUoXc8cVA4A6G3efXB5LtD1Qh6+PNRFqCjGHoc2Zs1Fs
-	y7z9KjZZyIl2eR5expbr+fVNDtAKcdxtiWOKjfsXXHJps1dDS6IFVUhbwi9xHoImBUzxXMOwmzU
-	BsdqFOGHxaCyiCACQ/K5UsbvNepnvwhHqJrTYRKtnFMrUzXlrtHncztJlbwg=
-X-Google-Smtp-Source: AGHT+IGVmkgxM/BHYmds//15NtrEZvxv8aFwrlsMsBe3q4X9HGpSd4L3Vc2qezoaYUvvh3wHgWzqzY4aNdheZSzDelJqt6uivYTN
+        d=1e100.net; s=20230601; t=1747321648; x=1747926448;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=x6oj7ezt9jvUhQfFHhzb0gtCHdhneDXF80OZSJ7C2Sg=;
+        b=ibWVqA5/XfFEVYPb0pOLfrkbK2GebJ+gqVrrRFj1nYUB0FuvPb9Sl8DQbH4Hbh9O30
+         4Kh49EFEx2sDGl4XZNGIIe6FXyzbxuo8lLk70v/bh337NY6cK+31KNN81owcgAbZU9dP
+         b/q8v4IWjX24ELY+6rDskA+54NTASbwubJuZGvMSZjW4XrX1RlJLmcSlUYQ7lFEcoPU+
+         MDXo7Sy69IBsMSD6eyd5dCPNHc2gVJqPjsla+HdHm+QBihMAEXmOFzn4rWsn88vNgkYj
+         vpVvkUaHiLgEB8ifUFnEfzl2Epb4m3FeOO33zGoWEQGTNewoQcAdDOYLostBKfToohWB
+         lAJg==
+X-Forwarded-Encrypted: i=1; AJvYcCXcqvmR0d77wchAVaKZStBVqLS4yvm7tclvY/Pq/jIm5WAhaj7IM1MuPp4xLYwLTfJABDooMGs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywxw2dKEkw5Kmvxydwsf4GHHbZmSYekdhLpyHBR09kFgq7tdLRS
+	89zDSSF7XtzKWSpxhlsfIBbgZM6YbirjrqaqP4iOGNqf/cnNhx5pT4CYYSY=
+X-Gm-Gg: ASbGncvXAyGc5fyr/lRYxTYU43Rn2X/kb4V43mHF4MgMwrpcZbczsj5u11Hdufhmwad
+	rUYQn83HHVdNkyRjZEh/FPxlUL9j6OlBWtjzQECCd6ccSVoQ6AZYLeGcKAIPkXz4ZrjP0LPRtMY
+	cmQ5ojzN0DTxww5VPOt+K3jVjnSUqxb84XIfzQTlBDmLgZcJNQllPuPYGj5uWuEUh5oshYAjGIl
+	bFCyrGcLLfT/Cgyb0+AZv0N78wo9LahcMfXdWmJX9OwyQDyJUF43nSJAnjOpJK9A+fMxNP6Pnx2
+	hpW0MaPbVuuwTz1iKnj7Wi5yjlqZaeiKgn5OT+ZLGhP8+0MYwbNUgcCN8MN3DGemk2fy+Vsest9
+	psgFtFqxrJ61y
+X-Google-Smtp-Source: AGHT+IH32SZXJ7ZEk0pqmNo2w6JoH4A2+nJtX1zU1VhJ2RozLTdl3eFYPcBS2j9SzBVVxbnirm2W0Q==
+X-Received: by 2002:a17:902:c952:b0:224:c76:5e57 with SMTP id d9443c01a7336-2319813e3f1mr112719915ad.39.1747321647595;
+        Thu, 15 May 2025 08:07:27 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-22fc8271ea0sm117455265ad.124.2025.05.15.08.07.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 May 2025 08:07:27 -0700 (PDT)
+Date: Thu, 15 May 2025 08:07:25 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Taehee Yoo <ap420073@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, horms@kernel.org, almasrymina@google.com,
+	sdf@fomichev.me, netdev@vger.kernel.org, asml.silence@gmail.com,
+	dw@davidwei.uk, skhawaja@google.com, kaiyuanz@google.com,
+	jdamato@fastly.com
+Subject: Re: [PATCH net v5] net: devmem: fix kernel panic when netlink socket
+ close after module unload
+Message-ID: <aCYDLZ_C46pLRacy@mini-arch>
+References: <20250514154028.1062909-1-ap420073@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:17cc:b0:3db:7c22:303c with SMTP id
- e9e14a558f8ab-3db842ce2f3mr123805ab.8.1747321597922; Thu, 15 May 2025
- 08:06:37 -0700 (PDT)
-Date: Thu, 15 May 2025 08:06:37 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <682602fd.a00a0220.a2f23.01d0.GAE@google.com>
-Subject: [syzbot] [wireless?] WARNING in mac80211_hwsim_sta_rc_update
-From: syzbot <syzbot+c0472dd80bb8f668625f@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250514154028.1062909-1-ap420073@gmail.com>
 
-Hello,
+On 05/14, Taehee Yoo wrote:
+> Kernel panic occurs when a devmem TCP socket is closed after NIC module
+> is unloaded.
+> 
+> This is Devmem TCP unregistration scenarios. number is an order.
+> (a)netlink socket close    (b)pp destroy    (c)uninstall    result
+> 1                          2                3               OK
+> 1                          3                2               (d)Impossible
+> 2                          1                3               OK
+> 3                          1                2               (e)Kernel panic
+> 2                          3                1               (d)Impossible
+> 3                          2                1               (d)Impossible
+> 
+> (a) netdev_nl_sock_priv_destroy() is called when devmem TCP socket is
+>     closed.
+> (b) page_pool_destroy() is called when the interface is down.
+> (c) mp_ops->uninstall() is called when an interface is unregistered.
+> (d) There is no scenario in mp_ops->uninstall() is called before
+>     page_pool_destroy().
+>     Because unregister_netdevice_many_notify() closes interfaces first
+>     and then calls mp_ops->uninstall().
+> (e) netdev_nl_sock_priv_destroy() accesses struct net_device to acquire
+>     netdev_lock().
+>     But if the interface module has already been removed, net_device
+>     pointer is invalid, so it causes kernel panic.
+> 
+> In summary, there are only 3 possible scenarios.
+>  A. sk close -> pp destroy -> uninstall.
+>  B. pp destroy -> sk close -> uninstall.
+>  C. pp destroy -> uninstall -> sk close.
+> 
+> Case C is a kernel panic scenario.
+> 
+> In order to fix this problem, It makes mp_dmabuf_devmem_uninstall() set
+> binding->dev to NULL.
+> It indicates an bound net_device was unregistered.
+> 
+> It makes netdev_nl_sock_priv_destroy() do not acquire netdev_lock()
+> if binding->dev is NULL.
+> 
+> A new binding->lock is added to protect a dev of a binding.
+> So, lock ordering is like below.
+>  priv->lock
+>  netdev_lock(dev)
+>  binding->lock
+> 
+> Tests:
+> Scenario A:
+>     ./ncdevmem -s 192.168.1.4 -c 192.168.1.2 -f $interface -l -p 8000 \
+>         -v 7 -t 1 -q 1 &
+>     pid=$!
+>     sleep 10
+>     kill $pid
+>     ip link set $interface down
+>     modprobe -rv $module
+> 
+> Scenario B:
+>     ./ncdevmem -s 192.168.1.4 -c 192.168.1.2 -f $interface -l -p 8000 \
+>         -v 7 -t 1 -q 1 &
+>     pid=$!
+>     sleep 10
+>     ip link set $interface down
+>     kill $pid
+>     modprobe -rv $module
+> 
+> Scenario C:
+>     ./ncdevmem -s 192.168.1.4 -c 192.168.1.2 -f $interface -l -p 8000 \
+>         -v 7 -t 1 -q 1 &
+>     pid=$!
+>     sleep 10
+>     modprobe -rv $module
+>     sleep 5
+>     kill $pid
+> 
+> Splat looks like:
+> Oops: general protection fault, probably for non-canonical address 0xdffffc001fffa9f7: 0000 [#1] SMP DEBUG_PAGEALLOC KASAN NOPTI
+> KASAN: probably user-memory-access in range [0x00000000fffd4fb8-0x00000000fffd4fbf]
+> CPU: 0 UID: 0 PID: 2041 Comm: ncdevmem Tainted: G    B   W           6.15.0-rc1+ #2 PREEMPT(undef)  0947ec89efa0fd68838b78e36aa1617e97ff5d7f
+> Tainted: [B]=BAD_PAGE, [W]=WARN
+> RIP: 0010:__mutex_lock (./include/linux/sched.h:2244 kernel/locking/mutex.c:400 kernel/locking/mutex.c:443 kernel/locking/mutex.c:605 kernel/locking/mutex.c:746)
+> Code: ea 03 80 3c 02 00 0f 85 4f 13 00 00 49 8b 1e 48 83 e3 f8 74 6a 48 b8 00 00 00 00 00 fc ff df 48 8d 7b 34 48 89 fa 48 c1 ea 03 <0f> b6 f
+> RSP: 0018:ffff88826f7ef730 EFLAGS: 00010203
+> RAX: dffffc0000000000 RBX: 00000000fffd4f88 RCX: ffffffffaa9bc811
+> RDX: 000000001fffa9f7 RSI: 0000000000000008 RDI: 00000000fffd4fbc
+> RBP: ffff88826f7ef8b0 R08: 0000000000000000 R09: ffffed103e6aa1a4
+> R10: 0000000000000007 R11: ffff88826f7ef442 R12: fffffbfff669f65e
+> R13: ffff88812a830040 R14: ffff8881f3550d20 R15: 00000000fffd4f88
+> FS:  0000000000000000(0000) GS:ffff888866c05000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000563bed0cb288 CR3: 00000001a7c98000 CR4: 00000000007506f0
+> PKRU: 55555554
+> Call Trace:
+> <TASK>
+>  ...
+>  netdev_nl_sock_priv_destroy (net/core/netdev-genl.c:953 (discriminator 3))
+>  genl_release (net/netlink/genetlink.c:653 net/netlink/genetlink.c:694 net/netlink/genetlink.c:705)
+>  ...
+>  netlink_release (net/netlink/af_netlink.c:737)
+>  ...
+>  __sock_release (net/socket.c:647)
+>  sock_close (net/socket.c:1393)
+> 
+> Fixes: 1d22d3060b9b ("net: drop rtnl_lock for queue_mgmt operations")
+> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+> ---
+> 
+> v5:
+>  - Remove cleanup changes.
 
-syzbot found the following issue on:
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
-HEAD commit:    6b466efc6365 dt-bindings: net: renesas-gbeth: Add support ..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1582e2f4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=cc0c7bf6a7800c98
-dashboard link: https://syzkaller.appspot.com/bug?extid=c0472dd80bb8f668625f
-compiler:       Debian clang version 20.1.2 (++20250402124445+58df0ef89dd6-1~exp1~20250402004600.97), Debian LLD 20.1.2
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/0dc241e466cd/disk-6b466efc.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/5df43ce17ae4/vmlinux-6b466efc.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/7cb3cf08e099/bzImage-6b466efc.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c0472dd80bb8f668625f@syzkaller.appspotmail.com
-
-netlink: 16 bytes leftover after parsing attributes in process `syz.0.682'.
-------------[ cut here ]------------
-intf 08:02:11:00:00:00 [link=0]: bad STA 08:02:11:00:00:01 bandwidth 20 MHz (0) > channel config 10 MHz (7)
-WARNING: CPU: 0 PID: 8246 at drivers/net/wireless/virtual/mac80211_hwsim.c:2653 mac80211_hwsim_sta_rc_update+0x6f5/0x860 drivers/net/wireless/virtual/mac80211_hwsim.c:2650
-Modules linked in:
-CPU: 0 UID: 0 PID: 8246 Comm: syz.0.682 Not tainted 6.15.0-rc5-syzkaller-01032-g6b466efc6365 #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-RIP: 0010:mac80211_hwsim_sta_rc_update+0x6f5/0x860 drivers/net/wireless/virtual/mac80211_hwsim.c:2650
-Code: 71 17 00 00 48 c7 c7 60 f8 0b 8c 48 8b 74 24 28 89 ea 48 8b 4c 24 10 41 89 d8 45 89 f9 41 56 50 e8 90 48 9c fa 48 83 c4 10 90 <0f> 0b 90 90 e9 0c ff ff ff e8 2d ec d7 fa 90 0f 0b 90 e9 fe fe ff
-RSP: 0018:ffffc90005156fb0 EFLAGS: 00010282
-RAX: bdf3540220fb5200 RBX: 0000000000000014 RCX: 0000000000080000
-RDX: ffffc9000d50e000 RSI: 0000000000005821 RDI: 0000000000005822
-RBP: 0000000000000000 R08: 0000000000000003 R09: 0000000000000004
-R10: dffffc0000000000 R11: fffffbfff1bba4b4 R12: 0000000000000000
-R13: dffffc0000000000 R14: 0000000000000007 R15: 0000000000000000
-FS:  00007f21ea3676c0(0000) GS:ffff8881260c0000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fa1e8181000 CR3: 000000002ff00000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- mac80211_hwsim_sta_add+0xa3/0x310 drivers/net/wireless/virtual/mac80211_hwsim.c:2670
- drv_sta_add net/mac80211/driver-ops.h:466 [inline]
- drv_sta_state+0x8be/0x1840 net/mac80211/driver-ops.c:155
- sta_info_insert_drv_state net/mac80211/sta_info.c:775 [inline]
- sta_info_insert_finish net/mac80211/sta_info.c:883 [inline]
- sta_info_insert_rcu+0xd32/0x1940 net/mac80211/sta_info.c:960
- sta_info_insert+0x16/0xc0 net/mac80211/sta_info.c:965
- rdev_add_station+0x105/0x290 net/wireless/rdev-ops.h:201
- nl80211_new_station+0x1723/0x1b40 net/wireless/nl80211.c:7843
- genl_family_rcv_msg_doit+0x212/0x300 net/netlink/genetlink.c:1115
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x219/0x490 net/netlink/af_netlink.c:2534
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
- netlink_unicast+0x758/0x8d0 net/netlink/af_netlink.c:1339
- netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1883
- sock_sendmsg_nosec net/socket.c:712 [inline]
- __sock_sendmsg+0x219/0x270 net/socket.c:727
- ____sys_sendmsg+0x505/0x830 net/socket.c:2566
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
- __sys_sendmsg net/socket.c:2652 [inline]
- __do_sys_sendmsg net/socket.c:2657 [inline]
- __se_sys_sendmsg net/socket.c:2655 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2655
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xf6/0x210 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f21e958e969
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f21ea367038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f21e97b6080 RCX: 00007f21e958e969
-RDX: 0200000000000000 RSI: 0000200000001080 RDI: 0000000000000009
-RBP: 00007f21e9610ab1 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f21e97b6080 R15: 00007ffd3178ff18
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+(looks mostly the same as v4, so should have been ok to carry over)
 
