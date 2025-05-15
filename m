@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-190870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACB59AB9264
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 00:51:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8C60AB9267
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 00:51:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FFDD3A390F
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 22:50:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BAAC87B4B6C
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 22:50:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D5C028C2B5;
-	Thu, 15 May 2025 22:51:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DF4128C2C2;
+	Thu, 15 May 2025 22:51:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="coinvQ+D"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="I0Ln2l1C"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 936461F153C
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 22:51:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAAAC28B4FE
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 22:51:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747349476; cv=none; b=Qb/LEDLY0ffItbGiw8IykoRgPFdx95DGDaZq//kvd4OpSRvPQF6gJqkjOYXyNre/5WV7QIGlm32e3V2kGhrPM58bbthVMHqxkIMqYKlvEe0f+WMRn6IbJ4e+E4cKftRPih95EXy1WPLZYiXAwzZY71o7S3zxXM1EGex6sh2e/Yg=
+	t=1747349498; cv=none; b=D3AINN06Z8bE5lYANasNxx1KzmgBgzEklXwEZIWVqPk5z26TsgiJ+XnR/LKJVcynhcSO0zAGFMVd9ZOIIgnfT7v1wtGGOm7X4cd9A+XN9U0ZR7hBOsmhjmrBe5zH2QwjEZzkq+1ipNCAWwLCohu8Fiq6e1aP8reQ7DXAIaB50EU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747349476; c=relaxed/simple;
-	bh=NVjpAVsJsAL21/QnGQ7GE8tFr18Si9FN8vpWnBmAl+M=;
+	s=arc-20240116; t=1747349498; c=relaxed/simple;
+	bh=P5oAQlSK3i8m08Uguo2ISLyhvkisiBa1uWCvyVLYZ3I=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZbpqNqQKL2PhZi3YvKOTHp1mXfGFu6A4/o1cap/2HV+ekKBtLuNNIW5dyKKebcD9Qb5x91LGulPIaU69wVBbgZoAuGxEaPYsEvlzQYvcoyx2/3+h403ymcq38RtQIb28UuVWpVeCkD5roiDlmZeXvMgcg9SeQuokaet9P6TokEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=coinvQ+D; arc=none smtp.client-ip=52.95.48.154
+	 MIME-Version:Content-Type; b=p+Y5upxufBQDXKjU+Z93fzKorjwxb8cMLc7eH+g0CPxAOTYP20xYu8r5W0YYhK/t2xj1YJmS4llNgllxZy/6NiakH502m2LjG6o1iwNb0glkUUy25ikBtUdR2z12CMG+Z1jaPqwBwNKIulnlrRy+Yhs1jWISp6z1dtQoNf9PH+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=I0Ln2l1C; arc=none smtp.client-ip=99.78.197.220
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1747349475; x=1778885475;
+  t=1747349496; x=1778885496;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Wov4LQelK27LLIpwvZO8SlM7ju6DeVaw7tO1Ci8Hd5s=;
-  b=coinvQ+DYBfQCEXTTpvUdAN1gAZXXECdr/TeSQfFYoc7BhKnFlERhjWN
-   8W3Ot+vr8vAypFqURmhG2QS92MKU0gJgFljs+MNE86wqznbvpwgsIPnbK
-   coF8DCRBBcilPv/TmiuKKBcZ7RUZG58Wpihf7iS1J9E82FYCLV7sFDK5u
-   86ZhOMf3npBuCZXsuOEXJFv1r3QIFWZI1drPdk3z34nFrhJEUzdl0vX/r
-   9H6eIU/OP2BhG3uGFp5Qt/hiibaR3bifFckZNWVoN1MD/WEFkBwMwuoW6
-   6usQ0fAf8k5zFOSUI3Pl4LWicMDJI5TjDA1Im4TJgbLb7kppKlP09FZCm
-   w==;
+  bh=MU489E+7TIP24CwvVN41FJM/5bgHQL56ksWvuWkrclM=;
+  b=I0Ln2l1CwzO+pqu8WqWZPST9QjDsR5YvvWjBOss2Fi/CzlfJHDykG/ng
+   Z8SnOk/NFOnUrw2iPSJrsvKXZI2giwIheLGlIFJz6Zc7Ht9t8qGJps0Yt
+   HaD1OrMoUKE0dPtbFCphNObFFpJ9kMZ9KKx060M/ds5aVaXJithv5pjY3
+   /Nvr0NmS+wX2tqX89OGf2mQK0cL4mI6/4oicQeHYka2cduOJ+aiaaLZI8
+   QxgsWVfl8IifPmyC5WVNFnjcY3NESZrNtDM0RRlUKSJlMsA3ZhDhF0X0S
+   vLMpGTxTv8ziAufRJjnBd3J1Kf/7IcWC45IoFuTXEpyrPd43ARmpjJJsO
+   Q==;
 X-IronPort-AV: E=Sophos;i="6.15,292,1739836800"; 
-   d="scan'208";a="490492374"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2025 22:51:13 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:56655]
+   d="scan'208";a="201027634"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2025 22:51:35 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:7067]
  by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.29.53:2525] with esmtp (Farcaster)
- id ebc63658-995c-4728-9cfb-a830c1c7376e; Thu, 15 May 2025 22:51:12 +0000 (UTC)
-X-Farcaster-Flow-ID: ebc63658-995c-4728-9cfb-a830c1c7376e
+ id 2c943f5d-e0f0-4b27-ab20-1a319f2a370a; Thu, 15 May 2025 22:51:34 +0000 (UTC)
+X-Farcaster-Flow-ID: 2c943f5d-e0f0-4b27-ab20-1a319f2a370a
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 15 May 2025 22:51:10 +0000
+ Thu, 15 May 2025 22:51:34 +0000
 Received: from 6c7e67bfbae3.amazon.com (10.187.170.35) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 15 May 2025 22:51:07 +0000
+ Thu, 15 May 2025 22:51:31 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -67,9 +67,9 @@ To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 CC: Simon Horman <horms@kernel.org>, Christian Brauner <brauner@kernel.org>,
 	Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v4 net-next 3/9] scm: Move scm_recv() from scm.h to scm.c.
-Date: Thu, 15 May 2025 15:49:11 -0700
-Message-ID: <20250515224946.6931-4-kuniyu@amazon.com>
+Subject: [PATCH v4 net-next 4/9] tcp: Restrict SO_TXREHASH to TCP socket.
+Date: Thu, 15 May 2025 15:49:12 -0700
+Message-ID: <20250515224946.6931-5-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250515224946.6931-1-kuniyu@amazon.com>
 References: <20250515224946.6931-1-kuniyu@amazon.com>
@@ -81,295 +81,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D040UWB003.ant.amazon.com (10.13.138.8) To
+X-ClientProxiedBy: EX19D037UWC001.ant.amazon.com (10.13.139.197) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-scm_recv() has been placed in scm.h since the pre-git era for no
-particular reason (I think), which makes the file really fragile.
+sk->sk_txrehash is only used for TCP.
 
-For example, when you move SOCK_PASSCRED from include/linux/net.h to
-enum sock_flags in include/net/sock.h, you will see weird build failure
-due to terrible dependency.
+Let's restrict SO_TXREHASH to TCP to reflect this.
 
-To avoid the build failure in the future, let's move scm_recv(_unix())?
-and its callees to scm.c.
-
-Note that only scm_recv() needs to be exported for Bluetooth.
-
-scm_send() should be moved to scm.c too, but I'll revisit later.
+Later, we will make sk_txrehash a part of the union for other
+protocol families.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 Reviewed-by: Willem de Bruijn <willemb@google.com>
 ---
-v3: Remove inline in scm.c
+v3: Return -EOPNOTSUPP for getsockopt() too
 ---
- include/net/scm.h | 121 ++-------------------------------------------
- net/core/scm.c    | 123 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 127 insertions(+), 117 deletions(-)
+ net/core/sock.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/include/net/scm.h b/include/net/scm.h
-index 22bb49589fde..84c4707e78a5 100644
---- a/include/net/scm.h
-+++ b/include/net/scm.h
-@@ -102,123 +102,10 @@ static __inline__ int scm_send(struct socket *sock, struct msghdr *msg,
- 	return __scm_send(sock, msg, scm);
- }
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 347ce75482f5..d7d6d3a8efe5 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -1276,6 +1276,8 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
+ 		return 0;
+ 		}
+ 	case SO_TXREHASH:
++		if (!sk_is_tcp(sk))
++			return -EOPNOTSUPP;
+ 		if (val < -1 || val > 1)
+ 			return -EINVAL;
+ 		if ((u8)val == SOCK_TXREHASH_DEFAULT)
+@@ -2102,6 +2104,9 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
+ 		break;
  
--#ifdef CONFIG_SECURITY_NETWORK
--static inline void scm_passec(struct socket *sock, struct msghdr *msg, struct scm_cookie *scm)
--{
--	struct lsm_context ctx;
--	int err;
--
--	if (test_bit(SOCK_PASSSEC, &sock->flags)) {
--		err = security_secid_to_secctx(scm->secid, &ctx);
--
--		if (err >= 0) {
--			put_cmsg(msg, SOL_SOCKET, SCM_SECURITY, ctx.len,
--				 ctx.context);
--			security_release_secctx(&ctx);
--		}
--	}
--}
--
--static inline bool scm_has_secdata(struct socket *sock)
--{
--	return test_bit(SOCK_PASSSEC, &sock->flags);
--}
--#else
--static inline void scm_passec(struct socket *sock, struct msghdr *msg, struct scm_cookie *scm)
--{ }
--
--static inline bool scm_has_secdata(struct socket *sock)
--{
--	return false;
--}
--#endif /* CONFIG_SECURITY_NETWORK */
--
--static __inline__ void scm_pidfd_recv(struct msghdr *msg, struct scm_cookie *scm)
--{
--	struct file *pidfd_file = NULL;
--	int len, pidfd;
--
--	/* put_cmsg() doesn't return an error if CMSG is truncated,
--	 * that's why we need to opencode these checks here.
--	 */
--	if (msg->msg_flags & MSG_CMSG_COMPAT)
--		len = sizeof(struct compat_cmsghdr) + sizeof(int);
--	else
--		len = sizeof(struct cmsghdr) + sizeof(int);
--
--	if (msg->msg_controllen < len) {
--		msg->msg_flags |= MSG_CTRUNC;
--		return;
--	}
--
--	if (!scm->pid)
--		return;
--
--	pidfd = pidfd_prepare(scm->pid, 0, &pidfd_file);
--
--	if (put_cmsg(msg, SOL_SOCKET, SCM_PIDFD, sizeof(int), &pidfd)) {
--		if (pidfd_file) {
--			put_unused_fd(pidfd);
--			fput(pidfd_file);
--		}
--
--		return;
--	}
--
--	if (pidfd_file)
--		fd_install(pidfd, pidfd_file);
--}
--
--static inline bool __scm_recv_common(struct socket *sock, struct msghdr *msg,
--				     struct scm_cookie *scm, int flags)
--{
--	if (!msg->msg_control) {
--		if (test_bit(SOCK_PASSCRED, &sock->flags) ||
--		    test_bit(SOCK_PASSPIDFD, &sock->flags) ||
--		    scm->fp || scm_has_secdata(sock))
--			msg->msg_flags |= MSG_CTRUNC;
--		scm_destroy(scm);
--		return false;
--	}
--
--	if (test_bit(SOCK_PASSCRED, &sock->flags)) {
--		struct user_namespace *current_ns = current_user_ns();
--		struct ucred ucreds = {
--			.pid = scm->creds.pid,
--			.uid = from_kuid_munged(current_ns, scm->creds.uid),
--			.gid = from_kgid_munged(current_ns, scm->creds.gid),
--		};
--		put_cmsg(msg, SOL_SOCKET, SCM_CREDENTIALS, sizeof(ucreds), &ucreds);
--	}
--
--	scm_passec(sock, msg, scm);
--
--	if (scm->fp)
--		scm_detach_fds(msg, scm);
--
--	return true;
--}
--
--static inline void scm_recv(struct socket *sock, struct msghdr *msg,
--			    struct scm_cookie *scm, int flags)
--{
--	if (!__scm_recv_common(sock, msg, scm, flags))
--		return;
--
--	scm_destroy_cred(scm);
--}
--
--static inline void scm_recv_unix(struct socket *sock, struct msghdr *msg,
--				 struct scm_cookie *scm, int flags)
--{
--	if (!__scm_recv_common(sock, msg, scm, flags))
--		return;
--
--	if (test_bit(SOCK_PASSPIDFD, &sock->flags))
--		scm_pidfd_recv(msg, scm);
--
--	scm_destroy_cred(scm);
--}
-+void scm_recv(struct socket *sock, struct msghdr *msg,
-+	      struct scm_cookie *scm, int flags);
-+void scm_recv_unix(struct socket *sock, struct msghdr *msg,
-+		   struct scm_cookie *scm, int flags);
- 
- static inline int scm_recv_one_fd(struct file *f, int __user *ufd,
- 				  unsigned int flags)
-diff --git a/net/core/scm.c b/net/core/scm.c
-index 733c0cbd393d..66e02b18c359 100644
---- a/net/core/scm.c
-+++ b/net/core/scm.c
-@@ -404,3 +404,126 @@ struct scm_fp_list *scm_fp_dup(struct scm_fp_list *fpl)
- 	return new_fpl;
- }
- EXPORT_SYMBOL(scm_fp_dup);
+ 	case SO_TXREHASH:
++		if (!sk_is_tcp(sk))
++			return -EOPNOTSUPP;
 +
-+#ifdef CONFIG_SECURITY_NETWORK
-+static void scm_passec(struct socket *sock, struct msghdr *msg, struct scm_cookie *scm)
-+{
-+	struct lsm_context ctx;
-+	int err;
-+
-+	if (test_bit(SOCK_PASSSEC, &sock->flags)) {
-+		err = security_secid_to_secctx(scm->secid, &ctx);
-+
-+		if (err >= 0) {
-+			put_cmsg(msg, SOL_SOCKET, SCM_SECURITY, ctx.len,
-+				 ctx.context);
-+
-+			security_release_secctx(&ctx);
-+		}
-+	}
-+}
-+
-+static bool scm_has_secdata(struct socket *sock)
-+{
-+	return test_bit(SOCK_PASSSEC, &sock->flags);
-+}
-+#else
-+static void scm_passec(struct socket *sock, struct msghdr *msg, struct scm_cookie *scm)
-+{
-+}
-+
-+static bool scm_has_secdata(struct socket *sock)
-+{
-+	return false;
-+}
-+#endif
-+
-+static void scm_pidfd_recv(struct msghdr *msg, struct scm_cookie *scm)
-+{
-+	struct file *pidfd_file = NULL;
-+	int len, pidfd;
-+
-+	/* put_cmsg() doesn't return an error if CMSG is truncated,
-+	 * that's why we need to opencode these checks here.
-+	 */
-+	if (msg->msg_flags & MSG_CMSG_COMPAT)
-+		len = sizeof(struct compat_cmsghdr) + sizeof(int);
-+	else
-+		len = sizeof(struct cmsghdr) + sizeof(int);
-+
-+	if (msg->msg_controllen < len) {
-+		msg->msg_flags |= MSG_CTRUNC;
-+		return;
-+	}
-+
-+	if (!scm->pid)
-+		return;
-+
-+	pidfd = pidfd_prepare(scm->pid, 0, &pidfd_file);
-+
-+	if (put_cmsg(msg, SOL_SOCKET, SCM_PIDFD, sizeof(int), &pidfd)) {
-+		if (pidfd_file) {
-+			put_unused_fd(pidfd);
-+			fput(pidfd_file);
-+		}
-+
-+		return;
-+	}
-+
-+	if (pidfd_file)
-+		fd_install(pidfd, pidfd_file);
-+}
-+
-+static bool __scm_recv_common(struct socket *sock, struct msghdr *msg,
-+			      struct scm_cookie *scm, int flags)
-+{
-+	if (!msg->msg_control) {
-+		if (test_bit(SOCK_PASSCRED, &sock->flags) ||
-+		    test_bit(SOCK_PASSPIDFD, &sock->flags) ||
-+		    scm->fp || scm_has_secdata(sock))
-+			msg->msg_flags |= MSG_CTRUNC;
-+
-+		scm_destroy(scm);
-+		return false;
-+	}
-+
-+	if (test_bit(SOCK_PASSCRED, &sock->flags)) {
-+		struct user_namespace *current_ns = current_user_ns();
-+		struct ucred ucreds = {
-+			.pid = scm->creds.pid,
-+			.uid = from_kuid_munged(current_ns, scm->creds.uid),
-+			.gid = from_kgid_munged(current_ns, scm->creds.gid),
-+		};
-+
-+		put_cmsg(msg, SOL_SOCKET, SCM_CREDENTIALS, sizeof(ucreds), &ucreds);
-+	}
-+
-+	scm_passec(sock, msg, scm);
-+
-+	if (scm->fp)
-+		scm_detach_fds(msg, scm);
-+
-+	return true;
-+}
-+
-+void scm_recv(struct socket *sock, struct msghdr *msg,
-+	      struct scm_cookie *scm, int flags)
-+{
-+	if (!__scm_recv_common(sock, msg, scm, flags))
-+		return;
-+
-+	scm_destroy_cred(scm);
-+}
-+EXPORT_SYMBOL(scm_recv);
-+
-+void scm_recv_unix(struct socket *sock, struct msghdr *msg,
-+		   struct scm_cookie *scm, int flags)
-+{
-+	if (!__scm_recv_common(sock, msg, scm, flags))
-+		return;
-+
-+	if (test_bit(SOCK_PASSPIDFD, &sock->flags))
-+		scm_pidfd_recv(msg, scm);
-+
-+	scm_destroy_cred(scm);
-+}
+ 		/* Paired with WRITE_ONCE() in sk_setsockopt() */
+ 		v.val = READ_ONCE(sk->sk_txrehash);
+ 		break;
 -- 
 2.49.0
 
