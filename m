@@ -1,115 +1,124 @@
-Return-Path: <netdev+bounces-190712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57BB4AB8588
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 14:01:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E85EAB859E
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 14:05:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62BA43ADD22
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 12:01:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D07D3AEC62
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 12:04:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75BEF205AA8;
-	Thu, 15 May 2025 12:01:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ECD817BB21;
+	Thu, 15 May 2025 12:04:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sbbkFEfq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zCjPgj+h"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 415511F16B;
-	Thu, 15 May 2025 12:01:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C93DC4B1E70
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 12:04:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747310499; cv=none; b=nZY+5x/zZCNsgqLkr/tmJib4B/nPuinIdN7v9Qd8udsP1sYqcKqp4ErLCrNRa6qrG48RvSMZQuDXSbI+gHOI6SxGThjzixBX3BmAIPoq0KLrLq75yRPXD1iCFjVOYAsJZj4fxl+cm4o57X9BsyYYQzSEh+VUXl+5Oc6pY79Ml+g=
+	t=1747310699; cv=none; b=BcZuaw9TQjJ/ZgByrp3IxZVxzQXIH+n6/N5xZDS+R3NuWah2enuCY0xMcnVy1/L/D2Nt6fUTq2zOlnJQT3REgGuKo7a19L54C75+6N/kqauE9Jtc+gaKIzN88coZVS05yCkG6931qGsnYHsjRXQXf9evwoTzqiiVoXFyIg5mFf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747310499; c=relaxed/simple;
-	bh=e5G8NoyYejh7bIRIp3fd5xF4gR7mdTNrW8fJ14jg26o=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=IgJfWQlqyYkXLg4Em23hejn+jTtenUNPX96vtTTVzTsO6BGxpd5w9ZNdg2+U5rRAI6mBBXp8vEaMSUQ51qr+Nz8DVmUSx9lnR2H6Bb78auhwwf0Rz8iayBSzAh0KGP3kULyDNrzVJL3UnzWxV/rCGPiponAWuc0s5ebt5XN/66Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sbbkFEfq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B4F0C4CEE7;
-	Thu, 15 May 2025 12:01:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747310498;
-	bh=e5G8NoyYejh7bIRIp3fd5xF4gR7mdTNrW8fJ14jg26o=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=sbbkFEfqIp+hUc6URcnxYNfrYG91eGJsW2BvjonemLcKnpIdN/KdEmlXBO3EHBGtl
-	 mAj5fHbMojfpZveQLTI+dQD3Y9jn+3DiVDYKy4ezjcgq6EN3I6JiDKbvS6po9M2lBO
-	 qm7EFzbW/6vuj/9zUi2CxxQiRJ1fvMUxrQZeZzQq91Qc9zCzZPbIixh2okUuj42QgD
-	 EeOIpghHfGkKAo/z54CHl5qSNymy7xZTZZrxTyC7IJNIIKJqHvUYB045uk38GPFu9I
-	 t9sEKZ0FJboQmuXpgahifkx6UQIGokUa/uDm7z0MsX+QntMkFPgzkd6LSR0d3pDZhr
-	 ietuPLmcRnYOg==
+	s=arc-20240116; t=1747310699; c=relaxed/simple;
+	bh=WpiUlejC7a9sr/eBVtWBvwV6YolLIp6nwvJO6M2Q7gI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GV/oN8b+0NML/T1gvPrC27WFci9crQlqwNPHhuYIThXTzo8W6ehAeZhHyKAFVSSRFnH8m0KEUzpBvwlf74f3vKdo9LNY8E5iSVVZba+oNLkxBypgYWVXU0IQswHFDTFDCNt+vhiItc1Fvbo9rzplT0hLb/aT9Ds9uW39UwUiMVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zCjPgj+h; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-48b7747f881so260271cf.1
+        for <netdev@vger.kernel.org>; Thu, 15 May 2025 05:04:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1747310695; x=1747915495; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WpiUlejC7a9sr/eBVtWBvwV6YolLIp6nwvJO6M2Q7gI=;
+        b=zCjPgj+hAlc4bY2AF/Y8IKvqPysDnyiFG/ePPyTPSwnJwzpDyH4JSF6o/1HwdY+UrZ
+         Em0zK4Ieg5IelHYt6eG0pOKUi5LbRtqswy6F4RGXZZRdHptX4vohrDHoGu6Uu1k2VPJ8
+         vNOLrWN/YLv/c2ylyjHeQDPniMueyHx7kj8vgS5lapRRh5X09IuDyJchalCxBgpJRa/i
+         QQj738YY7VTrk5CHJpme3CBDKH4KECY0/1xDBayroXxlly6Sdk4VKC8DnckgbEKQblqC
+         6vPCaBXIaZ1dOOkNYYvZN5vApUO00LPTWrEb8RacZrvbOPxiCYu4WvQBlzOFva4hOtFJ
+         upCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747310695; x=1747915495;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WpiUlejC7a9sr/eBVtWBvwV6YolLIp6nwvJO6M2Q7gI=;
+        b=TnJkW1K7Liv5aKiNfACaUNjibBjZhr+up7RMs+FM1+1Q8S3lcMtCy37nYky/4KMRPX
+         SuI+zFH/HSRDVuuPaEFYFsyYmei03xuCantYd6Uw/6gHTer8HcxttYvxo9+ClkIn8cqH
+         xUqA5ILnrQ7LMT7lFZtA66FNGyNXzqF2dBhHPy6KQ3tGb4Lxuv9+/7GazE9xM8m2eJdR
+         oEpZ6bo6dpV9ETfB+w2HKhJ7ywuhpzYY5KyE9Gd+BdcosM7f0KexxPOpXZWfG0c4BW4d
+         pp9jlR0P5xoo2F5/PEjNthh/GL9SOmx5MjMZyL+EKrCF7e6mFvk5ub5uUYE6xm0OUwwQ
+         d2PA==
+X-Forwarded-Encrypted: i=1; AJvYcCU5WjA7brodAMqXfDwHZceiKDrkbmZx1DLXKE9c0GIswTDtd7fXp8iaHirGJ8UqUIdlPFR7sQs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLeyec+Xx6AsUQ1eeQPvVa7mtZQ+6B3FIdwTU+rXG/oOQKZqge
+	L6aNmF0VZbr8MhZpkCY+a6zJ88ZIJG7nj5bGzAUxdmZ3drBzUwuvkTcWqL0fJE5T5fjgVjwh3Dl
+	0LS2s6o6T7YLb6euZCqvdI6sj9xJd7zELq+6tdIR+
+X-Gm-Gg: ASbGncs22eGs1R/KpgJSMTvMJ86SCQgoOyeSH1AbLyYu/WSUk7LVm3rBvap/a8u+x1V
+	U6ruJERsf4/X5DGM0eYb51ksOZIXC55HrKo5yc6lSWusH0/W6gz/sAFKP9RX+FGCDYFXk7Zx2mn
+	qUrjKNLa3z4s8yeRN0GjGKBrhyxuDCDYKr8tX9XMQ+6xo6apkzybB9z2dZOyvPvFCkdw==
+X-Google-Smtp-Source: AGHT+IGkGSmzWaqzdcacUg1rh73ITkWfIi3UFIcuI50sB1Xh1R+hqsyy+JTTr3L5SQdC8TIRIuQ1l6xFRIqxN4fe7+8=
+X-Received: by 2002:a05:622a:15cf:b0:48a:5b89:473b with SMTP id
+ d75a77b69052e-494a3377caemr2823271cf.7.1747310695164; Thu, 15 May 2025
+ 05:04:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+References: <20250515100354.3339920-1-edumazet@google.com>
+In-Reply-To: <20250515100354.3339920-1-edumazet@google.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Thu, 15 May 2025 08:04:38 -0400
+X-Gm-Features: AX0GCFtyI34RNd9GhGuI05YWT8By9j6fL7Cn74VOUX3djmct_hBdqaEr-Rg5sE0
+Message-ID: <CADVnQykngURxudFtaH+vYs1k7P+udzhhnQiG9Wjbd8pfu6cMbA@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: rfs: add sock_rps_delete_flow() helper
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Octavian Purdila <tavip@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 15 May 2025 14:01:22 +0200
-Message-Id: <D9WPVECZK7GQ.2HAJ6JDN7M3LQ@kernel.org>
-Cc: "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Rob
- Herring" <robh@kernel.org>, "Krzysztof Kozlowski" <krzk+dt@kernel.org>,
- "Conor Dooley" <conor+dt@kernel.org>, "Heiner Kallweit"
- <hkallweit1@gmail.com>, "Russell King" <linux@armlinux.org.uk>, "Florian
- Fainelli" <florian.fainelli@broadcom.com>, "Broadcom internal kernel review
- list" <bcm-kernel-feedback-list@broadcom.com>, =?utf-8?q?Marek_Beh=C3=BAn?=
- <kabel@kernel.org>, "Andrei Botila" <andrei.botila@oss.nxp.com>, "FUJITA
- Tomonori" <fujita.tomonori@gmail.com>, "Trevor Gross" <tmgross@umich.edu>,
- "Miguel Ojeda" <ojeda@kernel.org>, "Alex Gaynor" <alex.gaynor@gmail.com>,
- "Boqun Feng" <boqun.feng@gmail.com>, "Gary Guo" <gary@garyguo.net>,
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Benno Lossin"
- <benno.lossin@proton.me>, "Andreas Hindborg" <a.hindborg@kernel.org>,
- "Alice Ryhl" <aliceryhl@google.com>, "Danilo Krummrich" <dakr@kernel.org>,
- "Sabrina Dubroca" <sd@queasysnail.net>, "Michael Klein"
- <michael@fossekall.de>, "Daniel Golle" <daniel@makrotopia.org>,
- <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <rust-for-linux@vger.kernel.org>
-Subject: Re: [net-next PATCH v10 7/7] rust: net::phy sync with
- match_phy_device C changes
-From: "Benno Lossin" <lossin@kernel.org>
-To: "Christian Marangi" <ansuelsmth@gmail.com>
-X-Mailer: aerc 0.20.1
-References: <20250515112721.19323-1-ansuelsmth@gmail.com>
- <20250515112721.19323-8-ansuelsmth@gmail.com>
- <D9WPMD7Q4XRN.32LF8UDPK1IBI@kernel.org>
- <6825d53b.df0a0220.36755a.ca22@mx.google.com>
-In-Reply-To: <6825d53b.df0a0220.36755a.ca22@mx.google.com>
 
-On Thu May 15, 2025 at 1:51 PM CEST, Christian Marangi wrote:
-> On Thu, May 15, 2025 at 01:49:35PM +0200, Benno Lossin wrote:
->> On Thu May 15, 2025 at 1:27 PM CEST, Christian Marangi wrote:
->> > Sync match_phy_device callback wrapper in net:phy rust with the C
->> > changes where match_phy_device also provide the passed PHY driver.
->> >
->> > As explained in the C commit, this is useful for match_phy_device to
->> > access the PHY ID defined in the PHY driver permitting more generalize=
-d
->> > functions.
->> >
->> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
->> > ---
->> >  rust/kernel/net/phy.rs | 26 +++++++++++++++++++++++---
->> >  1 file changed, 23 insertions(+), 3 deletions(-)
->>=20
->> You probably should do this in the same commit as the C changes,
->> otherwise the in-between commits will error.
->>=20
+On Thu, May 15, 2025 at 6:04=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
 >
-> You are right, I will fix this in v11 but I would really want to know if
-> the Rust changes are correct. It's not my main language so it's all
-> discovering new stuff :D
+> RFS can exhibit lower performance for workloads using short-lived
+> flows and a small set of 4-tuple.
+>
+> This is often the case for load-testers, using a pair of hosts,
+> if the server has a single listener port.
+>
+> Typical use case :
+>
+> Server : tcp_crr -T128 -F1000 -6 -U -l30 -R 14250
+> Client : tcp_crr -T128 -F1000 -6 -U -l30 -c -H server | grep local_throug=
+hput
+>
+> This is because RFS global hash table contains stale information,
+> when the same RSS key is recycled for another socket and another cpu.
+>
+> Make sure to undo the changes and go back to initial state when
+> a flow is disconnected.
+>
+> Performance of the above test is increased by 22 %,
+> going from 372604 transactions per second to 457773.
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Reported-by: Octavian Purdila <tavip@google.com>
+> ---
 
-No worries :) I have lost some context on the PHY Rust bindings, so
-Fujita will probably have to review it, but if I find the time, I'll
-take a look.
+Reviewed-by: Neal Cardwell <ncardwell@google.com>
 
----
-Cheers,
-Benno
+Thanks, Eric!
+
+neal
 
