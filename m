@@ -1,111 +1,170 @@
-Return-Path: <netdev+bounces-190603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CA9BAB7BD9
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 05:00:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69EC2AB7BE2
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 05:01:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 242B0188BB0A
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 03:00:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 800AD8C810C
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 03:00:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EDF728DB46;
-	Thu, 15 May 2025 02:59:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V9DTHpJm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6C1525B1CE;
+	Thu, 15 May 2025 03:01:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D60D4B1E64;
-	Thu, 15 May 2025 02:59:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4214269839;
+	Thu, 15 May 2025 03:00:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747277998; cv=none; b=A5SdNU1bNL5PS3Cwp/KUEV4EmkVOevQGGIPd9t7zS0dtFVCdglruOQOoz1WLSN9WWsBNQPvxmjgzjlc6crswGQcozTV08yMQzeXAK/B2Hn6FGmpaRwLzJP9AOL6HU8moMXn0HgknApsiycrXyqPYpf4LIu7Dyb5dK+YcnETIO6w=
+	t=1747278065; cv=none; b=qysVOStKTHSd++IrEh3agHO50lgqtySNTLpZKzwP2CsTNcYlgWjq94MZdEosVIsYuB1hPY+P9v9fws2XkNwTSohzYjCWDHFaND9SI7kmEbQGPhhCy0DnqoIh03OWWYgm0fq30Qpr89cMjzlD36LFQodsgrrx+htTY3/RPyPzfhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747277998; c=relaxed/simple;
-	bh=PDLb/Z5CFapT4NGFtLlJZRiFyM6zo5sw4RC5O3pCj60=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PvinJE3pEvDX3g7cjqYWxqfPlr4opROMMdOgJx30KbE38PL9X/FxBQRgixIz0R0btBOOuzA2faBbHnElSGx4kM/Mduv4qwkIYAVewZsZahDboWuiGuI5K9Si56RndU9LjTL2k8N4ym93QS2xrSQxXRk57tM07GmOpRE+XaASifY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V9DTHpJm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBC5FC4CEEB;
-	Thu, 15 May 2025 02:59:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747277997;
-	bh=PDLb/Z5CFapT4NGFtLlJZRiFyM6zo5sw4RC5O3pCj60=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=V9DTHpJmS1XdJOo7dTi7f7SBsTBdKs7B7n75z+ENLeHSUtQZgNpTNstGghGQUFP5K
-	 sWDX1QeIPCL9RWephFXnPsWqPZ2JXEKoTi6gkya1Agy7KlfNvH6CjWbUI6idmhT8Ao
-	 2gD7tm/ix4SJJCBsiQkG0P8Fho4t7vIuDwjf66CYz3rZn00jFZxeh6qx4FnMsNIQ85
-	 AsOk6n3MPNmp8Jnp/gGJmhMdGD8xpxhTNnlZMDYINBb/+vSC4yFdatZlLpiDf4IAdB
-	 +TWT8lBJIK/8/evfnk/91ncMR9Mab5VL1VrNCpguRFRuXO8Yi3QHw07bfGLhaUe93g
-	 ncZtNbubpVCGA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D20380AA66;
-	Thu, 15 May 2025 03:00:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1747278065; c=relaxed/simple;
+	bh=WMtRPrTV5SKlwbqCnRpNmAVaeiJHq6e0YXcmEs9v6gM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=G5+cYgcxXXErKDNGnhfk9x8wV2DkGb4fyMG3kQwoqieu594EjJ794xtGQEOfPmZELRNtoEnzb9sSA0EkzAULgEpaQnfL3CdVrdQrdnPmsrcq2wt0UeAwd9rzcc49acTCUhIM3TvY/JN8soeT9lw64NDAPDRhvnDiqp1cTXusNhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-669ff7000002311f-13-682558e73367
+Date: Thu, 15 May 2025 12:00:50 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Waiman Long <llong@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
+	torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
+	linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
+	linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
+	will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
+	joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
+	duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
+	tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
+	amir73il@gmail.com, gregkh@linuxfoundation.org, kernel-team@lge.com,
+	linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+	minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+	sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+	penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+	ngupta@vflare.org, linux-block@vger.kernel.org,
+	josef@toxicpanda.com, linux-fsdevel@vger.kernel.org, jack@suse.cz,
+	jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
+	djwong@kernel.org, dri-devel@lists.freedesktop.org,
+	rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
+	hamohammed.sa@gmail.com, harry.yoo@oracle.com,
+	chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
+	max.byungchul.park@gmail.com, boqun.feng@gmail.com,
+	yskelg@gmail.com, yunseong.kim@ericsson.com, yeoreum.yun@arm.com,
+	netdev@vger.kernel.org, matthew.brost@intel.com,
+	her0gyugyu@gmail.com
+Subject: Re: [PATCH v15 01/43] llist: move llist_{head,node} definition to
+ types.h
+Message-ID: <20250515030050.GB1851@system.software.com>
+References: <20250513100730.12664-1-byungchul@sk.com>
+ <20250513100730.12664-2-byungchul@sk.com>
+ <5f412ff9-c6a3-4eb1-9c02-44d7c493327d@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/5] hv_netvsc: Fix error "nvsp_rndis_pkt_complete error
- status: 2"
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174727803505.2590892.12386533199392905169.git-patchwork-notify@kernel.org>
-Date: Thu, 15 May 2025 03:00:35 +0000
-References: <20250513000604.1396-1-mhklinux@outlook.com>
-In-Reply-To: <20250513000604.1396-1-mhklinux@outlook.com>
-To: Michael Kelley <mhkelley58@gmail.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- James.Bottomley@HansenPartnership.com, martin.petersen@oracle.com,
- linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-scsi@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5f412ff9-c6a3-4eb1-9c02-44d7c493327d@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUxTVxjHd+69vfe2WnYtOo+w+aHCZnBzQnA8SzZDsmU7ydhm4kwWt0SL
+	XNe6Aq68CM4l5TUKkyBbYRQmtWyVYFUsxlQFZBhqOh1WCxUdoDI0QHlf2w0FXCkx88uTX57/
+	//zO+XB4WlHGRvCatExRl6bSKlkZIxtfbn5j+PNo9aaH5RLw+w4xUHvGyoLr9EkE1nN5FIx0
+	fgi3A2MInvxxg4YqgwvB8Qf9NJxzDCBobchnwT0UBt3+SRachlIWCurPsHDTO0dBX2UFBSdt
+	H8M9yyMGrpWbKagaYaGmqoAKjmEKZi2NHFj00TDYYORg7kEsOAc8Emi9uwGqj/Wx0NLqZMBh
+	H6TAfbGWhQHrUwl4S6ZoCJRFguvoEQmcmjCz4A1YaLD4Jzm41W6iwGF6CZoKg8LivxckcPVI
+	OwXFv5yloPvOJQRth+5TYLN6WLjiH6Og2Wag4fGJTgSDZeMcFH0/y0FNXhmC0qJKBgr7NsOT
+	f4M3/+yLhby6JgZOzXtQ4rvEesyKyJWxSZoUNu8nj/09LGkNmBjyuxmTC8Z+jhS23eWIyZZF
+	mhtiSH3LCEWOz/glxNZ4mCW2mQqOlIx3U2Siq4vb+vIO2TspolaTLere3LJLpm50VDD7fg3L
+	6fT10HpUs6wESXksxGP9+I/cMz5a5ZYsMiNE474KO73IrPAa7u2dDfFKQYn9sy6mBMl4Wqhc
+	hi84pqnFIFz4DI9N94dEciEBm53uUEkhGBAuzR9lloIV2Fk9FGJaiMG9CyPBw3yQI/GJBX5x
+	LRW24LbAvVBllbAOt5+/Si09ziPF1Y6DS7wG/9bQy5Qjwfic1fic1fi/1YToRqTQpGWnqjTa
+	+I3q3DRNzsbd6ak2FPyllu/mvrCjGde2DiTwSLlc3l4UpVZIVNkZuakdCPO0cqX89t51aoU8
+	RZV7QNSl79RlacWMDhTJM8rV8rjA/hSF8JUqU/xaFPeJumcpxUsj9EgkOZ9OuV9Izg9cb1o9
+	H/uR95/3kwt++ivrh2tR2ydHrdtPh492vBr39sSu9w4nXg//oL9+TVwX3jN/48/zL+qmkg0p
+	tZsuZ3ter9PefMuZ7ttb882X9rUJO3w9ez5Zsap4fdh0XkTCxcGknYneAweTpVGZzLf37S1J
+	w3rV5qd1Q91rI+JfUTIZalVsDK3LUP0HPfruQ6EDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUxTZxTH8zz3tZWau47pjY1+qMMXFlFU4llc0CVm3Cxz0czERU1moze2
+	k1ZtEekUB1KMg0mEBYhFsZZZCJThilNQSwhIsahYLSIqoBAyh60CjttZYbCWZZlfTn45//M7
+	58thCeUYNY/VGdJEo0GTqqblpPzLtTnLnn8dp11x5dxikMZPkHCmzkmD75caBM5L2RiG21Lg
+	YSiIYOLOXQJKi30Izg/0EXDJ04/AXXWMBv/QbOiSRmjwFufTkFNRR8O9wCSG3pIiDDWujfDU
+	8TsJt07ZMZQO01BWmoMj5Q8MYUc1A46sOBissjIwOZAI3v5uClrPeilwP/4ITpf30nDd7SXB
+	0zCIwX/1DA39zmkKAnmjBIQKVOArPElB7Ss7DYGQgwCHNMLA/WYbBo9tDly0RLYe/3OKgvaT
+	zRiO//wrhq5H1xA0nXiGweXspqFVCmKodxUT8LayDcFgwUsGcn8MM1CWXYAgP7eEBEtvEky8
+	iVw+O54I2ecuklD7dzdanyw4y51IaA2OEIKl/pDwVnpAC+6QjRQ67LzQaO1jBEvTY0awuQ4K
+	9VXxQsX1YSycfy1Rgqv6B1pwvS5ihLyXXVh41dnJbJq/Tf7JbjFVly4alyfvlGurPUXk/guz
+	M9rGHxBZqGxWHpKxPLeaLyz1U1EmuTi+t6iBiDLNLeZ7esIzHMupeSnsI/OQnCW4kll8o2cM
+	R4P3uS18cKyPibKCW8Pbvf6ZISVXjPj8Yy/If4P3eO/poRkmuHi+Z2o4IrMRVvGVU2y0LeOS
+	+abQ05mRD7iFfPPldnwKKazv2NZ3bOv/tg0R1ShWZ0jXa3SpSQmmvVqzQZeRsGuf3oUij+jI
+	nCxsQOP+lBbEsUgdo2jO/VCrpDTpJrO+BfEsoY5VPPx2oVap2K0xfyca931jPJgqmlqQiiXV
+	cxWfbxV3Krk9mjRxryjuF43/pZiVzctCGQ5WVT+Qu6UirSCY5V4w+mR95tYL4dCiUN9vgcwb
+	n/o87WMbhj6eeF65Y/rQEfFNjP3A6Lru0a7bc/LL//rKeXWHbEVj50+fLf3+cswG87Tqi5WG
+	joHDSVZ9x2CK8eaqmtrtCds23lh5WMJlC1TBJUH9UUtd+sRmySzLsQZxYEndajVp0moS4wmj
+	SfMPr7iiAoQDAAA=
+X-CFilter-Loop: Reflected
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 12 May 2025 17:05:59 -0700 you wrote:
-> From: Michael Kelley <mhklinux@outlook.com>
+On Wed, May 14, 2025 at 08:14:26PM -0400, Waiman Long wrote:
+> On 5/13/25 6:06 AM, Byungchul Park wrote:
+> > llist_head and llist_node can be used by very primitives. For example,
 > 
-> Starting with commit dca5161f9bd0 in the 6.3 kernel, the Linux driver
-> for Hyper-V synthetic networking (netvsc) occasionally reports
-> "nvsp_rndis_pkt_complete error status: 2".[1] This error indicates
-> that Hyper-V has rejected a network packet transmit request from the
-> guest, and the outgoing network packet is dropped. Higher level
-> network protocols presumably recover and resend the packet so there is
-> no functional error, but performance is slightly impacted. Commit
-> dca5161f9bd0 is not the cause of the error -- it only added reporting
-> of an error that was already happening without any notice. The error
-> has presumably been present since the netvsc driver was originally
-> introduced into Linux.
+> I suppose you mean "every primitives". Right? However, the term "primitive"
+> may sound strange. Maybe just saying that it is used by some other header
+> files.
+
+Thank you.  I will apply it.
+
+	Byungchul
 > 
-> [...]
-
-Here is the summary with links:
-  - [net,1/5] Drivers: hv: Allow vmbus_sendpacket_mpb_desc() to create multiple ranges
-    https://git.kernel.org/netdev/net/c/380b75d30786
-  - [net,2/5] hv_netvsc: Use vmbus_sendpacket_mpb_desc() to send VMBus messages
-    https://git.kernel.org/netdev/net/c/4f98616b855c
-  - [net,3/5] hv_netvsc: Preserve contiguous PFN grouping in the page buffer array
-    https://git.kernel.org/netdev/net/c/41a6328b2c55
-  - [net,4/5] hv_netvsc: Remove rmsg_pgcnt
-    https://git.kernel.org/netdev/net/c/5bbc644bbf4e
-  - [net,5/5] Drivers: hv: vmbus: Remove vmbus_sendpacket_pagebuffer()
-    https://git.kernel.org/netdev/net/c/45a442fe369e
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+> Cheers,
+> Longman
+> 
+> > dept for tracking dependencies uses llist in its header. To avoid header
+> > dependency, move those to types.h.
+> > 
+> > Signed-off-by: Byungchul Park <byungchul@sk.com>
+> > ---
+> >   include/linux/llist.h | 8 --------
+> >   include/linux/types.h | 8 ++++++++
+> >   2 files changed, 8 insertions(+), 8 deletions(-)
+> > 
+> > diff --git a/include/linux/llist.h b/include/linux/llist.h
+> > index 2c982ff7475a..3ac071857612 100644
+> > --- a/include/linux/llist.h
+> > +++ b/include/linux/llist.h
+> > @@ -53,14 +53,6 @@
+> >   #include <linux/stddef.h>
+> >   #include <linux/types.h>
+> > -struct llist_head {
+> > -	struct llist_node *first;
+> > -};
+> > -
+> > -struct llist_node {
+> > -	struct llist_node *next;
+> > -};
+> > -
+> >   #define LLIST_HEAD_INIT(name)	{ NULL }
+> >   #define LLIST_HEAD(name)	struct llist_head name = LLIST_HEAD_INIT(name)
+> > diff --git a/include/linux/types.h b/include/linux/types.h
+> > index 49b79c8bb1a9..c727cc2249e8 100644
+> > --- a/include/linux/types.h
+> > +++ b/include/linux/types.h
+> > @@ -204,6 +204,14 @@ struct hlist_node {
+> >   	struct hlist_node *next, **pprev;
+> >   };
+> > +struct llist_head {
+> > +	struct llist_node *first;
+> > +};
+> > +
+> > +struct llist_node {
+> > +	struct llist_node *next;
+> > +};
+> > +
+> >   struct ustat {
+> >   	__kernel_daddr_t	f_tfree;
+> >   #ifdef CONFIG_ARCH_32BIT_USTAT_F_TINODE
+> 
 
