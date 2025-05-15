@@ -1,119 +1,115 @@
-Return-Path: <netdev+bounces-190711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF2CEAB855D
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 13:54:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57BB4AB8588
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 14:01:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD330188F644
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 11:55:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62BA43ADD22
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 12:01:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75F2E2989AE;
-	Thu, 15 May 2025 11:54:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75BEF205AA8;
+	Thu, 15 May 2025 12:01:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T/TOaeMC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sbbkFEfq"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D151729827F
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 11:54:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 415511F16B;
+	Thu, 15 May 2025 12:01:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747310086; cv=none; b=XAd9KodEIBGxoIQ0t7Ma80KxBuQGrO9mQnKVVuncnK5jNggxRWNfKT638agjVITohUwC41REr9D3FMTmpyWUFd+2fc3IDJgBz58sypl/kN7rSy7mi/Upgnj1FMfQvPMee4CCB8P5pXAbKdTlmXFSAw48KK5qY8fXv39vwqK2m5w=
+	t=1747310499; cv=none; b=nZY+5x/zZCNsgqLkr/tmJib4B/nPuinIdN7v9Qd8udsP1sYqcKqp4ErLCrNRa6qrG48RvSMZQuDXSbI+gHOI6SxGThjzixBX3BmAIPoq0KLrLq75yRPXD1iCFjVOYAsJZj4fxl+cm4o57X9BsyYYQzSEh+VUXl+5Oc6pY79Ml+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747310086; c=relaxed/simple;
-	bh=epsWvjWHu9kmVNTaRRd+qtpyAjbj5OYYAn55OL3IWmE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Yn9w/9cEIXUsraZ13NDTLuwJf5tphU4YFgcVJBEmRmhQC/qqHLx25Staj2w8bFbZ5rsYPFxfPomkIGq26d3h3Smq3FlLD6fYFoBYyVHD1AQ1k+/kxj9QOTEFs3I6hd2ZP+EM8Mwl3tVzFHVY1C0inVjKTzq9+WleUIh4C3W8m7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T/TOaeMC; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747310083;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=epsWvjWHu9kmVNTaRRd+qtpyAjbj5OYYAn55OL3IWmE=;
-	b=T/TOaeMCrvwW1KNA9hYC0Upw+XBlGV4amypHiHgzBRyKmnNiFIMy8kDxpkG3e9qDvihWx8
-	jNtJJljcY8uYNd6oFxvhzID8EFBQsk+Wp85TYpVygcYgYgeIUIudD3m98vVnMJHJ8+yoY4
-	cdtNZ3oBQFP0DGHstGm8x1zOHo9/fAU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-618-5I7PTCo5NHWqhnjFh0Jjlw-1; Thu, 15 May 2025 07:54:42 -0400
-X-MC-Unique: 5I7PTCo5NHWqhnjFh0Jjlw-1
-X-Mimecast-MFC-AGG-ID: 5I7PTCo5NHWqhnjFh0Jjlw_1747310081
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-440667e7f92so4753325e9.3
-        for <netdev@vger.kernel.org>; Thu, 15 May 2025 04:54:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747310081; x=1747914881;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=epsWvjWHu9kmVNTaRRd+qtpyAjbj5OYYAn55OL3IWmE=;
-        b=aG5IOleekvKDO1drBj3/z+UZuny1O1n1SBDUKnKEcIw+Ag4FnGkLmsdyzlUz8zxhMd
-         49axUmVIGtMuCZdmkhHVt3Qbe0TczMK71zSrBpg2XrV8H3BoxUVZebp+HcPc1kxtzG+0
-         zNq1+Xmt/7ahQakCvmguKM+f/bUEY5Le99eg7P91MswkOYJjdc477WXoEq+F0vWdkmCk
-         qmR0FbKudjJ/FDRGhd/PvsJ99Vdy/wh+WcPzTMprU/0CAjlTmHfscIFgXiwPtgcuJWB3
-         7oeIQGLi5yvlmb+ltxuakn818PZa5KlTMEjW1jIkIAsu+QQlsi/kbYFyC2GZpbM5s03k
-         Nkyg==
-X-Forwarded-Encrypted: i=1; AJvYcCX9GmdJ/3DSQ+91bPGf5ccwHWaIP538T6IQZ0YfHKdmy+DYsYbUqyKzPyqFTfVRAZpCp1YMXPM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFRdUz0QCyvZgzD7cI0hcKYmM4JGUqPY9UY2cFkMY83ph7Hcxx
-	x4sQ91rBp3fS7KhlOxHmibTiNyC6NmWAGA8lOQRuGAf5XVC+xtwRl/kSHYl7KkMbZkvUAsubRrj
-	N8SkD+IQvTtqMOyu0M9nqIk6v14zhkPr2K6IeKJuHGlO08bu1fFeR2Q==
-X-Gm-Gg: ASbGncuc0O4mP1OEGSFzFbtpKr34PtO1hLC4OSD+OvxJquBi+O7SMkm3dre+go5YKDy
-	bd2JbIHOBzxNfxJyFJY/E8B58JQXlCtGDR30i5zWYpv+nSUZKVDpQeWv/QsBEyawc3gu2r+EFtd
-	86zmIryWf0RUnYdCqhrY7iOoAibHyv8tGuHfqxqjvYhfyX/MLWJRbVHBaWj8xNQBL6+ynxsXPez
-	LObVvZYbL+Ez3Iw4Sfy+ORJ/zlZd8MULRMO3h8sGffrFdnSs1aoUhy5IMOIhXa3CxrGAGgX8+3e
-	uUB+M3XLwmLCsgu5O1ajvFzsOmEURG5CDHZG5AsHboreEZ4KkuCvc426vXw=
-X-Received: by 2002:a05:600c:c059:20b0:43c:f44c:72a6 with SMTP id 5b1f17b1804b1-442f285da04mr40196535e9.2.1747310081296;
-        Thu, 15 May 2025 04:54:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF94kl59CRKh8KcTSkw1SAiKI6cImxvIQTZSHoUW1IK/I8r2VxJB89xu8sNKWWPqxAdRF3Xqw==
-X-Received: by 2002:a05:600c:c059:20b0:43c:f44c:72a6 with SMTP id 5b1f17b1804b1-442f285da04mr40196275e9.2.1747310080913;
-        Thu, 15 May 2025 04:54:40 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2440:8010:8dec:ae04:7daa:497f? ([2a0d:3344:2440:8010:8dec:ae04:7daa:497f])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442f3368e3fsm67978805e9.2.2025.05.15.04.54.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 May 2025 04:54:40 -0700 (PDT)
-Message-ID: <1b1f8131-80e6-4671-b4f2-4cadf426d4fd@redhat.com>
-Date: Thu, 15 May 2025 13:54:38 +0200
+	s=arc-20240116; t=1747310499; c=relaxed/simple;
+	bh=e5G8NoyYejh7bIRIp3fd5xF4gR7mdTNrW8fJ14jg26o=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=IgJfWQlqyYkXLg4Em23hejn+jTtenUNPX96vtTTVzTsO6BGxpd5w9ZNdg2+U5rRAI6mBBXp8vEaMSUQ51qr+Nz8DVmUSx9lnR2H6Bb78auhwwf0Rz8iayBSzAh0KGP3kULyDNrzVJL3UnzWxV/rCGPiponAWuc0s5ebt5XN/66Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sbbkFEfq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B4F0C4CEE7;
+	Thu, 15 May 2025 12:01:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747310498;
+	bh=e5G8NoyYejh7bIRIp3fd5xF4gR7mdTNrW8fJ14jg26o=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=sbbkFEfqIp+hUc6URcnxYNfrYG91eGJsW2BvjonemLcKnpIdN/KdEmlXBO3EHBGtl
+	 mAj5fHbMojfpZveQLTI+dQD3Y9jn+3DiVDYKy4ezjcgq6EN3I6JiDKbvS6po9M2lBO
+	 qm7EFzbW/6vuj/9zUi2CxxQiRJ1fvMUxrQZeZzQq91Qc9zCzZPbIixh2okUuj42QgD
+	 EeOIpghHfGkKAo/z54CHl5qSNymy7xZTZZrxTyC7IJNIIKJqHvUYB045uk38GPFu9I
+	 t9sEKZ0FJboQmuXpgahifkx6UQIGokUa/uDm7z0MsX+QntMkFPgzkd6LSR0d3pDZhr
+	 ietuPLmcRnYOg==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 0/5] eth: fbnic: Add devlink dev flash support
-To: Lee Trager <lee@trager.us>, Alexander Duyck <alexanderduyck@fb.com>,
- Jakub Kicinski <kuba@kernel.org>, kernel-team@meta.com,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Jacob Keller
- <jacob.e.keller@intel.com>, Mohsin Bashir <mohsin.bashr@gmail.com>,
- Sanman Pradhan <sanman.p211993@gmail.com>, Su Hui <suhui@nfschina.com>,
- Al Viro <viro@zeniv.linux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250512190109.2475614-1-lee@trager.us>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250512190109.2475614-1-lee@trager.us>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Date: Thu, 15 May 2025 14:01:22 +0200
+Message-Id: <D9WPVECZK7GQ.2HAJ6JDN7M3LQ@kernel.org>
+Cc: "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Rob
+ Herring" <robh@kernel.org>, "Krzysztof Kozlowski" <krzk+dt@kernel.org>,
+ "Conor Dooley" <conor+dt@kernel.org>, "Heiner Kallweit"
+ <hkallweit1@gmail.com>, "Russell King" <linux@armlinux.org.uk>, "Florian
+ Fainelli" <florian.fainelli@broadcom.com>, "Broadcom internal kernel review
+ list" <bcm-kernel-feedback-list@broadcom.com>, =?utf-8?q?Marek_Beh=C3=BAn?=
+ <kabel@kernel.org>, "Andrei Botila" <andrei.botila@oss.nxp.com>, "FUJITA
+ Tomonori" <fujita.tomonori@gmail.com>, "Trevor Gross" <tmgross@umich.edu>,
+ "Miguel Ojeda" <ojeda@kernel.org>, "Alex Gaynor" <alex.gaynor@gmail.com>,
+ "Boqun Feng" <boqun.feng@gmail.com>, "Gary Guo" <gary@garyguo.net>,
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Benno Lossin"
+ <benno.lossin@proton.me>, "Andreas Hindborg" <a.hindborg@kernel.org>,
+ "Alice Ryhl" <aliceryhl@google.com>, "Danilo Krummrich" <dakr@kernel.org>,
+ "Sabrina Dubroca" <sd@queasysnail.net>, "Michael Klein"
+ <michael@fossekall.de>, "Daniel Golle" <daniel@makrotopia.org>,
+ <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <rust-for-linux@vger.kernel.org>
+Subject: Re: [net-next PATCH v10 7/7] rust: net::phy sync with
+ match_phy_device C changes
+From: "Benno Lossin" <lossin@kernel.org>
+To: "Christian Marangi" <ansuelsmth@gmail.com>
+X-Mailer: aerc 0.20.1
+References: <20250515112721.19323-1-ansuelsmth@gmail.com>
+ <20250515112721.19323-8-ansuelsmth@gmail.com>
+ <D9WPMD7Q4XRN.32LF8UDPK1IBI@kernel.org>
+ <6825d53b.df0a0220.36755a.ca22@mx.google.com>
+In-Reply-To: <6825d53b.df0a0220.36755a.ca22@mx.google.com>
 
-On 5/12/25 8:53 PM, Lee Trager wrote:
-> fbnic supports updating firmware using signed PLDM images. PLDM images are
-> written into the flash. Flashing does not interrupt the operation of the
-> device.
+On Thu May 15, 2025 at 1:51 PM CEST, Christian Marangi wrote:
+> On Thu, May 15, 2025 at 01:49:35PM +0200, Benno Lossin wrote:
+>> On Thu May 15, 2025 at 1:27 PM CEST, Christian Marangi wrote:
+>> > Sync match_phy_device callback wrapper in net:phy rust with the C
+>> > changes where match_phy_device also provide the passed PHY driver.
+>> >
+>> > As explained in the C commit, this is useful for match_phy_device to
+>> > access the PHY ID defined in the PHY driver permitting more generalize=
+d
+>> > functions.
+>> >
+>> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+>> > ---
+>> >  rust/kernel/net/phy.rs | 26 +++++++++++++++++++++++---
+>> >  1 file changed, 23 insertions(+), 3 deletions(-)
+>>=20
+>> You probably should do this in the same commit as the C changes,
+>> otherwise the in-between commits will error.
+>>=20
+>
+> You are right, I will fix this in v11 but I would really want to know if
+> the Rust changes are correct. It's not my main language so it's all
+> discovering new stuff :D
 
-Apparently the bot did not notice, but I applied the series a little
-time ago, thanks!
+No worries :) I have lost some context on the PHY Rust bindings, so
+Fujita will probably have to review it, but if I find the time, I'll
+take a look.
 
-Paolo
-
+---
+Cheers,
+Benno
 
