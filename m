@@ -1,125 +1,102 @@
-Return-Path: <netdev+bounces-190581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8878BAB7AF2
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 03:23:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0164AB7AFA
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 03:33:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4E3A863979
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 01:23:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8722B4C81D4
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 01:33:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FA4624C68D;
-	Thu, 15 May 2025 01:23:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31D452690FB;
+	Thu, 15 May 2025 01:32:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="TqrC6tHx"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="AnoUd7QG"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFEB58C1F;
-	Thu, 15 May 2025 01:23:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1298923BE;
+	Thu, 15 May 2025 01:32:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747272230; cv=none; b=sEFsBHwsN2zgId4VyDjwdQEM1/GuQKngVhpiIrWJwn18W4X0BP/2Pj2bQ5KkOu3qTw6CZGtY4b7eNryFCOrCySzvBWNLIwX+6fqf5Xo+nLX1xmFHtb8CvTkRLw9VRlgd8L+zmC5h7/PdIqNVcuzdib9K6IKm0i+d3xHiER9LfAg=
+	t=1747272776; cv=none; b=cTO4vnteVC31g6VCddAazi11T0RGVzclS/3oqrf71RbtQ7VoNgdZyo1iXgYOQ2GFtKP6HsSdsFi1l7Pj+Mk2ns/JSqJbDOs7TSUKLS94ud5ZCdloRTOafxndH3RmVPQywfCY7tMFdzSXVtNjqOSPSDob/f88iX6irmfa1AKqg1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747272230; c=relaxed/simple;
-	bh=bSX8ZwcZSPjmpOO3el/q+Vf6RN/k/v0gYzWUjl+oSPE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YMPP8qSAYgbMjI7ONoYTXvQ2sskACAsXKh6la4msM/WjYnIo1CTmbc4Lt23WRR+CkiVA4i5drzcvHTzDxqCrw6vHes9kx+i6nFot/8LqL2cV/EtPU4u6ulG7vm8jM774oVVjLuI3QqgvQBPcClEgfCpNLIbTeXVb7eHKWQ2+lzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=TqrC6tHx; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ZNEVePrYcEKpGjmy4ptaEK0bCgRenH9d4U+STgUBLp8=; b=TqrC6tHx2nDhX1MPJu5HfQDFFF
-	7iqxY6YE+cP/esAGf7veHNXV1UqPnK7nme2FRbF2NuoIM2IJw58Wj7bkVswUBcQrkVJntiDzFCHdt
-	tu1FC0gCzbV4WHr4o5HNEWiaqNxr5IwE+rAp/swFVcVA9BuGHRag39g70xUNxAlv4Grs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uFNJz-00CcSc-Nn; Thu, 15 May 2025 03:23:39 +0200
-Date: Thu, 15 May 2025 03:23:39 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Marek Pazdan <mpazdan@arista.com>
-Cc: aleksander.lobakin@intel.com, almasrymina@google.com,
-	andrew+netdev@lunn.ch, anthony.l.nguyen@intel.com,
-	daniel.zahka@gmail.com, davem@davemloft.net, ecree.xilinx@gmail.com,
-	edumazet@google.com, gal@nvidia.com, horms@kernel.org,
-	intel-wired-lan@lists.osuosl.org, jianbol@nvidia.com,
-	kory.maincent@bootlin.com, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, przemyslaw.kitszel@intel.com, willemb@google.com
-Subject: Re: [Intel-wired-lan] [PATCH net-next v2 2/2] ice: add qsfp
- transceiver reset, interrupt and presence pin control
-Message-ID: <200f7d11-50c2-4ee2-a80b-15341fbbd5f4@lunn.ch>
-References: <6f127b5b-77c6-4bd4-8124-8eea6a12ca61@lunn.ch>
- <20250513224017.202236-1-mpazdan@arista.com>
- <20250513224017.202236-2-mpazdan@arista.com>
+	s=arc-20240116; t=1747272776; c=relaxed/simple;
+	bh=9wA7RdmbNapS/2b7J2TfGqrkP22KbPova+zjoxgyb+I=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KJLtgL7eEgWALSFNH1X5rP6OUa6GyNEtcWr3QpuKbrj1AmAw2E8d9HYHc7EJ30EZm74msdWGYNB9lGxw8Ysvz40nlPYjpeArcvLbo76g//t1SXPUk6NF9kzEYd/C9mzT1moG4QNBB4pv8HK8uqfK20Fbkm9UF+GIT/LiJLfTK5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=AnoUd7QG; arc=none smtp.client-ip=220.197.31.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Ss
+	eu97KlXl6TVBlUuVYBOxoW4h4rgHHPvwjyLex7C+8=; b=AnoUd7QGNahbWEFnxW
+	LSWwxkfIt/bAFitKFtf05oVZKS4zH9KR6BRY//mIYTXU+qBK3Ee79CzUXBRAdOB9
+	wkYszWe2ZCe3qtL2mtGBVtaiEVuwPHu2zrl9EWnREkWdgCrmeC862Ik9teNoESSF
+	j5BN3R+ZlBkYNFdiyUpMS7IXc=
+Received: from localhost.localdomain (unknown [])
+	by gzsmtp5 (Coremail) with SMTP id QCgvCgAXf9clRCVoPz_mAg--.40336S2;
+	Thu, 15 May 2025 09:32:23 +0800 (CST)
+From: Feng Yang <yangfeng59949@163.com>
+To: pablo@netfilter.org,
+	kadlec@netfilter.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH nf-next] netfilter: bpf: Remove bpf_nf_func_proto
+Date: Thu, 15 May 2025 09:32:21 +0800
+Message-Id: <20250515013221.25503-1-yangfeng59949@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250513224017.202236-2-mpazdan@arista.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:QCgvCgAXf9clRCVoPz_mAg--.40336S2
+X-Coremail-Antispam: 1Uf129KBjvdXoWrZF15Kr4DKr43ZryUCw17KFg_yoWfKFg_Cr
+	y8tayxGFWrKr95Aa4UuFZrury5G34rWr4fXa4xXws8A343J3WvkFWxWr9YvrW5u3W7KryS
+	yrs0kryUtrWDKjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUji0eJUUUUU==
+X-CM-SenderInfo: p1dqww5hqjkmqzuzqiywtou0bp/1tbiThpOeGglQ6wTrwAAs8
 
-> + * ice_get_module_mgmt_signal - get module management signal status
-> + * @dev: network interface device structure
-> + * @params: ethtool module management signal params
-> + * @extack: extended ACK from the Netlink message
-> + *
-> + * Returns -EIO if AQ command for GPIO get failed, otherwise
-> + * returns 0 and current status of requested signal in params.
-> + */
-> +static int
-> +ice_get_module_mgmt_signal(struct net_device *dev,
-> +			   struct ethtool_module_mgmt_params *params,
-> +			   struct netlink_ext_ack *extack)
-> +{
-> +	struct ice_netdev_priv *np = netdev_priv(dev);
-> +	struct ice_pf *pf = np->vsi->back;
-> +	struct ice_hw *hw = &pf->hw;
-> +	u16 gpio_handle = 0; /* SOC/on-chip GPIO */
-> +	bool value;
-> +	int ret = 0;
-> +
-> +	if (hw->has_module_mgmt_gpio) {
-> +		switch (params->type) {
-> +		case ETHTOOL_MODULE_MGMT_RESET:
-> +			ret = ice_aq_get_gpio(hw, gpio_handle,
-> +					      ICE_MGMT_PIN_RESET, &value, NULL);
-> +			break;
+From: Feng Yang <yangfeng@kylinos.cn>
 
-Reset, i can kind of understand being used this way.
+Only use bpf_base_func_proto, so bpf_nf_func_proto can be removed
 
-> +		case ETHTOOL_MODULE_MGMT_INT:
-> +			ret = ice_aq_get_gpio(hw, gpio_handle,
-> +					      ICE_MGMT_PIN_INT, &value, NULL);
-> +			break;
-> +		case ETHTOOL_MODULE_MGMT_PRESENT:
-> +			ret = ice_aq_get_gpio(hw, gpio_handle,
-> +					      ICE_MGMT_PIN_PRESENT, &value, NULL);
-> +			break;
-
-but not these two. These represent events. I've not looked at the
-datasheet... Does the GPIO controller support interrupts? For PRESENT
-you are interested in the edges, maybe with some debounce logic. For
-INT, i _guess_ it is active low? But i've no idea what user space is
-going to actually do on an interrupt, and how is it going to clear the
-interrupt? This smells like a user space driver, which is not
-something we want. Even if there is a legitimate use case, which there
-might be for PRESENT, polling does not make much sense when the kernel
-can broadcast a netlink message to user space if the GPIO controller
-has interrupt support.
-
-    Andrew
-
+Signed-off-by: Feng Yang <yangfeng@kylinos.cn>
 ---
-pw-bot: cr
+ net/netfilter/nf_bpf_link.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
+
+diff --git a/net/netfilter/nf_bpf_link.c b/net/netfilter/nf_bpf_link.c
+index 06b084844700..f277722f9025 100644
+--- a/net/netfilter/nf_bpf_link.c
++++ b/net/netfilter/nf_bpf_link.c
+@@ -316,13 +316,7 @@ static bool nf_is_valid_access(int off, int size, enum bpf_access_type type,
+ 	return false;
+ }
+ 
+-static const struct bpf_func_proto *
+-bpf_nf_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
+-{
+-	return bpf_base_func_proto(func_id, prog);
+-}
+-
+ const struct bpf_verifier_ops netfilter_verifier_ops = {
+ 	.is_valid_access	= nf_is_valid_access,
+-	.get_func_proto		= bpf_nf_func_proto,
++	.get_func_proto		= bpf_base_func_proto,
+ };
+-- 
+2.43.0
+
 
