@@ -1,161 +1,104 @@
-Return-Path: <netdev+bounces-190990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D327AB9980
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 11:56:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F89CAB9B35
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 13:39:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C9A31BC6FDC
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 09:55:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A549179417
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 11:39:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E03723371F;
-	Fri, 16 May 2025 09:54:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4252B231846;
+	Fri, 16 May 2025 11:39:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uyBoMusI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hyEGTlms"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20BE9231836;
-	Fri, 16 May 2025 09:54:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810673E47B
+	for <netdev@vger.kernel.org>; Fri, 16 May 2025 11:39:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747389280; cv=none; b=muGvkjV4T9Tz4IPWXGsuNdQrFo+uvDX1oCEcSLA3GOMZxdeuiWQU2YC0bw6Zsn/fKIkP2UvQIF2fZEHPh1PCkMKpn6GD0ObAQQcCW7+/vmHsQ7ZSAeBIdFZMkL64D+YP2gkf0aoMHKcTUdugkFO0otdXYRdTTBlNHTO+E+mE9rA=
+	t=1747395552; cv=none; b=SYCJEm5K9Y6h0T5R3EPDOpX6/v65wBRZYJluWSi1/CDaGmtpCtr5tGARpvR1bRvr0K6nQ88bkYnlQGbXrtXh/cS/7ZNkmZjkLXinO/WlpEnXsCGrqwgnTtpdSJAFy7O4OfIkn4Y1AOeQSKxbx9kN4XArWkB53XVYaPcthROjZnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747389280; c=relaxed/simple;
-	bh=cNGzEGia25lZqXsVStZ30M0Gmy1ujfz1B+xpH/pyz5U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DyPFDknRmyNbcDxBIHgNjRqu/00Yl6g4M4bpPvzET42JBtK/PToz+wBWnvcgugFrEqhwzY8CvZZHU1o6VFWub+DjKEwO2Y0dylOTPEM6LecOEsQUXLUr6JHQPqcgQoxw2IrnCk9JcbsC+Ec7jcCTI2cP/72FN18oUaEeH6S9W2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uyBoMusI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F119C4CEEF;
-	Fri, 16 May 2025 09:54:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747389280;
-	bh=cNGzEGia25lZqXsVStZ30M0Gmy1ujfz1B+xpH/pyz5U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uyBoMusII2b45lXUcrViChhqP2cU17fdLv6zVDaxw8Kajvy9Xy27efVSKrlc7/mCZ
-	 rQaK+BzjNKV0+/XLrIACWcbBCkcehhGXdeuP3numrDxQ6bvbUG/NYX4jJGoK02VYL1
-	 WwLFlY5IX22Jf+cGS7H+XMZLPwJIpKIKPf2FyjvmPpD+98eZ0Hop9w691xyyIGAIrL
-	 jFEBwrap/t9Zwf7UkWrwJImzEvaX0/yNGFatq5AQPED4C5uBGIdSnvMmlFceoZ7qfX
-	 nbZ7FR70pp159O4JwpFKLBZXp6/t05ro6vNYmjTeOS7fYtVWEq8AvlwYlWcRwIM2Ww
-	 JvZZtln9UGzgw==
-Date: Fri, 16 May 2025 11:54:31 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Jann Horn <jannh@google.com>
-Cc: linux-fsdevel@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Eric Dumazet <edumazet@google.com>, 
-	Oleg Nesterov <oleg@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Daan De Meyer <daan.j.demeyer@gmail.com>, 
-	David Rheinsberg <david@readahead.eu>, Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>, 
-	Lennart Poettering <lennart@poettering.net>, Luca Boccassi <bluca@debian.org>, Mike Yuan <me@yhndnzj.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, Alexander Mikhalitsyn <alexander@mihalicyn.com>
-Subject: Re: [PATCH v7 7/9] coredump: validate socket name as it is written
-Message-ID: <20250516-planen-radar-2131a4b7d9b1@brauner>
-References: <20250515-work-coredump-socket-v7-0-0a1329496c31@kernel.org>
- <20250515-work-coredump-socket-v7-7-0a1329496c31@kernel.org>
- <CAG48ez1wqbOmQMqg6rH4LNjNifHU_WciceO_SQwu8T=tA_KxLw@mail.gmail.com>
+	s=arc-20240116; t=1747395552; c=relaxed/simple;
+	bh=owQ7b15DdeQ6lEWW9gXxTuFdVO9N2yluLH301f68ftY=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=hUI+2Bw/sG0KJ9lLawkzWyz+/nvqqpW+k6Ii270N74kF29suP4LeHSnXCjP7f7/+YLcocqJ+mKN+8UJvHGil74wpgukpMRokWv+nz0wPd9V0q+VORvnhV2qYOWtsxD7k0Kf/9kPrNAGekoDe2Ooa/YCEwkbu+0GEY6UvQZRoRhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hyEGTlms; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-441d1ed82dbso19577525e9.0
+        for <netdev@vger.kernel.org>; Fri, 16 May 2025 04:39:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747395549; x=1748000349; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=owQ7b15DdeQ6lEWW9gXxTuFdVO9N2yluLH301f68ftY=;
+        b=hyEGTlmsa4ScDwxLbmYOBKQ1h+u49kBuCBhZPXvdjlyqWt4pZ0iFfp0YZGn4kSGZzu
+         YMWQrmAtn3/mWx3QLjuNeGLzb7yMmDjAS0a+sdVAedTrwtb0amdjoC1nGDXSLOSU+Hwv
+         bOoi1kcS37COxpHR9XBAyPZam5p8u5L2nyckqvroWkE4dgwwnXY/ytom1GqvJrbPt9C3
+         m+L3GzoPMz8AMQ/Wox5y7s03Ux/3remKF9gDtAAm7yxJbgWmpkRizWPJqyCi3QIU88RC
+         fSdpWSvhY+mbRsss7DBrrMRrQjCC/czurOTAdIIw4MRpoFwe27OfIwNTof4tZhloYUDx
+         JBTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747395549; x=1748000349;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=owQ7b15DdeQ6lEWW9gXxTuFdVO9N2yluLH301f68ftY=;
+        b=N1tjogq85CrODDQlRGU98t4TP9pcl7O7pa+U1dNDceuDHbm45BI09EwzlorUswk62H
+         yxEClL1QIsL9mgCJAvBXx58cSaB1mtCbpC5dY2eO3f6srFDaLxg0OHmu7GdjxfZzFoEv
+         9DS9TeqfmzLKJerLgbnScS4s1eUicjH04rIsprHv3TPaAT+hJsy+UpZ5oExTYqCmkaVU
+         4xMtv1OkLjWedzvkhdW5Q4zSERnqi0BkuiDmQDkyCc6ZQ+iDFrMZ2sT9/KXVU3M25qlv
+         S82wJpW/HiDfGsDk2ay8zqAGTzuLcGxrnIDFulALqU1QRCP6oNUBM8HAWg0+sAK+Cr+9
+         TcKA==
+X-Forwarded-Encrypted: i=1; AJvYcCWfaXFGZGQbZPO0dyq69qDoqX+urOOkoUv/591JxEDxOMPagXHu6RztJl/GgnworinSGSKynbw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRy3PQsKeX+wEHPWA7mOvqb4NEw3x59EDFvXZ47/4LCCbYWm79
+	0Gi8OsULgA408eaCCTKchmvREvWezPxO+XLddUzeaNtYks2CSJvC42kA
+X-Gm-Gg: ASbGnct2nFlJOIaNM/OVIrOCHYKWWQuCM89hX3fbAmSSegw1wCTNF2HDxwXctKEk0pa
+	5OMlhYzFjLyHq10odCg6ertRGtupvYWqwzNm93Vo18AGHpgeINU/TBs/sgEdQH3PDvtn0hgOFVv
+	ttT0/rQvXL4+pX2IhI+cuEKFds5jvovad689Rft246d4KTTY8/HfBuC+zefk/gZkd7OrQLsLIGW
+	Wh3dC0ZiTaxM4b90M11plVVtzYErD2UNQ/T5LbKb3Ua4iRryTaXhuY6tdJIK6CeiL9ozuUanHuU
+	rwIoPoUR7QPpwdHMC4MnNubg+PfpwYSlS8EEIESkQV2xyBcvtr45SsHRsD+Pp/6xe4CECv3SB5E
+	=
+X-Google-Smtp-Source: AGHT+IFzi4B+HGVANh/QRaYTwGjyw6YuTfER/kH8G1pVKW8f4qlf3DNY7FxoafI83ONki41hzN/QaQ==
+X-Received: by 2002:a05:600c:4e0e:b0:439:9b2a:1b2f with SMTP id 5b1f17b1804b1-442fd606b72mr37993805e9.3.1747395548471;
+        Fri, 16 May 2025 04:39:08 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:fc98:7863:72c2:6bab])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442f39ef832sm102302965e9.40.2025.05.16.04.39.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 May 2025 04:39:07 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
+  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
+  jacob.e.keller@intel.com
+Subject: Re: [PATCH net-next] tools: ynl-gen: array-nest: support arrays of
+ nests
+In-Reply-To: <20250513222011.844106-1-kuba@kernel.org> (Jakub Kicinski's
+	message of "Tue, 13 May 2025 15:20:11 -0700")
+Date: Thu, 15 May 2025 08:51:08 +0100
+Message-ID: <m2frh6nwgj.fsf@gmail.com>
+References: <20250513222011.844106-1-kuba@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAG48ez1wqbOmQMqg6rH4LNjNifHU_WciceO_SQwu8T=tA_KxLw@mail.gmail.com>
+Content-Type: text/plain
 
-On Thu, May 15, 2025 at 10:56:51PM +0200, Jann Horn wrote:
-> On Thu, May 15, 2025 at 12:04 AM Christian Brauner <brauner@kernel.org> wrote:
-> > In contrast to other parameters written into
-> > /proc/sys/kernel/core_pattern that never fail we can validate enabling
-> > the new AF_UNIX support. This is obviously racy as hell but it's always
-> > been that way.
-> >
-> > Signed-off-by: Christian Brauner <brauner@kernel.org>
-> 
-> Reviewed-by: Jann Horn <jannh@google.com>
-> 
-> > ---
-> >  fs/coredump.c | 37 ++++++++++++++++++++++++++++++++++---
-> >  1 file changed, 34 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/fs/coredump.c b/fs/coredump.c
-> > index 6ee38e3da108..d4ff08ef03e5 100644
-> > --- a/fs/coredump.c
-> > +++ b/fs/coredump.c
-> > @@ -1228,13 +1228,44 @@ void validate_coredump_safety(void)
-> >         }
-> >  }
-> >
-> > +static inline bool check_coredump_socket(void)
-> > +{
-> > +       if (core_pattern[0] != '@')
-> > +               return true;
-> > +
-> > +       /*
-> > +        * Coredump socket must be located in the initial mount
-> > +        * namespace. Don't give the that impression anything else is
-> > +        * supported right now.
-> > +        */
-> > +       if (current->nsproxy->mnt_ns != init_task.nsproxy->mnt_ns)
-> > +               return false;
-> 
-> (Ah, dereferencing init_task.nsproxy without locks is safe because
-> init_task is actually the boot cpu's swapper/idle task, which never
-> switches namespaces, right?)
+Jakub Kicinski <kuba@kernel.org> writes:
 
-I would be very worried if it did. It would fsck everyone over that
-relies on copying its credentials and assumes that the set of namespaces
-is stable.
+> TC needs arrays of nests, but just a put for now.
+> Fairly straightforward addition.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-> 
-> > +       /* Must be an absolute path. */
-> > +       if (*(core_pattern + 1) != '/')
-> > +               return false;
-> > +
-> > +       return true;
-> > +}
-> > +
-> >  static int proc_dostring_coredump(const struct ctl_table *table, int write,
-> >                   void *buffer, size_t *lenp, loff_t *ppos)
-> >  {
-> > -       int error = proc_dostring(table, write, buffer, lenp, ppos);
-> > +       int error;
-> > +       ssize_t retval;
-> > +       char old_core_pattern[CORENAME_MAX_SIZE];
-> > +
-> > +       retval = strscpy(old_core_pattern, core_pattern, CORENAME_MAX_SIZE);
-> > +
-> > +       error = proc_dostring(table, write, buffer, lenp, ppos);
-> > +       if (error)
-> > +               return error;
-> > +       if (!check_coredump_socket()) {
-> 
-> (non-actionable note: This is kiiinda dodgy under
-> SYSCTL_WRITES_LEGACY, but I guess we can assume that new users of the
-> new coredump socket feature aren't actually going to write the
-> coredump path one byte at a time, so I guess it's fine.)
-
-So this is all kinds of broken already imho. Because there's not really
-mutual exclusion between multiple writers to such sysctls from what I
-remember. Which means that this buffer can be trampled in all kinds of
-ways if multiple tasks decide to update it at the same time. That's
-super unlikely of course but whatever.
-
-> 
-> > +               strscpy(core_pattern, old_core_pattern, retval + 1);
-> 
-> The third strscpy() argument is semantically supposed to be the
-> destination buffer size, not the amount of data to copy. For trivial
-> invocations like here, strscpy() actually allows you to leave out the
-> third argument.
-
-Eeeeewww, that's really implicit behavior. I can use the destination
-buffer size but given that retval will always be smaller than that I
-didn't bother but ok. I'll fix that in-tree.
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
