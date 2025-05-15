@@ -1,60 +1,68 @@
-Return-Path: <netdev+bounces-190600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 311E3AB7BCF
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 04:57:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0F09AB7BD2
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 04:58:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 517A88C74D1
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 02:57:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 591D14A7889
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 02:58:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2849213E8E;
-	Thu, 15 May 2025 02:57:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A6CF288C80;
+	Thu, 15 May 2025 02:58:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FRmOm7HT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zif55Efl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7F7E4B1E64;
-	Thu, 15 May 2025 02:57:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E94794B1E64;
+	Thu, 15 May 2025 02:58:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747277837; cv=none; b=bIl7TVfCPeCNbHcB2pOWfVmu2Pri52LLnN/mtHItA90ytLEEwY0S6TWhkH6NQ446iXunuI0LnJeUX50BOB+7obVGUdkCQ3mbN7YxACqXXqMJC+WyN1rfbHsiw4TxtnOjw4FxW+g91cUJEpHjHL6UQRm2SB5YSMZoqEQlt1O5MeI=
+	t=1747277903; cv=none; b=niKR8ZKuUmHqwxCUXJZOKtyGZmvUkPBtx4Iqz6o3YOmqLv0pclu4uY0LLejLKjwVroFUZ9GundoQqImMCAKk6U/XLzwSh/L7Z1zOHOuFJFcmU1vn2X0FASYnwjsx51nzUcLgmYAidYNAl7Q6Nh3U5NjnPY0ijcHXQWXlBSWcrjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747277837; c=relaxed/simple;
-	bh=IKxa+/dqwM9Ni4gdttJKV7TnstQDA8nGaIgMMKx1tD0=;
+	s=arc-20240116; t=1747277903; c=relaxed/simple;
+	bh=MJ9NvK4x6c2IC/ufJ5Ze19JfDwJVE60QHIw713vLMMg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C87oxR3p6rtzK4i7j9xmU8cnMhVU3eeB69JkZQNwOoP0Rfxfc6D1a+aNzvhelmLdbZZdhRj3StGBrSDKLJ+9bIOhPHJ6cEErDdJW358GN/7qH1H2LUoS9uttyTArMHWv/hRpq3FDylEDvENzSxmwTlHKePhM37GPRMKRBDjk9Ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FRmOm7HT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C99CEC4CEE3;
-	Thu, 15 May 2025 02:57:16 +0000 (UTC)
+	 MIME-Version:Content-Type; b=mll7JiXCGYMS4ietcnJpI0VmP/dMN0kXQbKPgjJ0SZaTaCdpwJrrEFQcHRj7cCfMjNlRUdP0gebNPjg/IoDTHVvcpRkn3P1LgGatcwJnp8fkn1Zp2v64nsuLaAN7kqT9Qxmvc0QAEnZOFYqoxfpRKRPaB233yzl1znnKPlVwtvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zif55Efl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFB59C4CEE3;
+	Thu, 15 May 2025 02:58:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747277837;
-	bh=IKxa+/dqwM9Ni4gdttJKV7TnstQDA8nGaIgMMKx1tD0=;
+	s=k20201202; t=1747277902;
+	bh=MJ9NvK4x6c2IC/ufJ5Ze19JfDwJVE60QHIw713vLMMg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FRmOm7HT8OCbQ24tZYIIgFV9qG5Al8potvi4ydeSuqpcj1xfpPOvFIpjvnB/PIT02
-	 0Ut9lXCxFhT2dxxSO9iF1W1Z+4nrFb/G9aRQdVLrdIynpgFvOJOIAGtFupTi6cCKKz
-	 2toD5m4ZvnpxmxpYjHbjEbT+y32Blh9c/f9dBAMh4gZaqCZzOHzziNPflQNgJSNlF/
-	 Lbp3iSQuVKtOZ+pxML8qRdf/WjmrgL/iP/jPaGV9stjIg3Z/XC7IVSOAoCMRb5A1Ti
-	 py8h9QtSCu1RlLKmh3f6C6LTt1DQlgv5QKZ+7iWEVt8XVw1Gp1VYLmiGpxhUkoP+yU
-	 IUjw/YhzODMUQ==
-Date: Wed, 14 May 2025 19:57:16 -0700
+	b=Zif55EflQ/wfoyYxuzgJJHSrnBUs8bX4XFTCXmCfL2k4nVxfdZptpbnKhsYTGJHyW
+	 RRWNbiS2iBt8i59yMtTwmGao/t3SUPhPkA5QpG/g8f5xrhYrwb0lj3ahw7sEv4pOvM
+	 WNFJgauzbDhZyMYy68n2w/6tSa+mYfoGNC513s65H1XAQr5JXbJwKjAzQ1iXB93pAA
+	 0T38+OzdVR3/lPkJlJq3ES50zfLllMLDQHrmSN2znHIrqOZqEqfk5MqjgqxZ5VOwal
+	 4Wq37MTo19nZeTjMzkfgnuAh31jvNex/owxuodR9jRj1cQweyyN6qZkhFDyC0abGkf
+	 dfW4bO91okreQ==
+Date: Wed, 14 May 2025 19:58:21 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Sean Anderson <sean.anderson@linux.dev>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- upstream@airoha.com, Kory Maincent <kory.maincent@bootlin.com>, Simon
- Horman <horms@kernel.org>, Christian Marangi <ansuelsmth@gmail.com>,
- linux-kernel@vger.kernel.org, Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [net-next PATCH v4 06/11] net: phy: Export some functions
-Message-ID: <20250514195716.5ec9d927@kernel.org>
-In-Reply-To: <20250512161013.731955-7-sean.anderson@linux.dev>
-References: <20250512161013.731955-1-sean.anderson@linux.dev>
-	<20250512161013.731955-7-sean.anderson@linux.dev>
+To: Luo Jie <quic_luoj@quicinc.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Lei Wei
+ <quic_leiwei@quicinc.com>, Suruchi Agarwal <quic_suruchia@quicinc.com>,
+ Pavithra R <quic_pavir@quicinc.com>, "Simon Horman" <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Kees Cook <kees@kernel.org>, "Gustavo A.
+ R. Silva" <gustavoars@kernel.org>, "Philipp Zabel"
+ <p.zabel@pengutronix.de>, <linux-arm-msm@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+ <linux-hardening@vger.kernel.org>, <quic_kkumarcs@quicinc.com>,
+ <quic_linchen@quicinc.com>, <srinivas.kandagatla@linaro.org>,
+ <bartosz.golaszewski@linaro.org>, <john@phrozen.org>
+Subject: Re: [PATCH net-next v4 00/14] Add PPE driver for Qualcomm IPQ9574
+ SoC
+Message-ID: <20250514195821.56df5c60@kernel.org>
+In-Reply-To: <20250513-qcom_ipq_ppe-v4-0-4fbe40cbbb71@quicinc.com>
+References: <20250513-qcom_ipq_ppe-v4-0-4fbe40cbbb71@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,19 +72,19 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 12 May 2025 12:10:08 -0400 Sean Anderson wrote:
-> Export a few functions so they can be used outside the phy subsystem:
-> 
-> get_phy_c22_id is useful when probing MDIO devices which present a
-> phy-like interface despite not using the Linux ethernet phy subsystem.
-> 
-> mdio_device_bus_match is useful when creating MDIO devices manually
-> (e.g. on non-devicetree platforms).
-> 
-> At the moment the only (future) user of these functions selects PHYLIB,
-> so we do not need fallbacks for when CONFIG_PHYLIB=n.
+On Tue, 13 May 2025 17:58:20 +0800 Luo Jie wrote:
+> The PPE (packet process engine) hardware block is available in Qualcomm
+> IPQ chipsets that support PPE architecture, such as IPQ9574 and IPQ5332.
+> The PPE in the IPQ9574 SoC includes six ethernet ports (6 GMAC and 6
+> XGMAC), which are used to connect with external PHY devices by PCS. The
+> PPE also includes packet processing offload capabilities for various
+> networking functions such as route and bridge flows, VLANs, different
+> tunnel protocols and VPN. It also includes an L2 switch function for
+> bridging packets among the 6 ethernet ports and the CPU port. The CPU
+> port enables packet transfer between the ethernet ports and the ARM
+> cores in the SoC, using the ethernet DMA.
 
-This one does not apply cleanly.
+Please make sure the code builds cleanly with W=1.
 -- 
 pw-bot: cr
 
