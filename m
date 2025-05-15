@@ -1,149 +1,150 @@
-Return-Path: <netdev+bounces-190627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6237AB7E0C
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 08:33:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 23F4BAB7E13
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 08:34:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2B753A8F43
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 06:33:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3ACE13B09C9
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 06:34:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B8551A08AB;
-	Thu, 15 May 2025 06:33:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 481B5296FD7;
+	Thu, 15 May 2025 06:34:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D+BMLNUM"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="AJuuJZmo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06B3C8F6B
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 06:33:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9F8D8F6B;
+	Thu, 15 May 2025 06:34:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747290816; cv=none; b=le3cxDIy5QxIIupxsSr5e8lyf2YT819lQA7fOAt3nopjLqHvxomvfRAwf6npiSRnaLIvrsafmMRgUL9sA2igsrG+f+BhxlMwGk4XIAkfTNU+qHlmZFLnDy65aiy52V1ydRzYmZ03Dg0Urq9ulNqFFGCRsSDF71goOiwYno5i36U=
+	t=1747290857; cv=none; b=dV75Hz9BHikCQRU1ujpwbbrsQkHplCyqjwd70ml0TtQuMkz96gxyZVOIvpHGuneIEuOyphzFeKRuXLxUIHYmeqofy5aZXgIZfuUgSFTplvrvFcQGIcIOuO8M4W7NQqUWHryNAdXaWh5Esn4N2Ct6qgZoD+dwdNkbZ8ybmp760a8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747290816; c=relaxed/simple;
-	bh=cbgw9V6+Bp5MHHZNIW3rwxi/2ijk9oU/XpwF92m4FqE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=dp/H1Nja7DxBF87azVPgGu7UxPlDGvnDoBKq+RaVCUJnl8+p2cNc5wlbpVg7aO6FXQohiYKhGQPq4g6VH+NBslvN6yuEBUv9247UD1b2Kn5vgKqD0qulwkZ6GMyWyG2d26+0PD6w5Kv25JAUAJy2vmuWXk6femYCHycYo5Xhqf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D+BMLNUM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18EF2C4CEE9;
-	Thu, 15 May 2025 06:33:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747290815;
-	bh=cbgw9V6+Bp5MHHZNIW3rwxi/2ijk9oU/XpwF92m4FqE=;
-	h=From:Date:Subject:To:Cc:From;
-	b=D+BMLNUMB2Vy87lZM2dhvbjvAU3/q53V4thtud/f8WqZcPx726NeWFyIziJ3hjlFK
-	 nAIdNSRVnjC/jKayjqGGOegQLLhkEcrf4Nd6uoOizkLDwfSST2y3GX2PDe3vI1sWuT
-	 LS1Uvzicy6HACYfwvKG4F6y6KBqiVej1HsYcgGRctp6MMhcuFaJvWkhfe3rm8KjaB1
-	 bFIcXfAaaPg97efmXJdUm9V+menpl4NXZc3jocs5wTSvfdJ1fb16IDWztjgi9oWIAI
-	 3w48nZrywTnS3W3HAU7kH0/7hc+CfBBElpWr79GSjaoREQshSDSfOArDrLuuo9id9Z
-	 CH4LWaIgc3Vow==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Thu, 15 May 2025 08:33:06 +0200
-Subject: [PATCH net v2] net: airoha: Fix page recycling in
- airoha_qdma_rx_process()
+	s=arc-20240116; t=1747290857; c=relaxed/simple;
+	bh=BxTqQTJFamKTMFyyfIqu51/R9NqX8JtDWlXABY8KO5I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=m7cConfuJGIRCRE11UvChCUS0irdWwRpVLF9DCZ5CG2NxcpgES3obFyoqc+cv3pRcnzSoxGkUg9NZqYN5bQvR9UH85dluUrsrUZ1rM068Lokk2kQi1TOCaSuQG/ndO17eIgamMEkIUgcEvNxTGeC0vUvk6heVf0EuWokEYMn27Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=AJuuJZmo; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 54F6XcsB2840777
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 15 May 2025 01:33:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1747290818;
+	bh=vsFmIkwdH9OoXCMppMf8wUNa7gtRjrtDKlbCp4u90l4=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=AJuuJZmoSy+db7mgObmuNpYkkrQ0tFEJr8H+XgANp8lEmD5mFbnpK3VkuKC3KUp1C
+	 VNmn4/ashv7iKQSj7ChApECaXKrNf6xFMq/v2rtez45sqUR9OJqjQW0awtb6U7NP0J
+	 b19oC07uC/B+xhPyZiWdW4PqPy/Eup1QcZJsUc5s=
+Received: from DFLE106.ent.ti.com (dfle106.ent.ti.com [10.64.6.27])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 54F6XcZR129050
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 15 May 2025 01:33:38 -0500
+Received: from DFLE113.ent.ti.com (10.64.6.34) by DFLE106.ent.ti.com
+ (10.64.6.27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 15
+ May 2025 01:33:37 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE113.ent.ti.com
+ (10.64.6.34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 15 May 2025 01:33:37 -0500
+Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 54F6XWVx116598;
+	Thu, 15 May 2025 01:33:33 -0500
+Message-ID: <4373351e-6dfe-428f-8253-dcc6a1374335@ti.com>
+Date: Thu, 15 May 2025 12:03:31 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v10] net: ti: icssg-prueth: add TAPRIO offload
+ support
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+CC: Meghana Malladi <m-malladi@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+        Simon Horman <horms@kernel.org>,
+        Guillaume La Roque <glaroque@baylibre.com>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        Roger Quadros <rogerq@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>, Eric
+ Dumazet <edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <srk@ti.com>,
+        Roger
+ Quadros <rogerq@ti.com>
+References: <20250502104235.492896-1-danishanwar@ti.com>
+ <20250506141709.rnhvtoghn2tc47rw@skbuf>
+Content-Language: en-US
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <20250506141709.rnhvtoghn2tc47rw@skbuf>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250515-airoha-fix-rx-process-error-condition-v2-1-657e92c894b9@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAKGKJWgC/5WNQQ6CMBBFr0Jm7Zi2WkhceQ/DAtoBJprWTAnBE
- O7uyA1cvp/89zYoJEwFbtUGQgsXzknBnSoIU5dGQo7K4IzzxtsLdix56nDgFWXFt+RApSCJZMG
- QU+RZDdjX5GPv3RCvA6jrLaSPo/NolScuc5bPkV3sb/23sFi0qJHGhNgEU9f3J0mi1znLCO2+7
- 1+YFHm82wAAAA==
-X-Change-ID: 20250513-airoha-fix-rx-process-error-condition-b6e5db52fd4f
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-X-Mailer: b4 0.14.2
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Do not recycle the page twice in airoha_qdma_rx_process routine in case
-of error. Just run dev_kfree_skb() if the skb has been allocated and marked
-for recycling. Run page_pool_put_full_page() directly if the skb has not
-been allocated yet.
-Moreover, rely on DMA address from queue entry element instead of reading
-it from the DMA descriptor for DMA syncing in airoha_qdma_rx_process().
+Hi Vladimir
 
-Fixes: e12182ddb6e71 ("net: airoha: Enable Rx Scatter-Gather")
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
-Changes in v2:
-- Add missing signed-off-by
-- Link to v1: https://lore.kernel.org/r/20250513-airoha-fix-rx-process-error-condition-v1-1-e5d70cd7c066@kernel.org
----
- drivers/net/ethernet/airoha/airoha_eth.c | 22 +++++++++-------------
- 1 file changed, 9 insertions(+), 13 deletions(-)
+On 06/05/25 7:47 pm, Vladimir Oltean wrote:
+> On Fri, May 02, 2025 at 04:12:35PM +0530, MD Danish Anwar wrote:
+>> From: Roger Quadros <rogerq@ti.com>
+>>
+>> The Time-Aware Shaper (TAS) is a key feature of the Enhanced Scheduled
+>> Traffic (EST) mechanism defined in IEEE 802.1Q-2018. This patch adds TAS
+>> support for the ICSSG driver by interacting with the ICSSG firmware to
+>> manage gate control lists, cycle times, and other TAS parameters.
+>>
+>> The firmware maintains active and shadow lists. The driver updates the
+>> operating list using API `tas_update_oper_list()` which,
+>> - Updates firmware list pointers via `tas_update_fw_list_pointers`.
+>> - Writes gate masks, window end times, and clears unused entries in the
+>>   shadow list.
+>> - Updates gate close times and Max SDU values for each queue.
+>> - Triggers list changes using `tas_set_trigger_list_change`, which
+>>   - Computes cycle count (base-time % cycle-time) and extend (base-time %
+>>     cycle-time)
+>>   - Writes cycle time, cycle count, and extend values to firmware memory.
+>>   - base-time being in past or base-time not being a multiple of
+>>     cycle-time is taken care by the firmware. Driver just writes these
+>>     variable for firmware and firmware takes care of the scheduling.
+>>   - If base-time is not a multiple of cycle-time, the value of extend
+>>     (base-time % cycle-time) is used by the firmware to extend the last
+>>     cycle.
+>>   - Sets `config_change` and `config_pending` flags to notify firmware of
+>>     the new shadow list and its readiness for activation.
+>>   - Sends the `ICSSG_EMAC_PORT_TAS_TRIGGER` r30 command to ask firmware to
+>>     swap active and shadow lists.
+>> - Waits for the firmware to clear the `config_change` flag before
+>>   completing the update and returning successfully.
+>>
+>> This implementation ensures seamless TAS functionality by offloading
+>> scheduling complexities to the firmware.
+>>
+>> Signed-off-by: Roger Quadros <rogerq@ti.com>
+>> Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
+>> Reviewed-by: Simon Horman <horms@kernel.org>
+>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+>> ---
+> 
+> This is not a review comment - just wanted to mention that a week ago,
+> I've added a selftest for this feature at
+> tools/testing/selftests/net/forwarding/tc_taprio.sh, and I'm wondering
+> whether you have the necessary setup to give that a run. That would give
+> maintainers a bit more confidence when merging, that things work as
+> expected.
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index d748dc6de92367365db9f9548f9af52a7fdac187..1e9ab65218ff144d99b47f5d4ad5ff4f9c227418 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -614,7 +614,6 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
- 		struct airoha_queue_entry *e = &q->entry[q->tail];
- 		struct airoha_qdma_desc *desc = &q->desc[q->tail];
- 		u32 hash, reason, msg1 = le32_to_cpu(desc->msg1);
--		dma_addr_t dma_addr = le32_to_cpu(desc->addr);
- 		struct page *page = virt_to_head_page(e->buf);
- 		u32 desc_ctrl = le32_to_cpu(desc->ctrl);
- 		struct airoha_gdm_port *port;
-@@ -623,22 +622,16 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
- 		if (!(desc_ctrl & QDMA_DESC_DONE_MASK))
- 			break;
- 
--		if (!dma_addr)
--			break;
--
--		len = FIELD_GET(QDMA_DESC_LEN_MASK, desc_ctrl);
--		if (!len)
--			break;
--
- 		q->tail = (q->tail + 1) % q->ndesc;
- 		q->queued--;
- 
--		dma_sync_single_for_cpu(eth->dev, dma_addr,
-+		dma_sync_single_for_cpu(eth->dev, e->dma_addr,
- 					SKB_WITH_OVERHEAD(q->buf_size), dir);
- 
-+		len = FIELD_GET(QDMA_DESC_LEN_MASK, desc_ctrl);
- 		data_len = q->skb ? q->buf_size
- 				  : SKB_WITH_OVERHEAD(q->buf_size);
--		if (data_len < len)
-+		if (!len || data_len < len)
- 			goto free_frag;
- 
- 		p = airoha_qdma_get_gdm_port(eth, desc);
-@@ -701,9 +694,12 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
- 		q->skb = NULL;
- 		continue;
- free_frag:
--		page_pool_put_full_page(q->page_pool, page, true);
--		dev_kfree_skb(q->skb);
--		q->skb = NULL;
-+		if (q->skb) {
-+			dev_kfree_skb(q->skb);
-+			q->skb = NULL;
-+		} else {
-+			page_pool_put_full_page(q->page_pool, page, true);
-+		}
- 	}
- 	airoha_qdma_fill_rx_queue(q);
- 
+I wasn't aware of this. I will check if I have the setup and try to test
+it before posting future revisions.
 
----
-base-commit: 09db7a4d287d1a2bcfc04df023c103d1213a0518
-change-id: 20250513-airoha-fix-rx-process-error-condition-b6e5db52fd4f
-
-Best regards,
 -- 
-Lorenzo Bianconi <lorenzo@kernel.org>
-
+Thanks and Regards,
+Danish
 
