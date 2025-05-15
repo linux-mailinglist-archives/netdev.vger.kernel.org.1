@@ -1,108 +1,101 @@
-Return-Path: <netdev+bounces-190707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190708-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94FA4AB852E
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 13:46:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34220AB853B
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 13:50:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8AD616923C
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 11:46:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F1413AF15C
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 11:49:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 314D229826D;
-	Thu, 15 May 2025 11:46:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 593DB29826D;
+	Thu, 15 May 2025 11:49:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S5GJrYui"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="doVvNYWc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D0092980B8
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 11:46:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 294DA1C36;
+	Thu, 15 May 2025 11:49:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747309609; cv=none; b=qeIExB8jJ/wvWLj3iPV0VcoHkEyrAqAuUZyI8mYh+MaVChjztZJODdCWpEzzetW1U+p8WjOOFb2qCvqOJFl2VigF178nOP7Npxt+4ELiOPrSsGAGoqtgGhfG5Et6VWyZjCiRDeMtOM5P211htp46zMmZC5HNc5B6ALjyFUXwtZk=
+	t=1747309798; cv=none; b=sO1LoCjMTNkZyc3FIqyxgui81jyRTzHsIVgBv/xo7ZuErM8iSPnUWuEBmopa6dlFvo5xI32+BJ4xaar0Jh0LiJrUor/6Ao7wcp6+dsJ/9GHNmvmL4jczwXbQ2m/ut67CzRqSr9hGnPA75JulaeW8nB6PN1iXYdRQLxmtfWfv9aQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747309609; c=relaxed/simple;
-	bh=vxJ1lJpDsokpa+3eqqj8W/hw7hRFfKPXaUCS5sNBDaw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bNZu6mDKMkUc4l/FAL5JCIdyER1P5Phj0zBrq7q4ljxZ/rZQO8ShcmAMVVIIMuK60FQjOkscrgCLX8EbtS2f23moQr0kXHUkDFB2HFe22xd15TOhy/BXk2GmVYlGj2SZLN92q3U3QKZSal2M46U7Z2tYD3f313B7CpFT+/l2plk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S5GJrYui; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB4AFC4CEE7;
-	Thu, 15 May 2025 11:46:46 +0000 (UTC)
+	s=arc-20240116; t=1747309798; c=relaxed/simple;
+	bh=twIU6Awl/78CP5Kz16PqgHQEF0dZE+yT7JiNb0lxBKg=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:
+	 References:In-Reply-To; b=LgqNyOG4RT5S6UbXQArb5yvzzX2WAHitEECBwABrFV5NklFHW+sT6yyl2zlqNzqrVusVliT33pLijgyVdsiQY6crbkzhLyjD9aLjNfbEoqUjLjh60OQYQ2PEVTPFyUNUqKvhyC2PzxtnKEoN2wIYQcCCm1OH/UaNcgs8OI1nTC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=doVvNYWc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 682D9C4CEE9;
+	Thu, 15 May 2025 11:49:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747309608;
-	bh=vxJ1lJpDsokpa+3eqqj8W/hw7hRFfKPXaUCS5sNBDaw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=S5GJrYui6Neqip2Tdi88KT8vqKUr/aOlX5Mr8fasyFqNbjETDWUYwIOA7LxlACcRU
-	 XprmjGC7X7/CLN/CjPZhoUce8NSMNl/ef9cqoVju34XMiYNOOTMCbI1Wh4aS7DF9WO
-	 Fxm98Kt9cBE1VsTJ515XLRwTgq69KlZTOW6JwYSRqgjPjD6wg3NdePNGnTHoECTROV
-	 aLkV4x/GAb2RPDve7E+bA/Py0uIRCw0ddS7sv4DhkDwTlXn1Mw6n5hHu8gcrXMOLyA
-	 1fBs1VOzPa1tkPYCeNurRTVf1yqTTkth9t/ydkcsuWb9vciKZ1gaxT8bOOm8A/532+
-	 CM/Klz9/j7nGA==
-Date: Thu, 15 May 2025 12:46:44 +0100
-From: Simon Horman <horms@kernel.org>
-To: Michal Kubiak <michal.kubiak@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, maciej.fijalkowski@intel.com,
-	aleksander.lobakin@intel.com, przemyslaw.kitszel@intel.com,
-	dawid.osuchowski@linux.intel.com, jacob.e.keller@intel.com,
-	jbrandeburg@cloudflare.com, netdev@vger.kernel.org
-Subject: Re: [PATCH iwl-net v3 3/3] ice: fix rebuilding the Tx scheduler tree
- for large queue counts
-Message-ID: <20250515114644.GW3339421@horms.kernel.org>
-References: <20250513105529.241745-1-michal.kubiak@intel.com>
- <20250513105529.241745-4-michal.kubiak@intel.com>
+	s=k20201202; t=1747309797;
+	bh=twIU6Awl/78CP5Kz16PqgHQEF0dZE+yT7JiNb0lxBKg=;
+	h=Date:Subject:From:To:References:In-Reply-To:From;
+	b=doVvNYWce7rcPlDh3ZJHjoZALo1aVHsreFjTSW5Cq556jOxNhVOLRzz+Yfa/GHusd
+	 VU+1W6PpuF8tQ321mDe3rwqq1KygTqiCJmJYZ780UL5e3vdwI4lxaAnzldhiD3ylvw
+	 Ufal2RB9z0riaHFpl3FuUZTClSzE9/s8Nka7DPkpMaaGCdY051JtUuqWBvIkiXFwVl
+	 m3i5B0FEpsEx5uU3csClk9xH+Y5TP0IY69S7bPMMUtfwTBam0VoOopha4h4NcVCzeX
+	 j+CHqG46B2PfqBv4acLpQCumhQA19PUdqBUMjLgLVA7K5WjVPjOu6AIUx44ZRgHTRZ
+	 hW9sVfR/8snjQ==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250513105529.241745-4-michal.kubiak@intel.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 15 May 2025 13:49:35 +0200
+Message-Id: <D9WPMD7Q4XRN.32LF8UDPK1IBI@kernel.org>
+Subject: Re: [net-next PATCH v10 7/7] rust: net::phy sync with
+ match_phy_device C changes
+From: "Benno Lossin" <lossin@kernel.org>
+To: "Christian Marangi" <ansuelsmth@gmail.com>, "Andrew Lunn"
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, "Rob Herring" <robh@kernel.org>, "Krzysztof
+ Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>,
+ "Heiner Kallweit" <hkallweit1@gmail.com>, "Russell King"
+ <linux@armlinux.org.uk>, "Florian Fainelli"
+ <florian.fainelli@broadcom.com>, "Broadcom internal kernel review list"
+ <bcm-kernel-feedback-list@broadcom.com>, =?utf-8?q?Marek_Beh=C3=BAn?=
+ <kabel@kernel.org>, "Andrei Botila" <andrei.botila@oss.nxp.com>, "FUJITA
+ Tomonori" <fujita.tomonori@gmail.com>, "Trevor Gross" <tmgross@umich.edu>,
+ "Miguel Ojeda" <ojeda@kernel.org>, "Alex Gaynor" <alex.gaynor@gmail.com>,
+ "Boqun Feng" <boqun.feng@gmail.com>, "Gary Guo" <gary@garyguo.net>,
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Benno Lossin"
+ <benno.lossin@proton.me>, "Andreas Hindborg" <a.hindborg@kernel.org>,
+ "Alice Ryhl" <aliceryhl@google.com>, "Danilo Krummrich" <dakr@kernel.org>,
+ "Sabrina Dubroca" <sd@queasysnail.net>, "Michael Klein"
+ <michael@fossekall.de>, "Daniel Golle" <daniel@makrotopia.org>,
+ <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <rust-for-linux@vger.kernel.org>
+X-Mailer: aerc 0.20.1
+References: <20250515112721.19323-1-ansuelsmth@gmail.com>
+ <20250515112721.19323-8-ansuelsmth@gmail.com>
+In-Reply-To: <20250515112721.19323-8-ansuelsmth@gmail.com>
 
-On Tue, May 13, 2025 at 12:55:29PM +0200, Michal Kubiak wrote:
-> The current implementation of the Tx scheduler allows the tree to be
-> rebuilt as the user adds more Tx queues to the VSI. In such a case,
-> additional child nodes are added to the tree to support the new number
-> of queues.
-> Unfortunately, this algorithm does not take into account that the limit
-> of the VSI support node may be exceeded, so an additional node in the
-> VSI layer may be required to handle all the requested queues.
-> 
-> Such a scenario occurs when adding XDP Tx queues on machines with many
-> CPUs. Although the driver still respects the queue limit returned by
-> the FW, the Tx scheduler was unable to add those queues to its tree
-> and returned one of the errors below.
-> 
-> Such a scenario occurs when adding XDP Tx queues on machines with many
-> CPUs (e.g. at least 321 CPUs, if there is already 128 Tx/Rx queue pairs).
-> Although the driver still respects the queue limit returned by the FW,
-> the Tx scheduler was unable to add those queues to its tree and returned
-> the following errors:
-> 
->      Failed VSI LAN queue config for XDP, error: -5
-> or:
->      Failed to set LAN Tx queue context, error: -22
-> 
-> Fix this problem by extending the tree rebuild algorithm to check if the
-> current VSI node can support the requested number of queues. If it
-> cannot, create as many additional VSI support nodes as necessary to
-> handle all the required Tx queues. Symmetrically, adjust the VSI node
-> removal algorithm to remove all nodes associated with the given VSI.
-> Also, make the search for the next free VSI node more restrictive. That is,
-> add queue group nodes only to the VSI support nodes that have a matching
-> VSI handle.
-> Finally, fix the comment describing the tree update algorithm to better
-> reflect the current scenario.
-> 
-> Fixes: b0153fdd7e8a ("ice: update VSI config dynamically")
-> Reviewed-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
+On Thu May 15, 2025 at 1:27 PM CEST, Christian Marangi wrote:
+> Sync match_phy_device callback wrapper in net:phy rust with the C
+> changes where match_phy_device also provide the passed PHY driver.
+>
+> As explained in the C commit, this is useful for match_phy_device to
+> access the PHY ID defined in the PHY driver permitting more generalized
+> functions.
+>
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> ---
+>  rust/kernel/net/phy.rs | 26 +++++++++++++++++++++++---
+>  1 file changed, 23 insertions(+), 3 deletions(-)
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+You probably should do this in the same commit as the C changes,
+otherwise the in-between commits will error.
 
+---
+Cheers,
+Benno
 
