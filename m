@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-190878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F147AB92BD
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 01:17:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0F20AB92BE
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 01:17:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 516723B4205
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 23:16:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82F44176BC7
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 23:17:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E00B2206AC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA328289350;
 	Thu, 15 May 2025 23:17:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WBsbfVmM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FkqgcpXC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A38020C009
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 23:17:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CE8D25A2B4
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 23:17:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747351027; cv=none; b=C2WfxDbWQZ0SBUyJ/ggSBBzhDDjylC04i6ZfjAakxdX7QkTdCccs2LigY9hEzaS8cpffWuos3lqOJ5dVX6K/W+Por2pdrGnwx66PFYO5poMkPAT5gvlGjajb97lagZNjkyLFRbhA2LBOpTQXQ6b/nbIJvPAuj6CrUMfoqVABB64=
+	t=1747351027; cv=none; b=jhyRO4GAKVCnPSXyp0D5zutAPELvTpwCNZxatYjifZ0S/osgxnsBB9c5Tm3K9l7xZaaqI5OTgyjbAZxRXM3jrq/RD2mTgMavkpRe2Vi9HzyCTWtrtnWhktQsq1Mv1GEe1k/g1bR+1QyqfuZDocAkzAQwUpS75dt2U+i+ZPHSJoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1747351027; c=relaxed/simple;
-	bh=rpx8DzzQvWKcRh3dEnX3oQwaPjlRsB1AMz3D544Jf0A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s4q/uOYBU/uURkHh9bBcy2CN8Y6zqzIh+Eq1TH1MbULpAO5Qc2IcPeqyztGiC3/i/Elwh8+zoROEuq0+1sjoTSq9NLa1cVJNTKvHen4Ef6v7TmGWrjFUTCekpF6PzjjdUh2uksmshamT25fyjMQ5JYK/bJaBRlbPr2u5w9FcyV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WBsbfVmM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CA0AC4CEE7;
+	bh=Q3mCCfNrVMXkcWUKeGps5pM10bhy4U3Ylxu76V2rTvw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=DCXqaEb6HXK0aHZQlpkNb7bA2M8otZGA0wyK48ge4Zad1Fr6RVqAscBn+EWoMGqwOfJaGQ30jGkPvVn8jm03ti0lfUa1QcYHnOzajZiEU21pmHFJp9+YNQQ15b4TgNDgQxSk8rirmeMRwcwNTM/3CxdGBDiJWTZQ0lkG6twLwyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FkqgcpXC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3BADC4CEEF;
 	Thu, 15 May 2025 23:17:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747351026;
-	bh=rpx8DzzQvWKcRh3dEnX3oQwaPjlRsB1AMz3D544Jf0A=;
-	h=From:To:Cc:Subject:Date:From;
-	b=WBsbfVmMTv/lWCQjGfvCWgBSUDrKyz652lWpiF4d/1vY7LTqtAOUv9f/ObWHPefOR
-	 D0uxfLAa/H16ydXGaKrAqnJ+JfybE8pFsnN6jR9VC8woFKUCZPNCV4kk0DWB9mLmSJ
-	 5/VmUPzGaqKNz7jdT1zXgAgH2PhF76K81jTmgYWtEqKuH+M8VXkKtWxSKrLDhNjnX0
-	 n2K/jMHJTFltZ3ao0+LZb+b5p8FrlKCH2Pn4TXgbchtZtPL6NSibBisnqgLvPrXxKo
-	 RvxTnvUh11u+/0tURpN5mCNO0zYboVyZQopLRRscVto5ZAMsPvNEeMdSe/WmX51mqc
-	 Y983ufAPPMN3g==
+	s=k20201202; t=1747351027;
+	bh=Q3mCCfNrVMXkcWUKeGps5pM10bhy4U3Ylxu76V2rTvw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=FkqgcpXC+Zx5Lqjq5FmymWn2S1OGTpRQJswvvJsdXgGuO99KGdKwRh5nOXOg5I0LN
+	 5sjV0Mg7gGoFVGLJe1I94N6Ig/ivuxCOg/r2SHQhSZVq4ftR5EMQ37blLAtNh1eEIn
+	 upO69o4xRMWWivSE8t5noxKtdo8UiSW3rSFszvR22Ha0sAB9y1H1O/02JgG1JFGBuv
+	 rU9xQBT5e+DxrHl28qpt6VFLVVsyM5La4RzNZz3l4Z+sKYmWBJm1lgUBgnVth6i54U
+	 x5+SMGyiPIXkGFC4SRkpG/BbKvRAl7W9/jZuW0SyohH5pvp4YGPPiaGExpNsmDsai3
+	 lh/FQ0OKfJtRA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -52,10 +53,12 @@ Cc: netdev@vger.kernel.org,
 	nicolas.dichtel@6wind.com,
 	jacob.e.keller@intel.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 0/9] tools: ynl-gen: support sub-messages and rt-link
-Date: Thu, 15 May 2025 16:16:41 -0700
-Message-ID: <20250515231650.1325372-1-kuba@kernel.org>
+Subject: [PATCH net-next 1/9] netlink: specs: rt-link: add C naming info for ovpn
+Date: Thu, 15 May 2025 16:16:42 -0700
+Message-ID: <20250515231650.1325372-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250515231650.1325372-1-kuba@kernel.org>
+References: <20250515231650.1325372-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,46 +67,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Sub-messages are how we express "polymorphism" in YNL. Donald added
-the support to specs and Python a while back, support them in C, too.
-Sub-message is a nest, but the interpretation of the attribute types
-within that nest depends on a value of another attribute. For example
-in rt-link the "kind" attribute contains the link type (veth, bonding,
-etc.) and based on that the right enum has to be applied to interpret
-link-specific attributes.
+C naming info for OVPN which was added since I adjusted
+the existing attrs. Also add missing reference to a header needed
+for a bridge struct.
 
-The last message is probably the most interesting to look at, as it
-adds a fairly advanced sample.
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ Documentation/netlink/specs/rt-link.yaml | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-This patch only contains enough support for rtnetlink, we will need
-a little more complexity to support TC, where sub-messages may contain
-fixed headers, and where the selector may be in a different nest than
-the submessage.
-
-Jakub Kicinski (9):
-  netlink: specs: rt-link: add C naming info for ovpn
-  tools: ynl-gen: factor out the annotation of pure nested struct
-  tools: ynl-gen: prepare for submsg structs
-  tools: ynl-gen: submsg: plumb thru an empty type
-  tools: ynl-gen: submsg: render the structs
-  tools: ynl-gen: submsg: support parsing and rendering sub-messages
-  tools: ynl: submsg: reverse parse / error reporting
-  tools: ynl: enable codegen for all rt- families
-  tools: ynl: add a sample for rt-link
-
- Documentation/netlink/specs/rt-link.yaml |   4 +
- tools/net/ynl/Makefile.deps              |   4 +
- tools/net/ynl/generated/Makefile         |   7 +-
- tools/net/ynl/lib/ynl-priv.h             |   8 +-
- tools/net/ynl/lib/ynl.h                  |   1 +
- tools/net/ynl/lib/ynl.c                  |  93 +++++++-
- tools/net/ynl/samples/rt-link.c          | 184 +++++++++++++++
- tools/net/ynl/pyynl/lib/__init__.py      |   5 +-
- tools/net/ynl/pyynl/ynl_gen_c.py         | 272 +++++++++++++++++++----
- tools/net/ynl/samples/.gitignore         |   1 +
- 10 files changed, 517 insertions(+), 62 deletions(-)
- create mode 100644 tools/net/ynl/samples/rt-link.c
-
+diff --git a/Documentation/netlink/specs/rt-link.yaml b/Documentation/netlink/specs/rt-link.yaml
+index 7f91f474ff25..5ec3d35b7a38 100644
+--- a/Documentation/netlink/specs/rt-link.yaml
++++ b/Documentation/netlink/specs/rt-link.yaml
+@@ -594,6 +594,7 @@ protonum: 0
+         name: reasm-overlaps
+   - name: br-boolopt-multi
+     type: struct
++    header: linux/if_bridge.h
+     members:
+       -
+         name: optval
+@@ -826,6 +827,8 @@ protonum: 0
+       - name: default
+   -
+     name: ovpn-mode
++    enum-name: ovpn-mode
++    name-prefix: ovpn-mode
+     type: enum
+     entries:
+       - p2p
+@@ -2195,6 +2198,7 @@ protonum: 0
+         type: u16
+   -
+     name: linkinfo-ovpn-attrs
++    name-prefix: ifla-ovpn-
+     attributes:
+       -
+         name: mode
 -- 
 2.49.0
 
