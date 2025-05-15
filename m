@@ -1,112 +1,127 @@
-Return-Path: <netdev+bounces-190715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3763DAB8647
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 14:25:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE0B6AB865F
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 14:31:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B8E51BC6AF9
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 12:21:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2EDD3AD941
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 12:30:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8D68298CB2;
-	Thu, 15 May 2025 12:17:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9790C1BC07B;
+	Thu, 15 May 2025 12:31:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="ckPoYWGW"
+	dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b="Y9CvUaig"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from mx0.infotecs.ru (mx0.infotecs.ru [91.244.183.115])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13EAC298C28;
-	Thu, 15 May 2025 12:17:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE5A74A02;
+	Thu, 15 May 2025 12:31:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.244.183.115
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747311475; cv=none; b=U1mNvesBT7NGFCTvcp2DJjJr/6vZ+YscEbzEx3o9O2E+3DcV3cIFR9wppBLwDScaDJ0w3vEtKFqD4L8kgoXf/LrExHkpcMPmoZjbGtjKAn1qUgBzp351jJyWAqPdVKUxd4ubLjOMonlThx5NFgzurVg3MhXCw7CTPo6N95S8pCE=
+	t=1747312270; cv=none; b=knBoQLl5tACZGf7SKd9x0RVQfUHTW7bFmRFtgCXw7F+7fYZJwuZ5P6LanFSpclJGxekxTalq/JCqkRxe7zO+rQQK9PM0IBcUdK30doMKwv4ciEoC1yL/ni1sNhig+6uzK9ZjcXRPYzYqxl3VxPiUZBZlGRiYkQjoBC6LqTlgnf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747311475; c=relaxed/simple;
-	bh=upvheuT9U+vPFBmxrb2y/zHTlu/4dEiyt30tRJxT7mE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NyuTqYgPspZ5dJEk+OpgX7QloF4zF2nacpqWiOlH0aKw4Csey+ee/hy514ivUTikHBy2kr23TN0mYemQoYYNRBN2qRUE1uUkTsgODmMiRHXTcFrMRW4HY6hM2tQ4NfptJ3mpCDCcb6K9XczGT0lcSm/cSiBBxFEi1Y+3fCIiVUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=ckPoYWGW; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
-	Resent-Message-ID:In-Reply-To:References;
-	bh=F0f0AG38+HQO0YXdjlttYURzgFgAqkO1MV32GipdyCk=; t=1747311474; x=1748521074; 
-	b=ckPoYWGWLfGuMGOoXn6jirfp4t7yjwPSwj7mPx5KI3pes00QPKnujtNrBln1eUqupfZND9BewWe
-	hmKk/c+j/eD/sDaFSUBS3rOY/aa6KQm5WqmT8/Zy22gn2E01j6ogjqeU1wLwIA0GZ3EKheurKE6dp
-	E89OMR1N1aO6x8H5e2PbW0fP2taUIPmLQhYy5fzJ2PXY2z7nqQIrhM7lvzp7OZIlBW+PGCv/OaROM
-	OI4uc9kkUbYGjLtTCz0ebnf+vxjTMhLFYKcwNtfx1NfwixE7fN6vqv9srULEzE9T2mTtvFB8KVIgf
-	sDRxKJ47pTepXK7lLCpR4aWkUH5zqqPv+Yew==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.1)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1uFXX5-0000000BD09-1ZY7;
-	Thu, 15 May 2025 14:17:51 +0200
-From: Johannes Berg <johannes@sipsolutions.net>
-To: netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Subject: [GIT PULL] wireless-2025-05-15
-Date: Thu, 15 May 2025 14:16:56 +0200
-Message-ID: <20250515121749.61912-4-johannes@sipsolutions.net>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1747312270; c=relaxed/simple;
+	bh=PpF+ZRQiOche5sGkaMp31I4/dN3ZsGItlD6ZgVdd9JI=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=OTT2SzQ7tvnu4iGmfLN+OKozMRFe+bnSRh0wxGwX5X/V61xzypzFmDvTPN+agOSqj0s1IO9xRKtC0HmvH9hBK1A21Tre6CdDcj9MBdgyTiESD1f16UvMi5TJmidASNVekwvu/8Dta0fdZP1lu5/tJ5wsRq1G57Jovun5CEuonHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru; spf=pass smtp.mailfrom=infotecs.ru; dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b=Y9CvUaig; arc=none smtp.client-ip=91.244.183.115
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infotecs.ru
+Received: from mx0.infotecs-nt (localhost [127.0.0.1])
+	by mx0.infotecs.ru (Postfix) with ESMTP id C32801024C4D;
+	Thu, 15 May 2025 15:20:15 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx0.infotecs.ru C32801024C4D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=infotecs.ru; s=mx;
+	t=1747311616; bh=MW8t8FQMiTnmW662Mj4TKI/7+oWH12UvPlfRSrGQIbE=;
+	h=From:To:CC:Subject:Date:From;
+	b=Y9CvUaigTbD5Rmz/XZEpy5vu843MpD9IYnE+3iLpdgNB5rPNMRGDsUYPu+KQtvpzR
+	 UJ8lsbSBrrn58mFXYoMpzpMLQThY6tLpGUNs2AYBDlCnmDgBF83hhVhgQXoCznAUdj
+	 15/9yh4nKVqp0uvUHCDwRNHeR5WMiOw3YKB5COgM=
+Received: from msk-exch-01.infotecs-nt (msk-exch-01.infotecs-nt [10.0.7.191])
+	by mx0.infotecs-nt (Postfix) with ESMTP id BF608304A47E;
+	Thu, 15 May 2025 15:20:15 +0300 (MSK)
+From: Ilia Gavrilov <Ilia.Gavrilov@infotecs.ru>
+To: "David S. Miller" <davem@davemloft.net>
+CC: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, "Michal
+ Luczaj" <mhal@rbox.co>, Arnaldo Carvalho de Melo <acme@mandriva.com>,
+	"Stephen Hemminger" <stephen@networkplumber.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "lvc-project@linuxtesting.org"
+	<lvc-project@linuxtesting.org>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>
+Subject: [PATCH net] llc: fix data loss when reading from a socket in
+ llc_ui_recvmsg()
+Thread-Topic: [PATCH net] llc: fix data loss when reading from a socket in
+ llc_ui_recvmsg()
+Thread-Index: AQHbxZO2JTyyBukLE0GIAjqYe9um5g==
+Date: Thu, 15 May 2025 12:20:15 +0000
+Message-ID: <20250515122014.1475447-1-Ilia.Gavrilov@infotecs.ru>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-exclaimer-md-config: 208ac3cd-1ed4-4982-a353-bdefac89ac0a
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-KLMS-Rule-ID: 5
+X-KLMS-Message-Action: clean
+X-KLMS-AntiSpam-Status: not scanned, disabled by settings
+X-KLMS-AntiSpam-Interceptor-Info: not scanned
+X-KLMS-AntiPhishing: Clean, bases: 2025/05/15 10:33:00
+X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2025/05/15 10:15:00 #27982467
+X-KLMS-AntiVirus-Status: Clean, skipped
 
-Hi,
+For SOCK_STREAM sockets, if user buffer size (len) is less
+than skb size (skb->len), the remaining data from skb
+will be lost after calling kfree_skb().
 
-So originally I thought last week was the end of it, but
-mt76 fixes just got in now, and I threw in a counted_by
-fix as well.
+To fix this, move the statement for partial reading
+above skb deletion.
 
-Please pull and let us know if there's any problem.
+Found by InfoTeCS on behalf of Linux Verification Center (linuxtesting.org)
 
-Thanks,
-johannes
+Fixes: 30a584d944fb ("[LLX]: SOCK_DGRAM interface fixes")
+Cc: stable@vger.kernel.org
+Signed-off-by: Ilia Gavrilov <Ilia.Gavrilov@infotecs.ru>
+---
+ net/llc/af_llc.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-
-
-The following changes since commit 2c89c1b655c0b06823f4ee8b055140d8628fc4da:
-
-  Merge tag 'net-6.15-rc6' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-05-08 08:33:56 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2025-05-15
-
-for you to fetch changes up to 943aeda0d75a24038723414dff6f63e337821197:
-
-  Merge tag 'mt76-fixes-2025-05-15' of https://github.com/nbd168/wireless (2025-05-15 13:44:57 +0200)
-
-----------------------------------------------------------------
-Couple of stragglers:
- - mac80211: fix syzbot/ubsan in scan counted-by
- - mt76: fix NAPI handling on driver remove
- - mt67: fix multicast/ipv6 receive
-
-----------------------------------------------------------------
-Fedor Pchelkin (1):
-      wifi: mt76: disable napi on driver removal
-
-Johannes Berg (1):
-      Merge tag 'mt76-fixes-2025-05-15' of https://github.com/nbd168/wireless
-
-Kees Cook (1):
-      wifi: mac80211: Set n_channels after allocating struct cfg80211_scan_request
-
-Ming Yen Hsieh (1):
-      wifi: mt76: mt7925: fix missing hdr_trans_tlv command for broadcast wtbl
-
- drivers/net/wireless/mediatek/mt76/dma.c        | 1 +
- drivers/net/wireless/mediatek/mt76/mt7925/mcu.c | 4 ++--
- net/mac80211/main.c                             | 6 ++++--
- 3 files changed, 7 insertions(+), 4 deletions(-)
+diff --git a/net/llc/af_llc.c b/net/llc/af_llc.c
+index 0259cde394ba..cc77ec5769d8 100644
+--- a/net/llc/af_llc.c
++++ b/net/llc/af_llc.c
+@@ -887,15 +887,15 @@ static int llc_ui_recvmsg(struct socket *sock, struct=
+ msghdr *msg, size_t len,
+ 		if (sk->sk_type !=3D SOCK_STREAM)
+ 			goto copy_uaddr;
+=20
++		/* Partial read */
++		if (used + offset < skb_len)
++			continue;
++
+ 		if (!(flags & MSG_PEEK)) {
+ 			skb_unlink(skb, &sk->sk_receive_queue);
+ 			kfree_skb(skb);
+ 			*seq =3D 0;
+ 		}
+-
+-		/* Partial read */
+-		if (used + offset < skb_len)
+-			continue;
+ 	} while (len > 0);
+=20
+ out:
+--=20
+2.39.5
 
