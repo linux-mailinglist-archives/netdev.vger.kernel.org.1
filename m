@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-190724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4567EAB87D0
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 15:22:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DB9BAB87D6
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 15:23:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7CF89E14C6
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 13:21:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B129F3A488C
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 13:22:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDECB7262E;
-	Thu, 15 May 2025 13:21:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA34672600;
+	Thu, 15 May 2025 13:22:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mihalicyn.com header.i=@mihalicyn.com header.b="SkNwMkB+"
+	dkim=pass (1024-bit key) header.d=mihalicyn.com header.i=@mihalicyn.com header.b="UbHWgPgJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC361548C
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 13:21:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E63C1548C
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 13:22:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747315314; cv=none; b=iyINSJcvU4eVYwZ5q44c8OjgAAgqt4v7AF2G9/veUedhFz/FKw/vOGYMk3NAsH9qVqhdpkMxgkDo77xqyFw/7ckoO7TNrYZ7Ed6ODymSJ2BfLrxhtIVTO8D+q2rMChoRZ6ugLhStIQdR1Y/rh1FJzyDx3e9DXofIZBNiSf9Tsdo=
+	t=1747315375; cv=none; b=uxyAGOy1DNTdeQF3Qr3Kf0laQAs+pKyof5KmcnSqBozfRWA/HIRn7M50Ve+mp5SMVDH3BPvTx1y7YrSf5Y/BuhnmA+SQcw3sX+q3UPJlyiurE++ejJZRlPFkg0aUkW+WxnVGIWe5kQoa9UISOcr+qQFbWecArG1vBBcAtWa+Rvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747315314; c=relaxed/simple;
-	bh=0qwJq3bQ4wZzZYyMLfyzoU+4N0UDYrslGD8tXICI3XI=;
+	s=arc-20240116; t=1747315375; c=relaxed/simple;
+	bh=EgyG0ArL+HtCA+Jm/wHgbZXmmR3n8RySP1ZgRGQZxWQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SCksuAFUKJbv4S9R+Vf/8lim9plxBU7bRBUnaFRuACgkxg2UC5i0IQrRS5uqm8LfeW09WT5kZIlCMX1E+/lrGEIvnZYtIMKguY9l6LFvk/OIN1x8+0pv+MEzUHwbdH10p94YiLJ8Y46IRXnHypfU320zmNBU9/VfFRQHsFo4Kno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mihalicyn.com; spf=pass smtp.mailfrom=mihalicyn.com; dkim=pass (1024-bit key) header.d=mihalicyn.com header.i=@mihalicyn.com header.b=SkNwMkB+; arc=none smtp.client-ip=209.85.167.45
+	 To:Cc:Content-Type; b=B0HBXfgjdN1sEbt5pOd5vb2SGqXQJY9DXK3xhakkZuBfEfbHGZouARavCGwFO8Ehgd+HHCzQ6NQy80iDOsWwKUieQZYtKJJNXw76PITdqyMeSMr8Tuf6yNFNrHJUCzknqztay6xkJhCO0u2t51EwgWKGf7UDIOi0nfntRg3Qk24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mihalicyn.com; spf=pass smtp.mailfrom=mihalicyn.com; dkim=pass (1024-bit key) header.d=mihalicyn.com header.i=@mihalicyn.com header.b=UbHWgPgJ; arc=none smtp.client-ip=209.85.167.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mihalicyn.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mihalicyn.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-54afb5fcebaso958516e87.3
-        for <netdev@vger.kernel.org>; Thu, 15 May 2025 06:21:51 -0700 (PDT)
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-54e7967cf67so950575e87.0
+        for <netdev@vger.kernel.org>; Thu, 15 May 2025 06:22:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mihalicyn.com; s=mihalicyn; t=1747315310; x=1747920110; darn=vger.kernel.org;
+        d=mihalicyn.com; s=mihalicyn; t=1747315372; x=1747920172; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=9/0rLioWunSkOUNMsdKO2DuQooK8T/s9++j3a8KFy8Q=;
-        b=SkNwMkB+Ld8aOJ1zwEvD7G20w+oLfIBQZjVrSF0U0npzWMVl5Lb5L4zNS//3wHIQIS
-         bQehNUOAed52zmdlWCt3ZElD6ZbIK3rBLyUFMzvAYiBRSEitwe/79UFo84je7XSeYhBK
-         UxS1cve7qTB6g9tYKaKpDXxII6DAXvlQkEQ5Q=
+        bh=xpwhDrJcmdUxr+aMMW8YmzS8jkn0TpvM55yuHoJ1Wh0=;
+        b=UbHWgPgJlT4zTzCgy6zO4SjqWDOSZqkfB9SCmeVPKfQ0rlrNfu0HZLugjQIUYDrDNO
+         oc1Py+EGVpmlqffPhblY7k7P7Mc7HoxI4VNO6GDySG2D0t6rV/oeLAG8g6wUoN6zU8dz
+         hKTpqqzaEV+VxyFVFbtDYgLCu/eLQpSvwtiSY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747315310; x=1747920110;
+        d=1e100.net; s=20230601; t=1747315372; x=1747920172;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=9/0rLioWunSkOUNMsdKO2DuQooK8T/s9++j3a8KFy8Q=;
-        b=hmbmgLY32hVj+eyDoPbSXZ4tpR56Lms4U6yBT/uOilgFsefGUXe2Fxv+6X+TqIvpwV
-         G5HKN4pkB2GbKyKV1FSrETY01Jkff69b6ts4VPeJJC/ZvtvruArBqn53gxCRsQsDyqH9
-         QH5AfACEPrQet0LC+J2UK19R+xkMMIfDVKnh1Sg7h8GyFbW9RpprSEzkvnR2t13zOdNn
-         lCvFd02lWKfL9Ufg3/rJdZJkoATb+vKXIBapbTg+0Jrutf2IfunOAzpM45alF48Vxu4h
-         Gwjk5WvE6Q+8/Oo4eo6DwN5jqwCwMxinZUJuLcdC+WpxfV9Mi2DI/5Kke9m1NoiSyv4y
-         EdzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXbYwLWGGaLNoWy8ZTQOgq/vBMXeOwvN5vKHAYvB4TuFKdD5YMZjK1Od+8T2Jo4yVTB45C+FYM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwTnAlicZUYdKU/2+vg3g+5QKKpabPr5f2b3tNYU/chSSYQN7H3
-	jhgyNZUIutDn72Kq/n31Rux8LOIk4M2U9X9EaVIjJYaI7aHmSWvDE04MtJFr3ORd+f+VAoTBbbR
-	l4v2icjCXopU0Lvr9LdE8pvNv4n7zY6dAx5AIXglnMPj0DNkWDSVPFURl
-X-Gm-Gg: ASbGncvEq7+p+Ixaw7948T/ztwKOoqYenVQFLl/UWWMpFnZ0lF9V/Qo/78eVx4hWXAj
-	at/+7oTq+6BToGsWTuZqHZSSqsdrrrXLYmF+NL/UZl8uwIVxneZeYfKNTxOepgqpOV/Om+H6ut9
-	DsSp40thNE8nIKYYv8TrUZoISeurPNaXZUrhEymKJlHoA4
-X-Google-Smtp-Source: AGHT+IFsP3ydWrJ83abQUqhyxXRR8VIad8vuhq9qo8X9+orqDhs7UiCFmfG5cRgOacMsA7cZGJHNLHHILRRTmcZZ8a4=
-X-Received: by 2002:a05:6512:6c4:b0:54f:c57d:d25 with SMTP id
- 2adb3069b0e04-550d61ddbe6mr2771666e87.48.1747315298977; Thu, 15 May 2025
- 06:21:38 -0700 (PDT)
+        bh=xpwhDrJcmdUxr+aMMW8YmzS8jkn0TpvM55yuHoJ1Wh0=;
+        b=OETCRGy2MR/1gtKDbSwweqMgieudKVvTy3aQD+LOghyROJaIsHUnDwAhysc0CbhxS2
+         hXZX36xKJx8Rm2u51rslwG1lsvv7SqCAvfDN6VcOF20SZz0qB8r0mVkKhuuOGOoeHmy7
+         X08j0U8AViyUkYFNtlOYDZ4Pig3RCDzp2x/k9/hzSUC8tnsOpjjyIQjSa2YHrZ87bnrr
+         7gCAWH1KMJBj9Ku4FiQMaBmCnqQtFLABtFU72iKXXGIvDhqiuEusqgT64gNfBOb45tRh
+         zjsSysrGLejhs6dSki6wQMQDc0l94ZN5LZVECtLp6hOFca3fjc+PdcxtiFSVi7wh0s+D
+         DB0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU4ZNpPgn65tLDzNBH2ACHZl6ybhB6SnUMKk7w/z06cunXBijI68OhIcXL0JJld8yKrnD/uZjc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAQ63BMmjjQsuZe4S8Hqm00cUHamAZ5npbw8ilpoArYoMpK3zd
+	bFN4C/RuznPxq5DkEdYkAmd9brNjI0rsyMEU6iyyfy7WRenBOkPEvl86ifHWrggsXs/qZDrT4iU
+	KSzeA5y1a6tw1Fbjl5GZPobcYvwlH19g9+62vKQ==
+X-Gm-Gg: ASbGncsQ54EG2plz75U9T/dSrNftHSnF7O6qWtDVGA+9dhZMzOqbsnCF6WJ/Mz6Bv+A
+	DWMdzumLIkaFdXqP0HF/ZhKTghOCZTsVZW8Sq07oMahF3Xp5AVcF/CJ35Gy2wFYhR/ziiKDOSw+
+	x/IGLuKtBxppJ1lqzv/poqbE0e5bn/3Yk4bg==
+X-Google-Smtp-Source: AGHT+IEhwlbgn+32pxYI1ofa/s6/2TQuFwALvt46bLIhQPT10vzlVoBp8hOxpg+dlGoYiEgJcm1faLY456zUlXZ1SjY=
+X-Received: by 2002:a05:6512:b03:b0:54f:ca5e:13ac with SMTP id
+ 2adb3069b0e04-550d5fb8f3amr3444086e87.31.1747315371956; Thu, 15 May 2025
+ 06:22:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250515-work-coredump-socket-v7-0-0a1329496c31@kernel.org> <20250515-work-coredump-socket-v7-2-0a1329496c31@kernel.org>
-In-Reply-To: <20250515-work-coredump-socket-v7-2-0a1329496c31@kernel.org>
+References: <20250515-work-coredump-socket-v7-0-0a1329496c31@kernel.org> <20250515-work-coredump-socket-v7-3-0a1329496c31@kernel.org>
+In-Reply-To: <20250515-work-coredump-socket-v7-3-0a1329496c31@kernel.org>
 From: Alexander Mikhalitsyn <alexander@mihalicyn.com>
-Date: Thu, 15 May 2025 15:21:27 +0200
-X-Gm-Features: AX0GCFtZbZz82-8yLUwL6JXmvjJbvTtiMA_mPveEttmh8tJJN9Z9Kzc8Qdt9YDU
-Message-ID: <CAJqdLrqrVWV_iHG+f51fRZ=JKLeu9jSd_7i5BQ=zCu9FFPjiog@mail.gmail.com>
-Subject: Re: [PATCH v7 2/9] coredump: massage do_coredump()
+Date: Thu, 15 May 2025 15:22:40 +0200
+X-Gm-Features: AX0GCFuJsLCvWcVGqgJhD9YjQcGy9FnFS3GMK4AhS0yialHNeCeiDfFFREAeYEU
+Message-ID: <CAJqdLroB-JGEQTdDzQXZSHCETmY=gvgSr9sKGEza0LaYiuOvqw@mail.gmail.com>
+Subject: Re: [PATCH v7 3/9] coredump: reflow dump helpers a little
 To: Christian Brauner <brauner@kernel.org>
 Cc: linux-fsdevel@vger.kernel.org, Jann Horn <jannh@google.com>, 
 	Daniel Borkmann <daniel@iogearbox.net>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
@@ -94,157 +94,63 @@ Content-Type: text/plain; charset="UTF-8"
 Am Do., 15. Mai 2025 um 00:04 Uhr schrieb Christian Brauner
 <brauner@kernel.org>:
 >
-> We're going to extend the coredump code in follow-up patches.
-> Clean it up so we can do this more easily.
+> They look rather messy right now.
 >
 > Signed-off-by: Christian Brauner <brauner@kernel.org>
 
 Reviewed-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
 
 > ---
->  fs/coredump.c | 122 +++++++++++++++++++++++++++++++---------------------------
->  1 file changed, 65 insertions(+), 57 deletions(-)
+>  fs/coredump.c | 22 +++++++++++-----------
+>  1 file changed, 11 insertions(+), 11 deletions(-)
 >
 > diff --git a/fs/coredump.c b/fs/coredump.c
-> index 368751d98781..0e97c21b35e3 100644
+> index 0e97c21b35e3..a70929c3585b 100644
 > --- a/fs/coredump.c
 > +++ b/fs/coredump.c
-> @@ -646,63 +646,8 @@ void do_coredump(const kernel_siginfo_t *siginfo)
->                 goto fail_unlock;
+> @@ -867,10 +867,9 @@ static int __dump_emit(struct coredump_params *cprm, const void *addr, int nr)
+>         struct file *file = cprm->file;
+>         loff_t pos = file->f_pos;
+>         ssize_t n;
+> +
+>         if (cprm->written + nr > cprm->limit)
+>                 return 0;
+> -
+> -
+>         if (dump_interrupted())
+>                 return 0;
+>         n = __kernel_write(file, addr, nr, &pos);
+> @@ -887,20 +886,21 @@ static int __dump_skip(struct coredump_params *cprm, size_t nr)
+>  {
+>         static char zeroes[PAGE_SIZE];
+>         struct file *file = cprm->file;
+> +
+>         if (file->f_mode & FMODE_LSEEK) {
+> -               if (dump_interrupted() ||
+> -                   vfs_llseek(file, nr, SEEK_CUR) < 0)
+> +               if (dump_interrupted() || vfs_llseek(file, nr, SEEK_CUR) < 0)
+>                         return 0;
+>                 cprm->pos += nr;
+>                 return 1;
+> -       } else {
+> -               while (nr > PAGE_SIZE) {
+> -                       if (!__dump_emit(cprm, zeroes, PAGE_SIZE))
+> -                               return 0;
+> -                       nr -= PAGE_SIZE;
+> -               }
+> -               return __dump_emit(cprm, zeroes, nr);
 >         }
->
-> -       if (cn.core_type == COREDUMP_PIPE) {
-> -               int argi;
-> -               int dump_count;
-> -               char **helper_argv;
-> -               struct subprocess_info *sub_info;
-> -
-> -               if (cprm.limit == 1) {
-> -                       /* See umh_coredump_setup() which sets RLIMIT_CORE = 1.
-> -                        *
-> -                        * Normally core limits are irrelevant to pipes, since
-> -                        * we're not writing to the file system, but we use
-> -                        * cprm.limit of 1 here as a special value, this is a
-> -                        * consistent way to catch recursive crashes.
-> -                        * We can still crash if the core_pattern binary sets
-> -                        * RLIM_CORE = !1, but it runs as root, and can do
-> -                        * lots of stupid things.
-> -                        *
-> -                        * Note that we use task_tgid_vnr here to grab the pid
-> -                        * of the process group leader.  That way we get the
-> -                        * right pid if a thread in a multi-threaded
-> -                        * core_pattern process dies.
-> -                        */
-> -                       coredump_report_failure("RLIMIT_CORE is set to 1, aborting core");
-> -                       goto fail_unlock;
-> -               }
-> -               cprm.limit = RLIM_INFINITY;
-> -
-> -               dump_count = atomic_inc_return(&core_dump_count);
-> -               if (core_pipe_limit && (core_pipe_limit < dump_count)) {
-> -                       coredump_report_failure("over core_pipe_limit, skipping core dump");
-> -                       goto fail_dropcount;
-> -               }
-> -
-> -               helper_argv = kmalloc_array(argc + 1, sizeof(*helper_argv),
-> -                                           GFP_KERNEL);
-> -               if (!helper_argv) {
-> -                       coredump_report_failure("%s failed to allocate memory", __func__);
-> -                       goto fail_dropcount;
-> -               }
-> -               for (argi = 0; argi < argc; argi++)
-> -                       helper_argv[argi] = cn.corename + argv[argi];
-> -               helper_argv[argi] = NULL;
-> -
-> -               retval = -ENOMEM;
-> -               sub_info = call_usermodehelper_setup(helper_argv[0],
-> -                                               helper_argv, NULL, GFP_KERNEL,
-> -                                               umh_coredump_setup, NULL, &cprm);
-> -               if (sub_info)
-> -                       retval = call_usermodehelper_exec(sub_info,
-> -                                                         UMH_WAIT_EXEC);
-> -
-> -               kfree(helper_argv);
-> -               if (retval) {
-> -                       coredump_report_failure("|%s pipe failed", cn.corename);
-> -                       goto close_fail;
-> -               }
-> -       } else if (cn.core_type == COREDUMP_FILE) {
-> +       switch (cn.core_type) {
-> +       case COREDUMP_FILE: {
->                 struct mnt_idmap *idmap;
->                 struct inode *inode;
->                 int open_flags = O_CREAT | O_WRONLY | O_NOFOLLOW |
-> @@ -796,6 +741,69 @@ void do_coredump(const kernel_siginfo_t *siginfo)
->                 if (do_truncate(idmap, cprm.file->f_path.dentry,
->                                 0, 0, cprm.file))
->                         goto close_fail;
-> +               break;
+> +
+> +       while (nr > PAGE_SIZE) {
+> +               if (!__dump_emit(cprm, zeroes, PAGE_SIZE))
+> +                       return 0;
+> +               nr -= PAGE_SIZE;
 > +       }
-> +       case COREDUMP_PIPE: {
-> +               int argi;
-> +               int dump_count;
-> +               char **helper_argv;
-> +               struct subprocess_info *sub_info;
 > +
-> +               if (cprm.limit == 1) {
-> +                       /* See umh_coredump_setup() which sets RLIMIT_CORE = 1.
-> +                        *
-> +                        * Normally core limits are irrelevant to pipes, since
-> +                        * we're not writing to the file system, but we use
-> +                        * cprm.limit of 1 here as a special value, this is a
-> +                        * consistent way to catch recursive crashes.
-> +                        * We can still crash if the core_pattern binary sets
-> +                        * RLIM_CORE = !1, but it runs as root, and can do
-> +                        * lots of stupid things.
-> +                        *
-> +                        * Note that we use task_tgid_vnr here to grab the pid
-> +                        * of the process group leader.  That way we get the
-> +                        * right pid if a thread in a multi-threaded
-> +                        * core_pattern process dies.
-> +                        */
-> +                       coredump_report_failure("RLIMIT_CORE is set to 1, aborting core");
-> +                       goto fail_unlock;
-> +               }
-> +               cprm.limit = RLIM_INFINITY;
-> +
-> +               dump_count = atomic_inc_return(&core_dump_count);
-> +               if (core_pipe_limit && (core_pipe_limit < dump_count)) {
-> +                       coredump_report_failure("over core_pipe_limit, skipping core dump");
-> +                       goto fail_dropcount;
-> +               }
-> +
-> +               helper_argv = kmalloc_array(argc + 1, sizeof(*helper_argv),
-> +                                           GFP_KERNEL);
-> +               if (!helper_argv) {
-> +                       coredump_report_failure("%s failed to allocate memory", __func__);
-> +                       goto fail_dropcount;
-> +               }
-> +               for (argi = 0; argi < argc; argi++)
-> +                       helper_argv[argi] = cn.corename + argv[argi];
-> +               helper_argv[argi] = NULL;
-> +
-> +               retval = -ENOMEM;
-> +               sub_info = call_usermodehelper_setup(helper_argv[0],
-> +                                               helper_argv, NULL, GFP_KERNEL,
-> +                                               umh_coredump_setup, NULL, &cprm);
-> +               if (sub_info)
-> +                       retval = call_usermodehelper_exec(sub_info,
-> +                                                         UMH_WAIT_EXEC);
-> +
-> +               kfree(helper_argv);
-> +               if (retval) {
-> +                       coredump_report_failure("|%s pipe failed", cn.corename);
-> +                       goto close_fail;
-> +               }
-> +               break;
-> +       }
-> +       default:
-> +               WARN_ON_ONCE(true);
-> +               goto close_fail;
->         }
+> +       return __dump_emit(cprm, zeroes, nr);
+>  }
 >
->         /* get us an unshared descriptor table; almost always a no-op */
+>  int dump_emit(struct coredump_params *cprm, const void *addr, int nr)
 >
 > --
 > 2.47.2
