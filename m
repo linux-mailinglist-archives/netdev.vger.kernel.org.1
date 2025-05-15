@@ -1,151 +1,163 @@
-Return-Path: <netdev+bounces-190825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79D78AB8FE9
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 21:23:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1AE3AB8FA9
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 21:06:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14801505A9A
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 19:23:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C1E73ABA97
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 19:06:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6958227EC73;
-	Thu, 15 May 2025 19:22:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14B63298CC6;
+	Thu, 15 May 2025 19:06:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="NTN7XkdW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JpulemFz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA11225A646
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 19:22:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B49E1F4163
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 19:06:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747336979; cv=none; b=Ty0mNGHcm9Y/+YtVBE0ltsJ6RxwECB8ffA3dGJatuAu5zcF4l+TBq/kck56XEleo49hOZcYdbCZRcAj8+pjYwFwmH6oFoL1rb0BuPHc7TxEve3tLztDISWt+ub9Dn7Jguin3mX1puMV921QgeUpTN08NYkK+ZdQGoqGT3ZgrRVY=
+	t=1747335980; cv=none; b=GYdzqXb7Y3EUBfXPuYJSI7aqdog4DUAibLUCP5P5lE2E7LQctgmXYrbcNFMO9YmYEpgv0SYqsuN1ed3InV9rMeNCgzdPvUXjZBFC89glKDuYG92GuxpaOSboitTT1o9O79mOc0n+QO7Y+3O4rOS7t8QZoMkyKPH8rHIk4GwmaNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747336979; c=relaxed/simple;
-	bh=96N46iqOIStqCIhFVpc7U2TEDGtEL6hnmfMs56TVuk0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GZhR5At+LnngRWODn5fyp4xkGd2pW1YLAR91fPwNAamy4DeUR7iujQSlNY7VqoxUcfnb4UcATeapNRk72WJdprBJt2KF2q6SjO4O6PGHATbwjeE3vq0SAqN65f46xLttxWnLSO70fnnBOi9tDudQWtSmKfRnCMdHpR1zKYO+aNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=NTN7XkdW; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-74248a3359fso1486023b3a.2
-        for <netdev@vger.kernel.org>; Thu, 15 May 2025 12:22:57 -0700 (PDT)
+	s=arc-20240116; t=1747335980; c=relaxed/simple;
+	bh=M7AW3p8ZT74JJJ3KmrdQfiIWxSWVMOWlF7cPjCbzcAE=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=q//3IReYLXwCVSFjSPNJZcMgxdI8EbX+mkVqIpJDzwvRQS64mHD2V2faQPZDcATcZ9Lcmn2R//Z02Qw8CzhKYP+nzgtiy2V1/a64U9P9GKyp3zovuNekbncUWf29MD8wr6iCqsrjpj19SmzKQwHW/cfW9fUHj0721/VizjqMUOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JpulemFz; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-47698757053so17516391cf.0
+        for <netdev@vger.kernel.org>; Thu, 15 May 2025 12:06:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1747336977; x=1747941777; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fyWm0rF9eCaDvUShSNc7s++hP2H/Glv+MtPcJ7Ax5f0=;
-        b=NTN7XkdWAvzW+LjgSPmy8TAIulTrUPQ1iIPFbitU1uXBpF6HdV/I3f0Xyq05zCF4a1
-         jiwPBNpDekTsf6i9+vdtMCenuGsljisrJqxMyFPBprkP1Qz8wWFeaJGW79OSSLROVmrv
-         iqnB1OkPv7Gk/Y42VHucbClG1D/9D1xoI2q5s=
+        d=gmail.com; s=20230601; t=1747335977; x=1747940777; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=31Mc7IErSOsq6mf6wvbGz+K9R8F7D3Am2o8t05lBhj0=;
+        b=JpulemFzVluMUOhFdM2KU3r0UaLX/GWsSV/CPWbzZR4UZRnyh1OWe6ZaTrJ2fpIWi9
+         eute3JV6TqS0k4aV5agZPsLpsb2AxItQNPaBDlp6rxwO2njH9gg+Jr/Ohccn4Gbk8n8u
+         ovBEuErIph7whSm25T9ApAzb44BHd9VKeOnbxRelN0Zlxgn5Je/v8SIJc08Nl5RTQ/vz
+         W/AolrWuxQweBbLycxulBA41j9yMFCtjw6GeU4ooehQ8lSE4xl+g99kYzHk+23sQ0Jup
+         7EsPAGf7Be2KSRKsfRXJ9ue+JndEs2AkJZRvSFvzRsRVCCgmHRqnCsrHzBoSWZEP97WE
+         wRfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747336977; x=1747941777;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fyWm0rF9eCaDvUShSNc7s++hP2H/Glv+MtPcJ7Ax5f0=;
-        b=jNeTWpwgjPOFxjMEvepYrd3bkglmJ0DOfYMnNWey2DcYMWvEG+cyri7LNOPDc0k413
-         /58ASnNTW5yRLN5+kQA8bvgcjWGSu8KTtPq5FZHb+/gNM+Fxf9CTGdC51MnsZnbhrPEK
-         KxfqlTGbawX0akEMla5H9CmpyfcIFVUzsPYHGufowfB0/0OtRp9PqNu6xYtPR8UBkwjb
-         QDHGpNSlZKJLsu5LEpZPwoUuTV//F+bxPnfU+hiW7VPTBEOfqXmo3lwjmPiNfXzGHXAM
-         W0FJ4hndDK875plgQ8CQ0N9Y/IjLW5Lss3Z/+bUmJ29OIaQV6/JCgy0AEseoUcu9Y6mI
-         1GHA==
-X-Gm-Message-State: AOJu0YyV/PshIKCcAZt2ju2UsIo1m1fm/cW4MSvD5bpSGqHUht1LxV8Z
-	QaGbrXxvNaUPjqHxDhPDlbFkqYjO+A3ppvR0oRLU+qrmwW4SEJeIIP2zl1+pwC5ZWxuw//yetQA
-	hTCkccRRfiUUJsNlsmUNC3k38t5IsO9g0WMHMcwvO5PoA8tE6I4tvRXfyVTVpwjhg46ELER9H8Q
-	cFu8DA9euTWLXVWXv0a7r5PftPO8lr2Z5k3mCjdz9lZ5o=
-X-Gm-Gg: ASbGnctH5w1C/eEYdoPUW18TPXB6tod799HlS4NoJfezb+S3bTuHKUDbt39GcxGXXHA
-	HFQ54iSe6mRAnblKf9oVwn12LleU25Sn+HXU79Nj+B+WzqF20TuL9wtPzTLCfIyqDxHAhFlUv8M
-	Ig7+NF7rdIaHnEHOtplZQCL9V9EVf7bYIj8NPTZQsuFVhRBXt7luBle8J+xtCDI+kuGclstDOzB
-	WqqIHffFH5w7Hi1iPz8nvXxDknd6G2MNnzis/NlvH2wJ+xUr9o6zLsi5Fl32u8pQ6CkPDo/zc30
-	Om74J6D7M6I/iZp3sSZkyuWrDsd5+ur1rLjbO52Z8+x/QQhx+DLqYY2TQEmfL2lA1ZE43WD5qKv
-	9
-X-Google-Smtp-Source: AGHT+IGjWfUdXhgZL/hXJdI9mgEh2fOX9YaRz+9pHCBuN/jVr88KABTo2oYP+8cK+POae/uJK9WdVQ==
-X-Received: by 2002:a05:6a21:3289:b0:215:df3d:d56 with SMTP id adf61e73a8af0-21621902575mr851830637.21.1747336976503;
-        Thu, 15 May 2025 12:22:56 -0700 (PDT)
-Received: from ubuntu.. ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b26eb0a0b19sm255222a12.74.2025.05.15.12.22.54
+        d=1e100.net; s=20230601; t=1747335977; x=1747940777;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=31Mc7IErSOsq6mf6wvbGz+K9R8F7D3Am2o8t05lBhj0=;
+        b=D/kWFatsr4RhJEvTQXse3jIRZ/G/PRESmFL9pDgkYBvv8kcZMV76hqzcYqVvgjbpRt
+         xIf0Boo4yTE1xYQAd2KCC5xQdaCGAsbuFwMy+J58PLPNWxUo1mvpB5PDosxADP3ooAQP
+         aDoux5W/CTu9yUSWFdKU92NhMzhAa5xOAvgv8ePnf9eC9Z8z685GhSX9DNTA/ApbLhot
+         i7P1+SRlhHUwD51cseKMiIhznA58WKDkpYkUfAHHtOpVvrqyAU3ZYZ7lFSMBMJ9U12Od
+         0FWY5Qyjf72dWunR3bh3wIHDWy2VpK9ymHmaI7oChtJamQHsDmcadOj3tXF2IgKagXt8
+         NCRg==
+X-Forwarded-Encrypted: i=1; AJvYcCUMc0a0hmJdv+wu/94YJEBk/OWo9miz4+5NAerZfHJ1yvvBbamsmwBL5dUaaveXQrb4L1wRw1E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBJOexmp9NDBxEjaO82Ulf3Yyc4+I+tO9Dxvde/mu9RiFjHXBB
+	/t0X5aUuNLLASn4Phk9J9aZAtZAL/y9S4mOAPX7oYr72VsM1a77649Vc
+X-Gm-Gg: ASbGncsC4vU2lnqpOlNOjO3kuY5z2GCXledULYZrYyVGkiwt66ihTiK29rUidDDhS+M
+	Nfi/2R5Zj8L1VWNHeLMKOhYn5CYvPXldUecG1oJv6EsL17OIie+S2+w9onMusDSmdVqQVsTHr3h
+	mHJqDPVw2oQG2hTIoeXF+cHIpEFiDrZopE7GzdQ3TpOO/xfiUm9vlkmI1ZOi7Hp7HXE3KZBCn9W
+	UVE8J4s66K/oRmRNmIB0JN9hShd3722bJvkyeFUwEXp/F1QqZWvYxKPygELL2pr9PcePgIZLzbh
+	w+nCDLJDq3JtDxqAOBytbg8OUZQ94myARbr7/pbXLJm4tC4yxtsrpxaSN0jRWPAmcPg+V3FewDc
+	dlvnm0o9Q8TBt5Y70rhnktJA=
+X-Google-Smtp-Source: AGHT+IEBHhrwJzUmi9i/5NPpvCiCy/Hm8ZR+M1r5jAEuw71R/vzVohV8qDYUaRzZSLkDQsoejzB15Q==
+X-Received: by 2002:a05:622a:1c18:b0:481:3f7:f5cc with SMTP id d75a77b69052e-494ae4622dbmr6887971cf.34.1747335977027;
+        Thu, 15 May 2025 12:06:17 -0700 (PDT)
+Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with UTF8SMTPSA id d75a77b69052e-494ae3f8d11sm1577071cf.18.2025.05.15.12.06.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 May 2025 12:22:55 -0700 (PDT)
-From: Ronak Doshi <ronak.doshi@broadcom.com>
-To: netdev@vger.kernel.org
-Cc: Ronak Doshi <ronak.doshi@broadcom.com>,
-	stable@vger.kernel.org,
-	Guolin Yang <guolin.yang@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Ronghua Zhang <ronghua@vmware.com>,
-	Shreyas Bhatewara <sbhatewara@vmware.com>,
-	Bhavesh Davda <bhavesh@vmware.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net v2] vmxnet3: update MTU after device quiesce
-Date: Thu, 15 May 2025 19:04:56 +0000
-Message-ID: <20250515190457.8597-1-ronak.doshi@broadcom.com>
-X-Mailer: git-send-email 2.45.2
+        Thu, 15 May 2025 12:06:16 -0700 (PDT)
+Date: Thu, 15 May 2025 15:06:16 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemb@google.com>
+Cc: Simon Horman <horms@kernel.org>, 
+ Christian Brauner <brauner@kernel.org>, 
+ Kuniyuki Iwashima <kuniyu@amazon.com>, 
+ Kuniyuki Iwashima <kuni1840@gmail.com>, 
+ netdev@vger.kernel.org
+Message-ID: <68263b2847600_25ebe52943d@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250514165226.40410-8-kuniyu@amazon.com>
+References: <20250514165226.40410-1-kuniyu@amazon.com>
+ <20250514165226.40410-8-kuniyu@amazon.com>
+Subject: Re: [PATCH v3 net-next 7/9] af_unix: Inherit sk_flags at connect().
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Currently, when device mtu is updated, vmxnet3 updates netdev mtu, quiesces
-the device and then reactivates it for the ESXi to know about the new mtu.
-So, technically the OS stack can start using the new mtu before ESXi knows
-about the new mtu.
+Kuniyuki Iwashima wrote:
+> For SOCK_STREAM embryo sockets, the SO_PASS{CRED,PIDFD,SEC} options
+> are inherited from the parent listen()ing socket.
+> =
 
-This can lead to issues for TSO packets which use mss as per the new mtu
-configured. This patch fixes this issue by moving the mtu write after
-device quiesce.
+> Currently, this inheritance happens at accept(), because these
+> attributes were stored in sk->sk_socket->flags and the struct socket
+> is not allocated until accept().
+> =
 
-Cc: stable@vger.kernel.org
-Fixes: d1a890fa37f2 ("net: VMware virtual Ethernet NIC driver: vmxnet3")
-Signed-off-by: Ronak Doshi <ronak.doshi@broadcom.com>
-Acked-by: Guolin Yang <guolin.yang@broadcom.com>
-Changes v1-> v2:
-  Moved MTU write after destroy of rx rings
----
- drivers/net/vmxnet3/vmxnet3_drv.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+> This leads to unintentional behaviour.
+> =
 
-diff --git a/drivers/net/vmxnet3/vmxnet3_drv.c b/drivers/net/vmxnet3/vmxnet3_drv.c
-index 3df6aabc7e33..c676979c7ab9 100644
---- a/drivers/net/vmxnet3/vmxnet3_drv.c
-+++ b/drivers/net/vmxnet3/vmxnet3_drv.c
-@@ -3607,8 +3607,6 @@ vmxnet3_change_mtu(struct net_device *netdev, int new_mtu)
- 	struct vmxnet3_adapter *adapter = netdev_priv(netdev);
- 	int err = 0;
- 
--	WRITE_ONCE(netdev->mtu, new_mtu);
--
- 	/*
- 	 * Reset_work may be in the middle of resetting the device, wait for its
- 	 * completion.
-@@ -3622,6 +3620,7 @@ vmxnet3_change_mtu(struct net_device *netdev, int new_mtu)
- 
- 		/* we need to re-create the rx queue based on the new mtu */
- 		vmxnet3_rq_destroy_all(adapter);
-+		WRITE_ONCE(netdev->mtu, new_mtu);
- 		vmxnet3_adjust_rx_ring_size(adapter);
- 		err = vmxnet3_rq_create_all(adapter);
- 		if (err) {
-@@ -3638,6 +3637,8 @@ vmxnet3_change_mtu(struct net_device *netdev, int new_mtu)
- 				   "Closing it\n", err);
- 			goto out;
- 		}
-+	} else {
-+		WRITE_ONCE(netdev->mtu, new_mtu);
- 	}
- 
- out:
--- 
-2.45.2
+> When a peer sends data to an embryo socket in the accept() queue,
+> unix_maybe_add_creds() embeds credentials into the skb, even if
+> neither the peer nor the listener has enabled these options.
+> =
 
+> If the option is enabled, the embryo socket receives the ancillary
+> data after accept().  If not, the data is silently discarded.
+> =
+
+> This conservative approach works for SO_PASS{CRED,PIDFD,SEC}, but
+> would not for SO_PASSRIGHTS; once an SCM_RIGHTS with a hung file
+> descriptor was sent, it'd be game over.
+> =
+
+> To avoid this, we will need to preserve SOCK_PASSRIGHTS even on embryo
+> sockets.
+> =
+
+> Commit aed6ecef55d7 ("af_unix: Save listener for embryo socket.")
+> made it possible to access the parent's flags in sendmsg() via
+> unix_sk(other)->listener->sk->sk_socket->flags, but this introduces
+> an unnecessary condition that is irrelevant for most sockets,
+> accept()ed sockets and clients.
+> =
+
+> Therefore, we moved SOCK_PASSXXX into struct sock.
+> =
+
+> Let=E2=80=99s inherit sk->sk_scm_recv_flags at connect() to avoid recei=
+ving
+> SCM_RIGHTS on embryo sockets created from a parent with SO_PASSRIGHTS=3D=
+0.
+> =
+
+> Note that the parent socket is locked in connect() so we don't need
+> READ_ONCE() for sk_scm_recv_flags.
+> =
+
+> Now, we can remove !other->sk_socket check in unix_maybe_add_creds()
+> to avoid slow SOCK_PASS{CRED,PIDFD} handling for embryo sockets
+> created from a parent with SO_PASS{CRED,PIDFD}=3D0.
+> =
+
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
