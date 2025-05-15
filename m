@@ -1,100 +1,177 @@
-Return-Path: <netdev+bounces-190633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AFA1AB7F23
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 09:46:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78025AB7F45
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 09:51:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 031AB4C64FE
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 07:46:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77BF01BA7230
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 07:51:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33B711E0E08;
-	Thu, 15 May 2025 07:46:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ECB8283FF7;
+	Thu, 15 May 2025 07:50:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="MRRE2jpO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F72F4B1E5A
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 07:46:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35B3F283FD9;
+	Thu, 15 May 2025 07:50:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747295199; cv=none; b=BDGU/P/i5ppVXurp/gsBxhKD+En2rpDHyTLALt+3er5hjOqo/NDmzcp8Yu8H1Sg6QPWph1I1RIckx0qg5MjIXLmMr5oVu+9ZHCysuRsq5CbL2GBcwsKYDC9utHchhfjqPsdOIz/HIVLS2GAd6/2ZlXu0NwBDAbcwbLs62kAlOwc=
+	t=1747295457; cv=none; b=DXmOYo71gDEwlQiga+wKrKzG5RAUh4CeTknD0vCwKotC4cBr7BHtXwVpoBdIt2C42SdEda/FI2V7NzLcSdqDo+wxntGh8KURxjOKP/67SE2RvHjkRSPk3OsDX9FaADSiTfSEvrBZrR/a9H7J+j4VW7P+kadycFiGVYEHxM2kM3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747295199; c=relaxed/simple;
-	bh=GcPWC9DTX9rlILvVyRFyZgGWozsdOzRauear8FzHQzY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=u4kDgDIl0+AcvLEw0wb14LH+WN1JWsdm8nZDKsI0yJEpnAlv157jhAJxya2YNW2KNk4XVTkRImFTmosK92HL5IP37hvucc3t0jaic4RNVkYk61MiPqXT1IwetdN0PzOsEg40PEhi3+DT576PHG7pHtPXLzi8SnPTVc/9YJ4tWfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-86195b64df7so103429139f.2
-        for <netdev@vger.kernel.org>; Thu, 15 May 2025 00:46:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747295197; x=1747899997;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=S86UjQFMGu5iYwtVlwx0AEIGx4zFd27s3P2snhatw/0=;
-        b=os7h8aHy7M5Q7T4n8ZUou++yoDkr70dTi/snuFfm9TB7xXCdtjTBdNPCD8yx/4efy+
-         i6SGlSDE5u5IuQqkV2bgW3nxNTmIDRuymkLqo6UGlOKKi6x7WwHYQ2hQVeBKQUuLK5YC
-         FEUpHmBEF1KDqv7QeR7+T+F5OEhUNTZBqkIP1pktyvCDSXgya8fzRB0izAm8NDHSrrZb
-         qozTlD2M6f8CJz+L5rWEFW+/0vZLrTIZ6A/oX7E10VpyLGGVhnQ06uAMCIOmbyWgRFPJ
-         o7nJ1CVYR7P9kvshrdsBsX84jx+gbormZbV3hGvPmFaeLERHzxxRM+sn0P70jsHQ3Gkm
-         CjUw==
-X-Forwarded-Encrypted: i=1; AJvYcCUOiqZnMQSQbHyeqKtuCvZFgSP2ovgMQnSr6Fz3zTqEeELEokDEpUGc2FVGZafSLirKS0BNi8U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0JKE6BOQmyOdGlPO5NC6hHTx3eRYfQVGPc0WM3+XFB95IoNks
-	YfX4KsceV6X2g7eFB7ZgWmMpVhOeYIGtlGG1M6791r0CYAybYkukyZIFqJYYlpbgpnUweA2SwGa
-	VTDzeQYRTBTIKy9ngBS+2awXE95ftNiPutp/GgqIYHHSdUUvF4H7T3Kw=
-X-Google-Smtp-Source: AGHT+IFoNQrhWrXpNLY7oh5rJ2tJ3Nb5XXwI5DRU6GxO6PTblFimDaCE8hr8eSKPRhk6PwZQLqVfgGYEsjiTdbz8CYNpTJjk9hQY
+	s=arc-20240116; t=1747295457; c=relaxed/simple;
+	bh=tpCTD5xGme/qPS7vcmDRv0oeU5Y1eIoub1iwPCyoqhU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GXcSODXCBv/33c2oHpUTXZ37hxijuwFPmy3Kl75O8CUtwjQQxbbtmoMqYw4x3/3SkCKslYk5V+eBl3cOHdGYll8W5WHlqeJwMEGvPvt16js+mnYDwkR2zFmWkTPql4s/P+HAr/aK5EbPTZ/djmBofzgKes4e9nL6eM+H/zMmzFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=MRRE2jpO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E490DC4CEED;
+	Thu, 15 May 2025 07:50:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1747295456;
+	bh=tpCTD5xGme/qPS7vcmDRv0oeU5Y1eIoub1iwPCyoqhU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MRRE2jpO51015SkZlpUH3dWOOmZ4ntJR8HlDtRS/JqOFD8nOw3UUPf2yukSld8ns4
+	 2ZCBTFaZ58lndbcxSgd+4XeTtMolz41FMjGHFB/OFyorz3NbHkWHYLNPV0bAO8gc4C
+	 VszQq7SNr0gaR0zgZmCoMWXesIZW/ZRWdPYkO2Js=
+Date: Thu, 15 May 2025 09:49:01 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Damien =?iso-8859-1?Q?Ri=E9gel?= <damien.riegel@silabs.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Silicon Labs Kernel Team <linux-devel@silabs.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Johan Hovold <johan@kernel.org>,
+	Alex Elder <elder@kernel.org>, greybus-dev@lists.linaro.org
+Subject: Re: [RFC net-next 00/15] Add support for Silicon Labs CPC
+Message-ID: <2025051551-rinsing-accurate-1852@gregkh>
+References: <20250512012748.79749-1-damien.riegel@silabs.com>
+ <6fea7d17-8e08-42c7-a297-d4f5a3377661@lunn.ch>
+ <D9VCEGBQWBW8.3MJCYYXOZHZNX@silabs.com>
+ <f1a4ab5a-f2ce-4c94-91eb-ab81aea5b413@lunn.ch>
+ <D9W93CSVNNM0.F14YDBPZP64O@silabs.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a6b:dc03:0:b0:86a:93c:f5fb with SMTP id
- ca18e2360f4ac-86a093cf6admr582105939f.1.1747295196799; Thu, 15 May 2025
- 00:46:36 -0700 (PDT)
-Date: Thu, 15 May 2025 00:46:36 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68259bdc.a00a0220.a2f23.0198.GAE@google.com>
-Subject: [syzbot] Monthly sctp report (May 2025)
-From: syzbot <syzbot+listc23b11af384e20c3b1fb@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, linux-sctp@vger.kernel.org, 
-	lucien.xin@gmail.com, marcelo.leitner@gmail.com, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <D9W93CSVNNM0.F14YDBPZP64O@silabs.com>
 
-Hello sctp maintainers/developers,
+On Wed, May 14, 2025 at 06:52:27PM -0400, Damien Riégel wrote:
+> On Tue May 13, 2025 at 5:53 PM EDT, Andrew Lunn wrote:
+> > On Tue, May 13, 2025 at 05:15:20PM -0400, Damien Riégel wrote:
+> >> On Mon May 12, 2025 at 1:07 PM EDT, Andrew Lunn wrote:
+> >> > On Sun, May 11, 2025 at 09:27:33PM -0400, Damien Riégel wrote:
+> >> >> Hi,
+> >> >>
+> >> >>
+> >> >> This patchset brings initial support for Silicon Labs CPC protocol,
+> >> >> standing for Co-Processor Communication. This protocol is used by the
+> >> >> EFR32 Series [1]. These devices offer a variety for radio protocols,
+> >> >> such as Bluetooth, Z-Wave, Zigbee [2].
+> >> >
+> >> > Before we get too deep into the details of the patches, please could
+> >> > you do a compare/contrast to Greybus.
+> >>
+> >> Thank you for the prompt feedback on the RFC. We took a look at Greybus
+> >> in the past and it didn't seem to fit our needs. One of the main use
+> >> case that drove the development of CPC was to support WiFi (in
+> >> coexistence with other radio stacks) over SDIO, and get the maximum
+> >> throughput possible. We concluded that to achieve this we would need
+> >> packet aggregation, as sending one frame at a time over SDIO is
+> >> wasteful, and managing Radio Co-Processor available buffers, as sending
+> >> frames that the RCP is not able to process would degrade performance.
+> >>
+> >> Greybus don't seem to offer these capabilities. It seems to be more
+> >> geared towards implementing RPC, where the host would send a command,
+> >> and then wait for the device to execute it and to respond. For Greybus'
+> >> protocols that implement some "streaming" features like audio or video
+> >> capture, the data streams go to an I2S or CSI interface, but it doesn't
+> >> seem to go through a CPort. So it seems to act as a backbone to connect
+> >> CPorts together, but high-throughput transfers happen on other types of
+> >> links. CPC is more about moving data over a physical link, guaranteeing
+> >> ordered delivery and avoiding unnecessary transmissions if remote
+> >> doesn't have the resources, it's much lower level than Greybus.
+> >
+> > As is said, i don't know Greybus too well. I hope its Maintainers can
+> > comment on this.
+> >
+> >> > Also, this patch adds Bluetooth, you talk about Z-Wave and Zigbee. But
+> >> > the EFR32 is a general purpose SoC, with I2C, SPI, PWM, UART. Greybus
+> >> > has support for these, although the code is current in staging. But
+> >> > for staging code, it is actually pretty good.
+> >>
+> >> I agree with you that the EFR32 is a general purpose SoC and exposing
+> >> all available peripherals would be great, but most customers buy it as
+> >> an RCP module with one or more radio stacks enabled, and that's the
+> >> situation we're trying to address. Maybe I introduced a framework with
+> >> custom bus, drivers and endpoints where it was unnecessary, the goal is
+> >> not to be super generic but only to support coexistence of our radio
+> >> stacks.
+> >
+> > This leads to my next problem.
+> >
+> > https://www.nordicsemi.com/-/media/Software-and-other-downloads/Product-Briefs/nRF5340-SoC-PB.pdf
+> > Nordic Semiconductor has what appears to be a similar device.
+> >
+> > https://www.microchip.com/en-us/products/wireless-connectivity/bluetooth-low-energy/microcontrollers
+> > Microchip has a similar device as well.
+> >
+> > https://www.ti.com/product/CC2674R10
+> > TI has a similar device.
+> >
+> > And maybe there are others?
+> >
+> > Are we going to get a Silabs CPC, a Nordic CPC, a Microchip CPC, a TI
+> > CPC, and an ACME CPC?
+> >
+> > How do we end up with one implementation?
+> >
+> > Maybe Greybus does not currently support your streaming use case too
+> > well, but it is at least vendor neutral. Can it be extended for
+> > streaming?
+> 
+> I get the sentiment that we don't want every single vendor to push their
+> own protocols that are ever so slightly different. To be honest, I don't
+> know if Greybus can be extended for that use case, or if it's something
+> they are interested in supporting. I've subscribed to greybus-dev so
+> hopefully my email will get through this time (previous one is pending
+> approval).
+> 
+> Unfortunately, we're deep down the CPC road, especially on the firmware
+> side. Blame on me for not sending the RFC sooner and getting feedback
+> earlier, but if we have to massively change our course of action we need
+> some degree of confidence that this is a viable alternative for
+> achieving high-throughput for WiFi over SDIO. I would really value any
+> input from the Greybus folks on this.
 
-This is a 31-day syzbot report for the sctp subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/sctp
+So what you are looking for is a standard way to "tunnel" SDIO over some
+other physical transport, right?  If so, then yes, please use Greybus as
+that is exactly what it was designed for.
 
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 4 issues are still open and 70 have already been fixed.
+If there is a throughput issue with the sdio implementation on Greybus,
+we can address it by fixing up the code to go faster, I don't recall
+there ever being any real benchmarking happening for that protocol in
+the past as the physical layer that we were using for Greybus at the
+time (MIPI) was very fast, the bottleneck was usually either the host
+controller we were using for Greybus, OR on the firmware side in the
+device itself (i.e. turning Greybus packets into SDIO commands, as SDIO
+was pretty slow.)
 
-Some of the still happening issues:
+thanks,
 
-Ref Crashes Repro Title
-<1> 3934    Yes   KMSAN: uninit-value in sctp_inq_pop (2)
-                  https://syzkaller.appspot.com/bug?extid=70a42f45e76bede082be
-<2> 83      No    KMSAN: uninit-value in sctp_assoc_bh_rcv
-                  https://syzkaller.appspot.com/bug?extid=773e51afe420baaf0e2b
-<3> 3       Yes   INFO: rcu detected stall in inet6_rtm_newaddr (3)
-                  https://syzkaller.appspot.com/bug?extid=3e17d9c9a137bb913b61
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+greg k-h
 
