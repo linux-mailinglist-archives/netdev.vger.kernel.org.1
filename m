@@ -1,30 +1,31 @@
-Return-Path: <netdev+bounces-190642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47F1BAB80D0
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 10:34:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87501AB80DE
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 10:36:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80AD416527C
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 08:34:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71AD09E3715
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 08:33:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAEAB28C5DF;
-	Thu, 15 May 2025 08:31:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F12E28D82E;
+	Thu, 15 May 2025 08:31:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A6F928A727
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 08:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84AC528AAFE
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 08:31:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747297871; cv=none; b=LZRumzHSIYd4vgo3QVwxJHmvCZCQLVIBllKboEA+tfpuhiIU3Srq2vKpZ6mfwYYK5jnAMnQIp19oQqhnSB8fY+56QCMikFG0OI3Wwb14DUmtI7ij8s/889Ug4iC4ZDZHkoup8wEPa2LVIb0NzyJAjVO+ZiRQ9/yv0Eld5j9QPds=
+	t=1747297872; cv=none; b=XYomHvrBS9N/4IFSFqjKXFnuSL20zmcCGpwBj06OkU1SYy7g9ezyEfwM8ekbtnh6DmjSBBDNoIComqdwtIyP30oiFm9iHiEhwIQP5NjdS1g3Tkl+S33rYi2djaImZ1UzFpc+qzb8L/FYMFlUico8OBmF5/6LF7JlEC0hPCzchfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747297871; c=relaxed/simple;
-	bh=QWKTXstryQVK9ziGqhj64pq08M5GkeLVLt89up2UIqg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UmFOuqUWShq9WJCZmlwiM1X+iMMeXqaATIAe9UZ6fHDOpCxgBmRgGs2RV+kyQIowxD6xUXB0sB64fs7BN1YC9zTwcuPH4ZXJO2TOhDBzBkx0L5HDDdYSCdsxDAslGBheiH3KnZyMMrFd9TNxvLGRBXTXX3JjXYotCdbBV/S8dB8=
+	s=arc-20240116; t=1747297872; c=relaxed/simple;
+	bh=0Pe2j0oXCZbo69Dqx7B15NyJMv5NjWuFBulofgo6Jhc=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=mpEDkhTXdbtgKkgjDniLfsWekwRXXKbw4Eb9NZoixTvjL2TD1Fpvt/Ms3wLrA0lQphD+O+b7Il6DhyhrCY9s0hsTQ+iEz7bFxLtUH3xKLJ5Oz1NTiQxjjlR47F3UBxpbrVDJbQpG7rsx5ko/pv42AeP9w9+8YQtzpnEWR3OU1wU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -32,16 +33,16 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1uFTzZ-0002Xv-Sn; Thu, 15 May 2025 10:31:01 +0200
+	id 1uFTzZ-0002Xx-Sm; Thu, 15 May 2025 10:31:01 +0200
 Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1uFTzY-002qOc-2e;
+	id 1uFTzY-002qOd-2j;
 	Thu, 15 May 2025 10:31:01 +0200
 Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1uFTzZ-00B8CP-0X;
+	id 1uFTzZ-00B8CY-0c;
 	Thu, 15 May 2025 10:31:01 +0200
 From: Oleksij Rempel <o.rempel@pengutronix.de>
 To: "David S. Miller" <davem@davemloft.net>,
@@ -54,10 +55,12 @@ Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: [PATCH net-next v4 0/4] net: selftest: improve test string formatting and checksum handling
-Date: Thu, 15 May 2025 10:30:56 +0200
-Message-Id: <20250515083100.2653102-1-o.rempel@pengutronix.de>
+Subject: [PATCH net-next v4 1/4] net: selftests: drop test index from net_selftest_get_strings()
+Date: Thu, 15 May 2025 10:30:57 +0200
+Message-Id: <20250515083100.2653102-2-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250515083100.2653102-1-o.rempel@pengutronix.de>
+References: <20250515083100.2653102-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,38 +73,43 @@ X-SA-Exim-Mail-From: ore@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-This patchset addresses two issues in the current net selftest
-framework:
+The test index is redundant and reduces available space for test names,
+which are already limited to ETH_GSTRING_LEN (32 bytes). Removing the
+index improves readability in tools like `ethtool -t`, especially when
+longer test names are used.
 
-- Truncated test names: Existing test names are prefixed with an index,
-  reducing the available space within the ETH_GSTRING_LEN limit.  This
-  patch removes the index to allow more descriptive names.
+Before this change:
+  3. PHY internal loopback, enab
+  7. PHY internal loopback, disa
 
-- Inconsistent checksum behavior: On DSA setups and similar
-  environments, checksum offloading is not always available or
-  appropriate. The previous selftests did not distinguish between software
-  and hardware checksum modes, leading to unreliable results. This
-  patchset introduces explicit csum_mode handling and adds separate tests
-  for both software and hardware checksum validation.
+After this change:
+  PHY internal loopback, enable
+  PHY internal loopback, disable
 
-changes v4:
-- s/Return /Return:/
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Reviewed-by: Simon Horman <horms@kernel.org>
+---
+changes v2:
+- use ethtool_puts instead of ethtool_sprintf
+---
+ net/core/selftests.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-changes v3:
-- no functional changes
-- rebase against latest net-next
-
-Oleksij Rempel (4):
-  net: selftests: drop test index from net_selftest_get_strings()
-  net: selftests: prepare for detailed error handling in
-    net_test_get_skb()
-  net: selftests: add checksum mode support and SW checksum handling
-  net: selftests: add PHY loopback tests with HW checksum offload
-
- net/core/selftests.c | 308 ++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 291 insertions(+), 17 deletions(-)
-
---
+diff --git a/net/core/selftests.c b/net/core/selftests.c
+index 35f807ea9952..9146e33db25a 100644
+--- a/net/core/selftests.c
++++ b/net/core/selftests.c
+@@ -408,8 +408,7 @@ void net_selftest_get_strings(u8 *data)
+ 	int i;
+ 
+ 	for (i = 0; i < net_selftest_get_count(); i++)
+-		ethtool_sprintf(&data, "%2d. %s", i + 1,
+-				net_selftests[i].name);
++		ethtool_puts(&data, net_selftests[i].name);
+ }
+ EXPORT_SYMBOL_GPL(net_selftest_get_strings);
+ 
+-- 
 2.39.5
 
 
