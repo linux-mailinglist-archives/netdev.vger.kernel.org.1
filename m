@@ -1,365 +1,192 @@
-Return-Path: <netdev+bounces-190635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C42CEAB7F52
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 09:53:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 647DAAB7F58
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 09:53:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D6A64E0451
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 07:53:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F218C1BA0009
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 07:54:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F841283FC9;
-	Thu, 15 May 2025 07:52:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1333280330;
+	Thu, 15 May 2025 07:53:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YhwdZu4/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ffUnYvzQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B42B280330
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 07:52:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B729280304;
+	Thu, 15 May 2025 07:53:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747295576; cv=none; b=gxOtVy68ac1zU0oHCwGirQcUcmulCpyePXOAxSFCmez+EtXD7gDM51xkz1ajwP93e149fS9WLKM6BAZDk4CYrSWzcxlXRScnitTNUvm3idA4qABvI62JZy9ZyiMMHzT6cF71dfMg7/uh8M2r6tmyqG2xvnFszzI2POldgy3mZy0=
+	t=1747295632; cv=none; b=K66kjV0KqzmIs3E7FMvcEBh5KjlikxUZnsiInNYkPfVcL4R0vsQmpHSWAnNxCKdTWjx2SrQH+QFAjQGlvJ4Rf8cmYz1k065sTt/fm/OHFUOREntBPMHCNGAZS0TzSUvQS9QVL3W5lHVFEyPgHqav1yF6qdO6FLdE97NjIIjBrDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747295576; c=relaxed/simple;
-	bh=eb+wlR6VhvXrZxjAcmXbXZfUEYlOr+TaIdA3h+BHceE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LOn3GUiuYGZGeqV/kMN7mw6txAFeRz44dPBtvujiXlmRh1RVytnCkJA1yTjN9D0E3ivrLpsCdTKNXzooh8we+9olBMY9qQEmYio0lzBoqtzMR648R48HU9o8/J7iyUp5+5Pog09K0msIfC/5U1lb6gzl8z8JrqIHsoanG0+fLzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YhwdZu4/; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747295573;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eb+wlR6VhvXrZxjAcmXbXZfUEYlOr+TaIdA3h+BHceE=;
-	b=YhwdZu4/1qF5iy412CBwW36rUBrVdtMM+mCLXyQwyWPvBcQx6hUD0KIs56V2aHc3QqcnC9
-	bdu+s9M84Ha5LTwYaDUEsIXRRLbRUWdBheNjcCFJmIsVjFGSq+RicBzbOzCP5OgsmToUht
-	iu9N9Lg5pKunJe6lG7klkx6Rh20yFfI=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-435-RuA61zmMNU-B3OtfsWC8cw-1; Thu, 15 May 2025 03:52:51 -0400
-X-MC-Unique: RuA61zmMNU-B3OtfsWC8cw-1
-X-Mimecast-MFC-AGG-ID: RuA61zmMNU-B3OtfsWC8cw_1747295571
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-30adbe9b568so650775a91.1
-        for <netdev@vger.kernel.org>; Thu, 15 May 2025 00:52:51 -0700 (PDT)
+	s=arc-20240116; t=1747295632; c=relaxed/simple;
+	bh=wUEqgSTV2QgtgOIjx6bsDxFv4ShMZp2fM80qbS8rSiw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X+phS23JiyXYHmilmlME1YnLVFEcOfSldRI0S5calzzIGbLf8eY1ZJpZ0oHVqbncK5YkXRyBB5aMvFI3RjLjOcd8skm4MrkK2UgAI4tZL6RXVugPO4nRFpeaJzmVuSo5DNB9pMW+sjimAa1cw6D3qHfm/D8v64gR2MXgLoIOzaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ffUnYvzQ; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7423fb98cb1so680306b3a.3;
+        Thu, 15 May 2025 00:53:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747295630; x=1747900430; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=d6+1l6psSc4ieMT2IvTyMfmvtZ8uQROzlTdXH4Fr4sA=;
+        b=ffUnYvzQ7XbzhYHIZhYhgBh6xzgkhlErhKH+0SHUy/cdhk0ggapLBYzO8t7rtiumo2
+         1PMuugL+cvSq1Oc1TVzk7Zy3Lw0UpuTdXe1+2nDd3c0+8Iqe3JB553WV4CUQx7MQpbQN
+         1+tk2zDnzfJGlqOBREoVhUJ7myX21SCYjg2+QVYWSlvXZDruP9NP9Cd1Pya7OtGyqphO
+         ohhqjXPOpMOoUV9sf7TJ5t2HfHsb/w4bf5MDifKEEqEJqrkLBrs3xmdYbI+oCX+CNhZI
+         zvk4uSATdF3kp/U2tbbMH9q/q0ZUh3na47esX00GvJG0+dXMT2FjslDmdQC2BlfcoWfK
+         HhfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747295570; x=1747900370;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eb+wlR6VhvXrZxjAcmXbXZfUEYlOr+TaIdA3h+BHceE=;
-        b=r+R5rllyU2Pu4CyPtT0SewB/mlbK8G65zd7i180iW1JkTeGQjTZlfFFQv6LtgxZk2Z
-         HFZZmKHLc2AeFP2dHs3AsEyRn6T67WZm7ZBo8FqLze+WQH9nc9rya9dORHZid39Yic1c
-         6Cajm28T1hzsvUnFCM+MkThOvN/53VTQ4/PjW3m/IXSPqozHQw7sm+za1EFRK/SDczp/
-         WZx1SX+B+wTkb+zhFYBmUQQwAY/dsMvmzFwarVngYGHH9UtVpw9VVEdY72gqrFpZJX6e
-         4kXRi8C90A9k5iXK2PPU7axXftAPOwxXjBrJub6iIGD8xteg5LTMFluPvltljaTEe89z
-         jInw==
-X-Forwarded-Encrypted: i=1; AJvYcCVwI/VhW53MV46sx8DaVLQvHxe/ku+qwdS2rr9PptHQ8wzsr3RwzORAZbBZRzL8Jj7wtPYWpxM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFZO3NJd6FmkGSy9KCpE60A/Ip7jJHBvcGZYuK53evTeDccFWD
-	a+/x/TPj2J9ndz+/Qsl6HfTWsqtL6KWG/fB7cVei6RM8NY2PQHHzqOJB8esUxEyZJkt4zWXHbc0
-	GuWF22wHQ4K9kzP2GD6iPkSRGhNjxFRnxJK37XFxI67Rwz2+a/l0rcX74MHmsthIhfWvJOOG6n+
-	pxU+oaQ5Z/CYuG/npdkMrreZk2RQzV
-X-Gm-Gg: ASbGncsZ+cv7CHh13Qw36oxWSnyX07idPGTa31CNxdSpP0FMU4WTzk4Ilfa5dfTi4oF
-	tG4z1vt0HC3Xhk1ijYH7dIz+vHX9M3MBBmfDl7NBNM+jGV2s1lkzAnBVTHkiTePs1q7Xt
-X-Received: by 2002:a17:90b:5748:b0:30e:5c7f:5d26 with SMTP id 98e67ed59e1d1-30e5c7f5e1cmr1092166a91.24.1747295570395;
-        Thu, 15 May 2025 00:52:50 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEPfseK+eDrNin6aeBitCZZLriHMOdldIb61D6rL2kRvicPYUO6lNTIgEIIN2iOKGqmJOl/hc7b+UCsh2aPCts=
-X-Received: by 2002:a17:90b:5748:b0:30e:5c7f:5d26 with SMTP id
- 98e67ed59e1d1-30e5c7f5e1cmr1092136a91.24.1747295569920; Thu, 15 May 2025
- 00:52:49 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1747295630; x=1747900430;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=d6+1l6psSc4ieMT2IvTyMfmvtZ8uQROzlTdXH4Fr4sA=;
+        b=g08R7NHOTHobFExgrmznHl00taj/R0IgIMTlgq+RoMZKDlK3WferWyi9b+gZF0EwuL
+         8k3n9rciJmC64KdYogsuyx7I76zS24aLerpgUPlu1SEkFJ3iEixLEKP8uhLXDI7N+Ckd
+         e10mzR6qL/krhUNp3HH8rr8fzVywK+M+LvHRzQbkWOufeC1FwnP1adDoXQEBHpQUFqVK
+         FspemQ2AQOOfMfLz13TgK7i9j7+BJO2lEK3l3r/zKXRHtbVwciMUx3G5cT+Rn+n1FpBa
+         oLA4IlTg+jHU8gaLw2BZOD4QWzGqAFVF71gunC3x4gew0Ze/2UfOzO/tnMHCsrrsnk8w
+         YlVg==
+X-Forwarded-Encrypted: i=1; AJvYcCU1CaZSk25A5mrLeOkEkFF6d4dB9auQp1kz/0TLghtG7JpyJ7iopJSlvWws0Exji3kmkGtj+OTO@vger.kernel.org, AJvYcCXHHWfOPL7Q99SF8naafDRrRNPocsh/5VVrO5xXePYe9z6XqoI8ZgBqYePjw6fx9PPLpqG0OogU5eMBIoY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyrVirB+wqsHXMsHdsolt8m0cB5p6WefMA3H6e6i1X5ZwnKGrTH
+	RpDbRMIXzpFP8uDFXp3nYeOsft/FB3uxPvgX2u5JQT+od4H9dghV
+X-Gm-Gg: ASbGncukODwTfmMrlijJK3/lBEUIi/bGXtWR0Yoa1o6z+1ta7DVgM18+ssBNlgo9Z9Q
+	dTdYV/tU2IwRy5RgI/ZnQ849c9h7rCDZJVF3sJxW9HE5NpVk1qq9P0G6e59az2+Vw4CIr8AB84e
+	+VGVQR9Oen5opW4w1KhR15AXDcGAmPtuWEQC83zHoG+zhnJm4P6A7eFdl2BOskQenK05oe9W9ql
+	3INMEB2Cx4hiIbX2l5Nw4LgVWQpJu/DWf4VRal2nPUoXA/IAE35OHdmJ9WhEuiEmounrweCenIM
+	sAncR29jSmtbrOK8/eC7gNBS3JDkfHDpiRAviiL3AN5bRQ50r+cm
+X-Google-Smtp-Source: AGHT+IHKeW/lRf4A736uiyEk8pb1EFNbX4MNRx95s1GbRRKiftyq5dFJydREqeAw1RiiX8blRyYUDg==
+X-Received: by 2002:a05:6a00:2987:b0:736:a8db:93bb with SMTP id d2e1a72fcca58-742892680f5mr7842964b3a.5.1747295630226;
+        Thu, 15 May 2025 00:53:50 -0700 (PDT)
+Received: from mythos-cloud.. ([125.138.201.7])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74237704dc0sm10666148b3a.7.2025.05.15.00.53.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 May 2025 00:53:49 -0700 (PDT)
+From: Moon Yeounsu <yyyynoom@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Moon Yeounsu <yyyynoom@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v3] net: dlink: add synchronization for stats update
+Date: Thu, 15 May 2025 16:53:31 +0900
+Message-ID: <20250515075333.48290-1-yyyynoom@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250404145241.1125078-1-jon@nutanix.com> <CACGkMEsFc-URhXBCGZ1=CTMZKcWPf57pYy1TcyKLL=N65u+F0Q@mail.gmail.com>
- <B32E2C5D-25FB-427F-8567-701C152DFDE6@nutanix.com> <CACGkMEucg5mduA-xoyrTRK5nOkdHvUAkG9fH6KpO=HxMVPYONA@mail.gmail.com>
- <CAJaqyWdhLCNs_B0gcxXHut7xufw23HMR6PaO11mqAQFoGkdfXQ@mail.gmail.com>
- <92470838-2B98-4FC6-8E5B-A8AF14965D4C@nutanix.com> <A2A66437-60B2-491E-96F7-CD302E90452F@nutanix.com>
-In-Reply-To: <A2A66437-60B2-491E-96F7-CD302E90452F@nutanix.com>
-From: Eugenio Perez Martin <eperezma@redhat.com>
-Date: Thu, 15 May 2025 09:52:12 +0200
-X-Gm-Features: AX0GCFvxwoG_KF2kIsCofHB3OnMAdD648vC3tjuloR2Wyw6ADVoQtW7FrhQDNsw
-Message-ID: <CAJaqyWcNNFRnFmmkEHhOPGWAL05P1EO1ebMJY8+YUC0jxyq3hg@mail.gmail.com>
-Subject: Re: [PATCH] vhost/net: remove zerocopy support
-To: Jon Kohler <jon@nutanix.com>
-Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Stefano Brivio <sbrivio@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, May 12, 2025 at 5:21=E2=80=AFPM Jon Kohler <jon@nutanix.com> wrote:
->
->
->
-> > On Apr 30, 2025, at 9:21=E2=80=AFPM, Jon Kohler <jon@nutanix.com> wrote=
-:
-> >
-> >
-> >
-> >> On Apr 16, 2025, at 6:15=E2=80=AFAM, Eugenio Perez Martin <eperezma@re=
-dhat.com> wrote:
-> >>
-> >> !-------------------------------------------------------------------|
-> >> CAUTION: External Email
-> >>
-> >> |-------------------------------------------------------------------!
-> >>
-> >> On Tue, Apr 8, 2025 at 8:28=E2=80=AFAM Jason Wang <jasowang@redhat.com=
-> wrote:
-> >>>
-> >>> On Tue, Apr 8, 2025 at 9:18=E2=80=AFAM Jon Kohler <jon@nutanix.com> w=
-rote:
-> >>>>
-> >>>>
-> >>>>
-> >>>>> On Apr 6, 2025, at 7:14=E2=80=AFPM, Jason Wang <jasowang@redhat.com=
-> wrote:
-> >>>>>
-> >>>>> !------------------------------------------------------------------=
--|
-> >>>>> CAUTION: External Email
-> >>>>>
-> >>>>> |------------------------------------------------------------------=
--!
-> >>>>>
-> >>>>> On Fri, Apr 4, 2025 at 10:24=E2=80=AFPM Jon Kohler <jon@nutanix.com=
-> wrote:
-> >>>>>>
-> >>>>>> Commit 098eadce3c62 ("vhost_net: disable zerocopy by default") dis=
-abled
-> >>>>>> the module parameter for the handle_tx_zerocopy path back in 2019,
-> >>>>>> nothing that many downstream distributions (e.g., RHEL7 and later)=
- had
-> >>>>>> already done the same.
-> >>>>>>
-> >>>>>> Both upstream and downstream disablement suggest this path is rare=
-ly
-> >>>>>> used.
-> >>>>>>
-> >>>>>> Testing the module parameter shows that while the path allows pack=
-et
-> >>>>>> forwarding, the zerocopy functionality itself is broken. On outbou=
-nd
-> >>>>>> traffic (guest TX -> external), zerocopy SKBs are orphaned by eith=
-er
-> >>>>>> skb_orphan_frags_rx() (used with the tun driver via tun_net_xmit()=
-)
-> >>>>>
-> >>>>> This is by design to avoid DOS.
-> >>>>
-> >>>> I understand that, but it makes ZC non-functional in general, as ZC =
-fails
-> >>>> and immediately increments the error counters.
-> >>>
-> >>> The main issue is HOL, but zerocopy may still work in some setups tha=
-t
-> >>> don't need to care about HOL. One example the macvtap passthrough
-> >>> mode.
-> >>>
-> >>>>
-> >>>>>
-> >>>>>> or
-> >>>>>> skb_orphan_frags() elsewhere in the stack,
-> >>>>>
-> >>>>> Basically zerocopy is expected to work for guest -> remote case, so
-> >>>>> could we still hit skb_orphan_frags() in this case?
-> >>>>
-> >>>> Yes, you=E2=80=99d hit that in tun_net_xmit().
-> >>>
-> >>> Only for local VM to local VM communication.
-> >
-> > Sure, but the tricky bit here is that if you have a mix of VM-VM and VM=
--external
-> > traffic patterns, any time the error path is hit, the zc error counter =
-will go up.
-> >
-> > When that happens, ZC will get silently disabled anyhow, so it leads to=
- sporadic
-> > success / non-deterministic performance.
-> >
-> >>>
-> >>>> If you punch a hole in that *and* in the
-> >>>> zc error counter (such that failed ZC doesn=E2=80=99t disable ZC in =
-vhost), you get ZC
-> >>>> from vhost; however, the network interrupt handler under net_tx_acti=
-on and
-> >>>> eventually incurs the memcpy under dev_queue_xmit_nit().
-> >>>
-> >>> Well, yes, we need a copy if there's a packet socket. But if there's
-> >>> no network interface taps, we don't need to do the copy here.
-> >>>
-> >
-> > Agreed on the packet socket side. I recently fixed an issue in lldpd [1=
-] that prevented
-> > this specific case; however, there are still other trip wires spread ou=
-t across the
-> > stack that would need to be addressed.
-> >
-> > [1] https://github.com/lldpd/lldpd/commit/622a91144de4ae487ceebdb333863=
-e9f660e0717
-> >
-> >>
-> >> Hi!
-> >>
-> >> I need more time diving into the issues. As Jon mentioned, vhost ZC is
-> >> so little used I didn't have the chance to experiment with this until
-> >> now :). But yes, I expect to be able to overcome these for pasta, by
-> >> adapting buffer sizes or modifying code etc.
-> >
-> > Another tricky bit here is that it has been disabled both upstream and =
-downstream
-> > for so long, the code naturally has a bit of wrench-in-the-engine.
-> >
-> > RE Buffer sizes: I tried this as well, because I think on sufficiently =
-fast systems,
-> > zero copy gets especially interesting in GSO/TSO cases where you have m=
-ega
-> > payloads.
-> >
-> > I tried playing around with the good copy value such that ZC restricted=
- itself to
-> > only lets say 32K payloads and above, and while it *does* work (with en=
-ough
-> > holes punched in), absolute t-put doesn=E2=80=99t actually go up, its j=
-ust that CPU utilization
-> > goes down a pinch. Not a bad thing for certain, but still not great.
-> >
-> > In fact, I found that tput actually went down with this path, even with=
- ZC occurring
-> > successfully, as there was still a mix of ZC and non-ZC because you can=
- only
-> > have so many pending at any given time before the copy path kicks in ag=
-ain.
-> >
-> >
-> >>
-> >>>>
-> >>>> This is no more performant, and in fact is actually worse since the =
-time spent
-> >>>> waiting on that memcpy to resolve is longer.
-> >>>>
-> >>>>>
-> >>>>>> as vhost_net does not set
-> >>>>>> SKBFL_DONT_ORPHAN.
-> >>>
-> >>> Maybe we can try to set this as vhost-net can hornor ulimit now.
-> >
-> > Yea I tried that, and while it helps kick things further down the stack=
-, its not actually
-> > faster in any testing I=E2=80=99ve drummed up.
-> >
-> >>>
-> >>>>>>
-> >>>>>> Orphaning enforces a memcpy and triggers the completion callback, =
-which
-> >>>>>> increments the failed TX counter, effectively disabling zerocopy a=
-gain.
-> >>>>>>
-> >>>>>> Even after addressing these issues to prevent SKB orphaning and er=
-ror
-> >>>>>> counter increments, performance remains poor. By default, only 64
-> >>>>>> messages can be zerocopied, which is immediately exhausted by work=
-loads
-> >>>>>> like iperf, resulting in most messages being memcpy'd anyhow.
-> >>>>>>
-> >>>>>> Additionally, memcpy'd messages do not benefit from the XDP batchi=
-ng
-> >>>>>> optimizations present in the handle_tx_copy path.
-> >>>>>>
-> >>>>>> Given these limitations and the lack of any tangible benefits, rem=
-ove
-> >>>>>> zerocopy entirely to simplify the code base.
-> >>>>>>
-> >>>>>> Signed-off-by: Jon Kohler <jon@nutanix.com>
-> >>>>>
-> >>>>> Any chance we can fix those issues? Actually, we had a plan to make
-> >>>>> use of vhost-net and its tx zerocopy (or even implement the rx
-> >>>>> zerocopy) in pasta.
-> >>>>
-> >>>> Happy to take direction and ideas here, but I don=E2=80=99t see a cl=
-ear way to fix these
-> >>>> issues, without dealing with the assertions that skb_orphan_frags_rx=
- calls out.
-> >>>>
-> >>>> Said another way, I=E2=80=99d be interested in hearing if there is a=
- config where ZC in
-> >>>> current host-net implementation works, as I was driving myself crazy=
- trying to
-> >>>> reverse engineer.
-> >>>
-> >>> See above.
-> >>>
-> >>>>
-> >>>> Happy to collaborate if there is something we could do here.
-> >>>
-> >>> Great, we can start here by seeking a way to fix the known issues of
-> >>> the vhost-net zerocopy code.
-> >>>
-> >>
-> >> Happy to help here :).
-> >>
-> >> Jon, could you share more details about the orphan problem so I can
-> >> speed up the help? For example, can you describe the code changes and
-> >> the code path that would lead to that assertion of
-> >> skb_orphan_frags_rx?
-> >>
-> >> Thanks!
-> >>
-> >
-> > Sorry for the slow response, getting back from holiday and catching up.
-> >
-> > When running through tun.c, there are a handful of places where ZC turn=
-s into
-> > a full copy, whether that is in the tun code itself, or in the interrup=
-t handler when
-> > tun xmit is running.
-> >
-> > For example, tun_net_xmit mandatorily calls skb_orphan_frags_rx. Anythi=
-ng
-> > with frags will get this memcpy, which are of course the =E2=80=9Cjuicy=
-=E2=80=9D targets here as
-> > they would take up the most memory bandwidth in general. Nasty catch22 =
-:)
-> >
-> > There are also plenty of places that call normal skb_orphan_frags, whic=
-h
-> > triggers because vhost doesn=E2=80=99t set SKBFL_DONT_ORPHAN. That=E2=
-=80=99s an easy
-> > fix, but still something to think about.
-> >
-> > Then there is the issue of packet sockets, which throw a king sized wre=
-nch into
-> > this. Its slightly insidious, but it isn=E2=80=99t directly apparent th=
-at loading some user
-> > space app nukes zero copy, but it happens.
-> >
-> > See my previous comment about LLDPD, where a simply compiler snafu caus=
-ed
-> > one socket option to get silently break, and it then ripped out ZC capa=
-bility. Easy
-> > fix, but its an example of how this can fall over.
-> >
-> > Bottom line, I=E2=80=99d *love****** have ZC work, work well and so on.=
- I=E2=80=99m open to ideas
-> > here :) (up to and including both A) fixing it and B) deleting it)
->
-> Hey Eugenio - wondering if you had a chance to check out my notes on this=
-?
->
+This patch synchronizes code that accesses from both user-space
+and IRQ contexts. The `get_stats()` function can be called from both
+context.
 
-Sorry I thought I was going to have the code ready by now :). I'll
-need more time to go through the items.
+`dev->stats.tx_errors` and `dev->stats.collisions` are also updated
+in the `tx_errors()` function. Therefore, these fields must also be
+protected by synchronized.
+
+There is no code that accessses `dev->stats.tx_errors` between the
+previous and updated lines, so the updating point can be moved.
+
+Signed-off-by: Moon Yeounsu <yyyynoom@gmail.com>
+---
+Changelog:
+v1: https://lore.kernel.org/netdev/20250421191645.43526-2-yyyynoom@gmail.com/
+v2: https://lore.kernel.org/netdev/20250425231352.102535-2-yyyynoom@gmail.com/
+- fix incorrect method of updating `dev->stats.tx_errors` and
+  `dev->stats.collisions`
+v3:
+- fix incorrect locking method
+---
+ drivers/net/ethernet/dlink/dl2k.c | 14 +++++++++++++-
+ drivers/net/ethernet/dlink/dl2k.h |  2 ++
+ 2 files changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/dlink/dl2k.c b/drivers/net/ethernet/dlink/dl2k.c
+index 232e839a9d07..038a0400c1f9 100644
+--- a/drivers/net/ethernet/dlink/dl2k.c
++++ b/drivers/net/ethernet/dlink/dl2k.c
+@@ -146,6 +146,8 @@ rio_probe1 (struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	np->ioaddr = ioaddr;
+ 	np->chip_id = chip_idx;
+ 	np->pdev = pdev;
++
++	spin_lock_init(&np->stats_lock);
+ 	spin_lock_init (&np->tx_lock);
+ 	spin_lock_init (&np->rx_lock);
+ 
+@@ -865,7 +867,6 @@ tx_error (struct net_device *dev, int tx_status)
+ 	frame_id = (tx_status & 0xffff0000);
+ 	printk (KERN_ERR "%s: Transmit error, TxStatus %4.4x, FrameId %d.\n",
+ 		dev->name, tx_status, frame_id);
+-	dev->stats.tx_errors++;
+ 	/* Ttransmit Underrun */
+ 	if (tx_status & 0x10) {
+ 		dev->stats.tx_fifo_errors++;
+@@ -902,9 +903,15 @@ tx_error (struct net_device *dev, int tx_status)
+ 		rio_set_led_mode(dev);
+ 		/* Let TxStartThresh stay default value */
+ 	}
++
++	spin_lock(&np->stats_lock);
+ 	/* Maximum Collisions */
+ 	if (tx_status & 0x08)
+ 		dev->stats.collisions++;
++
++	dev->stats.tx_errors++;
++	spin_unlock(&np->stats_lock);
++
+ 	/* Restart the Tx */
+ 	dw32(MACCtrl, dr16(MACCtrl) | TxEnable);
+ }
+@@ -1073,7 +1080,9 @@ get_stats (struct net_device *dev)
+ 	int i;
+ #endif
+ 	unsigned int stat_reg;
++	unsigned long flags;
+ 
++	spin_lock_irqsave(&np->stats_lock, flags);
+ 	/* All statistics registers need to be acknowledged,
+ 	   else statistic overflow could cause problems */
+ 
+@@ -1123,6 +1132,9 @@ get_stats (struct net_device *dev)
+ 	dr16(TCPCheckSumErrors);
+ 	dr16(UDPCheckSumErrors);
+ 	dr16(IPCheckSumErrors);
++
++	spin_unlock_irqrestore(&np->stats_lock, flags);
++
+ 	return &dev->stats;
+ }
+ 
+diff --git a/drivers/net/ethernet/dlink/dl2k.h b/drivers/net/ethernet/dlink/dl2k.h
+index 0e33e2eaae96..56aff2f0bdbf 100644
+--- a/drivers/net/ethernet/dlink/dl2k.h
++++ b/drivers/net/ethernet/dlink/dl2k.h
+@@ -372,6 +372,8 @@ struct netdev_private {
+ 	struct pci_dev *pdev;
+ 	void __iomem *ioaddr;
+ 	void __iomem *eeprom_addr;
++	// To ensure synchronization when stats are updated.
++	spinlock_t stats_lock;
+ 	spinlock_t tx_lock;
+ 	spinlock_t rx_lock;
+ 	unsigned int rx_buf_sz;		/* Based on MTU+slack. */
+-- 
+2.49.0
 
 
