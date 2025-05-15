@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-190803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 053F5AB8E5D
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 20:01:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5BADAB8E76
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 20:05:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7F8B189DF4A
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 18:01:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCD33A01765
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 18:05:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B828F2586C7;
-	Thu, 15 May 2025 18:01:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72E2B258CDC;
+	Thu, 15 May 2025 18:05:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LV2k/B8h"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="md5Rt4ES"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DDAB143C5D;
-	Thu, 15 May 2025 18:01:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFE741EA7F9;
+	Thu, 15 May 2025 18:05:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747332085; cv=none; b=m9OdBUwbmLPkA4P5xnw9uhNDYmPcYFcLvtKEJMkVW/ZR+KZSKHcH37X3PXl2GH4o9YdqwMUbYuJcyCkZIm66P55R55zaXnrYJoIJiqAw8qUdhXRUc6Lz9hX6hbhvkwVIR0xJZpPkxylV5KEdZ3pgqHPapdR1iXlcTN6FjbSajlg=
+	t=1747332343; cv=none; b=VwYTt1ktSxzNH6oCji2jz0nq5KVJi6hz4GO+a6PBsl1PPqgV4FFmVPEFlPSDzg7PJSK3DhOL57G9sWHrLikN7rxELdLCq10aBkxJduuo0EgMvIRH3xbtZM30c1TQ0EAFIfZvOL238aOJUi1tX3vvR7YefrZKOp691mylVgjrAQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747332085; c=relaxed/simple;
-	bh=QNsvzp8+Y020QhH/c0iTZMAZvM6gN/18xTUJ7KgeZXU=;
+	s=arc-20240116; t=1747332343; c=relaxed/simple;
+	bh=qoH6LccZOlhTi7y76NH6szhTMUifU4ew3xvC7+xhRr8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XVmAQND/D8LywwbpjsZYu8+G61Lgybbo0cp0LNvEyZfnrpd4pNiZgWP+aDmePb7CkMTXdnO0NHSg1gSlF7Ec7v3JuFjT6mdG48lqLSeu+6ykf6CmuHGleA5/oqj4tnagdIpV6HDcVX+cCXnxyY/xFloAfTUCDTE+BWNMg1Umu34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LV2k/B8h; arc=none smtp.client-ip=209.85.128.53
+	 In-Reply-To:Content-Type; b=mTZhbnvDHTH1+vtexn8ZhIe4DP13k1eHlXUXfdfZmjPCXCFQfrnoH3Km+wZY6+LuiUlDwUrOrLUNANSZDoo5XezoXBW62VwDw5N7frUK4wJYkqUQ2cBaAyYNZpnlLg0Pbtu2RBQFIVwB0RcB42dzLCm57eJXfPFn9WKoNeyeiIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=md5Rt4ES; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-442ed8a275fso14124925e9.2;
-        Thu, 15 May 2025 11:01:23 -0700 (PDT)
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43cf848528aso10337395e9.2;
+        Thu, 15 May 2025 11:05:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747332082; x=1747936882; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1747332340; x=1747937140; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ftL1zu9G85h+3xwDkEOI0cxrRxUcnx00/pKAwf99vzk=;
-        b=LV2k/B8hsjx2UgfSRqvTa6ekUK429Y/f53oa61hQ4jri9MyCJ2ppE1YuTZUGIi5mSK
-         rk4LFRyzHUI+U14bqvMcvgR86BwCZC0TxeR+iWvwo77UrAFnOVQzGHTVwtV3ejX3dKLU
-         faulSMKdeglpb+BABiP14caNFWDlB0QzyI66zYLrTsatBwcGZ5pwEN3vze6efj3je7VV
-         97ua4AWZd4BBlPEGe56J3Ky5aSE0ERmJKJImAbhIVrRTRgXib865kGo7yti1CQDJA87R
-         JePjbJWjuWHfAlRp+1T4N0xJXtCn/JGzI92vSW1ktcx/8qswRBnR0grp8A8QkkwYtHSV
-         /nhg==
+        bh=4THNUf1uXf81C9jvxSlBYnSoxyqZaGOpOTb4vLyxUPk=;
+        b=md5Rt4ESPXCzQaEyuulZMmaCn0Xg+ILgR+/BUsbE5SDuNkwp9H0V3HijYIyIQG6qRU
+         572aTNiTDMO1jqdbdQJghDO/Z38ihXnVIp60juLj+JMxnSFKcwQGrPlmm0qa3qfic/2w
+         Nhl8FhBNi/tOOn3SzKMgcJW6jK2M+wcEE1Ml0SWQ/sWE90YJaYgJFtalptHHxIg7mUd/
+         BoANLeHAH+crySHgrPc7kWofbPGDYXHyQdC15JehTP1iTKmt39S8y/qwVUFB++qMZ7np
+         EKAsXOCAZHAzQKJQZiKsnS7rM1kMiyloowWKxZFPOvV7+uWtMlwWy2spFKfJQ/rSSS3Z
+         ixqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747332082; x=1747936882;
+        d=1e100.net; s=20230601; t=1747332340; x=1747937140;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ftL1zu9G85h+3xwDkEOI0cxrRxUcnx00/pKAwf99vzk=;
-        b=ZFAdkk7JtRA4HiZhygn12Jglw4YYfEmfF0pCsLh1KPQKIQjLlmUcpu9DrHw9J6xt28
-         QKpYg8p9apznstfKk0Zah8YjFbpRriR9JuGydOK4rN8fciiZqAYiIQR0BFyJMonp4Oh4
-         zls8cRlqxIumrVmTzZw9gbll+vO9plpNT67PWuAkAT1oROTHxLT2bjEwpZgLFFDdI3Q2
-         hEI9Mkxkiv0NmWismJ9iUN7W9c/EROWp4pl0/y1zTuI2Dmh2cQYJFmAzN5x0C/FMG1Gg
-         xozIS/PMscBCG4ia4N8enxi00ZreRW4Bozgam5OrD3jaGrAmgkKvXsiX9ygUFLg4PBHt
-         o+Zw==
-X-Forwarded-Encrypted: i=1; AJvYcCX+xE8e15oAiomwBsC5hYD1wsxgrGQhdaxecepMjkWuOV/eqggItqrdgQNclbesHvJgAvgPvBtK38Z4s6U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTk3EvEY8Qt9YEwpwgEiyvDH/fvXPjAzA3nDKmLZMTs9iBAA/w
-	KQXAX//YthD/oBexrjOsvkKPOTwz1hoQdD8BYlgHTY/uXNRI8PjF0GQV
-X-Gm-Gg: ASbGncvta9c4Xo1X4sPq6J71EDIJ/lO75Yt/BCUKJSeFGLcATsUXclzj5vGtXob68s/
-	ipF/UsrKXYdRDe7+grRx45JS+MaCXcD9UsC5CvIupllNMOfiKIIg+xGCnoCKh1xdM1ArgoMoarZ
-	13grwPgzWcdVZlTI4q9+WLaWTTU1jaBM5/0BZMmrcdkEPK9vGdXJ27KXJlsrOyMShO3dhzhsiGN
-	dg8hTq4it+0Ows/3QMmTBbc2xtRIjKFeSZV1nUVc2yIqXYECpT1h+fieQ8ACl/l7zjIbnnolRsA
-	ajHIHU7tROr72FDU/itNByxx7p86096u9vyq/x7bVFH1j2/MB24k2y6rcRkP4mn0e3TBaNk/XcZ
-	2NkQ5YiQubPYVJDs2Wsf15Pq11wXAeZo94L+sCOypgiRFAlgBqVjZPYWYKg5+5Eeo4lylWXfrU/
-	B+VQdsOrDDwg==
-X-Google-Smtp-Source: AGHT+IHgeAM+8FzyBqZPg1R1yIQBqNvQ8UD9T6HygfSREDafkbuj7z9GEsOUiA8q4FoXVXqYMORHGg==
-X-Received: by 2002:a05:600c:4e0d:b0:43d:ac5:11e8 with SMTP id 5b1f17b1804b1-442fd664a0dmr4465545e9.21.1747332081787;
-        Thu, 15 May 2025 11:01:21 -0700 (PDT)
+        bh=4THNUf1uXf81C9jvxSlBYnSoxyqZaGOpOTb4vLyxUPk=;
+        b=ZgqEOk+9HvewUBL8rlSX0y5A2P1VRQmpJEg8ijOohD+wYomBk08lumodUjdDx+9tXp
+         oIQmTh91LTneCMcAP6WcYS0F7BmK/WMPmBc+//KNKpmIuSb36DZivClUl9wsJ6inrlHM
+         nazHAB/iLWPbyBALQ8tygPau+SixQ2Xssq4CFP5cW3YzuuGmoDmOvM8CQcrfHQZwKQEe
+         upLBSCaK9so0WdvF8WdZLhKPhaVg1PS+eMLLt8zkATYJA1UVbD9k9qq5/VEJYoIWKz37
+         Pdcq117c7kPkk9HGGOgdxoGnTz4jQk8Q2ZQSpMd+0P3bMqu4Y33aDU1xwdodOgIrydrl
+         FZ1A==
+X-Forwarded-Encrypted: i=1; AJvYcCViGskOvtc/pFl2PujVSujvaqe1SIdo1fXdh7VvKTy6GuJjyCrziBhm+GzGekTxQ+qokhHTzSsRgXPaRYE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZGDJ6+ZAoWla2er3mpBEvb01wr7jXgzV9maZcsrF4mEKlINVU
+	thJp3W2V8xyi33ihFZYAqtGeVthdITiI7wCBPqa9QTUtnBBRKcbYmEDN
+X-Gm-Gg: ASbGncvq1UpZrPY/b3gKyN1CsVLyVRNwWC2FqjgNeJfxFAC+0JMjYXa95ihiyWrvaKR
+	AN/qnqAulJgc42SPJ9zy8gG1xDuHkkhAeOYXgkk9taxRxqVLij/17/UPvHdZfImrNfyd0jX+BY/
+	NG/VbKlfb8Mj3Uk+QvKniqKhTvJftPkRbDBSVE0LwYZ+9BNCneXHkrMuRReh1ZdE2/BfIwQivkz
+	EWz5dm70JBbxZsSrV6YJtyxUIhRLTYgTY4R2dRRFroHrchuk3/XNPY5KLKwSFu2bHsXE+cLKcoR
+	c2UAHum7pOeJ8wBveOpQfwijnOMJPhClykjphmGSgx6O3wY85IiqXdYduQT69iXjq8bg1SXRu6Q
+	yiye45wkATGr/Vqen07NIEwquhYPremcHTv5A/dnBykg/0E9p3yUEQj1O5V7m+wjsnFBolxTInf
+	2zZRKzvJrtaw==
+X-Google-Smtp-Source: AGHT+IEAMZI0gYj6jUL1XNnD21cZordm0Cbrsc9of7B1lYW2lChuusSGJbdvOqSY1ZAdEKpZBYJs0w==
+X-Received: by 2002:a05:6000:4285:b0:3a0:b990:ab72 with SMTP id ffacd0b85a97d-3a35c847d18mr690722f8f.42.1747332339783;
+        Thu, 15 May 2025 11:05:39 -0700 (PDT)
 Received: from ?IPV6:2003:ea:8f4a:2300:ec36:b14d:f12:70b? (p200300ea8f4a2300ec36b14d0f12070b.dip0.t-ipconnect.de. [2003:ea:8f4a:2300:ec36:b14d:f12:70b])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-442fd4a0a5dsm5329295e9.0.2025.05.15.11.01.20
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3a35ca4d1easm231079f8f.5.2025.05.15.11.05.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 May 2025 11:01:21 -0700 (PDT)
-Message-ID: <2898dcdd-1955-4aeb-959a-58bf8166102f@gmail.com>
-Date: Thu, 15 May 2025 20:01:47 +0200
+        Thu, 15 May 2025 11:05:39 -0700 (PDT)
+Message-ID: <9714d7a5-196d-4f7f-ab01-dcbbf883f064@gmail.com>
+Date: Thu, 15 May 2025 20:06:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,17 +84,12 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] r8169: add support for RTL8127A
-To: Hau <hau@realtek.com>, nic_swsd <nic_swsd@realtek.com>,
- "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20250515030323.4602-1-hau@realtek.com>
- <c57f0ef9-62c6-4821-a695-e8e4724f1cb7@gmail.com>
- <a3bb102cb48f49179fae5167b1a6bacc@realtek.com>
+Subject: Re: [PATCH net-next v2] r8169: add support for RTL8127A
+To: ChunHao Lin <hau@realtek.com>, nic_swsd@realtek.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250515095303.3138-1-hau@realtek.com>
 Content-Language: en-US
 From: Heiner Kallweit <hkallweit1@gmail.com>
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
@@ -140,23 +135,22 @@ Autocrypt: addr=hkallweit1@gmail.com; keydata=
  H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
  lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
  OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
-In-Reply-To: <a3bb102cb48f49179fae5167b1a6bacc@realtek.com>
+In-Reply-To: <20250515095303.3138-1-hau@realtek.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 15.05.2025 11:37, Hau wrote:
->>
->> On 15.05.2025 05:03, ChunHao Lin wrote:
->>> This adds support for 10Gbs chip RTL8127A.
->>>
->> Thanks, Hau. One question wrt EEE:
->> Curently we disable EEE at 5Gbps, likely because support in
->> RTL8126 still has some flaws. Not 100% sure, but I assume also 10Gbps
->> supports EEE. How about EEE support at 5Gbps and 10Gbps in RTL8127? Can it
->> be enabled or better not?
->>
-> rtl8126 and rtl8127 EEE can be enabled at all supported speed now. 
+On 15.05.2025 11:53, ChunHao Lin wrote:
+> This adds support for 10Gbs chip RTL8127A.
 > 
-OK, then I will send a follow-up patch enabling EEE at 5Gbps for all
-RTL8126 versions.
+> Signed-off-by: ChunHao Lin <hau@realtek.com>
+> ---
+> v1 -> v2: update phy parameters
+> 
+>  drivers/net/ethernet/realtek/r8169.h          |   1 +
+>  drivers/net/ethernet/realtek/r8169_main.c     |  29 ++-
+>  .../net/ethernet/realtek/r8169_phy_config.c   | 166 ++++++++++++++++++
+>  3 files changed, 193 insertions(+), 3 deletions(-)
+> 
+
+Reviewed-by: Heiner Kallweit <hkallweit1@gmail.com>
 
