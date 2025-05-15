@@ -1,177 +1,365 @@
-Return-Path: <netdev+bounces-190634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78025AB7F45
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 09:51:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C42CEAB7F52
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 09:53:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77BF01BA7230
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 07:51:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D6A64E0451
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 07:53:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ECB8283FF7;
-	Thu, 15 May 2025 07:50:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F841283FC9;
+	Thu, 15 May 2025 07:52:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="MRRE2jpO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YhwdZu4/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35B3F283FD9;
-	Thu, 15 May 2025 07:50:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B42B280330
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 07:52:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747295457; cv=none; b=DXmOYo71gDEwlQiga+wKrKzG5RAUh4CeTknD0vCwKotC4cBr7BHtXwVpoBdIt2C42SdEda/FI2V7NzLcSdqDo+wxntGh8KURxjOKP/67SE2RvHjkRSPk3OsDX9FaADSiTfSEvrBZrR/a9H7J+j4VW7P+kadycFiGVYEHxM2kM3c=
+	t=1747295576; cv=none; b=gxOtVy68ac1zU0oHCwGirQcUcmulCpyePXOAxSFCmez+EtXD7gDM51xkz1ajwP93e149fS9WLKM6BAZDk4CYrSWzcxlXRScnitTNUvm3idA4qABvI62JZy9ZyiMMHzT6cF71dfMg7/uh8M2r6tmyqG2xvnFszzI2POldgy3mZy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747295457; c=relaxed/simple;
-	bh=tpCTD5xGme/qPS7vcmDRv0oeU5Y1eIoub1iwPCyoqhU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GXcSODXCBv/33c2oHpUTXZ37hxijuwFPmy3Kl75O8CUtwjQQxbbtmoMqYw4x3/3SkCKslYk5V+eBl3cOHdGYll8W5WHlqeJwMEGvPvt16js+mnYDwkR2zFmWkTPql4s/P+HAr/aK5EbPTZ/djmBofzgKes4e9nL6eM+H/zMmzFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=MRRE2jpO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E490DC4CEED;
-	Thu, 15 May 2025 07:50:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1747295456;
-	bh=tpCTD5xGme/qPS7vcmDRv0oeU5Y1eIoub1iwPCyoqhU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MRRE2jpO51015SkZlpUH3dWOOmZ4ntJR8HlDtRS/JqOFD8nOw3UUPf2yukSld8ns4
-	 2ZCBTFaZ58lndbcxSgd+4XeTtMolz41FMjGHFB/OFyorz3NbHkWHYLNPV0bAO8gc4C
-	 VszQq7SNr0gaR0zgZmCoMWXesIZW/ZRWdPYkO2Js=
-Date: Thu, 15 May 2025 09:49:01 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Damien =?iso-8859-1?Q?Ri=E9gel?= <damien.riegel@silabs.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Silicon Labs Kernel Team <linux-devel@silabs.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Johan Hovold <johan@kernel.org>,
-	Alex Elder <elder@kernel.org>, greybus-dev@lists.linaro.org
-Subject: Re: [RFC net-next 00/15] Add support for Silicon Labs CPC
-Message-ID: <2025051551-rinsing-accurate-1852@gregkh>
-References: <20250512012748.79749-1-damien.riegel@silabs.com>
- <6fea7d17-8e08-42c7-a297-d4f5a3377661@lunn.ch>
- <D9VCEGBQWBW8.3MJCYYXOZHZNX@silabs.com>
- <f1a4ab5a-f2ce-4c94-91eb-ab81aea5b413@lunn.ch>
- <D9W93CSVNNM0.F14YDBPZP64O@silabs.com>
+	s=arc-20240116; t=1747295576; c=relaxed/simple;
+	bh=eb+wlR6VhvXrZxjAcmXbXZfUEYlOr+TaIdA3h+BHceE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LOn3GUiuYGZGeqV/kMN7mw6txAFeRz44dPBtvujiXlmRh1RVytnCkJA1yTjN9D0E3ivrLpsCdTKNXzooh8we+9olBMY9qQEmYio0lzBoqtzMR648R48HU9o8/J7iyUp5+5Pog09K0msIfC/5U1lb6gzl8z8JrqIHsoanG0+fLzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YhwdZu4/; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747295573;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eb+wlR6VhvXrZxjAcmXbXZfUEYlOr+TaIdA3h+BHceE=;
+	b=YhwdZu4/1qF5iy412CBwW36rUBrVdtMM+mCLXyQwyWPvBcQx6hUD0KIs56V2aHc3QqcnC9
+	bdu+s9M84Ha5LTwYaDUEsIXRRLbRUWdBheNjcCFJmIsVjFGSq+RicBzbOzCP5OgsmToUht
+	iu9N9Lg5pKunJe6lG7klkx6Rh20yFfI=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-435-RuA61zmMNU-B3OtfsWC8cw-1; Thu, 15 May 2025 03:52:51 -0400
+X-MC-Unique: RuA61zmMNU-B3OtfsWC8cw-1
+X-Mimecast-MFC-AGG-ID: RuA61zmMNU-B3OtfsWC8cw_1747295571
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-30adbe9b568so650775a91.1
+        for <netdev@vger.kernel.org>; Thu, 15 May 2025 00:52:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747295570; x=1747900370;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eb+wlR6VhvXrZxjAcmXbXZfUEYlOr+TaIdA3h+BHceE=;
+        b=r+R5rllyU2Pu4CyPtT0SewB/mlbK8G65zd7i180iW1JkTeGQjTZlfFFQv6LtgxZk2Z
+         HFZZmKHLc2AeFP2dHs3AsEyRn6T67WZm7ZBo8FqLze+WQH9nc9rya9dORHZid39Yic1c
+         6Cajm28T1hzsvUnFCM+MkThOvN/53VTQ4/PjW3m/IXSPqozHQw7sm+za1EFRK/SDczp/
+         WZx1SX+B+wTkb+zhFYBmUQQwAY/dsMvmzFwarVngYGHH9UtVpw9VVEdY72gqrFpZJX6e
+         4kXRi8C90A9k5iXK2PPU7axXftAPOwxXjBrJub6iIGD8xteg5LTMFluPvltljaTEe89z
+         jInw==
+X-Forwarded-Encrypted: i=1; AJvYcCVwI/VhW53MV46sx8DaVLQvHxe/ku+qwdS2rr9PptHQ8wzsr3RwzORAZbBZRzL8Jj7wtPYWpxM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFZO3NJd6FmkGSy9KCpE60A/Ip7jJHBvcGZYuK53evTeDccFWD
+	a+/x/TPj2J9ndz+/Qsl6HfTWsqtL6KWG/fB7cVei6RM8NY2PQHHzqOJB8esUxEyZJkt4zWXHbc0
+	GuWF22wHQ4K9kzP2GD6iPkSRGhNjxFRnxJK37XFxI67Rwz2+a/l0rcX74MHmsthIhfWvJOOG6n+
+	pxU+oaQ5Z/CYuG/npdkMrreZk2RQzV
+X-Gm-Gg: ASbGncsZ+cv7CHh13Qw36oxWSnyX07idPGTa31CNxdSpP0FMU4WTzk4Ilfa5dfTi4oF
+	tG4z1vt0HC3Xhk1ijYH7dIz+vHX9M3MBBmfDl7NBNM+jGV2s1lkzAnBVTHkiTePs1q7Xt
+X-Received: by 2002:a17:90b:5748:b0:30e:5c7f:5d26 with SMTP id 98e67ed59e1d1-30e5c7f5e1cmr1092166a91.24.1747295570395;
+        Thu, 15 May 2025 00:52:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEPfseK+eDrNin6aeBitCZZLriHMOdldIb61D6rL2kRvicPYUO6lNTIgEIIN2iOKGqmJOl/hc7b+UCsh2aPCts=
+X-Received: by 2002:a17:90b:5748:b0:30e:5c7f:5d26 with SMTP id
+ 98e67ed59e1d1-30e5c7f5e1cmr1092136a91.24.1747295569920; Thu, 15 May 2025
+ 00:52:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <D9W93CSVNNM0.F14YDBPZP64O@silabs.com>
+References: <20250404145241.1125078-1-jon@nutanix.com> <CACGkMEsFc-URhXBCGZ1=CTMZKcWPf57pYy1TcyKLL=N65u+F0Q@mail.gmail.com>
+ <B32E2C5D-25FB-427F-8567-701C152DFDE6@nutanix.com> <CACGkMEucg5mduA-xoyrTRK5nOkdHvUAkG9fH6KpO=HxMVPYONA@mail.gmail.com>
+ <CAJaqyWdhLCNs_B0gcxXHut7xufw23HMR6PaO11mqAQFoGkdfXQ@mail.gmail.com>
+ <92470838-2B98-4FC6-8E5B-A8AF14965D4C@nutanix.com> <A2A66437-60B2-491E-96F7-CD302E90452F@nutanix.com>
+In-Reply-To: <A2A66437-60B2-491E-96F7-CD302E90452F@nutanix.com>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Thu, 15 May 2025 09:52:12 +0200
+X-Gm-Features: AX0GCFvxwoG_KF2kIsCofHB3OnMAdD648vC3tjuloR2Wyw6ADVoQtW7FrhQDNsw
+Message-ID: <CAJaqyWcNNFRnFmmkEHhOPGWAL05P1EO1ebMJY8+YUC0jxyq3hg@mail.gmail.com>
+Subject: Re: [PATCH] vhost/net: remove zerocopy support
+To: Jon Kohler <jon@nutanix.com>
+Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Stefano Brivio <sbrivio@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 14, 2025 at 06:52:27PM -0400, Damien Riégel wrote:
-> On Tue May 13, 2025 at 5:53 PM EDT, Andrew Lunn wrote:
-> > On Tue, May 13, 2025 at 05:15:20PM -0400, Damien Riégel wrote:
-> >> On Mon May 12, 2025 at 1:07 PM EDT, Andrew Lunn wrote:
-> >> > On Sun, May 11, 2025 at 09:27:33PM -0400, Damien Riégel wrote:
-> >> >> Hi,
-> >> >>
-> >> >>
-> >> >> This patchset brings initial support for Silicon Labs CPC protocol,
-> >> >> standing for Co-Processor Communication. This protocol is used by the
-> >> >> EFR32 Series [1]. These devices offer a variety for radio protocols,
-> >> >> such as Bluetooth, Z-Wave, Zigbee [2].
-> >> >
-> >> > Before we get too deep into the details of the patches, please could
-> >> > you do a compare/contrast to Greybus.
+On Mon, May 12, 2025 at 5:21=E2=80=AFPM Jon Kohler <jon@nutanix.com> wrote:
+>
+>
+>
+> > On Apr 30, 2025, at 9:21=E2=80=AFPM, Jon Kohler <jon@nutanix.com> wrote=
+:
+> >
+> >
+> >
+> >> On Apr 16, 2025, at 6:15=E2=80=AFAM, Eugenio Perez Martin <eperezma@re=
+dhat.com> wrote:
 > >>
-> >> Thank you for the prompt feedback on the RFC. We took a look at Greybus
-> >> in the past and it didn't seem to fit our needs. One of the main use
-> >> case that drove the development of CPC was to support WiFi (in
-> >> coexistence with other radio stacks) over SDIO, and get the maximum
-> >> throughput possible. We concluded that to achieve this we would need
-> >> packet aggregation, as sending one frame at a time over SDIO is
-> >> wasteful, and managing Radio Co-Processor available buffers, as sending
-> >> frames that the RCP is not able to process would degrade performance.
+> >> !-------------------------------------------------------------------|
+> >> CAUTION: External Email
 > >>
-> >> Greybus don't seem to offer these capabilities. It seems to be more
-> >> geared towards implementing RPC, where the host would send a command,
-> >> and then wait for the device to execute it and to respond. For Greybus'
-> >> protocols that implement some "streaming" features like audio or video
-> >> capture, the data streams go to an I2S or CSI interface, but it doesn't
-> >> seem to go through a CPort. So it seems to act as a backbone to connect
-> >> CPorts together, but high-throughput transfers happen on other types of
-> >> links. CPC is more about moving data over a physical link, guaranteeing
-> >> ordered delivery and avoiding unnecessary transmissions if remote
-> >> doesn't have the resources, it's much lower level than Greybus.
-> >
-> > As is said, i don't know Greybus too well. I hope its Maintainers can
-> > comment on this.
-> >
-> >> > Also, this patch adds Bluetooth, you talk about Z-Wave and Zigbee. But
-> >> > the EFR32 is a general purpose SoC, with I2C, SPI, PWM, UART. Greybus
-> >> > has support for these, although the code is current in staging. But
-> >> > for staging code, it is actually pretty good.
+> >> |-------------------------------------------------------------------!
 > >>
-> >> I agree with you that the EFR32 is a general purpose SoC and exposing
-> >> all available peripherals would be great, but most customers buy it as
-> >> an RCP module with one or more radio stacks enabled, and that's the
-> >> situation we're trying to address. Maybe I introduced a framework with
-> >> custom bus, drivers and endpoints where it was unnecessary, the goal is
-> >> not to be super generic but only to support coexistence of our radio
-> >> stacks.
+> >> On Tue, Apr 8, 2025 at 8:28=E2=80=AFAM Jason Wang <jasowang@redhat.com=
+> wrote:
+> >>>
+> >>> On Tue, Apr 8, 2025 at 9:18=E2=80=AFAM Jon Kohler <jon@nutanix.com> w=
+rote:
+> >>>>
+> >>>>
+> >>>>
+> >>>>> On Apr 6, 2025, at 7:14=E2=80=AFPM, Jason Wang <jasowang@redhat.com=
+> wrote:
+> >>>>>
+> >>>>> !------------------------------------------------------------------=
+-|
+> >>>>> CAUTION: External Email
+> >>>>>
+> >>>>> |------------------------------------------------------------------=
+-!
+> >>>>>
+> >>>>> On Fri, Apr 4, 2025 at 10:24=E2=80=AFPM Jon Kohler <jon@nutanix.com=
+> wrote:
+> >>>>>>
+> >>>>>> Commit 098eadce3c62 ("vhost_net: disable zerocopy by default") dis=
+abled
+> >>>>>> the module parameter for the handle_tx_zerocopy path back in 2019,
+> >>>>>> nothing that many downstream distributions (e.g., RHEL7 and later)=
+ had
+> >>>>>> already done the same.
+> >>>>>>
+> >>>>>> Both upstream and downstream disablement suggest this path is rare=
+ly
+> >>>>>> used.
+> >>>>>>
+> >>>>>> Testing the module parameter shows that while the path allows pack=
+et
+> >>>>>> forwarding, the zerocopy functionality itself is broken. On outbou=
+nd
+> >>>>>> traffic (guest TX -> external), zerocopy SKBs are orphaned by eith=
+er
+> >>>>>> skb_orphan_frags_rx() (used with the tun driver via tun_net_xmit()=
+)
+> >>>>>
+> >>>>> This is by design to avoid DOS.
+> >>>>
+> >>>> I understand that, but it makes ZC non-functional in general, as ZC =
+fails
+> >>>> and immediately increments the error counters.
+> >>>
+> >>> The main issue is HOL, but zerocopy may still work in some setups tha=
+t
+> >>> don't need to care about HOL. One example the macvtap passthrough
+> >>> mode.
+> >>>
+> >>>>
+> >>>>>
+> >>>>>> or
+> >>>>>> skb_orphan_frags() elsewhere in the stack,
+> >>>>>
+> >>>>> Basically zerocopy is expected to work for guest -> remote case, so
+> >>>>> could we still hit skb_orphan_frags() in this case?
+> >>>>
+> >>>> Yes, you=E2=80=99d hit that in tun_net_xmit().
+> >>>
+> >>> Only for local VM to local VM communication.
 > >
-> > This leads to my next problem.
+> > Sure, but the tricky bit here is that if you have a mix of VM-VM and VM=
+-external
+> > traffic patterns, any time the error path is hit, the zc error counter =
+will go up.
 > >
-> > https://www.nordicsemi.com/-/media/Software-and-other-downloads/Product-Briefs/nRF5340-SoC-PB.pdf
-> > Nordic Semiconductor has what appears to be a similar device.
+> > When that happens, ZC will get silently disabled anyhow, so it leads to=
+ sporadic
+> > success / non-deterministic performance.
 > >
-> > https://www.microchip.com/en-us/products/wireless-connectivity/bluetooth-low-energy/microcontrollers
-> > Microchip has a similar device as well.
+> >>>
+> >>>> If you punch a hole in that *and* in the
+> >>>> zc error counter (such that failed ZC doesn=E2=80=99t disable ZC in =
+vhost), you get ZC
+> >>>> from vhost; however, the network interrupt handler under net_tx_acti=
+on and
+> >>>> eventually incurs the memcpy under dev_queue_xmit_nit().
+> >>>
+> >>> Well, yes, we need a copy if there's a packet socket. But if there's
+> >>> no network interface taps, we don't need to do the copy here.
+> >>>
 > >
-> > https://www.ti.com/product/CC2674R10
-> > TI has a similar device.
+> > Agreed on the packet socket side. I recently fixed an issue in lldpd [1=
+] that prevented
+> > this specific case; however, there are still other trip wires spread ou=
+t across the
+> > stack that would need to be addressed.
 > >
-> > And maybe there are others?
+> > [1] https://github.com/lldpd/lldpd/commit/622a91144de4ae487ceebdb333863=
+e9f660e0717
 > >
-> > Are we going to get a Silabs CPC, a Nordic CPC, a Microchip CPC, a TI
-> > CPC, and an ACME CPC?
+> >>
+> >> Hi!
+> >>
+> >> I need more time diving into the issues. As Jon mentioned, vhost ZC is
+> >> so little used I didn't have the chance to experiment with this until
+> >> now :). But yes, I expect to be able to overcome these for pasta, by
+> >> adapting buffer sizes or modifying code etc.
 > >
-> > How do we end up with one implementation?
+> > Another tricky bit here is that it has been disabled both upstream and =
+downstream
+> > for so long, the code naturally has a bit of wrench-in-the-engine.
 > >
-> > Maybe Greybus does not currently support your streaming use case too
-> > well, but it is at least vendor neutral. Can it be extended for
-> > streaming?
-> 
-> I get the sentiment that we don't want every single vendor to push their
-> own protocols that are ever so slightly different. To be honest, I don't
-> know if Greybus can be extended for that use case, or if it's something
-> they are interested in supporting. I've subscribed to greybus-dev so
-> hopefully my email will get through this time (previous one is pending
-> approval).
-> 
-> Unfortunately, we're deep down the CPC road, especially on the firmware
-> side. Blame on me for not sending the RFC sooner and getting feedback
-> earlier, but if we have to massively change our course of action we need
-> some degree of confidence that this is a viable alternative for
-> achieving high-throughput for WiFi over SDIO. I would really value any
-> input from the Greybus folks on this.
+> > RE Buffer sizes: I tried this as well, because I think on sufficiently =
+fast systems,
+> > zero copy gets especially interesting in GSO/TSO cases where you have m=
+ega
+> > payloads.
+> >
+> > I tried playing around with the good copy value such that ZC restricted=
+ itself to
+> > only lets say 32K payloads and above, and while it *does* work (with en=
+ough
+> > holes punched in), absolute t-put doesn=E2=80=99t actually go up, its j=
+ust that CPU utilization
+> > goes down a pinch. Not a bad thing for certain, but still not great.
+> >
+> > In fact, I found that tput actually went down with this path, even with=
+ ZC occurring
+> > successfully, as there was still a mix of ZC and non-ZC because you can=
+ only
+> > have so many pending at any given time before the copy path kicks in ag=
+ain.
+> >
+> >
+> >>
+> >>>>
+> >>>> This is no more performant, and in fact is actually worse since the =
+time spent
+> >>>> waiting on that memcpy to resolve is longer.
+> >>>>
+> >>>>>
+> >>>>>> as vhost_net does not set
+> >>>>>> SKBFL_DONT_ORPHAN.
+> >>>
+> >>> Maybe we can try to set this as vhost-net can hornor ulimit now.
+> >
+> > Yea I tried that, and while it helps kick things further down the stack=
+, its not actually
+> > faster in any testing I=E2=80=99ve drummed up.
+> >
+> >>>
+> >>>>>>
+> >>>>>> Orphaning enforces a memcpy and triggers the completion callback, =
+which
+> >>>>>> increments the failed TX counter, effectively disabling zerocopy a=
+gain.
+> >>>>>>
+> >>>>>> Even after addressing these issues to prevent SKB orphaning and er=
+ror
+> >>>>>> counter increments, performance remains poor. By default, only 64
+> >>>>>> messages can be zerocopied, which is immediately exhausted by work=
+loads
+> >>>>>> like iperf, resulting in most messages being memcpy'd anyhow.
+> >>>>>>
+> >>>>>> Additionally, memcpy'd messages do not benefit from the XDP batchi=
+ng
+> >>>>>> optimizations present in the handle_tx_copy path.
+> >>>>>>
+> >>>>>> Given these limitations and the lack of any tangible benefits, rem=
+ove
+> >>>>>> zerocopy entirely to simplify the code base.
+> >>>>>>
+> >>>>>> Signed-off-by: Jon Kohler <jon@nutanix.com>
+> >>>>>
+> >>>>> Any chance we can fix those issues? Actually, we had a plan to make
+> >>>>> use of vhost-net and its tx zerocopy (or even implement the rx
+> >>>>> zerocopy) in pasta.
+> >>>>
+> >>>> Happy to take direction and ideas here, but I don=E2=80=99t see a cl=
+ear way to fix these
+> >>>> issues, without dealing with the assertions that skb_orphan_frags_rx=
+ calls out.
+> >>>>
+> >>>> Said another way, I=E2=80=99d be interested in hearing if there is a=
+ config where ZC in
+> >>>> current host-net implementation works, as I was driving myself crazy=
+ trying to
+> >>>> reverse engineer.
+> >>>
+> >>> See above.
+> >>>
+> >>>>
+> >>>> Happy to collaborate if there is something we could do here.
+> >>>
+> >>> Great, we can start here by seeking a way to fix the known issues of
+> >>> the vhost-net zerocopy code.
+> >>>
+> >>
+> >> Happy to help here :).
+> >>
+> >> Jon, could you share more details about the orphan problem so I can
+> >> speed up the help? For example, can you describe the code changes and
+> >> the code path that would lead to that assertion of
+> >> skb_orphan_frags_rx?
+> >>
+> >> Thanks!
+> >>
+> >
+> > Sorry for the slow response, getting back from holiday and catching up.
+> >
+> > When running through tun.c, there are a handful of places where ZC turn=
+s into
+> > a full copy, whether that is in the tun code itself, or in the interrup=
+t handler when
+> > tun xmit is running.
+> >
+> > For example, tun_net_xmit mandatorily calls skb_orphan_frags_rx. Anythi=
+ng
+> > with frags will get this memcpy, which are of course the =E2=80=9Cjuicy=
+=E2=80=9D targets here as
+> > they would take up the most memory bandwidth in general. Nasty catch22 =
+:)
+> >
+> > There are also plenty of places that call normal skb_orphan_frags, whic=
+h
+> > triggers because vhost doesn=E2=80=99t set SKBFL_DONT_ORPHAN. That=E2=
+=80=99s an easy
+> > fix, but still something to think about.
+> >
+> > Then there is the issue of packet sockets, which throw a king sized wre=
+nch into
+> > this. Its slightly insidious, but it isn=E2=80=99t directly apparent th=
+at loading some user
+> > space app nukes zero copy, but it happens.
+> >
+> > See my previous comment about LLDPD, where a simply compiler snafu caus=
+ed
+> > one socket option to get silently break, and it then ripped out ZC capa=
+bility. Easy
+> > fix, but its an example of how this can fall over.
+> >
+> > Bottom line, I=E2=80=99d *love****** have ZC work, work well and so on.=
+ I=E2=80=99m open to ideas
+> > here :) (up to and including both A) fixing it and B) deleting it)
+>
+> Hey Eugenio - wondering if you had a chance to check out my notes on this=
+?
+>
 
-So what you are looking for is a standard way to "tunnel" SDIO over some
-other physical transport, right?  If so, then yes, please use Greybus as
-that is exactly what it was designed for.
+Sorry I thought I was going to have the code ready by now :). I'll
+need more time to go through the items.
 
-If there is a throughput issue with the sdio implementation on Greybus,
-we can address it by fixing up the code to go faster, I don't recall
-there ever being any real benchmarking happening for that protocol in
-the past as the physical layer that we were using for Greybus at the
-time (MIPI) was very fast, the bottleneck was usually either the host
-controller we were using for Greybus, OR on the firmware side in the
-device itself (i.e. turning Greybus packets into SDIO commands, as SDIO
-was pretty slow.)
-
-thanks,
-
-greg k-h
 
