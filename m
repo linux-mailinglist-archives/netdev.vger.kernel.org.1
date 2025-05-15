@@ -1,90 +1,114 @@
-Return-Path: <netdev+bounces-190837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02B3DAB9098
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 22:12:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 16F5EAB90BF
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 22:23:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EF5657B72CF
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 20:11:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E6BA67B9038
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 20:22:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C31E28032E;
-	Thu, 15 May 2025 20:12:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E411297A48;
+	Thu, 15 May 2025 20:23:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eVlfuHKg"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="btcSmajs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14F4E282F1;
-	Thu, 15 May 2025 20:12:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E281F5827
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 20:23:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747339970; cv=none; b=UUcVm54BwOGn4+jLULYBQ3jkG16Af3i9ZiXYR76cn0nGQeMz2U/l9/l8bAt4qlGAvcOciaDOucZV+IDKjfyJKKuEjtxtoLg1p6hy3+XXod6WyJ/QAHQ12LXXjWOCBw1Bhc1oBeSqG5VJPVMTRHwU5QjDvTxogXPITLfwmSEtQKA=
+	t=1747340602; cv=none; b=SfdUavicCjfpkdAmPj0gU33hAI+g9dL8kiafQn+eYE8cChcmeXDaOqX9iAPXsz2Lrnn+9e/PBiigJDEVXN0bQM7x4SSwPeuMdOQmrTwoVrP/hBVXdyx8GW4LkcXPNJmwRH74OJVtOzaszRf0Q/XJgZnndjoSN2MQgOERHuqR9TQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747339970; c=relaxed/simple;
-	bh=fGPTYiA6cdbBydyA22vKFEs2piBzXgBhEu5Frcpbros=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j2YeV/wb4rph7TsBhYB6OWNNk96llTJ47I7OmW2U9fH/Fv/FAYec3vb3RQ0Vb7b35yZ4ej9vuBMVM++KDriJT9tuOMswlM01nn8vuad9g7bo3Z4HFiXd99j2GD4R/9n2gkXNb9s2xx764FingfcHkmnaqLBhNBAqbRWKk36rdJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eVlfuHKg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E22F1C4CEE7;
-	Thu, 15 May 2025 20:12:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747339969;
-	bh=fGPTYiA6cdbBydyA22vKFEs2piBzXgBhEu5Frcpbros=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eVlfuHKgjAfU5NWY8AgjXLeWjafxAwEFhJBl5HWk1jgr7/FqCdrcDoxZ5UpRTrIVx
-	 tFOeGFiM0DfmxTyQbGMKHB/5Lg0mpryUEwoTQMVe/dx5w0m/bkNV94/HxC1RRzHNg7
-	 OabmtMEN2j/tIV+ugY/gBAe6F+9Qmb+YpJ3vKYOug9Eu3adVO43emVVAXRhQ0dQD2c
-	 sRSLixA8n+IvpBFntjGRERkUn3e7eg2k1JbSRCF7kugaoCcadw8vdLRG1M1vZyLVAi
-	 lhsvKhbttP/uvfXmt3MUTcSklnUou90moJEaYY4jKLScbZsQRNagW3+Q4XfM9mfZL0
-	 RCIw2ZZXatXbA==
-Date: Thu, 15 May 2025 13:12:47 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: netdev@vger.kernel.org, Bernard Metzler <bmt@zurich.ibm.com>,
-	linux-nvme@lists.infradead.org, linux-sctp@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Sagi Grimberg <sagi@grimberg.me>, Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH net-next 04/10] RDMA/siw: use skb_crc32c() instead of
- __skb_checksum()
-Message-ID: <20250515201247.GM1411@quark>
-References: <20250511004110.145171-1-ebiggers@kernel.org>
- <20250511004110.145171-5-ebiggers@kernel.org>
- <69341806-3ffd-41f0-95d6-6c8b750a6b45@acm.org>
+	s=arc-20240116; t=1747340602; c=relaxed/simple;
+	bh=Tvl1iNUGoNbwalwLjgpcUBbpXAppxjHmnq/XKVQjV90=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rUqW47OQTTI5cikrCLgkeBUWfO4OL4keHs798xf1XAwr70gLd5vbMX+TRi8rCsV1R58S4q9zB5aXgvmPKpo8NHHhs3LnTd5QH9G1xkyRBAA0F0mE4LGA5meQK+rKRwQj1FjC2A9LTRAGeXZ5slbbz4drfVoEb+9JQJx1w3CddE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=btcSmajs; arc=none smtp.client-ip=52.95.48.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1747340600; x=1778876600;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=G7jgEodxGJ127OX2WRlI+Ltm9Hx+FvAecevXs1xAvFE=;
+  b=btcSmajspS8NxjKKFr25+Ev/st2OQJiIX+R1NmFDyqAaqJnPK64h5PUR
+   94gWwB3nI83qNgx4DGvFocmpHDaXNF5LSY/gp8To6H1GmGHHnfVTuJPYa
+   zhp9y115LPjNHhr26l5YxQ8zpaqaQNuHg1au56H0vT8NBv+cKx+uiSIJh
+   rvtNdxZENH99OeLJ1fJOY7ETRYt1qx6nZ2W7Ad54Up/tLSo/g9K6FOsiS
+   G6P0Zr57Uqlzltj5KSVofNR2BPcn2spSs9wAD491ivc/4Z3Y71R3Kx6LM
+   7PMIZgJQYwYGpwI4gLlON3p39Re7kHBGHICplz+xUiKl/quf9xPzv0MhF
+   g==;
+X-IronPort-AV: E=Sophos;i="6.15,292,1739836800"; 
+   d="scan'208";a="490455187"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2025 20:23:16 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:62048]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.3.83:2525] with esmtp (Farcaster)
+ id 733e5be9-f112-4099-990e-845ffb5be8a2; Thu, 15 May 2025 20:23:15 +0000 (UTC)
+X-Farcaster-Flow-ID: 733e5be9-f112-4099-990e-845ffb5be8a2
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 15 May 2025 20:23:15 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.187.170.35) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 15 May 2025 20:23:12 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <willemdebruijn.kernel@gmail.com>
+CC: <brauner@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<horms@kernel.org>, <kuba@kernel.org>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<willemb@google.com>
+Subject: Re: [PATCH v3 net-next 1/9] af_unix: Factorise test_bit() for SOCK_PASSCRED and SOCK_PASSPIDFD.
+Date: Thu, 15 May 2025 13:23:01 -0700
+Message-ID: <20250515202304.82187-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <68262d4ab643_25ebe529488@willemb.c.googlers.com.notmuch>
+References: <68262d4ab643_25ebe529488@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <69341806-3ffd-41f0-95d6-6c8b750a6b45@acm.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D035UWB001.ant.amazon.com (10.13.138.33) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Thu, May 15, 2025 at 01:02:20PM -0700, Bart Van Assche wrote:
-> On 5/10/25 5:41 PM, Eric Biggers wrote:
-> > Instead of calling __skb_checksum() with a skb_checksum_ops struct that
-> > does CRC32C, just call the new function skb_crc32c().  This is faster
-> > and simpler.
-> Bernard, since you are the owner and author of the siw driver, please help
-> with reviewing this patch.
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Thu, 15 May 2025 14:07:06 -0400
+> Kuniyuki Iwashima wrote:
+> > Currently, the same checks for SOCK_PASSCRED and SOCK_PASSPIDFD
+> > are scattered across many places.
+> > 
+> > Let's centralise the bit tests to make the following changes cleaner.
+> > 
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > ---
+> >  net/unix/af_unix.c | 37 +++++++++++++++----------------------
+> >  1 file changed, 15 insertions(+), 22 deletions(-)
+> > 
+> > diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> > index 2ab20821d6bb..464e183ffdb8 100644
+> > --- a/net/unix/af_unix.c
+> > +++ b/net/unix/af_unix.c
+> > @@ -765,6 +765,14 @@ static void copy_peercred(struct sock *sk, struct sock *peersk)
+> >  	spin_unlock(&sk->sk_peer_lock);
+> >  }
+> >  
+> > +static bool unix_may_passcred(const struct sock *sk)
+> > +{
+> > +	struct socket *sock = sk->sk_socket;
 > 
-> Eric, do you already have a test case for the siw driver? If not,
-> multiple tests in the blktests framework use this driver intensively,
-> including the SRP tests that I wrote myself. See also
-> https://github.com/osandov/blktests.
+> Also const?
 
-No.  I'll try that out when I have a chance.
-
-If the developers/maintainers of the driver could help test it, that would be a
-lot easier though.  I've been cleaning up the CRC calls across the whole kernel,
-and it gets time-consuming when individual subsystems insist on me running their
-custom test suite(s) and providing subsystem-specific benchmarks.
-
-- Eric
+yes, but this part is removed in patch 6, so I'd leave as is :)
 
