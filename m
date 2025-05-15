@@ -1,122 +1,122 @@
-Return-Path: <netdev+bounces-190841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EF3EAB90E6
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 22:40:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79B3FAB90F3
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 22:50:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2FDA1BC6260
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 20:40:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6254F4A8370
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 20:50:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D71729B77F;
-	Thu, 15 May 2025 20:39:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76DD7212FAA;
+	Thu, 15 May 2025 20:50:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="b6ESvTV7"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="hpl8gnEt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B309297A48
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 20:39:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E073E1F9A8B
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 20:50:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747341550; cv=none; b=FkRCwSLvlaLg7RW51YA7fCsGsq/kciKAMzcIgRjS1PzoHsdgYxAYWRJoav/dLS8iHXOsnScQ//H6hn4jbzrv0y0A4tPtT8l/2IWorY0OnFbzhij25cPlQIKDqIoYBA/9hJ877kPUsOLA1A1DPut5CI7HAPtFkY1LulDFWtTRWCg=
+	t=1747342237; cv=none; b=phCcuGvLG3O8mRuP52a63mgO7UiLqKk3VUCBZ5zX2bsuAJNfOQDkUjeCPu+WkRRRcfF55e6GyKfVZmGvsq347tMJwEyzPUtpEtc3WHJyapsxsFflYP4ZUYTx4FGVN0vrj0inYD0uYjsNkd0+9M4PI8xMuXRHwhENNzP3dF0/FH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747341550; c=relaxed/simple;
-	bh=5LvY5tzl6OpWTrPnPisYnQ8qd/DVKQU7fKCXD1M2VvE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SBM38s64+cZe0MAWeL0Usmw1BokSAuA7x508J5PlILPNxx88NHLu6u0IwYpuD0EgrxsC5T1YE4AkR87tRndoNWlSlKP0Bw9Nm89BJGAe8WDK8RJcOC1RiJhIF9ZYPwV1IV+N4JHNrxmw/pFvrcihhoilBeomR/zj1AApQqRvHiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=b6ESvTV7; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-30effbfaf61so16386611fa.0
-        for <netdev@vger.kernel.org>; Thu, 15 May 2025 13:39:08 -0700 (PDT)
+	s=arc-20240116; t=1747342237; c=relaxed/simple;
+	bh=avsKp5uOY2zyX+tMIonJ9qGA1CWiEn8pjPgNT4c7Ol8=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=I0PycldFggdY6bq/PM/RtB8rwmcr/fiXfMZATSaEnFHNHzv7tJVcgdbSakNO655SdhoIKq1MTayJ68yh5/qJ7Cp0TA3QgnMlPveGzMkaBixFPxkz2AQjf0ESsEEUaXpm052QcQb82cToSdfMzU/RKO4y8HSuyRkdZqoXcXEpa0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=hpl8gnEt; arc=none smtp.client-ip=207.171.188.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1747341546; x=1747946346; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RGd89Ij3ihsDUANJWKDVjCfRrcPwOEzhW7E9noIOuHY=;
-        b=b6ESvTV7b+mx9WOGCBbnI+Gmhu2CiawJBWgBsr01xFolu9J1NEjBhJwOGuaIKoz/gu
-         Xk3qPqpqoAWcFYg8l3u8/WKOjmq/DMFS+6mjw4aQzlOLLvpxart+4gyGyMCwJWRt9V9j
-         dPJX5Mc+sanynPvgnfGxCyIFQha1qpFrJ7ciU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747341546; x=1747946346;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RGd89Ij3ihsDUANJWKDVjCfRrcPwOEzhW7E9noIOuHY=;
-        b=Omh//o41yVvKCOACEitqa2b3SfTFmQTefAn8SOgZheU3N6zg7MJLZGQiT3fuqE1Gqh
-         OgLwr4W4LFB3KQKMmgH+IWn+83xHPUOKcMOlkkP8pM4sjiJ10jvgP+Ll5WNInKRRbUSl
-         7kgKSfpj/mIOY6lcBp5BR8C10D6vpmklv+JE+w4a1PXboMqPCW1flcMMB4SQqjN1nhw2
-         4zlRFynwZHxVniGuGRIelksRU15/EPJojSYJJzJJ1N19gzLyX16S+pOOdIyzD/VvixI6
-         6+WqbyoZwHz7a1L6jmKYTreRdNskvNR5Txsn5epE2AuZreJ3xDaEZSc8tyFy+G3mpcz+
-         JNlw==
-X-Forwarded-Encrypted: i=1; AJvYcCXGgUQz1/N+tVH4xUjbLYlUKO2OIixD4z81hGTGay+7pvMWNob0vkofIWfiR7a0seqEoA8pmEk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/s9yUBO0IWqW1v7E+Q9HmkFSMjOVtv6zVV21BrO53Ov8w5Z5w
-	C65WZeHmRdkkWIbPtbz4QccH9MWc78Me//uw3PntvzMWRroSbBbtDbiOCGRaxmUbRlWCVeXncs2
-	ChATD7g+lMeyhHzhJPF07dQz/gKYMXJz4S/oOVu+n
-X-Gm-Gg: ASbGncsCWlQyja7zStx81YmQI+t4pc2FYnAnKqADyeL51W4rYpBNhPKE0yp1YyykZV6
-	XI/9nM+j7D1ZJu51E9Ri30x1fhaMlpNSpwYhWKLP2pdAWUqo4w6f74rp0jams2tMR8w40huGe2X
-	jyl/oGBOgVjUyW91wZhRHBhcKbJQin/EhjVQ==
-X-Google-Smtp-Source: AGHT+IFEpyU1SVPtYkgJNaWkDU3vfROG0brtMk2c/tj0jWAjvmdg/YHiXLPyCBT0NU9510I+dsh+53qxgZ3Rtnmi/rE=
-X-Received: by 2002:a2e:b8c5:0:b0:30b:fc3a:5c49 with SMTP id
- 38308e7fff4ca-327f8484b1amr20578561fa.9.1747341546527; Thu, 15 May 2025
- 13:39:06 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1747342237; x=1778878237;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=k8WVyajH9ZdL6ShYY1kYCOWWdR5Q6+o96QLFXMb+Hx8=;
+  b=hpl8gnEtRpTm9W+9TNdW0b6V8tfraJwWl1gTzRN0I3pQeN9hQ7UUYaj5
+   Ue6ckwrE7ubB9YrLeWAJUoTVprPxP9Wp1iknTtZ1+uP7dDujZMW4GmIkf
+   NpDi9zCksbMQDAwkTqjlkf/mvyo0vRfwP1Nj4Zf5QSY/SW37i5ZTUb5Ao
+   57iHNU0l1Bfy7LOX5GuQlXO3NnVPWLzTdu7pXidkknJxZxTxz3J+Umcxg
+   kkQ0dPnljmsV4dsABDWfjnFVKuJmGXt9dAVwAerVw/GyiB5E0VG9Zc3Wt
+   tCUTO3FP4JLiAOzM5arA/R5L3Kcy7mJfjHzzVrSC+ET46n/PhTFEa0B8a
+   w==;
+X-IronPort-AV: E=Sophos;i="6.15,292,1739836800"; 
+   d="scan'208";a="20216963"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2025 20:50:30 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:6935]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.11.48:2525] with esmtp (Farcaster)
+ id a404ff2a-0915-4870-a709-cd40a6c1c8c3; Thu, 15 May 2025 20:50:29 +0000 (UTC)
+X-Farcaster-Flow-ID: a404ff2a-0915-4870-a709-cd40a6c1c8c3
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 15 May 2025 20:50:26 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.187.170.35) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 15 May 2025 20:50:23 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <willemdebruijn.kernel@gmail.com>
+CC: <brauner@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<horms@kernel.org>, <kuba@kernel.org>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<willemb@google.com>
+Subject: Re: [PATCH v3 net-next 9/9] selftest: af_unix: Test SO_PASSRIGHTS.
+Date: Thu, 15 May 2025 13:50:08 -0700
+Message-ID: <20250515205016.90052-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <6826401ac346c_25ebe5294c3@willemb.c.googlers.com.notmuch>
+References: <6826401ac346c_25ebe5294c3@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250513210504.1866-1-ronak.doshi@broadcom.com> <20250515070250.7c277988@kernel.org>
-In-Reply-To: <20250515070250.7c277988@kernel.org>
-From: Ronak Doshi <ronak.doshi@broadcom.com>
-Date: Thu, 15 May 2025 13:38:49 -0700
-X-Gm-Features: AX0GCFu6WRwaZwKs1VmGpZoHM3Ug86kZLV0H4pZQIn-f-tFF39RhsCaq2N2sM6g
-Message-ID: <CAP1Q3XQcPnjOYRb+G7hSDE6=GH=Yzat_oLM3PMREp-DWgfmT6w@mail.gmail.com>
-Subject: Re: [PATCH net] vmxnet3: correctly report gso type for UDP tunnels
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	Guolin Yang <guolin.yang@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D045UWA001.ant.amazon.com (10.13.139.83) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Thu, May 15, 2025 at 7:02=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Tue, 13 May 2025 21:05:02 +0000 Ronak Doshi wrote:
-> > +                             skb->encapsulation =3D 1;
-> >                       }
-> >                       WARN_ON_ONCE(!(gdesc->rcd.tcp || gdesc->rcd.udp) =
-&&
-> >                                    !(le32_to_cpu(gdesc->dword[0]) &
-> > @@ -1465,6 +1466,7 @@ vmxnet3_rx_csum(struct vmxnet3_adapter *adapter,
-> >                       if ((le32_to_cpu(gdesc->dword[0]) &
-> >                                    (1UL << VMXNET3_RCD_HDR_INNER_SHIFT)=
-)) {
-> >                               skb->csum_level =3D 1;
-> > +                             skb->encapsulation =3D 1;
->
-> IIRC ->encapsulation means that ->inner.. fields are valid, no?
-> And I don't see you setting any of these.
->
-> Paolo, please keep me honest, IIUC you have very recent and very
-> relevant experience with virtio.
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Thu, 15 May 2025 15:27:22 -0400
+> > @@ -227,10 +297,18 @@ void __send_fd(struct __test_metadata *_metadata,
+> >  		.msg_control = &cmsg,
+> >  		.msg_controllen = CMSG_SPACE(sizeof(cmsg.fd)),
+> >  	};
+> > -	int ret;
+> > +	int ret, saved_errno;
+> >  
+> > +	errno = 0;
+> >  	ret = sendmsg(self->fd[receiver * 2 + 1], &msg, variant->flags);
+> > -	ASSERT_EQ(MSGLEN, ret);
+> > +	saved_errno = errno;
+> > +
+> > +	if (variant->disabled) {
+> > +		ASSERT_EQ(-1, ret);
+> > +		ASSERT_EQ(-EPERM, -saved_errno);
+> > +	} else {
+> > +		ASSERT_EQ(MSGLEN, ret);
+> > +	}
+> 
+> Why is this errno complexity needed?
+> 
+> It should never be needed to manually reset errno.
+> 
+> Is the saved_errno there because ASSERT_EQ on ret could call a libc
+> function that resets errno?
 
-I did not hit any issues during Vxlan and Geneve tunnel testing. I did not =
-find
-the code which validates inner fields being set. Maybe I missed something. =
-If
-you and Paolo think inner fields are indeed required, then I will remove th=
-ese
-lines.
+I guess it's paranoid here.
 
-Thanks,
-Ronak
+When ASSERT_EQ() calls TH_LOG(), it always fails and does
+not reach the 2nd ASSERT_EQ().
+
+Will remove them.
+
+Thanks!
 
