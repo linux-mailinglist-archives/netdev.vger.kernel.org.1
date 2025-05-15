@@ -1,46 +1,65 @@
-Return-Path: <netdev+bounces-190678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31AD6AB8460
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 12:52:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 642EFAB8462
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 12:53:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B3BE1189766D
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 10:52:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76BFF9E4F6B
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 10:52:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24190297B8E;
-	Thu, 15 May 2025 10:51:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B9AD297B99;
+	Thu, 15 May 2025 10:52:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VxeJelsw"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF4DC2918F3;
-	Thu, 15 May 2025 10:51:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13C02224B04
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 10:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747306319; cv=none; b=QJ5zhL4lz3XFfSmtviZlbX5/jLm+wk7PDIzLlr5nY0lk4gH+pQTzUi19dbiqU5tWnVNK8c1ReNneRZNEugIkJRk6GMp0Hf8pM5Bnm3qeSC3EGP2rXdw+PSl/4qN4q7kYmHRdaAIlxcUvYmfwZFKIK2jqP21oatr1CcE8WuLhN68=
+	t=1747306378; cv=none; b=gpi/dU9adD4JaI1TbD7NGPWGTuIXs/CPVowt9b/6FQGs79iNIHVUWwYnhhmXbKIpvM3EL3BAM/AWwKJcf8wD+FI9NVRoeDZHsS+M0hSNf1kuf4OhU326HJo+hQbO0hRMCSdPBj17Z8COolwp9FEgpEaAIPZxixBa369qGMHVmhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747306319; c=relaxed/simple;
-	bh=rx3+JJqp4MLgy7PImSuLwHbfQSyVYK4T+tNucNa77no=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=vC9/S1uvUjJDPoYI/bxBx1lcXt5rNmCY86pBwx0cGqdZKs/Oq49xLp/ulqYpqAqixMYurbkyChPCUAw0KiKUJ4hQ6D5ELZt+UbIwB66deyjcaToWyjG2sVWfPUBrX1kWUlGa+A2t44bRmNGrwWtiBiwofIyuTLQoZy9CgT2hX8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Zyn6m4vYxz1DKYn;
-	Thu, 15 May 2025 18:50:24 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1E9DA1402EA;
-	Thu, 15 May 2025 18:51:52 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 15 May 2025 18:51:51 +0800
-Message-ID: <5b8d45e2-27bb-4294-9e89-b8d4866cb295@huawei.com>
-Date: Thu, 15 May 2025 18:51:50 +0800
+	s=arc-20240116; t=1747306378; c=relaxed/simple;
+	bh=ovFJnUrpIEp4+ba9a6q5iRMCX72A5K+Jk4wxyKuysrw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cuKdWIs6Pax9O1bkrXS1tEpX2uvlfs2FmksYiUEzVjGI+xy2sXZMW/WTnufOe9hufRs+QEjxsirfv6Tcp2yHcwyhxsRd3gigcC/s6VnmtTfxpJ+KWk56/Ld7iMSD6uc7tIOOKd/43Nad6XfbT22oug5pazhBY4VjExmhmck3aoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VxeJelsw; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747306378; x=1778842378;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=ovFJnUrpIEp4+ba9a6q5iRMCX72A5K+Jk4wxyKuysrw=;
+  b=VxeJelswaxEVZ9QUbzOMvCrE3FIV29/SS/5fUpWnuX0BC920lk8tjlK5
+   HVtBPvlfSe5ubpwbgZfkyR5q9oFf92D6Fit5qGALR0Y8+76pG8spJfgwj
+   cALel6FGu8UAl/DKu4kBVy09z5Ri7y0I2JG8XXWh0shPEBqTpratvyDEp
+   MkzrTF1nnRWTgVtDnDnCY/dVW6HKvGuGbMv4cNgKIHWJbFsh4symU8ym4
+   f3Xz75szHWJn6Mh0U6R2ooDvQOHHRxv6Stz22Ta1qGMVA6byxp1Pssckz
+   D6ajyud7GJLnIJnheI7fn3FDyK4zflvWgIRzHnjON1ax9C7ecBi4cs+xC
+   Q==;
+X-CSE-ConnectionGUID: 5UAtxkyAQd2Qz5UzSj4EUw==
+X-CSE-MsgGUID: JYUSK0OURnKVBYqFHDf/1g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11433"; a="66641232"
+X-IronPort-AV: E=Sophos;i="6.15,290,1739865600"; 
+   d="scan'208";a="66641232"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2025 03:52:57 -0700
+X-CSE-ConnectionGUID: vXcliIivSTyFGvZjGVwE8A==
+X-CSE-MsgGUID: roBxfZv1TSCgUz6qCwmjGw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,290,1739865600"; 
+   d="scan'208";a="139234033"
+Received: from mszapar-mobl1.ger.corp.intel.com (HELO [10.245.119.244]) ([10.245.119.244])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2025 03:52:55 -0700
+Message-ID: <c13179c7-74e2-4843-a052-571f6f0c033d@linux.intel.com>
+Date: Thu, 15 May 2025 12:52:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,72 +67,60 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
-	<shenjian15@huawei.com>, <wangpeiyang1@huawei.com>, <liuyonglong@huawei.com>,
-	<chenhao418@huawei.com>, <jonathan.cameron@huawei.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net 2/2] net: hibmcge: fix wrong ndo.open() after reset
- fail issue.
-To: Jakub Kicinski <kuba@kernel.org>
-References: <20250430093127.2400813-1-shaojijie@huawei.com>
- <20250430093127.2400813-3-shaojijie@huawei.com>
- <20250501072329.39c6304a@kernel.org>
- <743a78cc-10d4-45f0-9c46-f021258b577d@huawei.com>
- <20250514090808.2ae43183@kernel.org>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20250514090808.2ae43183@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next 1/2] ice: add link_down_events
+ statistic
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+References: <20250409113622.161379-2-martyna.szapar-mudlaw@linux.intel.com>
+ <20250409113622.161379-4-martyna.szapar-mudlaw@linux.intel.com>
+ <55ae83fc-8333-4a04-9320-053af1fd6f46@molgen.mpg.de>
+ <4012b88a-091d-4f81-92ab-ad32727914ff@linux.intel.com>
+ <355fc4f1-0116-4028-a455-ec76772f19b3@molgen.mpg.de>
+Content-Language: en-US
+From: "Szapar-Mudlaw, Martyna" <martyna.szapar-mudlaw@linux.intel.com>
+In-Reply-To: <355fc4f1-0116-4028-a455-ec76772f19b3@molgen.mpg.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 
-on 2025/5/15 0:08, Jakub Kicinski wrote:
-> On Wed, 14 May 2025 10:40:26 +0800 Jijie Shao wrote:
->> on 2025/5/1 22:23, Jakub Kicinski wrote:
->>> On Wed, 30 Apr 2025 17:31:27 +0800 Jijie Shao wrote:
->>>> If the driver reset fails, it may not work properly.
->>>> Therefore, the ndo.open() operation should be rejected.
->>> Why not call netif_device_detach() if the reset failed and let the core
->>> code handle blocking the callbacks?
->> If driver call netif_device_detach() after reset failed,
->> The network port cannot be operated. and I can't re-do the reset.
->> So how does the core code handle blocking callbacks?
->> Is there a good time to call netif_device_attach()?
+
+On 5/12/2025 11:27 AM, Paul Menzel wrote:
+> Dear Martyna,
+> 
+> 
+> Thank you for your reply.
+> 
+> Am 14.04.25 um 15:12 schrieb Szapar-Mudlaw, Martyna:
+> 
+>> On 4/9/2025 2:08 PM, Paul Menzel wrote:
+> 
+>>> Am 09.04.25 um 13:36 schrieb Martyna Szapar-Mudlaw:
+>>>> Introduce a new ethtool statistic to ice driver, `link_down_events`,
+>>>> to track the number of times the link transitions from up to down.
+>>>> This counter can help diagnose issues related to link stability,
+>>>> such as port flapping or unexpected link drops.
+>>>>
+>>>> The counter increments when a link-down event occurs and is exposed
+>>>> via ethtool stats as `link_down_events.nic`.
+>>>
+>>> It’d be great if you pasted an example output.
 >>
->> Or I need to implement pci_error_handlers.resume()?
->>
->>
->> [root@localhost sjj]# ethtool --reset enp132s0f1 dedicated
->> ETHTOOL_RESET 0xffff
->> Cannot issue ETHTOOL_RESET: Device or resource busy
->> [root@localhost sjj]# ethtool --reset enp132s0f1 dedicated
->> ETHTOOL_RESET 0xffff
->> Cannot issue ETHTOOL_RESET: No such device
->> [root@localhost sjj]# ifconfig enp132s0f1 up
->> SIOCSIFFLAGS: No such device
-> netdev APIs may not be the right path to recover the device after reset
-> failure. Can you use a PCI reset (via sysfs) or devlink ?
+>> In v2 (which I just submitted) the generic ethtool statistic is used 
+>> for this, instead of driver specific, so I guess no need to paste the 
+>> example output now.
+> 
+> I think it’s always good also as a reference how to test the patch. I 
+> just saw your v3. Should you resent, it’d be great if you added the 
+> example output.
+> 
+> […]
 
-PCI reset (via sysfs) can be used:
-[root@localhost sjj]# ethtool --reset enp132s0f1 dedicated
-ETHTOOL_RESET 0xffff
-Cannot issue ETHTOOL_RESET: No such device
-[root@localhost sjj]# echo 1 > /sys/bus/pci/devices/0000\:84\:00.1/reset
-[200643.771030] hibmcge 0000:84:00.1: reset done
-[root@localhost sjj]# ethtool --reset enp132s0f1 dedicated
-ETHTOOL_RESET 0xffff
-Cannot issue ETHTOOL_RESET: No such device
+Done in v4 updated cover letter.
 
-So, I need call netif_device_attach() in pci_error_handlers.reset_done() ?
-
-In this scenario, only PCI reset can be used, which imposes significant restrictions on users.
-
-Thanks,
-Jijie Shao
-
-  
+> 
+> 
+> Kind regards,
+> 
+> Paul
 
 
