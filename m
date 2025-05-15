@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-190690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2F56AB849A
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 13:15:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2029AB849E
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 13:15:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A8047A8631
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 11:13:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 542ED1BC1D4A
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 11:15:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF7E6298C1F;
-	Thu, 15 May 2025 11:14:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96BDA298C2F;
+	Thu, 15 May 2025 11:14:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="TrGeVJ3p"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="gYXOFKNm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EDF8298C14
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 11:14:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DB202989BA
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 11:14:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747307675; cv=none; b=Yt3AXBMzcinWYiKRExXLEOpVmCIN5RL4Klf7xuGUgyCViOC38C+K3cPtXoFpN1yBZVnDEvryO/he1yVuE6/qCSjzzCgTTEuPJ4TqlQKm2u03gfa4NH7QAMp7JW172rZgIGTTTuDixuUPOcn3yq6vXbbduL0eXmTV+EUou164r5w=
+	t=1747307676; cv=none; b=b/dKX2+16QbUtcmnoZlmysfC3FgGCtIoS7ck9H09NMeepui0yBQQyDA1+HBezk5+tZa2witPbCmYOO6mqkMDzGWVtF8e23ktE8zS7nzlvcaK/hLAb5+Tndjo7A+PiGkkIPEjoEM7QeDsBhJBgSgdn99ZmcBem2yKCk97ODz/yCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747307675; c=relaxed/simple;
-	bh=KLg9PbqTE2osO5nDPT9TSoefHmidLJnAfLOurHu0c7M=;
+	s=arc-20240116; t=1747307676; c=relaxed/simple;
+	bh=zoFd6yM2jO4l5buq2BxdCOcGr33b+h3WWROBWfiOUHs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=s288jhn15JUnHfcjt12VDEflDu2edVwgY4toTGMTuAf8aoLhQ1fBxxbe3LYGXJEEz0Oq0tPtDysnsTkKSajWLcUAECQGyTLyaEZfBXw5jS2z4anOm28DJ9PdV/6bOf/sE7ZzGjLwNt5o2VNn0useNPgTnRGvAmEL9ld3Whi0pEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=TrGeVJ3p; arc=none smtp.client-ip=209.85.128.44
+	 MIME-Version; b=gihapu1FGcy2CmD+f3QlTsAc+voqwYjLRWQtbpZNHP+g1Zmi4stc4A6syZgQzEHN5xID9tj7+Ib0/HoLsOwgdmiUGW3HUVLhBWRoX7cmFY+Az3riSGt3VQY/rwM4+GAl7amKZDaOccMhyVCi+BI+zTNaE64cOyv5SDu3iqAfQiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=gYXOFKNm; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-442ccf0e1b3so9823305e9.3
-        for <netdev@vger.kernel.org>; Thu, 15 May 2025 04:14:33 -0700 (PDT)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-43cf06eabdaso7574245e9.2
+        for <netdev@vger.kernel.org>; Thu, 15 May 2025 04:14:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1747307671; x=1747912471; darn=vger.kernel.org;
+        d=openvpn.net; s=google; t=1747307672; x=1747912472; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=R3z6EIG7WwyH4DMs3KBFF5OpR2FOeKdf6UzQp70TJxA=;
-        b=TrGeVJ3pEfAAk5AAov5yhfnJU4gXxgCJeHbZa4SzmO2p/IFEUSKp4feMgnHQYOvdbY
-         qzgC9RUonM3VM1eejtsiq23aUQeNl429NLjxDVpQsJ0zNI0hRlT8iCZRmRovU1Amf+Ur
-         JZ1I4traCtj6BDsRVQY1Jlh/l2DNA58RyGpen/fQLda22gbHvtKvKq5UGW8NRWdn4b8W
-         ZwZxw83AJ3bFDZXzSYRyBo6RraJdFJArJGMPmYphcrOBedPMeOzYesGyB7lRXoA+VC2V
-         GSQ7by3KZqzLD7GQhbQUB7TVR1X5surQ1L3iOKdsj36I89xOFGqxRYLHs2LoGt0Pc5tV
-         b1RA==
+        bh=HPGy+GjHeYV+uwN6tyXbPz06AQDovozMZ+Px2Wp1mjQ=;
+        b=gYXOFKNmfal9p05gUr7MKGd4Kc8H2THiYjreOzUnWKsxvwyad399USbQQTJeBn2D6t
+         miakzZD0O02ofZeM58GKa++8gAnGKjImNBi1OG7bY/o6BwBPiGwEUAYWUOLv1wCLr6F9
+         SoCNLHBr22qJHTmg/cKhaJ0ghs+8lhoV4KZwpguQG/YDYQCq2hLvZrWt3LmqIPXk5eG8
+         8NVzf0ecfVlQGfqo5X3ovSYPBqV8j66Nn34h5hm0qbDWIZ/CYcsheLk8iI/3JMjqPndB
+         oHUSPuGGNyVKHUyJC2bhcputFKlMx0TzV8x3KYfI1JAJe636LHkU48LLx4cFor5jc/Fy
+         gn+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747307671; x=1747912471;
+        d=1e100.net; s=20230601; t=1747307672; x=1747912472;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=R3z6EIG7WwyH4DMs3KBFF5OpR2FOeKdf6UzQp70TJxA=;
-        b=v3kaoP//A/qHNNohiKuEhOLbIOLJy7bGN5ynk3rd1dBiDWWpEVEXcxwYpX2bYRMDw9
-         lcOF5rC+xoiaZ0IOpaPNkW/pIu7AjEH4l/2za5HgpqdWzFo5JoUIIgUITHlPPVQ/ivo9
-         Va0QE2wWPugc4qNhJ6B4TzklJaaH6WSKnhdO4LcuayrUaf/3uIQlQX3yAbWe6l60FVse
-         fCPNDHOHvYRXEfUn1g0YOK6CRNC1uuImH2s8R938Cs9QrUWz1jAIZHy7np/YcZPrTxE2
-         6Xnkcq+xmm/8SxcDjNDILB6PsSX10Nj9V9rI9cHA6N/Ntb2sFnw76zkRmFvup6m/U/5M
-         RI8w==
-X-Gm-Message-State: AOJu0YxHtzsiGIrCZeLbL7bTQF6itkgMFNrTu4O5gnaKCq3Y21NP24ml
-	MrkJvX9zHy/0qkvblYH/Y7WAHeQok7M93aLU+qRIqAanuV8t5q5QMmFkVg1/NDHHou/wmoyoTSK
-	a/j3dPZeCzCuUc10dAxpkb48ORya5Ne3rR6zpZ26SP3CwRFDNQP3e2y3Daui6
-X-Gm-Gg: ASbGnctxK21X9g7fucvX/gt9qQV+8Ls4ALvDmiceFBGJZW7FOvr1Ncy37wHTD14oyhg
-	BYlIi32c+Yq1NUDBhK5P8SCYNo2dAInbJIRWWBwPdujngZVj4YR/MI+1Qx58YH0Nfr7dilmQBLD
-	G12lqoGnHupmaEXcZX8c3cqMhKsoSk7Vvl6Ab5s1Lo4K1f5mcSekXqnhd3BrISIzbfc2m117HDa
-	kpj25xdvQwhgb4sKML6LUDUhSigoXGQzEwx2XY+CTlKlGdFwBHm2QXGrbMufUDk3sE7lGJzrAd9
-	76v/T0QLwfi1hMKzFvdTKb4hQDbrZpEvgsIO4NMlJibZ63srCd5MlDr2Ybyt0cblXbwelGgyUtA
+        bh=HPGy+GjHeYV+uwN6tyXbPz06AQDovozMZ+Px2Wp1mjQ=;
+        b=wLv41c5HboAK01UyIaUSaOjFu6xVqNT4yXvVY270DNJkxQMBLWTPUWqAMrr0Brqxg6
+         VuUKz60CFbIbaf0AxXguWjSZUnDrXx/9jTOj1zQ3JVaIV0MwS3HN43uYDseUc83wOe0z
+         idokcApvPLgHPgWF3Q4FgVVo6b0KUNNHb/x3l+vSnTH/AwbDDZrjqTCrRk++c1oHuWnE
+         RQtb1bsbeDYBZtTrAXKIE2mM97gTOq7UgQAqJebnkPRp+ueiBcoYrnTwA4LxMGC6P3xB
+         R9BNaIPW49BK7F413vl66RgJiBSwBOG2MYWydgkrV81j3cASCHiReCyew5YQlfDvwIQY
+         eiHg==
+X-Gm-Message-State: AOJu0YxpXWSNuU43C3lGT5xHrX/VIrckXFkYNxd2ejVncwE6+HxUdwWb
+	fW/9AcirefMBxU5krFIiEeaMmuTUoKQusCS8oQgYyiNVzL8roYDTdkpgK4O0KeIresg1OihMVIb
+	o6Ezcqlm9GCvBrk8FefwYf057t0u9tGuuk1BBfXk5vaC5zWKO580/JzU2C6iu
+X-Gm-Gg: ASbGncuSFnM6hTkJAJvesQQCaCzU3TD5+SjfA7zBw9G3Vk9+zc8Tx9nG3FwfQ3w5LVr
+	kcrTHw/s/Tziet6xpz8V+bHZ9LM7evWp10eXBBaWF5YCul1cjKahsn6WiIEnehgqCpYOWRsZD6Z
+	4V04DRTY0FnAEmicmm7NToTXX8BeW9xyujRlFTnER2p83PSgmEYotqPLRgCipe1PStzV/lfrMp1
+	oALNZ0Q5J40STfDzU/2gHyjcWMVzDJYkwZZokO9VfX2LQgOmat1mIui6hvfsJa1HRSSgknrxjoo
+	5uhVKoh/8zkPaxkbWe+ODp8l3DiTod4FRoKMuwq7sy0gSqV88Xo65Q7Cgx+NfM72bkOEjiqnjtY
 	=
-X-Google-Smtp-Source: AGHT+IGz72n1TAJH/qgLUff3a2qmzO5rKOYrAfHdEQ0e7va1Je6HD8ngbXY631TDUiT5c2CYw5l7kg==
-X-Received: by 2002:a05:600c:3d15:b0:441:b076:fce8 with SMTP id 5b1f17b1804b1-442f20e73e8mr69491515e9.14.1747307671288;
-        Thu, 15 May 2025 04:14:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE+x39KILGGktrk896qf0+d3nxcdk1EyB25AIC+pY777ASs2QrI5loXDoBXnqbtFajXnU3taQ==
+X-Received: by 2002:a05:600c:1da9:b0:43d:fa59:be39 with SMTP id 5b1f17b1804b1-442f971a7c1mr18641515e9.33.1747307672254;
+        Thu, 15 May 2025 04:14:32 -0700 (PDT)
 Received: from inifinity.homelan.mandelbit.com ([2001:67c:2fbc:1:d81f:3514:37e7:327a])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442f8fc4557sm24321435e9.6.2025.05.15.04.14.30
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442f8fc4557sm24321435e9.6.2025.05.15.04.14.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 May 2025 04:14:30 -0700 (PDT)
+        Thu, 15 May 2025 04:14:31 -0700 (PDT)
 From: Antonio Quartulli <antonio@openvpn.net>
 To: netdev@vger.kernel.org
 Cc: Antonio Quartulli <antonio@openvpn.net>,
@@ -80,9 +80,9 @@ Cc: Antonio Quartulli <antonio@openvpn.net>,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	sd@queasysnail.net
-Subject: [PATCH net-next 07/10] selftest/net/ovpn: extend coverage with more test cases
-Date: Thu, 15 May 2025 13:13:52 +0200
-Message-ID: <20250515111355.15327-8-antonio@openvpn.net>
+Subject: [PATCH net-next 08/10] ovpn: drop useless reg_state check in keepalive worker
+Date: Thu, 15 May 2025 13:13:53 +0200
+Message-ID: <20250515111355.15327-9-antonio@openvpn.net>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250515111355.15327-1-antonio@openvpn.net>
 References: <20250515111355.15327-1-antonio@openvpn.net>
@@ -94,162 +94,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-To increase code coverage, extend the ovpn selftests with the following
-cases:
-* connect UDP peers using a mix of IPv6 and IPv4 at the transport layer
-* run full test with tunnel MTU equal to transport MTU (exercising
-  IP layer fragmentation)
-* ping "LAN IP" served by VPN peer ("LAN behind a client" test case)
+The keepalive worker is cancelled before calling
+unregister_netdevice_queue(), therefore it will never
+hit a situation where the reg_state can be different
+than NETDEV_REGISTERED.
+
+For this reason, checking reg_state is useless and the
+condition can be removed.
 
 Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
 ---
- tools/testing/selftests/net/ovpn/Makefile      |  1 +
- tools/testing/selftests/net/ovpn/common.sh     | 18 +++++++++++++++++-
- tools/testing/selftests/net/ovpn/ovpn-cli.c    |  9 +++++----
- tools/testing/selftests/net/ovpn/test.sh       |  6 +++++-
- tools/testing/selftests/net/ovpn/udp_peers.txt | 11 ++++++-----
- 5 files changed, 34 insertions(+), 11 deletions(-)
+ drivers/net/ovpn/peer.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/net/ovpn/Makefile b/tools/testing/selftests/net/ovpn/Makefile
-index 2d102878cb6d..e0926d76b4c8 100644
---- a/tools/testing/selftests/net/ovpn/Makefile
-+++ b/tools/testing/selftests/net/ovpn/Makefile
-@@ -20,6 +20,7 @@ LDLIBS += $(VAR_LDLIBS)
- TEST_FILES = common.sh
- 
- TEST_PROGS = test.sh \
-+	test-large-mtu.sh \
- 	test-chachapoly.sh \
- 	test-tcp.sh \
- 	test-float.sh \
-diff --git a/tools/testing/selftests/net/ovpn/common.sh b/tools/testing/selftests/net/ovpn/common.sh
-index 7502292a1ee0..88869c675d03 100644
---- a/tools/testing/selftests/net/ovpn/common.sh
-+++ b/tools/testing/selftests/net/ovpn/common.sh
-@@ -11,6 +11,8 @@ ALG=${ALG:-aes}
- PROTO=${PROTO:-UDP}
- FLOAT=${FLOAT:-0}
- 
-+LAN_IP="11.11.11.11"
-+
- create_ns() {
- 	ip netns add peer${1}
- }
-@@ -24,15 +26,25 @@ setup_ns() {
- 			ip link add veth${p} netns peer0 type veth peer name veth${p} netns peer${p}
- 
- 			ip -n peer0 addr add 10.10.${p}.1/24 dev veth${p}
-+			ip -n peer0 addr add fd00:0:0:${p}::1/64 dev veth${p}
- 			ip -n peer0 link set veth${p} up
- 
- 			ip -n peer${p} addr add 10.10.${p}.2/24 dev veth${p}
-+			ip -n peer${p} addr add fd00:0:0:${p}::2/64 dev veth${p}
- 			ip -n peer${p} link set veth${p} up
- 		done
- 	fi
- 
- 	ip netns exec peer${1} ${OVPN_CLI} new_iface tun${1} $MODE
- 	ip -n peer${1} addr add ${2} dev tun${1}
-+	# add a secondary IP to peer 1, to test a LAN behind a client
-+	if [ ${1} -eq 1 -a -n "${LAN_IP}" ]; then
-+		ip -n peer${1} addr add ${LAN_IP} dev tun${1}
-+		ip -n peer0 route add ${LAN_IP} via $(echo ${2} |sed -e s'!/.*!!') dev tun0
-+	fi
-+	if [ -n "${3}" ]; then
-+		ip -n peer${1} link set mtu ${3} dev tun${1}
-+	fi
- 	ip -n peer${1} link set tun${1} up
- }
- 
-@@ -46,7 +58,11 @@ add_peer() {
- 					data64.key
- 			done
- 		else
--			ip netns exec peer${1} ${OVPN_CLI} new_peer tun${1} ${1} 1 10.10.${1}.1 1
-+			RADDR=$(awk "NR == ${1} {print \$2}" ${UDP_PEERS_FILE})
-+			RPORT=$(awk "NR == ${1} {print \$3}" ${UDP_PEERS_FILE})
-+			LPORT=$(awk "NR == ${1} {print \$5}" ${UDP_PEERS_FILE})
-+			ip netns exec peer${1} ${OVPN_CLI} new_peer tun${1} ${1} ${LPORT} \
-+				${RADDR} ${RPORT}
- 			ip netns exec peer${1} ${OVPN_CLI} new_key tun${1} ${1} 1 0 ${ALG} 1 \
- 				data64.key
- 		fi
-diff --git a/tools/testing/selftests/net/ovpn/ovpn-cli.c b/tools/testing/selftests/net/ovpn/ovpn-cli.c
-index c6372a1b4728..de9c26f98b2e 100644
---- a/tools/testing/selftests/net/ovpn/ovpn-cli.c
-+++ b/tools/testing/selftests/net/ovpn/ovpn-cli.c
-@@ -1934,7 +1934,8 @@ static void ovpn_waitbg(void)
- 
- static int ovpn_run_cmd(struct ovpn_ctx *ovpn)
- {
--	char peer_id[10], vpnip[INET6_ADDRSTRLEN], raddr[128], rport[10];
-+	char peer_id[10], vpnip[INET6_ADDRSTRLEN], laddr[128], lport[10];
-+	char raddr[128], rport[10];
- 	int n, ret;
- 	FILE *fp;
- 
-@@ -2050,8 +2051,8 @@ static int ovpn_run_cmd(struct ovpn_ctx *ovpn)
- 			return -1;
- 		}
- 
--		while ((n = fscanf(fp, "%s %s %s %s\n", peer_id, raddr, rport,
--				   vpnip)) == 4) {
-+		while ((n = fscanf(fp, "%s %s %s %s %s %s\n", peer_id, laddr,
-+				   lport, raddr, rport, vpnip)) == 6) {
- 			struct ovpn_ctx peer_ctx = { 0 };
- 
- 			peer_ctx.ifindex = ovpn->ifindex;
-@@ -2355,7 +2356,7 @@ int main(int argc, char *argv[])
+diff --git a/drivers/net/ovpn/peer.c b/drivers/net/ovpn/peer.c
+index a37f89fffb02..24eb9d81429e 100644
+--- a/drivers/net/ovpn/peer.c
++++ b/drivers/net/ovpn/peer.c
+@@ -1353,8 +1353,7 @@ void ovpn_peer_keepalive_work(struct work_struct *work)
  	}
  
- 	memset(&ovpn, 0, sizeof(ovpn));
--	ovpn.sa_family = AF_INET;
-+	ovpn.sa_family = AF_UNSPEC;
- 	ovpn.cipher = OVPN_CIPHER_ALG_NONE;
- 
- 	ovpn.cmd = ovpn_parse_cmd(argv[1]);
-diff --git a/tools/testing/selftests/net/ovpn/test.sh b/tools/testing/selftests/net/ovpn/test.sh
-index 7b62897b0240..e8acdc303307 100755
---- a/tools/testing/selftests/net/ovpn/test.sh
-+++ b/tools/testing/selftests/net/ovpn/test.sh
-@@ -18,7 +18,7 @@ for p in $(seq 0 ${NUM_PEERS}); do
- done
- 
- for p in $(seq 0 ${NUM_PEERS}); do
--	setup_ns ${p} 5.5.5.$((${p} + 1))/24
-+	setup_ns ${p} 5.5.5.$((${p} + 1))/24 ${MTU}
- done
- 
- for p in $(seq 0 ${NUM_PEERS}); do
-@@ -34,8 +34,12 @@ sleep 1
- 
- for p in $(seq 1 ${NUM_PEERS}); do
- 	ip netns exec peer0 ping -qfc 500 -w 3 5.5.5.$((${p} + 1))
-+	ip netns exec peer0 ping -qfc 500 -s 3000 -w 3 5.5.5.$((${p} + 1))
- done
- 
-+# ping LAN behind client 1
-+ip netns exec peer0 ping -qfc 500 -w 3 ${LAN_IP}
-+
- if [ "$FLOAT" == "1" ]; then
- 	# make clients float..
- 	for p in $(seq 1 ${NUM_PEERS}); do
-diff --git a/tools/testing/selftests/net/ovpn/udp_peers.txt b/tools/testing/selftests/net/ovpn/udp_peers.txt
-index 32f14bd9347a..e9773ddf875c 100644
---- a/tools/testing/selftests/net/ovpn/udp_peers.txt
-+++ b/tools/testing/selftests/net/ovpn/udp_peers.txt
-@@ -1,5 +1,6 @@
--1 10.10.1.2 1 5.5.5.2
--2 10.10.2.2 1 5.5.5.3
--3 10.10.3.2 1 5.5.5.4
--4 10.10.4.2 1 5.5.5.5
--5 10.10.5.2 1 5.5.5.6
-+1 10.10.1.1 1 10.10.1.2 1 5.5.5.2
-+2 10.10.2.1 1 10.10.2.2 1 5.5.5.3
-+3 10.10.3.1 1 10.10.3.2 1 5.5.5.4
-+4 fd00:0:0:4::1 1 fd00:0:0:4::2 1 5.5.5.5
-+5 fd00:0:0:5::1 1 fd00:0:0:5::2 1 5.5.5.6
-+6 fd00:0:0:6::1 1 fd00:0:0:6::2 1 5.5.5.7
+ 	/* prevent rearming if the interface is being destroyed */
+-	if (next_run > 0 &&
+-	    READ_ONCE(ovpn->dev->reg_state) == NETREG_REGISTERED) {
++	if (next_run > 0) {
+ 		netdev_dbg(ovpn->dev,
+ 			   "scheduling keepalive work: now=%llu next_run=%llu delta=%llu\n",
+ 			   next_run, now, next_run - now);
 -- 
 2.49.0
 
