@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-190882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D1B6AB92C1
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 01:17:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BACD6AB92C3
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 01:17:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EB6F1B62B2D
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 23:17:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BE10A7B4E56
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 23:16:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2E66293449;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E92DF293732;
 	Thu, 15 May 2025 23:17:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dsxCWqcs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SOeBoC4u"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EBDF29291F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4AF229344A
 	for <netdev@vger.kernel.org>; Thu, 15 May 2025 23:17:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747351029; cv=none; b=mAJagM/Rhg71dLe4NxmvuZF3Hh/29hpCJnF1DGfKG0aO/FoO72R8CeMscGdfV/5Ftwy80dR5aQQH1hmoGYAwsJl+RaLRQfhRKD6CReHC5JN0J7HVTnGXVDwW5VwJzg3LLHSf7HkUPh5zxGr2cFXGW6UjSMzaJsCAYMB7u2sQTkw=
+	t=1747351029; cv=none; b=ODG+5CLr5kKKTc3T5yJm3/K2P3izyOqq3wpmhTQVjChiCFEhwsQqnbz7PBMfo0rsYmDzRnmlsXj8bDYmXyTZnwHNW1a4CnY7adbX1Ob+CJVvEXKy/1Q48CDUOa+n9JlegUk/Sv84GLgKiLQk5afvdrQZYJFhTnDj5qzJZSDQk1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1747351029; c=relaxed/simple;
-	bh=SpWSTzRDJAjaIiZrEmhChDP1tfUagyP7SutfJ2Y2W1c=;
+	bh=SpR8taaY6nqdJy0egENpsz9egKDxP6fd/ymRNYa6/ps=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SoezSIybKDo22UoncsoQ7r6CMYc2AsJYAkK/SCn5efTWDTquVdLV8wohgECIRUuXcNqkjb9dV8+W20EJnbqNAOrZijvtb8tLtVzM7eoRaxquS0a9Tn/tgzm1PJZKNauEL7csGrp1g9EHkYamXDcLxyWR64zdnh4wczaoYu1qHm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dsxCWqcs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D7B4C4CEF0;
-	Thu, 15 May 2025 23:17:08 +0000 (UTC)
+	 MIME-Version; b=EEbauiv3dRQv7lkznQidEQRUupmytY1ZAqltyPW252hF2jFu65YA7Ennu8fD85yt/mRTJlGmJe3vUMUh3fxp/iFS+ptoO3JuC/m0lrM1NiNO/TvcXkkGmGrHAHlUEsEPl7RnrSeMzd91b2DkKvxmdKwUAumhQyUhyyn6XflurbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SOeBoC4u; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29A33C4CEF2;
+	Thu, 15 May 2025 23:17:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1747351029;
-	bh=SpWSTzRDJAjaIiZrEmhChDP1tfUagyP7SutfJ2Y2W1c=;
+	bh=SpR8taaY6nqdJy0egENpsz9egKDxP6fd/ymRNYa6/ps=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dsxCWqcszji+XwIKX9RNdpfuMaNk9vynjvGlwS41mVgE0yJuxauBIiJk/x/8IVA9h
-	 iogfFo42RgxSyPg5/WTfAO+rePAgteRzXVPiSdfms8+8AESFZ4ILGtaW4xdPN7x/5N
-	 2REO0pCZneAB0IcbfJrOddnzgDppKCwQlzsqm6dG05Z+yuO/LumRAIBHJBGK/JKI7J
-	 fU8oK62j23/ysn3IF0UmHTbQrB88cqiG7hUF7iYbbNCHv84bc0LcXoO25wkz+K0rqE
-	 mRKtmamPxRhYdp5rvS3ndLYwR6UbNA6v3uBg7iE8YtP9h9ehusU2XZsa8I2VptHNNc
-	 FZbyyCVsw0DLw==
+	b=SOeBoC4usD46hGljsnHNCOINlTLxamEpLtgr6cK0mHu2tr+MCLCpIMvZ9MYwUebTK
+	 Qx4E9YR2p9ypyhONAS7ARblgYDr4399nJdJtzCyzBT/X/08xMGlPXHE+kwcq7acmVg
+	 oMOmWgdekvqHN1sm7aMH0PzgsO0Q5IPGmXArClne2D6xUr+kFFPeyoYkMY2KNccGyG
+	 KW4Lw5aS1dzP6Lb7DlJu7jglhTeraQE7K9A0SXVMbmPxCOH0bUTQr08T18sFlykZlv
+	 rp4TCXOg9yB5Hcrh0rZNMTbXhm4tmzrGrjVIxtFDIOs83hRRzjRtuzg9ZCepUcWkLX
+	 5tWNyDcEtE+/Q==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -53,9 +53,9 @@ Cc: netdev@vger.kernel.org,
 	nicolas.dichtel@6wind.com,
 	jacob.e.keller@intel.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 4/9] tools: ynl-gen: submsg: plumb thru an empty type
-Date: Thu, 15 May 2025 16:16:45 -0700
-Message-ID: <20250515231650.1325372-5-kuba@kernel.org>
+Subject: [PATCH net-next 5/9] tools: ynl-gen: submsg: render the structs
+Date: Thu, 15 May 2025 16:16:46 -0700
+Message-ID: <20250515231650.1325372-6-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250515231650.1325372-1-kuba@kernel.org>
 References: <20250515231650.1325372-1-kuba@kernel.org>
@@ -67,88 +67,134 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hook in handling of sub-messages, for now treat them as ignored attrs.
+The easiest (or perhaps only sane) way to support submessages in C
+is to treat them as if they were nests. Build fake attributes to
+that effect in the codegen. Render the submsg as a big nest of all
+possible values.
+
+With this in place the main missing part is to hook in the switch
+which selects how to parse based on the key.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- tools/net/ynl/pyynl/lib/__init__.py |  5 +++--
- tools/net/ynl/pyynl/ynl_gen_c.py    | 20 ++++++++++++++++++++
- 2 files changed, 23 insertions(+), 2 deletions(-)
+ tools/net/ynl/pyynl/ynl_gen_c.py | 46 +++++++++++++++++++++++++++++---
+ 1 file changed, 43 insertions(+), 3 deletions(-)
 
-diff --git a/tools/net/ynl/pyynl/lib/__init__.py b/tools/net/ynl/pyynl/lib/__init__.py
-index 9137b83e580a..71518b9842ee 100644
---- a/tools/net/ynl/pyynl/lib/__init__.py
-+++ b/tools/net/ynl/pyynl/lib/__init__.py
-@@ -1,8 +1,9 @@
- # SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- 
- from .nlspec import SpecAttr, SpecAttrSet, SpecEnumEntry, SpecEnumSet, \
--    SpecFamily, SpecOperation
-+    SpecFamily, SpecOperation, SpecSubMessage, SpecSubMessageFormat
- from .ynl import YnlFamily, Netlink, NlError
- 
- __all__ = ["SpecAttr", "SpecAttrSet", "SpecEnumEntry", "SpecEnumSet",
--           "SpecFamily", "SpecOperation", "YnlFamily", "Netlink", "NlError"]
-+           "SpecFamily", "SpecOperation", "SpecSubMessage", "SpecSubMessageFormat",
-+           "YnlFamily", "Netlink", "NlError"]
 diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
-index c8b2a2ab2e5d..2292bbb68836 100755
+index 2292bbb68836..020aa34b890b 100755
 --- a/tools/net/ynl/pyynl/ynl_gen_c.py
 +++ b/tools/net/ynl/pyynl/ynl_gen_c.py
-@@ -14,6 +14,7 @@ import yaml
+@@ -62,6 +62,8 @@ from lib import SpecSubMessage, SpecSubMessageFormat
  
- sys.path.append(pathlib.Path(__file__).resolve().parent.as_posix())
- from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, SpecEnumEntry
-+from lib import SpecSubMessage, SpecSubMessageFormat
+         if 'nested-attributes' in attr:
+             nested = attr['nested-attributes']
++        elif 'sub-message' in attr:
++            nested = attr['sub-message']
+         else:
+             nested = None
  
+@@ -125,7 +127,9 @@ from lib import SpecSubMessage, SpecSubMessageFormat
+         return c_upper(value)
  
- def c_upper(name):
-@@ -872,6 +873,10 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
+     def resolve(self):
+-        if 'name-prefix' in self.attr:
++        if 'parent-sub-message' in self.attr:
++            enum_name = self.attr['parent-sub-message'].enum_name
++        elif 'name-prefix' in self.attr:
+             enum_name = f"{self.attr['name-prefix']}{self.name}"
+         else:
+             enum_name = f"{self.attr_set.name_prefix}{self.name}"
+@@ -873,18 +877,20 @@ from lib import SpecSubMessage, SpecSubMessageFormat
          return get_lines, init_lines, local_vars
  
  
-+class TypeSubMessage(TypeUnused):
-+    pass
-+
-+
+-class TypeSubMessage(TypeUnused):
++class TypeSubMessage(TypeNest):
+     pass
+ 
+ 
  class Struct:
-     def __init__(self, family, space_name, type_list=None, inherited=None):
+-    def __init__(self, family, space_name, type_list=None, inherited=None):
++    def __init__(self, family, space_name, type_list=None,
++                 inherited=None, submsg=None):
          self.family = family
-@@ -1052,6 +1057,8 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-                 raise Exception(f'new_attr: unsupported sub-type {elem["sub-type"]}')
-         elif elem['type'] == 'nest-type-value':
-             t = TypeNestTypeValue(self.family, self, elem, value)
-+        elif elem['type'] == 'sub-message':
-+            t = TypeSubMessage(self.family, self, elem, value)
-         else:
-             raise Exception(f"No typed class for type {elem['type']}")
+         self.space_name = space_name
+         self.attr_set = family.attr_sets[space_name]
+         # Use list to catch comparisons with empty sets
+         self._inherited = inherited if inherited is not None else []
+         self.inherited = []
++        self.submsg = submsg
  
-@@ -1096,6 +1103,16 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-         self.has_ntf = True
+         self.nested = type_list is None
+         if family.name == c_lower(space_name):
+@@ -1250,6 +1256,8 @@ from lib import SpecSubMessage, SpecSubMessageFormat
+             for _, spec in self.attr_sets[name].items():
+                 if 'nested-attributes' in spec:
+                     nested = spec['nested-attributes']
++                elif 'sub-message' in spec:
++                    nested = spec.sub_message
+                 else:
+                     continue
  
+@@ -1286,6 +1294,32 @@ from lib import SpecSubMessage, SpecSubMessageFormat
  
-+class SubMessage(SpecSubMessage):
-+    def __init__(self, family, yaml):
-+        super().__init__(family, yaml)
-+
-+        self.render_name = c_lower(family.ident_name + '-' + yaml['name'])
-+
-+    def resolve(self):
-+        self.resolve_up(super())
-+
-+
- class Family(SpecFamily):
-     def __init__(self, file_name, exclude_ops):
-         # Added by resolve:
-@@ -1178,6 +1195,9 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-     def new_operation(self, elem, req_value, rsp_value):
-         return Operation(self, elem, req_value, rsp_value)
+         return nested
  
-+    def new_sub_message(self, elem):
-+        return SubMessage(self, elem)
++    def _load_nested_set_submsg(self, spec):
++        # Fake the struct type for the sub-message itself
++        # its not a attr_set but codegen wants attr_sets.
++        submsg = self.sub_msgs[spec["sub-message"]]
++        nested = submsg.name
 +
-     def is_classic(self):
-         return self.proto == 'netlink-raw'
++        attrs = []
++        for name, fmt in submsg.formats.items():
++            attrs.append({
++                "name": name,
++                "type": "nest",
++                "parent-sub-message": spec,
++                "nested-attributes": fmt['attribute-set']
++            })
++
++        self.attr_sets[nested] = AttrSet(self, {
++            "name": nested,
++            "name-pfx": self.name + '-' + spec.name + '-',
++            "attributes": attrs
++        })
++
++        if nested not in self.pure_nested_structs:
++            self.pure_nested_structs[nested] = Struct(self, nested, submsg=submsg)
++
++        return nested
++
+     def _load_nested_sets(self):
+         attr_set_queue = list(self.root_sets.keys())
+         attr_set_seen = set(self.root_sets.keys())
+@@ -1295,6 +1329,8 @@ from lib import SpecSubMessage, SpecSubMessageFormat
+             for attr, spec in self.attr_sets[a_set].items():
+                 if 'nested-attributes' in spec:
+                     nested = self._load_nested_set_nest(spec)
++                elif 'sub-message' in spec:
++                    nested = self._load_nested_set_submsg(spec)
+                 else:
+                     continue
+ 
+@@ -1306,6 +1342,8 @@ from lib import SpecSubMessage, SpecSubMessageFormat
+             for attr, spec in self.attr_sets[root_set].items():
+                 if 'nested-attributes' in spec:
+                     nested = spec['nested-attributes']
++                elif 'sub-message' in spec:
++                    nested = spec.sub_message
+                 else:
+                     nested = None
+ 
+@@ -1329,6 +1367,8 @@ from lib import SpecSubMessage, SpecSubMessageFormat
+ 
+                 if 'nested-attributes' in spec:
+                     child_name = spec['nested-attributes']
++                elif 'sub-message' in spec:
++                    child_name = spec.sub_message
+                 else:
+                     continue
  
 -- 
 2.49.0
