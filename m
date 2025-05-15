@@ -1,122 +1,103 @@
-Return-Path: <netdev+bounces-190807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC309AB8E7D
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 20:08:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED6D7AB8E87
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 20:09:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7EF697B6F5F
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 18:06:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01502A07695
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 18:08:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AA01258CF0;
-	Thu, 15 May 2025 18:08:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9582525A633;
+	Thu, 15 May 2025 18:09:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y1zT36O0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mgTeyS0n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AB201EA7F9
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 18:08:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60BAA1F4C96;
+	Thu, 15 May 2025 18:09:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747332489; cv=none; b=ZRAb9bb2l8C0XW6DFXmj4tLdSjE/Hgz/8YH5VE13wyQxZFn5G5z6fldCOHqHq6E9a1ptWfF3QammpjLbQjtPpOfEwKqUuM2+4nCRY6ygEDhSLvXVnGakwPGpZov+34VOZDDBWUZzR1CK+enUn/d64TrURKSHMUrVNECEmrhDt4k=
+	t=1747332544; cv=none; b=PTqkWbFZhDw0Vlg5AAhdOt27LtB9REmk28sA3JaKKeELXolmWLjumct29JbZAq0YvVOvzxr04JYiB0ez1J7MlT+BIaFzDtG/tVqth7YfwqpXvOvOhJ8WYeLe0yKVqbTIRFfdFPcP/HSADirnv/ejw0qSYtZdJck4AvZFNNfetyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747332489; c=relaxed/simple;
-	bh=pIlXmsZVtdjDzH6K+82qwJMox70wQ/aQo1Dm6MKI5xw=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=LCTK17o63H0G8avqxz2hwVnUAugbkNXYE2prhVJtKfTSBsnvfoTg01jnC5Xo63Z1QphqOPfAjpu4Q6ITsHOHNRoGz6ynwBk5+GpzCYWm+3mogDYm9L4/wlD3hd9yUNcNw5mDN/Jo64IM3dCDyrNmKnJM+G9ItweAVRGHaznVIiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y1zT36O0; arc=none smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6f0cfbe2042so15445836d6.1
-        for <netdev@vger.kernel.org>; Thu, 15 May 2025 11:08:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747332487; x=1747937287; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ws9tT78KrA0YTyhBNVLd6n4o+gLTz8KX8UVh4d7JKH4=;
-        b=Y1zT36O0Rj2QBEbEFvgNah5heXoVH4pYpGZRQAReUKLnpEo6ZtcQfDfG6H0BEb8zc9
-         waAkz4Vs4YaJTS1Qh7jlC5uC6SoJVq8dgL74uc+RneE4p3yS/6p065EQOETrl9nyhsZH
-         PeDSWz0SYqGvU0TmCe6ojsGvgKMMpx1AGn10FCfY+8GxRuav3PYhvLKY1ybkwB8zdqs0
-         Plt7/PeY3Y2qU67MTfIS4CUg8dc5D3YRYoF/B1b5PyRoBK0dC3u68DBF3nffc78U2J1c
-         zZ3PkSMVP7C34twnqEmK/7ktqa04HAS0Jk7GmRgNnLvNkeqJxJdSZ9R0bn+je2qKWDh2
-         8tBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747332487; x=1747937287;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ws9tT78KrA0YTyhBNVLd6n4o+gLTz8KX8UVh4d7JKH4=;
-        b=gjTVV7wB+KU0Ea0mQBoLxEK4bLvw1i4PMfbF7qLp9IAj/o491HcOloJ5rMPySGVMht
-         Z7qgG4AAMxn0NegReRhfVzqbcIjHRYYYvm8MYbvvi409y7L600B9A/lQfjEyJT4yCjID
-         z9sdMELz1aeiVtQzvJnv07JkV9vubqfqk5/D86kXeb5eJmGGhNFEYj3xFd7Tfz6pTY4H
-         Tv6+ohTQnPiuZ3ATQw4fZz4wJACJLGUrL1wi2U9yPolwKW25HB2RSmY+bBQpBQ/6J0kn
-         bVcWYUEfdAAUNM85vL/2UDCu0fwTuWsAiH/ug/AbezsCc7sZvUVkNrG0IHfvrOnvlG3n
-         RfKg==
-X-Forwarded-Encrypted: i=1; AJvYcCWza+gP4/7PzgN60hff1ebyC0gwAli/MR2Pyw5EnIqELYgFyJGUbMdCMShWlhBo8BrAf6vaGEs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5cyilQ1buuY8xLfhCI5AzlUCmBIZDucNeka+YJmasBvNNr4S2
-	INl+tnZtFu0ZjvyaDRdFSZBp9rnYmCCsuDSCD6A01Kw7ZkOigF8SvaAR
-X-Gm-Gg: ASbGncsRHbRlN21Nzlwb25q5Sdcdpy2natFKSHg8uHu9d7m+GcZ3orWGfQOdGIgCkWS
-	4Yh7Pq8HTw1Jun5LKLbcRJT0CrfZn6xuLao4bZtuXEiKOKEQ3guDmHziqrIrdpsMPgn2nsTY4oF
-	bFv11a6VasNxF0/ilIf54na2fEGjezrywoIx4KT6hE6Fcjeejhux0IRxmC7fvIW9yoYH7akvBEE
-	Vj/q2hGHoz4B9C+yEaVFbDz6wuV1wrJYmGAO6yU2/O9r3Irfr5WSO3wMImbPtZ2RS/1r0C0/eDe
-	+pP9rFHo4rO3VCsOpK7kElNrSxQV1U5tfkzhBVUL2BvClEfI5coT0mK9inCwWUqCL0p5A2xikAs
-	GfLunH6qNrms4dB85Hj525n4=
-X-Google-Smtp-Source: AGHT+IHDTklR8tA6dmEyXAGBndmD/yrR+zPfMuoMCyOqwZuxqP53FiU0x3VXnlc3X6w8vyqNW0bw6Q==
-X-Received: by 2002:a05:6214:1311:b0:6e4:2479:d59b with SMTP id 6a1803df08f44-6f8b12be68fmr4322076d6.16.1747332486581;
-        Thu, 15 May 2025 11:08:06 -0700 (PDT)
-Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
-        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-6f8b0966069sm2177556d6.79.2025.05.15.11.08.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 May 2025 11:08:05 -0700 (PDT)
-Date: Thu, 15 May 2025 14:08:05 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Willem de Bruijn <willemb@google.com>
-Cc: Simon Horman <horms@kernel.org>, 
- Christian Brauner <brauner@kernel.org>, 
- Kuniyuki Iwashima <kuniyu@amazon.com>, 
- Kuniyuki Iwashima <kuni1840@gmail.com>, 
- netdev@vger.kernel.org
-Message-ID: <68262d85460a2_25ebe529485@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250514165226.40410-4-kuniyu@amazon.com>
-References: <20250514165226.40410-1-kuniyu@amazon.com>
- <20250514165226.40410-4-kuniyu@amazon.com>
-Subject: Re: [PATCH v3 net-next 3/9] scm: Move scm_recv() from scm.h to scm.c.
+	s=arc-20240116; t=1747332544; c=relaxed/simple;
+	bh=EMbkV613PdDRHIH0TklJGK8IdRcNls/AaRkWvfzUGpQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fLphbU13iFSvd2LMNBIDKl7G7gl3F1ws1qm3ymYOm8TO7zTgNKMWICYfkC+PsvjQWjUvGpkNRG5lkWiL084KhMfmrAI4RtWj+BcpJ0Pv7uKJD7dHigq8GVHRHEcFc66dcgUwVIwlfaGCTerbK1TOWXR+9TUB1XehLDmc0T2ubS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mgTeyS0n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BBDBC4CEE7;
+	Thu, 15 May 2025 18:09:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747332543;
+	bh=EMbkV613PdDRHIH0TklJGK8IdRcNls/AaRkWvfzUGpQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mgTeyS0nRo/8GGQox7waepWvBt89X11Tjc4IIkuPLN0GqeY5JaU0dP3ym2OYbstyL
+	 hPFl1HqPwySKYVlNGI38eFb3BPYb3C2/AcLkuR50wXRdHE08PjpxH9cqqp+Mas8EYK
+	 myf9BJtwv/4ZVcfwyLFJvrIrIAML+DPXg8il6uwFuWTw6hOY1VNhSmZOBCVAOktZe5
+	 jIGzEPHRseWZPp8ondAPHuPX3YYAZUytRpBBj/4SyF2rV8x/Ga8V0gNi+mZuNkdA/z
+	 rU46XFYpoJRDo7+XpyKuN9P7N0Qyw6cTd0saAbr5xlcFyL2S1yity0q4TbtzPQ+f7d
+	 z44zZxxq4c07w==
+Date: Thu, 15 May 2025 11:09:01 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-sctp@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Sagi Grimberg <sagi@grimberg.me>, Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH net-next 08/10] net: add
+ skb_copy_and_crc32c_datagram_iter()
+Message-ID: <20250515180901.GA1411@quark>
+References: <20250511004110.145171-1-ebiggers@kernel.org>
+ <20250511004110.145171-9-ebiggers@kernel.org>
+ <20250513144154.49f8faaa@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250513144154.49f8faaa@kernel.org>
 
-Kuniyuki Iwashima wrote:
-> scm_recv() has been placed in scm.h since the pre-git era for no
-> particular reason (I think), which makes the file really fragile.
+On Tue, May 13, 2025 at 02:41:54PM -0700, Jakub Kicinski wrote:
+> On Sat, 10 May 2025 17:41:08 -0700 Eric Biggers wrote:
+> > +/**
+> > + *	skb_copy_and_crc32c_datagram_iter - Copy datagram to an iovec iterator
+> > + *		and update a CRC32C value.
+> > + *	@skb: buffer to copy
+> > + *	@offset: offset in the buffer to start copying from
+> > + *	@to: iovec iterator to copy to
+> > + *	@len: amount of data to copy from buffer to iovec
+> > + *	@crcp: pointer to CRC32C value to update
+> > + */
 > 
-> For example, when you move SOCK_PASSCRED from include/linux/net.h to
-> enum sock_flags in include/net/sock.h, you will see weird build failure
-> due to terrible dependency.
-> 
-> To avoid the build failure in the future, let's move scm_recv(_unix())?
-> and its callees to scm.c.
-> 
-> Note that only scm_recv() needs to be exported for Bluetooth.
-> 
-> scm_send() should be moved to scm.c too, but I'll revisit later.
-> 
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> When you repost please toss a Return: statement here.
+> kernel-doc -Wall is complaining
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+I'll plan to fold in the following:
+
+diff --git a/net/core/datagram.c b/net/core/datagram.c
+index 3599eda959917..fa87abb666324 100644
+--- a/net/core/datagram.c
++++ b/net/core/datagram.c
+@@ -538,10 +538,12 @@ static size_t crc32c_and_copy_to_iter(const void *addr, size_t bytes,
+  *	@skb: buffer to copy
+  *	@offset: offset in the buffer to start copying from
+  *	@to: iovec iterator to copy to
+  *	@len: amount of data to copy from buffer to iovec
+  *	@crcp: pointer to CRC32C value to update
++ *
++ *	Return: 0 on success, -EFAULT if there was a fault during copy.
+  */
+ int skb_copy_and_crc32c_datagram_iter(const struct sk_buff *skb, int offset,
+ 				      struct iov_iter *to, int len, u32 *crcp)
+ {
+ 	return __skb_datagram_iter(skb, offset, to, len, true,
 
