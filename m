@@ -1,145 +1,118 @@
-Return-Path: <netdev+bounces-190779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4FDBAB8AF0
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 17:39:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7EDEAB8B0C
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 17:42:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99DDC4C315C
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 15:36:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C878175938
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 15:40:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 100A321771C;
-	Thu, 15 May 2025 15:36:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8149420B7FE;
+	Thu, 15 May 2025 15:40:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="qA10momE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nPUhYzjf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39AE120B7FE
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 15:36:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CEC5211A0D;
+	Thu, 15 May 2025 15:40:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747323388; cv=none; b=S172taTWxwe+EXanJ3j/iVoZ/6Zi0hthcJkXyir7lUTFSUCyvsuPHNRdCH1rHn333oTUFe+ZIeInLxy21IByGpTAW8jBQm1D3oAvFSuICLlDixRF2vyLdjXkeLEQ2e/6PHqrM9TTaoxf+aFG9OmUhLIsNo/ZdulTEv+PB+VBfPw=
+	t=1747323650; cv=none; b=mG8nTcDetyR4GUNk/MK/PrLfTH4bKmzbXgXImnHDDKEf3Vv2Z0vMU2/JNiBciW7tSSnMO/phpvQ7VyA2Mu9Y3nrB2w/iuK6T45AfDDUuUAbVU9kG17eLw5L1zbluruf/LpU2TGCbeWypHl2NF0woMovqjtajUPb5/icr+OD0ysY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747323388; c=relaxed/simple;
-	bh=czKg2FsFT1Uwx+ZZLxsBMzwmQcMN+jJQWzv7DBrPeRs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=R2+nh4h2fO0QPI/3IxbAYvvwtgvvZlcg5b6PQja9gsnw9fk8+WIKuA6dRQUCEq/nZ9UZh/xv5ZsLzAlseiVzuza6hvD9ASJZKLVq07s3vRDmpiNwbS6P+elbitAp3EMLcZmsdcUhmX07KRcx7BnaR1p1SPRx4jEsJseaYL4nl8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=qA10momE; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5fc8c68dc9fso2164780a12.1
-        for <netdev@vger.kernel.org>; Thu, 15 May 2025 08:36:25 -0700 (PDT)
+	s=arc-20240116; t=1747323650; c=relaxed/simple;
+	bh=isnxA1U3Y80dnzjuWHMdDuK8gT472yylgVk3Nz9soZM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eOakhuOUVevR9SUFBxDgX+4MhnPO3Q840qvQn0MZdh5dnWSs2lppKVJsN6E7ao9HzpDHa4O6aM5M8gpXMYmzKuo6R7rp6clW0c0fEZITMuOYtjQdcxonCqE8MCgmSmpm2NYoqRryAn8XN+2t8rnlxs7IAsEC82+EwZUDkhMthU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nPUhYzjf; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-b239763eeddso892970a12.1;
+        Thu, 15 May 2025 08:40:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1747323384; x=1747928184; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=C9hm5OJVbBIj5FyioW9V7d0NGSFqie3wmW9PRCafSTw=;
-        b=qA10momECCJdKjota9vMLWZ5hEGp7sGsNRzzdfyYoS2TF2gTIDzQZBKFTX6TqR3vhB
-         iKtuY1aS8v3PPzBzKBy2HVx8IbVvKUF5UCHGsZESQM/1lunfj9fQikHqC96HhKShAqOl
-         LNpYnvk1E1cNKLmv0OwJrKwbsgQEToXHjtKSringKTc4O0BXwIdCaIzEOaj2ALLZG0cF
-         EINJkwlNvkd9qRlc+nHM3kKBbxBLrsW9p9W3uxxGXAib6nbkvIydOzZVESbHzU4ruxW2
-         L5fbB/FKBVSEWTDFR6lGWhc60uDT/7Yb0BH0sqfEqJNv7AsS6meAbxRkyQkCs6gDQ4w3
-         YG+A==
+        d=gmail.com; s=20230601; t=1747323648; x=1747928448; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gmddZo5hbgODLBcL9749K2U4oLVLG2d3XqRGsTj6JdE=;
+        b=nPUhYzjfW+w+1/mQ9Hmcl+zLj5SxOdEL25rPb8J8YU/LHE/9WQhTagA4AXtbM0rRTM
+         980ycZ4AtjDm6WSzm2p7+KHOoWOXkQkFsMKKEvQtIS53cst0dczw7dNSwdTq4p912pxs
+         HWzpcnQJjeW4cil1Fz+foZ+nSnTMPoo0Orxe9mJUdzrPx0Is3e8w252YOTXE+g/Ct8bC
+         LB3mFnfOLa3RQM6L1dbrRadnmjXSo41YvI0FQ0NbS7POzdP8FGXBZDpZhMp+0sCKFJSu
+         8IxJ6gSoYOJFAGsnNy2pp+5cVNJsF8hAlThLC0GmejeX+qCOm+gzjdpYYVsUIO7B0QED
+         rS3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747323384; x=1747928184;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C9hm5OJVbBIj5FyioW9V7d0NGSFqie3wmW9PRCafSTw=;
-        b=NUMZiP9+6HMDofQXzNcNtdDTIR6DglYL8JpBtKv3joOi/CxpEODy/FYaENGoIKxDjp
-         dCrdkCgYWR2zkFI8EwHQ4k8oXRnh3P+Z31WeFNbDNrkHcNjE7RR7gjiuvMrnu0cJWb/T
-         XoduMVP9g9qY6RZy1ldA8YOfYSwgAOJQEiOcFnMe7OUH9bzUz9XTjeqKmucft20DEULp
-         OZOcahT3Prm/mVO8vEq9gR8WEIYf0tROs/skNnUItDyeOWOXPxsiPorFH6D7ZFeliELB
-         jSatR1V5POYSWeqizmFmIJ6IWC8LDTvcEgee+vtH5db3YurQ02rYxHWXNodhm7H0S/7/
-         mBAg==
-X-Forwarded-Encrypted: i=1; AJvYcCWutMy+Z8vndY6YblMMvyPQsRzZiHIKS5dqT5PE8jv9Hl9ue6nZ+0Bf1Ll8Pia4eVx82noapF0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzadMv+Z+7S/NuKyRLmvO3X0dfneE1o29kzyDjagBUu6YGnqyro
-	2rZx/O2YQzQPgqPpK1YTroc3BpBFGOMd1RwP7fwSIwvHycEExwMK5nVwp+6NHYRQfwU=
-X-Gm-Gg: ASbGncvKXP3xbasX2ARWF0ZgEs2PGEW0GQdXtTvXyG+y4R8ZXJDVqDpOJPzdBiwAIlC
-	VB0XQsL/pb8PC3lgjPPbfVgmB40bXW1ZHu1a5np3L9pMmLq3J642DYz/xslc6L47aGqOJVU46BZ
-	hagSJsvK1eu84dj2mIURMrn6sngJFi4tBPchUsx82/ZKTd3jwB2VGmkX81qvaTY/2ewgpzi11Ju
-	qplitS0cL+DWx/NE5xPQeULbvo9U/negFO+mWr9rF4aSYuNNFZaaLkFTjolOv3ZSMohJwvYB+WY
-	jRuR8Tkctv6ChPs3rOY04fwDOfCZUQn/EnbYh4bUpv/QE9NkizF3D+l0H9s=
-X-Google-Smtp-Source: AGHT+IEPjbaCSAbzc2xrFZQp3EVHuzfnNM2s5oxAFnC2rwIBxm63qHEQgetTL+T7uEvlpJXarMIjwQ==
-X-Received: by 2002:a17:906:f594:b0:ad2:2ba6:2012 with SMTP id a640c23a62f3a-ad52d45ac6bmr19710866b.11.1747323384165;
-        Thu, 15 May 2025 08:36:24 -0700 (PDT)
-Received: from [100.115.92.205] ([212.180.210.124])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad52d490794sm4518466b.131.2025.05.15.08.36.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 May 2025 08:36:23 -0700 (PDT)
-Message-ID: <7855995f-6908-4684-b5be-dbff8415843e@blackwall.org>
-Date: Thu, 15 May 2025 17:36:22 +0200
+        d=1e100.net; s=20230601; t=1747323648; x=1747928448;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gmddZo5hbgODLBcL9749K2U4oLVLG2d3XqRGsTj6JdE=;
+        b=gun5G05cQoW2b4j/C1xRXfWyzznfaR3klvj+iMLCGQx/6LC/I7s5su5f6cbMnuxAC9
+         y31pK/k+aB+EiVMqxEC02YYw0Z8Cxu3MVRX0pw9C2qKOWPUWN8HUd08MjeJqnk0os3ub
+         arVLxHLr8qxr9j61Di8Er2IOIvgikIufjubTMnueJ0tcJIfBAEfBJwJioAUwtBxMEmyL
+         m6SimyoOu+D6IwFPP5lNRWAPQMfCNrspGwHrQX6Ehbz5Zp9tj+B0nyV2JjjTRS0Fxbwb
+         Wb4apMlP530Dne1/puv6HLPaIPJ0egyCzPVHRkkMj+DN49gRHwQ7yVocZrhZ/fy9hiQg
+         jDLg==
+X-Forwarded-Encrypted: i=1; AJvYcCX7c73/dNBYxoMns3ELlM7gID9MuC3PbhxpekHtbwKDInKX7Ln9mt31BiQoEOyDRTvoN9JS8JD64KTYGnI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/WaHZmh3jI+UfjlVgC+B6SVxUSQbQ4kB7RaPzcmBr0orr3iJC
+	BR0bNyNCzaBoV31hNkJh1cP1GHd6nXqCI+iKdc16w3rY8uikHWI=
+X-Gm-Gg: ASbGncsue7O9upnCOmQnVopVF31CLHw9te7dYEHmC+YUzFP7/4l010tvWsq4AKiBAOq
+	uprvYEwZxNrc5h8PurFNwnpGFsitJXYL+IrqO+oV6zH0YWgt8f1D+f4aXFGtCHt2qFTwm2OAOH8
+	P+Cs5IJdN4gQwXohhENMDl7rjjvBrJcQ7lu/gTiTC6gJ5upQaPg4uLLMtgjZKRtv4+aWBzhRAWS
+	j1q9tTI7lZVofgSvpxoeQSHIjDtW1f2ggbI7jfGp8c8uXS2Q+0sR/Xj55g3HyWxFeMdPKgMMSAZ
+	mwR8TC5K6VPtaT0nT748sxOxuRm7PTHGHXB6GjBB3qck2xnBtAppNwFZlfrOuV91rfIk6gfoHXi
+	APZoOKAPS4I3t
+X-Google-Smtp-Source: AGHT+IGDgwKqaGt4wIfWcyuMH9A7tr3fIlzPfW/V/Q670JgUBuyMgkn7D4fVvu0QbFyWupBvw0XnAA==
+X-Received: by 2002:a17:902:d4d1:b0:224:584:6eef with SMTP id d9443c01a7336-231b601cb46mr42528955ad.41.1747323648179;
+        Thu, 15 May 2025 08:40:48 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-22fc773edcesm118706505ad.71.2025.05.15.08.40.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 May 2025 08:40:47 -0700 (PDT)
+Date: Thu, 15 May 2025 08:40:46 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, jiri@resnulli.us, andrew+netdev@lunn.ch,
+	sdf@fomichev.me, linux-kernel@vger.kernel.org,
+	syzbot+53485086a41dbb43270a@syzkaller.appspotmail.com
+Subject: Re: [PATCH net] team: grab team lock during team_change_rx_flags
+Message-ID: <aCYK_rVZ7Tl7uIbc@mini-arch>
+References: <20250514220319.3505158-1-stfomichev@gmail.com>
+ <20250515075626.43fbd0e0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] bridge: netfilter: Fix forwarding of fragmented
- packets
-To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
- bridge@lists.linux.dev
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, venkat.x.venkatsubra@oracle.com, horms@kernel.org,
- pablo@netfilter.org, fw@strlen.de
-References: <20250515084848.727706-1-idosch@nvidia.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20250515084848.727706-1-idosch@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250515075626.43fbd0e0@kernel.org>
 
-On 5/15/25 10:48, Ido Schimmel wrote:
-> When netfilter defrag hooks are loaded (due to the presence of conntrack
-> rules, for example), fragmented packets entering the bridge will be
-> defragged by the bridge's pre-routing hook (br_nf_pre_routing() ->
-> ipv4_conntrack_defrag()).
+On 05/15, Jakub Kicinski wrote:
+> On Wed, 14 May 2025 15:03:19 -0700 Stanislav Fomichev wrote:
+> > --- a/drivers/net/team/team_core.c
+> > +++ b/drivers/net/team/team_core.c
+> > @@ -1778,8 +1778,8 @@ static void team_change_rx_flags(struct net_device *dev, int change)
+> >  	struct team_port *port;
+> >  	int inc;
+> >  
+> > -	rcu_read_lock();
+> > -	list_for_each_entry_rcu(port, &team->port_list, list) {
+> > +	mutex_lock(&team->lock);
+> > +	list_for_each_entry(port, &team->port_list, list) {
 > 
-> Later on, in the bridge's post-routing hook, the defragged packet will
-> be fragmented again. If the size of the largest fragment is larger than
-> what the kernel has determined as the destination MTU (using
-> ip_skb_dst_mtu()), the defragged packet will be dropped.
-> 
-> Before commit ac6627a28dbf ("net: ipv4: Consolidate ipv4_mtu and
-> ip_dst_mtu_maybe_forward"), ip_skb_dst_mtu() would return dst_mtu() as
-> the destination MTU. Assuming the dst entry attached to the packet is
-> the bridge's fake rtable one, this would simply be the bridge's MTU (see
-> fake_mtu()).
-> 
-> However, after above mentioned commit, ip_skb_dst_mtu() ends up
-> returning the route's MTU stored in the dst entry's metrics. Ideally, in
-> case the dst entry is the bridge's fake rtable one, this should be the
-> bridge's MTU as the bridge takes care of updating this metric when its
-> MTU changes (see br_change_mtu()).
-> 
-> Unfortunately, the last operation is a no-op given the metrics attached
-> to the fake rtable entry are marked as read-only. Therefore,
-> ip_skb_dst_mtu() ends up returning 1500 (the initial MTU value) and
-> defragged packets are dropped during fragmentation when dealing with
-> large fragments and high MTU (e.g., 9k).
-> 
-> Fix by moving the fake rtable entry's metrics to be per-bridge (in a
-> similar fashion to the fake rtable entry itself) and marking them as
-> writable, thereby allowing MTU changes to be reflected.
-> 
-> Fixes: 62fa8a846d7d ("net: Implement read-only protection and COW'ing of metrics.")
-> Fixes: 33eb9873a283 ("bridge: initialize fake_rtable metrics")
-> Reported-by: Venkat Venkatsubra <venkat.x.venkatsubra@oracle.com>
-> Closes: https://lore.kernel.org/netdev/PH0PR10MB4504888284FF4CBA648197D0ACB82@PH0PR10MB4504.namprd10.prod.outlook.com/
-> Tested-by: Venkat Venkatsubra <venkat.x.venkatsubra@oracle.com>
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-> ---
->   net/bridge/br_nf_core.c | 7 ++-----
->   net/bridge/br_private.h | 1 +
->   2 files changed, 3 insertions(+), 5 deletions(-)
-> 
+> I'm not sure if change_rx_flags is allowed to sleep.
+> Could you try to test it on a bond with a child without IFF_UNICAST_FLT,
+> add an extra unicast address to the bond and remove it?
+> That should flip promisc on and off IIUC.
 
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
-
+I see, looks like you're concerned about addr_list_lock spin lock in
+dev_set_rx_mode? (or other callers of __dev_set_rx_mode) Let me try
+to reproduce with your example, but seems like it's an issue, yes
+and we have a lot of ndo_change_rx_flags callbacks that are sleepable :-(
 
