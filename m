@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-190886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D21EAB92C7
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 01:18:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE51FAB92C4
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 01:17:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C33673BCB04
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 23:17:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B9E41B6350A
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 23:18:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0672296716;
-	Thu, 15 May 2025 23:17:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E682E29710C;
+	Thu, 15 May 2025 23:17:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fpH2jHFH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q0sK9wf/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B862A296162
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 23:17:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE6DD296FAD;
+	Thu, 15 May 2025 23:17:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747351031; cv=none; b=lFqv/A9D7Ln7IWH6WPG9xhuY4kb+THRiHN9WupyNixfYuL3Bg4h9lRynnTaoSYVzMCJ3+0wdxmJgX+KFyYiz7BVgcHm1jjeHosIZTf+5clp8KHPb9QuIeoyPkd5I+MZhPa1Qa37hlGT5PsmPqi7zgNnd0k6eR6mFdC9EOiiCE9Y=
+	t=1747351032; cv=none; b=ouyFFfPY1JxYceapZNfLO/waiC/rK+/zzTuCT30IoJhEeL+EdPEQ6arL/6N3Dop2PEM/aLsV2Prj+Bomm7dQFPB8Z63sGzAsH52q6hLXEFoEDMtkgiNPjw6AaO9KVo67YI4jO6NbhnkqWKXR7DU4jpeYKP7VNxmnh7qtYKng7Nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747351031; c=relaxed/simple;
-	bh=5Dl71sxdLyIdg3efDNhYkfJ8M4IsB0cH9u76Rj8nngI=;
+	s=arc-20240116; t=1747351032; c=relaxed/simple;
+	bh=3gXwjMFfOi7AILaAP8qYvaMgkPmZK1+iMnZ9P3mrEkg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uh3S1FCxEY1ajHc0Il80QNqr/UGVk+3OVWoML8seBiV8tilmCp61aK7cvqqhgfACEhCd2G+EABI5jkvojAaGYIWYl4AmtBxMyN9RliVS5gaQtogB0GikcCCvNSgxkWQ2LaBQhzFGPIbTNVRFU8OZIzOJgfnOC7OEvxqCFrkX8+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fpH2jHFH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19DE9C4CEE7;
+	 MIME-Version; b=sfnthad7ujZIjoPBRDzWd6Lf3GHLTA0LjwIY0CTczi+ZdXFVsTjzYIqf+VusT8q6tqkm7Q8C9e3zHOoVkkd0rDC8tmGcRfrLmw6yelL/Ha9tRXqy/imEKjBlWtoUJlm8EaFgSDXmONDpYal5Nc2rvmoCmH5y0JVkY55ru+EHZ8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q0sK9wf/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B922AC4CEEF;
 	Thu, 15 May 2025 23:17:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747351031;
-	bh=5Dl71sxdLyIdg3efDNhYkfJ8M4IsB0cH9u76Rj8nngI=;
+	s=k20201202; t=1747351032;
+	bh=3gXwjMFfOi7AILaAP8qYvaMgkPmZK1+iMnZ9P3mrEkg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fpH2jHFHe+bZQ79uLouvVUx66tjGZTLP4Qt/Owp9jYXmJ+dsHtLIUKYPgIq5laQ2x
-	 TgM3FO44dAl6Pu/Z16sF/OS1cicO6SQtAYQMDZEzhTFHxL47p1yGca5uDZjbB0MUfp
-	 aR9VFMBp29/cKj+kKgb4DrYp6zn9U2QO49wGlqCf3tG0iekjxkI6mK2GFnr5+UZ2GW
-	 fPZQL/+Bi20H3nAkPWO8f1YzZuFn2byOEN3TjVmoKO5i1vC/bW4f4NxP5xw4vOSZWR
-	 FIBJAR0q7n8EU7GlrirGH/0qO9RiXyQLLiGeLsk30EX79xN/hiubu7W4PgojflDD83
-	 PBzgJPT/pk1MQ==
+	b=Q0sK9wf/9Wl02kFnuJn9gMVDNkaMyOTEg9jZY5stXPhtBLNG3pc5E9v1OBC3mX0jk
+	 tcmEAipwYEL+d+6HYddXQ6+va1rozIe88ujvbCERLOZsLM+Zpv0+5dWgZJEPvedinC
+	 nTcUcyG0PD8VbN/YA6wPdlVWb81s6IYKcSjzEgvJWAClGPcTblVZPCAQ662mdGI0vP
+	 hoA9RW1tml0ToG9G9JL/ocp60Ds5NZJAbvWC1oAiL3UcOGCeBcVzv0nkeBENTwlZ6/
+	 gKBeY5RAKBawZh0VcKPmZLX6iA5tyIK6sdxWnl7oaRfn/75SNWPokkvEyU/dkGjDl+
+	 G6vpracvEgSrg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -52,10 +52,11 @@ Cc: netdev@vger.kernel.org,
 	daniel@iogearbox.net,
 	nicolas.dichtel@6wind.com,
 	jacob.e.keller@intel.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 8/9] tools: ynl: enable codegen for all rt- families
-Date: Thu, 15 May 2025 16:16:49 -0700
-Message-ID: <20250515231650.1325372-9-kuba@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	bpf@vger.kernel.org
+Subject: [PATCH net-next 9/9] tools: ynl: add a sample for rt-link
+Date: Thu, 15 May 2025 16:16:50 -0700
+Message-ID: <20250515231650.1325372-10-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250515231650.1325372-1-kuba@kernel.org>
 References: <20250515231650.1325372-1-kuba@kernel.org>
@@ -67,46 +68,249 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Switch from including Classic netlink families one by one to excluding.
+Add a fairly complete example of rt-link usage. If run without any
+arguments it simply lists the interfaces and some of their attrs.
+If run with an arg it tries to create and delete a netkit device.
+
+ 1 # ./tools/net/ynl/samples/rt-link 1
+ 2 Trying to create a Netkit interface
+ 3 Testing error message for policy being bad:
+ 4     Kernel error: 'Provided default xmit policy not supported' (bad attribute: .linkinfo.data(netkit).policy)
+ 5   1:               lo: mtu 65536
+ 6   2:           wlp0s1: mtu  1500
+ 7   3:          enp0s13: mtu  1500
+ 8   4:           dummy0: mtu  1500  kind dummy     altname one two
+ 9   5:              nk0: mtu  1500  kind netkit    primary 0  policy forward
+10   6:              nk1: mtu  1500  kind netkit    primary 1  policy blackhole
+11 Trying to delete a Netkit interface (ifindex 6)
+
+Sample creates the device first, it sets an invalid value for a netkit
+attribute to trigger reverse parsing. Line 4 shows the error with the
+attribute path correctly generated by YNL.
+
+Then sample fixes the bad attribute and re-issues the request, with
+NLM_F_ECHO set. This flag causes the notification to be looped back
+to the initiating socket (our socket). Sample parses this notification
+to save the ifindex of the created netkit.
+
+Sample then proceeds to list the devices. Line 8 above shows a dummy
+device with two alt names. Lines 9 and 10 show the netkit devices
+the sample itself created.
+
+The "primary" and "policy" attrs are from inside the netkit submsg.
+The string values are auto-generated for the enums by YNL.
+
+To clean up sample deletes the interface it created (line 11).
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- tools/net/ynl/Makefile.deps      | 4 ++++
- tools/net/ynl/generated/Makefile | 7 +++----
- 2 files changed, 7 insertions(+), 4 deletions(-)
+CC: bpf@vger.kernel.org
+---
+ tools/net/ynl/samples/rt-link.c  | 184 +++++++++++++++++++++++++++++++
+ tools/net/ynl/samples/.gitignore |   1 +
+ 2 files changed, 185 insertions(+)
+ create mode 100644 tools/net/ynl/samples/rt-link.c
 
-diff --git a/tools/net/ynl/Makefile.deps b/tools/net/ynl/Makefile.deps
-index a5e6093903fb..e5a5cb1b2cff 100644
---- a/tools/net/ynl/Makefile.deps
-+++ b/tools/net/ynl/Makefile.deps
-@@ -33,5 +33,9 @@ CFLAGS_ovs_flow:=$(call get_hdr_inc,__LINUX_OPENVSWITCH_H,openvswitch.h)
- CFLAGS_ovs_vport:=$(call get_hdr_inc,__LINUX_OPENVSWITCH_H,openvswitch.h)
- CFLAGS_rt-addr:=$(call get_hdr_inc,__LINUX_RTNETLINK_H,rtnetlink.h) \
- 	$(call get_hdr_inc,__LINUX_IF_ADDR_H,if_addr.h)
-+CFLAGS_rt-link:=$(call get_hdr_inc,__LINUX_RTNETLINK_H,rtnetlink.h) \
-+	$(call get_hdr_inc,_LINUX_IF_LINK_H,if_link.h)
-+CFLAGS_rt-neigh:=$(call get_hdr_inc,__LINUX_RTNETLINK_H,rtnetlink.h)
- CFLAGS_rt-route:=$(call get_hdr_inc,__LINUX_RTNETLINK_H,rtnetlink.h)
-+CFLAGS_rt-rule:=$(call get_hdr_inc,__LINUX_FIB_RULES_H,fib_rules.h)
- CFLAGS_tcp_metrics:=$(call get_hdr_inc,_LINUX_TCP_METRICS_H,tcp_metrics.h)
-diff --git a/tools/net/ynl/generated/Makefile b/tools/net/ynl/generated/Makefile
-index 6603ad8d4ce1..9208feed28c1 100644
---- a/tools/net/ynl/generated/Makefile
-+++ b/tools/net/ynl/generated/Makefile
-@@ -22,10 +22,9 @@ TOOL:=../pyynl/ynl_gen_c.py
- TOOL_RST:=../pyynl/ynl_gen_rst.py
- 
- SPECS_DIR:=../../../../Documentation/netlink/specs
--GENS_PATHS=$(shell grep -nrI --files-without-match \
--		'protocol: netlink' \
--		$(SPECS_DIR))
--GENS=$(patsubst $(SPECS_DIR)/%.yaml,%,${GENS_PATHS}) rt-addr rt-route
-+SPECS_PATHS=$(wildcard $(SPECS_DIR)/*.yaml)
-+GENS_UNSUP=conntrack nftables tc
-+GENS=$(filter-out ${GENS_UNSUP},$(patsubst $(SPECS_DIR)/%.yaml,%,${SPECS_PATHS}))
- SRCS=$(patsubst %,%-user.c,${GENS})
- HDRS=$(patsubst %,%-user.h,${GENS})
- OBJS=$(patsubst %,%-user.o,${GENS})
+diff --git a/tools/net/ynl/samples/rt-link.c b/tools/net/ynl/samples/rt-link.c
+new file mode 100644
+index 000000000000..acdd4b4a0f74
+--- /dev/null
++++ b/tools/net/ynl/samples/rt-link.c
+@@ -0,0 +1,184 @@
++// SPDX-License-Identifier: GPL-2.0
++#include <stdio.h>
++#include <string.h>
++
++#include <ynl.h>
++
++#include <arpa/inet.h>
++#include <net/if.h>
++
++#include "rt-link-user.h"
++
++static void rt_link_print(struct rt_link_getlink_rsp *r)
++{
++	unsigned int i;
++
++	printf("%3d: ", r->_hdr.ifi_index);
++
++	if (r->_len.ifname)
++		printf("%16s: ", r->ifname);
++
++	if (r->_present.mtu)
++		printf("mtu %5d  ", r->mtu);
++
++	if (r->linkinfo._len.kind)
++		printf("kind %-8s  ", r->linkinfo.kind);
++	else
++		printf("     %8s  ", "");
++
++	if (r->prop_list._count.alt_ifname) {
++		printf("altname ");
++		for (i = 0; i < r->prop_list._count.alt_ifname; i++)
++			printf("%s ", r->prop_list.alt_ifname[i]->str);
++		printf(" ");
++	}
++
++	if (r->linkinfo._present.data && r->linkinfo.data._present.netkit) {
++		struct rt_link_linkinfo_netkit_attrs *netkit;
++		const char *name;
++
++		netkit = &r->linkinfo.data.netkit;
++		printf("primary %d  ", netkit->primary);
++
++		name = NULL;
++		if (netkit->_present.policy)
++			name = rt_link_netkit_policy_str(netkit->policy);
++		if (name)
++			printf("policy %s  ", name);
++	}
++
++	printf("\n");
++}
++
++static int rt_link_create_netkit(struct ynl_sock *ys)
++{
++	struct rt_link_getlink_ntf *ntf_gl;
++	struct rt_link_newlink_req *req;
++	struct ynl_ntf_base_type *ntf;
++	int ret;
++
++	req = rt_link_newlink_req_alloc();
++	if (!req) {
++		fprintf(stderr, "Can't alloc req\n");
++		return -1;
++	}
++
++	/* rtnetlink doesn't provide info about the created object.
++	 * It expects us to set the ECHO flag and the dig the info out
++	 * of the notifications...
++	 */
++	rt_link_newlink_req_set_nlflags(req, NLM_F_CREATE | NLM_F_ECHO);
++
++	rt_link_newlink_req_set_linkinfo_kind(req, "netkit");
++
++	/* Test error messages */
++	rt_link_newlink_req_set_linkinfo_data_netkit_policy(req, 10);
++	ret = rt_link_newlink(ys, req);
++	if (ret) {
++		printf("Testing error message for policy being bad:\n\t%s\n", ys->err.msg);
++	} else {
++		fprintf(stderr,	"Warning: unexpected success creating netkit with bad attrs\n");
++		goto created;
++	}
++
++	rt_link_newlink_req_set_linkinfo_data_netkit_policy(req, NETKIT_DROP);
++
++	ret = rt_link_newlink(ys, req);
++created:
++	rt_link_newlink_req_free(req);
++	if (ret) {
++		fprintf(stderr, "YNL: %s\n", ys->err.msg);
++		return -1;
++	}
++
++	if (!ynl_has_ntf(ys)) {
++		fprintf(stderr,
++			"Warning: interface created but received no notification, won't delete the interface\n");
++		return 0;
++	}
++
++	ntf = ynl_ntf_dequeue(ys);
++	if (ntf->cmd !=	RTM_NEWLINK) {
++		fprintf(stderr,
++			"Warning: unexpected notification type, won't delete the interface\n");
++		return 0;
++	}
++	ntf_gl = (void *)ntf;
++	ret = ntf_gl->obj._hdr.ifi_index;
++	ynl_ntf_free(ntf);
++
++	return ret;
++}
++
++static void rt_link_del(struct ynl_sock *ys, int ifindex)
++{
++	struct rt_link_dellink_req *req;
++
++	req = rt_link_dellink_req_alloc();
++	if (!req) {
++		fprintf(stderr, "Can't alloc req\n");
++		return;
++	}
++
++	req->_hdr.ifi_index = ifindex;
++	if (rt_link_dellink(ys, req))
++		fprintf(stderr, "YNL: %s\n", ys->err.msg);
++	else
++		fprintf(stderr,
++			"Trying to delete a Netkit interface (ifindex %d)\n",
++			ifindex);
++
++	rt_link_dellink_req_free(req);
++}
++
++int main(int argc, char **argv)
++{
++	struct rt_link_getlink_req_dump *req;
++	struct rt_link_getlink_list *rsp;
++	struct ynl_error yerr;
++	struct ynl_sock *ys;
++	int created = 0;
++
++	ys = ynl_sock_create(&ynl_rt_link_family, &yerr);
++	if (!ys) {
++		fprintf(stderr, "YNL: %s\n", yerr.msg);
++		return 1;
++	}
++
++	if (argc > 1) {
++		fprintf(stderr, "Trying to create a Netkit interface\n");
++		created = rt_link_create_netkit(ys);
++		if (created < 0)
++			goto err_destroy;
++	}
++
++	req = rt_link_getlink_req_dump_alloc();
++	if (!req)
++		goto err_del_ifc;
++
++	rsp = rt_link_getlink_dump(ys, req);
++	rt_link_getlink_req_dump_free(req);
++	if (!rsp)
++		goto err_close;
++
++	if (ynl_dump_empty(rsp))
++		fprintf(stderr, "Error: no links reported\n");
++	ynl_dump_foreach(rsp, link)
++		rt_link_print(link);
++	rt_link_getlink_list_free(rsp);
++
++	if (created)
++		rt_link_del(ys, created);
++
++	ynl_sock_destroy(ys);
++	return 0;
++
++err_close:
++	fprintf(stderr, "YNL: %s\n", ys->err.msg);
++err_del_ifc:
++	if (created)
++		rt_link_del(ys, created);
++err_destroy:
++	ynl_sock_destroy(ys);
++	return 2;
++}
+diff --git a/tools/net/ynl/samples/.gitignore b/tools/net/ynl/samples/.gitignore
+index 7f9781cf532f..b3ec3fb0929f 100644
+--- a/tools/net/ynl/samples/.gitignore
++++ b/tools/net/ynl/samples/.gitignore
+@@ -4,4 +4,5 @@ netdev
+ ovs
+ page-pool
+ rt-addr
++rt-link
+ rt-route
 -- 
 2.49.0
 
