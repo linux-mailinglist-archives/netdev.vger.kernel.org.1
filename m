@@ -1,84 +1,223 @@
-Return-Path: <netdev+bounces-190858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A019BAB91C7
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 23:25:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 652A3AB91D2
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 23:38:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A35393AF07A
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 21:25:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 15FE31B6875A
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 21:38:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2598922D4C6;
-	Thu, 15 May 2025 21:25:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68B4E288502;
+	Thu, 15 May 2025 21:38:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qZAfrdmX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mjb/opsi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F03B1158DA3;
-	Thu, 15 May 2025 21:25:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 602E72857EE
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 21:38:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747344353; cv=none; b=gpH3DAHNNxmxW1RR7p2wO4c4lQXK3hR2XxGEnTlpO3pMhiGJ6wW0TsCU34lynJVxaIwz8aUoTum7sf2oOFGOK1AHiPxjQ+Cd2JriqZumTrQ+qm35Nn1jg6uoCJiB7EgHxmlVc9MhlEqxQfkvFJ+/ftUJ2Z/GEWh8uMhZZKRKW94=
+	t=1747345098; cv=none; b=VOF2eJE2zQ7zYQ+/5zm3xgvDoNpfRrcjRgS5W0eC9YXAitrU1vzsd9r6yDZI+4Q+Faczwk+UH3DGLAax3TyWXncKpcT9zp6/wsP9ioU+Tg39CJ9ji7FxODDepp5FuXRmv2jTq0PhhKCMprhsbMncmMSdLWt38HZsHtwA5c7h/WI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747344353; c=relaxed/simple;
-	bh=z6S5X9MnnkOQohJSFOywHQYKdlN/N3s6Cmbdad8m31I=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tPa27WSi5wir3DzjAyA/AEdzH9R4MZFsoCiplKK1OruVr5Jx5Rn0Wipk1UziO/1FA0Bgf0uinwGN8rN0O9q0nNXaJM4yFv7594LYC4GxCB69cYGCI3bHTZhXwrVbtE65QhPaulj3iESLxhRpQ6L+3WPaWc2ybN3Ae708+bPZZ4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qZAfrdmX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8F84C4CEE7;
-	Thu, 15 May 2025 21:25:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747344352;
-	bh=z6S5X9MnnkOQohJSFOywHQYKdlN/N3s6Cmbdad8m31I=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qZAfrdmX4b4LE4QTIhSyyg0vdCxc/bGV3nAADzgnBfgWlr4ZyAnpAkvDZBq0zio1h
-	 EccF2nnQ5TMagEleE5W7XeKT+Tu+39GjmFMWoql+4zBe6FXL+m9kgIZcsM1yKKU50Q
-	 3D6kQ46MSk5yIKKcdxUxBTFwKWtk8aIZu32U1AcVFFO5T0nOlU5upE9YB1Fm+IDCBD
-	 aCmQKKufjHaDmSDIQBG5Mu0PG+Ll4mrbEQ3mD+clg/4n59hOC7xIcCp8FvQIokZPFk
-	 5jUSFL8eKJL2sHuoJZM3fm+orFjiwKSg+WAMFS2V9ogjsHmHIhfhUIW4lQ/WNCowQ6
-	 VZDtA1yDT/m9A==
-Date: Thu, 15 May 2025 14:25:51 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ronak Doshi <ronak.doshi@broadcom.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, Guolin Yang
- <guolin.yang@broadcom.com>, Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net] vmxnet3: correctly report gso type for UDP tunnels
-Message-ID: <20250515142551.1fee0440@kernel.org>
-In-Reply-To: <CAP1Q3XQcPnjOYRb+G7hSDE6=GH=Yzat_oLM3PMREp-DWgfmT6w@mail.gmail.com>
-References: <20250513210504.1866-1-ronak.doshi@broadcom.com>
-	<20250515070250.7c277988@kernel.org>
-	<CAP1Q3XQcPnjOYRb+G7hSDE6=GH=Yzat_oLM3PMREp-DWgfmT6w@mail.gmail.com>
+	s=arc-20240116; t=1747345098; c=relaxed/simple;
+	bh=2r6+XSECKcWKaO/VXv4v+3bUhNwHwFwv90RIeKI6JnY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HQ5G2+CCZqeGIiGRXOyNNV9BvXauOtsSGuucxXRvco2/fPT2nUz3cYnfXGFiOhanNa+Q2xT0YNOzuxeuw26zTdxJuzz+vCNF7BviFtPk2qrcNkX8pPitLhqldc3m/QIGGnve080MYd0d4Zvsvj4D9lY20pS1e4Xgotz1Z/qvMP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mjb/opsi; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5fce6c7598bso3974a12.0
+        for <netdev@vger.kernel.org>; Thu, 15 May 2025 14:38:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1747345094; x=1747949894; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/LVA8CfjDfm+VSCeyGlJaAgYMUBeRaQEtemdua5k1qM=;
+        b=mjb/opsiTW2Pjl2MDNYLSP98lR+wzh1ls9TCH2OwBIDZ1EtNxiIyo7ShTYSo8+XtOU
+         n6E00AIWc++oIbh3vydgH8+2gk042JwsnY5bmczwKjzEIs7kc8His9u6gr1FdEG656By
+         Wp219ZRXEVJQ+kdOjwYD22SiXzYMZ83FgRKTsYWDVdlZFzXkj73D0Mq2B2UnOFzvxGtz
+         zNBy8cs/z6aQdT/IncGqSK+sNkO8m6rGZi+mVTY4rYfH/04vmDyXtMb9tx7ZaP2I9wiU
+         vu/M8ifM2JiJgrcf0clbt+MC30XGJtBJfuj8Q6Tyi9RUHsVe34uEXxw2rv+s+2FVE5QB
+         6b9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747345094; x=1747949894;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/LVA8CfjDfm+VSCeyGlJaAgYMUBeRaQEtemdua5k1qM=;
+        b=uJfJpkPKn0fd2QIzDBY1hR1ORmHgZotmXhZfKVoaTF0Blmk8aTYVU2Emsa8UqekBgO
+         Zl0UacxBpdTgmmXNkIz33yQssAfcPjILc5DegV/YS2evxansItkPLWh+S6AtOGI5uCZb
+         Po7zCnnY6FXIxYIfY5XjXBy1QDB59/ArFyXgvNK8wnxNnY4P1KdNWGc9FG1uV6PA/3fv
+         un3N4aAYQNnrqeE+ivhWNDn4qvP2U+DpglYnDDz+lMhKoePjFFEQJ5JkEsS/BGw+aYh0
+         Ubg0syKn1yUBbUc6nIIligPreMp76oy0+vsaYEeYcTowWpWV2qV6j2jcZ/E3O0e0ORvQ
+         MZsw==
+X-Forwarded-Encrypted: i=1; AJvYcCXhgF6JOy+rp6KzL9hI5LsXwlhjIgf9WSMR7U39AB2JAxMwpWtPk3ur1Dp7gAYLDGHsN5yI5aw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCpbuRLn5vlf0WIk2WyGgBRChiMFsgJyB7kLqizydxbGvGnX4/
+	8ZrFjEnctQvcjs816q7pbLhJyZ7bpVyKvqND518olii04rL3Dvt3RQD8DMy0+qwB3bTd+63jKoF
+	sx1FZqtk4DPYiBtsRhC4CmLRTYMz9VXmQKwcQXI/Z
+X-Gm-Gg: ASbGnctwpZPpZyBhRKJwJUYc5VAm1V55gBu2Gs/ZA+O9wisw7daf9zm9Ja1xx+J+hBx
+	Z0syNe0F/V7078GLOLEjAejdt1jWHzj1LcL5LkFEqmkjlPWa2ei14LCfpcCqM/W6IddS6td85Lz
+	l+c67zpJEAubH5GOZeOn+9OKhAp4p3LdPJWJchYpsUCOlcDBtTSq2OAvCMme6B
+X-Google-Smtp-Source: AGHT+IH49Y6US4taITWDU1pbVlF4yC0gcI/8Nb0THiwVU/n/87BUmOnKPci4gt5tadLxk2qZ0VReEuyaOguZv9aRoAQ=
+X-Received: by 2002:a50:951d:0:b0:5fd:d62b:a68d with SMTP id
+ 4fb4d7f45d1cf-5ffce28c7cemr138026a12.3.1747345094235; Thu, 15 May 2025
+ 14:38:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250515-work-coredump-socket-v7-0-0a1329496c31@kernel.org>
+ <20250515-work-coredump-socket-v7-5-0a1329496c31@kernel.org> <CAG48ez3-=B1aTftz0srNjV7_t6QqGuk41LFAe6_qeXtXWL3+PA@mail.gmail.com>
+In-Reply-To: <CAG48ez3-=B1aTftz0srNjV7_t6QqGuk41LFAe6_qeXtXWL3+PA@mail.gmail.com>
+From: Jann Horn <jannh@google.com>
+Date: Thu, 15 May 2025 23:37:37 +0200
+X-Gm-Features: AX0GCFsPTOBbbM97nj_zGvtiFNH08JEBWZLvjPj801SQAX6rk9ubric3xqIPWGc
+Message-ID: <CAG48ez33kd=KFKfxNN1Z-xwrCvrHSNumJ-YbDmke0GM2a3tv0g@mail.gmail.com>
+Subject: Re: [PATCH v7 5/9] pidfs, coredump: add PIDFD_INFO_COREDUMP
+To: Christian Brauner <brauner@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Eric Dumazet <edumazet@google.com>, Oleg Nesterov <oleg@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Daan De Meyer <daan.j.demeyer@gmail.com>, David Rheinsberg <david@readahead.eu>, 
+	Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>, 
+	Lennart Poettering <lennart@poettering.net>, Luca Boccassi <bluca@debian.org>, Mike Yuan <me@yhndnzj.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	=?UTF-8?Q?Zbigniew_J=C4=99drzejewski=2DSzmek?= <zbyszek@in.waw.pl>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, 
+	Alexander Mikhalitsyn <alexander@mihalicyn.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 15 May 2025 13:38:49 -0700 Ronak Doshi wrote:
-> > IIRC ->encapsulation means that ->inner.. fields are valid, no?
-> > And I don't see you setting any of these.
+On Thu, May 15, 2025 at 10:56=E2=80=AFPM Jann Horn <jannh@google.com> wrote=
+:
+> On Thu, May 15, 2025 at 12:04=E2=80=AFAM Christian Brauner <brauner@kerne=
+l.org> wrote:
+> > Extend the PIDFD_INFO_COREDUMP ioctl() with the new PIDFD_INFO_COREDUMP
+> > mask flag. This adds the fields @coredump_mask and @coredump_cookie to
+> > struct pidfd_info.
+>
+> FWIW, now that you're using path-based sockets and override_creds(),
+> one option may be to drop this patch and say "if you don't want
+> untrusted processes to directly connect to the coredumping socket,
+> just set the listening socket to mode 0000 or mode 0600"...
+
+Er, forget I said that, of course we'd still want to have at least the
+@coredump_mask.
+
+> > Signed-off-by: Christian Brauner <brauner@kernel.org>
+> [...]
+> > diff --git a/fs/coredump.c b/fs/coredump.c
+> > index e1256ebb89c1..bfc4a32f737c 100644
+> > --- a/fs/coredump.c
+> > +++ b/fs/coredump.c
+> [...]
+> > @@ -876,8 +880,34 @@ void do_coredump(const kernel_siginfo_t *siginfo)
+> >                         goto close_fail;
+> >                 }
 > >
-> > Paolo, please keep me honest, IIUC you have very recent and very
-> > relevant experience with virtio.  
-> 
-> I did not hit any issues during Vxlan and Geneve tunnel testing. I did not find
-> the code which validates inner fields being set. Maybe I missed something. If
-> you and Paolo think inner fields are indeed required, then I will remove these
-> lines.
-
-Not sure if the stack itself cares, but drivers look at those 
-fields for TSO. I see a call to skb_inner_transport_offset() 
-in vmxnet3_parse_hdr(). One thing to try would be to configure
-the machine for forwarding so that the packet comes via LRO
-and leaves via TSO.
+> > +               /*
+> > +                * Set the thread-group leader pid which is used for th=
+e
+> > +                * peer credentials during connect() below. Then
+> > +                * immediately register it in pidfs...
+> > +                */
+> > +               cprm.pid =3D task_tgid(current);
+> > +               retval =3D pidfs_register_pid(cprm.pid);
+> > +               if (retval) {
+> > +                       sock_release(socket);
+> > +                       goto close_fail;
+> > +               }
+> > +
+> > +               /*
+> > +                * ... and set the coredump information so userspace
+> > +                * has it available after connect()...
+> > +                */
+> > +               pidfs_coredump(&cprm);
+> > +
+> > +               /*
+> > +                * ... On connect() the peer credentials are recorded
+> > +                * and @cprm.pid registered in pidfs...
+>
+> I don't understand this comment. Wasn't "@cprm.pid registered in
+> pidfs" above with the explicit `pidfs_register_pid(cprm.pid)`?
+>
+> > +                */
+> >                 retval =3D kernel_connect(socket, (struct sockaddr *)(&=
+addr),
+> >                                         addr_len, O_NONBLOCK | SOCK_COR=
+EDUMP);
+> > +
+> > +               /* ... So we can safely put our pidfs reference now... =
+*/
+> > +               pidfs_put_pid(cprm.pid);
+>
+> Why can we safely put the pidfs reference now but couldn't do it
+> before the kernel_connect()? Does the kernel_connect() look up this
+> pidfs entry by calling something like pidfs_alloc_file()? Or does that
+> only happen later on, when the peer does getsockopt(SO_PEERPIDFD)?
+>
+> >                 if (retval) {
+> >                         if (retval =3D=3D -EAGAIN)
+> >                                 coredump_report_failure("Coredump socke=
+t %s receive queue full", addr.sun_path);
+> [...]
+> > diff --git a/fs/pidfs.c b/fs/pidfs.c
+> > index 3b39e471840b..d7b9a0dd2db6 100644
+> > --- a/fs/pidfs.c
+> > +++ b/fs/pidfs.c
+> [...]
+> > @@ -280,6 +299,13 @@ static long pidfd_info(struct file *file, unsigned=
+ int cmd, unsigned long arg)
+> >                 }
+> >         }
+> >
+> > +       if (mask & PIDFD_INFO_COREDUMP) {
+> > +               kinfo.mask |=3D PIDFD_INFO_COREDUMP;
+> > +               smp_rmb();
+>
+> I assume I would regret it if I asked what these barriers are for,
+> because the answer is something terrifying about how we otherwise
+> don't have a guarantee that memory accesses can't be reordered between
+> multiple subsequent syscalls or something like that?
+>
+> checkpatch complains about the lack of comments on these memory barriers.
+>
+> > +               kinfo.coredump_cookie =3D READ_ONCE(pidfs_i(inode)->__p=
+ei.coredump_cookie);
+> > +               kinfo.coredump_mask =3D READ_ONCE(pidfs_i(inode)->__pei=
+.coredump_mask);
+> > +       }
+> > +
+> >         task =3D get_pid_task(pid, PIDTYPE_PID);
+> >         if (!task) {
+> >                 /*
+> [...]
+> > diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> > index a9d1c9ba2961..053d2e48e918 100644
+> > --- a/net/unix/af_unix.c
+> > +++ b/net/unix/af_unix.c
+> [...]
+> > @@ -742,6 +743,7 @@ static void unix_release_sock(struct sock *sk, int =
+embrion)
+> >
+> >  struct unix_peercred {
+> >         struct pid *peer_pid;
+> > +       u64 cookie;
+>
+> Maybe add a comment here documenting that for now, this is assumed to
+> be used exclusively for coredump sockets.
+>
+>
+> >         const struct cred *peer_cred;
+> >  };
+> >
 
