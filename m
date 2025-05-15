@@ -1,83 +1,121 @@
-Return-Path: <netdev+bounces-190833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D88CAAB907D
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 22:02:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C8CC7AB9087
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 22:09:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AFAA189BA97
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 20:02:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 764B61BC3480
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 20:09:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD9B4263F5E;
-	Thu, 15 May 2025 20:02:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42D95266B66;
+	Thu, 15 May 2025 20:09:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oOqp8xDx"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="E7BM5X20"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.smtpout.orange.fr (smtp-17.smtpout.orange.fr [80.12.242.17])
+	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8BD720E332
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 20:02:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DFF04B1E42;
+	Thu, 15 May 2025 20:09:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747339355; cv=none; b=ku8lSD2W16A8ID9cHiVL5Rbi3WHNsShz2jHMSSBZbyBMOiXr6jfhLf6FXxx7nKv+TlCPVDKfpilucemF8YUDdUE7e765yxTFytmWRXr5lRZJ97n3uidIcN46joaTKlOfb0ww71eHhKvwGaYnyiBlTtcmuAqR3TqQjbNLDdLnkuQ=
+	t=1747339745; cv=none; b=lJQKwzZQZMizI5f2H48d/cg16p3kqDq98ud5JTuHQOvP0vjH2+7OtCBoisuhvCy+9pG7aexNtWKq3P7Egqciq9DGL2KWhjsVkxPBeD4s76Tq9DRzs9iSVEwvPcOfuB4OQSFp8nNacutSp3Rqyj1OsMHjk9n6eBYcn/w54t00Pgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747339355; c=relaxed/simple;
-	bh=faEObyMxYfkwccsx+LjjZfjnpOCaiPTiz0+oED1ZxpQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FPKdSKFF64BNJZE4WpOcSAUDe58ZDgC6zREqUgwyT7K4W9uvTexPImK7Zm1F5f/S+ajUmM8gWbzCt/7llslVG7z4vrQJw6xi4srOlJvdkSJr3YFz7I086VSZVzx94A8Pdo9mpvRnJAN1y4XYjyVsi9keiIzA6MjF/mHCGF8EuI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oOqp8xDx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BC5DC4CEED;
-	Thu, 15 May 2025 20:02:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747339355;
-	bh=faEObyMxYfkwccsx+LjjZfjnpOCaiPTiz0+oED1ZxpQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oOqp8xDxr5zGRaVYQT2t7J4h6IcX4Plu+uTFCf6NIhzyBHnflcIr/tFa/VP7ouiUK
-	 rDPDsZM3fvUg/LP/uvHLUWQSqzdnmMGjAvqAr+p6skJEb3aZQvWvTNQkdiAVb9YwVn
-	 dtVPt+vScCEmu6haXCTojEABsOXMqr8mxl63hw6p/7jlG1GXHmJX8kselSErjfx9zy
-	 GvkVxWUM1IEi9fM6w7rdYs6aXy02PstQIwESwpokoQm6i5YWoDaiCv+hNxd9ln5M5W
-	 7shv8pTbB8+LCt6FQpZwHSW91abn7adhI7+0El/QVZ+4Up1byXfYH9NpIihsb/I0ZE
-	 UuUEkxsxIZxrg==
-Date: Thu, 15 May 2025 21:02:32 +0100
-From: Simon Horman <horms@kernel.org>
-To: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Konrad Knitter <konrad.knitter@intel.com>
-Subject: Re: [PATCH iwl-next] ice: add E835 device IDs
-Message-ID: <20250515200232.GY3339421@horms.kernel.org>
-References: <20250514104632.331559-1-dawid.osuchowski@linux.intel.com>
+	s=arc-20240116; t=1747339745; c=relaxed/simple;
+	bh=uf+Uec8jqK+aCOyw7H+7MiHxFd2PaALAT6F2kPyWT/o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lr29pLnvoR1qEzLFseO5fsZiLWpDnsDLwzgqIl24dB25I/gDbRkU0mEfxcgtrwmSnS/cyDTTxAy5+498JUZDg/rP3/YiW4jvLP0iALDlvVfuK1O9hdJdDYtVz8ggOtXW06aVGXwy+67bfmA7VauwxLpWbpU6fqK3QYEGmnwPwaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=E7BM5X20; arc=none smtp.client-ip=80.12.242.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from localhost.localdomain ([90.11.132.44])
+	by smtp.orange.fr with ESMTPA
+	id FekBuCN6oIqMPFekCugnJy; Thu, 15 May 2025 21:59:56 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1747339196;
+	bh=MYe7aSMySa0ucT08nhb3OZlqYbxJUD++vh68yJRzj6M=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=E7BM5X20UrwkEoUQAe0akEYh/tAT6ODI+2Oc/9Zi6/yaf7wCBUufOmzwAsAZhcbZR
+	 9EgyqFCZ22tONOH0iqWDXw9v1xOKD2p27aOT2oJRtZyqOnQF/TZNzH1upW5SLFaoO1
+	 nASJ0dTx9oSlX1a/qPD2FvxfClJHSu5nQrv4N8Y+DCe4WJ04jvjw9dq0Bp2htyYABD
+	 SMqiEpVPcKXnGIdWS7RiOdM/6YjXCd/nhWE2sHCifxJkoF5sbjjKWXCre8JtDyCs88
+	 K35SYFUK6ZSLXgkFs4pvltoWu6X9uv4WsQNzgOzUArPzmHb8wUNjN+HWdPdwallz5B
+	 nJ6Cn7upIXDGw==
+X-ME-Helo: localhost.localdomain
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Thu, 15 May 2025 21:59:56 +0200
+X-ME-IP: 90.11.132.44
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To: Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v3 1/4] net: airoha: Fix an error handling path in airoha_alloc_gdm_port()
+Date: Thu, 15 May 2025 21:59:35 +0200
+Message-ID: <5c94b9b345017f29ed653e2f05d25620d128c3f0.1746715755.git.christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250514104632.331559-1-dawid.osuchowski@linux.intel.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, May 14, 2025 at 12:46:32PM +0200, Dawid Osuchowski wrote:
-> E835 is an enhanced version of the E830.
-> It continues to use the same set of commands, registers and interfaces
-> as other devices in the 800 Series.
-> 
-> Following device IDs are added:
-> - 0x1248: Intel(R) Ethernet Controller E835-CC for backplane
-> - 0x1249: Intel(R) Ethernet Controller E835-CC for QSFP
-> - 0x124A: Intel(R) Ethernet Controller E835-CC for SFP
-> - 0x1261: Intel(R) Ethernet Controller E835-C for backplane
-> - 0x1262: Intel(R) Ethernet Controller E835-C for QSFP
-> - 0x1263: Intel(R) Ethernet Controller E835-C for SFP
-> - 0x1265: Intel(R) Ethernet Controller E835-L for backplane
-> - 0x1266: Intel(R) Ethernet Controller E835-L for QSFP
-> - 0x1267: Intel(R) Ethernet Controller E835-L for SFP
-> 
-> Reviewed-by: Konrad Knitter <konrad.knitter@intel.com>
-> Signed-off-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
+If register_netdev() fails, the error handling path of the probe will not
+free the memory allocated by the previous airoha_metadata_dst_alloc() call
+because port->dev->reg_state will not be NETREG_REGISTERED.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+So, an explicit airoha_metadata_dst_free() call is needed in this case to
+avoid a memory leak.
+
+Fixes: af3cf757d5c9 ("net: airoha: Move DSA tag in DMA descriptor")
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+---
+Changes in v3:
+  - None
+
+Changes in v2:
+  - New patch
+v2: https://lore.kernel.org/all/5c94b9b3850f7f29ed653e2205325620df28c3ff.1746715755.git.christophe.jaillet@wanadoo.fr/
+
+Compile tested only.
+---
+ drivers/net/ethernet/airoha/airoha_eth.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+index 16c7896f931f..af8c4015938c 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.c
++++ b/drivers/net/ethernet/airoha/airoha_eth.c
+@@ -2873,7 +2873,15 @@ static int airoha_alloc_gdm_port(struct airoha_eth *eth,
+ 	if (err)
+ 		return err;
+ 
+-	return register_netdev(dev);
++	err = register_netdev(dev);
++	if (err)
++		goto free_metadata_dst;
++
++	return 0;
++
++free_metadata_dst:
++	airoha_metadata_dst_free(port);
++	return err;
+ }
+ 
+ static int airoha_probe(struct platform_device *pdev)
+-- 
+2.49.0
 
 
