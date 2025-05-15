@@ -1,79 +1,115 @@
-Return-Path: <netdev+bounces-190814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54D8AAB8F2A
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 20:33:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E374AB8F2C
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 20:36:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4752E3A367F
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 18:32:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EA494A757C
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 18:36:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42497298C24;
-	Thu, 15 May 2025 18:31:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78608255E44;
+	Thu, 15 May 2025 18:36:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gd5JGc1H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hTxPGPOk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B1782989B3;
-	Thu, 15 May 2025 18:31:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3E01263F38
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 18:36:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747333893; cv=none; b=jkLGIKAYbFpS5Fiq9NfNAxcVXbeKakKdUT7M3fwv/oAzuPtYX96Qq3hqelzWE8tO5SQhRAJ/QNDctQuWWvcFi8a/sjUfok8zr3SpyWGI4VATwhAV7620Aui5lnCT3lFxcuAhf5HzpMNb2GW1P6Nwxbikcyk4nslvD3ZHsAJLB+4=
+	t=1747334191; cv=none; b=KwEjBsHavzoN+zep9Hu+wQzeaWnVU8o8UwhYbuiQPU/qB5EWudIfj8U4IKWafVHsJ/ugOBgvro9PZP1EBSRFlPVVWK+ExT+LBJfdzBRdqW/KnAZJAidEVLozCyGHYVHSLO31PI8JNUEZK/F4nEOkWGLu2d1JrjMj8joeqmDwQzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747333893; c=relaxed/simple;
-	bh=V+QLsQuPxIprTLyEzkj8L8nEDsigEA8EWaPGDx2twaI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NBVhdNj17jFDQuQwlwM7Gxlt+hVNCYv1y0E/3vcDMYZkznuSOGPWhwoO1yL+QDw8vZBeRTYsrgfeRKFdRVVCUjHrDEI9JjHNKWVGbURAvLalBaaIjFP5GfTTMhXw00nJ94CA6DmnA2THztcSUFnv9Ln9md1q0ChP7Xta4RKc728=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gd5JGc1H; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B27DC4CEE7;
-	Thu, 15 May 2025 18:31:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747333892;
-	bh=V+QLsQuPxIprTLyEzkj8L8nEDsigEA8EWaPGDx2twaI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gd5JGc1Hfgk8dMBAZIdrjp6d4I8wV4j6cE7ZM4Lvh4GgR6o3GoCkXipqRNJ+Vr/vd
-	 aI0j5aGQkUYcLPDdjijKmGG1czmTxi518v2ruL53hF6+f7d0OHyKC9C0tgqUneJ09v
-	 03D1b42q8JVfLteMfCuGtSXkiLa2wkQInXBM8b2KB6OUO0WXLa7bntNYvhupreWTna
-	 /yxTMHaYBYOZG121IzUuZue0MBTAYX52qoDqNje/NyBbsAixtbkaRqLNDQPaAF6dgk
-	 GoR8ErxhXI9/M2P1xQJfJhN9yb7668CBH5i/tjGzNRIBrsIPNzeCZXB7XYlouqlYmz
-	 CZkyrQNkdNZdA==
-Date: Thu, 15 May 2025 11:31:31 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: patchwork-bot+netdevbpf@kernel.org
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, andrii@kernel.org,
- eddyz87@gmail.com, mykolal@fb.com, martin.lau@linux.dev,
- edumazet@google.com, kuni1840@gmail.com, bpf@vger.kernel.org,
+	s=arc-20240116; t=1747334191; c=relaxed/simple;
+	bh=RphQLpYVAnI77ltmge6ZB7SwtHmdzXN0SH9PhNxUAUE=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=iwfmTmL2DI7MWh90UWiwl0PQFXl1ph/jeM8v1MstFkhfc0Z/SJz8ZKdo8rxsvWdrm2D4AkT3zD7hm7AaHtRnEICJ/Rtp9vx6QuifGo6xVEFRULWWc2VQeSa3fu0qbWo6JQU5BzkbRo5QnvITKyB4O4m9JoBAUQM8LP9JTA5XgeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hTxPGPOk; arc=none smtp.client-ip=209.85.222.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7c54f67db99so263875185a.1
+        for <netdev@vger.kernel.org>; Thu, 15 May 2025 11:36:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747334189; x=1747938989; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ne2q4yJBVlfesS6s6k0cFjRHjcVvid+Kh3+SjvFFyz8=;
+        b=hTxPGPOk8aa7Rpnb65d1FIwfz0orWacvDcqtSw8gByo3jjgTlXbq5kSRpZWIed3z58
+         8Ynw03o4Ukap01EU93puFLATkTtgOASeiNuPweX+K1Yn5jzFdVbJsWlUm8Qw5yR0wLNI
+         nn1i6kOEhWypsBIOnpvvPECHfb6X+vKSeCompJTlbQc06w/OLIOs7tgpFm82PeCwVOAV
+         V+i+GKi789l0ljxpMRQVv8NlE/EesfKIR8ZmPGG6NJgkOl66juaCIag6dGPtOruynq5V
+         6CicsT2njhGL0HtUFKQTn4kbriU41TNUlhvcB9QthVdXYbZefohLknst4uXRXp7JLZCK
+         wgNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747334189; x=1747938989;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ne2q4yJBVlfesS6s6k0cFjRHjcVvid+Kh3+SjvFFyz8=;
+        b=Yn3AgZg1yDdKPIZrTKEyZXLR73uM8YzrkYcPzWGK3gNVgwCpP8iWXHPUu0YSY09SxE
+         /i+oZPXoMqrJrYiDvbHp2/w1mvENErfqU2om3IMsOSX3fa9iyJq3Qxn7DWejqzq9da19
+         kkVburfULdis47ili6SpXBLo25KkiFVrq8PxWCrkJ1JuT4y6Qp7DEyjHyDAgvNovo5wj
+         2svK7ehQQIIp6LOqnWGa/90b3QB65PPj68uBiFvkrlav1IXb4/9a7PNCZqj47jHeoRbN
+         xYIMMqUnMJRbfv8id2WOBcTvhiRelny3CJiAFB4SOldduKDeFPrmn/lSsnVTM48tMYpi
+         fS1A==
+X-Forwarded-Encrypted: i=1; AJvYcCUsm3n1LHs/WB2sV5MTc+5PYz9SJvA3XRZYGORjFMLd3lUbz+aPpEOX/rH+q07Ca34rtbdqTSU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzqxhiap1svwANOj6Fv+9IGOPgX9N8lYMn/PPj4NQ95N79IGJfA
+	Jj/ntp238hx2Qsn16IKhd/Efbym0G/jkNpwvbOQ60QdWtzRqWVzrSrnL
+X-Gm-Gg: ASbGnctr2qW4gi6IzB4i8jYP+ahxpIcLLpDsfE35Npw5MeewVc4vvlqfrlorLrWs40j
+	eznwV9w96w/N9Ls5ejKq9fMfoZF+LsF/Su/kUFrLN3OqBTIAFB2EpSx9b8ApsTWJ1/+7ewSZQWl
+	qMP43oQ4ZgtSq2DCiwwIbq3xQbM9NiuU7Kg2I9qvTuikJl/dYINWWNGCx46et02uHehsovczHVh
+	MVqbhEJISZm89LkyHvzSBAFM6r+Sf7E42nxcSTZPo5kh6aWDqmHwhWCMOdfeAi/lhehxpi7qKOu
+	nFy+ZSzA20n/NpIOClFSLaXGGtFoi3szFqOrFvklSHQ1IOBYTlZU2MioDwkArq8IMl1Sp0zZmVj
+	K25/v2kaeq8Ie587PxHf7fu4=
+X-Google-Smtp-Source: AGHT+IHn3k5XxPWM8Csv9Zoval+sqpNC4H5+DvTkbRsasWUjfkCuuXxwM5SuATQZyL/qeZYaoZ3xvQ==
+X-Received: by 2002:a05:620a:1d0d:b0:7c9:230f:904a with SMTP id af79cd13be357-7cd39de2503mr820983585a.14.1747334188547;
+        Thu, 15 May 2025 11:36:28 -0700 (PDT)
+Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7cd467d7fc6sm17843685a.27.2025.05.15.11.36.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 May 2025 11:36:27 -0700 (PDT)
+Date: Thu, 15 May 2025 14:36:27 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemb@google.com>
+Cc: Simon Horman <horms@kernel.org>, 
+ Christian Brauner <brauner@kernel.org>, 
+ Kuniyuki Iwashima <kuniyu@amazon.com>, 
+ Kuniyuki Iwashima <kuni1840@gmail.com>, 
  netdev@vger.kernel.org
-Subject: Re: [PATCH v1 bpf-next] selftest: bpf: Relax TCPOPT_WINDOW
- validation in test_tcp_custom_syncookie.c.
-Message-ID: <20250515113131.21203db4@kernel.org>
-In-Reply-To: <20250515103642.01ed5f5a@kernel.org>
-References: <20250514214021.85187-1-kuniyu@amazon.com>
-	<174726243176.2534141.9628048963449437170.git-patchwork-notify@kernel.org>
-	<20250515103642.01ed5f5a@kernel.org>
+Message-ID: <6826342b40a68_25ebe5294f3@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250514165226.40410-5-kuniyu@amazon.com>
+References: <20250514165226.40410-1-kuniyu@amazon.com>
+ <20250514165226.40410-5-kuniyu@amazon.com>
+Subject: Re: [PATCH v3 net-next 4/9] tcp: Restrict SO_TXREHASH to TCP socket.
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-On Thu, 15 May 2025 10:36:42 -0700 Jakub Kicinski wrote:
-> On Wed, 14 May 2025 22:40:31 +0000 patchwork-bot+netdevbpf@kernel.org
-> wrote:
-> > Here is the summary with links:
-> >   - [v1,bpf-next] selftest: bpf: Relax TCPOPT_WINDOW validation in test_tcp_custom_syncookie.c.
-> >     https://git.kernel.org/bpf/bpf-next/c/4dd372de3fde  
+Kuniyuki Iwashima wrote:
+> sk->sk_txrehash is only used for TCP.
 > 
-> Per the link in the commit description we need this in net-next :(
-> Did it land in the non-network BPF tree? Or on the network branch?
+> Let's restrict SO_TXREHASH to TCP to reflect this.
+> 
+> Later, we will make sk_txrehash a part of the union for other
+> protocol families.
+> 
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-Martin pointed out off list that the CI flow merges in bpf-next
-so it won't matter, all good.
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
