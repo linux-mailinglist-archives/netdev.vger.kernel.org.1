@@ -1,189 +1,101 @@
-Return-Path: <netdev+bounces-190850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFB75AB9110
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 22:57:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B34ECAB9126
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 23:05:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B4F917171F
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 20:57:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B83AAA055E9
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 21:05:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DC6629B77E;
-	Thu, 15 May 2025 20:57:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E165F28689F;
+	Thu, 15 May 2025 21:05:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NiW7Py5G"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="UGxd2zhy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C525255E44
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 20:57:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FA7D4174A;
+	Thu, 15 May 2025 21:05:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747342651; cv=none; b=GkYOoXirp0vJ3uTJQ13rHV0ToZy9X5AI68Zn8wpLL+MdSymaz6NYTcWZog0efxck0YU5YbUPt7frrHpBWI16s3ICf4Fz5a585k9WGkhFeb4EIxfkuy9QrAsSGkGKmsyN76f/gtbHJvnggYGuYVcFQVJr6YzPfHBy2hinBk3cExU=
+	t=1747343122; cv=none; b=My0/Wd2J3q4h52eVF1uf3HJ5lj7GzY6e9zzGYxUssItCoVwD3laovSw9peSxRD9KochMtnitLn+Pnu36m/exKaFePuRPCoPm1pp1qxdflts4Z6yJQxwWmEaEkFArcp+p3ztjP/fFipiLSBN8iZqT6QA1gE8hIKqpGdN4Bq/qB6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747342651; c=relaxed/simple;
-	bh=taP41+wJpy0yc6RsFja33qPnKJw1y2Xhs0S/9nTHmSw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tfzpJmbc17BEsuViUERV6cmBCgUNUByyWEEvDD5Pa/UpVlx5Nxv6K8yHjNeIQacgyds3XorjIgwNj8nAdgE8bulVeCKvnLc5VRnDSyCMRMquZfPKZs+HiITiJKbyPIl1jq0qknbvo6PwLPwO2vV3NJN7Ygiqr0dPa5n0tmlFRxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NiW7Py5G; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-6000791e832so1379a12.1
-        for <netdev@vger.kernel.org>; Thu, 15 May 2025 13:57:28 -0700 (PDT)
+	s=arc-20240116; t=1747343122; c=relaxed/simple;
+	bh=hjdY6wXLhuusRwtLdNI+7Lc2DWrEQ6E1YASsEzK2Aks=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SJE0QmicJAsywpJkVgxghuNXVAKWN5ptK1sXXyT3bJInBmqLVRm6vOl67F6uePQTED135rpQ8bRzTRvSxPCThaYpzYlm6Ee4ulbYieimJG6IxYwsquD5hU5P/YLvyPqcETeSQu/GW9Cldhj8t4HwLqWdqUbBMl/Ye8FdUQRaL+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=UGxd2zhy; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747342647; x=1747947447; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uzQSePE6o2SkN8jAbdnZRBJyZ+/cJeSuYPGHH8Q8rmQ=;
-        b=NiW7Py5GNvTJUqdHnmdVS0Vx9w/DCUN4NtA1oHQEAKK115jXjMwDE6wq6c431WVkEu
-         FYMxNwI0EUxnLxXl4L5RCPL81+QXnvaF5LrroJG+bmbSdTpfiGKH7mpSiPK6oVS9TL8o
-         yYqzQLmS9ue4AVnAlXCZ56QFBvk2Sbswmjl48iuVq3lgSF0uXhA/NRDs09SsNSCwsdA3
-         ZEqUkg0EAJTeig4yIkHZ6l1+b9FfVldi5DTr/nU/2X7O3wS6EcmTMyOgeRaeHOLjaJhY
-         JWP81uMyPFAxNI81Vd+kc3kuKL7ExeiIgJ8tbZRJ5C3+f+Z9Pdk6iFWZwixf8Ro8LaZd
-         u2aw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747342647; x=1747947447;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uzQSePE6o2SkN8jAbdnZRBJyZ+/cJeSuYPGHH8Q8rmQ=;
-        b=IjXaFRZOTywkoXaACaPevlRN+gOfvfEwMSMfyZCB3R0+haPLkx52Z0V9iaJSVKfrjO
-         BJfM6SCsotXZ3EpXkuLHCoPVGc4527Om+zRrfOz8n0vAu24qpQVV09uKrUFn902z2eB6
-         l5jZPSzhlSqYs0hdgke/5qx2jCBlycUHeT9cpX/qRjs39PKX8W0LKrUY87U0HvTt0IWF
-         HsDglWDvyimb461VlDkYDbRpFeA8X/yWpkmCxF0LuW67UNNl8qlJLz0V/UgxoeupyWeV
-         0L/hMNvSCzFqZTlmv5wnlqa4uhojF73sIpPxof9kf/fT58udhs7LIR0YXSGPKeZlP+6q
-         b5ZA==
-X-Forwarded-Encrypted: i=1; AJvYcCVbe5Tiyr/05jcykTcl2wEkBONwBQgmOsTNqfiMh6VbPEMaBzlp6hyhER3td5H/9pWTMckyIXM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2mnLst/3pGKGzcx/BlK/tRUF/UGfW5qfUu7dOdCtgt5y+hWFa
-	oT/1qjb0qoAi6owb3Ooi0aAnn+etdapHCy8hli7rDaBnHHefSOePvEa8kwJ+rXLOI4EhQXkaViC
-	NBmx3imRBqth0tJ+8H/7Yk5iwAWR12Z01E1XiESpj
-X-Gm-Gg: ASbGnct2guihLbtFQaYV0zeqQ+mCaStLB5V8Os4JgLkUAUjCGi4c1eJlOXGVS2rF7ZZ
-	2pxoQAirbuwZAbKwdTSRmQ6gDsY3vn3rbLm9GsCBjuzSRV1Zfq2P2oib4NrEiYEyTzECHMC+tOQ
-	paQdam/2R0kLYRS699sTDtruhHWpB0vhxmLcv4byy6P2CbKJbhO2MG71WOfAGQ
-X-Google-Smtp-Source: AGHT+IHUGBHKzk/laOxpxDdk5AaJ2CSKL/1StLLftbiH/My4JJgfMegIqDYIHn/O9agKIBI1Jj9t4zcpldbNJNharAw=
-X-Received: by 2002:aa7:c392:0:b0:601:233a:4f4d with SMTP id
- 4fb4d7f45d1cf-601233a4fc5mr3907a12.2.1747342647239; Thu, 15 May 2025 13:57:27
- -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1747343122; x=1778879122;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=tU5GPI6luOeZZUz1jc3iKVDreM5mUB0uafA/q4t13GU=;
+  b=UGxd2zhya9q1VxIlJoDvVSmSdXaZk+CB9idGs9TZogy1c2z9T+7UxTKu
+   pdoYMJmntnJzX6UX5iqVLwUiN+zrcQFDrKbUnyULO/9q5LXuhRfI5VucV
+   BTsp432j9qMHacBrzmWqSRUFxIKXilOxsDeJBERVSzj2js0DoD0xlBjdm
+   mpSxy5iXKC2Qss5Du8dNGiJ3Gnu/TkEbsuYhR7VIwuUYfGYoy4rS4iozU
+   e85BmQB2i3umzaXR3BasjSRWnmVk0Vjep1sCxprqt0JJyoTwEdd2XlhvV
+   C1xiC5Eh21zCA0gwmk9uOfwLSy2TBt85yTF57so66mwBlGIR/qYwdYTCk
+   Q==;
+X-IronPort-AV: E=Sophos;i="6.15,292,1739836800"; 
+   d="scan'208";a="405700419"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2025 21:05:16 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:60934]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.29.53:2525] with esmtp (Farcaster)
+ id d61893e1-700d-487e-8d5c-88e3e57e8dda; Thu, 15 May 2025 21:05:10 +0000 (UTC)
+X-Farcaster-Flow-ID: d61893e1-700d-487e-8d5c-88e3e57e8dda
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 15 May 2025 21:05:10 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.187.170.35) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 15 May 2025 21:05:05 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <jannh@google.com>
+CC: <alexander@mihalicyn.com>, <bluca@debian.org>, <brauner@kernel.org>,
+	<daan.j.demeyer@gmail.com>, <daniel@iogearbox.net>, <davem@davemloft.net>,
+	<david@readahead.eu>, <edumazet@google.com>, <horms@kernel.org>,
+	<jack@suse.cz>, <kuba@kernel.org>, <kuniyu@amazon.com>,
+	<lennart@poettering.net>, <linux-fsdevel@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
+	<me@yhndnzj.com>, <netdev@vger.kernel.org>, <oleg@redhat.com>,
+	<pabeni@redhat.com>, <viro@zeniv.linux.org.uk>, <zbyszek@in.waw.pl>
+Subject: Re: [PATCH v7 4/9] coredump: add coredump socket
+Date: Thu, 15 May 2025 14:04:37 -0700
+Message-ID: <20250515210458.91912-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <CAG48ez3fC902JU244d=0zzr39f+iXxQH0GZgJp0rs8pbu8ka4w@mail.gmail.com>
+References: <CAG48ez3fC902JU244d=0zzr39f+iXxQH0GZgJp0rs8pbu8ka4w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250515-work-coredump-socket-v7-0-0a1329496c31@kernel.org> <20250515-work-coredump-socket-v7-7-0a1329496c31@kernel.org>
-In-Reply-To: <20250515-work-coredump-socket-v7-7-0a1329496c31@kernel.org>
-From: Jann Horn <jannh@google.com>
-Date: Thu, 15 May 2025 22:56:51 +0200
-X-Gm-Features: AX0GCFsc9k8E5H-5e-dJE76E_RGv2ErOjmTrupW0-m9zZnC-HBMPkef6m1hs5Ng
-Message-ID: <CAG48ez1wqbOmQMqg6rH4LNjNifHU_WciceO_SQwu8T=tA_KxLw@mail.gmail.com>
-Subject: Re: [PATCH v7 7/9] coredump: validate socket name as it is written
-To: Christian Brauner <brauner@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Eric Dumazet <edumazet@google.com>, Oleg Nesterov <oleg@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, David Rheinsberg <david@readahead.eu>, 
-	Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>, 
-	Lennart Poettering <lennart@poettering.net>, Luca Boccassi <bluca@debian.org>, Mike Yuan <me@yhndnzj.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	=?UTF-8?Q?Zbigniew_J=C4=99drzejewski=2DSzmek?= <zbyszek@in.waw.pl>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, 
-	Alexander Mikhalitsyn <alexander@mihalicyn.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D041UWB003.ant.amazon.com (10.13.139.176) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Thu, May 15, 2025 at 12:04=E2=80=AFAM Christian Brauner <brauner@kernel.=
-org> wrote:
-> In contrast to other parameters written into
-> /proc/sys/kernel/core_pattern that never fail we can validate enabling
-> the new AF_UNIX support. This is obviously racy as hell but it's always
-> been that way.
->
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
+From: Jann Horn <jannh@google.com>
+Date: Thu, 15 May 2025 22:52:22 +0200
+> On Thu, May 15, 2025 at 7:01 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+> > nit: please keep these in the reverse xmas tree order.
+> > https://docs.kernel.org/process/maintainer-netdev.html#local-variable-ordering-reverse-xmas-tree-rcs
+> 
+> Isn't that rule specific to things that go through the net tree?
 
-Reviewed-by: Jann Horn <jannh@google.com>
-
-> ---
->  fs/coredump.c | 37 ++++++++++++++++++++++++++++++++++---
->  1 file changed, 34 insertions(+), 3 deletions(-)
->
-> diff --git a/fs/coredump.c b/fs/coredump.c
-> index 6ee38e3da108..d4ff08ef03e5 100644
-> --- a/fs/coredump.c
-> +++ b/fs/coredump.c
-> @@ -1228,13 +1228,44 @@ void validate_coredump_safety(void)
->         }
->  }
->
-> +static inline bool check_coredump_socket(void)
-> +{
-> +       if (core_pattern[0] !=3D '@')
-> +               return true;
-> +
-> +       /*
-> +        * Coredump socket must be located in the initial mount
-> +        * namespace. Don't give the that impression anything else is
-> +        * supported right now.
-> +        */
-> +       if (current->nsproxy->mnt_ns !=3D init_task.nsproxy->mnt_ns)
-> +               return false;
-
-(Ah, dereferencing init_task.nsproxy without locks is safe because
-init_task is actually the boot cpu's swapper/idle task, which never
-switches namespaces, right?)
-
-> +       /* Must be an absolute path. */
-> +       if (*(core_pattern + 1) !=3D '/')
-> +               return false;
-> +
-> +       return true;
-> +}
-> +
->  static int proc_dostring_coredump(const struct ctl_table *table, int wri=
-te,
->                   void *buffer, size_t *lenp, loff_t *ppos)
->  {
-> -       int error =3D proc_dostring(table, write, buffer, lenp, ppos);
-> +       int error;
-> +       ssize_t retval;
-> +       char old_core_pattern[CORENAME_MAX_SIZE];
-> +
-> +       retval =3D strscpy(old_core_pattern, core_pattern, CORENAME_MAX_S=
-IZE);
-> +
-> +       error =3D proc_dostring(table, write, buffer, lenp, ppos);
-> +       if (error)
-> +               return error;
-> +       if (!check_coredump_socket()) {
-
-(non-actionable note: This is kiiinda dodgy under
-SYSCTL_WRITES_LEGACY, but I guess we can assume that new users of the
-new coredump socket feature aren't actually going to write the
-coredump path one byte at a time, so I guess it's fine.)
-
-> +               strscpy(core_pattern, old_core_pattern, retval + 1);
-
-The third strscpy() argument is semantically supposed to be the
-destination buffer size, not the amount of data to copy. For trivial
-invocations like here, strscpy() actually allows you to leave out the
-third argument.
-
-
-> +               return -EINVAL;
-> +       }
->
-> -       if (!error)
-> -               validate_coredump_safety();
-> +       validate_coredump_safety();
->         return error;
->  }
->
->
-> --
-> 2.47.2
->
+Which tree to go through doesn't matter, rather it's applied
+to code maintained by netdev maintainers, especially net/ and
+drivers/net/.
 
