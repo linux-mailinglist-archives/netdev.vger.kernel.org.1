@@ -1,134 +1,198 @@
-Return-Path: <netdev+bounces-190629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE853AB7E77
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 09:02:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DDE9AB7ED3
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 09:30:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC0213B754E
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 07:02:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FD0617C62E
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 07:29:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2764B194A44;
-	Thu, 15 May 2025 07:02:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3D6110FD;
+	Thu, 15 May 2025 07:29:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SDXeYj5G"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KXAxaqQN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93ADA1C36;
-	Thu, 15 May 2025 07:02:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC68A27A935;
+	Thu, 15 May 2025 07:29:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747292536; cv=none; b=ItBVcd+9lLpKDZCFh4CY3dC+PWr0FT/Y5VsvQTSZz/iRscqL6CBOHK2zszg4DNQtWO31C9jNU13pTYmE5n+IfeepA2hat883TEuOCToOIGMfZTuD+cFIZeJF+exJomCG8NddMooZmw2c0tjafV5uHUBfcBiuI0PFcfpghzDqS8g=
+	t=1747294176; cv=none; b=hk0VC0iqHvE6KkBCIVl31EKGmThKsJFWMvphW1Kf9lO1dX6JBp2Ud09htjUboBDmfQZk0bsP9sHHAAeKp7EdqMuXztIPOs8z4dylj+5jsc0Pfn3v8dk8wdiktSyrpcjXbFzUpV3b+9+spxs40VppeIqqz4NFCUZiE1It3WFGMXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747292536; c=relaxed/simple;
-	bh=jscU0ocsacVXZvYxqXAwNblzhf6Di0ig1Ic+fxc21mM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AE5MzdIrpZ91urHyOjz5MODdCa331OFDboDiaKhh5av/DtGbMWxIIKhkUZWDY/QgNPKjyGrFFnt8r7KVxk+LumQPfe1c66keLrzf4jpvWMvh0Yov07pumGJeJ9ftezCJFFxpLam/0iYbph5rSMDjbIe8oS8NK8e9DBj8eKX8pcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SDXeYj5G; arc=none smtp.client-ip=209.85.128.179
+	s=arc-20240116; t=1747294176; c=relaxed/simple;
+	bh=xT73YG7vjavilCxVefcwNrXMNUFIuptsDRvlJC6qVKY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=I0rJeGrfBRnJFypOpXrfZMUV6QtxeSAcSJlxdPsSCIM49o2aXsqSda8vh581R29rpoHm3NDNbzNidSCXJB8imhflGcy22u9R8EbQXdcIsRs/Z3Sdo9gTixEU4aTpesANfv/2McvZmmpS5fNcP0BtlFwA6FDZQ0Vmkbq/pLwb/6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KXAxaqQN; arc=none smtp.client-ip=209.85.208.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-70a32708b4eso4209647b3.3;
-        Thu, 15 May 2025 00:02:14 -0700 (PDT)
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5fbc736f0c7so934817a12.2;
+        Thu, 15 May 2025 00:29:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747292533; x=1747897333; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ev23EJpUhfpuaTDvzV5dAzqSiBl4iuITpugYgy4/wT0=;
-        b=SDXeYj5G2rgvBA9Rj2xBZhT/Cft3gfGhuJj32/2+/AleQArddwO/05jF9f94MGMWbC
-         VzCU3vIGFY6bmZOS0m7QGwntP26KlE+xB6Kq4eeriVVcSw1Q3aS9VapACLE7q60SvbmX
-         GReo4tRwv1Bw/MK/rY7GX/xODnFnHocMep48V0roqI0fyqYap3fGlZPuK8NeIcOsWTl7
-         7pbeRYUe6zUXZ3VLkdbfkYoGEEp8kTWUaRHJ4SNioZ/PSGO6Xb6AI07vUhemnp931Rgm
-         Z6Eu0bJAsdBcnf/3JWhJWlbRoOgBm0kEnRTXsa0IUiN/IdOYxt9aCA9J+PwIbZNovjtn
-         GdTQ==
+        d=gmail.com; s=20230601; t=1747294173; x=1747898973; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IcSede8Su1QJmSqSFnb7duRkTxUsdythasqSlmba4ww=;
+        b=KXAxaqQNEaggWxwTeW4Iovce3tTc0RvwZjFBO+GwKCpiM340QnQ4IG+SKZMVVKNYhB
+         1gWuXKsPxT0M+Wuta21EDv2KxDixERJehFkYPBJEtKhHGETIzwP5oScRcnOfPztVFAKo
+         v+EqizBr6J2iKJAi5AlMHFtob8HxtyFfivs/HnTwlnfL0RFF8TWkX+FulG0QTevAceYp
+         ZasxpBoUjslZh+c4lrDfouaaSM0fYVAhn0vFB03idLLPRo7PS1pOqZjPHSmvEh83tQGI
+         bosvBZu3+ivzsLdJmFHAXb2QBHLMaWDkkGHy0X/3Vi6JyIiZhqrKqMkqjttxrQLHvBWP
+         Yqrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747292533; x=1747897333;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ev23EJpUhfpuaTDvzV5dAzqSiBl4iuITpugYgy4/wT0=;
-        b=jOXz0TI6qyI04nMuNs7RgQBGKgAzVeJQEhxJXg0uGmjcMmPZf7uvHEW7dBZlXngjU+
-         efrFTqPcmFK0L5Pw5TOV5WCDlrMqVXWkq02tEerBytw8VUlnCvMdXTo5QRsGXl7UAYkC
-         G88qkaQNxKq2Wr2wodFrkgFOW/1uWzhFgAm7Gr5RCEy+3swVjmpwwoXIY+HIgv0Tw4ex
-         GlJKCNSJoB2OWJAIahzb/x7AlDEwYV0ysEWdKOmOfmXexoNpz6e91O3wUlmU+NaclX3x
-         EeRqRGrvFa7PKDQzjjrEEfFAEjyfzA142CmLlCtAvk4MlKzrlQuGI9Lt51gwws952bma
-         aH5w==
-X-Forwarded-Encrypted: i=1; AJvYcCVst3UUsjdc7dIWEbdfak9Cm/9khlOzd666o3o1wCUTYB4dhoQchompC9Mk2GWZmYmB2Qz4DcT8xOHedjw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOhIX8aGhM0w6c46du5NPBgZA/9RMZzCPe35Ev9Qg9Z7mMuzd2
-	f8M0IeDyFKA2iWXg5iWSebhZ4LYaKH7yRAGJ+OVTz0Y3hgu6ffhdK1X6snjp1EZAgVUdAb5s30n
-	8iTcGF1o0AmPNcLPhqEYrT8ERNhM=
-X-Gm-Gg: ASbGncuC9DGoNOjMY6dNyaFRWXo6YC02AKTdQcazKDU4jJXWscYUZJ8L8IXs8egpDmS
-	76R1ZwmRHM+YmtG6EcvYTz3tCImiFAbhX7vGxqoasnbYhCrbk29Q4UHw9slR5h5hsGKrkCVqW53
-	SQUBPM2OZw1MuenOM18I0XS+nQ8DRj2zj9
-X-Google-Smtp-Source: AGHT+IGlJBExoNVm21b9koa1j40kjuKuqyYlVovJnnJ3hJaaoqYhDVpnG4Dg8bMA9y15TzfUwk/MD13Ttqh9gX+VPb0=
-X-Received: by 2002:a05:690c:6a03:b0:705:5fde:1b82 with SMTP id
- 00721157ae682-70c7f13926bmr88913207b3.13.1747292533304; Thu, 15 May 2025
- 00:02:13 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1747294173; x=1747898973;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IcSede8Su1QJmSqSFnb7duRkTxUsdythasqSlmba4ww=;
+        b=mne2JKnLZ/HY7rwt9Z0oA1W/VKyQh/IlPVysanGXcvmjQ65OTHYioDjBpKqBptooV1
+         XgLsiJWhI6XgKTCr848Er64lCMoAQ/hNy/VZbohXcRYThx1wbvD+KA9Wlu+UhV1sxFK3
+         b9TL4VwEhbaS6zjpdVYMOWE0avy58dRCooNHBknBaxU8kAABF0IhM+oYXagqRrQtk8HS
+         oTV7C/8wIt29QJbFLpnCkbd2MQJsLGsQvLNzmahkYuNT3Nhts1XStLZkxBwr0zlo7ryW
+         fJDM/dv19wORirZvw3iDteT74pVEBkGMrNF4qao7lOClNUV6UGGSafG9N7D0HHWG+9/S
+         61DA==
+X-Forwarded-Encrypted: i=1; AJvYcCUanfj3h6T9y/QPSgQQHmAXk0QWcx8pjPRw/NTv8Npr0303CkgeAMkEoFFFPtnMwjBSIcrl0H8S@vger.kernel.org, AJvYcCUmejukToARwfuBXC6+peFS9ryMQdcj6ZbHHJlUNq7mMk33VLP0IFOE2AvAiMP3K3x/1/L2DgIN@vger.kernel.org, AJvYcCXBoR1OcrcbPI8rOWN5F1meP7TDsF0Ghs4Ocgn4KpnFYN4CPD8kMo32KkgQnC96ZceFY7nxkm5dhMNFT10=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzc/gAlVHmbOnuyawZVxlU07v7qzEpd6ndXOQzamS2hq4KDFEeL
+	gKeZWZgPB4/VCYKpMU7gloWlM56CPQyGUAIJs5ckdxGy2JA4avV4
+X-Gm-Gg: ASbGnctfSyvs1S+zbaLGB0avfdQfmCvWGHnfuEXLCA+y14NSFX9vvIh5VfnKcT1y8EK
+	DXFXEYFMxrLL5PaWSrf8H72IVGY4WFR7PqaiBk7VrlLcMUu9JKXNUDa0Dtl6US24GGNP5PP6fyn
+	9QU+4mVY4PoNQAYactoGmFTfZHczzsNaZdj8DqdFUoP6bEvTw6lz9+BZCKVIBy1/HJgxE39g2vY
+	TXh2xiFg+oaI2w1yUUeDgHGspGgRNActDndSbIPG4Gepc3g07kUJrY/LiYfb2O7/dbOAf+hOrn9
+	Y4p6hYq2tmejbdCSA0oN1xyQ3HasDZQCIzOtu8bSnNPxxXBy8K8zgxYWkx9vFwZdt6mGTGVTT1r
+	CMokMM57O2gjiwiDGsyPv5doNi/w72A==
+X-Google-Smtp-Source: AGHT+IFSVVDRt3x2PXh3uMgcCoYQ2vtPrrvFgkELSqshxtEzujh1920Xxoj08IE6nOwdDjFPPstsVQ==
+X-Received: by 2002:a05:6402:84c:b0:5f8:36b2:dc1a with SMTP id 4fb4d7f45d1cf-5ff988ae1d0mr5580189a12.16.1747294172762;
+        Thu, 15 May 2025 00:29:32 -0700 (PDT)
+Received: from localhost.localdomain (ip092042140082.rev.nessus.at. [92.42.140.82])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5fc9cc5144csm10064410a12.41.2025.05.15.00.29.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 May 2025 00:29:32 -0700 (PDT)
+From: Jakob Unterwurzacher <jakobunt@gmail.com>
+X-Google-Original-From: Jakob Unterwurzacher <jakob.unterwurzacher@cherry.de>
+To: Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Tristram Ha <Tristram.Ha@microchip.com>,
+	Marek Vasut <marex@denx.de>,
+	Florian Fainelli <f.fainelli@gmail.com>
+Cc: quentin.schulz@cherry.de,
+	Jakob Unterwurzacher <jakob.unterwurzacher@cherry.de>,
+	stable@vger.kernel.org,
+	Woojung Huh <Woojung.Huh@microchip.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v3] net: dsa: microchip: linearize skb for tail-tagging switches
+Date: Thu, 15 May 2025 09:29:19 +0200
+Message-Id: <20250515072920.2313014-1-jakob.unterwurzacher@cherry.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250512191901.73823-1-stefano.radaelli21@gmail.com>
- <20250514173511.158088-1-stefano.radaelli21@gmail.com> <4c64695a-fb98-4b77-a886-3a056e6b229f@lunn.ch>
- <CAK+owoid1woDTiCxcGiEmdvKNHJeCnaKBjPEHyNrtHt_hKqi9g@mail.gmail.com> <d994cff7-e960-41fa-9ce6-c35cee3a2560@lunn.ch>
-In-Reply-To: <d994cff7-e960-41fa-9ce6-c35cee3a2560@lunn.ch>
-From: Stefano Radaelli <stefano.radaelli21@gmail.com>
-Date: Thu, 15 May 2025 09:02:02 +0200
-X-Gm-Features: AX0GCFtQ7P4HXzqzRxxk8WpC7jmRWlKvw0O7riLjCvHMabLK1laFi4IR6lK37b0
-Message-ID: <CAK+owojR_pRpZKJcyd-QgOBNCQo2XiVs7J7GWzEH98T_poWANw@mail.gmail.com>
-Subject: Re: [PATCH v2] net: phy: mxl-8611: add support for MaxLinear
- MxL86110/MxL86111 PHY
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Xu Liang <lxu@maxlinear.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Andrew,
+The pointer arithmentic for accessing the tail tag only works
+for linear skbs.
 
-Yes, I can confirm that the MXL86110 only supports copper (10/100/1000BASE-=
-T)
-over RGMII, and does not include any dual media or fiber logic.
-That definitely simplifies things.
+For nonlinear skbs, it reads uninitialized memory inside the
+skb headroom, essentially randomizing the tag. I have observed
+it gets set to 6 most of the time.
 
-I'll go ahead and work on a revised version of the driver that supports onl=
-y
-the MXL86110 for now, addressing the issues you pointed out. The MXL86111
-support can then be reworked and submitted separately once it's
-cleaned up properly.
+Example where ksz9477_rcv thinks that the packet from port 1 comes from port 6
+(which does not exist for the ksz9896 that's in use), dropping the packet.
+Debug prints added by me (not included in this patch):
 
-I=E2=80=99ll start a new thread with the updated patchset for the MXL86110
-driver once it's ready.
+	[  256.645337] ksz9477_rcv:323 tag0=6
+	[  256.645349] skb len=47 headroom=78 headlen=0 tailroom=0
+	               mac=(64,14) mac_len=14 net=(78,0) trans=78
+	               shinfo(txflags=0 nr_frags=1 gso(size=0 type=0 segs=0))
+	               csum(0x0 start=0 offset=0 ip_summed=0 complete_sw=0 valid=0 level=0)
+	               hash(0x0 sw=0 l4=0) proto=0x00f8 pkttype=1 iif=3
+	               priority=0x0 mark=0x0 alloc_cpu=0 vlan_all=0x0
+	               encapsulation=0 inner(proto=0x0000, mac=0, net=0, trans=0)
+	[  256.645377] dev name=end1 feat=0x0002e10200114bb3
+	[  256.645386] skb headroom: 00000000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+	[  256.645395] skb headroom: 00000010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+	[  256.645403] skb headroom: 00000020: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+	[  256.645411] skb headroom: 00000030: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+	[  256.645420] skb headroom: 00000040: ff ff ff ff ff ff 00 1c 19 f2 e2 db 08 06
+	[  256.645428] skb frag:     00000000: 00 01 08 00 06 04 00 01 00 1c 19 f2 e2 db 0a 02
+	[  256.645436] skb frag:     00000010: 00 83 00 00 00 00 00 00 0a 02 a0 2f 00 00 00 00
+	[  256.645444] skb frag:     00000020: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01
+	[  256.645452] ksz_common_rcv:92 dsa_conduit_find_user returned NULL
 
-Thanks again for your patience,
-Stefano
+Call skb_linearize before trying to access the tag.
 
-Il giorno gio 15 mag 2025 alle ore 01:56 Andrew Lunn <andrew@lunn.ch>
-ha scritto:
->
-> On Thu, May 15, 2025 at 12:29:48AM +0200, Stefano Radaelli wrote:
-> > Hi Andrew,
-> >
-> > Thanks again for your detailed review and suggestions,
-> > I really appreciate the time you took to go through the patch.
-> >
-> > After reviewing your feedback, I realized that most of the more complex=
- issues
-> > are specific to the MXL86111. The MXL86110 side, on the other hand, see=
-ms much
-> > closer to being ready once I address the points you raised.
->
-> I did not look too close. Does the MXL86110 not have this dual
-> Copper/Fibre setup? Removing that will make the driver a lot
-> simpler. So yes, submitting a simpler, more restricted driver is fine.
->
->         Andrew
+This patch fixes ksz9477_rcv which is used by the ksz9896 I have at
+hand, and also applies the same fix to ksz8795_rcv which seems to have
+the same problem.
+
+Signed-off-by: Jakob Unterwurzacher <jakob.unterwurzacher@cherry.de>
+CC: stable@vger.kernel.org
+Fixes: 016e43a26bab ("net: dsa: ksz: Add KSZ8795 tag code")
+Fixes: 8b8010fb7876 ("dsa: add support for Microchip KSZ tail tagging")
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+---
+v1: Initial submission
+    https://lore.kernel.org/netdev/20250509071820.4100022-1-jakob.unterwurzacher@cherry.de/
+v2: Add Fixes tags, Cc stable, "[PATCH net]" prefix
+    https://lore.kernel.org/netdev/20250512144416.3697054-1-jakob.unterwurzacher@cherry.de/
+v3: Move declarations before skb_linearize call, pick up Reviewed-By
+
+ net/dsa/tag_ksz.c | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
+
+diff --git a/net/dsa/tag_ksz.c b/net/dsa/tag_ksz.c
+index c33d4bf17929..0b7564b53790 100644
+--- a/net/dsa/tag_ksz.c
++++ b/net/dsa/tag_ksz.c
+@@ -140,7 +140,12 @@ static struct sk_buff *ksz8795_xmit(struct sk_buff *skb, struct net_device *dev)
+ 
+ static struct sk_buff *ksz8795_rcv(struct sk_buff *skb, struct net_device *dev)
+ {
+-	u8 *tag = skb_tail_pointer(skb) - KSZ_EGRESS_TAG_LEN;
++	u8 *tag;
++
++	if (skb_linearize(skb))
++		return NULL;
++
++	tag = skb_tail_pointer(skb) - KSZ_EGRESS_TAG_LEN;
+ 
+ 	return ksz_common_rcv(skb, dev, tag[0] & KSZ8795_TAIL_TAG_EG_PORT_M,
+ 			      KSZ_EGRESS_TAG_LEN);
+@@ -311,10 +316,16 @@ static struct sk_buff *ksz9477_xmit(struct sk_buff *skb,
+ 
+ static struct sk_buff *ksz9477_rcv(struct sk_buff *skb, struct net_device *dev)
+ {
+-	/* Tag decoding */
+-	u8 *tag = skb_tail_pointer(skb) - KSZ_EGRESS_TAG_LEN;
+-	unsigned int port = tag[0] & KSZ9477_TAIL_TAG_EG_PORT_M;
+ 	unsigned int len = KSZ_EGRESS_TAG_LEN;
++	unsigned int port;
++	u8 *tag;
++
++	if (skb_linearize(skb))
++		return NULL;
++
++	/* Tag decoding */
++	tag = skb_tail_pointer(skb) - KSZ_EGRESS_TAG_LEN;
++	port = tag[0] & KSZ9477_TAIL_TAG_EG_PORT_M;
+ 
+ 	/* Extra 4-bytes PTP timestamp */
+ 	if (tag[0] & KSZ9477_PTP_TAG_INDICATION) {
+-- 
+2.39.5
+
 
