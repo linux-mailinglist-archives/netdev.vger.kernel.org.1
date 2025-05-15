@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-190884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88528AB92C6
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 01:18:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52BD2AB92C2
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 01:17:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0024F3BF6F5
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 23:17:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C04204A2D2E
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 23:17:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE0FB2951D1;
-	Thu, 15 May 2025 23:17:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33A602957C2;
+	Thu, 15 May 2025 23:17:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qG32eDQp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WpTX1MYs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA03F294A0E
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 23:17:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FE6529551A
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 23:17:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747351030; cv=none; b=mwrDxdxOc7gq45Oo3PSPzSsbFBiG7l1ic3FJfNPRCmaWdlSP1sn21WOj3GNNhlhaHpq1Do4M72P5OgK8f3G8jXeyFLaKg/fbqMkrESQi6Lh6yx/+nCT2///B7pPtFt8cy8XGJpsZMbZGT8FpXU50A0WEZkcWzgK6USQ1gRotlsk=
+	t=1747351031; cv=none; b=JvgpyyCXtNR79K6FLACa3o7ZaZG5nilvzCZF30eSS1TWiqi9Lyju/h89kfIrplfrEFXrUphg6AiXHsUR2qYah7VFljSJEdY5F5ooOETePom46NPjBKVrZ19OM+7a/bAgroCUYPRdedGd6WpqiGXIh7sGo5/UrsJQqww4FieFLPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747351030; c=relaxed/simple;
-	bh=1d/4hHtwtfQEgWHO8d3rIY4w7zzgN70EbvbCPfXFOfw=;
+	s=arc-20240116; t=1747351031; c=relaxed/simple;
+	bh=uzD8xHq1iSv/cAAQ+WpmY2klC57rY6akIeqhvXATKGU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uXNBbYvZGxPvBig5QtQldSywo7KJRRrBlUcM1laZsra8WQX3rRsS6ajyx8tQEmBzO+n7/8gLW1FL+atg8vpE7HW8OEaaVXkV0Ptul8fHYVj12fIiSN3w7ttfTCekUI+5wZDP+ma3Ufur7CsYISn1B+36NUP9i93/tXoZBQgguUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qG32eDQp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD938C4CEE7;
-	Thu, 15 May 2025 23:17:09 +0000 (UTC)
+	 MIME-Version; b=f+0bn2oteyphcExdVA/HiMYlmMgKG0DAMNVgTt7YRWXved/8aCN+RqhB7erzZwTxLgRCDRpcNBfAwMETFxtSlGPhkV4lPAH1mz0bgMhEAWAG7aljEdRDlHBqcfUJy4FlyF8kk3frrGgXMWNUT6IpxxIBy6DGz0EwwLQGjIWzMDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WpTX1MYs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74B23C4CEF0;
+	Thu, 15 May 2025 23:17:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1747351030;
-	bh=1d/4hHtwtfQEgWHO8d3rIY4w7zzgN70EbvbCPfXFOfw=;
+	bh=uzD8xHq1iSv/cAAQ+WpmY2klC57rY6akIeqhvXATKGU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qG32eDQpOb/teB5hqjXSiQIAfoEcrqgc9yqg915qOzhfVpKYv/CXlvS0Ox7GhAZ9w
-	 u33yobnrJKLRI8GzIrIlD6XiVt8jc/QHKvYW4p+m6oaURpZNMwkGkrF20OgrxCaKaW
-	 rQLLq/3yl4xbQ9kxwKLhzx+73ct44P0WK5DDbWr1pwFpsrlZQq08QC06t36HUP0swl
-	 HorQ0+OZaVD8N5iqP0kMRSlNvDZ1Sl/kPcui5azQ/2u/ueuWLwIgUv5M9Qdg1LPh0o
-	 Ug5V3LEbnYQ1BFRigSPHT5eEHLzjvp0LbDewc0HxyVtSlSWllJTUOo4XGKqqC2Zfms
-	 ZR1fP8Lf87l+w==
+	b=WpTX1MYsH39ukxY81mr7zsPGkdH67rnbnDYRC5x8GFf0cN0JCSld5R81fOrrbN0q1
+	 7HP/WvHYSSs7J9WARl0AO/F+8eDjfbX7R1ZG4zJjELl3Wvpgz5YByjiOrfnVZ1N6he
+	 xs+egarUgFbv6a6iO4VqHrK7GPWqNbwMigSl/rWr2uJuwVJy1trmzdXWJ0l/UNOrmT
+	 JyYPiiJheZszjR2LGTRQuLUzKYZWllEpTtA/Z9RqW6SeztWtVMxUAGtSgGlW9TbR+A
+	 zNU6VV0RfN7axS+YmmznvPrgNJOyt56cFBYn15FJA8K/YqAq0+WQRp/7lzRCPBHE2X
+	 mr3OGTM1BvpCg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -53,9 +53,9 @@ Cc: netdev@vger.kernel.org,
 	nicolas.dichtel@6wind.com,
 	jacob.e.keller@intel.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 6/9] tools: ynl-gen: submsg: support parsing and rendering sub-messages
-Date: Thu, 15 May 2025 16:16:47 -0700
-Message-ID: <20250515231650.1325372-7-kuba@kernel.org>
+Subject: [PATCH net-next 7/9] tools: ynl: submsg: reverse parse / error reporting
+Date: Thu, 15 May 2025 16:16:48 -0700
+Message-ID: <20250515231650.1325372-8-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250515231650.1325372-1-kuba@kernel.org>
 References: <20250515231650.1325372-1-kuba@kernel.org>
@@ -67,234 +67,252 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Adjust parsing and rendering appropriately to make sub-messages work.
-Rendering is pretty trivial, as the submsg -> netlink conversion looks
-like rendering a nest in which only one attr was set. Only trick
-is that we use the enum value of the sub-message rather than the nest
-as the type, and effectively skip one layer of nesting. A real double
-nested struct would look like this:
+Reverse parsing lets YNL convert bad and missing attr pointers
+from extack into a string like "missing attribute nest1.nest2.attr_name".
+It's a feature that's unique to YNL C AFAIU (even the Python YNL
+can't do nested reverse parsing). Add support for reverse-parsing
+of sub-messages.
 
-  [SELECTOR]
-  [SUBMSG]
-    [NEST]
-      [MSG1-ATTR]
+To simplify the logic and the code annotate the type policies
+with extra metadata. Mark the selectors and the messages with
+the information we need. We assume that key / selector always
+precedes the sub-message while parsing (and also if there are
+multiple sub-messages like in rt-link they are interleaved
+selector 1 ... submsg 1 ... selector 2 .. submsg 2, not
+selector 1 ... selector 2 ... submsg 1 ... submsg 2).
 
-A submsg "is" the nest so by skipping I mean:
-
-  [SELECTOR]
-  [SUBMSG]
-    [MSG1-ATTR]
-
-There is no extra validation in YNL if caller has set the selector
-matching the submsg type (e.g. link type = "macvlan" but the nest
-attrs are set to carry "veth"). Let the kernel handle that.
-
-Parsing side is a little more specialized as we need to render and
-insert a new kind of function which switches between what to parse
-based on the selector. But code isn't too complicated.
+The rt-link sample in a subsequent changes shows reverse parsing
+of sub-messages in action.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- tools/net/ynl/lib/ynl-priv.h     |  3 ++
- tools/net/ynl/lib/ynl.h          |  1 +
- tools/net/ynl/lib/ynl.c          |  9 ++++
- tools/net/ynl/pyynl/ynl_gen_c.py | 80 ++++++++++++++++++++++++++++++--
- 4 files changed, 89 insertions(+), 4 deletions(-)
+ tools/net/ynl/lib/ynl-priv.h     |  5 +-
+ tools/net/ynl/lib/ynl.c          | 84 ++++++++++++++++++++++++++++----
+ tools/net/ynl/pyynl/ynl_gen_c.py | 29 ++++++++++-
+ 3 files changed, 107 insertions(+), 11 deletions(-)
 
 diff --git a/tools/net/ynl/lib/ynl-priv.h b/tools/net/ynl/lib/ynl-priv.h
-index 5debb09491e7..fbc058dd1c3e 100644
+index fbc058dd1c3e..416866f85820 100644
 --- a/tools/net/ynl/lib/ynl-priv.h
 +++ b/tools/net/ynl/lib/ynl-priv.h
-@@ -25,6 +25,7 @@ enum ynl_policy_type {
- 	YNL_PT_UINT,
- 	YNL_PT_NUL_STR,
- 	YNL_PT_BITFIELD32,
-+	YNL_PT_SUBMSG,
- };
+@@ -43,7 +43,10 @@ typedef int (*ynl_parse_cb_t)(const struct nlmsghdr *nlh,
+ 			      struct ynl_parse_arg *yarg);
  
- enum ynl_parse_result {
-@@ -103,6 +104,8 @@ struct nlmsghdr *
- ynl_gemsg_start_dump(struct ynl_sock *ys, __u32 id, __u8 cmd, __u8 version);
- 
- int ynl_attr_validate(struct ynl_parse_arg *yarg, const struct nlattr *attr);
-+int ynl_submsg_failed(struct ynl_parse_arg *yarg, const char *field_name,
-+		      const char *sel_name);
- 
- /* YNL specific helpers used by the auto-generated code */
- 
-diff --git a/tools/net/ynl/lib/ynl.h b/tools/net/ynl/lib/ynl.h
-index 32efeb224829..db7c0591a63f 100644
---- a/tools/net/ynl/lib/ynl.h
-+++ b/tools/net/ynl/lib/ynl.h
-@@ -23,6 +23,7 @@ enum ynl_error_code {
- 	YNL_ERROR_INV_RESP,
- 	YNL_ERROR_INPUT_INVALID,
- 	YNL_ERROR_INPUT_TOO_BIG,
-+	YNL_ERROR_SUBMSG_KEY,
- };
- 
- /**
+ struct ynl_policy_attr {
+-	enum ynl_policy_type type;
++	enum ynl_policy_type type:8;
++	__u8 is_submsg:1;
++	__u8 is_selector:1;
++	__u16 selector_type;
+ 	unsigned int len;
+ 	const char *name;
+ 	const struct ynl_policy_nest *nest;
 diff --git a/tools/net/ynl/lib/ynl.c b/tools/net/ynl/lib/ynl.c
-index a0b54ad4c073..25fc6501349b 100644
+index 25fc6501349b..2a169c3c0797 100644
 --- a/tools/net/ynl/lib/ynl.c
 +++ b/tools/net/ynl/lib/ynl.c
-@@ -384,6 +384,15 @@ int ynl_attr_validate(struct ynl_parse_arg *yarg, const struct nlattr *attr)
+@@ -45,8 +45,39 @@
+ #define perr(_ys, _msg)			__yerr(&(_ys)->err, errno, _msg)
+ 
+ /* -- Netlink boiler plate */
++static bool
++ynl_err_walk_is_sel(const struct ynl_policy_nest *policy,
++		    const struct nlattr *attr)
++{
++	unsigned int type = ynl_attr_type(attr);
++
++	return policy && type <= policy->max_attr &&
++		policy->table[type].is_selector;
++}
++
++static const struct ynl_policy_nest *
++ynl_err_walk_sel_policy(const struct ynl_policy_attr *policy_attr,
++			const struct nlattr *selector)
++{
++	const struct ynl_policy_nest *policy = policy_attr->nest;
++	const char *sel;
++	unsigned int i;
++
++	if (!policy_attr->is_submsg)
++		return policy;
++
++	sel = ynl_attr_get_str(selector);
++	for (i = 0; i <= policy->max_attr; i++) {
++		if (!strcmp(sel, policy->table[i].name))
++			return policy->table[i].nest;
++	}
++
++	return NULL;
++}
++
+ static int
+-ynl_err_walk_report_one(const struct ynl_policy_nest *policy, unsigned int type,
++ynl_err_walk_report_one(const struct ynl_policy_nest *policy,
++			const struct nlattr *selector, unsigned int type,
+ 			char *str, int str_sz, int *n)
+ {
+ 	if (!policy) {
+@@ -67,9 +98,34 @@ ynl_err_walk_report_one(const struct ynl_policy_nest *policy, unsigned int type,
+ 		return 1;
+ 	}
+ 
+-	if (*n < str_sz)
+-		*n += snprintf(str, str_sz - *n,
+-			       ".%s", policy->table[type].name);
++	if (*n < str_sz) {
++		int sz;
++
++		sz = snprintf(str, str_sz - *n,
++			      ".%s", policy->table[type].name);
++		*n += sz;
++		str += sz;
++	}
++
++	if (policy->table[type].is_submsg) {
++		if (!selector) {
++			if (*n < str_sz)
++				*n += snprintf(str, str_sz, "(!selector)");
++			return 1;
++		}
++
++		if (ynl_attr_type(selector) !=
++		    policy->table[type].selector_type) {
++			if (*n < str_sz)
++				*n += snprintf(str, str_sz, "(!=selector)");
++			return 1;
++		}
++
++		if (*n < str_sz)
++			*n += snprintf(str, str_sz - *n, "(%s)",
++				       ynl_attr_get_str(selector));
++	}
++
  	return 0;
  }
  
-+int ynl_submsg_failed(struct ynl_parse_arg *yarg, const char *field_name,
-+		      const char *sel_name)
-+{
-+	yerr(yarg->ys, YNL_ERROR_SUBMSG_KEY,
-+	     "Parsing error: Sub-message key not set (msg %s, key %s)",
-+	     field_name, sel_name);
-+	return YNL_PARSE_CB_ERROR;
-+}
+@@ -78,6 +134,8 @@ ynl_err_walk(struct ynl_sock *ys, void *start, void *end, unsigned int off,
+ 	     const struct ynl_policy_nest *policy, char *str, int str_sz,
+ 	     const struct ynl_policy_nest **nest_pol)
+ {
++	const struct ynl_policy_nest *next_pol;
++	const struct nlattr *selector = NULL;
+ 	unsigned int astart_off, aend_off;
+ 	const struct nlattr *attr;
+ 	unsigned int data_len;
+@@ -96,6 +154,10 @@ ynl_err_walk(struct ynl_sock *ys, void *start, void *end, unsigned int off,
+ 	ynl_attr_for_each_payload(start, data_len, attr) {
+ 		astart_off = (char *)attr - (char *)start;
+ 		aend_off = (char *)ynl_attr_data_end(attr) - (char *)start;
 +
- /* Generic code */
++		if (ynl_err_walk_is_sel(policy, attr))
++			selector = attr;
++
+ 		if (aend_off <= off)
+ 			continue;
  
- static void ynl_err_reset(struct ynl_sock *ys)
+@@ -109,16 +171,20 @@ ynl_err_walk(struct ynl_sock *ys, void *start, void *end, unsigned int off,
+ 
+ 	type = ynl_attr_type(attr);
+ 
+-	if (ynl_err_walk_report_one(policy, type, str, str_sz, &n))
++	if (ynl_err_walk_report_one(policy, selector, type, str, str_sz, &n))
++		return n;
++
++	next_pol = ynl_err_walk_sel_policy(&policy->table[type], selector);
++	if (!next_pol)
+ 		return n;
+ 
+ 	if (!off) {
+ 		if (nest_pol)
+-			*nest_pol = policy->table[type].nest;
++			*nest_pol = next_pol;
+ 		return n;
+ 	}
+ 
+-	if (!policy->table[type].nest) {
++	if (!next_pol) {
+ 		if (n < str_sz)
+ 			n += snprintf(str, str_sz, "!nest");
+ 		return n;
+@@ -128,7 +194,7 @@ ynl_err_walk(struct ynl_sock *ys, void *start, void *end, unsigned int off,
+ 	start =  ynl_attr_data(attr);
+ 	end = start + ynl_attr_data_len(attr);
+ 
+-	return n + ynl_err_walk(ys, start, end, off, policy->table[type].nest,
++	return n + ynl_err_walk(ys, start, end, off, next_pol,
+ 				&str[n], str_sz - n, nest_pol);
+ }
+ 
+@@ -231,7 +297,7 @@ ynl_ext_ack_check(struct ynl_sock *ys, const struct nlmsghdr *nlh,
+ 		}
+ 
+ 		n2 = 0;
+-		ynl_err_walk_report_one(nest_pol, type, &miss_attr[n],
++		ynl_err_walk_report_one(nest_pol, NULL, type, &miss_attr[n],
+ 					sizeof(miss_attr) - n, &n2);
+ 		n += n2;
+ 
 diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
-index 020aa34b890b..b6b54d6fa906 100755
+index b6b54d6fa906..1f8cc34ab3f0 100755
 --- a/tools/net/ynl/pyynl/ynl_gen_c.py
 +++ b/tools/net/ynl/pyynl/ynl_gen_c.py
-@@ -878,7 +878,16 @@ from lib import SpecSubMessage, SpecSubMessageFormat
+@@ -57,6 +57,8 @@ from lib import SpecSubMessage, SpecSubMessageFormat
+         self.request = False
+         self.reply = False
+ 
++        self.is_selector = False
++
+         if 'len' in attr:
+             self.len = attr['len']
+ 
+@@ -484,7 +486,10 @@ from lib import SpecSubMessage, SpecSubMessageFormat
+         ri.cw.p(f"char *{self.c_name};")
+ 
+     def _attr_typol(self):
+-        return f'.type = YNL_PT_NUL_STR, '
++        typol = f'.type = YNL_PT_NUL_STR, '
++        if self.is_selector:
++            typol += '.is_selector = 1, '
++        return typol
+ 
+     def _attr_policy(self, policy):
+         if 'exact-len' in self.checks:
+@@ -878,6 +883,16 @@ from lib import SpecSubMessage, SpecSubMessageFormat
  
  
  class TypeSubMessage(TypeNest):
--    pass
-+    def _attr_get(self, ri, var):
-+        sel = c_lower(self['selector'])
-+        get_lines = [f'if (!{var}->{sel})',
-+                     f'return ynl_submsg_failed(yarg, "%s", "%s");' %
-+                        (self.name, self['selector']),
-+                    f"if ({self.nested_render_name}_parse(&parg, {var}->{sel}, attr))",
-+                     "return YNL_PARSE_CB_ERROR;"]
-+        init_lines = [f"parg.rsp_policy = &{self.nested_render_name}_nest;",
-+                      f"parg.data = &{var}->{self.c_name};"]
-+        return get_lines, init_lines, None
++    def __init__(self, family, attr_set, attr, value):
++        super().__init__(family, attr_set, attr, value)
++
++        self.selector = Selector(attr, attr_set)
++
++    def _attr_typol(self):
++        typol = f'.type = YNL_PT_NEST, .nest = &{self.nested_render_name}_nest, '
++        typol += f'.is_submsg = 1, .selector_type = {self.attr_set[self["selector"]].value} '
++        return typol
++
+     def _attr_get(self, ri, var):
+         sel = c_lower(self['selector'])
+         get_lines = [f'if (!{var}->{sel})',
+@@ -890,6 +905,18 @@ from lib import SpecSubMessage, SpecSubMessageFormat
+         return get_lines, init_lines, None
  
  
++class Selector:
++    def __init__(self, msg_attr, attr_set):
++        self.name = msg_attr["selector"]
++
++        if self.name in attr_set:
++            self.attr = attr_set[self.name]
++            self.attr.is_selector = True
++            self._external = False
++        else:
++            raise Exception("Passing selectors from external nests not supported")
++
++
  class Struct:
-@@ -1818,11 +1827,34 @@ _C_KW = {
-     print_prototype(ri, "request")
- 
- 
-+def put_typol_submsg(cw, struct):
-+    cw.block_start(line=f'const struct ynl_policy_attr {struct.render_name}_policy[] =')
-+
-+    i = 0
-+    for name, arg in struct.member_list():
-+        cw.p('[%d] = { .type = YNL_PT_SUBMSG, .name = "%s", .nest = &%s_nest, },' %
-+             (i, name, arg.nested_render_name))
-+        i += 1
-+
-+    cw.block_end(line=';')
-+    cw.nl()
-+
-+    cw.block_start(line=f'const struct ynl_policy_nest {struct.render_name}_nest =')
-+    cw.p(f'.max_attr = {i - 1},')
-+    cw.p(f'.table = {struct.render_name}_policy,')
-+    cw.block_end(line=';')
-+    cw.nl()
-+
-+
- def put_typol_fwd(cw, struct):
-     cw.p(f'extern const struct ynl_policy_nest {struct.render_name}_nest;')
- 
- 
- def put_typol(cw, struct):
-+    if struct.submsg:
-+        put_typol_submsg(cw, struct)
-+        return
-+
-     type_max = struct.attr_set.max_name
-     cw.block_start(line=f'const struct ynl_policy_attr {struct.render_name}_policy[{type_max} + 1] =')
- 
-@@ -1908,8 +1940,9 @@ _C_KW = {
-     local_vars = []
-     init_lines = []
- 
--    local_vars.append('struct nlattr *nest;')
--    init_lines.append("nest = ynl_attr_nest_start(nlh, attr_type);")
-+    if struct.submsg is None:
-+        local_vars.append('struct nlattr *nest;')
-+        init_lines.append("nest = ynl_attr_nest_start(nlh, attr_type);")
- 
-     has_anest = False
-     has_count = False
-@@ -1931,7 +1964,8 @@ _C_KW = {
-     for _, arg in struct.member_list():
-         arg.attr_put(ri, "obj")
- 
--    ri.cw.p("ynl_attr_nest_end(nlh, nest);")
-+    if struct.submsg is None:
-+        ri.cw.p("ynl_attr_nest_end(nlh, nest);")
- 
-     ri.cw.nl()
-     ri.cw.p('return 0;')
-@@ -1968,6 +2002,7 @@ _C_KW = {
-         if 'multi-attr' in aspec:
-             multi_attrs.add(arg)
-         needs_parg |= 'nested-attributes' in aspec
-+        needs_parg |= 'sub-message' in aspec
-     if array_nests or multi_attrs:
-         local_vars.append('int i;')
-     if needs_parg:
-@@ -2086,9 +2121,43 @@ _C_KW = {
-     ri.cw.nl()
- 
- 
-+def parse_rsp_submsg(ri, struct):
-+    parse_rsp_nested_prototype(ri, struct, suffix='')
-+
-+    var = 'dst'
-+
-+    ri.cw.block_start()
-+    ri.cw.write_func_lvar(['const struct nlattr *attr = nested;',
-+                          f'{struct.ptr_name}{var} = yarg->data;',
-+                          'struct ynl_parse_arg parg;'])
-+
-+    ri.cw.p('parg.ys = yarg->ys;')
-+    ri.cw.nl()
-+
-+    first = True
-+    for name, arg in struct.member_list():
-+        kw = 'if' if first else 'else if'
-+        first = False
-+
-+        ri.cw.block_start(line=f'{kw} (!strcmp(sel, "{name}"))')
-+        get_lines, init_lines, _ = arg._attr_get(ri, var)
-+        for line in init_lines:
-+            ri.cw.p(line)
-+        for line in get_lines:
-+            ri.cw.p(line)
-+        if arg.presence_type() == 'present':
-+            ri.cw.p(f"{var}->_present.{arg.c_name} = 1;")
-+        ri.cw.block_end()
-+    ri.cw.p('return 0;')
-+    ri.cw.block_end()
-+    ri.cw.nl()
-+
-+
- def parse_rsp_nested_prototype(ri, struct, suffix=';'):
-     func_args = ['struct ynl_parse_arg *yarg',
-                  'const struct nlattr *nested']
-+    if struct.submsg:
-+        func_args.insert(1, 'const char *sel')
-     for arg in struct.inherited:
-         func_args.append('__u32 ' + arg)
- 
-@@ -2097,6 +2166,9 @@ _C_KW = {
- 
- 
- def parse_rsp_nested(ri, struct):
-+    if struct.submsg:
-+        return parse_rsp_submsg(ri, struct)
-+
-     parse_rsp_nested_prototype(ri, struct, suffix='')
- 
-     local_vars = ['const struct nlattr *attr;',
+     def __init__(self, family, space_name, type_list=None,
+                  inherited=None, submsg=None):
 -- 
 2.49.0
 
