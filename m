@@ -1,262 +1,228 @@
-Return-Path: <netdev+bounces-190610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190611-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89762AB7CB0
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 06:39:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ACA4AB7CBC
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 06:49:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15E1C17EB6B
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 04:39:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B0FC4A19F2
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 04:49:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE75C2AD25;
-	Thu, 15 May 2025 04:39:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D6621F03CF;
+	Thu, 15 May 2025 04:49:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F0S4L3El"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="DNEwPbI2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B68B010E5;
-	Thu, 15 May 2025 04:39:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747283970; cv=fail; b=LcPqumyASMsQU7P0X3xcBE9OKTPR8/ZLTA0aD8yazxbSE2hI1bhsGRh1GKcau9qyeT4ltWzzgevB1WGONwAXyQTHyz7zx12grskLQvkvFdN+ML+TxfJmyN5nT7vcHHfYpWF3jyKS9Ps74dWKDPSR1GJMSU8t/kw0vTKZtehJwiw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747283970; c=relaxed/simple;
-	bh=RbHssT6mnKqjMtPIcCOKhUuXBK3mKV0DfcNdVlaSKUk=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=q/dLRtWbp31XDtbjcnu9Z08nHnh8TqpA7PLEDGDr0W0UBX0F6gmWaR6MECTiv0j+4NyXoKjmeRDcsiXEKXQmS04FBZfWXeE7NK0kL2UpJaHjkCH5GVGPANsld5wBgmETD6cLDtLDPV+yfEO23J1prAp3ez4Dbgn1T5cLzJP5kbA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=F0S4L3El; arc=fail smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747283969; x=1778819969;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=RbHssT6mnKqjMtPIcCOKhUuXBK3mKV0DfcNdVlaSKUk=;
-  b=F0S4L3ElStF39wz0i9e4tudJYZY9GjJKWF/HOWHvmmgpnNETPtg6ONat
-   +3LceqcfkfFmQ82dpTmxYQA5wt0PsjsW+a4AXsYwsJx4l0uw8BQFKSieh
-   9GXd6chFHgbZVWuB7SzHDBR6YAwAcE8uqFLhgFu7HvYvIol5Q1f3HgJnS
-   FHBb68WL2W6zoofZoGvv/pTBHmY8Hmu/KMB+hv3SF5ob1S9TyCEQaIg4k
-   Lv7mG/grgMxKd3uOlzj7rzJYkpXdKFFDhcNSu2sAnr69mAxVmi+1jfl0H
-   Hkje55x+9ereoc8/Yh5B0x4UWvtY2BJxWFjgSn2Rf7k7j2vH2sy+Kr6F5
-   A==;
-X-CSE-ConnectionGUID: hH7RmqBsQ8mmuIHBRWiSWA==
-X-CSE-MsgGUID: Xc5joeZSTHu4fL8VMOVHUw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11433"; a="51844747"
-X-IronPort-AV: E=Sophos;i="6.15,290,1739865600"; 
-   d="scan'208";a="51844747"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2025 21:39:28 -0700
-X-CSE-ConnectionGUID: WC1oxWNjTF+AuaznMSFTkA==
-X-CSE-MsgGUID: klqBjN0pQ2CsPUbvkbyJ7A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,290,1739865600"; 
-   d="scan'208";a="142263962"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2025 21:39:28 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Wed, 14 May 2025 21:39:27 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Wed, 14 May 2025 21:39:27 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.173)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Wed, 14 May 2025 21:39:27 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=mohCWXw4nimCVcxbRMnGRuP37UjwiGCT4HQRuCry9aQzjWq+Ov+BBa0bTTtsp5rTLeGN7GmEfq53Ar+9bK+AiJIezNzBdhtYAow9U63xAp797ItPNp9YCsfui7LCOxbakdgpfFmrE758DNoBs+x68Nb/Rk+ihiJj5LAbJTZ6RbaULP2L6bL4DQyGEbNGY///KwmfsCNPYS1cbLLO+/HOraCVaOuHu0Y2UP3x3I/CYuvkyelfPxzr8ahCjw1dgx5EAD9Fcdh3BjzXK/xw+zNfFvvUpnQP2lNq1B5y/OhRYlSitliuKxX1K30S9pPv2oHcp7jAbgxKOIHMzwyKWojfXw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ED4emRdUg+cXU6dWhKZQurgOO7qZg9TPm6K7Fc86SrA=;
- b=gGJHRRqOVOobB76RwzYtuiXJck8/he5Io42KkNNty+IfwzXdFUGXmP1fZYCmvk+lUP/e8O1uUWEQEW5KnCy5FTxFz6T4AzLysOgPSMYicNyqBJ6f1wzd6CUkHJJXjhIcE7SW7ZEQoMCgxBfU6fqSHsiSBDQAhqiRCjKPFa4UvTHeNpcl//M8R8BIuvB6Ph6BVjIUl67G21jVoz5SYizXnSQGcNJ5pmNWhL8w+JzOo7nwJYLYtPDxjZhV1OGSq9ArNE3aO/K1WLkqZYZDuTkwznvzC6FxbtV7WNpCu22wMGj7MROXjITtHVJ/zJZiYHZeCbwqLr3wcZjRl3cHZlchTA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH0PR11MB5949.namprd11.prod.outlook.com (2603:10b6:510:144::6)
- by DM3PPFE50071912.namprd11.prod.outlook.com (2603:10b6:f:fc00::f57) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.30; Thu, 15 May
- 2025 04:39:25 +0000
-Received: from PH0PR11MB5949.namprd11.prod.outlook.com
- ([fe80::1c5d:e556:f779:e861]) by PH0PR11MB5949.namprd11.prod.outlook.com
- ([fe80::1c5d:e556:f779:e861%6]) with mapi id 15.20.8722.027; Thu, 15 May 2025
- 04:39:25 +0000
-Message-ID: <03216908-6675-4487-a7e1-4a42d169c401@intel.com>
-Date: Thu, 15 May 2025 07:39:18 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH] e1000e: disregard NVM checksum on tgp
- when valid checksum mask is not set
-To: Vlad URSU <vlad@ursu.me>, Jacek Kowalski <jacek@jacekk.info>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <5555d3bd-44f6-45c1-9413-c29fe28e79eb@jacekk.info>
- <23bb365c-9d96-487f-84cc-2ca1235a97bb@ursu.me>
-Content-Language: en-US
-From: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
-In-Reply-To: <23bb365c-9d96-487f-84cc-2ca1235a97bb@ursu.me>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: TL2P290CA0015.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:2::18) To PH0PR11MB5949.namprd11.prod.outlook.com
- (2603:10b6:510:144::6)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7B172D052;
+	Thu, 15 May 2025 04:49:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747284585; cv=none; b=ssPi9kbuEx3H3ZZChmHK1w3jlfu7An5NiHiFs0TkX0xDj5Q471Cwd/xwG77FvWD7r0+mhanN/CM1mi4OcWAZva3Zx/PFXESXbvoAjin2fi5PK7dljYfswEKxZG7x/ZW3HjrNsZCqKWIE6TCYCLr8L0W1pqrh6SsLkpqzy9uW09M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747284585; c=relaxed/simple;
+	bh=5ex2XPtCgcZjj6nBV/479N8/kyNeH+50ZY5udqoyUbQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SDsnjrUf/OiF4S2+TghuexuRLICvqBXjw4npFg6S3+iqgi72hP0/qL1SqNxYJbGkX3R8GDwwrtLqWxCxFi8rWP2Jjqeln/MaCbbdohWD4i1wIcyPIXmILutie2ns1Qwrsl1Kz6yxFT9oautCi5Zkj8splkupzYcuYsicykQkl4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=DNEwPbI2; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1134)
+	id 2A4BC201DB00; Wed, 14 May 2025 21:49:42 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 2A4BC201DB00
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1747284582;
+	bh=G229l3a/ssTXJb4AFEMQgw5XAvni2xdA/B6L+u0ij/Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DNEwPbI2HDYRbGnrTs3VLTI6m2Dtj+1S4NtqIJGi2K7Vatc+1c6T/OxlhzimDljRo
+	 xFvRPzcwt5TOtvzC1wza3XpC3Rom5zbHsJXGUCWTEq10A85UxUyKGkXXJaFQPbvkOB
+	 gijQh5tXDg5LDYcgYVjdAn6YOcb0xyLir7ZPmbBc=
+Date: Wed, 14 May 2025 21:49:42 -0700
+From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+To: Michael Kelley <mhklinux@outlook.com>
+Cc: Yury Norov <yury.norov@gmail.com>, Dexuan Cui <decui@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Simon Horman <horms@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+	Maxim Levitsky <mlevitsk@redhat.com>,
+	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Nipun Gupta <nipun.gupta@amd.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Jonathan Cameron <Jonathan.Cameron@huwei.com>,
+	Anna-Maria Behnsen <anna-maria@linutronix.de>,
+	Kevin Tian <kevin.tian@intel.com>, Long Li <longli@microsoft.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Bjorn Helgaas <bhelgaas@google.com>, Rob Herring <robh@kernel.org>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Krzysztof Wilczy???~Dski <kw@linux.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	Paul Rosswurm <paulros@microsoft.com>,
+	Shradha Gupta <shradhagupta@microsoft.com>
+Subject: Re: [PATCH v3 3/4] net: mana: Allow irq_setup() to skip cpus for
+ affinity
+Message-ID: <20250515044942.GA5681@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1746785566-4337-1-git-send-email-shradhagupta@linux.microsoft.com>
+ <1746785625-4753-1-git-send-email-shradhagupta@linux.microsoft.com>
+ <SN6PR02MB41577E2FAA79E2803C3384B0D491A@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <aCTK5PjV1n1EYOpi@yury>
+ <SN6PR02MB4157AA971E41FE92B1878F9DD491A@SN6PR02MB4157.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR11MB5949:EE_|DM3PPFE50071912:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1dd59dc6-2d1d-4ad4-1778-08dd936a7810
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?UXZGbWlFSG9ZaFlEVnlLNldQVW15MmIyL3BlQWphNlZNY0JrMmlFdzN1WXNj?=
- =?utf-8?B?aVhCckxKSGd6M2FRelJHODhKZnMxUCtvWGVDVS8vUGFjRFRpVUV6RDR1QjV5?=
- =?utf-8?B?QWduU2U4UmtZaVI3MTNxZ0E5RVNEVkEvNWhQSno2R2pmTHluY0V6RXFzTk83?=
- =?utf-8?B?VnQ0T3hCNzBjLzZwYW0xN0k0Vk1GdUNZSmcrbWhpZTFxZUVJaTZOc0VDRnJ1?=
- =?utf-8?B?Uml1MlhGNlRhcU9jTkVFTG9oL0tyN3dSVjNYZFhCYUlwejFmcW5rRk42T0Z6?=
- =?utf-8?B?SXFkVXErR0xrYTRQUWVIU2RFSjFSbmxUWGxUTmx3eXlGZmQ2eG1GdVF6MDNI?=
- =?utf-8?B?TWlMUWRLUG56dEdVNEJJQ0RUdS9DcEYzNXZ3RmVUa1plK0s3dHJWbG1sdUZt?=
- =?utf-8?B?M0pNclBTK2xPb3BwZjZOZHdxalZjTE0yRG5KQlZTeWt6d3lXUU5ibzQzcXJ0?=
- =?utf-8?B?amNkYkxENkxvd2JiemN3ZDRCNjR0U2FlUWFJWUtjenphT2craTdtZ2dNMTZI?=
- =?utf-8?B?c0JsSnVUYkRQTDlOV1dRYmNyRURzRzlEcGJva2Vwd0s5Y1p5VXBNNUpXeUdY?=
- =?utf-8?B?UkdyWjFMbTAvdzY0VEVNekhBZTNzSWNQZzNHRVJBUjBlOHlYWDRkN1BFTVVI?=
- =?utf-8?B?V3hLQUFsWHFGYWlwb0l2SVd6QmhPK1NwUDF2TnV1MHVrcDgrYzhWYUtER3p4?=
- =?utf-8?B?b1VyUnRWcTgzVlhIS3ppZCsyQktmM3Rib3QyaEk2a2xBN0c2bDVBUnpVdFNY?=
- =?utf-8?B?UUFDeXgyODFpNUtwT24vMGZUMThWYWFmbzdoTXhxb2Zic21PeWtidk9nZ09h?=
- =?utf-8?B?emVseS91OGtlWG5XdzI0cTdWQ0xRQzR3ekxWaGpTR3V2TlViaEZOaEV5UW0y?=
- =?utf-8?B?d0Q0dnp5a0VpcGVnNUR1YjBDSUE3NFd3ZzZSWkkrQ25tMDhMKzhyQnpqbXhh?=
- =?utf-8?B?LzhaR1dyS0VQMkZPLzNHWS9MK0FCTmhCb2c5c2VleFZGcmpXTkhSMmRLaDMr?=
- =?utf-8?B?UDVmL21DeE5XSW1ucnpLUmw5ZFV4bFNSU2FleWFtREs1VkRBVTFpOHlPbzBR?=
- =?utf-8?B?T2JmZ1RyS3ErYlB0aXg4Q2F2UitXRCswRWxPaFNsbCsyWEpDbTFDaHU0RkFn?=
- =?utf-8?B?RUJJYzZ1RDBPWEVobVpMYnJaeEcrTHk2b0tFTHVpZVNYMWUzTlNXUFZCRjgr?=
- =?utf-8?B?ZDFtNGdOMExPcXdZM3N6OE5SRnpGQW1MZVczN1p4VllOVTRERVVRelpvcllr?=
- =?utf-8?B?V3U3YS80MkN3S0pPQlFrYTJkbFEwYWZGRFdhMko0Zk52R3VRUXlUT0x4VnNW?=
- =?utf-8?B?SDlxS1ZZZ3hwWkI3VjFzSC9GSnZXM3dsWmQ0L3ZPcGtpNlZmalhkRVdCNFV4?=
- =?utf-8?B?T1pCN1lnWjFocXQxMHY0YjJMSVE5SFFORWhIUDFzTENxRjlMZnZ3Zk1HV1FZ?=
- =?utf-8?B?VktZVHEzWEphdDVpN3VLcE1sV0NWL2JGQ2JJZlZuejdvYnJFWGpOWWFnWWp3?=
- =?utf-8?B?eGlKS0kyV0taeHpkaUZaY082OTZrTTVyMWpXWjVZQUtldXh6RDF3WHhVV2U3?=
- =?utf-8?B?YnJPSHpRNk5jZ0o4VU5VYkRHdXp0OWZyR3BnVEJ1VlJxQ1UxMzdHaGZzU0xG?=
- =?utf-8?B?S0t5bWZRczUwaHZjM3RKR2FDYURZSDNTelJydlpvckc1UEhFcE9VRzJOeUhG?=
- =?utf-8?B?OW0rZHRqS0FjalFPVFFoSThscHFYMnpSZ0JodFpwOWh0STR5WkREcFRaTjVU?=
- =?utf-8?B?Rk5lT2ZKWDZublF3Sjg1RXlsM0l6eTFoOXYvL3RUQ3VyQ2szWm9SOERRbHVB?=
- =?utf-8?Q?u8WmF59JUVyNG/MQ2Nw78vLQ5dLC6E2mLJjWU=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5949.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cjNjKzhJT3NMN2ozZEMxUU0xeVVkUWVPZVU1WWNJdFRoK2pTQUJHVmozaWpI?=
- =?utf-8?B?Zkttb25KRTNGeVdZT3l0ZTVTVDl3blpZS1dndlBjK1JnOElBdTBUbU0yNzRI?=
- =?utf-8?B?OStwSUgrNXU3Y1hPaDE1UU02Rm1Sd1NUNitvZlpJODduM1BRY0doY3F4S1lB?=
- =?utf-8?B?WXRzcEZCTG9XWFdDNnlodE1Gc29QTFdBT0FJdFBOdjVsWWpnNjkyZFNhMzFo?=
- =?utf-8?B?eVJLaHNydVpCNmdOWG9WbDFmNW52S2FHSTEzVHNzZCsyRFA3TkM5T2d1TjRZ?=
- =?utf-8?B?bWI2c0F6b0FrVzdSeVpjRlcyMythOTVpQ2Y3VWtxRWVLK3ZjdXpDNmxqUTVJ?=
- =?utf-8?B?bnozQ0lSeE5ySm1yNjZqY3NVK29nVDY0dzkwYmNPZXE2cU9jWlY4bnE5cVJV?=
- =?utf-8?B?OWN0RHNCcStZL2tTVGd4am5Ba09Hb1JMSVBLcTJIWW1XZUIwTUEvNUZ5TFVm?=
- =?utf-8?B?TEJyTjFoZnkxQ2NqYThyZVVnNmxWMXpnWUJNakQ0NHpjTGJ4c3pBaWpoY3pk?=
- =?utf-8?B?WU4xTTY1RHJEc2ZKdytMbWhtRDBTdmZqQktMcy92UjdGTkNEbWRrRklHU1lZ?=
- =?utf-8?B?eS9vYUgzSFIzVlRXK0VTeEczUTBFdFNmTTRQZ3ZJM1BUendDY1h5NHIxT01X?=
- =?utf-8?B?dlFwQmpnVDhZRnFSVERWMisycjdndXlISnJGd1NPVFpkVWZEa200NVIxL0Jv?=
- =?utf-8?B?L1YzSTIvdW1FOFpBS3Fmc0JWMUZYdUQrcm5VRk1WSVNTUUdnOUhTTzlUaUU4?=
- =?utf-8?B?RVpZSGV3NDdOMlA1NmwyTWpydmRZc0t5bjE4TURaUytsbWhhREdPWnNyTFp4?=
- =?utf-8?B?eDhzU0FGRUFYYXdwSGZKU2FwalY5WlZuOGxXa05zcjEyam1tYXBDbGVZQjJi?=
- =?utf-8?B?elV0SndrVkdNYmg0bTVKOWlhVUNOQUFTNS9XWnFtOG5WL3JvMHBSaVNudzZS?=
- =?utf-8?B?d0oyUWZLSEtCT2FSdFlIbnhXdE42WXRmek43MTZ6cnE1dGk2bjRhaDI4bVRu?=
- =?utf-8?B?eHBVMkRpK3NOZThVK256TXE2Y1o5R2lFUDkvMXlrWWJKZE5aWTloaXVXRjZw?=
- =?utf-8?B?eUJpZFYyajdJZzluM0pzS3hET2JkVDczMmtKZGlCUFBZNXY5SXhhTUhmUnNj?=
- =?utf-8?B?bktWMVFRTU5vdmNHK2NmVTV0ZHBpVlBPTDdCbFhIdUhsWXJsSnNIVUcwZnhR?=
- =?utf-8?B?blRQdW95VVFqZTh6YVB1ZHZvaXBhbDFscXBmWmRlelZlYzIvMzdwV09xTk1V?=
- =?utf-8?B?aHNtS2x0TUVyM1JUY0dKdk4vRy9ZaUlqUUZpWmVCU053YUY5bEpIUkluenVa?=
- =?utf-8?B?dWVMWllBenFrMGNldlAvRmYwTnUyTVRYU1hVdEIwRlNiYnZ5Z0xKVUY3RHg0?=
- =?utf-8?B?ODg4blRZK29LK013NDVSejdLcTl1WS9adnFMcE44NDVsVkRLdkF3SnRza3RW?=
- =?utf-8?B?Y1k2eEtIanlvTVh0NUlLbXA0R0lWTEJqRFFoNkRwNzBhS3pWSFlpTWFrRTJH?=
- =?utf-8?B?ck5zQkZiTno4QTF4V0QyeHlZOElIemxUYktwdkErdTJWNUtOSVlZaFZEeS96?=
- =?utf-8?B?OE5nOEJKQ3lLQ1ZwRi9sM29CZmZTU0tOUmpHQW1xL0dpcDJNZzdIRk1PL1R5?=
- =?utf-8?B?RXNvMFY4b3NjbldWOE5GUEpNTkZIS0Q1b2tIeTg0U0tOZXJRdTR6cDQvUERV?=
- =?utf-8?B?WmZtTGp1RVZWVmNrM0ZrUmJpNUxiUWNUYWRsQkhsRERxYnBQeTdxT2JvYjZw?=
- =?utf-8?B?Rk5OUCtvdDlvSFF4RkJEUXphS2hYaVRNbVdZN1Q4TW1Lb1orRTdjOXBwd1Ez?=
- =?utf-8?B?eklBZE9laGFlS3diT1ZheEJia0daRWlPZ0I5TXZyV0xUeXNqalN2c2hGS29M?=
- =?utf-8?B?Mm95ZUNvQnhrSlNxZ1psd2pUZUlYdjIxTVA5bnBDS2k5a1EwNWhENXpqZno3?=
- =?utf-8?B?djJPVzJEWmpPSklYYkdlcVlqRnlTM3B5OGpDZmp4bzByRGw0OGNlbTNlb04v?=
- =?utf-8?B?dnVtS3BVSkdaMFVaeGpoNk9YQ0xIZU41aXF6TURZUFVNL1gvZisyWVFCbFMr?=
- =?utf-8?B?Q2Z2a25tZDV2R20wZldUaW5DTE1ldUs1Wmxja1Z5cDFEL29wTFMvcDlqd3hG?=
- =?utf-8?B?dHdMZmo5OUZJd0YvckdMTEplR2pRaTBxWkltVFQ1b1FyYUdIRXcybkFpbUZT?=
- =?utf-8?B?Nmc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1dd59dc6-2d1d-4ad4-1778-08dd936a7810
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5949.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 May 2025 04:39:24.9604
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BGz9PivqBJiu0z5+F7p9pxlcKhCf3UiTfVqkxT90p7qMMX+/jg+Pu6koo3+RmTe77U2QZ/yqS9a3mlHQupnFT9r33/BA719nqzvMeCcNya4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PPFE50071912
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SN6PR02MB4157AA971E41FE92B1878F9DD491A@SN6PR02MB4157.namprd02.prod.outlook.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-
-
-On 5/12/2025 8:25 PM, Vlad URSU wrote:
-> On 22.04.2025 10:43, Jacek Kowalski wrote:
->> Some Dell Tiger Lake systems have incorrect NVM checksum. These also
->> have a bitmask that indicates correct checksum set to "invalid".
->>
->> Because it is impossible to determine whether the NVM write would finish
->> correctly or hang (see https://bugzilla.kernel.org/show_bug.cgi? 
->> id=213667)
->> it makes sense to skip the validation completely under these conditions.
->>
->> Signed-off-by: Jacek Kowalski <Jacek@jacekk.info>
->> Fixes: 4051f68318ca9 ("e1000e: Do not take care about recovery NVM 
->> checksum")
->> Cc: stable@vger.kernel.org
->> ---
->>   drivers/net/ethernet/intel/e1000e/ich8lan.c | 2 ++
->>   1 file changed, 2 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/intel/e1000e/ich8lan.c b/drivers/ 
->> net/ethernet/intel/e1000e/ich8lan.c
->> index 364378133526..df4e7d781cb1 100644
->> --- a/drivers/net/ethernet/intel/e1000e/ich8lan.c
->> +++ b/drivers/net/ethernet/intel/e1000e/ich8lan.c
->> @@ -4274,6 +4274,8 @@ static s32 
->> e1000_validate_nvm_checksum_ich8lan(struct e1000_hw *hw)
->>               ret_val = e1000e_update_nvm_checksum(hw);
->>               if (ret_val)
->>                   return ret_val;
->> +        } else if (hw->mac.type == e1000_pch_tgp) {
->> +            return 0;
->>           }
->>       }
->>
+On Wed, May 14, 2025 at 05:26:45PM +0000, Michael Kelley wrote:
+> From: Yury Norov <yury.norov@gmail.com> Sent: Wednesday, May 14, 2025 9:55 AM
+> > 
+> > On Wed, May 14, 2025 at 04:53:34AM +0000, Michael Kelley wrote:
+> > > > -static int irq_setup(unsigned int *irqs, unsigned int len, int node)
+> > > > +static int irq_setup(unsigned int *irqs, unsigned int len, int node,
+> > > > +		     bool skip_first_cpu)
+> > > >  {
+> > > >  	const struct cpumask *next, *prev = cpu_none_mask;
+> > > >  	cpumask_var_t cpus __free(free_cpumask_var);
+> > > > @@ -1303,9 +1304,20 @@ static int irq_setup(unsigned int *irqs, unsigned int len, int node)
+> > > >  		while (weight > 0) {
+> > > >  			cpumask_andnot(cpus, next, prev);
+> > > >  			for_each_cpu(cpu, cpus) {
+> > > > +				/*
+> > > > +				 * if the CPU sibling set is to be skipped we
+> > > > +				 * just move on to the next CPUs without len--
+> > > > +				 */
+> > > > +				if (unlikely(skip_first_cpu)) {
+> > > > +					skip_first_cpu = false;
+> > > > +					goto next_cpumask;
+> > > > +				}
+> > > > +
+> > > >  				if (len-- == 0)
+> > > >  					goto done;
+> > > > +
+> > > >  				irq_set_affinity_and_hint(*irqs++, topology_sibling_cpumask(cpu));
+> > > > +next_cpumask:
+> > > >  				cpumask_andnot(cpus, cpus, topology_sibling_cpumask(cpu));
+> > > >  				--weight;
+> > > >  			}
+> > >
+> > > With a little bit of reordering of the code, you could avoid the need for the "next_cpumask"
+> > > label and goto statement.  "continue" is usually cleaner than a "goto". Here's what I'm thinking:
+> > >
+> > > 		for_each_cpu(cpu, cpus) {
+> > > 			cpumask_andnot(cpus, cpus, topology_sibling_cpumask(cpu));
+> > > 			--weight;
+> > 
+> > cpumask_andnot() is O(N), and before it was conditional on 'len == 0',
+> > so we didn't do that on the very last step. Your version has to do that.
+> > Don't know how important that is for real workloads. Shradha maybe can
+> > measure it...
 > 
-> This patch doesn't work for me on an Optiplex 5090 Micro (i5-10500T). I 
-> did some debugging and the platform is recognized as Tiger Lake, by the 
-> driver, but the checksum valid bit is set even though the checksum is 
-> not valid.
-> 
-> The network controller works fine if I patch out the validation in 
-> netdev.c. The checksum word at address 0x7e read using ethtool is 0xffff.
-> 
-> I'm also a bit confused about why the driver reports the mac type as 
-> e1000_pch_tgp even though i5-10500T should be Comet Lake?
+> Yes, there's one extra invocation of cpumask_andnot(). But if the
+> VM has a small number of CPUs, that extra invocation is negligible.
+> If the VM has a large number of CPUs, we're already executing
+> cpumask_andnot() many times, so one extra time is also negligible.
+> And this whole thing is done only at device initialization time, so
+> it's not a hot path.
+>
 
-The device is being recognized by the device ID. Probably the device you 
-have on your system is TGP.
+Hi Michael, Yury,
 
-Since the checksum word is 0xFFFF which is peculiar, can you dump the 
-whole NVM and share with us?
+That's right, the overhead is negligible. Tested with some common
+workloads. I will change this in the next version.
+
+Shradha.
+ 
+> > 
+> > >
+> > > 			If (unlikely(skip_first_cpu)) {
+> > > 				skip_first_cpu = false;
+> > > 				continue;
+> > > 			}
+> > >
+> > > 			If (len-- == 0)
+> > > 				goto done;
+> > >
+> > > 			irq_set_affinity_and_hint(*irqs++, topology_sibling_cpumask(cpu));
+> > > 		}
+> > >
+> > > I wish there were some comments in irq_setup() explaining the overall intention of
+> > > the algorithm. I can see how the goal is to first assign CPUs that are local to the current
+> > > NUMA node, and then expand outward to CPUs that are further away. And you want
+> > > to *not* assign both siblings in a hyper-threaded core.
+> > 
+> > I wrote this function, so let me step in.
+> > 
+> > The intention is described in the corresponding commit message:
+> > 
+> >   Souradeep investigated that the driver performs faster if IRQs are
+> >   spread on CPUs with the following heuristics:
+> > 
+> >   1. No more than one IRQ per CPU, if possible;
+> >   2. NUMA locality is the second priority;
+> >   3. Sibling dislocality is the last priority.
+> > 
+> >   Let's consider this topology:
+> > 
+> >   Node            0               1
+> >   Core        0       1       2       3
+> >   CPU       0   1   2   3   4   5   6   7
+> > 
+> >   The most performant IRQ distribution based on the above topology
+> >   and heuristics may look like this:
+> > 
+> >   IRQ     Nodes   Cores   CPUs
+> >   0       1       0       0-1
+> >   1       1       1       2-3
+> >   2       1       0       0-1
+> >   3       1       1       2-3
+> >   4       2       2       4-5
+> >   5       2       3       6-7
+> >   6       2       2       4-5
+> >   7       2       3       6-7
+> > 
+> > > But I can't figure out what
+> > > "weight" is trying to accomplish. Maybe this was discussed when the code first
+> > > went in, but I can't remember now. :-(
+> > 
+> > The weight here is to implement the heuristic discovered by Souradeep:
+> > NUMA locality is preferred over sibling dislocality.
+> > 
+> > The outer for_each() loop resets the weight to the actual number of
+> > CPUs in the hop. Then inner for_each() loop decrements it by the
+> > number of sibling groups (cores) while assigning first IRQ to each
+> > group.
+> > 
+> > Now, because NUMA locality is more important, we should walk the
+> > same set of siblings and assign 2nd IRQ, and it's implemented by the
+> > medium while() loop. So, we do like this unless the number of IRQs
+> > assigned on this hop will not become equal to number of CPUs in the
+> > hop (weight == 0). Then we switch to the next hop and do the same
+> > thing.
+> > 
+> > Hope that helps.
+> 
+> Yes, that helps! So the key to understanding "weight" is that
+> NUMA locality is preferred over sibling dislocality.
+> 
+> This is a great summary!  All or most of it should go as a
+> comment describing the function and what it is trying to do.
+> 
+> Michael
 
