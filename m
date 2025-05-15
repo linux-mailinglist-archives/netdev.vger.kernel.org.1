@@ -1,68 +1,56 @@
-Return-Path: <netdev+bounces-190601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0F09AB7BD2
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 04:58:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BF36AB7BD6
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 04:59:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 591D14A7889
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 02:58:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC5418C784C
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 02:59:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A6CF288C80;
-	Thu, 15 May 2025 02:58:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B69228DB46;
+	Thu, 15 May 2025 02:59:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zif55Efl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nfzSuFn3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E94794B1E64;
-	Thu, 15 May 2025 02:58:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05CDC288C80
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 02:59:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747277903; cv=none; b=niKR8ZKuUmHqwxCUXJZOKtyGZmvUkPBtx4Iqz6o3YOmqLv0pclu4uY0LLejLKjwVroFUZ9GundoQqImMCAKk6U/XLzwSh/L7Z1zOHOuFJFcmU1vn2X0FASYnwjsx51nzUcLgmYAidYNAl7Q6Nh3U5NjnPY0ijcHXQWXlBSWcrjY=
+	t=1747277990; cv=none; b=DGrbyd3vQOQvs0qyP2pwajuGdd/7E34d8FgU0sMxQ0q7+53sm+r1sFZoYYlkfj1rj8W514Sa9B04VgmNzZgp/YqFazTXLuaopkvfEAqlpV6L4z4qKR4cGfvPuI/ZngKn12LE5HUi8CfPqN0+KTwTf41Njw9Fd93ad5N7AaHLxWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747277903; c=relaxed/simple;
-	bh=MJ9NvK4x6c2IC/ufJ5Ze19JfDwJVE60QHIw713vLMMg=;
+	s=arc-20240116; t=1747277990; c=relaxed/simple;
+	bh=lcopZlSUVr1HIOY0O+1mk0mCJZZ16k8ZxqxNI3gMHIA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mll7JiXCGYMS4ietcnJpI0VmP/dMN0kXQbKPgjJ0SZaTaCdpwJrrEFQcHRj7cCfMjNlRUdP0gebNPjg/IoDTHVvcpRkn3P1LgGatcwJnp8fkn1Zp2v64nsuLaAN7kqT9Qxmvc0QAEnZOFYqoxfpRKRPaB233yzl1znnKPlVwtvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zif55Efl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFB59C4CEE3;
-	Thu, 15 May 2025 02:58:21 +0000 (UTC)
+	 MIME-Version:Content-Type; b=uofBUmlvIozyFZUT/6QMMvpqnQmY+IXS+hCTIavPAOZjqCwC5jil9UKeB0r/de/IyYIP0d1PdH02eF2RxGiRfhHW+9lqznMzjze7iAAzlKuzTNOWEt4RP4YUk/5F8H8UWGdNWrZNeh8GqNjJl3U5ExO+GEjAoUk7AuPBsdGO3nc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nfzSuFn3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EFDDC4CEE3;
+	Thu, 15 May 2025 02:59:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747277902;
-	bh=MJ9NvK4x6c2IC/ufJ5Ze19JfDwJVE60QHIw713vLMMg=;
+	s=k20201202; t=1747277989;
+	bh=lcopZlSUVr1HIOY0O+1mk0mCJZZ16k8ZxqxNI3gMHIA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Zif55EflQ/wfoyYxuzgJJHSrnBUs8bX4XFTCXmCfL2k4nVxfdZptpbnKhsYTGJHyW
-	 RRWNbiS2iBt8i59yMtTwmGao/t3SUPhPkA5QpG/g8f5xrhYrwb0lj3ahw7sEv4pOvM
-	 WNFJgauzbDhZyMYy68n2w/6tSa+mYfoGNC513s65H1XAQr5JXbJwKjAzQ1iXB93pAA
-	 0T38+OzdVR3/lPkJlJq3ES50zfLllMLDQHrmSN2znHIrqOZqEqfk5MqjgqxZ5VOwal
-	 4Wq37MTo19nZeTjMzkfgnuAh31jvNex/owxuodR9jRj1cQweyyN6qZkhFDyC0abGkf
-	 dfW4bO91okreQ==
-Date: Wed, 14 May 2025 19:58:21 -0700
+	b=nfzSuFn3cD8rSiqqEUlZdGSZSG4+N9HCjdao/TZec4Aeh3C3gHOP7Q9yb6vaavLGW
+	 SN9yjJgow9LB7yx46MExdxJL3akO0uEmXBD8LfmphzzzdIOpQ+Cmhq0Hm8NyPYGMnE
+	 /BzVCd19cZ2/EbYloP/pMn9T6fiYTWfX/y3VOPqaCj7tlOcd7AIbm3DYaj3c0B9RBy
+	 ZagHhCxQ2EbdLAAq+vptRAs11/Ow+Ff/4cAEZ5gXqINDm9hDvLrX1YHZATVzBBQhCm
+	 plZBz3bUQ4RiYdiZU7DXbTAoI2QeK3knATympRxE9/EtQS6sK1Gpwvkvh3Expu1H7g
+	 JHtQuVb5qs7Hw==
+Date: Wed, 14 May 2025 19:59:48 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Luo Jie <quic_luoj@quicinc.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Lei Wei
- <quic_leiwei@quicinc.com>, Suruchi Agarwal <quic_suruchia@quicinc.com>,
- Pavithra R <quic_pavir@quicinc.com>, "Simon Horman" <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Kees Cook <kees@kernel.org>, "Gustavo A.
- R. Silva" <gustavoars@kernel.org>, "Philipp Zabel"
- <p.zabel@pengutronix.de>, <linux-arm-msm@vger.kernel.org>,
- <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
- <linux-hardening@vger.kernel.org>, <quic_kkumarcs@quicinc.com>,
- <quic_linchen@quicinc.com>, <srinivas.kandagatla@linaro.org>,
- <bartosz.golaszewski@linaro.org>, <john@phrozen.org>
-Subject: Re: [PATCH net-next v4 00/14] Add PPE driver for Qualcomm IPQ9574
- SoC
-Message-ID: <20250514195821.56df5c60@kernel.org>
-In-Reply-To: <20250513-qcom_ipq_ppe-v4-0-4fbe40cbbb71@quicinc.com>
-References: <20250513-qcom_ipq_ppe-v4-0-4fbe40cbbb71@quicinc.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: netdev@vger.kernel.org, Pavan Chebbi <pavan.chebbi@broadcom.com>,
+ Michael Chan <mchan@broadcom.com>
+Subject: Re: [PATCH net-next] net/tg3: use crc32() instead of hand-rolled
+ equivalent
+Message-ID: <20250514195948.617b2df2@kernel.org>
+In-Reply-To: <20250513041402.541527-1-ebiggers@kernel.org>
+References: <20250513041402.541527-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,19 +60,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 13 May 2025 17:58:20 +0800 Luo Jie wrote:
-> The PPE (packet process engine) hardware block is available in Qualcomm
-> IPQ chipsets that support PPE architecture, such as IPQ9574 and IPQ5332.
-> The PPE in the IPQ9574 SoC includes six ethernet ports (6 GMAC and 6
-> XGMAC), which are used to connect with external PHY devices by PCS. The
-> PPE also includes packet processing offload capabilities for various
-> networking functions such as route and bridge flows, VLANs, different
-> tunnel protocols and VPN. It also includes an L2 switch function for
-> bridging packets among the 6 ethernet ports and the CPU port. The CPU
-> port enables packet transfer between the ethernet ports and the ARM
-> cores in the SoC, using the ethernet DMA.
+On Mon, 12 May 2025 21:14:02 -0700 Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> The calculation done by calc_crc() is equivalent to
+> ~crc32(~0, buf, len), so just use that instead.
 
-Please make sure the code builds cleanly with W=1.
--- 
-pw-bot: cr
+I applied this and the bmac patch, thanks!
+For some reason the bot doesn't want to reply.
 
