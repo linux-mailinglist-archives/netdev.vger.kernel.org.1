@@ -1,218 +1,140 @@
-Return-Path: <netdev+bounces-190856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 990E6AB9179
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 23:16:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AEB90AB917C
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 23:17:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 320A617E3AE
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 21:16:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15F0817E171
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 21:17:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9510528AAEE;
-	Thu, 15 May 2025 21:16:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECF7B225A50;
+	Thu, 15 May 2025 21:16:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GbTjDBKW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kjF51K1E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1D991FFC59;
-	Thu, 15 May 2025 21:16:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C047B19CCEA;
+	Thu, 15 May 2025 21:16:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747343773; cv=none; b=H7CzNSt2OwzWtwx4BFiUOuFz4/QFhw3JvEwM2dZ/64RrJUpU/89qPynJiSpSMM+1DQBc54sVuJ0MuHazaDgTWlDKg+TgYtGyBlHif7EEaz6LpJCdD1lSAyZ4xGNfUVNm2l/9XeNyqb3pAOmpzTZTQqWbi6MHxav3zZuNcqEmiac=
+	t=1747343819; cv=none; b=l6GDut99oyQ7AM3R4mIKWlYo995hXW8NZ5klf7tSOWWBr+jl6cIbtvaHWtDIaCiXkj2MnZGQSOENjbnVynbCKQUul7XMS216SEpk0d7rG1tO8DmugMCsCUZAsRaJhz1ul26UOlE2ac90HU2F0R3TyrzAaSSnO69kzxoas9Li2H8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747343773; c=relaxed/simple;
-	bh=9nUnCuCcmIQrMWVt+lIRxSDT5dWwf7z7QeMSilnPqag=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eF3us77SbGNwMnzt1iPwA70lLJPbzfOW97YsX0mm9rb1hKfccSBRZ1HZV2su0+VGaB/Yb6UARp2csJLrZLvc5XJ0bpEHhPHgqu3kd47igT/IkG73V8iKrjTekC1TpHwDpf3ZFL1RsN/NIevMOq9dnOhDEuipZgszm0QMeej9Rw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GbTjDBKW; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7390d21bb1cso1483364b3a.2;
-        Thu, 15 May 2025 14:16:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747343771; x=1747948571; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+KaesVsFIm14fYgwJFF3sLqz3tX811tjxxTcFdNyVvY=;
-        b=GbTjDBKW3lkr0NjECML+xHFqkifvtw2iPfhp+H0ieeAR/VSZlvX8EfAv9XnnTGFaZS
-         M4zTaknEP+fwPKaSiIWv4jG/A/WFWP4l76kWYS62Y0Yzsh6y92D+N8jOJeLXEdtNc6Oy
-         r/SwGTMpffoo52AydtrSzpH2NLopAjAf5iGInZgKXlA8goSwOZXQZkkotrlRMxPGP38O
-         SbYW5j/KJcok9WVh0T6y+eY2OU0YDltj2oleUlEVf9ZIMjzcky3hosHR0SZFRHK2Mh3f
-         N4c0UpsSMmywTSDlafkW2b3MxEBmY9XIzzhOa8KBhDjC0bPgaCUiZVV5aUdXV2dWhQ6b
-         L7lA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747343771; x=1747948571;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+KaesVsFIm14fYgwJFF3sLqz3tX811tjxxTcFdNyVvY=;
-        b=aZUMGYIC454xV4TM9CnERd9V+DHH0q67plHI+1PZHjpbKIKGwyEtg4P6VuW4kzECg8
-         eLKFxf21dyYmR0a2227AAvAyc1oKNOpoJAcN6FfbQGPlzE2k9MUJV5jK/MRb2MXfL5Ld
-         JpE3gp9+Ty7B3mcs8PGijOwErWH6LGTvGXRu86bLCuSyeCoW77NePF4YzG/syrs27ZSF
-         LGfAHxNRuxZeqF4JLA8t+0Gtn1x53ip1IKnECCj6vNIxEhrHLCg4/uQsIOSuEUIeTlWs
-         PSvb9mmIjwR10RFAUp39UJ6RgUjFLi5kfqOTjnbyyC/iYpSNC/8vb021tKjoIgLKrVuP
-         PS6A==
-X-Gm-Message-State: AOJu0YzyQkXTZX6qHAf6xMR0NMoaTkoSzNZ2YRnT1qIoKgpXD7HWn1Bf
-	c4tJChPpo5N0Hl90wTo4w5Sg/F0tEOM5bn/gTCl+d78OIxffWxncwDk5jhtQ6g==
-X-Gm-Gg: ASbGnctmk6CFoCX6IMk7QKUUnWDq9zG9pQlfEsEyRDdd783/wUA/u/Czsd85JfnC0GQ
-	JhhaJ20vC9Tf/Uyt6Z42KQq0l824BC2bhCxgYym6HVLCaPT802nxcw2eo1IuyUKwF3y1K94H9ry
-	R0u2IqP5urjjqPYycLVrXdnp4W8x80LGWcv+ZmRON429jmJqfwjPQJBnvL8TRcUZooKaGBavKmW
-	oURRiuYNUtzfrTR+OfuyeimskRRdzP9gDbFozqh5RjU8lwxmMS4gWDww8TZ0/EmCA9EjKGd4EkL
-	Zcvpm4DF3LMbtj5wI7xNunZFW2iUEUXJFKlRaVGqX54=
-X-Google-Smtp-Source: AGHT+IG3XHcvKMx09g5xIMSvZ1NzT3Euw4+LJIerbvrc2gBhHhvutVBG/2rqDoquwufNOMAULCWnJg==
-X-Received: by 2002:a05:6a00:3985:b0:742:a334:466a with SMTP id d2e1a72fcca58-742a97eb677mr1055601b3a.12.1747343770886;
-        Thu, 15 May 2025 14:16:10 -0700 (PDT)
-Received: from localhost ([2a03:2880:ff:70::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-742a9876e62sm246102b3a.147.2025.05.15.14.16.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 May 2025 14:16:10 -0700 (PDT)
-From: Amery Hung <ameryhung@gmail.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	alexei.starovoitov@gmail.com,
-	andrii@kernel.org,
-	daniel@iogearbox.net,
-	tj@kernel.org,
-	memxor@gmail.com,
-	martin.lau@kernel.org,
-	ameryhung@gmail.com,
-	kernel-team@meta.com
-Subject: [PATCH bpf-next v4 3/3] selftests/bpf: Test concurrent task local data key creation
-Date: Thu, 15 May 2025 14:16:02 -0700
-Message-ID: <20250515211606.2697271-4-ameryhung@gmail.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250515211606.2697271-1-ameryhung@gmail.com>
-References: <20250515211606.2697271-1-ameryhung@gmail.com>
+	s=arc-20240116; t=1747343819; c=relaxed/simple;
+	bh=0fDHksalYNZrl+B7FMp5wCiwKEDzwGLwVf4fzJoGC28=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OAOdungsDGsVFwTE1LQiC1HQqjq6bVpyAmucikJE2o/4qUjVWbpVMdJjOLDLPKU7QanS/CcCy1FPg0ILJEGCQcigBDeboG71FMj5MtMvH8Pg89NW835JOwFYaxTgPmxIn+m94lWmPLS1hgOp4DLrzHWRn00h3ukTVoETtt2ef5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kjF51K1E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8C4DC4CEE7;
+	Thu, 15 May 2025 21:16:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747343819;
+	bh=0fDHksalYNZrl+B7FMp5wCiwKEDzwGLwVf4fzJoGC28=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kjF51K1EgtuYR8HJm9urywpBzMwwkQvuEdKPydwn1A4Y7b7jzktOUJ+jCqIAC4MAc
+	 gNh78FbUVk0RcH4PFxVMc/LvzUIrDjxoGLa1Z8rU8xH0Sr6S7eFJnsTdNlgd2a+CWo
+	 tHo2pLoSxCpWwOutmKQLVKJpMK5efRZasD+ymKgAkLIC0VxRRBnY372MZ6oXt1kxKU
+	 IUXzWxQ4p1QKxXUNOsMqjsweKBVNYC+6qSJEK2R7pTaoKOff7btzUUTnriec44DK5c
+	 bGh/sgQoRn+ZgZ8Ebf1bau5dRq1Gi+Z29B0/rxd8AdD1lvfM6nLqtmnMV9YZoQwNIL
+	 +3hZnBiYjlikw==
+Date: Thu, 15 May 2025 23:16:56 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v3 1/4] net: airoha: Fix an error handling path in
+ airoha_alloc_gdm_port()
+Message-ID: <aCZZyDvp-TZ7AFwS@lore-desk>
+References: <5c94b9b345017f29ed653e2f05d25620d128c3f0.1746715755.git.christophe.jaillet@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Y6AU6u8oigfJDbdP"
+Content-Disposition: inline
+In-Reply-To: <5c94b9b345017f29ed653e2f05d25620d128c3f0.1746715755.git.christophe.jaillet@wanadoo.fr>
 
-Test thread-safety of tld_create_key(). Since tld_create_key() does
-not rely on locks but memory barriers and atomic operations to protect
-the shared metadata, the thread-safety of the function is non-trivial.
-Make sure concurrent tld_key_create(), both valid and invalid, can not
-race and corrupt metatada, which may leads to TLDs not being thread-
-specific or duplicate TLDs with the same name.
 
-Signed-off-by: Amery Hung <ameryhung@gmail.com>
----
- .../bpf/prog_tests/test_task_local_data.c     | 91 +++++++++++++++++++
- 1 file changed, 91 insertions(+)
+--Y6AU6u8oigfJDbdP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/test_task_local_data.c b/tools/testing/selftests/bpf/prog_tests/test_task_local_data.c
-index 738fc1c9d8a4..5743b753a4a1 100644
---- a/tools/testing/selftests/bpf/prog_tests/test_task_local_data.c
-+++ b/tools/testing/selftests/bpf/prog_tests/test_task_local_data.c
-@@ -156,8 +156,99 @@ static void test_task_local_data_basic(void)
- 		pthread_join(thread[i], NULL);
- }
- 
-+#define TEST_RACE_THREAD_NUM 61
-+
-+void *test_task_local_data_race_thread(void *arg)
-+{
-+	char key_name[32];
-+	tld_key_t key;
-+	int id, fd;
-+
-+	id = (intptr_t)arg & 0x0000ffff;
-+	fd = ((intptr_t)arg & 0xffff0000) >> 16;
-+
-+	key = tld_create_key(fd, "value_not_exist", PAGE_SIZE + 1);
-+	ASSERT_EQ(tld_key_err_or_zero(key), -E2BIG, "tld_create_key");
-+
-+	/*
-+	 * If more than one thread succeed in creating value1 or value2,
-+	 * some threads will fail to create thread_<id> later.
-+	 */
-+	key = tld_create_key(fd, "value1", sizeof(int));
-+	if (!tld_key_is_err(key))
-+		tld_keys[TEST_RACE_THREAD_NUM] = key;
-+	key = tld_create_key(fd, "value2", sizeof(struct test_struct));
-+	if (!tld_key_is_err(key))
-+		tld_keys[TEST_RACE_THREAD_NUM + 1] = key;
-+
-+	snprintf(key_name, 32, "thread_%d", id);
-+	tld_keys[id] = tld_create_key(fd, key_name, sizeof(int));
-+	ASSERT_FALSE(tld_key_is_err(tld_keys[id]), "tld_create_key");
-+
-+	pthread_exit(NULL);
-+}
-+
-+static void test_task_local_data_race(void)
-+{
-+	LIBBPF_OPTS(bpf_test_run_opts, opts);
-+	pthread_t thread[TEST_RACE_THREAD_NUM];
-+	struct test_task_local_data *skel;
-+	int fd, i, j, err, *data, arg;
-+
-+	skel = test_task_local_data__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "skel_open_and_load"))
-+		return;
-+
-+	fd = bpf_map__fd(skel->maps.tld_data_map);
-+
-+	for (j = 0; j < 100; j++) {
-+		reset_tld();
-+
-+		for (i = 0; i < TEST_RACE_THREAD_NUM; i++) {
-+			/*
-+			 * Try to make tld_create_key() race with each other. Call
-+			 * tld_create_key(), both valid and invalid, from different threads.
-+			 */
-+			arg = i | fd << 16;
-+			err = pthread_create(&thread[i], NULL, test_task_local_data_race_thread,
-+					     (void *)(intptr_t)arg);
-+			if (!ASSERT_OK(err, "pthread_create"))
-+				goto out;
-+		}
-+
-+		/* Wait for all tld_create_key() to return */
-+		for (i = 0; i < TEST_RACE_THREAD_NUM; i++)
-+			pthread_join(thread[i], NULL);
-+
-+		/* Run task_init to make sure no invalid TLDs are added */
-+		err = bpf_prog_test_run_opts(bpf_program__fd(skel->progs.task_init), &opts);
-+		ASSERT_OK(err, "run task_init");
-+		ASSERT_OK(opts.retval, "task_init retval");
-+
-+		/* Write a unique number in the range of [0, TEST_RACE_THREAD_NUM) to each TLD */
-+		for (i = 0; i < TEST_RACE_THREAD_NUM; i++) {
-+			data = tld_get_data(fd, tld_keys[i]);
-+			if (!ASSERT_OK_PTR(data, "tld_get_data"))
-+				goto out;
-+			*data = i;
-+		}
-+
-+		/* Read TLDs and check the value to see if any address collides with another */
-+		for (i = 0; i < TEST_RACE_THREAD_NUM; i++) {
-+			data = tld_get_data(fd, tld_keys[i]);
-+			if (!ASSERT_OK_PTR(data, "tld_get_data"))
-+				goto out;
-+			ASSERT_EQ(*data, i, "check TLD");
-+		}
-+	}
-+out:
-+	tld_free();
-+}
-+
- void test_task_local_data(void)
- {
- 	if (test__start_subtest("task_local_data_basic"))
- 		test_task_local_data_basic();
-+	if (test__start_subtest("task_local_data_race"))
-+		test_task_local_data_race();
- }
--- 
-2.47.1
+> If register_netdev() fails, the error handling path of the probe will not
+> free the memory allocated by the previous airoha_metadata_dst_alloc() call
+> because port->dev->reg_state will not be NETREG_REGISTERED.
+>=20
+> So, an explicit airoha_metadata_dst_free() call is needed in this case to
+> avoid a memory leak.
+>=20
+> Fixes: af3cf757d5c9 ("net: airoha: Move DSA tag in DMA descriptor")
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 
+Acked-by: Lorenzo Bianconi <lorenzo@kernel.org>
+
+> ---
+> Changes in v3:
+>   - None
+>=20
+> Changes in v2:
+>   - New patch
+> v2: https://lore.kernel.org/all/5c94b9b3850f7f29ed653e2205325620df28c3ff.=
+1746715755.git.christophe.jaillet@wanadoo.fr/
+>=20
+> Compile tested only.
+> ---
+>  drivers/net/ethernet/airoha/airoha_eth.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ether=
+net/airoha/airoha_eth.c
+> index 16c7896f931f..af8c4015938c 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.c
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
+> @@ -2873,7 +2873,15 @@ static int airoha_alloc_gdm_port(struct airoha_eth=
+ *eth,
+>  	if (err)
+>  		return err;
+> =20
+> -	return register_netdev(dev);
+> +	err =3D register_netdev(dev);
+> +	if (err)
+> +		goto free_metadata_dst;
+> +
+> +	return 0;
+> +
+> +free_metadata_dst:
+> +	airoha_metadata_dst_free(port);
+> +	return err;
+>  }
+> =20
+>  static int airoha_probe(struct platform_device *pdev)
+> --=20
+> 2.49.0
+>=20
+
+--Y6AU6u8oigfJDbdP
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaCZZyAAKCRA6cBh0uS2t
+rBnoAP9FaVPF2CbBdrO+fj0pthqLp8g0i6A/AjxSkyZWruuaHwEA5btpiFBZ5imz
+5SRZgTQ7PDqOijkGIb8OCvuDLpbXWQo=
+=XFmd
+-----END PGP SIGNATURE-----
+
+--Y6AU6u8oigfJDbdP--
 
