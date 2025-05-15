@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-190686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3385BAB8499
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 13:15:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27E90AB8498
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 13:15:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 153E51BC1C3C
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 11:15:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DC2D9E6493
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 11:14:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 122A62989B2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C82562989BD;
 	Thu, 15 May 2025 11:14:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="B7aBKBHM"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="GHJ7u5vb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29E32989A0
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 11:14:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83CBF1D2F42
+	for <netdev@vger.kernel.org>; Thu, 15 May 2025 11:14:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747307670; cv=none; b=PUOIRqpMwNjowzc0xhkQZozpT+Rt/J5IhHSrmMiK+MTLnyUaEXuAd7QE/26KdTJFV79/68XjGfOcdYB0ocGBGbJu/rju9OE3UKhMf8KXlbvRvV4O6NwaDlvVDRbFe5m7YJL/85H8RIj2WvdK7CP4qUfHzkvBroyHDupOyb2Z/Ac=
+	t=1747307670; cv=none; b=qKWwGqAWBChnsLRKB/c7Qvc2TVxeMPVH6SFro0lFcv4JMYBNr4GNdNOcs6etm19nv6i5TU7GzOQMAP7RGyaSFzRYr24vFsyotqHbF2vt5Rez4ZL7raZR3MQH61xhSHMWyESG+8B5yvxd3KhLNNsx3D8sSDswMNi2bnqN6cl6aiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1747307670; c=relaxed/simple;
-	bh=Gf//BG43K3Tf3FQERlG2nSN9E0Vs+ZPF6zjo+sVJaYU=;
+	bh=uJ659rSXpoXs4yxHQYIcoQRdDlt1Tzdxd1MYDDyvNdM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=X06EtsYpcPz2dUgP8ww44UAqVQ+KcMFmoJuNFiyZV+idSFC014Y7jOoxhL+W1G3IboXNyh4JIN8c8TzBvCl29IV2OtxUIwDCNLodie9E4JxMMrd/eaRzF0BninFiyQM3uW1pFKOZlUESukXdAFpekTkpxfPwaxavSuKWjFrza64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=B7aBKBHM; arc=none smtp.client-ip=209.85.128.49
+	 MIME-Version; b=Ji+sG6MhXmC83Hlo/oTywEEuOHnfSSFtTVj70TN9fO+eJapGfjMptAKp8NW8hZVcAvguOxewqw6A+5HUfuw0z9XJsjy7ARDIOKfRJo912KRTAFrJB1rrUi5vXEulVZtoOpY8Ukkkw8jFwKnMH6wKFXFl93ZRsjQyBDE/mNxAV9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=GHJ7u5vb; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-43d0618746bso6195415e9.2
-        for <netdev@vger.kernel.org>; Thu, 15 May 2025 04:14:27 -0700 (PDT)
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43ce71582e9so6288315e9.1
+        for <netdev@vger.kernel.org>; Thu, 15 May 2025 04:14:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1747307665; x=1747912465; darn=vger.kernel.org;
+        d=openvpn.net; s=google; t=1747307666; x=1747912466; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WFC+CYuc+lma1Z/Jr+A/hgZIN35QOyNF1dwagEiqkCs=;
-        b=B7aBKBHMa/pMv7v/alrSdIZkdj4IZSjfBf0LEBWhy94BZiZXO42wKcbgHWAQe024Kx
-         KCnoqqVDEwjKw2Iv8f//uGSy28HnRGWmbawp+lmXum+W0oeqN7jOcu+eMX3lS8MewhhV
-         YV5uK2H+d4YoK7Mt/vBYZqIVcrVOZ4bxAy1GEgaFe7w1EwAiDSy69vVj8pXLkS5zMUat
-         6+Aa4kZYOP3sY20iza+8EHsMiHfrVJ80xlH51Xp5raHcaeTw9MUotrdpWFMVAAWMvXIP
-         JS26TyR1Mo04lLr0Tw/FApLjjVeKRxwrifZdE16ophfzl2oQf7vzPGeSE3Y3IZbThZbO
-         Mr/g==
+        bh=ayiIIPtTmNtkvPKXWmL635X+uQFAuNDHLUnTEUP+O60=;
+        b=GHJ7u5vb7RaiPb6iYVkWs8eROlyg5fok9Lsfa+R+g6IfRZ0i9ZPOYu8Z7IjUj17sXF
+         MPBhLgASDsSUofY3+YxL9LEiCTe0zfpgUgQRA0EucllGjKLELIdSvaDwXFhT5AIRPRWi
+         kQUVGp3vDP+L/TEhuMmp2rWjRcxALEr/w/stlR0qkLTS9Cn6lYvxihYn0QneSJEpqv7y
+         LoGRU8maKCqEJh/rlM+yxmn/8gDf5QCW7JBY2mP+F3hDxXcql9jf33ffJqviGuyMwkZP
+         nod6Db1GOC+VRz2GYpwNjYWknLqseYXMIfBmtoCYIomRGu+mi/AU6kFy6q9RcVlJDzTS
+         7rnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747307665; x=1747912465;
+        d=1e100.net; s=20230601; t=1747307666; x=1747912466;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WFC+CYuc+lma1Z/Jr+A/hgZIN35QOyNF1dwagEiqkCs=;
-        b=g+CgcqoGJ+Nrb9TSVYRaxwHypzYfcdEw6BXznj/rL6RtyVctSVG4SceM0bs9wWn8lF
-         zfOVTuVOtoq0CpgpBIdh8Fa8BjIfZ01XTpiIcYYvyYlTIMWpSIxMHG0oPlFADtUtd9SE
-         3jKfJ/WBCFqKzgrDPhABY3Rc/lD3tQuBEwM/DIgjXJbU66B/wOgs9k91348YxYbsoxFD
-         9BvpwoKOSomCCz1B+xmHiEE9Ef/9IyR5xvH+0J9tQT2BR8bngQwifT26IDnREAg6SMCU
-         Z6Z6L54f+0/vaAavB3IH2gqQnJUiWoZkVqOk3dzzn8b1zr7tumgNznOqzS1cE+stpWuZ
-         qRgg==
-X-Gm-Message-State: AOJu0YwmSw5xe1Y/SJZE6VkFTylsgUWU25IU/vVy0dunPXAfxLBD/q18
-	XWq/wR13Dx1bOBThcdYjyjy3whtFTLbyqq4Ufk81c5MrHEOCYtGSWxhjYBx+/ly4Ig/6Kfv9dK1
-	VgvMFZgqrUB7Z2eCvtAyIhS/vMGWP6ZvYh0QPjvVRwfjez6NQsnfBe7lfdzmw
-X-Gm-Gg: ASbGncuSvBY44X7vWoxvoX47Ck+BhworrH+7r9VKLt9hv4ek7D0S+hJDqVJ37cGUfjs
-	0D2JKH+V3mbBxE0jnaPsnu7Pq5JwZ+0yCE5Me1hNZ1LEzzCLtxL+C2g5fSer0KTQiGoxUqamEBU
-	YVcc59yZjdve9G1plkW8o0ZGEtWgfRvD0gtg0sGNRNNO3D+F3FJhipjUYSiSmi1AFWmEvyZc/Lj
-	AnhCrVffq1exVuMUGid0Vy8uKOL3zDILafoJzKUUoX22oseeM3SK6I0JG5RRYLxNYKAvDe4B10H
-	UyGUX3NBnOXGvFr+pN0eSNwGbW794iRBajB1HELtd/FPt0zr4tr0DhtTQw1lCkRRqFh8+2KxxIb
-	RSD0hAKtoyw==
-X-Google-Smtp-Source: AGHT+IGgL+KI4zJK/8Wc5flYaQK/GtE5mS6Bi+RdHhXbbgUIHpfsmCmk4yqORRqZTUQppRroZNBV9Q==
-X-Received: by 2002:a05:600c:a344:b0:43c:eeee:b70a with SMTP id 5b1f17b1804b1-442f970b191mr16780935e9.22.1747307665411;
-        Thu, 15 May 2025 04:14:25 -0700 (PDT)
+        bh=ayiIIPtTmNtkvPKXWmL635X+uQFAuNDHLUnTEUP+O60=;
+        b=AL28HdxKpsbw0ZbLSGhLaPnL0wW/FIiJXdkMqLjxbth23Aei7L7z74aepHfuyJXB23
+         Zsg/lvCqf6JH5ej5JNS9kXxwB7M0gnV6BAeLCRMBIOgOQ2X1qFzHXzpoQq5JwQz2uNCG
+         GkSnSSeipmO/I5DYA2Ivw2+OfMrLD00fp1Ujwi2+1BvkTVsuHmmZHzTwtAQgle7077Nd
+         RH597hWpJdHCZl2YuofnJFUae8dtdXj81PPPq5KM5K2vH6BA/Pw/UUhN6iX5F4gmqJPc
+         pcYLY37sOR6TpmtbQnRaDOMJz0RWEaMEg5Vr/rgGvS9oX/c5UME9CVO8bmqCcGKLP1hz
+         7VWA==
+X-Gm-Message-State: AOJu0YwUT2BgEKieikTnmvWxrzk4TYQfU5m1dhUVZgUFnX+ff8eQ5LtS
+	fP6ZaZMM30CcBlhqBmJSpqmkmpOecS9HOqp2AIerJg2dOCwGRqz9fEUG6O+a1m96RBBBSJo/pRA
+	IJAThqPY70uE2yjuTmny+7WxaPYH5Y/HxBhdCzm5/Vu9ix/LJNZrG7DnJfnav
+X-Gm-Gg: ASbGnctIG65ZLjAk9gRGrlMpeUdQvs5Hlg6HDuxHaKmzkH7F6SPSa8iBXLSvpbCUlE7
+	6iQCcxLcaj4ccrd0AICaSqGUgTs4+FKkjft74MzPP/ub903CVieGQo0CvpRSM24Xg20svg0EviT
+	tozs2EveSv2NjCJn17vyuplkGzZ5hjN32prlJbBCbmwRiB750iiM3q19BKhbvqwu8EVq8TkSXu7
+	H+1cpckxeeLB+x1r7UgUi5uJ9xn+mxReO+vrxFIti0W1TJI2BujOk7FgxyXAp6VPrj44SQ3akRx
+	vsN3ZDC4DVHEamRtxKFLjmPOsS/XkhRCi495Qo6eZ0zyJGXPttNn/DoAryvjECkty1vQMVnnHH0
+	=
+X-Google-Smtp-Source: AGHT+IH/aU0vP+YoB94wZA+Nm/WufDIRAtoECjfs9nfWKT+d/L8gMVPkiptGZmDI658NxzOonbjzBw==
+X-Received: by 2002:a05:600c:818a:b0:43e:afca:808f with SMTP id 5b1f17b1804b1-442f21778cdmr72865675e9.31.1747307666551;
+        Thu, 15 May 2025 04:14:26 -0700 (PDT)
 Received: from inifinity.homelan.mandelbit.com ([2001:67c:2fbc:1:d81f:3514:37e7:327a])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442f8fc4557sm24321435e9.6.2025.05.15.04.14.24
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442f8fc4557sm24321435e9.6.2025.05.15.04.14.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 May 2025 04:14:24 -0700 (PDT)
+        Thu, 15 May 2025 04:14:26 -0700 (PDT)
 From: Antonio Quartulli <antonio@openvpn.net>
 To: netdev@vger.kernel.org
 Cc: Antonio Quartulli <antonio@openvpn.net>,
@@ -81,9 +81,9 @@ Cc: Antonio Quartulli <antonio@openvpn.net>,
 	pabeni@redhat.com,
 	sd@queasysnail.net,
 	Gert Doering <gert@greenie.muc.de>
-Subject: [PATCH net-next 03/10] ovpn: set skb->ignore_df = 1 before sending IPv6 packets out
-Date: Thu, 15 May 2025 13:13:48 +0200
-Message-ID: <20250515111355.15327-4-antonio@openvpn.net>
+Subject: [PATCH net-next 04/10] ovpn: don't drop skb's dst when xmitting packet
+Date: Thu, 15 May 2025 13:13:49 +0200
+Message-ID: <20250515111355.15327-5-antonio@openvpn.net>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250515111355.15327-1-antonio@openvpn.net>
 References: <20250515111355.15327-1-antonio@openvpn.net>
@@ -95,54 +95,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-IPv6 user packets (sent over the tunnel) may be larger than
-the outgoing interface MTU after encapsulation.
-When this happens ovpn should allow the kernel to fragment
-them because they are "locally generated".
+When routing a packet to a LAN behind a peer, ovpn needs to
+inspect the route entry that brought the packet there in the
+first place.
 
-To achieve the above, we must set skb->ignore_df = 1
-so that ip6_fragment() can be made aware of this decision.
+If this packet is truly routable, the route entry provides the
+GW to be used when looking up the VPN peer to send the packet to.
 
-Failing to do so will result in ip6_fragment() dropping
-the packet thinking it was "routed".
+However, the route entry is currently dropped before entering
+the ovpn xmit function, because the IFF_XMIT_DST_RELEASE priv_flag
+is enabled by default.
 
-No change is required in the IPv4 path, because when
-calling udp_tunnel_xmit_skb() we already pass the
-'df' argument set to 0, therefore the resulting datagram
-is allowed to be fragmented if need be.
+Clear the IFF_XMIT_DST_RELEASE flag during interface setup to allow
+the route entry (skb's dst) to survive and thus be inspected
+by the ovpn routing logic.
 
-Fixes: 08857b5ec5d9 ("ovpn: implement basic TX path (UDP)")
+Fixes: a3aaef8cd173 ("ovpn: implement peer lookup logic")
 Reported-by: Gert Doering <gert@greenie.muc.de>
-Closes: https://github.com/OpenVPN/ovpn-net-next/issues/3
+Closes: https://github.com/OpenVPN/ovpn-net-next/issues/2
 Tested-by: Gert Doering <gert@greenie.muc.de>
-Acked-by: Gert Doering <gert@greenie.muc.de> # as primary user
-Link: https://mail-archive.com/openvpn-devel@lists.sourceforge.net/msg31577.html
+Acked-by: Gert Doering <gert@greenie.muc.de> # as a primary user
+Link: https://www.mail-archive.com/openvpn-devel@lists.sourceforge.net/msg31583.html
 Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
 ---
- drivers/net/ovpn/udp.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ drivers/net/ovpn/io.c   | 2 ++
+ drivers/net/ovpn/main.c | 5 +++++
+ 2 files changed, 7 insertions(+)
 
-diff --git a/drivers/net/ovpn/udp.c b/drivers/net/ovpn/udp.c
-index c9e189056f33..aef8c0406ec9 100644
---- a/drivers/net/ovpn/udp.c
-+++ b/drivers/net/ovpn/udp.c
-@@ -262,6 +262,16 @@ static int ovpn_udp6_output(struct ovpn_peer *peer, struct ovpn_bind *bind,
- 	dst_cache_set_ip6(cache, dst, &fl.saddr);
+diff --git a/drivers/net/ovpn/io.c b/drivers/net/ovpn/io.c
+index dd8a8055d967..7e4b89484c9d 100644
+--- a/drivers/net/ovpn/io.c
++++ b/drivers/net/ovpn/io.c
+@@ -398,6 +398,8 @@ netdev_tx_t ovpn_net_xmit(struct sk_buff *skb, struct net_device *dev)
+ 				    netdev_name(ovpn->dev));
+ 		goto drop;
+ 	}
++	/* dst was needed for peer selection - it can now be dropped */
++	skb_dst_drop(skb);
  
- transmit:
-+	/* user IPv6 packets may be larger than the transport interface
-+	 * MTU (after encapsulation), however, since they are locally
-+	 * generated we should ensure they get fragmented.
-+	 * Setting the ignore_df flag to 1 will instruct ip6_fragment() to
-+	 * fragment packets if needed.
-+	 *
-+	 * NOTE: this is not needed for IPv4 because we pass df=0 to
-+	 * udp_tunnel_xmit_skb()
+ 	ovpn_peer_stats_increment_tx(&peer->vpn_stats, skb->len);
+ 	ovpn_send(ovpn, skb_list.next, peer);
+diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
+index 0acb0934c1be..1bb1afe766a4 100644
+--- a/drivers/net/ovpn/main.c
++++ b/drivers/net/ovpn/main.c
+@@ -157,6 +157,11 @@ static void ovpn_setup(struct net_device *dev)
+ 	dev->type = ARPHRD_NONE;
+ 	dev->flags = IFF_POINTOPOINT | IFF_NOARP;
+ 	dev->priv_flags |= IFF_NO_QUEUE;
++	/* when routing packets to a LAN behind a client, we rely on the
++	 * route entry that originally brought the packet into ovpn, so
++	 * don't release it
 +	 */
-+	skb->ignore_df = 1;
- 	udp_tunnel6_xmit_skb(dst, sk, skb, skb->dev, &fl.saddr, &fl.daddr, 0,
- 			     ip6_dst_hoplimit(dst), 0, fl.fl6_sport,
- 			     fl.fl6_dport, udp_get_no_check6_tx(sk));
++	netif_keep_dst(dev);
+ 
+ 	dev->lltx = true;
+ 	dev->features |= feat;
 -- 
 2.49.0
 
