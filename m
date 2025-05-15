@@ -1,104 +1,98 @@
-Return-Path: <netdev+bounces-190583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FBB8AB7B17
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 03:45:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 38133AB7B56
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 03:59:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90CD93BB3FA
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 01:44:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 495B7980688
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 01:59:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A504A27A92E;
-	Thu, 15 May 2025 01:45:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED7AA27933E;
+	Thu, 15 May 2025 01:59:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h7umvand"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BWAmZMRy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EBEC27A458
-	for <netdev@vger.kernel.org>; Thu, 15 May 2025 01:45:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B93AD41C71;
+	Thu, 15 May 2025 01:59:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747273504; cv=none; b=XTUo9Nw5aDwKmSeMjjK640z9YQsY/8bvBk3dFZiO1tDytIWSrY4OMSKtm0b+uwP7nnmOzRA83siU49+Ge8yZhkGu1JuonK3KA6kzE+00VgUUoETUNdyze0Gf+glbaPXAcT5HN1tt6eRsRJRBnwBKQ+DmfMHvfRzRjyLlbbRB4c4=
+	t=1747274393; cv=none; b=J2OpfawTyfCuMmscAcMzn6prRHaCit+gn9ODYbt8r9F5tal3C0RSMoUSshRKBqDoqqIWKHDR4HrZPpNWusYjjzfwo2Jo/tXqHIbtk0grIQm2k3kgl4+AaQfnQ3UtJ/GaxCvSrmLDOqZjQGQv6CNgKsUUztJZrRQ3vqI5dn0Z0Ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747273504; c=relaxed/simple;
-	bh=j9GIg/igXjykx8jaONqIvDfRxriM6ZmhLmLXUcEJkUs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QnCZPe2cpR0h6SCYEboVfUkwgDORO1zjrH1QluOpaE3Mk7ha8So/63dQOjVl9Eu91huuL/GC+T4wW34vGzI+0mSLC93psSsFdkg/rOgb0icI4Gb4GaQEbfnzSiTrjrNTPQX49puzADl82eZsRi9TMMaUyJIW1Y8puzqyXB6mE7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h7umvand; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE9C0C4CEE3;
-	Thu, 15 May 2025 01:45:03 +0000 (UTC)
+	s=arc-20240116; t=1747274393; c=relaxed/simple;
+	bh=S2H6UqBUBTSb4vAbOGk+4FjIFfo9bZNgQsNmb4DJWus=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Qg/XuuxqGUQzQpwRRzJHe9uC/atFGeJHuPJj3Hr5BeklrFlT7MSl5NdpQCFWISQxI9SKlb0FFD4fM4kJN7PtEZDAIiqwKzi2gua37PNRiETJaSQ9BYfkTURytAouiecC6rbvQ+JxVlmlXlRuyNKqSjbA9aAYN6nQYLRDaplnG9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BWAmZMRy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FE70C4CEE3;
+	Thu, 15 May 2025 01:59:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747273504;
-	bh=j9GIg/igXjykx8jaONqIvDfRxriM6ZmhLmLXUcEJkUs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h7umvandJC1wZYofVeI5ryUsPRUdXhYqaPneiryF7K9kSibDeW+PCJWloaHOW2Ugf
-	 qIFwdFQrIWscnbBVftRN/+1VVwqeBPWEShZAZrw4s3JJf9glfmiILFjm/muONU+Tdf
-	 hOBvmmmlXYy6ZHTiQVouNgYoWQVZgkrhvNvO+SZsqynVarcc1x2kYU5wdRkCPMLYvL
-	 7i5WNrIcJoMhgeOSg9riqXe1jOB4B1oqhViyQu/EYWqa2lbpHHiAheGuUuUh4uB7/g
-	 95pAxSyu3AIAs7OCtpHtSkdD2wZE6A/1QoVs8dNbzKKQfWjYu/FkZlq6xxotx48mI3
-	 84YBwLoXVxuCg==
-Date: Wed, 14 May 2025 18:45:02 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, "Paolo Abeni"
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Kuniyuki Iwashima
- <kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH v1 net-next 0/7] ipv6: Follow up for RTNL-free
- RTM_NEWROUTE series.
-Message-ID: <20250514184502.22f4c4e6@kernel.org>
-In-Reply-To: <20250514201943.74456-1-kuniyu@amazon.com>
-References: <20250514201943.74456-1-kuniyu@amazon.com>
+	s=k20201202; t=1747274393;
+	bh=S2H6UqBUBTSb4vAbOGk+4FjIFfo9bZNgQsNmb4DJWus=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=BWAmZMRyp/hs9OfqWgWlqXug8+EL0U49kOKnAaQxj6GxR/62iH0c5mgxgMBGf5/z1
+	 m2ilAprhlrYBZqbUQL02mHKSTLyjwyD1dlXLwskTw/zHwNjrsBiJrouzuiMCuTaxTQ
+	 /w2HjDbVdxoErbzZhgYoU52VGM4C5R5JDukbo/nltRuhcb3VjRH+DKJpZGFBB/Y348
+	 INhP6Ysyunt+Hxifb7/wWJQFuFMAPDTNGJ1t/4VZCSOqCQOTKKSBPXkJEm0WHHv55t
+	 WVF+9pybgE1foF57YJIOv9PHWzKQa8SIItJrazYBKbzddizUbKJ2uqWvFtnx1kcK4B
+	 gRFJcr7+02KoQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD05380AA66;
+	Thu, 15 May 2025 02:00:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] dt-bindings: net: snps,dwmac: Align mdio node in example with
+ bindings
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174727443076.2577794.8072853416288852164.git-patchwork-notify@kernel.org>
+Date: Thu, 15 May 2025 02:00:30 +0000
+References: <308d72c2fe8e575e6e137b99743329c2d53eceea.1747121550.git.geert+renesas@glider.be>
+In-Reply-To: <308d72c2fe8e575e6e137b99743329c2d53eceea.1747121550.git.geert+renesas@glider.be>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, alexandre.torgue@foss.st.com, peppe.cavallaro@st.com,
+ joabreu@synopsys.com, netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org
 
-On Wed, 14 May 2025 13:18:53 -0700 Kuniyuki Iwashima wrote:
-> Patch 1 removes rcu_read_lock() in fib6_get_table().
-> Patch 2 removes rtnl_is_held arg for lwtunnel_valid_encap_type(), which
->  was short-term fix and is no longer used.
-> Patch 3 fixes RCU vs GFP_KERNEL report by syzkaller.
-> Patch 4~7 reverts GFP_ATOMIC uses to GFP_KERNEL.
+Hello:
 
-Hi! Something in the following set of patches is making our CI time out.
-The problem seems to be:
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-[    0.751266] virtme-init: waiting for udev to settle
-Timed out for waiting the udev queue being empty.
-[  120.826428] virtme-init: udev is done
+On Tue, 13 May 2025 09:33:56 +0200 you wrote:
+> According to the bindings, the MDIO subnode should be called "mdio".
+> Update the example to match this.
+> 
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> ---
+> For dwc-qos-ethernet-4.10, the Linux driver insists on "mdio".
+> For other devices, the Linux driver does not seem to care, and just
+> looks for subnodes that are compatible with "snps,dwmac-mdio":
+> https://elixir.bootlin.com/linux/v6.14.6/source/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c#L302
+> 
+> [...]
 
-+team: grab team lock during team_change_rx_flags
-+net: mana: Add handler for hardware servicing events
-+ipv6: Revert two per-cpu var allocation for RTM_NEWROUTE.
-+ipv6: Pass gfp_flags down to ip6_route_info_create_nh().
-+Revert "ipv6: Factorise ip6_route_multipath_add()."
-+Revert "ipv6: sr: switch to GFP_ATOMIC flag to allocate memory during seg6local LWT setup"
-+ipv6: Narrow down RCU critical section in inet6_rtm_newroute().
-+inet: Remove rtnl_is_held arg of lwtunnel_valid_encap_type(_attr)?().
-+ipv6: Remove rcu_read_lock() in fib6_get_table().
-+net/mlx5e: Reuse per-RQ XDP buffer to avoid stack zeroing overhead
- amd-xgbe: read link status twice to avoid inconsistencies
-+net: phy: fixed_phy: remove fixed_phy_register_with_gpiod
- drivers: net: mvpp2: attempt to refill rx before allocating skb
-+selftest: af_unix: Test SO_PASSRIGHTS.
-+af_unix: Introduce SO_PASSRIGHTS.
-+af_unix: Inherit sk_flags at connect().
-+af_unix: Move SOCK_PASS{CRED,PIDFD,SEC} to struct sock.
-+net: Restrict SO_PASS{CRED,PIDFD,SEC} to AF_{UNIX,NETLINK,BLUETOOTH}.
-+tcp: Restrict SO_TXREHASH to TCP socket.
-+scm: Move scm_recv() from scm.h to scm.c.
-+af_unix: Don't pass struct socket to maybe_add_creds().
-+af_unix: Factorise test_bit() for SOCK_PASSCRED and SOCK_PASSPIDFD.
+Here is the summary with links:
+  - dt-bindings: net: snps,dwmac: Align mdio node in example with bindings
+    https://git.kernel.org/netdev/net-next/c/685e7b1522f7
 
-I haven't dug into it, gotta review / apply other patches :(
-Maybe you can try to repro? 
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
