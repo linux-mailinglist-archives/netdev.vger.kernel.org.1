@@ -1,73 +1,221 @@
-Return-Path: <netdev+bounces-190727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FC93AB8829
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 15:37:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0601AB8836
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 15:38:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68B531746E8
-	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 13:36:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26DDF189EACE
+	for <lists+netdev@lfdr.de>; Thu, 15 May 2025 13:37:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3661F16EB7C;
-	Thu, 15 May 2025 13:35:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N5xPPuII"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B403D1B07AE;
+	Thu, 15 May 2025 13:36:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.hallyn.com (mail.hallyn.com [178.63.66.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9903158DA3;
-	Thu, 15 May 2025 13:35:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8ADF64A98;
+	Thu, 15 May 2025 13:36:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.63.66.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747316152; cv=none; b=LfJ/Cc9l7XDdNBAYD523nYiYFh0Xmx8nHaSyIowPmjGYItnDBanCBOA6mH2pRw5+7Y9cIWtHhRbPk4wyxJLp8BcLXIYWuRNa1A+vyj2VnqJIKEWnPMD8pr0W4QxPobiX1gkVnjMhwdpqKfTAK+S+d1d+9UkOf6rThcfp53Q4fBc=
+	t=1747316176; cv=none; b=j9BkSsarfdKCWqJDV26HRLwH2NycMQHUdDRKlUU3amACkb7lIjWJxGObPxNsbbpU184eXVbPGlNDbYwtZ7b58t5DigVJEigFmF8pDswtWiOTQ7ckz+HdAdDC5Kd0vOsqQfPuQeHHlD5UBm1iGakrqq7f1khX7pa3Sx4ywe6QLKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747316152; c=relaxed/simple;
-	bh=3mpHCNTdw83e6Xd1/Q/RuiqfzIT6w2eWI6KqpTfF1x0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=njpURNWkD4qPVJ2YrIpFEWll0dh9FqyQfqpuz64TvD0N2nqBz/3MRiVGq3qHIDKhlGY8yhioy1o4V7DLLRnnG5SNTUMVkBgP+Mi2ak/v7SeC5u2AMJsPmb9izTIKnU1oT75Ha6KrCgKjuYSOQglBuekTopEtXJyR1LAcU8ClQgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N5xPPuII; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7600C4CEE7;
-	Thu, 15 May 2025 13:35:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747316151;
-	bh=3mpHCNTdw83e6Xd1/Q/RuiqfzIT6w2eWI6KqpTfF1x0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=N5xPPuIIRv1L5ax5/TiPgkKU6kHc0WesdMdEwwtk8AxN2Q7DG6Fh63Nc+9PHiQP4z
-	 Pu8RxK6WZgQVre3aFVAPL9jxrWWfn4+8xnL6reOVyN+Sy/3LD9P1E++WrqxHgNmYhx
-	 10DxmTtdfm9B6OmXi/CwFgMldi4ilG3YVT+vk1/1EE6j/XlI2VOBke3Y0uja7R4Ah5
-	 ghERYicesxT5rWmr8yuOU0/n5zNQsE3Qip+mjB/6XwvWLlPW3eIVbrmllO4iCLq0mg
-	 vbT8hnVnZ4gxnzDsGgh27kW5ZEEFCB1f+kss5O33niU4wETfippNLxC0UjttwlnR1L
-	 B0YwDbG25UYWA==
-Date: Thu, 15 May 2025 06:35:49 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: <long.yunjian@zte.com.cn>
-Cc: <anthony.l.nguyen@intel.com>, <przemyslaw.kitszel@intel.com>,
- <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
- <pabeni@redhat.com>, <intel-wired-lan@lists.osuosl.org>,
- <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <fang.yumeng@zte.com.cn>, <xu.lifeng1@zte.com.cn>,
- <ouyang.maochun@zte.com.cn>, <mou.yi@zte.com.cn>
-Subject: Re: [PATCH linux-next] net: e100: Use str_read_write() helper
-Message-ID: <20250515063549.0f7c0a34@kernel.org>
-In-Reply-To: <20250515204414844_YQsk90Odo5a3bx9qvo8g@zte.com.cn>
-References: <20250515204414844_YQsk90Odo5a3bx9qvo8g@zte.com.cn>
+	s=arc-20240116; t=1747316176; c=relaxed/simple;
+	bh=xaDmKt3RfeiiCoNmS8bhgDEBGsYhQ0B0xi9U4HGaC6A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hnp8L7KOSbeVit/ix3ITEG1VCTJ3xUxMtIPcwMYvm9vFQMRTvgzb7SC1E4Lm5mClnOJJ1FwvAetWOC9o/Tcq5Q3TLoy8TBxbcInapDNhKSio/ziv+P9vi35C91Y7tnMleJlyMKEClziF5IiARAw+RVI59DpIIpTAyJzSTIndgf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hallyn.com; spf=pass smtp.mailfrom=mail.hallyn.com; arc=none smtp.client-ip=178.63.66.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hallyn.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mail.hallyn.com
+Received: by mail.hallyn.com (Postfix, from userid 1001)
+	id 431CB8BF; Thu, 15 May 2025 08:36:06 -0500 (CDT)
+Date: Thu, 15 May 2025 08:36:06 -0500
+From: "Serge E. Hallyn" <serge@hallyn.com>
+To: Christian Brauner <brauner@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, Jann Horn <jannh@google.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Eric Dumazet <edumazet@google.com>, Oleg Nesterov <oleg@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Daan De Meyer <daan.j.demeyer@gmail.com>,
+	David Rheinsberg <david@readahead.eu>,
+	Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>,
+	Lennart Poettering <lennart@poettering.net>,
+	Luca Boccassi <bluca@debian.org>, Mike Yuan <me@yhndnzj.com>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	Alexander Mikhalitsyn <alexander@mihalicyn.com>
+Subject: Re: [PATCH v7 1/9] coredump: massage format_corname()
+Message-ID: <20250515133606.GA740869@mail.hallyn.com>
+References: <20250515-work-coredump-socket-v7-0-0a1329496c31@kernel.org>
+ <20250515-work-coredump-socket-v7-1-0a1329496c31@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250515-work-coredump-socket-v7-1-0a1329496c31@kernel.org>
 
-On Thu, 15 May 2025 20:44:14 +0800 (CST) long.yunjian@zte.com.cn wrote:
-> From: Yumeng Fang <fang.yumeng@zte.com.cn>
+On Thu, May 15, 2025 at 12:03:34AM +0200, Christian Brauner wrote:
+> We're going to extend the coredump code in follow-up patches.
+> Clean it up so we can do this more easily.
 > 
-> Remove hard-coded strings by using the str_read_write() helper.
+> Signed-off-by: Christian Brauner <brauner@kernel.org>
 
-Please don't send "string_choices" conversions to netdev.
-This is pointless churn.
+Not my wheelhouse, but this is a nice cleanup.
+
+Acked-by: Serge Hallyn <serge@hallyn.com>
+
+> ---
+>  fs/coredump.c | 41 ++++++++++++++++++++++++-----------------
+>  1 file changed, 24 insertions(+), 17 deletions(-)
+> 
+> diff --git a/fs/coredump.c b/fs/coredump.c
+> index d740a0411266..368751d98781 100644
+> --- a/fs/coredump.c
+> +++ b/fs/coredump.c
+> @@ -76,9 +76,15 @@ static char core_pattern[CORENAME_MAX_SIZE] = "core";
+>  static int core_name_size = CORENAME_MAX_SIZE;
+>  unsigned int core_file_note_size_limit = CORE_FILE_NOTE_SIZE_DEFAULT;
+>  
+> +enum coredump_type_t {
+> +	COREDUMP_FILE = 1,
+> +	COREDUMP_PIPE = 2,
+> +};
+> +
+>  struct core_name {
+>  	char *corename;
+>  	int used, size;
+> +	enum coredump_type_t core_type;
+>  };
+>  
+>  static int expand_corename(struct core_name *cn, int size)
+> @@ -218,18 +224,21 @@ static int format_corename(struct core_name *cn, struct coredump_params *cprm,
+>  {
+>  	const struct cred *cred = current_cred();
+>  	const char *pat_ptr = core_pattern;
+> -	int ispipe = (*pat_ptr == '|');
+>  	bool was_space = false;
+>  	int pid_in_pattern = 0;
+>  	int err = 0;
+>  
+>  	cn->used = 0;
+>  	cn->corename = NULL;
+> +	if (*pat_ptr == '|')
+> +		cn->core_type = COREDUMP_PIPE;
+> +	else
+> +		cn->core_type = COREDUMP_FILE;
+>  	if (expand_corename(cn, core_name_size))
+>  		return -ENOMEM;
+>  	cn->corename[0] = '\0';
+>  
+> -	if (ispipe) {
+> +	if (cn->core_type == COREDUMP_PIPE) {
+>  		int argvs = sizeof(core_pattern) / 2;
+>  		(*argv) = kmalloc_array(argvs, sizeof(**argv), GFP_KERNEL);
+>  		if (!(*argv))
+> @@ -247,7 +256,7 @@ static int format_corename(struct core_name *cn, struct coredump_params *cprm,
+>  		 * Split on spaces before doing template expansion so that
+>  		 * %e and %E don't get split if they have spaces in them
+>  		 */
+> -		if (ispipe) {
+> +		if (cn->core_type == COREDUMP_PIPE) {
+>  			if (isspace(*pat_ptr)) {
+>  				if (cn->used != 0)
+>  					was_space = true;
+> @@ -353,7 +362,7 @@ static int format_corename(struct core_name *cn, struct coredump_params *cprm,
+>  				 * Installing a pidfd only makes sense if
+>  				 * we actually spawn a usermode helper.
+>  				 */
+> -				if (!ispipe)
+> +				if (cn->core_type != COREDUMP_PIPE)
+>  					break;
+>  
+>  				/*
+> @@ -384,12 +393,12 @@ static int format_corename(struct core_name *cn, struct coredump_params *cprm,
+>  	 * If core_pattern does not include a %p (as is the default)
+>  	 * and core_uses_pid is set, then .%pid will be appended to
+>  	 * the filename. Do not do this for piped commands. */
+> -	if (!ispipe && !pid_in_pattern && core_uses_pid) {
+> +	if (!(cn->core_type == COREDUMP_PIPE) && !pid_in_pattern && core_uses_pid) {
+>  		err = cn_printf(cn, ".%d", task_tgid_vnr(current));
+>  		if (err)
+>  			return err;
+>  	}
+> -	return ispipe;
+> +	return 0;
+>  }
+>  
+>  static int zap_process(struct signal_struct *signal, int exit_code)
+> @@ -583,7 +592,6 @@ void do_coredump(const kernel_siginfo_t *siginfo)
+>  	const struct cred *old_cred;
+>  	struct cred *cred;
+>  	int retval = 0;
+> -	int ispipe;
+>  	size_t *argv = NULL;
+>  	int argc = 0;
+>  	/* require nonrelative corefile path and be extra careful */
+> @@ -632,19 +640,18 @@ void do_coredump(const kernel_siginfo_t *siginfo)
+>  
+>  	old_cred = override_creds(cred);
+>  
+> -	ispipe = format_corename(&cn, &cprm, &argv, &argc);
+> +	retval = format_corename(&cn, &cprm, &argv, &argc);
+> +	if (retval < 0) {
+> +		coredump_report_failure("format_corename failed, aborting core");
+> +		goto fail_unlock;
+> +	}
+>  
+> -	if (ispipe) {
+> +	if (cn.core_type == COREDUMP_PIPE) {
+>  		int argi;
+>  		int dump_count;
+>  		char **helper_argv;
+>  		struct subprocess_info *sub_info;
+>  
+> -		if (ispipe < 0) {
+> -			coredump_report_failure("format_corename failed, aborting core");
+> -			goto fail_unlock;
+> -		}
+> -
+>  		if (cprm.limit == 1) {
+>  			/* See umh_coredump_setup() which sets RLIMIT_CORE = 1.
+>  			 *
+> @@ -695,7 +702,7 @@ void do_coredump(const kernel_siginfo_t *siginfo)
+>  			coredump_report_failure("|%s pipe failed", cn.corename);
+>  			goto close_fail;
+>  		}
+> -	} else {
+> +	} else if (cn.core_type == COREDUMP_FILE) {
+>  		struct mnt_idmap *idmap;
+>  		struct inode *inode;
+>  		int open_flags = O_CREAT | O_WRONLY | O_NOFOLLOW |
+> @@ -823,13 +830,13 @@ void do_coredump(const kernel_siginfo_t *siginfo)
+>  		file_end_write(cprm.file);
+>  		free_vma_snapshot(&cprm);
+>  	}
+> -	if (ispipe && core_pipe_limit)
+> +	if ((cn.core_type == COREDUMP_PIPE) && core_pipe_limit)
+>  		wait_for_dump_helpers(cprm.file);
+>  close_fail:
+>  	if (cprm.file)
+>  		filp_close(cprm.file, NULL);
+>  fail_dropcount:
+> -	if (ispipe)
+> +	if (cn.core_type == COREDUMP_PIPE)
+>  		atomic_dec(&core_dump_count);
+>  fail_unlock:
+>  	kfree(argv);
+> 
+> -- 
+> 2.47.2
+> 
 
