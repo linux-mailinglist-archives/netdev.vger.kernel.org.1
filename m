@@ -1,183 +1,579 @@
-Return-Path: <netdev+bounces-190958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09874AB9786
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 10:27:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 971F0AB97BA
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 10:31:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27A8517BA44
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 08:27:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2CF3A00D19
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 08:30:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B588322D79B;
-	Fri, 16 May 2025 08:26:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BBE822DFBB;
+	Fri, 16 May 2025 08:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="R8ewAbkf"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="MkFIOiVY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827E7225A22
-	for <netdev@vger.kernel.org>; Fri, 16 May 2025 08:26:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4A1622CBD8;
+	Fri, 16 May 2025 08:30:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747384013; cv=none; b=vA3Hz0BookKjQaBOQY0y9pey39MGn4rgdAKX3BWJVVbVmxfEs47RTVv5C+Ck7E/+J2HCNZ+SqfQfY0aBKx/fRXZ9tmFgL2yPbsYRzR0t3UBjvKXDxG62J+hUDfGueJGy5/xS85kFH+sTsCYsber2y6Uw/Fb8yM7A4nU3lfnBOuo=
+	t=1747384229; cv=none; b=UQOMaUkRYykSUe0mOieOl9P3KjXeTCcUhxN4sQdBFCaH6tuqvZhTdU0SRQbx+w7JFzegAQaLJh2M6PqyYgG7EvYpDrq2smrN3nF2KAazSAbPKHyliXe+lRhJ7I+NXAmoJBbH0vNaDltNmglM/q0GsHfJSNOYdrdoqinq7xjO9vQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747384013; c=relaxed/simple;
-	bh=UhCeuXAhFdKN+k8NNU9tkzVV4R4qOX/CMxrUrC4RAMw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KRrm3X5NMRZOLn+bXHXJjll2t2yQjkuLvzmvt/3pdifQY4RqBwYRhaHqROHNFiUJxvPDziP9FnF9uUxnweTOuCG/XQ2E41noBNxK+62OFDVOTClui32Bd7QqrWc4d0RB2AcM1iTRA7NW78/A2IOxyrNUYHs1pPPK5w40HjDxBuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=R8ewAbkf; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-43d4ff56136so2551285e9.3
-        for <netdev@vger.kernel.org>; Fri, 16 May 2025 01:26:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1747384010; x=1747988810; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=f7l73PM002CCN10WrbnnaKwXuL9DVgMrLzlYZMX/umg=;
-        b=R8ewAbkfPHUg4/hS5vxRgxAzW4IHY2pQPImuHwwZyvaZsLlPkTnwVOpSAdxnqo48/P
-         7GSrd4jb3/yOOpsNf6f9mG1LM9sBPP8ffTFhggd828UsqrLkpnACrE6ImlJONmabQmWX
-         5axmIMPTNCJaPRHPO116EzomKY/Dg68yY2Jfp7Krr/F7G0pEIcru7DY6QHcjG5iG3+4N
-         rVnOYRTu060TxoOADFpKVRKVb9kQLkSoMK0a2xNPKb70NRoWETjIV4JytlCymTlcrXdR
-         vYScqC9JW0DwpxbqEkaMRO/or5e3gMssXBG+be64g21WD+YCwrcCWCULfuGlWhmsXC4V
-         A4TA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747384010; x=1747988810;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=f7l73PM002CCN10WrbnnaKwXuL9DVgMrLzlYZMX/umg=;
-        b=op/dleCySFM4mZwlZcYBZOButDqqDprjCN4P0GAoFGsLfHROua4jgNY2ZXTksgGDMd
-         /N9LgmWaRshD64pQCYkAhOWJhW5s1bZrmSlfUFdoWz3+4JWTItUqunSIOVwq0xCtRILO
-         g6PiFeG5XnqzCgAXXUaAN0Rj0l1I9kIcQ8PvNwFCQZ2O33i9t9vS9GvB8GMbXkiR9Qob
-         v4eUe9+aQ+wNj0KEwQ8g3rCHbi3kSCukTVK+5bnnLKOvnimiw8c9Ivtfkj9kqgcjJAPP
-         oLSIYJlQjWL9xqhV0WtiWHorfsazSGrTEJF4PYNAsR0/iz7sEYy90xx3i9LQlZqYeXB5
-         XZQA==
-X-Forwarded-Encrypted: i=1; AJvYcCUwazR5yjACsJdXWedCtsj11XwBAcIgnsH7OtQfpAXY0426tILCvcXpv6DwK5WeBw9auRzqoHE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxN6XdfYYlSy7rMSUR76xZJEly1pl9FqKXgcDgDwEWLdBKPzrdb
-	cGeyRDFBC2klbHEQVua9yf0+02R9g928Eooc594a1Bl61x6Hdz76zJdi9d/ktkqU8ag=
-X-Gm-Gg: ASbGncv8A9ttWKNFi/KXBT0aLF53XcBFm9RDnqQjWqLPX4ej1vsR5o+Mp4hxTfnI0ir
-	T8TGHl4XExsdRBzZIweUKR1FPxxRo71vTCuDsX9Wh5lOThQ3a8hHTdRvsP3+VjJfJXOH2rQkPc3
-	xPaQyLyjpXh7d8TrKfyrfpdLPvJz5kxfBQc+iV1+3sVZQBwHCuTWrQ/dQZ+Dia/ymXCfOUIEzWQ
-	33fcthLqcK66/isNe8rzsn3eleFBtVHiq9ONdJ4a0ZB1dGcuf+tc042q305GQl3Oe4fCR9e6L8G
-	GT8VRJGKqKADFV05fIBJLsKhUYdb3J3Cgc4dtQltHUhsWZ48nSl1j6OfybFFhd/uRDlJEC6H8p5
-	M3whnAZQR2aFCtXUnHA==
-X-Google-Smtp-Source: AGHT+IGWyXgoAVW4BSrSzUw5Y/5nzOpp23MQkmYnPVtuC71wZostsPX5aKPI88cXnFHlc6qgWlJ01g==
-X-Received: by 2002:a05:600c:45cf:b0:43d:301b:5508 with SMTP id 5b1f17b1804b1-442fd60fd95mr9296845e9.2.1747384009669;
-        Fri, 16 May 2025 01:26:49 -0700 (PDT)
-Received: from [10.61.0.48] (110.8.30.213.rev.vodafone.pt. [213.30.8.110])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a361a81fd8sm1166197f8f.81.2025.05.16.01.26.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 May 2025 01:26:49 -0700 (PDT)
-Message-ID: <bfe991fa-f54c-4d58-b2e0-34c4e4eb48f4@linaro.org>
-Date: Fri, 16 May 2025 10:26:47 +0200
+	s=arc-20240116; t=1747384229; c=relaxed/simple;
+	bh=ldZOGhtmx7WUb/eVybYY09LSeO494Ab8oT8AD/pa9aQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YJUomaeMvEfFFUHBBX9wsiZJgrZwUm41oLUrOrlVyrnY6/Qr25l6YWNt/P76ufdQazgP74ojcqZn9ejp76bkorJ0aQuKiA/DbpRSCfWX09HD/r4BN7HlA6+cUkO06bKlWvHZEYqmorNKXdkheYedSKlZiQvM00yUCS+oR2cwGTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=MkFIOiVY; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=3vnlmYkF5eL5zF22fjVEtExR7M5wVeYjulZM7+TVb9U=; b=MkFIOiVYCPPiCgm/L5jbqjC2eP
+	wwevs8d5eTp3Eu8m5JQAE0coJ45o0Uh5dt7mU/LXcfF63nvwAJ1u18AeYdZyIU7MqAUzVv22tUdTx
+	N6Hi7OE7NXikgwHMNTIQk82JBObxpQy5fC8vlb6PRrj5gx7XJ0cM1y5snCcfAOtuUAON4zSu8/RYw
+	BocfbX388afHuYwLgWHol5fl1F6BBDih017o0EN60iKdrD3c99iEcOoFCnl7VSyJOJQSrIKpAZOBa
+	6Ht1f4ZHC0bgnBNze1ERAT/0QVSEVd2oOTAA3PCa7NlaZ+4CmCxqjSGw+eD/AliHvnltTsody3voa
+	CNFUprKg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45458)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uFqSK-0001lH-0I;
+	Fri, 16 May 2025 09:30:12 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uFqSG-00067T-1L;
+	Fri, 16 May 2025 09:30:08 +0100
+Date: Fri, 16 May 2025 09:30:08 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Tristram.Ha@microchip.com
+Cc: Andrew Lunn <andrew@lunn.ch>, Woojung Huh <woojung.huh@microchip.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v4] net: dsa: microchip: Add SGMII port support
+ to KSZ9477 switch
+Message-ID: <aCb3kNniIhtmIhf1@shell.armlinux.org.uk>
+References: <20250516024123.24910-1-Tristram.Ha@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] mux: mmio: Fix missing CONFIG_REGMAP_MMIO
-To: Peter Rosin <peda@axentia.se>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Davis <afd@ti.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: kernel test robot <lkp@intel.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Samuel Holland <samuel@sholland.org>, Arnd Bergmann <arnd@arndb.de>
-References: <20250515140555.325601-2-krzysztof.kozlowski@linaro.org>
- <174738338644.6332.8007717408731919554.b4-ty@linaro.org>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Content-Language: en-US
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- 2+47PN9NZAOyb771QoVr8A==
-In-Reply-To: <174738338644.6332.8007717408731919554.b4-ty@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250516024123.24910-1-Tristram.Ha@microchip.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 16/05/2025 10:16, Krzysztof Kozlowski wrote:
+I think I gave comments on the previous version about this approach
+but I don't see any change. Maybe I missed your response, I don't know,
+I'm only occasionally dipping into the mass of emails I get.
+
+On Thu, May 15, 2025 at 07:41:23PM -0700, Tristram.Ha@microchip.com wrote:
+> From: Tristram Ha <tristram.ha@microchip.com>
 > 
-> On Thu, 15 May 2025 16:05:56 +0200, Krzysztof Kozlowski wrote:
->> MMIO mux uses now regmap_init_mmio(), so one way or another
->> CONFIG_REGMAP_MMIO should be enabled, because there are no stubs for
->> !REGMAP_MMIO case:
->>
->>   ERROR: modpost: "__regmap_init_mmio_clk" [drivers/mux/mux-mmio.ko] undefined!
->>
->> REGMAP_MMIO should be, because it is a non-visible symbol, but this
->> causes a circular dependency:
->>
->> [...]
+> The KSZ9477 switch driver uses the XPCS driver to operate its SGMII
+> port.  However there are some hardware bugs in the KSZ9477 SGMII
+> module so workarounds are needed.  There was a proposal to update the
+> XPCS driver to accommodate KSZ9477, but the new code is not generic
+> enough to be used by other vendors.  It is better to do all these
+> workarounds inside the KSZ9477 driver instead of modifying the XPCS
+> driver.
 > 
-> Applied, thanks!
+> There are 3 hardware issues.  The first is the MII_ADVERTISE register
+> needs to be write once after reset for the correct code word to be
+> sent.  The XPCS driver disables auto-negotiation first before
+> configuring the SGMII/1000BASE-X mode and then enables it back.  The
+> KSZ9477 driver then writes the MII_ADVERTISE register before enabling
+> auto-negotiation.  In 1000BASE-X mode the MII_ADVERTISE register will
+> be set, so KSZ9477 driver does not need to write it.
 > 
-> [1/1] mux: mmio: Fix missing CONFIG_REGMAP_MMIO
->       https://git.kernel.org/krzk/linux/c/39bff565b40d26cc51f6e85b3b224c86a563367e
+> The second issue is the MII_BMCR register needs to set the exact speed
+> and duplex mode when running in SGMII mode.  During link polling the
+> KSZ9477 will check the speed and duplex mode are different from
+> previous ones and update the MII_BMCR register accordingly.
 > 
-And dropped. More recursive dependencies are detected, so my fix here is
-incomplete.
+> The last issue is 1000BASE-X mode does not work with auto-negotiation
+> on.  The cause is the local port hardware does not know the link is up
+> and so network traffic is not forwarded.  The workaround is to write 2
+> additional bits when 1000BASE-X mode is configured.
+> 
+> Note the SGMII interrupt in the port cannot be masked.  As that
+> interrupt is not handled in the KSZ9477 driver the SGMII interrupt bit
+> will not be set even when the XPCS driver sets it.
+> 
+> Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
+> ---
+> v4
+>  - update for last ksz_common.c merge
+> 
+> v3
+>  - rebase with latest commit
+> 
+> v2
+>  - add Kconfig for required XPCS driver build
+> 
+>  drivers/net/dsa/microchip/Kconfig      |   1 +
+>  drivers/net/dsa/microchip/ksz9477.c    | 191 ++++++++++++++++++++++++-
+>  drivers/net/dsa/microchip/ksz9477.h    |   4 +-
+>  drivers/net/dsa/microchip/ksz_common.c |  36 ++++-
+>  drivers/net/dsa/microchip/ksz_common.h |  23 ++-
+>  5 files changed, 248 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/net/dsa/microchip/Kconfig b/drivers/net/dsa/microchip/Kconfig
+> index 12a86585a77f..c71d3fd5dfeb 100644
+> --- a/drivers/net/dsa/microchip/Kconfig
+> +++ b/drivers/net/dsa/microchip/Kconfig
+> @@ -6,6 +6,7 @@ menuconfig NET_DSA_MICROCHIP_KSZ_COMMON
+>  	select NET_DSA_TAG_NONE
+>  	select NET_IEEE8021Q_HELPERS
+>  	select DCB
+> +	select PCS_XPCS
+>  	help
+>  	  This driver adds support for Microchip KSZ8, KSZ9 and
+>  	  LAN937X series switch chips, being KSZ8863/8873,
+> diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
+> index 29fe79ea74cd..825aa570eed9 100644
+> --- a/drivers/net/dsa/microchip/ksz9477.c
+> +++ b/drivers/net/dsa/microchip/ksz9477.c
+> @@ -2,7 +2,7 @@
+>  /*
+>   * Microchip KSZ9477 switch driver main logic
+>   *
+> - * Copyright (C) 2017-2024 Microchip Technology Inc.
+> + * Copyright (C) 2017-2025 Microchip Technology Inc.
+>   */
+>  
+>  #include <linux/kernel.h>
+> @@ -161,6 +161,187 @@ static int ksz9477_wait_alu_sta_ready(struct ksz_device *dev)
+>  					10, 1000);
+>  }
+>  
+> +static void port_sgmii_s(struct ksz_device *dev, uint port, u16 devid, u16 reg)
+> +{
+> +	u32 data;
+> +
+> +	data = (devid & MII_MMD_CTRL_DEVAD_MASK) << 16;
+> +	data |= reg;
+> +	ksz_pwrite32(dev, port, REG_PORT_SGMII_ADDR__4, data);
+> +}
+> +
+> +static void port_sgmii_r(struct ksz_device *dev, uint port, u16 devid, u16 reg,
+> +			 u16 *buf)
+> +{
+> +	port_sgmii_s(dev, port, devid, reg);
+> +	ksz_pread16(dev, port, REG_PORT_SGMII_DATA__4 + 2, buf);
+> +}
+> +
+> +static void port_sgmii_w(struct ksz_device *dev, uint port, u16 devid, u16 reg,
+> +			 u16 buf)
+> +{
+> +	port_sgmii_s(dev, port, devid, reg);
+> +	ksz_pwrite32(dev, port, REG_PORT_SGMII_DATA__4, buf);
+> +}
+> +
+> +static int ksz9477_pcs_read(struct mii_bus *bus, int phy, int mmd, int reg)
+> +{
+> +	struct ksz_device *dev = bus->priv;
+> +	int port = ksz_get_sgmii_port(dev);
+> +	u16 val;
+> +
+> +	port_sgmii_r(dev, port, mmd, reg, &val);
+> +
+> +	/* Simulate a value to activate special code in the XPCS driver if
+> +	 * supported.
+> +	 */
+> +	if (mmd == MDIO_MMD_PMAPMD) {
+> +		if (reg == MDIO_DEVID1)
+> +			val = 0x9477;
+> +		else if (reg == MDIO_DEVID2)
+> +			val = 0x22 << 10;
+> +	} else if (mmd == MDIO_MMD_VEND2) {
+> +		struct ksz_port *p = &dev->ports[port];
+> +
+> +		/* Need to update MII_BMCR register with the exact speed and
+> +		 * duplex mode when running in SGMII mode and this register is
+> +		 * used to detect connected speed in that mode.
+> +		 */
+> +		if (reg == MMD_SR_MII_AUTO_NEG_STATUS) {
+> +			int duplex, speed;
+> +
+> +			if (val & SR_MII_STAT_LINK_UP) {
+> +				speed = (val >> SR_MII_STAT_S) & SR_MII_STAT_M;
+> +				if (speed == SR_MII_STAT_1000_MBPS)
+> +					speed = SPEED_1000;
+> +				else if (speed == SR_MII_STAT_100_MBPS)
+> +					speed = SPEED_100;
+> +				else
+> +					speed = SPEED_10;
+> +
+> +				if (val & SR_MII_STAT_FULL_DUPLEX)
+> +					duplex = DUPLEX_FULL;
+> +				else
+> +					duplex = DUPLEX_HALF;
+> +
+> +				if (!p->phydev.link ||
+> +				    p->phydev.speed != speed ||
+> +				    p->phydev.duplex != duplex) {
+> +					u16 ctrl;
+> +
+> +					p->phydev.link = 1;
+> +					p->phydev.speed = speed;
+> +					p->phydev.duplex = duplex;
+> +					port_sgmii_r(dev, port, mmd, MII_BMCR,
+> +						     &ctrl);
+> +					ctrl &= BMCR_ANENABLE;
+> +					ctrl |= mii_bmcr_encode_fixed(speed,
+> +								      duplex);
+> +					port_sgmii_w(dev, port, mmd, MII_BMCR,
+> +						     ctrl);
+> +				}
+> +			} else {
+> +				p->phydev.link = 0;
+> +			}
+> +		} else if (reg == MII_BMSR) {
+> +			p->phydev.link = (val & BMSR_LSTATUS);
+> +		}
+> +	}
+> +	return val;
+> +}
+> +
+> +static int ksz9477_pcs_write(struct mii_bus *bus, int phy, int mmd, int reg,
+> +			     u16 val)
+> +{
+> +	struct ksz_device *dev = bus->priv;
+> +	int port = ksz_get_sgmii_port(dev);
+> +
+> +	if (mmd == MDIO_MMD_VEND2) {
+> +		struct ksz_port *p = &dev->ports[port];
+> +
+> +		if (reg == MMD_SR_MII_AUTO_NEG_CTRL) {
+> +			u16 sgmii_mode = SR_MII_PCS_SGMII << SR_MII_PCS_MODE_S;
+> +
+> +			/* Need these bits for 1000BASE-X mode to work with
+> +			 * AN on.
+> +			 */
+> +			if (!(val & sgmii_mode))
+> +				val |= SR_MII_SGMII_LINK_UP |
+> +				       SR_MII_TX_CFG_PHY_MASTER;
+> +
+> +			/* SGMII interrupt in the port cannot be masked, so
+> +			 * make sure interrupt is not enabled as it is not
+> +			 * handled.
+> +			 */
+> +			val &= ~SR_MII_AUTO_NEG_COMPLETE_INTR;
+> +		} else if (reg == MII_BMCR) {
+> +			/* The MII_ADVERTISE register needs to write once
+> +			 * before doing auto-negotiation for the correct
+> +			 * config_word to be sent out after reset.
+> +			 */
+> +			if ((val & BMCR_ANENABLE) && !p->sgmii_adv_write) {
+> +				u16 adv;
+> +
+> +				/* The SGMII port cannot disable flow contrl
+> +				 * so it is better to just advertise symmetric
+> +				 * pause.
+> +				 */
+> +				port_sgmii_r(dev, port, mmd, MII_ADVERTISE,
+> +					     &adv);
+> +				adv |= ADVERTISE_1000XPAUSE;
+> +				adv &= ~ADVERTISE_1000XPSE_ASYM;
+> +				port_sgmii_w(dev, port, mmd, MII_ADVERTISE,
+> +					     adv);
+> +				p->sgmii_adv_write = 1;
+> +			} else if (val & BMCR_RESET) {
+> +				p->sgmii_adv_write = 0;
+> +			}
+> +		} else if (reg == MII_ADVERTISE) {
+> +			/* XPCS driver writes to this register so there is no
+> +			 * need to update it for the errata.
+> +			 */
+> +			p->sgmii_adv_write = 1;
+> +		}
+> +	}
+> +	port_sgmii_w(dev, port, mmd, reg, val);
+> +	return 0;
+> +}
+> +
+> +int ksz9477_pcs_create(struct ksz_device *dev)
+> +{
+> +	/* This chip has a SGMII port. */
+> +	if (ksz_has_sgmii_port(dev)) {
+> +		int port = ksz_get_sgmii_port(dev);
+> +		struct ksz_port *p = &dev->ports[port];
+> +		struct phylink_pcs *pcs;
+> +		struct mii_bus *bus;
+> +		int ret;
+> +
+> +		bus = devm_mdiobus_alloc(dev->dev);
+> +		if (!bus)
+> +			return -ENOMEM;
+> +
+> +		bus->name = "ksz_pcs_mdio_bus";
+> +		snprintf(bus->id, MII_BUS_ID_SIZE, "%s-pcs",
+> +			 dev_name(dev->dev));
+> +		bus->read_c45 = &ksz9477_pcs_read;
+> +		bus->write_c45 = &ksz9477_pcs_write;
+> +		bus->parent = dev->dev;
+> +		bus->phy_mask = ~0;
+> +		bus->priv = dev;
+> +
+> +		ret = devm_mdiobus_register(dev->dev, bus);
+> +		if (ret)
+> +			return ret;
+> +
+> +		pcs = xpcs_create_pcs_mdiodev(bus, 0);
+> +		if (IS_ERR(pcs))
+> +			return PTR_ERR(pcs);
+> +		p->pcs = pcs;
+> +	}
+> +	return 0;
+> +}
+> +
+>  int ksz9477_reset_switch(struct ksz_device *dev)
+>  {
+>  	u8 data8;
+> @@ -978,6 +1159,14 @@ void ksz9477_get_caps(struct ksz_device *dev, int port,
+>  
+>  	if (dev->info->gbit_capable[port])
+>  		config->mac_capabilities |= MAC_1000FD;
+> +
+> +	if (ksz_is_sgmii_port(dev, port)) {
+> +		struct ksz_port *p = &dev->ports[port];
+> +
+> +		phy_interface_or(config->supported_interfaces,
+> +				 config->supported_interfaces,
+> +				 p->pcs->supported_interfaces);
+> +	}
+>  }
+>  
+>  int ksz9477_set_ageing_time(struct ksz_device *dev, unsigned int msecs)
+> diff --git a/drivers/net/dsa/microchip/ksz9477.h b/drivers/net/dsa/microchip/ksz9477.h
+> index d2166b0d881e..0d1a6dfda23e 100644
+> --- a/drivers/net/dsa/microchip/ksz9477.h
+> +++ b/drivers/net/dsa/microchip/ksz9477.h
+> @@ -2,7 +2,7 @@
+>  /*
+>   * Microchip KSZ9477 series Header file
+>   *
+> - * Copyright (C) 2017-2022 Microchip Technology Inc.
+> + * Copyright (C) 2017-2025 Microchip Technology Inc.
+>   */
+>  
+>  #ifndef __KSZ9477_H
+> @@ -97,4 +97,6 @@ void ksz9477_acl_match_process_l2(struct ksz_device *dev, int port,
+>  				  u16 ethtype, u8 *src_mac, u8 *dst_mac,
+>  				  unsigned long cookie, u32 prio);
+>  
+> +int ksz9477_pcs_create(struct ksz_device *dev);
+> +
+>  #endif
+> diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+> index f492fa9f6dd4..248f8027e0cf 100644
+> --- a/drivers/net/dsa/microchip/ksz_common.c
+> +++ b/drivers/net/dsa/microchip/ksz_common.c
+> @@ -2,7 +2,7 @@
+>  /*
+>   * Microchip switch driver main logic
+>   *
+> - * Copyright (C) 2017-2024 Microchip Technology Inc.
+> + * Copyright (C) 2017-2025 Microchip Technology Inc.
+>   */
+>  
+>  #include <linux/delay.h>
+> @@ -408,12 +408,28 @@ static void ksz9477_phylink_mac_link_up(struct phylink_config *config,
+>  					int speed, int duplex, bool tx_pause,
+>  					bool rx_pause);
+>  
+> +static struct phylink_pcs *
+> +ksz_phylink_mac_select_pcs(struct phylink_config *config,
+> +			   phy_interface_t interface)
+> +{
+> +	struct dsa_port *dp = dsa_phylink_to_port(config);
+> +	struct ksz_device *dev = dp->ds->priv;
+> +	struct ksz_port *p = &dev->ports[dp->index];
+> +
+> +	if (ksz_is_sgmii_port(dev, dp->index) &&
+> +	    (interface == PHY_INTERFACE_MODE_SGMII ||
+> +	    interface == PHY_INTERFACE_MODE_1000BASEX))
+> +		return p->pcs;
+> +	return NULL;
+> +}
+> +
+>  static const struct phylink_mac_ops ksz9477_phylink_mac_ops = {
+>  	.mac_config	= ksz_phylink_mac_config,
+>  	.mac_link_down	= ksz_phylink_mac_link_down,
+>  	.mac_link_up	= ksz9477_phylink_mac_link_up,
+>  	.mac_disable_tx_lpi = ksz_phylink_mac_disable_tx_lpi,
+>  	.mac_enable_tx_lpi = ksz_phylink_mac_enable_tx_lpi,
+> +	.mac_select_pcs	= ksz_phylink_mac_select_pcs,
+>  };
+>  
+>  static const struct ksz_dev_ops ksz9477_dev_ops = {
+> @@ -451,6 +467,7 @@ static const struct ksz_dev_ops ksz9477_dev_ops = {
+>  	.reset = ksz9477_reset_switch,
+>  	.init = ksz9477_switch_init,
+>  	.exit = ksz9477_switch_exit,
+> +	.pcs_create = ksz9477_pcs_create,
+>  };
+>  
+>  static const struct phylink_mac_ops lan937x_phylink_mac_ops = {
+> @@ -1093,8 +1110,7 @@ static const struct regmap_range ksz9477_valid_regs[] = {
+>  	regmap_reg_range(0x701b, 0x701b),
+>  	regmap_reg_range(0x701f, 0x7020),
+>  	regmap_reg_range(0x7030, 0x7030),
+> -	regmap_reg_range(0x7200, 0x7203),
+> -	regmap_reg_range(0x7206, 0x7207),
+> +	regmap_reg_range(0x7200, 0x7207),
+>  	regmap_reg_range(0x7300, 0x7301),
+>  	regmap_reg_range(0x7400, 0x7401),
+>  	regmap_reg_range(0x7403, 0x7403),
+> @@ -1610,6 +1626,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
+>  				   true, false, false},
+>  		.gbit_capable	= {true, true, true, true, true, true, true},
+>  		.ptp_capable = true,
+> +		.sgmii_port = 7,
+>  		.wr_table = &ksz9477_register_set,
+>  		.rd_table = &ksz9477_register_set,
+>  	},
+> @@ -2002,6 +2019,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
+>  		.internal_phy	= {true, true, true, true,
+>  				   true, false, false},
+>  		.gbit_capable	= {true, true, true, true, true, true, true},
+> +		.sgmii_port = 7,
+>  		.wr_table = &ksz9477_register_set,
+>  		.rd_table = &ksz9477_register_set,
+>  	},
+> @@ -2137,7 +2155,7 @@ void ksz_r_mib_stats64(struct ksz_device *dev, int port)
+>  
+>  	spin_unlock(&mib->stats64_lock);
+>  
+> -	if (dev->info->phy_errata_9477) {
+> +	if (dev->info->phy_errata_9477 && !ksz_is_sgmii_port(dev, port)) {
+>  		ret = ksz9477_errata_monitor(dev, port, raw->tx_late_col);
+>  		if (ret)
+>  			dev_err(dev->dev, "Failed to monitor transmission halt\n");
+> @@ -2845,6 +2863,12 @@ static int ksz_setup(struct dsa_switch *ds)
+>  	if (ret)
+>  		return ret;
+>  
+> +	if (ksz_has_sgmii_port(dev) && dev->dev_ops->pcs_create) {
+> +		ret = dev->dev_ops->pcs_create(dev);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+>  	/* set broadcast storm protection 10% rate */
+>  	regmap_update_bits(ksz_regmap_16(dev), regs[S_BROADCAST_CTRL],
+>  			   BROADCAST_STORM_RATE,
+> @@ -3692,6 +3716,10 @@ static void ksz_phylink_mac_config(struct phylink_config *config,
+>  	if (dev->info->internal_phy[port])
+>  		return;
+>  
+> +	/* No need to configure XMII control register when using SGMII. */
+> +	if (ksz_is_sgmii_port(dev, port))
+> +		return;
+> +
+>  	if (phylink_autoneg_inband(mode)) {
+>  		dev_err(dev->dev, "In-band AN not supported!\n");
+>  		return;
+> diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
+> index a034017568cd..a08417df2ca4 100644
+> --- a/drivers/net/dsa/microchip/ksz_common.h
+> +++ b/drivers/net/dsa/microchip/ksz_common.h
+> @@ -1,7 +1,7 @@
+>  /* SPDX-License-Identifier: GPL-2.0 */
+>  /* Microchip switch driver common header
+>   *
+> - * Copyright (C) 2017-2024 Microchip Technology Inc.
+> + * Copyright (C) 2017-2025 Microchip Technology Inc.
+>   */
+>  
+>  #ifndef __KSZ_COMMON_H
+> @@ -10,6 +10,7 @@
+>  #include <linux/etherdevice.h>
+>  #include <linux/kernel.h>
+>  #include <linux/mutex.h>
+> +#include <linux/pcs/pcs-xpcs.h>
+>  #include <linux/phy.h>
+>  #include <linux/regmap.h>
+>  #include <net/dsa.h>
+> @@ -93,6 +94,7 @@ struct ksz_chip_data {
+>  	bool internal_phy[KSZ_MAX_NUM_PORTS];
+>  	bool gbit_capable[KSZ_MAX_NUM_PORTS];
+>  	bool ptp_capable;
+> +	u8 sgmii_port;
+>  	const struct regmap_access_table *wr_table;
+>  	const struct regmap_access_table *rd_table;
+>  };
+> @@ -132,6 +134,7 @@ struct ksz_port {
+>  	u32 force:1;
+>  	u32 read:1;			/* read MIB counters in background */
+>  	u32 freeze:1;			/* MIB counter freeze is enabled */
+> +	u32 sgmii_adv_write:1;
+>  
+>  	struct ksz_port_mib mib;
+>  	phy_interface_t interface;
+> @@ -141,6 +144,7 @@ struct ksz_port {
+>  	void *acl_priv;
+>  	struct ksz_irq pirq;
+>  	u8 num;
+> +	struct phylink_pcs *pcs;
+>  #if IS_ENABLED(CONFIG_NET_DSA_MICROCHIP_KSZ_PTP)
+>  	struct kernel_hwtstamp_config tstamp_config;
+>  	bool hwts_tx_en;
+> @@ -440,6 +444,8 @@ struct ksz_dev_ops {
+>  	int (*reset)(struct ksz_device *dev);
+>  	int (*init)(struct ksz_device *dev);
+>  	void (*exit)(struct ksz_device *dev);
+> +
+> +	int (*pcs_create)(struct ksz_device *dev);
+>  };
+>  
+>  struct ksz_device *ksz_switch_alloc(struct device *base, void *priv);
+> @@ -731,6 +737,21 @@ static inline bool is_lan937x_tx_phy(struct ksz_device *dev, int port)
+>  		dev->chip_id == LAN9372_CHIP_ID) && port == KSZ_PORT_4;
+>  }
+>  
+> +static inline int ksz_get_sgmii_port(struct ksz_device *dev)
+> +{
+> +	return dev->info->sgmii_port - 1;
+> +}
+> +
+> +static inline bool ksz_has_sgmii_port(struct ksz_device *dev)
+> +{
+> +	return dev->info->sgmii_port > 0;
+> +}
+> +
+> +static inline bool ksz_is_sgmii_port(struct ksz_device *dev, int port)
+> +{
+> +	return dev->info->sgmii_port == port + 1;
+> +}
+> +
+>  /* STP State Defines */
+>  #define PORT_TX_ENABLE			BIT(2)
+>  #define PORT_RX_ENABLE			BIT(1)
+> -- 
+> 2.34.1
+> 
+> 
 
-error: recursive dependency detected!
-	symbol REGMAP default is visible depending on REGMAP_MMIO
-	symbol REGMAP_MMIO is selected by MUX_MMIO
-	symbol MUX_MMIO depends on MULTIPLEXER
-	symbol MULTIPLEXER is selected by MDIO_BUS_MUX_MULTIPLEXER
-	symbol MDIO_BUS_MUX_MULTIPLEXER depends on MDIO_BUS
-	symbol MDIO_BUS is selected by REGMAP
-
-https://krzk.eu/#/builders/43/builds/4855
-
-That's a mess, I need work on this a bit more.
-
-Best regards,
-Krzysztof
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
