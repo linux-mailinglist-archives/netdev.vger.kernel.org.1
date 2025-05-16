@@ -1,76 +1,97 @@
-Return-Path: <netdev+bounces-191144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2501AABA2C6
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 20:29:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31884ABA30F
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 20:41:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E52EB1BC3D9A
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 18:29:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8D461BC65CF
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 18:41:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4F14278766;
-	Fri, 16 May 2025 18:29:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B3D1278743;
+	Fri, 16 May 2025 18:41:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="gQbnxmf+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gBY2wHpK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A7D2701A7;
-	Fri, 16 May 2025 18:29:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64A631A0BF1;
+	Fri, 16 May 2025 18:41:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747420151; cv=none; b=t1kxD1rbmJW/uN106hOUOsqadROSTJnFBjX46c13LkrcK6z+zmjrqBGzfl0VAE4IpZj7o9NT9QbRfCFs5OEnkqFSIDTUpVDkAWSaI6QJqJ8i0g5WEtQY46z+6vdW5F/F+X2uAoBHo1euF3CPOjfyLoflAQ3sjK6LUxrWaqPo2fA=
+	t=1747420872; cv=none; b=a3lbl2LUXIMqWStRus2TiwevYwUqHSqKBkUa/UiyY/DeciGfBUt8EAnc3xM3a4hZbbVzzdFXpcEbtC9jcbl8EsEJkWA3XBLWGCOhPX8IXefnTgc1TE67lLW9BcM/2m7AaWoOxqlVuRq4DpkBncdFY9O0LSrdQmewATQfxFafl4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747420151; c=relaxed/simple;
-	bh=L1J3lhc3dz/x2gt0Tyu0ZFkEuThw1q/QCIsKDCQAKZ8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SnSJuVNwnGLNKgWGRs5at66UN8yDBQXw1wiF6YirEGmMK2MkYoz2ciOjYAWOilXpzB7jIHZbIDjy88y8Fm+LJgVZDUuj7seCKPCxnwucoGAqCE1aFcGxeOPnt3Y9IatGkQz1K+CvyBk0I6PpbqdIB2Xe0Euu4IDILYjsHhMWijY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=gQbnxmf+; arc=none smtp.client-ip=52.95.48.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1747420872; c=relaxed/simple;
+	bh=j/psQkdzMVMF/cO2seHId0bpPEQPneH5fdBDVA9IMM4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=MX1JCfCc7skhzRU+rJMbUUiDE/vK6XqpKrTLgEMQcUZxsNBGmCXpNUD5SclAFfYmcmS5gSBnoHOHqbiMdXOJVWS27JYclj26nR0kRcmnVOJafwP+zkcLCHpJ9b51JGTRvdowisvumvoxhOblTGM4j8K5PEEmLMT3ECz2oqORTgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gBY2wHpK; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-43d0618746bso19596035e9.2;
+        Fri, 16 May 2025 11:41:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1747420150; x=1778956150;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=EDjwGpHfWYpxzbmgkSZNL4bT3LlkigmlrlW2zDkQW7Q=;
-  b=gQbnxmf+GOwGcChFD7o4HGg0ut+5/pehf1rQ7SYa0vXwv87ZZo7EOV27
-   aueA7CIR15d44CqC38eJmcw3x1JWBMjY2BSlEtdUiQJ1y3LjkodtW+gL/
-   8fHOMxckeYeehC2jmNgfSSe1vzrUfaImKVUSF7Ant0/6MCEPRRs1s4t0f
-   SPOtzRRqoHOjdfqDFjHulhUmDBNxOd44AczetUSuJkIllPAX+cxi4pgSc
-   G5WXV+7RbkzQgEYKNw+EXwhB/jQGaARVpdmVgAUklQwhN/df3Fibxykum
-   T6gR5yx+0KziOT63vJkMo8AQM9ZAQz5BvbxPBujZCpAS7k4GXbe7S7vPl
-   Q==;
-X-IronPort-AV: E=Sophos;i="6.15,294,1739836800"; 
-   d="scan'208";a="490910578"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2025 18:29:05 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:33913]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.29.53:2525] with esmtp (Farcaster)
- id 981a322c-17f6-46c5-b60d-3f7c1f4c214a; Fri, 16 May 2025 18:29:04 +0000 (UTC)
-X-Farcaster-Flow-ID: 981a322c-17f6-46c5-b60d-3f7c1f4c214a
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 16 May 2025 18:29:04 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.142.194.153) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 16 May 2025 18:29:01 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <lee@kernel.org>
-CC: <gregkh@linuxfoundation.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
-	<llfamsec@gmail.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<sashal@kernel.org>, <stable@vger.kernel.org>
-Subject: Re: [PATCH Astable 5.15/6.1/6.6] af_unix: Clear oob_skb in scan_inflight().
-Date: Fri, 16 May 2025 11:27:36 -0700
-Message-ID: <20250516182853.76205-1-kuniyu@amazon.com>
+        d=gmail.com; s=20230601; t=1747420868; x=1748025668; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2s3pifaOo54XXjlPvrpcaeSY+7yLzjRWQvRopUWszpY=;
+        b=gBY2wHpKEwo7DA5qVE3w9HjDrmMrmLSRMP16fT7D/eDTspWs0rmedzRzk+l71TVwui
+         tmayQBoiceEAUexZgrU2JsC6v1SJgojQeEd4RUUobfxS1PNljziMbkkE9dlPQJ29ImXT
+         NqxzREdtjhufoE+p+ZHJinNADvY3PSbBGGM/eY1HbJrThPV2kMEmz831WYdXcPaImTyJ
+         amQNWvtUaQURH8C7Pz1GyodLfjv/igtbux4O7r2GVVvIESqIi6W2om+BcNwqkRMnT5LT
+         CFpCfXdvHfkXhNKR1IRDrn/kfs1TbyUEDp8ldwnh5gTX7MTG4yn5Dqx+Jd/Z3Yz3aCVz
+         G9hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747420868; x=1748025668;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2s3pifaOo54XXjlPvrpcaeSY+7yLzjRWQvRopUWszpY=;
+        b=VbMTboxQ0x3NH5EMQTIlBOGN1Dj+Bppv4dBU4jlrPDwEHzSfPnxkCsDZ3/UTsdXCtZ
+         tZeL/H3V9c50LBCgdJnmOBXIFksJqnVKz3JuVOaaIKppYpdLMuEXQOjKKV4kCdxJ6qvO
+         Ok3HinWzmTAcD7/3K0j4+N5c7AZEpskdmi1TED7xYbTwE39U4fygFp1D/wfxDvVcroq5
+         vgeFQlplfM5HdpW3FSAhG1rQhcBuD8QEjIdruu73S9OanTOJnXIvsQTYfiZOavCJThQn
+         dDYZD5LVZr3RMN3bdpiapVHBUwE4Z6I5BDQxbJXIj9SS1rk2K9npq1vShSwQFGlSjDwG
+         CqDg==
+X-Forwarded-Encrypted: i=1; AJvYcCU1LBqwUo2O2qGCCYHAVeq806IA3c666pE+PEr89MyqPmze/3EhqMzm7yHtx7fTH9LuVQh3+YylDnzR3KA=@vger.kernel.org, AJvYcCWS5vdrmILLtlPvoNx3SOKEs1/XIfHB9rtmgVZfpVIngNta1cy5PIly1kMlGGI0ISzeFEIAo+hz@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2Nv5uMFoE/BOu9OOhD3oJOakGa7PJLziVnJmP5hdO0xTpEMDi
+	YG/HDzVaT2Se9L8f3ifwF5JJryJQYDnUjjhg+/I1sXPb+IOzudPMNfeju31VFw==
+X-Gm-Gg: ASbGncuZtb262WANFtxDPyc1n/My5zxpdACVVKnUk1owFIoSrRHoKuu4Cnu8wkSBr+p
+	Oy+WcravI1ur0gtprwd0VyU4FpgOgJf5T5bRdSdXarX0Bh8RNIjuw+c+0zktnKDIzJdgIFgQy6b
+	68T/19d3TmYOTVHqu20MylznOChYPfzw7LBnjMzYFPmDoUKlckVuVMlN+L+CxUbWOhV3ZgK5NAb
+	xhBQyMI4Zn1qhQP+X3p/VdHrPj+Fm7/OGYaP3RsurHRRHF2Sf3P0ti2BvH+JMTDCjpQse+MVT5T
+	3v4/7GU4SyassNqn6FbjvyhEA0KW7lWv3ELdDDa4FQ5E4LaPUz/2CN92qCmirMsCXE9NkHy8L76
+	NQo0t9hbGqf/gxHJQJ7D+NEuY6/Wq60e6UtHdJRRNlTnBWdoO8X5MWTI=
+X-Google-Smtp-Source: AGHT+IE7CbxsQRDRTjq+jdXKJjuEnw8oymFGz6wOWQjIpQ0orwEOHaYfnrlH8jcpnWI/RbTSz5dmVw==
+X-Received: by 2002:a05:600c:698c:b0:43c:eeee:b70a with SMTP id 5b1f17b1804b1-442ff029b68mr28706455e9.22.1747420868246;
+        Fri, 16 May 2025 11:41:08 -0700 (PDT)
+Received: from shift.daheim (p200300d5ff34db0050f496fffe46beef.dip0.t-ipconnect.de. [2003:d5:ff34:db00:50f4:96ff:fe46:beef])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-443000ee99csm28950405e9.31.2025.05.16.11.41.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 May 2025 11:41:07 -0700 (PDT)
+Received: from chuck by shift.daheim with local (Exim 4.98.2)
+	(envelope-from <chuck@shift.daheim>)
+	id 1uFzzX-00000000CR3-0Zip;
+	Fri, 16 May 2025 20:41:07 +0200
+From: Christian Lamparter <chunkeey@gmail.com>
+To: linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Robert Morris <rtm@csail.mit.edu>
+Cc: Kalle Valo <kvalo@kernel.org>,
+	"John W . Linville" <linville@tuxdriver.com>,
+	stable@kernel.org,
+	Robert Morris <rtm@mit.edu>
+Subject: [PATCH net v1] wifi: p54: prevent buffer-overflow in p54_rx_eeprom_readback()
+Date: Fri, 16 May 2025 20:41:06 +0200
+Message-ID: <20250516184107.47794-1-chunkeey@gmail.com>
 X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250516081843.GA1044914@google.com>
-References: <20250516081843.GA1044914@google.com>
+In-Reply-To: <28782.1747258414@localhost>
+References: <28782.1747258414@localhost>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,124 +99,127 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D044UWA001.ant.amazon.com (10.13.139.100) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Lee Jones <lee@kernel.org>
-Date: Fri, 16 May 2025 09:18:43 +0100
-> On Wed, 05 Mar 2025, Kuniyuki Iwashima wrote:
-> 
-> > +Paolo
-> > 
-> > From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > Date: Wed, 5 Mar 2025 15:08:26 +0100
-> > > On Mon, Mar 03, 2025 at 07:01:49PM -0800, Kuniyuki Iwashima wrote:
-> > > > Embryo socket is not queued in gc_candidates, so we can't drop
-> > > > a reference held by its oob_skb.
-> > > > 
-> > > > Let's say we create listener and embryo sockets, send the
-> > > > listener's fd to the embryo as OOB data, and close() them
-> > > > without recv()ing the OOB data.
-> > > > 
-> > > > There is a self-reference cycle like
-> > > > 
-> > > >   listener -> embryo.oob_skb -> listener
-> > > > 
-> > > > , so this must be cleaned up by GC.  Otherwise, the listener's
-> > > > refcnt is not released and sockets are leaked:
-> > > > 
-> > > >   # unshare -n
-> > > >   # cat /proc/net/protocols | grep UNIX-STREAM
-> > > >   UNIX-STREAM 1024      0      -1   NI       0   yes  kernel ...
-> > > > 
-> > > >   # python3
-> > > >   >>> from array import array
-> > > >   >>> from socket import *
-> > > >   >>>
-> > > >   >>> s = socket(AF_UNIX, SOCK_STREAM)
-> > > >   >>> s.bind('\0test\0')
-> > > >   >>> s.listen()
-> > > >   >>>
-> > > >   >>> c = socket(AF_UNIX, SOCK_STREAM)
-> > > >   >>> c.connect(s.getsockname())
-> > > >   >>> c.sendmsg([b'x'], [(SOL_SOCKET, SCM_RIGHTS, array('i', [s.fileno()]))], MSG_OOB)
-> > > >   1
-> > > >   >>> quit()
-> > > > 
-> > > >   # cat /proc/net/protocols | grep UNIX-STREAM
-> > > >   UNIX-STREAM 1024      3      -1   NI       0   yes  kernel ...
-> > > >                         ^^^
-> > > >                         3 sockets still in use after FDs are close()d
-> > > > 
-> > > > Let's drop the embryo socket's oob_skb ref in scan_inflight().
-> > > > 
-> > > > This also fixes a racy access to oob_skb that commit 9841991a446c
-> > > > ("af_unix: Update unix_sk(sk)->oob_skb under sk_receive_queue
-> > > > lock.") fixed for the new Tarjan's algo-based GC.
-> > > > 
-> > > > Fixes: 314001f0bf92 ("af_unix: Add OOB support")
-> > > > Reported-by: Lei Lu <llfamsec@gmail.com>
-> > > > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > > > ---
-> > > > This has no upstream commit because I replaced the entire GC in
-> > > > 6.10 and the new GC does not have this bug, and this fix is only
-> > > > applicable to the old GC (<= 6.9), thus for 5.15/6.1/6.6.
-> > > 
-> > > You need to get the networking maintainers to review and agree that this
-> > > is ok for us to take, as we really don't want to take "custom" stuff
-> > > like thi s at all.
-> > 
-> > Paolo, could you take a look at this patch ?
-> > https://lore.kernel.org/netdev/20250304030149.82265-1-kuniyu@amazon.com/
-> > 
-> > 
-> > > Why not just take the commits that are in newer
-> > > kernels instead?
-> > 
-> > That will be about 20 patches that rewrite the most lines of
-> > net/unix/garbage.c and cannot be applied cleanly.
-> > 
-> > I think backporting these commits is overkill to fix a small
-> > bug that can be fixed with a much smaller diff.
-> > 
-> > 927fa5b3e4f5 af_unix: Fix uninit-value in __unix_walk_scc()
-> > 041933a1ec7b af_unix: Fix garbage collection of embryos carrying OOB with SCM_RIGHTS
-> > 7172dc93d621 af_unix: Add dead flag to struct scm_fp_list.
-> > 1af2dface5d2 af_unix: Don't access successor in unix_del_edges() during GC.
-> > fd86344823b5 af_unix: Try not to hold unix_gc_lock during accept().
-> > 118f457da9ed af_unix: Remove lock dance in unix_peek_fds().
-> > 4090fa373f0e af_unix: Replace garbage collection algorithm.
-> > a15702d8b3aa af_unix: Detect dead SCC.
-> > bfdb01283ee8 af_unix: Assign a unique index to SCC.
-> > ad081928a8b0 af_unix: Avoid Tarjan's algorithm if unnecessary.
-> > 77e5593aebba af_unix: Skip GC if no cycle exists.
-> > ba31b4a4e101 af_unix: Save O(n) setup of Tarjan's algo.
-> > dcf70df2048d af_unix: Fix up unix_edge.successor for embryo socket.
-> > 3484f063172d af_unix: Detect Strongly Connected Components.
-> > 6ba76fd2848e af_unix: Iterate all vertices by DFS.
-> > 22c3c0c52d32 af_unix: Bulk update unix_tot_inflight/unix_inflight when queuing skb.
-> > 42f298c06b30 af_unix: Link struct unix_edge when queuing skb.
-> > 29b64e354029 af_unix: Allocate struct unix_edge for each inflight AF_UNIX fd.
-> > 1fbfdfaa5902 af_unix: Allocate struct unix_vertex for each inflight AF_UNIX fd.
-> 
-> Okay, I've taken some time to apply a set to linux-6.6.y that looks
-> similar to this [0].  Would someone please give me some advice on how to
-> test it please?  Are there some unit tests I could run to ensure that
-> everything is working as expected?
+Robert Morris reported:
 
-Thanks for working on this! and sorry for the late response, I'm
-personally busy this month.
+|If a malicious USB device pretends to be an Intersil p54 wifi
+|interface and generates an eeprom_readback message with a large
+|eeprom->v1.len, p54_rx_eeprom_readback() will copy data from the
+|message beyond the end of priv->eeprom.
+|
+|static void p54_rx_eeprom_readback(struct p54_common *priv,
+|                                   struct sk_buff *skb)
+|{
+|        struct p54_hdr *hdr = (struct p54_hdr *) skb->data;
+|        struct p54_eeprom_lm86 *eeprom = (struct p54_eeprom_lm86 *) hdr->data;
+|
+|        if (priv->fw_var >= 0x509) {
+|                memcpy(priv->eeprom, eeprom->v2.data,
+|                       le16_to_cpu(eeprom->v2.len));
+|        } else {
+|                memcpy(priv->eeprom, eeprom->v1.data,
+|                       le16_to_cpu(eeprom->v1.len));
+|        }
+| [...]
 
-Could you run tools/testing/selftests/net/af_unix/scm_rights.c
-with KASAN and kmemleak ?
+The eeprom->v{1,2}.len is set by the driver in p54_download_eeprom().
+The device is supposed to provide the same length back to the driver.
+But yes, it's possible (like shown in the report) to alter the value
+to something that causes a crash/panic due to overrun.
 
-The test is added by
+This patch addresses the issue by adding the size to the common device
+context, so p54_rx_eeprom_readback no longer relies on possibly tampered
+values... That said, it also checks if the "firmware" altered the value
+and no longer copies them.
 
-2a79651bf2fa selftest: af_unix: Add test case for backtrack after finalising SCC.
-e060e433e512 selftest: af_unix: Make SCM_RIGHTS into OOB data.
-2aa0cff26ed5 selftest: af_unix: Test GC for SCM_RIGHTS.
+The one, small saving grace is: Before the driver tries to read the eeprom,
+it needs to upload >a< firmware. the vendor firmware has a proprietary
+license and as a reason, it is not present on most distributions by
+default.
 
-The 2nd commit will cover the test case of the python script in
-the patch of this thread.
+Cc: <stable@kernel.org>
+Reported-by: Robert Morris <rtm@mit.edu>
+Closes: https://lore.kernel.org/linux-wireless/28782.1747258414@localhost/
+Fixes: 7cb770729ba8 ("p54: move eeprom code into common library")
+Signed-off-by: Christian Lamparter <chunkeey@gmail.com>
+
+---
+
+First of all: Congratulation and Thank you! This is a great report.
+the reprod. is the icing on the cake...
+I guess you found more issues with p54, right?
+
+From what I see, the first patch that introduced the "unchecked" buffer
+overrun has a date of "Sep 1 22:48:51 2008 +0200"
+
+I don't know who currently handles these patches, maybe netdev?
+---
+ drivers/net/wireless/intersil/p54/fwio.c |  2 ++
+ drivers/net/wireless/intersil/p54/p54.h  |  1 +
+ drivers/net/wireless/intersil/p54/txrx.c | 13 +++++++++----
+ 3 files changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/wireless/intersil/p54/fwio.c b/drivers/net/wireless/intersil/p54/fwio.c
+index 772084a9bd8d..3baf8ab01e22 100644
+--- a/drivers/net/wireless/intersil/p54/fwio.c
++++ b/drivers/net/wireless/intersil/p54/fwio.c
+@@ -231,6 +231,7 @@ int p54_download_eeprom(struct p54_common *priv, void *buf,
+ 
+ 	mutex_lock(&priv->eeprom_mutex);
+ 	priv->eeprom = buf;
++	priv->eeprom_slice_size = len;
+ 	eeprom_hdr = skb_put(skb, eeprom_hdr_size + len);
+ 
+ 	if (priv->fw_var < 0x509) {
+@@ -253,6 +254,7 @@ int p54_download_eeprom(struct p54_common *priv, void *buf,
+ 		ret = -EBUSY;
+ 	}
+ 	priv->eeprom = NULL;
++	priv->eeprom_slice_size = 0;
+ 	mutex_unlock(&priv->eeprom_mutex);
+ 	return ret;
+ }
+diff --git a/drivers/net/wireless/intersil/p54/p54.h b/drivers/net/wireless/intersil/p54/p54.h
+index 522656de4159..aeb5e40cc5ef 100644
+--- a/drivers/net/wireless/intersil/p54/p54.h
++++ b/drivers/net/wireless/intersil/p54/p54.h
+@@ -258,6 +258,7 @@ struct p54_common {
+ 
+ 	/* eeprom handling */
+ 	void *eeprom;
++	size_t eeprom_slice_size;
+ 	struct completion eeprom_comp;
+ 	struct mutex eeprom_mutex;
+ };
+diff --git a/drivers/net/wireless/intersil/p54/txrx.c b/drivers/net/wireless/intersil/p54/txrx.c
+index 8414aa208655..2deb1bb54f24 100644
+--- a/drivers/net/wireless/intersil/p54/txrx.c
++++ b/drivers/net/wireless/intersil/p54/txrx.c
+@@ -496,14 +496,19 @@ static void p54_rx_eeprom_readback(struct p54_common *priv,
+ 		return ;
+ 
+ 	if (priv->fw_var >= 0x509) {
+-		memcpy(priv->eeprom, eeprom->v2.data,
+-		       le16_to_cpu(eeprom->v2.len));
++		if (le16_to_cpu(eeprom->v2.len) != priv->eeprom_slice_size)
++			return;
++
++		memcpy(priv->eeprom, eeprom->v2.data, priv->eeprom_slice_size);
+ 	} else {
+-		memcpy(priv->eeprom, eeprom->v1.data,
+-		       le16_to_cpu(eeprom->v1.len));
++		if (le16_to_cpu(eeprom->v1.len) != priv->eeprom_slice_size)
++			return;
++
++		memcpy(priv->eeprom, eeprom->v1.data, priv->eeprom_slice_size);
+ 	}
+ 
+ 	priv->eeprom = NULL;
++	priv->eeprom_slice_size = 0;
+ 	tmp = p54_find_and_unlink_skb(priv, hdr->req_id);
+ 	dev_kfree_skb_any(tmp);
+ 	complete(&priv->eeprom_comp);
+-- 
+2.49.0
+
 
