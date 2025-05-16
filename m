@@ -1,403 +1,109 @@
-Return-Path: <netdev+bounces-191114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F415FABA1A0
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 19:08:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29218ABA1B9
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 19:14:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4ABFE1B62668
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 17:08:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B067A05CC2
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 17:14:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D25AD27781D;
-	Fri, 16 May 2025 17:07:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B98CB26FA4F;
+	Fri, 16 May 2025 17:14:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lPH+agaG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pvzpgd1q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B5B5277026
-	for <netdev@vger.kernel.org>; Fri, 16 May 2025 17:07:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94DCF200B9F
+	for <netdev@vger.kernel.org>; Fri, 16 May 2025 17:14:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747415228; cv=none; b=R0rTrxMlj3KLP9ff9r0l37nh0TmJ9ZGkPZhjhSEqdtFA7B7ms7iiQ5rU/4O3XimnqyCb1tfbfdphJ4QnXJT7Bw5F+eGWmTjr25B1vtupwFRNMIqW5dVI+vz3i3GQ6Kt1Ncrq3FpHIbQpnLcNVG8/aGhct6Mtqf7KmzMBteQpdJo=
+	t=1747415683; cv=none; b=lfvkREQNalrLyzQrcysOhC/TOWqCjNg6x2Sffo4zyGZq9vqNsshPQZNBu7mzIYNxkuWz399ANdAKBfH2wIpwibW39atJrEQhTkyXEQehz7AO1we5QzWdpTPKGgUwgCsJixcEDWIqro+yb0yjmZYcxFl/IH9U/fdDo1hf9olsJJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747415228; c=relaxed/simple;
-	bh=dXgLWdBTDVfrA54PtIz22bXwGwbaWbK5daz9S3c1E6Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z8S9dcC3ortVP3xIKXN8WY810seiITUjSERetTP549ihjyETig/0J3qsBaKCcoRSYmsbtyu0L2kw/2Zjgjdk/SyRRklYdltYRkAfIgvTGJsoy85GuEDDomDp8mXip43wlJI0onvVlZghXgPUS4gW6aaw/CE76keXIh5k3SFy4LQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lPH+agaG; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747415226; x=1778951226;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=dXgLWdBTDVfrA54PtIz22bXwGwbaWbK5daz9S3c1E6Q=;
-  b=lPH+agaGp4Z9KTKMAFLUgRhUWhygAHDWVIDQeSpMDtpR0+Vh1H5u1tHn
-   IQSQXjoFei1pySHwn9S4xOgxlr+kCY2/3i0P8wADN1q6Qf//EM9hEAl7W
-   DROeerLBArMFZHViS9eSQysj32nzpzJ67pvrMRrQjT9y5N+9R7AM3PwgN
-   oNHzlwJDzCUT5lSoAw6NPScXMglO0SQsgQ96YjwsL65a6UfFi5whm4Qn4
-   vbL20wg63hQO1tnEvbcQjreEun2luBwihO5aWVojXXiMgCYdt4Mw76L28
-   uWIVDn/YvvB2R9+yZOYcfgW3d8EhJ9l8W01MNCQHJKUnTx7AXiQ55ru8M
-   w==;
-X-CSE-ConnectionGUID: 8gHGZO68RF6AEshQXt+Jug==
-X-CSE-MsgGUID: jzaidsA5TYOdOhz4QBNdOQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11435"; a="49270972"
-X-IronPort-AV: E=Sophos;i="6.15,294,1739865600"; 
-   d="scan'208";a="49270972"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2025 10:06:54 -0700
-X-CSE-ConnectionGUID: zFXzmFK1SriJ4lsjBLTE1g==
-X-CSE-MsgGUID: D4FqTgjcT7q1Bsg+nW0ajQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,294,1739865600"; 
-   d="scan'208";a="143868402"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa005.jf.intel.com with ESMTP; 16 May 2025 10:06:54 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Milena Olech <milena.olech@intel.com>,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	jacob.e.keller@intel.com,
-	richardcochran@gmail.com,
-	YiFei Zhu <zhuyifei@google.com>,
-	Mina Almasry <almasrymina@google.com>,
-	Samuel Salin <Samuel.salin@intel.com>
-Subject: [PATCH net-next v3 10/10] idpf: add support for Rx timestamping
-Date: Fri, 16 May 2025 10:06:44 -0700
-Message-ID: <20250516170645.1172700-11-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250516170645.1172700-1-anthony.l.nguyen@intel.com>
-References: <20250516170645.1172700-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1747415683; c=relaxed/simple;
+	bh=djHJx/U1fACshlEXW1s5z2+2lfdtvle9nm+UBMEs5IY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GmEpTv4LEgsMQISldPFiV3XQHWzt+rABxayMc/PsOSEGAtz/sgSuTXgrLsoL73x6p7Xt5Yn7SUOW2Pe+WDjF0az5fTrcMFNg1Kme3nVKGxw1ogGICLtZky4mlGsrJXxzBb4g58SRJGpwjUQx3Ve/3U8b6lQyip5kUM/hMf0Szo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pvzpgd1q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFDC5C4CEE4;
+	Fri, 16 May 2025 17:14:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747415683;
+	bh=djHJx/U1fACshlEXW1s5z2+2lfdtvle9nm+UBMEs5IY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Pvzpgd1qDWlKVOQ0WKGTMYihob42TRiUlyNWV47v072E4L77Lk/jZQt25aEZeDZk3
+	 5llbfoqu40L8rYGI2JGjTwfP1Zrj6FVwQip7hoXOn7BQvYfbn8EaxPr2qp+x0vhPWe
+	 1rEgyj2eSgyZWM5quFag7ZU01EGdorUh6EnaVlaWhONPrtG5AFKZn02N9Eud54apL/
+	 yhZmoN3ADM8iosaYoqRA6aXnfrmI0XBm450sbTlngFe7soIbMLA8elN5MJLQTWRbvw
+	 LZRcOYyTsKzdAUjHermnVdelfbHd2MH8/5x3VUs9+gc2bcRX7EDF/9sn6UtstU2l5s
+	 z6o5By2M9d/9Q==
+Date: Fri, 16 May 2025 10:14:41 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+ <horms@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+ <sdf@fomichev.me>
+Subject: Re: [PATCH net-next] net: let lockdep compare instance locks
+Message-ID: <20250516101441.5ad5b722@kernel.org>
+In-Reply-To: <20250516082243.1befa6f4@kernel.org>
+References: <20250515193609.3da84ac3@kernel.org>
+	<20250516030000.48858-1-kuniyu@amazon.com>
+	<20250516082243.1befa6f4@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Milena Olech <milena.olech@intel.com>
+On Fri, 16 May 2025 08:22:43 -0700 Jakub Kicinski wrote:
+> On Thu, 15 May 2025 19:59:41 -0700 Kuniyuki Iwashima wrote:
+> > > Is the thinking that once the big rtnl lock disappears in cleanup_net
+> > > the devices are safe to destroy without any locking because there can't
+> > > be any live users trying to access them?    
+> > 
+> > I hope yes, but removing VF via sysfs and removing netns might
+> > race and need some locking ?  
+> 
+> I think we should take the small lock around default_device_exit_net()
+> and then we'd be safe? Either a given VF gets moved to init_net first
+> or the sysfs gets to it and unregisters it safely in the old netns.
 
-Add Rx timestamp function when the Rx timestamp value is read directly
-from the Rx descriptor. In order to extend the Rx timestamp value to 64
-bit in hot path, the PHC time is cached in the receive groups.
-Add supported Rx timestamp modes.
+Thinking about it some more, we'll have to revisit this problem before
+removing the big lock, anyway. I'm leaning towards doing this for now:
 
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Milena Olech <milena.olech@intel.com>
-Tested-by: YiFei Zhu <zhuyifei@google.com>
-Tested-by: Mina Almasry <almasrymina@google.com>
-Tested-by: Samuel Salin <Samuel.salin@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- .../net/ethernet/intel/idpf/idpf_ethtool.c    |  1 +
- drivers/net/ethernet/intel/idpf/idpf_lib.c    |  6 +-
- drivers/net/ethernet/intel/idpf/idpf_ptp.c    | 89 ++++++++++++++++++-
- drivers/net/ethernet/intel/idpf/idpf_ptp.h    | 21 +++++
- drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 30 +++++++
- drivers/net/ethernet/intel/idpf/idpf_txrx.h   |  7 +-
- 6 files changed, 150 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-index d14469603ce2..9bdb309b668e 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-@@ -1327,6 +1327,7 @@ static void idpf_get_timestamp_filters(const struct idpf_vport *vport,
- 				SOF_TIMESTAMPING_RAW_HARDWARE;
- 
- 	info->tx_types = BIT(HWTSTAMP_TX_OFF);
-+	info->rx_filters = BIT(HWTSTAMP_FILTER_NONE) | BIT(HWTSTAMP_FILTER_ALL);
- 
- 	if (!vport->tx_tstamp_caps ||
- 	    vport->adapter->ptp->tx_tstamp_access == IDPF_PTP_NONE)
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index 93f2d4c380ef..62a9c406a269 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -2342,7 +2342,8 @@ static int idpf_hwtstamp_set(struct net_device *netdev,
- 		return -EPERM;
- 	}
- 
--	if (!idpf_ptp_is_vport_tx_tstamp_ena(vport)) {
-+	if (!idpf_ptp_is_vport_tx_tstamp_ena(vport) &&
-+	    !idpf_ptp_is_vport_rx_tstamp_ena(vport)) {
- 		idpf_vport_ctrl_unlock(netdev);
- 		return -EOPNOTSUPP;
- 	}
-@@ -2367,7 +2368,8 @@ static int idpf_hwtstamp_get(struct net_device *netdev,
- 		return -EPERM;
- 	}
- 
--	if (!idpf_ptp_is_vport_tx_tstamp_ena(vport)) {
-+	if (!idpf_ptp_is_vport_tx_tstamp_ena(vport) &&
-+	    !idpf_ptp_is_vport_rx_tstamp_ena(vport)) {
- 		idpf_vport_ctrl_unlock(netdev);
+diff --git a/include/net/netdev_lock.h b/include/net/netdev_lock.h
+index 2a753813f849..c345afecd4c5 100644
+--- a/include/net/netdev_lock.h
++++ b/include/net/netdev_lock.h
+@@ -99,16 +99,15 @@ static inline void netdev_unlock_ops_compat(struct net_device *dev)
+ static inline int netdev_lock_cmp_fn(const struct lockdep_map *a,
+ 				     const struct lockdep_map *b)
+ {
+-	/* Only lower devices currently grab the instance lock, so no
+-	 * real ordering issues can occur. In the near future, only
+-	 * hardware devices will grab instance lock which also does not
+-	 * involve any ordering. Suppress lockdep ordering warnings
+-	 * until (if) we start grabbing instance lock on pure SW
+-	 * devices (bond/team/veth/etc).
+-	 */
+ 	if (a == b)
  		return 0;
- 	}
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_ptp.c b/drivers/net/ethernet/intel/idpf/idpf_ptp.c
-index bedf61ea3b96..4f8725c85332 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_ptp.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_ptp.c
-@@ -198,12 +198,41 @@ static int idpf_ptp_gettimex64(struct ptp_clock_info *info,
- 	return 0;
+-	return -1;
++
++	/* Allow locking multiple devices only under rtnl_lock,
++	 * the exact order doesn't matter.
++	 * Note that upper devices don't lock their ops, so nesting
++	 * mostly happens during batched device removal for now.
++	 */
++	return lockdep_rtnl_is_held() ? -1 : 1;
  }
  
-+/**
-+ * idpf_ptp_update_phctime_rxq_grp - Update the cached PHC time for a given Rx
-+ *				     queue group.
-+ * @grp: receive queue group in which Rx timestamp is enabled
-+ * @split: Indicates whether the queue model is split or single queue
-+ * @systime: Cached system time
-+ */
-+static void
-+idpf_ptp_update_phctime_rxq_grp(const struct idpf_rxq_group *grp, bool split,
-+				u64 systime)
-+{
-+	struct idpf_rx_queue *rxq;
-+	u16 i;
-+
-+	if (!split) {
-+		for (i = 0; i < grp->singleq.num_rxq; i++) {
-+			rxq = grp->singleq.rxqs[i];
-+			if (rxq)
-+				WRITE_ONCE(rxq->cached_phc_time, systime);
-+		}
-+	} else {
-+		for (i = 0; i < grp->splitq.num_rxq_sets; i++) {
-+			rxq = &grp->splitq.rxq_sets[i]->rxq;
-+			if (rxq)
-+				WRITE_ONCE(rxq->cached_phc_time, systime);
-+		}
-+	}
-+}
-+
- /**
-  * idpf_ptp_update_cached_phctime - Update the cached PHC time values
-  * @adapter: Driver specific private structure
-  *
-  * This function updates the system time values which are cached in the adapter
-- * structure.
-+ * structure and the Rx queues.
-  *
-  * This function must be called periodically to ensure that the cached value
-  * is never more than 2 seconds old.
-@@ -226,6 +255,21 @@ static int idpf_ptp_update_cached_phctime(struct idpf_adapter *adapter)
- 	WRITE_ONCE(adapter->ptp->cached_phc_time, systime);
- 	WRITE_ONCE(adapter->ptp->cached_phc_jiffies, jiffies);
- 
-+	idpf_for_each_vport(adapter, vport) {
-+		bool split;
-+
-+		if (!vport || !vport->rxq_grps)
-+			continue;
-+
-+		split = idpf_is_queue_model_split(vport->rxq_model);
-+
-+		for (u16 i = 0; i < vport->num_rxq_grp; i++) {
-+			struct idpf_rxq_group *grp = &vport->rxq_grps[i];
-+
-+			idpf_ptp_update_phctime_rxq_grp(grp, split, systime);
-+		}
-+	}
-+
- 	return 0;
- }
- 
-@@ -497,6 +541,48 @@ int idpf_ptp_request_ts(struct idpf_tx_queue *tx_q, struct sk_buff *skb,
- 	return 0;
- }
- 
-+/**
-+ * idpf_ptp_set_rx_tstamp - Enable or disable Rx timestamping
-+ * @vport: Virtual port structure
-+ * @rx_filter: Receive timestamp filter
-+ */
-+static void idpf_ptp_set_rx_tstamp(struct idpf_vport *vport, int rx_filter)
-+{
-+	bool enable = true, splitq;
-+
-+	splitq = idpf_is_queue_model_split(vport->rxq_model);
-+
-+	if (rx_filter == HWTSTAMP_FILTER_NONE) {
-+		enable = false;
-+		vport->tstamp_config.rx_filter = HWTSTAMP_FILTER_NONE;
-+	} else {
-+		vport->tstamp_config.rx_filter = HWTSTAMP_FILTER_ALL;
-+	}
-+
-+	for (u16 i = 0; i < vport->num_rxq_grp; i++) {
-+		struct idpf_rxq_group *grp = &vport->rxq_grps[i];
-+		struct idpf_rx_queue *rx_queue;
-+		u16 j, num_rxq;
-+
-+		if (splitq)
-+			num_rxq = grp->splitq.num_rxq_sets;
-+		else
-+			num_rxq = grp->singleq.num_rxq;
-+
-+		for (j = 0; j < num_rxq; j++) {
-+			if (splitq)
-+				rx_queue = &grp->splitq.rxq_sets[j]->rxq;
-+			else
-+				rx_queue = grp->singleq.rxqs[j];
-+
-+			if (enable)
-+				idpf_queue_set(PTP, rx_queue);
-+			else
-+				idpf_queue_clear(PTP, rx_queue);
-+		}
-+	}
-+}
-+
- /**
-  * idpf_ptp_set_timestamp_mode - Setup driver for requested timestamp mode
-  * @vport: Virtual port structure
-@@ -519,6 +605,7 @@ int idpf_ptp_set_timestamp_mode(struct idpf_vport *vport,
- 	}
- 
- 	vport->tstamp_config.tx_type = config->tx_type;
-+	idpf_ptp_set_rx_tstamp(vport, config->rx_filter);
- 	*config = vport->tstamp_config;
- 
- 	return 0;
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_ptp.h b/drivers/net/ethernet/intel/idpf/idpf_ptp.h
-index e0e3ab698ee6..a876749d6116 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_ptp.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf_ptp.h
-@@ -235,6 +235,27 @@ static inline bool idpf_ptp_is_vport_tx_tstamp_ena(struct idpf_vport *vport)
- 		return true;
- }
- 
-+/**
-+ * idpf_ptp_is_vport_rx_tstamp_ena - Verify the Rx timestamping enablement for
-+ *				     a given vport.
-+ * @vport: Virtual port structure
-+ *
-+ * Rx timestamp feature is enabled if the PTP clock for the adapter is created
-+ * and it is possible to read the value of the device clock. The second
-+ * assumption comes from the need to extend the Rx timestamp value to 64 bit
-+ * based on the current device clock time.
-+ *
-+ * Return: true if the Rx timestamping is enabled, false otherwise.
-+ */
-+static inline bool idpf_ptp_is_vport_rx_tstamp_ena(struct idpf_vport *vport)
-+{
-+	if (!vport->adapter->ptp ||
-+	    vport->adapter->ptp->get_dev_clk_time_access == IDPF_PTP_NONE)
-+		return false;
-+	else
-+		return true;
-+}
-+
- #if IS_ENABLED(CONFIG_PTP_1588_CLOCK)
- int idpf_ptp_init(struct idpf_adapter *adapter);
- void idpf_ptp_release(struct idpf_adapter *adapter);
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index 042b190c39b3..127560bebded 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -3170,6 +3170,33 @@ static int idpf_rx_rsc(struct idpf_rx_queue *rxq, struct sk_buff *skb,
- 	return 0;
- }
- 
-+/**
-+ * idpf_rx_hwtstamp - check for an RX timestamp and pass up the stack
-+ * @rxq: pointer to the rx queue that receives the timestamp
-+ * @rx_desc: pointer to rx descriptor containing timestamp
-+ * @skb: skb to put timestamp in
-+ */
-+static void
-+idpf_rx_hwtstamp(const struct idpf_rx_queue *rxq,
-+		 const struct virtchnl2_rx_flex_desc_adv_nic_3 *rx_desc,
-+		 struct sk_buff *skb)
-+{
-+	u64 cached_time, ts_ns;
-+	u32 ts_high;
-+
-+	if (!(rx_desc->ts_low & VIRTCHNL2_RX_FLEX_TSTAMP_VALID))
-+		return;
-+
-+	cached_time = READ_ONCE(rxq->cached_phc_time);
-+
-+	ts_high = le32_to_cpu(rx_desc->ts_high);
-+	ts_ns = idpf_ptp_tstamp_extend_32b_to_64b(cached_time, ts_high);
-+
-+	*skb_hwtstamps(skb) = (struct skb_shared_hwtstamps) {
-+		.hwtstamp = ns_to_ktime(ts_ns),
-+	};
-+}
-+
- /**
-  * idpf_rx_process_skb_fields - Populate skb header fields from Rx descriptor
-  * @rxq: Rx descriptor ring packet is being transacted on
-@@ -3195,6 +3222,9 @@ idpf_rx_process_skb_fields(struct idpf_rx_queue *rxq, struct sk_buff *skb,
- 	/* process RSS/hash */
- 	idpf_rx_hash(rxq, skb, rx_desc, decoded);
- 
-+	if (idpf_queue_has(PTP, rxq))
-+		idpf_rx_hwtstamp(rxq, rx_desc, skb);
-+
- 	skb->protocol = eth_type_trans(skb, rxq->netdev);
- 	skb_record_rx_queue(skb, rxq->idx);
- 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-index 9b7aa72e1f32..c779fe71df99 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-@@ -290,6 +290,8 @@ struct idpf_ptype_state {
-  * @__IDPF_Q_POLL_MODE: Enable poll mode
-  * @__IDPF_Q_CRC_EN: enable CRC offload in singleq mode
-  * @__IDPF_Q_HSPLIT_EN: enable header split on Rx (splitq)
-+ * @__IDPF_Q_PTP: indicates whether the Rx timestamping is enabled for the
-+ *		  queue
-  * @__IDPF_Q_FLAGS_NBITS: Must be last
-  */
- enum idpf_queue_flags_t {
-@@ -300,6 +302,7 @@ enum idpf_queue_flags_t {
- 	__IDPF_Q_POLL_MODE,
- 	__IDPF_Q_CRC_EN,
- 	__IDPF_Q_HSPLIT_EN,
-+	__IDPF_Q_PTP,
- 
- 	__IDPF_Q_FLAGS_NBITS,
- };
-@@ -496,6 +499,7 @@ struct idpf_txq_stash {
-  * @next_to_alloc: RX buffer to allocate at
-  * @skb: Pointer to the skb
-  * @truesize: data buffer truesize in singleq
-+ * @cached_phc_time: Cached PHC time for the Rx queue
-  * @stats_sync: See struct u64_stats_sync
-  * @q_stats: See union idpf_rx_queue_stats
-  * @q_id: Queue id
-@@ -543,6 +547,7 @@ struct idpf_rx_queue {
- 
- 	struct sk_buff *skb;
- 	u32 truesize;
-+	u64 cached_phc_time;
- 
- 	struct u64_stats_sync stats_sync;
- 	struct idpf_rx_queue_stats q_stats;
-@@ -562,7 +567,7 @@ struct idpf_rx_queue {
- 	__cacheline_group_end_aligned(cold);
- };
- libeth_cacheline_set_assert(struct idpf_rx_queue, 64,
--			    80 + sizeof(struct u64_stats_sync),
-+			    88 + sizeof(struct u64_stats_sync),
- 			    32);
- 
- /**
--- 
-2.47.1
-
+ #define netdev_lockdep_set_classes(dev)				\
 
