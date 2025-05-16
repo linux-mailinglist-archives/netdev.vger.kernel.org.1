@@ -1,156 +1,179 @@
-Return-Path: <netdev+bounces-190913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABCC0AB93CB
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 03:51:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E31E0AB93D6
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 03:57:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 477CE4A3E34
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 01:51:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD6C39E1743
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 01:56:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39E15220F2C;
-	Fri, 16 May 2025 01:51:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FF3B2253B7;
+	Fri, 16 May 2025 01:56:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="oBQs0h17"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="HyB3yr7j";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="U0JllwPP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+Received: from fhigh-b3-smtp.messagingengine.com (fhigh-b3-smtp.messagingengine.com [202.12.124.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98F6323AD
-	for <netdev@vger.kernel.org>; Fri, 16 May 2025 01:51:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D3223AD;
+	Fri, 16 May 2025 01:56:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747360289; cv=none; b=VzcVKnBj9+xKqRA6tROSpXW+VMksbTL79x/i3QkBULEBKt9s/Ms2wfS9hp7iHQCOuP/cDAWsJUACidqXhN8wYtUjmtJmqaTBMH4MgTljQKUXxKkYFeN2E9S6xY004b0WnZjiGtUQ0yjWbhM12kmZZLaf54GiHQQMoPg/9vgD7SU=
+	t=1747360619; cv=none; b=uMwqCQev/qfX6y8mPuUha0M4xGXtp85RkefsiV6uaEuCDaWEhqZGdtXS7gM1kjp7933x3l8Y62pnHfkiRKCnkpDWENS3tqwkgxxM+ssqcGs3/Zw2pSTFPLSdXXxwnFiEzzUZ9qvLCphReoh8VS+qLXuSwitW6QZRU//ThvcRNUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747360289; c=relaxed/simple;
-	bh=3Ano1EREaReOL8fQotMGvV9no1FgqaH63YAxtkmDwEg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Z6s2RvJHlaSA9N4m/DsT+e/7DIA1EV00qyI9CSCsDDZlWVEmEbfP9Wc50Y59r2Y0ujBPAwbT8FPsg5LyYvp4q9ZSR2lj81OycW/P+IxMGgUjT574IaRjcqAlUUrjfAOwsmrTx54vrfkh+OG9g3QhYrkj7oTMzcMwG6a/w+EYdIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=oBQs0h17; arc=none smtp.client-ip=99.78.197.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1747360288; x=1778896288;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=lI70L4Ogh0UdMi47Bmoiyc9kRuhuL+253tNouocIUw0=;
-  b=oBQs0h17yzjShPXBnIsRVolXUnxD2noI1NcXaFmnEbk2SRNODRCiPqf7
-   7bZTXixUGvgNWgZTr+4bigN0xwKfyDDJKHHmZ7BSYDVCAsM9xdHLSnRMO
-   4tfhxuk8QqBJO4onQMyU8r4SyO8jHcDdf4xMlN5OqX47sV1y5rthn409L
-   3IkOP/ZS7fGnayi/19Gr2op9sz4BYqLExhA/HcViU5hiDi3ZZF6fJg3BA
-   dErLL3Y8V5SvCLpTQJAl8qtTf9fz5DrSZ6or+xnur00SQ4K/FDMHfH5YL
-   23LQxPUErRVVkNEFCg9zlxj2zaB6b6aoDxySgs29WiAB3oUzyJc+12jh+
-   A==;
-X-IronPort-AV: E=Sophos;i="6.15,292,1739836800"; 
-   d="scan'208";a="50469526"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2025 01:51:26 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:25533]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.26.241:2525] with esmtp (Farcaster)
- id ab75bb16-f06c-4ba8-90b2-76886166cb01; Fri, 16 May 2025 01:51:25 +0000 (UTC)
-X-Farcaster-Flow-ID: ab75bb16-f06c-4ba8-90b2-76886166cb01
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 16 May 2025 01:51:24 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.187.170.35) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 16 May 2025 01:51:22 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuba@kernel.org>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<horms@kernel.org>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <sdf@fomichev.me>
-Subject: Re: [PATCH net-next] net: let lockdep compare instance locks
-Date: Thu, 15 May 2025 18:49:07 -0700
-Message-ID: <20250516015114.40011-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250516012459.1385997-1-kuba@kernel.org>
-References: <20250516012459.1385997-1-kuba@kernel.org>
+	s=arc-20240116; t=1747360619; c=relaxed/simple;
+	bh=lg2RswOoCVT4JrW3TwQs/AOKgg/d8/NK9CoRbhd7LRI=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=Dk3swGQhwkTV/xn8y/Eh/3QK/ds4rUoKZ9XNnxdHD7hYNfHtDYhhC8nLRx0UsO0CjgPmi5pIh7N1mbEx4tMiLvs6l+2ls8mBuzXBAwjL0e1zSoHKlhhuOieteXVx32crjIduQwGdKQLN0tTl3g7NWcMH3ICxoJzM3Q+tmtCnTwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=HyB3yr7j; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=U0JllwPP; arc=none smtp.client-ip=202.12.124.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
+Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 243F0254011B;
+	Thu, 15 May 2025 21:56:55 -0400 (EDT)
+Received: from phl-imap-18 ([10.202.2.89])
+  by phl-compute-02.internal (MEProxy); Thu, 15 May 2025 21:56:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1747360614;
+	 x=1747447014; bh=jorEOfVhRuwZqY7DZl1lH+R2d25d21QYNH3JcMu4gfw=; b=
+	HyB3yr7jxSvggdH3/vXZ2f89Y7OpJrA9xeRRbR87IWa8KKbhDw6a9QK0OclaVvmP
+	fv879vYMXAKehKCc3aPR89aruoQ15G5NogwDSvxVD5dWOHD1xyqG6kRFutqzwDDo
+	ITfmSX8DM7Dg+r9NYb8mx7m1E2Bcj3ASlLdeh5arf4ldqX/+/u3JO2LyNtmBfR+b
+	+0aD9Wsb/JL4pQp/4Qs/EeInSq/qNRIa8RYLdWh+JX667NCAKYu1iUSO7D1C+z2m
+	5IRUZSh8NmmZjQ2we4c2pcc06s4ApTLQ1144gaO1ZjQKgOjhFZYuYw8fjyUnob+Z
+	Z4cfUEMWKqI8VJSTSyBKkA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1747360614; x=
+	1747447014; bh=jorEOfVhRuwZqY7DZl1lH+R2d25d21QYNH3JcMu4gfw=; b=U
+	0JllwPPAhlmQMj4mHYhMFmIxvYqBPeX76bZ94SjfBRdJfIfpLSD+CfXtE4fsM/OH
+	NhgB9nEKdsV9/6bnriormhwryFvsn/6U77uN9wal61WX2VbbkH3/pxW+ajCYvEEZ
+	zhe691xwS2kALSNRUS6PBhewhfaIc5EN47a5UWHzSqkk/hVxwLEVTdCWsAwbh5zw
+	uUUIfw+SlWgGjiClAe5eS8j5/5BPihe9SBymCJLC/c/jnKyd6xCw8brajfd6hBVW
+	G0uJXrCQ8I5+t6p0QQ2Jjl+Y0nYp3U0cVQ/LDC8fkVl1jqaGhVjNqOwPX+n3tyVU
+	ua5B3fCi4UbFGj44bc5Dg==
+X-ME-Sender: <xms:ZpsmaGBmP0qH6pBF1-7ua7RnEw8enrdlchNxu604BwcJZVPB0Ugmsg>
+    <xme:ZpsmaAjzbns8BzoV5xfnEvWo0T1lgryF5cTPVhgbPeB0i6AY6Nzh8Dwow8nxnaJvu
+    usVZWtPES108h7ZjQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdefuddugeekucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnegfrhhlucfvnfffucdlfeehmdenucfjughrpefoggffhffv
+    vefkjghfufgtgfesthhqredtredtjeenucfhrhhomhepfdffrghnihgvlhcuighufdcuoe
+    gugihusegugihuuhhurdighiiiqeenucggtffrrghtthgvrhhnpefgleeitefgvefffedu
+    fefhffdtieetgeetgeegheeufeeufeekgfefueffvefhffenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegugihusegugihuuhhurdighiiipdhn
+    sggprhgtphhtthhopeduvddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepuggrvh
+    gvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopeifihhllhgvmhguvggsrhhu
+    ihhjnhdrkhgvrhhnvghlsehgmhgrihhlrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivg
+    htsehgohhoghhlvgdrtghomhdprhgtphhtthhopehjrggtohgsrdgvrdhkvghllhgvrhes
+    ihhnthgvlhdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtg
+    hpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepjhgrshhofigrnhhg
+    sehrvgguhhgrthdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtoh
+    hmpdhrtghpthhtohepsghpfhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:ZpsmaJkCVy_11Ajx9LuGyPyerWRlWJpvLckODbwrVdgLd0rZySZ7tA>
+    <xmx:ZpsmaEz9UKzw_rGHOsRZLQMSSK3nUKVSQQ-F908mCr141b7JFLKexA>
+    <xmx:ZpsmaLTlYchxHheIoaaDYGGRQKtGPCc5sNODgoo07DXknhL0nil6ug>
+    <xmx:ZpsmaPYh5aDICpu5v0vdb67bM3PX7VefJqRTrKvQcyOTkY5MiUL07A>
+    <xmx:ZpsmaH6Y8a49c2zq46SgonXYSE8L7qRXid5G4DiLRaKWKcWivzHCHYrV>
+Feedback-ID: i6a694271:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 3CDDE15C0068; Thu, 15 May 2025 21:56:54 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D040UWB002.ant.amazon.com (10.13.138.89) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+X-ThreadId: T995aa454cfce42d7
+Date: Thu, 15 May 2025 18:56:34 -0700
+From: "Daniel Xu" <dxu@dxuuu.xyz>
+To: "Willem de Bruijn" <willemdebruijn.kernel@gmail.com>,
+ "Alexander Shalimov" <alex-shalimov@yandex-team.ru>
+Cc: andrew@lunn.ch, "David Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, jacob.e.keller@intel.com,
+ jasowang@redhat.com, "Jakub Kicinski" <kuba@kernel.org>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ "Paolo Abeni" <pabeni@redhat.com>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>
+Message-Id: <0bcc08e4-9f22-431c-97f3-c7d5784d2652@app.fastmail.com>
+In-Reply-To: <6825f65ae82b5_24bddc29422@willemb.c.googlers.com.notmuch>
+References: <681a63e3c1a6c_18e44b2949d@willemb.c.googlers.com.notmuch>
+ <20250514233931.56961-1-alex-shalimov@yandex-team.ru>
+ <6825f65ae82b5_24bddc29422@willemb.c.googlers.com.notmuch>
+Subject: Re: [PATCH] net/tun: expose queue utilization stats via ethtool
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Jakub Kicinski <kuba@kernel.org>
-Date: Thu, 15 May 2025 18:24:59 -0700
-> AFAIU always returning -1 from lockdep's compare function
-> basically disables checking of dependencies between given
-> locks. Try to be a little more precise about what guarantees
-> that instance locks won't deadlock.
-> 
-> Right now we only nest them under protection of rtnl_lock.
-> Mostly in unregister_netdevice_many() and dev_close_many().
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  include/net/netdev_lock.h | 29 +++++++++++++++++++++--------
->  1 file changed, 21 insertions(+), 8 deletions(-)
-> 
-> diff --git a/include/net/netdev_lock.h b/include/net/netdev_lock.h
-> index 2a753813f849..75a2da23100d 100644
-> --- a/include/net/netdev_lock.h
-> +++ b/include/net/netdev_lock.h
-> @@ -99,16 +99,29 @@ static inline void netdev_unlock_ops_compat(struct net_device *dev)
->  static inline int netdev_lock_cmp_fn(const struct lockdep_map *a,
->  				     const struct lockdep_map *b)
->  {
-> -	/* Only lower devices currently grab the instance lock, so no
-> -	 * real ordering issues can occur. In the near future, only
-> -	 * hardware devices will grab instance lock which also does not
-> -	 * involve any ordering. Suppress lockdep ordering warnings
-> -	 * until (if) we start grabbing instance lock on pure SW
-> -	 * devices (bond/team/veth/etc).
-> -	 */
-> +#ifdef CONFIG_DEBUG_NET_SMALL_RTNL
-> +	const struct net_device *dev_a, *dev_b;
-> +
-> +	dev_a = container_of(a, struct net_device, lock.dep_map);
-> +	dev_b = container_of(b, struct net_device, lock.dep_map);
-> +#endif
-> +
->  	if (a == b)
->  		return 0;
-> -	return -1;
-> +
-> +	/* Locking multiple devices usually happens under rtnl_lock */
-> +	if (lockdep_rtnl_is_held())
-> +		return -1;
-> +
-> +#ifdef CONFIG_DEBUG_NET_SMALL_RTNL
-> +	/* It's okay to use per-netns rtnl_lock if devices share netns */
-> +	if (net_eq(dev_net(dev_a), dev_net(dev_b)) &&
-> +	    lockdep_rtnl_net_is_held(dev_net(dev_a)))
+On Thu, May 15, 2025, at 7:12 AM, Willem de Bruijn wrote:
+> Alexander Shalimov wrote:
+>> 06.05.2025, 22:32, "Willem de Bruijn" <willemdebruijn.kernel@gmail.co=
+m>:
+>> > Perhaps bpftrace with a kfunc at a suitable function entry point to
+>> > get access to these ring structures.
+>>=20
+>> Thank you for your responses!
+>>=20
+>> Initially, we implemented such monitoring using bpftrace but we were
+>> not satisfied with the need to double-check the structure definitions
+>> in tun.c for each new kernel version.
+>>=20
+>> We attached kprobe to the "tun_net_xmit()" function. This function
+>> gets a "struct net_device" as an argument, which is then explicitly
+>> cast to a tun_struct - "struct tun_struct *tun =3D netdev_priv(dev)".
+>> However, performing such a cast within bpftrace is difficult because
+>> tun_struct is defined in tun.c - meaning the structure definition
+>> cannot be included directly (not a header file). As a result, we were
+>> forced to add fake "struct tun_struct" and "struct tun_file"
+>> definitions, whose maintenance across kernel versions became
+>> cumbersome (see below). The same problems exists even with kfunc and
+>> btf - we are not able to cast properly netdev to tun_struct.
+>>=20
+>> That=E2=80=99s why we decided to add this functionality directly to t=
+he kernel.
+>
+> Let's solve this in bpftrace instead. That's no reason to rever to
+> hardcoded kernel APIs.
+>
+> It quite possibly already is. I'm no bpftrace expert. Cc:ing bpf@
 
-Do we need
+Yeah, should be possible. You haven't needed to include header
+files to access type information available in BTF for a while now.
+This seems to work for me - mind giving this a try?
 
-  !from_cleanup_net()
+```
+fentry:tun:tun_net_xmit {
+    $tun =3D (struct tun_struct *)args->dev->priv;
+    print($tun->numqueues);  // or whatever else you want
+}
+```
 
-before lockdep_rtnl_net_is_held() ?
+fentry probes are better in general than kprobes if all you're doing
+is attaching to the entry of a function.
 
-__rtnl_net_lock() is not held in ops_exit_rtnl_list() and
-default_device_exit_batch() when calling unregister_netdevice_many().
+You could do the same with kprobes like this if you really want, though:
 
+```
+kprobe:tun:tun_net_xmit {
+    $dev =3D (struct net_device *)arg1;
+    $tun =3D (struct tun_struct *)$dev->priv;
+    print($tun->numqueues);  // or whatever else you want
+}
+```
 
-> +		return -1;
-> +#endif
-> +
-> +	/* Otherwise taking two instance locks is not allowed */
-> +	return 1;
->  }
->  
->  #define netdev_lockdep_set_classes(dev)				\
-> -- 
-> 2.49.0
-> 
+Although it looks like there's a bug when you omit the module name
+where bpftrace doesn't find the struct definition. I'll look into that.
+
+Thanks,
+Daniel
 
