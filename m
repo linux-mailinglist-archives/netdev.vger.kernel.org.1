@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-190982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33600AB9928
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 11:45:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C429EAB992A
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 11:45:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00CD4168E62
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 09:44:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2BEA51BC69A1
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 09:45:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A45A23372C;
-	Fri, 16 May 2025 09:44:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECE1023182C;
+	Fri, 16 May 2025 09:44:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PgJSC7de"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ntTk9J6I"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50B6F231846;
-	Fri, 16 May 2025 09:44:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C468C230D0E;
+	Fri, 16 May 2025 09:44:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747388660; cv=none; b=i+q5mGc5wqWF5AB30KmQKhQ+2fX3hwyJDY9dyjJvE5rAQK8eONvl3Pt6jJJ2H4btEM75fW6eKD/IbN5pxRMomQn8NtYR9R8vQRG/8tLatiBXPG4vSyefXx41QQbMq58T5waCjihJRK9j076n/ekI3NtrEVc5LwoGN+UQ3sFy+Eo=
+	t=1747388676; cv=none; b=oHC/1rAkgQJmjJDRR4S5E6kEoe9wMcDzL0XuhTzg/l82hw5olTiRjBaqtfgLkSi6ixSDgRWQWpduJRsyTcnY3rxH5nyvRRw6QLdYfXxQglfLfNAdoMWFfWSfSnm8Lgh9Biik0tL7nmFGYc/ppj2lwd/SPH0b/jtSf9uru4DYLAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747388660; c=relaxed/simple;
-	bh=ViLQOvXZ7YdUVRBAco/N6BvNCqjN1vNbQcT7t0hpYQU=;
+	s=arc-20240116; t=1747388676; c=relaxed/simple;
+	bh=3JKVCHuwfCH0ovS0CE1nP1MwRo0qB1iO+++BwqsWJfE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dhCQSTrwsJvgz1KS7grFUjq2ydQMuk/PdCdn0GvL+0MfnD6EpyeNULpKo7kZlH8Ieqp7IIcop5lEfWD8nQVcSF36JGzuReD/76vMzdyJNJ5bvO4cnSELUzMEpmhaNkjf/NtXgR9Snu4bbNhhRrN68/RGcRj/NIhRo/EXFmMXzz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PgJSC7de; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02905C4CEEB;
-	Fri, 16 May 2025 09:44:16 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=P/G0zdA7PaW+cuxlSntunOA9VU00dLlg8uvGDkbsQ3AWoRweNEGVQ79xEDlGmQIRNepmRIjRdNnzyWOGVijyGtSJ7sEaSw1e2cCEjv5xeJE7fwTE0wKZgbYCtFw70+QHdF84qv/HxsxjAi0nY3XGk5H0CjboOixdQFWaRYPwTsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ntTk9J6I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92966C4CEE4;
+	Fri, 16 May 2025 09:44:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747388659;
-	bh=ViLQOvXZ7YdUVRBAco/N6BvNCqjN1vNbQcT7t0hpYQU=;
+	s=k20201202; t=1747388676;
+	bh=3JKVCHuwfCH0ovS0CE1nP1MwRo0qB1iO+++BwqsWJfE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PgJSC7dep6wWZebWv0Eu3olDtkMJKJTsvZefEr1t/r+GzZ59D6Pe/eScKYZcxhBle
-	 BSKeosCKLu9SUspwMjSko6M8N1sY6UzPGvxvn0/GZMkXnnbwSt388NjMoMVsWTfsje
-	 6EfFMVFewQOu6UAgRZsOSPN+DKb5DZOrlpz18bcKCyB4Z2tgXbE1bpF2g8g1MWyali
-	 PGmuxzSELPV1cANbjgTS70AyMIGKh/rGEUGbKTtEtMHjk7z7xLsnThsU9m15XJkY8w
-	 1EN0zFJTeQGTsfS5b6vQ6exg1Ukkl9k0i9bnrQQe2SIvyiTXM/ZTFAqiIft0i7VeI0
-	 qE8pPtDqGsMKw==
-Date: Fri, 16 May 2025 10:44:14 +0100
+	b=ntTk9J6IQzajFR0GB8wRqAt+dyAMqoDGaVGO8XAZGTgOyI51WjqcDpn5H4eWk013Y
+	 WDoqp1hZbjt10rJ+MXjdGycIOGS9eeIaPG+mJteAcWR7ucX+2JlFAqbtAEwERPER4q
+	 yfIjyokm20ATf0zF8gycdC6lQQbC6TzCEYMSqeEk82Tq36BsBQ38NV7v/qW7RJ0LQJ
+	 drKMgk6nG4frqj9TTaKBTJ4Q6qyLiTHeYyACRhilIOzTI8W9QPW7/ogcsVO3/YZ602
+	 0HZDWkyy3ihVy1v4FZOywJ5JHWHdt5lv7oJTnwSh3Dch9zwEf0hAaS/JSXqkmLpDa8
+	 DYWNDpt/CWEpA==
+Date: Fri, 16 May 2025 10:44:31 +0100
 From: Simon Horman <horms@kernel.org>
 To: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
 Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
@@ -55,10 +55,11 @@ Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
 	linux-kernel@vger.kernel.org,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
 	Chwee-Lin Choong <chwee.lin.choong@intel.com>
-Subject: Re: [PATCH iwl-next v2 2/8] igc: add DCTL prefix to related macros
-Message-ID: <20250516094414.GJ1898636@horms.kernel.org>
+Subject: Re: [PATCH iwl-next v2 3/8] igc: refactor TXDCTL macros to use
+ FIELD_PREP and GEN_MASK
+Message-ID: <20250516094431.GK1898636@horms.kernel.org>
 References: <20250514042945.2685273-1-faizal.abdul.rahim@linux.intel.com>
- <20250514042945.2685273-3-faizal.abdul.rahim@linux.intel.com>
+ <20250514042945.2685273-4-faizal.abdul.rahim@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,12 +68,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250514042945.2685273-3-faizal.abdul.rahim@linux.intel.com>
+In-Reply-To: <20250514042945.2685273-4-faizal.abdul.rahim@linux.intel.com>
 
-On Wed, May 14, 2025 at 12:29:39AM -0400, Faizal Rahim wrote:
-> Rename macros to use the DCTL prefix for consistency with existing
-> macros that reference the same register. This prepares for an upcoming
-> patch that adds new fields to TXDCTL.
+On Wed, May 14, 2025 at 12:29:40AM -0400, Faizal Rahim wrote:
+> Refactor TXDCTL macro handling to use FIELD_PREP and GENMASK macros.
+> This prepares the code for adding a new TXDCTL priority field in an
+> upcoming patch.
+> 
+> Verified that the macro values remain unchanged before and after
+> refactoring.
 > 
 > Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
 
