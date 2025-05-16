@@ -1,106 +1,236 @@
-Return-Path: <netdev+bounces-191018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0B1CAB9B38
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 13:39:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13350AB99C3
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 12:09:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30FACA02651
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 11:39:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C9354E4FFA
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 10:09:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2F71239085;
-	Fri, 16 May 2025 11:39:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1587E232395;
+	Fri, 16 May 2025 10:09:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O9bLP6Sw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LVgSnqhT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23D5123816B
-	for <netdev@vger.kernel.org>; Fri, 16 May 2025 11:39:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D72BF381C4;
+	Fri, 16 May 2025 10:09:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747395554; cv=none; b=LRK9HTdu3rTW5BIOMIUbVpQYSE4F+bJ3FiMBusk13OslDmGvO3ENfy66j/+kI+fRelJiAcwDOPffdSEqUmV/ScyZAbiAixi7XVjlWdANxDc2hY1beBY3CiuUbO9gwIntX2Oz2WuoNiWcBnN+RZ3ZJlxZL5DLbKdYoUqDnAX7CBI=
+	t=1747390169; cv=none; b=FXEnDMC2293FPCB56mx4ZJdDlXDIj6V/uhTcJS+zAYgYlbRRrYesdKKTfrpnaEYr10q7T9JsBthnQGP3us1+tCHQWbh033ek0i8NNLQnO3Syax0CxSKAepx5vQB+zKyKQNgbHC0ipP9ipZckPvJpCMrnrUNPnFyYmbEuZHEtmN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747395554; c=relaxed/simple;
-	bh=4LhXSpS+0Zl6SvQ9GrRCVxcaDvmorv677aW0u4mfVCM=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=hqhdlOEiFgAgqAZA4Q8VAY8bDs6MrHDt/2OyrVSsEc9mM/BjNIwimW4205PLE5WP7gVBHssJpIsaZmby8HAbdaMQ0suvyuwhYiWF1MipitQy4coeH4aausuUFO9Nht4Z48Zl+NxC9fl1lTK365y5e9pACIeuyitqE4ouUWFAlbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O9bLP6Sw; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-43ce71582e9so16056635e9.1
-        for <netdev@vger.kernel.org>; Fri, 16 May 2025 04:39:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747395551; x=1748000351; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4LhXSpS+0Zl6SvQ9GrRCVxcaDvmorv677aW0u4mfVCM=;
-        b=O9bLP6SwDXVeUvQnLjtyrpxh70MjODHCdJVnMp7Lz7qmJMbSFSNzgDi4MEQIeXBxS8
-         Y9a2faBKeovSCh4pvO8GJLZ7PQtiXVm0PxTBwRieQwJ/UCw3Zj7MSjwb5hbf1YnBI1Ts
-         v13JOzin7DUHjgLR6B2rl0De9OW9N26AxaVpzJNC3oWm6EkiQUhYWBjkVxV6cgTEpJAH
-         9oWxVLonqtGRuYr0Ctzyqy+2PuaIc6Jtd6cyLadlTuIqv3NwMpjXaeO865z2bxrFWxbu
-         j2s4BGRWuz0CeX3c4UFkwn7RcfR5qpB9zieEwR73qRw8v15zLAVnBefLh6s9keXwhq3s
-         8PPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747395551; x=1748000351;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4LhXSpS+0Zl6SvQ9GrRCVxcaDvmorv677aW0u4mfVCM=;
-        b=Te98t7eunM1t9snlNmk3qbbWvFA+zp3mPq/3jk54RdyJrnf/6Tq5x7abSWe20fiAFc
-         kedA/AeXOzpoVU3sQjU5riNtnMFq6fa++sF4TcMqGOu7Hz3whgzOt/tADXaGGmCI4nfs
-         CFJuTO3Mh3krnFGkJkNDUBUvNy0EGPdtTE42hPkfVBK3r/gbmFiJA7PPI2aM2k5i3Fog
-         f+ADxpAHK59hGPj5K6SZo0vev78UdvYIvTbDyUp60KoDYVGRRxU58C0URBtRf4gYHDpy
-         BlhOvF4yl4Wn1x3vVJA+8K3d0eDqifM8/2TZRUQlfQDSa6ZjpHXZYvEGw49wEpCyRpIu
-         z3Wg==
-X-Forwarded-Encrypted: i=1; AJvYcCUEgwbssZI/rp0o0IFc9FGB7HWd90H2UzpmD2EHvlw50036jodDkjIXR9PjwCHIylSp46WfOzY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVo/LIpYOX92nxFp0yphcDSJ3QvMwXGw9LJ5OvYBRlklljiDZa
-	Ncr6l3ioUm/I4bCRMvAoPE0CbHP60yKl6kRD4KSMgJagjfzf++gJZ7n8eNcbVQ==
-X-Gm-Gg: ASbGncs7WJJKKMEs4P0QK0pbbe7SzzuGK14E1MFRP7nIC3SlN3Hey7PD2RqSG3LPrL7
-	rIiYORbzssPWFCRbw4y2DLLxgQLqs7wW0uuPXMuvpJ2jgJOQtkZK4RZVtkrV6NLzbnh1FPVKLLQ
-	UgC+mYk3DXCOIwcXEJrQ2sLSWHsmIvKzzFg/GHFtVRLEDlRvJp2Dwiv/KNFidbjc09pgo30Llil
-	6cFeGZATzAWWhjba24ZoPgFt4MevtjDD7sLFHw6mhSpuwv7d1FDRdnCfrlSFfh8Cz9RL3+vsIhY
-	Tot10wkIb6YNvSUqE7O1oaQbqR5YxuGvSdMst0k7cctfZFAff0eM++rl3vbXZkhq
-X-Google-Smtp-Source: AGHT+IF1ry+666GBzsvnV+5oA7E0M515auCvX8CFAXEe+9lWx5/pJSQnmkRAiSAH5b+goAn0+pllag==
-X-Received: by 2002:a05:600c:1553:b0:43d:17f1:2640 with SMTP id 5b1f17b1804b1-442fd665728mr28765825e9.26.1747395551262;
-        Fri, 16 May 2025 04:39:11 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:fc98:7863:72c2:6bab])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442fd59702asm29970785e9.39.2025.05.16.04.39.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 May 2025 04:39:10 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
-  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
-  daniel@iogearbox.net,  nicolas.dichtel@6wind.com,
-  jacob.e.keller@intel.com
-Subject: Re: [PATCH net-next 2/9] tools: ynl-gen: factor out the annotation
- of pure nested struct
-In-Reply-To: <20250515231650.1325372-3-kuba@kernel.org> (Jakub Kicinski's
-	message of "Thu, 15 May 2025 16:16:43 -0700")
-Date: Fri, 16 May 2025 10:57:14 +0100
-Message-ID: <m27c2gop39.fsf@gmail.com>
-References: <20250515231650.1325372-1-kuba@kernel.org>
-	<20250515231650.1325372-3-kuba@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1747390169; c=relaxed/simple;
+	bh=828AqPmF+LTs7KHi7/rDDJZ/Wqefq9Hs5IZ8JnUzVcQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bG+rLfuH2nJlxnPhcWBPPGNRbTFE4TpGwff9WmYNMak0DepN0pMFJMW7Ab+0WsI5xOjmvkXgdni/8iJs2MjrI/90Boo/JCup64xKzJyaXs7imbsifsB5NCVEGL+v/7dvk3+RHqM3L7ryqXr4JO1QQoAXRxhJyf1sAYjEG0zN1bI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LVgSnqhT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEDC7C4CEE4;
+	Fri, 16 May 2025 10:09:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747390168;
+	bh=828AqPmF+LTs7KHi7/rDDJZ/Wqefq9Hs5IZ8JnUzVcQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LVgSnqhTytXU7NVwwS21fRCCbfybQbGjugR6IZwl/qg1q8etV90+WA11Chzebk4gy
+	 sXShFHan8wAIwDwoQNF3KAHWENw/NcoMHR9OTXwGr7iYj9Eq/8QH82eqQsL3fhAusw
+	 mkvWaTrdE4ESUCtio2JkR1P2Fe49YcYM/p0gjNnKex76CgX568A6rIPb5VBjoVdqTe
+	 6fWM6Whngvdr6XpbkXk0Pm7SmLk6Y6sKGYJoJMr7cGv+BTuvlJoike1JUxfUj27QTi
+	 F7mULIlTOH7+28aScxeLo179MY9SOr054LD/l5aO90dZpfVosAxUBRqbHs5+/w/g/O
+	 0rkmSo3hMXzRQ==
+Date: Fri, 16 May 2025 12:09:21 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Jann Horn <jannh@google.com>
+Cc: linux-fsdevel@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Eric Dumazet <edumazet@google.com>, 
+	Oleg Nesterov <oleg@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Daan De Meyer <daan.j.demeyer@gmail.com>, 
+	David Rheinsberg <david@readahead.eu>, Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>, 
+	Lennart Poettering <lennart@poettering.net>, Luca Boccassi <bluca@debian.org>, Mike Yuan <me@yhndnzj.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, Alexander Mikhalitsyn <alexander@mihalicyn.com>
+Subject: Re: [PATCH v7 4/9] coredump: add coredump socket
+Message-ID: <20250516-daneben-knebel-f9ec5dc8ee8c@brauner>
+References: <20250515-work-coredump-socket-v7-0-0a1329496c31@kernel.org>
+ <20250515-work-coredump-socket-v7-4-0a1329496c31@kernel.org>
+ <CAG48ez2iXeu7d8eu7L694n54qNi=_-frmBst36iuUTpq9GCFvg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAG48ez2iXeu7d8eu7L694n54qNi=_-frmBst36iuUTpq9GCFvg@mail.gmail.com>
 
-Jakub Kicinski <kuba@kernel.org> writes:
+On Thu, May 15, 2025 at 10:54:14PM +0200, Jann Horn wrote:
+> On Thu, May 15, 2025 at 12:04 AM Christian Brauner <brauner@kernel.org> wrote:
+> > diff --git a/fs/coredump.c b/fs/coredump.c
+> > index a70929c3585b..e1256ebb89c1 100644
+> > --- a/fs/coredump.c
+> > +++ b/fs/coredump.c
+> [...]
+> > @@ -393,11 +428,20 @@ static int format_corename(struct core_name *cn, struct coredump_params *cprm,
+> >          * If core_pattern does not include a %p (as is the default)
+> >          * and core_uses_pid is set, then .%pid will be appended to
+> >          * the filename. Do not do this for piped commands. */
+> > -       if (!(cn->core_type == COREDUMP_PIPE) && !pid_in_pattern && core_uses_pid) {
+> > -               err = cn_printf(cn, ".%d", task_tgid_vnr(current));
+> > -               if (err)
+> > -                       return err;
+> > +       if (!pid_in_pattern && core_uses_pid) {
+> > +               switch (cn->core_type) {
+> > +               case COREDUMP_FILE:
+> > +                       return cn_printf(cn, ".%d", task_tgid_vnr(current));
+> > +               case COREDUMP_PIPE:
+> > +                       break;
+> > +               case COREDUMP_SOCK:
+> > +                       break;
+> 
+> This branch is dead code, we can't get this far down with
+> COREDUMP_SOCK. Maybe you could remove the "break;" and fall through to
+> the default WARN_ON_ONCE() here. Or better, revert this hunk and
+> instead just change the check to check for "cn->core_type ==
+> COREDUMP_FILE" (in patch 1), since this whole block is legacy logic
+> specific to dumping into files (COREDUMP_FILE).
 
-> We're about to add some code here for sub-messages.
-> Factor out the nest-related logic to make the code readable.
-> No functional change.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Ok, folded:
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+diff --git a/fs/coredump.c b/fs/coredump.c
+index 368751d98781..45725465c299 100644
+--- a/fs/coredump.c
++++ b/fs/coredump.c
+@@ -393,11 +393,8 @@ static int format_corename(struct core_name *cn, struct coredump_params *cprm,
+         * If core_pattern does not include a %p (as is the default)
+         * and core_uses_pid is set, then .%pid will be appended to
+         * the filename. Do not do this for piped commands. */
+-       if (!(cn->core_type == COREDUMP_PIPE) && !pid_in_pattern && core_uses_pid) {
+-               err = cn_printf(cn, ".%d", task_tgid_vnr(current));
+-               if (err)
+-                       return err;
+-       }
++       if (cn->core_type == COREDUMP_FILE && !pid_in_pattern && core_uses_pid)
++               return cn_printf(cn, ".%d", task_tgid_vnr(current));
+        return 0;
+ }
+
+into the first patch.
+
+> 
+> > +               default:
+> > +                       WARN_ON_ONCE(true);
+> > +                       return -EINVAL;
+> > +               }
+> >         }
+> > +
+> >         return 0;
+> >  }
+> >
+> > @@ -801,6 +845,55 @@ void do_coredump(const kernel_siginfo_t *siginfo)
+> >                 }
+> >                 break;
+> >         }
+> > +       case COREDUMP_SOCK: {
+> > +#ifdef CONFIG_UNIX
+> > +               struct file *file __free(fput) = NULL;
+> > +               struct sockaddr_un addr = {
+> > +                       .sun_family = AF_UNIX,
+> > +               };
+> > +               ssize_t addr_len;
+> > +               struct socket *socket;
+> > +
+> > +               retval = strscpy(addr.sun_path, cn.corename, sizeof(addr.sun_path));
+> 
+> nit: strscpy() explicitly supports eliding the last argument in this
+> case, thanks to macro magic:
+> 
+>  * The size argument @... is only required when @dst is not an array, or
+>  * when the copy needs to be smaller than sizeof(@dst).
+
+Ok.
+
+> 
+> > +               if (retval < 0)
+> > +                       goto close_fail;
+> > +               addr_len = offsetof(struct sockaddr_un, sun_path) + retval + 1;
+> 
+> nit: On a 64-bit system, strscpy() returns a 64-bit value, and
+> addr_len is also 64-bit, but retval is 32-bit. Implicitly moving
+> length values back and forth between 64-bit and 32-bit is slightly
+> dodgy and might generate suboptimal code (it could force the compiler
+> to emit instructions to explicitly truncate the value if it can't
+> prove that the value fits in 32 bits). It would be nice to keep the
+> value 64-bit throughout by storing the return value in a ssize_t.
+> 
+> And actually, you don't have to compute addr_len here at all; that's
+> needed for abstract unix domain sockets, but for path-based unix
+> domain socket, you should be able to just use sizeof(struct
+> sockaddr_un) as addrlen. (This is documented in "man 7 unix".)
+
+Ok, folded:
+
+@@ -845,10 +845,10 @@ void do_coredump(const kernel_siginfo_t *siginfo)
+                ssize_t addr_len;
+                struct socket *socket;
+
+-               retval = strscpy(addr.sun_path, cn.corename);
+-               if (retval < 0)
++               addr_len = strscpy(addr.sun_path, cn.corename);
++               if (addr_len < 0)
+                        goto close_fail;
+-               addr_len = offsetof(struct sockaddr_un, sun_path) + retval + 1;
++               addr_len += offsetof(struct sockaddr_un, sun_path) + 1;
+
+> 
+> > +
+> > +               /*
+> > +                * It is possible that the userspace process which is
+> > +                * supposed to handle the coredump and is listening on
+> > +                * the AF_UNIX socket coredumps. Userspace should just
+> > +                * mark itself non dumpable.
+> > +                */
+> > +
+> > +               retval = sock_create_kern(&init_net, AF_UNIX, SOCK_STREAM, 0, &socket);
+> > +               if (retval < 0)
+> > +                       goto close_fail;
+> > +
+> > +               file = sock_alloc_file(socket, 0, NULL);
+> > +               if (IS_ERR(file)) {
+> > +                       sock_release(socket);
+> 
+> I think you missed an API gotcha here. See the sock_alloc_file() documentation:
+> 
+>  * On failure @sock is released, and an ERR pointer is returned.
+
+Thanks, fixed.
+
+> 
+> So I think basically sock_alloc_file() always consumes the socket
+> reference provided by the caller, and the sock_release() in this
+> branch is a double-free?
+
+> 
+> > +                       goto close_fail;
+> > +               }
+> [...]
+> > diff --git a/include/linux/net.h b/include/linux/net.h
+> > index 0ff950eecc6b..139c85d0f2ea 100644
+> > --- a/include/linux/net.h
+> > +++ b/include/linux/net.h
+> > @@ -81,6 +81,7 @@ enum sock_type {
+> >  #ifndef SOCK_NONBLOCK
+> >  #define SOCK_NONBLOCK  O_NONBLOCK
+> >  #endif
+> > +#define SOCK_COREDUMP  O_NOCTTY
+> 
+> Hrrrm. I looked through all the paths from which the ->connect() call
+> can come, and I think this is currently safe; but I wonder if it would
+
+Yes, I made sure that unknown bits are excluded.
 
