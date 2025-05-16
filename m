@@ -1,129 +1,174 @@
-Return-Path: <netdev+bounces-191025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70189AB9B40
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 13:40:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F2AAAB9B8E
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 13:57:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F253517B32A
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 11:40:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3DFF17074E
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 11:57:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7B802367DA;
-	Fri, 16 May 2025 11:40:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C5B723909F;
+	Fri, 16 May 2025 11:57:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EJI+vYoU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CnlGIgMI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AEA5233D91;
-	Fri, 16 May 2025 11:40:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3212376EB
+	for <netdev@vger.kernel.org>; Fri, 16 May 2025 11:57:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747395622; cv=none; b=cS/auwoLcibhOgdak1iI0JvHnuTr3cDZVeS8AGJEmdf5eY16Kj25wfvhIkUmxFhpc2kZF+tMaO+De6pZ5i0UyBHj5tQwtF+qAPRphEZNg6swWHMoMNzhxOEAA05mkW/nhP86bZPR0s5dBCBkI6B+yAzqf4aNpXz0wR5S1YurGuI=
+	t=1747396666; cv=none; b=Tmt8KEk89iCltzfeRB0mB4Bc+xCQiv17Knt9DAq4sWSdqqaSrKB/cCHvzKMS3Ofs7mndIwegY6IyqDfQJkIJo+sf8pahcjo5151v96KPRsZl4ae3l5egOiktlqYgvkuQjcgCm/vr3wHAem3l1lg/10VSp5/vRNbwfRqsxzMO8H4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747395622; c=relaxed/simple;
-	bh=0Mj+BtykqOdNUsFmfW8HuzL6Mqk7536Sro33aJLlBM8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CjhTO8B4Od1iIm68ZvApM8ZXmR12UPmOGqEJ4wNQyRrW2LLYR09kY32EsORKovE9gAX/KwMA85qXZVttewD7FWR+eH9YYi4Gq/idXQtSH8LEzpZuG9znCwekPLydhkgwtON1KtY/HK7mwEHUVp+9eGycfNGujpoD0X/czhi7Aho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EJI+vYoU; arc=none smtp.client-ip=209.85.167.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-3fb3f4bf97aso1035625b6e.2;
-        Fri, 16 May 2025 04:40:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747395620; x=1748000420; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=AxhGcnn6IqTQUmc2HYW8DH4TY3uNPkdwnZshlk/xeUY=;
-        b=EJI+vYoUz+pNMd9OmZU81t596MRisnDMMamRWUF7UeO6rUWdiqdseOoBWwFrBcBs4m
-         IUuuZq40ksFpdBpJyiJ2b6XpXB2kaW5o2/RERpvBVjcQ6cIudOYfpjDGXfgRpDIdqFzr
-         kIzuMinM0EuGMZAK2PriuDUdwDXWQIOoK4NhNwMgPf9XxPuU4LS0RMjwwpSy7uslX6Zl
-         ZZi1Z41WhBVkWfVY5NeaFZ6805veQdNq9EcYBEnoTbM61UojE5ZtaO6JpkhvT8IvIVNt
-         FfV+CsVPOmBGmZBFIHa51BaOkN3Vn/mt5LGp2GEXRwp78UzPfKSlLwf7wL8ws0ENx9fD
-         jczA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747395620; x=1748000420;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AxhGcnn6IqTQUmc2HYW8DH4TY3uNPkdwnZshlk/xeUY=;
-        b=Qs4D3Nh/pL0qQ/X+vttihnqF2nViKo3jO9ltYgTWxcHl0/FSMLal7Kit1HBdYwFhch
-         p36CRcHqpCYgQe+TWHyOueQdlmbrX7s0Y0jrQBXm1yLq7LmS6LvgKefBreadRh7vwKd/
-         Ks/QPTfVrpr6wctjHRT0wO+J6zJz5ho6s+c+CM/dj8bHW6dIMqGmjWlUi94DLfOcYiyA
-         mUVQrKsmHZrAGIt1uQbgU9FiJthGyI3DJw9/KvEsUa47ojFKow0+ifRcQVzZW3t6ZkSZ
-         wADJGBZiKazf0zlwJWP8fLAz0WKTlyvxk2R2bIyYtmP8FSzRTFVjAe7UXZrghHOwetTf
-         dNfA==
-X-Forwarded-Encrypted: i=1; AJvYcCVtXGc4UQGgYaPS19GiXg8upZXH+FjjL8STqzJkErx9/HH9o0ue2rZv6SEVLKo6eC2Z+dZjFnU/@vger.kernel.org, AJvYcCXPPPRaBHGQTHBCJYl5gGUbw5+qOwCPu3yPCRdmdTj0BQNV9S56oqKhCvlpOdxDbycHu5c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDSHBRLg+kK36/i258NzsFbMTlvbuKf3SKhEln7dit3+TroJIH
-	4CBUTiwZa3pnGyf4puwkIyMQOzKQrWfK60iN5d6EJS+m8noNTP1KLp4KG3bU5uVc7XcikizmrUe
-	LBspg9anQpvm3nZR5+hLlN2cbOOzzJmA=
-X-Gm-Gg: ASbGnctJNraBgBKsbUQJidOlnLgV40QRsX/Xg2/fZoDoztN81jYPwKQcIWejyWa87Bb
-	mUCAz3VD21y4fZLMp6YnZe+RLZdK+I5ltvq2FGy5upwgh5zwyubWSY0zOz2PSr1sDdrkPjBCozU
-	dqsw57aWLCpbDB1PyKN939Xvo5E9sr2vEF6mUdXSkdcqT22uUjeQhwLIDQJ7/UJx0=
-X-Google-Smtp-Source: AGHT+IGA6+yGsHEZB4h4688rV2RS7jYQS6csUsq5/06mGIJ8DFSpcISgYgYQEDE9K3OuPX1eYRNws+vogqTArgtBuAc=
-X-Received: by 2002:a05:6808:3195:b0:404:764:f7b6 with SMTP id
- 5614622812f47-404d865812amr2415447b6e.9.1747395620173; Fri, 16 May 2025
- 04:40:20 -0700 (PDT)
+	s=arc-20240116; t=1747396666; c=relaxed/simple;
+	bh=zas5qRvLzeVSRNH8Gf3aeHid+8WKUrrNydSDBKWaLx8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jd80yJXYhcwcS4NHUojdPahQ43+Ln+W1cP7PtNf/GsNUjttPFx5TcVC47yYWXyZXgnf2MoiuBHfGAkIRXAUBm+6fsK+RorMxh+IQnUWuvVFIG6N86VmQGZ0/4pg6lw5if+xddaKzoKYF5ExLaN858AxOZr927WllmUuVUaIAxJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CnlGIgMI; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747396666; x=1778932666;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=zas5qRvLzeVSRNH8Gf3aeHid+8WKUrrNydSDBKWaLx8=;
+  b=CnlGIgMIvKZv+IrJeev1Z0yJ06d9toUzUevqQvDYyYwz1XyzUiYK/LK5
+   6HU4KJUx0RMrQq7dWygTQJnNr1QofmhITLlrQ3fVsSSe0NYrWEAmH2Cdj
+   HRKOaSAH/3AOHAPcEzcH6EpWtlUZXfH10XbknmxzNGCkAtWtt2ZWbHA2n
+   1yQKibGqqFuUsgqgSMl7uMJQgvdA7yBYDcIJ9y8vOAKX4o/o5us93Z9Os
+   NpcqMMutV/p0RuohU4GEnMOI5JlaGjyyIcx+idE7fU8x+LsFbhX0RGVii
+   dTqQ7HQA0nndId612klhWv6tGwfyC6XL56i+GC+yV6WnMSGGUCrHFMT28
+   w==;
+X-CSE-ConnectionGUID: TabgDcVFR3OSvaDsF2c0NA==
+X-CSE-MsgGUID: wsAXeaU0TbmJLeUNsuQyYQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11434"; a="53038199"
+X-IronPort-AV: E=Sophos;i="6.15,293,1739865600"; 
+   d="scan'208";a="53038199"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2025 04:57:45 -0700
+X-CSE-ConnectionGUID: psRhwjvHQoO3hIq4z3kOiw==
+X-CSE-MsgGUID: bzsxGEAzSnO4N/caoHzEyw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,293,1739865600"; 
+   d="scan'208";a="143563541"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by fmviesa005.fm.intel.com with ESMTP; 16 May 2025 04:57:37 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uFth1-000JJX-26;
+	Fri, 16 May 2025 11:57:35 +0000
+Date: Fri, 16 May 2025 19:56:59 +0800
+From: kernel test robot <lkp@intel.com>
+To: Christian Marangi <ansuelsmth@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Andrei Botila <andrei.botila@oss.nxp.com>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>,
+	Trevor Gross <tmgross@umich.edu>, Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <benno.lossin@proton.me>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Michael Klein <michael@fossekall.de>,
+	Daniel Golle <daniel@makrotopia.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [net-next PATCH v10 7/7] rust: net::phy sync with
+ match_phy_device C changes
+Message-ID: <202505161944.2x21wbM5-lkp@intel.com>
+References: <20250515112721.19323-8-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250515231650.1325372-1-kuba@kernel.org> <20250515231650.1325372-10-kuba@kernel.org>
-In-Reply-To: <20250515231650.1325372-10-kuba@kernel.org>
-From: Donald Hunter <donald.hunter@gmail.com>
-Date: Fri, 16 May 2025 12:40:08 +0100
-X-Gm-Features: AX0GCFsG0H-iCjEs2uW7AlC3GHq30MzFGvk7B22PHzzVerBpl1NH0wzI33Cg9gw
-Message-ID: <CAD4GDZw-pL81FQmgKL9VBQ1pcHra_i-Ceje97y0ajXMoWvEuHw@mail.gmail.com>
-Subject: Re: [PATCH net-next 9/9] tools: ynl: add a sample for rt-link
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
-	daniel@iogearbox.net, nicolas.dichtel@6wind.com, jacob.e.keller@intel.com, 
-	bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250515112721.19323-8-ansuelsmth@gmail.com>
 
-On Fri, 16 May 2025 at 00:17, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> Add a fairly complete example of rt-link usage. If run without any
-> arguments it simply lists the interfaces and some of their attrs.
-> If run with an arg it tries to create and delete a netkit device.
->
->  1 # ./tools/net/ynl/samples/rt-link 1
->  2 Trying to create a Netkit interface
->  3 Testing error message for policy being bad:
->  4     Kernel error: 'Provided default xmit policy not supported' (bad attribute: .linkinfo.data(netkit).policy)
->  5   1:               lo: mtu 65536
->  6   2:           wlp0s1: mtu  1500
->  7   3:          enp0s13: mtu  1500
->  8   4:           dummy0: mtu  1500  kind dummy     altname one two
->  9   5:              nk0: mtu  1500  kind netkit    primary 0  policy forward
-> 10   6:              nk1: mtu  1500  kind netkit    primary 1  policy blackhole
-> 11 Trying to delete a Netkit interface (ifindex 6)
->
-> Sample creates the device first, it sets an invalid value for a netkit
-> attribute to trigger reverse parsing. Line 4 shows the error with the
-> attribute path correctly generated by YNL.
->
-> Then sample fixes the bad attribute and re-issues the request, with
-> NLM_F_ECHO set. This flag causes the notification to be looped back
-> to the initiating socket (our socket). Sample parses this notification
-> to save the ifindex of the created netkit.
->
-> Sample then proceeds to list the devices. Line 8 above shows a dummy
-> device with two alt names. Lines 9 and 10 show the netkit devices
-> the sample itself created.
->
-> The "primary" and "policy" attrs are from inside the netkit submsg.
-> The string values are auto-generated for the enums by YNL.
->
-> To clean up sample deletes the interface it created (line 11).
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Hi Christian,
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Christian-Marangi/net-phy-pass-PHY-driver-to-match_phy_device-OP/20250515-193151
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250515112721.19323-8-ansuelsmth%40gmail.com
+patch subject: [net-next PATCH v10 7/7] rust: net::phy sync with match_phy_device C changes
+config: x86_64-rhel-9.4-rust (https://download.01.org/0day-ci/archive/20250516/202505161944.2x21wbM5-lkp@intel.com/config)
+compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
+rustc: rustc 1.78.0 (9b00956e5 2024-04-29)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250516/202505161944.2x21wbM5-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202505161944.2x21wbM5-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   PATH=/opt/cross/clang-18/bin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+   INFO PATH=/opt/cross/rustc-1.78.0-bindgen-0.65.1/cargo/bin:/opt/cross/clang-18/bin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+   /usr/bin/timeout -k 100 12h /usr/bin/make KCFLAGS= -Wno-error=return-type -Wreturn-type -funsigned-char -Wundef W=1 --keep-going LLVM=1 -j32 -C source O=/kbuild/obj/consumer/x86_64-rhel-9.4-rust ARCH=x86_64 SHELL=/bin/bash rustfmtcheck
+   make: Entering directory '/kbuild/src/consumer'
+   make[1]: Entering directory '/kbuild/obj/consumer/x86_64-rhel-9.4-rust'
+>> Diff in rust/kernel/net/phy.rs at line 422:
+        //  `phy_driver`.
+        unsafe extern "C" fn match_phy_device_callback(
+            phydev: *mut bindings::phy_device,
+   -        phydrv: *const bindings::phy_driver
+   +        phydrv: *const bindings::phy_driver,
+        ) -> crate::ffi::c_int {
+            // SAFETY: This callback is called only in contexts
+            // where we hold `phy_device->lock`, so the accessors on
+>> Diff in rust/kernel/net/phy.rs at line 422:
+        //  `phy_driver`.
+        unsafe extern "C" fn match_phy_device_callback(
+            phydev: *mut bindings::phy_device,
+   -        phydrv: *const bindings::phy_driver
+   +        phydrv: *const bindings::phy_driver,
+        ) -> crate::ffi::c_int {
+            // SAFETY: This callback is called only in contexts
+            // where we hold `phy_device->lock`, so the accessors on
+>> Diff in rust/kernel/net/phy.rs at line 422:
+        //  `phy_driver`.
+        unsafe extern "C" fn match_phy_device_callback(
+            phydev: *mut bindings::phy_device,
+   -        phydrv: *const bindings::phy_driver
+   +        phydrv: *const bindings::phy_driver,
+        ) -> crate::ffi::c_int {
+            // SAFETY: This callback is called only in contexts
+            // where we hold `phy_device->lock`, so the accessors on
+   make[2]: *** [Makefile:1826: rustfmt] Error 123
+   make[2]: Target 'rustfmtcheck' not remade because of errors.
+   make[1]: Leaving directory '/kbuild/obj/consumer/x86_64-rhel-9.4-rust'
+   make[1]: *** [Makefile:248: __sub-make] Error 2
+   make[1]: Target 'rustfmtcheck' not remade because of errors.
+   make: *** [Makefile:248: __sub-make] Error 2
+   make: Target 'rustfmtcheck' not remade because of errors.
+   make: Leaving directory '/kbuild/src/consumer'
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
