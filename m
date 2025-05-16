@@ -1,104 +1,76 @@
-Return-Path: <netdev+bounces-190901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A83F4AB9362
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 03:02:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A99CAB9367
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 03:04:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A99A0A205CC
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 01:01:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33D1E1BC46D8
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 01:05:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B0CF21147D;
-	Fri, 16 May 2025 01:02:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 799E4214813;
+	Fri, 16 May 2025 01:04:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="oCf4nrR5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fM5Hpisd"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C8A2E628;
-	Fri, 16 May 2025 01:01:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5576D2147EA
+	for <netdev@vger.kernel.org>; Fri, 16 May 2025 01:04:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747357320; cv=none; b=h9l2ajIAybiIOVfgERug2hD5lVWs+vnNGzVeQkOBhGMVLf+HFeVJUSG7kwNDwBUa/pVYug3PYZEYd6dCzagb3teGsl9wg0GTdbdSQuaAWvtS69w6/36R8mnltH4NkUpILJ2aEBdaVJG1lvonNXBPJNnSJHD4cIpXqYD/pj3ZZL4=
+	t=1747357490; cv=none; b=SVtt6QgZwiri5ZP0H3zgjXqZe67sK2Gxi5LqrmpFJpWqdFdehe33QFjwmW77IP7Y4u4DHenB8E86YyHBNqnJSOURPR+d25YnXsrmbsJT7T3JCGBfZd0gc+SNa/sfr5Lsk8bzIwHMtCURY+Be/5Dr0HC2yFAtkqqfRqtb43YdVSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747357320; c=relaxed/simple;
-	bh=vo9tsHJNZFegfZa90XHjfcKXw62ztWhwEq7TJ3MNsro=;
-	h=From:To:CC:Subject:In-Reply-To:References:MIME-Version:
-	 Content-Type:Message-ID:Date; b=Q/Cr0y8wXiDsSYARtRMVCI/tqXErsWttQwshzvt0yqf7SBr/ONUgjo1+DWbh15cQO75WLmru3lSdajnJKA1V/V16rsg1FyPr/6wiKBqb5I6PSFtuiZuAUupmXeWMr3wMP9KV47FVVuxAj4khgP3REg0b3r2k977S79iaZ/Pftus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=oCf4nrR5; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 54G11nwJ6075015, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1747357309; bh=vo9tsHJNZFegfZa90XHjfcKXw62ztWhwEq7TJ3MNsro=;
-	h=From:To:CC:Subject:In-Reply-To:References:MIME-Version:
-	 Content-Type:Message-ID:Date;
-	b=oCf4nrR5TTMCnAQxkiiM+Cx5wvomN/WpEkwGsDNpXJjWmWJ8iT8KEAhaNF1NbW9O3
-	 fXtROXfNjFYzLGa9iovlbGOMIp9ng1XJ+9hns/gi791JVcnqrN7ordNy0buHZ9EeZH
-	 Bd3rBVBkNzagGhhYyhZtj/AngoJdUOsrnRIYXnFzHVUeQS9GARVGWQysu6V3X6K9KK
-	 vKeB0ZW3D81754dYoRnJ+ANA9YMHLjq/8TtZI32OzvhY4ykm4e8PrzbZeu7fUCWy78
-	 D/vtpCLvyG6PnNar7HNa+e8LD6kBszPAehWFNlpKWVHjHzJAhTHXfTda+PEXwDbQPs
-	 +5/RmGG8W2+jg==
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/3.13/5.93) with ESMTPS id 54G11nwJ6075015
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 16 May 2025 09:01:49 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 16 May 2025 09:01:50 +0800
-Received: from [127.0.1.1] (172.21.69.94) by RTEXMBS04.realtek.com.tw
- (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Fri, 16 May
- 2025 09:01:49 +0800
-From: Ping-Ke Shih <pkshih@realtek.com>
-To: Alexey Kodanev <aleksei.kodanev@bell-sw.com>,
-        <linux-wireless@vger.kernel.org>
-CC: <netdev@vger.kernel.org>, Ping-Ke Shih <pkshih@realtek.com>,
-        Kalle Valo
-	<kvalo@kernel.org>,
-        Alexey Kodanev <aleksei.kodanev@bell-sw.com>
-Subject: Re: [PATCH v2] wifi: rtw88: fix the 'para' buffer size to avoid reading out of bounds
-In-Reply-To: <20250513121304.124141-1-aleksei.kodanev@bell-sw.com>
-References: <20250513121304.124141-1-aleksei.kodanev@bell-sw.com>
+	s=arc-20240116; t=1747357490; c=relaxed/simple;
+	bh=3ggWfmad+Ahr7bFez/BW9d/QPrzgbhpVN0Lt6HYLdYw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mmSKPU97GSwhjBfJiT0QqB8i15vZsVAkID+AsnAn7VIhwdCPvee+PUHgeVAvFmvjWV4YZkPPgvrqGU32uhwHKoacSkfOdNCm/36cim78Px/bkqd8omsJnLyBlXpCjw48dTs0mW9GEBUPG7xV/QEa/kpxva/72lbQQt7zQLhEVaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fM5Hpisd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AC0EC4CEE7;
+	Fri, 16 May 2025 01:04:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747357489;
+	bh=3ggWfmad+Ahr7bFez/BW9d/QPrzgbhpVN0Lt6HYLdYw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fM5HpisdK9I89uPQxKjo44flBMfJQYJLWGvodP3rAmh4O/ZYNp19nXuMIEXEt9vl9
+	 M6lcd8BIxyIyhg27f8WudzMRH+ojoT4sr8/f5BJK8YsVeIrKy4DQ6YTDCUMBqQ2fVQ
+	 IimnR8/BHVSAg/ibZJLPhMGgE9mqyu6AEQ35FoQP46OCjtBMixlNrsXyCwh3DLULeW
+	 EvTbvV34sUfjtRidMBti0A97mHFewVxi3760FPT0iiTU7aUq9lXjsJ7FKS2YrySQcV
+	 VRajxmnCd8ublHWq0l2oeTPk/9NFvlTFJmMc2nRAIac5cSMRzcm1cUL7hg662V7Rl1
+	 TCUdwm5vxv7Tg==
+Date: Thu, 15 May 2025 18:04:48 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, Russell King <linux@armlinux.org.uk>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>, Richard Cochran <richardcochran@gmail.com>,
+ Furong Xu <0x1207@gmail.com>
+Subject: Re: [PATCH v2 net-next] net: stmmac: convert to ndo_hwtstamp_get()
+ and ndo_hwtstamp_set()
+Message-ID: <20250515180448.2d00909a@kernel.org>
+In-Reply-To: <20250514143249.1808377-1-vladimir.oltean@nxp.com>
+References: <20250514143249.1808377-1-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Message-ID: <ccf67349-0bb6-4944-8571-e6707a206eaf@RTEXMBS04.realtek.com.tw>
-Date: Fri, 16 May 2025 09:01:49 +0800
-X-ClientProxiedBy: RTEXMBS02.realtek.com.tw (172.21.6.95) To
- RTEXMBS04.realtek.com.tw (172.21.6.97)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Alexey Kodanev <aleksei.kodanev@bell-sw.com> wrote:
+On Wed, 14 May 2025 17:32:49 +0300 Vladimir Oltean wrote:
+> +	if (!netif_running(dev)) {
+> +		NL_SET_ERR_MSG_MOD(extack,
+> +				   "Cannot change timestamping configuration while up");
 
-> Set the size to 6 instead of 2, since 'para' array is passed to
-> 'rtw_fw_bt_wifi_control(rtwdev, para[0], &para[1])', which reads
-> 5 bytes:
-> 
-> void rtw_fw_bt_wifi_control(struct rtw_dev *rtwdev, u8 op_code, u8 *data)
-> {
->     ...
->     SET_BT_WIFI_CONTROL_DATA1(h2c_pkt, *data);
->     SET_BT_WIFI_CONTROL_DATA2(h2c_pkt, *(data + 1));
->     ...
->     SET_BT_WIFI_CONTROL_DATA5(h2c_pkt, *(data + 4));
-> 
-> Detected using the static analysis tool - Svace.
-> Fixes: 4136214f7c46 ("rtw88: add BT co-existence support")
-> Signed-off-by: Alexey Kodanev <aleksei.kodanev@bell-sw.com>
-
-1 patch(es) applied to rtw-next branch of rtw.git, thanks.
-
-4c2c372de2e1 wifi: rtw88: fix the 'para' buffer size to avoid reading out of bounds
-
----
-https://github.com/pkshih/rtw.git
-
+changed up -> down when applying
 
