@@ -1,254 +1,156 @@
-Return-Path: <netdev+bounces-190912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EA9AAB93B7
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 03:40:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABCC0AB93CB
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 03:51:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5B6D17E703
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 01:40:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 477CE4A3E34
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 01:51:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27E6F22422C;
-	Fri, 16 May 2025 01:40:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39E15220F2C;
+	Fri, 16 May 2025 01:51:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k2dYN2jw"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="oBQs0h17"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6451C21ABB4;
-	Fri, 16 May 2025 01:40:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98F6323AD
+	for <netdev@vger.kernel.org>; Fri, 16 May 2025 01:51:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747359640; cv=none; b=HVhacS+FwmMPN2hjFaSuofoiRDfbuCbhVM5EwiLHxcDK33GCOF6PQhWfqJsiaQ0L32tfHokR0TPdGPtMoAuhbJ4vvQ/baXQnAqSdkdlRDKfEipv5d7Dya33+f3GlKsUkdR5zhxT9qAPJ6MkLnEAiO6Ei4GNWOcndOE3YFtq6tRU=
+	t=1747360289; cv=none; b=VzcVKnBj9+xKqRA6tROSpXW+VMksbTL79x/i3QkBULEBKt9s/Ms2wfS9hp7iHQCOuP/cDAWsJUACidqXhN8wYtUjmtJmqaTBMH4MgTljQKUXxKkYFeN2E9S6xY004b0WnZjiGtUQ0yjWbhM12kmZZLaf54GiHQQMoPg/9vgD7SU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747359640; c=relaxed/simple;
-	bh=HOWTaMr10Y//SBsq/knUx6OQEtcZK6r9ddhtzirgbQQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AJXl/j9Z7YI/bpc7KPP+5GLy/SXVwlGMDSJb0kgaXnScHqN4QGTKEticOQej5HqoeFIzxPSw0iYIQwtOz2ozz9NXHwk/Yu2sedRGrx6T7pdZNIPOZAOPqJHhyTwvHKJay3UAugehaJUlZrguMLbP8Lz86kSQNQRi5eF5cQWyxwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k2dYN2jw; arc=none smtp.client-ip=209.85.167.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-3f7f7b70aebso1498864b6e.2;
-        Thu, 15 May 2025 18:40:38 -0700 (PDT)
+	s=arc-20240116; t=1747360289; c=relaxed/simple;
+	bh=3Ano1EREaReOL8fQotMGvV9no1FgqaH63YAxtkmDwEg=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Z6s2RvJHlaSA9N4m/DsT+e/7DIA1EV00qyI9CSCsDDZlWVEmEbfP9Wc50Y59r2Y0ujBPAwbT8FPsg5LyYvp4q9ZSR2lj81OycW/P+IxMGgUjT574IaRjcqAlUUrjfAOwsmrTx54vrfkh+OG9g3QhYrkj7oTMzcMwG6a/w+EYdIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=oBQs0h17; arc=none smtp.client-ip=99.78.197.217
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747359637; x=1747964437; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YbnWlrrlEA62ju+DNKq+Eh0Q+yGH2JwjMo6Br6ozAQQ=;
-        b=k2dYN2jw3WSnsg6PaG5afZiNzrsvCGjGmeMa3JQVhT+N+8FI3pFwGWvJsEQ6uxyJY8
-         6WjeiQ+7ZpNZodzeMW47QSh8u3LBu7734ec2H9PGRb5aXhdMRkaAwAQuscu++W1aN3FC
-         zkdolObzn28gN/vK+j3TPHY9myiCR9KcUSQlgsK3LDMMid5RLuYqWbUgTtgrHv2ngc7U
-         9d5HGs5s5K+yLCaC3T6chDhKFRM75yxsQX+SQSlTQ6v7BP0wfGWSY8mYQiPfx6EvhILP
-         rlajHCb10d/R5Lhgt+FJFGNeA6cTiH/gp3BhMvdxkWD35O0vgsHhwrJ9ozl7GAS6DC1h
-         YA0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747359637; x=1747964437;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YbnWlrrlEA62ju+DNKq+Eh0Q+yGH2JwjMo6Br6ozAQQ=;
-        b=oSm+9ecCCOxaWiVrGHJhv3FRlgcNna8R/a2HHufQYig1PQnx3Hez/2/tlEsoc+UYww
-         3Re+GmSUk20PilrpXCj9PAECyFCaPM/kzk0YfzyxhETCvW9ETKOs+EAgMoVA9Yur2w1Y
-         EIVRMPtAQrfdNbG4DGOkONAMgYxeDepVeTTj5/DtJL4PM4s89JpU4Cjm5VCNui6nZ8Qi
-         QMZnV3UVX+xGQ3WoYox6FMmQ0tCDKcNOER1qIhyIV/1FtyNdUmXuGEgeoEjTd0U6g78G
-         7t6YKXRCOpveuUP2YvgG+vbKFv+kyybSGLHQ+rs6itqBHqUGJNPPR6g4ZkZdfJqDoF38
-         i3KA==
-X-Forwarded-Encrypted: i=1; AJvYcCW8P++4cyoFY5Wb82dRphPTOqk8hwQyBmIY4OQADWvdXqsGPeRwQoSc0pTMge9/UEh8QGHCrY6c2Mv7@vger.kernel.org, AJvYcCWFFsYBfzkHpW9wOPfH/+zqsBbOPDekECvOVm3GZcd6CibHDPPCza5ykfOubW7szDD2Be9qmCjVTrXyFgkK@vger.kernel.org, AJvYcCX3IQ3cZTzcrpCN7zUtUy29BY4Zoqia+Yty9NtWfAUcgKQKxtdkGUE//UgXgmRXcM+FSoPGcutJJmBbkz2LgA==@vger.kernel.org, AJvYcCXGek8CMyFE2+kyAYMsiMj69EIXAYomoPCkgY+7Fx33rKcBg5Gf4xt0vwMqzcNfsM9GMUeWlsZ3@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOAJE31R0C7rP0uZmW6Z4JvhUyJAg01irveZVL73J1GjVfkE3l
-	jWXOveHOZgHavXUN7TWFO24xmlhDmIQdoLImCJNy1dV6Cw1qT91oWgPF
-X-Gm-Gg: ASbGnctSRhxWoxtwo0iVwojMIdBpTVXgHkyuBa5TpLmGar/M5rOCh/OSobTSaNJy/mg
-	YijW3cAkedZLd5FgXEs2FVqnde2xcjBLAcc/OdRNs5PTHaOai1cp2bknbUAzP+TCjCNpVRPgrvX
-	yKfdi5OPLNx/7Sxkj5yPrINR6c4uWBxclwTitD6COo47CTNgfNuGkN5Hna/TrE5R4Dsd82eayTH
-	jamzuv9cckv/72Qw0Ci20L5MPib8cylKEqXYb+tZG11euNElrbfRxOyOGjApxX3TfHllUz3fKRf
-	S1H8qV0B+toF7Lr81N0g+Zw9QAznLfNZn2MXAvdzJO7oN/fMOUebNpytM2xDC7c/pY1JvLvUNZA
-	YOmmlkqZHwd8aJw==
-X-Google-Smtp-Source: AGHT+IETLFoqkRb+eG0skJqyUnlAjIbWcsG/aqzYb4kHYSnQsR/l6nXXMDIKY2j37A0T02BKkdYMog==
-X-Received: by 2002:a05:6808:80a9:b0:400:32b9:7926 with SMTP id 5614622812f47-404d863751cmr1331555b6e.6.1747359637153;
-        Thu, 15 May 2025 18:40:37 -0700 (PDT)
-Received: from [192.168.7.203] (c-98-57-15-22.hsd1.tx.comcast.net. [98.57.15.22])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-404d98b2785sm154670b6e.33.2025.05.15.18.40.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 May 2025 18:40:35 -0700 (PDT)
-Message-ID: <be7f0fda-ac21-4f94-a6cf-b4c3ca59630a@gmail.com>
-Date: Thu, 15 May 2025 20:40:33 -0500
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1747360288; x=1778896288;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=lI70L4Ogh0UdMi47Bmoiyc9kRuhuL+253tNouocIUw0=;
+  b=oBQs0h17yzjShPXBnIsRVolXUnxD2noI1NcXaFmnEbk2SRNODRCiPqf7
+   7bZTXixUGvgNWgZTr+4bigN0xwKfyDDJKHHmZ7BSYDVCAsM9xdHLSnRMO
+   4tfhxuk8QqBJO4onQMyU8r4SyO8jHcDdf4xMlN5OqX47sV1y5rthn409L
+   3IkOP/ZS7fGnayi/19Gr2op9sz4BYqLExhA/HcViU5hiDi3ZZF6fJg3BA
+   dErLL3Y8V5SvCLpTQJAl8qtTf9fz5DrSZ6or+xnur00SQ4K/FDMHfH5YL
+   23LQxPUErRVVkNEFCg9zlxj2zaB6b6aoDxySgs29WiAB3oUzyJc+12jh+
+   A==;
+X-IronPort-AV: E=Sophos;i="6.15,292,1739836800"; 
+   d="scan'208";a="50469526"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2025 01:51:26 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:25533]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.26.241:2525] with esmtp (Farcaster)
+ id ab75bb16-f06c-4ba8-90b2-76886166cb01; Fri, 16 May 2025 01:51:25 +0000 (UTC)
+X-Farcaster-Flow-ID: ab75bb16-f06c-4ba8-90b2-76886166cb01
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 16 May 2025 01:51:24 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.187.170.35) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 16 May 2025 01:51:22 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kuba@kernel.org>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<horms@kernel.org>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <sdf@fomichev.me>
+Subject: Re: [PATCH net-next] net: let lockdep compare instance locks
+Date: Thu, 15 May 2025 18:49:07 -0700
+Message-ID: <20250516015114.40011-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250516012459.1385997-1-kuba@kernel.org>
+References: <20250516012459.1385997-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 0/5] Add PCS support for Qualcomm IPQ9574 SoC
-To: Lei Wei <quic_leiwei@quicinc.com>,
- "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, quic_kkumarcs@quicinc.com,
- quic_suruchia@quicinc.com, quic_pavir@quicinc.com, quic_linchen@quicinc.com,
- quic_luoj@quicinc.com, srinivas.kandagatla@linaro.org,
- bartosz.golaszewski@linaro.org, vsmuthu@qti.qualcomm.com, john@phrozen.org,
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-References: <20250207-ipq_pcs_6-14_rc1-v5-0-be2ebec32921@quicinc.com>
- <20250211195934.47943371@kernel.org> <Z6x1xD0krK0_eycB@shell.armlinux.org.uk>
- <71a69eb6-9e24-48ab-8301-93ec3ff43cc7@quicinc.com>
- <0c1a0dbd-fd24-40d7-bec9-c81583be1081@gmail.com>
- <c6a78dd6-763c-41a0-8a6e-2e81723412be@quicinc.com>
- <62c98d4f-8f02-43cc-8af6-99edfa5f6c88@gmail.com>
- <df2fa427-00d9-4d74-adec-c81feda69df5@quicinc.com>
-Content-Language: en-US
-From: mr.nuke.me@gmail.com
-In-Reply-To: <df2fa427-00d9-4d74-adec-c81feda69df5@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D040UWB002.ant.amazon.com (10.13.138.89) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 5/15/25 10:27 AM, Lei Wei wrote:
+From: Jakub Kicinski <kuba@kernel.org>
+Date: Thu, 15 May 2025 18:24:59 -0700
+> AFAIU always returning -1 from lockdep's compare function
+> basically disables checking of dependencies between given
+> locks. Try to be a little more precise about what guarantees
+> that instance locks won't deadlock.
 > 
+> Right now we only nest them under protection of rtnl_lock.
+> Mostly in unregister_netdevice_many() and dev_close_many().
 > 
-> On 5/15/2025 10:32 AM, Alex G. wrote:
->> On 5/14/25 11:03, Lei Wei wrote:> On 5/13/2025 6:56 AM, 
->> mr.nuke.me@gmail.com wrote:
->>>> On 2/19/25 4:46 AM, Lei Wei wrote:
->>>>
->>>> I tried this PCS driver, and I am seeing a circular dependency in 
->>>> the clock init. If the clock tree is:
->>>>      GCC -> NSSCC -> PCS(uniphy) -> NSSCC -> PCS(mii)
->>>>
->>>> The way I understand it, the UNIPHY probe depends on the MII probe. 
->>>> If MII .probe() returns -EPROBE_DEFER, then so will the 
->>>> UNIPHY .probe(). But the MII cannot probe until the UNIPHY is done, 
->>>> due to the clock dependency. How is it supposed to work?
->>>>
->>>> The way I found to resolve this is to move the probing of the MII 
->>>> clocks to ipq_pcs_get().
->>>>
->>>> This is the kernel log that I see:
->>>>
->>>> [   12.008754] platform 39b00000.clock-controller: deferred probe 
->>>> pending: platform: supplier 7a00000.ethernet-pcs not ready
->>>> [   12.008788] mdio_bus 90000.mdio-1:18: deferred probe pending: 
->>>> mdio_bus: supplier 7a20000.ethernet-pcs not ready
->>>> [   12.018704] mdio_bus 90000.mdio-1:00: deferred probe pending: 
->>>> mdio_bus: supplier 90000.mdio-1:18 not ready
->>>> [   12.028588] mdio_bus 90000.mdio-1:01: deferred probe pending: 
->>>> mdio_bus: supplier 90000.mdio-1:18 not ready
->>>> [   12.038310] mdio_bus 90000.mdio-1:02: deferred probe pending: 
->>>> mdio_bus: supplier 90000.mdio-1:18 not ready
->>>> [   12.047943] mdio_bus 90000.mdio-1:03: deferred probe pending: 
->>>> mdio_bus: supplier 90000.mdio-1:18 not ready
->>>> [   12.057579] platform 7a00000.ethernet-pcs: deferred probe 
->>>> pending: ipq9574_pcs: Failed to get MII 0 RX clock
->>>> [   12.067209] platform 7a20000.ethernet-pcs: deferred probe 
->>>> pending: ipq9574_pcs: Failed to get MII 0 RX clock
->>>> [   12.077200] platform 3a000000.qcom-ppe: deferred probe pending: 
->>>> platform: supplier 39b00000.clock-controller not ready
->>>>
->>>>
->>>
->>> Hello, thanks for bringing this to our notice. Let me try to 
->>> understand the reason for the probe failure:
->>>
->>> The merged NSSCC DTS does not reference the PCS node directly in the 
->>> "clocks" property. It uses a placeholder phandle '<0>' for the 
->>> reference. Please see below patch which is merged.
->>> https://lore.kernel.org/all/20250313110359.242491-6- 
->>> quic_mmanikan@quicinc.com/
->>>
->>> Ideally there should be no direct dependency from NSSCC to PCS driver if
->>> we use this version of the NSSCC DTS.
->>>
->>> Hence it seems that you may have a modified patch here, and DTS 
->>> changes have been applied to enable all the Ethernet components 
->>> including PCS and NSSCC, and NSSCC modified to have a direct 
->>> reference to PCS? However even in this case, I think the driver probe 
->>> should work if the drivers are built as modules. Can you please 
->>> confirm if the NSSCC and PCS drivers are built-in to the kernel and 
->>> not built as modules
->>
->> The NSSCC and PCS built-in. I also added the uniphy PCS clocks to the 
->> NSSCC in order to expose the issue.
->>
->> I have a heavily patched tree with PPE driver and EDMA support. That's 
->> the final use case in order to support ethernet, right?
->>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  include/net/netdev_lock.h | 29 +++++++++++++++++++++--------
+>  1 file changed, 21 insertions(+), 8 deletions(-)
 > 
-> Yes, all the drivers are eventually for enabling the Ethernet function
-> on IPQ9574.
+> diff --git a/include/net/netdev_lock.h b/include/net/netdev_lock.h
+> index 2a753813f849..75a2da23100d 100644
+> --- a/include/net/netdev_lock.h
+> +++ b/include/net/netdev_lock.h
+> @@ -99,16 +99,29 @@ static inline void netdev_unlock_ops_compat(struct net_device *dev)
+>  static inline int netdev_lock_cmp_fn(const struct lockdep_map *a,
+>  				     const struct lockdep_map *b)
+>  {
+> -	/* Only lower devices currently grab the instance lock, so no
+> -	 * real ordering issues can occur. In the near future, only
+> -	 * hardware devices will grab instance lock which also does not
+> -	 * involve any ordering. Suppress lockdep ordering warnings
+> -	 * until (if) we start grabbing instance lock on pure SW
+> -	 * devices (bond/team/veth/etc).
+> -	 */
+> +#ifdef CONFIG_DEBUG_NET_SMALL_RTNL
+> +	const struct net_device *dev_a, *dev_b;
+> +
+> +	dev_a = container_of(a, struct net_device, lock.dep_map);
+> +	dev_b = container_of(b, struct net_device, lock.dep_map);
+> +#endif
+> +
+>  	if (a == b)
+>  		return 0;
+> -	return -1;
+> +
+> +	/* Locking multiple devices usually happens under rtnl_lock */
+> +	if (lockdep_rtnl_is_held())
+> +		return -1;
+> +
+> +#ifdef CONFIG_DEBUG_NET_SMALL_RTNL
+> +	/* It's okay to use per-netns rtnl_lock if devices share netns */
+> +	if (net_eq(dev_net(dev_a), dev_net(dev_b)) &&
+> +	    lockdep_rtnl_net_is_held(dev_net(dev_a)))
+
+Do we need
+
+  !from_cleanup_net()
+
+before lockdep_rtnl_net_is_held() ?
+
+__rtnl_net_lock() is not held in ops_exit_rtnl_list() and
+default_device_exit_batch() when calling unregister_netdevice_many().
+
+
+> +		return -1;
+> +#endif
+> +
+> +	/* Otherwise taking two instance locks is not allowed */
+> +	return 1;
+>  }
+>  
+>  #define netdev_lockdep_set_classes(dev)				\
+> -- 
+> 2.49.0
 > 
->>
->>> For the case where the drivers are built-in to kernel, and the NSSCC DTS
->>> node has a direct reference to PCS node, we can use the below solution:
->>> [Note that the 'UNIPHY' PCS clocks are not needed for NSSCC clocks
->>> initialization/registration.]
->>>
->>>      Enable 'post-init-providers' property in the NSSCC DTS node to mark
->>>     'UNIPHY' PCS as post-initialization providers to NSSCC. This will
->>>      ensure following probe order by the kernel:
->>>
->>>      1.) NSSCC driver
->>>      2.) PCS driver.
->>>
->>> Please let me know if the above suggestion can help.
->>
->> I see. Adding the 'post-init-providers' property does fix the circular 
->> dependency. Thank you!
->>
->> I have another question. Do you have a public repository with the 
->> unmerged IPQ9574 patches, including, PCS, PPE, EDMA, QCA8084 ?
->>
-> 
-> May I know the source of your PPE/EDMA changes using which this issue
-> is seen?
-
-I use a mix of upstream submissions, and openwrt patches. As noted, 
-using 'post-init-providers' takes care of the problem.
-
-https://github.com/mrnuke/linux/commits/ipq95xx-devel-20250515/
-
-> 
-> The openwrt repository contains the unmerged IPQ9574 patches, Although
-> this version will be updated very soon with latest code(with some 
-> fixes), the version of the code in the repo currently is also functional 
-> and tested.
-> 
-> https://github.com/CodeLinaro/openwrt/tree/main/target/linux/qualcommbe/ 
-> patches-6.6
-
-
-Will you be updating a clock example with IPQ9574 + QCA8084 to the repo?
-
-Alex
-
->>
->>> Later once the IPQ PCS driver is merged, we are planning to push the 
->>> PCS DTS changes, along with an update of the NSSCC DTS to point to 
->>> the PCS node and mark the "post-init-providers" property. This should 
->>> work for all cases.
->>>
->>> Also, in my view, it is not suitable to move PCS MII clocks get to
->>> "ipq_pcs_get()" because the natural loading order for the drivers
->>> is as below:
->>>
->>> 1) NSSCC driver
->>> 2) PCS driver
->>> 3) Ethernet driver.
->>>
->>> Additionally, the community is currently working on an infrastructure to
->>> provide a common pcs get method. (Christian and Sean Anderson has 
->>> been working on this). Therefore, I expect "ipq_pcs_get" to be 
->>> dropped in the future and replaced with the common pcs get method 
->>> once this common infra is merged.
->>
->> That makes sense. Thank you for clarifying.
-> 
-
 
