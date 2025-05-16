@@ -1,109 +1,185 @@
-Return-Path: <netdev+bounces-191151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C00EABA47A
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 22:08:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5B10ABA484
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 22:10:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F6131751C5
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 20:08:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68DBA505F57
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 20:10:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FE82227E99;
-	Fri, 16 May 2025 20:08:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EEE626463A;
+	Fri, 16 May 2025 20:10:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Zn8zwB9G"
+	dkim=permerror (0-bit key) header.d=wizmail.org header.i=@wizmail.org header.b="DiMXWn8E";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wizmail.org header.i=@wizmail.org header.b="PCxkMDEy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.wizmail.org (smtp.wizmail.org [85.158.153.28])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB9CE1D5143
-	for <netdev@vger.kernel.org>; Fri, 16 May 2025 20:07:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA39A22B8AA;
+	Fri, 16 May 2025 20:10:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.158.153.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747426081; cv=none; b=EpKNrmNiQSLeonZSjPumGZ8Cd9TAymb/ILn3laY7sA8/0YNKJZyFYIuC597Tyw2XhX55UJlBSeZYyp7Rj6PJgjjz4HllR+s4UvJPc064/e4h0jG45OtcY0hrgO/aTePZKsnBTq6e8Gd+v18IPk18V3pAKvGTReN/cI9iFa4XdaI=
+	t=1747426245; cv=none; b=rAlsjTl0Uwdf15zXZwTQh66CRx4tPuoqZDEaB9WzrGQxMnCP/7puhCC4IGXCiJMCnzK4JF/GdhbYMIzxp3NBbHwVAy4NWF7y/1S54ogEbpfVL7MjVyNVw9eg3V0nVVbvBUusrbzU0FT9WQSOoSATmA/oa+sLLCw8jj0r946NRlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747426081; c=relaxed/simple;
-	bh=DZx1xzQFzzLIkltwNOLVSRLRDP8xL8W+oBLTLz89S/E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SHT7RAaz+JiJzKCK0THpBHhgt34WLl/atLF0tg9rwO6JWXZcXoPe+PV298Y0mda8SSbFq8AyYILncnmEDklTC2i6vG3SxvWddlj9rDQ/LQtWezSNWgYX+rCsYLqqZqgsvR7xkGDl2wb9FYS7+DLTP8vnG8G30ahZYBWjeHTiBqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Zn8zwB9G; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-47e9fea29easo14581cf.1
-        for <netdev@vger.kernel.org>; Fri, 16 May 2025 13:07:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747426078; x=1748030878; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VDYXmPcCBFUKCrITx9bahoWrqCPbfFOALOeElZxyjJ4=;
-        b=Zn8zwB9GZ/kJMOmcgvfacBGtl9xUtdNgmUBc16n6ptipeFyTQ37ct73vVefDcLp9V1
-         Am83p5sG2pDvU1HX56JaXGNesixpoJtCAcO3FYgzcSzSvpQ/fxtb2i2USZkJ74Kodhmd
-         Jax3HDoWLwtzxuF3bYha3LO4W8JjaY8DqkTPzfdSeSc894TppguSd9LCuSWVPssQs0HA
-         SmpnzoRzpHamS0YHFS8wVxQ3KELI8OQlDCgl8Y65GMuKBLZsCijB8z4RHK3oAjkadN4D
-         35xmhX3a4WwMNctgkeh7APpvgeeErws7dYKgOZybssI3UPojHMtRH1AfRXGaVY8RAEOY
-         ebkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747426078; x=1748030878;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VDYXmPcCBFUKCrITx9bahoWrqCPbfFOALOeElZxyjJ4=;
-        b=uLlyP8l6Nd8H9oMi9AfjW8bAXrJZYSQhWEb0DqcX/cxbCp7gLAP0wqiYnpP/6rztUs
-         e9gI6yZSnOZv6/YUTetgZmk/CovwBNbEc5A3RYk8J+CQzLNyrNAAvZpzWQ1rLt7wVJ6e
-         VrTEnHxfh7Zr0iwb8h8ZsHwbi4kEm4f4hy8Oadh7RKThk9tF4cfGSq3sPqe7lcxd/o1w
-         GP8m69a3vxvwjs7Z4TdmA9u/GvV21XBqpQH0ebahg2KRNFlXFiVZli7JZUIgYvUsq+Qb
-         bssCtaGx6ov2pZXNo4YWBczj+Cc7DpijC0zJaTgCZ6f1heICUBj1Nx5PHNQNFxx0ItAY
-         QntQ==
-X-Gm-Message-State: AOJu0YwHtYF282eBI6NcX1ni/WVBgnb2QO+QDM9KVbmd9Nlt8yFW+E0M
-	PltjNy9ODYDQWM/u9D0X53UY8BJ0zpT7MPC/1v+7sU7WVot0QdvUXCeWDSc4qs75C6iKWk8aMfo
-	YnlBVHObl/RZ3udMMLG+FYK06wVWO9AMGGuWaHD1q
-X-Gm-Gg: ASbGnct1VkAjcQeoa3J2AwyS800x0H16c5bDrY2riRZp0D/GL/+l9Z31/QHffDfdr8R
-	uuu2L7dQLjUsTJFolt7fp3bGJsscPe9bvcM9e4l2clKLnfo/mycEz1aDeklUECJc9hgWSFxIX6/
-	VOjO8uDt6l+HcwcP7jjlJG3WT+KJfbMyBMJgQrzGDPRX9583LJqaHg6ySZnXeqoX3yag==
-X-Google-Smtp-Source: AGHT+IEFPFax2QvYEfXuA8kORgi6wseYm8AziqtQ4gqsb9hLTsW/9Tjcxay+b1JpOJQlxgO6vSMciFK7fJM5MT8k/Wk=
-X-Received: by 2002:a05:622a:19a2:b0:494:763e:d971 with SMTP id
- d75a77b69052e-495a0f5ddafmr458671cf.23.1747426078228; Fri, 16 May 2025
- 13:07:58 -0700 (PDT)
+	s=arc-20240116; t=1747426245; c=relaxed/simple;
+	bh=MzQCKlZ6ntcYLkjp6eVbxjn94XdvNoNwLedvn9sSeyw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kGueK6o50ReRbduMH5z/p3UHhMHO9Ytv9d0YXB63p2Qal/JzQk49MG59gBIpkAH1OQecvjMV44oB6jk2sBDrCNhhw65na+cKb8cONRk1ro+NzHc+6kK0KIh3YfwXk0SYo8HL3l91IZd8wg8ybnY2wdiCPxjtUE66l3x4+u0Beso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exim.org; spf=fail smtp.mailfrom=exim.org; dkim=permerror (0-bit key) header.d=wizmail.org header.i=@wizmail.org header.b=DiMXWn8E; dkim=pass (2048-bit key) header.d=wizmail.org header.i=@wizmail.org header.b=PCxkMDEy; arc=none smtp.client-ip=85.158.153.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exim.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=exim.org
+DKIM-Signature: v=1; a=ed25519-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=wizmail.org; s=e202001; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:
+	References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:List-Post:
+	List-Owner:List-Archive:Autocrypt;
+	bh=2u/wuQYqYyn1Vldm9yAljhV51VyW7Grx7RCI3jbqeFE=; b=DiMXWn8EQAH5f4qBi2qu4wW2za
+	C55OP8yn6LIz+42J6kgjQjHtXJHMyae3oGcdL3io9odijpPUfYboN3dFeeDA==;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=wizmail.org
+	; s=r202001; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:From:Sender:Reply-To:
+	Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:
+	References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:List-Post:
+	List-Owner:List-Archive:Autocrypt;
+	bh=2u/wuQYqYyn1Vldm9yAljhV51VyW7Grx7RCI3jbqeFE=; b=PCxkMDEy3+RfINVsiOYIpq2of1
+	OMeE/KRzZ9l5il99QCVp5LrglVzyLUBh2iPB5LT0AEKcsCbHCGw45YUI3l/HEKxU8hcnw7lhcMKZZ
+	NxwbYdCsqXyf9kFoygKr1L0PcDUcb6bvvQ+JdKWsGfXIptWtFc9AkHulbcS8j56OH6v53O7JsnZSF
+	MCYgNK4Dz2tINbUuVFMMeUNVV1qzIEdAgb/Ce1//HFcAifcVsHNlxPiVDIZo1EW/mCuu3e3aGS/Y4
+	hJ+DQztSYzRtx3ace/h611eBoQhk1EH98UxpHx8htWwad3SzjEuIyuKMDVfRj+F3IjwM7IHbTe2St
+	HYlnWH7g==;
+Authentication-Results: wizmail.org;
+	iprev=pass (hellmouth.gulag.org.uk) smtp.remote-ip=85.158.153.62;
+	auth=pass (PLAIN) smtp.auth=jgh@wizmail.org
+Received: from hellmouth.gulag.org.uk ([85.158.153.62] helo=[192.168.0.17])
+	by wizmail.org (Exim 4.98.115)
+	(TLS1.3) tls TLS_AES_128_GCM_SHA256
+	with esmtpsa
+	id 1uG1OB-000000079Uj-3PDd
+	(return-path <jgh@exim.org>);
+	Fri, 16 May 2025 20:10:39 +0000
+Message-ID: <ff23f425-536c-43b7-b536-58d99e61f2f8@exim.org>
+Date: Fri, 16 May 2025 21:10:39 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAFYr1XPb=J0qeGt0Tco1z7QURmBH8TiWP0=uH0zhU=wCQKCtpA@mail.gmail.com>
- <CADVnQy=upW8ACnF5pN0d_AJtGi_OwT2VWc4Jg1nJ47Np-Qj66g@mail.gmail.com>
- <CAFYr1XOKceKP50Nc=T02McTa0FNdRNB0zEQUVop8PDW4F-dxuw@mail.gmail.com>
- <CADVnQy=C+9ogbtS7fVM9cev5iT+6Fz88H2FTKcjwKFnDbsUe2A@mail.gmail.com> <CAFYr1XNeLcCx4pur-RTHGcn_2hE-w6TYFFuOKFFohAXxTxCSag@mail.gmail.com>
-In-Reply-To: <CAFYr1XNeLcCx4pur-RTHGcn_2hE-w6TYFFuOKFFohAXxTxCSag@mail.gmail.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Fri, 16 May 2025 16:07:41 -0400
-X-Gm-Features: AX0GCFt-iGCt0RyPPiY4HmHex2mH_b2FyT36XNIks1en_0-BbP1iRxlzBfI0-Wc
-Message-ID: <CADVnQyks9OFDNnfm0musnouD8680GO+HfCk0he9psS+3UnfYUw@mail.gmail.com>
-Subject: Re: Potential bug in Linux TCP vegas implementation
-To: Anup Agarwal <anupa@andrew.cmu.edu>
-Cc: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/6] tcp: support preloading data on a listening socket
+To: Neal Cardwell <ncardwell@google.com>
+Cc: netdev@vger.kernel.org, linux-api@vger.kernel.org, edumazet@google.com
+References: <cover.1747409911.git.jgh@exim.org>
+ <CADVnQymxsOGLnUfurhDLXNUaK4gpaYm2zTDEWRxy8JPqH6O6vg@mail.gmail.com>
+Content-Language: en-GB
+From: Jeremy Harris <jgh@exim.org>
+In-Reply-To: <CADVnQymxsOGLnUfurhDLXNUaK4gpaYm2zTDEWRxy8JPqH6O6vg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Pcms-Received-Sender: hellmouth.gulag.org.uk ([85.158.153.62] helo=[192.168.0.17]) with esmtpsa
 
-On Fri, May 16, 2025 at 3:54=E2=80=AFPM Anup Agarwal <anupa@andrew.cmu.edu>=
- wrote:
->
-> Thanks for the detailed guidance Neal.
+Hi Neal,
 
-You're very welcome!
+Thanks for the initial review.
 
->  I will get back to you with this.
 
-Great. Thanks for the fix.
+On 2025/05/16 7:19 PM, Neal Cardwell wrote:
+> On Fri, May 16, 2025 at 11:55 AM Jeremy Harris <jgh@exim.org> wrote:
+>>
+>> Support write to a listen TCP socket, for immediate
+>> transmission on passive connection establishments.
+>>
+>> On a normal connection transmission is triggered by the receipt of
+>> the 3rd-ack. On a fastopen (with accepted cookie) connection the data
+>> is sent in the synack packet.
+>>
+>> The data preload is done using a sendmsg with a newly-defined flag
+>> (MSG_PRELOAD); the amount of data limited to a single linear sk_buff.
+>> Note that this definition is the last-but-two bit available if "int"
+>> is 32 bits.
+> 
+> Can you please add a bit more context, like:
+> 
+> + What is the motivating use case? (Accelerating Exim?)
 
-> I am assuming this is low priority/there is no pressing timeline on this.
+Accelerating any server-first ULP, SMTP being the major use I
+know of (and yes, Exim is my primary testcase and is operational
+against a test kernel with this patch series).
 
-Yes, exactly. There's no pressing timeline for fixing this 17-year old bug.=
- :-)
+One caveat: the initial server data cannot change from one passive
+connection to another.
 
-Thanks!
-neal
+> Is this
+> targeted for connections using encryption (like TLS/SSL), or just
+> plain-text connections?
+
+TLS-on-connect cannot benefit, being client-first.  SMTP that uses
+STARTTLS can take advantage of it, as can plaintext SMTP.
+
+I would not expect https to be able to use it.
+
+
+> + What are the exact performance improvements you are seeing in your
+> benchmarks that (a) motivate this, and (b) justify any performance
+> impact on the TCP stack?
+
+Because of the lack of userland roundtrip needed for the initial server
+data, there is a latency benefit.  This is better for the TFO-C case,
+but also significant for the non-TFO case.
+
+Packet capture (laptop, loopback, TFO-C case) for initial SYN to first
+client data packet (5 samples):
+
+- baseline   TFO_C      1064 1470 1455 1547 1595  usec
+- patched    non-TFO     140  150  159  144  153  usec
+- patched    TFO_C       142  149  149  125  125  usec
+
+
+
+One fewer packet is sent by the server in most packet captures, sometimes
+one fewer in each direction.  There is one less application kernel entry/exit
+on the server.
+
+I'm hoping those differences will add up to both less cpu time (on both
+endpoints) and less wire-time.  However, I have not run benchmarks looking
+for a change in peak rate of connection-handling.
+
+
+
+In summary, this is the mirror of TCP Fast Open client data: the latency
+benefit is probably the most useful aspect.
+
+
+> + Regarding "Support write to a listen TCP socket, for immediate
+> transmission on passive connection establishments.": can you please
+> make it explicitly clear whether the data written to the listening
+> socket is saved and transmitted on all future successful passive
+> sockets that are created for the listener,
+
+This.  The data is copied for each future passive socket from this
+listener,
+
+> or is just transmitted on
+> the next connection that is created?
+
+(and not this option).
+
+
+
+
+I'll copy these comments in any future v2.
+As Eric says, I should run KASAN/syzbot first.
+
+-- 
+Cheers,
+   Jeremy
 
