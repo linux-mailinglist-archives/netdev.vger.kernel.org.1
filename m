@@ -1,86 +1,206 @@
-Return-Path: <netdev+bounces-191159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6002ABA495
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 22:17:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35E51ABA4A3
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 22:22:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96D3A175B2E
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 20:17:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA68E504F6E
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 20:22:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32B2D27FD58;
-	Fri, 16 May 2025 20:17:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E396627EC9A;
+	Fri, 16 May 2025 20:22:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cC+TjSS/"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="K71XVToF";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="eJpqsqXy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0669927A450;
-	Fri, 16 May 2025 20:17:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A8CD1F956;
+	Fri, 16 May 2025 20:21:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747426636; cv=none; b=kP1GtTKckffLi607jgyTm4K0T4c47+1QdiASCRNhipAiyk7xYpNb6YQMtCi0sW1Ao3NfbfhX5BbjmqiOGAcVz4Mqkwygtev6xJo14/T0jWJjCz2ObRdQVZv3IDwo8c+jkCSBI/B3yH9c44rlSFhC/mkR0n5n3j8BIXqWMJdQX2o=
+	t=1747426921; cv=none; b=DNzQkE+eTqfOxzRdsWEwY2zMV+FjN+r44k3xvJi5VJT18eELPdr3qOmp5g6V6sCdDXLbx+nylSb2Kb2WwXiGlkTRcXZctBxCZjThzpMMs70HjLg5Tps//Hdg6mfkP/kXFPgZYxQPOk+64e7ooDmAvh5NyKiClXuIRjpsV1yESRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747426636; c=relaxed/simple;
-	bh=gdghEq68rS4dPfk9w/Dn9+8ctElaEIgaJKGdi8w2LsI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FEiaoQukLQCTyTDN/WyyqZtagq6YmPerkGp1YNKq6MRzaKzKcpqnzdi2yQRUVhHC1ROAfjVTLutFwx5QCad4xRka36BF3r0COviuG5R9edLLeji7bNd26Vfw54z3L3zP7WwDDd4lXdN+evP/BgOjD+8mSF5g60bc6j+B+gIbUQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cC+TjSS/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C9B1C4CEE4;
-	Fri, 16 May 2025 20:17:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747426635;
-	bh=gdghEq68rS4dPfk9w/Dn9+8ctElaEIgaJKGdi8w2LsI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cC+TjSS/6y17tbIKaZGsUJoPoCD1aU/C16eEMGQPyvJ9FM3znQC7DENjYVkdt70Jh
-	 aFOIkPu/qJkm3eWmq1rZ2IciIRicDngFiXU/dDFBxngh3y8GA6Wvms3mKF9TBmdNFZ
-	 6Ip4GISVjxFV4aqS7OtJ3OWKMATh3yfxhYQfPgtaJF3bvXCNoXjFNAWo1/jWsdwbOj
-	 PKDyYPwhzcuV8TMg9FkaF8jKMQ6Ph4dVqc7AAl881N/gOMY4aLKf74zn5KFQuQnZ5a
-	 mlhX1lzFp+/ApepbLqGVDxBdxj0XGVweXkfe4TRVDRA5JOcUHIvUX7elCJNqi29r4C
-	 fXGzduw+HA5kg==
-Date: Fri, 16 May 2025 21:17:11 +0100
-From: Simon Horman <horms@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v3 1/4] net: airoha: Fix an error handling path in
- airoha_alloc_gdm_port()
-Message-ID: <20250516201711.GK3339421@horms.kernel.org>
-References: <5c94b9b345017f29ed653e2f05d25620d128c3f0.1746715755.git.christophe.jaillet@wanadoo.fr>
- <aCZZyDvp-TZ7AFwS@lore-desk>
+	s=arc-20240116; t=1747426921; c=relaxed/simple;
+	bh=WJ8YeNryCSzH6Ui7JodUwBz580NMCQQnGARlq4uKk3A=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=C+gkwjxo5q67jeqoJ+2o/ePebzzOks//Ii8Qi+KMcCN1Z66fgzsgrcyn/zCaKVPS8f1d9yjWkCZHCay/kmRXE7j/RH0T4suIHQ5kSBsBhPJ++cmXTU7/6f2IQQdT37vggqQB0rgw2inAhnii5B+kNOIKosg4godSD6XOj6cKUTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=K71XVToF; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=eJpqsqXy; arc=none smtp.client-ip=202.12.124.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
+Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id EEB91254008E;
+	Fri, 16 May 2025 16:21:56 -0400 (EDT)
+Received: from phl-imap-18 ([10.202.2.89])
+  by phl-compute-02.internal (MEProxy); Fri, 16 May 2025 16:21:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1747426916;
+	 x=1747513316; bh=y44ryEmBs0W7W6qyiyoOfpaV4DqfaTmIbApjfW/mYM4=; b=
+	K71XVToFZ+lNvc97Hv4dRpzHpSvQEeA9s01ftjVew3BUAr5HB05Mj2o/jfYGqG+D
+	I0YJhhFCkc93E1TUGG8NAjxOzHMMz5a0sKkWLrlLGPwAwZnO4IoXpgbU9mUVmXQd
+	7Q7Llah3hpZ9UokDeCCeBQva7ycBiY/GBMNlRWiv+B9AeSUvb8qEk1ZyT6gRFE9z
+	qW93xZEI5e7Okjav8cHCdvnx+woJStrT9kmcPtLedxTkqFutSt16sGWEijKjq/5J
+	kFZSZz3IVu8H6kLEBGbhokjOhdrSy5jIQ34sPd5SmU+SGayhxylyXGGRjiC2NTl5
+	TLLUEpYjgxd/zKWxu1Ekqw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1747426916; x=
+	1747513316; bh=y44ryEmBs0W7W6qyiyoOfpaV4DqfaTmIbApjfW/mYM4=; b=e
+	JpqsqXyYO7gl5h1LsZIUbERsbuJFQ2X33y9639xXEcWOy/plyN2HkFLsmlRdtYEf
+	BDb6groc7LbH2KDJ9ZPWHJHhR7muvUZTPjchbvZY6ihnJbhfM0aGLqa7ALcim1Ax
+	aQPGhZJhiZv8mKLBUEp8Fhc6U9y09KZHApSKPx2sGwPH91Gv0TNMURZNZKG7x4R8
+	tzh2PvjSvdYgIJKRR7zxF26Ri+pronfZJeoZHjwykFmLbaUDP7gOSkmVrkd/nWgG
+	/l9BJxkibdZIX/SfvEw2mHNnWXLdL4UrqN819GgZzPYEuRZNEtLoFRXLKZSCgQVy
+	ppSEGr1N7MQrylXyhWnhw==
+X-ME-Sender: <xms:ZJ4naLz6SsDPHUSQaXvY4MO5W65DLJ4OmwD9SFR1hRQYZ13VCYzuVA>
+    <xme:ZJ4naDTGd7Ij93sx8RgKlxtgArHv8jvHi9U3eFV5tMfdK0LKlYu3Omg_ZIFGZb6FE
+    akNRPtp1NG262c57Q>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdefudefieelucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnegfrhhlucfvnfffucdlfeehmdenucfjughrpefoggffhffv
+    vefkjghfufgtgfesthhqredtredtjeenucfhrhhomhepfdffrghnihgvlhcuighufdcuoe
+    gugihusegugihuuhhurdighiiiqeenucggtffrrghtthgvrhhnpeeikeduveeiffekveff
+    ieehhfdtffdtveetjeefieevveffveevudetkeffffelleenucffohhmrghinhepghhith
+    hhuhgsrdgtohhmnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhf
+    rhhomhepugiguhesugiguhhuuhdrgiihiidpnhgspghrtghpthhtohepuddvpdhmohguvg
+    epshhmthhpohhuthdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvght
+    pdhrtghpthhtohepfihilhhlvghmuggvsghruhhijhhnrdhkvghrnhgvlhesghhmrghilh
+    drtghomhdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghp
+    thhtohepjhgrtghosgdrvgdrkhgvlhhlvghrsehinhhtvghlrdgtohhmpdhrtghpthhtoh
+    epkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrnhgurhgvfieslhhunhhn
+    rdgthhdprhgtphhtthhopehjrghsohifrghnghesrhgvughhrghtrdgtohhmpdhrtghpth
+    htohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegsphhfsehvghgv
+    rhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:ZJ4naFV0YmCUp-GHpwcdw6IsNTGk25FvYh5ugH6wBJfmu36HQcyNzg>
+    <xmx:ZJ4naFhSr7eZfttx0vcc0aqo-fZyMFnUthtWMo032DOM1gI3AS3MrQ>
+    <xmx:ZJ4naNDjBC80VuaxlnnXZSeUoe-aTDtRXzwA0a8QeZe0eMQXONtJXQ>
+    <xmx:ZJ4naOJ7aE58bMNwAfQHkgLMHxoWGlj_RG0rEHDiBvjg29sZfoWE5g>
+    <xmx:ZJ4naKqm8cnYibMvIdFvcYUJVpYjB1UujfMKiakolMEaPLpft0A_7Tc_>
+Feedback-ID: i6a694271:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id E6D9115C006D; Fri, 16 May 2025 16:21:55 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aCZZyDvp-TZ7AFwS@lore-desk>
+X-ThreadId: T995aa454cfce42d7
+Date: Fri, 16 May 2025 13:21:30 -0700
+From: "Daniel Xu" <dxu@dxuuu.xyz>
+To: "Willem de Bruijn" <willemdebruijn.kernel@gmail.com>,
+ "Alexander Shalimov" <alex-shalimov@yandex-team.ru>
+Cc: "Andrew Lunn" <andrew@lunn.ch>, "David Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>,
+ "Jacob Keller" <jacob.e.keller@intel.com>, jasowang@redhat.com,
+ "Jakub Kicinski" <kuba@kernel.org>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, "Paolo Abeni" <pabeni@redhat.com>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>
+Message-Id: <81d6fb01-e914-4c04-875a-58e61b433a80@app.fastmail.com>
+In-Reply-To: <68277463d4c43_2ba041294cf@willemb.c.googlers.com.notmuch>
+References: <681a63e3c1a6c_18e44b2949d@willemb.c.googlers.com.notmuch>
+ <20250514233931.56961-1-alex-shalimov@yandex-team.ru>
+ <6825f65ae82b5_24bddc29422@willemb.c.googlers.com.notmuch>
+ <0bcc08e4-9f22-431c-97f3-c7d5784d2652@app.fastmail.com>
+ <68277463d4c43_2ba041294cf@willemb.c.googlers.com.notmuch>
+Subject: Re: [PATCH] net/tun: expose queue utilization stats via ethtool
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 15, 2025 at 11:16:56PM +0200, Lorenzo Bianconi wrote:
-> > If register_netdev() fails, the error handling path of the probe will not
-> > free the memory allocated by the previous airoha_metadata_dst_alloc() call
-> > because port->dev->reg_state will not be NETREG_REGISTERED.
-> > 
-> > So, an explicit airoha_metadata_dst_free() call is needed in this case to
-> > avoid a memory leak.
-> > 
-> > Fixes: af3cf757d5c9 ("net: airoha: Move DSA tag in DMA descriptor")
-> > Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> 
-> Acked-by: Lorenzo Bianconi <lorenzo@kernel.org>
-
-Reviewed-by: Simon Horman <horms@kernel.org>
 
 
+On Fri, May 16, 2025, at 10:22 AM, Willem de Bruijn wrote:
+> Daniel Xu wrote:
+>> On Thu, May 15, 2025, at 7:12 AM, Willem de Bruijn wrote:
+>> > Alexander Shalimov wrote:
+>> >> 06.05.2025, 22:32, "Willem de Bruijn" <willemdebruijn.kernel@gmail=
+.com>:
+>> >> > Perhaps bpftrace with a kfunc at a suitable function entry point=
+ to
+>> >> > get access to these ring structures.
+>> >>=20
+>> >> Thank you for your responses!
+>> >>=20
+>> >> Initially, we implemented such monitoring using bpftrace but we we=
+re
+>> >> not satisfied with the need to double-check the structure definiti=
+ons
+>> >> in tun.c for each new kernel version.
+>> >>=20
+>> >> We attached kprobe to the "tun_net_xmit()" function. This function
+>> >> gets a "struct net_device" as an argument, which is then explicitly
+>> >> cast to a tun_struct - "struct tun_struct *tun =3D netdev_priv(dev=
+)".
+>> >> However, performing such a cast within bpftrace is difficult becau=
+se
+>> >> tun_struct is defined in tun.c - meaning the structure definition
+>> >> cannot be included directly (not a header file). As a result, we w=
+ere
+>> >> forced to add fake "struct tun_struct" and "struct tun_file"
+>> >> definitions, whose maintenance across kernel versions became
+>> >> cumbersome (see below). The same problems exists even with kfunc a=
+nd
+>> >> btf - we are not able to cast properly netdev to tun_struct.
+>> >>=20
+>> >> That=E2=80=99s why we decided to add this functionality directly t=
+o the kernel.
+>> >
+>> > Let's solve this in bpftrace instead. That's no reason to rever to
+>> > hardcoded kernel APIs.
+>> >
+>> > It quite possibly already is. I'm no bpftrace expert. Cc:ing bpf@
+>>=20
+>> Yeah, should be possible. You haven't needed to include header
+>> files to access type information available in BTF for a while now.
+>> This seems to work for me - mind giving this a try?
+>>=20
+>> ```
+>> fentry:tun:tun_net_xmit {
+>>     $tun =3D (struct tun_struct *)args->dev->priv;
+>>     print($tun->numqueues);  // or whatever else you want
+>> }
+>> ```
+>>=20
+>> fentry probes are better in general than kprobes if all you're doing
+>> is attaching to the entry of a function.
+>>=20
+>> You could do the same with kprobes like this if you really want, thou=
+gh:
+>>=20
+>> ```
+>> kprobe:tun:tun_net_xmit {
+>>     $dev =3D (struct net_device *)arg1;
+>>     $tun =3D (struct tun_struct *)$dev->priv;
+>>     print($tun->numqueues);  // or whatever else you want
+>> }
+>> ```
+>>=20
+>> Although it looks like there's a bug when you omit the module name
+>> where bpftrace doesn't find the struct definition. I'll look into tha=
+t.
+>
+> Minor: unless tun is built-in.
+
+Ah, right.
+
+>
+> Thanks a lot for your response, Daniel. Good to know that we can get
+> this information without kernel changes. And I learned something new
+> :) Replicated your examples.
+
+Nice! Feel free to CC me if you have other stuff in the future.
+
+Bug fix for parsing implicit module BTF up here:
+https://github.com/bpftrace/bpftrace/pull/4137
 
