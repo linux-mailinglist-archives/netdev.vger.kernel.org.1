@@ -1,149 +1,211 @@
-Return-Path: <netdev+bounces-191040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D69C8AB9CFB
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 15:11:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0877FAB9D1E
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 15:20:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4130617D5E2
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 13:10:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AF3A168925
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 13:20:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91D7F241CBA;
-	Fri, 16 May 2025 13:10:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DD1315E8B;
+	Fri, 16 May 2025 13:20:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nRClxAp2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f7KYZOki"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B977223C505
-	for <netdev@vger.kernel.org>; Fri, 16 May 2025 13:10:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F84911CAF;
+	Fri, 16 May 2025 13:19:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747401050; cv=none; b=b5Ph1yc+PkjSrlDJrlkFQ77bzcJ6BajvD55xVZyZbhOlp8ojBIKDP7phjF6tTmdv7qn4353X0UV183Vymek7HSYbLb6iPm0ks8AV14Q9FSKNneNf7dHTeRAhNOXcATIiClOjrsWDWQFNelYv5Pyz1Z2j+GA1gEgG4REmtowg55M=
+	t=1747401600; cv=none; b=AQqXsrOgAjX0XVy/ezCCUwDzsioJfXuxIHBS8qyedGqOBXU8qK+FK+lgNLdHOW9hNwprSLscLQhcqDOBfk2nGxSabc70hwRjtfvTAUfKKAptcfTw9DLT8rb1vfp1lOWkFnzdxZQq/Z3Y0Yf8Z/RBcGCX4LsRGEVjuh5n0BidrEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747401050; c=relaxed/simple;
-	bh=K9h2+0CIeLWJk6m9Bp2dv674EF0JQkEXZ3KQr4daZpo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hEFrmU0AzY8oSRV3Z+NiPyQgVwQsOUVx/FS5Go8LRn6X4QZgUEmDTNtJ3Opa7uPCetyK9ScZat+ZEaJytEa9agex2kBMSgf9lJ6VVGb5mpEzvXIfaO33xpa6Nlu+S7J2e0obNcQWeu9nWIQLZd/naINb8J8kR468BKzJLI5izwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nRClxAp2; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747401049; x=1778937049;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=K9h2+0CIeLWJk6m9Bp2dv674EF0JQkEXZ3KQr4daZpo=;
-  b=nRClxAp2iPnW4e63huM7eE3WfAw9FMwd39SBH+801dguGtzHXj8/tohQ
-   l4GLA+5Fa/Is21USOtjBHh9nuGy04w/bBw6ayHnnkbImyXVqabzhX4NJx
-   LbztT4F5wKBWbhjrCBpN2vgVZDm3qniplzQ7RtM2NMGAE8BF8voSSzqj5
-   BDJGUb8bn6iORM5XL9fdTYcGdnCAtz+hWUAWz1EA1+9VNRxPTXsluqdYx
-   ZO7HD25Cy1gp6Jb1zxUkCzJH0eFkpQXsPOakp5pAaNqyAvwQFA3wft0YA
-   CsV02oa5Jcu/4yJ2dnqZXqV7RtJZiMV728qZAH5KrKRnzmefblpKdVnsk
-   w==;
-X-CSE-ConnectionGUID: VV0oWVncSFigyW/zzOMoeQ==
-X-CSE-MsgGUID: T6OpHTMvR/uWPq4hfUCWNg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11435"; a="66924684"
-X-IronPort-AV: E=Sophos;i="6.15,293,1739865600"; 
-   d="scan'208";a="66924684"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2025 06:10:48 -0700
-X-CSE-ConnectionGUID: CitHtpdfS0yJpTUsuJWDSQ==
-X-CSE-MsgGUID: 5kIM4BIiSmyKzK+j2tETaw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,293,1739865600"; 
-   d="scan'208";a="169735672"
-Received: from gklab-003-001.igk.intel.com ([10.91.173.48])
-  by fmviesa001.fm.intel.com with ESMTP; 16 May 2025 06:10:47 -0700
-From: Grzegorz Nitka <grzegorz.nitka@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	Grzegorz Nitka <grzegorz.nitka@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-net v2] ice: fix eswitch code memory leak in reset scenario
-Date: Fri, 16 May 2025 15:09:07 +0200
-Message-Id: <20250516130907.3503623-1-grzegorz.nitka@intel.com>
-X-Mailer: git-send-email 2.39.3
+	s=arc-20240116; t=1747401600; c=relaxed/simple;
+	bh=Zxq4lQIG5sIEJG3iSRSF3Y91Onwf6xfW2l+nu/OgvR4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZJCphhu3IjGeAa+WRBzBoQsW+FvSkfVAcbE7kXfsAq1vJ7HRzmEyGr4oF49YJLN7xINKMe+QfTk3Vj+PBRv0n5B66Zf09DlVV2XQrBmfXiFCq0/xby7447FW4VDpAee5XYtYrtrYjlaGyPKx0Lr6Cp1wjxHuZtnCD2wc1gW4AIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f7KYZOki; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCCC7C4CEED;
+	Fri, 16 May 2025 13:19:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747401599;
+	bh=Zxq4lQIG5sIEJG3iSRSF3Y91Onwf6xfW2l+nu/OgvR4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=f7KYZOkiciLVxL06Wz9xBn/s0o2ikDE83HLLpIFwkA3pI/YvVIC+hVNbD1Q0ZqvCe
+	 4YVwXxDzjCXKAZG6feMNdvJHw2lKynyuY0sZg79cYbCbdQ6JOMuNhsZRoPNOLmn25Y
+	 4PiM0cBxMLklZc7JjFsRkl4tL5Y3c3R27pyAdVHKghxQQfnkYoxSZjvnAT3ZZegrdt
+	 NyYl1p79htzJiUzSNhe+t2bfIiOpQ5ODH6N2z+pMysiij/t+E5vew9oVGJRSzxTGsM
+	 D4ntUuDXGqBPOUKYxhxsg2XTDC4HSIDhaipH94NDDk8U4tCoyGDafps7q23FlPNEh+
+	 iRbN9zb42gamQ==
+Message-ID: <01f97fcc-1b6a-41f3-8a62-67fac9f5bae0@kernel.org>
+Date: Fri, 16 May 2025 15:19:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 1/2] ethernet: eswin: Document for eic7700 SoC
+To: weishangjuan@eswincomputing.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ richardcochran@gmail.com, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+ p.zabel@pengutronix.de, yong.liang.choong@linux.intel.com,
+ rmk+kernel@armlinux.org.uk, jszhang@kernel.org, inochiama@gmail.com,
+ jan.petrous@oss.nxp.com, dfustini@tenstorrent.com, 0x1207@gmail.com,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
+Cc: ningyu@eswincomputing.com, linmin@eswincomputing.com,
+ lizhi2@eswincomputing.com
+References: <20250516010849.784-1-weishangjuan@eswincomputing.com>
+ <20250516011040.801-1-weishangjuan@eswincomputing.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20250516011040.801-1-weishangjuan@eswincomputing.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Add simple eswitch mode checker in attaching VF procedure and allocate
-required port representor memory structures only in switchdev mode.
-The reset flows triggers VF (if present) detach/attach procedure.
-It might involve VF port representor(s) re-creation if the device is
-configured is switchdev mode (not legacy one).
-The memory was blindly allocated in current implementation,
-regardless of the mode and not freed if in legacy mode.
+On 16/05/2025 03:10, weishangjuan@eswincomputing.com wrote:
+> From: Shangjuan Wei <weishangjuan@eswincomputing.com>
+> 
+> Add ESWIN EIC7700 Ethernet controller, supporting
+> multi-rate (10M/100M/1G) auto-negotiation, PHY LED configuration,
+> clock/reset control, and AXI bus parameter optimization.
+> 
+> Signed-off-by: Zhi Li <lizhi2@eswincomputing.com>
+> Signed-off-by: Shangjuan Wei <weishangjuan@eswincomputing.com>
 
-Kmemeleak trace:
-unreferenced object (percpu) 0x7e3bce5b888458 (size 40):
-  comm "bash", pid 1784, jiffies 4295743894
-  hex dump (first 32 bytes on cpu 45):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace (crc 0):
-    pcpu_alloc_noprof+0x4c4/0x7c0
-    ice_repr_create+0x66/0x130 [ice]
-    ice_repr_create_vf+0x22/0x70 [ice]
-    ice_eswitch_attach_vf+0x1b/0xa0 [ice]
-    ice_reset_all_vfs+0x1dd/0x2f0 [ice]
-    ice_pci_err_resume+0x3b/0xb0 [ice]
-    pci_reset_function+0x8f/0x120
-    reset_store+0x56/0xa0
-    kernfs_fop_write_iter+0x120/0x1b0
-    vfs_write+0x31c/0x430
-    ksys_write+0x61/0xd0
-    do_syscall_64+0x5b/0x180
-    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+Please use subject prefixes matching the subsystem. You can get them for
+example with `git log --oneline -- DIRECTORY_OR_FILE` on the directory
+your patch is touching. For bindings, the preferred subjects are
+explained here:
+https://www.kernel.org/doc/html/latest/devicetree/bindings/submitting-patches.html#i-for-patch-submitters
 
-Testing hints (ethX is PF netdev):
-- create at least one VF
-    echo 1 > /sys/class/net/ethX/device/sriov_numvfs
-- trigger the reset
-    echo 1 > /sys/class/net/ethX/device/reset
 
-Fixes: 415db8399d06 ("ice: make representor code generic")
-Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
----
+> ---
+>  .../bindings/net/eswin,eic7700-eth.yaml       | 142 ++++++++++++++++++
+>  1 file changed, 142 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml b/Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
+> new file mode 100644
+> index 000000000000..6cb9c109c036
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
+> @@ -0,0 +1,142 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/eswin,eic7700-eth.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Eswin EIC7700 SOC Eth Controller
+> +
+> +maintainers:
+> +  - Shuang Liang <liangshuang@eswincomputing.com>
+> +  - Zhi Li <lizhi2@eswincomputing.com>
+> +  - Shangjuan Wei <weishangjuan@eswincomputing.com>
+> +
+> +description: |
 
-v1->v2: rebase, adding netdev mailing list
+Same comments apply as for all of your patches.
 
----
- drivers/net/ethernet/intel/ice/ice_eswitch.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+> +  The eth controller registers are part of the syscrg block on
+> +  the EIC7700 SoC.
+> +
+> +properties:
+> +  compatible:
+> +    const: eswin,eic7700-qos-eth
+> +
+> +  reg:
+> +    minItems: 1
+> +    items:
+> +      - description: Base address and size
+> +      - description: Extension region (optional)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-index ed21d7f55ac1..5b9a7ee278f1 100644
---- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
-+++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-@@ -502,10 +502,14 @@ ice_eswitch_attach(struct ice_pf *pf, struct ice_repr *repr, unsigned long *id)
-  */
- int ice_eswitch_attach_vf(struct ice_pf *pf, struct ice_vf *vf)
- {
--	struct ice_repr *repr = ice_repr_create_vf(vf);
- 	struct devlink *devlink = priv_to_devlink(pf);
-+	struct ice_repr *repr;
- 	int err;
- 
-+	if (!ice_is_eswitch_mode_switchdev(pf))
-+		return 0;
-+
-+	repr = ice_repr_create_vf(vf);
- 	if (IS_ERR(repr))
- 		return PTR_ERR(repr);
- 
+How it can be optional? This is SoC. It is strictly defined, isn't it?
 
-base-commit: 2ac71b085957eb2c674e1c57107a7f0f22d2311e
--- 
-2.39.3
+> +
+> +  interrupt-names:
+> +    const: macirq
+> +
+> +  interrupts:
+> +    maxItems: 1
+> +
+> +  phy-mode:
+> +    $ref: /schemas/types.yaml#/definitions/string
+> +    enum: [mii, gmii, rgmii, rmii, sgmii]
+> +
+> +  id:
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+> +    description: Controller instance ID
 
+No, drop. IDs are not allowed.
+
+> +
+> +  clocks:
+> +    minItems: 3
+> +    maxItems: 7
+
+No.
+
+I am supposed to repeat the same comments... So no.
+
+All my comments apply to all eswin patches. For driver, bindings,
+everything. I suggest to slow down and learn from one review.
+
+I finish review here.
+
+Best regards,
+Krzysztof
 
