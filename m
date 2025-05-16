@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-191043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FE14AB9D64
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 15:31:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6339CAB9DA7
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 15:38:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71CAD4A04AC
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 13:30:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 12FAF7B3CCF
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 13:36:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B0CD12B73;
-	Fri, 16 May 2025 13:30:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FBBF72619;
+	Fri, 16 May 2025 13:37:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NyrndIXr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gfWQl+ND"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 009F68F6C;
-	Fri, 16 May 2025 13:30:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD48A2A1AA;
+	Fri, 16 May 2025 13:37:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747402254; cv=none; b=G2XDkKF996UIplx4WnS8KQZqkYkRktsWG7loLmiDEtqZf7oq2kFnHeSpPSWd3JM+9eMXHXrXEU335OzwaArOOkobAnJ6dIK/hM2KWox5Mv3ZJj4/rTmc/jovqBaJLkov0Q00zRn4coVB1b91hN6aMXtJHc985KVZpJJWjgIoT/g=
+	t=1747402676; cv=none; b=feL/Ni6823a/QXYn4j6d1obqAm1Y8AOHNsykzUOT+w15q5fD3mX6SV9hIzgTRRqOwAZcPfrt6XYC+ukAFJX7NDjcJ7OisOi35eTomU78+fHBUiDZVLo+suhr68OxBjGguQ9nmDfcmdtxn/w9sa9Cngiq0/QV65h9L4gnhi8OFPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747402254; c=relaxed/simple;
-	bh=QAn6oY1ndhlOR/BpQNIMi0vIWRm7eyDLSPPh3kNhCfs=;
+	s=arc-20240116; t=1747402676; c=relaxed/simple;
+	bh=tfffhHByX5llwjU88/l6Be44Wo41qF7tcM+s9T2He5A=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=qfjWBv+0W1sSzQMQ8sYQiPjRa5nt7DmsYDFdg1/9RtEV2Ib6ysHWigqRR70RFkiiRH9FEmDIW3w51BW8gNtbzrzIn5S40Ez1T5ldbY0ejkeStP+LcSg81iRa/EQTcden6QaW52GxZRjy0rz+X2q6brUme3AURJFdnJUhMYbRscQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NyrndIXr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23A50C4CEE4;
-	Fri, 16 May 2025 13:30:49 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=eqz4PTRzR7SIh42Yhy/TPLaDZLZuLgEJyn/mlhnxnyLS3GtjiAu0nMOgrtdto9PeqitKgWQGEngEb3fD/YPlgvGDpqEmPAqzJw1eTVH5JtlePIT4hPDIoeKqNadYngr1vR71M5cvqTVr0LL4nGhg0LuEAifOVZxhTOrq2FKI9Xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gfWQl+ND; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CE23C4CEE4;
+	Fri, 16 May 2025 13:37:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747402253;
-	bh=QAn6oY1ndhlOR/BpQNIMi0vIWRm7eyDLSPPh3kNhCfs=;
+	s=k20201202; t=1747402675;
+	bh=tfffhHByX5llwjU88/l6Be44Wo41qF7tcM+s9T2He5A=;
 	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=NyrndIXrT2F54tXajQ/zVFqnvgRy82fBTKhucLENL/5/xqUetlmfiZkH3fKR++YBv
-	 2Ruv8R4l3x2dk1xRxOcuLaB46AAl7FoNmQC9eyERRK7X1vGA3LopvTfpLS6AJABczo
-	 Pzk8dlcPEmjQz1ZOFJ+ZPGICrJLbEuHk3LkkzdGARjaAP8lfdPxk/4kac9GDdiRjGH
-	 DEYOoMkSOukEOXE+AUl2AMzzYunI6aP9sJbE4+YSgftNEZAkx7lvbI+adBMbiFzcBP
-	 1Z/etCz91Likf1FQUdiP8VC/2eu9ghFN9I3HlVh4AJCAwAoT2bXDEhomPRt4tGjOfT
-	 9sK8rEFMhdG4Q==
-Message-ID: <acc244a7-54e8-49d0-848e-6eafb850c93b@kernel.org>
-Date: Fri, 16 May 2025 15:30:48 +0200
+	b=gfWQl+ND0oH81toVcQZ2tJEi6WZaERY7bPhNjhT9QiSs4zThOhvU22YGsJMLo8N07
+	 J8+jdWLARZR4APAaG9eIN6xBu4EAdASj6D7GBkLyWuaSbsoMjkf92yr9Xpkl1pMGJg
+	 yXY7ZXVYX8rbUOjCWbPiRUo7Vi6xt9WI69yz5hX0eGN7TDHkSeR9GjYGXuBkFMDhOU
+	 CPPcH6HxH2NYnbBX4+NxK1Iiyl7QHGZlb0vp9fVbLWkkeHfvsZzhJcuk1Q7Hl1KM9e
+	 nc1Y4ml0J/GIDTeHHhK9+YDcoDtXnHxfpGKDXPeHWL5ip9G2cOza+qJjIMc0FhrUOr
+	 MAptzn8rCo3oA==
+Message-ID: <b3db09da-72f0-465f-b177-ff14fd53608b@kernel.org>
+Date: Fri, 16 May 2025 15:37:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,8 +50,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [EXTERNAL]Re: [PATCH net-next 2/2] net: pse-pd: Add Si3474 PSE
- controller driver
+Subject: Re: [EXTERNAL]Re: [PATCH net-next 1/2] dt-bindings: net: pse-pd: Add
+ bindings for Si3474 PSE controller
 To: Piotr Kubik <piotr.kubik@adtran.com>,
  Oleksij Rempel <o.rempel@pengutronix.de>,
  Kory Maincent <kory.maincent@bootlin.com>,
@@ -64,11 +64,9 @@ To: Piotr Kubik <piotr.kubik@adtran.com>,
  "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
  "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 References: <bf9e5c77-512d-4efb-ad1d-f14120c4e06b@adtran.com>
- <036e6a6c-ba45-4288-bc2a-9fd8d860ade6@adtran.com>
- <4783c1aa-d918-4194-90d7-ebc69ddbb789@kernel.org>
- <45525374-413a-4381-8c73-4f708c72ad15@adtran.com>
- <1305689f-1673-4118-935c-f91705d17863@kernel.org>
- <c23d2b2e-6ebb-4a44-bd23-5a66b2cb4e38@adtran.com>
+ <259ad93b-9cc2-4b5d-8323-b427417af747@adtran.com>
+ <f8eb7131-5a5d-47ec-8f3b-d30cdb1364b5@kernel.org>
+ <dccd0e78-81c6-422c-9f8e-11d3e5d55715@adtran.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -114,82 +112,76 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <c23d2b2e-6ebb-4a44-bd23-5a66b2cb4e38@adtran.com>
+In-Reply-To: <dccd0e78-81c6-422c-9f8e-11d3e5d55715@adtran.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 15/05/2025 17:58, Piotr Kubik wrote:
-> On 5/15/25 17:40, Krzysztof Kozlowski wrote:
->> On 15/05/2025 17:20, Piotr Kubik wrote:
->>> Thanks Krzysztof for your review,
->>>
->>>> On 13/05/2025 00:06, Piotr Kubik wrote:
->>>>> +/* Parse pse-pis subnode into chan array of si3474_priv */
->>>>> +static int si3474_get_of_channels(struct si3474_priv *priv)
->>>>> +{
->>>>> +  struct device_node *pse_node, *node;
->>>>> +  struct pse_pi *pi;
->>>>> +  u32 pi_no, chan_id;
->>>>> +  s8 pairset_cnt;
->>>>> +  s32 ret = 0;
->>>>> +
->>>>> +  pse_node = of_get_child_by_name(priv->np, "pse-pis");
->>>>> +  if (!pse_node) {
->>>>> +          dev_warn(&priv->client[0]->dev,
->>>>> +                   "Unable to parse DT PSE power interface matrix, no pse-pis node\n");
->>>>> +          return -EINVAL;
->>>>> +  }
->>>>> +
->>>>> +  for_each_child_of_node(pse_node, node) {
->>>>
->>>> Use scoped variant. One cleanup less.
->>>
->>> good point
->>>
->>>>
->>>>
->>>>> +          if (!of_node_name_eq(node, "pse-pi"))
->>>>> +                  continue;
->>>>
->>>> ...
->>>>
->>>>> +
->>>>> +  ret = i2c_smbus_read_byte_data(client, FIRMWARE_REVISION_REG);
->>>>> +  if (ret < 0)
->>>>> +          return ret;
->>>>> +  fw_version = ret;
->>>>> +
->>>>> +  ret = i2c_smbus_read_byte_data(client, CHIP_REVISION_REG);
->>>>> +  if (ret < 0)
->>>>> +          return ret;
->>>>> +
->>>>> +  dev_info(dev, "Chip revision: 0x%x, firmware version: 0x%x\n",
->>>>
->>>> dev_dbg or just drop. Drivers should be silent on success.
->>>
->>> Is there any rule for this I'm not aware of?
->>> I'd like to know that device is present and what versions it runs just by looking into dmesg.
->>> This approach is similar to other drivers, all current PSE drivers log it this way.
->>>
->> And now I noticed that you already sent it, you got review:
->> https://lore.kernel.org/all/6ee047d4-f3de-4c25-aaae-721221dc3003@kernel.org/
+On 15/05/2025 17:20, Piotr Kubik wrote:
+> On 5/13/25 10:24, Krzysztof Kozlowski wrote:
+>> On 13/05/2025 00:05, Piotr Kubik wrote:
+>>> +
+>>> +maintainers:
+>>> +  - Piotr Kubik <piotr.kubik@adtran.com>
+>>> +
+>>> +allOf:
+>>> +  - $ref: pse-controller.yaml#
+>>> +
+>>> +properties:
+>>> +  compatible:
+>>> +    enum:
+>>> +      - skyworks,si3474
+>>> +
+>>> +  reg-names:
+>>> +    items:
+>>> +      - const: main
+>>> +      - const: slave
 >>
->> and you ignored it completely sending the same again.
+>> s/slave/secondary/ (or whatever is there in recommended names in coding
+>> style)
 >>
->> Sending the same over and over and asking us to do the same review over
->> and over is really waste of our time.
->>
->> Go back to v1, implement entire review. Then start versioning your patches.
->>
->> Best regards,
->> Krzysztof
 > 
+> Well I was thinking about it and decided to use 'slave' for at least two reasons:
+> - si3474 datasheet calls the second part of IC (we configure it here) this way
+
+
+This could be a reason, but specs are changing over time (see I2C, I3C)
+to include different namings. If this annoys certain government sending
+their executive directives, then even better.
+
+
+> - description of i2c_new_ancillary_device() calls this device explicitly slave multiple times
+
+Old driver code should not be an argument. If code changes, which it can
+anytime, are you going to change binding? No, because such change in the
+binding would not be allowed.
+
 > 
-> I didn't ignore, I replied to your comment, since there was no answer I assumed you agree.
-> https://lore.kernel.org/all/38b02e2d-7935-4a23-b351-d23941e781b0@adtran.com/
+>>> +
+>>> +  reg:
+>>
+>> First reg, then reg-names. Please follow other bindings/examples.
+>>
+>>> +    maxItems: 2
+>>> +
+>>> +  channels:
+>>> +    description: The Si3474 is a single-chip PoE PSE controller managing
+>>> +      8 physical power delivery channels. Internally, it's structured
+>>> +      into two logical "Quads".
+>>> +      Quad 0 Manages physical channels ('ports' in datasheet) 0, 1, 2, 3
+>>> +      Quad 1 Manages physical channels ('ports' in datasheet) 4, 5, 6, 7.
+>>> +      This parameter describes the relationship between the logical and
+>>> +      the physical power channels.
+>>
+>> How exactly this maps here logical and physical channels? You just
+>> listed channels one after another...
 > 
-> Thanks for a reference and explanation, I'll change it.
-Coding style has it pretty explicit as well.
+> yes, here in this example it is 1 to 1 simple mapping, but in a real world,
+> depending on hw connections, there is a possibility that 
+> e.g. "pse_pi0" will use "<&phys0_4>, <&phys0_5>" pairset for lan port 3.
+> 
+
+Ack, I see that's actually common for pse-pd. It's fine.
+
 
 Best regards,
 Krzysztof
