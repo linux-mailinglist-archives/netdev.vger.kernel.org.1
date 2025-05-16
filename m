@@ -1,122 +1,91 @@
-Return-Path: <netdev+bounces-191168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E9C5ABA4EB
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 23:00:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10226ABA48B
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 22:16:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 44FD51BC17C8
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 21:00:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3078A2630D
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 20:15:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09ECC1581F0;
-	Fri, 16 May 2025 21:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5AD422B8A6;
+	Fri, 16 May 2025 20:16:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="UbV7E42Q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="se3wgxqy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx02lb.world4you.com (mx02lb.world4you.com [81.19.149.112])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC7D8488
-	for <netdev@vger.kernel.org>; Fri, 16 May 2025 21:00:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 948D7218E8B;
+	Fri, 16 May 2025 20:16:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747429230; cv=none; b=Xnsoy64AILFJ4SBzdzh2hfMV72GeOzF186cREmlBauWMrHUKlqZ6zbvBkpyT4ypmAbqwOv97Uuu0rDWXr7SGmcGsOgOezmFb2GGfypg+y02deyx7RBwxV962Msm8lt9up5kyN70K+5w3jZE8st1O7ttICim/RzCUSXeIg1ukE5Q=
+	t=1747426571; cv=none; b=cvfAQGRbVnHpUEZJ/DIscyPIdRfHIESSrGWB6ovm2cSU5WnYo9lLwK0/R0FdJ0vreUVhnKuJvYHUH4a0VKkLAgowO238S7kyTQY4q5oolFy3r3YBpjzO8P2t6G6tx4CVIlqKoOQvBdkqp6WoKOgZQGVPIzgk/qeL7kMHJgGS0+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747429230; c=relaxed/simple;
-	bh=5vX4HQGo83/sXRyxrtyVZV3GkwDgtNiiXUpqJqyEJu4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P9sFbb64yigAcy6zne7i6AI1XyQ6tbb+pMFlErb/LcKdqQ1erqrG5iAOM/obkAKkscRuCHbqxpK/V23lxoA3Ft/ZTUoUsoto8N7yzMR2FAUfiwqViJZtI1fuPArFIYDS/tDT0OJfl3YOAc2RqB85gYPr09wWBYLR2UV8Eezg1bQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=UbV7E42Q; arc=none smtp.client-ip=81.19.149.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=0eBCyFa5nJfNhXT3ROfPcm1WyDIyjNrZL9o5go0BOfQ=; b=UbV7E42QHi27obx+Pc8EoZRWDg
-	zkF8s26+0KpTckB8QcWpprb5IyQH9tpKl+aFtAuuwK42ARm/Z6bZBALzxveSHxEHQU7ieGDB1AQuS
-	3oiRCnzxRVgCJL8U/bjD8odaz1tgquU0ZKRUdDGZ4GrlKASUZV0EnUUVbuxoYniq/nQc=;
-Received: from [188.22.4.212] (helo=[10.0.0.160])
-	by mx02lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.97.1)
-	(envelope-from <gerhard@engleder-embedded.com>)
-	id 1uG1Po-000000006eh-0KYk;
-	Fri, 16 May 2025 22:12:20 +0200
-Message-ID: <6eb6d8fc-3d3d-491f-9b57-a859d39dabb4@engleder-embedded.com>
-Date: Fri, 16 May 2025 22:12:18 +0200
+	s=arc-20240116; t=1747426571; c=relaxed/simple;
+	bh=agvIOpStuatXOhRFdkohKJn/j4d5AlIvVVKNhBZDkLo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r4wUWhVvMPEeX0RBYhkXopV65jXIbgbhzxGapkUBRaC4CJvG27FKbkAy+szjO9PJkq+YouWXU5ViPTErTPZsk9o7loC8Fnobyuv4Km6NG5nNRBk+eLTAvlTgjI2NDn+EOK/vFGlsnfhlaqtOCIVAH5jWi4YhI3mVuVO2wprBOKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=se3wgxqy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6E59C4CEE4;
+	Fri, 16 May 2025 20:16:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747426571;
+	bh=agvIOpStuatXOhRFdkohKJn/j4d5AlIvVVKNhBZDkLo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=se3wgxqydYjU1HXlHmCGblCL6ZONY2SLkIwqJFb4yr/MPpLV4SFXYL/3e85VC9nWR
+	 ouCVgP9G1Bg/2z7RbjXcKWLaC2bp41Dekg6W9+NlDj8wH4ped54cJWKc1oseieexnk
+	 umy+IEA7Xk3uzAjTogVMifhv+cImkh7g0czf+ZzEGCrRoNAwuRtUexvDjXsTnUmSZC
+	 F1PdAx9SuHwIA5X7wQe/YxA2HEgA9Vvkk+EV+o5pRsm0MMmdeCEFFpJS6SYfTyJn6V
+	 vu7sMBoebC2GZaqYPPe8X4CmxowTFwTm8yudTBl9QusxKItUgogFxOSdVwopzWVKG3
+	 rVIC4GTCdUmFA==
+Date: Fri, 16 May 2025 21:16:06 +0100
+From: Simon Horman <horms@kernel.org>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v3 1/4] net: airoha: Fix an error handling path in
+ airoha_alloc_gdm_port()
+Message-ID: <20250516201606.GH3339421@horms.kernel.org>
+References: <5c94b9b345017f29ed653e2f05d25620d128c3f0.1746715755.git.christophe.jaillet@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: tsnep: fix timestamping with a stacked DSA
- driver
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org
-References: <20250512132430.344473-1-vladimir.oltean@nxp.com>
- <532276c5-0c5f-41dd-add9-487f39ec1b3a@engleder-embedded.com>
- <20250512210942.2bvv466abjdswhay@skbuf>
- <76ce9b02-d809-4ccb-8f59-cb8f201e4496@engleder-embedded.com>
- <20250513200645.vxuevzz3hdtd56sc@skbuf>
-Content-Language: en-US
-From: Gerhard Engleder <gerhard@engleder-embedded.com>
-In-Reply-To: <20250513200645.vxuevzz3hdtd56sc@skbuf>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AV-Do-Run: Yes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5c94b9b345017f29ed653e2f05d25620d128c3f0.1746715755.git.christophe.jaillet@wanadoo.fr>
 
-On 13.05.25 22:06, Vladimir Oltean wrote:
-> On Tue, May 13, 2025 at 08:34:17PM +0200, Gerhard Engleder wrote:
->> On 12.05.25 23:09, Vladimir Oltean wrote:
->>> On Mon, May 12, 2025 at 10:07:52PM +0200, Gerhard Engleder wrote:
->>>> On 12.05.25 15:24, Vladimir Oltean wrote:
->>>>> This driver seems susceptible to a form of the bug explained in commit
->>>>> c26a2c2ddc01 ("gianfar: Fix TX timestamping with a stacked DSA driver")
->>>>> and in Documentation/networking/timestamping.rst section "Other caveats
->>>>> for MAC drivers", specifically it timestamps any skb which has
->>>>> SKBTX_HW_TSTAMP, and does not consider adapter->hwtstamp_config.tx_type.
->>>>
->>>> Is it necessary in general to check adapter->hwtstamp_config.tx_type for
->>>> HWTSTAMP_TX_ON or only to fix this bug?
->>>
->>> I'll start with the problem description and work my way towards an answer.
->>
->> (...)
->>
->>>> I can take over this patch and test it when I understand more clearly
->>>> what needs to be done.
->>>>
->>>> Gerhard
->>>
->>> It would be great if you could take over this patch. After the net ->
->>> net-next merge I can then submit the ndo_hwtstamp_get()/ndo_hwtstamp_set()
->>> conversion patch for tsnep, the one which initially prompted me to look
->>> into how this driver uses the provided configuration.
->>
->> I will post a new patch version in the next days. You can send me the
->> ndo_hwtstamp_get()/ndo_hwtstamp_set() conversion patch for testing. I
->> have it on my list, but nothing done so far, so I feel responsible
->> for that too.
->>
->> Gerhard
+On Thu, May 15, 2025 at 09:59:35PM +0200, Christophe JAILLET wrote:
+> If register_netdev() fails, the error handling path of the probe will not
+> free the memory allocated by the previous airoha_metadata_dst_alloc() call
+> because port->dev->reg_state will not be NETREG_REGISTERED.
 > 
-> See attached. It applies on top of this patch ("do_tstamp" is present in
-> the context).
+> So, an explicit airoha_metadata_dst_free() call is needed in this case to
+> avoid a memory leak.
+> 
+> Fixes: af3cf757d5c9 ("net: airoha: Move DSA tag in DMA descriptor")
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> ---
+> Changes in v3:
+>   - None
+> 
+> Changes in v2:
+>   - New patch
+> v2: https://lore.kernel.org/all/5c94b9b3850f7f29ed653e2205325620df28c3ff.1746715755.git.christophe.jaillet@wanadoo.fr/
+> 
+> Compile tested only.
 
-I tested the ndo_hwtstamp_get()/ndo_hwtstamp_set() conversion patch
-successfully on top of the timestamping fix patch. Thank you for the
-patch!
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Reviewed-by: Gerhard Engleder <gerhard@engleder-embedded.com>
-Tested-by: Gerhard Engleder <gerhard@engleder-embedded.com>
 
