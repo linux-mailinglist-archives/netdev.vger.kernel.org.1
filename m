@@ -1,239 +1,756 @@
-Return-Path: <netdev+bounces-191047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191048-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96EF8AB9E3F
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 16:10:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76363AB9E6D
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 16:16:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C5087A9573
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 14:08:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD2E34E6AB5
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 14:16:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FF3E13B590;
-	Fri, 16 May 2025 14:09:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C155518C01D;
+	Fri, 16 May 2025 14:16:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=adtran.com header.i=@adtran.com header.b="NSXkFm/1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gD1a7nIz"
 X-Original-To: netdev@vger.kernel.org
-Received: from BEUP281CU002.outbound.protection.outlook.com (mail-germanynorthazon11020134.outbound.protection.outlook.com [52.101.169.134])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB38145B3F;
-	Fri, 16 May 2025 14:09:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.169.134
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747404575; cv=fail; b=QMsdUteqYT/tf4ECwuyqzifPIVLiSaprYCZuN3TQVnvstKrxtEzCn3sxVED7B44B37I87Zd0F/diN+7ENCToxlCWNSXN6CdfWj9V6tEeaauUKs+GulvYLfZAP4LHmsLMLf32S06cvZWQR0w0OlzaMdCp9KjC2c9X16TQ0yW0JcI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747404575; c=relaxed/simple;
-	bh=7asNbf0qDnSUW1oP1bbBITjc+QThZ79+wmrx465dnIA=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=q4B8WPTxWHT2qt/CDGkdyjbKhWnDP193sIJOSC3KoOiiYBDs0P6gYrZkTTgVOf6Vv1jzD1oaqsNK6A8mlZqcXIkcBfCoW3/Ws4bY+dHhF9KCGptrJZTFpyH5w+blTcThsm3P/IYkYqx0Ek2V0nYSqHl3IFDqjvtZ5skIP9Ngkws=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=adtran.com; spf=pass smtp.mailfrom=adtran.com; dkim=pass (1024-bit key) header.d=adtran.com header.i=@adtran.com header.b=NSXkFm/1; arc=fail smtp.client-ip=52.101.169.134
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=adtran.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=adtran.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kvvXGGOict2x7BcJGaUn68gmjRrvsVUUnEvH4Wwpr3kr1QgHtj7OXxcnDo133b4qj9vlKjib54rX03ZEEEOKPs42wArVgf+F/YKENU4Fzl08doWWLMqHSTDHLGThdJZJk3e3635rgYNK4tDsWGerSLEABo0bxyY1ZObJj9C9LrI7H++QcWrfexerWY1mW7EWTz7qjTIQqxzgS6xCZLcg9t5D+saH79rVtc72eCH2/Xh062rrKzFrYuTeeCS40sMhg4bIl4Y9tsW/AAbtVlcU5OngdGCdrZyPiK9QgR4wTgWYLEr3ZznO0IVvfjEVIMzUcM3GOdezfhGwOKUVKXWczg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7asNbf0qDnSUW1oP1bbBITjc+QThZ79+wmrx465dnIA=;
- b=hlrXzYXQN2XCJz1VYY+c2O1kXj/0iwb5vIB8NlA43ZpgKHo30N+akV+8oFJXBBCXFy3iPnQAwwSTQ7GJ+5NUK1W1wRnJpX6HSV92vG6Al32W1+cVZlu/nSCHzHVeZiFIzSyU9+F+fmSFPMrzXGyJTa2vFXiJiorhTkeO4qxQ8R1lBe93NKXTWNPddfULnVGPKBOtzZTlYRmhZ/naLOtVtaQLaVtr/E3uIGmoU+3ODpJa9NHTZWTzA1tHZoZkLaerUvsxmRWPs3yr6HaxNVVBLm2q3wJeeDr1ufKVFJ+UDtBdl5ylo+n8y1Sq9VTWQnmp/DcMsM7ogphVMl3C0xczKA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=adtran.com; dmarc=pass action=none header.from=adtran.com;
- dkim=pass header.d=adtran.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=adtran.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7asNbf0qDnSUW1oP1bbBITjc+QThZ79+wmrx465dnIA=;
- b=NSXkFm/17YTrFXnjpfdDl6Zt+QQ3kXfi4Z2ySZ5o2VHW04SUIiwxAOkPejxzE9gTBrtHemZOrVj0kEg8G2c0CVOW653d65PQspFOncXtIaBG3XP912Bfb7e6U58xWxF+e8Lyu5WOWQGKu0QSCHTLEgdYHY0xLoXzRvdPiHhWlfI=
-Received: from FRYP281MB2224.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:43::5) by
- FR3PPF99537C539.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d18:2::16c) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.32; Fri, 16 May
- 2025 14:09:25 +0000
-Received: from FRYP281MB2224.DEUP281.PROD.OUTLOOK.COM
- ([fe80::8232:294d:6d45:7192]) by FRYP281MB2224.DEUP281.PROD.OUTLOOK.COM
- ([fe80::8232:294d:6d45:7192%5]) with mapi id 15.20.8722.031; Fri, 16 May 2025
- 14:09:25 +0000
-From: Piotr Kubik <piotr.kubik@adtran.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>, Oleksij Rempel
-	<o.rempel@pengutronix.de>, Kory Maincent <kory.maincent@bootlin.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
-	<krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 1/2] dt-bindings: net: pse-pd: Add bindings for
- Si3474 PSE controller
-Thread-Topic: [PATCH net-next 1/2] dt-bindings: net: pse-pd: Add bindings for
- Si3474 PSE controller
-Thread-Index: AQHbxmwhTcbMQZNDv0C/N02Kzc55pw==
-Date: Fri, 16 May 2025 14:09:25 +0000
-Message-ID: <0b7afab0-0283-4a52-82bc-0d492f752034@adtran.com>
-References: <bf9e5c77-512d-4efb-ad1d-f14120c4e06b@adtran.com>
- <259ad93b-9cc2-4b5d-8323-b427417af747@adtran.com>
- <f8eb7131-5a5d-47ec-8f3b-d30cdb1364b5@kernel.org>
- <dccd0e78-81c6-422c-9f8e-11d3e5d55715@adtran.com>
- <b3db09da-72f0-465f-b177-ff14fd53608b@kernel.org>
-In-Reply-To: <b3db09da-72f0-465f-b177-ff14fd53608b@kernel.org>
-Accept-Language: pl-PL, en-US
-Content-Language: pl-PL
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=adtran.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: FRYP281MB2224:EE_|FR3PPF99537C539:EE_
-x-ms-office365-filtering-correlation-id: 9f61d54f-be46-42c8-a0ee-08dd948343c3
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|366016|1800799024|376014|921020|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?MUxKWDQ0RFRkemtoM0ZzNnhwMExnaFdZZUJBeGQxRDZ1b2dBWWpWOWdzcWJN?=
- =?utf-8?B?bEJVZ3U2aXpRY0E3WVlVaElpczc3RlZyUnc1Qnd6eFZvN2MyMTBBUEdSK1VI?=
- =?utf-8?B?azdyQ09JTmxueWZ3VExlNU9JVk5iNDN5MjZ0d2NzUnUrczJhc0JqSnBxVmcy?=
- =?utf-8?B?Q3NDY20xRGV3UDdmWGVubjhqbmdyM2FHemdjdDkwN2p2OFp1WHZZazRXWE1M?=
- =?utf-8?B?OFA2cGVHclRaU0QrelJ4VU5sYXJiRHhHT0pwK3FTUm15Sk8yQnB5QWhKZDJv?=
- =?utf-8?B?SkJhUUc0ekpNOW1uSjROV29hMzJvanRqTnJRQk5LZ2NaKzBwM0V1SGdKMDI0?=
- =?utf-8?B?dk54YTcwdG1NaFFkVGtmRmhvYUNaR2hYVFptNlZtMUZxUlRlemRDVjBXM3c2?=
- =?utf-8?B?UmRKdlZyR2doc2s3eW9yYk5VeXNGVGppT0t5V1FoZ0pWa3J5WUdEaHB5NEhU?=
- =?utf-8?B?d1R4SVk5YTVLZWowVWw1ZDl6NjZoSXNmb2ZPRGpqQ2t3ODRZU1pFMHBMdE5D?=
- =?utf-8?B?TEdFZytBTUxvWEtTRjEzQklEMUFvWnBRUkFSdGV0NENWSjltaUVYcVk4eXo3?=
- =?utf-8?B?T3hEeWM3N1dGcE5xbGVoU2pkbkxrUlhsRWlpVG0zREZVMk1QR0wxZnJJY29h?=
- =?utf-8?B?UUppRXl0WUoyVVJ2L0VOdUswZDlqcU55UnAvQnZpcitpUDJSV2QybExMc2M0?=
- =?utf-8?B?bS9WU1pOd0VVSml3UlBPM2p3T3krUXYvK3dxSktnTm9SeW9iRFBnaHJpakxy?=
- =?utf-8?B?WkdkRW82Uk9MVTZHQVZ4Y2g0Z3RxeVFGVThNRi83UXllMFByeVZpekliZzBs?=
- =?utf-8?B?S1JuQVRmUTFkdmN3RjI0Rk8zQmk0dG9KaFlRKzdpN055OFJNZHJkU2RrMS9D?=
- =?utf-8?B?eWlDSExSMm0yNm1xQTVWRnhwMzB5ZW14a1ovUjlhUHRPbFVhb2laVUhjK1V3?=
- =?utf-8?B?ZGphWVRFNGxaRGxhY2JGZkdmYXBwM2FQRlZPWTZpelFkbUNCVDhSdGZTTmtE?=
- =?utf-8?B?WThuNk53YS9xSEVsZUFIcTV3ZjZDdUNVYmk3TE5Mc0hDck1FZkczYWdoVjU4?=
- =?utf-8?B?R3hNcE8vL0pGVlI1dVdzUnZKRTBHekZUdklWVThZNnNibWJRMUV0dkh6ayta?=
- =?utf-8?B?Z2I1bnpYZG5MK0F3d3M3Um1FZjhPbnFYSlpvNktTd0ZLbGorYThWZjl2alJ1?=
- =?utf-8?B?WGNlRXVhNzBWeXFkU041YnY5Qit4ZDhZMXc4Vmp1ZHFGZUJOVFJHQnJXRzVI?=
- =?utf-8?B?STdWTGV1eDNMbHJNZEVlQnlXSUp4elcrWTVxOE1RMVZ3R01scnErbnpjbXZl?=
- =?utf-8?B?NVVqY2RMZnJVK1ZWTnNQbFcwTmluOFNjN1RvUUQ5N2orMDJEZTA0UFF3aHNy?=
- =?utf-8?B?TEY0L2FQN2JSYzdEWk1Ub2U4ZlM2VTRjdmYzR0dTZ0RTK0kyUFVRaUl6OUlU?=
- =?utf-8?B?cUtjMm5qWlBNZTFJNmdxZFlnYXlUV0d1UlJaWmFPRWJiR3ZkMTNYYUl6cDBT?=
- =?utf-8?B?d0E2RUp0a2pyNnAwaUVQTzNEL2tuemVrVWNUKzJIWjJoNmdHL0IvRnJuVFJO?=
- =?utf-8?B?Wk82aHgrREVyZkhneFRKMWdZVk9XWmJSeEpXb2NlSnhTWENSeXpnb0owVG5y?=
- =?utf-8?B?NFBBTGZTTnl4TVI4ZDFlMGgyYmJuUklxSmV2Q25sYzVmQjFsdE9MOW9sWWNV?=
- =?utf-8?B?OENKeVdhMDNwa3dUVHBDNzFsb3FQS0lIYjZGZ25RNkdQRjc1SjU1Rjk5WkFo?=
- =?utf-8?B?RUlZKzU3ZEdicytoVGpWMHBwNFBGS0duZ21IeC9tTGxtcGw2cStIdHRBT05O?=
- =?utf-8?B?WHJoVTZabSs2MFVhaUE2VzF4T2xUODVnSDhjY28zTFEzWm00bnEyTU95em40?=
- =?utf-8?B?VWZMR3pNUSswa1JuVW5VR0l6c2ppRXdCM3NVVlJCNytLdk9SaTUxQVJ1cE8y?=
- =?utf-8?B?eTNFcVFGdjRKelB5eVJ3amZscEkxQytQY0tldmdJeWdxV1l0T2IrUmRnekJF?=
- =?utf-8?Q?P3AWhkpbR2KNA/2YIp1gm0yX5DcE7Y=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:FRYP281MB2224.DEUP281.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(1800799024)(376014)(921020)(38070700018);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?SVN6U0tPUSsrOTJhVC9OODNoOXNsVTgvUkxNWE5OVytodlQxbWkwUXdMbVFp?=
- =?utf-8?B?Rmx0OE02Y3poMkhSRGNFdlBvWVZXWS9UcGRiZkZVZ3F1Z2NaekJ4Z0htT2I3?=
- =?utf-8?B?dmpOY2s5VEtQdEp0OUV3WU9aS2JESzd2MEpXdXdVaUswQVFremVoNFlWRWp3?=
- =?utf-8?B?V3YwdmoxVUtnWDdJeUxxcytBS2krK1pTdnhkbzVja2tVQlluM3dtKzd4enJr?=
- =?utf-8?B?SXhzRHptMGY2elo2dTlKSm5HK2VWZFVuSDhNa2VvT0Q2VkQ5aFdqK1NPYWpN?=
- =?utf-8?B?TUZabEJmbVdkUG1BU05hZWpob3VqVU1SNUtvYi9vMzZGaGthOGgxM05NRi84?=
- =?utf-8?B?bEh1THhrY2ZKMjlXMHVxV1Z6Sk1oTVdrZjJZRkVmTFVyK2Vualg4NTAxd29y?=
- =?utf-8?B?NGpkRm5YUHZZN3dTV3phaTA0K1dvdlR4Zi9qYklsRFBVNWtLazBESlhnYnB2?=
- =?utf-8?B?LzA5VUpkdFNtYjZRVmNVcFhPNFVhRkR6RkRoZjdoSm1EbncwUnl6WDR4Smh0?=
- =?utf-8?B?WEwrQkpVVmlYVFN1MUZlVTU2clliNFFtMDdzVU13Zlh3OXEzM2djTk91R3E4?=
- =?utf-8?B?WHJrQ0pIekYrc3diTkJZbGE2VXZMdFdSWjVQdStMdCtldWZiLzI0WHVSNEo3?=
- =?utf-8?B?Zkk2cTRaaE9qMDI3amJkZzdGa2dBb2p1WUNUc2RVczA3cHdaQ2J0Si9WK1JY?=
- =?utf-8?B?TVlMSXp3ZlMwS21vUy9SL2FQeW9iOWF0TmFldS9zRTh0TUdGcTVpaVU5RHVr?=
- =?utf-8?B?SGpOL0trTkNtVTBhdFpQMFNCMVg4QllMT0FKMlpDbVFMSEZFc1lja0ZLUk4v?=
- =?utf-8?B?cnVkTTBqRWV6NjA4RE0vakZQbXQybmxOM0ZVNlZsR0tyelVjeVd0ZFFWcG9q?=
- =?utf-8?B?WkZMSjN2a3V5UjN4cmNKdnppZE9EcnJPQWRwcllodkJkSE03aFJsNCtsL0FP?=
- =?utf-8?B?ZWFzTVRLcWtwd1FTYUt0d3hZTldjZnpGRjRtejRZV1c4L2FBOFkrUGczdFJH?=
- =?utf-8?B?SStqOVNxRTBWVzBBSHdxTThCUXJxWkdrWXNJaEppdXoxSDgrVlNlall3RUpt?=
- =?utf-8?B?bm85WVUyVWp6QXB1VkNkVG5rR2t4MHJZNWYvRmE3bnVCbXBvVHFibWxZS1Y0?=
- =?utf-8?B?cktNcWJod0Z4OHRUK2NOQXYyZVRadDF4aUtCa05wWVBxWWlDdW5rRjdvKzRK?=
- =?utf-8?B?RjdCQngyai9NRXZWL0UvUEtNS09EYWVqdFJCOHJKOXk5N2o1eStQbUFuR3Q0?=
- =?utf-8?B?NTJjMHlORWVaL2MyZis2cUg3QS9ub3JvSE8rUWs1QjJDREFLak53bTUyTnhB?=
- =?utf-8?B?Q0lIcXdJN3dWQjhlaThvY3VoTWlSb2I5WDBsK3dnalVJZXBWdnJ4R2NNTHNH?=
- =?utf-8?B?US9aUXZLT1psSzVSOGp0RWQ1TUdxVGdaQ2k1RFRSYm9PQzF3MXkrSXNpZDVZ?=
- =?utf-8?B?WVVyZ2hoSHZrWUdSL1lEL3dWNXdvb0s4YkZZRkxhM21MTzkvVzh1QmdoMmRX?=
- =?utf-8?B?amR4TkJaU3V4YUt3c3pwYzVSQWorZGEzY3Y2aW1NcytlY1hWYXArKzNsVWRF?=
- =?utf-8?B?T0pSamxTWDBHM0U5WUVxUjBuZlJicVhUeTVBWFdmTE1yT05nWHRYU3Q1YlQ0?=
- =?utf-8?B?UFFWQWZNb1E5QWV3Mjd6Vi9jQTg5ZmJzbGZTOWhCWlArK1NDdnZvUCtIakdD?=
- =?utf-8?B?TTNGZEplM1BobGdaS0U0Y2hoTmN1OWdsZVFjdXZLM1hrUGphYWtIblNNVGZN?=
- =?utf-8?B?cmdtcmR6SkZOckFMdXBQd0dlN0tQMTR0VmQxSWs2TVc0SUZmTDBWdkNjTm5O?=
- =?utf-8?B?MHRiMWRYOSs4ZzBqV1dBSlB6ajI2d1VReUV5ZVU0RzRQQkN3MldzMkMrejJn?=
- =?utf-8?B?TkZqcmtTSzJ1cG1yL25RQ2VIWFN6NTRzU3B1UjA2MGpJbEFLYVRxR0FlWnBI?=
- =?utf-8?B?YUFuUlNLdXBVTWxtcGxXUU1qSXpUYlA1VEJVc0FDVVNVc25vcWpENW1yR3BP?=
- =?utf-8?B?b29sS2RJM21PUFpVVE5hU29Rank5VlNYM2krNElQQ1o4K2s4eWtHbGkzN1hI?=
- =?utf-8?B?cCszRFpVSEJadXlVWDEvZ0lDK2V0L1ByUmVkZmYwOFpzdjVTZHA0ejUzYjNZ?=
- =?utf-8?Q?SlXd3iOVafjzIocoh++jJXc4D?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <2B0434CC2258FE4BB6BAC0FEFB8B5BFF@DEUP281.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F84B191F84;
+	Fri, 16 May 2025 14:16:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747404972; cv=none; b=qfPOFdFqrnI+akYK+z9lO+pFnDHy2iQwNtPhSD0bfNsU8h+3Z3nPhcsAyHwPfxKRhGXa3wCgUHuJarITQSnuyW3j9OtYRiBwBr2pAhrcgcc9+tgs0VHPtk3JPIKphzHLBj2DBc7upQK1zEJ3SVaK8JEoZ0OgyjpXjqjj6ohcGog=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747404972; c=relaxed/simple;
+	bh=iW6z2y6htTsnXMkoHiQ8wKR5Jv8KMtxATWoyfJcSk2g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l2G/dhllYgAne+yWJzMRCBCFE7MX4IkB/cmm9iZfMAxpFWsEkEQRfk2oDqfhpP6234QKui49eW2xe7nNYQr/8bW9Qoluh27IYPbtwPeomqRvj6KGJfNFELxWhvu4LFPqOV8W15h9e4XvqhcgMJer45COosmgLLK1L07Dc1nolSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gD1a7nIz; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5fc7edf00b2so3394263a12.2;
+        Fri, 16 May 2025 07:16:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747404968; x=1748009768; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=DAYgYkF9MqTj3mUKxL6bg7kgfawtXkTLFqsgUG5D7BI=;
+        b=gD1a7nIzh6faN+fUEgkZP0gGQ5eXzBqNH6QZcucI4QbnXJUWwt6eYacco8RZ0r1oyz
+         37oGIqD3DOJpbvP8n7KBYrxUnsssIA/5mpoVML+R0Xmd692vFi6IcjsqegzziZlybiq4
+         RT4GNkr6XpVll45StKfJuQ94TKl9IgVsXxN59oMiosAj/dIucvKIbx+iVwpKEqrsKyVi
+         yiMktzV5RLov8IxDcHHCuQ33SJ1zb0o32dwCFalLDkILLTqxQtMZ9LGpucTShK/nuJYb
+         30Mpd41fA4zs8A9gdI9xu22vqPmcLktB4nQub1uWqCKtwfgntNB2JOfNOYPFPw4iMddU
+         D8fQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747404968; x=1748009768;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DAYgYkF9MqTj3mUKxL6bg7kgfawtXkTLFqsgUG5D7BI=;
+        b=AWwLIeIiJNkvdosomwd8wa+1Rdc7+a4OvgqSRp1Dy2c8TfDmslrtaaSLOpbtEdSIMo
+         0uY9yqy671w4n1kFR8Ouuz4WlXYuyet3QK7UFqEoYkdA6fMX3Z6HbShgjMtdTLmnQB6i
+         vgePWOQSRuxymnOBwcTpSod0GSVoE3mXVuKnih5iN2HfuYjSHv2754eB4fYGbbscr5Iw
+         7MLtBYBA/8ouackofqJAFrOmCYJT5jvJI7PZxB6qwklLU9i/RDshAjunktNMy7hXVMnH
+         g4hOddaRx0nUseYzsPDIbmO+2Pxt5S6hx6Sp7/nokLDVGgNbtVZbmpMWLE1kxwVhN0ps
+         62YA==
+X-Forwarded-Encrypted: i=1; AJvYcCXsLvTOpM5E9fl1VCKZ5t8c9sGmyYvg185hYfeqgmOcwlHiNtf0MnqYjpPH/llbCAtkkw2P+7p9m4mBlZI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpqzaJoGQ/+J1CkWaGVbMq59Y7eo2JRGk6jrNtrBlBuc7iAhb0
+	8rfzJYn8Ww3OD+kEkq+JlIerLFkyBQqcB/lD7ajMwoEcxM/NCGG48DhhoGkmOjJC
+X-Gm-Gg: ASbGncvmMfpQLFpI6qPn65IroZeVqgPW2ohhIya8rABwest2d6ejl7BdHtcWGSOIMZE
+	24bJGe4eeUfzufG75xKafnjBazJQHC6+cD0qt9mqtyue7WyTKP641BXPBACx/gjJiri6saW9Dcg
+	80pdtx8jxhsp0RKN6D8utp9R1Ic75+5yn9oVR6GDmYTe/3+usASjIzlNuGYgvbTKwxCS+KzX7ix
+	7Keilpt4B5qelTX490ffDV4hN0mSCCpBwA+rvmpLqcEXe49fD/90l5avTqbm+mcqSua0rc+ft0P
+	wlCgqehV1VquNzBBNMlJiDO2O6oLZbPv9Fbv6T3t2928zLFymyYFzPfwUOnEBMJprQLEfAoS3Zb
+	Zh+UIrFX+FaxBcM63/5uVG66v1aIJbXgW1yIllg==
+X-Google-Smtp-Source: AGHT+IE2p5xqXryVNhXDKp4bMUtki4IIQMXIvOYj41MGT6sPPuGRXJtItG3YhY4durA+b8yIvpLc+g==
+X-Received: by 2002:a05:6402:4410:b0:5f4:c5eb:50c9 with SMTP id 4fb4d7f45d1cf-60119cc8f77mr2514965a12.21.1747404967696;
+        Fri, 16 May 2025 07:16:07 -0700 (PDT)
+Received: from Lord-Beerus.station (net-130-25-109-68.cust.vodafonedsl.it. [130.25.109.68])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6005ae39492sm1514652a12.70.2025.05.16.07.16.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 May 2025 07:16:07 -0700 (PDT)
+From: Stefano Radaelli <stefano.radaelli21@gmail.com>
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: stefano.radaelli21@gmail.com,
+	"stefano.radaelli" <stefano.radaelli@tastitalia.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Xu Liang <lxu@maxlinear.com>
+Subject: [PATCH net-next] net: phy: add driver for MaxLinear MxL86110 PHY
+Date: Fri, 16 May 2025 16:15:05 +0200
+Message-ID: <20250516141509.163000-1-stefano.radaelli21@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: adtran.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: FRYP281MB2224.DEUP281.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9f61d54f-be46-42c8-a0ee-08dd948343c3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 May 2025 14:09:25.4911
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 423946e4-28c0-4deb-904c-a4a4b174fb3f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: WUaLWRyMhubQGNggUImgxmb6zl1Cu2Yl+Z4GBibJV0nV647yy1fb9Z4Ph1WhDaWFvkD5pDEhqALY9bO8QkQAWA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: FR3PPF99537C539
+Content-Transfer-Encoding: 8bit
 
-T24gNS8xNi8yNSAxNTozNywgS3J6eXN6dG9mIEtvemxvd3NraSB3cm90ZToNCj4gT24gMTUvMDUv
-MjAyNSAxNzoyMCwgUGlvdHIgS3ViaWsgd3JvdGU6DQo+PiBPbiA1LzEzLzI1IDEwOjI0LCBLcnp5
-c3p0b2YgS296bG93c2tpIHdyb3RlOg0KPj4+IE9uIDEzLzA1LzIwMjUgMDA6MDUsIFBpb3RyIEt1
-YmlrIHdyb3RlOg0KPj4+PiArDQo+Pj4+ICttYWludGFpbmVyczoNCj4+Pj4gKyAgLSBQaW90ciBL
-dWJpayA8cGlvdHIua3ViaWtAYWR0cmFuLmNvbT4NCj4+Pj4gKw0KPj4+PiArYWxsT2Y6DQo+Pj4+
-ICsgIC0gJHJlZjogcHNlLWNvbnRyb2xsZXIueWFtbCMNCj4+Pj4gKw0KPj4+PiArcHJvcGVydGll
-czoNCj4+Pj4gKyAgY29tcGF0aWJsZToNCj4+Pj4gKyAgICBlbnVtOg0KPj4+PiArICAgICAgLSBz
-a3l3b3JrcyxzaTM0NzQNCj4+Pj4gKw0KPj4+PiArICByZWctbmFtZXM6DQo+Pj4+ICsgICAgaXRl
-bXM6DQo+Pj4+ICsgICAgICAtIGNvbnN0OiBtYWluDQo+Pj4+ICsgICAgICAtIGNvbnN0OiBzbGF2
-ZQ0KPj4+DQo+Pj4gcy9zbGF2ZS9zZWNvbmRhcnkvIChvciB3aGF0ZXZlciBpcyB0aGVyZSBpbiBy
-ZWNvbW1lbmRlZCBuYW1lcyBpbiBjb2RpbmcNCj4+PiBzdHlsZSkNCj4+Pg0KPj4NCj4+IFdlbGwg
-SSB3YXMgdGhpbmtpbmcgYWJvdXQgaXQgYW5kIGRlY2lkZWQgdG8gdXNlICdzbGF2ZScgZm9yIGF0
-IGxlYXN0IHR3byByZWFzb25zOg0KPj4gLSBzaTM0NzQgZGF0YXNoZWV0IGNhbGxzIHRoZSBzZWNv
-bmQgcGFydCBvZiBJQyAod2UgY29uZmlndXJlIGl0IGhlcmUpIHRoaXMgd2F5DQo+IA0KPiANCj4g
-VGhpcyBjb3VsZCBiZSBhIHJlYXNvbiwgYnV0IHNwZWNzIGFyZSBjaGFuZ2luZyBvdmVyIHRpbWUg
-KHNlZSBJMkMsIEkzQykNCj4gdG8gaW5jbHVkZSBkaWZmZXJlbnQgbmFtaW5ncy4gSWYgdGhpcyBh
-bm5veXMgY2VydGFpbiBnb3Zlcm5tZW50IHNlbmRpbmcNCj4gdGhlaXIgZXhlY3V0aXZlIGRpcmVj
-dGl2ZXMsIHRoZW4gZXZlbiBiZXR0ZXIuDQo+IA0KDQpPSywgSSd2ZSByZWFkIHNvbWUgZGlzY3Vz
-c2lvbnMgcmVnYXJkaW5nIHRoaXMgaXNzdWUgYW5kIGRlY2lkZWQgdG8gcmVuYW1lIGhlcmUgYW5k
-IGluIHNpMzQ3NCBjb2RlLg0KDQo+IA0KPj4gLSBkZXNjcmlwdGlvbiBvZiBpMmNfbmV3X2FuY2ls
-bGFyeV9kZXZpY2UoKSBjYWxscyB0aGlzIGRldmljZSBleHBsaWNpdGx5IHNsYXZlIG11bHRpcGxl
-IHRpbWVzDQo+IA0KPiBPbGQgZHJpdmVyIGNvZGUgc2hvdWxkIG5vdCBiZSBhbiBhcmd1bWVudC4g
-SWYgY29kZSBjaGFuZ2VzLCB3aGljaCBpdCBjYW4NCj4gYW55dGltZSwgYXJlIHlvdSBnb2luZyB0
-byBjaGFuZ2UgYmluZGluZz8gTm8sIGJlY2F1c2Ugc3VjaCBjaGFuZ2UgaW4gdGhlDQo+IGJpbmRp
-bmcgd291bGQgbm90IGJlIGFsbG93ZWQuDQo+IA0KDQoNCg0KPj4NCj4+Pj4gKw0KPj4+PiArICBy
-ZWc6DQo+Pj4NCj4+PiBGaXJzdCByZWcsIHRoZW4gcmVnLW5hbWVzLiBQbGVhc2UgZm9sbG93IG90
-aGVyIGJpbmRpbmdzL2V4YW1wbGVzLg0KPj4+DQo+Pj4+ICsgICAgbWF4SXRlbXM6IDINCj4+Pj4g
-Kw0KPj4+PiArICBjaGFubmVsczoNCj4+Pj4gKyAgICBkZXNjcmlwdGlvbjogVGhlIFNpMzQ3NCBp
-cyBhIHNpbmdsZS1jaGlwIFBvRSBQU0UgY29udHJvbGxlciBtYW5hZ2luZw0KPj4+PiArICAgICAg
-OCBwaHlzaWNhbCBwb3dlciBkZWxpdmVyeSBjaGFubmVscy4gSW50ZXJuYWxseSwgaXQncyBzdHJ1
-Y3R1cmVkDQo+Pj4+ICsgICAgICBpbnRvIHR3byBsb2dpY2FsICJRdWFkcyIuDQo+Pj4+ICsgICAg
-ICBRdWFkIDAgTWFuYWdlcyBwaHlzaWNhbCBjaGFubmVscyAoJ3BvcnRzJyBpbiBkYXRhc2hlZXQp
-IDAsIDEsIDIsIDMNCj4+Pj4gKyAgICAgIFF1YWQgMSBNYW5hZ2VzIHBoeXNpY2FsIGNoYW5uZWxz
-ICgncG9ydHMnIGluIGRhdGFzaGVldCkgNCwgNSwgNiwgNy4NCj4+Pj4gKyAgICAgIFRoaXMgcGFy
-YW1ldGVyIGRlc2NyaWJlcyB0aGUgcmVsYXRpb25zaGlwIGJldHdlZW4gdGhlIGxvZ2ljYWwgYW5k
-DQo+Pj4+ICsgICAgICB0aGUgcGh5c2ljYWwgcG93ZXIgY2hhbm5lbHMuDQo+Pj4NCj4+PiBIb3cg
-ZXhhY3RseSB0aGlzIG1hcHMgaGVyZSBsb2dpY2FsIGFuZCBwaHlzaWNhbCBjaGFubmVscz8gWW91
-IGp1c3QNCj4+PiBsaXN0ZWQgY2hhbm5lbHMgb25lIGFmdGVyIGFub3RoZXIuLi4NCj4+DQo+PiB5
-ZXMsIGhlcmUgaW4gdGhpcyBleGFtcGxlIGl0IGlzIDEgdG8gMSBzaW1wbGUgbWFwcGluZywgYnV0
-IGluIGEgcmVhbCB3b3JsZCwNCj4+IGRlcGVuZGluZyBvbiBodyBjb25uZWN0aW9ucywgdGhlcmUg
-aXMgYSBwb3NzaWJpbGl0eSB0aGF0IA0KPj4gZS5nLiAicHNlX3BpMCIgd2lsbCB1c2UgIjwmcGh5
-czBfND4sIDwmcGh5czBfNT4iIHBhaXJzZXQgZm9yIGxhbiBwb3J0IDMuDQo+Pg0KPiANCj4gQWNr
-LCBJIHNlZSB0aGF0J3MgYWN0dWFsbHkgY29tbW9uIGZvciBwc2UtcGQuIEl0J3MgZmluZS4NCj4g
-DQpBY3R1YWxseSwgYWZ0ZXIgc29tZSBjb25zaWRlcmF0aW9uIEkgYWdyZWVkIHdpdGggeW91IGFu
-ZCBkZWNpZGVkIHRvIHJlbW92ZSB0aGlzIHBhcnQgDQppbiB2MyBhcyB0aGlzICdjaGFubmVscycg
-bm9kZSBkb2VzIG5vdCByZWFsbHkgIGRlc2NyaWJlIEhXIG1hcHBpbmcsIHRoZSBwc2UtcGlzIHBh
-cnQgZG9lcy4NCnYzOiBodHRwczovL2xvcmUua2VybmVsLm9yZy9uZXRkZXYvZWJlOWE5ZjUtZGI5
-Yy00YjgyLWE1ZTktM2IxMDhhMGM2MzM4QGFkdHJhbi5jb20vDQoNCj4gDQo+IEJlc3QgcmVnYXJk
-cywNCj4gS3J6eXN6dG9mDQoNClRoYW5rcw0KL1Bpb3RyDQo=
+From: "stefano.radaelli" <stefano.radaelli@tastitalia.com>
+
+Add support for the MaxLinear MxL86110 Gigabit Ethernet PHY, a low-power,
+cost-optimized transceiver supporting 10/100/1000 Mbps over twisted-pair
+copper, compliant with IEEE 802.3.
+
+The driver implements basic features such as:
+- Device initialization
+- RGMII interface timing configuration
+- Wake-on-LAN support
+- LED initialization and control via /sys/class/leds
+
+This driver has been tested on multiple Variscite boards, including:
+- VAR-SOM-MX93 (i.MX93)
+- VAR-SOM-MX8M-PLUS (i.MX8MP)
+
+Example boot log showing driver probe:
+[    7.692101] imx-dwmac 428a0000.ethernet eth0:
+        PHY [stmmac-0:00] driver [MXL86110 Gigabit Ethernet] (irq=POLL)
+
+Signed-off-by: stefano.radaelli <stefano.radaelli@tastitalia.com>
+---
+ MAINTAINERS                 |   1 +
+ drivers/net/phy/Kconfig     |  12 +
+ drivers/net/phy/Makefile    |   1 +
+ drivers/net/phy/mxl-86110.c | 570 ++++++++++++++++++++++++++++++++++++
+ 4 files changed, 584 insertions(+)
+ create mode 100644 drivers/net/phy/mxl-86110.c
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 84e99e991f53..cca046bbe00b 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -14653,6 +14653,7 @@ MAXLINEAR ETHERNET PHY DRIVER
+ M:	Xu Liang <lxu@maxlinear.com>
+ L:	netdev@vger.kernel.org
+ S:	Supported
++F:	drivers/net/phy/mxl-86110.c
+ F:	drivers/net/phy/mxl-gpy.c
+ 
+ MCAN MMIO DEVICE DRIVER
+diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
+index 677d56e06539..fbaa009c146d 100644
+--- a/drivers/net/phy/Kconfig
++++ b/drivers/net/phy/Kconfig
+@@ -263,6 +263,18 @@ config MAXLINEAR_GPHY
+ 	  Support for the Maxlinear GPY115, GPY211, GPY212, GPY215,
+ 	  GPY241, GPY245 PHYs.
+ 
++config MAXLINEAR_86110_PHY
++	tristate "MaxLinear MXL86110 PHY support"
++	help
++	 Support for the MaxLinear MXL86110 Gigabit Ethernet
++	 Physical Layer transceiver.
++	 The MXL86110 is commonly used in networking equipment such as
++	 routers, switches, and embedded systems, providing the
++	 physical interface for 10/100/1000 Mbps Ethernet connections
++	 over copper media.
++	 If you are using a board with the MXL86110 PHY connected to your
++	 Ethernet MAC, you should enable this option.
++
+ source "drivers/net/phy/mediatek/Kconfig"
+ 
+ config MICREL_PHY
+diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
+index 59ac3a9a3177..171a80228c12 100644
+--- a/drivers/net/phy/Makefile
++++ b/drivers/net/phy/Makefile
+@@ -75,6 +75,7 @@ obj-$(CONFIG_MARVELL_PHY)	+= marvell.o
+ obj-$(CONFIG_MARVELL_88Q2XXX_PHY)	+= marvell-88q2xxx.o
+ obj-$(CONFIG_MARVELL_88X2222_PHY)	+= marvell-88x2222.o
+ obj-$(CONFIG_MAXLINEAR_GPHY)	+= mxl-gpy.o
++obj-$(CONFIG_MAXLINEAR_86110_PHY)       += mxl-86110.o
+ obj-y				+= mediatek/
+ obj-$(CONFIG_MESON_GXL_PHY)	+= meson-gxl.o
+ obj-$(CONFIG_MICREL_KS8995MA)	+= spi_ks8995.o
+diff --git a/drivers/net/phy/mxl-86110.c b/drivers/net/phy/mxl-86110.c
+new file mode 100644
+index 000000000000..63f32c49fcc1
+--- /dev/null
++++ b/drivers/net/phy/mxl-86110.c
+@@ -0,0 +1,570 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * PHY driver for Maxlinear MXL86110
++ *
++ * Copyright 2023 MaxLinear Inc.
++ *
++ */
++
++#include <linux/bitfield.h>
++#include <linux/etherdevice.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/of.h>
++#include <linux/phy.h>
++
++/* PHY ID */
++#define PHY_ID_MXL86110		0xc1335580
++
++/* required to access extended registers */
++#define MXL86110_EXTD_REG_ADDR_OFFSET	0x1E
++#define MXL86110_EXTD_REG_ADDR_DATA		0x1F
++#define PHY_IRQ_ENABLE_REG				0x12
++#define PHY_IRQ_ENABLE_REG_WOL			BIT(6)
++
++/* SyncE Configuration Register - COM_EXT SYNCE_CFG */
++#define MXL86110_EXT_SYNCE_CFG_REG						0xA012
++#define MXL86110_EXT_SYNCE_CFG_CLK_FRE_SEL				BIT(4)
++#define MXL86110_EXT_SYNCE_CFG_EN_SYNC_E_DURING_LNKDN	BIT(5)
++#define MXL86110_EXT_SYNCE_CFG_EN_SYNC_E				BIT(6)
++#define MXL86110_EXT_SYNCE_CFG_CLK_SRC_SEL_MASK			GENMASK(3, 1)
++#define MXL86110_EXT_SYNCE_CFG_CLK_SRC_SEL_125M_PLL		0
++#define MXL86110_EXT_SYNCE_CFG_CLK_SRC_SEL_25M			4
++
++/* WOL registers */
++#define MXL86110_WOL_MAC_ADDR_HIGH_EXTD_REG		0xA007 /* high-> FF:FF                   */
++#define MXL86110_WOL_MAC_ADDR_MIDDLE_EXTD_REG	0xA008 /*    middle-> :FF:FF <-middle    */
++#define MXL86110_WOL_MAC_ADDR_LOW_EXTD_REG		0xA009 /*                   :FF:FF <-low */
++
++#define MXL86110_EXT_WOL_CFG_REG				0xA00A
++#define MXL86110_EXT_WOL_CFG_WOLE_MASK			BIT(3)
++#define MXL86110_EXT_WOL_CFG_WOLE_DISABLE		0
++#define MXL86110_EXT_WOL_CFG_WOLE_ENABLE		BIT(3)
++
++/* RGMII register */
++#define MXL86110_EXT_RGMII_CFG1_REG							0xA003
++/* delay can be adjusted in steps of about 150ps */
++#define MXL86110_EXT_RGMII_CFG1_RX_NO_DELAY				(0x0 << 10)
++/* Closest value to 2000 ps */
++#define MXL86110_EXT_RGMII_CFG1_RX_DELAY_1950PS				(0xD << 10)
++#define MXL86110_EXT_RGMII_CFG1_RX_DELAY_MASK				GENMASK(13, 10)
++
++#define MXL86110_EXT_RGMII_CFG1_TX_1G_DELAY_1950PS			(0xD << 0)
++#define MXL86110_EXT_RGMII_CFG1_TX_1G_DELAY_MASK			GENMASK(3, 0)
++
++#define MXL86110_EXT_RGMII_CFG1_TX_10MB_100MB_DELAY_1950PS		(0xD << 4)
++#define MXL86110_EXT_RGMII_CFG1_TX_10MB_100MB_DELAY_MASK	GENMASK(7, 4)
++
++#define MXL86110_EXT_RGMII_CFG1_FULL_MASK \
++			((MXL86110_EXT_RGMII_CFG1_RX_DELAY_MASK) | \
++			(MXL86110_EXT_RGMII_CFG1_TX_1G_DELAY_MASK) | \
++			(MXL86110_EXT_RGMII_CFG1_TX_10MB_100MB_DELAY_MASK))
++
++/* EXT Sleep Control register */
++#define MXL86110_UTP_EXT_SLEEP_CTRL_REG					0x27
++#define MXL86110_UTP_EXT_SLEEP_CTRL_EN_SLEEP_SW_OFF		0
++#define MXL86110_UTP_EXT_SLEEP_CTRL_EN_SLEEP_SW_MASK	BIT(15)
++
++/* RGMII In-Band Status and MDIO Configuration Register */
++#define MXL86110_EXT_RGMII_MDIO_CFG				0xA005
++#define MXL86110_EXT_RGMII_MDIO_CFG_EPA0_MASK			GENMASK(6, 6)
++#define MXL86110_EXT_RGMII_MDIO_CFG_EBA_MASK			GENMASK(5, 5)
++#define MXL86110_EXT_RGMII_MDIO_CFG_BA_MASK			GENMASK(4, 0)
++
++#define MXL86110_MAX_LEDS            3
++/* LED registers and defines */
++#define MXL86110_LED0_CFG_REG 0xA00C
++#define MXL86110_LED1_CFG_REG 0xA00D
++#define MXL86110_LED2_CFG_REG 0xA00E
++
++#define MXL86110_LEDX_CFG_TRAFFIC_ACT_BLINK_IND		BIT(13)
++#define MXL86110_LEDX_CFG_LINK_UP_FULL_DUPLEX_ON	BIT(12)
++#define MXL86110_LEDX_CFG_LINK_UP_HALF_DUPLEX_ON	BIT(11)
++#define MXL86110_LEDX_CFG_LINK_UP_TX_ACT_ON			BIT(10)	/* LED 0,1,2 default */
++#define MXL86110_LEDX_CFG_LINK_UP_RX_ACT_ON			BIT(9)	/* LED 0,1,2 default */
++#define MXL86110_LEDX_CFG_LINK_UP_TX_ON				BIT(8)
++#define MXL86110_LEDX_CFG_LINK_UP_RX_ON				BIT(7)
++#define MXL86110_LEDX_CFG_LINK_UP_1GB_ON			BIT(6) /* LED 2 default */
++#define MXL86110_LEDX_CFG_LINK_UP_100MB_ON			BIT(5) /* LED 1 default */
++#define MXL86110_LEDX_CFG_LINK_UP_10MB_ON			BIT(4) /* LED 0 default */
++#define MXL86110_LEDX_CFG_LINK_UP_COLLISION			BIT(3)
++#define MXL86110_LEDX_CFG_LINK_UP_1GB_BLINK			BIT(2)
++#define MXL86110_LEDX_CFG_LINK_UP_100MB_BLINK		BIT(1)
++#define MXL86110_LEDX_CFG_LINK_UP_10MB_BLINK		BIT(0)
++
++#define MXL86110_LED_BLINK_CFG_REG						0xA00F
++#define MXL86110_LED_BLINK_CFG_FREQ_MODE1_2HZ			0
++#define MXL86110_LED_BLINK_CFG_FREQ_MODE1_4HZ			BIT(0)
++#define MXL86110_LED_BLINK_CFG_FREQ_MODE1_8HZ			BIT(1)
++#define MXL86110_LED_BLINK_CFG_FREQ_MODE1_16HZ			(BIT(1) | BIT(0))
++#define MXL86110_LED_BLINK_CFG_FREQ_MODE2_2HZ			0
++#define MXL86110_LED_BLINK_CFG_FREQ_MODE2_4HZ			BIT(2)
++#define MXL86110_LED_BLINK_CFG_FREQ_MODE2_8HZ			BIT(3)
++#define MXL86110_LED_BLINK_CFG_FREQ_MODE2_16HZ			(BIT(3) | BIT(2))
++#define MXL86110_LED_BLINK_CFG_DUTY_CYCLE_50_PERC_ON	0
++#define MXL86110_LED_BLINK_CFG_DUTY_CYCLE_67_PERC_ON	(BIT(4))
++#define MXL86110_LED_BLINK_CFG_DUTY_CYCLE_75_PERC_ON	(BIT(5))
++#define MXL86110_LED_BLINK_CFG_DUTY_CYCLE_83_PERC_ON	(BIT(5) | BIT(4))
++#define MXL86110_LED_BLINK_CFG_DUTY_CYCLE_50_PERC_OFF	(BIT(6))
++#define MXL86110_LED_BLINK_CFG_DUTY_CYCLE_33_PERC_ON	(BIT(6) | BIT(4))
++#define MXL86110_LED_BLINK_CFG_DUTY_CYCLE_25_PERC_ON	(BIT(6) | BIT(5))
++#define MXL86110_LED_BLINK_CFG_DUTY_CYCLE_17_PERC_ON	(BIT(6) | BIT(5) | BIT(4))
++
++/* Chip Configuration Register - COM_EXT_CHIP_CFG */
++#define MXL86110_EXT_CHIP_CFG_REG			0xA001
++#define MXL86110_EXT_CHIP_CFG_RXDLY_ENABLE	BIT(8)
++#define MXL86110_EXT_CHIP_CFG_SW_RST_N_MODE	BIT(15)
++
++/**
++ * mxl86110_write_extended_reg() - write to a PHY's extended register
++ * @phydev: pointer to a &struct phy_device
++ * @regnum: register number to write
++ * @val: value to write to @regnum
++ *
++ * NOTE: This function assumes the caller already holds the MDIO bus lock
++ * or otherwise has exclusive access to the PHY.
++ *
++ * returns 0 or negative error code
++ */
++static int mxl86110_write_extended_reg(struct phy_device *phydev, u16 regnum, u16 val)
++{
++	int ret;
++
++	ret = __phy_write(phydev, MXL86110_EXTD_REG_ADDR_OFFSET, regnum);
++	if (ret < 0)
++		return ret;
++
++	return __phy_write(phydev, MXL86110_EXTD_REG_ADDR_DATA, val);
++}
++
++/**
++ * mxl86110_read_extended_reg - Read a PHY's extended register
++ * @phydev: Pointer to the PHY device structure
++ * @regnum: Extended register number to read (address written to reg 30)
++ *
++ * Reads the content of a PHY extended register using the MaxLinear
++ * 2-step access mechanism: write the register address to reg 30 (0x1E),
++ * then read the value from reg 31 (0x1F).
++ *
++ * NOTE: This function assumes the caller already holds the MDIO bus lock
++ * or otherwise has exclusive access to the PHY.
++ *
++ * Return: 16-bit register value on success, or negative errno code on failure.
++ */
++static int mxl86110_read_extended_reg(struct phy_device *phydev, u16 regnum)
++{
++	int ret;
++
++	ret = __phy_write(phydev, MXL86110_EXTD_REG_ADDR_OFFSET, regnum);
++	if (ret < 0)
++		return ret;
++	return __phy_read(phydev, MXL86110_EXTD_REG_ADDR_DATA);
++}
++
++/**
++ * mxl86110_modify_extended_reg() - modify bits of a PHY's extended register
++ * @phydev: pointer to the phy_device
++ * @regnum: register number to write
++ * @mask: bit mask of bits to clear
++ * @set: bit mask of bits to set
++ *
++ * NOTE: register value = (old register value & ~mask) | set.
++ * This function assumes the caller already holds the MDIO bus lock
++ * or otherwise has exclusive access to the PHY.
++ *
++ * returns 0 or negative error code
++ */
++static int mxl86110_modify_extended_reg(struct phy_device *phydev, u16 regnum, u16 mask,
++					u16 set)
++{
++	int ret;
++
++	ret = __phy_write(phydev, MXL86110_EXTD_REG_ADDR_OFFSET, regnum);
++	if (ret < 0)
++		return ret;
++
++	return __phy_modify(phydev, MXL86110_EXTD_REG_ADDR_DATA, mask, set);
++}
++
++/**
++ * mxl86110_get_wol() - report if wake-on-lan is enabled
++ * @phydev: pointer to the phy_device
++ * @wol: a pointer to a &struct ethtool_wolinfo
++ */
++static void mxl86110_get_wol(struct phy_device *phydev, struct ethtool_wolinfo *wol)
++{
++	int value;
++
++	wol->supported = WAKE_MAGIC;
++	wol->wolopts = 0;
++	phy_lock_mdio_bus(phydev);
++	value = mxl86110_read_extended_reg(phydev, MXL86110_EXT_WOL_CFG_REG);
++	phy_unlock_mdio_bus(phydev);
++	if (value >= 0 && (value & MXL86110_EXT_WOL_CFG_WOLE_MASK))
++		wol->wolopts |= WAKE_MAGIC;
++}
++
++/**
++ * mxl86110_set_wol() - enable/disable wake-on-lan
++ * @phydev: pointer to the phy_device
++ * @wol: a pointer to a &struct ethtool_wolinfo
++ *
++ * Configures the WOL Magic Packet MAC
++ * returns 0 or negative errno code
++ */
++static int mxl86110_set_wol(struct phy_device *phydev, struct ethtool_wolinfo *wol)
++{
++	struct net_device *netdev;
++	const u8 *mac;
++	int ret = 0;
++
++	phy_lock_mdio_bus(phydev);
++
++	if (wol->wolopts & WAKE_MAGIC) {
++		netdev = phydev->attached_dev;
++		if (!netdev) {
++			ret = -ENODEV;
++			goto error;
++		}
++
++		/* Configure the MAC address of the WOL magic packet */
++		mac = (const u8 *)netdev->dev_addr;
++		ret = mxl86110_write_extended_reg(phydev, MXL86110_WOL_MAC_ADDR_HIGH_EXTD_REG,
++						  ((mac[0] << 8) | mac[1]));
++		if (ret < 0)
++			goto error;
++
++		ret = mxl86110_write_extended_reg(phydev, MXL86110_WOL_MAC_ADDR_MIDDLE_EXTD_REG,
++						  ((mac[2] << 8) | mac[3]));
++		if (ret < 0)
++			goto error;
++
++		ret = mxl86110_write_extended_reg(phydev, MXL86110_WOL_MAC_ADDR_LOW_EXTD_REG,
++						  ((mac[4] << 8) | mac[5]));
++		if (ret < 0)
++			goto error;
++
++		ret = mxl86110_modify_extended_reg(phydev, MXL86110_EXT_WOL_CFG_REG,
++						   MXL86110_EXT_WOL_CFG_WOLE_MASK,
++						   MXL86110_EXT_WOL_CFG_WOLE_ENABLE);
++		if (ret < 0)
++			goto error;
++
++		/* Enables Wake-on-LAN interrupt in the PHY. */
++		ret = __phy_modify(phydev, PHY_IRQ_ENABLE_REG, 0,
++				   PHY_IRQ_ENABLE_REG_WOL);
++		if (ret < 0)
++			goto error;
++
++		phydev_dbg(phydev, "%s, WOL Magic packet MAC: %02X:%02X:%02X:%02X:%02X:%02X\n",
++			   __func__, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
++
++	} else {
++		ret = mxl86110_modify_extended_reg(phydev, MXL86110_EXT_WOL_CFG_REG,
++						   MXL86110_EXT_WOL_CFG_WOLE_MASK,
++						   MXL86110_EXT_WOL_CFG_WOLE_DISABLE);
++		if (ret < 0)
++			goto error;
++
++		/* Disables Wake-on-LAN interrupt in the PHY. */
++		ret = __phy_modify(phydev, PHY_IRQ_ENABLE_REG,
++				   PHY_IRQ_ENABLE_REG_WOL, 0);
++		if (ret < 0)
++			goto error;
++	}
++
++	phy_unlock_mdio_bus(phydev);
++	return 0;
++error:
++	phy_unlock_mdio_bus(phydev);
++	return ret;
++}
++
++static const unsigned long supported_triggers = (BIT(TRIGGER_NETDEV_LINK_10) |
++						 BIT(TRIGGER_NETDEV_LINK_100) |
++						 BIT(TRIGGER_NETDEV_LINK_1000) |
++						 BIT(TRIGGER_NETDEV_HALF_DUPLEX) |
++						 BIT(TRIGGER_NETDEV_FULL_DUPLEX) |
++						 BIT(TRIGGER_NETDEV_TX) |
++						 BIT(TRIGGER_NETDEV_RX));
++
++static int mxl86110_led_hw_is_supported(struct phy_device *phydev, u8 index,
++					unsigned long rules)
++{
++	if (index >= MXL86110_MAX_LEDS)
++		return -EINVAL;
++
++	/* All combinations of the supported triggers are allowed */
++	if (rules & ~supported_triggers)
++		return -EOPNOTSUPP;
++
++	return 0;
++}
++
++static int mxl86110_led_hw_control_get(struct phy_device *phydev, u8 index,
++				       unsigned long *rules)
++{
++	u16 val;
++
++	if (index >= MXL86110_MAX_LEDS)
++		return -EINVAL;
++
++	phy_lock_mdio_bus(phydev);
++	val = mxl86110_read_extended_reg(phydev, MXL86110_LED0_CFG_REG + index);
++	phy_unlock_mdio_bus(phydev);
++	if (val < 0)
++		return val;
++
++	if (val & MXL86110_LEDX_CFG_LINK_UP_TX_ACT_ON)
++		*rules |= BIT(TRIGGER_NETDEV_TX);
++
++	if (val & MXL86110_LEDX_CFG_LINK_UP_RX_ACT_ON)
++		*rules |= BIT(TRIGGER_NETDEV_RX);
++
++	if (val & MXL86110_LEDX_CFG_LINK_UP_HALF_DUPLEX_ON)
++		*rules |= BIT(TRIGGER_NETDEV_HALF_DUPLEX);
++
++	if (val & MXL86110_LEDX_CFG_LINK_UP_FULL_DUPLEX_ON)
++		*rules |= BIT(TRIGGER_NETDEV_FULL_DUPLEX);
++
++	if (val & MXL86110_LEDX_CFG_LINK_UP_10MB_ON)
++		*rules |= BIT(TRIGGER_NETDEV_LINK_10);
++
++	if (val & MXL86110_LEDX_CFG_LINK_UP_100MB_ON)
++		*rules |= BIT(TRIGGER_NETDEV_LINK_100);
++
++	if (val & MXL86110_LEDX_CFG_LINK_UP_1GB_ON)
++		*rules |= BIT(TRIGGER_NETDEV_LINK_1000);
++
++	return 0;
++};
++
++static int mxl86110_led_hw_control_set(struct phy_device *phydev, u8 index,
++				       unsigned long rules)
++{
++	u16 val = 0;
++	int ret;
++
++	if (index >= MXL86110_MAX_LEDS)
++		return -EINVAL;
++
++	if (rules & BIT(TRIGGER_NETDEV_LINK_10))
++		val |= MXL86110_LEDX_CFG_LINK_UP_10MB_ON;
++
++	if (rules & BIT(TRIGGER_NETDEV_LINK_100))
++		val |= MXL86110_LEDX_CFG_LINK_UP_100MB_ON;
++
++	if (rules & BIT(TRIGGER_NETDEV_LINK_1000))
++		val |= MXL86110_LEDX_CFG_LINK_UP_1GB_ON;
++
++	if (rules & BIT(TRIGGER_NETDEV_TX))
++		val |= MXL86110_LEDX_CFG_LINK_UP_TX_ACT_ON;
++
++	if (rules & BIT(TRIGGER_NETDEV_RX))
++		val |= MXL86110_LEDX_CFG_LINK_UP_RX_ACT_ON;
++
++	if (rules & BIT(TRIGGER_NETDEV_HALF_DUPLEX))
++		val |= MXL86110_LEDX_CFG_LINK_UP_HALF_DUPLEX_ON;
++
++	if (rules & BIT(TRIGGER_NETDEV_FULL_DUPLEX))
++		val |= MXL86110_LEDX_CFG_LINK_UP_FULL_DUPLEX_ON;
++
++	if (rules & BIT(TRIGGER_NETDEV_TX) ||
++	    rules & BIT(TRIGGER_NETDEV_RX))
++		val |= MXL86110_LEDX_CFG_TRAFFIC_ACT_BLINK_IND;
++
++	phy_lock_mdio_bus(phydev);
++	ret = mxl86110_write_extended_reg(phydev, MXL86110_LED0_CFG_REG + index, val);
++	phy_unlock_mdio_bus(phydev);
++	if (ret)
++		return ret;
++
++	return 0;
++};
++
++/**
++ * mxl86110_synce_clk_cfg() - applies syncE/clk output configuration
++ * @phydev: pointer to the phy_device
++ *
++ * Custom settings can be defined in custom config section of the driver
++ * returns 0 or negative errno code
++ */
++static int mxl86110_synce_clk_cfg(struct phy_device *phydev)
++{
++	u16 mask = 0, value = 0;
++	int ret = 0;
++
++	/*
++	 * Configures the clock output to its default setting as per the datasheet.
++	 * This results in a 25MHz clock output being selected in the
++	 * COM_EXT_SYNCE_CFG register for SyncE configuration.
++	 */
++	value = MXL86110_EXT_SYNCE_CFG_EN_SYNC_E |
++			FIELD_PREP(MXL86110_EXT_SYNCE_CFG_CLK_SRC_SEL_MASK,
++				   MXL86110_EXT_SYNCE_CFG_CLK_SRC_SEL_25M);
++	mask = MXL86110_EXT_SYNCE_CFG_EN_SYNC_E |
++	       MXL86110_EXT_SYNCE_CFG_CLK_SRC_SEL_MASK |
++	       MXL86110_EXT_SYNCE_CFG_CLK_FRE_SEL;
++
++	/* Write clock output configuration */
++	ret = mxl86110_modify_extended_reg(phydev, MXL86110_EXT_SYNCE_CFG_REG,
++					   mask, value);
++
++	return ret;
++}
++
++/**
++ * mxl86110_broadcast_cfg - Configure MDIO broadcast setting for PHY
++ * @phydev: Pointer to the PHY device structure
++ *
++ * This function configures the MDIO broadcast behavior of the MxL86110 PHY.
++ * Currently, broadcast mode is explicitly disabled by clearing the EPA0 bit
++ * in the RGMII_MDIO_CFG extended register.
++ *
++ * Return: 0 on success or a negative errno code on failure.
++ */
++static int mxl86110_broadcast_cfg(struct phy_device *phydev)
++{
++	int ret = 0;
++	u16 val;
++
++	val = mxl86110_read_extended_reg(phydev, MXL86110_EXT_RGMII_MDIO_CFG);
++	if (val < 0)
++		return val;
++
++	val &= ~MXL86110_EXT_RGMII_MDIO_CFG_EPA0_MASK;
++	ret = mxl86110_write_extended_reg(phydev, MXL86110_EXT_RGMII_MDIO_CFG, val);
++
++	return ret;
++}
++
++/**
++ * mxl86110_enable_led_activity_blink - Enable LEDs activity blink on PHY
++ * @phydev: Pointer to the PHY device structure
++ *
++ * Configure all PHY LEDs to blink on traffic activity regardless of their
++ * ON or OFF state. This behavior allows each LED to serve as a pure activity
++ * indicator, independently of its use as a link status indicator.
++ *
++ * By default, each LED blinks only when it is also in the ON state. This function
++ * modifies the appropriate registers (LABx fields) to enable blinking even
++ * when the LEDs are OFF, to allow the LED to be used as a traffic indicator
++ * without requiring it to also serve as a link status LED.
++ *
++ * NOTE: Any further LED customization can be performed via the
++ * /sys/class/led interface; the functions led_hw_is_supported, led_hw_control_get, and
++ * led_hw_control_set are used to support this mechanism.
++ *
++ * Return: 0 on success or a negative errno code on failure.
++ */
++static int mxl86110_enable_led_activity_blink(struct phy_device *phydev)
++{
++	int ret, index;
++	u16 val = 0;
++
++	for (index = 0; index < MXL86110_MAX_LEDS; index++) {
++		val = mxl86110_read_extended_reg(phydev, MXL86110_LED0_CFG_REG + index);
++		if (val < 0)
++			return val;
++
++		val |= MXL86110_LEDX_CFG_TRAFFIC_ACT_BLINK_IND;
++		ret = mxl86110_write_extended_reg(phydev, MXL86110_LED0_CFG_REG + index, val);
++		if (ret < 0)
++			return ret;
++	}
++
++	return 0;
++};
++
++/**
++ * mxl86110_config_init() - initialize the PHY
++ * @phydev: pointer to the phy_device
++ *
++ * returns 0 or negative errno code
++ */
++static int mxl86110_config_init(struct phy_device *phydev)
++{
++	unsigned int val = 0;
++	int ret;
++
++	phy_lock_mdio_bus(phydev);
++
++	/* configure syncE / clk output */
++	ret = mxl86110_synce_clk_cfg(phydev);
++	if (ret < 0)
++		goto error;
++
++	switch (phydev->interface) {
++	case PHY_INTERFACE_MODE_RGMII:
++		val = 0;
++		break;
++	case PHY_INTERFACE_MODE_RGMII_RXID:
++		val = MXL86110_EXT_RGMII_CFG1_RX_DELAY_1950PS;
++		break;
++	case PHY_INTERFACE_MODE_RGMII_TXID:
++		val = MXL86110_EXT_RGMII_CFG1_TX_1G_DELAY_1950PS |
++			MXL86110_EXT_RGMII_CFG1_TX_10MB_100MB_DELAY_1950PS;
++		break;
++	case PHY_INTERFACE_MODE_RGMII_ID:
++		val = MXL86110_EXT_RGMII_CFG1_TX_1G_DELAY_1950PS |
++			MXL86110_EXT_RGMII_CFG1_TX_10MB_100MB_DELAY_1950PS;
++		val |= MXL86110_EXT_RGMII_CFG1_RX_DELAY_1950PS;
++		break;
++	default:
++		ret = -EINVAL;
++		goto error;
++	}
++	ret = mxl86110_modify_extended_reg(phydev, MXL86110_EXT_RGMII_CFG1_REG,
++					   MXL86110_EXT_RGMII_CFG1_FULL_MASK, val);
++	if (ret < 0)
++		goto error;
++
++	/* Configure RXDLY (RGMII Rx Clock Delay) to disable the default additional
++	 * delay value on RX_CLK (2 ns for 125 MHz, 8 ns for 25 MHz/2.5 MHz)
++	 * and use just the digital one selected before
++	 */
++	ret = mxl86110_modify_extended_reg(phydev, MXL86110_EXT_CHIP_CFG_REG,
++					   MXL86110_EXT_CHIP_CFG_RXDLY_ENABLE, 0);
++	if (ret < 0)
++		goto error;
++
++	ret = mxl86110_enable_led_activity_blink(phydev);
++	if (ret < 0)
++		goto error;
++
++	ret = mxl86110_broadcast_cfg(phydev);
++	if (ret < 0)
++		goto error;
++
++	phy_unlock_mdio_bus(phydev);
++	return 0;
++error:
++	phy_unlock_mdio_bus(phydev);
++	return ret;
++}
++
++static struct phy_driver mxl_phy_drvs[] = {
++	{
++		PHY_ID_MATCH_EXACT(PHY_ID_MXL86110),
++		.name			= "MXL86110 Gigabit Ethernet",
++		.config_init		= mxl86110_config_init,
++		.get_wol		= mxl86110_get_wol,
++		.set_wol		= mxl86110_set_wol,
++		.led_hw_is_supported	= mxl86110_led_hw_is_supported,
++		.led_hw_control_get     = mxl86110_led_hw_control_get,
++		.led_hw_control_set     = mxl86110_led_hw_control_set,
++	},
++};
++
++module_phy_driver(mxl_phy_drvs);
++
++static const struct mdio_device_id __maybe_unused mxl_tbl[] = {
++	{ PHY_ID_MATCH_EXACT(PHY_ID_MXL86110) },
++	{  }
++};
++
++MODULE_DEVICE_TABLE(mdio, mxl_tbl);
++
++MODULE_DESCRIPTION("MaxLinear MXL86110 PHY driver");
++MODULE_AUTHOR("Stefano Radaelli");
++MODULE_LICENSE("GPL");
+
+base-commit: 894fbb55e60cab4ea740f6c65a08b5f8155221f4
+-- 
+2.43.0
+
 
