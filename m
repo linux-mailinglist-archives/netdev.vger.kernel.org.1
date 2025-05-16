@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-190975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F089AB98F5
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 11:35:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 395E9AB98F7
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 11:35:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45CF37B7FA3
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 09:33:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C74904A664B
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 09:34:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0C46232365;
-	Fri, 16 May 2025 09:34:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2A48233155;
+	Fri, 16 May 2025 09:34:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
+Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED622230BE9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15882231825
 	for <netdev@vger.kernel.org>; Fri, 16 May 2025 09:34:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747388057; cv=none; b=OmqEVDI5Jvix7gt4csb780rr+iYLof2ARHla/o8cuHjx9y0Z95gU5KLdZNdY+B6/pGg1NAu+z78foHehKJoeIM898GnDuOufCWgAaIJKF6PokXF/2Vh/LI0k0g3wI9E74SqM8NDPo2bSqW44V0tL34vroSsCohal7TDG6FX8zck=
+	t=1747388058; cv=none; b=DT6yPwuDTNCClO1F+nFkH71+jv3X5NJuQi5WueVmy7xCOpi0cakhJIBBqNHt6KZLw/Gg9p7U0vUGB37Qofn5bZ4Eb6UdbLlYysCt1sJIBUaqi2hTMjzQf6Ye6avQ3uSpDpwdtld0uaNm+5Mood5ZEdq8+7PED16n8HpDdinEYoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747388057; c=relaxed/simple;
-	bh=sOlP9omh66g0xJ1133H6F4TBFZahmeyBYna30iOBxIU=;
+	s=arc-20240116; t=1747388058; c=relaxed/simple;
+	bh=4O3kEczX06L0w29DATaf2abIVwMcvo1ygT4ixZUwNl0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=orHPJqpnyvUQP6rpzj4q4aXMczX21KeYUBsfDMMkF7fvkq0UqsJJLvoAMGIqCkbrdrWMrMtIk3c25CME/5nkbzeQ/X/BBzPtvXZk3JcvbuEbvTqUyJcCvQ2lh6P73tcBQxegzQAZQ/lBILxhUrJ06x7d4xaQVvxXRFo0ClT41So=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.92
+	 MIME-Version; b=HwlVAeKGTJc+HQbDxvCoRO1sLRCMYemvxgUwcjky+4s1DOA1gdEcZK/pD8srtgjroracK9e+WD+UTPqTaHn8wpX2X1mIHsK0YHjIOsgSIZtojqtqe2/q4//3pXodQZLGNVU4ReSkMeSv7/9SB7iE2rw/OERmuWhmkG5qdpGc+mM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.128
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: esmtpsz17t1747387975te6618c23
-X-QQ-Originating-IP: L3eWvFYan026Bgwx5IPaX7DOkx0nr3LVLcI66FsSHrk=
+X-QQ-mid: esmtpsz17t1747387977t27d641f5
+X-QQ-Originating-IP: Px+/DIO4HGDq4FBqVfobyENoyMGgE9GGjS7eApNpxDk=
 Received: from w-MS-7E16.trustnetic.com ( [122.233.195.51])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 16 May 2025 17:32:54 +0800 (CST)
-X-QQ-SSF: 0001000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 727843897797265350
+	id ; Fri, 16 May 2025 17:32:56 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 9192241663184129588
 EX-QQ-RecipientCnt: 10
 From: Jiawen Wu <jiawenwu@trustnetic.com>
 To: netdev@vger.kernel.org,
@@ -49,9 +49,9 @@ To: netdev@vger.kernel.org,
 	horms@kernel.org
 Cc: mengyuanlou@net-swift.com,
 	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next 7/9] net: txgbe: Restrict the use of mismatched FW versions
-Date: Fri, 16 May 2025 17:32:18 +0800
-Message-ID: <ED7ACBFDFF6405A7+20250516093220.6044-8-jiawenwu@trustnetic.com>
+Subject: [PATCH net-next 8/9] net: txgbe: Implement PTP for AML devices
+Date: Fri, 16 May 2025 17:32:19 +0800
+Message-ID: <41FE252AE684333A+20250516093220.6044-9-jiawenwu@trustnetic.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250516093220.6044-1-jiawenwu@trustnetic.com>
 References: <20250516093220.6044-1-jiawenwu@trustnetic.com>
@@ -64,95 +64,181 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: esmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: NcOoHQsD5eyELZ5L4X+hE8peAfsqMC/P0wsumJiVmkXXrKf1ZfphP4pN
-	nzgvINY3Fva1ISByO4mDV3QC3hlZEYKFTEdE2um/f9kjW/iD2abb1tQ9tORLZR3TJXKGsuD
-	gWvCxTlXlrVDXE6+UZ+bDJxIMGL6h6dJRT2mKDOLcWu94w8Op56ZST1wbj9mGyW+Qo7Eu0A
-	eyZeMfY/lOTWzwEfHdc23RmQ9HNJ1s2ni5DQm/75rZonBrR8m4Ueaq52/G95hStAFdV3fyB
-	ZvBAWUEGqWC730oLqeU2h8Jo8l3NXE40/hME9XkQ3bsS2vRss7pD7TisAHsACy/F8JVsJvk
-	TkdiecCBSf8XGaxDzQblrWQBf/9TSWDQayHPamyDVhstrnJ2GA7X8MiuOS+1g+uM2+Zme2q
-	vjcOci5FUZaH/dbmFElUUbQ+K6Qnszzlovx4cLwvTwCz0GlACIA2LwLHc7k1N41+KkUeGMr
-	R17U4IaTN19+yl/qTfd5WK+CD2DO6GW9fgaifr4IwqNL8oa+BuNv9jX6l246w2EbwecDe2O
-	B++Sy3kLb+u7E506g17KcNAQ5d9jZlwxasxkkEYTRPzbLj5WR2hQfBpGTm6QiN60F/cw/5z
-	tYQS0mecsd1EKXIlpZlRT8aPlExeHHChTfOMhINzJJUUAmi9W4LVTjgRN/wqDahtsfkoTcd
-	zPXeh40J132yPrXDxDgiXQj0DiQ4PP3k5UtOG7YMMtJW7l30Dj+rCW3Svmowsngz4jvrTax
-	/rgYvc/wRFwKnKiaqrwOoILSM0QjwOQ93NndM91l7QbMtE7xDqwxF4lfMke4QwX/PUIeHkp
-	jZ9ySltA0DF/jkJA5LrjR/13tEZ0M8unehzPUUzTZ+yFj5ihbVQ4JmWuybMgjvDS6Fgyf5t
-	Ym0v2HyCjo3blFicVQXrrgaVJCC/tx/3JZrb83/yOyq05QeGt74UupT6qxCh+Fc6lQq4UWL
-	Pb/080IY/M0cj8CLNtT7Rpqcv7FPObdIuUJl1rz28r7GoUy23kvfDhkjCkXb3DS7iaWATw4
-	6WVDf+9tKNCFfswg6Nk3oM8k/0+eU5nb+CrPxUlh9/5pc6sICAWPd1Cz3YgKeXT6uKG0Y9h
-	9ESQ0pn3G42lcwDyfHmRn8=
+X-QQ-XMAILINFO: MdeKXtvFSi8p2UnW2jlAwHRFTqziL2bbKmA1RH3kD6Y0nrR/8BbKlPnI
+	xvI1kfqynEduY08Kpa1GpNpVBG2kRQKk0aj8YZZNIGdi+vst+b1k7MKWSYnt7QoZ6drOYNo
+	Xd3A/5R4lEgamLcetixlGsKYRWqvj9voKDEViBelPkUFrRff3BZSvXscQjXoOBHC+zDenmT
+	/sqMjT+h68D5w5X7+BWW240e1kopcHk8GV5TPO2e5+TufnuKMCWr2oAAtMtbPOcDYgiRdlq
+	Pdsa1BNFGdF8Yao4E/USE4mfZgwpetAvT6D7gOk+Q5zvMLbLx8RO4TwnOSa1JFxxLfzPKXb
+	CqhVMoEMp7m2j+CQ4zgzlbDyk0J44XJ+btWLtTBTKyJXkARIOufuzZ5BWo1FUi4TUi7cFzx
+	dXjRp4l6YCe7vZ6PgLpW5UMtzX8A6H/okYlGdjHp3V+MQRX600jzZKHRdFSiYgVNtzJkdDF
+	zb8rzcS18LHJkemDbCx/ghpKiLUFaCxEUjD7PN7xd9B5sGpsUPBFAvfCpACWQQZPLRlHGxQ
+	C9G9EYvEmxmbCTYGfZ0YV9Hsnk9no12Q2TQJnteFvcIgGja2GQSoAnuoaQ3YOmaVXQFJRKR
+	Lnrnie40KuatjJ23b8dLJjsSL04zod652Uhl8uIGyQUz2ezfCUhKQciU4MQvxi1hEx26x6L
+	+A6irJkWSRn6p2S1FWvhNPefk4MvQUpaJiAURGFcJO4fwcMoF9M8smni2yad98PxBXNDmPz
+	5WjhSB0hYvu+z0JuQs4b//lSuJYRuLR1ZB0A7Q7GYU90gnIwhW8ShDNJeei+0GqfGy4dkcn
+	2eROHR4y9BrMkLaOPYRyoTZMo1EH6exA5IDAf4p5DlnOJjM5RWRQVfp9zbB4rsWGiYc0IfF
+	i71CNQjzi7fxlI1yijGuUJMZWYm10kH+SfQMGCP7OtmWi4CCk8ufTpglSm1AqFqqheZGFVg
+	p7ooNtTANCbvWXwoUVJvN/+4MAyrksuoL4PIu5J7qOFDzlu6WqKeyiqVw/AnCQSrMR5cNGi
+	/mnBMPDEIDZQlqi/wGatL4jjZ/V1g4+oUKGAv+axtDDNVh9krwDAf/R99mqmHhyYashbyuL
+	Q==
 X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
 X-QQ-RECHKSPAM: 0
 
-The new added mailbox commands require a new released firmware version.
-Otherwise, a lot of logs "Unknown FW command" would be printed. And the
-devices may not work properly. So add the test command in the probe
-function.
+Support PTP clock and 1PPS output signal for AML devices.
 
 Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 ---
- drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c  | 16 ++++++++++++++++
- drivers/net/ethernet/wangxun/txgbe/txgbe_aml.h  |  1 +
- drivers/net/ethernet/wangxun/txgbe/txgbe_main.c |  7 +++++++
- 3 files changed, 24 insertions(+)
+ drivers/net/ethernet/wangxun/libwx/wx_ptp.c   | 30 ++++++++++++++++---
+ .../net/ethernet/wangxun/txgbe/txgbe_aml.c    |  6 ++++
+ .../net/ethernet/wangxun/txgbe/txgbe_irq.c    |  5 ++++
+ .../net/ethernet/wangxun/txgbe/txgbe_type.h   |  3 +-
+ 4 files changed, 39 insertions(+), 5 deletions(-)
 
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ptp.c b/drivers/net/ethernet/wangxun/libwx/wx_ptp.c
+index 07c015ba338f..2c39b879f977 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_ptp.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_ptp.c
+@@ -15,12 +15,14 @@
+ #define WX_INCVAL_100         0xA00000
+ #define WX_INCVAL_10          0xC7F380
+ #define WX_INCVAL_EM          0x2000000
++#define WX_INCVAL_AML         0xA00000
+ 
+ #define WX_INCVAL_SHIFT_10GB  20
+ #define WX_INCVAL_SHIFT_1GB   18
+ #define WX_INCVAL_SHIFT_100   15
+ #define WX_INCVAL_SHIFT_10    12
+ #define WX_INCVAL_SHIFT_EM    22
++#define WX_INCVAL_SHIFT_AML   21
+ 
+ #define WX_OVERFLOW_PERIOD    (HZ * 30)
+ #define WX_PTP_TX_TIMEOUT     (HZ)
+@@ -504,15 +506,27 @@ static long wx_ptp_create_clock(struct wx *wx)
+ 	wx->ptp_caps.gettimex64 = wx_ptp_gettimex64;
+ 	wx->ptp_caps.settime64 = wx_ptp_settime64;
+ 	wx->ptp_caps.do_aux_work = wx_ptp_do_aux_work;
+-	if (wx->mac.type == wx_mac_em) {
+-		wx->ptp_caps.max_adj = 500000000;
++	switch (wx->mac.type) {
++	case wx_mac_aml:
++	case wx_mac_aml40:
++		wx->ptp_caps.max_adj = 250000000;
+ 		wx->ptp_caps.n_per_out = 1;
+ 		wx->ptp_setup_sdp = wx_ptp_setup_sdp;
+ 		wx->ptp_caps.enable = wx_ptp_feature_enable;
+-	} else {
++		break;
++	case wx_mac_sp:
+ 		wx->ptp_caps.max_adj = 250000000;
+ 		wx->ptp_caps.n_per_out = 0;
+ 		wx->ptp_setup_sdp = NULL;
++		break;
++	case wx_mac_em:
++		wx->ptp_caps.max_adj = 500000000;
++		wx->ptp_caps.n_per_out = 1;
++		wx->ptp_setup_sdp = wx_ptp_setup_sdp;
++		wx->ptp_caps.enable = wx_ptp_feature_enable;
++		break;
++	default:
++		return -EOPNOTSUPP;
+ 	}
+ 
+ 	wx->ptp_clock = ptp_clock_register(&wx->ptp_caps, &wx->pdev->dev);
+@@ -647,10 +661,18 @@ static u64 wx_ptp_read(const struct cyclecounter *hw_cc)
+ 
+ static void wx_ptp_link_speed_adjust(struct wx *wx, u32 *shift, u32 *incval)
+ {
+-	if (wx->mac.type == wx_mac_em) {
++	switch (wx->mac.type) {
++	case wx_mac_aml:
++	case wx_mac_aml40:
++		*shift = WX_INCVAL_SHIFT_AML;
++		*incval = WX_INCVAL_AML;
++		return;
++	case wx_mac_em:
+ 		*shift = WX_INCVAL_SHIFT_EM;
+ 		*incval = WX_INCVAL_EM;
+ 		return;
++	default:
++		break;
+ 	}
+ 
+ 	switch (wx->speed) {
 diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
-index af12ebb89c71..83b383021790 100644
+index 83b383021790..6bcf67bef576 100644
 --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
 +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
-@@ -50,6 +50,22 @@ irqreturn_t txgbe_gpio_irq_handler_aml(int irq, void *data)
- 	return IRQ_HANDLED;
+@@ -8,6 +8,7 @@
+ 
+ #include "../libwx/wx_type.h"
+ #include "../libwx/wx_lib.h"
++#include "../libwx/wx_ptp.h"
+ #include "../libwx/wx_hw.h"
+ #include "txgbe_type.h"
+ #include "txgbe_aml.h"
+@@ -311,6 +312,9 @@ static void txgbe_mac_link_up_aml(struct phylink_config *config,
+ 	wr32(wx, TXGBE_AML_MAC_TX_CFG, txcfg | TXGBE_AML_MAC_TX_CFG_TE);
+ 
+ 	wx->speed = speed;
++	wx->last_rx_ptp_check = jiffies;
++	if (test_bit(WX_STATE_PTP_RUNNING, wx->state))
++		wx_ptp_reset_cyclecounter(wx);
  }
  
-+int txgbe_test_hostif(struct wx *wx)
-+{
-+	struct txgbe_hic_ephy_getlink buffer;
-+
-+	if (wx->mac.type != wx_mac_aml)
-+		return 0;
-+
-+	buffer.hdr.cmd = FW_PHY_GET_LINK_CMD;
-+	buffer.hdr.buf_len = sizeof(struct txgbe_hic_ephy_getlink) -
-+			     sizeof(struct wx_hic_hdr);
-+	buffer.hdr.cmd_or_resp.cmd_resv = FW_CEM_CMD_RESERVED;
-+
-+	return wx_host_interface_command(wx, (u32 *)&buffer, sizeof(buffer),
-+					WX_HI_COMMAND_TIMEOUT, true);
-+}
-+
- static int txgbe_identify_sfp_hostif(struct wx *wx, struct txgbe_hic_i2c_read *buffer)
- {
- 	buffer->hdr.cmd = FW_READ_SFP_INFO_CMD;
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.h
-index 2376a021ba8d..25d4971ca0d9 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.h
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.h
+ static void txgbe_mac_link_down_aml(struct phylink_config *config,
+@@ -323,6 +327,8 @@ static void txgbe_mac_link_down_aml(struct phylink_config *config,
+ 	wr32m(wx, WX_MAC_RX_CFG, WX_MAC_RX_CFG_RE, 0);
+ 
+ 	wx->speed = SPEED_UNKNOWN;
++	if (test_bit(WX_STATE_PTP_RUNNING, wx->state))
++		wx_ptp_reset_cyclecounter(wx);
+ }
+ 
+ static void txgbe_mac_config_aml(struct phylink_config *config, unsigned int mode,
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
+index 05fe8fd43b80..dfc3a2cc27f6 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
 @@ -6,6 +6,7 @@
  
- void txgbe_gpio_init_aml(struct wx *wx);
- irqreturn_t txgbe_gpio_irq_handler_aml(int irq, void *data);
-+int txgbe_test_hostif(struct wx *wx);
- int txgbe_set_phy_link(struct wx *wx);
- int txgbe_identify_sfp(struct wx *wx);
- void txgbe_setup_link(struct wx *wx);
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index 6f3b67def51a..f3d2778b8e35 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -864,6 +864,13 @@ static int txgbe_probe(struct pci_dev *pdev,
- 	if (etrack_id < 0x20010)
- 		dev_warn(&pdev->dev, "Please upgrade the firmware to 0x20010 or above.\n");
- 
-+	err = txgbe_test_hostif(wx);
-+	if (err != 0) {
-+		dev_err(&pdev->dev, "Mismatched Firmware version\n");
-+		err = -EIO;
-+		goto err_release_hw;
+ #include "../libwx/wx_type.h"
+ #include "../libwx/wx_lib.h"
++#include "../libwx/wx_ptp.h"
+ #include "../libwx/wx_hw.h"
+ #include "../libwx/wx_sriov.h"
+ #include "txgbe_type.h"
+@@ -178,6 +179,10 @@ static irqreturn_t txgbe_misc_irq_thread_fn(int irq, void *data)
+ 		handle_nested_irq(sub_irq);
+ 		nhandled++;
+ 	}
++	if (unlikely(eicr & TXGBE_PX_MISC_IC_TIMESYNC)) {
++		wx_ptp_check_pps_event(wx);
++		nhandled++;
 +	}
-+
- 	txgbe = devm_kzalloc(&pdev->dev, sizeof(*txgbe), GFP_KERNEL);
- 	if (!txgbe) {
- 		err = -ENOMEM;
+ 
+ 	wx_intr_enable(wx, TXGBE_INTR_MISC);
+ 	return (nhandled > 0 ? IRQ_HANDLED : IRQ_NONE);
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
+index 98bd25254c80..7a00e3343be6 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
+@@ -82,6 +82,7 @@
+ /* Extended Interrupt Enable Set */
+ #define TXGBE_PX_MISC_ETH_LKDN                  BIT(8)
+ #define TXGBE_PX_MISC_DEV_RST                   BIT(10)
++#define TXGBE_PX_MISC_IC_TIMESYNC               BIT(11)
+ #define TXGBE_PX_MISC_ETH_EVENT                 BIT(17)
+ #define TXGBE_PX_MISC_ETH_LK                    BIT(18)
+ #define TXGBE_PX_MISC_ETH_AN                    BIT(19)
+@@ -92,7 +93,7 @@
+ 	(TXGBE_PX_MISC_ETH_LKDN | TXGBE_PX_MISC_DEV_RST | \
+ 	 TXGBE_PX_MISC_ETH_EVENT | TXGBE_PX_MISC_ETH_LK | \
+ 	 TXGBE_PX_MISC_ETH_AN | TXGBE_PX_MISC_INT_ERR | \
+-	 TXGBE_PX_MISC_IC_VF_MBOX)
++	 TXGBE_PX_MISC_IC_VF_MBOX | TXGBE_PX_MISC_IC_TIMESYNC)
+ 
+ /* Port cfg registers */
+ #define TXGBE_CFG_PORT_ST                       0x14404
 -- 
 2.48.1
 
