@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-190979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37316AB98F6
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 11:35:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F089AB98F5
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 11:35:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DA603AA74F
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 09:34:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45CF37B7FA3
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 09:33:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1A4B22F386;
-	Fri, 16 May 2025 09:34:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0C46232365;
+	Fri, 16 May 2025 09:34:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
+Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE71522FAF8
-	for <netdev@vger.kernel.org>; Fri, 16 May 2025 09:34:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED622230BE9
+	for <netdev@vger.kernel.org>; Fri, 16 May 2025 09:34:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747388069; cv=none; b=WRyGuLpX/e0fnf3Gwd2hwR5sgIl+mYIjXaqozIFanB2aPsO//f2GXbzGq8V6M4Lg1jLcYaIGzUf93TRMPPihSXkiOo5I6d05rJT2VYSW0XNAiu6802BhPM72wwm3Y3OGc6qa93QxD9KvOduFY+gpp3AjGKzsKDqt3z42DmcZoBw=
+	t=1747388057; cv=none; b=OmqEVDI5Jvix7gt4csb780rr+iYLof2ARHla/o8cuHjx9y0Z95gU5KLdZNdY+B6/pGg1NAu+z78foHehKJoeIM898GnDuOufCWgAaIJKF6PokXF/2Vh/LI0k0g3wI9E74SqM8NDPo2bSqW44V0tL34vroSsCohal7TDG6FX8zck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747388069; c=relaxed/simple;
-	bh=XDtDgQl5o+dwE+H9DVQmPRSzDXMYFiXMN610xWSFjkI=;
+	s=arc-20240116; t=1747388057; c=relaxed/simple;
+	bh=sOlP9omh66g0xJ1133H6F4TBFZahmeyBYna30iOBxIU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qjan+OIk1EyRSOABCZLQ2Om18ZfW4f8+KOr8sy5sv8b/vXlS0RJupnq5KyrrrFVmv3+Kuzdgkl5tB4wE8syQ+myQnd93VZf5kWM8UlUmxgdBeZ+jlBmuAwRZM4Z6CT1bWSJk97ihOCIBuPuntLYlo0cDa55VoIkvOu+3ejKRkRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.169.211.239
+	 MIME-Version; b=orHPJqpnyvUQP6rpzj4q4aXMczX21KeYUBsfDMMkF7fvkq0UqsJJLvoAMGIqCkbrdrWMrMtIk3c25CME/5nkbzeQ/X/BBzPtvXZk3JcvbuEbvTqUyJcCvQ2lh6P73tcBQxegzQAZQ/lBILxhUrJ06x7d4xaQVvxXRFo0ClT41So=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.92
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: esmtpsz17t1747387973tcb667559
-X-QQ-Originating-IP: A33E0v/fMzlOzYeY/WhRZl/77/VVIwLUiHWcpewg95g=
+X-QQ-mid: esmtpsz17t1747387975te6618c23
+X-QQ-Originating-IP: L3eWvFYan026Bgwx5IPaX7DOkx0nr3LVLcI66FsSHrk=
 Received: from w-MS-7E16.trustnetic.com ( [122.233.195.51])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 16 May 2025 17:32:51 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 4063943926388249656
+	id ; Fri, 16 May 2025 17:32:54 +0800 (CST)
+X-QQ-SSF: 0001000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 727843897797265350
 EX-QQ-RecipientCnt: 10
 From: Jiawen Wu <jiawenwu@trustnetic.com>
 To: netdev@vger.kernel.org,
@@ -49,9 +49,9 @@ To: netdev@vger.kernel.org,
 	horms@kernel.org
 Cc: mengyuanlou@net-swift.com,
 	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next 6/9] net: txgbe: Correct the currect link settings
-Date: Fri, 16 May 2025 17:32:17 +0800
-Message-ID: <48E2D9072A4EF7A0+20250516093220.6044-7-jiawenwu@trustnetic.com>
+Subject: [PATCH net-next 7/9] net: txgbe: Restrict the use of mismatched FW versions
+Date: Fri, 16 May 2025 17:32:18 +0800
+Message-ID: <ED7ACBFDFF6405A7+20250516093220.6044-8-jiawenwu@trustnetic.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250516093220.6044-1-jiawenwu@trustnetic.com>
 References: <20250516093220.6044-1-jiawenwu@trustnetic.com>
@@ -64,108 +64,95 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: esmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: MhRA+Wg7eZqsJex1Y2U6Sos/ElgG0LkeM41sbjkumwgx02Rqc7glFKTW
-	9TWDPfPoDHYaADARC2jNzSA8AW3crLm9du7rpN9oDnq5Bkqo6x/CA+MF1Uzgr6BjjxYVVJ0
-	OswB5e5cvQ5xlVsrhlSXG44Ktocm6+biQKFHmTi41LaOlNynJEiuYTXQMKGXfWHasSut0Xu
-	F/gvWIWMgFCy1HhD79JA0BoDHwCiz0zueHv3dn+R9M10Z3VeMo7h5D6piIkVTFquRyfoIMh
-	tea4R0OVsJMqj90kSDSk8PZ5B0owTTjT5mhhJi1R7gj6c5xs5PN8yY097grkmWnPqutUuJF
-	Fx9uIP2oEJaIeklxehdPZM1D8HGn1Kq3fbJAEoo/52bU9wSlpwsHMoB1VjQh0aijs6C+U+y
-	5/sciUljz2KWkoHSObwSBu7okgxn8zlgzA1eh54b4TgLpba0P2duY8QpBuGrsspNrQrfQPF
-	pBsC63fvOs2kCoXmzxLGaa1NURUe7YcAFGz9UH5DheJoAXuBdzN5MraSbvwBBiLWoMnId+p
-	LPSshuU7PkblXe1wzQNUy6kmmO/k9KuGxXIEKWBR7QDqNLBmnAt2KkfAFbPMGs3PNlAR/nu
-	HBqhMt4KvEqx2LUv6oP+vpldZptjk1OtaQfhXLhFU/tnglMWGRMTXMw+zFZ9ufXeSR9rQGs
-	psZ66QUO9q4mi8tQt0WPhXANQV5RpaRAJYpQKAWQJnph1JjIHwRBNmMf4dHrviLAKc6+3HA
-	cI+1KKNdAskISclbyur//BPgZjx4mOr/2R5EIiWPq0c+Lf1IosNJlet7yDgpvrnChln2tDp
-	aMGlSp1IlNvbg1I6ntt7i2lZUoCejiLw22n5H09BhR8t6WI+QW569zzs7Hs/4Ik1TvvFiHW
-	9EnZPrFaAuqJGYwbRc+4Qz+KWSxaOVrmFwx6Itpabtbi/klRyB8XNCnYyLiFQzZHMlcDj+h
-	ijq6vX45GSIp3jmc5m5LrU4QHFIJA6bQyhPGioPAdUto3xSjJdPdFrVt6y6sBsU4CWPPprr
-	doxScaySI1io7+baPjTZSAazTUjayYZqu0b+bqBg==
-X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
+X-QQ-XMAILINFO: NcOoHQsD5eyELZ5L4X+hE8peAfsqMC/P0wsumJiVmkXXrKf1ZfphP4pN
+	nzgvINY3Fva1ISByO4mDV3QC3hlZEYKFTEdE2um/f9kjW/iD2abb1tQ9tORLZR3TJXKGsuD
+	gWvCxTlXlrVDXE6+UZ+bDJxIMGL6h6dJRT2mKDOLcWu94w8Op56ZST1wbj9mGyW+Qo7Eu0A
+	eyZeMfY/lOTWzwEfHdc23RmQ9HNJ1s2ni5DQm/75rZonBrR8m4Ueaq52/G95hStAFdV3fyB
+	ZvBAWUEGqWC730oLqeU2h8Jo8l3NXE40/hME9XkQ3bsS2vRss7pD7TisAHsACy/F8JVsJvk
+	TkdiecCBSf8XGaxDzQblrWQBf/9TSWDQayHPamyDVhstrnJ2GA7X8MiuOS+1g+uM2+Zme2q
+	vjcOci5FUZaH/dbmFElUUbQ+K6Qnszzlovx4cLwvTwCz0GlACIA2LwLHc7k1N41+KkUeGMr
+	R17U4IaTN19+yl/qTfd5WK+CD2DO6GW9fgaifr4IwqNL8oa+BuNv9jX6l246w2EbwecDe2O
+	B++Sy3kLb+u7E506g17KcNAQ5d9jZlwxasxkkEYTRPzbLj5WR2hQfBpGTm6QiN60F/cw/5z
+	tYQS0mecsd1EKXIlpZlRT8aPlExeHHChTfOMhINzJJUUAmi9W4LVTjgRN/wqDahtsfkoTcd
+	zPXeh40J132yPrXDxDgiXQj0DiQ4PP3k5UtOG7YMMtJW7l30Dj+rCW3Svmowsngz4jvrTax
+	/rgYvc/wRFwKnKiaqrwOoILSM0QjwOQ93NndM91l7QbMtE7xDqwxF4lfMke4QwX/PUIeHkp
+	jZ9ySltA0DF/jkJA5LrjR/13tEZ0M8unehzPUUzTZ+yFj5ihbVQ4JmWuybMgjvDS6Fgyf5t
+	Ym0v2HyCjo3blFicVQXrrgaVJCC/tx/3JZrb83/yOyq05QeGt74UupT6qxCh+Fc6lQq4UWL
+	Pb/080IY/M0cj8CLNtT7Rpqcv7FPObdIuUJl1rz28r7GoUy23kvfDhkjCkXb3DS7iaWATw4
+	6WVDf+9tKNCFfswg6Nk3oM8k/0+eU5nb+CrPxUlh9/5pc6sICAWPd1Cz3YgKeXT6uKG0Y9h
+	9ESQ0pn3G42lcwDyfHmRn8=
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
 X-QQ-RECHKSPAM: 0
 
-For AML 25G devices, some of the information returned from
-phylink_ethtool_ksettings_get() is not correct, since there is a
-fixed-link mode. So add additional corrections.
+The new added mailbox commands require a new released firmware version.
+Otherwise, a lot of logs "Unknown FW command" would be printed. And the
+devices may not work properly. So add the test command in the probe
+function.
 
 Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 ---
- .../net/ethernet/wangxun/libwx/wx_ethtool.c   |  3 ---
- .../ethernet/wangxun/txgbe/txgbe_ethtool.c    | 27 ++++++++++++++++++-
- .../ethernet/wangxun/txgbe/txgbe_ethtool.h    |  2 ++
- 3 files changed, 28 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c  | 16 ++++++++++++++++
+ drivers/net/ethernet/wangxun/txgbe/txgbe_aml.h  |  1 +
+ drivers/net/ethernet/wangxun/txgbe/txgbe_main.c |  7 +++++++
+ 3 files changed, 24 insertions(+)
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-index 86c0159e8a2d..c12a4cb951f6 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-@@ -231,9 +231,6 @@ int wx_get_link_ksettings(struct net_device *netdev,
- {
- 	struct wx *wx = netdev_priv(netdev);
- 
--	if (wx->mac.type == wx_mac_aml40)
--		return -EOPNOTSUPP;
--
- 	return phylink_ethtool_ksettings_get(wx->phylink, cmd);
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
+index af12ebb89c71..83b383021790 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
+@@ -50,6 +50,22 @@ irqreturn_t txgbe_gpio_irq_handler_aml(int irq, void *data)
+ 	return IRQ_HANDLED;
  }
- EXPORT_SYMBOL(wx_get_link_ksettings);
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-index 78999d484f18..fa770961df5f 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-@@ -12,6 +12,31 @@
- #include "txgbe_fdir.h"
- #include "txgbe_ethtool.h"
  
-+int txgbe_get_link_ksettings(struct net_device *netdev,
-+			     struct ethtool_link_ksettings *cmd)
++int txgbe_test_hostif(struct wx *wx)
 +{
-+	struct wx *wx = netdev_priv(netdev);
-+	struct txgbe *txgbe = wx->priv;
-+	int err;
++	struct txgbe_hic_ephy_getlink buffer;
 +
-+	if (wx->mac.type == wx_mac_aml40)
-+		return -EOPNOTSUPP;
-+
-+	err = wx_get_link_ksettings(netdev, cmd);
-+	if (err)
-+		return err;
-+
-+	if (wx->mac.type == wx_mac_sp)
++	if (wx->mac.type != wx_mac_aml)
 +		return 0;
 +
-+	cmd->base.port = txgbe->link_port;
-+	cmd->base.autoneg = AUTONEG_DISABLE;
-+	linkmode_copy(cmd->link_modes.supported, txgbe->sfp_support);
-+	linkmode_copy(cmd->link_modes.advertising, txgbe->advertising);
++	buffer.hdr.cmd = FW_PHY_GET_LINK_CMD;
++	buffer.hdr.buf_len = sizeof(struct txgbe_hic_ephy_getlink) -
++			     sizeof(struct wx_hic_hdr);
++	buffer.hdr.cmd_or_resp.cmd_resv = FW_CEM_CMD_RESERVED;
 +
-+	return 0;
++	return wx_host_interface_command(wx, (u32 *)&buffer, sizeof(buffer),
++					WX_HI_COMMAND_TIMEOUT, true);
 +}
 +
- static int txgbe_set_ringparam(struct net_device *netdev,
- 			       struct ethtool_ringparam *ring,
- 			       struct kernel_ethtool_ringparam *kernel_ring,
-@@ -510,7 +535,7 @@ static const struct ethtool_ops txgbe_ethtool_ops = {
- 	.get_drvinfo		= wx_get_drvinfo,
- 	.nway_reset		= wx_nway_reset,
- 	.get_link		= ethtool_op_get_link,
--	.get_link_ksettings	= wx_get_link_ksettings,
-+	.get_link_ksettings	= txgbe_get_link_ksettings,
- 	.set_link_ksettings	= wx_set_link_ksettings,
- 	.get_sset_count		= wx_get_sset_count,
- 	.get_strings		= wx_get_strings,
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.h
-index ace1b3571012..66dbc8ec1bb6 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.h
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.h
-@@ -4,6 +4,8 @@
- #ifndef _TXGBE_ETHTOOL_H_
- #define _TXGBE_ETHTOOL_H_
+ static int txgbe_identify_sfp_hostif(struct wx *wx, struct txgbe_hic_i2c_read *buffer)
+ {
+ 	buffer->hdr.cmd = FW_READ_SFP_INFO_CMD;
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.h
+index 2376a021ba8d..25d4971ca0d9 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.h
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.h
+@@ -6,6 +6,7 @@
  
-+int txgbe_get_link_ksettings(struct net_device *netdev,
-+			     struct ethtool_link_ksettings *cmd);
- void txgbe_set_ethtool_ops(struct net_device *netdev);
+ void txgbe_gpio_init_aml(struct wx *wx);
+ irqreturn_t txgbe_gpio_irq_handler_aml(int irq, void *data);
++int txgbe_test_hostif(struct wx *wx);
+ int txgbe_set_phy_link(struct wx *wx);
+ int txgbe_identify_sfp(struct wx *wx);
+ void txgbe_setup_link(struct wx *wx);
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+index 6f3b67def51a..f3d2778b8e35 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+@@ -864,6 +864,13 @@ static int txgbe_probe(struct pci_dev *pdev,
+ 	if (etrack_id < 0x20010)
+ 		dev_warn(&pdev->dev, "Please upgrade the firmware to 0x20010 or above.\n");
  
- #endif /* _TXGBE_ETHTOOL_H_ */
++	err = txgbe_test_hostif(wx);
++	if (err != 0) {
++		dev_err(&pdev->dev, "Mismatched Firmware version\n");
++		err = -EIO;
++		goto err_release_hw;
++	}
++
+ 	txgbe = devm_kzalloc(&pdev->dev, sizeof(*txgbe), GFP_KERNEL);
+ 	if (!txgbe) {
+ 		err = -ENOMEM;
 -- 
 2.48.1
 
