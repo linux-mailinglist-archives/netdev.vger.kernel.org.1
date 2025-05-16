@@ -1,143 +1,161 @@
-Return-Path: <netdev+bounces-190989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F42DAB9951
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 11:48:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D327AB9980
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 11:56:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F0A5118993A1
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 09:49:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C9A31BC6FDC
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 09:55:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 047E722F768;
-	Fri, 16 May 2025 09:48:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E03723371F;
+	Fri, 16 May 2025 09:54:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="LcXKJZ4t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uyBoMusI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5099E230BC1
-	for <netdev@vger.kernel.org>; Fri, 16 May 2025 09:48:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20BE9231836;
+	Fri, 16 May 2025 09:54:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747388928; cv=none; b=q3uNwX/MutpNamjeKrjNygTIrvH9H4z/CZZWK4efb2LSKx39X9Tec1b7hNqQbSsYvxG4UQ/YEF5nRkuvkUZAxhU16vKS8HJGgbh2Q47YYc4R3FHwWoh8zPJ//VSVZON2J0jJ0cILK2Gf+imV8rtjfTqBV4jePLBd0V7x3MrhKE8=
+	t=1747389280; cv=none; b=muGvkjV4T9Tz4IPWXGsuNdQrFo+uvDX1oCEcSLA3GOMZxdeuiWQU2YC0bw6Zsn/fKIkP2UvQIF2fZEHPh1PCkMKpn6GD0ObAQQcCW7+/vmHsQ7ZSAeBIdFZMkL64D+YP2gkf0aoMHKcTUdugkFO0otdXYRdTTBlNHTO+E+mE9rA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747388928; c=relaxed/simple;
-	bh=Qo977XGgG7v34uoxD9Tovy9QN0HMoF32/dkjeVE6yr0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hMl1cLbqUgvAWp7NYGz2SugTTd4juf4qpm9Yk8jlNXI7w6YF8hvzXyFpvAkOiN+w/LR/ZvzUiYumXrGV5Z94IrPUGu5cXJfBCX8eiI5el+EPevSlaYsNH0UsubQp0OiYNQhxw5lNyve1T3wA5jA82kYT9uzeIYZf/l6beTS7f9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=LcXKJZ4t; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com [209.85.208.69])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 6144B3FC4C
-	for <netdev@vger.kernel.org>; Fri, 16 May 2025 09:48:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1747388924;
-	bh=os73Fv5dyqXqqpAvu7HzafHqtvu6cpi8sd0sMXDbjWY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type;
-	b=LcXKJZ4tK5EtOsIi4G8f9oPjGQpE6TUg3sJBWy26F3GqB58w9CiaLxu8cCHed3cbr
-	 XENxzbShuFjyjPhynu/Zloqwl9coiWFcs7GQ3MG2jr5ULNOPYQle6mv9of92/Y/Dtt
-	 +Lgvx+M6LyPSNCNl/MeAL0CO9gYoVE/sulahoupT5jHKi13AtQows7Pj8gWUvvxDli
-	 fn9Aq+m36xENjnQUWQ9sl9OE2RQjtrqOnHAbqSbu8rJ9ZcilndKsMD9n2xzPHNPUYb
-	 MBO3+skTSWVGEZPceSGwAUGmAZ7dEC4Fkf4IS2vZzQeO7GoUZcUvVf1BMIas6Uthru
-	 VdXLLcVMWj1RQ==
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5fbf91153c5so1981778a12.3
-        for <netdev@vger.kernel.org>; Fri, 16 May 2025 02:48:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747388923; x=1747993723;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=os73Fv5dyqXqqpAvu7HzafHqtvu6cpi8sd0sMXDbjWY=;
-        b=t1lLQT+9TBharF4dFhAQln/RqsHdTRlmsnBdK4CmBkcJpsmfPx+rIWMVTCqCOiznQ6
-         2n/XA/7U2bRN6OoyP0jT7GplVipPsyKrHFbwEx2cOMgvwYEZ2NLLhDSHHWkz8T1/3VYZ
-         hMzzuoNSD/PDFpQajkNmchelmgsZAwWv//DT3vAPoLat4OUX1JMWOAEGaqNNWtJPB8fd
-         P7Zs1o+QF+AtVI6ypJmJ1FNPDH5ovwDAJm5hrFEtehpCJe9S4GffGZCKYpZ5uTLbBDna
-         qV6nlKHlg6+aF6Wtpykwoi0Qa6Md6lds66HtMtCQjK1DUvl37ljINboq9lTatguLgm+y
-         VbpQ==
-X-Gm-Message-State: AOJu0YykhsMLPbdLsaWsq9e38knWkZh7wLcRcl0MDOX/X18YpcWdcFLz
-	LcLkO28swGPI288dNLQkHBquBvZ+ZEwmg/YroytuSCZCt09GeIQnBgTHJmxn/ZPOyKBpAQmnfr8
-	RNfGtJg5UUMy9aOQxZXKd+kMocJ5aVfvYL7oBcnzV4wVLjC4oNx+PGwPeDBiAbyTcfl7WFbsiot
-	ORK7Dk4UKMFDVNt6WNrVhR1Hq/nBadSw29KgNhXiQ3JZJ3qGH9
-X-Gm-Gg: ASbGncvnMgWMA014cTCBMyYbqzl0rYXAXH7o64NGR6Qd2Mz/MjUr5Bhw3l/sQ+of/9P
-	j97t8FA/zjyect0URJX3PxXp4YGaQe/ykmKIwrpEURoyXc+AxwB68PQT0RNWiWpoE0b4+Wg==
-X-Received: by 2002:a17:907:7b97:b0:ad2:39a9:f1b8 with SMTP id a640c23a62f3a-ad536f3867fmr178677966b.57.1747388923360;
-        Fri, 16 May 2025 02:48:43 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHjlz0pShlD+rWAV89gS8KIz+HoZeHIdmI5xKxGlkhwEtwqyull9K9qQ9xnRAnU0PTsJff/CwFG41SXRc4j8Xg=
-X-Received: by 2002:a17:907:7b97:b0:ad2:39a9:f1b8 with SMTP id
- a640c23a62f3a-ad536f3867fmr178675466b.57.1747388922975; Fri, 16 May 2025
- 02:48:42 -0700 (PDT)
+	s=arc-20240116; t=1747389280; c=relaxed/simple;
+	bh=cNGzEGia25lZqXsVStZ30M0Gmy1ujfz1B+xpH/pyz5U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DyPFDknRmyNbcDxBIHgNjRqu/00Yl6g4M4bpPvzET42JBtK/PToz+wBWnvcgugFrEqhwzY8CvZZHU1o6VFWub+DjKEwO2Y0dylOTPEM6LecOEsQUXLUr6JHQPqcgQoxw2IrnCk9JcbsC+Ec7jcCTI2cP/72FN18oUaEeH6S9W2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uyBoMusI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F119C4CEEF;
+	Fri, 16 May 2025 09:54:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747389280;
+	bh=cNGzEGia25lZqXsVStZ30M0Gmy1ujfz1B+xpH/pyz5U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uyBoMusII2b45lXUcrViChhqP2cU17fdLv6zVDaxw8Kajvy9Xy27efVSKrlc7/mCZ
+	 rQaK+BzjNKV0+/XLrIACWcbBCkcehhGXdeuP3numrDxQ6bvbUG/NYX4jJGoK02VYL1
+	 WwLFlY5IX22Jf+cGS7H+XMZLPwJIpKIKPf2FyjvmPpD+98eZ0Hop9w691xyyIGAIrL
+	 jFEBwrap/t9Zwf7UkWrwJImzEvaX0/yNGFatq5AQPED4C5uBGIdSnvMmlFceoZ7qfX
+	 nbZ7FR70pp159O4JwpFKLBZXp6/t05ro6vNYmjTeOS7fYtVWEq8AvlwYlWcRwIM2Ww
+	 JvZZtln9UGzgw==
+Date: Fri, 16 May 2025 11:54:31 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Jann Horn <jannh@google.com>
+Cc: linux-fsdevel@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Eric Dumazet <edumazet@google.com>, 
+	Oleg Nesterov <oleg@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Daan De Meyer <daan.j.demeyer@gmail.com>, 
+	David Rheinsberg <david@readahead.eu>, Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>, 
+	Lennart Poettering <lennart@poettering.net>, Luca Boccassi <bluca@debian.org>, Mike Yuan <me@yhndnzj.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, Alexander Mikhalitsyn <alexander@mihalicyn.com>
+Subject: Re: [PATCH v7 7/9] coredump: validate socket name as it is written
+Message-ID: <20250516-planen-radar-2131a4b7d9b1@brauner>
+References: <20250515-work-coredump-socket-v7-0-0a1329496c31@kernel.org>
+ <20250515-work-coredump-socket-v7-7-0a1329496c31@kernel.org>
+ <CAG48ez1wqbOmQMqg6rH4LNjNifHU_WciceO_SQwu8T=tA_KxLw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250514145720.91675-1-robert.malz@canonical.com>
- <20250514145720.91675-3-robert.malz@canonical.com> <fbf72244-873e-44f2-8974-76be6f7118e6@amd.com>
-In-Reply-To: <fbf72244-873e-44f2-8974-76be6f7118e6@amd.com>
-From: Robert Malz <robert.malz@canonical.com>
-Date: Fri, 16 May 2025 11:48:31 +0200
-X-Gm-Features: AX0GCFu3yAoLyjsy7f1ZgWGyedybKqFtqEYT2WelD-OPoIkfTxAFdFs8oq-Pi4w
-Message-ID: <CADcc-bx=0eAQmndocG4B+PWnzLKOajDT=9E6kM_XLZ4XR1rekg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] i40e: retry VFLR handling if there is ongoing VF reset
-To: "Nelson, Shannon" <shannon.nelson@amd.com>
-Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org, 
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, sylwesterx.dziedziuch@intel.com, 
-	mateusz.palczewski@intel.com, jacob.e.keller@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAG48ez1wqbOmQMqg6rH4LNjNifHU_WciceO_SQwu8T=tA_KxLw@mail.gmail.com>
 
-On Fri, May 16, 2025 at 12:40=E2=80=AFAM Nelson, Shannon <shannon.nelson@am=
-d.com> wrote:
->
-> On 5/14/2025 7:57 AM, Robert Malz wrote:
+On Thu, May 15, 2025 at 10:56:51PM +0200, Jann Horn wrote:
+> On Thu, May 15, 2025 at 12:04 AM Christian Brauner <brauner@kernel.org> wrote:
+> > In contrast to other parameters written into
+> > /proc/sys/kernel/core_pattern that never fail we can validate enabling
+> > the new AF_UNIX support. This is obviously racy as hell but it's always
+> > been that way.
 > >
-> > When a VFLR interrupt is received during a VF reset initiated from a
-> > different source, the VFLR may be not fully handled. This can
-> > leave the VF in an undefined state.
-> > To address this, set the I40E_VFLR_EVENT_PENDING bit again during VFLR
-> > handling if the reset is not yet complete. This ensures the driver
-> > will properly complete the VF reset in such scenarios.
-> >
-> > Fixes: 52424f974bc5 ("i40e: Fix VF hang when reset is triggered on anot=
-her VF")
-> > Signed-off-by: Robert Malz <robert.malz@canonical.com>
+> > Signed-off-by: Christian Brauner <brauner@kernel.org>
+> 
+> Reviewed-by: Jann Horn <jannh@google.com>
+> 
 > > ---
-> >   drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 9 ++++++---
-> >   1 file changed, 6 insertions(+), 3 deletions(-)
+> >  fs/coredump.c | 37 ++++++++++++++++++++++++++++++++++---
+> >  1 file changed, 34 insertions(+), 3 deletions(-)
 > >
-> > diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drive=
-rs/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> > index abd72ab36af7..6b13ac85016f 100644
-> > --- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> > +++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> > @@ -1546,8 +1546,8 @@ static void i40e_cleanup_reset_vf(struct i40e_vf =
-*vf)
-> >    * @vf: pointer to the VF structure
-> >    * @flr: VFLR was issued or not
-> >    *
-> > - * Returns true if resets are disabled or was performed successfully,
-> > - * false if reset is already in progress.
-> > + * Returns true if reset was performed successfully or if resets are
-> > + * disabled. False if reset is already in progress.
->
-> You also changed this wording in patch 1/2.  Let's keep the
-> i40e_reset_vf() description changes in the other patch where that
-> function is changed.
->
-> sln
+> > diff --git a/fs/coredump.c b/fs/coredump.c
+> > index 6ee38e3da108..d4ff08ef03e5 100644
+> > --- a/fs/coredump.c
+> > +++ b/fs/coredump.c
+> > @@ -1228,13 +1228,44 @@ void validate_coredump_safety(void)
+> >         }
+> >  }
+> >
+> > +static inline bool check_coredump_socket(void)
+> > +{
+> > +       if (core_pattern[0] != '@')
+> > +               return true;
+> > +
+> > +       /*
+> > +        * Coredump socket must be located in the initial mount
+> > +        * namespace. Don't give the that impression anything else is
+> > +        * supported right now.
+> > +        */
+> > +       if (current->nsproxy->mnt_ns != init_task.nsproxy->mnt_ns)
+> > +               return false;
+> 
+> (Ah, dereferencing init_task.nsproxy without locks is safe because
+> init_task is actually the boot cpu's swapper/idle task, which never
+> switches namespaces, right?)
 
-Thanks for pointing this out, fixed in v2
+I would be very worried if it did. It would fsck everyone over that
+relies on copying its credentials and assumes that the set of namespaces
+is stable.
 
-Robert
+> 
+> > +       /* Must be an absolute path. */
+> > +       if (*(core_pattern + 1) != '/')
+> > +               return false;
+> > +
+> > +       return true;
+> > +}
+> > +
+> >  static int proc_dostring_coredump(const struct ctl_table *table, int write,
+> >                   void *buffer, size_t *lenp, loff_t *ppos)
+> >  {
+> > -       int error = proc_dostring(table, write, buffer, lenp, ppos);
+> > +       int error;
+> > +       ssize_t retval;
+> > +       char old_core_pattern[CORENAME_MAX_SIZE];
+> > +
+> > +       retval = strscpy(old_core_pattern, core_pattern, CORENAME_MAX_SIZE);
+> > +
+> > +       error = proc_dostring(table, write, buffer, lenp, ppos);
+> > +       if (error)
+> > +               return error;
+> > +       if (!check_coredump_socket()) {
+> 
+> (non-actionable note: This is kiiinda dodgy under
+> SYSCTL_WRITES_LEGACY, but I guess we can assume that new users of the
+> new coredump socket feature aren't actually going to write the
+> coredump path one byte at a time, so I guess it's fine.)
+
+So this is all kinds of broken already imho. Because there's not really
+mutual exclusion between multiple writers to such sysctls from what I
+remember. Which means that this buffer can be trampled in all kinds of
+ways if multiple tasks decide to update it at the same time. That's
+super unlikely of course but whatever.
+
+> 
+> > +               strscpy(core_pattern, old_core_pattern, retval + 1);
+> 
+> The third strscpy() argument is semantically supposed to be the
+> destination buffer size, not the amount of data to copy. For trivial
+> invocations like here, strscpy() actually allows you to leave out the
+> third argument.
+
+Eeeeewww, that's really implicit behavior. I can use the destination
+buffer size but given that retval will always be smaller than that I
+didn't bother but ok. I'll fix that in-tree.
 
