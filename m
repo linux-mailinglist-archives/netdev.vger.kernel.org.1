@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-191141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4BA4ABA275
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 20:07:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DAA9ABA26F
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 20:05:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E41C7B79CC
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 18:05:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 550FA7B6956
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 18:03:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BC20280CE0;
-	Fri, 16 May 2025 18:02:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A9D027FD60;
+	Fri, 16 May 2025 18:02:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="JfPzrZpz"
+	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="E8iqsaXj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout3.routing.net (mxout3.routing.net [134.0.28.8])
+Received: from mxout1.routing.net (mxout1.routing.net [134.0.28.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7223527FD43;
-	Fri, 16 May 2025 18:02:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F36B327AC4E;
+	Fri, 16 May 2025 18:02:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747418533; cv=none; b=oxMyVnJHMbyqZMTaoHIWiBPbJEbGz+b/kwoAPuD4z07PVKYAZL1YjUdVACIo7VPQYj4NyE5QEbwtMEjakyd4kYlKvu1uVFvR5JsmWLCkVK+ON1Y/ARW4v4Xw0dzihnBQZ5ilKu1BsbblDqL8p8Gci+sQtbE3HhwhjT5n/XWEDx0=
+	t=1747418530; cv=none; b=GcWIWVdhDO3QA3bVYMNk75Usx/aPuLnzZav0zDVE45dkyq4ShW7BzvbS2lgWX1dOJINLrJ3cJabf0lC1ey5PXCgZO7ezn0HJVHHo3ZOUSu90cGm7C7+IDRBw/LbHENKGXE6ekOp74gsbzyOj5AJxq83B3DSTBcrTI38ZIaL9KBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747418533; c=relaxed/simple;
-	bh=2ayB3FFSLyItlEfwkpXppGL8M59c1GXDrtM74vNQrsI=;
+	s=arc-20240116; t=1747418530; c=relaxed/simple;
+	bh=7Jjblv4yG5YMN+/JXUJbLWbcWP0q8ENN+0a9DbtrRIs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dfTmAfycDNn/wH8bYsS/8+BvGmpI2a8Ba1/dUH+XXIfIBMgYEAXyx75+yww0amN9P3AROaK8fq+iuw4CD5sEwLdv23MtcKBHtKhH2KH1M8kMr1Ok4GkjJleIQvNPqcqLUUKrV9WER8t+lobRGjvpKPeDgugzrxMjDVbQgEiC04w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=JfPzrZpz; arc=none smtp.client-ip=134.0.28.8
+	 MIME-Version; b=Y+n+P1NLCP+xFWd63iQcedUqe70XCtS3Q1+g2hK5WrzWDesqwksjFzRieIjDm6L/d9gCKlLt2zC8lgteHWtyapN+SpJNMt8ysfqKuZcvB8JviooWm9vAcYnww4sj8sA1n5HOmhhwT6JxsYryCjeFUS8bDzUXDxvcGIIWUH4N3fc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=E8iqsaXj; arc=none smtp.client-ip=134.0.28.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
 Received: from mxbulk.masterlogin.de (unknown [192.168.10.85])
-	by mxout3.routing.net (Postfix) with ESMTP id 8FB2E60533;
+	by mxout1.routing.net (Postfix) with ESMTP id E1AF540772;
 	Fri, 16 May 2025 18:01:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
 	s=20200217; t=1747418519;
@@ -40,12 +40,12 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=swK23DCVf3KYOYwkgLxTlVXj4MpCXZYzSoeROC7b2Yg=;
-	b=JfPzrZpzRR88e8jOP/gBWRtjufBvq/KYt3/YWsQsy4aLBtUfi86jwV0f9iTxpJ4C007LAc
-	fiywWS0XdkYGHmfEfBD6cOme4xlw1jwMsLmQPVl/eeJ8AY4tvKJHe2bebRowIFUDVLfIfH
-	OaEr+mHl97wLnbjlyfE1A8A1w634GbE=
+	bh=RHbYPq/h+v4flSJokaAuA/cakf8tYhXsyBD00AeipyA=;
+	b=E8iqsaXjKJ/qJZ+Ipt0fdEhrky4FrF6JIXdOk5YxZEHaJvlUiWsbyIpmJpmbcWg1Cd8/j5
+	0Zj1uYhlTD7oPoYMRykR3hn4vvR5owojmXyuU9p9Ugh6hrTjtivaDYPdC+bzPO9gYJ2JIj
+	ZjlGgm4U38p0gwJ5uyRIZz5HNfMroqg=
 Received: from frank-u24.. (fttx-pool-157.180.226.139.bambit.de [157.180.226.139])
-	by mxbulk.masterlogin.de (Postfix) with ESMTPSA id 3BEBF1226F2;
+	by mxbulk.masterlogin.de (Postfix) with ESMTPSA id 96BA31226C1;
 	Fri, 16 May 2025 18:01:59 +0000 (UTC)
 From: Frank Wunderlich <linux@fw-web.de>
 To: Andrew Lunn <andrew@lunn.ch>,
@@ -72,9 +72,9 @@ Cc: Frank Wunderlich <frank-w@public-files.de>,
 	linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org
-Subject: [PATCH v2 12/14] arm64: dts: mediatek: mt7988a-bpi-r4: add proc-supply for cci
-Date: Fri, 16 May 2025 20:01:43 +0200
-Message-ID: <20250516180147.10416-14-linux@fw-web.de>
+Subject: [PATCH v2 13/14] arm64: dts: mediatek: mt7988a-bpi-r4: add sfp cages and link to gmac
+Date: Fri, 16 May 2025 20:01:44 +0200
+Message-ID: <20250516180147.10416-15-linux@fw-web.de>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250516180147.10416-1-linux@fw-web.de>
 References: <20250516180147.10416-1-linux@fw-web.de>
@@ -88,28 +88,102 @@ Content-Transfer-Encoding: 8bit
 
 From: Frank Wunderlich <frank-w@public-files.de>
 
-CCI requires proc-supply. Add it on board level.
+Add SFP cages to Bananapi-R4 board. The 2.5g phy variant only contains the
+wan-SFP, so add this to common dtsi and the lan-sfp only to the dual-SFP
+variant.
 
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
 ---
- arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi | 4 ++++
- 1 file changed, 4 insertions(+)
+ .../mediatek/mt7988a-bananapi-bpi-r4-2g5.dts   | 11 +++++++++++
+ .../dts/mediatek/mt7988a-bananapi-bpi-r4.dts   | 18 ++++++++++++++++++
+ .../dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi  | 18 ++++++++++++++++++
+ 3 files changed, 47 insertions(+)
 
+diff --git a/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4-2g5.dts b/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4-2g5.dts
+index 53de9c113f60..574ac1b853a6 100644
+--- a/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4-2g5.dts
++++ b/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4-2g5.dts
+@@ -9,3 +9,14 @@ / {
+ 	model = "Banana Pi BPI-R4 (1x SFP+, 1x 2.5GbE)";
+ 	chassis-type = "embedded";
+ };
++
++&gmac1 {
++	phy-mode = "internal";
++	phy-connection-type = "internal";
++	phy = <&int_2p5g_phy>;
++};
++
++&int_2p5g_phy {
++	pinctrl-names = "i2p5gbe-led";
++	pinctrl-0 = <&i2p5gbe_led0_pins>;
++};
+diff --git a/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dts b/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dts
+index 36bd1ef2efab..3136dc4ba4cc 100644
+--- a/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dts
++++ b/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dts
+@@ -8,6 +8,24 @@ / {
+ 	compatible = "bananapi,bpi-r4", "mediatek,mt7988a";
+ 	model = "Banana Pi BPI-R4 (2x SFP+)";
+ 	chassis-type = "embedded";
++
++	/* SFP2 cage (LAN) */
++	sfp2: sfp2 {
++		compatible = "sff,sfp";
++		i2c-bus = <&i2c_sfp2>;
++		los-gpios = <&pio 2 GPIO_ACTIVE_HIGH>;
++		mod-def0-gpios = <&pio 83 GPIO_ACTIVE_LOW>;
++		tx-disable-gpios = <&pio 0 GPIO_ACTIVE_HIGH>;
++		tx-fault-gpios = <&pio 1 GPIO_ACTIVE_HIGH>;
++		rate-select0-gpios = <&pio 3 GPIO_ACTIVE_LOW>;
++		maximum-power-milliwatt = <3000>;
++	};
++};
++
++&gmac1 {
++	sfp = <&sfp2>;
++	managed = "in-band-status";
++	phy-mode = "usxgmii";
+ };
+ 
+ &pca9545 {
 diff --git a/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi b/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
-index 81ba045e0e0e..afa9e3b2b16a 100644
+index afa9e3b2b16a..d40c8dbcd18e 100644
 --- a/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
 +++ b/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
-@@ -40,6 +40,10 @@ reg_3p3v: regulator-3p3v {
+@@ -38,6 +38,18 @@ reg_3p3v: regulator-3p3v {
+ 		regulator-boot-on;
+ 		regulator-always-on;
+ 	};
++
++	/* SFP1 cage (WAN) */
++	sfp1: sfp1 {
++		compatible = "sff,sfp";
++		i2c-bus = <&i2c_sfp1>;
++		los-gpios = <&pio 54 GPIO_ACTIVE_HIGH>;
++		mod-def0-gpios = <&pio 82 GPIO_ACTIVE_LOW>;
++		tx-disable-gpios = <&pio 70 GPIO_ACTIVE_HIGH>;
++		tx-fault-gpios = <&pio 69 GPIO_ACTIVE_HIGH>;
++		rate-select0-gpios = <&pio 21 GPIO_ACTIVE_LOW>;
++		maximum-power-milliwatt = <3000>;
++	};
+ };
+ 
+ &cci {
+@@ -108,6 +120,12 @@ map-cpu-active-low {
  	};
  };
  
-+&cci {
-+	proc-supply = <&rt5190_buck3>;
++&gmac2 {
++	sfp = <&sfp1>;
++	managed = "in-band-status";
++	phy-mode = "usxgmii";
 +};
 +
- &cpu0 {
- 	proc-supply = <&rt5190_buck3>;
- };
+ &i2c0 {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&i2c0_pins>;
 -- 
 2.43.0
 
