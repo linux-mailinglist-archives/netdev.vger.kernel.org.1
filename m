@@ -1,74 +1,75 @@
-Return-Path: <netdev+bounces-190918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC4ADAB940A
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 04:29:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 145FCAB940B
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 04:29:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 051E516BFE8
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 02:29:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E41E01BC4D06
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 02:29:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82B9F22A4CD;
-	Fri, 16 May 2025 02:29:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6401722A4E2;
+	Fri, 16 May 2025 02:29:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="I5Xybu/q"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="LsT+hJQ5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 893BF2288D6
-	for <netdev@vger.kernel.org>; Fri, 16 May 2025 02:29:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7BFA34CF9
+	for <netdev@vger.kernel.org>; Fri, 16 May 2025 02:29:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747362545; cv=none; b=hRke761YHf4do694Azt+zz0xaM47jvK81z4adVnZ3qZaOHCePcyyMz2MUVZUmDGjcFW8vn2Ewe0PVlSdQIzDriPKSchx9++vbWD6EnRt8cOjtiWVollZHJETNBhtSdTP+WwWCThZyVD6NSBOUYWQFdg9u9NJdR1Cd2DnNj6xYxM=
+	t=1747362567; cv=none; b=JirgO8tX3wKyBZtDxVvXdf1B7nCMBjjEvsNfeBMNPDuQguZsj+5YWAbQ4H1t4w6Qo46VF6w/xKoQxUZIo/U6TPIqrCK9XH3O9GC0MmNIyiWWodErE69ITcVA+o4qi0s8dxkkgPKbWiw8c3L+GkUDiT5m9JWKIzOBo686JYziZ9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747362545; c=relaxed/simple;
-	bh=+UOQ08jkXZYAB03VHeoeycHQW9Xy7HAkxPVGyJPTW4U=;
+	s=arc-20240116; t=1747362567; c=relaxed/simple;
+	bh=UIz9ffPEEpn/O68o6C3SAgNCh/y5jzo/lkXDs55JsVY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cgtIjLHtcBItl4pGDHSjd9LCDamN9kx95/imD1UiNUMu7hWQSJ9Us8jtwIfRfCwdJKz8gFZw8UfB9z/Igwu1YSg06TAix4a41NSJ7GG4zCtJQc5a6Ne2mO8HJoL/JsRwM9M4v5RWD/QD4Hj/FsYI5HoHkJKBh/8AlNHw8PiF15Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=I5Xybu/q; arc=none smtp.client-ip=52.95.49.90
+	 MIME-Version:Content-Type; b=oEnTHgyWf4llrNyrT6Zj2F8r99IoImDO4oYJyPNT4avAUTLvUfb9+fQYvsk0PUtkckJGArrYE/A/PuBTCXSFRrMR8I4Z5bfCxsQyYWz6r0/W18MH5TiqGx791BgRr7l+op76WYfTuPxIhTF/MEEwIeawU7LP7vxk39Lw8048eAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=LsT+hJQ5; arc=none smtp.client-ip=99.78.197.220
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1747362544; x=1778898544;
+  t=1747362565; x=1778898565;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=YOJLoXgi9NuTrVcN5nSCRmsfwcBa4mIk4upHB1WPqMg=;
-  b=I5Xybu/qzmGPUotXrKcxQS3TiH+N1frgOaomkSO2wSeTsMNWrAtkACrS
-   rBpuUkPtEXexOQBrXh+kTnJzyTe84+v3sWRaf5W+BHLCVHlyqBuxBCEEV
-   zcz8sy/WcEUFlWYi2FT64TaK7A1DCwgb85SBHXS3a8CWm/yUzMI4zQiWU
-   4lCzhO5ksxsApRZRfgM2LyUCrGSGU2DZAbk1ApmsN+rqj7t4pOg+3uBuo
-   Jb8YqMuSek50sXM+4Veah6JYuSZLQRxw4nZiHukS73ATNcguADjVlXRg7
-   1shaki83SupFjRfQYxmrsIbqkMGSTjrnvZKFmymMQuD5KHlNfkCP85PLF
-   g==;
+  bh=0I0Thx1QG9qKUaqAcNUuZxzMcftIoMDg8dx6uYlrQ+8=;
+  b=LsT+hJQ5FHtY5cMCnDDU0ELK77Do7BVJ9dWyfAM10dnExqFmEgsLZb6M
+   uOpbz6Z6kojNPAVimPsLzEhmSg/TWgmV60wvZwfFEMIeuujcKyDXIyaB4
+   rSv+uv//O98Fq9DcBF28nFrpSeORFUVnWZHgg9DInbhR7LezKqT4GQ+I0
+   87r/wyrkWvK/EBOVmpZ34+uZRtyTDoyMlZG3CvQdsMG3hhLdveond82fw
+   bb/avhGt7xLv4+1X0l4O+ElVvVbyGHeS+UGhczQDxDLsqyUrCcnn2CMB9
+   dePuaK3oAFp24xftzPU1fWxCHCH1wC9oJSSFDwFPKlMEvz00nN6X3cj5r
+   Q==;
 X-IronPort-AV: E=Sophos;i="6.15,292,1739836800"; 
-   d="scan'208";a="499140984"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2025 02:29:01 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:8597]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.26.241:2525] with esmtp (Farcaster)
- id d64853a9-344f-4d05-b6e0-887aa03e1003; Fri, 16 May 2025 02:28:59 +0000 (UTC)
-X-Farcaster-Flow-ID: d64853a9-344f-4d05-b6e0-887aa03e1003
+   d="scan'208";a="201067467"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2025 02:29:23 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:7735]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.11.48:2525] with esmtp (Farcaster)
+ id af38fed4-6bdc-4441-9283-55bfcb1d1f58; Fri, 16 May 2025 02:29:23 +0000 (UTC)
+X-Farcaster-Flow-ID: af38fed4-6bdc-4441-9283-55bfcb1d1f58
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 16 May 2025 02:28:59 +0000
+ Fri, 16 May 2025 02:29:23 +0000
 Received: from 6c7e67bfbae3.amazon.com (10.187.170.35) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 16 May 2025 02:28:56 +0000
+ Fri, 16 May 2025 02:29:20 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
  Abeni" <pabeni@redhat.com>
 CC: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v2 net-next 2/7] inet: Remove rtnl_is_held arg of lwtunnel_valid_encap_type(_attr)?().
-Date: Thu, 15 May 2025 19:27:18 -0700
-Message-ID: <20250516022759.44392-3-kuniyu@amazon.com>
+	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>,
+	<syzbot+bcc12d6799364500fbec@syzkaller.appspotmail.com>
+Subject: [PATCH v2 net-next 3/7] ipv6: Narrow down RCU critical section in inet6_rtm_newroute().
+Date: Thu, 15 May 2025 19:27:19 -0700
+Message-ID: <20250516022759.44392-4-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250516022759.44392-1-kuniyu@amazon.com>
 References: <20250516022759.44392-1-kuniyu@amazon.com>
@@ -80,171 +81,252 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWC004.ant.amazon.com (10.13.139.246) To
+X-ClientProxiedBy: EX19D041UWA002.ant.amazon.com (10.13.139.121) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Commit f130a0cc1b4f ("inet: fix lwtunnel_valid_encap_type() lock
-imbalance") added the rtnl_is_held argument as a temporary fix while
-I'm converting nexthop and IPv6 routing table to per-netns RTNL or RCU.
+Commit 169fd62799e8 ("ipv6: Get rid of RTNL for SIOCADDRT and
+RTM_NEWROUTE.") added rcu_read_lock() covering
+ip6_route_info_create_nh() and __ip6_ins_rt() to guarantee that
+nexthop and netdev will not go away.
 
-Now all callers of lwtunnel_valid_encap_type() do not hold RTNL.
+However, as reported by syzkaller [0], ip_tun_build_state() calls
+dst_cache_init() with GFP_KERNEL during the RCU critical section.
 
-Let's remove the argument.
+ip6_route_info_create_nh() fetches nexthop or netdev depending on
+whether RTA_NH_ID is set, and struct fib6_info holds a refcount
+of either of them by nexthop_get() or netdev_get_by_index().
 
+netdev_get_by_index() looks up a dev and calls dev_hold() under RCU.
+
+So, we need RCU only around nexthop_find_by_id() and nexthop_get()
+( and a few more nexthop code).
+
+Let's add rcu_read_lock() there and remove rcu_read_lock() in
+ip6_route_add() and ip6_route_multipath_add().
+
+Now these functions called from fib6_add() need RCU:
+
+  - inet6_rt_notify()
+  - fib6_drop_pcpu_from() (via fib6_purge_rt())
+  - rt6_flush_exceptions() (via fib6_purge_rt())
+  - ip6_ignore_linkdown() (via rt6_multipath_rebalance())
+
+All callers of inet6_rt_notify() need RCU, so rcu_read_lock() is
+added there.
+
+[0]:
+[ BUG: Invalid wait context ]
+6.15.0-rc4-syzkaller-00746-g836b313a14a3 #0 Tainted: G W
+ ----------------------------
+syz-executor234/5832 is trying to lock:
+ffffffff8e021688 (pcpu_alloc_mutex){+.+.}-{4:4}, at:
+pcpu_alloc_noprof+0x284/0x16b0 mm/percpu.c:1782
+other info that might help us debug this:
+context-{5:5}
+1 lock held by syz-executor234/5832:
+ 0: ffffffff8df3b860 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire
+include/linux/rcupdate.h:331 [inline]
+ 0: ffffffff8df3b860 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock
+include/linux/rcupdate.h:841 [inline]
+ 0: ffffffff8df3b860 (rcu_read_lock){....}-{1:3}, at:
+ip6_route_add+0x4d/0x2f0 net/ipv6/route.c:3913
+stack backtrace:
+CPU: 0 UID: 0 PID: 5832 Comm: syz-executor234 Tainted: G W
+6.15.0-rc4-syzkaller-00746-g836b313a14a3 #0 PREEMPT(full)
+Tainted: [W]=WARN
+Hardware name: Google Google Compute Engine/Google Compute Engine,
+BIOS Google 04/29/2025
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ print_lock_invalid_wait_context kernel/locking/lockdep.c:4831 [inline]
+ check_wait_context kernel/locking/lockdep.c:4903 [inline]
+ __lock_acquire+0xbcf/0xd20 kernel/locking/lockdep.c:5185
+ lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5866
+ __mutex_lock_common kernel/locking/mutex.c:601 [inline]
+ __mutex_lock+0x182/0xe80 kernel/locking/mutex.c:746
+ pcpu_alloc_noprof+0x284/0x16b0 mm/percpu.c:1782
+ dst_cache_init+0x37/0xc0 net/core/dst_cache.c:145
+ ip_tun_build_state+0x193/0x6b0 net/ipv4/ip_tunnel_core.c:687
+ lwtunnel_build_state+0x381/0x4c0 net/core/lwtunnel.c:137
+ fib_nh_common_init+0x129/0x460 net/ipv4/fib_semantics.c:635
+ fib6_nh_init+0x15e4/0x2030 net/ipv6/route.c:3669
+ ip6_route_info_create_nh+0x139/0x870 net/ipv6/route.c:3866
+ ip6_route_add+0xf6/0x2f0 net/ipv6/route.c:3915
+ inet6_rtm_newroute+0x284/0x1c50 net/ipv6/route.c:5732
+ rtnetlink_rcv_msg+0x7cc/0xb70 net/core/rtnetlink.c:6955
+ netlink_rcv_skb+0x219/0x490 net/netlink/af_netlink.c:2534
+ netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
+ netlink_unicast+0x758/0x8d0 net/netlink/af_netlink.c:1339
+ netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1883
+ sock_sendmsg_nosec net/socket.c:712 [inline]
+ __sock_sendmsg+0x219/0x270 net/socket.c:727
+ ____sys_sendmsg+0x505/0x830 net/socket.c:2566
+ ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
+ __sys_sendmsg net/socket.c:2652 [inline]
+ __do_sys_sendmsg net/socket.c:2657 [inline]
+ __se_sys_sendmsg net/socket.c:2655 [inline]
+ __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2655
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xf6/0x210 arch/x86/entry/syscall_64.c:94
+
+Fixes: 169fd62799e8 ("ipv6: Get rid of RTNL for SIOCADDRT and RTM_NEWROUTE.")
+Reported-by: syzbot+bcc12d6799364500fbec@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=bcc12d6799364500fbec
+Reported-by: Eric Dumazet <edumazet@google.com>
+Closes: https://lore.kernel.org/netdev/CANn89i+r1cGacVC_6n3-A-WSkAa_Nr+pmxJ7Gt+oP-P9by2aGw@mail.gmail.com/
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- include/net/lwtunnel.h  | 13 +++++--------
- net/core/lwtunnel.c     | 15 +++------------
- net/ipv4/fib_frontend.c |  4 ++--
- net/ipv4/nexthop.c      |  3 +--
- net/ipv6/route.c        |  6 ++----
- 5 files changed, 13 insertions(+), 28 deletions(-)
+v2: Call rt6_multipath_rebalance() under RCU.
+---
+ net/ipv6/ip6_fib.c |  9 +++++++--
+ net/ipv6/route.c   | 31 ++++++++++++++++++-------------
+ 2 files changed, 25 insertions(+), 15 deletions(-)
 
-diff --git a/include/net/lwtunnel.h b/include/net/lwtunnel.h
-index 39cd50300a18..c306ebe379a0 100644
---- a/include/net/lwtunnel.h
-+++ b/include/net/lwtunnel.h
-@@ -116,11 +116,9 @@ int lwtunnel_encap_add_ops(const struct lwtunnel_encap_ops *op,
- int lwtunnel_encap_del_ops(const struct lwtunnel_encap_ops *op,
- 			   unsigned int num);
- int lwtunnel_valid_encap_type(u16 encap_type,
--			      struct netlink_ext_ack *extack,
--			      bool rtnl_is_held);
-+			      struct netlink_ext_ack *extack);
- int lwtunnel_valid_encap_type_attr(struct nlattr *attr, int len,
--				   struct netlink_ext_ack *extack,
--				   bool rtnl_is_held);
-+				   struct netlink_ext_ack *extack);
- int lwtunnel_build_state(struct net *net, u16 encap_type,
- 			 struct nlattr *encap,
- 			 unsigned int family, const void *cfg,
-@@ -203,15 +201,14 @@ static inline int lwtunnel_encap_del_ops(const struct lwtunnel_encap_ops *op,
- }
+diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
+index 88770ecd2da1..7094d7708686 100644
+--- a/net/ipv6/ip6_fib.c
++++ b/net/ipv6/ip6_fib.c
+@@ -1027,8 +1027,9 @@ static void fib6_drop_pcpu_from(struct fib6_info *f6i,
+ 			.table = table
+ 		};
  
- static inline int lwtunnel_valid_encap_type(u16 encap_type,
--					    struct netlink_ext_ack *extack,
--					    bool rtnl_is_held)
-+					    struct netlink_ext_ack *extack)
- {
- 	NL_SET_ERR_MSG(extack, "CONFIG_LWTUNNEL is not enabled in this kernel");
- 	return -EOPNOTSUPP;
- }
-+
- static inline int lwtunnel_valid_encap_type_attr(struct nlattr *attr, int len,
--						 struct netlink_ext_ack *extack,
--						 bool rtnl_is_held)
-+						 struct netlink_ext_ack *extack)
- {
- 	/* return 0 since we are not walking attr looking for
- 	 * RTA_ENCAP_TYPE attribute on nexthops.
-diff --git a/net/core/lwtunnel.c b/net/core/lwtunnel.c
-index 60f27cb4e54f..f9d76d85d04f 100644
---- a/net/core/lwtunnel.c
-+++ b/net/core/lwtunnel.c
-@@ -149,8 +149,7 @@ int lwtunnel_build_state(struct net *net, u16 encap_type,
- }
- EXPORT_SYMBOL_GPL(lwtunnel_build_state);
+-		nexthop_for_each_fib6_nh(f6i->nh, fib6_nh_drop_pcpu_from,
+-					 &arg);
++		rcu_read_lock();
++		nexthop_for_each_fib6_nh(f6i->nh, fib6_nh_drop_pcpu_from, &arg);
++		rcu_read_unlock();
+ 	} else {
+ 		struct fib6_nh *fib6_nh;
  
--int lwtunnel_valid_encap_type(u16 encap_type, struct netlink_ext_ack *extack,
--			      bool rtnl_is_held)
-+int lwtunnel_valid_encap_type(u16 encap_type, struct netlink_ext_ack *extack)
- {
- 	const struct lwtunnel_encap_ops *ops;
- 	int ret = -EINVAL;
-@@ -167,12 +166,7 @@ int lwtunnel_valid_encap_type(u16 encap_type, struct netlink_ext_ack *extack,
- 		const char *encap_type_str = lwtunnel_encap_str(encap_type);
- 
- 		if (encap_type_str) {
--			if (rtnl_is_held)
--				__rtnl_unlock();
- 			request_module("rtnl-lwt-%s", encap_type_str);
--			if (rtnl_is_held)
--				rtnl_lock();
--
- 			ops = rcu_access_pointer(lwtun_encaps[encap_type]);
+@@ -1221,7 +1222,9 @@ static int fib6_add_rt2node(struct fib6_node *fn, struct fib6_info *rt,
+ 			fib6_nsiblings++;
  		}
+ 		BUG_ON(fib6_nsiblings != rt->fib6_nsiblings);
++		rcu_read_lock();
+ 		rt6_multipath_rebalance(temp_sibling);
++		rcu_read_unlock();
  	}
-@@ -186,8 +180,7 @@ int lwtunnel_valid_encap_type(u16 encap_type, struct netlink_ext_ack *extack,
- EXPORT_SYMBOL_GPL(lwtunnel_valid_encap_type);
  
- int lwtunnel_valid_encap_type_attr(struct nlattr *attr, int remaining,
--				   struct netlink_ext_ack *extack,
--				   bool rtnl_is_held)
-+				   struct netlink_ext_ack *extack)
- {
- 	struct rtnexthop *rtnh = (struct rtnexthop *)attr;
- 	struct nlattr *nla_entype;
-@@ -208,9 +201,7 @@ int lwtunnel_valid_encap_type_attr(struct nlattr *attr, int remaining,
- 				}
- 				encap_type = nla_get_u16(nla_entype);
- 
--				if (lwtunnel_valid_encap_type(encap_type,
--							      extack,
--							      rtnl_is_held) != 0)
-+				if (lwtunnel_valid_encap_type(encap_type, extack))
- 					return -EOPNOTSUPP;
+ 	/*
+@@ -1264,7 +1267,9 @@ static int fib6_add_rt2node(struct fib6_node *fn, struct fib6_info *rt,
+ 					sibling->fib6_nsiblings--;
+ 				rt->fib6_nsiblings = 0;
+ 				list_del_rcu(&rt->fib6_siblings);
++				rcu_read_lock();
+ 				rt6_multipath_rebalance(next_sibling);
++				rcu_read_unlock();
+ 				return err;
  			}
  		}
-diff --git a/net/ipv4/fib_frontend.c b/net/ipv4/fib_frontend.c
-index 57f088e5540e..fd1e1507a224 100644
---- a/net/ipv4/fib_frontend.c
-+++ b/net/ipv4/fib_frontend.c
-@@ -807,7 +807,7 @@ static int rtm_to_fib_config(struct net *net, struct sk_buff *skb,
- 		case RTA_MULTIPATH:
- 			err = lwtunnel_valid_encap_type_attr(nla_data(attr),
- 							     nla_len(attr),
--							     extack, false);
-+							     extack);
- 			if (err < 0)
- 				goto errout;
- 			cfg->fc_mp = nla_data(attr);
-@@ -825,7 +825,7 @@ static int rtm_to_fib_config(struct net *net, struct sk_buff *skb,
- 		case RTA_ENCAP_TYPE:
- 			cfg->fc_encap_type = nla_get_u16(attr);
- 			err = lwtunnel_valid_encap_type(cfg->fc_encap_type,
--							extack, false);
-+							extack);
- 			if (err < 0)
- 				goto errout;
- 			break;
-diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
-index 823e4a783d2b..4397e89d3123 100644
---- a/net/ipv4/nexthop.c
-+++ b/net/ipv4/nexthop.c
-@@ -3180,8 +3180,7 @@ static int rtm_to_nh_config(struct net *net, struct sk_buff *skb,
- 		}
- 
- 		cfg->nh_encap_type = nla_get_u16(tb[NHA_ENCAP_TYPE]);
--		err = lwtunnel_valid_encap_type(cfg->nh_encap_type,
--						extack, false);
-+		err = lwtunnel_valid_encap_type(cfg->nh_encap_type, extack);
- 		if (err < 0)
- 			goto out;
- 
 diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index 44300962230b..6baf177c529b 100644
+index 6baf177c529b..a87091dd06b1 100644
 --- a/net/ipv6/route.c
 +++ b/net/ipv6/route.c
-@@ -5172,8 +5172,7 @@ static int rtm_to_fib6_multipath_config(struct fib6_config *cfg,
- 		rtnh = rtnh_next(rtnh, &remaining);
- 	} while (rtnh_ok(rtnh, remaining));
+@@ -1820,11 +1820,13 @@ static int rt6_nh_flush_exceptions(struct fib6_nh *nh, void *arg)
  
--	return lwtunnel_valid_encap_type_attr(cfg->fc_mp, cfg->fc_mp_len,
--					      extack, false);
-+	return lwtunnel_valid_encap_type_attr(cfg->fc_mp, cfg->fc_mp_len, extack);
+ void rt6_flush_exceptions(struct fib6_info *f6i)
+ {
+-	if (f6i->nh)
+-		nexthop_for_each_fib6_nh(f6i->nh, rt6_nh_flush_exceptions,
+-					 f6i);
+-	else
++	if (f6i->nh) {
++		rcu_read_lock();
++		nexthop_for_each_fib6_nh(f6i->nh, rt6_nh_flush_exceptions, f6i);
++		rcu_read_unlock();
++	} else {
+ 		fib6_nh_flush_exceptions(f6i->fib6_nh, f6i);
++	}
  }
  
- static int rtm_to_fib6_config(struct sk_buff *skb, struct nlmsghdr *nlh,
-@@ -5310,8 +5309,7 @@ static int rtm_to_fib6_config(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	if (tb[RTA_ENCAP_TYPE]) {
- 		cfg->fc_encap_type = nla_get_u16(tb[RTA_ENCAP_TYPE]);
+ /* Find cached rt in the hash table inside passed in rt
+@@ -3841,6 +3843,8 @@ static int ip6_route_info_create_nh(struct fib6_info *rt,
+ 	if (cfg->fc_nh_id) {
+ 		struct nexthop *nh;
  
--		err = lwtunnel_valid_encap_type(cfg->fc_encap_type,
--						extack, false);
-+		err = lwtunnel_valid_encap_type(cfg->fc_encap_type, extack);
- 		if (err < 0)
- 			goto errout;
++		rcu_read_lock();
++
+ 		nh = nexthop_find_by_id(net, cfg->fc_nh_id);
+ 		if (!nh) {
+ 			err = -EINVAL;
+@@ -3860,6 +3864,8 @@ static int ip6_route_info_create_nh(struct fib6_info *rt,
+ 
+ 		rt->nh = nh;
+ 		fib6_nh = nexthop_fib6_nh(rt->nh);
++
++		rcu_read_unlock();
+ 	} else {
+ 		int addr_type;
+ 
+@@ -3895,6 +3901,7 @@ static int ip6_route_info_create_nh(struct fib6_info *rt,
+ 	fib6_info_release(rt);
+ 	return err;
+ out_free:
++	rcu_read_unlock();
+ 	ip_fib_metrics_put(rt->fib6_metrics);
+ 	kfree(rt);
+ 	return err;
+@@ -3910,16 +3917,12 @@ int ip6_route_add(struct fib6_config *cfg, gfp_t gfp_flags,
+ 	if (IS_ERR(rt))
+ 		return PTR_ERR(rt);
+ 
+-	rcu_read_lock();
+-
+ 	err = ip6_route_info_create_nh(rt, cfg, extack);
+ 	if (err)
+-		goto unlock;
++		return err;
+ 
+ 	err = __ip6_ins_rt(rt, &cfg->fc_nlinfo, extack);
+ 	fib6_info_release(rt);
+-unlock:
+-	rcu_read_unlock();
+ 
+ 	return err;
+ }
+@@ -5534,8 +5537,6 @@ static int ip6_route_multipath_add(struct fib6_config *cfg,
+ 	if (err)
+ 		return err;
+ 
+-	rcu_read_lock();
+-
+ 	err = ip6_route_mpath_info_create_nh(&rt6_nh_list, extack);
+ 	if (err)
+ 		goto cleanup;
+@@ -5627,8 +5628,6 @@ static int ip6_route_multipath_add(struct fib6_config *cfg,
  	}
+ 
+ cleanup:
+-	rcu_read_unlock();
+-
+ 	list_for_each_entry_safe(nh, nh_safe, &rt6_nh_list, list) {
+ 		fib6_info_release(nh->fib6_info);
+ 		list_del(&nh->list);
+@@ -6410,6 +6409,8 @@ void inet6_rt_notify(int event, struct fib6_info *rt, struct nl_info *info,
+ 	err = -ENOBUFS;
+ 	seq = info->nlh ? info->nlh->nlmsg_seq : 0;
+ 
++	rcu_read_lock();
++
+ 	skb = nlmsg_new(rt6_nlmsg_size(rt), GFP_ATOMIC);
+ 	if (!skb)
+ 		goto errout;
+@@ -6422,10 +6423,14 @@ void inet6_rt_notify(int event, struct fib6_info *rt, struct nl_info *info,
+ 		kfree_skb(skb);
+ 		goto errout;
+ 	}
++
++	rcu_read_unlock();
++
+ 	rtnl_notify(skb, net, info->portid, RTNLGRP_IPV6_ROUTE,
+ 		    info->nlh, GFP_ATOMIC);
+ 	return;
+ errout:
++	rcu_read_unlock();
+ 	rtnl_set_sk_err(net, RTNLGRP_IPV6_ROUTE, err);
+ }
+ 
 -- 
 2.49.0
 
