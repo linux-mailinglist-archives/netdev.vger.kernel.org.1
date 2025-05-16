@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-191136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93923ABA260
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 20:04:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF1CBABA261
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 20:04:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 719B11BC899B
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 18:04:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE3F9161014
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 18:04:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6986727E7C8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A998427F170;
 	Fri, 16 May 2025 18:02:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="TchpcRao"
+	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="JVePYhpe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout3.routing.net (mxout3.routing.net [134.0.28.8])
+Received: from mxout4.routing.net (mxout4.routing.net [134.0.28.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3189027A444;
-	Fri, 16 May 2025 18:02:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96E2727A92E;
+	Fri, 16 May 2025 18:02:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747418530; cv=none; b=sHCeFW+xkC0mfMmG2aDBxp1m/U1OO28gVZ2f7cccvhKSHr2CAAWOA0UxEimDJZ7TIwK9uMDpFu9O6uHFZXQrE8uVpypSI/4pzyFxhvAcaXz0yuXkall6cBs88GB3CTiJdsQgQpdRADw/W617mgr7gOfaCNxfYL3kSuL21EdawLM=
+	t=1747418530; cv=none; b=gAOa7zgJZGLltgWvL9KSgJlOp+fC5P1sZwdpBG9etwwjUg3LChdUb4qNbe+Ff3tUHj0dV36quPNudnrT/+l0d7kyV2bmAXstNqFz701HUfuhzs8fLiz3fMp2Gj3+RIaNNj5gI28opMAU7gfNUJGi6elNu1Y/SZMCiFsd5Vh3dgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1747418530; c=relaxed/simple;
-	bh=R9jK5mGO0iMsfsZZ0J6LovdZM+neosEMf09Sxm5GFdY=;
+	bh=kHwPxvD7M946+KWLYcCeAR5SpbIFFqBcCKwpRmbodqA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TexkS3rNTzC+PFVo6vQjNOQjSe+iaPCKY1rkS/NOLjlN3cTWfYlpzw0jVTksfu4Fsb3cuHU8PBh4gXqm7wYs8hdwYryMyquzAIJwPQPRF3motO+dRX2/mlzlUxerURCKB8OcqiBOFAtpOFXQZNQn1EFG4TD/TUGb8/CLV/urH5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=TchpcRao; arc=none smtp.client-ip=134.0.28.8
+	 MIME-Version; b=fGtPW2rfS8dyeYL+qrk71uT1auTqeG5/1FYFUlVUhdDuv3SwLz/9IdJUaB7UKG8EKtbmiGoMpqkZbtC7cMOL6pXQjwJ98t8ykg6Bi7phUDXczVo/PRdM8+ESLNhxHZT2/PGKnQSBj+CK/T3PPR0ZD77/6RWrz+Ca0fVuM6sfAaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=JVePYhpe; arc=none smtp.client-ip=134.0.28.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
 Received: from mxbulk.masterlogin.de (unknown [192.168.10.85])
-	by mxout3.routing.net (Postfix) with ESMTP id 7F5CD60531;
+	by mxout4.routing.net (Postfix) with ESMTP id D782D1007C9;
 	Fri, 16 May 2025 18:01:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
 	s=20200217; t=1747418518;
@@ -40,12 +40,12 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=yzhcuPLDSwh1mzz/nGqTSzBUSDaRDNpTMz/JFqw2TqY=;
-	b=TchpcRaovpOmKZ4Q9J8MIbaUuOE8QKTYzba4otiKgUc3i6MQI77I3poCJhukV8JEpx7ZhG
-	ht88CT1H71e5aYXCmrtlw35Hu46E79GJep4buUQ3EkU+TZ80smGipBCRsSd4rqlFE27VRz
-	Wwzfk7t2XA1o4YjP6Ue2GWkiAJrZZmY=
+	bh=+i5DM3x3WXg2uqMLLr9WJvq/q6qvV6rl33rsfy6Fiwc=;
+	b=JVePYhpe43R10j1wecIfq9dDxv8tsjf8UVk3pErXPRzjvAH/Q/VpyBp2kIJzxpQv4qWrMF
+	QvdYcomHJVQEpsRaEEnTZZEYuK+UUL66mrkAPNAhJD9PAzQENdvKkVeneIh/LvE2sBOzJc
+	aAlcrGcHqqbE+o6XJ1CO86s5GB2APD8=
 Received: from frank-u24.. (fttx-pool-157.180.226.139.bambit.de [157.180.226.139])
-	by mxbulk.masterlogin.de (Postfix) with ESMTPSA id 345941226C1;
+	by mxbulk.masterlogin.de (Postfix) with ESMTPSA id 8B8621226F2;
 	Fri, 16 May 2025 18:01:58 +0000 (UTC)
 From: Frank Wunderlich <linux@fw-web.de>
 To: Andrew Lunn <andrew@lunn.ch>,
@@ -72,9 +72,9 @@ Cc: Frank Wunderlich <frank-w@public-files.de>,
 	linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org
-Subject: [PATCH v2 09/14] arm64: dts: mediatek: mt7988: add switch node
-Date: Fri, 16 May 2025 20:01:40 +0200
-Message-ID: <20250516180147.10416-11-linux@fw-web.de>
+Subject: [PATCH v2 10/14] arm64: dts: mediatek: mt7988a-bpi-r4: Add fan and coolingmaps
+Date: Fri, 16 May 2025 20:01:41 +0200
+Message-ID: <20250516180147.10416-12-linux@fw-web.de>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250516180147.10416-1-linux@fw-web.de>
 References: <20250516180147.10416-1-linux@fw-web.de>
@@ -88,181 +88,62 @@ Content-Transfer-Encoding: 8bit
 
 From: Frank Wunderlich <frank-w@public-files.de>
 
-Add mt7988 builtin mt753x switch nodes.
+Add Fan and cooling maps for Bananapi-R4 board.
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
 ---
-v2:
-- drop labels and led-function too (have to be in board)
+v2: fix typo
 ---
- arch/arm64/boot/dts/mediatek/mt7988a.dtsi | 153 ++++++++++++++++++++++
- 1 file changed, 153 insertions(+)
+ .../dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi | 29 +++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-diff --git a/arch/arm64/boot/dts/mediatek/mt7988a.dtsi b/arch/arm64/boot/dts/mediatek/mt7988a.dtsi
-index aa0947a555aa..f738a025b623 100644
---- a/arch/arm64/boot/dts/mediatek/mt7988a.dtsi
-+++ b/arch/arm64/boot/dts/mediatek/mt7988a.dtsi
-@@ -742,6 +742,159 @@ ethsys: clock-controller@15000000 {
- 			#reset-cells = <1>;
- 		};
+diff --git a/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi b/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
+index 23b267cd47ac..c6f84de82a4d 100644
+--- a/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
++++ b/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
+@@ -12,6 +12,15 @@ chosen {
+ 		stdout-path = "serial0:115200n8";
+ 	};
  
-+		switch: switch@15020000 {
-+			compatible = "mediatek,mt7988-switch";
-+			reg = <0 0x15020000 0 0x8000>;
-+			interrupt-controller;
-+			#interrupt-cells = <1>;
-+			interrupt-parent = <&gic>;
-+			interrupts = <GIC_SPI 209 IRQ_TYPE_LEVEL_HIGH>;
-+			resets = <&ethwarp MT7988_ETHWARP_RST_SWITCH>;
++	fan: pwm-fan {
++		compatible = "pwm-fan";
++		/* cooling level (0, 1, 2, 3) : (0% duty, 30% duty, 50% duty, 100% duty) */
++		cooling-levels = <0 80 128 255>;
++		#cooling-cells = <2>;
++		pwms = <&pwm 0 50000>;
++		status = "okay";
++	};
 +
-+			ports {
-+				#address-cells = <1>;
-+				#size-cells = <0>;
+ 	reg_1p8v: regulator-1p8v {
+ 		compatible = "regulator-fixed";
+ 		regulator-name = "fixed-1.8V";
+@@ -73,6 +82,26 @@ cpu_trip_active_low: active-low {
+ 			type = "active";
+ 		};
+ 	};
 +
-+				gsw_port0: port@0 {
-+					reg = <0>;
-+					phy-mode = "internal";
-+					phy-handle = <&gsw_phy0>;
-+				};
-+
-+				gsw_port1: port@1 {
-+					reg = <1>;
-+					phy-mode = "internal";
-+					phy-handle = <&gsw_phy1>;
-+				};
-+
-+				gsw_port2: port@2 {
-+					reg = <2>;
-+					phy-mode = "internal";
-+					phy-handle = <&gsw_phy2>;
-+				};
-+
-+				gsw_port3: port@3 {
-+					reg = <3>;
-+					phy-mode = "internal";
-+					phy-handle = <&gsw_phy3>;
-+				};
-+
-+				port@6 {
-+					reg = <6>;
-+					ethernet = <&gmac0>;
-+					phy-mode = "internal";
-+
-+					fixed-link {
-+						speed = <10000>;
-+						full-duplex;
-+						pause;
-+					};
-+				};
-+			};
-+
-+			mdio {
-+				#address-cells = <1>;
-+				#size-cells = <0>;
-+				mediatek,pio = <&pio>;
-+
-+				gsw_phy0: ethernet-phy@0 {
-+					compatible = "ethernet-phy-ieee802.3-c22";
-+					reg = <0>;
-+					interrupts = <0>;
-+					phy-mode = "internal";
-+					nvmem-cells = <&phy_calibration_p0>;
-+					nvmem-cell-names = "phy-cal-data";
-+
-+					leds {
-+						#address-cells = <1>;
-+						#size-cells = <0>;
-+
-+						gsw_phy0_led0: led@0 {
-+							reg = <0>;
-+							status = "disabled";
-+						};
-+
-+						gsw_phy0_led1: led@1 {
-+							reg = <1>;
-+							status = "disabled";
-+						};
-+					};
-+				};
-+
-+				gsw_phy1: ethernet-phy@1 {
-+					compatible = "ethernet-phy-ieee802.3-c22";
-+					reg = <1>;
-+					interrupts = <1>;
-+					phy-mode = "internal";
-+					nvmem-cells = <&phy_calibration_p1>;
-+					nvmem-cell-names = "phy-cal-data";
-+
-+					leds {
-+						#address-cells = <1>;
-+						#size-cells = <0>;
-+
-+						gsw_phy1_led0: led@0 {
-+							reg = <0>;
-+							status = "disabled";
-+						};
-+
-+						gsw_phy1_led1: led@1 {
-+							reg = <1>;
-+							status = "disabled";
-+						};
-+					};
-+				};
-+
-+				gsw_phy2: ethernet-phy@2 {
-+					compatible = "ethernet-phy-ieee802.3-c22";
-+					reg = <2>;
-+					interrupts = <2>;
-+					phy-mode = "internal";
-+					nvmem-cells = <&phy_calibration_p2>;
-+					nvmem-cell-names = "phy-cal-data";
-+
-+					leds {
-+						#address-cells = <1>;
-+						#size-cells = <0>;
-+
-+						gsw_phy2_led0: led@0 {
-+							reg = <0>;
-+							status = "disabled";
-+						};
-+
-+						gsw_phy2_led1: led@1 {
-+							reg = <1>;
-+							status = "disabled";
-+						};
-+					};
-+				};
-+
-+				gsw_phy3: ethernet-phy@3 {
-+					compatible = "ethernet-phy-ieee802.3-c22";
-+					reg = <3>;
-+					interrupts = <3>;
-+					phy-mode = "internal";
-+					nvmem-cells = <&phy_calibration_p3>;
-+					nvmem-cell-names = "phy-cal-data";
-+
-+					leds {
-+						#address-cells = <1>;
-+						#size-cells = <0>;
-+
-+						gsw_phy3_led0: led@0 {
-+							reg = <0>;
-+							status = "disabled";
-+						};
-+
-+						gsw_phy3_led1: led@1 {
-+							reg = <1>;
-+							status = "disabled";
-+						};
-+					};
-+				};
-+			};
++	cooling-maps {
++		map-cpu-active-high {
++			/* active: set fan to cooling level 2 */
++			cooling-device = <&fan 3 3>;
++			trip = <&cpu_trip_active_high>;
 +		};
 +
- 		ethwarp: clock-controller@15031000 {
- 			compatible = "mediatek,mt7988-ethwarp";
- 			reg = <0 0x15031000 0 0x1000>;
++		map-cpu-active-med {
++			/* active: set fan to cooling level 1 */
++			cooling-device = <&fan 2 2>;
++			trip = <&cpu_trip_active_med>;
++		};
++
++		map-cpu-active-low {
++			/* active: set fan to cooling level 0 */
++			cooling-device = <&fan 1 1>;
++			trip = <&cpu_trip_active_low>;
++		};
++	};
+ };
+ 
+ &i2c0 {
 -- 
 2.43.0
 
