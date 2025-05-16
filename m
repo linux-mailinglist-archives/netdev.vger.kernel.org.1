@@ -1,81 +1,125 @@
-Return-Path: <netdev+bounces-191056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69118AB9EB9
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 16:36:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 205EEAB9EC0
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 16:38:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8147E1BC48C7
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 14:36:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15A72A030BF
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 14:38:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D13151A5BBA;
-	Fri, 16 May 2025 14:35:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13CE2199237;
+	Fri, 16 May 2025 14:38:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BdIIpNJK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ylGodoks"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26B51A3159;
-	Fri, 16 May 2025 14:35:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3425518DB35
+	for <netdev@vger.kernel.org>; Fri, 16 May 2025 14:38:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747406157; cv=none; b=ccpA19g7lRlciPYazN0qFsTukRqxFYRX1D0VykYV07m4nWqZ1kQ1dB/ysVcLM+j35bfafRD6oDFqWxDgYGe+RJq59efxdQH8KSHTM4PXVuKtDQBhPlGt0qY5NAbv1+XuJLGMFuvoSlgfjm3ClQS5RqWMZjTBPzwohdhPBFhiwiM=
+	t=1747406309; cv=none; b=LNEhZ7t2+IoUkszPAaDXoeKWRE2RhCDt7ZROu04j6zwkTakMD9vV3fpmaTfwAzpMbJ81xYq+kcMLTJKGdRktUTJ5Fs+xKOQzKHut9Gy02Jhd2CuCXKEOAQrp/hX1994+ystgB98ct2BNeubDb51+npG4mbuL/D8Xn1ziN2VCt/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747406157; c=relaxed/simple;
-	bh=Ogd+hIgVrZ22tEQjOqjzdcAXRUppwTmaITwWTzOe+70=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=B1GC64zJsDI3e+aQmGpUuMMrx1AQckNoDFMZoYYz2ofAPLgd76aX9wxdR2sdMeyS0wCqbqxrPaBNfnO2Ovzss9Ck/aNyOPLV8JktVCOAEll1hXIsvpmaRJhzAxD+YtQqLAa34Jrk+R7nXLOoV/4LQBbaS3pKFTGWhl9KFYnfbME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BdIIpNJK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBCD1C4CEE4;
-	Fri, 16 May 2025 14:35:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747406157;
-	bh=Ogd+hIgVrZ22tEQjOqjzdcAXRUppwTmaITwWTzOe+70=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=BdIIpNJKkY8MJ/0LYqvVEMn8BmgYkgeDMf432/Vx/L8wLvOgbGFcX5cEefi1y9C3R
-	 NorcX/F4Xg4J5JDY5cm6HPa8mkNUHjDBHM+9NFlpo5VHx3sY36mrbIRP1HJ9eJPeFP
-	 38YePmGhO5+z6YrbMT7cHXZpdwbE0NrcXqZueJQX6HisUMqxZsiV/mrxTfHFjdYnqn
-	 sr6T626LI5gx9GzxkMbIMYFmAR9bonAB7g/ZlRK5MH6U6gJanSIyyOdHWddL7+q26c
-	 ifkfpkttMGk3uQDqBKZXY5KxEJOhJGtJ/dMRp5y5BBekiJqoObBQlziCNqmYoc3jw3
-	 PdPAL2HhcZi/A==
-Date: Fri, 16 May 2025 07:35:56 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- jiri@resnulli.us, shuah@kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net] selftests: net: validate team flags propagation
-Message-ID: <20250516073556.5983d1d0@kernel.org>
-In-Reply-To: <20250515231332.4120071-1-stfomichev@gmail.com>
-References: <20250515231332.4120071-1-stfomichev@gmail.com>
+	s=arc-20240116; t=1747406309; c=relaxed/simple;
+	bh=x4z2xCYwo9fPX793BRjCTj4nqlE0ZVIMCsmio1DpU7s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IWbj6AA82lYbRIjuKk1mzFS9WomdTXH6tEPg3CHAR5CQlVuLoRZUIZS25dZLz72dlTQmWaviolHxRoKWOXeI1e6XpM1aimkn2X3pvZMvnhjgVXFoPwMkwGYxrmuT4BI1u7MtsJjPHsBE1xOibZQtG4EC2QkmJh5dzBpgIu1VULA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ylGodoks; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-6000791e832so9863a12.1
+        for <netdev@vger.kernel.org>; Fri, 16 May 2025 07:38:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1747406305; x=1748011105; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1sUYusB+kyJ76xlLEHH5qRi/bk9NwvxZ5fkLN1rm8tM=;
+        b=ylGodoks6gEtouvpWiK2FouRrMpwv2Eh1sJF33X1TF2ipa209I7hRwmNWjpOXHpEPo
+         07w2HZyHsUgkM9T7xqmbPEwZpj/qdWAPQvxYqKuwTiTaUY4AR3LFNgbbiC/KYqQg3Q/a
+         3+LPt3qRDwMWan6jgP+oLaCspe2RCg3JULoj4ezt1niCXv7xYEywUqtO1ONlsOj8qvRb
+         zb0R+Mk921gYpg+E2LZkK9P9VjI/V6Vk6CA9CrDzP60gY8Iu39XFnqQuyaKj2QwJHsWR
+         QYQYXhdFlr2+gshcB9eHxm6mliW/f4Ik35K8CHx45fEdoq9USw0tbNtG7GrGww7QKvPj
+         7Vcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747406305; x=1748011105;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1sUYusB+kyJ76xlLEHH5qRi/bk9NwvxZ5fkLN1rm8tM=;
+        b=VT54hBFdoHUEt4KBkOKzorF7FrTTXVrYA4rnINDibchPWVm9x24oWBxxJO8Pv8wgDK
+         bcrePZCOn1tlei7tKczPXicd88c50HjOBm84jvmi0lMVBQ/rLTebokNY7N+4gdS+lgvQ
+         laqVh/sDh5U5zqmgpD3t40SK3xG39oIz554LhTyB7MH3Ypbbpyl4B/M0vdKF+l5AlDKM
+         EQiyrb/KAidhwdGGBZ6gJ02OUJ6BQFa1evriSO5tOb9LqgAoj6wLU3NA9pEyzYaeHaPr
+         R9sKrjyfHZyGdr2oRUBlFU2ID8RDor2n5mU/VP3EGcRXcFBd3IchUMwXcD4JfiBhcUCj
+         O+8A==
+X-Forwarded-Encrypted: i=1; AJvYcCVm1TPRF59NLiCZFss7Y3U/wIxUUZuKuEPhhcCZBgkIQtG2P/6wJB3pNbINyBznuQz3moiQVHs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOTcIchLAmdt7hD0CqZNUGlTIdHDD0Ihqwtvmv7kiEoeAHT/V0
+	dOHGt65kGnnkMcElYuAHyYocKpIQkWsEZX/I42402NahShmtIqUAucbPqR08jPbK99YkM3FSQtR
+	r34W1vj8agvTn7H2gD6J8OoVQeoL9tcv+1zQie105
+X-Gm-Gg: ASbGnctmQCem8j3H5+Jp4xlq6ShM5QOEw8hrte2tEKJ6m3fnOLyWIpoKJxvulx6IK45
+	imZHnF0ITaOe7EHQOUvglfZhr0h2VyAIuQzmN/SFLNt47zwnQACZ2fiaZoSGpUPlHIK1/8KXCc4
+	S2XnaT+0lyV0bOUpjj6fWDl5Ti/yVLxMHhNwewpCiUJpGZOKpe0i+w6SlF9eKBkY9FHtCLpnE=
+X-Google-Smtp-Source: AGHT+IHjVPydHL7cpnwkAmy+wB0lfXFTh8aEtdxrJqk903N82gHmcHf1UJhj/sj7jHSEWrx43rmp+OotJ5wNqgsIi3c=
+X-Received: by 2002:a50:c049:0:b0:5fd:28:c3f6 with SMTP id 4fb4d7f45d1cf-5ffc9dbe5b8mr231155a12.4.1747406305152;
+ Fri, 16 May 2025 07:38:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250516-work-coredump-socket-v8-0-664f3caf2516@kernel.org> <20250516-work-coredump-socket-v8-5-664f3caf2516@kernel.org>
+In-Reply-To: <20250516-work-coredump-socket-v8-5-664f3caf2516@kernel.org>
+From: Jann Horn <jannh@google.com>
+Date: Fri, 16 May 2025 16:37:49 +0200
+X-Gm-Features: AX0GCFsuzCC3CmbLLxfWpRPaI0gyUSqgeVs70kejvwFPyqgeFolUzQNjXbEK5Yo
+Message-ID: <CAG48ez2ewzKuVoUQp=nyMiVS9euPts3fKaexwXMGhVefQXqoig@mail.gmail.com>
+Subject: Re: [PATCH v8 5/9] pidfs, coredump: add PIDFD_INFO_COREDUMP
+To: Christian Brauner <brauner@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Eric Dumazet <edumazet@google.com>, Oleg Nesterov <oleg@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Daan De Meyer <daan.j.demeyer@gmail.com>, David Rheinsberg <david@readahead.eu>, 
+	Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>, 
+	Lennart Poettering <lennart@poettering.net>, Luca Boccassi <luca.boccassi@gmail.com>, 
+	Mike Yuan <me@yhndnzj.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	=?UTF-8?Q?Zbigniew_J=C4=99drzejewski=2DSzmek?= <zbyszek@in.waw.pl>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, 
+	Alexander Mikhalitsyn <alexander@mihalicyn.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 15 May 2025 16:13:32 -0700 Stanislav Fomichev wrote:
-> Cover three recent cases:
-> 1. missing ops locking for the lowers during netdev_sync_lower_features
-> 2. missing locking for dev_set_promiscuity (plus netdev_ops_assert_locked
->    with a comment on why/when it's needed)
-> 3. rcu lock during team_change_rx_flags
-> 
-> Verified that each one triggers when the respective fix is reverted.
-> Not sure about the placement, but since it all relies on teaming,
-> added to the teaming directory.
-> 
-> One ugly bit is that I add NETIF_F_LRO to netdevsim; there is no way
-> to trigger netdev_sync_lower_features without it.
+On Fri, May 16, 2025 at 1:26=E2=80=AFPM Christian Brauner <brauner@kernel.o=
+rg> wrote:
+> Extend the PIDFD_INFO_COREDUMP ioctl() with the new PIDFD_INFO_COREDUMP
+> mask flag. This adds the @coredump_mask field to struct pidfd_info.
+>
+> When a task coredumps the kernel will provide the following information
+> to userspace in @coredump_mask:
+>
+> * PIDFD_COREDUMPED is raised if the task did actually coredump.
+> * PIDFD_COREDUMP_SKIP is raised if the task skipped coredumping (e.g.,
+>   undumpable).
+> * PIDFD_COREDUMP_USER is raised if this is a regular coredump and
+>   doesn't need special care by the coredump server.
+> * PIDFD_COREDUMP_ROOT is raised if the generated coredump should be
+>   treated as sensitive and the coredump server should restrict to the
+>   generated coredump to sufficiently privileged users.
+>
+> The kernel guarantees that by the time the connection is made the all
+> PIDFD_INFO_COREDUMP info is available.
+>
+> Acked-by: Luca Boccassi <luca.boccassi@gmail.com>
+> Reviewed-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+> Signed-off-by: Christian Brauner <brauner@kernel.org>
 
-Seems to consistently fail in NIPA :(
--- 
-pw-bot: cr
+Reviewed-by: Jann Horn <jannh@google.com>
+
+Thanks for clarifying the comments!
 
