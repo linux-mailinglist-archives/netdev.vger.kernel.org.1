@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-191212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDE78ABA652
-	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 01:12:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8481CABA653
+	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 01:12:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA6F25050FD
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 23:12:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69172A24955
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 23:12:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4B76281352;
-	Fri, 16 May 2025 23:09:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71DC3281519;
+	Fri, 16 May 2025 23:10:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rXBpW32j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jLeM8+7T"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3926281341;
-	Fri, 16 May 2025 23:09:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C73B22F3B1
+	for <netdev@vger.kernel.org>; Fri, 16 May 2025 23:10:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747436999; cv=none; b=ooHexJyjqUUw5zXxUfz4ttMau84BxpgTXkTQUj/nDWmPU2Wj7R3KAYbP+sJVNtzDIsyAY8CbpDjcEFNxngRqMkyRL3j5gggUiZM3jEyTbhaClywJrmmsXoMj3Y1nvkzCcbII2FLm14dd1uutzy7mtqDvDFQkFNUBVVFPjPq0/Fo=
+	t=1747437007; cv=none; b=YvuQBF6EsFqM0SUoobHnoQRgXXToqF4HCaaBVNBDMEeEwUp/LTBIv7mhXRb/UwyrhOyumxAEUU8XXkobP1Ipgl8saNNIv2cKO0yUKeeldv53ILaXfhuCcYE+X49ZekdP/Av7FakiWWlQ0PicjsPuOHAm3QOTByqo44u+2jirigs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747436999; c=relaxed/simple;
-	bh=0Vy5sVsDWeE1upI11kp7jf8llc1Sgop4vwX+lM3uqqE=;
+	s=arc-20240116; t=1747437007; c=relaxed/simple;
+	bh=z/Opi5ZC12sMP+8+zT4EJukfd5SY4yv5ounQUh3d7Ic=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=O9DGKW74mlsaRtvWwwvOmuN5CHy8eEO2NFcJ4mPp6X3rHwpePCbZysE+R4Ig5ra1Et2NMNFd12PBmsicHaSF6V0YP1MqvFp2LCmR1c7wKk9iRmhypW8Lx0s4uhcUQYwoJ0Fa5Bl9UATENAXwNy1iZtMDT5lRNalM/1UQbBzHD+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rXBpW32j; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F244C4CEE4;
-	Fri, 16 May 2025 23:09:59 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=D8axWPeOq6CLjXpxD/okbr77ZcnCWoq8xDCSVqDKbS3GA3fZipj8WoD07p68ktZwdJX2KPzo+rWZyanELUdEEpQmf+5GiwqLvviRTgQ1QH0B3t8Szp25yI/dN32afK2lXyDdPDDYDEFFIItMKwOydG2ukKJifSMGybEcqh5FDBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jLeM8+7T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B511FC4CEE4;
+	Fri, 16 May 2025 23:10:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747436999;
-	bh=0Vy5sVsDWeE1upI11kp7jf8llc1Sgop4vwX+lM3uqqE=;
+	s=k20201202; t=1747437006;
+	bh=z/Opi5ZC12sMP+8+zT4EJukfd5SY4yv5ounQUh3d7Ic=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=rXBpW32jnG6dEgUMelOxf0P8M7pgwVkpQllW/tmkUXccZqOOWUCaujfR7V6WFiqII
-	 +P2oKssOl9b4MyQgoAL56GhppRm+5FUtMWJqZZXqfPDbxF3cNQyXWfd7L6QCi2aonW
-	 QNoZpP3UXHkhjZZxN1R0Y7xfT6QejpDRoZodv54iMruJTn0KMXnUKjPxcuGsjiFsH8
-	 I/w+6xyXZFEF6XyPI9orwHf3A5MKww2uY4XcZsG992uS/lyENuEm3Li1zvmMeBru6d
-	 03+S3nmXo+zRodS3jKgR6g1t8NbpByuAazu05PSQe8xwEBA2ZLSzutnoW/sTs0R65+
-	 G3YZusIeFPJTQ==
+	b=jLeM8+7TDitqqUHczbLl2AFvhreX3+oPzxjs7MiwzG99YVerjppXnax4Z1uhCUkS9
+	 clY64T6ff9ikipmua5R+oXYYkQPbe1/bIClyr7ZyadgkH6gP/IuiVkr4ukM7WRIsWG
+	 PlNRkKEG7KCbJtMyb3d7C8C16mS60MRRPSL3pIeY6SIHv1VL4GkrctU25q9F99xnme
+	 9c409B7/EWlLOuafPT5Q0BaxNsoqR6BnHUIeqheOB3tk0Kk+tK1puwoFD01EQNGBvR
+	 4QcTZYcpJH9Url96EEYL7Ey+fqCZ/+4Slon2j+0bhfcMgMVn3SuAFBjiu8A9smVaMJ
+	 6ic+B5Uckx+lg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E903806659;
-	Fri, 16 May 2025 23:10:37 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDD03806659;
+	Fri, 16 May 2025 23:10:44 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] vmxnet3: update MTU after device quiesce
+Subject: Re: [PATCH net-next] net: rfs: add sock_rps_delete_flow() helper
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174743703575.4089123.13792303088374756172.git-patchwork-notify@kernel.org>
-Date: Fri, 16 May 2025 23:10:35 +0000
-References: <20250515190457.8597-1-ronak.doshi@broadcom.com>
-In-Reply-To: <20250515190457.8597-1-ronak.doshi@broadcom.com>
-To: Ronak Doshi <ronak.doshi@broadcom.com>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org, guolin.yang@broadcom.com,
- bcm-kernel-feedback-list@broadcom.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- ronghua@vmware.com, sbhatewara@vmware.com, bhavesh@vmware.com,
- linux-kernel@vger.kernel.org
+ <174743704349.4089123.14141926227424572519.git-patchwork-notify@kernel.org>
+Date: Fri, 16 May 2025 23:10:43 +0000
+References: <20250515100354.3339920-1-edumazet@google.com>
+In-Reply-To: <20250515100354.3339920-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, tavip@google.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 15 May 2025 19:04:56 +0000 you wrote:
-> Currently, when device mtu is updated, vmxnet3 updates netdev mtu, quiesces
-> the device and then reactivates it for the ESXi to know about the new mtu.
-> So, technically the OS stack can start using the new mtu before ESXi knows
-> about the new mtu.
+On Thu, 15 May 2025 10:03:54 +0000 you wrote:
+> RFS can exhibit lower performance for workloads using short-lived
+> flows and a small set of 4-tuple.
 > 
-> This can lead to issues for TSO packets which use mss as per the new mtu
-> configured. This patch fixes this issue by moving the mtu write after
-> device quiesce.
+> This is often the case for load-testers, using a pair of hosts,
+> if the server has a single listener port.
+> 
+> Typical use case :
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] vmxnet3: update MTU after device quiesce
-    https://git.kernel.org/netdev/net/c/43f0999af011
+  - [net-next] net: rfs: add sock_rps_delete_flow() helper
+    https://git.kernel.org/netdev/net-next/c/9cd5ef0b8c04
 
 You are awesome, thank you!
 -- 
