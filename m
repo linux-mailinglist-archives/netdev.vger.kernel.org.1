@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-191207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79CB8ABA64F
-	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 01:11:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E722ABA640
+	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 01:10:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 88E377AEBF2
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 23:08:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F0C991B68405
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 23:10:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 923B6283FD3;
-	Fri, 16 May 2025 23:07:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C176C284B2A;
+	Fri, 16 May 2025 23:07:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p+hE2Wjf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yk8f/R9/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E901F2836AA
-	for <netdev@vger.kernel.org>; Fri, 16 May 2025 23:07:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D089D283FEE
+	for <netdev@vger.kernel.org>; Fri, 16 May 2025 23:07:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747436871; cv=none; b=iymfrqb/lrPbyi8fM2kdEO5UinbD3c3MXkRJV8JdQ8EH6igzvhfi4trfU8H+ZcYzCsK/s9cDIf2fr46qd2pCwFDNf/nX0Fx8nHDZZC+dlpm00aGpUexV98jmvK6p27BjXx8QksnWCFhG/UuzgkTk7nB169koH3MSBqkYDNG95g8=
+	t=1747436873; cv=none; b=CZjeM/FRcJetlTjKhWtoFN5IflUNsXFfqYdDRQkZYUlYuefwrnsjM06Va547xpWOdVZHoxrG0nTq41QjX9qIX5GUkSY0Z/0IUklmve3jl7H4/67OwAJg2iVHMZr28G+2SIJWOwYwyhZwYHXeAQwVIzuh2uem8V+RJlvhUmiW0n4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747436871; c=relaxed/simple;
-	bh=3eV70KuPSBCjK3Otg1fXvhrN4aUAqOQEKnpjeLf+MLY=;
+	s=arc-20240116; t=1747436873; c=relaxed/simple;
+	bh=o6ojYocRmtbY7VPZ4gtOsMEHBN5PEdZ1+pPexJLlixI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=LpMRqv7+h1DE8zY3jC8Y/M99RDVV8+T4ve7Xn6zg8NGM4tRA1BnXnaXs9yrjz5nAm/p2yF75XtTUIaCsbc6Hm+jmd3g/D7Pg2njnoDf4dPBuWENSzUC+ga4jbr1DZ8CUBdJqZSHFSNCk0eZbLAm2oDmwyaqDtR8A5viING/RQj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p+hE2Wjf; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=FUj/CbpdBDlfalBw6W564ATEztNjjDpiK/s9Fd3kT6RVrjKDW80COlqW2TlWKDRnuTb5V7Jh0G9yCmrOI7voAyvghgzjfJIqymRMl9nHurIMAE6Wfmn7sOsYASftpkUFLw1BHo8r+gLBBDIZX9qO2A9X/MPJqlhQdKzH3UwCU8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yk8f/R9/; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b26db9af463so2309510a12.2
-        for <netdev@vger.kernel.org>; Fri, 16 May 2025 16:07:49 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-740adfc7babso2175313b3a.0
+        for <netdev@vger.kernel.org>; Fri, 16 May 2025 16:07:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747436869; x=1748041669; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1747436871; x=1748041671; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=PToc7yVowqyTNBLhp6IJYYBJ3tIDF6DyMy5BFKXkP80=;
-        b=p+hE2WjfdEAe1Ti02a6SlYDd04rA4649+me6OC/OD0O5mxHQSZUXOmjH0/Q2LCwkQS
-         uJ4kn9MlG0dboTJEHLHQAM9yaGwZMRdiueHHHGf8A/1beknFBtJKf+NnqC9wiXbbZHht
-         KHBjyXHFLtXVjyDxlRLD6nAELgpFyzZhy2qJZS3WQHhdYhYZfM+/V5CRMkCYwxD/XTOw
-         vkPBfdmF7f4lKKVTj6BkjT9FsfWEjuev9Fr55XakyqYYZkaRYjBmX99C7lkuc+ct5G8P
-         ryxerNEG5NbxOuDEGNebh6oZ9j1h3ya7pR3j8WE3hV2w09bK4XG1JACdD+5ooEal4rz3
-         wK8A==
+        bh=XqyZ4iRfRvJdneUtU4nKjIsAUcubAtsU20tcnlkHRMg=;
+        b=yk8f/R9/10/o+V+mqFPbmDTjcc5F3kH2eRc7ZKQFjCqigsT8m4mYxRKzb5271/Miy6
+         PMeSWR1xXnfptt+4/BfFFv6uz6I+mDsOgWW9StLlWEffaJMUMKQpTXcjLTlfTMFFIzQs
+         GMNR7mFg50btAaK0QyOTtddhS88Wt7jsJIzRHIMrLLvEBFvGkghIpsyVBDSYps3Vcigr
+         EW2kaFYx7pb/h1mu9u05Wdy0To5VuKUSUitQOfreTuqAXLbG1/L8VLHOZhpEtT8b27iX
+         1m8eyTyXu30SULxKgct+qVQNZ2JzagmouRAc+v4L9Kuz2r/FEVLEJ0oHVnr0X3iUsjUC
+         ryRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747436869; x=1748041669;
+        d=1e100.net; s=20230601; t=1747436871; x=1748041671;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=PToc7yVowqyTNBLhp6IJYYBJ3tIDF6DyMy5BFKXkP80=;
-        b=tMSqDzZa1QDE1l/Hzh+Ea1cfE+kW314aGal4KSkZnbV+aSj4bouRYPssGgzW984Ddm
-         NHL4LV8kXOOnSZ+mwIE2VZkkG9RiMWHK59d9NrNx8NbQmSJ9gpOfjaEtR35jpRrj76b6
-         KgWT5p+ZXvNjcpPHFpVxSBAcSgY4FyQgskH/ZPK5ljsQWqBC10C2zEQNZQWkcdioHdv6
-         LXN8RxeoGOEwI9C5ZdVCqS9yTIzClCq9uVVCKJWroe3rC1Hhyjh1id4JOogOW2mQnpIV
-         nebIjgDvLIG+QwxF43bc+G31QK9XpO+VOnJdGl1q8G4MUMJPpNvzPj0W63xW9cFj7aeo
-         lHzw==
-X-Forwarded-Encrypted: i=1; AJvYcCX1ABHiZCwm0VZ1aLGqNRkCyjnJSKp0qiXNYXD2uduB5MIWALeOGCzjTW+pgApWS7anPXSIR9w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwO1j3Ytj26yMoS/eSCpb1aVs3rdPTz2w3wQUKCrUnTFWb8QvER
-	xOv8KLl8VYK6ec26JhbewHSfcLbPCFHZTVXdeF1JoyTcxTYs+GZ+k1WtxJckQkIBQJPgQMreOM2
-	Fc/EB0w==
-X-Google-Smtp-Source: AGHT+IFMqF17coq6lIynvImodo9GEBI80OqIy5QNctbeCRw4yO4mG2Xb1BFvJbWtlWRj5T810Vi94FLEzzA=
-X-Received: from pjbqj4.prod.google.com ([2002:a17:90b:28c4:b0:308:861f:fddb])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1c05:b0:301:6343:1626
- with SMTP id 98e67ed59e1d1-30e7d4f91ccmr6639663a91.1.1747436869330; Fri, 16
- May 2025 16:07:49 -0700 (PDT)
+        bh=XqyZ4iRfRvJdneUtU4nKjIsAUcubAtsU20tcnlkHRMg=;
+        b=DpdIshvaFJ4q0zslLfiXr1gTeFDg5XVs/tZw9/tsPWotXVh2weuF/8a2AJiXZv1WuW
+         EtrhTDCFmsNHUt+GSjJw9bq0mq47Kii8CPXb7YQzWiQICnNQ+5OoHSif0TFjuvxKsv7R
+         6VeTNJxSa6ZaLKLfN+uD5jrgm6FhL5mRTMKLhlAoPJgwcbdfH7WHz9yoELgy8D9cxycP
+         hlBc+SoLQsh17kITt7GlNgvhTZV8DvXmWEX3q2KTYCh7iFGycWawfP/iAa2iSXALMYfM
+         Y264xqwUMOv5zzk6XaNHiX1IkAzajDm8eEG1XZqlNt541bePlYO+CPjeF5vSHxWfaCZL
+         CGoA==
+X-Forwarded-Encrypted: i=1; AJvYcCUkvdF8LsbSswldqdPOT1QqJntN/Y7TC0eztW4tb1Da727rr5z7EMAMFkSzbnimPpWCtvnnye0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxU5QLmytkzOhGvP06i4EW6F7XCxq7tD/F9bskSv/3lao9fg24f
+	XQ8Xeby8sJgsv/Ba8gbTyyw69jgkNF8WmgNgi+p3+Tx+KaxhxTPGqmt0aMuzTX7IXRnh5mOgYST
+	JOteA4A==
+X-Google-Smtp-Source: AGHT+IEOTe7V8s8lR/GhvzQE3vyIAN+8Rwn8cNp7gsJp1bTOQBIyn/LL0P5IEeP4ehuA+V5KmZJSBIdW6ZM=
+X-Received: from pjb7.prod.google.com ([2002:a17:90b:2f07:b0:2ff:5516:6add])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:8cc1:b0:216:1ea0:a516
+ with SMTP id adf61e73a8af0-21621a0a546mr8110596637.41.1747436871129; Fri, 16
+ May 2025 16:07:51 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 16 May 2025 16:07:32 -0700
+Date: Fri, 16 May 2025 16:07:33 -0700
 In-Reply-To: <20250516230734.2564775-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250516230734.2564775-1-seanjc@google.com>
 X-Mailer: git-send-email 2.49.0.1112.g889b7c5bd8-goog
-Message-ID: <20250516230734.2564775-7-seanjc@google.com>
-Subject: [PATCH v2 6/8] irqbypass: Use guard(mutex) in lieu of manual lock+unlock
+Message-ID: <20250516230734.2564775-8-seanjc@google.com>
+Subject: [PATCH v2 7/8] irqbypass: Use xarray to track producers and consumers
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
@@ -89,124 +89,231 @@ Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev,
 	Binbin Wu <binbin.wu@linux.intel.com>, Yong He <alexyonghe@tencent.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Use guard(mutex) to clean up irqbypass's error handling.
+Track IRQ bypass producers and consumers using an xarray to avoid the O(2n)
+insertion time associated with walking a list to check for duplicate
+entries, and to search for an partner.
 
+At low (tens or few hundreds) total producer/consumer counts, using a list
+is faster due to the need to allocate backing storage for xarray.  But as
+count creeps into the thousands, xarray wins easily, and can provide
+several orders of magnitude better latency at high counts.  E.g. hundreds
+of nanoseconds vs. hundreds of milliseconds.
+
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: David Matlack <dmatlack@google.com>
+Cc: Like Xu <like.xu.linux@gmail.com>
+Cc: Binbin Wu <binbin.wu@linux.intel.com>
+Reported-by: Yong He <alexyonghe@tencent.com>
+Closes: https://bugzilla.kernel.org/show_bug.cgi?id=217379
+Link: https://lore.kernel.org/all/20230801115646.33990-1-likexu@tencent.com
 Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 Acked-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- virt/lib/irqbypass.c | 38 ++++++++++----------------------------
- 1 file changed, 10 insertions(+), 28 deletions(-)
+ include/linux/irqbypass.h |  4 ---
+ virt/lib/irqbypass.c      | 74 ++++++++++++++++++++-------------------
+ 2 files changed, 38 insertions(+), 40 deletions(-)
 
+diff --git a/include/linux/irqbypass.h b/include/linux/irqbypass.h
+index b28197c87483..cd64fcaa88fe 100644
+--- a/include/linux/irqbypass.h
++++ b/include/linux/irqbypass.h
+@@ -33,7 +33,6 @@ struct irq_bypass_consumer;
+ 
+ /**
+  * struct irq_bypass_producer - IRQ bypass producer definition
+- * @node: IRQ bypass manager private list management
+  * @eventfd: eventfd context used to match producers and consumers
+  * @consumer: The connected consumer (NULL if no connection)
+  * @irq: Linux IRQ number for the producer device
+@@ -47,7 +46,6 @@ struct irq_bypass_consumer;
+  * for a physical device assigned to a VM.
+  */
+ struct irq_bypass_producer {
+-	struct list_head node;
+ 	struct eventfd_ctx *eventfd;
+ 	struct irq_bypass_consumer *consumer;
+ 	int irq;
+@@ -61,7 +59,6 @@ struct irq_bypass_producer {
+ 
+ /**
+  * struct irq_bypass_consumer - IRQ bypass consumer definition
+- * @node: IRQ bypass manager private list management
+  * @eventfd: eventfd context used to match producers and consumers
+  * @producer: The connected producer (NULL if no connection)
+  * @add_producer: Connect the IRQ consumer to an IRQ producer
+@@ -75,7 +72,6 @@ struct irq_bypass_producer {
+  * portions of the interrupt handling to the VM.
+  */
+ struct irq_bypass_consumer {
+-	struct list_head node;
+ 	struct eventfd_ctx *eventfd;
+ 	struct irq_bypass_producer *producer;
+ 
 diff --git a/virt/lib/irqbypass.c b/virt/lib/irqbypass.c
-index 6a183459dc44..828556c081f5 100644
+index 828556c081f5..ea888b9203d2 100644
 --- a/virt/lib/irqbypass.c
 +++ b/virt/lib/irqbypass.c
-@@ -99,33 +99,25 @@ int irq_bypass_register_producer(struct irq_bypass_producer *producer,
- 	if (WARN_ON_ONCE(producer->eventfd))
- 		return -EINVAL;
+@@ -22,8 +22,8 @@
+ MODULE_LICENSE("GPL v2");
+ MODULE_DESCRIPTION("IRQ bypass manager utility module");
  
--	mutex_lock(&lock);
-+	guard(mutex)(&lock);
+-static LIST_HEAD(producers);
+-static LIST_HEAD(consumers);
++static DEFINE_XARRAY(producers);
++static DEFINE_XARRAY(consumers);
+ static DEFINE_MUTEX(lock);
  
- 	list_for_each_entry(tmp, &producers, node) {
--		if (tmp->eventfd == eventfd) {
--			ret = -EBUSY;
--			goto out_err;
--		}
-+		if (tmp->eventfd == eventfd)
-+			return -EBUSY;
- 	}
+ /* @lock must be held when calling connect */
+@@ -86,13 +86,13 @@ static void __disconnect(struct irq_bypass_producer *prod,
+  * @producer: pointer to producer structure
+  * @eventfd: pointer to the eventfd context associated with the producer
+  *
+- * Add the provided IRQ producer to the list of producers and connect
+- * with any matching eventfd found on the IRQ consumers list.
++ * Add the provided IRQ producer to the set of producers and connect with the
++ * consumer with a matching eventfd, if one exists.
+  */
+ int irq_bypass_register_producer(struct irq_bypass_producer *producer,
+ 				 struct eventfd_ctx *eventfd)
+ {
+-	struct irq_bypass_producer *tmp;
++	unsigned long index = (unsigned long)eventfd;
+ 	struct irq_bypass_consumer *consumer;
+ 	int ret;
  
- 	list_for_each_entry(consumer, &consumers, node) {
- 		if (consumer->eventfd == eventfd) {
- 			ret = __connect(producer, consumer);
- 			if (ret)
--				goto out_err;
-+				return ret;
- 			break;
+@@ -101,22 +101,20 @@ int irq_bypass_register_producer(struct irq_bypass_producer *producer,
+ 
+ 	guard(mutex)(&lock);
+ 
+-	list_for_each_entry(tmp, &producers, node) {
+-		if (tmp->eventfd == eventfd)
+-			return -EBUSY;
+-	}
++	ret = xa_insert(&producers, index, producer, GFP_KERNEL);
++	if (ret)
++		return ret;
+ 
+-	list_for_each_entry(consumer, &consumers, node) {
+-		if (consumer->eventfd == eventfd) {
+-			ret = __connect(producer, consumer);
+-			if (ret)
+-				return ret;
+-			break;
++	consumer = xa_load(&consumers, index);
++	if (consumer) {
++		ret = __connect(producer, consumer);
++		if (ret) {
++			WARN_ON_ONCE(xa_erase(&producers, index) != producer);
++			return ret;
  		}
  	}
  
  	producer->eventfd = eventfd;
- 	list_add(&producer->node, &producers);
--
--	mutex_unlock(&lock);
--
+-	list_add(&producer->node, &producers);
  	return 0;
--out_err:
--	mutex_unlock(&lock);
--	return ret;
  }
  EXPORT_SYMBOL_GPL(irq_bypass_register_producer);
- 
-@@ -141,14 +133,13 @@ void irq_bypass_unregister_producer(struct irq_bypass_producer *producer)
+@@ -125,11 +123,14 @@ EXPORT_SYMBOL_GPL(irq_bypass_register_producer);
+  * irq_bypass_unregister_producer - unregister IRQ bypass producer
+  * @producer: pointer to producer structure
+  *
+- * Remove a previously registered IRQ producer from the list of producers
+- * and disconnect it from any connected IRQ consumer.
++ * Remove a previously registered IRQ producer (note, it's safe to call this
++ * even if registration was unsuccessful).  Disconnect from the associated
++ * consumer, if one exists.
+  */
+ void irq_bypass_unregister_producer(struct irq_bypass_producer *producer)
+ {
++	unsigned long index = (unsigned long)producer->eventfd;
++
  	if (!producer->eventfd)
  		return;
  
--	mutex_lock(&lock);
-+	guard(mutex)(&lock);
- 
+@@ -138,8 +139,8 @@ void irq_bypass_unregister_producer(struct irq_bypass_producer *producer)
  	if (producer->consumer)
  		__disconnect(producer, producer->consumer);
  
++	WARN_ON_ONCE(xa_erase(&producers, index) != producer);
  	producer->eventfd = NULL;
- 	list_del(&producer->node);
--	mutex_unlock(&lock);
+-	list_del(&producer->node);
  }
  EXPORT_SYMBOL_GPL(irq_bypass_unregister_producer);
  
-@@ -173,33 +164,25 @@ int irq_bypass_register_consumer(struct irq_bypass_consumer *consumer,
- 	if (!consumer->add_producer || !consumer->del_producer)
- 		return -EINVAL;
+@@ -148,13 +149,13 @@ EXPORT_SYMBOL_GPL(irq_bypass_unregister_producer);
+  * @consumer: pointer to consumer structure
+  * @eventfd: pointer to the eventfd context associated with the consumer
+  *
+- * Add the provided IRQ consumer to the list of consumers and connect
+- * with any matching eventfd found on the IRQ producer list.
++ * Add the provided IRQ consumer to the set of consumers and connect with the
++ * producer with a matching eventfd, if one exists.
+  */
+ int irq_bypass_register_consumer(struct irq_bypass_consumer *consumer,
+ 				 struct eventfd_ctx *eventfd)
+ {
+-	struct irq_bypass_consumer *tmp;
++	unsigned long index = (unsigned long)eventfd;
+ 	struct irq_bypass_producer *producer;
+ 	int ret;
  
--	mutex_lock(&lock);
-+	guard(mutex)(&lock);
+@@ -166,22 +167,20 @@ int irq_bypass_register_consumer(struct irq_bypass_consumer *consumer,
  
- 	list_for_each_entry(tmp, &consumers, node) {
--		if (tmp->eventfd == eventfd) {
--			ret = -EBUSY;
--			goto out_err;
--		}
-+		if (tmp->eventfd == eventfd)
-+			return -EBUSY;
- 	}
+ 	guard(mutex)(&lock);
  
- 	list_for_each_entry(producer, &producers, node) {
- 		if (producer->eventfd == eventfd) {
- 			ret = __connect(producer, consumer);
- 			if (ret)
--				goto out_err;
-+				return ret;
- 			break;
+-	list_for_each_entry(tmp, &consumers, node) {
+-		if (tmp->eventfd == eventfd)
+-			return -EBUSY;
+-	}
++	ret = xa_insert(&consumers, index, consumer, GFP_KERNEL);
++	if (ret)
++		return ret;
+ 
+-	list_for_each_entry(producer, &producers, node) {
+-		if (producer->eventfd == eventfd) {
+-			ret = __connect(producer, consumer);
+-			if (ret)
+-				return ret;
+-			break;
++	producer = xa_load(&producers, index);
++	if (producer) {
++		ret = __connect(producer, consumer);
++		if (ret) {
++			WARN_ON_ONCE(xa_erase(&consumers, index) != consumer);
++			return ret;
  		}
  	}
  
  	consumer->eventfd = eventfd;
- 	list_add(&consumer->node, &consumers);
--
--	mutex_unlock(&lock);
--
+-	list_add(&consumer->node, &consumers);
  	return 0;
--out_err:
--	mutex_unlock(&lock);
--	return ret;
  }
  EXPORT_SYMBOL_GPL(irq_bypass_register_consumer);
- 
-@@ -215,13 +198,12 @@ void irq_bypass_unregister_consumer(struct irq_bypass_consumer *consumer)
+@@ -190,11 +189,14 @@ EXPORT_SYMBOL_GPL(irq_bypass_register_consumer);
+  * irq_bypass_unregister_consumer - unregister IRQ bypass consumer
+  * @consumer: pointer to consumer structure
+  *
+- * Remove a previously registered IRQ consumer from the list of consumers
+- * and disconnect it from any connected IRQ producer.
++ * Remove a previously registered IRQ consumer (note, it's safe to call this
++ * even if registration was unsuccessful).  Disconnect from the associated
++ * producer, if one exists.
+  */
+ void irq_bypass_unregister_consumer(struct irq_bypass_consumer *consumer)
+ {
++	unsigned long index = (unsigned long)consumer->eventfd;
++
  	if (!consumer->eventfd)
  		return;
  
--	mutex_lock(&lock);
-+	guard(mutex)(&lock);
- 
+@@ -203,7 +205,7 @@ void irq_bypass_unregister_consumer(struct irq_bypass_consumer *consumer)
  	if (consumer->producer)
  		__disconnect(consumer->producer, consumer);
  
++	WARN_ON_ONCE(xa_erase(&consumers, index) != consumer);
  	consumer->eventfd = NULL;
- 	list_del(&consumer->node);
--	mutex_unlock(&lock);
+-	list_del(&consumer->node);
  }
  EXPORT_SYMBOL_GPL(irq_bypass_unregister_consumer);
 -- 
