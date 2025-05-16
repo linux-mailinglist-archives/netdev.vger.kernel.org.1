@@ -1,174 +1,134 @@
-Return-Path: <netdev+bounces-191185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA51DABA590
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 23:53:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6C95ABA5BD
+	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 00:00:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B4A0A01F88
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 21:53:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 923B21B68A72
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 22:01:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3691280300;
-	Fri, 16 May 2025 21:53:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9663F1E6DC5;
+	Fri, 16 May 2025 22:00:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="fFq76CWa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h13szOE6"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2051.outbound.protection.outlook.com [40.107.236.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B96128001B;
-	Fri, 16 May 2025 21:53:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747432409; cv=fail; b=IVP6G+OqRhvaUx8dK16luO91q/ENqA91g9dXyUxCnlJRh2XeoQpu2Wc26QrXx5MkA/NgxgEKVeXUsxAqRzbzt4iyqrSa8kC/nuzM0V1XVuKMux6wC+JJ9xWkJUM5XT/GjNq2QOjWpl4gcskb3hE1NmQ4XC1ZC+9EaJzC2nlCRg4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747432409; c=relaxed/simple;
-	bh=q16NTFnhHcXg3f4kzAGTsuPNI33NyidZSI1r63NoQQk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=LMHdAeeSjPr3908HGGjwjVczJnkRc8Yl0XQqsVz2wXEZhA2tZyvN+ksq0zu/0NVWvL2xgB06VjZyV6vhI2Do/B3LK0j8bea27cxys67TovzdaNWktZmV56x7UPd7ANbxTtmkfDS+bnpMNXVY986v9+Y3p0k+ZlFMIOpjQrVFtyA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=fFq76CWa; arc=fail smtp.client-ip=40.107.236.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=yrgXuQpHJEGxIN84PikVecOpuoGt4NmAVgsRnh3zsI1Juk39Rngz4r69SSNUHjxfdYYPRbdgnszJZmwNCzE8Pbrmop/FGf+1WrdQa9oa6CD18pjeslxT/dp/eCpje3B9lK4kzP/gQI3yaTaj2dSApMImlhTH5Ovnc2qiZxrdpLrlQ26lC9iZsbAiHdtv7oplbjMDCzr5Ev7EmXF/f1jlytVlVEvge8wzhuCA+jXWPxxR0nK9nIaQPsBpkDMeORQ1sUsJRT5D2K5BuIEL2HOF7X4Dqxf9P7VXJ2hqW0nrSX8Wc/0sznAjP1d+gBA9EJmNw/sSVXpnd1Z9L9hkeKfbTg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=q16NTFnhHcXg3f4kzAGTsuPNI33NyidZSI1r63NoQQk=;
- b=G4QFK6cDC+M76NmL5oyO6Jh8wbBQKFyreHi6yIj+pv8vg03jL5mY24SHGoAxvLnQkDOiDH7M4p61lnCet56y1D1JPmxY4p98fBBi39c+0zs7+AQfoTlMlhwkOPO+2UJqj4rXxLums7N9bTvDX17GrheeC9st8jbWq+e5581LBY2Sxe5BM3Ke1oXHrpAVkO+LfKa1s+LdbFD9zgF6VYS07I+e0jLq6rkkaUwLGHh+K5oFM8aTH+K0xUtvbqvoBAk0evKRdA6whProE21NuDhIsWFmYoHuuM0aBfDNinHN48GTv6/al5MtPFzfC4Otg13x5a3UPep6uNDn+CwwBbfboQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=q16NTFnhHcXg3f4kzAGTsuPNI33NyidZSI1r63NoQQk=;
- b=fFq76CWaayqSbswFzrOdaF3EazOcAtelycEwi2UAi20UMrGs4mL9VHD0xJdGiRQrdU5EXxxrJHuk3Lw3Aub34G0ghZeIBvmwi999gTTDl/R7wahn+X/UdTPfUDCkWLvcfAAC6bY3lHxoX+eUX8GQOi4G2R3dTKMDllDS3xXSUuQfpD8WCIulwAOTApq6W6NbADr+iuXtcltxDZuAIYLY2tTuTwHrFhZRisi8cZQFZf6jw8jPD9/gnPsYTqgPoZ3x52tjQYf7lKmiPbyI6xK5rZ6bIbtNnuZ4asUHhm7GX7WoiO/n3MKJ3sNSyHDfudoP6WxlTPH1QyUCLtPWQ3d83g==
-Received: from DM3PR11MB8736.namprd11.prod.outlook.com (2603:10b6:0:47::9) by
- DM6PR11MB4657.namprd11.prod.outlook.com (2603:10b6:5:2a6::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8722.33; Fri, 16 May 2025 21:53:24 +0000
-Received: from DM3PR11MB8736.namprd11.prod.outlook.com
- ([fe80::b929:8bd0:1449:67f0]) by DM3PR11MB8736.namprd11.prod.outlook.com
- ([fe80::b929:8bd0:1449:67f0%7]) with mapi id 15.20.8722.027; Fri, 16 May 2025
- 21:53:24 +0000
-From: <Tristram.Ha@microchip.com>
-To: <linux@armlinux.org.uk>
-CC: <andrew@lunn.ch>, <Woojung.Huh@microchip.com>, <olteanv@gmail.com>,
-	<hkallweit1@gmail.com>, <maxime.chevallier@bootlin.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <UNGLinuxDriver@microchip.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net-next v4] net: dsa: microchip: Add SGMII port support
- to KSZ9477 switch
-Thread-Topic: [PATCH net-next v4] net: dsa: microchip: Add SGMII port support
- to KSZ9477 switch
-Thread-Index: AQHbxgwLVyZ+0FlRMUiYEmAbgLH1dbPU7V4AgADfCXA=
-Date: Fri, 16 May 2025 21:53:24 +0000
-Message-ID:
- <DM3PR11MB8736778BE6F9A4B2F35594C1EC93A@DM3PR11MB8736.namprd11.prod.outlook.com>
-References: <20250516024123.24910-1-Tristram.Ha@microchip.com>
- <aCb3kNniIhtmIhf1@shell.armlinux.org.uk>
-In-Reply-To: <aCb3kNniIhtmIhf1@shell.armlinux.org.uk>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM3PR11MB8736:EE_|DM6PR11MB4657:EE_
-x-ms-office365-filtering-correlation-id: ac1118eb-da89-40ff-5f39-08dd94c414fc
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?rLywfMx5UXOXBgJpbDWT0PxGhkOJMCd2qZ0B/WiWwE/9I0b6gBYhViQsb2Yz?=
- =?us-ascii?Q?8srUhlmxq0NYcs7V4m1qnHva3okKV1wui459fXsOx5EMe+I+bCsWNZyZjbSS?=
- =?us-ascii?Q?WzvFc99Za4SN4yTKrTSBfPEH4gxYagDYv8KMIiRLFFXsfMLwppn9jUDP6y5A?=
- =?us-ascii?Q?8aF7W7dCNwTw4se0eQ2n7TyeKPVIADvATjtyyo8rBmDqJWMBUmYa5O3bFO1+?=
- =?us-ascii?Q?c3HWQP5O4ZHPYDCAqVd57XqgJ1CB/JlpPPnj+a8Aa4wPw5PNU4dizEmB8e/J?=
- =?us-ascii?Q?eJoiuruoowZI0rcSwJu5BKp/5rbEU9Q9HgmfpPKWW1Dwzsl4H3znn7rYdUG6?=
- =?us-ascii?Q?BxwzZigEz+5NEmUMTov8xpSWqQ+iUGjfy4uMftErpoaFzcoyhBEIianCBChk?=
- =?us-ascii?Q?YQ5GpOkJ37SQZBxhMcgzOM1MYAqgtLFW2oG9nJ5wGaJu6OzJpg9U7kgBN/tQ?=
- =?us-ascii?Q?FN7MAyMLQuiByxy1pEr+u7KCpM4MSsuRE7odq44nxJnnBFMpLwWwqD+ixNCb?=
- =?us-ascii?Q?QVOuFYnasmq/I3gK6gJghUAtv3ug4FliG2hK3agK7Ja91skewoPfo/3gUfs5?=
- =?us-ascii?Q?LWU2+5/rZAbjbilVGzuH5f/HyHz/Q8q3clkG0XD8fI5Q1ONhpoS8f3hvopZS?=
- =?us-ascii?Q?7KUU6/TugqN2AXyg3qM1PG1uRN0Soq+sphUF9Yl8K/Eom1JzW/tjDh9esMGP?=
- =?us-ascii?Q?ls6YGBJcYXalmx1vk0ZTMFLGVWptqwFTxzaCBVNN6V3NLUEQkHxWuZhiam9M?=
- =?us-ascii?Q?4qrY1e7hRM0ENc4m7dc6cv4jHZ7A0k8tX+CxrRC2Jqfy4AFzFcrO9VIcysMJ?=
- =?us-ascii?Q?M3TBID/rVrbRIeL3ZJtBzQUzR9vB4vToVFBWsCLqO/wULpGCkdJlJL6QZSnc?=
- =?us-ascii?Q?mriFg7r+PGmnO/wprkZOUY/n4ljDr/2KykAhwgGWY3V/nHEkOHCLp10dEl/k?=
- =?us-ascii?Q?OOOAF3UeOA4uMUeamAA7bA5hV5rAxHp/KiI/bROAIOvDjanSPuphoDEETtkB?=
- =?us-ascii?Q?tH4fWgMub+eWvPlcT4QScmf53KUiOWaOKbqWPAiWRZlrz6HDmuooUsBJu0i7?=
- =?us-ascii?Q?5D6XjLtdXmeZXerCD3AaV4VjRrutHYCTIBqlqVg7ayACFw8Vy2q2kgMbzUCU?=
- =?us-ascii?Q?UcmVvbsgOwvoftlWDGveVNklGcOJDf+6uvwRaZaN/RrpmJRN8gByfIILuZsn?=
- =?us-ascii?Q?nf7PluXqw9T2pQ9xFGiJ08Y7OThK4efsbjQAIJixZSnw/QZVkqVOVtv83Chk?=
- =?us-ascii?Q?pe5EHpjx0iwatKv/5Iur2f5JSg8qOwI1ibz5h7rPHTlvWLjXTwrL5MtYCwKx?=
- =?us-ascii?Q?38Xw5eYOWNoCf7UGWXXur4qBAWgGUC9umqBXS+pD7jkIGz9jYhO6cmlHwlGw?=
- =?us-ascii?Q?WZ1HJM5Jpr16OPn01iVLu9zPpM+/uD+8Xqa9LzR2KcbPCL6PznOcezuYWeMV?=
- =?us-ascii?Q?srWaLTeuKGkhPW9sDYpZsm5quCA1SK5nR7DwcIP1Judkgu0fA2SoLA=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM3PR11MB8736.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?Lo8V1sTiRkQR4AYgirof/UuuxD2lWw9t2Aw25E74tvsL2NO8q4k+SXrEZhy9?=
- =?us-ascii?Q?MJh47V4jLqk+3hS06OsDCSeeNZBIpOwQBs82Eti9JVddw52m6qq7KmeqF61h?=
- =?us-ascii?Q?MDi+a1DboQElQ4RYdj5azjZ2XzDmC8/hwOSsIMNasZz0iRo7xhaNlVU1yqlz?=
- =?us-ascii?Q?ZDgZoWCmlC3mss+sPSwdtr0JCFY+bQSrkl5/gr4B2+aoIdUOCx23vK/j1WfH?=
- =?us-ascii?Q?BqOVHYd6lvAgybzlg0KqGhBnpRL3SovDj+Zz+OGFzxpwnJdBoN3aSgra1cIc?=
- =?us-ascii?Q?OQQqQduyT/7ETCDXNXljihsX7mnzaefTiBZQQ694XyPWUwS+ivSQGvMJOgiw?=
- =?us-ascii?Q?Jo2A7/r3nNJWbiuG49+9y6ze2L5gNoU8vz5jjo3idhXh4dofswQs3CtIHTgn?=
- =?us-ascii?Q?YxfQXCxkC1MLmak3lxZW2NQFiz9itkRHmWhbJoEE6PcekMWihvKsNZEbnBVz?=
- =?us-ascii?Q?mlSg1dgAbRZdIoETWSS6p/xs0ZbwO8tHPkxTiqojO366h21oFxNmcRVGq747?=
- =?us-ascii?Q?eTK0A6vgU6+zC3ph0iBpzgVmvBNvODZO8zWhZeEgUSjHtxMABskfgFsNy4aL?=
- =?us-ascii?Q?8U0looS5xr1Xiuccm4kns7d7L0hkcacV8kse0q2GPAP5whICKlqPovmUMo7e?=
- =?us-ascii?Q?y/IYnd2qaI5VGIOJWjwh231VhylAy5TBc08oN/nctoWgxdrYenc9Uuv7qWZP?=
- =?us-ascii?Q?xoRMJ6z/Tnm2e0aibrG1ZZiVyG45Ah/y3QshO1vdFQR64wvYJ+BMNIR7G1vS?=
- =?us-ascii?Q?COwox1n1ljV79cCG+N1TJ/Bt2hHmm/FRP0HbNyxko/5qsCB/8lCiLsr0PmpD?=
- =?us-ascii?Q?SXf5vmdU3G4OwKGBBzxrgNbEP79Wt3YXkljPtrNDd9zGMNF3fNKc/zQ0Sh4/?=
- =?us-ascii?Q?mL7NaNAkdf8JTAepSEhw4Zyb8gFfNN5XHXFAC1QJFf0wmjvm/KWZCIsnTKay?=
- =?us-ascii?Q?rAXd2pFODXj5zCkMgHkyv7wHRimOYhvh7+WqNoh2Z6AsCW1fm1bXd97+DABB?=
- =?us-ascii?Q?Jwe7H23frWagC2FBTdB9PW+4FZJapxnglKS7HfcxeQumsBBJsZTHwaNky9AH?=
- =?us-ascii?Q?R0dy8Q0Xti0UZV5rUDkIZYNLyTvXztYpKHk+50c3mzrROn0CMPWE+nODu0ra?=
- =?us-ascii?Q?gH0xUBYslCe8KpgGzTQQoLuAmSc3N+fej2kEsnjCiBTXhXrHUbDBnFwjgwqx?=
- =?us-ascii?Q?d6BymlKQII9kzDp4DbTYxdjwdCQsE+JNFJc3M40+RZ9zbAWyUSoyWHvmxzYO?=
- =?us-ascii?Q?xKf+8VQ1atWv5Ggvb9Nlf6yyOfd44kPEFUqQ+YUWUkLFQuiftnmjXFbaTXUk?=
- =?us-ascii?Q?3Ep0ysqeEznbKdWAcDyLZct34QJKRQGQQ8mZoPsCvoylpXgcU0qZK5orabeU?=
- =?us-ascii?Q?XC730CXy4z0QC2akJOzNZb4pdpVEZvDfT2bZUcnWOXpFVCqs6jlG6GAU49Kq?=
- =?us-ascii?Q?IqvpaMef4GV5J+/elOVInjxXKYoW7g/2CeeQCFnsGhAXUAWqDKX9/Fyg1JTh?=
- =?us-ascii?Q?V49aAI+oRcTBRxCLYkEi350siscWYwmrQizOmf++pxDvLwdvcuihk3MOnt7F?=
- =?us-ascii?Q?5uvGCizQW5Rx2bqcBeKx4pekukA7N1mm49qNd9+Q?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 061BC1F869E
+	for <netdev@vger.kernel.org>; Fri, 16 May 2025 22:00:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747432843; cv=none; b=t4gqysxfgwS7MfZrKni7B/Ix2zhTvIsSUszhkfn904XDPNYHx3IyeY+JW0uHft6Of0iJFwHMAGDwl7EQkPk8YA4LjbWIeMWfeARN0eyC4/zKwAxZBHoOmYKfqMxuyHQY9jHd0vrn7HFsDYBR5Jleki/HeCp9/nHuncKcwfPU8H8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747432843; c=relaxed/simple;
+	bh=5VZtF9AyznRPKuOqsiMV6dDZnc721hdFgFtzY4XMqgc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n1YJearAOpxWsXldg8nF2/8H1y99bDu/4+Eh+X40mIB+YeEqa9uU9tPqC9hfM4fouDPUl0fIZBE3+R8ZQqZAnMqjqyGW7hKwlrAsdrk7owHYev/uqR3HUaNI3QCtf5dd6Z3uGwQQmYpfs6IAS4OVoqCJuIwEDooObZ2QET1W4pY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h13szOE6; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-3081f72c271so2348742a91.0
+        for <netdev@vger.kernel.org>; Fri, 16 May 2025 15:00:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747432841; x=1748037641; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cpirbzKS7jiFqYIC2XpFKRSuU8HHsNv2ttRI5hFJeCM=;
+        b=h13szOE6qYHBmSFthrQL3aZyvIa/HuSoV3PJmMV24PkZOCLVciuDganSXNkhm94dl2
+         IIm5PSZuNRIieeUKPfDbSVDTrSnEQgKOHv2qy7ZX/o0mZqbma16HZURttAonRl+cwa21
+         NOQQAirKfa3K3YT/DHBCu/W85RNhkAt1VRWSHmXRqXSD+TIT0CJVc1JDZW3nIMBaa5Sl
+         GBP4Scaxcw8I0m5efKlmIt+RxVmpb0IrVRlyvquO74Q4OlsETp0Gsronu1Fd7mPh6eKq
+         fmyGYMW6dwM1a0WIouTa9Dqeg02010XV8q34fLSxOy7GNzlbpzO7mqG+WPS8pIvC93vs
+         iV2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747432841; x=1748037641;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cpirbzKS7jiFqYIC2XpFKRSuU8HHsNv2ttRI5hFJeCM=;
+        b=TSOmZxkliGqktTwJB78ytAxHKCtcz8ADoGkRZkui7LS9ACcDpbfw/inVkAKvudIU/b
+         pwXM+tAqszdWmrfzMbb/rSot1qz+Dsr+cbIyNL17gnYGsD4TwlHCODm3D1MwDp47sHXT
+         p/msRGOGXwnJTZc5W4tyAWs/TWEf0YW0Ao9l+bNbb3at+cAswMi/985WKxS6SBlyvEyl
+         f2OahWSi/YZ624F7P1OBssNlLNUbdwJyJFgOoI11bBpLmmMeK3P/VPZwsglHHNRKWHah
+         fm+fpdGKtSz1s1NIO3e5pa1Sye8cwlyG2EIN3UIa7BgSY2GWaGd8N2ZY+ALU6L2TRFHH
+         n/jQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUqUqJNbmk/ba4U62/UsVrckrzslrUtZjsGFaCP3SIWGRjw0zZVgWmngdpMY/pQAyb/GJtrCEQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxu63mUKn90SPyIT0Md9JT/T13xcjKg8RrBdPdMWV8FfOOvCDM0
+	BKjQqlQnTmC43MGSuG3tWJlQ3rmQgPWrkK4SHDsN5KTlGNBY9xIqMbI=
+X-Gm-Gg: ASbGncvWJOfL9mLmF90mdrOLSqqyLjsQHjivWsJcpAV6fVdHje3H1pAnpWHOwP473S4
+	xitJxwpxoQv50ucUX3ywjZ9cQ5KngvYCohj1X1ACXXsVOichEBd/WEXJMvIGMSHv8mZqcMVDleM
+	lTyhe1CaQYa3jP1+uRGxIcKmg+ABFgdB3PirtawqO1nRVHDesxp2g6dkzI5EJxr6/yDmjocGUHM
+	vfcVfKne5CJbfKDcrLXktc2gMwnuRGIkejrgl5ZrRZUqW7g61ihIhLG3GOtTpaY0HnRXXv/m7Wv
+	YH9+0OrF7Ys6GmHUoZJsmXMJPbFS8MTFk4UVmKftpoEuHqHjOXiwn5aCd76+11wnq6g/BjNuv21
+	8sKot2asbiBF5
+X-Google-Smtp-Source: AGHT+IGUlj8O10zTWcNisoHTb84m6Id0Ei/3Wgu96diMrExwv4VRh4YQWiqeD6FHvGcc3aU0G15J0A==
+X-Received: by 2002:a17:90b:52c5:b0:30c:5256:3 with SMTP id 98e67ed59e1d1-30e830c7a9fmr5621597a91.5.1747432841049;
+        Fri, 16 May 2025 15:00:41 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-30e7d489292sm2060337a91.16.2025.05.16.15.00.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 May 2025 15:00:40 -0700 (PDT)
+Date: Fri, 16 May 2025 15:00:39 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Samiullah Khawaja <skhawaja@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller " <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	almasrymina@google.com, willemb@google.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net v2] xsk: Bring back busy polling support in XDP_COPY
+Message-ID: <aCe1h8tNaEqqUlO0@mini-arch>
+References: <20250516213638.1889546-1-skhawaja@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microchip.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM3PR11MB8736.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ac1118eb-da89-40ff-5f39-08dd94c414fc
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 May 2025 21:53:24.2947
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 8+ql/B1T+YvNo7nnFI+BiEoEgvvzVrHvAXADGqiVNUh8Tc9qUZp/XnRBgmLxIL1mhZRNTo7FAS9Mgzt334xfsU94NQ9wT4dTEnRW8LQ//pM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4657
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250516213638.1889546-1-skhawaja@google.com>
 
-> I think I gave comments on the previous version about this approach
-> but I don't see any change. Maybe I missed your response, I don't know,
-> I'm only occasionally dipping into the mass of emails I get.
+On 05/16, Samiullah Khawaja wrote:
+> Commit 5ef44b3cb43b ("xsk: Bring back busy polling support") fixed the
+> busy polling support in xsk for XDP_ZEROCOPY after it was broken in
+> commit 86e25f40aa1e ("net: napi: Add napi_config"). The busy polling
+> support with XDP_COPY remained broken since the napi_id setup in
+> xsk_rcv_check was removed.
+> 
+> Bring back the setup of napi_id for XDP_COPY so socket level SO_BUSYPOLL
+> can be used to poll the underlying napi.
+> 
+> Do the setup of napi_id for XDP_COPY in xsk_bind, as it is done
+> currently for XDP_ZEROCOPY. The setup of napi_id for XDP_COPY in
+> xsk_bind is safe because xsk_rcv_check checks that the rx queue at which
+> the packet arrives is equal to the queue_id that was supplied in bind.
+> This is done for both XDP_COPY and XDP_ZEROCOPY mode.
+> 
+> Tested using AF_XDP support in virtio-net by running the xsk_rr AF_XDP
+> benchmarking tool shared here:
+> https://lore.kernel.org/all/20250320163523.3501305-1-skhawaja@google.com/T/
+> 
+> Enabled socket busy polling using following commands in qemu,
+> 
+> ```
+> sudo ethtool -L eth0 combined 1
+> echo 400 | sudo tee /proc/sys/net/core/busy_read
+> echo 100 | sudo tee /sys/class/net/eth0/napi_defer_hard_irqs
+> echo 15000   | sudo tee /sys/class/net/eth0/gro_flush_timeout
+> ```
+> 
+> Fixes: 5ef44b3cb43b ("xsk: Bring back busy polling support")
+> Signed-off-by: Samiullah Khawaja <skhawaja@google.com>
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-Sorry if I missed your recommendations about the patch as your last email
-was chopped off.
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
-There is no code change from the very first version.
-
+Looks good to me. But note that I never understood why those __sk_mark_napi_id_once
+calls were there in the receive path in the first place. Presumably
+because of the unstable napi ids. Now, with the napi config, it should
+be safe to resolve both copy/non-copy modes during the bind.
 
