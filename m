@@ -1,247 +1,164 @@
-Return-Path: <netdev+bounces-191125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA86EABA241
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 19:55:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 51D84ABA24D
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 20:02:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 964381BA2DBA
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 17:55:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 454EF1BA4E16
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 18:02:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1620D24888D;
-	Fri, 16 May 2025 17:55:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E634C27817C;
+	Fri, 16 May 2025 18:02:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jEZRlcwg"
+	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="IDpC/Q9n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mxout2.routing.net (mxout2.routing.net [134.0.28.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 434CBA31
-	for <netdev@vger.kernel.org>; Fri, 16 May 2025 17:55:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA7D221719;
+	Fri, 16 May 2025 18:02:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747418114; cv=none; b=cJS6/Fxx1qPhhMKDI8V0m01RObu5Q1Y8LEnRHGYI74NXZolH99DkCEAnsoxs1P0N+3szbejry4PgG2U6ZNouKnjE91MpsHOyrqgeAK7JhyrQicQkYgX4fw5qGV2XI91dRS3kNjxgQGxL/Qzp2MJPV11/6BCDYBCshd1md/+UcIE=
+	t=1747418526; cv=none; b=F6kCzYB6V0pamZoYS1TBwO88XHdhPmEp15A0VgtVJJZU1N93i5e4A5o43ILEjh1AAfqWafqXdfNmlzAJ3qynC4693LpbmKY0/FxIJWTdhpRAfwsP+AQsP//kcoxnOuzzn1ogd69UPp6sy3p0VMyiClF36TBpfMKWDBaDrSH6sPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747418114; c=relaxed/simple;
-	bh=M8DCtvg0xAzMmBPx7RaYFWqdyuOPEkxnzCaa8SwaB6A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lpzQyYf4AmVyiwb9MTmDgZxcRpJstlrV6V3I98SQnjMMfQEw37TUz/xVrZzcZgC96M3QOmBA1i14WqpDYeun1wX3H9F1FuhmjeOinYYuAyFljoIzGZTgY42l2b8mlXhSRaC4elEP9kdZFAzgHaTlQSnsZREmwjRTz07ODCnH1g4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jEZRlcwg; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-48b7747f881so26321cf.1
-        for <netdev@vger.kernel.org>; Fri, 16 May 2025 10:55:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747418111; x=1748022911; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=F3FhLrCYH5Y47YZNjJKUMTUCmfALLfoq2jnT5Wwy7jk=;
-        b=jEZRlcwgDIr3wvto2rN1kr9h9qmsQfVkBT0PB+SZaRNy/uxcu4BkDVPy8BSVJvxk79
-         GOayTktR9TsCDSey0Q0H96kTeyU0WPOlFObt0wRWyanvCfIREdc5+5q5qgmZi3n9Pk5u
-         CgrT2L6zY5oSGZYU5rsIshE4oU81UnnBISKj9Vg14q5meSRguby4Ilpi117yu/UpP7BD
-         aBvlNA2uaKJ+TXEnZTbhmry+klTCAIDqARVQajgmaSPjy3HpMd+pY7MUrQDjIY4Z+D7U
-         8xYdGjV4n0PFGrfIcoLcmMmO3dpqpaH8ClAxKd5RvGAMEqdQBs8zuwFVbvrWuMz6KLs8
-         tROQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747418111; x=1748022911;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=F3FhLrCYH5Y47YZNjJKUMTUCmfALLfoq2jnT5Wwy7jk=;
-        b=iKQut5L5kvgBC4UV3QA+Q25SH7c9XKI48GgvZhj5OM9pFB2nuhQ4h3iO+6dKtyNwwC
-         7X8OTTvOF+4yLuEUvBF0LP9MoVxAMY2oFEVSO9MR7rrjEeRx/cRIA9xZ1/70WJfXHmB+
-         8jWyy0PMwQJU9mi9nl4pSBNSK2Tb+7VXRLb1m5HsEGBBf30695Ym3wznm/4uQhPD4KWT
-         HeP4K3W4tCNYoAX6ejDx2nhpdAoAfwwzTYz7y/Jy4sL8WrwNwjUJR/pQ/U1CXoyihDaV
-         CATmSlYffK7l9YTNDOmngckwYs+1BgiKsY2Pbi0i32KYATXIWM8hvh51u4GgAT1SH42G
-         zjUw==
-X-Gm-Message-State: AOJu0YwoRH7KIAcG/9ESsDf00JLJP+uNAOHuNUrO8EeJdBzL8xlkSh4T
-	XpMJEkZFsqHevML2/bSZfxWF9tvPlM+dvVIRN3ZI6LG0DhisJJTmFk4mcoQF7z6D7rOdAB2kPnv
-	cOE0CfnrZ05caDHFRrzfngfc8QHOqYW+cN5ek/Z5V//DRTB1zaef01DjRwKQ=
-X-Gm-Gg: ASbGncsZ20b2zNOMwmGwcPMdsJfdEt4RD9b1LYtqAfVBMQvM+xoWjddx7SBieuQLtTr
-	woME5EFBJ1xNTdTODPz8cv3zg5d1He3H5q65gISYcPL8n0w3H/1bV7879GZ+3gyKTHZrRtMr9jP
-	zjFQOa9NaSxp+BkUBDRUYIfeM2YsNlCrr5HvNrGnkp0laXhqNTYUAoee3ri/WhLZcJij45se7vt
-	C9j
-X-Google-Smtp-Source: AGHT+IFISTrvIFWlXqHycpT9/TCXtEUOLr+afezkSVHlshfSC7ehTTQSeXhbvo9IHAQJHoOpP33EnueqEL5ItQez994=
-X-Received: by 2002:a05:622a:1aa3:b0:477:63b7:3523 with SMTP id
- d75a77b69052e-4958cd1b9fdmr175281cf.4.1747418110889; Fri, 16 May 2025
- 10:55:10 -0700 (PDT)
+	s=arc-20240116; t=1747418526; c=relaxed/simple;
+	bh=UuF/JNUJBZ53+cPezbxA19lKN/JAyHQZ9Ehmog69s08=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LHw8bGvj0xrtEIqvZVReKMvmTB3rqiN1uYVY3P2Et9QBCjoqzo//NaUCLb94RCbGWaWiNaN/8YnnFrjd3sKOPktKBcQkGFEHkdHRdUa5nf9QWJWHWSePph7MYhX0cSm8qJQeNVGUQ5I0/mVsg4I2Cy0R0J7qDY/ZboAkZMcd77I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=IDpC/Q9n; arc=none smtp.client-ip=134.0.28.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
+Received: from mxbulk.masterlogin.de (unknown [192.168.10.85])
+	by mxout2.routing.net (Postfix) with ESMTP id 0EC785FCB0;
+	Fri, 16 May 2025 18:01:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
+	s=20200217; t=1747418515;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+JWgG7Xrb6kxHm/xBKBKplVRGDNZd7l9BWTCNftkPlo=;
+	b=IDpC/Q9nRdQRXK07+fcgEwZW75VKBwMst5E+e4D80srfYhdwyAFBS0ykeaQEhis9D5K/Mt
+	rmlKzEUgu82nwjK21lyQeaGGsGmMjnq0r01km9cVo9aBAY6LLS3YRceQkPZavqqnicPigT
+	9vp9f4y3eEFltnfyfLtyOoTmOkYIoQg=
+Received: from frank-u24.. (fttx-pool-157.180.226.139.bambit.de [157.180.226.139])
+	by mxbulk.masterlogin.de (Postfix) with ESMTPSA id B069A1226D6;
+	Fri, 16 May 2025 18:01:54 +0000 (UTC)
+From: Frank Wunderlich <linux@fw-web.de>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: Frank Wunderlich <frank-w@public-files.de>,
+	=?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Felix Fietkau <nbd@nbd.name>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH v2 00/14] further mt7988 devicetree work
+Date: Fri, 16 May 2025 20:01:30 +0200
+Message-ID: <20250516180147.10416-1-linux@fw-web.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAFYr1XPb=J0qeGt0Tco1z7QURmBH8TiWP0=uH0zhU=wCQKCtpA@mail.gmail.com>
- <CADVnQy=upW8ACnF5pN0d_AJtGi_OwT2VWc4Jg1nJ47Np-Qj66g@mail.gmail.com> <CAFYr1XOKceKP50Nc=T02McTa0FNdRNB0zEQUVop8PDW4F-dxuw@mail.gmail.com>
-In-Reply-To: <CAFYr1XOKceKP50Nc=T02McTa0FNdRNB0zEQUVop8PDW4F-dxuw@mail.gmail.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Fri, 16 May 2025 13:54:54 -0400
-X-Gm-Features: AX0GCFtjs8uezxSTF2k8QZeHKdf0l1gQpWWsmeLgLYWYLjLyhfHADgRZyfEWo94
-Message-ID: <CADVnQy=C+9ogbtS7fVM9cev5iT+6Fz88H2FTKcjwKFnDbsUe2A@mail.gmail.com>
-Subject: Re: Potential bug in Linux TCP vegas implementation
-To: Anup Agarwal <anupa@andrew.cmu.edu>
-Cc: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, May 13, 2025 at 7:20=E2=80=AFPM Anup Agarwal <anupa@andrew.cmu.edu>=
- wrote:
-...
-> From cccf2ef01acade18015977fabda56a619aa2084f Mon Sep 17 00:00:00 2001
-> From: Anup Agarwal <anupa@andrew.cmu.edu>
-> Date: Tue, 13 May 2025 22:57:19 +0000
-> Subject: [PATCH] tcp: tcp_vegas fix diff computation
->
-> Commit 8d3a564da34e5844aca4f991b73f8ca512246b23 changed the algebraic
-> expression for computing "diff =3D expected throughput - actual
-> throughput" compared to the prior implementation. This change was not
-> intended by that commit. This commit reverts this change ensuring that
-> the kernel implementation better reflects the algorithm description in
-> the original Vegas paper and the original Linux implementation.
-> ---
->  net/ipv4/tcp_vegas.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/ipv4/tcp_vegas.c b/net/ipv4/tcp_vegas.c
-> index 786848ad37ea..fd4ca1fbdf63 100644
-> --- a/net/ipv4/tcp_vegas.c
-> +++ b/net/ipv4/tcp_vegas.c
-> @@ -224,7 +224,7 @@ static void tcp_vegas_cong_avoid(struct sock *sk, u32=
- ack, u32 acked)
->   * and the window we would like to have. This quantity
->   * is the "Diff" from the Arizona Vegas papers.
->   */
-> - diff =3D tcp_snd_cwnd(tp) * (rtt-vegas->baseRTT) / vegas->baseRTT;
-> + diff =3D tcp_snd_cwnd(tp) * (rtt-vegas->baseRTT) / rtt;
->
->   if (diff > gamma && tcp_in_slow_start(tp)) {
->   /* Going too fast. Time to slow down
-> --
-> 2.34.1
+From: Frank Wunderlich <frank-w@public-files.de>
 
-Hi Anup,
+This series continues mt7988 devicetree work
 
-Many thanks for the patch!
+- Add SPI with BPI-R4 nand to reach eMMC
+- Add thermal protection (fan+cooling-points)
+- Extend cpu frequency scaling with CCI
+- Basic network-support (ethernet controller + builtin switch + SFP Cages)
 
-> I am not fully sure about the process for communicating the patch.
-> It seems like Linux uses emails instead of pull requests.
-> I am also not sure about the standard of
-> unit/integration/performance testing for such changes.
+depencies (i hope this list is complete and latest patches/series linked):
 
-Here are some notes on the process:
+"Add Bananapi R4 variants and add xsphy" (reviewed, partially applied):
+https://patchwork.kernel.org/project/linux-mediatek/list/?series=955733
 
-Please  read the following for documentation on the process for
-networking patches:
-  https://docs.kernel.org/process/maintainer-netdev.html
-  https://docs.kernel.org/process/submitting-patches.html
+"net: phy: mediatek: do not require syscon compatible for pio property":
+https://patchwork.kernel.org/project/netdevbpf/patch/20250510174933.154589-1-linux@fw-web.de/
+for phy led function (RFC not yet reviewed, resent without RFC)
 
-I would suggest including in the commit message more of the details
-you shared earlier in this thread about the nature of the bug and
-rationale for your bug fix.
+for 2.5g phy function (currently disabled):
+- net: ethernet: mtk_eth_soc: add support for MT7988 internal 2.5G PHY (already merged to 6.15-net-next)
+- net: phy: mediatek: add driver for built-in 2.5G ethernet PHY on MT7988
+  https://patchwork.kernel.org/project/netdevbpf/patch/20250516102327.2014531-3-SkyLake.Huang@mediatek.com/ (v4)
 
-I would suggest adding some commit message text like the following:
+for SFP-Function (macs currently disabled):
 
-The following 2008 commit:
+PCS clearance which is a 1.5 year discussion currently ongoing
 
-8d3a564da34e ("tcp: tcp_vegas cong avoid fix")
+e.g. something like this (one of):
+* https://patchwork.kernel.org/project/netdevbpf/patch/20250511201250.3789083-4-ansuelsmth@gmail.com/ (v4)
+* https://patchwork.kernel.org/project/netdevbpf/patch/20250512161013.731955-4-sean.anderson@linux.dev/ (v4)
+* https://patchwork.kernel.org/project/netdevbpf/patch/ba4e359584a6b3bc4b3470822c42186d5b0856f9.1721910728.git.daniel@makrotopia.org/
 
-...introduced a bug in Vegas implementation.
+full usxgmii driver:
+https://patchwork.kernel.org/project/netdevbpf/patch/07845ec900ba41ff992875dce12c622277592c32.1702352117.git.daniel@makrotopia.org/
 
-And then would suggest pasting in your previous notes:
+first PCS-discussion is here:
+https://patchwork.kernel.org/project/netdevbpf/patch/8aa905080bdb6760875d62cb3b2b41258837f80e.1702352117.git.daniel@makrotopia.org/
 
-"""
-Before this commit, the implementation compares "diff =3D cwnd * (RTT -
-baseRTT) / RTT" with alpha_pkts. However, after this commit, diff is
-changed to "diff =3D cwnd * (RTT - baseRTT) / baseRTT". This small
-change in denominator potentially changes Vegas's steady-state
-performance properties.
+and then dts nodes for sgmiisys+usxgmii
 
-Specifically, before the commit, Vegas's steady-state rate is "rate =3D
-alpha_pkts / delay", by substituting rate =3D cwnd/RTT and delay =3D RTT -
-baseRTT in the equation "diff =3D alpha_pkts" (i.e., when flows do not
-have incentive to change cwnd). After the commit, we get "rate =3D
-alpha_pkts/delay * baseRTT/RTT". When baseRTT is small this is close
-to "rate =3D alpha_pkts / delay^2".
+when above depencies are solved the mac1/2 can be enabled and 2.5G phy/SFP slots will work.
 
-"rate =3D alpha_pkts / delay" is the key to ensuring weighted
-proportional fairness which Vegas has been analyzed to ensure (e.g.,
-in https://www.cs.princeton.edu/techreports/2000/628.pdf or
-https://link.springer.com/book/10.1007/978-0-8176-8216-3).
-"rate =3D alpha_pkts/delay^2" would not give proportional fairness. For
-instance on a parking lot topology, proportional fairness corresponds
-to a throughput ratio of O(hops), whereas the delay^2 relation gives a
-throughput ratio of O(hops^2) (derived in
-https://arxiv.org/abs/2504.18786).
-"""
+changes:
+v2:
+  - change reg to list of items in eth binding
+  - changed mt7530 binding:
+    - unevaluatedProperties=false
+    - mediatek,pio subproperty
+    - from patternProperty to property
+  - board specific properties like led function and labels moved to bpi-r4 dtsi
 
-While you are changing this pline, please address the style issue in
-this line (missing space around the - operator). So instead of:
+Frank Wunderlich (14):
+  dt-bindings: net: mediatek,net: update for mt7988
+  dt-bindings: net: dsa: mediatek,mt7530: add dsa-port definition for
+    mt7988
+  dt-bindings: net: dsa: mediatek,mt7530: add internal mdio bus
+  arm64: dts: mediatek: mt7988: add spi controllers
+  arm64: dts: mediatek: mt7988: move uart0 and spi1 pins to soc dtsi
+  arm64: dts: mediatek: mt7988: add cci node
+  arm64: dts: mediatek: mt7988: add phy calibration efuse subnodes
+  arm64: dts: mediatek: mt7988: add basic ethernet-nodes
+  arm64: dts: mediatek: mt7988: add switch node
+  arm64: dts: mediatek: mt7988a-bpi-r4: Add fan and coolingmaps
+  arm64: dts: mediatek: mt7988a-bpi-r4: configure spi-nodes
+  arm64: dts: mediatek: mt7988a-bpi-r4: add proc-supply for cci
+  arm64: dts: mediatek: mt7988a-bpi-r4: add sfp cages and link to gmac
+  arm64: dts: mediatek: mt7988a-bpi-r4: configure switch phys and leds
 
-  diff =3D tcp_snd_cwnd(tp) * (rtt-vegas->baseRTT) / rtt;
+ .../bindings/net/dsa/mediatek,mt7530.yaml     |  24 +-
+ .../devicetree/bindings/net/mediatek,net.yaml |  10 +-
+ .../mediatek/mt7988a-bananapi-bpi-r4-2g5.dts  |  11 +
+ .../dts/mediatek/mt7988a-bananapi-bpi-r4.dts  |  18 +
+ .../dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi | 158 ++++++-
+ arch/arm64/boot/dts/mediatek/mt7988a.dtsi     | 389 +++++++++++++++++-
+ 6 files changed, 590 insertions(+), 20 deletions(-)
 
-Please use something more like:
+-- 
+2.43.0
 
-  diff =3D tcp_snd_cwnd(tp) * (rtt - vegas->baseRTT) / rtt;
-
-Please compile and test your change on top of the "net" branch:
-
-git remote add net git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net=
-.git
-git fetch net
-git checkout net/main
-git cherry-pick $YOUR_PATCH_SHA1
-
-Then please compile, boot, and test the patch, and add a few sentences
-about how you tested the patch, and what results you saw. Sadly, I
-don't think there are any automated tests for Linux TCP vegas in the
-kernel source tree, so for this commit, I would suggest the minimal
-testing would be something like reporting throughput and average RTT
-and average loss rate for:
-
-(1) a test with a single Vegas flow
-(2) a test with multiple Vegas flows sharing a bottleneck
-
-(Reporting the bottleneck bandwidth and min_rtt for each case, and
-whether the test was with netem or a real network, etc.)
-
-Please add a Signed-off-by: footer in the commit message, if you can
-certify the items documented here:
-
-  https://docs.kernel.org/process/submitting-patches.html#sign-your-work-th=
-e-developer-s-certificate-of-origin
-
-Since this is a bug fix, please add a Fixes: footer in the commit
-message before your Signed-off-by: footer, so maintainers know what
-commit has the bug you are fixing, so they know how far back in
-history to backport the fix for stable releases. In this case, based
-on the commit you mentioned you are fixing, I think we want:
-
-Fixes: 8d3a564da34e ("tcp: tcp_vegas cong avoid fix")
-
-You can run "git log" in your Linux source directory to get a sense of
-the formatting for the Signed-off-by:  and Fixes:  footer.
-
-Finally, please check the patch for style/formatting problems with the
-checkpatch.pl script:
-
-  ./scripts/checkpatch.pl *.patch
-
-After compiling and testing the patch, adding those footers, and
-verifying the patch with scripts/checkpatch.pl, please format the
-patch and email it to the mailing list:
-
-git format-patch --subject-prefix=3D'PATCH net' HEAD~1..HEAD
-
-git send-email \
-  --to 'David Miller <davem@davemloft.net>' \
-  --to 'Jakub Kicinski <kuba@kernel.org>' \
-  --to 'Eric Dumazet <edumazet@google.com>' \
-  --cc 'netdev@vger.kernel.org'  *.patch
-
-
-Thanks!
-neal
 
