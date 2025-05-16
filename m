@@ -1,90 +1,94 @@
-Return-Path: <netdev+bounces-191218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99473ABA68E
-	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 01:27:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93F90ABA693
+	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 01:30:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 847F01BA71A8
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 23:27:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3AAA77A66CD
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 23:28:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF015280001;
-	Fri, 16 May 2025 23:27:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 753EF280320;
+	Fri, 16 May 2025 23:29:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Th0Te/dT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IJWOx007"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B958237176;
-	Fri, 16 May 2025 23:27:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D2EF2798F9;
+	Fri, 16 May 2025 23:29:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747438039; cv=none; b=G4MGwk1gS1GaBwr3KU56MTiwgaDvzhxd1HJc+fscuU4YhfZYSvRfFXxaJdLguDsRpMREcgezvQPoMLkKvKDxemqPTBiUKATBfhLPbJidPvE/vcvvs5tbEFE9+a8iwPYrh8fCbUdP27BAG/0LW32H0ZAqhkQ7puPSgq52cdRhgXY=
+	t=1747438193; cv=none; b=gss5HuxQNr3SFlQiQEtOPEo9Z8ohBOpl12L6vqf0WS9XVao1r9PtH5OpkhYLd8PjYyW2f6i30nBMEcAZZylwCRNOqCWOfTq2O7jWRq/02rRsqorZTeynln5cVDtUVngHn5S7rocS6WGl2eqiAjK1ElfGrbeeeXVSOly0MRWlGSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747438039; c=relaxed/simple;
-	bh=GwcbTMr0kPAvM4fbL9ENzctYnJzwYdCactN7buZzrXY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tNAqUKGg7AY6ClqzIoaRNiyuXDEs8DetAWIdtzlYKovj3MMkXhgyMaeWBD5WdFsTdvJnR1iY6ZJauCDW3TIiY1fR5H1r8Fm5IPasfeeu8Jv7AELZuNxemAm06gU+HCyTHi/Z6oRxoNgPfDOeJoS39ttjRo024cqCZMqpmZBHzsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Th0Te/dT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A11D9C4CEE4;
-	Fri, 16 May 2025 23:27:17 +0000 (UTC)
+	s=arc-20240116; t=1747438193; c=relaxed/simple;
+	bh=S9KP9pyp5Cw0/B4s3gDa+GWacXE0tVau3M3d+PJ+OeY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=p6a4J7qMA7ltNqXF+JzaqnU6dxGfwYZR9JpauXCvnAmJjZ485ZUyp5/g4Be9dD9isTHoPY9C1tJNSX0bydf/mPiq2eTBL41P3O4CzJiUhj5fGh8/RwIdZXlf6PKSCbFOlyeRaHIf/pshEWhOPSBl08tXd0xDC6gnA2bgId3cdk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IJWOx007; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2FF6C4CEE4;
+	Fri, 16 May 2025 23:29:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747438037;
-	bh=GwcbTMr0kPAvM4fbL9ENzctYnJzwYdCactN7buZzrXY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Th0Te/dTtSUEtHKsMPU8aSEqAd8guNulh0AkI1F6yfbi4ycwoHhwzC/Yuyioih42k
-	 1a0bG1QspQQfjYUO6iid4ulDwa8IU7PoU18FLscNmNX71/ARtUa2gr+MoonAvqIq4f
-	 I+03qGd5hj8o0a3Btv1AtFaiGSincgT7s/iGH7SDqhZYq6fcLiJNuykejwMJ/UNF09
-	 9hPII5f9LsHGwfxLgLfDcHlhDzCOe0tl6lm2whDmyO/zXnEyI5y96Si8rOpNMTHtRR
-	 HUzcLKZKzaueSgi8pg+L3aPrjDwGdUgf11tVzpuUsUP++yyNHYqhVGDVQx6GuMUH0b
-	 jfaSuql5FuCDQ==
-Date: Fri, 16 May 2025 16:27:16 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Chuck Lever <chuck.lever@oracle.com>
-Cc: Hannes Reinecke <hare@suse.de>, Sabrina Dubroca <sd@queasysnail.net>,
- netdev@vger.kernel.org, Steve Sears <sjs@hammerspace.com>, Thomas Haynes
- <loghyr@hammerspace.com>, Linux NFS Mailing List
- <linux-nfs@vger.kernel.org>, kernel-tls-handshake
- <kernel-tls-handshake@lists.linux.dev>
-Subject: Re: RPC-with-TLS client does not receive traffic
-Message-ID: <20250516162716.340fb97c@kernel.org>
-In-Reply-To: <7014c4fa-fa99-45d4-9c3b-8bf3ff3f7b38@oracle.com>
-References: <0288b61b-6a8e-409d-8e4c-3f482526cf46@oracle.com>
-	<20d1d07b-a656-48ab-9e0e-7ba04214aa3f@oracle.com>
-	<62cbd258-11df-4d76-9ab1-8e7b72f01ca4@suse.de>
-	<7014c4fa-fa99-45d4-9c3b-8bf3ff3f7b38@oracle.com>
+	s=k20201202; t=1747438192;
+	bh=S9KP9pyp5Cw0/B4s3gDa+GWacXE0tVau3M3d+PJ+OeY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=IJWOx007mG8pIjnRpbSCej1u11zVy10VZM/NG+VTTvj5vT1zvw1yak2/9ExXt9YJL
+	 c84T8JX11t31LbreiHTPk/u4eka6AEGRr1dHN40y4Z0ckuoilygGEg8GgbL5OnD2Uq
+	 ITAZfA8HzFk6rXazPWMR6r/cbjLb36DIyDscmMWUvYdDXgAVjKUcGWrmYwkTdGebQp
+	 DhSMvXqYVzmTluv9ajmHe3LJcWdKKB94ROFqOvqv2cDewR6F53bLHrgtz4z3vILkxb
+	 S/DB9UUvk+rsxAbLkuXsFjyLQueImYmWYeTpAkJyh5Nb9ZxlAJrcygTcxymJ6MaMsU
+	 CRRkAz7oNTWMg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCB13806659;
+	Fri, 16 May 2025 23:30:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v1 1/1] net: phy: microchip: document where the
+ LAN88xx PHYs are used
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174743822950.4093464.8865364121925600971.git-patchwork-notify@kernel.org>
+Date: Fri, 16 May 2025 23:30:29 +0000
+References: <20250515082051.2644450-1-o.rempel@pengutronix.de>
+In-Reply-To: <20250515082051.2644450-1-o.rempel@pengutronix.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ kernel@pengutronix.de, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 
-On Thu, 15 May 2025 11:05:21 -0400 Chuck Lever wrote:
-> >>> The first tls_data_ready call then handles the waiting ingress data as
-> >>> expected.
-> >
-> > I _think_ you are expected to set the callbacks prior to do the tls
-> > handshake upcall (at least, that's what I'm doing).
-> > It's not that you can (nor should) receive anything on the socket
-> > while the handshake is active.
-> > If it fails you can always reset them to the original callbacks.  
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 15 May 2025 10:20:51 +0200 you wrote:
+> The driver uses the name LAN88xx for PHYs with phy_id = 0x0007c132. But
+> with this placeholder name no documentation can be found on the net.
 > 
-> It looks to me like the socket callbacks are set up correctly. If I
-> apply a patch to remove the msg_ready optimization from tls_data_ready,
-> everything works as expected.
+> Document the fact that these PHYs are build into the LAN7800 and LAN7850
+> USB/Ethernet controllers.
+> 
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> 
+> [...]
 
-The thinking is that we can stop reporting "data ready" once we have 
-a data record, because reader must check for pre-existing data when
-starting to monitor the socket. I suspect when you say "everything
-works as expected" you mean that the next chunk of data coming in
-wakes the reader and reader catches up?
+Here is the summary with links:
+  - [net-next,v1,1/1] net: phy: microchip: document where the LAN88xx PHYs are used
+    https://git.kernel.org/netdev/net-next/c/622b91e0f946
 
-Could you point me to the exact code path that handles the callback
-installation? Does it handle a socket with data in rcvq already?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
