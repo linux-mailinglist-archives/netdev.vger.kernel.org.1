@@ -1,111 +1,137 @@
-Return-Path: <netdev+bounces-191160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D0A5ABA4A0
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 22:21:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EA66ABA4BC
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 22:35:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C183504C98
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 20:21:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 677D83ABD93
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 20:35:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D455227AC22;
-	Fri, 16 May 2025 20:21:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FB6122B8D4;
+	Fri, 16 May 2025 20:35:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mff0oXGC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="htM/sldH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3FE41F956;
-	Fri, 16 May 2025 20:21:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E1F1A704B
+	for <netdev@vger.kernel.org>; Fri, 16 May 2025 20:35:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747426913; cv=none; b=sqh1bydgbvAburS+7nt0y0RuDpk6Ry9O3FH/axl0rnfX5Yswq/Eh9J9vrohxAEhKkEn3m9dUjCgeyato4crGr+BTpqMjiC0xVpfWSfcJrwyFWNtXhtuVwBjhG7yc1evSjKXaN2UJrklGj8b1rspnB2n3Evrhth7qi4Q5Qd0MLpI=
+	t=1747427720; cv=none; b=TwxaMSEb4P3I+3NxYMExp4Ik8ZvYqhsp1HvMnKUTS+VckLQSsTAxmfg5ocBqqZHcGH52nXBg6/6mSfHskMS4CLyU9Uiktf+79KK8Ohmzb3s9C/v5naq12lMyEPoHDrQNsVTzyn9ZW0h5EXeGmYHcQ9L1pmRoJCXZsK8OXCgxZjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747426913; c=relaxed/simple;
-	bh=0eZbYvSMOyz0txO7McOUt7WBCXP3fLg51sadhpP/XeE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C/V7DJgWMopi/Zxw4b9DDfgD5hGMnFf5OTHxM/cpqL1TpgddvTSAgKOnmKcHzTAYDUoStOvTjEnEsp3BIdMilKlYtG5DW16lAMlA6DGCbORuaSqLHeyxYY1jKTpVOUImX1Hn4h4xfrBk8GRfi+g5PgcGdyvWMxoFGXjevP58sys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mff0oXGC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24984C4CEE4;
-	Fri, 16 May 2025 20:21:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747426913;
-	bh=0eZbYvSMOyz0txO7McOUt7WBCXP3fLg51sadhpP/XeE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mff0oXGCBELo0hzgvl1WaEJjdXKZ7PB2yucYnPxgvfRfJtsyfndb2MF2nqpMWRNd6
-	 6QSwslLlHkotLfTgLKNJDZHKas5G61PIZ/7a43kJkNtGjgaIc8kTZS7vUdaNF6VwlI
-	 4HEg/c7NAuCUCMiawrmi2SVkxEVnd8Tkok6WC8ytZqBAw3HWVws7GIwYuklMxNJe2D
-	 RbBYKJALQSY4+ByUVtcQNY+Os6YPOLpagZk37B529LWkEru4lU5HBNRiNL+5zJEkcd
-	 e6OVlAMc47gBuo8m5D+6j5sVAzDeDPn1nm1dvDPlhVPLU/RZXeGoh1YtJZ+wGyAX+0
-	 HSJbIwqpTSQvQ==
-Date: Fri, 16 May 2025 21:21:49 +0100
-From: Simon Horman <horms@kernel.org>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: Lorenzo Bianconi <lorenzo@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v3 1/4] net: airoha: Fix an error handling path in
- airoha_alloc_gdm_port()
-Message-ID: <20250516202149.GL3339421@horms.kernel.org>
-References: <5c94b9b345017f29ed653e2f05d25620d128c3f0.1746715755.git.christophe.jaillet@wanadoo.fr>
- <20250516201606.GH3339421@horms.kernel.org>
+	s=arc-20240116; t=1747427720; c=relaxed/simple;
+	bh=fP8E9v3zJ+APJASBeiAwRmZRScRfbVU7Qi3sCSrOeSI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=quMkSPwgZuNl5cPwJ8PLvbPcdzTG96uNhPzg/N2HHlSwqfTrB1S8XaJF8fm9m0Q8WnbAvqMeTfpb/fsE7PeSBaFBiA9KJdY0x9BzZBpwDPPwE8ICPs8QAlTiL4ggsEKiQIPCScHCnj04RxTq1FWA89ReJYYbg6HQjAIeLyuTcH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=htM/sldH; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-550edba125bso731197e87.3
+        for <netdev@vger.kernel.org>; Fri, 16 May 2025 13:35:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747427713; x=1748032513; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=yxLxKPAkFRNTV46MhihIDPqFiSaNfOKTtn1tMu7HPrY=;
+        b=htM/sldHuj8YjLeBH1UOzFP/ddOYptFMkjT9wuLWNZyz3cCOrJHHVu8UDSAqNCDDo3
+         F0KM8PZvtOfxU5ssnM/a6vjELrTst3JJIh7nyV614QjtizCKet4YElyk4YUEgomdBdj7
+         GsbI/voi++Lln4FKbs/mQw4mU85+7wLQr1uR7H7ffnlMjSrQPqSfRL/t0cFCL+cPKD5v
+         iuhN/b1EM3qO+FtY5gJXcdRVCtXWEZigDq8FigWaaFMtAUXsv2S9AbVcek4fsz4hqAdS
+         iAulIvdq2d9TdEv27hqu+LQp9zLTZcRKj5Q1TAAb0qF17V4Gz4pOHqU7PVE8lR9NgyPV
+         y1Fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747427713; x=1748032513;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yxLxKPAkFRNTV46MhihIDPqFiSaNfOKTtn1tMu7HPrY=;
+        b=WcOVhLf4lR3ReimrkT8TCsWbv9OYqlEjeR56oKmCttjHG5NU/IE3ulZKEGYiby6BTv
+         i38MyjZTktHkhvG5uB+QeuIhh48hcjoRA6iOe0k1IHxik1TUr8gKeT39GnOGXiPYY2cz
+         5H2KE8CW+22yWw4ISr5hvC91JyHdHwaxfhI6Sl+JUP0Rx5mzbTSybKvPD6DmUWWnFnEv
+         QrSsZWByXxFeYq9VAQi93Z8vSu8xY3ECgFvg02ZdANVf8fTafb9yZkDm5hYvXnTiiebg
+         U3G7+CgyhG0B7zr5WzUM1ogVijoW1+0sc2Ed6hQFWRKxxHcJ34tDILKg8OYrGY7eI8SF
+         XulA==
+X-Gm-Message-State: AOJu0YwDz+nEj2i/OX/vI8wM+w512Pm3kgvE3S9FDlb+P9oyvLBp+mJU
+	H3csE8c0/5wXryGAk9uwflxHF/lhuSEePe89OJtoldlSHWsqiqY+i5FI8cR06S5G
+X-Gm-Gg: ASbGncs96Gb5ukE7QrdncDj0aRm+1MGJz4S0Kda0F7zCNcf5KLKkglCSDF9gqZYR7rr
+	CNqBRr24MpJS7DOO86iDZ8JT4QwbPLPUNi4QJNq8sN/bDkWrxjEQOgxh5ofMzBsbOmt5hbqzM0X
+	gpAQzlTFyYXTr5tpoJuhTPGhMGJwqZcygY19k9iPJlH5sZK4yn3VW6vedQKz5TnPH297jG8N6dM
+	auBdTgX1nlzm/msqArq0gW+FQ8Mkfp2s8YE5HC6WpuwRwqKKF2Q+kAj5jshFeda95wZPIe5CeE8
+	Bgmk8wiXD3zKIxNpr9J3a+XNxC7OcGh9RvuOmzpU3bedOsISVENIIbFlCz2J4+c4RKF0beTgmx5
+	WDYwpby3FRcQdtuxMtw==
+X-Google-Smtp-Source: AGHT+IEldMGogEOipYwUKI4qpd4j6FalCJWEhKELhDj0QJkWsSZp8gdrNXJNvJ8VR9AQiIjtl3kXiQ==
+X-Received: by 2002:a05:6512:620b:b0:550:e5b3:b1ab with SMTP id 2adb3069b0e04-550e719529amr1600719e87.4.1747427713142;
+        Fri, 16 May 2025 13:35:13 -0700 (PDT)
+Received: from anton-desktop.. (109-252-120-31.nat.spd-mgts.ru. [109.252.120.31])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-550e703f864sm577494e87.250.2025.05.16.13.35.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 May 2025 13:35:12 -0700 (PDT)
+From: ant.v.moryakov@gmail.com
+To: netdev@vger.kernel.org
+Cc: anton@vger.local,
+	AntonMoryakov <ant.v.moryakov@gmail.com>
+Subject: [PATCH] json_print: add NULL check before jsonw_string_field() in print_string()
+Date: Fri, 16 May 2025 23:35:09 +0300
+Message-Id: <20250516203509.259117-1-ant.v.moryakov@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250516201606.GH3339421@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, May 16, 2025 at 09:16:13PM +0100, Simon Horman wrote:
-> On Thu, May 15, 2025 at 09:59:35PM +0200, Christophe JAILLET wrote:
-> > If register_netdev() fails, the error handling path of the probe will not
-> > free the memory allocated by the previous airoha_metadata_dst_alloc() call
-> > because port->dev->reg_state will not be NETREG_REGISTERED.
-> > 
-> > So, an explicit airoha_metadata_dst_free() call is needed in this case to
-> > avoid a memory leak.
-> > 
-> > Fixes: af3cf757d5c9 ("net: airoha: Move DSA tag in DMA descriptor")
-> > Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> > ---
-> > Changes in v3:
-> >   - None
-> > 
-> > Changes in v2:
-> >   - New patch
-> > v2: https://lore.kernel.org/all/5c94b9b3850f7f29ed653e2205325620df28c3ff.1746715755.git.christophe.jaillet@wanadoo.fr/
-> > 
-> > Compile tested only.
-> 
-> Reviewed-by: Simon Horman <horms@kernel.org>
+From: AntonMoryakov <ant.v.moryakov@gmail.com>
 
-Sorry, I was a little too hasty.
+Static analyzer (Svace) reported a potential null pointer dereference
+in print_string(). Specifically, when both 'key' and 'value' are NULL,
+the function falls through to jsonw_string_field(_jw, key, value),
+which dereferences both pointers.
 
-This patch looks good to me, but as this is a fix for change
-present in net it should be targeted at net.
+Although comments suggest this case is unlikely, it is safer to
+explicitly guard against it. This patch adds a check to ensure
+both key and value are non-NULL before passing to jsonw_string_field().
 
-  Subject: [PATCH v4 net] ...
+This resolves:
+DEREF_AFTER_NULL: json_print.c:142
 
-And it should be split out from the patchset comprising the remaining
-patches in this series, which appear to be clean-ups (or at least not
-but fixes). This rump patch-set should be targeted at net-next.
-And ideally, IMHO, have a cover letter.
+Found by Svace static analysis tool.
 
-  Subject: [PATCH v4 net-next 0/3] ...
+Signed-off-by: Anton Moryakov <ant.v.moryakov@gmail.com>
 
-Thanks!
+---
+ json_print.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
+diff --git a/json_print.c b/json_print.c
+index 4f62767..76e654b 100644
+--- a/json_print.c
++++ b/json_print.c
+@@ -138,13 +138,15 @@ void print_string(enum output_type type,
+ 			jsonw_name(_jw, key);
+ 		else if (!key && value)
+ 			jsonw_string(_jw, value);
+-		else
++		else if (key && value)
+ 			jsonw_string_field(_jw, key, value);
+ 	} else if (_IS_FP_CONTEXT(type)) {
+-		fprintf(stdout, fmt, value);
++		if (value)  // защита fprintf
++			fprintf(stdout, fmt, value);
+ 	}
+ }
+ 
++
+ /*
+  * value's type is bool. When using this function in FP context you can't pass
+  * a value to it, you will need to use "is_json_context()" to have different
 -- 
-pw-bot: changes-requested
+2.34.1
+
 
