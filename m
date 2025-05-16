@@ -1,82 +1,85 @@
-Return-Path: <netdev+bounces-190986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B232AB9947
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 11:47:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 597D9AB9946
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 11:47:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FF8E7A377B
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 09:46:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA40A167E80
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 09:47:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42DDA21B9E7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A14522F768;
 	Fri, 16 May 2025 09:47:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="rB3hwvks"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="j8ghrWHN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE438163
-	for <netdev@vger.kernel.org>; Fri, 16 May 2025 09:47:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75FEF217F34
+	for <netdev@vger.kernel.org>; Fri, 16 May 2025 09:47:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747388855; cv=none; b=TT3xKsoVqqimt7nGLu6rLwTQ02XHlbgHR4uXMghXeZlfZSEt4+BuQ+cI/uhf0KltmRzENz5+OZMNzrI61SGBRBKASXhJXfvmZZx3Txwi1ugrW66UB4F5NHyGDc6O3PYqqxewX2V2ZS3PXDFrjvDZA+k+GzFmwjea1JY8Xv7qhn0=
+	t=1747388855; cv=none; b=HEf1tl//nKt3XWf+bG/pSHgjJiErdNALkSxfHlle1bZQhN7u6kR5W0vs6rlqRtkjvibr0q1xehM0Pytbzlt4KabzDpk1wNqvhaARNGZ3wWQsU5EzGl3DuKUA8CcjZhUZFIYCjWN6Au6LUBaUKc7FAh/6BPVf3LRaR8Th5B1X1bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1747388855; c=relaxed/simple;
-	bh=s/BYJVOslwfQh2Gv9bUrvn16TrcErl6S+z/aEUFkoIQ=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version; b=HtddWq+qdcGPrmbDHzLiIfHljWzulWbNjBWf/Ty2p5C21iDUrk45CExMvkLJ5Kw9i8CyEdo4qm2O0v9Zfo6IlvRF2CApjF/8w2fYo1x3cu69n4OQhxTSTwNjf/iIpPy1hfAtOgRhjix03IcN2+n2llEQrGtfWEIE4SjC1nYWj60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=rB3hwvks; arc=none smtp.client-ip=185.125.188.122
+	bh=Q0A7Pg88li+liP71pyE7Ta1/+0MofX+fn4pwAf26zh8=;
+	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=sz9wMadjxcCajiWzVPrHsr6KHl4vMX1gFy4ZjjfYp1uzsNeer6Baw1ksUIqw3G7hMR71wWxK+ab9TkT6WBNl6z+6/kAh7juJEEUpz0kJYpPiZTKC90PRMRJY+NjWZ42LMPYMhll5tuY9sqMIZzzEd3F907vB78zJ8VWT6ec7vhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=j8ghrWHN; arc=none smtp.client-ip=185.125.188.122
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 101973FC4D
-	for <netdev@vger.kernel.org>; Fri, 16 May 2025 09:47:30 +0000 (UTC)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 734B83FD42
+	for <netdev@vger.kernel.org>; Fri, 16 May 2025 09:47:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1747388850;
-	bh=rFz2hT4dJU8x+6xyAzn9MNouymJj5+a9kLkmNIJE3sY=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version;
-	b=rB3hwvks/S++KJru3IB71kEl3ZZdyTzuao2+DFjW+yNJRhRj1hE+SHXxrHadhI93U
-	 Wfbwf96rF60P3icaAfciAIg+sL5HoxbBrQC/v1TpabAWV7Ui+lnblx77NE10SKPx3b
-	 AJKNY58jVYzC0xnWxXaK6LllxVdVyuXMu8d16oPXZQBZSWKvoSZiPS1S7a20dWKoLc
-	 IWhXugJrROixPaWXYwkhIack8UFbwSbbpy5aeXscNJu8uh948UrAfdT4P9TyEYfEh1
-	 dCmu48rKAxa9a8VXOc3VgytAN7y64lQCR2D746jCInlEkKRLvD5ub97d2smGOdxv/M
-	 bHL6mk4Q695yQ==
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-39ee4b91d1cso1457676f8f.0
-        for <netdev@vger.kernel.org>; Fri, 16 May 2025 02:47:30 -0700 (PDT)
+	s=20210705; t=1747388851;
+	bh=ROE8L3YaWta5ImjYVCCqyUOCXfZoeYQlhcOMX8bYzao=;
+	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version;
+	b=j8ghrWHNyi62mPjLzrq9zfbDCQHOYc8bHORgole06swKVPRujAuvMueVAaoFTEDrk
+	 Hx5X3OnmLWZh2ytfu+7hTxGzOTiIvOIMerB8boF3M/1lY84BofAKlcAgvawZGvZZ1m
+	 AimUnRMgVNlrIEuPF884Svo/gpCZasa3hQYRPuUhufY+r0Yys44oVA18s4AIRsDuim
+	 hpCTyq9zHYU7UZw1a55gOfZxQjbApvmtAxLqlvng+5DVPBGBuk5pmQDR+1D/RIAgul
+	 9OU4CFz3hXEF55d82PwY2ibZ5v8HfcfWUQuQSp8FQGm4u7la/7lsKD4OyrZ6cO5MwV
+	 lX9l2azFQs4Fw==
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3a36416aef2so10534f8f.1
+        for <netdev@vger.kernel.org>; Fri, 16 May 2025 02:47:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747388848; x=1747993648;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rFz2hT4dJU8x+6xyAzn9MNouymJj5+a9kLkmNIJE3sY=;
-        b=LgYAebEyAz+u11FhpkcNldpO87wg70JJonCBVerGMfuhURf0ctdRsyrVn+3BvYzvF2
-         9FNVM0wty9POL/DJs4GxDkiegMnfXZ8TygJAgdLdrEhrymjwluPnMMV5DgdemYMn1SWj
-         mpFyaSAJiebg9Iz0d5mNGhvhlVHw//iAz87RnQAqkFEXTc7wN9xNH4XSpSYcdST3ewxT
-         HhrEDU1S0k4U1HFVIhGUt/V1kWGGhsm4k3py7T2iC5YY/KhphzeAVms9ohzoXU4Dpy3i
-         QmEdnEjXPVzN1z0BEukD8sQ/4kAypj6wPKXY07ZXnL76wVCSr+bqaF3VUkrfovL59LA1
-         nPuw==
-X-Gm-Message-State: AOJu0Yzx6RgOd9fbADWIyKjYjCDAznywqA4wvPJja1aecpqUTc+hcsOe
-	5pyohfRsD76nUuvzjpRhUlXb4Hr1Ct8uJ5rIu8CSXRW/QSO7BSI0bR6Ye0DRcfboFKjVcbx3yyo
-	J/OOxPYcUgDkj6AHRM+OOYSgNyP4GmqoAvAAngPEHxnMexigjRpc26wpOp7Dc55z+/Jywn4CjZC
-	JZfor1c4nkrZk=
-X-Gm-Gg: ASbGnctEP9quN0FHWzPRiOKzCFs2YCydL9gQsrPkNHZUXTODFIh571LfWHdjKyvTI1b
-	7OPPQ5QeRw/3/tosI25rJWA8SY1xTqjrqzo6rYUjDsHXctNs7Mjm9oS2UhopR1u8GiO5b+D1FhK
-	nwcS7IMV4FsUNiqCo+Y0rYDVhcL36rwBVNkWiavNM5q4hOGPgGYfbMvPsKYILBvVq3jXbK7sVsq
-	iI2IAZRZcKL3M0Q8F+/mmCRvnH6WtSs/k6N8R44SC0F/aYkB+1QWQE3aTwZFQReZeoJRqEN4DKa
-	ymwsiJW+Rnt02Q==
-X-Received: by 2002:a5d:59ab:0:b0:3a3:5c87:6e75 with SMTP id ffacd0b85a97d-3a35caa2ec2mr2611735f8f.25.1747388848061;
-        Fri, 16 May 2025 02:47:28 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFOz/bnJAGSk9AsZ4SS3NshUSa2NByjlHThL8Xa8m8s2R7j+UwYyrfzxT/4ncnhsaJdnYvq1g==
-X-Received: by 2002:a5d:59ab:0:b0:3a3:5c87:6e75 with SMTP id ffacd0b85a97d-3a35caa2ec2mr2611705f8f.25.1747388847713;
-        Fri, 16 May 2025 02:47:27 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1747388850; x=1747993650;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ROE8L3YaWta5ImjYVCCqyUOCXfZoeYQlhcOMX8bYzao=;
+        b=Biu+uEj49e39hYA6+5UFWrfZV5vdlcTRD93/IyGGDRwS0n1sn3AQ5WeQDhArV1+H9J
+         DQ1sRVeiyi35DAwbLEbGlY9TscV+O1/XtIkIGNRyKI9TNCn0ig0c8DDTzZDvqVviRyC3
+         qX3QwhwRqYEF1HtI1R1mb6Nq0+OvYIRNJw6qdbPAHjAOhT2Sm8ZDqQHHplgnJQQ2/8xH
+         zIwTTI6Gn40JvWA0gokY4cXny2qb0nTTWSgGapyLydwNwS0/XtYtZH/s4HTixfyIy6bc
+         mBkNnBNWpOJNfeXIhIE51lH+Ua1zSYlLF9nGNCuxDAiv4yGXgz/PlOujNPtFzEF4bJJK
+         sTJA==
+X-Gm-Message-State: AOJu0YzBcYjAc3V15w7y9iE+dRCb5qjSVegqluGrVaaM7Ed6E8SOIrS5
+	S1JUwklCTwxBdxm0aAar7u/J28Vt1ndZ4U396I+IhQrNlxDJ88PKAqOn2TLdj92YOEImtnYg/ZN
+	Dt0RTRBvnkzZej2AroKiZgPATLVfwD6VRGTu+5p/rbDiOp8kRHDz7sckKHAKjoUYVP51Tv/IZJI
+	CZdjb5pTEXvt0=
+X-Gm-Gg: ASbGnctzEY9vrnIPxOF8T5I4cGozfEXabWqn+kMb6QdYUghuI7qOyO33SPxVAGUzLB/
+	PXTBVZPWBzPK98cbI+KdYGNDEUm2PIiwi4nPMX0qxnckR60BQA+plc0HGupXKSkry0jDAEICN0J
+	+l1AnMo55x63PvsGDUUMcmpBgyGC5RJC6wevzzTFnH/TXefoGF5dGkdrFOL1Jk+q+eYIZLKG2HP
+	aBIP1r2DZasPHZGyF5A5JtltjtWcn/zNmBWpAPxel8UoKGJTw14hdu13Pzf8CBsfcQu/s+5oAzf
+	F2BKtJU4cxX8bg==
+X-Received: by 2002:a5d:64eb:0:b0:39c:12ce:6a0 with SMTP id ffacd0b85a97d-3a35c826787mr2935613f8f.21.1747388850424;
+        Fri, 16 May 2025 02:47:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGW/68AiiOfI1CjkEDC7SYJUC5vYNSXoFLVliIrOwpfKxrpS5HsEpGo+p0XvRgVvW/f68cNeg==
+X-Received: by 2002:a5d:64eb:0:b0:39c:12ce:6a0 with SMTP id ffacd0b85a97d-3a35c826787mr2935593f8f.21.1747388850077;
+        Fri, 16 May 2025 02:47:30 -0700 (PDT)
 Received: from rmalz.. ([213.157.19.150])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a35ca88990sm2329962f8f.68.2025.05.16.02.47.26
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a35ca88990sm2329962f8f.68.2025.05.16.02.47.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 May 2025 02:47:27 -0700 (PDT)
+        Fri, 16 May 2025 02:47:28 -0700 (PDT)
 From: Robert Malz <robert.malz@canonical.com>
 To: netdev@vger.kernel.org,
 	intel-wired-lan@lists.osuosl.org,
@@ -90,10 +93,12 @@ To: netdev@vger.kernel.org,
 	sylwesterx.dziedziuch@intel.com,
 	mateusz.palczewski@intel.com,
 	jacob.e.keller@intel.com
-Subject: [PATCH v2 0/2] improve i40e parallel VF reset handling  
-Date: Fri, 16 May 2025 11:47:24 +0200
-Message-Id: <20250516094726.20613-1-robert.malz@canonical.com>
+Subject: [PATCH v2 1/2] i40e: return false from i40e_reset_vf if reset is in progress
+Date: Fri, 16 May 2025 11:47:25 +0200
+Message-Id: <20250516094726.20613-2-robert.malz@canonical.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250516094726.20613-1-robert.malz@canonical.com>
+References: <20250516094726.20613-1-robert.malz@canonical.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,43 +107,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When the i40e driver receives VF reset requests from multiple sources,
-some requests may not be handled. For example, a VFLR interrupt might
-be ignored if it occurs while a VF is already resetting as part of an
-`ndo` request. In such scenarios, the VFLR is lost and, depending on
-timing, the VF may be left uninitialized. This can cause the VF driver
-to become stuck in an initialization loop until another VF reset is
-triggered.
+The function i40e_vc_reset_vf attempts, up to 20 times, to handle a
+VF reset request, using the return value of i40e_reset_vf as an indicator
+of whether the reset was successfully triggered. Currently, i40e_reset_vf
+always returns true, which causes new reset requests to be ignored if a
+different VF reset is already in progress.
 
-Currently, in i40e_vc_reset_vf, the driver attempts to reset the VF up
-to 20 times, logging an error if all attempts fail. This logic assumes
-that i40e_reset_vf returns false when another reset is already in
-progress. However, i40e_reset_vf currently always returns true, which
-causes overlapping resets to be silently ignored.
+This patch updates the return value of i40e_reset_vf to reflect when
+another VF reset is in progress, allowing the caller to properly use
+the retry mechanism.
 
-The first patch updates i40e_reset_vf to return false if a reset is
-already in progress. This aligns with the retry logic used in
-i40e_vc_reset_vf.
-
-While the first patch addresses resets triggered via ndo operations,
-VFLR interrupts can also initiate VF resets. In that case, the driver
-directly calls i40e_reset_vf, and if the reset is skipped due to
-another one being in progress, the VF reest is not retried. The
-second patch addresses this by re-setting the I40E_VFLR_EVENT_PENDING
-bit, ensuring the VFLR is handled during the next service task execution.
-
+Fixes: 52424f974bc5 ("i40e: Fix VF hang when reset is triggered on another VF")
+Signed-off-by: Robert Malz <robert.malz@canonical.com>
 ---
-Changes in v2:
-- Patch 1: modified doc string for i40e_reset_vf function
-- Patch 2: removed unnecessary doc string changes from the patch
+ drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Robert Malz (2):
-  i40e: return false from i40e_reset_vf if reset is in progress
-  i40e: retry VFLR handling if there is ongoing VF reset
-
- drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
-
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+index 1120f8e4bb67..2f1aa18bcfb8 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+@@ -1546,8 +1546,8 @@ static void i40e_cleanup_reset_vf(struct i40e_vf *vf)
+  * @vf: pointer to the VF structure
+  * @flr: VFLR was issued or not
+  *
+- * Returns true if the VF is in reset, resets successfully, or resets
+- * are disabled and false otherwise.
++ * Returns true if reset was performed successfully or if resets are
++ * disabled. False if reset is already in progress.
+  **/
+ bool i40e_reset_vf(struct i40e_vf *vf, bool flr)
+ {
+@@ -1566,7 +1566,7 @@ bool i40e_reset_vf(struct i40e_vf *vf, bool flr)
+ 
+ 	/* If VF is being reset already we don't need to continue. */
+ 	if (test_and_set_bit(I40E_VF_STATE_RESETTING, &vf->vf_states))
+-		return true;
++		return false;
+ 
+ 	i40e_trigger_vf_reset(vf, flr);
+ 
 -- 
 2.34.1
 
