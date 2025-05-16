@@ -1,96 +1,104 @@
-Return-Path: <netdev+bounces-190900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-190901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB92CAB935D
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 02:59:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A83F4AB9362
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 03:02:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FEA84E2BF6
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 00:59:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A99A0A205CC
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 01:01:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ED361D6DB9;
-	Fri, 16 May 2025 00:59:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B0CF21147D;
+	Fri, 16 May 2025 01:02:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dxrT6v76"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="oCf4nrR5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F3F1D63FC
-	for <netdev@vger.kernel.org>; Fri, 16 May 2025 00:59:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C8A2E628;
+	Fri, 16 May 2025 01:01:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747357194; cv=none; b=Mg82fUvfDbZUQsgmN4E45vtYw2EfeXV61C20hOJrcY1TfF1sF8BRcWd48bElkNboRTxWYbAYK1YQXt6QduFo6k3I9VNMKd0O6/brDuLd/RXup+ERGDL2manR1ElDJGi7LUo3qbOGvl2wX+txoR9hrgmp+4WNgqF+OupXIS65rPs=
+	t=1747357320; cv=none; b=h9l2ajIAybiIOVfgERug2hD5lVWs+vnNGzVeQkOBhGMVLf+HFeVJUSG7kwNDwBUa/pVYug3PYZEYd6dCzagb3teGsl9wg0GTdbdSQuaAWvtS69w6/36R8mnltH4NkUpILJ2aEBdaVJG1lvonNXBPJNnSJHD4cIpXqYD/pj3ZZL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747357194; c=relaxed/simple;
-	bh=hzxQZHxfS8l5J224f0fu07P9xz+Rm3FnC8uEIseAXCA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WD8tWxXZqG4pzuR72bUHAi+HcpTalky+gab2wXsq7L64dKGTm8zm8f+D8A4mp8FDXR/Ka+8JDiEf+e4uR29PiB3PgcHy36oAiLDQYIcHOQxeM/t/J94WwpWSWvTDPSh+r9PpwZTTL7RSNaojvb0EZB9UjpNfpF4XUxRUi2ares4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dxrT6v76; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDBEBC4CEF1;
-	Fri, 16 May 2025 00:59:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747357194;
-	bh=hzxQZHxfS8l5J224f0fu07P9xz+Rm3FnC8uEIseAXCA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dxrT6v763XBOGVZN9ev58sEoNQ2ThzQQe7rEkaRd4i4wJB52f6kwDHA29biL3gWhS
-	 B4FGHI/6pHfHXeghQ5brlS5ko97FxlFcj9VdNg4UidGIoVBDoZJj8Kc1iCXiBG0XTn
-	 /ewatylnTy4b+PJ8Vn6BuZElukTF80Sjx2YTnTbS7v1hvlGqCrUZmd31RUCFavkeQq
-	 evetWwmTFVp6/F7do9k/S7kpeq0wLLSFhd9s6B4mLgPDilWfeC5DHss8x6VSwEEKVC
-	 OVO/TAODDQIHWYlN1I8uzhUC6aC78p9ulJ9XvweW16N+GJYVcspqvYmd6aGuMwlMfT
-	 Y2skCU1CBidXw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33FD63806659;
-	Fri, 16 May 2025 01:00:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1747357320; c=relaxed/simple;
+	bh=vo9tsHJNZFegfZa90XHjfcKXw62ztWhwEq7TJ3MNsro=;
+	h=From:To:CC:Subject:In-Reply-To:References:MIME-Version:
+	 Content-Type:Message-ID:Date; b=Q/Cr0y8wXiDsSYARtRMVCI/tqXErsWttQwshzvt0yqf7SBr/ONUgjo1+DWbh15cQO75WLmru3lSdajnJKA1V/V16rsg1FyPr/6wiKBqb5I6PSFtuiZuAUupmXeWMr3wMP9KV47FVVuxAj4khgP3REg0b3r2k977S79iaZ/Pftus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=oCf4nrR5; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 54G11nwJ6075015, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1747357309; bh=vo9tsHJNZFegfZa90XHjfcKXw62ztWhwEq7TJ3MNsro=;
+	h=From:To:CC:Subject:In-Reply-To:References:MIME-Version:
+	 Content-Type:Message-ID:Date;
+	b=oCf4nrR5TTMCnAQxkiiM+Cx5wvomN/WpEkwGsDNpXJjWmWJ8iT8KEAhaNF1NbW9O3
+	 fXtROXfNjFYzLGa9iovlbGOMIp9ng1XJ+9hns/gi791JVcnqrN7ordNy0buHZ9EeZH
+	 Bd3rBVBkNzagGhhYyhZtj/AngoJdUOsrnRIYXnFzHVUeQS9GARVGWQysu6V3X6K9KK
+	 vKeB0ZW3D81754dYoRnJ+ANA9YMHLjq/8TtZI32OzvhY4ykm4e8PrzbZeu7fUCWy78
+	 D/vtpCLvyG6PnNar7HNa+e8LD6kBszPAehWFNlpKWVHjHzJAhTHXfTda+PEXwDbQPs
+	 +5/RmGG8W2+jg==
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/3.13/5.93) with ESMTPS id 54G11nwJ6075015
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 16 May 2025 09:01:49 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 16 May 2025 09:01:50 +0800
+Received: from [127.0.1.1] (172.21.69.94) by RTEXMBS04.realtek.com.tw
+ (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Fri, 16 May
+ 2025 09:01:49 +0800
+From: Ping-Ke Shih <pkshih@realtek.com>
+To: Alexey Kodanev <aleksei.kodanev@bell-sw.com>,
+        <linux-wireless@vger.kernel.org>
+CC: <netdev@vger.kernel.org>, Ping-Ke Shih <pkshih@realtek.com>,
+        Kalle Valo
+	<kvalo@kernel.org>,
+        Alexey Kodanev <aleksei.kodanev@bell-sw.com>
+Subject: Re: [PATCH v2] wifi: rtw88: fix the 'para' buffer size to avoid reading out of bounds
+In-Reply-To: <20250513121304.124141-1-aleksei.kodanev@bell-sw.com>
+References: <20250513121304.124141-1-aleksei.kodanev@bell-sw.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 1/2] net: lan743x: convert to ndo_hwtstamp_set()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174735723101.3295414.14333538206850685044.git-patchwork-notify@kernel.org>
-Date: Fri, 16 May 2025 01:00:31 +0000
-References: <20250514151931.1988047-1-vladimir.oltean@nxp.com>
-In-Reply-To: <20250514151931.1988047-1-vladimir.oltean@nxp.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, bryan.whitehead@microchip.com,
- Raju.Lakkaraju@microchip.com, vishvambarpanth.s@microchip.com,
- UNGLinuxDriver@microchip.com, andrew@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- vadim.fedorenko@linux.dev, richardcochran@gmail.com
+Content-Type: text/plain
+Message-ID: <ccf67349-0bb6-4944-8571-e6707a206eaf@RTEXMBS04.realtek.com.tw>
+Date: Fri, 16 May 2025 09:01:49 +0800
+X-ClientProxiedBy: RTEXMBS02.realtek.com.tw (172.21.6.95) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
 
-Hello:
+Alexey Kodanev <aleksei.kodanev@bell-sw.com> wrote:
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 14 May 2025 18:19:29 +0300 you wrote:
-> New timestamping API was introduced in commit 66f7223039c0 ("net: add
-> NDOs for configuring hardware timestamping") from kernel v6.6.
+> Set the size to 6 instead of 2, since 'para' array is passed to
+> 'rtw_fw_bt_wifi_control(rtwdev, para[0], &para[1])', which reads
+> 5 bytes:
 > 
-> It is time to convert the lan743x driver to the new API, so that
-> timestamping configuration can be removed from the ndo_eth_ioctl()
-> path completely.
+> void rtw_fw_bt_wifi_control(struct rtw_dev *rtwdev, u8 op_code, u8 *data)
+> {
+>     ...
+>     SET_BT_WIFI_CONTROL_DATA1(h2c_pkt, *data);
+>     SET_BT_WIFI_CONTROL_DATA2(h2c_pkt, *(data + 1));
+>     ...
+>     SET_BT_WIFI_CONTROL_DATA5(h2c_pkt, *(data + 4));
 > 
-> [...]
+> Detected using the static analysis tool - Svace.
+> Fixes: 4136214f7c46 ("rtw88: add BT co-existence support")
+> Signed-off-by: Alexey Kodanev <aleksei.kodanev@bell-sw.com>
 
-Here is the summary with links:
-  - [net-next,1/2] net: lan743x: convert to ndo_hwtstamp_set()
-    https://git.kernel.org/netdev/net-next/c/958a857a626c
-  - [net-next,2/2] net: lan743x: implement ndo_hwtstamp_get()
-    https://git.kernel.org/netdev/net-next/c/abb258eb78a9
+1 patch(es) applied to rtw-next branch of rtw.git, thanks.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+4c2c372de2e1 wifi: rtw88: fix the 'para' buffer size to avoid reading out of bounds
 
+---
+https://github.com/pkshih/rtw.git
 
 
