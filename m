@@ -1,125 +1,169 @@
-Return-Path: <netdev+bounces-191057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 205EEAB9EC0
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 16:38:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5644AB9ECC
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 16:42:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15A72A030BF
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 14:38:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FF104A7143
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 14:42:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13CE2199237;
-	Fri, 16 May 2025 14:38:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1DB2199924;
+	Fri, 16 May 2025 14:42:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ylGodoks"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ClHMyohv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3425518DB35
-	for <netdev@vger.kernel.org>; Fri, 16 May 2025 14:38:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2EF319343B
+	for <netdev@vger.kernel.org>; Fri, 16 May 2025 14:42:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747406309; cv=none; b=LNEhZ7t2+IoUkszPAaDXoeKWRE2RhCDt7ZROu04j6zwkTakMD9vV3fpmaTfwAzpMbJ81xYq+kcMLTJKGdRktUTJ5Fs+xKOQzKHut9Gy02Jhd2CuCXKEOAQrp/hX1994+ystgB98ct2BNeubDb51+npG4mbuL/D8Xn1ziN2VCt/U=
+	t=1747406539; cv=none; b=oko89AYKbIuqCPlP5T/NupE2/iO8TE0LG7W2BokObfZQvz7/3Y7e1zOxQLIIDPeRrUaSCTDcrjiAKBQHe/yoeUFCISmpttSIUQjY3y3BTydY8zLWsX766CQa21r44b8Nwucekb/VSsqhf5GU2iAX+m5ijrVbUp8l/RXGuRpJjp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747406309; c=relaxed/simple;
-	bh=x4z2xCYwo9fPX793BRjCTj4nqlE0ZVIMCsmio1DpU7s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IWbj6AA82lYbRIjuKk1mzFS9WomdTXH6tEPg3CHAR5CQlVuLoRZUIZS25dZLz72dlTQmWaviolHxRoKWOXeI1e6XpM1aimkn2X3pvZMvnhjgVXFoPwMkwGYxrmuT4BI1u7MtsJjPHsBE1xOibZQtG4EC2QkmJh5dzBpgIu1VULA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ylGodoks; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-6000791e832so9863a12.1
-        for <netdev@vger.kernel.org>; Fri, 16 May 2025 07:38:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747406305; x=1748011105; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1sUYusB+kyJ76xlLEHH5qRi/bk9NwvxZ5fkLN1rm8tM=;
-        b=ylGodoks6gEtouvpWiK2FouRrMpwv2Eh1sJF33X1TF2ipa209I7hRwmNWjpOXHpEPo
-         07w2HZyHsUgkM9T7xqmbPEwZpj/qdWAPQvxYqKuwTiTaUY4AR3LFNgbbiC/KYqQg3Q/a
-         3+LPt3qRDwMWan6jgP+oLaCspe2RCg3JULoj4ezt1niCXv7xYEywUqtO1ONlsOj8qvRb
-         zb0R+Mk921gYpg+E2LZkK9P9VjI/V6Vk6CA9CrDzP60gY8Iu39XFnqQuyaKj2QwJHsWR
-         QYQYXhdFlr2+gshcB9eHxm6mliW/f4Ik35K8CHx45fEdoq9USw0tbNtG7GrGww7QKvPj
-         7Vcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747406305; x=1748011105;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1sUYusB+kyJ76xlLEHH5qRi/bk9NwvxZ5fkLN1rm8tM=;
-        b=VT54hBFdoHUEt4KBkOKzorF7FrTTXVrYA4rnINDibchPWVm9x24oWBxxJO8Pv8wgDK
-         bcrePZCOn1tlei7tKczPXicd88c50HjOBm84jvmi0lMVBQ/rLTebokNY7N+4gdS+lgvQ
-         laqVh/sDh5U5zqmgpD3t40SK3xG39oIz554LhTyB7MH3Ypbbpyl4B/M0vdKF+l5AlDKM
-         EQiyrb/KAidhwdGGBZ6gJ02OUJ6BQFa1evriSO5tOb9LqgAoj6wLU3NA9pEyzYaeHaPr
-         R9sKrjyfHZyGdr2oRUBlFU2ID8RDor2n5mU/VP3EGcRXcFBd3IchUMwXcD4JfiBhcUCj
-         O+8A==
-X-Forwarded-Encrypted: i=1; AJvYcCVm1TPRF59NLiCZFss7Y3U/wIxUUZuKuEPhhcCZBgkIQtG2P/6wJB3pNbINyBznuQz3moiQVHs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOTcIchLAmdt7hD0CqZNUGlTIdHDD0Ihqwtvmv7kiEoeAHT/V0
-	dOHGt65kGnnkMcElYuAHyYocKpIQkWsEZX/I42402NahShmtIqUAucbPqR08jPbK99YkM3FSQtR
-	r34W1vj8agvTn7H2gD6J8OoVQeoL9tcv+1zQie105
-X-Gm-Gg: ASbGnctmQCem8j3H5+Jp4xlq6ShM5QOEw8hrte2tEKJ6m3fnOLyWIpoKJxvulx6IK45
-	imZHnF0ITaOe7EHQOUvglfZhr0h2VyAIuQzmN/SFLNt47zwnQACZ2fiaZoSGpUPlHIK1/8KXCc4
-	S2XnaT+0lyV0bOUpjj6fWDl5Ti/yVLxMHhNwewpCiUJpGZOKpe0i+w6SlF9eKBkY9FHtCLpnE=
-X-Google-Smtp-Source: AGHT+IHjVPydHL7cpnwkAmy+wB0lfXFTh8aEtdxrJqk903N82gHmcHf1UJhj/sj7jHSEWrx43rmp+OotJ5wNqgsIi3c=
-X-Received: by 2002:a50:c049:0:b0:5fd:28:c3f6 with SMTP id 4fb4d7f45d1cf-5ffc9dbe5b8mr231155a12.4.1747406305152;
- Fri, 16 May 2025 07:38:25 -0700 (PDT)
+	s=arc-20240116; t=1747406539; c=relaxed/simple;
+	bh=kwvWsv3eoY1iKE1pH01sDzRtO9se7WTWVjBjY+/WtA0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ACa6YRQ9K0elpdBriVzLUaOAX8ftpkLb4HWmc381HAUd6nYZVUnVLI6dMGwtvFdLn5p7bgH4SqIyCqDwxoC+Et+KIM0yZcB1G9Wf+yuc20rGFHP3hdtHc9x0SzCN6LUK6Xt5/Wn9R2ggJv/3qTwdNEwmrlQdwgvsItwSeFEv3tI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ClHMyohv; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747406538; x=1778942538;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=kwvWsv3eoY1iKE1pH01sDzRtO9se7WTWVjBjY+/WtA0=;
+  b=ClHMyohvYfXqjOtChIX22mt/cZ0CSpMLwtUtqjdY/e2rKFgkCxT94rvM
+   mTppFokE0YllJNwK+4wpWgPtPBK/DkMYOD0KObBiaClXLKmmcA3/OD98I
+   RlabwqHdatVdJJZdoZzzM/LKj/yRg0k2zCScgVJ/6r5yGLJ3n3zqlcW5J
+   ZCcj4PJGfVYmC8IM7Et5eTo29tayYeFEGppRwzaIfHLit90znGjkT7hrV
+   b34Fk2K0J4Ydkrdn6LsPlQdmyFmA1RYuZRq7lSIOPvUwMUw6pdiRH5B+M
+   qLINPeZgXYs2EapamzXzlSFcW2pLuNQmOPgQt8t6i3U3pfJRchkCSwyRX
+   g==;
+X-CSE-ConnectionGUID: 2OWULb6fTUS2DhaC4eo8kQ==
+X-CSE-MsgGUID: QRwFBFK1S/2xqAaWwG59oA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11435"; a="53181952"
+X-IronPort-AV: E=Sophos;i="6.15,294,1739865600"; 
+   d="scan'208";a="53181952"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2025 07:42:17 -0700
+X-CSE-ConnectionGUID: v8Fyh4LDSc6SyyL+CKGLwQ==
+X-CSE-MsgGUID: xjhFrZIWQnaHqSYLDH4kzw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,294,1739865600"; 
+   d="scan'208";a="138750854"
+Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
+  by fmviesa007.fm.intel.com with ESMTP; 16 May 2025 07:42:15 -0700
+From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	anthony.l.nguyen@intel.com,
+	aleksandr.loktionov@intel.com
+Cc: netdev@vger.kernel.org,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH iwl-next v3] ice: add 40G speed to Admin Command GET PORT OPTION
+Date: Fri, 16 May 2025 14:42:14 +0000
+Message-ID: <20250516144214.1405797-1-aleksandr.loktionov@intel.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250516-work-coredump-socket-v8-0-664f3caf2516@kernel.org> <20250516-work-coredump-socket-v8-5-664f3caf2516@kernel.org>
-In-Reply-To: <20250516-work-coredump-socket-v8-5-664f3caf2516@kernel.org>
-From: Jann Horn <jannh@google.com>
-Date: Fri, 16 May 2025 16:37:49 +0200
-X-Gm-Features: AX0GCFsuzCC3CmbLLxfWpRPaI0gyUSqgeVs70kejvwFPyqgeFolUzQNjXbEK5Yo
-Message-ID: <CAG48ez2ewzKuVoUQp=nyMiVS9euPts3fKaexwXMGhVefQXqoig@mail.gmail.com>
-Subject: Re: [PATCH v8 5/9] pidfs, coredump: add PIDFD_INFO_COREDUMP
-To: Christian Brauner <brauner@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Eric Dumazet <edumazet@google.com>, Oleg Nesterov <oleg@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, David Rheinsberg <david@readahead.eu>, 
-	Jakub Kicinski <kuba@kernel.org>, Jan Kara <jack@suse.cz>, 
-	Lennart Poettering <lennart@poettering.net>, Luca Boccassi <luca.boccassi@gmail.com>, 
-	Mike Yuan <me@yhndnzj.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	=?UTF-8?Q?Zbigniew_J=C4=99drzejewski=2DSzmek?= <zbyszek@in.waw.pl>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, 
-	Alexander Mikhalitsyn <alexander@mihalicyn.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, May 16, 2025 at 1:26=E2=80=AFPM Christian Brauner <brauner@kernel.o=
-rg> wrote:
-> Extend the PIDFD_INFO_COREDUMP ioctl() with the new PIDFD_INFO_COREDUMP
-> mask flag. This adds the @coredump_mask field to struct pidfd_info.
->
-> When a task coredumps the kernel will provide the following information
-> to userspace in @coredump_mask:
->
-> * PIDFD_COREDUMPED is raised if the task did actually coredump.
-> * PIDFD_COREDUMP_SKIP is raised if the task skipped coredumping (e.g.,
->   undumpable).
-> * PIDFD_COREDUMP_USER is raised if this is a regular coredump and
->   doesn't need special care by the coredump server.
-> * PIDFD_COREDUMP_ROOT is raised if the generated coredump should be
->   treated as sensitive and the coredump server should restrict to the
->   generated coredump to sufficiently privileged users.
->
-> The kernel guarantees that by the time the connection is made the all
-> PIDFD_INFO_COREDUMP info is available.
->
-> Acked-by: Luca Boccassi <luca.boccassi@gmail.com>
-> Reviewed-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
+Introduce the ICE_AQC_PORT_OPT_MAX_LANE_40G constant and update the code
+to process this new option in both the devlink and the Admin Queue Command
+GET PORT OPTION (opcode 0x06EA) message, similar to existing constants like
+ICE_AQC_PORT_OPT_MAX_LANE_50G, ICE_AQC_PORT_OPT_MAX_LANE_100G, and so on.
 
-Reviewed-by: Jann Horn <jannh@google.com>
+This feature allows the driver to correctly report configuration options
+for 2x40G on ICX-D LCC and other cards in the future via devlink.
 
-Thanks for clarifying the comments!
+Example command:
+ devlink port split pci/0000:01:00.0/0 count 2
+
+Example dmesg:
+ ice 0000:01:00.0: Available port split options and max port speeds (Gbps):
+ ice 0000:01:00.0: Status  Split      Quad 0          Quad 1
+ ice 0000:01:00.0:         count  L0  L1  L2  L3  L4  L5  L6  L7
+ ice 0000:01:00.0:         2      40   -   -   -  40   -   -   -
+ ice 0000:01:00.0:         2      50   -  50   -   -   -   -   -
+ ice 0000:01:00.0:         4      25  25  25  25   -   -   -   -
+ ice 0000:01:00.0:         4      25  25   -   -  25  25   -   -
+ ice 0000:01:00.0: Active  8      10  10  10  10  10  10  10  10
+ ice 0000:01:00.0:         1     100   -   -   -   -   -   -   -
+
+Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+---
+v2->v3 - fix indent
+v1->v2 - fix typo in commit message
+---
+ drivers/net/ethernet/intel/ice/devlink/port.c   | 2 ++
+ drivers/net/ethernet/intel/ice/ice_adminq_cmd.h | 1 +
+ drivers/net/ethernet/intel/ice/ice_common.c     | 2 +-
+ drivers/net/ethernet/intel/ice/ice_ethtool.c    | 3 ++-
+ 4 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/devlink/port.c b/drivers/net/ethernet/intel/ice/devlink/port.c
+index 767419a..63fb36f 100644
+--- a/drivers/net/ethernet/intel/ice/devlink/port.c
++++ b/drivers/net/ethernet/intel/ice/devlink/port.c
+@@ -30,6 +30,8 @@ static const char *ice_devlink_port_opt_speed_str(u8 speed)
+ 		return "10";
+ 	case ICE_AQC_PORT_OPT_MAX_LANE_25G:
+ 		return "25";
++	case ICE_AQC_PORT_OPT_MAX_LANE_40G:
++		return "40";
+ 	case ICE_AQC_PORT_OPT_MAX_LANE_50G:
+ 		return "50";
+ 	case ICE_AQC_PORT_OPT_MAX_LANE_100G:
+diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+index bdee499..2ff141a 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
++++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+@@ -1672,6 +1672,7 @@ struct ice_aqc_get_port_options_elem {
+ #define ICE_AQC_PORT_OPT_MAX_LANE_50G	6
+ #define ICE_AQC_PORT_OPT_MAX_LANE_100G	7
+ #define ICE_AQC_PORT_OPT_MAX_LANE_200G	8
++#define ICE_AQC_PORT_OPT_MAX_LANE_40G	9
+ 
+ 	u8 global_scid[2];
+ 	u8 phy_scid[2];
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index 4fedf01..2519ad6 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -4080,7 +4080,7 @@ int ice_get_phy_lane_number(struct ice_hw *hw)
+ 
+ 		speed = options[active_idx].max_lane_speed;
+ 		/* If we don't get speed for this lane, it's unoccupied */
+-		if (speed > ICE_AQC_PORT_OPT_MAX_LANE_200G)
++		if (speed > ICE_AQC_PORT_OPT_MAX_LANE_40G)
+ 			continue;
+ 
+ 		if (hw->pf_id == lport) {
+diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+index 6488151..f2c0b28 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
++++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+@@ -667,7 +667,8 @@ static int ice_get_port_topology(struct ice_hw *hw, u8 lport,
+ 
+ 		if (max_speed == ICE_AQC_PORT_OPT_MAX_LANE_100G)
+ 			port_topology->serdes_lane_count = 4;
+-		else if (max_speed == ICE_AQC_PORT_OPT_MAX_LANE_50G)
++		else if (max_speed == ICE_AQC_PORT_OPT_MAX_LANE_50G ||
++			 max_speed == ICE_AQC_PORT_OPT_MAX_LANE_40G)
+ 			port_topology->serdes_lane_count = 2;
+ 		else
+ 			port_topology->serdes_lane_count = 1;
+-- 
+2.49.0
+
 
