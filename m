@@ -1,119 +1,145 @@
-Return-Path: <netdev+bounces-191023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191004-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 829BEAB9B3D
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 13:40:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EE38AB9AB7
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 13:00:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 686A1A0524F
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 11:39:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95E6D17D194
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 11:00:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCEE123BCEE;
-	Fri, 16 May 2025 11:39:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41076239099;
+	Fri, 16 May 2025 10:59:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AZSmzL5Y"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="N8yXsf+x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F370C23AE87
-	for <netdev@vger.kernel.org>; Fri, 16 May 2025 11:39:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76DF52376E1;
+	Fri, 16 May 2025 10:59:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747395562; cv=none; b=Te6ywDNiBXolhS2J0zDWBv258Eug6ZSxmLX+GDRIpKSCE12lSe+rhCwCmEOCpxU/MAlasPVRfnObsrC6p0z2uMuyJ1azFE2fMUUwjz/kRJg4X2/U+u7tPZuptiynkOG4Yfjfa9GTtLLJnFRJgfzizNK/AArKsawE/R5MUDtHJHA=
+	t=1747393194; cv=none; b=mMeCWskXm+L+RKjiVKDeT0BYDIeBJ+YcctEkx3go19V4ORuP4pI5eGjE3lDXKuyjbBaSF9MAoxtchq22oKiJLpQDuRACJ5ipS0PtvmkvE/w5hbHdkPGLGIgkaeIJ0oh/EmomJQOK+DjiiXp6VLbdPi4e+3y7LkgMe8InIojq5aw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747395562; c=relaxed/simple;
-	bh=cIjuSZ1+ekTOI2uZ7Dd2nPT7ASNNWPFnUOJTz2LIQr4=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=n7ToOy3aLEHV6GgUcV4XNon9G9i9OQP/GIhGDvppG9Y5Cmf2SfXoq0Rz/efEfkT+Vt+CBqzsDMYNmxRLWAQXByiVnLIqY2snh5A6XrBGn8NwQdmb2BntnLCIAHHkDNIE2CigvY8lKiAqZHj3+Meh91DblwAeANI7qJR1a2jH7q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AZSmzL5Y; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-442ea95f738so14989675e9.3
-        for <netdev@vger.kernel.org>; Fri, 16 May 2025 04:39:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747395559; x=1748000359; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=cIjuSZ1+ekTOI2uZ7Dd2nPT7ASNNWPFnUOJTz2LIQr4=;
-        b=AZSmzL5YUodwq57ppxPvXue07xPt2l4+k4N/tyV/f/1sGRWoncjbS/h2gqqFDxbtzX
-         PCCtHLWkeNz4FX4odX1RAu8/PxcLso2yfGFVWfiXPMz94NZAtNsZYW1UiTgGNl6LvqCb
-         Sl+1LHKWF3yWHNRpBNCCSWuJypP//gdN3t2Ji5An8BFbhU+NRB5XSKL5b3M+CctkUA0o
-         THBqzWUwa/hWRe2szyU64S3l2yzgEQaKDBZH8HRvFkfVsRGTUs2vULFQFqcy7C72Cp8a
-         IdBOE55rwRsUjG+JVRWw7Ik2/7kAo22gl3n0tl+FEJGcRmDIMIxfRFAn1yBL83TvNNfs
-         EFMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747395559; x=1748000359;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cIjuSZ1+ekTOI2uZ7Dd2nPT7ASNNWPFnUOJTz2LIQr4=;
-        b=a2SM9YvJHqA4RoipzRJgbKxz2ftB8WBmrXoVQllEB7+6oSghwV5IDUS9cJDANu23kC
-         D7sLU4iYf+H0rvJHr+wRlxzBnczB3g+FbedwVLQK5UnsxiPKwVbFwaKirna0fsI2eQt2
-         hbiecR/I+Tx1MlO/ICsOFe9N3lY1weh1Ki14LdZam/wJTy6w16mBWrb0lAd1nYslUjy8
-         mtF0Ee6aGPDht3kw7PdLCHTigOhsvTX1cqPWD+jxHoPG47QMbNw5sCnoHjXJKyC1FIRD
-         9vr+tGHVsVybjlebc7LaWNJs71L4bxNEYN0h+alkoZ3H3/x0NxFwB5HDZkHSRNS4cJ6q
-         PT9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXLoe4WpSuk9Lvi1Y0BwBvRXSIdkHcg5RnsGasxNiqSLt+WCds9sFRDqSRBRlwbeyMSyGzxl4w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywjtzz7hPx1J2MpSy3Sx/nMf1Wz/OTlhdpIB0+dIGr8VZWiTb81
-	kZWLxbp73+W6Jki+WafDHcmx38BhnffFXDtCKqDz2+cG7BP5pwh2nmh2
-X-Gm-Gg: ASbGncudwgkTCjd7MmMbFG0xAjMA1qzpMni4AlK47TBUZ88s6NysOIQXFoue8KZimTD
-	AlNlgAI5JMdHLEqsCz6ipLaVxOfccUcb2b1Whw2qWUaSAARhHAlAVUwdin6TSw4Biy5PjAlIDcN
-	rZNJcDIeZNIbTsGkObEwKel39zESgl+Dx4hTbgj41ure7FR/XyF36S82ilNP+pjsmNeimaR+zrM
-	bDA97Lg64jlB6oLkBMBATL1RiQcTPHxjFoKShkSpNxyQjnPUrQda3+nesvuJhtjx7LdQludSOO8
-	7SLILPo6UcehLWQvD503WbyW8pAImMy4MvjVXLRS+tNqZLODLw4B6Cb02EHMaCZ6
-X-Google-Smtp-Source: AGHT+IHHudZnnihCm10fRZYorIjV2thbHFFJy+N+89a7hnu2d7fs4mlKLN6BLYMCMCcOMjJwZbFlAA==
-X-Received: by 2002:a05:600c:3114:b0:440:61eb:2ce5 with SMTP id 5b1f17b1804b1-442fd64e335mr32795335e9.17.1747395559039;
-        Fri, 16 May 2025 04:39:19 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:fc98:7863:72c2:6bab])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442f39e84acsm106617245e9.25.2025.05.16.04.39.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 May 2025 04:39:18 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
-  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
-  daniel@iogearbox.net,  nicolas.dichtel@6wind.com,
-  jacob.e.keller@intel.com
-Subject: Re: [PATCH net-next 7/9] tools: ynl: submsg: reverse parse / error
- reporting
-In-Reply-To: <20250515231650.1325372-8-kuba@kernel.org> (Jakub Kicinski's
-	message of "Thu, 15 May 2025 16:16:48 -0700")
-Date: Fri, 16 May 2025 11:58:41 +0100
-Message-ID: <m2ldqwn7oe.fsf@gmail.com>
-References: <20250515231650.1325372-1-kuba@kernel.org>
-	<20250515231650.1325372-8-kuba@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1747393194; c=relaxed/simple;
+	bh=ceUyDP/AgA4ZYlbwY1o6qyfuzkXQjy3vPbxZDljfKSI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=oA4cqxrd6OduWpnyOQKB1D/SOuBTtrLZChmW1Ir5oufR+fD3iRffAHgq//9dqo11+8n5N4ymr5BdXt3etVWr5F4CkH2rgjg41EMX3eIYwxzmmlmutZDdjIS+i7oDXWZQfTgHDjmaYLTMG+ekobk0ZSwYWnsMJnjQUs1Um0xhh6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=N8yXsf+x; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54G40WwO001795;
+	Fri, 16 May 2025 10:59:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	xhaje0yiLVs8KTTuPDwpOOOKiFeWxe8la47MOEnCjPY=; b=N8yXsf+xUqA9EoaK
+	6EjIH2jJmh0YJV9bc/ogXPhMMXeWhKt0gqo2ne7TveBjXd5cthxLh3iU1SC83aFM
+	VlNOQDFOq5/Yk/qmMG7WhVDDbezuQt8BBTC7aaPxZXPrZxLyMrYhxzRIBI4LcFps
+	Optdn1xjHwvzkcfOHs5xQxzfQ5y7Taqxiud0ZqSJwfINricfN/WqddCxbEch+R+Z
+	zUQ+PhNNQ9EV1eppZoh4tCSfBrrszfAUnT8pjusjyRwI3gEloxplso9kVRZkrXYc
+	qFnwOmoD8rsE1CoGL4I1Wfv3x0rbNm1H4aGC71Yj71kAsYPkZbdat/yp0603CfEF
+	KyWr/w==
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 46mbcrhht8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 16 May 2025 10:59:35 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 54GAxYV7007898
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 16 May 2025 10:59:34 GMT
+Received: from [10.253.77.60] (10.80.80.8) by nasanex01b.na.qualcomm.com
+ (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 16 May
+ 2025 03:59:28 -0700
+Message-ID: <1b209aa2-6399-40d5-9fa9-70a712a57aa2@quicinc.com>
+Date: Fri, 16 May 2025 18:59:26 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 00/14] Add PPE driver for Qualcomm IPQ9574 SoC
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Paolo Abeni
+	<pabeni@redhat.com>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>, Lei Wei
+	<quic_leiwei@quicinc.com>,
+        Suruchi Agarwal <quic_suruchia@quicinc.com>,
+        Pavithra R <quic_pavir@quicinc.com>, Simon Horman <horms@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>, Kees Cook <kees@kernel.org>,
+        "Gustavo A. R.
+ Silva" <gustavoars@kernel.org>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-hardening@vger.kernel.org>,
+        <quic_kkumarcs@quicinc.com>, <quic_linchen@quicinc.com>,
+        <srinivas.kandagatla@linaro.org>, <bartosz.golaszewski@linaro.org>,
+        <john@phrozen.org>
+References: <20250513-qcom_ipq_ppe-v4-0-4fbe40cbbb71@quicinc.com>
+ <20250514195821.56df5c60@kernel.org>
+ <27cf4b47-2ded-4a37-9717-1ede521d8639@quicinc.com>
+ <20250515072457.55902bfd@kernel.org>
+Content-Language: en-US
+From: Luo Jie <quic_luoj@quicinc.com>
+In-Reply-To: <20250515072457.55902bfd@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: pfhM-R8RXIFjm-mBw1jDByh1m__v2JJD
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTE2MDEwNCBTYWx0ZWRfX8NcUXlfSgtIq
+ BsgRb/eajTwvEIyApnmNql3ET2SJJy+asmjXa+Rv2Hvz6xEfeBDF5URip8FI8aIBEIjs02xbj0o
+ 7LmKKQFAFoJq8EPy7ToHLE/+quoMWEPs/BuBL0OgHY8ZZBBH/genym4AVieq37OodVUgmRr6RHK
+ adADn0NCitY6bIFzYHAnKczZ5kejOoZkk867L8PND2nkkTlxqe5Q9zz7e4OhA/rXQqrCj63RoMN
+ Enpd2ULUasfP7qXiw1zIxK12TjRwdJhlBOhTLxQenRiiucmm8pTr7tFwGzMoj+w0uYLZTe+8K0k
+ CiJ5Jy1DlcEILE8R16yiQYLWLnFdD7s20cVqDt6JMcCVCGDTBxSCJ+oG+wyvYfca/ly9EIsesB9
+ MmQWt6IVKNNbcNypJokSAg/gkjW9NiMaURe2I5nRo62ELazwV/GrQkPsmlH9wcSSfj7+vFYR
+X-Authority-Analysis: v=2.4 cv=K7UiHzWI c=1 sm=1 tr=0 ts=68271a97 cx=c_pps
+ a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10
+ a=Ht6I3Yxflf12Oa7PA1sA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: pfhM-R8RXIFjm-mBw1jDByh1m__v2JJD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-16_04,2025-05-16_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 priorityscore=1501 mlxscore=0 suspectscore=0 malwarescore=0
+ phishscore=0 mlxlogscore=906 clxscore=1015 bulkscore=0 impostorscore=0
+ lowpriorityscore=0 spamscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505070000
+ definitions=main-2505160104
 
-Jakub Kicinski <kuba@kernel.org> writes:
 
-> Reverse parsing lets YNL convert bad and missing attr pointers
-> from extack into a string like "missing attribute nest1.nest2.attr_name".
-> It's a feature that's unique to YNL C AFAIU (even the Python YNL
-> can't do nested reverse parsing). Add support for reverse-parsing
-> of sub-messages.
->
-> To simplify the logic and the code annotate the type policies
-> with extra metadata. Mark the selectors and the messages with
-> the information we need. We assume that key / selector always
-> precedes the sub-message while parsing (and also if there are
-> multiple sub-messages like in rt-link they are interleaved
-> selector 1 ... submsg 1 ... selector 2 .. submsg 2, not
-> selector 1 ... selector 2 ... submsg 1 ... submsg 2).
->
-> The rt-link sample in a subsequent changes shows reverse parsing
-> of sub-messages in action.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+On 5/15/2025 10:24 PM, Jakub Kicinski wrote:
+> On Thu, 15 May 2025 22:19:11 +0800 Luo Jie wrote:
+>> However, from the patchwork result as below, it seems the dependent
+>> patch series (for FIELD_MODIFY() macro) did not get picked to validate
+>> the PPE driver patch series together. This dependency is mentioned in
+>> the cover letter. Could you advise what could be wrong here, which is
+>> preventing the dependent patch to be picked up? Thanks.
+> 
+> Please try to read more about kernel development process.
+> These patches are not in Linus's tree or the networking tree.
+> If you want to use them you have to wait with your submission
+> until after the next merge window.
+
+OK, understand now. I will push the new version after the next
+merge window. Thanks for the information.
 
