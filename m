@@ -1,97 +1,85 @@
-Return-Path: <netdev+bounces-191102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4131CABA174
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 19:01:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F1A2ABA191
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 19:06:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00EBE162C08
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 16:59:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C727216594A
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 17:05:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC58F253347;
-	Fri, 16 May 2025 16:59:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7525324168A;
+	Fri, 16 May 2025 17:05:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=wizmail.org header.i=@wizmail.org header.b="BWJIchwO";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wizmail.org header.i=@wizmail.org header.b="gD4HiA6b"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VZvlNgoC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.wizmail.org (mx.wizmail.org [85.158.153.28])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F3624729D;
-	Fri, 16 May 2025 16:58:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.158.153.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 500B126B0AD
+	for <netdev@vger.kernel.org>; Fri, 16 May 2025 17:05:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747414742; cv=none; b=aD5Ro5pKWpq/LwGFQduKkHnyaPZHYuzCHQ23lzP4aCQRs9lCiWPDsySt3w1BS+7iQAedSJ99u2TJ3xU81k5eRooUNZ6EjkkGJyoygbk83B5wAK6ZiepirG1obX9k79ycT9Qhsb0BGtZBHBjgO+g22gl/2SqUtGC9lhbLeOwLseI=
+	t=1747415143; cv=none; b=NKDdtsbFTgYo82f2THHWDdJpxB2PNZXEmcLUD5R6DiVZ81HdrTdYjiyIH/KwPe5cigt/hJURFeXZHjJVloQxcLAULDmDbP+2UN3OxzWrilkNOxBKJOBOLIdszNjsWa0A2Owi3VYIrx9350A2W5v05ptxraQdpfMdWob3fdjss1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747414742; c=relaxed/simple;
-	bh=5YgBGUbiic/MC1/wwtYMy0uYy/LVurYgeVZrKfaJTgs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OSJaPInP2it0ytunOMGyr+j3f+acho/cPQv+yW7zm8g+KxtN/NZUcplY89TmbnPBKsNikd0ePMCTqX8/VG9yGKVrxKizXB4rVT7XKxh/HInmm80HbD3xqDtBPZeruAR7pnDgtGe5c73AHg+yQme6f4xFjA6oPkZnutAg80Nxvhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exim.org; spf=fail smtp.mailfrom=exim.org; dkim=permerror (0-bit key) header.d=wizmail.org header.i=@wizmail.org header.b=BWJIchwO; dkim=pass (2048-bit key) header.d=wizmail.org header.i=@wizmail.org header.b=gD4HiA6b; arc=none smtp.client-ip=85.158.153.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exim.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=exim.org
-DKIM-Signature: v=1; a=ed25519-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=wizmail.org; s=e202001; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:
-	References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:List-Post:
-	List-Owner:List-Archive:Autocrypt;
-	bh=gJewzccq10pkwVoPvyiEPBFkI4/Mxugn3vSYlvK9elE=; b=BWJIchwOvKZ/kc1sqSPdWJ6ofU
-	l0MY8D+Ri53FmmsMmfRbKVVz3m7Edb7qyEUT8MguxhYYT7Ma6944ubOkKxDw==;
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=wizmail.org
-	; s=r202001; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID:From:Sender:Reply-To:
-	Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:
-	References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:List-Post:
-	List-Owner:List-Archive:Autocrypt;
-	bh=gJewzccq10pkwVoPvyiEPBFkI4/Mxugn3vSYlvK9elE=; b=gD4HiA6bd9uTv6PS0LMbZFone5
-	Bi8UgNK3M2eID2cG+vJYwJfHNiNr7/Vb1kiZW+JK2DAvUw+12LNFyZQ+NF3Fl8hhYIvt9yNnhm13K
-	xTe7U4YgnV83A8ONqsN+C+0kIwP/PiuaOIxdoA8gAquCAFLd2r06L5J8SmMb9qY/QHoivLuTDz5Gx
-	c7vbsgZut7iEuYS69XsJPcW1M9tlQMn6TZsTdhwJPcDhwOsh25TbUA8oW2WYvFc0x7RF6hevX0i3d
-	vIxuJbjmnMNJSmEYcnyzwybUpTIyOf2yKi1qjff+8BwaCSCiGZ6cI038IJgNzL4l8Y8XTAyd8FDT2
-	HFcIwaHQ==;
-Authentication-Results: wizmail.org;
-	iprev=pass (hellmouth.gulag.org.uk) smtp.remote-ip=85.158.153.62;
-	auth=pass (PLAIN) smtp.auth=jgh@wizmail.org
-Received: from hellmouth.gulag.org.uk ([85.158.153.62] helo=[192.168.0.17])
-	by wizmail.org (Exim 4.98.115)
-	(TLS1.3) tls TLS_AES_128_GCM_SHA256
-	with esmtpsa
-	id 1uFyOe-000000074ht-2YEE
-	(return-path <jgh@exim.org>);
-	Fri, 16 May 2025 16:58:56 +0000
-Message-ID: <966fc020-094e-42e4-8c56-1625f7175737@exim.org>
-Date: Fri, 16 May 2025 17:58:56 +0100
+	s=arc-20240116; t=1747415143; c=relaxed/simple;
+	bh=3yZIo7O0CqhoDDXn9wGmnfNYRGBryVN2ivhz3+gAty8=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=finkvGNX5YEFsaae8AIeDL1l4N2ImtdwunL7N4Y9FXYllknrAgvcVxwo4chz3rvEDbJAe8A5WYAtG6EKIYzG6E3JGcezdlyzs/tXrU6s0QykUbl2rIDUfo3mNU9JNXBx9x9URtsTv0Y4KETcp0jWfoPPhnpAWzRmiv4j0c0nQ3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VZvlNgoC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB456C4CEE4;
+	Fri, 16 May 2025 17:05:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747415142;
+	bh=3yZIo7O0CqhoDDXn9wGmnfNYRGBryVN2ivhz3+gAty8=;
+	h=Date:From:To:Subject:From;
+	b=VZvlNgoCG7gIR15dPiujrlhqwbeVb6Ip62n7BUrmc2CNr/0zW24AksNt+zf9uxAkW
+	 NBVroOshQKlf9hG74lMjXjGj7pE09tHUur16Ys4V8kUFrvM9myXAuE2ZkjHPE6OCT9
+	 b+sszE+AVXXnqFhTJ4rRGI6YFQxE4bbctOdQTxvZuVt+H5JiBSHgmoJaSeJfb9zxst
+	 tAbPjaj6a1roz3uwjVhr2m206fIZiWcZ/6Hm5gOf/kbPS4U6yVrbk4jDAw+r3H4n9G
+	 pUhckiiwwDUux5yvpV+96LFp3Im9nJOGggQvXJxB948ksYC8t3DCKb/gK4/QpQWtnD
+	 YBiWygDIrkPig==
+Date: Fri, 16 May 2025 10:05:42 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, netdev@vger.kernel.org
+Subject: [TEST]  net/bind_wildcard flakiness
+Message-ID: <20250516100542.67c276ec@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/6] tcp: support preloading data on a listening socket
-To: netdev@vger.kernel.org
-Cc: linux-api@vger.kernel.org, edumazet@google.com, ncardwell@google.com
-References: <cover.1747409911.git.jgh@exim.org>
-From: Jeremy Harris <jgh@exim.org>
-Content-Language: en-GB
-In-Reply-To: <cover.1747409911.git.jgh@exim.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Pcms-Received-Sender: hellmouth.gulag.org.uk ([85.158.153.62] helo=[192.168.0.17]) with esmtpsa
 
-On 2025/05/16 4:54 PM, Jeremy Harris wrote:
-> Support write to a listen TCP socket, for immediate
-> transmission on passive connection establishments.
+Hi!
 
-This series should have included "net-next" in their Subjects.
--- 
-Apologies,
-   Jeremy
+The bind_wildcard used to be rock solid, no flakes in last 1000 runs,
+but then around the time Eric posted his Rx optimizations we hit one
+flake, and now we hit another:
+
+List:
+https://netdev.bots.linux.dev/contest.html?test=bind-wildcard&executor=vmksft-net&pass=0
+
+Outputs:
+https://netdev-3.bots.linux.dev/vmksft-net/results/122022/14-bind-wildcard/stdout
+https://netdev-3.bots.linux.dev/vmksft-net/results/123463/14-bind-wildcard/stdout
+
+One does:
+
+# 0.21 [+0.00] # bind_wildcard.c:768:reuseaddr:Expected ret (-1) == 0 (0)
+# 0.21 [+0.00] # reuseaddr: Test terminated by assertion
+# 0.21 [+0.00] #          FAIL  bind_wildcard.v6_any_only_v6_v4mapped_any.reuseaddr
+
+The other:
+
+# 0.25 [+0.00] # bind_wildcard.c:775:plain:Expected ret (-1) == 0 (0)
+# 0.25 [+0.00] # plain: Test terminated by assertion
+# 0.25 [+0.00] #          FAIL  bind_wildcard.v6_local_v6_v4mapped_any.plain
+
+
+The only change on the infra side is that I increased disk IO cap,
+so the builds are now faster.
 
