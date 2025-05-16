@@ -1,150 +1,267 @@
-Return-Path: <netdev+bounces-191193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8584ABA5ED
-	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 00:34:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73FB3ABA5F1
+	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 00:35:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB00F4E2E47
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 22:34:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53ABBA02FAC
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 22:35:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FA5820B7FE;
-	Fri, 16 May 2025 22:34:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59C842343C6;
+	Fri, 16 May 2025 22:35:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ww0iUgyp"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="EDhrE9S1"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3EB231841
-	for <netdev@vger.kernel.org>; Fri, 16 May 2025 22:34:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 312EC6A8D2;
+	Fri, 16 May 2025 22:35:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747434889; cv=none; b=JslDrasZyp0UEiS00WqXE9He8ILIuAsOKLh+izDp9HdkEtgl1hxoipJF+4juZSjF2EHN7CM+pq1nPvhfpHTemfuw6M3v0FbR433gC2IOapMgCbSqDYRycrRiZCrFtLasGt7puGrEnLNeY7ukyHt+zg3jCit1qc8CxAiL1K77wEM=
+	t=1747434934; cv=none; b=iVCVRB17IEwBycAEVdc0b3NKfrXCRJifKOX+e2v1RDboQlogEYf18u/E/t79psV6P9SpLwCytanOIyOyyOHG2C1uJTtRUKJjpBMDvFf/z5SQnBFfNTLfsxGNdtrygNySPJXQQvNWPrvdlF06WYHtHuu/huvBePgZM7cCP9ngj4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747434889; c=relaxed/simple;
-	bh=1Q/aHYWlKWrydy3cLVK8Qq4aGK0NaMxdS1gS1zbr5ZA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XIsLtMuh25DVV9neEXGvj0STS039cfsIM67ImrxXixRx5NlYqICtMJwR1E9chv9IrTNn4UCSY09jrau8hldu5fvYsqByBZc6IdS/IYs8Uw5EOit1HINUgOs9NpRg4Xs4FWQ0wn3kdocXZb4xHLUi/5anWVWAeNvN6dr49L7Qx90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ww0iUgyp; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <60092fac-2c8a-4076-9130-8c3e41cba040@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1747434875;
+	s=arc-20240116; t=1747434934; c=relaxed/simple;
+	bh=cMw4UsOINRnDBGrLZw8A/tkg1qlBAC7P1rGGcrLjJuY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fCn1ZJC6mt1oYsv6P4XTYUrJ1sRmbPcWHh+wmU4PIOndzRyx+1K25YGwCUpXCChwQPAIWLSuh9TGeioiS6t902MyMus+n6nNQDIjjK3pqgh9LcTm48deEb2gX1h9h3jcklnNJRFH7eRUkocxol+ZUxvtLAAUwvcl86W8JhM3uQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=EDhrE9S1; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 4CF4143137;
+	Fri, 16 May 2025 22:35:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1747434929;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=15iMtyH1jixdvcvcU/HjXnbNttGRzvlXzQGL31LvRTI=;
-	b=ww0iUgypAP2aPjYj7IgpdYQ3MYIXgkzo3/tL/pdsSxrOAZUMx8ADEaxfUHAJDsUi0ImibX
-	A3IJHLuRO/48ajbOlSc499S4gwRPQAv80IwrVt/vh2c3Tp0/RR62DKrbkbi+MSt3p/Cdfa
-	rtF6oWO7RaRlCJkA+z3d/iFxYMKycxc=
-Date: Fri, 16 May 2025 15:34:26 -0700
+	bh=ypgk7XZohQ5Mo5azVnaHdOVehBPBVRry66ULOrpPDPI=;
+	b=EDhrE9S15SmIv1BUv1fKwGYuyNZdoxIckQf2PeRoi/QD12Nx8TePdCSkb3j/KDPqYDInw4
+	iLE6Rk0xxf676bV5/ZeUgtEoNaS1oEXBi68IuCQ2nrWcMA0urVB/v/MB6j7HGChsS9sD8+
+	YhJ9+gAH82OPTs2ZcEvcDE98DTBv5e3TpjEzYqWxYyTZt+vM53s6s9blVF5TuJYzioAlkn
+	UqN4S0jch6WZ4gUKBsIj/sOnYa2HPpvhqkrjdthaohCydHjva/X4JkjdUF/NpxGepU1UJd
+	bdBHUCHL6XL5OXKlC40GG9GyE9kyZtGIhYZFIHf7hzfAiy/wwqMCqMM60tq2UA==
+Date: Sat, 17 May 2025 00:35:25 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Piotr Kubik <piotr.kubik@adtran.com>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>, Oleksij Rempel
+ <o.rempel@pengutronix.de>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [EXTERNAL]Re: [PATCH net-next 1/2] dt-bindings: net: pse-pd:
+ Add bindings for Si3474 PSE controller
+Message-ID: <20250517003525.2f6a5005@kmaincent-XPS-13-7390>
+In-Reply-To: <dccd0e78-81c6-422c-9f8e-11d3e5d55715@adtran.com>
+References: <bf9e5c77-512d-4efb-ad1d-f14120c4e06b@adtran.com>
+	<259ad93b-9cc2-4b5d-8323-b427417af747@adtran.com>
+	<f8eb7131-5a5d-47ec-8f3b-d30cdb1364b5@kernel.org>
+	<dccd0e78-81c6-422c-9f8e-11d3e5d55715@adtran.com>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next/net v3 2/5] bpf: Add mptcp_subflow bpf_iter
-To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Martin KaFai Lau <martin.lau@kernel.org>
-References: <20250320-bpf-next-net-mptcp-bpf_iter-subflows-v3-0-9abd22c2a7fd@kernel.org>
- <20250320-bpf-next-net-mptcp-bpf_iter-subflows-v3-2-9abd22c2a7fd@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20250320-bpf-next-net-mptcp-bpf_iter-subflows-v3-2-9abd22c2a7fd@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdefudefleeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgfdutdefvedtudegvefgvedtgfdvhfdtueeltefffefffffhgfetkedvfeduieeinecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppedvrgdtudemtggsudeimeejtgemfegrtdehmegviegvvdemugelgehfmeegleehugemugdugeegnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduieemjegtmeefrgdtheemvgeivgdvmeguleegfhemgeelhegumeguudeggedphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudehpdhrtghpthhtohepphhiohhtrhdrkhhusghikhesrgguthhrrghnrdgtohhmpdhrtghpthhtohepkhhriihksehkvghrnhgvlhdrohhrghdprhgtphhtthhopehordhrvghmphgvl
+ hesphgvnhhguhhtrhhonhhigidruggvpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On 3/20/25 10:48 AM, Matthieu Baerts (NGI0) wrote:
-> From: Geliang Tang <tanggeliang@kylinos.cn>
-> 
-> It's necessary to traverse all subflows on the conn_list of an MPTCP
-> socket and then call kfunc to modify the fields of each subflow. In
-> kernel space, mptcp_for_each_subflow() helper is used for this:
-> 
-> 	mptcp_for_each_subflow(msk, subflow)
-> 		kfunc(subflow);
-> 
-> But in the MPTCP BPF program, this has not yet been implemented. As
-> Martin suggested recently, this conn_list walking + modify-by-kfunc
-> usage fits the bpf_iter use case.
-> 
-> So this patch adds a new bpf_iter type named "mptcp_subflow" to do
-> this and implements its helpers bpf_iter_mptcp_subflow_new()/_next()/
-> _destroy(). And register these bpf_iter mptcp_subflow into mptcp
-> common kfunc set. Then bpf_for_each() for mptcp_subflow can be used
-> in BPF program like this:
-> 
-> 	bpf_for_each(mptcp_subflow, subflow, msk)
-> 		kfunc(subflow);
-> 
-> Suggested-by: Martin KaFai Lau <martin.lau@kernel.org>
-> Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-> Reviewed-by: Mat Martineau <martineau@kernel.org>
-> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-> ---
-> Notes:
->   - v2:
->     - Add BUILD_BUG_ON() checks, similar to the ones done with other
->       bpf_iter_(...) helpers.
->     - Replace msk_owned_by_me() by sock_owned_by_user_nocheck() and
->       !spin_is_locked() (Martin).
->   - v3:
->     - Switch parameter from 'struct mptcp_sock' to 'struct sock' (Martin)
->     - Remove unneeded !msk check (Martin)
->     - Remove locks checks, add msk_owned_by_me for lockdep (Martin)
->     - The following note and 2 questions have been added below.
-> 
-> This new bpf_iter will be used by our future BPF packet schedulers and
-> path managers. To see how we are going to use them, please check our
-> export branch [1], especially these two commits:
-> 
->   - "bpf: Add mptcp packet scheduler struct_ops": introduce a new
->     struct_ops.
->   - "selftests/bpf: Add bpf_burst scheduler & test": new test showing
->     how the new struct_ops and bpf_iter are being used.
-> 
-> [1] https://github.com/multipath-tcp/mptcp_net-next/commits/export
-> 
-> @BPF maintainers: we would like to allow this new mptcp_subflow bpf_iter
-> to be used with struct_ops, but only with the two new ones we are going
-> to introduce that are specific to MPTCP, and with not others struct_ops
-> (TCP CC, sched_ext, etc.). We are not sure how to do that. By chance, do
-> you have examples or doc you could point to us to have this restriction
-> in place, please?
+On Thu, 15 May 2025 15:20:40 +0000
+Piotr Kubik <piotr.kubik@adtran.com> wrote:
 
-The bpf_qdisc.c has done that. Take a look at the "bpf_qdisc_kfunc_filter()".
+> On 5/13/25 10:24, Krzysztof Kozlowski wrote:
+> > On 13/05/2025 00:05, Piotr Kubik wrote: =20
+> >> +
+> >> +maintainers:
+> >> +  - Piotr Kubik <piotr.kubik@adtran.com>
+> >> +
+> >> +allOf:
+> >> +  - $ref: pse-controller.yaml#
+> >> +
+> >> +properties:
+> >> +  compatible:
+> >> +    enum:
+> >> +      - skyworks,si3474
+> >> +
+> >> +  reg-names:
+> >> +    items:
+> >> +      - const: main
+> >> +      - const: slave =20
+> >=20
+> > s/slave/secondary/ (or whatever is there in recommended names in coding
+> > style)
+> >  =20
+>=20
+> Well I was thinking about it and decided to use 'slave' for at least two
+> reasons:
+> - si3474 datasheet calls the second part of IC (we configure it here) thi=
+s way
+> - description of i2c_new_ancillary_device() calls this device explicitly
+> slave multiple times
 
-It is in net-next and bpf-next/net.
+It is better to avoid the usage of such word in new code. Secondary suits w=
+ell
+for replacement.
 
-> 
-> Also, for one of the two future MPTCP struct_ops, not all callbacks
-> should be allowed to use this new bpf_iter, because they are called from
-> different contexts. How can we ensure such callbacks from a struct_ops
-> cannot call mptcp_subflow bpf_iter without adding new dedicated checks
-> looking if some locks are held for all callbacks? We understood that
-> they wanted to have something similar with sched_ext, but we are not
-> sure if this code is ready nor if it is going to be accepted.
+> >> +
+> >> +  reg: =20
+> >=20
+> > First reg, then reg-names. Please follow other bindings/examples.
+> >  =20
+> >> +    maxItems: 2
+> >> +
+> >> +  channels:
+> >> +    description: The Si3474 is a single-chip PoE PSE controller manag=
+ing
+> >> +      8 physical power delivery channels. Internally, it's structured
+> >> +      into two logical "Quads".
+> >> +      Quad 0 Manages physical channels ('ports' in datasheet) 0, 1, 2=
+, 3
+> >> +      Quad 1 Manages physical channels ('ports' in datasheet) 4, 5, 6=
+, 7.
+> >> +      This parameter describes the relationship between the logical a=
+nd
+> >> +      the physical power channels. =20
+> >=20
+> > How exactly this maps here logical and physical channels? You just
+> > listed channels one after another... =20
+>=20
+> yes, here in this example it is 1 to 1 simple mapping, but in a real worl=
+d,
+> depending on hw connections, there is a possibility that=20
+> e.g. "pse_pi0" will use "<&phys0_4>, <&phys0_5>" pairset for lan port 3.
 
-Same. Take a look at "bpf_qdisc_kfunc_filter()".
+But here you should describe the channels of the controller and the channel=
+ has
+no link to the relationship between logical and physical power channels. Th=
+is
+relationship rather is described in the "pairsets" parameter of PSE PI.
 
+Maybe something like that:
+
+The Si3474 is a single-chip PoE PSE controller managing 8 physical power
+delivery channels. Internally, it's structured into two logical "Quads".
+Quad 0 Manages physical channels ('ports' in datasheet) 0, 1, 2, 3
+Quad 1 Manages physical channels ('ports' in datasheet) 4, 5, 6, 7.
+This parameter defines the 8 physical delivery channels on the controller t=
+hat
+can be referenced by PSE PIs through their "pairsets" property. The actual =
+port
+matrix mapping is created when PSE PIs reference these channels in their
+pairsets. For 4-pair operation, two channels from the same group (0-3 or 4-=
+7)
+must be referenced by a single PSE PI.
+
+Similarly the description I used on the tps23881 is also not correct. I hav=
+e to
+change it.
+=20
+I didn't look into the datasheet, could we have parameters specific to a
+quad? If that the case we maybe should have something like that:
+          quad0: quad@0 {                                                =20
+            reg =3D <0>;                                                   =
+      =20
+            #address-cells =3D <1>;                                        =
+      =20
+            #size-cells =3D <0>;                                           =
+                                           =20
+                                                                           =
+    =20
+            phys0: port@0 {                                                =
+    =20
+              reg =3D <0>;                                                 =
+      =20
+            };                                                             =
+    =20
+                                                                           =
+    =20
+            phys1: port@1 {                                                =
+    =20
+              reg =3D <1>;                                                 =
+      =20
+            };                                                             =
+    =20
+                                                                           =
+    =20
+            phys2: port@2 {                                                =
+    =20
+              reg =3D <2>;                                                 =
+      =20
+            };                                                             =
+    =20
+                                                                           =
+    =20
+            phys3: port@3 {                                                =
+    =20
+              reg =3D <3>;                                                 =
+      =20
+            };                                                             =
+    =20
+          };                                                               =
+    =20
+                                                                           =
+    =20
+          quad@1 {                                                         =
+ =20
+            reg =3D <1>;                                                   =
+      =20
+            #address-cells =3D <1>;                                        =
+      =20
+            #size-cells =3D <0>;                                           =
+      =20
+                                                                           =
+    =20
+            phys4: port@0 {                                                =
+    =20
+              reg =3D <0>;                                                 =
+      =20
+            };                                                             =
+    =20
+                                                                           =
+    =20
+            phys5: port@1 {                                                =
+    =20
+              reg =3D <1>;                                                 =
+      =20
+            };                                                             =
+    =20
+                                                                           =
+    =20
+            phys6: port@2 {                                                =
+    =20
+              reg =3D <2>;                                                 =
+      =20
+            };                                                             =
+    =20
+                                                                           =
+    =20
+            phys7: port@3 {                                                =
+    =20
+              reg =3D <3>;                                                 =
+      =20
+            };                                                             =
+    =20
+          };                                                               =
+    =20
+        };
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
