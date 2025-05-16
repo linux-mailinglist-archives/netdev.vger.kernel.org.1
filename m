@@ -1,140 +1,155 @@
-Return-Path: <netdev+bounces-191045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51BBBAB9DD7
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 15:47:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9251DAB9DE1
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 15:48:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A3A43AD42E
-	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 13:45:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 277F14E3051
+	for <lists+netdev@lfdr.de>; Fri, 16 May 2025 13:47:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 218AE1519B4;
-	Fri, 16 May 2025 13:42:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D702A78F5E;
+	Fri, 16 May 2025 13:47:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="H4R6vJaT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ROywHA2B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B87E149DFF;
-	Fri, 16 May 2025 13:42:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0954410785;
+	Fri, 16 May 2025 13:47:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747402961; cv=none; b=Eh82vTNpiOc+uNI4hL5V2jpS3ODfHudX9IzsPm1LWluVg8pKHtiZCO9vB1qYMrafXRwpuyVpucZnCrsN7nlkqb+RWeBPDMOQ/G6+2eE73ocGhIqncr1CBigQRvNQ2mOc/g9XD46nzIzsu4zUzjwwERw/EIbCkIQc3a/FvDDboHI=
+	t=1747403233; cv=none; b=JVjm5W6ciX/l7cf1IYLKSJ9x0qpnet6I81BDt03qoa0YHdMkRle7sqnGo6X03l0Cdc8JyD09QoMySmetN+R7Way2wggsAifRitqEFyFt+eb30ZTD/EVLlwhvP2LmC/65KqlRMNuYqCheyfL1sRqXNCDlJX7wCTWOlh0ir2MYWrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747402961; c=relaxed/simple;
-	bh=0bUIUe4Sx2DWxLW1yYo6Ms1yEOIpi/0LQIRHc31B0Ik=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XLLq4mxw1KKSQVPzezRvnUgcwarhV8EpbF3vgI0IXpPMUPlJ8ropBlZOuSQTtEi0p44ZkfnJnZwE878qUeGVMuH393SWS9yYA7oUwbYaSpoc42q24AAguT5HfMZDJLXchOi22mQDUetnKGgMEDIFChgO4yCaNlmeRkrIuddB5pw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=H4R6vJaT; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54GC6QOd018190;
-	Fri, 16 May 2025 13:42:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=oW5TDyB0lDxwJpPJULvDTcBi
-	kCCDI6hqCKTXY32JOKM=; b=H4R6vJaTK73tW5Cyn7NFCclwh8hfLxS7T3S9ld1R
-	sj9hOeZpIKX24PWFdtF5zofuDtQ/stOEk4loRhcvjLZ0QrhJHW+Ghrwb/Hvmxa07
-	w/IGpehkBawkyo4Mr08LhG2qc2L1hCJtt+GEunxiRIu4sYaWsWlZskE+FA6MAfBg
-	FmXiX4ZcfZJgUKBnUZtfhQ9AWPgYOsE/L0Rej61YF+zpzcFMOz1UW4bcKFGtpLRq
-	zovC6+d+/zbnOOZHn0D/wC4BFGGUAzPjwjkRRdpBqT5ydqWntZ7MnX8i3DSW7yG6
-	Sjpks/V1cO9kQN3M/rRuvDlNDJLXC2g4I14jQFQGm2q89Q==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 46mbcnt18s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 16 May 2025 13:42:34 +0000 (GMT)
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 54GDgXdd021142
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 16 May 2025 13:42:33 GMT
-Received: from hu-wasimn-hyd.qualcomm.com (10.80.80.8) by
- nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Fri, 16 May 2025 06:42:27 -0700
-Date: Fri, 16 May 2025 19:12:17 +0530
-From: Wasim Nazir <quic_wasimn@quicinc.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-CC: Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio
-	<konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <kernel@quicinc.com>, <kernel@oss.qualcomm.com>
-Subject: Re: [PATCH 5/8] dt-bindings: arm: qcom: Add bindings for qam8775p SOM
-Message-ID: <aCdAuTS4pg7arxwC@hu-wasimn-hyd.qualcomm.com>
-References: <20250507065116.353114-1-quic_wasimn@quicinc.com>
- <20250507065116.353114-6-quic_wasimn@quicinc.com>
- <55d11250-75b1-4606-a110-84cdc0592c33@kernel.org>
+	s=arc-20240116; t=1747403233; c=relaxed/simple;
+	bh=gIPJ/iDLV/nl0ar/Tu/RiWPqiuZOy4ZKvq4zpmeDHGU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=W0xv3ssCJZxvXHTivsxzO3M+eXj7lrdzxywJaO24eVPEl9yZc15W5N3HbsNpDO4AOVVMM78AWYpo7UA4S7VFvUVNS7I+POkNw7Ijo0el8v863lrMR9dyCYe4W1EIFf5dTOhZwHeqn3oTXiSDB0yFswBr2yKV5ZqpFrKCu05VNr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ROywHA2B; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-442ea95f738so16032815e9.3;
+        Fri, 16 May 2025 06:47:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747403230; x=1748008030; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=K7G2I5OKBPNva6umSCfzfSla912kgeAD12cq229nxjE=;
+        b=ROywHA2Bz0qPWz915rPeI2DffZvy7h2Ggbpmgv/QPpOT+AEuGDTb+FYhSU/0cOa8qX
+         XWCuQVyOkeft5CjLaPqzaQpMi5P7dIHtEWerVo4sh1QLdWDq0JO8r+oev/FPxhwIg0Md
+         XWBBYW3vvZfSCSItU6k61XnDzGTxq741NY4renf2kqig7V34KonqshoOpJ3XkQxu2gJL
+         T4x64X9oS+GU2CC7LZOvMzARti1R8/kdmetWej7KSTFLL1VNctbHRTRrgGvgj3RODVXH
+         l2kpoLUcjqM1VR9OGJxqqnkxCztj2JKjNbyiJpma13bgetOFxds35zAbam9Vg9ykIxq4
+         tazw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747403230; x=1748008030;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=K7G2I5OKBPNva6umSCfzfSla912kgeAD12cq229nxjE=;
+        b=nu8FF6edKbWq4fDF03jLCceZNBJ9pxwy9OsqNn+RDfGqQUge4lT6Qq+vjF2Q3wxKrN
+         /Ca/39IWsPtOiYDceDqbvU6peeYoon3uLBufp7/791GiOY9EACVB3pfdj7eI0HXKq2Wg
+         txhiTbXBz2NiMVzc6VVCjbscjGJVBRO6sSkBjlQRTL9dSJf+LOLYch4Nbh68g9nRZzQ1
+         PLtz24EP4A+aymBtbpk8YvhDqW+IMhiMeIYFTMqJrOLwhZCI5i3jjdZ7KUNgwDhWgve/
+         /EWtBlL8ogdlR6ce7vL04ZadVzkIpnQMM+VX1e3TmJysKKfbQ3+zfxyR2RIANImjSY5R
+         clDw==
+X-Forwarded-Encrypted: i=1; AJvYcCUi2IqTRzFBbPAYSt1IHGHZXMBlubHeoq7TgfnWMfR+37aRjBKYH0Ue7gGf0KrqRq0H5yd5S5RB@vger.kernel.org, AJvYcCVHTL4m+LmDzEiYnOfm2F3XgYBreW+AcSwf0lSzBVT3CJeCsDStGzUZtOMS40GjM+IYmHo=@vger.kernel.org, AJvYcCWNjJecNN0752/4yKl7ZAVz/QHgLhPmECn8zP1BTy+QXYB+FTE2dxhjy2sT0kUrnBE6A/+RSAF5BD6JngPS@vger.kernel.org, AJvYcCXJqLDT1fA5onXX+yWXattiu25GWOh+apmKXuEkuQB7RMdCefypFyQ5UVZMT+ShHJDbcPY0y8Rd7JfCvg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxtwZr2lpULwo7eHGaGyF3jqY225jFAt+9fGDP2+fLfYEaBDiVZ
+	eWa7BXi5g+B5LZzvhgHgGDg3TIvK5TYnLgqtZp72rGP8/CCHdmn/XiZy3/SaMA==
+X-Gm-Gg: ASbGncu+Q7uEyfG3Jc05UckgAWjMtPPve2VtnAuLp8xk18QybXiCPnx+Qph+tj1yo1y
+	Jm09Eamh8RM+renvboK34OYi7xHrMaiuoNlX3U+XYUGWaiE/7KfeLhhNykP7T8vmFj5vR4A9oba
+	Uw8lpAYoEBJUVsyAqWIWyLd2e2hngcREBzU9yRY53bh16Hl+GDo36Jz++R7uE6UHmqEXBCInKPE
+	cvWs3U8mk9warhuhfMiw64NHQMwYh6OdIGsqlGFTRtgDVndRnHxQVqyjsrDEXXXcPfQTIQzmK97
+	knIu0MJANQ8ZPOhFCCh6rzHMMfQM948ShZ8Ci9dv+w/spotjty+sOJzDTG/tVXODKWM/rO80
+X-Google-Smtp-Source: AGHT+IH10n1Y0Q2+MvM5BkTzLrgdGKnNQN0RCaqs65h7v/86P47GRzrVro52ZRHru7adaDoziP6tKw==
+X-Received: by 2002:a5d:64e5:0:b0:3a0:a19f:2f47 with SMTP id ffacd0b85a97d-3a35c853278mr3674404f8f.42.1747403229917;
+        Fri, 16 May 2025 06:47:09 -0700 (PDT)
+Received: from [172.27.21.184] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a35fa8c6d6sm2391336f8f.26.2025.05.16.06.47.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 May 2025 06:47:09 -0700 (PDT)
+Message-ID: <dcb3053f-6588-4c87-be42-a172dacb1828@gmail.com>
+Date: Fri, 16 May 2025 16:47:06 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <55d11250-75b1-4606-a110-84cdc0592c33@kernel.org>
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: I-jYnTPIFCLUrKBmxL999qlgodyVDq99
-X-Authority-Analysis: v=2.4 cv=aIbwqa9m c=1 sm=1 tr=0 ts=682740ca cx=c_pps
- a=ouPCqIW2jiPt+lZRy3xVPw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17
- a=GEpy-HfZoHoA:10 a=kj9zAlcOel0A:10 a=dt9VzEwgFbYA:10 a=VwQbUJbxAAAA:8
- a=COk6AnOGAAAA:8 a=x0sF0_AxRbDvk2FnIs8A:9 a=CjuIK1q_8ugA:10
- a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-GUID: I-jYnTPIFCLUrKBmxL999qlgodyVDq99
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTE2MDEzMiBTYWx0ZWRfX8qDYzt0ATIZz
- 5ATZwk+WybOWYTcnX7jap2+XdKeCmS2fZyqNG8CmER1uZpra+PPEBsAMrjNx97wYVfyW7Mp1MXH
- AdlvycoYN0vGdRpyxMjXtH3QZy4mmmNgVXayjDDmF+jO5tDAsPypum2UYy0j2IHC/pFdbpBgAqU
- y6Hb4G3ki9HiTbE0dHAnaAzrVm+7srFSm4GCjxKQwCgZ+Nsl7yyHXQcSQaP96ga92UnuT80/jdf
- bFJiKH8keQ/2bBIFQigb/gI/NZHcnzMzDIgtr6U/1kQnaRQdyT13GfoP691DtjjXuhB4kCsvV0N
- 8CkQEIwjLiW+7rwIIZRWtv23oufcHh/sXF0yBD0RyOri3HuAnA9kVHiL5VLjFRm1/luelq4Tbs4
- KVfRNKqyZdVhTOXyDh+1e9X35H49rne2WXHK1NDjZIVXLJyHW6zrVph7NAXWSUHzQxWF4q4q
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-16_05,2025-05-16_03,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 mlxlogscore=572 malwarescore=0 bulkscore=0 impostorscore=0
- clxscore=1015 phishscore=0 suspectscore=0 mlxscore=0 spamscore=0
- lowpriorityscore=0 priorityscore=1501 classifier=spam authscore=0 authtc=n/a
- authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2505070000 definitions=main-2505160132
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net/mlx5e: Reuse per-RQ XDP buffer to avoid
+ stack zeroing overhead
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Network Development <netdev@vger.kernel.org>, linux-rdma@vger.kernel.org,
+ LKML <linux-kernel@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
+ Moshe Shemesh <moshe@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+ Gal Pressman <gal@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>,
+ Sebastiano Miano <mianosebastiano@gmail.com>,
+ Samuel Dobron <sdobron@redhat.com>
+References: <1747253032-663457-1-git-send-email-tariqt@nvidia.com>
+ <CAADnVQLSMvk3uuzTCjqQKXs6hbZH9-_XeYo2Uvu2uHAiYrnkog@mail.gmail.com>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <CAADnVQLSMvk3uuzTCjqQKXs6hbZH9-_XeYo2Uvu2uHAiYrnkog@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, May 07, 2025 at 09:00:18AM +0200, Krzysztof Kozlowski wrote:
-> On 07/05/2025 08:51, Wasim Nazir wrote:
-> > Add devicetree bindings for QAM8775p SOM which is based on sa8775p SOC.
+
+
+On 15/05/2025 3:26, Alexei Starovoitov wrote:
+> On Wed, May 14, 2025 at 1:04 PM Tariq Toukan <tariqt@nvidia.com> wrote:
+>>
+>> From: Carolina Jubran <cjubran@nvidia.com>
+>>
+>> CONFIG_INIT_STACK_ALL_ZERO introduces a performance cost by
+>> zero-initializing all stack variables on function entry. The mlx5 XDP
+>> RX path previously allocated a struct mlx5e_xdp_buff on the stack per
+>> received CQE, resulting in measurable performance degradation under
+>> this config.
+>>
+>> This patch reuses a mlx5e_xdp_buff stored in the mlx5e_rq struct,
+>> avoiding per-CQE stack allocations and repeated zeroing.
+>>
+>> With this change, XDP_DROP and XDP_TX performance matches that of
+>> kernels built without CONFIG_INIT_STACK_ALL_ZERO.
+>>
+>> Performance was measured on a ConnectX-6Dx using a single RX channel
+>> (1 CPU at 100% usage) at ~50 Mpps. The baseline results were taken from
+>> net-next-6.15.
+>>
+>> Stack zeroing disabled:
+>> - XDP_DROP:
+>>      * baseline:                     31.47 Mpps
+>>      * baseline + per-RQ allocation: 32.31 Mpps (+2.68%)
+>>
+>> - XDP_TX:
+>>      * baseline:                     12.41 Mpps
+>>      * baseline + per-RQ allocation: 12.95 Mpps (+4.30%)
 > 
-> You do not add new bindings. You instead change existing ones without
-> explanation why making that change.
+> Looks good, but where are these gains coming from ?
+> The patch just moves mxbuf from stack to rq.
+> The number of operations should really be the same.
 > 
 
-I understand your concern. We thought of adding it to define the SOM HW
-which was not done earlier.
-I will drop all the SOM bindings and maintain only SOM DT structure on
-IQ9 target (qcs9100), which we need it to add memory-map updates.
+I guess it's cache related. Hot/cold areas, alignments, movement of 
+other fields in the mlx5e_rq structure...
 
-Also, I will drop similar change from IQ-9075-evk series [1] for maintaining
-similar dt-bindings for IQ9 (qcs9100 & qcs9075) series of targets.
-
-[1]
-https://lore.kernel.org/all/20250429054906.113317-1-quic_wasimn@quicinc.com/
-
+>> Stack zeroing enabled:
+>> - XDP_DROP:
+>>      * baseline:                     24.32 Mpps
+>>      * baseline + per-RQ allocation: 32.27 Mpps (+32.7%)
 > 
-> 
-> Best regards,
-> Krzysztof
+> This part makes sense.
 
-Regards,
-Wasim
 
