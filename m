@@ -1,165 +1,82 @@
-Return-Path: <netdev+bounces-191299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 714A4ABAAC5
-	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 16:54:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F974ABAAD2
+	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 17:09:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D747E7A48AC
-	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 14:52:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B32417D0E1
+	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 15:09:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F38D61F5402;
-	Sat, 17 May 2025 14:53:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E11D01F4C8A;
+	Sat, 17 May 2025 15:09:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="o/S121zr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tKVM6EMT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.wp.pl (mx3.wp.pl [212.77.101.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BC9F1925AF
-	for <netdev@vger.kernel.org>; Sat, 17 May 2025 14:53:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA7FD4B1E40
+	for <netdev@vger.kernel.org>; Sat, 17 May 2025 15:09:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747493639; cv=none; b=U0iQgOgKW9WcoZEhTdu5U4zEUrrOp39KJH1xHJrGvzJSZpnpqWcuogZyhQ0hmdb2cPDic2pCu3JdxuxR5jTimo6p4sAeuw5E3HE6o59Jnly05Bs5MXJwJM7H/eOATCNdBmdMhk75ge16HZBbKEAaWSol8hlWpvvHgYbW8PpGjVo=
+	t=1747494589; cv=none; b=SKTg16P6i/4JDl/0t+ROpgf2bDCP6tTTyV+J6FDpWuQrWkneIJXJ/wwGIBAyI2+BPVbnP/OYS3rHYplAIlyhxx9QDRf6NM/ac8+R2zsHctph88+YoK7MwcnqDfAj6nTjKY+WY3Xt/mfQ5JHHD8JJds2sdqqDI/HE1bNfwv1kOkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747493639; c=relaxed/simple;
-	bh=cXMPqTXmSg3A8q4/lexSQeKGv7Eq/skAQeXYIDOSZKY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HFt2k7p6HwarBURCgTIY/nJldRgwwqUPSp7BwCdZ13bZCnagYLZwEQL1m5kDR+KUD0JV+xER4rtmUnrnk3B8i69BS64vaEd4U7CmsiYR+sDM1/UrmZRz0LpUTgNG4YXX9whYdxB/LcjfCNaxlo+C253ZfKhWdwh8PeRkezn93Yc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=o/S121zr; arc=none smtp.client-ip=212.77.101.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
-Received: (wp-smtpd smtp.wp.pl 35466 invoked from network); 17 May 2025 16:53:54 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
-          t=1747493634; bh=h56n9EjT24/ca+cjGGEx6B8lTas1EKvnunog3UGR0TE=;
-          h=From:To:Cc:Subject;
-          b=o/S121zrHyMZmR5wlV6RIf/tnaIlsf2C8/kf0ajc8VaiUkd5M+CcDGLqabNoINkzt
-           GLU5AaUnvqDoI8FtuAoRRHmMbVPjICsUXALnxwANtmNblZcCh8t0LrCcYYSNGofH3j
-           RmMYFZXIt3MCMcnBIGww9Et4RXFqRNGs2jg+sRYHe/3NLGewKBPyNolzHMmgtwwwvX
-           Rj3q9lKv+hU1NpR7uLG8DELcXFI7TBJWTaGMqYwp9PgndnYtgRYtZN1oX9vW/6JIxS
-           zBwernAIAk3BxjBYxsC4Mgl0WPnD7XM/IPvVztwE+E39NO7plEZExQjlWlSTlPzMXm
-           F3R4detOERQng==
-Received: from 89-64-9-114.dynamic.play.pl (HELO localhost) (stf_xl@wp.pl@[89.64.9.114])
-          (envelope-sender <stf_xl@wp.pl>)
-          by smtp.wp.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
-          for <pchelkin@ispras.ru>; 17 May 2025 16:53:54 +0200
-Date: Sat, 17 May 2025 16:53:53 +0200
-From: Stanislaw Gruszka <stf_xl@wp.pl>
-To: Fedor Pchelkin <pchelkin@ispras.ru>
-Cc: Johannes Berg <johannes@sipsolutions.net>,
-	Alexei Safin <a.safin@rosa.ru>, lvc-project@linuxtesting.org,
-	netdev@vger.kernel.org, Kalle Valo <kvalo@kernel.org>,
-	linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"David S . Miller" <davem@davemloft.net>
-Subject: Re: [PATCH] wifi: iwlegacy: Check rate_idx range after addition
-Message-ID: <20250517145353.GA138457@wp.pl>
-References: <20250424185244.3562-1-a.safin@rosa.ru>
- <20250427063900.GA48509@wp.pl>
- <d57qkj2tj4bgfobgzbhcb4bceh327o35mgamy2yyfuvolg4ymo@7p7hbpyg5bxi>
- <20250517074040.GA96365@wp.pl>
- <hrpy3omokg5zvrqnchx4jvp26bvfgdrashkmrjonsyz5b64aaz@6d5kn7z7x73q>
+	s=arc-20240116; t=1747494589; c=relaxed/simple;
+	bh=U3r+r4TOcnzLD7q/BzvL/e/jIoRxg3+4Rtzd64P02VI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ixwCzL87NPUXvII7gynPbjUIiOZQZIXpjfrHpOKEo0eCqlm1OKzZOTecOKwXFr7konx4R/LRL7F8nw4wV0Dyw+xhgDoIvsa7vne064gcVXPUXjQdErDRd6d7L/zzbI7dqPPdEqQTQH1pHunwmeVbX0XXwFHaA5VdZAP7RDRXPhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tKVM6EMT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDC1AC4CEE3;
+	Sat, 17 May 2025 15:09:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747494589;
+	bh=U3r+r4TOcnzLD7q/BzvL/e/jIoRxg3+4Rtzd64P02VI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tKVM6EMTQAXQVjwphQ5g98te/q/4Yxiw9VYNn/IORkellkMxyVSkSKBRrx7xQospv
+	 KTmMWdfvh10o1Zq7xPkUV4BmnIaPJUO+BPpDaME/4nuuxLNcz/32Tci7H7s6b0sc1a
+	 eLp2kMNfSKjW3CdQs2yTdorwNQuyYaHSLLlGt8cUn6dRgthJdmuO8+rbmMSQFAV1WG
+	 0y5TPBfipn+EUtSXdkkipkj6ERLSsk5NMIo35w+cRVLAehmIgDwu5KhO9flZRoJ1MO
+	 d7j3WvR2Cs3pp/mBU1G3X7bL9nUekb7GB2z5aYIogLVXBFD4X6+0lqstOv97HcIrOh
+	 M5zQAcAlkUVmg==
+Date: Sat, 17 May 2025 08:09:48 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Cc: Jiri Pirko <jiri@resnulli.us>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Hillf Danton
+ <hdanton@sina.com>, Network Development <netdev@vger.kernel.org>
+Subject: Re: [PATCH (EXPERIMENTAL)] team: replace term lock with rtnl lock
+Message-ID: <20250517080948.3c20db08@kernel.org>
+In-Reply-To: <ff1d684a-22ec-4ea2-a6ee-fe9704a6f284@I-love.SAKURA.ne.jp>
+References: <ff1d684a-22ec-4ea2-a6ee-fe9704a6f284@I-love.SAKURA.ne.jp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <hrpy3omokg5zvrqnchx4jvp26bvfgdrashkmrjonsyz5b64aaz@6d5kn7z7x73q>
-X-WP-MailID: 97996bdff59639d864b2fefc20139b51
-X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
-X-WP-SPAM: NO 0000000 [8UNh]                               
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Fedor, thanks for review,
+On Sat, 17 May 2025 16:32:20 +0900 Tetsuo Handa wrote:
+> -	if (!mutex_trylock(&team->lock)) {
+> +	/* Since this function is called from WQ context, RTNL can't be held by the caller. */
+> +	if (!rtnl_trylock()) {
+> +		/*
+> +		 * Since RTNL is shared by many callers, and rtnl_unlock() is a slower operation
+> +		 * than plain mutex_unlock(), rtnl_trylock() will be more easier to compate than
+> +		 * mutex_trylock(). Therefore, we might want to delay a bit before retrying.
+> +		 */
 
-On Sat, May 17, 2025 at 03:21:03PM +0300, Fedor Pchelkin wrote:
-> On Sat, 17. May 09:40, Stanislaw Gruszka wrote:
-> > Move rate_idx range check after we add IL_FIRST_OFDM_RATE for it
-> > for 5GHz band.
-> > 
-> > Additionally use ">= RATE_COUNT" check instead of "> RATE_COUNT_LEGACY"
-> > to avoid possible reviewers and static code analyzers confusion about
-> > size of il_rate array.
-> > 
-> > Reported-by: Fedor Pchelkin <pchelkin@ispras.ru>
-> > Reported-by: Alexei Safin <a.safin@rosa.ru>
-> > Signed-off-by: Stanislaw Gruszka <stf_xl@wp.pl>
-> > ---
-> 
-> Thank you for the patch, Stanislaw!
-> 
-> Please see some comments below.
-> 
-> >  drivers/net/wireless/intel/iwlegacy/4965-mac.c | 15 +++++++++------
-> >  1 file changed, 9 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/drivers/net/wireless/intel/iwlegacy/4965-mac.c b/drivers/net/wireless/intel/iwlegacy/4965-mac.c
-> > index dc8c408902e6..2294ea43b4c7 100644
-> > --- a/drivers/net/wireless/intel/iwlegacy/4965-mac.c
-> > +++ b/drivers/net/wireless/intel/iwlegacy/4965-mac.c
-> > @@ -1567,16 +1567,19 @@ il4965_tx_cmd_build_rate(struct il_priv *il,
-> >  	/**
-> >  	 * If the current TX rate stored in mac80211 has the MCS bit set, it's
-> >  	 * not really a TX rate.  Thus, we use the lowest supported rate for
-> > -	 * this band.  Also use the lowest supported rate if the stored rate
-> > -	 * idx is invalid.
-> > +	 * this band.
-> >  	 */
-> >  	rate_idx = info->control.rates[0].idx;
-> > -	if ((info->control.rates[0].flags & IEEE80211_TX_RC_MCS) || rate_idx < 0
-> > -	    || rate_idx > RATE_COUNT_LEGACY)
-> > +	if (info->control.rates[0].flags & IEEE80211_TX_RC_MCS)
-> >  		rate_idx = rate_lowest_index(&il->bands[info->band], sta);
-> > -	/* For 5 GHZ band, remap mac80211 rate indices into driver indices */
-> > -	if (info->band == NL80211_BAND_5GHZ)
-> > +	else if (info->band == NL80211_BAND_5GHZ)
-> 
-> 5GHZ shouldn't be in 'else if' clause, I think. Is it mutually exclusive
-> with IEEE80211_TX_RC_MCS ?
+I think this was a trylock because there are places we try to cancel
+this work while already holding the lock.
 
-Right, this is wrong. I thought we can use index returned by
-rate_lowest_index() but we still should add IL_FIRST_OFDM_RATE.
-At least this is how is done now.
-
-> 
-> > +		/* For 5 GHZ band, remap mac80211 rate indices into driver indices */
-> >  		rate_idx += IL_FIRST_OFDM_RATE;
-> > +
-> > +	/* Use the lowest supported rate if the stored rate idx is invalid. */
-> > +	if (rate_idx < 0 || rate_idx >= RATE_COUNT)
-> 
-> There is a check inside il4965_rs_get_rate():
-> 
-> 	/* Check for invalid rates */
-> 	if (rate_idx < 0 || rate_idx >= RATE_COUNT_LEGACY ||
-> 	    (sband->band == NL80211_BAND_5GHZ &&
-> 	     rate_idx < IL_FIRST_OFDM_RATE))
-> 		rate_idx = rate_lowest_index(sband, sta);
-> 
-> so RATE_COUNT_LEGACY (60M) is considered invalid there but is accepted
-> here in il4965_tx_cmd_build_rate(). It looks strange, at least for the
-> fresh reader as me..
-
-Indeed this is strange. I'm not sure why those checks differ.
-
-Anyway for the rate_idx in il4965_tx_cmd_build_rate()
-for 5GHs I'll just add additional check like below:
-
-	if (info->band == NL80211_BAND_5GHZ) {
-		rate_idx += IL_FIRST_OFDM_RATE;
-		if (rate_idx > IL_LAST_OFDM_RATE);
-			rate_idx = IL_LAST_OFDM_RATE;
-	}
-
-This patch should be dropped.
-
-Regards
-Stanislaw
-
-
+FWIW I'm not opposed to the patch. Could you wait a week and repost,
+tho? We have a fix queued up in another tree - 6b1d3c5f675cc7
+if we apply your patch to net-next there will be a build failure 
+on merge. Not a showstopper but we'll merge the trees on Thu so it
+can be easily avoided if we wait until then.
 
