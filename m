@@ -1,100 +1,101 @@
-Return-Path: <netdev+bounces-191291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B94EABAA41
-	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 15:13:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53545ABAA62
+	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 15:28:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02B399E2DCC
-	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 13:13:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF20F4A087A
+	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 13:28:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 896842010EE;
-	Sat, 17 May 2025 13:13:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD17F1FBE9E;
+	Sat, 17 May 2025 13:28:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gljPi1sq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ImxvMX9E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE267219EB;
-	Sat, 17 May 2025 13:13:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3294C1F473C;
+	Sat, 17 May 2025 13:28:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747487604; cv=none; b=j7djchhZJrLwp8Erya5AOJyXU6KSumRsaB1kMh6Kxamjcc8Y3bujwWL6+5LHW0SQ7qJ67ck9jT5iZdO8RgHverDlLElI8A6ZUPaQfz/INyH9QrAzxXD1GuJ61H71PVDrf8CNWa/zcZShs2LTIHCYMmyJtjSU4ghDUFp31SAbYi8=
+	t=1747488504; cv=none; b=oOjWkHV5lSUu8RdxnJUOgDmX13j/VvZeVvTi41OHcKy+FM1FRTbM3GEun+16ccKNtvvyMLOKvPOmiyeJkTriVueJ4/d4KBIwTNYDKoEhJiFE/e1UtoGmDNul35BPFKoXFyNu7qzt6pdn8z/tb/1vWO74JQZeLQRMZPDgAEnSdM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747487604; c=relaxed/simple;
-	bh=DkyUX8xYGpeMcQDNAs8NEO7xgU8atxO82AkU2m/j7SA=;
+	s=arc-20240116; t=1747488504; c=relaxed/simple;
+	bh=S1MWY0PJeO+keP5r+TY+fV9VcsQvbmi76vsf+dgP8hw=;
 	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=fe4Tu4YstR8UED82xUUP2qPjfgFYt9VHFF/CbtDO0/zQ7H8MPG1R2AlH5L4/mfmbG4AvlbWaoh4VATEdSgO2A9nZFBXRE7OwcgxHg+6NYA2nQ7okU74pljZpaQNt935CEJDLj8IgGdu8/2SKBCxjtsvdEAdj2lqVH5DlWl848zw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gljPi1sq; arc=none smtp.client-ip=209.85.210.169
+	 Mime-Version:Content-Type; b=Bvpn3s8KWkUmV7+Ts/LEq6c1Lctf6jLP//kyp2Dtk4MMmo52Z38jAsTGwfujFMbuMULyeIrr7/EdMqdkh08VE7q01oWExlVybIegDXUBIZjM/ylH0QNwKLQt1vzdwQQtIKrEg03FjhEPZWMPNeA3TvzdQo4RueN3tOvO6P3sNFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ImxvMX9E; arc=none smtp.client-ip=209.85.215.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7399a2dc13fso3982619b3a.2;
-        Sat, 17 May 2025 06:13:22 -0700 (PDT)
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-b200047a6a5so3711706a12.0;
+        Sat, 17 May 2025 06:28:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747487602; x=1748092402; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1747488502; x=1748093302; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to:from
          :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=06Le2eqgW5rnRXP+koCrOWKT5p6dh27NxlHabyyet/c=;
-        b=gljPi1sqFtcvkQohNHYQQsDTn+5SXlbm97nmGf0OaG8uMekhgiMYmZ9iL76hoLUPSt
-         +43J+H3kZOzJTGbFsZVnsTqHtYQ6VMeu4Pn1F2yBNFE8HqeP16aqM1C5T5BM18d0WhjS
-         xDxxDqRRRNkl0GXw2vYjVfY4k4ZfT8QI56C4/83HTCyiNTvUfCXFlC47gj37Qym8B1er
-         aIxRpSiDpqOkVd0kXH3SV3aBjwcneZUGbQe/DFaOERKi0zWYoGsnjC8vedMxkaLb6+gK
-         qGyOXptHwHCJAh4HU5B/uomn3s926fldiQ59y163bqBxKjAoPLsIc63wFI0x3yhzkH7w
-         lZhQ==
+        bh=Ok+Jn31WmGz0SXzj4UmJNwMJtqo//nsvsVAqld9UWx4=;
+        b=ImxvMX9E8Y/+h+VMKLoHrdT3XeavjrPofImFu4ueL/hehW7dKSG6QIHIOyXUeAoebu
+         BT22ZyeBWBBysYS/vI8DpyZ3h27YiXltwB67J8GOD/K+tNP9QQisSq3m4QeCKWPwzqz0
+         gojB4i+YyTLhGuL+IrjwonJ56yFCPBp82tAQwbkdT3n63pI4uxHgxQDIPh3IUUW2zvH9
+         R92xTPAUguWFRWj+CrIhD6siFt7VZPwRv88iOhjnBPvT20fGLxZZhhGS3iIReRMoKAOO
+         BjK8Tmm0nOVeC4Ng7xZbjLCRrxibRp3RW3R1a+9RIXQf8hqqQUxr+jdsjvzQb/xHp5iX
+         +QMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747487602; x=1748092402;
+        d=1e100.net; s=20230601; t=1747488502; x=1748093302;
         h=content-transfer-encoding:mime-version:references:in-reply-to:from
          :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=06Le2eqgW5rnRXP+koCrOWKT5p6dh27NxlHabyyet/c=;
-        b=gMO40xGiu4v5c9tIlCDVpXCIc3FP/9V9qvq7qHfF9A92QCuB/RRIlo3OUqijKAnAE/
-         KrqQX4k7dnC7qfQ1A6iWcjgMBI3xemGZFQa0noZ8f8sqdhyteDANcqQY7uz3nLkNvtza
-         x7IuQVRwEx8TVf+rl/pOWD7OPzdlk7bZ6mpF4GV1AbqnzNNhJ6DW5u5P/EQwjnX7DoS+
-         RqKtr6rhBNhegIRZlMsL3xSBqLpirgX3abXuXcVOw2i2gNcGJEB5h4szfYDQgFvGmgj0
-         1D5dRyFolw0x+e98mIzc7cT1e2JriSxwbtJW9W7RAC4UvhUvnKk8zujfElxweEm1w6tV
-         GOCw==
-X-Forwarded-Encrypted: i=1; AJvYcCU/bBMe7Gtw4HANoEipsk12BAfBtr2wt4ImZE1MRlrCNQNBNwUrOwk8wFWR0OuOJlIx2Q6+qva2@vger.kernel.org, AJvYcCV+797sLY8J6x30ZAWeRfbVVCv3+okWv2tQWNvnT2Gp16oETpYjv+R6nPIr1Ovrk2PPCs6tC0gpAgsjJ8ooMeI=@vger.kernel.org, AJvYcCX78ne6nIqPtTYW07MWxVNV+xzL/XDTLFtHL1xqvuhhFg2WH+cg9h7879iMzn/AUsdCsSGwdJjwM98CAy5H@vger.kernel.org, AJvYcCXjtwwO+Kh/x76mRExeQOwFhM8Us2lFpUeGw89Qxocjq3IYVbWukq4EBHTxqPKKX377EU7En4cDWMRw@vger.kernel.org
-X-Gm-Message-State: AOJu0YwaT33WOOcKvB0+RaDHUcImHDgOmFQalKIxhnICMF8dp9TYODDB
-	O4Ff06bKuFZ6v/HmFXfVp1SKbSYINxes+enf0Chewb5KQX31B9NomZ7Z
-X-Gm-Gg: ASbGncth2SayU4ZLcsSD7kAQbLqN2A06aTs/KoMHGAoJqmiaaOZ+CBHfJIKb0La2IPp
-	JtihRTFB9Tngjo858ZVvwGGOz6VIkYmxPnbfxP3lOTmC8RgYGhFGDJujuCb0cfn+MV12qzCpXp0
-	l/QFcdpOWsw/KwHkl5JZgNPzEN/+iyB4Mstt//hSN59KLCA0xuRghO8qAExsjKRDWl8HrzBw+T6
-	taLUFXBCBVF7Vh6cocXcHxDUFRt+kIHo6ZDMzo6/gDDai8FDvVncxqqgXfrpNkIN98MUzQw6rUi
-	BDp3scYcBx+vPDrcyQDO5fbULS+zBVDXEoUQroejSp7cDxGlGCRJzy+gWAp75+smH2itKwrqLwc
-	gmbh5aeQXWl50lBzF/5MoybHbdhsFYa4MOA==
-X-Google-Smtp-Source: AGHT+IGB8Lu8PEAR1AfLv5MspLLjhJwE3STPC5XPoHEBJpNh8tTNa9vSO8B+hzP7Lbny12U5Rw/27g==
-X-Received: by 2002:a05:6a20:3d1c:b0:1ee:d418:f764 with SMTP id adf61e73a8af0-2170ce33ad3mr9574877637.38.1747487601980;
-        Sat, 17 May 2025 06:13:21 -0700 (PDT)
+        bh=Ok+Jn31WmGz0SXzj4UmJNwMJtqo//nsvsVAqld9UWx4=;
+        b=I+DD0ip/dAw2yx+/NkRFfXo4kRJYTSnDVETh04J9U9ZpAmr7J8cEqMVg+uB0uuYO4Q
+         9beY7pKFsmFl/NkSQrZMPw5Dh0W0aAOKLafm5o/Yucwz+o9fLumqHsuraPg7VY+CzKjZ
+         P2ZJypnE2qcEnVGo0MdUksH3JmajGYtYwutyMH3nZ/l24p5sb3Xe005Dacqg5s8n0+XW
+         2pCch2cm3XXGhvhTxqHik1TgWEeFmW3q1T/0iO8cVMsMR3dIXn3XO6uEAG/LbLjisSHv
+         w9PiMuueM+Iurkv1AAYHaYjBMLZtsA5CkK7pQgqQVsrp2lYHPkNMgqM62KYr1xRPUor4
+         W21A==
+X-Forwarded-Encrypted: i=1; AJvYcCURp1dIGfVt+Ib7SG5uBLYXG0+9QQFPhWb+SKaN9oXR6NeLan8v6S6yHWgR+2NRjPNCZ2GvLE5nafDx1dgbCzM=@vger.kernel.org, AJvYcCWMOWVikQUefQ2za1GfuEy51C9VcT08PuPCOyFBhKU68W6rafuihiP+fwJhon1+Ut0FPSwQqSABNjd1@vger.kernel.org, AJvYcCWYgiVL7V1bHOKWlm/6qeipXeNgnYKhO91xMwoPH0ldLV/Olyn5pJKsVY7RX+A3WwVpNshaAZMq@vger.kernel.org, AJvYcCXTW16F/F5bVvESxe+VkLxgLFzftrS9R+f443lSzpBAPLWNBJVuwTNH18yZRXY15KMfCAEfmW0MHdodfaDV@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/MhQtpQGCtLJNpGlzFpKC/OVFeUR+QtPJOsyXHIloCgwCCy0T
+	LvE6F+o+pDibV35+IBf2ECRT8whePwCuBQ6HMZLjXEamq0F8zzzkkn8W
+X-Gm-Gg: ASbGncty/Cs5Z262ngp6QDPD4Hp8heB0Rj/xtoj+k/H2KVoCoNO9DfeFtOgqysQ74xt
+	XUm1VgIN8A4H3fLk9+57aGHiMCVQO7DmEsPWkToXG1pMNT38sxMvYC8QJ+OlpQGoQrv5H312hD4
+	Cg+rezvjSWQ6CZtOF8uMBb0UE0lV3D+iJLZa8tQFRo0H55ROty0Wfc+Q996NAFGPLLYgyndpATJ
+	2WY1eJNXEDPTaQDkBq7+KhPcv1Ig1qX+lNcPa4lg4Aijm5Ip/EhOTp8CPGm2R1TLE3dfh8z6kUT
+	xml1hK3p19sdfO15xjyUIwkNuwHM90daYVFcbYn6Biz/n9vu6MaIJsmn2wUMX1RoBxv74ote+ye
+	LgNAam9dbXkNnuJnwBK3kv65sM6wJzroazw==
+X-Google-Smtp-Source: AGHT+IH1yn0X4kPCK1uLV4MGl8bTGl35nSAlr0/UoFaLxgHm9QPrSBYXGKUXCH/5q+OGg4JXuR79pQ==
+X-Received: by 2002:a17:90a:d2ce:b0:30e:3737:7c87 with SMTP id 98e67ed59e1d1-30e7dc4ecb4mr9309953a91.5.1747488502263;
+        Sat, 17 May 2025 06:28:22 -0700 (PDT)
 Received: from localhost (p4138183-ipxg22701hodogaya.kanagawa.ocn.ne.jp. [153.129.206.183])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30e7d4abd90sm3304627a91.28.2025.05.17.06.13.15
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30e334016e7sm7006077a91.9.2025.05.17.06.28.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 17 May 2025 06:13:21 -0700 (PDT)
-Date: Sat, 17 May 2025 22:13:13 +0900 (JST)
-Message-Id: <20250517.221313.1252217275580085717.fujita.tomonori@gmail.com>
+        Sat, 17 May 2025 06:28:21 -0700 (PDT)
+Date: Sat, 17 May 2025 22:28:04 +0900 (JST)
+Message-Id: <20250517.222804.482303667530450320.fujita.tomonori@gmail.com>
 To: lossin@kernel.org
-Cc: fujita.tomonori@gmail.com, ansuelsmth@gmail.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
- florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
- kabel@kernel.org, andrei.botila@oss.nxp.com, tmgross@umich.edu,
+Cc: ansuelsmth@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, florian.fainelli@broadcom.com,
+ bcm-kernel-feedback-list@broadcom.com, kabel@kernel.org,
+ andrei.botila@oss.nxp.com, fujita.tomonori@gmail.com, tmgross@umich.edu,
  ojeda@kernel.org, alex.gaynor@gmail.com, boqun.feng@gmail.com,
  gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
  a.hindborg@kernel.org, aliceryhl@google.com, dakr@kernel.org,
  sd@queasysnail.net, michael@fossekall.de, daniel@makrotopia.org,
  netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org
-Subject: Re: [net-next PATCH v10 7/7] rust: net::phy sync with
- match_phy_device C changes
+ linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ rmk+kernel@armlinux.org.uk
+Subject: Re: [net-next PATCH v11 1/6] net: phy: pass PHY driver to
+ .match_phy_device OP
 From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <D9YA4FS5EX4S.217A1IK0WW4WR@kernel.org>
-References: <D9XV0Y22JHU5.3T51FVQONVERC@kernel.org>
-	<20250517.152735.1375764560545086525.fujita.tomonori@gmail.com>
-	<D9YA4FS5EX4S.217A1IK0WW4WR@kernel.org>
+In-Reply-To: <D9YA78RFVQMH.QPUFXMHSVU7V@kernel.org>
+References: <20250516212354.32313-1-ansuelsmth@gmail.com>
+	<20250516212354.32313-2-ansuelsmth@gmail.com>
+	<D9YA78RFVQMH.QPUFXMHSVU7V@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,105 +105,79 @@ Mime-Version: 1.0
 Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 
-On Sat, 17 May 2025 10:06:13 +0200
+On Sat, 17 May 2025 10:09:53 +0200
 "Benno Lossin" <lossin@kernel.org> wrote:
 
->>> I looked at the `phy.rs` file again and now I'm pretty sure the above
->>> code is wrong. `Self` can be implemented on any type (even types like
->>> `Infallible` that do not have any valid bit patterns, since it's an
->>> empty enum). The abstraction for `bindings::phy_driver` is
->>> `DriverVTable` not an object of type `Self`, so you should cast to that
->>> pointer instead.
->>
->> Yeah.
->>
->> I don't want to delay this patchset due to Rust side changes so
->> casting a pointer to bindings::phy_driver to DriverVTable is ok but
->> the following signature doesn't look useful for Rust phy drivers:
->>
->> fn match_phy_device(_dev: &mut Device, _drv: &DriverVTable) -> bool
->>
->> struct DriverVTable is only used to create an array of
->> bindings::phy_driver for C side, and it doesn't provide any
->> information to the Rust driver.
+> On Fri May 16, 2025 at 11:23 PM CEST, Christian Marangi wrote:
+>> diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
+>> index a59469c785e3..079a0f884887 100644
+>> --- a/rust/kernel/net/phy.rs
+>> +++ b/rust/kernel/net/phy.rs
+>> @@ -418,15 +418,18 @@ impl<T: Driver> Adapter<T> {
+>>  
+>>      /// # Safety
+>>      ///
+>> -    /// `phydev` must be passed by the corresponding callback in `phy_driver`.
+>> +    /// `phydev` and `phydrv` must be passed by the corresponding callback in
+>> +    //  `phy_driver`.
+>>      unsafe extern "C" fn match_phy_device_callback(
+>>          phydev: *mut bindings::phy_device,
+>> +        phydrv: *const bindings::phy_driver,
+>>      ) -> crate::ffi::c_int {
+>>          // SAFETY: This callback is called only in contexts
+>>          // where we hold `phy_device->lock`, so the accessors on
+>>          // `Device` are okay to call.
+>>          let dev = unsafe { Device::from_raw(phydev) };
+>> -        T::match_phy_device(dev) as i32
+>> +        let drv = unsafe { T::from_raw(phydrv) };
+>> +        T::match_phy_device(dev, drv) as i32
+>>      }
+>>  
+>>      /// # Safety
+>> @@ -574,6 +577,19 @@ pub const fn create_phy_driver<T: Driver>() -> DriverVTable {
+>>  /// This trait is used to create a [`DriverVTable`].
+>>  #[vtable]
+>>  pub trait Driver {
+>> +    /// # Safety
+>> +    ///
+>> +    /// For the duration of `'a`, the pointer must point at a valid
+>> +    /// `phy_driver`, and the caller must be in a context where all
+>> +    /// methods defined on this struct are safe to call.
+>> +    unsafe fn from_raw<'a>(ptr: *const bindings::phy_driver) -> &'a DriverVTable {
+>> +        // CAST: `DriverVTable` is a `repr(transparent)` wrapper around `bindings::phy_driver`.
+>> +        let ptr = ptr.cast::<DriverVTable>();
+>> +        // SAFETY: by the function requirements the pointer is const and is
+>> +        // always valid to access for the duration of `'a`.
+>> +        unsafe { &*ptr }
+>> +    }
 > 
-> Yeah, but we could add accessor functions that provide that information.
+> If we go the way of supplying a `&DriverVTable` in the
+> `match_phy_device` function, then this should be a function in the impl
+> block of `DriverVTable` and not in `Driver`.
 
-Yes. I thought that implementation was one of the options as well but
-realized it makes sense because inside match_phy_device() callback, a
-driver might call a helper function that takes a pointer to
-bindings::phy_driver (please see below for details).
+Yeah.
 
+> See my reply to Fujita on the previous version, I don't think that we
+> need to add the `DriverVTable` to the `match_phy_device` function if we
+> don't provide accessor methods. Currently that isn't needed, so you only
+> need the hunks above this one. (I'd wait for Fujita's reply though).
 
-> Although that doesn't really make sense at the moment, see below.
->
->> In match_phy_device(), for example, a device driver accesses to
->> PHY_DEVICE_ID, which the Driver trait provides. I think we need to
->> create an instance of the device driver's own type that implements the
->> Driver trait and make it accessible.
-> 
-> I think that's wrong, nothing stops me from implementing `Driver` for an
-> empty enum and that can't be instantiated. The reason that one wants to
-> have this in C is because the same `match` function is used for
-> different drivers (or maybe devices? I'm not too familiar with the
-> terminology). In Rust, you must implement the match function for a
-> single PHY_DEVICE_ID only, so maybe we don't need to change the
-> signature at all?
+Agreed, to make DriverVTable actually useful in match_phy_device(),
+further changes would be needed. I think it's sufficient to simply
+make the Rust code compile, as shown in the patch below.
 
-I'm not sure I understand the last sentence. The Rust PHY abstraction
-allows one module to support multiple drivers. So we can could the
-similar trick that the second patch in this patchset does.
+I can take care of making sure Rust uses DriverVTable correctly later.
 
-fn match_device_id(dev: &mut phy::Device, drv: &phy::DriverVTable) -> bool {
-    // do comparison workking for three drivers
-}
-
-#[vtable]
-impl Driver for PhyA {
-    ...
-    fn match_phy_device(dev: &mut phy::Device, drv: &phy::DriverVTable) -> bool {
-        match_device_id(dev, drv)
-    }
-}
-
-#[vtable]
-impl Driver for PhyB {
-    ...
-    fn match_phy_device(dev: &mut phy::Device, drv: &phy::DriverVTable) -> bool {
-        match_device_id(dev, drv)
-    }
-}
-
-#[vtable]
-impl Driver for PhyC {
-    ...
-    fn match_phy_device(dev: &mut phy::Device, drv: &phy::DriverVTable) -> bool {
-        match_device_id(dev, drv)
-    }
-}
-
-
-The other use case, as mentioned above, is when using the generic helper
-function inside match_phy_device() callback. For example, the 4th
-patch in this patchset adds genphy_match_phy_device():
-
-int genphy_match_phy_device(struct phy_device *phydev,
-                           const struct phy_driver *phydrv)
-
-We could add a wrapper for this function as phy::Device's method like
-
-impl Device {
-    ...
-    pub fn genphy_match_phy_device(&self, drv: &phy::DriverVTable) -> i32 
-
-Then a driver could do something like 5th patch in the patchset:
-
-#[vtable]
-impl Driver for PhyD {
-    ...
-    fn match_phy_device(dev: &mut phy::Device, drv: &phy::DriverVTable) -> bool {
-       let val = dev.genphy_match_phy_device(drv);
-       ...
-    }
-}
+diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
+index a59469c785e3..32ea43ece646 100644
+--- a/rust/kernel/net/phy.rs
++++ b/rust/kernel/net/phy.rs
+@@ -421,6 +421,7 @@ impl<T: Driver> Adapter<T> {
+     /// `phydev` must be passed by the corresponding callback in `phy_driver`.
+     unsafe extern "C" fn match_phy_device_callback(
+         phydev: *mut bindings::phy_device,
++        _phydrv: *const bindings::phy_driver,
+     ) -> crate::ffi::c_int {
+         // SAFETY: This callback is called only in contexts
+         // where we hold `phy_device->lock`, so the accessors on
 
