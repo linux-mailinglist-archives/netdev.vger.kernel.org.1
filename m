@@ -1,171 +1,126 @@
-Return-Path: <netdev+bounces-191262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D4ECABA7CD
-	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 04:24:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C957DABA7EB
+	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 04:52:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BB6E1BA6C60
-	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 02:24:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6ACD517C305
+	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 02:52:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60EAC481C4;
-	Sat, 17 May 2025 02:24:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E430144304;
+	Sat, 17 May 2025 02:52:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VdRsgW8A"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="McJpQK12"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C83E136A
-	for <netdev@vger.kernel.org>; Sat, 17 May 2025 02:24:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F1F6347B4;
+	Sat, 17 May 2025 02:52:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747448668; cv=none; b=kXlZ6ZekkWEOBwi5E96hMDX6yB6/MMFBDl4q1GiplxKzcyqjhYUQLNyrCYN4mQyW0EUYGynND67MuLf9nTKNsc4ujUMJkxtEwA2skf7Q2jf4Oc+HupQvoVlZc9wItrkvphK4y6Cjs294Dp3zUtKg7NxdX7olEUbOH//VOu9A0yU=
+	t=1747450342; cv=none; b=iiC/Su71NrlPn5x5xjUvJiRsixbC593GI1wOr5AOL9aVkX/uN6TpEOzFQYTCi6l0pNp6SBrXdhcwVzOkIeyaAjRO2yP9ID1zCehFc0xBwwqblo5KA5H89b2XOyzlrwX2DctBot5d7kJO325AKSP0RtJLAB9XlytLZ7PtFMo5Xs8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747448668; c=relaxed/simple;
-	bh=h7aX2ssPnt1Kb4y6lpm12xn6PV/MDkOMHQyrn++Kd2w=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=tqdgnC7zoa3yLnLeAc0StWHvo7HCxmOk+cRPLoc/KJrYh8NADaNea9Rdb/3i+xq6NvvDcOWpXPrkdex4GOgs+lIs1/h0UN6u9QF1osNlotThhdvavwv9/RkzuF6+PgYpTy3LEz4J11oAj0UIcwBA+h0TF/3CRCbqnIqXSlwHe1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VdRsgW8A; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1747450342; c=relaxed/simple;
+	bh=n7AWFPWFWIjXZt0SHoLEFSzimZmTXpG29aNJIaSEyLs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YArDmZFZannZPcLjxYoBDNqTBWG2Hj+bDG40aEbog7EbDYWJR8qHzhTYmEv1vm+j4/WmLh4A/mDL+vRTfAD14PgbCN25taTw13wW8KfFjuRFuEMibPNtAEIZRuGFe8OSr5bSAjsvmh++md+TeiZDfWaHXFe+e3ScVw/PEqGFoxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=McJpQK12; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1747450341; x=1778986341;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=GL/y5vcmXDXc1EWkQZOFfkTkQwsYOksD9WIAFqZhRJA=;
+  b=McJpQK12BENg+ANemRNOyLOqCQd7Vi8xkuZJj9RzTY0IpuV88ZvTq4yK
+   44rWR6ENoxLGTEr+7NPI8qvB/9k5f6GwyEAy0OwDUPjowT/Rl1wxpSvdo
+   /r0+ti7XTrnJ1Aqi+byrlmmucr3eaZQ9BONh1TGybwtUbU/BL7BME3bD4
+   X2z2G8QCldSU+eXfJMcnOE1ZJXhvhGINlIhPUxnQL54l+QpmPvtttumZ6
+   J7fznm/Mqw6bOBJGN6un+5+92xLaRnEwrylx/3B9xJBu9SAAn20b6hMBK
+   E4vlHfC/X40FgIZG+8Y7Fwa4L4iejgnApPr9sgsfjliPcxZObUuv7MxWO
+   g==;
+X-IronPort-AV: E=Sophos;i="6.15,295,1739836800"; 
+   d="scan'208";a="499617658"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2025 02:52:18 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:16376]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.29.53:2525] with esmtp (Farcaster)
+ id 37a77022-cfb3-4f6e-ab60-a957f6e92a13; Sat, 17 May 2025 02:52:17 +0000 (UTC)
+X-Farcaster-Flow-ID: 37a77022-cfb3-4f6e-ab60-a957f6e92a13
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Sat, 17 May 2025 02:52:16 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.142.194.153) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Sat, 17 May 2025 02:52:14 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <ematsumiya@suse.de>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
+	<kuba@kernel.org>, <kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <willemb@google.com>
+Subject: Re: [RFC PATCH 0/1] net: socket: centralize netns refcounting
+Date: Fri, 16 May 2025 19:51:03 -0700
+Message-ID: <20250517025206.47762-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250516220920.1142578-1-ematsumiya@suse.de>
+References: <20250516220920.1142578-1-ematsumiya@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1747448663;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gv5pST7Dgsy3sMDFeBeFuSKUbKMzzt5YcOXi+MoeozQ=;
-	b=VdRsgW8AVT+jpp/7rrc2sj2jNqScfvPUwA/Br5SnXhzbU9CN2IKbaRhOch/lWQTUOe0gV0
-	sX0DvzLiIZmlEA1ifjyGFLHYy4jUB/2fq3ZrVd5lOxXpYn3B6Oi8PtjcoPQSy8Q6+EuHTe
-	1eKE7Uc3evoipD4zf6urfhzgIJuhpKo=
-Date: Sat, 17 May 2025 02:24:17 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Yajun Deng" <yajun.deng@linux.dev>
-Message-ID: <3f8cd57a8c9456bf65fe7d83e48f090f2dfa2999@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH net-next] net: sysfs: Implement is_visible for
- phys_(port_id, port_name, switch_id)
-To: "Jakub Kicinski" <kuba@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- horms@kernel.org, andrew+netdev@lunn.ch, netdev@vger.kernel.org
-In-Reply-To: <20250516152611.5945afae@kernel.org>
-References: <20250515130205.3274-1-yajun.deng@linux.dev>
- <20250516152611.5945afae@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D040UWB001.ant.amazon.com (10.13.138.82) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-May 17, 2025 at 6:26 AM, "Jakub Kicinski" <kuba@kernel.org> wrote:
+From: Enzo Matsumiya <ematsumiya@suse.de>
+Date: Fri, 16 May 2025 19:09:18 -0300
+> Hi,
+> 
+> I came up with this patch to centralize netns refcounting on kernel sockets,
+> because `sk_net_refcnt = !kern' is not enough anymore.
+> 
+> The idea is simply to remove the responsibility of a module outside of net/
+> to have to deal with sockets internals (cf. sk_net_refcnt_upgrade()).
+> 
+> It adds an anonymous enum (just for named values) SOCK_NETNS_REFCNT_* that
+> can be passed to __sock_create() and sk_alloc() through the @kern arg.
+> (this was much easier and shorter than e.g. adding another arg)
+> 
+> A sock_create_netns() wrapper is added, for callers who need such refcounting
+> (e.g. current callers of sk_net_refcnt_upgrade()).
+> 
+> And then, the core change is quite simple in sk_alloc() -- sk_net_refcnt is
+> set only if it's a user socket, or
+> (@kern == SOCK_NETNS_REFCNT_KERN_ANY && @net != inet_net).
+> 
+> I have the patches that modifies current users of sk_net_refcnt_upgrade() to
+> create their sockets with sock_create_netns(), if anyone wants to test or
+> this gets merged.
+> 
+> I could confirm this works only on cifs, though, by using Kuniyuki's reproducer
+> in [0], which is quite reliable.  Unfortunately, I don't know enough about the
+> other modules and/or how to trigger this same bug on those, but I'll be happy
+> to test it if I can get instructions.
+> 
 
+I was waiting for b013b817f32f to land on net-next to respin
+this series [0] as propised in [1].
 
+[0]: https://lore.kernel.org/netdev/20241213092152.14057-1-kuniyu@amazon.com/#t
+[1]: https://lore.kernel.org/lkml/20250409190031.38942-1-kuniyu@amazon.com/
 
->=20
->=20On Thu, 15 May 2025 21:02:05 +0800 Yajun Deng wrote:
->=20
->=20>=20
->=20> +static struct attribute *netdev_phys_attrs[] __ro_after_init =3D {
-> >=20
->=20
-> Why __ro_after_init and not const? I can't find the reason with=20
->=20
-> a quick grep. This is just an array of pointers, not objects.
->=20
+So, let me respin it.
 
-These=20attributes in net_class_attrs had __ro_after_init before this pat=
-ch.
-
-
-> >=20
->=20> + &dev_attr_phys_port_id.attr,
-> >=20
->=20>  + &dev_attr_phys_port_name.attr,
-> >=20
->=20>  + &dev_attr_phys_switch_id.attr,
-> >=20
->=20>  + NULL,
-> >=20
->=20>  +};
-> >=20
->=20>  +
-> >=20
->=20>  +static umode_t netdev_phys_is_visible(struct kobject *kobj,
-> >=20
->=20>  + struct attribute *attr, int index)
-> >=20
->=20>  +{
-> >=20
->=20>  + struct device *dev =3D kobj_to_dev(kobj);
-> >=20
->=20>  + struct net_device *netdev =3D to_net_dev(dev);
-> >=20
->=20>  +
-> >=20
->=20>  + if (attr =3D=3D &dev_attr_phys_port_id.attr) {
-> >=20
->=20>  + /* The check is also done in dev_get_phys_port_id; this helps re=
-turning
-> >=20
->=20>  + * early without hitting the locking section below.
-> >=20
->=20>  + */
-> >=20
->=20>  + if (!netdev->netdev_ops->ndo_get_phys_port_id)
-> >=20
->=20>  + return 0;
-> >=20
->=20>  + } else if (attr =3D=3D &dev_attr_phys_port_name.attr) {
-> >=20
->=20>  + /* The checks are also done in dev_get_phys_port_name; this help=
-s
-> >=20
->=20>  + * returning early without hitting the locking section below.
-> >=20
->=20>  + */
-> >=20
->=20>  + if (!netdev->netdev_ops->ndo_get_phys_port_name &&
-> >=20
->=20>  + !netdev->devlink_port)
-> >=20
->=20>  + return 0;
-> >=20
->=20>  + } else if (attr =3D=3D &dev_attr_phys_switch_id.attr) {
-> >=20
->=20>  + /* The checks are also done in dev_get_phys_port_name; this help=
-s
-> >=20
->=20>  + * returning early without hitting the locking section below. Thi=
-s works
-> >=20
->=20>  + * because recurse is false when calling dev_get_port_parent_id.
-> >=20
->=20>  + */
-> >=20
->=20>  + if (!netdev->netdev_ops->ndo_get_port_parent_id &&
-> >=20
->=20>  + !netdev->devlink_port)
-> >=20
->=20>  + return 0;
-> >=20
->=20
-> I'm slightly worried some user space depends on the files existing,
->=20
->=20but maybe ENOENT vs EOPNOTSUPP doesn't make a big difference.
->=20
->=20Can you remove the comments, tho? I don't think they add much value.
->=20
-Okay.
-
->=20--=20
->=20
-> pw-bot: cr
->
+FWIW, I posted the most identical patch before the series.
+https://lore.kernel.org/netdev/20240227011041.97375-4-kuniyu@amazon.com/
 
