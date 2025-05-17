@@ -1,122 +1,160 @@
-Return-Path: <netdev+bounces-191282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39A7AABA8D2
-	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 10:07:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 336C1ABA8D0
+	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 10:06:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 227C73B3A89
-	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 08:07:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05C2B3B3E64
+	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 08:06:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDAFB1CCB4B;
-	Sat, 17 May 2025 08:07:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 612A91C5485;
+	Sat, 17 May 2025 08:06:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="BrNLLp+g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SwY7/cN2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.wp.pl (mx3.wp.pl [212.77.101.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F1BF15A86B
-	for <netdev@vger.kernel.org>; Sat, 17 May 2025 08:07:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A7E1154457;
+	Sat, 17 May 2025 08:06:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747469245; cv=none; b=txfcy/Y7CuL3QY3b690+7GSydcejtge/6A6Vl+v+SgH/MaGV1p5c57q2rtMw6m5JG1pmO2ruk+6200FkQWBTPjBet5m3CFsvoHrNhgNH6XQaxf3ekWYu67r4uiuy68wuLDT4bZiHUHtqQ9Q+dl/oyKk3dLjYzIE9A0cT0A21IEU=
+	t=1747469181; cv=none; b=LPQ9DzMqCi4a3gqjcII03AgWtdd4FA5ZaGLLqBRUXeFEjpp85HtnSC/GKfzEjLzFKDv0hk+nbcY6vHaYqtGDABHwFAc6grEfrrqyB3IS9C6B4z8jvo4NGIhzYDKQUYz8vELjIYu3LCUulhXEoDVSxzCrdFhK1rPKAW1iYZyrEMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747469245; c=relaxed/simple;
-	bh=GzUx3qX8x8Ti/WYrmeDubgDgmu4jLi8bLsh1uhw67kY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W1ja7eTDHUiOiK5mjbVuOwNrIviuCxcxLw3FlHHBD+L239H9NOISTTE02bAtNs+aYCRh77kQczc9j48f474l5He09zxandCHQln9GVtOPxdmxzdcng07Snzd849f7c1VKhd/m0dRIkqoBWL4HAsBr+bKFdS/I6/CKr9zrnFPZ/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=BrNLLp+g; arc=none smtp.client-ip=212.77.101.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
-Received: (wp-smtpd smtp.wp.pl 25770 invoked from network); 17 May 2025 09:40:40 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
-          t=1747467640; bh=vQzP50BnvI3iw2cFJFa5sluy2kEXYWbvimnAccLCu5M=;
-          h=From:To:Cc:Subject;
-          b=BrNLLp+garP4N8WaeTnMRagYwZpHQ7I6HOH5WNH4Or66u0Te/Ov1VGM9iPfCEzSjB
-           XN9w+ZsSr4ZX61NM6YnIgi8YCUiRXXlKTDOIpT5E8fPJoiNjNOyVrmXIaeCUVe8Yv3
-           9TqZ3dvokEroZDA0fRAShrlSZV9OaqDjv2q3FXMoq6XLwPfUGz1v/16BYOcck0frCz
-           ens3cmATBAZRVvwFAd31wHxaX3Mn0vbOJQ2SZ1cFH0Dk8KdqA9XplRMraKMwSGtS0b
-           PV3b9Daw6C526l/CjINRvEefI90nYXK33NQ7zAx5Iaeaj/odicvm9bPkof/5jSEys/
-           lHLfHkeeJUgbQ==
-Received: from 89-64-9-114.dynamic.play.pl (HELO localhost) (stf_xl@wp.pl@[89.64.9.114])
-          (envelope-sender <stf_xl@wp.pl>)
-          by smtp.wp.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
-          for <pchelkin@ispras.ru>; 17 May 2025 09:40:40 +0200
-Date: Sat, 17 May 2025 09:40:40 +0200
-From: Stanislaw Gruszka <stf_xl@wp.pl>
-To: Fedor Pchelkin <pchelkin@ispras.ru>,
-	Johannes Berg <johannes@sipsolutions.net>
-Cc: Alexei Safin <a.safin@rosa.ru>, lvc-project@linuxtesting.org,
-	netdev@vger.kernel.org, Kalle Valo <kvalo@kernel.org>,
-	linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"David S . Miller" <davem@davemloft.net>
-Subject: [PATCH] wifi: iwlegacy: Check rate_idx range after addition
-Message-ID: <20250517074040.GA96365@wp.pl>
-References: <20250424185244.3562-1-a.safin@rosa.ru>
- <20250427063900.GA48509@wp.pl>
- <d57qkj2tj4bgfobgzbhcb4bceh327o35mgamy2yyfuvolg4ymo@7p7hbpyg5bxi>
+	s=arc-20240116; t=1747469181; c=relaxed/simple;
+	bh=v25frJiPTgTzstYi/qAYHKcOdKSdtiKU5KMYe58p61Y=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=IrsVA6HO50F6psJCwrHbwqmHjqFlqeah40LvFxHnjhmV+gJCvB+1kWLZrPuihm9K9gB+V8p2DAhnTyCB25dX8wr2GhxSfFvrUpkdU0bi1OXRqBQ/fsSvzypxC5YEzMO8U2KGfd7aDmO4UR1puIsiw1g6WA0cnmlfJD467uexSzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SwY7/cN2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05DA1C4CEE3;
+	Sat, 17 May 2025 08:06:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747469180;
+	bh=v25frJiPTgTzstYi/qAYHKcOdKSdtiKU5KMYe58p61Y=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=SwY7/cN2Yk1sCK+NCwebNdelth5ocrTWsV+A1Vlb+aXtKBAIwx9r0Xxn42aF7YHHU
+	 Hl9f+82kqPSdIRZ8Qn+R6VFiudcyRLYrxVQ1aZUwePfIgfQxa8d9qau99wVJeEQdWl
+	 YIRlkDxedT3uy8iapsaVkDx+0kFGnIbSsUal3aRHGlLJUqq+c23DWs0H5bl1qGMxNV
+	 3BD0fsEX0HU8pzsA/lGNKlHpiaazodmAW+mgK9tjJx62dfeNPimse6k1LT4ghBHOvb
+	 OsbIoyQcyU9cACNzuN+xjcyMHWm/vi4nGQt/rso3x5IGSAY7phQ/oMjWuzL/zPg63X
+	 d6ZBqH+vI6ykg==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d57qkj2tj4bgfobgzbhcb4bceh327o35mgamy2yyfuvolg4ymo@7p7hbpyg5bxi>
-X-WP-MailID: 779311392d6761ada01cae0109ceb9c8
-X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
-X-WP-SPAM: NO 0000000 [sVOR]                               
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Sat, 17 May 2025 10:06:13 +0200
+Message-Id: <D9YA4FS5EX4S.217A1IK0WW4WR@kernel.org>
+Cc: <ansuelsmth@gmail.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+ <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+ <robh@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
+ <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+ <florian.fainelli@broadcom.com>, <bcm-kernel-feedback-list@broadcom.com>,
+ <kabel@kernel.org>, <andrei.botila@oss.nxp.com>, <tmgross@umich.edu>,
+ <ojeda@kernel.org>, <alex.gaynor@gmail.com>, <boqun.feng@gmail.com>,
+ <gary@garyguo.net>, <bjorn3_gh@protonmail.com>, <benno.lossin@proton.me>,
+ <a.hindborg@kernel.org>, <aliceryhl@google.com>, <dakr@kernel.org>,
+ <sd@queasysnail.net>, <michael@fossekall.de>, <daniel@makrotopia.org>,
+ <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <rust-for-linux@vger.kernel.org>
+Subject: Re: [net-next PATCH v10 7/7] rust: net::phy sync with
+ match_phy_device C changes
+From: "Benno Lossin" <lossin@kernel.org>
+To: "FUJITA Tomonori" <fujita.tomonori@gmail.com>
+X-Mailer: aerc 0.20.1
+References: <D9XO2721HEQI.3BGSHJXCHPTL@kernel.org>
+ <682755d8.050a0220.3c78c8.a604@mx.google.com>
+ <D9XV0Y22JHU5.3T51FVQONVERC@kernel.org>
+ <20250517.152735.1375764560545086525.fujita.tomonori@gmail.com>
+In-Reply-To: <20250517.152735.1375764560545086525.fujita.tomonori@gmail.com>
 
-Move rate_idx range check after we add IL_FIRST_OFDM_RATE for it
-for 5GHz band.
+On Sat May 17, 2025 at 8:27 AM CEST, FUJITA Tomonori wrote:
+> On Fri, 16 May 2025 22:16:23 +0200
+> "Benno Lossin" <lossin@kernel.org> wrote:
+>> On Fri May 16, 2025 at 5:12 PM CEST, Christian Marangi wrote:
+>>> On Fri, May 16, 2025 at 04:48:53PM +0200, Benno Lossin wrote:
+>>>> On Fri May 16, 2025 at 2:30 PM CEST, FUJITA Tomonori wrote:
+>>>> > On Thu, 15 May 2025 13:27:12 +0200
+>>>> > Christian Marangi <ansuelsmth@gmail.com> wrote:
+>>>> >> @@ -574,6 +577,23 @@ pub const fn create_phy_driver<T: Driver>() ->=
+ DriverVTable {
+>>>> >>  /// This trait is used to create a [`DriverVTable`].
+>>>> >>  #[vtable]
+>>>> >>  pub trait Driver {
+>>>> >> +    /// # Safety
+>>>> >> +    ///
+>>>> >> +    /// For the duration of `'a`,
+>>>> >> +    /// - the pointer must point at a valid `phy_driver`, and the =
+caller
+>>>> >> +    ///   must be in a context where all methods defined on this s=
+truct
+>>>> >> +    ///   are safe to call.
+>>>> >> +    unsafe fn from_raw<'a>(ptr: *const bindings::phy_driver) -> &'=
+a Self
+>>>> >> +    where
+>>>> >> +        Self: Sized,
+>>>> >> +    {
+>>>> >> +        // CAST: `Self` is a `repr(transparent)` wrapper around `b=
+indings::phy_driver`.
+>>>> >> +        let ptr =3D ptr.cast::<Self>();
+>>>> >> +        // SAFETY: by the function requirements the pointer is val=
+id and we have unique access for
+>>>> >> +        // the duration of `'a`.
+>>>> >> +        unsafe { &*ptr }
+>>>> >> +    }
+>>>> >
+>>>> > We might need to update the comment. phy_driver is const so I think
+>>>> > that we can access to it any time.
+>>>>=20
+>>>> Why is any type implementing `Driver` a transparent wrapper around
+>>>> `bindings::phy_driver`?
+>>>>=20
+>>>
+>>> Is this referred to a problem with using from_raw or more of a general
+>>> question on how the rust wrapper are done for phy code?
+>>=20
+>> I looked at the `phy.rs` file again and now I'm pretty sure the above
+>> code is wrong. `Self` can be implemented on any type (even types like
+>> `Infallible` that do not have any valid bit patterns, since it's an
+>> empty enum). The abstraction for `bindings::phy_driver` is
+>> `DriverVTable` not an object of type `Self`, so you should cast to that
+>> pointer instead.
+>
+> Yeah.
+>
+> I don't want to delay this patchset due to Rust side changes so
+> casting a pointer to bindings::phy_driver to DriverVTable is ok but
+> the following signature doesn't look useful for Rust phy drivers:
+>
+> fn match_phy_device(_dev: &mut Device, _drv: &DriverVTable) -> bool
+>
+> struct DriverVTable is only used to create an array of
+> bindings::phy_driver for C side, and it doesn't provide any
+> information to the Rust driver.
 
-Additionally use ">= RATE_COUNT" check instead of "> RATE_COUNT_LEGACY"
-to avoid possible reviewers and static code analyzers confusion about
-size of il_rate array.
+Yeah, but we could add accessor functions that provide that information.
+Although that doesn't really make sense at the moment, see below.
 
-Reported-by: Fedor Pchelkin <pchelkin@ispras.ru>
-Reported-by: Alexei Safin <a.safin@rosa.ru>
-Signed-off-by: Stanislaw Gruszka <stf_xl@wp.pl>
+> In match_phy_device(), for example, a device driver accesses to
+> PHY_DEVICE_ID, which the Driver trait provides. I think we need to
+> create an instance of the device driver's own type that implements the
+> Driver trait and make it accessible.
+
+I think that's wrong, nothing stops me from implementing `Driver` for an
+empty enum and that can't be instantiated. The reason that one wants to
+have this in C is because the same `match` function is used for
+different drivers (or maybe devices? I'm not too familiar with the
+terminology). In Rust, you must implement the match function for a
+single PHY_DEVICE_ID only, so maybe we don't need to change the
+signature at all?
+
 ---
- drivers/net/wireless/intel/iwlegacy/4965-mac.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/wireless/intel/iwlegacy/4965-mac.c b/drivers/net/wireless/intel/iwlegacy/4965-mac.c
-index dc8c408902e6..2294ea43b4c7 100644
---- a/drivers/net/wireless/intel/iwlegacy/4965-mac.c
-+++ b/drivers/net/wireless/intel/iwlegacy/4965-mac.c
-@@ -1567,16 +1567,19 @@ il4965_tx_cmd_build_rate(struct il_priv *il,
- 	/**
- 	 * If the current TX rate stored in mac80211 has the MCS bit set, it's
- 	 * not really a TX rate.  Thus, we use the lowest supported rate for
--	 * this band.  Also use the lowest supported rate if the stored rate
--	 * idx is invalid.
-+	 * this band.
- 	 */
- 	rate_idx = info->control.rates[0].idx;
--	if ((info->control.rates[0].flags & IEEE80211_TX_RC_MCS) || rate_idx < 0
--	    || rate_idx > RATE_COUNT_LEGACY)
-+	if (info->control.rates[0].flags & IEEE80211_TX_RC_MCS)
- 		rate_idx = rate_lowest_index(&il->bands[info->band], sta);
--	/* For 5 GHZ band, remap mac80211 rate indices into driver indices */
--	if (info->band == NL80211_BAND_5GHZ)
-+	else if (info->band == NL80211_BAND_5GHZ)
-+		/* For 5 GHZ band, remap mac80211 rate indices into driver indices */
- 		rate_idx += IL_FIRST_OFDM_RATE;
-+
-+	/* Use the lowest supported rate if the stored rate idx is invalid. */
-+	if (rate_idx < 0 || rate_idx >= RATE_COUNT)
-+		rate_idx = rate_lowest_index(&il->bands[info->band], sta);
-+
- 	/* Get PLCP rate for tx_cmd->rate_n_flags */
- 	rate_plcp = il_rates[rate_idx].plcp;
- 	/* Zero out flags for this packet */
--- 
-2.25.4
+Cheers,
+Benno
 
