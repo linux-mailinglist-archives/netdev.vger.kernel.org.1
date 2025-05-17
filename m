@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-191287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14813ABA977
-	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 12:08:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55A30ABA97B
+	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 12:08:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E72943B61D7
-	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 10:07:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA2BD1BA270C
+	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 10:08:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE79F1EDA16;
-	Sat, 17 May 2025 10:05:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AFE61F5820;
+	Sat, 17 May 2025 10:05:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F38B1E521D;
-	Sat, 17 May 2025 10:05:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A7C11DE3A7;
+	Sat, 17 May 2025 10:05:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747476326; cv=none; b=gXZSo28twcPrFbF5PflpRZFDufv7tcsIUvupqrODXSZVERTUq+jpdu6L0wl8DeTXaY5cbX60lzlGgNqCFCCqWLj06xRdCn1907YAIxZpNdKvTTRg37Cm7ds32RLgvHdcrADcBuyaG561R58c/CorQsAlmaMguSGFRCDH4MelHEY=
+	t=1747476337; cv=none; b=b0svIcro3Jyx/h5KvxKeZrDvNJEQa/EcF3SzcS+bG6GLnYdhoEf5Bht2mLtYOhhFyy7mYZ4r46eEDo0g86kj93UrWwmYlRzSktKlB9G1LIHnFdVIv7d5X9mzGitQr/bIWJKJRQVWEw7s6Ba+xw6jPBJ/h0SOIg93zbPhBUcDCjo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747476326; c=relaxed/simple;
-	bh=zf60cnGWJmyto7hJniS3i37W9CD8mvZyR+D1yMUdzGM=;
+	s=arc-20240116; t=1747476337; c=relaxed/simple;
+	bh=cDKGUI3rjs2G7Oboz1ElaHfdfU5ASoa3Muk9Q8T29So=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZRVqNrh/82f/esOhg4wPzb2d9wqUNc+8X2pNaabpZLsFaDPEw2WLyc3LL2hc/anWqsFmO/cW+EAWoFq7N1uqPFKuLgqPQkrku8SjXE4UFNAmfp6fTfwpIlbdEKzx3uslz/7FPUd95Lpxiq2C8U5plmU+xA96PpHQ7snQkNBvMZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+	 MIME-Version:Content-Type; b=dGn626QvH3pCHeY74ao0a8YjLLXUkTvOwHqYHZh2Em8jqW0IlRz5aga9Ij7+D7WFvXe0req5AgaoAljDB+/5gMiyRXUmZOyLj6uMGy2bPKWhNZDH0EFfT6dZw6XNoRvSRavz6bD3SOaccEFzHS9CuEp4RNC26L6WUXOEbc6bnSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4b00006p6VzxWp2;
-	Sat, 17 May 2025 18:03:44 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4b002g4Hrlz27hdQ;
+	Sat, 17 May 2025 18:06:03 +0800 (CST)
 Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 139051402E0;
+	by mail.maildlp.com (Postfix) with ESMTPS id AFEE61800B3;
 	Sat, 17 May 2025 18:05:15 +0800 (CST)
 Received: from localhost.localdomain (10.90.30.45) by
  kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
@@ -47,9 +47,9 @@ CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
 	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
 	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
-Subject: [PATCH v2 net 1/2] net: hibmcge: fix incorrect statistics update issue
-Date: Sat, 17 May 2025 17:58:27 +0800
-Message-ID: <20250517095828.1763126-2-shaojijie@huawei.com>
+Subject: [PATCH v2 net 2/2] net: hibmcge: fix wrong ndo.open() after reset fail issue.
+Date: Sat, 17 May 2025 17:58:28 +0800
+Message-ID: <20250517095828.1763126-3-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20250517095828.1763126-1-shaojijie@huawei.com>
 References: <20250517095828.1763126-1-shaojijie@huawei.com>
@@ -64,33 +64,80 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
  kwepemk100013.china.huawei.com (7.202.194.61)
 
-When the user dumps statistics, the hibmcge driver automatically
-updates all statistics. If the driver is performing the reset operation,
-the error data of 0xFFFFFFFF is updated.
+If the driver reset fails, it may not work properly.
+Therefore, the ndo.open() operation should be rejected.
 
-Therefore, if the driver is resetting, the hbg_update_stats_by_info()
-needs to return directly.
+In this patch, the driver calls netif_device_detach()
+before the reset and calls netif_device_attach()
+after the reset succeeds. If the reset fails,
+netif_device_attach() is not called. Therefore,
+netdev does not present and cannot be opened.
 
-Fixes: c0bf9bf31e79 ("net: hibmcge: Add support for dump statistics")
+If reset fails, only the PCI reset (via sysfs)
+can be used to attempt recovery.
+
+Fixes: 3f5a61f6d504 ("net: hibmcge: Add reset supported in this module")
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 ---
- drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c | 3 +++
- 1 file changed, 3 insertions(+)
+ChangeLog:
+v1 -> v2:
+  - Use netif_device_detach() to block netdev callbacks after reset fails, suggested by Jakub.
+  v1: https://lore.kernel.org/all/20250430093127.2400813-1-shaojijie@huawei.com/
+---
+ drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
-index 8f1107b85fbb..55520053270a 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
-@@ -317,6 +317,9 @@ static void hbg_update_stats_by_info(struct hbg_priv *priv,
- 	const struct hbg_ethtool_stats *stats;
- 	u32 i;
+diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c
+index a0bcfb5a713d..ff3295b60a69 100644
+--- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c
++++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c
+@@ -61,6 +61,8 @@ static int hbg_reset_prepare(struct hbg_priv *priv, enum hbg_reset_type type)
+ 		return -EBUSY;
+ 	}
  
-+	if (test_bit(HBG_NIC_STATE_RESETTING, &priv->state))
-+		return;
++	netif_device_detach(priv->netdev);
 +
- 	for (i = 0; i < info_len; i++) {
- 		stats = &info[i];
- 		if (!stats->reg)
+ 	priv->reset_type = type;
+ 	set_bit(HBG_NIC_STATE_RESETTING, &priv->state);
+ 	clear_bit(HBG_NIC_STATE_RESET_FAIL, &priv->state);
+@@ -91,6 +93,8 @@ static int hbg_reset_done(struct hbg_priv *priv, enum hbg_reset_type type)
+ 		return ret;
+ 	}
+ 
++	netif_device_attach(priv->netdev);
++
+ 	dev_info(&priv->pdev->dev, "reset done\n");
+ 	return ret;
+ }
+@@ -117,16 +121,13 @@ void hbg_err_reset(struct hbg_priv *priv)
+ 	if (running)
+ 		dev_close(priv->netdev);
+ 
+-	hbg_reset(priv);
+-
+-	/* in hbg_pci_err_detected(), we will detach first,
+-	 * so we need to attach before open
+-	 */
+-	if (!netif_device_present(priv->netdev))
+-		netif_device_attach(priv->netdev);
++	if (hbg_reset(priv))
++		goto err_unlock;
+ 
+ 	if (running)
+ 		dev_open(priv->netdev, NULL);
++
++err_unlock:
+ 	rtnl_unlock();
+ }
+ 
+@@ -160,7 +161,6 @@ static pci_ers_result_t hbg_pci_err_slot_reset(struct pci_dev *pdev)
+ 	pci_save_state(pdev);
+ 
+ 	hbg_err_reset(priv);
+-	netif_device_attach(netdev);
+ 	return PCI_ERS_RESULT_RECOVERED;
+ }
+ 
 -- 
 2.33.0
 
