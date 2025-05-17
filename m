@@ -1,144 +1,138 @@
-Return-Path: <netdev+bounces-191288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55A30ABA97B
-	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 12:08:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06271ABAA03
+	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 14:21:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA2BD1BA270C
-	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 10:08:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF5F83A2339
+	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 12:21:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AFE61F5820;
-	Sat, 17 May 2025 10:05:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0BBB1FBE8A;
+	Sat, 17 May 2025 12:21:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="b2SsUhlm"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A7C11DE3A7;
-	Sat, 17 May 2025 10:05:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 617E11E4BE;
+	Sat, 17 May 2025 12:21:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747476337; cv=none; b=b0svIcro3Jyx/h5KvxKeZrDvNJEQa/EcF3SzcS+bG6GLnYdhoEf5Bht2mLtYOhhFyy7mYZ4r46eEDo0g86kj93UrWwmYlRzSktKlB9G1LIHnFdVIv7d5X9mzGitQr/bIWJKJRQVWEw7s6Ba+xw6jPBJ/h0SOIg93zbPhBUcDCjo=
+	t=1747484476; cv=none; b=tukVNjlWahTSFJpzptRnWt3+j8zsbErVdyPo53hQlA8QoTcRpc9L9f2ZUDdA4dsaXxCtqBUgatdMN30s22+1exomp8Yd51kONGHq97N/D+DfUoFbDUjJY3kk+sCS6i8lQ8VTJ60tJ4v7A44V95HCdCk/pAqA0y9Xdrt0oeTP7Do=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747476337; c=relaxed/simple;
-	bh=cDKGUI3rjs2G7Oboz1ElaHfdfU5ASoa3Muk9Q8T29So=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dGn626QvH3pCHeY74ao0a8YjLLXUkTvOwHqYHZh2Em8jqW0IlRz5aga9Ij7+D7WFvXe0req5AgaoAljDB+/5gMiyRXUmZOyLj6uMGy2bPKWhNZDH0EFfT6dZw6XNoRvSRavz6bD3SOaccEFzHS9CuEp4RNC26L6WUXOEbc6bnSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4b002g4Hrlz27hdQ;
-	Sat, 17 May 2025 18:06:03 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id AFEE61800B3;
-	Sat, 17 May 2025 18:05:15 +0800 (CST)
-Received: from localhost.localdomain (10.90.30.45) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 17 May 2025 18:05:14 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
-CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
-	<liuyonglong@huawei.com>, <chenhao418@huawei.com>,
-	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
-Subject: [PATCH v2 net 2/2] net: hibmcge: fix wrong ndo.open() after reset fail issue.
-Date: Sat, 17 May 2025 17:58:28 +0800
-Message-ID: <20250517095828.1763126-3-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20250517095828.1763126-1-shaojijie@huawei.com>
-References: <20250517095828.1763126-1-shaojijie@huawei.com>
+	s=arc-20240116; t=1747484476; c=relaxed/simple;
+	bh=l/GKdNs2n3c+2P7UHIu1YttCo+lljn7T91JrelRRofQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ihLU9/E7p1hGJs1t/1aHuXnG7WUV8kUFFi36hHcmKle4Vdqz3rFYJCcFn53yxFbq3Taxh/SNxMkdhwojPuz03PB6GlYcwpkQRpSCJAtuoDOqllohg51YhbwJRU7ZBWFOX0ddPUG1C/HNt+6YVMa0jFVT7zArItkLQnx7DUAKbBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=b2SsUhlm; arc=none smtp.client-ip=83.149.199.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
+Received: from localhost (unknown [10.10.165.8])
+	by mail.ispras.ru (Postfix) with ESMTPSA id 9A791552F55C;
+	Sat, 17 May 2025 12:21:03 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 9A791552F55C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
+	s=default; t=1747484463;
+	bh=sd+U3YFqzk1RpnzvJolI6XDMfp42yhZlNKOwpVmal5M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=b2SsUhlmTX4gkIlerxaK4I8cvRmhMh0dt/rr90e1mfgH8nCE/TVkBnEcMfwHaVDa0
+	 Tyn5l9+ZNG9UKU0QbjIk0PaWKnGsAJv8yjBdOhNiULFt9jI0KJqqp8yOcLIOHeXFiP
+	 PUxbWdYXUxwL5PXe0bYcIyAlpYDJp7IgehlVo5tw=
+Date: Sat, 17 May 2025 15:21:03 +0300
+From: Fedor Pchelkin <pchelkin@ispras.ru>
+To: Stanislaw Gruszka <stf_xl@wp.pl>
+Cc: Johannes Berg <johannes@sipsolutions.net>, 
+	Alexei Safin <a.safin@rosa.ru>, lvc-project@linuxtesting.org, netdev@vger.kernel.org, 
+	Kalle Valo <kvalo@kernel.org>, linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, "David S . Miller" <davem@davemloft.net>
+Subject: Re: [PATCH] wifi: iwlegacy: Check rate_idx range after addition
+Message-ID: <hrpy3omokg5zvrqnchx4jvp26bvfgdrashkmrjonsyz5b64aaz@6d5kn7z7x73q>
+References: <20250424185244.3562-1-a.safin@rosa.ru>
+ <20250427063900.GA48509@wp.pl>
+ <d57qkj2tj4bgfobgzbhcb4bceh327o35mgamy2yyfuvolg4ymo@7p7hbpyg5bxi>
+ <20250517074040.GA96365@wp.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250517074040.GA96365@wp.pl>
 
-If the driver reset fails, it may not work properly.
-Therefore, the ndo.open() operation should be rejected.
+On Sat, 17. May 09:40, Stanislaw Gruszka wrote:
+> Move rate_idx range check after we add IL_FIRST_OFDM_RATE for it
+> for 5GHz band.
+> 
+> Additionally use ">= RATE_COUNT" check instead of "> RATE_COUNT_LEGACY"
+> to avoid possible reviewers and static code analyzers confusion about
+> size of il_rate array.
+> 
+> Reported-by: Fedor Pchelkin <pchelkin@ispras.ru>
+> Reported-by: Alexei Safin <a.safin@rosa.ru>
+> Signed-off-by: Stanislaw Gruszka <stf_xl@wp.pl>
+> ---
 
-In this patch, the driver calls netif_device_detach()
-before the reset and calls netif_device_attach()
-after the reset succeeds. If the reset fails,
-netif_device_attach() is not called. Therefore,
-netdev does not present and cannot be opened.
+Thank you for the patch, Stanislaw!
 
-If reset fails, only the PCI reset (via sysfs)
-can be used to attempt recovery.
+Please see some comments below.
 
-Fixes: 3f5a61f6d504 ("net: hibmcge: Add reset supported in this module")
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
----
-ChangeLog:
-v1 -> v2:
-  - Use netif_device_detach() to block netdev callbacks after reset fails, suggested by Jakub.
-  v1: https://lore.kernel.org/all/20250430093127.2400813-1-shaojijie@huawei.com/
----
- drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+>  drivers/net/wireless/intel/iwlegacy/4965-mac.c | 15 +++++++++------
+>  1 file changed, 9 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/wireless/intel/iwlegacy/4965-mac.c b/drivers/net/wireless/intel/iwlegacy/4965-mac.c
+> index dc8c408902e6..2294ea43b4c7 100644
+> --- a/drivers/net/wireless/intel/iwlegacy/4965-mac.c
+> +++ b/drivers/net/wireless/intel/iwlegacy/4965-mac.c
+> @@ -1567,16 +1567,19 @@ il4965_tx_cmd_build_rate(struct il_priv *il,
+>  	/**
+>  	 * If the current TX rate stored in mac80211 has the MCS bit set, it's
+>  	 * not really a TX rate.  Thus, we use the lowest supported rate for
+> -	 * this band.  Also use the lowest supported rate if the stored rate
+> -	 * idx is invalid.
+> +	 * this band.
+>  	 */
+>  	rate_idx = info->control.rates[0].idx;
+> -	if ((info->control.rates[0].flags & IEEE80211_TX_RC_MCS) || rate_idx < 0
+> -	    || rate_idx > RATE_COUNT_LEGACY)
+> +	if (info->control.rates[0].flags & IEEE80211_TX_RC_MCS)
+>  		rate_idx = rate_lowest_index(&il->bands[info->band], sta);
+> -	/* For 5 GHZ band, remap mac80211 rate indices into driver indices */
+> -	if (info->band == NL80211_BAND_5GHZ)
+> +	else if (info->band == NL80211_BAND_5GHZ)
 
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c
-index a0bcfb5a713d..ff3295b60a69 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c
-@@ -61,6 +61,8 @@ static int hbg_reset_prepare(struct hbg_priv *priv, enum hbg_reset_type type)
- 		return -EBUSY;
- 	}
- 
-+	netif_device_detach(priv->netdev);
-+
- 	priv->reset_type = type;
- 	set_bit(HBG_NIC_STATE_RESETTING, &priv->state);
- 	clear_bit(HBG_NIC_STATE_RESET_FAIL, &priv->state);
-@@ -91,6 +93,8 @@ static int hbg_reset_done(struct hbg_priv *priv, enum hbg_reset_type type)
- 		return ret;
- 	}
- 
-+	netif_device_attach(priv->netdev);
-+
- 	dev_info(&priv->pdev->dev, "reset done\n");
- 	return ret;
- }
-@@ -117,16 +121,13 @@ void hbg_err_reset(struct hbg_priv *priv)
- 	if (running)
- 		dev_close(priv->netdev);
- 
--	hbg_reset(priv);
--
--	/* in hbg_pci_err_detected(), we will detach first,
--	 * so we need to attach before open
--	 */
--	if (!netif_device_present(priv->netdev))
--		netif_device_attach(priv->netdev);
-+	if (hbg_reset(priv))
-+		goto err_unlock;
- 
- 	if (running)
- 		dev_open(priv->netdev, NULL);
-+
-+err_unlock:
- 	rtnl_unlock();
- }
- 
-@@ -160,7 +161,6 @@ static pci_ers_result_t hbg_pci_err_slot_reset(struct pci_dev *pdev)
- 	pci_save_state(pdev);
- 
- 	hbg_err_reset(priv);
--	netif_device_attach(netdev);
- 	return PCI_ERS_RESULT_RECOVERED;
- }
- 
--- 
-2.33.0
+5GHZ shouldn't be in 'else if' clause, I think. Is it mutually exclusive
+with IEEE80211_TX_RC_MCS ?
 
+> +		/* For 5 GHZ band, remap mac80211 rate indices into driver indices */
+>  		rate_idx += IL_FIRST_OFDM_RATE;
+> +
+> +	/* Use the lowest supported rate if the stored rate idx is invalid. */
+> +	if (rate_idx < 0 || rate_idx >= RATE_COUNT)
+
+There is a check inside il4965_rs_get_rate():
+
+	/* Check for invalid rates */
+	if (rate_idx < 0 || rate_idx >= RATE_COUNT_LEGACY ||
+	    (sband->band == NL80211_BAND_5GHZ &&
+	     rate_idx < IL_FIRST_OFDM_RATE))
+		rate_idx = rate_lowest_index(sband, sta);
+
+so RATE_COUNT_LEGACY (60M) is considered invalid there but is accepted
+here in il4965_tx_cmd_build_rate(). It looks strange, at least for the
+fresh reader as me..
+
+> +		rate_idx = rate_lowest_index(&il->bands[info->band], sta);
+> +
+>  	/* Get PLCP rate for tx_cmd->rate_n_flags */
+>  	rate_plcp = il_rates[rate_idx].plcp;
+>  	/* Zero out flags for this packet */
+> -- 
+> 2.25.4
 
