@@ -1,113 +1,252 @@
-Return-Path: <netdev+bounces-191310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FBEAABAC37
-	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 22:08:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA2EDABAC38
+	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 22:09:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9419189DD1A
-	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 20:08:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8F6D189DD28
+	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 20:09:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1DE71FDA9E;
-	Sat, 17 May 2025 20:08:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9543920B808;
+	Sat, 17 May 2025 20:09:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oOcZ/UUx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TvRyOC1K"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD9951A00E7
-	for <netdev@vger.kernel.org>; Sat, 17 May 2025 20:08:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC5174B1E79;
+	Sat, 17 May 2025 20:09:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747512496; cv=none; b=jPSTgxC6a9qsqXaekqMRjXP+bVoryDL3uUWTnA1IqItUQKCnOxZnhfkFx/vS5j7ZxOzbQUJP0CtSXH5f5Zlb7ddZbhYScV5ep/wu1ANN/Tt8v4BTdIiNbgoZqe9Fso0xIonJtCeLaNmE7huyKICwvCdDfdGCwPGc9+oC+7aXOso=
+	t=1747512552; cv=none; b=gedwZLx1omIcGsPmZIh1sjcEDkLMiBRL1HdqkNUSGLWjSTOQ6tQDFsBHJv0yYOwYjSRsxXUcFpOzkXNZvzu7c77cOUuSwF/ixr9a9hrSFoKRaECGCVcwGCxPf33yGWju8EPpJ+i1yFEwseGaaKXz1C7Ubi19cR20WrFxhnn10Oc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747512496; c=relaxed/simple;
-	bh=iA1Y5fx4gXzRmsr7cuWs91Z2WnmPtG6tdy/PS9jMGS8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cknwp1b4Tv0h3+u4UMUuZ19pGxRJ9b1LoNib7BVP2yJDXpVPsTGNGb1McYyv2aDAKU5fDwNZcEz9HDL6qqkaF8FdHEyxZITerpVfThq8hXFJuJCHCfMyiQVre30odlxiWyX+R0XrnyQQiU2wlb4V5yy7MpB0I35sBoGF6PoVy6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oOcZ/UUx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2DFEC4CEE3;
-	Sat, 17 May 2025 20:08:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747512494;
-	bh=iA1Y5fx4gXzRmsr7cuWs91Z2WnmPtG6tdy/PS9jMGS8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=oOcZ/UUxtdChgIw83wmcPrziPn3PbAwqdo2AFLMSQ62+TWl+XvFkxhP6jzPHDz3S2
-	 NAs1iHjI9gJ+goNlfegx9e6zlFw4FdF/9o4AKnkXiOK+ntyf1P3TJzAsIY766jXBLR
-	 zGvF0l6gY2sjtfUPg63+YsUcMqjuOn5SHrYivtuA3Lx/zThZpWl/0VY6AnXx7ZePil
-	 Iq87IL8IRs0kyRNWzd1TRsTTWEwzDADEgPYUoj/zLv/7s09uYTYpkl4ayohykbvs8w
-	 Pg3osMnydhlMJr7wIldTrKVByO2vgJHb/fT55gwwWyQLwWb3fl3ruVWGD4P4l0tpv+
-	 HXbvaW1mZEUlQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	kuniyu@amazon.com,
-	sdf@fomichev.me,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2] net: let lockdep compare instance locks
-Date: Sat, 17 May 2025 13:08:10 -0700
-Message-ID: <20250517200810.466531-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1747512552; c=relaxed/simple;
+	bh=TMqG9CjB2LnWUVbL+i3E25ztftUibPgC8VJkqvvljbM=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KrZ21P8pfOkOg3js30IQ2FJQj8cpM3SvWZnrvXHdDeGoOgp0FANiE4FciyvvAJU0DXyAzVa9kJCFqFjWiBgA/bX4jnBV3HmxRIrqWWP+AwgoVqy4R1mSRmJGekENwzqeCdxfUmGh3u8T13zaYFXnHqPhcGIlMuI91MbdIlTNF0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TvRyOC1K; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-441d1ed82faso23167635e9.0;
+        Sat, 17 May 2025 13:09:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747512549; x=1748117349; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=V5LWVbk/o28tnUQOIgYBSt/dGSgM6hXGxumrTysarjs=;
+        b=TvRyOC1K4oz89ToAKOlX+xsmEa3zmmv2teLodpXsr2ezKT70es8SqSMvPPFdFc59bb
+         OoRZvcWxCGeNsgpE18ki3AguNcHL3c3+5nuRjIC2juu0pUCcSUBJaDPHtcu/3WxP6Zc0
+         E38cNZha+qO3urPepFDHSutJH30RJWIzoNL0vjHx9B3F0Ximvokl31t3fBSHYOBexdaH
+         8GSPAkSx4YwC/9aR2AWo6aOkeH9d3NoiW55B9Vrj9y4qJat2l9u1Uvl9Y5iXUpsujCvO
+         OWm77PhfcY+YS1cnH8m+E72Bmj1Aucgx01h9tx2puJLLat+XJBYEHjTJPMqPlA/u+BrU
+         iwbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747512549; x=1748117349;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V5LWVbk/o28tnUQOIgYBSt/dGSgM6hXGxumrTysarjs=;
+        b=RXjsL4mf3Jk2benKTHPD2Ag5zuQ7q32yP/X9n7gGadp9I9DAyRo7qcL96h/UijTXT6
+         qgu7jAjz12iH2YKZz2i67mRk7UvVPznq8Eq2rlNLtV/tfaZkDjaL9Z+28KxT++PKqQ0x
+         pI7p3D/5v8odFZmdHpoGSvxFcGpWyfkraJ/08le4hD9qOMPMtwsvcEGGWwT4kOyOYmvI
+         NcYAyGJc8GehSIlMZl72ShGx3Ug3QtOhQlq5xErDL4VJX8fgPeA9eFriaZGunEFz4jMB
+         eXlUkEYD9HJ3wibxlP9P1bos3RiLjL6PnW86+/TR0SImooobqr4dQGmbPvTLVsSsRLIL
+         G6iQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUPAJGqS3KQY7icnGd+M6msbX2gPyzn7ahDx2zKJihL5KZuV9RqbmGM9pb8v/KxcQz6WFdEXIB4N6M/@vger.kernel.org, AJvYcCVscBzCpg0IXDKRz0y1T6r8pLArKI9eSvc7HMlwoxuwVAWeUkgw0WRe6OM/gT9rjC67CHUhQruV@vger.kernel.org, AJvYcCW0JbFRAgW+Mg8HErYbS5n3RVa798vGq1o4mBGGDfKyWwDQzn0RlkX2h/m9jIreYuLqBhAuUV2lxti6vgdxUQk=@vger.kernel.org, AJvYcCWmIsWWeRWZZaNW5Rhjdl7tzXfA652XbMNmVjARTPqRaeUUB4K7VTvvuRUfRhVn9/1VS/2g+c9zhL7WSw5K@vger.kernel.org
+X-Gm-Message-State: AOJu0YzbArhmfIDRYdnxtCLTKCxhlMj02p0GGN4SJoVg8tVbe9C9UEze
+	hsyPTdnDTSYXE5BqQbTn+RqKCxwCU+4jRXq6T9feW5Xy2sgXogHdKiAj
+X-Gm-Gg: ASbGnct2bm/xjXZi+j6K+7NKvm+aJ0Opwfb1UhvT1NIhwmVBzp2b8awjqCX4PBrWLMb
+	ueFrG/6y7K+mY37dxZslhSAfaixUH2pE7/TRrYYGFYnnhXJFFUTgaqkIcWuPqJligFue0CKiIuQ
+	gmHpTughUCWExFLY3gJWjcVRrlbQ/NWrrmALH6zzrJq/vViuq5g4B7Luc6geOxK3MU7FTL0DAdY
+	qmln3K3XGhx6TT6QeC56SjxFTeOPazWLA3K3DySFmpb77ODK6FAF8EKJmaollvvFk0YGwwJGgsb
+	X9JGlR5YgCPqhXWhmv3yG/1ClgSGv16U3wH/0aXLPxsNPmHwkk4lR8C+upywgRenupI1fZvGWyf
+	jbFJK8L4=
+X-Google-Smtp-Source: AGHT+IEd/mtwzYiUebZmpkaKej43SV14REit3B587TyDZ3nT5ts/cVhLyEG/wCx0ZfTpwliFkM3n0Q==
+X-Received: by 2002:a05:600c:c8c:b0:442:f4a3:b5ec with SMTP id 5b1f17b1804b1-442fefd5f8dmr76328875e9.4.1747512548739;
+        Sat, 17 May 2025 13:09:08 -0700 (PDT)
+Received: from Ansuel-XPS. (93-34-88-225.ip49.fastwebnet.it. [93.34.88.225])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442f3951a97sm160719005e9.23.2025.05.17.13.09.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 17 May 2025 13:09:08 -0700 (PDT)
+Message-ID: <6828ece4.050a0220.49f8b.ca57@mx.google.com>
+X-Google-Original-Message-ID: <aCjs4ZiamXYmHXKg@Ansuel-XPS.>
+Date: Sat, 17 May 2025 22:09:05 +0200
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Benno Lossin <lossin@kernel.org>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	florian.fainelli@broadcom.com,
+	bcm-kernel-feedback-list@broadcom.com, kabel@kernel.org,
+	andrei.botila@oss.nxp.com, tmgross@umich.edu, ojeda@kernel.org,
+	alex.gaynor@gmail.com, boqun.feng@gmail.com, gary@garyguo.net,
+	bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+	a.hindborg@kernel.org, aliceryhl@google.com, dakr@kernel.org,
+	sd@queasysnail.net, michael@fossekall.de, daniel@makrotopia.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org
+Subject: Re: [net-next PATCH v10 7/7] rust: net::phy sync with
+ match_phy_device C changes
+References: <D9XV0Y22JHU5.3T51FVQONVERC@kernel.org>
+ <20250517.152735.1375764560545086525.fujita.tomonori@gmail.com>
+ <D9YA4FS5EX4S.217A1IK0WW4WR@kernel.org>
+ <20250517.221313.1252217275580085717.fujita.tomonori@gmail.com>
+ <D9YO3781UI2X.1CI7FG1EATN8G@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <D9YO3781UI2X.1CI7FG1EATN8G@kernel.org>
 
-AFAIU always returning -1 from lockdep's compare function
-basically disables checking of dependencies between given
-locks. Try to be a little more precise about what guarantees
-that instance locks won't deadlock.
+On Sat, May 17, 2025 at 09:02:51PM +0200, Benno Lossin wrote:
+> On Sat May 17, 2025 at 3:13 PM CEST, FUJITA Tomonori wrote:
+> > On Sat, 17 May 2025 10:06:13 +0200
+> > "Benno Lossin" <lossin@kernel.org> wrote:
+> >>>> I looked at the `phy.rs` file again and now I'm pretty sure the above
+> >>>> code is wrong. `Self` can be implemented on any type (even types like
+> >>>> `Infallible` that do not have any valid bit patterns, since it's an
+> >>>> empty enum). The abstraction for `bindings::phy_driver` is
+> >>>> `DriverVTable` not an object of type `Self`, so you should cast to that
+> >>>> pointer instead.
+> >>>
+> >>> Yeah.
+> >>>
+> >>> I don't want to delay this patchset due to Rust side changes so
+> >>> casting a pointer to bindings::phy_driver to DriverVTable is ok but
+> >>> the following signature doesn't look useful for Rust phy drivers:
+> >>>
+> >>> fn match_phy_device(_dev: &mut Device, _drv: &DriverVTable) -> bool
+> >>>
+> >>> struct DriverVTable is only used to create an array of
+> >>> bindings::phy_driver for C side, and it doesn't provide any
+> >>> information to the Rust driver.
+> >> 
+> >> Yeah, but we could add accessor functions that provide that information.
+> >
+> > Yes. I thought that implementation was one of the options as well but
+> > realized it makes sense because inside match_phy_device() callback, a
+> > driver might call a helper function that takes a pointer to
+> > bindings::phy_driver (please see below for details).
+> >
+> >
+> >> Although that doesn't really make sense at the moment, see below.
+> >>
+> >>> In match_phy_device(), for example, a device driver accesses to
+> >>> PHY_DEVICE_ID, which the Driver trait provides. I think we need to
+> >>> create an instance of the device driver's own type that implements the
+> >>> Driver trait and make it accessible.
+> >> 
+> >> I think that's wrong, nothing stops me from implementing `Driver` for an
+> >> empty enum and that can't be instantiated. The reason that one wants to
+> >> have this in C is because the same `match` function is used for
+> >> different drivers (or maybe devices? I'm not too familiar with the
+> >> terminology). In Rust, you must implement the match function for a
+> >> single PHY_DEVICE_ID only, so maybe we don't need to change the
+> >> signature at all?
+> >
+> > I'm not sure I understand the last sentence. The Rust PHY abstraction
+> > allows one module to support multiple drivers. So we can could the
+> > similar trick that the second patch in this patchset does.
+> >
+> > fn match_device_id(dev: &mut phy::Device, drv: &phy::DriverVTable) -> bool {
+> >     // do comparison workking for three drivers
+> > }
+> 
+> I wouldn't do it like this in Rust, instead this would be a "rustier"
+> function signature:
+> 
+>     fn match_device_id<T: Driver>(dev: &mut phy::Device) -> bool {
+>         // do the comparison with T::PHY_DEVICE_ID
+>         dev.id() == T::PHY_DEVICE_ID
+>     }
+> 
+> And then in the impls for Phy{A,B,C,D} do this:
+> 
+>     impl Driver for PhyA {
+>         fn match_phy_device(dev: &mut phy::Device) -> bool {
+>             match_device_id::<Self>(dev)
+>         }
+>     }
+> 
 
-Right now we only nest them under protection of rtnl_lock.
-Mostly in unregister_netdevice_many() and dev_close_many().
+My 2 cent about the discussion and I'm totally detached from how it
+works on Rust kernel code but shouldn't we try to keep parallel API and
+args between C and Rust?
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-v2:
- - drop the speculative small rtnl handling
-v1: https://lore.kernel.org/20250516012459.1385997-1-kuba@kernel.org
----
- include/net/netdev_lock.h | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+I know maybe some thing doesn't make sense from C to Rust but doesn't
+deviates from C code introduce more confusion when something need to be
+ported from C to Rust?
 
-diff --git a/include/net/netdev_lock.h b/include/net/netdev_lock.h
-index 2a753813f849..c345afecd4c5 100644
---- a/include/net/netdev_lock.h
-+++ b/include/net/netdev_lock.h
-@@ -99,16 +99,15 @@ static inline void netdev_unlock_ops_compat(struct net_device *dev)
- static inline int netdev_lock_cmp_fn(const struct lockdep_map *a,
- 				     const struct lockdep_map *b)
- {
--	/* Only lower devices currently grab the instance lock, so no
--	 * real ordering issues can occur. In the near future, only
--	 * hardware devices will grab instance lock which also does not
--	 * involve any ordering. Suppress lockdep ordering warnings
--	 * until (if) we start grabbing instance lock on pure SW
--	 * devices (bond/team/veth/etc).
--	 */
- 	if (a == b)
- 		return 0;
--	return -1;
-+
-+	/* Allow locking multiple devices only under rtnl_lock,
-+	 * the exact order doesn't matter.
-+	 * Note that upper devices don't lock their ops, so nesting
-+	 * mostly happens in batched device removal for now.
-+	 */
-+	return lockdep_rtnl_is_held() ? -1 : 1;
- }
- 
- #define netdev_lockdep_set_classes(dev)				\
+Again no idea if this apply so I'm just curious about this.
+
+> >
+> > #[vtable]
+> > impl Driver for PhyA {
+> >     ...
+> >     fn match_phy_device(dev: &mut phy::Device, drv: &phy::DriverVTable) -> bool {
+> >         match_device_id(dev, drv)
+> >     }
+> > }
+> >
+> > #[vtable]
+> > impl Driver for PhyB {
+> >     ...
+> >     fn match_phy_device(dev: &mut phy::Device, drv: &phy::DriverVTable) -> bool {
+> >         match_device_id(dev, drv)
+> >     }
+> > }
+> >
+> > #[vtable]
+> > impl Driver for PhyC {
+> >     ...
+> >     fn match_phy_device(dev: &mut phy::Device, drv: &phy::DriverVTable) -> bool {
+> >         match_device_id(dev, drv)
+> >     }
+> > }
+> >
+> >
+> > The other use case, as mentioned above, is when using the generic helper
+> > function inside match_phy_device() callback. For example, the 4th
+> > patch in this patchset adds genphy_match_phy_device():
+> >
+> > int genphy_match_phy_device(struct phy_device *phydev,
+> >                            const struct phy_driver *phydrv)
+> >
+> > We could add a wrapper for this function as phy::Device's method like
+> >
+> > impl Device {
+> >     ...
+> >     pub fn genphy_match_phy_device(&self, drv: &phy::DriverVTable) -> i32 
+> 
+> Not sure why this returns an `i32`, but we probably could have such a
+> function as well (though I wouldn't use the vtable for that).
+>
+
+Mhh looking at some comments, maybe the module needs some extra love here
+and there.
+
+> 
+> > Then a driver could do something like 5th patch in the patchset:
+> >
+> > #[vtable]
+> > impl Driver for PhyD {
+> >     ...
+> >     fn match_phy_device(dev: &mut phy::Device, drv: &phy::DriverVTable) -> bool {
+> >        let val = dev.genphy_match_phy_device(drv);
+> >        ...
+> >     }
+> > }
+> 
+
 -- 
-2.49.0
-
+	Ansuel
 
