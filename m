@@ -1,131 +1,398 @@
-Return-Path: <netdev+bounces-191280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 629D3ABA8B2
-	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 09:38:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8FF2ABA8E4
+	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 10:37:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5EF671B662F3
-	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 07:39:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B13D4C1E74
+	for <lists+netdev@lfdr.de>; Sat, 17 May 2025 08:37:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BDD41C2DB2;
-	Sat, 17 May 2025 07:38:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ozmiuTmz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBD841DB551;
+	Sat, 17 May 2025 08:37:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BD451519AC
-	for <netdev@vger.kernel.org>; Sat, 17 May 2025 07:38:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 943AB13D891
+	for <netdev@vger.kernel.org>; Sat, 17 May 2025 08:37:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747467527; cv=none; b=GgNdkZ8B8EwemKFzzG1nY+X/xh2+SLbfabovqXZWRLhr+dm3g+trsQLOKU/THlDEMm9+b9kZGDlpBvJFC8QfRxyUi9H1gU1vtMeHFiqqHrK+FCzHJoKVKPNkiEyCawRrxZOPDI21rMFlfXqwPI6slDhAJVzyOEZARyQBMiaYzIw=
+	t=1747471065; cv=none; b=NJTjYInjypfElKVjaVmKJpyiniAx7K78ADlBcikn+1xLoaZofl/BTf3k8K9cgoPWX/D/aiT4JK6SwC1TDyNXJ8qg6bv+0ZpuyEUBZEfZ8HF44mZo5u+2btrl2DB8bXQKNcaXObuIU5N0QO/oqUA9tN/OpckBFilZeBpE4Q3k0Hw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747467527; c=relaxed/simple;
-	bh=/UzpW5GFx8tR8oPBJ+IxSaWjYlrW3/bxH6xCqRRDNWM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=K/QFgO8aiAPQ0OnaRhVUspibhWat4gtPLdcgVJra+z34Hc2wbNp7djySJUo0I3FEdWC30xUqQI68h8R8spDMeBWZCniYEsXXDWUApcfa6RB352rjgnB+i9jE0jNxUKx9RS5sIv4S6URR1gn1b1r1X2dgiH49HwETrJsp3Du2P5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ozmiuTmz; arc=none smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-47691d82bfbso51779471cf.0
-        for <netdev@vger.kernel.org>; Sat, 17 May 2025 00:38:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747467524; x=1748072324; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=B9kA7G8jvAebsZm9fFd+gZxu9or/CeU8wcOw+bvlUpY=;
-        b=ozmiuTmzFRDTRGkWiCYBKNZIxb+Qqj6uUqqVNJEC+e8HD6jfgXtQET5wRRWvjytz27
-         lx/2ekIdy1gQ+D4ufqoNTKnI1UyGw66w+EUlaSsYO1q9dLbfkWMKTr6mbSi9FOTjW2SF
-         g4/Z4+LIKeQdy4YrmfyiGYKT+7TXiVTS+aYq9lElbVlb2/7pESdG3pnjvbLW78zTKlv1
-         MEHwa0UsEPn0Fc/PPwzSSDwKF6St5Cfhlx6eKGoVZ9iYEA/ov1xGrn1b9fLfZ2eAfD+I
-         DymBP33TF4J8XXzXJ9JlXWQbAfp8aeJaVftstDr1rXTLDGoh/XQKPv0bZgDwHQOn6duX
-         7m1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747467524; x=1748072324;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=B9kA7G8jvAebsZm9fFd+gZxu9or/CeU8wcOw+bvlUpY=;
-        b=Y1uFsoRWP1FXlVHjrjK+5A+wIcjmTN/R3jLiusnMV3L4oyk2klxeZ9ZnS30zSr1DAq
-         Nzb2kCldo8hXx7nCzALcTqep9cURvwl/q7Gk/wbxuEsXoNpN1kfFJiq7FGXeyK9OU42G
-         VmzvsbFdoqG74qySTbTwF+/V2gqMn8he53TlaxCIMtI7RmihqYiVEA0jgtITTgsruEIp
-         Tfp6meEy1tTPSezNj5P1JH+6IjnDafvXhvVsCXZpIW5//O6rwUd/YPxwYmFw/j5tD4ca
-         y/aj+aqpSGryA7xZgCLcT7F+95iX3fIBxsOoGN5dibazUjDlZPwJ9UJnJCeSa5wpa/Lx
-         xQeg==
-X-Forwarded-Encrypted: i=1; AJvYcCXFqaBTsOxcdnpS+oOcbjLQ0Zh6XfvzMhIQwj0S1V0HYt2hHQWDwDKqeXPppoCPI4Dj8lEOY8I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw45G1S+XtjtllVDDxCNNrNLQ58Y7RwJslEkfUHeoc/ZgeMx1Ub
-	Eam5V8JnnOq3UtZl/Nwac4Tj3EVqKXK/jkSnadQGBUE1QAlmiBB8cf+AO1PmnNoFK96m8ocWXtm
-	jthVTdEAMGcQ2qIkOi1D8thlf3vxWamyIvUTbNUROz843vQGJb92p0Xn/sZg=
-X-Gm-Gg: ASbGncuz2uZojsIeD1qM1DqI3PDOKMF/+O2kCW/mIPHa9tdUjVObvQsZMgvHGLDTi8R
-	dV1WhdydQfvOi4obJ7fVaiSITDxdreVN5fT6lMDPvK1aNhG1pUtlgfSURZyeChHD6v/yY8qzQw8
-	bRT2QQ/6GMchC2mz5pNA/OVBZoCnkTlzM=
-X-Google-Smtp-Source: AGHT+IFBfqp+Um/HWnxSdG273xN1f/RM4LtAAlsUIHqaQXuBsq8Q9M571VqWyPoxieYzKpp8L5rKZkatRVDwKHE/5cM=
-X-Received: by 2002:a05:622a:5915:b0:477:1edc:baaa with SMTP id
- d75a77b69052e-494b075afb4mr90658281cf.6.1747467523796; Sat, 17 May 2025
- 00:38:43 -0700 (PDT)
+	s=arc-20240116; t=1747471065; c=relaxed/simple;
+	bh=knAVvo3iJMcdTqPZh9rGbQYiWVthFHNT7bXXirYFEHg=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=RKWRu5Sbn7cGGjY34nN+cAAVQ9JAvktu4CwZQpJmvGkUAzKKMuTcj8AkuWDeqEPBytza/i0GK8q0uflR2k0Y/J3zKRgAkJ7H1HmHhnDKEGrigb2Jm1KV2LJWLrajE7+T/kXumYn6/ztPnJAKtGetTH3qgKQcIjVoFSWGRDH/0lg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 54H7WL3O020451;
+	Sat, 17 May 2025 16:32:21 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.6] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 54H7WLGx020448
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Sat, 17 May 2025 16:32:21 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <ff1d684a-22ec-4ea2-a6ee-fe9704a6f284@I-love.SAKURA.ne.jp>
+Date: Sat, 17 May 2025 16:32:20 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250430085741.5108-1-aaptel@nvidia.com> <20250430085741.5108-2-aaptel@nvidia.com>
- <CANn89iLW86_BsB97jZw0joPwne_K79iiqwogCYFA7U9dZa3jhQ@mail.gmail.com> <2537c2gzk6x.fsf@nvidia.com>
-In-Reply-To: <2537c2gzk6x.fsf@nvidia.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sat, 17 May 2025 00:38:32 -0700
-X-Gm-Features: AX0GCFuZltUxtYUb1nPOItK5LArEgIDp57rbKbS10vKZC2yAJgYMDJKD8I5OG_4
-Message-ID: <CANn89iJa+fWdR4jUqeJyhgwHMa5ujZ96WR6jv6iVFUhOXC+jhA@mail.gmail.com>
-Subject: Re: [PATCH v28 01/20] net: Introduce direct data placement tcp offload
-To: Aurelien Aptel <aaptel@nvidia.com>
-Cc: linux-nvme@lists.infradead.org, netdev@vger.kernel.org, sagi@grimberg.me, 
-	hch@lst.de, kbusch@kernel.org, axboe@fb.com, chaitanyak@nvidia.com, 
-	davem@davemloft.net, kuba@kernel.org, Boris Pismenny <borisp@nvidia.com>, 
-	aurelien.aptel@gmail.com, smalin@nvidia.com, malin1024@gmail.com, 
-	ogerlitz@nvidia.com, yorayz@nvidia.com, galshalom@nvidia.com, 
-	mgurtovoy@nvidia.com, tariqt@nvidia.com, gus@collabora.com, pabeni@redhat.com, 
-	dsahern@kernel.org, ast@kernel.org, jacob.e.keller@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Jiri Pirko <jiri@resnulli.us>, Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Hillf Danton <hdanton@sina.com>,
+        Network Development <netdev@vger.kernel.org>
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Subject: [PATCH (EXPERIMENTAL)] team: replace term lock with rtnl lock
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav202.rs.sakura.ne.jp
+X-Virus-Status: clean
 
-On Fri, May 16, 2025 at 7:47=E2=80=AFAM Aurelien Aptel <aaptel@nvidia.com> =
-wrote:
->
-> Hi Eric,
->
-> We have looked into your suggestions, but both have drawbacks.
->
-> The first idea was to make the tailroom small/empty to prevent
-> condensing. The issue is that the header is already placed at the skb
-> head, and there could be another PDU after the first payload.
+syzbot is reporting locking order problem between wiphy and team [1].
 
-What function in the driver puts the headers in skb->head ? Of course
-you would need to change it.
+Jiri Pirko commented [2]:
 
-Something like this
+  I wonder, since we already rely on rtnl in lots of team code, perhaps we
+  can remove team->lock completely and convert the rest of the code to be
+  protected by rtnl lock as well
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-index 5fd70b4d55beb4ed277a5ea896a6859350b72d21..9a87b3bb46c01dc09d729923e70=
-5ca6df93f1df1
-100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-@@ -553,6 +553,11 @@ mlx5e_copy_skb_header(struct mlx5e_rq *rq, struct
-sk_buff *skb,
+I asked syzbot to check whether rtnl is already held when team lock is
+held, and the reproducer did not find obvious location [3]. Thus, I wrote
+this patch for more testing.
 
-        dma_sync_single_for_cpu(rq->pdev, addr + dma_offset, len,
-                                rq->buff.map_dir);
-+
-+       if (ddp_mode) {
-+               skb_reserve(skb, skb->end - skb->tail);
-+               len =3D headlen;
-+       }
-        skb_copy_to_linear_data(skb, from, len);
+[1] https://syzkaller.appspot.com/bug?extid=705c61d60b091ef42c04
+[2] https://lkml.kernel.org/r/ZoZ2RH9BcahEB9Sb@nanopsycho.orion
+[3] https://lkml.kernel.org/r/68275676.a00a0220.398d88.0213.GAE@google.com
+
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+ drivers/net/team/team_core.c              | 52 +++++++----------------
+ drivers/net/team/team_mode_activebackup.c |  2 +-
+ drivers/net/team/team_mode_loadbalance.c  | 16 ++++---
+ include/linux/if_team.h                   |  3 --
+ 4 files changed, 27 insertions(+), 46 deletions(-)
+
+diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
+index d8fc0c79745d..f32c3db56088 100644
+--- a/drivers/net/team/team_core.c
++++ b/drivers/net/team/team_core.c
+@@ -933,7 +933,7 @@ static bool team_port_find(const struct team *team,
+  * Enable/disable port by adding to enabled port hashlist and setting
+  * port->index (Might be racy so reader could see incorrect ifindex when
+  * processing a flying packet, but that is not a problem). Write guarded
+- * by team->lock.
++ * by RTNL.
+  */
+ static void team_port_enable(struct team *team,
+ 			     struct team_port *port)
+@@ -1660,8 +1660,6 @@ static int team_init(struct net_device *dev)
+ 		goto err_options_register;
+ 	netif_carrier_off(dev);
+ 
+-	lockdep_register_key(&team->team_lock_key);
+-	__mutex_init(&team->lock, "team->team_lock_key", &team->team_lock_key);
+ 	netdev_lockdep_set_classes(dev);
+ 
+ 	return 0;
+@@ -1682,7 +1680,7 @@ static void team_uninit(struct net_device *dev)
+ 	struct team_port *port;
+ 	struct team_port *tmp;
+ 
+-	mutex_lock(&team->lock);
++	ASSERT_RTNL();
+ 	list_for_each_entry_safe(port, tmp, &team->port_list, list)
+ 		team_port_del(team, port->dev);
+ 
+@@ -1691,9 +1689,7 @@ static void team_uninit(struct net_device *dev)
+ 	team_mcast_rejoin_fini(team);
+ 	team_notify_peers_fini(team);
+ 	team_queue_override_fini(team);
+-	mutex_unlock(&team->lock);
+ 	netdev_change_features(dev);
+-	lockdep_unregister_key(&team->team_lock_key);
  }
+ 
+ static void team_destructor(struct net_device *dev)
+@@ -1811,14 +1807,13 @@ static int team_set_mac_address(struct net_device *dev, void *p)
+ 	struct team *team = netdev_priv(dev);
+ 	struct team_port *port;
+ 
++	ASSERT_RTNL();
+ 	if (dev->type == ARPHRD_ETHER && !is_valid_ether_addr(addr->sa_data))
+ 		return -EADDRNOTAVAIL;
+ 	dev_addr_set(dev, addr->sa_data);
+-	mutex_lock(&team->lock);
+ 	list_for_each_entry(port, &team->port_list, list)
+ 		if (team->ops.port_change_dev_addr)
+ 			team->ops.port_change_dev_addr(team, port);
+-	mutex_unlock(&team->lock);
+ 	return 0;
+ }
+ 
+@@ -1829,10 +1824,10 @@ static int team_change_mtu(struct net_device *dev, int new_mtu)
+ 	int err;
+ 
+ 	/*
+-	 * Alhough this is reader, it's guarded by team lock. It's not possible
++	 * Alhough this is reader, it's guarded by RTNL. It's not possible
+ 	 * to traverse list in reverse under rcu_read_lock
+ 	 */
+-	mutex_lock(&team->lock);
++	ASSERT_RTNL();
+ 	team->port_mtu_change_allowed = true;
+ 	list_for_each_entry(port, &team->port_list, list) {
+ 		err = dev_set_mtu(port->dev, new_mtu);
+@@ -1843,7 +1838,6 @@ static int team_change_mtu(struct net_device *dev, int new_mtu)
+ 		}
+ 	}
+ 	team->port_mtu_change_allowed = false;
+-	mutex_unlock(&team->lock);
+ 
+ 	WRITE_ONCE(dev->mtu, new_mtu);
+ 
+@@ -1853,7 +1847,6 @@ static int team_change_mtu(struct net_device *dev, int new_mtu)
+ 	list_for_each_entry_continue_reverse(port, &team->port_list, list)
+ 		dev_set_mtu(port->dev, dev->mtu);
+ 	team->port_mtu_change_allowed = false;
+-	mutex_unlock(&team->lock);
+ 
+ 	return err;
+ }
+@@ -1904,23 +1897,21 @@ static int team_vlan_rx_add_vid(struct net_device *dev, __be16 proto, u16 vid)
+ 	int err;
+ 
+ 	/*
+-	 * Alhough this is reader, it's guarded by team lock. It's not possible
++	 * Alhough this is reader, it's guarded by RTNL. It's not possible
+ 	 * to traverse list in reverse under rcu_read_lock
+ 	 */
+-	mutex_lock(&team->lock);
++	ASSERT_RTNL();
+ 	list_for_each_entry(port, &team->port_list, list) {
+ 		err = vlan_vid_add(port->dev, proto, vid);
+ 		if (err)
+ 			goto unwind;
+ 	}
+-	mutex_unlock(&team->lock);
+ 
+ 	return 0;
+ 
+ unwind:
+ 	list_for_each_entry_continue_reverse(port, &team->port_list, list)
+ 		vlan_vid_del(port->dev, proto, vid);
+-	mutex_unlock(&team->lock);
+ 
+ 	return err;
+ }
+@@ -1930,10 +1921,9 @@ static int team_vlan_rx_kill_vid(struct net_device *dev, __be16 proto, u16 vid)
+ 	struct team *team = netdev_priv(dev);
+ 	struct team_port *port;
+ 
+-	mutex_lock(&team->lock);
++	ASSERT_RTNL();
+ 	list_for_each_entry(port, &team->port_list, list)
+ 		vlan_vid_del(port->dev, proto, vid);
+-	mutex_unlock(&team->lock);
+ 
+ 	return 0;
+ }
+@@ -1955,9 +1945,8 @@ static void team_netpoll_cleanup(struct net_device *dev)
+ {
+ 	struct team *team = netdev_priv(dev);
+ 
+-	mutex_lock(&team->lock);
++	ASSERT_RTNL();
+ 	__team_netpoll_cleanup(team);
+-	mutex_unlock(&team->lock);
+ }
+ 
+ static int team_netpoll_setup(struct net_device *dev)
+@@ -1966,7 +1955,7 @@ static int team_netpoll_setup(struct net_device *dev)
+ 	struct team_port *port;
+ 	int err = 0;
+ 
+-	mutex_lock(&team->lock);
++	ASSERT_RTNL();
+ 	list_for_each_entry(port, &team->port_list, list) {
+ 		err = __team_port_enable_netpoll(port);
+ 		if (err) {
+@@ -1974,7 +1963,6 @@ static int team_netpoll_setup(struct net_device *dev)
+ 			break;
+ 		}
+ 	}
+-	mutex_unlock(&team->lock);
+ 	return err;
+ }
+ #endif
+@@ -1985,9 +1973,8 @@ static int team_add_slave(struct net_device *dev, struct net_device *port_dev,
+ 	struct team *team = netdev_priv(dev);
+ 	int err;
+ 
+-	mutex_lock(&team->lock);
++	ASSERT_RTNL();
+ 	err = team_port_add(team, port_dev, extack);
+-	mutex_unlock(&team->lock);
+ 
+ 	if (!err)
+ 		netdev_change_features(dev);
+@@ -2000,18 +1987,12 @@ static int team_del_slave(struct net_device *dev, struct net_device *port_dev)
+ 	struct team *team = netdev_priv(dev);
+ 	int err;
+ 
+-	mutex_lock(&team->lock);
++	ASSERT_RTNL();
+ 	err = team_port_del(team, port_dev);
+-	mutex_unlock(&team->lock);
+ 
+ 	if (err)
+ 		return err;
+ 
+-	if (netif_is_team_master(port_dev)) {
+-		lockdep_unregister_key(&team->team_lock_key);
+-		lockdep_register_key(&team->team_lock_key);
+-		lockdep_set_class(&team->lock, &team->team_lock_key);
+-	}
+ 	netdev_change_features(dev);
+ 
+ 	return err;
+@@ -2308,6 +2289,7 @@ static struct team *team_nl_team_get(struct genl_info *info)
+ 	struct net_device *dev;
+ 	struct team *team;
+ 
++	ASSERT_RTNL();
+ 	if (!info->attrs[TEAM_ATTR_TEAM_IFINDEX])
+ 		return NULL;
+ 
+@@ -2319,13 +2301,12 @@ static struct team *team_nl_team_get(struct genl_info *info)
+ 	}
+ 
+ 	team = netdev_priv(dev);
+-	mutex_lock(&team->lock);
+ 	return team;
+ }
+ 
+ static void team_nl_team_put(struct team *team)
+ {
+-	mutex_unlock(&team->lock);
++	ASSERT_RTNL();
+ 	dev_put(team->dev);
+ }
+ 
+@@ -2961,11 +2942,8 @@ static void __team_port_change_port_removed(struct team_port *port)
+ 
+ static void team_port_change_check(struct team_port *port, bool linkup)
+ {
+-	struct team *team = port->team;
+-
+-	mutex_lock(&team->lock);
++	ASSERT_RTNL();
+ 	__team_port_change_check(port, linkup);
+-	mutex_unlock(&team->lock);
+ }
+ 
+ 
+diff --git a/drivers/net/team/team_mode_activebackup.c b/drivers/net/team/team_mode_activebackup.c
+index e0f599e2a51d..4e133451f4d6 100644
+--- a/drivers/net/team/team_mode_activebackup.c
++++ b/drivers/net/team/team_mode_activebackup.c
+@@ -68,7 +68,7 @@ static void ab_active_port_get(struct team *team, struct team_gsetter_ctx *ctx)
+ 	struct team_port *active_port;
+ 
+ 	active_port = rcu_dereference_protected(ab_priv(team)->active_port,
+-						lockdep_is_held(&team->lock));
++						rtnl_is_locked());
+ 	if (active_port)
+ 		ctx->data.u32_val = active_port->dev->ifindex;
+ 	else
+diff --git a/drivers/net/team/team_mode_loadbalance.c b/drivers/net/team/team_mode_loadbalance.c
+index 00f8989c29c0..fb4ead02c504 100644
+--- a/drivers/net/team/team_mode_loadbalance.c
++++ b/drivers/net/team/team_mode_loadbalance.c
+@@ -302,7 +302,7 @@ static int lb_bpf_func_set(struct team *team, struct team_gsetter_ctx *ctx)
+ 		/* Clear old filter data */
+ 		__fprog_destroy(lb_priv->ex->orig_fprog);
+ 		orig_fp = rcu_dereference_protected(lb_priv->fp,
+-						lockdep_is_held(&team->lock));
++						    rtnl_is_locked());
+ 	}
+ 
+ 	rcu_assign_pointer(lb_priv->fp, fp);
+@@ -325,7 +325,7 @@ static void lb_bpf_func_free(struct team *team)
+ 
+ 	__fprog_destroy(lb_priv->ex->orig_fprog);
+ 	fp = rcu_dereference_protected(lb_priv->fp,
+-				       lockdep_is_held(&team->lock));
++				       rtnl_is_locked());
+ 	bpf_prog_destroy(fp);
+ }
+ 
+@@ -336,7 +336,7 @@ static void lb_tx_method_get(struct team *team, struct team_gsetter_ctx *ctx)
+ 	char *name;
+ 
+ 	func = rcu_dereference_protected(lb_priv->select_tx_port_func,
+-					 lockdep_is_held(&team->lock));
++					 rtnl_is_locked());
+ 	name = lb_select_tx_port_get_name(func);
+ 	BUG_ON(!name);
+ 	ctx->data.str_val = name;
+@@ -478,7 +478,13 @@ static void lb_stats_refresh(struct work_struct *work)
+ 	team = lb_priv_ex->team;
+ 	lb_priv = get_lb_priv(team);
+ 
+-	if (!mutex_trylock(&team->lock)) {
++	/* Since this function is called from WQ context, RTNL can't be held by the caller. */
++	if (!rtnl_trylock()) {
++		/*
++		 * Since RTNL is shared by many callers, and rtnl_unlock() is a slower operation
++		 * than plain mutex_unlock(), rtnl_trylock() will be more easier to compate than
++		 * mutex_trylock(). Therefore, we might want to delay a bit before retrying.
++		 */
+ 		schedule_delayed_work(&lb_priv_ex->stats.refresh_dw, 0);
+ 		return;
+ 	}
+@@ -515,7 +521,7 @@ static void lb_stats_refresh(struct work_struct *work)
+ 	schedule_delayed_work(&lb_priv_ex->stats.refresh_dw,
+ 			      (lb_priv_ex->stats.refresh_interval * HZ) / 10);
+ 
+-	mutex_unlock(&team->lock);
++	rtnl_unlock();
+ }
+ 
+ static void lb_stats_refresh_interval_get(struct team *team,
+diff --git a/include/linux/if_team.h b/include/linux/if_team.h
+index cdc684e04a2f..ce97d891cf72 100644
+--- a/include/linux/if_team.h
++++ b/include/linux/if_team.h
+@@ -191,8 +191,6 @@ struct team {
+ 
+ 	const struct header_ops *header_ops_cache;
+ 
+-	struct mutex lock; /* used for overall locking, e.g. port lists write */
+-
+ 	/*
+ 	 * List of enabled ports and their count
+ 	 */
+@@ -223,7 +221,6 @@ struct team {
+ 		atomic_t count_pending;
+ 		struct delayed_work dw;
+ 	} mcast_rejoin;
+-	struct lock_class_key team_lock_key;
+ 	long mode_priv[TEAM_MODE_PRIV_LONGS];
+ };
+ 
+-- 
+2.43.5
+
 
