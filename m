@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-191341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D17CABB046
-	for <lists+netdev@lfdr.de>; Sun, 18 May 2025 15:01:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E186DABB04A
+	for <lists+netdev@lfdr.de>; Sun, 18 May 2025 15:08:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D4171896B76
-	for <lists+netdev@lfdr.de>; Sun, 18 May 2025 13:01:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92FCD3A61E3
+	for <lists+netdev@lfdr.de>; Sun, 18 May 2025 13:08:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0747D3FC7;
-	Sun, 18 May 2025 13:01:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 666BB1E502;
+	Sun, 18 May 2025 13:08:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HF8KPGvu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gbvOfNbQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38FC21373
-	for <netdev@vger.kernel.org>; Sun, 18 May 2025 13:01:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CCB4635
+	for <netdev@vger.kernel.org>; Sun, 18 May 2025 13:08:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747573291; cv=none; b=j76BZHKZEA/BfTrIxfKdi0E0Naf3uGxH9sZxaya+sD4qp7b/HFG/NBeKeOi6l+JWaYGdKABKqRsJmD0Qg6mBMzcavjAiKhmC5o5DE2ulgLCkzenWT3hlABt1BDp/dL4XwqJjiDHstJJ5Oyo6goNTbjbQYg72HIk44SzQ7QF6yxI=
+	t=1747573718; cv=none; b=XmClRzHBuTEVRBwBHTzR+vvM+GlvyIZ99uCWvCKeVYp9ALTIQ1QKcjue7KPrWMSMIVGTFQemMcUuu2v5f0DCWFx/wKZUZpbT7E/2/v45zZUq48Hyvwn+6K3dz/0s0pqlJ+qfFAScp2+v7VxwtuQ3nRnvMydD+wZYTdiS8rkDHF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747573291; c=relaxed/simple;
-	bh=Ho8ZPEiEaP2uQiGzy7VSCJQ+iWr/uCqHlNV4R43olRM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QJzluGFhph1NAffAjG0B88oIiTV2eLh6c+ieuVOH3K83q81QEfQ5aQivDxsP/F0GXs2GCLtz9DlJ/7G9sN+2F9VOH314sS4svLWCerPPYCjtKCN7qzCB1EIGBIJX4BTcmDyVk1d4+lT/im/KQ+Xwb/IgGUCiSdKGstNNB68F8J0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HF8KPGvu; arc=none smtp.client-ip=209.85.167.49
+	s=arc-20240116; t=1747573718; c=relaxed/simple;
+	bh=h51j+1hvbZJh331C/zzdrO3GyrEER/O5H2kYmHFsm8I=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ET89tn5c4A8tH3fD7vX8SbmhxV1RwDzYWdrgBMS/Ph67C4/36DNeQd/xQkurWNfNTd9YzQZRLLa0yjk9CnCrGaouCOlvJLh5WQnb3F6X4JfKoetsFWz6uoLBMKUxkxVUQHYcnUxFDhbVUL2sWAAIN5NMPFIN3ESuZtupjN1adgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gbvOfNbQ; arc=none smtp.client-ip=209.85.167.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-551f00720cfso263957e87.0
-        for <netdev@vger.kernel.org>; Sun, 18 May 2025 06:01:29 -0700 (PDT)
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-550ee1cb0a3so2567756e87.3
+        for <netdev@vger.kernel.org>; Sun, 18 May 2025 06:08:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747573288; x=1748178088; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1747573715; x=1748178515; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=GLFsBsfNmOU6zCrPl9XdQAYXUP8IWq13yeciPdyTxPU=;
-        b=HF8KPGvuIHrWrrPK0+FOafQfwgOtBpElNwAuciVM5PQJ7684dqY7cqKPlM9QH92J16
-         8pjYd4LBxBXCTAuXYHslxpLFT5vKcMh/43RWYXbb7sr4HTf+PMS9iyMFMD5/kevIGpCR
-         l8xv5rx8rEHcG2G1D/aYBaJ3rb7Vs119mRbYTu9r2Se9o1hZpBu13Bp2Ar1EjlRu0M3/
-         /mh3X2dtn7djp1owdGtdncdiDuc5kdOBaABTY9i/Vw0tMLzv9fSst+pRLDxSCe+qAWQG
-         qWyB4TVyhJSxrNI9cWjeOUurbKvhH1mNvb0pKLnF7n2Ai77Yy0Jh4Zkk7ASscxZVyKtV
-         Ii8w==
+        bh=4cC9rOPVAPM2zWjOKY1n4zlJe2p2cfRcSX/55/ploHI=;
+        b=gbvOfNbQ9VtTu+GYnPyAYNqJjVguMpOP/ZnEWMNFzktwbTeHtKjv6aMTDyZRE/4+1T
+         IqQlpmW1N/L/tTV8G8ke7+eW7AK00IGSZwVC1iKAA7j9gMUC4VBjAGQEJYRYz6NGFWGK
+         Hmj+ax3pJcSLo8WotVnuzCMYz7/ztdxjKtGSI6Op8XqcN+j6+bEsKVzMiioOPAsO2YRU
+         PsyQJDbgWNSqEYHrYSup4JWqeQSDLJAImzfIgKVbGBxXIVcz7iP7mKtLCAWWHM2sBLLp
+         MlV2GMOk4vQ3uYDL5HaGt9YGGTWvxy3aRHgOmBUAueG6vzU1r/QezdjffBcaDIJlktfB
+         VfZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747573288; x=1748178088;
+        d=1e100.net; s=20230601; t=1747573715; x=1748178515;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=GLFsBsfNmOU6zCrPl9XdQAYXUP8IWq13yeciPdyTxPU=;
-        b=dxOTjryikEJHrMIqQMiyp9q7APPqYG8OdMJQlT75krYdwJwb4XAowxT0GhiTSlm0yN
-         nm33oJ/g16e1FHwAErmWT3iH0DUvvlnB2EBL81GSZrZ0Gs0PA6f6obS3Ekk1a3JJrB6B
-         hu21d0OIYLFapGxSbiSqh00y03mdnYuoirrGWNP6VASIks06rJaRSwEsIi9iFDMqKcPN
-         V/KegcpM3+PvWWtTo0n6bNflcZMuWWI5Zc9TGl6oQ5vglAHHPTDbUPkFf/Ouj8Fgz9SE
-         HnN9lBAoAT9IxSAXVClUg0RMpaDZAznyetjG/7TxZdzGnWnRItyU86XTSTTGromTjKPi
-         C2RA==
-X-Gm-Message-State: AOJu0YwX35p7QCNgEDNoBkwgtLS7BY2lM/lsczXnP4+gbIELwmcz8ELu
-	Lve9bzbE33shzaThdfZNh45WCb+moWGU954XLxL02aLaIWRomHb3MRvB
-X-Gm-Gg: ASbGncvrq3x9F9TVFUFW9xeqCyQlmDlRDZogUf9xzWq9DJ+W3xzJXQF3N6P39b9mehJ
-	RIW4ga9t1q85k40ZGChsa7aHUO9HkZ+w4PfZyk1YxgRh6H/V7Rn0gs2mjnG5pk19rmHGo3dqAO6
-	QSzflZ6XO8Y/wxsCZyeDswM0Qode1W2CgbqfdiGJsLb/vgkhW2AkNB/5nvai0uPvcpzSMnt5O/P
-	Tuv/lN3r/ANHhKWSgJ02rm/PTnhAW/hT8yhEqIM6apTw+hJDRMPIW/NJ5HFFe1RU5zoZ3XT++En
-	JJqdoUn3sauVBCHaBZZ4G7Obg7dN9qYaVQqHybCU4U9IKKSwtUdIxMDCJu4xa7TWadn4taNkpT6
-	BgEJcxa/a919rBK7SpLPJjPUnb1hz
-X-Google-Smtp-Source: AGHT+IE1TwOS9Jk1FFjJ/rJ2KPitQgY53FnxYOzmgfgzqdCOnelctqQL2INYkoOo1QsYarV2/eml4A==
-X-Received: by 2002:a05:6512:2614:b0:550:df52:310a with SMTP id 2adb3069b0e04-550e7195360mr2504311e87.5.1747573287862;
-        Sun, 18 May 2025 06:01:27 -0700 (PDT)
+        bh=4cC9rOPVAPM2zWjOKY1n4zlJe2p2cfRcSX/55/ploHI=;
+        b=EJdpVjYP5uWg2jC/1JNdL9OWQ2eiT3kL2xR9/7nSIzVKSIX+MyiCEQtlPqMyUpBEGw
+         zYRl1dzhcNkVXrn3y+VxoZjVo//jjMOVbOPKRt+78nWEsslGqr6U7XuzvjkpphgYbj4q
+         ESYj6dvnUsapP+sEnHyy9OMhD2Qt8cSsi7EePllneTknghWM1eik6nVmq2smD8rFlz+H
+         IIym7Z3FSdtNx4Bt8rWUG9Nom+vAVK1t51iWzrB0ubh1KPE3N0zRUUnlqWYxWrwliZVd
+         5DWvJ5M0h3VrR3K3w32yOVyP+nbzYHFeRsSd/ang9cJVitxzq9gDe532B03E6eoW0M6C
+         SdoQ==
+X-Gm-Message-State: AOJu0Yxc6PkPv3qiaa2ydgzwjEZn4/arxDhzitGuTmaLlKzNRQGOvSjs
+	q3l8M1hMt80yhLtQ9MKa1qhWzlxlBZsn8cJkGZig2DilTVq7bSzQDlRv
+X-Gm-Gg: ASbGncsNoM9akK+PiNJ2HjbxLTYMPNBcBVxEFsLr5fms+y46XjZFNFzzuAq/Sznp4tt
+	W6CC1GwNHp8fW5aRxBg0sRsn+KTi7pHSsjqygy8zm5W9Ayb82rl5E38oU6K98az9aqPzKavH5Yj
+	7ouDqbWEcNXdjENA7EHVlytvQPS0ICdCrH7nerKJnH1QUySCV1HYVyvaoYDi3ahWVOz402yzf8y
+	gaoDxlUHvCCtfEh+zr4lN3cmF/oXx5PyVuwc4q+peiDKrzjcK7zKYNPygLo5OTfLr7/k6U9R0c2
+	xe01sVP8FP3zfx12tPag8UH5QWnvUrifkRupIO3hkMm17UmYBR9ilbpiBkK+9RZmYNv+FQAlqH/
+	Ik3dA9HMwcmUoAyb/KQ==
+X-Google-Smtp-Source: AGHT+IGpy5I7Axdy7VtB6Yo7wleaI/BW1EUvI6rPK1mnt8lfc53DAJvVpqUDUkJXQSL2EgFEM8EFrQ==
+X-Received: by 2002:a05:6512:3e04:b0:54f:b8a8:d660 with SMTP id 2adb3069b0e04-550e7244c1fmr2821530e87.50.1747573714460;
+        Sun, 18 May 2025 06:08:34 -0700 (PDT)
 Received: from anton-desktop.. (109-252-120-31.nat.spd-mgts.ru. [109.252.120.31])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-550e703c2f3sm1395870e87.214.2025.05.18.06.01.26
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-550e703f6e0sm1415152e87.223.2025.05.18.06.08.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 May 2025 06:01:26 -0700 (PDT)
+        Sun, 18 May 2025 06:08:34 -0700 (PDT)
 From: ant.v.moryakov@gmail.com
 To: mkubecek@suse.cz
 Cc: netdev@vger.kernel.org,
 	AntonMoryakov <ant.v.moryakov@gmail.com>
-Subject: [PATCH ethtool V2] json_print: add NULL check before jsonw_string_field() in print_string()
-Date: Sun, 18 May 2025 16:01:11 +0300
-Message-Id: <20250518130110.965797-1-ant.v.moryakov@gmail.com>
+Subject: [PATCH] common: fix potential NULL dereference in print_rss_hkey()
+Date: Sun, 18 May 2025 16:08:28 +0300
+Message-Id: <20250518130828.968381-1-ant.v.moryakov@gmail.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -88,48 +88,42 @@ Content-Transfer-Encoding: 8bit
 
 From: AntonMoryakov <ant.v.moryakov@gmail.com>
 
-Static analyzer (Svace) reported a potential null pointer dereference
-in print_string(). Specifically, when both 'key' and 'value' are NULL,
-the function falls through to jsonw_string_field(_jw, key, value),
-which dereferences both pointers.
 
-Although comments suggest this case is unlikely, it is safer to
-explicitly guard against it. This patch adds a check to ensure
-both key and value are non-NULL before passing to jsonw_string_field().
+Static analyzer (Svace) reported a possible null pointer dereference
+in print_rss_hkey(). Specifically, when the 'hkey' pointer is NULL,
+the function continues execution after printing an error message,
+leading to dereferencing hkey[i].
+
+This patch adds an early return after the NULL check to prevent
+execution from continuing in such cases.
 
 This resolves:
-DEREF_AFTER_NULL: json_print.c:142
+DEREF_AFTER_NULL: common.c:209
 
 Found by Svace static analysis tool.
 
 Signed-off-by: Anton Moryakov <ant.v.moryakov@gmail.com>
 
 ---
- json_print.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ common.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/json_print.c b/json_print.c
-index 4f62767..76e654b 100644
---- a/json_print.c
-+++ b/json_print.c
-@@ -138,13 +138,15 @@ void print_string(enum output_type type,
- 			jsonw_name(_jw, key);
- 		else if (!key && value)
- 			jsonw_string(_jw, value);
--		else
-+		else if (key && value)
- 			jsonw_string_field(_jw, key, value);
- 	} else if (_IS_FP_CONTEXT(type)) {
--		fprintf(stdout, fmt, value);
-+		if (value)
-+			fprintf(stdout, fmt, value);
- 	}
- }
+diff --git a/common.c b/common.c
+index 1ba27e7..35ec36d 100644
+--- a/common.c
++++ b/common.c
+@@ -233,8 +233,10 @@ void print_rss_hkey(u8 *hkey, u32 hkey_size)
+ 	u32 i;
  
-+
- /*
-  * value's type is bool. When using this function in FP context you can't pass
-  * a value to it, you will need to use "is_json_context()" to have different
+ 	printf("RSS hash key:\n");
+-	if (!hkey_size || !hkey)
++	if (!hkey_size || !hkey) {
+ 		printf("Operation not supported\n");
++		return;
++	}
+ 
+ 	for (i = 0; i < hkey_size; i++) {
+ 		if (i == (hkey_size - 1))
 -- 
 2.34.1
 
