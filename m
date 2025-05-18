@@ -1,91 +1,92 @@
-Return-Path: <netdev+bounces-191348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B9CFABB12D
-	for <lists+netdev@lfdr.de>; Sun, 18 May 2025 20:07:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 091E8ABB154
+	for <lists+netdev@lfdr.de>; Sun, 18 May 2025 20:48:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C850F3B015D
-	for <lists+netdev@lfdr.de>; Sun, 18 May 2025 18:06:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A79FC3B8881
+	for <lists+netdev@lfdr.de>; Sun, 18 May 2025 18:48:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9307721D599;
-	Sun, 18 May 2025 18:07:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4ECF1B4F0F;
+	Sun, 18 May 2025 18:48:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MBSQVE7X"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HZbCLbce"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9246E21D583;
-	Sun, 18 May 2025 18:07:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 478CE1373;
+	Sun, 18 May 2025 18:48:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747591622; cv=none; b=bznDTprcoYLOIjWthaFOAMBRE7MGoUNEaLRr99uu0j5ddM4qQuFbsV0gRXkY46SfIThqHd1bz+eeFAprxPNB25IFrNnYL48ctEaaagbF/U16hFJiTUtV8oc/1aAj2RLYzFzDw+WNsbpdjRB3Q6DDHFyY6BIJlcmjSbkifVXakRo=
+	t=1747594115; cv=none; b=DXqj882coGfTjxMasNuFcsN2QC5WefOgYbjzjq8L0lXK1CZC+PgB7+uds1CzSkt+3k6K97LHKE2A+kfkTKQYDbvaPoYvhp06Tc4i1D8yb3rdGti+Uj2XuCu5sh+TS85NI4wXRj6hXO8+KlZdZrwOq/MGd0eVlDCuBPtFhki2HJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747591622; c=relaxed/simple;
-	bh=pskOUvGEBKAl0vNeYYdPWPN8DH4UBURr9gH4uXhAoYQ=;
+	s=arc-20240116; t=1747594115; c=relaxed/simple;
+	bh=gS1VEGiPowwxWN2Jb0/+xH16i848Y8FN/BYCnT5X5Pc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pc6SW3p8u/p/aTfZ7ol4aVjmH0Cy1zHHhcQpAhwgmrKKimmd3wRpGCuWB5STuy9c0tgUmy2X99PnWjyNjr0W2tHw3Qy/fW4BdURlYnBOyGBNQhR/PKhW6R+V550MLWCHKY0nZ/Q1aYPGqWPhwgkXthAD5ptiISl9avkqpi7dS1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MBSQVE7X; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747591620; x=1779127620;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=pskOUvGEBKAl0vNeYYdPWPN8DH4UBURr9gH4uXhAoYQ=;
-  b=MBSQVE7XEbY3dosgWk7RLmpzlmu0us6B8FAfg6mDHlMKAP2oF6wrpsgq
-   5FaY3/koUgZ46Sm5efXC2D45QwFvV1fT7qh4ajJg51rUkoADbKyo/r5uw
-   9sKES/FefPivJrZv7u7hLaZ7xz/GyGIpK9DvkDPIclTj8xP4CZw3Iv9zQ
-   ZuUuOufrNE6SixehDJdCCr4DD8ZREGxeI4JLiumSazgin63+glD/nqZeV
-   k3nL+0RXz2y3Y1zQJS/wyp+Ym/koMZ2EhkR6WmZrBWvv5HgVUeKjurovH
-   mgeOta2vFBRi1rG9uvhNuPwNV2mOyOhDlpwgS7TEq1n+lfJoDdHIEW/Kz
-   w==;
-X-CSE-ConnectionGUID: X73GSG06SFKRfK7gJesJyw==
-X-CSE-MsgGUID: 7qcqoqFGS/mA+4Fkv5vDkg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11437"; a="53296878"
-X-IronPort-AV: E=Sophos;i="6.15,299,1739865600"; 
-   d="scan'208";a="53296878"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2025 11:06:59 -0700
-X-CSE-ConnectionGUID: n6mz+/FWR1CZPevGq+cRjg==
-X-CSE-MsgGUID: KxbogY7STF6fUxxxWpNfvQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,299,1739865600"; 
-   d="scan'208";a="138910479"
-Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 18 May 2025 11:06:55 -0700
-Received: from kbuild by 1992f890471c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uGiPT-000Ky3-2r;
-	Sun, 18 May 2025 18:06:51 +0000
-Date: Mon, 19 May 2025 02:06:38 +0800
-From: kernel test robot <lkp@intel.com>
-To: Gur Stavi <gur.stavi@huawei.com>, Fan Gong <gongfan1@huawei.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=J7TSlp0sZa02Ut0U3oeEFCevmbmtgjryR5gUlz9vUgR48p2Lp9vRuuArw9W70puHwangzTp35omG3SRd6IPpmGTOLgF3HKKnmqpqMqPut1QoqGQq9C4DUEpkfzhbbsZ9zx+RR/QDrTe6uBmlGTNRKA3G0t0KIQqBhZrgo+URARk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HZbCLbce; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-b26f5cd984cso1928605a12.3;
+        Sun, 18 May 2025 11:48:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747594113; x=1748198913; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZdJv4YRH0LF+qEVhNWiI9qZKzNeQBOlfoe8LQVeqwOI=;
+        b=HZbCLbcekkMQBJXHpf3SZEiiliFmi4dPCKYMs+1ks8Gzp5L9X0ggqbztrYFwoFyPct
+         SXmTNKcH5+ukUOKOZE5PfU3Gbm3aWMvmEqvE4R7YT5nCRcM0xIs9/tCBS/Dzqo7ESgLP
+         x/ZyLn2nSFhsv6DpxU+ZyQksJwhjXMxlhdRUcW8/JaQiIbjxlrLHY2nooCdUcY/QeoGm
+         gpVCBnFiRFzsEJMw68n+Bn5UjgBwEyrvCa9gZZn9icSnamvIBJHGB5N0yGkUxZ10RjXw
+         gy+KI41xzL8G4Jq0pC2A1uQGx0jOrL8pnsrl/OlFwi74H4N9VZKiUezY2dto+hwVZ//s
+         ZUOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747594113; x=1748198913;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZdJv4YRH0LF+qEVhNWiI9qZKzNeQBOlfoe8LQVeqwOI=;
+        b=Q4Vi6A821EnO8JGZtSDB9qQsTDQthQg+g25UntNjwLFyGZ9omxtzViSrxQFrtnOMmj
+         RN5HS3MaRVbI8xyr05HO2ceOI9/u5gXjoHT4lGzJBKerCkIEEQBpMgBkj/5cBSAS6Ut+
+         qilYcmMaZD5Lt/oelPD0TtKKZmV7tPuQ7zN/anfxxW26X6DPJP7iBmBawZ5AFJb/6Zm2
+         ciSVj5bYb8ERXLMOhK8nWbK9qjs7VOmuH+AK0s4Bleeuw6GJ4EisAuJJrLwbVPdBzdGU
+         eaxYf4KzSwJpKcbG9jEdddzSreAOtkxvechg6EUThNvhTvHxv1QhnbVIgatfp0aiASMf
+         ZPQA==
+X-Forwarded-Encrypted: i=1; AJvYcCVsfj8RChZOsMpYXmmi7VFJEoR1Gv27I5r6bpaEudGDQVz97L3QZBtUp7Q+Lgu93evRkatCyJaRS8BoXr8=@vger.kernel.org, AJvYcCWfh16cZz7Hlwl354Z2Yt0Y46mjku8+/z7W++uwpywiW5NH6YRneXEB4XNtxEOU9FF1TgvfwqDf@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTSA1Hl/rHLyHGrCyp7hkPEkBGPAHRHjshbMjAVp13VC6BMdBS
+	k4JMsIq23WOMhpztRH24ETJ9fNGQK45wtEFZk7KZDFuKZKvwbyql2rIU
+X-Gm-Gg: ASbGncvuOgXnmUUliibc5fMQ3+zXxICafTrTfWpBUp//a9uVV61bpogYq5kOn54qVOe
+	WRwd4w1bjRb6ZHoG/+PF7fT+sfZ89JJImfTJE6gYxmi0cw3/p8/7U+ZtCscj98jpBm6yYvU7A9n
+	nS/WxBEjKXsdRownDeeebUedlYxh+SNMQXJbipvUlwFnTDxHPAr/zZpx/VNKb73LjJURvCHRsN+
+	Vy54ccIfJMf9VaNxZw4A9nNIhCVCVNSMUaRvUiU28SuWz/vc/yt5HLas2h1HJBc94mnuIekymkP
+	uBNk7fW3GIKlF1S3FHVZiRX8WhXS/oXsAKWLLadQ+t6Yud8V+zXi41+ERA==
+X-Google-Smtp-Source: AGHT+IEbtsSTAhA5HI8Cj3BFN2PPge6wTU+eaOuo6Fk7YaYF2EQ9GThOrkOIpHbK3+os0chpFb2c3g==
+X-Received: by 2002:a17:903:3d07:b0:224:a96:e39 with SMTP id d9443c01a7336-231d438b420mr150253565ad.9.1747594113434;
+        Sun, 18 May 2025 11:48:33 -0700 (PDT)
+Received: from localhost ([2601:647:6881:9060:6a86:3458:a742:d44e])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-231d4afe8bbsm46108135ad.90.2025.05.18.11.48.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 18 May 2025 11:48:32 -0700 (PDT)
+Date: Sun, 18 May 2025 11:48:31 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: bpf@vger.kernel.org, John Fastabend <john.fastabend@gmail.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, linux-doc@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>,
-	Bjorn Helgaas <helgaas@kernel.org>, luosifu <luosifu@huawei.com>,
-	Xin Guo <guoxin09@huawei.com>,
-	Shen Chenyang <shenchenyang1@hisilicon.com>,
-	Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
-	Shi Jing <shijing34@huawei.com>,
-	Meny Yossefi <meny.yossefi@huawei.com>, Lee Trager <lee@trager.us>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Suman Ghosh <sumang@marvell.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Joe Damato <jdamato@fastly.com>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: Re: [PATCH net-next v15 1/1] hinic3: module initialization and tx/rx
- logic
-Message-ID: <202505190148.x7llMRfr-lkp@intel.com>
-References: <b5e005d0f8255df11f052b17a8deb856f8a7bdc2.1747556339.git.gur.stavi@huawei.com>
+	Cong Wang <cong.wang@bytedance.com>,
+	Alexei Starovoitov <ast@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf-next v1] bpf, sockmap: Fix concurrency issues between
+ memory charge and uncharge
+Message-ID: <aCorf4Cq3Fuwiw2h@pop-os.localdomain>
+References: <20250508062423.51978-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,48 +95,73 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b5e005d0f8255df11f052b17a8deb856f8a7bdc2.1747556339.git.gur.stavi@huawei.com>
+In-Reply-To: <20250508062423.51978-1-jiayuan.chen@linux.dev>
 
-Hi Gur,
+On Thu, May 08, 2025 at 02:24:22PM +0800, Jiayuan Chen wrote:
+> Triggering WARN_ON_ONCE(sk->sk_forward_alloc) by running the following
+> command, followed by pressing Ctrl-C after 2 seconds:
+> ./bench sockmap -c 2 -p 1 -a --rx-verdict-ingress
+> '''
+> ------------[ cut here ]------------
+> WARNING: CPU: 2 PID: 40 at net/ipv4/af_inet.c inet_sock_destruct
+> 
+> Call Trace:
+> <TASK>
+> __sk_destruct+0x46/0x222
+> sk_psock_destroy+0x22f/0x242
+> process_one_work+0x504/0x8a8
+> ? process_one_work+0x39d/0x8a8
+> ? __pfx_process_one_work+0x10/0x10
+> ? worker_thread+0x44/0x2ae
+> ? __list_add_valid_or_report+0x83/0xea
+> ? srso_return_thunk+0x5/0x5f
+> ? __list_add+0x45/0x52
+> process_scheduled_works+0x73/0x82
+> worker_thread+0x1ce/0x2ae
+> '''
+> 
+> Reason:
+> When we are in the backlog process, we allocate sk_msg and then perform
+> the charge process. Meanwhile, in the user process context, the recvmsg()
+> operation performs the uncharge process, leading to concurrency issues
+> between them.
+> 
+> The charge process (2 functions):
+> 1. sk_rmem_schedule(size) -> sk_forward_alloc increases by PAGE_SIZE
+>                              multiples
+> 2. sk_mem_charge(size)    -> sk_forward_alloc -= size
+> 
+> The uncharge process (sk_mem_uncharge()):
+> 3. sk_forward_alloc += size
+> 4. check if sk_forward_alloc > PAGE_SIZE
+> 5. reclaim    -> sk_forward_alloc decreases, possibly becoming 0
+> 
+> Because the sk performing charge and uncharge is not locked
+> (mainly because the backlog process does not lock the socket), therefore,
+> steps 1 to 5 will execute concurrently as follows:
+> 
+> cpu0                                cpu1
+> 1
+>                                     3
+>                                     4   --> sk_forward_alloc >= PAGE_SIZE
+>                                     5   --> reclaim sk_forward_alloc
+> 2 --> sk_forward_alloc may
+>       become negative
+> 
+> Solution:
+> 1. Add locking to the kfree_sk_msg() process, which is only called in the
+>    user process context.
+> 2. Integrate the charge process into sk_psock_create_ingress_msg() in the
+>    backlog process and add locking.
+> 3. Reuse the existing psock->ingress_lock.
 
-kernel test robot noticed the following build warnings:
+Reusing the psock->ingress_lock looks weird to me, as it is intended for
+locking ingress queue, at least at the time it was introduced.
 
-[auto build test WARNING on 67fa756408a5359941bea2c021740da5e9ed490d]
+And technically speaking, it is the sock lock which is supposed to serialize
+socket charging.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Gur-Stavi/hinic3-module-initialization-and-tx-rx-logic/20250518-160845
-base:   67fa756408a5359941bea2c021740da5e9ed490d
-patch link:    https://lore.kernel.org/r/b5e005d0f8255df11f052b17a8deb856f8a7bdc2.1747556339.git.gur.stavi%40huawei.com
-patch subject: [PATCH net-next v15 1/1] hinic3: module initialization and tx/rx logic
-config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20250519/202505190148.x7llMRfr-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250519/202505190148.x7llMRfr-lkp@intel.com/reproduce)
+So is there any better solution here?
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202505190148.x7llMRfr-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   drivers/net/ethernet/huawei/hinic3/hinic3_tx.c: In function 'hinic3_tx_poll':
->> drivers/net/ethernet/huawei/hinic3/hinic3_tx.c:633:32: warning: variable 'nic_dev' set but not used [-Wunused-but-set-variable]
-     633 |         struct hinic3_nic_dev *nic_dev;
-         |                                ^~~~~~~
-
-
-vim +/nic_dev +633 drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
-
-   625	
-   626	#define HINIC3_BDS_PER_SQ_WQEBB \
-   627		(HINIC3_SQ_WQEBB_SIZE / sizeof(struct hinic3_sq_bufdesc))
-   628	
-   629	bool hinic3_tx_poll(struct hinic3_txq *txq, int budget)
-   630	{
-   631		struct net_device *netdev = txq->netdev;
-   632		u16 hw_ci, sw_ci, q_id = txq->sq->q_id;
- > 633		struct hinic3_nic_dev *nic_dev;
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks.
 
