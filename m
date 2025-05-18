@@ -1,290 +1,207 @@
-Return-Path: <netdev+bounces-191353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2361ABB19D
-	for <lists+netdev@lfdr.de>; Sun, 18 May 2025 23:11:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 982FDABB1C1
+	for <lists+netdev@lfdr.de>; Sun, 18 May 2025 23:38:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 332881738C9
-	for <lists+netdev@lfdr.de>; Sun, 18 May 2025 21:11:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E6EB3B1BCD
+	for <lists+netdev@lfdr.de>; Sun, 18 May 2025 21:38:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFFE01BC9F4;
-	Sun, 18 May 2025 21:11:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59E971FBEA4;
+	Sun, 18 May 2025 21:38:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="DdwUn9Gh";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="PvvFADGJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UZr1rOfb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A7C64B1E5C;
-	Sun, 18 May 2025 21:11:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747602686; cv=fail; b=dGxskTrJcJc1hFhOpdCqiQRpChJIaD6C5lm3XSWzih1wFRPGExDZ29m2w9AhdBfSNZJsooQ0lgS3PdP5/rQB7e5PFD7zNdJhhGvDBPaym9bTCrZtY+EfZcT4yN8wIka1Hs50atQ6MHC3553gN8bGbxwy6N3as9HpdV4RAipRi0Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747602686; c=relaxed/simple;
-	bh=nFjCc6/ORpvYiKp3BXWPgCYd6zpopToHry3hTNB3t0k=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=eOW4O/XqiE9jrd7Hu551JqOjey7ttJwbAZmSf7tjFClDSArTYqnGDiq4B280Ey72p4/xAJ6ZdEWb1yWaceG3KEHoRIawb///GJeKtJOXD3EOcKi1dXpD/9wYSgcG4Z5dQOaEFRvbXOqe83QBROomvzvEP5xAmiOuDaE1PufxVFM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=DdwUn9Gh; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=PvvFADGJ; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54IKjGgc030107;
-	Sun, 18 May 2025 21:10:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2025-04-25; bh=xbOqQQqUw8s14nxlfrfoM2OV1UpaQYaDkByWstBf4Ws=; b=
-	DdwUn9GhiN2ywgCMyJPgmYShmFm5fF3cXD5bSVrSvuqV1+joIe736awpLThvRuCR
-	IhrBK1JpZqGxdVFqVluImdAPfnSZ463hD2h/MyHHdJ4NRrp5V+r/+rIz6g3p5xnm
-	MF2tKBwWmazMalcAF5+ztNb3hOcvQjGvpbHIGwKFuDvyOEp7v5JOexkIHrmKcsnM
-	FusP6W0HnhmXblKEJEV8wK2uO2ImrAsvjBpV6P0zz7OxgJjwI5RNvmbVGgTgoiVp
-	lBkuPeMM2K/o6958fXrpv6Vt3UZq1TH5NWIvV70rUvz7Pa+jcgrJV66aggQVVWtm
-	9hVI4D0MS+VLmzLDqVyE8w==
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 46pk0vsq8r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 18 May 2025 21:10:38 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 54IIiYO9010805;
-	Sun, 18 May 2025 21:10:37 GMT
-Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2169.outbound.protection.outlook.com [104.47.57.169])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 46pgw615gv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 18 May 2025 21:10:37 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=mKNpxIJ5NHHeWxn8foAPyvc47trv5AGZ/tGl6q5YUifzGB/0Zz/hJTjuMttIqvoeFbRgiSL8BfMDzIdlaHZLn97dYxLImCUY61ZAENoif5WnvV3G+/hRVRA30hdJBEHa9hON/fUWViNU5vekc3wiECVa3GYQRLY3elsk2/3iEBszb1H3cHJ3Fx5I5/emnUOs097LqW6rqFGzesx9D9XsO5PrW8osExDGh1IMMEKj1mGggjgMb9il+dbaUo54wqUfa77sWhFx+pYvy6CcHu3CCm+7fQl4Zz0zXWShHkpdJlNroMxwQEoKFLWVBgLtr6ksB138DcNefbUSj2A+Ptf6gw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xbOqQQqUw8s14nxlfrfoM2OV1UpaQYaDkByWstBf4Ws=;
- b=JTQ31ttGWzH2fdXMx7RnFYVwngcusQTXBnpaPjRfwzmZqBrUhb0sJKgcTCpGw9EOwK/eDXLDQCQ8g51FL19JK+gF6OBX19+ltnucq2lvPW7Q0VT2bWlgL36OE/DoBix45POOJga8TDdeLZij7xrf9ZlUgBt6nJOa2ZRXEB7YvGWBz3pdHBt7vH61kQ06MrLv4MZOvtR38lJlbFutk7KVIKLK9njbn29IQeefIoeFnNDr4HI/453AJaWYTjLg1i4QUyOVDcWyZTUCKstDJ6P4ucVI18g+Hsh+k2qMhI9tfeSVowHPkuPiNB9TizZCWhIXWCLI2nI6WkgqeZJKphElqg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xbOqQQqUw8s14nxlfrfoM2OV1UpaQYaDkByWstBf4Ws=;
- b=PvvFADGJhe6US84meeBoT+VWMs11xtMo/ZXsBi+kkPsFviWdrCxozzYS5xyPobH4EZpJ8IQhxqjDrk4I0r/YQ2tP7lHAWRANgHYiDsPaIHZSXQr8QMbyjFpchGI/vLQb/CgOugwBZxd+ls1lHdAopF5Br2rLxhOfB65nYOwOiG8=
-Received: from DS7PR10MB5328.namprd10.prod.outlook.com (2603:10b6:5:3a6::12)
- by SA1PR10MB7831.namprd10.prod.outlook.com (2603:10b6:806:3b5::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8722.30; Sun, 18 May
- 2025 21:10:35 +0000
-Received: from DS7PR10MB5328.namprd10.prod.outlook.com
- ([fe80::ea13:c6c1:9956:b29c]) by DS7PR10MB5328.namprd10.prod.outlook.com
- ([fe80::ea13:c6c1:9956:b29c%2]) with mapi id 15.20.8699.022; Sun, 18 May 2025
- 21:10:35 +0000
-Message-ID: <7549d1fa-dc76-477a-95b4-edfc09085fd2@oracle.com>
-Date: Mon, 19 May 2025 02:40:23 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] hv_netvsc: fix potential deadlock in
- netvsc_vf_setxdp()
-To: Saurabh Sengar <ssengar@linux.microsoft.com>, kys@microsoft.com,
-        haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        pabeni@redhat.com, horms@kernel.org, ast@kernel.org,
-        daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
-        sdf@fomichev.me, kuniyu@amazon.com, ahmed.zaki@intel.com,
-        aleksander.lobakin@intel.com, linux-hyperv@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        bpf@vger.kernel.org
-Cc: ssengar@microsoft.com, stable@vger.kernel.org
-References: <1747540070-11086-1-git-send-email-ssengar@linux.microsoft.com>
-Content-Language: en-US
-From: ALOK TIWARI <alok.a.tiwari@oracle.com>
-In-Reply-To: <1747540070-11086-1-git-send-email-ssengar@linux.microsoft.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SI2PR01CA0036.apcprd01.prod.exchangelabs.com
- (2603:1096:4:192::22) To DS7PR10MB5328.namprd10.prod.outlook.com
- (2603:10b6:5:3a6::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815BA1A5BA3
+	for <netdev@vger.kernel.org>; Sun, 18 May 2025 21:38:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747604313; cv=none; b=UP5Dq5BHu9eIzNGYnoc3uFvqYiMcOJZArY3h4zQr4cvP8noZnUjhIoAvG7eAYicu3PNTp8FmsekXlLIKx6ToXqJosE24lwAw32fGenr1EPgyQuhv407ih4KmbssoWKH3o98R54UFcYYPP/Z4cvgSQtAT0ZdjFHt6OnJlsi4aSys=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747604313; c=relaxed/simple;
+	bh=IY5YxUgfeivoNaGKuPIC9nYUq6Yn5iTNzaXtAmgFxWA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oP0zkn6+9ZXG2NOXvEFbQiYW3SrWVmyxrXgpx61hGVzsnJeKBkdSbY3JiMEL3Xwgr8La/5lzVlrN2fqUhKJy7BBoGD+njExhRjiWPi+kw23ZLJG7BmPR4e5R55FRmcwe+tQdUx/OFEs4s61KXmSrtIXMk64iEEo2fD06YtVirPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UZr1rOfb; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747604310;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2DxfFVVppWL2QDoeVADckrWoeG/v7XssiZgeHgdT/vk=;
+	b=UZr1rOfboB5AypuAyhh5MGYPeKBw3dKb1JLCbgJ1lA4sqMyrK72mKUngXF3K3to380hlfl
+	jEkE54ecCs3MvSVBMdbk3m8BSdbNln/8nXISQ+zaVT4W9uF825e3BGy44ePaLyq0hyJZl5
+	Qcgq8EQszsXSpHlzRcPN14cgGfp6PJ4=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-592-xHPpIfGsM6edXpxWwLRLYw-1; Sun, 18 May 2025 17:38:28 -0400
+X-MC-Unique: xHPpIfGsM6edXpxWwLRLYw-1
+X-Mimecast-MFC-AGG-ID: xHPpIfGsM6edXpxWwLRLYw_1747604308
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43d209dc2d3so23465225e9.3
+        for <netdev@vger.kernel.org>; Sun, 18 May 2025 14:38:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747604307; x=1748209107;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2DxfFVVppWL2QDoeVADckrWoeG/v7XssiZgeHgdT/vk=;
+        b=tDzbuBKm6VB5zWUWmVurH1wPtXjU+dPSxZabzKsOOd7aFU+znQAeWo5brLAEDEkL2D
+         WnK3blenh35pNKgg7swlJAdRUONGW8h3CAb2RqYVzE8OHnGdy7jbABN4GUwUCCdr29RK
+         eWZMgzv/56mWYXP1rTDOC6UApQOXBHytB7fbBg5LG+KyR38Nn8koZjRrB8piJeBnEpyl
+         O0/+997kC+A833UCml3YwQDSmr9pGv+dUO1QSBq0MhCFBuVYgMNj/G2rLrahvz9QmCje
+         JR4IAvPZlSKgFo56p7mOXn3GDrdIHkM7iHwPdPueQCp24LYU7KeniKfU1YhndhN1zkot
+         La9A==
+X-Forwarded-Encrypted: i=1; AJvYcCUYqw83oAxtaWVaYJnLDXhRrnQKOywM+ZAQh3Fww8med6pzQUXG7PvlvD/9iSQFkiRZZzhV6rc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZGdOT6PkomVI+PbLhD/ElBrnKe6PliKIRjujev41SwV6NBlhu
+	1JBtV+Hov15Z5D/10xmGarn/F6z73M2eNKH4rY3qxsj6wAUh7RygIVe87py8hEVNAvYWjNwFo/b
+	vVhXjT9tttX4fvycznVzNpZ3jVnOnXsPn2q1P2ogcD0rjX900Nz8ug0zJag==
+X-Gm-Gg: ASbGncteuoBOCeAiqBiulVR6cEMW0vxFh0qja3xWyLLN87gq3Anhm+vTlX4LEvXVZME
+	eE4e8qu/icSkRCwjTRZAdknEtXheZ0aiQGitFUxODnh5N4Vv2as47ps9VNPmUaOX4G336uhgf5Y
+	g5buvqX9Wf2Kf0mNRip+GDULVWK8j9BMjhkDavOwEtfDrVPE5vc/qr9NWmiEla2KOiL+08svxwu
+	eftwv/ZAzImKMbFxSgTSTJJzWzhH4IJADgGQOEUN5yQm7HQI2pbuW7VQyKF+ZnYE64OTu1Q9vKe
+	q0MHsQ==
+X-Received: by 2002:a05:6000:2a4:b0:3a0:b5ec:f05f with SMTP id ffacd0b85a97d-3a35c84bd9emr9695878f8f.39.1747604307625;
+        Sun, 18 May 2025 14:38:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFPvcQqiUdzhpUsTAuhZDZDZTf1fjEgpPyr6jPbRPZ5J04iBfqTi3ZNActvJ+NaYfNQu9hbkw==
+X-Received: by 2002:a05:6000:2a4:b0:3a0:b5ec:f05f with SMTP id ffacd0b85a97d-3a35c84bd9emr9695869f8f.39.1747604307288;
+        Sun, 18 May 2025 14:38:27 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442eb85bb20sm131025615e9.0.2025.05.18.14.38.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 18 May 2025 14:38:26 -0700 (PDT)
+Date: Sun, 18 May 2025 17:38:23 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jon Kohler <jon@nutanix.com>
+Cc: Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	kvm@vger.kernel.org, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] vhost/net: Defer TX queue re-enable until
+ after sendmsg
+Message-ID: <20250518173756-mutt-send-email-mst@kernel.org>
+References: <20250420010518.2842335-1-jon@nutanix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR10MB5328:EE_|SA1PR10MB7831:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3745d211-7184-4082-805d-08dd96506e35
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|1800799024|366016|921020|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?NkpIbUt4TjN4eUVZZ3o0dW5WZ1BhUFNzM1hSNk1MeUxJdlUzSmMvckcrK0N6?=
- =?utf-8?B?L0tDTFhBQklZTnY5Q3ZzSkFhNVJpMkdvUHVEMGUxK1ExTytmMjFYS0tlNDc0?=
- =?utf-8?B?eTgzTENBZWdNUjM3MDFaYkxadXdBYUJWNWJwVE05Zk56cnZVY0VwWXBEVVZz?=
- =?utf-8?B?VzhPVVJPVXl5L25OK2kzY291K1I4WE5WaE9lRUN4K3BsWnFUYmFjR3V2dk16?=
- =?utf-8?B?b25yNTllQ1JQYmlsSHd6SDFWeU1MaHQ3aVZDZEFTQXl6ejBHd0xPODZXZDVW?=
- =?utf-8?B?YWpHNGhRNGVEZ1F2aWE5R3BPTnl2S2Z5ZnNrTXhnWk1iWDR4TWEwZjZXakwy?=
- =?utf-8?B?K2pzTWk1LzlyUXp1REFSQ3FiZEFGL2E0N3NNSWg2cGZQaS8wYmdwc2FBd2ZG?=
- =?utf-8?B?MGJDZER4RStxUWpybTVyNGtVU0FXMU1sdC9mZkdvUXVpRWVoMlVXMXZJSE9Z?=
- =?utf-8?B?MDFpRUNzU1ZJcFhySzBwbUJYT1N5aWJvQng1NzFoaUNab2VMSzN5YnBYekxs?=
- =?utf-8?B?a29QYXZMUVEyRkNRSGRBSTRQYTV1L050aXpiQTRVNVR0V1ZFenJ0WjJzUUxj?=
- =?utf-8?B?bHZMaHRaQlRIUTA0azlUeDd2eTU2ZVdUbzlFRlh4cW1LOE8rM0JHU1hENWph?=
- =?utf-8?B?emlhcW5vaTJvSFkrMTRrdG9JQzJiK0VuaGVOcEV0WjdVU3Znd21hTjc2N0Vs?=
- =?utf-8?B?bEFSQlBQcUdHbWxhOVEvTGVrS3pLUDJyb2xDR0w2MVF5dDBWOEMwYm5URFpG?=
- =?utf-8?B?Y0krU0pEbFpWTHNlVFFwbGswaE0vK0VyME0zNmJYNmRha3BwZnAxd0cvOWNk?=
- =?utf-8?B?bVIxSm5KaGNIdEpJYVVMejBkUnJ2TW9lZXF3RXVFQXNyK3hWcHRXRDFNaldr?=
- =?utf-8?B?REVjbUw1b0R6bXB6NFUvalduUzhBc0t4K2FRVVB3dTZUT25TN3pMRmpwZnhI?=
- =?utf-8?B?ODB4NUdTd3hwblNCT2NJRGRuZVJTNmIyR3pVUzBPczc1T3VoUzF3UnJLWmJU?=
- =?utf-8?B?QW1pVE9FWTRXYWt3NlNrcE9IT0lqaFE0OW9URW1GWlpkSkhRZWZib0tjTVFq?=
- =?utf-8?B?UUxCbjl2TGJoNGxyajdqNE5vMmVPc2V5ZmtqaWdVeEpuUHNZN2JlcGxZTG1I?=
- =?utf-8?B?Z1lOMFBmY05XZDloRDNWYnZ6SXMzS0VRK3p0OXhqRU40bWtqL1BIcU5NUDhW?=
- =?utf-8?B?Qmo1cXZlMTR0cW0xNTllcGx1djg0K2xMVWJtcDJUdC9BZWkzd2ZBcjBFbTZi?=
- =?utf-8?B?bFRvM0c3RXpqZlcxTjJkNlFjMXFPQnl1NmVFUVBTRkI0ajI3bTYvV3ZPdHpY?=
- =?utf-8?B?U3pTeVJHU0d0eEZ0aUJtNitnZGswc3Yrb3RXTDh3dVN4MTYvWGRwcmE0MUxr?=
- =?utf-8?B?RHc5SWJMOWhiMFJGem9qZ09UOXFMSkVaUHdsNEJBR1N3WW1nZFY0WWFyeWZI?=
- =?utf-8?B?OFRIeXZrMzhzOHNBM3dIOFlhUGhEdjA5ellZZjNRT1FJNzhnSkVaU0NEcGQ5?=
- =?utf-8?B?TlVrWmhXRzRyL0JvOHV2Uk9XdEVLNEV6VzFpTXRTVTg2akNjVUZPUnJINWc3?=
- =?utf-8?B?Y2JHWmh4akpTbUpvS0ZKTmwyMXB0N1dCTUtlTUNYVDdLZlpwUE1HSGRpK1Bq?=
- =?utf-8?B?bWtnZVo0Qld1MVhGY3JVVmU5NTVtWHR4L1FCVTJVVWlBMkg3VnVsVVR2ZndM?=
- =?utf-8?B?UDJqY3lZTzAxSHNPaGVlbHBxeDVJZ0VxYlM1UjFzT2w4RDZJRkY4ZG9QWkFG?=
- =?utf-8?B?dG9wL2Z3OGpTeW9KUjJsS0NtQjA0STJDZXRUQnQyWlNnemVBclVFWGR6Qnc2?=
- =?utf-8?B?TEJ1QmhYcTNVTm9hOE5ER2pycnIrRzJ4UHRTT2RUQ1c4YXdhd2djN1MzRFVZ?=
- =?utf-8?B?Mkk2MkVHcHZnUUg3a0xRYVhOeE8yc0IzVU9Xc2tsaitGVVpxR0lDZUdaL05w?=
- =?utf-8?B?T2Q5QjNRUHBqejhjM1RxUFRJNEIzVHVodFF4NUpiekFUZFRtQXFENmxyWTZE?=
- =?utf-8?B?YkxuME1yd2dRPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR10MB5328.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(921020)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?TGJkblhkSTJ6UHFITko3OTZDWEg3VjRLUVp0TTVZdmYzdEdQb2twaWhTcm01?=
- =?utf-8?B?dy85OEg4eGU0VXJrbURSazg0SHllVUNGdm1IenZwenMxK1B1bC9KdktsVjZR?=
- =?utf-8?B?Q3NpQkdUR2JiK1dTaVRvZS9NdDVFWThoY0trZTVuUnloQnYvcFJpc2tVLzky?=
- =?utf-8?B?KzJTdTQreVpXWkdBUnJoMStyNk44eWs2SW9MRVFsVWgvcTAvcDcwbTBTN0xa?=
- =?utf-8?B?ZE0vajFRYjN6TUcxQWpRYzhRNEZkcytkZzZQaEQ3dkVyenBzK2lXVVRwZ0xu?=
- =?utf-8?B?a2U4U3pDa1k4THFYU3IzdWtUcmcySlBoY3B1eVNXQjZCTnI1Vlh6N05oZ2c3?=
- =?utf-8?B?M0NWUWF0bkl2QjZsWUJMZkhCZkczTXA2VlR1b0JWUUhaZGliekdvSVI2WmlS?=
- =?utf-8?B?bUNDaEVNWU9VZFhyRGVoTGlUeU5mdjBMbkhEbWFFTnFvdXR4THFjd2N0Qmh0?=
- =?utf-8?B?NGtPc1UzdU5iZmdHM0tzaWhpb2s1TXRKK0JvTFRBckM1SXV4V1h1SXJ4SGhw?=
- =?utf-8?B?YnRIem1Bc0ZFTTU2cStBNjF4NS9YOW9jU29kVlNUbGJZT1VETE8wYXBVT1BP?=
- =?utf-8?B?bmlYT0g0VTcrOExhL2tyOFF0Rk8waExua05TbUxKTUZjSkdHenBqbE4xQWNW?=
- =?utf-8?B?YVE3T09PTVhnN21YY1N2TTdXZkFVOEZ0RjNCdU8vdG52OHNvdjF5TkRuMzdR?=
- =?utf-8?B?SkRpWmZIdnJJUnk2ZW5JSHlJckUvME01MS81M0RjdzBkQVZCQmpQamRBWlE3?=
- =?utf-8?B?VEFYYXFxWTM0UGpJT0kwWjg4eDhuc2ozU3VsTXdFRzBaenBOSHpGdGlhaWEv?=
- =?utf-8?B?elJoTHRucENTMldPaUxiZ1pVN1AwOUJYTi9rYkxvdHRXMmtIYVZPRkVsdXRw?=
- =?utf-8?B?MEpMRVpKckxTRDlmSGszNXJKTUpaa21QdDBnWlJVbnVxdi8yMmhYby9KUS9m?=
- =?utf-8?B?WU1pN3ltbTRPREdMV05XUzR0RnRjOEF2TjlRQjA1LzhmVkREcGRUWDJjS3Va?=
- =?utf-8?B?cnR1V0xNTGFFSmp6cmY3eFAralI4L3NTNkY5Q1pUZTdHTkNwOUliV1o5U2ZO?=
- =?utf-8?B?R3FWcWNLbWVUenlWSkxzaGpKSVg3SytNNHZoak44dStpSitHUzdpaHB6RUJ5?=
- =?utf-8?B?eExySjFvNHlONHlSRTRuRkpnQzQ2d2lnOFcrM3dZamZiWFAyM2ExdTdVNCtT?=
- =?utf-8?B?MVd1emdlazlHMnNFMEV5MHJBZU5xbDcwOUs2aU1idzdoVUwrMGZnbWcwY0R4?=
- =?utf-8?B?R0pJK0RFalBvWm5oeENkM2RIMVVGYmFIU3hHdjZITWxLK2R2OUR2RWgzc284?=
- =?utf-8?B?SGpHcjIyVDNHb2xUckkvNWJaeVAyQXBOUE83dm1IKzR2T1hPeUVjcjhjVGN6?=
- =?utf-8?B?WlQ1TmNEMHdXeDNlNzN4cHdRcWt3M2lHblpkUWdMK0UxTmVCRldQT1Nxem85?=
- =?utf-8?B?ZGh2Yi9JK3UvTVlPb2tCWjNXRzRNTk5qZ2VTcmdYQXN0cXAzd2I5dTFjWCtm?=
- =?utf-8?B?MFduYUNBanp5MlJwRGtXMTFGOTJBajd6bS81dCtQL0lwQ2hISWZsb3RYVDFC?=
- =?utf-8?B?SytzdHQ5OWZKVDZJbkxhUjlOZ2lDMGlLdHVpait6Y0s2VmZ3cUx6V2NPT25N?=
- =?utf-8?B?MnFPSGVGNU13UkVIUzkyNnVFcVN0aWFkR045cWhSQ21reHhvQlRYbFRiaDE1?=
- =?utf-8?B?b0dEcE10eW5xVFdHV1JmWDd6U3VLQkJKa2NBM0s1aHJjMjFIdjFKZStWTTRN?=
- =?utf-8?B?SHZsbExmNkpqNTZZb1JBNkdVbUt1NWpTRTVkWktUVExQakxQUW5ySU91OFhS?=
- =?utf-8?B?ZklMSFpIK203eCtTSTB0M29hSys5YjV0b2Z1bk9jbzUycnJCc0hON2JwTXFT?=
- =?utf-8?B?SWNpOC9zd3krQnRnUWFaYkpyMjhYcllTbHVuSXhDVkVtTXFSMWs3TFY3OFRM?=
- =?utf-8?B?UENNc29wMlpzeFh4NjM1YjlDYlVFeS9iVFRGYWsvVzVFb05idzZTNDQwdjJn?=
- =?utf-8?B?c0JveWsvdDByV3U5bXdHMjdLMnA0enNld1h5djB3SldOTmFJVnB3azRXY1dx?=
- =?utf-8?B?RnJ5MWJKWkk5cTVIR2M5eTRzU2U4U3YzQnZWTDRYeXorWHBTa0g1NHVwcFdo?=
- =?utf-8?B?b2MraHFiU2JPZnFWWllOa2I3VGlUUFpmRXVTYzB4bklDeWVhek41L0tiRDJP?=
- =?utf-8?B?dVE9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	g6SUtXfVXQ5GIkqyAnTGagqPW5L4i+vdxy9B3krMQrveW95ob1zCNg9hYUyB403DIpy8XQnafsQZZmkT8Up5SDQ9hzs1LxHM+nalGGb9EP6/+iYe7Bakra6hfByQzXAHwa0hXJlHbMzg3jQLmNf/9lTrpoywCwJx9q6dUg8B+3Fq40vGC0/MGgzGIoOBtc/UYjMfni0u9Vd9dLxj3kR9SHClzvPmoCXGoZH4dGqnMAsgtgUy0fm3hthB24SzWQWFfx81wdJwE5yrN/ItzxcovLij6a9NDXL/SGgw0sp/LLRlcL+IA5Hq0fGXoXtQlxv+Ea3tCqKYAyZUotCQhX7/Ov2oyh/1/h7JQKEifvY/bkYw7l+V2q5iaR1BSAYf1fcx/b2Mgoji3Q4kasbKxTMv18WyOUHvreAL3ePUG55jUF1s96KbpYYhkewVdxzB3o6nIy0klrk9VNvDjlQl/EhfEtNqpZKH1XmYsN1dEH7RuCkXZiyNq1NubZYsYdZVrIDnPsSsfARnYpwNSU7g12oyrenjKgiEeGMT8vu98aZRnPcJWhIUZO44vAB7x8qB/GQuudeWtGlRRqEm8Vf9F3rkfCN9tikBUN1RMeteeKHVSEc=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3745d211-7184-4082-805d-08dd96506e35
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR10MB5328.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 May 2025 21:10:35.0682
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ayt0v4McvVnJQaGpc0kglTyKT9yhgRBY1/4hxjksJ04rgL6srz6nT+WUWR3ReXfkMgG1GdKE2qrAKpGsLVbHhDAC0haq7IQCyRGvWgwfji0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR10MB7831
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-18_10,2025-05-16_03,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0 phishscore=0
- bulkscore=0 adultscore=0 mlxscore=0 suspectscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505070000
- definitions=main-2505180209
-X-Proofpoint-ORIG-GUID: elakneDeaMeI4RS3stBvvvT5KQp-snPp
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTE4MDIwOSBTYWx0ZWRfXwmD8PUkG5iam wy0plUeD3NMJFEezTXiDaFe+pVSdwmzqICUws8wya8+oQxmL+tzA9peI2Dfoank9eFCWmGn9ud2 gHnctcnyQZhNJFYJiaJheN318341jOg7MZMLTogsFB3RQaxQVbcIRJMRFUVJ+wSblyW4Tzixzm9
- 39Lz8cHHwdxyCRF1K+NCCGQe5PPsO6Yejrfty1DeYVjiaQRNmKtL5PGhAgw8Z6LgdO1acEajRuw hodva+/NjAUaLq2fjIbXgDaK8xSxhwycdjPVJ0rKaTuxVSR4f0dqCvLH+IzchmcvZ9Bd2H6W6yR 6Iv0WvEJzJTqdZECpcNPJaleimCk06PBhrVQDUYNsD87nlsHXa8fwH0wECMuy+zlSaB83ilCxay
- +/cbn/u8a28kn888k6jHsK0NYx8Xw5XjrYd89aUDqsU4Nu4bWgbedMLiD9NnkdFUuIx/8r8E
-X-Authority-Analysis: v=2.4 cv=CMIqXQrD c=1 sm=1 tr=0 ts=682a4cce b=1 cx=c_pps a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19
- a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=GoEa3M9JfhUA:10 a=VwQbUJbxAAAA:8 a=yMhMjlubAAAA:8 a=UaDLk3Jgrf0VfbM3KK0A:9 a=QEXdDO2ut3YA:10 cc=ntf awl=host:14694
-X-Proofpoint-GUID: elakneDeaMeI4RS3stBvvvT5KQp-snPp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250420010518.2842335-1-jon@nutanix.com>
+
+On Sat, Apr 19, 2025 at 06:05:18PM -0700, Jon Kohler wrote:
+> In handle_tx_copy, TX batching processes packets below ~PAGE_SIZE and
+> batches up to 64 messages before calling sock->sendmsg.
+> 
+> Currently, when there are no more messages on the ring to dequeue,
+> handle_tx_copy re-enables kicks on the ring *before* firing off the
+> batch sendmsg. However, sock->sendmsg incurs a non-zero delay,
+> especially if it needs to wake up a thread (e.g., another vhost worker).
+> 
+> If the guest submits additional messages immediately after the last ring
+> check and disablement, it triggers an EPT_MISCONFIG vmexit to attempt to
+> kick the vhost worker. This may happen while the worker is still
+> processing the sendmsg, leading to wasteful exit(s).
+> 
+> This is particularly problematic for single-threaded guest submission
+> threads, as they must exit, wait for the exit to be processed
+> (potentially involving a TTWU), and then resume.
+> 
+> In scenarios like a constant stream of UDP messages, this results in a
+> sawtooth pattern where the submitter frequently vmexits, and the
+> vhost-net worker alternates between sleeping and waking.
+> 
+> A common solution is to configure vhost-net busy polling via userspace
+> (e.g., qemu poll-us). However, treating the sendmsg as the "busy"
+> period by keeping kicks disabled during the final sendmsg and
+> performing one additional ring check afterward provides a significant
+> performance improvement without any excess busy poll cycles.
+> 
+> If messages are found in the ring after the final sendmsg, requeue the
+> TX handler. This ensures fairness for the RX handler and allows
+> vhost_run_work_list to cond_resched() as needed.
+> 
+> Test Case
+>     TX VM: taskset -c 2 iperf3  -c rx-ip-here -t 60 -p 5200 -b 0 -u -i 5
+>     RX VM: taskset -c 2 iperf3 -s -p 5200 -D
+>     6.12.0, each worker backed by tun interface with IFF_NAPI setup.
+>     Note: TCP side is largely unchanged as that was copy bound
+> 
+> 6.12.0 unpatched
+>     EPT_MISCONFIG/second: 5411
+>     Datagrams/second: ~382k
+>     Interval         Transfer     Bitrate         Lost/Total Datagrams
+>     0.00-30.00  sec  15.5 GBytes  4.43 Gbits/sec  0/11481630 (0%)  sender
+> 
+> 6.12.0 patched
+>     EPT_MISCONFIG/second: 58 (~93x reduction)
+>     Datagrams/second: ~650k  (~1.7x increase)
+>     Interval         Transfer     Bitrate         Lost/Total Datagrams
+>     0.00-30.00  sec  26.4 GBytes  7.55 Gbits/sec  0/19554720 (0%)  sender
+> 
+> Acked-by: Jason Wang <jasowang@redhat.com>
+> Signed-off-by: Jon Kohler <jon@nutanix.com>
 
 
+Jon what are we doing with this patch? you still looking into
+some feedback?
 
-On 18-05-2025 09:17, Saurabh Sengar wrote:
-> The MANA driver's probe registers netdevice via the following call chain:
-> 
-> mana_probe()
->    register_netdev()
->      register_netdevice()
-> 
-> register_netdevice() calls notifier callback for netvsc driver,
-> holding the netdev mutex via netdev_lock_ops().
-> 
-> Further this netvsc notifier callback end up attempting to acquire the
-> same lock again in dev_xdp_propagate() leading to deadlock.
-> 
-> netvsc_netdev_event()
->    netvsc_vf_setxdp()
->      dev_xdp_propagate()
-> 
-> This deadlock was not observed so far because net_shaper_ops was never
-> set and this lock in noop in this case. Fix this by using
-> netif_xdp_propagate instead of dev_xdp_propagate to avoid recursive
-> locking in this path.
-> 
-> This issue has not observed so far because net_shaper_ops was unset,
-> making the lock path effectively a no-op. To prevent recursive locking
-> and avoid this deadlock, replace dev_xdp_propagate() with
-> netif_xdp_propagate(), which does not acquire the lock again.
-
-avoid noop and repetition (because the paragraph about net_shaper_ops is 
-repeated):
-
-"This deadlock was not observed so far because net_shaper_ops was never 
-set, and thus the lock was effectively a no-op in this case. Fix this by 
-using netif_xdp_propagate() instead of dev_xdp_propagate() to avoid 
-recursive locking in this path.
-
-Also, clean up the unregistration path by removing the unnecessary call 
-to netvsc_vf_setxdp(), since unregister_netdevice_many_notify() already 
-performs this cleanup via dev_xdp_uninstall()."
-
-> 
-> Also, clean up the unregistration path by removing unnecessary call to
-> netvsc_vf_setxdp(), since unregister_netdevice_many_notify() already
-> performs this cleanup via dev_xdp_uninstall.
-> 
-> Fixes: 97246d6d21c2 ("net: hold netdev instance lock during ndo_bpf")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Saurabh Sengar <ssengar@linux.microsoft.com>
 > ---
->   drivers/net/hyperv/netvsc_bpf.c | 2 +-
->   drivers/net/hyperv/netvsc_drv.c | 2 --
->   net/core/dev.c                  | 1 +
->   3 files changed, 2 insertions(+), 3 deletions(-)
+>  drivers/vhost/net.c | 19 +++++++++++++++----
+>  1 file changed, 15 insertions(+), 4 deletions(-)
 > 
-> diff --git a/drivers/net/hyperv/netvsc_bpf.c b/drivers/net/hyperv/netvsc_bpf.c
-> index e01c5997a551..1dd3755d9e6d 100644
-> --- a/drivers/net/hyperv/netvsc_bpf.c
-> +++ b/drivers/net/hyperv/netvsc_bpf.c
-> @@ -183,7 +183,7 @@ int netvsc_vf_setxdp(struct net_device *vf_netdev, struct bpf_prog *prog)
-
-
-Thanks,
-Alok
+> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> index b9b9e9d40951..9b04025eea66 100644
+> --- a/drivers/vhost/net.c
+> +++ b/drivers/vhost/net.c
+> @@ -769,13 +769,17 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
+>  			break;
+>  		/* Nothing new?  Wait for eventfd to tell us they refilled. */
+>  		if (head == vq->num) {
+> +			/* If interrupted while doing busy polling, requeue
+> +			 * the handler to be fair handle_rx as well as other
+> +			 * tasks waiting on cpu
+> +			 */
+>  			if (unlikely(busyloop_intr)) {
+>  				vhost_poll_queue(&vq->poll);
+> -			} else if (unlikely(vhost_enable_notify(&net->dev,
+> -								vq))) {
+> -				vhost_disable_notify(&net->dev, vq);
+> -				continue;
+>  			}
+> +			/* Kicks are disabled at this point, break loop and
+> +			 * process any remaining batched packets. Queue will
+> +			 * be re-enabled afterwards.
+> +			 */
+>  			break;
+>  		}
+>  
+> @@ -825,7 +829,14 @@ static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
+>  		++nvq->done_idx;
+>  	} while (likely(!vhost_exceeds_weight(vq, ++sent_pkts, total_len)));
+>  
+> +	/* Kicks are still disabled, dispatch any remaining batched msgs. */
+>  	vhost_tx_batch(net, nvq, sock, &msg);
+> +
+> +	/* All of our work has been completed; however, before leaving the
+> +	 * TX handler, do one last check for work, and requeue handler if
+> +	 * necessary. If there is no work, queue will be reenabled.
+> +	 */
+> +	vhost_net_busy_poll_try_queue(net, vq);
+>  }
+>  
+>  static void handle_tx_zerocopy(struct vhost_net *net, struct socket *sock)
+> -- 
+> 2.43.0
 
 
