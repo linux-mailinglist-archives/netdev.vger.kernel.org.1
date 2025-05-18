@@ -1,156 +1,109 @@
-Return-Path: <netdev+bounces-191327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191328-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7398DABADAE
-	for <lists+netdev@lfdr.de>; Sun, 18 May 2025 05:48:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F701ABADB3
+	for <lists+netdev@lfdr.de>; Sun, 18 May 2025 05:50:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B1F81896D45
-	for <lists+netdev@lfdr.de>; Sun, 18 May 2025 03:48:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08FCE1767D6
+	for <lists+netdev@lfdr.de>; Sun, 18 May 2025 03:50:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90BC01922F4;
-	Sun, 18 May 2025 03:47:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC228199E89;
+	Sun, 18 May 2025 03:50:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="iOPiA8P8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RqsM0YCF"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1102710A1E;
-	Sun, 18 May 2025 03:47:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72153469D
+	for <netdev@vger.kernel.org>; Sun, 18 May 2025 03:50:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747540077; cv=none; b=KJaigDb9lh4RLZmmFG4zW90EXncFNBXezKWgbAA7Y7HasaayIu+FH2zfqeCmm7IYAAwWtFN0URByVabh39HO5vawcfHeYVDPxQqgZ8BLC+zCTgRHYPx3D7qv7kDarJZnSy6C86Y+G4QEe/ODPsFdND1aAEW1kS4C0ISX9OOA4Lg=
+	t=1747540224; cv=none; b=Q2nsgnfsfhaGo1AOynAjtJsr5VWxzAkvR6MDAgMvSEwp3gg7oaeywe4ef03AYwsJZba3duXNcTLinxOkea1P0qiDlO3FLhdXxASI3Sr05FgzSzmKlH3VwCm0xB7kYXiiZKgG55ht9AvvscLh+DZhG2YSdtHPjthaX+tMluagud4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747540077; c=relaxed/simple;
-	bh=aXvJKxmzfESpaedYEM0k3r230KTw/3k6G8+3Tse+Lhs=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=O1ssZn2gaWI3R4aF6UGbCjxyUZd8+vr41E2j+Bh5yG5IsXWpU4xnKmYmdGgYL1y42ZMVHzDkDMR7Dd+MKVYDGtNXRSMitOyPpQHal1MtoX0mqWA5Mo+W8NjpzzMGS8AQOzENHSNjf2AuWeYzu5w+MMi76GNm5jiS7vEtei4F4Pg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=iOPiA8P8; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1127)
-	id 84C0D20277FA; Sat, 17 May 2025 20:47:55 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 84C0D20277FA
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1747540075;
-	bh=lPGYH1glaOFQwG0Qf4sdwd5qCLAWVCDmPlEySsWR4Kg=;
-	h=From:To:Cc:Subject:Date:From;
-	b=iOPiA8P85ZLuht2RkG9gqBfxGdBHeS1PaINFVYLt/5Q9Mms2x7auacqvvfbloAlVp
-	 zDQEMZO8q6QXyfhuot5555zl1gP+ihmFJCM0iiHyFDC66yEW/8j+JZY2txvxVQoSSa
-	 0o9OciEJMKsgntdUYDpMj+4fkOKPTlCMIFaCAE0c=
-From: Saurabh Sengar <ssengar@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	sdf@fomichev.me,
-	kuniyu@amazon.com,
-	ahmed.zaki@intel.com,
-	aleksander.lobakin@intel.com,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Cc: ssengar@microsoft.com,
-	stable@vger.kernel.org,
-	Saurabh Sengar <ssengar@linux.microsoft.com>
-Subject: [PATCH net] hv_netvsc: fix potential deadlock in netvsc_vf_setxdp()
-Date: Sat, 17 May 2025 20:47:50 -0700
-Message-Id: <1747540070-11086-1-git-send-email-ssengar@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
+	s=arc-20240116; t=1747540224; c=relaxed/simple;
+	bh=80Ff83/Sc3aiKeq6u7rFfdcS9BDmv3QCbNXHIwNdEiM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K7VKVvOepUQ4wFjZ9QuYeY2KWrnjphR5dJ+EhUITMJ7mPVTv+o09A+Jmm0UA93ARA5q8lmywUrTJvQIHzwPa3w5UO4IcPK1VEdOj+eIvwaRF0MlnToievKa9EaRlw/HS6pYTN8FJkP8m5MFjhiQieglLv9EEvKDfCrJOeDMx0BM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RqsM0YCF; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-30e8f4dbb72so1932741a91.1
+        for <netdev@vger.kernel.org>; Sat, 17 May 2025 20:50:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747540222; x=1748145022; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=exwrmOR3k+VqhT2rdUHEO7FbGbFA4c/6j+6IMkXX7/M=;
+        b=RqsM0YCFvghBamKt6p02CHqCG8RlYB2sxvn8JotUzqj7mSG5YHbPW8RIgOOFsRYC3x
+         71pwqOHRoxZACGzLPLBoX9hp7whVD1Fl1x1Zi1aEj0ErjeT3DtbtXIpkE/JBOVhHFz2t
+         ixgmvI0fsN3sHoFCSBv+Ya+ny27LMnUVny4zMCfFgoPVp8WXTmoBGI6BpvewWbrTvprY
+         6BYom21RP4oG1DLZ80x2Y9BtQlA9Q7JlUg318IbSpDe4Laxs0b2Idw7K+FYl5tkwHYNb
+         92892MR7PCfvc/NaEkQutkbHeCZROsHunLcMXRR8KknDfu7yddKyUWismFz0kb80XY0h
+         8ArQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747540222; x=1748145022;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=exwrmOR3k+VqhT2rdUHEO7FbGbFA4c/6j+6IMkXX7/M=;
+        b=JnSqT+D0zHgDy/qt4ioBwSHNaDrlfNOyEXG93ub4rXbS6dhf4MDip6h2dSqpipl9ZS
+         dPyWPt4slL9asHg8CSBffKl3I120U665asqedd3o5TkPTOHWXGFHMC2c5RzZyYsGwtaV
+         OBZsk2yoRIdr9kpk723ne6Budnh/Gm1mt/gzjqbpYZ9eGIBvbtILyyQ33Q1wOjkE8iCv
+         Zwa5LMDf/dmX9OpfO1/f7z1x8/LoxS9SKBgzQD884r6J2F+Gcp9JEDQzHfh5ndLM6HYH
+         q6D6GL0ejmLqKcfeG9CGr/OqnZk5HtM2lpfnTdtxGRtsnRaTxnNOVDPkh/XZKPrGX6AI
+         zTxw==
+X-Forwarded-Encrypted: i=1; AJvYcCVRFJt5W/JC9L+XQBnzjqPClZbPZGknoGJBpzGXBfH6z6fB/aIZz3p40vgi8YWD60t+V/tYBV4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyiK6nmoZFW4AZEdKnAP9WcuuIITNpAEfRtXkN/c8IRHx9VBOrP
+	iT1clO3ueMy9oj4zcX1XDPJyXPrWKOb66TcC60V2Pg7GEp/uUcIaZxc=
+X-Gm-Gg: ASbGnctgLjehTS/+lrNgS+nQ5uCU4JQ/+8gxUPyRh4fCJTCyx/0HzhisQzWyutSusML
+	PiBIXL+cI4bZ4k9IvoM6mZTCiunVgB4J6peGQb8u9AsIdYB/q03TraJOnWPufs1laNJjWcrc+/B
+	m4mUF6xy2ZQPTuhrm4jqyJ1jh3+UKipIk8ROAfVq2wCdhYkvi5ssjPLmP74k1D8P+/Rsqb+5JFN
+	ZI3JkCTTu3YTpFfiBDrObVkppLlimpZj4MyhVagUxPyOUOrE0Kyc1hIffhucq9DoDOaP5+NCoQB
+	aamcCwX28PNQmPtiQXwMmHEksPHIavYn45Rvw6yJT6U5sWKm3LiwiSs+zoW/OrIc/68VNmbKsSQ
+	IBQZ+gsWvrHez
+X-Google-Smtp-Source: AGHT+IEhqkn1CVBJGDz7DHVk+OB1FiCKJqEE2i3t6LE1y/IIGZ7UpQPNF9aqqooWpfR8GWhKx6mOWw==
+X-Received: by 2002:a17:90b:2b45:b0:2ff:6a5f:9b39 with SMTP id 98e67ed59e1d1-30e8314fe2emr13808887a91.18.1747540222591;
+        Sat, 17 May 2025 20:50:22 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-30e7b4dda42sm4205472a91.35.2025.05.17.20.50.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 17 May 2025 20:50:22 -0700 (PDT)
+Date: Sat, 17 May 2025 20:50:21 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	kuniyu@amazon.com, sdf@fomichev.me
+Subject: Re: [PATCH net-next v2] net: let lockdep compare instance locks
+Message-ID: <aClY_Vy7RWOYD45A@mini-arch>
+References: <20250517200810.466531-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250517200810.466531-1-kuba@kernel.org>
 
-The MANA driver's probe registers netdevice via the following call chain:
+On 05/17, Jakub Kicinski wrote:
+> AFAIU always returning -1 from lockdep's compare function
+> basically disables checking of dependencies between given
+> locks. Try to be a little more precise about what guarantees
+> that instance locks won't deadlock.
+> 
+> Right now we only nest them under protection of rtnl_lock.
+> Mostly in unregister_netdevice_many() and dev_close_many().
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> v2:
+>  - drop the speculative small rtnl handling
 
-mana_probe()
-  register_netdev()
-    register_netdevice()
-
-register_netdevice() calls notifier callback for netvsc driver,
-holding the netdev mutex via netdev_lock_ops().
-
-Further this netvsc notifier callback end up attempting to acquire the
-same lock again in dev_xdp_propagate() leading to deadlock.
-
-netvsc_netdev_event()
-  netvsc_vf_setxdp()
-    dev_xdp_propagate()
-
-This deadlock was not observed so far because net_shaper_ops was never
-set and this lock in noop in this case. Fix this by using
-netif_xdp_propagate instead of dev_xdp_propagate to avoid recursive
-locking in this path.
-
-This issue has not observed so far because net_shaper_ops was unset,
-making the lock path effectively a no-op. To prevent recursive locking
-and avoid this deadlock, replace dev_xdp_propagate() with
-netif_xdp_propagate(), which does not acquire the lock again.
-
-Also, clean up the unregistration path by removing unnecessary call to
-netvsc_vf_setxdp(), since unregister_netdevice_many_notify() already
-performs this cleanup via dev_xdp_uninstall.
-
-Fixes: 97246d6d21c2 ("net: hold netdev instance lock during ndo_bpf")
-Cc: stable@vger.kernel.org
-Signed-off-by: Saurabh Sengar <ssengar@linux.microsoft.com>
----
- drivers/net/hyperv/netvsc_bpf.c | 2 +-
- drivers/net/hyperv/netvsc_drv.c | 2 --
- net/core/dev.c                  | 1 +
- 3 files changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/hyperv/netvsc_bpf.c b/drivers/net/hyperv/netvsc_bpf.c
-index e01c5997a551..1dd3755d9e6d 100644
---- a/drivers/net/hyperv/netvsc_bpf.c
-+++ b/drivers/net/hyperv/netvsc_bpf.c
-@@ -183,7 +183,7 @@ int netvsc_vf_setxdp(struct net_device *vf_netdev, struct bpf_prog *prog)
- 	xdp.command = XDP_SETUP_PROG;
- 	xdp.prog = prog;
- 
--	ret = dev_xdp_propagate(vf_netdev, &xdp);
-+	ret = netif_xdp_propagate(vf_netdev, &xdp);
- 
- 	if (ret && prog)
- 		bpf_prog_put(prog);
-diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_drv.c
-index d8b169ac0343..ee3aaf9c10e6 100644
---- a/drivers/net/hyperv/netvsc_drv.c
-+++ b/drivers/net/hyperv/netvsc_drv.c
-@@ -2462,8 +2462,6 @@ static int netvsc_unregister_vf(struct net_device *vf_netdev)
- 
- 	netdev_info(ndev, "VF unregistering: %s\n", vf_netdev->name);
- 
--	netvsc_vf_setxdp(vf_netdev, NULL);
--
- 	reinit_completion(&net_device_ctx->vf_add);
- 	netdev_rx_handler_unregister(vf_netdev);
- 	netdev_upper_dev_unlink(vf_netdev, ndev);
-diff --git a/net/core/dev.c b/net/core/dev.c
-index fccf2167b235..8c6c9d7fba26 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -9953,6 +9953,7 @@ int netif_xdp_propagate(struct net_device *dev, struct netdev_bpf *bpf)
- 
- 	return dev->netdev_ops->ndo_bpf(dev, bpf);
- }
-+EXPORT_SYMBOL_GPL(netif_xdp_propagate);
- 
- u32 dev_xdp_prog_id(struct net_device *dev, enum bpf_xdp_mode mode)
- {
--- 
-2.43.0
-
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
