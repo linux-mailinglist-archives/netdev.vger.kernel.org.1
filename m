@@ -1,128 +1,173 @@
-Return-Path: <netdev+bounces-191345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BA3FABB05E
-	for <lists+netdev@lfdr.de>; Sun, 18 May 2025 15:31:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD82DABB0A9
+	for <lists+netdev@lfdr.de>; Sun, 18 May 2025 17:24:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC3683B0B89
-	for <lists+netdev@lfdr.de>; Sun, 18 May 2025 13:31:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8EBC918964DB
+	for <lists+netdev@lfdr.de>; Sun, 18 May 2025 15:24:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63A1B1D6188;
-	Sun, 18 May 2025 13:31:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 397D41DD877;
+	Sun, 18 May 2025 15:24:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b2lFSyVF"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="AOCYjY/E"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35BC6EEAA;
-	Sun, 18 May 2025 13:31:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CFF9610B;
+	Sun, 18 May 2025 15:24:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747575092; cv=none; b=hBFxTYDjK+mDryVURnXSSCh1uyi85j+8X2lxZyQEJ+bfd5PJc02mtD1OYBaEVXhzyhtC6YCKXXKh/edoTpQIj0TOcTmXrlnVlvDVKySkSLx8PpHkMWer5qcfORDGy72dEEbJOfXOZvkMY/KDpZSS31AbkmaKxXutIOyDlQ6g6YQ=
+	t=1747581844; cv=none; b=L9RWoVz8y/T1nYGyHb+w+3rBUOdcoDiLzhO4CI1cH0Ecew36xtrUX3Q8inn2qGKWDhClD4ZGyXxKWdUVl7naLGvh7fKSvRt1CBvbh+D3Qo6uNssmvAXy4BdGvU4RQWL/+KRCw9N58FBC3epO+DPFHfNxDWZPKgd+uRytn24ignQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747575092; c=relaxed/simple;
-	bh=dV15awbD247lj6+VR3yfY/UUy8Kzmk0rr5ZokrGdYmw=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
-	 References:In-Reply-To; b=Nu7fwKvyCtvcfQUfFGpg8EEWmIGbKtp9KKH0BEJ1YXgzbcJMKwypo0T8Dvjo7AFpSJrR88an1xY/USrTZFsV5SpNiQpw3iR7TDU30rH+ZaDuk4aBFcdavN/nqXG/zJbaM9QxAOo+VNoG5UYrXfs70T5n2Oclg3lRwknb50EzJ9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b2lFSyVF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15DAFC4CEE7;
-	Sun, 18 May 2025 13:30:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747575091;
-	bh=dV15awbD247lj6+VR3yfY/UUy8Kzmk0rr5ZokrGdYmw=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=b2lFSyVFm403R0QirlXfajgv0Yq+HhXqzpmEF6GdZJp9ASL5IujhZ8VevggSQ18FM
-	 uU67FccfDFcP+x5JrKcqy11TktdGYYrY6cAjICNUed0P6CHuZdLADBXTtgT04MhWLW
-	 b3hxdQYWzvQTryICqfzrAfR9nuAEyORmcwSc5NpyEqjKLYoQ+CzuPBfLWm4F7go+Wm
-	 1FDKmucHxK0PKkOFa03WQebvw54C9Wze2p1Qg7ZIe9xFLAgRIUBbgX6h/8xsRfPMaR
-	 KMLWzUcveHW3Dy07olT3nU5TZUQV0fXwHjEIHqWnAQcDeBOCO4XKODQ6xeSNWI1/qT
-	 5Z+RMrj5Iqt5Q==
+	s=arc-20240116; t=1747581844; c=relaxed/simple;
+	bh=mA5qQuJQLAcro2vZxBNo6TniIdRazAHJd+dKe7jRx/M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NldNjDKr0KM8YSEhqqsfURFtB4nzQgSMvZuKjfmeRp/+PuPCP0MbwhjDYMKuW3p6T/OzBpjNqqgfclpaxYFadIc2hmC2hmddy2vVShdv9uLAbRUcca9pLs461TS9EakmEb1saMOhZN7CnYpfmceosgNnGSQk4iNcGcaamsnmgRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=AOCYjY/E; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=RqGz4jmLw49/KAEoCTsNsCNBUVqB9Q8hkq+7cfJELDc=; b=AOCYjY/EKXnr6o6xc1hx49/EJr
+	4A1itY69D3PnaUZmXJsrGSlhwOsjIRGF97zJErsBG/nYi9FU5ecPz8xYQzxcTG78GA3VIQIjgWYcS
+	ZXE3TIgPXMIWWU9WLq6Xz75fKUq7r3/+btZKuJZ/5WZLW2oQ4d9OqwS4mFtrBdq/n9Eo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uGfra-00Cvey-By; Sun, 18 May 2025 17:23:42 +0200
+Date: Sun, 18 May 2025 17:23:42 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Damien =?iso-8859-1?Q?Ri=E9gel?= <damien.riegel@silabs.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Silicon Labs Kernel Team <linux-devel@silabs.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Johan Hovold <johan@kernel.org>,
+	Alex Elder <elder@kernel.org>, greybus-dev@lists.linaro.org
+Subject: Re: [RFC net-next 00/15] Add support for Silicon Labs CPC
+Message-ID: <cbfc9422-9ba8-475b-9c8d-e6ab0e53856e@lunn.ch>
+References: <20250512012748.79749-1-damien.riegel@silabs.com>
+ <6fea7d17-8e08-42c7-a297-d4f5a3377661@lunn.ch>
+ <D9VCEGBQWBW8.3MJCYYXOZHZNX@silabs.com>
+ <f1a4ab5a-f2ce-4c94-91eb-ab81aea5b413@lunn.ch>
+ <D9W93CSVNNM0.F14YDBPZP64O@silabs.com>
+ <2025051551-rinsing-accurate-1852@gregkh>
+ <D9WTONSVOPJS.1DNQ703ATXIN1@silabs.com>
+ <2025051612-stained-wasting-26d3@gregkh>
+ <D9XQ42C56TUG.2VXDA4CVURNAM@silabs.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Sun, 18 May 2025 15:30:50 +0200
-Message-Id: <D9ZBNJ6VL5XL.2TIH5QSOI8ABL@kernel.org>
-Subject: Re: [net-next PATCH v12 1/6] net: phy: pass PHY driver to
- .match_phy_device OP
-From: "Benno Lossin" <lossin@kernel.org>
-To: "Christian Marangi" <ansuelsmth@gmail.com>, "Andrew Lunn"
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, "Rob Herring" <robh@kernel.org>, "Krzysztof
- Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>,
- "Heiner Kallweit" <hkallweit1@gmail.com>, "Russell King"
- <linux@armlinux.org.uk>, "Florian Fainelli"
- <florian.fainelli@broadcom.com>, "Broadcom internal kernel review list"
- <bcm-kernel-feedback-list@broadcom.com>, =?utf-8?q?Marek_Beh=C3=BAn?=
- <kabel@kernel.org>, "Andrei Botila" <andrei.botila@oss.nxp.com>, "FUJITA
- Tomonori" <fujita.tomonori@gmail.com>, "Trevor Gross" <tmgross@umich.edu>,
- "Miguel Ojeda" <ojeda@kernel.org>, "Alex Gaynor" <alex.gaynor@gmail.com>,
- "Boqun Feng" <boqun.feng@gmail.com>, "Gary Guo" <gary@garyguo.net>,
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Benno Lossin"
- <benno.lossin@proton.me>, "Andreas Hindborg" <a.hindborg@kernel.org>,
- "Alice Ryhl" <aliceryhl@google.com>, "Danilo Krummrich" <dakr@kernel.org>,
- "Sabrina Dubroca" <sd@queasysnail.net>, "Michael Klein"
- <michael@fossekall.de>, "Daniel Golle" <daniel@makrotopia.org>,
- <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <rust-for-linux@vger.kernel.org>
-Cc: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-X-Mailer: aerc 0.20.1
-References: <20250517201353.5137-1-ansuelsmth@gmail.com>
- <20250517201353.5137-2-ansuelsmth@gmail.com>
-In-Reply-To: <20250517201353.5137-2-ansuelsmth@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <D9XQ42C56TUG.2VXDA4CVURNAM@silabs.com>
 
-On Sat May 17, 2025 at 10:13 PM CEST, Christian Marangi wrote:
-> Pass PHY driver pointer to .match_phy_device OP in addition to phydev.
-> Having access to the PHY driver struct might be useful to check the
-> PHY ID of the driver is being matched for in case the PHY ID scanned in
-> the phydev is not consistent.
->
-> A scenario for this is a PHY that change PHY ID after a firmware is
-> loaded, in such case, the PHY ID stored in PHY device struct is not
-> valid anymore and PHY will manually scan the ID in the match_phy_device
-> function.
->
-> Having the PHY driver info is also useful for those PHY driver that
-> implement multiple simple .match_phy_device OP to match specific MMD PHY
-> ID. With this extra info if the parsing logic is the same, the matching
-> function can be generalized by using the phy_id in the PHY driver
-> instead of hardcoding.
->
-> Rust wrapper callback is updated to align to the new match_phy_device
-> arguments.
->
-> Suggested-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> ---
->  drivers/net/phy/bcm87xx.c              |  6 ++++--
->  drivers/net/phy/icplus.c               |  6 ++++--
->  drivers/net/phy/marvell10g.c           | 12 ++++++++----
->  drivers/net/phy/micrel.c               |  6 ++++--
->  drivers/net/phy/nxp-c45-tja11xx.c      | 12 ++++++++----
->  drivers/net/phy/nxp-tja11xx.c          |  6 ++++--
->  drivers/net/phy/phy_device.c           |  2 +-
->  drivers/net/phy/realtek/realtek_main.c | 27 +++++++++++++++++---------
->  drivers/net/phy/teranetics.c           |  3 ++-
->  include/linux/phy.h                    |  3 ++-
->  rust/kernel/net/phy.rs                 |  1 +
->  11 files changed, 56 insertions(+), 28 deletions(-)
+> I think Andrew pulled Greybus in the discussion because there is some
+> overlap between Greybus and CPC:
+>   - Greybus has bundles and CPorts, CPC only has "endpoints", which
+>     would be the equivalent of a bundle with a single cport
+>   - discoverability of Greybus bundles/CPC endpoints by the host
+>   - multiple bundles/endpoints might coexist in the same
+>     module/CPC-enabled device
+>   - bundles/endpoints are independent from each other and each has its
+>     own dedicated driver
+> 
+> Greybus goes a step further and specs some protocols like GPIO or UART.
+> CPC doesn't spec what goes over endpoints because it's geared towards
+> radio applications and as you said, it's very device/stack specific.
 
-I haven't really looked at the C code, just the part that interfaces
-with Rust, so:
+Is it device specific? Look at your Bluetooth implementation. I don't
+see anything device specific in it. That should work for any of the
+vendors of similar chips to yours.
 
-Reviewed-by: Benno Lossin <lossin@kernel.org> # for Rust
+For 802.15.4, Linux defines:
 
----
-Cheers,
-Benno
+struct ieee802154_ops {
+        struct module   *owner;
+        int             (*start)(struct ieee802154_hw *hw);
+        void            (*stop)(struct ieee802154_hw *hw);
+        int             (*xmit_sync)(struct ieee802154_hw *hw,
+                                     struct sk_buff *skb);
+        int             (*xmit_async)(struct ieee802154_hw *hw,
+                                      struct sk_buff *skb);
+        int             (*ed)(struct ieee802154_hw *hw, u8 *level);
+        int             (*set_channel)(struct ieee802154_hw *hw, u8 page,
+                                       u8 channel);
+        int             (*set_hw_addr_filt)(struct ieee802154_hw *hw,
+                                            struct ieee802154_hw_addr_filt *filt,
+                                            unsigned long changed);
+        int             (*set_txpower)(struct ieee802154_hw *hw, s32 mbm);
+        int             (*set_lbt)(struct ieee802154_hw *hw, bool on);
+        int             (*set_cca_mode)(struct ieee802154_hw *hw,
+                                        const struct wpan_phy_cca *cca);
+        int             (*set_cca_ed_level)(struct ieee802154_hw *hw, s32 mbm);
+        int             (*set_csma_params)(struct ieee802154_hw *hw,
+                                           u8 min_be, u8 max_be, u8 retries);
+        int             (*set_frame_retries)(struct ieee802154_hw *hw,
+                                             s8 retries);
+        int             (*set_promiscuous_mode)(struct ieee802154_hw *hw,
+                                                const bool on);
+};
+
+Many of these are optional, but this gives an abstract representation
+of a device, which is should be possible to turn into a protocol
+talked over a transport bus like SPI or SDIO.
+
+This also comes back to my point of there being at least four vendors
+of devices like yours. Linux does not want four or more
+implementations of this, each 90% the same, just a different way of
+converting this structure of operations into messages over a transport
+bus.
+
+You have to define the protocol. Mainline needs that so when the next
+vendor comes along, we can point at your protocol and say that is how
+it has to be implemented in Mainline. Make your firmware on the SoC
+understand it.  You have the advantage that you are here first, you
+get to define that protocol, but you do need to clearly define it.
+
+You have listed how your implementation is similar to Greybus. You say
+what is not so great is streaming, i.e. the bulk data transfer needed
+to implement xmit_sync() and xmit_async() above. Greybus is too much
+RPC based. RPCs are actually what you want for most of the operations
+listed above, but i agree for data, in order to keep the transport
+fully loaded, you want double buffering. However, that appears to be
+possible with the current Greybus code.
+
+gb_operation_unidirectional_timeout() says:
+
+ * Note that successful send of a unidirectional operation does not imply that
+ * the request as actually reached the remote end of the connection.
+ */
+
+So long as you are doing your memory management correctly, i don't see
+why you cannot implement double buffering in the transport driver.
+
+I also don't see why you cannot extend the Greybus upper API and add a
+true gb_operation_unidirectional_async() call.
+
+You also said that lots of small transfers are inefficient, and you
+wanted to combine small high level messages into one big transport
+layer message. This is something you frequently see with USB Ethernet
+dongles. The Ethernet driver puts a number of small Ethernet packets
+into one USB URB. The USB layer itself has no idea this is going on. I
+don't see why the same cannot be done here, greybus itself does not
+need to be aware of the packet consolidation.
+
+	Andrew
 
