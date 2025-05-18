@@ -1,118 +1,131 @@
-Return-Path: <netdev+bounces-191337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2DF5ABAF0E
-	for <lists+netdev@lfdr.de>; Sun, 18 May 2025 11:44:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FA79ABAF4D
+	for <lists+netdev@lfdr.de>; Sun, 18 May 2025 12:33:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF2F33B700B
-	for <lists+netdev@lfdr.de>; Sun, 18 May 2025 09:44:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B31E3BC4DE
+	for <lists+netdev@lfdr.de>; Sun, 18 May 2025 10:32:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86EE2207DEE;
-	Sun, 18 May 2025 09:44:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCD292135CD;
+	Sun, 18 May 2025 10:32:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D/C8uPvF"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A130E1DB34C;
-	Sun, 18 May 2025 09:44:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91D112135B7;
+	Sun, 18 May 2025 10:32:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747561459; cv=none; b=nCDA+rKgPoCjmj6uXLrUzZCEQN4TQjEZgEt8V6KDStQFmTLCyaqvc79/26zsxkYdAPoXXbHDeaZNQeOub10SDnP5UrnAFpKUPv0F3yBRG7B7D50ediHiiAz1rR77onhI72Mgub1p6ZZGLYQi28DLxNahXp2+5LW4ukov2Vnfdgc=
+	t=1747564371; cv=none; b=Y2564whPNaygMvRsqUYFFpfi+pjhOVKZeSgcv+JqmGVsBrXhyq8l7zGBR0JHoAjESQ8JFKq0FmOUSAAW5kYcUbfaXosjLVZ+oIMEGG85cTwkUDvypBDiGPSa31+7C+SxmUkgq1tPHPF4iAj7MMhLoYGUuo16L/lsXxiN/qiZwRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747561459; c=relaxed/simple;
-	bh=qQZGVyrQHu1q7OAzBul9jHFJs677FLpnum3Dq8gwdh0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lSf6p1JVGKK3uceIcIhrke8l2BDpvv2yq5uush9LEQb1nDuxm/uDXimQeYgsFX4cgmaTGtH5lJX3OCrxE0tVRu3EiCnm8AOnaL+r+5uwemYtxSgIj7FfjX9qXNrTr0MAhyOU0iZDelzYw/IWLbTGV1QPnyWrcfrFEzu221szlDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4b0bRX6YfHz6L574;
-	Sun, 18 May 2025 17:41:12 +0800 (CST)
-Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5319914050C;
-	Sun, 18 May 2025 17:44:14 +0800 (CST)
-Received: from china (10.220.118.114) by frapeml500005.china.huawei.com
- (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Sun, 18 May
- 2025 11:44:09 +0200
-From: Gur Stavi <gur.stavi@huawei.com>
-To: Gur Stavi <gur.stavi@huawei.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>
-Subject: [PATCH net-next v1 1/1] queue_api: reduce risk of name collision over txq
-Date: Sun, 18 May 2025 13:00:54 +0300
-Message-ID: <95b60d218f004308486d92ed17c8cc6f28bac09d.1747559621.git.gur.stavi@huawei.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <cover.1747559621.git.gur.stavi@huawei.com>
-References: <cover.1747559621.git.gur.stavi@huawei.com>
+	s=arc-20240116; t=1747564371; c=relaxed/simple;
+	bh=AWQvOkqfCymWRv4I1KXFLFgKcfHbEtOXv0IBc7w/mGE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mYXB70EGXL37dUmpgfpiYdMzU9K9pah66OCtc5jgDumHDCU/1UcSbw/WOgTRloZgo18VArMg6RbGMyvJQsgSJCgmBwTBq/RxhNra8gtRZ+pLGN9KNgRQmESlmxcOOoD4b/ygt7fIQ4Dim4y+t3f2FpfW464mUNvjsYkecN9xUAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D/C8uPvF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0692CC4CEEB;
+	Sun, 18 May 2025 10:32:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747564371;
+	bh=AWQvOkqfCymWRv4I1KXFLFgKcfHbEtOXv0IBc7w/mGE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=D/C8uPvFi2k02o3ae9tFPpQNl/ftDhf5iISphzSzQIrMK9y+HTNHRH8OLFdf7f7nD
+	 cWNsvMCBWdjorxAoI46JG/XIYH0BT+A2auKb92kpa3rbp2Vm//bGKlLsTTcHybzBiw
+	 M7rYxDpOVxX5QXng5gEPbZ4VD25O/9wAm9IcUw+XA/j4hwMb2Crytasp7M49rmPgXm
+	 34DDsQrrf0g7GTTL1Wk4N/Cr9yLSH5pnP/uG/eCLCV2KS7xEQN6j8aCDNF5VJ1NoLX
+	 3Az/QZnPgkhV4i3GejDd9o58UPOHaJj2fSZyNGbmnvqmQ1dYrkNt/E9fAnJjTSAs8F
+	 e+jkmPj2yX7gw==
+Message-ID: <e414c1ca-6e56-4088-b974-3a45eab682c1@kernel.org>
+Date: Sun, 18 May 2025 12:32:48 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- frapeml500005.china.huawei.com (7.182.85.13)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/6] nfc: s3fwrn5: Correct Samsung "Electronics" spelling
+ in copyright headers
+To: Sumanth Gavini <sumanth.gavini@yahoo.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250518085734.88890-1-sumanth.gavini@yahoo.com>
+ <20250518085734.88890-2-sumanth.gavini@yahoo.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20250518085734.88890-2-sumanth.gavini@yahoo.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Rename local variable in macros from txq to _txq.
-When macro parameter get_desc is expended it is likely to have a txq
-token that refers to a different txq variable at the caller's site.
+On 18/05/2025 10:57, Sumanth Gavini wrote:
+> Fix the misspelling in NFC-related drivers.
+> 
+> Signed-off-by: Sumanth Gavini <sumanth.gavini@yahoo.com>
+> ---
+>  drivers/nfc/s3fwrn5/core.c       | 2 +-
+>  drivers/nfc/s3fwrn5/firmware.c   | 2 +-
+>  drivers/nfc/s3fwrn5/firmware.h   | 2 +-
+>  drivers/nfc/s3fwrn5/i2c.c        | 2 +-
+>  drivers/nfc/s3fwrn5/nci.c        | 2 +-
+>  drivers/nfc/s3fwrn5/nci.h        | 2 +-
+>  drivers/nfc/s3fwrn5/phy_common.c | 4 ++--
+>  drivers/nfc/s3fwrn5/phy_common.h | 4 ++--
+>  drivers/nfc/s3fwrn5/s3fwrn5.h    | 2 +-
+>  9 files changed, 11 insertions(+), 11 deletions(-)
 
-Signed-off-by: Gur Stavi <gur.stavi@huawei.com>
----
- include/net/netdev_queues.h | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+Just squash both NFC patches together.
 
-diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
-index 069ff35a72de..ba2eaf39089b 100644
---- a/include/net/netdev_queues.h
-+++ b/include/net/netdev_queues.h
-@@ -288,27 +288,27 @@ netdev_txq_completed_mb(struct netdev_queue *dev_queue,
- 
- #define netif_subqueue_try_stop(dev, idx, get_desc, start_thrs)		\
- 	({								\
--		struct netdev_queue *txq;				\
-+		struct netdev_queue *_txq;				\
- 									\
--		txq = netdev_get_tx_queue(dev, idx);			\
--		netif_txq_try_stop(txq, get_desc, start_thrs);		\
-+		_txq = netdev_get_tx_queue(dev, idx);			\
-+		netif_txq_try_stop(_txq, get_desc, start_thrs);		\
- 	})
- 
- #define netif_subqueue_maybe_stop(dev, idx, get_desc, stop_thrs, start_thrs) \
- 	({								\
--		struct netdev_queue *txq;				\
-+		struct netdev_queue *_txq;				\
- 									\
--		txq = netdev_get_tx_queue(dev, idx);			\
--		netif_txq_maybe_stop(txq, get_desc, stop_thrs, start_thrs); \
-+		_txq = netdev_get_tx_queue(dev, idx);			\
-+		netif_txq_maybe_stop(_txq, get_desc, stop_thrs, start_thrs); \
- 	})
- 
- #define netif_subqueue_completed_wake(dev, idx, pkts, bytes,		\
- 				      get_desc, start_thrs)		\
- 	({								\
--		struct netdev_queue *txq;				\
-+		struct netdev_queue *_txq;				\
- 									\
--		txq = netdev_get_tx_queue(dev, idx);			\
--		netif_txq_completed_wake(txq, pkts, bytes,		\
-+		_txq = netdev_get_tx_queue(dev, idx);			\
-+		netif_txq_completed_wake(_txq, pkts, bytes,		\
- 					 get_desc, start_thrs);		\
- 	})
- 
--- 
-2.45.2
 
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
+Best regards,
+Krzysztof
 
