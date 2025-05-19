@@ -1,76 +1,127 @@
-Return-Path: <netdev+bounces-191449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B7ABABB837
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 11:07:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 607A2ABB85D
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 11:10:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4373F16F834
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 09:07:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A0E03B47F1
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 09:10:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0670426AA93;
-	Mon, 19 May 2025 09:07:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sfEJgBfP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59BC826A09A;
+	Mon, 19 May 2025 09:10:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66A835957
-	for <netdev@vger.kernel.org>; Mon, 19 May 2025 09:07:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7CE326A0C5;
+	Mon, 19 May 2025 09:10:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747645641; cv=none; b=ku9FVUF0wIOIUN0cF7pv30Iruga/yXPWNsMC5TQxs2l2Y423UO2MYwGmyVZL3cVlN2C5WA/ZuDp2yeqwWiqaGXnNUchT0pPNAK/L1MRERw+zLVmXWjk36J+0PoD9v2FouH9X2nMOf/qHmF+jMDeuoPOezwPJziYv0Gx+/u//LpQ=
+	t=1747645816; cv=none; b=XmCyO1q+EZpCczbu19Gxt3fao3rZhJEhm0mnRHcbawIuizx5gG94UekSyDCVHbwWTaVNlAOC70UeNWEoY31NP6nrX4T5Eau01mMYJ/FyxzsmrxNZCpWjiDd61AWPhMkj6pZxUWGWXiMKMg40v2P+K0beI2DEPLp//13b5jPI3bk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747645641; c=relaxed/simple;
-	bh=CY5hZNk7BtIXQNCriJ9WT8EywUZQlHQRfgpoWPjAgU0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gda6wyrn4I68v6DAoRTvDn+RgOhFvuYGwHPP+xHAH7YxzP3XbE9Q6nYFuY4+IjFvxeqjxeDSA5uYRaqruUx5G5Wsdg0ZkdTTjiMrddIYjL+ozx8/Ab6el61QoRn77NYc3PArUnDfNKh+uNLdgAz/zQVg+kBFmZU3QFMhaeN6Gts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sfEJgBfP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C735C4CEE4;
-	Mon, 19 May 2025 09:07:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747645641;
-	bh=CY5hZNk7BtIXQNCriJ9WT8EywUZQlHQRfgpoWPjAgU0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sfEJgBfPqXUCSqXQLtWgDk8jplfJhbaV9iiHt0v060V3mMYHdGIHR0ImBocR2w4dU
-	 O6Ma2v8DF488tlgw2vbN6aDv7SEk+kPAx9+u45Z3s8PNG+UlxHOKD8bgtxgjI21nQy
-	 +I04SD5Enmx0hdnYvPuou/AeEqRqP+nxj9O7FEfo1032LMwmGH2z6V3ZIsJNpfGzrL
-	 G0LD3ANQPlPFHaYEztI0PrYGq9Bcw2LnConjOW5TS+Pk7w8MqljzIwfp3qtLZX/a8w
-	 rUeYUlnSGrLUdb39FJG6Rogfv/8f4Ljh8Hmn5ojw13EmpCqDonV1R4b+f2sN83h+8j
-	 qqqBt32aIM5Og==
-Date: Mon, 19 May 2025 10:07:18 +0100
-From: Simon Horman <horms@kernel.org>
-To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Karol Kolacinski <karol.kolacinski@intel.com>,
-	Milena Olech <milena.olech@intel.com>
-Subject: Re: [PATCH iwl-next v5 3/3] ice: add ice driver PTP pin documentation
-Message-ID: <20250519090718.GD365796@horms.kernel.org>
-References: <20250422160149.1131069-1-arkadiusz.kubalewski@intel.com>
- <20250422160149.1131069-4-arkadiusz.kubalewski@intel.com>
+	s=arc-20240116; t=1747645816; c=relaxed/simple;
+	bh=xsCboqL3jxEu4TqJ56Egqo7fvZqcQHchhQaolk+V1cU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SWfMIYxz1asnuhqyQZY/3ai4MIsh2j+Rm/Bd7SD+OsHsE4dDOV28YSpX26qdEysnwFO9Z50aITj/fVVcUG8qEuSOrFKO1uoa2fcfFHY4bVk5RVgSuHSpxrF9xOaH5HPiRigwDl6G+8GBLUw9c2Z3JufKdfswFoSTXNm6fxmyNXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost.localdomain (unknown [124.16.141.245])
+	by APP-05 (Coremail) with SMTP id zQCowABnpylk9SpoaO1sAQ--.11917S2;
+	Mon, 19 May 2025 17:09:57 +0800 (CST)
+From: Wentao Liang <vulab@iscas.ac.cn>
+To: saeedm@nvidia.com,
+	leon@kernel.org,
+	tariqt@nvidia.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Wentao Liang <vulab@iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH v2] net: mlx5: vport: Add error handling in mlx5_query_nic_vport_node_guid()
+Date: Mon, 19 May 2025 17:09:33 +0800
+Message-ID: <20250519090934.1956-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.42.0.windows.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250422160149.1131069-4-arkadiusz.kubalewski@intel.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowABnpylk9SpoaO1sAQ--.11917S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxJr4rCF1DWr1DGF48uw4xXrb_yoW8WF4rpF
+	47tr9rCrykJa4rX34j9FWrZrn5u3yqya1j9a47tw13Xr4ktr4DAr45CF9FgrWUCFW8KrZY
+	yr42y3ZxArn8C37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9E14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK67AK6r4fMxAIw28IcxkI7VAKI4
+	8JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xv
+	wVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjx
+	v20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20E
+	Y4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267
+	AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUjAsqtUUUUU==
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBg0HA2gqszrqdgACsa
 
-On Tue, Apr 22, 2025 at 06:01:49PM +0200, Arkadiusz Kubalewski wrote:
-> From: Karol Kolacinski <karol.kolacinski@intel.com>
-> 
-> Add a description of PTP pins support by the adapters to ice driver
-> documentation.
-> 
-> Reviewed-by: Milena Olech <milena.olech@intel.com>
-> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-> Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+The function mlx5_query_nic_vport_node_guid() calls the function
+mlx5_query_nic_vport_context() but does not check its return value.
+A proper implementation can be found in mlx5_nic_vport_query_local_lb().
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Add error handling for mlx5_query_nic_vport_context(). If it fails, free
+the out buffer via kvfree() and return error code.
+
+Fixes: 9efa75254593 ("net/mlx5_core: Introduce access functions to query vport RoCE fields")
+Cc: stable@vger.kernel.org # v4.5
+Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+---
+v2: Remove redundant reassignment. Fix typo error.
+
+ drivers/net/ethernet/mellanox/mlx5/core/vport.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/vport.c b/drivers/net/ethernet/mellanox/mlx5/core/vport.c
+index ded086ffe8ac..8235fa6add03 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/vport.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/vport.c
+@@ -465,19 +465,22 @@ int mlx5_query_nic_vport_node_guid(struct mlx5_core_dev *mdev, u64 *node_guid)
+ {
+ 	u32 *out;
+ 	int outlen = MLX5_ST_SZ_BYTES(query_nic_vport_context_out);
++	int ret;
+ 
+ 	out = kvzalloc(outlen, GFP_KERNEL);
+ 	if (!out)
+ 		return -ENOMEM;
+ 
+-	mlx5_query_nic_vport_context(mdev, 0, out);
++	ret = mlx5_query_nic_vport_context(mdev, 0, out);
++	if (ret)
++		goto err;
+ 
+ 	*node_guid = MLX5_GET64(query_nic_vport_context_out, out,
+ 				nic_vport_context.node_guid);
+-
++err:
+ 	kvfree(out);
+ 
+-	return 0;
++	return ret;
+ }
+ EXPORT_SYMBOL_GPL(mlx5_query_nic_vport_node_guid);
+ 
+-- 
+2.42.0.windows.2
 
 
