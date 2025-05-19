@@ -1,142 +1,132 @@
-Return-Path: <netdev+bounces-191365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38D1AABB32D
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 04:24:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7447ABB33C
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 04:35:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEB4B3B26EF
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 02:24:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C382172F2C
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 02:35:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C20581C7005;
-	Mon, 19 May 2025 02:24:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F24171D63D8;
+	Mon, 19 May 2025 02:35:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kCY5/VFy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PLYImH2B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BABD148838;
-	Mon, 19 May 2025 02:24:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 709351A23A4
+	for <netdev@vger.kernel.org>; Mon, 19 May 2025 02:35:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747621472; cv=none; b=IhUvc6hbY3ujVLFt6iaPAqpSnHFavPKk3+3XCb/W1Yhouf0bk8rWqZVzyBhw453w92PlU+iIN/KfF7TPFHmqPfavnOlZvubdtPJZIonI7OVA6QkXUJiUHyG0DJoLwgP7oSO6Q/ftJmzMrFDAkLFhUjM26qeHkD4TqXRSkU0TO5U=
+	t=1747622121; cv=none; b=mLbyC1E0WUzTGlJdKUUwTkdi5+vLMxaCO85F9t4IFMtTvMq4fJWadfs4ai1HaG+sUIBh2ZKxgwShL0a/UIbs8VGM1+vA91td0ebR0s4fXZpzIoe1BDf7ogGAWqKJOyH/PjJb3rj8Krd114OhrhwRwsdDH+S1UwDwW3/+UsrG03s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747621472; c=relaxed/simple;
-	bh=+6JefHOyRDhuRcD7uicxKOr2Vmu000LwlUIzhsrBtfg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=W/NJyul2JpDTKc8D3sQKojkt1t0d/SxIngL8DnTKO8AOaJnv7VVTBQVkHV5hkBsc193pa9R9kYf7KulxvjkL/eLYGl/d53VUiv1IU/BhlP86Q7bgTF74V4qtjYeTgeqsds0F++UgGFmTuhC59Ka4VXewyjry2326urURiMfybfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kCY5/VFy; arc=none smtp.client-ip=209.85.222.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7c922734cc2so464245985a.1;
-        Sun, 18 May 2025 19:24:30 -0700 (PDT)
+	s=arc-20240116; t=1747622121; c=relaxed/simple;
+	bh=MLOjAAPcplXLjt0idgSdbv1QlkinDsa4uGJV0cja2/c=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=SpSHD0S7CpxdzrGJ2BlAb3iZ7KQJVYjkyKg+/lO0t9zGu8UJa+jPW6t7c546BONVQJVtpxE0EHgxrBKoiNRR+bro2VdxIramrT/1mNDLWdFxOYoQ0+7vgs3tWJPpLbjOgQCU/2K+us4slAC6822hxqlIEohG1AMnhg8EbFBXKXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PLYImH2B; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-23209d8ba1bso11506905ad.3
+        for <netdev@vger.kernel.org>; Sun, 18 May 2025 19:35:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747621470; x=1748226270; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=NgckMePkDsvoiomlsNhotMuX9O+MXw76eEiqf1frqvs=;
-        b=kCY5/VFyyez7MlM3+IOnwnBqJ2FauaixfY9Ez6BAQN9d0W5+HYWTiGsd1hKWEorahY
-         gceliX1PQGi+slSyNVOxhi+qNs5artzEqIyTs1PtQT3ZJCu82sfMB8Ac1TI9JgXhR6rf
-         zEkIsvJPfr7fjjtY8s1tCQq7AUgFVjDAaHEZjnj+PnJ2r1VdrK3V61M1VwADUFRWxEAP
-         loXcUpYOZwky98I7VQK2/7lC0PnmC37kMNEEbvG0VsCerTDp8x4gVJTbMj5fDx9Waxvq
-         84HW7n/RTmHwYDqleoKIjpcoeQczZqdB+/RBra+nDFau+/sSgM9LvEKWHLYKIoFV6iyC
-         eh/g==
+        d=google.com; s=20230601; t=1747622120; x=1748226920; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=T4x7wNdRetlNSCsQonq8ajzFu9C5gDJsZscn/CMz2O0=;
+        b=PLYImH2BhdshJHaFILfr25Wwx/NFCumVkTQtZ7brzNAGLG3XTgOEGTDNFwIi3qyk5I
+         1pt6uq1kmL9BhcUKu99OK3lPreW0tle3fUei9N8BIR+XLaMVg6DGkKkwN18PN54Dk4q/
+         VgOWN0mFEd4QmmT2oPNZop4ldWL382HtFtVhkIsrHVFqIke8eIyUCHKr/MkmCCxsDyYy
+         /7B6gnHjhA1U6epa1MU9mCRem8Gy/3ObKR18h3OQvCZRyYSn9L+mVl7zFwN9IAb97G8+
+         ENTSD/a/HcC1Ffyn/S0c1fb92MoN5GOZFVNd6jot4q+8jFNEy3ewVHFzDFx6UNqx1PxY
+         FoiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747621470; x=1748226270;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NgckMePkDsvoiomlsNhotMuX9O+MXw76eEiqf1frqvs=;
-        b=Gu/K8En1s0vmaG/Wp7lZIIRP+m8ZN/dU0Eg8lBE7qnjNbvSoIlkfbWM1EmU6UXvRkI
-         EJHYih1h1xfRSujrCMBbTL0VOD839JRXJbjxSQmqGuRpXo6H2QrYKoSS3QhMXHTf1CRx
-         QaChA6yhlGLyMOYMU//Axs9Zt/GkaXEsUdY+64HcqZmVvERjRWDof7kQsTn7IkTU7gRa
-         gchjZxRgysRxCIpD9movGdsG42wL6g7ba4lxyvev9R1HUqAgm1QMsMiYVuiiDzHzyz0G
-         mSrRDkAF7S3+pHq+mvZCmOy1dnT1R9Ljmi3WQsw8ZZdO5IKYkLMIWvsXISmbqinHtHRW
-         IWvw==
-X-Forwarded-Encrypted: i=1; AJvYcCV4cNvQSo2wMtUrbRjK9m2yxoMf04KdOKv04ShG/n3QF/XeShvv/TA09BiSQuQlyD2BTxb1wbJKPGuZqWA=@vger.kernel.org, AJvYcCVgS9tef91LTM5w/ltIfD9xF6xC/BbFIoUADkS0puOwizsBeT04aZyr8FgifbiM1hTEKThP4BHD@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywja4bTfeG+l58VultGeFye26KsqF/Ca5ogI5OeDqf60tfMXBpL
-	khx6gSSWVLPG5IVge35ULCFBhDAF5CG7Ip57YF3zHJjz+c3R0IAM6n/c
-X-Gm-Gg: ASbGncu0DSBllsjgQzHzkPVJjYLMt3MJHRnmHWUGwNx+pwxJVXnRKq6JSvyeZ9F/i7m
-	bonC1TyrCEM24N18eWFfcrsFVw7XYaLVIxcuhMlE4UTE+C4eBWMwspiTx8+Ea9Q/kn8hmWXLFXI
-	RKUCS20dUYw1NzNlJodnfnIE57dfIDmRTQdRFj34VQQ7AxDf3bJuIfi+Nor5PrSsfvPSy1GGacF
-	ESNX5GOZTsWntNoTBrQQZ0YJuZUz+kpGeIQxht0D/zw0ufRBsBcyzdHjqEvADONLO45T+7fT6iZ
-	7AjrLc57ZB4m6LCgoxlHG2OaHtDSSs6K3wR9vbsYd4AihWdaF5Kl
-X-Google-Smtp-Source: AGHT+IHuWe/rBBjfv75XfVSHZZHVi2QoC/iWDtHKHkxwz+Y444DamRvdY/8UvCyFty7xfX3CD65ggg==
-X-Received: by 2002:a05:620a:1265:b0:7ce:b799:8eaf with SMTP id af79cd13be357-7ceb7999146mr542709185a.3.1747621469745;
-        Sun, 18 May 2025 19:24:29 -0700 (PDT)
-Received: from CNCMK0001D007E.ht.home ([2607:fa49:8c41:2600::f21d])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f8b08ac575sm49550766d6.43.2025.05.18.19.24.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 May 2025 19:24:29 -0700 (PDT)
-From: chalianis1@gmail.com
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux@armlinux.org.uk,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Anis Chali <chalianis1@gmail.com>
-Subject: [PATCH] net: phy: dp83869: fix interrupts issue, not correctly handled when operate with an optical fiber sfp.
-Date: Sun, 18 May 2025 22:24:17 -0400
-Message-ID: <20250519022417.338302-1-chalianis1@gmail.com>
-X-Mailer: git-send-email 2.49.0
+        d=1e100.net; s=20230601; t=1747622120; x=1748226920;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=T4x7wNdRetlNSCsQonq8ajzFu9C5gDJsZscn/CMz2O0=;
+        b=siUWJZqxY340vJMmFjNBArbeN4RXUrf1CoZ/ZIygfdRWtPsAaYDXFy0SsC4M/nfCve
+         6WEzgscvXcKe3iYhQQA2N1YT2UXVLGUfgEgj3eEPnWjm8Q+zLGG5JlN93ahUyQLKOR5c
+         v6hiI5TzbY7ZvPgQuUdbUkT58jRoEbr5OxMvi/UcaJgwYmdg3+T3dIX2Jrty6X8ukINl
+         Wa5ph69+GBlEtOg6z95A5KhnjZDEyN8vpyNDOZY66M2/ScariP7/H+/MoOMJ1spxLJW3
+         FOw9Pv2lF2sy4riu1bphC7po4V0mfiYkOVefcVTkt/XiT4FHjPwLyKkTT8r/0XONC0A5
+         pZUg==
+X-Gm-Message-State: AOJu0YxcRhE3VnAyNQ6rR8cmwEtg7658n3qn7ux0dWHJ9UbZv2yuGgLs
+	+QCWBb+m5RxIwFASwWKir5rPhOQ5sDRooU9uqcZwU+dyXkMoYw18ir2/cxMCZus4eKuzPb9Ug+Z
+	HM85COmJYqeSQbvWvnrTnDCBDWQtDSj2fX8LTxvzqLgNYE/BobUKDhMhO4H0icXiptL54x1WyGS
+	R2p/jVTm3LGIu0SxiIjDbMJkJ/ttninsPYFx6w+AR6jaNYiehvhrdYW+Torca1dFg=
+X-Google-Smtp-Source: AGHT+IGmupnY76hX7BcuQdiL3IIli6yYr7kfdGnKxgi2woWXJy5arAeTwD4OJxOiun/hcxLuZq62u/OigAgXEhe0bw==
+X-Received: from plxe18.prod.google.com ([2002:a17:902:ef52:b0:22d:c61d:a4a3])
+ (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:902:d4d2:b0:231:faf5:c1d0 with SMTP id d9443c01a7336-231faf5c3ecmr138087165ad.24.1747622119492;
+ Sun, 18 May 2025 19:35:19 -0700 (PDT)
+Date: Mon, 19 May 2025 02:35:08 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.1101.gccaa498523-goog
+Message-ID: <20250519023517.4062941-1-almasrymina@google.com>
+Subject: [PATCH net-next v1 0/9] Devmem TCP minor cleanups and ksft improvements
+From: Mina Almasry <almasrymina@google.com>
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, David Ahern <dsahern@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, 
+	ap420073@gmail.com, praan@google.com, shivajikant@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Anis Chali <chalianis1@gmail.com>
+Minor cleanups to the devmem tcp code, and not-so-minor improvements to
+the ksft.
 
-to correctly clear the interrupts both status registers must be read.
+For the cleanups:
+- Address comment from Paolo post-merge.
+- Fix whitespace.
+- Add improvement dropped from Taehee's fix patch.
 
-from datasheet: http://ti.com/lit/ds/symlink/dp83869hm.pdf
-7.3.6 Interrupt
-The DP83869HM can be configured to generate an interrupt when changes of internal status occur. The interrupt
-allows a MAC to act upon the status in the PHY without polling the PHY registers. The interrupt source can be
-selected through the interrupt registers, MICR (12h) and FIBER_INT_EN (C18h). The interrupt status can be
-read from ISR (13h) and FIBER_INT_STTS (C19h) registers. Some interrupts are enabled by default and can
-be disabled through register access. Both the interrupt status registers must be read in order to clear pending
-interrupts. Until the pending interrupts are cleared, new interrupts may not be routed to the interrupt pin.
+For the ksft:
+- Add support for ipv4 environment.
+- Add support for drivers that are limited to 5-tuple flow steering.
+- Improve test by sending 1K data instead of just "hello\nworld"
 
-Signed-off-by: Anis Chali <chalianis1@gmail.com>
----
- drivers/net/phy/dp83869.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+Cc: sdf@fomichev.me
+Cc: ap420073@gmail.com
+Cc: praan@google.com
+Cc: shivajikant@google.com
 
-diff --git a/drivers/net/phy/dp83869.c b/drivers/net/phy/dp83869.c
-index a62cd838a9ea..98d773175462 100644
---- a/drivers/net/phy/dp83869.c
-+++ b/drivers/net/phy/dp83869.c
-@@ -25,6 +25,7 @@
- #define DP83869_CFG2		0x14
- #define DP83869_CTRL		0x1f
- #define DP83869_CFG4		0x1e
-+#define DP83869_FX_INT_STS	0xc19
- 
- /* Extended Registers */
- #define DP83869_GEN_CFG3        0x0031
-@@ -195,6 +196,12 @@ static int dp83869_ack_interrupt(struct phy_device *phydev)
- 	if (err < 0)
- 		return err;
- 
-+	if (linkmode_test_bit(ETHTOOL_LINK_MODE_FIBRE_BIT, phydev->supported)) {
-+		err = phy_read_mmd(phydev, DP83869_DEVADDR, DP83869_FX_INT_STS);
-+		if (err < 0)
-+			return err;		
-+	}
-+
- 	return 0;
- }
- 
+
+Mina Almasry (9):
+  net: devmem: move list_add to net_devmem_bind_dmabuf.
+  page_pool: fix ugly page_pool formatting
+  net: devmem: preserve sockc_err
+  net: devmem: ksft: remove ksft_disruptive
+  net: devmem: ksft: add ipv4 support
+  net: devmem: ksft: add exit_wait to make rx test pass
+  net: devmem: ksft: add 5 tuple FS support
+  net: devmem: ksft: upgrade rx test to send 1K data
+  net: devmem: ncdevmem: remove unused variable
+
+ net/core/devmem.c                             |  5 +-
+ net/core/devmem.h                             |  5 +-
+ net/core/netdev-genl.c                        |  8 +--
+ net/core/page_pool.c                          |  4 +-
+ net/ipv4/tcp.c                                | 24 ++++-----
+ .../selftests/drivers/net/hw/devmem.py        | 52 +++++++++++++------
+ .../selftests/drivers/net/hw/ncdevmem.c       |  1 -
+ 7 files changed, 59 insertions(+), 40 deletions(-)
+
+
+base-commit: b8fa067c4a76e9a28f2003a50ff9b60f00b11168
 -- 
-2.49.0
+2.49.0.1101.gccaa498523-goog
 
 
