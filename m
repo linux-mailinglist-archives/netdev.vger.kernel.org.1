@@ -1,174 +1,110 @@
-Return-Path: <netdev+bounces-191608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BB26ABC615
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 19:54:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D298ABC6E8
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 20:10:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D261D16B8E7
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 17:54:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9B78188358D
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 18:10:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E213E28AAE0;
-	Mon, 19 May 2025 17:52:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33BFE283C9F;
+	Mon, 19 May 2025 18:10:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QR2+iVWK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MPUgYP57"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2D7628A719;
-	Mon, 19 May 2025 17:52:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C64B2B67F;
+	Mon, 19 May 2025 18:09:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747677120; cv=none; b=Gn3COtg7/ImEVRwqqEemI7jkV4tgk300/BF/TngsQqHT8zZCoFweVUTO5CS0ouLxXn92Lvu6NTPngHRf0ivbtqvporiF7NjzL5rXNGhocy+QQUMl6LOkvuJFkOWnWuGRG2zvcioAUxWs+wfkA7hvon+jtG0TRRrxvhRdtKNtg6A=
+	t=1747678200; cv=none; b=fHyEd2PVSORcpv16iEbCenBIechjj46peeR7JT4kWgPp7jiF8ysvLzqI0LVQ4TBHf97DixLlweoNJJmXsDRn09ALU1iU9Y+A2SX90OTAkwZsfyFD1VmKkY3aL9t9+0ztfngGEA70iwNGvn+EI4a3KgT2q91ZYb0IVDv+vFB0ChI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747677120; c=relaxed/simple;
-	bh=mIsfiVI45v2VPTWBozlSjRtw4VqrI/GcVcTcOwb4ZRY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dev2BLGtVx1kP7FXZZDS+bsr18pP2pw5AukOizD9jk5qfoJoQIvUMbWmay25ANl9oyKKiWPpn5aqyzWFtZdRzZ3I0/JL4EwYHXqwMFPVuY9ZsN36cxWNBv5jAC+f7ahbmQ/1P4BIGgR5Qwxriz1E2JXHW0Fgdo1FRo0IWpaZOag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QR2+iVWK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56F53C4CEF1;
-	Mon, 19 May 2025 17:52:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747677120;
-	bh=mIsfiVI45v2VPTWBozlSjRtw4VqrI/GcVcTcOwb4ZRY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QR2+iVWKJqeHqPio6M358dZ6cQUWbOX/PBRAO2eoWIddik+He5js4DXnq6aqPbeYC
-	 6x+To/VR2K2WcczMELmWTmH2uhqmvKf9Ge4oKVWuJrZhPiZgZ4xAl34/1FENmTSEIe
-	 P5c8E3xZSsSx+Et92DossoX9+FwAlX7/23r2kUxcCQ9eiNGcjZH6nAgYvrI9UZxBmB
-	 qKSfwx/i2h7c5g7THDj7SPzNsg2zNqCqQVmW9CB5Ay+YoFCZbrvUXZ021BFfmkpBSD
-	 V+155XQBuNbNnmaTsxGZ08hIfgzf+MmGtyY1z1ND0UtLvq/iYbjAf8ccvf2cPmNuRw
-	 3/bMDyqVcqqiw==
-From: Eric Biggers <ebiggers@kernel.org>
-To: netdev@vger.kernel.org
-Cc: linux-nvme@lists.infradead.org,
-	linux-sctp@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH v2 10/10] net: remove skb_copy_and_hash_datagram_iter()
-Date: Mon, 19 May 2025 10:50:12 -0700
-Message-ID: <20250519175012.36581-11-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250519175012.36581-1-ebiggers@kernel.org>
-References: <20250519175012.36581-1-ebiggers@kernel.org>
+	s=arc-20240116; t=1747678200; c=relaxed/simple;
+	bh=Ujm3qC0orBzqYk5UGsJndf74AenQ037h15KGkkJwDGg=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=rCMyLLXnc1hVaU03WIviIE00lr/SiYFFKQ8vFroYFKoPLrMKlLwPBmDv7gBInV3CmOrQV71H1iUuMGbxlqqwUK7nt9Ep7UY1EmlpL2sjPWovEzkHKU2547FCLCy8Hb59nJNmJDNMc+5Ibq+lRxN1Kdyxa0bejDH9iwtrAURIeGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MPUgYP57; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747678198; x=1779214198;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=Ujm3qC0orBzqYk5UGsJndf74AenQ037h15KGkkJwDGg=;
+  b=MPUgYP57FX+NhVkguIAL6X5HW1twSE0Bx0U2IUpXBxkZnRjVmP1PA4CC
+   duRxrpoSDzBpvncjmmAnW3z2eNXyZeI36BM9ooxHnbYUng1bIA6bP/cx/
+   gccj0hygeWcpzevG1UnXxQ1otcvtUcSIDz20Tz1XBsd8YLB1cwup3fDSB
+   k/tK9CF/JxDG081YpIG6CG42xmTunAFq/TMrHRlnq7Ck0Y1TLhldKR6Dp
+   nPWRMEMceJxp0WHHFdVG6pEKtFLY1bByGdh+NlfCtsPm231ueVvAw9Akn
+   2Z+wT2lRyRk779DUOVuXbnK0sO5+3Odlz1kFfNp6nKhrYsoyy5B7gCrJm
+   g==;
+X-CSE-ConnectionGUID: 7oympGOmRwuIPK96S0U3Bg==
+X-CSE-MsgGUID: wbOtU69tTv635jxHxbjAmw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11438"; a="49727479"
+X-IronPort-AV: E=Sophos;i="6.15,301,1739865600"; 
+   d="scan'208";a="49727479"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2025 11:09:57 -0700
+X-CSE-ConnectionGUID: tiLWmR9IROypzZN0IeVY/w==
+X-CSE-MsgGUID: QUqYULJsRK+M1Mr/7+CgYQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,301,1739865600"; 
+   d="scan'208";a="143444590"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by fmviesa003.fm.intel.com with ESMTP; 19 May 2025 11:09:55 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uH4vv-000Lko-1i;
+	Mon, 19 May 2025 18:09:51 +0000
+Date: Tue, 20 May 2025 02:08:57 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+	"Michael S. Tsirkin" <mst@redhat.com>
+Subject: [mst-vhost:vhost 35/35] drivers/virtio/virtio_ring.c:1281:22:
+ sparse: sparse: symbol 'split_in_order_ops' was not declared. Should it be
+ static?
+Message-ID: <202505200227.usDCH63W-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-From: Eric Biggers <ebiggers@google.com>
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git vhost
+head:   f640220b1e149add1dff0be2978905c5df628eaf
+commit: f640220b1e149add1dff0be2978905c5df628eaf [35/35] virtio_ring: add in order support
+config: arc-randconfig-r132-20250519 (https://download.01.org/0day-ci/archive/20250520/202505200227.usDCH63W-lkp@intel.com/config)
+compiler: arc-linux-gcc (GCC) 10.5.0
+reproduce: (https://download.01.org/0day-ci/archive/20250520/202505200227.usDCH63W-lkp@intel.com/reproduce)
 
-Now that skb_copy_and_hash_datagram_iter() is no longer used, remove it.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202505200227.usDCH63W-lkp@intel.com/
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- include/linux/skbuff.h |  4 ----
- net/core/datagram.c    | 37 -------------------------------------
- 2 files changed, 41 deletions(-)
+sparse warnings: (new ones prefixed by >>)
+>> drivers/virtio/virtio_ring.c:1281:22: sparse: sparse: symbol 'split_in_order_ops' was not declared. Should it be static?
+   drivers/virtio/virtio_ring.c:2510:22: sparse: sparse: symbol 'packed_ops' was not declared. Should it be static?
+>> drivers/virtio/virtio_ring.c:2511:22: sparse: sparse: symbol 'packed_in_order_ops' was not declared. Should it be static?
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 510adf63c2113..5520524c93bff 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -272,11 +272,10 @@
- /* return minimum truesize of one skb containing X bytes of data */
- #define SKB_TRUESIZE(X) ((X) +						\
- 			 SKB_DATA_ALIGN(sizeof(struct sk_buff)) +	\
- 			 SKB_DATA_ALIGN(sizeof(struct skb_shared_info)))
- 
--struct ahash_request;
- struct net_device;
- struct scatterlist;
- struct pipe_inode_info;
- struct iov_iter;
- struct napi_struct;
-@@ -4132,13 +4131,10 @@ static inline int skb_copy_datagram_msg(const struct sk_buff *from, int offset,
- {
- 	return skb_copy_datagram_iter(from, offset, &msg->msg_iter, size);
- }
- int skb_copy_and_csum_datagram_msg(struct sk_buff *skb, int hlen,
- 				   struct msghdr *msg);
--int skb_copy_and_hash_datagram_iter(const struct sk_buff *skb, int offset,
--			   struct iov_iter *to, int len,
--			   struct ahash_request *hash);
- int skb_copy_and_crc32c_datagram_iter(const struct sk_buff *skb, int offset,
- 				      struct iov_iter *to, int len, u32 *crcp);
- int skb_copy_datagram_from_iter(struct sk_buff *skb, int offset,
- 				 struct iov_iter *from, int len);
- int zerocopy_sg_from_iter(struct sk_buff *skb, struct iov_iter *frm);
-diff --git a/net/core/datagram.c b/net/core/datagram.c
-index fa87abb666324..b352a10093041 100644
---- a/net/core/datagram.c
-+++ b/net/core/datagram.c
-@@ -60,11 +60,10 @@
- #include <net/checksum.h>
- #include <net/sock.h>
- #include <net/tcp_states.h>
- #include <trace/events/skb.h>
- #include <net/busy_poll.h>
--#include <crypto/hash.h>
- 
- #include "devmem.h"
- 
- /*
-  *	Is a socket 'connection oriented' ?
-@@ -482,46 +481,10 @@ static int __skb_datagram_iter(const struct sk_buff *skb, int offset,
- 		goto fault;
- 
- 	return 0;
- }
- 
--static size_t hash_and_copy_to_iter(const void *addr, size_t bytes, void *hashp,
--				    struct iov_iter *i)
--{
--#ifdef CONFIG_CRYPTO_HASH
--	struct ahash_request *hash = hashp;
--	struct scatterlist sg;
--	size_t copied;
--
--	copied = copy_to_iter(addr, bytes, i);
--	sg_init_one(&sg, addr, copied);
--	ahash_request_set_crypt(hash, &sg, NULL, copied);
--	crypto_ahash_update(hash);
--	return copied;
--#else
--	return 0;
--#endif
--}
--
--/**
-- *	skb_copy_and_hash_datagram_iter - Copy datagram to an iovec iterator
-- *          and update a hash.
-- *	@skb: buffer to copy
-- *	@offset: offset in the buffer to start copying from
-- *	@to: iovec iterator to copy to
-- *	@len: amount of data to copy from buffer to iovec
-- *      @hash: hash request to update
-- */
--int skb_copy_and_hash_datagram_iter(const struct sk_buff *skb, int offset,
--			   struct iov_iter *to, int len,
--			   struct ahash_request *hash)
--{
--	return __skb_datagram_iter(skb, offset, to, len, true,
--			hash_and_copy_to_iter, hash);
--}
--EXPORT_SYMBOL(skb_copy_and_hash_datagram_iter);
--
- #ifdef CONFIG_NET_CRC32C
- static size_t crc32c_and_copy_to_iter(const void *addr, size_t bytes,
- 				      void *_crcp, struct iov_iter *i)
- {
- 	u32 *crcp = _crcp;
+vim +/split_in_order_ops +1281 drivers/virtio/virtio_ring.c
+
+  1279	
+> 1280	struct virtqueue_ops split_ops;
+> 1281	struct virtqueue_ops split_in_order_ops;
+  1282	
+
 -- 
-2.49.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
