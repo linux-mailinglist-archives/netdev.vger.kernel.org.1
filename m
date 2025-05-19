@@ -1,164 +1,260 @@
-Return-Path: <netdev+bounces-191639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A67FABC8B3
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 22:54:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62A76ABC8A6
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 22:52:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D32E41B65E6A
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 20:55:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B94731B60722
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 20:52:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79AF321ADA3;
-	Mon, 19 May 2025 20:54:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C47321ABA3;
+	Mon, 19 May 2025 20:52:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=universe-factory.net header.i=@universe-factory.net header.b="Z36oibbO"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="MdKEOgQ2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.universe-factory.net (osgiliath.universe-factory.net [141.95.161.142])
+Received: from mx.denx.de (mx.denx.de [89.58.32.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA9721A94F;
-	Mon, 19 May 2025 20:54:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.95.161.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4EC9217705;
+	Mon, 19 May 2025 20:52:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747688072; cv=none; b=BD2osM8jsPrmg9iBlSj6DyaLmPQ8Omdmy0Ol19/Y4GrTcuCr8w1CHszjR7SK9tV6pyXW7lPfnkrgTtwp1cuRDawQxlF9u89LzAkCdGt6jUw6B2uQqAgGqlyFNd4nvlGf66HDTffMSmV0sIjGQ79KLkE2G+OCJXABTU4bX0Qrhmg=
+	t=1747687940; cv=none; b=kqQN+opIIYIAIsmCw6uTZdl7GVIGuXa8ie+odnqwaEQXMePPvIOqexzuchZd8lq9CFGXIXrzRdtEplBABNo7QPM1aIAbES7HIv5pcvvi9+sCHJEn1ciG22mEcY8ejNGEtMI/8yQxpUhWhrrfDCBmqJljY7cg6Qyb2l8OtTPv0Xs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747688072; c=relaxed/simple;
-	bh=o9yUfEBtm/4TRNaNJcKUoN/ncTqU60oDUTRvPK/bwMg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lkE4iwoTuQpuPlqmWgYI3zE/B6Tpu5UWvpqrX0vmM3Ts7XN6A5bV6MMDli9GYPM7WHAj7CmBgdJNjqa2SL+ur+2gZuPf1qWxZFOwPaQGJeLoOK6lnqFpGjlK9Ji/EeVdEmKRJVxaFPL4BkY0QsTxx2ZFc522Vj7u4l8q6Ef3hh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=universe-factory.net; spf=pass smtp.mailfrom=universe-factory.net; dkim=pass (2048-bit key) header.d=universe-factory.net header.i=@universe-factory.net header.b=Z36oibbO; arc=none smtp.client-ip=141.95.161.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=universe-factory.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=universe-factory.net
-From: Matthias Schiffer <mschiffer@universe-factory.net>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=universe-factory.net;
-	s=dkim; t=1747687626;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r4tFLqo5k3xKoHIPW5pDy7bw73GjEG7aqdMDGqN1oPs=;
-	b=Z36oibbOCISEclanDTqUhUZ8OJNayNS0OT3H8FGMI4K6d3BLP+DWeRHr1T2QFUS9nGXfRx
-	58RB3eHl12InmKgD3nwF2OuivDCPtKNeJJgWHQJ1EBs0itwIxnDCE07nDq56ag+0pwZADS
-	2f+RZf21onm1QBcomKGxAckds+1AZzGj+5bdFIZufGzqH6sKXDiC2RBBmKyM9KRPKe99zm
-	P25UJZPUxRjYbxkuJYJtZRm6vqxoa1ThDUTvYrdCELe6SRtbqgD8CSG5uRd7bVSUGZpHjX
-	QmpRHrLnsjOolvhYPm4CFPFNnIuAolcu96U9LtHjU/DeHouFuj7BIb0e+8XgzQ==
-Authentication-Results: mail.universe-factory.net;
-	auth=pass smtp.mailfrom=mschiffer@universe-factory.net
-To: Marek Lindner <marek.lindner@mailbox.org>,
-	Simon Wunderlich <sw@simonwunderlich.de>,
-	Antonio Quartulli <antonio@mandelbit.com>,
-	Sven Eckelmann <sven@narfation.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	b.a.t.m.a.n@lists.open-mesh.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Matthias Schiffer <mschiffer@universe-factory.net>
-Subject: [PATCH batadv 5/5] batman-adv: move hardif generation counter into batadv_priv
-Date: Mon, 19 May 2025 22:46:32 +0200
-Message-ID: <fd475dcf9ceaa7d14e4f0b4dca668f93e704f370.1747687504.git.mschiffer@universe-factory.net>
-In-Reply-To: <0b26554afea5203820faef1dfb498af7533a9b5d.1747687504.git.mschiffer@universe-factory.net>
-References: <0b26554afea5203820faef1dfb498af7533a9b5d.1747687504.git.mschiffer@universe-factory.net>
+	s=arc-20240116; t=1747687940; c=relaxed/simple;
+	bh=GHBvbY3fgn9tKe86kfPJG/2c8/ck7nOT9M0uEfF+cv0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IaPHWM4YP62R7QBdY1+Qd8448PDujNWLIcnGztClXjTh3GS+vUPRTU7PGTMPtxcj+8E2OSiLZvVc4x2vx/q0q8c3yCy+JUYORiER13ThTy5yOOHw1f70HIeoGpD9RTWh2UdimMm4pYr7eY1+5FPr1udrEWs55k9LQbt36CK1iHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=MdKEOgQ2; arc=none smtp.client-ip=89.58.32.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E433C1039728C;
+	Mon, 19 May 2025 22:52:10 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
+	t=1747687934; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=xi0fa9hZtQ3xUfjh/Fd+6H85XEzvRV9KyKLSSoEBIho=;
+	b=MdKEOgQ2NYMapNfr6nWpzieFKGxPSRJvQ75R1YB86etandc2/tz4Gw51ZJxeKtPDcCGFZm
+	jps1OdMdqB19S7kvfimr8bHMPMia877rQmTJ0/EMDs81TVfUyi8P7ogE5ksjtvTzzzMdjd
+	SxuV+oa002NkrORXIibfJc2D6cDRzgS89bkKjuiVmE4mKMwnLlAswiicF780OX3xQ0uYiI
+	4FD0zTngteBD5df6JzSt5bsNDpA2+yF2qwg5EQvU9/ATfcdAOLVX3n85Cdyb6BOPFKixc5
+	V27CH5iBzELG9fL7mGxX3yGwyf2NqPflDDyDitP7wOF1dKfUIuSSz/uQQV+6pw==
+Date: Mon, 19 May 2025 22:52:08 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
+ <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>, Richard Cochran
+ <richardcochran@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
+ <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>, Andrew Lunn
+ <andrew@lunn.ch>
+Subject: Re: [net-next v11 4/7] net: mtip: The L2 switch driver for imx287
+Message-ID: <20250519225208.50d60df5@wsk>
+In-Reply-To: <20250516075402.5104a0b6@wsk>
+References: <20250504145538.3881294-1-lukma@denx.de>
+	<20250504145538.3881294-5-lukma@denx.de>
+	<61ebe754-d895-47cb-a4b2-bb2650b9ff7b@redhat.com>
+	<20250513073109.485fec95@wsk>
+	<20250516075402.5104a0b6@wsk>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Bar: -----
+Content-Type: multipart/signed; boundary="Sig_/TOeu=qW_6zT9zkkN5+sCnzY";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Last-TLS-Session-Version: TLSv1.3
 
-The counter doesn't need to be global.
+--Sig_/TOeu=qW_6zT9zkkN5+sCnzY
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Matthias Schiffer <mschiffer@universe-factory.net>
----
- net/batman-adv/hard-interface.c | 4 ++--
- net/batman-adv/main.c           | 1 -
- net/batman-adv/main.h           | 2 --
- net/batman-adv/netlink.c        | 2 +-
- net/batman-adv/types.h          | 3 +++
- 5 files changed, 6 insertions(+), 6 deletions(-)
+Hi Paolo,
 
-diff --git a/net/batman-adv/hard-interface.c b/net/batman-adv/hard-interface.c
-index 5b46104dcf61..90968abefba0 100644
---- a/net/batman-adv/hard-interface.c
-+++ b/net/batman-adv/hard-interface.c
-@@ -748,7 +748,7 @@ int batadv_hardif_enable_interface(struct net_device *net_dev,
- 	hard_iface->mesh_iface = mesh_iface;
- 	bat_priv = netdev_priv(hard_iface->mesh_iface);
- 
--	batadv_hardif_generation++;
-+	bat_priv->hardif_generation++;
- 	ret = netdev_master_upper_dev_link(hard_iface->net_dev,
- 					   mesh_iface, hard_iface, NULL, NULL);
- 	if (ret)
-@@ -869,7 +869,7 @@ void batadv_hardif_disable_interface(struct batadv_hard_iface *hard_iface)
- 	batadv_purge_outstanding_packets(bat_priv, hard_iface);
- 	netdev_put(hard_iface->mesh_iface, &hard_iface->meshif_dev_tracker);
- 
--	batadv_hardif_generation++;
-+	bat_priv->hardif_generation++;
- 	netdev_upper_dev_unlink(hard_iface->net_dev, hard_iface->mesh_iface);
- 	batadv_hardif_recalc_extra_skbroom(hard_iface->mesh_iface);
- 
-diff --git a/net/batman-adv/main.c b/net/batman-adv/main.c
-index 8e8ea93cf61d..f3d82d567968 100644
---- a/net/batman-adv/main.c
-+++ b/net/batman-adv/main.c
-@@ -61,7 +61,6 @@
- #include "tp_meter.h"
- #include "translation-table.h"
- 
--unsigned int batadv_hardif_generation;
- static int (*batadv_rx_handler[256])(struct sk_buff *skb,
- 				     struct batadv_hard_iface *recv_if);
- 
-diff --git a/net/batman-adv/main.h b/net/batman-adv/main.h
-index debc55922fe1..365d92d04c85 100644
---- a/net/batman-adv/main.h
-+++ b/net/batman-adv/main.h
-@@ -232,8 +232,6 @@ static inline int batadv_print_vid(unsigned short vid)
- 		return -1;
- }
- 
--extern unsigned int batadv_hardif_generation;
--
- extern struct workqueue_struct *batadv_event_workqueue;
- 
- int batadv_mesh_init(struct net_device *mesh_iface);
-diff --git a/net/batman-adv/netlink.c b/net/batman-adv/netlink.c
-index 41c1e7e0cf0d..23a626c63d40 100644
---- a/net/batman-adv/netlink.c
-+++ b/net/batman-adv/netlink.c
-@@ -978,7 +978,7 @@ batadv_netlink_dump_hardif(struct sk_buff *msg, struct netlink_callback *cb)
- 	bat_priv = netdev_priv(mesh_iface);
- 
- 	rtnl_lock();
--	cb->seq = batadv_hardif_generation << 1 | 1;
-+	cb->seq = bat_priv->hardif_generation << 1 | 1;
- 
- 	netdev_for_each_lower_private(mesh_iface, hard_iface, iter) {
- 		if (i++ < skip)
-diff --git a/net/batman-adv/types.h b/net/batman-adv/types.h
-index fc84c2a80020..f490fe436458 100644
---- a/net/batman-adv/types.h
-+++ b/net/batman-adv/types.h
-@@ -1727,6 +1727,9 @@ struct batadv_priv {
- 	/** @tp_num: number of currently active tp sessions */
- 	atomic_t tp_num;
- 
-+	/** @hardif_generation: generation counter added to netlink hardif dumps */
-+	unsigned int hardif_generation;
-+
- 	/** @orig_work: work queue callback item for orig node purging */
- 	struct delayed_work orig_work;
- 
--- 
-2.49.0
+> Hi Paolo,
+>=20
+> > Hi Paolo,
+> >  =20
+> > > On 5/4/25 4:55 PM, Lukasz Majewski wrote:   =20
+> > > > +		/* This does 16 byte alignment, exactly what we
+> > > > need.
+> > > > +		 * The packet length includes FCS, but we don't
+> > > > want to
+> > > > +		 * include that when passing upstream as it
+> > > > messes up
+> > > > +		 * bridging applications.
+> > > > +		 */
+> > > > +		skb =3D netdev_alloc_skb(pndev, pkt_len +
+> > > > NET_IP_ALIGN);
+> > > > +		if (unlikely(!skb)) {
+> > > > +			dev_dbg(&fep->pdev->dev,
+> > > > +				"%s: Memory squeeze, dropping
+> > > > packet.\n",
+> > > > +				pndev->name);
+> > > > +			pndev->stats.rx_dropped++;
+> > > > +			goto err_mem;
+> > > > +		} else {
+> > > > +			skb_reserve(skb, NET_IP_ALIGN);
+> > > > +			skb_put(skb, pkt_len);      /* Make
+> > > > room */
+> > > > +			skb_copy_to_linear_data(skb, data,
+> > > > pkt_len);
+> > > > +			skb->protocol =3D eth_type_trans(skb,
+> > > > pndev);
+> > > > +			napi_gro_receive(&fep->napi, skb);
+> > > > +		}
+> > > > +
+> > > > +		bdp->cbd_bufaddr =3D
+> > > > dma_map_single(&fep->pdev->dev, data,
+> > > > +
+> > > > bdp->cbd_datlen,
+> > > > +
+> > > > DMA_FROM_DEVICE);
+> > > > +		if (unlikely(dma_mapping_error(&fep->pdev->dev,
+> > > > +
+> > > > bdp->cbd_bufaddr))) {
+> > > > +			dev_err(&fep->pdev->dev,
+> > > > +				"Failed to map descriptor rx
+> > > > buffer\n");
+> > > > +			pndev->stats.rx_errors++;
+> > > > +			pndev->stats.rx_dropped++;
+> > > > +			dev_kfree_skb_any(skb);
+> > > > +			goto err_mem;
+> > > > +		}     =20
+> > >=20
+> > > This is doing the mapping and ev. dropping the skb _after_ pushing
+> > > the skb up the stack, you must attempt the mapping first.   =20
+> >=20
+> > I've double check it - the code seems to be correct.
+> >=20
+> > This code is a part of mtip_switch_rx() function, which handles
+> > receiving data.
+> >=20
+> > First, on probe, the initial dma memory is mapped for MTIP received
+> > data.
+> >=20
+> > When we receive data, it is processed and afterwards it is "pushed"
+> > up to the network stack.
+> >=20
+> > As a last step we do map memory for next, incoming data and leave
+> > the function.
+> >=20
+> > Hence, IMHO, the order is OK and this part shall be left as is. =20
+>=20
+> Is the explanation sufficient?
 
+I would do appreciate your feedback as your OK is required to prepare
+v12, so I would had the opportunity to have this patch set accepted to
+net-next before cut-off date.
+
+Thanks in advance for your help.
+
+>=20
+> >  =20
+> > >    =20
+> > > > +static void mtip_free_buffers(struct net_device *dev)
+> > > > +{
+> > > > +	struct mtip_ndev_priv *priv =3D netdev_priv(dev);
+> > > > +	struct switch_enet_private *fep =3D priv->fep;
+> > > > +	struct sk_buff *skb;
+> > > > +	struct cbd_t *bdp;
+> > > > +	int i;
+> > > > +
+> > > > +	bdp =3D fep->rx_bd_base;
+> > > > +	for (i =3D 0; i < RX_RING_SIZE; i++) {
+> > > > +		skb =3D fep->rx_skbuff[i];
+> > > > +
+> > > > +		if (bdp->cbd_bufaddr)
+> > > > +			dma_unmap_single(&fep->pdev->dev,
+> > > > bdp->cbd_bufaddr,
+> > > > +					 MTIP_SWITCH_RX_FRSIZE,
+> > > > +					 DMA_FROM_DEVICE);
+> > > > +		if (skb)
+> > > > +			dev_kfree_skb(skb);     =20
+> > >=20
+> > > I suspect that on error paths mtip_free_buffers() can be invoked
+> > > multiple consecutive times with any successful allocation in
+> > > between: skb will be freed twice. Likely you need to clear
+> > > fep->rx_skbuff[i] here.   =20
+> >=20
+> > +1 - I will add it with v12.
+> >  =20
+> > >=20
+> > > Side note: this patch is way too big for a proper review: you need
+> > > to break it in multiple smaller ones, introducing the basic
+> > > features separately.
+> > >=20
+> > > Cheers,
+> > >=20
+> > > Paolo
+> > >    =20
+> >=20
+> >=20
+> >=20
+> >=20
+> > Best regards,
+> >=20
+> > Lukasz Majewski
+> >=20
+> > --
+> >=20
+> > DENX Software Engineering GmbH,      Managing Director: Erika Unter
+> > HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell,
+> > Germany Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email:
+> > lukma@denx.de =20
+>=20
+>=20
+>=20
+>=20
+> Best regards,
+>=20
+> Lukasz Majewski
+>=20
+> --
+>=20
+> DENX Software Engineering GmbH,      Managing Director: Erika Unter
+> HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+> Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email:
+> lukma@denx.de
+
+
+
+
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/TOeu=qW_6zT9zkkN5+sCnzY
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmgrmfgACgkQAR8vZIA0
+zr09nAf+PrG7I521kkXUYZKC2dEjxU/q4ixwas9hAklmPl5J8w3C7wiM5/X4unzo
+vgyoBo1oGToGHEV79FZkeZxn/MF9YXMrKl2WEAaLyNhHpKeusus4my0xt1Ao/Q9R
+dkyM0jAeOSnUNpcIl0zhOmgEyBzPFPeRMz263XvTekvJet3E/gTAPHHc1Cg2PfA1
+EyxCnsiGy4aHuPJGg+zMhVHxWkt1awEIwSwEZu5O4OtjpUAqfllFn4eiapelBHb7
+Z7IM3C1tqdvKGO8lU9nqIoBnYpU9ZzZcg4N27morc9NfrAbF0KlJr/a+pxbM7ptD
+rXo54/GaGqwWVq3BcFVpWi3OD+9oJA==
+=WWM9
+-----END PGP SIGNATURE-----
+
+--Sig_/TOeu=qW_6zT9zkkN5+sCnzY--
 
