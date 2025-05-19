@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-191649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A6D9ABC8CB
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 23:00:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0B99ABC8CD
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 23:01:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8A453B2423
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 21:00:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B8624A13F0
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 21:01:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D1DD1D5ACE;
-	Mon, 19 May 2025 21:00:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 829B0217F27;
+	Mon, 19 May 2025 21:01:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="ijInmRrB"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="hFsUcfwO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B4A27470
-	for <netdev@vger.kernel.org>; Mon, 19 May 2025 21:00:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 526AC1EB193
+	for <netdev@vger.kernel.org>; Mon, 19 May 2025 21:01:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747688445; cv=none; b=iZ9ABw7V05udEZyR5lElEJ6yr6s2f9jTHGnbgafVSqUyVGsJeKTDL9gglABi8IbbaHubxuPDrTmuedayxTWi924tmB7m/T0nfZ0JUTYeBmS3p6u1FHH/RNc3z/JE5F/mYkiPoHvH75ZuGRUYhEtLKTB2C90dCqOsTlgDFBRaNwk=
+	t=1747688481; cv=none; b=Q5DnX5J48AUTr7Es7ou948C39TkUZeNThG4RMFTsYrvcewwE08F8giyN/CPBHbJt5HIUzMIdCNXpoFVSDyGy2QEuNStQgvChCBxvt+Sc7ZRXX8zSI+KsDaQkdTwM8OAPJIpg5YxM+p2/riMdeJMTMa61OlggGUS8AwLz8psO+1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747688445; c=relaxed/simple;
-	bh=WfOYeIgKhhw1mGs9tugt3QGwIaA5wsi82JPT2dT1Kxg=;
+	s=arc-20240116; t=1747688481; c=relaxed/simple;
+	bh=lolbAwSaFBzu8yxs7caefz5pPjPrm9+4BB/YAKBjTLY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gJUY7VXajDM2nVmgVe4zeSuwbOhX6dVu8dIqbSU/bz0FS7JyLRSzuO5BKGEP0lKGnrRHNnG21+umxNDOguCM4l4emTRwZAXdxnMx8NJbLA6YZuWA316i97LvW7qcxUhbo2U1Sku6sSiCOCvk4QBESUAAxDfxg/nzIoypMlk8vrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=ijInmRrB; arc=none smtp.client-ip=72.21.196.25
+	 MIME-Version:Content-Type; b=uNo/LoxzO4cy8LZxHyN3CHYdrhpzCDt7byvMg1Jh09+C9OpBalERPVGomiaD7hvm1IxR7nqXMwxzyyYMs5xLzD4STaVItfvnJvdaw+68KjewioXqTlNqMCw7b3bACVhnWr32X+XoIMgt/2BgyyxUXo8mZOrJJGi2jvk14H2ldL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=hFsUcfwO; arc=none smtp.client-ip=52.119.213.154
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1747688445; x=1779224445;
+  t=1747688479; x=1779224479;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=lX84mVYng7du5C+evun9nBld517z2lM4zi2vzi/i7P8=;
-  b=ijInmRrBYoorwNheD/jgwfqN0NyqqiybvysxCwAcu1ehexGcJ+6DC2Nb
-   hFCNNESZvVNhKeZOONLTysiSe4q31pzeCub57LsiS02MUONzeVr3qTrx9
-   jw0QOM5hUyfbO4SEaTnLvqu3NAG+8iWFhnapXzuNg2vSE47OdTraNKv+y
-   WUTjFYnvbH9fwV4U/T4daY7E675CddjKmjBnIPgILQkq9d5rDnSt6XZxj
-   iLhLdPlNECELK4ByMxuOcou4moTZTnIhnPlEfwMbCyMDRgVHrLvdk3YAl
-   P+TF1v0QeunE+vy17NDv47bU/ri9H5h2CMvTFxrDgYgl2VA8Ir6zxJg+I
-   w==;
+  bh=o/8aAMCC0V9bM640FZEMaxGhJMCBpLcl98GsTvHQG18=;
+  b=hFsUcfwOF0fLvXHQd5PzpDu/KTSjilPGZg0EI5A0Ok8IusJOb8M9YZOT
+   qcY2um23S09N5FsddceKd6bJEdodZ2VX1mIr0XnQ3sZdbq2n+0ttICuCt
+   4wFyXWcD2TH8emUzbDofsIKgntAN+HX6pZU5ULsfdlMPjdd9T5JvHtmT3
+   B+u7HYsp3H7k4qQ9oIKF7UFsJgPy1HYmtzUebT+vAptfqjuYcfzM/kfRS
+   gt04I2Ef9QQrVmtLPePv649g4voXNS4+UF9zRUqX1Ee5BIwQc4EqZRMGr
+   vouLDc5YIK6hmNADGy7ICCBW8VmQ/zUZ25oRY+5chYv6tA/6MYIKEIKqq
+   A==;
 X-IronPort-AV: E=Sophos;i="6.15,301,1739836800"; 
-   d="scan'208";a="493941989"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2025 21:00:41 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:28961]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.29.53:2525] with esmtp (Farcaster)
- id 54a574e2-fb64-4041-acc1-e3ff47bd6666; Mon, 19 May 2025 21:00:39 +0000 (UTC)
-X-Farcaster-Flow-ID: 54a574e2-fb64-4041-acc1-e3ff47bd6666
+   d="scan'208";a="299457693"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2025 21:01:04 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:29576]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.0.141:2525] with esmtp (Farcaster)
+ id 2ccfba71-316f-44b5-93db-2a791632a1f4; Mon, 19 May 2025 21:01:03 +0000 (UTC)
+X-Farcaster-Flow-ID: 2ccfba71-316f-44b5-93db-2a791632a1f4
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 19 May 2025 21:00:38 +0000
+ Mon, 19 May 2025 21:01:03 +0000
 Received: from 6c7e67bfbae3.amazon.com (10.142.169.18) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 19 May 2025 21:00:36 +0000
+ Mon, 19 May 2025 21:01:00 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -67,9 +67,9 @@ To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 CC: Simon Horman <horms@kernel.org>, Christian Brauner <brauner@kernel.org>,
 	Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v5 net-next 5/9] net: Restrict SO_PASS{CRED,PIDFD,SEC} to AF_{UNIX,NETLINK,BLUETOOTH}.
-Date: Mon, 19 May 2025 13:57:56 -0700
-Message-ID: <20250519205820.66184-6-kuniyu@amazon.com>
+Subject: [PATCH v5 net-next 6/9] af_unix: Move SOCK_PASS{CRED,PIDFD,SEC} to struct sock.
+Date: Mon, 19 May 2025 13:57:57 -0700
+Message-ID: <20250519205820.66184-7-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250519205820.66184-1-kuniyu@amazon.com>
 References: <20250519205820.66184-1-kuniyu@amazon.com>
@@ -81,121 +81,327 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWA003.ant.amazon.com (10.13.139.47) To
+X-ClientProxiedBy: EX19D036UWB002.ant.amazon.com (10.13.139.139) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-SCM_CREDENTIALS and SCM_SECURITY can be recv()ed by calling
-scm_recv() or scm_recv_unix(), and SCM_PIDFD is only used by
-scm_recv_unix().
+As explained in the next patch, SO_PASSRIGHTS would have a problem
+if we assigned a corresponding bit to socket->flags, so it must be
+managed in struct sock.
 
-scm_recv() is called from AF_NETLINK and AF_BLUETOOTH.
+Mixing socket->flags and sk->sk_flags for similar options will look
+confusing, and sk->sk_flags does not have enough space on 32bit system.
 
-scm_recv_unix() is literally called from AF_UNIX.
+Also, as mentioned in commit 16e572626961 ("af_unix: dont send
+SCM_CREDENTIALS by default"), SOCK_PASSCRED and SOCK_PASSPID handling
+is known to be slow, and managing the flags in struct socket cannot
+avoid that for embryo sockets.
 
-Let's restrict SO_PASSCRED and SO_PASSSEC to such sockets and
-SO_PASSPIDFD to AF_UNIX only.
+Let's move SOCK_PASS{CRED,PIDFD,SEC} to struct sock.
 
-Later, SOCK_PASS{CRED,PIDFD,SEC} will be moved to struct sock
-and united with another field.
+While at it, other SOCK_XXX flags in net.h are grouped as enum.
+
+Note that assign_bit() was atomic, so the writer side is moved down
+after lock_sock() in setsockopt(), but the bit is only read once
+in sendmsg() and recvmsg(), so lock_sock() is not needed there.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 Reviewed-by: Willem de Bruijn <willemb@google.com>
 ---
-v3:
-  * Return -EOPNOTSUPP in getsockopt() too
-  * Add CONFIG_SECURITY_NETWORK check for SO_PASSSEC
----
- include/net/sock.h | 14 +++++++++++++-
- net/core/sock.c    | 18 ++++++++++++++++++
- 2 files changed, 31 insertions(+), 1 deletion(-)
+v4:
+  * Group sk->sk_scm_XXX bits by struct
 
+v3:
+  * Add kdoc for sk_scm_unused
+  * Update sk->sk_scm_xxx after lock_sock() in setsockopt()
+---
+ include/linux/net.h | 15 +++++++--------
+ include/net/sock.h  | 16 +++++++++++++++-
+ net/core/scm.c      | 29 ++++++++++++++---------------
+ net/core/sock.c     | 44 +++++++++++++++++++++++---------------------
+ net/unix/af_unix.c  | 18 ++----------------
+ 5 files changed, 61 insertions(+), 61 deletions(-)
+
+diff --git a/include/linux/net.h b/include/linux/net.h
+index 0ff950eecc6b..f8418d6e33e0 100644
+--- a/include/linux/net.h
++++ b/include/linux/net.h
+@@ -36,14 +36,13 @@ struct net;
+  * in sock->flags, but moved into sk->sk_wq->flags to be RCU protected.
+  * Eventually all flags will be in sk->sk_wq->flags.
+  */
+-#define SOCKWQ_ASYNC_NOSPACE	0
+-#define SOCKWQ_ASYNC_WAITDATA	1
+-#define SOCK_NOSPACE		2
+-#define SOCK_PASSCRED		3
+-#define SOCK_PASSSEC		4
+-#define SOCK_SUPPORT_ZC		5
+-#define SOCK_CUSTOM_SOCKOPT	6
+-#define SOCK_PASSPIDFD		7
++enum socket_flags {
++	SOCKWQ_ASYNC_NOSPACE,
++	SOCKWQ_ASYNC_WAITDATA,
++	SOCK_NOSPACE,
++	SOCK_SUPPORT_ZC,
++	SOCK_CUSTOM_SOCKOPT,
++};
+ 
+ #ifndef ARCH_HAS_SOCKET_TYPES
+ /**
 diff --git a/include/net/sock.h b/include/net/sock.h
-index 3e15d7105ad2..56fa558d24c0 100644
+index 56fa558d24c0..d14d7d960d44 100644
 --- a/include/net/sock.h
 +++ b/include/net/sock.h
-@@ -2773,9 +2773,14 @@ static inline bool sk_is_udp(const struct sock *sk)
- 	       sk->sk_protocol == IPPROTO_UDP;
- }
+@@ -337,6 +337,11 @@ struct sk_filter;
+   *	@sk_txtime_deadline_mode: set deadline mode for SO_TXTIME
+   *	@sk_txtime_report_errors: set report errors mode for SO_TXTIME
+   *	@sk_txtime_unused: unused txtime flags
++  *	@sk_scm_recv_flags: all flags used by scm_recv()
++  *	@sk_scm_credentials: flagged by SO_PASSCRED to recv SCM_CREDENTIALS
++  *	@sk_scm_security: flagged by SO_PASSSEC to recv SCM_SECURITY
++  *	@sk_scm_pidfd: flagged by SO_PASSPIDFD to recv SCM_PIDFD
++  *	@sk_scm_unused: unused flags for scm_recv()
+   *	@ns_tracker: tracker for netns reference
+   *	@sk_user_frags: xarray of pages the user is holding a reference on.
+   *	@sk_owner: reference to the real owner of the socket that calls
+@@ -523,7 +528,16 @@ struct sock {
+ #endif
+ 	int			sk_disconnects;
  
-+static inline bool sk_is_unix(const struct sock *sk)
-+{
-+	return sk->sk_family == AF_UNIX;
-+}
-+
- static inline bool sk_is_stream_unix(const struct sock *sk)
+-	u8			sk_txrehash;
++	union {
++		u8		sk_txrehash;
++		u8		sk_scm_recv_flags;
++		struct {
++			u8	sk_scm_credentials : 1,
++				sk_scm_security : 1,
++				sk_scm_pidfd : 1,
++				sk_scm_unused : 5;
++		};
++	};
+ 	u8			sk_clockid;
+ 	u8			sk_txtime_deadline_mode : 1,
+ 				sk_txtime_report_errors : 1,
+diff --git a/net/core/scm.c b/net/core/scm.c
+index 66e02b18c359..0225bd94170f 100644
+--- a/net/core/scm.c
++++ b/net/core/scm.c
+@@ -406,12 +406,12 @@ struct scm_fp_list *scm_fp_dup(struct scm_fp_list *fpl)
+ EXPORT_SYMBOL(scm_fp_dup);
+ 
+ #ifdef CONFIG_SECURITY_NETWORK
+-static void scm_passec(struct socket *sock, struct msghdr *msg, struct scm_cookie *scm)
++static void scm_passec(struct sock *sk, struct msghdr *msg, struct scm_cookie *scm)
  {
--	return sk->sk_family == AF_UNIX && sk->sk_type == SOCK_STREAM;
-+	return sk_is_unix(sk) && sk->sk_type == SOCK_STREAM;
+ 	struct lsm_context ctx;
+ 	int err;
+ 
+-	if (test_bit(SOCK_PASSSEC, &sock->flags)) {
++	if (sk->sk_scm_security) {
+ 		err = security_secid_to_secctx(scm->secid, &ctx);
+ 
+ 		if (err >= 0) {
+@@ -423,16 +423,16 @@ static void scm_passec(struct socket *sock, struct msghdr *msg, struct scm_cooki
+ 	}
  }
  
- static inline bool sk_is_vsock(const struct sock *sk)
-@@ -2783,6 +2788,13 @@ static inline bool sk_is_vsock(const struct sock *sk)
- 	return sk->sk_family == AF_VSOCK;
+-static bool scm_has_secdata(struct socket *sock)
++static bool scm_has_secdata(struct sock *sk)
+ {
+-	return test_bit(SOCK_PASSSEC, &sock->flags);
++	return sk->sk_scm_security;
+ }
+ #else
+-static void scm_passec(struct socket *sock, struct msghdr *msg, struct scm_cookie *scm)
++static void scm_passec(struct sock *sk, struct msghdr *msg, struct scm_cookie *scm)
+ {
  }
  
-+static inline bool sk_may_scm_recv(const struct sock *sk)
-+{
-+	return (IS_ENABLED(CONFIG_UNIX) && sk->sk_family == AF_UNIX) ||
-+		sk->sk_family == AF_NETLINK ||
-+		(IS_ENABLED(CONFIG_BT) && sk->sk_family == AF_BLUETOOTH);
-+}
-+
- /**
-  * sk_eat_skb - Release a skb if it is no longer needed
-  * @sk: socket to eat this skb from
+-static bool scm_has_secdata(struct socket *sock)
++static bool scm_has_secdata(struct sock *sk)
+ {
+ 	return false;
+ }
+@@ -474,20 +474,19 @@ static void scm_pidfd_recv(struct msghdr *msg, struct scm_cookie *scm)
+ 		fd_install(pidfd, pidfd_file);
+ }
+ 
+-static bool __scm_recv_common(struct socket *sock, struct msghdr *msg,
++static bool __scm_recv_common(struct sock *sk, struct msghdr *msg,
+ 			      struct scm_cookie *scm, int flags)
+ {
+ 	if (!msg->msg_control) {
+-		if (test_bit(SOCK_PASSCRED, &sock->flags) ||
+-		    test_bit(SOCK_PASSPIDFD, &sock->flags) ||
+-		    scm->fp || scm_has_secdata(sock))
++		if (sk->sk_scm_credentials || sk->sk_scm_pidfd ||
++		    scm->fp || scm_has_secdata(sk))
+ 			msg->msg_flags |= MSG_CTRUNC;
+ 
+ 		scm_destroy(scm);
+ 		return false;
+ 	}
+ 
+-	if (test_bit(SOCK_PASSCRED, &sock->flags)) {
++	if (sk->sk_scm_credentials) {
+ 		struct user_namespace *current_ns = current_user_ns();
+ 		struct ucred ucreds = {
+ 			.pid = scm->creds.pid,
+@@ -498,7 +497,7 @@ static bool __scm_recv_common(struct socket *sock, struct msghdr *msg,
+ 		put_cmsg(msg, SOL_SOCKET, SCM_CREDENTIALS, sizeof(ucreds), &ucreds);
+ 	}
+ 
+-	scm_passec(sock, msg, scm);
++	scm_passec(sk, msg, scm);
+ 
+ 	if (scm->fp)
+ 		scm_detach_fds(msg, scm);
+@@ -509,7 +508,7 @@ static bool __scm_recv_common(struct socket *sock, struct msghdr *msg,
+ void scm_recv(struct socket *sock, struct msghdr *msg,
+ 	      struct scm_cookie *scm, int flags)
+ {
+-	if (!__scm_recv_common(sock, msg, scm, flags))
++	if (!__scm_recv_common(sock->sk, msg, scm, flags))
+ 		return;
+ 
+ 	scm_destroy_cred(scm);
+@@ -519,10 +518,10 @@ EXPORT_SYMBOL(scm_recv);
+ void scm_recv_unix(struct socket *sock, struct msghdr *msg,
+ 		   struct scm_cookie *scm, int flags)
+ {
+-	if (!__scm_recv_common(sock, msg, scm, flags))
++	if (!__scm_recv_common(sock->sk, msg, scm, flags))
+ 		return;
+ 
+-	if (test_bit(SOCK_PASSPIDFD, &sock->flags))
++	if (sock->sk->sk_scm_pidfd)
+ 		scm_pidfd_recv(msg, scm);
+ 
+ 	scm_destroy_cred(scm);
 diff --git a/net/core/sock.c b/net/core/sock.c
-index d7d6d3a8efe5..fd5f9d3873c1 100644
+index fd5f9d3873c1..381abf8f25b7 100644
 --- a/net/core/sock.c
 +++ b/net/core/sock.c
-@@ -1221,12 +1221,21 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
+@@ -1220,24 +1220,6 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
+ 			return 0;
  		}
  		return -EPERM;
- 	case SO_PASSSEC:
-+		if (!IS_ENABLED(CONFIG_SECURITY_NETWORK) || sk_may_scm_recv(sk))
-+			return -EOPNOTSUPP;
-+
- 		assign_bit(SOCK_PASSSEC, &sock->flags, valbool);
- 		return 0;
- 	case SO_PASSCRED:
-+		if (!sk_may_scm_recv(sk))
-+			return -EOPNOTSUPP;
-+
- 		assign_bit(SOCK_PASSCRED, &sock->flags, valbool);
- 		return 0;
- 	case SO_PASSPIDFD:
-+		if (!sk_is_unix(sk))
-+			return -EOPNOTSUPP;
-+
- 		assign_bit(SOCK_PASSPIDFD, &sock->flags, valbool);
- 		return 0;
+-	case SO_PASSSEC:
+-		if (!IS_ENABLED(CONFIG_SECURITY_NETWORK) || sk_may_scm_recv(sk))
+-			return -EOPNOTSUPP;
+-
+-		assign_bit(SOCK_PASSSEC, &sock->flags, valbool);
+-		return 0;
+-	case SO_PASSCRED:
+-		if (!sk_may_scm_recv(sk))
+-			return -EOPNOTSUPP;
+-
+-		assign_bit(SOCK_PASSCRED, &sock->flags, valbool);
+-		return 0;
+-	case SO_PASSPIDFD:
+-		if (!sk_is_unix(sk))
+-			return -EOPNOTSUPP;
+-
+-		assign_bit(SOCK_PASSPIDFD, &sock->flags, valbool);
+-		return 0;
  	case SO_TYPE:
-@@ -1855,10 +1864,16 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
+ 	case SO_PROTOCOL:
+ 	case SO_DOMAIN:
+@@ -1568,6 +1550,26 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
+ 		sock_valbool_flag(sk, SOCK_SELECT_ERR_QUEUE, valbool);
  		break;
  
- 	case SO_PASSCRED:
-+		if (!sk_may_scm_recv(sk))
-+			return -EOPNOTSUPP;
++	case SO_PASSCRED:
++		if (sk_may_scm_recv(sk))
++			sk->sk_scm_credentials = valbool;
++		else
++			ret = -EOPNOTSUPP;
++		break;
 +
- 		v.val = !!test_bit(SOCK_PASSCRED, &sock->flags);
++	case SO_PASSSEC:
++		if (IS_ENABLED(CONFIG_SECURITY_NETWORK) && sk_may_scm_recv(sk))
++			sk->sk_scm_security = valbool;
++		else
++			ret = -EOPNOTSUPP;
++		break;
++
++	case SO_PASSPIDFD:
++		if (sk_is_unix(sk))
++			sk->sk_scm_pidfd = valbool;
++		else
++			ret = -EOPNOTSUPP;
++		break;
+ 
+ 	case SO_INCOMING_CPU:
+ 		reuseport_update_incoming_cpu(sk, val);
+@@ -1867,14 +1869,14 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
+ 		if (!sk_may_scm_recv(sk))
+ 			return -EOPNOTSUPP;
+ 
+-		v.val = !!test_bit(SOCK_PASSCRED, &sock->flags);
++		v.val = sk->sk_scm_credentials;
  		break;
  
  	case SO_PASSPIDFD:
-+		if (!sk_is_unix(sk))
-+			return -EOPNOTSUPP;
-+
- 		v.val = !!test_bit(SOCK_PASSPIDFD, &sock->flags);
+ 		if (!sk_is_unix(sk))
+ 			return -EOPNOTSUPP;
+ 
+-		v.val = !!test_bit(SOCK_PASSPIDFD, &sock->flags);
++		v.val = sk->sk_scm_pidfd;
  		break;
  
-@@ -1956,6 +1971,9 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
+ 	case SO_PEERCRED:
+@@ -1974,7 +1976,7 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
+ 		if (!IS_ENABLED(CONFIG_SECURITY_NETWORK) || !sk_may_scm_recv(sk))
+ 			return -EOPNOTSUPP;
+ 
+-		v.val = !!test_bit(SOCK_PASSSEC, &sock->flags);
++		v.val = sk->sk_scm_security;
  		break;
  
- 	case SO_PASSSEC:
-+		if (!IS_ENABLED(CONFIG_SECURITY_NETWORK) || !sk_may_scm_recv(sk))
-+			return -EOPNOTSUPP;
-+
- 		v.val = !!test_bit(SOCK_PASSSEC, &sock->flags);
- 		break;
+ 	case SO_PEERSEC:
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index a39497fd6e98..27ebda4cd9b9 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -767,10 +767,7 @@ static void copy_peercred(struct sock *sk, struct sock *peersk)
  
+ static bool unix_may_passcred(const struct sock *sk)
+ {
+-	struct socket *sock = sk->sk_socket;
+-
+-	return test_bit(SOCK_PASSCRED, &sock->flags) ||
+-		test_bit(SOCK_PASSPIDFD, &sock->flags);
++	return sk->sk_scm_credentials || sk->sk_scm_pidfd;
+ }
+ 
+ static int unix_listen(struct socket *sock, int backlog)
+@@ -1713,17 +1710,6 @@ static int unix_socketpair(struct socket *socka, struct socket *sockb)
+ 	return 0;
+ }
+ 
+-static void unix_sock_inherit_flags(const struct socket *old,
+-				    struct socket *new)
+-{
+-	if (test_bit(SOCK_PASSCRED, &old->flags))
+-		set_bit(SOCK_PASSCRED, &new->flags);
+-	if (test_bit(SOCK_PASSPIDFD, &old->flags))
+-		set_bit(SOCK_PASSPIDFD, &new->flags);
+-	if (test_bit(SOCK_PASSSEC, &old->flags))
+-		set_bit(SOCK_PASSSEC, &new->flags);
+-}
+-
+ static int unix_accept(struct socket *sock, struct socket *newsock,
+ 		       struct proto_accept_arg *arg)
+ {
+@@ -1760,7 +1746,7 @@ static int unix_accept(struct socket *sock, struct socket *newsock,
+ 	unix_state_lock(tsk);
+ 	unix_update_edges(unix_sk(tsk));
+ 	newsock->state = SS_CONNECTED;
+-	unix_sock_inherit_flags(sock, newsock);
++	tsk->sk_scm_recv_flags = READ_ONCE(sk->sk_scm_recv_flags);
+ 	sock_graft(tsk, newsock);
+ 	unix_state_unlock(tsk);
+ 	return 0;
 -- 
 2.49.0
 
