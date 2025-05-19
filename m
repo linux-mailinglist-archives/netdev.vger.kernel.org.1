@@ -1,105 +1,117 @@
-Return-Path: <netdev+bounces-191561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C08CABC255
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 17:24:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9EBEABC25D
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 17:25:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D26C18924BA
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 15:24:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DE7A172655
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 15:25:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0CE428540F;
-	Mon, 19 May 2025 15:24:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B0182857C4;
+	Mon, 19 May 2025 15:25:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C4ZrvHpz"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9687626B093;
-	Mon, 19 May 2025 15:24:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD5028540E;
+	Mon, 19 May 2025 15:25:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747668269; cv=none; b=owyRqwArXAcKL4UynhPKWc/arWiuGJ+tpebdfjWBbHbDuQ8pC0F2johHU4CZEh5rZGHbAVQ8Y5jTAST+B38kesnBmhS1PDpb97M7OTk7RKlSUfaIPFtTJyTcy5GjImi5tpoIhq1Qe7zn+pz8lcEo77t0CB3cWQ5qcNxE++mEHuQ=
+	t=1747668324; cv=none; b=Sgc0DBubafxBInSVFCU91HjIrkPRfLEbOqtWgPI+OttHUH3jprJm/HEptfv/6Rd7ufwxIbjMzluuum5C482+kgN7srHicxx8KVwnyhmG6ZqwIUl9FIJh/F0G9fkzQZRR+Y+Trk+Nzxa1Y/DfKIhw1e+eZ/eyqibFGKQcJ7/LqpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747668269; c=relaxed/simple;
-	bh=00J/mLo+IrM88P4etHzFofObO9aswcuOd778AuTnGSk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XMjnqOB99Ykdp/Qc5xEO18eYbF+VQrB7uLdf/IS9g3orTLM8uwtBE5G5tobBEN+4o3yqEgiWBj0Z6DYhEMU1JnI8WMg0lim+3DdABEzXfYikgU/5MixUERoGCiiu7vGMj274B/NmZsUuWBOSqqpkztt0vS2A/QelfA7kSXi9aok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [124.16.141.245])
-	by APP-01 (Coremail) with SMTP id qwCowABn1MMZTStokbplAQ--.53700S2;
-	Mon, 19 May 2025 23:24:11 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: sgoutham@marvell.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>
-Subject: [PATCH] net: cavium: thunder: Add log for verification fail in bgx_poll_for_link()
-Date: Mon, 19 May 2025 23:23:48 +0800
-Message-ID: <20250519152348.2839-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.42.0.windows.2
+	s=arc-20240116; t=1747668324; c=relaxed/simple;
+	bh=WxTmxGlQrrguSoMwDfctC0NDsUBzH83Lrk3yMUKKBt0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KN+Ot96cxcCJOeWIVTkxkGnAbnU5GZGRkGCEaQSov+wdRfY4+KProRXGVNaPkm6GXB1jtUlErulvhXBIUUmDgw8fI5TAH0PwQQelZ0NYX/F/VHLipUXWEw085tcg3nfC3AmwU0lPlQoXL5UP+09LSdkFhjOYUynh+c1+JoB8ECw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C4ZrvHpz; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-22fcf9cf3c2so37302815ad.0;
+        Mon, 19 May 2025 08:25:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747668322; x=1748273122; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WxTmxGlQrrguSoMwDfctC0NDsUBzH83Lrk3yMUKKBt0=;
+        b=C4ZrvHpzFC8Wf74Fl1mug86eDGHYRvlzBI4OoYfVQtBsRrIk5D9IrIkTtc2wlym2RU
+         VI7xgs0ezUkqDcJqdzzhMA56uqXk+tSZ6+ckzlrwk9twsQWoxIrBcwPtWEkdFmYPqGZW
+         HV/K+cUuo+Ov/yi+0H9R7wblWFDLZ2blJ4x7N3yU3ZYRB/aQRIPvBhiEYNoI9BIAqyR+
+         aLJnZbxprWPZpym4s+S3sM4hxNmwmaQNQ13rK8ltM9Lpm7H0NSOCK3/htDhYcca6MCVd
+         mH52pKABLqrW1QYrqA+SXWiQuoM/nknKM1t9VoNIOh4F2SYhTXv9bJhuNfJYk1ZJzaMe
+         p3TA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747668322; x=1748273122;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WxTmxGlQrrguSoMwDfctC0NDsUBzH83Lrk3yMUKKBt0=;
+        b=xNvS96EOc5hzoCP8MoG711/v+PvdRSml06SI9qluoCRKkxnaDxZ84dvb3JQbhrM+Lp
+         nKGrRmn4OB4OCh6Xt/mtaT+46IX+BjTcmpfl99e95pV/ULp65SedgolWJWeSvS/EU8lG
+         BeNAQMYv4zqqrOEapUyAzrSowjWrp8523nuRhrj+D/7dj33JsPtAD3vT30wPNCw+k0UR
+         kcDgbnyoipal0NcoFKpaclODs0zNizuHyoHbfGp7rScac4Y31uNlNMGZdUzbYaE/qMGX
+         PQ14s4F1RPvRzeQSGiTdudchnYIe57dS4Irugc3dICtozIRDaYSYk1c0HLHq8yQ80ox+
+         fVmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUGcON29B1Xrjfj/5se2rRegKI/xaHWyO/1/14Q17kXDURjfljfkvlc0VcYK4kZZ4407QnalBR3riQRBa4=@vger.kernel.org, AJvYcCV5ROOK5qszCqt4Y6/G5aDPNj+YKPKZm+MokQO5yXg4boWG8AAVwMNySUn3THf+8cyNAd95pocQg2oTG3Rxraqq@vger.kernel.org
+X-Gm-Message-State: AOJu0YwzSTmJvXa2v5GbN4ao0Sf45G5pPvQR6qpCVDPAnUf4xLcD0l4/
+	ytx+YG7M/H1/giiYzF+0O/UQ5wAacjaAGYjeaLcA5vf7K/1J7Ac/k4Y=
+X-Gm-Gg: ASbGncv4bJRvI1DopMU34Jc2PRm/yq3vft8M/ZqiaTLMBA6jGUnKxkU3sQr/khN1D+M
+	01Mf9q7dbq+rdF9XGoTWUiXdSlPlFN6eIT7pMLZGf7idakF6EkcNcvXdpAhr80xd9HSUWOeAsLc
+	enN4voQEI53rpQ3iZic13Ny3kdsnE/NfPC+6EINNzA/BvFl74Pv8/BIYxdJAa3uVqIkVAdpBQ67
+	gtEUKyekeTzFyEyM5SX2bSjY6nXdmJqaB2ez8m/qmyz5QnKhQ5TUCtSiZMS5iU40UWPlEazfiHW
+	//GvtsTizkAP9v3schJHghB+zl1c7ihF6189dL/tDkiVkQe702jpuyx00X4Tc5RKFhLkXaNVtoJ
+	5F/4LtxYx+v5m1r/ftpHy+1Q=
+X-Google-Smtp-Source: AGHT+IHLWG5Gp6m02I3QhciVry41Kgg1dKPKkjp1fv3rQ0gNRmq6/G1TiOAb1/czY65bEK3uo1b8ZA==
+X-Received: by 2002:a17:902:cf12:b0:224:2717:7993 with SMTP id d9443c01a7336-231d454dcaamr193778135ad.45.1747668322082;
+        Mon, 19 May 2025 08:25:22 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-231d4e978b8sm61053245ad.129.2025.05.19.08.25.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 May 2025 08:25:21 -0700 (PDT)
+Date: Mon, 19 May 2025 08:25:20 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	David Ahern <dsahern@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>,
+	sdf@fomichev.me, ap420073@gmail.com, praan@google.com,
+	shivajikant@google.com
+Subject: Re: [PATCH net-next v1 4/9] net: devmem: ksft: remove ksft_disruptive
+Message-ID: <aCtNYJo01UfMOLfr@mini-arch>
+References: <20250519023517.4062941-1-almasrymina@google.com>
+ <20250519023517.4062941-5-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowABn1MMZTStokbplAQ--.53700S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Kw4xZryrWw1kKr13ZFyfCrg_yoW8GFWxpa
-	17tasI9F97Aw1Uu3Wvvws8CrZ8WaykKF93AFW5Cwn3uF17try5ZrWDG3yayFsFqrW8KFWY
-	qF1jv3s7CF98Ar7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Cr0_Gr1UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
-	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
-	zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
-	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
-	CwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcS
-	sGvfC2KfnxnUUI43ZEXa7VU1TqcUUUUUU==
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiDAgHA2grSfIIhQAAs1
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250519023517.4062941-5-almasrymina@google.com>
 
-The bgx_poll_for_link() calls bgx_poll_reg() but does not handle the
-return value. The link setting is not verified if the polling operation
-times out. It helps to debug if the link polling fails.
+On 05/19, Mina Almasry wrote:
+> As far as I can tell the ksft_disruptive here is unnecessary. These
+> tests are largerly independent, and when one test fails, it's nice to
+> know the results from all the other test cases.
 
-Add a time out error log for bgx_poll_reg().
-
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
----
- drivers/net/ethernet/cavium/thunder/thunder_bgx.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
-index 608cc6af5af1..eadc58de35ac 100644
---- a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
-+++ b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
-@@ -1007,8 +1007,9 @@ static void bgx_poll_for_link(struct work_struct *work)
- 	/* Receive link is latching low. Force it high and verify it */
- 	bgx_reg_modify(lmac->bgx, lmac->lmacid,
- 		       BGX_SPUX_STATUS1, SPU_STATUS1_RCV_LNK);
--	bgx_poll_reg(lmac->bgx, lmac->lmacid, BGX_SPUX_STATUS1,
--		     SPU_STATUS1_RCV_LNK, false);
-+	if (bgx_poll_reg(lmac->bgx, lmac->lmacid, BGX_SPUX_STATUS1,
-+			 SPU_STATUS1_RCV_LNK, false))
-+		dev_err(lmac->bgx->pdev->dev, "BXG verification fail with time out.\n");
- 
- 	spu_link = bgx_reg_read(lmac->bgx, lmac->lmacid, BGX_SPUX_STATUS1);
- 	smu_link = bgx_reg_read(lmac->bgx, lmac->lmacid, BGX_SMUX_RX_CTL);
--- 
-2.42.0.windows.2
-
+We currently don't do anything special for disruptive tests. I'm assuming
+anything that changes nic configuration is disruptive and was thinking of
+an option to run all disruptive tests at the end of the run. But so far we
+haven't had any problem with mixing disruptive and non-disruptive tests,
+so it's all moot. I'd prefer to keep everything as is for now (or remove
+this whole disruptive category).
 
