@@ -1,126 +1,216 @@
-Return-Path: <netdev+bounces-191399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA8CFABB634
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 09:33:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC4C5ABB640
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 09:35:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8493E7A9D3F
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 07:31:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFC6F1896558
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 07:35:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF74265CD3;
-	Mon, 19 May 2025 07:33:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 731DE266F1D;
+	Mon, 19 May 2025 07:35:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R5W+9Vy9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HbWxFEmS"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 936E1257ACF
-	for <netdev@vger.kernel.org>; Mon, 19 May 2025 07:33:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A67CB265CC9
+	for <netdev@vger.kernel.org>; Mon, 19 May 2025 07:35:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747639985; cv=none; b=AYors7ZrrJuWHwCltJnCYhycGGwDuxNlDPHJwHmgRftGTDoTSC41pVZuCAIhA0xNhNVG65yGZy40U00mGPkHBa3CAM/WOE7lafLH31xXlS+boyHXa7LTHZmtVXGrVAMF96tPR6R+ABjQaBkD9zPYUICLt9rej3iN3UUwKugPKAQ=
+	t=1747640109; cv=none; b=Gx9JCOJbtpgGe8ShEMq6RmsqnS66yh4d9APRFj1hMy23RkqpS5Kan11pe5jwULAUVzUA+IC9KiDzXMqHYL5izXSZwS5OBI92ZrNnZJQjL8qWVYhlIaezwvfOMDvF4i73ccDmQIpVCPKI2NatknWsh+M2AcK+tOde+ajB8twawhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747639985; c=relaxed/simple;
-	bh=NIIBGgdcUvKU9PXZWWl8yZ2hQCYtCo95kYBZvG/Mh5A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BFls/E6Jp+Bma4sMOMVQ/dHZmYJEwrNZ7FJRP9WwlsRJ4XoBikHzrvOY+xNjUsqcwxeV+mjoQJuEViuS3D2G02mbLmy24iYvwhIHnsIzhjplWRiZhNlE3zahEcP9iUGI9njwNo6sZbsynOeoF7+NaIGSCMe7NqNPkvz5v0prDbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R5W+9Vy9; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1747640109; c=relaxed/simple;
+	bh=+GWWr5RiqW6nfGpNUOrgJWmEkayVvBy0v+dsRdLauRc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EQxD0uOkFd/qvE7hxIE8YmlNoeMX1bo5gpyhUIExwVYCjLriiBtlGS0c+8dchjPvVmVA562u3FTs/eP4aPXzdUY3RkMegKqr1fVmvmotPckiwzPm1WcZghQNX01v56rMUZATROFUbLiVbr4oUrYYynlvUm4XW5qlmfYxvLYKhkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HbWxFEmS; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747639982;
+	s=mimecast20190719; t=1747640106;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=mpbF5ydmLJC97ArKOHWf3B+/uOH4TOjBfUDJxighhMg=;
-	b=R5W+9Vy9OH+IxrDgsbbkro8845th7OZMb7588o9soyhrsI2W+W3SiQ5wFspWdmZR72Owqm
-	VALkoplbWmyUM/brWiczn90rNy4dvmovGG8cLwyFzqudg2x211CAKTBMw7C3jxND5icBEb
-	SplL7aRroFutA3khWafoONEDZzo5OWE=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=+GWWr5RiqW6nfGpNUOrgJWmEkayVvBy0v+dsRdLauRc=;
+	b=HbWxFEmSD8gKg7tseA9mA6dg7+z1gVh22QLQDPG03Rw+rlMUHf6KXV5oWC/megZdw00u9S
+	dB6GiUNT9c+NlL+hCwnoDhMhXqbo9LC+IjFe0AY5yysU2eyFLGS8bFkVcOXPFJBTnlb7Bb
+	+WqYVK9z9pcSq0izezZ5bRO8AXOL3AU=
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
+ [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-86-amNld2-iNaeObawahDJu5Q-1; Mon, 19 May 2025 03:33:01 -0400
-X-MC-Unique: amNld2-iNaeObawahDJu5Q-1
-X-Mimecast-MFC-AGG-ID: amNld2-iNaeObawahDJu5Q_1747639980
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43eea5a5d80so22310015e9.1
-        for <netdev@vger.kernel.org>; Mon, 19 May 2025 00:33:01 -0700 (PDT)
+ us-mta-449-M1AbbX_2ODyrfmZfg-0fAQ-1; Mon, 19 May 2025 03:35:02 -0400
+X-MC-Unique: M1AbbX_2ODyrfmZfg-0fAQ-1
+X-Mimecast-MFC-AGG-ID: M1AbbX_2ODyrfmZfg-0fAQ_1747640101
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-b26fa2cac30so1245366a12.2
+        for <netdev@vger.kernel.org>; Mon, 19 May 2025 00:35:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747639979; x=1748244779;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mpbF5ydmLJC97ArKOHWf3B+/uOH4TOjBfUDJxighhMg=;
-        b=A7RrNAhDyJQ8ESxObKgVo89NjKg/KpBVb1i0mr4CQFiUSPOrqqMASMaIohkshncmtI
-         2Nb4hvmR4ZGAZuwshkbA4bYHNRYpPJ2SlbDcy+qI21o1yOWNQ1Cb48hnGgEbvFR95MHd
-         KwsRbywdz1+3qFFnJC/i9Fr6ZRPVrKynz/cJeDzVMoo00VfUzmECdAU+BukIZErh+En7
-         VR+hkIlwwtbKEcDwrjzCNNo0V5zSX+SuVng/DriMu4LYd9ZvEZuWoPFi4jXCQ2vQwAtx
-         ihIiB1YpTGQx3TX1kMAJIVne8QxyW0Lhym9c+aSz2GNrZ4N9eBCYMngD7nqP8/j5PW1W
-         DrMA==
-X-Gm-Message-State: AOJu0YzDgXExgKZ0WFPGvvD8ywwLxWTL3BZu8UdYwcutyyRx9gU392j1
-	jZTmcKMQhN/WITrKpAVbnwaq0JW8xTFSpieJNsKXkrx1yfdnv+V3TxZib0Shc59oABPnz/W0tyk
-	TcbhYLTeETPKA/qC7q5Ou+8mibq23otGiUTDweig0g5hg1OmraOHRhthGSfw5QnxfHWZF
-X-Gm-Gg: ASbGncvSimS7cWGPmkW0oozteeB/lkyHNmQbrcP+8kfvxdhKi8zuS8oL9DR3Nbst4AK
-	vlo6BBWeIXfQP0NvGMF8pK6c8lWlfS771AqsXTpYoIA56+0z5focf31wQNeNZQ98IIMCgzuDDpL
-	/t7U7JVdRvMUkROOa++UHVCZmsMvhuXJPq5feH3HYDpc4wEjHgwWc8L49wzcJRUk1jdixEqgjYE
-	zf44QIGJHhJs12rBEGF9aHxSZL0rrI7B+DwGzf3XvFAiiaS/NmcTr4qq/mKpdqKogvee2dl5pBz
-	+Qb8MNTHOR7Q/AdEiMY=
-X-Received: by 2002:a05:600c:3e84:b0:442:e9eb:1b48 with SMTP id 5b1f17b1804b1-442ff029b73mr96855775e9.24.1747639979519;
-        Mon, 19 May 2025 00:32:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGaCZYbZM8t/6WKW5V6Yyjso0NzAYq5rzjSYKf6LP3dgLjQUUu5ZcEz3TrYG1/+BWgXIUJTqw==
-X-Received: by 2002:a05:600c:3e84:b0:442:e9eb:1b48 with SMTP id 5b1f17b1804b1-442ff029b73mr96855505e9.24.1747639979159;
-        Mon, 19 May 2025 00:32:59 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:244f:5710::f39? ([2a0d:3344:244f:5710::f39])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442fd516a51sm127705335e9.24.2025.05.19.00.32.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 May 2025 00:32:58 -0700 (PDT)
-Message-ID: <6ec93824-1db7-4839-a0ba-845f4e30d883@redhat.com>
-Date: Mon, 19 May 2025 09:32:57 +0200
+        d=1e100.net; s=20230601; t=1747640101; x=1748244901;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+GWWr5RiqW6nfGpNUOrgJWmEkayVvBy0v+dsRdLauRc=;
+        b=WxxIA78GSfLgqR80pWvuArMqlPctwhzmAlIK0THW+fO8wHYhFyEXk2qNPQ0nqFRLTL
+         P0kSGscNZymTP14cx574hnETsKp5wQgxdIOx90Ibig3GHiJltBjNluFY+aeUmkQ8WgIv
+         /pKE+0xalyMg/TRhiSZ7v8YSHegDeqjyWz552P/QpDfr/1bdj2mi4MKgTNYLe725yG2e
+         nnb7Y9EWIa/UIeW/t8K+bfs2BQGXnce65aYdZ9kmX38lG/70EnnJ06LP2rLXvfyx6zZt
+         NsHUP/1sh5aaJGg0fW/L7wyrLqEGncilduEgYVQiLdDItBb6mmreHhnUBNr7ZNP9uVwB
+         Ap/g==
+X-Forwarded-Encrypted: i=1; AJvYcCWHS3r3NTIiBeAMShmmHUQ4L1RXbu7etmFi9HOnn5ucJpv+KGqNUHUuz3No1hNjMboVb297a0s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyX5toUec8g+7iZ/03fGrGm64Qw9Xcd0A+f50slipimRcHMmPL9
+	VDZ7EkQVCLzhpgaxW4eETp8djcEgV9Cz6CUuBcjPMpb1111IVGdy+YyE4NfqxuK3VL3gDsEVdr/
+	kRWwpx1efy86MI8SU6vNcz7z7eUJtnquXDONtdlc9LtINskBq9eLpVqcdBpHtrx8imVuqfdVGos
+	eeXGuFBlPBvuz2u506xXBKkI0lKd0V44YEs/onlCICMmlG2g==
+X-Gm-Gg: ASbGncseXqrvrcJwjPlXadLbD2HeLqDN3OeWBfLWhs0oTWP8tCuoK2ZxYgRLsVdeBsU
+	RcERarXk3F8Fgv4S3OiKghqSLyoQCnFGUaxkj0VdfRwTy+BYGJueDf0RkTs1AKO3c6cHIHA==
+X-Received: by 2002:a17:90b:5344:b0:30a:b93e:381b with SMTP id 98e67ed59e1d1-30e8323efb1mr16994397a91.35.1747640100986;
+        Mon, 19 May 2025 00:35:00 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHt9F94wd/fVIMSOApEGXJjgSdwwxfi3SsRD6UvHPFqL4hZL+vGud5MgtJ7RZc3Wd0IkHVmn4mfL7q3qoCrYIg=
+X-Received: by 2002:a17:90b:5344:b0:30a:b93e:381b with SMTP id
+ 98e67ed59e1d1-30e8323efb1mr16994369a91.35.1747640100521; Mon, 19 May 2025
+ 00:35:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] vmxnet3: correctly report gso type for UDP tunnels
-To: Ronak Doshi <ronak.doshi@broadcom.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Guolin Yang <guolin.yang@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, open list <linux-kernel@vger.kernel.org>
-References: <20250513210504.1866-1-ronak.doshi@broadcom.com>
- <20250515070250.7c277988@kernel.org>
- <CAP1Q3XQcPnjOYRb+G7hSDE6=GH=Yzat_oLM3PMREp-DWgfmT6w@mail.gmail.com>
- <20250515142551.1fee0440@kernel.org>
- <CAP1Q3XT-2uD87bm-Ch7Oj49=0NBba6vdcwp7dAf51FfmwJhUew@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CAP1Q3XT-2uD87bm-Ch7Oj49=0NBba6vdcwp7dAf51FfmwJhUew@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <CACGkMEte6Lobr+tFM9ZmrDWYOpMtN6Xy=rzvTy=YxSPkHaVdPA@mail.gmail.com>
+ <CACGkMEstbCKdHahYE6cXXu1kvFxiVGoBw3sr4aGs4=MiDE4azg@mail.gmail.com>
+ <20250429065044-mutt-send-email-mst@kernel.org> <CACGkMEteBReoezvqp0za98z7W3k_gHOeSpALBxRMhjvj_oXcOw@mail.gmail.com>
+ <20250430052424-mutt-send-email-mst@kernel.org> <CACGkMEub28qBCe4Mw13Q5r-VX4771tBZ1zG=YVuty0VBi2UeWg@mail.gmail.com>
+ <20250513030744-mutt-send-email-mst@kernel.org> <CACGkMEtm75uu0SyEdhRjUGfbhGF4o=X1VT7t7_SK+uge=CzkFQ@mail.gmail.com>
+ <20250515021319-mutt-send-email-mst@kernel.org> <CACGkMEvQaUtpsaWYkU6SC=i1tXVbupNrAVPBsXm3eMfAJHzC=Q@mail.gmail.com>
+ <20250516063659-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20250516063659-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 19 May 2025 15:34:46 +0800
+X-Gm-Features: AX0GCFvjL12yu5vbZKoZG0F8FRp_SpNIY-NCfrlEoz_AECElKDPTfAB5-YtQhxY
+Message-ID: <CACGkMEscvjHyrWy1PgMOwz8Ys7s2ReX_xiu65WvLyShPubZvVQ@mail.gmail.com>
+Subject: Re: [PATCH v9 4/4] vhost: Add a KConfig knob to enable IOCTL VHOST_FORK_FROM_OWNER
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Cindy Lu <lulu@redhat.com>, michael.christie@oracle.com, sgarzare@redhat.com, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 5/16/25 1:38 AM, Ronak Doshi wrote:
-> On Thu, May 15, 2025 at 2:25 PM Jakub Kicinski <kuba@kernel.org> wrote:
->>
->> Not sure if the stack itself cares, but drivers look at those
->> fields for TSO. I see a call to skb_inner_transport_offset()
->> in vmxnet3_parse_hdr(). One thing to try would be to configure
->> the machine for forwarding so that the packet comes via LRO
->> and leaves via TSO.
-> 
-> I see. Yes, drivers do check for it. Sure, let me update the patch to not set
-> encapsulation.
+On Fri, May 16, 2025 at 6:39=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
+>
+> On Fri, May 16, 2025 at 09:31:42AM +0800, Jason Wang wrote:
+> > On Thu, May 15, 2025 at 2:14=E2=80=AFPM Michael S. Tsirkin <mst@redhat.=
+com> wrote:
+> > >
+> > > On Wed, May 14, 2025 at 10:52:58AM +0800, Jason Wang wrote:
+> > > > On Tue, May 13, 2025 at 3:09=E2=80=AFPM Michael S. Tsirkin <mst@red=
+hat.com> wrote:
+> > > > >
+> > > > > On Tue, May 13, 2025 at 12:08:51PM +0800, Jason Wang wrote:
+> > > > > > On Wed, Apr 30, 2025 at 5:27=E2=80=AFPM Michael S. Tsirkin <mst=
+@redhat.com> wrote:
+> > > > > > >
+> > > > > > > On Wed, Apr 30, 2025 at 11:34:49AM +0800, Jason Wang wrote:
+> > > > > > > > On Tue, Apr 29, 2025 at 6:56=E2=80=AFPM Michael S. Tsirkin =
+<mst@redhat.com> wrote:
+> > > > > > > > >
+> > > > > > > > > On Tue, Apr 29, 2025 at 11:39:37AM +0800, Jason Wang wrot=
+e:
+> > > > > > > > > > On Mon, Apr 21, 2025 at 11:46=E2=80=AFAM Jason Wang <ja=
+sowang@redhat.com> wrote:
+> > > > > > > > > > >
+> > > > > > > > > > > On Mon, Apr 21, 2025 at 11:45=E2=80=AFAM Jason Wang <=
+jasowang@redhat.com> wrote:
+> > > > > > > > > > > >
+> > > > > > > > > > > > On Mon, Apr 21, 2025 at 10:45=E2=80=AFAM Cindy Lu <=
+lulu@redhat.com> wrote:
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > Introduce a new config knob `CONFIG_VHOST_ENABLE_=
+FORK_OWNER_IOCTL`,
+> > > > > > > > > > > > > to control the availability of the `VHOST_FORK_FR=
+OM_OWNER` ioctl.
+> > > > > > > > > > > > > When CONFIG_VHOST_ENABLE_FORK_OWNER_IOCTL is set =
+to n, the ioctl
+> > > > > > > > > > > > > is disabled, and any attempt to use it will resul=
+t in failure.
+> > > > > > > > > > > >
+> > > > > > > > > > > > I think we need to describe why the default value w=
+as chosen to be false.
+> > > > > > > > > > > >
+> > > > > > > > > > > > What's more, should we document the implications he=
+re?
+> > > > > > > > > > > >
+> > > > > > > > > > > > inherit_owner was set to false: this means "legacy"=
+ userspace may
+> > > > > > > > > > >
+> > > > > > > > > > > I meant "true" actually.
+> > > > > > > > > >
+> > > > > > > > > > MIchael, I'd expect inherit_owner to be false. Otherwis=
+e legacy
+> > > > > > > > > > applications need to be modified in order to get the be=
+haviour
+> > > > > > > > > > recovered which is an impossible taks.
+> > > > > > > > > >
+> > > > > > > > > > Any idea on this?
+> > > > > > > > > >
+> > > > > > > > > > Thanks
+> > > > > > >
+> > > > > > > So, let's say we had a modparam? Enough for this customer?
+> > > > > > > WDYT?
+> > > > > >
+> > > > > > Just to make sure I understand the proposal.
+> > > > > >
+> > > > > > Did you mean a module parameter like "inherit_owner_by_default"=
+? I
+> > > > > > think it would be fine if we make it false by default.
+> > > > > >
+> > > > > > Thanks
+> > > > >
+> > > > > I think we should keep it true by default, changing the default
+> > > > > risks regressing what we already fixes.
+> > > >
+> > > > I think it's not a regression since it comes since the day vhost is
+> > > > introduced. To my understanding the real regression is the user spa=
+ce
+> > > > noticeable behaviour changes introduced by vhost thread.
+> > > >
+> > > > > The specific customer can
+> > > > > flip the modparam and be happy.
+> > > >
+> > > > If you stick to the false as default, I'm fine.
+> > > >
+> > > > Thanks
+> > >
+> > > That would be yet another behaviour change.
+> >
+> > Back to the original behaviour.
+>
+> yes but the original was also a bugfix.
+>
+> > > I think one was enough, don't you think?
+> >
+> > I think such kind of change is unavoidable if we want to fix the
+> > usersapce behaviour change.
+> >
+> > Thanks
+>
+> I feel it is too late to "fix". the new behaviour is generally ok, and I
+> feel the right thing so to give management control knobs do pick the
+> desired behaviour.
+> And really modparam is wrong here because different userspace
+> can have different requirements, and in ~10 years I want to see us
+> disable the legacy behaviour altogether.
+> But given your time constraints, a modparam knob as a quick workaround
+> for the specific customer is kind of not very terrible.
+>
 
-AFAICS, not setting skb->encapsulation, but still building a GSO packet
-would still break the s/w segmentation in the scenario described by my
-previous email.
+Ok, that makes sense.
 
-/P
+Thanks
 
 
