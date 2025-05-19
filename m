@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-191428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D819ABB782
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 10:41:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EF1B5ABB785
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 10:42:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84CCC189C92D
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 08:39:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59E9E18846EC
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 08:40:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BADA527511E;
-	Mon, 19 May 2025 08:33:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1A96276034;
+	Mon, 19 May 2025 08:33:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="uYH33D9d";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="rxKLUGFY"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="kdUe7wne";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ft1ugcU/"
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0669E2741D0;
-	Mon, 19 May 2025 08:33:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DB7D275111;
+	Mon, 19 May 2025 08:33:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747643625; cv=none; b=CqTXxjnkR7nCVPYUsdEDWG6Lwjth+lTmeSGm7fvwAcdh9HutaV1yzegdH6OCEF6QOddM53xWdkIvWEd5aussW8Rmhnu8PMtCbe2v7RUmbZGi+FFvNqtcRdITAf5QoN4cys/ABGZn8lGx5VEgqSUhE+xMEma9zg+dEOaa3V+Ox/A=
+	t=1747643626; cv=none; b=qjyqWmt0jU5XF1UF43927GAo0u5rmidTdY6XO6sjCqtC/iN63X+HAcpg/dazjsKCgQ32Dvk2oXCBcE2GMLKu52YrF9dLP7Wm61ALBCxUqE4lXD6wWC/+bFQLLVNIQUSBGpg8BrjoQTaqmUw8NfuuXyMFA6Z+dyqCyyJlyCbANQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747643625; c=relaxed/simple;
-	bh=GRP0gjAGrn/citbYtuiPWdcwsdlss+TGtUZ0SDP84BM=;
+	s=arc-20240116; t=1747643626; c=relaxed/simple;
+	bh=/yvQ5d85ORUDtBs4xTz9aRwb5nKG4+IlF2ndIStdpeM=;
 	h=Message-ID:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Date; b=JMtZvYTb4nvOKsW3q7OT/nA7cNQbpUNFbR5nCxcfnpTKcsssgNwPGfevZ4LbXQM9Jhgm9W8VJDMblChoSembcFBkWSQC+0+zW5tJxuiRMJB6W/Vv/DLiIv6GDuPyyUkllnZlgRWH+KyWv9gnAwRsYom4xDn0AiWgNo3DDcX/O5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=uYH33D9d; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=rxKLUGFY; arc=none smtp.client-ip=193.142.43.55
+	 Content-Type:Date; b=HdWDAWcdp4yQiHo6oG8kWO9e/Wz8NiH0WsFtjYFnuppgtnIkQL11O5BFLTho8IjeUow5M7NVAMe8yfRa4GUJRGVgcmJ2Ik+SrdKVyTR0BgXXqFpDdk/D0ckrU+UdBtgpKgR5N8pw8BqnTL2fjbr21rzOzE3oi2+Lit6jHcQzRQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=kdUe7wne; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ft1ugcU/; arc=none smtp.client-ip=193.142.43.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Message-ID: <20250519083027.023158795@linutronix.de>
+Message-ID: <20250519083027.084196985@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1747643622;
+	s=2020; t=1747643623;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 references:references; bh=QHFCCWtgxJo9J0DtoRfT+72OmxVX42D6q0paXfZdXuM=;
-	b=uYH33D9daUwl2TGXRYuCv9UO6a8r5qge1T7r5kOXptL/hiIPfeE/m+gklzEq+ii8SIwDcp
-	DUIY+InFOiuQV7cIXjIQsgotKEV0MShNAPyfPZRmqvYg+jfZRSTSqgtD/PhhKsFgReuyiA
-	IN6q8DhLFmBtfWUc2bWNmarVKh9TxIGN/laKnEZYZpVZc7XBnM7CEn6upewf7NZMUHEESD
-	CcjHfAkrjCgnD8K0oMK0eAVdJDDaLReWrgXzsqUOGMG7uP3ZT4RtF4rno5ZvK3nY1IwQEX
-	nasM9rOHUGaxS0Y+pqOZF1dJcLDgFP/PcVGIhwMtDGyCru7sLDEwjMb8iQ6CuA==
+	 references:references; bh=xOJpwZxqnxHnJfwGF114Z3PUlwN9EdN52IlzQAPgVbw=;
+	b=kdUe7wnevZ4tF5B8BACtqXOdd6UtmQ8bt5lYryDyBJQa8iWxIg6CvbYpIC++PHoX5KxFYb
+	tID5a0GqNOoHrylyIFCL3h7i49vwT++qQaTxCXExluzzCkT/nQt03j0GH6U7NSUbHOL/Jp
+	uhwjKQyv67hRXub0KDuUKzFCKxHLB2Dd/X1xH5haacHthw0FqQPCdqyjUfr6NXo9dn/zBm
+	k3x+fbDfBIeS40cB5yb79s3QQiZEpbBcGpQFgCM93Gz5FqXlVeDzivq64Dln5z5F626gLY
+	7OS/YhwgDcYSSizMmWeWbWJc+vbRCxeCqg7S+C5uOjfEeG+KCQSRpx+1IV1KpA==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1747643622;
+	s=2020e; t=1747643623;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 references:references; bh=QHFCCWtgxJo9J0DtoRfT+72OmxVX42D6q0paXfZdXuM=;
-	b=rxKLUGFYd7nDDOrLYUzoC4+xAqIgZlJ6OpHemWQiZ1zoc3x0RVwgAeKElRBjDAVG0mz50t
-	Rju/Cq2aBs/aOdAA==
+	 references:references; bh=xOJpwZxqnxHnJfwGF114Z3PUlwN9EdN52IlzQAPgVbw=;
+	b=ft1ugcU/HXbaxmcG2/oXcrJ21nP3iERg88KQ741ZRKEnJHvzbVQP35sMhsz7d+l4pW3tnb
+	cWb4JRdHvuQE0rBQ==
 From: Thomas Gleixner <tglx@linutronix.de>
 To: LKML <linux-kernel@vger.kernel.org>
 Cc: netdev@vger.kernel.org,
@@ -66,8 +66,7 @@ Cc: netdev@vger.kernel.org,
  Kurt Kanzenbach <kurt@linutronix.de>,
  Nam Cao <namcao@linutronix.de>,
  Antoine Tenart <atenart@kernel.org>
-Subject: [patch V2 23/26] timekeeping: Prepare do_adtimex() for auxiliary
- clocks
+Subject: [patch V2 24/26] timekeeping: Provide adjtimex() for auxiliary clocks
 References: <20250519082042.742926976@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,92 +75,52 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Date: Mon, 19 May 2025 10:33:42 +0200 (CEST)
+Date: Mon, 19 May 2025 10:33:43 +0200 (CEST)
 
-Exclude ADJ_TAI, leap seconds and PPS functionality as they make no sense
-in the context of auxiliary clocks and provide a time stamp based on the
-actual clock.
+The behaviour is close to clock_adtime(CLOCK_REALTIME) with the
+following differences:
+
+  1) ADJ_SETOFFSET adjusts the auxiliary clock offset
+  
+  2) ADJ_TAI is not supported
+
+  3) Leap seconds are not supported
+
+  4) PPS is not supported
 
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 ---
- kernel/time/timekeeping.c |   39 ++++++++++++++++++++++++++++++++++++---
- 1 file changed, 36 insertions(+), 3 deletions(-)
+ kernel/time/timekeeping.c |   16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 ---
 --- a/kernel/time/timekeeping.c
 +++ b/kernel/time/timekeeping.c
-@@ -58,6 +58,17 @@ static struct tk_data timekeeper_data[TI
- /* The core timekeeper */
- #define tk_core		(timekeeper_data[TIMEKEEPER_CORE])
- 
-+#ifdef CONFIG_POSIX_AUX_CLOCKS
-+static inline bool tk_get_aux_ts64(unsigned int tkid, struct timespec64 *ts)
-+{
-+	return ktime_get_aux_ts64(CLOCK_AUX + tkid - TIMEKEEPER_AUX, ts);
-+}
-+#else
-+static inline bool tk_get_aux_ts64(unsigned int tkid, struct timespec64 *ts)
-+{
-+	return false;
-+}
-+#endif
- 
- /* flag for if timekeeping is suspended */
- int __read_mostly timekeeping_suspended;
-@@ -2503,7 +2514,7 @@ ktime_t ktime_get_update_offsets_now(uns
- /*
-  * timekeeping_validate_timex - Ensures the timex is ok for use in do_adjtimex
-  */
--static int timekeeping_validate_timex(const struct __kernel_timex *txc)
-+static int timekeeping_validate_timex(const struct __kernel_timex *txc, bool aux_clock)
- {
- 	if (txc->modes & ADJ_ADJTIME) {
- 		/* singleshot must not be used with any other mode bits */
-@@ -2562,6 +2573,21 @@ static int timekeeping_validate_timex(co
- 			return -EINVAL;
- 	}
- 
-+	if (!aux_clock)
-+		return 0;
-+
-+	/* Auxiliary clocks are similar to TAI and do not have leap seconds */
-+	if (txc->status & (STA_INS | STA_DEL))
-+		return -EINVAL;
-+
-+	/* No TAI offset setting */
-+	if (txc->modes & ADJ_TAI)
-+		return -EINVAL;
-+
-+	/* No PPS support either */
-+	if (txc->status & (STA_PPSFREQ | STA_PPSTIME))
-+		return -EINVAL;
-+
+@@ -2860,10 +2860,26 @@ static int aux_clock_set(const clockid_t
  	return 0;
  }
  
-@@ -2592,15 +2618,22 @@ static int __do_adjtimex(struct tk_data
- 	struct timekeeper *tks = &tkd->shadow_timekeeper;
- 	struct timespec64 ts;
- 	s32 orig_tai, tai;
-+	bool aux_clock;
- 	int ret;
- 
-+	aux_clock = IS_ENABLED(CONFIG_POSIX_AUX_CLOCKS) && tkd->timekeeper.id != TIMEKEEPER_CORE;
++static int aux_clock_adj(const clockid_t id, struct __kernel_timex *txc)
++{
++	struct tk_data *tkd = aux_get_tk_data(id);
++	struct adjtimex_result result = { };
 +
- 	/* Validate the data before disabling interrupts */
--	ret = timekeeping_validate_timex(txc);
-+	ret = timekeeping_validate_timex(txc, aux_clock);
- 	if (ret)
- 		return ret;
- 	add_device_randomness(txc, sizeof(*txc));
- 
--	ktime_get_real_ts64(&ts);
-+	if (!aux_clock)
-+		ktime_get_real_ts64(&ts);
-+	else
-+		tk_get_aux_ts64(tkd->timekeeper.id, &ts);
++	if (!tkd)
++		return -ENODEV;
 +
- 	add_device_randomness(&ts, sizeof(ts));
++	/*
++	 * @result is ignored for now as there are neither hrtimers nor a
++	 * RTC related to auxiliary clocks for now.
++	 */
++	return __do_adjtimex(tkd, txc, &result);
++}
++
+ const struct k_clock clock_aux = {
+ 	.clock_getres		= aux_get_res,
+ 	.clock_get_timespec	= aux_get_timespec,
+ 	.clock_set		= aux_clock_set,
++	.clock_adj		= aux_clock_adj,
+ };
  
- 	guard(raw_spinlock_irqsave)(&tkd->lock);
+ static __init void tk_aux_setup(void)
 
 
