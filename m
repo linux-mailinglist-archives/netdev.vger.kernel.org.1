@@ -1,187 +1,100 @@
-Return-Path: <netdev+bounces-191581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07B1CABC4C8
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 18:40:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3E57ABC4E6
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 18:50:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A3C9189F80A
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 16:40:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E4783AE447
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 16:50:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AD1B284B42;
-	Mon, 19 May 2025 16:40:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SCNnrMTO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79AF328641D;
+	Mon, 19 May 2025 16:50:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from leonov.paulk.fr (leonov.paulk.fr [185.233.101.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 321A4189906;
-	Mon, 19 May 2025 16:40:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9091E573F;
+	Mon, 19 May 2025 16:50:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.233.101.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747672826; cv=none; b=Yz+ynMl//dB92YVpIxaMICk2dr9kH39oHKMiA807ze/+G55mL3uA+a15zXZOZMuIKDGcdUFwQathcqvxOkVJeDPDalSC98bLwuDoC0XvnwlKtLDiXq/weiYw6XTdUQSVOZTpTiCZt1YT5IGEtOgXXNJDrXzdwQK01l9mxxpy5uQ=
+	t=1747673439; cv=none; b=bRVE3oB1LE/78RrrqGGq51P0mSnX1rfLDBQvVLho7gDll/QEQr1xCDBDbEs5PIzCqoG5AE5Oqhu61KtnPCNXUgHltPnPne2AYQEommlhqKFZKTHFrYrdZpXnrVW4ZNGO+ODmNBg8Z3hXuZpuvkjLJjx8eNULE7LoBBp278Tt0iM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747672826; c=relaxed/simple;
-	bh=8AekMnk7LJZuUtqQ1X0wseXmvLHDUBX7h+wM+z7I/ww=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dj4Wb3Zig6JgUqcUCK16FpotF1FfTrhJkVsU4IWb9KnA0JYbP/K0xpSGdXTButMUwop+EaarK3OOwhZlPhpoW9BhpfVpoznPwLh+MvxZlvnwEdIR25+4i/QJHrZoDrCR10qOK71/vFSeDOpztAoDjEOUjUmtMEDgEYtZSkdeLEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SCNnrMTO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9354BC4CEE4;
-	Mon, 19 May 2025 16:40:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747672825;
-	bh=8AekMnk7LJZuUtqQ1X0wseXmvLHDUBX7h+wM+z7I/ww=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SCNnrMTOytetYBMrRAwp1W0dzqcMOnVDJ1J2TaqS1eTxFEMoUWCMFlYu7VgKjQWqr
-	 t1kqRsaYadf6EaoZq+UF2KwCuhAmcj3tdwk3qi7aV70zYrIXSfZX3s9rPFffWLQcIR
-	 9n+M8Bn3W+Wm70mH//h3UqRlaxqsXbDf2e3qIVCa8l031H1iST9bxPMyMObW+CUjrO
-	 MDriWmWr0Z9+sQ1niXPjBx/fwpPbDoA508vyKK2YRd3JhkxksDXXko2Q57rtKzBcRe
-	 035934n5qtj+C/0H1v/iJqTVwib7zy+0owU9tyvR27vEtWd8k2foPf2zETy0LB7mk6
-	 LoGj7Lli8jq5w==
-Date: Mon, 19 May 2025 17:40:21 +0100
-From: Simon Horman <horms@kernel.org>
-To: Stefano Radaelli <stefano.radaelli21@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1747673439; c=relaxed/simple;
+	bh=DhnCSKYnCcHJP7adP7B7aiXP352DFFSnM0q4AZoM1Bg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rlP7kL54GUAiy+FAo1WFFqTKK+Eqev612tSlh7B3FRsQ/rmxCUgxRR3EhKCbC7xiGDOsMgpLpbC2pmkSaKtgWcfMRSh/1Gnv1obwOFk2Jodjn7wQLk+LB2xhYfV5EgBvDGNSu6i6mmycR0nXhpRysWaKJ1RMlcJq0rYWI1z7cyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sys-base.io; spf=pass smtp.mailfrom=sys-base.io; arc=none smtp.client-ip=185.233.101.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sys-base.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sys-base.io
+Received: from laika.paulk.fr (12.234.24.109.rev.sfr.net [109.24.234.12])
+	by leonov.paulk.fr (Postfix) with ESMTPS id CB8071F00050;
+	Mon, 19 May 2025 16:50:32 +0000 (UTC)
+Received: by laika.paulk.fr (Postfix, from userid 65534)
+	id 495AFAC2ABA; Mon, 19 May 2025 16:50:31 +0000 (UTC)
+X-Spam-Level: *
+Received: from localhost.localdomain (unknown [192.168.1.64])
+	by laika.paulk.fr (Postfix) with ESMTP id 4EB52AC2ABA;
+	Mon, 19 May 2025 16:49:43 +0000 (UTC)
+From: Paul Kocialkowski <paulk@sys-base.io>
+To: netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-sunxi@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Xu Liang <lxu@maxlinear.com>
-Subject: Re: [PATCH net-next v2] net: phy: add driver for MaxLinear MxL86110
- PHY
-Message-ID: <20250519164021.GL365796@horms.kernel.org>
-References: <20250516164126.234883-1-stefano.radaelli21@gmail.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Corentin Labbe <clabbe.montjoie@gmail.com>,
+	Paul Kocialkowski <paulk@sys-base.io>
+Subject: [PATCH] net: dwmac-sun8i: Use parsed internal PHY address instead of 1
+Date: Mon, 19 May 2025 18:49:36 +0200
+Message-ID: <20250519164936.4172658-1-paulk@sys-base.io>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250516164126.234883-1-stefano.radaelli21@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, May 16, 2025 at 06:41:23PM +0200, Stefano Radaelli wrote:
-> Add support for the MaxLinear MxL86110 Gigabit Ethernet PHY, a low-power,
-> cost-optimized transceiver supporting 10/100/1000 Mbps over twisted-pair
-> copper, compliant with IEEE 802.3.
-> 
-> The driver implements basic features such as:
-> - Device initialization
-> - RGMII interface timing configuration
-> - Wake-on-LAN support
-> - LED initialization and control via /sys/class/leds
-> 
-> This driver has been tested on multiple Variscite boards, including:
-> - VAR-SOM-MX93 (i.MX93)
-> - VAR-SOM-MX8M-PLUS (i.MX8MP)
-> 
-> Example boot log showing driver probe:
-> [    7.692101] imx-dwmac 428a0000.ethernet eth0:
->         PHY [stmmac-0:00] driver [MXL86110 Gigabit Ethernet] (irq=POLL)
-> 
-> Changes from v1:
-> - Add net-next support
-> - Improved locking management and tests using CONFIG_PROVE_LOCKING
-> - General cleanup
-> 
-> Started a new thread
-> 
-> Signed-off-by: Stefano Radaelli <stefano.radaelli21@gmail.com>
+While the MDIO address of the internal PHY on Allwinner sun8i chips is
+generally 1, of_mdio_parse_addr is used to cleanly parse the address
+from the device-tree instead of hardcoding it.
 
-Hi Stefano,
+A commit reworking the code ditched the parsed value and hardcoded the
+value 1 instead, which didn't really break anything but is more fragile
+and not future-proof.
 
-Some minor feedback from my side.
+Restore the initial behavior using the parsed address returned from the
+helper.
 
-...
+Fixes: 634db83b8265 ("net: stmmac: dwmac-sun8i: Handle integrated/external MDIOs")
+Signed-off-by: Paul Kocialkowski <paulk@sys-base.io>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> diff --git a/drivers/net/phy/mxl-86110.c b/drivers/net/phy/mxl-86110.c
-> new file mode 100644
-> index 000000000000..63f32c49fcc1
-> --- /dev/null
-> +++ b/drivers/net/phy/mxl-86110.c
-> @@ -0,0 +1,570 @@
-> +// SPDX-License-Identifier: GPL-2.0+
-> +/*
-> + * PHY driver for Maxlinear MXL86110
-> + *
-> + * Copyright 2023 MaxLinear Inc.
-> + *
-> + */
-> +
-> +#include <linux/bitfield.h>
-> +#include <linux/etherdevice.h>
-> +#include <linux/kernel.h>
-> +#include <linux/module.h>
-> +#include <linux/of.h>
-> +#include <linux/phy.h>
-> +
-> +/* PHY ID */
-> +#define PHY_ID_MXL86110		0xc1335580
-> +
-> +/* required to access extended registers */
-> +#define MXL86110_EXTD_REG_ADDR_OFFSET	0x1E
-> +#define MXL86110_EXTD_REG_ADDR_DATA		0x1F
-> +#define PHY_IRQ_ENABLE_REG				0x12
-> +#define PHY_IRQ_ENABLE_REG_WOL			BIT(6)
-> +
-> +/* SyncE Configuration Register - COM_EXT SYNCE_CFG */
-> +#define MXL86110_EXT_SYNCE_CFG_REG						0xA012
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+index 85723a78793a..6c7e8655a7eb 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+@@ -964,7 +964,7 @@ static int sun8i_dwmac_set_syscon(struct device *dev,
+ 		/* of_mdio_parse_addr returns a valid (0 ~ 31) PHY
+ 		 * address. No need to mask it again.
+ 		 */
+-		reg |= 1 << H3_EPHY_ADDR_SHIFT;
++		reg |= ret << H3_EPHY_ADDR_SHIFT;
+ 	} else {
+ 		/* For SoCs without internal PHY the PHY selection bit should be
+ 		 * set to 0 (external PHY).
+-- 
+2.49.0
 
-For Networking code, please restrict lines to no more than 80 columns
-wide where you can do so without reducing readability (I'd say that is the
-case here.
-
-Likewise elsewhere in this patch.
-
-checkpatch.pl --max-line-length=80 can be helpful here.
-
-...
-
-> +/**
-> + * mxl86110_write_extended_reg() - write to a PHY's extended register
-> + * @phydev: pointer to a &struct phy_device
-> + * @regnum: register number to write
-> + * @val: value to write to @regnum
-> + *
-> + * NOTE: This function assumes the caller already holds the MDIO bus lock
-> + * or otherwise has exclusive access to the PHY.
-> + *
-> + * returns 0 or negative error code
-> + */
-
-Tooling expects 'Return:' or 'Returns: ' to document return values.
-
-Likewise elsewhere in this patch.
-
-Flagged by ./scripts/kernel-doc -Wall -none
-
-...
-
-> +static int mxl86110_led_hw_control_get(struct phy_device *phydev, u8 index,
-> +				       unsigned long *rules)
-> +{
-> +	u16 val;
-> +
-> +	if (index >= MXL86110_MAX_LEDS)
-> +		return -EINVAL;
-> +
-> +	phy_lock_mdio_bus(phydev);
-> +	val = mxl86110_read_extended_reg(phydev, MXL86110_LED0_CFG_REG + index);
-> +	phy_unlock_mdio_bus(phydev);
-> +	if (val < 0)
-> +		return val;
-
-val is unsigned. It cannot be less than zero.
-
-Likewise in mxl86110_broadcast_cfg() and mxl86110_enable_led_activity_blink().
-
-Flagged by Smatch.
-
-...
 
