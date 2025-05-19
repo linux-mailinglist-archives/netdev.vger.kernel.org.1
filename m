@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-191518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8F05ABBC01
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 13:09:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45A8EABBC15
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 13:11:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 828A43A6F29
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 11:08:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EDA307AD13D
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 11:10:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 901D52586CA;
-	Mon, 19 May 2025 11:08:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64DEF27466A;
+	Mon, 19 May 2025 11:11:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Pcv/Hyab"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n7UIph1Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B7635961
-	for <netdev@vger.kernel.org>; Mon, 19 May 2025 11:08:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA83D274650
+	for <netdev@vger.kernel.org>; Mon, 19 May 2025 11:11:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747652938; cv=none; b=AMfiRYM6MIv5pBFr9bDTXe8JOW5bbfEnnRRrshpG8xUPCQ6LE0NYHFMc4PlODQcEBqw2xruxcp0jx6EUibiFtE9/rBij5V8rQ9rdBjucbHu8mo6ayPR9se8S12TPBfl20IKzrSp96k0c7NccoRhmVzIScXS/WFfcvjFyJDfxIoQ=
+	t=1747653068; cv=none; b=XovdeFCyveROZkTqdKaL6M0hsh27f+h1mR7jMz7qTL/l19+ieSwba/YNw7pN9PFBuE1aNTm9Uzxf6oZWWKmf8HvwcT+8bL8NndQggAtNlqtZ5tF7Q1JkN4h7UpH/eosJbI0ETTVXmZ3JMZqXxrBnRzl37weD/6IWp8ida99IGzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747652938; c=relaxed/simple;
-	bh=J7zRdUs2zjeswu6c1Gotaem54BW+/7Zj+WhK0PNZnHc=;
+	s=arc-20240116; t=1747653068; c=relaxed/simple;
+	bh=wDy9U9xfDCcQpqqxYgT4nsDbQCpuav+UsE+22IXvpTI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YBQ95UVmFIuW/xVC/7dzfFsptUjLaZijEkMIpASq1qY5fjAnFA5KtQF16axCZVOboJRedi+LlLQEHbywY1C6km7LtcqldcZdPFKCEmL5kUs7XzSy5h19Ssqp1u6V0Sq3q07W42OS83qXnvOivR7NfCppXDmHYzDPshoh38FZaxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Pcv/Hyab; arc=none smtp.client-ip=192.198.163.8
+	 In-Reply-To:Content-Type; b=V6NxSVNsIMccSZcAxWTIC5Fm+X3lWVksiuE2x7tk6nJw2kqbXs4xJpQ+ohbjlMyK0hfmOU9d05uYcAAGzF+L7LSykAdCzmydn4l744E83MGewxPsD+72iA8fxJ0uqtEMG1m00KLoU3lBl+lahiGwDWtll0PNpl3H05pwXZZESqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n7UIph1Y; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747652937; x=1779188937;
+  t=1747653067; x=1779189067;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=J7zRdUs2zjeswu6c1Gotaem54BW+/7Zj+WhK0PNZnHc=;
-  b=Pcv/Hyabqx0+S6NyzL2q6RfiFs+HO+tJG4Idhu9RzvwbBfdjiSRzjR2Y
-   /jJqonwCOrrH5Ac8ZWx6LaUN1ufrZhlycGzfjVk8Kb0IYImBFddYe533y
-   wVD9G+iJnUAoNAWBBIMC/gCp3O3jvJkGpSRfe4vt8BuHeD/UQ5V2nVV5O
-   B9G71zQfZ58lMysXO6pMrgNfYBY4XCh46+Wdn4ftXU5mvVVSL/1RfZy05
-   606yX9dn4zavIABeB8/sQv8hzke/qzz5ZWtwOckt+0N+DT6qfxVldDg+Q
-   LqYyg0UM0PAaa0Sp+abiJ8v5XwON3wBgVF5Xn4FO07yrTRSp2FIICbOPE
-   A==;
-X-CSE-ConnectionGUID: u+ofP02SSf2Z5ddWOhTN9g==
-X-CSE-MsgGUID: yCJKx2qLQsGNoU8JOi4lnQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11437"; a="67103226"
+  bh=wDy9U9xfDCcQpqqxYgT4nsDbQCpuav+UsE+22IXvpTI=;
+  b=n7UIph1Yqibl23a7yMNKliLDdHt+ywf9ai54+VWvQPmdsWnGaURuyHhN
+   IQIw7lQysntTX7B+GRs1zURdFNF5p4DIbQWQD2toBgAnHhS0t5qqf15Gy
+   2zkawXn0fAl/ygjlKcYW1LQlgFvzTGwRSaPUHXkY+wIriXxLruL2M6OIH
+   O1mmbDf3RjKCr+HjKMl1OpQp2CD5K8VNetZUu+eRqEprwXllEEyF8nH8C
+   u0kyJ+zdWBo+EtbiBm1ojm4Hi/7/tB6JQlaD2r7gzQLfy3saprPhTP1Cp
+   tLWl1u9RCX+Sd4KTx86lEztxO2BRaddCjaJb+Mc4mJJ/+wzrz519GvDlx
+   g==;
+X-CSE-ConnectionGUID: JIFmy0wdQb2AcL/mEzpyGA==
+X-CSE-MsgGUID: 0EpGkMl5R0OzMvt5MSzHWA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11437"; a="53221111"
 X-IronPort-AV: E=Sophos;i="6.15,300,1739865600"; 
-   d="scan'208";a="67103226"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2025 04:08:55 -0700
-X-CSE-ConnectionGUID: yJbzfspgTda+j3B6x+wz5A==
-X-CSE-MsgGUID: ivLU9qppST2LIllAmGNA6Q==
+   d="scan'208";a="53221111"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2025 04:11:07 -0700
+X-CSE-ConnectionGUID: lUC/xHwRRDuxiTu+YoKz+g==
+X-CSE-MsgGUID: 0VcRx902RNS5Z3vukCq1tg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,300,1739865600"; 
-   d="scan'208";a="139832474"
+   d="scan'208";a="139855703"
 Received: from cwachsma-mobl.ger.corp.intel.com (HELO [10.245.252.240]) ([10.245.252.240])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2025 04:08:52 -0700
-Message-ID: <870e9fd3-0b09-4da7-97fe-cca386fa2ca2@linux.intel.com>
-Date: Mon, 19 May 2025 13:08:49 +0200
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2025 04:11:05 -0700
+Message-ID: <46e45673-66fa-4942-a733-fdcbc95b5ee1@linux.intel.com>
+Date: Mon, 19 May 2025 13:11:02 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,57 +68,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [Intel-wired-lan] [PATCH iwl-next] ice: add E835 device IDs
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org, Konrad Knitter <konrad.knitter@intel.com>
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ Konrad Knitter <konrad.knitter@intel.com>
 References: <20250514104632.331559-1-dawid.osuchowski@linux.intel.com>
- <31f29ba7-7731-487c-9738-1beab56b727f@intel.com>
+ <8c8999a7-d586-4bc6-9912-b088d9c3049f@molgen.mpg.de>
 Content-Language: pl, en-US
 From: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-In-Reply-To: <31f29ba7-7731-487c-9738-1beab56b727f@intel.com>
+In-Reply-To: <8c8999a7-d586-4bc6-9912-b088d9c3049f@molgen.mpg.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 2025-05-16 7:30 PM, Tony Nguyen wrote:
-> On 5/14/2025 3:46 AM, Dawid Osuchowski wrote:
->> diff --git a/drivers/net/ethernet/intel/ice/ice_devids.h b/drivers/ 
->> net/ethernet/intel/ice/ice_devids.h
->> index 34fd604132f5..7761c3501174 100644
->> --- a/drivers/net/ethernet/intel/ice/ice_devids.h
->> +++ b/drivers/net/ethernet/intel/ice/ice_devids.h
->> @@ -36,6 +36,24 @@
->>   #define ICE_DEV_ID_E830_XXV_QSFP    0x12DD
->>   /* Intel(R) Ethernet Controller E830-XXV for SFP */
->>   #define ICE_DEV_ID_E830_XXV_SFP        0x12DE
->> +/* Intel(R) Ethernet Controller E835-CC for backplane */
->> +#define ICE_DEV_ID_E835CC_BACKPLANE    0x1248
->> +/* Intel(R) Ethernet Controller E835-CC for QSFP */
->> +#define ICE_DEV_ID_E835CC_QSFP56    0x1249
->> +/* Intel(R) Ethernet Controller E835-CC for SFP */
->> +#define ICE_DEV_ID_E835CC_SFP        0x124A
->> +/* Intel(R) Ethernet Controller E835-C for backplane */
->> +#define ICE_DEV_ID_E835C_BACKPLANE    0x1261
->> +/* Intel(R) Ethernet Controller E835-C for QSFP */
->> +#define ICE_DEV_ID_E835C_QSFP        0x1262
->> +/* Intel(R) Ethernet Controller E835-C for SFP */
->> +#define ICE_DEV_ID_E835C_SFP        0x1263
->> +/* Intel(R) Ethernet Controller E835-L for backplane */
->> +#define ICE_DEV_ID_E835_L_BACKPLANE    0x1265
->> +/* Intel(R) Ethernet Controller E835-L for QSFP */
->> +#define ICE_DEV_ID_E835_L_QSFP        0x1266
->> +/* Intel(R) Ethernet Controller E835-L for SFP */
->> +#define ICE_DEV_ID_E835_L_SFP        0x1267
->>   /* Intel(R) Ethernet Controller E810-C for backplane */
->>   #define ICE_DEV_ID_E810C_BACKPLANE    0x1591
+On 2025-05-16 10:57 PM, Paul Menzel wrote:
+> Am 14.05.25 um 12:46 schrieb Dawid Osuchowski:
+>> E835 is an enhanced version of the E830.
+>> It continues to use the same set of commands, registers and interfaces
+>> as other devices in the 800 Series.
+>>
+>> Following device IDs are added:
+>> - 0x1248: Intel(R) Ethernet Controller E835-CC for backplane
+>> - 0x1249: Intel(R) Ethernet Controller E835-CC for QSFP
+>> - 0x124A: Intel(R) Ethernet Controller E835-CC for SFP
+>> - 0x1261: Intel(R) Ethernet Controller E835-C for backplane
+>> - 0x1262: Intel(R) Ethernet Controller E835-C for QSFP
+>> - 0x1263: Intel(R) Ethernet Controller E835-C for SFP
+>> - 0x1265: Intel(R) Ethernet Controller E835-L for backplane
+>> - 0x1266: Intel(R) Ethernet Controller E835-L for QSFP
+>> - 0x1267: Intel(R) Ethernet Controller E835-L for SFP
 > 
-> For the most part this file is sorted by device id, could you move these 
-> to the corresponding spot?
+> Should you resend, it’d be great, if you added the datasheet name, where 
+> these id’s are present.
 
-Sure, will send v2.
+Sorry it isn't publicly available yet.
 
 Best regards,
 Dawid
-
+> Kind regards,
 > 
-> Thanks,
-> Tony
+> Paul
 
