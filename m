@@ -1,132 +1,142 @@
-Return-Path: <netdev+bounces-191551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACAFBABC11F
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 16:43:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B9B5ABC13E
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 16:47:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4C59188C633
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 14:42:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1905E16656B
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 14:47:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A626927FD71;
-	Mon, 19 May 2025 14:42:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD0531DC997;
+	Mon, 19 May 2025 14:47:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KuXirE3t"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hntFdLCu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238512797B0
-	for <netdev@vger.kernel.org>; Mon, 19 May 2025 14:42:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F0531CD21C;
+	Mon, 19 May 2025 14:47:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747665762; cv=none; b=oQhm1Ks7KvLOWRfW+8Tt6UUqp+SK3w6GczTDa60ICc5up3ezREW7dhkytLmxaInnnq1p3wqv4lhV/JnXfBKQzFM4qhT0o2G8/53MB3KMzOdCGRbII3JJ1LcMYETYOFqkqRbq4Pf3P5u4/1WSKcQn5ryCE2yyWqk8ajZp49rjW4A=
+	t=1747666028; cv=none; b=Yi/vKxI0yFP76flpKjKSNqHGuBSywAcfbgme8vz2Ew9uFdfZBKfgjJnEWaYN+gyJfUk85Vpw0c3cK1955SY3LnBiuSWtEjVyBgYMV2kt9MbRJTheZbkquIzT9LD6eVTyH5KIKVO8hvWdOaUdKbC0/3WdICEuw8xTpWtxdY88zuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747665762; c=relaxed/simple;
-	bh=WimnWdvpT8uyHGBWMM4RfnRiNuVFbHk3iZJ90sTawMc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OMgvYXqTRLPkrbvHH31s78JhulTvylca9XhoCWB3atzp5t19ghqhN3cx7tLkjxjS5Jys4SAGRoWrwi1Zf2vTeTQJPA0howPhGwHjHWAUPiefPNwRgaOO6SzHY51Lcvhtl1LyknI3ZY8XNtm3acn1WjWMwOD8/p18SOvKuQ+ZN08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KuXirE3t; arc=none smtp.client-ip=209.85.166.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3dc77edaa4aso70325ab.1
-        for <netdev@vger.kernel.org>; Mon, 19 May 2025 07:42:40 -0700 (PDT)
+	s=arc-20240116; t=1747666028; c=relaxed/simple;
+	bh=3qnV08bZhkf4pfjJZBx8dUF6Qff3QUhvneWIe9at9jA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=q+Q/2aW31w3YBwFXEjvRuSgJuxr3LSggMPbWwsadxWFg13LzCHFd0ntzps4PHDSIEsqA2+dzDr4H/V7TtC6/XgYfIxnGFuklh73ulfJFP624qVuTr0SSscCTnLDmbFv7kzJJoscaCbL9mbfcr63K+5lXojbWZQUnl77y/q7M6ls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hntFdLCu; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6f8b81fda4aso28390826d6.1;
+        Mon, 19 May 2025 07:47:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747665760; x=1748270560; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nmYRnRdmFmJki7g87U395m8T1NZ/Fl4k2+oynLtdog4=;
-        b=KuXirE3tTQJeyO4AnfHJJ6tabf2kYdc+pg7izm2Wq+7atLbq1HZr1ssmE4yp8d/1NC
-         tQNNNxypETLSPewx9gJDI870pk0Z/E/rHaRNJAIqopsUtX7rqEZknkRICNh5i50xA3+1
-         SrmhLeS8h4Qv2TnqlEif5dwKx5A4JDKKTVZ34RbbA8l97dUoPUrOTkQvjJffgVGlxtCN
-         4Q0H3WKUibJtE6Xm60Tqd6xRbX2brmzHViyWXCkNY/P8iIJYSUM6TsiwBEFIW6C2BduH
-         W7u8mDgAclupqNQ6Aqs08LTy84r7JywZo6z9Cww8BWjuOpwCQnzn0Ir02xP2R/wQLJVr
-         rYeg==
+        d=gmail.com; s=20230601; t=1747666026; x=1748270826; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=E8Jd7Qi9TWpcjCpG46oFCwsLyC3CfnqUMVCo075QTSo=;
+        b=hntFdLCuvNpu0kuBMD8S6ipRLDVfGnsqNbIlmJ0GfDNJVQFOuFw4Rl5j5ry3BRSZwu
+         m/y/Km/wtx9ZRd4U9fMc2q23hW7tEjZnVHZHOvAZ20bzdlipbDwyTnRSWYybk2lO1hu6
+         yuNwK6Tl68oIWWcA8PS4ihemkchjuVG9otaL/TfPeiyjVyFQoMKqOB2SGY5Gd4CS0kQf
+         0LPBry+UkBh03P5nAW1kf+mg/4BIOSIocsIxOahvOGvylckxwKmZ1aGGzN+Oxv9TuynE
+         qN+4ujcXrdoOIxU2Kr2h9ZD2mqF4ry2TNgD2YKa8bbtN0o7+Ui6a+wjIzgECRQRRkRK8
+         0CYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747665760; x=1748270560;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nmYRnRdmFmJki7g87U395m8T1NZ/Fl4k2+oynLtdog4=;
-        b=syB0WxQv8B6TM5ZnPFOmhjgZB6bmZiZYZQLcrIKj24MUSJ+N8s0FstSu/OWNFQML4e
-         WYGGki64rU7TiyAbqK377rbSOeIxMjhhzbpWZswKUk5AWZSdgE2Sx8gtwi0Ew0TLUZ7y
-         If+rpfk4DabE96SiG2ykAn/r8q6zPpmiyZXS60ABSpKSwU6mqKIzLo/99yrFywHezeyv
-         nmVP1VMd6n/Fm/mqKPGPhgxOWivCQG0vdDYyCZsMEcJ5YHP/zn573fNWDh9GqFoqNarO
-         Z7PobK1dr7gKoWPAI5eFPL3Cr5XlLEYf3c3N2wTyyCVl62rVBjaScr5JzXJbsCjT8Ndm
-         9AqA==
-X-Gm-Message-State: AOJu0Yx5JO5d0Nn6wgqvqiRM40wb0jly/CcYpPbpXHwLTDrrYsgBJvp6
-	55bMONujHlJZzB4AexXcMvMbXuD7AOn/djpFTZuhSjlJCL5FH2H4ZkY7qFY0piMhEu5zxsVxm7x
-	ci5VZ45KWjRlJWZiwvP9rqDh/+M5OeJgEiHcHJCSUbuiSRx3yBuBh+/fedqY=
-X-Gm-Gg: ASbGncvZnci/t++LQBhQ/+Pt6F4nvmJfCEj9lL/fU0oOC6VoWuREwj4KNg4nE+28vSd
-	AZfUzmqmkoq5QpGRVKHxAM8d/k9ppTCObo1eAaHRhkZLBDMHZn4ilccGeWquBnO+/6LoRJYLTxs
-	T+SrmIo+iV9hME/om1p2bBNDd+U7HPM4LPjw1Oc5R4JvJ/GTtTOrP49eoqXQl1jQr0GQPgZfG4b
-	m1L
-X-Google-Smtp-Source: AGHT+IEE7ggtSshKtQJiHnrAQKrOhJQthk3yv4LhwRx/Yn0eHMx8HUalTBz7vA2IErIxqGcyLXZjS/y7Z3GRBdYJDpg=
-X-Received: by 2002:ac8:5f83:0:b0:476:f4e9:3152 with SMTP id
- d75a77b69052e-49601369b34mr6860671cf.25.1747665747668; Mon, 19 May 2025
- 07:42:27 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1747666026; x=1748270826;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=E8Jd7Qi9TWpcjCpG46oFCwsLyC3CfnqUMVCo075QTSo=;
+        b=IRvJ2/ZxhsU79qCABpxI5oRi8RXVdApKq29CkQuw5hqH1dXM/+ukyou5hxZ/5g6zQt
+         4OgIHbhuh827JzHkcryU1a2Enu5lRS/AjVxHeOmeCPEO36+EfQnSKRcX6a3qqrXxETI4
+         9FYZXnzRIE2jVaqhTPEDJ9vebenDrGu5c82UP6J++vDkVD+dEaa6xLPs8znYMu6oFjV9
+         UZ7PG3CLGuJo9OLemUyRB/i/z3rv/ki7FxwoO0V+ve6rEEtaVSWWsyF+zCKcZaZUiLHC
+         8YfGmEoygXpJrE4UK1vg3giyHjdL7Mg0lVRKZF8jGYoSMfQtlkxft2LDzrygMUS2Eg82
+         V98Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWrWyLB1UlsisNJXmeJFik3mqUNPMmz1w/YRRzsACvyP+buh769+OyurHqTGGnE68MHhS8T78K7@vger.kernel.org, AJvYcCXpAC3CsWqbcCEp2tRxUl0bU2CJzU1gzUB/Zcn7X3eXL0fbLbSl5iRqNYrdFV2r+3QGL2EFnSrso/U0Yg8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzl1/N/4pXElCZCHnVhcs+l+o0ieMT0YLk9yU/uZOI5MofsUS+v
+	CTFJlpOQiQWJXexy9xF7xlcfAXtSd+LyBf62j4m4IwloHQGkIaUznAmCj88tGDFWfik=
+X-Gm-Gg: ASbGnctkbnaQrK6OdxquCNw4uHyv5fm4/R0kDoh8i7Ca5eZ8yyHraq1+bWZm6O9oF7+
+	O4glFUbfkWaUqVKejRSgC/d6MPlAqIuVV7E34oshPhrUgO5zj+lGjiY3fae0+JpzHe1Rd4oxtDr
+	SVBOFBf5R32S/fUTe40yTndjdlws8dQFwDVzyznBInw+ZM7dJCBXn7cgPfgPi+Sahaivb1x8svU
+	R6PCxkjy607omaip7KEuto5VJSb3YHnwjB2ShnQH/qU6RrYGrdYu5xcNCGrL8kBAAZzCHoWK3f1
+	uP9ciDm0VYaYR2nyFjIJF8xMhtGSdHu/hC73U1rigRZvq/PmbUvD
+X-Google-Smtp-Source: AGHT+IH9gfQ+apMRIS3qcJyKjW6PWaqbuvRhWH7s8idH69K7FwlmtGsTZZNFdqKx6LjWZmqCtVkvgQ==
+X-Received: by 2002:a05:6214:2403:b0:6e8:fcde:58d5 with SMTP id 6a1803df08f44-6f8b08e56ddmr210246136d6.42.1747666026022;
+        Mon, 19 May 2025 07:47:06 -0700 (PDT)
+Received: from CNCMK0001D007E.ht.home ([2607:fa49:8c41:2600::f21d])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f8b096ddb4sm57405716d6.78.2025.05.19.07.47.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 May 2025 07:47:05 -0700 (PDT)
+From: chalianis1@gmail.com
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux@armlinux.org.uk,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: stable@vger.kernel.org,
+	Anis Chali <chalianis1@gmail.com>
+Subject: [PATCH net] phy: dp83869: fix interrupts issue when using with an optical fiber sfp. to correctly clear the interrupts both status registers must be read.
+Date: Mon, 19 May 2025 10:47:01 -0400
+Message-ID: <20250519144701.92264-1-chalianis1@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAAHxn9-ctPXJh1jeZc3bYeNod6pdfd6qgYWuXMb9uN_12McPAQ@mail.gmail.com>
-In-Reply-To: <CAAHxn9-ctPXJh1jeZc3bYeNod6pdfd6qgYWuXMb9uN_12McPAQ@mail.gmail.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Mon, 19 May 2025 10:42:11 -0400
-X-Gm-Features: AX0GCFsi_tK_K8KDkFMzUtKwu0QFEf4-oIvOWiHm5Mj1xqVLcCa7QIx7DfGXzo0
-Message-ID: <CADVnQy=RRLaTG4t5BqQ1XJskb+oxWe=M_qY0u9rzmXGS1+b7nQ@mail.gmail.com>
-Subject: Re: tcp: socket stuck with zero receive window after SACK
-To: Simon Campion <simon.campion@deepl.com>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
-	Yuchung Cheng <ycheng@google.com>, Kevin Yang <yyd@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, May 19, 2025 at 9:31=E2=80=AFAM Simon Campion <simon.campion@deepl.=
-com> wrote:
->
-> Hi all,
->
-> We have a TCP socket that's stuck in the following state:
->
-> * it SACKed ~40KB of data, but misses 602 bytes at the beginning
-> * it has a zero receive window
-> * the Recv-Q as reported by ss is 0
->
-> Due to the zero window, the kernel drops the missing 602 bytes when
-> the peer sends them. So, the socket is stuck indefinitely waiting for
-> data it drops when it receives it. Since the Recv-Q as reported by ss
-> is 0, we suspect the receive window is not 0 because the owner of the
-> socket isn't reading data. Rather, we wonder whether the kernel SACKed
-> too much data than it should have, given the receive buffer size, not
-> leaving enough space to store the missing bytes when they arrive.
-> Could this happen?
->
-> We don't have a reproducer for this issue. The socket is still in this
-> state, so we're happy to provide more debugging information while we
-> have it. This is the first time we've seen this problem.
->
-> Here are more details:
->
-> # uname -r
-> 6.6.83-flatcar
+From: Anis Chali <chalianis1@gmail.com>
 
-Thanks for the detailed report!
+from datasheet of dp83869hm
+7.3.6 Interrupt
+The DP83869HM can be configured to generate an interrupt when changes of internal status occur. The interrupt
+allows a MAC to act upon the status in the PHY without polling the PHY registers. The interrupt source can be
+selected through the interrupt registers, MICR (12h) and FIBER_INT_EN (C18h). The interrupt status can be
+read from ISR (13h) and FIBER_INT_STTS (C19h) registers. Some interrupts are enabled by default and can
+be disabled through register access. Both the interrupt status registers must be read in order to clear pending
+interrupts. Until the pending interrupts are cleared, new interrupts may not be routed to the interrupt pin.
+Fixes: interrupts issue when using with an optical fiber sfp.
 
-Can you please attach the output of the following command, run on the
-same machine (and in the same network namespace) as the socket with
-the receive buffer that is almost full:
+Signed-off-by: Anis Chali <chalianis1@gmail.com>
+---
+ drivers/net/phy/dp83869.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-  nstat -az > /tmp/nstat.txt
+diff --git a/drivers/net/phy/dp83869.c b/drivers/net/phy/dp83869.c
+index a62cd838a9ea..1e8c20f387b8 100644
+--- a/drivers/net/phy/dp83869.c
++++ b/drivers/net/phy/dp83869.c
+@@ -41,6 +41,7 @@
+ #define DP83869_IO_MUX_CFG	0x0170
+ #define DP83869_OP_MODE		0x01df
+ #define DP83869_FX_CTRL		0x0c00
++#define DP83869_FX_INT_STS		0x0c19
+ 
+ #define DP83869_SW_RESET	BIT(15)
+ #define DP83869_SW_RESTART	BIT(14)
+@@ -195,6 +196,12 @@ static int dp83869_ack_interrupt(struct phy_device *phydev)
+ 	if (err < 0)
+ 		return err;
+ 
++	if (linkmode_test_bit(ETHTOOL_LINK_MODE_FIBRE_BIT, phydev->supported)) {
++		err = phy_read_mmd(phydev, DP83869_DEVADDR, DP83869_FX_INT_STS);
++		if (err < 0)
++			return err;		
++	}
++
+ 	return 0;
+ }
+ 
+-- 
+2.49.0
 
-This should help us get a better idea about which "prune" methods are
-being tried, and which of them are failing to free up enough memory.
-
-Thanks!
-neal
 
