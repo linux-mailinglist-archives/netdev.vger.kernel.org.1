@@ -1,101 +1,107 @@
-Return-Path: <netdev+bounces-191501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16881ABBAA3
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 12:08:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA10AABBAF2
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 12:20:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B07DA168528
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 10:08:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC9267AE105
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 10:19:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF14F269D0A;
-	Mon, 19 May 2025 10:08:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 344E62750F8;
+	Mon, 19 May 2025 10:19:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fyIxmRBU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jFL+mKx8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5EAF1E9906;
-	Mon, 19 May 2025 10:08:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A6EC274FFD
+	for <netdev@vger.kernel.org>; Mon, 19 May 2025 10:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747649290; cv=none; b=ppbft2i29rlWCTxSrodwPWPaad+Atpl99d5BcCanPBxPbS17V1tFk1+6ks1WU23uVIh+sbh/XeCt4z7S3lHvyiWBNZPoIkUW7FOsI0G3tkLPCVgo2cxQS9ppCRVms52TEV8yyB7eO9/y5EQFIkYcTXeRSAhkTESEEE9p+WCOEbA=
+	t=1747649981; cv=none; b=L7/MfITxaawB88E02JY7aiXfQXSsCymxb+Q2Dyp0SJN2Y/XYMr7t/SVDWTcMH8scKjvZVJI+eaB5JWCF1Tj6NtIBSG7mPBFmrs8+GF81z4lu4nJJIXfwrqaDaCZZJSu3nCRd8ZuVSe0kgKlT88nqj7jenWEE84cvlQEQEJJfa4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747649290; c=relaxed/simple;
-	bh=wL+5PnBKqpKcg8WZY/24OfXz24Tyva4tqhKg/S7c2A0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JQniIw+vBKxrp3kvOZeMwpyuTVI8DZJvMLriwidBaJ/rWS4XAt638sF/zRf1ezexHg8hZ8ol9OUAnt7F45z8nXOTcYaCafIqyBqY7s+LbRIGusb5PRZ4OxuWIGosl/yjnfuZa+FNVdeRh71N5BJ8EZyDWSatoK/rj1LDIdVpYjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fyIxmRBU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F544C4CEE4;
-	Mon, 19 May 2025 10:08:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747649290;
-	bh=wL+5PnBKqpKcg8WZY/24OfXz24Tyva4tqhKg/S7c2A0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fyIxmRBUNTWLWC8pnAJ9DzSmLwOckyInVq5KSXN7KGIGPwqQc4JpQoEsE+gj//PfG
-	 kHU3IQlcwO/cP5YsGqbLgfDAVe2twWHQW04h56uSaa9yOUto86rpJXl+xPZ8Zl8lWp
-	 P2N6pH1W/MB7Omm8UXNGVBaBo7K2pc1QcThFjEyaIAefJ94kb/gEhjJlr9seeGuCcM
-	 E2De76g0pjTqtM9ab/2iySGcjx1txxOT+IS7EKlS1N6R/6/rFPWe/fEoha8yVzKIl8
-	 PGXKVlv+RWTfGgHJU+Q43BgiuaB12DEAasAAMlyzH9XlEuv9EswvF7wQW3HeP1PMya
-	 n74Srx+wlVlCQ==
-Date: Mon, 19 May 2025 11:08:03 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Sumanth Gavini <sumanth.gavini@yahoo.com>
-Cc: krzk@kernel.org, bongsu.jeon@samsung.com, cw00.choi@samsung.com,
-	myungjoo.ham@samsung.com, lee@kernel.org, lgirdwood@gmail.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/6] fix: Correct Samsung 'Electronics' spelling in
- copyright headers
-Message-ID: <3aa30119-60e5-4dcb-b13a-1753966ca775@sirena.org.uk>
-References: <20250518085734.88890-1-sumanth.gavini.ref@yahoo.com>
- <20250518085734.88890-1-sumanth.gavini@yahoo.com>
+	s=arc-20240116; t=1747649981; c=relaxed/simple;
+	bh=GQPdAJgH68IIc9mT+fvqXofapRWMcyOKv3t6CE8UCos=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=pn0hRI5U69626vW3cbk0kBE5fiXfyorNoGNCd05w848oM6+ISQM+bQ32i3vMLQsNnNDlFfa8fEETwLM3Ds77we4TK2eDag9LlR8s0IqMf4Upt2A4eBIY4OA2FioW947Q81/8O13TwEXjdRHAxdM++ohm+KIRmgNX4Hca05Mge6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jFL+mKx8; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3a37535646aso272671f8f.0
+        for <netdev@vger.kernel.org>; Mon, 19 May 2025 03:19:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747649978; x=1748254778; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=EHn/bhUwowMVfB1kTXdgaXuPPUnewAJnniffTVcH5a0=;
+        b=jFL+mKx8YIjrzVlyT8BPs51rZiX9tw/ZmTsXSMLy925G33ym4VTScE3UOLxvax3aST
+         h2ULasWEaBAuqAW+xGpLF+q9haAmzU2CIMjYNBW5hhcyxaKpk+mU/bXOE+034xo85Pf3
+         RGgmdm6m+BWJs04SpTwPHh1/FsHDEvfd79WaDjsTlHUwFextZ5NFQ+K/TRl/6CREfLUR
+         RfDEj3daOaMx586H/8TyCkG3T4QhPZ2zKnS4/h6TamGITOc0x9vje7sDIur1wqqzkP1d
+         eVwcQmyG9x3svhfSsnrTnVljG1YPeD5TZdB3sHilU7fm45V2sQ4qQlfBkyVwc6YB3atw
+         rscg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747649978; x=1748254778;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EHn/bhUwowMVfB1kTXdgaXuPPUnewAJnniffTVcH5a0=;
+        b=ZzqCm6frU9ueKFKQE7pO3YkXnJWpQt9hTTAjS+pXh5le3RyhlLJRG8OEPLM21byrU3
+         9AF9LCi9lhUW5L6PlzEXf4AgRm2nZIU7XCZjDFL634alJOHWbj12hNE1Ai89q6/HB56A
+         qiykMP6td1l2/JL/AYnsNRa+gOyT6GYm2zUI6qVkumeZS/0t7gQUaoQe1yCgh70KBnQM
+         WaxAl3y2xNaOJ3QsnFQ5TVYHO+QUH1GPAA+V062/ctVmoKcbvJdWyKsgm6pYZoRLpBsC
+         /Jk6JcgSZ3VkP8wVOGKCoaEndnalYcT/nOsY/bmAva+3PQdJrzYq/mel3UCSuDyIlWkK
+         3piA==
+X-Forwarded-Encrypted: i=1; AJvYcCUqMZjXLrn5CaEv6LHgl1KWz/DA5xMF11kmOrzELReWI3pW0XEd8eEbWeF/kZjUJeoh0yQYAKM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyADjerYSY14dwLR2PwDZt9P2kvraer4w+SHqW0r2nen35LU43B
+	Tj0y9HHV9fFKBEIkPU1t+9YH6WC/F9eZtgYSUDE0LPxwOceg90eHualK
+X-Gm-Gg: ASbGncv8aJTxWp/ygA8kEET4XGmfFnZShk+aVLskHpMHe7f8grwmVsLjKBGN9m/65VJ
+	Rol4uTbaouZVpPGsojNZJHCovAADacPnMJrzYbfrXA81HlEKzKJr9hsc2Ko9k4hmW8RghD16EHx
+	qgHYZrabDxwvqjLcy52ZE50gP8FmBrXXIa3WRFPrQqJ5U8eTevxkKf1hAPc6dfhzSmurLAHivSc
+	hChW8iXAdPteIQHjCZBkyIbWVIYhTD0gmRjbsyE5RyN0sZTSbt/onLLtE7B98dr9yDP5YXpCCjA
+	Yv9e2MPDANPYm6GRxh8iy12SFmJjVqpfLabOLa2ot+eFIWtWl10hC4QbFTOEh/CT
+X-Google-Smtp-Source: AGHT+IGzkc6KLgya7drpt6lajzxZS8eyKDZMhWy+rGXy5ojlUz8ZPAk224coFS70C4CRWxTewPHK+Q==
+X-Received: by 2002:a5d:4b8a:0:b0:3a3:62e1:a7ba with SMTP id ffacd0b85a97d-3a362e1a8fdmr7612110f8f.9.1747649977642;
+        Mon, 19 May 2025 03:19:37 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:d5e9:e348:9b63:abf5])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a3631c728esm10824579f8f.60.2025.05.19.03.19.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 May 2025 03:19:37 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
+  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
+  jacob.e.keller@intel.com,  sdf@fomichev.me,  jstancek@redhat.com
+Subject: Re: [PATCH net-next 11/11] tools: ynl: add a sample for TC
+In-Reply-To: <20250517001318.285800-12-kuba@kernel.org> (Jakub Kicinski's
+	message of "Fri, 16 May 2025 17:13:18 -0700")
+Date: Mon, 19 May 2025 11:19:13 +0100
+Message-ID: <m234d0kin2.fsf@gmail.com>
+References: <20250517001318.285800-1-kuba@kernel.org>
+	<20250517001318.285800-12-kuba@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="1JBMmA2tdEPES3PJ"
-Content-Disposition: inline
-In-Reply-To: <20250518085734.88890-1-sumanth.gavini@yahoo.com>
-X-Cookie: We have ears, earther...FOUR OF THEM!
+Content-Type: text/plain
 
+Jakub Kicinski <kuba@kernel.org> writes:
 
---1JBMmA2tdEPES3PJ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Add a very simple TC dump sample with decoding of fq_codel attrs:
+>
+>   # ./tools/net/ynl/samples/tc
+>         dummy0: fq_codel  limit: 10240p target: 5ms new_flow_cnt: 0
+>
+> proving that selector passing (for stats) works.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-On Sun, May 18, 2025 at 01:57:26AM -0700, Sumanth Gavini wrote:
-> This series fixes the misspelling of "Electronics" as "Electrnoics"
-> across multiple subsystems (MFD, NFC, EXTCON). Each patch targets
-> a different subsystem for easier review.
->=20
-> The changes are mechanical and do not affect functionality.
-
-Please don't combine unrelated patches like this into a series that
-crosses subsystems, it just makes it more confusing how things are
-going to get applied and if there's dependencies. Just send things
-separately to each subsystem.
-
---1JBMmA2tdEPES3PJ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmgrAwIACgkQJNaLcl1U
-h9DFnwf/XjcxEKF2KSmebB4Y0RFqowuduWRbFUGux971QxPXN02FXJDhen91BqiO
-RjnTHmUbbkQiHs2kealN4P1k3ousMoAPdIcpFUQG2vt59BPfuyJCpsbKXzogUBOF
-OYKz9N5JHxx/zxQ4C7xuS+FnZyEQIQoni+FDFLKQQOUWfqS4g+bYg1RPMs7YOHVs
-Gr3eJQHE7eQk4ISHEmErCGHIIWaZ/XXHrNtGP4ZZvRWHQb76hXTxumwtoE+waIR+
-Of+4V3ODuX7PqXeF5XbY8PRicptJhsuSVhuuuqdmQNgd5Gne4THhnmnddi1tud3f
-L5GC9XUhs0xhl9ilsvANYvNjIR/Xdw==
-=dDHu
------END PGP SIGNATURE-----
-
---1JBMmA2tdEPES3PJ--
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
