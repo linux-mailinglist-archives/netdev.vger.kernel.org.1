@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-191412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8ED0BABB752
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 10:35:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 865DFABB75A
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 10:36:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9476A3BA344
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 08:34:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CACCB3BB06A
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 08:35:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD4B026C389;
-	Mon, 19 May 2025 08:33:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBD9426D4E4;
+	Mon, 19 May 2025 08:33:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="KexKH+k5";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="wxtwz27F"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="nZxJsh4K";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="EhC+gmva"
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13D5726B0A7;
-	Mon, 19 May 2025 08:33:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB50F26B97D;
+	Mon, 19 May 2025 08:33:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747643604; cv=none; b=VRpbg7DdIVe2XcngczrnGwwh2rfssnKniwqnwSV6TvjO2H0GhSCVCicNZLgbuugh1eAzn0RqzCGxJaI3nPAHJF8uMt/fNHw+Kzbu/4ZZvh2rhBQd2pxyiYcudeClPafLMFknTMk/DVVkaBV73RXXqdApo5d+JaGwN5zh3VtxTTo=
+	t=1747643606; cv=none; b=SFtD40bsJGQOTB9jMwsjPcLws1op9kK+nBwFeA8WzrE86yxPt9Fs6RYQhrIw7mgorZUhJ+h2Ip+kfM0ldnvQxmUax2jTZq0YJDlAVkvRHq4Z3FLlekpv9wfBFxFwmkcZz4wUAmLFc6XDO0FHPWRLxBoc2qZi1dAImKkl35hAxmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747643604; c=relaxed/simple;
-	bh=oAwwXd29RmLztsc7SAntcL4APp16zBohgk7uM9zwQWA=;
+	s=arc-20240116; t=1747643606; c=relaxed/simple;
+	bh=4oSyT8c87swIdB49sX0Y4s+hFyQeoBovFZ/8/TiDCSQ=;
 	h=Message-ID:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Date; b=RskvYAQxIVaOVWEsDMng5yKAXEEZrLiBLw6xNknu/9tx61mrqiCIEHzS7hnpnI/Qrxi3TMGyEI5w19gv5nqWaxYF6OqFqznXse0qhmrO5UXnboJqViMG45UwqKSmyYOHRExS3kQSP8H/DMFKO6KWA9kcG6NPeqAyW2MzIsAmlxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=KexKH+k5; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=wxtwz27F; arc=none smtp.client-ip=193.142.43.55
+	 Content-Type:Date; b=C8ZW8qlkBbqC2Y7a5HGE2FtLNETG55WAxQbvFEV/9cjJ9wVCgDFTpBxJRVYJWzn0EgymJza8VSEEXr91dCqu6b2ROimqqwpU7jcERtSY/DlNgnOvlmRjzgajGBx6earSY00V3zhDxvXhjqTns3mLPHXaOPTNN0CywvXcE2S0i2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=nZxJsh4K; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=EhC+gmva; arc=none smtp.client-ip=193.142.43.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Message-ID: <20250519083025.969000914@linutronix.de>
+Message-ID: <20250519083026.032425931@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1747643601;
+	s=2020; t=1747643603;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 references:references; bh=fuJ7o+F9Ll8i3WU2Ep3XtBcWSbqbcijosAFfflFA/wk=;
-	b=KexKH+k56yF/n2IUNWbzusciqEdMhv2G0ZAuklgI7H8NtmSj0qFc1ELpkUaTBvLorbUhhh
-	OyeQHfJQ6xW5z99KtdKeAI3Cln18zhO9tDv/+pRYcxcc3KDJDVVosjZNwCMX1K7hq4pzhb
-	hLkg+yQtm/3Rwh6BGS2+AtYhEz7eGIlRT+PM2TK7S7GphgYfc9CnW2sAwNvp/yN/ytfuxf
-	GJ+olk2G+iyXekAPVe0ghxx6EQATliRB/NcvsxQ0DPGTSdNYRHXLoJMmS7hwFJwZZf8vLA
-	Jkm/Z9CIGLMwamPDsJxX9vLGV7zi30VytCxNwUzPhYKLLrinEsFfKm53Zk8fRw==
+	 references:references; bh=nsMXYnVhmeWV+rct6a1vAML/qWO67maRFKGbU8FjRDI=;
+	b=nZxJsh4KIt3uclp6UdINIiX0P+Euu01OBve+BN2vZ+od1KsSl+4SNC7BOjVlsNiceY7q43
+	/P1d9gpjhnQFwR1wZ8qd7DONx2M6xCgc4svitTlb0xYIiZcr/r/JvQCiEWpSoivVQRvL/q
+	gPcave98QOb5tLP9q4WBvoj6EcAy3IJnn7SoexSKl59+I1xbejPUJd9XCVGaUoHNZyotNl
+	vvp/bJfkzADOe1R6/+fvaGYdU+Wi3F36RMMzPy1uVbUKOjTsRl/toig+Y/GZm8sbatM0S8
+	9xqIatpeU11s4TReuOlmEaLcpQkg8E8MCHG6ebBiQhz+6Bve0HgA8259XPSlJg==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1747643601;
+	s=2020e; t=1747643603;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 references:references; bh=fuJ7o+F9Ll8i3WU2Ep3XtBcWSbqbcijosAFfflFA/wk=;
-	b=wxtwz27FUXF9wkNYkA5oJMBrrDLQ+yN2BDkW5oBRhE63vRPNaA0fCdfFy7crLkPpZTvpdM
-	dGhRFZfbu4cXLkBg==
+	 references:references; bh=nsMXYnVhmeWV+rct6a1vAML/qWO67maRFKGbU8FjRDI=;
+	b=EhC+gmva+dPEb2ArVxqMjRURyYo1T3/uXvduM2J0spnwOnVy/hctFmTzoq2JH6pDHRD2/v
+	saFdtYhGte/vABBQ==
 From: Thomas Gleixner <tglx@linutronix.de>
 To: LKML <linux-kernel@vger.kernel.org>
 Cc: netdev@vger.kernel.org,
@@ -66,7 +66,7 @@ Cc: netdev@vger.kernel.org,
  Kurt Kanzenbach <kurt@linutronix.de>,
  Nam Cao <namcao@linutronix.de>,
  Antoine Tenart <atenart@kernel.org>
-Subject: [patch V2 06/26] ntp: Add support for auxiliary timekeepers
+Subject: [patch V2 07/26] ntp: Add timekeeper ID arguments to public functions
 References: <20250519082042.742926976@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -75,135 +75,171 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Date: Mon, 19 May 2025 10:33:21 +0200 (CEST)
+Date: Mon, 19 May 2025 10:33:22 +0200 (CEST)
 
-If auxiliary clocks are enabled, provide an array of NTP data so that the
-auxiliary timekeepers can be steered independently of the core timekeeper.
+In preparation for supporting auxiliary POSIX clocks, add a timekeeper ID
+to the relevant functions.
 
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+
 ---
- kernel/time/ntp.c |   41 ++++++++++++++++++++++-------------------
- 1 file changed, 22 insertions(+), 19 deletions(-)
+ kernel/time/ntp.c          |   33 +++++++++++++++++++--------------
+ kernel/time/ntp_internal.h |   11 +++++------
+ kernel/time/timekeeping.c  |   12 ++++++------
+ 3 files changed, 30 insertions(+), 26 deletions(-)
 ---
 --- a/kernel/time/ntp.c
 +++ b/kernel/time/ntp.c
-@@ -18,6 +18,7 @@
- #include <linux/module.h>
- #include <linux/rtc.h>
- #include <linux/audit.h>
-+#include <linux/timekeeper_internal.h>
+@@ -351,33 +351,38 @@ static void __ntp_clear(struct ntp_data
  
- #include "ntp_internal.h"
- #include "timekeeping_internal.h"
-@@ -86,14 +87,16 @@ struct ntp_data {
- #endif
- };
- 
--static struct ntp_data tk_ntp_data = {
--	.tick_usec		= USER_TICK_USEC,
--	.time_state		= TIME_OK,
--	.time_status		= STA_UNSYNC,
--	.time_constant		= 2,
--	.time_maxerror		= NTP_PHASE_LIMIT,
--	.time_esterror		= NTP_PHASE_LIMIT,
--	.ntp_next_leap_sec	= TIME64_MAX,
-+static struct ntp_data tk_ntp_data[TIMEKEEPERS_MAX] = {
-+	[ 0 ... TIMEKEEPERS_MAX - 1 ] = {
-+		.tick_usec		= USER_TICK_USEC,
-+		.time_state		= TIME_OK,
-+		.time_status		= STA_UNSYNC,
-+		.time_constant		= 2,
-+		.time_maxerror		= NTP_PHASE_LIMIT,
-+		.time_esterror		= NTP_PHASE_LIMIT,
-+		.ntp_next_leap_sec	= TIME64_MAX,
-+	},
- };
- 
- #define SECS_PER_DAY		86400
-@@ -351,13 +354,13 @@ static void __ntp_clear(struct ntp_data
+ /**
+  * ntp_clear - Clears the NTP state variables
++ * @tkid:	Timekeeper ID to be able to select proper ntp data array member
   */
- void ntp_clear(void)
+-void ntp_clear(void)
++void ntp_clear(unsigned int tkid)
  {
--	__ntp_clear(&tk_ntp_data);
-+	__ntp_clear(&tk_ntp_data[TIMEKEEPER_CORE]);
+-	__ntp_clear(&tk_ntp_data[TIMEKEEPER_CORE]);
++	__ntp_clear(&tk_ntp_data[tkid]);
  }
  
  
- u64 ntp_tick_length(void)
+-u64 ntp_tick_length(void)
++u64 ntp_tick_length(unsigned int tkid)
  {
--	return tk_ntp_data.tick_length;
-+	return tk_ntp_data[TIMEKEEPER_CORE].tick_length;
+-	return tk_ntp_data[TIMEKEEPER_CORE].tick_length;
++	return tk_ntp_data[tkid].tick_length;
  }
  
  /**
-@@ -368,7 +371,7 @@ u64 ntp_tick_length(void)
+  * ntp_get_next_leap - Returns the next leapsecond in CLOCK_REALTIME ktime_t
++ * @tkid:	Timekeeper ID
+  *
+- * Provides the time of the next leapsecond against CLOCK_REALTIME in
+- * a ktime_t format. Returns KTIME_MAX if no leapsecond is pending.
++ * Returns: For @tkid == TIMEKEEPER_CORE this provides the time of the next
++ *	    leap second against CLOCK_REALTIME in a ktime_t format if a
++ *	    leap second is pending. KTIME_MAX otherwise.
   */
- ktime_t ntp_get_next_leap(void)
+-ktime_t ntp_get_next_leap(void)
++ktime_t ntp_get_next_leap(unsigned int tkid)
  {
--	struct ntp_data *ntpdata = &tk_ntp_data;
-+	struct ntp_data *ntpdata = &tk_ntp_data[TIMEKEEPER_CORE];
- 	ktime_t ret;
+ 	struct ntp_data *ntpdata = &tk_ntp_data[TIMEKEEPER_CORE];
+-	ktime_t ret;
++
++	if (tkid != TIMEKEEPER_CORE)
++		return KTIME_MAX;
  
  	if ((ntpdata->time_state == TIME_INS) && (ntpdata->time_status & STA_INS))
-@@ -389,7 +392,7 @@ ktime_t ntp_get_next_leap(void)
-  */
- int second_overflow(time64_t secs)
- {
--	struct ntp_data *ntpdata = &tk_ntp_data;
-+	struct ntp_data *ntpdata = &tk_ntp_data[TIMEKEEPER_CORE];
- 	s64 delta;
- 	int leap = 0;
- 	s32 rem;
-@@ -605,7 +608,7 @@ static inline int update_rtc(struct time
-  */
- static inline bool ntp_synced(void)
- {
--	return !(tk_ntp_data.time_status & STA_UNSYNC);
-+	return !(tk_ntp_data[TIMEKEEPER_CORE].time_status & STA_UNSYNC);
+ 		return ktime_set(ntpdata->ntp_next_leap_sec, 0);
+-	ret = KTIME_MAX;
+-	return ret;
++
++	return KTIME_MAX;
  }
  
  /*
-@@ -762,7 +765,7 @@ static inline void process_adjtimex_mode
- int __do_adjtimex(struct __kernel_timex *txc, const struct timespec64 *ts,
+@@ -390,9 +395,9 @@ ktime_t ntp_get_next_leap(void)
+  *
+  * Also handles leap second processing, and returns leap offset
+  */
+-int second_overflow(time64_t secs)
++int second_overflow(unsigned int tkid, time64_t secs)
+ {
+-	struct ntp_data *ntpdata = &tk_ntp_data[TIMEKEEPER_CORE];
++	struct ntp_data *ntpdata = &tk_ntp_data[tkid];
+ 	s64 delta;
+ 	int leap = 0;
+ 	s32 rem;
+@@ -762,10 +767,10 @@ static inline void process_adjtimex_mode
+  * adjtimex() mainly allows reading (and writing, if superuser) of
+  * kernel time-keeping variables. used by xntpd.
+  */
+-int __do_adjtimex(struct __kernel_timex *txc, const struct timespec64 *ts,
++int __do_adjtimex(unsigned int tkid, struct __kernel_timex *txc, const struct timespec64 *ts,
  		  s32 *time_tai, struct audit_ntp_data *ad)
  {
--	struct ntp_data *ntpdata = &tk_ntp_data;
-+	struct ntp_data *ntpdata = &tk_ntp_data[TIMEKEEPER_CORE];
+-	struct ntp_data *ntpdata = &tk_ntp_data[TIMEKEEPER_CORE];
++	struct ntp_data *ntpdata = &tk_ntp_data[tkid];
  	int result;
  
  	if (txc->modes & ADJ_ADJTIME) {
-@@ -1031,8 +1034,8 @@ static void hardpps_update_phase(struct
+--- a/kernel/time/ntp_internal.h
++++ b/kernel/time/ntp_internal.h
+@@ -3,13 +3,12 @@
+ #define _LINUX_NTP_INTERNAL_H
+ 
+ extern void ntp_init(void);
+-extern void ntp_clear(void);
++extern void ntp_clear(unsigned int tkid);
+ /* Returns how long ticks are at present, in ns / 2^NTP_SCALE_SHIFT. */
+-extern u64 ntp_tick_length(void);
+-extern ktime_t ntp_get_next_leap(void);
+-extern int second_overflow(time64_t secs);
+-extern int __do_adjtimex(struct __kernel_timex *txc,
+-			 const struct timespec64 *ts,
++extern u64 ntp_tick_length(unsigned int tkid);
++extern ktime_t ntp_get_next_leap(unsigned int tkid);
++extern int second_overflow(unsigned int tkid, time64_t secs);
++extern int __do_adjtimex(unsigned int tkid, struct __kernel_timex *txc, const struct timespec64 *ts,
+ 			 s32 *time_tai, struct audit_ntp_data *ad);
+ extern void __hardpps(const struct timespec64 *phase_ts, const struct timespec64 *raw_ts);
+ 
+--- a/kernel/time/timekeeping.c
++++ b/kernel/time/timekeeping.c
+@@ -601,7 +601,7 @@ EXPORT_SYMBOL_GPL(pvclock_gtod_unregiste
   */
- void __hardpps(const struct timespec64 *phase_ts, const struct timespec64 *raw_ts)
+ static inline void tk_update_leap_state(struct timekeeper *tk)
  {
-+	struct ntp_data *ntpdata = &tk_ntp_data[TIMEKEEPER_CORE];
- 	struct pps_normtime pts_norm, freq_norm;
--	struct ntp_data *ntpdata = &tk_ntp_data;
+-	tk->next_leap_ktime = ntp_get_next_leap();
++	tk->next_leap_ktime = ntp_get_next_leap(tk->id);
+ 	if (tk->next_leap_ktime != KTIME_MAX)
+ 		/* Convert to monotonic time */
+ 		tk->next_leap_ktime = ktime_sub(tk->next_leap_ktime, tk->offs_real);
+@@ -678,7 +678,7 @@ static void timekeeping_update_from_shad
  
- 	pts_norm = pps_normalize_ts(*phase_ts);
+ 	if (action & TK_CLEAR_NTP) {
+ 		tk->ntp_error = 0;
+-		ntp_clear();
++		ntp_clear(tk->id);
+ 	}
  
-@@ -1083,18 +1086,18 @@ void __hardpps(const struct timespec64 *
- 
- static int __init ntp_tick_adj_setup(char *str)
+ 	tk_update_leap_state(tk);
+@@ -2049,7 +2049,7 @@ static __always_inline void timekeeping_
+  */
+ static void timekeeping_adjust(struct timekeeper *tk, s64 offset)
  {
--	int rc = kstrtos64(str, 0, &tk_ntp_data.ntp_tick_adj);
-+	int rc = kstrtos64(str, 0, &tk_ntp_data[TIMEKEEPER_CORE].ntp_tick_adj);
- 	if (rc)
- 		return rc;
+-	u64 ntp_tl = ntp_tick_length();
++	u64 ntp_tl = ntp_tick_length(tk->id);
+ 	u32 mult;
  
--	tk_ntp_data.ntp_tick_adj <<= NTP_SCALE_SHIFT;
-+	tk_ntp_data[TIMEKEEPER_CORE].ntp_tick_adj <<= NTP_SCALE_SHIFT;
- 	return 1;
- }
--
- __setup("ntp_tick_adj=", ntp_tick_adj_setup);
+ 	/*
+@@ -2130,7 +2130,7 @@ static inline unsigned int accumulate_ns
+ 		}
  
- void __init ntp_init(void)
- {
--	ntp_clear();
-+	for (int id = 0; id < TIMEKEEPERS_MAX; id++)
-+		__ntp_clear(tk_ntp_data + id);
- 	ntp_init_cmos_sync();
- }
+ 		/* Figure out if its a leap sec and apply if needed */
+-		leap = second_overflow(tk->xtime_sec);
++		leap = second_overflow(tk->id, tk->xtime_sec);
+ 		if (unlikely(leap)) {
+ 			struct timespec64 ts;
+ 
+@@ -2227,7 +2227,7 @@ static bool __timekeeping_advance(enum t
+ 	shift = ilog2(offset) - ilog2(tk->cycle_interval);
+ 	shift = max(0, shift);
+ 	/* Bound shift to one less than what overflows tick_length */
+-	maxshift = (64 - (ilog2(ntp_tick_length())+1)) - 1;
++	maxshift = (64 - (ilog2(ntp_tick_length(tk->id)) + 1)) - 1;
+ 	shift = min(shift, maxshift);
+ 	while (offset >= tk->cycle_interval) {
+ 		offset = logarithmic_accumulation(tk, offset, shift, &clock_set);
+@@ -2586,7 +2586,7 @@ int do_adjtimex(struct __kernel_timex *t
+ 		}
+ 
+ 		orig_tai = tai = tks->tai_offset;
+-		ret = __do_adjtimex(txc, &ts, &tai, &ad);
++		ret = __do_adjtimex(tks->id, txc, &ts, &tai, &ad);
+ 
+ 		if (tai != orig_tai) {
+ 			__timekeeping_set_tai_offset(tks, tai);
 
 
