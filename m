@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-191642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BE1CABC8B7
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 22:55:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 969C5ABC8B8
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 22:55:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 009977A4B8A
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 672433BFABE
 	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 20:54:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DF0121B9C7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2208521B9D3;
 	Mon, 19 May 2025 20:54:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=universe-factory.net header.i=@universe-factory.net header.b="PJb+TBoh"
+	dkim=pass (2048-bit key) header.d=universe-factory.net header.i=@universe-factory.net header.b="ctEsFRqe"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.universe-factory.net (osgiliath.universe-factory.net [141.95.161.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA13219A72;
-	Mon, 19 May 2025 20:54:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CD74219301;
+	Mon, 19 May 2025 20:54:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.95.161.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747688073; cv=none; b=kzDpBiGIa0PwxR7z4K1jK1tYx/vi/vtCz8voXqMg2v+uf3+3+kqE4e9cEY3wHBetx4gJdkz99BG2CLBWAB2GZC4j+vkOer24IdTNgdvZ9lpZPu/qS0WHzk1d6taZ252z6AukGyge8Qwbwt4wFoIOxxuQBE0dLiubqBcQYXBMup0=
+	t=1747688073; cv=none; b=G0wb6Xys2pUi+4Za+d1e659E41ifC7LPgNmr89KuSR2pRfDKOCMDdLYEG4cwqpe7mkPoVZjBgzT7+PyNXF2Hyvm8sMrdJiFhjimEqG7HD44EX6dXxZznILM8z13suche+bFytZdjjKjOt78GkiQtfgOkr/YYArKYzFV3DMjD+Fw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1747688073; c=relaxed/simple;
-	bh=yOXE5Hy8uK0+whvJbTnwB+B5BIBCP9CJTyMoOTtIjpQ=;
+	bh=KTK0YDQbB5ScB25Ab1/UdMq5A/2krDtMSazFIcy293U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HSyzHpN0KTYAJWNiIPupeBVsutCcaBl9ZIITdGSTdvQK9Kt6zotqsEDNVpXsHVb0fu6fQ1hw2xXMnrNGwweMlZCvQuPx/o17uN//3albpZxCmrK9SuWYU+hOx+x5qvo9YklM3naHACpHEm74RcUfyziZgTFc8/tzV51QWGHslgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=universe-factory.net; spf=pass smtp.mailfrom=universe-factory.net; dkim=pass (2048-bit key) header.d=universe-factory.net header.i=@universe-factory.net header.b=PJb+TBoh; arc=none smtp.client-ip=141.95.161.142
+	 MIME-Version; b=MhIUMt+O/F7Z72V2PJop0uI1CNWx+FMghZcRr/NqgrlfSxWawz2OiLztgQXBSojJBuNcUgK3h/QPKFEQqXzbLlHqGcYZ/CCTnLtwKlocXrhBnfkmsXwu7Tu4EtDHLLoPw4p9EHl1zP50zdDbLfaeyIPmG3cyTVKvB0Uj0p2gAk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=universe-factory.net; spf=pass smtp.mailfrom=universe-factory.net; dkim=pass (2048-bit key) header.d=universe-factory.net header.i=@universe-factory.net header.b=ctEsFRqe; arc=none smtp.client-ip=141.95.161.142
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=universe-factory.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=universe-factory.net
 From: Matthias Schiffer <mschiffer@universe-factory.net>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=universe-factory.net;
-	s=dkim; t=1747687624;
+	s=dkim; t=1747687625;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ZyLWWB7YfeF/QGdzEH0pR1JoVUVT39q+Nr/ihIBlmTU=;
-	b=PJb+TBoh24tTtvbGcekC1HCI+flXMs6FLRU0QzzaIr9y5ty8NhTSW4y1g0eXR2Usongt1V
-	yejsRtN/VJyBrAIPRb/1l688Qgx8j+EKl21+2xmHPvEzKf/EsbTnSMDB65+UCM8aBuE/lG
-	fI9kRrfjrILUDxCqoVNMu5bDXX4H83AVzovzLJFwvqx5Br1BZumXzCglp/t3NDD16/jTT7
-	t5vaiwWNlbEBgXgm1sWnsi/VeEPhN3L28T6PhBVLvMKDN6wS34X8NNhhw3PuFruTk90GrA
-	CBggFABT6Fc/ayCFhsYTlWNIQxKPEXPvKR4PfIKnOXCR86uJdzxz0GUmhyte5g==
+	bh=QjKLo/tOnJbbn4RE3qNlH9tuSfGKWChkWil4hpttwM4=;
+	b=ctEsFRqe5Ac/NbKeEnR97EPb8EEaVr7ZcIbDP+gqCAKSqg9Hyn5tarkQ3bZSr1mmXSQ4cb
+	1Ieg5OstWu3YDYPkD25JEn/bqn4Ic4yo9meg8gd9Lb5EEUVySrbUC1STxXGRDA8LSx0c+j
+	kpI8uIPTwgi0rj3+BlvoRGXywt0VAHBz/biXuehhj/umVJptSZONd/cVz1SrWfcU3VBk9c
+	7S66Iny0zaxmCCgH32/YMYe5ZsK4mE0JpwSOviQ0UdX0AD4Kz2qls9DxltB17bHt8XZM4F
+	wtkrIC4X4WRxP6rI7FVobaQYfEWgnG2AiAGUD+49EH/yWFmlXrf5c1aPwPKX1g==
 Authentication-Results: mail.universe-factory.net;
 	auth=pass smtp.mailfrom=mschiffer@universe-factory.net
 To: Marek Lindner <marek.lindner@mailbox.org>,
@@ -59,9 +59,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Matthias Schiffer <mschiffer@universe-factory.net>
-Subject: [PATCH batadv 2/5] batman-adv: only create hardif while a netdev is part of a mesh
-Date: Mon, 19 May 2025 22:46:29 +0200
-Message-ID: <e311c7d643fa1a7d13f2b518f6ee525eb6711f6c.1747687504.git.mschiffer@universe-factory.net>
+Subject: [PATCH batadv 3/5] batman-adv: remove BATADV_IF_NOT_IN_USE hardif state
+Date: Mon, 19 May 2025 22:46:30 +0200
+Message-ID: <18929b62aafd4ce02940bea02b7a2bf6c5661089.1747687504.git.mschiffer@universe-factory.net>
 In-Reply-To: <0b26554afea5203820faef1dfb498af7533a9b5d.1747687504.git.mschiffer@universe-factory.net>
 References: <0b26554afea5203820faef1dfb498af7533a9b5d.1747687504.git.mschiffer@universe-factory.net>
 Precedence: bulk
@@ -73,289 +73,128 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spamd-Bar: -----
 
-batman-adv has used netdevice notifiers to create a hardif struct for
-every Ethernet-like netdev in the system, instead of just for netdevs
-that are actually used for meshing.
-
-This is inefficient in many ways: It requires maintaining a global list
-of hardifs (as there is no other place to store the hardif associated
-with a netdev), lookups in this list are O(n) in the total number of
-interfaces, and the maintenance of this list results in just loading the
-batman-adv module to cause a slowdown of certain netdev operations (for
-example, deleting n Ethernet netdevs may take O(n^2) because for each
-removal, the corresponding hardif needs to be looked up in the global
-list).
-
-As the next step towards removing the global list, only create a hardif
-struct when an interface is added to a mesh, and destroy it on removal.
-Parts of batadv_hardif_add_interface() are merged into
-batadv_hardif_enable_interface(), and batadv_hardif_remove_interface()
-can be dropped altogether.
+With hardifs only existing while an interface is part of a mesh, the
+BATADV_IF_NOT_IN_USE state has become redundant.
 
 Signed-off-by: Matthias Schiffer <mschiffer@universe-factory.net>
 ---
- net/batman-adv/hard-interface.c | 131 +++++++++++++-------------------
- net/batman-adv/hard-interface.h |   2 +-
- net/batman-adv/mesh-interface.c |  13 +---
- 3 files changed, 53 insertions(+), 93 deletions(-)
+ net/batman-adv/bat_iv_ogm.c     | 3 +--
+ net/batman-adv/bat_v_elp.c      | 3 +--
+ net/batman-adv/hard-interface.c | 9 ---------
+ net/batman-adv/hard-interface.h | 6 ------
+ net/batman-adv/originator.c     | 4 ----
+ 5 files changed, 2 insertions(+), 23 deletions(-)
 
+diff --git a/net/batman-adv/bat_iv_ogm.c b/net/batman-adv/bat_iv_ogm.c
+index 54fe38b3b2fd..c09ca4a896cc 100644
+--- a/net/batman-adv/bat_iv_ogm.c
++++ b/net/batman-adv/bat_iv_ogm.c
+@@ -866,8 +866,7 @@ static void batadv_iv_ogm_schedule_buff(struct batadv_hard_iface *hard_iface)
+ 
+ static void batadv_iv_ogm_schedule(struct batadv_hard_iface *hard_iface)
+ {
+-	if (hard_iface->if_status == BATADV_IF_NOT_IN_USE ||
+-	    hard_iface->if_status == BATADV_IF_TO_BE_REMOVED)
++	if (hard_iface->if_status == BATADV_IF_TO_BE_REMOVED)
+ 		return;
+ 
+ 	mutex_lock(&hard_iface->bat_iv.ogm_buff_mutex);
+diff --git a/net/batman-adv/bat_v_elp.c b/net/batman-adv/bat_v_elp.c
+index 42ec62387ce1..7c914bfac340 100644
+--- a/net/batman-adv/bat_v_elp.c
++++ b/net/batman-adv/bat_v_elp.c
+@@ -301,8 +301,7 @@ static void batadv_v_elp_periodic_work(struct work_struct *work)
+ 		goto out;
+ 
+ 	/* we are in the process of shutting this interface down */
+-	if (hard_iface->if_status == BATADV_IF_NOT_IN_USE ||
+-	    hard_iface->if_status == BATADV_IF_TO_BE_REMOVED)
++	if (hard_iface->if_status == BATADV_IF_TO_BE_REMOVED)
+ 		goto out;
+ 
+ 	/* the interface was enabled but may not be ready yet */
 diff --git a/net/batman-adv/hard-interface.c b/net/batman-adv/hard-interface.c
-index bace57e4f9a5..7e8c08fbd049 100644
+index 7e8c08fbd049..89e0e11250ca 100644
 --- a/net/batman-adv/hard-interface.c
 +++ b/net/batman-adv/hard-interface.c
-@@ -694,32 +694,66 @@ batadv_hardif_deactivate_interface(struct batadv_hard_iface *hard_iface)
- }
+@@ -517,9 +517,6 @@ static void batadv_check_known_mac_addr(const struct batadv_hard_iface *hard_ifa
+ 		if (tmp_hard_iface == hard_iface)
+ 			continue;
  
- /**
-- * batadv_hardif_enable_interface() - Enslave hard interface to mesh interface
-- * @hard_iface: hard interface to add to mesh interface
-+ * batadv_hardif_enable_interface() - Enslave interface to mesh interface
-+ * @net_dev: netdev struct of the interface to add to mesh interface
-  * @mesh_iface: netdev struct of the mesh interface
-  *
-- * Return: 0 on success or negative error number in case of failure
-+ * Return: new hardif on success, NULL for unsupported device types or negative
-+ *         error number in case of failure
-  */
--int batadv_hardif_enable_interface(struct batadv_hard_iface *hard_iface,
-+int batadv_hardif_enable_interface(struct net_device *net_dev,
- 				   struct net_device *mesh_iface)
- {
- 	struct batadv_priv *bat_priv;
- 	__be16 ethertype = htons(ETH_P_BATMAN);
- 	int max_header_len = batadv_max_header_len();
-+	struct batadv_hard_iface *hard_iface;
- 	unsigned int required_mtu;
- 	unsigned int hardif_mtu;
- 	int ret;
+-		if (tmp_hard_iface->if_status == BATADV_IF_NOT_IN_USE)
+-			continue;
+-
+ 		if (!batadv_compare_eth(tmp_hard_iface->net_dev->dev_addr,
+ 					hard_iface->net_dev->dev_addr))
+ 			continue;
+@@ -545,9 +542,6 @@ static void batadv_hardif_recalc_extra_skbroom(struct net_device *mesh_iface)
  
--	hardif_mtu = READ_ONCE(hard_iface->net_dev->mtu);
--	required_mtu = READ_ONCE(mesh_iface->mtu) + max_header_len;
-+	ASSERT_RTNL();
+ 	rcu_read_lock();
+ 	netdev_for_each_lower_private_rcu(mesh_iface, hard_iface, iter) {
+-		if (hard_iface->if_status == BATADV_IF_NOT_IN_USE)
+-			continue;
+-
+ 		lower_header_len = max_t(unsigned short, lower_header_len,
+ 					 hard_iface->net_dev->hard_header_len);
  
--	if (hardif_mtu < ETH_MIN_MTU + max_header_len)
-+	if (!batadv_is_valid_iface(net_dev))
- 		return -EINVAL;
- 
--	if (hard_iface->if_status != BATADV_IF_NOT_IN_USE)
--		goto out;
-+	hard_iface = kzalloc(sizeof(*hard_iface), GFP_ATOMIC);
-+	if (!hard_iface)
-+		return -ENOMEM;
-+
-+	netdev_hold(net_dev, &hard_iface->dev_tracker, GFP_ATOMIC);
-+	hard_iface->net_dev = net_dev;
-+
-+	hard_iface->mesh_iface = NULL;
-+	hard_iface->if_status = BATADV_IF_INACTIVE;
-+
-+	INIT_LIST_HEAD(&hard_iface->list);
-+	INIT_HLIST_HEAD(&hard_iface->neigh_list);
-+
-+	mutex_init(&hard_iface->bat_iv.ogm_buff_mutex);
-+	spin_lock_init(&hard_iface->neigh_list_lock);
-+	kref_init(&hard_iface->refcount);
-+
-+	hard_iface->num_bcasts = BATADV_NUM_BCASTS_DEFAULT;
-+	hard_iface->wifi_flags = batadv_wifi_flags_evaluate(net_dev);
-+	if (batadv_is_wifi_hardif(hard_iface))
-+		hard_iface->num_bcasts = BATADV_NUM_BCASTS_WIRELESS;
-+
-+	atomic_set(&hard_iface->hop_penalty, 0);
-+
-+	batadv_v_hardif_init(hard_iface);
- 
- 	kref_get(&hard_iface->refcount);
-+	list_add_tail_rcu(&hard_iface->list, &batadv_hardif_list);
-+	batadv_hardif_generation++;
-+
-+	hardif_mtu = READ_ONCE(hard_iface->net_dev->mtu);
-+	required_mtu = READ_ONCE(mesh_iface->mtu) + max_header_len;
-+
-+	if (hardif_mtu < ETH_MIN_MTU + max_header_len) {
-+		ret = -EINVAL;
-+		goto err_put;
-+	}
- 
- 	netdev_hold(mesh_iface, &hard_iface->meshif_dev_tracker, GFP_ATOMIC);
- 	hard_iface->mesh_iface = mesh_iface;
-@@ -734,9 +768,6 @@ int batadv_hardif_enable_interface(struct batadv_hard_iface *hard_iface,
- 	if (ret < 0)
- 		goto err_upper;
- 
--	hard_iface->if_status = BATADV_IF_INACTIVE;
--
--	kref_get(&hard_iface->refcount);
- 	hard_iface->batman_adv_ptype.type = ethertype;
- 	hard_iface->batman_adv_ptype.func = batadv_batman_skb_recv;
- 	hard_iface->batman_adv_ptype.dev = hard_iface->net_dev;
-@@ -773,7 +804,6 @@ int batadv_hardif_enable_interface(struct batadv_hard_iface *hard_iface,
- 	if (bat_priv->algo_ops->iface.enabled)
- 		bat_priv->algo_ops->iface.enabled(hard_iface);
- 
--out:
- 	return 0;
- 
- err_upper:
-@@ -781,6 +811,7 @@ int batadv_hardif_enable_interface(struct batadv_hard_iface *hard_iface,
- err_dev:
- 	hard_iface->mesh_iface = NULL;
- 	netdev_put(mesh_iface, &hard_iface->meshif_dev_tracker);
-+err_put:
- 	batadv_hardif_put(hard_iface);
- 	return ret;
- }
-@@ -818,11 +849,16 @@ void batadv_hardif_disable_interface(struct batadv_hard_iface *hard_iface)
- 	struct batadv_priv *bat_priv = netdev_priv(hard_iface->mesh_iface);
- 	struct batadv_hard_iface *primary_if = NULL;
- 
-+	ASSERT_RTNL();
-+
- 	batadv_hardif_deactivate_interface(hard_iface);
- 
- 	if (hard_iface->if_status != BATADV_IF_INACTIVE)
- 		goto out;
- 
-+	list_del_rcu(&hard_iface->list);
-+	batadv_hardif_generation++;
-+
- 	batadv_info(hard_iface->mesh_iface, "Removing interface: %s\n",
- 		    hard_iface->net_dev->name);
- 	dev_remove_pack(&hard_iface->batman_adv_ptype);
-@@ -839,7 +875,7 @@ void batadv_hardif_disable_interface(struct batadv_hard_iface *hard_iface)
- 	}
- 
- 	bat_priv->algo_ops->iface.disable(hard_iface);
--	hard_iface->if_status = BATADV_IF_NOT_IN_USE;
-+	hard_iface->if_status = BATADV_IF_TO_BE_REMOVED;
- 
- 	/* delete all references to this hard_iface */
- 	batadv_purge_orig_ref(bat_priv);
-@@ -860,64 +896,6 @@ void batadv_hardif_disable_interface(struct batadv_hard_iface *hard_iface)
- 	batadv_hardif_put(primary_if);
- }
- 
--static struct batadv_hard_iface *
--batadv_hardif_add_interface(struct net_device *net_dev)
--{
--	struct batadv_hard_iface *hard_iface;
--
--	ASSERT_RTNL();
--
--	if (!batadv_is_valid_iface(net_dev))
--		return NULL;
--
--	hard_iface = kzalloc(sizeof(*hard_iface), GFP_ATOMIC);
--	if (!hard_iface)
--		return NULL;
--
--	netdev_hold(net_dev, &hard_iface->dev_tracker, GFP_ATOMIC);
--	hard_iface->net_dev = net_dev;
--
--	hard_iface->mesh_iface = NULL;
--	hard_iface->if_status = BATADV_IF_NOT_IN_USE;
--
--	INIT_LIST_HEAD(&hard_iface->list);
--	INIT_HLIST_HEAD(&hard_iface->neigh_list);
--
--	mutex_init(&hard_iface->bat_iv.ogm_buff_mutex);
--	spin_lock_init(&hard_iface->neigh_list_lock);
--	kref_init(&hard_iface->refcount);
--
--	hard_iface->num_bcasts = BATADV_NUM_BCASTS_DEFAULT;
--	hard_iface->wifi_flags = batadv_wifi_flags_evaluate(net_dev);
--	if (batadv_is_wifi_hardif(hard_iface))
--		hard_iface->num_bcasts = BATADV_NUM_BCASTS_WIRELESS;
--
--	atomic_set(&hard_iface->hop_penalty, 0);
--
--	batadv_v_hardif_init(hard_iface);
--
--	kref_get(&hard_iface->refcount);
--	list_add_tail_rcu(&hard_iface->list, &batadv_hardif_list);
--	batadv_hardif_generation++;
--
--	return hard_iface;
--}
--
--static void batadv_hardif_remove_interface(struct batadv_hard_iface *hard_iface)
--{
--	ASSERT_RTNL();
--
--	/* first deactivate interface */
--	if (hard_iface->if_status != BATADV_IF_NOT_IN_USE)
--		batadv_hardif_disable_interface(hard_iface);
--
--	if (hard_iface->if_status != BATADV_IF_NOT_IN_USE)
--		return;
--
--	hard_iface->if_status = BATADV_IF_TO_BE_REMOVED;
--	batadv_hardif_put(hard_iface);
--}
--
- /**
-  * batadv_hard_if_event_meshif() - Handle events for mesh interfaces
-  * @event: NETDEV_* event to handle
-@@ -952,10 +930,6 @@ static int batadv_hard_if_event(struct notifier_block *this,
- 		return batadv_hard_if_event_meshif(event, net_dev);
- 
- 	hard_iface = batadv_hardif_get_by_netdev(net_dev);
--	if (!hard_iface && (event == NETDEV_REGISTER ||
--			    event == NETDEV_POST_TYPE_CHANGE))
--		hard_iface = batadv_hardif_add_interface(net_dev);
--
- 	if (!hard_iface)
- 		goto out;
- 
-@@ -969,10 +943,7 @@ static int batadv_hard_if_event(struct notifier_block *this,
+@@ -950,9 +944,6 @@ static int batadv_hard_if_event(struct notifier_block *this,
+ 			batadv_update_min_mtu(hard_iface->mesh_iface);
  		break;
- 	case NETDEV_UNREGISTER:
- 	case NETDEV_PRE_TYPE_CHANGE:
--		list_del_rcu(&hard_iface->list);
--		batadv_hardif_generation++;
+ 	case NETDEV_CHANGEADDR:
+-		if (hard_iface->if_status == BATADV_IF_NOT_IN_USE)
+-			goto hardif_put;
 -
--		batadv_hardif_remove_interface(hard_iface);
-+		batadv_hardif_disable_interface(hard_iface);
- 		break;
- 	case NETDEV_CHANGEMTU:
- 		if (hard_iface->mesh_iface)
+ 		batadv_check_known_mac_addr(hard_iface);
+ 
+ 		bat_priv = netdev_priv(hard_iface->mesh_iface);
 diff --git a/net/batman-adv/hard-interface.h b/net/batman-adv/hard-interface.h
-index 262a78364742..ebde3d5077a4 100644
+index ebde3d5077a4..ace7a0f6f3b6 100644
 --- a/net/batman-adv/hard-interface.h
 +++ b/net/batman-adv/hard-interface.h
-@@ -73,7 +73,7 @@ bool batadv_is_cfg80211_hardif(struct batadv_hard_iface *hard_iface);
- bool batadv_is_wifi_hardif(struct batadv_hard_iface *hard_iface);
- struct batadv_hard_iface*
- batadv_hardif_get_by_netdev(const struct net_device *net_dev);
--int batadv_hardif_enable_interface(struct batadv_hard_iface *hard_iface,
-+int batadv_hardif_enable_interface(struct net_device *net_dev,
- 				   struct net_device *mesh_iface);
- void batadv_hardif_disable_interface(struct batadv_hard_iface *hard_iface);
- int batadv_hardif_min_mtu(struct net_device *mesh_iface);
-diff --git a/net/batman-adv/mesh-interface.c b/net/batman-adv/mesh-interface.c
-index 5872818f4e31..860c5af5752a 100644
---- a/net/batman-adv/mesh-interface.c
-+++ b/net/batman-adv/mesh-interface.c
-@@ -835,18 +835,7 @@ static int batadv_meshif_slave_add(struct net_device *dev,
- 				   struct net_device *slave_dev,
- 				   struct netlink_ext_ack *extack)
- {
--	struct batadv_hard_iface *hard_iface;
--	int ret = -EINVAL;
+@@ -21,12 +21,6 @@
+  * enum batadv_hard_if_state - State of a hard interface
+  */
+ enum batadv_hard_if_state {
+-	/**
+-	 * @BATADV_IF_NOT_IN_USE: interface is not used as slave interface of a
+-	 * batman-adv mesh interface
+-	 */
+-	BATADV_IF_NOT_IN_USE,
 -
--	hard_iface = batadv_hardif_get_by_netdev(slave_dev);
--	if (!hard_iface || hard_iface->mesh_iface)
--		goto out;
--
--	ret = batadv_hardif_enable_interface(hard_iface, dev);
--
--out:
--	batadv_hardif_put(hard_iface);
--	return ret;
-+	return batadv_hardif_enable_interface(slave_dev, dev);
- }
+ 	/**
+ 	 * @BATADV_IF_TO_BE_REMOVED: interface will be removed from mesh
+ 	 * interface
+diff --git a/net/batman-adv/originator.c b/net/batman-adv/originator.c
+index 2726f2905f3c..2e5ea70acbd9 100644
+--- a/net/batman-adv/originator.c
++++ b/net/batman-adv/originator.c
+@@ -1033,7 +1033,6 @@ batadv_purge_neigh_ifinfo(struct batadv_priv *bat_priv,
  
- /**
+ 		/* don't purge if the interface is not (going) down */
+ 		if (if_outgoing->if_status != BATADV_IF_INACTIVE &&
+-		    if_outgoing->if_status != BATADV_IF_NOT_IN_USE &&
+ 		    if_outgoing->if_status != BATADV_IF_TO_BE_REMOVED)
+ 			continue;
+ 
+@@ -1077,7 +1076,6 @@ batadv_purge_orig_ifinfo(struct batadv_priv *bat_priv,
+ 
+ 		/* don't purge if the interface is not (going) down */
+ 		if (if_outgoing->if_status != BATADV_IF_INACTIVE &&
+-		    if_outgoing->if_status != BATADV_IF_NOT_IN_USE &&
+ 		    if_outgoing->if_status != BATADV_IF_TO_BE_REMOVED)
+ 			continue;
+ 
+@@ -1127,10 +1125,8 @@ batadv_purge_orig_neighbors(struct batadv_priv *bat_priv,
+ 
+ 		if (batadv_has_timed_out(last_seen, BATADV_PURGE_TIMEOUT) ||
+ 		    if_incoming->if_status == BATADV_IF_INACTIVE ||
+-		    if_incoming->if_status == BATADV_IF_NOT_IN_USE ||
+ 		    if_incoming->if_status == BATADV_IF_TO_BE_REMOVED) {
+ 			if (if_incoming->if_status == BATADV_IF_INACTIVE ||
+-			    if_incoming->if_status == BATADV_IF_NOT_IN_USE ||
+ 			    if_incoming->if_status == BATADV_IF_TO_BE_REMOVED)
+ 				batadv_dbg(BATADV_DBG_BATMAN, bat_priv,
+ 					   "neighbor purge: originator %pM, neighbor: %pM, iface: %s\n",
 -- 
 2.49.0
 
