@@ -1,759 +1,187 @@
-Return-Path: <netdev+bounces-191580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95D68ABC486
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 18:31:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07B1CABC4C8
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 18:40:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A4073BD6F8
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 16:30:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A3C9189F80A
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 16:40:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFE9C286D64;
-	Mon, 19 May 2025 16:31:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AD1B284B42;
+	Mon, 19 May 2025 16:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JC9G1o4a"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SCNnrMTO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F66E1A5B91;
-	Mon, 19 May 2025 16:31:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 321A4189906;
+	Mon, 19 May 2025 16:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747672266; cv=none; b=VTj46TXMjAq3oqBNcRGlVEQX+1o0Dn0HsT5C0DUTer+dLXJF6rWKHN8JVzcdcfEfCtk162cSZqwMB9Li89oXS44M/irOJ+mFLGQdsI6UvmgyaK4wQYcVTKAN76PxtCbNGNgtYmlZhZ+wcIWKtMOqZRgJU5ix12rlXc5MX5w/6UI=
+	t=1747672826; cv=none; b=Yz+ynMl//dB92YVpIxaMICk2dr9kH39oHKMiA807ze/+G55mL3uA+a15zXZOZMuIKDGcdUFwQathcqvxOkVJeDPDalSC98bLwuDoC0XvnwlKtLDiXq/weiYw6XTdUQSVOZTpTiCZt1YT5IGEtOgXXNJDrXzdwQK01l9mxxpy5uQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747672266; c=relaxed/simple;
-	bh=TdH8xvR+otWhxYNv5QidDvP6x7+zcXWJo6eudAIfuVI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MDNpjvUycGPPvKo5pdZg9UORrDiR1hj7qW342gDpYr1/3YeUrt+zmn/ANjmD0GECKymUGNcGZ1OXILdLODw1PGbognack53SSOm7DYcE3qTZSdE+JPgkEFifo9d+qNiuQ7lWgb/6VtSxXg92DBqBtgq4IhmXc4CPUJlrEMR6rY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JC9G1o4a; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43d04dc73b7so50482245e9.3;
-        Mon, 19 May 2025 09:31:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747672262; x=1748277062; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kgc1cYNubouccX5B/5oDCtI7burqRoYCH/AJo+qxmzc=;
-        b=JC9G1o4as+ZoYHYqypWLbTpoUtFcwMsFsB7auuO8dU/rfKXXMA8GVqswGIkr21L2oZ
-         NzFYvl7gqbLvOfoR3A0LoEgPcKeUYiHfA33A5yZmzv+ZAmUWlMtVFCqCxjGWcUvMqpCH
-         AvOIvV7h389XOzlXEicvZUzRVD+TnXtUpGmeXzeyrpKd1ZYmU27j/qLWuPbXzBg+QNed
-         mlVF1zBwmLLd46bihhpBpiKOJepxcr2ipUjD4D+3KOgRUehGoKIF+UAk+YtYo1J5uC38
-         jcD7naOTb2A+NiJYEP5Li4dDn1kKBo05VpYpzscz69Pu56OkEh5z/rz5prxefMpoMBF3
-         kYbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747672262; x=1748277062;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kgc1cYNubouccX5B/5oDCtI7burqRoYCH/AJo+qxmzc=;
-        b=M6B0Xy2/ixYYx/HmdAiRtTjtNRBku/mc+d4yqxVthXTO99VE+511SscMStAiamCkgh
-         Q410QkBifgPG0mr0EnwvIlZEOFrKAVMY46g7JNwUxxFNHaOMcYLINg8aop3B2jd4DnTb
-         Ln44WsE1/UrYHj0IdTGoYvn0kap+bsffxjG8Pv6giyJFo4cq8SNjWPboDaYZBeUZBEPm
-         otB5dFJH60yScLtucSWgFePVbmF4Ld/ZU3hsgS+pFpS0gNob3EICVynRAT4sdWLu07BS
-         5yOgfTTAwVN63oWdIRG5/6hMMRjLhKcoKrkihM5cDiCRj1EqFcrnybuw0LCbsoprZ8IS
-         q61Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUvBOqpUpBLKPGvOXmYH+wHdPLX60BmMRipMqyOSCS8o+QFneJ5G58DBpZiA3PCa7OdQ4EFRD833Cbr17o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLqJD36nUr2P3MM8vv/9AJNCRAUA1evwViy9wmfeAcYIylmNLB
-	Cpj5fkJJ5gy/WfB5NnwEsL4Mq7MLBWJwsCBWLmrNXo4uuMkHjZuaKX+PPBhSWVqa
-X-Gm-Gg: ASbGncukY9m9rCpIbg0Ws0UzxlJxKmHvPCQX3Shw7b4albJbwyDKKJ8odU9JnSDDTSS
-	6q/XUTIwX6T4y/lRf8JRGqTze3C8fr4W75Jy0qx0uCgJ7prQp9inx7LQCFmTR075fpXkfGQGNQh
-	K0bLt2k1HP1O98iv/GJmgc404T/4ugMX3Hq6BeJNpzHCYMwwBRVTx+k2ilSAOvSAcd3gooqOomA
-	r5ihKxotWuJ9Ptcm326cZ8hDsn1yQhXxc3mF6jK/ckmAt94Wk7r3PB8ZxFkxPT7VblmO8cwykG6
-	STKaqyw3V5i8slyJgDNn952PqPZfI+ejj1Nucy7ueOFr2/NY6TB+R46pZRf1zkfhkkK7jw==
-X-Google-Smtp-Source: AGHT+IHiQhSufT9fYtGwlWTYaVJOg6Fu2t4YSQpSKAyF3AFeEwIllbpXkFJ/NMqKpaOkurjMKpBL3w==
-X-Received: by 2002:a05:600c:1e1c:b0:442:c98f:d8cf with SMTP id 5b1f17b1804b1-44302934f7bmr116500355e9.16.1747672261798;
-        Mon, 19 May 2025 09:31:01 -0700 (PDT)
-Received: from GLaDOS.. ([151.84.244.111])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442fd4fe161sm153029195e9.8.2025.05.19.09.31.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 May 2025 09:31:01 -0700 (PDT)
-From: stefano.radaelli21@gmail.com
-To: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: stefano.radaelli21@gmail.com,
+	s=arc-20240116; t=1747672826; c=relaxed/simple;
+	bh=8AekMnk7LJZuUtqQ1X0wseXmvLHDUBX7h+wM+z7I/ww=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dj4Wb3Zig6JgUqcUCK16FpotF1FfTrhJkVsU4IWb9KnA0JYbP/K0xpSGdXTButMUwop+EaarK3OOwhZlPhpoW9BhpfVpoznPwLh+MvxZlvnwEdIR25+4i/QJHrZoDrCR10qOK71/vFSeDOpztAoDjEOUjUmtMEDgEYtZSkdeLEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SCNnrMTO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9354BC4CEE4;
+	Mon, 19 May 2025 16:40:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747672825;
+	bh=8AekMnk7LJZuUtqQ1X0wseXmvLHDUBX7h+wM+z7I/ww=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SCNnrMTOytetYBMrRAwp1W0dzqcMOnVDJ1J2TaqS1eTxFEMoUWCMFlYu7VgKjQWqr
+	 t1kqRsaYadf6EaoZq+UF2KwCuhAmcj3tdwk3qi7aV70zYrIXSfZX3s9rPFffWLQcIR
+	 9n+M8Bn3W+Wm70mH//h3UqRlaxqsXbDf2e3qIVCa8l031H1iST9bxPMyMObW+CUjrO
+	 MDriWmWr0Z9+sQ1niXPjBx/fwpPbDoA508vyKK2YRd3JhkxksDXXko2Q57rtKzBcRe
+	 035934n5qtj+C/0H1v/iJqTVwib7zy+0owU9tyvR27vEtWd8k2foPf2zETy0LB7mk6
+	 LoGj7Lli8jq5w==
+Date: Mon, 19 May 2025 17:40:21 +0100
+From: Simon Horman <horms@kernel.org>
+To: Stefano Radaelli <stefano.radaelli21@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Andrew Lunn <andrew@lunn.ch>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
 	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Xu Liang <lxu@maxlinear.com>
-Subject: [PATCH net-next v3] net: phy: add driver for MaxLinear MxL86110 PHY
-Date: Mon, 19 May 2025 18:30:26 +0200
-Message-ID: <20250519163032.96467-1-stefano.radaelli21@gmail.com>
-X-Mailer: git-send-email 2.43.0
+Subject: Re: [PATCH net-next v2] net: phy: add driver for MaxLinear MxL86110
+ PHY
+Message-ID: <20250519164021.GL365796@horms.kernel.org>
+References: <20250516164126.234883-1-stefano.radaelli21@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250516164126.234883-1-stefano.radaelli21@gmail.com>
 
-From: Stefano Radaelli <stefano.radaelli21@gmail.com>
+On Fri, May 16, 2025 at 06:41:23PM +0200, Stefano Radaelli wrote:
+> Add support for the MaxLinear MxL86110 Gigabit Ethernet PHY, a low-power,
+> cost-optimized transceiver supporting 10/100/1000 Mbps over twisted-pair
+> copper, compliant with IEEE 802.3.
+> 
+> The driver implements basic features such as:
+> - Device initialization
+> - RGMII interface timing configuration
+> - Wake-on-LAN support
+> - LED initialization and control via /sys/class/leds
+> 
+> This driver has been tested on multiple Variscite boards, including:
+> - VAR-SOM-MX93 (i.MX93)
+> - VAR-SOM-MX8M-PLUS (i.MX8MP)
+> 
+> Example boot log showing driver probe:
+> [    7.692101] imx-dwmac 428a0000.ethernet eth0:
+>         PHY [stmmac-0:00] driver [MXL86110 Gigabit Ethernet] (irq=POLL)
+> 
+> Changes from v1:
+> - Add net-next support
+> - Improved locking management and tests using CONFIG_PROVE_LOCKING
+> - General cleanup
+> 
+> Started a new thread
+> 
+> Signed-off-by: Stefano Radaelli <stefano.radaelli21@gmail.com>
 
-Add support for the MaxLinear MxL86110 Gigabit Ethernet PHY, a low-power,
-cost-optimized transceiver supporting 10/100/1000 Mbps over twisted-pair
-copper, compliant with IEEE 802.3.
+Hi Stefano,
 
-The driver implements basic features such as:
-- Device initialization
-- RGMII interface timing configuration
-- Wake-on-LAN support
-- LED initialization and control via /sys/class/leds
+Some minor feedback from my side.
 
-This driver has been tested on multiple Variscite boards, including:
-- VAR-SOM-MX93 (i.MX93)
-- VAR-SOM-MX8M-PLUS (i.MX8MP)
+...
 
-Example boot log showing driver probe:
-[    7.692101] imx-dwmac 428a0000.ethernet eth0:
-        PHY [stmmac-0:00] driver [MXL86110 Gigabit Ethernet] (irq=POLL)
+> diff --git a/drivers/net/phy/mxl-86110.c b/drivers/net/phy/mxl-86110.c
+> new file mode 100644
+> index 000000000000..63f32c49fcc1
+> --- /dev/null
+> +++ b/drivers/net/phy/mxl-86110.c
+> @@ -0,0 +1,570 @@
+> +// SPDX-License-Identifier: GPL-2.0+
+> +/*
+> + * PHY driver for Maxlinear MXL86110
+> + *
+> + * Copyright 2023 MaxLinear Inc.
+> + *
+> + */
+> +
+> +#include <linux/bitfield.h>
+> +#include <linux/etherdevice.h>
+> +#include <linux/kernel.h>
+> +#include <linux/module.h>
+> +#include <linux/of.h>
+> +#include <linux/phy.h>
+> +
+> +/* PHY ID */
+> +#define PHY_ID_MXL86110		0xc1335580
+> +
+> +/* required to access extended registers */
+> +#define MXL86110_EXTD_REG_ADDR_OFFSET	0x1E
+> +#define MXL86110_EXTD_REG_ADDR_DATA		0x1F
+> +#define PHY_IRQ_ENABLE_REG				0x12
+> +#define PHY_IRQ_ENABLE_REG_WOL			BIT(6)
+> +
+> +/* SyncE Configuration Register - COM_EXT SYNCE_CFG */
+> +#define MXL86110_EXT_SYNCE_CFG_REG						0xA012
 
-Signed-off-by: Stefano Radaelli <stefano.radaelli21@gmail.com>
----
-v3:
-  - Simplified return handling, removed unnecessary goto/ret=0 patterns
-  - Added comments where MDIO lock is assumed
-  - Replaced read-modify-write sequences with _modify_
-    in broadcast and LED blink configuration
+For Networking code, please restrict lines to no more than 80 columns
+wide where you can do so without reducing readability (I'd say that is the
+case here.
 
-v2: https://lore.kernel.org/netdev/20250516164126.234883-1-stefano.radaelli21@gmail.com/
-  - Add net-next support
-  - Improved locking management and validation with CONFIG_PROVE_LOCKING
-  - General cleanup and simplification
+Likewise elsewhere in this patch.
 
-v1: https://lore.kernel.org/netdev/20250515184836.97605-1-stefano.radaelli21@gmail.com/
+checkpatch.pl --max-line-length=80 can be helpful here.
 
- MAINTAINERS                 |   1 +
- drivers/net/phy/Kconfig     |  12 +
- drivers/net/phy/Makefile    |   1 +
- drivers/net/phy/mxl-86110.c | 562 ++++++++++++++++++++++++++++++++++++
- 4 files changed, 576 insertions(+)
- create mode 100644 drivers/net/phy/mxl-86110.c
+...
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 84e99e991f53..cca046bbe00b 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -14653,6 +14653,7 @@ MAXLINEAR ETHERNET PHY DRIVER
- M:	Xu Liang <lxu@maxlinear.com>
- L:	netdev@vger.kernel.org
- S:	Supported
-+F:	drivers/net/phy/mxl-86110.c
- F:	drivers/net/phy/mxl-gpy.c
- 
- MCAN MMIO DEVICE DRIVER
-diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-index 677d56e06539..fbaa009c146d 100644
---- a/drivers/net/phy/Kconfig
-+++ b/drivers/net/phy/Kconfig
-@@ -263,6 +263,18 @@ config MAXLINEAR_GPHY
- 	  Support for the Maxlinear GPY115, GPY211, GPY212, GPY215,
- 	  GPY241, GPY245 PHYs.
- 
-+config MAXLINEAR_86110_PHY
-+	tristate "MaxLinear MXL86110 PHY support"
-+	help
-+	 Support for the MaxLinear MXL86110 Gigabit Ethernet
-+	 Physical Layer transceiver.
-+	 The MXL86110 is commonly used in networking equipment such as
-+	 routers, switches, and embedded systems, providing the
-+	 physical interface for 10/100/1000 Mbps Ethernet connections
-+	 over copper media.
-+	 If you are using a board with the MXL86110 PHY connected to your
-+	 Ethernet MAC, you should enable this option.
-+
- source "drivers/net/phy/mediatek/Kconfig"
- 
- config MICREL_PHY
-diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
-index 59ac3a9a3177..171a80228c12 100644
---- a/drivers/net/phy/Makefile
-+++ b/drivers/net/phy/Makefile
-@@ -75,6 +75,7 @@ obj-$(CONFIG_MARVELL_PHY)	+= marvell.o
- obj-$(CONFIG_MARVELL_88Q2XXX_PHY)	+= marvell-88q2xxx.o
- obj-$(CONFIG_MARVELL_88X2222_PHY)	+= marvell-88x2222.o
- obj-$(CONFIG_MAXLINEAR_GPHY)	+= mxl-gpy.o
-+obj-$(CONFIG_MAXLINEAR_86110_PHY)       += mxl-86110.o
- obj-y				+= mediatek/
- obj-$(CONFIG_MESON_GXL_PHY)	+= meson-gxl.o
- obj-$(CONFIG_MICREL_KS8995MA)	+= spi_ks8995.o
-diff --git a/drivers/net/phy/mxl-86110.c b/drivers/net/phy/mxl-86110.c
-new file mode 100644
-index 000000000000..155f2b174c87
---- /dev/null
-+++ b/drivers/net/phy/mxl-86110.c
-@@ -0,0 +1,562 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+/*
-+ * PHY driver for Maxlinear MXL86110
-+ *
-+ * Copyright 2023 MaxLinear Inc.
-+ *
-+ */
-+
-+#include <linux/bitfield.h>
-+#include <linux/etherdevice.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/of.h>
-+#include <linux/phy.h>
-+
-+/* PHY ID */
-+#define PHY_ID_MXL86110		0xc1335580
-+
-+/* required to access extended registers */
-+#define MXL86110_EXTD_REG_ADDR_OFFSET	0x1E
-+#define MXL86110_EXTD_REG_ADDR_DATA		0x1F
-+#define PHY_IRQ_ENABLE_REG				0x12
-+#define PHY_IRQ_ENABLE_REG_WOL			BIT(6)
-+
-+/* SyncE Configuration Register - COM_EXT SYNCE_CFG */
-+#define MXL86110_EXT_SYNCE_CFG_REG						0xA012
-+#define MXL86110_EXT_SYNCE_CFG_CLK_FRE_SEL				BIT(4)
-+#define MXL86110_EXT_SYNCE_CFG_EN_SYNC_E_DURING_LNKDN	BIT(5)
-+#define MXL86110_EXT_SYNCE_CFG_EN_SYNC_E				BIT(6)
-+#define MXL86110_EXT_SYNCE_CFG_CLK_SRC_SEL_MASK			GENMASK(3, 1)
-+#define MXL86110_EXT_SYNCE_CFG_CLK_SRC_SEL_125M_PLL		0
-+#define MXL86110_EXT_SYNCE_CFG_CLK_SRC_SEL_25M			4
-+
-+/* WOL registers */
-+#define MXL86110_WOL_MAC_ADDR_HIGH_EXTD_REG		0xA007 /* high-> FF:FF                   */
-+#define MXL86110_WOL_MAC_ADDR_MIDDLE_EXTD_REG	0xA008 /*    middle-> :FF:FF <-middle    */
-+#define MXL86110_WOL_MAC_ADDR_LOW_EXTD_REG		0xA009 /*                   :FF:FF <-low */
-+
-+#define MXL86110_EXT_WOL_CFG_REG				0xA00A
-+#define MXL86110_EXT_WOL_CFG_WOLE_MASK			BIT(3)
-+#define MXL86110_EXT_WOL_CFG_WOLE_DISABLE		0
-+#define MXL86110_EXT_WOL_CFG_WOLE_ENABLE		BIT(3)
-+
-+/* RGMII register */
-+#define MXL86110_EXT_RGMII_CFG1_REG							0xA003
-+/* delay can be adjusted in steps of about 150ps */
-+#define MXL86110_EXT_RGMII_CFG1_RX_NO_DELAY				(0x0 << 10)
-+/* Closest value to 2000 ps */
-+#define MXL86110_EXT_RGMII_CFG1_RX_DELAY_1950PS				(0xD << 10)
-+#define MXL86110_EXT_RGMII_CFG1_RX_DELAY_MASK				GENMASK(13, 10)
-+
-+#define MXL86110_EXT_RGMII_CFG1_TX_1G_DELAY_1950PS			(0xD << 0)
-+#define MXL86110_EXT_RGMII_CFG1_TX_1G_DELAY_MASK			GENMASK(3, 0)
-+
-+#define MXL86110_EXT_RGMII_CFG1_TX_10MB_100MB_DELAY_1950PS		(0xD << 4)
-+#define MXL86110_EXT_RGMII_CFG1_TX_10MB_100MB_DELAY_MASK	GENMASK(7, 4)
-+
-+#define MXL86110_EXT_RGMII_CFG1_FULL_MASK \
-+			((MXL86110_EXT_RGMII_CFG1_RX_DELAY_MASK) | \
-+			(MXL86110_EXT_RGMII_CFG1_TX_1G_DELAY_MASK) | \
-+			(MXL86110_EXT_RGMII_CFG1_TX_10MB_100MB_DELAY_MASK))
-+
-+/* EXT Sleep Control register */
-+#define MXL86110_UTP_EXT_SLEEP_CTRL_REG					0x27
-+#define MXL86110_UTP_EXT_SLEEP_CTRL_EN_SLEEP_SW_OFF		0
-+#define MXL86110_UTP_EXT_SLEEP_CTRL_EN_SLEEP_SW_MASK	BIT(15)
-+
-+/* RGMII In-Band Status and MDIO Configuration Register */
-+#define MXL86110_EXT_RGMII_MDIO_CFG				0xA005
-+#define MXL86110_EXT_RGMII_MDIO_CFG_EPA0_MASK			GENMASK(6, 6)
-+#define MXL86110_EXT_RGMII_MDIO_CFG_EBA_MASK			GENMASK(5, 5)
-+#define MXL86110_EXT_RGMII_MDIO_CFG_BA_MASK			GENMASK(4, 0)
-+
-+#define MXL86110_MAX_LEDS            3
-+/* LED registers and defines */
-+#define MXL86110_LED0_CFG_REG 0xA00C
-+#define MXL86110_LED1_CFG_REG 0xA00D
-+#define MXL86110_LED2_CFG_REG 0xA00E
-+
-+#define MXL86110_LEDX_CFG_TRAFFIC_ACT_BLINK_IND		BIT(13)
-+#define MXL86110_LEDX_CFG_LINK_UP_FULL_DUPLEX_ON	BIT(12)
-+#define MXL86110_LEDX_CFG_LINK_UP_HALF_DUPLEX_ON	BIT(11)
-+#define MXL86110_LEDX_CFG_LINK_UP_TX_ACT_ON			BIT(10)	/* LED 0,1,2 default */
-+#define MXL86110_LEDX_CFG_LINK_UP_RX_ACT_ON			BIT(9)	/* LED 0,1,2 default */
-+#define MXL86110_LEDX_CFG_LINK_UP_TX_ON				BIT(8)
-+#define MXL86110_LEDX_CFG_LINK_UP_RX_ON				BIT(7)
-+#define MXL86110_LEDX_CFG_LINK_UP_1GB_ON			BIT(6) /* LED 2 default */
-+#define MXL86110_LEDX_CFG_LINK_UP_100MB_ON			BIT(5) /* LED 1 default */
-+#define MXL86110_LEDX_CFG_LINK_UP_10MB_ON			BIT(4) /* LED 0 default */
-+#define MXL86110_LEDX_CFG_LINK_UP_COLLISION			BIT(3)
-+#define MXL86110_LEDX_CFG_LINK_UP_1GB_BLINK			BIT(2)
-+#define MXL86110_LEDX_CFG_LINK_UP_100MB_BLINK		BIT(1)
-+#define MXL86110_LEDX_CFG_LINK_UP_10MB_BLINK		BIT(0)
-+
-+#define MXL86110_LED_BLINK_CFG_REG						0xA00F
-+#define MXL86110_LED_BLINK_CFG_FREQ_MODE1_2HZ			0
-+#define MXL86110_LED_BLINK_CFG_FREQ_MODE1_4HZ			BIT(0)
-+#define MXL86110_LED_BLINK_CFG_FREQ_MODE1_8HZ			BIT(1)
-+#define MXL86110_LED_BLINK_CFG_FREQ_MODE1_16HZ			(BIT(1) | BIT(0))
-+#define MXL86110_LED_BLINK_CFG_FREQ_MODE2_2HZ			0
-+#define MXL86110_LED_BLINK_CFG_FREQ_MODE2_4HZ			BIT(2)
-+#define MXL86110_LED_BLINK_CFG_FREQ_MODE2_8HZ			BIT(3)
-+#define MXL86110_LED_BLINK_CFG_FREQ_MODE2_16HZ			(BIT(3) | BIT(2))
-+#define MXL86110_LED_BLINK_CFG_DUTY_CYCLE_50_PERC_ON	0
-+#define MXL86110_LED_BLINK_CFG_DUTY_CYCLE_67_PERC_ON	(BIT(4))
-+#define MXL86110_LED_BLINK_CFG_DUTY_CYCLE_75_PERC_ON	(BIT(5))
-+#define MXL86110_LED_BLINK_CFG_DUTY_CYCLE_83_PERC_ON	(BIT(5) | BIT(4))
-+#define MXL86110_LED_BLINK_CFG_DUTY_CYCLE_50_PERC_OFF	(BIT(6))
-+#define MXL86110_LED_BLINK_CFG_DUTY_CYCLE_33_PERC_ON	(BIT(6) | BIT(4))
-+#define MXL86110_LED_BLINK_CFG_DUTY_CYCLE_25_PERC_ON	(BIT(6) | BIT(5))
-+#define MXL86110_LED_BLINK_CFG_DUTY_CYCLE_17_PERC_ON	(BIT(6) | BIT(5) | BIT(4))
-+
-+/* Chip Configuration Register - COM_EXT_CHIP_CFG */
-+#define MXL86110_EXT_CHIP_CFG_REG			0xA001
-+#define MXL86110_EXT_CHIP_CFG_RXDLY_ENABLE	BIT(8)
-+#define MXL86110_EXT_CHIP_CFG_SW_RST_N_MODE	BIT(15)
-+
-+/**
-+ * mxl86110_write_extended_reg() - write to a PHY's extended register
-+ * @phydev: pointer to a &struct phy_device
-+ * @regnum: register number to write
-+ * @val: value to write to @regnum
-+ *
-+ * NOTE: This function assumes the caller already holds the MDIO bus lock
-+ * or otherwise has exclusive access to the PHY.
-+ *
-+ * returns 0 or negative error code
-+ */
-+static int mxl86110_write_extended_reg(struct phy_device *phydev, u16 regnum, u16 val)
-+{
-+	int ret;
-+
-+	ret = __phy_write(phydev, MXL86110_EXTD_REG_ADDR_OFFSET, regnum);
-+	if (ret < 0)
-+		return ret;
-+
-+	return __phy_write(phydev, MXL86110_EXTD_REG_ADDR_DATA, val);
-+}
-+
-+/**
-+ * mxl86110_read_extended_reg - Read a PHY's extended register
-+ * @phydev: Pointer to the PHY device structure
-+ * @regnum: Extended register number to read (address written to reg 30)
-+ *
-+ * Reads the content of a PHY extended register using the MaxLinear
-+ * 2-step access mechanism: write the register address to reg 30 (0x1E),
-+ * then read the value from reg 31 (0x1F).
-+ *
-+ * NOTE: This function assumes the caller already holds the MDIO bus lock
-+ * or otherwise has exclusive access to the PHY.
-+ *
-+ * Return: 16-bit register value on success, or negative errno code on failure.
-+ */
-+static int mxl86110_read_extended_reg(struct phy_device *phydev, u16 regnum)
-+{
-+	int ret;
-+
-+	ret = __phy_write(phydev, MXL86110_EXTD_REG_ADDR_OFFSET, regnum);
-+	if (ret < 0)
-+		return ret;
-+	return __phy_read(phydev, MXL86110_EXTD_REG_ADDR_DATA);
-+}
-+
-+/**
-+ * mxl86110_modify_extended_reg() - modify bits of a PHY's extended register
-+ * @phydev: pointer to the phy_device
-+ * @regnum: register number to write
-+ * @mask: bit mask of bits to clear
-+ * @set: bit mask of bits to set
-+ *
-+ * NOTE: register value = (old register value & ~mask) | set.
-+ * This function assumes the caller already holds the MDIO bus lock
-+ * or otherwise has exclusive access to the PHY.
-+ *
-+ * returns 0 or negative error code
-+ */
-+static int mxl86110_modify_extended_reg(struct phy_device *phydev, u16 regnum, u16 mask,
-+					u16 set)
-+{
-+	int ret;
-+
-+	ret = __phy_write(phydev, MXL86110_EXTD_REG_ADDR_OFFSET, regnum);
-+	if (ret < 0)
-+		return ret;
-+
-+	return __phy_modify(phydev, MXL86110_EXTD_REG_ADDR_DATA, mask, set);
-+}
-+
-+/**
-+ * mxl86110_get_wol() - report if wake-on-lan is enabled
-+ * @phydev: pointer to the phy_device
-+ * @wol: a pointer to a &struct ethtool_wolinfo
-+ */
-+static void mxl86110_get_wol(struct phy_device *phydev, struct ethtool_wolinfo *wol)
-+{
-+	int value;
-+
-+	wol->supported = WAKE_MAGIC;
-+	wol->wolopts = 0;
-+	phy_lock_mdio_bus(phydev);
-+	value = mxl86110_read_extended_reg(phydev, MXL86110_EXT_WOL_CFG_REG);
-+	phy_unlock_mdio_bus(phydev);
-+	if (value >= 0 && (value & MXL86110_EXT_WOL_CFG_WOLE_MASK))
-+		wol->wolopts |= WAKE_MAGIC;
-+}
-+
-+/**
-+ * mxl86110_set_wol() - enable/disable wake-on-lan
-+ * @phydev: pointer to the phy_device
-+ * @wol: a pointer to a &struct ethtool_wolinfo
-+ *
-+ * Configures the WOL Magic Packet MAC
-+ * returns 0 or negative errno code
-+ */
-+static int mxl86110_set_wol(struct phy_device *phydev, struct ethtool_wolinfo *wol)
-+{
-+	struct net_device *netdev;
-+	const u8 *mac;
-+	int ret = 0;
-+
-+	phy_lock_mdio_bus(phydev);
-+
-+	if (wol->wolopts & WAKE_MAGIC) {
-+		netdev = phydev->attached_dev;
-+		if (!netdev) {
-+			ret = -ENODEV;
-+			goto out;
-+		}
-+
-+		/* Configure the MAC address of the WOL magic packet */
-+		mac = (const u8 *)netdev->dev_addr;
-+		ret = mxl86110_write_extended_reg(phydev, MXL86110_WOL_MAC_ADDR_HIGH_EXTD_REG,
-+						  ((mac[0] << 8) | mac[1]));
-+		if (ret < 0)
-+			goto out;
-+
-+		ret = mxl86110_write_extended_reg(phydev, MXL86110_WOL_MAC_ADDR_MIDDLE_EXTD_REG,
-+						  ((mac[2] << 8) | mac[3]));
-+		if (ret < 0)
-+			goto out;
-+
-+		ret = mxl86110_write_extended_reg(phydev, MXL86110_WOL_MAC_ADDR_LOW_EXTD_REG,
-+						  ((mac[4] << 8) | mac[5]));
-+		if (ret < 0)
-+			goto out;
-+
-+		ret = mxl86110_modify_extended_reg(phydev, MXL86110_EXT_WOL_CFG_REG,
-+						   MXL86110_EXT_WOL_CFG_WOLE_MASK,
-+						   MXL86110_EXT_WOL_CFG_WOLE_ENABLE);
-+		if (ret < 0)
-+			goto out;
-+
-+		/* Enables Wake-on-LAN interrupt in the PHY. */
-+		ret = __phy_modify(phydev, PHY_IRQ_ENABLE_REG, 0,
-+				   PHY_IRQ_ENABLE_REG_WOL);
-+		if (ret < 0)
-+			goto out;
-+
-+		phydev_dbg(phydev, "%s, WOL Magic packet MAC: %02X:%02X:%02X:%02X:%02X:%02X\n",
-+			   __func__, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-+	} else {
-+		ret = mxl86110_modify_extended_reg(phydev, MXL86110_EXT_WOL_CFG_REG,
-+						   MXL86110_EXT_WOL_CFG_WOLE_MASK,
-+						   MXL86110_EXT_WOL_CFG_WOLE_DISABLE);
-+		if (ret < 0)
-+			goto out;
-+
-+		/* Disables Wake-on-LAN interrupt in the PHY. */
-+		ret = __phy_modify(phydev, PHY_IRQ_ENABLE_REG,
-+				   PHY_IRQ_ENABLE_REG_WOL, 0);
-+	}
-+
-+out:
-+	phy_unlock_mdio_bus(phydev);
-+	return ret;
-+}
-+
-+static const unsigned long supported_triggers = (BIT(TRIGGER_NETDEV_LINK_10) |
-+						 BIT(TRIGGER_NETDEV_LINK_100) |
-+						 BIT(TRIGGER_NETDEV_LINK_1000) |
-+						 BIT(TRIGGER_NETDEV_HALF_DUPLEX) |
-+						 BIT(TRIGGER_NETDEV_FULL_DUPLEX) |
-+						 BIT(TRIGGER_NETDEV_TX) |
-+						 BIT(TRIGGER_NETDEV_RX));
-+
-+static int mxl86110_led_hw_is_supported(struct phy_device *phydev, u8 index,
-+					unsigned long rules)
-+{
-+	if (index >= MXL86110_MAX_LEDS)
-+		return -EINVAL;
-+
-+	/* All combinations of the supported triggers are allowed */
-+	if (rules & ~supported_triggers)
-+		return -EOPNOTSUPP;
-+
-+	return 0;
-+}
-+
-+static int mxl86110_led_hw_control_get(struct phy_device *phydev, u8 index,
-+				       unsigned long *rules)
-+{
-+	u16 val;
-+
-+	if (index >= MXL86110_MAX_LEDS)
-+		return -EINVAL;
-+
-+	phy_lock_mdio_bus(phydev);
-+	val = mxl86110_read_extended_reg(phydev, MXL86110_LED0_CFG_REG + index);
-+	phy_unlock_mdio_bus(phydev);
-+	if (val < 0)
-+		return val;
-+
-+	if (val & MXL86110_LEDX_CFG_LINK_UP_TX_ACT_ON)
-+		*rules |= BIT(TRIGGER_NETDEV_TX);
-+
-+	if (val & MXL86110_LEDX_CFG_LINK_UP_RX_ACT_ON)
-+		*rules |= BIT(TRIGGER_NETDEV_RX);
-+
-+	if (val & MXL86110_LEDX_CFG_LINK_UP_HALF_DUPLEX_ON)
-+		*rules |= BIT(TRIGGER_NETDEV_HALF_DUPLEX);
-+
-+	if (val & MXL86110_LEDX_CFG_LINK_UP_FULL_DUPLEX_ON)
-+		*rules |= BIT(TRIGGER_NETDEV_FULL_DUPLEX);
-+
-+	if (val & MXL86110_LEDX_CFG_LINK_UP_10MB_ON)
-+		*rules |= BIT(TRIGGER_NETDEV_LINK_10);
-+
-+	if (val & MXL86110_LEDX_CFG_LINK_UP_100MB_ON)
-+		*rules |= BIT(TRIGGER_NETDEV_LINK_100);
-+
-+	if (val & MXL86110_LEDX_CFG_LINK_UP_1GB_ON)
-+		*rules |= BIT(TRIGGER_NETDEV_LINK_1000);
-+
-+	return 0;
-+};
-+
-+static int mxl86110_led_hw_control_set(struct phy_device *phydev, u8 index,
-+				       unsigned long rules)
-+{
-+	u16 val = 0;
-+	int ret;
-+
-+	if (index >= MXL86110_MAX_LEDS)
-+		return -EINVAL;
-+
-+	if (rules & BIT(TRIGGER_NETDEV_LINK_10))
-+		val |= MXL86110_LEDX_CFG_LINK_UP_10MB_ON;
-+
-+	if (rules & BIT(TRIGGER_NETDEV_LINK_100))
-+		val |= MXL86110_LEDX_CFG_LINK_UP_100MB_ON;
-+
-+	if (rules & BIT(TRIGGER_NETDEV_LINK_1000))
-+		val |= MXL86110_LEDX_CFG_LINK_UP_1GB_ON;
-+
-+	if (rules & BIT(TRIGGER_NETDEV_TX))
-+		val |= MXL86110_LEDX_CFG_LINK_UP_TX_ACT_ON;
-+
-+	if (rules & BIT(TRIGGER_NETDEV_RX))
-+		val |= MXL86110_LEDX_CFG_LINK_UP_RX_ACT_ON;
-+
-+	if (rules & BIT(TRIGGER_NETDEV_HALF_DUPLEX))
-+		val |= MXL86110_LEDX_CFG_LINK_UP_HALF_DUPLEX_ON;
-+
-+	if (rules & BIT(TRIGGER_NETDEV_FULL_DUPLEX))
-+		val |= MXL86110_LEDX_CFG_LINK_UP_FULL_DUPLEX_ON;
-+
-+	if (rules & BIT(TRIGGER_NETDEV_TX) ||
-+	    rules & BIT(TRIGGER_NETDEV_RX))
-+		val |= MXL86110_LEDX_CFG_TRAFFIC_ACT_BLINK_IND;
-+
-+	phy_lock_mdio_bus(phydev);
-+	ret = mxl86110_write_extended_reg(phydev, MXL86110_LED0_CFG_REG + index, val);
-+	phy_unlock_mdio_bus(phydev);
-+	if (ret)
-+		return ret;
-+
-+	return 0;
-+};
-+
-+/**
-+ * mxl86110_synce_clk_cfg() - applies syncE/clk output configuration
-+ * @phydev: pointer to the phy_device
-+ *
-+ * NOTE: This function assumes the caller already holds the MDIO bus lock
-+ * or otherwise has exclusive access to the PHY.
-+ *
-+ * returns 0 or negative errno code
-+ */
-+static int mxl86110_synce_clk_cfg(struct phy_device *phydev)
-+{
-+	u16 mask = 0, val = 0;
-+	int ret;
-+
-+	/*
-+	 * Configures the clock output to its default setting as per the datasheet.
-+	 * This results in a 25MHz clock output being selected in the
-+	 * COM_EXT_SYNCE_CFG register for SyncE configuration.
-+	 */
-+	val = MXL86110_EXT_SYNCE_CFG_EN_SYNC_E |
-+			FIELD_PREP(MXL86110_EXT_SYNCE_CFG_CLK_SRC_SEL_MASK,
-+				   MXL86110_EXT_SYNCE_CFG_CLK_SRC_SEL_25M);
-+	mask = MXL86110_EXT_SYNCE_CFG_EN_SYNC_E |
-+	       MXL86110_EXT_SYNCE_CFG_CLK_SRC_SEL_MASK |
-+	       MXL86110_EXT_SYNCE_CFG_CLK_FRE_SEL;
-+
-+	/* Write clock output configuration */
-+	ret = mxl86110_modify_extended_reg(phydev, MXL86110_EXT_SYNCE_CFG_REG,
-+					   mask, val);
-+
-+	return ret;
-+}
-+
-+/**
-+ * mxl86110_broadcast_cfg - Configure MDIO broadcast setting for PHY
-+ * @phydev: Pointer to the PHY device structure
-+ *
-+ * This function configures the MDIO broadcast behavior of the MxL86110 PHY.
-+ * Currently, broadcast mode is explicitly disabled by clearing the EPA0 bit
-+ * in the RGMII_MDIO_CFG extended register.
-+ *
-+ * NOTE: This function assumes the caller already holds the MDIO bus lock
-+ * or otherwise has exclusive access to the PHY.
-+ *
-+ * Return: 0 on success or a negative errno code on failure.
-+ */
-+static int mxl86110_broadcast_cfg(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	ret = mxl86110_modify_extended_reg(phydev,
-+					   MXL86110_EXT_RGMII_MDIO_CFG,
-+					   MXL86110_EXT_RGMII_MDIO_CFG_EPA0_MASK, 0);
-+
-+	return ret;
-+}
-+
-+/**
-+ * mxl86110_enable_led_activity_blink - Enable LEDs activity blink on PHY
-+ * @phydev: Pointer to the PHY device structure
-+ *
-+ * Configure all PHY LEDs to blink on traffic activity regardless of their
-+ * ON or OFF state. This behavior allows each LED to serve as a pure activity
-+ * indicator, independently of its use as a link status indicator.
-+ *
-+ * By default, each LED blinks only when it is also in the ON state. This function
-+ * modifies the appropriate registers (LABx fields) to enable blinking even
-+ * when the LEDs are OFF, to allow the LED to be used as a traffic indicator
-+ * without requiring it to also serve as a link status LED.
-+ *
-+ * NOTE: Any further LED customization can be performed via the
-+ * /sys/class/led interface; the functions led_hw_is_supported, led_hw_control_get, and
-+ * led_hw_control_set are used to support this mechanism.
-+ *
-+ * This function assumes the caller already holds the MDIO bus lock
-+ * or otherwise has exclusive access to the PHY.
-+ *
-+ * Return: 0 on success or a negative errno code on failure.
-+ */
-+static int mxl86110_enable_led_activity_blink(struct phy_device *phydev)
-+{
-+	int index, ret = 0;
-+
-+	for (index = 0; index < MXL86110_MAX_LEDS; index++) {
-+		ret = mxl86110_modify_extended_reg(phydev,
-+						   MXL86110_LED0_CFG_REG + index, 0,
-+						   MXL86110_LEDX_CFG_TRAFFIC_ACT_BLINK_IND);
-+		if (ret < 0)
-+			break;
-+	}
-+
-+	return ret;
-+};
-+
-+/**
-+ * mxl86110_config_init() - initialize the PHY
-+ * @phydev: pointer to the phy_device
-+ *
-+ * returns 0 or negative errno code
-+ */
-+static int mxl86110_config_init(struct phy_device *phydev)
-+{
-+	u16 val = 0;
-+	int ret;
-+
-+	phy_lock_mdio_bus(phydev);
-+
-+	/* configure syncE / clk output */
-+	ret = mxl86110_synce_clk_cfg(phydev);
-+	if (ret < 0)
-+		goto out;
-+
-+	switch (phydev->interface) {
-+	case PHY_INTERFACE_MODE_RGMII:
-+		val = 0;
-+		break;
-+	case PHY_INTERFACE_MODE_RGMII_RXID:
-+		val = MXL86110_EXT_RGMII_CFG1_RX_DELAY_1950PS;
-+		break;
-+	case PHY_INTERFACE_MODE_RGMII_TXID:
-+		val = MXL86110_EXT_RGMII_CFG1_TX_1G_DELAY_1950PS |
-+			MXL86110_EXT_RGMII_CFG1_TX_10MB_100MB_DELAY_1950PS;
-+		break;
-+	case PHY_INTERFACE_MODE_RGMII_ID:
-+		val = MXL86110_EXT_RGMII_CFG1_TX_1G_DELAY_1950PS |
-+			MXL86110_EXT_RGMII_CFG1_TX_10MB_100MB_DELAY_1950PS |
-+			MXL86110_EXT_RGMII_CFG1_RX_DELAY_1950PS;
-+		break;
-+	default:
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
-+	ret = mxl86110_modify_extended_reg(phydev, MXL86110_EXT_RGMII_CFG1_REG,
-+					   MXL86110_EXT_RGMII_CFG1_FULL_MASK, val);
-+	if (ret < 0)
-+		goto out;
-+
-+	/* Configure RXDLY (RGMII Rx Clock Delay) to disable the default additional
-+	 * delay value on RX_CLK (2 ns for 125 MHz, 8 ns for 25 MHz/2.5 MHz)
-+	 * and use just the digital one selected before
-+	 */
-+	ret = mxl86110_modify_extended_reg(phydev, MXL86110_EXT_CHIP_CFG_REG,
-+					   MXL86110_EXT_CHIP_CFG_RXDLY_ENABLE, 0);
-+	if (ret < 0)
-+		goto out;
-+
-+	ret = mxl86110_enable_led_activity_blink(phydev);
-+	if (ret < 0)
-+		goto out;
-+
-+	ret = mxl86110_broadcast_cfg(phydev);
-+
-+out:
-+	phy_unlock_mdio_bus(phydev);
-+	return ret;
-+}
-+
-+static struct phy_driver mxl_phy_drvs[] = {
-+	{
-+		PHY_ID_MATCH_EXACT(PHY_ID_MXL86110),
-+		.name			= "MXL86110 Gigabit Ethernet",
-+		.config_init		= mxl86110_config_init,
-+		.get_wol		= mxl86110_get_wol,
-+		.set_wol		= mxl86110_set_wol,
-+		.led_hw_is_supported	= mxl86110_led_hw_is_supported,
-+		.led_hw_control_get     = mxl86110_led_hw_control_get,
-+		.led_hw_control_set     = mxl86110_led_hw_control_set,
-+	},
-+};
-+
-+module_phy_driver(mxl_phy_drvs);
-+
-+static const struct mdio_device_id __maybe_unused mxl_tbl[] = {
-+	{ PHY_ID_MATCH_EXACT(PHY_ID_MXL86110) },
-+	{  }
-+};
-+
-+MODULE_DEVICE_TABLE(mdio, mxl_tbl);
-+
-+MODULE_DESCRIPTION("MaxLinear MXL86110 PHY driver");
-+MODULE_AUTHOR("Stefano Radaelli");
-+MODULE_LICENSE("GPL");
+> +/**
+> + * mxl86110_write_extended_reg() - write to a PHY's extended register
+> + * @phydev: pointer to a &struct phy_device
+> + * @regnum: register number to write
+> + * @val: value to write to @regnum
+> + *
+> + * NOTE: This function assumes the caller already holds the MDIO bus lock
+> + * or otherwise has exclusive access to the PHY.
+> + *
+> + * returns 0 or negative error code
+> + */
 
-base-commit: 894fbb55e60cab4ea740f6c65a08b5f8155221f4
--- 
-2.43.0
+Tooling expects 'Return:' or 'Returns: ' to document return values.
 
+Likewise elsewhere in this patch.
+
+Flagged by ./scripts/kernel-doc -Wall -none
+
+...
+
+> +static int mxl86110_led_hw_control_get(struct phy_device *phydev, u8 index,
+> +				       unsigned long *rules)
+> +{
+> +	u16 val;
+> +
+> +	if (index >= MXL86110_MAX_LEDS)
+> +		return -EINVAL;
+> +
+> +	phy_lock_mdio_bus(phydev);
+> +	val = mxl86110_read_extended_reg(phydev, MXL86110_LED0_CFG_REG + index);
+> +	phy_unlock_mdio_bus(phydev);
+> +	if (val < 0)
+> +		return val;
+
+val is unsigned. It cannot be less than zero.
+
+Likewise in mxl86110_broadcast_cfg() and mxl86110_enable_led_activity_blink().
+
+Flagged by Smatch.
+
+...
 
