@@ -1,105 +1,232 @@
-Return-Path: <netdev+bounces-191381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCF06ABB53C
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 08:35:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56B97ABB556
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 08:45:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D5483B3867
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 06:35:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48ABA18966A3
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 06:45:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D5EE1DDC2A;
-	Mon, 19 May 2025 06:35:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EF74257AC9;
+	Mon, 19 May 2025 06:45:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R9oUP07t"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B8DA136358
-	for <netdev@vger.kernel.org>; Mon, 19 May 2025 06:35:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6673C2561A8;
+	Mon, 19 May 2025 06:45:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747636526; cv=none; b=BHUaBuGqR5xyKFeKwZhqg1fB7hz4IDxn5b5e0zI0v5NnoL9CjHDugEnLHgqQAWiB7Hn+d0usbE5uJgjL8rGRVXdD2OuwtXdf23F2YfNt80spjPXoQEp8iw+12X2ENdBEQfL+ycd9LvoCiv9ixgn8nv1Aw2OY/8B84JYxd7IilH0=
+	t=1747637132; cv=none; b=UPPfAOGSWUS6ctx2bgw1wxxUpbswCce3dZwFNjoka4iYXFT7AGdGW6ApWGhPuoh/OAIgG6qk2NPs1C7SAwfh1hav10V5K5vbiJmiM+rfN3yiwscA1WsrRYWxICoQ2gAc4Ki2I1KKogzU6sviYiQWDz4MaQwCoXOLvKoQFa3IQ/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747636526; c=relaxed/simple;
-	bh=whSVd2GPtXSBPn8+unr3UzXeBt4T9TxLWM47BQKwnJk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rlCSHxFGIvuilfuR3N4TR3pEgNLZbeDkzfZT0UMsyRR3wBPmb1T5qWYshGTscouaMaetdkIwVcIcwc4N8HTvfbspO4nN5fD9yXSdoVe2gLjBVxCMiSft6s2dXw2mEANJQtjY4yc9sULWUVwod8WfJRMD5znXabDUipPZLbz011Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.132.163.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: zesmtpgz3t1747636450t72b2ecec
-X-QQ-Originating-IP: A2xmDCZ27vMM8DZ/IMgZuvquzCxsg0WvAmJqjCRQfjY=
-Received: from w-MS-7E16.trustnetic.com ( [125.119.67.87])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 19 May 2025 14:34:04 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 11827701625567042168
-EX-QQ-RecipientCnt: 8
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	andrew+netdev@lunn.ch
-Cc: mengyuanlou@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next] net: libwx: Fix log level
-Date: Mon, 19 May 2025 14:33:57 +0800
-Message-ID: <67409DB57B87E2F0+20250519063357.21164-1-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1747637132; c=relaxed/simple;
+	bh=Q/EuBFxYLHacrAtoDgyo+Cp+NqiGu+iQD1Hv+BWylno=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Y+d7IEdqbzSNlTQf5o6desFU+dAwBhlY/RoTJSgBoVTEnRVdVebUOoaA6NSEVQOCIVKg9qy035ROz88NFpra3yo0mentyUdbEe3F/uaHLxoTE37w6KwQxRavwG9L+LiBZrDntHWZJnB6sqQ8zXmrjQWn4MYOcJqcQCCSNAN5uHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R9oUP07t; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-601a9e65228so2183460a12.2;
+        Sun, 18 May 2025 23:45:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747637129; x=1748241929; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7dywUjDT8o21WvwXU4M6vIQErqeNKabKpWm7swQyA/U=;
+        b=R9oUP07tvzvWilMahP2g4NXeVHsPQArwdVJ5fCFJWYmNwKstjVjBwpHvCFyFHkiQY4
+         Uux2mAgf+4akYzQyTwVGkNv7UgYNRu+Wsh3q6erfMN4RsKInH89kEqfJp+LLaKZLKTSI
+         sA2xpWCf289oQKQikaq9TBSillqWQbPqKFpHb2AwxgBkNLLjP729ZngVoWJuRcdJUEUU
+         PCV3Hb9ObWBjpw/Q5Sv2xMVxc8GWMN6bSYHQl1zBkOqcylTmwpnQpBnQExoa8yi4AB67
+         rBg38/jP+XrT2dn6xGRmEE/6H51GTvXiyxzcJahW46XRPcjpdIwOmOfrIVdBMOlqbCi8
+         5NTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747637129; x=1748241929;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7dywUjDT8o21WvwXU4M6vIQErqeNKabKpWm7swQyA/U=;
+        b=n9rHc23+QDkzQfaCtdOmJ2wAkxqMpz8vq/vc5CvF0NyBqzXLSQlUR78cBcq3/vq/Uw
+         Lc5UXzDD0O/TiSIV4bC8ZgD2Ag0I4iePyObG+zQsxDtfsq/WIOwr2czNLxjkQCVUUA8i
+         Cr3/vsMHfa0damiolw1gLgHnjaF1/QgtQHDAkSPXeoCvRSb6HXrzh2Oo7aCXkWjCBDjU
+         mQ7WWRbshgV7rTBSRUWX6OblPyZ+MOU6eEX2cU9hU7++sug+iHsWlrl3bmoRqd8igHP3
+         V/3V1CztnGTS6q6PDv+FYtATyfL2ZjRJITkclv+PcqvtLO2vZeAtpYK9xYq5atHxfMeM
+         CBoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWAofZyWo00DnSVweJZdDgifcFTzZeHpm52BhKPJkl2nZdUfISVQ2V6cKgpNCWo3eNdLnlvBff2bF8MeUfMkDh6@vger.kernel.org, AJvYcCXOQ++6x7SXyzByUqNJ5Y54j9OxUR7UzzzqXyL4iF8qEjADNrUP8314tbKxVmS6Uq4PKjfSe+pj8T+XSYQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQmEKbc3ujAa7Qk6aKB6avYzIlqqOyHlGlwRoucIgyJY6EZgEb
+	cwgdYMdBXfuQJEl3iXoh6e8wwIXUVPCzXk2+HpapOm+1XRDdMV1mGq1Msd8+FAzL2ssJMMU9gZK
+	az8scclSVBDnCj1fRB1ty330hvkXbBGE=
+X-Gm-Gg: ASbGnctLFeA4zNLivlyOEdBa6+diiNzcemkWxLejDYYgfwVyXd+5ToKP7kxCIxTDQNs
+	+vmTAKLqbNWtFMoEdrtfzprjpUAdTvp1+iQHCjQmdzCyuUAcLmm9d0xNrtzU/4uw7E2EPOeZgnO
+	UXtIDF0NhwALpyla9GO3K07jVczaDdJ5/EBHA=
+X-Google-Smtp-Source: AGHT+IF3L8AEKICmzGQm5Dojg79LCCoJK0F7RtvPfyM64CES29vCUgrPrAWhmo0Ub4qh5k07rF4LLYu7OYPAWeeMwNM=
+X-Received: by 2002:a05:6402:3547:b0:601:e99c:9b19 with SMTP id
+ 4fb4d7f45d1cf-601e99c9c00mr1880146a12.1.1747637128468; Sun, 18 May 2025
+ 23:45:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: MKP/ykXjBfbuyv0H1luUbEsKUR+mKt6OMfKA2qRfcRez+Mz9dfkbFGca
-	vOoWXlFl5QjPXyFHgPKtMvNXyFQZ8yfbDQHbyrmEl7l9f6n/XrLr78q1O2nI2yEfoqrtWo1
-	QI34cHZeyVePjt5i1yr1bhIEPaCwwNSAw0Ju/SS1pksuITbrRrTpcBSUebWnP1GP/aYfIQ/
-	GLd2DlPAalAM5/9CEs3dXgeUdDfYqI0SwJOtda+FKXYMc5wdgWVRbVs8HOmnwqghXiVsuQX
-	/G+KoromnXeTkAtBlN/yK3y7LF0tb9bqx+ExeSVs42kzW8oLgN9lczmXZUt58dRmVbvHEmJ
-	ffgpTqwrg7YPfD6RG7Cx6P6AI1KNZs+LkBBmuT7dx3beI4xUa4as8b5oCom2mTw8GSah9+c
-	EAwBjSAExDmZWq1f6osKed4VJ5I+GOgiYlfjc4n836ooxdRjgQ3KN2jdwdX3XF2wWgJUWk6
-	OSROatlK/IHnudLyIYN0pqrl/zykbjGxtxlXJXX4dcVK4cp15R0ZTfAF9wIUOABWE+oAZmM
-	OaWoSHHiylY9i7RgSmQgowLoXYxFMQ7MMCbGMWLZNh0xn3XMLn6pO/f9mGJgF5QeQjYWK54
-	MHxgN1XXlTatdqmPOLuqCIfRymisrFMYfOjl9Mwu+wj37Xqb/dz0VwwLxe07pl1emFAqLHR
-	hBY/yVYPzWFHhvRXk7DRunH+7Jf9/MkRxdW0Bws4OxrbCE0ECHbE7gScOp7v0bWT4w/pZ0e
-	tj38UXKgMyAaLqXtKkXRLVYvtxg7B9dB+tRoGhYIkpqOQVZUeCY2qsrePvo1l3MaMmTu3ew
-	uu6oGkuv4zY/6XT0HX8EqFVFLYVaMcIvaAluqNJtqABqnf21xnmWiRDx/11MGBKM2+pMZTr
-	Lu14zYzro0TG+u7lVvuam2gigFqisN27qya4aVan3VT0HAPbFiRqOu/LMudGxGCmT27B6VM
-	6GuCeGhm/ETUG/CAUCqn+5jHfAuhINjB5ma6Cy/JXOwRzeELU+aYzkbzawBlMc/ZFULCojQ
-	nYnPymMSkgrIw/77HB
-X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
-X-QQ-RECHKSPAM: 0
+References: <20250519023517.4062941-1-almasrymina@google.com> <20250519023517.4062941-2-almasrymina@google.com>
+In-Reply-To: <20250519023517.4062941-2-almasrymina@google.com>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Mon, 19 May 2025 15:45:17 +0900
+X-Gm-Features: AX0GCFua0Whe2SPSz3kVScCNpt1xz5InpnKb57gfS0HzR5yNtmzH2eWzkLVWbEk
+Message-ID: <CAMArcTWQY5FW5x3x-OM6tHh6nX4Fu91e7GNSQ97x6Qy80gCH6g@mail.gmail.com>
+Subject: Re: [PATCH net-next v1 1/9] net: devmem: move list_add to net_devmem_bind_dmabuf.
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, David Ahern <dsahern@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, 
+	praan@google.com, shivajikant@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-There is a log should be printed as info level, not error level.
+On Mon, May 19, 2025 at 11:35=E2=80=AFAM Mina Almasry <almasrymina@google.c=
+om> wrote:
+>
+> It's annoying for the list_add to be outside net_devmem_bind_dmabuf, but
+> the list_del is in net_devmem_unbind_dmabuf. Make it consistent by
+> having both the list_add/del be inside the net_devmem_[un]bind_dmabuf.
+>
+> Cc: ap420073@gmail.com
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
 
-Fixes: 9bfd65980f8d ("net: libwx: Add sriov api for wangxun nics")
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
- drivers/net/ethernet/wangxun/libwx/wx_sriov.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Mina,
+Thanks a lot for this work!
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-index 52e6a6faf715..195f64baedab 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-@@ -76,7 +76,7 @@ static int __wx_enable_sriov(struct wx *wx, u8 num_vfs)
- 	u32 value = 0;
- 
- 	set_bit(WX_FLAG_SRIOV_ENABLED, wx->flags);
--	wx_err(wx, "SR-IOV enabled with %d VFs\n", num_vfs);
-+	dev_info(&wx->pdev->dev, "SR-IOV enabled with %d VFs\n", num_vfs);
- 
- 	/* Enable VMDq flag so device will be set in VM mode */
- 	set_bit(WX_FLAG_VMDQ_ENABLED, wx->flags);
--- 
-2.48.1
+I tested it and it works well.
 
+Tested-by: Taehee Yoo <ap420073@gmail.com>
+
+Thanks!
+Taehee Yoo
+
+>
+> ---
+>  net/core/devmem.c      | 5 ++++-
+>  net/core/devmem.h      | 5 ++++-
+>  net/core/netdev-genl.c | 8 ++------
+>  3 files changed, 10 insertions(+), 8 deletions(-)
+>
+> diff --git a/net/core/devmem.c b/net/core/devmem.c
+> index 0dba26baae18..b3a62ca0df65 100644
+> --- a/net/core/devmem.c
+> +++ b/net/core/devmem.c
+> @@ -178,7 +178,8 @@ int net_devmem_bind_dmabuf_to_queue(struct net_device=
+ *dev, u32 rxq_idx,
+>  struct net_devmem_dmabuf_binding *
+>  net_devmem_bind_dmabuf(struct net_device *dev,
+>                        enum dma_data_direction direction,
+> -                      unsigned int dmabuf_fd, struct netlink_ext_ack *ex=
+tack)
+> +                      unsigned int dmabuf_fd, struct netdev_nl_sock *pri=
+v,
+> +                      struct netlink_ext_ack *extack)
+>  {
+>         struct net_devmem_dmabuf_binding *binding;
+>         static u32 id_alloc_next;
+> @@ -299,6 +300,8 @@ net_devmem_bind_dmabuf(struct net_device *dev,
+>         if (err < 0)
+>                 goto err_free_chunks;
+>
+> +       list_add(&binding->list, &priv->bindings);
+> +
+>         return binding;
+>
+>  err_free_chunks:
+> diff --git a/net/core/devmem.h b/net/core/devmem.h
+> index 58d8d3c1b945..e7ba77050b8f 100644
+> --- a/net/core/devmem.h
+> +++ b/net/core/devmem.h
+> @@ -11,6 +11,7 @@
+>  #define _NET_DEVMEM_H
+>
+>  #include <net/netmem.h>
+> +#include <net/netdev_netlink.h>
+>
+>  struct netlink_ext_ack;
+>
+> @@ -82,7 +83,8 @@ void __net_devmem_dmabuf_binding_free(struct work_struc=
+t *wq);
+>  struct net_devmem_dmabuf_binding *
+>  net_devmem_bind_dmabuf(struct net_device *dev,
+>                        enum dma_data_direction direction,
+> -                      unsigned int dmabuf_fd, struct netlink_ext_ack *ex=
+tack);
+> +                      unsigned int dmabuf_fd, struct netdev_nl_sock *pri=
+v,
+> +                      struct netlink_ext_ack *extack);
+>  struct net_devmem_dmabuf_binding *net_devmem_lookup_dmabuf(u32 id);
+>  void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *binding)=
+;
+>  int net_devmem_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_idx,
+> @@ -170,6 +172,7 @@ static inline void __net_devmem_dmabuf_binding_free(s=
+truct work_struct *wq)
+>  static inline struct net_devmem_dmabuf_binding *
+>  net_devmem_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
+>                        enum dma_data_direction direction,
+> +                      struct netdev_nl_sock *priv,
+>                        struct netlink_ext_ack *extack)
+>  {
+>         return ERR_PTR(-EOPNOTSUPP);
+> diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+> index 762570dcda61..2afa7b2141aa 100644
+> --- a/net/core/netdev-genl.c
+> +++ b/net/core/netdev-genl.c
+> @@ -908,7 +908,7 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struc=
+t genl_info *info)
+>         }
+>
+>         binding =3D net_devmem_bind_dmabuf(netdev, DMA_FROM_DEVICE, dmabu=
+f_fd,
+> -                                        info->extack);
+> +                                        priv, info->extack);
+>         if (IS_ERR(binding)) {
+>                 err =3D PTR_ERR(binding);
+>                 goto err_unlock;
+> @@ -943,8 +943,6 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struc=
+t genl_info *info)
+>                         goto err_unbind;
+>         }
+>
+> -       list_add(&binding->list, &priv->bindings);
+> -
+>         nla_put_u32(rsp, NETDEV_A_DMABUF_ID, binding->id);
+>         genlmsg_end(rsp, hdr);
+>
+> @@ -1020,15 +1018,13 @@ int netdev_nl_bind_tx_doit(struct sk_buff *skb, s=
+truct genl_info *info)
+>                 goto err_unlock_netdev;
+>         }
+>
+> -       binding =3D net_devmem_bind_dmabuf(netdev, DMA_TO_DEVICE, dmabuf_=
+fd,
+> +       binding =3D net_devmem_bind_dmabuf(netdev, DMA_TO_DEVICE, dmabuf_=
+fd, priv,
+>                                          info->extack);
+>         if (IS_ERR(binding)) {
+>                 err =3D PTR_ERR(binding);
+>                 goto err_unlock_netdev;
+>         }
+>
+> -       list_add(&binding->list, &priv->bindings);
+> -
+>         nla_put_u32(rsp, NETDEV_A_DMABUF_ID, binding->id);
+>         genlmsg_end(rsp, hdr);
+>
+> --
+> 2.49.0.1101.gccaa498523-goog
+>
 
