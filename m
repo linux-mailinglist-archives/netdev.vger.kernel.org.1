@@ -1,148 +1,117 @@
-Return-Path: <netdev+bounces-191379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 943DEABB4DC
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 08:10:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 619E6ABB511
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 08:27:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23F673B871C
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 06:09:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BAA43A1DFE
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 06:27:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33E9422686F;
-	Mon, 19 May 2025 06:09:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3474F24469B;
+	Mon, 19 May 2025 06:27:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UFJV9dLz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dDGSci3L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82AF522538F;
-	Mon, 19 May 2025 06:09:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A02524468E;
+	Mon, 19 May 2025 06:27:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747634990; cv=none; b=d26xoIgVIWezQb6Eobd2icRF+cgkcX0EN0REHO4jBhc9l/erWSpR7+vBA14yrmDyO+eLUfnqsMIhr6h1Q/q5cLQtCIp7s3GLvNZvAkTDkYY0lcp48AUSQRR7t4Vmk99JSJE884DaQw1yV8RxQdSe1Ras/YKGelAWyfgasAJRwBA=
+	t=1747636065; cv=none; b=SODsbg3MWr6CoP0xG7FIOan7rt8a+p2D1vviFwXIny61ZhQlzxm3urwimnjtxXF5pZHVaJxLaDDexOk+72VVWpEwTDzl3hFfVCOSegzbzLq+M6h5OI+v+8YQfxuNTDxpIDcFtdOdV23ODTD6CjVkU6kY/h2Z57fY8HupR7rPY2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747634990; c=relaxed/simple;
-	bh=96AL4BcJrGHqEJ9hFry1I6kX260b5WUQ2aCpMvWixBc=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=P8zSyc1QOs38aUla9TLBQXU+TlYYWaLHDYsLG87ZGF86DlDQ+hJrbT0RQRecb0jsSU1RUDm7e15JO36a9Nf6AvQ96L7fmUCrqBnH0ZpqjtAkbF0I+FzpsIgwBi5m1ylHQuT5ZfuVFDpQDt2dHu4uZmj4FkugTqK9rKE1xnj/xDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UFJV9dLz; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b26df8f44e6so3734887a12.2;
-        Sun, 18 May 2025 23:09:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747634988; x=1748239788; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fZq5C2nAtqXvToxkhK76speunl4djNnbXazWf3GNPfQ=;
-        b=UFJV9dLzEuOl8LthHnxdcKbTjU1Ef/xZyfvW76aqepCisXtGEOUkKCO7Sa2ZZdCBql
-         9Dme/lYfZYX75khuf5DQww3VWWA/sjBaRUQtY735fo7X83eeiLZy7okiIRG/yB5HhPER
-         UtDI7FIsIgTtVHoJNdOQR2FsuG7KiO6cwgD8a5GkR3bFPftBY95r9NFlVSQQX9OR6Y9U
-         Xc/iYjVUrNq3iiqXecbP9Zo3nTg1vLhWFXHY/sJzr07QYcoB56bBZma6aeU5N0ZpVURv
-         8tomN82QaqOecl+xBIHK0wHhfjPN4VBK2YBuwyP3h4iSSETC56XUSnO45culDCvvrY2N
-         7q+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747634988; x=1748239788;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=fZq5C2nAtqXvToxkhK76speunl4djNnbXazWf3GNPfQ=;
-        b=O5I97UGyqm8865pwqSkz/7z0/JrWFCFh5W2mJ9Nq+n0/+MKR/czA3y8GAkHFb28Txf
-         NotOjQTNCPBjvG5W4R3Fz7jw9E4mWA3kctbsEAH+6CQOhFf0rfJ1ZJbqk+IbESRP1LeI
-         OD+80mg/vuRz+WWRy/ooUKN0ptNSsopD7F1upVP9hiEbdORJnrsOudCWNpRObN2sPD1U
-         YwkrnJImsXgo1Qau9zPhfczFE274g33NBso/OZtPt2Wv1AD6hBi9q6lm8v/xYM3Pe695
-         3ev0OWqjCsxvWEps45Ikud0DHTqNxiU969FtStGeJnwAc6HbS941YLAFQaiK29FsNXHr
-         KOYg==
-X-Forwarded-Encrypted: i=1; AJvYcCUVdmZUBqDJFdnFG/4FqLa4SsVlHsAi84TkhIPssZIBaMuM4jnsoWa/gheMRScXyqYI5Mkf4uB9l3BoFnl/@vger.kernel.org, AJvYcCV8UZ4GBPn12XT1rGglR1PaJlK1+sUhtx22utOUaXZm3yNtAVwOk03rR9hWJk3cbTebL+V7St0gZQLm@vger.kernel.org, AJvYcCWav5Sya0xPwy2tmjHfonat4Gk4j52mUi5J0f5EQjLXxiJABatSBJWrFcVpcgSGfcm/T4Iz2OlR@vger.kernel.org, AJvYcCWewnR2LTpFGU8EEAuy6TgqJyiv2kZaTLE/ziaFfjfvjAsubbVJoNNq7zTii8X21NV5Fz/7S6SBo9TeBFq2UCY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw56Ma1GjXA7w9+7JD2o1NkM0AZ0UmS+8aRLbRrCi64Oly0sxs1
-	X8FnwQYaA2JtfbmugxsHF5+YOlFsD88Vvi100GCpBBfspLfpx76jmuz2
-X-Gm-Gg: ASbGncsCyXD3OinWBe8nnPfsVBN3nxXByOgqz07QG3ST8m0pQwP+EVuK/W0SVWuogyX
-	oEzYjrvxQk6p9GaJCQJmeUU546rRB22w1sIBdAIuEHP1GBFj20mcAJsIOT2xqvgmde7vFlqi4dx
-	Rr26PZpuiuFtVTEDwbJvigvfYfyOch234kM+TyNAGujnbCLPpmcwbP8Qlai70Jv9DF7f/+gvnDo
-	ZriSVxxZ2h2SIBkNf7T2qu3o6ygDrHKSrIObfM5QOaLP38rJumC6WcqX6T7GadfmdQrFTx2VipW
-	z+1DLkTuAXd0I67da5pcDNZ5rKgTAsYRoiPuvAnQmZLOqUhcanum9ZOnmn9ffHs6TSl/8hj7OOs
-	Vasm75oeKBsrJ3SzkOW0Jwy/4DeqHAKlSVw==
-X-Google-Smtp-Source: AGHT+IELag7CjPk/EztKgu/bui7qkSTouCTFpuh6lXhH2TBCVewVe8EY8r5ytRPlESvuwqMCXQHS9w==
-X-Received: by 2002:a17:902:c949:b0:220:f449:7419 with SMTP id d9443c01a7336-231d438b3femr160373195ad.7.1747634987701;
-        Sun, 18 May 2025 23:09:47 -0700 (PDT)
-Received: from localhost (p4138183-ipxg22701hodogaya.kanagawa.ocn.ne.jp. [153.129.206.183])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-231d4eba524sm52135435ad.191.2025.05.18.23.09.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 May 2025 23:09:47 -0700 (PDT)
-Date: Mon, 19 May 2025 15:09:29 +0900 (JST)
-Message-Id: <20250519.150929.1041324722416773408.fujita.tomonori@gmail.com>
-To: ansuelsmth@gmail.com
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
- florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
- kabel@kernel.org, andrei.botila@oss.nxp.com, fujita.tomonori@gmail.com,
- tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
- boqun.feng@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
- benno.lossin@proton.me, a.hindborg@kernel.org, aliceryhl@google.com,
- dakr@kernel.org, sd@queasysnail.net, michael@fossekall.de,
- daniel@makrotopia.org, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
- rmk+kernel@armlinux.org.uk
-Subject: Re: [net-next PATCH v12 1/6] net: phy: pass PHY driver to
- .match_phy_device OP
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <20250517201353.5137-2-ansuelsmth@gmail.com>
-References: <20250517201353.5137-1-ansuelsmth@gmail.com>
-	<20250517201353.5137-2-ansuelsmth@gmail.com>
+	s=arc-20240116; t=1747636065; c=relaxed/simple;
+	bh=05be7fLfzW+Lkh9/B6CDCkEvJrnVcJV+48VP51XW+4I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HQOJncN4Le6bj5892TZPut7AR2WVyhMXLbnfLVoRv2HqXGaccO23pH74/qPw9btzEL/wifvI4FKpcXrQ66e+nBpuQ9H+eufQiPlMFeftPiPo+JJxQqtANdB4gJYfoep5Qeou1C3bg7OdrpXW7nsQOtXqiYxWOoLHDelR9klWj34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dDGSci3L; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747636064; x=1779172064;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=05be7fLfzW+Lkh9/B6CDCkEvJrnVcJV+48VP51XW+4I=;
+  b=dDGSci3L0NxJ6+0HS5/VT4r0p3H0vHaH6SGvrp6ZHtgzzgqKcivfo4Yc
+   rDkZmL4T9EsM0Yp5/5SWbkjiOZ4HqqsZkv+RftgT6VKdkZKLADRpPg17l
+   hra4dMx9fM35Bkr14/m5VhczfjgnLnYlB5vYCyO4MfG754dHG69FnSNUI
+   MxPE3JcA+ScjOIR7xgBPa682cuRWI5/aNLsgpPHVrYC1d+jRkb+/WI+yy
+   URLQP/64uJXt5i7viZNjUTy9NklF1D7a2oljkm+Nb0BDF0TxCxuIvR/WW
+   0HqdFTPSWzNnoRwUWXkU0lHFXpBj5whuTietw7lry1EIn2pvmmaBTE4rC
+   A==;
+X-CSE-ConnectionGUID: 3W948e2hQwSCWUOv9wUs0g==
+X-CSE-MsgGUID: ZoSeOeUKRnSwZVf+RXL+Ng==
+X-IronPort-AV: E=McAfee;i="6700,10204,11437"; a="49503810"
+X-IronPort-AV: E=Sophos;i="6.15,300,1739865600"; 
+   d="scan'208";a="49503810"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2025 23:27:42 -0700
+X-CSE-ConnectionGUID: UK5odDNjSF+5FI6KHpYkxA==
+X-CSE-MsgGUID: KP5sPoGBQVKkqbLHSlAehg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,300,1739865600"; 
+   d="scan'208";a="170313674"
+Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.247.73.217]) ([10.247.73.217])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2025 23:27:38 -0700
+Message-ID: <12093d3c-ca0a-46fd-950e-6af1448ee079@linux.intel.com>
+Date: Mon, 19 May 2025 14:27:36 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next v2 8/8] igc: SW pad preemptible frames for
+ correct mCRC calculation
+To: Simon Horman <horms@kernel.org>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+ Chwee-Lin Choong <chwee.lin.choong@intel.com>
+References: <20250514042945.2685273-1-faizal.abdul.rahim@linux.intel.com>
+ <20250514042945.2685273-9-faizal.abdul.rahim@linux.intel.com>
+ <20250516094336.GH1898636@horms.kernel.org>
+Content-Language: en-US
+From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
+In-Reply-To: <20250516094336.GH1898636@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Sat, 17 May 2025 22:13:45 +0200
-Christian Marangi <ansuelsmth@gmail.com> wrote:
 
-> Pass PHY driver pointer to .match_phy_device OP in addition to phydev.
-> Having access to the PHY driver struct might be useful to check the
-> PHY ID of the driver is being matched for in case the PHY ID scanned in
-> the phydev is not consistent.
-> 
-> A scenario for this is a PHY that change PHY ID after a firmware is
-> loaded, in such case, the PHY ID stored in PHY device struct is not
-> valid anymore and PHY will manually scan the ID in the match_phy_device
-> function.
-> 
-> Having the PHY driver info is also useful for those PHY driver that
-> implement multiple simple .match_phy_device OP to match specific MMD PHY
-> ID. With this extra info if the parsing logic is the same, the matching
-> function can be generalized by using the phy_id in the PHY driver
-> instead of hardcoding.
-> 
-> Rust wrapper callback is updated to align to the new match_phy_device
-> arguments.
-> 
-> Suggested-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> ---
->  drivers/net/phy/bcm87xx.c              |  6 ++++--
->  drivers/net/phy/icplus.c               |  6 ++++--
->  drivers/net/phy/marvell10g.c           | 12 ++++++++----
->  drivers/net/phy/micrel.c               |  6 ++++--
->  drivers/net/phy/nxp-c45-tja11xx.c      | 12 ++++++++----
->  drivers/net/phy/nxp-tja11xx.c          |  6 ++++--
->  drivers/net/phy/phy_device.c           |  2 +-
->  drivers/net/phy/realtek/realtek_main.c | 27 +++++++++++++++++---------
->  drivers/net/phy/teranetics.c           |  3 ++-
->  include/linux/phy.h                    |  3 ++-
->  rust/kernel/net/phy.rs                 |  1 +
->  11 files changed, 56 insertions(+), 28 deletions(-)
 
-As for Rust PHY abstractions:
+On 16/5/2025 5:43 pm, Simon Horman wrote:
+> On Wed, May 14, 2025 at 12:29:45AM -0400, Faizal Rahim wrote:
+>> From: Chwee-Lin Choong <chwee.lin.choong@intel.com>
+>>
+>> A hardware-padded frame transmitted from the preemptible queue
+>> results in an incorrect mCRC computation by hardware, as the
+>> padding bytes are not included in the mCRC calculation.
+>>
+>> To address this, manually pad frames in preemptible queues to a
+>> minimum length of 60 bytes using skb_padto() before transmission.
+>> This ensures that the hardware includes the padding bytes in the
+>> mCRC computation, producing a correct mCRC value.
+>>
+>> Signed-off-by: Chwee-Lin Choong <chwee.lin.choong@intel.com>
+>> Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+> 
+> Hi Faizal, all,
+> 
+> Perhaps it would be best to shuffle this patch within this series
+> so that it appears before the patches that add pre-emption support.
+> That way, when the are added the bug isn't present.
+> 
 
-Reviewed-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Makes sense, will update. Thanks!
 
