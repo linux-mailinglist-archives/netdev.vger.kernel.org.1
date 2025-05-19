@@ -1,238 +1,712 @@
-Return-Path: <netdev+bounces-191565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 673A0ABC27A
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 17:31:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93054ABC27B
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 17:31:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8370A7A0974
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 15:30:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28E843AF7EF
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 15:31:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05081286400;
-	Mon, 19 May 2025 15:30:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9859284694;
+	Mon, 19 May 2025 15:31:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="B/O+o1GC"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dxBgNTn+"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2080.outbound.protection.outlook.com [40.107.93.80])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55CFF27CCDA
-	for <netdev@vger.kernel.org>; Mon, 19 May 2025 15:30:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.80
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747668646; cv=fail; b=KyojHQVZpNmTw81lAfLv+JH/8QPthBYtyQ9xvZUW2T5eZgzSRyQ9WSQ/OHHh6mt0cHOdJg2+DrsvvB/UsUpKiIETFz+1ZwbeSMdGAOPRqbZu7i9g8GYF4/s/TW3rTDVDXCgU0TvN7wNseS66ogG04bWKZKpMz7Rq9OdYaEUxfyY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747668646; c=relaxed/simple;
-	bh=Kc0FGlXslx+lrOTqxiEWIUYMT6Za3zG2QorW0cJcpus=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=PARQt8XttiNt4OWSN69sK1UWeI5spvKeLd/BQM15MOMbHK8xWDz1Oje3vtL/Re+TavtSPpJBLEZ9ZQlq0cutlfE3Brx4zTwUUiW8LufcZgDuhSN0wn8fT8/xrp1ehIzLclD2BfCgWdL3M9VpHn70VtYdERrEeVwpZ8hKEcIUAPI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=B/O+o1GC; arc=fail smtp.client-ip=40.107.93.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=egViydvlsSFTvUBP6xN/lCdEUDpKmvFYvZ6XQ7qE4CEnA20SeFYW7nrvAw8ugYrdzDye1PzkrrdR4IIm/4MFY5/oV80/sFKPTVGThNjbivbzbPHb3Rj0s+EXPMdFX9AyiwrwF1xXAu3IyntzR9t63M/RJV6jJVvLc/TER1xLNHNbSwHGT4XUGYo7UbqTK8B15go8rFjdZN8u6YMp7B1seRzxfMOu1BNgGwbJ2wCMWnO6jOnheVKAo54srMbkfZ9YbHfEpZo4EAv7XJuFpgfD/68ghg1E8YiTfiCDfWpQxQyf/wIy6PEG/0nit9J/EuOhk6mAHyOJegMryj2IVlTlfA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OYl1s0scF1H3Ewy17ZUHIJZFVxMz5mI5FF2p3Uq9eoc=;
- b=cUFAC8fR2A+LjML4TIzF5PBeBPcNhpfPULG5kN765+6PkkP9vbU1ZIEt8vuhnqP7G9Xwc13cKZyCNpKON3leDIv44GeTpcNpV7h44/AAHu/fwpusWHtqNQq5l0MXdKlKG9pw/n9q3usvp10FD8gHyJe3tpoH97N6bM5SnFieTGBxrklIWGkBPxl+eGOyWX+VPTt14HmJwLrgc4Dde4w5LTUj6tKHjqTo5D8DVdccx+2PdbYfQ1zWWOHAPmcMSe0Iq3aeJ5DwSVkkr5Fl4vLYn8lNJtvzjsuHltEV/oAQvAyYlejJaB67p3oySL+/hz+/4hA9QM4kL57MU8FSzI6mpQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OYl1s0scF1H3Ewy17ZUHIJZFVxMz5mI5FF2p3Uq9eoc=;
- b=B/O+o1GCqAtptiVeE53wuif8Mf+dkpiL6a6EKgQNAkerUWV/Ev//GGOP1jwvgMlcgSdYdvxN6ACWwY71Z0baWKNQKC8ohb3m1m/hnZgoMmADq6NRzJK1iM2QnIgrM42cmsbtuPeXIXBbA3NY+IeYJDUK9y2CovfSfL/jq701ZHVd5um/4SOf2Xx49XIXbdDt+DD9AT6iQNwwP8jvirKWmD/vCJL6NPhCobHtwx5bVeCed/1L/OumwhjCso1pcf0zQ/BTcSw+WhTSVLeYBOUPWsHBpucexsOnq7CnwTF6ymlggyCy8HlsYJXMMNYefc5/U/7/MjHxG4+lUURIpnVKdw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM4PR12MB8558.namprd12.prod.outlook.com (2603:10b6:8:187::22)
- by DM6PR12MB4073.namprd12.prod.outlook.com (2603:10b6:5:217::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8746.30; Mon, 19 May
- 2025 15:30:42 +0000
-Received: from DM4PR12MB8558.namprd12.prod.outlook.com
- ([fe80::5ce:264f:c63c:2703]) by DM4PR12MB8558.namprd12.prod.outlook.com
- ([fe80::5ce:264f:c63c:2703%6]) with mapi id 15.20.8746.030; Mon, 19 May 2025
- 15:30:41 +0000
-From: Wojtek Wasko <wwasko@nvidia.com>
-To: richardcochran@gmail.com,
-	vadim.fedorenko@linux.dev,
-	kuba@kernel.org,
-	andrew@lunn.ch,
-	gregkh@linuxfoundation.org
-Cc: netdev@vger.kernel.org,
-	Wojtek Wasko <wwasko@nvidia.com>
-Subject: [PATCH v2] ptp: Add sysfs attribute to show PTP device is safe to open RO
-Date: Mon, 19 May 2025 18:30:32 +0300
-Message-ID: <20250519153032.655953-1-wwasko@nvidia.com>
-X-Mailer: git-send-email 2.47.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: TL2P290CA0007.ISRP290.PROD.OUTLOOK.COM (2603:1096:950:2::9)
- To DM4PR12MB8558.namprd12.prod.outlook.com (2603:10b6:8:187::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1852B2746A
+	for <netdev@vger.kernel.org>; Mon, 19 May 2025 15:31:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747668694; cv=none; b=M/hAHkD2Zqwbi/13QGhkQoNmEzf54vzEbX1gzQJ+un3dbFxqnina8mQ44wstfws31DLdubE7HGbeKxL3Rrnid7SmAtiiizoQwRPlx3y3dYGgT22ip2Lb6Yrs4DIlNwVW4a1EJgjBIZPCJ7SdtD3EPIytUj0Vsqa4Pz73s1Keakc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747668694; c=relaxed/simple;
+	bh=1IOQTr5cTlalX72jbS0pWMZ3tdoUJbccP4JY1qBGalo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YKWdT45xjqDCEcAeKekVzVp3bEtciswNtB0AlxcG6PIEyYPo8MaE4gjd2cPCAz9686vCehyUYh8fsyEq8JE4q2aoDuUVmYlnB+qRvuUkYe14mQ5nyBc1UGQZo91FSLOG4KyhkLTipIvL1k5jLEGTwQ/q+Fyf0q/xJTzv5VwxQ/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dxBgNTn+; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <86c22bb2-93db-4798-805b-3abda728741a@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1747668689;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=28ZA0dWyJDB4v/ySwu/GywuXG6uFgERBRCMSy749ZJs=;
+	b=dxBgNTn+uVVUpXWo0XDFBggIJ78PfB6JVP0iF6MmqLN93y0ndF2V1WYsrCVvnBq4wsSp+L
+	JDKyB/Pm9jO6rfTx59ZLgg7VTegTKe719qpBg2Wme8dVG04RMkjZwXZDpH5Pv7mvt09+yG
+	Vs66XziUFAjmzl1rQ7buyMKENwzyIw0=
+Date: Mon, 19 May 2025 11:31:24 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB8558:EE_|DM6PR12MB4073:EE_
-X-MS-Office365-Filtering-Correlation-Id: fe574527-eb15-43b7-ab62-08dd96ea1d58
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?KCh+6h2p0yzUtThemAJztd0Q32Ke3qTJ1InemXWhdgYKjhy4PoeWcss3am9t?=
- =?us-ascii?Q?bwhSjK6TOpyPP+XQRJJeZiH2BJWBUKAOVK3QWKwXSXaz71LD1fuG1m0eMzTn?=
- =?us-ascii?Q?ov7QNiH9JF78N5dd26j0I8ZyT3cYRx+8J172Q7PpUiGftoO+pY4b9n1GgJ3h?=
- =?us-ascii?Q?hbg71E3Nblu8lX7dTe2/SeCvG90PvXuVLp13lsMwGsS7Opof7XqQAbZejh05?=
- =?us-ascii?Q?EwGs5q7WF6yBqLus+wXDDvBNwunp/uFkMW8bepqy4S0254TWFls4pjH9LI5k?=
- =?us-ascii?Q?QX0qoi0wRjnmBj5Wg9K3XvAL0NqZc1PWB24lJ0+kXvwBGIxZOUX9PXwOLevK?=
- =?us-ascii?Q?HRkt6fEmVRj50ZLdffdfttB170HOcJP3oq+nIQIxjYl8CR3yr3W57Id47mbf?=
- =?us-ascii?Q?GFpvvMFmI14bMY4XTZ7kuwg3iUfkqMmJ/isSVk3bFsZE8fBhqsp5pY2glb82?=
- =?us-ascii?Q?B6Jg7M5KPaUqfOyHvXuY2gO+L3Ijft91XG+vQKOHEF09sLmLMu8pzW+EB3FR?=
- =?us-ascii?Q?bky82pfAqB2Ozm+/vy936Ww/adzfWyIt8qkYcVxdcMDJ9Q77VhGh0QV7uc6B?=
- =?us-ascii?Q?S6I7JFP1Mbh29o5FUGhLUM/9wcnjk0KfZxEicERiR7a+qCrarKmk9koMv2vA?=
- =?us-ascii?Q?iruCbRwDr0cQegQhg8ZFtU0lhZgR39UTRH72jWCFx6/0of4aqRX5M+XdpphC?=
- =?us-ascii?Q?t43dbScwxvdg/iAj573mwpPpr/F/9ffxu2g55WAQgU5ZnR6TCHMTqF0tFKZv?=
- =?us-ascii?Q?6mQHg4UdA3ZyehyBXzwgmigSPZgCqnjmLpxGzcfbqIOdVDbsxJih0MtH/rfN?=
- =?us-ascii?Q?SVkf1TmkS+3R9xPk6jkOruUaWifVBiD5Oc3+NzQR9/nCHypU705Al0c+PNCJ?=
- =?us-ascii?Q?5ihYQp3XqD9iiXXdzEOUPIG9ghADMkmm6fSAd/qI7PAbTRrJr52GfF/w3NkR?=
- =?us-ascii?Q?sNAU/VQIt8dL+uVKvd8/kqTvlDjfy+cDIVdaQgxG0s8sKZVShJ9fT7y4C3Xq?=
- =?us-ascii?Q?o09ws8oTwbOXP1XQOHsMkUYmkLld+H+WuvSCZ3O0dWSeiNBG7h1Ea47KRHRx?=
- =?us-ascii?Q?18pO2ct/c1KcitkOMxRAFULddeBWaQ+zetlAC3jIR80NWi/s4SU9Dgk3VDZu?=
- =?us-ascii?Q?qF4Iiy5z50Ip6PBPcQ1Y0l2BSiWbd0J7VOO12AvbpCqK0IUSMpB/qpmCpGhn?=
- =?us-ascii?Q?iEFol7Zgzwiqa5wRn8Z1MI1uPMNEccEKvLWKLtQYQMySET0QrCIaap1XzflS?=
- =?us-ascii?Q?gMvk3uz33diuL3v27qYV3FIKCbZWCqzIKKUmhun5/UNIem9y/2xz36uGiMD3?=
- =?us-ascii?Q?eUrKfnBqo03A2QiNL4mADVck8zCAsK9erKHRDiFsowgMuYUpgJ2H4yK2REBS?=
- =?us-ascii?Q?GgFZg7ahpUPF3YpQyxxxVGpU5gCs76O9Ur/fO9qlZnphU9Plw6RlQKmYiUEl?=
- =?us-ascii?Q?JoiWQxUjxmI=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB8558.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?9oLIMAISIeIpUIA2+QwPWHh9GAIjQBNUd9iaVxJs5+Z3/Tr+G9Yk6WWOuHhT?=
- =?us-ascii?Q?pnHJHzrT7/0pi0paoKZ51BgeC+DdE3MF8NGPG+cvDl3mfc3DzRuLyS4FFoL0?=
- =?us-ascii?Q?fs8zLKiPYcfMq9VOEjNq7vKE4e/MjJxUatE+kgyhOwagM4vbhoWd+9DTpdPa?=
- =?us-ascii?Q?VoxHiqnqbkVe6VOXZcPT9zcx2vKC5I92Q5zrEYda5ppDhyLDhkKMeVOvgRUi?=
- =?us-ascii?Q?3gCi7hyUjFYCX8QhuWRzx6LLCaxLBtcOiibB6iAA73sJYX9SrdfIZ5qDqj28?=
- =?us-ascii?Q?bEcvdqYJMstugistMl+7AVoutHscL77m9wigGHeTxCb920CGLSJcbW9+mImb?=
- =?us-ascii?Q?eVXo8QkZ3bUnP7XjxK/ouYp48zepbDK6Rz7LpvxUWAJ6zAA9XBKCU8tkqBLg?=
- =?us-ascii?Q?UwEK1J+pLf6gSW1NwD4HGFTImWiNQbOVcYovWK5rp+7NWACNpOM4YvLGR4b2?=
- =?us-ascii?Q?AnJY7gZBx6u3+OOwa7IypjdtaML+f4Qa4RzkakGDx1ZzN1PliWNZ6zDBkwPf?=
- =?us-ascii?Q?zvKAv5duPmfZcQ04NPLOyx4qDSlMs+o/Yz2cF45+2isrD9q4/ddfwKRZEf2R?=
- =?us-ascii?Q?0vgrx1qDiFw/SIAcP+gj+AnbkXb6ZL1XlWiZL4uHwp6lSj6mDrvuVxrLlKr2?=
- =?us-ascii?Q?m8/raVgQl505k+NsX53Cqw4I1g+Ge1YaxxnwzkMquYjNwHmkuIiydKLm1I3i?=
- =?us-ascii?Q?eI4TuSEtnfOJHjE8E6UtKPI3SKRjPX1noJSOafOXwm1Y6oOuEHl3J48vw9iN?=
- =?us-ascii?Q?ZVlpq4IaSNx7xPRUHw//pXDhvZsZghZHOUQJVETx+5OsxkZJu/Hs5LWlNjy9?=
- =?us-ascii?Q?80RHf7mq+Bqz5p3Lh2ZxZ7paTYhae7kDB3wEw+9SkMEyNIGwvoPbb365vfta?=
- =?us-ascii?Q?8jD56o3Zwm4cfWWL0NeBRW3jGdAVnBJ1hXfm9tK8V4zGhn830iurtt9sTMew?=
- =?us-ascii?Q?1TVRKPhpJcUUgqvMMO0cH+zhLfHYsSO5XZu2gaa4iQWEeKW4+TiQTR8xt9wy?=
- =?us-ascii?Q?Cg6INlpZPuqznUnifhivOK96fng2B8/zYNulfTdcC1ptu7wcOGM9XjYOK08m?=
- =?us-ascii?Q?xDsC/fk7p4wS8BpLSRKEC25BWQHcRkJ3TxrohJAvzT485CPWsD2HXOEQMcTM?=
- =?us-ascii?Q?gmxOb7tT3LosRq4LpKDgQMs19LAwpReu11P6thmXbWnEXq633wZMM5FMQ36l?=
- =?us-ascii?Q?mpPF3mz5ZktGYi1drFoAD0K/yVs8GTQRFntzz8zHHsKow1+Bg+JYSCEbU0zB?=
- =?us-ascii?Q?8lU7Gx+SiBl9fJBU+0SaZDW5AaSil97dY4miovys8ieHQH6en2oEoIZJw0bq?=
- =?us-ascii?Q?xC4PwUiUYcPp4HVHICHcKYkAlYTSKUhcF7EqphmfohQ2eIBNn7lENqeK48Fg?=
- =?us-ascii?Q?+sukhVSX8knQ+hVtuppO7Mi+SLe5E48MCEy20+8bixXFEK/Zioa8gFnYXr9X?=
- =?us-ascii?Q?ZiNcg1ZnNvJEN4v5qXSe9WUth2ZPsGa/MDbn0Gj3qMsoWKMDHyLWv7Z/Ah4g?=
- =?us-ascii?Q?D5IbPjpz9zfpqJJi8NvpuDgcX5rUqxZqjiNXXsIeWxgfIGLripHSi4/xB3e4?=
- =?us-ascii?Q?5oCvqqnxEDxUrK1pPlSChvNzsJkxi2tbnGJd8j5B?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fe574527-eb15-43b7-ab62-08dd96ea1d58
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB8558.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2025 15:30:41.8956
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xokHU+f7wo/wSBBhD1xzUShfW3LGIqRrwvEsiJjVAaoyTNj0ce+8vBRUKICDbYF4MeSY/tAmJWl687G01VfseQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4073
+Subject: Re: [net-next PATCH v4 07/11] net: pcs: Add Xilinx PCS driver
+To: Lei Wei <quic_leiwei@quicinc.com>, netdev@vger.kernel.org,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Russell King <linux@armlinux.org.uk>
+Cc: upstream@airoha.com, Kory Maincent <kory.maincent@bootlin.com>,
+ Simon Horman <horms@kernel.org>, Christian Marangi <ansuelsmth@gmail.com>,
+ linux-kernel@vger.kernel.org, Heiner Kallweit <hkallweit1@gmail.com>,
+ Michal Simek <michal.simek@amd.com>,
+ Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+ Robert Hancock <robert.hancock@calian.com>,
+ linux-arm-kernel@lists.infradead.org
+References: <20250512161013.731955-1-sean.anderson@linux.dev>
+ <20250512161013.731955-8-sean.anderson@linux.dev>
+ <2f9ab3f6-6477-4d94-ba8a-1f2af865461e@quicinc.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <2f9ab3f6-6477-4d94-ba8a-1f2af865461e@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Recent patches introduced in 6.15 implement permissions checks for PTP
-clocks [1]. Prior to those, a process with readonly access could modify
-the state of PTP devices, in particular the generation and consumption
-of PPS signals. This security hole was not widely exposed as userspace
-managing the ownership and permissions of PTP device nodes (e.g. udev)
-typically disabled unprivileged access entirely as a stopgap workaround.
+On 5/14/25 12:18, Lei Wei wrote:
+> 
+> 
+> On 5/13/2025 12:10 AM, Sean Anderson wrote:
+>> This adds support for the Xilinx 1G/2.5G Ethernet PCS/PMA or SGMII device.
+>> This is a soft device which converts between GMII and either SGMII,
+>> 1000Base-X, or 2500Base-X. If configured correctly, it can also switch
+>> between SGMII and 1000BASE-X at runtime. Thoretically this is also possible
+>> for 2500Base-X, but that requires reconfiguring the serdes. The exact
+>> capabilities depend on synthesis parameters, so they are read from the
+>> devicetree.
+>>
+>> This device has a c22-compliant PHY interface, so for the most part we can
+>> just use the phylink helpers. This device supports an interrupt which is
+>> triggered on autonegotiation completion. I'm not sure how useful this is,
+>> since we can never detect a link down (in the PCS).
+>>
+>> This device supports sharing some logic between different implementations
+>> of the device. In this case, one device contains the "shared logic" and the
+>> clocks are connected to other devices. To coordinate this, one device
+>> registers a clock that the other devices can request.  The clock is enabled
+>> in the probe function by releasing the device from reset. There are no othe
+>> software controls, so the clock ops are empty.
+>>
+>> Later in this series, we will convert the Xilinx AXI Ethernet driver to use
+>> this PCS. To help out, we provide a compatibility function to bind this
+>> driver in the event the MDIO device has no compatible.
+>>
+>> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+>> ---
+>>
+>> Changes in v4:
+>> - Re-add documentation for axienet_xilinx_pcs_get that was accidentally
+>>    removed
+>>
+>> Changes in v3:
+>> - Adjust axienet_xilinx_pcs_get for changes to pcs_find_fwnode API
+>> - Call devm_pcs_register instead of devm_pcs_register_provider
+>>
+>> Changes in v2:
+>> - Add support for #pcs-cells
+>> - Change compatible to just xlnx,pcs
+>> - Drop PCS_ALTERA_TSE which was accidentally added while rebasing
+>> - Rework xilinx_pcs_validate to just clear out half-duplex modes instead
+>>    of constraining modes based on the interface.
+>>
+>>   MAINTAINERS                  |   6 +
+>>   drivers/net/pcs/Kconfig      |  21 ++
+>>   drivers/net/pcs/Makefile     |   2 +
+>>   drivers/net/pcs/pcs-xilinx.c | 488 +++++++++++++++++++++++++++++++++++
+>>   include/linux/pcs-xilinx.h   |  15 ++
+>>   5 files changed, 532 insertions(+)
+>>   create mode 100644 drivers/net/pcs/pcs-xilinx.c
+>>   create mode 100644 include/linux/pcs-xilinx.h
+>>
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index 65f936521d65..4f41237b1f36 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -26454,6 +26454,12 @@ L:    netdev@vger.kernel.org
+>>   S:    Orphan
+>>   F:    drivers/net/ethernet/xilinx/ll_temac*
+>>   +XILINX PCS DRIVER
+>> +M:    Sean Anderson <sean.anderson@linux.dev>
+>> +S:    Maintained
+>> +F:    Documentation/devicetree/bindings/net/xilinx,pcs.yaml
+>> +F:    drivers/net/pcs/pcs-xilinx.c
+>> +
+>>   XILINX PWM DRIVER
+>>   M:    Sean Anderson <sean.anderson@seco.com>
+>>   S:    Maintained
+>> diff --git a/drivers/net/pcs/Kconfig b/drivers/net/pcs/Kconfig
+>> index ef3dc57da1b5..5c2209cc8b31 100644
+>> --- a/drivers/net/pcs/Kconfig
+>> +++ b/drivers/net/pcs/Kconfig
+>> @@ -51,4 +51,25 @@ config PCS_RZN1_MIIC
+>>         on RZ/N1 SoCs. This PCS converts MII to RMII/RGMII or can be set in
+>>         pass-through mode for MII.
+>>   +config PCS_XILINX
+>> +    depends on OF
+>> +    depends on GPIOLIB
+>> +    depends on COMMON_CLK
+>> +    depends on PCS
+>> +    select MDIO_DEVICE
+>> +    select PHYLINK
+>> +    tristate "Xilinx PCS driver"
+>> +    help
+>> +      PCS driver for the Xilinx 1G/2.5G Ethernet PCS/PMA or SGMII device.
+>> +      This device can either act as a PCS+PMA for 1000BASE-X or 2500BASE-X,
+>> +      or as a GMII-to-SGMII bridge. It can also switch between 1000BASE-X
+>> +      and SGMII dynamically if configured correctly when synthesized.
+>> +      Typical applications use this device on an FPGA connected to a GEM or
+>> +      TEMAC on the GMII side. The other side is typically connected to
+>> +      on-device gigabit transceivers, off-device SERDES devices using TBI,
+>> +      or LVDS IO resources directly.
+>> +
+>> +      To compile this driver as a module, choose M here: the module
+>> +      will be called pcs-xilinx.
+>> +
+>>   endmenu
+>> diff --git a/drivers/net/pcs/Makefile b/drivers/net/pcs/Makefile
+>> index 35e3324fc26e..347afd91f034 100644
+>> --- a/drivers/net/pcs/Makefile
+>> +++ b/drivers/net/pcs/Makefile
+>> @@ -10,3 +10,5 @@ obj-$(CONFIG_PCS_XPCS)        += pcs_xpcs.o
+>>   obj-$(CONFIG_PCS_LYNX)        += pcs-lynx.o
+>>   obj-$(CONFIG_PCS_MTK_LYNXI)    += pcs-mtk-lynxi.o
+>>   obj-$(CONFIG_PCS_RZN1_MIIC)    += pcs-rzn1-miic.o
+>> +obj-$(CONFIG_PCS_ALTERA_TSE)    += pcs-altera-tse.o
+>> +obj-$(CONFIG_PCS_XILINX)    += pcs-xilinx.o
+>> diff --git a/drivers/net/pcs/pcs-xilinx.c b/drivers/net/pcs/pcs-xilinx.c
+>> new file mode 100644
+>> index 000000000000..cc42e2a22cd2
+>> --- /dev/null
+>> +++ b/drivers/net/pcs/pcs-xilinx.c
+>> @@ -0,0 +1,488 @@
+>> +// SPDX-License-Identifier: GPL-2.0+
+>> +/*
+>> + * Copyright 2021-25 Sean Anderson <sean.anderson@seco.com>
+>> + *
+>> + * This is the driver for the Xilinx 1G/2.5G Ethernet PCS/PMA or SGMII LogiCORE
+>> + * IP. A typical setup will look something like
+>> + *
+>> + * MAC <--GMII--> PCS/PMA <--1000BASE-X--> SFP module (PMD)
+>> + *
+>> + * The IEEE model mostly describes this device, but the PCS layer has a
+>> + * separate sublayer for 8b/10b en/decoding:
+>> + *
+>> + * - When using a device-specific transceiver (serdes), the serdes handles 8b/10b
+>> + *   en/decoding and PMA functions. The IP implements other PCS functions.
+>> + * - When using LVDS IO resources, the IP implements PCS and PMA functions,
+>> + *   including 8b/10b en/decoding and (de)serialization.
+>> + * - When using an external serdes (accessed via TBI), the IP implements all
+>> + *   PCS functions, including 8b/10b en/decoding.
+>> + *
+>> + * The link to the PMD is not modeled by this driver, except for refclk. It is
+>> + * assumed that the serdes (if present) needs no configuration, though it
+>> + * should be fairly easy to add support. It is also possible to go from SGMII
+>> + * to GMII (PHY mode), but this is not supported.
+>> + *
+>> + * This driver was written with reference to PG047:
+>> + * https://docs.amd.com/r/en-US/pg047-gig-eth-pcs-pma
+>> + */
+>> +
+>> +#include <linux/bitmap.h>
+>> +#include <linux/clk.h>
+>> +#include <linux/clk-provider.h>
+>> +#include <linux/gpio/consumer.h>
+>> +#include <linux/iopoll.h>
+>> +#include <linux/mdio.h>
+>> +#include <linux/of.h>
+>> +#include <linux/pcs.h>
+>> +#include <linux/pcs-xilinx.h>
+>> +#include <linux/phylink.h>
+>> +#include <linux/property.h>
+>> +
+>> +#include "../phy/phy-caps.h"
+>> +
+>> +/* Vendor-specific MDIO registers */
+>> +#define XILINX_PCS_ANICR 16 /* Auto-Negotiation Interrupt Control Register */
+>> +#define XILINX_PCS_SSR   17 /* Standard Selection Register */
+>> +
+>> +#define XILINX_PCS_ANICR_IE BIT(0) /* Interrupt Enable */
+>> +#define XILINX_PCS_ANICR_IS BIT(1) /* Interrupt Status */
+>> +
+>> +#define XILINX_PCS_SSR_SGMII BIT(0) /* Select SGMII standard */
+>> +
+>> +/**
+>> + * struct xilinx_pcs - Private data for Xilinx PCS devices
+>> + * @pcs: The phylink PCS
+>> + * @mdiodev: The mdiodevice used to access the PCS
+>> + * @refclk: The reference clock for the PMD
+>> + * @refclk_out: Optional reference clock for other PCSs using this PCS's shared
+>> + *              logic
+>> + * @reset: The reset line for the PCS
+>> + * @done: Optional GPIO for reset_done
+>> + * @irq: IRQ, or -EINVAL if polling
+>> + * @enabled: Set if @pcs.link_change is valid and we can call phylink_pcs_change()
+>> + */
+>> +struct xilinx_pcs {
+>> +    struct phylink_pcs pcs;
+>> +    struct clk_hw refclk_out;
+>> +    struct clk *refclk;
+>> +    struct gpio_desc *reset, *done;
+>> +    struct mdio_device *mdiodev;
+>> +    int irq;
+>> +    bool enabled;
+>> +};
+>> +
+>> +static inline struct xilinx_pcs *pcs_to_xilinx(struct phylink_pcs *pcs)
+>> +{
+>> +    return container_of(pcs, struct xilinx_pcs, pcs);
+>> +}
+>> +
+>> +static irqreturn_t xilinx_pcs_an_irq(int irq, void *dev_id)
+>> +{
+>> +    struct xilinx_pcs *xp = dev_id;
+>> +
+>> +    if (mdiodev_modify_changed(xp->mdiodev, XILINX_PCS_ANICR,
+>> +                   XILINX_PCS_ANICR_IS, 0) <= 0)
+>> +        return IRQ_NONE;
+>> +
+>> +    /* paired with xilinx_pcs_enable/disable; protects xp->pcs->link_change */
+>> +    if (smp_load_acquire(&xp->enabled))
+>> +        phylink_pcs_change(&xp->pcs, true);
+>> +    return IRQ_HANDLED;
+>> +}
+>> +
+>> +static int xilinx_pcs_enable(struct phylink_pcs *pcs)
+>> +{
+>> +    struct xilinx_pcs *xp = pcs_to_xilinx(pcs);
+>> +    struct device *dev = &xp->mdiodev->dev;
+>> +    int ret;
+>> +
+>> +    if (xp->irq < 0)
+>> +        return 0;
+>> +
+>> +    ret = mdiodev_modify(xp->mdiodev, XILINX_PCS_ANICR, 0,
+>> +                 XILINX_PCS_ANICR_IE);
+>> +    if (ret)
+>> +        dev_err(dev, "could not clear IRQ enable: %d\n", ret);
+>> +    else
+>> +        /* paired with xilinx_pcs_an_irq */
+>> +        smp_store_release(&xp->enabled, true);
+>> +    return ret;
+>> +}
+>> +
+>> +static void xilinx_pcs_disable(struct phylink_pcs *pcs)
+>> +{
+>> +    struct xilinx_pcs *xp = pcs_to_xilinx(pcs);
+>> +    struct device *dev = &xp->mdiodev->dev;
+>> +    int err;
+>> +
+>> +    if (xp->irq < 0)
+>> +        return;
+>> +
+>> +    WRITE_ONCE(xp->enabled, false);
+>> +    /* paired with xilinx_pcs_an_irq */
+>> +    smp_wmb();
+>> +
+>> +    err = mdiodev_modify(xp->mdiodev, XILINX_PCS_ANICR,
+>> +                 XILINX_PCS_ANICR_IE, 0);
+>> +    if (err)
+>> +        dev_err(dev, "could not clear IRQ enable: %d\n", err);
+>> +}
+>> +
+>> +static __ETHTOOL_DECLARE_LINK_MODE_MASK(half_duplex) __ro_after_init;
+>> +
+>> +static int xilinx_pcs_validate(struct phylink_pcs *pcs,
+>> +                   unsigned long *supported,
+>> +                   const struct phylink_link_state *state)
+>> +{
+>> +    linkmode_andnot(supported, supported, half_duplex);
+>> +    return 0;
+>> +}
+>> +
+>> +static void xilinx_pcs_get_state(struct phylink_pcs *pcs,
+>> +                 unsigned int neg_mode,
+>> +                 struct phylink_link_state *state)
+>> +{
+>> +    struct xilinx_pcs *xp = pcs_to_xilinx(pcs);
+>> +
+>> +    phylink_mii_c22_pcs_get_state(xp->mdiodev, neg_mode, state);
+>> +}
+>> +
+>> +static int xilinx_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
+>> +                 phy_interface_t interface,
+>> +                 const unsigned long *advertising,
+>> +                 bool permit_pause_to_mac)
+>> +{
+>> +    int ret, changed = 0;
+>> +    struct xilinx_pcs *xp = pcs_to_xilinx(pcs);
+>> +
+>> +    if (test_bit(PHY_INTERFACE_MODE_SGMII, pcs->supported_interfaces) &&
+>> +        test_bit(PHY_INTERFACE_MODE_1000BASEX, pcs->supported_interfaces)) {
+>> +        u16 ssr;
+>> +
+>> +        if (interface == PHY_INTERFACE_MODE_SGMII)
+>> +            ssr = XILINX_PCS_SSR_SGMII;
+>> +        else
+>> +            ssr = 0;
+>> +
+>> +        changed = mdiodev_modify_changed(xp->mdiodev, XILINX_PCS_SSR,
+>> +                         XILINX_PCS_SSR_SGMII, ssr);
+>> +        if (changed < 0)
+>> +            return changed;
+>> +    }
+>> +
+>> +    ret = phylink_mii_c22_pcs_config(xp->mdiodev, interface, advertising,
+>> +                     neg_mode);
+>> +    return ret ?: changed;
+>> +}
+>> +
+>> +static void xilinx_pcs_an_restart(struct phylink_pcs *pcs)
+>> +{
+>> +    struct xilinx_pcs *xp = pcs_to_xilinx(pcs);
+>> +
+>> +    phylink_mii_c22_pcs_an_restart(xp->mdiodev);
+>> +}
+>> +
+>> +static void xilinx_pcs_link_up(struct phylink_pcs *pcs, unsigned int mode,
+>> +                   phy_interface_t interface, int speed, int duplex)
+>> +{
+>> +    int bmcr;
+>> +    struct xilinx_pcs *xp = pcs_to_xilinx(pcs);
+>> +
+>> +    if (phylink_autoneg_inband(mode))
+>> +        return;
+>> +
+>> +    bmcr = mdiodev_read(xp->mdiodev, MII_BMCR);
+>> +    if (bmcr < 0) {
+>> +        dev_err(&xp->mdiodev->dev, "could not read BMCR (err=%d)\n",
+>> +            bmcr);
+>> +        return;
+>> +    }
+>> +
+>> +    bmcr &= ~(BMCR_SPEED1000 | BMCR_SPEED100);
+>> +    switch (speed) {
+>> +    case SPEED_2500:
+>> +    case SPEED_1000:
+>> +        bmcr |= BMCR_SPEED1000;
+>> +        break;
+>> +    case SPEED_100:
+>> +        bmcr |= BMCR_SPEED100;
+>> +        break;
+>> +    case SPEED_10:
+>> +        bmcr |= BMCR_SPEED10;
+>> +        break;
+>> +    default:
+>> +        dev_err(&xp->mdiodev->dev, "invalid speed %d\n", speed);
+>> +    }
+>> +
+>> +    bmcr = mdiodev_write(xp->mdiodev, MII_BMCR, bmcr);
+>> +    if (bmcr < 0)
+>> +        dev_err(&xp->mdiodev->dev, "could not write BMCR (err=%d)\n",
+>> +            bmcr);
+>> +}
+>> +
+>> +static const struct phylink_pcs_ops xilinx_pcs_ops = {
+>> +    .pcs_validate = xilinx_pcs_validate,
+>> +    .pcs_enable = xilinx_pcs_enable,
+>> +    .pcs_disable = xilinx_pcs_disable,
+>> +    .pcs_get_state = xilinx_pcs_get_state,
+>> +    .pcs_config = xilinx_pcs_config,
+>> +    .pcs_an_restart = xilinx_pcs_an_restart,
+>> +    .pcs_link_up = xilinx_pcs_link_up,
+>> +};
+>> +
+>> +static const struct clk_ops xilinx_pcs_clk_ops = { };
+>> +
+>> +static const phy_interface_t xilinx_pcs_interfaces[] = {
+>> +    PHY_INTERFACE_MODE_SGMII,
+>> +    PHY_INTERFACE_MODE_1000BASEX,
+>> +    PHY_INTERFACE_MODE_2500BASEX,
+>> +};
+>> +
+>> +static int xilinx_pcs_probe(struct mdio_device *mdiodev)
+>> +{
+>> +    struct device *dev = &mdiodev->dev;
+>> +    struct fwnode_handle *fwnode = dev->fwnode;
+>> +    int ret, i, j, mode_count;
+>> +    struct xilinx_pcs *xp;
+>> +    const char **modes;
+>> +    u32 phy_id;
+>> +
+>> +    xp = devm_kzalloc(dev, sizeof(*xp), GFP_KERNEL);
+>> +    if (!xp)
+>> +        return -ENOMEM;
+>> +    xp->mdiodev = mdiodev;
+>> +    dev_set_drvdata(dev, xp);
+>> +
+>> +    xp->irq = fwnode_irq_get_byname(fwnode, "an");
+>> +    /* There's no _optional variant, so this is the best we've got */
+>> +    if (xp->irq < 0 && xp->irq != -EINVAL)
+>> +        return dev_err_probe(dev, xp->irq, "could not get IRQ\n");
+>> +
+>> +    mode_count = fwnode_property_string_array_count(fwnode,
+>> +                            "xlnx,pcs-modes");
+>> +    if (!mode_count)
+>> +        mode_count = -ENODATA;
+>> +    if (mode_count < 0) {
+>> +        dev_err(dev, "could not read xlnx,pcs-modes: %d", mode_count);
+>> +        return mode_count;
+>> +    }
+>> +
+>> +    modes = kcalloc(mode_count, sizeof(*modes), GFP_KERNEL);
+>> +    if (!modes)
+>> +        return -ENOMEM;
+>> +
+>> +    ret = fwnode_property_read_string_array(fwnode, "xlnx,pcs-modes",
+>> +                        modes, mode_count);
+>> +    if (ret < 0) {
+>> +        dev_err(dev, "could not read xlnx,pcs-modes: %d\n", ret);
+>> +        kfree(modes);
+>> +        return ret;
+>> +    }
+>> +
+>> +    for (i = 0; i < mode_count; i++) {
+>> +        for (j = 0; j < ARRAY_SIZE(xilinx_pcs_interfaces); j++) {
+>> +            if (!strcmp(phy_modes(xilinx_pcs_interfaces[j]), modes[i])) {
+>> +                __set_bit(xilinx_pcs_interfaces[j],
+>> +                      xp->pcs.supported_interfaces);
+>> +                goto next;
+>> +            }
+>> +        }
+>> +
+>> +        dev_err(dev, "invalid pcs-mode \"%s\"\n", modes[i]);
+>> +        kfree(modes);
+>> +        return -EINVAL;
+>> +next:
+>> +    }
+>> +
+>> +    kfree(modes);
+>> +    if ((test_bit(PHY_INTERFACE_MODE_SGMII, xp->pcs.supported_interfaces) ||
+>> +         test_bit(PHY_INTERFACE_MODE_1000BASEX, xp->pcs.supported_interfaces)) &&
+>> +        test_bit(PHY_INTERFACE_MODE_2500BASEX, xp->pcs.supported_interfaces)) {
+>> +        dev_err(dev,
+>> +            "Switching from SGMII or 1000Base-X to 2500Base-X not supported\n");
+>> +        return -EINVAL;
+>> +    }
+>> +
+>> +    xp->reset = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_HIGH);
+>> +    if (IS_ERR(xp->reset))
+>> +        return dev_err_probe(dev, PTR_ERR(xp->reset),
+>> +                     "could not get reset gpio\n");
+>> +
+>> +    xp->done = devm_gpiod_get_optional(dev, "done", GPIOD_IN);
+>> +    if (IS_ERR(xp->done))
+>> +        return dev_err_probe(dev, PTR_ERR(xp->done),
+>> +                     "could not get done gpio\n");
+>> +
+>> +    xp->refclk = devm_clk_get_optional_enabled(dev, "refclk");
+>> +    if (IS_ERR(xp->refclk))
+>> +        return dev_err_probe(dev, PTR_ERR(xp->refclk),
+>> +                     "could not get/enable reference clock\n");
+>> +
+>> +    gpiod_set_value_cansleep(xp->reset, 0);
+>> +    if (xp->done) {
+>> +        if (read_poll_timeout(gpiod_get_value_cansleep, ret, ret, 1000,
+>> +                      100000, true, xp->done))
+>> +            return dev_err_probe(dev, -ETIMEDOUT,
+>> +                         "timed out waiting for reset\n");
+>> +    } else {
+>> +        /* Just wait for a while and hope we're done */
+>> +        usleep_range(50000, 100000);
+>> +    }
+>> +
+>> +    if (fwnode_property_present(fwnode, "#clock-cells")) {
+>> +        const char *parent = "refclk";
+>> +        struct clk_init_data init = {
+>> +            .name = fwnode_get_name(fwnode),
+>> +            .ops = &xilinx_pcs_clk_ops,
+>> +            .parent_names = &parent,
+>> +            .num_parents = 1,
+>> +            .flags = 0,
+>> +        };
+>> +
+>> +        xp->refclk_out.init = &init;
+>> +        ret = devm_clk_hw_register(dev, &xp->refclk_out);
+>> +        if (ret)
+>> +            return dev_err_probe(dev, ret,
+>> +                         "could not register refclk\n");
+>> +
+>> +        ret = devm_of_clk_add_hw_provider(dev, of_clk_hw_simple_get,
+>> +                          &xp->refclk_out);
+>> +        if (ret)
+>> +            return dev_err_probe(dev, ret,
+>> +                         "could not register refclk\n");
+>> +    }
+>> +
+>> +    /* Sanity check */
+>> +    ret = get_phy_c22_id(mdiodev->bus, mdiodev->addr, &phy_id);
+>> +    if (ret) {
+>> +        dev_err_probe(dev, ret, "could not read id\n");
+>> +        return ret;
+>> +    }
+>> +    if ((phy_id & 0xfffffff0) != 0x01740c00)
+>> +        dev_warn(dev, "unknown phy id %x\n", phy_id);
+>> +
+>> +    if (xp->irq < 0) {
+>> +        xp->pcs.poll = true;
+>> +    } else {
+>> +        /* The IRQ is enabled by default; turn it off */
+>> +        ret = mdiodev_write(xp->mdiodev, XILINX_PCS_ANICR, 0);
+>> +        if (ret) {
+>> +            dev_err(dev, "could not disable IRQ: %d\n", ret);
+>> +            return ret;
+>> +        }
+>> +
+>> +        /* Some PCSs have a bad habit of re-enabling their IRQ!
+>> +         * Request the IRQ in probe so we don't end up triggering the
+>> +         * spurious IRQ logic.
+>> +         */
+>> +        ret = devm_request_threaded_irq(dev, xp->irq, NULL, xilinx_pcs_an_irq,
+>> +                        IRQF_SHARED | IRQF_ONESHOT,
+>> +                        dev_name(dev), xp);
+>> +        if (ret) {
+>> +            dev_err(dev, "could not request IRQ: %d\n", ret);
+>> +            return ret;
+>> +        }
+>> +    }
+>> +
+>> +    xp->pcs.ops = &xilinx_pcs_ops;
+>> +    ret = devm_pcs_register(dev, &xp->pcs);
+>> +    if (ret)
+>> +        return dev_err_probe(dev, ret, "could not register PCS\n");
+>> +
+>> +    if (xp->irq < 0)
+>> +        dev_info(dev, "probed with irq=poll\n");
+>> +    else
+>> +        dev_info(dev, "probed with irq=%d\n", xp->irq);
+>> +    return 0;
+>> +}
+>> +
+>> +static const struct of_device_id xilinx_pcs_of_match[] = {
+>> +    { .compatible = "xlnx,pcs", },
+>> +    {},
+>> +};
+>> +MODULE_DEVICE_TABLE(of, xilinx_pcs_of_match);
+>> +
+>> +static struct mdio_driver xilinx_pcs_driver = {
+>> +    .probe = xilinx_pcs_probe,
+>> +    .mdiodrv.driver = {
+>> +        .name = "xilinx-pcs",
+>> +        .of_match_table = of_match_ptr(xilinx_pcs_of_match),
+>> +        .suppress_bind_attrs = true,
+> 
+> Do we support pcs removal for this device through the sysfs method of
+> driver unbind?
 
-Although the security vulnerability has been fixed in the kernel,
-userspace has no reliable way to detect whether the necessary
-permissions checks are actually in place. As a result, it must continue
-restricting PTP device permissions, even though unprivileged users can
-now be granted readonly access.
+I don't think this feature is too useful for a PCS so I disabled it. It's
+of course possible to not do this if you think there is value.
 
-There is little precedent for fixing device permissions security hole
-covered by a long-standing userspace workaround. In previous cases where
-device permission checks were tightened [2-4], there were no userspace
-workarounds to remove/disable and so kernel fixes were applied silently
-without notifying the userspace.
+--Sean
 
-A possible solution that would not require new ABI is for userspace to
-check the kernel version to detect whether the fix is in place. However,
-this approach is unreliable and error-prone, especially if backports are
-considered [5].
-
-Add a readonly sysfs attribute to PTP clocks, "ro_safe", backed by a
-static string.
-
-[1] https://lore.kernel.org/netdev/20250303161345.3053496-1-wwasko@nvidia.com/
-[2] https://lore.kernel.org/lkml/20070723145105.01b3acc3@the-village.bc.nu/
-[3] https://lore.kernel.org/linux-mtd/20200716115346.GA1667288@kroah.com/
-[4] https://lore.kernel.org/linux-mtd/20210303155735.25887-1-michael@walle.cc/
-[5] https://github.com/systemd/systemd/pull/37302#issuecomment-2850510329
-
-Changes in v2:
-- Document the new sysfs node
-
-Signed-off-by: Wojtek Wasko <wwasko@nvidia.com>
----
- Documentation/ABI/testing/sysfs-ptp | 8 ++++++++
- drivers/ptp/ptp_sysfs.c             | 3 +++
- 2 files changed, 11 insertions(+)
-
-diff --git a/Documentation/ABI/testing/sysfs-ptp b/Documentation/ABI/testing/sysfs-ptp
-index 9c317ac7c47a..1968199dcf1c 100644
---- a/Documentation/ABI/testing/sysfs-ptp
-+++ b/Documentation/ABI/testing/sysfs-ptp
-@@ -140,3 +140,11 @@ Description:
- 		PPS events to the Linux PPS subsystem. To enable PPS
- 		events, write a "1" into the file. To disable events,
- 		write a "0" into the file.
-+
-+What:		/sys/class/ptp/ptp<N>/ro_safe
-+Date:		May 2025
-+Contact:	Wojtek Wasko <wwasko@nvidia.com>
-+Description:
-+        This read-only file conveys whether the kernel
-+        implements necessary permissions checks to allow
-+        safe readonly access to PTP devices.
-diff --git a/drivers/ptp/ptp_sysfs.c b/drivers/ptp/ptp_sysfs.c
-index 6b1b8f57cd95..763fc54cf267 100644
---- a/drivers/ptp/ptp_sysfs.c
-+++ b/drivers/ptp/ptp_sysfs.c
-@@ -28,6 +28,8 @@ static ssize_t max_phase_adjustment_show(struct device *dev,
- }
- static DEVICE_ATTR_RO(max_phase_adjustment);
- 
-+static DEVICE_STRING_ATTR_RO(ro_safe, 0444, "1\n");
-+
- #define PTP_SHOW_INT(name, var)						\
- static ssize_t var##_show(struct device *dev,				\
- 			   struct device_attribute *attr, char *page)	\
-@@ -320,6 +322,7 @@ static DEVICE_ATTR_RW(max_vclocks);
- 
- static struct attribute *ptp_attrs[] = {
- 	&dev_attr_clock_name.attr,
-+	&dev_attr_ro_safe.attr.attr,
- 
- 	&dev_attr_max_adjustment.attr,
- 	&dev_attr_max_phase_adjustment.attr,
--- 
-2.43.5
+>> +    },
+>> +};
+>> +
+>> +static int __init xilinx_pcs_init(void)
+>> +{
+>> +    phy_caps_linkmodes(LINK_CAPA_10HD | LINK_CAPA_100HD | LINK_CAPA_1000HD,
+>> +               half_duplex);
+>> +    return mdio_driver_register(&xilinx_pcs_driver);
+>> +}
+>> +module_init(xilinx_pcs_init);
+>> +
+>> +static void __exit xilinx_pcs_exit(void)
+>> +{
+>> +    mdio_driver_unregister(&xilinx_pcs_driver);
+>> +}
+>> +module_exit(xilinx_pcs_exit)
+>> +
+>> +static int axienet_xilinx_pcs_fixup(struct of_changeset *ocs,
+>> +                    struct device_node *np, void *data)
+>> +{
+>> +#ifdef CONFIG_OF_DYNAMIC
+>> +    unsigned int interface, mode_count, mode = 0;
+>> +    const unsigned long *interfaces = data;
+>> +    const char **modes;
+>> +    int ret;
+>> +
+>> +    mode_count = bitmap_weight(interfaces, PHY_INTERFACE_MODE_MAX);
+>> +    WARN_ON_ONCE(!mode_count);
+>> +    modes = kcalloc(mode_count, sizeof(*modes), GFP_KERNEL);
+>> +    if (!modes)
+>> +        return -ENOMEM;
+>> +
+>> +    for_each_set_bit(interface, interfaces, PHY_INTERFACE_MODE_MAX)
+>> +        modes[mode++] = phy_modes(interface);
+>> +    ret = of_changeset_add_prop_string_array(ocs, np, "xlnx,pcs-modes",
+>> +                         modes, mode_count);
+>> +    kfree(modes);
+>> +    if (ret)
+>> +        return ret;
+>> +
+>> +    return of_changeset_add_prop_string(ocs, np, "compatible",
+>> +                        "xlnx,pcs");
+>> +#else
+>> +    return -ENODEV;
+>> +#endif
+>> +}
+>> +
+>> +/**
+>> + * axienet_xilinx_pcs_get() - Compatibility function for the AXI Ethernet driver
+>> + * @dev: The MAC device
+>> + * @interfaces: The interfaces to use as a fallback
+>> + *
+>> + * This is a helper function for the AXI Ethernet driver to ensure backwards
+>> + * compatibility with device trees which do not include compatible strings for
+>> + * the PCS. It should not be used by new code.
+>> + *
+>> + * Return: a PCS, or an error pointer
+>> + */
+>> +struct phylink_pcs *axienet_xilinx_pcs_get(struct device *dev,
+>> +                       const unsigned long *interfaces)
+>> +{
+>> +    struct fwnode_handle *fwnode;
+>> +    struct phylink_pcs *pcs;
+>> +
+>> +    fwnode = pcs_find_fwnode(dev_fwnode(dev), NULL, "phy-handle", false);
+>> +    if (IS_ERR(fwnode))
+>> +        return ERR_CAST(fwnode);
+>> +
+>> +    pcs = pcs_get_by_fwnode_compat(dev, fwnode, axienet_xilinx_pcs_fixup,
+>> +                       (void *)interfaces);
+>> +    fwnode_handle_put(fwnode);
+>> +    return pcs;
+>> +}
+>> +EXPORT_SYMBOL_GPL(axienet_xilinx_pcs_get);
+>> +
+>> +MODULE_ALIAS("platform:xilinx-pcs");
+>> +MODULE_DESCRIPTION("Xilinx PCS driver");
+>> +MODULE_LICENSE("GPL");
+>> diff --git a/include/linux/pcs-xilinx.h b/include/linux/pcs-xilinx.h
+>> new file mode 100644
+>> index 000000000000..28ff65226c3c
+>> --- /dev/null
+>> +++ b/include/linux/pcs-xilinx.h
+>> @@ -0,0 +1,15 @@
+>> +/* SPDX-License-Identifier: GPL-2.0+ */
+>> +/*
+>> + * Copyright 2024 Sean Anderson <sean.anderson@seco.com>
+>> + */
+>> +
+>> +#ifndef PCS_XILINX_H
+>> +#define PCS_XILINX_H
+>> +
+>> +struct device;
+>> +struct phylink_pcs;
+>> +
+>> +struct phylink_pcs *axienet_xilinx_pcs_get(struct device *dev,
+>> +                       const unsigned long *interfaces);
+>> +
+>> +#endif /* PCS_XILINX_H */
+> 
 
 
