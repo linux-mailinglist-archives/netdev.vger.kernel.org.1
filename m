@@ -1,90 +1,129 @@
-Return-Path: <netdev+bounces-191563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A954DABC273
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 17:30:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B55DEABC277
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 17:30:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBFC317DB4A
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 15:30:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D66A5189E8F8
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 15:31:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A1E02857DB;
-	Mon, 19 May 2025 15:29:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="luuD0GWt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59519281358;
+	Mon, 19 May 2025 15:30:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4939E2857D5
-	for <netdev@vger.kernel.org>; Mon, 19 May 2025 15:29:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1C2527CCDA;
+	Mon, 19 May 2025 15:30:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747668590; cv=none; b=jNweVHNxuUN50l8AgO/4Z7+wlM2fnde28LojbL28cKulIgKajXvZItGj/0tq7dxItMiMp7RpTlJEnNnJERctKzueiyGBPGDar+mod+r+zwQXBaz3rA8auE31sxNBSUQwm3f2DUQTEWEVREW8h3InJONK4GSpBkHqtBxfpQuw8yQ=
+	t=1747668637; cv=none; b=RAKXyyJGQznY4oEURge9Bpm8zysCVaXQkbFIjJjqelHkO9S8Gzp8pry2C8VNAbT7bv5KStWwsNxbWZvwQj9zGgVrRMHemSjEakh7+xhIjBqRgWyn/8W2apF5kxvuZh2nuK/xXjdWodaiPJTk4n8AN7UJhZ6nJ/YMktMnf+sK9Q8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747668590; c=relaxed/simple;
-	bh=dU0t219Hy+0YzyLO0ZatIatua6I558/Q69hN/3VqUe0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=utZjl2Fx+vppT7tXITiGhyLLLVnyDXIuUYqyM8fb25fLTaKMIBKdlPMGfbmtULQZNgbs1b7OIWyZVGrpDX32LQMOlF29nuMTDHDFDKyeQ2qPt9Idgt9yJ5jA5UbBVCFBxWugcfhwl33zjjd7KrU27KuKHxgAuriJaYAcB7Dihgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=luuD0GWt; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <ae1bb763-5461-4be1-983f-0155aab8ca6e@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1747668576;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xumGfFtSe+qcAudX3LPcfaE2MqABEtJR7l9tjfT+N60=;
-	b=luuD0GWtPMk7VwhSXXSWr7/gnEPUxyEXBrnCKRmi5vCq6sZfj4NAeaoc5Qc3iLyLcXKYDF
-	JQGtrwlfmovBTn4V5+gOJhj7sdAeZsxABHKJ4kafj6oaIO4rNwPqouGW9PxR+BHZY0IAXz
-	hzwEEx+YjyiNoGPNl3K+68Cb9TF91Io=
-Date: Mon, 19 May 2025 11:29:32 -0400
+	s=arc-20240116; t=1747668637; c=relaxed/simple;
+	bh=tf5L2fCE4dGtpAhYewQzZfypzzNRaPuFIUwDAS5IA64=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=thu6QuqOsFZ5Eq1lH5qfWbVq3hlBcRjIUUgJiTnyshmgOSc5S/Lo8hy8nR/mTKGPC2KS6cw56KkSSDyvFPm+Pet4upp790OZj5B7lCkHxs1GeV0TLQCCKOjwhqTsC1Dq4MFPFPdYEEXfgq7ukfsxdVXvMZC8LmsUU3MyZsFdnZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4b1M932mdFz27hwY;
+	Mon, 19 May 2025 23:31:19 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 11E6B1A016C;
+	Mon, 19 May 2025 23:30:31 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 19 May 2025 23:30:30 +0800
+Message-ID: <3f03a8d0-c056-4c46-8f98-a5b5f48c6159@huawei.com>
+Date: Mon, 19 May 2025 23:30:29 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [net-next PATCH v4 06/11] net: phy: Export some functions
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Russell King <linux@armlinux.org.uk>, upstream@airoha.com,
- Kory Maincent <kory.maincent@bootlin.com>, Simon Horman <horms@kernel.org>,
- Christian Marangi <ansuelsmth@gmail.com>, linux-kernel@vger.kernel.org,
- Heiner Kallweit <hkallweit1@gmail.com>
-References: <20250512161013.731955-1-sean.anderson@linux.dev>
- <20250512161013.731955-7-sean.anderson@linux.dev>
- <20250514195716.5ec9d927@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-In-Reply-To: <20250514195716.5ec9d927@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <horms@kernel.org>, <lanhao@huawei.com>,
+	<wangpeiyang1@huawei.com>, <rosenp@gmail.com>, <liuyonglong@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<stable@vger.kernel.org>
+Subject: Re: [PATCH] net: hns3: Add error handling for VLAN filter hardware
+ configuration
+To: Wentao Liang <vulab@iscas.ac.cn>, <shenjian15@huawei.com>,
+	<salil.mehta@huawei.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+References: <20250517141514.800-1-vulab@iscas.ac.cn>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <20250517141514.800-1-vulab@iscas.ac.cn>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-On 5/14/25 22:57, Jakub Kicinski wrote:
-> On Mon, 12 May 2025 12:10:08 -0400 Sean Anderson wrote:
->> Export a few functions so they can be used outside the phy subsystem:
->> 
->> get_phy_c22_id is useful when probing MDIO devices which present a
->> phy-like interface despite not using the Linux ethernet phy subsystem.
->> 
->> mdio_device_bus_match is useful when creating MDIO devices manually
->> (e.g. on non-devicetree platforms).
->> 
->> At the moment the only (future) user of these functions selects PHYLIB,
->> so we do not need fallbacks for when CONFIG_PHYLIB=n.
-> 
-> This one does not apply cleanly.
 
-Sorry, I forgot to rebase before sending this series.
+on 2025/5/17 22:15, Wentao Liang wrote:
+> The hclge_rm_vport_vlan_table() calls hclge_set_vlan_filter_hw() but does
+> not check the return value. This could lead to execution with potentially
+> invalid data. A proper implementation can be found in
 
---Sean
+Hi:
+
+Are there any real functional problems?
+Would you please tell me your test cases? I'm going to try to reproduce the problem.
+
+Thanks,
+Jijie Shao
+
+> hclge_add_vport_all_vlan_table().
+>
+> Add error handling after calling hclge_set_vlan_filter_hw(). If
+> hclge_set_vlan_filter_hw() fails, log an error message via dev_err() and
+> return.
+>
+> Fixes: c6075b193462 ("net: hns3: Record VF vlan tables")
+> Cc: stable@vger.kernel.org # v5.1
+> Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+> ---
+>   .../hisilicon/hns3/hns3pf/hclge_main.c        | 20 +++++++++++++------
+>   1 file changed, 14 insertions(+), 6 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> index db7845009252..5ab4c7f63766 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> @@ -10141,15 +10141,23 @@ static void hclge_rm_vport_vlan_table(struct hclge_vport *vport, u16 vlan_id,
+>   {
+>   	struct hclge_vport_vlan_cfg *vlan, *tmp;
+>   	struct hclge_dev *hdev = vport->back;
+> +	int ret;
+>   
+>   	list_for_each_entry_safe(vlan, tmp, &vport->vlan_list, node) {
+>   		if (vlan->vlan_id == vlan_id) {
+> -			if (is_write_tbl && vlan->hd_tbl_status)
+> -				hclge_set_vlan_filter_hw(hdev,
+> -							 htons(ETH_P_8021Q),
+> -							 vport->vport_id,
+> -							 vlan_id,
+> -							 true);
+> +			if (is_write_tbl && vlan->hd_tbl_status) {
+> +				ret = hclge_set_vlan_filter_hw(hdev,
+> +							       htons(ETH_P_8021Q),
+> +							       vport->vport_id,
+> +							       vlan_id,
+> +							       true);
+> +				if (ret) {
+> +					dev_err(&hdev->pdev->dev,
+> +						"restore vport vlan list failed, ret=%d\n",
+> +						ret);
+> +					return;
+> +				}
+> +			}
+>   
+>   			list_del(&vlan->node);
+>   			kfree(vlan);
 
