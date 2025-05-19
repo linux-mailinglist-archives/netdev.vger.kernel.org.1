@@ -1,113 +1,128 @@
-Return-Path: <netdev+bounces-191375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DBACABB35B
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 04:38:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E1D5ABB3AA
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 05:41:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3075F18961FA
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 02:38:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 938303A928E
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 03:41:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D4CF211297;
-	Mon, 19 May 2025 02:35:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jOtww293"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7B801E260A;
+	Mon, 19 May 2025 03:41:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9407A20E338
-	for <netdev@vger.kernel.org>; Mon, 19 May 2025 02:35:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3119E1AA1D2;
+	Mon, 19 May 2025 03:41:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747622138; cv=none; b=hLtQS2I/iEhRJM4GxWQMO4XRG3L39MmA0oa45/WxB0hynanDXaaJ5pFkKzBHgbDLmS7j/WfB4Bw8ZKTaBuLwtkoNsiRWaKkHzCyVScsy+qbZnZUbtPMfaMf/ylJYz/dE2Gtpe5IEz6taAt9d5V1VLFmpicqGiCM+l6PSQuG9rmM=
+	t=1747626087; cv=none; b=Z3dPTXrHY9fA4A7GMIe/3LQLs9obPW27QPRa2G6R5rsqmAUyc9muZIgcov0nyjGt+CN/vzUlN0UR36kgwc7tICHkZ8Txw7R23wgRAl9pJUSu6BqoNxvmq+Sf6OP8+WQnHUuKDOiRR05Eq/ss0ZfTkF7uThO2WrUoUBANNslbA+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747622138; c=relaxed/simple;
-	bh=RrPVhAa66e66GaEwz0wQ3D7hCOWXRdfrdXeUxMO+Rog=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gAu3Bxg+NZhrqkVvHLR+8deuA+U7+3XrPtszBWkcOLTYwLIpAbm16L+Yv+BTv3cOCA2s7okiLpN7LDz8K9EXtSBXmtlokywMg62rSR9tUz6gjaN7pI6pgr1DHuq8voe3U6Oe9gqQ2QQcv4FWYBTbbVVMx1ow1A50DzFrXrsDzBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jOtww293; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b240fdc9c20so4035271a12.3
-        for <netdev@vger.kernel.org>; Sun, 18 May 2025 19:35:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747622136; x=1748226936; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0Glndt75G+OVXAAyKARdAz9i34uW2k/8nkArkfG9jRQ=;
-        b=jOtww293+X4rPff3K+J+q384ObwJNJgnL/qR4Q9WceIWatjjwLzQgQ7OoYsVp0WuCE
-         lAl015nCIDBlurAnfmQUXgPHJZWdKiOnvNJDLsKP3sN8Cm1czlNv84q6DI2Sij/TJM0b
-         Wbu7lagmNycOly8IjaaortIcrBS9ksZaMvBqqpdCdxwzphzqmyouBO6IqsmIAYQPQXH1
-         7kNo81BSkkeV0+2cuV0iTqIc4L5YZ7Tg2jxmKHoZTA56H0L1ALGk4Qxfqi4eoyIm61tS
-         KvvcwsBrDFUNNyAukG98iUmOn5sMThLRbDx5FvZx5Ny/88oy9bbrh0YY2JfKrOXY3IAN
-         lRhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747622136; x=1748226936;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0Glndt75G+OVXAAyKARdAz9i34uW2k/8nkArkfG9jRQ=;
-        b=BtWfHDFaQdgz4dKZuxO5K79bBpZhLauaR4TxyxuYRGcbUV+3RCsgyE1I7T7tH7bvKI
-         EtTwQpg+lg/wvIs/qnBQf+RzGeX6L+Zx/1G1917O+wy5VA7Fh9zF4SbQ6EFqpPnoJqCa
-         IQJ90SKCgIi7IjYwM8tAZwlhUDFroyiqDk44ygL1+TvdBF8SlzZ+qDHSje3szWjzyZTS
-         nMvWLB+2wXv8GMDiBbEMiz0ZaDuXVTFkIi25pP023JX11Iz2WPPlRx1o6/Ry4HIZz/nS
-         Mpo6smQrGNX/nwjcXBK8znbPovHOlmHyesttmQtl2svVOzyr+dNZ6sRN/4sbmd6+eyxb
-         37lA==
-X-Gm-Message-State: AOJu0YxD6HbMmrIMDuFIsLonWZ9lNQBTNlPAfI2ZRp/z+Cde5MBSPD23
-	lC1a4S4IrEqp1uFEB5y/FbuYtyCxd6lBsnlBB9tFmKflv5gKbWV8PAiXYS6FkSxKxH+BvIft41I
-	SSUYINurdovEkCexsyCfmq7Dp4NlSggEtwMWpbQbxtotwr1kiQM1+7tGLIRVXKL8BcGcgKy+aJE
-	hXCqy6GhPgsLNYOEMqfAnWMib6iJA7bXzCFlADQRT+Mdr84PRClgwxLsCCU5hyToQ=
-X-Google-Smtp-Source: AGHT+IFwRhrMNWbY27xjgLky+xuDZgpoiQb6iEc1dBa6/1lAvXmfz8U9WnJ0DFLv/7SmNdMeydFBL9ineFFXIDYMvg==
-X-Received: from plrj13.prod.google.com ([2002:a17:903:28d:b0:223:fab5:e761])
- (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:3d07:b0:224:a96:e39 with SMTP id d9443c01a7336-231d438b420mr163717575ad.9.1747622135688;
- Sun, 18 May 2025 19:35:35 -0700 (PDT)
-Date: Mon, 19 May 2025 02:35:17 +0000
-In-Reply-To: <20250519023517.4062941-1-almasrymina@google.com>
+	s=arc-20240116; t=1747626087; c=relaxed/simple;
+	bh=YLy0bIxUyBEJ4MsErB/HNh/nkpkd4n4QESqkZKSikzQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QsbMbJNrUnFGe+JukLUwMPHmkD8smO5JEnjdr4NqbIneXSYBqr97surTokoczp8IHVmppeKptL1Xn8jMWjXEod9EkxxrNjxpbLEsECs4DuSIKlN9J7utz5cBPf6ERinBCembg7m5snEKCa1nwfm/g9W6h7SWHndDBhDe6Ppcy+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost.localdomain (unknown [124.16.141.245])
+	by APP-01 (Coremail) with SMTP id qwCowABXw8JNqCpoWNs_AQ--.48942S2;
+	Mon, 19 May 2025 11:41:03 +0800 (CST)
+From: Wentao Liang <vulab@iscas.ac.cn>
+To: saeedm@nvidia.com,
+	leon@kernel.org,
+	tariqt@nvidia.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Wentao Liang <vulab@iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] net: mlx5: vport: Add error handling in mlx5_query_nic_vport_qkey_viol_cntr()
+Date: Mon, 19 May 2025 11:40:43 +0800
+Message-ID: <20250519034043.1247-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.42.0.windows.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250519023517.4062941-1-almasrymina@google.com>
-X-Mailer: git-send-email 2.49.0.1101.gccaa498523-goog
-Message-ID: <20250519023517.4062941-10-almasrymina@google.com>
-Subject: [PATCH net-next v1 9/9] net: devmem: ncdevmem: remove unused variable
-From: Mina Almasry <almasrymina@google.com>
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, David Ahern <dsahern@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, 
-	ap420073@gmail.com, praan@google.com, shivajikant@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qwCowABXw8JNqCpoWNs_AQ--.48942S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxJr4ruF45tFy7Aw48Ww47CFg_yoW8AF4DpF
+	47tr93XrykJa40v3WjkFWrZrs5CrWku3W09a4xt34fXr4qyr4DAr45AF9FgrWUurW8trZa
+	yr42y3ZxCF98C37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Cr
+	1j6rxdM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
+	6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr
+	0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E
+	8cxan2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFV
+	Cjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWl
+	x4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r
+	1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_
+	JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
+	sGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiDAUHA2gqdptmMwACs1
 
-This variable is unused and can be removed.
+The function mlx5_query_nic_vport_qkey_viol_cntr() calls the functuion
+mlx5_query_nic_vport_context() but does not check its return value. This
+could lead to undefined behavior if the query fails. A proper
+implementation can be found in mlx5_nic_vport_query_local_lb().
 
-Signed-off-by: Mina Almasry <almasrymina@google.com>
+Add error handling for mlx5_query_nic_vport_context(). If it fails, free
+the out buffer via kvfree() and return error code.
+
+Fixes: 9efa75254593 ("net/mlx5_core: Introduce access functions to query vport RoCE fields")
+Cc: stable@vger.kernel.org # v4.5
+Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
 ---
- tools/testing/selftests/drivers/net/hw/ncdevmem.c | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/net/ethernet/mellanox/mlx5/core/vport.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/hw/ncdevmem.c b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-index ca723722a810..a86e4ce5e65d 100644
---- a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-+++ b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-@@ -526,7 +526,6 @@ static struct netdev_queue_id *create_queues(void)
- static int do_server(struct memory_buffer *mem)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/vport.c b/drivers/net/ethernet/mellanox/mlx5/core/vport.c
+index 0d5f750faa45..276b162ccf18 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/vport.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/vport.c
+@@ -518,20 +518,23 @@ int mlx5_query_nic_vport_qkey_viol_cntr(struct mlx5_core_dev *mdev,
+ 					u16 *qkey_viol_cntr)
  {
- 	char ctrl_data[sizeof(int) * 20000];
--	struct netdev_queue_id *queues;
- 	size_t non_page_aligned_frags = 0;
- 	struct sockaddr_in6 client_addr;
- 	struct sockaddr_in6 server_sin;
+ 	u32 *out;
+-	int outlen = MLX5_ST_SZ_BYTES(query_nic_vport_context_out);
++	int ret, outlen = MLX5_ST_SZ_BYTES(query_nic_vport_context_out);
+ 
+ 	out = kvzalloc(outlen, GFP_KERNEL);
+ 	if (!out)
+ 		return -ENOMEM;
+ 
+-	mlx5_query_nic_vport_context(mdev, 0, out);
++	ret = mlx5_query_nic_vport_context(mdev, 0, out);
++	if (ret)
++		goto out;
+ 
+ 	*qkey_viol_cntr = MLX5_GET(query_nic_vport_context_out, out,
+ 				   nic_vport_context.qkey_violation_counter);
+-
++	ret = 0;
++out:
+ 	kvfree(out);
+ 
+-	return 0;
++	return ret;
+ }
+ EXPORT_SYMBOL_GPL(mlx5_query_nic_vport_qkey_viol_cntr);
+ 
 -- 
-2.49.0.1101.gccaa498523-goog
+2.42.0.windows.2
 
 
