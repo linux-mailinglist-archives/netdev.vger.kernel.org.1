@@ -1,192 +1,128 @@
-Return-Path: <netdev+bounces-191614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6071ABC755
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 20:45:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1F09ABC79F
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 21:14:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C18781B641F8
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 18:45:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7861C3A3119
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 19:14:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BB1A1E47CC;
-	Mon, 19 May 2025 18:45:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6A2020E719;
+	Mon, 19 May 2025 19:14:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="A8dqOgy5"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HzyRAz8G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E2A21DA21
-	for <netdev@vger.kernel.org>; Mon, 19 May 2025 18:45:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BABC19AD70;
+	Mon, 19 May 2025 19:14:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747680335; cv=none; b=sw9Di2VtLAARsMMjnNqhbZFhTfeApv2BrB/MZkZfICCYW1ppwSjfdHMqdoc7WIMezLSnaaCvpIRdzOsQi2bMnJb5dNy7uT0G7T+JD8l6CoVMMR5RdrjapN6hAeZ1CO2lHdYpjbHwjMDnbEgck3xGANpBwBv/xiEr6e0Tkyg6798=
+	t=1747682072; cv=none; b=Uc5s1v7rCgjl8oNsNrfNTIG2zyO5nfoa6ILnknV/vJjHJ+y7jdAWbyr8X+bilp6DBEtOvkUaoJiR5aDMWvCbGnTl2CzZb9trn5rZhO5R+qv3dhRJiWgVnvixe8+rT1k9hh4aLAyIrn4dXcy02NExSmaijeqj3ksM8IMzkUMWfeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747680335; c=relaxed/simple;
-	bh=qixL8WtENA/y47zs5WPsanzQIyfZpO1I0UpQSU7JL9k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UDD+CWf2biP8trgDmYnznadKFiiAQmrP4eZYh1Fq9GKYhIIl7ByOaSOCT8NeWQHvUvrCgPHq8pVvu52VKnurUklgP7vbZIUnXh4sX6v+2t91bEiY+GB2DE4FMx3CpLGimFwu4JEMUwjAwsr/Vdrjyp9OZEM1AGufJIYsilNyx+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=A8dqOgy5; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43d5f10e1aaso118325e9.0
-        for <netdev@vger.kernel.org>; Mon, 19 May 2025 11:45:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747680331; x=1748285131; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+uI0u1meq1DSWC2d3l+uIBBA0xgtWtQ+JRUsL+sxc5w=;
-        b=A8dqOgy5WOwmTLopIY1uJE5JRfMeEXR3OW7IVGSkoaUiu21IVlChnKFcDrAX+letcm
-         l0b+WXOd6ugfq2rSkRool90cgqd9nD5xBZPNuVk+IITdN5jyVYZqNzqJzBEVY2HJSq7E
-         3R4TNbjaVFJt2Il446hqbmB0KZshQZwbiVtVeEFsua0gHhudH40rtPel+z9p59EZNXyt
-         fdlQfnTf1tAMI0Ohxb/+T8zGgyOuO0rTXtwHy042CWR+Jbdb9Gw2jlys+1IcZ9wEtSyE
-         sgg4qSktXf/T+NScgjcC0uuV78idbMcyOvc+vrhzVM3ZdSAzKT3rfzK+VM0U2UraolCw
-         dNcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747680331; x=1748285131;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+uI0u1meq1DSWC2d3l+uIBBA0xgtWtQ+JRUsL+sxc5w=;
-        b=TmqmgSRWEg8L0rut4acD8FhF05zOfFlRfYlcDFahkh1KFihCJJsrl4THb5z6ARbEDz
-         xycg4cAcFr3kR0L9yKNgYDXWLGfJvthiTbSMbsTQUEMkBYMEQaSjV3Gtn9noJCnHz7BP
-         LAHH5e9SDduzUFOplheL1VxoFiIyJMTeWdAUPSZG0M/kOXpAGtDgE5y6aZ8INQcbj705
-         +dqmFafnZufkfNSlV5umqBG0+3EltxtHg/kO5eJdX5e/O+oSZUPDdyONy5SDWocntKdn
-         Mvpnb+cSzQjdnn/lhwbrNFXCMJe191CzClNzHajT8JsAAhyeXINySIvksCeSId8c9/3r
-         NZUg==
-X-Forwarded-Encrypted: i=1; AJvYcCVUhoykoucYgpGUhrqZYliYdQArpdx/Q50C3q9TBk2TsngSgfihbvq/1s8oK8rUUuMSdf/cjsY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPwvTtpdz3qTsIsh/EvEHqA4jNmQpmoApDkD6EXqRrM+kwXZuG
-	pvWUm+qkLdEkxKZxFCiYIBM2yLclUPCtpxwuNQznV3TBVPRdRl9wUddfnusjbWogU26rm2pRyCq
-	YUU8ZiBF9e5LLqfLXCxJ0W4H8C0z1lUUVsSmAtd2y
-X-Gm-Gg: ASbGncus8KkdSNiVfukQPt9WzEdCGVfXtAhAWZr17HWgEszwWW56ebGp+3NI+k9VJGv
-	pq0+rI8jbzGcGJ1yzbd29OuxmxH2D2cin41feMODP/LIy6sHbYHVg984g6skEyNpOC1qA/ssiWM
-	9s5KiG733CvAvB0xX0A0VBP+pFpp54lghtQtsCQ+m8DxvkzikThYW2YN6PipPE5GNUwPSlo0nmG
-	w==
-X-Google-Smtp-Source: AGHT+IEi4No6J063KwsVoQNLxNxjrCv7jm/u9i3e5Q/uH+0pyHVkWYIXIES2WdEQ/sfu/KRTy3tguljTVJckDxdkD2Q=
-X-Received: by 2002:a7b:ce8d:0:b0:43b:c2cc:5075 with SMTP id
- 5b1f17b1804b1-4440027c1efmr3272695e9.5.1747680331414; Mon, 19 May 2025
- 11:45:31 -0700 (PDT)
+	s=arc-20240116; t=1747682072; c=relaxed/simple;
+	bh=UMtW8QINSoWMGXXCFvUIFqv4TXzzTYvRUgjov61s0HQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BoWwAhV1AaeSziQKRdrY6shYxJeUg7lk8yc1J48tn7TIOBZpy9khVOiOEcySUfKh1u7MG1y82uv1L8KCsU/lw/Rz3uqPFyy9qWy87q9oGd/2WUJRrEbM7I+W1mSoRSRvM1OUjWMnss/TdThjVmxXCiKjuvwLjfaARD5mEgtVwTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=HzyRAz8G; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=lghZXCBMQytnlWQM8HAUV+A8SQOt96nptrBbQcQHuoE=; b=HzyRAz8GhziKHKIuBU8XUqr0oc
+	f8wZ4d5G/bCr0SShvs8LyictHBPKK+49LFhHKq/VYG0N+eegOaRkMY/OhSIQ45tv6iijlx1vclaOa
+	Kn17AAPxgAFcPHb49ahy8RkNWjcTHHPdnudzbcKL50jt39uK9c5BSV4KJXQ6RVoyuMwg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uH5w8-00D36U-T8; Mon, 19 May 2025 21:14:08 +0200
+Date: Mon, 19 May 2025 21:14:08 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jonas Gorski <jonas.gorski@gmail.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vivien Didelot <vivien.didelot@gmail.com>,
+	=?iso-8859-1?Q?=C1lvaro_Fern=E1ndez?= Rojas <noltari@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 2/3] net: dsa: b53: fix configuring RGMII delay on
+ bcm63xx
+Message-ID: <ed75677c-c3fb-41d1-a2cd-dd84d224ffe3@lunn.ch>
+References: <20250519174550.1486064-1-jonas.gorski@gmail.com>
+ <20250519174550.1486064-3-jonas.gorski@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250517001110.183077-1-hramamurthy@google.com>
- <20250517001110.183077-7-hramamurthy@google.com> <50be88c9-2cb3-421d-a2bf-4ed9c7d58c58@linux.dev>
-In-Reply-To: <50be88c9-2cb3-421d-a2bf-4ed9c7d58c58@linux.dev>
-From: Ziwei Xiao <ziweixiao@google.com>
-Date: Mon, 19 May 2025 11:45:19 -0700
-X-Gm-Features: AX0GCFtuTKgp1zKfAPn8KbknOLyEMpCOVc7hNlTvX5suHLNuXThS_kS4KxvyiPs
-Message-ID: <CAG-FcCO7H=1Xj5B830RA-=+W8umUqq=WdOjwNqzeKvJLeMgywA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 6/8] gve: Add rx hardware timestamp expansion
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Harshitha Ramamurthy <hramamurthy@google.com>, netdev@vger.kernel.org, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, jeroendb@google.com, 
-	andrew+netdev@lunn.ch, willemb@google.com, pkaligineedi@google.com, 
-	yyd@google.com, joshwash@google.com, shailend@google.com, linux@treblig.org, 
-	thostet@google.com, jfraker@google.com, richardcochran@gmail.com, 
-	jdamato@fastly.com, horms@kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250519174550.1486064-3-jonas.gorski@gmail.com>
 
-.
+On Mon, May 19, 2025 at 07:45:49PM +0200, Jonas Gorski wrote:
+> The RGMII delay type of the PHY interface is intended for the PHY, not
+> the MAC, so we need to configure the opposite. Else we double the delay
+> or don't add one at all if the PHY also supports configuring delays.
+> 
+> Additionally, we need to enable RGMII_CTRL_TIMING_SEL for the delay
+> actually being effective.
+> 
+> Fixes e.g. BCM54612E connected on RGMII ports that also configures RGMII
+> delays in its driver.
 
+We have to be careful here not to cause regressions. It might be
+wrong, but are there systems using this which actually work? Does this
+change break them?
 
-On Sun, May 18, 2025 at 2:45=E2=80=AFPM Vadim Fedorenko
-<vadim.fedorenko@linux.dev> wrote:
->
-> On 17.05.2025 01:11, Harshitha Ramamurthy wrote:
-> > From: John Fraker <jfraker@google.com>
-> >
-> > Allow the rx path to recover the high 32 bits of the full 64 bit rx
-> > timestamp.
-> >
-> > Use the low 32 bits of the last synced nic time and the 32 bits of the
-> > timestamp provided in the rx descriptor to generate a difference, which
-> > is then applied to the last synced nic time to reconstruct the complete
-> > 64-bit timestamp.
-> >
-> > This scheme remains accurate as long as no more than ~2 seconds have
-> > passed between the last read of the nic clock and the timestamping
-> > application of the received packet.
-> >
-> > Signed-off-by: John Fraker <jfraker@google.com>
-> > Signed-off-by: Ziwei Xiao <ziweixiao@google.com>
-> > Reviewed-by: Willem de Bruijn <willemb@google.com>
-> > Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
-> > ---
-> >   Changes in v2:
-> >   - Add the missing READ_ONCE (Joe Damato)
-> > ---
-> >   drivers/net/ethernet/google/gve/gve_rx_dqo.c | 23 +++++++++++++++++++=
-+
-> >   1 file changed, 23 insertions(+)
-> >
-> > diff --git a/drivers/net/ethernet/google/gve/gve_rx_dqo.c b/drivers/net=
-/ethernet/google/gve/gve_rx_dqo.c
-> > index dcb0545baa50..c03c3741e0d4 100644
-> > --- a/drivers/net/ethernet/google/gve/gve_rx_dqo.c
-> > +++ b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
-> > @@ -437,6 +437,29 @@ static void gve_rx_skb_hash(struct sk_buff *skb,
-> >       skb_set_hash(skb, le32_to_cpu(compl_desc->hash), hash_type);
-> >   }
-> >
-> > +/* Expand the hardware timestamp to the full 64 bits of width, and add=
- it to the
-> > + * skb.
-> > + *
-> > + * This algorithm works by using the passed hardware timestamp to gene=
-rate a
-> > + * diff relative to the last read of the nic clock. This diff can be p=
-ositive or
-> > + * negative, as it is possible that we have read the clock more recent=
-ly than
-> > + * the hardware has received this packet. To detect this, we use the h=
-igh bit of
-> > + * the diff, and assume that the read is more recent if the high bit i=
-s set. In
-> > + * this case we invert the process.
-> > + *
-> > + * Note that this means if the time delta between packet reception and=
- the last
-> > + * clock read is greater than ~2 seconds, this will provide invalid re=
-sults.
-> > + */
-> > +static void __maybe_unused gve_rx_skb_hwtstamp(struct gve_rx_ring *rx,=
- u32 hwts)
-> > +{
-> > +     s64 last_read =3D READ_ONCE(rx->gve->last_sync_nic_counter);
->
-> I believe last_read should be u64 as last_sync_nic_counter is u64 and
-> ns_to_ktime expects u64.
->
-Thanks for the suggestion. The reason to choose s64 for `last_read`
-here is to use signed addition explicitly with `last_read +
-(s32)diff`. This allows diff (which can be positive or negative,
-depending on whether hwts is ahead of or behind low(last_read)) to
-directly adjust last_read without a conditional branch, which makes
-the intent clear IMO. The s64 nanosecond value is not at risk of
-overflow, and the positive s64 result is then safely converted to u64
-for ns_to_ktime.
+> 
+> Fixes: ce3bf94871f7 ("net: dsa: b53: add support for BCM63xx RGMIIs")
+> Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
+> ---
+>  drivers/net/dsa/b53/b53_common.c | 13 +++++++------
+>  1 file changed, 7 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
+> index a316f8c01d0a..b00975189dab 100644
+> --- a/drivers/net/dsa/b53/b53_common.c
+> +++ b/drivers/net/dsa/b53/b53_common.c
+> @@ -1328,19 +1328,19 @@ static void b53_adjust_63xx_rgmii(struct dsa_switch *ds, int port,
+>  
+>  	switch (interface) {
+>  	case PHY_INTERFACE_MODE_RGMII_ID:
+> -		rgmii_ctrl |= (RGMII_CTRL_DLL_RXC | RGMII_CTRL_DLL_TXC);
+> +		rgmii_ctrl &= ~(RGMII_CTRL_DLL_RXC | RGMII_CTRL_DLL_TXC);
+>  		break;
+>  	case PHY_INTERFACE_MODE_RGMII_RXID:
+> -		rgmii_ctrl &= ~(RGMII_CTRL_DLL_TXC);
+> -		rgmii_ctrl |= RGMII_CTRL_DLL_RXC;
+> +		rgmii_ctrl |= RGMII_CTRL_DLL_TXC;
+> +		rgmii_ctrl &= ~RGMII_CTRL_DLL_RXC;
+>  		break;
+>  	case PHY_INTERFACE_MODE_RGMII_TXID:
+> -		rgmii_ctrl &= ~(RGMII_CTRL_DLL_RXC);
+> -		rgmii_ctrl |= RGMII_CTRL_DLL_TXC;
+> +		rgmii_ctrl |= RGMII_CTRL_DLL_RXC;
+> +		rgmii_ctrl &= ~RGMII_CTRL_DLL_TXC;
+>  		break;
+>  	case PHY_INTERFACE_MODE_RGMII:
+>  	default:
+> -		rgmii_ctrl &= ~(RGMII_CTRL_DLL_RXC | RGMII_CTRL_DLL_TXC);
+> +		rgmii_ctrl |= RGMII_CTRL_DLL_RXC | RGMII_CTRL_DLL_TXC;
+>  		break;
 
-I'm happy to change last_read to u64 if that's preferred for type
-consistency, or I can add a comment to clarify the rationale for the
-current s64 approach. Please let me know what you think. Thanks!
+These changes look wrong. There is more background here:
 
-> > +     struct sk_buff *skb =3D rx->ctx.skb_head;
-> > +     u32 low =3D (u32)last_read;
-> > +     s32 diff =3D hwts - low;
-> > +
-> > +     skb_hwtstamps(skb)->hwtstamp =3D ns_to_ktime(last_read + diff);
-> > +}
-> > +
-> >   static void gve_rx_free_skb(struct napi_struct *napi, struct gve_rx_r=
-ing *rx)
-> >   {
-> >       if (!rx->ctx.skb_head)
->
+https://elixir.bootlin.com/linux/v6.15-rc7/source/Documentation/devicetree/bindings/net/ethernet-controller.yaml#L287
+
+	Andrew
 
