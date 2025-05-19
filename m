@@ -1,203 +1,147 @@
-Return-Path: <netdev+bounces-191514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCE47ABBAFF
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 12:23:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3349DABBB37
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 12:35:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2557188E085
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 10:23:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BFDB3BB90A
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 10:32:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E5A2741BE;
-	Mon, 19 May 2025 10:23:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3FA41FBE8A;
+	Mon, 19 May 2025 10:32:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P3TcxBwS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5777A94F
-	for <netdev@vger.kernel.org>; Mon, 19 May 2025 10:23:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E2581EB190
+	for <netdev@vger.kernel.org>; Mon, 19 May 2025 10:32:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747650215; cv=none; b=sYBgUH0jlcPKOPxNprkRK5rPyUEt2m6WTnSE9wPC2iMfW62s8NKOj42zH7cj+YPqoOW1hegpVxIB4aGYjgOOCgPMe3dOJlZ14IuOeZnxp6pNXW9ST/bnd5lxVtKgvfZCYZDbYqPsAH7sc5shKxWO0+n7LXTKXfGzij0wL0DkvG0=
+	t=1747650732; cv=none; b=U1NdbySnBPMCOyyrlLqzPqHcB1zHE8P/5FgkKituBXTcHhxAMQCLHgP+0ZxmRTdZ3oXI6fcQ+60NcRnSESngh7LWSpThDGbleqswikIbH0AzqiDgBJZFlaIbn/zupamjGk7PrsPjU6SrJcw3mHa7SOaB9WnDi65yjLeWqPtSxEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747650215; c=relaxed/simple;
-	bh=TNWOOmFdKh5Te0IVVwVug5wyjYdt6ZQ3zVv0lDeecH4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=PgEFW7MFX3ukaNUm+pRNZ7WF53b0RM29nwF01KpjM3vHsRmRw3APt8g46PEkn2OPrBo5OMYyKU/H4koAeAoGXQswWIKAVip7TzRtXSCnEpQ79fEsIIh/PshvAytB/UHfQixFRMpVO65ao83FjPec5XbzQIwgh1D35RxesHN7mQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-85b3a6c37e2so425843939f.0
-        for <netdev@vger.kernel.org>; Mon, 19 May 2025 03:23:33 -0700 (PDT)
+	s=arc-20240116; t=1747650732; c=relaxed/simple;
+	bh=heVVrzr7upRdLwcnKeTKuQ65Iq0XaBFntogT5dJAnu0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XDQT9bCsgTZXxujL9+W7jSOk9XDe+NF2IcZ2XafPJGIrC9OCfDZjnF8R2F/4mop2rtOQN6NHrfhiqsib89WbojcjbqnbnT43DMxBE/9RwAL+S3w9Lb6QO53iNOv5HDSQHptPcD4EuUKn0KCosYgzZKYi7odzGcKdhl/vWITxZZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P3TcxBwS; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-742c73f82dfso823942b3a.2
+        for <netdev@vger.kernel.org>; Mon, 19 May 2025 03:32:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747650731; x=1748255531; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=doFhj/tFASXejX5nBETInlDqJ9qy7Ivn4NT9HRbgBgc=;
+        b=P3TcxBwSje9SCBY4MDhb3f+SBmm/ajl8LiK0u+1wmXmrIyd3wJDNPvclRoppmc3MiA
+         ZSm22d1NafKTRw6N9ecIdfBAjxTT+624S7tJvA/VgYQj4eA1R31aQrveK7KukBbGbH/j
+         vCiUzMfPkfl8Ff/+tZGN3BoMMfa3nJedso7ROeWzUWhnRNmCSemz0p9Ww0OclsGGSoQw
+         E50i+rrL+2ZKjHPvKjzVGlcSL4VTElQQf07yfsfKNb92s1J89kxdKZl9Nceuwi/VWKpF
+         JsatH+SfJo0XOMRrxkFWroIJka0hKJcdOsKDLsTiSLl04WwqPGIQ7bjS2iVUHMd5fkhU
+         S+Eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747650213; x=1748255013;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UxjA/skpsZ6ve4Eq9tzitS6uxtwllVmaQFjM+/pknUU=;
-        b=D61uQ41uEyu85dK7N/Qax/gXYVfB1l8Ubf9FLBtsihaQhNt62Ta0E8iXDlFaMndNFg
-         Bf42lFwCcLxOHbEOuoTM//DnMGivIfY3OM5WFbX5J3KO0Dnwqxy1XfwP9jbZ3nH5Zbyf
-         ZPOccQ+T1sRGTAv/ZQMV/cshHGgSoQ2Yi2beCjRGY/pqlv4uexbPz+Cf6xc8p4qGZeT8
-         Ggeviyvc6RjLCPyEBLs9S98iuyTevPxdulfFEGutWmZtzieOIFVezwnAQLCrix4pz68a
-         TucOzAoMexKkfyKV+0PLJxSf6Bee/Yz4FK+R9W2YKC5H5auFvV+tMsSbZvT8dzFxTf/s
-         crCw==
-X-Forwarded-Encrypted: i=1; AJvYcCU4bH5wGqf3YpuzZl1CbFIBrclRF7o2jFH8yE5iMz8EVG6TkwBjx1MFjJKzJeHACy7C+U5nf0Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJ63UmsNehe9VoCswgg2g/VDM8ULvlzjXCzgbLFfaF/Sz+Kq2C
-	BfmnhCURsLJC9zBtDmWIdHS0QpiKAdUDq78T145WZnCXmPL4M7cpV4HFAgAdE1zs4Ea0vxMx9pG
-	aY2qRNOqKv+cJ2AwE96ojmFH6QoeYq7Li1OG725LR6O1qYhMC94tzOE1tFrc=
-X-Google-Smtp-Source: AGHT+IGz54PQorwCHO4ZTXZfYi3B6zUxW5Jlae9hRcYrqwnUlQVxe05FQm557HufLDHLz5GMlvCQpgViKJwt6uqb0GqnNmJHCSDT
+        d=1e100.net; s=20230601; t=1747650731; x=1748255531;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=doFhj/tFASXejX5nBETInlDqJ9qy7Ivn4NT9HRbgBgc=;
+        b=jbVKJQYETifmbYBeqlMXBXO5kimaBnpd4yBuxrDb7szujfjeD1fJK7nZt3NFuLWmlj
+         cQREnFWnZIp+yvOv7Q5zGbjn5IneeG8Q+hHTzaphHGvm+JhTdRmhhTbgdj+HgfsACn56
+         Y0cVY2Wt+JNcIq6gFjzRA7sYbxtuMtZNS1LTNkFmPYlwW72Ywgv6ekAbezBomrffC4ts
+         xDH4/UjG2zCe1Q/+4ASi0ybLO60+7zT8R1MkXl6XXlpHvude0MfGIFjjPovbHt/ia7Eh
+         RWVRkmP10HZit1rTIEicZIoXxht7QpZgzRciFa/iHb6Xw5y/Ra5lUT1DBc3FYgNFoOEN
+         pP9Q==
+X-Gm-Message-State: AOJu0YxyKbISzU1mjto1oBA7WthSS+22Ld24nYfS11HP8oMCAIYQsHpa
+	C/hlMTEZaBy9W72RmA9aze8UnnLDRjubJ/6Jy8iIyVJQyfW0UJ5QvNhV
+X-Gm-Gg: ASbGncv4EVvt0eZjqbWG8GssobKYZHQFzALjiV38v/9V3hVktAmQAH66/sUyDOzG1Dn
+	/ORMUgctVEZuQ/qsr8d/lNBSuwIuMYecgNozi5Onj2kM4FcrjWz60OqH9rlCLC+Rlq43Vw3uH0d
+	nYIEAbTgXLGXnoCwImPlu5JRToGdtxPHp1je1R7lUozQBKs6SnreOL2fzlkMTMWBVOTVnCvHf+X
+	SvA+d6TRmVqS9ZGOy1J8UFy3uouityb62X4tQUpVQxeAh4Ospqam7VYStuunw/9SGRyelsaJA1B
+	95dx1RX48S87CENPNsswBNtLvTS8h7F4/UqlPhq0TfoKLjhEMQsaWCN35dDic0iUxrKY
+X-Google-Smtp-Source: AGHT+IHtMZJNoGSPDqDBJJjXfrzyeaVXO2biuIQILDIm042Dfnt8bDL+8zzA4jYWSDzDQYfIokDoMQ==
+X-Received: by 2002:a05:6a00:a88f:b0:742:a77b:8bc with SMTP id d2e1a72fcca58-742a9775102mr18248084b3a.2.1747650730523;
+        Mon, 19 May 2025 03:32:10 -0700 (PDT)
+Received: from localhost.localdomain ([139.198.112.210])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-742a97395adsm5817872b3a.75.2025.05.19.03.32.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 May 2025 03:32:09 -0700 (PDT)
+From: Duan Jiong <djduanjiong@gmail.com>
+To: ja@ssi.bg,
+	pablo@netfilter.org
+Cc: netdev@vger.kernel.org,
+	Duan Jiong <djduanjiong@gmail.com>
+Subject: [PATCH] ipvs: skip ipvs snat processing when packet dst is not vip
+Date: Mon, 19 May 2025 18:32:03 +0800
+Message-Id: <20250519103203.17255-1-djduanjiong@gmail.com>
+X-Mailer: git-send-email 2.32.1 (Apple Git-133)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:3a0a:b0:86a:93c:5571 with SMTP id
- ca18e2360f4ac-86a2317c56cmr1550801339f.1.1747650212909; Mon, 19 May 2025
- 03:23:32 -0700 (PDT)
-Date: Mon, 19 May 2025 03:23:32 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <682b06a4.a70a0220.3849cf.00b2.GAE@google.com>
-Subject: [syzbot] [net?] general protection fault in ip6_ins_rt
-From: syzbot <syzbot+ce95bbc882771b5d81f7@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+Now suppose there are two net namespaces, one is the server and
+its ip is 192.168.99.4, the other is the client and its ip
+is 192.168.99.5, and the other is configured with ipvs vip
+192.168.99.6 in the host net namespace, configuring ipvs with
+the backend 192.168.99.5.
 
-syzbot found the following issue on:
+Also configure
+iptables -t nat -A POSTROUTING -p TCP -j MASQUERADE
+to avoid packet loss when accessing with the specified
+source port.
 
-HEAD commit:    c94d59a126cb Merge tag 'trace-v6.15-rc6' of git://git.kern..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=100ddcd4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7819b10245b63b3d
-dashboard link: https://syzkaller.appspot.com/bug?extid=ce95bbc882771b5d81f7
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: i386
+First we use curl --local-port 15280 to specify the source port
+to access the vip, after the request is completed again use
+curl --local-port 15280 to specify the source port to access
+192.168.99.5, this time the request will always be stuck in
+the main.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+The packet sent by the client arrives at the server without
+any problem, but ipvs will process the packet back from the
+server with the wrong snat for vip, and at this time, since
+the client will directly rst after receiving the packet, the
+client will be stuck until the vip ct rule on the host
+times out.
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-c94d59a1.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/c62247a68f8a/vmlinux-c94d59a1.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/4e1db4893db7/bzImage-c94d59a1.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+ce95bbc882771b5d81f7@syzkaller.appspotmail.com
-
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000006: 0000 [#1] SMP KASAN NOPTI
-KASAN: null-ptr-deref in range [0x0000000000000030-0x0000000000000037]
-CPU: 0 UID: 0 PID: 1136 Comm: kworker/u32:5 Not tainted 6.15.0-rc6-syzkaller-00085-gc94d59a126cb #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Workqueue: ipv6_addrconf addrconf_dad_work
-RIP: 0010:kasan_byte_accessible+0x15/0x30 mm/kasan/generic.c:199
-Code: 00 00 0f 1f 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 66 0f 1f 00 48 b8 00 00 00 00 00 fc ff df 48 c1 ef 03 48 01 c7 <0f> b6 07 3c 07 0f 96 c0 e9 0e 29 4d 09 66 66 2e 0f 1f 84 00 00 00
-RSP: 0018:ffffc90006d8f818 EFLAGS: 00010286
-RAX: dffffc0000000000 RBX: 0000000000000030 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: ffffffff8b6c0863 RDI: dffffc0000000006
-RBP: 0000000000000030 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000000 R12: ffffffff8b6c0863
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8880977ea000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fbf9f52c6b0 CR3: 0000000065999000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- __kasan_check_byte+0x13/0x50 mm/kasan/common.c:556
- kasan_check_byte include/linux/kasan.h:399 [inline]
- lock_acquire kernel/locking/lockdep.c:5840 [inline]
- lock_acquire+0xfc/0x350 kernel/locking/lockdep.c:5823
- __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
- _raw_spin_lock_bh+0x33/0x40 kernel/locking/spinlock.c:178
- spin_lock_bh include/linux/spinlock.h:356 [inline]
- __ip6_ins_rt net/ipv6/route.c:1350 [inline]
- ip6_ins_rt+0xa1/0x110 net/ipv6/route.c:1361
- __ipv6_ifa_notify+0xa6b/0xd60 net/ipv6/addrconf.c:6286
- ipv6_ifa_notify net/ipv6/addrconf.c:6325 [inline]
- addrconf_dad_completed+0x19a/0x10d0 net/ipv6/addrconf.c:4324
- addrconf_dad_work+0x84d/0x14e0 net/ipv6/addrconf.c:4272
- process_one_work+0x9cc/0x1b70 kernel/workqueue.c:3238
- process_scheduled_works kernel/workqueue.c:3319 [inline]
- worker_thread+0x6c8/0xf10 kernel/workqueue.c:3400
- kthread+0x3c5/0x780 kernel/kthread.c:464
- ret_from_fork+0x48/0x80 arch/x86/kernel/process.c:153
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:kasan_byte_accessible+0x15/0x30 mm/kasan/generic.c:199
-Code: 00 00 0f 1f 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 66 0f 1f 00 48 b8 00 00 00 00 00 fc ff df 48 c1 ef 03 48 01 c7 <0f> b6 07 3c 07 0f 96 c0 e9 0e 29 4d 09 66 66 2e 0f 1f 84 00 00 00
-RSP: 0018:ffffc90006d8f818 EFLAGS: 00010286
-RAX: dffffc0000000000 RBX: 0000000000000030 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: ffffffff8b6c0863 RDI: dffffc0000000006
-RBP: 0000000000000030 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000000 R12: ffffffff8b6c0863
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8880977ea000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fbf9f52c6b0 CR3: 0000000065999000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	00 00                	add    %al,(%rax)
-   2:	0f 1f 00             	nopl   (%rax)
-   5:	90                   	nop
-   6:	90                   	nop
-   7:	90                   	nop
-   8:	90                   	nop
-   9:	90                   	nop
-   a:	90                   	nop
-   b:	90                   	nop
-   c:	90                   	nop
-   d:	90                   	nop
-   e:	90                   	nop
-   f:	90                   	nop
-  10:	90                   	nop
-  11:	90                   	nop
-  12:	90                   	nop
-  13:	90                   	nop
-  14:	90                   	nop
-  15:	66 0f 1f 00          	nopw   (%rax)
-  19:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  20:	fc ff df
-  23:	48 c1 ef 03          	shr    $0x3,%rdi
-  27:	48 01 c7             	add    %rax,%rdi
-* 2a:	0f b6 07             	movzbl (%rdi),%eax <-- trapping instruction
-  2d:	3c 07                	cmp    $0x7,%al
-  2f:	0f 96 c0             	setbe  %al
-  32:	e9 0e 29 4d 09       	jmp    0x94d2945
-  37:	66                   	data16
-  38:	66                   	data16
-  39:	2e                   	cs
-  3a:	0f                   	.byte 0xf
-  3b:	1f                   	(bad)
-  3c:	84 00                	test   %al,(%rax)
-
-
+Signed-off-by: Duan Jiong <djduanjiong@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ net/netfilter/ipvs/ip_vs_core.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/net/netfilter/ipvs/ip_vs_core.c b/net/netfilter/ipvs/ip_vs_core.c
+index c7a8a08b7308..98abe4085a11 100644
+--- a/net/netfilter/ipvs/ip_vs_core.c
++++ b/net/netfilter/ipvs/ip_vs_core.c
+@@ -1260,6 +1260,8 @@ handle_response(int af, struct sk_buff *skb, struct ip_vs_proto_data *pd,
+ 		unsigned int hooknum)
+ {
+ 	struct ip_vs_protocol *pp = pd->pp;
++	enum ip_conntrack_info ctinfo;
++	struct nf_conn *ct = nf_ct_get(skb, &ctinfo);
+ 
+ 	if (IP_VS_FWD_METHOD(cp) != IP_VS_CONN_F_MASQ)
+ 		goto after_nat;
+@@ -1270,6 +1272,12 @@ handle_response(int af, struct sk_buff *skb, struct ip_vs_proto_data *pd,
+ 		goto drop;
+ 
+ 	/* mangle the packet */
++	if (ct != NULL &&
++	    hooknum == NF_INET_FORWARD &&
++	    !ip_vs_addr_equal(af,
++		    &ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple.dst.u3,
++		    &cp->vaddr))
++		return NF_ACCEPT;
+ 	if (pp->snat_handler &&
+ 	    !SNAT_CALL(pp->snat_handler, skb, pp, cp, iph))
+ 		goto drop;
+-- 
+2.32.1 (Apple Git-133)
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
