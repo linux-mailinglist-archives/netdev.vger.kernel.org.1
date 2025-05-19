@@ -1,159 +1,239 @@
-Return-Path: <netdev+bounces-191556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191557-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3104ABC1EB
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 17:15:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4636ABC246
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 17:22:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 761531B63B0F
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 15:15:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40209165EDB
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 15:21:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF5662857FF;
-	Mon, 19 May 2025 15:15:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6A7526B093;
+	Mon, 19 May 2025 15:16:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="TEAipUZP";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="C1eLwpE2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N44U+WMo"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a4-smtp.messagingengine.com (fhigh-a4-smtp.messagingengine.com [103.168.172.155])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4840D284B32;
-	Mon, 19 May 2025 15:15:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A922B9A6;
+	Mon, 19 May 2025 15:16:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747667705; cv=none; b=clPo6LgkMoN/y4/ZqbB7+YcyDiP2ZHFIOmylYBpbpCQAVxVaO/He2xNB84uPwhvKO4/oHlkEwbkffDXdSvQJVFHfV1QKDwgs6fuhibvRs0Lt0twoVw/+x5lDFeSSU3VUb9UyExI0n3w9tLFh1G09dpN8kOu3GOS8J18GT0VTvdo=
+	t=1747667787; cv=none; b=b3jm6Q6/wXlf/DmXBzAFBC0X9SZFwlQ/Oieo1fm1oLHyyTF+/iyfNOC5AGXhGUxsDJPC4w+otBuDZIFplXmypdq8nhK2waKnCmVNVQGEu2EFaKFHFxmfCzJIZgnrHtsWlOWxKAgwuD7fuPjb/TBtoCxj1TD27lYll1iARxIq+rI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747667705; c=relaxed/simple;
-	bh=jYL2bughZhL5fhclYC6ZUjq53/NSvcpXmg9LXkf0Qrk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lK+rb65h94nAK/qAqvLV8GvYvPzh8JLU6H5KRWoba3MOroyq6VBFgVHixsbgmxBmKqduV9/9qel6uXbt3I9FQSITTzsf19VMJP2fgx6ycS/AVYXFoqA0ZR9Lvq4yR9Ps0wusEMGJ+C4hdZniK7LnBpxJanAYLeUw8848xrYPhV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=TEAipUZP; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=C1eLwpE2; arc=none smtp.client-ip=103.168.172.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 28C191140111;
-	Mon, 19 May 2025 11:15:02 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-11.internal (MEProxy); Mon, 19 May 2025 11:15:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1747667702;
-	 x=1747754102; bh=0hCgPnXImsuIFaEAhK+umfxDXGxtGkWxXQT8k6qoI58=; b=
-	TEAipUZPWq8peKMcVBiKqNcBManf9VS8rP0Lu5sYCZqyRblW3kdCUcmU+USc/NCQ
-	bETu6pOEZ3e744NOKhWf/TvW0xwkIovo17Mh9vkUhlliD9oPL0whv53812eikARf
-	FgUbHjvwGbIbttmqZAP2BAAzl38eW1NonWpm7YmTkixQo4CXN7w+a7sduHTbdMI5
-	tEyDMC44rg3XI6KXaehfucIbrcxRFlaKDCM/+4ycKwctFWjxIHKzlg6po2aafWKT
-	3HByXZgwQxeqOhhRVpl4OrU3OV2MUwhUFxKQRNlTmyvbhY/fH0aw1YWXbTKM5JNU
-	9HaDHFvCBzlJSNaqmgL2qw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1747667702; x=
-	1747754102; bh=0hCgPnXImsuIFaEAhK+umfxDXGxtGkWxXQT8k6qoI58=; b=C
-	1eLwpE2Z+cVqE0KWIZplgv+RqfRaxfzRyiOxab1xSq95at2l0FL9KDrO4HCwLbAT
-	gyHDhwYvcmfsEKKGuEEoikCOcbNnCJ6zkymAKKtyt8cn6DAiPiE03UiHPMRH63Go
-	BsCSoq2lZKznPaXPmt+ny0HjpUSJ9QKZ6lr2pPMyQ4nw0pnSlwPmtJ1nX58Y4CZY
-	S4+UOnB9V0sF9rYGpUjLSo4XK7q1k2Ss11wJw79liOznOSv6+zRfm7OvH8juD7OR
-	uQuwhk4D9o6MA5RvZFvsRBL9+kXflnu2YEloN/xgiV6C7veVaGReRfvrF6y5nwlg
-	03v9991w8UB/fqeccOtKQ==
-X-ME-Sender: <xms:9EoraDdRABLDnuB8CsHzIbG6tY1DCSLwbQsAz_trsGq-VR8_CZnfhg>
-    <xme:9EoraJMaxMvtgYwlyhZ5FuavCwuoYI6K-QgfYcFKKbKOUKMvFUcEF9bbhn5XBrQ3Z
-    t2oRWcsqBAKeTVqlJA>
-X-ME-Received: <xmr:9EoraMi6Q-MtDLW-zuzOlh8lABdMd7rRFc6_Xlo1fPfeT2cjhmlaELlEMD2BYucU8xJwOVeSyFbz_7_RL2kwwXfB8-xZtBSpaQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdefvddujedvucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddt
-    tdejnecuhfhrohhmpefpihhklhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrsh
-    houggvrhhluhhnugesrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgvrhhnpeev
-    teegtddvvdfhtdekgefhfeefheetheekkeegfeejudeiudeuleegtdehkeekteenucevlh
-    hushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihhklhgrshdr
-    shhouggvrhhluhhnugesrhgrghhnrghtvggthhdrshgvpdhnsggprhgtphhtthhopeduvd
-    dpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepphgruhhlrdgsrghrkhgvrhdrtght
-    segsphdrrhgvnhgvshgrshdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvg
-    hvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgv
-    thdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtoh
-    epkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughh
-    rghtrdgtohhmpdhrtghpthhtohepghgvvghrthdorhgvnhgvshgrshesghhlihguvghrrd
-    gsvgdprhgtphhtthhopehsrdhshhhthihlhihovhesohhmphdrrhhupdhrtghpthhtohep
-    phgruhhlsehpsggrrhhkvghrrdguvghv
-X-ME-Proxy: <xmx:9EoraE-j6YIHqx5ub3eJy07-MpWf5DMjzMnZ5TBaI-XEMT70FbGtnw>
-    <xmx:9EoraPtGS_F96r9GzySw37YH0gbTt-vRsxUiMvwLyzm_SIiOywGlIQ>
-    <xmx:9EoraDFXHfmzbntoeFSCfnJgr_Y3C4YwpVWfLcQRrdpijXwQpqI3ww>
-    <xmx:9EoraGO3nb8gnqFNw8bcONO7FHZyHTXZnRMNdHpf0rckDXyGd3t89Q>
-    <xmx:9koraBbwJGU0MKucSgI8qmEEAcbMHX8cDoXBtcJDDIP1dr0AL049mgND>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 19 May 2025 11:14:59 -0400 (EDT)
-Date: Mon, 19 May 2025 17:14:57 +0200
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>
-To: Paul Barker <paul.barker.ct@bp.renesas.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>, Paul Barker <paul@pbarker.dev>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] MAINTAINERS: Drop myself to reviewer for ravb driver
-Message-ID: <20250519151457.GA600042@ragnatech.se>
-References: <20250519133354.6564-1-paul.barker.ct@bp.renesas.com>
+	s=arc-20240116; t=1747667787; c=relaxed/simple;
+	bh=o5D8Duk+Vv3tA+KDzWYeXQ3WdzArCIIB2zu2hTvm1l4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uBpoPoNFEo7w3LOXbXVIwJRJLijA20pKvx8efth7gd54b34F0yfgVTt8Dw+1A0DeIWJYeoevkVr2Bw9h/8N92Jqvf5N9pC4sGBx8s1lnPw4ZwZZSCRtTG8lo5qvSM/3Eho97DcqgQTXyo/zKOB065wpBbw9kFa6PY2CB1akVYAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N44U+WMo; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-7082ad1355bso38509147b3.1;
+        Mon, 19 May 2025 08:16:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747667785; x=1748272585; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=5gaIJp7DEmiGONwa5iKv0yKiahtqfMYGddi7S5u0w9E=;
+        b=N44U+WMoeSNl8wn7vLi3blNH/oE4zUealR185CZIe7heVT9wNrcDOo540rjOy4S4ox
+         kMOfnjjSJ/PvMPxzTQm40tufws0a5BPoqgCUbR63BxMjSXHKak7V+NsIqysetsfJI/jM
+         yyG8fOCGCdceEA1B5+FCAnZev5zMRVBhYPloc4uFylNRnf0c978ypGdldUEnL4u3rJCR
+         Rz8uiUvFpP+HgMQApCz7SAV+qJbVmrTMoGds/0wCW2/vJDffzAFGofQ7WYZRXy78t7WE
+         sNwm5m68fyrBbrLFmfdygSMf430ddBoVFd8cB3Q5gDFjucrheV7nP7YQiD4xp+oOl5aJ
+         PuXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747667785; x=1748272585;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5gaIJp7DEmiGONwa5iKv0yKiahtqfMYGddi7S5u0w9E=;
+        b=NMGKGdgAiTp0MWEk6iI69OUWrHgIrC/bgLg5xFAAfDxGPIQELtjZAZC0dgrLaMVGXU
+         E5rBGxZ2LaInYYtvpWrwpteiNhVM3ZlHjXmStZQZRZf6aqPTXhO1uIaPzb9IPaA5cHie
+         4YgvH3LF39lZe2KQTSEpSXhzDsL12yyvVNPNsNEVzQj+8IW1p9CmiUQOX3eVg97cH3GZ
+         dkEgdKm1Ns6z1WWjWFvKgJyr87P4M2YeoyNw/EOFpZDvxBH+Hu0T9F/HSRuto00xYvq7
+         vjg+GWKImNk/vGpfHnYZMuI99F2D5IY5pkjh7fi2FZrPHhacRpLN6TE8G9u6z3F/0Mit
+         qZnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWxVZXgxvrne03pUFGfNwsOydwHn1M/pcJqpkBOgn7lyUPpAInwfVJ31Mu6p9p8jC/CeTWGKbzsGoJUK/w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy38UErNDUP1xKSuLUeHxS5KKN8NS3eIKC1cHzRJZ5h+qbflZf+
+	Os+WPNr6CZraN8MQHQfcdyNQvMKv7b9jLQCw8rzke/UhlNYiiquSddVCqKQR5D7D/7dLiaSWxOA
+	KAxI9yfnwvT0vwoMNDDGJj1vmOF0DORA=
+X-Gm-Gg: ASbGncuc9w8jrOg8HChPIStlOf6tFYEDGCvC26mwAppCmEkypRkK/b+k+PUw+YJ/lkL
+	d+1y69vfWE9dCzRwjBXdvwl2TROtYN9PxQybphIrfHmjuoaaaPwFuH/1ZmdDvH3dLFGDnIDW6mG
+	NMqxkDAPJtm/7pUFd86WPGn4hponlMfw==
+X-Google-Smtp-Source: AGHT+IE5FnslhdPzKpqPc7F2k54Mz7YAmogpbFKDQGPxJ9oFMdadV2bYqji9vtSlUsesrO5ZwCeYP3CujkZOHjDVYfY=
+X-Received: by 2002:a05:690c:88c:b0:6f9:4bb6:eb4e with SMTP id
+ 00721157ae682-70ca7b8d811mr188852907b3.31.1747667784766; Mon, 19 May 2025
+ 08:16:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250519133354.6564-1-paul.barker.ct@bp.renesas.com>
+References: <20250516142707.163457-1-stefano.radaelli21@gmail.com> <de1514f8-7612-4a26-a74e-cf87ce3c8819@lunn.ch>
+In-Reply-To: <de1514f8-7612-4a26-a74e-cf87ce3c8819@lunn.ch>
+From: Stefano Radaelli <stefano.radaelli21@gmail.com>
+Date: Mon, 19 May 2025 17:16:08 +0200
+X-Gm-Features: AX0GCFtr1NrvXwdVxf--yfxPhOInMncFJx7SIpWeTMoP8Cz6kvPOGJHuLWFDYbU
+Message-ID: <CAK+owogkvN+Y28YQ9X28QdLo6VXguR-6tY-10an_F02BMqFtew@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] net: phy: add driver for MaxLinear MxL86110 PHY
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Xu Liang <lxu@maxlinear.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Paul,
+Hi Andrew,
 
-On 2025-05-19 13:33:51 +0000, Paul Barker wrote:
-> Maintenance of the ravb driver will be handled by Niklas for now. I
-> still intend to review patches, and will be using my own email address
-> going forward.
+Thank you for your patience and valuable feedback.
+I'm learning a lot from your reviews and this process overall.
 
-I'm sad to see you step down as maintainer, you will be missed. Thanks 
-for all your hard work and collaboration! I hope you will be back 
-somewhen in the future!
+I'll send v3 shortly with the changes you pointed out.
 
-> 
-> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+Best regards,
 
-Acked-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+Stefano
 
-> ---
->  MAINTAINERS | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 20e07e61a148..9d64b1fc5180 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -20908,8 +20908,8 @@ F:	Documentation/devicetree/bindings/i2c/renesas,iic-emev2.yaml
->  F:	drivers/i2c/busses/i2c-emev2.c
->  
->  RENESAS ETHERNET AVB DRIVER
-> -M:	Paul Barker <paul.barker.ct@bp.renesas.com>
->  M:	Niklas Söderlund <niklas.soderlund@ragnatech.se>
-> +R:	Paul Barker <paul@pbarker.dev>
->  L:	netdev@vger.kernel.org
->  L:	linux-renesas-soc@vger.kernel.org
->  S:	Maintained
-> -- 
-> 2.43.0
-> 
 
--- 
-Kind Regards,
-Niklas Söderlund
+Il giorno lun 19 mag 2025 alle ore 14:35 Andrew Lunn <andrew@lunn.ch>
+ha scritto:
+>
+> > +static int mxl86110_set_wol(struct phy_device *phydev, struct ethtool_wolinfo *wol)
+> > +{
+> > +     struct net_device *netdev;
+> > +     const u8 *mac;
+> > +     int ret = 0;
+> > +
+> > +     phy_lock_mdio_bus(phydev);
+> > +
+> > +     if (wol->wolopts & WAKE_MAGIC) {
+> > +             netdev = phydev->attached_dev;
+> > +             if (!netdev) {
+> > +                     ret = -ENODEV;
+> > +                     goto error;
+> > +             }
+>
+> ...
+>
+> > +
+> > +     phy_unlock_mdio_bus(phydev);
+> > +     return 0;
+> > +error:
+> > +     phy_unlock_mdio_bus(phydev);
+> > +     return ret;
+> > +}
+>
+> You should be able to simplify this. If you have not had an error, ret
+> should be 0. So you can also return ret. You have the same pattern in
+> other places.
+>
+> > +/**
+> > + * mxl86110_synce_clk_cfg() - applies syncE/clk output configuration
+> > + * @phydev: pointer to the phy_device
+> > + *
+> > + * Custom settings can be defined in custom config section of the driver
+> > + * returns 0 or negative errno code
+> > + */
+>
+> Maybe add a comment that the bus is expected to be locked.
+>
+> > +static int mxl86110_synce_clk_cfg(struct phy_device *phydev)
+> > +{
+> > +     u16 mask = 0, value = 0;
+> > +     int ret = 0;
+> > +
+> > +     /*
+> > +      * Configures the clock output to its default setting as per the datasheet.
+> > +      * This results in a 25MHz clock output being selected in the
+> > +      * COM_EXT_SYNCE_CFG register for SyncE configuration.
+> > +      */
+> > +     value = MXL86110_EXT_SYNCE_CFG_EN_SYNC_E |
+> > +                     FIELD_PREP(MXL86110_EXT_SYNCE_CFG_CLK_SRC_SEL_MASK,
+> > +                                MXL86110_EXT_SYNCE_CFG_CLK_SRC_SEL_25M);
+> > +     mask = MXL86110_EXT_SYNCE_CFG_EN_SYNC_E |
+> > +            MXL86110_EXT_SYNCE_CFG_CLK_SRC_SEL_MASK |
+> > +            MXL86110_EXT_SYNCE_CFG_CLK_FRE_SEL;
+> > +
+> > +     /* Write clock output configuration */
+> > +     ret = mxl86110_modify_extended_reg(phydev, MXL86110_EXT_SYNCE_CFG_REG,
+> > +                                        mask, value);
+> > +
+> > +     return ret;
+> > +}
+> > +
+> > +/**
+> > + * mxl86110_broadcast_cfg - Configure MDIO broadcast setting for PHY
+> > + * @phydev: Pointer to the PHY device structure
+> > + *
+> > + * This function configures the MDIO broadcast behavior of the MxL86110 PHY.
+> > + * Currently, broadcast mode is explicitly disabled by clearing the EPA0 bit
+> > + * in the RGMII_MDIO_CFG extended register.
+>
+> here as well.
+>
+> > + *
+> > + * Return: 0 on success or a negative errno code on failure.
+> > + */
+> > +static int mxl86110_broadcast_cfg(struct phy_device *phydev)
+> > +{
+> > +     int ret = 0;
+> > +     u16 val;
+> > +
+> > +     val = mxl86110_read_extended_reg(phydev, MXL86110_EXT_RGMII_MDIO_CFG);
+> > +     if (val < 0)
+> > +             return val;
+> > +
+> > +     val &= ~MXL86110_EXT_RGMII_MDIO_CFG_EPA0_MASK;
+> > +     ret = mxl86110_write_extended_reg(phydev, MXL86110_EXT_RGMII_MDIO_CFG, val);
+>
+> Could _modify_ be used here?
+>
+> > +
+> > +     return ret;
+> > +}
+> > +
+> > +/**
+> > + * mxl86110_enable_led_activity_blink - Enable LEDs activity blink on PHY
+> > + * @phydev: Pointer to the PHY device structure
+> > + *
+> > + * Configure all PHY LEDs to blink on traffic activity regardless of their
+> > + * ON or OFF state. This behavior allows each LED to serve as a pure activity
+> > + * indicator, independently of its use as a link status indicator.
+> > + *
+> > + * By default, each LED blinks only when it is also in the ON state. This function
+> > + * modifies the appropriate registers (LABx fields) to enable blinking even
+> > + * when the LEDs are OFF, to allow the LED to be used as a traffic indicator
+> > + * without requiring it to also serve as a link status LED.
+> > + *
+> > + * NOTE: Any further LED customization can be performed via the
+> > + * /sys/class/led interface; the functions led_hw_is_supported, led_hw_control_get, and
+> > + * led_hw_control_set are used to support this mechanism.
+> > + *
+> > + * Return: 0 on success or a negative errno code on failure.
+> > + */
+> > +static int mxl86110_enable_led_activity_blink(struct phy_device *phydev)
+> > +{
+> > +     int ret, index;
+> > +     u16 val = 0;
+> > +
+> > +     for (index = 0; index < MXL86110_MAX_LEDS; index++) {
+> > +             val = mxl86110_read_extended_reg(phydev, MXL86110_LED0_CFG_REG + index);
+> > +             if (val < 0)
+> > +                     return val;
+> > +
+> > +             val |= MXL86110_LEDX_CFG_TRAFFIC_ACT_BLINK_IND;
+> > +             ret = mxl86110_write_extended_reg(phydev, MXL86110_LED0_CFG_REG + index, val);
+> > +             if (ret < 0)
+> > +                     return ret;
+>
+> _modify_ ?
+>
+> Getting pretty close to finished now. Thanks for keeping working on
+> it.
+>
+>         Andrew
 
