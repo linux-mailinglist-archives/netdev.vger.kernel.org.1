@@ -1,107 +1,125 @@
-Return-Path: <netdev+bounces-191512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA10AABBAF2
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 12:20:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D652FABBAFC
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 12:22:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC9267AE105
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 10:19:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD2BD1703BD
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 10:22:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 344E62750F8;
-	Mon, 19 May 2025 10:19:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jFL+mKx8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A299E26B2DD;
+	Mon, 19 May 2025 10:22:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A6EC274FFD
-	for <netdev@vger.kernel.org>; Mon, 19 May 2025 10:19:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60A88A94F;
+	Mon, 19 May 2025 10:22:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747649981; cv=none; b=L7/MfITxaawB88E02JY7aiXfQXSsCymxb+Q2Dyp0SJN2Y/XYMr7t/SVDWTcMH8scKjvZVJI+eaB5JWCF1Tj6NtIBSG7mPBFmrs8+GF81z4lu4nJJIXfwrqaDaCZZJSu3nCRd8ZuVSe0kgKlT88nqj7jenWEE84cvlQEQEJJfa4c=
+	t=1747650135; cv=none; b=i9hVhtI1NZ7/L4BgaFHzleMdl2lfgeMk54wfod98MsAPLB6ET08RK7/EUS1fgZ1Dggs/hiubZqPQlFbz5BI7OTN02FUHcDc2uirHjh+Hf8zH3VTAfsSIsB4fFmZ4rf2HWT5+YESW25bkVZM0khK1n3ieZ6y6qRnhu6bP5Sht3Yg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747649981; c=relaxed/simple;
-	bh=GQPdAJgH68IIc9mT+fvqXofapRWMcyOKv3t6CE8UCos=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=pn0hRI5U69626vW3cbk0kBE5fiXfyorNoGNCd05w848oM6+ISQM+bQ32i3vMLQsNnNDlFfa8fEETwLM3Ds77we4TK2eDag9LlR8s0IqMf4Upt2A4eBIY4OA2FioW947Q81/8O13TwEXjdRHAxdM++ohm+KIRmgNX4Hca05Mge6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jFL+mKx8; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3a37535646aso272671f8f.0
-        for <netdev@vger.kernel.org>; Mon, 19 May 2025 03:19:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747649978; x=1748254778; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=EHn/bhUwowMVfB1kTXdgaXuPPUnewAJnniffTVcH5a0=;
-        b=jFL+mKx8YIjrzVlyT8BPs51rZiX9tw/ZmTsXSMLy925G33ym4VTScE3UOLxvax3aST
-         h2ULasWEaBAuqAW+xGpLF+q9haAmzU2CIMjYNBW5hhcyxaKpk+mU/bXOE+034xo85Pf3
-         RGgmdm6m+BWJs04SpTwPHh1/FsHDEvfd79WaDjsTlHUwFextZ5NFQ+K/TRl/6CREfLUR
-         RfDEj3daOaMx586H/8TyCkG3T4QhPZ2zKnS4/h6TamGITOc0x9vje7sDIur1wqqzkP1d
-         eVwcQmyG9x3svhfSsnrTnVljG1YPeD5TZdB3sHilU7fm45V2sQ4qQlfBkyVwc6YB3atw
-         rscg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747649978; x=1748254778;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EHn/bhUwowMVfB1kTXdgaXuPPUnewAJnniffTVcH5a0=;
-        b=ZzqCm6frU9ueKFKQE7pO3YkXnJWpQt9hTTAjS+pXh5le3RyhlLJRG8OEPLM21byrU3
-         9AF9LCi9lhUW5L6PlzEXf4AgRm2nZIU7XCZjDFL634alJOHWbj12hNE1Ai89q6/HB56A
-         qiykMP6td1l2/JL/AYnsNRa+gOyT6GYm2zUI6qVkumeZS/0t7gQUaoQe1yCgh70KBnQM
-         WaxAl3y2xNaOJ3QsnFQ5TVYHO+QUH1GPAA+V062/ctVmoKcbvJdWyKsgm6pYZoRLpBsC
-         /Jk6JcgSZ3VkP8wVOGKCoaEndnalYcT/nOsY/bmAva+3PQdJrzYq/mel3UCSuDyIlWkK
-         3piA==
-X-Forwarded-Encrypted: i=1; AJvYcCUqMZjXLrn5CaEv6LHgl1KWz/DA5xMF11kmOrzELReWI3pW0XEd8eEbWeF/kZjUJeoh0yQYAKM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyADjerYSY14dwLR2PwDZt9P2kvraer4w+SHqW0r2nen35LU43B
-	Tj0y9HHV9fFKBEIkPU1t+9YH6WC/F9eZtgYSUDE0LPxwOceg90eHualK
-X-Gm-Gg: ASbGncv8aJTxWp/ygA8kEET4XGmfFnZShk+aVLskHpMHe7f8grwmVsLjKBGN9m/65VJ
-	Rol4uTbaouZVpPGsojNZJHCovAADacPnMJrzYbfrXA81HlEKzKJr9hsc2Ko9k4hmW8RghD16EHx
-	qgHYZrabDxwvqjLcy52ZE50gP8FmBrXXIa3WRFPrQqJ5U8eTevxkKf1hAPc6dfhzSmurLAHivSc
-	hChW8iXAdPteIQHjCZBkyIbWVIYhTD0gmRjbsyE5RyN0sZTSbt/onLLtE7B98dr9yDP5YXpCCjA
-	Yv9e2MPDANPYm6GRxh8iy12SFmJjVqpfLabOLa2ot+eFIWtWl10hC4QbFTOEh/CT
-X-Google-Smtp-Source: AGHT+IGzkc6KLgya7drpt6lajzxZS8eyKDZMhWy+rGXy5ojlUz8ZPAk224coFS70C4CRWxTewPHK+Q==
-X-Received: by 2002:a5d:4b8a:0:b0:3a3:62e1:a7ba with SMTP id ffacd0b85a97d-3a362e1a8fdmr7612110f8f.9.1747649977642;
-        Mon, 19 May 2025 03:19:37 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:d5e9:e348:9b63:abf5])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a3631c728esm10824579f8f.60.2025.05.19.03.19.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 May 2025 03:19:37 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
-  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
-  jacob.e.keller@intel.com,  sdf@fomichev.me,  jstancek@redhat.com
-Subject: Re: [PATCH net-next 11/11] tools: ynl: add a sample for TC
-In-Reply-To: <20250517001318.285800-12-kuba@kernel.org> (Jakub Kicinski's
-	message of "Fri, 16 May 2025 17:13:18 -0700")
-Date: Mon, 19 May 2025 11:19:13 +0100
-Message-ID: <m234d0kin2.fsf@gmail.com>
-References: <20250517001318.285800-1-kuba@kernel.org>
-	<20250517001318.285800-12-kuba@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1747650135; c=relaxed/simple;
+	bh=M66grIRayxuiFCfPOtRCmOUI64aUQPuVQIUUf0osrtk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=owBGxmQkFfrCKJ/F/7iMZ/zaknGLu3MlJIYhhWPLCihlkTVQLdGIHl5GxNaq5Hw8p7Rw0Idc1W5EmN8HASLm5iWUunt4MGb0K9dOEf+DYtixDAQpTHVNr0la8h/TslH31TxJUXh3WBdxNlRgCT9UJrMTVgJFb00oiQcR8LnbnMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost.localdomain (unknown [124.16.141.245])
+	by APP-05 (Coremail) with SMTP id zQCowAB3tylFBitovWVxAQ--.12796S2;
+	Mon, 19 May 2025 18:21:58 +0800 (CST)
+From: Wentao Liang <vulab@iscas.ac.cn>
+To: irusskikh@marvell.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Wentao Liang <vulab@iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] net: atlantic: Add error handling in set_raw_ingress_record()
+Date: Mon, 19 May 2025 18:21:32 +0800
+Message-ID: <20250519102132.2089-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.42.0.windows.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowAB3tylFBitovWVxAQ--.12796S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7uFWxXw48GF45tF4UJry5Arb_yoW8CFy8pw
+	4a9F90g34Utw4fuFW8Ja1rCr45Z3y8try7Way3Gw1fZFyFyr4DtF4rXryF9F15WFWUAanI
+	9rW0krW2kwn0y3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r1I6r4UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCT
+	nIWIevJa73UjIFyTuYvjfU52NtDUUUU
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiDAgHA2gq9CsK8QABsn
 
-Jakub Kicinski <kuba@kernel.org> writes:
+The set_raw_ingress_record() calls aq_mss_mdio_write() but does not
+check the return value. A proper implementation can be found in
+get_raw_ingress_record().
 
-> Add a very simple TC dump sample with decoding of fq_codel attrs:
->
->   # ./tools/net/ynl/samples/tc
->         dummy0: fq_codel  limit: 10240p target: 5ms new_flow_cnt: 0
->
-> proving that selector passing (for stats) works.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Add error handling for aq_mss_mdio_write(). If the write fails,
+return immediately.
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+Fixes: b8f8a0b7b5cb ("net: atlantic: MACSec ingress offload HW bindings")
+Cc: stable@vger.kernel.org # v5.7
+Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+---
+ .../aquantia/atlantic/macsec/macsec_api.c         | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/aquantia/atlantic/macsec/macsec_api.c b/drivers/net/ethernet/aquantia/atlantic/macsec/macsec_api.c
+index 431924959520..5e87f8b749c5 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/macsec/macsec_api.c
++++ b/drivers/net/ethernet/aquantia/atlantic/macsec/macsec_api.c
+@@ -62,6 +62,7 @@ static int set_raw_ingress_record(struct aq_hw_s *hw, u16 *packed_record,
+ {
+ 	struct mss_ingress_lut_addr_ctl_register lut_sel_reg;
+ 	struct mss_ingress_lut_ctl_register lut_op_reg;
++	int ret;
+ 
+ 	unsigned int i;
+ 
+@@ -105,11 +106,15 @@ static int set_raw_ingress_record(struct aq_hw_s *hw, u16 *packed_record,
+ 	lut_op_reg.bits_0.lut_read = 0;
+ 	lut_op_reg.bits_0.lut_write = 1;
+ 
+-	aq_mss_mdio_write(hw, MDIO_MMD_VEND1,
+-			  MSS_INGRESS_LUT_ADDR_CTL_REGISTER_ADDR,
+-			  lut_sel_reg.word_0);
+-	aq_mss_mdio_write(hw, MDIO_MMD_VEND1, MSS_INGRESS_LUT_CTL_REGISTER_ADDR,
+-			  lut_op_reg.word_0);
++	ret = aq_mss_mdio_write(hw, MDIO_MMD_VEND1,
++				MSS_INGRESS_LUT_ADDR_CTL_REGISTER_ADDR,
++				lut_sel_reg.word_0);
++	if (unlikely(ret))
++		return ret;
++	ret = aq_mss_mdio_write(hw, MDIO_MMD_VEND1, MSS_INGRESS_LUT_CTL_REGISTER_ADDR,
++				lut_op_reg.word_0);
++	if (unlikely(ret))
++		return ret;
+ 
+ 	return 0;
+ }
+-- 
+2.42.0.windows.2
+
 
