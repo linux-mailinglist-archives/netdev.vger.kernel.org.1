@@ -1,142 +1,201 @@
-Return-Path: <netdev+bounces-191552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B9B5ABC13E
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 16:47:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9EC7ABC14A
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 16:49:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1905E16656B
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 14:47:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2F89188D4F5
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 14:50:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD0531DC997;
-	Mon, 19 May 2025 14:47:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6613280CC9;
+	Mon, 19 May 2025 14:49:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hntFdLCu"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="GHTzXxha"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F0531CD21C;
-	Mon, 19 May 2025 14:47:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 919D728000A
+	for <netdev@vger.kernel.org>; Mon, 19 May 2025 14:49:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747666028; cv=none; b=Yi/vKxI0yFP76flpKjKSNqHGuBSywAcfbgme8vz2Ew9uFdfZBKfgjJnEWaYN+gyJfUk85Vpw0c3cK1955SY3LnBiuSWtEjVyBgYMV2kt9MbRJTheZbkquIzT9LD6eVTyH5KIKVO8hvWdOaUdKbC0/3WdICEuw8xTpWtxdY88zuU=
+	t=1747666195; cv=none; b=mw1R3Q3MGbUXYx55ahV3JoQI9fhs7ZEe5H5BINFR6dGExuquVSCJVa8PjCk9CYxPucPd4Vp5JSqnLHmTIKwKMTKkif2+4lmNcecDhGlEnfurs1keWSemqRRgQ3QlMegkYsLAzgm433dGL9EONlkKVgAEAUbdIgxihGZR+KDETUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747666028; c=relaxed/simple;
-	bh=3qnV08bZhkf4pfjJZBx8dUF6Qff3QUhvneWIe9at9jA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=q+Q/2aW31w3YBwFXEjvRuSgJuxr3LSggMPbWwsadxWFg13LzCHFd0ntzps4PHDSIEsqA2+dzDr4H/V7TtC6/XgYfIxnGFuklh73ulfJFP624qVuTr0SSscCTnLDmbFv7kzJJoscaCbL9mbfcr63K+5lXojbWZQUnl77y/q7M6ls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hntFdLCu; arc=none smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6f8b81fda4aso28390826d6.1;
-        Mon, 19 May 2025 07:47:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747666026; x=1748270826; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=E8Jd7Qi9TWpcjCpG46oFCwsLyC3CfnqUMVCo075QTSo=;
-        b=hntFdLCuvNpu0kuBMD8S6ipRLDVfGnsqNbIlmJ0GfDNJVQFOuFw4Rl5j5ry3BRSZwu
-         m/y/Km/wtx9ZRd4U9fMc2q23hW7tEjZnVHZHOvAZ20bzdlipbDwyTnRSWYybk2lO1hu6
-         yuNwK6Tl68oIWWcA8PS4ihemkchjuVG9otaL/TfPeiyjVyFQoMKqOB2SGY5Gd4CS0kQf
-         0LPBry+UkBh03P5nAW1kf+mg/4BIOSIocsIxOahvOGvylckxwKmZ1aGGzN+Oxv9TuynE
-         qN+4ujcXrdoOIxU2Kr2h9ZD2mqF4ry2TNgD2YKa8bbtN0o7+Ui6a+wjIzgECRQRRkRK8
-         0CYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747666026; x=1748270826;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=E8Jd7Qi9TWpcjCpG46oFCwsLyC3CfnqUMVCo075QTSo=;
-        b=IRvJ2/ZxhsU79qCABpxI5oRi8RXVdApKq29CkQuw5hqH1dXM/+ukyou5hxZ/5g6zQt
-         4OgIHbhuh827JzHkcryU1a2Enu5lRS/AjVxHeOmeCPEO36+EfQnSKRcX6a3qqrXxETI4
-         9FYZXnzRIE2jVaqhTPEDJ9vebenDrGu5c82UP6J++vDkVD+dEaa6xLPs8znYMu6oFjV9
-         UZ7PG3CLGuJo9OLemUyRB/i/z3rv/ki7FxwoO0V+ve6rEEtaVSWWsyF+zCKcZaZUiLHC
-         8YfGmEoygXpJrE4UK1vg3giyHjdL7Mg0lVRKZF8jGYoSMfQtlkxft2LDzrygMUS2Eg82
-         V98Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWrWyLB1UlsisNJXmeJFik3mqUNPMmz1w/YRRzsACvyP+buh769+OyurHqTGGnE68MHhS8T78K7@vger.kernel.org, AJvYcCXpAC3CsWqbcCEp2tRxUl0bU2CJzU1gzUB/Zcn7X3eXL0fbLbSl5iRqNYrdFV2r+3QGL2EFnSrso/U0Yg8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzl1/N/4pXElCZCHnVhcs+l+o0ieMT0YLk9yU/uZOI5MofsUS+v
-	CTFJlpOQiQWJXexy9xF7xlcfAXtSd+LyBf62j4m4IwloHQGkIaUznAmCj88tGDFWfik=
-X-Gm-Gg: ASbGnctkbnaQrK6OdxquCNw4uHyv5fm4/R0kDoh8i7Ca5eZ8yyHraq1+bWZm6O9oF7+
-	O4glFUbfkWaUqVKejRSgC/d6MPlAqIuVV7E34oshPhrUgO5zj+lGjiY3fae0+JpzHe1Rd4oxtDr
-	SVBOFBf5R32S/fUTe40yTndjdlws8dQFwDVzyznBInw+ZM7dJCBXn7cgPfgPi+Sahaivb1x8svU
-	R6PCxkjy607omaip7KEuto5VJSb3YHnwjB2ShnQH/qU6RrYGrdYu5xcNCGrL8kBAAZzCHoWK3f1
-	uP9ciDm0VYaYR2nyFjIJF8xMhtGSdHu/hC73U1rigRZvq/PmbUvD
-X-Google-Smtp-Source: AGHT+IH9gfQ+apMRIS3qcJyKjW6PWaqbuvRhWH7s8idH69K7FwlmtGsTZZNFdqKx6LjWZmqCtVkvgQ==
-X-Received: by 2002:a05:6214:2403:b0:6e8:fcde:58d5 with SMTP id 6a1803df08f44-6f8b08e56ddmr210246136d6.42.1747666026022;
-        Mon, 19 May 2025 07:47:06 -0700 (PDT)
-Received: from CNCMK0001D007E.ht.home ([2607:fa49:8c41:2600::f21d])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f8b096ddb4sm57405716d6.78.2025.05.19.07.47.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 May 2025 07:47:05 -0700 (PDT)
-From: chalianis1@gmail.com
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux@armlinux.org.uk,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: stable@vger.kernel.org,
-	Anis Chali <chalianis1@gmail.com>
-Subject: [PATCH net] phy: dp83869: fix interrupts issue when using with an optical fiber sfp. to correctly clear the interrupts both status registers must be read.
-Date: Mon, 19 May 2025 10:47:01 -0400
-Message-ID: <20250519144701.92264-1-chalianis1@gmail.com>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1747666195; c=relaxed/simple;
+	bh=Vp17GqqGTV1g/ha2tScDyQWOt31Abqsyiij/fj0l0C0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MvHqsubl3Cg52lB5k6kMX0rI7qDvkHBQIbfvpAdv8LcbFkiD5gqnfmuslSzOUAed59jtEzS1remONjBHaTQ54t7MD8Tm04BYojZQ55mSqTWWuy5wGQhAJQRtY09C0bo8flLFkc+0S7a+JdMl65/kkl5qYRF405+6p3eJ2QrpvrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=GHTzXxha; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id AA95342E7E;
+	Mon, 19 May 2025 14:49:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1747666191;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qDQg72xYSOYHbCNL9sBjMomziaYCG5q3JwE1bnhWH+8=;
+	b=GHTzXxhaqPLVPJczmIJ4ws7TzIjkN1Rvs0jWJG25FJmLI8OT/BMI/uV0zW7+QBr0FblmFt
+	ZccM0ub3Av6ETKwhWKoLsLnZnY6qYEUiuy+5PdkKEMY7ILxX5GC9c5lGSsahkovSpr5gMS
+	ixPV9ds7EV7gf9W/1bdhE/AJxf4auOaT+TlKtX74WgTii9f18aE6t+m9n1ym/wo0lAJvX0
+	CuVdXqaiUql43LgSBpAnz7lWP3DDKPeXAJbaUzPKdzCVjrJxP8aiiTnZmUkIKzAmG4Pz8P
+	0mPX+e04WRinjUYd32K+cw73l2miKvgOYOOSTG2YaHFP4hk6U1zo4Eq4yqpYbg==
+Date: Mon, 19 May 2025 16:49:49 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ donald.hunter@gmail.com, daniel@iogearbox.net, nicolas.dichtel@6wind.com,
+ jacob.e.keller@intel.com
+Subject: Re: [PATCH net-next 8/9] tools: ynl: enable codegen for all rt-
+ families
+Message-ID: <20250519164949.597d6e92@kmaincent-XPS-13-7390>
+In-Reply-To: <20250515231650.1325372-9-kuba@kernel.org>
+References: <20250515231650.1325372-1-kuba@kernel.org>
+	<20250515231650.1325372-9-kuba@kernel.org>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: 0
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdefvdduieeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecunecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefguddtfeevtddugeevgfevtdfgvdfhtdeuleetffefffffhffgteekvdefudeiieenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduvddprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtp
+ hhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepughonhgrlhgurdhhuhhnthgvrhesghhmrghilhdrtghomh
+X-GND-Sasl: kory.maincent@bootlin.com
 
-From: Anis Chali <chalianis1@gmail.com>
+On Thu, 15 May 2025 16:16:49 -0700
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-from datasheet of dp83869hm
-7.3.6 Interrupt
-The DP83869HM can be configured to generate an interrupt when changes of internal status occur. The interrupt
-allows a MAC to act upon the status in the PHY without polling the PHY registers. The interrupt source can be
-selected through the interrupt registers, MICR (12h) and FIBER_INT_EN (C18h). The interrupt status can be
-read from ISR (13h) and FIBER_INT_STTS (C19h) registers. Some interrupts are enabled by default and can
-be disabled through register access. Both the interrupt status registers must be read in order to clear pending
-interrupts. Until the pending interrupts are cleared, new interrupts may not be routed to the interrupt pin.
-Fixes: interrupts issue when using with an optical fiber sfp.
+> Switch from including Classic netlink families one by one to excluding.
+>=20
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  tools/net/ynl/Makefile.deps      | 4 ++++
+>  tools/net/ynl/generated/Makefile | 7 +++----
+>  2 files changed, 7 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/tools/net/ynl/Makefile.deps b/tools/net/ynl/Makefile.deps
+> index a5e6093903fb..e5a5cb1b2cff 100644
+> --- a/tools/net/ynl/Makefile.deps
+> +++ b/tools/net/ynl/Makefile.deps
+> @@ -33,5 +33,9 @@ CFLAGS_ovs_flow:=3D$(call
+> get_hdr_inc,__LINUX_OPENVSWITCH_H,openvswitch.h) CFLAGS_ovs_vport:=3D$(ca=
+ll
+> get_hdr_inc,__LINUX_OPENVSWITCH_H,openvswitch.h) CFLAGS_rt-addr:=3D$(call
+> get_hdr_inc,__LINUX_RTNETLINK_H,rtnetlink.h) \ $(call
+> get_hdr_inc,__LINUX_IF_ADDR_H,if_addr.h) +CFLAGS_rt-link:=3D$(call
+> get_hdr_inc,__LINUX_RTNETLINK_H,rtnetlink.h) \
+> +	$(call get_hdr_inc,_LINUX_IF_LINK_H,if_link.h)
+> +CFLAGS_rt-neigh:=3D$(call get_hdr_inc,__LINUX_RTNETLINK_H,rtnetlink.h)
+>  CFLAGS_rt-route:=3D$(call get_hdr_inc,__LINUX_RTNETLINK_H,rtnetlink.h)
+> +CFLAGS_rt-rule:=3D$(call get_hdr_inc,__LINUX_FIB_RULES_H,fib_rules.h)
+>  CFLAGS_tcp_metrics:=3D$(call get_hdr_inc,_LINUX_TCP_METRICS_H,tcp_metric=
+s.h)
+> diff --git a/tools/net/ynl/generated/Makefile
+> b/tools/net/ynl/generated/Makefile index 6603ad8d4ce1..9208feed28c1 100644
+> --- a/tools/net/ynl/generated/Makefile
+> +++ b/tools/net/ynl/generated/Makefile
+> @@ -22,10 +22,9 @@ TOOL:=3D../pyynl/ynl_gen_c.py
+>  TOOL_RST:=3D../pyynl/ynl_gen_rst.py
+> =20
+>  SPECS_DIR:=3D../../../../Documentation/netlink/specs
+> -GENS_PATHS=3D$(shell grep -nrI --files-without-match \
+> -		'protocol: netlink' \
+> -		$(SPECS_DIR))
+> -GENS=3D$(patsubst $(SPECS_DIR)/%.yaml,%,${GENS_PATHS}) rt-addr rt-route
+> +SPECS_PATHS=3D$(wildcard $(SPECS_DIR)/*.yaml)
+> +GENS_UNSUP=3Dconntrack nftables tc
+> +GENS=3D$(filter-out ${GENS_UNSUP},$(patsubst
+> $(SPECS_DIR)/%.yaml,%,${SPECS_PATHS})) SRCS=3D$(patsubst %,%-user.c,${GEN=
+S})
+>  HDRS=3D$(patsubst %,%-user.h,${GENS})
+>  OBJS=3D$(patsubst %,%-user.o,${GENS})
 
-Signed-off-by: Anis Chali <chalianis1@gmail.com>
----
- drivers/net/phy/dp83869.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+This patch introduces a build error when building the specs.
 
-diff --git a/drivers/net/phy/dp83869.c b/drivers/net/phy/dp83869.c
-index a62cd838a9ea..1e8c20f387b8 100644
---- a/drivers/net/phy/dp83869.c
-+++ b/drivers/net/phy/dp83869.c
-@@ -41,6 +41,7 @@
- #define DP83869_IO_MUX_CFG	0x0170
- #define DP83869_OP_MODE		0x01df
- #define DP83869_FX_CTRL		0x0c00
-+#define DP83869_FX_INT_STS		0x0c19
- 
- #define DP83869_SW_RESET	BIT(15)
- #define DP83869_SW_RESTART	BIT(14)
-@@ -195,6 +196,12 @@ static int dp83869_ack_interrupt(struct phy_device *phydev)
- 	if (err < 0)
- 		return err;
- 
-+	if (linkmode_test_bit(ETHTOOL_LINK_MODE_FIBRE_BIT, phydev->supported)) {
-+		err = phy_read_mmd(phydev, DP83869_DEVADDR, DP83869_FX_INT_STS);
-+		if (err < 0)
-+			return err;		
-+	}
-+
- 	return 0;
- }
- 
--- 
-2.49.0
+Maybe we should add a spec build check in the net CI?
 
+$ make -C tools/net/ynl -j9
+-e 	CC rt-neigh-user.o
+rt-neigh-user.c:122:10: error: =E2=80=98NDTPA_INTERVAL_PROBE_TIME_MS=E2=80=
+=99 undeclared here (not in a function); did you mean =E2=80=98NDTPA_DELAY_=
+PROBE_TIME=E2=80=99?
+  122 |         [NDTPA_INTERVAL_PROBE_TIME_MS] =3D { .name =3D "interval-pr=
+obe-time-ms", .type =3D YNL_PT_U64, },
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |          NDTPA_DELAY_PROBE_TIME
+rt-neigh-user.c:122:10: error: array index in initializer not of integer ty=
+pe
+rt-neigh-user.c:122:10: note: (near initialization for =E2=80=98rt_neigh_nd=
+tpa_attrs_policy=E2=80=99)
+rt-neigh-user.c:122:42: warning: excess elements in array initializer
+  122 |         [NDTPA_INTERVAL_PROBE_TIME_MS] =3D { .name =3D "interval-pr=
+obe-time-ms", .type =3D YNL_PT_U64, },
+      |                                          ^
+rt-neigh-user.c:122:42: note: (near initialization for =E2=80=98rt_neigh_nd=
+tpa_attrs_policy=E2=80=99)
+rt-neigh-user.c:146:10: error: =E2=80=98NDA_FLAGS_EXT=E2=80=99 undeclared h=
+ere (not in a function)
+  146 |         [NDA_FLAGS_EXT] =3D { .name =3D "flags-ext", .type =3D YNL_=
+PT_U32, },
+      |          ^~~~~~~~~~~~~
+rt-neigh-user.c:146:10: error: array index in initializer not of integer ty=
+pe
+rt-neigh-user.c:146:10: note: (near initialization for =E2=80=98rt_neigh_ne=
+ighbour_attrs_policy=E2=80=99)
+rt-neigh-user.c:146:27: warning: excess elements in array initializer
+  146 |         [NDA_FLAGS_EXT] =3D { .name =3D "flags-ext", .type =3D YNL_=
+PT_U32, },
+      |                           ^
+rt-neigh-user.c:146:27: note: (near initialization for =E2=80=98rt_neigh_ne=
+ighbour_attrs_policy=E2=80=99)
+rt-neigh-user.c:147:10: error: =E2=80=98NDA_NDM_STATE_MASK=E2=80=99 undecla=
+red here (not in a function)
+  147 |         [NDA_NDM_STATE_MASK] =3D { .name =3D "ndm-state-mask", .typ=
+e =3D YNL_PT_U16, },
+      |          ^~~~~~~~~~~~~~~~~~
+rt-neigh-user.c:147:10: error: array index in initializer not of integer ty=
+pe
+rt-neigh-user.c:147:10: note: (near initialization for =E2=80=98rt_neigh_ne=
+ighbour_attrs_policy=E2=80=99)
+rt-neigh-user.c:147:32: warning: excess elements in array initializer
+  147 |         [NDA_NDM_STATE_MASK] =3D { .name =3D "ndm-state-mask", .typ=
+e =3D YNL_PT_U16, },
+      |                                ^
+rt-neigh-user.c:147:32: note: (near initialization for =E2=80=98rt_neigh_ne=
+ighbour_attrs_policy=E2=80=99)
+rt-neigh-user.c:148:10: error: =E2=80=98NDA_NDM_FLAGS_MASK=E2=80=99 undecla=
+red here (not in a function); did you mean =E2=80=98XDP_FLAGS_MASK=E2=80=99?
+  148 |         [NDA_NDM_FLAGS_MASK] =3D { .name =3D "ndm-flags-mask", .typ=
+e =3D YNL_PT_U8, },
+      |          ^~~~~~~~~~~~~~~~~~
+      |          XDP_FLAGS_MASK
+rt-neigh-user.c:148:10: error: array index in initializer not of integer ty=
+pe
+rt-neigh-user.c:148:10: note: (near initialization for =E2=80=98rt_neigh_ne=
+ighbour_attrs_policy=E2=80=99)
+rt-neigh-user.c:148:32: warning: excess elements in array initializer
+  148 |         [NDA_NDM_FLAGS_MASK] =3D { .name =3D "ndm-flags-mask", .typ=
+e =3D YNL_PT_U8, },
+      |                                ^
+rt-neigh-user.c:148:32: note: (near initialization for =E2=80=98rt_neigh_ne=
+ighbour_attrs_policy=E2=80=99)
+make[1]: *** [Makefile:52: rt-neigh-user.o] Error 1
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
