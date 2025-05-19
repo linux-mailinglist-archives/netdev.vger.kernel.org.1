@@ -1,130 +1,168 @@
-Return-Path: <netdev+bounces-191527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1CC7ABBCA7
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 13:38:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BAB9ABBD2F
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 14:02:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0F3C18939E0
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 11:38:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D85317AB3A
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 12:01:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0910B275863;
-	Mon, 19 May 2025 11:38:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CCBF27511C;
+	Mon, 19 May 2025 12:01:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mMSnTket"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iKwTHTol"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42F48274FCD;
-	Mon, 19 May 2025 11:38:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D546513D52F;
+	Mon, 19 May 2025 12:01:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747654688; cv=none; b=QpYvCkHcq08LUkxNDyCa6t9XPeaf11PKuLJYe88cSEwH7uaG6InTYLCb9L1vraNBTw4+kgc6JzjyCI+BITiCrH0DUWAbPHIaS83hgfE48yysOtUpIjc8gX5tbZpQ+OjzaNlPGIaf59jwV6crt6YwB+a915K2dqBYG6/aRVDqdbU=
+	t=1747656090; cv=none; b=N7JKn7xpSDIuNXVq+l+ZFi0swQSD8hGV/5ZRBaVlOtPX/I5oc+f2PwQ7RArIFwiXDX7yuK9sA2xpvkjOLrhwv8hrOlol8jFh4bMw+UblXPiL6n6sQMKVZ8jQwGOIub0y0NiQk7OrvTm4clDf3RHwEopMRO7wnPAVqCbWEX3kwIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747654688; c=relaxed/simple;
-	bh=7TmHIFButu0/rC/hCn0tJ126dw1GXvpkvMpN+ZjRtPE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=G8rhmPTzq58n840UxmfPG9EkRWUcM0EBMXQglCLQQTpIG2BOFtReY5iltip54w5uHznfSzSCGbxi8I05bluycswC+zzmQ+fc3Rv7TlMU5ibaFsMRJ/vfQ2xvvRSlg41xzJP18SyG9HAeRsUiZaW/t1B46z25Swztoffd2h3+JIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mMSnTket; arc=none smtp.client-ip=209.85.221.52
+	s=arc-20240116; t=1747656090; c=relaxed/simple;
+	bh=Oi2AsDVEz//MMAK2DEH0Sl+qm7MOIE7coxM6eIGolLU=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=PRlCbV3lFwXHbtp20i3O1ylwYnxuDu/BFvnZNGifmWbdKyh+cYmR0tVQY78+NItBu+Ltb4u5sB5sg6IXLY9t/aWVYiobd5EJTfWUSPQkyUG2MH/LtI1PACA2pTM0SjEcJROi5NiMXG9tB0ElpXfzjC6OysV+VrcDth9vfH21KrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iKwTHTol; arc=none smtp.client-ip=209.85.210.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3a37535646aso332803f8f.0;
-        Mon, 19 May 2025 04:38:06 -0700 (PDT)
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-742c96af71dso1501725b3a.0;
+        Mon, 19 May 2025 05:01:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747654685; x=1748259485; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=4PD/r7qfEReGXA3osi3B9vh/FP+woHInGVqSdMby7LA=;
-        b=mMSnTketD2fF3BxYO9753tA7mqeLmYq6MhVE9eXPwqAKbjWDrbQAAtLLvwulBg8eg7
-         cuMoCu6Qc9Id8rzkTLScvtXeZa0gEmW/6p/5XUikjYdxU+m8MS5qz5DWYtchFxyRAj8N
-         +kkKgfbwJM7eyR9jmTuqOarHSz6qlOTX4j3z1vShwhVHDM2rIhZrRPYZ0eh3XVrzakay
-         2GurPhZ+GwUU5q4WTuOFdl834kX+KWjHxZ5Aar62i2ka2FT9WaN+Xz9VWdKfLnw52ywG
-         m91TvpL7MhQm+KzNZMbTkiOKVuLksL2LHe4ydGIOXWDgGx9Oplq0gL9+E3YKnO0BiyYW
-         /MyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747654685; x=1748259485;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20230601; t=1747656088; x=1748260888; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=4PD/r7qfEReGXA3osi3B9vh/FP+woHInGVqSdMby7LA=;
-        b=B7U5IYgsTLxd+UoK9OHgoH/P8T3IMFSPSiewgIeXxPgzln6B4ePgOxeDH+xjGHkWDL
-         tczwFogbc3THFIrHb3vKmgZi9lprxY905jY62mHbZ2DDDMNJWuvqvcHjxICPv4VU4i/A
-         cLe2J380mr3+cKUNXCpiwlIS2GsPbWnGWtioqQWQjtO9xtoFvho5U+H8Py97TazaDZyw
-         rSf+fs4Udx0fRmHVnwIkCDRMcOuAxlBZm5s3OPMrsXQBWvA39w6nOBiDYCWKDOfxS4Dx
-         BvYLaMjqnfWOmSTq4gc4ScNvr0FZ/yo6KVXcrDvyGAYReHGd+lxVqk45YvpySlwugAR6
-         r2yQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVJyQsqXLwi35J/MIZNOTCE7XpHmtKgcJtcZXb6ZkWXSkR0D2kvO13dHVYvpthw2j6Jmi7qWYeCEVATL+Q=@vger.kernel.org, AJvYcCWBJLDCG3kojTW2VvBtLicGGQWx8zuLTHPoJcfCfOuhXhqg6qYNJ2lH5tIAzCfG3p7+H4Lfr7QP@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3z8I3guSL9yHj9j8bYoALbhWjZWEatVmVdWCRwIcttNpu36oM
-	fMvoEFP0M6KOqYwuU/++08C2jCjv1DwI46aqeec0gFNM604eB/moYm2SDDVnS13Bwex/fNosOho
-	E/+MUxmHVgtZoEI9N+tTOWrOQu5p/wj0=
-X-Gm-Gg: ASbGncswDCqC8fxClVESA6FnqtRck697FCUWvmFGeJHQt/KC34/PYpBpc+FLe8Blhwk
-	dRvcvCGcIqPyNf11Ean9Tp8mZM0SsS5fhxGt1h9jxo6jsyA/Q/MbazSuDVQ+kkzscEr5wnr07MX
-	15ssPcto+Azkt7zv5Waukb9hDZEcM1YVuXMLACUITcqDcp3Ktrd9Hfx0eEXQgNHxaLfjc=
-X-Google-Smtp-Source: AGHT+IGlUi0WQ+8Hn7GUf3y+zK6i4y5xQwsE5jb6qnK+zrOMCASls4EDis4EHUhqpiUvC8TUCOfXFXvKlpRA+43TZxE=
-X-Received: by 2002:a05:6000:40e1:b0:3a3:71fb:78c6 with SMTP id
- ffacd0b85a97d-3a371fb81admr1801156f8f.16.1747654685503; Mon, 19 May 2025
- 04:38:05 -0700 (PDT)
+        bh=XTmZBlZhUVLhhjEjpTTIpHbOBPnV7i0+TYTlL3dGEFg=;
+        b=iKwTHTolgkJISlGRG0NxzXTuiedOD6xTElWMcPn5aVxSDWUmh3Lk7yLbxHVM8RkbqT
+         xX/OphskVGnjt83aGpgrVY6KLznvz2W6w7foUDBMQSJCIAhwa7lSb94jDjjtzJgNZYq1
+         5h7IeJLIAl6ZxhZWtxmn2tEqKbaWkOzfBEmnWkl1LQ6EYxMv3gEJPTJxh3IM84C20WHa
+         wRZLojL6JcPHH43rgbAU/DTFdHKGbd3h+Jx2LREOeRXhn7Og4R6dcJJhh6SKLoU0wX2o
+         U+PE5qCD64bNe+vnBaEBd+mArwxKb3WU7Neo9NoSgwLHWq4/uId0oNVUmN05JsXtI1fa
+         waFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747656088; x=1748260888;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=XTmZBlZhUVLhhjEjpTTIpHbOBPnV7i0+TYTlL3dGEFg=;
+        b=IHTHvf9mDIxDXdzr2bnM6nq5WpvCOtF/Lyn95WAAhRvllcj8t6+BIzvrAYoDqhdMeS
+         jUcHAJeOahbR3RInZ2MMU/sZ+Fogrni6vMNiIEBWE+BSck57Yqr0QjpcTwL/Ap7lYCQr
+         oYWBB0kkbhPexd6cKyeBX/RRkw6NYmUaSg5d8ei9/5MdSOsqAfqnrMDh+YyY3o2xb858
+         GwK+uYjCpagwUMKSv2IvHwQH3NqK39e/hsngiT7kV7aiYSlbhEPzLtibtu5/3e5c2vVw
+         Bofr4GVvGTenjh1NJfVNNr+b+wAlqB3/CE0LTTurZY13uLFCW8pqRDPQ6k3rnOGYr4P0
+         NuWg==
+X-Forwarded-Encrypted: i=1; AJvYcCUy4ftQ93fM9WKHDgbflsm3HiIVLGo9Skv8TuQDXFc6D/xV7baM8mrhyC6vKKgku/u0UyJGa+vklhqF@vger.kernel.org, AJvYcCVUf4ssKBicrZVmt9W5TPDAq4j1mOL0QyD8LAKxaNQ+O2tjZab5HnV0cZgaONe10mL1QKLg/fUxHBigr8Uf@vger.kernel.org, AJvYcCVjrHUOId3sAm7HL8rpUGP4x0XSwmFj4w+Brc1kMstEeY7z2/5RSK0B3XDKxy8rjR2SUIdVq+y1CHjPocs/pxM=@vger.kernel.org, AJvYcCXvy9xB3nkHUwRwkmbje2oCTwuKad3PzR6rY322YkUK/kKlpxhg+ZASBJ5fvJqLtAQ1AaA94tRj@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxJB66SarHA+vNrGsilz64pJ9lMalJ3ofnnfZB2+5i1zcE4W/K
+	JaCzgjmzB5qtfEuy9Ygge+6zafw+Ny9v+Q7uOtS9pG97FcHlLreyzqjCXBDcqDhu
+X-Gm-Gg: ASbGncuGU5ljxpJMOj0zUaB71EoKO5y45E1aJKS0FD5T0AHdDR57aYwhBcFR9Yxkgl/
+	ZMwuWuAaOXuybagl8YeiRrt9nsrdnWcHoYTG4toyT2lXsElbQjU0TkNw97rVfc+Wk8zWfp610PQ
+	c10cVBkQ2+LJ+rwx9soWClccuJYQuUlI+nk/zuSZgExpI+Nxw69Gd8FnRD/POfxP/T+DmW8h3IW
+	JRmTvWDFOX8mo1bZ0TmQHfhrsRdX3iQdRYJIJUdaIkIBnft2Y2gkhZ/Z8f77qIhhyyq3rUFGlaF
+	vTMLUKhNvWMquw/rR0vvpNcEXS9E+ktzs6SNS1cGH4c3Me/jbbB8i3ebw8EqBcGkgh1TyctKdCs
+	asJoK0KVR4CK5jxigHrczr8dIZ+cxlnpeTQ==
+X-Google-Smtp-Source: AGHT+IFA5WtJ5T6gVjrQKrpyLmTmrTegeDbfrWJqzoylEFS0ZUr6GsuE/3DhnckmSjBrOGZeN1nV4g==
+X-Received: by 2002:a05:6a21:3289:b0:215:d25d:fd14 with SMTP id adf61e73a8af0-2162189f061mr17513907637.13.1747656077753;
+        Mon, 19 May 2025 05:01:17 -0700 (PDT)
+Received: from localhost (p4138183-ipxg22701hodogaya.kanagawa.ocn.ne.jp. [153.129.206.183])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-742a986d9c3sm5972829b3a.121.2025.05.19.05.01.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 May 2025 05:01:17 -0700 (PDT)
+Date: Mon, 19 May 2025 21:00:59 +0900 (JST)
+Message-Id: <20250519.210059.2097701450976383427.fujita.tomonori@gmail.com>
+To: lossin@kernel.org
+Cc: fujita.tomonori@gmail.com, ansuelsmth@gmail.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
+ kabel@kernel.org, andrei.botila@oss.nxp.com, tmgross@umich.edu,
+ ojeda@kernel.org, alex.gaynor@gmail.com, boqun.feng@gmail.com,
+ gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+ a.hindborg@kernel.org, aliceryhl@google.com, dakr@kernel.org,
+ sd@queasysnail.net, michael@fossekall.de, daniel@makrotopia.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org
+Subject: Re: [net-next PATCH v10 7/7] rust: net::phy sync with
+ match_phy_device C changes
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <D9YO3781UI2X.1CI7FG1EATN8G@kernel.org>
+References: <D9YA4FS5EX4S.217A1IK0WW4WR@kernel.org>
+	<20250517.221313.1252217275580085717.fujita.tomonori@gmail.com>
+	<D9YO3781UI2X.1CI7FG1EATN8G@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250515145142.1415-1-zakkemble@gmail.com> <20250515145142.1415-2-zakkemble@gmail.com>
- <20250516175231.4049a53d@kernel.org>
-In-Reply-To: <20250516175231.4049a53d@kernel.org>
-From: Zak Kemble <zakkemble@gmail.com>
-Date: Mon, 19 May 2025 12:37:54 +0100
-X-Gm-Features: AX0GCFvFKRUD3QyA0n1hKV8cG9UDCp1h_ldb7fWV2yY32xyfr08_JxkGJiC5Mf8
-Message-ID: <CAA+QEuQ+2gFNCqK_txG-Lsye5JmsoKUYHnsmOgK0LSoabc7yeQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] net: bcmgenet: switch to use 64bit statistics
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Doug Berger <opendmb@gmail.com>, Florian Fainelli <florian.fainelli@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-Thanks, v3 is here
-https://lore.kernel.org/all/20250519113257.1031-1-zakkemble@gmail.com/
+On Sat, 17 May 2025 21:02:51 +0200
+"Benno Lossin" <lossin@kernel.org> wrote:
 
-On Sat, 17 May 2025 at 01:52, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Thu, 15 May 2025 15:51:40 +0100 Zak Kemble wrote:
-> > @@ -2315,7 +2358,7 @@ static unsigned int bcmgenet_desc_rx(struct bcmgenet_rx_ring *ring,
-> >               if (unlikely(!(dma_flag & DMA_EOP) || !(dma_flag & DMA_SOP))) {
-> >                       netif_err(priv, rx_status, dev,
-> >                                 "dropping fragmented packet!\n");
-> > -                     ring->errors++;
-> > +                     BCMGENET_STATS64_INC(stats, fragmented_errors);
->
-> Please refrain from adding new counters in the conversion patch.
->
-> >                       dev_kfree_skb_any(skb);
-> >                       goto next;
-> >               }
->
-> > @@ -3402,6 +3455,7 @@ static void bcmgenet_dump_tx_queue(struct bcmgenet_tx_ring *ring)
-> >  static void bcmgenet_timeout(struct net_device *dev, unsigned int txqueue)
-> >  {
-> >       struct bcmgenet_priv *priv = netdev_priv(dev);
-> > +     struct bcmgenet_tx_stats64 *stats = &priv->tx_rings[txqueue].stats64;
-> >       u32 int1_enable = 0;
-> >       unsigned int q;
->
-> Please maintain the coding style of declaring variables from longest
-> line to shortest. If there are dependencies the init should happen
-> in the body of the function.
->
-> > -static struct net_device_stats *bcmgenet_get_stats(struct net_device *dev)
-> > +static void bcmgenet_get_stats64(struct net_device *dev,
-> > +                                                              struct rtnl_link_stats64 *stats)
->
-> the indent is way off here, in general please try to fit in 80chars
-> unless the readability suffers.
-> --
-> pw-bot: cr
+>>> I think that's wrong, nothing stops me from implementing `Driver` for an
+>>> empty enum and that can't be instantiated. The reason that one wants to
+>>> have this in C is because the same `match` function is used for
+>>> different drivers (or maybe devices? I'm not too familiar with the
+>>> terminology). In Rust, you must implement the match function for a
+>>> single PHY_DEVICE_ID only, so maybe we don't need to change the
+>>> signature at all?
+>>
+>> I'm not sure I understand the last sentence. The Rust PHY abstraction
+>> allows one module to support multiple drivers. So we can could the
+>> similar trick that the second patch in this patchset does.
+>>
+>> fn match_device_id(dev: &mut phy::Device, drv: &phy::DriverVTable) -> bool {
+>>     // do comparison workking for three drivers
+>> }
+> 
+> I wouldn't do it like this in Rust, instead this would be a "rustier"
+> function signature:
+> 
+>     fn match_device_id<T: Driver>(dev: &mut phy::Device) -> bool {
+>         // do the comparison with T::PHY_DEVICE_ID
+>         dev.id() == T::PHY_DEVICE_ID
+>     }
+> 
+> And then in the impls for Phy{A,B,C,D} do this:
+> 
+>     impl Driver for PhyA {
+>         fn match_phy_device(dev: &mut phy::Device) -> bool {
+>             match_device_id::<Self>(dev)
+>         }
+>     }
+
+Ah, yes, this works well.
+
+
+>> The other use case, as mentioned above, is when using the generic helper
+>> function inside match_phy_device() callback. For example, the 4th
+>> patch in this patchset adds genphy_match_phy_device():
+>>
+>> int genphy_match_phy_device(struct phy_device *phydev,
+>>                            const struct phy_driver *phydrv)
+>>
+>> We could add a wrapper for this function as phy::Device's method like
+>>
+>> impl Device {
+>>     ...
+>>     pub fn genphy_match_phy_device(&self, drv: &phy::DriverVTable) -> i32 
+> 
+> Not sure why this returns an `i32`, but we probably could have such a
+
+Maybe a bool would be more appropriate here because the C's comment
+says:
+
+Return: 1 if the PHY device matches the driver, 0 otherwise.
+
+> function as well (though I wouldn't use the vtable for that).
+
+What would you use instead?
 
