@@ -1,142 +1,124 @@
-Return-Path: <netdev+bounces-191589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 256F6ABC5A6
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 19:31:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EE227ABC5A8
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 19:31:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 20C7C7AEBB5
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 17:30:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 52D7B7AF4BD
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 17:30:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D06D3288C23;
-	Mon, 19 May 2025 17:30:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE784288C89;
+	Mon, 19 May 2025 17:31:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="ow5UG4jx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2mtNDa2U"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BA78288518
-	for <netdev@vger.kernel.org>; Mon, 19 May 2025 17:30:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6794E288518
+	for <netdev@vger.kernel.org>; Mon, 19 May 2025 17:31:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747675852; cv=none; b=e5vMpMBqJsXyaClDEcC5htTtgF2EMnk/5D+66Kr5T+XhG3v5laxB31v0uJJu4d7SeDSjcdGGM1ZqjJZSLSWYQCKv6i98u7nIbBJhEU62I+AQmSJSisLaZmfwdDFm5JIlZ6qD7YuCZQUzegnQxBbEnmufxJNi8r0T3+06xM7RThU=
+	t=1747675868; cv=none; b=Tg/B6q3SRz7rn/dLjojdzMB83TeqoobUpsxKTDp33TpaRzpe+DdErbpYEDuRtHt11WHNXYu5vbznkLtR/AVs87/ff9W5b3X7vbpRRiAKb3CSkmTLNR5Qgo53Zad7pVeKR7J3Iu7bi3ElS/6n97Nvh2feG2DlRzKtbjJ46Cozdks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747675852; c=relaxed/simple;
-	bh=dyqrCNo9CXtfevjUxnwpsgNqT9cBOHHMn/D91RI7oTw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fm4qiJ9Ks2PIYx2kmYiJsyEIMMR78umD7FdMIShmMGp14WXi5CYbFZadz4q/Ipzt9OR+gpAZuYchQ610aknCVPqapiLIjiDpHXYbNcoiXUX3PkywJIVU2qwIJBQHICT52hQSg/jWHL4WwafEtFTwNrqJKCZtgseEoAwIlY8tfeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=ow5UG4jx; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1747675868; c=relaxed/simple;
+	bh=9k3rSkCOUuBoGczbRjC9e6BrYoiZJsdyvLLsXOGHPTE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pOrBT56wX6XsRHHJYqEZ/IFVHbZlU0Rbd6v1yhyDcy+0PINIlLjaOh8cN4gjm3wcOCr6zZeKJzXeklYJcnQ17rb8sAVbXddCptapWjagzrdx188o+UGt8MGBujSmKLWpl+EVefOvk671YrPSa+mgeLKhNOjBJWCdLDowZModR/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2mtNDa2U; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-231f37e114eso477185ad.1
+        for <netdev@vger.kernel.org>; Mon, 19 May 2025 10:31:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1747675851; x=1779211851;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=seZWFjglv4Jt7ef2m/LSBQbrctE5lgBHmK9DnE+8Kas=;
-  b=ow5UG4jxovNoI4qvEfDKB6S2h+6+CUz2/f7RFuiNGExJ/4e7uiAvKiQg
-   V/spbVbvopoexZJpKJPASnSr+NVRmdB4eZxswe4kEBvm0RrJQdcF04h5d
-   ch9DXEqiNH/KKCmeMSlS+r09P2B/351dTxSmGbl7QkCnM/jQ5FEBHPpsy
-   b8CATcVMtlYURIYJc4lpZ3hxM7wAMhnEKQ8waC5stMAhYsP1Sk9Gj+OMv
-   jPfqoXGaPfKgnmmFh3FYV8M+g1WWlzTvdDhq0XF5ZMnQD1YFBca9NdNBL
-   54zP9H3NagIlF+quxdbv3/zd5KNmKNJ5NliQzoUBmWvdOOnTw4LwGht7B
-   A==;
-X-IronPort-AV: E=Sophos;i="6.15,301,1739836800"; 
-   d="scan'208";a="406879687"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2025 17:30:42 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:63966]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.47:2525] with esmtp (Farcaster)
- id 5a794e2d-a3d4-4c67-86a3-c961fbb706d8; Mon, 19 May 2025 17:30:41 +0000 (UTC)
-X-Farcaster-Flow-ID: 5a794e2d-a3d4-4c67-86a3-c961fbb706d8
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 19 May 2025 17:30:41 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.142.169.18) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 19 May 2025 17:30:38 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <david.laight.linux@gmail.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
-	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <willemb@google.com>
-Subject: Re: [PATCH v1 net-next 6/6] socket: Clean up kdoc for sock_create() and sock_create_lite().
-Date: Mon, 19 May 2025 10:28:25 -0700
-Message-ID: <20250519173030.40491-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250519134309.35b1e007@pumpkin>
-References: <20250519134309.35b1e007@pumpkin>
+        d=google.com; s=20230601; t=1747675866; x=1748280666; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9k3rSkCOUuBoGczbRjC9e6BrYoiZJsdyvLLsXOGHPTE=;
+        b=2mtNDa2UCZjQd5G64gKNgvhl/EPIIqYesvKxSqxk/yd9DR4QkGrdBVqUGXgdXIBwrX
+         panzXFMmFo222Py+QFlkwUJaYiHleOo0qEfJThS/zYAZptw6HFm7+As7OjcU0KIeiobC
+         9ni2HzVPv1rSMkNomYUW9qHF2+76rgX8Oh6WByMEsqiwM9vrjgrdTZdW3+MnixVZGYhL
+         uaSQl0Mdx5BSnBGI5onxvmYic/cyEWh4sUeDLcKoMzeWRcsg5Pmy2DsqK1ixq9oChnC8
+         J2GZbQ3I6+ORpczhfawUkubTkqrees6WsYwIT3XwAL1hXne/QizzV9zd0hn2ZRsEMz+O
+         QCwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747675866; x=1748280666;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9k3rSkCOUuBoGczbRjC9e6BrYoiZJsdyvLLsXOGHPTE=;
+        b=oBwuT5t+obm6uQkb5jvbE31hbBSFZtdt/UaiB5ty+VHqGlzQ+TaQaL8rcoHkt7Nqaq
+         0U++sgHTYL5rNx+JyO73gHVrPwJgonM8Bm5+O4oDt2ZDRznemcymhJOyVuzmmfiNdtXZ
+         2CzvcN8czPinHj49hAkx1Ee7WNBM6qavQfJ53q72Kz26unfr9Z+edJDYi5921858Yo8r
+         VT+ODd3eBqdR1zQ1203aIUa6md6ySua9YTNRqBZKf6u6gZSJZR4rFFKejF/iJPPQNw1G
+         ZO+k0NaKeqiSSa/WEUbxQqVFOfH1zwJerdCyUw+KSOa1ZRHwFUR0/+uYPGHzuNytkDvX
+         MkCA==
+X-Gm-Message-State: AOJu0Yxtip3t4XXNNCRAUh7keP1TLB7yQbfflPDSCRHmzJh5+iRTJpuT
+	i2AckcXOObm5sGaxlNtWOZBgLIFYh1+w0nkJqK9GTBOQ7jQQorH9x8arpe5zF+rfZt056Ku2JLo
+	WM10U/jE4trh1jSOrjT8uYCiNxZAmwJJAJvxcokmw
+X-Gm-Gg: ASbGncvga39KLBOhrf+fJhZWtu4H1Zqag9RhUGZzhbpnXRx4wEON8WVvx601GdAgGHi
+	xlgxNNEQjW8LqGjMTjwI+yctd72SqG+50EyVqlUiuKhlI6FL+cTtCkrGuVFqN2QfRWn4aObp7k9
+	GMs4eZwk037ugl7vHc+ZStIimT3GPm8yZvPCFSMSo3TWJP
+X-Google-Smtp-Source: AGHT+IEEIZ5rIpCccmFXs6TxZYXiYRfp12vQO1P3n/ZqrkCa4SEVdMDrNAx9mJoPegE4qe9PiPx3y2eAjD4yYx4laKE=
+X-Received: by 2002:a17:903:2350:b0:21d:dd8f:6e01 with SMTP id
+ d9443c01a7336-23203ed3169mr4290135ad.5.1747675866236; Mon, 19 May 2025
+ 10:31:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D037UWC001.ant.amazon.com (10.13.139.197) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+References: <20250519023517.4062941-1-almasrymina@google.com>
+ <20250519023517.4062941-5-almasrymina@google.com> <aCtNYJo01UfMOLfr@mini-arch>
+In-Reply-To: <aCtNYJo01UfMOLfr@mini-arch>
+From: Mina Almasry <almasrymina@google.com>
+Date: Mon, 19 May 2025 10:30:52 -0700
+X-Gm-Features: AX0GCFufj5h-vFrrv9zQxEBaDXmM181og-1BYf2_XB1nm1053kjiQphd_FW10KQ
+Message-ID: <CAHS8izOMLm5jLr+778nY0AdFoOWPSb+UV+1sZmOkFb5SSqTGqg@mail.gmail.com>
+Subject: Re: [PATCH net-next v1 4/9] net: devmem: ksft: remove ksft_disruptive
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, David Ahern <dsahern@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, 
+	ap420073@gmail.com, praan@google.com, shivajikant@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: David Laight <david.laight.linux@gmail.com>
-Date: Mon, 19 May 2025 13:43:09 +0100
-> On Fri, 16 May 2025 20:50:27 -0700
-> Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
-> 
-> > __sock_create() is now static and the same doc exists on sock_create()
-> > and sock_create_kern().
-> > 
-> > Also, __sock_create() says "On failure @res is set to %NULL.", but
-> > this is always false.
-> > 
-> > In addition, the old style kdoc is a bit corrupted and we can't see the
-> > DESCRIPTION section:
-> > 
-> >   $ scripts/kernel-doc -man net/socket.c | scripts/split-man.pl /tmp/man
-> >   $ man /tmp/man/sock_create.9
-> > 
-> > Let's clean them up.
-> 
-> I think you need to absolutely explicit about which calls hold a reference
-> to 'net' and which don't.
+On Mon, May 19, 2025 at 8:25=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
+l.com> wrote:
+>
+> On 05/19, Mina Almasry wrote:
+> > As far as I can tell the ksft_disruptive here is unnecessary. These
+> > tests are largerly independent, and when one test fails, it's nice to
+> > know the results from all the other test cases.
+>
+> We currently don't do anything special for disruptive tests. I'm assuming
+> anything that changes nic configuration is disruptive and was thinking of
+> an option to run all disruptive tests at the end of the run. But so far w=
+e
+> haven't had any problem with mixing disruptive and non-disruptive tests,
+> so it's all moot. I'd prefer to keep everything as is for now (or remove
+> this whole disruptive category).
 
-I don't think so regarding sock_create() and sock_create_lite() because
+I've noticed that if all the tests are marked disruptive, and one test
+fails, the others don't run at all, which seems unnecessary. I'd like
+to see if the rx test passed if the tx one failed and vice versa for
+example. Removing the disruptive tag seems to resolve that.
 
-  1) sock_create() is only used for userspace, and we always
-     use current->nsproxy->net_ns, which must exist
+dmabuf bind is automatically unbound when ncdevmem exits, so i don't
+think these tests leave the nic in a bad state or anything that
+warrants blocking running the other tests?
 
-  2) sock_create_lite() does not create struct sock by itself, and
-     sock_create_lite() must be used with an already-created socket
-     by other sock_create() helpers, where kdoc says when you need netns ref:
-
----8<---
-/**
- * __sock_create_kern - creates a socket for kernel space
-...
- * @net MUST be alive as of calling __sock_create_kern().
-...
-/**
- * sock_create_kern - creates a socket for kernel space
-...
- * This MUST NOT be called from the __net_init path and @net MUST
- * be alive as of calling sock_create_net().
----8<---
-
-
-> 
-> This is separate from any user/kernel flag - and may need a second flag
-> (although there are probably only 3 options).
-> 
-> IIRC some sockets are created internally within the protocol code
-> and don't want to stop the 'net' being deleted.
-> Such code has to have a callback from the 'net delete' path to tidy up.
-> 
-> OTOH it is not unreasonable for other kernel activities (perhaps file
-> system mounts) to hold a ref count to stop the net being deleted.
-
-It's written in patch 2 and kdoc in patch 3.
+--=20
+Thanks,
+Mina
 
