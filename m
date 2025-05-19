@@ -1,128 +1,115 @@
-Return-Path: <netdev+bounces-191385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8917BABB57C
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 09:02:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76B78ABB5EC
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 09:15:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E7B83AE9B6
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 07:01:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C5323B8CB5
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 07:12:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7FD82459F1;
-	Mon, 19 May 2025 07:02:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jwCv114/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F8272686B1;
+	Mon, 19 May 2025 07:09:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3977C35946;
-	Mon, 19 May 2025 07:01:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DC27267B71
+	for <netdev@vger.kernel.org>; Mon, 19 May 2025 07:09:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747638121; cv=none; b=hOLcN9k3IPF5nZVqs0KdPriq9rRtygp+8UD44z8Rubg5cku7Ow5yj6j3cAuemq4ej0B8EmVAz1SrDixIqYq+1y9f1Y9STTQy+KvI7FYTeOB6zns0HMN52vyIpanWMsL7d6MkAP9KQ6Zn1W6xFLXRmf9H2+MrQHl4ixm0PSplz6M=
+	t=1747638561; cv=none; b=AFgBKhsX0Ml7YYX28r1NCiKztfs+8/tLLoZtWkPhIAIOjwU5LEUgLHVZs0OGEbAPxH5BvKRreFuf7J1VreWEx4mtCSxYxRbJXggzxpni+Hqhsv0JblK8CowwgzuURVRmIDyDyhaNY0vvTts+oHw2XGbMJvxSrHNnWy1soAsZ8UA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747638121; c=relaxed/simple;
-	bh=xUkod8gEgbX3i5MGZ9QfRvlui8/J9hSoRtS3NWtUZbI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YIYp+DDMPGM9tsWQk2S9tdMo6dLQm6neLYJf+FaFk2DW+yh3QKVdrwGdiYKOlB3SrIl5tT3xMQGIWLnGF/JERWRF8xiuH0sbm+Jl7KfLrfkA0Q4ufoCNLyvFXojSjbHKSwXxU9+1yRQlUGiyPaHoZrZrapbu7IPYmoGybcReHcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jwCv114/; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747638120; x=1779174120;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=xUkod8gEgbX3i5MGZ9QfRvlui8/J9hSoRtS3NWtUZbI=;
-  b=jwCv114/FWOYuRT2EXAHO2czu2Q64z80ZDaDk4aH8WYihTq2bzlcT+Yc
-   +KxkUhGicQvb6TrN1qCdkJjeNSNGXXryCYcXLqzyzV2DxwgUfrzgp62UL
-   VjrA2IXlIACAuCU5rbjqogPP8AV3JwdNVHYlr5hEIGdmvi2RM1ebKHwSF
-   5Sx65pTrOfTloZSuKPionLoGhVNQ71hzOk5oUXITVk6RwE46a7cVOUIhx
-   /KOwwMwYUNgYOq0exccU2nRiZ442SXy+L6kSd27L5x6mnxO1AkSf4JQln
-   H80YxJrAdIH5dGU59T+bJFZIyS7JkdJpCoYDgW0d1polpBoY5AIb3stgd
-   A==;
-X-CSE-ConnectionGUID: emfC8L1MS0OX7F7DTZgmIw==
-X-CSE-MsgGUID: ZYRKbBa6RrWZixvtpzr52Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11437"; a="49425942"
-X-IronPort-AV: E=Sophos;i="6.15,300,1739865600"; 
-   d="scan'208";a="49425942"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2025 00:02:00 -0700
-X-CSE-ConnectionGUID: S88TpiU7RKWvNFurnzFTxg==
-X-CSE-MsgGUID: 5OdMhunZRW2JAMDp2DHnDw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,300,1739865600"; 
-   d="scan'208";a="140183475"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2025 00:01:57 -0700
-Date: Mon, 19 May 2025 09:01:22 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: goralbaris <goralbaris@gmail.com>
-Cc: horms@kernel.org, allison.henderson@oracle.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, linux-rdma@vger.kernel.org,
-	pabeni@redhat.com, skhan@linuxfoundation.org,
-	shankari.ak0208@gmail.com, netdev@vger.kernel.org
-Subject: Re: [PATCH v3 net-next: rds] replace strncpy with strscpy_pad
-Message-ID: <aCrXQtrGMIntkcZs@mev-dev.igk.intel.com>
-References: <20250518090020.GA366906@horms.kernel.org>
- <20250518195328.14469-1-goralbaris@gmail.com>
+	s=arc-20240116; t=1747638561; c=relaxed/simple;
+	bh=vm+hcJxdjh6i738X2wL5tXux/qq/1w6rOzqwW0Jguhw=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=FeczPdsPH5vCZXQxdRQiwy+4/xOl8GzgogMIXKS+iOj+3ukI8icGmdYO3E2pxPK0fkWf8hjG3z91YSam0vvXosm/+fnoGgoPoCw6EwtwjJm5iARvvsijRuCa9sumh9xmjazgHjr8O8m2eRqD9yWfqxFzn7ZIB0k/+j3oIutQFMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.206.34.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas7t1747638496t188t54733
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [125.119.67.87])
+X-QQ-SSF:0000000000000000000000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 18046988283776760284
+To: "'Michal Swiatkowski'" <michal.swiatkowski@linux.intel.com>
+Cc: <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>,
+	<kuba@kernel.org>,
+	<edumazet@google.com>,
+	<davem@davemloft.net>,
+	<andrew+netdev@lunn.ch>,
+	<mengyuanlou@net-swift.com>
+References: <67409DB57B87E2F0+20250519063357.21164-1-jiawenwu@trustnetic.com> <aCrV/xlFlxoDsOVl@mev-dev.igk.intel.com>
+In-Reply-To: <aCrV/xlFlxoDsOVl@mev-dev.igk.intel.com>
+Subject: RE: [PATCH net-next] net: libwx: Fix log level
+Date: Mon, 19 May 2025 15:08:15 +0800
+Message-ID: <000301dbc88c$ca5757e0$5f0607a0$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250518195328.14469-1-goralbaris@gmail.com>
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQGCPLIqHUueQC3qKdJFIo7cu8OQXgDmen8/tIVrogA=
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: NjSyPD5q5D+NyKf/AIUpeh4B44I9sRtgg49KWuYt4NqujmPE1evAHKjk
+	2dHXFfMBzzjNZTUn5KDctcYQpZk+vfsIAofW6XLLHsgN5uYwNFiJ02IFEdpvy/xpqMsaW5L
+	ncUKxOaipoyBEJx5fbCk/FpsPqJzgMfP4AJv0BgR3q2z6b1lnrKznv4+gYXYKxJqbCr25dS
+	wZCLOLHqYPuUzhAze5XUUiwV+uhtT+rM6ApPKv4Ol6PG4Db8pCWyFATJ43G+aDeet30UE7h
+	7I0YeT8ZttSn33OJAKHM9+FiBaNP950ONugVjuCnYZBKVB01K9pMowCFLEXGDE1JxpFye0y
+	D4PriG87U4NkD2KKyr89tSDba/SoBEVswrw87pzW5qI3rXP3ppMl0a0Z1h03Q0yB7JiEnvP
+	6MlFhSkbxS2T1ry/fTeg7RApNU9Zj/5mtHIq5OlTwfYk4VW9zsKTzWRhK2OSjpQv4FtkpPO
+	Quj7AJ7LO9q4oiKDghR554WLU83gv2KXAnW+PsEeycFxwB02JYghLQRzZ5F73xQQS4npvKm
+	r7oF5VtigvecVf5jVestfiKrFi7rBmeBzLJteMQZ9a2op/lFFA/6VU0yWbg+ljnWDtMERyn
+	xoidyqNVdxbcvHlhZ6z0KWnDXVpHTWTns1iWBKlMK1A6Le2PR09f1/d2Q+Pv4rmRAQ52d0s
+	VIBdSmCm0u/otxDTfIBxz69Sk3W+nEBJX1weGjGtSPjSvYd0v8ogf5qqktIJrGKJOCOF4iE
+	pTJOUIiQy89jS8EhZ1Z+ygS84H3vMclihGcpqVshka16aUcAIouZ4JtRsytQlnhuDDwl7FB
+	UDcsCAcHE7igR/svHo/xuo/NgHqsI6cJgi2UCIpEYC7VX3lBqfDxO/UZBr+y/6NGKm5Z8DG
+	yJicCucdpmxTa7Iz2uhu11etF7BXyxTCAplit4RftQSZ/8vPGH+8QmTrRSwgLYSt5nJpG9y
+	NpulN1ujAdhTLggzPidPUohLnRH0FF/gjxLdwys4T2b3qN/DPV2QGZqEAuCAfNgXgS8rMdW
+	YOZtKu2GhWtfoCWRnc7mTaedgJQMCZ+pHR60VAlDQfjGfbm0QVCohSuUH3c2ATvQxkVKoNH
+	A99d1YPi0OX843FC867Muw=
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+X-QQ-RECHKSPAM: 0
 
-On Sun, May 18, 2025 at 10:53:29PM +0300, goralbaris wrote:
-> The strncpy() function is actively dangerous to use since it may not
-> NULL-terminate the destination string, resulting in potential memory.
-> Link: https://github.com/KSPP/linux/issues/90
+On Mon, May 19, 2025 2:56 PM, Michal Swiatkowski wrote:
+> On Mon, May 19, 2025 at 02:33:57PM +0800, Jiawen Wu wrote:
+> > There is a log should be printed as info level, not error level.
+> >
+> > Fixes: 9bfd65980f8d ("net: libwx: Add sriov api for wangxun nics")
+> > Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+> > ---
+> >  drivers/net/ethernet/wangxun/libwx/wx_sriov.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
+> > index 52e6a6faf715..195f64baedab 100644
+> > --- a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
+> > +++ b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
+> > @@ -76,7 +76,7 @@ static int __wx_enable_sriov(struct wx *wx, u8 num_vfs)
+> >  	u32 value = 0;
+> >
+> >  	set_bit(WX_FLAG_SRIOV_ENABLED, wx->flags);
+> > -	wx_err(wx, "SR-IOV enabled with %d VFs\n", num_vfs);
+> > +	dev_info(&wx->pdev->dev, "SR-IOV enabled with %d VFs\n", num_vfs);
+> >
+> >  	/* Enable VMDq flag so device will be set in VM mode */
+> >  	set_bit(WX_FLAG_VMDQ_ENABLED, wx->flags);
 > 
-> In addition, strscpy_pad is more appropriate because it also zero-fills 
-> any remaining space in the destination if the source is shorter than 
-> the provided buffer size.
-> 
-> Signed-off-by: goralbaris <goralbaris@gmail.com>
+> It is unclear if you want it to go to net, or net-next (net-next in
+> subject, but fixes tag in commit message). I think it should go to
+> net-next, so fixes tag can be dropped.
 
-There should be your full name, not nick.
+It is because the fixes tag commit is not merged in net yet, so I give it a prefix net-next.
 
-Feel free to add my RB tag
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-> ---
->  net/rds/connection.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/rds/connection.c b/net/rds/connection.c
-> index c749c5525b40..d62f486ab29f 100644
-> --- a/net/rds/connection.c
-> +++ b/net/rds/connection.c
-> @@ -749,8 +749,7 @@ static int rds_conn_info_visitor(struct rds_conn_path *cp, void *buffer)
->  	cinfo->laddr = conn->c_laddr.s6_addr32[3];
->  	cinfo->faddr = conn->c_faddr.s6_addr32[3];
->  	cinfo->tos = conn->c_tos;
-> -	strncpy(cinfo->transport, conn->c_trans->t_name,
-> -		sizeof(cinfo->transport));
-> +	strscpy_pad(cinfo->transport, conn->c_trans->t_name);
->  	cinfo->flags = 0;
->  
->  	rds_conn_info_set(cinfo->flags, test_bit(RDS_IN_XMIT, &cp->cp_flags),
-> @@ -775,8 +774,7 @@ static int rds6_conn_info_visitor(struct rds_conn_path *cp, void *buffer)
->  	cinfo6->next_rx_seq = cp->cp_next_rx_seq;
->  	cinfo6->laddr = conn->c_laddr;
->  	cinfo6->faddr = conn->c_faddr;
-> -	strncpy(cinfo6->transport, conn->c_trans->t_name,
-> -		sizeof(cinfo6->transport));
-> +	strscpy_pad(cinfo6->transport, conn->c_trans->t_name);
->  	cinfo6->flags = 0;
->  
->  	rds_conn_info_set(cinfo6->flags, test_bit(RDS_IN_XMIT, &cp->cp_flags),
-> -- 
-> 2.34.1
 
