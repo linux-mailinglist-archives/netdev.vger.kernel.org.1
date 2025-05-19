@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-191420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EC5EABB76C
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 10:38:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EEB1ABB76B
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 10:38:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52B2D188C60B
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 08:37:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7CF817A0B0
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 08:37:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9736C27055B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6957F270553;
 	Mon, 19 May 2025 08:33:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="jToyYKZv";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="AISqXRdl"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="jyCJknbi";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="D8Ck+jKI"
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1189E2701D4;
-	Mon, 19 May 2025 08:33:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6CE22701CF;
+	Mon, 19 May 2025 08:33:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747643614; cv=none; b=N9FbtUN+QDUirGa0DQfiZHJ9lZc+6NnYte5RKrH3aHfNzkFmKRjjUxnnxdevrX4gDG2TGJ0zCaFynIEYkEYZ7nrDQUQqip7kVYCYeTdk9x+tFFGpa90wWjKLAi7sxZ6S6Uf9UMkuTL1+jDQQBZBWKf1nA/Y+jev4dfM3Ne1InZA=
+	t=1747643614; cv=none; b=Q0UaVytRM7269C7CU9fzc4A8hlmi0H9uHj0zAvNN34ilvJtnzTuE/+HIapBWOD4OX48MDGxPvsl/MbXMIFv2SlKs+OBinjyCpyWqa+NyVhRvijwuu0xaRkri5MvGYQBtso0JMPNCxTIw/w90ECf9w/Mc/LJ3H8ijR8DsxHvGsmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1747643614; c=relaxed/simple;
-	bh=FM9ELVeqz4TUsKpyJHGSgjwI5KFnezd+C6Mvdegl1pE=;
+	bh=PFTKjntnYzQGNP+r1AaA3SG71QP/EDqas/WFTRwWtu8=;
 	h=Message-ID:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Date; b=Mun/nXjYsMEsogU5jeBDuoakyA/nkbbN5+s1wy7eR0olfQU7vaLDhVzf1DB2r1zlM0BxRhm0Gm4xSLa0rwpJ0C0Jlz2ZtDqwrK6ULmSTnTumge8f7hBc5dWJmz8q/PH+o3NivNkRfT6lZ4BKrlmZGEowt3OwwWMzXm+JXmy234M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=jToyYKZv; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=AISqXRdl; arc=none smtp.client-ip=193.142.43.55
+	 Content-Type:Date; b=TsXUgg47NWrSt8Tzv/IAgUCVcc4dLGD54yjnjhSY5oIYRAfBxZ7C6C+oDxa9nE9vti85DXMgXM0swj3tWjv2kj1/KUf/KV9mAA9ZdSpfLt/W1/L8DWd9q9Z6GKHFQZZPVrfNGCX54zrYcYwrBAGIcu7jcyz0eh3h5tdJBFE9Y1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=jyCJknbi; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=D8Ck+jKI; arc=none smtp.client-ip=193.142.43.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Message-ID: <20250519083026.411809421@linutronix.de>
+Message-ID: <20250519083026.472512636@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1747643610;
+	s=2020; t=1747643611;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 references:references; bh=1v1pAT49VMlkOWBDIvngj4OT88UyCqJmnvYZ4oJqhv4=;
-	b=jToyYKZvwkC3JcQOhodrq7x/nVjuIB9mBdYySunQp0g1n5qX26/crAoA5zXYHEmdjwvUVn
-	eajKLGOK2pYbrlY0xr2ucM/MqO4EdznL9sRpNWLAIB1p8XzI2E4rLHgD/X6j2FQhmH2TlF
-	ZYXUxWTVSA3C4MpGMMAFw9FAmnXkQgsBB1lc6QMEGKLlFnLI2cWX9kWWf8Z2qmvS4M73R5
-	bRbaiY/EXL2kI5zjDSHYeLjCPRdU3P441Cm6TJcc/jKlczRrcftpA6W7WfClEb0Vj8YEif
-	WgSCtRg/flT0MFpAYXvgDvCGazEXQGo8e0mWrQrKYy3WSGMiG2a3357AlXRZrg==
+	 references:references; bh=9QsTzgHBJ42Ub04898XgpgHcyA6q4XFW9DFcftyvhXU=;
+	b=jyCJknbipGhq0WYF9kbQEZInAVrWqqTybWVxaxUU3++la/wJ7sLxe9iCSiFq7EydiMz41r
+	oSw4ecJ9boJMsAUPUtvODZM/H8OvxH5iysRAZ+JLk3nPTFzUuW+glCsJZ6PUcEpZCs1teO
+	qD1RG1gboLnDkVGHgYX69QwTW3VBJevyK+zN5avbf6ubKIZxfvUAfuNG9ZfZNrNmVPR4Hv
+	TvOvZJftLxvfXi38HnnMNfcsWSGEo0O2uHVHgpW/c5ApfSpkGWL8jGzYq2KrpqkmbbBMg7
+	RD59CH20Usep82I0Fkozxd/mUSA8h26bkKHoo7hAFK2CYWzZw0NXDNYcT7NDnw==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1747643610;
+	s=2020e; t=1747643611;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 references:references; bh=1v1pAT49VMlkOWBDIvngj4OT88UyCqJmnvYZ4oJqhv4=;
-	b=AISqXRdlhD/0o0O59uRlbj36ghoiLIyq+rL/YHfoLNNc8vjLsKt/NNssM2uLaPjWmNo5p8
-	ogWD7EKVf6DCt+CQ==
+	 references:references; bh=9QsTzgHBJ42Ub04898XgpgHcyA6q4XFW9DFcftyvhXU=;
+	b=D8Ck+jKIrRW+Vf1dowxd3rPU0L3o/MzezbyxFwVtp+OskRxAnezubNYVH4CPPmW3JBQgD4
+	OZ7Mk7aeqUIKXVDQ==
 From: Thomas Gleixner <tglx@linutronix.de>
 To: LKML <linux-kernel@vger.kernel.org>
 Cc: netdev@vger.kernel.org,
@@ -66,7 +66,7 @@ Cc: netdev@vger.kernel.org,
  Kurt Kanzenbach <kurt@linutronix.de>,
  Nam Cao <namcao@linutronix.de>,
  Antoine Tenart <atenart@kernel.org>
-Subject: [patch V2 13/26] timekeeping: Provide ktime_get_ntp_seconds()
+Subject: [patch V2 14/26] ntp: Use ktime_get_ntp_seconds()
 References: <20250519082042.742926976@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -75,45 +75,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Date: Mon, 19 May 2025 10:33:30 +0200 (CEST)
+Date: Mon, 19 May 2025 10:33:31 +0200 (CEST)
 
-ntp_adjtimex() requires access to the actual time keeper per timekeeper
-ID. Provide an interface.
+Use ktime_get_ntp_seconds() to prepare for auxiliary clocks so that
+the readout becomes per timekeeper.
 
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 
 ---
- kernel/time/timekeeping.c          |    9 +++++++++
- kernel/time/timekeeping_internal.h |    3 +++
- 2 files changed, 12 insertions(+)
+ kernel/time/ntp.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 ---
---- a/kernel/time/timekeeping.c
-+++ b/kernel/time/timekeeping.c
-@@ -2627,6 +2627,15 @@ int do_adjtimex(struct __kernel_timex *t
- 	return ret;
- }
+--- a/kernel/time/ntp.c
++++ b/kernel/time/ntp.c
+@@ -303,7 +303,7 @@ static void ntp_update_offset(struct ntp
+ 	 * Select how the frequency is to be controlled
+ 	 * and in which mode (PLL or FLL).
+ 	 */
+-	real_secs = __ktime_get_real_seconds();
++	real_secs = ktime_get_ntp_seconds(ntpdata - tk_ntp_data);
+ 	secs = (long)(real_secs - ntpdata->time_reftime);
+ 	if (unlikely(ntpdata->time_status & STA_FREQHOLD))
+ 		secs = 0;
+@@ -710,7 +710,7 @@ static inline void process_adj_status(st
+ 	 * reference time to current time.
+ 	 */
+ 	if (!(ntpdata->time_status & STA_PLL) && (txc->status & STA_PLL))
+-		ntpdata->time_reftime = __ktime_get_real_seconds();
++		ntpdata->time_reftime = ktime_get_ntp_seconds(ntpdata - tk_ntp_data);
  
-+/*
-+ * Invoked from NTP with the time keeper lock held, so lockless access is
-+ * fine.
-+ */
-+long ktime_get_ntp_seconds(unsigned int id)
-+{
-+	return timekeeper_data[id].timekeeper.xtime_sec;
-+}
-+
- #ifdef CONFIG_NTP_PPS
- /**
-  * hardpps() - Accessor function to NTP __hardpps function
---- a/kernel/time/timekeeping_internal.h
-+++ b/kernel/time/timekeeping_internal.h
-@@ -45,4 +45,7 @@ static inline u64 clocksource_delta(u64
- unsigned long timekeeper_lock_irqsave(void);
- void timekeeper_unlock_irqrestore(unsigned long flags);
- 
-+/* NTP specific interface to access the current seconds value */
-+long ktime_get_ntp_seconds(unsigned int id);
-+
- #endif /* _TIMEKEEPING_INTERNAL_H */
+ 	/* only set allowed bits */
+ 	ntpdata->time_status &= STA_RONLY;
 
 
