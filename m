@@ -1,149 +1,147 @@
-Return-Path: <netdev+bounces-191663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D24B2ABCA3C
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 23:46:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2E35ABCA50
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 23:50:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6655167691
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 21:44:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BD9C3B3F8A
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 21:47:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFF3E21CC52;
-	Mon, 19 May 2025 21:40:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10AB1223313;
+	Mon, 19 May 2025 21:43:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="FUk12U+4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gsmHtKsz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36CA521CA1F
-	for <netdev@vger.kernel.org>; Mon, 19 May 2025 21:40:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5810622126A;
+	Mon, 19 May 2025 21:43:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747690854; cv=none; b=FcyDhElH51/Eg2kh8+rdOI5EqEYfKjyP/R0U16oTULTjYp+7YmQC8HbOQht7eulOeKwfPlKf9QIcBrfiyw+K4o9uLa9LKkFUiV+fl910LB1zC1EQzCJNmGo2cRxXcM/Z4oxZH45upLs3DZeFm+FB5em5lCrEoCgH3nq/+7J4jCc=
+	t=1747691018; cv=none; b=Bg4ruNRdkOFA/NvYeQfTENoczJIiROM8aDcP2KbVjp7dE+w2FPVeVip2CA0TUI72S+XMUJOc6j1/EYMHcBtaLw3iQHlC9ex4LmZR7arO6gC/3mbU98C4VxkFfi5NM4lcNZHMezawrMjNZyRB469Jr9IQkLkCqVnReeWFaEYXpt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747690854; c=relaxed/simple;
-	bh=/uFHROyI0Kx6jitpThXLN1Ib1Uivr9ksyUKL4WmI29o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IE6XZHxr3Z7lj61b9zi0/J2F+2lJjMtmIpkRock82RRVAAAlLS2V72mPuSrPVcfJ0q5/6K/oeSEd0hjwiut16xX4sU91kprGR5qmQ9VJTMFqfpXtaQQtLd+erFerEPKvM7DuVRDuPAh9jwhbdXaCFl1J9DVyFfBRn6gJVpQUnQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=FUk12U+4; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-742c5eb7d1cso2716005b3a.3
-        for <netdev@vger.kernel.org>; Mon, 19 May 2025 14:40:52 -0700 (PDT)
+	s=arc-20240116; t=1747691018; c=relaxed/simple;
+	bh=eoKyZZeh4dCJi1ifrO/HYH0EZs1icYueUurBrUQhaeQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ov5os74jB7S/V07Zk5AzngxIP7GoV3FgFtq3Em/zv0fdKw4Y7+8L0IylI7m16f6ZNLIbobrKVDJV3f9JfwbjD50nxLmbblwGyVOexvg8wYVeNF+kcd+/JzhyFHsP2aV36sYSRFBF3zJQc/VgCVNPIn2yotxEPD3nhy+q+5cU1uE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gsmHtKsz; arc=none smtp.client-ip=209.85.128.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-703cd93820fso44541027b3.2;
+        Mon, 19 May 2025 14:43:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1747690852; x=1748295652; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=yYGjiC5UDvQshFcMR9QcQxV0wJO+Bk3yzbRWhuFNt90=;
-        b=FUk12U+4MHwGpNgTckWCde8Xjcr7g7kL+QKe+MpPJEqbcYisVHTQ8+hD3d/djmtnd8
-         392x9McBRDrMOdrCNK5e24QmcLqBYpPhEw8snQHjSvA8rPVWI+C7YIINEwcljfIw2Mg3
-         5akCyAsVoGKTBlCiDECfOPIqrDIbdioPv+UJI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747690852; x=1748295652;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1747691015; x=1748295815; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yYGjiC5UDvQshFcMR9QcQxV0wJO+Bk3yzbRWhuFNt90=;
-        b=HbbgourshEcUQhVdrel1N7AhA3AgDDq2dfRGTBbJrFbFFZX/9t7ovAQvsnnyCYaaY9
-         loflWTyIVOHO7xIpCEcexbAfN8gzZZESUymX62SlyC8GzqM7E2fS2Rz8iXI/z9GWxcnN
-         wkO0dVdrhtL2PS32Fh+cHiKcHJ7g/sBH3xl08FfzjzNWD4TWOAPIshv3AJ8KTZ8/cktz
-         7ZrvGJkvPP8WUEnryAkDcx9gblTxk7tWiL8rlWD0Bg16Zgkf7niD56AbBMtmfiEy5XBQ
-         H5DHBfGs3Id/yT57dqElGhNLoeGL8S+c4DkAgNycgLVuGGwk96Dg/qI9ItpF7Qb706nV
-         kTmQ==
-X-Gm-Message-State: AOJu0Yz++AVD6of+3yBfqXeUOvdChdsHvT8PK854izBV++2oE+bhtaga
-	R8W1p/Ly+JvfAl6GNeWBrLmodhLOuaboXDCoU2YZdCme4u+7pIU5YIwpRl8G/Zg9WQ==
-X-Gm-Gg: ASbGncu3N8h+Mz+dXCCFiCfjyOz4sXFzPwsete/9NANyFgg8T/46cK6pGQcmnSLGkKT
-	wAmLwszgHYj0QSfFDd6DU5O/StMnd28EfzhS3h6SdhyKNJ5iY4RfttqNTSJpX4dJ6BTtHTSlu2F
-	TE5FiRbU1fpH7E3tHjlHMdSrvriN4IUnQt+M5RriffY2hBDnreQpEeqzQasEWm8CAJr5gUIU8vX
-	CwuyNbkDcMsNgUFXMD5sbYzkjJU15f1k1hfaxAyP1ZZLXLbtLrd6xam6FVyYtfbSnH2HPQmx/NR
-	EQsstLyy8ODXhV7nmM9B+JRXh50I4jY8QLO7K+bnNFT+IrMlRFVxrRXCHpo3lfXeYFHO+v+iAGt
-	mpbAXkCBTbYf/h+V/HuA2X0+pTA==
-X-Google-Smtp-Source: AGHT+IFFPdD3VsDwmbZYP05GQeqcTUN56P0IxA5walt+qDMfQ9wiMUpStXp4V+29gYmyjZ8WCx/tnQ==
-X-Received: by 2002:a05:6a00:a06:b0:72d:9cbc:730d with SMTP id d2e1a72fcca58-742a97d4650mr18312464b3a.11.1747690852374;
-        Mon, 19 May 2025 14:40:52 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-742a96dfa9dsm6931394b3a.10.2025.05.19.14.40.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 May 2025 14:40:51 -0700 (PDT)
-Message-ID: <dc9c76cf-64bf-434b-9f7b-af050822bfe5@broadcom.com>
-Date: Mon, 19 May 2025 14:40:50 -0700
+        bh=eoKyZZeh4dCJi1ifrO/HYH0EZs1icYueUurBrUQhaeQ=;
+        b=gsmHtKszgz6TJfDMsA/E/PLiNnMw0TSc1qklHbowRZVSLX4p7NUjTkKiWTfq6lKAqk
+         ewSHn33OCum5XU2xAFtKYBucDvJg6uUKxZV3DJiOubn5PfgPSwOAhPfUQdQSrYz0H2HY
+         zig3ufO0D5kq5qBudc+NoLXmzfV+H0W7Mx6XF4y4RDXq3O1SIS9lQj2Tlf4i93Y6WFd6
+         hzHZ3c8BV3UW9hQIxNRnIlDtKaYVeMSmKw6d0cnz+88Q3lZNfpxBoTYqayJ9SLGdNFjD
+         V1wMsJdF9iRMZPqEG3GM0hLe3lRFbKEHbsXTpJdExv5J/fl4o6tfCG9K9CuXm1TuKnXQ
+         yLrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747691015; x=1748295815;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eoKyZZeh4dCJi1ifrO/HYH0EZs1icYueUurBrUQhaeQ=;
+        b=r0dscLAlIjSgX/swd3GV/Ois7YHgA+IASguGj0nzwuB7s7y2uG40do6QtW//SvzqJI
+         H5K7nnnY9TVafZ/qlbVTu7LCHEkW0QOTw/4XDXIcmvjsYOq7BaMZejqPLFr2iTHexxO4
+         9ztIwdazlx+p9oErHyhPywrOQLZt+xcKP+ckhK3KonuBi8yCkKZHSnx25Lr38jacjiXV
+         j8KvQ0Kdiw62p8QShY/62JrDTPHXEPwQGwdWupxU1B2C0YgKUGro+k8o9tts8i19Iq1J
+         h/l3BGY51y7FByWbPYkuKKSLeW2w3kSZSo1Lwkax34ptfqbhaOHPRFvXFBT0fA7itftk
+         dH6g==
+X-Forwarded-Encrypted: i=1; AJvYcCWNU+zNnOJWLTJrhvewyVE0/8viNQ2gasH5+DJMao5fv+lqeuAjVf+l1vk+mU1+tVkXfK9fA8l4@vger.kernel.org, AJvYcCX1xn6RNqeneWaRRevoWo+GTDXm+bT3JG91zs5SXkaygpFh1dp3cXSZYRaRQQdXnvjM6PMgs6pfdior8OI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyE9uGpXZZbGRQ/xjeAL0O6bZ2OjQhyB+v8lybRvHdDwQYQMBwW
+	XCqOsZm5YPYa1BfAIIPZv4X2eOsNdVfBRFnRWBjN7jkqqeloB0eqLuYwLMprfpkRcXtrEVddVUR
+	3vN7BjkIUXifVH9yzJVQclr3Dv8WQHIw=
+X-Gm-Gg: ASbGncvV1zqw9px9xgkFexjbcl19PQvFIQDT73Dq2hR+IRsezdnjwpxTi+axKzBSIh2
+	p5jP9jz2xNWlltVP8JXcXWt48MxP+Ov8UIyupaL1th2vSW8vgR8O3wGfIX/Dq1M6ROOJct9ZcRb
+	Cxy7j/nv4x8HRQ8QvWMdZ3DpoeEwYfi7k=
+X-Google-Smtp-Source: AGHT+IEVUXmqrqf2co1CDu/Xmw3prCw0ZQz+oMhqZMl6b1KMNFNeeeKC4jcgxBIUdxXH/dECMmbWYTHGehpcjK3jYz8=
+X-Received: by 2002:a05:690c:951b:b0:708:35b1:d55b with SMTP id
+ 00721157ae682-70caaf38bc4mr144684617b3.8.1747691015300; Mon, 19 May 2025
+ 14:43:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 3/3] net: dsa: b53: allow RGMII for bcm63xx RGMII
- ports
-To: Jonas Gorski <jonas.gorski@gmail.com>,
- Florian Fainelli <florian.fainelli@broadcom.com>,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Vivien Didelot <vivien.didelot@gmail.com>,
- =?UTF-8?Q?=C3=81lvaro_Fern=C3=A1ndez_Rojas?= <noltari@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <20250519174550.1486064-1-jonas.gorski@gmail.com>
- <20250519174550.1486064-4-jonas.gorski@gmail.com>
-Content-Language: en-US
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20250519174550.1486064-4-jonas.gorski@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+ <20250519174550.1486064-3-jonas.gorski@gmail.com> <ed75677c-c3fb-41d1-a2cd-dd84d224ffe3@lunn.ch>
+ <CAOiHx=nwbs7030GKZHLc6Pc6LA6Hqq0NYfNSt=3zOgnj5zpAYQ@mail.gmail.com> <2e5e16a1-e59e-470d-a1d9-618a1b9efdd4@lunn.ch>
+In-Reply-To: <2e5e16a1-e59e-470d-a1d9-618a1b9efdd4@lunn.ch>
+From: Jonas Gorski <jonas.gorski@gmail.com>
+Date: Mon, 19 May 2025 23:43:24 +0200
+X-Gm-Features: AX0GCFs0Cd-tkQBXp_ukkEPbXXlQllmjZxbVCmyPTiMZwzFkGeq5Bg99ndcdFpg
+Message-ID: <CAOiHx=mQ8z1CO1V-8b=7pjK-Hm9_4-tcvucKXpM1i+eOOB4axg@mail.gmail.com>
+Subject: Re: [PATCH net 2/3] net: dsa: b53: fix configuring RGMII delay on bcm63xx
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Vivien Didelot <vivien.didelot@gmail.com>, =?UTF-8?B?w4FsdmFybyBGZXJuw6FuZGV6IFJvamFz?= <noltari@gmail.com>, 
+	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 5/19/25 10:45, Jonas Gorski wrote:
-> Add RGMII to supported interfaces for BCM63xx RGMII ports so they can be
-> actually used in RGMII mode.
-> 
-> Without this, phylink will fail to configure them:
-> 
-> [    3.580000] b53-switch 10700000.switch GbE3 (uninitialized): validation of rgmii with support 0000000,00000000,00000000,000062ff and advertisement 0000000,00000000,00000000,000062ff failed: -EINVAL
-> [    3.600000] b53-switch 10700000.switch GbE3 (uninitialized): failed to connect to PHY: -EINVAL
-> [    3.610000] b53-switch 10700000.switch GbE3 (uninitialized): error -22 setting up PHY for tree 0, switch 0, port 4
-> 
-> Fixes: ce3bf94871f7 ("net: dsa: b53: add support for BCM63xx RGMIIs")
-> Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
+On Mon, May 19, 2025 at 10:34=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote=
+:
+>
+> > > These changes look wrong. There is more background here:
+> > >
+> > > https://elixir.bootlin.com/linux/v6.15-rc7/source/Documentation/devic=
+etree/bindings/net/ethernet-controller.yaml#L287
+> >
+> > This is what makes it work for me (I tested all four modes, rgmii,
+> > rgmii-id, rgmii-txid and rgmii-rxid).
+>
+> So you have rgmii-id which works, and the rest are broken?
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+I have four rgmii ports with PHYs, I configured each one to a
+different mode (rgmii, rgmii-txid, rgmii-rxid, rgmii-id).
 
+Without this change no mode/port works, since there is always either a
+0 ns delay or a 4 ns delay in the rx/tx paths (I assume, I have no
+equipment to measure).
+
+With this change all modes/ports work. With "rgmii-id" the mac doesn't
+configure any delays (and the phy does instead), with "rgmii" it's
+vice versa, so there is always the expected 2 ns delay. Same for rxid
+and txid.
+
+Though on testing again RGMII_CTRL_TIMING_SEL doesn't seem to be needed.
+
+> > E.g. with a phy-mode of "rgmii-id", both b53 and the PHY driver would
+> > enable rx and tx delays, causing the delays to be 4 ns instead of 2
+> > ns. So I don't see how this could have ever worked.
+>
+> In this situation, the switch port is playing the role of MAC. Hence i
+> would stick to what is suggested in ethernet-controller.yaml. The MAC
+> does not add any delays, and leaves it to the PHY.
+> phylink_fwnode_phy_connect() gets the phy-mode from the DT blob, and
+> passes it to phylib when it calls phy_attach_direct().
+>
+> There is a second use case for DSA, when the port is connected to the
+> host, i.e. the port is a CPU port. In that setup, the port is playing
+> the PHY side of the RGMII connection, with the host conduit interface
+> being the MAC. In that setup, the above recommendations is that the
+> conduit interface does not add delays, with the expectation the 'PHY'
+> adds the delays. Then the DSA port does need to add delays. So you
+> might want to use dsa_is_cpu_port() to decide if to add delays or not.
+
+The Switch is always integrated into the host SoC, so there is no
+(r)gmii cpu port to configure. There's basically directly attached DMA
+to/from the buffers of the cpu port. Not sure if there are even
+buffers, or if it is a direct to DMA delivery.
+
+Best Regards,
+Jonas
 
