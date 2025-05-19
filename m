@@ -1,260 +1,161 @@
-Return-Path: <netdev+bounces-191638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62A76ABC8A6
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 22:52:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 327A8ABC8C5
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 22:58:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B94731B60722
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 20:52:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5A737A4DDF
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 20:58:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C47321ABA3;
-	Mon, 19 May 2025 20:52:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D934420F09B;
+	Mon, 19 May 2025 20:58:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="MdKEOgQ2"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="dlXds4fZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.denx.de (mx.denx.de [89.58.32.78])
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4EC9217705;
-	Mon, 19 May 2025 20:52:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8DC11A3142
+	for <netdev@vger.kernel.org>; Mon, 19 May 2025 20:58:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747687940; cv=none; b=kqQN+opIIYIAIsmCw6uTZdl7GVIGuXa8ie+odnqwaEQXMePPvIOqexzuchZd8lq9CFGXIXrzRdtEplBABNo7QPM1aIAbES7HIv5pcvvi9+sCHJEn1ciG22mEcY8ejNGEtMI/8yQxpUhWhrrfDCBmqJljY7cg6Qyb2l8OtTPv0Xs=
+	t=1747688322; cv=none; b=ZzeASs7KCWewDy5vlTwXtmlNGUZFq4kuKQcmYvRGiPts2RUWQoGPNvspOcZy+uJgH9Y6JzeTcY7AzK2WVsQVk53igMVwA42UePZjIeQ1KNuCnHaDO1kCupMusTAbnAkCXH3H+zzH9s1UiF5Ppvb0OC/E3nB+zpC5iDAa2TTCp+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747687940; c=relaxed/simple;
-	bh=GHBvbY3fgn9tKe86kfPJG/2c8/ck7nOT9M0uEfF+cv0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IaPHWM4YP62R7QBdY1+Qd8448PDujNWLIcnGztClXjTh3GS+vUPRTU7PGTMPtxcj+8E2OSiLZvVc4x2vx/q0q8c3yCy+JUYORiER13ThTy5yOOHw1f70HIeoGpD9RTWh2UdimMm4pYr7eY1+5FPr1udrEWs55k9LQbt36CK1iHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=MdKEOgQ2; arc=none smtp.client-ip=89.58.32.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E433C1039728C;
-	Mon, 19 May 2025 22:52:10 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1747687934; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=xi0fa9hZtQ3xUfjh/Fd+6H85XEzvRV9KyKLSSoEBIho=;
-	b=MdKEOgQ2NYMapNfr6nWpzieFKGxPSRJvQ75R1YB86etandc2/tz4Gw51ZJxeKtPDcCGFZm
-	jps1OdMdqB19S7kvfimr8bHMPMia877rQmTJ0/EMDs81TVfUyi8P7ogE5ksjtvTzzzMdjd
-	SxuV+oa002NkrORXIibfJc2D6cDRzgS89bkKjuiVmE4mKMwnLlAswiicF780OX3xQ0uYiI
-	4FD0zTngteBD5df6JzSt5bsNDpA2+yF2qwg5EQvU9/ATfcdAOLVX3n85Cdyb6BOPFKixc5
-	V27CH5iBzELG9fL7mGxX3yGwyf2NqPflDDyDitP7wOF1dKfUIuSSz/uQQV+6pw==
-Date: Mon, 19 May 2025 22:52:08 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
- <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, Richard Cochran
- <richardcochran@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
- <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>, Andrew Lunn
- <andrew@lunn.ch>
-Subject: Re: [net-next v11 4/7] net: mtip: The L2 switch driver for imx287
-Message-ID: <20250519225208.50d60df5@wsk>
-In-Reply-To: <20250516075402.5104a0b6@wsk>
-References: <20250504145538.3881294-1-lukma@denx.de>
-	<20250504145538.3881294-5-lukma@denx.de>
-	<61ebe754-d895-47cb-a4b2-bb2650b9ff7b@redhat.com>
-	<20250513073109.485fec95@wsk>
-	<20250516075402.5104a0b6@wsk>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1747688322; c=relaxed/simple;
+	bh=DGVVNLUPiV6sfCkOjR1kFN4cvMpzJzSd2+Cn81PX+DU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UxOGC9ZNQIzSDTbyKBx+XQ2Y7pva2Tvp9/TkgmkdDZ0fuXYrbJPjcyBMwteuirDptvcP3m6Shi3KlqWAqIU+nVLpgoQpsvnj9QtAx88MSODM1y9WAdPAkeV8J1RIA8epItpHhPzZNT6qO1kzc/YsG12162gT8eaGetlggxA6mCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=dlXds4fZ; arc=none smtp.client-ip=52.95.48.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1747688321; x=1779224321;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=LX+A+TF2YaUaML0OBh3WkqCAUk5Kf1+3fS2xP+7bdHo=;
+  b=dlXds4fZcj1exX2VDLVSKaDOxfHBQzMneXrPNLd3kxNLRbxPXxADFiSL
+   fFtluV0DdR+3NlkzKiFg4PE3as+2TU4eNoPXOZrOlFhdvLkMd4sfhrM3e
+   yB3pwiRVVKnOSwbvE0YH+Q24lz22SHO7ck/gV6klwPFjfQRePeG4qLI+k
+   kJ6QJsFxJi7jLGXqj5kMegTa+y2O5G2Y+dpVkhHO+QfNShQj+kxJ32KWR
+   F54Py66h3Dz9G9qytRm0Xc2h+wt5lbZQKCccaiJLAApp+Vy/nMgqjAKKU
+   NeVsbBfWyKeNTkIYESv+PxJm60XM8SkyKe9Ra9bz7oVth9fLPfL0QCBeH
+   w==;
+X-IronPort-AV: E=Sophos;i="6.15,301,1739836800"; 
+   d="scan'208";a="491753854"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2025 20:58:38 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:38469]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.3.83:2525] with esmtp (Farcaster)
+ id 2ecddace-722c-4cd4-9ff7-db78378df367; Mon, 19 May 2025 20:58:37 +0000 (UTC)
+X-Farcaster-Flow-ID: 2ecddace-722c-4cd4-9ff7-db78378df367
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 19 May 2025 20:58:36 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.142.169.18) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 19 May 2025 20:58:34 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>
+CC: Simon Horman <horms@kernel.org>, Christian Brauner <brauner@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v5 net-next 0/9] af_unix: Introduce SO_PASSRIGHTS.
+Date: Mon, 19 May 2025 13:57:51 -0700
+Message-ID: <20250519205820.66184-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/TOeu=qW_6zT9zkkN5+sCnzY";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D041UWA003.ant.amazon.com (10.13.139.105) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
---Sig_/TOeu=qW_6zT9zkkN5+sCnzY
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+As long as recvmsg() or recvmmsg() is used with cmsg, it is not
+possible to avoid receiving file descriptors via SCM_RIGHTS.
 
-Hi Paolo,
+This series introduces a new socket option, SO_PASSRIGHTS, to allow
+disabling SCM_RIGHTS.  The option is enabled by default.
 
-> Hi Paolo,
->=20
-> > Hi Paolo,
-> >  =20
-> > > On 5/4/25 4:55 PM, Lukasz Majewski wrote:   =20
-> > > > +		/* This does 16 byte alignment, exactly what we
-> > > > need.
-> > > > +		 * The packet length includes FCS, but we don't
-> > > > want to
-> > > > +		 * include that when passing upstream as it
-> > > > messes up
-> > > > +		 * bridging applications.
-> > > > +		 */
-> > > > +		skb =3D netdev_alloc_skb(pndev, pkt_len +
-> > > > NET_IP_ALIGN);
-> > > > +		if (unlikely(!skb)) {
-> > > > +			dev_dbg(&fep->pdev->dev,
-> > > > +				"%s: Memory squeeze, dropping
-> > > > packet.\n",
-> > > > +				pndev->name);
-> > > > +			pndev->stats.rx_dropped++;
-> > > > +			goto err_mem;
-> > > > +		} else {
-> > > > +			skb_reserve(skb, NET_IP_ALIGN);
-> > > > +			skb_put(skb, pkt_len);      /* Make
-> > > > room */
-> > > > +			skb_copy_to_linear_data(skb, data,
-> > > > pkt_len);
-> > > > +			skb->protocol =3D eth_type_trans(skb,
-> > > > pndev);
-> > > > +			napi_gro_receive(&fep->napi, skb);
-> > > > +		}
-> > > > +
-> > > > +		bdp->cbd_bufaddr =3D
-> > > > dma_map_single(&fep->pdev->dev, data,
-> > > > +
-> > > > bdp->cbd_datlen,
-> > > > +
-> > > > DMA_FROM_DEVICE);
-> > > > +		if (unlikely(dma_mapping_error(&fep->pdev->dev,
-> > > > +
-> > > > bdp->cbd_bufaddr))) {
-> > > > +			dev_err(&fep->pdev->dev,
-> > > > +				"Failed to map descriptor rx
-> > > > buffer\n");
-> > > > +			pndev->stats.rx_errors++;
-> > > > +			pndev->stats.rx_dropped++;
-> > > > +			dev_kfree_skb_any(skb);
-> > > > +			goto err_mem;
-> > > > +		}     =20
-> > >=20
-> > > This is doing the mapping and ev. dropping the skb _after_ pushing
-> > > the skb up the stack, you must attempt the mapping first.   =20
-> >=20
-> > I've double check it - the code seems to be correct.
-> >=20
-> > This code is a part of mtip_switch_rx() function, which handles
-> > receiving data.
-> >=20
-> > First, on probe, the initial dma memory is mapped for MTIP received
-> > data.
-> >=20
-> > When we receive data, it is processed and afterwards it is "pushed"
-> > up to the network stack.
-> >=20
-> > As a last step we do map memory for next, incoming data and leave
-> > the function.
-> >=20
-> > Hence, IMHO, the order is OK and this part shall be left as is. =20
->=20
-> Is the explanation sufficient?
+See patch 8 for background/context.
 
-I would do appreciate your feedback as your OK is required to prepare
-v12, so I would had the opportunity to have this patch set accepted to
-net-next before cut-off date.
+This series is related to [0], but is split into a separate series,
+as most of the patches are specific to af_unix.
 
-Thanks in advance for your help.
+The v2 of the BPF LSM extension part will be posted later, once
+this series is merged into net-next and has landed in bpf-next.
 
->=20
-> >  =20
-> > >    =20
-> > > > +static void mtip_free_buffers(struct net_device *dev)
-> > > > +{
-> > > > +	struct mtip_ndev_priv *priv =3D netdev_priv(dev);
-> > > > +	struct switch_enet_private *fep =3D priv->fep;
-> > > > +	struct sk_buff *skb;
-> > > > +	struct cbd_t *bdp;
-> > > > +	int i;
-> > > > +
-> > > > +	bdp =3D fep->rx_bd_base;
-> > > > +	for (i =3D 0; i < RX_RING_SIZE; i++) {
-> > > > +		skb =3D fep->rx_skbuff[i];
-> > > > +
-> > > > +		if (bdp->cbd_bufaddr)
-> > > > +			dma_unmap_single(&fep->pdev->dev,
-> > > > bdp->cbd_bufaddr,
-> > > > +					 MTIP_SWITCH_RX_FRSIZE,
-> > > > +					 DMA_FROM_DEVICE);
-> > > > +		if (skb)
-> > > > +			dev_kfree_skb(skb);     =20
-> > >=20
-> > > I suspect that on error paths mtip_free_buffers() can be invoked
-> > > multiple consecutive times with any successful allocation in
-> > > between: skb will be freed twice. Likely you need to clear
-> > > fep->rx_skbuff[i] here.   =20
-> >=20
-> > +1 - I will add it with v12.
-> >  =20
-> > >=20
-> > > Side note: this patch is way too big for a proper review: you need
-> > > to break it in multiple smaller ones, introducing the basic
-> > > features separately.
-> > >=20
-> > > Cheers,
-> > >=20
-> > > Paolo
-> > >    =20
-> >=20
-> >=20
-> >=20
-> >=20
-> > Best regards,
-> >=20
-> > Lukasz Majewski
-> >=20
-> > --
-> >=20
-> > DENX Software Engineering GmbH,      Managing Director: Erika Unter
-> > HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell,
-> > Germany Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email:
-> > lukma@denx.de =20
->=20
->=20
->=20
->=20
-> Best regards,
->=20
-> Lukasz Majewski
->=20
-> --
->=20
-> DENX Software Engineering GmbH,      Managing Director: Erika Unter
-> HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-> Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email:
-> lukma@denx.de
+[0]: https://lore.kernel.org/bpf/20250505215802.48449-1-kuniyu@amazon.com/
 
 
+Changes:
+  v5:
+    * Patch 4
+      * Fix BPF selftest failure (setget_sockopt.c)
+
+  v4: https://lore.kernel.org/netdev/20250515224946.6931-1-kuniyu@amazon.com/
+    * Patch 6
+      * Group sk->sk_scm_XXX bits by struct
+    * Patch 9
+      * Remove errno handling
+
+  v3: https://lore.kernel.org/netdev/20250514165226.40410-1-kuniyu@amazon.com/
+    * Patch 3
+      * Remove inline in scm.c
+    * Patch 4 & 5 & 8
+      * Return -EOPNOTSUPP in getsockopt()
+    * Patch 5
+      * Add CONFIG_SECURITY_NETWORK check for SO_PASSSEC
+    * Patch 6
+      * Add kdoc for sk_scm_unused
+      * Update sk_scm_XXX under lock_sock() in setsockopt()
+    * Patch 7
+      * Update changelog (recent change -> aed6ecef55d7)
+
+  v2: https://lore.kernel.org/netdev/20250510015652.9931-1-kuniyu@amazon.com/
+    * Added patch 4 & 5 to reuse sk_txrehash for scm_recv() flags
+
+  v1: https://lore.kernel.org/netdev/20250508013021.79654-1-kuniyu@amazon.com/
 
 
-Best regards,
+Kuniyuki Iwashima (9):
+  af_unix: Factorise test_bit() for SOCK_PASSCRED and SOCK_PASSPIDFD.
+  af_unix: Don't pass struct socket to maybe_add_creds().
+  scm: Move scm_recv() from scm.h to scm.c.
+  tcp: Restrict SO_TXREHASH to TCP socket.
+  net: Restrict SO_PASS{CRED,PIDFD,SEC} to AF_{UNIX,NETLINK,BLUETOOTH}.
+  af_unix: Move SOCK_PASS{CRED,PIDFD,SEC} to struct sock.
+  af_unix: Inherit sk_flags at connect().
+  af_unix: Introduce SO_PASSRIGHTS.
+  selftest: af_unix: Test SO_PASSRIGHTS.
 
-Lukasz Majewski
+ arch/alpha/include/uapi/asm/socket.h          |   2 +
+ arch/mips/include/uapi/asm/socket.h           |   2 +
+ arch/parisc/include/uapi/asm/socket.h         |   2 +
+ arch/sparc/include/uapi/asm/socket.h          |   2 +
+ include/linux/net.h                           |  15 +--
+ include/net/scm.h                             | 121 +----------------
+ include/net/sock.h                            |  32 ++++-
+ include/uapi/asm-generic/socket.h             |   2 +
+ net/core/scm.c                                | 122 ++++++++++++++++++
+ net/core/sock.c                               |  63 +++++++--
+ net/unix/af_unix.c                            |  96 +++++++-------
+ tools/include/uapi/asm-generic/socket.h       |   2 +
+ .../selftests/bpf/progs/setget_sockopt.c      |  11 ++
+ .../selftests/net/af_unix/scm_rights.c        |  80 +++++++++++-
+ 14 files changed, 362 insertions(+), 190 deletions(-)
 
---
+-- 
+2.49.0
 
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/TOeu=qW_6zT9zkkN5+sCnzY
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmgrmfgACgkQAR8vZIA0
-zr09nAf+PrG7I521kkXUYZKC2dEjxU/q4ixwas9hAklmPl5J8w3C7wiM5/X4unzo
-vgyoBo1oGToGHEV79FZkeZxn/MF9YXMrKl2WEAaLyNhHpKeusus4my0xt1Ao/Q9R
-dkyM0jAeOSnUNpcIl0zhOmgEyBzPFPeRMz263XvTekvJet3E/gTAPHHc1Cg2PfA1
-EyxCnsiGy4aHuPJGg+zMhVHxWkt1awEIwSwEZu5O4OtjpUAqfllFn4eiapelBHb7
-Z7IM3C1tqdvKGO8lU9nqIoBnYpU9ZzZcg4N27morc9NfrAbF0KlJr/a+pxbM7ptD
-rXo54/GaGqwWVq3BcFVpWi3OD+9oJA==
-=WWM9
------END PGP SIGNATURE-----
-
---Sig_/TOeu=qW_6zT9zkkN5+sCnzY--
 
