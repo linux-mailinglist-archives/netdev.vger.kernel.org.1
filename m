@@ -1,142 +1,128 @@
-Return-Path: <netdev+bounces-191543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191542-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 744C5ABBE52
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 14:53:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A96FAABBE4B
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 14:52:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BC687A129C
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 12:52:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46CD53BB53F
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 12:51:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5B87274673;
-	Mon, 19 May 2025 12:52:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DA82278E47;
+	Mon, 19 May 2025 12:52:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jO31Gd22"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LaytfcXk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA91D1C683;
-	Mon, 19 May 2025 12:52:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A398278E42;
+	Mon, 19 May 2025 12:52:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747659164; cv=none; b=dsMNLjFaIQhT/stPtRGjjNiDSB1CqudOnMQyLcsykb/s3lFWVV5AZsa9Wnb3DskvHLZj7ln3qsJM8xbYynrhsaiQg7Mo1dNze/e0RmoRshLl2RaUf8+WDkiZUI4XL+U08zXTWLG7hZ4KhRBIcRnEwXPjNb4uCUTgd6MBFcEKcZo=
+	t=1747659124; cv=none; b=eLWAb00Ca3aN9vUvNpPYBhGM82hUkJ0JulFdyeAo09fwctxEyxVzE4ZC3FesRSjyCOxkZ9fClc3HijFgj/MtX8O/3sZKsnNae1JBqyOM5LT/mXtpIfyqBK1x6j1YPgZDT8+AjUscvYX/Qtqbrvs6xwz1SDTmuM76EFq3q1w3YDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747659164; c=relaxed/simple;
-	bh=kh44kyMOcaqgQ/Jctem92JY8R9/ZQzrh5hu2Jorx4Nk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nrY44682F9ZBYQKcjuOtVoFnjXsxKMGwQhw9iX45cmI9tblrBQwohArzmhCCd5dfUW+NwO+7vgjzS7wszVCtvIcalDmNOIZXni22LE9eP9DOaRWOVaBvXvPQ0exHSu8kDDob3+56ztxUj7vVfENNs+iM15lb0lSO9n4p+v0/6HQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jO31Gd22; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3a365a68057so1857614f8f.0;
-        Mon, 19 May 2025 05:52:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747659161; x=1748263961; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WOhymhbVYgW8k7keXP/n1X5vmyztYmP2bMRzhPjvLGQ=;
-        b=jO31Gd224mqq9DfEjOi10dSRnprdfn2pppfB8FXu3d/jif32LQCoFncFFZuqiuhpUJ
-         KtJh8boXhmPkrj6c/Gl6h4zNGSawCX3NYlaYoGADItFlo1lkUhjsUv8GpoUMNq+36j3l
-         0Oeur2JXERpvTJ3ghAx+NXunJTxZ7oukm9kaNbWJAtu38veZXril2PxndtThBQ3Yrhnj
-         5yatQIXJVhXVFULQx0EtSz4VtaYziiqaSfN2Il6MpqClTpqSiLQjYCY1zmxvPecmbgo8
-         KRDqHXQbcGhR98QuhVLge0iYISYRNOMTCWQ9ZpPRxxX1c8VyF7RdJ0HufPP0YQm6efjQ
-         sabw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747659161; x=1748263961;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WOhymhbVYgW8k7keXP/n1X5vmyztYmP2bMRzhPjvLGQ=;
-        b=fDMN6YMIqrUroJ2a63mjWMUb3nP4ne9V2AHudYuXIsq0OzVQeOapTw3o9g3aKyvEwZ
-         9O8uxTXyezxDFw5HvSQylQe4a7ag4reCRgA2sLX8J3ZVNiwzvoPKV4f+vZ0c3H5QXM78
-         Dz8jk1dzvwuLawMyINuIGS4k3c1ECo6MxL80kbM58D2fdHqRXzBCaMzW91zSsFwtknsx
-         UDplDjZ46GcwkeKM1QjX1U9izVSz3PQEd4lmVCYpuqin24tOWbvv6uDNw2COVwOLydbr
-         3fIZtr5H5x0cGayjY3D0/CrBYhM0fwc40nkxXVIOfFEWjtixXKEXu/b5OGo1Gz+BJxIn
-         7EbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVrdPeAiV7POxP6FI1VYnOMp5AtNIMgPFryktRBzzteox/uAjzn6ViER2/PalnFNWvvovrkWTQ1@vger.kernel.org, AJvYcCXRXV+DSxuRze+jvO3e1WBS0wsgFdyz4BDtiCUt6J2QaIP+cH4oeYNGzLWEXbGSCwFcxulOX/FlTi54@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAIc93l81p96EFE4T0M9m/OjAnLyktZMGUGX0Bes9a0h/xfan6
-	fhampSk+NVV2Ma4vnRIQ+YvDZQzqUFDg6D6vbHm1YoZ4LyZcypz/EyRb
-X-Gm-Gg: ASbGncvq42UCvr+ZWaGe98y1pooKu5oo27nxSwmnT419J9vUSuFfiDLsYoqIOg3rdqZ
-	bPbOkEVNsUgvTmLkb81qgV26SzRZTv1yC1ZwhU2WEPwpzMgAYw4p1STzOGN7nV+jSTNnqxjB86L
-	PHqkjqiu/9ivL/3NZ7V/HAK0IMDfaTurVYJSx75OU4OaVl3rIP4RKWdg8Wn5y5zbqpKUPxd/Ptj
-	w0Nxi3XizpC5p56HgniKcCNwxddZ2ZMzexrrBm0fI7NvvO26hASYYSnw+G2sPaqWUKy4kPhEmtL
-	HBSv6Fb/VOFHuy9gMsTtNetcgEO0yr4Z+PkN/n3uav1s7YyiGNVgrMNQFbV2vX0=
-X-Google-Smtp-Source: AGHT+IH++MoGiR/jcXllwZDfhYiEreWaRp8wN3RQS5F3l+90nrzVplEoMOk0J3to6PpIvypqn/Sfqg==
-X-Received: by 2002:a05:6000:2211:b0:3a3:70ec:e1fb with SMTP id ffacd0b85a97d-3a370ece386mr2550128f8f.29.1747659161044;
-        Mon, 19 May 2025 05:52:41 -0700 (PDT)
-Received: from localhost.localdomain ([78.172.0.119])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a35ca5abaesm12799939f8f.39.2025.05.19.05.52.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 May 2025 05:52:40 -0700 (PDT)
-From: Baris Can Goral <goralbaris@gmail.com>
-To: michal.swiatkowski@linux.intel.com
-Cc: allison.henderson@oracle.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	goralbaris@gmail.com,
-	horms@kernel.org,
-	kuba@kernel.org,
-	linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	shankari.ak0208@gmail.com,
-	skhan@linuxfoundation.org
-Subject: [PATCH v4 net-next: rds] replace strncpy with strscpy_pad
-Date: Mon, 19 May 2025 15:51:53 +0300
-Message-Id: <20250519125151.24618-1-goralbaris@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <aCrXQtrGMIntkcZs@mev-dev.igk.intel.com>
-References: <aCrXQtrGMIntkcZs@mev-dev.igk.intel.com>
+	s=arc-20240116; t=1747659124; c=relaxed/simple;
+	bh=sfW3T+vo1+Sy5qSz9UXUWZ/rKPHP36qwJ6NQxledKXc=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=b8blglemLLbUb/RTphTFywEXAyh2WJbNSH8S4JiALbAKSb9PeE+aIuXSldXOrrsN1Bnmbpyle2kZlfMSdjZP6BRftke+sE313rOZqiehXc+prxeIMlMErKJB19PWiOX5WFeMxWHKCArmoc4vgdP9r2+2OmYLN2xsMzcM7QQ4TUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LaytfcXk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EBB1C4CEE4;
+	Mon, 19 May 2025 12:51:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747659123;
+	bh=sfW3T+vo1+Sy5qSz9UXUWZ/rKPHP36qwJ6NQxledKXc=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=LaytfcXkBzo1JYDQs1kmjiB56pSbeBrNpE1LgdKpfoBYR7YKFhKD9Bq3bsqCJDRSf
+	 z0gNVal+VZjmhk7VaDxwzKWhxzyst5z21AIBYa0/738kxOnm+OmFrscu7UuMiOcqXA
+	 p11542j4iuWbGQ/bLfONlyLRJ5WJMhqbOIpjX5JXAYOchJIAP7wVHW00T6lPIzojCE
+	 ZoBQ71JIORNKtRyIBOFBiytUppWc2I2o6A0QczLMHs1D8RYwHV34MAC5R9Sr94EJ9K
+	 F/1YvKtkmP2+jJv1UzbbF/ZJcsqTA6cWW3NPdrwfzxUdIk8FWML5xxTU+CTIo/m+xq
+	 Jm+31dgbaxPMQ==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 19 May 2025 14:51:55 +0200
+Message-Id: <DA05GA6QUD1R.1XR0GFPLNXPTQ@kernel.org>
+Cc: <ansuelsmth@gmail.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+ <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+ <robh@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
+ <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+ <florian.fainelli@broadcom.com>, <bcm-kernel-feedback-list@broadcom.com>,
+ <kabel@kernel.org>, <andrei.botila@oss.nxp.com>, <tmgross@umich.edu>,
+ <ojeda@kernel.org>, <alex.gaynor@gmail.com>, <boqun.feng@gmail.com>,
+ <gary@garyguo.net>, <bjorn3_gh@protonmail.com>, <benno.lossin@proton.me>,
+ <a.hindborg@kernel.org>, <aliceryhl@google.com>, <dakr@kernel.org>,
+ <sd@queasysnail.net>, <michael@fossekall.de>, <daniel@makrotopia.org>,
+ <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <rust-for-linux@vger.kernel.org>
+Subject: Re: [net-next PATCH v10 7/7] rust: net::phy sync with
+ match_phy_device C changes
+From: "Benno Lossin" <lossin@kernel.org>
+To: "FUJITA Tomonori" <fujita.tomonori@gmail.com>
+X-Mailer: aerc 0.20.1
+References: <D9YO3781UI2X.1CI7FG1EATN8G@kernel.org>
+ <20250519.210059.2097701450976383427.fujita.tomonori@gmail.com>
+ <DA051LGPX0NX.20CQCK4V3B6PF@kernel.org>
+ <20250519.214449.1761137544422192991.fujita.tomonori@gmail.com>
+In-Reply-To: <20250519.214449.1761137544422192991.fujita.tomonori@gmail.com>
 
-The strncpy() function is actively dangerous to use since it may not
-NULL-terminate the destination string, resulting in potential memory.
-Link: https://github.com/KSPP/linux/issues/90
+On Mon May 19, 2025 at 2:44 PM CEST, FUJITA Tomonori wrote:
+> On Mon, 19 May 2025 14:32:44 +0200
+> "Benno Lossin" <lossin@kernel.org> wrote:
+>>>>> The other use case, as mentioned above, is when using the generic hel=
+per
+>>>>> function inside match_phy_device() callback. For example, the 4th
+>>>>> patch in this patchset adds genphy_match_phy_device():
+>>>>>
+>>>>> int genphy_match_phy_device(struct phy_device *phydev,
+>>>>>                            const struct phy_driver *phydrv)
+>>>>>
+>>>>> We could add a wrapper for this function as phy::Device's method like
+>>>>>
+>>>>> impl Device {
+>>>>>     ...
+>>>>>     pub fn genphy_match_phy_device(&self, drv: &phy::DriverVTable) ->=
+ i32=20
+>>>>=20
+>>>> Not sure why this returns an `i32`, but we probably could have such a
+>>>
+>>> Maybe a bool would be more appropriate here because the C's comment
+>>> says:
+>>>
+>>> Return: 1 if the PHY device matches the driver, 0 otherwise.
+>>>
+>>>> function as well (though I wouldn't use the vtable for that).
+>>>
+>>> What would you use instead?
+>>=20
+>> The concept that I sketched above:
+>>=20
+>>     impl Device {
+>>         fn genphy_match_phy_device<T: Driver>(&self) -> bool {
+>>             self.phy_id() =3D=3D T::PHY_DEVICE_ID.id
+>>         }
+>>     }
+>
+> I think there might be a misunderstanding.
+>
+> Rust's genphy_match_phy_device() is supposed to be a wrapper for C's
+> genphy_match_phy_device():
+>
+> https://lore.kernel.org/rust-for-linux/20250517201353.5137-5-ansuelsmth@g=
+mail.com/
 
-In addition, strscpy_pad is more appropriate because it also zero-fills
-any remaining space in the destination if the source is shorter than
-the provided buffer size.
+Oh yeah you're right. But using `DriverVTable` for that doesn't sound
+nice...
 
-Signed-off-by: Baris Can Goral <goralbaris@gmail.com>
 ---
- net/rds/connection.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
-
-diff --git a/net/rds/connection.c b/net/rds/connection.c
-index c749c5525b40..d62f486ab29f 100644
---- a/net/rds/connection.c
-+++ b/net/rds/connection.c
-@@ -749,8 +749,7 @@ static int rds_conn_info_visitor(struct rds_conn_path *cp, void *buffer)
- 	cinfo->laddr = conn->c_laddr.s6_addr32[3];
- 	cinfo->faddr = conn->c_faddr.s6_addr32[3];
- 	cinfo->tos = conn->c_tos;
--	strncpy(cinfo->transport, conn->c_trans->t_name,
--		sizeof(cinfo->transport));
-+	strscpy_pad(cinfo->transport, conn->c_trans->t_name);
- 	cinfo->flags = 0;
- 
- 	rds_conn_info_set(cinfo->flags, test_bit(RDS_IN_XMIT, &cp->cp_flags),
-@@ -775,8 +774,7 @@ static int rds6_conn_info_visitor(struct rds_conn_path *cp, void *buffer)
- 	cinfo6->next_rx_seq = cp->cp_next_rx_seq;
- 	cinfo6->laddr = conn->c_laddr;
- 	cinfo6->faddr = conn->c_faddr;
--	strncpy(cinfo6->transport, conn->c_trans->t_name,
--		sizeof(cinfo6->transport));
-+	strscpy_pad(cinfo6->transport, conn->c_trans->t_name);
- 	cinfo6->flags = 0;
- 
- 	rds_conn_info_set(cinfo6->flags, test_bit(RDS_IN_XMIT, &cp->cp_flags),
--- 
-2.34.1
-
+Cheers,
+Benno
 
