@@ -1,105 +1,101 @@
-Return-Path: <netdev+bounces-191511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35A42ABBAF0
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 12:20:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16881ABBAA3
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 12:08:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4CAF87A8887
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 10:19:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B07DA168528
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 10:08:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2958274FFE;
-	Mon, 19 May 2025 10:19:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF14F269D0A;
+	Mon, 19 May 2025 10:08:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FW9NavSS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fyIxmRBU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE354274FE6
-	for <netdev@vger.kernel.org>; Mon, 19 May 2025 10:19:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5EAF1E9906;
+	Mon, 19 May 2025 10:08:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747649979; cv=none; b=TAFWB5ukRBxbB7yzseY+tcUrLRJbFhVLHNFjUnJz7SxZL3JDjCyHK1a6Y6njBZvEy+PIALQhIyTz9REsOUtlCGsz4Oa5sY8EIg/4rQ1A+W/CWhQWl1oY+9EMEVjyTUuB56rAKxMKEqkl+ZEj3Co48y5+cXFLhUTRPgCrayakoJ8=
+	t=1747649290; cv=none; b=ppbft2i29rlWCTxSrodwPWPaad+Atpl99d5BcCanPBxPbS17V1tFk1+6ks1WU23uVIh+sbh/XeCt4z7S3lHvyiWBNZPoIkUW7FOsI0G3tkLPCVgo2cxQS9ppCRVms52TEV8yyB7eO9/y5EQFIkYcTXeRSAhkTESEEE9p+WCOEbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747649979; c=relaxed/simple;
-	bh=kO8G3sy6c+3MCSlYI9JrwQb+k7zTplAkBbpVGJQRU74=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=XsU0gp4whcxJ7Xzzr1vqXIqkv6rBSlm8dqFggMeB0xXbKinWAX77bGfRzsi6ZS+4kpx21wAo3Ax9LL5rf6sw8dxD5TT5UTwYTik87uDST+CBSDNycsqE8Hcql5bD4j2FjVywpFpqARCkmmr6XSmN/FdnuQqTiwU0+3xK1Vsd+ZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FW9NavSS; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-441ab63a415so46911395e9.3
-        for <netdev@vger.kernel.org>; Mon, 19 May 2025 03:19:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747649976; x=1748254776; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kO8G3sy6c+3MCSlYI9JrwQb+k7zTplAkBbpVGJQRU74=;
-        b=FW9NavSSVbsKQa7yF1hwB6PyjuJ5mUZTTwwhjdXoCW1eYHKD7/qANDxhSTpAw2PfrV
-         TDx3jPliYmHB0kW6itoG1iuu8wiHsD0u4xXf28wPznvVBdxFXxFcHAQXhhQhIbm3GczB
-         oDk+Dkgp4Ma1e69E6G50T/hw1nXlO9FnCOjRDqMyxhQ3qu1PCpX4IUvEBwNYS3uUTybz
-         qAu2pxaF6Nw/TA58fqDI7q7ARl24lhH+VpAfYI1h380VeqL2iuPEDdsxPzd+FvuyGjAR
-         TRdnOnUL4IWppGdhal1tuOIXaUccyRK43FLMkpueTJjbbHxzyF/z1QndbG7ZBP5yeTMg
-         Jp9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747649976; x=1748254776;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kO8G3sy6c+3MCSlYI9JrwQb+k7zTplAkBbpVGJQRU74=;
-        b=e7wc90gV22TIOf01HVZ88vnv9zRPOHC3hk1VMDUl2NZSdrIbvgEySo7YHJ4CQ4iXwi
-         LblkQcHgeQ/wu2oRVdANOszeqpG3NNS3Z2HrVgILM2nI9vG7tdVAhnLJL8uzRhtVdHxP
-         yzy628NW16McvA4+oSycu1syHDZzhEz03LkWD/vL+ADRCi+8pbapAqh1M1XHjNHQukU1
-         E9XFMhYB4dbNWJOyeA0oHI2ttPLj4InVGw6hXJAxXo6B5neEeLuWxN0zR1zZpaNK0ZBt
-         EftKOT/k7KDcv4Dxm5uFc1Qb+JgORcoKe1cIcQSfdlM065W+MHgggeGLITRXOL83mSKG
-         lFaw==
-X-Forwarded-Encrypted: i=1; AJvYcCX3e+EyFAjGN0KFvOtd8OzPDIBK14L38ew38d66e86t8W1S6v+kSLQ0xNmhRtkCmEQirtLMN70=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzs7KkVaANNw2rxCpzKGQMvuSQPOD7QPZkJBadHKE1+djDBXS5O
-	6SbQNJQgrUPJ33XvzxjX6X3e5HT5SxFfjuo4a4cRL6V+E5j3dlsILO6v
-X-Gm-Gg: ASbGncvSPzgry5+VlPcjgBpPRLZiYTvAfmo7z2De1fICcxllNB5/g20d3Pm+Ws7igo3
-	6SMjjlenAGc6ozv8CmEG3B7ZRKV09XlBp03ncHNs8ubcZa6O4gcGGi7nSUdkv7+3GqityZiquca
-	f7dngrxyqWjAU2wI9E0knvxIpe4ZVbgg1IWfl2MEcsdrtMowDiMEND0Cbwmd2Z3RNxuG9NwJapl
-	OXlsXKOS6XLbpRDCqwKQJdyoKpetZ7dm9vLBE0UBo/ktohfJ2cj1WjYL5UlZ3yRG2CJY6jKkEj2
-	YOenXP331+06Y1RKmzmYP1c58XNF2mH0xSANy3YognbUZIy6T26pvq+pMTwzEMO6VUf/7oRrQ0Y
-	=
-X-Google-Smtp-Source: AGHT+IG7SqVCqnPWKiD+U2bMAjcTts8ji/txGFOJrFZME2cYq1mwP7KfNaLtYoxWCBhTQh6BjxcWMQ==
-X-Received: by 2002:a05:600c:1c87:b0:43d:4686:5cfb with SMTP id 5b1f17b1804b1-442feebf434mr85377775e9.27.1747649976062;
-        Mon, 19 May 2025 03:19:36 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:d5e9:e348:9b63:abf5])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442f8ab839esm165108005e9.17.2025.05.19.03.19.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 May 2025 03:19:35 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
-  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
-  jacob.e.keller@intel.com,  sdf@fomichev.me,  jstancek@redhat.com
-Subject: Re: [PATCH net-next 10/11] netlink: specs: tc: add qdisc dump to TC
- spec
-In-Reply-To: <20250517001318.285800-11-kuba@kernel.org> (Jakub Kicinski's
-	message of "Fri, 16 May 2025 17:13:17 -0700")
-Date: Mon, 19 May 2025 10:27:07 +0100
-Message-ID: <m27c2dj6hg.fsf@gmail.com>
-References: <20250517001318.285800-1-kuba@kernel.org>
-	<20250517001318.285800-11-kuba@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1747649290; c=relaxed/simple;
+	bh=wL+5PnBKqpKcg8WZY/24OfXz24Tyva4tqhKg/S7c2A0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JQniIw+vBKxrp3kvOZeMwpyuTVI8DZJvMLriwidBaJ/rWS4XAt638sF/zRf1ezexHg8hZ8ol9OUAnt7F45z8nXOTcYaCafIqyBqY7s+LbRIGusb5PRZ4OxuWIGosl/yjnfuZa+FNVdeRh71N5BJ8EZyDWSatoK/rj1LDIdVpYjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fyIxmRBU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F544C4CEE4;
+	Mon, 19 May 2025 10:08:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747649290;
+	bh=wL+5PnBKqpKcg8WZY/24OfXz24Tyva4tqhKg/S7c2A0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fyIxmRBUNTWLWC8pnAJ9DzSmLwOckyInVq5KSXN7KGIGPwqQc4JpQoEsE+gj//PfG
+	 kHU3IQlcwO/cP5YsGqbLgfDAVe2twWHQW04h56uSaa9yOUto86rpJXl+xPZ8Zl8lWp
+	 P2N6pH1W/MB7Omm8UXNGVBaBo7K2pc1QcThFjEyaIAefJ94kb/gEhjJlr9seeGuCcM
+	 E2De76g0pjTqtM9ab/2iySGcjx1txxOT+IS7EKlS1N6R/6/rFPWe/fEoha8yVzKIl8
+	 PGXKVlv+RWTfGgHJU+Q43BgiuaB12DEAasAAMlyzH9XlEuv9EswvF7wQW3HeP1PMya
+	 n74Srx+wlVlCQ==
+Date: Mon, 19 May 2025 11:08:03 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Sumanth Gavini <sumanth.gavini@yahoo.com>
+Cc: krzk@kernel.org, bongsu.jeon@samsung.com, cw00.choi@samsung.com,
+	myungjoo.ham@samsung.com, lee@kernel.org, lgirdwood@gmail.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/6] fix: Correct Samsung 'Electronics' spelling in
+ copyright headers
+Message-ID: <3aa30119-60e5-4dcb-b13a-1753966ca775@sirena.org.uk>
+References: <20250518085734.88890-1-sumanth.gavini.ref@yahoo.com>
+ <20250518085734.88890-1-sumanth.gavini@yahoo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="1JBMmA2tdEPES3PJ"
+Content-Disposition: inline
+In-Reply-To: <20250518085734.88890-1-sumanth.gavini@yahoo.com>
+X-Cookie: We have ears, earther...FOUR OF THEM!
 
-Jakub Kicinski <kuba@kernel.org> writes:
 
-> Hook TC qdisc dump in the TC qdisc get, it only supported doit
-> until now and dumping will be used by the sample code.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+--1JBMmA2tdEPES3PJ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+On Sun, May 18, 2025 at 01:57:26AM -0700, Sumanth Gavini wrote:
+> This series fixes the misspelling of "Electronics" as "Electrnoics"
+> across multiple subsystems (MFD, NFC, EXTCON). Each patch targets
+> a different subsystem for easier review.
+>=20
+> The changes are mechanical and do not affect functionality.
+
+Please don't combine unrelated patches like this into a series that
+crosses subsystems, it just makes it more confusing how things are
+going to get applied and if there's dependencies. Just send things
+separately to each subsystem.
+
+--1JBMmA2tdEPES3PJ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmgrAwIACgkQJNaLcl1U
+h9DFnwf/XjcxEKF2KSmebB4Y0RFqowuduWRbFUGux971QxPXN02FXJDhen91BqiO
+RjnTHmUbbkQiHs2kealN4P1k3ousMoAPdIcpFUQG2vt59BPfuyJCpsbKXzogUBOF
+OYKz9N5JHxx/zxQ4C7xuS+FnZyEQIQoni+FDFLKQQOUWfqS4g+bYg1RPMs7YOHVs
+Gr3eJQHE7eQk4ISHEmErCGHIIWaZ/XXHrNtGP4ZZvRWHQb76hXTxumwtoE+waIR+
+Of+4V3ODuX7PqXeF5XbY8PRicptJhsuSVhuuuqdmQNgd5Gne4THhnmnddi1tud3f
+L5GC9XUhs0xhl9ilsvANYvNjIR/Xdw==
+=dDHu
+-----END PGP SIGNATURE-----
+
+--1JBMmA2tdEPES3PJ--
 
