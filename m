@@ -1,100 +1,78 @@
-Return-Path: <netdev+bounces-191582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3E57ABC4E6
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 18:50:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C28AABC503
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 18:55:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E4783AE447
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 16:50:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AE10175F70
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 16:55:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79AF328641D;
-	Mon, 19 May 2025 16:50:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4664428853A;
+	Mon, 19 May 2025 16:55:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NhqhzXWk"
 X-Original-To: netdev@vger.kernel.org
-Received: from leonov.paulk.fr (leonov.paulk.fr [185.233.101.22])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9091E573F;
-	Mon, 19 May 2025 16:50:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.233.101.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A04A28852D;
+	Mon, 19 May 2025 16:55:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747673439; cv=none; b=bRVE3oB1LE/78RrrqGGq51P0mSnX1rfLDBQvVLho7gDll/QEQr1xCDBDbEs5PIzCqoG5AE5Oqhu61KtnPCNXUgHltPnPne2AYQEommlhqKFZKTHFrYrdZpXnrVW4ZNGO+ODmNBg8Z3hXuZpuvkjLJjx8eNULE7LoBBp278Tt0iM=
+	t=1747673736; cv=none; b=HoYbZNEEai26A2Py2ZUo55Rf4aGHmGk8t3ziYz4p5yzazkmFpSfbe6Y8LJBCD4NyBgQzmJOxGu7eDyevvh+5LplqRFloO+eRnvwhCt14nW4klsYxqGnVKj7T0lEG+WOtDHmBVRQueEqAX7BztXAixKPXyAGPP3TMPxJDC+X4aKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747673439; c=relaxed/simple;
-	bh=DhnCSKYnCcHJP7adP7B7aiXP352DFFSnM0q4AZoM1Bg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rlP7kL54GUAiy+FAo1WFFqTKK+Eqev612tSlh7B3FRsQ/rmxCUgxRR3EhKCbC7xiGDOsMgpLpbC2pmkSaKtgWcfMRSh/1Gnv1obwOFk2Jodjn7wQLk+LB2xhYfV5EgBvDGNSu6i6mmycR0nXhpRysWaKJ1RMlcJq0rYWI1z7cyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sys-base.io; spf=pass smtp.mailfrom=sys-base.io; arc=none smtp.client-ip=185.233.101.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sys-base.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sys-base.io
-Received: from laika.paulk.fr (12.234.24.109.rev.sfr.net [109.24.234.12])
-	by leonov.paulk.fr (Postfix) with ESMTPS id CB8071F00050;
-	Mon, 19 May 2025 16:50:32 +0000 (UTC)
-Received: by laika.paulk.fr (Postfix, from userid 65534)
-	id 495AFAC2ABA; Mon, 19 May 2025 16:50:31 +0000 (UTC)
-X-Spam-Level: *
-Received: from localhost.localdomain (unknown [192.168.1.64])
-	by laika.paulk.fr (Postfix) with ESMTP id 4EB52AC2ABA;
-	Mon, 19 May 2025 16:49:43 +0000 (UTC)
-From: Paul Kocialkowski <paulk@sys-base.io>
-To: netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-sunxi@lists.linux.dev,
+	s=arc-20240116; t=1747673736; c=relaxed/simple;
+	bh=VzPNWlfyeCWo7o+KEHwNHpSZQp69P7Gy1mri66l5Kys=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=irK2l4ZKuW9GQ7Lcb+Y5MGocBILDuIVVp6zoB8xNR9aEqcfMzWImRMQdiwPEsHs4E8faH5CZUz25pbOFSZndr20IZ+mP9ZmkuXrVvpl1VKc855sI4Xu79vcgbfFOuw5chE+rjfGBNFW3C4ICTUxpl12uv+dAafqpCms0q9CtEAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NhqhzXWk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 273DEC4CEE4;
+	Mon, 19 May 2025 16:55:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747673734;
+	bh=VzPNWlfyeCWo7o+KEHwNHpSZQp69P7Gy1mri66l5Kys=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NhqhzXWkWyh1ZNOYnmnBsJpCAzy/JTCM2NOnyRc9xarl1uJ6yUEu4MvFndXBQPhaA
+	 0fR5/K96WomU3ltcvv0YxiNR/3cbdgyHulNHnybsSOY0y1LEbfZWwnYb2HrdVQDq21
+	 nQuVcuOS8VOEdpj/l6w6bFn+NZJxic95gUtXyQD3AnAAOGu3eZzsmLAJxdbTOmnhyY
+	 SLZnHBKJNMMLmJKXaYZTR2YoYHB41kKYGpM2prWeoL6/cw9MVJY4NiBT2352o6JfP3
+	 7VgJfwuGOgNy6Klr25esBKQmlpfh2lG0cuprEIp/+vJGkSn25hKk2QlKYoh7tPaC+N
+	 Ma4wLFRbbPbSQ==
+Date: Mon, 19 May 2025 17:55:30 +0100
+From: Simon Horman <horms@kernel.org>
+To: Sumanth Gavini <sumanth.gavini@yahoo.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org,
+	willemb@google.com, petrm@nvidia.com, sdf@fomichev.me,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Corentin Labbe <clabbe.montjoie@gmail.com>,
-	Paul Kocialkowski <paulk@sys-base.io>
-Subject: [PATCH] net: dwmac-sun8i: Use parsed internal PHY address instead of 1
-Date: Mon, 19 May 2025 18:49:36 +0200
-Message-ID: <20250519164936.4172658-1-paulk@sys-base.io>
-X-Mailer: git-send-email 2.49.0
+Subject: Re: [PATCH] selftests: drv-net: Fix "envirnoments" to "environments"
+Message-ID: <20250519165530.GM365796@horms.kernel.org>
+References: <20250516225156.1122058-1-sumanth.gavini.ref@yahoo.com>
+ <20250516225156.1122058-1-sumanth.gavini@yahoo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250516225156.1122058-1-sumanth.gavini@yahoo.com>
 
-While the MDIO address of the internal PHY on Allwinner sun8i chips is
-generally 1, of_mdio_parse_addr is used to cleanly parse the address
-from the device-tree instead of hardcoding it.
+On Fri, May 16, 2025 at 03:51:48PM -0700, Sumanth Gavini wrote:
+> Fix misspelling reported by codespell
+> 
+> Signed-off-by: Sumanth Gavini <sumanth.gavini@yahoo.com>
 
-A commit reworking the code ditched the parsed value and hardcoded the
-value 1 instead, which didn't really break anything but is more fragile
-and not future-proof.
+Thanks,
 
-Restore the initial behavior using the parsed address returned from the
-helper.
+With this change this file appears to be codespell-clean.
 
-Fixes: 634db83b8265 ("net: stmmac: dwmac-sun8i: Handle integrated/external MDIOs")
-Signed-off-by: Paul Kocialkowski <paulk@sys-base.io>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-index 85723a78793a..6c7e8655a7eb 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-@@ -964,7 +964,7 @@ static int sun8i_dwmac_set_syscon(struct device *dev,
- 		/* of_mdio_parse_addr returns a valid (0 ~ 31) PHY
- 		 * address. No need to mask it again.
- 		 */
--		reg |= 1 << H3_EPHY_ADDR_SHIFT;
-+		reg |= ret << H3_EPHY_ADDR_SHIFT;
- 	} else {
- 		/* For SoCs without internal PHY the PHY selection bit should be
- 		 * set to 0 (external PHY).
--- 
-2.49.0
-
+...
 
