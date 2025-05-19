@@ -1,85 +1,72 @@
-Return-Path: <netdev+bounces-191395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D5E2ABB618
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 09:22:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A2B6ABB625
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 09:28:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8228A188F52B
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 07:22:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C75F189639A
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 07:28:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 551062690FA;
-	Mon, 19 May 2025 07:21:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B53CB266B59;
+	Mon, 19 May 2025 07:27:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ge61jM1L"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="k18YC5ty"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 852312676D5;
-	Mon, 19 May 2025 07:21:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECAE5F4E2;
+	Mon, 19 May 2025 07:27:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747639267; cv=none; b=R1AyGSgkvziuLBkFig1EQHcBg97AcAouKbH6jqZj7Dl7568/xAI43eUbKDvkiCw2sB/wC2wzdz8Ded35ZlRpVpC41qN3eJnzb70UzjLfTAk0vpr2MsaLdtxtLu69aau43PdshZoLZAbayOn97GSF6wKLKlTXUWDiwmt6av696Gs=
+	t=1747639651; cv=none; b=R/ezFuNyB+svdsK/MDkw5p4MkJkmSakCfaLjlbMbWH7rZoV6wgFuvIHaQjNsNEBsHTs3giVntK+qmALWYLV9OycJzl6quyGsb+FmBBVmwCsvId+IWM0uOUyELfedpjlBQFMbT/iR0M9QN66kIU2JW9Delh46PPhSNxsTEaYK/HI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747639267; c=relaxed/simple;
-	bh=PXzwswM7zeCQGH43r5Hb+tLm48f6r20TC+9wRh21xZc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Nv2Dhjpq8q+WwQCATklKKLnPbleGHwion6OO4hVmIR0ZQqxnECjpzdwWIcAisqtA1L1uEF335D9wTykUjpySiH872iAVFBkiypConaZwr+uZLU85Fc3oiRROBbw6TTATE/yeLlpgUM+MGF/VpZ/NEHZN13pPGyvdZVeKRVtEpLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ge61jM1L; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747639265; x=1779175265;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=PXzwswM7zeCQGH43r5Hb+tLm48f6r20TC+9wRh21xZc=;
-  b=ge61jM1LyRskNvvBIRJtdmsZbeZ71kusX+e9au89w2CNgek2jrys2sDG
-   6ESpN+rx1dMnBhjLPKGXSnsZQITB14q5crn7bD26fAMkG8sh5F3Ajmc1G
-   kzuu8X5JuFIfkO6SPi+GejDqIwTNyhQwEXp69r1JZDlPneIQUK/kUPIKo
-   E0BchKyhHs5XK3M20PJYNq7icgE7IItrRtcG3jngIZzazT003dX5+3xco
-   RJa3sGJgrobMjdkXNfTaRxPudH77RtPhHodrDpau9Wj1Sii/oGdXyFpIu
-   7uXEkFZYQ2GQ2E6sWz6ydji8ihUfwGo0sW07leUWaKXfMiYkzbUkQoo9i
-   A==;
-X-CSE-ConnectionGUID: Iyy1sRelSRCGz3P8SMWpvg==
-X-CSE-MsgGUID: 75lPGIUmSNOfkyJqo9lToQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11437"; a="72030778"
-X-IronPort-AV: E=Sophos;i="6.15,300,1739865600"; 
-   d="scan'208";a="72030778"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2025 00:21:05 -0700
-X-CSE-ConnectionGUID: mmpoC57BR9uND73U9O8tew==
-X-CSE-MsgGUID: 2EcW9jtTSHC2bVPaerrckw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,300,1739865600"; 
-   d="scan'208";a="139798887"
-Received: from mohdfai2-ilbpg12-1.png.intel.com ([10.88.227.73])
-  by orviesa007.jf.intel.com with ESMTP; 19 May 2025 00:21:02 -0700
-From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Simon Horman <horms@kernel.org>,
-	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Chwee-Lin Choong <chwee.lin.choong@intel.com>
-Subject: [PATCH iwl-next v3 7/7] igc: add preemptible queue support in mqprio
-Date: Mon, 19 May 2025 03:19:11 -0400
-Message-Id: <20250519071911.2748406-8-faizal.abdul.rahim@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250519071911.2748406-1-faizal.abdul.rahim@intel.com>
-References: <20250519071911.2748406-1-faizal.abdul.rahim@intel.com>
+	s=arc-20240116; t=1747639651; c=relaxed/simple;
+	bh=BOnEr9Rl2fHLZ5/jEW+mTH4Vq9hJYeh90JsFlGFCPaU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=aH7uzoo3nBg1UhbjblpFjSuckXaOkkYrzrvK8/27PhG/ydtFAHtUJS9/p0+RuvR8t+yMKUBahFtsDQFKK8tvhvKcGbKNVE9bwfPT8+nZfSsqnLVckN8kxDXBTUHsogz+7gFyq/KgvklbH8xehhU9cS/P1wVYjlTlb7iyuXUhfaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=k18YC5ty; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54J1HIkR017553;
+	Mon, 19 May 2025 00:27:08 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=Xk63N9eSkVMHuKTHBf+krYV
+	UirUlULcHk8wZOb2zrvA=; b=k18YC5ty1+iDXs33TviiCJRO68N2dZUdd7eM4N2
+	tCVf9wts/Pzmsv1HhwfTGPKXxRtuWN+OM54/ys1Y+C9rj/uTMjBEfQQQmWOGa4Fu
+	v+DF1PYbWUjAyplT8RdN5YfQaOAIdl6fgPBYZobKy3VaQW8WYAbcjdRozUFK1W0R
+	aI+isx2rv3aJ+WFKbKFvzFEwfcxSpqw7JjGH5yqRLvxBLX3ISqoJlyqXfyB6KJKc
+	U91p2RLProYSNTv/HMOBnOcYgtIHmLUJYZ/QbXMPbPk/DBmzfPaHK7r88snl22hz
+	r6LlD/1DUR7G0MXwUsiJMjkDbTmDjvmvjQd0WaJX0stjyRA==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 46qb799dcc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 19 May 2025 00:27:08 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Mon, 19 May 2025 00:27:07 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 19 May 2025 00:27:07 -0700
+Received: from localhost.localdomain (unknown [10.28.36.166])
+	by maili.marvell.com (Postfix) with ESMTP id E61733F7080;
+	Mon, 19 May 2025 00:27:02 -0700 (PDT)
+From: Suman Ghosh <sumang@marvell.com>
+To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <bbhushan2@marvell.com>,
+        <andrew+netdev@lunn.ch>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC: Suman Ghosh <sumang@marvell.com>
+Subject: [net PATCH] octeontx2-pf: Avoid adding dcbnl_ops for LBK and SDP vf
+Date: Mon, 19 May 2025 12:56:58 +0530
+Message-ID: <20250519072658.2960851-1-sumang@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,94 +74,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: zoK2cDfe-H6ph1Q6rJKPlnM7g0oJt5lY
+X-Proofpoint-ORIG-GUID: zoK2cDfe-H6ph1Q6rJKPlnM7g0oJt5lY
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTE5MDA2OSBTYWx0ZWRfX+sJsjopTO48u BBPeqcJX/WXcChDXaAOHir4NVHnociEVRGF5YUG8cW/83q79y0tBwK6BmW1fuCttPdFMts+/U+k +G8T4HqhjrzKs4pATZGuEN96LYbwCdfx7T5JkVQ7b6T7kXc0vtjPSOHGTT5JIUODhl0w7wl1MhF
+ xlVtpuRoKOkFLQBZ2KeaA6SMN0o52ico08YKmEr3mahEwxf22KycSYODaAKsOJ/YoFX0PD/KYzX 8g1dXhFIMtwIM5+jiH63/tgskkO6H4chQLanwi7s4yseVIkACr5aU36HXVOOKuFdu8ZzvIskEuP gJeJIAtxn85qHgj0p2K2cXdVEXGs4gR+oxFed2ANAPu9CDaajoTRzwU/K+q+Zray0vsC1y0v1GN
+ MgDhSFucxE0vmndfFW9Mxw8gIS+swG0tf6wXfykHkad19zjtvR1mW6ZkEQ4p22PoWINCAEa8
+X-Authority-Analysis: v=2.4 cv=YvQPR5YX c=1 sm=1 tr=0 ts=682add4c cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=dt9VzEwgFbYA:10 a=M5GUcnROAAAA:8 a=Z0Ml1a-pTqFXQDG8VyoA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
+ definitions=2025-05-19_03,2025-05-16_03,2025-03-28_01
 
-From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+Priority flow control is not supported for LBK and SDP vf. This patch
+adds support to not add dcbnl_ops for LBK and SDP vf.
 
-igc already supports enabling MAC Merge for FPE. This patch adds
-support for preemptible queues in mqprio.
-
-Tested preemption with mqprio by:
-1. Enable FPE:
-   ethtool --set-mm enp1s0 pmac-enabled on tx-enabled on verify-enabled on
-2. Enable preemptible queue in mqprio:
-   mqprio num_tc 4 map 0 1 2 3 0 0 0 0 0 0 0 0 0 0 0 0 \
-   queues 1@0 1@1 1@2 1@3 \
-   fp P P P E
-
-Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+Fixes: 8e67558177f8 ("octeontx2-pf: PFC config support with DCBx")
+Signed-off-by: Suman Ghosh <sumang@marvell.com>
 ---
- drivers/net/ethernet/intel/igc/igc_main.c | 9 ++-------
- drivers/net/ethernet/intel/igc/igc_tsn.c  | 9 +++++++++
- drivers/net/ethernet/intel/igc/igc_tsn.h  | 1 +
- 3 files changed, 12 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index eb68a352840a..509f95651f25 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -6764,6 +6764,7 @@ static int igc_tsn_enable_mqprio(struct igc_adapter *adapter,
- 
- 	if (!mqprio->qopt.num_tc) {
- 		adapter->strict_priority_enable = false;
-+		igc_fpe_clear_preempt_queue(adapter);
- 		netdev_reset_tc(adapter->netdev);
- 		goto apply;
- 	}
-@@ -6791,13 +6792,6 @@ static int igc_tsn_enable_mqprio(struct igc_adapter *adapter,
- 		return -EOPNOTSUPP;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
+index 7ef3ba477d49..9b28be4c4a5d 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
+@@ -729,9 +729,12 @@ static int otx2vf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
  	}
  
--	/* Preemption is not supported yet. */
--	if (mqprio->preemptible_tcs) {
--		NL_SET_ERR_MSG_MOD(mqprio->extack,
--				   "Preemption is not supported yet");
--		return -EOPNOTSUPP;
--	}
--
- 	igc_save_mqprio_params(adapter, mqprio->qopt.num_tc,
- 			       mqprio->qopt.offset);
- 
-@@ -6817,6 +6811,7 @@ static int igc_tsn_enable_mqprio(struct igc_adapter *adapter,
- 		adapter->queue_per_tc[i] = i;
- 
- 	mqprio->qopt.hw = TC_MQPRIO_HW_OFFLOAD_TCS;
-+	igc_fpe_save_preempt_queue(adapter, mqprio);
- 
- apply:
- 	return igc_tsn_offload_apply(adapter);
-diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethernet/intel/igc/igc_tsn.c
-index 811856d66571..b23b9ca451a7 100644
---- a/drivers/net/ethernet/intel/igc/igc_tsn.c
-+++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
-@@ -160,6 +160,15 @@ void igc_fpe_init(struct igc_adapter *adapter)
- 	ethtool_mmsv_init(&adapter->fpe.mmsv, adapter->netdev, &igc_mmsv_ops);
- }
- 
-+void igc_fpe_clear_preempt_queue(struct igc_adapter *adapter)
-+{
-+	for (int i = 0; i < adapter->num_tx_queues; i++) {
-+		struct igc_ring *tx_ring = adapter->tx_ring[i];
-+
-+		tx_ring->preemptible = false;
+ #ifdef CONFIG_DCB
+-	err = otx2_dcbnl_set_ops(netdev);
+-	if (err)
+-		goto err_free_zc_bmap;
++	/* Priority flow control is not supported for LBK and SDP vf(s) */
++	if (!(is_otx2_lbkvf(vf->pdev) || is_otx2_sdp_rep(vf->pdev))) {
++		err = otx2_dcbnl_set_ops(netdev);
++		if (err)
++			goto err_free_zc_bmap;
 +	}
-+}
-+
- static u32 igc_fpe_map_preempt_tc_to_queue(const struct igc_adapter *adapter,
- 					   unsigned long preemptible_tcs)
- {
-diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.h b/drivers/net/ethernet/intel/igc/igc_tsn.h
-index f2e8bfef4871..a95b893459d7 100644
---- a/drivers/net/ethernet/intel/igc/igc_tsn.h
-+++ b/drivers/net/ethernet/intel/igc/igc_tsn.h
-@@ -17,6 +17,7 @@ enum igc_txd_popts_type {
- DECLARE_STATIC_KEY_FALSE(igc_fpe_enabled);
+ #endif
+ 	otx2_qos_init(vf, qos_txqs);
  
- void igc_fpe_init(struct igc_adapter *adapter);
-+void igc_fpe_clear_preempt_queue(struct igc_adapter *adapter);
- void igc_fpe_save_preempt_queue(struct igc_adapter *adapter,
- 				const struct tc_mqprio_qopt_offload *mqprio);
- u32 igc_fpe_get_supported_frag_size(u32 frag_size);
 -- 
-2.34.1
+2.25.1
 
 
