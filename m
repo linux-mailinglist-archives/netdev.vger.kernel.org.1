@@ -1,120 +1,146 @@
-Return-Path: <netdev+bounces-191396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A2B6ABB625
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 09:28:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8841ABB62B
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 09:30:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C75F189639A
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 07:28:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCABA175110
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 07:30:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B53CB266B59;
-	Mon, 19 May 2025 07:27:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADDA72676E9;
+	Mon, 19 May 2025 07:30:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="k18YC5ty"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XOwuvj5c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECAE5F4E2;
-	Mon, 19 May 2025 07:27:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2170267396
+	for <netdev@vger.kernel.org>; Mon, 19 May 2025 07:30:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747639651; cv=none; b=R/ezFuNyB+svdsK/MDkw5p4MkJkmSakCfaLjlbMbWH7rZoV6wgFuvIHaQjNsNEBsHTs3giVntK+qmALWYLV9OycJzl6quyGsb+FmBBVmwCsvId+IWM0uOUyELfedpjlBQFMbT/iR0M9QN66kIU2JW9Delh46PPhSNxsTEaYK/HI=
+	t=1747639806; cv=none; b=ZbCUIB6yICkmb8X5erxCJwT7T+77luz6OkEeq8pk7Su1Fx3zQ3jeSV65/gsInClsC5mic3SBQOv/u+2iveNr4MWX/E4eNpMAaPaa2WlXe4cQ7CE2xM0NZ/J2dN/2l3V1WheRvcLP1Q5mLgQ8idj1s+ej7dXgws0/HSxSPg6PN7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747639651; c=relaxed/simple;
-	bh=BOnEr9Rl2fHLZ5/jEW+mTH4Vq9hJYeh90JsFlGFCPaU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=aH7uzoo3nBg1UhbjblpFjSuckXaOkkYrzrvK8/27PhG/ydtFAHtUJS9/p0+RuvR8t+yMKUBahFtsDQFKK8tvhvKcGbKNVE9bwfPT8+nZfSsqnLVckN8kxDXBTUHsogz+7gFyq/KgvklbH8xehhU9cS/P1wVYjlTlb7iyuXUhfaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=k18YC5ty; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54J1HIkR017553;
-	Mon, 19 May 2025 00:27:08 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=Xk63N9eSkVMHuKTHBf+krYV
-	UirUlULcHk8wZOb2zrvA=; b=k18YC5ty1+iDXs33TviiCJRO68N2dZUdd7eM4N2
-	tCVf9wts/Pzmsv1HhwfTGPKXxRtuWN+OM54/ys1Y+C9rj/uTMjBEfQQQmWOGa4Fu
-	v+DF1PYbWUjAyplT8RdN5YfQaOAIdl6fgPBYZobKy3VaQW8WYAbcjdRozUFK1W0R
-	aI+isx2rv3aJ+WFKbKFvzFEwfcxSpqw7JjGH5yqRLvxBLX3ISqoJlyqXfyB6KJKc
-	U91p2RLProYSNTv/HMOBnOcYgtIHmLUJYZ/QbXMPbPk/DBmzfPaHK7r88snl22hz
-	r6LlD/1DUR7G0MXwUsiJMjkDbTmDjvmvjQd0WaJX0stjyRA==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 46qb799dcc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 19 May 2025 00:27:08 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Mon, 19 May 2025 00:27:07 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Mon, 19 May 2025 00:27:07 -0700
-Received: from localhost.localdomain (unknown [10.28.36.166])
-	by maili.marvell.com (Postfix) with ESMTP id E61733F7080;
-	Mon, 19 May 2025 00:27:02 -0700 (PDT)
-From: Suman Ghosh <sumang@marvell.com>
-To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
-        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <bbhushan2@marvell.com>,
-        <andrew+netdev@lunn.ch>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: Suman Ghosh <sumang@marvell.com>
-Subject: [net PATCH] octeontx2-pf: Avoid adding dcbnl_ops for LBK and SDP vf
-Date: Mon, 19 May 2025 12:56:58 +0530
-Message-ID: <20250519072658.2960851-1-sumang@marvell.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1747639806; c=relaxed/simple;
+	bh=8DQrGW3fNond81i8XUM1ng5L2vDaVpermOep4R9MteE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WTsvFmtdQGdsCJLpLyEs26Ln056C48vMZQPjm5KUtmkvzB6A43gVtJ6AwN5JIW1Mkj93UDtmSxixy5H6MPJFfWk8Ajqt4ZDc7VqhTiM7xnJcRBV/73hvVPG58Lq3SAyGPoIWOFX4elKSfh+4Ao4p/zlqveYRFjzkXuXnd0E2Tjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XOwuvj5c; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747639803;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=joHJ7VkBkFOgihuRaFy1ry6ubQhRRYbdaHEDufKQwd0=;
+	b=XOwuvj5cvxrk7xqsCyQYZYYOE/Fm5CixgSiOfRPrCXA6qFKJ1hfBrFLvq0PLSubjd6FUeG
+	heVGkl8eQ6ii2Bky12LmtdzzvkC/kqKBNzRwMDwl2i7mbIn5hoJxGoUicBo/dhsVnmcWQT
+	lX2jfhU5sKBL/RTD1T7jzZ+SriOQP/A=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-333-mnRXCct8MqyxKMMxjKUBIw-1; Mon, 19 May 2025 03:30:02 -0400
+X-MC-Unique: mnRXCct8MqyxKMMxjKUBIw-1
+X-Mimecast-MFC-AGG-ID: mnRXCct8MqyxKMMxjKUBIw_1747639801
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43cfda30a3cso21349595e9.3
+        for <netdev@vger.kernel.org>; Mon, 19 May 2025 00:30:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747639801; x=1748244601;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=joHJ7VkBkFOgihuRaFy1ry6ubQhRRYbdaHEDufKQwd0=;
+        b=WSIg+FmcaUCMNCpblBKiYIX1wUxBgsuzue6vT7mcqaCGB69DQnUP3N3RYpKijHyABi
+         LnjzCqUWdHCoxoKBXWjDv+12xQIstEbUacSTjSS9UVVZN0hkSb9ixa2Pp4S0rLhvAdkz
+         BY1ydLDC+l4s2HSLVITRoJ0pYQ62oIHNBAuPGV8cNRlNc7ChNsUjeOHZKCcNNwFSODii
+         TgUXEWEwagDekoSNbC3CQD52j4jhlqvbtTVF3QnaH34r4AWDfNW4OBKDqxZ6XIuHuVB4
+         d8oKbVmp9COdZtu1T9K1IwekVvUIHAJW6EHE7eZcRc/55SXpYGnlCl8oZKMpRGLIuUZG
+         jDFw==
+X-Gm-Message-State: AOJu0YzxDhUI/Wm5GRbnBvcTVc/YCH1zdXc0LZ2eds8eEhSrI3s/vwx5
+	Sk6qnbNTHhica8loNYs5H7ovyLxsIpt8vfZYK9ak3UUHG2pGAEGBdPnLO6gFFxo6Gp4Pf0DXPFg
+	9arhWqqzlTJ/bfE9P/y8U/CWFBw8/Oz1SztXke4o2oRkqNcQqKaWyGI8uDA==
+X-Gm-Gg: ASbGnctYYrlQEjZbmGhsHJFpTqTMcMfXXwsVkLW/j83dgiKGSBqgczmIY46ks32AaGM
+	YZwvz5/KMNktOLsDT4bctdjfeDHzuC6J3qLLy5we+NQmYSsXnLqZENx2Fgo0psxaXlZPABr34Ht
+	0XYz/k5D3QVZL+0QkgOnxOZkocf1fo8gWVWrKlMBJLlufMj8u7WvtjmQp82SSI8qJFsUxqd3Wmz
+	wHJinqA9O1oRD9rkb6ENZBWzdGJfIZIusgfYntE0Garu/M4/RqDJvhZuArxcKpF0VjCTFpHJpvM
+	7tZ1Dohsi+ipuvWNw8Q=
+X-Received: by 2002:a05:600c:468a:b0:43d:47e:3205 with SMTP id 5b1f17b1804b1-442fefee29dmr92666365e9.11.1747639801118;
+        Mon, 19 May 2025 00:30:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG2Y4WKeNu3TbKYtE/Els3B0YLR831MXjCS7lvm9kYztKB54r+MlAwo8fTOt0TbLPAwQD5Dqg==
+X-Received: by 2002:a05:600c:468a:b0:43d:47e:3205 with SMTP id 5b1f17b1804b1-442fefee29dmr92666045e9.11.1747639800739;
+        Mon, 19 May 2025 00:30:00 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:244f:5710::f39? ([2a0d:3344:244f:5710::f39])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-442f9053b4dsm156471475e9.4.2025.05.19.00.29.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 May 2025 00:30:00 -0700 (PDT)
+Message-ID: <71d0fbf8-00f7-4e0b-819d-d0b6efb01f03@redhat.com>
+Date: Mon, 19 May 2025 09:29:58 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: zoK2cDfe-H6ph1Q6rJKPlnM7g0oJt5lY
-X-Proofpoint-ORIG-GUID: zoK2cDfe-H6ph1Q6rJKPlnM7g0oJt5lY
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTE5MDA2OSBTYWx0ZWRfX+sJsjopTO48u BBPeqcJX/WXcChDXaAOHir4NVHnociEVRGF5YUG8cW/83q79y0tBwK6BmW1fuCttPdFMts+/U+k +G8T4HqhjrzKs4pATZGuEN96LYbwCdfx7T5JkVQ7b6T7kXc0vtjPSOHGTT5JIUODhl0w7wl1MhF
- xlVtpuRoKOkFLQBZ2KeaA6SMN0o52ico08YKmEr3mahEwxf22KycSYODaAKsOJ/YoFX0PD/KYzX 8g1dXhFIMtwIM5+jiH63/tgskkO6H4chQLanwi7s4yseVIkACr5aU36HXVOOKuFdu8ZzvIskEuP gJeJIAtxn85qHgj0p2K2cXdVEXGs4gR+oxFed2ANAPu9CDaajoTRzwU/K+q+Zray0vsC1y0v1GN
- MgDhSFucxE0vmndfFW9Mxw8gIS+swG0tf6wXfykHkad19zjtvR1mW6ZkEQ4p22PoWINCAEa8
-X-Authority-Analysis: v=2.4 cv=YvQPR5YX c=1 sm=1 tr=0 ts=682add4c cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=dt9VzEwgFbYA:10 a=M5GUcnROAAAA:8 a=Z0Ml1a-pTqFXQDG8VyoA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-19_03,2025-05-16_03,2025-03-28_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] vmxnet3: correctly report gso type for UDP tunnels
+To: Jakub Kicinski <kuba@kernel.org>, Ronak Doshi <ronak.doshi@broadcom.com>
+Cc: netdev@vger.kernel.org, Guolin Yang <guolin.yang@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, open list <linux-kernel@vger.kernel.org>
+References: <20250513210504.1866-1-ronak.doshi@broadcom.com>
+ <20250515070250.7c277988@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250515070250.7c277988@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Priority flow control is not supported for LBK and SDP vf. This patch
-adds support to not add dcbnl_ops for LBK and SDP vf.
+On 5/15/25 4:02 PM, Jakub Kicinski wrote:
+> On Tue, 13 May 2025 21:05:02 +0000 Ronak Doshi wrote:
+>> +				skb->encapsulation = 1;
+>>  			}
+>>  			WARN_ON_ONCE(!(gdesc->rcd.tcp || gdesc->rcd.udp) &&
+>>  				     !(le32_to_cpu(gdesc->dword[0]) &
+>> @@ -1465,6 +1466,7 @@ vmxnet3_rx_csum(struct vmxnet3_adapter *adapter,
+>>  			if ((le32_to_cpu(gdesc->dword[0]) &
+>>  				     (1UL << VMXNET3_RCD_HDR_INNER_SHIFT))) {
+>>  				skb->csum_level = 1;
+>> +				skb->encapsulation = 1;
+> 
+> IIRC ->encapsulation means that ->inner.. fields are valid, no?
+> And I don't see you setting any of these.
+> 
+> Paolo, please keep me honest, IIUC you have very recent and very
+> relevant experience with virtio.
 
-Fixes: 8e67558177f8 ("octeontx2-pf: PFC config support with DCBx")
-Signed-off-by: Suman Ghosh <sumang@marvell.com>
----
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+Yes. Specifically the GSO code expect the inner headers to be set,
+otherwise the segmentation will yield quite wrong results.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
-index 7ef3ba477d49..9b28be4c4a5d 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
-@@ -729,9 +729,12 @@ static int otx2vf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	}
- 
- #ifdef CONFIG_DCB
--	err = otx2_dcbnl_set_ops(netdev);
--	if (err)
--		goto err_free_zc_bmap;
-+	/* Priority flow control is not supported for LBK and SDP vf(s) */
-+	if (!(is_otx2_lbkvf(vf->pdev) || is_otx2_sdp_rep(vf->pdev))) {
-+		err = otx2_dcbnl_set_ops(netdev);
-+		if (err)
-+			goto err_free_zc_bmap;
-+	}
- #endif
- 	otx2_qos_init(vf, qos_txqs);
- 
--- 
-2.25.1
+Note that reproducing the issue requires a quite specific setup, i.e.
+bridging (or tc redirecting) the ingress traffic from an
+UDP-tunnel-HW-GRO enabled device into an egress device not supporting
+tx-udp_tnl-segmentation.
+
+If otherwise the traffic goes into the UDP tunnel rx path, such
+processing will set the needed field correctly and no issue could/should
+be observed AFAICS.
+
+@Ronak: I think the problem pre-exists this specific patch, but since
+you are fixing the relevant offload, I think it should be better to
+address the problem now.
+
+Thanks,
+
+Paolo
+
+
+
 
 
