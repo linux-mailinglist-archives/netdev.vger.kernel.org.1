@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-191388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 951B1ABB609
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 09:20:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4B43ABB60B
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 09:20:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7AF818945B6
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 07:20:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E64581895408
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 07:21:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B58162580E2;
-	Mon, 19 May 2025 07:20:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF933266F1E;
+	Mon, 19 May 2025 07:20:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gsb3TWj/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MfaX4Wr2"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 033C623FC52;
-	Mon, 19 May 2025 07:20:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5830266B6C;
+	Mon, 19 May 2025 07:20:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747639239; cv=none; b=Ah6bQ7kJ54i4/21MNy77MpYV+HQikXu7sm0roYdsE/eIsoCG+d13aaG4DhvIaFW5LkJpVRtQxhw9GkFvQMEUyiAWWEU6ibAacGUPalGtF2ReyA9BvfMFuc823O3FleQBQdqoygEoDRbSts5LE0teCIyZH4TecNoK/5hpC0pPEF4=
+	t=1747639243; cv=none; b=lMOtD9w2EnX8g6cD97ZWYKtsWVUS5ld9oNtlCvw/Wxuo5x21bKDpsVgvuoY55fB/QpksGCzENotMeIGeYlpmAYP9zhiAzeEDttc5E8oD9IagLFa2jWtsZVjrf2iwBgll9kHMHdmE36LxesHbcrTp5dz1xjbqRla0WMswC9V3n+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747639239; c=relaxed/simple;
-	bh=Y+C59h/qCKqtCEBhRtM+dfq6uWu6DUbfGTucGvd/FNA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=WN0lckdoiytUVOyjZysL0YGW+MdH/5kqohxRKbzQ8/Bs7gKoDoFKeCLA457N13Ls20dHugtB3eAfcgwhoCkHKTRZ3uRluyZmCVdwb8W7NdyGSLfkQLoNQZti+iJLEn+VAq3Xj5mpYPSCpMSQp5f89JKInBgdYgyk6bqzfg42+/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gsb3TWj/; arc=none smtp.client-ip=198.175.65.9
+	s=arc-20240116; t=1747639243; c=relaxed/simple;
+	bh=X7n7rR82XQJo1WypxQezqqyl90YGNPvBN0QcTvREVko=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=oorVGBOE5Ut4WZ3j4LqfuA9y6yh8Q52UkPEeLr8dKdPUQKMPwBxJAFYOxI+mCteyCtoAaeBfJrnlkrUumTEYMYq/ViTVA7Zd0V3v5ZPnnnms192uPiuEzXMYdszMOdsKwJlwJQv8Scfc54tyjCrVC2lMk01gfyPtoJUSPNBjbo8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MfaX4Wr2; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747639238; x=1779175238;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Y+C59h/qCKqtCEBhRtM+dfq6uWu6DUbfGTucGvd/FNA=;
-  b=Gsb3TWj/1q8wyF9haA6I+WU6fzs8np1GRtUnNGLTm0DNp5K5I5DLkb3Z
-   X2Dpy38xMiLkxjTjlddQGLQFmYcrHohd4DKhc35vc4noi02Le/0vzWCQZ
-   18xKgkSOL45FhjkSKjtodEb8tU3SENnXJcK0AYNWGP8suRphKTY2mxPI+
-   sBIypJDi661F6grmrX/6Ks0WKZz/5v5SmdorEkO9fegg4xxAxtNc0BmyE
-   EcHoWxZZncL5auTjubccG2KBiPFycaW2Iut4f2Im04Zw4aKfjJwxhD8kA
-   QYVELmQO8/vX7mGooXAHtFMHNoK/mbzhxw6M22PM9OZmKNCINBTNTzZOc
-   w==;
-X-CSE-ConnectionGUID: q4oOD9CoRvaI+9g/rfa++Q==
-X-CSE-MsgGUID: h7FH46yASCOO7goIbrsVXA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11437"; a="72030685"
+  t=1747639242; x=1779175242;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=X7n7rR82XQJo1WypxQezqqyl90YGNPvBN0QcTvREVko=;
+  b=MfaX4Wr2cOWhOWjAdiOn+DT1K3zUCMEDugvXnagjw4Z6pN10AaYGgpIy
+   fgIaJzJDVt5aIyGMd+hyS+WITxkBWYboRwvhkTJ4QqBWziJmoVfOd++AZ
+   7jUYqQzW7PzHTH0XFkAuo9+gXDOEAsZL+6luFhhRZS9/R2V/YmwG3XGzt
+   4Lgd/vkGBYjN7Dv3FQa/Uu0JWg7+5mU81anV/t7k9uOJNHc50qEXR0BZj
+   pwmFmJiNbGsRFDquJ3vHnpFcNXSpmIQhJqN+xhZykYB1mjapxlp3kHMhC
+   mjgLyftPj7/u0nUxOn7W8OkCsu4kIzCtXV4ZMpY3/e7alhbpqRWx5xRS2
+   Q==;
+X-CSE-ConnectionGUID: +zfZ0pzLSWuKUF/QzBLcfw==
+X-CSE-MsgGUID: R/MhEAyFQaSSnS478od+hw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11437"; a="72030701"
 X-IronPort-AV: E=Sophos;i="6.15,300,1739865600"; 
-   d="scan'208";a="72030685"
+   d="scan'208";a="72030701"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2025 00:20:37 -0700
-X-CSE-ConnectionGUID: YyPRf72qRi2gzLQRKklzKA==
-X-CSE-MsgGUID: mvKcYUVhR9WuQj+iar3zTg==
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2025 00:20:42 -0700
+X-CSE-ConnectionGUID: fqTvO+mdQEqMTLlG7bMIDg==
+X-CSE-MsgGUID: 3AzgyEQaTOSXwq+joGUE4A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,300,1739865600"; 
-   d="scan'208";a="139798719"
+   d="scan'208";a="139798752"
 Received: from mohdfai2-ilbpg12-1.png.intel.com ([10.88.227.73])
-  by orviesa007.jf.intel.com with ESMTP; 19 May 2025 00:20:34 -0700
+  by orviesa007.jf.intel.com with ESMTP; 19 May 2025 00:20:38 -0700
 From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@intel.com>
 To: Tony Nguyen <anthony.l.nguyen@intel.com>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
@@ -73,67 +74,77 @@ Cc: intel-wired-lan@lists.osuosl.org,
 	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
 	Chwee-Lin Choong <chwee.lin.choong@intel.com>
-Subject: [PATCH iwl-next v3 0/7] igc: harmonize queue priority and add preemptible queue support
-Date: Mon, 19 May 2025 03:19:04 -0400
-Message-Id: <20250519071911.2748406-1-faizal.abdul.rahim@intel.com>
+Subject: [PATCH iwl-next v3 1/7] igc: move TXDCTL and RXDCTL related macros
+Date: Mon, 19 May 2025 03:19:05 -0400
+Message-Id: <20250519071911.2748406-2-faizal.abdul.rahim@intel.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250519071911.2748406-1-faizal.abdul.rahim@intel.com>
+References: <20250519071911.2748406-1-faizal.abdul.rahim@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
 
-MAC Merge support for frame preemption was previously added for igc:
-https://patchwork.kernel.org/project/netdevbpf/patch/20250318030742.2567080-1-faizal.abdul.rahim@linux.intel.com/
+Move and consolidate TXDCTL and RXDCTL macros in preparation for
+upcoming TXDCTL changes. This improves organization and readability.
 
-This series builds on that work and adds support for:
-- Harmonizing taprio and mqprio queue priority behavior, based on past
-  discussions and suggestions:
-  https://lore.kernel.org/all/20250214102206.25dqgut5tbak2rkz@skbuf/
-- Enabling preemptible queue support for both taprio and mqprio, with
-  priority harmonization as a prerequisite.
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+---
+ drivers/net/ethernet/intel/igc/igc.h      | 11 ++++++++++-
+ drivers/net/ethernet/intel/igc/igc_base.h |  8 --------
+ 2 files changed, 10 insertions(+), 9 deletions(-)
 
-Patch organization:
-- Patches 1–3: Preparation work for patches 6 and 7
-- Patches 4–5: Queue priority harmonization
-- Patches 6–7: Add preemptible queue support
-
-v3 changes:
-- v2: https://patchwork.kernel.org/project/netdevbpf/cover/20250514042945.2685273-1-faizal.abdul.rahim@linux.intel.com/
-- Patch 8 fixes a HW limitation and should precede preemption support. Merged into patch 6. (Simon)
-- Add Reviewed-by tag from Simon for patch 1-5
-
-v2 changes:
-- v1: https://patchwork.kernel.org/project/netdevbpf/cover/20250428060225.1306986-1-faizal.abdul.rahim@linux.intel.com/
-- Move RXDCTL macros for consistency with TXDCTL (Ruinskiy, Dima)
-- Rename RX descriptor control macros with RXDCTL prefix (Ruinskiy, Dima)
-- Add FPE acronym explanation in commit description (Loktionov, Aleksandr)
-- Add Reviewed-by tag from Aleksandr for patch 6
-
-Faizal Rahim (7):
-  igc: move TXDCTL and RXDCTL related macros
-  igc: add DCTL prefix to related macros
-  igc: refactor TXDCTL macros to use FIELD_PREP and GEN_MASK
-  igc: assign highest TX queue number as highest priority in mqprio
-  igc: add private flag to reverse TX queue priority in TSN mode
-  igc: add preemptible queue support in taprio
-  igc: add preemptible queue support in mqprio
-
- drivers/net/ethernet/intel/igc/igc.h         |  33 +++++-
- drivers/net/ethernet/intel/igc/igc_base.h    |   8 --
- drivers/net/ethernet/intel/igc/igc_defines.h |   1 +
- drivers/net/ethernet/intel/igc/igc_ethtool.c |  12 +-
- drivers/net/ethernet/intel/igc/igc_main.c    |  56 ++++++---
- drivers/net/ethernet/intel/igc/igc_tsn.c     | 116 ++++++++++++++++---
- drivers/net/ethernet/intel/igc/igc_tsn.h     |   5 +
- 7 files changed, 188 insertions(+), 43 deletions(-)
-
---
+diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
+index 859a15e4ccba..25695eada563 100644
+--- a/drivers/net/ethernet/intel/igc/igc.h
++++ b/drivers/net/ethernet/intel/igc/igc.h
+@@ -487,10 +487,19 @@ static inline u32 igc_rss_type(const union igc_adv_rx_desc *rx_desc)
+  */
+ #define IGC_RX_PTHRESH			8
+ #define IGC_RX_HTHRESH			8
++#define IGC_RX_WTHRESH			4
++/* Ena specific Rx Queue */
++#define IGC_RXDCTL_QUEUE_ENABLE		0x02000000
++/* Receive Software Flush */
++#define IGC_RXDCTL_SWFLUSH		0x04000000
++
+ #define IGC_TX_PTHRESH			8
+ #define IGC_TX_HTHRESH			1
+-#define IGC_RX_WTHRESH			4
+ #define IGC_TX_WTHRESH			16
++/* Ena specific Tx Queue */
++#define IGC_TXDCTL_QUEUE_ENABLE		0x02000000
++/* Transmit Software Flush */
++#define IGC_TXDCTL_SWFLUSH		0x04000000
+ 
+ #define IGC_RX_DMA_ATTR \
+ 	(DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_WEAK_ORDERING)
+diff --git a/drivers/net/ethernet/intel/igc/igc_base.h b/drivers/net/ethernet/intel/igc/igc_base.h
+index 6320eabb72fe..eaf17cd031c3 100644
+--- a/drivers/net/ethernet/intel/igc/igc_base.h
++++ b/drivers/net/ethernet/intel/igc/igc_base.h
+@@ -86,14 +86,6 @@ union igc_adv_rx_desc {
+ 	} wb;  /* writeback */
+ };
+ 
+-/* Additional Transmit Descriptor Control definitions */
+-#define IGC_TXDCTL_QUEUE_ENABLE	0x02000000 /* Ena specific Tx Queue */
+-#define IGC_TXDCTL_SWFLUSH	0x04000000 /* Transmit Software Flush */
+-
+-/* Additional Receive Descriptor Control definitions */
+-#define IGC_RXDCTL_QUEUE_ENABLE	0x02000000 /* Ena specific Rx Queue */
+-#define IGC_RXDCTL_SWFLUSH		0x04000000 /* Receive Software Flush */
+-
+ /* SRRCTL bit definitions */
+ #define IGC_SRRCTL_BSIZEPKT_MASK	GENMASK(6, 0)
+ #define IGC_SRRCTL_BSIZEPKT(x)		FIELD_PREP(IGC_SRRCTL_BSIZEPKT_MASK, \
+-- 
 2.34.1
 
 
