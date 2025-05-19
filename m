@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-191591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3EAAABC5AA
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 19:31:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95F19ABC5B0
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 19:33:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEFEE188C00E
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 17:32:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AA887A1C89
+	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 17:32:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7033F288C23;
-	Mon, 19 May 2025 17:31:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AC68288C24;
+	Mon, 19 May 2025 17:33:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="arcfNm9d"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cuUXCyV6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB1BC288508
-	for <netdev@vger.kernel.org>; Mon, 19 May 2025 17:31:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0645527979D
+	for <netdev@vger.kernel.org>; Mon, 19 May 2025 17:33:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747675906; cv=none; b=JVc4geNmUkldS397s6CXeD/fLA5UysxMdkuIfymfvyemqmBOAivE7oChlFdXfE6bWvfC4ca1xU4oqRgZNxH6pOpgBd/BKVdkOMAU72mtFtRIyJ/7IXnxxQZFJA6ek3vUU+JWwLf9xGjGFRtdDwa3SpYOfeJrl0FEjAsu8r2amq8=
+	t=1747675982; cv=none; b=twCZV+xiDupBqz0Ci9Ry3MKhBgxDHihHSiyUACz+lNIvxeo71WPAo4DULnOim1e1eAOA/nKNaTAyd69mT/25CrAxtQ9n6v2YKquFp0RjkKmUBEMD9+ygM+nGWzQdK1vPW+1M+IXzaHOepbQuFgnXk3PwqGNR3QfTzvIJMf43wdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747675906; c=relaxed/simple;
-	bh=jLy2szwDWHqqJviMtbGQnTN3ULw2S8OhfWEULUU5naU=;
+	s=arc-20240116; t=1747675982; c=relaxed/simple;
+	bh=f4dgfRMtTYcBFr3isa3AuROYQqzp0vO9ur0rnexY61Y=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IRU3KKedWznKHtmXg1wrgyFWMZ/hDMqbAuzIO0EqEoPWR+72EgqqDlaKsm3Aqrw5KwqyyQzOmOVy1yZoyJxhBuJki0gaKfUVQhB+trgI5asv7MXIaWR4yQsRgYWddQbfeq/sTxHYa82wqzYRrgpnqDAbf6N4qSAdzCsrMTKzlyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=arcfNm9d; arc=none smtp.client-ip=209.85.214.179
+	 To:Cc:Content-Type; b=Z8XKKcMjsHmpXL0dESxnfVonZr03VDD421S5pG4NRpASnT1Y9hJvEov7Xk7WdIGp/rrS2zApdPvjoznceQOLV6nEtkmpUu3SZVMIbV9YP1KOb/Ef7zXkqs/L9zcOWhVELNq4mabXbEVK8OEXst5MSEi4QxtbgHt1yABG1HT1lFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cuUXCyV6; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-231f6c0b692so394245ad.0
-        for <netdev@vger.kernel.org>; Mon, 19 May 2025 10:31:44 -0700 (PDT)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-231f37e114eso477815ad.1
+        for <netdev@vger.kernel.org>; Mon, 19 May 2025 10:33:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1747675904; x=1748280704; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1747675980; x=1748280780; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jmvWuYAzDFR95No8NLEp3J02kOMT0LgXSZkJsXShgyI=;
-        b=arcfNm9dzdfLscpmlpVDEvs2TKM5Mi2Z0WnjOxp7rGYONICbU89yYSsQmFGLqcVAII
-         Nxg6tY2KSq/Q9ktudvd4ARVthPepxN31bytwyFggTJqYRomqziiueimd+urSo0E+7yod
-         4ugEKIMR+E5zSuniz//0HzZoBkiValRZwD7JgDOh5lwmx/ihw3uBG85IV6NyeD7yhdSw
-         CYnWmYU6niokcl0IWDXz6/mrL/0avUIhemJ2eo4M3FvCuDS+ru/sfGI0b2N3wlhgUo7y
-         7wiqts48lRx44UlZfrYuq0cPl9WN2vdQ3GPT7B7oRq4o1SNEGb0dQmw4BOK4VjzWwAyB
-         154A==
+        bh=1tcAaZdGQpMjictMPYKyIxyCcVwEKuNN7fh7v7Ym22Y=;
+        b=cuUXCyV6qGzXDJwr8AmMAaz21olJquI5M1uyQ1f/7A7gm2nPUPCkNbQh3LwpF11oXE
+         FCLsEvNJUG4BLkE+1rjLBOPdjVNGnPUK2dt441bVCKd1PKCCjWelKMUkdORNDsEWP+6z
+         gsIJzRaMFoKsiNzVbCe6LFye2nbqA5F9FfkpA646R2Kw5vOiXoJs6l0BJpe10imC0Jpb
+         kweDtqVoGP59O+aS992VPEeDsu+lFwwlaAEq5Ol2RTV4LycyRC3sc86uRobpWh86V2o1
+         h14JIig+QVjyuB95w0blVG0XSATEBKoj7EnvL4aj+w3NNLudUoJhL8A/a/vueZQbCwg4
+         ZjtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747675904; x=1748280704;
+        d=1e100.net; s=20230601; t=1747675980; x=1748280780;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jmvWuYAzDFR95No8NLEp3J02kOMT0LgXSZkJsXShgyI=;
-        b=QxljYlogYTKCQchMjaA6ur4I9ClXF1UtXb9U/XnwOHRGj9/Qd+GjyKRkzgnbdOPpGC
-         tXapWZDh6GjnLJFISCUk7Ms57cGeqNRO12eZduhujYCie93rl8ikqIqThdGjjd0iT7Li
-         STJ7isMTl523Pe4bpNBTBN1KHUHWhVnzR4zrEQthXQPfxINX3f7oZ6hy/olyk2PZknMr
-         gb6rXI44WAzS5w1VTXQU4qUk4NN1j7cCvOa6/SNEaTteni2o6Hg0tX0smOybEISfbGFQ
-         AIejvo3YwkFRE5/U2ZRmSECGJVZLWGRwdgxzXk2mWAanXzV7m512+rQEgKvz6uicvOeq
-         6FfQ==
-X-Gm-Message-State: AOJu0YyHeZBcvCWTlVAWqz1DWwuGjYn3PK/QrT9kK+xeWGBuKd0M1LKa
-	kXlQ9tpw/OVju9WE5aWUBmr6g58YFS5semmFL1tyMzParjxEN++xp75WxOnZnD+JXXYgmRXS3F3
-	6x7V+iyAHiJNNeQfSd3nv5EMinwwTF8DtjuVooae/
-X-Gm-Gg: ASbGnctJebmDwARCiYjBrU5ZoOlhSfBNM7RXccxQ9XkOX8R7xSV32/APLHpx20ZkSXy
-	EEpTDCi6SSzb6J2QkZBCHUmLYj8JKKmbHSyytF/hFgrbyo0fdMenxpssz0po4r+txvfOGYTOF1d
-	mzzMVG9a/DRiY9NSgPsjlgV66cR+6xOmSIn/j6nYF2Oj84
-X-Google-Smtp-Source: AGHT+IG+ExyKgE3ruV/gl5M9ZTWtLqmpbXPFt1mRf9GKepoZU4AoYFfOGioK8r7ghizA4noQkXhiVCYtew70Mv8tqF8=
-X-Received: by 2002:a17:903:290:b0:215:f0c6:4dbf with SMTP id
- d9443c01a7336-231ffd3192fmr4993165ad.14.1747675903859; Mon, 19 May 2025
- 10:31:43 -0700 (PDT)
+        bh=1tcAaZdGQpMjictMPYKyIxyCcVwEKuNN7fh7v7Ym22Y=;
+        b=T6A4foF39Ej2wMfTbwqoRUGsBEv1RvvwjbloaUTkYN7DA/ng4htHIqx7jVI5KRjn1i
+         HAQtJZPAq2EY+jJyD3LWs1eN110gyc6WAsSJ7Fr4QEZrbKAFcToxXgbbyaTBat9Vhfky
+         zlVQJJXH+YKOeo8i8IAtYRmMaQnPZUqvM11ijF5w+H88dOjEXZri7VdC7j8Eoh9NV3LX
+         JR7QPRUh78wEuNNEcAanAclhouPfgXl0yr+rfn+R+ThJiWDh95BZ416lqqGAjVcu1KDi
+         yZISnsvagCJRzAsfsLAHZ6bqE0NezQmw3PgMTiDuYi9vSZgCZSdNJ31/kv6LtcOUxAKG
+         rEWA==
+X-Gm-Message-State: AOJu0YxLIPCG0VbkomDlKZ0lXItkdasypEEPOvURfFdBJIjsihGYl6/b
+	H+7i4w1OuA1/tbc78Nl6cbPqggA087tkDoFCA0ZuWEs+NMytGMNu2fpb+dgOP31D0hDwfZNQSdU
+	A3AP/Aac/G796bER2DsJIYEydP6hHWp41Uec+eNxR
+X-Gm-Gg: ASbGnctYE0lNQF8KuX+na4x2a2+jPVmZHqyCLRzBWyF4jfSTnes0Z9OLcWVCk7VU4qQ
+	bEij2yu81IItDi2V0+xxXuGKQjr/PWwJXnUoSp/M8197cRviSXD0kO0flP03Q4MGYTrZ9kE/zkx
+	dd1tBv7Imk8c8ZpQpD9AX6dl/rsdn9v5Yq/O5PY1rodCtW
+X-Google-Smtp-Source: AGHT+IGs+elfCZbGySGmARwysKiN5p4pA5ucWH3hrD3Nt/Z1HRaqMpOBAmn2/ArPLy46knYKJuvBPtRwFmnKGvjEYGw=
+X-Received: by 2002:a17:902:d48c:b0:22e:766f:d66e with SMTP id
+ d9443c01a7336-231ffd1ac56mr5590675ad.12.1747675979944; Mon, 19 May 2025
+ 10:32:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,13 +74,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20250519023517.4062941-1-almasrymina@google.com>
- <20250519023517.4062941-6-almasrymina@google.com> <aCtPEBmBFvM-bA_i@mini-arch>
-In-Reply-To: <aCtPEBmBFvM-bA_i@mini-arch>
+ <20250519023517.4062941-8-almasrymina@google.com> <aCtQIK-vFm6j6o9w@mini-arch>
+In-Reply-To: <aCtQIK-vFm6j6o9w@mini-arch>
 From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 19 May 2025 10:31:30 -0700
-X-Gm-Features: AX0GCFs-Ut1FZDyYbbaHFHUXedO7i5T9SEf7r_1r-9FnEhuG-l96h6IGYWAaNwo
-Message-ID: <CAHS8izMjCX=PkU0bE6s46uXxrnHjP71G6LN0v6oQumNa2Mouzg@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 5/9] net: devmem: ksft: add ipv4 support
+Date: Mon, 19 May 2025 10:32:47 -0700
+X-Gm-Features: AX0GCFt0iOE7Rccr5An255yF4CJvW76_sgtAE7JjibiHwryZmUnfjp-kmbjPgrI
+Message-ID: <CAHS8izOKZBtDQT7zjd81v8X5sAXB0NAsL8iXYg3_0zurwF1WhA@mail.gmail.com>
+Subject: Re: [PATCH net-next v1 7/9] net: devmem: ksft: add 5 tuple FS support
 To: Stanislav Fomichev <stfomichev@gmail.com>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
@@ -93,96 +93,43 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 19, 2025 at 8:32=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
+On Mon, May 19, 2025 at 8:37=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
 l.com> wrote:
 >
 > On 05/19, Mina Almasry wrote:
-> > ncdevmem supports both ipv4 and ipv6, but the ksft is currently
-> > ipv6-only. Propagate the ipv4 support to the ksft, so that folks that
-> > are limited to these networks can also test.
+> > ncdevmem supports drivers that are limited to either 3-tuple or 5-tuple
+> > FS support, but the ksft is currently 3-tuple only. Support drivers tha=
+t
+> > have 5-tuple FS supported by adding a ksft arg.
 > >
 > > Signed-off-by: Mina Almasry <almasrymina@google.com>
 > >
 > > ---
-> >  .../selftests/drivers/net/hw/devmem.py        | 33 ++++++++++++-------
-> >  1 file changed, 22 insertions(+), 11 deletions(-)
+> >  .../testing/selftests/drivers/net/hw/devmem.py  | 17 +++++++++++++++--
+> >  1 file changed, 15 insertions(+), 2 deletions(-)
 > >
 > > diff --git a/tools/testing/selftests/drivers/net/hw/devmem.py b/tools/t=
 esting/selftests/drivers/net/hw/devmem.py
-> > index f5d7809400ea..850381e14d9e 100755
+> > index 39b5241463aa..40fe5b525d51 100755
 > > --- a/tools/testing/selftests/drivers/net/hw/devmem.py
 > > +++ b/tools/testing/selftests/drivers/net/hw/devmem.py
-> > @@ -18,30 +18,36 @@ def require_devmem(cfg):
-> >          raise KsftSkipEx("Test requires devmem support")
-> >
-> >
-> > -def check_rx(cfg) -> None:
-> > -    cfg.require_ipver("6")
-> > +def check_rx(cfg, ipver) -> None:
+> > @@ -21,14 +21,27 @@ def require_devmem(cfg):
+> >  def check_rx(cfg, ipver) -> None:
 > >      require_devmem(cfg)
 > >
-> > +    addr =3D cfg.addr_v[ipver]
-> > +    if ipver =3D=3D "6":
-> > +        addr =3D "[" + addr + "]"
+> > +    fs_5_tuple =3D False
+> > +    if "FLOW_STEERING_5_TUPLE" in cfg.env:
+> > +        fs_5_tuple =3D cfg.env["FLOW_STEERING_5_TUPLE"]
 >
-> I think you can add [] unconditionally, no need to special case v6.
+> I wonder if we can transparently handle it in ncdevmem: if -c is passed,
+> try installing 3-tuple rule, and if it fails, try 5-tuple one. This
+> should work without any user input / extra environment variable.
 >
 
-I'll double check, but IIRC the [] were v6-only.
-
-> > +
-> > +    socat =3D f"socat -u - TCP{ipver}:{addr}:{port}"
-> > +
-> >      port =3D rand_port()
-> >      listen_cmd =3D f"{cfg.bin_local} -l -f {cfg.ifname} -s {cfg.addr_v=
-['6']} -p {port}"
-> >
-> > -    with bkg(listen_cmd) as socat:
-> > +    with bkg(listen_cmd) as ncdevmem:
-> >          wait_port_listen(port)
-> > -        cmd(f"echo -e \"hello\\nworld\"| socat -u - TCP6:[{cfg.addr_v[=
-'6']}]:{port}", host=3Dcfg.remote, shell=3DTrue)
-> > +        cmd(f"echo -e \"hello\\nworld\"| {socat}", host=3Dcfg.remote, =
-shell=3DTrue)
-> >
-> > -    ksft_eq(socat.stdout.strip(), "hello\nworld")
-> > +    ksft_eq(ncdevmem.stdout.strip(), "hello\nworld")
-> >
-> >
-> > -def check_tx(cfg) -> None:
-> > -    cfg.require_ipver("6")
-> > +def check_tx(cfg, ipver) -> None:
-> >      require_devmem(cfg)
-> >
-> >      port =3D rand_port()
-> > -    listen_cmd =3D f"socat -U - TCP6-LISTEN:{port}"
-> > +    listen_cmd =3D f"socat -U - TCP{ipver}-LISTEN:{port}"
-> >
-> > -    with bkg(listen_cmd, exit_wait=3DTrue) as socat:
-> > +    addr =3D cfg.addr_v[ipver]
-> > +
-> > +    with bkg(listen_cmd) as socat:
-> >          wait_port_listen(port)
-> > -        cmd(f"echo -e \"hello\\nworld\"| {cfg.bin_remote} -f {cfg.ifna=
-me} -s {cfg.addr_v['6']} -p {port}", host=3Dcfg.remote, shell=3DTrue)
-> > +        cmd(f"echo -e \"hello\\nworld\"| {cfg.bin_remote} -f {cfg.ifna=
-me} -s {addr} -p {port}", host=3Dcfg.remote, shell=3DTrue)
-> >
-> >      ksft_eq(socat.stdout.strip(), "hello\nworld")
-> >
-> > @@ -51,8 +57,13 @@ def main() -> None:
-> >          cfg.bin_local =3D path.abspath(path.dirname(__file__) + "/ncde=
-vmem")
-> >          cfg.bin_remote =3D cfg.remote.deploy(cfg.bin_local)
-> >
-> > +        if "4" in cfg.addr_v:
-> > +            ipver =3D "4"
-> > +        else:
-> > +            ipver =3D "6"
->
-> If we have both, we prefer v4, can we do the opposite?
-
-Sure, but why? Just curious.
+This seems like a good idea, yes, but I think install a 5-tuple one
+first, and if that fails, try a 3-tuple one? 5-tuple rules are more
+specific and should take precedence when the driver supports both. It
+doesn't really matter but the 3-tuple one can match unintended flows.
 
 --=20
 Thanks,
