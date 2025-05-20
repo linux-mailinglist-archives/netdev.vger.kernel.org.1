@@ -1,225 +1,170 @@
-Return-Path: <netdev+bounces-192015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59A89ABE41A
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 21:53:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B571BABE424
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 21:54:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 088BC1BC1D44
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 19:53:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5918B4C2C0E
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 19:54:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A8E2283128;
-	Tue, 20 May 2025 19:52:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7407F2820CC;
+	Tue, 20 May 2025 19:53:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pTCCX8XV"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QFCkIs6T"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35AC02820CC;
-	Tue, 20 May 2025 19:52:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 380A9283144
+	for <netdev@vger.kernel.org>; Tue, 20 May 2025 19:53:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747770777; cv=none; b=ph/3Xdb6o7pKet51Hc8S35Ie/CVDOeSmP2tH86w+TALFU7PJE+Q3UicN4bf3dr7gMPOHtsxx3kwuaDtG9Z5Ck8wd90O6KQunlP8GZe3ebZ/uNKQJCTlIr1JbpvMTqBmbiwr8IhYTC1EOoSfC25lKWYOeNQm4VuXrmnGuPmS50Js=
+	t=1747770836; cv=none; b=IB70Qh+MrYMGzCYZG4m287UQogVyqXS8ggqYM/H9rbrfCt9tF1C6QmoCkHh7zLcVn4nUoUlWiQKD/dlYQzocdfeIZP+zV18In3ckwi2QaqZ4rGFxOum6ojsLQ4odQjRqLoQ9ogKxJoki2q3krN34jxn1QBtMo1JOot3Ou5czMTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747770777; c=relaxed/simple;
-	bh=sVuIV87vGQNNhBH1C+IifHHMly6qW45dro2WlmwqoKE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UFuHdpghk3X/Qc4GYyzakjlUIwzrv94Nj3EqblvWvZCDYQgynzOulWbLgZeZeMIhuznvB78nRgcYt1UK+iDAy63JTY9BNcXh07kD+0IqbJPDVNx2LUGT0dcO00mJHa12F0M90/l+2dhps77KxHgRPd4RIzMbrD7FG4YlMlg9u5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pTCCX8XV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79FCDC4CEE9;
-	Tue, 20 May 2025 19:52:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747770776;
-	bh=sVuIV87vGQNNhBH1C+IifHHMly6qW45dro2WlmwqoKE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pTCCX8XVM9CEiOBZ79VhWuUwWU6FGvo2W901AQ4LYk4O44bVdXPD+YcX2kmgyjLTi
-	 1+LgeF8JMlSIvH5ORHHLppC0LhPgisAd7j6rUtJjbnzyaocoljL7ga8x3l5MpXgwvv
-	 cQ0Oq8LN6prykF704uEZjAHRpdLmYqqOm68GjPaZJNhaAXvEM4x1esIYkFZwsYc4pP
-	 QopYcvL3vU8OnP1iDQI6WUY+n8EDsWXgTeZxc395GqVkr4fumvmRTBI1ucbDqObCCg
-	 OHMZhAneCp7TFzKEcFdGySTnVre2k5G2siQs4gTpPRPU7cKCLcoe8q1W6wlqT2bfuB
-	 r5JD92U70lgeQ==
-Date: Tue, 20 May 2025 14:52:54 -0500
-From: Rob Herring <robh@kernel.org>
-To: Matthew Gerlach <matthew.gerlach@altera.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, krzk+dt@kernel.org,
-	conor+dt@kernel.org, mturquette@baylibre.com,
-	richardcochran@gmail.com, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Mun Yew Tham <mun.yew.tham@altera.com>
-Subject: Re: [PATCH] dt-bindings: net: Convert socfpga-dwmac bindings to yaml
-Message-ID: <20250520195254.GA1247930-robh@kernel.org>
-References: <20250513152237.21541-1-matthew.gerlach@altera.com>
+	s=arc-20240116; t=1747770836; c=relaxed/simple;
+	bh=LMow8st1O7Ysp4v8Zqt9T/zgaRzah2q6OQC3qfPUJiI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KL+Lfpv2XedKSHUWj8PtlQOcnVjrngt/3wBFWnPxBGS7yfXto290AzPAY+j00aa+c+rZ7gqes9U+1fgYfB1t//MVUuNqVxPHr29O2OCmimHHqilX9aSNnJGmNpl5lJrjRX+/Mdv72YFU7Dbh/ePOxAdTtLp90yoD6iKI00ZVLwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QFCkIs6T; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <abf16cc2-c350-430d-a2fd-2a8bedef9f34@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1747770822;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SgVreyh/32mfFDTl9eouagm/kPBKpy5gDkzprCKXQV8=;
+	b=QFCkIs6Ti1ypb1zPq6wred4TjtU/VIph0994kvbSrUFnqbsECVutNgiCCrb7t6OrfPKHk/
+	/0zEsUTsjc3PM2ue+rWJYcISlDW0c8wVJJCvSBAxxcXvP4TDVUgwtUnPNptQdelcDpPLtY
+	wFg9O67+IgAh1R5xLOxp2AHH005ADso=
+Date: Tue, 20 May 2025 20:53:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250513152237.21541-1-matthew.gerlach@altera.com>
+Subject: Re: [PATCH net-next v2 6/8] gve: Add rx hardware timestamp expansion
+Content-Language: en-US
+To: Ziwei Xiao <ziweixiao@google.com>
+Cc: Harshitha Ramamurthy <hramamurthy@google.com>, netdev@vger.kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, jeroendb@google.com, andrew+netdev@lunn.ch,
+ willemb@google.com, pkaligineedi@google.com, yyd@google.com,
+ joshwash@google.com, shailend@google.com, linux@treblig.org,
+ thostet@google.com, jfraker@google.com, richardcochran@gmail.com,
+ jdamato@fastly.com, horms@kernel.org, linux-kernel@vger.kernel.org
+References: <20250517001110.183077-1-hramamurthy@google.com>
+ <20250517001110.183077-7-hramamurthy@google.com>
+ <50be88c9-2cb3-421d-a2bf-4ed9c7d58c58@linux.dev>
+ <CAG-FcCO7H=1Xj5B830RA-=+W8umUqq=WdOjwNqzeKvJLeMgywA@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <CAG-FcCO7H=1Xj5B830RA-=+W8umUqq=WdOjwNqzeKvJLeMgywA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, May 13, 2025 at 08:22:37AM -0700, Matthew Gerlach wrote:
-> From: Mun Yew Tham <mun.yew.tham@altera.com>
+On 19.05.2025 19:45, Ziwei Xiao wrote:
+> .
 > 
-> Convert the bindings for socfpga-dwmac to yaml.
 > 
-> Signed-off-by: Mun Yew Tham <mun.yew.tham@altera.com>
-> Signed-off-by: Matthew Gerlach <matthew.gerlach@altera.com>
-> ---
->  .../bindings/net/socfpga,dwmac.yaml           | 109 ++++++++++++++++++
->  .../devicetree/bindings/net/socfpga-dwmac.txt |  57 ---------
->  2 files changed, 109 insertions(+), 57 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/net/socfpga,dwmac.yaml
->  delete mode 100644 Documentation/devicetree/bindings/net/socfpga-dwmac.txt
+> On Sun, May 18, 2025 at 2:45 PM Vadim Fedorenko
+> <vadim.fedorenko@linux.dev> wrote:
+>>
+>> On 17.05.2025 01:11, Harshitha Ramamurthy wrote:
+>>> From: John Fraker <jfraker@google.com>
+>>>
+>>> Allow the rx path to recover the high 32 bits of the full 64 bit rx
+>>> timestamp.
+>>>
+>>> Use the low 32 bits of the last synced nic time and the 32 bits of the
+>>> timestamp provided in the rx descriptor to generate a difference, which
+>>> is then applied to the last synced nic time to reconstruct the complete
+>>> 64-bit timestamp.
+>>>
+>>> This scheme remains accurate as long as no more than ~2 seconds have
+>>> passed between the last read of the nic clock and the timestamping
+>>> application of the received packet.
+>>>
+>>> Signed-off-by: John Fraker <jfraker@google.com>
+>>> Signed-off-by: Ziwei Xiao <ziweixiao@google.com>
+>>> Reviewed-by: Willem de Bruijn <willemb@google.com>
+>>> Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
+>>> ---
+>>>    Changes in v2:
+>>>    - Add the missing READ_ONCE (Joe Damato)
+>>> ---
+>>>    drivers/net/ethernet/google/gve/gve_rx_dqo.c | 23 ++++++++++++++++++++
+>>>    1 file changed, 23 insertions(+)
+>>>
+>>> diff --git a/drivers/net/ethernet/google/gve/gve_rx_dqo.c b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+>>> index dcb0545baa50..c03c3741e0d4 100644
+>>> --- a/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+>>> +++ b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+>>> @@ -437,6 +437,29 @@ static void gve_rx_skb_hash(struct sk_buff *skb,
+>>>        skb_set_hash(skb, le32_to_cpu(compl_desc->hash), hash_type);
+>>>    }
+>>>
+>>> +/* Expand the hardware timestamp to the full 64 bits of width, and add it to the
+>>> + * skb.
+>>> + *
+>>> + * This algorithm works by using the passed hardware timestamp to generate a
+>>> + * diff relative to the last read of the nic clock. This diff can be positive or
+>>> + * negative, as it is possible that we have read the clock more recently than
+>>> + * the hardware has received this packet. To detect this, we use the high bit of
+>>> + * the diff, and assume that the read is more recent if the high bit is set. In
+>>> + * this case we invert the process.
+>>> + *
+>>> + * Note that this means if the time delta between packet reception and the last
+>>> + * clock read is greater than ~2 seconds, this will provide invalid results.
+>>> + */
+>>> +static void __maybe_unused gve_rx_skb_hwtstamp(struct gve_rx_ring *rx, u32 hwts)
+>>> +{
+>>> +     s64 last_read = READ_ONCE(rx->gve->last_sync_nic_counter);
+>>
+>> I believe last_read should be u64 as last_sync_nic_counter is u64 and
+>> ns_to_ktime expects u64.
+>>
+> Thanks for the suggestion. The reason to choose s64 for `last_read`
+> here is to use signed addition explicitly with `last_read +
+> (s32)diff`. This allows diff (which can be positive or negative,
+> depending on whether hwts is ahead of or behind low(last_read)) to
+> directly adjust last_read without a conditional branch, which makes
+> the intent clear IMO. The s64 nanosecond value is not at risk of
+> overflow, and the positive s64 result is then safely converted to u64
+> for ns_to_ktime.
 > 
-> diff --git a/Documentation/devicetree/bindings/net/socfpga,dwmac.yaml b/Documentation/devicetree/bindings/net/socfpga,dwmac.yaml
-> new file mode 100644
-> index 000000000000..68ad580dc2da
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/socfpga,dwmac.yaml
-> @@ -0,0 +1,109 @@
-> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/socfpga,dwmac.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Altera SOCFPGA SoC DWMAC controller
-> +
-> +maintainers:
-> +  - Matthew Gerlach <matthew.gerlach@altera.com>
-> +
-> +select:
-> +  properties:
-> +    compatible:
-> +      contains:
-> +        enum:
-> +          - altr,socfpga-stmmac
-> +          - altr,socfpga-stmmac-a10-s10
-> +  required:
-> +    - altr,sysmgr-syscon
+> I'm happy to change last_read to u64 if that's preferred for type
+> consistency, or I can add a comment to clarify the rationale for the
+> current s64 approach. Please let me know what you think. Thanks!
 
-Should be 'compatible' here.
+I didn't get where is the conditional branch expected? AFAIU, you can do
+direct addition u64 + s32 without any branches. The assembly is also pretty
+clean in this case (used simplified piece of code):
 
-> +
-> +properties:
-> +  compatible:
-> +    oneOf:
-> +      - items:
-> +          - const: altr,socfpga-stmmac
-> +          - const: snps,dwmac-3.70a
-> +          - const: snps,dwmac
-> +      - items:
-> +          - const: altr,socfpga-stmmac-a10-s10
-> +          - const: snps,dwmac-3.74a
-> +          - const: snps,dwmac
-> +      - items:
-> +          - const: altr,socfpga-stmmac-a10-s10
-> +          - const: snps,dwmac-3.72a
-> +          - const: snps,dwmac
+         movl    -12(%rbp), %eax
+         movslq  %eax, %rdx
+         movq    -8(%rbp), %rax
+         addq    %rax, %rdx
 
-The last 2 lists can be combined.
 
-> +
-> +  clocks:
-> +    minItems: 1
-> +    maxItems: 4
+> 
+>>> +     struct sk_buff *skb = rx->ctx.skb_head;
+>>> +     u32 low = (u32)last_read;
+>>> +     s32 diff = hwts - low;
+>>> +
+>>> +     skb_hwtstamps(skb)->hwtstamp = ns_to_ktime(last_read + diff);
+>>> +}
+>>> +
+>>>    static void gve_rx_free_skb(struct napi_struct *napi, struct gve_rx_ring *rx)
+>>>    {
+>>>        if (!rx->ctx.skb_head)
+>>
 
-You need to define what each entry is.
-
-> +
-> +  clock-names:
-> +    minItems: 1
-> +    maxItems: 4
-
-And the name for each entry.
-
-> +
-> +  phy-mode:
-> +    enum:
-> +      - rgmii
-> +      - sgmii
-> +      - gmii
-> +
-> +  altr,emac-splitter:
-> +    $ref: /schemas/types.yaml#/definitions/phandle
-> +    description:
-> +      Should be the phandle to the emac splitter soft IP node if DWMAC
-> +      controller is connected an emac splitter.
-> +
-> +  altr,f2h_ptp_ref_clk:
-> +    $ref: /schemas/types.yaml#/definitions/phandle
-> +    description:
-> +      Phandle to Precision Time Protocol reference clock. This clock is
-> +      common to gmac instances and defaults to osc1.
-> +
-> +  altr,gmii-to-sgmii-converter:
-> +    $ref: /schemas/types.yaml#/definitions/phandle
-> +    description:
-> +      Should be the phandle to the gmii to sgmii converter soft IP.
-> +
-> +  altr,sysmgr-syscon:
-> +    $ref: /schemas/types.yaml#/definitions/phandle-array
-> +    description:
-> +      Should be the phandle to the system manager node that encompass
-> +      the glue register, the register offset, and the register shift.
-> +      On Cyclone5/Arria5, the register shift represents the PHY mode
-> +      bits, while on the Arria10/Stratix10/Agilex platforms, the
-> +      register shift represents bit for each emac to enable/disable
-> +      signals from the FPGA fabric to the EMAC modules.
-> +    minItems: 1
-> +    items:
-> +      - description: phandle to the system manager node
-> +      - description: offset of the control register
-> +      - description: shift within the control register
-
-items:
-  - items:
-      - description: phandle to the system manager node
-      - ...
-      - ...
-
-And drop minItems.
-
-> +
-> +allOf:
-> +  - $ref: snps,dwmac.yaml#
-> +
-> +additionalProperties: true
-
-unevaluatedProperties: false
-
-> +
-> +examples:
-> +
-> +  - |
-> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
-> +    #include <dt-bindings/interrupt-controller/irq.h>
-> +    soc {
-> +            #address-cells = <1>;
-
-Use 4 space indent.
-
-> +            #size-cells = <1>;
-> +            gmac0: ethernet@ff700000 {
-
-Drop the label.
-
-> +                    compatible = "altr,socfpga-stmmac", "snps,dwmac-3.70a",
-> +                    "snps,dwmac";
-> +                    altr,sysmgr-syscon = <&sysmgr 0x60 0>;
-> +                    reg = <0xff700000 0x2000>;
-> +                    interrupts = <GIC_SPI 116 IRQ_TYPE_LEVEL_HIGH>;
-> +                    interrupt-names = "macirq";
-> +                    mac-address = [00 00 00 00 00 00]; /* Filled in by U-Boot */
-> +                    clocks = <&emac_0_clk>;
-> +                    clock-names = "stmmaceth";
-> +                    phy-mode = "sgmii";
-> +            };
-> +    };
 
