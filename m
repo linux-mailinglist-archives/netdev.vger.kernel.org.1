@@ -1,83 +1,104 @@
-Return-Path: <netdev+bounces-191685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC082ABCBD9
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 01:58:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 026E6ABCBF0
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 02:16:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF5FC188ACE0
-	for <lists+netdev@lfdr.de>; Mon, 19 May 2025 23:58:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E19F3B6BB4
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 00:15:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE6A923BD0F;
-	Mon, 19 May 2025 23:57:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26F52253F07;
+	Tue, 20 May 2025 00:15:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iDL2puIB"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="INrmpwCZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A2923A9B1;
-	Mon, 19 May 2025 23:57:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40596374D1;
+	Tue, 20 May 2025 00:15:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747699079; cv=none; b=McIAQpNArTgyDKlFNwJP2Fr+LSua3D4ql01uAWhRFE8fCJLILFrsMnOx34lApsq8+3WiRga/juKIUUP3YzGHuNRKUo1eRYvJCmcfFluNDQ8aoj5jwQBM0ML/wTID9RN6AkBHgd/0L3JF92UKqzhLgMPLYoffug6BaRnx73BFlBU=
+	t=1747700159; cv=none; b=jwuYCE3f9gRQGL6nfPWjNzYE/FiJjPPcZHkrxTfcPOPN8fmJJTc5qFk7egWcv5cEC1jYYAhU7IengNsgBH09QOHUsFWHc+m11XAKXvDc1LaJCIOA+PqB4RYxnwbxKOltYxOFkNH9vVHVzS0GZjr9aa7JgS9vDRKc9qF7sRIg/gg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747699079; c=relaxed/simple;
-	bh=ld8fEAbyAJ/eXUwUBtpIevulmKNgly05/V7s2D1ToSg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZtOmO2or08avAA9bX0mEGsQrRC8FMzZoJuOc1zbgBN4uHVe0m2i+LlIDo822fdT5LsqQij5TL7ttMTXGe0VLerzyxEw3LQSdJ3CsI401bj4zohsCrKzxx76dNfv2hVrHF4U60aVubFshP7wWmOyq3URDqtNDlZES/0KiODL80nY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iDL2puIB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8498C4CEED;
-	Mon, 19 May 2025 23:57:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747699079;
-	bh=ld8fEAbyAJ/eXUwUBtpIevulmKNgly05/V7s2D1ToSg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iDL2puIBF82J4DAU5izVvmtq37M1KQ3azlAGVpuSLKUmEL2CijlTfGbxvzjIP4+jn
-	 giruBkcdNXnNnW/WUwhx+WdwLRnVtrPYZiD9zx0kxTY8H5RBlTI3PCQaVPi1iMLgvW
-	 Eq1gisDhBKTB+WJ8WnzP19OY56qZc8KdSXgIMJqFcztHO74wxEsoozyChBx4u7VMsN
-	 PVVERdI3i8eFx0dEot3zeebpVqy2VBWwSCKE/n0g3/mueVjdphOQC5A9FQF2oE4LQD
-	 95qOL2ca+qCuVt/4RH+ibNQGqqI4UNJkouTEUudIKUnZpQRCwGT3oWPDygRkTOuQ+p
-	 oA51LCG+zhevg==
-Date: Mon, 19 May 2025 16:57:58 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Moon Yeounsu <yyyynoom@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dlink: add Kconfig option for RMON
- registers
-Message-ID: <20250519165758.58157a0b@kernel.org>
-In-Reply-To: <20250519214046.47856-2-yyyynoom@gmail.com>
-References: <20250519214046.47856-2-yyyynoom@gmail.com>
+	s=arc-20240116; t=1747700159; c=relaxed/simple;
+	bh=TU1PuU20ULP0nxdQLvR4OMMp/ktsrxHvmhb+Ek+jIT8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Zm5R2cwwpw+S5xu0Lxnnxg/wmHFhKTdlk04k7hKJjpKaAgLJYnCRqpXBQRqLiFP0r3uzilYsrXpxGYYC9LGCMwYgwh5NoOnH2uLAy0yhm7scO4xr/BamcFXI1nLe/REuulzMPtY61eYTeJJSSyVOpBfJaz+e21MK+vAzuW/h6wM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=INrmpwCZ; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=7MeXPOcFmUddS1SAwooWtuqxeKXe3n1iDcpVdycH0O0=; b=INrmpwCZhz1VbKAkkOBF7qF6SG
+	7c7735Eoz0KbjiO9TR8P6WUZBywZ893FV3XP+efpALN/Pcn5HyDFmUSsFKNq1/wXMx9mK0SqTdkvb
+	mruwi448TfW+h/FHiz5+0kQUtLMZQ5qsM0mipnN3VlZ8gvCSNaG+sDaaAcCbdN8RbXB0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uHAe1-00D4ER-DB; Tue, 20 May 2025 02:15:45 +0200
+Date: Tue, 20 May 2025 02:15:45 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jonas Gorski <jonas.gorski@gmail.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vivien Didelot <vivien.didelot@gmail.com>,
+	=?iso-8859-1?Q?=C1lvaro_Fern=E1ndez?= Rojas <noltari@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 2/3] net: dsa: b53: fix configuring RGMII delay on
+ bcm63xx
+Message-ID: <e0d25a68-057b-4839-a8cd-affe458bfea3@lunn.ch>
+References: <20250519174550.1486064-1-jonas.gorski@gmail.com>
+ <20250519174550.1486064-3-jonas.gorski@gmail.com>
+ <ed75677c-c3fb-41d1-a2cd-dd84d224ffe3@lunn.ch>
+ <CAOiHx=nwbs7030GKZHLc6Pc6LA6Hqq0NYfNSt=3zOgnj5zpAYQ@mail.gmail.com>
+ <2e5e16a1-e59e-470d-a1d9-618a1b9efdd4@lunn.ch>
+ <CAOiHx=mQ8z1CO1V-8b=7pjK-Hm9_4-tcvucKXpM1i+eOOB4axg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOiHx=mQ8z1CO1V-8b=7pjK-Hm9_4-tcvucKXpM1i+eOOB4axg@mail.gmail.com>
 
-On Tue, 20 May 2025 06:40:45 +0900 Moon Yeounsu wrote:
-> This patch adds a Kconfig option to enable MMIO for RMON registers.
+> Without this change no mode/port works, since there is always either a
+> 0 ns delay or a 4 ns delay in the rx/tx paths (I assume, I have no
+> equipment to measure).
 > 
-> To read RMON registers, the code `dw32(RmonStatMask, 0x0007ffff);`
-> must also be skipped, so this patch adds a preprocessor directive to
-> that line as well.
-> 
-> On the `D-Link DGE-550T Rev-A3`, RMON statistics registers can be read
-> correctly and statistic data can be collected. However, the behavior on
-> other hardware is uncertain, and there may be undiscovered issues even
-> on this device. Thus, the default setting is `no`, allowing users to
-> enable it manually if necessary.
+> With this change all modes/ports work.
 
-Kconfig is not a great choice for chip specific logic.
-You should check some sort of chip ID register or PCI ID
-to match the chip version at runtime. Most users don't compile
-their own kernels.
--- 
-pw-bot: cr
+Which is wrong. 
+
+> With "rgmii-id" the mac doesn't
+> configure any delays (and the phy does instead), with "rgmii" it's
+> vice versa, so there is always the expected 2 ns delay. Same for rxid
+> and txid.
+
+If you read the description of what these four modes mean, you should
+understand why only one should work. And given the most likely PCB
+design, the only mode that should work is rgmii-id. You would have to
+change the PCB design, to make the other modes work.
+
+> The Switch is always integrated into the host SoC, so there is no
+> (r)gmii cpu port to configure. There's basically directly attached DMA
+> to/from the buffers of the cpu port. Not sure if there are even
+> buffers, or if it is a direct to DMA delivery.
+
+That makes it a lot simpler. It always plays the MAC side. So i
+recommend you just hard code it no delay, and let the PHY add the
+delays as needed.
+
+	Andrew
 
