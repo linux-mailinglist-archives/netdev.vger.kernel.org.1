@@ -1,65 +1,62 @@
-Return-Path: <netdev+bounces-191952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A699ABE05E
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 18:18:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 433F9ABE07C
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 18:21:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7213A8A2551
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:16:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 415DE1885617
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:19:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F79927BF8E;
-	Tue, 20 May 2025 16:12:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10EE61AE875;
+	Tue, 20 May 2025 16:19:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uPrnBUlS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h2dbNTo1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7F3E26B085;
-	Tue, 20 May 2025 16:12:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D559C4A06
+	for <netdev@vger.kernel.org>; Tue, 20 May 2025 16:19:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747757546; cv=none; b=UkuwkYm0A5uO/kK11Wf+uOgHmA0LN+F2fq9eB6GbOXYFkLokSa3UyDC3I+7LocIcFX2/aCZFdZpPsdBU2mzsQwIKIBWtgwJfZMMqwfmy2Zu0VuzpRxi7QfDHBZxQLF+aaZje+T1rKAJUX/i43FQl2obvVWTZ0SV1G2LZdNqW0YE=
+	t=1747757963; cv=none; b=WCl0J3Bo1gaqN4M11o0DJAOddYcsNCk5x0y5BCV3y5229XmOUwQ8YkoV+SjNRLOTHzweFmrz7WKJqEYPGh29x/Ca+FDygqTgKhaaQqYGbZ9CFL08tZKGkAjH1nQMW8m5voGEybus3LXmxcl6R0/4P2I8shkANCILj4X0Mn/NnOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747757546; c=relaxed/simple;
-	bh=H0wdVOSbUkt1lm7oK4U/1cODmEgFmaDK31ojwjNSrDc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QHNeZ7jSFxQZVykWsgRWo6D8utBV6q330K6NNAIHKZJXRwR+cybgefqmiRJNsrfsG7+Dyi3C+wuFnnNWwYeebunAxDyG2oxG3JM+8dDo/0UrDRnoHQv4GR4a2jpbrA9t6/kp6MiI0GrTJiIKjBIWDrYJyvhk7N9rWePS+T9xexY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uPrnBUlS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07871C4CEE9;
-	Tue, 20 May 2025 16:12:21 +0000 (UTC)
+	s=arc-20240116; t=1747757963; c=relaxed/simple;
+	bh=qyko8M+DwWkXiFa9rBq9Z4beye64CDnfGvEkSN35Cpk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NVo8/iGsGLw3UTauIkU44ZAiBuAQDhQF3DvU02r753VoJdRx9ZKRbxjvcWLVk/xlSln9eB58dkrE0Z/bpFnzyM+2UDsuAN2J/UUHefoEbqTLlEnj9XLFNiXBvFKwMyOomI7klqGCi1yBJU/EouZ5AK9dX1zXO5jW+llZnAfTBYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h2dbNTo1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C28F9C4CEE9;
+	Tue, 20 May 2025 16:19:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747757545;
-	bh=H0wdVOSbUkt1lm7oK4U/1cODmEgFmaDK31ojwjNSrDc=;
+	s=k20201202; t=1747757963;
+	bh=qyko8M+DwWkXiFa9rBq9Z4beye64CDnfGvEkSN35Cpk=;
 	h=From:To:Cc:Subject:Date:From;
-	b=uPrnBUlS6G38zQL9J1d0mEtD3d6wnS3FaUkDi741pR6lEo71M/GmN7s7zJoU3Z5+P
-	 kJiVqXDfbIQvZujeqZnfreCz9rrIj/0emBGveYgh7ZS2NfC5aKBMJKXoEtkBTQEuKB
-	 k0CF4InZYB/lEpqQRHZ0nKUjYsK6oYR8bxGorwFXY1ZhqF6DGVBmZEuz8ZzRN1/AEl
-	 Wx2L1bu/zXPySD8gNI1GSg0/xWaqj0Fj6SXhJOGLLv0l/njfI4mD9LEfMNkQiP/1VS
-	 o0tkt12LtgzbtZaVZ/qA0E1mMJOFt3H4tyCohfB/ATK9JTxKXM2xVXFfawM4HA1Hga
-	 EOoxt/4atys7A==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Wei Fang <wei.fang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Frank Li <Frank.Li@nxp.com>,
-	imx@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: enetc: fix NTMP build dependency
-Date: Tue, 20 May 2025 18:12:09 +0200
-Message-Id: <20250520161218.3581272-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.5
+	b=h2dbNTo1OmQYcwYQxSmDqhecuYMXkcsTHJZnKEXjiXcVd9GGvvp85SwFkR3NhMkiq
+	 0+UXWdSga9dyZEa3eQ4rDvHmNoCF1yI1ECi3X0oSm7EDY69SCmSd3sXsXTFYjMq5bA
+	 LTUL0JTGGfQx5k1YBlxS5hzDnFnR7LwqpisZlvmEInuHB6NYW8l1SZt3t3YGBAOtio
+	 8MC7d+h/SSmM20nvpwuBCu0l6sr92lrF5hRqH3R50rVdVezotWVlgtc4Aqm5l7MMaN
+	 T0/uDy/duI/XAevkyj0bc+Ehko7qbqEALkPEV5/ryzQUcxk7bMqmIWgCJXwMhaRyf1
+	 e7WaccVvaR2Xg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	donald.hunter@gmail.com,
+	jacob.e.keller@intel.com,
+	sdf@fomichev.me,
+	jstancek@redhat.com,
+	kory.maincent@bootlin.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next v2 00/12] tools: ynl-gen: add support for "inherited" selector and therefore TC
+Date: Tue, 20 May 2025 09:19:04 -0700
+Message-ID: <20250520161916.413298-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,57 +65,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Arnd Bergmann <arnd@arndb.de>
+Add C codegen support for constructs needed by TC, namely passing
+sub-message selector from a lower nest, and sub-messages with
+fixed headers.
 
-When the new library driver is in a loadable module, but the enetc
-core driver is built-in, the kernel fails to link:
+v2:
+ - [patch  1] new
+ - [patch  8] small refactor
+ - [patch 10] add more includes to build on Ubuntu 22.04 system headers
 
-aarch64-linux-ld: drivers/net/ethernet/freescale/enetc/enetc_cbdr.o: in function `enetc4_teardown_cbdr':
-enetc_cbdr.c:(.text+0x70): undefined reference to `ntmp_free_cbdr'
-aarch64-linux-ld: drivers/net/ethernet/freescale/enetc/enetc_cbdr.o: in function `enetc4_get_rss_table':
-enetc_cbdr.c:(.text+0x98): undefined reference to `ntmp_rsst_query_entry'
-aarch64-linux-ld: drivers/net/ethernet/freescale/enetc/enetc_cbdr.o: in function `enetc4_set_rss_table':
-enetc_cbdr.c:(.text+0xb8): undefined reference to `ntmp_rsst_update_entry'
-aarch64-linux-ld: drivers/net/ethernet/freescale/enetc/enetc_cbdr.o: in function `enetc4_setup_cbdr':
-enetc_cbdr.c:(.text+0x438): undefined reference to `ntmp_init_cbdr'
+Jakub Kicinski (12):
+  tools: ynl-gen: add makefile deps for neigh
+  netlink: specs: tc: remove duplicate nests
+  netlink: specs: tc: use tc-gact instead of tc-gen as struct name
+  netlink: specs: tc: add C naming info
+  netlink: specs: tc: drop the family name prefix from attrs
+  tools: ynl-gen: support passing selector to a nest
+  tools: ynl-gen: move fixed header info from RenderInfo to Struct
+  tools: ynl-gen: support local attrs in _multi_parse
+  tools: ynl-gen: support weird sub-message formats
+  tools: ynl: enable codegen for TC
+  netlink: specs: tc: add qdisc dump to TC spec
+  tools: ynl: add a sample for TC
 
-Move the ntmp code into the core module itself to avoid this link error.
+ Documentation/netlink/specs/tc.yaml | 514 +++++++++++++++-------------
+ tools/net/ynl/Makefile.deps         |  10 +-
+ tools/net/ynl/generated/Makefile    |   2 +-
+ include/uapi/linux/neighbour.h      |   4 +-
+ tools/net/ynl/lib/ynl-priv.h        |   8 +-
+ tools/net/ynl/samples/tc.c          |  80 +++++
+ tools/net/ynl/pyynl/ynl_gen_c.py    | 168 +++++++--
+ tools/net/ynl/samples/.gitignore    |   1 +
+ 8 files changed, 500 insertions(+), 287 deletions(-)
+ create mode 100644 tools/net/ynl/samples/tc.c
 
-Fixes: 4701073c3deb ("net: enetc: add initial netc-lib driver to support NTMP")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/net/ethernet/freescale/enetc/Kconfig  | 2 +-
- drivers/net/ethernet/freescale/enetc/Makefile | 3 +--
- 2 files changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/freescale/enetc/Kconfig b/drivers/net/ethernet/freescale/enetc/Kconfig
-index e917132d3714..90aa6f6dfd63 100644
---- a/drivers/net/ethernet/freescale/enetc/Kconfig
-+++ b/drivers/net/ethernet/freescale/enetc/Kconfig
-@@ -16,7 +16,7 @@ config NXP_ENETC_PF_COMMON
- 	  If compiled as module (M), the module name is nxp-enetc-pf-common.
- 
- config NXP_NETC_LIB
--	tristate
-+	bool
- 	help
- 	  This module provides common functionalities for both ENETC and NETC
- 	  Switch, such as NETC Table Management Protocol (NTMP) 2.0, common tc
-diff --git a/drivers/net/ethernet/freescale/enetc/Makefile b/drivers/net/ethernet/freescale/enetc/Makefile
-index f1c5ad45fd76..0af59f97b7e7 100644
---- a/drivers/net/ethernet/freescale/enetc/Makefile
-+++ b/drivers/net/ethernet/freescale/enetc/Makefile
-@@ -6,8 +6,7 @@ fsl-enetc-core-y := enetc.o enetc_cbdr.o enetc_ethtool.o
- obj-$(CONFIG_NXP_ENETC_PF_COMMON) += nxp-enetc-pf-common.o
- nxp-enetc-pf-common-y := enetc_pf_common.o
- 
--obj-$(CONFIG_NXP_NETC_LIB) += nxp-netc-lib.o
--nxp-netc-lib-y := ntmp.o
-+fsl-enetc-core-$(CONFIG_NXP_NETC_LIB) += ntmp.o
- 
- obj-$(CONFIG_FSL_ENETC) += fsl-enetc.o
- fsl-enetc-y := enetc_pf.o
 -- 
-2.39.5
+2.49.0
 
 
