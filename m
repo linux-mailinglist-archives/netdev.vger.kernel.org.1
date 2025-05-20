@@ -1,113 +1,112 @@
-Return-Path: <netdev+bounces-191721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B631ABCDCA
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 05:20:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 074AAABCDC5
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 05:20:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3A9697A7D31
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 03:19:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82AEC3B8FA0
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 03:19:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C52258CF1;
-	Tue, 20 May 2025 03:20:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="VOg79n2N"
-X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D7BE257451;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68A502571CA;
 	Tue, 20 May 2025 03:20:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rf+r0fOQ"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 434E9256C60
+	for <netdev@vger.kernel.org>; Tue, 20 May 2025 03:20:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747711214; cv=none; b=YH7g6Z506Uf+U7XnJMq0YtD2iVoXiyDgRi18mPvh+B+Gz3Bf9hZZgA/8FnCZX3WgVgpXAtjwJZu6iOwBY1XEU9SWukZsoKaK4TiV523eRUd8JLFNvuzjQFklRTP/69zpMiLEHlPMLbS6n1vk8wqYtH5YWnlUCCQvHExs+klK/s4=
+	t=1747711211; cv=none; b=TZgc/ZMzfiRIiC5lIKkmOTHczLjPrzPq5gF4tmPVWKnWXAwvWlkirenbIxhaWhuKbwUjat42B5MhciSOgK21d4FUT3CBxWdl8HXmW8k9EqUtPIyG4JEU2ACe+kFW1DpAuESDsK3HLJN6yXsnNjsVTIS2lZ33KNvjuHT6UBC8PT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747711214; c=relaxed/simple;
-	bh=VKH7KRryI4ktofS9C7UuxsXcayJGKdrDWZTcnz1iCV8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=fTHXDvtaz2kmz+pJdOpf3zvxjhukFkPFNxOv+V0MlQVgqS5YSVhvq//VSpKzb9ZEBTijDFqR4IZFTWRTGFdZoZJWg/kgT6/NsKhQiuY3sgwIS2HNhBVpD45OgETccWKLo8dQMqrM8Ozeg6y64Xf/L4gWkCM+fpkbqPaXptVKtCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=VOg79n2N; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 54K3JglR61991624, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1747711182; bh=VKH7KRryI4ktofS9C7UuxsXcayJGKdrDWZTcnz1iCV8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=VOg79n2NWp3+9ktcKp9gtbrYjJUIk53irYbowRSnVHj9Ux8pIM2POAFnWSdpPZ8He
-	 QwbfGXyJoVDyWu2aMSLTfTyCLTeaCpChYYUQjfr2c8+VRAC1B3WoL9TEbbDWzT15Pr
-	 AIWgLgP0UnfM2ymQUE2ymcgcj6V1vup9/PfnhCUVd6VwdoNkZKkxb0TrT6kB3beEm/
-	 RKFX2pIcOqk96VElM0nQ06TPkV2UlmQd/kzhCUGWlY+krnYzQX5IQkBu6+xs8yS1Lc
-	 asJXJOxgPng6U42lBO2qp6HzQ9zOuebgyRcAS+SAm4kyur6U/3Hu8r2M1IZPnmC9aX
-	 FmDhcEXtd+Slg==
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/3.13/5.93) with ESMTPS id 54K3JglR61991624
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 20 May 2025 11:19:42 +0800
-Received: from RTEXMBS01.realtek.com.tw (172.21.6.94) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 20 May 2025 11:19:42 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS01.realtek.com.tw (172.21.6.94) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 20 May 2025 11:19:42 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622]) by
- RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622%5]) with mapi id
- 15.01.2507.035; Tue, 20 May 2025 11:19:41 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com"
-	<edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "horms@kernel.org"
-	<horms@kernel.org>,
-        Ping-Ke Shih <pkshih@realtek.com>,
-        Larry Chiu
-	<larry.chiu@realtek.com>, Joe Damato <jdamato@fastly.com>
-Subject: RE: [PATCH net-next v2] rtase: Use min() instead of min_t()
-Thread-Topic: [PATCH net-next v2] rtase: Use min() instead of min_t()
-Thread-Index: AQHbtawdSIC/HJstr0OxTEOUNg41/rPaAlkAgAAn8wCAAAG8AIAA1A0g
-Date: Tue, 20 May 2025 03:19:41 +0000
-Message-ID: <73c27a5a4c814a5a9cdf6319314f8480@realtek.com>
-References: <20250425063429.29742-1-justinlai0215@realtek.com>
-	<bb78d791abe34d9cbac30e75e7bec373@realtek.com>
-	<20250519153218.0036db7f@kernel.org> <20250519153830.112e1e0a@kernel.org>
-In-Reply-To: <20250519153830.112e1e0a@kernel.org>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-x-kse-serverinfo: RTEXMBS01.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1747711211; c=relaxed/simple;
+	bh=Jtkz9+yRkeX3xjEWWeb1iy2c48fCpvht45FjB9gD0og=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=rxf5cJbWFWshX2n+RXMe+fVswZxl86MpwbXpEm1Nh9sQnHa5SLhOcB3fWDbtEvZSCMuoEeUobswkRly+/8eyovFC8Ywr0332ZcTF9hzkKo11V+FQs5SwY5d0+NwEpUWAjYzqp6WtIdX4PEZEbsDHhyWDIzhntp9Bxm47DYE39tU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rf+r0fOQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A18E3C4CEE4;
+	Tue, 20 May 2025 03:20:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747711210;
+	bh=Jtkz9+yRkeX3xjEWWeb1iy2c48fCpvht45FjB9gD0og=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=rf+r0fOQznCVDkru9e8/kLIeQPyKPpGsNwIg8yXAwtZ0ANZA17Uwl8iuPWQB9EpRB
+	 Zbw9sVkXOzjyCLboq0ocpqIzR3W8GDrFcc36pnINyuWWP5nSQiY4tkSD2K0JfyS/kH
+	 upmnMUURGvMnlLiKMClHbdlIfIoVBRp+mmyPFJ0m+qLGGEdrNgE/HhE7HoSVgl83Bv
+	 UTNnkLih6lKRewAfbLEdIDOnW4ckCln3baftlgqgY+e97jhNX6Wc1MYcQzJ9yllZbd
+	 w6nN3b4Okq5xaIfV3PAi1qlPiPKzZIQuCmbXQITzWKR85Pfg8nMyNxjCf9n2RlyS5L
+	 4EV8dwT2Og9EA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF41380AA70;
+	Tue, 20 May 2025 03:20:47 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3 00/10][pull request] idpf: add initial PTP support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174771124675.1146050.13022731490334705259.git-patchwork-notify@kernel.org>
+Date: Tue, 20 May 2025 03:20:46 +0000
+References: <20250516170645.1172700-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20250516170645.1172700-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
+ milena.olech@intel.com, przemyslaw.kitszel@intel.com,
+ jacob.e.keller@intel.com, richardcochran@gmail.com
 
-> On Mon, 19 May 2025 15:32:18 -0700 Jakub Kicinski wrote:
-> > On Mon, 19 May 2025 12:16:11 +0000 Justin Lai wrote:
-> > > I apologize for the interruption, I would like to ask why this patch
-> > > is rejected on patchwork.
-> >
-> > Hm, unclear, sorry about that.
->=20
-> It doesn't apply, perhaps that's why? Please rebase and repost.
+Hello:
 
-Hi Jakub,
+This series was applied to netdev/net-next.git (main)
+by Tony Nguyen <anthony.l.nguyen@intel.com>:
 
-Thank you for your reply. I will rebase and repost.
+On Fri, 16 May 2025 10:06:34 -0700 you wrote:
+> Milena Olech says:
+> 
+> This patch series introduces support for Precision Time Protocol (PTP) to
+> Intel(R) Infrastructure Data Path Function (IDPF) driver. PTP feature is
+> supported when the PTP capability is negotiated with the Control
+> Plane (CP). IDPF creates a PTP clock and sets a set of supported
+> functions.
+> 
+> [...]
 
-Thanks,
-Justin
+Here is the summary with links:
+  - [net-next,v3,01/10] idpf: change the method for mailbox workqueue allocation
+    https://git.kernel.org/netdev/net-next/c/9525a12d6b0b
+  - [net-next,v3,02/10] idpf: add initial PTP support
+    https://git.kernel.org/netdev/net-next/c/8d5e12c5921c
+  - [net-next,v3,03/10] virtchnl: add PTP virtchnl definitions
+    https://git.kernel.org/netdev/net-next/c/bf27283ba594
+  - [net-next,v3,04/10] idpf: move virtchnl structures to the header file
+    https://git.kernel.org/netdev/net-next/c/c5d0607f424e
+  - [net-next,v3,05/10] idpf: negotiate PTP capabilities and get PTP clock
+    https://git.kernel.org/netdev/net-next/c/5cb8805d2366
+  - [net-next,v3,06/10] idpf: add mailbox access to read PTP clock time
+    https://git.kernel.org/netdev/net-next/c/5a27503d3862
+  - [net-next,v3,07/10] idpf: add PTP clock configuration
+    https://git.kernel.org/netdev/net-next/c/d5dba8f7206d
+  - [net-next,v3,08/10] idpf: add Tx timestamp capabilities negotiation
+    https://git.kernel.org/netdev/net-next/c/4901e83a94ef
+  - [net-next,v3,09/10] idpf: add Tx timestamp flows
+    https://git.kernel.org/netdev/net-next/c/1a49cf814fe1
+  - [net-next,v3,10/10] idpf: add support for Rx timestamping
+    https://git.kernel.org/netdev/net-next/c/494565a74502
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
