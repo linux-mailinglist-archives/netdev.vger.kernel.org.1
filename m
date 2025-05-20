@@ -1,62 +1,70 @@
-Return-Path: <netdev+bounces-191827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04400ABD768
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 13:53:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73133ABD777
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 13:55:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9E0B4C1229
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 11:53:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1A703B127E
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 11:55:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 206FD276030;
-	Tue, 20 May 2025 11:53:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7F1C27BF83;
+	Tue, 20 May 2025 11:55:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="jhZ6H4dm"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="BH8osOYN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout3.routing.net (mxout3.routing.net [134.0.28.8])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F096BB5B;
-	Tue, 20 May 2025 11:53:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 616E714F9FB;
+	Tue, 20 May 2025 11:55:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747742033; cv=none; b=KHHwykfFAqo2XEWhsk6Y3eppLwIb8DGhDz5BiLUwPxxBT2LN4vkxJh4DZfrd3I2d0RUES1t961/HnoDcvc8ZJfmRCqobVMpy1U8VOjgjJfS5wMnFLn3iH/Xfs+e4ueD4bYujZ0E3ylRmv4dCoksVyUnAUOrwCqze4+f2e2daeto=
+	t=1747742118; cv=none; b=NRAYfEIA3avj2VaIqr8jgSqyQTeQlma+cjIK5rhqVbQWaEPZa5eTk+5sFOkMzSeODlEUv2PVvXIlglj3yP8BhlEa+kCJ2RrkO4pqS87XamVeLnprpD6N5PPEOU62yqL7+AD5KiS0KKfZMMmnzJeATZMsMa+fcEYGUvY1jyEYgcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747742033; c=relaxed/simple;
-	bh=jZpv78M0XLQXvPOauuXS6ONIikwRvvKqi0uQmtH+E88=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=nvgiPrDjd/A9nf3nZZOlql7Kw0/ixfZF6WUn0uRGyIDu4YQwLw1v/SHA1eXjm+hFgCDSI8vJ18uu0l+STCUnSjOWYCEJCty/DkDWy4WntTpnumqj/w3iURZqZRZZ781OUJbtjqiNSIkZTYTp1jgAtlSJWWahK/bOFQMp4860W5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=jhZ6H4dm; arc=none smtp.client-ip=134.0.28.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
-Received: from mxbox4.masterlogin.de (unknown [192.168.10.79])
-	by mxout3.routing.net (Postfix) with ESMTP id E4B4B61625;
-	Tue, 20 May 2025 11:53:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
-	s=20200217; t=1747742023;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DWgu5lBfL5XpJjjET0WzNaYSrku+BoCHnp93wZOvIz8=;
-	b=jhZ6H4dmH4PqaBbiMtuQINMyJgIfDAivcHRGi8Lw23Mjc4lMh8E5D0hNQqcQC5EmT8afWX
-	Mo5cQ5OWOrIJBTK/GhIQXhYxJynUIKDOhuf6ZGuA7+PujHyTbiBhnLIXs60lGNFn3rhk7U
-	7mcN+CQ8DR158tEYKD9Cs8l4GWzftLk=
-Received: from [IPv6:::1] (unknown [IPv6:2a01:599:a12:a881:7bc8:fcdc:bd77:c992])
-	by mxbox4.masterlogin.de (Postfix) with ESMTPSA id 91EC9801A1;
-	Tue, 20 May 2025 11:53:41 +0000 (UTC)
-Date: Tue, 20 May 2025 13:53:43 +0200
-From: Frank Wunderlich <linux@fw-web.de>
-To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	s=arc-20240116; t=1747742118; c=relaxed/simple;
+	bh=5RUqzLMaMG5lBzncssnhHrZkrCiokJ9qjd2PNJ/2yKU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=G3AqRaX21Vq1eXQgmCn3diyHxH1p6JhgCneRP732evaaknqrm/2WCZHuw+yxdn8cjNMZhqssBHivNUG+QoDRt28hzkwFRshftOGeibpf5Xmar56RtWLInkxlu/A01b8eHl76uynsyWfN65TkethdAR6pJ1l+xeRBjr/iXLGC7ck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=BH8osOYN; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1747742114;
+	bh=5RUqzLMaMG5lBzncssnhHrZkrCiokJ9qjd2PNJ/2yKU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=BH8osOYNE7umJPQkBEZqyCmHfgRY16TdRs2HA7tz8P7i5G1ORAwxVBwf5J7EaHD7t
+	 XtvvFJRY/KMIdb+/byxSxyM77NPEozPuxAz1Og+VhFJrz9BYTCdW+UvHcX3810mpmZ
+	 X6FJlJdKPEZdbkKNoLxZa7xxiC9Y54n8tyYqvsyfijatmWygpWMCyAChgviL3OvgBq
+	 4gJfIB1QsnR7ftaC6l9v4nZBNtVtbAlbH6lMTatgsRIu7XivtkIVwqqDgZw1EXIjXy
+	 HaK5Bz7V5dyqHytCdpCxpx6gNex0rlT0egjiajJfzypwdb7dr3ieooKjIaVcIw0l9y
+	 MF/SBS8B/IyQQ==
+Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
+	(No client certificate requested)
+	(Authenticated sender: kholk11)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 3AE0D17E0E2D;
+	Tue, 20 May 2025 13:55:13 +0200 (CEST)
+Message-ID: <c83aa789-662a-455d-a535-237d42df3eb9@collabora.com>
+Date: Tue, 20 May 2025 13:55:12 +0200
+Precedence: bulk
+X-Mailing-List: netdev@vger.kernel.org
+List-Id: <netdev.vger.kernel.org>
+List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 06/14] arm64: dts: mediatek: mt7988: add cci node
+To: Frank Wunderlich <linux@fw-web.de>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
  Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Matthias Brugger <matthias.bgg@gmail.com>
-CC: Frank Wunderlich <frank-w@public-files.de>,
+ Conor Dooley <conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>
+Cc: Frank Wunderlich <frank-w@public-files.de>,
  =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
  Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
  Sean Wang <sean.wang@mediatek.com>, Daniel Golle <daniel@makrotopia.org>,
@@ -64,62 +72,55 @@ CC: Frank Wunderlich <frank-w@public-files.de>,
  netdev@vger.kernel.org, devicetree@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH v2 06/14] arm64: dts: mediatek: mt7988: add cci node
-User-Agent: K-9 Mail for Android
-In-Reply-To: <7a563716-a7c6-446d-b66d-bc71c6207ef6@collabora.com>
-References: <20250516180147.10416-1-linux@fw-web.de> <20250516180147.10416-8-linux@fw-web.de> <7a563716-a7c6-446d-b66d-bc71c6207ef6@collabora.com>
-Message-ID: <4BEF26F3-957D-4BB4-BF7B-69DCFCC513DC@fw-web.de>
-Precedence: bulk
-X-Mailing-List: netdev@vger.kernel.org
-List-Id: <netdev.vger.kernel.org>
-List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Mail-ID: 2d52479b-b83b-47c9-978a-066fc5c63c1d
+References: <20250516180147.10416-1-linux@fw-web.de>
+ <20250516180147.10416-8-linux@fw-web.de>
+ <7a563716-a7c6-446d-b66d-bc71c6207ef6@collabora.com>
+ <4BEF26F3-957D-4BB4-BF7B-69DCFCC513DC@fw-web.de>
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Content-Language: en-US
+In-Reply-To: <4BEF26F3-957D-4BB4-BF7B-69DCFCC513DC@fw-web.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Am 20=2E Mai 2025 13:27:23 MESZ schrieb AngeloGioacchino Del Regno <angelog=
-ioacchino=2Edelregno@collabora=2Ecom>:
->Il 16/05/25 20:01, Frank Wunderlich ha scritto:
->> From: Frank Wunderlich <frank-w@public-files=2Ede>
->>=20
->> Add cci devicetree node for cpu frequency scaling=2E
->>=20
->> Signed-off-by: Daniel Golle <daniel@makrotopia=2Eorg>
->> Signed-off-by: Frank Wunderlich <frank-w@public-files=2Ede>
->> ---
->>   arch/arm64/boot/dts/mediatek/mt7988a=2Edtsi | 33 ++++++++++++++++++++=
-+++
->>   1 file changed, 33 insertions(+)
->>=20
->> diff --git a/arch/arm64/boot/dts/mediatek/mt7988a=2Edtsi b/arch/arm64/b=
-oot/dts/mediatek/mt7988a=2Edtsi
->> index ab6fc09940b8=2E=2E64466acb0e71 100644
->> --- a/arch/arm64/boot/dts/mediatek/mt7988a=2Edtsi
->> +++ b/arch/arm64/boot/dts/mediatek/mt7988a=2Edtsi
->> @@ -12,6 +12,35 @@ / {
->>   	#address-cells =3D <2>;
->>   	#size-cells =3D <2>;
->>   +	cci: cci {
->> +		compatible =3D "mediatek,mt8183-cci";
->
->While you can keep the mediatek,mt8183-cci fallback, this needs its own c=
-ompatible
->as "mediatek,mt7988-cci", therefore, I had to drop this patch from the on=
-es that I
->picked=2E
->
->Please add the new compatible both here and in the binding=2E
+Il 20/05/25 13:53, Frank Wunderlich ha scritto:
+> Am 20. Mai 2025 13:27:23 MESZ schrieb AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>:
+>> Il 16/05/25 20:01, Frank Wunderlich ha scritto:
+>>> From: Frank Wunderlich <frank-w@public-files.de>
+>>>
+>>> Add cci devicetree node for cpu frequency scaling.
+>>>
+>>> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+>>> Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
+>>> ---
+>>>    arch/arm64/boot/dts/mediatek/mt7988a.dtsi | 33 +++++++++++++++++++++++
+>>>    1 file changed, 33 insertions(+)
+>>>
+>>> diff --git a/arch/arm64/boot/dts/mediatek/mt7988a.dtsi b/arch/arm64/boot/dts/mediatek/mt7988a.dtsi
+>>> index ab6fc09940b8..64466acb0e71 100644
+>>> --- a/arch/arm64/boot/dts/mediatek/mt7988a.dtsi
+>>> +++ b/arch/arm64/boot/dts/mediatek/mt7988a.dtsi
+>>> @@ -12,6 +12,35 @@ / {
+>>>    	#address-cells = <2>;
+>>>    	#size-cells = <2>;
+>>>    +	cci: cci {
+>>> +		compatible = "mediatek,mt8183-cci";
+>>
+>> While you can keep the mediatek,mt8183-cci fallback, this needs its own compatible
+>> as "mediatek,mt7988-cci", therefore, I had to drop this patch from the ones that I
+>> picked.
+>>
+>> Please add the new compatible both here and in the binding.
+> 
+> Ok,but you have to drop last one too (add proc-supply) else there are build-errors.
+> 
 
-Ok,but you have to drop last one too (add proc-supply) else there are buil=
-d-errors=2E
+Many many thanks for the reminder, but yes, I already dropped that one too ;-)
 
->Cheers,
->Angelo
->
+>> Cheers,
+>> Angelo
+>>
+> 
+> 
+> regards Frank
 
-
-regards Frank
 
