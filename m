@@ -1,117 +1,85 @@
-Return-Path: <netdev+bounces-192027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35DCCABE4DE
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 22:37:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6557DABE543
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 22:59:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 400A73B0A2A
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 20:37:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B1477AF020
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 20:58:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B78128DF08;
-	Tue, 20 May 2025 20:36:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2F2321A43C;
+	Tue, 20 May 2025 20:59:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X4OgE11w"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cRtgVEaS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5932A28D8CA;
-	Tue, 20 May 2025 20:36:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EFAFBE5E;
+	Tue, 20 May 2025 20:59:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747773382; cv=none; b=scaKQQq27aQiaoNlgqSBx8dWa7IYjbS90/BFk7RLp/785aOrtUO3GksBAUVD+wzU33GWvr4nKDA2QUu6Y2UwcT4t2jwYAK1a4zNWev44dmu/6fdoU5W3GANlEWw1BQYYdT8AL4NgHts+fTFwymkjYmiTHC0Pfna0UhszYi092W8=
+	t=1747774772; cv=none; b=BWxeRLCBvFygFPJ2r8rgZQTe3QTAseFXSmJ6fU6mQkC64k81DEOZJ5gv9Xg1alsZVPtetabIA7+WaguuByWYbnu/b8XrHvWwt1md/HU38VP/wQIADa3N8yZJEBDyzZFl+/ARqtE4E/9Kmt3HO2vyA8RYrm/6QVH1BlpP4NSO4Wc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747773382; c=relaxed/simple;
-	bh=BpT/h0vYVM/F7Qu3OnVojwEelU9Q3/KKLsVzvM8EYjc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=U0HLNqxyofNbaLTvQUZsXu1dihMVSHyEXDM3QkyvO9i0eHZFuNnpYniq1bgbLmjyaMauTRtxeauWiGym38CPcC5g8i1Kc+wc5KMJTwMmr4FxRSivEmNRR1pMjpwGOFRSxQbbOWaR4x05nVAMv+ifZrNsARkmW6TVc6kJMCIspLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X4OgE11w; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-22e033a3a07so62200235ad.0;
-        Tue, 20 May 2025 13:36:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747773380; x=1748378180; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jCeM+ec5B4gH6tk0fEnypFNTVZat6T1JxRuML0u4Z8U=;
-        b=X4OgE11wIVAJ3sMCkW/jiN7DY51oFZi+t4XvJ4JTcuazjOXy/k2sfa17vg4Y4YM/wf
-         NwGZydMJ9c5RleXwnteuNrfi0bj0IsPNHK6ZkHIcGUmWLDedwCfSqhuGW3t5lt9x3qmk
-         gM1OpYngj5X7gFPV8njPAa2Xhk5rNIvgjd1Vms4WoZ0gZXPDe4YmRA/TN780iwbZ2dV8
-         4Ml51vGAcInVtTHV+eag8YsEUT2Rmi4GDeSMSXe/tqFpQUtsWZ+pEuFL9XZikJ/Xd0ja
-         ZdOr+S3HxqOmQmWOR6+nJ9jPYrBLFTkqLuYgUSpYn1gZ/UijlcscpGjqFp/xeFwTBupV
-         ZTZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747773380; x=1748378180;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jCeM+ec5B4gH6tk0fEnypFNTVZat6T1JxRuML0u4Z8U=;
-        b=GJk0q+8f81cqVVUtEu1PXN150y4/qqVIFjBFJVd9uVxvXaGQNalbxUh2/ryMOSHgmu
-         Fe7AT6Av6Zv9tNIhh5L5y9I+YBalA+JgmHGLQBEa81qHnGyGVm/eiufhlSsMd1pMvd4k
-         kgg/nb+S/uFsSuoG3NmeC3BYsNKQsnEF07/KzCLeP7K2D7ujJifsMiOrK6JnZTp7+HLA
-         bj7btpBxIZ1yqSmQeNIenxlzbwUvUngBWCkHsZnb8Ss1dEy8ME47IH61tfeBGesxkiSM
-         4QtosZRxw9UTx62ds7nPoXT3KikajFmvUPL2DY1PsTmgNSfZ0njbeWHiu6+c//b/nGNX
-         rpaw==
-X-Forwarded-Encrypted: i=1; AJvYcCWuyPAEqLEP6WkK19t2clgTac8MMkoHs8DkP0l5mGOKM++F38IORGD1dFZhQbx7xEVIPfx9tnMWXtchpdA=@vger.kernel.org, AJvYcCX3Yp2WikiilciWobUi6uWXI1uEPE4FndNOPoX/NSc0xziYWdzUOSHaKZwxWiwJdtxSRVI9CRxrwaJMbA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlnKCOmCsMqtL8ZMQevvErugsqimccRudQ33zzB3wiD4huB6B4
-	t+npbYJD7oUwPMUkl4MUgcOcl1X3wOvtRvB2mxRtxSmgFngMDT5HGBWAAJmW
-X-Gm-Gg: ASbGnctnEjs4fk8neLD/kwIUkj14na7jrLEVXjwtrSXYccp65lOqIhELydDimm2SJAA
-	kVicJK372o1NQDJspsowxvO0CEuLgcRRnEVMeR+8ixpPOOLGwMOsyecpMQi+ABV7w4zcGeu/N4t
-	104cRmksGYJ6NK3q7aofSVEjAYShAK6ZjdWK7iG3l+Da6oPUB2JZeEU7d46u0W17NtTaYXF0pzN
-	ItgIVq0Q1TWenwvmZ+MWNmicnAYqk6dv0bOt2Kxkx5zdvdx+j30LUm6ulEobxvAH4DMFEfBZ3bP
-	6KK5Vv18xgjHA8HxY4xWEiJ+xXFrK91LQqM7lP+Z2cOCHH5l7U4nD8E0kemv21FRtDuyHHClJ+L
-	mdnQ6I+c6skiz
-X-Google-Smtp-Source: AGHT+IHZAUIjrGWx7MHglWxuwcEk9khRmWgUQFYbF5wFZSXKA6EsR94YaJWuTX/WLyK6xZKL0cxykw==
-X-Received: by 2002:a17:902:d483:b0:232:17d8:486 with SMTP id d9443c01a7336-23217d81153mr195813465ad.22.1747773380107;
-        Tue, 20 May 2025 13:36:20 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-231d4ebba01sm80212605ad.208.2025.05.20.13.36.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 May 2025 13:36:19 -0700 (PDT)
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
+	s=arc-20240116; t=1747774772; c=relaxed/simple;
+	bh=i2LXA6q4w9avQnr8XrVoLkY33W1jD6X9Kz+ZNsIjaUE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jZILGpcHjyAEsHFmyOmViWI2iRzCa6leeRcpbBhS1k2Y6cvHCYbWai6AemeVVFcQFBiZ8upLXBcnLXrhUpOzH3tKzbkWxcnC0ZklkYY2wGfxvlB1JYCm0tV8jWnPnbcy/ybHnOuboImRiTQ3nBoz8Aam7bD5qeDAyZKVNumJ20M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cRtgVEaS; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747774770; x=1779310770;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=i2LXA6q4w9avQnr8XrVoLkY33W1jD6X9Kz+ZNsIjaUE=;
+  b=cRtgVEaSRela9HC6Jv29C5ZJ8ABTDjZifirMpONSiRLyoKy3UKyBzo20
+   Z/BGlzaYGDMdJ6mfKFQI96rlTnyKhgUcm3dobpXTq5VaRgRLZ8mPvx91O
+   Xbk8lVBSPoBBB+apoZYQ31nsnJdOdKpURYgvkMtXN35e1xeIXBUucgy64
+   BmPMDbChnQtcRIuvYXi8YMrOCxCpfYcqsvjAB036mpD/Rb5EA+ZsDZVBw
+   iQqsXyfddIn1tI3OjBmXCDg6W7fDixlgW4SeLkEKnarqpDAjGdIN39FOh
+   BC6BZVFi3xN9h5F/bwRyv8Jz7ukVx16KaV7iIHK02jjNAC19FD7qmk5Wa
+   g==;
+X-CSE-ConnectionGUID: /2OgcT59SHqcLr5ieKSHTg==
+X-CSE-MsgGUID: o5Jc3sYXQFaZPKKRIIWphw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11439"; a="67142672"
+X-IronPort-AV: E=Sophos;i="6.15,302,1739865600"; 
+   d="scan'208";a="67142672"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2025 13:59:29 -0700
+X-CSE-ConnectionGUID: FyJ2DKuiR6+JVL9IagIWGQ==
+X-CSE-MsgGUID: Cm+nMiCRSG2zW7u72APeZw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,302,1739865600"; 
+   d="scan'208";a="139850848"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmviesa007.fm.intel.com with ESMTP; 20 May 2025 13:59:29 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	skalluru@marvell.com,
-	manishc@marvell.com,
+	edumazet@google.com,
 	andrew+netdev@lunn.ch,
-	michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com,
-	ajit.khaparde@broadcom.com,
-	sriharsha.basavapatna@broadcom.com,
-	somnath.kotur@broadcom.com,
-	anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	aleksander.lobakin@intel.com,
+	maciej.fijalkowski@intel.com,
+	magnus.karlsson@intel.com,
+	michal.kubiak@intel.com,
 	przemyslaw.kitszel@intel.com,
-	tariqt@nvidia.com,
-	saeedm@nvidia.com,
-	louis.peens@corigine.com,
-	shshaikh@marvell.com,
-	GR-Linux-NIC-Dev@marvell.com,
-	ecree.xilinx@gmail.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
 	horms@kernel.org,
-	dsahern@kernel.org,
-	ruanjinjie@huawei.com,
-	mheib@redhat.com,
-	stfomichev@gmail.com,
-	linux-kernel@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	linux-rdma@vger.kernel.org,
-	oss-drivers@corigine.com,
-	linux-net-drivers@amd.com,
-	leon@kernel.org
-Subject: [PATCH net-next 3/3] Revert "bnxt_en: bring back rtnl_lock() in the bnxt_open() path"
-Date: Tue, 20 May 2025 13:36:14 -0700
-Message-ID: <20250520203614.2693870-4-stfomichev@gmail.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250520203614.2693870-1-stfomichev@gmail.com>
-References: <20250520203614.2693870-1-stfomichev@gmail.com>
+	bpf@vger.kernel.org
+Subject: [PATCH net-next 00/16][pull request] libeth: add libeth_xdp helper lib
+Date: Tue, 20 May 2025 13:59:01 -0700
+Message-ID: <20250520205920.2134829-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -120,142 +88,143 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This reverts commit 325eb217e41fa14f307c7cc702bd18d0bb38fe84.
+Alexander Lobakin says:
 
-udp_tunnel infra doesn't need RTNL, should be safe to get back
-to only netdev instance lock.
+Time to add XDP helpers infra to libeth to greatly simplify adding
+XDP to idpf and iavf, as well as improve and extend XDP in ice and
+i40e. Any vendor is free to reuse helpers. If this happens, I'm fine
+with moving the folder of out intel/.
 
-Cc: Michael Chan <michael.chan@broadcom.com>
-Signed-off-by: Stanislav Fomichev <stfomichev@gmail.com>
+The helpers greatly simplify building xdp_buff, running a prog,
+handling the verdict, implement XDP_TX, .ndo_xdp_xmit, XDP buffer
+completion. Same applies to XSk (with XSk xmit instead of
+.ndo_xdp_xmit, plus stuff like XSk wakeup).
+They are entirely generic with no HW definitions or assumptions.
+HW-specific stuff like parsing Rx desc / filling Tx desc is passed
+from the driver as inline callbacks.
+
+For now, key assumptions that optimize performance / avoid code
+bloat, but might not fit every driver in driver/net/:
+ * netmem holding the buffers are always order-0;
+ * driver has separate XDP Tx queues, doesn't use stack queues for
+   that. For best efficiency, you may want to have nr_cpu_ids XDP
+   queues, but less (queue sharing) is also supported;
+ * XDP Tx queues are interrupt-less and use "lazy" cleaning only
+   when there are less than 1/4 free Tx descriptors of the queue
+   size;
+ * main target platforms are 64-bit, although 32-bit is also fully
+   supported, but the code might be not as optimized for them.
+
+Library code already supports multi-buffer for all kinds of Tx and
+both header split and no split for Rx and Tx. Frags can come from
+devmem/io_uring etc., direct `struct page *` is used only for header
+buffers for which it's always true.
+Drivers are free to pass their own Rx hints and XSK xmit hints ops.
+
+XDP_TX and ndo_xdp_xmit use onstack bulk for the frames to be sent
+and send them by batches of 16 buffers. This eats ~280 bytes on the
+stack, but gives good boosts and allow to greatly optimize the main
+sending function leaving it without any error/exception paths.
+
+XSk xmit fills Tx descriptors in the loop unrolled by 8. This was
+proven to improve perf on ice and i40e. XDP_TX and ndo_xdp_xmit
+doesn't use unrolling as I wasn't able to get any improvements in
+those scenenarios from this, while +1 Kb for their sending functions
+for nothing doesn't sound reasonable.
+
+XSk wakeup, instead of traditionally used "SW interrupts" provided
+by NICs, uses IPI to schedule NAPI on the CPU corresponding to the
+given queue pair. It gives better control over CPU distribution and
+in general performs way better than "SW interrupts", plus allows us
+to not pass any HW-specific callbacks there.
+
+The code is built the way that all callbacks passed from drivers
+get inlined; in general, most of hotpath gets inlined. Everything
+slow/exception lands to .c files in the libeth folder, doesn't
+create copies in the drivers themselves and doesn't overloat
+hotpath.
+Sure, inlining means that hotpath will be compiled into every driver
+that uses the lib, but the core code is written in one place, so no
+copying of bugs happens. Fixed once -- works everywhere.
+
+The last commit might look like sorta hack, but it gives really good
+boosts and decreases object code size, plus there are checks that
+all those wider accesses are fully safe, so I don't feel anything
+bad about it.
+
+An example of using libeth_xdp can be found either on my GitHub or
+on the mailing lists here ("XDP for idpf"). Macros for building
+driver XDP functions lead to that some implementations (XDP_TX,
+ndo_xdp_xmit etc.) consist of really only a few lines.
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 36 +++++------------------
- 1 file changed, 7 insertions(+), 29 deletions(-)
+Was a part of "XDP for idpf" series, now submitted separately with
+proper splitting into atomic commits. I hope 16 patches out of 15
+maximum allowed is not a problem.
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index a3dadde65b8d..1da208c36572 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -14055,28 +14055,13 @@ static void bnxt_unlock_sp(struct bnxt *bp)
- 	netdev_unlock(bp->dev);
- }
- 
--/* Same as bnxt_lock_sp() with additional rtnl_lock */
--static void bnxt_rtnl_lock_sp(struct bnxt *bp)
--{
--	clear_bit(BNXT_STATE_IN_SP_TASK, &bp->state);
--	rtnl_lock();
--	netdev_lock(bp->dev);
--}
--
--static void bnxt_rtnl_unlock_sp(struct bnxt *bp)
--{
--	set_bit(BNXT_STATE_IN_SP_TASK, &bp->state);
--	netdev_unlock(bp->dev);
--	rtnl_unlock();
--}
--
- /* Only called from bnxt_sp_task() */
- static void bnxt_reset(struct bnxt *bp, bool silent)
- {
--	bnxt_rtnl_lock_sp(bp);
-+	bnxt_lock_sp(bp);
- 	if (test_bit(BNXT_STATE_OPEN, &bp->state))
- 		bnxt_reset_task(bp, silent);
--	bnxt_rtnl_unlock_sp(bp);
-+	bnxt_unlock_sp(bp);
- }
- 
- /* Only called from bnxt_sp_task() */
-@@ -14084,9 +14069,9 @@ static void bnxt_rx_ring_reset(struct bnxt *bp)
- {
- 	int i;
- 
--	bnxt_rtnl_lock_sp(bp);
-+	bnxt_lock_sp(bp);
- 	if (!test_bit(BNXT_STATE_OPEN, &bp->state)) {
--		bnxt_rtnl_unlock_sp(bp);
-+		bnxt_unlock_sp(bp);
- 		return;
- 	}
- 	/* Disable and flush TPA before resetting the RX ring */
-@@ -14125,7 +14110,7 @@ static void bnxt_rx_ring_reset(struct bnxt *bp)
- 	}
- 	if (bp->flags & BNXT_FLAG_TPA)
- 		bnxt_set_tpa(bp, true);
--	bnxt_rtnl_unlock_sp(bp);
-+	bnxt_unlock_sp(bp);
- }
- 
- static void bnxt_fw_fatal_close(struct bnxt *bp)
-@@ -15017,17 +15002,15 @@ static void bnxt_fw_reset_task(struct work_struct *work)
- 		bp->fw_reset_state = BNXT_FW_RESET_STATE_OPENING;
- 		fallthrough;
- 	case BNXT_FW_RESET_STATE_OPENING:
--		while (!rtnl_trylock()) {
-+		while (!netdev_trylock(bp->dev)) {
- 			bnxt_queue_fw_reset_work(bp, HZ / 10);
- 			return;
- 		}
--		netdev_lock(bp->dev);
- 		rc = bnxt_open(bp->dev);
- 		if (rc) {
- 			netdev_err(bp->dev, "bnxt_open() failed during FW reset\n");
- 			bnxt_fw_reset_abort(bp, rc);
- 			netdev_unlock(bp->dev);
--			rtnl_unlock();
- 			goto ulp_start;
- 		}
- 
-@@ -15047,7 +15030,6 @@ static void bnxt_fw_reset_task(struct work_struct *work)
- 			bnxt_dl_health_fw_status_update(bp, true);
- 		}
- 		netdev_unlock(bp->dev);
--		rtnl_unlock();
- 		bnxt_ulp_start(bp, 0);
- 		bnxt_reenable_sriov(bp);
- 		netdev_lock(bp->dev);
-@@ -15996,7 +15978,7 @@ static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
- 		   rc);
- 	napi_enable_locked(&bnapi->napi);
- 	bnxt_db_nq_arm(bp, &cpr->cp_db, cpr->cp_raw_cons);
--	netif_close(dev);
-+	bnxt_reset_task(bp, true);
- 	return rc;
- }
- 
-@@ -16812,7 +16794,6 @@ static int bnxt_resume(struct device *device)
- 	struct bnxt *bp = netdev_priv(dev);
- 	int rc = 0;
- 
--	rtnl_lock();
- 	netdev_lock(dev);
- 	rc = pci_enable_device(bp->pdev);
- 	if (rc) {
-@@ -16857,7 +16838,6 @@ static int bnxt_resume(struct device *device)
- 
- resume_exit:
- 	netdev_unlock(bp->dev);
--	rtnl_unlock();
- 	bnxt_ulp_start(bp, rc);
- 	if (!rc)
- 		bnxt_reenable_sriov(bp);
-@@ -17023,7 +17003,6 @@ static void bnxt_io_resume(struct pci_dev *pdev)
- 	int err;
- 
- 	netdev_info(bp->dev, "PCI Slot Resume\n");
--	rtnl_lock();
- 	netdev_lock(netdev);
- 
- 	err = bnxt_hwrm_func_qcaps(bp);
-@@ -17041,7 +17020,6 @@ static void bnxt_io_resume(struct pci_dev *pdev)
- 		netif_device_attach(netdev);
- 
- 	netdev_unlock(netdev);
--	rtnl_unlock();
- 	bnxt_ulp_start(bp, err);
- 	if (!err)
- 		bnxt_reenable_sriov(bp);
+All checkpatch warnings are false-positives unless someone disagrees.
+Checked with `--strict --codespell`, a well as building with W=12
+and sparse/smatch.
+W=12 is clean, sparse only warns about "context imbalance", but it's
+intended that libeth_xdp_tx_init_bulk() takes rcu_read_lock() and
+libeth_xdp_rx_finalize() does rcu_read_unlock(). This is how Eth
+drivers with enabled XDP do: lock before the NAPI polling loop,
+unlock after the loop is done and the pending XDP_TX and
+XDP_REDIRECT frames/maps are flushed (both functions are always
+required to be called when using libeth_xdp helpers on Rx).
+
+From "XDP for idpf" series, no changes except splitting and a couple
+of kdoc fixes. Also checked upstream Patchwork to make sure I didn't
+miss anything.
+
+IWL: https://lore.kernel.org/intel-wired-lan/20250415172825.3731091-1-aleksander.lobakin@intel.com/
+
+The following are changes since commit 9ab0ac0e532afd167b3bec39b2eb25c53486dcb5:
+  octeontx2-pf: Add tracepoint for NIX_PARSE_S
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 200GbE
+
+Alexander Lobakin (16):
+  libeth: convert to netmem
+  libeth: support native XDP and register memory model
+  libeth: xdp: add XDP_TX buffers sending
+  libeth: xdp: add .ndo_xdp_xmit() helpers
+  libeth: xdp: add XDPSQE completion helpers
+  libeth: xdp: add XDPSQ locking helpers
+  libeth: xdp: add XDPSQ cleanup timers
+  libeth: xdp: add helpers for preparing/processing &libeth_xdp_buff
+  libeth: xdp: add XDP prog run and verdict result handling
+  libeth: xdp: add templates for building driver-side callbacks
+  libeth: xdp: add RSS hash hint and XDP features setup helpers
+  libeth: xsk: add XSk XDP_TX sending helpers
+  libeth: xsk: add XSk xmit functions
+  libeth: xsk: add XSk Rx processing support
+  libeth: xsk: add XSkFQ refill and XSk wakeup helpers
+  libeth: xdp, xsk: access adjacent u32s as u64 where applicable
+
+ drivers/net/ethernet/intel/iavf/iavf_txrx.c   |   14 +-
+ .../ethernet/intel/idpf/idpf_singleq_txrx.c   |    2 +-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   |   33 +-
+ drivers/net/ethernet/intel/libeth/Kconfig     |   10 +-
+ drivers/net/ethernet/intel/libeth/Makefile    |    8 +-
+ drivers/net/ethernet/intel/libeth/priv.h      |   37 +
+ drivers/net/ethernet/intel/libeth/rx.c        |   40 +-
+ drivers/net/ethernet/intel/libeth/tx.c        |   41 +
+ drivers/net/ethernet/intel/libeth/xdp.c       |  449 ++++
+ drivers/net/ethernet/intel/libeth/xsk.c       |  269 +++
+ include/net/libeth/rx.h                       |   28 +-
+ include/net/libeth/tx.h                       |   36 +-
+ include/net/libeth/types.h                    |  106 +-
+ include/net/libeth/xdp.h                      | 1872 +++++++++++++++++
+ include/net/libeth/xsk.h                      |  685 ++++++
+ 15 files changed, 3576 insertions(+), 54 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/libeth/priv.h
+ create mode 100644 drivers/net/ethernet/intel/libeth/tx.c
+ create mode 100644 drivers/net/ethernet/intel/libeth/xdp.c
+ create mode 100644 drivers/net/ethernet/intel/libeth/xsk.c
+ create mode 100644 include/net/libeth/xdp.h
+ create mode 100644 include/net/libeth/xsk.h
+
 -- 
-2.49.0
+2.47.1
 
 
