@@ -1,86 +1,64 @@
-Return-Path: <netdev+bounces-191881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8067DABD918
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 15:15:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B52CABD929
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 15:18:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F10BC3B5B77
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 13:15:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BAC417F321
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 13:18:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B939A233713;
-	Tue, 20 May 2025 13:15:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D7622417D9;
+	Tue, 20 May 2025 13:18:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G73Rzmqv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GHZFwaCx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40236233158;
-	Tue, 20 May 2025 13:15:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A56B241696;
+	Tue, 20 May 2025 13:18:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747746934; cv=none; b=mF98z6MT3plRcASAgiPQe2EsR4rVAbhJzFtQ7yE3Qk6HJjp7m31OM9hnTPlFEhjXhKSpRAhGHzSSoqjswe0KKAcJVbf279h2WjljTP5+fHLFSCoDjarAjN74TLzSTLdhG6G3JmiID7qqIIfpVJWdrn5LB7nHAhT7EY+QWlUX+RQ=
+	t=1747747126; cv=none; b=ZKJYw9lE0tV7aSAfA60XlzEUkxtM5AE8QdUjdfk7lKJUKxuzlQNAoYQm90bRlDvh5zOicy4RqmTLYHWOEULLd58dCC1ixMKm6wm9Fbe/IjuR72j/WWwLO7Ifk+miXMgkVIKxQF5JIUY4DsdWht6c8qC2SuSNwluPB3yyPCbD0zg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747746934; c=relaxed/simple;
-	bh=eGBVGsNUyL/zdctIeW6YFnpPx4Mvwnhao4BWU/2HB74=;
+	s=arc-20240116; t=1747747126; c=relaxed/simple;
+	bh=3MlZ6pJ3PgzLg+lrX3zgXpF30gosCty23jYj1U6ABBg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Adqz6Ghphqf/8fBOfUIHnaqVuWXZkgX7qVnOitP2OrU6AT1tHIvAXyv6y0FexFNakvWMCMpJH+8s1IzXcYFZu/iGVRmEeNai6ALzTiwgt1YUOeAlu4II45jxIHMktHspPUlZSb9zlP8UEZD4Nr1Mt3wjRj4uF8cJGdRDYUldubg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G73Rzmqv; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-30ea8b7c5c2so2960579a91.3;
-        Tue, 20 May 2025 06:15:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747746932; x=1748351732; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2slTZBYuy532hRPOCHbFViHDs6iyGn7xyCftK4p+0VQ=;
-        b=G73Rzmqv5vTOnsiBovWPhekc6sIfC8kJjn53YjqeLt+iMEXDI5zuf4QV5EeMl1Vxtt
-         EwG4BxZwI8irAZef4lCO6ijfZNngizGGo4F0ORkkkWsJxEfADZ7ygFgf0QGx1SClW5Fn
-         CKwckY76KiHHH0wbWtuCbQ7WCdg5YnaKHYHueerqd5oeHqVDw5gjbrlHqlpJGqNsccT7
-         U7lPzQWWsChcsgYWdo2qPA3knu92wytZObG2M+LMkkZa9lfRQL70vF54jw4RECR+y0OF
-         3ZZsIfXuMkE9Mgnu6ELyGjM+jMBnxZ0lFQakYrLdKGxaWJ9qtEsuWJCv426weNkZZh3i
-         nrSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747746932; x=1748351732;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2slTZBYuy532hRPOCHbFViHDs6iyGn7xyCftK4p+0VQ=;
-        b=SSaKhMbVAFLq2jLc2z7wFljYT/GR7x907pS3Q+TPt+RcxSNXUUDFms7yb3G1aCgSEU
-         5UKiMCkVsAUq4Sh0ENMw/kh7YnJ0jodlsWSjX0eoPQfcy94GmZqXoVSaIByv3EJ7Xidg
-         HCcfyMcYpoJTsnY5jYPJPxRhczktYmn2kd7nW7BV9eOQIx2EVmlOdGmBjtKr27XUjleS
-         /YIF8V+pGtzhqheQ7moO+hwgWClgRL8M8sVfz/ErzJ7nh8B2pJb5DskMyb+DkY74kBCT
-         KS8Dpks9Ms4dnHRaW+87Y/6l1cYOb9lyQHcQUsahqVcsyc9k6wVWObnYGoYGcgf7RELr
-         rrwg==
-X-Forwarded-Encrypted: i=1; AJvYcCXP6ziOk0KtUwytefoL2oF1/4TluzXq3xHNVuwK7xzHCE584vUNxudDypSMkraLUOHZFhIvi4+X@vger.kernel.org, AJvYcCXyciNA9rulv33jFCZNShFJPR/CKWDyC51GC8u6VEfPwvhvEdaBuuhqcwjbJoS/7zRiXj2r3dtPOIaHX3Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YygZ38dBv0+cnkM4KlaqNLExZCFs3sLi9JX2l5W5Aggx25Fd/Ar
-	tSa2719cJtWFUqpWtENu2Q5+X0tQzcbG5xfaDiUrhmSC0t1VwrT1t08e
-X-Gm-Gg: ASbGncuUA9OhtEi5sYZI/3tskwI4SEMciEB+nKeHC8GOTkuVbhb1zJJHXNAMDx5AiG6
-	LZfnUYpdIbCveVc5t1gaejvC/IOqynVlgJC71KAjXRFxq5rKsTlhOQFA5oG8mAnL65/chCAHunh
-	JR1pmBpKJy+1nWkRdO3k35CZ7bLD8N8ru8xSprg1iC7gd3v3ihik1X4C2cImxK+rYiIKrvzb8Kc
-	9V/ZBDfhNdCx1J8eXS2aYBgXdk4XLld2DX4QMiIfcMIkDAmyegr4XfNdAU/oBbCCsnpA52PRzsz
-	1uuq1zK2FqdNer+LaWa6wVXDztEjz26fXFgGYp/yqhTAbXLBMK2a7Pg0Z9xYbRr9N7sIGyc=
-X-Google-Smtp-Source: AGHT+IEJtNiwcn3oWwFHyZWV7+40ijEV4xe+dL0OmaEu4W0lh00EsRAe8w98Fc2a3NU9eTRdHK1liA==
-X-Received: by 2002:a17:90b:17cb:b0:30e:9349:2da3 with SMTP id 98e67ed59e1d1-30e93493205mr19147311a91.3.1747746932238;
-        Tue, 20 May 2025 06:15:32 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30f365c4f84sm1759071a91.14.2025.05.20.06.15.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 May 2025 06:15:31 -0700 (PDT)
-Date: Tue, 20 May 2025 06:15:29 -0700
-From: Richard Cochran <richardcochran@gmail.com>
-To: Jeongjun Park <aha310510@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, yangbo.lu@nxp.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] ptp: remove ptp->n_vclocks check logic in
- ptp_vclock_in_use()
-Message-ID: <aCyAcbNqKRlPnadx@hoboy.vegasvil.org>
-References: <20250519153735.66940-1-aha310510@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=BIZQ8Nj9mVXXXybOQL8VMy6nM3B8zPTdGblhcv3FlC3/nBM624GdNl/nHi4l1L0kzefAWAjsc0qjyyZOY19y7Y09HSdY5+Xy3MLXLJusNO7GMQK6+1+vKrD7nQpDUGAHxPCNBuSEPqtLy1Y7iEnaSrrLX45t+sb8nPzGUnhe/5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GHZFwaCx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1F6BC4CEE9;
+	Tue, 20 May 2025 13:18:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747747125;
+	bh=3MlZ6pJ3PgzLg+lrX3zgXpF30gosCty23jYj1U6ABBg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GHZFwaCxrPnFBX+bCrP5SkGGkSpo8BjIXmypxC9p1xgUqUVI4SItq8gDUSbD/AZfa
+	 wtrfH0zta4wZBkhj62UOCiue0+e33QAgbRtBIGgqva+jRnocD2SZleuKv63XMgiKV9
+	 j9lbRtSHDM9ULHKpQnU/yIFlVUYNTenfQHTGRKoZOVPEjis08m3aMIMLmjTA//YMju
+	 V7fmp3019Gsydch6NSzmwWZMxrYP0phNVLd3cvY7QV7kOC/Sv1H8igKvkr/VTVd2qC
+	 yCDPCvIO9eg96H353N5rnH7gGbQaXeC6V2eWT00dQ7okBDANBDYR69Z10sD9Hu4DT/
+	 r+bZgLir/nF4w==
+Date: Tue, 20 May 2025 16:18:41 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Bernard Metzler <BMT@zurich.ibm.com>
+Cc: Eric Biggers <ebiggers@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"linux-sctp@vger.kernel.org" <linux-sctp@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Sagi Grimberg <sagi@grimberg.me>, Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH net-next 04/10] RDMA/siw: use skb_crc32c() instead of
+ __skb_checksum()
+Message-ID: <20250520131841.GH7435@unreal>
+References: <20250511004110.145171-1-ebiggers@kernel.org>
+ <20250511004110.145171-5-ebiggers@kernel.org>
+ <BN8PR15MB2513872CE462784A1A4E50B7999CA@BN8PR15MB2513.namprd15.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,29 +67,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250519153735.66940-1-aha310510@gmail.com>
+In-Reply-To: <BN8PR15MB2513872CE462784A1A4E50B7999CA@BN8PR15MB2513.namprd15.prod.outlook.com>
 
-On Tue, May 20, 2025 at 12:37:35AM +0900, Jeongjun Park wrote:
+On Mon, May 19, 2025 at 09:04:04AM +0000, Bernard Metzler wrote:
+> 
 
-> diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-> index 35a5994bf64f..0ae9f074fc52 100644
-> --- a/drivers/ptp/ptp_clock.c
-> +++ b/drivers/ptp/ptp_clock.c
-> @@ -412,9 +412,8 @@ static int unregister_vclock(struct device *dev, void *data)
->  
->  int ptp_clock_unregister(struct ptp_clock *ptp)
->  {
-> -	if (ptp_vclock_in_use(ptp)) {
-> +	if (ptp_vclock_in_use(ptp))
->  		device_for_each_child(&ptp->dev, NULL, unregister_vclock);
-> -	}
->  
->  	ptp->defunct = 1;
->  	wake_up_interruptible(&ptp->tsev_wq);
+<...>
 
-This hunk is not related to the subject of the patch.  Please remove it.
+> > 
+> 
+> Thanks Eric!
+> Works fine. Correct checksum tested against siw and cxgb4 peers.
+> 
+> Reviewed-by: Bernard Metzler <bmt@zurich.ibm.com>
 
-Thanks,
-Richard
+This patch should go through RDMA repository, Please resend it.
 
+Thanks
 
