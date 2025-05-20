@@ -1,121 +1,210 @@
-Return-Path: <netdev+bounces-191769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 552DCABD231
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 10:42:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A7D6AABD26E
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 10:55:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97A11189448F
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 08:42:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 757441BA1D7A
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 08:56:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 792F126156A;
-	Tue, 20 May 2025 08:42:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E6B9266588;
+	Tue, 20 May 2025 08:54:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GmwWeQo1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZrIrwnOF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF25E25E46A
-	for <netdev@vger.kernel.org>; Tue, 20 May 2025 08:42:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73E4D265CA7
+	for <netdev@vger.kernel.org>; Tue, 20 May 2025 08:54:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747730550; cv=none; b=VAncHldJajNE2GQFAev6Dr8UuC7jgaRn1F0/PZIi+DEDG16HWPbR+7OpFwT5KwDD2XeXvV/+77o26VMEo4/2ojyjl3xUu+AvCsOBmyOk/JxovjFDSKK2YP/qB4JCrns8hg6yc8xHdUf6h5p2FvO1GbuWNGlEvLA4RgN3dG6RUak=
+	t=1747731288; cv=none; b=lkJlCTwB/NCcnP9zgrQvjaCbW3+vZ9EWC/1Wn8JJmvdjt+If7+Hl6hYutdX+jmSCGLV2uERc2mHQHmBixGyCOCT6Hc9Cug1sJG7wudCRrZ/y34LmVeMcYy0fXtrpaK+qWgIEFD8O9vnEp4llQX5MOjRqj4CfgYRAezFgAbQo2tk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747730550; c=relaxed/simple;
-	bh=rchwuanThsE5B2k89HcYlZ9D24IM1yxl1+aLijatFB4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CN1y6c+iXfScGvAs2JtGALs0hw7UZEzZzBXNLZwLS3cMOGhBJQPMsM6nY73v/jGNHlclheO59RXqOjDuEsnv5iNx9/iJ5/Z/yklfqLZDheJy5/v4WnJjsgkGMB3oWX/pBRzmkt3L+W7UQX9NR0cApJUjNAD9AgZ8Co43eczZz7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GmwWeQo1; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747730547; x=1779266547;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=rchwuanThsE5B2k89HcYlZ9D24IM1yxl1+aLijatFB4=;
-  b=GmwWeQo1PV3ieM2tQbUiF+Wq+HozPbqThFSO+Lte8QE+TBEYTjfN0r3l
-   +MlZkKAHkIXKqr0zZBV7NBtV6DYrlwrRPSh/6dhqJUIdajJgVftVQQIyd
-   okfahxGHW2Tr/wDLcXysDcpOg1rMI0eW4P74y/HK8Xs+rpb3eaMoolqDD
-   k4cSyzz6yaIZ12ee+iQHZvALqYfR1g/jkvSg1o2HgU1saNbMDJjspx2Wr
-   EwTxU+S66KWElJuIKQl1463+0Dp5/O5OnwkcygZFmn/dMsi4kvX70S+7A
-   zMSu4SvIVkMT80VbeazbDlCmvUaGbF6H4jqp0zJXXulwyZZqFrmjVpiLM
-   Q==;
-X-CSE-ConnectionGUID: GV8lFOufRXWFSZRDQLS5xg==
-X-CSE-MsgGUID: LTA5p8m2TP6VfSLGjSDNnw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11438"; a="37270479"
-X-IronPort-AV: E=Sophos;i="6.15,302,1739865600"; 
-   d="scan'208";a="37270479"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2025 01:42:27 -0700
-X-CSE-ConnectionGUID: PQHVbds1QNieHIhf0zbgLA==
-X-CSE-MsgGUID: Ge8aUrcrS3yfNDSM4SLwdQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,302,1739865600"; 
-   d="scan'208";a="144742753"
-Received: from admindev-x299-aorus-gaming-3-pro.igk.intel.com ([10.91.3.52])
-  by orviesa005.jf.intel.com with ESMTP; 20 May 2025 01:42:25 -0700
-From: Anton Nadezhdin <anton.nadezhdin@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	richardcochran@gmail.com,
-	Anton Nadezhdin <anton.nadezhdin@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Subject: [PATCH iwl-net v4] ice/ptp: fix crosstimestamp reporting
-Date: Tue, 20 May 2025 10:42:16 +0200
-Message-Id: <20250520084216.326210-1-anton.nadezhdin@intel.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1747731288; c=relaxed/simple;
+	bh=EW8+ltB5RD/cj4k61+Elnw7V9Vm0GX9HYQV8/qmM9fY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DjT2RLePNWYQosEpeXoU99uCBQ/tmikGkkhUbXgzwigkb4lWpK4CPK9RJsBck5RJjIVy3SXxZSvYfx78uFjbL43PcZIMT26jOst8jbBj346hb5gSF8Pr6sxPS2GtV/CuAbOd4Mr8jJf88PDeDlC33yFX4xGv8/etLoZUxJIWDQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZrIrwnOF; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747731285;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=K84RlwjKxdVMrP8H1/lSZbVNtNLQI+5UHNrYUWsQ7to=;
+	b=ZrIrwnOFEuqLWNPfXWVdj5GnZ9sinNb4i+fTjtkI1q4GTVomC/LHWPfArrOwEqA/HLrHLM
+	3TBfDjoiHkfgLKlDUTg8Gfmc9npmfyizgiu3fs51sceQNE8rMrVhxT8XLZ5WJFrEkrZhHi
+	CEMMXRK1Gg4TMsgEComHckS/XOS7Xt8=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-531-_rLM4NCnMnqCMct-f0QAkA-1; Tue, 20 May 2025 04:54:43 -0400
+X-MC-Unique: _rLM4NCnMnqCMct-f0QAkA-1
+X-Mimecast-MFC-AGG-ID: _rLM4NCnMnqCMct-f0QAkA_1747731282
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-ad55e9a80acso166565666b.3
+        for <netdev@vger.kernel.org>; Tue, 20 May 2025 01:54:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747731282; x=1748336082;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=K84RlwjKxdVMrP8H1/lSZbVNtNLQI+5UHNrYUWsQ7to=;
+        b=SSMeemnvCtnM5T/vGAlTVeMkBTEVGSDvT+DJgk60UPh1yb+g9lZ9w7NbQM8Bo9jigD
+         Q66/fkkQOhxqlyE+LDqErjg6ai5yuq5DTZ1/n9dGdvSycyIuT5xEPucFuQtd2rZpcxFS
+         WqPYzY53ZrSB0P6NbzN86wyM9K3c041y0+ClOIFZr9iNcMHRQgIMckiwh5/BISYFytGZ
+         jWFzM1gKC3UdO5mJndUtn88i7LKFjvtF/hJpJ1V8dkY/R6ofQ15QBjqeU0fd2NfZ1maK
+         99LSllFREi1vy+4mJ9cF+z42r3k5dmz/n46mCIt7XtW+eqZnXKJm4L6xZYyilrxGE5do
+         wwHg==
+X-Forwarded-Encrypted: i=1; AJvYcCW/2PK/N2njRLunYRzk4/8034Ag30I6kf/UytEDF0cidgEtSnN6zVu0r5iGAImWs0M9+vSt+ac=@vger.kernel.org
+X-Gm-Message-State: AOJu0YykgNK0919EojDhoCi9LxY49llaehClGJbb2FXPq8RRzNo7etN+
+	I0YGVjzJqXsiz/jfI1Ay0rScNuX+0hxQBLk2SGF7hIg32flbwy0K8O1YigpLS/liIQ95C0tTRhD
+	tbff6W1o0WSGvIz5dVbdu1Tnhpb7MUMGDqRgtqdKKn7zsN3lb+t5gnOlVLg==
+X-Gm-Gg: ASbGncvUUEO/mgcJBwqeH8kFb0/BXIGAWclyvelU7mAJBnyA1EPrOeKrzMQJWeJXTq6
+	9jGXccwfCfC81VHBgkmIiT/MpBDm//gUoyHG1NVYnuEYHSEszkd+1vZPsnCbnIPCrDNucn/uk6/
+	2iz0PSguLPzfLpWi7fRat7xFINcBnYcK1BQ2liXEZbp8atoeblgXgiNMHQUW/dIDrkenJ6RVfCh
+	GD49WDDQLrKIawTbxz4474y9F9zQ/T8TGbxPFDJtEL9chNBLmew7B3VoRvsAwgCGmR/4c5c+6nm
+	/qlIKcivQcM/TYKsz7fmY7snht2+J09XQ38GF+9aKQeqlTd2S268V5ZXBc7o
+X-Received: by 2002:a17:907:7e87:b0:acb:5c83:25b with SMTP id a640c23a62f3a-ad52d42bf0cmr1554050266b.7.1747731282116;
+        Tue, 20 May 2025 01:54:42 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF1u3cs6wd8rFHSzcQTyYA8XLXVHbvNEiRktGHBow2x1xCtVqQdufsC3hsDqcyuuMCDDTKafQ==
+X-Received: by 2002:a17:907:7e87:b0:acb:5c83:25b with SMTP id a640c23a62f3a-ad52d42bf0cmr1554045766b.7.1747731281366;
+        Tue, 20 May 2025 01:54:41 -0700 (PDT)
+Received: from sgarzare-redhat (host-82-53-134-35.retail.telecomitalia.it. [82.53.134.35])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad52d278282sm689962766b.80.2025.05.20.01.54.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 May 2025 01:54:40 -0700 (PDT)
+Date: Tue, 20 May 2025 10:54:33 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH net-next v4 3/3] vsock/test: Expand linger test to ensure
+ close() does not misbehave
+Message-ID: <37c5ymzjhr3pivvx6sygsdqmrr72solzqltwhcsiyvvc3iagiy@3vc3rbxrbcab>
+References: <20250501-vsock-linger-v4-0-beabbd8a0847@rbox.co>
+ <20250501-vsock-linger-v4-3-beabbd8a0847@rbox.co>
+ <g5wemyogxthe43rkigufv7p5wrkegbdxbleujlsrk45dmbmm4l@qdynsbqfjwbk>
+ <CAGxU2F59O7QK2Q7TeaP6GU9wHrDMTpcO94TKz72UQndXfgNLVA@mail.gmail.com>
+ <ff959c3e-4c47-4f93-8ab8-32446bb0e0d0@rbox.co>
+ <CAGxU2F77OT5_Pd6EUF1QcvPDC38e-nuhfwKmPSTau262Eey5vQ@mail.gmail.com>
+ <720f6986-8b32-4d00-b309-66a6f0c1ca40@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <720f6986-8b32-4d00-b309-66a6f0c1ca40@rbox.co>
 
-Set use_nsecs=true as timestamp is reported in ns. Lack of this result
-in smaller timestamp error window which cause error during phc2sys
-execution on E825 NICs:
-phc2sys[1768.256]: ioctl PTP_SYS_OFFSET_PRECISE: Invalid argument
+On Mon, May 12, 2025 at 02:23:12PM +0200, Michal Luczaj wrote:
+>On 5/7/25 10:26, Stefano Garzarella wrote:
+>> On Wed, 7 May 2025 at 00:47, Michal Luczaj <mhal@rbox.co> wrote:
+>>>
+>>> On 5/6/25 11:46, Stefano Garzarella wrote:
+>>>> On Tue, 6 May 2025 at 11:43, Stefano Garzarella <sgarzare@redhat.com> wrote:
+>>>>>
+>>>>> On Thu, May 01, 2025 at 10:05:24AM +0200, Michal Luczaj wrote:
+>>>>>> There was an issue with SO_LINGER: instead of blocking until all queued
+>>>>>> messages for the socket have been successfully sent (or the linger timeout
+>>>>>> has been reached), close() would block until packets were handled by the
+>>>>>> peer.
+>>>>>
+>>>>> This is a new behaviour that only new kernels will follow, so I think
+>>>>> it is better to add a new test instead of extending a pre-existing test
+>>>>> that we described as "SOCK_STREAM SO_LINGER null-ptr-deref".
+>>>>>
+>>>>> The old test should continue to check the null-ptr-deref also for old
+>>>>> kernels, while the new test will check the new behaviour, so we can skip
+>>>>> the new test while testing an old kernel.
+>>>
+>>> Right, I'll split it.
+>>>
+>>>> I also saw that we don't have any test to verify that actually the
+>>>> lingering is working, should we add it since we are touching it?
+>>>
+>>> Yeah, I agree we should. Do you have any suggestion how this could be done
+>>> reliably?
+>>
+>> Can we play with SO_VM_SOCKETS_BUFFER_SIZE like in credit-update tests?
+>>
+>> One peer can set it (e.g. to 1k), accept the connection, but without
+>> read anything. The other peer can set the linger timeout, send more
+>> bytes than the buffer size set by the receiver.
+>> At this point the extra bytes should stay on the sender socket buffer,
+>> so we can do the close() and it should time out, and we can check if
+>> it happens.
+>>
+>> WDYT?
+>
+>Haven't we discussed this approach in [1]? I've reported that I can't make
 
-This problem was introduced in the cited commit which omitted setting
-use_nsecs to true when converting the ice driver to use
-convert_base_to_cs().
+Sorry, I forgot. What was the conclusion? Why this can't work?
 
-Testing hints (ethX is PF netdev):
-phc2sys -s ethX -c CLOCK_REALTIME  -O 37 -m
-phc2sys[1769.256]: CLOCK_REALTIME phc offset -5 s0 freq      -0 delay    0
+>it work. But maybe I'm misunderstanding something, please see the code 
+>below.
 
-Fixes: d4bea547ebb57 ("ice/ptp: Remove convert_art_to_tsc()")
-Signed-off-by: Anton Nadezhdin <anton.nadezhdin@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
----
-V3 -> V4 Updated commit message
----
- drivers/net/ethernet/intel/ice/ice_ptp.c | 1 +
- 1 file changed, 1 insertion(+)
+What I should check in the code below?
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 1fd1ae03eb90..11ed48a62b53 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -2307,6 +2307,7 @@ static int ice_capture_crosststamp(ktime_t *device,
- 	ts = ((u64)ts_hi << 32) | ts_lo;
- 	system->cycles = ts;
- 	system->cs_id = CSID_X86_ART;
-+	system->use_nsecs = true;
- 
- 	/* Read Device source clock time */
- 	ts_lo = rd32(hw, cfg->dev_time_l[tmr_idx]);
+Thanks,
+Stefano
 
-base-commit: 7e5af365e38059ed585917623c1ba3a6c04a8c10
--- 
-2.34.1
+>
+>[1]:
+>https://lore.kernel.org/netdev/df2d51fd-03e7-477f-8aea-938446f47864@rbox.co/
+>
+>import termios, time
+>from socket import *
+>
+>SIOCOUTQ = termios.TIOCOUTQ
+>VMADDR_CID_LOCAL = 1
+>SZ = 1024
+>
+>def set_linger(s, timeout):
+>	optval = (timeout << 32) | 1
+>	s.setsockopt(SOL_SOCKET, SO_LINGER, optval)
+>	assert s.getsockopt(SOL_SOCKET, SO_LINGER) == optval
+>
+>def set_bufsz(s, size):
+>	s.setsockopt(AF_VSOCK, SO_VM_SOCKETS_BUFFER_SIZE, size)
+>	assert s.getsockopt(AF_VSOCK, SO_VM_SOCKETS_BUFFER_SIZE) == size
+>
+>def check_lingering(addr):
+>	lis = socket(AF_VSOCK, SOCK_STREAM)
+>	lis.bind(addr)
+>	lis.listen()
+>	set_bufsz(lis, SZ)
+>
+>	s = socket(AF_VSOCK, SOCK_STREAM)
+>	set_linger(s, 5)
+>	s.connect(lis.getsockname())
+>
+>	p, _ = lis.accept()
+>
+>	s.send(b'x')
+>	p.recv(1)
+>
+>	print("sending...")
+>	s.send(b'x' * (SZ+1)) # blocks
+>	print("sent")
+>
+>	print("closing...")
+>	ts = time.time()
+>	s.close()
+>	print("done in %ds" % (time.time() - ts))
+>
+>check_lingering((VMADDR_CID_LOCAL, 1234))
+>
 
 
