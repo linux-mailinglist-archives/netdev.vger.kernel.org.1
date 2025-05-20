@@ -1,65 +1,96 @@
-Return-Path: <netdev+bounces-191965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CC55ABE079
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 18:21:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 247EDABE0A5
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 18:27:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CABBA7B7DFD
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:19:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A308162CCD
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:24:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0FEA27FB24;
-	Tue, 20 May 2025 16:19:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5305425F794;
+	Tue, 20 May 2025 16:24:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="grnxZKa0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kOlsDT4R"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC4A827FB0E
-	for <netdev@vger.kernel.org>; Tue, 20 May 2025 16:19:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97B2A258CD6;
+	Tue, 20 May 2025 16:24:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747757970; cv=none; b=mDmHUbpus0nN2TNv+rLtsv7JBiDEsHsct4XeAbpsxGBMakUHh5c+njp2H54wC/DUOZnH71wkwo0a17oNPmaZh3xmSMrQtWQwWD0urF+pwfFQibGyRZTlYfSqlEiMZ4rDHYWqlKSzplOmn210u0rVdhAIQPuUrFEc7H63dKaELEI=
+	t=1747758242; cv=none; b=AihDReblMOUAQKZTUuC9Bnu6zYrtof9OpWImLd4nielstQQ+N5yyqtaZvwN+KSEE+CFV1EVN0kK+5S864zQ27iY+yPPih2mTAxlrSzMRypxdWx4x1qbkWTT6HvQrvmaXj437JDGtMqnadyrNBSJsnUYtXWDHWNYJiKuRkgLDEes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747757970; c=relaxed/simple;
-	bh=L4PveM2KoTgSU1oVx5l6aGweLH+DkLO3ZZ4SWf9hYhU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MFdNkkiXG4Sz7bcW8afRR/V9FdD6peUCBB+RaanaVFpJorD7pKrSlKcUkveO2+cPbgAXkvahyG4WzeFyphdzJ7N6Mytmiela3gT1Rt+4RQgBP3OOYsmIdQL6qKTlYbStniZWSGrfHtRqgmvFVs3OmF4u5GuDTBm4KXHKXSgXCU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=grnxZKa0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36BEDC4CEEA;
-	Tue, 20 May 2025 16:19:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747757970;
-	bh=L4PveM2KoTgSU1oVx5l6aGweLH+DkLO3ZZ4SWf9hYhU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=grnxZKa0BGz7cQDoiQYf4HHzfU2AZzJqwvtyD3b6RqJB8jMUzV8IGFGYF7QgNjoR4
-	 slK8EU5I3M+wcwBC0GspV824mE8DIl6uac4Rdga+Vbe0NBhYpu/Mzr+E3RW9KsBUBH
-	 mA6DEDLhYHzpQwqb2ngaQgmEnw6G4NEU8VpYOGdH/7AzsKuDsJmSNV4qDu52sQ+ndh
-	 yKoop1rTvS8/1Lbz3W+L0lFfBgJZBAGZwDtLqe1Gu66TZKNbiNlVxv4g6nM+AAm2cP
-	 TAv8r+AFDfOxfDCTbXXCYLhWABgB6Y6rHEKz3oKZLxZYn+R5cibWKsrCCSZtSJAtQG
-	 1EKuB1oAx91JA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
+	s=arc-20240116; t=1747758242; c=relaxed/simple;
+	bh=x5muKbCVzItFqAnOAT50XHNKJhDgcS8Cum8SC4y29HM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=hML7rz6N0W9PKicuH625d4koxpDQQCdRFxZxWpTZYwHrGMJOnzvE/7drk+DjW8sAUG2o1s8T/qKZmQOKIQSzJbGwpeZCORUP2c3hgCUBnYG0YxKNdl8qeuSFnfA7I6mMxxRNE+lUFoMfKknGea0CbUdpBv0w2wcX1h9jBTH77Ao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kOlsDT4R; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-43cfdc2c8c9so35041275e9.2;
+        Tue, 20 May 2025 09:24:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747758239; x=1748363039; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dFb/8UDIi4+DL9YBgWv8kfPMDoQAHsOz6JPN/DZoxFg=;
+        b=kOlsDT4Rwe2iCf7tXRfuu7WoCOe0HB2AaeMjLdTtXawj3Hrlm1hoxfJkc3qGPHJ5Q9
+         lnMVDyAW43CKiTW+EDjKqYKKNavgIamhErZ6JF/qpmKqXEvbMRC46y1mIgcRPHgwj2VU
+         bcOq1Wxo6ZvFYhLoKgarVupc1yvjZoy/r5lRHs+cy5l+eNwVM4D1uqgDAOqNxYyJyC4D
+         cmXC57t5fbME7LrpnRoivWDTZbDa8gKVtkoh8XQEOMmRGvaLWUZbkpq08bDFWZjGq+o4
+         1o8U70vkcjkVSyDrPojYMRKTc9B+r5eJULoKkpDVhBpgYPZuwFGWb4CWodU1PxYBQGTl
+         TUsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747758239; x=1748363039;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dFb/8UDIi4+DL9YBgWv8kfPMDoQAHsOz6JPN/DZoxFg=;
+        b=VNIwAuyPIKbl5Tl1REb0ox4Td4VODMiRVac5GcKTMKSTMV4vxkF4tmXS4KbLKstv93
+         9KXfoOAoY0D7YtyERcAAwTvtc6dlC5SVjFProfnsvvkBsrVsANxiTBrcxPAHvmq8lOrZ
+         kokM4osblEfhbL7f/A8KBW3RU/XxGMAfUUElPjFLfQCGbqNw5/MdanjvaoDz806swflk
+         jNAWpB8eBma3VLdOyaOqZ9PqzkDg8vjIpwTHypoFoiaN/jRfNOXht0Oo2VCmlogLIyHM
+         Fyn6/G+1O/ZQ6WEGzPqWC52JSOh6BSJ5ixx3T7BFBhqW0Bjky/4uTVRG2AkHYNa6IPWc
+         5XkA==
+X-Forwarded-Encrypted: i=1; AJvYcCWu0Uu4r9KMdVeLkWgbpRUTLGQKLTZL1qKpQb7pxrei+YYClUthM2J0oWc/e80lLtBXPOIIlDiA@vger.kernel.org, AJvYcCXTchENlgOGCvKbF9TdF091QY2QG9R74YxheO/a/0VvP3/7NTc0da48YoSZVEgjLxJV9abhccoPMNMl@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGG8ExJEmMi9bmicznlciFz6+l+f3tw8bcK+QN1qB1xK3/IKUv
+	mpMXCD5DgzjCPefYxtXw3EAkFoO3gThrsQBHGQX1eT8Sgik6d+Ga3GGS
+X-Gm-Gg: ASbGncthPDPEKxHM2Dt/O+CPoINexEwjWcPbPnNgekI9CtwHpXub3vFfIIooUrlZbiX
+	gT9U/E/h1lNvj+nKBzAFZdtMdRR3jtckIrFPzFGGZQaJEIyK32l0+Qe9zc+rf3OfMaqmMDwhfTA
+	uS0qp5kvebbK2oXC8LxR/V5zbNQzTPAVTLPrwclJAIem4h3cNW0YGRqSMmUSxZkoWMM39oNTGFI
+	zcE9f8eStHe379el8a6FZ9jR0ly7AB3zj/AHF6H/p+35O1zZyOAWtof47kcJPjA00Cf53tpt4ht
+	TSMU0A3ABp4bM/Ak2psE8V1Bb4ojrPv8kXsGU+7EAMm7sW5hOCEfAht7zG/9YpQ=
+X-Google-Smtp-Source: AGHT+IH6kXpxLVNJGsgmiZlcSpTl9o+5YIxQ9ZEjLWi5Fi1sIa+2ZQbjOv420DG8yIMupEturEUy0w==
+X-Received: by 2002:a05:6000:184d:b0:39d:724f:a8f1 with SMTP id ffacd0b85a97d-3a35c8220b2mr15399667f8f.10.1747758238737;
+        Tue, 20 May 2025 09:23:58 -0700 (PDT)
+Received: from localhost.localdomain ([78.172.0.119])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a35ca4d230sm16630062f8f.4.2025.05.20.09.23.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 May 2025 09:23:57 -0700 (PDT)
+From: Baris Can Goral <goralbaris@gmail.com>
+To: allison.henderson@oracle.com
+Cc: davem@davemloft.net,
 	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
+	goralbaris@gmail.com,
 	horms@kernel.org,
-	donald.hunter@gmail.com,
-	jacob.e.keller@intel.com,
-	sdf@fomichev.me,
-	jstancek@redhat.com,
-	kory.maincent@bootlin.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 12/12] tools: ynl: add a sample for TC
-Date: Tue, 20 May 2025 09:19:16 -0700
-Message-ID: <20250520161916.413298-13-kuba@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250520161916.413298-1-kuba@kernel.org>
-References: <20250520161916.413298-1-kuba@kernel.org>
+	kuba@kernel.org,
+	linux-rdma@vger.kernel.org,
+	michal.swiatkowski@linux.intel.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	shankari.ak0208@gmail.com,
+	skhan@linuxfoundation.org
+Subject: [PATCH v5 net-next: rds] replace strncpy with strscpy_pad
+Date: Tue, 20 May 2025 19:23:43 +0300
+Message-Id: <20250520162342.6144-1-goralbaris@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <43d0274b9e2d45f2dd81a4b8e74a6cfd247db5c0.camel@oracle.com>
+References: <43d0274b9e2d45f2dd81a4b8e74a6cfd247db5c0.camel@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,117 +99,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a very simple TC dump sample with decoding of fq_codel attrs:
+The strncpy() function is actively dangerous to use since it may not
+NULL-terminate the destination string, resulting in potential memory
+content exposures, unbounded reads, or crashes.
+Link: https://github.com/KSPP/linux/issues/90
 
-  # ./tools/net/ynl/samples/tc
-        dummy0: fq_codel  limit: 10240p target: 5ms new_flow_cnt: 0
+In addition, strscpy_pad is more appropriate because it also zero-fills
+any remaining space in the destination if the source is shorter than
+the provided buffer size.
 
-proving that selector passing (for stats) works.
-
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Baris Can Goral <goralbaris@gmail.com>
 ---
- tools/net/ynl/samples/tc.c       | 80 ++++++++++++++++++++++++++++++++
- tools/net/ynl/samples/.gitignore |  1 +
- 2 files changed, 81 insertions(+)
- create mode 100644 tools/net/ynl/samples/tc.c
+ net/rds/connection.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/tools/net/ynl/samples/tc.c b/tools/net/ynl/samples/tc.c
-new file mode 100644
-index 000000000000..0bfff0fdd792
---- /dev/null
-+++ b/tools/net/ynl/samples/tc.c
-@@ -0,0 +1,80 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <stdio.h>
-+#include <string.h>
-+
-+#include <ynl.h>
-+
-+#include <net/if.h>
-+
-+#include "tc-user.h"
-+
-+static void tc_qdisc_print(struct tc_getqdisc_rsp *q)
-+{
-+	char ifname[IF_NAMESIZE];
-+	const char *name;
-+
-+	name = if_indextoname(q->_hdr.tcm_ifindex, ifname);
-+	if (name)
-+		printf("%16s: ", name);
-+
-+	if (q->_len.kind) {
-+		printf("%s  ", q->kind);
-+
-+		if (q->options._present.fq_codel) {
-+			struct tc_fq_codel_attrs *fq_codel;
-+			struct tc_fq_codel_xstats *stats;
-+
-+			fq_codel = &q->options.fq_codel;
-+			stats = q->stats2.app.fq_codel;
-+
-+			if (fq_codel->_present.limit)
-+				printf("limit: %dp ", fq_codel->limit);
-+			if (fq_codel->_present.target)
-+				printf("target: %dms ",
-+				       (fq_codel->target + 500) / 1000);
-+			if (q->stats2.app._len.fq_codel)
-+				printf("new_flow_cnt: %d ",
-+				       stats->qdisc_stats.new_flow_count);
-+		}
-+	}
-+
-+	printf("\n");
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	struct tc_getqdisc_req_dump *req;
-+	struct tc_getqdisc_list *rsp;
-+	struct ynl_error yerr;
-+	struct ynl_sock *ys;
-+
-+	ys = ynl_sock_create(&ynl_tc_family, &yerr);
-+	if (!ys) {
-+		fprintf(stderr, "YNL: %s\n", yerr.msg);
-+		return 1;
-+	}
-+
-+	req = tc_getqdisc_req_dump_alloc();
-+	if (!req)
-+		goto err_destroy;
-+
-+	rsp = tc_getqdisc_dump(ys, req);
-+	tc_getqdisc_req_dump_free(req);
-+	if (!rsp)
-+		goto err_close;
-+
-+	if (ynl_dump_empty(rsp))
-+		fprintf(stderr, "Error: no addresses reported\n");
-+	ynl_dump_foreach(rsp, qdisc)
-+		tc_qdisc_print(qdisc);
-+	tc_getqdisc_list_free(rsp);
-+
-+	ynl_sock_destroy(ys);
-+	return 0;
-+
-+err_close:
-+	fprintf(stderr, "YNL: %s\n", ys->err.msg);
-+err_destroy:
-+	ynl_sock_destroy(ys);
-+	return 2;
-+}
-diff --git a/tools/net/ynl/samples/.gitignore b/tools/net/ynl/samples/.gitignore
-index b3ec3fb0929f..7f5fca7682d7 100644
---- a/tools/net/ynl/samples/.gitignore
-+++ b/tools/net/ynl/samples/.gitignore
-@@ -6,3 +6,4 @@ page-pool
- rt-addr
- rt-link
- rt-route
-+tc
+diff --git a/net/rds/connection.c b/net/rds/connection.c
+index c749c5525b40..d62f486ab29f 100644
+--- a/net/rds/connection.c
++++ b/net/rds/connection.c
+@@ -749,8 +749,7 @@ static int rds_conn_info_visitor(struct rds_conn_path *cp, void *buffer)
+ 	cinfo->laddr = conn->c_laddr.s6_addr32[3];
+ 	cinfo->faddr = conn->c_faddr.s6_addr32[3];
+ 	cinfo->tos = conn->c_tos;
+-	strncpy(cinfo->transport, conn->c_trans->t_name,
+-		sizeof(cinfo->transport));
++	strscpy_pad(cinfo->transport, conn->c_trans->t_name);
+ 	cinfo->flags = 0;
+ 
+ 	rds_conn_info_set(cinfo->flags, test_bit(RDS_IN_XMIT, &cp->cp_flags),
+@@ -775,8 +774,7 @@ static int rds6_conn_info_visitor(struct rds_conn_path *cp, void *buffer)
+ 	cinfo6->next_rx_seq = cp->cp_next_rx_seq;
+ 	cinfo6->laddr = conn->c_laddr;
+ 	cinfo6->faddr = conn->c_faddr;
+-	strncpy(cinfo6->transport, conn->c_trans->t_name,
+-		sizeof(cinfo6->transport));
++	strscpy_pad(cinfo6->transport, conn->c_trans->t_name);
+ 	cinfo6->flags = 0;
+ 
+ 	rds_conn_info_set(cinfo6->flags, test_bit(RDS_IN_XMIT, &cp->cp_flags),
 -- 
-2.49.0
+2.34.1
 
 
