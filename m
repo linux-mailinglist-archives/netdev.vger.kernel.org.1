@@ -1,175 +1,132 @@
-Return-Path: <netdev+bounces-191935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEAF6ABDFFE
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 18:07:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9C6DABE005
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 18:08:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC1033A6B53
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:07:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24B191B6526A
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:08:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93D1B269CFA;
-	Tue, 20 May 2025 16:07:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAD6E269CFA;
+	Tue, 20 May 2025 16:07:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TGkLMI+f"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KwcFIuz+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06755241696;
-	Tue, 20 May 2025 16:07:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BDEB2741B2
+	for <netdev@vger.kernel.org>; Tue, 20 May 2025 16:07:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747757263; cv=none; b=JTSoUY+TKBflwxal+TYKAGsGqF4zKnZ/drpZT2tOlRIzxCO3OQaLPDEf9YiKTn24b/rRu4Gx2W3za5qqjOCvevk689rnyrsbjwXV45OWFTJshiWPq7LrEFtGp0XHkZycjBcuDsOUqxIpPk5u6EGAwZlYLwxZ7npIZH+HYfICYyQ=
+	t=1747757271; cv=none; b=MymEyfnAzVax54HAQu73sodWd9NrDc2St+Y+Ab5p1I3Uk8pVbMpJpS0FUw85WgFGVtzKiG6aLixdE99GOHtyFa1ZDAbGgflJWSe4ASAGP8Fpt5lQ4TiAeN703ilugj3AfgoTYaHgbkOmn9Mm4ecfZYSKUNuene0lqSLbwGsxTyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747757263; c=relaxed/simple;
-	bh=sOzjotnO4jDD0opsHU7773NR8s7oyPcDu4CT5dafdK8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r+bQneJNDumZbXF6Up9KM0wlEtRjS1NQWuFFnc/TbLX3ojebCyO0/IzPhVn6WFiMj8P01HBq3HlmXOuO5aFO+ru+RhcHzuB+5UQGTwwU+wMgutBzC3l3wnPdfyrbSyd1O6jlS/QqZtDaNCMLaEQ8jaWEgNh10/e7j4nQiLvzKgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TGkLMI+f; arc=none smtp.client-ip=209.85.214.171
+	s=arc-20240116; t=1747757271; c=relaxed/simple;
+	bh=KEmywsEn9OPiTNAgnQZWHfqSO542tzK1uRyVMFzMmXc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kqIhm1SgDbJVHV1WglljfL7Uc5PS/2LlTIT8mW4MI/KIjMe2F6opbdFNdIM0DZ0qgHZxny6ScVQXLhuYXfxNsGlUCGX77+lQkB0sAj2ES826gRoZ+2TC4dYSq46uBxHFMOd3+H4VPSWlqYvKcdT6YMrllBoV1iScJ159oADteNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KwcFIuz+; arc=none smtp.client-ip=209.85.216.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2320d06b728so26532405ad.1;
-        Tue, 20 May 2025 09:07:41 -0700 (PDT)
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-30e542e4187so4265722a91.3
+        for <netdev@vger.kernel.org>; Tue, 20 May 2025 09:07:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747757261; x=1748362061; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=f+e4tDb9ZmYBKg9MrFn8FNPWvTvXxngCCXTAK6EIg70=;
-        b=TGkLMI+fBT0FFYACt9VrvVZTmoqkcLFRG666DYNSUexnJ/bGWZae0PoeVTfpRxRTz3
-         SBdbY8X2xdqT4IBJYPdszW9hX9hgQ5SgpROYzRntl0PhXsQfgI5PYfog8gZEs+Jn67WZ
-         9NWaUeBOnQg1OSaerjOS8bFnVYUygW9u5p+up7b5mTkLi1UXDQ3fH8b3kYJe84tKFKa8
-         RvwSS+34zuXgnrCWNI9V2QQYSLzBYCvtYyiEeK+voGwPLWp0tXaPdBN8NbFQ99j6WpJC
-         8s2D7IYV3N853M/KwD1VlJfoOUbNJtMMpP8Do4IUsdsrMCXWOEItb/tugue86YzLzDBy
-         9rxA==
+        d=gmail.com; s=20230601; t=1747757269; x=1748362069; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pgKSlcIHaP2JfMPMGmeAiqHpEUAyT6DPYqTVU+V99g4=;
+        b=KwcFIuz+3QWUNVvBjThDrnXJjjzKMfgIuKtxgRQQDxMsK+38FlxACYtGVdqaMorwxZ
+         y/ePGxg6YD1RxKCBV9oK2ub15ZG7OJu59uSC6E9IgVLYfPlNWBXbQg33iWDGroUOFhXz
+         LsM637reRSnOqAnI3J3q8n3Uibyru84iHwvR7/rAwtpO10k52tloxa7Y5hpfB7CHzCvl
+         ky14JuTnewtlqPbQmKsPn8Q8C15fIYpvs7VxScsfEP26nCKKJXCtIQOKF0vF323qDAK0
+         eNFxTuxHwTiKvXuaLXhiKMcNKu9ZseBnnatMDQIgsivXiaoLb0GKH1LpSrYoQm1zJCAq
+         iR0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747757261; x=1748362061;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=f+e4tDb9ZmYBKg9MrFn8FNPWvTvXxngCCXTAK6EIg70=;
-        b=j0rB8UTAkyIuSI60Q+i3J2ya0yRu1g/rRb9tBy4Oo0x52udR3vOsx+wmPbePbcxam1
-         LAgqi8m4JZp8BhJXGoEaM+ryiL3T0evooKCCDBjOLw3pXCgietz32IhYgX+w006Zcw2L
-         po5AwGz1BtZUUMg9ZlRFnSJBN0i0KgjhSsoCKEqpSUCp4aluY9NxCifzbelEjr6kR0m5
-         Pq3VlE/tnLPOcXFDKVM8VIw3peeX4UlGwqaIHcf3/aGxVhXvNLBTeIvAzgOVuvqH+xg+
-         tHF9W8DmSHM4VrucbwKoCYris02gU/WS3GgQ1vSgDDe4/NwPlDtbovawnXRXjWLeUcU2
-         hgOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUZQ+vGUKgiy1fi4ZamahxyDY4hMtVYbcNgvktq/kSxUGpWu3cBV/h6Ku61eUVq1Ct1bSHfE/HJIOfvlQo=@vger.kernel.org, AJvYcCVSA7FeelJmg78s8t4dtYHuHJf54JS1OgsAbdZSyKrJVQpkDNfmBsqXF4bGUS8r4t2s3BUKVDw+@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJzDEOMPqPhQufbbCLqBYo5NmqXCRIetvFzDzbsEOXuHwI82Ux
-	YdcW0MGt34i3cmLJ25DkIPXAj1kTuz3nAQRj7ORa8ol1iRtKHIrzRVfV8rb/45nk
-X-Gm-Gg: ASbGncuSJ9EC7Lf7KjToHkTuCziBX92nZvOcFK3WIi8L54D1MvyOHIWaOgNWLY/6pa0
-	+23DPeog7yk6tuWUmsUbA18pYdegesN1TnJOG39C2iERpauu8feL6TlelokrFwKpvCHSJfVPe5V
-	EJYjtYjI4SyWVGxSnOKiOMQpGLNSGRUVb/Qesj3jmPC9Q7NBsG8gCeuroSERHABWmgB2QVVA4sY
-	gZYycHm0uwI5Xu48W9tjmSXwZ6Y1MPMG5ZIEyPQkYT+oBx8oDYqnUd/BsIudrxlpqdCWUD9pAiG
-	ce+CJZLcImnQoHzK768YhKmyTaOnxO7RxvqvDZ+aaClBIzFo7x7Mbb04K8R2ww7kjF7XZYd90e4
-	7uIXN
-X-Google-Smtp-Source: AGHT+IFf3tN7oijoQgx+fn/tyZ59P4T81j705hb5/J9qCMNqj3PXl7fndl3gCph+ZwZSZRjLMhwkdA==
-X-Received: by 2002:a17:903:1acf:b0:224:255b:c934 with SMTP id d9443c01a7336-231d4583e46mr225839065ad.51.1747757260890;
-        Tue, 20 May 2025 09:07:40 -0700 (PDT)
-Received: from localhost.localdomain ([121.185.186.233])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-231d4adb73esm78383735ad.59.2025.05.20.09.07.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 May 2025 09:07:40 -0700 (PDT)
-From: Jeongjun Park <aha310510@gmail.com>
-To: richardcochran@gmail.com,
-	andrew+netdev@lunn.ch
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	yangbo.lu@nxp.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jeongjun Park <aha310510@gmail.com>
-Subject: [PATCH v2] ptp: remove ptp->n_vclocks check logic in ptp_vclock_in_use()
-Date: Wed, 21 May 2025 01:07:17 +0900
-Message-ID: <20250520160717.7350-1-aha310510@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1747757269; x=1748362069;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pgKSlcIHaP2JfMPMGmeAiqHpEUAyT6DPYqTVU+V99g4=;
+        b=V9XLAusRjRRKicZiM+doVPeZ00s/nCvw1zg/GH2nzKFJ/F+DDEujiUZNYeak3l+8cw
+         zXagc4gzwpcbk6dMoQlMyFI6NZcLYZ2yulX06i0WBckz0WGuzXh0oiSUj02QFuDgmdZn
+         miTwJ+qUgTnBMsc0GTHcO8mRBeoZIaZF0fDtn04NaDoqHC24OJDcFfglF2qs1kZFcp2r
+         ZrEx85pghHSCuMghCzjyYqRTE3oXUWaPqxPwLq4T2INsQxg15khBxJYNbaWivq1sRGq8
+         gmbU2k/t+N3UoDc46uguhFhs3z9qgREZtCBqP0+e05n9gu7KN6EbUybp6lhPsR5DpD8i
+         g3Rg==
+X-Forwarded-Encrypted: i=1; AJvYcCXZqyeirKWSSILW4QqA+DA4Xrrj0dF6VXVWHZGpU/wf8iyKB3zIw1PpBcjEnHSxIfz5MhfgbCM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9O81d9rvrOKJn2kI3ucBSJ30X5LLQmU5TlCfvHx1Ns8yjLEXN
+	DonvTL3Ora70POwP6qQ8rVs+zAD9e7lcykbsBZWGg+Km0vZkebHvn8e+NBkIKN6SpeNQoFdmbb2
+	KWqFxufeWB0lQNm3QvQsWz34CxBu6siM=
+X-Gm-Gg: ASbGncvFS3abct8+kmvc6WxG1u1QxdljsfzM0Z5cFmNhO7gQHfvrUDRMTzv+M3KMD/6
+	sutp2pwoCkbz4BcfLCunP6kMz9ihnT33CFc7Ox+IWgC1wXeJ/7LifNzRnzLIfZ9NDP2suMNsgWO
+	tD44zwWlVVg47sh2Q4+cOFLXlIh5F3Qqk=
+X-Google-Smtp-Source: AGHT+IEkFr67ARw6CK7+QYwd2pKUJ/v3hF77cMEtCG/fswuNpdpX+3fdUCXDCmNyuZq7z9CwNXcUMIOV3U5m6mJrESM=
+X-Received: by 2002:a17:90b:1805:b0:2f9:bcd8:da33 with SMTP id
+ 98e67ed59e1d1-30e7d57f355mr24237733a91.21.1747757269300; Tue, 20 May 2025
+ 09:07:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <de5f64cb-1d9f-414e-b506-c924dd9f951d@gmail.com> <914ef57a-7c22-448c-b9a3-0580e5311102@redhat.com>
+In-Reply-To: <914ef57a-7c22-448c-b9a3-0580e5311102@redhat.com>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Date: Tue, 20 May 2025 18:07:43 +0200
+X-Gm-Features: AX0GCFuVXTibbJuV2iprMPB1xbK0WCM0HHgvH_dPsh_-_1Gti41dFNH4QqFMdTY
+Message-ID: <CAFSsGVvLr9KLFBjgs25RedKKJsHYeSw1xWLQnNddMYxUjrzLhg@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: phy: move mdiobus_setup_mdiodev_from_board_info
+ to mdio_bus_provider.c
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Russell King - ARM Linux <linux@armlinux.org.uk>, Jakub Kicinski <kuba@kernel.org>, 
+	David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-There is no disagreement that we should check both ptp->is_virtual_clock
-and ptp->n_vclocks to check if the ptp virtual clock is in use.
+On Tue, May 20, 2025 at 12:45=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
+>
+> On 5/15/25 10:11 PM, Heiner Kallweit wrote:
+> > Move mdiobus_setup_mdiodev_from_board_info() to mdio_bus_provider.c.
+> > Benefits are:
+> > - The function doesn't have to be exported any longer and can be made
+> >   static.
+> > - We can call mdiobus_create_device() directly instead of passing it
+> >   as a callback.
+> >
+> > Only drawback is that now list and mutex have to be exported.
+>
+> ... so the total exports count actually increases, and I personally
+> think that exporting a function is preferable to exporting a variable.
+>
+Current call chain is:
 
-However, when we acquire ptp->n_vclocks_mux to read ptp->n_vclocks in
-ptp_vclock_in_use(), we observe a recursive lock in the call trace
-starting from n_vclocks_store().
+__mdio_bus_register()    // in mdio_bus_provider.c (module or built-in)
+  mdiobus_setup_mdiodev_from_board_info()   // in mdio-boardinfo.c (built-i=
+n)
+    mdiobus_create_device()    // in mdio_bus_provider.c, currently
+passed to mdiobus_setup_mdiodev_from_board_info as function pointer
 
-============================================
-WARNING: possible recursive locking detected
-6.15.0-rc6 #1 Not tainted
---------------------------------------------
-syz.0.1540/13807 is trying to acquire lock:
-ffff888035a24868 (&ptp->n_vclocks_mux){+.+.}-{4:4}, at:
- ptp_vclock_in_use drivers/ptp/ptp_private.h:103 [inline]
-ffff888035a24868 (&ptp->n_vclocks_mux){+.+.}-{4:4}, at:
- ptp_clock_unregister+0x21/0x250 drivers/ptp/ptp_clock.c:415
+Having this call chain in one source file and not having to pass
+mdiobus_create_device
+as a function pointer outweighs the drawback of having to export list/mutex=
+ IMO.
+But as always YMMV
 
-but task is already holding lock:
-ffff888030704868 (&ptp->n_vclocks_mux){+.+.}-{4:4}, at:
- n_vclocks_store+0xf1/0x6d0 drivers/ptp/ptp_sysfs.c:215
+> @Andrew, Russell: WDYT?
+>
++1
 
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock(&ptp->n_vclocks_mux);
-  lock(&ptp->n_vclocks_mux);
-
- *** DEADLOCK ***
-....
-============================================
-
-The best way to solve this is to remove the logic that checks
-ptp->n_vclocks in ptp_vclock_in_use().
-
-The reason why this is appropriate is that any path that uses
-ptp->n_vclocks must unconditionally check if ptp->n_vclocks is greater
-than 0 before unregistering vclocks, and all functions are already
-written this way. And in the function that uses ptp->n_vclocks, we
-already get ptp->n_vclocks_mux before unregistering vclocks.
-
-Therefore, we need to remove the redundant check for ptp->n_vclocks in
-ptp_vclock_in_use() to prevent recursive locking.
-
-Fixes: 73f37068d540 ("ptp: support ptp physical/virtual clocks conversion")
-Signed-off-by: Jeongjun Park <aha310510@gmail.com>
----
-v2: Remove changes unrelated to the patch subject
-- Link to v1: https://lore.kernel.org/all/20250519153735.66940-1-aha310510@gmail.com/
----
- drivers/ptp/ptp_private.h | 12 +-----------
- 1 file changed, 1 insertion(+), 11 deletions(-)
-
-diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
-index 18934e28469e..528d86a33f37 100644
---- a/drivers/ptp/ptp_private.h
-+++ b/drivers/ptp/ptp_private.h
-@@ -98,17 +98,7 @@ static inline int queue_cnt(const struct timestamp_event_queue *q)
- /* Check if ptp virtual clock is in use */
- static inline bool ptp_vclock_in_use(struct ptp_clock *ptp)
- {
--	bool in_use = false;
--
--	if (mutex_lock_interruptible(&ptp->n_vclocks_mux))
--		return true;
--
--	if (!ptp->is_virtual_clock && ptp->n_vclocks)
--		in_use = true;
--
--	mutex_unlock(&ptp->n_vclocks_mux);
--
--	return in_use;
-+	return !ptp->is_virtual_clock;
- }
- 
- /* Check if ptp clock shall be free running */
---
+> Thanks,
+>
+> Paolo
+>
+Thanks, Heiner
 
