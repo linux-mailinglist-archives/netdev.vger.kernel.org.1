@@ -1,647 +1,751 @@
-Return-Path: <netdev+bounces-191886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B070AABD98F
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 15:35:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CA24ABD99A
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 15:37:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5AFDA7AC636
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 13:34:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8F5F172481
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 13:34:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06742242D70;
-	Tue, 20 May 2025 13:34:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E76B6245012;
+	Tue, 20 May 2025 13:34:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="sOD8L20y";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="qKVrCPsz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LUJDasAb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C0E2417F8;
-	Tue, 20 May 2025 13:34:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747748096; cv=fail; b=LCY8YFGsIvyhoNofzw7VYAtaFVddItix6uNdGUlJGXvTnkRYGbVT925/jPtRpHLDsofntW6/xHJm2b03CTHp6lXe+ZYheab2/h1eNzWBs+/v/e8vkUqgRuMQGugSl4tALc9hl4vTU4PSuTNrBJIWaj6/xRRls3QsFuBDv2tbYu8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747748096; c=relaxed/simple;
-	bh=M6WcbTLZ2zi4kC9ns72BkE1te8TPgcy+NGqMU2zL+3E=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=nxjQqhYDpu3s6wyj2szclv4i1hg+LQq1zVcMzYqde8zpPVzbk4u+YtbNyACFMR673jS7NOdBXSjAeGQXcEJlloxySIXvIK367tIogtvdwx0qBlBELGCDVnlosJO0GGzI08t6SUnfohLxC+dhjPtpTdUrUyxPm/3KplW6DTbE2UU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=sOD8L20y; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=qKVrCPsz; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54KCtsPr028687;
-	Tue, 20 May 2025 13:34:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2025-04-25; bh=dDsDGcT8+MUwUUvtwi5zZDo+ywvE2fTB1SN6+4vWMOQ=; b=
-	sOD8L20y2QB8W2/VTTs0qF4coFelKhVMhvIOLzD5sfgvGFBYO+/wkq8LMOCDwPub
-	i1ikT0Rq15Bf5jGl8vejrT8/4DtwQAiB5uD3uYSYt+ddEzxEdh4SpHLSb2dveDB7
-	JMKJHmiNFDtA96HfjCm+3KiR9I/b0LxNq7Vrmfia1TfQy4LA7TvWsU0EmkPYcaVf
-	W1JgarsGDZxMxHixfhR+2FXfqNKUGV5XpIjTkWyxIMldxHZ17wK262raFwHiy/lR
-	Pnvu58cNGRLA7tAKL9nNlslXY1CQf93SLCwR8wIF9jY2pMf3GbTl0/s7Z0tfIx3i
-	QDVspL077dG+q+njVeFvVg==
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 46pjge5gbb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 20 May 2025 13:34:02 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 54KCiGqO029257;
-	Tue, 20 May 2025 13:34:01 GMT
-Received: from ch5pr02cu005.outbound.protection.outlook.com (mail-northcentralusazlp17012051.outbound.protection.outlook.com [40.93.20.51])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 46pgw80bum-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 20 May 2025 13:34:01 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wxMKE1J2cSlx7+hgDrhjoPd4ZI6WrVCRo7QlYmJ1ACBgh4NdPcE69cPPVtk6JO29j/3FN4hUTmzRP9EhJZ83AYbgdPHleK24Eiuhz9yCLWMOKP3UK4ubTa0M10IKJf2Dr+kbVSMeqYuTTGjHRfPmj0GTeh0Ztzu4sMWQIDJxKbdB8spqjzBvijGa8tOUzZzPdwDCkf3Lj5wLKfbiaYlhwpJKegiyRmMH2BwnXYfPgJkkOnzyBKnSDWPqZ2KaSExBGWdUfT2BQt01pyerazvGcKoW1HiR7LU3rLpGGxmmCljDgO8FNfM1Yz0rcfzyxcOluyQMdftrsKo1ZcM7aQbyxA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dDsDGcT8+MUwUUvtwi5zZDo+ywvE2fTB1SN6+4vWMOQ=;
- b=U0YtGlq780/Fvqj1oUPIoh2I4r2kBe4ull13sgGB+uA32a/Si2f5kigrwrUS/lEu6insxzXWbCIssNleWT43wT5S8rvHkIfL320vh57Au3QwUTMQWfrC6e/fNFdwwQ4JJZ6av9Pm6NH6Gwcwcy8foVSVB9qXodGZr8OjpRoUYE/+Bxug6BgIJuTZshpguF2nLNTrwGxh4ZAMYwAiQENvwSdboAYfiBg0I/UM1rwU1GOBkS1QaYVFmKvfoCq2kJj//7HZieOujRBhhr+SMOBkGojHiAex48tTfdPRSlWvNuYaj4+L0R0rAvfn6mObGGQ7oxyHWjrpQWIDUJ4cBxdKIQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dDsDGcT8+MUwUUvtwi5zZDo+ywvE2fTB1SN6+4vWMOQ=;
- b=qKVrCPsznOL01cVNu8Id32gp7UbY8GVpEUPu9xd7PB/U00xUWEHW5U3wLc26Xo6fFEeZPR24vR+ujAtRPuYnbWEeZXqfOnJ4CrgH+pN7gz5ai9Xxlm+1VHR/OmKIhoQakDBkHMsmtRTmtTg9LgMxZ+n5BUsotl8yktD6BzJZjBY=
-Received: from DS7PR10MB5328.namprd10.prod.outlook.com (2603:10b6:5:3a6::12)
- by CH3PR10MB7564.namprd10.prod.outlook.com (2603:10b6:610:17d::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8746.30; Tue, 20 May
- 2025 13:33:58 +0000
-Received: from DS7PR10MB5328.namprd10.prod.outlook.com
- ([fe80::ea13:c6c1:9956:b29c]) by DS7PR10MB5328.namprd10.prod.outlook.com
- ([fe80::ea13:c6c1:9956:b29c%2]) with mapi id 15.20.8699.022; Tue, 20 May 2025
- 13:33:58 +0000
-Message-ID: <53e692f9-296c-4f4b-8593-058fa6cfaa13@oracle.com>
-Date: Tue, 20 May 2025 19:03:49 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4] net: phy: add driver for MaxLinear MxL86110
- PHY
-To: stefano.radaelli21@gmail.com, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-        Russell King <linux@armlinux.org.uk>,
-        "David S. Miller"
- <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Xu Liang <lxu@maxlinear.com>
-References: <20250520124521.440639-1-stefano.radaelli21@gmail.com>
-Content-Language: en-US
-From: ALOK TIWARI <alok.a.tiwari@oracle.com>
-In-Reply-To: <20250520124521.440639-1-stefano.radaelli21@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SI2P153CA0033.APCP153.PROD.OUTLOOK.COM
- (2603:1096:4:190::21) To DS7PR10MB5328.namprd10.prod.outlook.com
- (2603:10b6:5:3a6::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4524E244681
+	for <netdev@vger.kernel.org>; Tue, 20 May 2025 13:34:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1747748049; cv=none; b=Y9l5ynqpD+KDpjtsADrksnEgne/LKayCqLBTIgTYlhF+inxxNVfqqY6xjxs2rcSlAqJrXnrNX53d+6kA3RwqkhaoyW1k3nbN+/R3MD3Ndlzi2dDruxkbg/pbn8SJicdzCvOp2J+opnFNtajEKKwWDq7i12Rr9iv3JHII8+WdtBk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1747748049; c=relaxed/simple;
+	bh=kGsoRZoR1371c7S0L+pPmRmiIGpsZ3niGp6ljGzI8UY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LZGIdsbOwr2YF65Gj28VUn9YlTRVHqC3mIwYTqPogukOu44pWmTYSu2ZCCvpK2iBHOPi/Ds4zPI9MqDfRlu1EQT7laMpVAmxd5Yrp7rzWBlxppAqsAhvqBDE+jKDk3z6WlCLQSMqwGTVYkzu/zkxCUjSgmD8hac84AOCYOWlJzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LUJDasAb; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747748045;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cp+QI/FUEokdJfJNPH+W6NcsfuPlYnlplF6CXE3JP8A=;
+	b=LUJDasAbPJHA2KhJ3JP07mEbbC/OpggcoWWJhjMYHAJKeSyL8bR/XI85zj+flF9OGu6YL9
+	fAWrWfEK6wEcyM7oH8oPPatKWKGo4jVIZcTbGmKcV4bac1dGnsyQ0tsHCh7CfdbBJDf1y/
+	mlq5FSbrcLM3BnO2BAgK8wwG+aJsuJs=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-328-_iPUu4unNcGXLDHkBLnH-Q-1; Tue, 20 May 2025 09:34:03 -0400
+X-MC-Unique: _iPUu4unNcGXLDHkBLnH-Q-1
+X-Mimecast-MFC-AGG-ID: _iPUu4unNcGXLDHkBLnH-Q_1747748042
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3a375938404so1236925f8f.0
+        for <netdev@vger.kernel.org>; Tue, 20 May 2025 06:34:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747748042; x=1748352842;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cp+QI/FUEokdJfJNPH+W6NcsfuPlYnlplF6CXE3JP8A=;
+        b=v5A7o1FD85WisN9X1BnLcvWhHt6RmbS4Tex6xUc2QzhEYMtcRbMCokD2f0tJF92iTA
+         7n2ywOHZ2W8oXdDr8qz7Of0QRtsN6MxkN+ehkq+Mhp4qOwngCah/iLFyraX7ratu6n/o
+         N660g8FHfhMJKnXCA2ZKGaCOjK4HzgS5ZemFKLbnd5Wvs//+vUP58Rp0w03Q2fea7d8M
+         V7GrZnKuDastbuhLhwjN5Z0t2zl3YTVwx1j/h8StcRcgjUgr3KLPH43Q/YLdPIJ1ZCI9
+         gUiGaH4DzN8RYQlzzN0RzyFhO4pDS/z8qz20iSP7a6xMer786iV/1SwFfjfKrBXZYZNc
+         xP8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXJNEIemPubRzpNn5C3a8fuHklBjJhjyr2r8VP0MWDiQveYrDjEnsBDsiLvZGrxHDUfIoGFdj0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZCJrQAaQtEImVNCdHfJNDaF05BeeIZ6/1wpfVucN4jrm+bglq
+	O5LeTi7heU1rIBYqiEC26gNSHytQ9l2ZJE88T5BhAoOM8l+EQf4AAJZI9wN5gWDDNb6WvBR3nfB
+	pUlVDYgXK8ItU6uJnzKJeP2n4etWRi79vuEj3GPvuf/OW2URtpAZ4hJsmYw==
+X-Gm-Gg: ASbGncsGSO4WlWnXDd776EiHEVLXf5Yu8LZVY0t0VLgVP6Q4Pn63dwbsYsO4G7tALIX
+	oaUfRJ7bCtEgf56gcarPwMDzjeUSdz2AJjjfHgaKfs8QFBXsy3Flrf1DNe5KLFGjsU3Y75zSfkU
+	xZX581/tu8kpioWsEu7eMZPVV8Wg72w/toFwQDU1h8h5+RsU/ybTdyPbadrEcl9fBllwFjkA94X
+	UXUanKlij9Z5jScAVma0nAZSSCDybdkj7UBifs4O4/sZ0aAPmMJZf/FyvhRJ8Nu/DRJGUrtO+vK
+	AraBbP4hh9eIXsHBsX0=
+X-Received: by 2002:a05:6000:4284:b0:3a2:244:67a4 with SMTP id ffacd0b85a97d-3a35ffd2acbmr13405823f8f.43.1747748041813;
+        Tue, 20 May 2025 06:34:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHVf3XBSnIKCynv8heDnjUZQ/zUTTrHNAVITFYhp+CZTZ0R5JgwQKvUtIy1raSS5ZBNR1LIiw==
+X-Received: by 2002:a05:6000:4284:b0:3a2:244:67a4 with SMTP id ffacd0b85a97d-3a35ffd2acbmr13405778f8f.43.1747748041198;
+        Tue, 20 May 2025 06:34:01 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:244f:5710::f39? ([2a0d:3344:244f:5710::f39])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a361a81fd8sm15228410f8f.81.2025.05.20.06.33.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 May 2025 06:34:00 -0700 (PDT)
+Message-ID: <8eae6bfd-c641-4fd4-9642-7fc038a974a2@redhat.com>
+Date: Tue, 20 May 2025 15:33:58 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR10MB5328:EE_|CH3PR10MB7564:EE_
-X-MS-Office365-Filtering-Correlation-Id: 88ba0d78-2bca-46a5-3dec-08dd97a2f97b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?TFAvVTVOZjBBeGRrUjhsYWlBZDBvZHlGQXIzYVRGakNWRWphREFtNmtidmJW?=
- =?utf-8?B?WDFJSHBic0Z2VUoyMWw5YnZON2oxamlwZXdnNEViTGcwUkdEWTlMbURlMkNF?=
- =?utf-8?B?RWhzMzR6V0V1K3ozSUZXQlQvWml3WGphSTNwbkJtWTN1YUJIRURKNmJaS0hh?=
- =?utf-8?B?bGcxd2E5WEdpeEloclJzb3NOb2NUb20zK3pHRHUzVlUxSGVySHdaRmFRME1u?=
- =?utf-8?B?VkVQV3JhSGgrRHJidm5PQ0EwMmZmUUNHOStpcVhvc0VZcVh6TFk3UWF6Nmhw?=
- =?utf-8?B?MTkvSHB1NDY0T2ZZSm11ckszQ1g3NWUvV2pEc1BoSGRyTnJ2V0l6eFdGWklP?=
- =?utf-8?B?bUxvbFVBd3V6WnNWRFREaW5lNHJscHhUeW1STEFSMzR6ZWJJeWN3YlFueU01?=
- =?utf-8?B?UEY0ek5SeGlCaFFRclVpaWFtNzRWWWM4Vkg2aFdlWWgxYnNmamwxNkY4OGJU?=
- =?utf-8?B?YlJOakVMcm8rZGtvcjA2dUVkQjRScU9QSGRzSlJtbUprSjFJdnNXbDZBWnho?=
- =?utf-8?B?WmhNei9UR2gyM3VWalVhS2hrakw2NWRaUlFvUXlMUkJaQXd1aG5yYm90QXlK?=
- =?utf-8?B?WnRSMGxDSzN5V3FyK21KV1AxYlc2b3UyOGJJbytWNFRyTVBUWFRnTzh0OW9S?=
- =?utf-8?B?TWtXaklLOWsraHBwYzNMRzR3cUVkcW1sNUtidTdsZUZNcVR1ZWFpTDl0UVAw?=
- =?utf-8?B?OERHeHdzbXpaM0tXMldaUjhlTklGalNsS3Y5ZUpDREpBaVRmVmdSa1RmQVR3?=
- =?utf-8?B?RzNqYkVPa3EzV1Y4UXNWenVSSlZDTERNY3RYZVpGZHpXdkVoYkRvVStLR2ty?=
- =?utf-8?B?ZnlJaFNCL29laHc3eXU0NTdJWGtYblBSOFpkY2kxUXVVcVVTcmorOVRGaDNH?=
- =?utf-8?B?MnhoMElKdTB4Wko4WE1aMlA1K2NDT1ZKdTZNN3hRdHMyb0ZIanZoZVUvZVo3?=
- =?utf-8?B?MGlwWldlN3hxcTNzZHZjN1lzVURuV0RzZVdqWkZmZnc0OVpBV241bmRpWFE0?=
- =?utf-8?B?QWpBYWpkYVh3ZE9wak9paTYzbTJHRitpVmF2UHFJdWNNbG5kbHZWd1JJUzVn?=
- =?utf-8?B?VE9NWEZJRjV5amQ2YUE0cXpSODdXa2JxTXp5NTcwOXYwaFVjelI2eFBPYitw?=
- =?utf-8?B?QXpXTWtxa0FHcXl0Mmk1UGN2WjNBRGE2b3FDc2Z0dkdBTW1DcERhVHBpS2p1?=
- =?utf-8?B?NHhXR2g5VmpCZlNkM25OcHpFSlhGYUxEL0dwWEJ1eE1qbERWMjBMYTRtTU0r?=
- =?utf-8?B?OWZ6MlNtMlFSS1d3M2UwQ2ZSUnZEUGNwNE9KWDg5WWdIRHdZaEl0Q01teExj?=
- =?utf-8?B?MmdlT2dVaE02cy9YKzlQR3pQL3ZVQ0EvWjlkSWNQclRSM2tMYVY4RE9kdWVh?=
- =?utf-8?B?YS9mOHE5a0RPR1hMa0ZkQy9lb3hncDBCV2lBSktKUk54OEFqUkd2SmFqQmtC?=
- =?utf-8?B?MlBpZXFER0lTd01zU3Q5QXhTQmtKTlRlZzEvZEVmakU5NGsvUlY0YTJBT21Q?=
- =?utf-8?B?TTlBNkdMditYZDAvQ2dDaUMxbW1idE1LeXdyQVZndGFHeUNGZDUrdmFGTjI5?=
- =?utf-8?B?aDdTdXNNUGhOcjJMdkxsbVRKQWlmdTVjMzlWRGpnUjhabk5zSktNOUF0cVov?=
- =?utf-8?B?eXRlTTFXWkJ6ZXNlb2RsR3BlbzM4ZmhkYkw2aEhNTUJpK2U1d2oyVTlEOE8v?=
- =?utf-8?B?U2xrSGtlZS9BWE9SMU5xZXdURmdvcjVYV0ZhU1hLYUhwM0hsWnV3eHZDbzlt?=
- =?utf-8?B?TENrbW9JUjkwamdVNDVvYXdhRjdHUFpYSGd5YVJRR3l3QTBNUzhOYmNhNnJi?=
- =?utf-8?B?T1RpNFN0VnVTNmw0c3QyblRsYTY4VVJ1aThweGJIRjNHVnhqV3k0d2ZVM1hJ?=
- =?utf-8?B?ZzVoR1hxVWpaMnI0R0QwY2JCN0xPSnZHWWwyUFdsUm9GNmNtYmViTGRTaGh1?=
- =?utf-8?Q?vqADgOx71pY=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR10MB5328.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Sjc0M0l5K0lrV292MjI4ZGtESmpxZXZvN0tIUGlWSTRRSWdkeXQ0VERuSER3?=
- =?utf-8?B?OW5odWE5Mmk3RnBzcmJCQVIxSHZ5cnJ1TU1SampzM2NsVi96VE4ydGo5a25P?=
- =?utf-8?B?Tmo2NStsdGczWUd5Uk5YVUtJSGFjelpmMExuYk5Md2l5OTdPR2xtZU1wM041?=
- =?utf-8?B?VUJNT1cveGJLYzRVbFJobjE2Rkc5N0x3Q0dxTm5iUzVYQWYwbWlEeEVUektF?=
- =?utf-8?B?RmRwUmlHcVlDcEM1RXhpbzdXS1I2SEd2b1hVblhuZGZrQ2VUc3RkSEpDVVFD?=
- =?utf-8?B?SlpxTy9pdVdaenVUcDRzK2xJY21xc0lhVnl4RVBQSEY2NVMrcUZTUE9DTytw?=
- =?utf-8?B?RFpobjVBVVI1WVBaUm1PZE9HVTlCb013bEVwNDhXcUE3eDhqeXZRVzJBNExX?=
- =?utf-8?B?SWhUc2QxcFI5WncyZXNPV3ArUk1zeVpnVG9mOXRPMys5cndsMW1Bc0FKOVBi?=
- =?utf-8?B?QnJtQmxFY0NsVHozeXdZK0swR0xZeU4xbmdMc3g4UGp2QzY2NkdtWlp2czlj?=
- =?utf-8?B?cnRweGVBV1ZSa2h0L3g3UitjVzBoZkFrR1I1NnVRQ3pRQ1hpZ2N3R2FDVEpC?=
- =?utf-8?B?TEJSMGJ1WVdYUXROOXZqVks2ZEFkVytJZW9ST3JrNnNjYXAycmJBVE1KVk5P?=
- =?utf-8?B?dWJDQ1A5c1J2aTFYbklmUFkvRnB3YlNkZ0haaW9FbUYxT1h1UXlkaDVOS2h5?=
- =?utf-8?B?MjBvQmc1cEIzemxEdm1MdTNJS2NFUEVic2U0QnEwTGRqczBsYWxlYTBhRlk0?=
- =?utf-8?B?dGdsK1NzWkVhUEVMOVN0UXdvTmdBTWFITW40REQ4M0dIL0liL2NyL3U3bUdF?=
- =?utf-8?B?YWxYdzJBQkZVbVRydWIrd0hRTDdMTklxK2xhYS9UQUpla0ExK2Z1OG00bURL?=
- =?utf-8?B?c0V3VTB6RkRLU0JadmJybGc1MGJ6UlVYTVZCSFBGa3J6ZzFueTNqQTFyMWxZ?=
- =?utf-8?B?dDVQWjVVVjMwRUxzVWZUQkttdXA2dnYrZjdlYlUwQUl5NGpXMi8rdVdjOWpF?=
- =?utf-8?B?YVkwMEtqNkRVME91V2Z2THRzeHRDZDZEc05BVlh4eFNRZmFRblZERFA4U1o4?=
- =?utf-8?B?SEZuaUdhZzZaQ1M0bUhtdTBmSm05QWx5NFp1TFZqNmFvMmNRdmxubDZsd1RB?=
- =?utf-8?B?UFFzdkhuSUF5djVEeGtQN0ZOSkh1WFNyNyswVFM0ZW1CK2FIbXZ6eTFSZ3NT?=
- =?utf-8?B?eHFiNWo1cFRMb08vaDE4ZGQzOThGU3RJblM4ayt3NVhreTlNdUI0cTNkZGlQ?=
- =?utf-8?B?dHptMlBtNkdFQnVkSDc2d0hRZFg0Qlptb08vQ1EydUdQbDhrN3lIODAyYWNS?=
- =?utf-8?B?bmhzV2U0UG9FNU55dkJXTStBczhpMG5jaHhpVXpRWjVoNklzZm44VUpGR0xH?=
- =?utf-8?B?cHFvVTFvcjlSNGM0UGJPNFlNbFB3eDNVUnAwQXRrS3FDNTRHWjQvb2ptOHRH?=
- =?utf-8?B?cWlBcmM2bjRiVGhseDdtbzhRdzdWNnhaUGdIOFFQZTZmdjVJWDJjVUtIWjhN?=
- =?utf-8?B?Y1ZPallQak1ZdnEvNFNhM0tDM3N4VmMzbUhiUE1qZHlNczlJSkprcWFMOFVV?=
- =?utf-8?B?RVRyOFBBRXlSRXFwRityT2ttQ3ZIMzNraU1LN2dyQklyVXRXaWpoeGtxRWU0?=
- =?utf-8?B?dmVESzRjelVUbWJCbWU5VVkvaXV4VjVuS2wwMDUrTkxVeXN1RnRERUhaZkFp?=
- =?utf-8?B?UENPcmtwQ2tMU2hSamhqVTJqTVpXT0dYYzF6SmNCU2VGZzhTUTMxWXlMNnpW?=
- =?utf-8?B?NThGTzJ0cnlzTzRqRzM5a0RTcVJVR1NaSHB6bWRMVGl4NUdHdEtONTZRandm?=
- =?utf-8?B?djNTZklmaSt5eXU0eU1MeDljZERVTFEyQlgyS2xWQllkVUVPajVmS2lBWnJ6?=
- =?utf-8?B?Y3dvcC9nV1BnN0lrSFYrM0ROc3ZsMEozY0MvZ3p6QndwT1JXNnhPd0VWWjNP?=
- =?utf-8?B?UTNIMHdyblNlL2g1dzVuK3BlaHY0UnM0TzVRMEc3QmN1bmY2a2dQTWxoZEZW?=
- =?utf-8?B?NklJWEQ2aEVXaVVnbG5FZVJ1YVFyc1BrU0FKb29YTkQxZSs0ZjJRK01JR2pM?=
- =?utf-8?B?QXFFUHFSZkxVYzA4N1BvNllWRC9ZQW5rWXRNSkw3NlJwa1JHZjJSVytkZWNZ?=
- =?utf-8?B?NTRHMlJyREhzVEYwZmFkMHA2VkNSQTR4ekVUVG1oZVgxNDFwN1Y4K3Z5Nm9x?=
- =?utf-8?B?WEE9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	xmraCLuyIKKxIs4wIstbJ9h4wu6w/RSntYszMTlI0D8kN6iS6Yom7ryegViFlckA6vN1ho1Zfrv6GXuVSPURLGPpZJ7kYhj6Pn9Myn7+EVe2vBecqT8HawtlLmsttNtbpG4ofMUDg3kEpQfXmXluvB1iY03pMdxs/EFs/QjIOq19qypxDcRts4upp5CI8HjGBrLbcli2ixEK4FTCUNmZj+VsMKeGeJ9Z3xFJqHMjepgAQM6rttRiI73DxPrsKll8QqfOdlYGuB16evug7oaIJUG8moPoJIf94N6JBqYlBlwz+goAdfedx/Etn2WxvibJgQJan8eJOSRxGOBqPbmigx21aIbZN0ysZKUUvBIfXcWTH9bGOhruYo5eScJ5v+KX+j4J1hCoW44IGCffxiFKLekk0nlG3dl/dwXSek+f3JbcPCHA09/s4IEDYAw4E1UKfGOWsHuhYdoHrVfo37DzXQYjKebcKpgV4Amd8zwy4eNJjWPZeKFOFy8agh33FIiJeAmRiRm9Xna4cZidih7WUK4Taldt2m6H/gqJ9clsdycB6UHkDj7Te2EIeus8ba5/fegeRODDk6N6uOG+VQZYRsr+Le6Js44ILQn+Xp+prSk=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 88ba0d78-2bca-46a5-3dec-08dd97a2f97b
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR10MB5328.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2025 13:33:58.5912
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gdev3OADqRmSZrO+ReWoIyUlTqt5YJZDQlFdHorN1Ls+gBKR4O+B0aSKyysGb7QmxHqFCgd2+2xDMJikZLBvtJmGY/QUf517kYNUBEai668=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR10MB7564
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-20_05,2025-05-16_03,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 mlxscore=0 adultscore=0
- phishscore=0 malwarescore=0 suspectscore=0 spamscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505070000
- definitions=main-2505200109
-X-Authority-Analysis: v=2.4 cv=RamQC0tv c=1 sm=1 tr=0 ts=682c84ca b=1 cx=c_pps a=WeWmnZmh0fydH62SvGsd2A==:117 a=WeWmnZmh0fydH62SvGsd2A==:17 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19
- a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=GoEa3M9JfhUA:10 a=sNdkZwqNwaVHzQMhbA4A:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIwMDEwOCBTYWx0ZWRfX6V3PSZpAQEAp 2AA+rWuGsrIqxPJGpEBclcixZmBbzpGh79XhYduY0sPL0tMsx9bA05oFm9CBztDdMu2aQEjiQgr 55QXGh+FgOltIX5Ey3HNDG+63X28AbFu1G+SKgJx64Ec9j1CzClpiBqvIHV4kAHGKCsOe+wLcxR
- vuL787R06Gyp9O2Mt5/QdokjLUXw628RwmpcNQBqSMRkiqDyNc3SnJR25HC6GYRa5irAMGDN3Qj QmyBeMIqVBJvrQWj6+Ur2embWscy9WAt950xFhGtEcEQdOZYCMH2yGrMh09MIX9u2m7PS6fs8Dz YaVZU+pI79AwVT2O4c7V39DjKGUX/BryzqOdNa11I9QFcvW3LQeXdWCkK54fyvIoCnnl4GyN69e
- +N2x+ZQnESkG9nj0TXNDPLPx9dh8gi0ROc1x8S1mqU9e05tr6K3jolUSuj5W3mFS+IGjhAe0
-X-Proofpoint-ORIG-GUID: hGp1thjPa1Vgfcdm9KzA5Z0u4aU4CvUP
-X-Proofpoint-GUID: hGp1thjPa1Vgfcdm9KzA5Z0u4aU4CvUP
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v16 net-next 3/5] sched: Add enqueue/dequeue of dualpi2
+ qdisc
+To: chia-yu.chang@nokia-bell-labs.com, horms@kernel.org,
+ donald.hunter@gmail.com, xandfury@gmail.com, netdev@vger.kernel.org,
+ dave.taht@gmail.com, jhs@mojatatu.com, kuba@kernel.org,
+ stephen@networkplumber.org, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, andrew+netdev@lunn.ch,
+ ast@fiberby.net, liuhangbin@gmail.com, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org, ij@kernel.org, ncardwell@google.com,
+ koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com,
+ ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
+ cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
+ vidhi_goel@apple.com
+Cc: Olga Albisser <olga@albisser.org>,
+ Olivier Tilmans <olivier.tilmans@nokia.com>,
+ Henrik Steen <henrist@henrist.net>, Bob Briscoe <research@bobbriscoe.net>
+References: <20250516000201.18008-1-chia-yu.chang@nokia-bell-labs.com>
+ <20250516000201.18008-4-chia-yu.chang@nokia-bell-labs.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250516000201.18008-4-chia-yu.chang@nokia-bell-labs.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-
-[snip]
-> +#define PHY_ID_MXL86110		0xc1335580
+On 5/16/25 2:01 AM, chia-yu.chang@nokia-bell-labs.com wrote:
+> From: Koen De Schepper <koen.de_schepper@nokia-bell-labs.com>
+> 
+> DualPI2 provides L4S-type low latency & loss to traffic that uses a
+> scalable congestion controller (e.g. TCP-Prague, DCTCP) without
+> degrading the performance of 'classic' traffic (e.g. Reno,
+> Cubic etc.). It is to be the reference implementation of IETF RFC9332
+> DualQ Coupled AQM (https://datatracker.ietf.org/doc/html/rfc9332).
+> 
+> Note that creating two independent queues cannot meet the goal of
+> DualPI2 mentioned in RFC9332: "...to preserve fairness between
+> ECN-capable and non-ECN-capable traffic." Further, it could even
+> lead to starvation of Classic traffic, which is also inconsistent
+> with the requirements in RFC9332: "...although priority MUST be
+> bounded in order not to starve Classic traffic." DualPI2 is
+> designed to maintain approximate per-flow fairness on L-queue and
+> C-queue by forming a single qdisc using the coupling factor and
+> scheduler between two queues.
+> 
+> The qdisc provides two queues called low latency and classic. It
+> classifies packets based on the ECN field in the IP headers. By
+> default it directs non-ECN and ECT(0) into the classic queue and
+> ECT(1) and CE into the low latency queue, as per the IETF spec.
+> 
+> Each queue runs its own AQM:
+> * The classic AQM is called PI2, which is similar to the PIE AQM but
+>   more responsive and simpler. Classic traffic requires a decent
+>   target queue (default 15ms for Internet deployment) to fully
+>   utilize the link and to avoid high drop rates.
+> * The low latency AQM is, by default, a very shallow ECN marking
+>   threshold (1ms) similar to that used for DCTCP.
+> 
+> The DualQ isolates the low queuing delay of the Low Latency queue
+> from the larger delay of the 'Classic' queue. However, from a
+> bandwidth perspective, flows in either queue will share out the link
+> capacity as if there was just a single queue. This bandwidth pooling
+> effect is achieved by coupling together the drop and ECN-marking
+> probabilities of the two AQMs.
+> 
+> The PI2 AQM has two main parameters in addition to its target delay.
+> The integral gain factor alpha is used to slowly correct any persistent
+> standing queue error from the target delay, while the proportional gain
+> factor beta is used to quickly compensate for queue changes (growth or
+> shrinkage). Either alpha and beta are given as a parameter, or they can
+> be calculated by tc from alternative typical and maximum RTT parameters.
+> 
+> Internally, the output of a linear Proportional Integral (PI)
+> controller is used for both queues. This output is squared to
+> calculate the drop or ECN-marking probability of the classic queue.
+> This counterbalances the square-root rate equation of Reno/Cubic,
+> which is the trick that balances flow rates across the queues. For
+> the ECN-marking probability of the low latency queue, the output of
+> the base AQM is multiplied by a coupling factor. This determines the
+> balance between the flow rates in each queue. The default setting
+> makes the flow rates roughly equal, which should be generally
+> applicable.
+> 
+> If DUALPI2 AQM has detected overload (due to excessive non-responsive
+> traffic in either queue), it will switch to signaling congestion
+> solely using drop, irrespective of the ECN field. Alternatively, it
+> can be configured to limit the drop probability and let the queue
+> grow and eventually overflow (like tail-drop).
+> 
+> GSO splitting in DUALPI2 is configurable from userspace while the
+> default behavior is to split gso. When running DUALPI2 at unshaped
+> 10gigE with 4 download streams test, splitting gso apart results in
+> halving the latency with no loss in throughput:
+> 
+> Summary of tcp_4down run 'no_split_gso':
+>                          avg         median      # data pts
+>  Ping (ms) ICMP   :       0.53      0.30 ms         350
+>  TCP download avg :    2326.86       N/A Mbits/s    350
+>  TCP download sum :    9307.42       N/A Mbits/s    350
+>  TCP download::1  :    2672.99   2568.73 Mbits/s    350
+>  TCP download::2  :    2586.96   2570.51 Mbits/s    350
+>  TCP download::3  :    1786.26   1798.82 Mbits/s    350
+>  TCP download::4  :    2261.21   2309.49 Mbits/s    350
+> 
+> Summart of tcp_4down run 'split_gso':
+>                          avg          median      # data pts
+>  Ping (ms) ICMP   :       0.22      0.23 ms         350
+>  TCP download avg :    2335.02       N/A Mbits/s    350
+>  TCP download sum :    9340.09       N/A Mbits/s    350
+>  TCP download::1  :    2335.30   2334.22 Mbits/s    350
+>  TCP download::2  :    2334.72   2334.20 Mbits/s    350
+>  TCP download::3  :    2335.28   2334.58 Mbits/s    350
+>  TCP download::4  :    2334.79   2334.39 Mbits/s    350
+> 
+> A similar result is observed when running DUALPI2 at unshaped 1gigE
+> with 1 download stream test:
+> 
+> Summary of tcp_1down run 'no_split_gso':
+>                          avg         median      # data pts
+>  Ping (ms) ICMP :         1.13      1.25 ms         350
+>  TCP download   :       941.41    941.46 Mbits/s    350
+> 
+> Summart of tcp_1down run 'split_gso':
+>                          avg         median      # data pts
+>  Ping (ms) ICMP :         0.51      0.55 ms         350
+>  TCP download   :       941.41    941.45 Mbits/s    350
+> 
+> Additional details can be found in the draft:
+>   https://datatracker.ietf.org/doc/html/rfc9332
+> 
+> Signed-off-by: Koen De Schepper <koen.de_schepper@nokia-bell-labs.com>
+> Co-developed-by: Olga Albisser <olga@albisser.org>
+> Signed-off-by: Olga Albisser <olga@albisser.org>
+> Co-developed-by: Olivier Tilmans <olivier.tilmans@nokia.com>
+> Signed-off-by: Olivier Tilmans <olivier.tilmans@nokia.com>
+> Co-developed-by: Henrik Steen <henrist@henrist.net>
+> Signed-off-by: Henrik Steen <henrist@henrist.net>
+> Signed-off-by: Bob Briscoe <research@bobbriscoe.net>
+> Signed-off-by: Ilpo Järvinen <ij@kernel.org>
+> Co-developed-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> Acked-by: Dave Taht <dave.taht@gmail.com>
+> ---
+>  include/net/dropreason-core.h |   6 +
+>  net/sched/Kconfig             |  12 +
+>  net/sched/Makefile            |   1 +
+>  net/sched/sch_dualpi2.c       | 449 ++++++++++++++++++++++++++++++++++
+>  4 files changed, 468 insertions(+)
+> 
+> diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
+> index bea77934a235..faae9f416e54 100644
+> --- a/include/net/dropreason-core.h
+> +++ b/include/net/dropreason-core.h
+> @@ -120,6 +120,7 @@
+>  	FN(ARP_PVLAN_DISABLE)		\
+>  	FN(MAC_IEEE_MAC_CONTROL)	\
+>  	FN(BRIDGE_INGRESS_STP_STATE)	\
+> +	FN(DUALPI2_STEP_DROP)		\
+>  	FNe(MAX)
+>  
+>  /**
+> @@ -570,6 +571,11 @@ enum skb_drop_reason {
+>  	 * ingress bridge port does not allow frames to be forwarded.
+>  	 */
+>  	SKB_DROP_REASON_BRIDGE_INGRESS_STP_STATE,
+> +	/**
+> +	 * @SKB_DROP_REASON_DUALPI2_STEP_DROP: dropped by the step drop
+> +	 * threshold of DualPI2 qdisc.
+> +	 */
+> +	SKB_DROP_REASON_DUALPI2_STEP_DROP,
+>  	/**
+>  	 * @SKB_DROP_REASON_MAX: the maximum of core drop reasons, which
+>  	 * shouldn't be used as a real 'reason' - only for tracing code gen
+> diff --git a/net/sched/Kconfig b/net/sched/Kconfig
+> index 9f0b3f943fca..dda66a3590d8 100644
+> --- a/net/sched/Kconfig
+> +++ b/net/sched/Kconfig
+> @@ -415,6 +415,18 @@ config NET_SCH_BPF
+>  
+>  	  If unsure, say N.
+>  
+> +config NET_SCH_DUALPI2
+> +	tristate "Dual Queue PI Square (DUALPI2) scheduler"
+> +	help
+> +	  Say Y here if you want to use the Dual Queue Proportional Integral
+> +	  Controller Improved with a Square scheduling algorithm.
+> +	  For more information, please see https://tools.ietf.org/html/rfc9332
 > +
-> +/* required to access extended registers */
-> +#define MXL86110_EXTD_REG_ADDR_OFFSET			0x1E
-> +#define MXL86110_EXTD_REG_ADDR_DATA			0x1F
-> +#define PHY_IRQ_ENABLE_REG				0x12
-> +#define PHY_IRQ_ENABLE_REG_WOL				BIT(6)
+> +	  To compile this driver as a module, choose M here: the module
+> +	  will be called sch_dualpi2.
 > +
-> +/* SyncE Configuration Register - COM_EXT SYNCE_CFG */
-> +#define MXL86110_EXT_SYNCE_CFG_REG			0xA012
-> +#define MXL86110_EXT_SYNCE_CFG_CLK_FRE_SEL		BIT(4)
-> +#define MXL86110_EXT_SYNCE_CFG_EN_SYNC_E_DURING_LNKDN	BIT(5)
-> +#define MXL86110_EXT_SYNCE_CFG_EN_SYNC_E		BIT(6)
-> +#define MXL86110_EXT_SYNCE_CFG_CLK_SRC_SEL_MASK		GENMASK(3, 1)
-> +#define MXL86110_EXT_SYNCE_CFG_CLK_SRC_SEL_125M_PLL	0
-> +#define MXL86110_EXT_SYNCE_CFG_CLK_SRC_SEL_25M		4
+> +	  If unsure, say N.
 > +
-> +/* MAC Address registers */
-> +#define MXL86110_EXT_MAC_ADDR_CFG1			0xA007
-> +#define MXL86110_EXT_MAC_ADDR_CFG2			0xA008
-> +#define MXL86110_EXT_MAC_ADDR_CFG3			0xA009
+>  menuconfig NET_SCH_DEFAULT
+>  	bool "Allow override default queue discipline"
+>  	help
+> diff --git a/net/sched/Makefile b/net/sched/Makefile
+> index 904d784902d1..5078ea84e6ad 100644
+> --- a/net/sched/Makefile
+> +++ b/net/sched/Makefile
+> @@ -63,6 +63,7 @@ obj-$(CONFIG_NET_SCH_CBS)	+= sch_cbs.o
+>  obj-$(CONFIG_NET_SCH_ETF)	+= sch_etf.o
+>  obj-$(CONFIG_NET_SCH_TAPRIO)	+= sch_taprio.o
+>  obj-$(CONFIG_NET_SCH_BPF)	+= bpf_qdisc.o
+> +obj-$(CONFIG_NET_SCH_DUALPI2)	+= sch_dualpi2.o
+>  
+>  obj-$(CONFIG_NET_CLS_U32)	+= cls_u32.o
+>  obj-$(CONFIG_NET_CLS_ROUTE4)	+= cls_route.o
+> diff --git a/net/sched/sch_dualpi2.c b/net/sched/sch_dualpi2.c
+> index 97986c754e47..7ecd7502332c 100644
+> --- a/net/sched/sch_dualpi2.c
+> +++ b/net/sched/sch_dualpi2.c
+> @@ -113,8 +113,44 @@ struct dualpi2_sched_data {
+>  	u32	step_marks;	/* ECN mark pkt counter due to step AQM */
+>  	u32	memory_used;	/* Memory used of both queues */
+>  	u32	max_memory_used;/* Maximum used memory */
 > +
-> +#define MXL86110_EXT_WOL_CFG_REG			0xA00A
-> +#define MXL86110_WOL_CFG_WOLE_MASK			BIT(3)
-> +#define MXL86110_EXT_WOL_CFG_WOLE			BIT(3)
-
-seems Redundant since MXL86110_WOL_CFG_WOLE_MASK is defined
-
+> +	/* Deferred drop statistics */
+> +	u32	deferred_drops_cnt;	/* Packets dropped */
+> +	u32	deferred_drops_len;	/* Bytes dropped */
+> +};
 > +
-> +/* RGMII register */
-> +#define MXL86110_EXT_RGMII_CFG1_REG			0xA003
-> +/* delay can be adjusted in steps of about 150ps */
-> +#define MXL86110_EXT_RGMII_CFG1_RX_NO_DELAY		(0x0 << 10)
-> +/* Closest value to 2000 ps */
-> +#define MXL86110_EXT_RGMII_CFG1_RX_DELAY_1950PS		(0xD << 10)
-> +#define MXL86110_EXT_RGMII_CFG1_RX_DELAY_MASK		GENMASK(13, 10)
+> +struct dualpi2_skb_cb {
+> +	u64 ts;			/* Timestamp at enqueue */
+> +	u8 apply_step:1,	/* Can we apply the step threshold */
+> +	   classified:2,	/* Packet classification results */
+> +	   ect:2;		/* Packet ECT codepoint */
+> +};
 > +
-> +#define MXL86110_EXT_RGMII_CFG1_TX_1G_DELAY_1950PS	(0xD << 0)
-> +#define MXL86110_EXT_RGMII_CFG1_TX_1G_DELAY_MASK	GENMASK(3, 0)
-> +
-> +#define MXL86110_EXT_RGMII_CFG1_TX_10MB_100MB_DELAY_1950PS	(0xD << 4)
-> +#define MXL86110_EXT_RGMII_CFG1_TX_10MB_100MB_DELAY_MASK	GENMASK(7, 4)
-> +
-> +#define MXL86110_EXT_RGMII_CFG1_FULL_MASK \
-> +			((MXL86110_EXT_RGMII_CFG1_RX_DELAY_MASK) | \
-> +			(MXL86110_EXT_RGMII_CFG1_TX_1G_DELAY_MASK) | \
-> +			(MXL86110_EXT_RGMII_CFG1_TX_10MB_100MB_DELAY_MASK))
-> +
-> +/* EXT Sleep Control register */
-> +#define MXL86110_UTP_EXT_SLEEP_CTRL_REG			0x27
-> +#define MXL86110_UTP_EXT_SLEEP_CTRL_EN_SLEEP_SW_OFF	0
-> +#define MXL86110_UTP_EXT_SLEEP_CTRL_EN_SLEEP_SW_MASK	BIT(15)
-> +
-> +/* RGMII In-Band Status and MDIO Configuration Register */
-> +#define MXL86110_EXT_RGMII_MDIO_CFG			0xA005
-> +#define MXL86110_RGMII_MDIO_CFG_EPA0_MASK		GENMASK(6, 6)
-> +#define MXL86110_EXT_RGMII_MDIO_CFG_EBA_MASK		GENMASK(5, 5)
-> +#define MXL86110_EXT_RGMII_MDIO_CFG_BA_MASK		GENMASK(4, 0)
-> +
-> +#define MXL86110_MAX_LEDS	3
-> +/* LED registers and defines */
-> +#define MXL86110_LED0_CFG_REG 0xA00C
-> +#define MXL86110_LED1_CFG_REG 0xA00D
-> +#define MXL86110_LED2_CFG_REG 0xA00E
-> +
-> +#define MXL86110_LEDX_CFG_LAB_BLINK			BIT(13)
-> +#define MXL86110_LEDX_CFG_LINK_UP_FULL_DUPLEX_ON	BIT(12)
-> +#define MXL86110_LEDX_CFG_LINK_UP_HALF_DUPLEX_ON	BIT(11)
-> +#define MXL86110_LEDX_CFG_LINK_UP_TX_ACT_ON		BIT(10)
-> +#define MXL86110_LEDX_CFG_LINK_UP_RX_ACT_ON		BIT(9)
-> +#define MXL86110_LEDX_CFG_LINK_UP_TX_ON			BIT(8)
-> +#define MXL86110_LEDX_CFG_LINK_UP_RX_ON			BIT(7)
-> +#define MXL86110_LEDX_CFG_LINK_UP_1GB_ON		BIT(6)
-> +#define MXL86110_LEDX_CFG_LINK_UP_100MB_ON		BIT(5)
-> +#define MXL86110_LEDX_CFG_LINK_UP_10MB_ON		BIT(4)
-> +#define MXL86110_LEDX_CFG_LINK_UP_COLLISION		BIT(3)
-> +#define MXL86110_LEDX_CFG_LINK_UP_1GB_BLINK		BIT(2)
-> +#define MXL86110_LEDX_CFG_LINK_UP_100MB_BLINK		BIT(1)
-> +#define MXL86110_LEDX_CFG_LINK_UP_10MB_BLINK		BIT(0)
-> +
-> +#define MXL86110_LED_BLINK_CFG_REG			0xA00F
-> +#define MXL86110_LED_BLINK_CFG_FREQ_MODE1_2HZ		0
-> +#define MXL86110_LED_BLINK_CFG_FREQ_MODE1_4HZ		BIT(0)
-> +#define MXL86110_LED_BLINK_CFG_FREQ_MODE1_8HZ		BIT(1)
-> +#define MXL86110_LED_BLINK_CFG_FREQ_MODE1_16HZ		(BIT(1) | BIT(0))
-> +#define MXL86110_LED_BLINK_CFG_FREQ_MODE2_2HZ		0
-> +#define MXL86110_LED_BLINK_CFG_FREQ_MODE2_4HZ		BIT(2)
-> +#define MXL86110_LED_BLINK_CFG_FREQ_MODE2_8HZ		BIT(3)
-> +#define MXL86110_LED_BLINK_CFG_FREQ_MODE2_16HZ		(BIT(3) | BIT(2))
-> +#define MXL86110_LED_BLINK_CFG_DUTY_CYCLE_50_ON		0
-> +#define MXL86110_LED_BLINK_CFG_DUTY_CYCLE_67_ON		(BIT(4))
-> +#define MXL86110_LED_BLINK_CFG_DUTY_CYCLE_75_ON		(BIT(5))
-> +#define MXL86110_LED_BLINK_CFG_DUTY_CYCLE_83_ON		(BIT(5) | BIT(4))
-> +#define MXL86110_LED_BLINK_CFG_DUTY_CYCLE_50_OFF	(BIT(6))
-> +#define MXL86110_LED_BLINK_CFG_DUTY_CYCLE_33_ON		(BIT(6) | BIT(4))
-> +#define MXL86110_LED_BLINK_CFG_DUTY_CYCLE_25_ON		(BIT(6) | BIT(5))
-> +#define MXL86110_LED_BLINK_CFG_DUTY_CYCLE_17_ON	(BIT(6) | BIT(5) | BIT(4))
-> +
-> +/* Chip Configuration Register - COM_EXT_CHIP_CFG */
-> +#define MXL86110_EXT_CHIP_CFG_REG			0xA001
-> +#define MXL86110_EXT_CHIP_CFG_RXDLY_ENABLE		BIT(8)
-> +#define MXL86110_EXT_CHIP_CFG_SW_RST_N_MODE		BIT(15)
-> +
-> +/**
-> + * mxl86110_write_extended_reg() - write to a PHY's extended register
-> + * @phydev: pointer to a &struct phy_device
-> + * @regnum: register number to write
-> + * @val: value to write to @regnum
-> + *
-> + * Note: This function assumes the caller already holds the MDIO bus lock
-> + * or otherwise has exclusive access to the PHY.
-> + *
-> + * Return: 0 or negative error code
-> + */
-> +static int mxl86110_write_extended_reg(struct phy_device *phydev,
-> +				       u16 regnum, u16 val)
+> +enum dualpi2_classification_results {
+> +	DUALPI2_C_CLASSIC	= 0,	/* C-queue */
+> +	DUALPI2_C_L4S		= 1,	/* L-queue (scale mark/classic drop) */
+> +	DUALPI2_C_LLLL		= 2,	/* L-queue (no drops/marks) */
+> +	__DUALPI2_C_MAX			/* Keep last*/
+>  };
+>  
+> +static struct dualpi2_skb_cb *dualpi2_skb_cb(struct sk_buff *skb)
 > +{
-> +	int ret;
-> +
-> +	ret = __phy_write(phydev, MXL86110_EXTD_REG_ADDR_OFFSET, regnum);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	return __phy_write(phydev, MXL86110_EXTD_REG_ADDR_DATA, val);
+> +	qdisc_cb_private_validate(skb, sizeof(struct dualpi2_skb_cb));
+> +	return (struct dualpi2_skb_cb *)qdisc_skb_cb(skb)->data;
 > +}
 > +
-> +/**
-> + * mxl86110_read_extended_reg - Read a PHY's extended register
-> + * @phydev: Pointer to the PHY device structure
-> + * @regnum: Extended register number to read (address written to reg 30)
-> + *
-> + * Reads the content of a PHY extended register using the MaxLinear
-> + * 2-step access mechanism: write the register address to reg 30 (0x1E),
-> + * then read the value from reg 31 (0x1F).
-> + *
-> + * Note: This function assumes the caller already holds the MDIO bus lock
-> + * or otherwise has exclusive access to the PHY.
-> + *
-> + * Return: 16-bit register value on success, or negative errno code on failure.
-> + */
-> +static int mxl86110_read_extended_reg(struct phy_device *phydev, u16 regnum)
+> +static u64 dualpi2_sojourn_time(struct sk_buff *skb, u64 reference)
 > +{
-> +	int ret;
-> +
-> +	ret = __phy_write(phydev, MXL86110_EXTD_REG_ADDR_OFFSET, regnum);
-> +	if (ret < 0)
-> +		return ret;
-> +	return __phy_read(phydev, MXL86110_EXTD_REG_ADDR_DATA);
+> +	return reference - dualpi2_skb_cb(skb)->ts;
 > +}
 > +
-> +/**
-> + * mxl86110_modify_extended_reg() - modify bits of a PHY's extended register
-> + * @phydev: pointer to the phy_device
-> + * @regnum: register number to write
-> + * @mask: bit mask of bits to clear
-> + * @set: bit mask of bits to set
-> + *
-> + * Note: register value = (old register value & ~mask) | set.
-> + * This function assumes the caller already holds the MDIO bus lock
-> + * or otherwise has exclusive access to the PHY.
-> + *
-> + * Return: 0 or negative error code
-> + */
-> +static int mxl86110_modify_extended_reg(struct phy_device *phydev,
-> +					u16 regnum, u16 mask, u16 set)
+> +static u64 head_enqueue_time(struct Qdisc *q)
 > +{
-> +	int ret;
+> +	struct sk_buff *skb = qdisc_peek_head(q);
 > +
-> +	ret = __phy_write(phydev, MXL86110_EXTD_REG_ADDR_OFFSET, regnum);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	return __phy_modify(phydev, MXL86110_EXTD_REG_ADDR_DATA, mask, set);
+> +	return skb ? dualpi2_skb_cb(skb)->ts : 0;
 > +}
 > +
-> +/**
-> + * mxl86110_get_wol() - report if wake-on-lan is enabled
-> + * @phydev: pointer to the phy_device
-> + * @wol: a pointer to a &struct ethtool_wolinfo
-> + */
-> +static void mxl86110_get_wol(struct phy_device *phydev,
-> +			     struct ethtool_wolinfo *wol)
+>  static u32 dualpi2_scale_alpha_beta(u32 param)
+>  {
+>  	u64 tmp = ((u64)param * MAX_PROB >> ALPHA_BETA_SCALING);
+> @@ -136,6 +172,25 @@ static ktime_t next_pi2_timeout(struct dualpi2_sched_data *q)
+>  	return ktime_add_ns(ktime_get_ns(), q->pi2_tupdate);
+>  }
+>  
+> +static bool skb_is_l4s(struct sk_buff *skb)
 > +{
-> +	int value;
-> +
-> +	wol->supported = WAKE_MAGIC;
-> +	wol->wolopts = 0;
-> +	phy_lock_mdio_bus(phydev);
-> +	value = mxl86110_read_extended_reg(phydev, MXL86110_EXT_WOL_CFG_REG);
-> +	phy_unlock_mdio_bus(phydev);
-> +	if (value >= 0 && (value & MXL86110_WOL_CFG_WOLE_MASK))
-> +		wol->wolopts |= WAKE_MAGIC;
+> +	return dualpi2_skb_cb(skb)->classified == DUALPI2_C_L4S;
 > +}
 > +
-> +/**
-> + * mxl86110_set_wol() - enable/disable wake-on-lan
-> + * @phydev: pointer to the phy_device
-> + * @wol: a pointer to a &struct ethtool_wolinfo
-> + *
-> + * Configures the WOL Magic Packet MAC
-> + *
-> + * Return: 0 or negative errno code
-> + */
-> +static int mxl86110_set_wol(struct phy_device *phydev,
-> +			    struct ethtool_wolinfo *wol)
+> +static bool skb_in_l_queue(struct sk_buff *skb)
 > +{
-> +	struct net_device *netdev;
-> +	const u8 *mac;
-> +	int ret = 0;
+> +	return dualpi2_skb_cb(skb)->classified != DUALPI2_C_CLASSIC;
+> +}
 > +
-> +	phy_lock_mdio_bus(phydev);
+> +static bool dualpi2_mark(struct dualpi2_sched_data *q, struct sk_buff *skb)
+> +{
+> +	if (INET_ECN_set_ce(skb)) {
+> +		q->ecn_mark++;
+> +		return true;
+> +	}
+> +	return false;
+> +}
 > +
-> +	if (wol->wolopts & WAKE_MAGIC) {
-> +		netdev = phydev->attached_dev;
-> +		if (!netdev) {
-> +			ret = -ENODEV;
-> +			goto out;
-> +		}
+>  static void dualpi2_reset_c_protection(struct dualpi2_sched_data *q)
+>  {
+>  	q->c_protection_credit = q->c_protection_init;
+> @@ -155,6 +210,398 @@ static void dualpi2_calculate_c_protection(struct Qdisc *sch,
+>  	dualpi2_reset_c_protection(q);
+>  }
+>  
+> +static bool dualpi2_roll(u32 prob)
+> +{
+> +	return get_random_u32() <= prob;
+> +}
 > +
-> +		/* Configure the MAC address of the WOL magic packet */
-> +		mac = (const u8 *)netdev->dev_addr;
-
-is netdev->dev_addr not already of type u8 * ?
-
-> +		ret = mxl86110_write_extended_reg(phydev,
-> +						  MXL86110_EXT_MAC_ADDR_CFG1,
-> +						  ((mac[0] << 8) | mac[1]));
-> +		if (ret < 0)
-> +			goto out;
+> +/* Packets in the C-queue are subject to a marking probability pC, which is the
+> + * square of the internal PI probability (i.e., have an overall lower mark/drop
+> + * probability). If the qdisc is overloaded, ignore ECT values and only drop.
+> + *
+> + * Note that this marking scheme is also applied to L4S packets during overload.
+> + * Return true if packet dropping is required in C queue
+> + */
+> +static bool dualpi2_classic_marking(struct dualpi2_sched_data *q,
+> +				    struct sk_buff *skb, u32 prob,
+> +				    bool overload)
+> +{
+> +	if (dualpi2_roll(prob) && dualpi2_roll(prob)) {
+> +		if (overload || dualpi2_skb_cb(skb)->ect == INET_ECN_NOT_ECT)
+> +			return true;
+> +		dualpi2_mark(q, skb);
+> +	}
+> +	return false;
+> +}
 > +
-> +		ret = mxl86110_write_extended_reg(phydev,
-> +						  MXL86110_EXT_MAC_ADDR_CFG2,
-> +						  ((mac[2] << 8) | mac[3]));
-> +		if (ret < 0)
-> +			goto out;
-> +
-> +		ret = mxl86110_write_extended_reg(phydev,
-> +						  MXL86110_EXT_MAC_ADDR_CFG3,
-> +						  ((mac[4] << 8) | mac[5]));
-> +		if (ret < 0)
-> +			goto out;
-> +
-> +		ret = mxl86110_modify_extended_reg(phydev,
-> +						   MXL86110_EXT_WOL_CFG_REG,
-> +						   MXL86110_WOL_CFG_WOLE_MASK,
-> +						   MXL86110_EXT_WOL_CFG_WOLE);
-> +		if (ret < 0)
-> +			goto out;
-> +
-> +		/* Enables Wake-on-LAN interrupt in the PHY. */
-> +		ret = __phy_modify(phydev, PHY_IRQ_ENABLE_REG, 0,
-> +				   PHY_IRQ_ENABLE_REG_WOL);
-> +		if (ret < 0)
-> +			goto out;
-> +
-> +		phydev_dbg(phydev,
-> +			   "%s, MAC Addr: %02X:%02X:%02X:%02X:%02X:%02X\n",
-> +			   __func__,
-> +			   mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-> +	} else {
-> +		ret = mxl86110_modify_extended_reg(phydev,
-> +						   MXL86110_EXT_WOL_CFG_REG,
-> +						   MXL86110_WOL_CFG_WOLE_MASK,
-> +						   0);
-> +		if (ret < 0)
-> +			goto out;
-> +
-> +		/* Disables Wake-on-LAN interrupt in the PHY. */
-> +		ret = __phy_modify(phydev, PHY_IRQ_ENABLE_REG,
-> +				   PHY_IRQ_ENABLE_REG_WOL, 0);
+> +/* Packets in the L-queue are subject to a marking probability pL given by the
+> + * internal PI probability scaled by the coupling factor.
+> + *
+> + * On overload (i.e., @local_l_prob is >= 100%):
+> + * - if the qdisc is configured to trade losses to preserve latency (i.e.,
+> + *   @q->drop_overload), apply classic drops first before marking.
+> + * - otherwise, preserve the "no loss" property of ECN at the cost of queueing
+> + *   delay, eventually resulting in taildrop behavior once sch->limit is
+> + *   reached.
+> + * Return true if packet dropping is required in L queue
+> + */
+> +static bool dualpi2_scalable_marking(struct dualpi2_sched_data *q,
+> +				     struct sk_buff *skb,
+> +				     u64 local_l_prob, u32 prob,
+> +				     bool overload)
+> +{
+> +	if (overload) {
+> +		/* Apply classic drop */
+> +		if (!q->drop_overload ||
+> +		    !(dualpi2_roll(prob) && dualpi2_roll(prob)))
+> +			goto mark;
+> +		return true;
 > +	}
 > +
-> +out:
-> +	phy_unlock_mdio_bus(phydev);
-> +	return ret;
+> +	/* We can safely cut the upper 32b as overload==false */
+> +	if (dualpi2_roll(local_l_prob)) {
+> +		/* Non-ECT packets could have classified as L4S by filters. */
+> +		if (dualpi2_skb_cb(skb)->ect == INET_ECN_NOT_ECT)
+> +			return true;
+> +mark:
+> +		dualpi2_mark(q, skb);
+> +	}
+> +	return false;
 > +}
 > +
-> +static const unsigned long supported_trgs = (BIT(TRIGGER_NETDEV_LINK_10) |
-> +					      BIT(TRIGGER_NETDEV_LINK_100) |
-> +					      BIT(TRIGGER_NETDEV_LINK_1000) |
-> +					      BIT(TRIGGER_NETDEV_HALF_DUPLEX) |
-> +					      BIT(TRIGGER_NETDEV_FULL_DUPLEX) |
-> +					      BIT(TRIGGER_NETDEV_TX) |
-> +					      BIT(TRIGGER_NETDEV_RX));
-> +
-> +static int mxl86110_led_hw_is_supported(struct phy_device *phydev, u8 index,
-> +					unsigned long rules)
-> +{
-> +	if (index >= MXL86110_MAX_LEDS)
-> +		return -EINVAL;
-> +
-> +	/* All combinations of the supported triggers are allowed */
-> +	if (rules & ~supported_trgs)
-> +		return -EOPNOTSUPP;
-> +
-> +	return 0;
-> +}
-> +
-> +static int mxl86110_led_hw_control_get(struct phy_device *phydev, u8 index,
-> +				       unsigned long *rules)
-> +{
-> +	int val;
-> +
-> +	if (index >= MXL86110_MAX_LEDS)
-> +		return -EINVAL;
-> +
-> +	phy_lock_mdio_bus(phydev);
-> +	val = mxl86110_read_extended_reg(phydev,
-> +					 MXL86110_LED0_CFG_REG + index);
-> +	phy_unlock_mdio_bus(phydev);
-> +	if (val < 0)
-> +		return val;
-> +
-> +	if (val & MXL86110_LEDX_CFG_LINK_UP_TX_ACT_ON)
-> +		*rules |= BIT(TRIGGER_NETDEV_TX);
-> +
-> +	if (val & MXL86110_LEDX_CFG_LINK_UP_RX_ACT_ON)
-> +		*rules |= BIT(TRIGGER_NETDEV_RX);
-> +
-> +	if (val & MXL86110_LEDX_CFG_LINK_UP_HALF_DUPLEX_ON)
-> +		*rules |= BIT(TRIGGER_NETDEV_HALF_DUPLEX);
-> +
-> +	if (val & MXL86110_LEDX_CFG_LINK_UP_FULL_DUPLEX_ON)
-> +		*rules |= BIT(TRIGGER_NETDEV_FULL_DUPLEX);
-> +
-> +	if (val & MXL86110_LEDX_CFG_LINK_UP_10MB_ON)
-> +		*rules |= BIT(TRIGGER_NETDEV_LINK_10);
-> +
-> +	if (val & MXL86110_LEDX_CFG_LINK_UP_100MB_ON)
-> +		*rules |= BIT(TRIGGER_NETDEV_LINK_100);
-> +
-> +	if (val & MXL86110_LEDX_CFG_LINK_UP_1GB_ON)
-> +		*rules |= BIT(TRIGGER_NETDEV_LINK_1000);
-> +
-> +	return 0;
-> +};
-
-extra ;
-
-> +
-> +static int mxl86110_led_hw_control_set(struct phy_device *phydev, u8 index,
-> +				       unsigned long rules)
-> +{
-> +	u16 val = 0;
-> +	int ret;
-> +
-> +	if (index >= MXL86110_MAX_LEDS)
-> +		return -EINVAL;
-> +
-> +	if (rules & BIT(TRIGGER_NETDEV_LINK_10))
-> +		val |= MXL86110_LEDX_CFG_LINK_UP_10MB_ON;
-> +
-> +	if (rules & BIT(TRIGGER_NETDEV_LINK_100))
-> +		val |= MXL86110_LEDX_CFG_LINK_UP_100MB_ON;
-> +
-> +	if (rules & BIT(TRIGGER_NETDEV_LINK_1000))
-> +		val |= MXL86110_LEDX_CFG_LINK_UP_1GB_ON;
-> +
-> +	if (rules & BIT(TRIGGER_NETDEV_TX))
-> +		val |= MXL86110_LEDX_CFG_LINK_UP_TX_ACT_ON;
-> +
-> +	if (rules & BIT(TRIGGER_NETDEV_RX))
-> +		val |= MXL86110_LEDX_CFG_LINK_UP_RX_ACT_ON;
-> +
-> +	if (rules & BIT(TRIGGER_NETDEV_HALF_DUPLEX))
-> +		val |= MXL86110_LEDX_CFG_LINK_UP_HALF_DUPLEX_ON;
-> +
-> +	if (rules & BIT(TRIGGER_NETDEV_FULL_DUPLEX))
-> +		val |= MXL86110_LEDX_CFG_LINK_UP_FULL_DUPLEX_ON;
-> +
-> +	if (rules & BIT(TRIGGER_NETDEV_TX) ||
-> +	    rules & BIT(TRIGGER_NETDEV_RX))
-> +		val |= MXL86110_LEDX_CFG_LAB_BLINK;
-> +
-> +	phy_lock_mdio_bus(phydev);
-> +	ret = mxl86110_write_extended_reg(phydev,
-> +					  MXL86110_LED0_CFG_REG + index, val);
-> +	phy_unlock_mdio_bus(phydev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return 0;
-> +};
-
-extra ;
-
-> +
-> +/**
-> + * mxl86110_synce_clk_cfg() - applies syncE/clk output configuration
-> + * @phydev: pointer to the phy_device
+> +/* Decide whether a given packet must be dropped (or marked if ECT), according
+> + * to the PI2 probability.
 > + *
-> + * Note: This function assumes the caller already holds the MDIO bus lock
-> + * or otherwise has exclusive access to the PHY.
-> + *
-> + * Return: 0 or negative errno code
+> + * Never mark/drop if we have a standing queue of less than 2 MTUs.
 > + */
-> +static int mxl86110_synce_clk_cfg(struct phy_device *phydev)
+> +static bool must_drop(struct Qdisc *sch, struct dualpi2_sched_data *q,
+> +		      struct sk_buff *skb)
 > +{
-> +	u16 mask = 0, val = 0;
-> +	int ret;
+> +	u64 local_l_prob;
+> +	bool overload;
+> +	u32 prob;
 > +
-> +	/*
-> +	 * Configures the clock output to its default
-> +	 * setting as per the datasheet.
-> +	 * This results in a 25MHz clock output being selected in the
-> +	 * COM_EXT_SYNCE_CFG register for SyncE configuration.
-> +	 */
-> +	val = MXL86110_EXT_SYNCE_CFG_EN_SYNC_E |
-> +			FIELD_PREP(MXL86110_EXT_SYNCE_CFG_CLK_SRC_SEL_MASK,
-> +				   MXL86110_EXT_SYNCE_CFG_CLK_SRC_SEL_25M);
-> +	mask = MXL86110_EXT_SYNCE_CFG_EN_SYNC_E |
-> +	       MXL86110_EXT_SYNCE_CFG_CLK_SRC_SEL_MASK |
-> +	       MXL86110_EXT_SYNCE_CFG_CLK_FRE_SEL;
+> +	if (sch->qstats.backlog < 2 * psched_mtu(qdisc_dev(sch)))
+> +		return false;
 > +
-> +	/* Write clock output configuration */
-> +	ret = mxl86110_modify_extended_reg(phydev, MXL86110_EXT_SYNCE_CFG_REG,
-> +					   mask, val);
+> +	prob = READ_ONCE(q->pi2_prob);
+> +	local_l_prob = (u64)prob * q->coupling_factor;
+> +	overload = local_l_prob > MAX_PROB;
 > +
-> +	return ret;
+> +	switch (dualpi2_skb_cb(skb)->classified) {
+> +	case DUALPI2_C_CLASSIC:
+> +		return dualpi2_classic_marking(q, skb, prob, overload);
+> +	case DUALPI2_C_L4S:
+> +		return dualpi2_scalable_marking(q, skb, local_l_prob, prob,
+> +						overload);
+> +	default: /* DUALPI2_C_LLLL */
+> +		return false;
+> +	}
 > +}
 > +
+> +static void dualpi2_read_ect(struct sk_buff *skb)
+> +{
+> +	struct dualpi2_skb_cb *cb = dualpi2_skb_cb(skb);
+> +	int wlen = skb_network_offset(skb);
+> +
+> +	switch (skb_protocol(skb, true)) {
+> +	case htons(ETH_P_IP):
+> +		wlen += sizeof(struct iphdr);
+> +		if (!pskb_may_pull(skb, wlen) ||
+> +		    skb_try_make_writable(skb, wlen))
+> +			goto not_ecn;
+> +
+> +		cb->ect = ipv4_get_dsfield(ip_hdr(skb)) & INET_ECN_MASK;
+> +		break;
+> +	case htons(ETH_P_IPV6):
+> +		wlen += sizeof(struct ipv6hdr);
+> +		if (!pskb_may_pull(skb, wlen) ||
+> +		    skb_try_make_writable(skb, wlen))
+> +			goto not_ecn;
+> +
+> +		cb->ect = ipv6_get_dsfield(ipv6_hdr(skb)) & INET_ECN_MASK;
+> +		break;
+> +	default:
+> +		goto not_ecn;
+> +	}
+> +	return;
+> +
+> +not_ecn:
+> +	/* Non pullable/writable packets can only be dropped hence are
+> +	 * classified as not ECT.
+> +	 */
+> +	cb->ect = INET_ECN_NOT_ECT;
+> +}
+> +
+> +static int dualpi2_skb_classify(struct dualpi2_sched_data *q,
+> +				struct sk_buff *skb)
+> +{
+> +	struct dualpi2_skb_cb *cb = dualpi2_skb_cb(skb);
+> +	struct tcf_result res;
+> +	struct tcf_proto *fl;
+> +	int result;
+> +
+> +	dualpi2_read_ect(skb);
+> +	if (cb->ect & q->ecn_mask) {
+> +		cb->classified = DUALPI2_C_L4S;
+> +		return NET_XMIT_SUCCESS;
+> +	}
+> +
+> +	if (TC_H_MAJ(skb->priority) == q->sch->handle &&
+> +	    TC_H_MIN(skb->priority) < __DUALPI2_C_MAX) {
+> +		cb->classified = TC_H_MIN(skb->priority);
+> +		return NET_XMIT_SUCCESS;
+> +	}
+> +
+> +	fl = rcu_dereference_bh(q->tcf_filters);
+> +	if (!fl) {
+> +		cb->classified = DUALPI2_C_CLASSIC;
+> +		return NET_XMIT_SUCCESS;
+> +	}
+> +
+> +	result = tcf_classify(skb, NULL, fl, &res, false);
+> +	if (result >= 0) {
+> +#ifdef CONFIG_NET_CLS_ACT
+> +		switch (result) {
+> +		case TC_ACT_STOLEN:
+> +		case TC_ACT_QUEUED:
+> +		case TC_ACT_TRAP:
+> +			return NET_XMIT_SUCCESS | __NET_XMIT_STOLEN;
+> +		case TC_ACT_SHOT:
+> +			return NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
+> +		}
+> +#endif
+> +		cb->classified = TC_H_MIN(res.classid) < __DUALPI2_C_MAX ?
+> +			TC_H_MIN(res.classid) : DUALPI2_C_CLASSIC;
+> +	}
+> +	return NET_XMIT_SUCCESS;
+> +}
+> +
+> +static int dualpi2_enqueue_skb(struct sk_buff *skb, struct Qdisc *sch,
+> +			       struct sk_buff **to_free)
+> +{
+> +	struct dualpi2_sched_data *q = qdisc_priv(sch);
+> +	struct dualpi2_skb_cb *cb;
+> +
+> +	if (unlikely(qdisc_qlen(sch) >= sch->limit) ||
+> +	    unlikely((u64)q->memory_used + skb->truesize > q->memory_limit)) {
+> +		qdisc_qstats_overlimit(sch);
+> +		if (skb_in_l_queue(skb))
+> +			qdisc_qstats_overlimit(q->l_queue);
+> +		return qdisc_drop_reason(skb, sch, to_free,
+> +					 SKB_DROP_REASON_QDISC_OVERLIMIT);
+> +	}
+> +
+> +	if (q->drop_early && must_drop(sch, q, skb)) {
+> +		qdisc_drop_reason(skb, sch, to_free,
+> +				  SKB_DROP_REASON_QDISC_OVERLIMIT);
 
-Thanks,
-Alok
+I think it's better to use a different drop reason here or it will be
+hard to distinguish between packets dropped here or above.
+Possibly SKB_DROP_REASON_QDISC_CONGESTED.
+
+> +		return NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
+> +	}
+> +
+> +	cb = dualpi2_skb_cb(skb);
+> +	cb->ts = ktime_get_ns();
+> +	q->memory_used += skb->truesize;
+> +	if (q->memory_used > q->max_memory_used)
+> +		q->max_memory_used = q->memory_used;
+> +
+> +	if (qdisc_qlen(sch) > q->maxq)
+> +		q->maxq = qdisc_qlen(sch);
+> +
+> +	if (skb_in_l_queue(skb)) {
+> +		/* Only apply the step if a queue is building up */
+> +		dualpi2_skb_cb(skb)->apply_step = skb_is_l4s(skb) &&
+> +			qdisc_qlen(q->l_queue) >= q->min_qlen_step;
+> +		/* Keep the overall qdisc stats consistent */
+> +		++sch->q.qlen;
+> +		qdisc_qstats_backlog_inc(sch, skb);
+> +		++q->packets_in_l;
+> +		if (!q->l_head_ts)
+> +			q->l_head_ts = cb->ts;
+
+This chunck is very hard to read. Please insert a black line before the
+2nd comment and consider introducing an helper to compute the
+'apply_step' value.
+
+> +		return qdisc_enqueue_tail(skb, q->l_queue);
+> +	}
+> +	++q->packets_in_c;
+> +	if (!q->c_head_ts)
+> +		q->c_head_ts = cb->ts;
+> +	return qdisc_enqueue_tail(skb, sch);
+> +}
+> +
+> +/* By default, dualpi2 will split GSO skbs into independent skbs and enqueue
+> + * each of those individually. This yields the following benefits, at the
+> + * expense of CPU usage:
+> + * - Finer-grained AQM actions as the sub-packets of a burst no longer share the
+> + *   same fate (e.g., the random mark/drop probability is applied individually)
+> + * - Improved precision of the starvation protection/WRR scheduler at dequeue,
+> + *   as the size of the dequeued packets will be smaller.
+> + */
+> +static int dualpi2_qdisc_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+> +				 struct sk_buff **to_free)
+> +{
+> +	struct dualpi2_sched_data *q = qdisc_priv(sch);
+> +	int err;
+> +
+> +	err = dualpi2_skb_classify(q, skb);
+> +	if (err != NET_XMIT_SUCCESS) {
+> +		if (err & __NET_XMIT_BYPASS)
+> +			qdisc_qstats_drop(sch);
+> +		__qdisc_drop(skb, to_free);
+> +		return err;
+> +	}
+> +
+> +	if (q->split_gso && skb_is_gso(skb)) {
+> +		netdev_features_t features;
+> +		struct sk_buff *nskb, *next;
+> +		int cnt, byte_len, orig_len;
+> +		int err;
+> +
+> +		features = netif_skb_features(skb);
+> +		nskb = skb_gso_segment(skb, features & ~NETIF_F_GSO_MASK);
+> +		if (IS_ERR_OR_NULL(nskb))
+> +			return qdisc_drop(skb, sch, to_free);
+> +
+> +		cnt = 1;
+> +		byte_len = 0;
+> +		orig_len = qdisc_pkt_len(skb);
+> +		skb_list_walk_safe(nskb, nskb, next) {
+> +			skb_mark_not_on_list(nskb);
+> +			qdisc_skb_cb(nskb)->pkt_len = nskb->len;
+> +			dualpi2_skb_cb(nskb)->classified =
+> +				dualpi2_skb_cb(skb)->classified;
+
+Possibly just:
+			*qdisc_skb_cb(nskb) = *dualpi2_skb_cb(skb);
+
+> +			dualpi2_skb_cb(nskb)->ect = dualpi2_skb_cb(skb)->ect;
+> +			err = dualpi2_enqueue_skb(nskb, sch, to_free);
+> +			if (err == NET_XMIT_SUCCESS) {
+> +				/* Compute the backlog adjustment that needs
+> +				 * to be propagated in the qdisc tree to reflect
+> +				 * all new skbs successfully enqueued.
+> +				 */
+> +				++cnt;
+> +				byte_len += nskb->len;
+> +			}
+> +		}
+> +		if (err == NET_XMIT_SUCCESS) {
+> +			/* The caller will add the original skb stats to its
+> +			 * backlog, compensate this.
+> +			 */
+> +			--cnt;
+> +			byte_len -= orig_len;
+> +		}
+> +		qdisc_tree_reduce_backlog(sch, -cnt, -byte_len);
+> +		consume_skb(skb);
+> +		return err;
+
+Using the return value from the last enqueue operation is IMHO
+inaccurate and confusing. Instead you could return NET_XMIT_SUCCESS if
+at least a skb is enqueued successfully, or possibly always
+unconditionally NET_XMIT_SUCCESS (will simplify the code a bit)
+
+> +	}
+> +	return dualpi2_enqueue_skb(skb, sch, to_free);
+> +}
+> +
+> +/* Select the queue from which the next packet can be dequeued, ensuring that
+> + * neither queue can starve the other with a WRR scheduler.
+> + *
+> + * The sign of the WRR credit determines the next queue, while the size of
+> + * the dequeued packet determines the magnitude of the WRR credit change. If
+> + * either queue is empty, the WRR credit is kept unchanged.
+> + *
+> + * As the dequeued packet can be dropped later, the caller has to perform the
+> + * qdisc_bstats_update() calls.
+> + */
+> +static struct sk_buff *dequeue_packet(struct Qdisc *sch,
+> +				      struct dualpi2_sched_data *q,
+> +				      int *credit_change,
+> +				      u64 now)
+> +{
+> +	struct sk_buff *skb = NULL;
+> +	int c_len;
+> +
+> +	*credit_change = 0;
+> +	c_len = qdisc_qlen(sch) - qdisc_qlen(q->l_queue);
+> +	if (qdisc_qlen(q->l_queue) && (!c_len || q->c_protection_credit <= 0)) {
+> +		skb = __qdisc_dequeue_head(&q->l_queue->q);
+> +		WRITE_ONCE(q->l_head_ts, head_enqueue_time(q->l_queue));
+> +		if (c_len)
+> +			*credit_change = q->c_protection_wc;
+> +		qdisc_qstats_backlog_dec(q->l_queue, skb);
+
+Please add an empty line here.
+
+> +		/* Keep the global queue size consistent */
+> +		--sch->q.qlen;
+> +		q->memory_used -= skb->truesize;
+> +	} else if (c_len) {
+> +		skb = __qdisc_dequeue_head(&sch->q);
+> +		WRITE_ONCE(q->c_head_ts, head_enqueue_time(sch));
+> +		if (qdisc_qlen(q->l_queue))
+> +			*credit_change = ~((s32)q->c_protection_wl) + 1;
+> +		q->memory_used -= skb->truesize;
+> +	} else {
+> +		dualpi2_reset_c_protection(q);
+> +		return NULL;
+> +	}
+> +	*credit_change *= qdisc_pkt_len(skb);
+> +	qdisc_qstats_backlog_dec(sch, skb);
+> +	return skb;
+> +}
+> +
+> +static int do_step_aqm(struct dualpi2_sched_data *q, struct sk_buff *skb,
+> +		       u64 now)
+> +{
+> +	u64 qdelay = 0;
+> +
+> +	if (q->step_in_packets)
+> +		qdelay = qdisc_qlen(q->l_queue);
+> +	else
+> +		qdelay = dualpi2_sojourn_time(skb, now);
+> +
+> +	if (dualpi2_skb_cb(skb)->apply_step && qdelay > q->step_thresh) {
+> +		if (!dualpi2_skb_cb(skb)->ect)
+> +			/* Drop this non-ECT packet */
+> +			return 1;
+
+Please add brackets and an empty line:
+
+		if (!dualpi2_skb_cb(skb)->ect) {
+			/* Drop this non-ECT packet */
+			return 1;
+		}
+
+		if (dualpi2_mark(q, skb))
+
+
+/P
+
 
