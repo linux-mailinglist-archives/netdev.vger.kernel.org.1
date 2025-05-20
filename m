@@ -1,228 +1,99 @@
-Return-Path: <netdev+bounces-192045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14EE5ABE595
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 23:03:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B4BF2ABE5CB
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 23:10:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 489DD7B31EA
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 21:01:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 91CF87B0C38
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 21:09:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DD60263C9B;
-	Tue, 20 May 2025 20:59:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE8031AAA1E;
+	Tue, 20 May 2025 21:10:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eVYBuYlH"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="QwjMz1oL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53786262802;
-	Tue, 20 May 2025 20:59:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA547846F
+	for <netdev@vger.kernel.org>; Tue, 20 May 2025 21:10:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747774785; cv=none; b=DhJPI887d+t4RKLWU5QaEqNA8dfMT6QBmp7mbAhTVokQB/6fpgncxz7PyNBR8f3DRVWOaDvBBPiQhrAjvuNbL9UBS0ub0hnfFY156Fu34YAzniwAKL/GJoGS7PDPqIMPCeFG4O1y/tXhg5/nKeYe9K/GEf83GE8yUcv3SuvbLoo=
+	t=1747775436; cv=none; b=M/BhOTyfAVtpGAJo0tDokJMJZsWaGEVQiH1thFSOaF+WKVtPY1Kaj1QBG/FmLVB6qgfqu7DWCvqyTMDmP1Vweo85NJySGWH9Ax0oR3EPxInONLfg1NIoJG/6DC0D0jprZ9VvlkpSJrgC0gbs4vDhQrAMXsimosX+zVwx8ZJNKUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747774785; c=relaxed/simple;
-	bh=TxnEzQ9iMtKzyMMd8shQeHwasKbl/Er7rP8Xn3KpqNw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lFAjEaZu5Anh4X13KxylBNyqJelfPaulwhbeEiN1aWxJLMscPNod90rvuGdrdaYk+D834pYp6ZEzeDjpP/IXEsRRlLQOqOH2q5uq31Vk7/6AUDckrIfHKjh8SjlhWDM70llpjz3NE/kE88A9YpD/EzViRZLqzSHktZ4IIBY8ekY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eVYBuYlH; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747774783; x=1779310783;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=TxnEzQ9iMtKzyMMd8shQeHwasKbl/Er7rP8Xn3KpqNw=;
-  b=eVYBuYlHtnSp4p5dzu6kKboiZqBgOvvAKMQ9YjtJoS2pvgJ0Qm1z7pwh
-   ivrWKGSAZzcvsunmPiyff3ix87t0UHnDLlljDrUrBz9/UbPrfJECm1N8i
-   28MjrjOvWuo4ooWiR2Jf+bO2OzFN4ymFdIysMe6pN+9lGgyQTVCL90EN2
-   2ZUpBlU1DE5Ypv6qN11RpYQegezd1OuVJ9mHlORtmMmTwrYSAnxG/Feh+
-   su67Fks6QcMiJIZ35rKEVk3aJScB1FdPzV3R2Xx5Xye7zUUspjY64RFhq
-   0Ci2/SMm61a/wt/zHv4wHVSEXHTF6EohUwud9vmJRyvAuQH/4ZZxCp095
-   w==;
-X-CSE-ConnectionGUID: Vb7FJxMeQ+6i6diuD2EIiw==
-X-CSE-MsgGUID: lrQ3diEpQaq7J7k8Q7UWXA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11439"; a="67142814"
-X-IronPort-AV: E=Sophos;i="6.15,302,1739865600"; 
-   d="scan'208";a="67142814"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2025 13:59:40 -0700
-X-CSE-ConnectionGUID: /vE/MEVlTPi/5ilASCMRYQ==
-X-CSE-MsgGUID: zuIZ/Xg8TU+sTrF0Bu6YPA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,302,1739865600"; 
-   d="scan'208";a="139850973"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa007.fm.intel.com with ESMTP; 20 May 2025 13:59:40 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	anthony.l.nguyen@intel.com,
-	maciej.fijalkowski@intel.com,
-	magnus.karlsson@intel.com,
-	michal.kubiak@intel.com,
-	przemyslaw.kitszel@intel.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	horms@kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH net-next 16/16] libeth: xdp, xsk: access adjacent u32s as u64 where applicable
-Date: Tue, 20 May 2025 13:59:17 -0700
-Message-ID: <20250520205920.2134829-17-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250520205920.2134829-1-anthony.l.nguyen@intel.com>
-References: <20250520205920.2134829-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1747775436; c=relaxed/simple;
+	bh=wGt/PRoUTXt8q4ByPicf9lrCtA/S/v7jf1tXnbH4IO8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FT/aMVY53NeQoVf1jiuWYx0nOgWbce4EtKkYaNHF1ZB+GQVPZ5n9h8lF2XUbLPFJLNR6PNQRdh+hqzZA65KJOpF7FcQPSwGceQiJdRVDLyD7jFLKlDOQih4VWcW11+bdBwvgSVkYA6/ki1AfWiDZBVuIAuDyjlIcZ5nH7o3xdok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=QwjMz1oL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7474C4CEE9;
+	Tue, 20 May 2025 21:10:35 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="QwjMz1oL"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1747775433;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FcnEUGIidvbrlCTFSfkiuxs9z+zoIVTbHGD/stmUpa4=;
+	b=QwjMz1oLEl1hY9lT5yC3iLOlYgINaXWp5E7pdcGmuRJx55H9Abqa1/AY8pRzs9SexBNZTz
+	f33q4DeERkETNmmZhFy8j2uHEQzuD07l8nBYE5DpYIbV+H+6Q63mThUG7tJx0BqInuJBUq
+	5SdNFiYan795g3SR9e5YbFtHXTNv6Eg=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 387b7411 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Tue, 20 May 2025 21:10:32 +0000 (UTC)
+Date: Tue, 20 May 2025 23:10:30 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Jordan Rife <jordan@jrife.io>
+Cc: wireguard@lists.zx2c4.com, netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>
+Subject: Re: [RESEND PATCH v1 wireguard-tools] ipc: linux: Support
+ incremental allowed ips updates
+Message-ID: <aCzvxmD5eHRTIoAF@zx2c4.com>
+References: <20250517192955.594735-1-jordan@jrife.io>
+ <aCzirk7xt3K-5_ql@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aCzirk7xt3K-5_ql@zx2c4.com>
 
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
+On Tue, May 20, 2025 at 10:14:38PM +0200, Jason A. Donenfeld wrote:
+> On Sat, May 17, 2025 at 12:29:51PM -0700, Jordan Rife wrote:
+> > Extend the interface of `wg set` to leverage the WGALLOWEDIP_F_REMOVE_ME
+> > flag, a direct way of removing a single allowed ip from a peer,
+> > allowing for incremental updates to a peer's configuration. By default,
+> > allowed-ips fully replaces a peer's allowed ips using
+> > WGPEER_REPLACE_ALLOWEDIPS under the hood. When '+' or '-' is prepended
+> > to any ip in the list, wg clears WGPEER_F_REPLACE_ALLOWEDIPS and sets
+> > the WGALLOWEDIP_F_REMOVE_ME flag on any ip prefixed with '-'.
+> > 
+> > $ wg set wg0 peer <PUBKEY> allowed-ips +192.168.88.0/24,-192.168.0.1/32
+> > 
+> > This command means "add 192.168.88.0/24 to this peer's allowed ips if
+> > not present, and remove 192.168.0.1/32 if present".
+> > 
+> > Use -isystem so that headers in uapi/ take precedence over system
+> > headers; otherwise, the build will fail on systems running kernels
+> > without the WGALLOWEDIP_F_REMOVE_ME flag.
+> > 
+> > Note that this patch is meant to be merged alongside the kernel patch
+> > that introduces the flag.
+> 
+> Merged here:
+> https://git.zx2c4.com/wireguard-tools/commit/?id=0788f90810efde88cfa07ed96e7eca77c7f2eedd
+> 
+> With a followup here:
+> https://git.zx2c4.com/wireguard-tools/commit/?id=dce8ac6e2fa30f8b07e84859f244f81b3c6b2353
 
-On 64-bit systems, writing/reading one u64 is faster than two u32s even
-when they're are adjacent in a struct. The compilers won't guarantee
-they will combine those; I observed both successful and unsuccessful
-attempts with both GCC and Clang, and it's not easy to say what it
-depends on.
-There's a few places in libeth_xdp winning up to several percent from
-combined access (both performance and object code size, especially
-when unrolling). Add __LIBETH_WORD_ACCESS and use it there on LE.
-Drivers are free to optimize HW-specific callbacks under the same
-definition.
-
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- include/net/libeth/xdp.h | 29 ++++++++++++++++++++++++++---
- include/net/libeth/xsk.h | 10 +++++-----
- 2 files changed, 31 insertions(+), 8 deletions(-)
-
-diff --git a/include/net/libeth/xdp.h b/include/net/libeth/xdp.h
-index 85f058482fc7..6d15386aff31 100644
---- a/include/net/libeth/xdp.h
-+++ b/include/net/libeth/xdp.h
-@@ -464,6 +464,21 @@ struct libeth_xdp_tx_desc {
- 	((const void *)(uintptr_t)(priv));				      \
- })
- 
-+/*
-+ * On 64-bit systems, assigning one u64 is faster than two u32s. When ::len
-+ * occupies lowest 32 bits (LE), whole ::opts can be assigned directly instead.
-+ */
-+#ifdef __LITTLE_ENDIAN
-+#define __LIBETH_WORD_ACCESS		1
-+#endif
-+#ifdef __LIBETH_WORD_ACCESS
-+#define __libeth_xdp_tx_len(flen, ...)					      \
-+	.opts = ((flen) | FIELD_PREP(GENMASK_ULL(63, 32), (__VA_ARGS__ + 0)))
-+#else
-+#define __libeth_xdp_tx_len(flen, ...)					      \
-+	.len = (flen), .flags = (__VA_ARGS__ + 0)
-+#endif
-+
- /**
-  * libeth_xdp_tx_xmit_bulk - main XDP Tx function
-  * @bulk: array of frames to send
-@@ -863,8 +878,7 @@ static inline u32 libeth_xdp_xmit_queue_head(struct libeth_xdp_tx_bulk *bq,
- 
- 	bq->bulk[bq->count++] = (typeof(*bq->bulk)){
- 		.xdpf	= xdpf,
--		.len	= xdpf->len,
--		.flags	= LIBETH_XDP_TX_FIRST,
-+		__libeth_xdp_tx_len(xdpf->len, LIBETH_XDP_TX_FIRST),
- 	};
- 
- 	if (!xdp_frame_has_frags(xdpf))
-@@ -895,7 +909,7 @@ static inline bool libeth_xdp_xmit_queue_frag(struct libeth_xdp_tx_bulk *bq,
- 
- 	bq->bulk[bq->count++] = (typeof(*bq->bulk)){
- 		.dma	= dma,
--		.len	= skb_frag_size(frag),
-+		__libeth_xdp_tx_len(skb_frag_size(frag)),
- 	};
- 
- 	return true;
-@@ -1253,6 +1267,7 @@ bool libeth_xdp_buff_add_frag(struct libeth_xdp_buff *xdp,
-  * Internal, use libeth_xdp_process_buff() instead. Initializes XDP buffer
-  * head with the Rx buffer data: data pointer, length, headroom, and
-  * truesize/tailroom. Zeroes the flags.
-+ * Uses faster single u64 write instead of per-field access.
-  */
- static inline void libeth_xdp_prepare_buff(struct libeth_xdp_buff *xdp,
- 					   const struct libeth_fqe *fqe,
-@@ -1260,7 +1275,15 @@ static inline void libeth_xdp_prepare_buff(struct libeth_xdp_buff *xdp,
- {
- 	const struct page *page = __netmem_to_page(fqe->netmem);
- 
-+#ifdef __LIBETH_WORD_ACCESS
-+	static_assert(offsetofend(typeof(xdp->base), flags) -
-+		      offsetof(typeof(xdp->base), frame_sz) ==
-+		      sizeof(u64));
-+
-+	*(u64 *)&xdp->base.frame_sz = fqe->truesize;
-+#else
- 	xdp_init_buff(&xdp->base, fqe->truesize, xdp->base.rxq);
-+#endif
- 	xdp_prepare_buff(&xdp->base, page_address(page) + fqe->offset,
- 			 page->pp->p.offset, len, true);
- }
-diff --git a/include/net/libeth/xsk.h b/include/net/libeth/xsk.h
-index 213778a68476..481a7b28e6f2 100644
---- a/include/net/libeth/xsk.h
-+++ b/include/net/libeth/xsk.h
-@@ -26,8 +26,8 @@ static inline bool libeth_xsk_tx_queue_head(struct libeth_xdp_tx_bulk *bq,
- {
- 	bq->bulk[bq->count++] = (typeof(*bq->bulk)){
- 		.xsk	= xdp,
--		.len	= xdp->base.data_end - xdp->data,
--		.flags	= LIBETH_XDP_TX_FIRST,
-+		__libeth_xdp_tx_len(xdp->base.data_end - xdp->data,
-+				    LIBETH_XDP_TX_FIRST),
- 	};
- 
- 	if (likely(!xdp_buff_has_frags(&xdp->base)))
-@@ -48,7 +48,7 @@ static inline void libeth_xsk_tx_queue_frag(struct libeth_xdp_tx_bulk *bq,
- {
- 	bq->bulk[bq->count++] = (typeof(*bq->bulk)){
- 		.xsk	= frag,
--		.len	= frag->base.data_end - frag->data,
-+		__libeth_xdp_tx_len(frag->base.data_end - frag->data),
- 	};
- }
- 
-@@ -199,7 +199,7 @@ __libeth_xsk_xmit_fill_buf_md(const struct xdp_desc *xdesc,
- 	ctx = xsk_buff_raw_get_ctx(sq->pool, xdesc->addr);
- 	desc = (typeof(desc)){
- 		.addr	= ctx.dma,
--		.len	= xdesc->len,
-+		__libeth_xdp_tx_len(xdesc->len),
- 	};
- 
- 	BUILD_BUG_ON(!__builtin_constant_p(tmo == libeth_xsktmo));
-@@ -226,7 +226,7 @@ __libeth_xsk_xmit_fill_buf(const struct xdp_desc *xdesc,
- {
- 	return (struct libeth_xdp_tx_desc){
- 		.addr	= xsk_buff_raw_get_dma(sq->pool, xdesc->addr),
--		.len	= xdesc->len,
-+		__libeth_xdp_tx_len(xdesc->len),
- 	};
- }
- 
--- 
-2.47.1
-
+Also,
+https://git.zx2c4.com/wireguard-go/commit/?id=256bcbd70d5b4eaae2a9f21a9889498c0f89041c
 
