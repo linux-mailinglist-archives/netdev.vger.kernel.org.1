@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-191938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3622ABE020
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 18:11:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89815ABE02F
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 18:13:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFF031BC0E81
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:11:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A436E4C57FF
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:11:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D6826B2CC;
-	Tue, 20 May 2025 16:11:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80F6B270EB9;
+	Tue, 20 May 2025 16:11:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="kxf0OSzD"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="oj0ZAQQq"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24417268691;
-	Tue, 20 May 2025 16:11:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CFDB26A1CC;
+	Tue, 20 May 2025 16:11:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747757485; cv=none; b=rSi5Asqcf8BqwQb07EZ0mXymE+ZsBCG+cYJpnus3ww0rBmWpOrSzqNa6q5uzEY/9qX367W/47dyDU2b+mQ3gNh5r5+Ik42DsMS1AK257AHs2hKM2Co+7lCxB/W25pSEHTxMR+McszoN4OVlFX1w76hfjBeWFhCtXvtuY++8gmlM=
+	t=1747757486; cv=none; b=PtrvNaFVZdC8uKKv/8f3/FFxDG8GGNuhPyoue6MjSa8cvp8Q51LOTpLwMVD3q16At4plJLECvCDFhtVR8wNvZxuMcgLlpj1oyqwT45kZyzoymwSYLj76bQhguFb79e/6XYaJVOZM0/x4t5RPo77QINr0JW4G4UI7VPl1A/D2Apo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747757485; c=relaxed/simple;
-	bh=5zBqkOd/JR4sL0Zx3JV6mBbHzN63ECXpQrVEipiYn9Q=;
+	s=arc-20240116; t=1747757486; c=relaxed/simple;
+	bh=lJetcxEcbVz9/t846h32sXHQqRHPQd2dMogNnjOxTVM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=qyszCRUFkTjCaUqs/YfMiBRNNeG8TlG1G9TnCquzQdkrhpnOEZeJTLPV9Pljxp7HFALkAYeFqruFPcdifmF59XTo6A3sOcc6dM2xaHmwz5RVrfwTEQjDgPVSCa+Abf6yl2kQ1LUVdtLPxKrAtP6/0q7QmyhDRrmgC0N/Zu/qm8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=kxf0OSzD; arc=none smtp.client-ip=217.70.183.199
+	 In-Reply-To:To:Cc; b=YiLjE3ucoR87J8iRE/g6bVY+OBQDoJC1SnRkOAXkHSlGtS1FKAIe9qIhEVpNrr6v15gOmmLmj3n+wd/lXGNuKbPuwPNUrHfpXV3I8M+G+y6NdNkwX2rM53Sr5zxR0gWA9w50sRefYqrigEMQD5QWfmLAckW8S2CPRN8ExvA+laY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=oj0ZAQQq; arc=none smtp.client-ip=217.70.183.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 5C05D4397B;
-	Tue, 20 May 2025 16:11:19 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 837524327F;
+	Tue, 20 May 2025 16:11:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1747757480;
+	t=1747757481;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Opk45UsWK8agVJCxfm99YbDO9xDuvWxn6d7SyiYPx48=;
-	b=kxf0OSzDt+e+f8z38jQv6UnPWZx97ed8JL+e6w/DKyzTNruHVZQyOhOYURvkcQeYBxXw40
-	dfBbHV7rlh8AWqDPNp7ouXpsh92GXdlV4OERrX57rVa+7K+D4N798tMsAdPuqCKNlQdoMN
-	Nemddt70Ny3b1pmDnWt3AiWmjP5QVlTWHpnhdKN4t/6ZdjCvb3f/oGKt8WZ0bGiAj9ZdUS
-	cc2AQSVxQvWVzjk6qZICzfFfIKCE27sGqTkQonBEKl5O4RIoDMXohFM3Mk/qgks7roTtLD
-	Wpu05kBfKVvWEWUdg0xnRNlDZ52aFidr2AJNs74bgJfryuLwnEOkcXxLNJdFkg==
+	bh=1PZnM8ANY3SfQQEn+bKsLUzQXcaUUF/lcM3qDnZ7DbE=;
+	b=oj0ZAQQq6K/caSR8bMa4nES29zcoS2prcJOCv2boMCVJgNNyMP3jTW9gk/PNrugmdXfg+n
+	htpBGReSgtYFBNkqDZLhtbvZmFoeRtpcLEkhIyAO3hvOMOg3/qTytANHc/qINd+mHyFdee
+	TfT8QMNU6BFtM8vDhBdzK4uhurT8tXqec3TXt20y8a3Q2Ejx4++6a2r0d4Y2bndnqrGUe/
+	HsRR9D9vMib+7LJyiUbE/rgZ1LDS6AStG+g3aaP178qC3vPSef3lRpPF8vaTvoVfMtiPP2
+	dUjygXYO7v2rk/Hv9oO1LgimAXD1SSJzbrvEU5ohOzQHYBryIn5e4ujnWzYN3A==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Tue, 20 May 2025 18:11:03 +0200
-Subject: [PATCH net-next v11 01/13] net: pse-pd: Introduce attached_phydev
- to pse control
+Date: Tue, 20 May 2025 18:11:04 +0200
+Subject: [PATCH net-next v11 02/13] net: pse-pd: Add support for reporting
+ events
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250520-feature_poe_port_prio-v11-1-bbaf447e1b28@bootlin.com>
+Message-Id: <20250520-feature_poe_port_prio-v11-2-bbaf447e1b28@bootlin.com>
 References: <20250520-feature_poe_port_prio-v11-0-bbaf447e1b28@bootlin.com>
 In-Reply-To: <20250520-feature_poe_port_prio-v11-0-bbaf447e1b28@bootlin.com>
 To: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>, 
@@ -79,185 +79,551 @@ Cc: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
 X-Mailer: b4 0.15-dev-8cb71
 X-GND-State: clean
 X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgdeiheculddtuddrgeefvddrtddtmdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephfffufggtgfgkfhfjgfvvefosehtjeertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepvefgvdfgkeetgfefgfegkedugffghfdtffeftdeuteehjedtvdelvddvleehtdevnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopegluddvjedrtddruddrudgnpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdejpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvghrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehordhrvghmphgvlhesphgvnhhguhhtrhhonhhigidruggvpdhrtghpthhtohepkhhriihkodgutheskhgvrhhnvghlrdhorhhgp
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgdeiheculddtuddrgeefvddrtddtmdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephfffufggtgfgkfhfjgfvvefosehtjeertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepvefgvdfgkeetgfefgfegkedugffghfdtffeftdeuteehjedtvdelvddvleehtdevnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgepudenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopegluddvjedrtddruddrudgnpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdejpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvghrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehordhrvghmphgvlhesphgvnhhguhhtrhhonhhigidruggvpdhrtghpthhtohepkhhriihkodgutheskhgvrhhnvghlrdhorhhgp
  dhrtghpthhtoheplhhinhhugidqughotgesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegsrhhoohhnihgvsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhm
 X-GND-Sasl: kory.maincent@bootlin.com
 
 From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-In preparation for reporting PSE events via ethtool notifications,
-introduce an attached_phydev field in the pse_control structure.
-This field stores the phy_device associated with the PSE PI,
-ensuring that notifications are sent to the correct network
-interface.
+Add support for devm_pse_irq_helper() to register PSE interrupts and report
+events such as over-current or over-temperature conditions. This follows a
+similar approach to the regulator API but also sends notifications using a
+dedicated PSE ethtool netlink socket.
 
-The attached_phydev pointer is directly tied to the PHY lifecycle. It
-is set when the PHY is registered and cleared when the PHY is removed.
-There is no need to use a refcount, as doing so could interfere with
-the PHY removal process.
-
-Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+Signed-off-by: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 ---
-
 Change in v11:
-- New patch due to a split of the next patch.
----
- drivers/net/mdio/fwnode_mdio.c | 26 ++++++++++++++------------
- drivers/net/pse-pd/pse_core.c  | 11 ++++++++---
- include/linux/pse-pd/pse.h     |  6 ++++--
- 3 files changed, 26 insertions(+), 17 deletions(-)
+- Split the part that add attached_phydev to another patch.
+- Fully describe the PSE events in the ethtool spec.
+- Made small fixes reported by Jakub in the ethnl_pse_send_ntf.
 
-diff --git a/drivers/net/mdio/fwnode_mdio.c b/drivers/net/mdio/fwnode_mdio.c
-index aea0f0357568..9b41d4697a40 100644
---- a/drivers/net/mdio/fwnode_mdio.c
-+++ b/drivers/net/mdio/fwnode_mdio.c
-@@ -18,7 +18,8 @@ MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("FWNODE MDIO bus (Ethernet PHY) accessors");
+Change in v10:
+- Removed Oleksij reviewed-by due to few code change.
+- Take a reference of the netdev pointer to avoid any use after free in
+  the ethnl_pse_send_ntf function.
+
+Change in v9:
+- Add a missing check after skb creation.
+
+Change in v7:
+- Use flags definition for pse events in ethtool specs.
+- Change irq name by prepending the device name.
+
+Change in v6:
+- Update pse-ntf netlink to u32 instead of bitset.
+- Update commit message.
+
+Change in v4:
+- Fix netlink notification message issues.
+- Use netlink bitset in ethtool_pse_send_ntf.
+- Add kdoc.
+
+Change in v3:
+- Remove C33 prefix when it is not in the standards.
+- Fix pse_to_regulator_notifs which could not report regulator events
+  together.
+- Fix deadlock issue.
+- Save interrupt in pcdev structure for later use.
+
+Change in v2:
+- Add support for PSE ethtool notification.
+- Saved the attached phy_device in the pse_control structure to know which
+  interface should have the notification.
+- Rethink devm_pse_irq_helper() without devm_regulator_irq_helper() call.
+---
+ Documentation/netlink/specs/ethtool.yaml       |  34 +++++
+ Documentation/networking/ethtool-netlink.rst   |  19 +++
+ drivers/net/pse-pd/pse_core.c                  | 180 +++++++++++++++++++++++++
+ include/linux/ethtool_netlink.h                |   9 ++
+ include/linux/pse-pd/pse.h                     |  20 +++
+ include/uapi/linux/ethtool_netlink_generated.h |  19 +++
+ net/ethtool/pse-pd.c                           |  38 ++++++
+ 7 files changed, 319 insertions(+)
+
+diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
+index c650cd3dcb80..891c37a4bb09 100644
+--- a/Documentation/netlink/specs/ethtool.yaml
++++ b/Documentation/netlink/specs/ethtool.yaml
+@@ -98,6 +98,17 @@ definitions:
+     name: tcp-data-split
+     type: enum
+     entries: [ unknown, disabled, enabled ]
++  -
++    name: pse-event
++    doc: PSE event list for the PSE controller
++    type: flags
++    entries:
++      -
++        name: over-current
++        doc: PSE output current is too high
++      -
++        name: over-temp
++        doc: PSE in over temperature state
  
- static struct pse_control *
--fwnode_find_pse_control(struct fwnode_handle *fwnode)
-+fwnode_find_pse_control(struct fwnode_handle *fwnode,
-+			struct phy_device *phydev)
- {
- 	struct pse_control *psec;
- 	struct device_node *np;
-@@ -30,7 +31,7 @@ fwnode_find_pse_control(struct fwnode_handle *fwnode)
- 	if (!np)
- 		return NULL;
+ attribute-sets:
+   -
+@@ -1528,6 +1539,19 @@ attribute-sets:
+         name: hwtstamp-flags
+         type: nest
+         nested-attributes: bitset
++  -
++    name: pse-ntf
++    attr-cnt-name: --ethtool-a-pse-ntf-cnt
++    attributes:
++      -
++        name: header
++        type: nest
++        nested-attributes: header
++      -
++        name: events
++        type: uint
++        enum: pse-event
++        doc: List of events reported by the PSE controller
  
--	psec = of_pse_control_get(np);
-+	psec = of_pse_control_get(np, phydev);
- 	if (PTR_ERR(psec) == -ENOENT)
- 		return NULL;
- 
-@@ -128,15 +129,9 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
- 	u32 phy_id;
- 	int rc;
- 
--	psec = fwnode_find_pse_control(child);
--	if (IS_ERR(psec))
--		return PTR_ERR(psec);
--
- 	mii_ts = fwnode_find_mii_timestamper(child);
--	if (IS_ERR(mii_ts)) {
--		rc = PTR_ERR(mii_ts);
--		goto clean_pse;
--	}
-+	if (IS_ERR(mii_ts))
-+		return PTR_ERR(mii_ts);
- 
- 	is_c45 = fwnode_device_is_compatible(child, "ethernet-phy-ieee802.3-c45");
- 	if (is_c45 || fwnode_get_phy_id(child, &phy_id))
-@@ -169,6 +164,12 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
- 			goto clean_phy;
- 	}
- 
-+	psec = fwnode_find_pse_control(child, phy);
-+	if (IS_ERR(psec)) {
-+		rc = PTR_ERR(psec);
-+		goto unregister_phy;
-+	}
+ operations:
+   enum-model: directional
+@@ -2384,3 +2408,13 @@ operations:
+           attributes: *tsconfig
+         reply:
+           attributes: *tsconfig
++    -
++      name: pse-ntf
++      doc: Notification for PSE events.
 +
- 	phy->psec = psec;
++      attribute-set: pse-ntf
++
++      event:
++        attributes:
++          - header
++          - events
+diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
+index b6e9af4d0f1b..433737865bc2 100644
+--- a/Documentation/networking/ethtool-netlink.rst
++++ b/Documentation/networking/ethtool-netlink.rst
+@@ -290,6 +290,7 @@ Kernel to userspace:
+   ``ETHTOOL_MSG_PHY_NTF``                  Ethernet PHY information change
+   ``ETHTOOL_MSG_TSCONFIG_GET_REPLY``       hw timestamping configuration
+   ``ETHTOOL_MSG_TSCONFIG_SET_REPLY``       new hw timestamping configuration
++  ``ETHTOOL_MSG_PSE_NTF``                  PSE events notification
+   ======================================== =================================
  
- 	/* phy->mii_ts may already be defined by the PHY driver. A
-@@ -180,12 +181,13 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
+ ``GET`` requests are sent by userspace applications to retrieve device
+@@ -1896,6 +1897,24 @@ various existing products that document power consumption in watts rather than
+ classes. If power limit configuration based on classes is needed, the
+ conversion can be done in user space, for example by ethtool.
  
- 	return 0;
++PSE_NTF
++=======
++
++Notify PSE events.
++
++Notification contents:
++
++  ===============================  ======  ========================
++  ``ETHTOOL_A_PSE_HEADER``         nested  request header
++  ``ETHTOOL_A_PSE_EVENTS``         bitset  PSE events
++  ===============================  ======  ========================
++
++When set, the optional ``ETHTOOL_A_PSE_EVENTS`` attribute identifies the
++PSE events.
++
++.. kernel-doc:: include/uapi/linux/ethtool_netlink_generated.h
++    :identifiers: ethtool_pse_event
++
+ RSS_GET
+ =======
  
-+unregister_phy:
-+	if (is_acpi_node(child) || is_of_node(child))
-+		phy_device_remove(phy);
- clean_phy:
- 	phy_device_free(phy);
- clean_mii_ts:
- 	unregister_mii_timestamper(mii_ts);
--clean_pse:
--	pse_control_put(psec);
- 
- 	return rc;
- }
 diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
-index 4602e26eb8c8..4610c1f0ddd6 100644
+index 4610c1f0ddd6..a79dcab9c12e 100644
 --- a/drivers/net/pse-pd/pse_core.c
 +++ b/drivers/net/pse-pd/pse_core.c
-@@ -23,6 +23,7 @@ static LIST_HEAD(pse_controller_list);
-  * @list: list entry for the pcdev's PSE controller list
-  * @id: ID of the PSE line in the PSE controller device
-  * @refcnt: Number of gets of this pse_control
-+ * @attached_phydev: PHY device pointer attached by the PSE control
-  */
- struct pse_control {
- 	struct pse_controller_dev *pcdev;
-@@ -30,6 +31,7 @@ struct pse_control {
- 	struct list_head list;
- 	unsigned int id;
- 	struct kref refcnt;
-+	struct phy_device *attached_phydev;
- };
+@@ -7,10 +7,14 @@
  
- static int of_load_single_pse_pi_pairset(struct device_node *node,
-@@ -599,7 +601,8 @@ void pse_control_put(struct pse_control *psec)
- EXPORT_SYMBOL_GPL(pse_control_put);
+ #include <linux/device.h>
+ #include <linux/ethtool.h>
++#include <linux/ethtool_netlink.h>
+ #include <linux/of.h>
++#include <linux/phy.h>
+ #include <linux/pse-pd/pse.h>
+ #include <linux/regulator/driver.h>
+ #include <linux/regulator/machine.h>
++#include <linux/rtnetlink.h>
++#include <net/net_trackers.h>
  
- static struct pse_control *
--pse_control_get_internal(struct pse_controller_dev *pcdev, unsigned int index)
-+pse_control_get_internal(struct pse_controller_dev *pcdev, unsigned int index,
-+			 struct phy_device *phydev)
- {
- 	struct pse_control *psec;
- 	int ret;
-@@ -638,6 +641,7 @@ pse_control_get_internal(struct pse_controller_dev *pcdev, unsigned int index)
- 	psec->pcdev = pcdev;
- 	list_add(&psec->list, &pcdev->pse_control_head);
- 	psec->id = index;
-+	psec->attached_phydev = phydev;
- 	kref_init(&psec->refcnt);
- 
- 	return psec;
-@@ -693,7 +697,8 @@ static int psec_id_xlate(struct pse_controller_dev *pcdev,
- 	return pse_spec->args[0];
+ static DEFINE_MUTEX(pse_list_mutex);
+ static LIST_HEAD(pse_controller_list);
+@@ -210,6 +214,52 @@ static int of_load_pse_pis(struct pse_controller_dev *pcdev)
+ 	return ret;
  }
  
--struct pse_control *of_pse_control_get(struct device_node *node)
-+struct pse_control *of_pse_control_get(struct device_node *node,
-+				       struct phy_device *phydev)
++/**
++ * pse_control_find_net_by_id - Find net attached to the pse control id
++ * @pcdev: a pointer to the PSE
++ * @id: index of the PSE control
++ * @tracker: refcount tracker used by netdev
++ *
++ * Return: net device pointer or NULL. The device returned has had a
++ *	   reference added and the pointer is safe until the user calls
++ *	   netdev_put() to indicate they have finished with it.
++ */
++static struct net_device *
++pse_control_find_net_by_id(struct pse_controller_dev *pcdev, int id,
++			   netdevice_tracker *tracker)
++{
++	struct pse_control *psec, *next;
++
++	mutex_lock(&pse_list_mutex);
++	list_for_each_entry_safe(psec, next, &pcdev->pse_control_head, list) {
++		if (psec->id == id) {
++			struct net_device *netdev = NULL;
++			struct phy_device *phydev;
++
++			kref_get(&psec->refcnt);
++			/* Release the mutex before taking the rtnl lock
++			 * to avoid deadlock in case of a pse_control_put
++			 * call with the rtnl lock held.
++			 */
++			mutex_unlock(&pse_list_mutex);
++			/* Acquire rtnl to protect the net device
++			 * reference get.
++			 */
++			rtnl_lock();
++			phydev = psec->attached_phydev;
++			if (phydev->attached_dev) {
++				netdev = phydev->attached_dev;
++				netdev_hold(netdev, tracker, GFP_KERNEL);
++			}
++			rtnl_unlock();
++			pse_control_put(psec);
++			return netdev;
++		}
++	}
++	mutex_unlock(&pse_list_mutex);
++	return NULL;
++}
++
+ static int pse_pi_is_enabled(struct regulator_dev *rdev)
  {
- 	struct pse_controller_dev *r, *pcdev;
- 	struct of_phandle_args args;
-@@ -743,7 +748,7 @@ struct pse_control *of_pse_control_get(struct device_node *node)
- 	}
+ 	struct pse_controller_dev *pcdev = rdev_get_drvdata(rdev);
+@@ -559,6 +609,136 @@ int devm_pse_controller_register(struct device *dev,
+ }
+ EXPORT_SYMBOL_GPL(devm_pse_controller_register);
  
- 	/* pse_list_mutex also protects the pcdev's pse_control list */
--	psec = pse_control_get_internal(pcdev, psec_id);
-+	psec = pse_control_get_internal(pcdev, psec_id, phydev);
++struct pse_irq {
++	struct pse_controller_dev *pcdev;
++	struct pse_irq_desc desc;
++	unsigned long *notifs;
++};
++
++/**
++ * pse_to_regulator_notifs - Convert PSE notifications to Regulator
++ *			     notifications
++ * @notifs: PSE notifications
++ *
++ * Return: Regulator notifications
++ */
++static unsigned long pse_to_regulator_notifs(unsigned long notifs)
++{
++	unsigned long rnotifs = 0;
++
++	if (notifs & ETHTOOL_PSE_EVENT_OVER_CURRENT)
++		rnotifs |= REGULATOR_EVENT_OVER_CURRENT;
++	if (notifs & ETHTOOL_PSE_EVENT_OVER_TEMP)
++		rnotifs |= REGULATOR_EVENT_OVER_TEMP;
++
++	return rnotifs;
++}
++
++/**
++ * pse_isr - IRQ handler for PSE
++ * @irq: irq number
++ * @data: pointer to user interrupt structure
++ *
++ * Return: irqreturn_t - status of IRQ
++ */
++static irqreturn_t pse_isr(int irq, void *data)
++{
++	struct netlink_ext_ack extack = {};
++	struct pse_controller_dev *pcdev;
++	unsigned long notifs_mask = 0;
++	struct pse_irq_desc *desc;
++	struct pse_irq *h = data;
++	int ret, i;
++
++	desc = &h->desc;
++	pcdev = h->pcdev;
++
++	/* Clear notifs mask */
++	memset(h->notifs, 0, pcdev->nr_lines * sizeof(*h->notifs));
++	mutex_lock(&pcdev->lock);
++	ret = desc->map_event(irq, pcdev, h->notifs, &notifs_mask);
++	mutex_unlock(&pcdev->lock);
++	if (ret || !notifs_mask)
++		return IRQ_NONE;
++
++	for_each_set_bit(i, &notifs_mask, pcdev->nr_lines) {
++		unsigned long notifs, rnotifs;
++		struct net_device *netdev;
++		netdevice_tracker tracker;
++
++		/* Do nothing PI not described */
++		if (!pcdev->pi[i].rdev)
++			continue;
++
++		notifs = h->notifs[i];
++		dev_dbg(h->pcdev->dev,
++			"Sending PSE notification EVT 0x%lx\n", notifs);
++
++		netdev = pse_control_find_net_by_id(pcdev, i, &tracker);
++		if (netdev)
++			ethnl_pse_send_ntf(netdev, notifs, &extack);
++		netdev_put(netdev, &tracker);
++		rnotifs = pse_to_regulator_notifs(notifs);
++		regulator_notifier_call_chain(pcdev->pi[i].rdev, rnotifs,
++					      NULL);
++	}
++
++	return IRQ_HANDLED;
++}
++
++/**
++ * devm_pse_irq_helper - Register IRQ based PSE event notifier
++ * @pcdev: a pointer to the PSE
++ * @irq: the irq value to be passed to request_irq
++ * @irq_flags: the flags to be passed to request_irq
++ * @d: PSE interrupt description
++ *
++ * Return: 0 on success and errno on failure
++ */
++int devm_pse_irq_helper(struct pse_controller_dev *pcdev, int irq,
++			int irq_flags, const struct pse_irq_desc *d)
++{
++	struct device *dev = pcdev->dev;
++	size_t irq_name_len;
++	struct pse_irq *h;
++	char *irq_name;
++	int ret;
++
++	if (!d || !d->map_event || !d->name)
++		return -EINVAL;
++
++	h = devm_kzalloc(dev, sizeof(*h), GFP_KERNEL);
++	if (!h)
++		return -ENOMEM;
++
++	h->pcdev = pcdev;
++	h->desc = *d;
++
++	/* IRQ name len is pcdev dev name + 5 char + irq desc name + 1 */
++	irq_name_len = strlen(dev_name(pcdev->dev)) + 5 + strlen(d->name) + 1;
++	irq_name = devm_kzalloc(dev, irq_name_len, GFP_KERNEL);
++	if (!irq_name)
++		return -ENOMEM;
++
++	snprintf(irq_name, irq_name_len, "pse-%s:%s", dev_name(pcdev->dev),
++		 d->name);
++
++	h->notifs = devm_kcalloc(dev, pcdev->nr_lines,
++				 sizeof(*h->notifs), GFP_KERNEL);
++	if (!h->notifs)
++		return -ENOMEM;
++
++	ret = devm_request_threaded_irq(dev, irq, NULL, pse_isr,
++					IRQF_ONESHOT | irq_flags,
++					irq_name, h);
++	if (ret)
++		dev_err(pcdev->dev, "Failed to request IRQ %d\n", irq);
++
++	pcdev->irq = irq;
++	return ret;
++}
++EXPORT_SYMBOL_GPL(devm_pse_irq_helper);
++
+ /* PSE control section */
  
- out:
- 	mutex_unlock(&pse_list_mutex);
+ static void __pse_control_release(struct kref *kref)
+diff --git a/include/linux/ethtool_netlink.h b/include/linux/ethtool_netlink.h
+index aba91335273a..bd65a478140a 100644
+--- a/include/linux/ethtool_netlink.h
++++ b/include/linux/ethtool_netlink.h
+@@ -43,6 +43,9 @@ void ethtool_aggregate_rmon_stats(struct net_device *dev,
+ 				  struct ethtool_rmon_stats *rmon_stats);
+ bool ethtool_dev_mm_supported(struct net_device *dev);
+ 
++void ethnl_pse_send_ntf(struct net_device *netdev, unsigned long notif,
++			struct netlink_ext_ack *extack);
++
+ #else
+ static inline int ethnl_cable_test_alloc(struct phy_device *phydev, u8 cmd)
+ {
+@@ -120,6 +123,12 @@ static inline bool ethtool_dev_mm_supported(struct net_device *dev)
+ 	return false;
+ }
+ 
++static inline void ethnl_pse_send_ntf(struct phy_device *phydev,
++				      unsigned long notif,
++				      struct netlink_ext_ack *extack)
++{
++}
++
+ #endif /* IS_ENABLED(CONFIG_ETHTOOL_NETLINK) */
+ 
+ static inline int ethnl_cable_test_result(struct phy_device *phydev, u8 pair,
 diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
-index c773eeb92d04..8b0866fad2ad 100644
+index 8b0866fad2ad..6eb064722aa8 100644
 --- a/include/linux/pse-pd/pse.h
 +++ b/include/linux/pse-pd/pse.h
-@@ -250,7 +250,8 @@ struct device;
+@@ -7,12 +7,15 @@
+ 
+ #include <linux/list.h>
+ #include <uapi/linux/ethtool.h>
++#include <uapi/linux/ethtool_netlink_generated.h>
++#include <linux/regulator/driver.h>
+ 
+ /* Maximum current in uA according to IEEE 802.3-2022 Table 145-1 */
+ #define MAX_PI_CURRENT 1920000
+ /* Maximum power in mW according to IEEE 802.3-2022 Table 145-16 */
+ #define MAX_PI_PW 99900
+ 
++struct net_device;
+ struct phy_device;
+ struct pse_controller_dev;
+ struct netlink_ext_ack;
+@@ -37,6 +40,19 @@ struct ethtool_c33_pse_pw_limit_range {
+ 	u32 max;
+ };
+ 
++/**
++ * struct pse_irq_desc - notification sender description for IRQ based events.
++ *
++ * @name: the visible name for the IRQ
++ * @map_event: driver callback to map IRQ status into PSE devices with events.
++ */
++struct pse_irq_desc {
++	const char *name;
++	int (*map_event)(int irq, struct pse_controller_dev *pcdev,
++			 unsigned long *notifs,
++			 unsigned long *notifs_mask);
++};
++
+ /**
+  * struct pse_control_config - PSE control/channel configuration.
+  *
+@@ -228,6 +244,7 @@ struct pse_pi {
+  * @types: types of the PSE controller
+  * @pi: table of PSE PIs described in this controller device
+  * @no_of_pse_pi: flag set if the pse_pis devicetree node is not used
++ * @irq: PSE interrupt
+  */
+ struct pse_controller_dev {
+ 	const struct pse_controller_ops *ops;
+@@ -241,6 +258,7 @@ struct pse_controller_dev {
+ 	enum ethtool_pse_types types;
+ 	struct pse_pi *pi;
+ 	bool no_of_pse_pi;
++	int irq;
+ };
+ 
+ #if IS_ENABLED(CONFIG_PSE_CONTROLLER)
+@@ -249,6 +267,8 @@ void pse_controller_unregister(struct pse_controller_dev *pcdev);
+ struct device;
  int devm_pse_controller_register(struct device *dev,
  				 struct pse_controller_dev *pcdev);
++int devm_pse_irq_helper(struct pse_controller_dev *pcdev, int irq,
++			int irq_flags, const struct pse_irq_desc *d);
  
--struct pse_control *of_pse_control_get(struct device_node *node);
-+struct pse_control *of_pse_control_get(struct device_node *node,
-+				       struct phy_device *phydev);
- void pse_control_put(struct pse_control *psec);
+ struct pse_control *of_pse_control_get(struct device_node *node,
+ 				       struct phy_device *phydev);
+diff --git a/include/uapi/linux/ethtool_netlink_generated.h b/include/uapi/linux/ethtool_netlink_generated.h
+index 30c8dad6214e..e9d336d9a325 100644
+--- a/include/uapi/linux/ethtool_netlink_generated.h
++++ b/include/uapi/linux/ethtool_netlink_generated.h
+@@ -37,6 +37,16 @@ enum ethtool_tcp_data_split {
+ 	ETHTOOL_TCP_DATA_SPLIT_ENABLED,
+ };
  
- int pse_ethtool_get_status(struct pse_control *psec,
-@@ -268,7 +269,8 @@ bool pse_has_c33(struct pse_control *psec);
++/**
++ * enum ethtool_pse_event - PSE event list for the PSE controller
++ * @ETHTOOL_PSE_EVENT_OVER_CURRENT: PSE output current is too high
++ * @ETHTOOL_PSE_EVENT_OVER_TEMP: PSE in over temperature state
++ */
++enum ethtool_pse_event {
++	ETHTOOL_PSE_EVENT_OVER_CURRENT = 1,
++	ETHTOOL_PSE_EVENT_OVER_TEMP = 2,
++};
++
+ enum {
+ 	ETHTOOL_A_HEADER_UNSPEC,
+ 	ETHTOOL_A_HEADER_DEV_INDEX,
+@@ -704,6 +714,14 @@ enum {
+ 	ETHTOOL_A_TSCONFIG_MAX = (__ETHTOOL_A_TSCONFIG_CNT - 1)
+ };
  
- #else
++enum {
++	ETHTOOL_A_PSE_NTF_HEADER = 1,
++	ETHTOOL_A_PSE_NTF_EVENTS,
++
++	__ETHTOOL_A_PSE_NTF_CNT,
++	ETHTOOL_A_PSE_NTF_MAX = (__ETHTOOL_A_PSE_NTF_CNT - 1)
++};
++
+ enum {
+ 	ETHTOOL_MSG_USER_NONE = 0,
+ 	ETHTOOL_MSG_STRSET_GET = 1,
+@@ -808,6 +826,7 @@ enum {
+ 	ETHTOOL_MSG_PHY_NTF,
+ 	ETHTOOL_MSG_TSCONFIG_GET_REPLY,
+ 	ETHTOOL_MSG_TSCONFIG_SET_REPLY,
++	ETHTOOL_MSG_PSE_NTF,
  
--static inline struct pse_control *of_pse_control_get(struct device_node *node)
-+static inline struct pse_control *of_pse_control_get(struct device_node *node,
-+						     struct phy_device *phydev)
- {
- 	return ERR_PTR(-ENOENT);
- }
+ 	__ETHTOOL_MSG_KERNEL_CNT,
+ 	ETHTOOL_MSG_KERNEL_MAX = (__ETHTOOL_MSG_KERNEL_CNT - 1)
+diff --git a/net/ethtool/pse-pd.c b/net/ethtool/pse-pd.c
+index 4f6b99eab2a6..0e5d2095eeda 100644
+--- a/net/ethtool/pse-pd.c
++++ b/net/ethtool/pse-pd.c
+@@ -315,3 +315,41 @@ const struct ethnl_request_ops ethnl_pse_request_ops = {
+ 	.set			= ethnl_set_pse,
+ 	/* PSE has no notification */
+ };
++
++void ethnl_pse_send_ntf(struct net_device *netdev, unsigned long notifs,
++			struct netlink_ext_ack *extack)
++{
++	void *reply_payload;
++	struct sk_buff *skb;
++	int reply_len;
++	int ret;
++
++	if (!netdev || !notifs)
++		return;
++
++	reply_len = ethnl_reply_header_size() +
++		    nla_total_size(sizeof(u32)); /* _PSE_NTF_EVENTS */
++
++	skb = genlmsg_new(reply_len, GFP_KERNEL);
++	if (!skb)
++		return;
++
++	reply_payload = ethnl_bcastmsg_put(skb, ETHTOOL_MSG_PSE_NTF);
++	if (!reply_payload)
++		goto err_skb;
++
++	ret = ethnl_fill_reply_header(skb, netdev, ETHTOOL_A_PSE_NTF_HEADER);
++	if (ret < 0)
++		goto err_skb;
++
++	if (nla_put_uint(skb, ETHTOOL_A_PSE_NTF_EVENTS, notifs))
++		goto err_skb;
++
++	genlmsg_end(skb, reply_payload);
++	ethnl_multicast(skb, netdev);
++	return;
++
++err_skb:
++	nlmsg_free(skb);
++}
++EXPORT_SYMBOL_GPL(ethnl_pse_send_ntf);
 
 -- 
 2.34.1
