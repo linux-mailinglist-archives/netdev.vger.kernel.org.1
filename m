@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-191977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0E8FABE159
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 18:56:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7601BABE15C
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 18:57:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 321E01BA7286
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:56:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 904E91890D6B
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:57:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38522242D85;
-	Tue, 20 May 2025 16:56:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5E75258CDD;
+	Tue, 20 May 2025 16:56:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F7xbo8ki"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fm6a9w1a"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1402222083
-	for <netdev@vger.kernel.org>; Tue, 20 May 2025 16:56:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B17992472A4
+	for <netdev@vger.kernel.org>; Tue, 20 May 2025 16:56:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747760200; cv=none; b=nOmRpGvepIo1T1Lkv4wJ2YaX5mmuqEhjr4gq5wpawZY6i4F+Y/zY8M7dMR9XKtzYf8Z/STJ+bf1+rOmodQ59I66wY8NDDAWuvSYma8+aPIrbaAER8V8uOuQVklsRJuw44zyHoeskS5aD6Sh/fBfZAeEMA+4+Yyc2dEGpKM1W8Nw=
+	t=1747760214; cv=none; b=dIgMDncvc0kUaI2Cj61/n0HO4db1h/xw9MDQWBtnFcl1CKwZ+0qxkP0eXL1CqcJjV3nU4eOP2gP+hsCotcLMA5sFunfAqT4mLpih1erzkCviNPIj3qy8jSQJoBKIrTH/oWpbvHsGwdUVo4FK6vHKDZ6Bk0tcMzIyRmhWRCf01nI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747760200; c=relaxed/simple;
-	bh=R2LH2rZEfsv4i6o4b0WSOGbE7Y7H3Up5vJnZGEZucM0=;
+	s=arc-20240116; t=1747760214; c=relaxed/simple;
+	bh=V/GNWDFOl7FG6mO8LZheDU0UBgoD4G5z2ZHBBlPlzSg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lSbMluAy1Q+39ZKkqtRtKRv1KcRR1Gi3C6srkyZws54QQXVf6z48XcNckl4Qvh2BHUMCC9NON9nFX4rcLGCTSt8Qxs6YaG1N3fz9TaKSQs+95SCgq1fxxlImfTzEwWDDfvzI4UYzahj1QH/QVAR0yBMmKOHotUmpslgStwSuAT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F7xbo8ki; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE29CC4CEE9;
-	Tue, 20 May 2025 16:56:37 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=jj4l7QRPeYYAmR8KZMXNzuZdXLYpT6EdkFJrUBVzalocytQFGmx/SXh1LSnbrDYRR/cQtpE7fMfix5Weq/WUxq3x2zr6KFSE5P20yk/sEYFOVoNKf9Zmb6dvGE3ee+FSTcnZDE30uNpFcYhuTs2pdoY7cSRosOIodrz8c2N4lRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fm6a9w1a; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE68DC4CEEB;
+	Tue, 20 May 2025 16:56:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747760199;
-	bh=R2LH2rZEfsv4i6o4b0WSOGbE7Y7H3Up5vJnZGEZucM0=;
+	s=k20201202; t=1747760214;
+	bh=V/GNWDFOl7FG6mO8LZheDU0UBgoD4G5z2ZHBBlPlzSg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=F7xbo8kiBZvLKEhVVE6zvdir338QOg71Mg0mYqNzqgxR6Gr/oG/jgYDVhGjiChnNF
-	 czD5BdRT6pHqtKM/O0gb6VwnHh8GnUWuymo2JnI6wxa+vEIWiawS/TE0QJIqacs891
-	 I0x0KvKUtjj68aXZePwVMdKOaxiiTvPD5DWqId0FYDTRo0ty0H8QCPDAFJTZ94K+7A
-	 FbGOaXqQmJ/rvkjvoO4AF+qG52K0RnCXZ7ZIrA1JtnMLumchlVeK08FQs35YbPv5Cz
-	 io2e/3ZG9Vk/CoeFlh3YHjPscUbenYjAjS2wNRwAebrgBfzFpFl3xcBqadY1jNlJzJ
-	 0W5KlnDg8xmEg==
-Date: Tue, 20 May 2025 17:56:35 +0100
+	b=fm6a9w1apELvMKQCHzyLbcfipS2k9DQldRm5Cs5aJuUP9wZhieZOV+MZT69j6WVx9
+	 x4Oq5Hlm2nVzZuySUOA1w2XjLya/+zswxFAxkpPI9yCYTLGKlf/7PR3ptPJxpGzz8j
+	 OZy8ceaoCE3cy/m0Yrd7JxYdcHytw5DQK8KA8UiQefXeTxb0vCBKVrZ78EzVZ35B7d
+	 cIbOmB52CI2LZCCls2mhn5CXYe6Xl5iOuWKkGb74r6cLlKoGZCUiXe6iAl8kMxlXVn
+	 eB1kz5OOc93eY1ixjfGjuCvZNA2rQkbic9LyFWCIPUUtW41FnyFkeweDanXv061kjx
+	 o7b3S3HTQbBhA==
+Date: Tue, 20 May 2025 17:56:50 +0100
 From: Simon Horman <horms@kernel.org>
 To: Jiawen Wu <jiawenwu@trustnetic.com>
 Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
 	edumazet@google.com, kuba@kernel.org, richardcochran@gmail.com,
 	linux@armlinux.org.uk, mengyuanlou@net-swift.com
-Subject: Re: [PATCH net-next 2/9] net: wangxun: Use specific flag bit to
- simplify the code
-Message-ID: <20250520165635.GH365796@horms.kernel.org>
+Subject: Re: [PATCH net-next 3/9] net: txgbe: Distinguish between 40G and 25G
+ devices
+Message-ID: <20250520165650.GI365796@horms.kernel.org>
 References: <20250516093220.6044-1-jiawenwu@trustnetic.com>
- <328F8950017A7028+20250516093220.6044-3-jiawenwu@trustnetic.com>
+ <2A092B0D4355A4AC+20250516093220.6044-4-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,14 +60,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <328F8950017A7028+20250516093220.6044-3-jiawenwu@trustnetic.com>
+In-Reply-To: <2A092B0D4355A4AC+20250516093220.6044-4-jiawenwu@trustnetic.com>
 
-On Fri, May 16, 2025 at 05:32:13PM +0800, Jiawen Wu wrote:
-> Most of the different code that requires MAC type in the common library
-> is due to NGBE only supports a few queues and pools, unlike TXGBE, which
-> supports 128 queues and 64 pools. This difference accounts for most of
-> the hardware configuration differences in the driver code. So add a flag
-> bit "WX_FLAG_MULTI_64_FUNC" for them to clean-up the driver code.
+On Fri, May 16, 2025 at 05:32:14PM +0800, Jiawen Wu wrote:
+> For the following patches to support PHYLINK for AML 25G devices,
+> separate MAC type wx_mac_aml40 to maintain the driver of 40G devices.
+> Because 40G devices will complete support later, not now.
+> 
+> And this patch makes the 25G devices use some PHYLINK interfaces, but it
+> is not yet create PHYLINK and cannot be used on its own. It is just
+> preparation for the next patches.
 > 
 > Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 
