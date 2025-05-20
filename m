@@ -1,128 +1,131 @@
-Return-Path: <netdev+bounces-191898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E78DAABDD42
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:36:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E9B4ABDD0B
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:32:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C36E14E6C6A
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 14:23:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 043FA7AB8AD
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 14:26:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A2E1253326;
-	Tue, 20 May 2025 14:18:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85FE9242D92;
+	Tue, 20 May 2025 14:25:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C48QBauZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jNZ+pBif"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28B962505C7;
-	Tue, 20 May 2025 14:18:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F3ED24290D
+	for <netdev@vger.kernel.org>; Tue, 20 May 2025 14:25:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747750685; cv=none; b=KiZ427tURaURtUtzhiqs34c5vz5S39cJ2cmtrm2LjesY6rqAqK77TkBSMNrqG7pF+Z4og4TbZc1VynQmT/ezUGPNdv8K8/QI6viiT6dPZtMs77IHHLzTVnnoD+t3mGXjkCeSmVtra7qy9D4H7imxllnQz2KBVKIaCGNOqFvz/3g=
+	t=1747751149; cv=none; b=pWL2fE6AsOEKP2JnyWePnJy+iwICa7ynb3dgcx1x5aSFmvUrHPqKp6Pu36iS93dFotnGN/2fFFVYx/nRv48BxL75h1ygFXUGu6FGlSxzEjaOjL6X5IQfmOyX4wTZJ+j8AAFK/X33+SbaUGHDMWRud7T8/gDrqTkPi7GTW/7vZts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747750685; c=relaxed/simple;
-	bh=n5HLSG+HZfhC0Gthpz8JGBNHOZuHr52+38rD1o9D0lw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NM3Jl0A6+Dy08KznMrzXK1ZitkT1hqIZrHG6reTOrhkLmIQye1ieveNhdEvQ5SUgrEWKFHL/cKQjIRvUYIq6/dvCSuomO7UxB99yRkIQPGbR4uaRqvChsE2T/1e9kFe2IPAm+VUxwErf6bfBBgOrVc95izVaGn0l0geFqAp1cao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C48QBauZ; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-30ecc762cb7so2412931a91.1;
-        Tue, 20 May 2025 07:18:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747750683; x=1748355483; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cV/OQIV8ztouckrklGIhTFHAEbzSsaIMTwiOmhCaP08=;
-        b=C48QBauZAzvrCEkx9l9IdUtN9txVIgO1SUMxsplEgmS1Ey/qSGy0NTPZEEnHgkFxJk
-         bvgZsLKUsh9Cm9UYvhcw2GOkHIuB9ks+tlgdtlMxY5v4pRM/ncRS3ewcbmskbGi1dCKs
-         s0lYtG/P1MyjzJ/9RvlpmqoeiLyp3EBiqAOA6xAAGFg0AQOknybKV1N82ZdQFL+m/OCO
-         Rb/NkA5QPyuqyTBvkQKgr1qAohyV/DamIT7mQLzx666IJFT9u81n1AVAiuSRmUBf6GXH
-         Fs8gUcdXbrSQQFmHojmvC04ga3m7tCNjhyFkZVNcnRmHOFC+nZOMxY49ZBReuUOnXOxt
-         oZ9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747750683; x=1748355483;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cV/OQIV8ztouckrklGIhTFHAEbzSsaIMTwiOmhCaP08=;
-        b=CFZaAQfS+mreCd1AvpwtZeHKRMHg2UmW0yjpb1Q/dNrARnbk7i6g8Wn6Lb6PwDnazY
-         KJsVEjm/W6PTOeuVKR6H0dMCKla5JDxIKs+Tb3g7Gudjcyo87IFVNfhDkr5Oo5nDrEqM
-         uVvAr+6Zg2MgeMQG8f/mz2YVhIxZOjs2X6pdTjPa448l6SdVQpdj8hNqJReB96OPS8gS
-         adAcpfGyN0TbexaKz0RUuobFUV1KvaaOeX9asdgB/UEPrKb+KPI2gLD1QnC1TpbeqwvX
-         rYT0nPYFaHFECQqlulbdOVEDAsWSL78WUl45oP4LFwFomOtOLWOuB6FNfTDmCoHitnId
-         vqYA==
-X-Forwarded-Encrypted: i=1; AJvYcCX7qkQymgs+ybvWbHDcE2NizxQnajoVRswb5PeveFCyyaaIU/53zREzwa901x5Ium9gQsloS31bef1Jeq0=@vger.kernel.org, AJvYcCXfMpcnLsIa3ABzriOoP8ixG/+0jbSWzey5ZvnLVgd0Fgq5JaLZdmYiJQFC0+8keRwdUXCwXRde@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFWCDJwMdRd+NODQwgSmZF6rqSysdqbdqMb4ks0yQRStGS6gkI
-	4+7w+P0+NfsmX7W6UHsnEJ8x5tGiNZl+hWCZwGoWQ/LW3AQgq/p2YX2rxboLa4FhlOiKbfXLD12
-	+0LAFwDKlDKfu3oNhSxrE47WQajUK5Fs=
-X-Gm-Gg: ASbGncuY2+QcIsQzy8nPKRh8ElAr03ekGwXdJPEuuOKImwjQCK7N22GjafhA2mxrURa
-	sYkBqB9RxU//ZkUWs4bddqxEDtUr8bainIIRIOlnCX7++/1AgHnHr62NpJj3GmVw6r8rWxkT/Ik
-	AiKn9i7mqwkA6LFsoICUPNKqy6j00NM7SD9lY=
-X-Google-Smtp-Source: AGHT+IHop0vmNJRZlUx6caCyeoeYe6BDnYX4Gm7Du+V6bm/RRJ8NWj0JlPUUEXPwgVB01rPgXJlziSg6bf/mQEtweI4=
-X-Received: by 2002:a17:90b:2f03:b0:302:fc48:4f0a with SMTP id
- 98e67ed59e1d1-30e7d6d17e6mr25420919a91.0.1747750683051; Tue, 20 May 2025
- 07:18:03 -0700 (PDT)
+	s=arc-20240116; t=1747751149; c=relaxed/simple;
+	bh=lS9OWDi//f3vB7k3nDFQZ+474U5QwuKXEWwgoExcFA0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=nbt55SCQAMFDUIl6v/4uF57rppIOC15Nwi+ef2n5LYTU5jjnx5UQWByP7bq1M0sg/J2xGCHBH4EooAQfgs72pv8ACy6jUpMiTxgij80W5eyxahm/jHwlfWaFe20eFA3BHa97JkSY/rem2+jBySj0c5dRdR92LKh4YaRDJ8D0sZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jNZ+pBif; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A47E4C4CEE9;
+	Tue, 20 May 2025 14:25:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747751148;
+	bh=lS9OWDi//f3vB7k3nDFQZ+474U5QwuKXEWwgoExcFA0=;
+	h=From:Date:Subject:To:Cc:From;
+	b=jNZ+pBifyT6QoV9RtWzM1qFe74jhN43YAvbTldmOnMyGK9iwHVvNo1EDzgSoaaGRl
+	 coijngQGgY2Uu7lW1jPdm6Z8jLuC0W+Zphh8o/A0pkYy2rcHI6ioIOupwBB4c3Fdd8
+	 c2uef9ojE3aUqo9GD2umS9oh+whSCGF+OSwJd+uVMv3pHhTeYWiVmrkvAU3H9ZtmmZ
+	 3v90GOoDtDN9Ah1k3GcJhHMhQdmT5op/9ii4o44x3G7L8ZjPlxaWrEcSqgKvVUCur6
+	 xMJGrcbyVB6M9RhwRIr08f03+/QdQXlZC9HOIB/etrLBkKS8zdSN5NpYqglEHduFEm
+	 LsGuLPocVbirw==
+From: Simon Horman <horms@kernel.org>
+Date: Tue, 20 May 2025 15:25:41 +0100
+Subject: [PATCH net-next] net: dlink: Correct endian treatment of t_SROM
+ data
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250519153735.66940-1-aha310510@gmail.com> <aCyAcbNqKRlPnadx@hoboy.vegasvil.org>
-In-Reply-To: <aCyAcbNqKRlPnadx@hoboy.vegasvil.org>
-From: Jeongjun Park <aha310510@gmail.com>
-Date: Tue, 20 May 2025 23:17:54 +0900
-X-Gm-Features: AX0GCFtcL76npAhxQUeiUE6yEiaTCAtDhflj2Ax0XR2OXCJwmO4Pk_G2kOAmp3A
-Message-ID: <CAO9qdTHe1bR=c6dn4WEDsVZS8pRtf9FsMMQXNFVV_DT0wm_FVw@mail.gmail.com>
-Subject: Re: [PATCH] ptp: remove ptp->n_vclocks check logic in ptp_vclock_in_use()
-To: Richard Cochran <richardcochran@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, yangbo.lu@nxp.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250520-dlink-endian-v1-1-63e420c7b935@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAOSQLGgC/x3MQQqDMBBG4avIrB2IsRHxKsWFmn/aQZmWREQQ7
+ 97Q5bd476KMpMg0VBclHJr1YwVNXdHynuwF1lhM3vnggnccN7WVYVEn49DOAvEP6XqhknwTRM/
+ /7kmGnQ3nTuN9/wBnW3nlaAAAAA==
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org
+X-Mailer: b4 0.14.0
 
-Richard Cochran <richardcochran@gmail.com> wrote:
->
-> On Tue, May 20, 2025 at 12:37:35AM +0900, Jeongjun Park wrote:
->
-> > diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-> > index 35a5994bf64f..0ae9f074fc52 100644
-> > --- a/drivers/ptp/ptp_clock.c
-> > +++ b/drivers/ptp/ptp_clock.c
-> > @@ -412,9 +412,8 @@ static int unregister_vclock(struct device *dev, vo=
-id *data)
-> >
-> >  int ptp_clock_unregister(struct ptp_clock *ptp)
-> >  {
-> > -     if (ptp_vclock_in_use(ptp)) {
-> > +     if (ptp_vclock_in_use(ptp))
-> >               device_for_each_child(&ptp->dev, NULL, unregister_vclock)=
-;
-> > -     }
-> >
-> >       ptp->defunct =3D 1;
-> >       wake_up_interruptible(&ptp->tsev_wq);
->
-> This hunk is not related to the subject of the patch.  Please remove it.
->
-> Thanks,
-> Richard
->
+As it's name suggests, parse_eeprom() parses EEPROM data.
 
-While working on the patch, I noticed an unnecessary pair of braces in
-ptp_clock_unregister() and included their removal in the patch. Since
-you=E2=80=99ve pointed out that this isn=E2=80=99t the right approach, I=E2=
-=80=99ll fix it
-immediately and send over the v2 patch.
+This is done by reading data, 16 bits at a time as follows:
 
-Regards,
+  for (i = 0; i < 128; i++)
+    ((__le16 *) sromdata)[i] = cpu_to_le16(read_eeprom(np, i));
 
-Jeongjun Park
+sromdata is at the same memory location as psrom.
+And the type of psrom is a pointer to struct t_SROM.
+
+As can be seen in the loop above, data is stored in sromdata, and thus
+psrom, as 16-bit little-endian values. However, the integer fields of
+t_SROM are host byte order.
+
+In the case of the led_mode field this results in a but which has been
+addressed by commit e7e5ae71831c ("net: dlink: Correct endianness
+handling of led_mode").
+
+In the case of the remaining fields, which are updated by this patch,
+I do not believe this does not result in any bugs. But it does seem
+best to correctly annotate the endianness of integers.
+
+Flagged by Sparse as:
+
+  .../dl2k.c:344:35: warning: restricted __le32 degrades to integer
+
+Compile tested only.
+No run-time change intended.
+
+Signed-off-by: Simon Horman <horms@kernel.org>
+---
+ drivers/net/ethernet/dlink/dl2k.h | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/ethernet/dlink/dl2k.h b/drivers/net/ethernet/dlink/dl2k.h
+index 56aff2f0bdbf..ba679025e866 100644
+--- a/drivers/net/ethernet/dlink/dl2k.h
++++ b/drivers/net/ethernet/dlink/dl2k.h
+@@ -329,18 +329,18 @@ enum _pcs_anlpar {
+ };
+ 
+ typedef struct t_SROM {
+-	u16 config_param;	/* 0x00 */
+-	u16 asic_ctrl;		/* 0x02 */
+-	u16 sub_vendor_id;	/* 0x04 */
+-	u16 sub_system_id;	/* 0x06 */
+-	u16 pci_base_1;		/* 0x08 (IP1000A only) */
+-	u16 pci_base_2;		/* 0x0a (IP1000A only) */
++	__le16 config_param;	/* 0x00 */
++	__le16 asic_ctrl;	/* 0x02 */
++	__le16 sub_vendor_id;	/* 0x04 */
++	__le16 sub_system_id;	/* 0x06 */
++	__le16 pci_base_1;	/* 0x08 (IP1000A only) */
++	__le16 pci_base_2;	/* 0x0a (IP1000A only) */
+ 	__le16 led_mode;	/* 0x0c (IP1000A only) */
+-	u16 reserved1[9];	/* 0x0e-0x1f */
++	__le16 reserved1[9];	/* 0x0e-0x1f */
+ 	u8 mac_addr[6];		/* 0x20-0x25 */
+ 	u8 reserved2[10];	/* 0x26-0x2f */
+ 	u8 sib[204];		/* 0x30-0xfb */
+-	u32 crc;		/* 0xfc-0xff */
++	__le32 crc;		/* 0xfc-0xff */
+ } SROM_t, *PSROM_t;
+ 
+ /* Ioctl custom data */
+
 
