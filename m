@@ -1,124 +1,111 @@
-Return-Path: <netdev+bounces-192083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CD16ABE817
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 01:34:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DD35ABE81D
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 01:37:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 317E07A7228
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 23:33:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3053C4A6D48
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 23:37:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBD28254870;
-	Tue, 20 May 2025 23:34:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA2F4256C6A;
+	Tue, 20 May 2025 23:37:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y5yQRu5L"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Omv9fjTb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0C07218EA2;
-	Tue, 20 May 2025 23:34:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 224001E570B
+	for <netdev@vger.kernel.org>; Tue, 20 May 2025 23:37:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747784088; cv=none; b=FLY1na3URfmI9DgwMRXLJk8A/k3myW9JniFYxFinZUyX19WTroicN1aEFFtYLjMqUteONkrk/80hhodh+pM6//a5h8kLkptnCtPwtLFvNeVwAuoS6+98eXaDu6KpiGDlKDL5BCP4cxMXKv8JaBUbgPOmLw6zH03J09/qmAeRGnk=
+	t=1747784257; cv=none; b=JrZCR7/pYSJmm27CLZqPM+bson6E8tmu1PGVfdbiF2pXRAuaShHC/bcqWcd8SRBC2z5M3Zsrt996+BKbqU9uc6PDzz+jADTHJjwMJNQQJ+bURjXF23KQoB2vuVwfjgMbY14pZV1dP/viQhQxBLitASZJHN4gthmYfX0oA28wojw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747784088; c=relaxed/simple;
-	bh=nk5kiEmG5q6Z6ly3rI2SSY3NQLP58Venst00SAF/F60=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pQSQWaEXNJtCwCmnjx7/+ErlYXG4iIHELhG788Jr4BwetBC7T6/ctVePbyyGYmBPcnwWHpeTjdd/WtMBOkCcdWwcfvuPZzf5i7viPcCMsznO0ReS0gETCI/IhQcvnB73z2URerOE67V218EtmZ7jh0Qy/9pU4WxQrIL2bvC+UUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y5yQRu5L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED200C4CEE9;
-	Tue, 20 May 2025 23:34:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747784088;
-	bh=nk5kiEmG5q6Z6ly3rI2SSY3NQLP58Venst00SAF/F60=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Y5yQRu5LByw0qmZ43NOxThhQtuMUYw/+ZdxT7XSL2GD0uPrryMrYvF7hrXlwb+LxR
-	 ZAfYA8jueqxHLuIGfSEGpdB03PxUdHOD91p18u+8CGqSnWfc9/soxQeMhxcRYBBBP+
-	 o41IY6fqHnI7Oi9ai33uTiKQyuy/T7f/w8Q49UeG//f1O73giDmS8Ze/DVf8TBo2Aa
-	 6TPSC1h85fHcC96Hk2lzl8/29drA/WjeXSfevV9r9NApvmOgTavSSP+ow+/oLOE4my
-	 oiGZgeNaci6l6nx2iuJRl+1kBOLp9aHH5LMm4NLiMyC8W4Rd7mV5+Jzq+T7yfudl0m
-	 ihhDCVTGozBlw==
-Date: Tue, 20 May 2025 19:34:46 -0400
-From: Mike Snitzer <snitzer@kernel.org>
-To: cel@kernel.org
-Cc: Thomas Haynes <loghyr@hammerspace.com>, linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org, kernel-tls-handshake@lists.linux.dev,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Steve Sears <sjs@hammerspace.com>, Jakub Kacinski <kuba@kernel.org>
-Subject: Re: [PATCH v1] SUNRPC: Prevent hang on NFS mount with xprtsec=[m]tls
-Message-ID: <aC0RlqfuilOj51kT@kernel.org>
-References: <20250520195916.676511-1-cel@kernel.org>
+	s=arc-20240116; t=1747784257; c=relaxed/simple;
+	bh=PGZYBlj/OCgCz8/PGNGSAJeArIWm5gf75vjKd0N4XO8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YSMz7Ni7iVJSKt5yA+yBnlScMNWmYSqSBwuXIC/g4jrVyb3299idbT0DmuGlimKiqx3LiHfCkEcyNoAjlL+fyJYIm1JZdB62sIfFhlai5gTl85V7pl47Km8/qNvQYU5r+S0HY8cEvEq4LTh0BpIx7ZgZWZyASAV1F7nXEnG7IjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Omv9fjTb; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-22d95f0dda4so65230145ad.2
+        for <netdev@vger.kernel.org>; Tue, 20 May 2025 16:37:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747784254; x=1748389054; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PGZYBlj/OCgCz8/PGNGSAJeArIWm5gf75vjKd0N4XO8=;
+        b=Omv9fjTb4kLhF0rguVuvwrwiPNF9FpxdwMRZROXeM+/JaqUi0MJLhIUiu3HGLV0QnN
+         OmfwjbUrNGZ/mANY41yH8HTdKsrygR2VhAhst4IhUqMHlB6NnZ8Ma2MUMQMIYGD4yKYe
+         gfnR+OaeLTi96rXGsKnRqIscFbc66es0+Di7xHduGUk1zvjGnYsixjpBQvOLUvLBmM6N
+         jMhG4PPvp7xjO0s7UY120x0rG76XF6Z21WxeMTzSLjdVVEjRM1VdWaWwX4EN7UNZQtTg
+         aFBIdSDScoLHcKnZEsZHTA8P+ziuBHwsf/bGBvtoHjBpkEa1dPML3pqx8n+IFbdwHP8L
+         tO2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747784254; x=1748389054;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PGZYBlj/OCgCz8/PGNGSAJeArIWm5gf75vjKd0N4XO8=;
+        b=H+XU5FUXGCmULOLBTUOr7Q4aNFzNDVXpWmZwDHfR3c8XnEKsWGlpcgzU/ZL7+wSiG4
+         qpTq+DFvlmbSGGSsj4Uh5w+5c2dtihtEknwWe9Qy2Pqf9cDnRdmXIMZYUUGzoey1YK+6
+         sxCZ/d7eobr5cdNwQ2cfdAy+tL7Otaq8Wm48PqWmZGsHyW33a6q3LY+kXsaOPArb2pNk
+         X7yN17hddy/1xFaxYeXyLX7DmgkLUpmlkiy+QA9RgF8wCGKqJDDCSiYaATrtUyghJOcY
+         g9zYU/UD3P5BKHSbBbNgE6J2opKF9YOcuF/dYoRg/eyAK9k/yBozFPH7RVhHiikmUAQW
+         8jOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWJtWdWrDflHCr78aPc8ODAG3b9T0srdhZl9zy86E0BImyZDUplWm4mVcoSrMmcuzncp14wMOA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNBsZPbzEGzqcsfsV/TkPY9yIts6Rrsy+oZ6+81vwq7PZ271Un
+	RVIg85R4Lhq7RCYl+G90OQb05HzNxEs78g6EOHiBcxZ8BgSLe7Y4jysXMyNHrpZaj/X5HisBnHM
+	YyVbIcKNaf17wm1mJkQ0fx+CbXxor6Wk=
+X-Gm-Gg: ASbGncsIbCuDNyZlx8iLSAfDnzQs/WHOcAVXLiqIVEUW/9VK9Vu+s/RuKJyVEQ8rrFZ
+	eyjvZTtg35LuYM/yb5tiwD/HaNdQrkjYkEZ2olfemRgq3VxFBCwrLKVAn17rdoL0AOBXRF+7AhK
+	lizP6qG4i2Kmreh8Ha82VnKcnZ2ulOv96LpYl2EbKI/rIN5eeittRiCpLMtxTScsl6uGQ=
+X-Google-Smtp-Source: AGHT+IEp4cUBW/sIbXbeqATMyNwkGqxRE7jOps6AQj/YAiR1kKEmoq/k+XU1YhzO8x8leIr1xMVwqfXwHSOBVSGPdgE=
+X-Received: by 2002:a17:902:db05:b0:231:c792:205 with SMTP id
+ d9443c01a7336-231d43dcad8mr275480585ad.4.1747784254267; Tue, 20 May 2025
+ 16:37:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250520195916.676511-1-cel@kernel.org>
+References: <20250520050205.2778391-1-krikku@gmail.com> <4068bd0c-d613-483f-8975-9cde1c6074d6@intel.com>
+ <CACLgkEb+5OU+op+FvrrqiA1mgsp7NbA=KB_dCa532R6AL2c3Kw@mail.gmail.com> <7d901760-460b-491e-986a-4c5a4ac1fe17@molgen.mpg.de>
+In-Reply-To: <7d901760-460b-491e-986a-4c5a4ac1fe17@molgen.mpg.de>
+From: Krishna Kumar <krikku@gmail.com>
+Date: Wed, 21 May 2025 05:06:56 +0530
+X-Gm-Features: AX0GCFvqeNt1kCX2i3ZfOSHmodrvEnJ9kSi4e3UlJp3TkFC-sqabBsv2opWnKmI
+Message-ID: <CACLgkEZo4HPfdCSPbKXku3sZkPDzgibDi4XhbuQfUYqcEWa_Hw@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH] net: ice: Perform accurate aRFS flow match
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: Ahmed Zaki <ahmed.zaki@intel.com>, netdev@vger.kernel.org, davem@davemloft.net, 
+	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com, edumazet@google.com, 
+	intel-wired-lan@lists.osuosl.org, andrew+netdev@lunn.ch, kuba@kernel.org, 
+	pabeni@redhat.com, sridhar.samudrala@intel.com, krishna.ku@flipkart.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 20, 2025 at 03:59:16PM -0400, cel@kernel.org wrote:
-> From: Chuck Lever <chuck.lever@oracle.com>
-> 
-> Engineers at Hammerspace noticed that sometimes mounting with
-> "xprtsec=tls" hangs for a minute or so, and then times out, even
-> when the NFS server is reachable and responsive.
-> 
-> kTLS shuts off data_ready callbacks if strp->msg_ready is set to
-> mitigate data_ready callbacks when a full TLS record is not yet
-> ready to be read from the socket.
-> 
-> Normally msg_ready is clear when the first TLS record arrives on
-> a socket. However, I observed that sometimes tls_setsockopt() sets
-> strp->msg_ready, and that prevents forward progress because
-> tls_data_ready() becomes a no-op.
-> 
-> Moreover, Jakub says: "If there's a full record queued at the time
-> when [tlshd] passes the socket back to the kernel, it's up to the
-> reader to read the already queued data out." So SunRPC cannot
-> expect a data_ready call when ingress data is already waiting.
-> 
-> Add an explicit poll after SunRPC's upper transport is set up to
-> pick up any data that arrived after the TLS handshake but before
-> transport set-up is complete.
-> 
-> Reported-by: Steve Sears <sjs@hammerspace.com>
-> Suggested-by: Jakub Kacinski <kuba@kernel.org>
-> Fixes: 75eb6af7acdf ("SUNRPC: Add a TCP-with-TLS RPC transport class")
-> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
-> ---
->  net/sunrpc/xprtsock.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> Mike, can you try this out?
+On Wed, May 21, 2025 at 12:41=E2=80=AFAM Paul Menzel <pmenzel@molgen.mpg.de=
+> wrote:
 
-Works well, thanks to you and Jakub for seeing this through!
+> >> Also, please add instructions on how to get these values, so that
+> >> validation team may be able to replicate.
+> >
+> > I have a large set of scripts that measure each of these parameters.
+> > If you wish, I can send you the set of scripts separately.
+> It=E2=80=99d be great if you could share the scripts with instructions. M=
+aybe
+> you could even publish them in a git archive.
 
-Tested-by: Mike Snitzer <snitzer@kernel.org>
-Reviewed-by: Mike Snitzer <snitzer@kernel.org>
+Sure, I am happy to share them! I need a little time to clean them
+up, replace hardcoded values, make them more robust, etc. I will
+publish them soon and share the link here.
 
-> 
-> diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
-> index 83cc095846d3..4b10ecf4c265 100644
-> --- a/net/sunrpc/xprtsock.c
-> +++ b/net/sunrpc/xprtsock.c
-> @@ -2740,6 +2740,11 @@ static void xs_tcp_tls_setup_socket(struct work_struct *work)
->  	}
->  	rpc_shutdown_client(lower_clnt);
->  
-> +	/* Check for ingress data that arrived before the socket's
-> +	 * ->data_ready callback was set up.
-> +	 */
-> +	xs_poll_check_readable(upper_transport);
-> +
->  out_unlock:
->  	current_restore_flags(pflags, PF_MEMALLOC);
->  	upper_transport->clnt = NULL;
-> -- 
-> 2.49.0
-> 
+Regards,
+- Krishna
 
