@@ -1,96 +1,113 @@
-Return-Path: <netdev+bounces-191716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36375ABCDB0
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 05:13:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B631ABCDCA
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 05:20:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF65B8A08D2
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 03:13:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3A9697A7D31
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 03:19:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32F53257429;
-	Tue, 20 May 2025 03:13:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C52258CF1;
+	Tue, 20 May 2025 03:20:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uHcFmAlk"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="VOg79n2N"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F22841C3306;
-	Tue, 20 May 2025 03:13:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D7BE257451;
+	Tue, 20 May 2025 03:20:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747710822; cv=none; b=HRPu9Y92m925FwIrNYZ9IJ7MUS0vu8MROu+Khy7abmo30pWt4MOsnHrdzHw82Y+S3aSus7rfL8fssyqg/GTE1UnNO3IemFSkXa899RBIWpaMXMEbCRFyfPe30s0xgT4R0RDg7XC8vnf3hnmjclvA1SieQ8Rl5cYgXhDgJlZpatM=
+	t=1747711214; cv=none; b=YH7g6Z506Uf+U7XnJMq0YtD2iVoXiyDgRi18mPvh+B+Gz3Bf9hZZgA/8FnCZX3WgVgpXAtjwJZu6iOwBY1XEU9SWukZsoKaK4TiV523eRUd8JLFNvuzjQFklRTP/69zpMiLEHlPMLbS6n1vk8wqYtH5YWnlUCCQvHExs+klK/s4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747710822; c=relaxed/simple;
-	bh=8Cobphk6r51dMXzBM8pd1XqlT8rwpbR5fZWejWw6pLM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WWKx0DIgqWdrWd9+NfaJfriyYdgcc0s1MQCkx1a8ifL/9bLvNT+e5GmQFgwiWssYz61c54VwqV/d3XoY1DPAdqSPTsB9xgwJTpDY4qNKzhM0EwZddKaqRKBOcD7S6pWN5y8G3PgycGsnCVD6rtDvvOf2+USASbjXFKCBkRqR24Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uHcFmAlk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0AD1C4CEE4;
-	Tue, 20 May 2025 03:13:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747710821;
-	bh=8Cobphk6r51dMXzBM8pd1XqlT8rwpbR5fZWejWw6pLM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uHcFmAlkKZJaM1T9E73QGGBke82b49ji5/nRcOy+4+K8neCJCI+KySzTysDS3T455
-	 P7TLHf0kSvoHdw55RgJjGVoDAdql7BjGLnmO9um9ahTvmGtCuyahFXPmdaU+ZUG8sN
-	 EHgH9silMhnY84C0GZA86n2k0oE5rSxIms5WSkGKm9SvwgVAkXwOWreluj/azxmDHy
-	 nVa4bC+YG/KSxZLkdEEDmyV/sxH9CLnDO2lvKvgIjmbNXbJxjjUT9W2tR0MgcCdKsk
-	 U+DZgXNKVvKempkMPX0kG28ckWFDNbRvt6I1S5WJic8gnNUAv1AkFyuYHKLpOWXlLf
-	 K2Yv9wv1O0z4g==
-Date: Mon, 19 May 2025 20:13:40 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Gur Stavi <gur.stavi@huawei.com>
-Cc: Fan Gong <gongfan1@huawei.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- <linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Bjorn
- Helgaas <helgaas@kernel.org>, luosifu <luosifu@huawei.com>, Xin Guo
- <guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>, Zhou
- Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
- <shijing34@huawei.com>, Meny Yossefi <meny.yossefi@huawei.com>, Lee Trager
- <lee@trager.us>, Michael Ellerman <mpe@ellerman.id.au>, Suman Ghosh
- <sumang@marvell.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, Joe
- Damato <jdamato@fastly.com>, Christophe JAILLET
- <christophe.jaillet@wanadoo.fr>
-Subject: Re: [PATCH net-next v16 1/1] hinic3: module initialization and
- tx/rx logic
-Message-ID: <20250519201340.4eda0aae@kernel.org>
-In-Reply-To: <507a27deb49315dd98192b13414dade82fe12622.1747640393.git.gur.stavi@huawei.com>
-References: <cover.1747640393.git.gur.stavi@huawei.com>
-	<507a27deb49315dd98192b13414dade82fe12622.1747640393.git.gur.stavi@huawei.com>
+	s=arc-20240116; t=1747711214; c=relaxed/simple;
+	bh=VKH7KRryI4ktofS9C7UuxsXcayJGKdrDWZTcnz1iCV8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=fTHXDvtaz2kmz+pJdOpf3zvxjhukFkPFNxOv+V0MlQVgqS5YSVhvq//VSpKzb9ZEBTijDFqR4IZFTWRTGFdZoZJWg/kgT6/NsKhQiuY3sgwIS2HNhBVpD45OgETccWKLo8dQMqrM8Ozeg6y64Xf/L4gWkCM+fpkbqPaXptVKtCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=VOg79n2N; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 54K3JglR61991624, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1747711182; bh=VKH7KRryI4ktofS9C7UuxsXcayJGKdrDWZTcnz1iCV8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=VOg79n2NWp3+9ktcKp9gtbrYjJUIk53irYbowRSnVHj9Ux8pIM2POAFnWSdpPZ8He
+	 QwbfGXyJoVDyWu2aMSLTfTyCLTeaCpChYYUQjfr2c8+VRAC1B3WoL9TEbbDWzT15Pr
+	 AIWgLgP0UnfM2ymQUE2ymcgcj6V1vup9/PfnhCUVd6VwdoNkZKkxb0TrT6kB3beEm/
+	 RKFX2pIcOqk96VElM0nQ06TPkV2UlmQd/kzhCUGWlY+krnYzQX5IQkBu6+xs8yS1Lc
+	 asJXJOxgPng6U42lBO2qp6HzQ9zOuebgyRcAS+SAm4kyur6U/3Hu8r2M1IZPnmC9aX
+	 FmDhcEXtd+Slg==
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/3.13/5.93) with ESMTPS id 54K3JglR61991624
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 20 May 2025 11:19:42 +0800
+Received: from RTEXMBS01.realtek.com.tw (172.21.6.94) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 20 May 2025 11:19:42 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS01.realtek.com.tw (172.21.6.94) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 20 May 2025 11:19:42 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622]) by
+ RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622%5]) with mapi id
+ 15.01.2507.035; Tue, 20 May 2025 11:19:41 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "horms@kernel.org"
+	<horms@kernel.org>,
+        Ping-Ke Shih <pkshih@realtek.com>,
+        Larry Chiu
+	<larry.chiu@realtek.com>, Joe Damato <jdamato@fastly.com>
+Subject: RE: [PATCH net-next v2] rtase: Use min() instead of min_t()
+Thread-Topic: [PATCH net-next v2] rtase: Use min() instead of min_t()
+Thread-Index: AQHbtawdSIC/HJstr0OxTEOUNg41/rPaAlkAgAAn8wCAAAG8AIAA1A0g
+Date: Tue, 20 May 2025 03:19:41 +0000
+Message-ID: <73c27a5a4c814a5a9cdf6319314f8480@realtek.com>
+References: <20250425063429.29742-1-justinlai0215@realtek.com>
+	<bb78d791abe34d9cbac30e75e7bec373@realtek.com>
+	<20250519153218.0036db7f@kernel.org> <20250519153830.112e1e0a@kernel.org>
+In-Reply-To: <20250519153830.112e1e0a@kernel.org>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+x-kse-serverinfo: RTEXMBS01.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-On Mon, 19 May 2025 12:19:28 +0300 Gur Stavi wrote:
-> +	if (unlikely(hinic3_wq_free_wqebbs(&txq->sq->wq) < wqebb_cnt)) {
-> +		if (likely(wqebb_cnt > txq->tx_stop_thrs))
-> +			txq->tx_stop_thrs = min(wqebb_cnt, txq->tx_start_thrs);
-> +
-> +		netif_subqueue_try_stop(netdev, tx_q->sq->q_id,
-> +					hinic3_wq_free_wqebbs(&tx_q->sq->wq),
-> +					tx_q->tx_start_thrs);
-> +
-> +		return -NETDEV_TX_BUSY;
+> On Mon, 19 May 2025 15:32:18 -0700 Jakub Kicinski wrote:
+> > On Mon, 19 May 2025 12:16:11 +0000 Justin Lai wrote:
+> > > I apologize for the interruption, I would like to ask why this patch
+> > > is rejected on patchwork.
+> >
+> > Hm, unclear, sorry about that.
+>=20
+> It doesn't apply, perhaps that's why? Please rebase and repost.
 
-Why flip the value to negative here?
-Should be just:
+Hi Jakub,
 
-		return NETDEV_TX_BUSY;
+Thank you for your reply. I will rebase and repost.
 
-right?
-
-The rest looks good.
--- 
-pw-bot: cr
+Thanks,
+Justin
 
