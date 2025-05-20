@@ -1,87 +1,87 @@
-Return-Path: <netdev+bounces-191840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86A86ABD7AC
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 14:03:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 352DEABD7BD
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 14:05:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D3BE188CCE0
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 12:02:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7B238C1C67
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 12:02:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94BAE281374;
-	Tue, 20 May 2025 12:01:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD927283686;
+	Tue, 20 May 2025 12:01:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mW/DfGCz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lqR9ooMb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB231280CFA;
-	Tue, 20 May 2025 12:01:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2837527FD50;
+	Tue, 20 May 2025 12:01:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747742477; cv=none; b=qfEUBhYvNgfz6bXit7Vdtl+05ldv9VgWxDLOsVdnN8ACOa4wdlQwHro5uqcaUNVUQnqN3eQEsWpo7WbL3/N1EIQYnncryF29I318D/mRexo9R3K3+Qo7ybb2PbzdUIFENQ7F/Ro5GGCbeg93fqco6BGmwCu1Xmz0a+HISQG43us=
+	t=1747742489; cv=none; b=DObUW/5bBrlpMBOBLcdU4utDVXEA0I1YsQqoE6B8pYhz6Y4W/wXBXTQEuWOHJVkxR91XqSVuWEkRaujDpmPbrsR6kI1maJlW/vvBWFN6aRa+ea6DeuI5MOI7TvxMajPsWJwW2Mj+bc8gRtA3C9+NA+w5wfevHGcfdddkoT9HDvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747742477; c=relaxed/simple;
-	bh=GfmMIoKWn8PdCJ1d+kB8+iTrLO6rfZtiX8AhENbYXeU=;
+	s=arc-20240116; t=1747742489; c=relaxed/simple;
+	bh=zbzWWlmHAu+WpIR3gMquaD/H3WoHsUsW1tntQoWqVPU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KG578jjPXouOcDOPRKD8dO5FpuYPkiEGajtkVbKttHFarsUfHqKn1VA56SpVfGKpGL3OSLPwk03djMxSc8PjvHC0NyqrHVIC5h1iG62/FpK+Xk2GRW9/U+u52+AVxDggeyNZovqEljZCEIAVzETOBKfBRpA3zI5R27u1Hyjipt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mW/DfGCz; arc=none smtp.client-ip=209.85.221.173
+	 MIME-Version; b=BPOC18ucEoVGXsR0ZQPoVCpc2egfJck3aKHQF6xfLpU4XpZL4Aj0HXLE0Wv+2N/wgbNHkOcElMzUGi9/pMMhjfHCUbtcfOIAjvfgh274gvz1jp7O3NUM3E8x/y+SBkwBtkf5EMSO3Qq9CDqWs3bj+5p+3TDgUlNnGkyqwe8VYWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lqR9ooMb; arc=none smtp.client-ip=209.85.210.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-52617ceae0dso1485411e0c.0;
-        Tue, 20 May 2025 05:01:15 -0700 (PDT)
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-742af848148so2873663b3a.1;
+        Tue, 20 May 2025 05:01:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747742474; x=1748347274; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1747742487; x=1748347287; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tV2Z5eXwtJlDOv5lEytFDYwGtZ3t+Llb5onxXt5Y3SA=;
-        b=mW/DfGCzwQYtP3RqILBaXzWlUK0tOx9TH513hGMSUq3OAyfc34tcFl3LvvPuc1Sedn
-         rYZVngESvQqwsxsJYzmMiFv4WHLMkF9jodqdIpXarIuMeMjMzUjrgM5BAoE1XTOfuUjN
-         VCpyisysvjkin/MjObJPqSo4firQwSdLXJEa1ZoNTSc+cbiGafuxIs5jaZ7Mlom3qWNc
-         yoLeak0TpK/hJ2YQNDHL+TpDsAWibqoLYJND12kpJTEvtu+aoSB8cvmoMcYXake3rtnX
-         dLyl1FE/8X/r6hnpWbizuHLbk9OdwgyiARYDpO90ftZyt0psV6Ql/bteBJt/gxj5nqh7
-         YUig==
+        bh=kn52Rhou6I14SJm/yFwT6Yj7U5o3/kLEmyz4Zw1Sd+w=;
+        b=lqR9ooMb7ESo1tOi+y3lIdNBmKJ45Kr9P1mcuVnoOCLYrKZKpfP7urOglBKyJCS0mP
+         a7ghoHlmnersw8tGUI0dCrAzVZzwrNolETAKwydAtLyHmzp8JK+yZbTkTNFdyRrQS0P2
+         FnW5l+Xr3hdKdXQjT11HZbMha1dzrAq71M2kqLn1edGelWYgWJPPkeS1AfhxqTTzvCXV
+         7CIozbSQjuhaWn/R/26r96qATIgnE1yuvm9+Wi/EPmIP7b0+meyoJ3QE8Ge3pUipCFwT
+         6tvLGRyhjVVcCzb+Ucc0Su2P2NE7p1nE5iiIE48MXOY6tRHBGBQBpfg0xEeX+5B6LRl6
+         XhZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747742474; x=1748347274;
+        d=1e100.net; s=20230601; t=1747742487; x=1748347287;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=tV2Z5eXwtJlDOv5lEytFDYwGtZ3t+Llb5onxXt5Y3SA=;
-        b=O0z+wUtBUYtdLaK8ts5EQLgmM//PGk269t+/4UJ4bXiO7Y7hL6clUAP3YGERJkFegq
-         E5uIy0BC71XlgPf+Qh7SH+S47eDY9WNcAjnAMdbG4DRWwD7VbsknO8Y8CIKOJHLD/V52
-         3lUnh1YqZ268i58wn0nOA8a6RubpE9R6cDpRrv8FDrj1WdoshYfckbxUJtYIJfM/YTEQ
-         MVxtHmnzyS7GSpwDfm+ZvVwMwFDOz+n4aPRAa3kSWMzG02OqElI5+qeoweKp7hvrs9c7
-         ZBf8SqlubOOVrlsMdoNRY7TIWJWPSE2UmNavYdrp+9IppWCZtFlYKJGfp5VHvWatT778
-         3H8w==
-X-Forwarded-Encrypted: i=1; AJvYcCXHje9Ysss8fpE7aN4iBCmy7eR/23ZrAlAaTno/pukSSrjPYKnl5LNUmQDP5ouIux2BZp18c6I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0DKx+v9HoR0QqOC4XtIXmJnPF4aww85L9y2N2+jvNVuH9ckkJ
-	9PpLVW6OIylpsbCA5e+LFY9Oi9XqnOzczi5Sot6mRd93QTF24IENwGcfZ+qDTA==
-X-Gm-Gg: ASbGncuthRCBKm+9x5DVBeVp6K4LjDpfTMllNHxzmgwzS0LD1M7jn6tYildnHBbbY/A
-	y4/eNRwPn7RhBXuA44wLwd+nhhLvuHV8r9r/T0YHyGtcAAjGv/AGUb5w2ZA6hVNgVMQ/6gtYu3c
-	1A9SCcrcoIKbMAzaZuLE4CpQTlscXgMUy0oa4ZBayRAMrxUlW1EqiPHU4XrApKRyBw7SccRpbdI
-	f97Wb61WrnHQ9zo8vfOutdW+tVCYJOJHzxjtyn49+fCWu5iMyyf5oEz94aigV1QDJmpMUNn2nQM
-	PrFh93/0ZIKqxtTPsjx31b1DD1X/8SHgGSWepmgsY+TeV0QCWkRZpv0vF2WvHVSMfN38c20QeAH
-	HKHc6oGV5rEbqkO9TK1c9ueP1fZ3Bn5JG7qdHpF8L9tW0X5csLtLoIg==
-X-Google-Smtp-Source: AGHT+IFCBbu8NuDZR6fmqyeAbjGjC5aY+QHYPnfwRYl02Fb6751YIASm0cwSn1a7zaUTiMhdLaI6jQ==
-X-Received: by 2002:a05:6122:6170:b0:529:d7e:d13f with SMTP id 71dfb90a1353d-52dbce756a5mr12327798e0c.9.1747742474381;
-        Tue, 20 May 2025 05:01:14 -0700 (PDT)
+        bh=kn52Rhou6I14SJm/yFwT6Yj7U5o3/kLEmyz4Zw1Sd+w=;
+        b=FszaE0/09B2Kdmv2SCmkUrl88cEbmNn1t6YJrtYmyUUR4Oa+2AQUCf7p+85/StXNxg
+         w2fxQhW2yLEj2dbgXmvWv0N3SvMSnv1eK9/UPoaXSIk49cjuD7hiPGaZSIm2rPiFwjqv
+         UtMur2CCW0aGm3JGjZONqoeYIaYC/85RJ1v9umSEIhEwJEnkxqaeHQCRXhsxcx22Wet2
+         hna3R4dyGXKNiP66w37R/hErp385rezSbw+nVFufiwpffh5WIE00bd2ECze/rsZg7toS
+         8Iiw5LVFlYJndit6FaUV6qYiv97rAL/sRqLbypotZGY/ZfN3WuW8hXxiiXi1yLUIcEeC
+         kMeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWn+VQB+06qFJNOcMaHjhGxWEmMPWGoTuAsls5mQ/sRCIm5qAbl0NQX+KyfzIvDzJHua7TSrIU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4HcnGOjLH8GNn6+WwkQlu7DMSwBzBHsEuURi609stoTSzO/PP
+	1cD+7a+u2XmGwAGmqE/ab1eu1eaIk4EAH2/RllFpiiNM5PZjGD+0WUe6pngkwg==
+X-Gm-Gg: ASbGnctiyTzXmE61p/MSPhdljIMZxgmBpilYIV/cVIh0armJxaNPTy0Nuh6JotpX26E
+	wdNVt1Il+KzqUdufkBhXyFPuFoft5/imhc8BB2uSlN8IAEI3xBA3/GeGVREDPyRub0VPhpoAUmw
+	X6GLRCCA7o+sk/9LK0q+IE+mDL1GUStPNF0V6OGNI76irBUKplolWqr2q6ybjmjUw5PNZwpy1oG
+	MVAJ1w2VAuhTcI87jVGcqwafY+68O2CW/hDS18Xpr6AZ4WtvQlOTZCYb5vsiu0KFcTNp0cUXBEO
+	87Gl/g1TyCZJ5fimrw3SoxMHggJTXCNoQML01Z5dLM8TSNfCFowCEPDXPTohAz/OhsV8tSSkxlF
+	0WvUJs+sH6LPi9LVfHs7vAf6CaNgM3FC3Pg/Yma07XJiz9RrwO5tPcfWI31EN4h6o
+X-Google-Smtp-Source: AGHT+IEh2Hekn1Qe18806pl08nZu4nAAUNhw9Zyxmgx9/NYiBgdXhtuiW/Lz/WG1T805FxBHbqIA4g==
+X-Received: by 2002:a05:620a:29d6:b0:7c5:42c8:ac82 with SMTP id af79cd13be357-7cd4672de2emr2507863185a.23.1747742475820;
+        Tue, 20 May 2025 05:01:15 -0700 (PDT)
 Received: from fedora.. (ec2-52-70-167-183.compute-1.amazonaws.com. [52.70.167.183])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7cd468b6e52sm728409985a.77.2025.05.20.05.01.13
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7cd468b6e52sm728409985a.77.2025.05.20.05.01.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 May 2025 05:01:13 -0700 (PDT)
+        Tue, 20 May 2025 05:01:14 -0700 (PDT)
 From: Stephen Smalley <stephen.smalley.work@gmail.com>
 To: selinux@vger.kernel.org
 Cc: paul@paul-moore.com,
 	omosnace@redhat.com,
 	netdev@vger.kernel.org,
 	Stephen Smalley <stephen.smalley.work@gmail.com>
-Subject: [PATCH v3 13/42] selinux: allow userspace to detect non-init SELinux namespace
-Date: Tue, 20 May 2025 07:59:11 -0400
-Message-ID: <20250520120000.25501-15-stephen.smalley.work@gmail.com>
+Subject: [PATCH v3 14/42] selinuxfs: restrict write operations to the same selinux namespace
+Date: Tue, 20 May 2025 07:59:12 -0400
+Message-ID: <20250520120000.25501-16-stephen.smalley.work@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250520120000.25501-2-stephen.smalley.work@gmail.com>
 References: <20250520120000.25501-2-stephen.smalley.work@gmail.com>
@@ -93,58 +93,126 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Enable reading of /sys/fs/selinux/unshare as a way to detect
-whether a process is in a non-init SELinux namespace. This is
-to allow the selinux-testsuite to adapt based on whether it is
-run within a child SELinux namespace. Whether or not we want
-to retain this as a userspace API is an open question.
+This ensures that once a process unshares its selinux namespace,
+it can no longer act on the parent namespace's selinuxfs instance,
+irrespective of policy.  This is a safety measure so that even if
+an otherwise unconfined process unshares its selinux namespace, it
+won't be able to subsequently affect the enforcing mode or policy of the
+parent.  This also helps avoid common mistakes like failing to create
+a mount namespace and mount a new selinuxfs instance in order to act
+on one's own selinux namespace after unsharing.
 
 Signed-off-by: Stephen Smalley <stephen.smalley.work@gmail.com>
 ---
- security/selinux/selinuxfs.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+ security/selinux/selinuxfs.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
 diff --git a/security/selinux/selinuxfs.c b/security/selinux/selinuxfs.c
-index c7e74229d2e3..40d2d2cae2a6 100644
+index 40d2d2cae2a6..a0c398c2d3f8 100644
 --- a/security/selinux/selinuxfs.c
 +++ b/security/selinux/selinuxfs.c
-@@ -321,6 +321,19 @@ static const struct file_operations sel_disable_ops = {
- 	.llseek		= generic_file_llseek,
- };
+@@ -150,6 +150,9 @@ static ssize_t sel_write_enforce(struct file *file, const char __user *buf,
+ 	int scan_value;
+ 	bool old_value, new_value;
  
-+static ssize_t sel_read_unshare(struct file *filp, char __user *buf,
-+				size_t count, loff_t *ppos)
-+{
-+	const struct task_security_struct *tsec = selinux_cred(current_cred());
-+	char tmpbuf[1];
++	if (state != current_selinux_state)
++		return -EPERM;
 +
-+	if (tsec->state == init_selinux_state)
-+		tmpbuf[0] = '0';
-+	else
-+		tmpbuf[0] = '1';
-+	return simple_read_from_buffer(buf, count, ppos, tmpbuf, 1);
-+}
-+
- static ssize_t sel_write_unshare(struct file *file, const char __user *buf,
+ 	if (count >= PAGE_SIZE)
+ 		return -ENOMEM;
+ 
+@@ -338,11 +341,16 @@ static ssize_t sel_write_unshare(struct file *file, const char __user *buf,
  				 size_t count, loff_t *ppos)
  
-@@ -373,6 +386,7 @@ static ssize_t sel_write_unshare(struct file *file, const char __user *buf,
- }
+ {
++	struct selinux_fs_info *fsi = file_inode(file)->i_sb->s_fs_info;
++	struct selinux_state *state = fsi->state;
+ 	char *page;
+ 	ssize_t length;
+ 	bool set;
+ 	int rc;
  
- static const struct file_operations sel_unshare_ops = {
-+	.read		= sel_read_unshare,
- 	.write		= sel_write_unshare,
- 	.llseek		= generic_file_llseek,
- };
-@@ -2236,7 +2250,7 @@ static int sel_fill_super(struct super_block *sb, struct fs_context *fc)
- 		[SEL_POLICY] = {"policy", &sel_policy_ops, S_IRUGO},
- 		[SEL_VALIDATE_TRANS] = {"validatetrans", &sel_transition_ops,
- 					S_IWUGO},
--		[SEL_UNSHARE] = {"unshare", &sel_unshare_ops, 0200},
-+		[SEL_UNSHARE] = {"unshare", &sel_unshare_ops, 0600},
- 		[SEL_MAXNS] = {"maxns", &sel_maxns_ops, 0600},
- 		[SEL_MAXNSDEPTH] = {"maxnsdepth", &sel_maxnsdepth_ops, 0600},
- 		/* last one */ {"", NULL, 0}
++	if (state != current_selinux_state)
++		return -EPERM;
++
+ 	if (count >= PAGE_SIZE)
+ 		return -ENOMEM;
+ 
+@@ -795,6 +803,9 @@ static ssize_t sel_write_load(struct file *file, const char __user *buf,
+ 	if (!count)
+ 		return -EINVAL;
+ 
++	if (fsi->state != current_selinux_state)
++		return -EPERM;
++
+ 	mutex_lock(&fsi->state->policy_mutex);
+ 	length = avc_has_perm(current_selinux_state,
+ 			      current_sid(), SECINITSID_SECURITY,
+@@ -899,6 +910,9 @@ static ssize_t sel_write_checkreqprot(struct file *file, const char __user *buf,
+ 	ssize_t length;
+ 	unsigned int new_value;
+ 
++	if (fsi->state != current_selinux_state)
++		return -EPERM;
++
+ 	length = avc_has_perm(current_selinux_state,
+ 			      current_sid(), SECINITSID_SECURITY,
+ 			      SECCLASS_SECURITY, SECURITY__SETCHECKREQPROT,
+@@ -955,6 +969,9 @@ static ssize_t sel_write_validatetrans(struct file *file,
+ 	u16 tclass;
+ 	int rc;
+ 
++	if (state != current_selinux_state)
++		return -EPERM;
++
+ 	rc = avc_has_perm(current_selinux_state,
+ 			  current_sid(), SECINITSID_SECURITY,
+ 			  SECCLASS_SECURITY, SECURITY__VALIDATE_TRANS, NULL);
+@@ -1042,10 +1059,14 @@ static ssize_t (*const write_op[])(struct file *, char *, size_t) = {
+ 
+ static ssize_t selinux_transaction_write(struct file *file, const char __user *buf, size_t size, loff_t *pos)
+ {
++	struct selinux_fs_info *fsi = file_inode(file)->i_sb->s_fs_info;
+ 	ino_t ino = file_inode(file)->i_ino;
+ 	char *data;
+ 	ssize_t rv;
+ 
++	if (fsi->state != current_selinux_state)
++		return -EPERM;
++
+ 	if (ino >= ARRAY_SIZE(write_op) || !write_op[ino])
+ 		return -EINVAL;
+ 
+@@ -1485,6 +1506,9 @@ static ssize_t sel_write_bool(struct file *filep, const char __user *buf,
+ 	unsigned index = file_inode(filep)->i_ino & SEL_INO_MASK;
+ 	const char *name = filep->f_path.dentry->d_name.name;
+ 
++	if (fsi->state != current_selinux_state)
++		return -EPERM;
++
+ 	if (count >= PAGE_SIZE)
+ 		return -ENOMEM;
+ 
+@@ -1541,6 +1565,9 @@ static ssize_t sel_commit_bools_write(struct file *filep,
+ 	ssize_t length;
+ 	int new_value;
+ 
++	if (fsi->state != current_selinux_state)
++		return -EPERM;
++
+ 	if (count >= PAGE_SIZE)
+ 		return -ENOMEM;
+ 
+@@ -1672,6 +1699,9 @@ static ssize_t sel_write_avc_cache_threshold(struct file *file,
+ 	ssize_t ret;
+ 	unsigned int new_value;
+ 
++	if (state != current_selinux_state)
++		return -EPERM;
++
+ 	ret = avc_has_perm(current_selinux_state,
+ 			   current_sid(), SECINITSID_SECURITY,
+ 			   SECCLASS_SECURITY, SECURITY__SETSECPARAM,
 -- 
 2.49.0
 
