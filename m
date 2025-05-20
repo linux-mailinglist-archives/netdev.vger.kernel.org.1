@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-191957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 377BBABE082
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34CB4ABE081
 	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 18:22:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DD4B188F8EF
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:20:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 930601BC3512
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:20:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 895AB27055C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEAFF274678;
 	Tue, 20 May 2025 16:19:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A2Em0Gzp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XktO0e8C"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 653EC2701B6
-	for <netdev@vger.kernel.org>; Tue, 20 May 2025 16:19:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1598272E7B
+	for <netdev@vger.kernel.org>; Tue, 20 May 2025 16:19:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747757966; cv=none; b=txlXlXwlKImoL/uvlDBmK7wTD3wCbjIKvYfZHMGHV/ARVpT1hCV/nxmLuaqtyyjfRrOl7u+Sa8BegJt8J7hbLRkmKxc7r3lOrYrWW5Nf8JEF8PwKRXCczH8yNUzbUkDtbtt8XiTQ9RAMvYXOCizzXAo7nB3mOwTF5m6DZdHDIFI=
+	t=1747757966; cv=none; b=Y9Y1dfEqpT/t9sgZISh6KLwYBSwiICY3yN8Xq1/W035OqOtyNnlAQb8rQSOwEgxNObUCRTS6aPQBcPyIwsGgj+f8i86SqPf4EvvKuxXhEwsVEH1DC7uQr0F/lnKdo9HWsIcWVyY+V05TwDhP8bKaDeD1SPJbC1D13AESbmiKOGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1747757966; c=relaxed/simple;
-	bh=cVsXyFbZFH4xTgFSG0KA8C/CyrNmhjtjGcNkjtFj/oM=;
+	bh=O6xurG4g8LpuVeZAYlnv8NDs3dzmGDpYN4MR3HNrAnA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mjGa0g/vz40tV6bjDgfzA/ouRSTYF62ybXM8gY9PFYtAqbHvNlO6W6PClJtKM/O0QH2E/0SEZuwUAzg2U2OSww3cbLwiaAfxVrjWLMLlNo6uJcJedp08/GGV2KqkONHfHQaTKpKWTaAh/S+SSun2zug13DJOtZtfG+7X00Voy/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A2Em0Gzp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FB76C4CEE9;
-	Tue, 20 May 2025 16:19:25 +0000 (UTC)
+	 MIME-Version; b=o2x7dsFvBCsbEi71qDI/XQ+Ayzd0xM2zQ28J/Nnk1zNijdRq46rP/3CGvwIYVB7AWdDJC5/oArrepquPfkyGFC1cjzwECAQX09mC3QFpU3U+fokdixxmRTDWBJPWo9VQV1gvjblipe1Tu05pO2nlCEBZ26Q3H6iYehnuK6R4p8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XktO0e8C; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DD63C4CEF5;
+	Tue, 20 May 2025 16:19:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747757965;
-	bh=cVsXyFbZFH4xTgFSG0KA8C/CyrNmhjtjGcNkjtFj/oM=;
+	s=k20201202; t=1747757966;
+	bh=O6xurG4g8LpuVeZAYlnv8NDs3dzmGDpYN4MR3HNrAnA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=A2Em0Gzp6ABjss3HedKTnPWP2qLHWmW1kAuxRy1o8BAQ3Dlsb8ao3DP0Oudlx+l50
-	 U/DYU4Tzsmw384iUhUnxmkalpuxfGyVQIhyNb7OVUjlepRYMJYZ5qjbs9tklMJ8NeH
-	 eveuMDYV7nsDOSPiDdH2+eW0yH67Tf4vs6p+xEWLmYLazizPtuBO215oEBegALyC5i
-	 1308zm+O66kvHRodo0EKjBcCfbLAEYa9apfY33ubHMTDroel7kemr3vougdqgyjqsP
-	 LqAJlcsOzP+XPqQrFntwmQqJFFsxrhYjafm76f1HE6cY/e2CfMVqqBPzow+oBth7LW
-	 WPXlmYNSapw6g==
+	b=XktO0e8CZGAA8SuQJstw0Hngqtw/vFpP+fSY2/7ufqZhlnqB45uFkk51NapVd56vN
+	 572s7zziMIyzbIPwLEun6qQ93UdKGIiOwOOmvoSCZd2MOHbSTVdlwCN7fGsAPEwyxM
+	 9xhGZAyFpZacefmiqKRWzvGW8aaZiucgtbYbN/BghSPaUQjzWXXVGNQmDR1k/RmOCV
+	 KV8JRkWXtTxiXQJRuQEHrh5AEr783t+OaWDdq+IDueaFQbq5Ai6tiErfndELYBHcrP
+	 7kMVqWfGtuhyRcJFodrkJ/DecaH+niqw66s7vO3QzK7DUml0/jcOrtxU9z5kyro+DP
+	 5WdcxvpaJvFPQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -54,9 +54,9 @@ Cc: netdev@vger.kernel.org,
 	jstancek@redhat.com,
 	kory.maincent@bootlin.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 04/12] netlink: specs: tc: add C naming info
-Date: Tue, 20 May 2025 09:19:08 -0700
-Message-ID: <20250520161916.413298-5-kuba@kernel.org>
+Subject: [PATCH net-next v2 05/12] netlink: specs: tc: drop the family name prefix from attrs
+Date: Tue, 20 May 2025 09:19:09 -0700
+Message-ID: <20250520161916.413298-6-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250520161916.413298-1-kuba@kernel.org>
 References: <20250520161916.413298-1-kuba@kernel.org>
@@ -68,622 +68,1230 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add naming info needed by C code gen.
+All attribute sets and messages are prefixed with tc-.
+The C codegen also adds the family name to all structs.
+We end up with names like struct tc_tc_act_attrs.
+Remove the tc- prefixes to shorten the names.
+This should not impact Python as the attr set names
+are never exposed to user, they are only used to refer
+to things internally, in the encoder / decoder.
 
 Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- Documentation/netlink/specs/tc.yaml | 95 +++++++++++++++++++++++++++++
- 1 file changed, 95 insertions(+)
+ Documentation/netlink/specs/tc.yaml | 334 ++++++++++++++--------------
+ 1 file changed, 167 insertions(+), 167 deletions(-)
 
 diff --git a/Documentation/netlink/specs/tc.yaml b/Documentation/netlink/specs/tc.yaml
-index 697fdd1219d5..8d5e5cb439e4 100644
+index 8d5e5cb439e4..6e8db7adde3c 100644
 --- a/Documentation/netlink/specs/tc.yaml
 +++ b/Documentation/netlink/specs/tc.yaml
-@@ -2,6 +2,7 @@
- 
- name: tc
- protocol: netlink-raw
-+uapi-header: linux/pkt_cls.h
- protonum: 0
- 
- doc:
-@@ -12,6 +13,7 @@ protonum: 0
-   -
-     name: tcmsg
-     type: struct
-+    header: linux/rtnetlink.h
-     members:
-       -
-         name: family
-@@ -34,6 +36,7 @@ protonum: 0
+@@ -35,7 +35,7 @@ protonum: 0
+         name: info
          type: u32
    -
-     name: tc-cls-flags
-+    enum-name:
+-    name: tc-cls-flags
++    name: cls-flags
+     enum-name:
      type: flags
      entries:
-       - skip-hw
-@@ -43,6 +46,8 @@ protonum: 0
+@@ -45,7 +45,7 @@ protonum: 0
+       - not-in-nw
        - verbose
    -
-     name: tc-flower-key-ctrl-flags
-+    name-prefix: tca-flower-key-flags-
-+    enum-name:
+-    name: tc-flower-key-ctrl-flags
++    name: flower-key-ctrl-flags
+     name-prefix: tca-flower-key-flags-
+     enum-name:
      type: flags
-     entries:
-       - frag
-@@ -630,6 +635,7 @@ protonum: 0
-   -
-     name: tc-ratespec
-     type: struct
-+    header: linux/pkt_sched.h
-     members:
-       -
-         name: cell-log
-@@ -1378,6 +1384,7 @@ protonum: 0
+@@ -1383,7 +1383,7 @@ protonum: 0
+         type: s32
  attribute-sets:
    -
-     name: tc-attrs
-+    name-prefix: tca-
+-    name: tc-attrs
++    name: attrs
+     name-prefix: tca-
      attributes:
        -
-         name: kind
-@@ -1437,6 +1444,7 @@ protonum: 0
+@@ -1392,7 +1392,7 @@ protonum: 0
+       -
+         name: options
+         type: sub-message
+-        sub-message: tc-options-msg
++        sub-message: options-msg
+         selector: kind
+       -
+         name: stats
+@@ -1443,7 +1443,7 @@ protonum: 0
+         name: ext-warn-msg
          type: string
    -
-     name: tc-act-attrs
-+    name-prefix: tca-act-
+-    name: tc-act-attrs
++    name: act-attrs
+     name-prefix: tca-act-
      attributes:
        -
-         name: kind
-@@ -1473,6 +1481,8 @@ protonum: 0
+@@ -1452,7 +1452,7 @@ protonum: 0
+       -
+         name: options
+         type: sub-message
+-        sub-message: tc-act-options-msg
++        sub-message: act-options-msg
+         selector: kind
+       -
+         name: index
+@@ -1480,7 +1480,7 @@ protonum: 0
+         name: in-hw-count
          type: u32
    -
-     name: tc-act-bpf-attrs
-+    name-prefix: tca-act-bpf-
-+    header: linux/tc_act/tc_bpf.h
+-    name: tc-act-bpf-attrs
++    name: act-bpf-attrs
+     name-prefix: tca-act-bpf-
+     header: linux/tc_act/tc_bpf.h
      attributes:
-       -
-         name: tm
-@@ -1504,6 +1514,8 @@ protonum: 0
+@@ -1513,7 +1513,7 @@ protonum: 0
+         name: id
          type: binary
    -
-     name: tc-act-connmark-attrs
-+    name-prefix: tca-connmark-
-+    header: linux/tc_act/tc_connmark.h
+-    name: tc-act-connmark-attrs
++    name: act-connmark-attrs
+     name-prefix: tca-connmark-
+     header: linux/tc_act/tc_connmark.h
      attributes:
-       -
-         name: parms
-@@ -1517,6 +1529,8 @@ protonum: 0
+@@ -1528,7 +1528,7 @@ protonum: 0
+         name: pad
          type: pad
    -
-     name: tc-act-csum-attrs
-+    name-prefix: tca-csum-
-+    header: linux/tc_act/tc_csum.h
+-    name: tc-act-csum-attrs
++    name: act-csum-attrs
+     name-prefix: tca-csum-
+     header: linux/tc_act/tc_csum.h
      attributes:
-       -
-         name: parms
-@@ -1530,6 +1544,8 @@ protonum: 0
+@@ -1543,7 +1543,7 @@ protonum: 0
+         name: pad
          type: pad
    -
-     name: tc-act-ct-attrs
-+    name-prefix: tca-ct-
-+    header: linux/tc_act/tc_ct.h
+-    name: tc-act-ct-attrs
++    name: act-ct-attrs
+     name-prefix: tca-ct-
+     header: linux/tc_act/tc_ct.h
      attributes:
-       -
-         name: parms
-@@ -1592,6 +1608,8 @@ protonum: 0
+@@ -1607,7 +1607,7 @@ protonum: 0
+         name: helper-proto
          type: u8
    -
-     name: tc-act-ctinfo-attrs
-+    name-prefix: tca-ctinfo-
-+    header: linux/tc_act/tc_ctinfo.h
+-    name: tc-act-ctinfo-attrs
++    name: act-ctinfo-attrs
+     name-prefix: tca-ctinfo-
+     header: linux/tc_act/tc_ctinfo.h
      attributes:
-       -
-         name: pad
-@@ -1626,6 +1644,8 @@ protonum: 0
+@@ -1643,7 +1643,7 @@ protonum: 0
+         name: stats-cpmark-set
          type: u64
    -
-     name: tc-act-gate-attrs
-+    name-prefix: tca-gate-
-+    header: linux/tc_act/tc_gate.h
+-    name: tc-act-gate-attrs
++    name: act-gate-attrs
+     name-prefix: tca-gate-
+     header: linux/tc_act/tc_gate.h
      attributes:
-       -
-         name: tm
-@@ -1660,6 +1680,8 @@ protonum: 0
+@@ -1679,7 +1679,7 @@ protonum: 0
+         name: clockid
          type: s32
    -
-     name: tc-act-ife-attrs
-+    name-prefix: tca-ife-
-+    header: linux/tc_act/tc_ife.h
+-    name: tc-act-ife-attrs
++    name: act-ife-attrs
+     name-prefix: tca-ife-
+     header: linux/tc_act/tc_ife.h
      attributes:
-       -
-         name: parms
-@@ -1685,6 +1707,8 @@ protonum: 0
+@@ -1706,7 +1706,7 @@ protonum: 0
+         name: pad
          type: pad
    -
-     name: tc-act-mirred-attrs
-+    name-prefix: tca-mirred-
-+    header: linux/tc_act/tc_mirred.h
+-    name: tc-act-mirred-attrs
++    name: act-mirred-attrs
+     name-prefix: tca-mirred-
+     header: linux/tc_act/tc_mirred.h
      attributes:
-       -
-         name: tm
-@@ -1701,6 +1725,8 @@ protonum: 0
+@@ -1724,7 +1724,7 @@ protonum: 0
+         name: blockid
          type: binary
    -
-     name: tc-act-mpls-attrs
-+    name-prefix: tca-mpls-
-+    header: linux/tc_act/tc_mpls.h
+-    name: tc-act-mpls-attrs
++    name: act-mpls-attrs
+     name-prefix: tca-mpls-
+     header: linux/tc_act/tc_mpls.h
      attributes:
-       -
-         name: tm
-@@ -1731,6 +1757,8 @@ protonum: 0
+@@ -1756,7 +1756,7 @@ protonum: 0
+         name: bos
          type: u8
    -
-     name: tc-act-nat-attrs
-+    name-prefix: tca-nat-
-+    header: linux/tc_act/tc_nat.h
+-    name: tc-act-nat-attrs
++    name: act-nat-attrs
+     name-prefix: tca-nat-
+     header: linux/tc_act/tc_nat.h
      attributes:
-       -
-         name: parms
-@@ -1744,6 +1772,8 @@ protonum: 0
+@@ -1771,7 +1771,7 @@ protonum: 0
+         name: pad
          type: pad
    -
-     name: tc-act-pedit-attrs
-+    name-prefix: tca-pedit-
-+    header: linux/tc_act/tc_pedit.h
+-    name: tc-act-pedit-attrs
++    name: act-pedit-attrs
+     name-prefix: tca-pedit-
+     header: linux/tc_act/tc_pedit.h
      attributes:
-       -
-         name: tm
-@@ -1767,6 +1797,8 @@ protonum: 0
+@@ -1796,7 +1796,7 @@ protonum: 0
+         name: key-ex
          type: binary
    -
-     name: tc-act-simple-attrs
-+    name-prefix: tca-def-
-+    header: linux/tc_act/tc_defact.h
+-    name: tc-act-simple-attrs
++    name: act-simple-attrs
+     name-prefix: tca-def-
+     header: linux/tc_act/tc_defact.h
      attributes:
-       -
-         name: tm
-@@ -1783,6 +1815,8 @@ protonum: 0
+@@ -1814,7 +1814,7 @@ protonum: 0
+         name: pad
          type: pad
    -
-     name: tc-act-skbedit-attrs
-+    name-prefix: tca-skbedit-
-+    header: linux/tc_act/tc_skbedit.h
+-    name: tc-act-skbedit-attrs
++    name: act-skbedit-attrs
+     name-prefix: tca-skbedit-
+     header: linux/tc_act/tc_skbedit.h
      attributes:
-       -
-         name: tm
-@@ -1817,6 +1851,8 @@ protonum: 0
+@@ -1850,7 +1850,7 @@ protonum: 0
+         name: queue-mapping-max
          type: u16
    -
-     name: tc-act-skbmod-attrs
-+    name-prefix: tca-skbmod-
-+    header: linux/tc_act/tc_skbmod.h
+-    name: tc-act-skbmod-attrs
++    name: act-skbmod-attrs
+     name-prefix: tca-skbmod-
+     header: linux/tc_act/tc_skbmod.h
      attributes:
-       -
-         name: tm
-@@ -1839,6 +1875,8 @@ protonum: 0
+@@ -1874,7 +1874,7 @@ protonum: 0
+         name: pad
          type: pad
    -
-     name: tc-act-tunnel-key-attrs
-+    name-prefix: tca-tunnel-key-
-+    header: linux/tc_act/tc_tunnel_key.h
+-    name: tc-act-tunnel-key-attrs
++    name: act-tunnel-key-attrs
+     name-prefix: tca-tunnel-key-
+     header: linux/tc_act/tc_tunnel_key.h
      attributes:
-       -
-         name: tm
-@@ -1889,6 +1927,8 @@ protonum: 0
+@@ -1926,7 +1926,7 @@ protonum: 0
+         name: no-frag
          type: flag
    -
-     name: tc-act-vlan-attrs
-+    name-prefix: tca-vlan-
-+    header: linux/tc_act/tc_vlan.h
+-    name: tc-act-vlan-attrs
++    name: act-vlan-attrs
+     name-prefix: tca-vlan-
+     header: linux/tc_act/tc_vlan.h
      attributes:
-       -
-         name: tm
-@@ -1918,6 +1958,7 @@ protonum: 0
+@@ -1957,7 +1957,7 @@ protonum: 0
+         name: push-eth-src
          type: binary
    -
-     name: tc-basic-attrs
-+    name-prefix: tca-basic-
+-    name: tc-basic-attrs
++    name: basic-attrs
+     name-prefix: tca-basic-
      attributes:
        -
-         name: classid
-@@ -1944,6 +1985,7 @@ protonum: 0
+@@ -1966,16 +1966,16 @@ protonum: 0
+       -
+         name: ematches
+         type: nest
+-        nested-attributes: tc-ematch-attrs
++        nested-attributes: ematch-attrs
+       -
+         name: act
+         type: indexed-array
+         sub-type: nest
+-        nested-attributes: tc-act-attrs
++        nested-attributes: act-attrs
+       -
+         name: police
+         type: nest
+-        nested-attributes: tc-police-attrs
++        nested-attributes: police-attrs
+       -
+         name: pcnt
+         type: binary
+@@ -1984,18 +1984,18 @@ protonum: 0
+         name: pad
          type: pad
    -
-     name: tc-bpf-attrs
-+    name-prefix: tca-bpf-
+-    name: tc-bpf-attrs
++    name: bpf-attrs
+     name-prefix: tca-bpf-
      attributes:
        -
          name: act
-@@ -1983,6 +2025,7 @@ protonum: 0
+         type: indexed-array
+         sub-type: nest
+-        nested-attributes: tc-act-attrs
++        nested-attributes: act-attrs
+       -
+         name: police
+         type: nest
+-        nested-attributes: tc-police-attrs
++        nested-attributes: police-attrs
+       -
+         name: classid
+         type: u32
+@@ -2024,7 +2024,7 @@ protonum: 0
+         name: id
          type: u32
    -
-     name: tc-cake-attrs
-+    name-prefix: tca-cake-
+-    name: tc-cake-attrs
++    name: cake-attrs
+     name-prefix: tca-cake-
      attributes:
        -
-         name: pad
-@@ -2040,6 +2083,7 @@ protonum: 0
+@@ -2082,7 +2082,7 @@ protonum: 0
+         name: fwmark
          type: u32
    -
-     name: tc-cake-stats-attrs
-+    name-prefix: tca-cake-stats-
+-    name: tc-cake-stats-attrs
++    name: cake-stats-attrs
+     name-prefix: tca-cake-stats-
      attributes:
        -
-         name: pad
-@@ -2093,6 +2137,7 @@ protonum: 0
+@@ -2116,7 +2116,7 @@ protonum: 0
+         name: tin-stats
+         type: indexed-array
+         sub-type: nest
+-        nested-attributes: tc-cake-tin-stats-attrs
++        nested-attributes: cake-tin-stats-attrs
+       -
+         name: deficit
+         type: s32
+@@ -2136,7 +2136,7 @@ protonum: 0
+         name: blue-timer-us
          type: s32
    -
-     name: tc-cake-tin-stats-attrs
-+    name-prefix: tca-cake-tin-stats-
+-    name: tc-cake-tin-stats-attrs
++    name: cake-tin-stats-attrs
+     name-prefix: tca-cake-tin-stats-
      attributes:
        -
-         name: pad
-@@ -2171,6 +2216,7 @@ protonum: 0
+@@ -2215,7 +2215,7 @@ protonum: 0
+         name: flow-quantum
          type: u32
    -
-     name: tc-cbs-attrs
-+    name-prefix: tca-cbs-
+-    name: tc-cbs-attrs
++    name: cbs-attrs
+     name-prefix: tca-cbs-
      attributes:
        -
-         name: parms
-@@ -2178,6 +2224,7 @@ protonum: 0
+@@ -2223,23 +2223,23 @@ protonum: 0
+         type: binary
          struct: tc-cbs-qopt
    -
-     name: tc-cgroup-attrs
-+    name-prefix: tca-cgroup-
+-    name: tc-cgroup-attrs
++    name: cgroup-attrs
+     name-prefix: tca-cgroup-
      attributes:
        -
          name: act
-@@ -2193,6 +2240,7 @@ protonum: 0
+         type: indexed-array
+         sub-type: nest
+-        nested-attributes: tc-act-attrs
++        nested-attributes: act-attrs
+       -
+         name: police
+         type: nest
+-        nested-attributes: tc-police-attrs
++        nested-attributes: police-attrs
+       -
+         name: ematches
          type: binary
    -
-     name: tc-choke-attrs
-+    name-prefix: tca-choke-
+-    name: tc-choke-attrs
++    name: choke-attrs
+     name-prefix: tca-choke-
      attributes:
        -
-         name: parms
-@@ -2209,6 +2257,7 @@ protonum: 0
+@@ -2256,7 +2256,7 @@ protonum: 0
+         name: max-p
          type: u32
    -
-     name: tc-codel-attrs
-+    name-prefix: tca-codel-
+-    name: tc-codel-attrs
++    name: codel-attrs
+     name-prefix: tca-codel-
      attributes:
        -
-         name: target
-@@ -2227,12 +2276,15 @@ protonum: 0
+@@ -2275,14 +2275,14 @@ protonum: 0
+         name: ce-threshold
          type: u32
    -
-     name: tc-drr-attrs
-+    name-prefix: tca-drr-
+-    name: tc-drr-attrs
++    name: drr-attrs
+     name-prefix: tca-drr-
      attributes:
        -
          name: quantum
          type: u32
    -
-     name: tc-ematch-attrs
-+    name-prefix: tca-ematch-
-+    attr-max-name: tca-ematch-tree-max
+-    name: tc-ematch-attrs
++    name: ematch-attrs
+     name-prefix: tca-ematch-
+     attr-max-name: tca-ematch-tree-max
      attributes:
-       -
-         name: tree-hdr
-@@ -2243,6 +2295,7 @@ protonum: 0
+@@ -2294,7 +2294,7 @@ protonum: 0
+         name: tree-list
          type: binary
    -
-     name: tc-flow-attrs
-+    name-prefix: tca-flow-
+-    name: tc-flow-attrs
++    name: flow-attrs
+     name-prefix: tca-flow-
      attributes:
        -
-         name: keys
-@@ -2283,6 +2336,7 @@ protonum: 0
+@@ -2327,7 +2327,7 @@ protonum: 0
+       -
+         name: police
+         type: nest
+-        nested-attributes: tc-police-attrs
++        nested-attributes: police-attrs
+       -
+         name: ematches
+         type: binary
+@@ -2335,7 +2335,7 @@ protonum: 0
+         name: perturb
          type: u32
    -
-     name: tc-flower-attrs
-+    name-prefix: tca-flower-
+-    name: tc-flower-attrs
++    name: flower-attrs
+     name-prefix: tca-flower-
      attributes:
        -
-         name: classid
-@@ -2709,6 +2763,7 @@ protonum: 0
+@@ -2348,7 +2348,7 @@ protonum: 0
+         name: act
+         type: indexed-array
+         sub-type: nest
+-        nested-attributes: tc-act-attrs
++        nested-attributes: act-attrs
+       -
+         name: key-eth-dst
+         type: binary
+@@ -2427,7 +2427,7 @@ protonum: 0
+       -
+         name: flags
+         type: u32
+-        enum: tc-cls-flags
++        enum: cls-flags
+         enum-as-flags: true
+       -
+         name: key-vlan-id
+@@ -2532,13 +2532,13 @@ protonum: 0
+         name: key-flags
+         type: u32
+         byte-order: big-endian
+-        enum: tc-flower-key-ctrl-flags
++        enum: flower-key-ctrl-flags
+         enum-as-flags: true
+       -
+         name: key-flags-mask
+         type: u32
+         byte-order: big-endian
+-        enum: tc-flower-key-ctrl-flags
++        enum: flower-key-ctrl-flags
+         enum-as-flags: true
+       -
+         name: key-icmpv4-code
+@@ -2661,11 +2661,11 @@ protonum: 0
+       -
+         name: key-enc-opts
+         type: nest
+-        nested-attributes: tc-flower-key-enc-opts-attrs
++        nested-attributes: flower-key-enc-opts-attrs
+       -
+         name: key-enc-opts-mask
+         type: nest
+-        nested-attributes: tc-flower-key-enc-opts-attrs
++        nested-attributes: flower-key-enc-opts-attrs
+       -
+         name: in-hw-count
+         type: u32
+@@ -2712,7 +2712,7 @@ protonum: 0
+       -
+         name: key-mpls-opts
+         type: nest
+-        nested-attributes: tc-flower-key-mpls-opt-attrs
++        nested-attributes: flower-key-mpls-opt-attrs
+       -
+         name: key-hash
+         type: u32
+@@ -2740,7 +2740,7 @@ protonum: 0
+       -
+         name: key-cfm
+         type: nest
+-        nested-attributes: tc-flower-key-cfm-attrs
++        nested-attributes: flower-key-cfm-attrs
+       -
+         name: key-spi
+         type: u32
+@@ -2753,36 +2753,36 @@ protonum: 0
+         name: key-enc-flags
+         type: u32
+         byte-order: big-endian
+-        enum: tc-flower-key-ctrl-flags
++        enum: flower-key-ctrl-flags
+         enum-as-flags: true
+       -
+         name: key-enc-flags-mask
+         type: u32
+         byte-order: big-endian
+-        enum: tc-flower-key-ctrl-flags
++        enum: flower-key-ctrl-flags
          enum-as-flags: true
    -
-     name: tc-flower-key-enc-opts-attrs
-+    name-prefix: tca-flower-key-enc-opts-
+-    name: tc-flower-key-enc-opts-attrs
++    name: flower-key-enc-opts-attrs
+     name-prefix: tca-flower-key-enc-opts-
      attributes:
        -
          name: geneve
-@@ -2728,6 +2783,7 @@ protonum: 0
-         nested-attributes: tc-flower-key-enc-opt-gtp-attrs
+         type: nest
+-        nested-attributes: tc-flower-key-enc-opt-geneve-attrs
++        nested-attributes: flower-key-enc-opt-geneve-attrs
+       -
+         name: vxlan
+         type: nest
+-        nested-attributes: tc-flower-key-enc-opt-vxlan-attrs
++        nested-attributes: flower-key-enc-opt-vxlan-attrs
+       -
+         name: erspan
+         type: nest
+-        nested-attributes: tc-flower-key-enc-opt-erspan-attrs
++        nested-attributes: flower-key-enc-opt-erspan-attrs
+       -
+         name: gtp
+         type: nest
+-        nested-attributes: tc-flower-key-enc-opt-gtp-attrs
++        nested-attributes: flower-key-enc-opt-gtp-attrs
    -
-     name: tc-flower-key-enc-opt-geneve-attrs
-+    name-prefix: tca-flower-key-enc-opt-geneve-
+-    name: tc-flower-key-enc-opt-geneve-attrs
++    name: flower-key-enc-opt-geneve-attrs
+     name-prefix: tca-flower-key-enc-opt-geneve-
      attributes:
        -
-         name: class
-@@ -2740,12 +2796,14 @@ protonum: 0
+@@ -2795,14 +2795,14 @@ protonum: 0
+         name: data
          type: binary
    -
-     name: tc-flower-key-enc-opt-vxlan-attrs
-+    name-prefix: tca-flower-key-enc-opt-vxlan-
+-    name: tc-flower-key-enc-opt-vxlan-attrs
++    name: flower-key-enc-opt-vxlan-attrs
+     name-prefix: tca-flower-key-enc-opt-vxlan-
      attributes:
        -
          name: gbp
          type: u32
    -
-     name: tc-flower-key-enc-opt-erspan-attrs
-+    name-prefix: tca-flower-key-enc-opt-erspan-
+-    name: tc-flower-key-enc-opt-erspan-attrs
++    name: flower-key-enc-opt-erspan-attrs
+     name-prefix: tca-flower-key-enc-opt-erspan-
      attributes:
        -
-         name: ver
-@@ -2761,6 +2819,7 @@ protonum: 0
+@@ -2818,7 +2818,7 @@ protonum: 0
+         name: hwid
          type: u8
    -
-     name: tc-flower-key-enc-opt-gtp-attrs
-+    name-prefix: tca-flower-key-enc-opt-gtp-
+-    name: tc-flower-key-enc-opt-gtp-attrs
++    name: flower-key-enc-opt-gtp-attrs
+     name-prefix: tca-flower-key-enc-opt-gtp-
      attributes:
        -
-         name: pdu-type
-@@ -2770,6 +2829,8 @@ protonum: 0
+@@ -2828,7 +2828,7 @@ protonum: 0
+         name: qfi
          type: u8
    -
-     name: tc-flower-key-mpls-opt-attrs
-+    name-prefix: tca-flower-key-mpls-opt-
-+    attr-max-name: tca-flower-key-mpls-opt-lse-max
+-    name: tc-flower-key-mpls-opt-attrs
++    name: flower-key-mpls-opt-attrs
+     name-prefix: tca-flower-key-mpls-opt-
+     attr-max-name: tca-flower-key-mpls-opt-lse-max
      attributes:
-       -
-         name: lse-depth
-@@ -2788,6 +2849,7 @@ protonum: 0
+@@ -2848,7 +2848,7 @@ protonum: 0
+         name: lse-label
          type: u32
    -
-     name: tc-flower-key-cfm-attrs
-+    name-prefix: tca-flower-key-cfm-
+-    name: tc-flower-key-cfm-attrs
++    name: flower-key-cfm-attrs
+     name-prefix: tca-flower-key-cfm-
      attributes:
        -
-         name: md-level
-@@ -2797,6 +2859,7 @@ protonum: 0
+@@ -2858,7 +2858,7 @@ protonum: 0
+         name: opcode
          type: u8
    -
-     name: tc-fw-attrs
-+    name-prefix: tca-fw-
+-    name: tc-fw-attrs
++    name: fw-attrs
+     name-prefix: tca-fw-
      attributes:
        -
-         name: classid
-@@ -2818,6 +2881,7 @@ protonum: 0
+@@ -2867,7 +2867,7 @@ protonum: 0
+       -
+         name: police
+         type: nest
+-        nested-attributes: tc-police-attrs
++        nested-attributes: police-attrs
+       -
+         name: indev
+         type: string
+@@ -2875,12 +2875,12 @@ protonum: 0
+         name: act
+         type: indexed-array
+         sub-type: nest
+-        nested-attributes: tc-act-attrs
++        nested-attributes: act-attrs
+       -
+         name: mask
          type: u32
    -
-     name: tc-gred-attrs
-+    name-prefix: tca-gred-
+-    name: tc-gred-attrs
++    name: gred-attrs
+     name-prefix: tca-gred-
      attributes:
        -
-         name: parms
-@@ -2843,6 +2907,7 @@ protonum: 0
-         nested-attributes: tca-gred-vq-list-attrs
+@@ -2955,7 +2955,7 @@ protonum: 0
+         name: flags
+         type: u32
    -
-     name: tca-gred-vq-list-attrs
-+    name-prefix: tca-gred-vq-
+-    name: tc-hfsc-attrs
++    name: hfsc-attrs
      attributes:
        -
-         name: entry
-@@ -2851,6 +2916,7 @@ protonum: 0
-         multi-attr: true
-   -
-     name: tca-gred-vq-entry-attrs
-+    name-prefix: tca-gred-vq-
-     attributes:
-       -
-         name: pad
-@@ -2902,6 +2968,7 @@ protonum: 0
+         name: rsc
+@@ -2967,7 +2967,7 @@ protonum: 0
+         name: usc
          type: binary
    -
-     name: tc-hhf-attrs
-+    name-prefix: tca-hhf-
+-    name: tc-hhf-attrs
++    name: hhf-attrs
+     name-prefix: tca-hhf-
      attributes:
        -
-         name: backlog-limit
-@@ -2926,6 +2993,7 @@ protonum: 0
+@@ -2992,7 +2992,7 @@ protonum: 0
+         name: non-hh-weight
          type: u32
    -
-     name: tc-htb-attrs
-+    name-prefix: tca-htb-
+-    name: tc-htb-attrs
++    name: htb-attrs
+     name-prefix: tca-htb-
      attributes:
        -
-         name: parms
-@@ -2958,6 +3026,7 @@ protonum: 0
+@@ -3025,7 +3025,7 @@ protonum: 0
+         name: offload
          type: flag
    -
-     name: tc-matchall-attrs
-+    name-prefix: tca-matchall-
+-    name: tc-matchall-attrs
++    name: matchall-attrs
+     name-prefix: tca-matchall-
      attributes:
        -
-         name: classid
-@@ -2979,6 +3048,7 @@ protonum: 0
+@@ -3035,7 +3035,7 @@ protonum: 0
+         name: act
+         type: indexed-array
+         sub-type: nest
+-        nested-attributes: tc-act-attrs
++        nested-attributes: act-attrs
+       -
+         name: flags
+         type: u32
+@@ -3047,7 +3047,7 @@ protonum: 0
+         name: pad
          type: pad
    -
-     name: tc-etf-attrs
-+    name-prefix: tca-etf-
+-    name: tc-etf-attrs
++    name: etf-attrs
+     name-prefix: tca-etf-
      attributes:
        -
-         name: parms
-@@ -2986,6 +3056,7 @@ protonum: 0
+@@ -3055,7 +3055,7 @@ protonum: 0
+         type: binary
          struct: tc-etf-qopt
    -
-     name: tc-ets-attrs
-+    name-prefix: tca-ets-
+-    name: tc-ets-attrs
++    name: ets-attrs
+     name-prefix: tca-ets-
      attributes:
        -
-         name: nbands
-@@ -3011,6 +3082,7 @@ protonum: 0
-         multi-attr: true
-   -
-     name: tc-fq-attrs
-+    name-prefix: tca-fq-
-     attributes:
+@@ -3067,7 +3067,7 @@ protonum: 0
        -
-         name: plimit
-@@ -3082,6 +3154,7 @@ protonum: 0
-         doc: Weights for each band
-   -
-     name: tc-fq-codel-attrs
-+    name-prefix: tca-fq-codel-
-     attributes:
+         name: quanta
+         type: nest
+-        nested-attributes: tc-ets-attrs
++        nested-attributes: ets-attrs
        -
-         name: target
-@@ -3118,6 +3191,7 @@ protonum: 0
-         type: u8
-   -
-     name: tc-fq-pie-attrs
-+    name-prefix: tca-fq-pie-
-     attributes:
-       -
-         name: limit
-@@ -3157,6 +3231,7 @@ protonum: 0
+         name: quanta-band
          type: u32
-   -
-     name: tc-netem-attrs
-+    name-prefix: tca-netem-
-     attributes:
-       -
-         name: corr
-@@ -3210,6 +3285,7 @@ protonum: 0
-         type: u64
-   -
-     name: tc-netem-loss-attrs
-+    name-prefix: netem-loss-
-     attributes:
-       -
-         name: gi
-@@ -3223,6 +3299,7 @@ protonum: 0
-         struct: tc-netem-gemodel
-   -
-     name: tc-pie-attrs
-+    name-prefix: tca-pie-
-     attributes:
-       -
-         name: target
-@@ -3250,6 +3327,7 @@ protonum: 0
-         type: u32
-   -
-     name: tc-police-attrs
-+    name-prefix: tca-police-
-     attributes:
-       -
-         name: tbf
-@@ -3288,6 +3366,7 @@ protonum: 0
-         type: u64
-   -
-     name: tc-qfq-attrs
-+    name-prefix: tca-qfq-
-     attributes:
-       -
-         name: weight
-@@ -3297,6 +3376,7 @@ protonum: 0
-         type: u32
-   -
-     name: tc-red-attrs
-+    name-prefix: tca-red-
-     attributes:
-       -
-         name: parms
-@@ -3319,6 +3399,7 @@ protonum: 0
-         type: u32
-   -
-     name: tc-route-attrs
-+    name-prefix: tca-route4-
-     attributes:
-       -
-         name: classid
-@@ -3343,6 +3424,7 @@ protonum: 0
-         nested-attributes: tc-act-attrs
-   -
-     name: tc-taprio-attrs
-+    name-prefix: tca-taprio-attr-
-     attributes:
+@@ -3075,13 +3075,13 @@ protonum: 0
        -
          name: priomap
-@@ -3386,6 +3468,7 @@ protonum: 0
-         nested-attributes: tc-taprio-tc-entry-attrs
+         type: nest
+-        nested-attributes: tc-ets-attrs
++        nested-attributes: ets-attrs
+       -
+         name: priomap-band
+         type: u8
+         multi-attr: true
    -
-     name: tc-taprio-sched-entry-list
-+    name-prefix: tca-taprio-sched-
+-    name: tc-fq-attrs
++    name: fq-attrs
+     name-prefix: tca-fq-
+     attributes:
+       -
+@@ -3153,7 +3153,7 @@ protonum: 0
+         sub-type: s32
+         doc: Weights for each band
+   -
+-    name: tc-fq-codel-attrs
++    name: fq-codel-attrs
+     name-prefix: tca-fq-codel-
+     attributes:
+       -
+@@ -3190,7 +3190,7 @@ protonum: 0
+         name: ce-threshold-mask
+         type: u8
+   -
+-    name: tc-fq-pie-attrs
++    name: fq-pie-attrs
+     name-prefix: tca-fq-pie-
+     attributes:
+       -
+@@ -3230,7 +3230,7 @@ protonum: 0
+         name: dq-rate-estimator
+         type: u32
+   -
+-    name: tc-netem-attrs
++    name: netem-attrs
+     name-prefix: tca-netem-
+     attributes:
+       -
+@@ -3252,7 +3252,7 @@ protonum: 0
+       -
+         name: loss
+         type: nest
+-        nested-attributes: tc-netem-loss-attrs
++        nested-attributes: netem-loss-attrs
+       -
+         name: rate
+         type: binary
+@@ -3284,7 +3284,7 @@ protonum: 0
+         name: prng-seed
+         type: u64
+   -
+-    name: tc-netem-loss-attrs
++    name: netem-loss-attrs
+     name-prefix: netem-loss-
+     attributes:
+       -
+@@ -3298,7 +3298,7 @@ protonum: 0
+         doc: Gilbert Elliot models
+         struct: tc-netem-gemodel
+   -
+-    name: tc-pie-attrs
++    name: pie-attrs
+     name-prefix: tca-pie-
+     attributes:
+       -
+@@ -3326,7 +3326,7 @@ protonum: 0
+         name: dq-rate-estimator
+         type: u32
+   -
+-    name: tc-police-attrs
++    name: police-attrs
+     name-prefix: tca-police-
+     attributes:
+       -
+@@ -3365,7 +3365,7 @@ protonum: 0
+         name: pktburst64
+         type: u64
+   -
+-    name: tc-qfq-attrs
++    name: qfq-attrs
+     name-prefix: tca-qfq-
+     attributes:
+       -
+@@ -3375,7 +3375,7 @@ protonum: 0
+         name: lmax
+         type: u32
+   -
+-    name: tc-red-attrs
++    name: red-attrs
+     name-prefix: tca-red-
+     attributes:
+       -
+@@ -3398,7 +3398,7 @@ protonum: 0
+         name: mark-block
+         type: u32
+   -
+-    name: tc-route-attrs
++    name: route-attrs
+     name-prefix: tca-route4-
+     attributes:
+       -
+@@ -3416,14 +3416,14 @@ protonum: 0
+       -
+         name: police
+         type: nest
+-        nested-attributes: tc-police-attrs
++        nested-attributes: police-attrs
+       -
+         name: act
+         type: indexed-array
+         sub-type: nest
+-        nested-attributes: tc-act-attrs
++        nested-attributes: act-attrs
+   -
+-    name: tc-taprio-attrs
++    name: taprio-attrs
+     name-prefix: tca-taprio-attr-
+     attributes:
+       -
+@@ -3433,14 +3433,14 @@ protonum: 0
+       -
+         name: sched-entry-list
+         type: nest
+-        nested-attributes: tc-taprio-sched-entry-list
++        nested-attributes: taprio-sched-entry-list
+       -
+         name: sched-base-time
+         type: s64
+       -
+         name: sched-single-entry
+         type: nest
+-        nested-attributes: tc-taprio-sched-entry
++        nested-attributes: taprio-sched-entry
+       -
+         name: sched-clockid
+         type: s32
+@@ -3465,18 +3465,18 @@ protonum: 0
+       -
+         name: tc-entry
+         type: nest
+-        nested-attributes: tc-taprio-tc-entry-attrs
++        nested-attributes: taprio-tc-entry-attrs
+   -
+-    name: tc-taprio-sched-entry-list
++    name: taprio-sched-entry-list
+     name-prefix: tca-taprio-sched-
      attributes:
        -
          name: entry
-@@ -3394,6 +3477,7 @@ protonum: 0
+         type: nest
+-        nested-attributes: tc-taprio-sched-entry
++        nested-attributes: taprio-sched-entry
          multi-attr: true
    -
-     name: tc-taprio-sched-entry
-+    name-prefix: tca-taprio-sched-entry-
+-    name: tc-taprio-sched-entry
++    name: taprio-sched-entry
+     name-prefix: tca-taprio-sched-entry-
      attributes:
        -
-         name: index
-@@ -3409,6 +3493,7 @@ protonum: 0
+@@ -3492,7 +3492,7 @@ protonum: 0
+         name: interval
          type: u32
    -
-     name: tc-taprio-tc-entry-attrs
-+    name-prefix: tca-taprio-tc-entry-
+-    name: tc-taprio-tc-entry-attrs
++    name: taprio-tc-entry-attrs
+     name-prefix: tca-taprio-tc-entry-
      attributes:
        -
-         name: index
-@@ -3421,6 +3506,7 @@ protonum: 0
+@@ -3505,7 +3505,7 @@ protonum: 0
+         name: fp
          type: u32
    -
-     name: tc-tbf-attrs
-+    name-prefix: tca-tbf-
+-    name: tc-tbf-attrs
++    name: tbf-attrs
+     name-prefix: tca-tbf-
      attributes:
        -
-         name: parms
-@@ -3449,6 +3535,8 @@ protonum: 0
+@@ -3534,7 +3534,7 @@ protonum: 0
+         name: pad
          type: pad
    -
-     name: tc-act-sample-attrs
-+    name-prefix: tca-sample-
-+    header: linux/tc_act/tc_sample.h
+-    name: tc-act-sample-attrs
++    name: act-sample-attrs
+     name-prefix: tca-sample-
+     header: linux/tc_act/tc_sample.h
      attributes:
-       -
-         name: tm
-@@ -3472,6 +3560,8 @@ protonum: 0
+@@ -3559,7 +3559,7 @@ protonum: 0
+         name: pad
          type: pad
    -
-     name: tc-act-gact-attrs
-+    name-prefix: tca-gact-
-+    header: linux/tc_act/tc_gact.h
+-    name: tc-act-gact-attrs
++    name: act-gact-attrs
+     name-prefix: tca-gact-
+     header: linux/tc_act/tc_gact.h
      attributes:
-       -
-         name: tm
-@@ -3490,6 +3580,7 @@ protonum: 0
-         type: pad
-   -
-     name: tca-stab-attrs
-+    name-prefix: tca-stab-
-     attributes:
-       -
-         name: base
-@@ -3500,6 +3591,8 @@ protonum: 0
-         type: binary
-   -
-     name: tca-stats-attrs
-+    name-prefix: tca-stats-
-+    header: linux/gen_stats.h
-     attributes:
-       -
-         name: basic
-@@ -3534,6 +3627,7 @@ protonum: 0
+@@ -3626,7 +3626,7 @@ protonum: 0
+         name: pkt64
          type: u64
    -
-     name: tc-u32-attrs
-+    name-prefix: tca-u32-
+-    name: tc-u32-attrs
++    name: u32-attrs
+     name-prefix: tca-u32-
      attributes:
        -
-         name: classid
-@@ -3805,6 +3899,7 @@ protonum: 0
+@@ -3648,12 +3648,12 @@ protonum: 0
+       -
+         name: police
+         type: nest
+-        nested-attributes: tc-police-attrs
++        nested-attributes: police-attrs
+       -
+         name: act
+         type: indexed-array
+         sub-type: nest
+-        nested-attributes: tc-act-attrs
++        nested-attributes: act-attrs
+       -
+         name: indev
+         type: string
+@@ -3674,78 +3674,78 @@ protonum: 0
  
- operations:
-   enum-model: directional
-+  name-prefix: rtm-
-   list:
+ sub-messages:
+   -
+-    name: tc-options-msg
++    name: options-msg
+     formats:
+       -
+         value: basic
+-        attribute-set: tc-basic-attrs
++        attribute-set: basic-attrs
+       -
+         value: bpf
+-        attribute-set: tc-bpf-attrs
++        attribute-set: bpf-attrs
+       -
+         value: bfifo
+         fixed-header: tc-fifo-qopt
+       -
+         value: cake
+-        attribute-set: tc-cake-attrs
++        attribute-set: cake-attrs
+       -
+         value: cbs
+-        attribute-set: tc-cbs-attrs
++        attribute-set: cbs-attrs
+       -
+         value: cgroup
+-        attribute-set: tc-cgroup-attrs
++        attribute-set: cgroup-attrs
+       -
+         value: choke
+-        attribute-set: tc-choke-attrs
++        attribute-set: choke-attrs
+       -
+         value: clsact # no content
+       -
+         value: codel
+-        attribute-set: tc-codel-attrs
++        attribute-set: codel-attrs
+       -
+         value: drr
+-        attribute-set: tc-drr-attrs
++        attribute-set: drr-attrs
+       -
+         value: etf
+-        attribute-set: tc-etf-attrs
++        attribute-set: etf-attrs
+       -
+         value: ets
+-        attribute-set: tc-ets-attrs
++        attribute-set: ets-attrs
+       -
+         value: flow
+-        attribute-set: tc-flow-attrs
++        attribute-set: flow-attrs
+       -
+         value: flower
+-        attribute-set: tc-flower-attrs
++        attribute-set: flower-attrs
+       -
+         value: fq
+-        attribute-set: tc-fq-attrs
++        attribute-set: fq-attrs
+       -
+         value: fq_codel
+-        attribute-set: tc-fq-codel-attrs
++        attribute-set: fq-codel-attrs
+       -
+         value: fq_pie
+-        attribute-set: tc-fq-pie-attrs
++        attribute-set: fq-pie-attrs
+       -
+         value: fw
+-        attribute-set: tc-fw-attrs
++        attribute-set: fw-attrs
+       -
+         value: gred
+-        attribute-set: tc-gred-attrs
++        attribute-set: gred-attrs
+       -
+         value: hfsc
+         fixed-header: tc-hfsc-qopt
+       -
+         value: hhf
+-        attribute-set: tc-hhf-attrs
++        attribute-set: hhf-attrs
+       -
+         value: htb
+-        attribute-set: tc-htb-attrs
++        attribute-set: htb-attrs
+       -
+         value: ingress # no content
+       -
+         value: matchall
+-        attribute-set: tc-matchall-attrs
++        attribute-set: matchall-attrs
+       -
+         value: mq # no content
+       -
+@@ -3757,7 +3757,7 @@ protonum: 0
+       -
+         value: netem
+         fixed-header: tc-netem-qopt
+-        attribute-set: tc-netem-attrs
++        attribute-set: netem-attrs
+       -
+         value: pfifo
+         fixed-header: tc-fifo-qopt
+@@ -3769,7 +3769,7 @@ protonum: 0
+         fixed-header: tc-fifo-qopt
+       -
+         value: pie
+-        attribute-set: tc-pie-attrs
++        attribute-set: pie-attrs
+       -
+         value: plug
+         fixed-header: tc-plug-qopt
+@@ -3778,13 +3778,13 @@ protonum: 0
+         fixed-header: tc-prio-qopt
+       -
+         value: qfq
+-        attribute-set: tc-qfq-attrs
++        attribute-set: qfq-attrs
+       -
+         value: red
+-        attribute-set: tc-red-attrs
++        attribute-set: red-attrs
+       -
+         value: route
+-        attribute-set: tc-route-attrs
++        attribute-set: route-attrs
+       -
+         value: sfb
+         fixed-header: tc-sfb-qopt
+@@ -3793,79 +3793,79 @@ protonum: 0
+         fixed-header: tc-sfq-qopt-v1
+       -
+         value: taprio
+-        attribute-set: tc-taprio-attrs
++        attribute-set: taprio-attrs
+       -
+         value: tbf
+-        attribute-set: tc-tbf-attrs
++        attribute-set: tbf-attrs
+       -
+         value: u32
+-        attribute-set: tc-u32-attrs
++        attribute-set: u32-attrs
+   -
+-    name: tc-act-options-msg
++    name: act-options-msg
+     formats:
+       -
+         value: bpf
+-        attribute-set: tc-act-bpf-attrs
++        attribute-set: act-bpf-attrs
+       -
+         value: connmark
+-        attribute-set: tc-act-connmark-attrs
++        attribute-set: act-connmark-attrs
+       -
+         value: csum
+-        attribute-set: tc-act-csum-attrs
++        attribute-set: act-csum-attrs
+       -
+         value: ct
+-        attribute-set: tc-act-ct-attrs
++        attribute-set: act-ct-attrs
+       -
+         value: ctinfo
+-        attribute-set: tc-act-ctinfo-attrs
++        attribute-set: act-ctinfo-attrs
+       -
+         value: gact
+-        attribute-set: tc-act-gact-attrs
++        attribute-set: act-gact-attrs
+       -
+         value: gate
+-        attribute-set: tc-act-gate-attrs
++        attribute-set: act-gate-attrs
+       -
+         value: ife
+-        attribute-set: tc-act-ife-attrs
++        attribute-set: act-ife-attrs
+       -
+         value: mirred
+-        attribute-set: tc-act-mirred-attrs
++        attribute-set: act-mirred-attrs
+       -
+         value: mpls
+-        attribute-set: tc-act-mpls-attrs
++        attribute-set: act-mpls-attrs
+       -
+         value: nat
+-        attribute-set: tc-act-nat-attrs
++        attribute-set: act-nat-attrs
+       -
+         value: pedit
+-        attribute-set: tc-act-pedit-attrs
++        attribute-set: act-pedit-attrs
+       -
+         value: police
+-        attribute-set: tc-police-attrs
++        attribute-set: police-attrs
+       -
+         value: sample
+-        attribute-set: tc-act-sample-attrs
++        attribute-set: act-sample-attrs
+       -
+         value: simple
+-        attribute-set: tc-act-simple-attrs
++        attribute-set: act-simple-attrs
+       -
+         value: skbedit
+-        attribute-set: tc-act-skbedit-attrs
++        attribute-set: act-skbedit-attrs
+       -
+         value: skbmod
+-        attribute-set: tc-act-skbmod-attrs
++        attribute-set: act-skbmod-attrs
+       -
+         value: tunnel_key
+-        attribute-set: tc-act-tunnel-key-attrs
++        attribute-set: act-tunnel-key-attrs
+       -
+         value: vlan
+-        attribute-set: tc-act-vlan-attrs
++        attribute-set: act-vlan-attrs
+   -
+     name: tca-stats-app-msg
+     formats:
+       -
+         value: cake
+-        attribute-set: tc-cake-stats-attrs
++        attribute-set: cake-stats-attrs
+       -
+         value: choke
+         fixed-header: tc-choke-xstats
+@@ -3904,7 +3904,7 @@ protonum: 0
      -
        name: newqdisc
+       doc: Create new tc qdisc.
+-      attribute-set: tc-attrs
++      attribute-set: attrs
+       fixed-header: tcmsg
+       do:
+         request:
+@@ -3919,7 +3919,7 @@ protonum: 0
+     -
+       name: delqdisc
+       doc: Delete existing tc qdisc.
+-      attribute-set: tc-attrs
++      attribute-set: attrs
+       fixed-header: tcmsg
+       do:
+         request:
+@@ -3927,7 +3927,7 @@ protonum: 0
+     -
+       name: getqdisc
+       doc: Get / dump tc qdisc information.
+-      attribute-set: tc-attrs
++      attribute-set: attrs
+       fixed-header: tcmsg
+       do:
+         request:
+@@ -3951,7 +3951,7 @@ protonum: 0
+     -
+       name: newtclass
+       doc: Get / dump tc traffic class information.
+-      attribute-set: tc-attrs
++      attribute-set: attrs
+       fixed-header: tcmsg
+       do:
+         request:
+@@ -3960,7 +3960,7 @@ protonum: 0
+     -
+       name: deltclass
+       doc: Get / dump tc traffic class information.
+-      attribute-set: tc-attrs
++      attribute-set: attrs
+       fixed-header: tcmsg
+       do:
+         request:
+@@ -3968,7 +3968,7 @@ protonum: 0
+     -
+       name: gettclass
+       doc: Get / dump tc traffic class information.
+-      attribute-set: tc-attrs
++      attribute-set: attrs
+       fixed-header: tcmsg
+       do:
+         request:
+@@ -3979,7 +3979,7 @@ protonum: 0
+     -
+       name: newtfilter
+       doc: Get / dump tc filter information.
+-      attribute-set: tc-attrs
++      attribute-set: attrs
+       fixed-header: tcmsg
+       do:
+         request:
+@@ -3988,7 +3988,7 @@ protonum: 0
+     -
+       name: deltfilter
+       doc: Get / dump tc filter information.
+-      attribute-set: tc-attrs
++      attribute-set: attrs
+       fixed-header: tcmsg
+       do:
+         request:
+@@ -3999,7 +3999,7 @@ protonum: 0
+     -
+       name: gettfilter
+       doc: Get / dump tc filter information.
+-      attribute-set: tc-attrs
++      attribute-set: attrs
+       fixed-header: tcmsg
+       do:
+         request:
+@@ -4022,7 +4022,7 @@ protonum: 0
+     -
+       name: newchain
+       doc: Get / dump tc chain information.
+-      attribute-set: tc-attrs
++      attribute-set: attrs
+       fixed-header: tcmsg
+       do:
+         request:
+@@ -4031,7 +4031,7 @@ protonum: 0
+     -
+       name: delchain
+       doc: Get / dump tc chain information.
+-      attribute-set: tc-attrs
++      attribute-set: attrs
+       fixed-header: tcmsg
+       do:
+         request:
+@@ -4041,7 +4041,7 @@ protonum: 0
+     -
+       name: getchain
+       doc: Get / dump tc chain information.
+-      attribute-set: tc-attrs
++      attribute-set: attrs
+       fixed-header: tcmsg
+       do:
+         request:
 -- 
 2.49.0
 
