@@ -1,123 +1,112 @@
-Return-Path: <netdev+bounces-191969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191970-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A028ABE0C3
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 18:33:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B0CEABE0D4
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 18:35:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82AC03A3CC1
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:32:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B24661BA5C25
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:34:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFF7426B2C1;
-	Tue, 20 May 2025 16:33:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D4B31C5F10;
+	Tue, 20 May 2025 16:34:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GA6yiitB"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FejLLnkT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52C604B1E5D;
-	Tue, 20 May 2025 16:33:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02D472750F8
+	for <netdev@vger.kernel.org>; Tue, 20 May 2025 16:34:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747758789; cv=none; b=s62hZuX6gjvzvb3LxfXo26wPaQjdZM7kLpT1FgmvDylM0XzLRk4cNYaEBPTUtHUybWvs96nWSnAuKBav+ARMH0MnqY8mbRpv9b6x2iNgEYj59DCGWCpOCKx6Na1+O26p2Gbyxf+6ZqISMEnxgI8J/WJcgxKtb8XIM7xdeneND8o=
+	t=1747758863; cv=none; b=KLlafKR50obLIFqMYakRgc3XHtQYMVyJP0SqLe7vrfmmJQ4JRTq3eAnIjFJ2z6si7Q/8AzVipdpygURNDRcx/hMIgR+w2nXgo8fQjOgkv3ZOSwDO1irqxsWEOMo9V+YTK+glvW1q2XRV3JZvyzl3RPiFAWqe429q35BrCDNmxCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747758789; c=relaxed/simple;
-	bh=9iywa8LxDBmIJmnFA0mWiRWkOXXa499m0kRd7LsL7ag=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CILZL6uRGkoJQtJgmsgEQzFq8uqcaPSht9m6viTBcuer1/7wKxtbG9qYZg5sjfcPv7KOZNNZouApUF1gHtoh0IqSOETMhelZq9L8fcaX4rM/7R7P5DA6Qil7KUKf7G8cdwFMuJLX0n+DuK0vC/rnsJyQ/fwae2OvCaCBONnbxTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GA6yiitB; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7399838db7fso5528526b3a.0;
-        Tue, 20 May 2025 09:33:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747758787; x=1748363587; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=N4J9GjT2DkNx9RKMdFilKV2qV6BHNi7N4nhhnVWjxkM=;
-        b=GA6yiitBt6I5Rd95Do5zzbLjzJb0nj7Vw/LFeumfftUIiOVarMigpCicb698VT/wIE
-         2nY37kIUll4gH8JXK61UJqRSWJJNThxW6UF0YskbLHQfs9X6x/42qQ4dMEpixNoLmZrV
-         9vYJrOYfa5g8zR7nFotLguBfDwbcMu2w9qhxJKNv2Be0CxLrViSw3A5rKQlKj0pVcBCo
-         Gy0LE9gzr1UrTXCPSFPdf2RIgT1se1eB1zR0Lh/d/8yMeNHpNjurjoQCmmGsIRIIbasu
-         FaAnt2Hyojdg0yNr9z9KJdJip7VBsVTowzQcbR9jE9idxS+aoC9eH5nJL2bx8eGSghGa
-         27iQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747758787; x=1748363587;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=N4J9GjT2DkNx9RKMdFilKV2qV6BHNi7N4nhhnVWjxkM=;
-        b=hc1zSem6wVrQOJ5pPpI3773fY5VGa64rLso2SvLGpvte9Y+fB42XrSl2Kx43mbD0NU
-         CPDI/Yozcu1d31L+hxU6doxmMFTYLrlu0femnnWcBqxo4ugJpowevBnjj8E0nim1mkDa
-         vkUZ+OT68G9NXo5gehg4aBKnHQlfx3WWOaRez3m5j9y7VSjPIXlQJm87Fqym6G2p5IrH
-         7O128l6+QdSODI5LH+fqKO4fXZvOtTqeiDO+1DF8e0JXkNsINQU9VnNIL2H0AO+IMFhP
-         1LRIcB0shFmOiWsbFFGDZy2unHVk6tB0cIxlOCqPsirsmLXqMN0zA/9xhPv7gL75bMJx
-         7E6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU/z+7dIv9eX5Ng4KFXXXY7sCrSlD/kj1lC0n0qG0+5C6odjKs7Mr8yK/ydVewkrlCZ3Q6sNfpk0iVkgU3wWu3F@vger.kernel.org, AJvYcCV8Ys9VPzPe59MVXldyoa6fGcLAnqk+cR3d/51kkYEI6SsZ5O8Ebf/p9uFXl9/gRhgSohv9yMA6HiJLLScf@vger.kernel.org, AJvYcCWA+GaI7udbxBJQprH4UFfR90R2T2D5zz2jkWapTiI5kENq901ZsJUDWgZkx5jZdLm8Nx4=@vger.kernel.org, AJvYcCWvOcvTyBJrlX6qXlnZSPnlYkXT3TKnLsEzJawhoFltR6f2U7wFNfOAZL+yGPBgPKhPok8rLD7r@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyi3gtW8kxnqdJJetBjFbjA1VRtgR35yH01vpi0J2b9UTpJZlxx
-	52h0+2PnyaqOpAKYSOzVaQxkWmQMk3mH5rUfkcwwQ3IjLaTHoEjytmTW
-X-Gm-Gg: ASbGnctSmvmZWvO+hNL1+29OK/m9RJ5NbwdJY3iLZ7UvHvE9VWH140K5xYNkdfu+m3q
-	66+oisJ3p/6fIMLo49DuZzMaV1gMDz1DzyJ4TAvUtFaJwNp0wvs3+O4Z8uAOYSj+CS5l1c1Piq0
-	Ak3vSCTpNXzoYJHQUasYGuY2ara2f4tir7xYvBwooBLwYXX05SaDiTLJ8m2a0hsc7HsiIMrb+iR
-	ndnMkr5N0RJF3+a9zU+k8mei8cg3XRtE7pyOAma1GRFQ2l3q6jxN2n58oaFaVsd2M53JM/pd7kT
-	1PR8/PtxjTvPqEttUeIsvlSViV1RjHPhnI3LLuS1Pw/ZV7pFq0smrPXPbGpvMrBCtMMa5bY=
-X-Google-Smtp-Source: AGHT+IFFEtELJ7CNY/gj67X7KGAeNhJCZbOLnPiYWwQ92Z9dI1v88DKGl6Pdba0V9ObimC+EYXJnbQ==
-X-Received: by 2002:a05:6a20:12c3:b0:1f3:3547:f21b with SMTP id adf61e73a8af0-2165f641cf3mr29465576637.5.1747758787474;
-        Tue, 20 May 2025 09:33:07 -0700 (PDT)
-Received: from devbig793.prn5.facebook.com ([2a03:2880:ff:3::])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b26eb081aa2sm8256782a12.48.2025.05.20.09.33.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 May 2025 09:33:06 -0700 (PDT)
-Date: Tue, 20 May 2025 09:33:05 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v7] selftests/vsock: add initial vmtest.sh for
- vsock
-Message-ID: <aCyuwa8x9ClTOM+Z@devbig793.prn5.facebook.com>
-References: <20250515-vsock-vmtest-v7-1-ba6fa86d6c2c@gmail.com>
- <f7dpfvsdupcf4iucmmit2xzgwk53ial6mcl445uxocizw6iow5@rhmh6m2qd3zu>
- <73a4740e-755e-4ba8-8130-df09bd25197a@redhat.com>
- <w6aizeb2i5m52e2ifqcikgwdbrkkbc46sf4hx5b6jsm7o4drio@n3dzlatb426s>
+	s=arc-20240116; t=1747758863; c=relaxed/simple;
+	bh=kcNk7MBO5q7xGKOh5IEK9yhJsUZMeD3VDy5eD2t4KUU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UNQps9isyWD9vFDUCbU4QNouh7l7YSTVUMk2+Obkd1vnREE64Evt2eEAG6XFnJzzORpgkas9Iv1QQPdlPilx/86iZIPpfgaZsn3EpHqnM6pAXQRXlC3yO/e9v+qK9BU+jGVeNMq9IeIElaVbIhB+IwANRnlf9yiEiOxQ9K/s0ms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FejLLnkT; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 51A3C43288;
+	Tue, 20 May 2025 16:34:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1747758858;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=W3fNTYLC6c1oFNfyxnG5Eu5y1LoT4/wA09vkRV/0dEM=;
+	b=FejLLnkT6xgA3QeehEFmcfzk0U8jDnpoJqN9N6PjU8s5+lYOy6Kvg8F/bNj2GTfkO8JMLt
+	fj6VzdPy9vp8h4f7VFFNo7UKw6Z7hxp1KoCBKmzbdevmC2TbEpoiGYUJ3VqDf4mEp61se5
+	kOZRfhDAPoJHOHDWirTsSNLLkagPCNYBYCVfLXRatZc/rHAWPG9PRKV8LULpZuqBpkYfhm
+	xjGUbaAZ5dmlEwZIo6KiDtCny+GMiK4PJiGGZ1IOFnIoDn8VREY2K+YqSeFesiMCiu1VbT
+	Rjp2bfZuTOfmjpmTbpYcZdyqjFFKC1VGCB7Iry/DKJwHXhfUvjHfoF44Vy0NAA==
+Date: Tue, 20 May 2025 18:34:16 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ donald.hunter@gmail.com, jacob.e.keller@intel.com, sdf@fomichev.me,
+ jstancek@redhat.com
+Subject: Re: [PATCH net-next v2 10/12] tools: ynl: enable codegen for TC
+Message-ID: <20250520183416.5b720968@kmaincent-XPS-13-7390>
+In-Reply-To: <20250520161916.413298-11-kuba@kernel.org>
+References: <20250520161916.413298-1-kuba@kernel.org>
+	<20250520161916.413298-11-kuba@kernel.org>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <w6aizeb2i5m52e2ifqcikgwdbrkkbc46sf4hx5b6jsm7o4drio@n3dzlatb426s>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: 0
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgdejtdculddtuddrgeefvddrtddtmdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhephfduveekuedtvdeiffduleetvdegteetveetvdelteehhfeuhfegvdeuuedtleegnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghdpsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduvddprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepp
+ hgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepughonhgrlhgurdhhuhhnthgvrhesghhmrghilhdrtghomh
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Tue, May 20, 2025 at 01:09:25PM +0200, Stefano Garzarella wrote:
-> On Tue, May 20, 2025 at 12:58:18PM +0200, Paolo Abeni wrote:
-> > On 5/20/25 10:24 AM, Stefano Garzarella wrote:
-> > 
-> > Still it could be worthy to re-introduce (behind a command line option)
-> > the ability to build the kernel as per Stefano request, to fit his
-> > existing workflow (sorry for the partial back and forth).
-> 
-> If that's possible, I'd appreciate it (not a strong opinion). Otherwise if
-> we don't, I'd say take the use of the direct script out of the commit
-> messaging, because to me it's confusing if we don't plan to use it without
-> the selftest infrastructure.
-> 
-> Thanks,
-> Stefano
-> 
+On Tue, 20 May 2025 09:19:14 -0700
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-No problem at all to add it back in. It's a nice feature to have for dev
-workflows too.
+> We are ready to support most of TC. Enable C code gen.
+>=20
+> Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> v2:
+>  - add more headers to the local includes to build on Ubuntu 22.04
+> v1: https://lore.kernel.org/20250517001318.285800-10-kuba@kernel.org
+> ---
 
-Best,
-Bobby
+Now got this build error:
+
+-e 	GEN tc-user.c
+-e 	GEN tc-user.h
+-e 	GEN_RST tc.rst
+-e 	CC tc-user.o
+In file included from <command-line>:
+./../../../../include/uapi//linux/pkt_cls.h:250:9: error: expected specifie=
+r-qualifier-list before =E2=80=98__struct_group=E2=80=99
+  250 |         __struct_group(tc_u32_sel_hdr, hdr, /* no attrs */,
+      |         ^~~~~~~~~~~~~~
+tc-user.c: In function =E2=80=98tc_u32_attrs_parse=E2=80=99:
+tc-user.c:9086:33: warning: comparison is always false due to limited range=
+ of data type [-Wtype-limits]
+ 9086 |                         if (len < sizeof(struct tc_u32_sel))
+      |                                 ^
+make[1]: *** [Makefile:52: tc-user.o] Error 1
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
