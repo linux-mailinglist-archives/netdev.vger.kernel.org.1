@@ -1,155 +1,161 @@
-Return-Path: <netdev+bounces-192058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A21DAABE6CE
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 00:19:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEAFDABE6FA
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 00:31:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F32D28A0546
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 22:18:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E899E1BA76D5
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 22:31:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D97246769;
-	Tue, 20 May 2025 22:19:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0247A1F875C;
+	Tue, 20 May 2025 22:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Nqzk9IHX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c8JF6yMZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79172171D2
-	for <netdev@vger.kernel.org>; Tue, 20 May 2025 22:19:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCF95D515;
+	Tue, 20 May 2025 22:31:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747779551; cv=none; b=gKT7rPfl4dG8H8qZv0kUQ65/0p8EuQ1ZrN8rkYBtVjTdRr157hFZsCrOnE6feV9xxSkGuqvCyy0in7RR9pvFXk9cEuQNH6PENAiU4fwQIlHNt0R3xfEQIYgElQBZJSLYLCtVGmZEsFCZm1vSVbMWdEF0g21KmNwsUm3K+Dvr6YQ=
+	t=1747780271; cv=none; b=X/IZoAeyVCrl6akyWrzRjimPKQNm0B4dGfrKsSFnJUabSq13f25El06FcCU48CJ4OR47xUqow+k+nttjnRes4gQdmLmKWQbjFTtoygaDAjw9hJVhEqOfObkqco0sqOHD9jXsZOMSvklv7GXr2EFtS2sI1u4CdgLy1HVk/sYitNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747779551; c=relaxed/simple;
-	bh=zZ3dMFhzEwUmlj6GDS4VfT/nsqtJbGAw6nColxOnEpg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kJ5+HIsEcLZzK4TZ1cv47nh0y3pVJ++7bILPFWTTpW1rLrV7YWl+tXeU+ELYWqJ9RHVjZtoX9qA0VKjDAY1TV23+rB57urnaqZuOx5BaOeeNgLO+RzUFZKhmq7WugYgDBW1/w0o7Zp2qrhTRfrSkw2dNXRJ0P5NtHi+YRrGwWws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Nqzk9IHX; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <0364f8d2-9aa5-4dc0-b7f6-1c8572932814@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1747779546;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XKb0gnOHlciTS6MFRPmrAwCVe1IGdy183kVWTGpCTUs=;
-	b=Nqzk9IHXZ5wcLJAOB7SOOqfQafxl5qrD4y2BeetsNgMI/EXHN5JOjKMaw+0lPa3ketk7gm
-	3hABdTtpen4ekkqXZvQUtmchddXoO0jBUh4t9YJgWVvCGxnaUXp+CdXHW9zvLMGOK9d2qq
-	ND3cQKueCyAxyY2WH4zTrTHcryUR/qg=
-Date: Tue, 20 May 2025 15:18:52 -0700
+	s=arc-20240116; t=1747780271; c=relaxed/simple;
+	bh=V5uf6YlgPTr2U418QetNaAAYXDxQz7VW/iPHa55aWbE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Yt/pXzyxfjS+M9m3ozkDBwFgx5emZmNEk/H970QAv51hYhsESx7u1QAKALYM7G5Gfl9jc1Fmrd0G2PIdXaQQbQYnKY/Alk7LK0D5uR33dkGMRufAlvdM1jbPcQt/1CfQvD9l+cOq82xrjkN+2boH8t82L/PL2k1BqaQSzZhL0pE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c8JF6yMZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8971C4CEE9;
+	Tue, 20 May 2025 22:31:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747780271;
+	bh=V5uf6YlgPTr2U418QetNaAAYXDxQz7VW/iPHa55aWbE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=c8JF6yMZ2CfkNKv+fj/emGvRG+4AyBoiThhjNe5giOiqWyOZw3S7kTIX/1n0SD9Jj
+	 suGB+ONLcSBgGXRUppLShhfbiSMiz01dT9hURbyiqqUgl9uZIL9h5Qb1w5mz9fq2g3
+	 +3KDq2sAocKLZIJ+6qf0tJKmZvhm5Ld//TaXafA9rqLXQ0D01Gikn2kmFDNEFisM35
+	 hYRp9zZ9CfpjFon3LCztZHDMjSgmV62M8vHILqeu31B7msusbLOVZEM7R0MiAGCaAv
+	 doSIfmG9RO12LRHELfyIyHykmNE5dHzqAAGdqhZvqPBN5eiLTNrMtO52XzsHkdfs9B
+	 5R1K5BHNnA5CA==
+From: Kees Cook <kees@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: Kees Cook <kees@kernel.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Mike Christie <michael.christie@oracle.com>,
+	Max Gurtovoy <mgurtovoy@nvidia.com>,
+	Maurizio Lombardi <mlombard@redhat.com>,
+	Dmitry Bogdanov <d.bogdanov@yadro.com>,
+	Mingzhe Zou <mingzhe.zou@easystack.cn>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Simon Horman <horms@kernel.org>,
+	"Dr. David Alan Gilbert" <linux@treblig.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Cosmin Ratiu <cratiu@nvidia.com>,
+	Lei Yang <leiyang@redhat.com>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Samuel Mendoza-Jonas <sam@mendozajonas.com>,
+	Paul Fertser <fercerpav@gmail.com>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Hayes Wang <hayeswang@realtek.com>,
+	Douglas Anderson <dianders@chromium.org>,
+	Grant Grundler <grundler@chromium.org>,
+	Jay Vosburgh <jv@jvosburgh.net>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Eric Biggers <ebiggers@google.com>,
+	Milan Broz <gmazyland@gmail.com>,
+	Philipp Hahn <phahn-oss@avm.de>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Xiao Liang <shaw.leon@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-scsi@vger.kernel.org,
+	target-devel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-wpan@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH 0/7] net: Convert dev_set_mac_address() to struct sockaddr_storage
+Date: Tue, 20 May 2025 15:30:59 -0700
+Message-Id: <20250520222452.work.063-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next/net v3 4/5] selftests/bpf: Add mptcp_subflow
- bpf_iter subtest
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20250320-bpf-next-net-mptcp-bpf_iter-subflows-v3-0-9abd22c2a7fd@kernel.org>
- <20250320-bpf-next-net-mptcp-bpf_iter-subflows-v3-4-9abd22c2a7fd@kernel.org>
- <98348a02-9f8b-4648-8abe-e6b802ae9a63@linux.dev>
- <1621611c-8cf1-4281-986f-cfd8cc0e70f0@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <1621611c-8cf1-4281-986f-cfd8cc0e70f0@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2018; i=kees@kernel.org; h=from:subject:message-id; bh=V5uf6YlgPTr2U418QetNaAAYXDxQz7VW/iPHa55aWbE=; b=owGbwMvMwCVmps19z/KJym7G02pJDBm6TCseuGUb11+RCOzXO7lCOWzlOiOBrx4L36js6ygWL q07/N2go5SFQYyLQVZMkSXIzj3OxeNte7j7XEWYOaxMIEMYuDgFYCKzBRgZ/tQsZlVS1pRfEbvj 8Caz4t6e8B9HuKfWHNo4c+GV9lVGrxj+WV4zLXjF52Tya+X2me5K9ydwBjwu97i7/jWv+FeeaQG 6zAA=
+X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-On 5/19/25 3:04 AM, Matthieu Baerts wrote:
->>> +SEC("cgroup/getsockopt")
->>> +int iters_subflow(struct bpf_sockopt *ctx)
->>> +{
->>> +    struct mptcp_subflow_context *subflow;
->>> +    struct bpf_sock *sk = ctx->sk;
->>> +    struct sock *ssk = NULL;
->>> +    struct mptcp_sock *msk;
->>> +    int local_ids = 0;
->>> +
->>> +    if (ctx->level != SOL_TCP || ctx->optname != TCP_IS_MPTCP)
->>> +        return 1;
->>> +
->>> +    msk = bpf_core_cast(sk, struct mptcp_sock);
->>> +    if (!msk || msk->pm.server_side || !msk->pm.subflows)
->>> +        return 1;
->>> +
->>> +    bpf_for_each(mptcp_subflow, subflow, (struct sock *)sk) {
->>> +        /* Here MPTCP-specific packet scheduler kfunc can be called:
->>> +         * this test is not doing anything really useful, only to
->>
->> Lets fold the bpf_iter_mptcp_subflow addition into the future
->> "mptcp_sched_ops" set (the github link that you mentioned in patch 2).
->> Post them as one set to have a more practical example.
-> 
-> Thank you for this suggestion. We can delay that if needed.
-> 
-> Note that we have two struct_ops in preparation: mptcp_sched_ops and
-> mptcp_pm_ops. We don't know which one will be ready first. They are both
-> "blocked" by internal API modifications we would like to do to ease the
-> maintenance later before "exposing" such API's via BPF. That's why we
-> suggested to upstream this common part first as it is ready. But we can
-> of course wait if you prefer.
+Hi,
 
-This set is useful for discussing the questions you raised in patch 2.
+As part of the effort to allow the compiler to reason about object sizes,
+we need to deal with the problematic variably sized struct sockaddr,
+which has no internal runtime size tracking. In much of the network
+stack the use of struct sockaddr_storage has been adopted. Continue the
+transition toward this for more of the internal APIs. Specifically:
 
-I still don't see it useful to upstream patch 2 alone. The existing 
-selftests/bpf/progs/mptcp_subflow.c has already shown a way to do similar 
-iteration in SEC("cgroup/getsockopt") without patch 2.
+- inet_addr_is_any()
+- netif_set_mac_address()
+- dev_set_mac_address()
 
-I would prefer to wait for a fuller picture on the main struct_ops use case 
-first to ensure that we didn't overlook things. iiuc, improving the iteration in 
-SEC("cgroup/getsockopt") is not the main objective.
+Only 3 callers of dev_set_mac_address() needed adjustment; all others
+were already using struct sockaddr_storage internally.
 
-> 
->>> +         * verify the iteration works.
->>> +         */
->>> +
->>> +        local_ids += subflow->subflow_id;
->>> +
->>> +        /* only to check the following helper works */
->>> +        ssk = mptcp_subflow_tcp_sock(subflow);
->>> +    }
->>> +
->>> +    if (!ssk)
->>> +        goto out;
->>> +
->>> +    /* assert: if not OK, something wrong on the kernel side */
->>> +    if (ssk->sk_dport != ((struct sock *)msk)->sk_dport)
->>> +        goto out;
->>> +
->>> +    /* only to check the following kfunc works */
->>> +    subflow = bpf_mptcp_subflow_ctx(ssk);
->>
->> bpf_core_cast should be as good instead of adding a new
->> bpf_mptcp_subflow_ctx() kfunc, so patch 1 should not be needed.
-> 
-> OK, indeed, in this series we don't need it. We will need it later to
-> modify some fields from the "subflow" structure directly. We can do the
+-Kees
 
-The "ssk" here is not a trusted pointer. Note that in patch 1, the kfunc 
-bpf_mptcp_subflow_ctx() does not specify KF_TRUSTED_ARGS. I suspect it should be 
-KF_TRUSTED_ARGS based on what you described here.
+Kees Cook (7):
+  net: core: Convert inet_addr_is_any() to sockaddr_storage
+  net: core: Switch netif_set_mac_address() to struct sockaddr_storage
+  net/ncsi: Use struct sockaddr_storage for pending_mac
+  ieee802154: Use struct sockaddr_storage with dev_set_mac_address()
+  net: usb: r8152: Convert to use struct sockaddr_storage internally
+  net: core: Convert dev_set_mac_address() to struct sockaddr_storage
+  rtnetlink: do_setlink: Use struct sockaddr_storage
 
+ include/linux/inet.h                |  2 +-
+ include/linux/netdevice.h           |  4 +--
+ net/ncsi/internal.h                 |  2 +-
+ drivers/net/bonding/bond_alb.c      |  8 ++---
+ drivers/net/bonding/bond_main.c     | 10 +++---
+ drivers/net/hyperv/netvsc_drv.c     |  6 ++--
+ drivers/net/macvlan.c               | 10 +++---
+ drivers/net/team/team_core.c        |  2 +-
+ drivers/net/usb/r8152.c             | 52 +++++++++++++++--------------
+ drivers/nvme/target/rdma.c          |  2 +-
+ drivers/nvme/target/tcp.c           |  2 +-
+ drivers/target/iscsi/iscsi_target.c |  2 +-
+ net/core/dev.c                      | 11 +++---
+ net/core/dev_api.c                  |  6 ++--
+ net/core/rtnetlink.c                | 19 +++--------
+ net/core/utils.c                    |  8 ++---
+ net/ieee802154/nl-phy.c             |  6 ++--
+ net/ncsi/ncsi-rsp.c                 | 18 +++++-----
+ 18 files changed, 79 insertions(+), 91 deletions(-)
+
+-- 
+2.34.1
 
 
