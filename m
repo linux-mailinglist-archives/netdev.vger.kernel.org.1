@@ -1,333 +1,279 @@
-Return-Path: <netdev+bounces-191691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191692-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87F38ABCC75
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 03:52:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAC45ABCC96
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 04:04:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D78A417F229
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 01:52:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D9CE7A4C48
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 02:03:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8AC2253F35;
-	Tue, 20 May 2025 01:52:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 116E82561C5;
+	Tue, 20 May 2025 02:04:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MehRgb68"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YH/fteTS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBDBF21ADA9;
-	Tue, 20 May 2025 01:52:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42DF41DC9A3;
+	Tue, 20 May 2025 02:04:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747705955; cv=none; b=nsyccv0ua216UmoCW/A6lW6/58mjf8nk+lW7z1BGfXKjNW6K3Va3+9jcYK5nmaifITBfbEKbh07C3vJnOI69jn9xzNsK/ZjtyVHz294MjF60EzqIRHhlLi9jg9g+ErgEH7aRv3CXwWQj4RNSBihtMu3unHn38+ikNxF/UVeuM7E=
+	t=1747706653; cv=none; b=MRkvMPoaEBuJ7L6EYoQ7pdIma7USInxdxt5c+Tmho9EL3IUGrEasUkfDOCYUr/4VuT8/iRvRRl/MqWUzkYAzXrxjZskNkshCJBE5q9rBZLWNOuuIomU53SR5dhE3ftSIX689GA6WQklZwrnhWa8dB1dlDCQzjy8TIpbpGHfUrBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747705955; c=relaxed/simple;
-	bh=hq7tG6InQiMtDLFIKCTHEe2KHxUYZrzTpjLuQAf3PBY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CxzGTer1Na/sbq7HdANsTO5BqK9CK6Yg9RQwUrUqqY1KOpMtHQt5cba1vYUiIt/8S+oVizk9dNdDIRiFZgQxsQPvFRzFB7UWAvxefbK+Yd8gJY/coYzjqH68e7r0TWRuegPuww4EBNZIexWN95CPKjS5w2eDhHKt1HddHLmYa9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MehRgb68; arc=none smtp.client-ip=209.85.208.44
+	s=arc-20240116; t=1747706653; c=relaxed/simple;
+	bh=eZevjrBJDQd84ux4Hn0Tssg/hRPdrOsP77nOURTRkoo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eMmh9FaOsKDQdx63P3OAOXYN5EiYsTARX7hg0u9NeDNdKoH6alPCrMAU/gQJwYc8oAEtrT3kGzuutfF2lnqDjquxlx+V4btDCxhlVxUDL1d3aMzrGJRtSbkqshhf8E/etQlfndjesqdQllvyPc4COceTa0TSJjzZxQeDxVrjTAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YH/fteTS; arc=none smtp.client-ip=209.85.215.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-600210e4219so7516512a12.0;
-        Mon, 19 May 2025 18:52:33 -0700 (PDT)
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-b26f01c638fso3481784a12.1;
+        Mon, 19 May 2025 19:04:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747705952; x=1748310752; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mT7APD0PPLceAEMsL11QVrKRuvd0HX5iowg9HBwBVQA=;
-        b=MehRgb68MuMVtsnx5n5tfXhIHFPI2l1DZnT5siTAFbhAI6hfbAKlM7YYvwqcULvAy5
-         PQNoKUrxpOtyT6RIp39QfLrZdJ0slgR+epbCs+teLSNYFcx/Y8jRsIi59q9ijFhhzzjL
-         xwC99a4u869nUcZ8iFTEo9OB6y8s7QGNtVjMxl0+i2OkEsD7rJDliOgFUFtD6CMQB3bV
-         T03caZzOXHoL1v9iho6e86UNKwX9ozT/x8DyGcE5D0CaHCf5uD5VoSuqMbIfWHdT6hKl
-         iiHWUrMKKTqnKUd2NPpolBXCxkgM/ykBgZtxyy24UDgF5FYvalorEkSKm5jASQwxo1fw
-         M/QQ==
+        d=gmail.com; s=20230601; t=1747706650; x=1748311450; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RHhCVuI9jfUfhhUD36lWqRN5JsHeOM1NCpeDQ6ZpDpQ=;
+        b=YH/fteTSJD/2LIVshKu/BOibn8pC/aPFm9QR+xx7SUrVw3OV5hcYni8N3lAp46rTmO
+         73KnbILWPlPtsxextpRrGyoWgXEiwof63dmdhx3aC1wxQtBVHarE31ryAIbS+3nIk44r
+         O4gyk1qrOUxExcpjF6qXgpF6LYZ5xBqYXSJzslGtqlbN1ukM6IyhZkqVRAGfGK1RKf2j
+         z3h6o8nU/RHwQ72QLWyoZWqu86rvXgGKfE9fJ5xp7Ic288oRYvoXCD81hUvY51Lt6g5e
+         XDXixAp2nPahK/5pEgJuBwsB58Q+5D3RUkYa3e1+ja5P2IEK+eUtHDxrribAnquFxi2j
+         PYEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747705952; x=1748310752;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mT7APD0PPLceAEMsL11QVrKRuvd0HX5iowg9HBwBVQA=;
-        b=ReVQlUNKwCfAaBOnPoMvxGPFImtOahxtbblmhVGoNg3DtLmWPracMOlaP8pX+nlgw6
-         z3FwXeVYhBPyjHiynFONwmMbmysUvGIO7K78s5iCiPJaRPI+0NoC52kF9n7Gq5/OxNIT
-         qHqZ9xL75NqcEmHidzE0uvoINkRYEGFfz57ipMwjJ8EmNCW4yiRKWeXzsB3ddPBuwQ+q
-         9lSBDikzra86b1jc7DXXSiC16fQPad4B2PBWmuURLSGY8fHGMc3fMTXrbZVY+3DhdL7p
-         PplCUjkD6tcJhMCQ205aHY0LeAXC7fYM2/6SpTS/ly/dUumCGAWURlQ3C3fOhm0v0+kF
-         GeBA==
-X-Forwarded-Encrypted: i=1; AJvYcCV+xarS9Wgc7CJaLmPh2GDJtOXpPB4oXsrrw4FiD/R8iFToCX6qAD3MW7ZSzcL4xy4ItHrqEsFkTIk=@vger.kernel.org, AJvYcCVXyPK4K/NPkBWqitCAU44rhutIWuJpIO7P02PEbPMyl/5sV2yClhH9ACUBKXA5V4OO2wPHQXED@vger.kernel.org
-X-Gm-Message-State: AOJu0YwscnkY78NU8Lf9gA3LxUnwZi+YoIDe02UkJ8LtKyeP06Tp8a8+
-	lWkKhcYBdRjP/NjA2VdgdihuXL+AjTlztGBxzxOi9T7A1NZKmxpUI3RP2Y0rw9eHABqcSJpMaK9
-	MuQiEdTgAJlLaNq7gLB3gQQ0kpY2qlygFpEwUWN8=
-X-Gm-Gg: ASbGncs7rGPYOLHBZ2/9oLO/au8pFk5ShVwGp5yySDpEaia1K2Jzz20d8LTal40u40P
-	A4koe14MrT/UbIXTFAp0mSeY2oGjAgPVlNY8a8K5B5ZqNaLgoQXQwtKnGCSIw8aA2HQcsFHwQ0k
-	edsgrKHjUteRS+7BuBa74RPAWpqsRu0+JQKjc=
-X-Google-Smtp-Source: AGHT+IEZH7FDonKk41E9BCvtsQCjU48p1JLXnrB8RAk7TOAQPce97ykfJUP/PGKpomrSZ+qQmamKM5MlAGvYKqxcKek=
-X-Received: by 2002:a17:907:7e9a:b0:ad5:1d0c:1b90 with SMTP id
- a640c23a62f3a-ad52f321ba1mr1333541766b.11.1747705951614; Mon, 19 May 2025
- 18:52:31 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1747706650; x=1748311450;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RHhCVuI9jfUfhhUD36lWqRN5JsHeOM1NCpeDQ6ZpDpQ=;
+        b=LqZIYaAzQZIHm1kqmldJt7OIIJwsxm4nInggkIugz2MzTZbb0SWfH1g5X9aRuVXuHO
+         CtcTFwYU2t/bTIvzFkNsFUVeq1uZUXS9bLSWeessO4paKp3xFbQlrW49MWLULbOf5mTw
+         1UqyY/xnI+/WucrNJdnEclvfuOCgd5dOmN5mSAjdygt1jHL9e5y0hWzenyFCeoDJIvkq
+         +YTHkPLuE8j6dyAx/KibYPGrQ+wGvywjCQ4ulZ+yA3v2d4xVLlNdtFLPcvZFmtj3PikC
+         W7uyB+dIExhlqkwecSqnioWEEuByoB06RXmbR9rml7pioRFKKt5Pzl9XdBHiQay1fraX
+         RFsA==
+X-Forwarded-Encrypted: i=1; AJvYcCUbKi8hTwJ/OR86vU3xv2zhcAYlOVfKsogpyrIvRV1yT/ebU24lFSMVjM+5YDvL02oqb88u6DfI+oQ=@vger.kernel.org, AJvYcCUbwkhL2BIm5pm9mferv+dPVvUY+Nz1N+9zBmN0Zq4jzMSJQbYhUSfeFUMHXADJztH+mrq5fYbh@vger.kernel.org, AJvYcCUfjRUFS653UbPnfc2eKiCWtJoztWcWjEs5Kd/pDtAoOf42NgFEj8o+LNPCVSWjIHG7Km0QkeXXlUaQ@vger.kernel.org, AJvYcCV1rqFnCk+tPsDrIpiP/qFc8VUyLepKLyI945IS+LoHmBiQrnswOkvxnUAHv6hCeWBw2WxRcXjdnsSPyg==@vger.kernel.org, AJvYcCVQ9GeA63u+VsoEGfuqFKgZ/mtRWA42SEdr4R8W+jcAM5NGSnHNGi/XvvGOUU59y8zrVLdI/KgBXsRJq9o=@vger.kernel.org, AJvYcCVXzJaX37Sv0Qws4VSALOhWLyzyy/5nk/wsnaamYPfJ5pZzbet4CsK0/yso42Jq8rUGb87+9nm8F2Sc@vger.kernel.org, AJvYcCVkOIyy8lcURSJVIOy17w3pYyeXTWLd3dhE83CubjZ3/TrUPiX6GMUgDLHXdPWxZCLbBOFFeg5Ffsq7@vger.kernel.org, AJvYcCWFlVw6Ofrcr4DmqOMtgjKhXMU67bcLSolu1/Eiu5RUKWufg0CTG29ujlNtZ+5b4Gb5o1bs9ZP+uC7ThzLlNDw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXqtzE2PsxdA3VJzQ1f8JqEb9W9sJDjvUkgOBfaVGWdC1YlrTQ
+	EmTeIrtZvAT1Lgu7j2mHwz0VkD+Yt8os8wKLnNK+OEYLBcpW0CI8uKj5
+X-Gm-Gg: ASbGncsQp4zh9CZD0g2Ike0VjuYTiq2qL/z/NAaCGBxD3+4gaY0e8S76H5pPd9A5z1W
+	Jl4y3V0cIH6072MFCpIIBXOs9UdWIRZ1ks0IdBc7XvNVCfhN7FDk/5dz6OAvG3nboOaqLdsSj0N
+	yRyNa2SFVJL1cPl1sh0nIGIYIl+XrTdmktAhN+DFqn70xqTzu2MqESbboXKS0A38W0p9+fnjJkI
+	Jw3KTrE8j1qroSCC36FzF/I5zG/2G9CH2a5Ob7OUvifgXbfO3NJVga+0GRf0JJSQgO7XltB6bTg
+	EYzjH0daadrrqy6RWQNSwGhPTjbu5PktPPVPUy7Y6V2fttR8PT3BXuAyoTwDYRzx0S6cmbvw1Oa
+	hbqnVXhdRagNqJebn6kjgCFUV
+X-Google-Smtp-Source: AGHT+IHmvL20VOsrYUkJJnx0emX68OO0uubs/euN6jS0aBRwShJx/pvE5WZTxmq6zBIHRTSrcJQstA==
+X-Received: by 2002:a17:903:acb:b0:21d:dfae:300c with SMTP id d9443c01a7336-231d438b4cfmr192393265ad.3.1747706650362;
+        Mon, 19 May 2025 19:04:10 -0700 (PDT)
+Received: from hcdev-d520mt2.. (60-250-196-139.hinet-ip.hinet.net. [60.250.196.139])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-231d4ac9fc8sm66543855ad.27.2025.05.19.19.04.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 May 2025 19:04:09 -0700 (PDT)
+From: a0282524688@gmail.com
+X-Google-Original-From: tmyu0@nuvoton.com
+To: lee@kernel.org,
+	linus.walleij@linaro.org,
+	brgl@bgdev.pl,
+	andi.shyti@kernel.org,
+	mkl@pengutronix.de,
+	mailhol.vincent@wanadoo.fr,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	wim@linux-watchdog.org,
+	linux@roeck-us.net,
+	jdelvare@suse.com,
+	alexandre.belloni@bootlin.com
+Cc: linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	linux-i2c@vger.kernel.org,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-watchdog@vger.kernel.org,
+	linux-hwmon@vger.kernel.org,
+	linux-rtc@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	Ming Yu <tmyu0@nuvoton.com>
+Subject: [PATCH v11 0/7] Add Nuvoton NCT6694 MFD drivers
+Date: Tue, 20 May 2025 10:03:48 +0800
+Message-Id: <20250520020355.3885597-1-tmyu0@nuvoton.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250519103203.17255-1-djduanjiong@gmail.com> <aef5ec1d-c62f-9a1c-c6f3-c3e275494234@ssi.bg>
-In-Reply-To: <aef5ec1d-c62f-9a1c-c6f3-c3e275494234@ssi.bg>
-From: Duan Jiong <djduanjiong@gmail.com>
-Date: Tue, 20 May 2025 09:52:19 +0800
-X-Gm-Features: AX0GCFvmVIbUuVZBDlwxsinqEMdQzBM2Guin-Bkgk50Hstn0rBGV2TwiA7wFJn4
-Message-ID: <CALttK1Sn=D4x81NpEq1ELHoXnEaiMboYBzYeOUX8qKHzDDxk0A@mail.gmail.com>
-Subject: Re: [PATCH] ipvs: skip ipvs snat processing when packet dst is not vip
-To: Julian Anastasov <ja@ssi.bg>
-Cc: pablo@netfilter.org, netdev@vger.kernel.org, lvs-devel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, May 20, 2025 at 4:11=E2=80=AFAM Julian Anastasov <ja@ssi.bg> wrote:
->
->
->         Hello,
->
->         Adding lvs-devel@ to CC...
->
-> On Mon, 19 May 2025, Duan Jiong wrote:
->
-> > Now suppose there are two net namespaces, one is the server and
-> > its ip is 192.168.99.4, the other is the client and its ip
-> > is 192.168.99.5, and the other is configured with ipvs vip
-> > 192.168.99.6 in the host net namespace, configuring ipvs with
-> > the backend 192.168.99.5.
-> >
-> > Also configure
-> > iptables -t nat -A POSTROUTING -p TCP -j MASQUERADE
-> > to avoid packet loss when accessing with the specified
-> > source port.
->
->         May be I don't quite understand why the MASQUERADE
-> rule is used...
+From: Ming Yu <tmyu0@nuvoton.com>
 
-If nat is not configured, __nf_conntrack_confirm drops packets due to
-tuple conflicts.
+This patch series introduces support for Nuvoton NCT6694, a peripheral
+expander based on USB interface. It models the chip as an MFD driver
+(1/7), GPIO driver(2/7), I2C Adapter driver(3/7), CANfd driver(4/7),
+WDT driver(5/7), HWMON driver(6/7), and RTC driver(7/7).
 
-I'll post my reproduction method later on.
+The MFD driver implements USB device functionality to issue
+custom-define USB bulk pipe packets for NCT6694. Each child device can
+use the USB functions nct6694_read_msg() and nct6694_write_msg() to issue
+a command. They can also request interrupt that will be called when the
+USB device receives its interrupt pipe.
 
->
-> >
-> > First we use curl --local-port 15280 to specify the source port
-> > to access the vip, after the request is completed again use
-> > curl --local-port 15280 to specify the source port to access
-> > 192.168.99.5, this time the request will always be stuck in
-> > the main.
-> >
-> > The packet sent by the client arrives at the server without
-> > any problem, but ipvs will process the packet back from the
-> > server with the wrong snat for vip, and at this time, since
-> > the client will directly rst after receiving the packet, the
-> > client will be stuck until the vip ct rule on the host
-> > times out.
-> >
-> > Signed-off-by: Duan Jiong <djduanjiong@gmail.com>
-> > ---
-> >  net/netfilter/ipvs/ip_vs_core.c | 8 ++++++++
-> >  1 file changed, 8 insertions(+)
-> >
-> > diff --git a/net/netfilter/ipvs/ip_vs_core.c b/net/netfilter/ipvs/ip_vs=
-_core.c
-> > index c7a8a08b7308..98abe4085a11 100644
-> > --- a/net/netfilter/ipvs/ip_vs_core.c
-> > +++ b/net/netfilter/ipvs/ip_vs_core.c
-> > @@ -1260,6 +1260,8 @@ handle_response(int af, struct sk_buff *skb, stru=
-ct ip_vs_proto_data *pd,
-> >               unsigned int hooknum)
-> >  {
-> >       struct ip_vs_protocol *pp =3D pd->pp;
-> > +     enum ip_conntrack_info ctinfo;
-> > +     struct nf_conn *ct =3D nf_ct_get(skb, &ctinfo);
-> >
-> >       if (IP_VS_FWD_METHOD(cp) !=3D IP_VS_CONN_F_MASQ)
-> >               goto after_nat;
-> > @@ -1270,6 +1272,12 @@ handle_response(int af, struct sk_buff *skb, str=
-uct ip_vs_proto_data *pd,
-> >               goto drop;
-> >
-> >       /* mangle the packet */
-> > +     if (ct !=3D NULL &&
-> > +         hooknum =3D=3D NF_INET_FORWARD &&
-> > +         !ip_vs_addr_equal(af,
-> > +                 &ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple.dst.u3,
-> > +                 &cp->vaddr))
-> > +             return NF_ACCEPT;
->
->         Such check will prevent SNAT for active FTP connections
-> because their original direction is from real server to client.
-> In which case ip_vs_addr_equal will see difference? When
-> Netfilter creates new connection for packet from real server?
-> It does not look good IPVS connection to be DNAT-ed but not
-> SNAT-ed.
->
->         May be you can explain better what IPs/ports are present in
-> the transferred packets.
->
-> >       if (pp->snat_handler &&
-> >           !SNAT_CALL(pp->snat_handler, skb, pp, cp, iph))
-> >               goto drop;
-> > --
-> > 2.32.1 (Apple Git-133)
->
-> Regards
->
-> --
-> Julian Anastasov <ja@ssi.bg>
->
+The following introduces the custom-define USB transactions:
+	nct6694_read_msg - Send bulk-out pipe to write request packet
+			   Receive bulk-in pipe to read response packet
+			   Receive bulk-in pipe to read data packet
+
+	nct6694_write_msg - Send bulk-out pipe to write request packet
+			   Send bulk-out pipe to write data packet
+			   Receive bulk-in pipe to read response packet
+			   Receive bulk-in pipe to read data packet
+
+Changes since version 10:
+- Add change log for each patch
+- Fix mfd_cell to MFD_CELL_NAME() in nct6694.c
+- Implement IDA to allocate id in gpio-nct6694.c, i2c-nct6694.c,
+  nct6694_canfd.c and nct6694_wdt.c
+- Add header <linux/bitfield.h> in nct6694_canfd.c
+- Add support to config tdc in nct6694_canfd.c
+- Add module parameters to configure WDT's timeout and pretimeout value
+  in nct6694_wdt.c
+
+Changes since version 9:
+- Add devm_add_action_or_reset() to dispose irq mapping
+- Add KernelDoc to exported functions in nct6694.c
+
+Changes since version 8:
+- Modify the signed-off-by with my work address
+- Rename all MFD cell names to "nct6694-xxx"
+- Add irq_dispose_mapping() in the error handling path and in the remove
+  function
+- Fix some comments in nct6694.c and in nct6694.h
+- Add module parameters to configure I2C's baudrate in i2c-nct6694.c
+- Rename all function names nct6694_can_xxx to nct6694_canfd_xxx in
+  nct6694_canfd.c
+- Fix nct6694_canfd_handle_state_change() in nct6694_canfd.c
+- Fix nct6694_canfd_start() to configure NBTP and DBTP in nct6694_canfd.c
+- Add can_set_static_ctrlmode() in nct6694_canfd.c
+
+Changes since version 7:
+- Add error handling for devm_mutex_init()
+- Modify the name of the child devices CAN1 and CAN2 to CAN0 and CAN1.
+- Fix multiline comments to net-dev style in nct6694_canfd.c
+
+Changes since version 6:
+- Fix nct6694_can_handle_state_change() in nct6694_canfd.c
+- Fix warnings in nct6694_canfd.c
+- Move the nct6694_can_priv's bec to the end in nct6694_canfd.c
+- Fix warning in nct6694_wdt.c
+- Fix temp_hyst's data type to signed variable in nct6694-hwmon.c
+
+Changes since version 5:
+- Modify the module name and the driver name consistently
+- Fix mfd_cell to MFD_CELL_NAME() and MFD_CELL_BASIC()
+- Drop unnecessary macros in nct6694.c
+- Update private data and drop mutex in nct6694_canfd.c
+- Fix nct6694_can_handle_state_change() in nct6694_canfd.c
+
+Changes since version 4:
+- Modify arguments in read/write function to a pointer to cmd_header
+- Modify all callers that call the read/write function
+- Move the nct6694_canfd.c to drivers/net/can/usb/
+- Fix the missing rx offload function in nct6694_canfd.c
+- Fix warngings in nct6694-hwmon.c
+
+Changes since version 3:
+- Modify array buffer to structure for each drivers
+- Fix defines and comments for each drivers
+- Add header <linux/bits.h> and use BIT macro in nct6694.c and
+  gpio-nct6694.c
+- Modify mutex_init() to devm_mutex_init()
+- Add rx-offload helper in nct6694_canfd.c
+- Drop watchdog_init_timeout() in nct6694_wdt.c
+- Modify the division method to DIV_ROUND_CLOSEST() in nct6694-hwmon.c
+- Drop private mutex and use rtc core lock in rtc-nct6694.c
+- Modify device_set_wakeup_capable() to device_init_wakeup() in
+  rtc-nct6694.c
+
+Changes since version 2:
+- Add MODULE_ALIAS() for each child driver
+- Modify gpio line names be a local variable in gpio-nct6694.c
+- Drop unnecessary platform_get_drvdata() in gpio-nct6694.c
+- Rename each command in nct6694_canfd.c
+- Modify each function name consistently in nct6694_canfd.c
+- Modify the pretimeout validation procedure in nct6694_wdt.c
+- Fix warnings in nct6694-hwmon.c
+
+Changes since version 1:
+- Implement IRQ domain to handle IRQ demux in nct6694.c
+- Modify USB_DEVICE to USB_DEVICE_AND_INTERFACE_INFO API in nct6694.c
+- Add each driver's command structure
+- Fix USB functions in nct6694.c
+- Fix platform driver registration in each child driver
+- Sort each driver's header files alphabetically
+- Drop unnecessary header in gpio-nct6694.c
+- Add gpio line names in gpio-nct6694.c
+- Fix errors and warnings in nct6694_canfd.c
+- Fix TX-flow control in nct6694_canfd.c
+- Fix warnings in nct6694_wdt.c
+- Drop unnecessary logs in nct6694_wdt.c
+- Modify start() function to setup device in nct6694_wdt.c
+- Add voltage sensors functionality in nct6694-hwmon.c
+- Add temperature sensors functionality in nct6694-hwmon.c
+- Fix overwrite error return values in nct6694-hwmon.c
+- Add write value limitation for each write() function in nct6694-hwmon.c
+- Drop unnecessary logs in rtc-nct6694.c
+- Fix overwrite error return values in rtc-nct6694.c
+- Modify to use dev_err_probe API in rtc-nct6694.c
 
 
-1.  setup environment
+Ming Yu (7):
+  mfd: Add core driver for Nuvoton NCT6694
+  gpio: Add Nuvoton NCT6694 GPIO support
+  i2c: Add Nuvoton NCT6694 I2C support
+  can: Add Nuvoton NCT6694 CANFD support
+  watchdog: Add Nuvoton NCT6694 WDT support
+  hwmon: Add Nuvoton NCT6694 HWMON support
+  rtc: Add Nuvoton NCT6694 RTC support
 
-[root@centos9s vagrant]# cat setup.sh
-#!/bin/bash
+ MAINTAINERS                         |  12 +
+ drivers/gpio/Kconfig                |  12 +
+ drivers/gpio/Makefile               |   1 +
+ drivers/gpio/gpio-nct6694.c         | 496 +++++++++++++++
+ drivers/hwmon/Kconfig               |  10 +
+ drivers/hwmon/Makefile              |   1 +
+ drivers/hwmon/nct6694-hwmon.c       | 949 ++++++++++++++++++++++++++++
+ drivers/i2c/busses/Kconfig          |  10 +
+ drivers/i2c/busses/Makefile         |   1 +
+ drivers/i2c/busses/i2c-nct6694.c    | 193 ++++++
+ drivers/mfd/Kconfig                 |  15 +
+ drivers/mfd/Makefile                |   2 +
+ drivers/mfd/nct6694.c               | 387 ++++++++++++
+ drivers/net/can/usb/Kconfig         |  11 +
+ drivers/net/can/usb/Makefile        |   1 +
+ drivers/net/can/usb/nct6694_canfd.c | 837 ++++++++++++++++++++++++
+ drivers/rtc/Kconfig                 |  10 +
+ drivers/rtc/Makefile                |   1 +
+ drivers/rtc/rtc-nct6694.c           | 297 +++++++++
+ drivers/watchdog/Kconfig            |  11 +
+ drivers/watchdog/Makefile           |   1 +
+ drivers/watchdog/nct6694_wdt.c      | 320 ++++++++++
+ include/linux/mfd/nct6694.h         |  98 +++
+ 23 files changed, 3676 insertions(+)
+ create mode 100644 drivers/gpio/gpio-nct6694.c
+ create mode 100644 drivers/hwmon/nct6694-hwmon.c
+ create mode 100644 drivers/i2c/busses/i2c-nct6694.c
+ create mode 100644 drivers/mfd/nct6694.c
+ create mode 100644 drivers/net/can/usb/nct6694_canfd.c
+ create mode 100644 drivers/rtc/rtc-nct6694.c
+ create mode 100644 drivers/watchdog/nct6694_wdt.c
+ create mode 100644 include/linux/mfd/nct6694.h
 
-ip netns add server
-ip link add svrh type veth peer name svr
-ip link set svr netns server
-ip link set svrh up
-ip link set dev svrh address ee:ee:ee:ee:ee:ee
-ip netns exec server ip link set svr up
-ip netns exec server ip addr add 192.168.99.4/32 dev svr
-ip netns exec server ip route add 169.254.1.1 dev svr scope link
-ip netns exec server ip route add default via 169.254.1.1 dev svr
-ip netns exec server ip neigh add 169.254.1.1 lladdr ee:ee:ee:ee:ee:ee
-dev svr nud permanent
-ip route add 192.168.99.4/32 dev svrh
+-- 
+2.34.1
 
-ip netns add client
-ip link add clih type veth peer name cli
-ip link set cli netns client
-ip link set clih up
-ip link set dev clih address ee:ee:ee:ee:ee:ee
-ip netns exec client ip link set cli up
-ip netns exec client ip addr add 192.168.99.5/32 dev cli
-ip netns exec client ip route add 169.254.1.1 dev cli scope link
-ip netns exec client ip route add default via 169.254.1.1 dev cli
-ip netns exec client ip neigh add 169.254.1.1 lladdr ee:ee:ee:ee:ee:ee
-dev cli nud permanent
-ip route add 192.168.99.5/32 dev clih
-
-ip addr add 192.168.99.6/32 dev lo
-ipvsadm -A -t 192.168.99.6:8080 -s rr
-ipvsadm -a -t 192.168.99.6:8080 -r 192.168.99.4:8080 -m
-
-echo 1 > /proc/sys/net/ipv4/ip_forward
-echo 1 >  /proc/sys/net/ipv4/vs/conntrack
-iptables -t nat -A POSTROUTING -p TCP -j MASQUERADE
-
-2. start server
-ip netns exec server python -m http.server 8080
-
-3. curl vip
-ip netns exec client curl --local-port 15280 http://192.168.99.6:8080
-
-4. curl rs
-ip netns exec client curl --local-port 15280 http://192.168.99.4:8080
-
-Here are the ct rules for executing curl and the tcpdump capture.
-
-[root@centos9s vagrant]# tcpdump -s0 -nn -i clih
-dropped privs to tcpdump
-tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
-listening on clih, link-type EN10MB (Ethernet), snapshot length 262144 byte=
-s
-01:50:14.328558 IP6 fe80::fc0e:fff:fef8:7c05 > ff02::2: ICMP6, router
-solicitation, length 16
-01:50:28.430769 IP 192.168.99.5.15280 > 192.168.99.6.8080: Flags [S],
-seq 614710449, win 64240, options [mss 1460,sackOK,TS val 2654895687
-ecr 0,nop,wscale 7], length 0
-01:50:28.431026 ARP, Request who-has 192.168.99.5 tell 192.168.99.6, length=
- 28
-01:50:28.431034 ARP, Reply 192.168.99.5 is-at fe:0e:0f:f8:7c:05, length 28
-01:50:28.431035 IP 192.168.99.6.8080 > 192.168.99.5.15280: Flags [S.],
-seq 3593264529, ack 614710450, win 65160, options [mss 1460,sackOK,TS
-val 4198589191 ecr 2654895687,nop,wscale 7], length 0
-01:50:28.431048 IP 192.168.99.5.15280 > 192.168.99.6.8080: Flags [.],
-ack 1, win 502, options [nop,nop,TS val 2654895687 ecr 4198589191],
-length 0
-01:50:28.431683 IP 192.168.99.5.15280 > 192.168.99.6.8080: Flags [P.],
-seq 1:82, ack 1, win 502, options [nop,nop,TS val 2654895688 ecr
-4198589191], length 81: HTTP: GET / HTTP/1.1
-01:50:28.431709 IP 192.168.99.6.8080 > 192.168.99.5.15280: Flags [.],
-ack 82, win 509, options [nop,nop,TS val 4198589192 ecr 2654895688],
-length 0
-01:50:28.434072 IP 192.168.99.6.8080 > 192.168.99.5.15280: Flags [P.],
-seq 1:157, ack 82, win 509, options [nop,nop,TS val 4198589194 ecr
-2654895688], length 156: HTTP: HTTP/1.0 200 OK
-01:50:28.434083 IP 192.168.99.5.15280 > 192.168.99.6.8080: Flags [.],
-ack 157, win 501, options [nop,nop,TS val 2654895690 ecr 4198589194],
-length 0
-01:50:28.434166 IP 192.168.99.6.8080 > 192.168.99.5.15280: Flags [P.],
-seq 157:1195, ack 82, win 509, options [nop,nop,TS val 4198589194 ecr
-2654895690], length 1038: HTTP
-01:50:28.434171 IP 192.168.99.5.15280 > 192.168.99.6.8080: Flags [.],
-ack 1195, win 501, options [nop,nop,TS val 2654895690 ecr 4198589194],
-length 0
-01:50:28.434221 IP 192.168.99.6.8080 > 192.168.99.5.15280: Flags [F.],
-seq 1195, ack 82, win 509, options [nop,nop,TS val 4198589194 ecr
-2654895690], length 0
-01:50:28.434669 IP 192.168.99.5.15280 > 192.168.99.6.8080: Flags [F.],
-seq 82, ack 1196, win 501, options [nop,nop,TS val 2654895691 ecr
-4198589194], length 0
-01:50:28.434712 IP 192.168.99.6.8080 > 192.168.99.5.15280: Flags [.],
-ack 83, win 509, options [nop,nop,TS val 4198589195 ecr 2654895691],
-length 0
-01:50:33.158284 IP 192.168.99.5.15280 > 192.168.99.4.8080: Flags [S],
-seq 886133763, win 64240, options [mss 1460,sackOK,TS val 2236082988
-ecr 0,nop,wscale 7], length 0
-01:50:33.158429 IP 192.168.99.6.8080 > 192.168.99.5.15280: Flags [S.],
-seq 2329127612, ack 886133764, win 65160, options [mss 1460,sackOK,TS
-val 4198593919 ecr 2236082988,nop,wscale 7], length 0
-01:50:33.158496 IP 192.168.99.5.15280 > 192.168.99.6.8080: Flags [R],
-seq 886133764, win 0, length 0
-01:50:34.168530 IP 192.168.99.5.15280 > 192.168.99.4.8080: Flags [S],
-seq 886133763, win 64240, options [mss 1460,sackOK,TS val 2236083999
-ecr 0,nop,wscale 7], length 0
-01:50:34.168722 IP 192.168.99.6.8080 > 192.168.99.5.15280: Flags [S.],
-seq 2329127612, ack 886133764, win 65160, options [mss 1460,sackOK,TS
-val 4198594929 ecr 2236082988,nop,wscale 7], length 0
-01:50:34.168754 IP 192.168.99.6.8080 > 192.168.99.5.15280: Flags [S.],
-seq 2329127612, ack 886133764, win 65160, options [mss 1460,sackOK,TS
-val 4198594929 ecr 2236082988,nop,wscale 7], length 0
-01:50:34.168751 IP 192.168.99.5.15280 > 192.168.99.6.8080: Flags [R],
-seq 886133764, win 0, length 0
-01:50:34.168769 IP 192.168.99.5.15280 > 192.168.99.6.8080: Flags [R],
-seq 886133764, win 0, length 0
-01:50:36.216624 IP 192.168.99.6.8080 > 192.168.99.5.15280: Flags [S.],
-seq 2329127612, ack 886133764, win 65160, options [mss 1460,sackOK,TS
-val 4198596977 ecr 2236082988,nop,wscale 7], length 0
-01:50:36.216626 IP 192.168.99.5.15280 > 192.168.99.4.8080: Flags [S],
-seq 886133763, win 64240, options [mss 1460,sackOK,TS val 2236086047
-ecr 0,nop,wscale 7], length 0
-01:50:36.216678 IP 192.168.99.5.15280 > 192.168.99.6.8080: Flags [R],
-seq 886133764, win 0, length 0
-01:50:36.216690 IP 192.168.99.6.8080 > 192.168.99.5.15280: Flags [S.],
-seq 2329127612, ack 886133764, win 65160, options [mss 1460,sackOK,TS
-val 4198596977 ecr 2236082988,nop,wscale 7], length 0
-01:50:36.216693 IP 192.168.99.5.15280 > 192.168.99.6.8080: Flags [R],
-seq 886133764, win 0, length 0
-^C
-28 packets captured
-28 packets received by filter
-0 packets dropped by kernel
-[root@centos9s vagrant]# cat^C
-[root@centos9s vagrant]# cat /proc/net/nf_conntrack | grep 15280
-ipv4     2 tcp      6 7 CLOSE src=3D192.168.99.5 dst=3D192.168.99.6
-sport=3D15280 dport=3D8080 src=3D192.168.99.4 dst=3D192.168.99.6 sport=3D80=
-80
-dport=3D15280 [ASSURED] mark=3D0 secctx=3Dsystem_u:object_r:unlabeled_t:s0
-zone=3D0 use=3D2
-ipv4     2 tcp      6 53 SYN_RECV src=3D192.168.99.5 dst=3D192.168.99.4
-sport=3D15280 dport=3D8080 src=3D192.168.99.4 dst=3D192.168.99.6 sport=3D80=
-80
-dport=3D1279 mark=3D0 secctx=3Dsystem_u:object_r:unlabeled_t:s0 zone=3D0 us=
-e=3D2
 
