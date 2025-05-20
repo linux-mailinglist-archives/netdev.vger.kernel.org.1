@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-192068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B45E9ABE772
-	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 00:48:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50CE2ABE77A
+	for <lists+netdev@lfdr.de>; Wed, 21 May 2025 00:49:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1EF1C3A4791
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 22:48:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF4ED3A59F4
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 22:48:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 704081EB1BC;
-	Tue, 20 May 2025 22:48:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D26E72459DD;
+	Tue, 20 May 2025 22:48:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="Dg2rs5Hk"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="p/QC0DeZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from omta34.uswest2.a.cloudfilter.net (omta34.uswest2.a.cloudfilter.net [35.89.44.33])
+Received: from omta034.useast.a.cloudfilter.net (omta034.useast.a.cloudfilter.net [44.202.169.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64D941C84C0
-	for <netdev@vger.kernel.org>; Tue, 20 May 2025 22:48:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.89.44.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF2F221C19E
+	for <netdev@vger.kernel.org>; Tue, 20 May 2025 22:48:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747781304; cv=none; b=laZoJDGCdXmyba2UEmfMYS/Dh+Gii1Zpi/3P8DX8q9kKquwyUDwDIgL/cQ+xJlgp/bPxcX6U5k+NTm1/W781bfCZQ0Yj3572ntwkma3pprJUu+jyc8hEYpl2ItVEddomzU+exAfbmD2c7cdyulSE5h9Z7QKLp5ZfU9V/gSY5Ueo=
+	t=1747781334; cv=none; b=nlAZGo3NwBAnihiY44du2BcQjgPaNgDDHCGNb6z2XdUNUUp56dofRPG3W0EO/UETzo01/NQSftwhV6YjCsI1V6hnmoYoQ4MKQoDrZFBZrtcv1w2nNNvuFn8k3A+NYLa+aldNwRJvE7lHlNS4hiLcFHCDSiKaX4qEBzJPQ18Ci9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747781304; c=relaxed/simple;
-	bh=nsBsHgVZIn7v53pEHJNwcniuElU0WFLKLfRQY/VPFR8=;
+	s=arc-20240116; t=1747781334; c=relaxed/simple;
+	bh=FRBU12wCTaCzoZ5TtifNKBgvl3lXOKevuBirxZjnEIs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F7GkzDoKxdWkL44C9Dnd75v3s+gjaPj0a7M59nIUg61IQjbwuE1rdeFARjFN846kh5Q6G+0+MeFs8n5Bykm2VeuxHWBE62/q5CocT10S2z4cM8cszYwFl1Y9LT8B35h773+FdzpZoxeKnTf5KXxjhuLhH5cP/MpIw3NhLYdizVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=Dg2rs5Hk; arc=none smtp.client-ip=35.89.44.33
+	 In-Reply-To:Content-Type; b=aImu1JtKaz3ynkQqlrrXtGpb8UGx8BccADPMn/y27CY5+/YTt7HWrNTv7CDa9xuQoUYZFZyYog1JSRL7vprD8DJ3JHRc8Q7F7PfuueZ82+3JjZWPajnokSjKgYR8w1JTff2E3WZqC71oJz6kPqpKc6nWyktzoqtIDLzH6A8wxQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=p/QC0DeZ; arc=none smtp.client-ip=44.202.169.33
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
-Received: from eig-obgw-6009a.ext.cloudfilter.net ([10.0.30.184])
+Received: from eig-obgw-5009a.ext.cloudfilter.net ([10.0.29.176])
 	by cmsmtp with ESMTPS
-	id HSC3uOMFSWuHKHVkyuBfuz; Tue, 20 May 2025 22:48:20 +0000
+	id HSEEuNplNXshwHVlUur0kn; Tue, 20 May 2025 22:48:52 +0000
 Received: from gator4166.hostgator.com ([108.167.133.22])
 	by cmsmtp with ESMTPS
-	id HVkyuc3WKSPIxHVkyuFB7K; Tue, 20 May 2025 22:48:20 +0000
-X-Authority-Analysis: v=2.4 cv=MdZquY/f c=1 sm=1 tr=0 ts=682d06b4
+	id HVlUuTdkjLedNHVlUu5xts; Tue, 20 May 2025 22:48:52 +0000
+X-Authority-Analysis: v=2.4 cv=Bpabw5X5 c=1 sm=1 tr=0 ts=682d06d4
  a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=efVMuJ2jJG67FGuSm7J3ww==:17
  a=IkcTkHD0fZMA:10 a=dt9VzEwgFbYA:10 a=7T7KSl7uo7wA:10 a=VwQbUJbxAAAA:8
- a=J1Y8HTJGAAAA:8 a=1XWaLZrsAAAA:8 a=20KFwNOVAAAA:8 a=Ikd4Dj_1AAAA:8
- a=vggBfdFIAAAA:8 a=DJTdb95cQ3q3fOx0NTQA:9 a=QEXdDO2ut3YA:10
- a=y1Q9-5lHfBjTkpIzbSAN:22 a=xYX6OU9JNrHFPr8prv8u:22
+ a=jT_9lS9cAAAA:8 a=pGLkceISAAAA:8 a=J1Y8HTJGAAAA:8 a=1XWaLZrsAAAA:8
+ a=20KFwNOVAAAA:8 a=jAoKAhDiyLNNFIt04WcA:9 a=QEXdDO2ut3YA:10
+ a=Ec8Bv2-zM_L_lWdDgjzK:22 a=y1Q9-5lHfBjTkpIzbSAN:22 a=xYX6OU9JNrHFPr8prv8u:22
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
 	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
 	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=sQ1KdJsLeNFUGVUFftkX6bJiPEcnX1VunVFKPkYeT8w=; b=Dg2rs5HkQrM8cFMSQZir7ibl2U
-	r5MJYf81XgVpvLxj8m1pVUZqk7lCt9GSHaLZ+INTR9ZihlXQyi/EyPjA+pr7zZntKW9rFIYCIgl8p
-	QZ5bwrUY4I/bUQucRupRcXHboiCC0OfM2oSzAnrloBmVLy549XLcLJn52gOSknTpemZ0RcHiDWQC9
-	QPpsw6cqmuToNqJPYEMq+208VDKgI8A74qVKhdtfKdKfqTBpXsIDx4w4b0ZjolrLLQW8Jc51rCOU7
-	mBY3St5V168Y9AXi88vYgRCgkRj9Nmds/3rAH+lSb1HOP6PZNz5EgPnrzK3/kAbyM3roxKpc/3DVK
-	Kfr8N0Fw==;
+	bh=m0Sgv2xQObBfrVQ5o4f/G36TLeQWyWSFMFj3tSm1xxo=; b=p/QC0DeZWBoMfFQmEYO8zYmywp
+	gUvDU/K3IwDn8tTqJo55ZHGzxFxuJROBdMK9HOfEDm4KuUdAL3fKX9WJ1Noque7KlutJ2VjZHe0Ra
+	Ff3KfWQjbx8/nndfcLIBULP8MQeA6ebPdBOKgArsYtJZ4C/cmghkHbrRzdWdrNu6mRd+BnJWtA1b2
+	sCUIcIwFpmNuP7TNaEcF0AgBSKbIG/KpYOV37upwXUJdo7Z4qOTDgs1MCk4+bHspuC6gu1LPlzHz6
+	9HKuSL2pU20c4fCDAN3ELqTlFDLFNibvvrYejrntX+nAgwUPRw1day3awBaDB8IqsJ7S1TYpA/2S9
+	98thY1HA==;
 Received: from [177.238.17.151] (port=48738 helo=[192.168.0.27])
 	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.98.1)
 	(envelope-from <gustavo@embeddedor.com>)
-	id 1uHVku-000000011s1-0VVi;
-	Tue, 20 May 2025 17:48:16 -0500
-Message-ID: <c57bd8e0-75b7-4f17-9326-d8d0d7a2301c@embeddedor.com>
-Date: Tue, 20 May 2025 16:47:33 -0600
+	id 1uHVlQ-000000011s1-1d7y;
+	Tue, 20 May 2025 17:48:49 -0500
+Message-ID: <b5ead7f5-1bc1-442f-9d17-34564571b3ce@embeddedor.com>
+Date: Tue, 20 May 2025 16:48:22 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,17 +70,14 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/7] net: core: Switch netif_set_mac_address() to struct
- sockaddr_storage
+Subject: Re: [PATCH 3/7] net/ncsi: Use struct sockaddr_storage for pending_mac
 To: Kees Cook <kees@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
+Cc: Samuel Mendoza-Jonas <sam@mendozajonas.com>,
+ Paul Fertser <fercerpav@gmail.com>, "David S. Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
  Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Stanislav Fomichev <sdf@fomichev.me>,
- Cosmin Ratiu <cratiu@nvidia.com>, Lei Yang <leiyang@redhat.com>,
- Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
- Chaitanya Kulkarni <kch@nvidia.com>,
+ netdev@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+ Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>,
  "Martin K. Petersen" <martin.petersen@oracle.com>,
  Mike Christie <michael.christie@oracle.com>,
  Max Gurtovoy <mgurtovoy@nvidia.com>, Maurizio Lombardi
@@ -88,8 +85,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
  Mingzhe Zou <mingzhe.zou@easystack.cn>,
  Christophe Leroy <christophe.leroy@csgroup.eu>,
  "Dr. David Alan Gilbert" <linux@treblig.org>,
- Samuel Mendoza-Jonas <sam@mendozajonas.com>,
- Paul Fertser <fercerpav@gmail.com>, Alexander Aring <alex.aring@gmail.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Stanislav Fomichev <sdf@fomichev.me>,
+ Cosmin Ratiu <cratiu@nvidia.com>, Lei Yang <leiyang@redhat.com>,
+ Ido Schimmel <idosch@nvidia.com>, Alexander Aring <alex.aring@gmail.com>,
  Stefan Schmidt <stefan@datenfreihafen.org>,
  Miquel Raynal <miquel.raynal@bootlin.com>, Hayes Wang
  <hayeswang@realtek.com>, Douglas Anderson <dianders@chromium.org>,
@@ -107,10 +105,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
  linux-usb@vger.kernel.org, linux-hyperv@vger.kernel.org,
  linux-hardening@vger.kernel.org
 References: <20250520222452.work.063-kees@kernel.org>
- <20250520223108.2672023-2-kees@kernel.org>
-Content-Language: en-US
+ <20250520223108.2672023-3-kees@kernel.org>
 From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-In-Reply-To: <20250520223108.2672023-2-kees@kernel.org>
+In-Reply-To: <20250520223108.2672023-3-kees@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
@@ -121,27 +118,24 @@ X-AntiAbuse: Sender Address Domain - embeddedor.com
 X-BWhitelist: no
 X-Source-IP: 177.238.17.151
 X-Source-L: No
-X-Exim-ID: 1uHVku-000000011s1-0VVi
+X-Exim-ID: 1uHVlQ-000000011s1-1d7y
 X-Source: 
 X-Source-Args: 
 X-Source-Dir: 
 X-Source-Sender: ([192.168.0.27]) [177.238.17.151]:48738
 X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 42
+X-Email-Count: 99
 X-Org: HG=hgshared;ORG=hostgator;
 X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
 X-Local-Domain: yes
-X-CMAE-Envelope: MS4xfI5H2JzIOZQb6+uB8sUD3yo399z0LqkuOLSykRa24OBv7n1qcyCURC4+Sr3VEL1KQvShWAOWOGh/Oea5ftUJluwI8HCsfW+aUw3NZ4nFR2Ig6weD0CZd
- XTIJ1hcu7zGrVLPWkU2RA/0pyqFIp6xk4LCxT51rJz/Z8d2+ysL0yFy9W+Nv91ClHXk6W07+tyLblBnJpC45KHxsy/NUr95OIcI=
+X-CMAE-Envelope: MS4xfDOrJUUeBw++jFowNQFdMyIU9bG1MG/azmhWcEqMS7JVZaVgU6BoDgtrJDYan944Sh+9V0uT8WM47HYQWdLn9tFx0zaMcXzUL/y/Adoiq+c5APDsq/m/
+ 3EnoRRd9fhE/JRaH+XDI1hVIM1DkML8OlPNEXNWyh0UUtrJmUZxtxIe+nWKfhnOrn1D1PaxTO6C7w3MM1mhICdXh+Va8ZYHB6I8=
 
 
 
 On 20/05/25 16:31, Kees Cook wrote:
-> In order to avoid passing around struct sockaddr that has a size the
-> compiler cannot reason about (nor track at runtime), convert
-> netif_set_mac_address() to take struct sockaddr_storage. This is just a
-> cast conversion, so there is are no binary changes. Following patches
-> will make actual allocation changes.
+> To avoid future casting with coming API type changes, switch struct
+> ncsi_dev_priv::pending_mac to a full struct sockaddr_storage.
 > 
 > Signed-off-by: Kees Cook <kees@kernel.org>
 
@@ -151,105 +145,102 @@ Thanks!
 -Gustavo
 
 > ---
+> Cc: Samuel Mendoza-Jonas <sam@mendozajonas.com>
+> Cc: Paul Fertser <fercerpav@gmail.com>
 > Cc: "David S. Miller" <davem@davemloft.net>
 > Cc: Eric Dumazet <edumazet@google.com>
 > Cc: Jakub Kicinski <kuba@kernel.org>
 > Cc: Paolo Abeni <pabeni@redhat.com>
 > Cc: Simon Horman <horms@kernel.org>
-> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-> Cc: Stanislav Fomichev <sdf@fomichev.me>
-> Cc: Cosmin Ratiu <cratiu@nvidia.com>
-> Cc: Lei Yang <leiyang@redhat.com>
-> Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Cc: Ido Schimmel <idosch@nvidia.com>
 > Cc: <netdev@vger.kernel.org>
 > ---
->   include/linux/netdevice.h |  2 +-
->   net/core/dev.c            | 10 +++++-----
->   net/core/dev_api.c        |  4 ++--
->   net/core/rtnetlink.c      |  2 +-
->   4 files changed, 9 insertions(+), 9 deletions(-)
+>   net/ncsi/internal.h    |  2 +-
+>   net/ncsi/ncsi-manage.c |  2 +-
+>   net/ncsi/ncsi-rsp.c    | 18 +++++++++---------
+>   3 files changed, 11 insertions(+), 11 deletions(-)
 > 
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index ea9d335de130..47200a394a02 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -4212,7 +4212,7 @@ int netif_set_mtu(struct net_device *dev, int new_mtu);
->   int dev_set_mtu(struct net_device *, int);
->   int dev_pre_changeaddr_notify(struct net_device *dev, const char *addr,
->   			      struct netlink_ext_ack *extack);
-> -int netif_set_mac_address(struct net_device *dev, struct sockaddr *sa,
-> +int netif_set_mac_address(struct net_device *dev, struct sockaddr_storage *ss,
->   			  struct netlink_ext_ack *extack);
->   int dev_set_mac_address(struct net_device *dev, struct sockaddr *sa,
->   			struct netlink_ext_ack *extack);
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index fccf2167b235..f8c8aad7df2e 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -9655,7 +9655,7 @@ int dev_pre_changeaddr_notify(struct net_device *dev, const char *addr,
->   }
->   EXPORT_SYMBOL(dev_pre_changeaddr_notify);
->   
-> -int netif_set_mac_address(struct net_device *dev, struct sockaddr *sa,
-> +int netif_set_mac_address(struct net_device *dev, struct sockaddr_storage *ss,
->   			  struct netlink_ext_ack *extack)
+> diff --git a/net/ncsi/internal.h b/net/ncsi/internal.h
+> index 2c260f33b55c..e76c6de0c784 100644
+> --- a/net/ncsi/internal.h
+> +++ b/net/ncsi/internal.h
+> @@ -322,7 +322,7 @@ struct ncsi_dev_priv {
+>   #define NCSI_DEV_RESHUFFLE	4
+>   #define NCSI_DEV_RESET		8            /* Reset state of NC          */
+>   	unsigned int        gma_flag;        /* OEM GMA flag               */
+> -	struct sockaddr     pending_mac;     /* MAC address received from GMA */
+> +	struct sockaddr_storage pending_mac; /* MAC address received from GMA */
+>   	spinlock_t          lock;            /* Protect the NCSI device    */
+>   	unsigned int        package_probe_id;/* Current ID during probe    */
+>   	unsigned int        package_num;     /* Number of packages         */
+> diff --git a/net/ncsi/ncsi-manage.c b/net/ncsi/ncsi-manage.c
+> index b36947063783..0202db2aea3e 100644
+> --- a/net/ncsi/ncsi-manage.c
+> +++ b/net/ncsi/ncsi-manage.c
+> @@ -1058,7 +1058,7 @@ static void ncsi_configure_channel(struct ncsi_dev_priv *ndp)
+>   		break;
+>   	case ncsi_dev_state_config_apply_mac:
+>   		rtnl_lock();
+> -		ret = dev_set_mac_address(dev, &ndp->pending_mac, NULL);
+> +		ret = dev_set_mac_address(dev, (struct sockaddr *)&ndp->pending_mac, NULL);
+>   		rtnl_unlock();
+>   		if (ret < 0)
+>   			netdev_warn(dev, "NCSI: 'Writing MAC address to device failed\n");
+> diff --git a/net/ncsi/ncsi-rsp.c b/net/ncsi/ncsi-rsp.c
+> index 8668888c5a2f..472cc68ad86f 100644
+> --- a/net/ncsi/ncsi-rsp.c
+> +++ b/net/ncsi/ncsi-rsp.c
+> @@ -628,7 +628,7 @@ static int ncsi_rsp_handler_snfc(struct ncsi_request *nr)
+>   static int ncsi_rsp_handler_oem_gma(struct ncsi_request *nr, int mfr_id)
 >   {
->   	const struct net_device_ops *ops = dev->netdev_ops;
-> @@ -9663,15 +9663,15 @@ int netif_set_mac_address(struct net_device *dev, struct sockaddr *sa,
+>   	struct ncsi_dev_priv *ndp = nr->ndp;
+> -	struct sockaddr *saddr = &ndp->pending_mac;
+> +	struct sockaddr_storage *saddr = &ndp->pending_mac;
+>   	struct net_device *ndev = ndp->ndev.dev;
+>   	struct ncsi_rsp_oem_pkt *rsp;
+>   	u32 mac_addr_off = 0;
+> @@ -644,11 +644,11 @@ static int ncsi_rsp_handler_oem_gma(struct ncsi_request *nr, int mfr_id)
+>   	else if (mfr_id == NCSI_OEM_MFR_INTEL_ID)
+>   		mac_addr_off = INTEL_MAC_ADDR_OFFSET;
 >   
->   	if (!ops->ndo_set_mac_address)
->   		return -EOPNOTSUPP;
-> -	if (sa->sa_family != dev->type)
-> +	if (ss->ss_family != dev->type)
->   		return -EINVAL;
->   	if (!netif_device_present(dev))
->   		return -ENODEV;
-> -	err = dev_pre_changeaddr_notify(dev, sa->sa_data, extack);
-> +	err = dev_pre_changeaddr_notify(dev, ss->__data, extack);
->   	if (err)
->   		return err;
-> -	if (memcmp(dev->dev_addr, sa->sa_data, dev->addr_len)) {
-> -		err = ops->ndo_set_mac_address(dev, sa);
-> +	if (memcmp(dev->dev_addr, ss->__data, dev->addr_len)) {
-> +		err = ops->ndo_set_mac_address(dev, ss);
->   		if (err)
->   			return err;
+> -	saddr->sa_family = ndev->type;
+> -	memcpy(saddr->sa_data, &rsp->data[mac_addr_off], ETH_ALEN);
+> +	saddr->ss_family = ndev->type;
+> +	memcpy(saddr->__data, &rsp->data[mac_addr_off], ETH_ALEN);
+>   	if (mfr_id == NCSI_OEM_MFR_BCM_ID || mfr_id == NCSI_OEM_MFR_INTEL_ID)
+> -		eth_addr_inc((u8 *)saddr->sa_data);
+> -	if (!is_valid_ether_addr((const u8 *)saddr->sa_data))
+> +		eth_addr_inc(saddr->__data);
+> +	if (!is_valid_ether_addr(saddr->__data))
+>   		return -ENXIO;
+>   
+>   	/* Set the flag for GMA command which should only be called once */
+> @@ -1088,7 +1088,7 @@ static int ncsi_rsp_handler_netlink(struct ncsi_request *nr)
+>   static int ncsi_rsp_handler_gmcma(struct ncsi_request *nr)
+>   {
+>   	struct ncsi_dev_priv *ndp = nr->ndp;
+> -	struct sockaddr *saddr = &ndp->pending_mac;
+> +	struct sockaddr_storage *saddr = &ndp->pending_mac;
+>   	struct net_device *ndev = ndp->ndev.dev;
+>   	struct ncsi_rsp_gmcma_pkt *rsp;
+>   	int i;
+> @@ -1105,15 +1105,15 @@ static int ncsi_rsp_handler_gmcma(struct ncsi_request *nr)
+>   			    rsp->addresses[i][4], rsp->addresses[i][5]);
 >   	}
-> diff --git a/net/core/dev_api.c b/net/core/dev_api.c
-> index f9a160ab596f..b5f293e637d9 100644
-> --- a/net/core/dev_api.c
-> +++ b/net/core/dev_api.c
-> @@ -91,7 +91,7 @@ int dev_set_mac_address_user(struct net_device *dev, struct sockaddr *sa,
 >   
->   	down_write(&dev_addr_sem);
->   	netdev_lock_ops(dev);
-> -	ret = netif_set_mac_address(dev, sa, extack);
-> +	ret = netif_set_mac_address(dev, (struct sockaddr_storage *)sa, extack);
->   	netdev_unlock_ops(dev);
->   	up_write(&dev_addr_sem);
+> -	saddr->sa_family = ndev->type;
+> +	saddr->ss_family = ndev->type;
+>   	for (i = 0; i < rsp->address_count; i++) {
+>   		if (!is_valid_ether_addr(rsp->addresses[i])) {
+>   			netdev_warn(ndev, "NCSI: Unable to assign %pM to device\n",
+>   				    rsp->addresses[i]);
+>   			continue;
+>   		}
+> -		memcpy(saddr->sa_data, rsp->addresses[i], ETH_ALEN);
+> -		netdev_warn(ndev, "NCSI: Will set MAC address to %pM\n", saddr->sa_data);
+> +		memcpy(saddr->__data, rsp->addresses[i], ETH_ALEN);
+> +		netdev_warn(ndev, "NCSI: Will set MAC address to %pM\n", saddr->__data);
+>   		break;
+>   	}
 >   
-> @@ -332,7 +332,7 @@ int dev_set_mac_address(struct net_device *dev, struct sockaddr *sa,
->   	int ret;
->   
->   	netdev_lock_ops(dev);
-> -	ret = netif_set_mac_address(dev, sa, extack);
-> +	ret = netif_set_mac_address(dev, (struct sockaddr_storage *)sa, extack);
->   	netdev_unlock_ops(dev);
->   
->   	return ret;
-> diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-> index 8a914b37ef6e..9743f1c2ae3c 100644
-> --- a/net/core/rtnetlink.c
-> +++ b/net/core/rtnetlink.c
-> @@ -3100,7 +3100,7 @@ static int do_setlink(const struct sk_buff *skb, struct net_device *dev,
->   
->   		memcpy(sa->sa_data, nla_data(tb[IFLA_ADDRESS]),
->   		       dev->addr_len);
-> -		err = netif_set_mac_address(dev, sa, extack);
-> +		err = netif_set_mac_address(dev, (struct sockaddr_storage *)sa, extack);
->   		kfree(sa);
->   		if (err) {
->   			up_write(&dev_addr_sem);
 
 
