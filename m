@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-191962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9409CABE08B
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 18:23:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7ADE7ABE098
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 18:25:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8535818943DD
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:20:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DE8A4C4762
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:20:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9079427CCE3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0BCD27D782;
 	Tue, 20 May 2025 16:19:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b1So+Y8t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Myu942yl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ACDC27CCDF
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7E127CCE4
 	for <netdev@vger.kernel.org>; Tue, 20 May 2025 16:19:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747757969; cv=none; b=ho7JnMkLSNPtcMEeGklezGnTkmC9Ga7k9V3edkoU2ZMS4NOU5uTL+UAg75Ds364GqB10iM7E4dBwdttnpZou6r4DFL8HKTyEACYX4U/MNEpjof6qaolIoV7S3BUw7HYhHv8TL+P+9NtJl4cA4dKez1Mxw0+32N4Wdv+ne4NFkK8=
+	t=1747757969; cv=none; b=FjohIhsw+pTFFcDr5v5i0J+r4yLq14k6gyyPgJuX6j6zscNCsI5/EuCyukQiLS2issMnHhijh5zanO/IBionQ7xoz8eJCCUJw2McK2bnA2AVgYZ9Acyex9TAUxRjtGRW6JWbfnpsTKkVa9UqXNG0ochE6uw+0CJlOeIlfnMu5Ic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1747757969; c=relaxed/simple;
-	bh=pXO8GkkLvCrVTO6o0DXeYyL2uO9W6Zh6FGSKBnVS1tU=;
+	bh=hosW0XWyFytDFe89coz1ARVkPvZ7saE5ErjaxLfay+4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Rtv13eZouF1joTMEO9IbKonKO7HJQBDIa+QCjlPMB6+VS/yb42XltjLXpNJOxJ8JrZMadn3RGE9PYIM5XX9UAnStDuxkrFraUI5G7ngsI/9CmVf2d5yCuuAuwlf5OmTD36kTEq/z2P0MtA7rpm21DQJ5RBErdsCYNRWgTydTbhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b1So+Y8t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CFAFC4CEEA;
-	Tue, 20 May 2025 16:19:28 +0000 (UTC)
+	 MIME-Version; b=Y5rxxvDtSmGutPg7Q8os/IzX3Dp8Knqw+Vpni9hhygGtvgbu53UU+2Clqr+BvKsHWpN2n2f4zfehRSsw5FXpMNkn4qIo0BmEQzjvvDePuitghjqa+Z8wT1zBeVkI3kcjveG3M4q7JrMCPC+dVJmyg6cX74bmuGbpb758ZTwpp1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Myu942yl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15600C4CEEB;
+	Tue, 20 May 2025 16:19:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747757968;
-	bh=pXO8GkkLvCrVTO6o0DXeYyL2uO9W6Zh6FGSKBnVS1tU=;
+	s=k20201202; t=1747757969;
+	bh=hosW0XWyFytDFe89coz1ARVkPvZ7saE5ErjaxLfay+4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=b1So+Y8tLiaOlJXhYl3q4n8WcWAfQ824m7meH7KBLFLF8iqOiudKi+pmBcWbVltBE
-	 agEvXSNIAaBz2BuUcJh33H40dgK8umZaHmLKv7U7Yu8jRr57D09IHHbB+WVc3w1mlH
-	 kFatJmwvjz2PMWBJZUVZKjyxyqB5Z8iaddytT4hCm61gw9h0u4pvcCyDBnQ9zXQIrN
-	 zdq5m5Kd6Biaunop7s3Vm6xEUvYDe5moQyOxGtM0txUesBd7IqVBQyTK69pS6pjapA
-	 VRIjDN+2ierCN8+tM57wDekByfW5mXwRvVDqBwNaJsmB42jvUTJ+56NW95CpTEAEtW
-	 B9Qv5zh89buqg==
+	b=Myu942yljnLk48KKiQ5EZN817v754cQUZZWKyoQjOePDwuY/trcGVgLzQsHA4wrDG
+	 WrQrQKTjFsu0Z5Ir23YnWrBl4by7pGgPO9+vudmv12NLUAmVPWDad5GHP/9zq+bzR/
+	 KahjfJ4HA3AvfWCYmaB3WkMVSB7g1Lh8dT4IZjWnoTxW0T5A3tFdZ5PKrC2U1Dmp2L
+	 04FnD/q7JYMLc95EhEZ5qew1NGTk990peZyu3vEnOXFEe7c1Zi9ON9NEU6ztWALZJ/
+	 16fhlwPekYPqyy81D6iJVFgmN3HLekupeLAtRlQVnqYqu0inDXRZK8FDDapSSe+nBN
+	 46i5pFM7aQz0A==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -54,9 +54,9 @@ Cc: netdev@vger.kernel.org,
 	jstancek@redhat.com,
 	kory.maincent@bootlin.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 09/12] tools: ynl-gen: support weird sub-message formats
-Date: Tue, 20 May 2025 09:19:13 -0700
-Message-ID: <20250520161916.413298-10-kuba@kernel.org>
+Subject: [PATCH net-next v2 10/12] tools: ynl: enable codegen for TC
+Date: Tue, 20 May 2025 09:19:14 -0700
+Message-ID: <20250520161916.413298-11-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250520161916.413298-1-kuba@kernel.org>
 References: <20250520161916.413298-1-kuba@kernel.org>
@@ -68,150 +68,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-TC uses all possible sub-message formats:
- - nested attrs
- - fixed headers + nested attrs
- - fixed headers
- - empty
-
-Nested attrs are already supported for rt-link. Add support
-for remaining 3. The empty and fixed headers ones are fairly
-trivial, we can fake a Binary or Flags type instead of a Nest.
-
-For fixed headers + nest we need to teach nest parsing and
-nest put to handle fixed headers.
+We are ready to support most of TC. Enable C code gen.
 
 Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
 v2:
- - refactor for when init_lines is None
-v1: https://lore.kernel.org/20250517001318.285800-9-kuba@kernel.org
+ - add more headers to the local includes to build on Ubuntu 22.04
+v1: https://lore.kernel.org/20250517001318.285800-10-kuba@kernel.org
 ---
- tools/net/ynl/lib/ynl-priv.h     |  8 ++++--
- tools/net/ynl/pyynl/ynl_gen_c.py | 48 ++++++++++++++++++++++++--------
- 2 files changed, 43 insertions(+), 13 deletions(-)
+ tools/net/ynl/Makefile.deps      | 7 +++++++
+ tools/net/ynl/generated/Makefile | 2 +-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/tools/net/ynl/lib/ynl-priv.h b/tools/net/ynl/lib/ynl-priv.h
-index 416866f85820..824777d7e05e 100644
---- a/tools/net/ynl/lib/ynl-priv.h
-+++ b/tools/net/ynl/lib/ynl-priv.h
-@@ -213,11 +213,15 @@ static inline void *ynl_attr_data_end(const struct nlattr *attr)
- 				     NLMSG_HDRLEN + fixed_hdr_sz); attr; \
- 	     (attr) = ynl_attr_next(ynl_nlmsg_end_addr(nlh), attr))
+diff --git a/tools/net/ynl/Makefile.deps b/tools/net/ynl/Makefile.deps
+index 8c378356fc87..90686e241157 100644
+--- a/tools/net/ynl/Makefile.deps
++++ b/tools/net/ynl/Makefile.deps
+@@ -39,4 +39,11 @@ CFLAGS_rt-neigh:=$(call get_hdr_inc,__LINUX_RTNETLINK_H,rtnetlink.h) \
+ 	$(call get_hdr_inc,__LINUX_NEIGHBOUR_H,neighbour.h)
+ CFLAGS_rt-route:=$(call get_hdr_inc,__LINUX_RTNETLINK_H,rtnetlink.h)
+ CFLAGS_rt-rule:=$(call get_hdr_inc,__LINUX_FIB_RULES_H,fib_rules.h)
++CFLAGS_tc:= $(call get_hdr_inc,__LINUX_RTNETLINK_H,rtnetlink.h) \
++	$(call get_hdr_inc,__LINUX_PKT_SCHED_H,pkt_sched.h) \
++	$(call get_hdr_inc,__LINUX_PKT_CLS_H,pkt_cls.h) \
++	$(call get_hdr_inc,_TC_CT_H,tc_act/tc_ct.h) \
++	$(call get_hdr_inc,_TC_MIRRED_H,tc_act/tc_mirred.h) \
++	$(call get_hdr_inc,_TC_SKBEDIT_H,tc_act/tc_skbedit.h) \
++	$(call get_hdr_inc,_TC_TUNNEL_KEY_H,tc_act/tc_tunnel_key.h)
+ CFLAGS_tcp_metrics:=$(call get_hdr_inc,_LINUX_TCP_METRICS_H,tcp_metrics.h)
+diff --git a/tools/net/ynl/generated/Makefile b/tools/net/ynl/generated/Makefile
+index 9208feed28c1..86e1e4a959a7 100644
+--- a/tools/net/ynl/generated/Makefile
++++ b/tools/net/ynl/generated/Makefile
+@@ -23,7 +23,7 @@ TOOL_RST:=../pyynl/ynl_gen_rst.py
  
--#define ynl_attr_for_each_nested(attr, outer)				\
-+#define ynl_attr_for_each_nested_off(attr, outer, offset)		\
- 	for ((attr) = ynl_attr_first(outer, outer->nla_len,		\
--				     sizeof(struct nlattr)); attr;	\
-+				     sizeof(struct nlattr) + offset);	\
-+	     attr;							\
- 	     (attr) = ynl_attr_next(ynl_attr_data_end(outer), attr))
- 
-+#define ynl_attr_for_each_nested(attr, outer)				\
-+	ynl_attr_for_each_nested_off(attr, outer, 0)
-+
- #define ynl_attr_for_each_payload(start, len, attr)			\
- 	for ((attr) = ynl_attr_first(start, len, 0); attr;		\
- 	     (attr) = ynl_attr_next(start + len, attr))
-diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
-index f2a4404d0d21..76032e01c2e7 100755
---- a/tools/net/ynl/pyynl/ynl_gen_c.py
-+++ b/tools/net/ynl/pyynl/ynl_gen_c.py
-@@ -1372,12 +1372,25 @@ from lib import SpecSubMessage, SpecSubMessageFormat
- 
-         attrs = []
-         for name, fmt in submsg.formats.items():
--            attrs.append({
-+            attr = {
-                 "name": name,
--                "type": "nest",
-                 "parent-sub-message": spec,
--                "nested-attributes": fmt['attribute-set']
--            })
-+            }
-+            if 'attribute-set' in fmt:
-+                attr |= {
-+                    "type": "nest",
-+                    "nested-attributes": fmt['attribute-set'],
-+                }
-+                if 'fixed-header' in fmt:
-+                    attr |= { "fixed-header": fmt["fixed-header"] }
-+            elif 'fixed-header' in fmt:
-+                attr |= {
-+                    "type": "binary",
-+                    "struct": fmt["fixed-header"],
-+                }
-+            else:
-+                attr["type"] = "flag"
-+            attrs.append(attr)
- 
-         self.attr_sets[nested] = AttrSet(self, {
-             "name": nested,
-@@ -1921,8 +1934,11 @@ _C_KW = {
- 
-     i = 0
-     for name, arg in struct.member_list():
--        cw.p('[%d] = { .type = YNL_PT_SUBMSG, .name = "%s", .nest = &%s_nest, },' %
--             (i, name, arg.nested_render_name))
-+        nest = ""
-+        if arg.type == 'nest':
-+            nest = f" .nest = &{arg.nested_render_name}_nest,"
-+        cw.p('[%d] = { .type = YNL_PT_SUBMSG, .name = "%s",%s },' %
-+             (i, name, nest))
-         i += 1
- 
-     cw.block_end(line=';')
-@@ -2032,6 +2048,11 @@ _C_KW = {
-     if struct.submsg is None:
-         local_vars.append('struct nlattr *nest;')
-         init_lines.append("nest = ynl_attr_nest_start(nlh, attr_type);")
-+    if struct.fixed_header:
-+        local_vars.append('void *hdr;')
-+        struct_sz = f'sizeof({struct.fixed_header})'
-+        init_lines.append(f"hdr = ynl_nlmsg_put_extra_header(nlh, {struct_sz});")
-+        init_lines.append(f"memcpy(hdr, &obj->_hdr, {struct_sz});")
- 
-     has_anest = False
-     has_count = False
-@@ -2063,11 +2084,14 @@ _C_KW = {
- 
- 
- def _multi_parse(ri, struct, init_lines, local_vars):
-+    if struct.fixed_header:
-+        local_vars += ['void *hdr;']
-     if struct.nested:
--        iter_line = "ynl_attr_for_each_nested(attr, nested)"
--    else:
-         if struct.fixed_header:
--            local_vars += ['void *hdr;']
-+            iter_line = f"ynl_attr_for_each_nested_off(attr, nested, sizeof({struct.fixed_header}))"
-+        else:
-+            iter_line = "ynl_attr_for_each_nested(attr, nested)"
-+    else:
-         iter_line = "ynl_attr_for_each(attr, nlh, yarg->ys->family->hdr_len)"
-         if ri.op.fixed_header != ri.family.fixed_header:
-             if ri.family.is_classic():
-@@ -2114,7 +2138,9 @@ _C_KW = {
-         ri.cw.p(f'dst->{arg} = {arg};')
- 
-     if struct.fixed_header:
--        if ri.family.is_classic():
-+        if struct.nested:
-+            ri.cw.p('hdr = ynl_attr_data(nested);')
-+        elif ri.family.is_classic():
-             ri.cw.p('hdr = ynl_nlmsg_data(nlh);')
-         else:
-             ri.cw.p('hdr = ynl_nlmsg_data_offset(nlh, sizeof(struct genlmsghdr));')
-@@ -2234,7 +2260,7 @@ _C_KW = {
- 
-         ri.cw.block_start(line=f'{kw} (!strcmp(sel, "{name}"))')
-         get_lines, init_lines, _ = arg._attr_get(ri, var)
--        for line in init_lines:
-+        for line in init_lines or []:
-             ri.cw.p(line)
-         for line in get_lines:
-             ri.cw.p(line)
+ SPECS_DIR:=../../../../Documentation/netlink/specs
+ SPECS_PATHS=$(wildcard $(SPECS_DIR)/*.yaml)
+-GENS_UNSUP=conntrack nftables tc
++GENS_UNSUP=conntrack nftables
+ GENS=$(filter-out ${GENS_UNSUP},$(patsubst $(SPECS_DIR)/%.yaml,%,${SPECS_PATHS}))
+ SRCS=$(patsubst %,%-user.c,${GENS})
+ HDRS=$(patsubst %,%-user.h,${GENS})
 -- 
 2.49.0
 
