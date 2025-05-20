@@ -1,264 +1,196 @@
-Return-Path: <netdev+bounces-191872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6B15ABD7EC
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 14:09:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FF6FABD7FB
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 14:11:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B13548C0D63
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 12:05:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0717B3A8694
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 12:09:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11CD828983B;
-	Tue, 20 May 2025 12:02:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G7HtNs7r"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1081327EC6A;
+	Tue, 20 May 2025 12:09:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+Received: from mail-oo1-f78.google.com (mail-oo1-f78.google.com [209.85.161.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E01A28982D;
-	Tue, 20 May 2025 12:01:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3518D4A21
+	for <netdev@vger.kernel.org>; Tue, 20 May 2025 12:09:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747742521; cv=none; b=gKSJ8XInJ4X5qrZQE3jTZMpCfbvJ8uBTtSKIlC9ctcgP0mB20UeJxlzOkZ82hpJ26vTHCWT/oYPXmtjBfPIRr+Hqs7GfYuDAs/K0p4/SgMRqWGFFaWbQx1VgntCgr/3SLrj86G5HOFXyMX0wl8fbkmu3qVnl9OxXloeqBWVNXno=
+	t=1747742978; cv=none; b=SDkA57ulJFb9fuye6v3QzoR/0FvjsQ4bMN4QvroWpsLQk1de4r7PBnYTr8FJl8n5sS0QIajV8ynPMOPLSTD2eGkBZroRxzZkxJ47oXX31j3EDLBcO+Cn8eSUbx02fsGDxkII3kPZiT0L1O79qLS8XaC6lZt6dwckheVAdNbuZH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747742521; c=relaxed/simple;
-	bh=8AAWGI9mVTbIOvvWZ/vdGNfGVETY2OQMisdBIc7yisM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lqyjvNIN1efhs90QvW6nwNKjD0XI5A8u9t5sCMIODvZ+PNkFvLv/d5Ngm5KCZN1YJPd0HwcBxnb9r+TeLMom8sncYsM2dt/heiVgEl99ttrAzZ8/66RJ7oK3+Y4+xSea8QQyLoFqPE/gSzKRNS3HF76alU3cRsMqtSUcpPz2STM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G7HtNs7r; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7c5e39d1db2so346960685a.3;
-        Tue, 20 May 2025 05:01:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1747742518; x=1748347318; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xHwSkLYEt6R23VP5umdMSGq8PnLF4TsFM1PnZxhRlLg=;
-        b=G7HtNs7rJEYRd886BvZNUUU9LYN7n+40Bd1p3xKh8GcBABF3o7JmmZaBUd2Cv5zKi9
-         ZL5UVJ3pr8ov/cYTsDlWtsJmKpdmogOq3NKKcX8m3NNjmt6aWtgLbSph0MUYn8aj2jLY
-         7p/VMCwhizJuK0BzXD/eEgRBzVLWPDIeh3Rw9YZCc7H+Bx6JFuDS9b3ahaU931rzmLMe
-         iOOfTaMt4HoomX6a6ioY7jJZstS+NpQydHU2GElU9+g++40SUAG46A8CeWFHTBJ4q/ja
-         1dFSjWLfFRwBmdERdl+3ywMcOSwVe5TH3ls66k/JH2UYiVdupORbT5nVi6KS1ZclTw2g
-         WcTA==
+	s=arc-20240116; t=1747742978; c=relaxed/simple;
+	bh=4s1MXYKS4c2lwdmXpuoBhJEfVxuBazYKQs8LqDeA9PA=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=myyawIOiFkR0l/19qk45JcWZcOtCIMYu3rd88fd5Rpkkqw6IU3uqQoV4/JRW8knKp7pbjxXqK3T4uRvazWBwC97rfpLYjZubAr5TtxZJ4chuoFGkF+N4siGQ0iTnt01v++N7vtdZ0wr5/3VXhp8LeZA9oYwGj29ntpgZgR7iPfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f78.google.com with SMTP id 006d021491bc7-606691c2afdso6222293eaf.0
+        for <netdev@vger.kernel.org>; Tue, 20 May 2025 05:09:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747742518; x=1748347318;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xHwSkLYEt6R23VP5umdMSGq8PnLF4TsFM1PnZxhRlLg=;
-        b=iqs0xN+X7WD2Tv7LXdA8NgQSwy+vX6jTlVbUxItW/j+PbGaoppiXfam2bwwougsWl5
-         uvlp+gFTPqI6vUVgDXOWi5met3Wb9Yu0pbbyH6sSlFz3ioVNMmv59EAJLekR2z7J522E
-         kxfjnInDMgx+Lfb8FyoNxOcizWruqXQcRA29CZqzGQeYa4fa9Mibp3D7NoVmR7fLThYi
-         Zuvj/A1Chsk4cfX2H0CcL2LcOB/iltcKSPkOmfhVdtLXD5ZsNL2iWc95zHRzj0Fz27P8
-         eIecrbgnU7tMIkpLYokvmwh21ovkGEyT1+Kes0YwuAZ7w2X5M28bcbuHOFC9c08IlvDy
-         XYdg==
-X-Forwarded-Encrypted: i=1; AJvYcCVlQqe6aNZcNBU6IyV7IX47/484+FBEf2g1dqYA1168QdlXOAqCl5zBysvsgmi4fLqRAHdWFes=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwzsGa0JmxNcMAHd+7zzRsGRTNSGZN7XU8CAbH4JizN2EtO9JN1
-	tfy5K4fUvg892ELjw7+SPbVO3OrrpTX7PiMjNEBVG7lNcQTBU/ficYJfFWnjiQ==
-X-Gm-Gg: ASbGncsqcIYiMxY0WY+RcW5hm0+lPMa4VvZ6WTWXIlKxz7ptQ4uWpPagTiH/l71sN9q
-	zAZR8OVdhjtbXUvbRm6y/xZ7YssqPWPuXi0IN88sYKEmiWit08kveQgATKWl62EtTaGeAug9ZXZ
-	2iqZOVaWiESvQHack19SDJygNDIdSylr54EA3xG1rk6i3NXvynZ5ecdvALDiyn5lkqviDl3DnRA
-	UE9PMwWFofb2P2MlLyNAxJxczDYkSzQcJnJjQ6dm4K94sZW8OOEaoGvRv/MKEF0l2gmLcfgEhWt
-	zRDPWlzCVfBK4XmVUcH5o6v4E5ctTQ05sfJeUzk0criLVam1bNx0v270DLIVvSNRPUd53S8nD9E
-	yepLSRWMu9hjGtd9AyKcQG5ISUYvcQlK4apaJjR0S7mZH06wxyCdSfA==
-X-Google-Smtp-Source: AGHT+IEKVRdFuL0p/BxqDLKGJ8UiRPKpwL461JfIXnXPa9CtAFuPYUjHO3094qdAsJw5Gx1fcBOqXQ==
-X-Received: by 2002:a05:620a:1984:b0:7c5:65ab:5001 with SMTP id af79cd13be357-7cd4677db22mr2029769285a.39.1747742518012;
-        Tue, 20 May 2025 05:01:58 -0700 (PDT)
-Received: from fedora.. (ec2-52-70-167-183.compute-1.amazonaws.com. [52.70.167.183])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7cd468b6e52sm728409985a.77.2025.05.20.05.01.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 May 2025 05:01:57 -0700 (PDT)
-From: Stephen Smalley <stephen.smalley.work@gmail.com>
-To: selinux@vger.kernel.org
-Cc: paul@paul-moore.com,
-	omosnace@redhat.com,
-	netdev@vger.kernel.org,
-	Stephen Smalley <stephen.smalley.work@gmail.com>
-Subject: [PATCH v3 42/42] selinux: init inode from nearest initialized namespace
-Date: Tue, 20 May 2025 07:59:40 -0400
-Message-ID: <20250520120000.25501-44-stephen.smalley.work@gmail.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250520120000.25501-2-stephen.smalley.work@gmail.com>
-References: <20250520120000.25501-2-stephen.smalley.work@gmail.com>
+        d=1e100.net; s=20230601; t=1747742975; x=1748347775;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xf6oI+HpUV0v8ri6idGeDRM5S4U5dFh/3If6EnGC8YA=;
+        b=iysW0P4GssXUouQiMiP49p09/TaCKnNDyka0X7ojg67F4mu8hOOlX5Xhb6E+FI5bIq
+         PHDu2XSbHONFzKNVtI0y53z46iY8dLcK6WUCZ+nHbbWldceHaNRmCfAfkm3gLH+RYw68
+         fG5pRFdP5VRhmtZiT1zhPy1QJMJopEJMoMOn/akb+2Z4EzimiJ3M73WgjraL/2i8/ED0
+         JoDihmBDixdREodnZT1TR2DFCtq66gA7oPHmEpmUHTyuaZ4WGidmcpYB5Kd07jmog4YG
+         PUywWx700/nS4Ci9tAMf4FVKsIuRrcmCao4auYXw44vLw9svtbPYdcPlHp98/+Paa5WZ
+         00HA==
+X-Forwarded-Encrypted: i=1; AJvYcCUNe4LgRpRlEc55TrHvSiai+BuPFP57H+Kq/vU7xUrG1Tp09tdnnK1n1Yp+QVLNjWxUrTxEh7g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/anPdE5qKZ6AQyPDW7zhk2B2CSpeVyu05GcIZcRaPd4pURY7o
+	AMD+gqo4s0qfu5iHV28f3cn4QX7qIVcGp7Yf6nHfikRXuy6VxBN5Re8dC0Fod2WrXzQ14JcUBx3
+	SfMvKa2wJQ67B0bKfTxkAvOmz+pxxB/XtfjkTAWkqmIrUOVtF3Nq6dl5AEKg=
+X-Google-Smtp-Source: AGHT+IE8VLuOxtSktBxAWPe05KDrddF5+NgoTcwjcpJwHgXR/bx9yzCIOiAZxEErBcNP8YB1x/P3Ms0kEyXm7YLwGJ1oeEjF1xim
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6602:388b:b0:85b:35b1:53b4 with SMTP id
+ ca18e2360f4ac-86a24cd237cmr1915462439f.12.1747742964315; Tue, 20 May 2025
+ 05:09:24 -0700 (PDT)
+Date: Tue, 20 May 2025 05:09:24 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <682c70f4.050a0220.ade60.09ba.GAE@google.com>
+Subject: [syzbot] [net?] BUG: unable to handle kernel paging request in
+ bond_rr_gen_slave_id (2)
+From: syzbot <syzbot+e224b9d5803638de57d9@syzkaller.appspotmail.com>
+To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	jv@jvosburgh.net, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Previously inode_doinit_with_dentry() was only checking sbsec->flags
-to see if it should defer the inode security blob initialization,
-which was fine when there was only a single SELinux state/namespace
-since that could only be set if the state was initialized. However,
-with the introduction of SELinux namespaces, the superblock could be
-initialized in the parent (or other ancestor) namespace but the
-current namespace may not yet be initialized (i.e. the namespace was
-unshared but no policy has yet been loaded into it). Check for this
-case, and if uninitialized, find the nearest ancestor SELinux
-namespace that is initialized and use it instead. In the case where
-the init SELinux namespace was never initialized (i.e. no policy
-loaded on the host), then defer initialization of the inode.
+Hello,
 
-Signed-off-by: Stephen Smalley <stephen.smalley.work@gmail.com>
+syzbot found the following issue on:
+
+HEAD commit:    fee3e843b309 Merge tag 'bcachefs-2025-05-15' of git://evil..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=15f342d4580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=30181bfb60dbb0a9
+dashboard link: https://syzkaller.appspot.com/bug?extid=e224b9d5803638de57d9
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-fee3e843.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/bad9badea84a/vmlinux-fee3e843.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/9aae70a5a85a/bzImage-fee3e843.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+e224b9d5803638de57d9@syzkaller.appspotmail.com
+
+BUG: unable to handle page fault for address: ffff8880d6bdf000
+#PF: supervisor write access in kernel mode
+#PF: error_code(0x0002) - not-present page
+PGD 1b001067 P4D 1b001067 PUD 0 
+Oops: Oops: 0002 [#1] SMP KASAN NOPTI
+CPU: 2 UID: 0 PID: 12899 Comm: syz.2.2035 Not tainted 6.15.0-rc6-syzkaller-00188-gfee3e843b309 #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+RIP: 0010:bond_rr_gen_slave_id+0x1df/0x260 drivers/net/bonding/bond_main.c:4996
+Code: bc 24 f0 00 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 75 7a 49 8b 84 24 f0 00 00 00 bb 01 00 00 00 <65> 0f c1 18 e8 b8 af 53 fb 83 c3 01 89 d8 5b 5d 41 5c 41 5d 41 5e
+RSP: 0018:ffffc90003c5f650 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: 0000000000000001 RCX: ffffc90007111000
+RDX: 1ffff110092e69ce RSI: ffffffff86679653 RDI: ffff888049734e70
+RBP: ffff888049734000 R08: 0000000000000005 R09: 0000000000000001
+R10: 0000000000000001 R11: 0000000000000000 R12: ffff888049734d80
+R13: 0000000000000000 R14: ffff888049734d80 R15: ffffc90003c5f9c0
+FS:  00007fd2ddf556c0(0000) GS:ffff8880d6bdf000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffff8880d6bdf000 CR3: 000000004bfa9000 CR4: 0000000000352ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ bond_xdp_xmit_roundrobin_slave_get drivers/net/bonding/bond_main.c:5083 [inline]
+ bond_xdp_get_xmit_slave+0x2a9/0x6b0 drivers/net/bonding/bond_main.c:5622
+ xdp_master_redirect+0x15e/0x330 net/core/filter.c:4349
+ bpf_prog_run_xdp include/net/xdp.h:657 [inline]
+ xdp_test_run_batch.constprop.0+0x18c8/0x1f10 net/bpf/test_run.c:318
+ bpf_test_run_xdp_live+0x34d/0x500 net/bpf/test_run.c:390
+ bpf_prog_test_run_xdp+0x824/0x1540 net/bpf/test_run.c:1316
+ bpf_prog_test_run kernel/bpf/syscall.c:4427 [inline]
+ __sys_bpf+0x1488/0x4d80 kernel/bpf/syscall.c:5852
+ __do_sys_bpf kernel/bpf/syscall.c:5941 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5939 [inline]
+ __x64_sys_bpf+0x78/0xc0 kernel/bpf/syscall.c:5939
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xcd/0x260 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fd2dd18e969
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fd2ddf55038 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+RAX: ffffffffffffffda RBX: 00007fd2dd3b5fa0 RCX: 00007fd2dd18e969
+RDX: 0000000000000048 RSI: 0000200000000600 RDI: 000000000000000a
+RBP: 00007fd2dd210ab1 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007fd2dd3b5fa0 R15: 00007ffc29f1f808
+ </TASK>
+Modules linked in:
+CR2: ffff8880d6bdf000
+---[ end trace 0000000000000000 ]---
+RIP: 0010:bond_rr_gen_slave_id+0x1df/0x260 drivers/net/bonding/bond_main.c:4996
+Code: bc 24 f0 00 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 75 7a 49 8b 84 24 f0 00 00 00 bb 01 00 00 00 <65> 0f c1 18 e8 b8 af 53 fb 83 c3 01 89 d8 5b 5d 41 5c 41 5d 41 5e
+RSP: 0018:ffffc90003c5f650 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: 0000000000000001 RCX: ffffc90007111000
+RDX: 1ffff110092e69ce RSI: ffffffff86679653 RDI: ffff888049734e70
+RBP: ffff888049734000 R08: 0000000000000005 R09: 0000000000000001
+R10: 0000000000000001 R11: 0000000000000000 R12: ffff888049734d80
+R13: 0000000000000000 R14: ffff888049734d80 R15: ffffc90003c5f9c0
+FS:  00007fd2ddf556c0(0000) GS:ffff8880d6bdf000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffff8880d6bdf000 CR3: 000000004bfa9000 CR4: 0000000000352ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess), 4 bytes skipped:
+   0:	00 00                	add    %al,(%rax)
+   2:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+   9:	fc ff df
+   c:	48 89 fa             	mov    %rdi,%rdx
+   f:	48 c1 ea 03          	shr    $0x3,%rdx
+  13:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
+  17:	75 7a                	jne    0x93
+  19:	49 8b 84 24 f0 00 00 	mov    0xf0(%r12),%rax
+  20:	00
+  21:	bb 01 00 00 00       	mov    $0x1,%ebx
+* 26:	65 0f c1 18          	xadd   %ebx,%gs:(%rax) <-- trapping instruction
+  2a:	e8 b8 af 53 fb       	call   0xfb53afe7
+  2f:	83 c3 01             	add    $0x1,%ebx
+  32:	89 d8                	mov    %ebx,%eax
+  34:	5b                   	pop    %rbx
+  35:	5d                   	pop    %rbp
+  36:	41 5c                	pop    %r12
+  38:	41 5d                	pop    %r13
+  3a:	41 5e                	pop    %r14
+
+
 ---
- security/selinux/hooks.c            | 45 +++++++++++++++++------------
- security/selinux/include/security.h |  6 ++--
- 2 files changed, 30 insertions(+), 21 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
-index dcb97a636aa2..06a5ffaebafd 100644
---- a/security/selinux/hooks.c
-+++ b/security/selinux/hooks.c
-@@ -1332,10 +1332,9 @@ static inline u16 socket_type_to_security_class(int family, int type, int protoc
- 	return SECCLASS_SOCKET;
- }
- 
--static int selinux_genfs_get_sid(struct dentry *dentry,
--				 u16 tclass,
--				 u16 flags,
--				 u32 *sid)
-+static int selinux_genfs_get_sid(struct selinux_state *state,
-+				 struct dentry *dentry, u16 tclass,
-+				 u16 flags, u32 *sid)
- {
- 	int rc;
- 	struct super_block *sb = dentry->d_sb;
-@@ -1358,8 +1357,8 @@ static int selinux_genfs_get_sid(struct dentry *dentry,
- 				path++;
- 			}
- 		}
--		rc = security_genfs_sid(current_selinux_state, sb->s_type->name,
--					path, tclass, sid);
-+		rc = security_genfs_sid(state, sb->s_type->name, path,
-+					tclass, sid);
- 		if (rc == -ENOENT) {
- 			/* No match in policy, mark as unlabeled. */
- 			*sid = SECINITSID_UNLABELED;
-@@ -1370,7 +1369,9 @@ static int selinux_genfs_get_sid(struct dentry *dentry,
- 	return rc;
- }
- 
--static int inode_doinit_use_xattr(struct inode *inode, struct dentry *dentry,
-+static int inode_doinit_use_xattr(struct selinux_state *state,
-+				  struct inode *inode,
-+				  struct dentry *dentry,
- 				  u32 def_sid, u32 *sid)
- {
- #define INITCONTEXTLEN 255
-@@ -1413,8 +1414,8 @@ static int inode_doinit_use_xattr(struct inode *inode, struct dentry *dentry,
- 		return 0;
- 	}
- 
--	rc = security_context_to_sid_default(current_selinux_state, context, rc,
--					     sid, def_sid, GFP_NOFS);
-+	rc = security_context_to_sid_default(state, context, rc, sid,
-+					     def_sid, GFP_NOFS);
- 	if (rc) {
- 		char *dev = inode->i_sb->s_id;
- 		unsigned long ino = inode->i_ino;
-@@ -1434,6 +1435,7 @@ static int inode_doinit_use_xattr(struct inode *inode, struct dentry *dentry,
- /* The inode's security attributes must be initialized before first use. */
- static int inode_doinit_with_dentry(struct inode *inode, struct dentry *opt_dentry)
- {
-+	struct selinux_state *state = current_selinux_state;
- 	struct superblock_security_struct *sbsec = NULL;
- 	struct inode_security_struct *isec = selinux_inode(inode);
- 	u32 task_sid, sid = 0;
-@@ -1451,8 +1453,14 @@ static int inode_doinit_with_dentry(struct inode *inode, struct dentry *opt_dent
- 	if (isec->sclass == SECCLASS_FILE)
- 		isec->sclass = inode_mode_to_security_class(inode->i_mode);
- 
-+	/*
-+	 * Find an initialized state to use.
-+	 */
-+	while (state && !selinux_initialized(state))
-+		state = state->parent;
-+
- 	sbsec = selinux_superblock(inode->i_sb);
--	if (!(sbsec->flags & SE_SBINITIALIZED)) {
-+	if (!state || !(sbsec->flags & SE_SBINITIALIZED)) {
- 		/* Defer initialization until selinux_complete_init,
- 		   after the initial policy is loaded and the security
- 		   server is ready to handle calls. */
-@@ -1509,8 +1517,8 @@ static int inode_doinit_with_dentry(struct inode *inode, struct dentry *opt_dent
- 			goto out_invalid;
- 		}
- 
--		rc = inode_doinit_use_xattr(inode, dentry, sbsec->def_sid,
--					    &sid);
-+		rc = inode_doinit_use_xattr(state, inode, dentry,
-+					    sbsec->def_sid, &sid);
- 		dput(dentry);
- 		if (rc)
- 			goto out;
-@@ -1523,8 +1531,8 @@ static int inode_doinit_with_dentry(struct inode *inode, struct dentry *opt_dent
- 		sid = sbsec->sid;
- 
- 		/* Try to obtain a transition SID. */
--		rc = security_transition_sid(current_selinux_state, task_sid, sid,
--					     sclass, NULL, &sid);
-+		rc = security_transition_sid(state, task_sid, sid, sclass,
-+					     NULL, &sid);
- 		if (rc)
- 			goto out;
- 		break;
-@@ -1537,7 +1545,7 @@ static int inode_doinit_with_dentry(struct inode *inode, struct dentry *opt_dent
- 
- 		if ((sbsec->flags & SE_SBGENFS) &&
- 		     (!S_ISLNK(inode->i_mode) ||
--		      selinux_policycap_genfs_seclabel_symlinks())) {
-+		      selinux_policycap_genfs_seclabel_symlinks(state))) {
- 			/* We must have a dentry to determine the label on
- 			 * procfs inodes */
- 			if (opt_dentry) {
-@@ -1564,7 +1572,7 @@ static int inode_doinit_with_dentry(struct inode *inode, struct dentry *opt_dent
- 			 */
- 			if (!dentry)
- 				goto out_invalid;
--			rc = selinux_genfs_get_sid(dentry, sclass,
-+			rc = selinux_genfs_get_sid(state, dentry, sclass,
- 						   sbsec->flags, &sid);
- 			if (rc) {
- 				dput(dentry);
-@@ -1573,8 +1581,9 @@ static int inode_doinit_with_dentry(struct inode *inode, struct dentry *opt_dent
- 
- 			if ((sbsec->flags & SE_SBGENFS_XATTR) &&
- 			    (inode->i_opflags & IOP_XATTR)) {
--				rc = inode_doinit_use_xattr(inode, dentry,
--							    sid, &sid);
-+				rc = inode_doinit_use_xattr(state, inode,
-+							    dentry, sid,
-+							    &sid);
- 				if (rc) {
- 					dput(dentry);
- 					goto out;
-diff --git a/security/selinux/include/security.h b/security/selinux/include/security.h
-index a9ef6d97b88d..22de64287b4d 100644
---- a/security/selinux/include/security.h
-+++ b/security/selinux/include/security.h
-@@ -259,11 +259,11 @@ static inline bool selinux_policycap_nnp_nosuid_transition(void)
- 			->policycap[POLICYDB_CAP_NNP_NOSUID_TRANSITION]);
- }
- 
--static inline bool selinux_policycap_genfs_seclabel_symlinks(void)
-+static inline bool
-+selinux_policycap_genfs_seclabel_symlinks(struct selinux_state *state)
- {
- 	return READ_ONCE(
--		current_selinux_state
--			->policycap[POLICYDB_CAP_GENFS_SECLABEL_SYMLINKS]);
-+		state->policycap[POLICYDB_CAP_GENFS_SECLABEL_SYMLINKS]);
- }
- 
- static inline bool selinux_policycap_ioctl_skip_cloexec(void)
--- 
-2.49.0
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
