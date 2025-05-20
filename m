@@ -1,171 +1,225 @@
-Return-Path: <netdev+bounces-192014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-192015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CC8EABE3B0
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 21:28:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59A89ABE41A
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 21:53:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 646D57AA18A
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 19:27:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 088BC1BC1D44
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 19:53:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EA6E26D4E3;
-	Tue, 20 May 2025 19:28:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A8E2283128;
+	Tue, 20 May 2025 19:52:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="jhTEBsgU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pTCCX8XV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4E5025C70B
-	for <netdev@vger.kernel.org>; Tue, 20 May 2025 19:28:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35AC02820CC;
+	Tue, 20 May 2025 19:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747769327; cv=none; b=HHPkcNCnKUUKjkxd8Zb4ikchHQ+EFEaV9PKDyHjGM5JYQpiojXMm6XKBrsmNLj5NUKjKK3M1CECerhnQTS/5Xlx1EzqICx0dZhgQnftXmnxDgl3u0/3v3hVULi//DXTb6xh/Mql+5qfMcN0sOqJBzOneDsmMre5Ny0liKnYFopM=
+	t=1747770777; cv=none; b=ph/3Xdb6o7pKet51Hc8S35Ie/CVDOeSmP2tH86w+TALFU7PJE+Q3UicN4bf3dr7gMPOHtsxx3kwuaDtG9Z5Ck8wd90O6KQunlP8GZe3ebZ/uNKQJCTlIr1JbpvMTqBmbiwr8IhYTC1EOoSfC25lKWYOeNQm4VuXrmnGuPmS50Js=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747769327; c=relaxed/simple;
-	bh=VDO3T/W1YczuPEGQTj+B/DwdwmAGf+sUsv2s865z87w=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tKwo2+/TKpl1K4FGJEWqRY5kB4tyaiLpoVIh3XEi9+ScrpYrZOu5g+vkaSyyML3vtfQ5RdOTrXnJ2zLXn6iXvxmqR3JO0NShXUz6xoxiQGjmFGqevrHhRcodv5ABI36s5siN8n8xhXukoNdnHoWzTcuumCySGGK1fTC06aECt30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=jhTEBsgU; arc=none smtp.client-ip=209.85.219.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6f8b9c72045so57667676d6.1
-        for <netdev@vger.kernel.org>; Tue, 20 May 2025 12:28:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1747769325; x=1748374125; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QSq28DpagvGJS4EtTRrUgm0EArBYqtzS+oqfIhFoB8s=;
-        b=jhTEBsgUQidpFVnE5qLU4pKv1nO0I3DDJyO/CWdXlDVk2gHDOscqqAzWn7+/FF39en
-         lxYNaWQm5QZ4DMclGefY/P+xGhIY2b6PoFItz65MxCZwhaqQ6QX6H1B+9O1fhi1qhnRL
-         qRqE6HP6qrB0PiCETsG03zm04CNW5LAOqjMzZ46geJbg/LfI5dqlqeERuC4LMdvHF/ky
-         wmRKoyiL8u+h4sm71CqoDz/lY5dEgoauNUd/BxyJ31CUMMVIflS0cu4zy3naIas+MxPf
-         yRN3TH8CzU59pCMzKQ81NzUX9w3A47wnO8cDF/nyaOFtYsvDS+AnBzXRT+jPb87UFK93
-         TKwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747769325; x=1748374125;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QSq28DpagvGJS4EtTRrUgm0EArBYqtzS+oqfIhFoB8s=;
-        b=U0DljlDy8N+xfnlX6Vu0Ruzz16wpBYjQFnM9qblbjNcesPKwNnt5ZXK5r5GQGcPiFH
-         Loz4MxVyEil0n9mPgW/W8mzS8NXbHW1NAjNO/1LwIKGsj0CEOq1ZwOym+x9PVj2i1wxK
-         WwxsUQh+lgTWe0G6SxfR+Uf9XVBviGRdaspHrjuMKGkNhQvAQVubdH6mNPPW1VtvKDtD
-         AVeCnyQE/P+BCCj5aWcxnwroaCWzvfgOBLSuq0o0sOm/bhl+QA54DpM2xPEYdC2W25QB
-         O5qKIrE5dguziUTEdHu44ncEUfnKmni10HuaR98AvtqW5EqEnVfkxPHvVTmUgAI2zm0Q
-         HyMw==
-X-Forwarded-Encrypted: i=1; AJvYcCXWMglaOAA1FRjwjCt2wDVstF4XKhF/XsmZhv3O5nICQP2CCP8vQflNUSsyyfQaz6UNp2vMbH8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyhtz2mCZR7yqW1XGsMsxkftHCeg2IN48W2M6bJf2iXsQS+Iilx
-	hdV5uY58GDBNuTyh43B7U4EFnPZ4rZBo5o5ScgS1Xyepco7/lfgelkcVME+/lONJyqM=
-X-Gm-Gg: ASbGnctmz1jOJw2np9XCjHBQ5MIs0EMMxx3j+agVb2gcUNhTJxklNTGAnKTIF4siWa9
-	nCMGmnE/y71yuoW9qjVL9FhkNo0bwilhbRiD8uXI2YxtYWtamHgu8jGV2fPzGyAAOV0Lom/L/lZ
-	KDYFP53S9y82DnzsZFcaW+yOy0miTYFV6laiT4m1kMz1YKTZH1jxNOpUs6M0ihyq+C3Ko78WHAp
-	+7lkxC9iuO+iKaO0Y2SaqO/g6BxMHBOsR8UBj7DYdIVA7d0o5gN7L06JCRDR/x3zG01gio0BBCZ
-	C1ddp6oJ8xhQsUU3hr71ScQcg0qbB44bKaOiNFgUcQi4VGYv0k+rHnjyC7Hhfo76h9p4dG8kFNB
-	POQBwloqXZIYWAQsqnlRmLfW53hr+
-X-Google-Smtp-Source: AGHT+IF2atiktvD9wDULfPXZekAoh4vnDwU+9Pt1AMawvaALaKAT6Zl+DIgg+N+z4H74uEanAqqEQQ==
-X-Received: by 2002:a05:6214:2027:b0:6f5:3811:cc67 with SMTP id 6a1803df08f44-6f8b0842b16mr287390866d6.12.1747769324713;
-        Tue, 20 May 2025 12:28:44 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f8b8778237sm67169206d6.17.2025.05.20.12.28.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 May 2025 12:28:44 -0700 (PDT)
-Date: Tue, 20 May 2025 12:28:38 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Christian Brauner <brauner@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, Jann Horn <jannh@google.com>, Daniel
- Borkmann <daniel@iogearbox.net>, Kuniyuki Iwashima <kuniyu@amazon.com>,
- Eric Dumazet <edumazet@google.com>, Oleg Nesterov <oleg@redhat.com>, "David
- S. Miller" <davem@davemloft.net>, Alexander Viro <viro@zeniv.linux.org.uk>,
- Daan De Meyer <daan.j.demeyer@gmail.com>, David Rheinsberg
- <david@readahead.eu>, Jakub Kicinski <kuba@kernel.org>, Jan Kara
- <jack@suse.cz>, Lennart Poettering <lennart@poettering.net>, Luca Boccassi
- <luca.boccassi@gmail.com>, Mike Yuan <me@yhndnzj.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Zbigniew
- =?UTF-8?B?SsSZZHJ6ZWpld3NraS1Tem1law==?= <zbyszek@in.waw.pl>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-security-module@vger.kernel.org, Alexander Mikhalitsyn
- <alexander@mihalicyn.com>, Serge Hallyn <serge@hallyn.com>
-Subject: Re: [PATCH v8 0/9] coredump: add coredump socket
-Message-ID: <20250520122838.29131f04@hermes.local>
-In-Reply-To: <20250516-work-coredump-socket-v8-0-664f3caf2516@kernel.org>
-References: <20250516-work-coredump-socket-v8-0-664f3caf2516@kernel.org>
+	s=arc-20240116; t=1747770777; c=relaxed/simple;
+	bh=sVuIV87vGQNNhBH1C+IifHHMly6qW45dro2WlmwqoKE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UFuHdpghk3X/Qc4GYyzakjlUIwzrv94Nj3EqblvWvZCDYQgynzOulWbLgZeZeMIhuznvB78nRgcYt1UK+iDAy63JTY9BNcXh07kD+0IqbJPDVNx2LUGT0dcO00mJHa12F0M90/l+2dhps77KxHgRPd4RIzMbrD7FG4YlMlg9u5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pTCCX8XV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79FCDC4CEE9;
+	Tue, 20 May 2025 19:52:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747770776;
+	bh=sVuIV87vGQNNhBH1C+IifHHMly6qW45dro2WlmwqoKE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pTCCX8XVM9CEiOBZ79VhWuUwWU6FGvo2W901AQ4LYk4O44bVdXPD+YcX2kmgyjLTi
+	 1+LgeF8JMlSIvH5ORHHLppC0LhPgisAd7j6rUtJjbnzyaocoljL7ga8x3l5MpXgwvv
+	 cQ0Oq8LN6prykF704uEZjAHRpdLmYqqOm68GjPaZJNhaAXvEM4x1esIYkFZwsYc4pP
+	 QopYcvL3vU8OnP1iDQI6WUY+n8EDsWXgTeZxc395GqVkr4fumvmRTBI1ucbDqObCCg
+	 OHMZhAneCp7TFzKEcFdGySTnVre2k5G2siQs4gTpPRPU7cKCLcoe8q1W6wlqT2bfuB
+	 r5JD92U70lgeQ==
+Date: Tue, 20 May 2025 14:52:54 -0500
+From: Rob Herring <robh@kernel.org>
+To: Matthew Gerlach <matthew.gerlach@altera.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, krzk+dt@kernel.org,
+	conor+dt@kernel.org, mturquette@baylibre.com,
+	richardcochran@gmail.com, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Mun Yew Tham <mun.yew.tham@altera.com>
+Subject: Re: [PATCH] dt-bindings: net: Convert socfpga-dwmac bindings to yaml
+Message-ID: <20250520195254.GA1247930-robh@kernel.org>
+References: <20250513152237.21541-1-matthew.gerlach@altera.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250513152237.21541-1-matthew.gerlach@altera.com>
 
-On Fri, 16 May 2025 13:25:27 +0200
-Christian Brauner <brauner@kernel.org> wrote:
+On Tue, May 13, 2025 at 08:22:37AM -0700, Matthew Gerlach wrote:
+> From: Mun Yew Tham <mun.yew.tham@altera.com>
+> 
+> Convert the bindings for socfpga-dwmac to yaml.
+> 
+> Signed-off-by: Mun Yew Tham <mun.yew.tham@altera.com>
+> Signed-off-by: Matthew Gerlach <matthew.gerlach@altera.com>
+> ---
+>  .../bindings/net/socfpga,dwmac.yaml           | 109 ++++++++++++++++++
+>  .../devicetree/bindings/net/socfpga-dwmac.txt |  57 ---------
+>  2 files changed, 109 insertions(+), 57 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/net/socfpga,dwmac.yaml
+>  delete mode 100644 Documentation/devicetree/bindings/net/socfpga-dwmac.txt
+> 
+> diff --git a/Documentation/devicetree/bindings/net/socfpga,dwmac.yaml b/Documentation/devicetree/bindings/net/socfpga,dwmac.yaml
+> new file mode 100644
+> index 000000000000..68ad580dc2da
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/socfpga,dwmac.yaml
+> @@ -0,0 +1,109 @@
+> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/socfpga,dwmac.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Altera SOCFPGA SoC DWMAC controller
+> +
+> +maintainers:
+> +  - Matthew Gerlach <matthew.gerlach@altera.com>
+> +
+> +select:
+> +  properties:
+> +    compatible:
+> +      contains:
+> +        enum:
+> +          - altr,socfpga-stmmac
+> +          - altr,socfpga-stmmac-a10-s10
+> +  required:
+> +    - altr,sysmgr-syscon
 
-> Coredumping currently supports two modes:
-> 
-> (1) Dumping directly into a file somewhere on the filesystem.
-> (2) Dumping into a pipe connected to a usermode helper process
->     spawned as a child of the system_unbound_wq or kthreadd.
-> 
-> For simplicity I'm mostly ignoring (1). There's probably still some
-> users of (1) out there but processing coredumps in this way can be
-> considered adventurous especially in the face of set*id binaries.
-> 
-> The most common option should be (2) by now. It works by allowing
-> userspace to put a string into /proc/sys/kernel/core_pattern like:
-> 
->         |/usr/lib/systemd/systemd-coredump %P %u %g %s %t %c %h
-> 
-> The "|" at the beginning indicates to the kernel that a pipe must be
-> used. The path following the pipe indicator is a path to a binary that
-> will be spawned as a usermode helper process. Any additional parameters
-> pass information about the task that is generating the coredump to the
-> binary that processes the coredump.
-> 
-> In the example core_pattern shown above systemd-coredump is spawned as a
-> usermode helper. There's various conceptual consequences of this
-> (non-exhaustive list):
-> 
-> - systemd-coredump is spawned with file descriptor number 0 (stdin)
->   connected to the read-end of the pipe. All other file descriptors are
->   closed. That specifically includes 1 (stdout) and 2 (stderr). This has
->   already caused bugs because userspace assumed that this cannot happen
->   (Whether or not this is a sane assumption is irrelevant.).
-> 
-> - systemd-coredump will be spawned as a child of system_unbound_wq. So
->   it is not a child of any userspace process and specifically not a
->   child of PID 1. It cannot be waited upon and is in a weird hybrid
->   upcall which are difficult for userspace to control correctly.
-> 
-> - systemd-coredump is spawned with full kernel privileges. This
->   necessitates all kinds of weird privilege dropping excercises in
->   userspace to make this safe.
-> 
-> - A new usermode helper has to be spawned for each crashing process.
-> 
-> This series adds a new mode:
-> 
-> (3) Dumping into an AF_UNIX socket.
-> 
-> Userspace can set /proc/sys/kernel/core_pattern to:
-> 
->         @/path/to/coredump.socket
-> 
-> The "@" at the beginning indicates to the kernel that an AF_UNIX
-> coredump socket will be used to process coredumps.
-> 
-> The coredump socket must be located in the initial mount namespace.
-> When a task coredumps it opens a client socket in the initial network
-> namespace and connects to the coredump socket.
+Should be 'compatible' here.
 
+> +
+> +properties:
+> +  compatible:
+> +    oneOf:
+> +      - items:
+> +          - const: altr,socfpga-stmmac
+> +          - const: snps,dwmac-3.70a
+> +          - const: snps,dwmac
+> +      - items:
+> +          - const: altr,socfpga-stmmac-a10-s10
+> +          - const: snps,dwmac-3.74a
+> +          - const: snps,dwmac
+> +      - items:
+> +          - const: altr,socfpga-stmmac-a10-s10
+> +          - const: snps,dwmac-3.72a
+> +          - const: snps,dwmac
 
-There is a problem with using @ as naming convention.
-The starting character of @ is already used to indicate abstract
-unix domain sockets in some programs like ss.
-And will the new coredump socekt allow use of abstrace unix
-domain sockets?
+The last 2 lists can be combined.
+
+> +
+> +  clocks:
+> +    minItems: 1
+> +    maxItems: 4
+
+You need to define what each entry is.
+
+> +
+> +  clock-names:
+> +    minItems: 1
+> +    maxItems: 4
+
+And the name for each entry.
+
+> +
+> +  phy-mode:
+> +    enum:
+> +      - rgmii
+> +      - sgmii
+> +      - gmii
+> +
+> +  altr,emac-splitter:
+> +    $ref: /schemas/types.yaml#/definitions/phandle
+> +    description:
+> +      Should be the phandle to the emac splitter soft IP node if DWMAC
+> +      controller is connected an emac splitter.
+> +
+> +  altr,f2h_ptp_ref_clk:
+> +    $ref: /schemas/types.yaml#/definitions/phandle
+> +    description:
+> +      Phandle to Precision Time Protocol reference clock. This clock is
+> +      common to gmac instances and defaults to osc1.
+> +
+> +  altr,gmii-to-sgmii-converter:
+> +    $ref: /schemas/types.yaml#/definitions/phandle
+> +    description:
+> +      Should be the phandle to the gmii to sgmii converter soft IP.
+> +
+> +  altr,sysmgr-syscon:
+> +    $ref: /schemas/types.yaml#/definitions/phandle-array
+> +    description:
+> +      Should be the phandle to the system manager node that encompass
+> +      the glue register, the register offset, and the register shift.
+> +      On Cyclone5/Arria5, the register shift represents the PHY mode
+> +      bits, while on the Arria10/Stratix10/Agilex platforms, the
+> +      register shift represents bit for each emac to enable/disable
+> +      signals from the FPGA fabric to the EMAC modules.
+> +    minItems: 1
+> +    items:
+> +      - description: phandle to the system manager node
+> +      - description: offset of the control register
+> +      - description: shift within the control register
+
+items:
+  - items:
+      - description: phandle to the system manager node
+      - ...
+      - ...
+
+And drop minItems.
+
+> +
+> +allOf:
+> +  - $ref: snps,dwmac.yaml#
+> +
+> +additionalProperties: true
+
+unevaluatedProperties: false
+
+> +
+> +examples:
+> +
+> +  - |
+> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
+> +    #include <dt-bindings/interrupt-controller/irq.h>
+> +    soc {
+> +            #address-cells = <1>;
+
+Use 4 space indent.
+
+> +            #size-cells = <1>;
+> +            gmac0: ethernet@ff700000 {
+
+Drop the label.
+
+> +                    compatible = "altr,socfpga-stmmac", "snps,dwmac-3.70a",
+> +                    "snps,dwmac";
+> +                    altr,sysmgr-syscon = <&sysmgr 0x60 0>;
+> +                    reg = <0xff700000 0x2000>;
+> +                    interrupts = <GIC_SPI 116 IRQ_TYPE_LEVEL_HIGH>;
+> +                    interrupt-names = "macirq";
+> +                    mac-address = [00 00 00 00 00 00]; /* Filled in by U-Boot */
+> +                    clocks = <&emac_0_clk>;
+> +                    clock-names = "stmmaceth";
+> +                    phy-mode = "sgmii";
+> +            };
+> +    };
 
