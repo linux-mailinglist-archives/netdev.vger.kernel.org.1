@@ -1,448 +1,163 @@
-Return-Path: <netdev+bounces-191921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4710BABDDD8
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:53:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8F3DABDE02
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:58:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D1651BA395E
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 14:53:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71CD57A481B
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 14:57:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 055E72528F0;
-	Tue, 20 May 2025 14:51:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7622B24E016;
+	Tue, 20 May 2025 14:57:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="VBfTH0tB"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="Mmozjogk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F3DF2522A4
-	for <netdev@vger.kernel.org>; Tue, 20 May 2025 14:51:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94DC524E4A8
+	for <netdev@vger.kernel.org>; Tue, 20 May 2025 14:57:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747752691; cv=none; b=uIw/PYowi7ijtWOzqw08l8qeHWhdfB9xJG16D/socdwMiIdLCCANUjwBl0HwL8eaouKfDKf1aVdOk3l4gWxGgMS2Bj4FYYuSfDEwnGIWh+yzvlhQVfuKBYybR8QHIAt2Kk96PBaN/b8e1Dv2/lX1IuhQqY/8VYZRUGbBYLy7qS4=
+	t=1747753079; cv=none; b=TmM/GOwQEgnQV+IvSmdytqG18EtIggPxUOtaz/ncvf3Ksthvn0K7sShEqSy0vDZMc4dRt5/ocnLLZDevcFWdSSd1bjWPmU1m7T4/3rZCMLZZmtgXMd5O4i0QspUXKUmQpME/vExhrnoHxTWrlE5xR8RjDyfVpNIVr/dagjnR6uE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747752691; c=relaxed/simple;
-	bh=uSr4x49PDr9ZXwI2vF7mnRwL2E6/FOtgzemo2B45RS8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QVt0Yp7pbLYj82aMomXbNbq4Hy2J2nCh2R562RQM9pe/0GPmyR23+X8n4qm45sm67QnvJsXlYY9JYnrB1rViXRsvytbEWdWIbbA7FpkGbu9Iv8h1EDVrvc1jW069HiBkJt9KJno2d7UWi1N5Qp0xaxJFTUut3e0H+xvKRWZ8G/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=VBfTH0tB; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7426c4e3d57so820209b3a.2
-        for <netdev@vger.kernel.org>; Tue, 20 May 2025 07:51:30 -0700 (PDT)
+	s=arc-20240116; t=1747753079; c=relaxed/simple;
+	bh=VISxHv4OsFTsoEUt5eNyegys5mmm4qPf/ppdXwiKktg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mQDn210Y8yyPiqXQEnLxTo+gKp0cEc4CkIEu24H+b690RY4Yz4OIZFK4I/3dm+38+7fVCkEknaBj0khsL/i2CfEpRvoeAqOdOYv0yBOUgIW6cCFFKeFS8aOf/eIsy9S/uZjpBW3Hnb9QfTAmRTOeqxtSST4l4lvooUaUlNNJaPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=Mmozjogk; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-6016d401501so6683042a12.2
+        for <netdev@vger.kernel.org>; Tue, 20 May 2025 07:57:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1747752689; x=1748357489; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=N2i/y9zOLCNlUgSgHvl580ugReZupnq3VMN/q9SzffM=;
-        b=VBfTH0tBnEg73dzPfDT3N7QxPp6PPotAIgQlbeNeBcZvCdcRGE+1NUS0AOZ2apKpzD
-         niAEkvDNjQjngTcQWgr6YWmi+PCkaOWNiu7dBcGFkU7EdHqM6qmqiXxVGVTjpJ733WEo
-         vQVrIFJgo1sA9tDpj4o0Kh2lz4tmkhkO9m2+5fxI+Mg35GhzAnVA9uF0WvpOQGbuRNoP
-         th7zu+yloQCfoAtvlDpZnWhHRP3m4QW262TwImp/35WHF2rBnsVIT6UrCMcQAh4sc2ha
-         6kVVJIvUi9WuIPeITOm7yJ33n+/ughV19CCAP2pyBCu408o2Gt1oULhNeUap196PrKV7
-         c2lg==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1747753076; x=1748357876; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0Qtl97qHyAzb2uefJnsAL0gs4dhaHr+ud6o600xsqZw=;
+        b=MmozjogkWoc4b5NOr9kWY7aVKSkE+iwHGGzv54GAsCSWNSF67XrgM0QU6Cib3F3x2A
+         2AqlfPcH9aoFnyi3eEMx5v306trxAIttE/I0eUyhene1+XdHcnjwrA1uBZ1ofdD46O72
+         Lip6C+9V+fhDE+lZgBcr6HBDZTwZaKHxtF5/0DQ5IKhy46RQZ356eIEHjTU9VNwVvSHF
+         A48roedBDRlnE5KfbPUdBU96DOP+sGHPH4ubEpvU6TpVrfBB0sC0LV5QsSPzqryvh4OW
+         7UdU9FeUwJtVlOJHhxB0yfY+XVN1tmJUN0EWvrVNVn0ux3X3bKyY0tPVT060DyIFk6DG
+         dRvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747752689; x=1748357489;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=N2i/y9zOLCNlUgSgHvl580ugReZupnq3VMN/q9SzffM=;
-        b=nfAUnXTEMOdaXwtUJX6mf8cuLQXcC2FtTpGzsgrQabJ8UBH2kgHFwWblktnVdN+UDP
-         4L9XDEBvxLvSwy6XfafebX3cCg/AlJmPw3fRl/46b6HzYuc/pxy0lNbHUE8dpOhQLcns
-         8y/uHejq48Dq3UlvzOXT8cTOj7E7HhIc3m1LJM/1Y8NaYFRYnjDlE+dmcYk7twsOhXbd
-         JoT9yayJFHom3m2LqjHAZoTqY8LVjtPAxMbq+C0aBHlbstlnHwkn9Axb4i8+fCMjUcDd
-         HKxIhoHChV4em6slalinSzyT1nUuey0ZlHSNDNkuvgMj4lHk9ztE0Mn53ZeyORF4ifDh
-         UCKg==
-X-Gm-Message-State: AOJu0Yy8e2xInu8Sa8sREmnquYHm2aToGWM41x3xdidzQx7tj4ncXGXl
-	yu1/Ei2AZq2vWgKW0AfQwb15YpfSEijdIOs3lq20RxuJ6D1iMtyyd0sEcPgemNtKx1rVgjPHP1m
-	jeK4WAEA=
-X-Gm-Gg: ASbGncskdl/QBz3Fpyo98NkOfyyqLvY5GX16Q0w+LEPyV39tbqw4TRE3cYN8xnVVOk2
-	/+A2vP/bk4J96ymlKJfQWBRqk3UInMWBtob1lXFqElpsAUMeHyA27JHMOtsuETONOwjfPOKhVmY
-	WTUnB1uO1EPMivzzT7kSWiECHl4vov8IYdnnX9kZ7+21b+tHoIyGywP+XywHIrehXe3+EEY4wyo
-	upaXUHvqcrdatZ0gMFuVJxH21gffnS/ehdDRPAlw7l12GwgFdalgJ895UnC8PqaLEzxLuKC6pBu
-	fxgcaaD8YVHBzIVg3s/s4WwGzJQStj90fr6uXRrDqwP7PGAOWIg=
-X-Google-Smtp-Source: AGHT+IG3vEO8Ztm2SNFvNLFj+7X83Esu1zmICZeqh7qZKgyI+uz0bSXBQLVrrIAlkrVtBNNWjVm0gQ==
-X-Received: by 2002:a05:6a00:ab87:b0:726:380a:282f with SMTP id d2e1a72fcca58-742a9780577mr9048855b3a.2.1747752689340;
-        Tue, 20 May 2025 07:51:29 -0700 (PDT)
-Received: from t14.. ([2001:5a8:4528:b100:276d:b09e:9f33:af8d])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-742a9829bb3sm8242993b3a.100.2025.05.20.07.51.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 May 2025 07:51:29 -0700 (PDT)
-From: Jordan Rife <jordan@jrife.io>
-To: netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Cc: Jordan Rife <jordan@jrife.io>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Subject: [PATCH v1 bpf-next 10/10] selftests/bpf: Add tests for bucket resume logic in established sockets
-Date: Tue, 20 May 2025 07:50:57 -0700
-Message-ID: <20250520145059.1773738-11-jordan@jrife.io>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250520145059.1773738-1-jordan@jrife.io>
-References: <20250520145059.1773738-1-jordan@jrife.io>
+        d=1e100.net; s=20230601; t=1747753076; x=1748357876;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0Qtl97qHyAzb2uefJnsAL0gs4dhaHr+ud6o600xsqZw=;
+        b=bQqn4EzA/EFBSPsMjwP47dcGOYqMPuxU4z/TftIibpKgCIhQHG+uFKL13ovMLo3x2j
+         QTNdU6PCl5KywRN+aH9A23BCC8x/CMxEUM0LcRuY0ykcqjnBmkOEaNRZxpzSvP2Jwz7O
+         j4SxsNg+ynkahmawYyHrW7QoFtXtZ0EHetVFLJzTe+v3cwGtymnRLhH7jHibkVsXJ8kA
+         +XlJtnOLr9kMYXD2OCy6hr8p/Ct5sjC5Z4yyItFiR4k6art3C2HTGsE2WhFQVi/uZIip
+         LQlmaIDvaXc2bZiKZodcyjWgxo5lbhk3J6Zki0oQ45lypf4DBC9UcBO4l5t+Fax87Vwz
+         5zIg==
+X-Gm-Message-State: AOJu0YwXOnd9Yab36Fg0w2OtcS0HrRhQLlwqy8zAcs7idzsL5YH68dks
+	KdhAMmKd1kRM8jwXe6XuhUibrFuw3tvEEQ9rqCNWuL/D0nbyJcatxmwEX9AO1UaHl4k=
+X-Gm-Gg: ASbGncu9dfWf/WKdJmU+UrIzshUso0UFPhA1yRZKUoWxr4btcEfMsuBLpiP0yZ5dajR
+	FL4zeniqNACFBBba1VO3IcSlvjyiNMWxtofZd8tmAiL0aeoKxlRXmxErpVxmgG3Wlv7jKs3uD1O
+	rwZ8qI4toXEYkXAuIkCHnuKukyOuca0Xbtrd8cSvhiT0nd6zKJ80PfpkZsGruvoRGeyF4JMcToY
+	o/2VR8f4VE5E241jK01WVIW52iTgpyPc8HR6IDC1DIBtf/85OGIvUCWEFUreF/tZO92ugmB5eVj
+	Ww6yUx2od0pGtlPsyh5ppAeVPwbXM5ho1HAMYCyDQk4eMYOsuS1H3h2NOU5JEXzvA+ZSnxntuEa
+	058UPAIsXuIO+lWns5zLNd4h+IJJx
+X-Google-Smtp-Source: AGHT+IHVWRmNINZ96DFZ1cfXeAt/3uTCvt4xtp79i2Bzh4mHaL04S0fexJCL73Vex+VmbK6o7r87pQ==
+X-Received: by 2002:a05:6402:60b:b0:601:68ee:9644 with SMTP id 4fb4d7f45d1cf-60168ef1177mr11903937a12.17.1747753075624;
+        Tue, 20 May 2025 07:57:55 -0700 (PDT)
+Received: from ?IPV6:2a03:83e0:1126:4:cc1:c3d6:1a7c:1c1b? ([2620:10d:c092:500::4:4bc7])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6005ae39492sm7323508a12.70.2025.05.20.07.57.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 May 2025 07:57:55 -0700 (PDT)
+Message-ID: <f21ff7c0-9462-44f8-8212-00906698706f@davidwei.uk>
+Date: Tue, 20 May 2025 15:57:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 2/3] bnxt_en: Add a helper function to configure MRU
+ and RSS
+To: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, pavan.chebbi@broadcom.com,
+ andrew.gospodarek@broadcom.com
+References: <20250519204130.3097027-1-michael.chan@broadcom.com>
+ <20250519204130.3097027-3-michael.chan@broadcom.com>
+Content-Language: en-US
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <20250519204130.3097027-3-michael.chan@broadcom.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Replicate the set of test cases used for UDP socket iterators to test
-similar scenarios for TCP established sockets.
+On 5/19/25 13:41, Michael Chan wrote:
+> From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+> 
+> Add a new helper function that will configure MRU and RSS table
+> of a VNIC. This will be useful when we configure both on a VNIC
+> when resetting an RX ring.  This function will be used again in
+> the next bug fix patch where we have to reconfigure VNICs for RSS
+> contexts.
+> 
+> Suggested-by: Michael Chan <michael.chan@broadcom.com>
+> Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+> ---
+> Cc: David Wei <dw@davidwei.uk>
+> ---
+>   drivers/net/ethernet/broadcom/bnxt/bnxt.c | 36 ++++++++++++++++-------
+>   1 file changed, 25 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> index 6afc2ab6fad2..a45c5ce81111 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> @@ -10738,6 +10738,26 @@ void bnxt_del_one_rss_ctx(struct bnxt *bp, struct bnxt_rss_ctx *rss_ctx,
+>   	bp->num_rss_ctx--;
+>   }
+>   
+> +static int bnxt_set_vnic_mru_p5(struct bnxt *bp, struct bnxt_vnic_info *vnic,
+> +				u16 mru)
+> +{
+> +	int rc;
+> +
+> +	if (mru) {
+> +		rc = bnxt_hwrm_vnic_set_rss_p5(bp, vnic, true);
+> +		if (rc) {
+> +			netdev_err(bp->dev, "hwrm vnic %d set rss failure rc: %d\n",
+> +				   vnic->vnic_id, rc);
+> +			return rc;
+> +		}
+> +	}
+> +	vnic->mru = mru;
+> +	bnxt_hwrm_vnic_update(bp, vnic,
+> +			      VNIC_UPDATE_REQ_ENABLES_MRU_VALID);
+> +
+> +	return 0;
+> +}
+> +
+>   static void bnxt_hwrm_realloc_rss_ctx_vnic(struct bnxt *bp)
+>   {
+>   	bool set_tpa = !!(bp->flags & BNXT_FLAG_TPA);
+> @@ -15936,15 +15956,10 @@ static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
+>   	for (i = 0; i < bp->nr_vnics; i++) {
+>   		vnic = &bp->vnic_info[i];
+>   
+> -		rc = bnxt_hwrm_vnic_set_rss_p5(bp, vnic, true);
+> -		if (rc) {
+> -			netdev_err(bp->dev, "hwrm vnic %d set rss failure rc: %d\n",
+> -				   vnic->vnic_id, rc);
+> +		rc = bnxt_set_vnic_mru_p5(bp, vnic,
+> +					  bp->dev->mtu + ETH_HLEN + VLAN_HLEN);
 
-Signed-off-by: Jordan Rife <jordan@jrife.io>
----
- .../bpf/prog_tests/sock_iter_batch.c          | 286 ++++++++++++++++++
- 1 file changed, 286 insertions(+)
+Pure mechanical change, LGTM.
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c b/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
-index f14adda52f53..44fbb527594d 100644
---- a/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
-+++ b/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
-@@ -119,6 +119,44 @@ static int get_nth_socket(int *fds, int fds_len, struct bpf_link *link, int n)
- 	return nth_sock_idx;
- }
- 
-+static bool close_and_wait(int fd, struct bpf_link *link)
-+{
-+	static const int us_per_ms = 1000;
-+	__u64 cookie = socket_cookie(fd);
-+	struct iter_out out;
-+	bool exists = true;
-+	int iter_fd, nread;
-+	int waits = 20; /* 2 seconds */
-+
-+	close(fd);
-+
-+	/* Wait for socket to disappear from the ehash table. */
-+	while (waits--) {
-+		iter_fd = bpf_iter_create(bpf_link__fd(link));
-+		if (!ASSERT_OK_FD(iter_fd, "bpf_iter_create"))
-+			return false;
-+
-+		/* Is it still there? */
-+		do {
-+			nread = read(iter_fd, &out, sizeof(out));
-+			if (!ASSERT_GE(nread, 0, "nread")) {
-+				close(iter_fd);
-+				return false;
-+			}
-+			exists = nread && cookie == out.cookie;
-+		} while (!exists && nread);
-+
-+		close(iter_fd);
-+
-+		if (!exists)
-+			break;
-+
-+		usleep(100 * us_per_ms);
-+	}
-+
-+	return !exists;
-+}
-+
- static int get_seen_count(int fd, struct sock_count counts[], int n)
- {
- 	__u64 cookie = socket_cookie(fd);
-@@ -241,6 +279,43 @@ static void remove_seen(int family, int sock_type, const char *addr, __u16 port,
- 			       counts_len);
- }
- 
-+static void remove_seen_established(int family, int sock_type, const char *addr,
-+				    __u16 port, int *listen_socks,
-+				    int listen_socks_len, int *established_socks,
-+				    int established_socks_len,
-+				    struct sock_count *counts, int counts_len,
-+				    struct bpf_link *link, int iter_fd)
-+{
-+	int close_idx;
-+
-+	/* Iterate through all listening sockets. */
-+	read_n(iter_fd, listen_socks_len, counts, counts_len);
-+
-+	/* Make sure we saw all listening sockets exactly once. */
-+	check_n_were_seen_once(listen_socks, listen_socks_len, listen_socks_len,
-+			       counts, counts_len);
-+
-+	/* Leave one established socket. */
-+	read_n(iter_fd, established_socks_len - 1, counts, counts_len);
-+
-+	/* Close a socket we've already seen to remove it from the bucket. */
-+	close_idx = get_seen_socket(established_socks, counts, counts_len);
-+	if (!ASSERT_GE(close_idx, 0, "close_idx"))
-+		return;
-+	ASSERT_TRUE(close_and_wait(established_socks[close_idx], link),
-+		    "close_and_wait");
-+	established_socks[close_idx] = -1;
-+
-+	/* Iterate through the rest of the sockets. */
-+	read_n(iter_fd, -1, counts, counts_len);
-+
-+	/* Make sure the last socket wasn't skipped and that there were no
-+	 * repeats.
-+	 */
-+	check_n_were_seen_once(established_socks, established_socks_len,
-+			       established_socks_len - 1, counts, counts_len);
-+}
-+
- static void remove_unseen(int family, int sock_type, const char *addr,
- 			  __u16 port, int *socks, int socks_len,
- 			  int *established_socks, int established_socks_len,
-@@ -274,6 +349,52 @@ static void remove_unseen(int family, int sock_type, const char *addr,
- 			       counts_len);
- }
- 
-+static void remove_unseen_established(int family, int sock_type,
-+				      const char *addr, __u16 port,
-+				      int *listen_socks, int listen_socks_len,
-+				      int *established_socks,
-+				      int established_socks_len,
-+				      struct sock_count *counts, int counts_len,
-+				      struct bpf_link *link, int iter_fd)
-+{
-+	int close_idx;
-+
-+	/* Iterate through all listening sockets. */
-+	read_n(iter_fd, listen_socks_len, counts, counts_len);
-+
-+	/* Make sure we saw all listening sockets exactly once. */
-+	check_n_were_seen_once(listen_socks, listen_socks_len, listen_socks_len,
-+			       counts, counts_len);
-+
-+	/* Iterate through the first established socket. */
-+	read_n(iter_fd, 1, counts, counts_len);
-+
-+	/* Make sure we saw one established socks. */
-+	check_n_were_seen_once(established_socks, established_socks_len, 1,
-+			       counts, counts_len);
-+
-+	/* Close what would be the next socket in the bucket to exercise the
-+	 * condition where we need to skip past the first cookie we remembered.
-+	 */
-+	close_idx = get_nth_socket(established_socks, established_socks_len,
-+				   link, listen_socks_len + 1);
-+	if (!ASSERT_GE(close_idx, 0, "close_idx"))
-+		return;
-+
-+	ASSERT_TRUE(close_and_wait(established_socks[close_idx], link),
-+		    "close_and_wait");
-+	established_socks[close_idx] = -1;
-+
-+	/* Iterate through the rest of the sockets. */
-+	read_n(iter_fd, -1, counts, counts_len);
-+
-+	/* Make sure the remaining sockets were seen exactly once and that we
-+	 * didn't repeat the socket that was already seen.
-+	 */
-+	check_n_were_seen_once(established_socks, established_socks_len,
-+			       established_socks_len - 1, counts, counts_len);
-+}
-+
- static void remove_all(int family, int sock_type, const char *addr,
- 		       __u16 port, int *socks, int socks_len,
- 		       int *established_socks, int established_socks_len,
-@@ -303,6 +424,47 @@ static void remove_all(int family, int sock_type, const char *addr,
- 	ASSERT_EQ(read_n(iter_fd, -1, counts, counts_len), 0, "read_n");
- }
- 
-+static void remove_all_established(int family, int sock_type, const char *addr,
-+				   __u16 port, int *listen_socks,
-+				   int listen_socks_len, int *established_socks,
-+				   int established_socks_len,
-+				   struct sock_count *counts, int counts_len,
-+				   struct bpf_link *link, int iter_fd)
-+{
-+	int close_idx, i;
-+
-+	/* Iterate through all listening sockets. */
-+	read_n(iter_fd, listen_socks_len, counts, counts_len);
-+
-+	/* Make sure we saw all listening sockets exactly once. */
-+	check_n_were_seen_once(listen_socks, listen_socks_len, listen_socks_len,
-+			       counts, counts_len);
-+
-+	/* Iterate through the first established socket. */
-+	read_n(iter_fd, 1, counts, counts_len);
-+
-+	/* Make sure we saw one established socks. */
-+	check_n_were_seen_once(established_socks, established_socks_len, 1,
-+			       counts, counts_len);
-+
-+	/* Close all remaining sockets to exhaust the list of saved cookies and
-+	 * exit without putting any sockets into the batch on the next read.
-+	 */
-+	for (i = 0; i < established_socks_len - 1; i++) {
-+		close_idx = get_nth_socket(established_socks,
-+					   established_socks_len, link,
-+					   listen_socks_len + 1);
-+		if (!ASSERT_GE(close_idx, 0, "close_idx"))
-+			return;
-+		ASSERT_TRUE(close_and_wait(established_socks[close_idx], link),
-+			    "close_and_wait");
-+		established_socks[close_idx] = -1;
-+	}
-+
-+	/* Make sure there are no more sockets returned */
-+	ASSERT_EQ(read_n(iter_fd, -1, counts, counts_len), 0, "read_n");
-+}
-+
- static void add_some(int family, int sock_type, const char *addr, __u16 port,
- 		     int *socks, int socks_len, int *established_socks,
- 		     int established_socks_len, struct sock_count *counts,
-@@ -333,6 +495,49 @@ static void add_some(int family, int sock_type, const char *addr, __u16 port,
- 	free_fds(new_socks, socks_len);
- }
- 
-+static void add_some_established(int family, int sock_type, const char *addr,
-+				 __u16 port, int *listen_socks,
-+				 int listen_socks_len, int *established_socks,
-+				 int established_socks_len,
-+				 struct sock_count *counts,
-+				 int counts_len, struct bpf_link *link,
-+				 int iter_fd)
-+{
-+	int *new_socks = NULL;
-+
-+	/* Iterate through all listening sockets. */
-+	read_n(iter_fd, listen_socks_len, counts, counts_len);
-+
-+	/* Make sure we saw all listening sockets exactly once. */
-+	check_n_were_seen_once(listen_socks, listen_socks_len, listen_socks_len,
-+			       counts, counts_len);
-+
-+	/* Iterate through the first established_socks_len - 1 sockets. */
-+	read_n(iter_fd, established_socks_len - 1, counts, counts_len);
-+
-+	/* Make sure we saw established_socks_len - 1 sockets exactly once. */
-+	check_n_were_seen_once(established_socks, established_socks_len,
-+			       established_socks_len - 1, counts, counts_len);
-+
-+	/* Double the number of established sockets in the bucket. */
-+	new_socks = connect_to_server(family, sock_type, addr, port,
-+				      established_socks_len / 2, listen_socks,
-+				      listen_socks_len);
-+	if (!ASSERT_OK_PTR(new_socks, "connect_to_server"))
-+		goto done;
-+
-+	/* Iterate through the rest of the sockets. */
-+	read_n(iter_fd, -1, counts, counts_len);
-+
-+	/* Make sure each of the original sockets was seen exactly once. */
-+	check_n_were_seen_once(listen_socks, listen_socks_len, listen_socks_len,
-+			       counts, counts_len);
-+	check_n_were_seen_once(established_socks, established_socks_len,
-+			       established_socks_len, counts, counts_len);
-+done:
-+	free_fds(new_socks, established_socks_len);
-+}
-+
- static void force_realloc(int family, int sock_type, const char *addr,
- 			  __u16 port, int *socks, int socks_len,
- 			  int *established_socks, int established_socks_len,
-@@ -362,6 +567,24 @@ static void force_realloc(int family, int sock_type, const char *addr,
- 	free_fds(new_socks, socks_len);
- }
- 
-+static void force_realloc_established(int family, int sock_type,
-+				      const char *addr, __u16 port,
-+				      int *listen_socks, int listen_socks_len,
-+				      int *established_socks,
-+				      int established_socks_len,
-+				      struct sock_count *counts, int counts_len,
-+				      struct bpf_link *link, int iter_fd)
-+{
-+	/* Iterate through all sockets to trigger a realloc. */
-+	read_n(iter_fd, -1, counts, counts_len);
-+
-+	/* Make sure each socket was seen exactly once. */
-+	check_n_were_seen_once(listen_socks, listen_socks_len, listen_socks_len,
-+			       counts, counts_len);
-+	check_n_were_seen_once(established_socks, established_socks_len,
-+			       established_socks_len, counts, counts_len);
-+}
-+
- struct test_case {
- 	void (*test)(int family, int sock_type, const char *addr, __u16 port,
- 		     int *socks, int socks_len, int *established_socks,
-@@ -471,6 +694,69 @@ static struct test_case resume_tests[] = {
- 		.family = AF_INET6,
- 		.test = force_realloc,
- 	},
-+	{
-+		.description = "tcp: resume after removing a seen socket (established)",
-+		/* Force all established sockets into one bucket */
-+		.ehash_buckets = 1,
-+		.connections = nr_soreuse,
-+		.init_socks = nr_soreuse,
-+		/* Room for connect()ed and accept()ed sockets */
-+		.max_socks = nr_soreuse * 3,
-+		.sock_type = SOCK_STREAM,
-+		.family = AF_INET6,
-+		.test = remove_seen_established,
-+	},
-+	{
-+		.description = "tcp: resume after removing one unseen socket (established)",
-+		/* Force all established sockets into one bucket */
-+		.ehash_buckets = 1,
-+		.connections = nr_soreuse,
-+		.init_socks = nr_soreuse,
-+		/* Room for connect()ed and accept()ed sockets */
-+		.max_socks = nr_soreuse * 3,
-+		.sock_type = SOCK_STREAM,
-+		.family = AF_INET6,
-+		.test = remove_unseen_established,
-+	},
-+	{
-+		.description = "tcp: resume after removing all unseen sockets (established)",
-+		/* Force all established sockets into one bucket */
-+		.ehash_buckets = 1,
-+		.connections = nr_soreuse,
-+		.init_socks = nr_soreuse,
-+		/* Room for connect()ed and accept()ed sockets */
-+		.max_socks = nr_soreuse * 3,
-+		.sock_type = SOCK_STREAM,
-+		.family = AF_INET6,
-+		.test = remove_all_established,
-+	},
-+	{
-+		.description = "tcp: resume after adding a few sockets (established)",
-+		/* Force all established sockets into one bucket */
-+		.ehash_buckets = 1,
-+		.connections = nr_soreuse,
-+		.init_socks = nr_soreuse,
-+		/* Room for connect()ed and accept()ed sockets */
-+		.max_socks = nr_soreuse * 3,
-+		.sock_type = SOCK_STREAM,
-+		.family = AF_INET6,
-+		.test = add_some_established,
-+	},
-+	{
-+		.description = "tcp: force a realloc to occur (established)",
-+		/* Force all established sockets into one bucket */
-+		.ehash_buckets = 1,
-+		/* Bucket size will need to double when going from listening to
-+		 * established sockets.
-+		 */
-+		.connections = init_batch_size,
-+		.init_socks = nr_soreuse,
-+		/* Room for connect()ed and accept()ed sockets */
-+		.max_socks = nr_soreuse + (init_batch_size * 2),
-+		.sock_type = SOCK_STREAM,
-+		.family = AF_INET6,
-+		.test = force_realloc_established,
-+	},
- };
- 
- static void do_resume_test(struct test_case *tc)
--- 
-2.43.0
+Only nit is to calculate this mru once outside the loop, like patch 2.
 
+Reviewed-by: David Wei <dw@davidwei.uk>
 
