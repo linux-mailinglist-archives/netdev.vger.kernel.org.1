@@ -1,178 +1,158 @@
-Return-Path: <netdev+bounces-191823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2376BABD6BE
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 13:27:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F7A2ABD6E2
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 13:33:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CEE917AA3E
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 11:27:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32FD9189C79A
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 11:33:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE8D6276032;
-	Tue, 20 May 2025 11:27:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="P8SRquc/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D23E274FE2;
+	Tue, 20 May 2025 11:33:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689F810E4;
-	Tue, 20 May 2025 11:27:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD8D21A45A;
+	Tue, 20 May 2025 11:32:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.54.195.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747740449; cv=none; b=mW75xLirzjpV47Oe7fAxNmZSXdEu6iXExKtySRH/wkevyhnT9DoOqdtpPw6q32oeYxDp8WnkrPmVrylznxuRJWjfTI4Io8X8aV8VIvUZ5fBk52iMX7cAYXzYMMUgflFgmkAHdDH/1nbwgjD1r/PK6671GxE20wf3gJAPV5k/Toc=
+	t=1747740782; cv=none; b=F3OJ+kpOJS3QS7XCUX52OlL58thNkbFgHeUvbLuW7VurxrRwh3A5YWNSKHyHloAuccB7jwtYhao+f/VHMBgTXLaYGIe6Qv4INXUVItW1hLxAkJTh9NFl5SE4LJlWS8HgpQFnr84/1pzCScZ32GOpouo4oVA3wDQpFaQhlVKUFAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747740449; c=relaxed/simple;
-	bh=F8a6adaotmO9OFJk2lV6zJwLtEE1bNQqk3sdSWmUODU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Gjrasrm/DmJIMxtiS4HsVShPmI9hj2ix38U94RbMUPy/ZniGTaytsSGbOQGNJnkNEJoUXmRXreVPaqDkL02/x0047rfsP0TOYFML53ipRb7ApY1xoi8N1SRHBJLRDcKBtwxlF9m/8qnRvZGyVh6PQdxDD43eHAtAtvS84G/qdFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=P8SRquc/; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1747740445;
-	bh=F8a6adaotmO9OFJk2lV6zJwLtEE1bNQqk3sdSWmUODU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=P8SRquc/6RmoHWKXfMC2MT4Sn7ljY4RBbPhkcOcQhdXZGtrP8Fogm9M1uF7Q788oT
-	 2ILTvSGALDAITwCMLhIiQ8UCK7Urew5Go0Ec0U+9AV4epkUXSvdAfaeke0psbGaibE
-	 eb0BpNpsx3Z9UvzEU13Hx8che2VE3ZpRzEFtCjakFxVqug05oXEwY4dRyUDSPyxXg8
-	 pMGmjfNS9i4Mn67v3Lzp7y1ySHoCAKKaDWnAebNRyMNnmyf8Pcn7B9vkxIapgo5tOl
-	 YavD0qx5ieU9Ku39uxV/OvxJQDUkJsH3NZBXOllcNQ3Q2fkZbwoqCxinhCrBtoYjdf
-	 vcRqi6I2hPm4g==
-Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id D0F2217E0E89;
-	Tue, 20 May 2025 13:27:23 +0200 (CEST)
-Message-ID: <7a563716-a7c6-446d-b66d-bc71c6207ef6@collabora.com>
-Date: Tue, 20 May 2025 13:27:23 +0200
+	s=arc-20240116; t=1747740782; c=relaxed/simple;
+	bh=k1fG5ajRDy2nag7Bj63UX37XmQ7V6ulqT0aGln+oI1w=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=iJ6TZn3+8FP2Cu9s+qCfYlP5vCqCOTh8OcnjivHQbKbhAh2REQKL/LfcRjd6iX4oJFgzZ6YLv0Y7/eRpZKNKL8qu7u2yq1PB3oDGWFl0ZxTKDmqQ82vnRwXsQuKpUX7rk3pnPbSl/J2jPMSem0RdJkGwfNcNKM+bnBxdIAVHk5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru; spf=pass smtp.mailfrom=fintech.ru; arc=none smtp.client-ip=195.54.195.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fintech.ru
+Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
+ (195.54.195.159) with Microsoft SMTP Server (TLS) id 14.3.498.0; Tue, 20 May
+ 2025 14:32:53 +0300
+Received: from localhost (10.0.253.101) by Ex16-01.fintech.ru (10.0.10.18)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Tue, 20 May
+ 2025 14:32:53 +0300
+From: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
+CC: Nikita Zhandarovich <n.zhandarovich@fintech.ru>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<linux-usb@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>,
+	<syzbot+3b6b9ff7b80430020c7b@syzkaller.appspotmail.com>,
+	<lvc-project@linuxtesting.org>
+Subject: [PATCH net-next] net: usb: aqc111: fix error handling of usbnet read calls
+Date: Tue, 20 May 2025 14:32:39 +0300
+Message-ID: <20250520113240.2369438-1-n.zhandarovich@fintech.ru>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 06/14] arm64: dts: mediatek: mt7988: add cci node
-To: Frank Wunderlich <linux@fw-web.de>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>
-Cc: Frank Wunderlich <frank-w@public-files.de>,
- =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
- Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Daniel Golle <daniel@makrotopia.org>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20250516180147.10416-1-linux@fw-web.de>
- <20250516180147.10416-8-linux@fw-web.de>
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Content-Language: en-US
-In-Reply-To: <20250516180147.10416-8-linux@fw-web.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: Ex16-02.fintech.ru (10.0.10.19) To Ex16-01.fintech.ru
+ (10.0.10.18)
 
-Il 16/05/25 20:01, Frank Wunderlich ha scritto:
-> From: Frank Wunderlich <frank-w@public-files.de>
-> 
-> Add cci devicetree node for cpu frequency scaling.
-> 
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
-> ---
->   arch/arm64/boot/dts/mediatek/mt7988a.dtsi | 33 +++++++++++++++++++++++
->   1 file changed, 33 insertions(+)
-> 
-> diff --git a/arch/arm64/boot/dts/mediatek/mt7988a.dtsi b/arch/arm64/boot/dts/mediatek/mt7988a.dtsi
-> index ab6fc09940b8..64466acb0e71 100644
-> --- a/arch/arm64/boot/dts/mediatek/mt7988a.dtsi
-> +++ b/arch/arm64/boot/dts/mediatek/mt7988a.dtsi
-> @@ -12,6 +12,35 @@ / {
->   	#address-cells = <2>;
->   	#size-cells = <2>;
->   
-> +	cci: cci {
-> +		compatible = "mediatek,mt8183-cci";
+Syzkaller, courtesy of syzbot, identified an error (see report [1]) in
+aqc111 driver, caused by incomplete sanitation of usb read calls'
+results. This problem is quite similar to the one fixed in commit
+920a9fa27e78 ("net: asix: add proper error handling of usb read errors").
 
-While you can keep the mediatek,mt8183-cci fallback, this needs its own compatible
-as "mediatek,mt7988-cci", therefore, I had to drop this patch from the ones that I
-picked.
+For instance, usbnet_read_cmd() may read fewer than 'size' bytes,
+even if the caller expected the full amount, and aqc111_read_cmd()
+will not check its result properly. As [1] shows, this may lead
+to MAC address in aqc111_bind() being only partly initialized,
+triggering KMSAN warnings.
 
-Please add the new compatible both here and in the binding.
+Fix the issue by verifying that the number of bytes read is
+as expected and not less.
 
-Cheers,
-Angelo
+[1] Partial syzbot report:
+BUG: KMSAN: uninit-value in is_valid_ether_addr include/linux/etherdevice.h:208 [inline]
+BUG: KMSAN: uninit-value in usbnet_probe+0x2e57/0x4390 drivers/net/usb/usbnet.c:1830
+ is_valid_ether_addr include/linux/etherdevice.h:208 [inline]
+ usbnet_probe+0x2e57/0x4390 drivers/net/usb/usbnet.c:1830
+ usb_probe_interface+0xd01/0x1310 drivers/usb/core/driver.c:396
+ call_driver_probe drivers/base/dd.c:-1 [inline]
+ really_probe+0x4d1/0xd90 drivers/base/dd.c:658
+ __driver_probe_device+0x268/0x380 drivers/base/dd.c:800
+...
 
-> +		clocks = <&mcusys CLK_MCU_BUS_DIV_SEL>,
-> +			 <&topckgen CLK_TOP_XTAL>;
-> +		clock-names = "cci", "intermediate";
-> +		operating-points-v2 = <&cci_opp>;
-> +	};
-> +
-> +	cci_opp: opp-table-cci {
-> +		compatible = "operating-points-v2";
-> +		opp-shared;
-> +		opp-480000000 {
-> +			opp-hz = /bits/ 64 <480000000>;
-> +			opp-microvolt = <850000>;
-> +		};
-> +		opp-660000000 {
-> +			opp-hz = /bits/ 64 <660000000>;
-> +			opp-microvolt = <850000>;
-> +		};
-> +		opp-900000000 {
-> +			opp-hz = /bits/ 64 <900000000>;
-> +			opp-microvolt = <850000>;
-> +		};
-> +		opp-1080000000 {
-> +			opp-hz = /bits/ 64 <1080000000>;
-> +			opp-microvolt = <900000>;
-> +		};
-> +	};
-> +
->   	cpus {
->   		#address-cells = <1>;
->   		#size-cells = <0>;
-> @@ -25,6 +54,7 @@ cpu0: cpu@0 {
->   				 <&topckgen CLK_TOP_XTAL>;
->   			clock-names = "cpu", "intermediate";
->   			operating-points-v2 = <&cluster0_opp>;
-> +			mediatek,cci = <&cci>;
->   		};
->   
->   		cpu1: cpu@1 {
-> @@ -36,6 +66,7 @@ cpu1: cpu@1 {
->   				 <&topckgen CLK_TOP_XTAL>;
->   			clock-names = "cpu", "intermediate";
->   			operating-points-v2 = <&cluster0_opp>;
-> +			mediatek,cci = <&cci>;
->   		};
->   
->   		cpu2: cpu@2 {
-> @@ -47,6 +78,7 @@ cpu2: cpu@2 {
->   				 <&topckgen CLK_TOP_XTAL>;
->   			clock-names = "cpu", "intermediate";
->   			operating-points-v2 = <&cluster0_opp>;
-> +			mediatek,cci = <&cci>;
->   		};
->   
->   		cpu3: cpu@3 {
-> @@ -58,6 +90,7 @@ cpu3: cpu@3 {
->   				 <&topckgen CLK_TOP_XTAL>;
->   			clock-names = "cpu", "intermediate";
->   			operating-points-v2 = <&cluster0_opp>;
-> +			mediatek,cci = <&cci>;
->   		};
->   
->   		cluster0_opp: opp-table-0 {
+Uninit was stored to memory at:
+ dev_addr_mod+0xb0/0x550 net/core/dev_addr_lists.c:582
+ __dev_addr_set include/linux/netdevice.h:4874 [inline]
+ eth_hw_addr_set include/linux/etherdevice.h:325 [inline]
+ aqc111_bind+0x35f/0x1150 drivers/net/usb/aqc111.c:717
+ usbnet_probe+0xbe6/0x4390 drivers/net/usb/usbnet.c:1772
+ usb_probe_interface+0xd01/0x1310 drivers/usb/core/driver.c:396
+...
 
+Uninit was stored to memory at:
+ ether_addr_copy include/linux/etherdevice.h:305 [inline]
+ aqc111_read_perm_mac drivers/net/usb/aqc111.c:663 [inline]
+ aqc111_bind+0x794/0x1150 drivers/net/usb/aqc111.c:713
+ usbnet_probe+0xbe6/0x4390 drivers/net/usb/usbnet.c:1772
+ usb_probe_interface+0xd01/0x1310 drivers/usb/core/driver.c:396
+ call_driver_probe drivers/base/dd.c:-1 [inline]
+...
 
+Local variable buf.i created at:
+ aqc111_read_perm_mac drivers/net/usb/aqc111.c:656 [inline]
+ aqc111_bind+0x221/0x1150 drivers/net/usb/aqc111.c:713
+ usbnet_probe+0xbe6/0x4390 drivers/net/usb/usbnet.c:1772
+
+Reported-by: syzbot+3b6b9ff7b80430020c7b@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=3b6b9ff7b80430020c7b
+Tested-by: syzbot+3b6b9ff7b80430020c7b@syzkaller.appspotmail.com
+Fixes: df2d59a2ab6c ("net: usb: aqc111: Add support for getting and setting of MAC address")
+Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+---
+P.S. In aqc111 there are many calls to aqc111_read_cmd[_nopm]
+functions in other parts of the driver and most of them are not
+checked at all. I've chosen to forego error handling of them, as
+it seems it's missing deliberately. Correct me if I am wrong.
+
+ drivers/net/usb/aqc111.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/usb/aqc111.c b/drivers/net/usb/aqc111.c
+index ff5be2cbf17b..453a2cf82753 100644
+--- a/drivers/net/usb/aqc111.c
++++ b/drivers/net/usb/aqc111.c
+@@ -30,10 +30,13 @@ static int aqc111_read_cmd_nopm(struct usbnet *dev, u8 cmd, u16 value,
+ 	ret = usbnet_read_cmd_nopm(dev, cmd, USB_DIR_IN | USB_TYPE_VENDOR |
+ 				   USB_RECIP_DEVICE, value, index, data, size);
+ 
+-	if (unlikely(ret < 0))
++	if (unlikely(ret < size)) {
++		ret = ret < 0 ? ret : -ENODATA;
++
+ 		netdev_warn(dev->net,
+ 			    "Failed to read(0x%x) reg index 0x%04x: %d\n",
+ 			    cmd, index, ret);
++	}
+ 
+ 	return ret;
+ }
+@@ -46,10 +49,13 @@ static int aqc111_read_cmd(struct usbnet *dev, u8 cmd, u16 value,
+ 	ret = usbnet_read_cmd(dev, cmd, USB_DIR_IN | USB_TYPE_VENDOR |
+ 			      USB_RECIP_DEVICE, value, index, data, size);
+ 
+-	if (unlikely(ret < 0))
++	if (unlikely(ret < size)) {
++		ret = ret < 0 ? ret : -ENODATA;
++
+ 		netdev_warn(dev->net,
+ 			    "Failed to read(0x%x) reg index 0x%04x: %d\n",
+ 			    cmd, index, ret);
++	}
+ 
+ 	return ret;
+ }
 
