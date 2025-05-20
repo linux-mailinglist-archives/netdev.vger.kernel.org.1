@@ -1,100 +1,128 @@
-Return-Path: <netdev+bounces-191892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FA8BABDBB9
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:15:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DAAEABDBC8
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:16:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAF191886A38
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 14:12:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F8C41884CC0
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 14:13:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8DB024A049;
-	Tue, 20 May 2025 14:09:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 209E824E019;
+	Tue, 20 May 2025 14:10:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cJgb1qTk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ATHRvJ49"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81BDD24886F;
-	Tue, 20 May 2025 14:09:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5BCB24E008;
+	Tue, 20 May 2025 14:10:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747750199; cv=none; b=CjH1XNxkgEuSJjt5ql/V78S7SCSNsr8TwPID0hA+ea/YKrWjjvEeujUhDF8l+zSN+Y0LGJdwbnciRMhcTHlKQynF2P0d1zhyAbUsBpWRFB8pk9hQP6nV5zIKqe/qKAjAS+8q/dl/puOSKSoN7PmGE9BroPRLS9biWJKc6BegPeo=
+	t=1747750250; cv=none; b=dl2gbsalQdVrFJRRH1v9gLmHof2vCNNEFgs8WmEvOAMqrujCEwIQ3coGOTKvFATpCo4Tvn1Ht/O60oQR0QCdqPuxEA5zQfVAxF+AwNlUhukYlCiYEBm4LCug1alv2UPUgazy/Nlxb6rsSp2eYUM0b6b4++UKZDDvUndA734a8G8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747750199; c=relaxed/simple;
-	bh=U7HmJIgAwANTXh8GX3ab1BkDtvTDewIc1iAxfBriVIM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=KWTsaKKDlRpORzWBKaEug0K9Wcelh62l77vWKrnjh1iMNfTfJnosdOUf6FQDuPSNTilUU3cHuv8Iz2gpfqe5D+qwIGVQT3DhJMU2fgmCG9AYG2G7yyFDRWK/C4naX1vpp3rBPolIoZNa+ZKmKM9Quex1p8i/pqjnjo1Oik5sbJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cJgb1qTk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48F6FC4CEEA;
-	Tue, 20 May 2025 14:09:59 +0000 (UTC)
+	s=arc-20240116; t=1747750250; c=relaxed/simple;
+	bh=cdHyZHYtiVmlTNEcUXDCYu+vQs7EHt7y5KTbaRf7oc0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X5XLtziXDtTLxhUsxi1eJD6cberMKY4vX/6mcGH3mXGeshBYIMqeh43fIwhucU+W3xmyzVTNgdCEv4hOgJwH42Gd2AC6ZF3hMVoDG5Kh4CtmoPzf+dG3QITWT55oAwcvQ8tzrMrOZ2pfV72+KGKOP7sB/NhcxyQxP7L2P8U93oA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ATHRvJ49; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AFB4C4CEE9;
+	Tue, 20 May 2025 14:10:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747750199;
-	bh=U7HmJIgAwANTXh8GX3ab1BkDtvTDewIc1iAxfBriVIM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cJgb1qTkj97hnAsju6x8I1ghB/DcAVB9qQRQV27LQEOfC9Vvc+FCl07xlO+5xsu//
-	 Z/J5lf0q04TdKiWwC4HWdlO4UM5+/QTwXmRjv/IjWYkk88q8GJwVY6bYra3obrvTw1
-	 R6c8Aa5wyBlTys3AdwPqvfu0bi196O3zo9YWLXqSTC7O63DGlxlELAoicaa6Ggtr74
-	 nTlK9AK6SR0QLoBaiFuHPOc9jH6cpNUaXoj7YozStS+/du242yeIRRoz/qY51KuRcq
-	 mqIArXtq9nDUTYRb32aL/70Y3mJDIHxSK5Ji5tr7iP/cJ3ApRk2JjqbHUfKko0DDE0
-	 nNJhIunn3aDxg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7169F380AA70;
-	Tue, 20 May 2025 14:10:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1747750249;
+	bh=cdHyZHYtiVmlTNEcUXDCYu+vQs7EHt7y5KTbaRf7oc0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ATHRvJ49L9s3Ghyxau8mpYx7tpHna5mSjzni2b2NjMor5RtMDYSCQy34MVMd50pi/
+	 SSjSRBFX4ak5uNfKmdeHsmGXQG2Pl8W2CCjFtjqQw8hvbiZZxrg5odMQy5DH7yeCxy
+	 ZtoPwoxCa8kSyAqmUJ0bn2AfbA/juRxLWmW7RaO3Wqk95IfsQLXc4tHRwWn6tujz29
+	 uxLOIdG7E1lGiSFPqP+63C/Kbh+TjMaQu2D669zAC1uUZ8jr5+EnIKZht16ACdPKX/
+	 utW3WPeslpbN3Q0auca5xK9omT6ujV0nzYCZZZL3se+UwmRo3MnBtw5wGLonp0AzIm
+	 ZSDi5xuna7WPQ==
+Date: Tue, 20 May 2025 10:10:48 -0400
+From: Sasha Levin <sashal@kernel.org>
+To: Antoine Tenart <atenart@kernel.org>
+Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, sdf@fomichev.me,
+	jdamato@fastly.com, aleksander.lobakin@intel.com, kuniyu@amazon.com,
+	shaw.leon@gmail.com, netdev@vger.kernel.org
+Subject: Re: [PATCH AUTOSEL 6.14 554/642] net-sysfs: remove rtnl_trylock from
+ device attributes
+Message-ID: <aCyNaDS3w8UEv7El@lappy>
+References: <20250505221419.2672473-1-sashal@kernel.org>
+ <20250505221419.2672473-554-sashal@kernel.org>
+ <jj7nizvkfuas57zcfkkbdaqnxzjdlgwtgzlkgzpazbrdnzhlc3@6ohz5cfz3tds>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/3] dt-bindings: can: microchip,mcp2510: Fix $id path
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174775023525.1333412.13241067062760119382.git-patchwork-notify@kernel.org>
-Date: Tue, 20 May 2025 14:10:35 +0000
-References: <20250520091424.142121-2-mkl@pengutronix.de>
-In-Reply-To: <20250520091424.142121-2-mkl@pengutronix.de>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- linux-can@vger.kernel.org, kernel@pengutronix.de, robh@kernel.org,
- conor.dooley@microchip.com
+In-Reply-To: <jj7nizvkfuas57zcfkkbdaqnxzjdlgwtgzlkgzpazbrdnzhlc3@6ohz5cfz3tds>
 
-Hello:
+On Tue, May 06, 2025 at 10:12:40AM +0200, Antoine Tenart wrote:
+>Hello,
+>
+>On Mon, May 05, 2025 at 06:12:50PM -0400, Sasha Levin wrote:
+>> From: Antoine Tenart <atenart@kernel.org>
+>>
+>> [ Upstream commit 79c61899b5eee317907efd1b0d06a1ada0cc00d8 ]
+>>
+>> There is an ABBA deadlock between net device unregistration and sysfs
+>> files being accessed[1][2]. To prevent this from happening all paths
+>> taking the rtnl lock after the sysfs one (actually kn->active refcount)
+>> use rtnl_trylock and return early (using restart_syscall)[3], which can
+>> make syscalls to spin for a long time when there is contention on the
+>> rtnl lock[4].
+>>
+>> There are not many possibilities to improve the above:
+>> - Rework the entire net/ locking logic.
+>> - Invert two locks in one of the paths — not possible.
+>>
+>> But here it's actually possible to drop one of the locks safely: the
+>> kernfs_node refcount. More details in the code itself, which comes with
+>> lots of comments.
+>>
+>> Note that we check the device is alive in the added sysfs_rtnl_lock
+>> helper to disallow sysfs operations to run after device dismantle has
+>> started. This also help keeping the same behavior as before. Because of
+>> this calls to dev_isalive in sysfs ops were removed.
+>>
+>> [1] https://lore.kernel.org/netdev/49A4D5D5.5090602@trash.net/
+>> [2] https://lore.kernel.org/netdev/m14oyhis31.fsf@fess.ebiederm.org/
+>> [3] https://lore.kernel.org/netdev/20090226084924.16cb3e08@nehalam/
+>> [4] https://lore.kernel.org/all/20210928125500.167943-1-atenart@kernel.org/T/
+>>
+>> Signed-off-by: Antoine Tenart <atenart@kernel.org>
+>> Link: https://patch.msgid.link/20250204170314.146022-2-atenart@kernel.org
+>> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+>> Signed-off-by: Sasha Levin <sashal@kernel.org>
+>
+>I'm not sure why commits from this series were flagged for stable trees,
+>but I would not advise to take them. They are not fixing a bug, only
+>improving performances by reducing lock contention.
+>
+>The commits are:
+>
+>79c61899b5ee  net-sysfs: remove rtnl_trylock from device attributes
+>b7ecc1de51ca  net-sysfs: move queue attribute groups outside the default groups
+>[It seems this one was missed?]
+>7e54f85c6082  net-sysfs: prevent uncleared queues from being re-added
+>[My guess is this looks like a real fix, but it's only preventing an
+>issue after the changes made in the series]
+>b0b6fcfa6ad8  net-sysfs: remove rtnl_trylock from queue attributes
+>
+>Same applies for the other stable backport requests.
 
-This series was applied to netdev/net.git (main)
-by Marc Kleine-Budde <mkl@pengutronix.de>:
+I'll drop them, thanks!
 
-On Tue, 20 May 2025 11:11:01 +0200 you wrote:
-> From: "Rob Herring (Arm)" <robh@kernel.org>
-> 
-> The "$id" value must match the relative path under bindings/ and is
-> missing the "net" sub-directory.
-> 
-> Fixes: 09328600c2f9 ("dt-bindings: can: convert microchip,mcp251x.txt to yaml")
-> Signed-off-by: "Rob Herring (Arm)" <robh@kernel.org>
-> Acked-by: Conor Dooley <conor.dooley@microchip.com>
-> Link: https://patch.msgid.link/20250507154201.1589542-1-robh@kernel.org
-> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,1/3] dt-bindings: can: microchip,mcp2510: Fix $id path
-    https://git.kernel.org/netdev/net/c/69c6d83d7173
-  - [net,2/3] can: bcm: add locking for bcm_op runtime updates
-    https://git.kernel.org/netdev/net/c/c2aba69d0c36
-  - [net,3/3] can: bcm: add missing rcu read protection for procfs content
-    https://git.kernel.org/netdev/net/c/dac5e6249159
-
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks,
+Sasha
 
