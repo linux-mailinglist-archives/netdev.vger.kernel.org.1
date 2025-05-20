@@ -1,86 +1,67 @@
-Return-Path: <netdev+bounces-191887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD949ABD9A2
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 15:38:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 033DFABD9B4
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 15:40:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 512AF1BA396B
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 13:38:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73D6E173DB5
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 13:38:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E2C242D8E;
-	Tue, 20 May 2025 13:37:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ddktNoAq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F7CA242D78;
+	Tue, 20 May 2025 13:37:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com [209.85.221.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF43E242D9F
-	for <netdev@vger.kernel.org>; Tue, 20 May 2025 13:37:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78249242D75;
+	Tue, 20 May 2025 13:37:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747748271; cv=none; b=nnHqFtjaKLSS3kX2ry7gvHY/ST5uCkIELlf9oEcRy3vLLeBIMDry3zK+yL1bHvHvaVIflZfes8xB2SEgCIfLh7Ptg5a+39fzk6HXDk6Krxlt7G+/3GgaccbX9bq+ibkC49Dv+z8q+c67HOh5coK7W59NwqEw0B4eHGfTNn5iqKc=
+	t=1747748279; cv=none; b=saxMk6o2tl6Ut6x5F0TwrIyxmYhDEJ1Qt3s9KrKuY7Pq1ifgk1HtjRca4whzhKR54wHQHsvsY8Eh2UpfTRAzigPo7JJ/XRneqTzluvLaLSjxVMGQiTJIRr0teyXEh+61TKNXMvaTTsumjccAjqdGWcKI7Eri0MSG7ctaHgYqPkM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747748271; c=relaxed/simple;
-	bh=U5YZUOHnFba3YEEPRb4B8MFish1XcE6mlQd58Sc0Ulo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Knb4TA5PaVVLJB2zrO0Q6ulTRoWwkOzBnXGoy4VwnW0XY0GKm3emrK3MA1lc7u5JszydHFcSB4lXvqaeqWmvweTzLJ0Gxgey19AifIRlUlj1X9bBq7WjglKQAx/n1BJQW9wPyRDp0q4MnWZYo2HUPXN/PF6yHFcLGvM7mJjso9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ddktNoAq; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1747748268;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EMsyQ7VNnN2qO1o186LSTMN+Ccv8Zs0ud4b/iPJ/c0Y=;
-	b=ddktNoAqoxnCA7ZVQCm+NgnfJHx9H82vcdyAbyij9F4XxE9ok7IHRnJB6aBfrucca0ak6e
-	9DZ0rRan/pfirb9CiyTvsgiOJdrm9j1QxpiA38G0r6pI+oBvlZvUzI4L5A1t7C5crRbycW
-	3T+2tTClPHLu7A4tsfzOjmKwU6TV+X4=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-496-uBwLxOiiMd6QY6Qu7Q5wSg-1; Tue, 20 May 2025 09:37:45 -0400
-X-MC-Unique: uBwLxOiiMd6QY6Qu7Q5wSg-1
-X-Mimecast-MFC-AGG-ID: uBwLxOiiMd6QY6Qu7Q5wSg_1747748264
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43cf446681cso34542215e9.1
-        for <netdev@vger.kernel.org>; Tue, 20 May 2025 06:37:45 -0700 (PDT)
+	s=arc-20240116; t=1747748279; c=relaxed/simple;
+	bh=lJ1O6hVAeYCq3TjoW7lWKxUkpMal0DDl5preTzMeYRs=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=s4YF8iKcOaOrCVG1nSugAdgUpg1/0BryXSIJO05Jn53m7c88Fxo3Ai8oZkkN1OYK3VAdVntu74HcmLHJ5/JHNCM4LgjSNRJDLbfMeDRzEz3ewPdp7PBfvfEYfgXe3aM0nan+YAFdHMoJW7S4ELvyTHCakO4bF/Wko9MVBAnF6X0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f68.google.com with SMTP id ffacd0b85a97d-3a374f727dbso1387404f8f.0;
+        Tue, 20 May 2025 06:37:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747748264; x=1748353064;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EMsyQ7VNnN2qO1o186LSTMN+Ccv8Zs0ud4b/iPJ/c0Y=;
-        b=SA6Wg/PfmNcQRIohLFtTzeEfxzHF/MdnIq6dKn78zuW0HGVlBCnMGCX5xaW1jdug+A
-         eIFEdEiqgpSHCcn8oItObbu1wYyAtKqCn+aV9hqLjmvRYGB6sdwO2yXwgiGAz+teHNFi
-         DKKij2Cej5fnqJ2PWohLFa8MVqmb+WhIROCRUifc5jipcGePe0R8mydq7xPkxdtFKbL2
-         UOSjkUiZcVve/ZB5z3/pxc+R75IppjxNj2QSZpnxuWfFau1nNWYKVzwjG0tSDCZx5A7z
-         8a1lRutBVWF2aGAptNb2UP9ZQkqI1MYDYEp9dswZr22yFkne4zcRD5NSGuZ77kNybGbu
-         GsAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW0fDdXJBdHlE9IBfRqJ9Ib0xmtWXIU8jCWLIcRfq+cIce/j3FlEYfFNq1plL4YbTISl/vL4Hk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yynkcw72goN8dXnUgwzthUK6Uy2Hj9rQZWtIGha4+xp3Ho8egQc
-	+Rugx2y1x47QlhQOxU6uPcq8BC+unWjMzfHB9hQuLzjRIN145TDQsVeEpbBujHjcC5tkX0bZZP1
-	nXoCe1Hy7mrAG4B4QEhrmdPGS9EEVvf1e2goR0sbKQKJfjmeU2NG1dD94lg==
-X-Gm-Gg: ASbGncslPqWhIdrwqb6VvW1uPBz3NPnlMfUjjplUJKKznw8I7TvYWmYUY0HqNwk97ye
-	eunhJ3bwedKnzc1zOyVDhWtCapOhlKfTJl+Y4tp6Hx4PE5xlQ/lGGdIZ1rGwcMqSmycQS9YMZ9b
-	q8sRei+P/3/LD4DEvAYQ1AfoDfY5Eti/f3gt8IWm+Hg33AK2dhmdUfN1hI8ij2PQ3+Hcig+Y4Zu
-	xVBVPWW1V6ezefGRgbQPP0oXtLdrt7zINpFdGedIj2CtAeVFD3tEweOxRIyGBMdWVBEk+DjXye7
-	5Ws+Yk+1c16Md7dSzho=
-X-Received: by 2002:a5d:5f8d:0:b0:3a0:8492:e493 with SMTP id ffacd0b85a97d-3a35c834f91mr16985993f8f.6.1747748264370;
-        Tue, 20 May 2025 06:37:44 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH2IgQR6pfl4f9JZX+mTcQQJIcZJQqSQkpv9zrll3ynmvnMB9+rl/8mcTBCpK5VIAeoxVyW1Q==
-X-Received: by 2002:a5d:5f8d:0:b0:3a0:8492:e493 with SMTP id ffacd0b85a97d-3a35c834f91mr16985962f8f.6.1747748264000;
-        Tue, 20 May 2025 06:37:44 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:244f:5710::f39? ([2a0d:3344:244f:5710::f39])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f23bfdd9sm31041385e9.18.2025.05.20.06.37.41
+        d=1e100.net; s=20230601; t=1747748275; x=1748353075;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:cc:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jzKeHLvkldBBNWFlV3J1PWGfZydBkzACibJG9mKAtK8=;
+        b=ZNgCxddjO6V8b2oXq1FlRsoNmdhGO3IDGVDc22z16CeIxPtikW5VxdCrVRC9ZtpXln
+         fKq1+Lhq8DMxlQc+5BwsxHh0zPTb6D5q+fM2mu3Q7c5kVg3PJ/4p6h1CFLODA+spY6uG
+         NCDNBujVd+tXd9qoEz5ymKaaBvAo0LQNV4RII9nlY/uWvw8igfOXWlKG/XnQOx0j+eE2
+         tQp4cK9ees2i4+9Cc0t8MuH2lLO54vPOUvzPaxuwIKWGB9jdiEgXydwdZnS25XLwDYmt
+         GVPba1y7/Q1PzxLU3IMyhpZl/x7xKXuaO6zjuCf/XN8NghDa+1oH5qrMBrCPwOfciGqx
+         Uorg==
+X-Forwarded-Encrypted: i=1; AJvYcCVnuhHpeXgnMOrjlGEDI9C2deo76U58S++qALjGPNUNQsldFOypaJ1CAzrXfVi0TqH1RKU3UbhW@vger.kernel.org, AJvYcCXc4hP6pqq0PVK3V9JiQNxx6lLIL2r42jvgy7fcy+EjMKg6ZashR7Ug6hMOzhjqwIWOLICgI8uUMuN4Z6M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAB2bnDD+UxTmsKmGmheQ6ZZPvndTU4rb1i4TMckvJ+GKbB6A1
+	krqiPYeumFHuWq44hq4mR3LlHRXYLsrAVgucyjN95QJetMcnKTnHuJEm
+X-Gm-Gg: ASbGncsvLSi3HM1betu2YaX41uVCU56yWIaZDBljPtzRv0b/Boy373npPhStFS+Vhle
+	XbFEpYSB9f80b+rN0aDhSr2IXjlpUlhjPcJ8hgOdzDKNRBFHVfG++so1r+unHrfU4Izc4YjlxH5
+	CJglbPrtsMqhgXrAYnOaJ5GDxpNzZ3IV+cGgRjPyCieim52xhiDmznTpejgTNQii7LGPx0Qew3C
+	mraAGqLnyXFgvXx9pmIYRpPVant74umi2eNGCyftFCZL3GU5Y0XEAQT4AJCcf43Put2uLv/d9K9
+	TPJzIEAc/+0UfSVsfU+XRhDkxVOYQ4dWDZ78VKL/14hIh80b5F9PxmXvZyLDXdw+vGXUfDh82pO
+	sgZpykUS68RFsyrMoqiTvBJNKKN0w
+X-Google-Smtp-Source: AGHT+IGuUEXch/PCRoEM7ilkwD1/obd0T/A0zeMUHdVyeq/0l5jufLqdeNGlQ47tnwFhhrk/9LjIVA==
+X-Received: by 2002:a05:6000:2407:b0:3a1:fcd3:a788 with SMTP id ffacd0b85a97d-3a3600dba61mr15218095f8f.48.1747748275145;
+        Tue, 20 May 2025 06:37:55 -0700 (PDT)
+Received: from [192.168.88.252] (194-212-160-119.customers.tmcz.cz. [194.212.160.119])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f1825457sm33261655e9.1.2025.05.20.06.37.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 May 2025 06:37:43 -0700 (PDT)
-Message-ID: <c9465324-b2df-4507-8d17-7cdda55a60f0@redhat.com>
-Date: Tue, 20 May 2025 15:37:40 +0200
+        Tue, 20 May 2025 06:37:54 -0700 (PDT)
+Message-ID: <c7d27849-f48b-4c85-bcd9-5d2206856abd@ovn.org>
+Date: Tue, 20 May 2025 15:37:53 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,55 +69,142 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 net-next 09/15] tcp: accecn: AccECN option
-To: Eric Dumazet <edumazet@google.com>, chia-yu.chang@nokia-bell-labs.com
-Cc: linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org,
- dsahern@kernel.org, kuniyu@amazon.com, bpf@vger.kernel.org,
- netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com,
- kuba@kernel.org, stephen@networkplumber.org, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch,
- donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
- shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
- ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
- g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
- mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
- Jason_Livingood@comcast.com, vidhi_goel@apple.com
-References: <20250514135642.11203-1-chia-yu.chang@nokia-bell-labs.com>
- <20250514135642.11203-10-chia-yu.chang@nokia-bell-labs.com>
- <ba1b1b36-cd7f-4b36-9cee-7444c219b4f5@redhat.com>
- <CANn89iLkyC-MfGUTvcV=zr+LYKzMsyv1im1Oft6EAXYb2x0jGw@mail.gmail.com>
+Cc: i.maximets@ovn.org, "aconole@redhat.com" <aconole@redhat.com>,
+ "echaudro@redhat.com" <echaudro@redhat.com>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "horms@kernel.org" <horms@kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "dev@openvswitch.org" <dev@openvswitch.org>
+Subject: Re: [PATCH] net: openvswitch: Fix the dead loop of MPLS parse
+To: Faicker Mo <faicker.mo@zenlayer.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "ovs-dev@openvswitch.org" <ovs-dev@openvswitch.org>
+References: <20250520032654.2453312-1-heapbin2@gmail.com>
+ <SJ0PR20MB60791551365A54151B195E44FA9FA@SJ0PR20MB6079.namprd20.prod.outlook.com>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CANn89iLkyC-MfGUTvcV=zr+LYKzMsyv1im1Oft6EAXYb2x0jGw@mail.gmail.com>
+From: Ilya Maximets <i.maximets@ovn.org>
+Autocrypt: addr=i.maximets@ovn.org; keydata=
+ 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
+In-Reply-To: <SJ0PR20MB60791551365A54151B195E44FA9FA@SJ0PR20MB6079.namprd20.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 5/20/25 12:32 PM, Eric Dumazet wrote:
-> On Tue, May 20, 2025 at 2:31 AM Paolo Abeni <pabeni@redhat.com> wrote:
->>
->> On 5/14/25 3:56 PM, chia-yu.chang@nokia-bell-labs.com wrote:
->>> This patch uses the existing 1-byte holes in the tcp_sock_write_txrx
->>> group for new u8 members, but adds a 4-byte hole in tcp_sock_write_rx
->>> group after the new u32 delivered_ecn_bytes[3] member. Therefore, the
->>> group size of tcp_sock_write_rx is increased from 96 to 112.
->>
->> Note that I'm still concerned by the relevant increase of the cacheline
->> groups size. My fear is that this change could defeat some/most of the
->> benefist from the cacheline reorg for all tcp users.
->>
->> Some additional feedback from Eric and/or Neal more than welcome!
+On 5/20/25 6:13 AM, Faicker Mo wrote:
+> The unexpected MPLS packet may not end with the bottom label stack.
+> When there are many stacks, The label count value has wrapped around.
+> A dead loop occurs, soft lockup/CPU stuck finally.
 > 
-> I have been trapped lately with production issues, sorry for the delay.
+> stack backtrace:
+> UBSAN: array-index-out-of-bounds in /build/linux-0Pa0xK/linux-5.15.0/net/openvswitch/flow.c:662:26
+> index -1 is out of range for type '__be32 [3]'
+> CPU: 34 PID: 0 Comm: swapper/34 Kdump: loaded Tainted: G           OE   5.15.0-121-generic #131-Ubuntu
+> Hardware name: Dell Inc. PowerEdge C6420/0JP9TF, BIOS 2.12.2 07/14/2021
+> Call Trace:
+>  <IRQ>
+>  show_stack+0x52/0x5c
+>  dump_stack_lvl+0x4a/0x63
+>  dump_stack+0x10/0x16
+>  ubsan_epilogue+0x9/0x36
+>  __ubsan_handle_out_of_bounds.cold+0x44/0x49
+>  key_extract_l3l4+0x82a/0x840 [openvswitch]
+>  ? kfree_skbmem+0x52/0xa0
+>  key_extract+0x9c/0x2b0 [openvswitch]
+>  ovs_flow_key_extract+0x124/0x350 [openvswitch]
+>  ovs_vport_receive+0x61/0xd0 [openvswitch]
+>  ? kernel_init_free_pages.part.0+0x4a/0x70
+>  ? get_page_from_freelist+0x353/0x540
+>  netdev_port_receive+0xc4/0x180 [openvswitch]
+>  ? netdev_port_receive+0x180/0x180 [openvswitch]
+>  netdev_frame_hook+0x1f/0x40 [openvswitch]
+>  __netif_receive_skb_core.constprop.0+0x23a/0xf00
+>  __netif_receive_skb_list_core+0xfa/0x240
+>  netif_receive_skb_list_internal+0x18e/0x2a0
+>  napi_complete_done+0x7a/0x1c0
+>  bnxt_poll+0x155/0x1c0 [bnxt_en]
+>  __napi_poll+0x30/0x180
+>  net_rx_action+0x126/0x280
+>  ? bnxt_msix+0x67/0x80 [bnxt_en]
+>  handle_softirqs+0xda/0x2d0
+>  irq_exit_rcu+0x96/0xc0
+>  common_interrupt+0x8e/0xa0
+>  </IRQ>
 > 
-> I am still working on an idpf bug, hopefully done today.
+> Signed-off-by: Faicker Mo <faicker.mo@zenlayer.com>
+> ---
+>  net/openvswitch/flow.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> Then, I am OOO tomorrow, and can have a look at the whole series on Thursday.
+> diff --git a/net/openvswitch/flow.c b/net/openvswitch/flow.c
+> index 8a848ce72e29..834b1b9110ac 100644
+> --- a/net/openvswitch/flow.c
+> +++ b/net/openvswitch/flow.c
+> @@ -805,6 +805,8 @@ static int key_extract_l3l4(struct sk_buff *skb, struct sw_flow_key *key)
+>                         if (label_count <= MPLS_LABEL_DEPTH)
+>                                 memcpy(&key->mpls.lse[label_count - 1], &lse,
+>                                        MPLS_HLEN);
+> +                       else if (unlikely(label_count == 255))
+> +                               return 0;
+> 
+>                         skb_set_inner_network_header(skb, skb->mac_len +
+>                                                      label_count * MPLS_HLEN);
+> --
+> 2.34.1
+> 
 
-Thanks Eric!
+One other thing,
 
-@Chia-Yu: please consider the above timeline before posting a new
-revision. i.e. it would be likely wise to wait for the additional review.
+For some reason the patch was not delivered to lore.kernel.org
+and is not available in netdev+bpf patchwork and not in lkml.org.
+Both of our replies are available in list archives.  The original
+email is available only via mail-archive, but it is ovs-dev and
+not the netdev list:
+  https://www.mail-archive.com/ovs-dev@openvswitch.org/msg94895.html
+Same for v2.
 
-/P
+Is kernel.org blocking the sender somehow?  Does anyone know?
 
+Best regards, Ilya Maximets.
 
