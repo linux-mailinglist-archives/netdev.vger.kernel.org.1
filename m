@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-191954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EC4FABE07D
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 18:21:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CAFBABE090
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 18:24:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59CA01885C44
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:19:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E6D64A8128
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:19:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97C29258CDD;
-	Tue, 20 May 2025 16:19:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B78226AA9E;
+	Tue, 20 May 2025 16:19:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e6JEqTam"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BQWMt3IX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7331B2522AC
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 279EC266B6B
 	for <netdev@vger.kernel.org>; Tue, 20 May 2025 16:19:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747757964; cv=none; b=Gl6Xb8ttIA05KrQCwM5YAHxZNM5jnpLk/oIDsr3wQTUL5IvuLwko6eg2Fic+5xwQWgtnOG7Q1OHhW93NUpReWQ2aSZ95zTXtjbYdiNtqNUKXhlfZul9MoFR1cp1rO19hF8BFmTdFWLqHcnzci8NAFNG1ppcZpnpUfL8aDtvC32w=
+	t=1747757965; cv=none; b=LzxC4PhEIgSBYQoLbIHyMHJCu4Mtt8JDeLm4szPYdIFhTfYHCK7YYqN9PmzLszleyJaQXu92drIm/Em73jwChFeN85N+HYSEbz9pZBcnYuaqHZhFuZG/FEbEPWVviEoPo9XY46hxX5itYwf0N0qTDW8gho/7cTUVX4QvVwwbVXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747757964; c=relaxed/simple;
-	bh=gHB+EBx132QnV15nyPcMh8RHuNJVqYtf14Cu4w7tXaY=;
+	s=arc-20240116; t=1747757965; c=relaxed/simple;
+	bh=drm+3T6vMFwHwT+I4LyqUan18l3+iBxMG/6JK4cUud0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ru9PprXwMqlRnx2kHgCBfD9tfaNvYbs4w+ybaLiVG7FCgg19Lm2OsE2xvIIeAkYLh/YeFoN7MEeanznUV7lOGDGX+mA20Nbfs0633dJzMMev/gzuR/Hh6qwiWlEL0MG276/eTmkagaRYLABbQHTX06hkN8sEpUKTPjJCeilvQI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e6JEqTam; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F596C4CEEA;
-	Tue, 20 May 2025 16:19:23 +0000 (UTC)
+	 MIME-Version; b=EMkqDPx8XhC2FX0XEUw+EnDeo6nMBY6x9ltXLpoktBqU9SWZyALwfURZMRIygQGcnicgVJAIfZJZyz0B5ZR4g9YX6kgAWoqEmJoNuOpiVlcqCmh/RMq7pOqZJbsLZr6HARajuduKdCF3JKFAy6RIXw9BRX+FRKtQkZjzLj0GdI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BQWMt3IX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A7AAC4CEEB;
+	Tue, 20 May 2025 16:19:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747757963;
-	bh=gHB+EBx132QnV15nyPcMh8RHuNJVqYtf14Cu4w7tXaY=;
+	s=k20201202; t=1747757964;
+	bh=drm+3T6vMFwHwT+I4LyqUan18l3+iBxMG/6JK4cUud0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=e6JEqTamVfPyhjSqFWivwxhK8HgRaRq7Wci1V0uTCG6L29yhuQUNALD/6ilWOPFsA
-	 WwGVDUQBbASilfrvtDsZNgDOohUmMRwOYjnKprf4GAbT07ZqPcdsDCXal2aL8PpP8p
-	 JUQOF2zGpP+v2TVEUTVd/HEwCrAvlg+1KWGWdsWeSxY98pvGAaogeAJQQscXbU9JGL
-	 Pr+i58tIREvHUD/Es1Q32T9MxGnIugnGgVda46DSzne5xqyYGmUFDjbOT9PvEIpu+8
-	 mOvgCKYCmqfrgNimJeza20s9OvVKOGXSB4rmhWF0HldbIk8waeOWfKJI3QtjxpS3t2
-	 Isr8o9mOA16MA==
+	b=BQWMt3IXbR5i8D4cJE0DPdiWopfxWi+5JosMGWplNfWutym/Zi3J8arDF7y9ihVhN
+	 5WypG+AeMv1VzEUmE79ukSGDP9NpcGXsg+US/kveAzG6A8AYqSUeguKMESkpBmBsd9
+	 jo84tP1VeClT+X8nznJDr9RxeXNBVa9vLJNyTuohKJGbS7L2Iwh/5B66/xLC4EIZ5B
+	 /in0Bf/BgDwEsLReWloYCVNyiXQIsTjYC8kXbBkT38y5yGSflm0fLUcrLG9WbbLpn/
+	 9G3IL4S6Z/IuHw3DZI46wRA/S80dcwUQqqq0O/ZLgEga48mrPhdbQ8w7kSfn5QPou3
+	 cACNO9bhl5DLQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -54,9 +54,9 @@ Cc: netdev@vger.kernel.org,
 	jstancek@redhat.com,
 	kory.maincent@bootlin.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 01/12] tools: ynl-gen: add makefile deps for neigh
-Date: Tue, 20 May 2025 09:19:05 -0700
-Message-ID: <20250520161916.413298-2-kuba@kernel.org>
+Subject: [PATCH net-next v2 02/12] netlink: specs: tc: remove duplicate nests
+Date: Tue, 20 May 2025 09:19:06 -0700
+Message-ID: <20250520161916.413298-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250520161916.413298-1-kuba@kernel.org>
 References: <20250520161916.413298-1-kuba@kernel.org>
@@ -68,48 +68,138 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Kory is reporting build issues after recent additions to YNL
-if the system headers are old.
+tc-act-stats-attrs and tca-stats-attrs are almost identical.
+The only difference is that the latter has sub-message decoding
+for app, rather than declaring it as a binary attr.
 
-Link: https://lore.kernel.org/20250519164949.597d6e92@kmaincent-XPS-13-7390
-Reported-by: Kory Maincent <kory.maincent@bootlin.com>
-Fixes: 0939a418b3b0 ("tools: ynl: submsg: reverse parse / error reporting")
+tc-act-police-attrs and tc-police-attrs are identical but for
+the TODO annotations.
+
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-v2:
- - new patch
----
- tools/net/ynl/Makefile.deps    | 3 ++-
- include/uapi/linux/neighbour.h | 4 ++--
- 2 files changed, 4 insertions(+), 3 deletions(-)
+ Documentation/netlink/specs/tc.yaml | 78 ++---------------------------
+ 1 file changed, 4 insertions(+), 74 deletions(-)
 
-diff --git a/tools/net/ynl/Makefile.deps b/tools/net/ynl/Makefile.deps
-index e5a5cb1b2cff..8c378356fc87 100644
---- a/tools/net/ynl/Makefile.deps
-+++ b/tools/net/ynl/Makefile.deps
-@@ -35,7 +35,8 @@ CFLAGS_rt-addr:=$(call get_hdr_inc,__LINUX_RTNETLINK_H,rtnetlink.h) \
- 	$(call get_hdr_inc,__LINUX_IF_ADDR_H,if_addr.h)
- CFLAGS_rt-link:=$(call get_hdr_inc,__LINUX_RTNETLINK_H,rtnetlink.h) \
- 	$(call get_hdr_inc,_LINUX_IF_LINK_H,if_link.h)
--CFLAGS_rt-neigh:=$(call get_hdr_inc,__LINUX_RTNETLINK_H,rtnetlink.h)
-+CFLAGS_rt-neigh:=$(call get_hdr_inc,__LINUX_RTNETLINK_H,rtnetlink.h) \
-+	$(call get_hdr_inc,__LINUX_NEIGHBOUR_H,neighbour.h)
- CFLAGS_rt-route:=$(call get_hdr_inc,__LINUX_RTNETLINK_H,rtnetlink.h)
- CFLAGS_rt-rule:=$(call get_hdr_inc,__LINUX_FIB_RULES_H,fib_rules.h)
- CFLAGS_tcp_metrics:=$(call get_hdr_inc,_LINUX_TCP_METRICS_H,tcp_metrics.h)
-diff --git a/include/uapi/linux/neighbour.h b/include/uapi/linux/neighbour.h
-index 5e67a7eaf4a7..b851c36ad25d 100644
---- a/include/uapi/linux/neighbour.h
-+++ b/include/uapi/linux/neighbour.h
-@@ -1,6 +1,6 @@
- /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
--#ifndef __LINUX_NEIGHBOUR_H
--#define __LINUX_NEIGHBOUR_H
-+#ifndef _UAPI__LINUX_NEIGHBOUR_H
-+#define _UAPI__LINUX_NEIGHBOUR_H
- 
- #include <linux/types.h>
- #include <linux/netlink.h>
+diff --git a/Documentation/netlink/specs/tc.yaml b/Documentation/netlink/specs/tc.yaml
+index 953aa837958b..c7e6a734cd12 100644
+--- a/Documentation/netlink/specs/tc.yaml
++++ b/Documentation/netlink/specs/tc.yaml
+@@ -1452,7 +1452,7 @@ protonum: 0
+       -
+         name: stats
+         type: nest
+-        nested-attributes: tc-act-stats-attrs
++        nested-attributes: tca-stats-attrs
+       -
+         name: pad
+         type: pad
+@@ -1471,38 +1471,6 @@ protonum: 0
+       -
+         name: in-hw-count
+         type: u32
+-  -
+-    name: tc-act-stats-attrs
+-    attributes:
+-      -
+-        name: basic
+-        type: binary
+-        struct: gnet-stats-basic
+-      -
+-        name: rate-est
+-        type: binary
+-        struct: gnet-stats-rate-est
+-      -
+-        name: queue
+-        type: binary
+-        struct: gnet-stats-queue
+-      -
+-        name: app
+-        type: binary
+-      -
+-        name: rate-est64
+-        type: binary
+-        struct: gnet-stats-rate-est64
+-      -
+-        name: pad
+-        type: pad
+-      -
+-        name: basic-hw
+-        type: binary
+-        struct: gnet-stats-basic
+-      -
+-        name: pkt64
+-        type: u64
+   -
+     name: tc-act-bpf-attrs
+     attributes:
+@@ -1797,44 +1765,6 @@ protonum: 0
+       -
+         name: key-ex
+         type: binary
+-  -
+-    name: tc-act-police-attrs
+-    attributes:
+-      -
+-        name: tbf
+-        type: binary
+-        struct: tc-police
+-      -
+-        name: rate
+-        type: binary # TODO
+-      -
+-        name: peakrate
+-        type: binary # TODO
+-      -
+-        name: avrate
+-        type: u32
+-      -
+-        name: result
+-        type: u32
+-      -
+-        name: tm
+-        type: binary
+-        struct: tcf-t
+-      -
+-        name: pad
+-        type: pad
+-      -
+-        name: rate64
+-        type: u64
+-      -
+-        name: peakrate64
+-        type: u64
+-      -
+-        name: pktrate64
+-        type: u64
+-      -
+-        name: pktburst64
+-        type: u64
+   -
+     name: tc-act-simple-attrs
+     attributes:
+@@ -3327,10 +3257,10 @@ protonum: 0
+         struct: tc-police
+       -
+         name: rate
+-        type: binary
++        type: binary # TODO
+       -
+         name: peakrate
+-        type: binary
++        type: binary # TODO
+       -
+         name: avrate
+         type: u32
+@@ -3817,7 +3747,7 @@ protonum: 0
+         attribute-set: tc-act-pedit-attrs
+       -
+         value: police
+-        attribute-set: tc-act-police-attrs
++        attribute-set: tc-police-attrs
+       -
+         value: sample
+         attribute-set: tc-act-sample-attrs
 -- 
 2.49.0
 
