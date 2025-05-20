@@ -1,95 +1,158 @@
-Return-Path: <netdev+bounces-191809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A27FABD592
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 12:52:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BCDEABD5AC
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 12:58:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95BBE1620D8
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 10:50:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94DDE177D32
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 10:58:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3B40269CFD;
-	Tue, 20 May 2025 10:49:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A126274678;
+	Tue, 20 May 2025 10:58:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="siHNuvtC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FL/1PXNI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EDCB1A3177
-	for <netdev@vger.kernel.org>; Tue, 20 May 2025 10:49:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6E4E272E63
+	for <netdev@vger.kernel.org>; Tue, 20 May 2025 10:58:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747738196; cv=none; b=L57QEGxfs2Qnys3JWLBGGaW6D/IIN+FIzWHlZbrmv2N/HXGsgw/bRchTdfv5zKhJbKgdAdrvmgxghcoHYEzddWcwi7p2Ae3tWYS9NMHhyGfz+TXnx+g7BcN0mRS83r0Aeu2GCt2skVk4AU0HqTEQTxwLM8dFaGi6dZqRHnLFmkk=
+	t=1747738707; cv=none; b=Yiaz4MHHQbCxhy518rvjJZmuPOG6CJYMIVeJIx69UDOhpkL+sKoe/8yD2UeJWWidAj1Gb+NQUMKKU3T17yZce2IWjQn4nm0sU9W413tDJq4Rbnre/cLlrmYEbZuYpV3WhM2QiPFLnvd+KNKmhFivFhRbI2XXvUtdtGlAIOtd0YU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747738196; c=relaxed/simple;
-	bh=/bKGV9MAHUzsTfQt9N51BwCwYmlTb1cXbI66SgtHRI8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hJkd9LGvrx58hL4uoBXLKGG6aLy3K+kyAep5XKEPaQ4KO85z1kaq4L/TxuomkR6Izkj/7/fcyNi9UoTpkuDg+r4z4WMfdOhuOxGXUsHS0HXM+eiYHgGabwZYnBi651+n0gcZsN/hTg5WAIkxOhbLXe+OZ14O7eHedelPM88zX8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=siHNuvtC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0130DC4CEE9;
-	Tue, 20 May 2025 10:49:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747738196;
-	bh=/bKGV9MAHUzsTfQt9N51BwCwYmlTb1cXbI66SgtHRI8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=siHNuvtC+uvn0OepxhNoQQP6VaRdtcDHPophwdY2FVCuva7FptjhEUd4AZ6htd39k
-	 XhNKtwVMHRHNfkiPlR7KPJrHk1ZPdzc0h9o3Qh7QyKS+vVSREJHr9P4X4C/CMQ2j16
-	 4KkZisSUwNwql4uHY99smGNj/oJNw5YRn/wOhw5rtwmOgT5zr1TKEKAykjVjC5gdTd
-	 d1LrBbJJGaPAAvzgLxgocMN8a6KS91TwQ1RF3H5Ic7FVVjMzgVPcm7nPEUzmJO9ohH
-	 z/ugxGd7U986kR/sh51ZgJF1L3U7ix2t9Av9ntUB5qwLv3ycH2T5mHkopThR4YZTgi
-	 YiFXaigIJS8PQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33FA7380AA70;
-	Tue, 20 May 2025 10:50:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1747738707; c=relaxed/simple;
+	bh=XCjhuqMISSLiz8GE+zUfY3bVdPUVO6omDyP1PQiJ4QE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=U93cx5y3k8KfmWe0/pHM8VwKQUxcV9/0SB0XWFuU4wfCVXGgmYKFN2SupZZFPHp/5CSmbcDz4dm0KfoeE9N7Z94EZZkv6ywRA6Pk77gk0uGCt8/YMlRRmtpzTqALetuNDGYiXCsvWtz+a/XCkJyBkUt5j9hklE4W6jWhrLyQR4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FL/1PXNI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747738703;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=D274b/Kowlx4frHiCJWZP9nEutUPctu6wUBTBcBAl+Q=;
+	b=FL/1PXNIhWSeLXnyHnd6L1CGvcIpqOeGjkYUPkenRVJ23R1Fr5eOF/+kkgqWIiBQMRuEGX
+	G/Jz/H50tVl12AC68A+385ys8j6BeQkOTibLyyAq9XeYXVtr89ts7h4+4dAU8lC4/DrsEn
+	Gh6+1SOoStzECLl3V75G9ptC+vIgCHQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-218-XUKzzG_NODaYaWFa-0j95g-1; Tue, 20 May 2025 06:58:22 -0400
+X-MC-Unique: XUKzzG_NODaYaWFa-0j95g-1
+X-Mimecast-MFC-AGG-ID: XUKzzG_NODaYaWFa-0j95g_1747738701
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-442e0e6eb84so34691725e9.0
+        for <netdev@vger.kernel.org>; Tue, 20 May 2025 03:58:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747738701; x=1748343501;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=D274b/Kowlx4frHiCJWZP9nEutUPctu6wUBTBcBAl+Q=;
+        b=F8Clp8p+g6+BOreCfprlWJEqi+cn3M9vHBryQXUA1MSckybweQm4tSr3GN68aSV7k5
+         TNB4VLf2N/ft9U6pci9Qlc4VZbrtwcHV9ZfhZd/XlUyX6j07iQCaoBHzsKu7HSs7uIVh
+         8mmRzEsq/pbKZYAPNYI07Ruc5Pu3nlPEVn/EZYMTlsEhsIE9yjh5AfgxcDRsnne3W7RF
+         FOO4kRPNoc/tO1Nov9k5eRhAKgsM83dJ8t9GisII9OR+ddES99QcZuCC3cDR8mvrFsxa
+         HtH3KANK8BaStBPwWRXZcpKj5+Kj/v8SqDV6qFSPquQMlw99WGiZvURlO/GPKfFqPk2k
+         34aw==
+X-Forwarded-Encrypted: i=1; AJvYcCXO4ugGHYxdJ5f9MQqBBX6NmxdiRzGSHjKgQfADqRHH5LNLhaC9GhRCZs66E3sNZPNTYZU3uwY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyzKYivdAHGHuDmgeyU4DpH+Sl50iMjmadH1sgNcFL5tejR6P5S
+	fSmVVRX0HU5mHXdsy7T9agBux9p8CL2/yxDZQLVmyd3ZTS0y6EvLhAXxtWPjxT83l2SXgjOwWIg
+	N2PHnB5Or7WEFhtc1vqcJ+cwufkafjxzrGLtS7mTIEgIhlbFakSjF77KHKw==
+X-Gm-Gg: ASbGnctHElczEQ1t5tSCssa7jzA8Pfr+GVgjAUAdMgdM3WqvVLI2FOOmlnrQ70IM92v
+	3woY8NDAfr3PE10iptF5kd9PwRIAJOqAXQFG0tL+2iR8a8lVsY6tN5hA7CL4s1fXtD8VzOxlKuT
+	w4PSJhHwjpAmnrzFO+w9usa5cUq1V6VU5ltIMdEk9BkIiPNEr/hTP2sijcdrzDQvcbqAvzPI8yY
+	ASiazyau25qf4pqfpnwj1CnBGTV7hBdiGz+U0ql0L/6xQwOT3fQS6oNGVSS0qui05+TYmYglIFd
+	0JJUOnYyOJKqwKfi8VJieWWMTlSzT3scYFYyGp8kwM17fxvgeWmMMmQVuM8=
+X-Received: by 2002:a05:600c:34c9:b0:43d:fa59:af97 with SMTP id 5b1f17b1804b1-442fd671d12mr138378715e9.32.1747738701187;
+        Tue, 20 May 2025 03:58:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGvQyiml0UoaDF/88g9sn8ucNfch1PfIPLwL2A/DSRiTilof5rRlAsf3z16t0LsF6Ckj58VyA==
+X-Received: by 2002:a05:600c:34c9:b0:43d:fa59:af97 with SMTP id 5b1f17b1804b1-442fd671d12mr138378435e9.32.1747738700827;
+        Tue, 20 May 2025 03:58:20 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:244f:5710:ef42:9a8d:40c2:f2db? ([2a0d:3344:244f:5710:ef42:9a8d:40c2:f2db])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a35ca9417dsm15708833f8f.101.2025.05.20.03.58.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 May 2025 03:58:20 -0700 (PDT)
+Message-ID: <73a4740e-755e-4ba8-8130-df09bd25197a@redhat.com>
+Date: Tue, 20 May 2025 12:58:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next PATCH] octeontx2-pf: Add tracepoint for NIX_PARSE_S
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174773823201.1264167.11954102216898347230.git-patchwork-notify@kernel.org>
-Date: Tue, 20 May 2025 10:50:32 +0000
-References: <1747331048-15347-1-git-send-email-sbhatta@marvell.com>
-In-Reply-To: <1747331048-15347-1-git-send-email-sbhatta@marvell.com>
-To: Subbaraya Sundeep <sbhatta@marvell.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, gakula@marvell.com,
- hkelam@marvell.com, sgoutham@marvell.com, lcherian@marvell.com,
- bbhushan2@marvell.com, jerinj@marvell.com, netdev@vger.kernel.org,
- rkannoth@marvell.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7] selftests/vsock: add initial vmtest.sh for
+ vsock
+To: Stefano Garzarella <sgarzare@redhat.com>,
+ Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ kvm@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20250515-vsock-vmtest-v7-1-ba6fa86d6c2c@gmail.com>
+ <f7dpfvsdupcf4iucmmit2xzgwk53ial6mcl445uxocizw6iow5@rhmh6m2qd3zu>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <f7dpfvsdupcf4iucmmit2xzgwk53ial6mcl445uxocizw6iow5@rhmh6m2qd3zu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Thu, 15 May 2025 23:14:08 +0530 you wrote:
-> The NIX_PARSE_S structure populated by hardware in the
-> NIX RX CQE has parsing information for the received packet.
-> A tracepoint to dump the all words of NIX_PARSE_S
-> is helpful in debugging packet parser.
+On 5/20/25 10:24 AM, Stefano Garzarella wrote:
+> On Thu, May 15, 2025 at 03:00:48PM -0700, Bobby Eshleman wrote:
+>> This commit introduces a new vmtest.sh runner for vsock.
+>>
+>> It uses virtme-ng/qemu to run tests in a VM. The tests validate G2H,
+>> H2G, and loopback. The testing tools from tools/testing/vsock/ are
+>> reused. Currently, only vsock_test is used.
+>>
+>> VMCI and hyperv support is automatically built, though not used.
+>>
+>> Only tested on x86.
+>>
+>> To run:
+>>
+>>  $ make -C tools/testing/selftests TARGETS=vsock
+>>  $ tools/testing/selftests/vsock/vmtest.sh
 > 
-> Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
-> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+> I am a little confused, now we have removed the kernel build step, so 
+> how should I test this? (It's running my fedora kernel, but then ssh 
+> fails to connect)
 > 
-> [...]
+> Would it be better to re-introduce the build phase at least in the 
+> script as optional (not used by selftest, but usable if you want to use 
+> the script directly)?
+> 
+> Or at least I think we should explain that the script launches the 
+> running kernel, because the config file introduced by this patch 
+> confused me. How it's supposed to be used?
 
-Here is the summary with links:
-  - [net-next] octeontx2-pf: Add tracepoint for NIX_PARSE_S
-    https://git.kernel.org/netdev/net-next/c/9ab0ac0e532a
+This is the usual selftests schema. The user has to build and install
+the kernel including the specified config before running the tests, see
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+make help |grep kselftest
 
+Also this is what we do for our CI:
+
+https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style
+
+@Bobby: AFAICS this now has all the ingredients to fit NIPA integration
+am I correct? the last commit message sentence could possibly be dropped.
+
+Still it could be worthy to re-introduce (behind a command line option)
+the ability to build the kernel as per Stefano request, to fit his
+existing workflow (sorry for the partial back and forth).
+
+Thanks,
+
+Paolo
 
 
