@@ -1,56 +1,73 @@
-Return-Path: <netdev+bounces-191768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EFF8ABD211
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 10:34:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 552DCABD231
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 10:42:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B499C3A981F
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 08:34:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97A11189448F
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 08:42:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C73725E822;
-	Tue, 20 May 2025 08:34:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 792F126156A;
+	Tue, 20 May 2025 08:42:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GmwWeQo1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69D01D86C6;
-	Tue, 20 May 2025 08:34:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.166.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF25E25E46A
+	for <netdev@vger.kernel.org>; Tue, 20 May 2025 08:42:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747730091; cv=none; b=oUvhWarIFB7OXe/EhFo2FaxuoOWVfNQW9KByee29kxL78vYzT+rk152p5105FSU9S4n95c1JALQa+4XBlUhVnLktnSazII+7Pz36PUSKo7nbukWkHYx8ckYLeGcEFiG4X3TDc4vBQJEx31NLlkkAMmOZ1OwPW9IdrxES4nDJhL4=
+	t=1747730550; cv=none; b=VAncHldJajNE2GQFAev6Dr8UuC7jgaRn1F0/PZIi+DEDG16HWPbR+7OpFwT5KwDD2XeXvV/+77o26VMEo4/2ojyjl3xUu+AvCsOBmyOk/JxovjFDSKK2YP/qB4JCrns8hg6yc8xHdUf6h5p2FvO1GbuWNGlEvLA4RgN3dG6RUak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747730091; c=relaxed/simple;
-	bh=baaNnB5mw6P6bMCAwvRD2yCzeVDnqWbowLwoQ3gRqBU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HxAuzVhsHTZKX6ajxKZc0zKtgLZpExo1pS5a7ERDBRfFDPc+PNyo5Dn6GwC7xNTM7H1VbimPvKPJDWJH7MENEGBDIB7Lwh2BUbCji216b29ZghIsA10vYpOQTXRQFHvJWZV0bO8i0LbTEBa5TPewzfVUuMZbla1k+g/rs/kYQ+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.166.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250809.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54K6KccP028082;
-	Tue, 20 May 2025 01:34:40 -0700
-Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [147.11.82.254])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 46psykjn66-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Tue, 20 May 2025 01:34:40 -0700 (PDT)
-Received: from ala-exchng01.corp.ad.wrs.com (147.11.82.252) by
- ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.43; Tue, 20 May 2025 01:34:24 -0700
-Received: from pek-lpg-core1.wrs.com (147.11.136.210) by
- ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server id
- 15.1.2507.43 via Frontend Transport; Tue, 20 May 2025 01:34:20 -0700
-From: <jianqi.ren.cn@windriver.com>
-To: <gregkh@linuxfoundation.org>, <stable@vger.kernel.org>
-CC: <patches@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
-        <jianqi.ren.cn@windriver.com>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <atenart@kernel.org>, <kareemem@amazon.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 5.15.y] net: decrease cached dst counters in dst_release
-Date: Tue, 20 May 2025 16:34:36 +0800
-Message-ID: <20250520083436.1956589-1-jianqi.ren.cn@windriver.com>
+	s=arc-20240116; t=1747730550; c=relaxed/simple;
+	bh=rchwuanThsE5B2k89HcYlZ9D24IM1yxl1+aLijatFB4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CN1y6c+iXfScGvAs2JtGALs0hw7UZEzZzBXNLZwLS3cMOGhBJQPMsM6nY73v/jGNHlclheO59RXqOjDuEsnv5iNx9/iJ5/Z/yklfqLZDheJy5/v4WnJjsgkGMB3oWX/pBRzmkt3L+W7UQX9NR0cApJUjNAD9AgZ8Co43eczZz7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GmwWeQo1; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747730547; x=1779266547;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=rchwuanThsE5B2k89HcYlZ9D24IM1yxl1+aLijatFB4=;
+  b=GmwWeQo1PV3ieM2tQbUiF+Wq+HozPbqThFSO+Lte8QE+TBEYTjfN0r3l
+   +MlZkKAHkIXKqr0zZBV7NBtV6DYrlwrRPSh/6dhqJUIdajJgVftVQQIyd
+   okfahxGHW2Tr/wDLcXysDcpOg1rMI0eW4P74y/HK8Xs+rpb3eaMoolqDD
+   k4cSyzz6yaIZ12ee+iQHZvALqYfR1g/jkvSg1o2HgU1saNbMDJjspx2Wr
+   EwTxU+S66KWElJuIKQl1463+0Dp5/O5OnwkcygZFmn/dMsi4kvX70S+7A
+   zMSu4SvIVkMT80VbeazbDlCmvUaGbF6H4jqp0zJXXulwyZZqFrmjVpiLM
+   Q==;
+X-CSE-ConnectionGUID: GV8lFOufRXWFSZRDQLS5xg==
+X-CSE-MsgGUID: LTA5p8m2TP6VfSLGjSDNnw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11438"; a="37270479"
+X-IronPort-AV: E=Sophos;i="6.15,302,1739865600"; 
+   d="scan'208";a="37270479"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2025 01:42:27 -0700
+X-CSE-ConnectionGUID: PQHVbds1QNieHIhf0zbgLA==
+X-CSE-MsgGUID: Ge8aUrcrS3yfNDSM4SLwdQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,302,1739865600"; 
+   d="scan'208";a="144742753"
+Received: from admindev-x299-aorus-gaming-3-pro.igk.intel.com ([10.91.3.52])
+  by orviesa005.jf.intel.com with ESMTP; 20 May 2025 01:42:25 -0700
+From: Anton Nadezhdin <anton.nadezhdin@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	richardcochran@gmail.com,
+	Anton Nadezhdin <anton.nadezhdin@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Subject: [PATCH iwl-net v4] ice/ptp: fix crosstimestamp reporting
+Date: Tue, 20 May 2025 10:42:16 +0200
+Message-Id: <20250520084216.326210-1-anton.nadezhdin@intel.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -58,82 +75,46 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=a8kw9VSF c=1 sm=1 tr=0 ts=682c3ea0 cx=c_pps a=K4BcnWQioVPsTJd46EJO2w==:117 a=K4BcnWQioVPsTJd46EJO2w==:17 a=dt9VzEwgFbYA:10 a=bC-a23v3AAAA:8 a=VwQbUJbxAAAA:8 a=20KFwNOVAAAA:8 a=t7CeM3EgAAAA:8 a=RSTy8_7DnOH_di7dvoIA:9
- a=-FEs8UIgK8oA:10 a=FO4_E8m0qiDe52t0p3_H:22 a=FdTzh2GWekK77mhwV6Dw:22
-X-Proofpoint-GUID: BnuNRq0N2AnM-9QjhHY5rghkzHYzyerE
-X-Proofpoint-ORIG-GUID: BnuNRq0N2AnM-9QjhHY5rghkzHYzyerE
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIwMDA2OSBTYWx0ZWRfX7V+o0cpuP0ED SKJuEbV+Ne49fSGoLidRfnT7LVcyUt1GTDxB+tXbFX/7t8TJ5rIUD1xLA6kJwmwRY0ZckDV2og0 Vq0VQ9bLUPuNOgBpTQ5x3a85K6/R0kQhC3ior7XYLuCF5+bWpr2q3+MDqGmA9ZsBB3V+knnuVc9
- TMTscfUAyfTO/LmYlPUk/+fciHF4fwStuxOTZH45XUEoSpX1Ojnw0aETgAAdVv8c45GRH7sIe6o 8g/P2oGe+CQOFlSnVGmO43LnPwdj9iSk4VRESvnwNYzmrg+P51BS4OjgwmKYK4798rnidfCxwrc G2BsvcGZ5zuQY4TsELWNbaxGgMZf/IjJnU01eVQLkUF9UfXBfciFdgkMEbrrObuoHTBTfwHp0xE
- hwCXGF1jYPjbcZgM/Pyg6agjO/LdNvPy+QmyQ1Bey63uRgKJ2+3rt9g58dCXyMSNR0xVpfiN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-20_03,2025-05-16_03,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 malwarescore=0
- lowpriorityscore=0 adultscore=0 spamscore=0 bulkscore=0 phishscore=0
- impostorscore=0 mlxlogscore=999 mlxscore=0 priorityscore=1501
- clxscore=1015 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.21.0-2505070000
- definitions=main-2505200069
 
-From: Antoine Tenart <atenart@kernel.org>
+Set use_nsecs=true as timestamp is reported in ns. Lack of this result
+in smaller timestamp error window which cause error during phc2sys
+execution on E825 NICs:
+phc2sys[1768.256]: ioctl PTP_SYS_OFFSET_PRECISE: Invalid argument
 
-[ Upstream commit 3a0a3ff6593d670af2451ec363ccb7b18aec0c0a ]
+This problem was introduced in the cited commit which omitted setting
+use_nsecs to true when converting the ice driver to use
+convert_base_to_cs().
 
-Upstream fix ac888d58869b ("net: do not delay dst_entries_add() in
-dst_release()") moved decrementing the dst count from dst_destroy to
-dst_release to avoid accessing already freed data in case of netns
-dismantle. However in case CONFIG_DST_CACHE is enabled and OvS+tunnels
-are used, this fix is incomplete as the same issue will be seen for
-cached dsts:
+Testing hints (ethX is PF netdev):
+phc2sys -s ethX -c CLOCK_REALTIME  -O 37 -m
+phc2sys[1769.256]: CLOCK_REALTIME phc offset -5 s0 freq      -0 delay    0
 
-  Unable to handle kernel paging request at virtual address ffff5aabf6b5c000
-  Call trace:
-   percpu_counter_add_batch+0x3c/0x160 (P)
-   dst_release+0xec/0x108
-   dst_cache_destroy+0x68/0xd8
-   dst_destroy+0x13c/0x168
-   dst_destroy_rcu+0x1c/0xb0
-   rcu_do_batch+0x18c/0x7d0
-   rcu_core+0x174/0x378
-   rcu_core_si+0x18/0x30
-
-Fix this by invalidating the cache, and thus decrementing cached dst
-counters, in dst_release too.
-
-Fixes: d71785ffc7e7 ("net: add dst_cache to ovs vxlan lwtunnel")
-Signed-off-by: Antoine Tenart <atenart@kernel.org>
-Link: https://patch.msgid.link/20250326173634.31096-1-atenart@kernel.org
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-[Minor conflict resolved due to code context change.]
-Signed-off-by: Jianqi Ren <jianqi.ren.cn@windriver.com>
-Signed-off-by: He Zhe <zhe.he@windriver.com>
+Fixes: d4bea547ebb57 ("ice/ptp: Remove convert_art_to_tsc()")
+Signed-off-by: Anton Nadezhdin <anton.nadezhdin@intel.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 ---
-Verified the build test
+V3 -> V4 Updated commit message
 ---
- net/core/dst.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ drivers/net/ethernet/intel/ice/ice_ptp.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/core/dst.c b/net/core/dst.c
-index 6d74b4663085..c1ea331c4bfd 100644
---- a/net/core/dst.c
-+++ b/net/core/dst.c
-@@ -173,6 +173,14 @@ void dst_release(struct dst_entry *dst)
- 			net_warn_ratelimited("%s: dst:%p refcnt:%d\n",
- 					     __func__, dst, newrefcnt);
- 		if (!newrefcnt){
-+#ifdef CONFIG_DST_CACHE
-+			if (dst->flags & DST_METADATA) {
-+				struct metadata_dst *md_dst = (struct metadata_dst *)dst;
-+
-+				if (md_dst->type == METADATA_IP_TUNNEL)
-+					dst_cache_reset_now(&md_dst->u.tun_info.dst_cache);
-+			}
-+#endif
- 			dst_count_dec(dst);
- 			call_rcu(&dst->rcu_head, dst_destroy_rcu);
- 		}
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+index 1fd1ae03eb90..11ed48a62b53 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+@@ -2307,6 +2307,7 @@ static int ice_capture_crosststamp(ktime_t *device,
+ 	ts = ((u64)ts_hi << 32) | ts_lo;
+ 	system->cycles = ts;
+ 	system->cs_id = CSID_X86_ART;
++	system->use_nsecs = true;
+ 
+ 	/* Read Device source clock time */
+ 	ts_lo = rd32(hw, cfg->dev_time_l[tmr_idx]);
+
+base-commit: 7e5af365e38059ed585917623c1ba3a6c04a8c10
 -- 
 2.34.1
 
