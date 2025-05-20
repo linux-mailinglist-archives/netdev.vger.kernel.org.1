@@ -1,126 +1,92 @@
-Return-Path: <netdev+bounces-191777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04215ABD342
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 11:23:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26C1AABD375
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 11:34:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7EC03A6008
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 09:23:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 325D57A241C
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 09:32:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 420AA265CAC;
-	Tue, 20 May 2025 09:23:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="JqhKLJO7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51B19265CDE;
+	Tue, 20 May 2025 09:34:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77AF0263F44
-	for <netdev@vger.kernel.org>; Tue, 20 May 2025 09:23:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5651121C9F5;
+	Tue, 20 May 2025 09:33:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747733003; cv=none; b=ZCD8DZCLvzjPv3n0gpWDpJEn/Xf4nOMkHDTXFavUeocpkZw1CP7bXzJK0YOA3b1F3zNilF89WO0MsQ+f3KrQaAH3dr5k4miWeMdm8yIttjV/8zhZWLhqlFSZywVqF6bPUpfR/1KrysBEjhRgu2aPJXBqnXH5bDIABG3U7E2vqvI=
+	t=1747733647; cv=none; b=DlOiQkcam5hHTBXw/0AIhW0OGiSFyCmHY3NFXRJySROQf2ehQi15yJaIW0oTBjx4z3ayvwhKNVghA8INa2RMN56T5P4lpVGXeCPJZPc77x2i08/12gBAZDXgJiAQ/w7HcOCu6w52OZ5WQDbXV3cW6AcnshRuiehX/hGo7q2P49c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747733003; c=relaxed/simple;
-	bh=oU3PoYWbOuB2N5/61L0EZdrxVrNeUt8BXRgCEkVG41w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hiFZ6nQZQPRxIr4qSiwcRO/cX9g4ypdb4VOjEZenf4a4YWWi7PjNOV1B5lLFv7re/fPF8KK2C+Ki7fdEm6jhg5KqaxTQWxV75OVsXtGh5jMC8aEJhvVGQ/jrgJKmXG9h7w+SD/29LmMepF/xizwoitxnCGGniq+lMoWMVEmoTh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=JqhKLJO7; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-442e9c00bf4so38786865e9.3
-        for <netdev@vger.kernel.org>; Tue, 20 May 2025 02:23:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1747732998; x=1748337798; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LD9HrbKHnhJ4K0C/4DmxBK8ifQh0KlDxWTRCTkR52/w=;
-        b=JqhKLJO7oUXrz2iNzAoXGXbZHuTcQC6LwoDALzy7A1U5XuKlQdibwLFXnNIRuU4T+F
-         lOMNG0ntjAEhbVC1UiWQYWk4HiWRqC2lgOZgCPTh1GXL/oTI3xFTMH3Z/4ZUDMu8zKQ8
-         upVxYkUYUHKl8A9PWbjxEYpT78V0ohkF/dDBXGgHBmS/AI8yhgWBP5QksvPnAH/OjO2O
-         JkkpcSYYL3c/8rDq/UzAfZnpze8g1Rf/Obbiousa9wCOBJCqXwWmjEANd5Iax0dW+fE5
-         LaWDK5GN4Zt/rdrF196UMAZzt46IfpJaRG3foQIoDjsH8gK/XQzrjI8wiHylXPcpgdNk
-         krqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747732998; x=1748337798;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LD9HrbKHnhJ4K0C/4DmxBK8ifQh0KlDxWTRCTkR52/w=;
-        b=hwZ2gJ1g4YURcmuq1/akLo2xmSRaBke0ptfN1NLuju8Vlq8wXU9nSFL4NlWlsD512r
-         BWDzzyf18T3XQ9xmfNO6nmLGrYzHSZCypUMzYlrE83j7h8GiAaBRAIwMez0RnuwzItUZ
-         YU1llv2Wh0j8KuIDJoMfeUlA/h3/6W0ZhwLTx4oA/fsuW3/Q2Zs0BWQLV+e3mX6NzlMK
-         khUPR4gGxo/09LLTcHzrmi0K/+F9RGDmtZZ1V/NFhbczKxkAHI7bwVaSICici0VEICoM
-         GU2xQIDqfOYVdM94F2nibNCw92F0IldBYEc68fiUyj06G/Lt0cjcwW+lzOxlJBVz6Gyj
-         3/gg==
-X-Forwarded-Encrypted: i=1; AJvYcCXIXwAl9ENgwKACsw1HHEJoLWLf/nC8UBJRVEAKfTOI7Clex/4aG4dwj4Jeq4Bk6bdT7ZB8Gf0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YypLR01/D2olXDiQs5misyLF3Zn+m7tuWlfqo45eizxZjFpny0t
-	qdpf4jYHR26fwe69lJBzlmxU3aIPio1uv5dEfhT2iPmZIneR0t/fViqUQbdcRZcJoRM=
-X-Gm-Gg: ASbGncs7qYlXX+1NhgYdKRrbKEo1NzRDVQ3irV5EVHhQ6jvro4uuGriV8lj8FqinKQH
-	B9M0vhcFi10LLeaW78aaKwn34GQW3SO1W0aeN1uX34cAWr2qQ/RYJhQOZ/xixAwV3aNC+TzRjfC
-	BIOKTCK4/mEIwAuRv5j95/fn6y3ksBtEq36FQCFIk+Fq/0LA3OXCeNoKSXS1X4fzxPZDdEVnPbJ
-	uX7LikqbLlZYu0tx1wiSRGfgeWqaNFpF5nV2YtiAt+BU7Eb++6KAfcRS3XwJs7Hy7BduSEikpDN
-	2t+auZ0ojSbqCzsT8JvHeD9q63usFwBigNyku84Jwu3cPDBahlbSo3Pbw8OsJ3YJX3etY2OA7pU
-	IHBA=
-X-Google-Smtp-Source: AGHT+IFTNkO4oeYYd+isFnT8BAYXSbncDCnTalzxGlPlPp4KRDRw8uh9ZRJhgwZ2auOBgfYcmOOVFw==
-X-Received: by 2002:a05:600c:1e1c:b0:43d:9d5:474d with SMTP id 5b1f17b1804b1-442fef3e822mr165415425e9.0.1747732998458;
-        Tue, 20 May 2025 02:23:18 -0700 (PDT)
-Received: from jiri-mlt (37-48-1-197.nat.epc.tmcz.cz. [37.48.1.197])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f6f062c7sm23389385e9.14.2025.05.20.02.23.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 May 2025 02:23:18 -0700 (PDT)
-Date: Tue, 20 May 2025 11:23:14 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Hillf Danton <hdanton@sina.com>, 
-	Network Development <netdev@vger.kernel.org>
-Subject: Re: [PATCH (EXPERIMENTAL)] team: replace term lock with rtnl lock
-Message-ID: <ooxxjzmbid3jb4optotv5ptzdh253wgwi3v3omo5r7rxl6vqac@7l4rrug5l2z5>
-References: <ff1d684a-22ec-4ea2-a6ee-fe9704a6f284@I-love.SAKURA.ne.jp>
+	s=arc-20240116; t=1747733647; c=relaxed/simple;
+	bh=dVHCcdZBjEhRo7MHU8YBvfIU2nlbHhQKdCAkPePq5J4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=g3blaVFOS2yK1zochao9rnpILDtYgbpHJwRpMV2lJ4CgWYwuGAVVUJj3WxLcPY/j/u8YFzeZyDUDUFEgl4X2F3tKBWJ7rJIdQS/0OZN9vlRIJLlidqOEkO+DB7UpehcrDTiolAKmP9PZDedOmXS1rM9STDDJaHIGmopoiCD/A/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
+Received: from TWMBX01.aspeed.com (192.168.0.62) by TWMBX01.aspeed.com
+ (192.168.0.62) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Tue, 20 May
+ 2025 17:28:48 +0800
+Received: from mail.aspeedtech.com (192.168.10.13) by TWMBX01.aspeed.com
+ (192.168.0.62) with Microsoft SMTP Server id 15.2.1748.10 via Frontend
+ Transport; Tue, 20 May 2025 17:28:48 +0800
+From: Jacky Chou <jacky_chou@aspeedtech.com>
+To: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-clk@vger.kernel.org>
+CC: <linux-arm-kernel@lists.infradead.org>, <linux-aspeed@lists.ozlabs.org>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <robh@kernel.org>,
+	<krzk+dt@kernel.org>, <conor+dt@kernel.org>, <joel@jms.id.au>,
+	<andrew@codeconstruct.com.au>, <mturquette@baylibre.com>, <sboyd@kernel.org>,
+	<p.zabel@pengutronix.de>, <BMC-SW@aspeedtech.com>
+Subject: [net 0/4] net: ftgmac100: Add SoC reset support for RMII mode
+Date: Tue, 20 May 2025 17:28:44 +0800
+Message-ID: <20250520092848.531070-1-jacky_chou@aspeedtech.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ff1d684a-22ec-4ea2-a6ee-fe9704a6f284@I-love.SAKURA.ne.jp>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Sat, May 17, 2025 at 09:32:20AM +0200, penguin-kernel@I-love.SAKURA.ne.jp wrote:
+This patch series adds support for an optional reset line to the
+ftgmac100 ethernet controller, as used on Aspeed SoCs. On these SoCs,
+the internal MAC reset is not sufficient to reset the RMII interface.
+By providing a SoC-level reset via the device tree "resets" property,
+the driver can properly reset both the MAC and RMII logic, ensuring
+correct operation in RMII mode.
 
-[..]
+The series includes:
+- Device tree binding update to document the new "resets" property.
+- Addition of MAC1 and MAC2 reset definitions for AST2600.
+- Device tree changes for AST2600 to use the new reset properties.
+- Driver changes to assert/deassert the reset line as needed.
 
->@@ -2319,13 +2301,12 @@ static struct team *team_nl_team_get(struct genl_info *info)
-> 	}
-> 
-> 	team = netdev_priv(dev);
->-	mutex_lock(&team->lock);
-> 	return team;
-> }
+This improves reliability and initialization of the MAC in RMII mode
+on Aspeed platforms.
 
+Jacky Chou (4):
+  dt-bindings: net: ftgmac100: Add resets property
+  dt-bindings: clock: ast2600: Add reset definitions for MAC1 and MAC2
+  ARM: dts: aspeed-g6: Add resets property for MAC controllers
+  net: ftgmac100: Add optional reset control for RMII mode on Aspeed
+    SoCs
 
-Why do you think this is safe?
+ .../bindings/net/faraday,ftgmac100.yaml       |  5 ++++
+ arch/arm/boot/dts/aspeed/aspeed-g6.dtsi       |  4 +++
+ drivers/net/ethernet/faraday/ftgmac100.c      | 26 +++++++++++++++++++
+ include/dt-bindings/clock/ast2600-clock.h     |  2 ++
+ 4 files changed, 37 insertions(+)
 
-Rtnl is held only for set doit.
+-- 
+2.34.1
 
-
-> 
-> static void team_nl_team_put(struct team *team)
-> {
->-	mutex_unlock(&team->lock);
->+	ASSERT_RTNL();
-
-Did you test this? How? Howcome you didn't hit this assertion?
-
-
-
-> 	dev_put(team->dev);
-> }
-> 
 
