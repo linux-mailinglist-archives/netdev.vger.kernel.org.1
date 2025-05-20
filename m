@@ -1,168 +1,333 @@
-Return-Path: <netdev+bounces-191690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 359F0ABCC65
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 03:38:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 87F38ABCC75
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 03:52:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC41F169AB7
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 01:38:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D78A417F229
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 01:52:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2771221E0BB;
-	Tue, 20 May 2025 01:38:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8AC2253F35;
+	Tue, 20 May 2025 01:52:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="AWCQ6qeR";
-	dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="gYotsU7H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MehRgb68"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0845A4B1E5C
-	for <netdev@vger.kernel.org>; Tue, 20 May 2025 01:37:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBDBF21ADA9;
+	Tue, 20 May 2025 01:52:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747705080; cv=none; b=OJysoZfU3wp+qhtnpfuaNBEZ65yuiG/YE4Ep2d+bHkCbt6F9js6/2jFo2KQ6Gu7Tqe6S/tr3jvJtN8ElX3FuiboxHQlaTM88N2mic0t/GXXgqOFJQDRWL1XV1Kux+tDn7GY4zTeYfRnwxlB0lb4Bwh6oQ+IpSE+3xouGz2WkCoo=
+	t=1747705955; cv=none; b=nsyccv0ua216UmoCW/A6lW6/58mjf8nk+lW7z1BGfXKjNW6K3Va3+9jcYK5nmaifITBfbEKbh07C3vJnOI69jn9xzNsK/ZjtyVHz294MjF60EzqIRHhlLi9jg9g+ErgEH7aRv3CXwWQj4RNSBihtMu3unHn38+ikNxF/UVeuM7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747705080; c=relaxed/simple;
-	bh=XA/vMCVpIfjTJXCkcJsC1zRWpAp1PCVcgULIjiaoTas=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=dpylDmcHA5YgrNnOKAPdl/96AgAlQuQv1ZpYwR9DT7cQcgGqbHOmlh7BaeC90cevb6sqMJ5W0bWHxaxxsR+VSG1yAq6Bn5XU72qN90NJoXZ6uuuZcTcmUP5AmGGdXAe0RvIZnJdYi2ufzm6jprn11VsK5o+NcLXDJo61m4gjLiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=AWCQ6qeR; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=gYotsU7H; arc=none smtp.client-ip=160.80.4.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
-Received: from smtpauth-2019-1.uniroma2.it (smtpauth.uniroma2.it [160.80.5.46])
-	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 54K1bAAh032447;
-	Tue, 20 May 2025 03:37:15 +0200
-Received: from lubuntu-18.04 (unknown [160.80.103.126])
-	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id 8F70B1205C5;
-	Tue, 20 May 2025 03:37:05 +0200 (CEST)
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
-	s=ed201904; t=1747705025; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4xRU2ratrj+rHIVvF1jAVQWZqX+Qdn2Xh9r/t/No4f4=;
-	b=AWCQ6qeRkqBpguPdx3QGFrtD6ahu4x1heoOkY9MBZJgPBTAi8YXuvN7bxY8+TG2yYIdrKv
-	c6EGNMOjs9ONy7CQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
-	t=1747705025; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4xRU2ratrj+rHIVvF1jAVQWZqX+Qdn2Xh9r/t/No4f4=;
-	b=gYotsU7H79/FhSCvBATTLL1xyp2pjkornfCLnIHOjH8TgRQvVsbZrBYAjoWxTGdTUKtl5w
-	hqAE0lCpJyIRZy/mrcIIbZB6BjcqmamcmozPyMfqlqlUwWgRO0dEPi5CuY6UaQY7KiiIl/
-	28DSn3cLZlfgpJfGhGVE7G3dZeqW56HeLUmJuS4/gXk8YqA8RyTFH+JqExTwKmF0/DSQYX
-	Z/pRFBC2Tz1XsleRV6vFIx+BfWaEbh9Ad4wGM0OKae3Ry6PrJpmH3C6y5LiH5oC9ufWQd7
-	VBozCI/Dy+CHQQD1lV14IUR5qKe7JtE0ANL+hMOlaWQ4dHL2qbpeKsSwNla+lQ==
-Date: Tue, 20 May 2025 03:37:05 +0200
-From: Andrea Mayer <andrea.mayer@uniroma2.it>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>,
-        "Paolo Abeni" <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>,
-        Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>,
-        Andrea Mayer <andrea.mayer@uniroma2.it>
-Subject: Re: [PATCH v2 net-next 4/7] Revert
- "ipv6: sr: switch to GFP_ATOMIC flag to allocate memory during seg6local LWT setup"
-Message-Id: <20250520033705.662cb221ec3e55a4ad08736a@uniroma2.it>
-In-Reply-To: <20250516022759.44392-5-kuniyu@amazon.com>
-References: <20250516022759.44392-1-kuniyu@amazon.com>
-	<20250516022759.44392-5-kuniyu@amazon.com>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1747705955; c=relaxed/simple;
+	bh=hq7tG6InQiMtDLFIKCTHEe2KHxUYZrzTpjLuQAf3PBY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CxzGTer1Na/sbq7HdANsTO5BqK9CK6Yg9RQwUrUqqY1KOpMtHQt5cba1vYUiIt/8S+oVizk9dNdDIRiFZgQxsQPvFRzFB7UWAvxefbK+Yd8gJY/coYzjqH68e7r0TWRuegPuww4EBNZIexWN95CPKjS5w2eDhHKt1HddHLmYa9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MehRgb68; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-600210e4219so7516512a12.0;
+        Mon, 19 May 2025 18:52:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1747705952; x=1748310752; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mT7APD0PPLceAEMsL11QVrKRuvd0HX5iowg9HBwBVQA=;
+        b=MehRgb68MuMVtsnx5n5tfXhIHFPI2l1DZnT5siTAFbhAI6hfbAKlM7YYvwqcULvAy5
+         PQNoKUrxpOtyT6RIp39QfLrZdJ0slgR+epbCs+teLSNYFcx/Y8jRsIi59q9ijFhhzzjL
+         xwC99a4u869nUcZ8iFTEo9OB6y8s7QGNtVjMxl0+i2OkEsD7rJDliOgFUFtD6CMQB3bV
+         T03caZzOXHoL1v9iho6e86UNKwX9ozT/x8DyGcE5D0CaHCf5uD5VoSuqMbIfWHdT6hKl
+         iiHWUrMKKTqnKUd2NPpolBXCxkgM/ykBgZtxyy24UDgF5FYvalorEkSKm5jASQwxo1fw
+         M/QQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747705952; x=1748310752;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mT7APD0PPLceAEMsL11QVrKRuvd0HX5iowg9HBwBVQA=;
+        b=ReVQlUNKwCfAaBOnPoMvxGPFImtOahxtbblmhVGoNg3DtLmWPracMOlaP8pX+nlgw6
+         z3FwXeVYhBPyjHiynFONwmMbmysUvGIO7K78s5iCiPJaRPI+0NoC52kF9n7Gq5/OxNIT
+         qHqZ9xL75NqcEmHidzE0uvoINkRYEGFfz57ipMwjJ8EmNCW4yiRKWeXzsB3ddPBuwQ+q
+         9lSBDikzra86b1jc7DXXSiC16fQPad4B2PBWmuURLSGY8fHGMc3fMTXrbZVY+3DhdL7p
+         PplCUjkD6tcJhMCQ205aHY0LeAXC7fYM2/6SpTS/ly/dUumCGAWURlQ3C3fOhm0v0+kF
+         GeBA==
+X-Forwarded-Encrypted: i=1; AJvYcCV+xarS9Wgc7CJaLmPh2GDJtOXpPB4oXsrrw4FiD/R8iFToCX6qAD3MW7ZSzcL4xy4ItHrqEsFkTIk=@vger.kernel.org, AJvYcCVXyPK4K/NPkBWqitCAU44rhutIWuJpIO7P02PEbPMyl/5sV2yClhH9ACUBKXA5V4OO2wPHQXED@vger.kernel.org
+X-Gm-Message-State: AOJu0YwscnkY78NU8Lf9gA3LxUnwZi+YoIDe02UkJ8LtKyeP06Tp8a8+
+	lWkKhcYBdRjP/NjA2VdgdihuXL+AjTlztGBxzxOi9T7A1NZKmxpUI3RP2Y0rw9eHABqcSJpMaK9
+	MuQiEdTgAJlLaNq7gLB3gQQ0kpY2qlygFpEwUWN8=
+X-Gm-Gg: ASbGncs7rGPYOLHBZ2/9oLO/au8pFk5ShVwGp5yySDpEaia1K2Jzz20d8LTal40u40P
+	A4koe14MrT/UbIXTFAp0mSeY2oGjAgPVlNY8a8K5B5ZqNaLgoQXQwtKnGCSIw8aA2HQcsFHwQ0k
+	edsgrKHjUteRS+7BuBa74RPAWpqsRu0+JQKjc=
+X-Google-Smtp-Source: AGHT+IEZH7FDonKk41E9BCvtsQCjU48p1JLXnrB8RAk7TOAQPce97ykfJUP/PGKpomrSZ+qQmamKM5MlAGvYKqxcKek=
+X-Received: by 2002:a17:907:7e9a:b0:ad5:1d0c:1b90 with SMTP id
+ a640c23a62f3a-ad52f321ba1mr1333541766b.11.1747705951614; Mon, 19 May 2025
+ 18:52:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
-X-Virus-Status: Clean
+MIME-Version: 1.0
+References: <20250519103203.17255-1-djduanjiong@gmail.com> <aef5ec1d-c62f-9a1c-c6f3-c3e275494234@ssi.bg>
+In-Reply-To: <aef5ec1d-c62f-9a1c-c6f3-c3e275494234@ssi.bg>
+From: Duan Jiong <djduanjiong@gmail.com>
+Date: Tue, 20 May 2025 09:52:19 +0800
+X-Gm-Features: AX0GCFvmVIbUuVZBDlwxsinqEMdQzBM2Guin-Bkgk50Hstn0rBGV2TwiA7wFJn4
+Message-ID: <CALttK1Sn=D4x81NpEq1ELHoXnEaiMboYBzYeOUX8qKHzDDxk0A@mail.gmail.com>
+Subject: Re: [PATCH] ipvs: skip ipvs snat processing when packet dst is not vip
+To: Julian Anastasov <ja@ssi.bg>
+Cc: pablo@netfilter.org, netdev@vger.kernel.org, lvs-devel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 15 May 2025 19:27:20 -0700
-Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+On Tue, May 20, 2025 at 4:11=E2=80=AFAM Julian Anastasov <ja@ssi.bg> wrote:
+>
+>
+>         Hello,
+>
+>         Adding lvs-devel@ to CC...
+>
+> On Mon, 19 May 2025, Duan Jiong wrote:
+>
+> > Now suppose there are two net namespaces, one is the server and
+> > its ip is 192.168.99.4, the other is the client and its ip
+> > is 192.168.99.5, and the other is configured with ipvs vip
+> > 192.168.99.6 in the host net namespace, configuring ipvs with
+> > the backend 192.168.99.5.
+> >
+> > Also configure
+> > iptables -t nat -A POSTROUTING -p TCP -j MASQUERADE
+> > to avoid packet loss when accessing with the specified
+> > source port.
+>
+>         May be I don't quite understand why the MASQUERADE
+> rule is used...
 
-> The previous patch fixed the same issue mentioned in
-> commit 14a0087e7236 ("ipv6: sr: switch to GFP_ATOMIC
-> flag to allocate memory during seg6local LWT setup").
-> 
-> Let's revert it.
-> 
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
->  net/ipv6/seg6_local.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+If nat is not configured, __nf_conntrack_confirm drops packets due to
+tuple conflicts.
 
-Patch [1] was originally intended to fix the creation of seg6local lwtunnels
-within an RCU-protected block executed from inet6_rtm_newroute(), where recent
-changes to locking mechanisms were introduced.
+I'll post my reproduction method later on.
 
-Patch [2], included in this patchset, aims to redesign and correct the RCU
-usage in inet6_rtm_newroute().
-From the perspective of the SRv6 subsystem, the creation of a seg6local
-lwtunnel is no longer performed within an RCU-protected section. This change
-allows us to sleep again and enables memory allocations with GFP_KERNEL, which
-is clearly preferable.
+>
+> >
+> > First we use curl --local-port 15280 to specify the source port
+> > to access the vip, after the request is completed again use
+> > curl --local-port 15280 to specify the source port to access
+> > 192.168.99.5, this time the request will always be stuck in
+> > the main.
+> >
+> > The packet sent by the client arrives at the server without
+> > any problem, but ipvs will process the packet back from the
+> > server with the wrong snat for vip, and at this time, since
+> > the client will directly rst after receiving the packet, the
+> > client will be stuck until the vip ct rule on the host
+> > times out.
+> >
+> > Signed-off-by: Duan Jiong <djduanjiong@gmail.com>
+> > ---
+> >  net/netfilter/ipvs/ip_vs_core.c | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> >
+> > diff --git a/net/netfilter/ipvs/ip_vs_core.c b/net/netfilter/ipvs/ip_vs=
+_core.c
+> > index c7a8a08b7308..98abe4085a11 100644
+> > --- a/net/netfilter/ipvs/ip_vs_core.c
+> > +++ b/net/netfilter/ipvs/ip_vs_core.c
+> > @@ -1260,6 +1260,8 @@ handle_response(int af, struct sk_buff *skb, stru=
+ct ip_vs_proto_data *pd,
+> >               unsigned int hooknum)
+> >  {
+> >       struct ip_vs_protocol *pp =3D pd->pp;
+> > +     enum ip_conntrack_info ctinfo;
+> > +     struct nf_conn *ct =3D nf_ct_get(skb, &ctinfo);
+> >
+> >       if (IP_VS_FWD_METHOD(cp) !=3D IP_VS_CONN_F_MASQ)
+> >               goto after_nat;
+> > @@ -1270,6 +1272,12 @@ handle_response(int af, struct sk_buff *skb, str=
+uct ip_vs_proto_data *pd,
+> >               goto drop;
+> >
+> >       /* mangle the packet */
+> > +     if (ct !=3D NULL &&
+> > +         hooknum =3D=3D NF_INET_FORWARD &&
+> > +         !ip_vs_addr_equal(af,
+> > +                 &ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple.dst.u3,
+> > +                 &cp->vaddr))
+> > +             return NF_ACCEPT;
+>
+>         Such check will prevent SNAT for active FTP connections
+> because their original direction is from real server to client.
+> In which case ip_vs_addr_equal will see difference? When
+> Netfilter creates new connection for packet from real server?
+> It does not look good IPVS connection to be DNAT-ed but not
+> SNAT-ed.
+>
+>         May be you can explain better what IPs/ports are present in
+> the transferred packets.
+>
+> >       if (pp->snat_handler &&
+> >           !SNAT_CALL(pp->snat_handler, skb, pp, cp, iph))
+> >               goto drop;
+> > --
+> > 2.32.1 (Apple Git-133)
+>
+> Regards
+>
+> --
+> Julian Anastasov <ja@ssi.bg>
+>
 
-After applying this patch (along with the corresponding patchset), it appears
-that creating a seg6local lwtunnel instance works fine.
 
-Therefore, I believe it is ok to revert [1] in favor of the current approach.
+1.  setup environment
 
-Thanks,
-Andrea
+[root@centos9s vagrant]# cat setup.sh
+#!/bin/bash
 
-[1] ipv6: sr: switch to GFP_ATOMIC flag to allocate memory during seg6local LWT setup
-    https://patch.msgid.link/20250429132453.31605-1-andrea.mayer@uniroma2.it
+ip netns add server
+ip link add svrh type veth peer name svr
+ip link set svr netns server
+ip link set svrh up
+ip link set dev svrh address ee:ee:ee:ee:ee:ee
+ip netns exec server ip link set svr up
+ip netns exec server ip addr add 192.168.99.4/32 dev svr
+ip netns exec server ip route add 169.254.1.1 dev svr scope link
+ip netns exec server ip route add default via 169.254.1.1 dev svr
+ip netns exec server ip neigh add 169.254.1.1 lladdr ee:ee:ee:ee:ee:ee
+dev svr nud permanent
+ip route add 192.168.99.4/32 dev svrh
 
-[2] ipv6: Narrow down RCU critical section in inet6_rtm_newroute()
-    https://lore.kernel.org/all/20250516022759.44392-4-kuniyu@amazon.com/
+ip netns add client
+ip link add clih type veth peer name cli
+ip link set cli netns client
+ip link set clih up
+ip link set dev clih address ee:ee:ee:ee:ee:ee
+ip netns exec client ip link set cli up
+ip netns exec client ip addr add 192.168.99.5/32 dev cli
+ip netns exec client ip route add 169.254.1.1 dev cli scope link
+ip netns exec client ip route add default via 169.254.1.1 dev cli
+ip netns exec client ip neigh add 169.254.1.1 lladdr ee:ee:ee:ee:ee:ee
+dev cli nud permanent
+ip route add 192.168.99.5/32 dev clih
 
+ip addr add 192.168.99.6/32 dev lo
+ipvsadm -A -t 192.168.99.6:8080 -s rr
+ipvsadm -a -t 192.168.99.6:8080 -r 192.168.99.4:8080 -m
 
-Reviewed-by: Andrea Mayer <andrea.mayer@uniroma2.it>
+echo 1 > /proc/sys/net/ipv4/ip_forward
+echo 1 >  /proc/sys/net/ipv4/vs/conntrack
+iptables -t nat -A POSTROUTING -p TCP -j MASQUERADE
 
+2. start server
+ip netns exec server python -m http.server 8080
 
-> 
-> diff --git a/net/ipv6/seg6_local.c b/net/ipv6/seg6_local.c
-> index ee5e448cc7a8..ac1dbd492c22 100644
-> --- a/net/ipv6/seg6_local.c
-> +++ b/net/ipv6/seg6_local.c
-> @@ -1671,7 +1671,7 @@ static int parse_nla_srh(struct nlattr **attrs, struct seg6_local_lwt *slwt,
->  	if (!seg6_validate_srh(srh, len, false))
->  		return -EINVAL;
->  
-> -	slwt->srh = kmemdup(srh, len, GFP_ATOMIC);
-> +	slwt->srh = kmemdup(srh, len, GFP_KERNEL);
->  	if (!slwt->srh)
->  		return -ENOMEM;
->  
-> @@ -1911,7 +1911,7 @@ static int parse_nla_bpf(struct nlattr **attrs, struct seg6_local_lwt *slwt,
->  	if (!tb[SEG6_LOCAL_BPF_PROG] || !tb[SEG6_LOCAL_BPF_PROG_NAME])
->  		return -EINVAL;
->  
-> -	slwt->bpf.name = nla_memdup(tb[SEG6_LOCAL_BPF_PROG_NAME], GFP_ATOMIC);
-> +	slwt->bpf.name = nla_memdup(tb[SEG6_LOCAL_BPF_PROG_NAME], GFP_KERNEL);
->  	if (!slwt->bpf.name)
->  		return -ENOMEM;
->  
-> @@ -1994,7 +1994,7 @@ static int parse_nla_counters(struct nlattr **attrs,
->  		return -EINVAL;
->  
->  	/* counters are always zero initialized */
-> -	pcounters = seg6_local_alloc_pcpu_counters(GFP_ATOMIC);
-> +	pcounters = seg6_local_alloc_pcpu_counters(GFP_KERNEL);
->  	if (!pcounters)
->  		return -ENOMEM;
->  
-> -- 
-> 2.49.0
+3. curl vip
+ip netns exec client curl --local-port 15280 http://192.168.99.6:8080
+
+4. curl rs
+ip netns exec client curl --local-port 15280 http://192.168.99.4:8080
+
+Here are the ct rules for executing curl and the tcpdump capture.
+
+[root@centos9s vagrant]# tcpdump -s0 -nn -i clih
+dropped privs to tcpdump
+tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+listening on clih, link-type EN10MB (Ethernet), snapshot length 262144 byte=
+s
+01:50:14.328558 IP6 fe80::fc0e:fff:fef8:7c05 > ff02::2: ICMP6, router
+solicitation, length 16
+01:50:28.430769 IP 192.168.99.5.15280 > 192.168.99.6.8080: Flags [S],
+seq 614710449, win 64240, options [mss 1460,sackOK,TS val 2654895687
+ecr 0,nop,wscale 7], length 0
+01:50:28.431026 ARP, Request who-has 192.168.99.5 tell 192.168.99.6, length=
+ 28
+01:50:28.431034 ARP, Reply 192.168.99.5 is-at fe:0e:0f:f8:7c:05, length 28
+01:50:28.431035 IP 192.168.99.6.8080 > 192.168.99.5.15280: Flags [S.],
+seq 3593264529, ack 614710450, win 65160, options [mss 1460,sackOK,TS
+val 4198589191 ecr 2654895687,nop,wscale 7], length 0
+01:50:28.431048 IP 192.168.99.5.15280 > 192.168.99.6.8080: Flags [.],
+ack 1, win 502, options [nop,nop,TS val 2654895687 ecr 4198589191],
+length 0
+01:50:28.431683 IP 192.168.99.5.15280 > 192.168.99.6.8080: Flags [P.],
+seq 1:82, ack 1, win 502, options [nop,nop,TS val 2654895688 ecr
+4198589191], length 81: HTTP: GET / HTTP/1.1
+01:50:28.431709 IP 192.168.99.6.8080 > 192.168.99.5.15280: Flags [.],
+ack 82, win 509, options [nop,nop,TS val 4198589192 ecr 2654895688],
+length 0
+01:50:28.434072 IP 192.168.99.6.8080 > 192.168.99.5.15280: Flags [P.],
+seq 1:157, ack 82, win 509, options [nop,nop,TS val 4198589194 ecr
+2654895688], length 156: HTTP: HTTP/1.0 200 OK
+01:50:28.434083 IP 192.168.99.5.15280 > 192.168.99.6.8080: Flags [.],
+ack 157, win 501, options [nop,nop,TS val 2654895690 ecr 4198589194],
+length 0
+01:50:28.434166 IP 192.168.99.6.8080 > 192.168.99.5.15280: Flags [P.],
+seq 157:1195, ack 82, win 509, options [nop,nop,TS val 4198589194 ecr
+2654895690], length 1038: HTTP
+01:50:28.434171 IP 192.168.99.5.15280 > 192.168.99.6.8080: Flags [.],
+ack 1195, win 501, options [nop,nop,TS val 2654895690 ecr 4198589194],
+length 0
+01:50:28.434221 IP 192.168.99.6.8080 > 192.168.99.5.15280: Flags [F.],
+seq 1195, ack 82, win 509, options [nop,nop,TS val 4198589194 ecr
+2654895690], length 0
+01:50:28.434669 IP 192.168.99.5.15280 > 192.168.99.6.8080: Flags [F.],
+seq 82, ack 1196, win 501, options [nop,nop,TS val 2654895691 ecr
+4198589194], length 0
+01:50:28.434712 IP 192.168.99.6.8080 > 192.168.99.5.15280: Flags [.],
+ack 83, win 509, options [nop,nop,TS val 4198589195 ecr 2654895691],
+length 0
+01:50:33.158284 IP 192.168.99.5.15280 > 192.168.99.4.8080: Flags [S],
+seq 886133763, win 64240, options [mss 1460,sackOK,TS val 2236082988
+ecr 0,nop,wscale 7], length 0
+01:50:33.158429 IP 192.168.99.6.8080 > 192.168.99.5.15280: Flags [S.],
+seq 2329127612, ack 886133764, win 65160, options [mss 1460,sackOK,TS
+val 4198593919 ecr 2236082988,nop,wscale 7], length 0
+01:50:33.158496 IP 192.168.99.5.15280 > 192.168.99.6.8080: Flags [R],
+seq 886133764, win 0, length 0
+01:50:34.168530 IP 192.168.99.5.15280 > 192.168.99.4.8080: Flags [S],
+seq 886133763, win 64240, options [mss 1460,sackOK,TS val 2236083999
+ecr 0,nop,wscale 7], length 0
+01:50:34.168722 IP 192.168.99.6.8080 > 192.168.99.5.15280: Flags [S.],
+seq 2329127612, ack 886133764, win 65160, options [mss 1460,sackOK,TS
+val 4198594929 ecr 2236082988,nop,wscale 7], length 0
+01:50:34.168754 IP 192.168.99.6.8080 > 192.168.99.5.15280: Flags [S.],
+seq 2329127612, ack 886133764, win 65160, options [mss 1460,sackOK,TS
+val 4198594929 ecr 2236082988,nop,wscale 7], length 0
+01:50:34.168751 IP 192.168.99.5.15280 > 192.168.99.6.8080: Flags [R],
+seq 886133764, win 0, length 0
+01:50:34.168769 IP 192.168.99.5.15280 > 192.168.99.6.8080: Flags [R],
+seq 886133764, win 0, length 0
+01:50:36.216624 IP 192.168.99.6.8080 > 192.168.99.5.15280: Flags [S.],
+seq 2329127612, ack 886133764, win 65160, options [mss 1460,sackOK,TS
+val 4198596977 ecr 2236082988,nop,wscale 7], length 0
+01:50:36.216626 IP 192.168.99.5.15280 > 192.168.99.4.8080: Flags [S],
+seq 886133763, win 64240, options [mss 1460,sackOK,TS val 2236086047
+ecr 0,nop,wscale 7], length 0
+01:50:36.216678 IP 192.168.99.5.15280 > 192.168.99.6.8080: Flags [R],
+seq 886133764, win 0, length 0
+01:50:36.216690 IP 192.168.99.6.8080 > 192.168.99.5.15280: Flags [S.],
+seq 2329127612, ack 886133764, win 65160, options [mss 1460,sackOK,TS
+val 4198596977 ecr 2236082988,nop,wscale 7], length 0
+01:50:36.216693 IP 192.168.99.5.15280 > 192.168.99.6.8080: Flags [R],
+seq 886133764, win 0, length 0
+^C
+28 packets captured
+28 packets received by filter
+0 packets dropped by kernel
+[root@centos9s vagrant]# cat^C
+[root@centos9s vagrant]# cat /proc/net/nf_conntrack | grep 15280
+ipv4     2 tcp      6 7 CLOSE src=3D192.168.99.5 dst=3D192.168.99.6
+sport=3D15280 dport=3D8080 src=3D192.168.99.4 dst=3D192.168.99.6 sport=3D80=
+80
+dport=3D15280 [ASSURED] mark=3D0 secctx=3Dsystem_u:object_r:unlabeled_t:s0
+zone=3D0 use=3D2
+ipv4     2 tcp      6 53 SYN_RECV src=3D192.168.99.5 dst=3D192.168.99.4
+sport=3D15280 dport=3D8080 src=3D192.168.99.4 dst=3D192.168.99.6 sport=3D80=
+80
+dport=3D1279 mark=3D0 secctx=3Dsystem_u:object_r:unlabeled_t:s0 zone=3D0 us=
+e=3D2
 
