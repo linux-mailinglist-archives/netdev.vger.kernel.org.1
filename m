@@ -1,152 +1,126 @@
-Return-Path: <netdev+bounces-191778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43256ABD343
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 11:24:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04215ABD342
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 11:23:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3AF84A71B8
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 09:24:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7EC03A6008
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 09:23:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC3DD2673B5;
-	Tue, 20 May 2025 09:23:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 420AA265CAC;
+	Tue, 20 May 2025 09:23:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="G9824tmF"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="JqhKLJO7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7872263F44;
-	Tue, 20 May 2025 09:23:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77AF0263F44
+	for <netdev@vger.kernel.org>; Tue, 20 May 2025 09:23:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747733006; cv=none; b=fZCjc9ap78jlaab72KpbKJ/lLj0bJ0w+VA2iTm6dskEUqPIf2zF07UVkUBzaNLrufbbWIjz/aY/cPsbxgb75waf169J1sLtcKOvhvdAffUkeMdDMweodXq7Ujhgu9/SnF8w4ih6g+6H2fBun3PqWs66YLQuGL6qLL24QfNVKiXc=
+	t=1747733003; cv=none; b=ZCD8DZCLvzjPv3n0gpWDpJEn/Xf4nOMkHDTXFavUeocpkZw1CP7bXzJK0YOA3b1F3zNilF89WO0MsQ+f3KrQaAH3dr5k4miWeMdm8yIttjV/8zhZWLhqlFSZywVqF6bPUpfR/1KrysBEjhRgu2aPJXBqnXH5bDIABG3U7E2vqvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747733006; c=relaxed/simple;
-	bh=f6uMN/qfgFSUel7hrqq9RGFK8nG0PVaWF4Jy5LR6W4o=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZT+DvbOt2PxcU/ai7DO5JlwNQDEAjEI1klhmYzIE/CiZER9RgXWhTMrB48BI6rDNPZMS5nPtF+yitH22LU0KBCjB0AHU31ddjIYElKoOjDrqyucLkqVTFNR2o0jqOVtfIEq4JF8LvmwFuoH3Gnk2XsKK0FUUBGQdE2UlZ+EUih8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=G9824tmF; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 54JHr1GM001904;
-	Tue, 20 May 2025 02:23:01 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=MXCKhHkSP7si1f7Y5i5VsCh
-	4Ng2sFD41PgdisHGznVE=; b=G9824tmFdPal5EJ89rSbJSHy7QQJb1dM9uN/ODC
-	sjcIjm16bCahjosMmYzj3tEIdoDh1EcfQn+1eq+BmgMTtFf+78xaBBbVGst19DjA
-	mMqKyTRfHMV+AehpEF3Sp0LEWDgNi/ZOSk9Cqiro+jZtm9NlrShVGxEOjqI/viQC
-	JDbDHPVcCfcd0am+JGzMy6oIE7mL1ZgmFJVma5C8J1iKMw2U7VcweNUv+x6r4zA7
-	9wmkyZ79hjN7mnryHsmxGh89VV/k56rYwypuMvD9U537uXMd0+shKPkfBlyf8owy
-	5nvUrZP+Mhp1OoFzUYebUWHkOr7rK62Y+yE/vyHG82j1njA==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 46q46fcgq5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 20 May 2025 02:23:01 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Tue, 20 May 2025 02:23:00 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Tue, 20 May 2025 02:23:00 -0700
-Received: from test-OptiPlex-Tower-Plus-7010.marvell.com (unknown [10.29.37.157])
-	by maili.marvell.com (Postfix) with ESMTP id 2EC0F3F7061;
-	Tue, 20 May 2025 02:22:55 -0700 (PDT)
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Hariprasad Kelam <hkelam@marvell.com>,
-        Sunil Goutham
-	<sgoutham@marvell.com>,
-        Geetha sowjanya <gakula@marvell.com>,
-        "Subbaraya
- Sundeep" <sbhatta@marvell.com>,
-        Bharat Bhushan <bbhushan2@marvell.com>,
-        "Andrew Lunn" <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        "Eric Dumazet" <edumazet@google.com>,
-        Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: [net-next] octeontx2-pf: QOS: Perform cache sync on send queue teardown
-Date: Tue, 20 May 2025 14:52:48 +0530
-Message-ID: <20250520092248.1102707-1-hkelam@marvell.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1747733003; c=relaxed/simple;
+	bh=oU3PoYWbOuB2N5/61L0EZdrxVrNeUt8BXRgCEkVG41w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hiFZ6nQZQPRxIr4qSiwcRO/cX9g4ypdb4VOjEZenf4a4YWWi7PjNOV1B5lLFv7re/fPF8KK2C+Ki7fdEm6jhg5KqaxTQWxV75OVsXtGh5jMC8aEJhvVGQ/jrgJKmXG9h7w+SD/29LmMepF/xizwoitxnCGGniq+lMoWMVEmoTh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=JqhKLJO7; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-442e9c00bf4so38786865e9.3
+        for <netdev@vger.kernel.org>; Tue, 20 May 2025 02:23:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1747732998; x=1748337798; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LD9HrbKHnhJ4K0C/4DmxBK8ifQh0KlDxWTRCTkR52/w=;
+        b=JqhKLJO7oUXrz2iNzAoXGXbZHuTcQC6LwoDALzy7A1U5XuKlQdibwLFXnNIRuU4T+F
+         lOMNG0ntjAEhbVC1UiWQYWk4HiWRqC2lgOZgCPTh1GXL/oTI3xFTMH3Z/4ZUDMu8zKQ8
+         upVxYkUYUHKl8A9PWbjxEYpT78V0ohkF/dDBXGgHBmS/AI8yhgWBP5QksvPnAH/OjO2O
+         JkkpcSYYL3c/8rDq/UzAfZnpze8g1Rf/Obbiousa9wCOBJCqXwWmjEANd5Iax0dW+fE5
+         LaWDK5GN4Zt/rdrF196UMAZzt46IfpJaRG3foQIoDjsH8gK/XQzrjI8wiHylXPcpgdNk
+         krqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747732998; x=1748337798;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LD9HrbKHnhJ4K0C/4DmxBK8ifQh0KlDxWTRCTkR52/w=;
+        b=hwZ2gJ1g4YURcmuq1/akLo2xmSRaBke0ptfN1NLuju8Vlq8wXU9nSFL4NlWlsD512r
+         BWDzzyf18T3XQ9xmfNO6nmLGrYzHSZCypUMzYlrE83j7h8GiAaBRAIwMez0RnuwzItUZ
+         YU1llv2Wh0j8KuIDJoMfeUlA/h3/6W0ZhwLTx4oA/fsuW3/Q2Zs0BWQLV+e3mX6NzlMK
+         khUPR4gGxo/09LLTcHzrmi0K/+F9RGDmtZZ1V/NFhbczKxkAHI7bwVaSICici0VEICoM
+         GU2xQIDqfOYVdM94F2nibNCw92F0IldBYEc68fiUyj06G/Lt0cjcwW+lzOxlJBVz6Gyj
+         3/gg==
+X-Forwarded-Encrypted: i=1; AJvYcCXIXwAl9ENgwKACsw1HHEJoLWLf/nC8UBJRVEAKfTOI7Clex/4aG4dwj4Jeq4Bk6bdT7ZB8Gf0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YypLR01/D2olXDiQs5misyLF3Zn+m7tuWlfqo45eizxZjFpny0t
+	qdpf4jYHR26fwe69lJBzlmxU3aIPio1uv5dEfhT2iPmZIneR0t/fViqUQbdcRZcJoRM=
+X-Gm-Gg: ASbGncs7qYlXX+1NhgYdKRrbKEo1NzRDVQ3irV5EVHhQ6jvro4uuGriV8lj8FqinKQH
+	B9M0vhcFi10LLeaW78aaKwn34GQW3SO1W0aeN1uX34cAWr2qQ/RYJhQOZ/xixAwV3aNC+TzRjfC
+	BIOKTCK4/mEIwAuRv5j95/fn6y3ksBtEq36FQCFIk+Fq/0LA3OXCeNoKSXS1X4fzxPZDdEVnPbJ
+	uX7LikqbLlZYu0tx1wiSRGfgeWqaNFpF5nV2YtiAt+BU7Eb++6KAfcRS3XwJs7Hy7BduSEikpDN
+	2t+auZ0ojSbqCzsT8JvHeD9q63usFwBigNyku84Jwu3cPDBahlbSo3Pbw8OsJ3YJX3etY2OA7pU
+	IHBA=
+X-Google-Smtp-Source: AGHT+IFTNkO4oeYYd+isFnT8BAYXSbncDCnTalzxGlPlPp4KRDRw8uh9ZRJhgwZ2auOBgfYcmOOVFw==
+X-Received: by 2002:a05:600c:1e1c:b0:43d:9d5:474d with SMTP id 5b1f17b1804b1-442fef3e822mr165415425e9.0.1747732998458;
+        Tue, 20 May 2025 02:23:18 -0700 (PDT)
+Received: from jiri-mlt (37-48-1-197.nat.epc.tmcz.cz. [37.48.1.197])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f6f062c7sm23389385e9.14.2025.05.20.02.23.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 May 2025 02:23:18 -0700 (PDT)
+Date: Tue, 20 May 2025 11:23:14 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Hillf Danton <hdanton@sina.com>, 
+	Network Development <netdev@vger.kernel.org>
+Subject: Re: [PATCH (EXPERIMENTAL)] team: replace term lock with rtnl lock
+Message-ID: <ooxxjzmbid3jb4optotv5ptzdh253wgwi3v3omo5r7rxl6vqac@7l4rrug5l2z5>
+References: <ff1d684a-22ec-4ea2-a6ee-fe9704a6f284@I-love.SAKURA.ne.jp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=b8uy4sGx c=1 sm=1 tr=0 ts=682c49f5 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=dt9VzEwgFbYA:10 a=M5GUcnROAAAA:8 a=QY2NK7KhZwvVfJmNNlwA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: R1i0RygRbEliO-PJRScBckPEThoCfpn0
-X-Proofpoint-ORIG-GUID: R1i0RygRbEliO-PJRScBckPEThoCfpn0
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNTIwMDA3NiBTYWx0ZWRfX7QMj2kpUSwTk L1yfvBbF9eKdCrM9iEXvV7YCB40vXq/Ha9mVhE1fj7rirMGRLE+86cPcnKoIUoeB0r2rgPOrTG7 OBhCCi2Ig8d4hJ8YjjfgQHOryzemT21MSuOfBkk0xSaGUOx9qyzkhLqAa9YhyrYWlkHYxPU9Hb1
- nbKfFrIxSB+jRG/9HgdaPfKMVcA9u9GmnRsLxUm6UZJi29WyUClTVCV7ywoaQNgnOttXOtmNIl5 XVeT0DrbouKJP+CXiqxXwv846jOBU+8sllNslYoKC4MmlrHRlP7AAlKlfCdOEciWqewYHM/G0eC UOrIFOtQKobS5VCy2BKXK1aH+MexCTcDfJ9Nsun2+92VJCgRMc7ok7AEQa2cvCJ1hhMJ34DffT3
- 54IWn37T/KGBjfYc1Tr1Jrt1emfxUr+H3DcktuWHbvnVtZ7F38G5XzXkmLXMv0EZ2xvWYww2
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.0.736,FMLib:17.12.80.40
- definitions=2025-05-20_04,2025-05-16_03,2025-03-28_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ff1d684a-22ec-4ea2-a6ee-fe9704a6f284@I-love.SAKURA.ne.jp>
 
-QOS is designed to create a new send queue whenever  a class
-is created, ensuring proper shaping and scheduling. However,
-when multiple send queues are created and deleted in a loop,
-SMMU errors are observed.
+Sat, May 17, 2025 at 09:32:20AM +0200, penguin-kernel@I-love.SAKURA.ne.jp wrote:
 
-This patch addresses the issue by performing an data cache sync
-during the teardown of QOS send queues.
+[..]
 
-Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
----
- .../ethernet/marvell/octeontx2/nic/qos_sq.c   | 22 +++++++++++++++++++
- 1 file changed, 22 insertions(+)
+>@@ -2319,13 +2301,12 @@ static struct team *team_nl_team_get(struct genl_info *info)
+> 	}
+> 
+> 	team = netdev_priv(dev);
+>-	mutex_lock(&team->lock);
+> 	return team;
+> }
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/qos_sq.c b/drivers/net/ethernet/marvell/octeontx2/nic/qos_sq.c
-index c5dbae0e513b..58d572ce08ef 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/qos_sq.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/qos_sq.c
-@@ -256,6 +256,26 @@ int otx2_qos_enable_sq(struct otx2_nic *pfvf, int qidx)
- 	return err;
- }
- 
-+static int otx2_qos_nix_npa_ndc_sync(struct otx2_nic *pfvf)
-+{
-+	struct ndc_sync_op *req;
-+	int rc;
-+
-+	mutex_lock(&pfvf->mbox.lock);
-+
-+	req = otx2_mbox_alloc_msg_ndc_sync_op(&pfvf->mbox);
-+	if (!req) {
-+		mutex_unlock(&pfvf->mbox.lock);
-+		return -ENOMEM;
-+	}
-+
-+	req->nix_lf_tx_sync = true;
-+	req->npa_lf_sync = true;
-+	rc = otx2_sync_mbox_msg(&pfvf->mbox);
-+	mutex_unlock(&pfvf->mbox.lock);
-+	return rc;
-+}
-+
- void otx2_qos_disable_sq(struct otx2_nic *pfvf, int qidx)
- {
- 	struct otx2_qset *qset = &pfvf->qset;
-@@ -285,6 +305,8 @@ void otx2_qos_disable_sq(struct otx2_nic *pfvf, int qidx)
- 
- 	otx2_qos_sqb_flush(pfvf, sq_idx);
- 	otx2_smq_flush(pfvf, otx2_get_smq_idx(pfvf, sq_idx));
-+	/* NIX/NPA NDC sync */
-+	otx2_qos_nix_npa_ndc_sync(pfvf);
- 	otx2_cleanup_tx_cqes(pfvf, cq);
- 
- 	mutex_lock(&pfvf->mbox.lock);
--- 
-2.34.1
 
+Why do you think this is safe?
+
+Rtnl is held only for set doit.
+
+
+> 
+> static void team_nl_team_put(struct team *team)
+> {
+>-	mutex_unlock(&team->lock);
+>+	ASSERT_RTNL();
+
+Did you test this? How? Howcome you didn't hit this assertion?
+
+
+
+> 	dev_put(team->dev);
+> }
+> 
 
