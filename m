@@ -1,121 +1,120 @@
-Return-Path: <netdev+bounces-191923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BE8CABDE96
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 17:15:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1E6BABDE4F
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 17:07:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7C2A17E7BD
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 14:59:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DAB6D7ACEAD
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 15:06:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFEB924677D;
-	Tue, 20 May 2025 14:59:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CDC4252901;
+	Tue, 20 May 2025 15:06:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="DhN+4PCo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LYkKFlz0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DE4124C66C
-	for <netdev@vger.kernel.org>; Tue, 20 May 2025 14:59:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07B37251798
+	for <netdev@vger.kernel.org>; Tue, 20 May 2025 15:06:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747753177; cv=none; b=KYCaBFOGgC0yOWqMYzY6ombYBJ1P3sn6jNrcIrI7loETRJB4QSXbYV9p8R6omqWIyhEAxMlK4B6sBFHAk8FXPJN6o9pJpY+sZM7L61vsD3jdgzrCEnDvkZi/Jxq6IcTWVDP2PSbmBKwyiGEsYHWkNg6fXYNMPtFw8tdrUcBS6zQ=
+	t=1747753585; cv=none; b=O09biTsorV/kOjRIowRmw21bp6OCyQkn3kXJuFRY+bgRvTZrFVnHwki8UO/Qgq7D0Xg0ej8gvlKPftrHd52EhyJs6A7AzxRRERJ+ZON+ioY/Ut89YsTcw+b4T91jP5iuvDEB0BMRK9oCcr09dj6TVale+ZZ9XOchMzkIzjfvY/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747753177; c=relaxed/simple;
-	bh=tBpZ0/kobeFb/wXbvGgeE+EZeUv85g3hi2ioKvPgsHc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g7LuGs6y92McqIqbOAgYbBhPU/3PFaJ0Bgdgx6AGq5XXJx8g3xqQs9pkNnz5uniMqgi39Y2VQIjCwZG/y2KUEz9kWuCWTxYnSGj1osmiDzAHpZUNqXiLo+pk6+6iGm8RkNoJWiIZCi4OpWEAN0z79BBtKG4l0keoRkQ1cVTjcLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=DhN+4PCo; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-ad1f6aa2f84so1112858266b.0
-        for <netdev@vger.kernel.org>; Tue, 20 May 2025 07:59:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1747753174; x=1748357974; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fg5DdC4iMqSSER4zCMZwVTBTVih8D7aFm22aVmaEjZI=;
-        b=DhN+4PCoYAqDfAl07irfw6g51NUhTSyZUa24RkW6t9+sNGiYUn8gZfENnZyTRVTe6W
-         NSnaqvML/999hfuqZwQ/bUI3tQIUUw1YniEw4pK62F+SKHMnCTMOdfYpFvC9r/LupqlU
-         Q8MbvUZOu5cs4D4whrlEuSgPojHp2Rmj2GCH7anQOGol1taV0N5pt9B0fgcX6P0RWQPY
-         IU8zZcb0vnM4YHPxK/LSLhH2C2EiHNrUG1vo1/bgnAS7NxdRaBkyBC9lZtg4wtUxWdCV
-         66AE5v+3xC1IvZ+Q9orlKrN1I95b5T35L59krRfMeeLj0GpAUTRFiyTIfsSBfxaPbhBn
-         OWFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747753174; x=1748357974;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fg5DdC4iMqSSER4zCMZwVTBTVih8D7aFm22aVmaEjZI=;
-        b=B11UMdqcuN/tFor92fiYBIkwSTpliYemCN/Z4MvOFVkQ9ilGZmudlAcI3mWdgM9BK6
-         zx/tZVmz6dOn1uytedYYHnRD/96Pll3i/TbMWv8bEXVtsoYN8WsA6r8q2ab+yAY/5tSM
-         Q6Ha/Je2O7qkv1KWU4MzKbcJ6UomA9idNd6nRq2qzyml8pbEbTnYqU5XTQgwPWXTp5Ja
-         h0Ix/cDun3WRjpK5wd6EUL0yxYkF97umN+HJAqKaj+Yw8XGepD4DQTxYI++pOQzkFcHi
-         pTADZA/p7eVRxXT1zSsR3b6Z++EJoxRgrhdOIuNtdKTtWyHN6nyfJUmn0NucA6a+qb8Q
-         FYhA==
-X-Gm-Message-State: AOJu0YyR5uNbgez/Rziewuscg0Zk89cqdQ6CYd2RmAhgQaFETsmIdkKp
-	YtN8RPfiNwqHqcnrSeSMN+qhhmL7+UbxvNUux4e0dd+a0m1DB0qgRWaSDgMcPi7cXJk=
-X-Gm-Gg: ASbGnct5sZIXvc8a8qisHoA//NMyCNR6aJKAHe4jNf00bb8+8rHohrw/e/t0X4J3Bza
-	3N6BwJJdYcQJvbGpu8y5JsmQNzEFY3tDQ0Dt+QXH4+6W0QYWOaf9jaS3bnE62pdkl2/PTRA2LEE
-	ciCauV2AykAzcg5EiHRvW8V4mvGw+DEChOipYj6yr4iUteh38XdlO2IV7gZtxWb1WLVXnL49Jvd
-	Fm4AFPB2CXfF/C47i7Bp+fZvNOOMItxCa22J3wVeLzuLLDcmgQ1kIhRi/+ZqP6zWSFkxWDG1u9t
-	2TSN4sd/2cSvVcb0tdE75vyeOHxF+04yxfwnF6MRmRocanIMqS8EgDdVs90hNlfyCzcEjOl4juR
-	qEq+850DRRzvw7KEhAw==
-X-Google-Smtp-Source: AGHT+IFUxnAmkx274h1RA9dFiQ0hmb3bCOunpIK9vknHa9Me54kXAozjGnAIanHbcOKiOjm4vP2I3A==
-X-Received: by 2002:a17:907:960a:b0:ad3:e742:69ea with SMTP id a640c23a62f3a-ad52f86c635mr1358196566b.14.1747753174309;
-        Tue, 20 May 2025 07:59:34 -0700 (PDT)
-Received: from ?IPV6:2a03:83e0:1126:4:cc1:c3d6:1a7c:1c1b? ([2620:10d:c092:500::4:4bc7])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ad52d43830esm749977366b.98.2025.05.20.07.59.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 May 2025 07:59:34 -0700 (PDT)
-Message-ID: <d6529b8d-dbca-408d-b28b-803b90a4d23b@davidwei.uk>
-Date: Tue, 20 May 2025 15:59:33 +0100
+	s=arc-20240116; t=1747753585; c=relaxed/simple;
+	bh=QPww7qfnARV4leuhCvCGrKI8AvKvoSsWTFouBCCaPYc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m1hO6T/8p5XUlzuJIuOQDtz9UtfBCXk/+a546mfjb3MauLLx3P95RI12bCMuH7hDlECPlJ9HOsbVyT+3JJRB92qy5UmkH5jnYA32LrUZeiJ48oToGpPhxk8rISuMYEV91yD9b+hhtP61TUNET+bXoJlCql3/2dV0TKJ3AxB/01s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LYkKFlz0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06A8AC4CEE9;
+	Tue, 20 May 2025 15:06:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747753584;
+	bh=QPww7qfnARV4leuhCvCGrKI8AvKvoSsWTFouBCCaPYc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LYkKFlz05LorMAQjWfbGoFgphE5bSvssPZrHSMcxp2PLiv/LZ/55B8+bmbpDaaDgr
+	 eXU9T0cov/p234n5pZ2gLpMnU1xzvhmwzacKffXLQJl7O9qg0kE1m3y5h9fHNZdiEE
+	 N1xYctwNV3M2ikgaF/Q092IRUOZFmWiSILwmcfq954oBQwikabGUFOnzzoSNTTDTQd
+	 jBPrIxaXR8tXdN7Li0Y/Z/Y35V6zrLbmpkyFLdk3mINMt5KCD9KiG342IAqM6De3eH
+	 RrsE1S6e9oLGqKib8Hkego9d+NCW4Q0tXkIW+oPr+ePWfMN8MTQstQAZJzpkGd/cnM
+	 sE1ySX6kiOeqw==
+Date: Tue, 20 May 2025 16:06:19 +0100
+From: Simon Horman <horms@kernel.org>
+To: Krishna Kumar <krikku@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com, edumazet@google.com,
+	intel-wired-lan@lists.osuosl.org, andrew+netdev@lunn.ch,
+	kuba@kernel.org, pabeni@redhat.com, sridhar.samudrala@intel.com,
+	ahmed.zaki@intel.com, krishna.ku@flipkart.com
+Subject: Re: [PATCH] net: ice: Perform accurate aRFS flow match
+Message-ID: <20250520150619.GZ365796@horms.kernel.org>
+References: <20250520050205.2778391-1-krikku@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 3/3] bnxt_en: Update MRU and RSS table of RSS contexts
- on queue reset
-To: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew+netdev@lunn.ch, pavan.chebbi@broadcom.com,
- andrew.gospodarek@broadcom.com
-References: <20250519204130.3097027-1-michael.chan@broadcom.com>
- <20250519204130.3097027-4-michael.chan@broadcom.com>
-Content-Language: en-US
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20250519204130.3097027-4-michael.chan@broadcom.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250520050205.2778391-1-krikku@gmail.com>
 
-On 5/19/25 13:41, Michael Chan wrote:
-> From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+On Tue, May 20, 2025 at 10:32:05AM +0530, Krishna Kumar wrote:
+> This patch fixes an issue seen in a large-scale deployment under heavy
+> incoming pkts where the aRFS flow wrongly matches a flow and reprograms the
+> NIC with wrong settings. That mis-steering causes RX-path latency spikes
+> and noisy neighbor effects when many connections collide on the same has
+> (some of our production servers have 20-30K connections).
+
+...
+
 > 
-> The commit under the Fixes tag below which updates the VNICs' RSS
-> and MRU during .ndo_queue_start(), needs to be extended to cover any
-> non-default RSS contexts which have their own VNICs.  Without this
-> step, packets that are destined to a non-default RSS context may be
-> dropped after .ndo_queue_start().
-> 
-> Fixes: 5ac066b7b062 ("bnxt_en: Fix queue start to update vnic RSS table")
-> Reported-by: David Wei <dw@davidwei.uk>
-> Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+> Signed-off-by: Krishna Kumar <krikku@gmail.com>
+
+Hi Krishna,
+
+As a fix if this should probably have a Fixes tag.
+
+And it would be useful to denote the target tree in the subject.
+
+E.g. [PATCH iwl-net] ...
+
 > ---
-> Cc: David Wei <dw@davidwei.uk>
-> ---
->   drivers/net/ethernet/broadcom/bnxt/bnxt.c | 27 +++++++++++++++++++----
->   1 file changed, 23 insertions(+), 4 deletions(-)
+>  drivers/net/ethernet/intel/ice/ice_arfs.c | 45 +++++++++++++++++++++++
+>  1 file changed, 45 insertions(+)
 > 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_arfs.c b/drivers/net/ethernet/intel/ice/ice_arfs.c
+> index 2bc5c7f59844..b36bd189bd64 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_arfs.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_arfs.c
+> @@ -377,6 +377,47 @@ ice_arfs_is_perfect_flow_set(struct ice_hw *hw, __be16 l3_proto, u8 l4_proto)
+>  	return false;
+>  }
+>  
+> +/**
+> + * ice_arfs_cmp - Check if aRFS filter matches this flow.
+> + * @fltr_info: filter info of the saved ARFS entry.
+> + * @fk: flow dissector keys.
+> + * n_proto:  One of htons(IPv4) or htons(IPv6).
+> + * ip_proto: One of IPPROTO_TCP or IPPROTO_UDP.
 
-Thanks for the fix.
+nit: A '@' is required to document function parameters.
 
-Reviewed-by: David Wei <dw@davidwei.uk>
+ * @nproto: ...
+ * @ip_proto: ...
+
+> + *
+> + * Since this function assumes limited values for n_proto and ip_proto, it
+> + * is meant to be called only from ice_rx_flow_steer().
+
+Please also document the return value using "Return: " or "Returns: ".
+
+Flagged by ./scripts/kernel-doc -Wall -none
+
+> + */
+
+...
 
