@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-191920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 326B0ABDDD6
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:52:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4710BABDDD8
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:53:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B75A11BA2A0B
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 14:52:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D1651BA395E
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 14:53:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3840C2522AB;
-	Tue, 20 May 2025 14:51:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 055E72528F0;
+	Tue, 20 May 2025 14:51:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="KVMSfZYm"
+	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="VBfTH0tB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0DEF25228C
-	for <netdev@vger.kernel.org>; Tue, 20 May 2025 14:51:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F3DF2522A4
+	for <netdev@vger.kernel.org>; Tue, 20 May 2025 14:51:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747752690; cv=none; b=crH67RXJ9fLj1ZcMQVlp7ABre0PlEiW1h/TZyG7UMCkDtf1WppFa3eGGRAkGxQoqJNuv1kQ8pvPhj2kfJKVQ0P4bj5JNRlSpDcIRn4+0DtPiUdXFVC+9VkqZYqYo+nzrXllJU3Fk4F/E/vppPavbQcG90WVd+TYwUiEUFb/HWjQ=
+	t=1747752691; cv=none; b=uIw/PYowi7ijtWOzqw08l8qeHWhdfB9xJG16D/socdwMiIdLCCANUjwBl0HwL8eaouKfDKf1aVdOk3l4gWxGgMS2Bj4FYYuSfDEwnGIWh+yzvlhQVfuKBYybR8QHIAt2Kk96PBaN/b8e1Dv2/lX1IuhQqY/8VYZRUGbBYLy7qS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747752690; c=relaxed/simple;
-	bh=2tkAMlhAZoaRx0TqrjPlNgg15lg5GmPYcMCc1bfgSwg=;
+	s=arc-20240116; t=1747752691; c=relaxed/simple;
+	bh=uSr4x49PDr9ZXwI2vF7mnRwL2E6/FOtgzemo2B45RS8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r71m4cdCUBtj/TmbDh9yU88kY6rniMiHw5v1S6Sh2Nm5ZnglK/JdqTl/4gzkonHjmklIMb1/ltMdDAnXHPFKwCKSDUSwdkNqtX3GNX728BgtU3treK4B2Onfs0k2wgLo1eEi0O3/pqvz/nCGFJxNxy6dJ3ydpEDKlrz4bfn6Nb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=KVMSfZYm; arc=none smtp.client-ip=209.85.210.181
+	 MIME-Version; b=QVt0Yp7pbLYj82aMomXbNbq4Hy2J2nCh2R562RQM9pe/0GPmyR23+X8n4qm45sm67QnvJsXlYY9JYnrB1rViXRsvytbEWdWIbbA7FpkGbu9Iv8h1EDVrvc1jW069HiBkJt9KJno2d7UWi1N5Qp0xaxJFTUut3e0H+xvKRWZ8G/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=VBfTH0tB; arc=none smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-7390294782bso584351b3a.0
-        for <netdev@vger.kernel.org>; Tue, 20 May 2025 07:51:28 -0700 (PDT)
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7426c4e3d57so820209b3a.2
+        for <netdev@vger.kernel.org>; Tue, 20 May 2025 07:51:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1747752688; x=1748357488; darn=vger.kernel.org;
+        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1747752689; x=1748357489; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=C4kf3ZieW9o/TFhugnSaDvAiwleQ1fSWe8YKYPJAUM0=;
-        b=KVMSfZYm76bjdzLgFpMmViUF4r1IdJDOfwmROaPyxQcoVQSbNFVGOSf3oSCEEuH81B
-         VWjqJSJLe7GBUbe/WEoeDLgxxgyARy4SICfJ9x132sYybeHFTxkAVsVntN8gElItbDAr
-         wOfIRY8rAIsfF+jRaNZm65iY9lPp0QozyGsGM609HoWIQ0g86eq4aaFCRfxrepewfgBu
-         dP0LufT5P+bJDLjlgyVBnOlqc04eLgAO2OCt0UWmUPKcS8WlfxF4ccgCPdnLiwxuikaK
-         8yGgQkOQmVycFRAIEI1WpKoxzjCMmldEkB2b0fk7bssZN4rcGK0VJ1WCo0I768iR5GqG
-         Lq9Q==
+        bh=N2i/y9zOLCNlUgSgHvl580ugReZupnq3VMN/q9SzffM=;
+        b=VBfTH0tBnEg73dzPfDT3N7QxPp6PPotAIgQlbeNeBcZvCdcRGE+1NUS0AOZ2apKpzD
+         niAEkvDNjQjngTcQWgr6YWmi+PCkaOWNiu7dBcGFkU7EdHqM6qmqiXxVGVTjpJ733WEo
+         vQVrIFJgo1sA9tDpj4o0Kh2lz4tmkhkO9m2+5fxI+Mg35GhzAnVA9uF0WvpOQGbuRNoP
+         th7zu+yloQCfoAtvlDpZnWhHRP3m4QW262TwImp/35WHF2rBnsVIT6UrCMcQAh4sc2ha
+         6kVVJIvUi9WuIPeITOm7yJ33n+/ughV19CCAP2pyBCu408o2Gt1oULhNeUap196PrKV7
+         c2lg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1747752688; x=1748357488;
+        d=1e100.net; s=20230601; t=1747752689; x=1748357489;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=C4kf3ZieW9o/TFhugnSaDvAiwleQ1fSWe8YKYPJAUM0=;
-        b=U/NF+OX4GYG+r6myWVKPQC+KkIPX5x+akeqbGz0oAT3N4SmoN/nQnamArAS23vZCjB
-         cMu2MXYwPseD8ygYdKo5IVOXctno9cUAsvIpjd5MrnDa0Jvgm/GuTLSG0xVDo6SiNLKH
-         g+vEZ/vml8QFJ++BkT7n3ITtZJSIqgdvUaiDu1RmCoiWfBuHdLydvsFG4gvLpraRh+Zs
-         GsYi1i3zAqIQhMPoLepAsPIK18FMqJo8DegWrehum+kwGz/CFQA4rP9csqzvOQ5k4hS/
-         CiymY5YayEyxn849bDGMonhIJ0KXHmhPKooUuPKiYA4PEodgk9JmE80BOAS4OhhiPIed
-         5hxw==
-X-Gm-Message-State: AOJu0YydTchnYZjC6LdxLqo0YPZ96c1/2ZTp5Nj8+B4Fk2P80NJOHfME
-	BQOPIJUiJ1H3PE/O4f/q7I2PuI3gUbLh3HxtdtSw81TdWVcp/8CzgeGFhxhghlC2nazaasCTBjL
-	lmg/FTAo=
-X-Gm-Gg: ASbGncsqXECzacrBWcA7VTocAqgCLhK1ks3AbiqJDPC1KJJjfaxaHxbdWrB9FJjX1ZH
-	qk0wllp/lXhpKRgryY51cBMFLapth134p/eWL0izWg1WJglWvbxdbZNaPVy/HSWb+bpam/Xwf/d
-	WYeng5P9mSriTYQCby/BmIa1R8lZRbmS7cbXaYyJbh0XcYyZl3zhWCDr2c8bMHitBc4F/ql5hXd
-	w1D2uv+HOQlXxxQ+lGy4qdkWVMzzGSoeVSe4pBN9qZFhiFSZMFOGI1FFR1SVInYp8tqV1xnLWp0
-	Px6tv38jZn/Eo5qaX6PlLRm5HuDm7n9Hqn8TR4YS
-X-Google-Smtp-Source: AGHT+IEXW7+AsDPqB0o2RuLGL90KhocP3vgD1k2sKWq0uqeTFftW6eP1ChVSOZgb9VkuPebXDgaC9A==
-X-Received: by 2002:a05:6a00:aca:b0:742:938a:3eca with SMTP id d2e1a72fcca58-742a98f943dmr9816941b3a.3.1747752687937;
-        Tue, 20 May 2025 07:51:27 -0700 (PDT)
+        bh=N2i/y9zOLCNlUgSgHvl580ugReZupnq3VMN/q9SzffM=;
+        b=nfAUnXTEMOdaXwtUJX6mf8cuLQXcC2FtTpGzsgrQabJ8UBH2kgHFwWblktnVdN+UDP
+         4L9XDEBvxLvSwy6XfafebX3cCg/AlJmPw3fRl/46b6HzYuc/pxy0lNbHUE8dpOhQLcns
+         8y/uHejq48Dq3UlvzOXT8cTOj7E7HhIc3m1LJM/1Y8NaYFRYnjDlE+dmcYk7twsOhXbd
+         JoT9yayJFHom3m2LqjHAZoTqY8LVjtPAxMbq+C0aBHlbstlnHwkn9Axb4i8+fCMjUcDd
+         HKxIhoHChV4em6slalinSzyT1nUuey0ZlHSNDNkuvgMj4lHk9ztE0Mn53ZeyORF4ifDh
+         UCKg==
+X-Gm-Message-State: AOJu0Yy8e2xInu8Sa8sREmnquYHm2aToGWM41x3xdidzQx7tj4ncXGXl
+	yu1/Ei2AZq2vWgKW0AfQwb15YpfSEijdIOs3lq20RxuJ6D1iMtyyd0sEcPgemNtKx1rVgjPHP1m
+	jeK4WAEA=
+X-Gm-Gg: ASbGncskdl/QBz3Fpyo98NkOfyyqLvY5GX16Q0w+LEPyV39tbqw4TRE3cYN8xnVVOk2
+	/+A2vP/bk4J96ymlKJfQWBRqk3UInMWBtob1lXFqElpsAUMeHyA27JHMOtsuETONOwjfPOKhVmY
+	WTUnB1uO1EPMivzzT7kSWiECHl4vov8IYdnnX9kZ7+21b+tHoIyGywP+XywHIrehXe3+EEY4wyo
+	upaXUHvqcrdatZ0gMFuVJxH21gffnS/ehdDRPAlw7l12GwgFdalgJ895UnC8PqaLEzxLuKC6pBu
+	fxgcaaD8YVHBzIVg3s/s4WwGzJQStj90fr6uXRrDqwP7PGAOWIg=
+X-Google-Smtp-Source: AGHT+IG3vEO8Ztm2SNFvNLFj+7X83Esu1zmICZeqh7qZKgyI+uz0bSXBQLVrrIAlkrVtBNNWjVm0gQ==
+X-Received: by 2002:a05:6a00:ab87:b0:726:380a:282f with SMTP id d2e1a72fcca58-742a9780577mr9048855b3a.2.1747752689340;
+        Tue, 20 May 2025 07:51:29 -0700 (PDT)
 Received: from t14.. ([2001:5a8:4528:b100:276d:b09e:9f33:af8d])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-742a9829bb3sm8242993b3a.100.2025.05.20.07.51.26
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-742a9829bb3sm8242993b3a.100.2025.05.20.07.51.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 May 2025 07:51:27 -0700 (PDT)
+        Tue, 20 May 2025 07:51:29 -0700 (PDT)
 From: Jordan Rife <jordan@jrife.io>
 To: netdev@vger.kernel.org,
 	bpf@vger.kernel.org
@@ -81,9 +81,9 @@ Cc: Jordan Rife <jordan@jrife.io>,
 	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
 	Kuniyuki Iwashima <kuniyu@amazon.com>,
 	Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Subject: [PATCH v1 bpf-next 09/10] selftests/bpf: Create established sockets in socket iterator tests
-Date: Tue, 20 May 2025 07:50:56 -0700
-Message-ID: <20250520145059.1773738-10-jordan@jrife.io>
+Subject: [PATCH v1 bpf-next 10/10] selftests/bpf: Add tests for bucket resume logic in established sockets
+Date: Tue, 20 May 2025 07:50:57 -0700
+Message-ID: <20250520145059.1773738-11-jordan@jrife.io>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250520145059.1773738-1-jordan@jrife.io>
 References: <20250520145059.1773738-1-jordan@jrife.io>
@@ -95,175 +95,353 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Prepare for bucket resume tests for established TCP sockets by creating
-established sockets. Collect socket fds from connect() and accept()
-sides and pass them to test cases.
+Replicate the set of test cases used for UDP socket iterators to test
+similar scenarios for TCP established sockets.
 
 Signed-off-by: Jordan Rife <jordan@jrife.io>
 ---
- .../bpf/prog_tests/sock_iter_batch.c          | 83 ++++++++++++++++++-
- 1 file changed, 79 insertions(+), 4 deletions(-)
+ .../bpf/prog_tests/sock_iter_batch.c          | 286 ++++++++++++++++++
+ 1 file changed, 286 insertions(+)
 
 diff --git a/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c b/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
-index 847e4b87ab92..f14adda52f53 100644
+index f14adda52f53..44fbb527594d 100644
 --- a/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
 +++ b/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
-@@ -153,8 +153,66 @@ static void check_n_were_seen_once(int *fds, int fds_len, int n,
- 	ASSERT_EQ(seen_once, n, "seen_once");
+@@ -119,6 +119,44 @@ static int get_nth_socket(int *fds, int fds_len, struct bpf_link *link, int n)
+ 	return nth_sock_idx;
  }
  
-+static int accept_from_one(int *server_fds, int server_fds_len)
++static bool close_and_wait(int fd, struct bpf_link *link)
 +{
-+	int i = 0;
-+	int fd;
++	static const int us_per_ms = 1000;
++	__u64 cookie = socket_cookie(fd);
++	struct iter_out out;
++	bool exists = true;
++	int iter_fd, nread;
++	int waits = 20; /* 2 seconds */
 +
-+	for (; i < server_fds_len; i++) {
-+		fd = accept(server_fds[i], NULL, NULL);
-+		if (fd >= 0)
-+			return fd;
-+		if (!ASSERT_EQ(errno, EWOULDBLOCK, "EWOULDBLOCK"))
-+			return -1;
++	close(fd);
++
++	/* Wait for socket to disappear from the ehash table. */
++	while (waits--) {
++		iter_fd = bpf_iter_create(bpf_link__fd(link));
++		if (!ASSERT_OK_FD(iter_fd, "bpf_iter_create"))
++			return false;
++
++		/* Is it still there? */
++		do {
++			nread = read(iter_fd, &out, sizeof(out));
++			if (!ASSERT_GE(nread, 0, "nread")) {
++				close(iter_fd);
++				return false;
++			}
++			exists = nread && cookie == out.cookie;
++		} while (!exists && nread);
++
++		close(iter_fd);
++
++		if (!exists)
++			break;
++
++		usleep(100 * us_per_ms);
 +	}
 +
-+	return -1;
++	return !exists;
 +}
 +
-+static int *connect_to_server(int family, int sock_type, const char *addr,
-+			      __u16 port, int nr_connects, int *server_fds,
-+			      int server_fds_len)
-+{
-+	struct network_helper_opts opts = {
-+		.timeout_ms = 0,
-+	};
-+	int *established_socks;
-+	int i;
-+
-+	/* Make sure accept() doesn't block. */
-+	for (i = 0; i < server_fds_len; i++)
-+		if (!ASSERT_OK(fcntl(server_fds[i], F_SETFL, O_NONBLOCK),
-+			       "fcntl(O_NONBLOCK)"))
-+			return NULL;
-+
-+	established_socks = malloc(sizeof(int) * nr_connects*2);
-+	if (!ASSERT_OK_PTR(established_socks, "established_socks"))
-+		return NULL;
-+
-+	i = 0;
-+
-+	while (nr_connects--) {
-+		established_socks[i] = connect_to_addr_str(family, sock_type,
-+							   addr, port, &opts);
-+		if (!ASSERT_OK_FD(established_socks[i], "connect_to_addr_str"))
-+			goto error;
-+		i++;
-+		established_socks[i] = accept_from_one(server_fds,
-+						       server_fds_len);
-+		if (!ASSERT_OK_FD(established_socks[i], "accept_from_one"))
-+			goto error;
-+		i++;
-+	}
-+
-+	return established_socks;
-+error:
-+	free_fds(established_socks, i);
-+	return NULL;
-+}
-+
- static void remove_seen(int family, int sock_type, const char *addr, __u16 port,
--			int *socks, int socks_len, struct sock_count *counts,
-+			int *socks, int socks_len, int *established_socks,
-+			int established_socks_len, struct sock_count *counts,
- 			int counts_len, struct bpf_link *link, int iter_fd)
+ static int get_seen_count(int fd, struct sock_count counts[], int n)
  {
- 	int close_idx;
-@@ -185,6 +243,7 @@ static void remove_seen(int family, int sock_type, const char *addr, __u16 port,
+ 	__u64 cookie = socket_cookie(fd);
+@@ -241,6 +279,43 @@ static void remove_seen(int family, int sock_type, const char *addr, __u16 port,
+ 			       counts_len);
+ }
  
++static void remove_seen_established(int family, int sock_type, const char *addr,
++				    __u16 port, int *listen_socks,
++				    int listen_socks_len, int *established_socks,
++				    int established_socks_len,
++				    struct sock_count *counts, int counts_len,
++				    struct bpf_link *link, int iter_fd)
++{
++	int close_idx;
++
++	/* Iterate through all listening sockets. */
++	read_n(iter_fd, listen_socks_len, counts, counts_len);
++
++	/* Make sure we saw all listening sockets exactly once. */
++	check_n_were_seen_once(listen_socks, listen_socks_len, listen_socks_len,
++			       counts, counts_len);
++
++	/* Leave one established socket. */
++	read_n(iter_fd, established_socks_len - 1, counts, counts_len);
++
++	/* Close a socket we've already seen to remove it from the bucket. */
++	close_idx = get_seen_socket(established_socks, counts, counts_len);
++	if (!ASSERT_GE(close_idx, 0, "close_idx"))
++		return;
++	ASSERT_TRUE(close_and_wait(established_socks[close_idx], link),
++		    "close_and_wait");
++	established_socks[close_idx] = -1;
++
++	/* Iterate through the rest of the sockets. */
++	read_n(iter_fd, -1, counts, counts_len);
++
++	/* Make sure the last socket wasn't skipped and that there were no
++	 * repeats.
++	 */
++	check_n_were_seen_once(established_socks, established_socks_len,
++			       established_socks_len - 1, counts, counts_len);
++}
++
  static void remove_unseen(int family, int sock_type, const char *addr,
  			  __u16 port, int *socks, int socks_len,
-+			  int *established_socks, int established_socks_len,
- 			  struct sock_count *counts, int counts_len,
- 			  struct bpf_link *link, int iter_fd)
- {
-@@ -217,6 +276,7 @@ static void remove_unseen(int family, int sock_type, const char *addr,
- 
- static void remove_all(int family, int sock_type, const char *addr,
- 		       __u16 port, int *socks, int socks_len,
-+		       int *established_socks, int established_socks_len,
- 		       struct sock_count *counts, int counts_len,
- 		       struct bpf_link *link, int iter_fd)
- {
-@@ -244,7 +304,8 @@ static void remove_all(int family, int sock_type, const char *addr,
+ 			  int *established_socks, int established_socks_len,
+@@ -274,6 +349,52 @@ static void remove_unseen(int family, int sock_type, const char *addr,
+ 			       counts_len);
  }
  
- static void add_some(int family, int sock_type, const char *addr, __u16 port,
--		     int *socks, int socks_len, struct sock_count *counts,
-+		     int *socks, int socks_len, int *established_socks,
-+		     int established_socks_len, struct sock_count *counts,
- 		     int counts_len, struct bpf_link *link, int iter_fd)
- {
- 	int *new_socks = NULL;
-@@ -274,6 +335,7 @@ static void add_some(int family, int sock_type, const char *addr, __u16 port,
++static void remove_unseen_established(int family, int sock_type,
++				      const char *addr, __u16 port,
++				      int *listen_socks, int listen_socks_len,
++				      int *established_socks,
++				      int established_socks_len,
++				      struct sock_count *counts, int counts_len,
++				      struct bpf_link *link, int iter_fd)
++{
++	int close_idx;
++
++	/* Iterate through all listening sockets. */
++	read_n(iter_fd, listen_socks_len, counts, counts_len);
++
++	/* Make sure we saw all listening sockets exactly once. */
++	check_n_were_seen_once(listen_socks, listen_socks_len, listen_socks_len,
++			       counts, counts_len);
++
++	/* Iterate through the first established socket. */
++	read_n(iter_fd, 1, counts, counts_len);
++
++	/* Make sure we saw one established socks. */
++	check_n_were_seen_once(established_socks, established_socks_len, 1,
++			       counts, counts_len);
++
++	/* Close what would be the next socket in the bucket to exercise the
++	 * condition where we need to skip past the first cookie we remembered.
++	 */
++	close_idx = get_nth_socket(established_socks, established_socks_len,
++				   link, listen_socks_len + 1);
++	if (!ASSERT_GE(close_idx, 0, "close_idx"))
++		return;
++
++	ASSERT_TRUE(close_and_wait(established_socks[close_idx], link),
++		    "close_and_wait");
++	established_socks[close_idx] = -1;
++
++	/* Iterate through the rest of the sockets. */
++	read_n(iter_fd, -1, counts, counts_len);
++
++	/* Make sure the remaining sockets were seen exactly once and that we
++	 * didn't repeat the socket that was already seen.
++	 */
++	check_n_were_seen_once(established_socks, established_socks_len,
++			       established_socks_len - 1, counts, counts_len);
++}
++
+ static void remove_all(int family, int sock_type, const char *addr,
+ 		       __u16 port, int *socks, int socks_len,
+ 		       int *established_socks, int established_socks_len,
+@@ -303,6 +424,47 @@ static void remove_all(int family, int sock_type, const char *addr,
+ 	ASSERT_EQ(read_n(iter_fd, -1, counts, counts_len), 0, "read_n");
+ }
  
++static void remove_all_established(int family, int sock_type, const char *addr,
++				   __u16 port, int *listen_socks,
++				   int listen_socks_len, int *established_socks,
++				   int established_socks_len,
++				   struct sock_count *counts, int counts_len,
++				   struct bpf_link *link, int iter_fd)
++{
++	int close_idx, i;
++
++	/* Iterate through all listening sockets. */
++	read_n(iter_fd, listen_socks_len, counts, counts_len);
++
++	/* Make sure we saw all listening sockets exactly once. */
++	check_n_were_seen_once(listen_socks, listen_socks_len, listen_socks_len,
++			       counts, counts_len);
++
++	/* Iterate through the first established socket. */
++	read_n(iter_fd, 1, counts, counts_len);
++
++	/* Make sure we saw one established socks. */
++	check_n_were_seen_once(established_socks, established_socks_len, 1,
++			       counts, counts_len);
++
++	/* Close all remaining sockets to exhaust the list of saved cookies and
++	 * exit without putting any sockets into the batch on the next read.
++	 */
++	for (i = 0; i < established_socks_len - 1; i++) {
++		close_idx = get_nth_socket(established_socks,
++					   established_socks_len, link,
++					   listen_socks_len + 1);
++		if (!ASSERT_GE(close_idx, 0, "close_idx"))
++			return;
++		ASSERT_TRUE(close_and_wait(established_socks[close_idx], link),
++			    "close_and_wait");
++		established_socks[close_idx] = -1;
++	}
++
++	/* Make sure there are no more sockets returned */
++	ASSERT_EQ(read_n(iter_fd, -1, counts, counts_len), 0, "read_n");
++}
++
+ static void add_some(int family, int sock_type, const char *addr, __u16 port,
+ 		     int *socks, int socks_len, int *established_socks,
+ 		     int established_socks_len, struct sock_count *counts,
+@@ -333,6 +495,49 @@ static void add_some(int family, int sock_type, const char *addr, __u16 port,
+ 	free_fds(new_socks, socks_len);
+ }
+ 
++static void add_some_established(int family, int sock_type, const char *addr,
++				 __u16 port, int *listen_socks,
++				 int listen_socks_len, int *established_socks,
++				 int established_socks_len,
++				 struct sock_count *counts,
++				 int counts_len, struct bpf_link *link,
++				 int iter_fd)
++{
++	int *new_socks = NULL;
++
++	/* Iterate through all listening sockets. */
++	read_n(iter_fd, listen_socks_len, counts, counts_len);
++
++	/* Make sure we saw all listening sockets exactly once. */
++	check_n_were_seen_once(listen_socks, listen_socks_len, listen_socks_len,
++			       counts, counts_len);
++
++	/* Iterate through the first established_socks_len - 1 sockets. */
++	read_n(iter_fd, established_socks_len - 1, counts, counts_len);
++
++	/* Make sure we saw established_socks_len - 1 sockets exactly once. */
++	check_n_were_seen_once(established_socks, established_socks_len,
++			       established_socks_len - 1, counts, counts_len);
++
++	/* Double the number of established sockets in the bucket. */
++	new_socks = connect_to_server(family, sock_type, addr, port,
++				      established_socks_len / 2, listen_socks,
++				      listen_socks_len);
++	if (!ASSERT_OK_PTR(new_socks, "connect_to_server"))
++		goto done;
++
++	/* Iterate through the rest of the sockets. */
++	read_n(iter_fd, -1, counts, counts_len);
++
++	/* Make sure each of the original sockets was seen exactly once. */
++	check_n_were_seen_once(listen_socks, listen_socks_len, listen_socks_len,
++			       counts, counts_len);
++	check_n_were_seen_once(established_socks, established_socks_len,
++			       established_socks_len, counts, counts_len);
++done:
++	free_fds(new_socks, established_socks_len);
++}
++
  static void force_realloc(int family, int sock_type, const char *addr,
  			  __u16 port, int *socks, int socks_len,
-+			  int *established_socks, int established_socks_len,
- 			  struct sock_count *counts, int counts_len,
- 			  struct bpf_link *link, int iter_fd)
- {
-@@ -302,10 +364,12 @@ static void force_realloc(int family, int sock_type, const char *addr,
+ 			  int *established_socks, int established_socks_len,
+@@ -362,6 +567,24 @@ static void force_realloc(int family, int sock_type, const char *addr,
+ 	free_fds(new_socks, socks_len);
+ }
  
++static void force_realloc_established(int family, int sock_type,
++				      const char *addr, __u16 port,
++				      int *listen_socks, int listen_socks_len,
++				      int *established_socks,
++				      int established_socks_len,
++				      struct sock_count *counts, int counts_len,
++				      struct bpf_link *link, int iter_fd)
++{
++	/* Iterate through all sockets to trigger a realloc. */
++	read_n(iter_fd, -1, counts, counts_len);
++
++	/* Make sure each socket was seen exactly once. */
++	check_n_were_seen_once(listen_socks, listen_socks_len, listen_socks_len,
++			       counts, counts_len);
++	check_n_were_seen_once(established_socks, established_socks_len,
++			       established_socks_len, counts, counts_len);
++}
++
  struct test_case {
  	void (*test)(int family, int sock_type, const char *addr, __u16 port,
--		     int *socks, int socks_len, struct sock_count *counts,
-+		     int *socks, int socks_len, int *established_socks,
-+		     int established_socks_len, struct sock_count *counts,
- 		     int counts_len, struct bpf_link *link, int iter_fd);
- 	const char *description;
- 	int ehash_buckets;
-+	int connections;
- 	int init_socks;
- 	int max_socks;
- 	int sock_type;
-@@ -416,6 +480,7 @@ static void do_resume_test(struct test_case *tc)
- 	static const __u16 port = 10001;
- 	struct nstoken *nstoken = NULL;
- 	struct bpf_link *link = NULL;
-+	int *established_fds = NULL;
- 	int err, iter_fd = -1;
- 	const char *addr;
- 	int *fds = NULL;
-@@ -444,6 +509,14 @@ static void do_resume_test(struct test_case *tc)
- 				     tc->init_socks);
- 	if (!ASSERT_OK_PTR(fds, "start_reuseport_server"))
- 		goto done;
-+	if (tc->connections) {
-+		established_fds = connect_to_server(tc->family, tc->sock_type,
-+						    addr, port,
-+						    tc->connections, fds,
-+						    tc->init_socks);
-+		if (!ASSERT_OK_PTR(established_fds, "connect_to_server"))
-+			goto done;
-+	}
- 	skel->rodata->ports[0] = 0;
- 	skel->rodata->ports[1] = 0;
- 	skel->rodata->sf = tc->family;
-@@ -464,13 +537,15 @@ static void do_resume_test(struct test_case *tc)
- 		goto done;
+ 		     int *socks, int socks_len, int *established_socks,
+@@ -471,6 +694,69 @@ static struct test_case resume_tests[] = {
+ 		.family = AF_INET6,
+ 		.test = force_realloc,
+ 	},
++	{
++		.description = "tcp: resume after removing a seen socket (established)",
++		/* Force all established sockets into one bucket */
++		.ehash_buckets = 1,
++		.connections = nr_soreuse,
++		.init_socks = nr_soreuse,
++		/* Room for connect()ed and accept()ed sockets */
++		.max_socks = nr_soreuse * 3,
++		.sock_type = SOCK_STREAM,
++		.family = AF_INET6,
++		.test = remove_seen_established,
++	},
++	{
++		.description = "tcp: resume after removing one unseen socket (established)",
++		/* Force all established sockets into one bucket */
++		.ehash_buckets = 1,
++		.connections = nr_soreuse,
++		.init_socks = nr_soreuse,
++		/* Room for connect()ed and accept()ed sockets */
++		.max_socks = nr_soreuse * 3,
++		.sock_type = SOCK_STREAM,
++		.family = AF_INET6,
++		.test = remove_unseen_established,
++	},
++	{
++		.description = "tcp: resume after removing all unseen sockets (established)",
++		/* Force all established sockets into one bucket */
++		.ehash_buckets = 1,
++		.connections = nr_soreuse,
++		.init_socks = nr_soreuse,
++		/* Room for connect()ed and accept()ed sockets */
++		.max_socks = nr_soreuse * 3,
++		.sock_type = SOCK_STREAM,
++		.family = AF_INET6,
++		.test = remove_all_established,
++	},
++	{
++		.description = "tcp: resume after adding a few sockets (established)",
++		/* Force all established sockets into one bucket */
++		.ehash_buckets = 1,
++		.connections = nr_soreuse,
++		.init_socks = nr_soreuse,
++		/* Room for connect()ed and accept()ed sockets */
++		.max_socks = nr_soreuse * 3,
++		.sock_type = SOCK_STREAM,
++		.family = AF_INET6,
++		.test = add_some_established,
++	},
++	{
++		.description = "tcp: force a realloc to occur (established)",
++		/* Force all established sockets into one bucket */
++		.ehash_buckets = 1,
++		/* Bucket size will need to double when going from listening to
++		 * established sockets.
++		 */
++		.connections = init_batch_size,
++		.init_socks = nr_soreuse,
++		/* Room for connect()ed and accept()ed sockets */
++		.max_socks = nr_soreuse + (init_batch_size * 2),
++		.sock_type = SOCK_STREAM,
++		.family = AF_INET6,
++		.test = force_realloc_established,
++	},
+ };
  
- 	tc->test(tc->family, tc->sock_type, addr, port, fds, tc->init_socks,
--		 counts, tc->max_socks, link, iter_fd);
-+		 established_fds, tc->connections*2, counts, tc->max_socks,
-+		 link, iter_fd);
- done:
- 	close_netns(nstoken);
- 	SYS_NOFAIL("ip netns del " TEST_CHILD_NS);
- 	SYS_NOFAIL("sysctl -w net.ipv4.tcp_child_ehash_entries=0");
- 	free(counts);
- 	free_fds(fds, tc->init_socks);
-+	free_fds(established_fds, tc->connections*2);
- 	if (iter_fd >= 0)
- 		close(iter_fd);
- 	bpf_link__destroy(link);
+ static void do_resume_test(struct test_case *tc)
 -- 
 2.43.0
 
