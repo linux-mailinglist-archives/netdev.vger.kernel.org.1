@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-191948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EF58ABE058
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 18:17:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 476F8ABE04E
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 18:16:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC8774A8295
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:14:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 918CB8C6A19
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:13:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 130FD286414;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54DEE286883;
 	Tue, 20 May 2025 16:11:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="HUtf3h2F"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PdorgV4h"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11D60283120;
-	Tue, 20 May 2025 16:11:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45C7284691;
+	Tue, 20 May 2025 16:11:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747757496; cv=none; b=CN+2cL6u6QT0Q/Xd2FG54ImIh6FPgFvTgSOs/Wzt2qVGyUraYEQronvIXwHFEdfBU4lbdSDIBaWskPgqvNoarr6tCU5kCcmGqg22csL5P/x+1LN/cuIy5gNXLg503svzGhauohoHmZyD5IBQ9uCk0nD3661AynzOvLenLXWIKQs=
+	t=1747757497; cv=none; b=Lok/BaHlxOd9xx8vL4FFCAaH2Jbxy2ZWAhfRtHfoVxDIbHZnsVGnqdCb6QeLOs986rGWnb1ymGHFjDUboRqbPfAJdkCVOnYRpSG3LcQ5SDrZJr2hq0m54cAgHhHJwAduk2mHHeXZ/DF3bzE27aBXAkrclUmDJDwA4dox3GcOZiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747757496; c=relaxed/simple;
-	bh=wNTtWuZ9PIAV8L0JaDxmIfUDLFDb5Mvkk9jscQoWQgY=;
+	s=arc-20240116; t=1747757497; c=relaxed/simple;
+	bh=fdLBJz3XfsfY4TPnyBshtFiMS/5KSmrv/6AScwZObXQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=bVFy6CsoL0J9Boa5fdTtD89VgppzYJ+vT8LBBp2WKPtd+65bO0oNDgq/giGHGJC83bicf7lYMLLGuxnQG6KRKY9DGqZFggj7JMAEUpS79gQeceqfpjyrxeHEZMr3Y1tkrEmtu8t0oDiwv9pETWyLozo6CcWB95Xnol33qqxYmLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=HUtf3h2F; arc=none smtp.client-ip=217.70.183.199
+	 In-Reply-To:To:Cc; b=C+HhdLAELTNmqH5z6Zsdnl5myZHd5/aQ37XH6+Wiyk6V7goBFI8GpO24slKQh574f6viJKG5AjA2C9gwuhjl5HqybxYv5nlLllgK7a7VLhcVTNRY5ZI5O45KUkJZpeloWvcsbyF4WBLZWry1ISbdImSuVapmlblyi1SoZKZPF7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PdorgV4h; arc=none smtp.client-ip=217.70.183.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A981543973;
-	Tue, 20 May 2025 16:11:30 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id DDFC743288;
+	Tue, 20 May 2025 16:11:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1747757491;
+	t=1747757493;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=NPml4V67ie+1RR8+CcYuG+2+P+ykgMxIiLJ27l5t7D0=;
-	b=HUtf3h2FDaPiv1UImxDuVfdip7CFrbv1BMfZ/P1YVcLOEFRKObH9btSljMxRsCEanqMB1I
-	5/csh9o2CvjXvD8Z5lUXzQaSHp8oTdYT0/eDEyyocoGR099vnwq1lx/ZjvMbKt1PM5oO10
-	5fSojUZEBIojfW9sdBrR2tmnZBTPMCJavk4wxrfrEa+heM95pdWvrXHlK80FVGLeET1sO2
-	vxZG2LiFscijuGXHIRxYfd8kvvPnvhcGm68PxjZAyBK5eGD3WZeLijYUh/ccadM0W1KWZ9
-	ztq3/b85j4g786D3MIRBGg2/yAp8Qf7rBaJ2w1vxSBDbPLr/CUx7DY1KQ6SU+Q==
+	bh=AFEefeZamBor0b/TGmFIcJZdU44c/sbmnuWd9h4THL8=;
+	b=PdorgV4hz8atJuQe/UpkaeptINKIHFlWL4lRcHdyME2mJoo1dHS6QcPsTI8s+dPBX1qaS7
+	BNh+GgSBFhqsHEUwMwKJ1kp8QHLLkkTPRXXcOVTGdJLjAicPCbhjjnpO7fpI2HRkaZyolU
+	TOrYsEmpIae60nhYk2B00O4VgEg0YvPxIjAPjGP0nfpEcy3xQx4SEO2B0BpE4HLnp7d95V
+	1uD6Zrt0knoXSUWmoSlDRLUuggzVoCbmKozGqMRYnB9/5ryrqK6B7mzi+u5monx/W37oJX
+	8Z6ayGqET4XZsXKcHgKH03WVX8XLZoALDsUBrhM3PMY/iW5JZ1bIfExIiGaP+g==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Tue, 20 May 2025 18:11:12 +0200
-Subject: [PATCH net-next v11 10/13] net: pse-pd: pd692x0: Add support for
- controller and manager power supplies
+Date: Tue, 20 May 2025 18:11:13 +0200
+Subject: [PATCH net-next v11 11/13] dt-bindings: net: pse-pd:
+ microchip,pd692x0: Add manager regulator supply
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250520-feature_poe_port_prio-v11-10-bbaf447e1b28@bootlin.com>
+Message-Id: <20250520-feature_poe_port_prio-v11-11-bbaf447e1b28@bootlin.com>
 References: <20250520-feature_poe_port_prio-v11-0-bbaf447e1b28@bootlin.com>
 In-Reply-To: <20250520-feature_poe_port_prio-v11-0-bbaf447e1b28@bootlin.com>
 To: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>, 
@@ -75,84 +75,98 @@ Cc: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
  Dent Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, 
  Maxime Chevallier <maxime.chevallier@bootlin.com>, 
  devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- "Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>
+ "Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 X-Mailer: b4 0.15-dev-8cb71
 X-GND-State: clean
 X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgdeiheculddtuddrgeefvddrtddtmdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephfffufggtgfgkfhfjgfvvefosehtjeertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepvefgvdfgkeetgfefgfegkedugffghfdtffeftdeuteehjedtvdelvddvleehtdevnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgepieenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopegluddvjedrtddruddrudgnpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdejpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvghrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehordhrvghmphgvlhesphgvnhhguhhtrhhonhhigidruggvpdhrtghpthhtohepkhhriihkodgutheskhgvrhhnvghlrdhorhhgp
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgdeiheculddtuddrgeefvddrtddtmdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephfffufggtgfgkfhfjgfvvefosehtjeertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepvefgvdfgkeetgfefgfegkedugffghfdtffeftdeuteehjedtvdelvddvleehtdevnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgepleenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopegluddvjedrtddruddrudgnpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdekpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvghrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehordhrvghmphgvlhesphgvnhhguhhtrhhonhhigidruggvpdhrtghpthhtohepkhhriihkodgutheskhgvrhhnvghlrdhorhhgp
  dhrtghpthhtoheplhhinhhugidqughotgesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegsrhhoohhnihgvsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhm
 X-GND-Sasl: kory.maincent@bootlin.com
 
 From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-Add support for managing the VDD and VDDA power supplies for the PD692x0
-PSE controller, as well as the VAUX5 and VAUX3P3 power supplies for the
-PD6920x PSE managers.
+Adds the regulator supply parameter of the managers.
+Update also the example as the regulator supply of the PSE PIs
+should be the managers itself and not an external regulator.
 
 Signed-off-by: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
-Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 ---
 
 Changes in v5:
+- Add description of others power supplies.
+
+Changes in v3:
 - New patch
 ---
- drivers/net/pse-pd/pd692x0.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ .../bindings/net/pse-pd/microchip,pd692x0.yaml     | 22 +++++++++++++++++++---
+ 1 file changed, 19 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/pse-pd/pd692x0.c b/drivers/net/pse-pd/pd692x0.c
-index a4766c18f333..4de004813560 100644
---- a/drivers/net/pse-pd/pd692x0.c
-+++ b/drivers/net/pse-pd/pd692x0.c
-@@ -976,8 +976,10 @@ pd692x0_register_managers_regulator(struct pd692x0_priv *priv,
- 	reg_name_len = strlen(dev_name(dev)) + 23;
+diff --git a/Documentation/devicetree/bindings/net/pse-pd/microchip,pd692x0.yaml b/Documentation/devicetree/bindings/net/pse-pd/microchip,pd692x0.yaml
+index fd4244fceced..ca61cc37a790 100644
+--- a/Documentation/devicetree/bindings/net/pse-pd/microchip,pd692x0.yaml
++++ b/Documentation/devicetree/bindings/net/pse-pd/microchip,pd692x0.yaml
+@@ -22,6 +22,12 @@ properties:
+   reg:
+     maxItems: 1
  
- 	for (i = 0; i < nmanagers; i++) {
-+		static const char * const regulators[] = { "vaux5", "vaux3p3" };
- 		struct regulator_dev *rdev;
- 		char *reg_name;
-+		int ret;
- 
- 		reg_name = devm_kzalloc(dev, reg_name_len, GFP_KERNEL);
- 		if (!reg_name)
-@@ -988,6 +990,17 @@ pd692x0_register_managers_regulator(struct pd692x0_priv *priv,
- 		if (IS_ERR(rdev))
- 			return PTR_ERR(rdev);
- 
-+		/* VMAIN is described as main supply for the manager.
-+		 * Add other VAUX power supplies and link them to the
-+		 * virtual device rdev->dev.
-+		 */
-+		ret = devm_regulator_bulk_get_enable(&rdev->dev,
-+						     ARRAY_SIZE(regulators),
-+						     regulators);
-+		if (ret)
-+			return dev_err_probe(&rdev->dev, ret,
-+					     "Failed to enable regulators\n");
++  vdd-supply:
++    description: Regulator that provides 3.3V VDD power supply.
 +
- 		priv->manager_reg[i] = rdev;
- 	}
- 
-@@ -1640,6 +1653,7 @@ static const struct fw_upload_ops pd692x0_fw_ops = {
- 
- static int pd692x0_i2c_probe(struct i2c_client *client)
- {
-+	static const char * const regulators[] = { "vdd", "vdda" };
- 	struct pd692x0_msg msg, buf = {0}, zero = {0};
- 	struct device *dev = &client->dev;
- 	struct pd692x0_msg_ver ver;
-@@ -1647,6 +1661,12 @@ static int pd692x0_i2c_probe(struct i2c_client *client)
- 	struct fw_upload *fwl;
- 	int ret;
- 
-+	ret = devm_regulator_bulk_get_enable(dev, ARRAY_SIZE(regulators),
-+					     regulators);
-+	if (ret)
-+		return dev_err_probe(dev, ret,
-+				     "Failed to enable regulators\n");
++  vdda-supply:
++    description: Regulator that provides 3.3V VDDA power supply.
 +
- 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
- 		dev_err(dev, "i2c check functionality failed\n");
- 		return -ENXIO;
+   managers:
+     type: object
+     additionalProperties: false
+@@ -68,6 +74,15 @@ properties:
+           "#size-cells":
+             const: 0
+ 
++          vmain-supply:
++            description: Regulator that provides 44-57V VMAIN power supply.
++
++          vaux5-supply:
++            description: Regulator that provides 5V VAUX5 power supply.
++
++          vaux3p3-supply:
++            description: Regulator that provides 3.3V VAUX3P3 power supply.
++
+         patternProperties:
+           '^port@[0-7]$':
+             type: object
+@@ -106,10 +121,11 @@ examples:
+           #address-cells = <1>;
+           #size-cells = <0>;
+ 
+-          manager@0 {
++          manager0: manager@0 {
+             reg = <0>;
+             #address-cells = <1>;
+             #size-cells = <0>;
++            vmain-supply = <&pse1_supply>;
+ 
+             phys0: port@0 {
+               reg = <0>;
+@@ -161,7 +177,7 @@ examples:
+             pairset-names = "alternative-a", "alternative-b";
+             pairsets = <&phys0>, <&phys1>;
+             polarity-supported = "MDI", "S";
+-            vpwr-supply = <&vpwr1>;
++            vpwr-supply = <&manager0>;
+           };
+           pse_pi1: pse-pi@1 {
+             reg = <1>;
+@@ -169,7 +185,7 @@ examples:
+             pairset-names = "alternative-a";
+             pairsets = <&phys2>;
+             polarity-supported = "MDI";
+-            vpwr-supply = <&vpwr2>;
++            vpwr-supply = <&manager0>;
+           };
+         };
+       };
 
 -- 
 2.34.1
