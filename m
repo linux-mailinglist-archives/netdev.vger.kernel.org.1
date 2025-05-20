@@ -1,158 +1,280 @@
-Return-Path: <netdev+bounces-191824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F7A2ABD6E2
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 13:33:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30C9DABD757
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 13:48:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32FD9189C79A
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 11:33:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FFB03AF136
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 11:48:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D23E274FE2;
-	Tue, 20 May 2025 11:33:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1716274678;
+	Tue, 20 May 2025 11:48:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EsJqa5pG"
 X-Original-To: netdev@vger.kernel.org
-Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD8D21A45A;
-	Tue, 20 May 2025 11:32:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.54.195.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C77219A8A
+	for <netdev@vger.kernel.org>; Tue, 20 May 2025 11:48:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747740782; cv=none; b=F3OJ+kpOJS3QS7XCUX52OlL58thNkbFgHeUvbLuW7VurxrRwh3A5YWNSKHyHloAuccB7jwtYhao+f/VHMBgTXLaYGIe6Qv4INXUVItW1hLxAkJTh9NFl5SE4LJlWS8HgpQFnr84/1pzCScZ32GOpouo4oVA3wDQpFaQhlVKUFAc=
+	t=1747741712; cv=none; b=nWkLiQ6/ACSTzLZ6uaWB9FkrTrkPWZYxn2l0myQS10R34of67u+7Y/+9uj7gKSFmqsxD1+EXOkny+poW1hHpGiPF0nhvB/z/DTMiUgT5kfDreKwIRcdnD4CB+rfK49LkEgFQzd10YMceT0nX38/W+jjuUshofnQGt+3nlswM1Qc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747740782; c=relaxed/simple;
-	bh=k1fG5ajRDy2nag7Bj63UX37XmQ7V6ulqT0aGln+oI1w=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=iJ6TZn3+8FP2Cu9s+qCfYlP5vCqCOTh8OcnjivHQbKbhAh2REQKL/LfcRjd6iX4oJFgzZ6YLv0Y7/eRpZKNKL8qu7u2yq1PB3oDGWFl0ZxTKDmqQ82vnRwXsQuKpUX7rk3pnPbSl/J2jPMSem0RdJkGwfNcNKM+bnBxdIAVHk5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru; spf=pass smtp.mailfrom=fintech.ru; arc=none smtp.client-ip=195.54.195.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fintech.ru
-Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
- (195.54.195.159) with Microsoft SMTP Server (TLS) id 14.3.498.0; Tue, 20 May
- 2025 14:32:53 +0300
-Received: from localhost (10.0.253.101) by Ex16-01.fintech.ru (10.0.10.18)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Tue, 20 May
- 2025 14:32:53 +0300
-From: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
-CC: Nikita Zhandarovich <n.zhandarovich@fintech.ru>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<linux-usb@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>,
-	<syzbot+3b6b9ff7b80430020c7b@syzkaller.appspotmail.com>,
-	<lvc-project@linuxtesting.org>
-Subject: [PATCH net-next] net: usb: aqc111: fix error handling of usbnet read calls
-Date: Tue, 20 May 2025 14:32:39 +0300
-Message-ID: <20250520113240.2369438-1-n.zhandarovich@fintech.ru>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1747741712; c=relaxed/simple;
+	bh=rQ9nuQ96Iibk24HlloVC1HIIF9nw6Z88jPXRCvT7ocU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=oPYrvqh/RO3jnrpFGccYJlAYNu19NUg3S1VnTG941i/xx4OYdDyEMPg65ZBShPNlab2w3wAH7p5dULltE5dDek3FknmVCwskQQNaXrIj9GE8tmZe70A3u89GSvX9xLTm8/YAWYkIoNI2wvbm2LzJLqlKdxwnAeWz1rgtr1JucYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EsJqa5pG; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1747741709;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jXOr/YGgLdkSLnG0lGNZrIL8GJmfF7oYFFM4NepCMWg=;
+	b=EsJqa5pGLmUlJPzk5XfQ3U5Zz/0bEmr2WVGlWVqTRDB8kGp1EZJIj7FG/wm7sNDOhHxa+d
+	GaWSdRtLOMM+xEoNYA41yZXUoqw3ZG8OaI160WSikVkmNcAihdTvj5o/x0g2A9oNKf8lFy
+	KrYDSmVjDxSLL+k7kww+L/g44IW7MaY=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-515-qvm45S_JMjqZc1plEhC61g-1; Tue, 20 May 2025 07:48:28 -0400
+X-MC-Unique: qvm45S_JMjqZc1plEhC61g-1
+X-Mimecast-MFC-AGG-ID: qvm45S_JMjqZc1plEhC61g_1747741707
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3a364d2d0efso1828704f8f.3
+        for <netdev@vger.kernel.org>; Tue, 20 May 2025 04:48:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747741707; x=1748346507;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jXOr/YGgLdkSLnG0lGNZrIL8GJmfF7oYFFM4NepCMWg=;
+        b=dtCNkt/+HaoE4SG3wIdsJP2siPc+pyFWnLl96sKsBt9wc9i2XQ4Df4C3xfGOvM6eZJ
+         G0tMc28S0XzNjX/7JxUZGNPT1CviQGfDi+38g42J3TfEMyVJ4jRbsWEi6K+OMbxaSrV7
+         N27w72am40656CFJALtAbtkRWW9WKKdCDglQsrORQCJqFtzHLdLSwxYWgdy8Pv64Ko02
+         +8QTu/GQctjAZXEm7LBcL06CH6aUl+83g3QgxP89mM7SzJYgtIvv+bzzVsJC5uHTgpxY
+         jfy9/oS98hbSYUcC+gUBBkx5JKmxLH0pY7cscNt9VUEjN2hBEJPtvme8tmICQUSdSBFb
+         22bw==
+X-Forwarded-Encrypted: i=1; AJvYcCWC6xIIc48cCggNcOYQoQ4Ys+fRsO04n5NbZ6Gh+e4l6FyDnoBSB/SdgFffFiiFUgKb1+7Fc8s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkUwC6A2f5CgkMygETEa3fYba/PjnffCk3a80Ml/gSdzXfdWGx
+	51E1+eXpde7a9kFrxRTl2hh5B8rmUXl341+WbJEUiv6j2PeVMMu83f2PY7FhgPbHNxizomfk3oL
+	t+TZtdbWAncq266jd36Kl7OMRhuoco2FVPdhFh1prSIfM110tdJkcuVKnSQ==
+X-Gm-Gg: ASbGncs2o+Ip6mHs0DBqVvTcpcQoN+SPCTcjjkovqBO/GljMx6qCriT+Ti4iuZs8mX2
+	+S5TfBdz6PfdZ5rHoOlKzGmF+WQGVEJCjGoXKFl4CST+PxPt3KvE/M8m1CbFGASQQAT+9LxGt7W
+	/ncD+cTJ2Yl0DREnSqv9KEtYdr9MbkRIEpP9iO1oOnGeuk67Eh0DF8MjtTWsOx/VACsHT3x6lL4
+	qdAfeBvqZTTc3pvD9x6+r3i1Oj4AkvudHp4EnNZXTIhxFYO0477LdGYVaqJ39QJhmvR8waN1NP4
+	EsJS/oGT2UgcsKNfhr4=
+X-Received: by 2002:a05:600c:3114:b0:43c:fa24:8721 with SMTP id 5b1f17b1804b1-442fd6445bdmr168066095e9.17.1747741707149;
+        Tue, 20 May 2025 04:48:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEnOjEw44gC4sY9CJQhd2ildDF8FCvRzA2nnAw5uM1/xzK/4E023+uiNX8t5NUMMfWBhbl/Yg==
+X-Received: by 2002:a05:600c:3114:b0:43c:fa24:8721 with SMTP id 5b1f17b1804b1-442fd6445bdmr168065655e9.17.1747741706704;
+        Tue, 20 May 2025 04:48:26 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:244f:5710::f39? ([2a0d:3344:244f:5710::f39])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-447f78aeb56sm27251695e9.27.2025.05.20.04.48.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 May 2025 04:48:26 -0700 (PDT)
+Message-ID: <468e63af-7049-4c1e-a64d-fdbfa2b45855@redhat.com>
+Date: Tue, 20 May 2025 13:48:23 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: Ex16-02.fintech.ru (10.0.10.19) To Ex16-01.fintech.ru
- (10.0.10.18)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v16 net-next 1/5] sched: Struct definition and parsing of
+ dualpi2 qdisc
+To: chia-yu.chang@nokia-bell-labs.com, horms@kernel.org,
+ donald.hunter@gmail.com, xandfury@gmail.com, netdev@vger.kernel.org,
+ dave.taht@gmail.com, jhs@mojatatu.com, kuba@kernel.org,
+ stephen@networkplumber.org, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, andrew+netdev@lunn.ch,
+ ast@fiberby.net, liuhangbin@gmail.com, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org, ij@kernel.org, ncardwell@google.com,
+ koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com,
+ ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
+ cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
+ vidhi_goel@apple.com
+References: <20250516000201.18008-1-chia-yu.chang@nokia-bell-labs.com>
+ <20250516000201.18008-2-chia-yu.chang@nokia-bell-labs.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250516000201.18008-2-chia-yu.chang@nokia-bell-labs.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Syzkaller, courtesy of syzbot, identified an error (see report [1]) in
-aqc111 driver, caused by incomplete sanitation of usb read calls'
-results. This problem is quite similar to the one fixed in commit
-920a9fa27e78 ("net: asix: add proper error handling of usb read errors").
+On 5/16/25 2:01 AM, chia-yu.chang@nokia-bell-labs.com wrote:
+> +static u32 calculate_probability(struct Qdisc *sch)
+> +{
+> +	struct dualpi2_sched_data *q = qdisc_priv(sch);
+> +	u32 new_prob;
+> +	u64 qdelay_c;
+> +	u64 qdelay_l;
+> +	u64 qdelay;
+> +	s64 delta;
+> +
+> +	get_queue_delays(q, &qdelay_c, &qdelay_l);
+> +	qdelay = max(qdelay_l, qdelay_c);
+> +	/* Alpha and beta take at most 32b, i.e, the delay difference would
+> +	 * overflow for queuing delay differences > ~4.2sec.
+> +	 */
+> +	delta = ((s64)qdelay - q->pi2_target) * q->pi2_alpha;
+> +	delta += ((s64)qdelay - q->last_qdelay) * q->pi2_beta;
 
-For instance, usbnet_read_cmd() may read fewer than 'size' bytes,
-even if the caller expected the full amount, and aqc111_read_cmd()
-will not check its result properly. As [1] shows, this may lead
-to MAC address in aqc111_bind() being only partly initialized,
-triggering KMSAN warnings.
+The abov code is confusing. What do you intend to obtain with the
+explicit cast? the '+' left operand will be converted implicitly to
+unsigned as C integer implicit conversion rules.
 
-Fix the issue by verifying that the number of bytes read is
-as expected and not less.
+> +	if (delta > 0) {
+> +		new_prob = __scale_delta(delta) + q->pi2_prob;
+> +		if (new_prob < q->pi2_prob)
+> +			new_prob = MAX_PROB;
+> +	} else {
+> +		new_prob = q->pi2_prob - __scale_delta(~delta + 1);
+> +		if (new_prob > q->pi2_prob)
+> +			new_prob = 0;
+> +	}
+> +	q->last_qdelay = qdelay;
+> +	/* If we do not drop on overload, ensure we cap the L4S probability to
+> +	 * 100% to keep window fairness when overflowing.
+> +	 */
+> +	if (!q->drop_overload)
+> +		return min_t(u32, new_prob, MAX_PROB / q->coupling_factor);
+> +	return new_prob;
+> +}
+> +
+> +static u32 get_memory_limit(struct Qdisc *sch, u32 limit)
+> +{
+> +	/* Apply rule of thumb, i.e., doubling the packet length,
+> +	 * to further include per packet overhead in memory_limit.
+> +	 */
+> +	u64 memlim = mul_u32_u32(limit, 2 * psched_mtu(qdisc_dev(sch)));
+> +
+> +	if (upper_32_bits(memlim))
+> +		return 0xffffffff;
 
-[1] Partial syzbot report:
-BUG: KMSAN: uninit-value in is_valid_ether_addr include/linux/etherdevice.h:208 [inline]
-BUG: KMSAN: uninit-value in usbnet_probe+0x2e57/0x4390 drivers/net/usb/usbnet.c:1830
- is_valid_ether_addr include/linux/etherdevice.h:208 [inline]
- usbnet_probe+0x2e57/0x4390 drivers/net/usb/usbnet.c:1830
- usb_probe_interface+0xd01/0x1310 drivers/usb/core/driver.c:396
- call_driver_probe drivers/base/dd.c:-1 [inline]
- really_probe+0x4d1/0xd90 drivers/base/dd.c:658
- __driver_probe_device+0x268/0x380 drivers/base/dd.c:800
-...
+Pleas use U32_MAX.
 
-Uninit was stored to memory at:
- dev_addr_mod+0xb0/0x550 net/core/dev_addr_lists.c:582
- __dev_addr_set include/linux/netdevice.h:4874 [inline]
- eth_hw_addr_set include/linux/etherdevice.h:325 [inline]
- aqc111_bind+0x35f/0x1150 drivers/net/usb/aqc111.c:717
- usbnet_probe+0xbe6/0x4390 drivers/net/usb/usbnet.c:1772
- usb_probe_interface+0xd01/0x1310 drivers/usb/core/driver.c:396
-...
+[...]
+> +static int dualpi2_change(struct Qdisc *sch, struct nlattr *opt,
+> +			  struct netlink_ext_ack *extack)
+> +{
+> +	struct nlattr *tb[TCA_DUALPI2_MAX + 1];
+> +	struct dualpi2_sched_data *q;
+> +	int old_backlog;
+> +	int old_qlen;
+> +	int err;
+> +
+> +	if (!opt)
+> +		return -EINVAL;
+> +	err = nla_parse_nested(tb, TCA_DUALPI2_MAX, opt, dualpi2_policy,
+> +			       extack);
+> +	if (err < 0)
+> +		return err;
+> +
+> +	q = qdisc_priv(sch);
+> +	sch_tree_lock(sch);
+> +
+> +	if (tb[TCA_DUALPI2_LIMIT]) {
+> +		u32 limit = nla_get_u32(tb[TCA_DUALPI2_LIMIT]);
+> +
+> +		WRITE_ONCE(sch->limit, limit);
+> +		WRITE_ONCE(q->memory_limit, get_memory_limit(sch, limit));
+> +	}
+> +
+> +	if (tb[TCA_DUALPI2_MEMORY_LIMIT])
+> +		WRITE_ONCE(q->memory_limit,
+> +			   nla_get_u32(tb[TCA_DUALPI2_MEMORY_LIMIT]));
+> +
+> +	if (tb[TCA_DUALPI2_TARGET]) {
+> +		u64 target = nla_get_u32(tb[TCA_DUALPI2_TARGET]);
+> +
+> +		WRITE_ONCE(q->pi2_target, target * NSEC_PER_USEC);
+> +	}
+> +
+> +	if (tb[TCA_DUALPI2_TUPDATE]) {
+> +		u64 tupdate = nla_get_u32(tb[TCA_DUALPI2_TUPDATE]);
+> +
+> +		WRITE_ONCE(q->pi2_tupdate, convert_us_to_nsec(tupdate));
+> +	}
+> +
+> +	if (tb[TCA_DUALPI2_ALPHA]) {
+> +		u32 alpha = nla_get_u32(tb[TCA_DUALPI2_ALPHA]);
+> +
+> +		WRITE_ONCE(q->pi2_alpha, dualpi2_scale_alpha_beta(alpha));
+> +	}
+> +
+> +	if (tb[TCA_DUALPI2_BETA]) {
+> +		u32 beta = nla_get_u32(tb[TCA_DUALPI2_BETA]);
+> +
+> +		WRITE_ONCE(q->pi2_beta, dualpi2_scale_alpha_beta(beta));
+> +	}
+> +
+> +	if (tb[TCA_DUALPI2_STEP_THRESH]) {
+> +		u32 step_th = nla_get_u32(tb[TCA_DUALPI2_STEP_THRESH]);
+> +		bool step_pkt = nla_get_flag(tb[TCA_DUALPI2_STEP_PACKETS]);
+> +
+> +		WRITE_ONCE(q->step_in_packets, step_pkt);
+> +		WRITE_ONCE(q->step_thresh,
+> +			   step_pkt ? step_th : convert_us_to_nsec(step_th));
+> +	}
+> +
+> +	if (tb[TCA_DUALPI2_MIN_QLEN_STEP])
+> +		WRITE_ONCE(q->min_qlen_step,
+> +			   nla_get_u32(tb[TCA_DUALPI2_MIN_QLEN_STEP]));
+> +
+> +	if (tb[TCA_DUALPI2_COUPLING]) {
+> +		u8 coupling = nla_get_u8(tb[TCA_DUALPI2_COUPLING]);
+> +
+> +		WRITE_ONCE(q->coupling_factor, coupling);
+> +	}
+> +
+> +	if (tb[TCA_DUALPI2_DROP_OVERLOAD]) {
+> +		u8 drop_overload = nla_get_u8(tb[TCA_DUALPI2_DROP_OVERLOAD]);
+> +
+> +		WRITE_ONCE(q->drop_overload, (bool)drop_overload);
+> +	}
+> +
+> +	if (tb[TCA_DUALPI2_DROP_EARLY]) {
+> +		u8 drop_early = nla_get_u8(tb[TCA_DUALPI2_DROP_EARLY]);
+> +
+> +		WRITE_ONCE(q->drop_early, (bool)drop_early);
+> +	}
+> +
+> +	if (tb[TCA_DUALPI2_C_PROTECTION]) {
+> +		u8 wc = nla_get_u8(tb[TCA_DUALPI2_C_PROTECTION]);
+> +
+> +		dualpi2_calculate_c_protection(sch, q, wc);
+> +	}
+> +
+> +	if (tb[TCA_DUALPI2_ECN_MASK]) {
+> +		u8 ecn_mask = nla_get_u8(tb[TCA_DUALPI2_ECN_MASK]);
+> +
+> +		WRITE_ONCE(q->ecn_mask, ecn_mask);
+> +	}
+> +
+> +	if (tb[TCA_DUALPI2_SPLIT_GSO]) {
+> +		u8 split_gso = nla_get_u8(tb[TCA_DUALPI2_SPLIT_GSO]);
+> +
+> +		WRITE_ONCE(q->split_gso, (bool)split_gso);
+> +	}
+> +
+> +	old_qlen = qdisc_qlen(sch);
+> +	old_backlog = sch->qstats.backlog;
+> +	while (qdisc_qlen(sch) > sch->limit ||
+> +	       q->memory_used > q->memory_limit) {
+> +		struct sk_buff *skb = __qdisc_dequeue_head(&sch->q);
 
-Uninit was stored to memory at:
- ether_addr_copy include/linux/etherdevice.h:305 [inline]
- aqc111_read_perm_mac drivers/net/usb/aqc111.c:663 [inline]
- aqc111_bind+0x794/0x1150 drivers/net/usb/aqc111.c:713
- usbnet_probe+0xbe6/0x4390 drivers/net/usb/usbnet.c:1772
- usb_probe_interface+0xd01/0x1310 drivers/usb/core/driver.c:396
- call_driver_probe drivers/base/dd.c:-1 [inline]
-...
+As per commit 2d3cbfd6d54a2c39ce3244f33f85c595844bd7b8, the above should be:
 
-Local variable buf.i created at:
- aqc111_read_perm_mac drivers/net/usb/aqc111.c:656 [inline]
- aqc111_bind+0x221/0x1150 drivers/net/usb/aqc111.c:713
- usbnet_probe+0xbe6/0x4390 drivers/net/usb/usbnet.c:1772
+		struct sk_buff *skb = qdisc_dequeue_internal(sch, true);
 
-Reported-by: syzbot+3b6b9ff7b80430020c7b@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=3b6b9ff7b80430020c7b
-Tested-by: syzbot+3b6b9ff7b80430020c7b@syzkaller.appspotmail.com
-Fixes: df2d59a2ab6c ("net: usb: aqc111: Add support for getting and setting of MAC address")
-Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
----
-P.S. In aqc111 there are many calls to aqc111_read_cmd[_nopm]
-functions in other parts of the driver and most of them are not
-checked at all. I've chosen to forego error handling of them, as
-it seems it's missing deliberately. Correct me if I am wrong.
+/P
 
- drivers/net/usb/aqc111.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/usb/aqc111.c b/drivers/net/usb/aqc111.c
-index ff5be2cbf17b..453a2cf82753 100644
---- a/drivers/net/usb/aqc111.c
-+++ b/drivers/net/usb/aqc111.c
-@@ -30,10 +30,13 @@ static int aqc111_read_cmd_nopm(struct usbnet *dev, u8 cmd, u16 value,
- 	ret = usbnet_read_cmd_nopm(dev, cmd, USB_DIR_IN | USB_TYPE_VENDOR |
- 				   USB_RECIP_DEVICE, value, index, data, size);
- 
--	if (unlikely(ret < 0))
-+	if (unlikely(ret < size)) {
-+		ret = ret < 0 ? ret : -ENODATA;
-+
- 		netdev_warn(dev->net,
- 			    "Failed to read(0x%x) reg index 0x%04x: %d\n",
- 			    cmd, index, ret);
-+	}
- 
- 	return ret;
- }
-@@ -46,10 +49,13 @@ static int aqc111_read_cmd(struct usbnet *dev, u8 cmd, u16 value,
- 	ret = usbnet_read_cmd(dev, cmd, USB_DIR_IN | USB_TYPE_VENDOR |
- 			      USB_RECIP_DEVICE, value, index, data, size);
- 
--	if (unlikely(ret < 0))
-+	if (unlikely(ret < size)) {
-+		ret = ret < 0 ? ret : -ENODATA;
-+
- 		netdev_warn(dev->net,
- 			    "Failed to read(0x%x) reg index 0x%04x: %d\n",
- 			    cmd, index, ret);
-+	}
- 
- 	return ret;
- }
 
