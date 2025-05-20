@@ -1,112 +1,119 @@
-Return-Path: <netdev+bounces-191970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B0CEABE0D4
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 18:35:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CC8FABE0ED
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 18:43:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B24661BA5C25
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:34:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4181C1BA6836
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:44:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D4B31C5F10;
-	Tue, 20 May 2025 16:34:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11DCB267F5C;
+	Tue, 20 May 2025 16:43:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FejLLnkT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kldIzCyb"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02D472750F8
-	for <netdev@vger.kernel.org>; Tue, 20 May 2025 16:34:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCC5F24A076;
+	Tue, 20 May 2025 16:43:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747758863; cv=none; b=KLlafKR50obLIFqMYakRgc3XHtQYMVyJP0SqLe7vrfmmJQ4JRTq3eAnIjFJ2z6si7Q/8AzVipdpygURNDRcx/hMIgR+w2nXgo8fQjOgkv3ZOSwDO1irqxsWEOMo9V+YTK+glvW1q2XRV3JZvyzl3RPiFAWqe429q35BrCDNmxCg=
+	t=1747759425; cv=none; b=gNYUzSxkdyQoqk5/39cq4edK6wUMINO/O6D2gwycaotK4m4mNeQqe3CTdAeMKXZz9Zze3Eg06C+nq43cgngLL13mRM+o+A9MUcgZaVYogWNxlL2cCuj5+NUDW2QT1uOpKCNxifx9xQR0kbMrlPYEU2monqdFA82FCjk6TenE81w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747758863; c=relaxed/simple;
-	bh=kcNk7MBO5q7xGKOh5IEK9yhJsUZMeD3VDy5eD2t4KUU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UNQps9isyWD9vFDUCbU4QNouh7l7YSTVUMk2+Obkd1vnREE64Evt2eEAG6XFnJzzORpgkas9Iv1QQPdlPilx/86iZIPpfgaZsn3EpHqnM6pAXQRXlC3yO/e9v+qK9BU+jGVeNMq9IeIElaVbIhB+IwANRnlf9yiEiOxQ9K/s0ms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FejLLnkT; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 51A3C43288;
-	Tue, 20 May 2025 16:34:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1747758858;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=W3fNTYLC6c1oFNfyxnG5Eu5y1LoT4/wA09vkRV/0dEM=;
-	b=FejLLnkT6xgA3QeehEFmcfzk0U8jDnpoJqN9N6PjU8s5+lYOy6Kvg8F/bNj2GTfkO8JMLt
-	fj6VzdPy9vp8h4f7VFFNo7UKw6Z7hxp1KoCBKmzbdevmC2TbEpoiGYUJ3VqDf4mEp61se5
-	kOZRfhDAPoJHOHDWirTsSNLLkagPCNYBYCVfLXRatZc/rHAWPG9PRKV8LULpZuqBpkYfhm
-	xjGUbaAZ5dmlEwZIo6KiDtCny+GMiK4PJiGGZ1IOFnIoDn8VREY2K+YqSeFesiMCiu1VbT
-	Rjp2bfZuTOfmjpmTbpYcZdyqjFFKC1VGCB7Iry/DKJwHXhfUvjHfoF44Vy0NAA==
-Date: Tue, 20 May 2025 18:34:16 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- donald.hunter@gmail.com, jacob.e.keller@intel.com, sdf@fomichev.me,
- jstancek@redhat.com
-Subject: Re: [PATCH net-next v2 10/12] tools: ynl: enable codegen for TC
-Message-ID: <20250520183416.5b720968@kmaincent-XPS-13-7390>
-In-Reply-To: <20250520161916.413298-11-kuba@kernel.org>
-References: <20250520161916.413298-1-kuba@kernel.org>
-	<20250520161916.413298-11-kuba@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1747759425; c=relaxed/simple;
+	bh=dhITEbXnPvgxwrrtbQCh7Ba4RjLia7RhjOjlcd3lwfg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=toe/W5ZV1KekLUAFm0cU75kYj42h0T9GYJarpGNmK/+NRqT6SbjqBbzv2mmSL8qUcm6nz6BRKDDu0A+FH7RRXeDJjhept7YJ/to7MvICcbeNo6vQwxsvNtHZup0dKKKE+68UQdiGQ1uS6bayWxQezL978Z23VMgkc2FsR+kzXyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kldIzCyb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAB30C4CEE9;
+	Tue, 20 May 2025 16:43:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747759424;
+	bh=dhITEbXnPvgxwrrtbQCh7Ba4RjLia7RhjOjlcd3lwfg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kldIzCyb7uZjDGXJ8CfzKS0eVN6dKSfUk96ciPwwjqXIlRzMaXDTNByI8x6o7wPTt
+	 b8S+wWB3uanSHVfjOOYB1hdCJu6OMf1TjqW7CPfiuBQXb+tus2P3BNxDrSreZXMduG
+	 2/zZ5yInQ60GsbZK1DxtHahgsG41IiVX9frINxDi1o1I4aOu1Xy+wpOFE36Qm8aUhB
+	 eCghZkKmEno+rTs3YdsWNA/qm43ZA+UFG54o9BX4K7Wsc/vSxHfybmNTzB7Bx62Vza
+	 /PUrZiMwOEL5W0cGQJDki4R5tIUjiNgppTF9ud6Mjt++FPLeSILsoYQRbMLv62azjC
+	 ULbcajpCd0FEw==
+Date: Tue, 20 May 2025 17:43:39 +0100
+From: Simon Horman <horms@kernel.org>
+To: Hariprasad Kelam <hkelam@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Naveen Mamindlapalli <naveenm@marvell.com>
+Subject: Re: [net] octeontx2-pf: QOS: Fix HTB queue deletion on reboot
+Message-ID: <20250520164339.GC365796@horms.kernel.org>
+References: <20250520073523.1095939-1-hkelam@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: 0
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddtgdejtdculddtuddrgeefvddrtddtmdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhephfduveekuedtvdeiffduleetvdegteetveetvdelteehhfeuhfegvdeuuedtleegnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghdpsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduvddprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepp
- hgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepughonhgrlhgurdhhuhhnthgvrhesghhmrghilhdrtghomh
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250520073523.1095939-1-hkelam@marvell.com>
 
-On Tue, 20 May 2025 09:19:14 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
-
-> We are ready to support most of TC. Enable C code gen.
->=20
-> Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+On Tue, May 20, 2025 at 01:05:23PM +0530, Hariprasad Kelam wrote:
+> During a system reboot, the interface receives TC_HTB_LEAF_DEL
+> and TC_HTB_LEAF_DEL_LAST callbacks to delete its HTB queues.
+> In the case of TC_HTB_LEAF_DEL_LAST, although the same send queue
+> is reassigned to the parent, the current logic still attempts to update
+> the real number of queues, leadning to below warnings
+> 
+>         New queues can't be registered after device unregistration.
+>         WARNING: CPU: 0 PID: 6475 at net/core/net-sysfs.c:1714
+>         netdev_queue_update_kobjects+0x1e4/0x200
+> 
+> Fixes: 5e6808b4c68d ("octeontx2-pf: Add support for HTB offload")
+> Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
 > ---
-> v2:
->  - add more headers to the local includes to build on Ubuntu 22.04
-> v1: https://lore.kernel.org/20250517001318.285800-10-kuba@kernel.org
-> ---
+>  drivers/net/ethernet/marvell/octeontx2/nic/qos.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/qos.c b/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
+> index 35acc07bd964..5765bac119f0 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
+> @@ -1638,6 +1638,7 @@ static int otx2_qos_leaf_del_last(struct otx2_nic *pfvf, u16 classid, bool force
+>  	if (!node->is_static)
+>  		dwrr_del_node = true;
+>  
+> +	WRITE_ONCE(node->qid, OTX2_QOS_QID_INNER);
 
-Now got this build error:
+Hi Hariprasad,
 
--e 	GEN tc-user.c
--e 	GEN tc-user.h
--e 	GEN_RST tc.rst
--e 	CC tc-user.o
-In file included from <command-line>:
-./../../../../include/uapi//linux/pkt_cls.h:250:9: error: expected specifie=
-r-qualifier-list before =E2=80=98__struct_group=E2=80=99
-  250 |         __struct_group(tc_u32_sel_hdr, hdr, /* no attrs */,
-      |         ^~~~~~~~~~~~~~
-tc-user.c: In function =E2=80=98tc_u32_attrs_parse=E2=80=99:
-tc-user.c:9086:33: warning: comparison is always false due to limited range=
- of data type [-Wtype-limits]
- 9086 |                         if (len < sizeof(struct tc_u32_sel))
-      |                                 ^
-make[1]: *** [Makefile:52: tc-user.o] Error 1
+Perhaps a comment is warranted regarding the line above.
+It would probably be more valuable than the one on the line below.
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+>  	/* destroy the leaf node */
+>  	otx2_qos_disable_sq(pfvf, qid);
+>  	otx2_qos_destroy_node(pfvf, node);
+> @@ -1682,9 +1683,6 @@ static int otx2_qos_leaf_del_last(struct otx2_nic *pfvf, u16 classid, bool force
+>  	}
+>  	kfree(new_cfg);
+>  
+> -	/* update tx_real_queues */
+> -	otx2_qos_update_tx_netdev_queues(pfvf);
+> -
+>  	return 0;
+>  }
+>  
+> -- 
+> 2.34.1
+> 
+> 
 
