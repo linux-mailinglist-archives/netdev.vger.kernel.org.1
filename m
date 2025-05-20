@@ -1,131 +1,83 @@
-Return-Path: <netdev+bounces-191899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-191900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E9B4ABDD0B
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:32:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7896AABDD46
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 16:36:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 043FA7AB8AD
-	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 14:26:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 185738E1407
+	for <lists+netdev@lfdr.de>; Tue, 20 May 2025 14:30:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85FE9242D92;
-	Tue, 20 May 2025 14:25:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10369246765;
+	Tue, 20 May 2025 14:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jNZ+pBif"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="b1+f6y/q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F3ED24290D
-	for <netdev@vger.kernel.org>; Tue, 20 May 2025 14:25:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC5B0EEDE;
+	Tue, 20 May 2025 14:30:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747751149; cv=none; b=pWL2fE6AsOEKP2JnyWePnJy+iwICa7ynb3dgcx1x5aSFmvUrHPqKp6Pu36iS93dFotnGN/2fFFVYx/nRv48BxL75h1ygFXUGu6FGlSxzEjaOjL6X5IQfmOyX4wTZJ+j8AAFK/X33+SbaUGHDMWRud7T8/gDrqTkPi7GTW/7vZts=
+	t=1747751428; cv=none; b=jrXnSUNzMZysOWxzmJe7zqu1KFJ+R9DFyHLJsOJbpswxtT1zoxKgLNBfczvfoKZxaf3izbuBYfyUxrkUXsTSsGjg6bWO55iI7c2HA2uI0NI8jDkIgqGHgMkVa8wXF2uesQw6y50qtLjcL//fsdK+zZGoKIQbTfUPga08kDBM+SY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747751149; c=relaxed/simple;
-	bh=lS9OWDi//f3vB7k3nDFQZ+474U5QwuKXEWwgoExcFA0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=nbt55SCQAMFDUIl6v/4uF57rppIOC15Nwi+ef2n5LYTU5jjnx5UQWByP7bq1M0sg/J2xGCHBH4EooAQfgs72pv8ACy6jUpMiTxgij80W5eyxahm/jHwlfWaFe20eFA3BHa97JkSY/rem2+jBySj0c5dRdR92LKh4YaRDJ8D0sZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jNZ+pBif; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A47E4C4CEE9;
-	Tue, 20 May 2025 14:25:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747751148;
-	bh=lS9OWDi//f3vB7k3nDFQZ+474U5QwuKXEWwgoExcFA0=;
-	h=From:Date:Subject:To:Cc:From;
-	b=jNZ+pBifyT6QoV9RtWzM1qFe74jhN43YAvbTldmOnMyGK9iwHVvNo1EDzgSoaaGRl
-	 coijngQGgY2Uu7lW1jPdm6Z8jLuC0W+Zphh8o/A0pkYy2rcHI6ioIOupwBB4c3Fdd8
-	 c2uef9ojE3aUqo9GD2umS9oh+whSCGF+OSwJd+uVMv3pHhTeYWiVmrkvAU3H9ZtmmZ
-	 3v90GOoDtDN9Ah1k3GcJhHMhQdmT5op/9ii4o44x3G7L8ZjPlxaWrEcSqgKvVUCur6
-	 xMJGrcbyVB6M9RhwRIr08f03+/QdQXlZC9HOIB/etrLBkKS8zdSN5NpYqglEHduFEm
-	 LsGuLPocVbirw==
-From: Simon Horman <horms@kernel.org>
-Date: Tue, 20 May 2025 15:25:41 +0100
-Subject: [PATCH net-next] net: dlink: Correct endian treatment of t_SROM
- data
+	s=arc-20240116; t=1747751428; c=relaxed/simple;
+	bh=muApyINzTB9u4a/fQgtoIyPRGqFRWXQQmhe1H/OsntU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=vFscY+q7Ny1cqnvRPY7gr3DnoIz86j9Y4gIg6ySqdWff4Hw3akHIeod+YIclMQ1+GNiqz2TV99BmTKcpnLOgXHPuh44IXndVSNjNr+9VtVEpdmqU7q6vVzwY1+Dhlc2ug7+l/H5q8fp+ubegzr40TgXCaY9SZlA1WYz6F46PPo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=b1+f6y/q; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=60oYgzAqshuD6yLOKdWI/2Zup0hrKz6aeKRaimHYHAU=; b=b1+f6y/qH2058NF2o/xrWpwO2L
+	8MoTZG0nKc3MTgGQfRLBEdPRafkGWEK3ijxCQ9bcpbumoeiNLv86XQr9TWXw/ZqLfeeD6OQBg83P1
+	CaOiweBnQ5dCVPAv5On3ryybfKlhWBMlvWfjvQ0OfkUjmAvZBizf7FXaqJj3BJ71oYsM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uHNz0-00D8Jc-Gt; Tue, 20 May 2025 16:30:18 +0200
+Date: Tue, 20 May 2025 16:30:18 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jacky Chou <jacky_chou@aspeedtech.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-aspeed@lists.ozlabs.org,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, joel@jms.id.au,
+	andrew@codeconstruct.com.au, mturquette@baylibre.com,
+	sboyd@kernel.org, p.zabel@pengutronix.de, BMC-SW@aspeedtech.com
+Subject: Re: [net 0/4] net: ftgmac100: Add SoC reset support for RMII mode
+Message-ID: <cfb44996-ad63-43cd-bbc5-07f70939d019@lunn.ch>
+References: <20250520092848.531070-1-jacky_chou@aspeedtech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250520-dlink-endian-v1-1-63e420c7b935@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAOSQLGgC/x3MQQqDMBBG4avIrB2IsRHxKsWFmn/aQZmWREQQ7
- 97Q5bd476KMpMg0VBclHJr1YwVNXdHynuwF1lhM3vnggnccN7WVYVEn49DOAvEP6XqhknwTRM/
- /7kmGnQ3nTuN9/wBnW3nlaAAAAA==
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org
-X-Mailer: b4 0.14.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250520092848.531070-1-jacky_chou@aspeedtech.com>
 
-As it's name suggests, parse_eeprom() parses EEPROM data.
+On Tue, May 20, 2025 at 05:28:44PM +0800, Jacky Chou wrote:
+> This patch series adds support for an optional reset line to the
+> ftgmac100 ethernet controller, as used on Aspeed SoCs. On these SoCs,
+> the internal MAC reset is not sufficient to reset the RMII interface.
+> By providing a SoC-level reset via the device tree "resets" property,
+> the driver can properly reset both the MAC and RMII logic, ensuring
+> correct operation in RMII mode.
 
-This is done by reading data, 16 bits at a time as follows:
+What tree is this for? You have net in the subject, but no Fixes:
+tags?
 
-  for (i = 0; i < 128; i++)
-    ((__le16 *) sromdata)[i] = cpu_to_le16(read_eeprom(np, i));
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
 
-sromdata is at the same memory location as psrom.
-And the type of psrom is a pointer to struct t_SROM.
-
-As can be seen in the loop above, data is stored in sromdata, and thus
-psrom, as 16-bit little-endian values. However, the integer fields of
-t_SROM are host byte order.
-
-In the case of the led_mode field this results in a but which has been
-addressed by commit e7e5ae71831c ("net: dlink: Correct endianness
-handling of led_mode").
-
-In the case of the remaining fields, which are updated by this patch,
-I do not believe this does not result in any bugs. But it does seem
-best to correctly annotate the endianness of integers.
-
-Flagged by Sparse as:
-
-  .../dl2k.c:344:35: warning: restricted __le32 degrades to integer
-
-Compile tested only.
-No run-time change intended.
-
-Signed-off-by: Simon Horman <horms@kernel.org>
----
- drivers/net/ethernet/dlink/dl2k.h | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/net/ethernet/dlink/dl2k.h b/drivers/net/ethernet/dlink/dl2k.h
-index 56aff2f0bdbf..ba679025e866 100644
---- a/drivers/net/ethernet/dlink/dl2k.h
-+++ b/drivers/net/ethernet/dlink/dl2k.h
-@@ -329,18 +329,18 @@ enum _pcs_anlpar {
- };
- 
- typedef struct t_SROM {
--	u16 config_param;	/* 0x00 */
--	u16 asic_ctrl;		/* 0x02 */
--	u16 sub_vendor_id;	/* 0x04 */
--	u16 sub_system_id;	/* 0x06 */
--	u16 pci_base_1;		/* 0x08 (IP1000A only) */
--	u16 pci_base_2;		/* 0x0a (IP1000A only) */
-+	__le16 config_param;	/* 0x00 */
-+	__le16 asic_ctrl;	/* 0x02 */
-+	__le16 sub_vendor_id;	/* 0x04 */
-+	__le16 sub_system_id;	/* 0x06 */
-+	__le16 pci_base_1;	/* 0x08 (IP1000A only) */
-+	__le16 pci_base_2;	/* 0x0a (IP1000A only) */
- 	__le16 led_mode;	/* 0x0c (IP1000A only) */
--	u16 reserved1[9];	/* 0x0e-0x1f */
-+	__le16 reserved1[9];	/* 0x0e-0x1f */
- 	u8 mac_addr[6];		/* 0x20-0x25 */
- 	u8 reserved2[10];	/* 0x26-0x2f */
- 	u8 sib[204];		/* 0x30-0xfb */
--	u32 crc;		/* 0xfc-0xff */
-+	__le32 crc;		/* 0xfc-0xff */
- } SROM_t, *PSROM_t;
- 
- /* Ioctl custom data */
-
+	Andrew
 
